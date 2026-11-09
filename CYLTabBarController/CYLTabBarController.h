@@ -2773,13 +2773,98 @@ FOUNDATION_EXTERN NSNotificationName const CYLTabBarItemAnimationViewDidAddNotif
 FOUNDATION_EXTERN NSString *const CYLTabBarItemWidthDidChangeNotification;
 
 /*!
- * [EN] Posted when a tab's title changes in place (`-updateTabBarItemsWithAttributes:`, `-updateTabBarItemAtIndex:…`, and
- *      the APIs built on them). The object is the tab's page (the root view controller of its navigation controller);
- *      `userInfo[CYLTabBarItemTitle]` is the new title.
- * [CN] Tab 标题原地变化时发送（`-updateTabBarItemsWithAttributes:`、`-updateTabBarItemAtIndex:…` 以及基于它们的接口）。object 为该 Tab 的
- *      页面（导航控制器的根控制器）；`userInfo[CYLTabBarItemTitle]` 为新标题。
+ * [EN] userInfo of the tab notifications below (`CYLTabBarItemTitleDidChangeNotification`, `CYLTabBarItemIconDidChangeNotification`,
+ *      `CYLTabBarItemDidChangeNotification`). The object of each is the tab's page (the root view controller of its
+ *      navigation controller); userInfo names exactly what changed:
+ *      - `CYLTabBarControllerKey`: the tab bar controller.
+ *      - `CYLTabBarItemIdentifier`: the tab's identifier (from its attributes), the exact way to find it; absent when it has none.
+ *      - `CYLTabBarItemIndexKey`: the tab's index in `viewControllers` (NSNumber).
+ *      - `CYLTabBarItemViewControllerKey`: the tab's entry in `viewControllers` (e.g. its navigation controller).
+ *      - `CYLTabBarItemKey`: the tab's item (`UITabBarItem`; `CYLFlatDesignTabBarItem` on FlatDesign).
+ *      - `CYLTabBarItemChangedAttributesKey`: the changed attributes, keys and new values (when the change came from attributes).
+ * [CN] 下列 Tab 通知（`CYLTabBarItemTitleDidChangeNotification`、`CYLTabBarItemIconDidChangeNotification`、`CYLTabBarItemDidChangeNotification`）的
+ *      userInfo。object 均为该 Tab 的页面（导航控制器的根控制器）；userInfo 精确指出变化的对象：
+ *      - `CYLTabBarControllerKey`：TabBar 控制器。
+ *      - `CYLTabBarItemIdentifier`：Tab 的 ID（来自其 attributes），精确定位 Tab 的方式；没有 ID 时不存在。
+ *      - `CYLTabBarItemIndexKey`：Tab 在 `viewControllers` 中的下标（NSNumber）。
+ *      - `CYLTabBarItemViewControllerKey`：Tab 在 `viewControllers` 中的控制器（例如其导航控制器）。
+ *      - `CYLTabBarItemKey`：Tab 的 item（`UITabBarItem`；扁平样式为 `CYLFlatDesignTabBarItem`）。
+ *      - `CYLTabBarItemChangedAttributesKey`：变化的 attributes，key 与新值（变化来自 attributes 时）。
+ */
+FOUNDATION_EXTERN NSString *const CYLTabBarControllerKey;
+FOUNDATION_EXTERN NSString *const CYLTabBarItemViewControllerKey;
+FOUNDATION_EXTERN NSString *const CYLTabBarItemKey;
+
+/*!
+ * [EN] Posted when a tab's title or selected title changes in place (`-updateTabBarItemsWithAttributes:`,
+ *      `-updateTabBarItemAtIndex:…`, skins and the APIs built on them). userInfo: the keys above, plus
+ *      `CYLTabBarItemTitle` (the new title), `CYLTabBarItemSelectedTitle` (when the tab has one) and
+ *      `CYLTabBarItemOldTitleKey` (the title before, when there was one).
+ * [CN] Tab 标题或选中标题原地变化时发送（`-updateTabBarItemsWithAttributes:`、`-updateTabBarItemAtIndex:…`、换肤以及基于它们的接口）。
+ *      userInfo：上述 key，以及 `CYLTabBarItemTitle`（新标题）、`CYLTabBarItemSelectedTitle`（有选中标题时）、
+ *      `CYLTabBarItemOldTitleKey`（之前的标题，有时）。
  */
 FOUNDATION_EXTERN NSNotificationName const CYLTabBarItemTitleDidChangeNotification;
+/// [EN] userInfo key of the title notification: the title before the change. [CN] 标题通知的 userInfo key：变化前的标题。
+FOUNDATION_EXTERN NSString *const CYLTabBarItemOldTitleKey;
+
+/*!
+ * [EN] Posted after any in-place change of a tab (`-updateTabBarItemAtIndex:attributes:`, `-updateTabBarItemsWithAttributes:`,
+ *      skins): title, selected title, images, colors, fonts, animations, image URLs. The object is the tab's page (the root
+ *      view controller of its navigation controller). `userInfo[CYLTabBarItemChangedAttributesKey]` holds the changed
+ *      attributes (their keys and new values), `userInfo[CYLTabBarItemIndexKey]` the tab's index in `viewControllers`.
+ *      A title change posts `CYLTabBarItemTitleDidChangeNotification` too.
+ * [CN] Tab 任意原地变化后发送（`-updateTabBarItemAtIndex:attributes:`、`-updateTabBarItemsWithAttributes:`、换肤）：标题、选中标题、图片、
+ *      颜色、字体、动画、图片 URL。object 为该 Tab 的页面（导航控制器的根控制器）。`userInfo[CYLTabBarItemChangedAttributesKey]` 为变化的
+ *      attributes（key 与新值），`userInfo[CYLTabBarItemIndexKey]` 为该 Tab 在 `viewControllers` 中的下标。标题变化时也会发送
+ *      `CYLTabBarItemTitleDidChangeNotification`。
+ */
+FOUNDATION_EXTERN NSNotificationName const CYLTabBarItemDidChangeNotification;
+/// [EN] userInfo key: the changed attributes (NSDictionary). [CN] userInfo key：变化的 attributes（NSDictionary）。
+FOUNDATION_EXTERN NSString *const CYLTabBarItemChangedAttributesKey;
+/// [EN] userInfo key: the tab's index in `viewControllers` (NSNumber). [CN] userInfo key：Tab 在 `viewControllers` 中的下标（NSNumber）。
+FOUNDATION_EXTERN NSString *const CYLTabBarItemIndexKey;
+
+/*!
+ * [EN] Posted when a tab's icon changes in place: image keys (`CYLTabBarItemImage`, `CYLTabBarItemSelectedImage`, their dark
+ *      variants, `CYLTabBarItemImageURL`…) through `-updateTabBarItemAtIndex:attributes:`, and a view shown in place of the
+ *      icon (`-setTabBarItemIcon:selectedIcon:size:atIndex:`, `-setTabBarItemIconWithURL:…` once loaded, skins, restoring).
+ *      userInfo: the keys above (`CYLTabBarItemChangedAttributesKey`: the changed image keys), plus
+ *      `CYLTabBarItemIconViewProviderKey` for a view in place of the icon (absent when the tab's own icon comes back).
+ *      Images loaded from `CYLTabBarItemImageURL` arrive later.
+ * [CN] Tab 图标原地变化时发送：通过 `-updateTabBarItemAtIndex:attributes:` 修改图片 key（`CYLTabBarItemImage`、`CYLTabBarItemSelectedImage`、
+ *      对应的深色图片、`CYLTabBarItemImageURL`…），以及替换图标显示的视图（`-setTabBarItemIcon:selectedIcon:size:atIndex:`、加载完成的
+ *      `-setTabBarItemIconWithURL:…`、换肤、恢复）。userInfo：上述 key（`CYLTabBarItemChangedAttributesKey` 为变化的图片 key），以及替换图标的
+ *      视图的 `CYLTabBarItemIconViewProviderKey`（恢复 Tab 自己的图标时不存在）。从 `CYLTabBarItemImageURL` 加载的图片稍后才到。
+ */
+FOUNDATION_EXTERN NSNotificationName const CYLTabBarItemIconDidChangeNotification;
+/// [EN] userInfo key of the icon notification: the `CYLTabBarItemIconViewProvider` now shown in place of the icon. [CN] 图标通知的 userInfo key：当前替换图标显示的 `CYLTabBarItemIconViewProvider`。
+FOUNDATION_EXTERN NSString *const CYLTabBarItemIconViewProviderKey;
+
+/*!
+ * [EN] Posted by a tab bar controller after it applied a skin (`CYLThemeManager`, a `CYLTabBarTheme` or none to restore):
+ *      the tabs, the plus button and the appearance are already updated; network or animated icons may still be loading.
+ *      The object is the tab bar controller; `userInfo[CYLTabBarThemeKey]` is the theme (absent when restoring), and
+ *      `userInfo[CYLTabBarItemIndexesKey]` / `userInfo[CYLTabBarItemIdentifiersKey]` the tabs it changed (all of them by default).
+ *      `CYLThemeDidChangeNotification` comes from the manager, before the tab bar applies the skin.
+ * [CN] TabBar 控制器应用皮肤后发送（`CYLThemeManager`、`CYLTabBarTheme`，或无主题以恢复）：Tab、PlusButton 与外观都已更新；网络图标或
+ *      动画图标可能仍在加载。object 为 TabBar 控制器；`userInfo[CYLTabBarThemeKey]` 为主题（恢复时不存在），
+ *      `userInfo[CYLTabBarItemIndexesKey]` / `userInfo[CYLTabBarItemIdentifiersKey]` 为修改的 Tab（默认全部）。`CYLThemeDidChangeNotification`
+ *      由管理器发送，早于 TabBar 应用皮肤。
+ */
+FOUNDATION_EXTERN NSNotificationName const CYLTabBarControllerThemeDidApplyNotification;
+/// [EN] userInfo key: the applied theme. [CN] userInfo key：应用的主题。
+FOUNDATION_EXTERN NSString *const CYLTabBarThemeKey;
+/// [EN] userInfo key of `CYLTabBarControllerThemeDidApplyNotification`: the indexes (in `viewControllers`) of the tabs a skin
+///      changed (NSIndexSet); by default every tab, the plus button's tab excepted.
+/// [CN] `CYLTabBarControllerThemeDidApplyNotification` 的 userInfo key：皮肤修改的 Tab 下标（`viewControllers` 中，NSIndexSet）；默认为全部 Tab，
+///      PlusButton 的 Tab 除外。
+FOUNDATION_EXTERN NSString *const CYLTabBarItemIndexesKey;
+/// [EN] userInfo key of `CYLTabBarControllerThemeDidApplyNotification`: the identifiers (`CYLTabBarItemIdentifier`) of the
+///      tabs it changed, in tab order (NSArray<NSString *>); tabs without an identifier are left out.
+/// [CN] `CYLTabBarControllerThemeDidApplyNotification` 的 userInfo key：修改的 Tab 的 ID（`CYLTabBarItemIdentifier`），按 Tab 顺序
+///      （NSArray<NSString *>）；没有 ID 的 Tab 不在其中。
+FOUNDATION_EXTERN NSString *const CYLTabBarItemIdentifiersKey;
 
 /*!
  * [EN] The tab title of a page, for its navigation bar. A page's `title` sets both its tab and its navigation bar, and a

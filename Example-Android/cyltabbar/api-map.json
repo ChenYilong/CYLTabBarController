@@ -2250,6 +2250,58 @@
   "status": "planned",
   "note": "Android pages have no navigation bar title of their own yet"
  },
+ "CYLTabBarItemDidChangeNotification": {
+  "status": "planned",
+  "note": "tab change notifications: Android listeners planned"
+ },
+ "CYLTabBarItemChangedAttributesKey": {
+  "status": "planned",
+  "note": "tab change notifications: Android listeners planned"
+ },
+ "CYLTabBarItemIndexKey": {
+  "status": "planned",
+  "note": "tab change notifications: Android listeners planned"
+ },
+ "CYLTabBarItemIconDidChangeNotification": {
+  "status": "planned",
+  "note": "tab change notifications: Android listeners planned"
+ },
+ "CYLTabBarItemIconViewProviderKey": {
+  "status": "planned",
+  "note": "tab change notifications: Android listeners planned"
+ },
+ "CYLTabBarControllerThemeDidApplyNotification": {
+  "status": "planned",
+  "note": "tab change notifications: Android listeners planned"
+ },
+ "CYLTabBarThemeKey": {
+  "status": "planned",
+  "note": "tab change notifications: Android listeners planned"
+ },
+ "CYLTabBarItemIndexesKey": {
+  "status": "planned",
+  "note": "tab change notifications: Android listeners planned"
+ },
+ "CYLTabBarItemIdentifiersKey": {
+  "status": "planned",
+  "note": "tab change notifications: Android listeners planned"
+ },
+ "CYLTabBarControllerKey": {
+  "status": "planned",
+  "note": "tab change notifications: Android listeners planned"
+ },
+ "CYLTabBarItemViewControllerKey": {
+  "status": "planned",
+  "note": "tab change notifications: Android listeners planned"
+ },
+ "CYLTabBarItemKey": {
+  "status": "planned",
+  "note": "tab change notifications: Android listeners planned"
+ },
+ "CYLTabBarItemOldTitleKey": {
+  "status": "planned",
+  "note": "tab change notifications: Android listeners planned"
+ },
  "UIViewController(CYLTabBarItemTitle) cyl_tabBarItemTitle": {
   "status": "planned"
  },

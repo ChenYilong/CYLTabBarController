@@ -133,25 +133,44 @@
     UINavigationController *homeNavigation = [[UINavigationController alloc] initWithRootViewController:home];
     UINavigationController *meNavigation = [[UINavigationController alloc] initWithRootViewController:me];
     CYLTabBarController *tabBarController = [[CYLTabBarController alloc] initWithViewControllers:@[ homeNavigation, meNavigation ]
-                                                                           tabBarItemsAttributes:@[ @{ CYLTabBarItemTitle : @"Home" }, @{ CYLTabBarItemTitle : @"Me" } ]];
+                                                                           tabBarItemsAttributes:@[ @{ CYLTabBarItemTitle : @"Home", CYLTabBarItemIdentifier : @"home" },
+                                                                                                    @{ CYLTabBarItemTitle : @"Me", CYLTabBarItemIdentifier : @"me" } ]];
     XCTAssertEqualObjects(home.navigationItem.title, @"Home", @"set when the tab is set up");
     XCTAssertEqualObjects(CYL_TAB_BAR_ITEM_TITLE(home), @"Home");
     XCTAssertEqualObjects(CYL_TAB_BAR_ITEM_TITLE(me), @"Me");
-    __block NSString *notifiedTitle = nil;
-    __block id notifiedPage = nil;
-    id observer = [[NSNotificationCenter defaultCenter] addObserverForName:CYLTabBarItemTitleDidChangeNotification object:nil queue:nil usingBlock:^(NSNotification *note) {
-        if (note.object == home) {
-            notifiedPage = note.object;
-            notifiedTitle = note.userInfo[CYLTabBarItemTitle];
-        }
+    __block NSNotification *titleNote = nil;
+    id observer = [[NSNotificationCenter defaultCenter] addObserverForName:CYLTabBarItemTitleDidChangeNotification object:home queue:nil usingBlock:^(NSNotification *note) {
+        titleNote = note;
     }];
     [tabBarController updateTabBarItemsWithAttributes:@[ @{ CYLTabBarItemTitle : @"★ Home" }, @{ CYLTabBarItemTitle : @"★ Me" } ]];
     [[NSNotificationCenter defaultCenter] removeObserver:observer];
     XCTAssertEqualObjects(home.navigationItem.title, @"★ Home", @"follows the in-place update");
     XCTAssertEqualObjects(CYL_TAB_BAR_ITEM_TITLE(home), @"★ Home");
-    XCTAssertEqual(notifiedPage, home);
-    XCTAssertEqualObjects(notifiedTitle, @"★ Home");
+    // [EN] The notification names exactly what changed. [CN] 通知精确指出变化的对象。
+    XCTAssertEqual(titleNote.object, home);
+    XCTAssertEqualObjects(titleNote.userInfo[CYLTabBarItemTitle], @"★ Home");
+    XCTAssertEqualObjects(titleNote.userInfo[CYLTabBarItemOldTitleKey], @"Home");
+    XCTAssertEqualObjects(titleNote.userInfo[CYLTabBarItemIdentifier], @"home");
+    XCTAssertEqualObjects(titleNote.userInfo[CYLTabBarItemIndexKey], @0);
+    XCTAssertEqual(titleNote.userInfo[CYLTabBarControllerKey], tabBarController);
+    XCTAssertEqual(titleNote.userInfo[CYLTabBarItemViewControllerKey], homeNavigation);
+    XCTAssertEqual(titleNote.userInfo[CYLTabBarItemKey], homeNavigation.tabBarItem);
     XCTAssertEqualObjects(me.navigationItem.title, @"Mine", @"a page that does not follow keeps its own title");
+
+    // [EN] An image key posts the icon notification with that key; a title alone does not. [CN] 图片 key 发送带该 key 的图标通知；仅标题不发送。
+    NSMutableArray<NSNotification *> *iconNotes = [NSMutableArray array];
+    id iconObserver = [[NSNotificationCenter defaultCenter] addObserverForName:CYLTabBarItemIconDidChangeNotification object:me queue:nil usingBlock:^(NSNotification *note) {
+        [iconNotes addObject:note];
+    }];
+    [tabBarController updateTabBarItemAtIndex:1 attributes:@{ CYLTabBarItemTitle : @"Me again" }];
+    XCTAssertEqual(iconNotes.count, 0u);
+    UIImage *image = [UIImage systemImageNamed:@"star"];
+    [tabBarController updateTabBarItemAtIndex:1 attributes:@{ CYLTabBarItemImage : image }];
+    [[NSNotificationCenter defaultCenter] removeObserver:iconObserver];
+    XCTAssertEqual(iconNotes.count, 1u);
+    XCTAssertEqualObjects(iconNotes.firstObject.userInfo[CYLTabBarItemIndexKey], @1);
+    XCTAssertEqualObjects(iconNotes.firstObject.userInfo[CYLTabBarItemIdentifier], @"me");
+    XCTAssertEqual(iconNotes.firstObject.userInfo[CYLTabBarItemChangedAttributesKey][CYLTabBarItemImage], image);
 }
 
 - (void)testPerformanceExample {

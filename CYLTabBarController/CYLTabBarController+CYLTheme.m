@@ -256,6 +256,27 @@ static BOOL CYLThemeSameValue(id _Nullable value, id _Nullable otherValue) {
     if (CYLTabBarStyleTypeFlatDesign != self.tabBarStyleType && [CYLConstants isLiquidGlassActive] && self.isViewLoaded) {
         [self.view setNeedsLayout];
     }
+    // [EN] The skin is applied: tabs (and the navigation titles that follow them), plus button, appearance.
+    // [CN] 皮肤已应用：Tab（以及跟随它们的导航栏标题）、PlusButton、外观。
+    // [EN] Every tab by default (the plus button's tab and placeholders excepted). [CN] 默认为全部 Tab（PlusButton 的 Tab 与占位除外）。
+    NSMutableIndexSet *indexes = [NSMutableIndexSet indexSet];
+    NSMutableArray<NSString *> *identifiers = [NSMutableArray array];
+    [self.viewControllers enumerateObjectsUsingBlock:^(UIViewController *viewController, NSUInteger index, BOOL *stop) {
+        if (![self cyl_isPlusSlotViewController:viewController] && !viewController.cyl_isPlaceholder) {
+            [indexes addIndex:index];
+            NSString *identifier = viewController.cyl_tabBarItemIdentifier ?: viewController.cyl_getViewControllerInsteadOfNavigationController.cyl_tabBarItemIdentifier;
+            if (identifier.length > 0) {
+                [identifiers addObject:identifier];
+            }
+        }
+    }];
+    NSMutableDictionary *userInfo = [NSMutableDictionary dictionaryWithObject:[indexes copy] forKey:CYLTabBarItemIndexesKey];
+    userInfo[CYLTabBarItemIdentifiersKey] = [identifiers copy];
+    if (theme) {
+        userInfo[CYLTabBarThemeKey] = theme;
+    }
+    [[NSNotificationCenter defaultCenter] postNotificationName:CYLTabBarControllerThemeDidApplyNotification object:self
+                                                      userInfo:[userInfo copy]];
 }
 
 /// [EN] YES while no other theme was applied after the one counted `generation`. [CN] 计数为 `generation` 的主题之后没有应用其他主题时为 YES。

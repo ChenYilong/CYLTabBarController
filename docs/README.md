@@ -273,7 +273,9 @@ docs/
     ├── update-tab-bar-items-wrapped-cells-flatdesign.png
     ├── update-tab-bar-items-wrapped-cells.png
     ├── update-tab-navigation-title-changed.png
-    └── update-tab-navigation-title-restored.png
+    ├── update-tab-navigation-title-restored.png
+    ├── update-tab-navigation-title-skin.png
+    └── update-tab-network-icons-plus-button.png
 ```
 
 <!-- navigation:end -->

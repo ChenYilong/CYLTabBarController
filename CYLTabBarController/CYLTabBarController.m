@@ -222,14 +222,22 @@ static void CYLSetNeedsUpdateTabBarItemSelectedTitles(CYLTabBarController *tabBa
 }
 NSNotificationName const CYLTabBarLoginStateDidChangeNotification = @"CYLTabBarLoginStateDidChangeNotification";
 NSNotificationName const CYLTabBarItemTitleDidChangeNotification = @"CYLTabBarItemTitleDidChangeNotification";
+NSNotificationName const CYLTabBarItemDidChangeNotification = @"CYLTabBarItemDidChangeNotification";
+NSString *const CYLTabBarItemChangedAttributesKey = @"CYLTabBarItemChangedAttributesKey";
+NSString *const CYLTabBarItemIndexKey = @"CYLTabBarItemIndexKey";
+NSNotificationName const CYLTabBarItemIconDidChangeNotification = @"CYLTabBarItemIconDidChangeNotification";
+NSString *const CYLTabBarItemIndexesKey = @"CYLTabBarItemIndexesKey";
+NSString *const CYLTabBarItemIdentifiersKey = @"CYLTabBarItemIdentifiersKey";
+NSString *const CYLTabBarControllerKey = @"CYLTabBarControllerKey";
+NSString *const CYLTabBarItemViewControllerKey = @"CYLTabBarItemViewControllerKey";
+NSString *const CYLTabBarItemKey = @"CYLTabBarItemKey";
+NSString *const CYLTabBarItemOldTitleKey = @"CYLTabBarItemOldTitleKey";
+NSString *const CYLTabBarItemIconViewProviderKey = @"CYLTabBarItemIconViewProviderKey";
+NSNotificationName const CYLTabBarControllerThemeDidApplyNotification = @"CYLTabBarControllerThemeDidApplyNotification";
+NSString *const CYLTabBarThemeKey = @"CYLTabBarThemeKey";
 
 static const void *CYLNavigationTitleFollowsTabBarItemTitleKey = &CYLNavigationTitleFollowsTabBarItemTitleKey;
 
-/*!
- * [EN] A tab's title changed in place: the pages that follow it get it as their navigation bar title, and
- *      `CYLTabBarItemTitleDidChangeNotification` is posted with the page.
- * [CN] Tab 标题已原地修改：跟随它的页面把它设为导航栏标题，并发送带有该页面的 `CYLTabBarItemTitleDidChangeNotification`。
- */
 /// [EN] Sets the navigation bar title of a page that follows its tab title. [CN] 为跟随 Tab 标题的页面设置导航栏标题。
 static void CYLApplyNavigationTitleOfFollowingPage(UIViewController *viewController, NSString *_Nullable title) {
     UIViewController *page = [viewController cyl_getViewControllerInsteadOfNavigationController] ?: viewController;
@@ -238,11 +246,58 @@ static void CYLApplyNavigationTitleOfFollowingPage(UIViewController *viewControl
     }
 }
 
-static void CYLTabBarItemTitleDidChange(UIViewController *viewController, NSString *title) {
-    CYLApplyNavigationTitleOfFollowingPage(viewController, title);
+/*!
+ * [EN] Posts a tab notification. The object is the tab's page; userInfo names exactly what changed: the tab bar controller,
+ *      the tab's index, its entry in `viewControllers`, its tab bar item (`cyl_tabBarItem` on FlatDesign), plus `extra`.
+ * [CN] 发送 Tab 通知。object 为该 Tab 的页面；userInfo 精确指出变化的对象：TabBar 控制器、Tab 下标、它在 `viewControllers` 中的控制器、
+ *      它的 tabBarItem（扁平样式为 `cyl_tabBarItem`），以及 `extra`。
+ */
+static void CYLPostTabBarItemNotification(NSNotificationName name, CYLTabBarController *tabBarController, NSUInteger index,
+                                          NSDictionary *_Nullable extra) {
+    if (index >= tabBarController.viewControllers.count) {
+        return;
+    }
+    UIViewController *viewController = tabBarController.viewControllers[index];
     UIViewController *page = [viewController cyl_getViewControllerInsteadOfNavigationController] ?: viewController;
-    [[NSNotificationCenter defaultCenter] postNotificationName:CYLTabBarItemTitleDidChangeNotification object:page
-                                                      userInfo:@{ CYLTabBarItemTitle : title ?: @"" }];
+    NSMutableDictionary *userInfo = [NSMutableDictionary dictionary];
+    userInfo[CYLTabBarControllerKey] = tabBarController;
+    userInfo[CYLTabBarItemIndexKey] = @(index);
+    userInfo[CYLTabBarItemViewControllerKey] = viewController;
+    // [EN] The tab's identifier (`CYLTabBarItemIdentifier`), more exact than its index. [CN] Tab 的 ID（`CYLTabBarItemIdentifier`），比下标更精确。
+    NSString *identifier = viewController.cyl_tabBarItemIdentifier ?: page.cyl_tabBarItemIdentifier;
+    if (identifier.length > 0) {
+        userInfo[CYLTabBarItemIdentifier] = identifier;
+    }
+    id tabBarItem = viewController.tabBarItem;
+#if CYL_FLATDESIGN_AVAILABLE
+    if (CYLTabBarStyleTypeFlatDesign == tabBarController.tabBarStyleType && viewController.cyl_tabBarItem) {
+        tabBarItem = viewController.cyl_tabBarItem;
+    }
+#endif
+    if (tabBarItem) {
+        userInfo[CYLTabBarItemKey] = tabBarItem;
+    }
+    if (extra.count > 0) {
+        [userInfo addEntriesFromDictionary:extra];
+    }
+    [[NSNotificationCenter defaultCenter] postNotificationName:name object:page userInfo:[userInfo copy]];
+}
+
+/// [EN] The image keys of `attributes` (an icon change), empty when there is none. [CN] `attributes` 中的图片 key（图标变化），没有时为空。
+static NSDictionary *CYLTabBarItemIconAttributes(NSDictionary *attributes) {
+    static NSArray<NSString *> *iconKeys;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        iconKeys = @[ CYLTabBarItemImage, CYLTabBarItemSelectedImage, CYLTabBarItemDarkImage, CYLTabBarItemSelectedDarkImage,
+                      CYLTabBarItemImageURL, CYLTabBarItemSelectedImageURL, CYLTabBarItemImageURLSize ];
+    });
+    NSMutableDictionary *iconAttributes = [NSMutableDictionary dictionary];
+    for (NSString *key in iconKeys) {
+        if (attributes[key]) {
+            iconAttributes[key] = attributes[key];
+        }
+    }
+    return [iconAttributes copy];
 }
 NSString *const CYLTabBarLottieDarkURL = @"CYLTabBarLottieDarkURL";
 NSString *const CYLTabBarLottieDarkFilePath = @"CYLTabBarLottieDarkFilePath";
@@ -2953,6 +3008,35 @@ static NSString *const CYLTabBarItemPlusSlotPlaceholderKey = @"CYLTabBarItemPlus
 }
 
 - (BOOL)updateTabBarItemAtIndex:(NSUInteger)index attributes:(NSDictionary<NSString *, id> *)attributes {
+    NSString *oldTitle = (index < _viewControllers.count) ? [self tabBarItemAttributesAtIndex:index][CYLTabBarItemTitle] : nil;
+    BOOL updated = [self cyl_applyTabBarItemUpdateAtIndex:index attributes:attributes];
+    if (updated) {
+        // [EN] After the tab shows the change: the title and icon notifications for their keys, then one for every change.
+        // [CN] Tab 显示变化之后：标题与图标 key 分别发送标题、图标通知，然后每次变化发送一次通用通知。
+        if (attributes[CYLTabBarItemTitle] || attributes[CYLTabBarItemSelectedTitle]) {
+            NSDictionary *current = [self tabBarItemAttributesAtIndex:index];
+            NSMutableDictionary *titleInfo = [NSMutableDictionary dictionary];
+            titleInfo[CYLTabBarItemTitle] = current[CYLTabBarItemTitle] ?: @"";
+            titleInfo[CYLTabBarItemSelectedTitle] = current[CYLTabBarItemSelectedTitle];
+            titleInfo[CYLTabBarItemOldTitleKey] = oldTitle;
+            titleInfo[CYLTabBarItemChangedAttributesKey] = [attributes dictionaryWithValuesForKeys:
+                [@[ CYLTabBarItemTitle, CYLTabBarItemSelectedTitle ] filteredArrayUsingPredicate:
+                 [NSPredicate predicateWithBlock:^BOOL(NSString *key, NSDictionary *bindings) { return attributes[key] != nil; }]]];
+            CYLPostTabBarItemNotification(CYLTabBarItemTitleDidChangeNotification, self, index, titleInfo);
+        }
+        NSDictionary *iconAttributes = CYLTabBarItemIconAttributes(attributes);
+        if (iconAttributes.count > 0) {
+            CYLPostTabBarItemNotification(CYLTabBarItemIconDidChangeNotification, self, index,
+                                          @{ CYLTabBarItemChangedAttributesKey : iconAttributes });
+        }
+        CYLPostTabBarItemNotification(CYLTabBarItemDidChangeNotification, self, index,
+                                      @{ CYLTabBarItemChangedAttributesKey : [attributes copy] });
+    }
+    return updated;
+}
+
+/// [EN] The in-place update itself; `-updateTabBarItemAtIndex:attributes:` posts the notification. [CN] 原地更新本身；通知由 `-updateTabBarItemAtIndex:attributes:` 发送。
+- (BOOL)cyl_applyTabBarItemUpdateAtIndex:(NSUInteger)index attributes:(NSDictionary<NSString *, id> *)attributes {
     if (index >= _viewControllers.count || attributes.count == 0) {
         return NO;
     }
@@ -3017,7 +3101,7 @@ static NSString *const CYLTabBarItemPlusSlotPlaceholderKey = @"CYLTabBarItemPlus
         if (image) { tabBarItem.image = image; }
         if (selectedImage) { tabBarItem.selectedImage = selectedImage; }
         if (title) {
-            CYLTabBarItemTitleDidChange(viewController, title);
+            CYLApplyNavigationTitleOfFollowingPage(viewController, title);
         }
         // FIX: issue #433
         // [EN] The selected tab shows its selected title, not the new normal title.
@@ -3045,7 +3129,7 @@ static NSString *const CYLTabBarItemPlusSlotPlaceholderKey = @"CYLTabBarItemPlus
         if (selectedImage) { tabBarItem.selectedImage = selectedImage; }
     }
     if (title) {
-        CYLTabBarItemTitleDidChange(viewController, title);
+        CYLApplyNavigationTitleOfFollowingPage(viewController, title);
     }
     // FIX: issue #433
     // [EN] The selected tab shows its selected title, not the new normal title.
@@ -3150,6 +3234,8 @@ static char CYLTabBarItemIconViewsProviderKey;
     // [CN] TabBar 重新布局其按钮，与选中 Tab 时相同。
     [self.tabBar setNeedsLayout];
     [self cyl_setNeedsUpdateTabBarItemIconViews];
+    CYLPostTabBarItemNotification(CYLTabBarItemIconDidChangeNotification, self, index,
+                                  provider ? @{ CYLTabBarItemIconViewProviderKey : [provider copy] } : nil);
     return YES;
 }
 
