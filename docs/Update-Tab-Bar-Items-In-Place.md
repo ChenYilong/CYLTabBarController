@@ -34,10 +34,14 @@
 | &nbsp;&nbsp;&nbsp;&nbsp;↳ [自定义 tabBar.items（#22）/ Customizing tabBar.items (#22)](#自定义-tabbaritems22-customizing-tabbaritems-22) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [自定义 tabBar.items（#22）/ Customizing tabBar.items (#22)](#自定义-tabbaritems22-customizing-tabbaritems-22) |
 | &nbsp;&nbsp;&nbsp;&nbsp;↳ [替换 Tab 的页面（#481）/ Replacing a tab's page (#481)](#替换-tab-的页面481-replacing-a-tabs-page-481) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [替换 Tab 的页面（#481）/ Replacing a tab's page (#481)](#替换-tab-的页面481-replacing-a-tabs-page-481) |
 | [API](#api) | [API](#api) |
+| [导航栏标题跟随 Tab 标题](#导航栏标题跟随-tab-标题--navigation-bar-title-follows-the-tab-title) | [Navigation bar title follows the tab title](#导航栏标题跟随-tab-标题--navigation-bar-title-follows-the-tab-title) |
+| [Tab 变化通知](#tab-变化通知--tab-change-notifications) | [Tab change notifications](#tab-变化通知--tab-change-notifications) |
+| [Android](#android) | [Android](#android) |
 | [Demo](#demo) | [Demo](#demo) |
 | [截图](#截图--screenshots) | [Screenshots](#截图--screenshots) |
 | [角标](#角标--badges) | [Badges](#角标--badges) |
 | [限制](#限制--limits) | [Limits](#限制--limits) |
+| [TODO](#todo) | [TODO](#todo) |
 
 <!-- navigation:end -->
 
@@ -118,7 +122,8 @@ cache.downloadTimeout = 15;
 | `-updatePlusButtonWithAttributes:` 接受与 Tab 相同的 key 和图片来源，图片缩放到 `CYLTabBarItemImageURLSize`，未设置时缩放到 PlusButton 当前图片的尺寸。液态玻璃下由 TabBarItem 显示的标题（#636）与选中图层中的替身也会更新。 | `-updatePlusButtonWithAttributes:` takes the tab keys and image sources; images are scaled to `CYLTabBarItemImageURLSize`, else to the plus button's current image size. With Liquid Glass, the title shown by the tab item (#636) and the stand-in in the selected layer are updated too. |
 | 下载的图片不会保留原始尺寸（512 px 的图标约 170 pt）：读不到 PlusButton 当前图片的尺寸时，改用其图片视图的尺寸，再没有则用 Tab 图标的尺寸。 | A downloaded image never keeps its own size (a 512 px icon is about 170 pt): when the plus button's current image size cannot be read, its image view's size is used, else the tab icon's. |
 | 液态玻璃下，标题与 PlusButton 不在同一个图层：标题在 Tab 按钮的普通图层与选中图层（透过放大镜）中各绘制一次，PlusButton 在 platter 上。PlusButton 只与普通图层中、自己 Tab 的标题对齐（先直接取其 slot 的 Tab 按钮，见 [PlusButton-Slot.md](PlusButton-Slot.md)；离它的 Tab 中心不超过半个 Tab 宽），选中图层中的副本不再参与计算。以前点击「更换所有网络图标」后再点击 PlusButton，PlusButton 会对齐到其他图层中的标题而移到 x = 0。 | With Liquid Glass the titles and the plus button are not in the same layer: each title is drawn in the tab buttons' normal layer and again in the selected layer (through the lens), and the plus button sits on the platter. The plus button now follows only its own tab's title in the normal layer (taken from its slot's tab button first, see [PlusButton-Slot.md](PlusButton-Slot.md); within half a tab width of its tab's center); copies in the selected layer are left out. After "Change all network icons", a tap on the plus button used to align it with a title of another layer and move it to x = 0. |
-| 该修复本次未能运行验证（当前环境没有 Xcode 和模拟器），也未加截图；请在液态玻璃模拟器上点击「更换所有网络图标」后再点击 PlusButton 确认。 | This fix could not be run this time (no Xcode or simulator in this environment), so no screenshot is added; check it on a Liquid Glass simulator by tapping "Change all network icons" and then the plus button. |
+| DONE：2026-11-09 在 iPhone 17 Pro Max 模拟器（iOS 26.1，液态玻璃）上验证：点击「批量下载网络图标」后再点击 PlusButton，PlusButton 仍在 x = 192（与之前相同），居中于自己的「Post」标题之上。 | DONE: verified on 2026-11-09 on an iPhone 17 Pro Max simulator (iOS 26.1, Liquid Glass): after "Change all network icons" and a tap on the plus button, the plus button stays at x = 192 (as before), centered over its own "Post" title. |
+| ![网络图标后点击 PlusButton](assets/update-tab-network-icons-plus-button.png) | ![The plus button after network icons and a tap](assets/update-tab-network-icons-plus-button.png) |
 
 ```objc
 [tabBarController updatePlusButtonWithAttributes:@{ CYLTabBarItemTitle : @"★ 发布",
@@ -177,6 +182,92 @@ cache.downloadTimeout = 15;
 | `-performWhenTabBarItemsReady:` | item 创建后执行（#22）/ Runs once the items exist (#22) |
 | `-replaceViewControllerAtIndex:withViewController:attributes:` | 替换一个 Tab 的页面（#481）/ Replace one tab's page (#481) |
 
+## 导航栏标题跟随 Tab 标题 / Navigation bar title follows the tab title
+
+| 中文 | English |
+|:---|:---|
+| 页面的 `title` 会同时设置 Tab 与导航栏，而原地修改的 Tab 标题（本页的 API、皮肤、配置文件）不会传到导航栏。在创建 Tab 时让页面跟随 Tab 标题即可，不需要在 `-viewDidLoad` 中再设置标题：本库在 Tab 设置时与之后每次修改时设置 `navigationItem.title`，并发送 `CYLTabBarItemTitleDidChangeNotification`（object 为页面，`userInfo[CYLTabBarItemTitle]` 为新标题）。`CYL_TAB_BAR_ITEM_TITLE(page)` 随时读取当前的 Tab 标题（显示选中标题时返回普通标题）。 | A page's `title` sets both its tab and its navigation bar, and a tab title changed in place (this page's API, skins, configuration files) never reached the navigation bar. Make the page follow its tab title where the tabs are created; there is no need to set a title in `-viewDidLoad`: the library sets `navigationItem.title` when the tab is set up and on every later change, and posts `CYLTabBarItemTitleDidChangeNotification` (the object is the page, `userInfo[CYLTabBarItemTitle]` the new title). `CYL_TAB_BAR_ITEM_TITLE(page)` reads the current tab title at any time (the normal title while a selected title shows). |
+
+| PlusButton 的页面（PlusButton 子控制器）同样可以跟随：它的「Tab 标题」即 PlusButton 的标题。`-updatePlusButtonWithAttributes:`（以及换肤）修改标题时，本库设置该页面的导航栏标题，并发送同样的通知（object 为该页面，userInfo 另有 `CYLPlusButtonKey`；PlusButton 没有页面时 object 为 PlusButton）。ObjC 示例在 `+plusChildViewController` 中设置跟随，不再写死「PlusChildViewController」。 | The plus button's page (the plus child view controller) can follow too: its "tab title" is the plus button's title. When `-updatePlusButtonWithAttributes:` (or a skin) changes it, the library sets that page's navigation bar title and posts the same notifications (the object is the page, userInfo adds `CYLPlusButtonKey`; without a page the object is the plus button). The ObjC example makes it follow in `+plusChildViewController` instead of a fixed "PlusChildViewController". |
+| 2026-11-09 在 iOS 26.1 模拟器（液态玻璃）上验证：启动后 PlusButton 页面的导航栏显示「Post」（PlusButton 的标题，以前为「PlusChildViewController」）。在首页点「批量更换标题」后，PlusButton 显示「★ Post」，打开其页面后导航栏也显示「★ Post」（第二张截图）。单元测试：`testPlusButtonTitleUpdatesItsPageNavigationTitle`。 | Verified on 2026-11-09 on an iOS 26.1 simulator (Liquid Glass): at launch the plus button's page reads "Post" (the plus button's title; it was "PlusChildViewController"). After "Change all titles" on the Home tab, the plus button reads "★ Post", and its page's navigation bar reads "★ Post" too (second screenshot). Unit test: `testPlusButtonTitleUpdatesItsPageNavigationTitle`. |
+| ![PlusButton 页面的导航栏标题](assets/update-tab-plus-page-navigation-title.png) | ![The plus button page's navigation bar title](assets/update-tab-plus-page-navigation-title.png) |
+| ![批量更换标题后 PlusButton 页面的导航栏标题](assets/update-tab-plus-page-navigation-title-changed.png) | ![The plus button page's navigation bar title after "Change all titles"](assets/update-tab-plus-page-navigation-title-changed.png) |
+
+```objc
+// Where the tabs are created (the ObjC example: MainTabBarController.m). 创建 Tab 的位置（ObjC 示例：MainTabBarController.m）。
+for (UIViewController *viewController in viewControllers) {
+    CYL_NAVIGATION_TITLE_FOLLOWS_TAB_BAR_ITEM(viewController.cyl_getViewControllerInsteadOfNavigationController);
+}
+// The plus button's page (the ObjC example: CYLPlusButtonSubclass.m, +plusChildViewController). PlusButton 的页面。
+CYL_NAVIGATION_TITLE_FOLLOWS_TAB_BAR_ITEM(plusChildViewController);
+// Later, anywhere: 之后任意位置：
+NSString *title = CYL_TAB_BAR_ITEM_TITLE(self);
+```
+
+| 中文 | English |
+|:---|:---|
+| 2026-11-09 在 iPhone 17 Pro Max 模拟器（iOS 26.1，液态玻璃）上验证：启动后各 Tab 的导航栏标题即 Tab 标题；「批量更换标题」后导航栏显示「★ Nearby」，恢复后显示「Nearby」。单元测试 `testNavigationTitleFollowsTabBarItemTitle`。ObjC 示例去掉了重复设置标题的代码（以前每个页面再设置一次 `title`，液态玻璃下加上「 (Liquid)」，且不跟随之后的修改）。Android 见下方 [Android](#android)。 | Verified on 2026-11-09 on an iPhone 17 Pro Max simulator (iOS 26.1, Liquid Glass): at launch each tab's navigation bar title is its tab title; after "Change all titles" the navigation bar reads "★ Nearby", and "Nearby" after restoring. Unit test: `testNavigationTitleFollowsTabBarItemTitle`. The ObjC example drops the code that set the titles a second time (each page set `title` again, with " (Liquid)" on Liquid Glass, and never followed later changes). Android: see [Android](#android) below. |
+| 「批量更换标题」之后（导航栏与 Tab 同步）： | After "Change all titles" (the navigation bar follows the tab): |
+| ![导航栏标题跟随 Tab 标题](assets/update-tab-navigation-title-changed.png) | ![The navigation bar title follows the tab title](assets/update-tab-navigation-title-changed.png) |
+| 恢复之后： | After restoring: |
+| ![恢复后的导航栏标题](assets/update-tab-navigation-title-restored.png) | ![The navigation bar title after restoring](assets/update-tab-navigation-title-restored.png) |
+| 换肤（「网络图标、标题与配色」皮肤）之后，导航栏同样显示「★ Me」；切回「默认」后恢复为「Me」： | After a skin (the "Network icons, titles and colors" skin) the navigation bar also reads "★ Me", and "Me" again after switching back to "Default": |
+| ![换肤后导航栏标题跟随 Tab 标题](assets/update-tab-navigation-title-skin.png) | ![After a skin, the navigation bar title follows the tab title](assets/update-tab-navigation-title-skin.png) |
+
+## Tab 变化通知 / Tab change notifications
+
+| 中文 | English |
+|:---|:---|
+| 导航栏标题以外的需求（自定义标题视图、统计、跟随 Tab 颜色的页面头部……）可以监听通知。本库在 Tab 显示变化之后发送。 | For anything beyond the navigation bar title (a custom title view, analytics, a page header in the tab's color…), observe the notifications. The library posts them after the tab shows the change. |
+
+| 通知 / Notification | 中文：何时发送 | English: when |
+|:---|:---|:---|
+| `CYLTabBarItemTitleDidChangeNotification` | 某个 Tab 的标题或选中标题原地变化（本页的 API、皮肤） | A tab's title or selected title changes in place (this page's API, skins) |
+| `CYLTabBarItemIconDidChangeNotification` | 某个 Tab 的图标变化：图片 key、图片 URL、`-setTabBarItemIcon:…`（网络图标在加载完成时）、皮肤、恢复 | A tab's icon changes: image keys, image URLs, `-setTabBarItemIcon:…` (a network icon once loaded), skins, restoring |
+| `CYLTabBarItemDidChangeNotification` | 某个 Tab 的任意原地变化（标题、图片、颜色、字体、动画……），每次一条 | Any in-place change of a tab (title, images, colors, fonts, animations…), one per change |
+| `CYLTabBarControllerThemeDidApplyNotification` | TabBar 应用了皮肤（或恢复）：默认视为全部 Tab 都已变化 | The tab bar applied a skin (or restored): every tab counts as changed by default |
+
+| 中文 | English |
+|:---|:---|
+| 前三个通知的 object 为该 Tab 的页面（导航控制器的根控制器），userInfo 精确指出变化的对象：`CYLTabBarItemIdentifier`（Tab 的 ID，最精确；没有 ID 时不存在）、`CYLTabBarItemIndexKey`（下标）、`CYLTabBarControllerKey`（TabBar 控制器）、`CYLTabBarItemViewControllerKey`（`viewControllers` 中的控制器，例如导航控制器）、`CYLTabBarItemKey`（`UITabBarItem`，扁平样式为 `CYLFlatDesignTabBarItem`）、`CYLTabBarItemChangedAttributesKey`（变化的 key 与新值）。标题通知另有 `CYLTabBarItemTitle`（新标题）、`CYLTabBarItemSelectedTitle`、`CYLTabBarItemOldTitleKey`（旧标题）；图标通知另有 `CYLTabBarItemIconViewProviderKey`（替换图标的视图，恢复 Tab 自己的图标时不存在）。皮肤通知的 object 为 TabBar 控制器，userInfo 有 `CYLTabBarThemeKey`（主题，恢复时不存在）、`CYLTabBarItemIndexesKey`（NSIndexSet）与 `CYLTabBarItemIdentifiersKey`（ID 数组），默认为全部 Tab（PlusButton 的 Tab 除外）。`CYLThemeDidChangeNotification` 由主题管理器发送，早于 TabBar 应用皮肤。 | The first three have the tab's page (the root view controller of its navigation controller) as object, and their userInfo names exactly what changed: `CYLTabBarItemIdentifier` (the tab's identifier, the most exact; absent when it has none), `CYLTabBarItemIndexKey` (its index), `CYLTabBarControllerKey` (the tab bar controller), `CYLTabBarItemViewControllerKey` (its entry in `viewControllers`, e.g. the navigation controller), `CYLTabBarItemKey` (the `UITabBarItem`; `CYLFlatDesignTabBarItem` on FlatDesign) and `CYLTabBarItemChangedAttributesKey` (the changed keys and their new values). The title notification adds `CYLTabBarItemTitle` (the new title), `CYLTabBarItemSelectedTitle` and `CYLTabBarItemOldTitleKey` (the title before); the icon notification adds `CYLTabBarItemIconViewProviderKey` (the view in place of the icon, absent when the tab's own icon comes back). The skin notification has the tab bar controller as object, with `CYLTabBarThemeKey` (the theme, absent when restoring), `CYLTabBarItemIndexesKey` (an NSIndexSet) and `CYLTabBarItemIdentifiersKey` (an array of identifiers): every tab by default, the plus button's tab excepted. `CYLThemeDidChangeNotification` comes from the theme manager, before the tab bar applies the skin. |
+
+```objc
+[[NSNotificationCenter defaultCenter] addObserverForName:CYLTabBarItemTitleDidChangeNotification object:nil queue:nil
+                                              usingBlock:^(NSNotification *note) {
+    NSString *identifier = note.userInfo[CYLTabBarItemIdentifier];   // e.g. @"home"
+    NSString *newTitle = note.userInfo[CYLTabBarItemTitle];
+    NSString *oldTitle = note.userInfo[CYLTabBarItemOldTitleKey];
+}];
+```
+
+| 中文 | English |
+|:---|:---|
+| 单元测试：`testNavigationTitleFollowsTabBarItemTitle`（标题与图标通知、ID 与各对象）、`testSkinUpdatesFollowingNavigationTitlesAndPostsNotifications`（皮肤通知、跟随的导航栏标题）。Android 见下方 [Android](#android)。 | Unit tests: `testNavigationTitleFollowsTabBarItemTitle` (title and icon notifications, identifier and objects), `testSkinUpdatesFollowingNavigationTitlesAndPostsNotifications` (skin notification, following navigation titles). Android: see [Android](#android) below. |
+
+## Android
+
+| 中文 | English |
+|:---|:---|
+| Android 库（`Example-Android/cyltabbar`）提供同样的通知与跟随的标题，名称与 iOS 相同。通知通过 `CYLNotificationCenter` 观察（对应 `NSNotificationCenter`，在发送的线程上同步执行），名称与 userInfo 的 key 在 `CYLConstants` 中，值相同。 | The Android library (`Example-Android/cyltabbar`) has the same notifications and following titles, with the iOS names. The notifications are observed through `CYLNotificationCenter` (the counterpart of `NSNotificationCenter`; observers run synchronously on the posting thread); their names and userInfo keys are in `CYLConstants`, with the same values. |
+| 与 iOS 的区别：一个 Activity 只有一个 ActionBar，所有 Tab 共用（iOS 的每个 Tab 有自己的导航栏）。因此 `cyl_navigationTitleFollowsTabBarItemTitle` 的页面被选中时，本库把其 Tab 标题写入 Activity 的标题，标题原地变化时再次写入；有自己 Toolbar 的页面改为观察 `CYLTabBarItemTitleDidChangeNotification`。`CYLTabBarItemIndexesKey` 为 `List<Int>`（iOS 为 `NSIndexSet`），`CYLTabBarItemKey` 为 `CYLTabBarItem`，PlusButton 页面的下标为 `viewControllers.size`。 | Differences from iOS: an activity has one action bar for every tab (an iOS tab has its own navigation bar). So while a page with `cyl_navigationTitleFollowsTabBarItemTitle` is selected, the library writes its tab title into the activity's title, and again when that title changes in place; a page with a toolbar of its own observes `CYLTabBarItemTitleDidChangeNotification` instead. `CYLTabBarItemIndexesKey` is a `List<Int>` (iOS: `NSIndexSet`), `CYLTabBarItemKey` is the `CYLTabBarItem`, and the plus button's page has the index `viewControllers.size`. |
+| Android 上皮肤一次替换所有 Tab 的属性，因此本库比较每个 Tab 变化前后的属性，只为真正变化的 Tab 发送各自的通知，再发送皮肤通知。与 iOS 相同，`reloadTabBarItemsWithAttributes`（重新创建 Tab）不发送 Tab 变化通知，跟随的标题仍会更新。 | A skin replaces every tab's attributes at once on Android, so the library compares each tab's attributes before and after and posts the per-tab notifications only for the tabs that changed, then the skin notification. As on iOS, `reloadTabBarItemsWithAttributes` (which builds the tabs again) posts no tab change notification; the following titles are still updated. |
+| 跟随的页面没有 Tab 标题时（例如 PlusButton 没有标题），Activity 的标题为空，而不是保留上一个 Tab 的标题（那会显示错误页面的名称）；与 iOS 上页面自己的导航栏一致。 | A following page without a tab title (e.g. a plus button without a title) gets an empty activity title instead of keeping the previous tab's, which would name the wrong page; as the page's own navigation bar on iOS. |
+| 2026-11-09 在 Android 15 模拟器（API 35）上验证：Android 示例启动后 ActionBar 显示「JSON」（选中的第一个 Tab 的标题，以前为「App 名称 · Default」），选中「Message」后显示「Message」，打开 PlusButton 的页面后为空（示例的 PlusButton 没有标题）。「Change every title」之后显示「Tab 1」，选中第二个 Tab 后显示「Tab 2」；再点一次恢复后显示「JSON」。Robolectric 测试 `CYLTabChangeNotificationsTest`（3 个）覆盖原地更新、图标与图标视图、皮肤与 PlusButton 的通知及其参数。 | Verified on 2026-11-09 on an Android 15 emulator (API 35): at launch the Android demo's action bar reads "JSON" (the selected first tab's title; it was "app name · Default"), "Message" after selecting Message, and nothing on the plus button's page (the demo's plus button has no title). After "Change every title" it reads "Tab 1", and "Tab 2" after selecting the second tab; "JSON" again after tapping the row to restore. The Robolectric `CYLTabChangeNotificationsTest` (3 tests) covers the notifications and their parameters for in-place updates, icons and icon views, skins and the plus button. |
+| ![Android：「Change every title」之后](assets/update-tab-android-activity-title-changed.png) | ![Android: after "Change every title"](assets/update-tab-android-activity-title-changed.png) |
+| ![Android：恢复之后](assets/update-tab-android-activity-title-restored.png) | ![Android: after restoring](assets/update-tab-android-activity-title-restored.png) |
+
+```kotlin
+// Where the tabs are created (the Android demo: MainActivity.kt). 创建 Tab 的位置（Android 示例：MainActivity.kt）。
+controller.viewControllers.forEach { it.cyl_navigationTitleFollowsTabBarItemTitle = true }
+DemoPlusButton.Provider.plusChildViewController().cyl_navigationTitleFollowsTabBarItemTitle = true
+// A page with its own toolbar: 有自己 Toolbar 的页面：
+val token = CYLNotificationCenter.addObserver(CYLConstants.CYLTabBarItemTitleDidChangeNotification, this) { note ->
+    toolbar.title = note.userInfo[CYLConstants.CYLTabBarItemTitle] as? String   // also CYLTabBarItemIdentifier, CYLTabBarItemOldTitleKey…
+}
+CYLNotificationCenter.removeObserver(token)   // e.g. in onDestroyView
+val title = cyl_tabBarItemTitle               // the current tab title 当前的 Tab 标题
+```
+
 ## Demo
 
 | 中文 | English |
@@ -222,3 +313,12 @@ cache.downloadTimeout = 15;
 | 本库不依赖任何图片库；需要 WebP、渐进式加载等时，请用 `-setTabBarItemIconViewProvider:atIndex:` 返回 SDWebImage 或 Kingfisher 加载的视图。 | The library depends on no image library; for WebP, progressive loading and the like, return a view loaded by SDWebImage or Kingfisher from `-setTabBarItemIconViewProvider:atIndex:`. |
 | 替换页面会重新设置 TabBar：直接添加到 Tab 按钮上的视图（如封面、角标）需要在新按钮创建后重新添加，例如在 `-performWhenTabBarItemsReady:` 中。 | Replacing a page sets the tab bar up again: views added to the tab buttons yourself (covers, badges) must be added again to the new buttons, e.g. in `-performWhenTabBarItemsReady:`. |
 | 本次在 iOS 26.5 模拟器上验证了液态玻璃与扁平样式；经典样式（iOS 25 及更早）未在本次重新运行。 | Verified this time on the iOS 26.5 simulator with Liquid Glass and FlatDesign; the classic style (iOS 25 and earlier) was not run again this time. |
+
+## TODO
+
+| 中文 | English |
+|:---|:---|
+| 状态（2026-11-09）：iOS 上的标题、导航栏标题跟随与通知已完成，并经单元测试与 iOS 26.1 模拟器验证（含 PlusButton 页面）。 | Status (2026-11-09): titles, following navigation titles and notifications are done on iOS, verified by unit tests and on the iOS 26.1 simulator (the plus button's page included). |
+| DONE（2026-11-09）：原地更换标题后，液态玻璃下 VoiceOver 曾读出旧标题。现在读出新标题，恢复后读出原标题，见 [Tab 的无障碍](Tab-Accessibility.md)（`axe describe-ui` 验证，三个单元测试）。 | DONE (2026-11-09): after an in-place title change on Liquid Glass, VoiceOver used to read the old titles. It now reads the new ones, and the original ones after restoring; see [Tab accessibility](Tab-Accessibility.md) (checked with `axe describe-ui`, three unit tests). |
+| 已知缺陷：批量更换标题后，「附近」角标中的「8」字体变小。 | Known defect: after "Change all titles", the "8" in the Nearby badge is drawn in a smaller font. |
+| DONE（2026-11-09）：Android 提供跟随的标题与 Tab 变化通知，事件与参数与 iOS 相同，见 [Android](#android)（Robolectric 测试 `CYLTabChangeNotificationsTest`、模拟器验证）。 | DONE (2026-11-09): Android has the following titles and the tab change notifications, with the same events and parameters as iOS; see [Android](#android) (Robolectric `CYLTabChangeNotificationsTest`, checked on an emulator). |

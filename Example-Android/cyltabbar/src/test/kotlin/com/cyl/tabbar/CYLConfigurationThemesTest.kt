@@ -177,4 +177,42 @@ class CYLConfigurationThemesTest {
         assertEquals(mapOf("dark" to mapOf("accent" to "#FF0000")), themes)
         assertTrue(CYLTabBarConfigurationParser.dictionaryWithData(data, CYLTabBarConfigurationFormat.Protobuf).containsKey(CYLConstants.CYLTabBarControllerDarkThemeIdentifier))
     }
+
+    /**
+     * [EN] The bar's images and item layout from a skin, with the same names as iOS (`CYLTabBarBackgroundImage`,
+     *      `CYLTabBarShadowImage`, `CYLTabBarStackedItemPositioning` / `Width` / `Spacing`): they reach the bar's appearance,
+     *      and the classic bar centers its items.
+     * [CN] 皮肤中 TabBar 的图片与 Item 布局，名称与 iOS 相同（`CYLTabBarBackgroundImage`、`CYLTabBarShadowImage`、
+     *      `CYLTabBarStackedItemPositioning` / `Width` / `Spacing`）：写入 TabBar 的外观，经典 TabBar 让各 Item 居中。
+     */
+    @Test
+    fun aSkinSetsTheBarImagesAndCentersTheItems() = withActivity { activity ->
+        val name = UUID.randomUUID().toString()
+        val bar = mapOf(
+            "light" to mapOf(
+                "homeTitle" to "Home",
+                CYLConstants.CYLTabBarBackgroundImage to android.graphics.drawable.ColorDrawable(android.graphics.Color.YELLOW),
+                CYLConstants.CYLTabBarShadowImage to android.graphics.drawable.ColorDrawable(android.graphics.Color.GRAY),
+                CYLConstants.CYLTabBarStackedItemPositioning to "centered",
+                CYLConstants.CYLTabBarStackedItemWidth to 60,
+                CYLConstants.CYLTabBarStackedItemSpacing to 10,
+            ),
+        )
+        val controller = CYLTabBarController(activity, configuration(name, bar))
+        activity.setContentView(controller.view)
+        idle()
+        val appearance = controller.tabBar.standardAppearance!!
+        assertNotNull(appearance.backgroundImage)
+        assertNotNull(appearance.shadowImage)
+        assertTrue(appearance.stackedItemPositioningCentered)
+        assertEquals(60f, appearance.stackedItemWidth, 0f)
+        assertEquals(10f, appearance.stackedItemSpacing, 0f)
+        controller.view.measure(android.view.View.MeasureSpec.makeMeasureSpec(1080, android.view.View.MeasureSpec.EXACTLY), android.view.View.MeasureSpec.makeMeasureSpec(1920, android.view.View.MeasureSpec.EXACTLY))
+        controller.view.layout(0, 0, 1080, 1920)
+        val density = activity.resources.displayMetrics.density
+        val buttons = controller.tabBar.tabBarButtonArray
+        assertEquals("each item is stackedItemWidth wide", (60 * density), buttons[0].width.toFloat(), 1f)
+        assertEquals("stackedItemSpacing apart", (10 * density), (buttons[1].left - buttons[0].right).toFloat(), 1f)
+        assertEquals("centered", 1080f - buttons[1].right, buttons[0].left.toFloat(), 2f)
+    }
 }

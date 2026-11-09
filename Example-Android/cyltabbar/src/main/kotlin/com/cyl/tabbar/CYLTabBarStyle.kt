@@ -46,18 +46,18 @@ internal interface CYLTabBarStyleRenderer {
     }
     /** [EN] The space between two slots, in px (FlatDesign's `stackedItemSpacing`). [CN] 相邻 slot 之间的间距（像素，扁平样式的 `stackedItemSpacing`）。 */
     fun itemSpacing(tabBar: CYLTabBar): Int = 0
-    fun onAttach(tabBar: CYLTabBar) {}
-    fun onDetach(tabBar: CYLTabBar) {}
+    fun onAttach(tabBar: CYLTabBar) { /* [EN] Optional: a style may take over the bar's background. [CN] 可选：样式可以接管 TabBar 的背景。 */ }
+    fun onDetach(tabBar: CYLTabBar) { /* [EN] Optional: a style may stop its animations. [CN] 可选：样式可以停止其动画。 */ }
     /** [EN] Drawn behind the items. [CN] 绘制在 Item 后面。 */
-    fun drawBehindItems(tabBar: CYLTabBar, canvas: Canvas) {}
+    fun drawBehindItems(tabBar: CYLTabBar, canvas: Canvas) { /* [EN] Optional: nothing by default. [CN] 可选：默认不绘制。 */ }
     /** [EN] Drawn above the items. [CN] 绘制在 Item 上面。 */
-    fun drawAboveItems(tabBar: CYLTabBar, canvas: Canvas) {}
+    fun drawAboveItems(tabBar: CYLTabBar, canvas: Canvas) { /* [EN] Optional: nothing by default. [CN] 可选：默认不绘制。 */ }
     /** [EN] The selected tab changed. [CN] 选中的 Tab 已改变。 */
-    fun onSelectionChanged(tabBar: CYLTabBar, animated: Boolean) {}
+    fun onSelectionChanged(tabBar: CYLTabBar, animated: Boolean) { /* [EN] Optional: only styles that follow the selection (the glass bubble). [CN] 可选：只有跟随选中的样式需要（玻璃气泡）。 */ }
     fun onInterceptTouchEvent(tabBar: CYLTabBar, event: MotionEvent): Boolean = false
     fun onTouchEvent(tabBar: CYLTabBar, event: MotionEvent): Boolean = false
     /** [EN] The bar's background color changed (`cyl_tabBarBackgroundColor`). [CN] TabBar 背景色已改变（`cyl_tabBarBackgroundColor`）。 */
-    fun applyBackgroundColor(tabBar: CYLTabBar, @ColorInt color: Int?) {}
+    fun applyBackgroundColor(tabBar: CYLTabBar, @ColorInt color: Int?) { /* [EN] Optional: each style uses the color its own way. [CN] 可选：每种样式按自己的方式使用该颜色。 */ }
 
     companion object {
         fun forStyle(style: CYLEnums.CYLTabBarStyleType): CYLTabBarStyleRenderer = when (style) {
@@ -68,8 +68,46 @@ internal interface CYLTabBarStyleRenderer {
     }
 }
 
+/**
+ * [EN] `stackedItemPositioning == .centered` of the bar's appearance: the frame of items `stackedItemWidth` wide (or an equal
+ *      share), `stackedItemSpacing` apart, centered, and that spacing in px; null when the items fill the width (not
+ *      centered, or they do not fit). Shared by the classic and FlatDesign styles, as `UITabBar` and `CYLFlatDesignTabBar`
+ *      both follow it on iOS.
+ * [CN] TabBar 外观的 `stackedItemPositioning == .centered`：宽 `stackedItemWidth`（或平分）、间距 `stackedItemSpacing`、整体居中的 Item 区域，
+ *      以及该间距（像素）；铺满宽度时（未居中或放不下）为 null。经典与扁平样式共用，与 iOS 上 `UITabBar` 和 `CYLFlatDesignTabBar` 一致。
+ */
+internal fun CYLTabBar.centeredItemsFrame(width: Int, itemsHeight: Int, out: Rect): Int? {
+    val appearance = cyl_effectiveAppearance() ?: return null
+    val count = cyl_slotCount()
+    if (!appearance.stackedItemPositioningCentered || count == 0) return null
+    val density = resources.displayMetrics.density
+    val space = (appearance.stackedItemSpacing * density).coerceAtLeast(0f)
+    val each = if (appearance.stackedItemWidth > 0f) appearance.stackedItemWidth * density else (width - (count - 1) * space) / count
+    val total = (count * each + (count - 1) * space).roundToInt()
+    if (each <= 0f || total > width) return null
+    val left = (width - total) / 2
+    out.set(left, 0, left + total, itemsHeight)
+    return space.roundToInt()
+}
+
+/** [EN] The bar's background image: the appearance's, else the bar's own; false when there is none. [CN] TabBar 的背景图片：外观中的，否则为 TabBar 自己的；没有时返回 false。 */
+internal fun CYLTabBar.drawBackgroundImage(canvas: Canvas): Boolean {
+    val image = cyl_effectiveAppearance()?.backgroundImage ?: backgroundImage ?: return false
+    image.setBounds(0, 0, width, height)
+    image.draw(canvas)
+    return true
+}
+
+/** [EN] The bar's top-line image: the appearance's, else the bar's own; false when there is none. [CN] TabBar 顶部线条图片：外观中的，否则为 TabBar 自己的；没有时返回 false。 */
+internal fun CYLTabBar.drawShadowImage(canvas: Canvas): Boolean {
+    val image = cyl_effectiveAppearance()?.shadowImage ?: shadowImage ?: return false
+    image.setBounds(0, 0, width, image.intrinsicHeight.takeIf { it > 0 } ?: 1)
+    image.draw(canvas)
+    return true
+}
+
 /** [EN] Whether the app runs in Dark Mode. [CN] App 是否处于深色模式。 */
-private fun View.cyl_isDarkMode(): Boolean =
+private fun View.isInDarkMode(): Boolean =
     (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
 
 /**
@@ -85,6 +123,18 @@ internal object CYLClassicTabBarStyle : CYLTabBarStyleRenderer {
 
     override fun applyBackgroundColor(tabBar: CYLTabBar, color: Int?) {
         tabBar.background = ColorDrawable(color ?: 0xFFF9F9F9.toInt())
+    }
+
+    override fun itemSpacing(tabBar: CYLTabBar): Int = tabBar.cyl_itemSpacing
+
+    override fun itemsFrame(tabBar: CYLTabBar, width: Int, height: Int, itemsHeight: Int, safeBottom: Int, out: Rect) {
+        tabBar.cyl_itemSpacing = tabBar.centeredItemsFrame(width, itemsHeight, out) ?: run { out.set(0, 0, width, itemsHeight); 0 }
+    }
+
+    /** [EN] `backgroundImage` / `shadowImage` of the appearance (or the bar), over the background color and the hairline. [CN] 外观（或 TabBar）的 `backgroundImage` / `shadowImage`，绘制在背景色与细线之上。 */
+    override fun drawBehindItems(tabBar: CYLTabBar, canvas: Canvas) {
+        tabBar.drawBackgroundImage(canvas)
+        tabBar.drawShadowImage(canvas)
     }
 }
 
@@ -116,42 +166,19 @@ internal class CYLFlatDesignTabBarStyle : CYLTabBarStyleRenderer {
         tabBar.barTintColor = color ?: Color.TRANSPARENT
     }
 
-    private var spacing = 0
-
-    override fun itemSpacing(tabBar: CYLTabBar): Int = spacing
+    override fun itemSpacing(tabBar: CYLTabBar): Int = tabBar.cyl_itemSpacing
 
     override fun itemsFrame(tabBar: CYLTabBar, width: Int, height: Int, itemsHeight: Int, safeBottom: Int, out: Rect) {
-        spacing = 0
-        val appearance = tabBar.cyl_effectiveAppearance()
-        val itemWidth = appearance?.stackedItemWidth ?: 0f
-        val count = tabBar.cyl_slotCount()
-        if (appearance?.stackedItemPositioningCentered == true && count > 0) {
-            // [EN] `.centered`: items of `stackedItemWidth` (or an equal share) spaced by `stackedItemSpacing`, centered; when they do not fit, they fill the width. [CN] `.centered`：item 宽为 `stackedItemWidth`（或平分），间距 `stackedItemSpacing`，整体居中；放不下时铺满宽度。
-            val density = tabBar.resources.displayMetrics.density
-            val space = (appearance.stackedItemSpacing * density).coerceAtLeast(0f)
-            val each = if (itemWidth > 0f) itemWidth * density else (width - (count - 1) * space) / count
-            val total = (count * each + (count - 1) * space).roundToInt()
-            if (each > 0f && total <= width) {
-                spacing = space.roundToInt()
-                val left = (width - total) / 2
-                out.set(left, 0, left + total, itemsHeight)
-                return
-            }
-        }
-        out.set(0, 0, width, itemsHeight)
+        tabBar.cyl_itemSpacing = tabBar.centeredItemsFrame(width, itemsHeight, out) ?: run { out.set(0, 0, width, itemsHeight); 0 }
     }
 
     override fun drawBehindItems(tabBar: CYLTabBar, canvas: Canvas) {
         val appearance = tabBar.cyl_effectiveAppearance()
         rect.set(0f, 0f, tabBar.width.toFloat(), tabBar.height.toFloat())
-        val image = tabBar.backgroundImage
-        if (image != null && appearance?.backgroundColor == null) {
-            image.setBounds(0, 0, tabBar.width, tabBar.height)
-            image.draw(canvas)
-        } else {
+        if (appearance?.backgroundColor != null || !tabBar.drawBackgroundImage(canvas)) {
             // [EN] `UIBlurEffectStyleProminent`: a strong blur under a near-opaque system background. [CN] `UIBlurEffectStyleProminent`：强模糊，上面是接近不透明的系统背景色。
             val pages = tabBar.tabBarController?.pagesContainer
-            val dark = tabBar.cyl_isDarkMode()
+            val dark = tabBar.isInDarkMode()
             val blurred = pages != null && backdrop.draw(canvas, pages, tabBar.x - pages.x, tabBar.y - pages.y, rect, 0f,
                 CYLGlassEffects(saturation = 1.8f, blurRadius = 30f * tabBar.resources.displayMetrics.density))
             fillPaint.color = when {
@@ -162,13 +189,8 @@ internal class CYLFlatDesignTabBarStyle : CYLTabBarStyleRenderer {
             fillPaint.color = appearance?.backgroundColor ?: tabBar.barTintColor
             if (Color.alpha(fillPaint.color) > 0) canvas.drawRect(rect, fillPaint)
         }
-        val shadowImage = tabBar.shadowImage
         val density = tabBar.resources.displayMetrics.density
-        if (shadowImage != null) {
-            val height = shadowImage.intrinsicHeight.takeIf { it > 0 && appearance != null } ?: 1
-            shadowImage.setBounds(0, 0, tabBar.width, height)
-            shadowImage.draw(canvas)
-        } else {
+        if (!tabBar.drawShadowImage(canvas)) {
             val shadowColor = appearance?.shadowColor ?: return
             fillPaint.color = shadowColor
             canvas.drawRect(0f, 0f, tabBar.width.toFloat(), maxOf(1f, 0.5f * density), fillPaint)
@@ -199,6 +221,7 @@ internal class CYLLiquidGlassTabBarStyle : CYLTabBarStyleRenderer {
     private val panel = RectF()
     private val panelShape = RectF()
     private val bubble = RectF()
+    private var tint: Int? = null
     private var host: CYLTabBar? = null
 
     /** [EN] The bubble's position, in slots. [CN] 气泡的位置（以 slot 为单位）。 */
@@ -220,7 +243,7 @@ internal class CYLLiquidGlassTabBarStyle : CYLTabBarStyleRenderer {
     override val drawsPagesUnderTabBar: Boolean get() = true
 
     override fun defaultTintColors(tabBar: CYLTabBar): Pair<Int, Int> =
-        if (tabBar.cyl_isDarkMode()) 0xFF0091FF.toInt() to 0xFFEBEBF5.toInt() else 0xFF0088FF.toInt() to 0xFF1C1C1E.toInt()
+        if (tabBar.isInDarkMode()) 0xFF0091FF.toInt() to 0xFFEBEBF5.toInt() else 0xFF0088FF.toInt() to 0xFF1C1C1E.toInt()
 
     override fun barHeight(tabBar: CYLTabBar, itemsHeight: Int, safeBottom: Int): Int {
         val density = tabBar.resources.displayMetrics.density
@@ -244,6 +267,7 @@ internal class CYLLiquidGlassTabBarStyle : CYLTabBarStyleRenderer {
         tabBar.background = null
         tabBar.setWillNotDraw(false)
         tabBar.cyl_setShadowVisible(false)
+        tint = tabBar.tabBarController?.cyl_tabBarBackgroundColor
         positioned = false
     }
 
@@ -253,8 +277,8 @@ internal class CYLLiquidGlassTabBarStyle : CYLTabBarStyleRenderer {
     }
 
     override fun applyBackgroundColor(tabBar: CYLTabBar, color: Int?) {
-        // [EN] Ignored, as on iOS 26: the glass does not take the bar's background color (a skin's opaque background shows
-        //      only in the classic bar and FlatDesign). [CN] 与 iOS 26 相同，忽略：玻璃不使用 TabBar 的背景色（皮肤的不透明背景只在经典样式与扁平样式中显示）。
+        tint = color
+        tabBar.invalidate()
     }
 
     override fun onSelectionChanged(tabBar: CYLTabBar, animated: Boolean) {
@@ -306,7 +330,7 @@ internal class CYLLiquidGlassTabBarStyle : CYLTabBarStyleRenderer {
     override fun drawBehindItems(tabBar: CYLTabBar, canvas: Canvas) {
         if (!positioned) onSelectionChanged(tabBar, animated = false)
         val density = tabBar.resources.displayMetrics.density
-        val dark = tabBar.cyl_isDarkMode()
+        val dark = tabBar.isInDarkMode()
         val offset = panelOffset(tabBar)
         val pages = tabBar.tabBarController?.pagesContainer
         val press = pressProgress.value
@@ -319,14 +343,20 @@ internal class CYLLiquidGlassTabBarStyle : CYLTabBarStyleRenderer {
             inset(-width() * (grow - 1f) / 2f, -height() * (grow - 1f) / 2f)
         }
         val radius = shape.height() / 2f
-        // [EN] Backdrop's default `Shadow`: 24 dp, 4 dp down, 10 % black, so the dock shows on a white page as on iOS. [CN] Backdrop 默认的 `Shadow`：24 dp、向下 4 dp、10 % 黑色，使胶囊在白色页面上也可见，与 iOS 相同。
-        shadowPaint.color = if (dark) Color.BLACK else Color.WHITE
-        shadowPaint.setShadowLayer(12f * density, 0f, 4f * density, if (dark) 0x40000000 else 0x1A000000)
-        canvas.drawRoundRect(shape, radius, radius, shadowPaint)
+        // [EN] Backdrop's default `Shadow` (24 dp, 4 dp down, 10 % black), drawn outside the dock only, as Backdrop does: a filled
+        //      shape under the glass would show through as a white board wherever the glass is clear or not drawn.
+        // [CN] Backdrop 默认的 `Shadow`（24 dp、向下 4 dp、10 % 黑色），与 Backdrop 一样只绘制在胶囊外部：若在玻璃下方绘制填充形状，玻璃透明或未绘制的地方会露出白板。
+        drawShadowOutside(canvas, shape, radius, density, dark)
         val glass = pages != null && panelBackdrop.draw(canvas, pages, tabBar.x - pages.x + shape.left, tabBar.y - pages.y + shape.top, shape, radius,
             CYLGlassEffects(blurRadius = 8f * density, refractionHeight = 24f * density, refractionAmount = 24f * density))
-        paint.color = if (dark) 0x66121212 else 0x66FAFAFA
-        if (!glass) paint.color = if (dark) 0xE6121212.toInt() else 0xE6FAFAFA.toInt()
+        // [EN] The surface tint: `cyl_liquidGlassSurfaceColor` (or the app's `cyl_tabBarBackgroundColor`, often opaque white)
+        //      at `cyl_liquidGlassSurfaceOpacity` (default 0.4, `LiquidBottomTabs`' container), so the blurred page shows through.
+        // [CN] 表面着色：`cyl_liquidGlassSurfaceColor`（或 App 的 `cyl_tabBarBackgroundColor`，常为不透明白色），不透明度为
+        //      `cyl_liquidGlassSurfaceOpacity`（默认 0.4，即 `LiquidBottomTabs` 的容器），模糊后的页面因此可见。
+        val base = tabBar.cyl_liquidGlassSurfaceColor ?: tint ?: if (dark) 0xFF121212.toInt() else 0xFFFAFAFA.toInt()
+        val opacity = (tabBar.cyl_liquidGlassSurfaceOpacity * 255).roundToInt()
+        paint.color = if (glass) androidx.core.graphics.ColorUtils.setAlphaComponent(base, opacity)
+                      else androidx.core.graphics.ColorUtils.setAlphaComponent(base, maxOf(opacity, 0xE6))
         val surface = paint.color
         canvas.drawRoundRect(shape, radius, radius, paint)
 
@@ -356,6 +386,21 @@ internal class CYLLiquidGlassTabBarStyle : CYLTabBarStyleRenderer {
         paint.color = if (dark) Color.WHITE else Color.BLACK
         paint.alpha = ((0.1f * (1f - press) + 0.03f * press) * 255).toInt()
         canvas.drawRoundRect(bubble, bubbleRadius, bubbleRadius, paint)
+    }
+
+    private val shadowPath = android.graphics.Path()
+
+    /** [EN] The dock's shadow with the dock itself cut out. [CN] 挖掉胶囊本身的胶囊阴影。 */
+    private fun drawShadowOutside(canvas: Canvas, shape: RectF, radius: Float, density: Float, dark: Boolean) {
+        shadowPath.rewind()
+        shadowPath.addRoundRect(shape, radius, radius, android.graphics.Path.Direction.CW)
+        canvas.save()
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) canvas.clipOutPath(shadowPath)
+        else @Suppress("DEPRECATION") canvas.clipPath(shadowPath, android.graphics.Region.Op.DIFFERENCE)
+        shadowPaint.color = Color.BLACK
+        shadowPaint.setShadowLayer(12f * density, 0f, 4f * density, if (dark) 0x40000000 else 0x1A000000)
+        canvas.drawRoundRect(shape, radius, radius, shadowPaint)
+        canvas.restore()
     }
 
     override fun drawAboveItems(tabBar: CYLTabBar, canvas: Canvas) {

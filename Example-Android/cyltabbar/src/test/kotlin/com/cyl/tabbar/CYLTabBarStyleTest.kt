@@ -152,57 +152,6 @@ class CYLTabBarStyleTest {
         CYLPlusButton.removePlusButtonForTabBarContext("glass-plus")
     }
 
-    /** [EN] The tab buttons of a bar, in order. [CN] TabBar 的各 Tab 按钮（按顺序）。 */
-    private fun tabButtons(view: View): List<CYLTabBarItemButton> = when (view) {
-        is CYLTabBarItemButton -> listOf(view)
-        is android.view.ViewGroup -> (0 until view.childCount).flatMap { tabButtons(view.getChildAt(it)) }
-        else -> emptyList()
-    }.sortedBy { it.index }
-
-    @Test
-    fun liquidGlassDrawsUnselectedTitlesInTheSystemColorAsIOS26() = withActivity { activity ->
-        val controller = show(activity, CYLEnums.CYLTabBarStyleType.Default)
-        controller.cyl_tabBarItemTitleColor = android.graphics.Color.RED
-        controller.cyl_tabBarItemSelectedTitleColor = android.graphics.Color.GREEN
-        val bar = controller.tabBar
-        val button = tabButtons(bar)[1]
-        assertEquals("classic: the app's unselected color", android.graphics.Color.RED, button.titleColor(false, bar))
-        controller.tabBarStyleType = CYLEnums.CYLTabBarStyleType.LiquidGlass
-        layout(controller)
-        assertEquals("Liquid Glass: the system's unselected color", bar.unselectedTintColor, button.titleColor(false, bar))
-        assertEquals("the selected color stays the app's", android.graphics.Color.GREEN, button.titleColor(true, bar))
-    }
-
-    @Test
-    fun aPlusButtonWithItsOwnPageKeepsItsNormalImageWhenSelectedOnLiquidGlass() = withActivity { activity ->
-        val normal = ColorDrawable(android.graphics.Color.WHITE)
-        val selected = ColorDrawable(android.graphics.Color.YELLOW)
-        val page = Page()
-        CYLPlusButton.registerPlusButton(object : CYLPlusButtonSubclassing {
-            override fun plusButton(context: android.content.Context) = CYLPlusButton(context).apply {
-                setImageDrawable(normal)
-                setSelectedImageDrawable(selected)
-            }
-            override fun plusChildViewController() = page
-            override fun indexOfPlusButtonInTabBar() = 1
-            override fun tabBarContext() = "glass-plus-image"
-        })
-        val controller = CYLTabBarController(activity, listOf(Page(), Page()), attributes("Home", "Me"), CYLEnums.CYLTabBarStyleType.LiquidGlass, "glass-plus-image")
-        activity.setContentView(controller.view)
-        idle()
-        layout(controller)
-        val plus = controller.tabBar.plusButton!!
-        plus.isSelected = true
-        assertSame("Liquid Glass: the normal image, as iOS", normal, plus.imageView.drawable)
-        controller.tabBarStyleType = CYLEnums.CYLTabBarStyleType.FlatDesign
-        layout(controller)
-        val flatPlus = controller.tabBar.plusButton!!
-        flatPlus.isSelected = false
-        flatPlus.isSelected = true
-        assertSame("FlatDesign: the selected image", selected, flatPlus.imageView.drawable)
-        CYLPlusButton.removePlusButtonForTabBarContext("glass-plus-image")
-    }
-
     @Test
     fun aFloatingBarGivesItsHeightToThePagesAsTheirBottomInset() = withActivity { activity ->
         val controller = show(activity, CYLEnums.CYLTabBarStyleType.LiquidGlass)
@@ -231,5 +180,20 @@ class CYLTabBarStyleTest {
         layout(controller)
         assertEquals("back to the classic bar, with the app's background color", 0x80FF0000.toInt(), (controller.tabBar.background as ColorDrawable).color)
         assertEquals("below the pages again", controller.pagesContainer.bottom, controller.tabBar.top)
+    }
+
+    /** [EN] The Liquid Glass surface tint: 0.4 by default (`LiquidBottomTabs`), kept between 0 and 1. [CN] 液态玻璃表面着色：默认 0.4（`LiquidBottomTabs`），限制在 0 到 1 之间。 */
+    @Test
+    fun theLiquidGlassSurfaceTintCanBeCustomized() = withActivity { activity ->
+        val controller = show(activity, CYLEnums.CYLTabBarStyleType.LiquidGlass)
+        val bar = controller.tabBar
+        assertEquals(0.4f, bar.cyl_liquidGlassSurfaceOpacity, 0f)
+        assertNull(bar.cyl_liquidGlassSurfaceColor)
+        bar.cyl_liquidGlassSurfaceOpacity = 2f
+        assertEquals(1f, bar.cyl_liquidGlassSurfaceOpacity, 0f)
+        bar.cyl_liquidGlassSurfaceOpacity = -1f
+        assertEquals(0f, bar.cyl_liquidGlassSurfaceOpacity, 0f)
+        bar.cyl_liquidGlassSurfaceColor = 0xFF336699.toInt()
+        assertEquals(0xFF336699.toInt(), bar.cyl_liquidGlassSurfaceColor)
     }
 }

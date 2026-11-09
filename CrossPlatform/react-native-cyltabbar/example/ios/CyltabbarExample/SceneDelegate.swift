@@ -9,7 +9,7 @@ class SceneDelegate: RCTDefaultReactNativeFactoryDelegate, UIWindowSceneDelegate
 
   func scene(
     _ scene: UIScene,
-    willConnectTo session: UISceneSession,
+    willConnectTo _: UISceneSession,
     options connectionOptions: UIScene.ConnectionOptions
   ) {
     guard let windowScene = scene as? UIWindowScene else {

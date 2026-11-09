@@ -17,7 +17,7 @@ import CYLTabBarController
 final class SwiftAutoPageViewController: UIViewController, CYLTabBarPage {
     static func cylTabBarPageIdentifier() -> String { "swift-auto" }
 
-    static func cylTabBarPage(withAttributes tabAttributes: [String: Any]) -> UIViewController? {
+    static func cylTabBarPage(attributes tabAttributes: [String: Any]) -> UIViewController? {
         let page = SwiftAutoPageViewController()
         page.title = tabAttributes[CYLTabBarItemTitle] as? String
         return UINavigationController(rootViewController: page)

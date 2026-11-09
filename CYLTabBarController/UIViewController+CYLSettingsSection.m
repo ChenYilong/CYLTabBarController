@@ -435,6 +435,9 @@ static NSString *const CYLTouchableAreaCellIdentifier = @"CYLTouchableAreaCell";
 - (void)cyl_reloadTouchableArea {
     CYLPlusButton *plusButton = [self cyl_touchableAreaPlusButton];
     self.titleLabel.text = CYLLocalizedString(@"PlusButton 点击范围（issue #91）");
+    // [EN] Accessibility: the slider reads as the row's title with the current scale as its value (it had no label).
+    // [CN] 无障碍：滑块读作本行标题，当前倍数作为其值（以前没有标签）。
+    self.scaleSlider.accessibilityLabel = self.titleLabel.text;
     self.scaleSlider.enabled = (plusButton != nil);
     self.overlaySwitch.enabled = (plusButton != nil);
     if (!plusButton) {
@@ -446,6 +449,7 @@ static NSString *const CYLTouchableAreaCellIdentifier = @"CYLTouchableAreaCell";
     self.scaleSlider.value = plusButton.touchableAreaScale;
     self.overlaySwitch.on = plusButton.showsTouchableArea;
     NSString *scaleText = [NSString stringWithFormat:@"%.1f", plusButton.touchableAreaScale];
+    self.scaleSlider.accessibilityValue = [scaleText stringByAppendingString:@"×"];
     self.summaryLabel.text = [NSString stringWithFormat:CYLLocalizedString(@"打开开关以半透明红色显示可点击区域，关闭恢复正常；拖动滑块按倍数扩大点击范围，当前：%@ 倍"), scaleText];
 }
 

@@ -47,7 +47,13 @@ object TabConfigurationFormats {
         TabConfigurationFormat.PROPERTIES -> parseProperties(text)
     }
 
+    // [EN] JAXP property names: identifiers, not URLs that are fetched. Spelled out because Android's XMLConstants does
+    //      not have them (the React Native and Flutter wrappers compile this file against android.jar).
+    // [CN] JAXP 属性名：是标识符，不是会被访问的 URL。直接写出字符串，因为 Android 的 XMLConstants 没有这两个常量（React Native 与 Flutter
+    //      封装会用 android.jar 编译本文件）。
+    @Suppress("kotlin:S5332")
     private const val ACCESS_EXTERNAL_DTD = "http://javax.xml.XMLConstants/property/accessExternalDTD"
+    @Suppress("kotlin:S5332")
     private const val ACCESS_EXTERNAL_SCHEMA = "http://javax.xml.XMLConstants/property/accessExternalSchema"
 
     // [EN] External entities and DTD loading are off (the iOS parser does the same, edge case A14). [CN] 关闭外部实体与 DTD 加载（iOS 解析器相同，边界情况 A14）。

@@ -181,13 +181,11 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
     ];
     for (NSInteger i = 0; i < self.tabBarItemsAttributesForTabBar.count; i++) {
         UIViewController *vc = viewControllers[i];
-        NSDictionary *firstTabBarItemsAttributes = self.tabBarItemsAttributesForTabBar[i];
-        //        vc.title = firstTabBarItemsAttributes[CYLTabBarItemTitle];
-        NSString *title = firstTabBarItemsAttributes[CYLTabBarItemTitle];
-        if ([CYLConstants isLiquidGlassActive]) {
-            title = [NSString stringWithFormat:@"%@%@", firstTabBarItemsAttributes[CYLTabBarItemTitle],CYLLocalizedString(@"（液态）")];
-        }
-        vc.cyl_getViewControllerInsteadOfNavigationController.title  = title;
+        // [EN] The navigation bar title is the tab title, also after it changes in place ("Change all titles", skins):
+        //      no page sets `title` itself any more (it set the tab title a second time and never followed changes).
+        // [CN] 导航栏标题即 Tab 标题，原地修改后（「批量更换标题」、皮肤）也会同步：页面不再自己设置 `title`（以前会再设置一次 Tab 标题，
+        //      而且不跟随之后的修改）。
+        CYL_NAVIGATION_TITLE_FOLLOWS_TAB_BAR_ITEM(vc.cyl_getViewControllerInsteadOfNavigationController);
         
         //        [self setupChildViewController:nav
         //                                 title:titles[i]
@@ -826,10 +824,10 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
     UIButton *button = [CYLPlusButton plusButtonForOwner:tabBarController];
     BOOL isPlusButton = [tabBarController hasPlusButton] && [control cyl_isPlusControl];
     // [CN] 即使 PlusButton 也添加了点击事件，点击 PlusButton 后也会触发该代理方法。
-    // 可在PlusButton初始化时使用 CYLExternPlusButton.cyl_userInteractionDisabled = YES; 来禁止该协议方法触发plusButton回调
+    // 可在PlusButton初始化时设置 reportsTapsToDelegate = NO 来禁止该协议方法触发plusButton回调
     // [EN] Even if the PlusButton has its own tap action, tapping the PlusButton still triggers this delegate method.
-    //      Use CYLExternPlusButton.cyl_userInteractionDisabled = YES; when initializing the PlusButton to stop this
-    //      protocol method from triggering the plusButton callback.
+    //      Set reportsTapsToDelegate = NO when creating the PlusButton to stop this protocol method from triggering the
+    //      plusButton callback.
     if (isPlusButton) {
         animationView = button.imageView;
     }

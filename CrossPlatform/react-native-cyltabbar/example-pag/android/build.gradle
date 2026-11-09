@@ -19,3 +19,17 @@ buildscript {
 }
 
 apply plugin: "com.facebook.react.rootproject"
+
+// [EN] The root project, the app and the react-native-cyltabbar library lock their dependencies (gradle.lockfile next to
+//      each build file). LENIENT: a new React Native or library version updates the build instead of failing it; refresh
+//      with `./gradlew dependencies :app:dependencies :react-native-cyltabbar:dependencies --write-locks`.
+// [CN] 根工程、App 与 react-native-cyltabbar 库锁定依赖（各构建文件旁的 gradle.lockfile）。LENIENT：React Native 或库升级时继续构建而不是失败；
+//      用 `./gradlew dependencies :app:dependencies :react-native-cyltabbar:dependencies --write-locks` 更新。
+allprojects { project ->
+    if (project == rootProject || project.name == "app" || project.name == "react-native-cyltabbar") {
+        dependencyLocking {
+            lockAllConfigurations()
+            lockMode = LockMode.LENIENT
+        }
+    }
+}

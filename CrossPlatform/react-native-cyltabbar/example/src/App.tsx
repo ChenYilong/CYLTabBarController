@@ -103,9 +103,7 @@ export default function App() {
   CYLSetDemoLanguage(language);
   const shownLanguage = CYLDemoLanguage();
   const dark = useColorScheme() === 'dark';
-  // CYLDemoSetFollowsSystem: Dark in dark mode; in light mode back to Default from Dark, otherwise the skin chosen.
-  // 跟随系统：深色时为 Dark；浅色时从 Dark 回到 Default，否则为所选皮肤。
-  const effectiveName = followsSystem ? (dark ? 'Dark' : skinName === 'Dark' ? 'Default' : skinName) : skinName;
+  const effectiveName = effectiveSkinName(skinName, followsSystem, dark);
   const skin = SKINS.find((candidate) => candidate.name === effectiveName) ?? SKINS[0]!;
   const skinPicker = {
     skin,
@@ -223,7 +221,7 @@ function skinnedItems(skin: CYLSkin): CYLTabBarItem[] {
 function skinnedPlusButton(skin: CYLSkin): CYLTabBarPlusButton {
   const plusButton = { ...PLUS_BUTTON, title: t(PLUS_BUTTON.title as string) };
   if (skin.icons) {
-    const icon = THEME_ICONS[skin.icons[skin.icons.length - 1]!]!.image;
+    const icon = THEME_ICONS[skin.icons.at(-1)!]!.image;
     return { ...plusButton, image: icon, selectedImage: icon };
   }
   if (skin.network) {
@@ -252,7 +250,7 @@ function skinnedConfiguration(skin: CYLSkin) {
 }
 
 /** The skin picker (`-cyl_themeMenuWithCompletion:`): a swatch or the first icon, a check on the current one. 换肤菜单。 */
-function CYLSkinMenu({ visible, picker, colors, onClose }: { visible: boolean; picker: CYLSkinPicker; colors: typeof LIGHT; onClose: () => void }) {
+function CYLSkinMenu({ visible, picker, colors, onClose }: Readonly<{ visible: boolean; picker: CYLSkinPicker; colors: typeof LIGHT; onClose: () => void }>) {
   const row = (key: string, icon: ReactNode, title: string, checked: boolean, onPress: () => void) => (
     <Pressable
       key={key}
@@ -298,7 +296,7 @@ function CYLSkinMenu({ visible, picker, colors, onClose }: { visible: boolean; p
 }
 
 /** A dot badge on a navigation bar button (`-cyl_showBadgeValue:animationType:backgroundColor:`). 导航栏按钮上的红点角标。 */
-function CYLNavigationBadge({ color, animation }: { color: string; animation: 'breathe' | 'shake' }) {
+function CYLNavigationBadge({ color, animation }: Readonly<{ color: string; animation: 'breathe' | 'shake' }>) {
   const progress = useRef(new Animated.Value(0)).current;
   useEffect(() => {
     const loop = Animated.loop(
@@ -327,7 +325,7 @@ function CYLNavigationBadge({ color, animation }: { color: string; animation: 'b
 }
 
 /** A Liquid Glass bar button. 液态玻璃导航栏按钮。 */
-function CYLNavigationButton(props: { title: string; colors: typeof LIGHT; onPress: () => void; badge?: ReactNode }) {
+function CYLNavigationButton(props: Readonly<{ title: string; colors: typeof LIGHT; onPress: () => void; badge?: ReactNode }>) {
   return (
     <Pressable
       accessibilityRole="button"
@@ -341,6 +339,86 @@ function CYLNavigationButton(props: { title: string; colors: typeof LIGHT; onPre
   );
 }
 
+/**
+ * [EN] CYLDemoSetFollowsSystem: Dark in dark mode; in light mode back to Default from Dark, otherwise the skin chosen.
+ * [CN] 跟随系统：深色时为 Dark；浅色时从 Dark 回到 Default，否则为所选皮肤。
+ */
+function effectiveSkinName(skinName: string, followsSystem: boolean, dark: boolean): string {
+  if (!followsSystem) {
+    return skinName;
+  }
+  if (dark) {
+    return 'Dark';
+  }
+  return skinName === 'Dark' ? 'Default' : skinName;
+}
+
+/**
+ * [EN] MainTabBarController: the first page's title gets " (Liquid)" on Liquid Glass.
+ * [CN] MainTabBarController：液态玻璃下第一个页面的标题加上「 (Liquid)」。
+ */
+function homePageTitle(selectedIndex: number, styleType: CYLStyleType): string {
+  if (selectedIndex !== 0) {
+    return t(ITEMS[selectedIndex]!.title as string);
+  }
+  return styleType === 'liquidGlass' ? `${t('Home')} (Liquid)` : t('Home');
+}
+
+/**
+ * [EN] FlatDesign: a skin's tint colors the badges without a color of their own (`badgeBackgroundColor` of the
+ *      appearance); Liquid Glass keeps them red.
+ * [CN] 扁平样式：皮肤的 tint 为没有自定颜色的角标着色（appearance 的 `badgeBackgroundColor`）；液态玻璃下仍为红色。
+ */
+function badgesInSkin(badges: (CYLTabBarBadge | null)[], styleType: CYLStyleType, skin: CYLSkin): (CYLTabBarBadge | null)[] {
+  if (styleType !== 'flatDesign' || !skin.tint) {
+    return badges;
+  }
+  return badges.map((badge) => (badge && !badge.color ? { ...badge, color: skin.tint } : badge));
+}
+
+/** [EN] The values the demo rows show, in the current language, as the Objective-C example. [CN] 演示列表各行显示的值，使用当前语言，与 Objective-C 示例相同。 */
+function demoValues(skinName: string, selectedIndex: number, titleOffset: number): Record<string, string> {
+  const selectedTitle = selectedIndex === 0 ? 'Refresh' : (ITEMS[selectedIndex]!.title as string);
+  return {
+    titleOffset: `(0, ${titleOffset})`,
+    appearance: t('Original'),
+    skin: t(skinName),
+    scrollBehavior: 'Automatic',
+    indexWithoutPlus: String(selectedIndex),
+    selectedIndex: String(selectedIndex < 2 ? selectedIndex : selectedIndex + 1),
+    selectedTitle: t(selectedTitle),
+    loginTabs: [t('Messages'), t('Me')].join(', '),
+    bundleImage: 'Found CYLImagePathInBundle ✓ (cyl_badge_sample_icon@3x.png) · CYLBundleImagePath ✓ · CYLBundleImageData 11 KB · CYLBundleImageFromData ✓ (@3x) · CYLImageNamed ✓',
+    touchScale: '1.0',
+    tapAnimation: t('None'),
+    tapSound: t('None'),
+    longPress: '0.5',
+    doubleTap: '0.35',
+    adjacent: '-',
+    outsideTaps: '0',
+  };
+}
+
+/**
+ * [EN] The system version, as -[CYLHomeViewController configureCell:forIndexPath:] ("iOS 26.5", "Android 15").
+ * [CN] 系统版本，与 ObjC 示例相同（「iOS 26.5」「Android 15」）。
+ */
+function systemVersionText(): string {
+  if (Platform.OS === 'ios') {
+    return `iOS ${Platform.Version}`;
+  }
+  const release = (Platform.constants as { Release?: string }).Release ?? Platform.Version;
+  return `Android ${release}`;
+}
+
+/** [EN] The badge samples' subtitle; the library translates the iOS one. [CN] 角标样例的副标题；库翻译了 iOS 的写法。 */
+function badgeSubtitle(pageTitle: string): string {
+  if (Platform.OS === 'ios') {
+    return t('{page} CYLTabBarController on iOS {version}', { page: pageTitle, version: String(Platform.Version) });
+  }
+  return `${pageTitle} CYLTabBarController on ${systemVersionText()}`;
+}
+
 function CYLMainTabBar({
   styleType,
   onRebuild,
@@ -349,7 +427,7 @@ function CYLMainTabBar({
   onLoggedInChange,
   language,
   onLanguageChange,
-}: {
+}: Readonly<{
   styleType: CYLStyleType;
   onRebuild: (styleType: CYLStyleType) => void;
   skinPicker: CYLSkinPicker;
@@ -357,7 +435,7 @@ function CYLMainTabBar({
   onLoggedInChange: (loggedIn: boolean) => void;
   language: string | undefined;
   onLanguageChange: (language: string | undefined) => void;
-}) {
+}>) {
   const dark = useColorScheme() === 'dark';
   const colors = dark ? DARK : LIGHT;
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -415,15 +493,11 @@ function CYLMainTabBar({
     return () => clearTimeout(timer);
   }, [skinName, skinPicker.skin.network]);
   const [orangePagePushed, setOrangePagePushed] = useState(false);
-  // MainTabBarController: the first page's title gets " (Liquid)" on Liquid Glass. 液态玻璃下第一个页面的标题加上「 (Liquid)」。
   // The badge samples' subtitle uses the page's `title`; a badge row changes only `navigationItem.title` ("Home (n)").
   // 角标样例副标题使用页面的 `title`；点击角标行只修改 `navigationItem.title`（「Home (n)」）。
-  const pageTitle = selectedIndex === 0 ? `${t('Home')}${styleType === 'liquidGlass' ? ' (Liquid)' : ''}` : t(ITEMS[selectedIndex]!.title as string);
+  const pageTitle = homePageTitle(selectedIndex, styleType);
   const { skin } = skinPicker;
-  // FlatDesign: a skin's tint colors the badges without a color of their own (`badgeBackgroundColor` of the appearance);
-  // Liquid Glass keeps them red. 扁平样式：皮肤的 tint 为没有自定颜色的角标着色（appearance 的 `badgeBackgroundColor`）；液态玻璃下仍为红色。
-  const tintsBadges = styleType === 'flatDesign' && skin.tint;
-  const skinnedBadges = badgeStyles.map((badge) => (badge && !badge.color && tintsBadges ? { ...badge, color: skin.tint } : badge));
+  const skinnedBadges = badgesInSkin(badgeStyles, styleType, skin);
 
   const insetTop = useSafeAreaInsets().top;
 
@@ -469,33 +543,10 @@ function CYLMainTabBar({
         <CYLDemoList
           colors={colors}
           tint={skin.tint ?? colors.tint}
-          values={{
-            titleOffset: `(0, ${shownTitleOffset})`,
-            appearance: t('Original'),
-            skin: t(skin.name),
-            scrollBehavior: 'Automatic',
-            indexWithoutPlus: String(selectedIndex),
-            selectedIndex: String(selectedIndex < 2 ? selectedIndex : selectedIndex + 1),
-            selectedTitle: t(selectedIndex === 0 ? 'Refresh' : (ITEMS[selectedIndex]!.title as string)),
-            loginTabs: [t('Messages'), t('Me')].join(', '),
-            bundleImage: 'Found CYLImagePathInBundle ✓ (cyl_badge_sample_icon@3x.png) · CYLBundleImagePath ✓ · CYLBundleImageData 11 KB · CYLBundleImageFromData ✓ (@3x) · CYLImageNamed ✓',
-            touchScale: '1.0',
-            tapAnimation: t('None'),
-            tapSound: t('None'),
-            longPress: '0.5',
-            doubleTap: '0.35',
-            adjacent: '-',
-            outsideTaps: '0',
-          }}
+          values={demoValues(skin.name, selectedIndex, shownTitleOffset)}
           switches={{ login: loggedIn === true }}
           currentSkin={skinPicker.followsSystem ? '' : skin.name}
-          // The system version, as -[CYLHomeViewController configureCell:forIndexPath:] ("iOS 26.5", "Android 15").
-          // 系统版本，与 ObjC 示例相同（「iOS 26.5」「Android 15」）。
-          badgeSubtitle={
-            Platform.OS === 'ios'
-              ? t('{page} CYLTabBarController on iOS {version}', { page: pageTitle, version: String(Platform.Version) })
-              : `${pageTitle} CYLTabBarController on Android ${(Platform.constants as { Release?: string }).Release ?? Platform.Version}`
-          }
+          badgeSubtitle={badgeSubtitle(pageTitle)}
           onRow={(row: CYLDemoRow) => {
             if (row.skin) return skinPicker.choose(row.skin.name);
             if (row.id === 'skin') return setSkinMenuVisible(true);

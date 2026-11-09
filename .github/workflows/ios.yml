@@ -180,8 +180,11 @@ jobs:
           path: build/unit-tests.log
           if-no-files-found: ignore
 
-  # [EN] Carthage, as an app would use it: build this checkout as an XCFramework.
-  # [CN] 与 App 的用法一致的 Carthage：把当前代码编译为 XCFramework。
+  # [EN] Carthage: the XCFramework a release attaches for Carthage's binary spec (docs/Carthage.md), built as the
+  #      Release workflow builds it (`scripts/pod-lint.sh xcframework`, from a copy without CrossPlatform/), then a check
+  #      that the binary spec is valid JSON.
+  # [CN] Carthage：发布时附在 Release 上、供 Carthage 二进制规格使用的 XCFramework（docs/Carthage.md），构建方式与 Release workflow
+  #      相同（`scripts/pod-lint.sh xcframework`，从去掉 CrossPlatform/ 的副本构建），随后检查二进制规格是合法的 JSON。
   carthage:
     name: Carthage
     needs: changes
@@ -192,9 +195,12 @@ jobs:
       - name: Install Carthage
         if: needs.changes.outputs.code == 'true'
         run: carthage version || brew install carthage
-      - name: carthage build
+      - name: XCFramework for the Carthage binary spec
         if: needs.changes.outputs.code == 'true'
-        run: carthage build --no-skip-current --use-xcframeworks --platform iOS
+        run: |
+          scripts/pod-lint.sh xcframework
+          unzip -l build/CYLTabBarController.xcframework.zip | grep -q "CYLTabBarController.xcframework/Info.plist"
+          python3 -c 'import json; json.load(open("CYLTabBarController.json"))'
 
   # [EN] Every demo, one job each; one failing demo does not stop the others.
   # [CN] 每个 Demo 一个 job；一个 Demo 失败不会中止其他 Demo。

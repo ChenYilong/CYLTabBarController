@@ -9,7 +9,11 @@
 import UIKit
 import CYLTabBarController
 
-class RootTabBarController: CYLTabBarController {
+// [EN] The Carthage framework includes FlatDesign, whose `delegate` is `CYLTabBarControllerDelegate &
+//      CYLFlatDesignUITabBarControllerDelegate`: adopt both to set `delegate = self` (as Example-Swift-SwiftManager-FlatDesign).
+// [CN] Carthage 框架包含扁平样式，其 `delegate` 类型为 `CYLTabBarControllerDelegate & CYLFlatDesignUITabBarControllerDelegate`：
+//      同时遵守两者才能设置 `delegate = self`（与 Example-Swift-SwiftManager-FlatDesign 相同）。
+class RootTabBarController: CYLTabBarController, CYLFlatDesignUITabBarControllerDelegate {
 
     // #535: the plus button's badge, shared by every Swift demo (Example-Shared/CYLPlusButtonBadgeDemo.swift).
     // #535：PlusButton 的角标，所有 Swift Demo 共用（Example-Shared/CYLPlusButtonBadgeDemo.swift）。

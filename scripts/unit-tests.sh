@@ -28,12 +28,20 @@ echo "Simulator: $DEVICE_ID"
 scripts/free-ram.sh || true
 xcodebuild -version
 
+# [EN] A new, empty derived data folder on the internal disk for every run (AGENTS.md: clean before every build). Inside
+#      the checkout on an external volume, macOS wrote `._*` files into the built framework's Headers folder, and the
+#      compiler warned "umbrella header ... does not include header '._…'" for each of them.
+# [CN] 每次运行都使用内置磁盘上新的空 derived data 文件夹（AGENTS.md：每次构建前清理）。放在外置卷上的仓库内时，macOS 会在构建出的
+#      framework 的 Headers 文件夹中写入 `._*` 文件，编译器对每个文件警告“umbrella header ... does not include header '._…'”。
+DERIVED_DATA=$(mktemp -d "${TMPDIR:-/tmp}/cyl-unit-tests.XXXXXX")
+trap 'rm -rf "$DERIVED_DATA"' EXIT
+
 set +e
 xcodebuild test \
   -project CYLTabBarController.xcodeproj \
   -scheme CYLTabBarController-Framework \
   -destination "id=$DEVICE_ID" \
-  -derivedDataPath build/DerivedData/unit-tests \
+  -derivedDataPath "$DERIVED_DATA" \
   CODE_SIGNING_ALLOWED=NO > build/unit-tests.log 2>&1
 STATUS=$?
 set -e

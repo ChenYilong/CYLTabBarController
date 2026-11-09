@@ -22,7 +22,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import org.json.JSONArray
 import org.json.JSONObject
-import java.net.URL
+import java.net.URI
 import java.util.concurrent.Executors
 
 /** [EN] The page of every tab of a [CYLTabBarHostView]: the host draws the pages, so it is empty. [CN] [CYLTabBarHostView] 每个 Tab 的页面：页面由宿主绘制，因此为空。 */
@@ -358,7 +358,7 @@ open class CYLTabBarHostView @JvmOverloads constructor(context: Context, attrs: 
     }
 
     private fun urlImage(value: String): Drawable? {
-        val bytes = runCatching { URL(value).openStream().use { it.readBytes() } }.getOrNull() ?: return null
+        val bytes = runCatching { URI(value).toURL().openStream().use { it.readBytes() } }.getOrNull() ?: return null
         val bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size) ?: return null
         return BitmapDrawable(resources, bitmap)
     }
@@ -379,8 +379,11 @@ open class CYLTabBarHostView @JvmOverloads constructor(context: Context, attrs: 
         super.onDetachedFromWindow()
         // [EN] Rebuilt when attached again: the fragments cannot outlive the view tree. [CN] 再次附加时重新创建：Fragment 不能比视图树存活更久。
         if (tabBarController != null && configuration != null) {
+            // [EN] Setting the same configuration again runs its setter, which builds the controller on the next attach.
+            // [CN] 再次设置同一配置会执行其 setter，在下次附加时重新创建控制器。
+            val current = configuration
             removeController()
-            configuration = configuration
+            configuration = current
         }
     }
 
@@ -633,14 +636,9 @@ open class CYLTabBarHostView @JvmOverloads constructor(context: Context, attrs: 
         val rects = mutableListOf<Rect>()
         if (tabBar != null && tabBar.isLaidOut && !tabBarHidden) {
             rects += rectInView(tabBar, Rect(0, 0, tabBar.width, tabBar.height))
-            val plusButton = tabBar.plusButton
-            if (plusButton != null && plusButton.isAttachedToWindow && plusButton.visibility == VISIBLE) {
-                val frame = Rect(0, 0, plusButton.width, plusButton.height)
-                for (index in 0 until plusButton.childCount) {
-                    val child = plusButton.getChildAt(index)
-                    if (child.visibility == VISIBLE) frame.union(child.left + child.translationX.toInt(), child.top + child.translationY.toInt(), child.right + child.translationX.toInt(), child.bottom + child.translationY.toInt())
-                }
-                val plusRect = rectInView(plusButton, frame)
+            val plusButton = tabBar.plusButton?.takeIf { it.isAttachedToWindow && it.visibility == VISIBLE }
+            if (plusButton != null) {
+                val plusRect = rectInView(plusButton, plusButtonFrame(plusButton))
                 rects += plusRect
                 // [EN] The part of the plus button in the strip lies outside the content: this view hands its touches over.
                 // [CN] PlusButton 位于透明区域中的部分在内容之外：由本视图转交其触摸。
@@ -655,6 +653,23 @@ open class CYLTabBarHostView @JvmOverloads constructor(context: Context, attrs: 
         val density = resources.displayMetrics.density
         touchableRects = rects.map { RectF(it.left / density, it.top / density, it.right / density, it.bottom / density) }
         touchableRectsDidChange?.invoke(touchableRects)
+    }
+
+    /**
+     * [EN] The plus button's frame with its visible children (its badge and a title that reach outside it), in its
+     *      own coordinates.
+     * [CN] PlusButton 及其可见子视图（超出其范围的角标与标题）的范围，以其自身坐标表示。
+     */
+    private fun plusButtonFrame(plusButton: CYLPlusButton): Rect {
+        val frame = Rect(0, 0, plusButton.width, plusButton.height)
+        for (index in 0 until plusButton.childCount) {
+            val child = plusButton.getChildAt(index)
+            if (child.visibility != VISIBLE) continue
+            val dx = child.translationX.toInt()
+            val dy = child.translationY.toInt()
+            frame.union(child.left + dx, child.top + dy, child.right + dx, child.bottom + dy)
+        }
+        return frame
     }
 
     /** [EN] `rect`, in the coordinates of `view`, in this view's coordinates. [CN] 把 `view` 坐标中的 `rect` 转为本视图坐标。 */

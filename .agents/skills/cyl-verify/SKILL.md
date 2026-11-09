@@ -36,6 +36,8 @@ The `CYLTabBarController` scheme has no test action: use `scripts/unit-tests.sh`
 | Simulator taps do nothing | The simulator's input is stuck | Shut it down, boot it, wait, try again |
 | `pod` fails with a missing `ffi` | The system's CocoaPods | Use the Homebrew one: put `/opt/homebrew/opt/ruby/bin` and its gems `bin` first in `PATH` |
 | Git errors about `._*` files on the exFAT volume | macOS AppleDouble files inside `.git` | `find .git -name '._*' -delete` |
+| `umbrella header for module 'CYLTabBarController' does not include header '._….h'` | Derived data on the exFAT volume: macOS writes `._*` files into the built framework's `Headers` | Build into a folder on the internal disk (`$TMPDIR`); `scripts/unit-tests.sh` does |
+| VoiceOver (`axe describe-ui`) reads a tab's old title on Liquid Glass | The selected layer's tab button reads the item's own `accessibilityLabel`, else its first title | The library writes the title as the item's label on layout (`-cyl_syncTabBarItemAccessibility`); keep that call in the tab bar's `-layoutSubviews` |
 | `-[UIApplication statusBarStyle] ... no-op` | `UIViewControllerBasedStatusBarAppearance = NO` in `Info.plist` | Remove the key |
 | `CVPixelBufferCreate returned err -6680`, simulator only | JPEG assets decoded by the system | Use PNG, or ignore it |
 | `cannot add handler to 0 from 0`, `pointeruid` | UIKit and the system, no app frames | Ignore |
@@ -54,6 +56,15 @@ The `CYLTabBarController` scheme has no test action: use `scripts/unit-tests.sh`
 | PAG / Rive demo (RN, Flutter) Android: icons blank | No `.pag` files (fetched by `pod install` in `Example-PAG`), or Rive not initialized | Run `pod install` in `Example-PAG` first; the library calls `Rive.init` itself |
 | A resource added to a Flutter Runner project lands in `RunnerTests` | The script took the first Resources phase | Add it to the Resources phase of the application target |
 | `CYLTabBarHostView` shows no tab for an item | Neither a page ID nor an identifier: no page | The host gives such a tab a page ID of its own (`CYLTabBarHostView-tab-<index>`) |
+
+### Clean builds
+
+- **Before every build and run** (an app, `xcodebuild test`, a script that builds), start from an empty derived data
+  folder: `rm -rf <derived data>` or a new `-derivedDataPath`. The Objective-C demo does not relink after a change in the
+  library only, so an incremental build runs the old library code: a test or a screenshot from it proves nothing.
+  `scripts/plus-child-theme-test.sh` deletes its build folder itself; `scripts/unit-tests.sh` builds into a new folder
+  under `$TMPDIR` and deletes it afterwards.
+- When in doubt, check that the app holds the new code: `strings <app>/<binary> | grep <new symbol>`.
 
 ### Running the simulator
 

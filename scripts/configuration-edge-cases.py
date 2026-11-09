@@ -108,9 +108,17 @@ CASES = [
  # E. Threads 线程
  ('E1', '在后台线程读取文件并创建控制器', 'Reading a file and creating the controller on a background thread', '文件接口返回 MainThreadRequired 错误；代码初始化输出警告（与原行为一致）', 'The file APIs return a MainThreadRequired error; the code initializer warns (as before)', {'fixed': 5}),
  ('E2', '在后台线程只解析配置字典', 'Only parsing the dictionary on a background thread', '解析器只依赖 Foundation，线程安全', 'The parser is Foundation only and thread-safe', {'fixed': 1}),
+ # L. Localization 本地化（CYLTabBarControllerLocalization）
+ ('L1', '字符串表位于配置文件旁（相对路径）或运行时下载到沙盒（"sandbox:Caches/…"）', 'The tables sit next to the configuration file (a relative path) or were downloaded into the sandbox at run time ("sandbox:Caches/…")', '按位置路由找到 `<语言>.lproj/<表名>.strings` 并翻译文本；iOS 与 Android 读取同样的文件', 'The location route finds `<language>.lproj/<table>.strings` and the texts are translated; iOS and Android read the same files', {'fixed': 17, 'found': 17}),
+ ('L2', '找不到当前语言的字符串表', 'No table for the current language', '依次尝试语言、文字、语言代码、Base、en；都没有时文本保持原样（DEBUG 日志）', 'The language, its script, its code, Base and en are tried; with none, the texts stay as they are (DEBUG log)', {'fixed': 17, 'found': 17}),
+ ('L3', '字符串表中没有某个键', 'A key is missing from the table', '该文本保持原样，与 NSLocalizedString 相同', 'That text stays as it is, as with NSLocalizedString', {'fixed': 17, 'found': 17}),
+ ('L4', '`CYLTabBarControllerLocalization` 的值类型错误，或资源包不存在', 'A `CYLTabBarControllerLocalization` value of the wrong type, or a missing resource bundle', '忽略并输出 DEBUG 日志，文本不变', 'Ignored with a DEBUG log; the texts do not change', {'fixed': 17, 'found': 17}),
+ ('L5', '配置来自代码或网络（没有文件目录）', 'The configuration comes from code or the network (no file folder)', '相对路径相对于 App 资源（Android：assets）；可用 "bundle:"、"sandbox:"、"file:" 或绝对路径', 'A relative path is relative to the app\'s resources (Android: the assets); "bundle:", "sandbox:", "file:" or an absolute path work too', {'fixed': 17, 'found': 17}),
 ]
 
 ROUNDS = {
+ 17: ('新增 `CYLTabBarControllerLocalization`：配置中的文本作为键，在 App 的 `<语言>.lproj/<表名>.strings` 中查找（iOS、Android，以及经由宿主视图的 React Native 与 Flutter），字符串表的位置用位置路由指定（"bundle:"、"sandbox:"、"file:"、绝对路径、"~/"、相对路径）。新增并处理 L1–L5。',
+     'New `CYLTabBarControllerLocalization`: the texts of a configuration are keys looked up in the app\'s `<language>.lproj/<table>.strings` (iOS, Android, and React Native and Flutter through the host view), with the location of the tables given as a location route ("bundle:", "sandbox:", "file:", an absolute path, "~/", a relative path). L1–L5 added and handled.'),
  1: ('基线：解析器已能拒绝大部分无效文件，但值的类型、NaN、嵌套深度、空文件与 HTML 页面等会导致崩溃或生成空 TabBar。',
      'Baseline: the parser already refuses most invalid files, but wrong value types, NaN, deep nesting, empty files and HTML pages crash or give an empty tab bar.'),
  2: ('修复会崩溃的情况：值的类型检查、null、NaN / Infinity、尺寸范围、样式编号范围、非控制器对象、重复的控制器、嵌套深度限制。',

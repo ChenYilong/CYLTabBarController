@@ -6,7 +6,7 @@
  * Objective-C 示例的演示列表，每个 Tab 都显示。行数据来自 Example-Shared/CYLDemoList/demo-list.json（由 scripts/sync-example-shared.py
  * 复制到这里）；`values` 填入「{name}」部分，`onRow` 处理点击。所有文字使用当前语言显示（CYLLocalization.ts）。
  */
-import { Image, Platform, Pressable, SectionList, StyleSheet, Switch, Text, View, type ImageSourcePropType } from 'react-native';
+import { Image, Pressable, SectionList, StyleSheet, Switch, Text, View, type ImageSourcePropType } from 'react-native';
 import { CYLBadgeView, type CYLBadgeSample } from './CYLBadgeView';
 import { DEMO_ICONS } from './icons';
 import { SKINS, THEME_ICONS, type CYLSkin } from '../CYLSkins';
@@ -70,7 +70,23 @@ function rowTexts(row: CYLDemoRow, values: Record<string, string>, switches: Rec
   return { title, subtitle: t(row.subtitle, values), label: undefined };
 }
 
-export function CYLDemoList({ colors, tint, values, switches, currentSkin, badgeSubtitle, header, onRow, onSwitch }: Props) {
+/** [EN] What a skin row says it changes. [CN] 皮肤行说明它改变的内容。 */
+function skinSubtitle(skin: CYLSkin): string {
+  if (skin.network) {
+    return 'Network icons, titles and colors';
+  }
+  return skin.icons ? 'Holiday icons and colors' : 'Colors only';
+}
+
+/** [EN] A switch row reports on / off; a skin row reports whether it is the current skin. [CN] 开关行报告开 / 关；皮肤行报告是否为当前皮肤。 */
+function rowAccessibilityState(item: CYLDemoRow, isSwitch: boolean, switches: Record<string, boolean>, currentSkin: string) {
+  if (isSwitch) {
+    return { checked: !!switches[item.id] };
+  }
+  return item.skin ? { selected: item.skin.name === currentSkin } : undefined;
+}
+
+export function CYLDemoList({ colors, tint, values, switches, currentSkin, badgeSubtitle, header, onRow, onSwitch }: Readonly<Props>) {
   const sections = [
     ...DATA.sections.map((section) => ({
       title: t(section.title),
@@ -79,7 +95,7 @@ export function CYLDemoList({ colors, tint, values, switches, currentSkin, badge
             id: `skin:${skin.name}`,
             icon: null,
             title: t(skin.name),
-            subtitle: t(skin.network ? 'Network icons, titles and colors' : skin.icons ? 'Holiday icons and colors' : 'Colors only'),
+            subtitle: t(skinSubtitle(skin)),
             accessory: 'none',
             skin,
           }))
@@ -171,7 +187,7 @@ export function CYLDemoList({ colors, tint, values, switches, currentSkin, badge
             accessible={grouped}
             accessibilityRole={isSwitch ? 'switch' : 'button'}
             accessibilityLabel={grouped ? label : undefined}
-            accessibilityState={isSwitch ? { checked: !!switches[item.id] } : item.skin ? { selected: item.skin.name === currentSkin } : undefined}
+            accessibilityState={rowAccessibilityState(item, isSwitch, switches, currentSkin)}
             onPress={() => (isSwitch ? onSwitch(item, !switches[item.id]) : onRow(item, index))}
             style={({ pressed }) => [
               styles.row,
@@ -222,7 +238,7 @@ const styles = StyleSheet.create({
   swatch: { width: 24, height: 24, borderRadius: 12, marginRight: 16, alignItems: 'center', justifyContent: 'center' },
   swatchGlyph: { color: '#FFFFFF', fontSize: 13, fontWeight: '700' },
   texts: { flex: 1 },
-  title: { fontSize: 17, fontWeight: Platform.OS === 'ios' ? '500' : '500' },
+  title: { fontSize: 17, fontWeight: '500' },
   subtitle: { fontSize: 13, marginTop: 2 },
   chevron: { width: 9, height: 14, marginLeft: 8 },
   check: { fontSize: 17, fontWeight: '600', marginLeft: 8 },

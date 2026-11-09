@@ -1,4 +1,4 @@
-const path = require('path');
+const path = require('node:path');
 const { getDefaultConfig } = require('@react-native/metro-config');
 const { withMetroConfig } = require('react-native-monorepo-config');
 

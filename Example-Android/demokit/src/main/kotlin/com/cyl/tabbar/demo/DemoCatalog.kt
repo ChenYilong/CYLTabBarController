@@ -126,6 +126,13 @@ object DemoCatalog {
             controller.tabBar.requestLayout()
             controller.tabBar.tabBarButtonArray.forEach { it.requestLayout() }
         },
+        DemoRow("Liquid Glass surface tint (cyl_liquidGlassSurfaceOpacity)", {
+            val opacity = tabBarController?.tabBar?.cyl_liquidGlassSurfaceOpacity ?: 0.4f
+            "Android only: drag the slider to see the dock change, from clear glass (0) to a solid board (1); now ${"%.2f".format(opacity)}"
+        }) {
+            val controller = tabBarController ?: return@DemoRow
+            DemoLiquidGlassSurface.showSlider(requireContext(), controller) { reload() }
+        },
         DemoRow("standardAppearance theme (shared by Liquid Glass and FlatDesign)", { "Current: ${appearanceNames[appearanceIndex]}; tap for the next one" }) {
             val controller = tabBarController ?: return@DemoRow
             appearanceIndex = (appearanceIndex + 1) % appearanceNames.size

@@ -24,3 +24,5 @@ plugins {
 }
 
 include(":app")
+
+rootProject.name = "flutter_cyltabbar_example_rive"

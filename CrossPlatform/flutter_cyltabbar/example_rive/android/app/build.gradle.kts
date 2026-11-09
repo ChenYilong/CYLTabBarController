@@ -53,6 +53,11 @@ android {
             // TODO: Add your own signing config for the release build.
             // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig = signingConfigs.getByName("debug")
+            // [EN] R8 shrinks and obfuscates the release build (Flutter adds its rules and this folder's proguard-rules.pro).
+            // [CN] R8 压缩并混淆 release 包（Flutter 会加入自己的规则与本目录的 proguard-rules.pro）。
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"))
         }
     }
 }
@@ -69,5 +74,5 @@ flutter {
 
 dependencies {
     // [EN] The library plays the animation files through this library, found by reflection. [CN] 库通过反射找到该库播放动画文件。
-    implementation("app.rive:rive-android:10.3.0")
+    implementation(libs.rive.android)
 }

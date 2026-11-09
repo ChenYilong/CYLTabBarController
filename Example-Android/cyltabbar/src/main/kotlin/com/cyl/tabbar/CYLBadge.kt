@@ -394,13 +394,9 @@ fun View.cyl_refreshBadge() {
         return
     }
     val host = badge.parent as? ViewGroup ?: return
-    val anchorRect = when (this) {
-        is CYLTabBarItemButton -> cyl_badgeAnchorRect()
-        is CYLPlusButton -> android.graphics.Rect(imageView.left, imageView.top, imageView.right, imageView.bottom)
-        else -> android.graphics.Rect(0, 0, width, height)
-    }
-    val anchorRight = if (host === this) anchorRect.right else right
-    val anchorTop = if (host === this) anchorRect.top else top
+    val anchor = when (this) { is CYLTabBarItemButton -> iconView; is CYLPlusButton -> imageView; else -> this }
+    val anchorRight = if (host === this) anchor.right else right
+    val anchorTop = if (host === this) anchor.top else top
     // [EN] The plus button places its badge itself (`CYLPlusButton.onLayout`), with no margins: margins make the FrameLayout
     //      measure itself around the badge, so each new badge value widened the button by half a badge and stretched its image.
     // [CN] PlusButton 自己放置角标（`CYLPlusButton.onLayout`），不使用 margin：margin 会让 FrameLayout 把角标计入自身尺寸，每次角标变化都会把按钮
@@ -412,9 +408,8 @@ fun View.cyl_refreshBadge() {
         return
     }
     val params = badge.layoutParams as? FrameLayout.LayoutParams ?: FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-    val (badgeLeft, badgeTop) = cyl_badgeOrigin(anchorRight, anchorTop, badge, state.centerOffset, density)
-    params.leftMargin = badgeLeft
-    params.topMargin = badgeTop
+    params.leftMargin = (anchorRight - badge.measuredWidth / 2 + state.centerOffset.horizontal * density).toInt()
+    params.topMargin = (anchorTop - badge.measuredHeight / 2 + state.centerOffset.vertical * density).toInt()
     if (host is FrameLayout) badge.layoutParams = params
     else badge.layout(params.leftMargin, params.topMargin, params.leftMargin + badge.measuredWidth, params.topMargin + badge.measuredHeight)
     badge.bringToFront()

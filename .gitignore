@@ -17,7 +17,9 @@ xcuserdata
 DerivedData 
 .idea/ 
 Pods 
-Podfile.lock
+# Lock files (*.lock: Podfile.lock, yarn.lock, pubspec.lock, Gemfile.lock) are never committed (AGENTS.md).
+# Gradle's gradle.lockfile is not a *.lock file and stays committed.
+*.lock
 *.xcworkspace
 
 
@@ -111,3 +113,4 @@ __pycache__/
 
 # macOS AppleDouble metadata written on external volumes: never commit
 ._*
+*.base

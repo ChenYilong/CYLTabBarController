@@ -285,13 +285,14 @@ open class CYLPlusButton(context: Context) : FrameLayout(context) {
         val titleTop = if (imageView.drawable == null && background != null) (height - titleHeight) / 2 else height - titleHeight
         titleLabel.layout(0, titleTop, width, titleTop + titleHeight)
         selectedContent?.layout(0, 0, width, height)
-        // [EN] Badges sit on the image view's top-right corner, 2 dp right, plus `cyl_badgeCenterOffset`, as on iOS. [CN] 角标位于图片视图右上角右侧 2 dp，再加上 `cyl_badgeCenterOffset`，与 iOS 相同。
+        // [EN] Badges sit on the icon's top-right corner plus `cyl_badgeCenterOffset`, as on the tab buttons. [CN] 角标位于图标右上角并加上 `cyl_badgeCenterOffset`，与 Tab 按钮相同。
         val density = resources.displayMetrics.density
         val state = cyl_badgeState
         for (index in 0 until childCount) {
             val badge = getChildAt(index) as? CYLBadgeView ?: continue
             if (badge.measuredWidth == 0) badge.measure(MeasureSpec.UNSPECIFIED, MeasureSpec.UNSPECIFIED)
-            val (badgeLeft, badgeTop) = cyl_badgeOrigin(imageView.right, imageView.top, badge, state.centerOffset, density)
+            val badgeLeft = (imageView.right - badge.measuredWidth / 2 + state.centerOffset.horizontal * density).toInt()
+            val badgeTop = (imageView.top - badge.measuredHeight / 2 + state.centerOffset.vertical * density).toInt()
             badge.layout(badgeLeft, badgeTop, badgeLeft + badge.measuredWidth, badgeTop + badge.measuredHeight)
         }
     }

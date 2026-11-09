@@ -104,7 +104,7 @@ const STYLES = ['liquidGlass', 'flatDesign'] as const;
 
 // MARK: - Navigation bar (a UINavigationController with the tab's title) 导航栏
 
-function NavigationBar({ title, dark = true }: { title: string; dark?: boolean }) {
+function NavigationBar({ title, dark = true }: Readonly<{ title: string; dark?: boolean }>) {
   const top = useSafeAreaInsetsTop();
   return (
     <View style={{ paddingTop: top, backgroundColor: dark ? BACKGROUND : '#FFFFFF' }}>
@@ -186,7 +186,7 @@ const HISTORY = [
   { text: 'Notifications', artboard: 'BELL', machine: 'BELL_Interactivity' },
 ];
 
-function MenuRow({ item, selected, onPress }: { item: (typeof BROWSE)[number]; selected: boolean; onPress: () => void }) {
+function MenuRow({ item, selected, onPress }: Readonly<{ item: (typeof BROWSE)[number]; selected: boolean; onPress: () => void }>) {
   const [playing, setPlaying] = useState(false);
   return (
     <Pressable
@@ -277,7 +277,7 @@ function OnboardingPage() {
 
 // MARK: - Bell: menu_button.riv (RiveMenuButtonDemoView.swift) above the settings list
 
-function BellPage({ styleIndex, onStyle }: { styleIndex: number; onStyle: () => void }) {
+function BellPage({ styleIndex, onStyle }: Readonly<{ styleIndex: number; onStyle: () => void }>) {
   const [open, setOpen] = useState(false);
   return (
     <View style={[styles.flex, styles.black]}>

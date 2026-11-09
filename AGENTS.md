@@ -138,6 +138,10 @@ Every new feature and user-visible change ships with bilingual documentation in 
   the cover again once the new icons are in. Do not change the library to keep a cover over icons that replace it later.
 - **New demos** follow the `cyl-new-project` skill. **PlusButton with forced title alignment**: give it a title; see `cyl-plus-button`.
 - **Xcode project files** keep the ObjC example's format (`objectVersion = 46`, `compatibilityVersion = "Xcode 3.2"`, no folder sync, deployment target below 27), or CI on Xcode 26 fails. Check before committing any `.xcodeproj` change. Full rules: the `cyl-xcode-compat` skill.
+- **Clean before every build and run**: build into an empty derived data folder (delete it first, or pass a new
+  `-derivedDataPath`), for apps, tests and scripts alike. The Objective-C demo does not relink after a change in the
+  library only, so a reused build tests an old binary and its result means nothing (2026-11-09: two experiments ran
+  stale code). Confirm a new symbol is in the app (`strings <app>/<binary> | grep <symbol>`) when in doubt.
 - **Simulator**: run `scripts/free-ram.sh` before every simulator use. Details and common failures: the `cyl-verify` skill.
 
 ## Xcode projects: Podfile, app icon, launch screen
@@ -210,9 +214,55 @@ The root `Podfile` is the reference: it already has the top lines and the hook.
 
   Some were committed anyway: take them out of the repository with `git rm --cached` in a new commit; an unpushed commit
   that holds only them is undone instead. Rewriting pushed history needs a force push: ask first.
+- **Never commit `*.lock` files** (`Podfile.lock`, `yarn.lock`, `pubspec.lock`, `Gemfile.lock`): `.gitignore` excludes
+  `*.lock`. Gradle's `gradle.lockfile` (and `settings-gradle.lockfile`) does not end in `.lock` and stays committed.
+  SonarCloud's "lock file is missing" findings (`text:S8564` package.json, `text:S8568` Gemfile, `text:S8571`
+  pubspec.yaml) are therefore avoided by excluding those manifests in `.sonarcloud.properties` (`sonar.exclusions`;
+  automatic analysis ignores `sonar.issue.ignore.*` there), never by committing a lock file.
+- **Before every commit, check `docs/` for stale notes**: search every document in `docs/` (and `README.md`) for the
+  keywords **`TODO`** and **`Linux`**, and for other notes left by an environment that could not run the code
+  ("without Xcode", "no simulator", "no screenshots", `无法运行`, `没有截图`):
+
+  ```sh
+  grep -rn -i -E "TODO|Linux|without Xcode|no (iOS )?simulator|no screenshots?|无法(编译|运行)|没有截图|暂无(测试)?截图" docs README.md
+  ```
+
+  For each hit about a feature: test it (build, unit tests, run it on the simulator or emulator), then update the
+  document with what was verified and the test screenshots (`docs/assets/`, layout as the `cyl-docs` skill says), and
+  `README.md` when its section is affected. A finished TODO becomes DONE with its evidence; a TODO that only the
+  maintainer can do (a repository setting, a release) stays, with what was checked and when. A bug found while testing
+  is fixed in the same change. Details: the `cyl-docs` skill, "Stale notes before every commit".
+- **Push over SSH first**: `git push origin <branch>` (`origin` is `git@github.com:ChenYilong/CYLTabBarController.git`).
+  Use HTTPS with the `gh` credential helper only when SSH fails: its token has no `workflow` scope, so GitHub rejects
+  any push that changes `.github/workflows/*` ("refusing to allow an OAuth App to create or update workflow").
 - Branch from the latest `master` for each issue or feature.
 - Commit messages are in English, Conventional Commits as configured for commitizen in `package.json`
   (`feat: ✨ …`, `fix: 🐛 …`, `docs: 📝 …`).
+- Follow the Commitizen defaults: emojis are enabled and the format is
+  `{type}{scope}: {emoji}{subject}`. Scope is optional and there are no
+  predefined scopes. The configured message length is 3–64 characters. The
+  examples use a space between the emoji and subject. The
+  interactive types, in order, are `test`, `feat`, `fix`, `chore`, `docs`,
+  `refactor`, `style`, `ci`, and `perf`; `release` is defined but not listed.
+- Default type meanings and emojis: `chore` (build or auxiliary tools, 🤖),
+  `ci` (CI changes, 🎡), `docs` (documentation only, ✏️), `feat` (new feature,
+  🎸), `fix` (bug fix, 🐛), `perf` (performance improvement, ⚡️), `refactor`
+  (neither a feature nor fix, 💡), `style` (markup or formatting only, 💄),
+  `test` (adding missing tests, 💍), and `release` (release commit, 🏹).
+- The question sequence is `type`, `scope`, `subject`, `body`, `breaking`,
+  `issues`, and `lerna`. Prompts request a change type, optional scope, a short
+  imperative subject, longer description, breaking changes, issues closed (for
+  example `#123`), and affected packages. Use this repository's established
+  emoji mappings when they differ from defaults: `feat: ✨`, `fix: 🐛`,
+  `docs: 📝`, `chore: 🔧`, and `refactor: ♻️`. Keep commit text in English.
+- Before every commit, review the changed scope and its issue, comparison, and implementation-status documents.
+  Record each incomplete or unverified item in the commit under a `TODO` heading in the most relevant existing
+  `docs/` document. State the current score or status, remaining work, implementation constraints, known defects,
+  API design and compatibility risks, optimization opportunities, and verification required for completion.
+  Reserved keys, stubs, and successful compilation alone are not completion evidence.
+- The Conventional Commit subject summarizes completed work in English; put details and pending tasks in the body.
+  If the detailed description exceeds 50 characters, create or update a suitable `docs/` note and link it in the
+  commit body. Reuse existing trackers and avoid duplicate documents.
 - Push early and open the pull request once the change is substantial; the PR body closes the issue (`Closes #N`).
 - Before merging, squash the PR into a single commit and push with `--force-with-lease` (never a plain force push).
   On someone else's branch, merge `master` in instead of rebasing.

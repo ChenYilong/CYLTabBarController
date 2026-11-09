@@ -5,11 +5,22 @@ import NativeAnimationView from './CyltabbarAnimationViewNativeComponent';
 export type CYLAnimationOptions = Record<string, string | number>;
 
 /** The URL of `file` with `options` in its fragment, sorted by name, like `CYLTabBarAnimationURLWithOptions()`. */
+/**
+ * [EN] Code-unit order, as Android's `toSortedMap()`, so both platforms build the same URL (`localeCompare` would not).
+ * [CN] 按 UTF-16 码元排序，与 Android 的 `toSortedMap()` 相同，两个平台生成同样的 URL（`localeCompare` 做不到）。
+ */
+function compareCodeUnits(a: string, b: string): number {
+  if (a === b) {
+    return 0;
+  }
+  return a < b ? -1 : 1;
+}
+
 export function animationURLWithOptions(file: string, options: CYLAnimationOptions = {}): string {
   const base = file.split('#')[0]!;
   const pairs = Object.keys(options)
     .filter((name) => String(options[name]).length > 0)
-    .sort()
+    .sort(compareCodeUnits)
     .map((name) => `${encodeURIComponent(name)}=${encodeURIComponent(String(options[name]))}`);
   return pairs.length > 0 ? `${base}#${pairs.join('&')}` : base;
 }

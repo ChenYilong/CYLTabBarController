@@ -274,6 +274,7 @@ static NSArray<NSArray<NSString *> *> *CYLConfigurationEdgeCases(void) {
         @[ @"D3", @"HTTP 404" ], @[ @"D4", @"Unknown host" ], @[ @"D5", @"Server timeout (3 s)" ], @[ @"D10", @"Request cancelled" ],
         @[ @"C10", @"Request without a URL" ],
         @[ @"D7", @"An HTML page (network)" ],
+        @[ @"L1", @"Localized texts (tables in the sandbox)" ],
     ];
 }
 
@@ -606,6 +607,32 @@ static NSData *CYLEdgeCaseData(NSString *text) {
         // [EN] C10: a request without a URL (and, in code, a nil request or URL) gives a FileNotFound error.
         // [CN] C10：没有 URL 的请求（以及代码中传入 nil 请求或 URL）返回 FileNotFound 错误。
         fromURL([[NSURLRequest alloc] init], NO);
+    } else if ([title isEqualToString:@"Localized texts (tables in the sandbox)"]) {
+        // [EN] L1: the app writes its tables into the sandbox, as if downloaded, and the configuration names them with a
+        //      location route ("sandbox:Caches/…", docs/Configuration-Localization.md). The titles follow the library's
+        //      language (the "Language" row); a language without a table falls back to English.
+        // [CN] L1：App 把字符串表写入沙盒（如同下载），配置用位置路由（"sandbox:Caches/…"，docs/Configuration-Localization.md）指定它们。
+        //      标题跟随本库语言（「语言」行）；没有字符串表的语言回退到英文。
+        NSString *caches = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES).firstObject;
+        NSString *folder = [caches stringByAppendingPathComponent:@"CYLConfigurationLocalizationDemo"];
+        NSDictionary<NSString *, NSString *> *tables = @{
+            @"en" : @"\"demo.home\" = \"Home (localized)\";\n\"demo.me\" = \"Me (localized)\";\n",
+            @"zh-Hans" : @"\"demo.home\" = \"首页（本地化）\";\n\"demo.me\" = \"我的（本地化）\";\n",
+            @"ja" : @"\"demo.home\" = \"ホーム（ローカライズ）\";\n\"demo.me\" = \"マイページ（ローカライズ）\";\n",
+        };
+        for (NSString *language in tables) {
+            NSString *lproj = [folder stringByAppendingPathComponent:[language stringByAppendingPathExtension:@"lproj"]];
+            [[NSFileManager defaultManager] createDirectoryAtPath:lproj withIntermediateDirectories:YES attributes:nil error:NULL];
+            [tables[language] writeToFile:[lproj stringByAppendingPathComponent:@"Tabs.strings"] atomically:YES encoding:NSUTF8StringEncoding error:NULL];
+        }
+        NSString *configurationText = @"{\"CYLTabBarControllerLocalization\": {\"CYLTabBarLocalizationTableName\": \"Tabs\", \"CYLTabBarLocalizationPath\": \"sandbox:Caches/CYLConfigurationLocalizationDemo\"},\n"
+                                      @" \"CYLTabBarControllerTabBarItemsAttributes\": [{\"CYLTabBarItemTitle\": \"demo.home\", \"CYLTabBarItemImage\": \"system:house\", \"CYLTabBarItemIdentifier\": \"home\"},"
+                                      @" {\"CYLTabBarItemTitle\": \"demo.me\", \"CYLTabBarItemImage\": \"system:person\", \"CYLTabBarItemIdentifier\": \"me\"}]}";
+        NSString *path = [folder stringByAppendingPathComponent:@"localized.json"];
+        [CYLEdgeCaseData(configurationText) writeToFile:path atomically:YES];
+        NSError *error = nil;
+        CYLTabBarController *tabBarController = [CYLTabBarController tabBarControllerWithConfigurationFile:path error:&error];
+        finish(tabBarController, error, configurationText);
     } else if ([title isEqualToString:@"Empty strings"]) {
         // [EN] B21: empty URLs, Lottie files, image URLs, colors, fonts and platforms are left out; an empty page ID falls back to
         //      CYLTabBarItemIdentifier; the tabs stay.

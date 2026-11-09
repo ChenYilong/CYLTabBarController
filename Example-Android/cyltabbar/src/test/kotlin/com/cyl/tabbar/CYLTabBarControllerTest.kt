@@ -426,9 +426,7 @@ class CYLTabBarControllerTest {
             assertEquals("height after badge $value", height, plus.height)
         }
         val badge = plus.cyl_badge!!
-        // [EN] As iOS: 2 dp right of the image view's right edge. [CN] 与 iOS 相同：图片视图右边缘右侧 2 dp。
-        val gap = CYL_BADGE_CORNER_GAP_DP * plus.resources.displayMetrics.density
-        assertEquals("2 dp right of the icon's right edge", plus.imageView.right + gap, (badge.left + badge.right) / 2f, 1f)
+        assertEquals("on the icon's right edge", plus.imageView.right.toFloat(), (badge.left + badge.right) / 2f, 1f)
         assertEquals("on the icon's top edge", plus.imageView.top.toFloat(), (badge.top + badge.bottom) / 2f, 1f)
         CYLPlusButton.removePlusButtonForTabBarContext("badged-plus")
     }

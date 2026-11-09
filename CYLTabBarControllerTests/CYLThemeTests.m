@@ -223,6 +223,59 @@ static UIImage *CYLTestImage(CGFloat side, UIColor *color) {
     XCTAssertEqualObjects(first.tabBarItem.title, @"A", @"nil gives back the app's own titles");
 }
 
+/// [EN] A skin and its restore: following navigation titles change with the tabs, every changed tab posts
+///      `CYLTabBarItemDidChangeNotification`, and the tab bar posts `CYLTabBarControllerThemeDidApplyNotification` once.
+/// [CN] 换肤与恢复：跟随的导航栏标题随 Tab 变化，每个变化的 Tab 发送 `CYLTabBarItemDidChangeNotification`，TabBar 发送一次
+///      `CYLTabBarControllerThemeDidApplyNotification`。
+- (void)testSkinUpdatesFollowingNavigationTitlesAndPostsNotifications {
+    UIViewController *page = [UIViewController new];
+    CYL_NAVIGATION_TITLE_FOLLOWS_TAB_BAR_ITEM(page);
+    UINavigationController *navigation = [[UINavigationController alloc] initWithRootViewController:page];
+    CYLTabBarController *tabBarController = [[CYLTabBarController alloc] initWithViewControllers:@[ navigation, [UIViewController new] ]
+                                                                           tabBarItemsAttributes:@[ @{ CYLTabBarItemTitle : @"A", CYLTabBarItemIdentifier : @"a" },
+                                                                                                    @{ CYLTabBarItemTitle : @"B", CYLTabBarItemIdentifier : @"b" } ]];
+    [tabBarController loadViewIfNeeded];
+    XCTAssertEqualObjects(page.navigationItem.title, @"A");
+    NSMutableArray<NSNotification *> *itemNotes = [NSMutableArray array];
+    NSMutableArray<NSNotification *> *skinNotes = [NSMutableArray array];
+    NSMutableArray<NSNotification *> *iconNotes = [NSMutableArray array];
+    id iconObserver = [[NSNotificationCenter defaultCenter] addObserverForName:CYLTabBarItemIconDidChangeNotification object:page queue:nil usingBlock:^(NSNotification *note) {
+        [iconNotes addObject:note];
+    }];
+    id itemObserver = [[NSNotificationCenter defaultCenter] addObserverForName:CYLTabBarItemDidChangeNotification object:nil queue:nil usingBlock:^(NSNotification *note) {
+        [itemNotes addObject:note];
+    }];
+    id skinObserver = [[NSNotificationCenter defaultCenter] addObserverForName:CYLTabBarControllerThemeDidApplyNotification object:tabBarController queue:nil usingBlock:^(NSNotification *note) {
+        [skinNotes addObject:note];
+    }];
+    CYLTestItemsTabBarTheme *theme = [CYLTestItemsTabBarTheme new];
+    [tabBarController cyl_applyTabBarTheme:theme];
+    XCTAssertEqualObjects(page.navigationItem.title, @"★ A", @"a skin's title reaches the following navigation bar");
+    NSNotification *pageNote = nil;
+    for (NSNotification *note in itemNotes) {
+        if (note.object == page) { pageNote = note; }
+    }
+    XCTAssertNotNil(pageNote);
+    XCTAssertEqualObjects(pageNote.userInfo[CYLTabBarItemChangedAttributesKey][CYLTabBarItemTitle], @"★ A");
+    XCTAssertEqualObjects(pageNote.userInfo[CYLTabBarItemIndexKey], @0);
+    XCTAssertEqual(skinNotes.count, 1u);
+    XCTAssertEqual(skinNotes.firstObject.userInfo[CYLTabBarThemeKey], theme);
+    XCTAssertEqualObjects(skinNotes.firstObject.userInfo[CYLTabBarItemIndexesKey], [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, 2)],
+                          @"a skin changes every tab by default");
+    XCTAssertEqualObjects(skinNotes.firstObject.userInfo[CYLTabBarItemIdentifiersKey], (@[ @"a", @"b" ]));
+    XCTAssertEqualObjects(pageNote.userInfo[CYLTabBarItemIdentifier], @"a");
+    XCTAssertGreaterThan(iconNotes.count, 0u, @"the skin's icon (a view in place of the icon) posts the icon notification");
+    XCTAssertEqualObjects(iconNotes.firstObject.userInfo[CYLTabBarItemIndexKey], @0);
+
+    [tabBarController cyl_applyTabBarTheme:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:itemObserver];
+    [[NSNotificationCenter defaultCenter] removeObserver:skinObserver];
+    [[NSNotificationCenter defaultCenter] removeObserver:iconObserver];
+    XCTAssertEqualObjects(page.navigationItem.title, @"A", @"restoring gives the navigation bar the app's title back");
+    XCTAssertEqual(skinNotes.count, 2u);
+    XCTAssertNil(skinNotes.lastObject.userInfo[CYLTabBarThemeKey], @"no theme when restoring");
+}
+
 #pragma mark - The restore model, applying the current theme, persistence
 
 - (CYLTabBarController *)newTabBarControllerWithTitles {
@@ -821,6 +874,16 @@ FOUNDATION_EXTERN void CYLTabBarItemAnimationRegisterColors(NSURL *URL, NSDictio
         XCTAssertNil([plusButton imageForState:state.unsignedIntegerValue], @"plus button, state %@", state);
         XCTAssertNil([standIn imageForState:state.unsignedIntegerValue], @"stand-in, state %@", state);
     }
+}
+
+/// [EN] The stand-in is a picture of the plus button; the real plus button is the accessibility element.
+/// [CN] 替身只是 PlusButton 的画面；真实 PlusButton 才是无障碍元素。
+- (void)testThePlusButtonStandInIsHiddenFromAccessibility {
+    CYLTestPlusButton *plusButton = [CYLTestPlusButton new];
+    UIButton *standIn = plusButton.selectedContentView;
+    XCTAssertNotEqual(standIn, plusButton);
+    XCTAssertFalse(standIn.isAccessibilityElement);
+    XCTAssertTrue(standIn.accessibilityElementsHidden);
 }
 
 - (void)testTheTabBarFollowsAnInjectedThemeManager {

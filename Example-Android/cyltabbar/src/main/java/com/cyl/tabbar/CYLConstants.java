@@ -142,10 +142,25 @@ public final class CYLConstants {
     public static final String CYLTabBarControllerThemeIdentifier = "CYLTabBarControllerThemeIdentifier";
     public static final String CYLTabBarControllerDarkThemeIdentifier = "CYLTabBarControllerDarkThemeIdentifier";
     public static final String CYLTabBarControllerThemeManagerName = "CYLTabBarControllerThemeManagerName";
+    // [EN] Localized texts of a configuration (see CYLTabBarConfigurationLocalization, docs/Configuration-File.md).
+    // [CN] 配置中的本地化文本（见 CYLTabBarConfigurationLocalization、docs/Configuration-File.md）。
+    public static final String CYLTabBarControllerLocalization = "CYLTabBarControllerLocalization";
+    public static final String CYLTabBarLocalizationTableName = "CYLTabBarLocalizationTableName";
+    public static final String CYLTabBarLocalizationPath = "CYLTabBarLocalizationPath";
+    public static final String CYLTabBarLocalizationBundleName = "CYLTabBarLocalizationBundleName";
     public static final String CYLTabBarThemeIdentifier = "CYLTabBarThemeIdentifier";
     public static final String CYLTabBarThemeValues = "CYLTabBarThemeValues";
     public static final String CYLTabBarBackgroundColor = "CYLTabBarBackgroundColor";
     public static final String CYLTabBarShadowColor = "CYLTabBarShadowColor";
+    /** [EN] Skin value names of the bar's images and item layout, as on iOS (`UITabBarAppearance`). [CN] TabBar 图片与 Item 布局的皮肤值名称，与 iOS 相同（`UITabBarAppearance`）。 */
+    public static final String CYLTabBarBackgroundImage = "CYLTabBarBackgroundImage";
+    public static final String CYLTabBarShadowImage = "CYLTabBarShadowImage";
+    /** [EN] "centered", "fill" or "automatic". [CN] "centered"、"fill" 或 "automatic"。 */
+    public static final String CYLTabBarStackedItemPositioning = "CYLTabBarStackedItemPositioning";
+    /** [EN] dp; 0: an equal share. [CN] dp；0 表示平分。 */
+    public static final String CYLTabBarStackedItemWidth = "CYLTabBarStackedItemWidth";
+    /** [EN] dp between centered items. [CN] 居中的 Item 之间的间距（dp）。 */
+    public static final String CYLTabBarStackedItemSpacing = "CYLTabBarStackedItemSpacing";
 
     // MARK: - Notifications 通知 (names, posted through CYLNotificationCenter)
 
@@ -153,6 +168,30 @@ public final class CYLConstants {
     public static final String CYLTabBarItemAnimationViewDidAddNotification = "CYLTabBarItemAnimationViewDidAddNotification";
     public static final String CYLThemeDidChangeNotification = "CYLThemeDidChangeNotification";
     public static final String CYLTabBarMinimizeDidChangeNotification = "CYLTabBarMinimizeDidChangeNotification";
+
+    // MARK: - Tab change notifications Tab 变化通知 (as on iOS; observe with CYLNotificationCenter)
+
+    /** [EN] A tab's title (or selected title) changed in place; object: the tab's page. [CN] Tab 的标题（或选中标题）原地变化；object 为该 Tab 的页面。 */
+    public static final String CYLTabBarItemTitleDidChangeNotification = "CYLTabBarItemTitleDidChangeNotification";
+    /** [EN] A tab's icon changed (image keys, URLs, `setTabBarItemIcon`, an icon view provider); object: the tab's page. [CN] Tab 的图标变化；object 为该 Tab 的页面。 */
+    public static final String CYLTabBarItemIconDidChangeNotification = "CYLTabBarItemIconDidChangeNotification";
+    /** [EN] Any in-place change of a tab, after the two above; object: the tab's page. [CN] Tab 的任何原地变化，在上面两个之后发送；object 为该 Tab 的页面。 */
+    public static final String CYLTabBarItemDidChangeNotification = "CYLTabBarItemDidChangeNotification";
+    /** [EN] A skin was applied (or removed); object: the tab bar controller. [CN] 应用（或移除）了皮肤；object 为 TabBarController。 */
+    public static final String CYLTabBarControllerThemeDidApplyNotification = "CYLTabBarControllerThemeDidApplyNotification";
+    /** [EN] userInfo keys. [CN] userInfo 的 key。 */
+    public static final String CYLTabBarControllerKey = "CYLTabBarControllerKey";
+    public static final String CYLTabBarItemIndexKey = "CYLTabBarItemIndexKey";
+    public static final String CYLTabBarItemViewControllerKey = "CYLTabBarItemViewControllerKey";
+    public static final String CYLTabBarItemKey = "CYLTabBarItemKey";
+    public static final String CYLTabBarItemChangedAttributesKey = "CYLTabBarItemChangedAttributesKey";
+    public static final String CYLTabBarItemOldTitleKey = "CYLTabBarItemOldTitleKey";
+    public static final String CYLTabBarItemIconViewProviderKey = "CYLTabBarItemIconViewProviderKey";
+    public static final String CYLPlusButtonKey = "CYLPlusButtonKey";
+    public static final String CYLTabBarThemeKey = "CYLTabBarThemeKey";
+    /** [EN] The tab indexes a skin applies to (`List<Int>`; iOS: `NSIndexSet`). [CN] 皮肤作用的 Tab 下标（`List<Int>`；iOS 为 `NSIndexSet`）。 */
+    public static final String CYLTabBarItemIndexesKey = "CYLTabBarItemIndexesKey";
+    public static final String CYLTabBarItemIdentifiersKey = "CYLTabBarItemIdentifiersKey";
 
     // MARK: - Sizes 尺寸 (dp)
 
