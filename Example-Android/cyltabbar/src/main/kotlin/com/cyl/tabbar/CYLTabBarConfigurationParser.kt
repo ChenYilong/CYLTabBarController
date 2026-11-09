@@ -1624,6 +1624,8 @@ private object CYLProtobufSchema {
         "CYLTabBarRiveURL", "CYLTabBarRiveFilePath", "CYLTabBarRiveSize", "CYLTabBarRiveDarkURL", "CYLTabBarRiveDarkFilePath", "map:CYLTabBarRiveDarkColors",
         // [EN] GIF tab icons (#605), fields 57–61. [CN] GIF Tab 图标（#605），字段 57–61。
         "CYLTabBarGIFURL", "CYLTabBarGIFFilePath", "CYLTabBarGIFSize", "CYLTabBarGIFDarkURL", "CYLTabBarGIFDarkFilePath",
+        // [EN] Icon rendering mode (#787), field 62. [CN] 图标渲染方式（#787），字段 62。
+        "CYLTabBarItemIconRenderingMode",
     )
 
     private fun field(entry: String): Pair<String, String> =
@@ -1642,6 +1644,10 @@ private object CYLProtobufSchema {
             9 to ("CYLTabBarControllerThemeIdentifier" to "string"),
             10 to ("CYLTabBarControllerDarkThemeIdentifier" to "string"),
             11 to ("CYLTabBarControllerThemeManagerName" to "string"),
+            // [EN] The tab bar's icon defaults (#787). [CN] TabBar 的图标默认值（#787）。
+            13 to ("CYLTabBarControllerIconRenderingMode" to "string"),
+            14 to ("CYLTabBarControllerIconColor" to "string"),
+            15 to ("CYLTabBarControllerSelectedIconColor" to "string"),
         ),
         "CYLTabBarTheme" to mapOf(1 to ("CYLTabBarThemeIdentifier" to "string"), 2 to ("CYLTabBarThemeValues" to "map")),
         "CYLTabBarItem" to itemFields.withIndex().filter { it.value != null }.associate { (index, entry) -> index + 1 to field(entry!!) },

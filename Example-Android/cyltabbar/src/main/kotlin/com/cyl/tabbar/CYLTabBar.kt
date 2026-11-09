@@ -275,9 +275,19 @@ class CYLTabBarItemButton(context: Context, val item: CYLTabBarItem, val index: 
         return item.cyl_titleColor ?: controller?.cyl_tabBarItemTitleColor ?: tabBar.unselectedTintColor
     }
 
+    /**
+     * [EN] The icon's tint, or null to draw it as it is. FIX: issue #787 — "original" never tints; "template" always tints,
+     *      with the bar's tint colors when no icon color is set.
+     * [CN] 图标的着色；null 表示按原图绘制。FIX: issue #787——"original" 从不着色；"template" 总是着色，没有图标颜色时使用 TabBar 的着色。
+     */
     private fun iconColor(selected: Boolean, tabBar: CYLTabBar): Int? {
         val controller = tabBar.tabBarController
-        return if (selected) item.cyl_selectedIconColor ?: controller?.cyl_tabBarItemSelectedImageColor else item.cyl_iconColor ?: controller?.cyl_tabBarItemImageColor
+        val color = if (selected) item.cyl_selectedIconColor ?: controller?.cyl_tabBarItemSelectedImageColor else item.cyl_iconColor ?: controller?.cyl_tabBarItemImageColor
+        return when (item.cyl_iconRenderingMode) {
+            CYLTabBarConfiguration.ICON_RENDERING_ORIGINAL -> null
+            CYLTabBarConfiguration.ICON_RENDERING_TEMPLATE -> color ?: if (selected) tabBar.selectedTintColor else tabBar.unselectedTintColor
+            else -> color
+        }
     }
 
     /**

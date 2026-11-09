@@ -284,6 +284,50 @@ class CYLTabBarControllerTest {
         assertEquals(true, items[3][CYLTabBarConfiguration.EXCLUDED_KEY])
     }
 
+    /**
+     * [EN] FIX: issue #787. The bar's icon defaults reach every tab without its own, the mode is lowercased and an unknown one
+     *      is dropped; "template" tints without an icon color, "original" never tints, "automatic" tints only with one.
+     * [CN] FIX: issue #787。TabBar 的图标默认值用于没有单独设置的 Tab，渲染方式转为小写，未知值被移除；"template" 没有图标颜色也着色，
+     *      "original" 从不着色，"automatic" 只在有图标颜色时着色。
+     */
+    @Test
+    fun iconRenderingModeTintsOrKeepsTheIcon() = withActivity { activity ->
+        val normalized = CYLTabBarConfiguration.cyl_normalizedConfiguration(mapOf(
+            CYLConstants.CYLTabBarControllerIconRenderingMode to "Template",
+            CYLConstants.CYLTabBarControllerIconColor to "#8E8E93",
+            CYLConstants.CYLTabBarControllerTabBarItemsAttributes to listOf(
+                mapOf(CYLConstants.CYLTabBarItemIdentifier to "a"),
+                mapOf(CYLConstants.CYLTabBarItemIdentifier to "b", CYLConstants.CYLTabBarItemIconRenderingMode to "original", CYLConstants.CYLTabBarItemIconColor to "#FF0000"),
+                mapOf(CYLConstants.CYLTabBarItemIdentifier to "c", CYLConstants.CYLTabBarItemIconRenderingMode to "bogus"))))
+        @Suppress("UNCHECKED_CAST")
+        val items = normalized[CYLConstants.CYLTabBarControllerTabBarItemsAttributes] as List<Map<String, Any?>>
+        assertEquals("template", items[0][CYLConstants.CYLTabBarItemIconRenderingMode])
+        assertEquals("#8E8E93", items[0][CYLConstants.CYLTabBarItemIconColor])
+        assertEquals("a tab's own mode wins", "original", items[1][CYLConstants.CYLTabBarItemIconRenderingMode])
+        assertEquals("a tab's own color wins", "#FF0000", items[1][CYLConstants.CYLTabBarItemIconColor])
+        assertNull("an unknown mode is dropped", items[2][CYLConstants.CYLTabBarItemIconRenderingMode])
+
+        val icon = { android.graphics.drawable.ColorDrawable(Color.BLUE).apply { setBounds(0, 0, 24, 24) } }
+        val tabs = listOf(
+            mapOf(CYLConstants.CYLTabBarItemTitle to "Template", CYLConstants.CYLTabBarItemImage to icon(), CYLConstants.CYLTabBarItemIconRenderingMode to "template"),
+            mapOf(CYLConstants.CYLTabBarItemTitle to "Original", CYLConstants.CYLTabBarItemImage to icon(), CYLConstants.CYLTabBarItemIconRenderingMode to "original", CYLConstants.CYLTabBarItemIconColor to "#FF0000"),
+            mapOf(CYLConstants.CYLTabBarItemTitle to "Automatic", CYLConstants.CYLTabBarItemImage to icon(), CYLConstants.CYLTabBarItemIconColor to "#FF0000"),
+            mapOf(CYLConstants.CYLTabBarItemTitle to "Plain", CYLConstants.CYLTabBarItemImage to icon()),
+        )
+        val controller = CYLTabBarController(activity, listOf(Page(), Page(), Page(), Page()), tabs)
+        activity.setContentView(controller.view)
+        idle()
+        val buttons = controller.tabBar.tabBarButtonArray
+        assertNotNull("template: tinted with the bar's tint", buttons[0].iconView.colorFilter)
+        assertNull("original: never tinted", buttons[1].iconView.colorFilter)
+        assertNotNull("automatic with an icon color: tinted", buttons[2].iconView.colorFilter)
+        assertNull("automatic without one: as it is", buttons[3].iconView.colorFilter)
+        // [EN] In place: a new mode alone changes the tint. [CN] 原地更新：只更新渲染方式即改变着色。
+        controller.updateTabBarItemAtIndex(1, mapOf(CYLConstants.CYLTabBarItemIconRenderingMode to "template"))
+        idle()
+        assertNotNull(controller.tabBar.tabBarButtonArray[1].iconView.colorFilter)
+    }
+
     @Test
     fun asynchronousPagesAreSwappedIn() = withActivity { activity ->
         val registry = CYLTabBarPageRegistry()

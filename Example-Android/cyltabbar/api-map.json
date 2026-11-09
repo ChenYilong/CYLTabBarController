@@ -5782,5 +5782,21 @@
   "status": "done",
   "android": "CYLTabBarManifestLoader.loadManifestWithURL",
   "note": "a URL string"
+ },
+ "CYLTabBarItemIconRenderingMode": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarItemIconRenderingMode"
+ },
+ "CYLTabBarControllerIconRenderingMode": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarControllerIconRenderingMode"
+ },
+ "CYLTabBarControllerIconColor": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarControllerIconColor"
+ },
+ "CYLTabBarControllerSelectedIconColor": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarControllerSelectedIconColor"
  }
 }

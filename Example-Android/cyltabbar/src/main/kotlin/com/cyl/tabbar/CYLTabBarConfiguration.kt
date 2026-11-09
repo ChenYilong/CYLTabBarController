@@ -287,6 +287,15 @@ object CYLTabBarConfiguration {
         return if (numbers.size == count && numbers.all { it.isFinite() }) numbers else null
     }
 
+    /** [EN] Icon rendering modes (#787). [CN] 图标渲染方式（#787）。 */
+    const val ICON_RENDERING_TEMPLATE = "template"
+    const val ICON_RENDERING_ORIGINAL = "original"
+    private val iconRenderingModes = setOf(ICON_RENDERING_TEMPLATE, ICON_RENDERING_ORIGINAL, "automatic")
+
+    /** [EN] `CYLTabBarItemIconRenderingMode` (#787), lowercased; null when not one of the three. [CN] 转为小写的渲染方式；不是三者之一时为 null。 */
+    @JvmStatic
+    fun iconRenderingModeValue(value: Any?): String? = (value as? String)?.lowercase()?.takeIf { it in iconRenderingModes }
+
     /** [EN] A BOOL: true / false, yes / no, 1 / 0. [CN] 布尔值。 */
     @JvmStatic
     fun boolValue(value: Any?): Boolean? = when (value) {
@@ -320,11 +329,22 @@ object CYLTabBarConfiguration {
             else -> emptyList()
         }
         val seen = HashSet<String>()
+        val iconDefaults = iconDefaults(normalized)
         normalized[CYLConstants.CYLTabBarControllerTabBarItemsAttributes] = items.map { item ->
             val references = LinkedHashMap<String, String>()
             itemReferences += references
             val raw = (item as? Map<*, *>)?.entries?.associate { it.key.toString() to it.value } ?: return@map emptyMap<String, Any?>()
-            val attributes = (if (initialValues != null) CYLConfigurationThemes.resolve(raw, initialValues, references) else raw).toMutableMap()
+            // [EN] FIX: issue #787 — the bar's icon defaults, for a tab without its own. [CN] TabBar 的图标默认值，用于没有单独设置的 Tab。
+            val attributes = (if (initialValues != null) CYLConfigurationThemes.resolve(iconDefaults + raw, initialValues, references) else iconDefaults + raw).toMutableMap()
+            attributes[CYLConstants.CYLTabBarItemIconRenderingMode]?.let { mode ->
+                val valid = iconRenderingModeValue(mode)
+                if (valid != null) {
+                    attributes[CYLConstants.CYLTabBarItemIconRenderingMode] = valid
+                } else {
+                    android.util.Log.w("CYLTabBarController", "configuration: invalid ${CYLConstants.CYLTabBarItemIconRenderingMode}: $mode")
+                    attributes.remove(CYLConstants.CYLTabBarItemIconRenderingMode)
+                }
+            }
             val tab = com.cyl.tabbar.pages.TabItem(attributes)
             val reason = TabConfiguration.exclusionReason(tab, platform, appVersion)
             if (reason != null) {
@@ -355,6 +375,13 @@ object CYLTabBarConfiguration {
         }
         return normalized
     }
+
+    /** [EN] The tab bar's icon keys (#787) as tab keys. [CN] TabBar 的图标键（#787），转为 Tab 的键。 */
+    private fun iconDefaults(configuration: Map<String, Any?>): Map<String, Any?> = listOf(
+        CYLConstants.CYLTabBarControllerIconRenderingMode to CYLConstants.CYLTabBarItemIconRenderingMode,
+        CYLConstants.CYLTabBarControllerIconColor to CYLConstants.CYLTabBarItemIconColor,
+        CYLConstants.CYLTabBarControllerSelectedIconColor to CYLConstants.CYLTabBarItemSelectedIconColor,
+    ).mapNotNull { (barKey, itemKey) -> configuration[barKey]?.let { itemKey to it } }.toMap()
 
     const val EXCLUDED_KEY = "_CYLTabBarItemExcluded"
     const val EXCLUSION_REASON_KEY = "_CYLTabBarItemExclusionReason"

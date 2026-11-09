@@ -31,6 +31,17 @@ public final class CYLConstants {
     public static final String CYLTabBarItemSelectedTitleColor = "CYLTabBarItemSelectedTitleColor";
     public static final String CYLTabBarItemIconColor = "CYLTabBarItemIconColor";
     public static final String CYLTabBarItemSelectedIconColor = "CYLTabBarItemSelectedIconColor";
+    /**
+     * [EN] FIX: issue #787. How a tab's icon takes its colors: "template" (tinted with the icon colors, else the bar's tint;
+     *      one image serves both states), "original" (keeps its own colors, even with an icon color set) or "automatic"
+     *      (default: tinted when it has an icon color). The controller keys are the defaults of every tab without its own.
+     * [CN] FIX: issue #787。Tab 图标如何取色："template"（用图标颜色着色，否则用 TabBar 的着色；一张图用于两种状态）、"original"
+     *      （保持原色，即使设置了图标颜色）或 "automatic"（默认：有图标颜色时着色）。Controller 级的键是没有单独设置的所有 Tab 的默认值。
+     */
+    public static final String CYLTabBarItemIconRenderingMode = "CYLTabBarItemIconRenderingMode";
+    public static final String CYLTabBarControllerIconRenderingMode = "CYLTabBarControllerIconRenderingMode";
+    public static final String CYLTabBarControllerIconColor = "CYLTabBarControllerIconColor";
+    public static final String CYLTabBarControllerSelectedIconColor = "CYLTabBarControllerSelectedIconColor";
     public static final String CYLTabBarItemBackgroundColor = "CYLTabBarItemBackgroundColor";
     public static final String CYLTabBarItemSelectedBackgroundColor = "CYLTabBarItemSelectedBackgroundColor";
     public static final String CYLTabBarItemTitleFont = "CYLTabBarItemTitleFont";
