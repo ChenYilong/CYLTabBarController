@@ -152,11 +152,15 @@ class MainTabBarController: CYLTabBarController {
 | `+[CYLPlusButton plusButtonForOwner:]` | 某个 TabBarController 的 PlusButton | A tab bar controller's plus button |
 | `+[CYLPlusButton plusChildViewControllerForOwner:]` | 某个 TabBarController 的 PlusButton 子控制器 | A tab bar controller's plus child view controller |
 | `-cyl_showBadgeValue:animationType:` | 显示角标（`@""` 为红点） | Shows a badge (`@""` for a red dot) |
-| `cyl_userInteractionDisabled` | 设为 YES 时该控件不触发 didSelectControl | YES keeps the control out of didSelectControl |
+| `cyl_userInteractionDisabled` | 设为 YES 时该控件不触发 didSelectControl。注意：要用角标统计点击次数时，PlusButton 必须保持 NO（不要按布局在创建时决定） | YES keeps the control out of didSelectControl. A plus button whose badge counts taps must keep NO (do not decide it from the layout at creation) |
 
 ## [CN]测试与截图
 ## [EN]Testing and screenshots
 
 | 中文 | English |
 |:---|:---|
-| 本次修改在 Linux 环境中完成，无法运行 Xcode 和 iOS 模拟器，因此**没有截图**，也没有在设备上验证。请在 iOS 26（液态玻璃）和 iOS 18 / UI 兼容模式（经典样式）上分别运行 `Example` 与 `Example-Swift`，连续点击 PlusButton，确认角标数字每次加 1，且 `didSelectControl` 每次点击只打印一次。验证后的截图请放在 `docs/assets/` 中，并用 `![](assets/文件名.png)` 引用。 | This change was made on Linux, where Xcode and the iOS simulator cannot run, so there are **no screenshots** and it was not verified on a device. Run `Example` and `Example-Swift` on iOS 26 (Liquid Glass) and on iOS 18 / UI compatibility mode (classic style), tap the plus button several times, and check that the badge number goes up by 1 each time and `didSelectControl` logs once per tap. Put screenshots from that check in `docs/assets/` and reference them as `![](assets/file-name.png)`. |
+| 2026-11-09 在 iPhone 17 Pro Max 模拟器（iOS 26.1，液态玻璃，Xcode 27.2）上运行 ObjC 示例 `Example` 验证：连续点击 PlusButton 3 次，角标依次为 2、3、4（通过 VoiceOver 的值「4 new messages」与截图确认），每次点击都选中 PlusButton 页面。测试中发现并修复的问题：示例在创建 PlusButton 时，只有按钮垂直居中且子控制器已注册才把 `cyl_userInteractionDisabled` 设为 NO；示例的 PlusButton 是凸起的（偏移 -14），第一次创建时子控制器也尚未注册，因此点击从不回调 `didSelectControl`，角标一直是 1。现在示例总是设为 NO。`Example-Swift` 与经典样式（iOS 18 / UI 兼容模式）尚未验证。 | Verified on 2026-11-09 with the ObjC `Example` on an iPhone 17 Pro Max simulator (iOS 26.1, Liquid Glass, Xcode 27.2): three taps on the plus button gave 2, 3 and 4 (checked through its VoiceOver value, "4 new messages", and the screenshots), and each tap selected the plus button's page. Found and fixed while testing: when creating the plus button, the example set `cyl_userInteractionDisabled` to NO only if the button was vertically centered and the child view controller already registered; its plus button is raised (offset -14) and the child is not registered at the first creation, so taps never reached `didSelectControl` and the badge stayed at 1. The example now always sets NO. `Example-Swift` and the classic style (iOS 18 / UI compatibility mode) are not verified yet. |
+| 点击前（角标 1，选中首页）： | Before (badge 1, Home selected): |
+| ![点击 PlusButton 前](assets/plusbutton-badge-before.png) | ![Before tapping the plus button](assets/plusbutton-badge-before.png) |
+| 连续点击 3 次后（角标 4，选中 PlusButton 页面）： | After three taps (badge 4, the plus button's page selected): |
+| ![点击 PlusButton 3 次后](assets/plusbutton-badge-after-3-taps.png) | ![After three taps on the plus button](assets/plusbutton-badge-after-3-taps.png) |

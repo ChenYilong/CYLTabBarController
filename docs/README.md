@@ -187,6 +187,8 @@ docs/
     ├── plusbutton-background-image-liquid-glass-swiftui.png
     ├── plusbutton-background-image-liquid-glass.png
     ├── plusbutton-background-title-centered-pag.png
+    ├── plusbutton-badge-after-3-taps.png
+    ├── plusbutton-badge-before.png
     ├── plusbutton-image-loaded-later.png
     ├── plusbutton-overlap-classic.png
     ├── plusbutton-overlap-flat.png

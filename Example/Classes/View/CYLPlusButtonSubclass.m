@@ -182,11 +182,15 @@ static CGFloat const CYLDemoPlusButtonWidth = 55;
     [button removeTarget:self action:action forControlEvents:UIControlEventTouchUpInside];
     [button addTarget:button action:action forControlEvents:UIControlEventTouchUpInside];
     
-    if ([CYLPlusButton plusChildViewControllerForTabBarContext:[self matchedTabBarContext]] && button.isLayoutCentered) {
-        [button cyl_setUserInteractionDisabled:NO];
-    } else {
-        [button cyl_setUserInteractionDisabled:YES];
-    }
+    // [EN] Every tap is reported through `tabBarController:didSelectControl:`, which changes the plus button's badge (#535,
+    //      MainTabBarController.m). This used to be off unless the button was vertically centered and the plus child view
+    //      controller already registered, both decided here at creation: the raised button below (offset -14) and the
+    //      first creation (before the child is registered) never reported, so the badge stayed at 1. Set it to YES only
+    //      to stop the plus button's reports.
+    // [CN] 每次点击都会通过 `tabBarController:didSelectControl:` 上报，并改变 PlusButton 的角标（#535，MainTabBarController.m）。以前只有
+    //      按钮垂直居中且 PlusButton 子控制器已注册时才上报，而这两点都在创建时判断：下面凸起的按钮（偏移 -14）和第一次创建（子控制器尚未注册）
+    //      都不会上报，角标一直是 1。只有不需要 PlusButton 上报时才设为 YES。
+    [button cyl_setUserInteractionDisabled:NO];
     
     // [CN] ===== iOS 15 以下：手动设置 imageView / titleLabel 位置 =====
     // [EN] ===== Below iOS 15: manually set the imageView / titleLabel positions =====
