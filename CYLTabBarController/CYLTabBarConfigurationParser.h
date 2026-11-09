@@ -80,6 +80,12 @@ typedef NS_ENUM(NSInteger, CYLTabBarConfigurationErrorCode) {
     CYLTabBarConfigurationErrorMainThreadRequired = 10,
     /// [EN] No tab found its page (see `CYLTabBarPageRegistry`). [CN] 没有任何 Tab 找到页面（见 `CYLTabBarPageRegistry`）。
     CYLTabBarConfigurationErrorNoPages = 11,
+    /// [EN] A manifest of an unknown `schemaVersion`, or not a manifest. [CN] 未知 `schemaVersion` 的清单，或不是清单。
+    CYLTabBarConfigurationErrorUnsupportedManifest = 12,
+    /// [EN] A manifest that is not for this platform, app version or time (`runtime`). [CN] 清单不适用于当前平台、App 版本或时间（`runtime`）。
+    CYLTabBarConfigurationErrorNotEligible = 13,
+    /// [EN] A manifest asset is missing or does not match its `hash`. [CN] 清单资源缺失或与其 `hash` 不一致。
+    CYLTabBarConfigurationErrorAssetInvalid = 14,
 };
 
 /// [EN] The largest file or response read: 5 MB. [CN] 读取的文件或响应的最大长度：5 MB。

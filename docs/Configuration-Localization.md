@@ -68,6 +68,10 @@
 | 语言：iOS 使用本库的语言（`CYLLocalizationLanguage()`，跟随 `CYLSetLocalizationLanguage` 与系统设置）；Android 使用 App 的语言。依次尝试该语言（如 `zh-Hans`、`pt-BR`）、语言代码（`zh`、`pt`）、`Base` 与 `en`。 | The language: on iOS, the library's language (`CYLLocalizationLanguage()`, which follows `CYLSetLocalizationLanguage` and the system settings); on Android, the app's language. The language (e.g. `zh-Hans`, `pt-BR`), its code (`zh`, `pt`), `Base` and `en` are tried in this order. |
 | 字符串表总是属于 App（示例层），本库不提供、也不会在自己的资源包 `CYLTabBarController.bundle` 中查找这些译文。 | The tables always belong to the app (the example layer): the library ships none and never looks in its own `CYLTabBarController.bundle` for them. |
 
+| 中文 | English |
+|:---|:---|
+| [TabBar 配置清单](Configuration-Manifest.md)用 `localization`（`tableName`、`route`）写同样的设置，`route` 相对于清单所在目录。 | A [tab bar configuration manifest](Configuration-Manifest.md) writes the same setting as `localization` (`tableName`, `route`), the `route` relative to the manifest's folder. |
+
 ## [CN]键
 ## [EN]Keys
 

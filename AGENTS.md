@@ -215,6 +215,9 @@ The root `Podfile` is the reference: it already has the top lines and the hook.
   touch .git/hooks/NO_AUTO_SYNC
   ```
 
+- **On any branch other than `master` or `main`, commit and push as soon as the work is written, without asking
+  for confirmation.** On `master` or `main`, ask first.
+
 - **Never commit `._*` files.** macOS writes these AppleDouble metadata files next to every file on an external volume
   (e.g. `._.claude`, `._.git`, `._.github`, `._.gitignore`, `._.pullapprove.yml`, `._ChatKit`). `.gitignore` excludes
   `._*`. Before git commands, delete them, including the ones in `.git/objects` (`._pack-*.idx` makes git report

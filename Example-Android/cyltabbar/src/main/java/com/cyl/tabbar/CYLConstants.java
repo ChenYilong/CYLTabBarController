@@ -148,6 +148,9 @@ public final class CYLConstants {
     // [EN] A resource route to a configuration file (CYLResourceRoute, docs/Resource-Routes.md); the other keys win over the file's.
     // [CN] 指向配置文件的资源路由（CYLResourceRoute，docs/Resource-Routes.md）；其他键覆盖文件中的键。
     public static final String CYLTabBarControllerConfigurationRoute = "CYLTabBarControllerConfigurationRoute";
+    // [EN] A resource route to a tab bar manifest (CYLTabBarManifest); the other keys win over its configuration.
+    // [CN] 指向 TabBar 配置清单的资源路由（CYLTabBarManifest）；其他键覆盖清单的配置。
+    public static final String CYLTabBarControllerManifestRoute = "CYLTabBarControllerManifestRoute";
     public static final String CYLTabBarLocalizationTableName = "CYLTabBarLocalizationTableName";
     public static final String CYLTabBarLocalizationPath = "CYLTabBarLocalizationPath";
     public static final String CYLTabBarLocalizationBundleName = "CYLTabBarLocalizationBundleName";

@@ -13,6 +13,8 @@
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Configuration-File.md
 //   - Localized texts in a configuration file / 配置文件的本地化文本
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Configuration-Localization.md
+//   - Tab bar configuration manifest / TabBar 配置清单
+//     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Configuration-Manifest.md
 //   - Custom Tab Bar Feature Checklist / 自定义 TabBar 功能清单
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Custom-Tab-Bar-Features.md
 //   - The demo test list: settings groups and a pure Swift version / Demo 测试列表：设置分组与纯 Swift 版本
@@ -118,6 +120,7 @@
 #import "CYLTabBarConfigurationParser.h"
 #import "CYLTabBarPageRegistry.h"
 #import "CYLTabBarHostView.h"
+#import "CYLTabBarManifest.h"
 #import "UIViewController+CYLSettingsSection.h"
 #import "UIViewController+CYLThemeSettings.h"
 #import "NSObject+CYLTabBarControllerExtention.h"
@@ -633,6 +636,16 @@ FOUNDATION_EXTERN NSString *const CYLTabBarControllerLocalization;
  *      覆盖，因此代码（以及发送字典的 React Native 与 Flutter）可以修改文件中的少数值。没有匹配文件的路由会打印日志并被忽略。Android 读取同一个键。
  */
 FOUNDATION_EXTERN NSString *const CYLTabBarControllerConfigurationRoute;
+/*!
+ * [EN] Configuration key: a resource route to a tab bar manifest (`CYLTabBarManifest`, docs/Configuration-Manifest.md).
+ *      The manifest's configuration (`-[CYLTabBarManifest configuration]`) is read first, then the other keys win over it;
+ *      React Native's `manifestRoute` prop and Flutter's `manifestRoute` parameter write it. A route that is not a
+ *      manifest this app may use (platform, app version, time) is logged and ignored. Android reads the same key.
+ * [CN] 配置键：指向 TabBar 配置清单的资源路由（`CYLTabBarManifest`，docs/Configuration-Manifest.md）。先读取清单的配置
+ *      （`-[CYLTabBarManifest configuration]`），再由其他键覆盖；React Native 的 `manifestRoute` 属性与 Flutter 的 `manifestRoute` 参数写入该键。
+ *      不是本 App 可以使用的清单（平台、App 版本、时间）时打印日志并忽略。Android 读取同一个键。
+ */
+FOUNDATION_EXTERN NSString *const CYLTabBarControllerManifestRoute;
 /// [EN] The strings table, without ".strings" (default "Localizable"). [CN] 字符串表名，不含 ".strings"（默认 "Localizable"）。
 FOUNDATION_EXTERN NSString *const CYLTabBarLocalizationTableName;
 /*!

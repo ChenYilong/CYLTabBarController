@@ -80,6 +80,10 @@ CYLTabBar(configurationRoute: 'bundle:Configurations?name=tabbar', onTabSelect: 
 | 路由没有匹配的文件时，iOS 返回 nil 并设置 `CYLTabBarConfigurationErrorFileNotFound`；Android 抛出 `FileNotFound`。错误信息中包含该路由。 | When a route matches no file, iOS returns nil with `CYLTabBarConfigurationErrorFileNotFound`, and Android throws `FileNotFound`. The message includes the route. |
 | 配置中的 `CYLTabBarLocalizationPath` 也是资源路由（见[配置文件的本地化文本](Configuration-Localization.md)）。相对路径相对于路由选中的配置文件所在目录，因此配置文件与 `Localization/` 文件夹可以一起下载到同一个目录。 | `CYLTabBarLocalizationPath` in a configuration is a resource route too (see [Localized texts in a configuration file](Configuration-Localization.md)). A relative path is relative to the folder of the configuration file the route picked, so a configuration file and its `Localization/` folder can be downloaded into one folder together. |
 
+| 中文 | English |
+|:---|:---|
+| [TabBar 配置清单](Configuration-Manifest.md)中的图标另有资源引用 `asset:<key>?state=&theme=`：在清单的 `assets.baseRoute`（一个资源路由，包含版本）下按主题、Tab 与状态选出一张图片。 | Icons in a [tab bar configuration manifest](Configuration-Manifest.md) use asset references, `asset:<key>?state=&theme=`: under the manifest's `assets.baseRoute` (a resource route that holds the version), one image is picked by theme, tab and state. |
+
 ## [CN]前缀
 ## [EN]Prefixes
 

@@ -622,7 +622,7 @@ static NSArray<NSString *> *CYLKnownConfigurationKeys(void) {
               CYLTabBarControllerUserInterfaceStyle, CYLTabBarControllerTabButtonTapAnimation, CYLTabBarControllerSwipeToSwitchTab,
               CYLTabBarControllerLoginRequiredTabBarItemIdentifiers, CYLTabBarControllerUnloadsUnselectedViewsOnMemoryWarning,
               CYLTabBarControllerKeepsLoadedTabBarItemIdentifiers, CYLTabBarControllerLocalization,
-              CYLTabBarControllerConfigurationRoute ];
+              CYLTabBarControllerConfigurationRoute, CYLTabBarControllerManifestRoute ];
 }
 
 static NSArray<NSString *> *CYLKnownItemKeys(void) {
@@ -1674,6 +1674,20 @@ static void CYLApplyConfigurationLocalization(NSMutableDictionary<NSString *, id
  * [CN] `CYLTabBarControllerConfigurationRoute`：先取路由指向文件中的键，再用本配置中的其他键覆盖。
  */
 static void CYLApplyConfigurationRoute(NSMutableDictionary<NSString *, id> *configuration) {
+    id manifestRoute = configuration[CYLTabBarControllerManifestRoute];
+    if (manifestRoute) {
+        // [EN] A manifest the app may use, as a configuration, under the other keys. [CN] 本 App 可以使用的清单，转换为配置，再由其他键覆盖。
+        [configuration removeObjectForKey:CYLTabBarControllerManifestRoute];
+        NSError *error = nil;
+        CYLTabBarManifest *manifest = [manifestRoute isKindOfClass:[NSString class]] ? [CYLTabBarManifest manifestWithRoute:manifestRoute error:&error] : nil;
+        if (manifest && [manifest isEligibleAtDate:[NSDate date] error:&error]) {
+            NSMutableDictionary<NSString *, id> *merged = [manifest.configuration mutableCopy];
+            [merged addEntriesFromDictionary:configuration];
+            [configuration setDictionary:merged];
+        } else {
+            CYLLogInvalidConfigurationValue(CYLTabBarControllerManifestRoute, manifestRoute);
+        }
+    }
     id route = configuration[CYLTabBarControllerConfigurationRoute];
     if (!route) {
         return;

@@ -191,6 +191,7 @@ class CYLTabBar extends StatefulWidget {
     this.animationSpeed,
     this.plusButton,
     this.configurationRoute,
+    this.manifestRoute,
     this.configuration = const {},
     this.selectedIndex,
     this.badgeValues = const [],
@@ -300,9 +301,14 @@ class CYLTabBar extends StatefulWidget {
   /// other parameters and [configuration] win over its keys.
   final String? configurationRoute;
 
+  /// A resource route to a tab bar manifest (docs/Configuration-Manifest.md): tabs, plus button, themes and their images,
+  /// version, platforms. The manifest is read first; the other parameters and [configuration] win over it.
+  final String? manifestRoute;
+
   /// The configuration sent to the native library.
   Map<String, Object?> buildConfiguration() => {
         if (configurationRoute != null) 'CYLTabBarControllerConfigurationRoute': configurationRoute,
+        if (manifestRoute != null) 'CYLTabBarControllerManifestRoute': manifestRoute,
         if (styleType != null) 'CYLTabBarControllerStyleType': styleType,
         if (userInterfaceStyle != null) 'CYLTabBarControllerUserInterfaceStyle': userInterfaceStyle,
         if (tapAnimation != null) 'CYLTabBarControllerTabButtonTapAnimation': tapAnimation,

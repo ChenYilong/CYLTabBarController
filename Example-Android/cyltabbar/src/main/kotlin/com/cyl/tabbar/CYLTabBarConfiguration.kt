@@ -25,7 +25,9 @@ object CYLTabBarConfiguration {
 
     /** [EN] `CYLTabBarConfigurationError` codes (the iOS values). [CN] 错误码（与 iOS 相同）。 */
     enum class CYLTabBarConfigurationError(val code: Int) {
-        FileNotFound(1), UnknownFormat(2), InvalidSyntax(3), NotADictionary(4), Network(5), Empty(6), TooLarge(7), TooDeep(8), NoTabs(9), MainThreadRequired(10), NoPages(11);
+        FileNotFound(1), UnknownFormat(2), InvalidSyntax(3), NotADictionary(4), Network(5), Empty(6), TooLarge(7), TooDeep(8), NoTabs(9), MainThreadRequired(10), NoPages(11),
+        // [EN] Manifests (docs/Configuration-Manifest.md), as on iOS. [CN] 配置清单（docs/Configuration-Manifest.md），与 iOS 相同。
+        UnsupportedManifest(12), NotEligible(13), AssetInvalid(14);
 
         companion object {
             /** [EN] The error of a parser error code (`UnsupportedFormat` is `UnknownFormat`). [CN] 解析器错误码对应的错误（`UnsupportedFormat` 即 `UnknownFormat`）。 */
@@ -104,6 +106,8 @@ object CYLTabBarConfiguration {
      */
     @JvmStatic
     fun withRoutedFile(context: Context, configuration: Map<String, Any?>): Map<String, Any?> {
+        val withManifest = withManifest(context, configuration)
+        if (withManifest !== configuration) return withRoutedFile(context, withManifest)
         val route = configuration[CYLConstants.CYLTabBarControllerConfigurationRoute] ?: return configuration
         val rest = configuration - CYLConstants.CYLTabBarControllerConfigurationRoute
         val file = (route as? String)?.let { runCatching { configurationWithRoute(context, it) }.getOrNull() }
@@ -112,6 +116,18 @@ object CYLTabBarConfiguration {
             return rest
         }
         return file + rest
+    }
+
+    /** [EN] `CYLTabBarControllerManifestRoute`: a manifest the app may use, as a configuration, under the other keys. [CN] 本 App 可以使用的清单，转换为配置，再由其他键覆盖。 */
+    private fun withManifest(context: Context, configuration: Map<String, Any?>): Map<String, Any?> {
+        val route = configuration[CYLConstants.CYLTabBarControllerManifestRoute] ?: return configuration
+        val rest = configuration - CYLConstants.CYLTabBarControllerManifestRoute
+        val manifest = (route as? String)?.let { runCatching { CYLTabBarManifest.manifestWithRoute(context, it) }.getOrNull() }?.takeIf { it.isEligible() }
+        if (manifest == null) {
+            android.util.Log.w("CYLTabBarController", "configuration: invalid ${CYLConstants.CYLTabBarControllerManifestRoute}: $route")
+            return rest
+        }
+        return manifest.configuration() + rest
     }
 
     /** [EN] Reads at most 5 MB (API 23: no `readNBytes`). [CN] 最多读取 5 MB（API 23 没有 `readNBytes`）。 */

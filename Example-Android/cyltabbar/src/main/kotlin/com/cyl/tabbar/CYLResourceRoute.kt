@@ -94,7 +94,18 @@ object CYLResourceRoute {
         if (key.isEmpty() || value.isEmpty()) null else key to value
     }.toMap()
 
-    private fun join(folder: String, path: String): String = listOf(folder, path).filter { it.isNotEmpty() }.joinToString("/").trimEnd('/')
+    /** [EN] `folder/path` with "." and ".." resolved (assets have no "..", so "Manifests/../Skins" is "Skins"). [CN] 解析 "." 与 ".." 后的 `folder/path`（assets 不支持 ".."）。 */
+    private fun join(folder: String, path: String): String {
+        val parts = ArrayList<String>()
+        for (part in "$folder/$path".split('/')) {
+            when (part) {
+                "", "." -> Unit
+                ".." -> if (parts.isNotEmpty()) parts.removeAt(parts.size - 1)
+                else -> parts.add(part)
+            }
+        }
+        return parts.joinToString("/")
+    }
 
     /** [EN] "1.10" > "1.9": numeric parts compare as numbers. [CN] "1.10" > "1.9"：数字部分按数值比较。 */
     internal fun compareVersions(first: String, second: String): Int {

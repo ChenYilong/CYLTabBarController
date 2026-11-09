@@ -5661,5 +5661,126 @@
   "status": "done",
   "android": "CYLConstants.CYLTabBarControllerConfigurationRoute",
   "note": "CYLTabBarConfiguration.withRoutedFile; the other keys win over the file's"
+ },
+ "CYLTabBarControllerManifestRoute": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarControllerManifestRoute",
+  "note": "CYLTabBarConfiguration.withRoutedFile; the other keys win over the manifest"
+ },
+ "CYLTabBarManifestSource": {
+  "status": "done",
+  "android": "CYLTabBarManifest.CYLTabBarManifestSource",
+  "note": "None, Remote, Cache, Embedded"
+ },
+ "CYLTabBarManifest": {
+  "status": "done",
+  "android": "CYLTabBarManifest",
+  "note": "the same manifest rules (docs/Configuration-Manifest.md)"
+ },
+ "CYLTabBarManifest supportedSchemaVersion": {
+  "status": "done",
+  "android": "CYLTabBarManifest.supportedSchemaVersion"
+ },
+ "CYLTabBarManifest dictionary": {
+  "status": "done",
+  "android": "CYLTabBarManifest.dictionary"
+ },
+ "CYLTabBarManifest identifier": {
+  "status": "done",
+  "android": "CYLTabBarManifest.identifier"
+ },
+ "CYLTabBarManifest version": {
+  "status": "done",
+  "android": "CYLTabBarManifest.version"
+ },
+ "CYLTabBarManifest baseDirectory": {
+  "status": "done",
+  "android": "CYLTabBarManifest.baseDirectory",
+  "note": "a folder, or asset:<folder>"
+ },
+ "CYLTabBarManifest +manifestWithDictionary:baseDirectory:error:": {
+  "status": "done",
+  "android": "CYLTabBarManifest.manifestWithDictionary",
+  "note": "throws UnsupportedManifest"
+ },
+ "CYLTabBarManifest +manifestWithRoute:error:": {
+  "status": "done",
+  "android": "CYLTabBarManifest.manifestWithRoute"
+ },
+ "CYLTabBarManifest -isEligibleAtDate:error:": {
+  "status": "done",
+  "android": "CYLTabBarManifest.eligibilityError / isEligible",
+  "note": "a time in milliseconds"
+ },
+ "CYLTabBarManifest -verifyAssetsWithError:": {
+  "status": "done",
+  "android": "CYLTabBarManifest.assetError",
+  "note": "returns the first problem, null when all match"
+ },
+ "CYLTabBarManifest -pathOfAssetWithKey:theme:state:": {
+  "status": "done",
+  "android": "CYLTabBarManifest.pathOfAsset",
+  "note": "an asset is \"asset:<path>\""
+ },
+ "CYLTabBarManifest -pathForAssetReference:": {
+  "status": "done",
+  "android": "CYLTabBarManifest.pathForAssetReference"
+ },
+ "CYLTabBarManifest -configuration": {
+  "status": "done",
+  "android": "CYLTabBarManifest.configuration"
+ },
+ "CYLTabBarManifest -tabBarControllerWithError:": {
+  "status": "done",
+  "android": "CYLTabBarManifest.tabBarController(activity)",
+  "note": "throws NoPages"
+ },
+ "CYLTabBarManifestLoaderDelegate": {
+  "status": "done",
+  "android": "CYLTabBarManifestLoader.Delegate",
+  "note": "default methods"
+ },
+ "CYLTabBarManifestLoaderDelegate -manifestLoader:shouldApplyManifest:source:": {
+  "status": "done",
+  "android": "Delegate.shouldApplyManifest"
+ },
+ "CYLTabBarManifestLoaderDelegate -manifestLoader:didApplyManifest:source:": {
+  "status": "done",
+  "android": "Delegate.didApplyManifest"
+ },
+ "CYLTabBarManifestLoaderDelegate -manifestLoader:didFailWithError:fallbackSource:": {
+  "status": "done",
+  "android": "Delegate.didFail"
+ },
+ "CYLTabBarManifestCompletion": {
+  "status": "done",
+  "android": "loadManifestWithURL completion lambda"
+ },
+ "CYLTabBarManifestLoader": {
+  "status": "done",
+  "android": "CYLTabBarManifestLoader",
+  "note": "downloads on a background thread, callbacks on the main thread"
+ },
+ "CYLTabBarManifestLoader delegate": {
+  "status": "done",
+  "android": "CYLTabBarManifestLoader.delegate"
+ },
+ "CYLTabBarManifestLoader embeddedManifestRoute": {
+  "status": "done",
+  "android": "CYLTabBarManifestLoader.embeddedManifestRoute"
+ },
+ "CYLTabBarManifestLoader date": {
+  "status": "done",
+  "android": "CYLTabBarManifestLoader.nowMillis",
+  "note": "milliseconds"
+ },
+ "CYLTabBarManifestLoader -cachedManifest": {
+  "status": "done",
+  "android": "CYLTabBarManifestLoader.cachedManifest"
+ },
+ "CYLTabBarManifestLoader -loadManifestWithURL:completion:": {
+  "status": "done",
+  "android": "CYLTabBarManifestLoader.loadManifestWithURL",
+  "note": "a URL string"
  }
 }

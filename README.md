@@ -317,6 +317,7 @@ Analyst.ai [App Store Link](https://itunes.apple.com/us/app/analyst-ai/id1345754
 | [使用 Carthage 集成](docs/Carthage.md) | [Integrating with Carthage](docs/Carthage.md) |
 | [一个配置文件生成 TabBarController](docs/Configuration-File.md) | [One configuration file, one TabBarController](docs/Configuration-File.md) |
 | [配置文件的本地化文本](docs/Configuration-Localization.md) | [Localized texts in a configuration file](docs/Configuration-Localization.md) |
+| [TabBar 配置清单](docs/Configuration-Manifest.md) | [Tab bar configuration manifest](docs/Configuration-Manifest.md) |
 | [配置文件相关脚本：导出、边界情况与测试](docs/Configuration-Scripts.md) | [Configuration scripts: export, edge cases and tests](docs/Configuration-Scripts.md) |
 | [React Native 与 Flutter 组件](docs/Cross-Platform-Components.md) | [React Native and Flutter components](docs/Cross-Platform-Components.md) |
 | [自定义 TabBar 功能清单](docs/Custom-Tab-Bar-Features.md) | [Custom Tab Bar Feature Checklist](docs/Custom-Tab-Bar-Features.md) |

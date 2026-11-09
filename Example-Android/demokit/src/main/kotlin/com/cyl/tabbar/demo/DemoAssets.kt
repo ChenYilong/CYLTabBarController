@@ -104,6 +104,9 @@ object DemoAssets {
         return if (file.endsWith(".pdf", ignoreCase = true)) pdf(context, file) else bitmap(context, file, scale)
     }
 
+    /** [EN] A file of the assets at `path`, an @`scale`x image (null when missing). [CN] assets 中 `path` 处的文件，@`scale`x 图片（不存在时为 null）。 */
+    fun file(context: Context, path: String, scale: Float): Drawable? = bitmap(context, path, scale)
+
     /** [EN] A bitmap of an @Nx file, decoded so that it keeps its size in points (dp). [CN] @Nx 文件的位图，解码后保持其点（dp）尺寸。 */
     private fun bitmap(context: Context, path: String, scale: Float): Drawable? = runCatching {
         val options = BitmapFactory.Options().apply {

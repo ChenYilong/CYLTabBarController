@@ -86,6 +86,11 @@ export type CYLTabBarProps = ViewProps & {
    * the other props and `configuration` win over its keys.
    */
   configurationRoute?: string;
+  /**
+   * A resource route to a tab bar manifest (docs/Configuration-Manifest.md): tabs, plus button, themes and their images,
+   * version, platforms. The manifest is read first; the other props and `configuration` win over it.
+   */
+  manifestRoute?: string;
   /** Any other key of the configuration file (docs/Configuration-File.md); it wins over the props above. */
   configuration?: Record<string, unknown>;
   selectedIndex?: number;
@@ -233,6 +238,9 @@ export function buildConfiguration(props: CYLTabBarProps): Record<string, unknow
   if (props.configurationRoute) {
     configuration.CYLTabBarControllerConfigurationRoute = props.configurationRoute;
   }
+  if (props.manifestRoute) {
+    configuration.CYLTabBarControllerManifestRoute = props.manifestRoute;
+  }
   copyKeys(configuration, props, CONTROLLER_KEYS);
   if (props.items) {
     configuration.CYLTabBarControllerTabBarItemsAttributes = props.items.map(itemAttributes);
@@ -290,7 +298,7 @@ export function CYLTabBar(props: CYLTabBarProps) {
   const configuration = useMemo(
     () => JSON.stringify(buildConfiguration(props)),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [props.items, props.styleType, props.plusButton, props.configuration, props.configurationRoute, props.userInterfaceStyle, props.tapAnimation,
+    [props.items, props.styleType, props.plusButton, props.configuration, props.configurationRoute, props.manifestRoute, props.userInterfaceStyle, props.tapAnimation,
       props.swipeToSwitchTab, props.animationSpeed]
   );
   return (
