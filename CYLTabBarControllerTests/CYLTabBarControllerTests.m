@@ -173,6 +173,27 @@
     XCTAssertEqual(iconNotes.firstObject.userInfo[CYLTabBarItemChangedAttributesKey][CYLTabBarItemImage], image);
 }
 
+/// [EN] VoiceOver reads a tab's new title after an in-place change, and a label the app set on the tab item is kept.
+/// [CN] 原地修改标题后 VoiceOver 读出新标题，App 自己给 TabBarItem 设置的 label 保持不变。
+- (void)testTabAccessibilityLabelsFollowTitlesAndKeepTheAppsLabels {
+    CYLTabBarController *tabBarController = [[CYLTabBarController alloc] initWithViewControllers:@[ [UIViewController new], [UIViewController new] ]
+                                                                           tabBarItemsAttributes:@[ @{ CYLTabBarItemTitle : @"A" },
+                                                                                                    @{ CYLTabBarItemTitle : @"B" } ]];
+    [tabBarController loadViewIfNeeded];
+    UITabBarItem *appLabeledItem = tabBarController.viewControllers[1].tabBarItem;
+    appLabeledItem.accessibilityLabel = @"Custom";
+    [tabBarController updateTabBarItemAtIndex:0 attributes:@{ CYLTabBarItemTitle : @"★ A" }];
+    [tabBarController updateTabBarItemAtIndex:1 attributes:@{ CYLTabBarItemTitle : @"★ B" }];
+    [tabBarController.view setNeedsLayout];
+    [tabBarController.view layoutIfNeeded];
+    XCTAssertEqualObjects(tabBarController.viewControllers[0].tabBarItem.accessibilityLabel, @"★ A");
+    XCTAssertEqualObjects(appLabeledItem.accessibilityLabel, @"Custom", @"the app's own label is kept");
+    [tabBarController updateTabBarItemAtIndex:0 attributes:@{ CYLTabBarItemTitle : @"A" }];
+    [tabBarController.view setNeedsLayout];
+    [tabBarController.view layoutIfNeeded];
+    XCTAssertEqualObjects(tabBarController.viewControllers[0].tabBarItem.accessibilityLabel, @"A", @"follows the title back");
+}
+
 /// [EN] The plus button's page follows the plus button's title: `-updatePlusButtonWithAttributes:` sets its navigation bar
 ///      title and posts the title notification with the page as object and `CYLPlusButtonKey`.
 /// [CN] PlusButton 的页面跟随 PlusButton 的标题：`-updatePlusButtonWithAttributes:` 设置其导航栏标题，并发送以页面为 object、带有
@@ -208,6 +229,11 @@
     XCTAssertEqualObjects(titleNote.userInfo[CYLTabBarItemOldTitleKey], @"Post");
     XCTAssertNotNil(titleNote.userInfo[CYLPlusButtonKey]);
     XCTAssertEqual(titleNote.userInfo[CYLTabBarItemViewControllerKey], plusNavigation);
+    // [EN] VoiceOver: the tab under the plus button reads as the plus button, with its new title.
+    // [CN] VoiceOver：PlusButton 下方的 Tab 读作 PlusButton，使用其新标题。
+    [tabBarController.view setNeedsLayout];
+    [tabBarController.view layoutIfNeeded];
+    XCTAssertEqualObjects(plusNavigation.tabBarItem.accessibilityLabel, @"★ Post", @"not the first title, \"Post\"");
 }
 
 - (void)testPerformanceExample {

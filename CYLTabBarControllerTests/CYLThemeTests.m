@@ -876,6 +876,16 @@ FOUNDATION_EXTERN void CYLTabBarItemAnimationRegisterColors(NSURL *URL, NSDictio
     }
 }
 
+/// [EN] The stand-in is a picture of the plus button; the real plus button is the accessibility element.
+/// [CN] 替身只是 PlusButton 的画面；真实 PlusButton 才是无障碍元素。
+- (void)testThePlusButtonStandInIsHiddenFromAccessibility {
+    CYLTestPlusButton *plusButton = [CYLTestPlusButton new];
+    UIButton *standIn = plusButton.selectedContentView;
+    XCTAssertNotEqual(standIn, plusButton);
+    XCTAssertFalse(standIn.isAccessibilityElement);
+    XCTAssertTrue(standIn.accessibilityElementsHidden);
+}
+
 - (void)testTheTabBarFollowsAnInjectedThemeManager {
     CYLThemeManager *manager = [CYLThemeManagerCenter themeManagerWithName:@"CYLThemeAnimationTests.tabBar"];
     for (NSObject<NSCopying> *identifier in [manager.themeIdentifiers copy]) {

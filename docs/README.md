@@ -231,6 +231,7 @@ docs/
 │   ├── rive-classic.png
 │   ├── rive-flat-design.png
 │   ├── rive-liquid-glass.png
+│   ├── tab-accessibility-labels-after-title-change.png
 │   ├── tab-interactions-long-press-classic.png
 │   ├── tab-interactions-long-press-flatdesign.png
 │   ├── tab-interactions-long-press-liquid-glass.png

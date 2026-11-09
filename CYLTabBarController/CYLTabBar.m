@@ -488,6 +488,9 @@ static NSDictionary<NSAttributedStringKey, id> *CYLTitleAttributesWithColor(NSDi
     CYLTabBarController *owningTabBarController = self.tabBarController;
     if (owningTabBarController.cyl_tabBar == self) {
         [owningTabBarController cyl_layOutPlusButtonInLiquidGlassLayers];
+        // [EN] A title changed in place lays out only the tab bar: update the tabs' accessibility labels here too.
+        // [CN] 原地修改标题时只有 TabBar 重新布局：这里也更新 Tab 的无障碍 label。
+        [owningTabBarController cyl_syncTabBarItemAccessibility];
     }
 }
 

@@ -2126,8 +2126,23 @@ static BOOL CYLPlusButtonSubviewTakesTouches(UIView *view, UIView *plusButton) {
     return plusButton;
 }
 
+/*!
+ * [EN] The stand-in (`-selectedContentView`) is a picture of the plus button in Liquid Glass's selected layer; the real plus
+ *      button stays on screen and is the accessibility element. The stand-in was a second element with the plus button's
+ *      first title, which did not follow later title changes ("Post" next to "★ Post"). Hidden from accessibility.
+ * [CN] 替身（`-selectedContentView`）是 PlusButton 在液态玻璃选中图层中的画面；真实 PlusButton 一直显示，是无障碍元素。替身以前是
+ *      第二个元素，使用 PlusButton 最初的标题，不随之后的标题变化（「★ Post」旁还有「Post」）。这里对无障碍隐藏。
+ */
+static void CYLPlusButtonHideStandInFromAccessibility(UIButton *plusButton, UIButton *standIn) {
+    if (standIn == plusButton) {
+        return;
+    }
+    standIn.isAccessibilityElement = NO;
+    standIn.accessibilityElementsHidden = YES;
+}
+
 - (UIButton *)selectedContentView {
-    
+
     if (_selectedContentView) {
         return _selectedContentView;
     }
@@ -2136,6 +2151,7 @@ static BOOL CYLPlusButtonSubviewTakesTouches(UIView *view, UIView *plusButton) {
         UIButton *button = [[self class] performSelector:@selector(selectedContentView)];
         if (button) {
             CYLPlusButtonDrawImagesAsIs(button);
+            CYLPlusButtonHideStandInFromAccessibility(self, button);
             _selectedContentView = button;
             // FIX: the plus button's stand-in kept the original image after a theme
             // [EN] Liquid Glass only (the stand-in is shown in the selected layer while the plus child view controller is
@@ -2188,6 +2204,7 @@ static BOOL CYLPlusButtonSubviewTakesTouches(UIView *view, UIView *plusButton) {
         // [EN] Do not use selected, to avoid the selected background
         selectedContentView.highlighted = YES;
     }
+    CYLPlusButtonHideStandInFromAccessibility(self, selectedContentView);
     _selectedContentView = selectedContentView;
     [self cyl_updateSelectedContentViewImage];
     [self cyl_showRequestedBadgeIfNeeded];

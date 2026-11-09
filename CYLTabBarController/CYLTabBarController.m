@@ -4720,6 +4720,8 @@ static void CYLApplyExplicitAccessibility(NSObject<UIAccessibilityIdentification
     }
 }
 
+static void CYLApplyDefaultAccessibilityLabel(UITabBarItem *item, NSString *title);
+
 /*!
  * [EN] Gives every tab (and the plus button) an `accessibilityIdentifier` and the explicit accessibility values of its
  *      attributes. Runs on layout (`-cyl_syncTabBarAppearances`); only changed values are written.
@@ -4728,6 +4730,9 @@ static void CYLApplyExplicitAccessibility(NSObject<UIAccessibilityIdentification
  */
 - (void)cyl_syncTabBarItemAccessibility {
     NSArray<UIViewController *> *viewControllers = self.viewControllers;
+    // [EN] Not FlatDesign: on iOS 26 `+isLiquidGlassActive` is YES with the FlatDesign tab bar too.
+    // [CN] 不是扁平样式：iOS 26 上使用扁平样式 TabBar 时 `+isLiquidGlassActive` 也为 YES。
+    BOOL isLiquidGlassTabBar = (CYLTabBarStyleTypeFlatDesign != self.tabBarStyleType && [CYLConstants isLiquidGlassActive]);
     for (NSUInteger index = 0; index < viewControllers.count; index++) {
         UIViewController *viewController = viewControllers[index];
         // [EN] The plus child view controller's tab sits under the plus button, which gets the identifier instead.
@@ -4751,11 +4756,52 @@ static void CYLApplyExplicitAccessibility(NSObject<UIAccessibilityIdentification
         if (attributes) {
             CYLApplyExplicitAccessibility(element, attributes);
         }
+        if (isLiquidGlassTabBar) {
+            CYLApplyDefaultAccessibilityLabel(viewController.tabBarItem, viewController.tabBarItem.title);
+        }
     }
     UIButton *plusButton = [self cyl_contextPlusButton];
     if (plusButton && [self hasPlusButton]) {
         CYLApplyDefaultAccessibilityIdentifier(plusButton, plusButton.cyl_tabBarItemIdentifier);
+        // [EN] Liquid Glass: the plus child view controller's tab sits under the plus button and reads as the plus button.
+        //      Its label was set once, at setup, and kept the old title after the plus button's title changed.
+        // [CN] 液态玻璃：PlusButton 子控制器的 Tab 位于 PlusButton 下方，读作 PlusButton。其 label 以前只在设置时写入一次，
+        //      PlusButton 标题变化后仍为旧标题。
+        UIViewController *plusChildViewController = [self cyl_contextPlusChildViewController];
+        NSString *plusLabel = plusButton.accessibilityLabel;
+        if (isLiquidGlassTabBar && plusChildViewController && plusLabel.length > 0 &&
+            ![plusChildViewController.tabBarItem.accessibilityLabel isEqualToString:plusLabel]) {
+            plusChildViewController.tabBarItem.accessibilityLabel = plusLabel;
+        }
     }
+}
+
+/// [EN] The label the library wrote on a tab item, so a later title change updates it while a label the app set is kept.
+/// [CN] 本库写入 TabBarItem 的 label，使标题变化时可以更新它，同时保留 App 自己设置的 label。
+static char CYLAccessibilityLabelSetByCYLKey;
+
+/*!
+ * [EN] Liquid Glass draws each tab twice, in the normal layer and in the selected layer (the lens), and VoiceOver reads the
+ *      selected layer's button. That button reads the item's own `accessibilityLabel` when it has one, else the title it
+ *      got when it was created: after an in-place title change (`-updateTabBarItemAtIndex:attributes:`, a skin), VoiceOver
+ *      read the old title. So the item's title is written as its label, unless the app set a different label itself.
+ * [CN] 液态玻璃中每个 Tab 绘制两次：普通图层与选中图层（放大镜），VoiceOver 读取选中图层中的按钮。该按钮有 item 自己的
+ *      `accessibilityLabel` 时读取它，否则读取创建时得到的标题：原地修改标题后（`-updateTabBarItemAtIndex:attributes:`、换肤），
+ *      VoiceOver 读出旧标题。因此把 item 的标题写为其 label，除非 App 自己设置了其他 label。
+ */
+static void CYLApplyDefaultAccessibilityLabel(UITabBarItem *item, NSString *title) {
+    if (!item || title.length == 0) {
+        return;
+    }
+    NSString *current = item.accessibilityLabel;
+    NSString *setByCYL = objc_getAssociatedObject(item, &CYLAccessibilityLabelSetByCYLKey);
+    // [EN] Without a label of its own, the item reports its title. [CN] 没有自己的 label 时，item 返回其标题。
+    BOOL ownedByApp = current.length > 0 && ![current isEqualToString:setByCYL ?: @""] && ![current isEqualToString:title];
+    if (ownedByApp || [setByCYL isEqualToString:title]) {
+        return;
+    }
+    item.accessibilityLabel = title;
+    objc_setAssociatedObject(item, &CYLAccessibilityLabelSetByCYLKey, title, OBJC_ASSOCIATION_COPY_NONATOMIC);
 }
 
 /// [EN] Marks the tab buttons (and the controller) the library filled with a selected background color.
