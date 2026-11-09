@@ -622,7 +622,8 @@ static NSArray<NSString *> *CYLKnownConfigurationKeys(void) {
               CYLTabBarControllerUserInterfaceStyle, CYLTabBarControllerTabButtonTapAnimation, CYLTabBarControllerSwipeToSwitchTab,
               CYLTabBarControllerLoginRequiredTabBarItemIdentifiers, CYLTabBarControllerUnloadsUnselectedViewsOnMemoryWarning,
               CYLTabBarControllerKeepsLoadedTabBarItemIdentifiers, CYLTabBarControllerLocalization,
-              CYLTabBarControllerConfigurationRoute, CYLTabBarControllerManifestRoute ];
+              CYLTabBarControllerConfigurationRoute, CYLTabBarControllerManifestRoute, CYLTabBarControllerIconRenderingMode,
+              CYLTabBarControllerIconColor, CYLTabBarControllerSelectedIconColor ];
 }
 
 static NSArray<NSString *> *CYLKnownItemKeys(void) {
@@ -632,7 +633,7 @@ static NSArray<NSString *> *CYLKnownItemKeys(void) {
               CYLConfigurationLottieFilePathKey, CYLConfigurationLottieURLKey, CYLConfigurationLottieSizeKey, CYLTabBarItemIdentifier, CYLConfigurationLottieDarkURLKey,
               CYLConfigurationLottieDarkFilePathKey, CYLConfigurationLottieDarkColorsKey, CYLTabBarItemPageIdentifier,
               CYLTabBarItemPageParameters, CYLTabBarItemPlatforms, CYLTabBarItemMinimumAppVersion, CYLTabBarItemSelectedTitle, CYLTabBarItemTitleColor, CYLTabBarItemSelectedTitleColor,
-              CYLTabBarItemIconColor, CYLTabBarItemSelectedIconColor, CYLTabBarItemSelectedBackgroundColor, CYLTabBarItemBackgroundColor,
+              CYLTabBarItemIconColor, CYLTabBarItemSelectedIconColor, CYLTabBarItemIconRenderingMode, CYLTabBarItemSelectedBackgroundColor, CYLTabBarItemBackgroundColor,
               CYLTabBarItemTitleFont, CYLTabBarItemSelectedTitleFont, CYLTabBarItemAccessibilityIdentifier, CYLTabBarItemAccessibilityLabel,
               CYLTabBarItemAccessibilityHint,
               // [EN] Tab animations (#604, #752, #605): the generic keys, the options, Lottie's loop flag, PAG, Rive and GIF.
@@ -1024,6 +1025,15 @@ static NSDictionary *CYLNormalizedItemAttributes(NSDictionary *attributes) {
         if (item[key] && !(item[key] = CYLColorValue(item[key]))) {
             CYLLogInvalidConfigurationValue(key, attributes[key]);
         }
+    }
+    if (item[CYLTabBarItemIconRenderingMode]) {
+        // FIX: issue #787 — "template", "original" or "automatic". [CN] "template"、"original" 或 "automatic"。
+        NSString *mode = [item[CYLTabBarItemIconRenderingMode] isKindOfClass:[NSString class]] ? [item[CYLTabBarItemIconRenderingMode] lowercaseString] : nil;
+        if (![@[ @"template", @"original", @"automatic" ] containsObject:mode ?: @""]) {
+            CYLLogInvalidConfigurationValue(CYLTabBarItemIconRenderingMode, attributes[CYLTabBarItemIconRenderingMode]);
+            mode = nil;
+        }
+        item[CYLTabBarItemIconRenderingMode] = mode;
     }
     for (NSString *key in @[ CYLTabBarItemTitleFont, CYLTabBarItemSelectedTitleFont ]) {
         if (item[key] && !(item[key] = CYLFontValue(item[key]))) {
@@ -1819,6 +1829,10 @@ static void CYLApplyConfigurationRoute(NSMutableDictionary<NSString *, id> *conf
         // One tab: formats without list syntax (Protobuf text, XML) give a dictionary. 只有一个 Tab：没有列表语法的格式（Protobuf 文本、XML）解析为字典。
         items = @[ items ];
     }
+    NSMutableDictionary *barIconDefaults = [NSMutableDictionary dictionary];
+    barIconDefaults[CYLTabBarItemIconRenderingMode] = normalized[CYLTabBarControllerIconRenderingMode];
+    barIconDefaults[CYLTabBarItemIconColor] = normalized[CYLTabBarControllerIconColor];
+    barIconDefaults[CYLTabBarItemSelectedIconColor] = normalized[CYLTabBarControllerSelectedIconColor];
     if (items) {
         NSMutableArray<NSDictionary *> *normalizedItems = [NSMutableArray array];
         if ([items isKindOfClass:[NSArray class]]) {
@@ -1833,6 +1847,12 @@ static void CYLApplyConfigurationRoute(NSMutableDictionary<NSString *, id> *conf
                     NSMutableDictionary<NSString *, NSString *> *references = [NSMutableDictionary dictionary];
                     NSDictionary *source = initialValues ? CYLItemResolvingThemeReferences(item, initialValues, references) : item;
                     [itemReferences addObject:references];
+                    // FIX: issue #787 — the tab bar's icon defaults, for a tab without its own. [CN] TabBar 的图标默认值，用于没有单独设置的 Tab。
+                    if (barIconDefaults.count > 0) {
+                        NSMutableDictionary *withDefaults = [barIconDefaults mutableCopy];
+                        [withDefaults addEntriesFromDictionary:source];
+                        source = withDefaults;
+                    }
                     NSDictionary *normalizedItem = CYLNormalizedItemAttributes(source);
                     NSString *reason = CYLExclusionReason(normalizedItem);
                     if (reason) {

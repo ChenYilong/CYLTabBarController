@@ -35,6 +35,11 @@ message CYLTabBarConfiguration {
   // [EN] The plus button: CYLTabBarItemTitle, CYLTabBarItemImage, CYLTabBarItemSelectedTitle, CYLTabBarItemSelectedTitleColor.
   // [CN] PlusButton：CYLTabBarItemTitle、CYLTabBarItemImage、CYLTabBarItemSelectedTitle、CYLTabBarItemSelectedTitleColor。
   CYLTabBarItem CYLTabBarControllerPlusButton = 12;
+  // [EN] Icon tint of every tab without its own (#787): "template", "original" or "automatic", and "#RRGGBB" colors.
+  // [CN] 没有单独设置的所有 Tab 的图标着色（#787）："template"、"original" 或 "automatic"，以及 "#RRGGBB" 颜色。
+  string CYLTabBarControllerIconRenderingMode = 13;
+  string CYLTabBarControllerIconColor = 14;
+  string CYLTabBarControllerSelectedIconColor = 15;
 }
 
 message CYLTabBarTheme {
@@ -108,4 +113,6 @@ message CYLTabBarItem {
   string CYLTabBarGIFSize = 59;
   string CYLTabBarGIFDarkURL = 60;
   string CYLTabBarGIFDarkFilePath = 61;
+  // [EN] "template", "original" or "automatic" (#787). [CN] "template"、"original" 或 "automatic"（#787）。
+  string CYLTabBarItemIconRenderingMode = 62;
 }

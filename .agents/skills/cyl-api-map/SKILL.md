@@ -52,6 +52,7 @@ Read the document for the feature before using its API. The public API is in the
 | Publishing the Android library to Maven (Maven Local, Maven Central, GitHub Packages): `scripts/publish-android.sh`, coordinates `io.github.chenyilong:cyltabbarcontroller` / `cyltabbarcontroller-pages`, credentials, signing | [Android-Library](../../../docs/Android-Library.md) |
 | Image-only tabs | [Image-Only-Tabs](../../../docs/Image-Only-Tabs.md) |
 | Per-tab colors | [Tab-Item-Colors](../../../docs/Tab-Item-Colors.md) |
+| Icon rendering mode: one image tinted per state, or original colors (`CYLTabBarItemIconRenderingMode`, `CYLTabBarControllerIconRenderingMode`, #787) | [Tab-Item-Colors](../../../docs/Tab-Item-Colors.md) |
 | Tab positioning, width, spacing | [Tab-Item-Positioning](../../../docs/Tab-Item-Positioning.md) |
 | A different title when selected | [TabBarItem-Selected-Title](../../../docs/TabBarItem-Selected-Title.md) |
 | FlatDesign appearance | [FlatDesign-StandardAppearance](../../../docs/FlatDesign-StandardAppearance.md) |

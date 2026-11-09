@@ -761,6 +761,32 @@ FOUNDATION_EXTERN NSString *const CYLTabBarItemTitleColor;
 FOUNDATION_EXTERN NSString *const CYLTabBarItemSelectedTitleColor;
 FOUNDATION_EXTERN NSString *const CYLTabBarItemIconColor;
 FOUNDATION_EXTERN NSString *const CYLTabBarItemSelectedIconColor;
+
+/*!
+ * [EN] FIX: issue #787 (and #159, #465, #588). How a tab's icon takes its colors, after Kongzue Tabbar's `noDyeing` and
+ *      `focusColor` / `normalColor`:
+ *      - `CYLTabBarItemIconRenderingMode` (a tab) / `CYLTabBarControllerIconRenderingMode` (every tab without its own):
+ *        "template": the icon is tinted, so one image serves both states (no selected image needed): unselected with
+ *        `CYLTabBarItemIconColor`, selected with `CYLTabBarItemSelectedIconColor`, else the tab bar's tint colors.
+ *        "original": the icon keeps its own colors, even when an icon color is set (the fix for gray icons, #465 / #588).
+ *        "automatic" (default): as before: on iOS image names keep their colors and template images (SF Symbols) are
+ *        tinted; on Android an icon is tinted when it has an icon color.
+ *      - `CYLTabBarControllerIconColor` / `CYLTabBarControllerSelectedIconColor`: the icon colors of every tab without its
+ *        own ("#RRGGBB" in a file, or a UIColor), like Kongzue Tabbar's `normalColor` / `focusColor` for icons.
+ *      iOS only for now; Android, React Native and Flutter are a TODO in docs/Tab-Item-Colors.md.
+ * [CN] FIX: issue #787（以及 #159、#465、#588）。Tab 图标如何取色，参照 Kongzue Tabbar 的 `noDyeing` 与 `focusColor` / `normalColor`：
+ *      - `CYLTabBarItemIconRenderingMode`（单个 Tab）/ `CYLTabBarControllerIconRenderingMode`（没有单独设置的所有 Tab）：
+ *        "template"：图标被着色，因此一张图即可用于两种状态（无需选中图片）：未选中使用 `CYLTabBarItemIconColor`，选中使用
+ *        `CYLTabBarItemSelectedIconColor`，否则使用 TabBar 的着色。"original"：图标保持原色，即使设置了图标颜色（解决图标变灰，#465 / #588）。
+ *        "automatic"（默认）：与之前相同：iOS 上图片名保持原色、模板图片（SF Symbols）被着色；Android 上有图标颜色时着色。
+ *      - `CYLTabBarControllerIconColor` / `CYLTabBarControllerSelectedIconColor`：没有单独设置的所有 Tab 的图标颜色（文件中为 "#RRGGBB"，
+ *        或 UIColor），相当于 Kongzue Tabbar 中用于图标的 `normalColor` / `focusColor`。
+ *      目前仅 iOS 支持；Android、React Native 与 Flutter 见 docs/Tab-Item-Colors.md 的 TODO。
+ */
+FOUNDATION_EXTERN NSString *const CYLTabBarItemIconRenderingMode;
+FOUNDATION_EXTERN NSString *const CYLTabBarControllerIconRenderingMode;
+FOUNDATION_EXTERN NSString *const CYLTabBarControllerIconColor;
+FOUNDATION_EXTERN NSString *const CYLTabBarControllerSelectedIconColor;
 FOUNDATION_EXTERN NSString *const CYLTabBarItemSelectedBackgroundColor;
 /*!
  * [EN] Optional background of the tab while NOT selected (UIColor), the counterpart of

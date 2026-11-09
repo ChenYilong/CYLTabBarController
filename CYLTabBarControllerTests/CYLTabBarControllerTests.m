@@ -236,6 +236,63 @@
     XCTAssertEqualObjects(plusNavigation.tabBarItem.accessibilityLabel, @"★ Post", @"not the first title, \"Post\"");
 }
 
+/// [EN] FIX: issue #787. `CYLTabBarItemIconRenderingMode` and the tab bar's defaults (`CYLTabBarControllerIconRenderingMode`,
+///      `CYLTabBarControllerIconColor`, `CYLTabBarControllerSelectedIconColor`): "template" tints one image in both states,
+///      "original" keeps the image's colors, a tab's own value wins, an unknown value is dropped, and an in-place update
+///      keeps the tab's mode.
+/// [CN] FIX: issue #787。`CYLTabBarItemIconRenderingMode` 与 TabBar 的默认值：「template」让一张图片在两种状态下着色，「original」保持原色，
+///      Tab 自己的值优先，未知值被丢弃，原地更新时保持 Tab 的渲染方式。
+- (void)testIconRenderingMode {
+    UIImage * (^drawn)(UIColor *) = ^UIImage *(UIColor *color) {
+        return [[[UIGraphicsImageRenderer alloc] initWithSize:CGSizeMake(8, 8)] imageWithActions:^(UIGraphicsImageRendererContext *context) {
+            [color setFill];
+            [context fillRect:CGRectMake(0, 0, 8, 8)];
+        }];
+    };
+    UIImage *icon = drawn(UIColor.blueColor);
+    XCTAssertEqual(icon.renderingMode, UIImageRenderingModeAutomatic);
+    CYLTabBarController *tabBarController = [CYLTabBarController tabBarControllerWithConfiguration:@{
+        CYLTabBarControllerContext : [NSUUID UUID].UUIDString,
+        CYLTabBarControllerIconRenderingMode : @"Template",
+        CYLTabBarControllerIconColor : @"#FF0000",
+        CYLTabBarControllerSelectedIconColor : @"#00FF00",
+        CYLTabBarControllerTabBarItemsAttributes : @[
+            @{ CYLTabBarItemIdentifier : @"a", CYLTabBarItemTitle : @"A", CYLTabBarItemImage : icon },
+            @{ CYLTabBarItemIdentifier : @"b", CYLTabBarItemTitle : @"B", CYLTabBarItemImage : icon, CYLTabBarItemSelectedImage : drawn(UIColor.redColor),
+               CYLTabBarItemIconRenderingMode : @"original", CYLTabBarItemIconColor : UIColor.purpleColor },
+            @{ CYLTabBarItemIdentifier : @"c", CYLTabBarItemTitle : @"C", CYLTabBarItemImage : icon, CYLTabBarItemIconRenderingMode : @"bogus" },
+        ],
+        CYLTabBarControllerPageResolver : ^UIViewController *(NSString *pageIdentifier, NSDictionary *attributes) {
+            return [[UIViewController alloc] init];
+        },
+    }];
+    NSArray<NSDictionary *> *attributes = tabBarController.tabBarItemsAttributes;
+    XCTAssertEqual(attributes.count, 3u);
+    XCTAssertEqualObjects(attributes[0][CYLTabBarItemIconRenderingMode], @"template", @"the tab bar's default, lowercased");
+    XCTAssertTrue([attributes[0][CYLTabBarItemIconColor] isKindOfClass:[UIColor class]], @"the tab bar's icon color, parsed");
+    XCTAssertTrue([attributes[0][CYLTabBarItemSelectedIconColor] isKindOfClass:[UIColor class]]);
+    XCTAssertEqualObjects(attributes[1][CYLTabBarItemIconRenderingMode], @"original", @"a tab's own mode wins");
+    XCTAssertEqualObjects(attributes[1][CYLTabBarItemIconColor], UIColor.purpleColor, @"a tab's own color wins");
+    XCTAssertNil(attributes[2][CYLTabBarItemIconRenderingMode], @"an unknown mode is dropped");
+
+    [tabBarController loadViewIfNeeded];
+    UITabBarItem *a = tabBarController.viewControllers[0].tabBarItem;
+    UITabBarItem *b = tabBarController.viewControllers[1].tabBarItem;
+    UITabBarItem *c = tabBarController.viewControllers[2].tabBarItem;
+    XCTAssertEqual(a.image.renderingMode, UIImageRenderingModeAlwaysTemplate);
+    XCTAssertEqual(a.selectedImage.renderingMode, UIImageRenderingModeAlwaysTemplate, @"one image serves both states");
+    XCTAssertEqual(b.image.renderingMode, UIImageRenderingModeAlwaysOriginal);
+    XCTAssertEqual(b.selectedImage.renderingMode, UIImageRenderingModeAlwaysOriginal);
+    XCTAssertNotEqual(c.image.renderingMode, UIImageRenderingModeAlwaysTemplate, @"no mode: the image as it is");
+
+    // [EN] In place: a new image keeps the tab's mode; a new mode alone redraws both images.
+    // [CN] 原地更新：新图片保持 Tab 的渲染方式；只更新渲染方式也会重新绘制两张图片。
+    XCTAssertTrue([tabBarController updateTabBarItemAtIndex:0 attributes:@{ CYLTabBarItemImage : drawn(UIColor.greenColor) }]);
+    XCTAssertEqual(a.image.renderingMode, UIImageRenderingModeAlwaysTemplate);
+    XCTAssertTrue([tabBarController updateTabBarItemAtIndex:0 attributes:@{ CYLTabBarItemIconRenderingMode : @"original" }]);
+    XCTAssertEqual(a.image.renderingMode, UIImageRenderingModeAlwaysOriginal);
+}
+
 - (void)testPerformanceExample {
     // This is an example of a performance test case.
     [self measureBlock:^{

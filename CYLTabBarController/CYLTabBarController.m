@@ -133,6 +133,10 @@ NSString *const CYLTabBarItemTitleColor = @"CYLTabBarItemTitleColor";
 NSString *const CYLTabBarItemSelectedTitleColor = @"CYLTabBarItemSelectedTitleColor";
 NSString *const CYLTabBarItemIconColor = @"CYLTabBarItemIconColor";
 NSString *const CYLTabBarItemSelectedIconColor = @"CYLTabBarItemSelectedIconColor";
+NSString *const CYLTabBarItemIconRenderingMode = @"CYLTabBarItemIconRenderingMode";
+NSString *const CYLTabBarControllerIconRenderingMode = @"CYLTabBarControllerIconRenderingMode";
+NSString *const CYLTabBarControllerIconColor = @"CYLTabBarControllerIconColor";
+NSString *const CYLTabBarControllerSelectedIconColor = @"CYLTabBarControllerSelectedIconColor";
 NSString *const CYLTabBarItemSelectedBackgroundColor = @"CYLTabBarItemSelectedBackgroundColor";
 NSString *const CYLTabBarItemBackgroundColor = @"CYLTabBarItemBackgroundColor";
 NSString *const CYLTabBarLottieLoopsWhenUnselected = @"CYLTabBarLottieLoopsWhenUnselected";
@@ -543,6 +547,36 @@ static NSString *const CYLImageOnlyTabAppliedTitleKey = @"appliedTitle";
  */
 static inline id _Nullable CYLObjectAtIndex(NSArray * _Nullable array, NSUInteger index) {
     return index < array.count ? array[index] : nil;
+}
+
+/*!
+ * [EN] FIX: issue #787. A tab's images in its `CYLTabBarItemIconRenderingMode`: "template" makes both images templates (the
+ *      selected one falls back to the normal one, so one image is enough), "original" keeps their colors; otherwise the
+ *      image infos are returned as they are.
+ * [CN] FIX: issue #787。按 Tab 的 `CYLTabBarItemIconRenderingMode` 处理其图片："template" 把两张图片都设为模板（没有选中图片时使用普通图片，
+ *      因此一张图即可），"original" 保持原色；否则原样返回图片信息。
+ */
+static void CYLApplyIconRenderingMode(NSDictionary *attributes, id _Nullable *_Nonnull normalImageInfo, id _Nullable *_Nonnull selectedImageInfo) {
+    NSString *mode = [attributes[CYLTabBarItemIconRenderingMode] isKindOfClass:[NSString class]] ? attributes[CYLTabBarItemIconRenderingMode] : nil;
+    UIImageRenderingMode renderingMode;
+    if ([mode isEqualToString:@"template"]) {
+        renderingMode = UIImageRenderingModeAlwaysTemplate;
+    } else if ([mode isEqualToString:@"original"]) {
+        renderingMode = UIImageRenderingModeAlwaysOriginal;
+    } else {
+        return;
+    }
+    UIImage *normal = *normalImageInfo ? [UIImage cyl_imageNamed:*normalImageInfo] : nil;
+    UIImage *selected = *selectedImageInfo ? [UIImage cyl_imageNamed:*selectedImageInfo] : nil;
+    if (!selected && renderingMode == UIImageRenderingModeAlwaysTemplate) {
+        selected = normal;
+    }
+    if (normal) {
+        *normalImageInfo = [normal imageWithRenderingMode:renderingMode];
+    }
+    if (selected) {
+        *selectedImageInfo = [selected imageWithRenderingMode:renderingMode];
+    }
 }
 
 @implementation CYLTabBarController {
@@ -1999,6 +2033,11 @@ static const void *const CYLPlusButtonGlassLayoutRetryPendingKey = &CYLPlusButto
                                                        darkImageInfo:attributes[CYLTabBarItemDarkImage]];
             setup.selectedImageInfo = [UIImage cyl_imageWithImageInfo:attributes[CYLTabBarItemSelectedImage]
                                                          darkImageInfo:attributes[CYLTabBarItemSelectedDarkImage]];
+            id normalImageInfo = setup.normalImageInfo;
+            id selectedImageInfo = setup.selectedImageInfo;
+            CYLApplyIconRenderingMode(attributes, &normalImageInfo, &selectedImageInfo);
+            setup.normalImageInfo = normalImageInfo;
+            setup.selectedImageInfo = selectedImageInfo;
             NSString *animationFilePath = nil;
             setup.animationURL = CYLTabBarItemAnimationURLFromAttributes(attributes, &animationFilePath);
             setup.animationFilePath = animationFilePath;
@@ -3103,13 +3142,24 @@ static NSString *const CYLTabBarItemPlusSlotPlaceholderKey = @"CYLTabBarItemPlus
 
     // As when the tab was set up (`-setViewControllers:`), so a dark image is combined with its light one (#620).
     NSString *title = attributes[CYLTabBarItemTitle];
-    BOOL updatesImage = attributes[CYLTabBarItemImage] || attributes[CYLTabBarItemDarkImage];
-    BOOL updatesSelectedImage = attributes[CYLTabBarItemSelectedImage] || attributes[CYLTabBarItemSelectedDarkImage];
+    // FIX: issue #787 — a new rendering mode alone redraws both images. [CN] 只更新渲染方式时也重新绘制两张图片。
+    BOOL updatesRenderingMode = attributes[CYLTabBarItemIconRenderingMode] != nil;
+    BOOL updatesImage = attributes[CYLTabBarItemImage] || attributes[CYLTabBarItemDarkImage] || updatesRenderingMode;
+    BOOL updatesSelectedImage = attributes[CYLTabBarItemSelectedImage] || attributes[CYLTabBarItemSelectedDarkImage] || updatesRenderingMode;
     UIImage *image = updatesImage ? [UIImage cyl_imageNamed:[UIImage cyl_imageWithImageInfo:newAttributes[CYLTabBarItemImage]
                                                                                darkImageInfo:newAttributes[CYLTabBarItemDarkImage]]] : nil;
     UIImage *selectedImage = updatesSelectedImage ?
         [UIImage cyl_imageNamed:[UIImage cyl_imageWithImageInfo:newAttributes[CYLTabBarItemSelectedImage]
                                                   darkImageInfo:newAttributes[CYLTabBarItemSelectedDarkImage]]] : nil;
+    if (updatesImage || updatesSelectedImage) {
+        // FIX: issue #787 — the tab's rendering mode applies to images updated in place too.
+        // [CN] Tab 的渲染方式同样作用于原地更新的图片。
+        id normalInfo = image;
+        id selectedInfo = selectedImage;
+        CYLApplyIconRenderingMode(newAttributes, &normalInfo, &selectedInfo);
+        image = normalInfo;
+        selectedImage = selectedInfo;
+    }
 
     // FIX: issue #216 — an animation key (e.g. from a `CYLTabBarTheme`) replaces the tab's animation in place, in every style.
     // 动画 key（例如来自 `CYLTabBarTheme`）在所有样式下原地替换该 Tab 的动画。
