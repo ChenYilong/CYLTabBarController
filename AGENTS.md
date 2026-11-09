@@ -138,6 +138,10 @@ Every new feature and user-visible change ships with bilingual documentation in 
   the cover again once the new icons are in. Do not change the library to keep a cover over icons that replace it later.
 - **New demos** follow the `cyl-new-project` skill. **PlusButton with forced title alignment**: give it a title; see `cyl-plus-button`.
 - **Xcode project files** keep the ObjC example's format (`objectVersion = 46`, `compatibilityVersion = "Xcode 3.2"`, no folder sync, deployment target below 27), or CI on Xcode 26 fails. Check before committing any `.xcodeproj` change. Full rules: the `cyl-xcode-compat` skill.
+- **Clean before every build and run**: build into an empty derived data folder (delete it first, or pass a new
+  `-derivedDataPath`), for apps, tests and scripts alike. The Objective-C demo does not relink after a change in the
+  library only, so a reused build tests an old binary and its result means nothing (2026-11-09: two experiments ran
+  stale code). Confirm a new symbol is in the app (`strings <app>/<binary> | grep <symbol>`) when in doubt.
 - **Simulator**: run `scripts/free-ram.sh` before every simulator use. Details and common failures: the `cyl-verify` skill.
 
 ## Xcode projects: Podfile, app icon, launch screen

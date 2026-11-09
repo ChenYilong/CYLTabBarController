@@ -150,4 +150,21 @@ typedef BOOL (^CYLTabBarControllerMatcher)(CYLTabBarController *tabBarController
 - (BOOL)cyl_liquidGlassTakesTabTaps;
 @end
 
+/*!
+ * [EN] The two jobs of the deprecated `cyl_userInteractionDisabled` / `cyl_shouldNotSelect`, kept apart (implemented in
+ *      UIControl+CYLTabBarControllerExtention.m):
+ *      - `CYLControlIsSelectionLocked` / `CYLControlSetSelectionLocked`: the library's lock on the selected tab button
+ *        (same stored value as the deprecated properties, so an app that still sets them keeps its behavior);
+ *      - `CYLControlReportsTaps`: whether a tap on `control` is reported through `tabBarController:didSelectControl:`.
+ *        For a plus button that is `reportsTapsToDelegate`; for any other control, "not locked".
+ * [CN] 已废弃的 `cyl_userInteractionDisabled` / `cyl_shouldNotSelect` 承担的两件事，在这里分开（实现位于 UIControl+CYLTabBarControllerExtention.m）：
+ *      - `CYLControlIsSelectionLocked` / `CYLControlSetSelectionLocked`：库对已选中 Tab 按钮的锁定（与废弃属性存储同一个值，仍在设置它们的
+ *        App 行为不变）；
+ *      - `CYLControlReportsTaps`：点击 `control` 是否通过 `tabBarController:didSelectControl:` 上报。PlusButton 为 `reportsTapsToDelegate`；
+ *        其他控件为“未锁定”。
+ */
+FOUNDATION_EXTERN BOOL CYLControlIsSelectionLocked(UIControl *_Nullable control);
+FOUNDATION_EXTERN void CYLControlSetSelectionLocked(UIControl *_Nullable control, BOOL locked);
+FOUNDATION_EXTERN BOOL CYLControlReportsTaps(UIControl *_Nullable control);
+
 NS_ASSUME_NONNULL_END

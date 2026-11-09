@@ -5153,7 +5153,7 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
                               shouldSelectViewController:(UIViewController *)viewController
                                             shouldSelect:(BOOL)shouldSelect {
     CYL_IF_NOT_FLATDESIGN_BEGIN     //Not CYLTabBarStyleTypeFlatDesign
-    [[viewController.tabBarItem cyl_tabButton] cyl_setUserInteractionDisabled:!shouldSelect];
+    CYLControlSetSelectionLocked([viewController.tabBarItem cyl_tabButton], !shouldSelect);
     if (!shouldSelect) {
         return;
     }
@@ -5358,7 +5358,7 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
     
     BOOL shouldSelectViewController =  YES;
     @try {
-        shouldSelectViewController = (!control.cyl_userInteractionDisabled) && (!control.hidden) ;
+        shouldSelectViewController = CYLControlReportsTaps(control) && (!control.hidden);
     } @catch (NSException *exception) {
 #if defined(DEBUG) || defined(BETA)
         NSLog(CYLLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
@@ -5374,6 +5374,12 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
             [self.cyl_tabBar cyl_setSelectedControl:[self cyl_contextPlusButton]];
         }
         
+        // [EN] Liquid Glass with a plus child view controller: the plus button's stand-in in the selected layer keeps its own
+        //      state (`-cyl_updateSelectedContentViewImage`); selecting it here left it with the old image after a theme change
+        //      (plus child theme test) once the plus button reported its taps.
+        // [CN] 液态玻璃且有 PlusButton 子控制器：PlusButton 在选中图层中的替身自己维护状态（`-cyl_updateSelectedContentViewImage`）；
+        //      PlusButton 上报点击时若在这里选中它，换肤后替身会保留旧图片（PlusButton 子控制器换肤测试）。
+        BOOL plusButtonKeepsItsOwnState = [CYLConstants isLiquidGlassActive] && [self hasPlusChildViewController] && [control cyl_isPlusControl];
         if (shouldSelectViewController) {
             //TODO:  pure tabbar
             CYLTabBar *cyl_tabBar = (CYLTabBar *)self.cyl_tabBar;
@@ -5384,7 +5390,9 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
             [cyl_tabBar.cyl_platterSelectedContentViews enumerateObjectsUsingBlock:^(UIControl * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
                 obj.selected = NO;
             }];
-            contentControl.selected = YES;
+            if (!plusButtonKeepsItsOwnState) {
+                contentControl.selected = YES;
+            }
             selectedContentControl.selected = YES;
             // [CN] 非液态玻璃 与 液态玻璃逻辑共用，Lottie播放逻辑都在 tabChangedToSelectedIndex 中。
             // [EN] Shared logic for non-Liquid Glass and Liquid Glass; all Lottie playback logic lives in
@@ -5399,16 +5407,16 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
     //      of `plusChildViewController`. A tap could be reported with that system tab button, which `-cyl_isPlusButton`
     //      does not recognize, or not at all: when the plus child view controller is already selected,
     //      `-updateSelectionStatusIfNeededForTabBarController:shouldSelectViewController:` disables that tab button and the
-    //      check above skipped the report. Report the plus button itself instead (its own `cyl_userInteractionDisabled`
+    //      check above skipped the report. Report the plus button itself instead (its own `reportsTapsToDelegate`
     //      still opts out), so the delegate always gets the same control for the plus button, as in a direct tap.
     // [CN] 带子控制器的 PlusButton 有两个图层：PlusButton 本身，以及其下方 `plusChildViewController` 的系统 Tab 按钮。点击时可能上报
     //      的是该系统 Tab 按钮（`-cyl_isPlusButton` 不认识它），或者根本不上报：子控制器已选中时，
     //      `-updateSelectionStatusIfNeededForTabBarController:shouldSelectViewController:` 会禁用该 Tab 按钮，上面的判断就跳过了回调。
-    //      这里统一上报 PlusButton 本身（其 `cyl_userInteractionDisabled` 仍可关闭回调），代理每次都拿到同一个控件。
+    //      这里统一上报 PlusButton 本身（其 `reportsTapsToDelegate` 仍可关闭回调），代理每次都拿到同一个控件。
     UIControl *reportedControl = [self cyl_reportedControlForControl:control_];
     BOOL shouldReport = shouldSelectViewController;
     if (reportedControl != control_) {
-        shouldReport = !reportedControl.cyl_userInteractionDisabled;
+        shouldReport = CYLControlReportsTaps(reportedControl);
     }
     // [EN] One report per tap, only for a plus button with a child view controller. On Liquid Glass a tap on a plus button with a child view controller runs
     //      `-plusChildViewControllerButtonClicked:` → `-setSelectedIndex:`, which reports through the
@@ -6474,7 +6482,7 @@ static BOOL CYLIsImplementedOutsideSystemFrameworks(Class cls, SEL selector) {
  *      （`-plusChildViewControllerButtonClicked:`，或其下方的 Tab 按钮）、没有子控制器的 PlusButton（`-cyl_flatDesignPlusButtonTouchUpInside:`）。
  */
 - (void)cyl_flatDesignReportDidSelectControl:(UIControl *)control {
-    if (!control || control.cyl_userInteractionDisabled) {
+    if (!CYLControlReportsTaps(control)) {
         return;
     }
     [self cyl_sendDidSelectControl:control];

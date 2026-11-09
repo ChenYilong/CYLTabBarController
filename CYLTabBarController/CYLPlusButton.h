@@ -306,6 +306,17 @@ FOUNDATION_EXTERN UIViewController *CYLPlusChildViewController;
 @property (nonatomic, assign) UIEdgeInsets touchableAreaOutsets;
 
 /*!
+ * [EN] Whether a tap on this plus button is reported through `tabBarController:didSelectControl:`. Default YES; set NO when
+ *      the plus button's own target-action is all you want. Unlike the deprecated `cyl_userInteractionDisabled`, it does
+ *      not change when the plus button's page is selected, so every tap is reported (e.g. a badge that counts taps).
+ *      While it is not set, the deprecated `cyl_userInteractionDisabled = YES` still keeps the taps out, as before.
+ * [CN] 点击本 PlusButton 是否通过 `tabBarController:didSelectControl:` 上报。默认 YES；只需要 PlusButton 自己的 target-action 时设为 NO。
+ *      与已废弃的 `cyl_userInteractionDisabled` 不同，它不会因为 PlusButton 页面被选中而改变，因此每次点击都会上报（例如统计点击次数的角标）。
+ *      未设置时，已废弃的 `cyl_userInteractionDisabled = YES` 仍会阻止上报，与以前相同。
+ */
+@property (nonatomic, assign) BOOL reportsTapsToDelegate;
+
+/*!
  * [EN] Scales the touchable area around the plus button's center, before `touchableAreaOutsets`: 1 is the frame
  *      (default), 2 doubles its width and height. Values below 1 count as 1, so the area never gets smaller than the
  *      button.

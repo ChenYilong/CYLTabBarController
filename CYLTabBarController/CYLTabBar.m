@@ -9,6 +9,7 @@
 #import "CYLTabBar.h"
 #import "CYLTabBarController.h"
 #import "CYLConstants.h"
+#import "CYLTabBarController+CYLPrivate.h"
 #import <objc/runtime.h>
 #import "UIControl+CYLTabBarControllerExtention.h"
 #import "CYLTabBar+CYLTabBarControllerExtention.h"
@@ -1861,7 +1862,17 @@ UISearchTab 会从 TabBar 分离出来单独显示。
         CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS
         (
          UIControl *control = (UIControl *)hitView;
-         if (control.selected) {
+         // [EN] A plus button with a child view controller counts as selected while its page is: on Liquid Glass its
+         //      `selected` flag is not set when it reports a tap (that left its stand-in with the old image after a theme
+         //      change), and a second tap on it must still be reported.
+         // [CN] 有子控制器的 PlusButton 在其页面被选中时视为已选中：液态玻璃下上报点击时不再设置它的 `selected`（否则换肤后替身会保留旧图片），
+         //      而再次点击仍需上报。
+         BOOL isSelected = control.selected;
+         UIViewController *plusChildViewController = [control isKindOfClass:[CYLPlusButton class]] ? [CYLPlusButton plusChildViewControllerForOwner:self] : nil;
+         if (!isSelected && plusChildViewController) {
+             isSelected = [tabBarController.selectedViewController cyl_isEqualToViewController:plusChildViewController];
+         }
+         if (isSelected) {
              // [CN] FIX: iOS26 无法追加点击事件， 导致无法在选中状态下， 二次点击回调, 被系统手势拦截需要禁用特定手势，因为手势优先级高于 ControlEvents;
              // [EN] FIX: On iOS26 tap events cannot be added, so there is no callback for a second tap in the selected state;
              //      the system gesture intercepts it, so specific gestures must be disabled, because gestures take priority
@@ -1873,11 +1884,11 @@ UISearchTab 会从 TabBar 分离出来单独显示。
     
     if ([hitView isKindOfClass:[CYLPlusButton class]] && ![CYLPlusButton plusChildViewControllerForOwner:self]) {
         // [CN] 即使 PlusButton 也添加了点击事件，点击 PlusButton 后也会触发该代理方法。
-        // 可在PlusButton初始化时使用 CYLExternPlusButton.cyl_userInteractionDisabled = YES; 来禁止该协议方法触发plusButton回调
+        // 可在PlusButton初始化时设置 reportsTapsToDelegate = NO 来禁止该协议方法触发plusButton回调
         // [EN] Even if the PlusButton has its own tap event, tapping the PlusButton still triggers this delegate method.
-        //      Set CYLExternPlusButton.cyl_userInteractionDisabled = YES; when initializing the PlusButton to stop this
-        //      protocol method from firing the plusButton callback
-        if (![CYLPlusButton plusButtonForOwner:self].cyl_userInteractionDisabled) {
+        //      Set reportsTapsToDelegate = NO when creating the PlusButton to stop this protocol method from firing the
+        //      plusButton callback
+        if (CYLControlReportsTaps([CYLPlusButton plusButtonForOwner:self])) {
             if ([tabBarController respondsToSelector:actin]) {
                 CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS
                 (

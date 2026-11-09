@@ -556,7 +556,8 @@ NSLog(CYLLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述�
     }
     
     // 即使 PlusButton 也添加了点击事件，点击 PlusButton 后也会触发该代理方法。
-    // 可在PlusButton初始化时使用 CYLExternPlusButton.cyl_userInteractionDisabled = YES; 来禁止该协议方法触发plusButton回调
+    // 可在PlusButton初始化时设置 reportsTapsToDelegate = NO 来禁止该协议方法触发plusButton回调
+    // [EN] Set reportsTapsToDelegate = NO when creating the PlusButton to keep its taps out of this delegate method.
     // Rotating the tapped icon is disabled, the badge would rotate too. To enable it:
     // 暂时不推荐用旋转方式，badge也会旋转。如需启用：
     //    // The plus button of this tab bar controller's context (`CYLExternPlusButton` is the one registered last).

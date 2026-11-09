@@ -826,10 +826,10 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
     UIButton *button = [CYLPlusButton plusButtonForOwner:tabBarController];
     BOOL isPlusButton = [tabBarController hasPlusButton] && [control cyl_isPlusControl];
     // [CN] 即使 PlusButton 也添加了点击事件，点击 PlusButton 后也会触发该代理方法。
-    // 可在PlusButton初始化时使用 CYLExternPlusButton.cyl_userInteractionDisabled = YES; 来禁止该协议方法触发plusButton回调
+    // 可在PlusButton初始化时设置 reportsTapsToDelegate = NO 来禁止该协议方法触发plusButton回调
     // [EN] Even if the PlusButton has its own tap action, tapping the PlusButton still triggers this delegate method.
-    //      Use CYLExternPlusButton.cyl_userInteractionDisabled = YES; when initializing the PlusButton to stop this
-    //      protocol method from triggering the plusButton callback.
+    //      Set reportsTapsToDelegate = NO when creating the PlusButton to stop this protocol method from triggering the
+    //      plusButton callback.
     if (isPlusButton) {
         animationView = button.imageView;
     }

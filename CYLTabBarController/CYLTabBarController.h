@@ -866,7 +866,7 @@ presentLoginForViewController:(UIViewController *)viewController
   *  选中状态下的重新点击，（iOS26 需要在手势代理方法中进行hook追加该方法）
   *  用户切换index时 ，底层通过 `-setSelectedViewController`方法来实现。
   *  代码切换index 时，底层通过 `-setSelectedIndex` 方法来实现。
- * @attention 即使 PlusButton 也添加了点击事件，点击 PlusButton 后也会触发该代理方法。可在PlusButton初始化时使用 CYLExternPlusButton.cyl_userInteractionDisabled = YES; 来禁止该协议方法触发涉及plusButton的回调
+ * @attention 即使 PlusButton 也添加了点击事件，点击 PlusButton 后也会触发该代理方法。可在PlusButton初始化时设置 `reportsTapsToDelegate = NO` 来禁止该协议方法触发涉及plusButton的回调（`cyl_userInteractionDisabled` 已废弃）。[EN] Set the plus button's `reportsTapsToDelegate = NO` to keep its taps out of this method (`cyl_userInteractionDisabled` is deprecated).
  * [EN] Called after the selected control changes, whether by a tap or by code. Unlike `-tabBar:didSelectItem:`, `control` may be the plus button.
  *      FIX: issue #232 — in the classic system tab bar, a tap that `-tabBarController:shouldSelectViewController:` refuses
  *      (returns NO) changes nothing and is not reported here.

@@ -7,6 +7,7 @@
 //
 
 #import "CYLPlusButton.h"
+#import "CYLTabBarController+CYLPrivate.h"
 #import <objc/runtime.h>
 #import "CYLTabBarController.h"
 #import "UIViewController+CYLTabBarControllerExtention.h"
@@ -249,12 +250,8 @@ static BOOL CYLPlusButtonIsInLiquidGlassTabBar(CYLPlusButton *plusButton) {
     return tabBarController && CYLTabBarStyleTypeFlatDesign != tabBarController.tabBarStyleType;
 }
 
-// [EN] Implemented in CYLTabBarController+CYLInteraction.m: the pressed (highlight / dehighlight) animation of a button.
-// [CN] 在 CYLTabBarController+CYLInteraction.m 中实现：按钮的按下（highlight / dehighlight）动画。
-@interface CYLTabBarController (CYLTabButtonHighlight)
-- (void)cyl_tabButtonTouchDown:(UIControl *)control;
-- (void)cyl_tabButtonTouchUp:(UIControl *)control;
-@end
+// [EN] `CYLTabBarController (CYLTabButtonHighlight)` comes from CYLTabBarController+CYLPrivate.h.
+// [CN] `CYLTabBarController (CYLTabButtonHighlight)` 来自 CYLTabBarController+CYLPrivate.h。
 
 @implementation CYLPlusButton
 //@synthesize selected = _selected;
@@ -1764,7 +1761,7 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
     // twice. Otherwise keep the previous behavior.
     BOOL selectedBySetSelectedIndex =
         ([tabBarController cyl_plusButtonControlIfSelectingPlusChildViewController:plusChildViewController] == sender);
-    if (!selectedBySetSelectedIndex && NO == sender.cyl_userInteractionDisabled) {
+    if (!selectedBySetSelectedIndex && CYLControlReportsTaps(sender)) {
         sender.selected = YES;
         [tabBarController tabChangedToControl:sender];
     }
@@ -1969,6 +1966,16 @@ static BOOL CYLPlusButtonSubviewTakesTouches(UIView *view, UIView *plusButton) {
     return CGRectContainsPoint(touchableRect, point);
 }
 
+- (BOOL)reportsTapsToDelegate {
+    NSNumber *value = objc_getAssociatedObject(self, @selector(reportsTapsToDelegate));
+    // [EN] Not set: the deprecated flag decides, as before. [CN] 未设置：由已废弃的标记决定，与以前相同。
+    return value ? value.boolValue : !CYLControlIsSelectionLocked(self);
+}
+
+- (void)setReportsTapsToDelegate:(BOOL)reportsTapsToDelegate {
+    objc_setAssociatedObject(self, @selector(reportsTapsToDelegate), @(reportsTapsToDelegate), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
 - (void)setTouchableAreaOutsets:(UIEdgeInsets)touchableAreaOutsets {
     _touchableAreaOutsets = touchableAreaOutsets;
     [self cyl_updateTouchableAreaView];
@@ -2111,7 +2118,7 @@ static BOOL CYLPlusButtonSubviewTakesTouches(UIView *view, UIView *plusButton) {
     // [CN] 只有替身以高亮状态显示。原先这里也把已注册的 PlusButton 设为高亮且一直保持，系统因此把它的图片画暗（如 Example-PAG 选中
     //      其页面时，玻璃上方的圆形变暗）。
     UIButton<CYLPlusButtonSubclassing> *plusButton = [class plusButton];
-    if (NO == plusButton.cyl_userInteractionDisabled) {
+    if (CYLControlReportsTaps(plusButton)) {
         // [CN] 不使用selected 以避免选中背景
         // [EN] Do not use selected, to avoid the selected background
         plusButton.highlighted = YES;
@@ -2176,7 +2183,7 @@ static BOOL CYLPlusButtonSubviewTakesTouches(UIView *view, UIView *plusButton) {
     selectedContentView.translatesAutoresizingMaskIntoConstraints = YES;
     selectedContentView.userInteractionEnabled = false;
     [selectedContentView sizeToFit];
-    if (NO == self.cyl_userInteractionDisabled) {
+    if (CYLControlReportsTaps(self)) {
         // [CN] 不使用selected 以避免选中背景
         // [EN] Do not use selected, to avoid the selected background
         selectedContentView.highlighted = YES;

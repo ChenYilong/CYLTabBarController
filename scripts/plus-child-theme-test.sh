@@ -30,6 +30,10 @@ SELECT_INDEX="${SELECT_INDEX:-2}"
 DERIVED=build/plus-child-theme-test-build
 OUT=build/plus-child-theme-test
 LOG="$OUT/app.log"
+# [EN] A clean build every run (AGENTS.md): the Objective-C demo does not relink after a change in the library only, so a
+#      reused build folder tested an old binary. [CN] 每次都从干净的构建开始（AGENTS.md）：只修改库时 Objective-C Demo 不会重新链接，
+#      复用构建目录会测试旧的二进制文件。
+rm -rf "$DERIVED"
 mkdir -p "$DERIVED" "$OUT"
 : > "$LOG"
 

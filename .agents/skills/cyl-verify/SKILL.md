@@ -55,6 +55,14 @@ The `CYLTabBarController` scheme has no test action: use `scripts/unit-tests.sh`
 | A resource added to a Flutter Runner project lands in `RunnerTests` | The script took the first Resources phase | Add it to the Resources phase of the application target |
 | `CYLTabBarHostView` shows no tab for an item | Neither a page ID nor an identifier: no page | The host gives such a tab a page ID of its own (`CYLTabBarHostView-tab-<index>`) |
 
+### Clean builds
+
+- **Before every build and run** (an app, `xcodebuild test`, a script that builds), start from an empty derived data
+  folder: `rm -rf <derived data>` or a new `-derivedDataPath`. The Objective-C demo does not relink after a change in the
+  library only, so an incremental build runs the old library code: a test or a screenshot from it proves nothing.
+  `scripts/plus-child-theme-test.sh` deletes its build folder itself.
+- When in doubt, check that the app holds the new code: `strings <app>/<binary> | grep <new symbol>`.
+
 ### Running the simulator
 
 - **Before every run of the iOS Simulator** (`xcrun simctl boot`, `xcodebuild test`, installing and launching an app,

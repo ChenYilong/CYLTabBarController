@@ -228,9 +228,11 @@ static NSDictionary *CYLTestTab(NSString *title, NSString *pageIdentifier) {
                                                            dispatch_queue_attr_make_with_qos_class(DISPATCH_QUEUE_SERIAL, QOS_CLASS_USER_INITIATED, 0));
     __block atomic_int completions = 0;
     [registry registerAsyncPageFactory:^UIViewController *(CYLTabBarPageRequest *request, CYLTabBarPageCompletion completion) {
+        // [EN] The page is made on the main thread (UIKit); only its delivery comes from the background queue.
+        // [CN] 页面在主线程创建（UIKit 要求）；只有交付来自后台队列。
+        UIViewController *page = [request.pageIdentifier isEqualToString:@"later"] ? [[UIViewController alloc] init] : nil;
+        page.title = request.title;
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.05 * NSEC_PER_SEC)), deliveryQueue, ^{
-            UIViewController *page = [request.pageIdentifier isEqualToString:@"later"] ? [[UIViewController alloc] init] : nil;
-            page.title = request.title;
             completion(page);
             completion(page); // [EN] A second call is ignored. [CN] 第二次调用被忽略。
             atomic_fetch_add(&completions, 1);
