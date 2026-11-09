@@ -232,6 +232,23 @@ The root `Podfile` is the reference: it already has the top lines and the hook.
 - Branch from the latest `master` for each issue or feature.
 - Commit messages are in English, Conventional Commits as configured for commitizen in `package.json`
   (`feat: ✨ …`, `fix: 🐛 …`, `docs: 📝 …`).
+- Follow the Commitizen defaults: emojis are enabled and the format is
+  `{type}{scope}: {emoji}{subject}`. Scope is optional and there are no
+  predefined scopes. The configured message length is 3–64 characters. The
+  examples use a space between the emoji and subject. The
+  interactive types, in order, are `test`, `feat`, `fix`, `chore`, `docs`,
+  `refactor`, `style`, `ci`, and `perf`; `release` is defined but not listed.
+- Default type meanings and emojis: `chore` (build or auxiliary tools, 🤖),
+  `ci` (CI changes, 🎡), `docs` (documentation only, ✏️), `feat` (new feature,
+  🎸), `fix` (bug fix, 🐛), `perf` (performance improvement, ⚡️), `refactor`
+  (neither a feature nor fix, 💡), `style` (markup or formatting only, 💄),
+  `test` (adding missing tests, 💍), and `release` (release commit, 🏹).
+- The question sequence is `type`, `scope`, `subject`, `body`, `breaking`,
+  `issues`, and `lerna`. Prompts request a change type, optional scope, a short
+  imperative subject, longer description, breaking changes, issues closed (for
+  example `#123`), and affected packages. Use this repository's established
+  emoji mappings when they differ from defaults: `feat: ✨`, `fix: 🐛`,
+  `docs: 📝`, `chore: 🔧`, and `refactor: ♻️`. Keep commit text in English.
 - Before every commit, review the changed scope and its issue, comparison, and implementation-status documents.
   Record each incomplete or unverified item in the commit under a `TODO` heading in the most relevant existing
   `docs/` document. State the current score or status, remaining work, implementation constraints, known defects,
