@@ -7,7 +7,7 @@ import androidx.fragment.app.FragmentActivity
 import com.cyl.tabbar.CYLTabBarConfiguration.CYLConfigurationException
 import com.cyl.tabbar.CYLTabBarConfiguration.CYLTabBarConfigurationError
 import java.io.File
-import java.net.URL
+import java.net.URI
 import java.security.MessageDigest
 import java.util.Locale
 
@@ -39,6 +39,8 @@ class CYLTabBarManifest private constructor(
         /** [EN] The manifest format this library reads. [CN] 本库读取的清单格式版本。 */
         const val supportedSchemaVersion = 1
         private const val ASSET_NAME_PREFIX = "cyl.asset."
+        /** [EN] The scheme of an asset reference ("asset:home?state=selected"). [CN] 资源引用的 scheme。 */
+        private const val ASSET_REFERENCE_PREFIX = "asset:"
 
         /** [EN] A manifest from a dictionary; `UnsupportedManifest` when it is not one. [CN] 由字典创建清单；不是清单时抛出 `UnsupportedManifest`。 */
         @JvmStatic
@@ -220,8 +222,8 @@ class CYLTabBarManifest private constructor(
 
     /** [EN] The path an asset reference ("asset:home?state=selected") leads to. [CN] 资源引用对应的路径。 */
     fun pathForAssetReference(reference: String): String? {
-        if (!reference.startsWith("asset:")) return null
-        val rest = reference.removePrefix("asset:")
+        if (!reference.startsWith(ASSET_REFERENCE_PREFIX)) return null
+        val rest = reference.removePrefix(ASSET_REFERENCE_PREFIX)
         val query = rest.substringAfter('?', "").split('&').associate { it.substringBefore('=') to java.net.URLDecoder.decode(it.substringAfter('=', ""), "UTF-8") }
         val key = rest.substringBefore('?').ifEmpty { return null }
         return pathOfAsset(key, query["theme"], query["state"])
@@ -249,7 +251,7 @@ class CYLTabBarManifest private constructor(
     private fun imagePath(value: Any?, theme: String?): String? {
         val text = resolved(value, theme) as? String ?: return null
         if (text.isEmpty()) return null
-        if (text.startsWith("asset:")) {
+        if (text.startsWith(ASSET_REFERENCE_PREFIX)) {
             val reference = if (theme != null && !text.contains("theme=")) text + (if ('?' in text) "&" else "?") + "theme=$theme" else text
             return pathForAssetReference(reference)?.let(::imageValue)
         }
@@ -316,29 +318,38 @@ class CYLTabBarManifest private constructor(
         }
         configuration[CYLConstants.CYLTabBarControllerTabBarItemsAttributes] = items
         (tabBar["midButton"] as? Map<*, *>)?.takeIf { isForThisApp(it) }?.let { mid ->
-            val plus = linkedMapOf<String, Any?>(
-                CYLConstants.CYLTabBarItemIdentifier to string(mid, "key"),
-                CYLConstants.CYLTabBarItemTitle to string(mid, "text"),
-                CYLConstants.CYLTabBarItemImage to imagePath(mid["iconPath"], defaultName),
-                CYLConstants.CYLPlusButtonBackgroundImage to imagePath(mid["backgroundImage"], defaultName),
-            )
-            (mid["index"] as? Number)?.let { plus[CYLConstants.CYLPlusButtonIndexInTabBar] = it.toInt() }
-            val width = (mid["width"] as? Number)?.toDouble()
-            val height = (mid["height"] as? Number)?.toDouble()
-            if (width != null && height != null) plus[CYLConstants.CYLPlusButtonSize] = "{${format(width)}, ${format(height)}}"
-            if (string(mid, "action") != "callback") plus[CYLConstants.CYLTabBarItemPageIdentifier] = string(mid, "pagePath")
-            configuration[CYLConstants.CYLTabBarControllerPlusButton] = plus.filterValues { it != null }
+            configuration[CYLConstants.CYLTabBarControllerPlusButton] = plusButton(mid, defaultName)
             configuration[CYLConstants.CYLTabBarControllerContext] = "CYLTabBarManifest:" + (identifier ?: "manifest")
         }
-        (dictionary["localization"] as? Map<*, *>)?.let { localization ->
-            val value = LinkedHashMap<String, Any?>()
-            string(localization, "tableName")?.let { value[CYLConstants.CYLTabBarLocalizationTableName] = it }
-            string(localization, "route")?.let { value[CYLConstants.CYLTabBarLocalizationPath] = it }
-            configuration[CYLConstants.CYLTabBarControllerLocalization] = value
-            // [EN] A relative table route starts from the manifest's folder. [CN] 相对的字符串表路由以清单所在目录为起点。
-            baseDirectory?.let { configuration[CYLTabBarConfigurationLocalization.FILE_DIRECTORY_KEY] = it }
-        }
+        (dictionary["localization"] as? Map<*, *>)?.let { configuration.putAll(localization(it)) }
         return configuration
+    }
+
+    /** [EN] The plus button's attributes from `tabBar.midButton`. [CN] 由 `tabBar.midButton` 得到的 PlusButton 属性。 */
+    private fun plusButton(mid: Map<*, *>, defaultName: String?): Map<String, Any?> {
+        val plus = linkedMapOf<String, Any?>(
+            CYLConstants.CYLTabBarItemIdentifier to string(mid, "key"),
+            CYLConstants.CYLTabBarItemTitle to string(mid, "text"),
+            CYLConstants.CYLTabBarItemImage to imagePath(mid["iconPath"], defaultName),
+            CYLConstants.CYLPlusButtonBackgroundImage to imagePath(mid["backgroundImage"], defaultName),
+        )
+        (mid["index"] as? Number)?.let { plus[CYLConstants.CYLPlusButtonIndexInTabBar] = it.toInt() }
+        val width = (mid["width"] as? Number)?.toDouble()
+        val height = (mid["height"] as? Number)?.toDouble()
+        if (width != null && height != null) plus[CYLConstants.CYLPlusButtonSize] = "{${format(width)}, ${format(height)}}"
+        if (string(mid, "action") != "callback") plus[CYLConstants.CYLTabBarItemPageIdentifier] = string(mid, "pagePath")
+        return plus.filterValues { it != null }
+    }
+
+    /** [EN] The localization keys from `localization`. [CN] 由 `localization` 得到的本地化键。 */
+    private fun localization(localization: Map<*, *>): Map<String, Any?> {
+        val value = LinkedHashMap<String, Any?>()
+        string(localization, "tableName")?.let { value[CYLConstants.CYLTabBarLocalizationTableName] = it }
+        string(localization, "route")?.let { value[CYLConstants.CYLTabBarLocalizationPath] = it }
+        val keys = linkedMapOf<String, Any?>(CYLConstants.CYLTabBarControllerLocalization to value)
+        // [EN] A relative table route starts from the manifest's folder. [CN] 相对的字符串表路由以清单所在目录为起点。
+        baseDirectory?.let { keys[CYLTabBarConfigurationLocalization.FILE_DIRECTORY_KEY] = it }
+        return keys
     }
 
     private fun format(value: Double) = if (value == Math.floor(value)) value.toLong().toString() else value.toString()
@@ -378,7 +389,7 @@ internal object CYLManifestConditions {
     /** [EN] 0–99, the same for this install. [CN] 0–99，本次安装固定不变。 */
     private fun percentile(context: Context): Int {
         val preferences = context.getSharedPreferences("cyl_tabbar_manifest", Context.MODE_PRIVATE)
-        if (!preferences.contains("percentile")) preferences.edit().putInt("percentile", java.util.Random().nextInt(100)).apply()
+        if (!preferences.contains("percentile")) preferences.edit().putInt("percentile", java.security.SecureRandom().nextInt(100)).apply()
         return preferences.getInt("percentile", 0)
     }
 
@@ -415,8 +426,12 @@ internal object CYLManifestConditions {
 class CYLTabBarManifestLoader(context: Context) {
     interface Delegate {
         fun shouldApplyManifest(manifest: CYLTabBarManifest, source: CYLTabBarManifest.CYLTabBarManifestSource): Boolean = true
-        fun didApplyManifest(manifest: CYLTabBarManifest, source: CYLTabBarManifest.CYLTabBarManifestSource) {}
-        fun didFail(error: CYLConfigurationException, fallbackSource: CYLTabBarManifest.CYLTabBarManifestSource) {}
+        fun didApplyManifest(manifest: CYLTabBarManifest, source: CYLTabBarManifest.CYLTabBarManifestSource) {
+            // [EN] Optional: nothing to do by default. [CN] 可选：默认不做任何事。
+        }
+        fun didFail(error: CYLConfigurationException, fallbackSource: CYLTabBarManifest.CYLTabBarManifestSource) {
+            // [EN] Optional: nothing to do by default. [CN] 可选：默认不做任何事。
+        }
     }
 
     private val context = context.applicationContext
@@ -447,7 +462,7 @@ class CYLTabBarManifestLoader(context: Context) {
             var failed: Map<String, Any?>? = null
             var error: CYLConfigurationException? = null
             val saved = try {
-                val data = URL(url).openStream().use { it.readBytes() }
+                val data = URI(url).toURL().openStream().use { it.readBytes() }
                 val dictionary = CYLTabBarConfigurationParser.dictionaryWithData(data, CYLTabBarConfigurationFormat.JSON)
                 failed = dictionary
                 val manifest = CYLTabBarManifest.manifestWithDictionary(context, dictionary, null)
@@ -475,8 +490,8 @@ class CYLTabBarManifestLoader(context: Context) {
         try {
             for (entry in staged.assetEntries()) {
                 val path = staged.pathOfEntry(entry) ?: throw CYLConfigurationException(CYLTabBarConfigurationError.AssetInvalid, "Asset ${CYLTabBarManifest.string(entry, "path")} is outside the assets folder.")
-                val source = CYLTabBarManifest.string(entry, "url") ?: URL(URL(baseURL), CYLTabBarManifest.string(entry, "path")).toString()
-                val data = runCatching { URL(source).openStream().use { it.readBytes() } }.getOrNull()
+                val source = CYLTabBarManifest.string(entry, "url") ?: URI(baseURL).resolve(CYLTabBarManifest.string(entry, "path").orEmpty()).toString()
+                val data = runCatching { URI(source).toURL().openStream().use { it.readBytes() } }.getOrNull()
                     ?: throw CYLConfigurationException(CYLTabBarConfigurationError.AssetInvalid, "Asset ${CYLTabBarManifest.string(entry, "path")} could not be downloaded.")
                 File(path).apply { parentFile?.mkdirs(); writeBytes(data) }
             }

@@ -509,7 +509,8 @@ fun CYLSimulateMemoryWarningReport(context: Context, controller: CYLTabBarContro
     pages.forEachIndexed { index, page ->
         // [EN] The title the tab shows, as iOS `tabBarItem.title`: the selected title on the selected tab. [CN] Tab 显示的标题，与 iOS 相同：选中的 Tab 显示选中标题。
         val item = controller?.tabBarItems?.getOrNull(index)
-        val title = (if (index == controller?.selectedIndex) item?.cyl_selectedTitle else null) ?: item?.title ?: page.javaClass.simpleName
+        val selectedTitle = item?.cyl_selectedTitle?.takeIf { index == controller?.selectedIndex }
+        val title = selectedTitle ?: item?.title ?: page.javaClass.simpleName
         val status = when {
             !wasLoaded[index] -> R.string.cyl_memory_warning_not_loaded
             page.view == null -> R.string.cyl_memory_warning_unloaded

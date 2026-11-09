@@ -159,7 +159,7 @@ function presentLanguagePicker(onChoose: (language: string | undefined) => void,
 }
 
 /** The Android language list, in the skin menu's style. Android 的语言列表，与换肤菜单样式相同。 */
-function CYLLanguageMenu({ visible, colors, onChoose, onClose }: { visible: boolean; colors: typeof LIGHT; onChoose: (language: string | undefined) => void; onClose: () => void }) {
+function CYLLanguageMenu({ visible, colors, onChoose, onClose }: Readonly<{ visible: boolean; colors: typeof LIGHT; onChoose: (language: string | undefined) => void; onClose: () => void }>) {
   const row = (key: string, title: string, label: string, onPress: () => void) => (
     <Pressable
       key={key}

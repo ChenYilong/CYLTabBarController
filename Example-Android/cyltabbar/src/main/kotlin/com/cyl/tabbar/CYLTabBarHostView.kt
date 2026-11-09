@@ -66,10 +66,16 @@ open class CYLTabBarHostView @JvmOverloads constructor(context: Context, attrs: 
     var configuration: Map<String, Any?>? = null
         set(value) {
             field = value
-            generation++
-            pendingConfiguration = null
-            if (value == null) removeController() else loadImages(value, generation)
+            reloadConfiguration()
         }
+
+    /** [EN] Builds the controller again from `configuration` (images first). [CN] 由 `configuration` 重新创建控制器（先加载图片）。 */
+    private fun reloadConfiguration() {
+        generation++
+        pendingConfiguration = null
+        val current = configuration
+        if (current == null) removeController() else loadImages(current, generation)
+    }
 
     /** [EN] The activity that hosts the fragments; by default the one the view's context wraps. [CN] 承载 Fragment 的 Activity；默认为视图 context 所包装的 Activity。 */
     var activityProvider: () -> FragmentActivity? = { findActivity(context) }
@@ -247,7 +253,7 @@ open class CYLTabBarHostView @JvmOverloads constructor(context: Context, attrs: 
                 CYLLocalization.isRightToLeft(value) -> View.LAYOUT_DIRECTION_RTL
                 else -> View.LAYOUT_DIRECTION_LTR
             }
-            if (tabBarController != null) configuration = configuration
+            if (tabBarController != null) reloadConfiguration()
         }
     var preferredHeightDidChange: ((height: Float) -> Unit)? = null
 
@@ -379,11 +385,21 @@ open class CYLTabBarHostView @JvmOverloads constructor(context: Context, attrs: 
         super.onDetachedFromWindow()
         // [EN] Rebuilt when attached again: the fragments cannot outlive the view tree. [CN] 再次附加时重新创建：Fragment 不能比视图树存活更久。
         if (tabBarController != null && configuration != null) {
-            // [EN] Setting the same configuration again runs its setter, which builds the controller on the next attach.
-            // [CN] 再次设置同一配置会执行其 setter，在下次附加时重新创建控制器。
-            val current = configuration
+            // [EN] Loading the same configuration again builds the controller on the next attach.
+            // [CN] 再次加载同一配置，在下次附加时重新创建控制器。
             removeController()
-            configuration = current
+            reloadConfiguration()
+        }
+    }
+
+    /** [EN] What a tap on the plus button reports. [CN] 点击 PlusButton 时报告的内容。 */
+    private fun plusButtonAction(plus: Map<*, *>): (CYLPlusButton) -> Unit {
+        val plusIdentifier = (plus[CYLConstants.CYLTabBarItemIdentifier] as? String).orEmpty()
+        val plusHasPage = !(plus[CYLConstants.CYLTabBarItemPageIdentifier] as? String).isNullOrEmpty()
+        return {
+            didTapPlusButton?.invoke()
+            // [EN] Its own page is shown: reported like iOS, index -1. [CN] 显示其自己的页面：与 iOS 相同，报告下标 -1。
+            if (plusHasPage) didSelectTab?.invoke(-1, plusIdentifier)
         }
     }
 
@@ -400,13 +416,7 @@ open class CYLTabBarHostView @JvmOverloads constructor(context: Context, attrs: 
         configuration[CYLConstants.CYLTabBarControllerPageResolver] = { _: String, _: Map<String, Any?> -> CYLTabBarHostEmptyPage() }
         configuration[CYLConstants.CYLTabBarControllerPageLookupOrder] = listOf(CYLTabBarPageSource.RESOLVER.key)
         (configuration[CYLConstants.CYLTabBarControllerPlusButton] as? Map<*, *>)?.let { plus ->
-            val plusIdentifier = (plus[CYLConstants.CYLTabBarItemIdentifier] as? String).orEmpty()
-            val plusHasPage = !(plus[CYLConstants.CYLTabBarItemPageIdentifier] as? String).isNullOrEmpty()
-            configuration[CYLConstants.CYLTabBarControllerPlusButtonAction] = { _: CYLPlusButton ->
-                didTapPlusButton?.invoke()
-                // [EN] Its own page is shown: reported like iOS, index -1. [CN] 显示其自己的页面：与 iOS 相同，报告下标 -1。
-                if (plusHasPage) didSelectTab?.invoke(-1, plusIdentifier)
-            }
+            configuration[CYLConstants.CYLTabBarControllerPlusButtonAction] = plusButtonAction(plus)
         }
         val controller = CYLTabBarController.tabBarControllerWithConfiguration(activity, configuration)
         if (controller.viewControllers.isEmpty()) return

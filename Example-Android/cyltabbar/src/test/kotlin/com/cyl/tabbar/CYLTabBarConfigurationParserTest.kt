@@ -87,16 +87,23 @@ class CYLTabBarConfigurationParserTest {
         val failures = ArrayList<String>()
         for (file in files) for (sniff in listOf(false, true)) {
             val (parsed, error) = attempt(file, sniff)
-            if (itemsWithoutFirstTitle(parsed) != expected) failures += "${file.name} (${if (sniff) "content" else "extension"}): ${error?.message ?: "different dictionary"}"
-            // [EN] Every text format names its string tables (binary Protobuf has no field for them).
-            // [CN] 每种文本格式都写明字符串表（二进制 Protobuf 没有对应字段）。
-            val localization = parsed?.get(CYLConstants.CYLTabBarControllerLocalization) as? Map<*, *>
-            if (file.extension != "binpb" && (localization?.get(CYLConstants.CYLTabBarLocalizationTableName) != "ConfigurationDemo" ||
-                    localization[CYLConstants.CYLTabBarLocalizationPath] != "Localization")) {
-                failures += "${file.name} (${if (sniff) "content" else "extension"}): CYLTabBarControllerLocalization is $localization"
-            }
+            val label = "${file.name} (${if (sniff) "content" else "extension"})"
+            if (itemsWithoutFirstTitle(parsed) != expected) failures += "$label: ${error?.message ?: "different dictionary"}"
+            localizationFailure(file, parsed)?.let { failures += "$label: $it" }
         }
         assertTrue(failures.joinToString("\n"), failures.isEmpty())
+    }
+
+    /**
+     * [EN] Every text format names its string tables (binary Protobuf has no field for them); the problem otherwise.
+     * [CN] 每种文本格式都写明字符串表（二进制 Protobuf 没有对应字段）；否则给出问题。
+     */
+    private fun localizationFailure(file: File, parsed: Map<String, Any?>?): String? {
+        if (file.extension == "binpb") return null
+        val localization = parsed?.get(CYLConstants.CYLTabBarControllerLocalization) as? Map<*, *>
+        val named = localization?.get(CYLConstants.CYLTabBarLocalizationTableName) == "ConfigurationDemo" &&
+            localization[CYLConstants.CYLTabBarLocalizationPath] == "Localization"
+        return if (named) null else "CYLTabBarControllerLocalization is $localization"
     }
 
     private fun fixtures(): File? {

@@ -41,11 +41,12 @@ STRINGS_PAIR = re.compile(r'^"((?:[^"\\]|\\.)*)"\s*=\s*"((?:[^"\\]|\\.)*)";', re
 PLACEHOLDER = re.compile(r'%(?:(\d+)\$)?@')
 SLOT = re.compile(r'\{[A-Za-z]+\}|\d+(?:\.\d+)?')
 BADGE_ROW = re.compile(r'^(\d+)\. (.*?)(?: \(([^()]*)\))?$')
+LPROJ = '.lproj'
 
 
 def strings_table(language):
     """[EN] One .strings file of the library as a dictionary. [CN] 库的一个 .strings 文件，转为字典。"""
-    path = os.path.join(BUNDLE, language + '.lproj', 'CYLTabBarController.strings')
+    path = os.path.join(BUNDLE, language + LPROJ, 'CYLTabBarController.strings')
     unescape = lambda text: text.replace('\\"', '"').replace('\\n', '\n').replace('\\\\', '\\')
     return {unescape(key): unescape(value) for key, value in STRINGS_PAIR.findall(open(path, encoding='utf-8').read())}
 
@@ -99,17 +100,13 @@ class CYLTranslator:
         if text in self.keys:
             key = self.keys[text]
             return lambda language: self.tables[language].get(key, text)
-        # [EN] {name} and, if needed, numbers are the placeholders. [CN] {name} 以及必要时数字作为占位符。
+        return self.resolve_slots(text) or self.resolve_badge_row(text)
+
+    def resolve_slots(self, text):
+        """[EN] `text` with {name} and, if needed, numbers as the placeholders. [CN] 以 {name} 以及必要时数字作为占位符的 `text`。"""
         for numbers_are_slots in (False, True):
             slots = [match for match in SLOT.finditer(text) if numbers_are_slots or match.group(0).startswith('{')]
-            if not slots:
-                continue
-            skeleton, last = '', 0
-            for match in slots:
-                skeleton += text[last:match.start()] + '\0'
-                last = match.end()
-            skeleton += text[last:]
-            key = self.keys.get(skeleton)
+            key = self.keys.get(skeleton_of(text, slots)) if slots else None
             if key is None:
                 continue
             # [EN] The i-th placeholder of the English value is argument n (%n$@) or i. [CN] 英文值中第 i 个占位符为第 n 个参数（%n$@）或第 i 个。
@@ -117,20 +114,32 @@ class CYLTranslator:
                      for index, match in enumerate(PLACEHOLDER.finditer(self.english[key]))]
             arguments = {order[index]: slot.group(0) for index, slot in enumerate(slots)}
             return lambda language, key=key, arguments=arguments: self.translation(key, language, arguments)
-        # [EN] Badge rows: "N. " + title + an optional " (API)", the API kept as is. [CN] 角标行："N. " + 标题 + 可选的 " (API)"，API 保持原样。
+        return None
+
+    def resolve_badge_row(self, text):
+        """[EN] Badge rows: "N. " + title + an optional " (API)", the API kept as is. [CN] 角标行："N. " + 标题 + 可选的 " (API)"，API 保持原样。"""
         match = BADGE_ROW.match(text)
-        if match:
-            number, title, api = match.groups()
-            for candidate, kept_api in ((title + (f' ({api})' if api else ''), None), (title, api)):
-                inner = self.resolve(candidate)
-                if inner:
-                    return lambda language, inner=inner, kept_api=kept_api: f'{number}. {inner(language)}' + (f' ({kept_api})' if kept_api else '')
+        if not match:
+            return None
+        number, title, api = match.groups()
+        for candidate, kept_api in ((title + (f' ({api})' if api else ''), None), (title, api)):
+            inner = self.resolve(candidate)
+            if inner:
+                return lambda language, inner=inner, kept_api=kept_api: f'{number}. {inner(language)}' + (f' ({kept_api})' if kept_api else '')
         return None
 
 
+def skeleton_of(text, slots):
+    """[EN] `text` with every slot replaced by "\\0". [CN] 把每个占位符替换为 "\\0" 后的 `text`。"""
+    skeleton, last = '', 0
+    for match in slots:
+        skeleton += text[last:match.start()] + '\0'
+        last = match.end()
+    return skeleton + text[last:]
+
 def strings_source():
     """[EN] strings.json: language -> {English text: translation}, only texts that differ. [CN] strings.json：语言 -> {英文: 译文}，只保留不同的文字。"""
-    languages = sorted(name[:-len('.lproj')] for name in os.listdir(BUNDLE) if name.endswith('.lproj') and not name.startswith('._'))
+    languages = sorted(name[:-len(LPROJ)] for name in os.listdir(BUNDLE) if name.endswith(LPROJ) and not name.startswith('._'))
     translator = CYLTranslator({language: strings_table(language) for language in languages})
     resolved = {text: function for text in example_texts() if (function := translator.resolve(text))}
     tables = {language: {text: function(language) for text, function in resolved.items() if function(language) != text}
@@ -160,7 +169,8 @@ def files():
         yield os.path.join('icons', name + '.png')
 
 
-def check():
+def stale_copies():
+    """[EN] Copies that differ from Example-Shared, and icons it no longer has. [CN] 与 Example-Shared 不同的副本，以及它已没有的图标。"""
     stale = []
     for target in TARGETS:
         for relative in files():
@@ -170,18 +180,25 @@ def check():
     kept = {name + '.png' for name in icon_names()}
     for target in TARGETS:
         folder = os.path.join(target, 'icons')
-        stale += [os.path.join(folder, name) for name in os.listdir(folder) if name.endswith('.png') and not name.startswith('._') and name not in kept] if os.path.isdir(folder) else []
-    if not os.path.exists(RN_ICONS) or open(RN_ICONS, encoding='utf-8').read() != rn_icons_source():
+        if os.path.isdir(folder):
+            stale += [os.path.join(folder, name) for name in os.listdir(folder)
+                      if name.endswith('.png') and not name.startswith('._') and name not in kept]
+    return stale
+
+
+def is_stale(path, content):
+    return not os.path.exists(path) or open(path, encoding='utf-8').read() != content
+
+
+def check():
+    stale = stale_copies()
+    if is_stale(RN_ICONS, rn_icons_source()):
         stale.append(RN_ICONS)
     strings = strings_source()
-    for target in TARGETS:
-        path = os.path.join(target, STRINGS)
-        if not os.path.exists(path) or open(path, encoding='utf-8').read() != strings:
-            stale.append(path)
+    stale += [os.path.join(target, STRINGS) for target in TARGETS if is_stale(os.path.join(target, STRINGS), strings)]
     for path in stale:
         print(f'error: {os.path.relpath(path, ROOT)} is out of date: run scripts/sync-example-shared.py')
     return 1 if stale else 0
-
 
 def sync():
     for target in TARGETS:

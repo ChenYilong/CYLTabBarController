@@ -14,6 +14,14 @@ NSString *const CYLSampleConfigurationURLString = @"https://raw.githubuserconten
 
 static NSString *const CYLConfigurationDemoCellIdentifier = @"CYLConfigurationDemoCell";
 
+/// [EN] Text shown as is in every language: resource routes, file names and manifest themes. The annotation tells the
+///      static analyzer's localizability checker that this is intended.
+/// [CN] 在所有语言中原样显示的文字：资源路由、文件名与清单主题。该标注告知静态分析器的本地化检查这是有意为之。
+static NSString *CYLConfigurationDemoUntranslatedText(NSString *text) CYL_RETURNS_LOCALIZED_STRING;
+static NSString *CYLConfigurationDemoUntranslatedText(NSString *text) {
+    return text;
+}
+
 @interface CYLTabBarController (CYLConfigurationDemo)
 - (void)cyl_dismissConfigurationDemo;
 @end
@@ -209,7 +217,7 @@ static NSURL *CYLPublishDemoManifest(BOOL broken) {
     NSString *route = @"bundle:Configurations?name=cyl_tabbar_configuration";
     NSString *routedPath = [CYLResourceRoute pathForRoute:route baseDirectory:nil];
     if (routedPath) {
-        [sheet addAction:[UIAlertAction actionWithTitle:route style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+        [sheet addAction:[UIAlertAction actionWithTitle:CYLConfigurationDemoUntranslatedText(route) style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
             NSError *error = nil;
             CYLTabBarController *tabBarController = [CYLTabBarController tabBarControllerWithConfigurationRoute:route error:&error];
             NSDictionary *configuration = [CYLTabBarController configurationWithRoute:route error:NULL];
@@ -224,7 +232,7 @@ static NSURL *CYLPublishDemoManifest(BOOL broken) {
     // [CN] 下载到沙盒的资源：把示例文件按下载后的方式复制到 Caches（多个版本与主题，字符串表放在旁边），再由路由选出一个文件。
     NSString *sandboxRoute = @"sandbox:Caches/CYLConfigurationDemo?name=tabbar&theme=dark";
     if (routedPath) {
-        [sheet addAction:[UIAlertAction actionWithTitle:sandboxRoute style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+        [sheet addAction:[UIAlertAction actionWithTitle:CYLConfigurationDemoUntranslatedText(sandboxRoute) style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
             CYLCopySamplesIntoSandbox(routedPath.stringByDeletingLastPathComponent);
             NSError *error = nil;
             CYLTabBarController *tabBarController = [CYLTabBarController tabBarControllerWithConfigurationRoute:sandboxRoute error:&error];
@@ -243,7 +251,7 @@ static NSURL *CYLPublishDemoManifest(BOOL broken) {
     if ([CYLResourceRoute pathForRoute:manifestRoute baseDirectory:nil] && [NSFileManager.defaultManager fileExistsAtPath:[CYLResourceRoute pathForRoute:manifestRoute baseDirectory:nil]]) {
         for (NSString *theme in @[ @"light", @"christmas" ]) {
             NSString *title = [NSString stringWithFormat:@"Manifest · %@ · %@", theme, manifestRoute];
-            [sheet addAction:[UIAlertAction actionWithTitle:title style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+            [sheet addAction:[UIAlertAction actionWithTitle:CYLConfigurationDemoUntranslatedText(title) style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
                 NSError *error = nil;
                 CYLTabBarManifest *manifest = [CYLTabBarManifest manifestWithRoute:manifestRoute error:&error];
                 CYLTabBarController *tabBarController = [manifest tabBarControllerWithError:&error];
@@ -265,7 +273,7 @@ static NSURL *CYLPublishDemoManifest(BOOL broken) {
         }
         for (NSNumber *broken in @[ @NO, @YES ]) {
             NSString *title = broken.boolValue ? @"Manifest · download with a bad asset → fallback" : @"Manifest · download into sandbox:Caches";
-            [sheet addAction:[UIAlertAction actionWithTitle:title style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+            [sheet addAction:[UIAlertAction actionWithTitle:CYLConfigurationDemoUntranslatedText(title) style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
                 NSURL *URL = CYLPublishDemoManifest(broken.boolValue);
                 CYLTabBarManifestLoader *loader = [[CYLTabBarManifestLoader alloc] init];
                 loader.embeddedManifestRoute = manifestRoute;

@@ -13,7 +13,7 @@ export const CYL_PICKER_LANGUAGES = ['en', 'zh-Hans', 'hi', 'es', 'ar'];
 const FLAGS: Record<string, string> = { 'en': '🇺🇸', 'zh-Hans': '🇨🇳', 'hi': '🇮🇳', 'es': '🇪🇸', 'ar': '🇸🇦' };
 /** Each language's name in that language (CYLLocalizationNativeName). 每种语言以其自身书写的名称。 */
 const NATIVE_NAMES: Record<string, string> = { 'en': 'English', 'zh-Hans': '中文', 'hi': 'हिन्दी', 'es': 'Español', 'ar': 'العربية' };
-const RIGHT_TO_LEFT = ['ar', 'he', 'fa', 'ur'];
+const RIGHT_TO_LEFT = new Set(['ar', 'he', 'fa', 'ur']);
 
 /** The table closest to a language tag such as "zh-Hant-TW" or "pt-PT"; English when none. 与语言标签最接近的表；没有时为英语。 */
 export function CYLClosestLanguage(tag: string): string {
@@ -45,7 +45,7 @@ export function CYLDemoLanguage(): string {
 }
 
 export function CYLIsRightToLeft(language: string): boolean {
-  return RIGHT_TO_LEFT.includes(language.split('-')[0]!);
+  return RIGHT_TO_LEFT.has(language.split('-')[0]!);
 }
 
 /** "{name}" parts filled in. 填入「{name}」部分。 */

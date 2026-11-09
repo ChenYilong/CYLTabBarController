@@ -123,47 +123,54 @@ object CYLResourceRoute {
         return 0
     }
 
+    /** [EN] A file name split as {name}[-{theme}][@{version}].{extension}. [CN] 按 {name}[-{theme}][@{version}].{extension} 拆分的文件名。 */
+    private class CYLRouteCandidate(val file: String, val theme: String?, val version: String?, val extension: String)
+
+    /** [EN] `file` split after `name`; null when it is not one of `name`'s files. [CN] 以 `name` 拆分 `file`；不属于 `name` 时为 null。 */
+    private fun candidate(file: String, name: String): CYLRouteCandidate? {
+        if (file.startsWith(".") || '.' !in file) return null
+        // [EN] {name}[-{theme}][@{version}]: the version after the last "@", the theme after "-". [CN] 版本位于最后一个 "@" 之后，主题位于 "-" 之后。
+        val stem = file.substringBeforeLast('.')
+        if (!stem.startsWith(name)) return null
+        var rest = stem.removePrefix(name)
+        val version = if ('@' in rest) rest.substringAfterLast('@') else null
+        if (version != null) rest = rest.substringBeforeLast('@')
+        val theme = when {
+            rest.isEmpty() -> null
+            rest.startsWith("-") -> rest.substring(1)
+            else -> return null
+        }
+        return CYLRouteCandidate(file, theme, version, file.substringAfterLast('.').lowercase())
+    }
+
+    /** [EN] The candidate has the theme and version the query asks for. [CN] 候选文件符合查询要求的主题与版本。 */
+    private fun matches(candidate: CYLRouteCandidate, theme: String?, version: String?): Boolean {
+        val themeMatches = if (theme.isNullOrEmpty()) candidate.theme.isNullOrEmpty() else candidate.theme == theme
+        val versionMatches = version.isNullOrEmpty() || (candidate.version != null && compareVersions(candidate.version, version) == 0)
+        return themeMatches && versionMatches
+    }
+
+    /** [EN] `candidate` beats `best`: the newer version, then the preferred format. [CN] `candidate` 优于 `best`：版本更新，其次格式更优先。 */
+    private fun isBetter(candidate: CYLRouteCandidate, best: CYLRouteCandidate?): Boolean {
+        if (best == null) return true
+        val order = when {
+            best.version != null && candidate.version != null -> compareVersions(candidate.version, best.version)
+            candidate.version != null -> 1
+            best.version != null -> -1
+            else -> 0
+        }
+        return order > 0 || (order == 0 && formats.indexOf(candidate.extension) < formats.indexOf(best.extension))
+    }
+
     /** [EN] The file of `names` that matches, as the route query. [CN] `names` 中与查询参数匹配的文件。 */
     @JvmStatic
     fun pickFile(names: List<String>, name: String, theme: String?, version: String?, format: String?): String? {
         val extensions = format?.takeIf { it.isNotEmpty() }?.lowercase()?.let { wanted -> formatGroups.firstOrNull { wanted in it } ?: listOf(wanted) } ?: formats
-        var best: String? = null
-        var bestVersion: String? = null
-        var bestFormat = Int.MAX_VALUE
+        var best: CYLRouteCandidate? = null
         for (file in names) {
-            if (file.startsWith(".") || '.' !in file) continue
-            val extension = file.substringAfterLast('.').lowercase()
-            if (extension !in extensions) continue
-            // [EN] {name}[-{theme}][@{version}]: the version after the last "@", the theme after "-". [CN] 版本位于最后一个 "@" 之后，主题位于 "-" 之后。
-            val stem = file.substringBeforeLast('.')
-            if (!stem.startsWith(name)) continue
-            var rest = stem.removePrefix(name)
-            var fileVersion: String? = null
-            if ('@' in rest) {
-                fileVersion = rest.substringAfterLast('@')
-                rest = rest.substringBeforeLast('@')
-            }
-            val fileTheme = when {
-                rest.isEmpty() -> null
-                rest.startsWith("-") -> rest.substring(1)
-                else -> continue
-            }
-            if (if (!theme.isNullOrEmpty()) fileTheme != theme else !fileTheme.isNullOrEmpty()) continue
-            if (!version.isNullOrEmpty() && (fileVersion == null || compareVersions(fileVersion, version) != 0)) continue
-            val formatRank = formats.indexOf(extension)
-            val order = when {
-                best == null -> 1
-                bestVersion != null && fileVersion != null -> compareVersions(fileVersion, bestVersion)
-                fileVersion != null -> 1
-                bestVersion != null -> -1
-                else -> 0
-            }
-            if (order > 0 || (order == 0 && formatRank < bestFormat)) {
-                best = file
-                bestVersion = fileVersion
-                bestFormat = formatRank
-            }
+            val candidate = candidate(file, name) ?: continue
+            if (candidate.extension in extensions && matches(candidate, theme, version) && isBetter(candidate, best)) best = candidate
         }
-        return best
+        return best?.file
     }
 }

@@ -66,7 +66,8 @@ function rowTexts(row: CYLDemoRow, values: Record<string, string>, switches: Rec
       label: `${t('Language')}, ${CYLLanguageName(language)}`,
     };
   }
-  const title = row.id === 'login' ? t(switches.login ? 'Login state: logged in' : 'Login state: logged out') : t(row.title, values);
+  const loginTitle = switches.login ? 'Login state: logged in' : 'Login state: logged out';
+  const title = row.id === 'login' ? t(loginTitle) : t(row.title, values);
   return { title, subtitle: t(row.subtitle, values), label: undefined };
 }
 
