@@ -489,6 +489,13 @@ fun Fragment.cyl_simulateMemoryWarningAndShowResult() {
         .setPositiveButton(android.R.string.ok, null).show()
 }
 
+/** [EN] The tab's title, or `fallback` without a tab item. [CN] Tab 的标题；没有 Tab 项时为 `fallback`。 */
+private fun CYLMemoryWarningTabTitle(item: CYLTabBarItem?, selected: Boolean, fallback: String): String {
+    if (item == null) return fallback
+    val selectedTitle = if (selected) item.cyl_selectedTitle else null
+    return selectedTitle ?: item.title ?: fallback
+}
+
 /**
  * [EN] `CYLSimulateMemoryWarningReport()`: simulates a memory warning for `controller` and returns what happened to each tab,
  *      one line per tab, in [CYLLocalization.language]: the message of `cyl_simulateMemoryWarningAndShowResult`, for any UI
@@ -506,15 +513,15 @@ fun CYLSimulateMemoryWarningReport(context: Context, controller: CYLTabBarContro
         controller == null -> lines += text(R.string.cyl_memory_warning_no_controller)
         !controller.unloadsUnselectedViewsOnMemoryWarning -> lines += text(R.string.cyl_memory_warning_disabled)
     }
+    val items = controller?.tabBarItems.orEmpty()
+    val selectedIndex = controller?.selectedIndex
     pages.forEachIndexed { index, page ->
         // [EN] The title the tab shows, as iOS `tabBarItem.title`: the selected title on the selected tab. [CN] Tab 显示的标题，与 iOS 相同：选中的 Tab 显示选中标题。
-        val item = controller?.tabBarItems?.getOrNull(index)
-        val selectedTitle = item?.cyl_selectedTitle?.takeIf { index == controller?.selectedIndex }
-        val title = selectedTitle ?: item?.title ?: page.javaClass.simpleName
+        val title = CYLMemoryWarningTabTitle(items.getOrNull(index), index == selectedIndex, page.javaClass.simpleName)
         val status = when {
             !wasLoaded[index] -> R.string.cyl_memory_warning_not_loaded
             page.view == null -> R.string.cyl_memory_warning_unloaded
-            index == controller?.selectedIndex -> R.string.cyl_memory_warning_kept_selected
+            index == selectedIndex -> R.string.cyl_memory_warning_kept_selected
             controller?.unloadsUnselectedViewsOnMemoryWarning == true && !controller.shouldUnloadViewOfViewController(page) -> R.string.cyl_memory_warning_kept_should_unload
             else -> R.string.cyl_memory_warning_kept
         }
