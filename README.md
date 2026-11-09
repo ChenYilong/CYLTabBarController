@@ -367,6 +367,8 @@ Analyst.ai [App Store Link](https://itunes.apple.com/us/app/analyst-ai/id1345754
 | [换肤实现评估：与 QMUI 的差距、架构符合度与改进建议](docs/Theme-Switching-QMUI-Evaluation.md) | [Theme switching evaluation: the gap to QMUI, fit with the original design, and what to improve](docs/Theme-Switching-QMUI-Evaluation.md) |
 | [换肤（主题切换）](docs/Theme-Switching.md) | [Theme switching (skins)](docs/Theme-Switching.md) |
 | [原地更新 Tab：标题、图标、网络图标与替换页面](docs/Update-Tab-Bar-Items-In-Place.md) | [Update Tabs in Place: Titles, Icons, Network Icons and Pages](docs/Update-Tab-Bar-Items-In-Place.md) |
+| [提交前准备规则](docs/commit-readiness-2026-11-09.md) | [Commit Readiness Rules](docs/commit-readiness-2026-11-09.md) |
+| [文档文件夹说明](docs/instructions.md) | [Documentation Folder Instructions](docs/instructions.md) |
 
 <!-- navigation:end -->
 

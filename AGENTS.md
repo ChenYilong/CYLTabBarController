@@ -232,6 +232,14 @@ The root `Podfile` is the reference: it already has the top lines and the hook.
 - Branch from the latest `master` for each issue or feature.
 - Commit messages are in English, Conventional Commits as configured for commitizen in `package.json`
   (`feat: ✨ …`, `fix: 🐛 …`, `docs: 📝 …`).
+- Before every commit, review the changed scope and its issue, comparison, and implementation-status documents.
+  Record each incomplete or unverified item in the commit under a `TODO` heading in the most relevant existing
+  `docs/` document. State the current score or status, remaining work, implementation constraints, known defects,
+  API design and compatibility risks, optimization opportunities, and verification required for completion.
+  Reserved keys, stubs, and successful compilation alone are not completion evidence.
+- The Conventional Commit subject summarizes completed work in English; put details and pending tasks in the body.
+  If the detailed description exceeds 50 characters, create or update a suitable `docs/` note and link it in the
+  commit body. Reuse existing trackers and avoid duplicate documents.
 - Push early and open the pull request once the change is substantial; the PR body closes the issue (`Closes #N`).
 - Before merging, squash the PR into a single commit and push with `--force-with-lease` (never a plain force push).
   On someone else's branch, merge `master` in instead of rebasing.

@@ -77,6 +77,8 @@ Read the document for the feature before using its API. The public API is in the
 | CI and releases | [Mac-CI-CD](../../../docs/Mac-CI-CD.md) |
 | Bilingual documents | [Bilingual-Documentation](../../../docs/Bilingual-Documentation.md) |
 | Agent skills in this repository | [Agent-Skills](../../../docs/Agent-Skills.md) |
+| Documentation folder rules | [instructions](../../../docs/instructions.md) |
+| Commit readiness and pre-commit TODO tracking | [Commit-Readiness-2026-11-09](../../../docs/commit-readiness-2026-11-09.md) |
 
 `python3 scripts/sync-agent-skills.py --check` fails when a document in `docs/` is missing here. A new document gets a row in the same change.
 
