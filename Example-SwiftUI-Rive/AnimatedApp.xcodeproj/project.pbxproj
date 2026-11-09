@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		661FC956D921DE3CACAB0BCE /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 12456E910E8BF49A648006F8 /* LaunchScreen.storyboard */; };
 		05E01D9BF04C30EEE73BF392 /* Pods_AnimatedApp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8CE6F5D715DFB016703F7D2 /* Pods_AnimatedApp.framework */; };
 		28A6EE30C16DFCB5CE2C16E3 /* CYLSettingsDemoTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13E709C0BA997FC30A2E119A /* CYLSettingsDemoTableViewController.swift */; };
 		3C843375B1A0CE558EF7C619 /* CYLDemoTabBarStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80D4D659B49C202968FFBE2D /* CYLDemoTabBarStyle.swift */; };
@@ -43,6 +44,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		12456E910E8BF49A648006F8 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 		096BD0B31B7775C7A5ECC202 /* Pods-AnimatedApp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AnimatedApp.debug.xcconfig"; path = "Target Support Files/Pods-AnimatedApp/Pods-AnimatedApp.debug.xcconfig"; sourceTree = "<group>"; };
 		13E709C0BA997FC30A2E119A /* CYLSettingsDemoTableViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CYLSettingsDemoTableViewController.swift; path = "../Example-Shared/CYLSettingsDemoTableViewController.swift"; sourceTree = SOURCE_ROOT; };
 		80D4D659B49C202968FFBE2D /* CYLDemoTabBarStyle.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CYLDemoTabBarStyle.swift; path = "../Example-Shared/CYLDemoTabBarStyle.swift"; sourceTree = SOURCE_ROOT; };
@@ -154,6 +156,7 @@
 				9611279A27F3660200977157 /* RiveAssets */,
 				961127D327F3661000977157 /* Fonts */,
 				9611279027F364E600977157 /* Assets.xcassets */,
+				12456E910E8BF49A648006F8 /* LaunchScreen.storyboard */,
 				9611279227F364E600977157 /* Preview Content */,
 			);
 			path = AnimatedApp;
@@ -323,6 +326,7 @@
 				969E9B4627F75729003A124E /* shapes.riv in Resources */,
 				969E9B5927FF1865003A124E /* icons.riv in Resources */,
 				9611279127F364E600977157 /* Assets.xcassets in Resources */,
+				661FC956D921DE3CACAB0BCE /* LaunchScreen.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -472,7 +476,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -526,7 +530,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
@@ -552,10 +556,10 @@
 				INFOPLIST_KEY_CFBundleDisplayName = Animated;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 15.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.cyltabbarcontroller.AnimatedApp;
@@ -582,10 +586,10 @@
 				INFOPLIST_KEY_CFBundleDisplayName = Animated;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 15.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.cyltabbarcontroller.AnimatedApp;

@@ -3,6 +3,9 @@ package com.cyl.tabbar
 import android.graphics.Color
 import android.os.Looper
 import android.view.View
+import androidx.core.graphics.Insets
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import org.robolectric.Robolectric
@@ -142,6 +145,12 @@ class CYLTabBarControllerTest {
         controller.tabBar.tabBarButtonArray[0].performClick()
         idle()
         assertFalse(controller.tabBar.plusButtonActive)
+        assertTrue("the plus button's page leaves the screen", TestPlusButton.child.isHidden)
+        assertFalse("the tapped tab's page shows again", controller.viewControllers[0].isHidden)
+        controller.tabBar.tabBarButtonArray[1].performClick()
+        idle()
+        assertEquals(1, controller.selectedIndex)
+        assertFalse(controller.viewControllers[1].isHidden)
         CYLPlusButton.removePlusButtonForTabBarContext("plus-test")
     }
 
@@ -180,6 +189,10 @@ class CYLTabBarControllerTest {
         val x = (plus.left + plus.right) / 2f
         assertTrue(controller.tabBar.cyl_plusButtonTouchable(x, plus.top - 10f))
         assertFalse(controller.tabBar.cyl_plusButtonTouchable(x, plus.top - 200f))
+        // [EN] The raised part above the bar is drawn, not clipped by the bar or the root view. [CN] TabBar 上方的凸起部分会被绘制，不被 TabBar 或根视图裁剪。
+        assertTrue("the plus button rises above the bar", plus.top < 0)
+        assertFalse(controller.tabBar.clipChildren)
+        assertFalse(controller.view.clipChildren)
         plus.setTabLabelHidden(true)
         assertFalse(plus.cyl_showsTitleInTabBarItem())
         CYLPlusButton.removePlusButtonForTabBarContext("titled-plus")
@@ -312,5 +325,104 @@ class CYLTabBarControllerTest {
         controller.cyl_scrollDidChange(-30)
         assertFalse(controller.cyl_isTabBarHiddenByScroll)
         assertNotNull(CYLTabBarController.cyl_activeTabBarController())
+    }
+
+    /**
+     * [EN] Edge-to-edge (forced from Android 15): the pages keep clear of the status bar and the sides, and the tab bar grows by
+     *      the navigation bar (iOS's bottom safe area) while its items keep `tabBarHeight`, so the system bar does not cut them.
+     * [CN] edge-to-edge（Android 15 起强制）：页面避开状态栏与两侧，TabBar 增高导航栏的高度（iOS 的底部安全区），各 Item 保持 `tabBarHeight`，
+     *      系统栏不会切割它们。
+     */
+    @Test
+    fun keepsTheTabItemsClearOfTheSystemBars() = withActivity { activity ->
+        val controller = CYLTabBarController(activity, listOf(Page(), Page()), attributes("Home", "Me"))
+        activity.setContentView(controller.view)
+        idle()
+        val insets = WindowInsetsCompat.Builder()
+            .setInsets(WindowInsetsCompat.Type.statusBars(), Insets.of(0, 63, 0, 0))
+            .setInsets(WindowInsetsCompat.Type.navigationBars(), Insets.of(0, 0, 0, 48))
+            .build()
+        ViewCompat.dispatchApplyWindowInsets(controller.view, insets)
+        controller.view.measure(View.MeasureSpec.makeMeasureSpec(1080, View.MeasureSpec.EXACTLY), View.MeasureSpec.makeMeasureSpec(2400, View.MeasureSpec.EXACTLY))
+        controller.view.layout(0, 0, 1080, 2400)
+
+        val density = activity.resources.displayMetrics.density
+        val itemsHeight = (controller.tabBarHeight * density).toInt()
+        assertEquals("the pages start below the status bar", 63, controller.view.paddingTop)
+        assertEquals("the bar grows by the navigation bar", itemsHeight + 48, controller.tabBar.height)
+        assertEquals("the bar reaches the screen's bottom edge", 2400, controller.tabBar.bottom)
+        for (button in controller.tabBar.tabBarButtonArray) {
+            assertEquals("an item keeps tabBarHeight, above the navigation bar", itemsHeight, button.height)
+        }
+    }
+
+    /**
+     * [EN] A badge on a view that cannot hold children (an icon in a row): it stays on the icon's top-right corner instead of
+     *      joining the row's `LinearLayout`, and it fits its text when the text changes.
+     * [CN] 不能包含子视图的视图（行中的图标）上的角标：始终位于图标右上角，而不是成为行 `LinearLayout` 的子视图，并在文字变化时适配文字。
+     */
+    @Test
+    fun badgeOfAnIconInARowSitsOnItsCornerAndFitsItsText() = withActivity { activity ->
+        val row = android.widget.LinearLayout(activity).apply { orientation = android.widget.LinearLayout.HORIZONTAL }
+        val icon = android.widget.ImageView(activity)
+        row.addView(icon, android.widget.LinearLayout.LayoutParams(90, 90).apply { leftMargin = 40; topMargin = 30 })
+        row.addView(android.widget.TextView(activity).apply { text = "Title" })
+        activity.setContentView(row)
+        idle()
+        icon.cyl_showBadgeValue("3", CYLEnums.CYLBadgeAnimationType.None)
+        idle()
+        val badge = icon.cyl_badge!!
+        assertEquals("the badge does not join the row", 2, row.childCount)
+        // [EN] As iOS (`-cyl_layoutBadgeAtTopRightCorner`): 2 dp right of the right edge. [CN] 与 iOS 相同：右边缘右侧 2 dp。
+        val gap = CYL_BADGE_CORNER_GAP_DP * icon.resources.displayMetrics.density
+        assertEquals("centered 2 dp right of the icon's right edge", icon.right + gap, (badge.left + badge.right) / 2f, 1f)
+        assertEquals("centered on the icon's top edge", icon.top.toFloat(), (badge.top + badge.bottom) / 2f, 1f)
+        val narrow = badge.width
+        icon.cyl_showBadgeValue("new", CYLEnums.CYLBadgeAnimationType.None)
+        assertTrue("\"new\" is wider than \"3\"", badge.width > narrow)
+        assertEquals(badge.measuredWidth, badge.width)
+        icon.cyl_badgeFont = CYLFont(20f)
+        assertEquals("a bigger font grows the badge", badge.measuredHeight, badge.height)
+        icon.cyl_clearBadge()
+        assertNull(icon.cyl_badge)
+    }
+
+    object BadgedPlusButton : CYLPlusButtonSubclassing {
+        override fun plusButton(context: android.content.Context) = CYLPlusButton.cyl_plusButtonWithImage(context, android.graphics.drawable.ColorDrawable(Color.BLUE).apply { setBounds(0, 0, 120, 120) }, "Menu", null, null).apply {
+            background = android.graphics.drawable.ColorDrawable(Color.MAGENTA)
+            minimumWidth = 150; minimumHeight = 150
+        }
+        override fun indexOfPlusButtonInTabBar() = 1
+        override fun tabBarContext() = "badged-plus"
+    }
+
+    /**
+     * [EN] Each tap of the demo's plus button raises its badge: the button keeps its size (its badge used to widen it, which
+     *      stretched its image a little more each time) and the badge stays on the icon's corner.
+     * [CN] 演示中每次点击 PlusButton 都会增加角标：按钮保持尺寸（以前角标会加宽按钮，每次都把图片多拉伸一点），角标保持在图标右上角。
+     */
+    @Test
+    fun aPlusButtonBadgeNeverResizesTheButton() = withActivity { activity ->
+        CYLPlusButton.registerPlusButton(BadgedPlusButton)
+        val controller = CYLTabBarController(activity, listOf(Page(), Page()), attributes("Home", "Me"), CYLEnums.CYLTabBarStyleType.Default, "badged-plus")
+        activity.setContentView(controller.view)
+        fun layout() {
+            controller.view.measure(View.MeasureSpec.makeMeasureSpec(1080, View.MeasureSpec.EXACTLY), View.MeasureSpec.makeMeasureSpec(1920, View.MeasureSpec.EXACTLY))
+            controller.view.layout(0, 0, 1080, 1920)
+        }
+        idle(); layout()
+        val plus = controller.tabBar.plusButton!!
+        val width = plus.width
+        val height = plus.height
+        for (value in 1..5) {
+            plus.cyl_showBadgeValue(value.toString(), CYLEnums.CYLBadgeAnimationType.None)
+            idle(); layout()
+            assertEquals("width after badge $value", width, plus.width)
+            assertEquals("height after badge $value", height, plus.height)
+        }
+        val badge = plus.cyl_badge!!
+        assertEquals("on the icon's right edge", plus.imageView.right.toFloat(), (badge.left + badge.right) / 2f, 1f)
+        assertEquals("on the icon's top edge", plus.imageView.top.toFloat(), (badge.top + badge.bottom) / 2f, 1f)
+        CYLPlusButton.removePlusButtonForTabBarContext("badged-plus")
     }
 }

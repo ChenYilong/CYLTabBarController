@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D6CC2F0CF401AE5AA8949682 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8335A27A0F54664A21A04D9D /* LaunchScreen.storyboard */; };
 		08E79CD10245A663F1BD4123 /* Poppins-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 45BFB2F14A25627FEFFEF13E /* Poppins-Bold.ttf */; };
 		167CF5CA65FDB746AE1E47F6 /* SignInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64CBB7661983D3BF1EC5DDFF /* SignInView.swift */; };
 		19E3EF073616D95A0907ECF0 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D8E9F1732B1A1048CFEFB23 /* HomeView.swift */; };
@@ -46,6 +47,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		8335A27A0F54664A21A04D9D /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 		036951B5B2B073F789932FF8 /* HCard.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = HCard.swift; sourceTree = "<group>"; };
 		16027FA884CF141ACF8691AD /* OnboardingView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		1E61D8530FAB92D859BBCDFC /* Inter-SemiBold.ttf */ = {isa = PBXFileReference; includeInIndex = 1; path = "Inter-SemiBold.ttf"; sourceTree = "<group>"; };
@@ -181,6 +183,7 @@
 				0682FBCB181EADD3F8B65FB1 /* Views */,
 				51A5FBC86B8FF493F665445F /* Navigation */,
 				FF928D71D024B7F90696E769 /* Assets.xcassets */,
+				8335A27A0F54664A21A04D9D /* LaunchScreen.storyboard */,
 				168BABC23F369A551A5520EB /* Fonts */,
 				B7E1FBDCB94469A0266AA1ED /* RiveAssets */,
 			);
@@ -326,6 +329,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				6501E84D2037A29884A2FDA7 /* Assets.xcassets in Resources */,
+				D6CC2F0CF401AE5AA8949682 /* LaunchScreen.storyboard in Resources */,
 				C3D4D7128115A1AC496AE727 /* Inter-Regular.ttf in Resources */,
 				97F5EDDE4D5B47AFC38A08BD /* Inter-SemiBold.ttf in Resources */,
 				08E79CD10245A663F1BD4123 /* Poppins-Bold.ttf in Resources */,
@@ -453,9 +457,9 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = RiveApp/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.cyltabbarcontroller.RiveApp;
@@ -540,9 +544,9 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = RiveApp/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.cyltabbarcontroller.RiveApp;

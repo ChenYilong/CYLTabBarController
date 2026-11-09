@@ -77,14 +77,14 @@ class ColorPage : NavigationPage(0) {
 }
 
 /**
- * [EN] iOS `HomeVC`: a red page with the badge helper table (`cyl_addBadgeHelperTable`), a "Full screen" action item with
+ * [EN] iOS `HomeVC`: a page with the default background and the badge helper table (`cyl_addBadgeHelperTable`), a "Full screen" action item with
  *      a shaking dot badge of a random color (`cyl_showNavigationBadgeValue`) that pushes `ChildPage`.
- * [CN] iOS `HomeVC`：带角标帮助列表（`cyl_addBadgeHelperTable`）的红色页面，"全屏" 菜单项上有随机颜色、抖动的红点角标
+ * [CN] iOS `HomeVC`：默认背景色、带角标帮助列表（`cyl_addBadgeHelperTable`）的页面，"全屏" 菜单项上有随机颜色、抖动的红点角标
  *      （`cyl_showNavigationBadgeValue`），点击 push `ChildPage`。
  */
 class HomePage : NavigationPage(R.string.tab_home) {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
-        FrameLayout(inflater.context).apply { setBackgroundColor(Color.RED) }
+        FrameLayout(inflater.context)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         cyl_addBadgeHelperTable()

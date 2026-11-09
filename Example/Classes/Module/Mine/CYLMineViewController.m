@@ -31,8 +31,6 @@
 
     self.view.backgroundColor = UIColor.systemBackgroundColor; // [EN] Dark Mode. [CN] 适配深色模式。
 
-//    self.navigationItem.title = @"我的";
-//    self.tabBarItem.title = @"我的";
 
     // [CN] ✅ 关键代码：设置 NavigationBar 为白色背景（非透明）
     // [EN] ✅ Key code: give the NavigationBar a white (non-transparent) background

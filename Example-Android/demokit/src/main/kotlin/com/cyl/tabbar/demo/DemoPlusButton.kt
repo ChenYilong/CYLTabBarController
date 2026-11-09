@@ -17,12 +17,21 @@ class DemoPlusButton(context: Context) : CYLPlusButton(context) {
 
     init {
         val density = resources.displayMetrics.density
-        background = GradientDrawable().apply {
-            shape = GradientDrawable.OVAL
-            setColor(Color.rgb(0, 122, 255))
+        // [EN] The iOS demo's images (`post_normal`, `post_highlight` when selected), copied from the ObjC Example; a blue round plus without them. [CN] iOS 演示的图片（`post_normal`，选中时 `post_highlight`），复制自 ObjC Example；没有时为蓝色圆形加号。
+        val normal = DemoAssets.drawable(context, "post_normal")
+        if (normal != null) {
+            setImageDrawable(android.graphics.drawable.StateListDrawable().apply {
+                DemoAssets.drawable(context, "post_highlight")?.let { addState(intArrayOf(android.R.attr.state_selected), it) }
+                addState(intArrayOf(), normal)
+            })
+        } else {
+            background = GradientDrawable().apply {
+                shape = GradientDrawable.OVAL
+                setColor(Color.rgb(0, 122, 255))
+            }
+            setImageDrawable(ContextCompat.getDrawable(context, android.R.drawable.ic_input_add))
+            imageView.setColorFilter(Color.WHITE)
         }
-        setImageDrawable(ContextCompat.getDrawable(context, android.R.drawable.ic_input_add))
-        imageView.setColorFilter(Color.WHITE)
         minimumWidth = (56 * density).toInt()
         minimumHeight = (56 * density).toInt()
         touchableAreaScale = 1.2f

@@ -2,7 +2,8 @@
 # Usage:
 #   scripts/pod-lint.sh lib      [extra pod args]   # pod lib lint
 #   scripts/pod-lint.sh push     [extra pod args]   # pod trunk push, then update the Carthage and SPM versions (below)
-#   scripts/pod-lint.sh carthage                    # only update the Carthage version
+#   scripts/pod-lint.sh carthage                    # only update the Carthage version (binary spec and demo Cartfile)
+#   scripts/pod-lint.sh xcframework                 # build build/CYLTabBarController.xcframework.zip (Carthage binary)
 #   scripts/pod-lint.sh spm                         # only update the Swift Package Manager version
 #   scripts/pod-lint.sh versions                    # update both, without pushing
 #   scripts/pod-lint.sh version                     # print s.version
@@ -16,13 +17,20 @@
 #
 # [EN] Carthage and Swift Package Manager have no registry: a release is the git tag that `pod trunk push` also
 #      requires. After a push, the places that pin this library's version follow the podspec's s.version:
-#      - Carthage: the demo's Example-Swift-Carthage/Cartfile becomes "~> <s.version>".
+#      - Carthage: a prebuilt XCFramework (docs/Carthage.md). Apps use `binary "<CYLTabBarController.json URL>"`:
+#        Carthage cannot build this repository from source since it holds the Flutter examples' Xcode projects.
+#        CYLTabBarController.json gets "<s.version>": "<release asset URL>" (the URL is known before the release, so
+#        `bump` adds it to the release pull request); the Release workflow uploads the zip that `xcframework` builds.
+#        The demo's Example-Swift-Carthage/Cartfile becomes `binary "..." ~> <s.version>`.
 #      - SPM: every `.package(url: ".../CYLTabBarController.git", from: "...")` in README.md and docs/*.md becomes
 #        `from: "<s.version>"` (Package.swift has no version; the SPM demo uses a local package).
 #      The documentation navigation is regenerated afterwards. Commit the changes.
 # [CN] Carthage 与 Swift Package Manager 都没有中央仓库：版本就是 `pod trunk push` 同样需要的 git tag。push 成功后，所有固定本库
 #      版本的地方都跟随 podspec 的 s.version：
-#      - Carthage：演示工程的 Example-Swift-Carthage/Cartfile 改为 "~> <s.version>"。
+#      - Carthage：预编译的 XCFramework（docs/Carthage.md）。App 使用 `binary "<CYLTabBarController.json 的 URL>"`：本仓库包含
+#        Flutter 示例的 Xcode 工程，Carthage 无法从源码编译。CYLTabBarController.json 添加 "<s.version>": "<Release 附件 URL>"
+#        （URL 在发布前已确定，因此 `bump` 会把它加入发布 PR）；Release workflow 上传 `xcframework` 生成的 zip。
+#        演示工程的 Example-Swift-Carthage/Cartfile 改为 `binary "..." ~> <s.version>`。
 #      - SPM：README.md 与 docs/*.md 中所有 `.package(url: ".../CYLTabBarController.git", from: "...")` 改为
 #        `from: "<s.version>"`（Package.swift 没有版本号；SPM 演示工程使用本地 package）。
 #      之后重新生成文档导航。请提交这些修改。
@@ -32,7 +40,11 @@ export XCODE_XCCONFIG_FILE="$PWD/scripts/pod-lint.xcconfig"
 
 PODSPEC=CYLTabBarController.podspec
 CARTFILE=Example-Swift-Carthage/Cartfile
-CARTHAGE_DEPENDENCY='github "ChenYilong/CYLTabBarController"'
+CARTHAGE_SPEC=CYLTabBarController.json
+CARTHAGE_SPEC_URL='https://raw.githubusercontent.com/ChenYilong/CYLTabBarController/master/CYLTabBarController.json'
+CARTHAGE_DEPENDENCY="binary \"$CARTHAGE_SPEC_URL\""
+CARTHAGE_ASSET=CYLTabBarController.xcframework.zip
+RELEASE_DOWNLOAD_URL='https://github.com/ChenYilong/CYLTabBarController/releases/download'
 
 SPM_URL='https://github.com/ChenYilong/CYLTabBarController.git'
 
@@ -55,18 +67,46 @@ update_carthage() {
     echo "error: $CARTFILE not found" >&2
     exit 1
   fi
-  # The tag must exist on the remote, or Carthage cannot resolve the version. 远端必须有该 tag，否则 Carthage 无法解析该版本。
-  if ! git ls-remote --exit-code --tags origin "refs/tags/$version" >/dev/null 2>&1; then
-    echo "warning: tag $version is not on origin yet; push it (git push origin $version) before using the Cartfile" >&2
-  fi
-  # Rewrite only the dependency line (portable sed: write a temp file). 只改写依赖那一行（兼容 macOS 与 Linux 的 sed）。
-  sed "s|^$CARTHAGE_DEPENDENCY.*\$|$CARTHAGE_DEPENDENCY ~> $version|" "$CARTFILE" > "$CARTFILE.tmp"
+  # [EN] The binary spec: one "version": "zip URL" entry per release, sorted by version, the others kept.
+  # [CN] 二进制规格文件：每个版本一条 "版本": "zip URL"，按版本排序，保留已有条目。
+  python3 - "$CARTHAGE_SPEC" "$version" "$RELEASE_DOWNLOAD_URL/$version/$CARTHAGE_ASSET" <<'PYTHON'
+import json, os, sys
+path, version, url = sys.argv[1:4]
+spec = json.load(open(path)) if os.path.exists(path) else {}
+spec[version] = url
+ordered = dict(sorted(spec.items(), key=lambda item: [int(part) for part in item[0].split(".")]))
+with open(path, "w") as file:
+    json.dump(ordered, file, indent=2)
+    file.write("\n")
+PYTHON
+  # [EN] The demo's dependency line, whatever form it had (github or binary). [CN] 演示工程的依赖行，无论原来是 github 还是 binary 形式。
+  sed -e "s|^github \"ChenYilong/CYLTabBarController\".*\$|$CARTHAGE_DEPENDENCY ~> $version|" \
+      -e "s|^binary \"[^\"]*CYLTabBarController.json\".*\$|$CARTHAGE_DEPENDENCY ~> $version|" "$CARTFILE" > "$CARTFILE.tmp"
   mv "$CARTFILE.tmp" "$CARTFILE"
-  if ! grep -q "^$CARTHAGE_DEPENDENCY ~> $version\$" "$CARTFILE"; then
-    echo "error: the $CARTHAGE_DEPENDENCY line was not found in $CARTFILE" >&2
+  if ! grep -qF "$CARTHAGE_DEPENDENCY ~> $version" "$CARTFILE"; then
+    echo "error: the CYLTabBarController line was not found in $CARTFILE" >&2
     exit 1
   fi
-  echo "Carthage: $CARTFILE now requires $CARTHAGE_DEPENDENCY ~> $version (commit this change)"
+  echo "Carthage: $CARTHAGE_SPEC lists $version; $CARTFILE requires it (commit these changes)"
+}
+
+# [EN] The XCFramework of the release, zipped for Carthage's binary spec. Built from a clean copy of HEAD without
+#      CrossPlatform/: Carthage lists the schemes of every Xcode project it finds, and the Flutter examples' projects
+#      need packages that only `flutter pub get` creates.
+# [CN] 发布用的 XCFramework，压缩为 Carthage 二进制规格使用的 zip。从 HEAD 的干净副本（去掉 CrossPlatform/）构建：Carthage 会列出
+#      找到的每个 Xcode 工程的 scheme，而 Flutter 示例的工程依赖只有 `flutter pub get` 才会生成的包。
+build_xcframework() {
+  command -v carthage >/dev/null 2>&1 || { echo "error: carthage is not installed (brew install carthage)" >&2; exit 1; }
+  root=$PWD
+  work=$(mktemp -d "${TMPDIR:-/tmp}/cyl-xcframework.XXXXXX")
+  git archive HEAD | tar -x -C "$work"
+  rm -rf "$work/CrossPlatform"
+  (cd "$work" && carthage build --no-skip-current --use-xcframeworks --platform iOS)
+  mkdir -p "$root/build"
+  rm -f "$root/build/$CARTHAGE_ASSET"
+  (cd "$work/Carthage/Build" && zip -qry "$root/build/$CARTHAGE_ASSET" CYLTabBarController.xcframework)
+  rm -rf "$work"
+  echo "Carthage: build/$CARTHAGE_ASSET (upload it to the GitHub release of the tag)"
 }
 
 update_spm() {
@@ -133,6 +173,7 @@ case "$1" in
   check-tag) check_tag "${2:?usage: $0 check-tag <tag>}" ;;
   bump)      bump_version "${2:-}"; update_carthage; update_spm; update_navigation ;;
   carthage) update_carthage ;;
+  xcframework) build_xcframework ;;
   spm)      update_spm; update_navigation ;;
   versions) update_carthage; update_spm; update_navigation ;;
   *)        [ "$1" = lib ] && shift; pod lib lint "$PODSPEC" --allow-warnings "$@" ;;

@@ -126,6 +126,13 @@ object DemoCatalog {
             controller.tabBar.requestLayout()
             controller.tabBar.tabBarButtonArray.forEach { it.requestLayout() }
         },
+        DemoRow("Liquid Glass surface tint (cyl_liquidGlassSurfaceOpacity)", {
+            val opacity = tabBarController?.tabBar?.cyl_liquidGlassSurfaceOpacity ?: 0.4f
+            "Android only: drag the slider to see the dock change, from clear glass (0) to a solid board (1); now ${"%.2f".format(opacity)}"
+        }) {
+            val controller = tabBarController ?: return@DemoRow
+            DemoLiquidGlassSurface.showSlider(requireContext(), controller) { reload() }
+        },
         DemoRow("standardAppearance theme (shared by Liquid Glass and FlatDesign)", { "Current: ${appearanceNames[appearanceIndex]}; tap for the next one" }) {
             val controller = tabBarController ?: return@DemoRow
             appearanceIndex = (appearanceIndex + 1) % appearanceNames.size
@@ -300,9 +307,14 @@ object DemoTabs {
     val titles = listOf("Home", "Message", "Discover", "Me")
     val pages = listOf(DemoCatalog.HOME, DemoCatalog.MESSAGE, DemoCatalog.DISCOVER, DemoCatalog.ME)
 
+    /** [EN] The ObjC Example's tab images (copied into `assets/objc-example`), normal and selected. [CN] ObjC Example 的 Tab 图片（复制到 `assets/objc-example`），普通与选中。 */
+    private val objcImages = listOf("home", "message", "fishpond", "account")
+
     fun attributes(context: Context, count: Int = 4): List<Map<String, Any?>> = (0 until count).map { index ->
+        val name = objcImages[index % 4]
         mapOf(CYLConstants.CYLTabBarItemTitle to titles[index % 4] + (if (index >= 4) " ${index + 1}" else ""),
-              CYLConstants.CYLTabBarItemImage to androidx.core.content.ContextCompat.getDrawable(context, icons[index % 4]),
+              CYLConstants.CYLTabBarItemImage to (DemoAssets.drawable(context, "${name}_normal") ?: androidx.core.content.ContextCompat.getDrawable(context, icons[index % 4])),
+              CYLConstants.CYLTabBarItemSelectedImage to DemoAssets.drawable(context, "${name}_highlight"),
               CYLConstants.CYLTabBarItemIdentifier to pages[index % 4] + (if (index >= 4) "${index + 1}" else ""))
     }
 

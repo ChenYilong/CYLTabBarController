@@ -506,6 +506,111 @@ static NSNumber *_Nullable CYLAnimationSpeedValue(id value) {
     return (number && isfinite(speed) && speed > 0) ? number : nil;
 }
 
+static UIColor *_Nullable CYLColorValue(id value);
+static UIFont *_Nullable CYLFontValue(id value);
+static NSNumber *_Nullable CYLBoolValue(id value);
+
+/// [EN] `CYLTabBarControllerPlusButton`: the title, image and selected title color as the plus button needs them; nil when
+///      it is not a dictionary. [CN] `CYLTabBarControllerPlusButton`：按 PlusButton 需要转换标题、图片与选中标题颜色；不是字典时为 nil。
+static NSDictionary<NSString *, id> *_Nullable CYLPlusButtonAttributesValue(id value) {
+    if (![value isKindOfClass:[NSDictionary class]]) {
+        CYLLogInvalidConfigurationValue(CYLTabBarControllerPlusButton, value);
+        return nil;
+    }
+    NSMutableDictionary<NSString *, id> *attributes = [NSMutableDictionary dictionary];
+    for (NSString *key in @[ CYLTabBarItemTitle, CYLTabBarItemSelectedTitle ]) {
+        id title = value[key];
+        if ([title isKindOfClass:[NSString class]] || [title isKindOfClass:[NSNumber class]]) {
+            attributes[key] = [title description];
+        }
+    }
+    // [EN] The image, and the selected one (`CYLPlusButtonSubclass`'s highlighted image). [CN] 图片与选中图片（`CYLPlusButtonSubclass` 的高亮图片）。
+    for (NSString *key in @[ CYLTabBarItemImage, CYLTabBarItemSelectedImage ]) {
+        id image = CYLImageValue(value[key]);
+        if ([image isKindOfClass:[UIImage class]]) {
+            attributes[key] = image;
+        } else if ([image isKindOfClass:[NSString class]] && [UIImage imageNamed:image]) {
+            attributes[key] = [UIImage imageNamed:image];
+        } else if ([image isKindOfClass:[NSString class]] && [image isAbsolutePath] && [UIImage imageWithContentsOfFile:image]) {
+            attributes[key] = [UIImage imageWithContentsOfFile:image];
+        }
+    }
+    UIColor *selectedTitleColor = CYLColorValue(value[CYLTabBarItemSelectedTitleColor]);
+    if (selectedTitleColor) {
+        attributes[CYLTabBarItemSelectedTitleColor] = selectedTitleColor;
+    }
+    UIColor *titleColor = CYLColorValue(value[CYLTabBarItemTitleColor]);
+    if (titleColor) {
+        attributes[CYLTabBarItemTitleColor] = titleColor;
+    }
+    UIFont *font = CYLFontValue(value[CYLTabBarItemTitleFont]);
+    if (font) {
+        attributes[CYLTabBarItemTitleFont] = font;
+    }
+    id backgroundImage = CYLImageValue(value[CYLPlusButtonBackgroundImage]);
+    if ([backgroundImage isKindOfClass:[NSString class]]) {
+        backgroundImage = [UIImage imageNamed:backgroundImage] ?: ([backgroundImage isAbsolutePath] ? [UIImage imageWithContentsOfFile:backgroundImage] : nil);
+    }
+    if ([backgroundImage isKindOfClass:[UIImage class]]) {
+        attributes[CYLPlusButtonBackgroundImage] = backgroundImage;
+    }
+    // [EN] Numbers: a position and a vertical center. [CN] 数字：位置与垂直中心。
+    for (NSString *key in @[ CYLPlusButtonIndexInTabBar, CYLPlusButtonCenterYMultiplier, CYLPlusButtonCenterYOffset ]) {
+        id number = value[key];
+        if ([number isKindOfClass:[NSString class]]) {
+            number = @([number doubleValue]);
+        }
+        if ([number isKindOfClass:[NSNumber class]] && isfinite([number doubleValue]) && !([key isEqualToString:CYLPlusButtonIndexInTabBar] && [number doubleValue] < 0)) {
+            attributes[key] = number;
+        } else if (value[key]) {
+            CYLLogInvalidConfigurationValue(key, value[key]);
+        }
+    }
+    for (NSString *key in @[ CYLPlusButtonSize, CYLPlusButtonImageSize ]) {
+        NSValue *size = value[key] ? CYLSizeValue(value[key], key) : nil;
+        if (size) {
+            attributes[key] = size;
+        }
+    }
+    for (NSString *key in @[ CYLPlusButtonAlignsTitle, CYLPlusButtonKeepsTitleVisible, CYLPlusButtonShowsSelection ]) {
+        NSNumber *flag = value[key] ? CYLBoolValue(value[key]) : nil;
+        if (flag) {
+            attributes[key] = flag;
+        }
+    }
+    for (NSString *key in @[ CYLTabBarItemIdentifier, CYLTabBarItemPageIdentifier ]) {
+        if ([value[key] isKindOfClass:[NSString class]] && [value[key] length] > 0) {
+            attributes[key] = value[key];
+        }
+    }
+    return attributes;
+}
+
+/// [EN] "light", "dark", "system" → UIUserInterfaceStyle. [CN] "light"、"dark"、"system" → UIUserInterfaceStyle。
+static NSNumber *_Nullable CYLUserInterfaceStyleValue(id value) {
+    NSDictionary<NSString *, NSNumber *> *names = @{ @"system" : @0, @"unspecified" : @0, @"light" : @1, @"dark" : @2 };
+    if ([value isKindOfClass:[NSString class]]) {
+        return names[[value lowercaseString]];
+    }
+    if ([value isKindOfClass:[NSNumber class]] && [value integerValue] >= 0 && [value integerValue] <= 2) {
+        return value;
+    }
+    return nil;
+}
+
+/// [EN] A tap animation name → CYLTabButtonTapAnimationType. [CN] 点击动画名称 → CYLTabButtonTapAnimationType。
+static NSNumber *_Nullable CYLTapAnimationValue(id value) {
+    NSArray<NSString *> *names = @[ @"none", @"scale", @"zoomin", @"bounce", @"bouncewithfireworks", @"rotation", @"flip", @"fume" ];
+    if ([value isKindOfClass:[NSString class]]) {
+        NSUInteger index = [names indexOfObject:[value lowercaseString]];
+        return index == NSNotFound ? nil : @(index);
+    }
+    if ([value isKindOfClass:[NSNumber class]] && [value integerValue] >= 0 && [value integerValue] < (NSInteger)names.count) {
+        return value;
+    }
+    return nil;
+}
+
 /// [EN] Every key the library reads. [CN] 本库读取的所有键。
 static NSArray<NSString *> *CYLKnownConfigurationKeys(void) {
     return @[ CYLTabBarControllerViewControllers, CYLTabBarControllerTabBarItemsAttributes, CYLTabBarControllerImageInsets,
@@ -513,7 +618,9 @@ static NSArray<NSString *> *CYLKnownConfigurationKeys(void) {
               CYLTabBarControllerPageRegistry, CYLTabBarControllerPageResolver, CYLTabBarControllerPageLookupOrder,
               CYLTabBarControllerAutomaticPageRegistration, CYLTabBarControllerTabBarItemAnimationSpeed,
               CYLTabBarControllerThemes, CYLTabBarControllerThemeIdentifier, CYLTabBarControllerDarkThemeIdentifier,
-              CYLTabBarControllerThemeManagerName ];
+              CYLTabBarControllerThemeManagerName, CYLTabBarControllerPlusButton, CYLTabBarControllerPlusButtonAction,
+              CYLTabBarControllerUserInterfaceStyle, CYLTabBarControllerTabButtonTapAnimation, CYLTabBarControllerSwipeToSwitchTab,
+              CYLTabBarControllerLoginRequiredTabBarItemIdentifiers, CYLTabBarControllerLocalization ];
 }
 
 static NSArray<NSString *> *CYLKnownItemKeys(void) {
@@ -1240,17 +1347,51 @@ static BOOL CYLScreenIsDark(void) {
     UIColor *selectedIconColor = [self colorForName:CYLTabBarItemSelectedIconColor];
     UIFont *titleFont = [self fontForName:CYLTabBarItemTitleFont];
     UIFont *selectedTitleFont = [self fontForName:CYLTabBarItemSelectedTitleFont] ?: titleFont;
-    if (!background && !shadow && !titleColor && !selectedTitleColor && !iconColor && !selectedIconColor && !titleFont && !selectedTitleFont) {
+    UIImage *backgroundImage = [self imageForName:CYLTabBarBackgroundImage];
+    UIImage *shadowImage = [self imageForName:CYLTabBarShadowImage];
+    NSString *positioning = [CYLStringValue([self valueForName:CYLTabBarStackedItemPositioning]) lowercaseString];
+    id itemWidth = [self valueForName:CYLTabBarStackedItemWidth];
+    id itemSpacing = [self valueForName:CYLTabBarStackedItemSpacing];
+    BOOL layout = positioning.length > 0 || [itemWidth respondsToSelector:@selector(doubleValue)] || [itemSpacing respondsToSelector:@selector(doubleValue)];
+    if (!background && !shadow && !titleColor && !selectedTitleColor && !iconColor && !selectedIconColor && !titleFont && !selectedTitleFont &&
+        !backgroundImage && !shadowImage && !layout) {
         // [EN] No bar-wide values: the app's own appearance stays. [CN] 没有整个 TabBar 的值：保留 App 自己的外观。
         return nil;
     }
     UITabBarAppearance *appearance = [[UITabBarAppearance alloc] init];
-    [appearance configureWithDefaultBackground];
+    // [EN] A background color asks for an opaque bar, as the example's skins (`CYLDemoTheme`): over the default (blurred)
+    //      background, Liquid Glass did not show it. [CN] 背景色需要不透明的 TabBar，与示例的皮肤（`CYLDemoTheme`）相同：
+    //      在默认（模糊）背景上，液态玻璃不显示该颜色。
     if (background) {
+        [appearance configureWithOpaqueBackground];
         appearance.backgroundColor = background;
+    } else {
+        [appearance configureWithDefaultBackground];
     }
     if (shadow) {
         appearance.shadowColor = shadow;
+    }
+    if (backgroundImage) {
+        appearance.backgroundImage = backgroundImage;
+    }
+    if (shadowImage) {
+        appearance.shadowImage = shadowImage;
+    }
+    // [EN] How the items share the width: the system tab bar and the FlatDesign tab bar both read these. [CN] 各 Item 如何分配宽度：系统 TabBar 与扁平样式 TabBar 都会读取。
+    if ([positioning isEqualToString:@"centered"]) {
+        appearance.stackedItemPositioning = UITabBarItemPositioningCentered;
+    } else if ([positioning isEqualToString:@"fill"]) {
+        appearance.stackedItemPositioning = UITabBarItemPositioningFill;
+    } else if ([positioning isEqualToString:@"automatic"]) {
+        appearance.stackedItemPositioning = UITabBarItemPositioningAutomatic;
+    } else if (positioning.length > 0) {
+        CYLLogInvalidConfigurationValue(CYLTabBarStackedItemPositioning, positioning);
+    }
+    if ([itemWidth respondsToSelector:@selector(doubleValue)]) {
+        appearance.stackedItemWidth = MAX([itemWidth doubleValue], 0);
+    }
+    if ([itemSpacing respondsToSelector:@selector(doubleValue)]) {
+        appearance.stackedItemSpacing = MAX([itemSpacing doubleValue], 0);
     }
     [appearance cyl_applyItemAppearanceWithBlock:^(UITabBarItemAppearance *itemAppearance) {
         NSMutableDictionary *normal = [itemAppearance.normal.titleTextAttributes mutableCopy] ?: [NSMutableDictionary dictionary];
@@ -1384,6 +1525,201 @@ static void CYLFinishThemesInfo(NSMutableDictionary<NSString *, id> *info, NSArr
 
 @implementation CYLTabBarController (CYLConfiguration)
 
+#pragma mark - Localization (CYLTabBarControllerLocalization)
+
+/// [EN] Private: the folder of the configuration file, set by the file loader. [CN] 私有：配置文件所在目录，由文件加载方法设置。
+static NSString *const CYLConfigurationFileDirectoryKey = @"_CYLTabBarControllerConfigurationFileDirectory";
+
+/// [EN] The text keys whose values are localization keys. [CN] 值为本地化键的文本键。
+static NSArray<NSString *> *CYLLocalizedConfigurationKeys(void) {
+    return @[ CYLTabBarItemTitle, CYLTabBarItemSelectedTitle, CYLTabBarItemAccessibilityLabel, CYLTabBarItemAccessibilityHint ];
+}
+
+/*!
+ * [EN] A folder in the app's sandbox, for tables downloaded at run time: "sandbox:Documents/…" (Android: `filesDir`),
+ *      "sandbox:Caches/…" (Android: `cacheDir`), "sandbox:tmp/…", or "sandbox:<path>" below the app's home folder.
+ * [CN] App 沙盒中的目录，用于运行时下载的字符串表："sandbox:Documents/…"（Android：`filesDir`）、"sandbox:Caches/…"（Android：`cacheDir`）、
+ *      "sandbox:tmp/…"，或 "sandbox:<路径>"（App 主目录之下）。
+ */
+static NSString *CYLLocalizationSandboxPath(NSString *rest) {
+    while ([rest hasPrefix:@"/"]) {
+        rest = [rest substringFromIndex:1];
+    }
+    NSArray<NSString *> *parts = [rest componentsSeparatedByString:@"/"];
+    NSString *first = parts.firstObject ?: @"";
+    NSString *remainder = parts.count > 1 ? [[parts subarrayWithRange:NSMakeRange(1, parts.count - 1)] componentsJoinedByString:@"/"] : @"";
+    NSString *root = nil;
+    if ([first isEqualToString:@"Documents"]) {
+        root = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES).firstObject;
+    } else if ([first isEqualToString:@"Caches"]) {
+        root = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES).firstObject;
+    } else if ([first isEqualToString:@"tmp"]) {
+        root = NSTemporaryDirectory();
+    }
+    return root ? [root stringByAppendingPathComponent:remainder] : [NSHomeDirectory() stringByAppendingPathComponent:rest];
+}
+
+/*!
+ * [EN] The location routes of `CYLTabBarLocalizationPath` (docs/Configuration-Localization.md), checked in this order:
+ *      "bundle:<path>" in the app's resources, "sandbox:<Documents|Caches|tmp>/<path>" in the app's sandbox, "file:" URL,
+ *      "/…" absolute, "~/…" the app's home folder, anything else relative to `baseDirectory` (the configuration file's
+ *      folder, else the app's resources).
+ * [CN] `CYLTabBarLocalizationPath` 的位置路由（docs/Configuration-Localization.md），按以下顺序判断："bundle:<路径>" App 资源，
+ *      "sandbox:<Documents|Caches|tmp>/<路径>" App 沙盒，"file:" URL，"/…" 绝对路径，"~/…" App 主目录，其余相对于 `baseDirectory`
+ *      （配置文件所在目录，否则为 App 资源目录）。
+ */
+static NSString *CYLLocalizationResolvedPath(NSString *path, NSString *baseDirectory) {
+    if ([path hasPrefix:@"bundle:"]) {
+        NSString *rest = [path substringFromIndex:@"bundle:".length];
+        while ([rest hasPrefix:@"/"]) {
+            rest = [rest substringFromIndex:1];
+        }
+        return [NSBundle.mainBundle.resourcePath ?: @"" stringByAppendingPathComponent:rest];
+    }
+    if ([path hasPrefix:@"file:"]) {
+        return [NSURL URLWithString:path].path ?: path;
+    }
+    if ([path hasPrefix:@"sandbox:"]) {
+        return CYLLocalizationSandboxPath([path substringFromIndex:@"sandbox:".length]);
+    }
+    path = [path stringByExpandingTildeInPath];
+    if (path.isAbsolutePath) {
+        return path;
+    }
+    return [baseDirectory stringByAppendingPathComponent:path];
+}
+
+/*!
+ * [EN] The folder of the `.lproj` folders, and the table name, for a `CYLTabBarControllerLocalization` value; nil when it is
+ *      off or invalid.
+ * [CN] 根据 `CYLTabBarControllerLocalization` 的值得到 `.lproj` 文件夹所在目录与表名；关闭或无效时为 nil。
+ */
+static NSString *_Nullable CYLLocalizationDirectory(id value, NSString *_Nullable fileDirectory, NSString *_Nonnull *_Nonnull table) {
+    *table = @"Localizable";
+    NSString *resources = NSBundle.mainBundle.resourcePath ?: @"";
+    if ([value isKindOfClass:[NSNumber class]]) {
+        return [value boolValue] ? resources : nil;
+    }
+    if ([value isKindOfClass:[NSString class]]) {
+        NSString *text = [(NSString *)value stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceCharacterSet];
+        if ([text.lowercaseString isEqualToString:@"true"] || [text.lowercaseString isEqualToString:@"yes"]) {
+            return resources;
+        }
+        if (text.length == 0 || [text.lowercaseString isEqualToString:@"false"] || [text.lowercaseString isEqualToString:@"no"]) {
+            return nil;
+        }
+        *table = text;
+        return resources;
+    }
+    if (![value isKindOfClass:[NSDictionary class]]) {
+        CYLLogInvalidConfigurationValue(CYLTabBarControllerLocalization, value);
+        return nil;
+    }
+    NSDictionary *info = value;
+    NSString *tableName = CYLStringValue(info[CYLTabBarLocalizationTableName]);
+    if (tableName.length > 0) {
+        *table = [tableName hasSuffix:@".strings"] ? [tableName stringByDeletingPathExtension] : tableName;
+    }
+    NSString *path = CYLStringValue(info[CYLTabBarLocalizationPath]);
+    if (path.length > 0) {
+        return CYLLocalizationResolvedPath(path, fileDirectory ?: resources);
+    }
+    NSString *bundleName = CYLStringValue(info[CYLTabBarLocalizationBundleName]);
+    if (bundleName.length > 0 && ![bundleName isEqualToString:@"main"]) {
+        NSString *name = [bundleName hasSuffix:@".bundle"] ? bundleName : [bundleName stringByAppendingPathExtension:@"bundle"];
+        NSString *bundlePath = [NSBundle.mainBundle pathForResource:name ofType:nil];
+        if (!bundlePath) {
+            CYLLogInvalidConfigurationValue(CYLTabBarLocalizationBundleName, bundleName);
+            return nil;
+        }
+        return bundlePath;
+    }
+    return resources;
+}
+
+/*!
+ * [EN] The strings of `<directory>/{language}.lproj/{table}.strings`, trying the language, then its script ("zh-Hans" for
+ *      "zh-Hans-CN"), its language code, "Base" and "en".
+ * [CN] 读取 `<目录>/{语言}.lproj/{表名}.strings`，依次尝试该语言、其文字（"zh-Hans-CN" 的 "zh-Hans"）、语言代码、"Base" 与 "en"。
+ */
+static NSDictionary<NSString *, NSString *> *_Nullable CYLLocalizationStrings(NSString *directory, NSString *table, NSString *language) {
+    NSMutableArray<NSString *> *candidates = [NSMutableArray array];
+    NSArray<NSString *> *parts = [language componentsSeparatedByString:@"-"];
+    [candidates addObject:language];
+    if (parts.count > 2) {
+        [candidates addObject:[NSString stringWithFormat:@"%@-%@", parts[0], parts[1]]];
+    }
+    if (parts.count > 1) {
+        [candidates addObject:parts[0]];
+    }
+    [candidates addObjectsFromArray:@[ @"Base", @"en" ]];
+    for (NSString *candidate in candidates) {
+        NSString *file = [[directory stringByAppendingPathComponent:[candidate stringByAppendingPathExtension:@"lproj"]]
+                          stringByAppendingPathComponent:[table stringByAppendingPathExtension:@"strings"]];
+        NSDictionary *strings = [NSDictionary dictionaryWithContentsOfFile:file];
+        if ([strings isKindOfClass:[NSDictionary class]]) {
+            return strings;
+        }
+    }
+    return nil;
+}
+
+/// [EN] `object` with every text value translated, at any depth. [CN] 翻译 `object` 中任意层级的所有文本值。
+static id CYLLocalizedConfigurationObject(id object, NSDictionary<NSString *, NSString *> *strings) {
+    if ([object isKindOfClass:[NSArray class]]) {
+        NSMutableArray *array = [NSMutableArray arrayWithCapacity:[object count]];
+        for (id element in object) {
+            [array addObject:CYLLocalizedConfigurationObject(element, strings)];
+        }
+        return array;
+    }
+    if (![object isKindOfClass:[NSDictionary class]]) {
+        return object;
+    }
+    NSMutableDictionary *dictionary = [object mutableCopy];
+    NSArray<NSString *> *textKeys = CYLLocalizedConfigurationKeys();
+    for (id key in object) {
+        id value = object[key];
+        if ([textKeys containsObject:key] && [value isKindOfClass:[NSString class]]) {
+            NSString *translation = strings[value];
+            if ([translation isKindOfClass:[NSString class]]) {
+                dictionary[key] = translation;
+            }
+        } else if ([value isKindOfClass:[NSArray class]] || [value isKindOfClass:[NSDictionary class]]) {
+            dictionary[key] = CYLLocalizedConfigurationObject(value, strings);
+        }
+    }
+    return dictionary;
+}
+
+/*!
+ * [EN] Translates the texts of `configuration` when it has `CYLTabBarControllerLocalization`; removes the private file folder.
+ * [CN] 配置包含 `CYLTabBarControllerLocalization` 时翻译其中的文本；并移除私有的文件目录键。
+ */
+static void CYLApplyConfigurationLocalization(NSMutableDictionary<NSString *, id> *configuration) {
+    NSString *fileDirectory = CYLStringValue(configuration[CYLConfigurationFileDirectoryKey]);
+    [configuration removeObjectForKey:CYLConfigurationFileDirectoryKey];
+    id value = configuration[CYLTabBarControllerLocalization];
+    if (!value) {
+        return;
+    }
+    NSString *table = nil;
+    NSString *directory = CYLLocalizationDirectory(value, fileDirectory, &table);
+    if (!directory) {
+        return;
+    }
+    NSString *language = CYLLocalizationLanguage();
+    NSDictionary<NSString *, NSString *> *strings = CYLLocalizationStrings(directory, table, language);
+    if (!strings) {
+#if defined(DEBUG) || defined(BETA)
+        NSLog(@"🟡 CYLTabBarController configuration: no %@.strings for %@ in %@; the texts stay as they are.", table, language, directory);
+#endif
+        return;
+    }
+    NSDictionary *localized = CYLLocalizedConfigurationObject(configuration, strings);
+    [configuration setDictionary:localized];
+}
+
 + (NSDictionary<NSString *, id> *)cyl_normalizedConfiguration:(NSDictionary<NSString *, id> *)configuration {
     if (![configuration isKindOfClass:[NSDictionary class]]) {
         // E.g. an untyped JSON result that is a list (B18). 例如类型不明、实际为数组的 JSON 结果（B18）。
@@ -1396,6 +1732,8 @@ static void CYLFinishThemesInfo(NSMutableDictionary<NSString *, id> *info, NSArr
             [normalized removeObjectForKey:key];
         }
     }
+    // [EN] Localized texts first, so every later step sees the translated values. [CN] 先本地化文本，后续步骤看到的都是翻译后的值。
+    CYLApplyConfigurationLocalization(normalized);
     if (normalized[CYLTabBarControllerViewControllers]) {
         normalized[CYLTabBarControllerViewControllers] = CYLValidViewControllers(normalized[CYLTabBarControllerViewControllers]);
     }
@@ -1420,6 +1758,53 @@ static void CYLFinishThemesInfo(NSMutableDictionary<NSString *, id> *info, NSArr
             CYLLogInvalidConfigurationValue(CYLTabBarControllerTabBarItemAnimationSpeed, normalized[CYLTabBarControllerTabBarItemAnimationSpeed]);
         }
         normalized[CYLTabBarControllerTabBarItemAnimationSpeed] = speed;
+    }
+    if (normalized[CYLTabBarControllerPlusButton]) {
+        normalized[CYLTabBarControllerPlusButton] = CYLPlusButtonAttributesValue(normalized[CYLTabBarControllerPlusButton]);
+    }
+    if (normalized[CYLTabBarControllerUserInterfaceStyle]) {
+        NSNumber *style = CYLUserInterfaceStyleValue(normalized[CYLTabBarControllerUserInterfaceStyle]);
+        if (!style) {
+            CYLLogInvalidConfigurationValue(CYLTabBarControllerUserInterfaceStyle, normalized[CYLTabBarControllerUserInterfaceStyle]);
+        }
+        normalized[CYLTabBarControllerUserInterfaceStyle] = style;
+    }
+    if (normalized[CYLTabBarControllerTabButtonTapAnimation]) {
+        NSNumber *animation = CYLTapAnimationValue(normalized[CYLTabBarControllerTabButtonTapAnimation]);
+        if (!animation) {
+            CYLLogInvalidConfigurationValue(CYLTabBarControllerTabButtonTapAnimation, normalized[CYLTabBarControllerTabButtonTapAnimation]);
+        }
+        normalized[CYLTabBarControllerTabButtonTapAnimation] = animation;
+    }
+    if (normalized[CYLTabBarControllerSwipeToSwitchTab]) {
+        NSNumber *swipe = CYLBoolValue(normalized[CYLTabBarControllerSwipeToSwitchTab]);
+        if (!swipe) {
+            CYLLogInvalidConfigurationValue(CYLTabBarControllerSwipeToSwitchTab, normalized[CYLTabBarControllerSwipeToSwitchTab]);
+        }
+        normalized[CYLTabBarControllerSwipeToSwitchTab] = swipe;
+    }
+    // [EN] Tabs that need login: an array of strings, or a comma-separated string. [CN] 需要登录的 Tab：字符串数组或逗号分隔的字符串。
+    id loginRequired = normalized[CYLTabBarControllerLoginRequiredTabBarItemIdentifiers];
+    if (loginRequired) {
+        if ([loginRequired isKindOfClass:[NSString class]]) {
+            loginRequired = [loginRequired componentsSeparatedByString:@","];
+        }
+        NSMutableArray<NSString *> *identifiers = [NSMutableArray array];
+        if ([loginRequired isKindOfClass:[NSArray class]]) {
+            for (id identifier in (NSArray *)loginRequired) {
+                NSString *trimmed = [identifier isKindOfClass:[NSString class]] ? [identifier stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceCharacterSet] : nil;
+                if (trimmed.length > 0) {
+                    [identifiers addObject:trimmed];
+                }
+            }
+        } else {
+            CYLLogInvalidConfigurationValue(CYLTabBarControllerLoginRequiredTabBarItemIdentifiers, loginRequired);
+        }
+        normalized[CYLTabBarControllerLoginRequiredTabBarItemIdentifiers] = [identifiers copy];
+    }
+    if (normalized[CYLTabBarControllerPlusButtonAction] && !(blockClass && [normalized[CYLTabBarControllerPlusButtonAction] isKindOfClass:blockClass])) {
+        CYLLogInvalidConfigurationValue(CYLTabBarControllerPlusButtonAction, normalized[CYLTabBarControllerPlusButtonAction]);
+        [normalized removeObjectForKey:CYLTabBarControllerPlusButtonAction];
     }
     if (normalized[CYLTabBarControllerAutomaticPageRegistration]) {
         NSNumber *automatic = CYLBoolValue(normalized[CYLTabBarControllerAutomaticPageRegistration]);
@@ -1534,6 +1919,12 @@ static void CYLFinishThemesInfo(NSMutableDictionary<NSString *, id> *info, NSArr
         }
         return nil;
     }
+    if (configuration[CYLTabBarControllerLocalization]) {
+        // [EN] A relative `CYLTabBarLocalizationPath` is resolved against this file's folder. [CN] 相对的 `CYLTabBarLocalizationPath` 相对于本文件所在目录。
+        NSMutableDictionary<NSString *, id> *withDirectory = [configuration mutableCopy];
+        withDirectory[CYLConfigurationFileDirectoryKey] = [path stringByDeletingLastPathComponent];
+        configuration = withDirectory;
+    }
     return configuration;
 }
 
@@ -1582,9 +1973,18 @@ static void CYLFinishThemesInfo(NSMutableDictionary<NSString *, id> *info, NSArr
     NSString *base = info[CYLConfigurationThemesBaseKey];
     NSString *dark = info[CYLConfigurationThemesDarkKey];
     id current = manager.currentThemeIdentifier;
+    // [EN] A skin of an earlier configuration that this one does not have is not a choice to keep: before, it stayed
+    //      current and none of this configuration's skins was applied (a React Native or Flutter app changing skins).
+    // [CN] 之前配置中的皮肤、而本配置中没有，不属于需要保留的选择：之前它仍为当前皮肤，本配置的皮肤都不会生效（React Native 或 Flutter App 切换皮肤时）。
+    BOOL listed = NO;
+    for (CYLTabBarConfigurationTheme *theme in info[CYLConfigurationThemesListKey]) {
+        listed = listed || [theme.identifier isEqual:current];
+    }
+    BOOL staleConfigurationSkin = !listed && [manager.currentTheme isKindOfClass:[CYLTabBarConfigurationTheme class]];
     // [EN] A skin the app or the user chose before stays; otherwise the first one. [CN] App 或用户之前选择的皮肤保持不变；否则使用首个皮肤。
-    if (!current) {
+    if (!current || staleConfigurationSkin) {
         manager.currentThemeIdentifier = info[CYLConfigurationThemesInitialKey];
+        current = staleConfigurationSkin ? nil : current;
     }
     if (@available(iOS 13.0, *)) {
         // [EN] Dark Mode follows the system, unless the manager follows it its own way or another skin was chosen.

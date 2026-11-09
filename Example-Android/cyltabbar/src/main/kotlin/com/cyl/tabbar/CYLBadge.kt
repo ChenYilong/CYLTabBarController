@@ -50,9 +50,27 @@ class CYLBadgeView(context: Context) : View(context), CYLBadgeTextDisplaying {
     var badgeBorderWidth: Float = 0f
     /** [EN] The dot radius in dp (`cyl_badgeRadius`). [CN] 红点半径（dp）。 */
     var badgeRadius: Float = 4f
+        set(value) { field = value; requestLayout(); invalidate() }
     var badgeCornerRadius: Float? = null
-    var badgeFont: CYLFont = CYLFont(11f)
-    var badgeMargin: Float = 2f
+        set(value) { field = value; invalidate() }
+    var badgeFont: CYLFont = CYLFont(9f, bold = true)
+        set(value) { field = value; requestLayout(); invalidate() }
+    var badgeMargin: Float = 8f
+        set(value) { field = value; requestLayout(); invalidate() }
+    private var refreshing = false
+
+    /**
+     * [EN] A badge in its host's parent overlay is not laid out by that parent: when its text or font changes, it measures
+     *      itself again and goes back to the host's corner, so it always fits its text ("3", "99+", "new").
+     * [CN] 位于宿主父视图 overlay 中的角标不由该父视图布局：文字或字体变化时自己重新测量并回到宿主角落，因此始终适配文字（"3"、"99+"、"new"）。
+     */
+    override fun requestLayout() {
+        super.requestLayout()
+        val host = host ?: return
+        if (refreshing || host.cyl_badgeState.overlayHost == null) return
+        refreshing = true
+        try { host.cyl_refreshBadge() } finally { refreshing = false }
+    }
     private val paint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val textPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { textAlign = Paint.Align.CENTER }
     private val density get() = resources.displayMetrics.density
@@ -68,8 +86,11 @@ class CYLBadgeView(context: Context) : View(context), CYLBadgeTextDisplaying {
         }
         textPaint.textSize = android.util.TypedValue.applyDimension(android.util.TypedValue.COMPLEX_UNIT_SP, badgeFont.size, resources.displayMetrics)
         textPaint.typeface = badgeFont.typeface ?: if (badgeFont.bold) Typeface.DEFAULT_BOLD else Typeface.DEFAULT
-        val height = (textPaint.fontSpacing + badgeMargin * 2 * density).toInt()
-        val width = maxOf(height, (textPaint.measureText(text) + badgeMargin * 2 * density + height / 2).toInt())
+        // [EN] As iOS (`-cyl_adjustLabelWidth:` and `-cyl_addMargin`): the text's size plus `badgeMargin` once in each
+        //      direction, never narrower than tall. [CN] 与 iOS 相同（`-cyl_adjustLabelWidth:` 与 `-cyl_addMargin`）：文字尺寸在两个方向各加一次
+        //      `badgeMargin`，宽度不小于高度。
+        val height = (kotlin.math.ceil(textPaint.fontSpacing) + badgeMargin * density).toInt()
+        val width = maxOf(height, (kotlin.math.ceil(textPaint.measureText(text)) + badgeMargin * density).toInt())
         setMeasuredDimension(width, height)
     }
 
@@ -93,7 +114,7 @@ class CYLBadgeView(context: Context) : View(context), CYLBadgeTextDisplaying {
             textPaint.color = badgeTextColor
             val y = height / 2f - (textPaint.descent() + textPaint.ascent()) / 2
             val horizontal = textGravity and android.view.Gravity.HORIZONTAL_GRAVITY_MASK
-            val inset = badgeMargin * density + textPaint.measureText(text ?: "") / 2
+            val inset = badgeMargin * density / 2 + textPaint.measureText(text ?: "") / 2
             val x = when (horizontal) {
                 android.view.Gravity.START, android.view.Gravity.LEFT -> inset
                 android.view.Gravity.END, android.view.Gravity.RIGHT -> width - inset
@@ -109,7 +130,7 @@ class CYLBadgeView(context: Context) : View(context), CYLBadgeTextDisplaying {
     fun stopAnimation() {
         running?.cancel()
         running = null
-        scaleX = 1f; scaleY = 1f; translationX = 0f; translationY = 0f; alpha = 1f; rotationX = 0f
+        scaleX = 1f; scaleY = 1f; translationX = 0f; translationY = 0f; alpha = 1f; rotationX = 0f; rotation = 0f; rotationY = 0f
     }
 
     /**
@@ -136,6 +157,13 @@ class CYLBadgeView(context: Context) : View(context), CYLBadgeTextDisplaying {
         animator.start()
     }
 
+    /** [EN] Plays a custom `animator` on the badge (the iOS factory animations); `stopAnimation` stops it. [CN] 在角标上播放自定义 `animator`（iOS 的工厂动画）；`stopAnimation` 会停止它。 */
+    internal fun playAnimator(animator: android.animation.Animator) {
+        stopAnimation()
+        running = animator
+        animator.start()
+    }
+
     override fun onDetachedFromWindow() {
         stopAnimation()
         super.onDetachedFromWindow()
@@ -151,6 +179,9 @@ class CYLBadgeView(context: Context) : View(context), CYLBadgeTextDisplaying {
  */
 class CYLBadgeState internal constructor() {
     var badge: CYLBadgeView? = null
+    /** [EN] The parent whose overlay holds the badge of a view that cannot hold children. [CN] 不能包含子视图的视图，其角标所在 overlay 的父视图。 */
+    internal var overlayHost: ViewGroup? = null
+    internal var followsLayout = false
     var value: String? = null
     var paused = false
     var style = CYLEnums.CYLBadgeStyle.RedDot
@@ -218,12 +249,8 @@ fun View.cyl_showBadgeValue(value: String, animationType: CYLEnums.CYLBadgeAnima
     val badge = state.badge ?: CYLBadgeView(context).also {
         state.badge = it
         it.host = this
-        host.addView(it, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
     }
-    if (badge.parent !== host) {
-        (badge.parent as? ViewGroup)?.removeView(badge)
-        host.addView(badge, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-    }
+    cyl_attachBadge(badge, host)
     val number = value.toIntOrNull()
     badge.text = when {
         value.isEmpty() -> null
@@ -253,7 +280,7 @@ fun View.cyl_showBadgeValue(value: String, animationType: CYLEnums.CYLBadgeAnima
 /** [EN] `-cyl_clearBadge`: removes the badge. [CN] 移除角标。 */
 fun View.cyl_clearBadge() {
     val state = cyl_badgeState
-    state.badge?.let { it.stopAnimation(); (it.parent as? ViewGroup)?.removeView(it) }
+    state.badge?.let { badge -> badge.stopAnimation(); cyl_detachBadge(badge) }
     state.badge = null
     state.value = null
     state.paused = false
@@ -295,20 +322,86 @@ fun View.cyl_isReady(): Boolean = width > 0 && height > 0
 /** [EN] `-cyl_findBarButtonContentView`: this view (Android bar buttons are plain views). [CN] 本视图（Android 的栏按钮即普通视图）。 */
 fun View.cyl_findBarButtonContentView(): View = this
 
+/**
+ * [EN] Adds the badge to `host`. A tab button or the plus button holds it as a child. Any other view (an `ImageView`, a
+ *      label) cannot, so, as on iOS where the badge is a subview of the view above everything, it goes into the parent's
+ *      overlay: drawn above the parent's children, never laid out by the parent (a `LinearLayout` would otherwise place
+ *      it after the other children), and moved with the view whenever it is laid out.
+ * [CN] 把角标添加到 `host`。Tab 按钮或 PlusButton 把它作为子视图。其他视图（`ImageView`、文字）不能包含子视图，因此与 iOS 角标是视图的子视图、
+ *      位于最上层一样，放入父视图的 overlay：绘制在父视图所有子视图之上，不参与父视图的布局（否则 `LinearLayout` 会把它排在其他子视图后面），
+ *      并在视图每次布局时跟随移动。
+ */
+private fun View.cyl_attachBadge(badge: CYLBadgeView, host: ViewGroup) {
+    val state = cyl_badgeState
+    if (host === this) {
+        if (badge.parent !== host) {
+            cyl_detachBadge(badge)
+            host.addView(badge, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+        }
+        return
+    }
+    if (state.overlayHost !== host) {
+        cyl_detachBadge(badge)
+        host.overlay.add(badge)
+        state.overlayHost = host
+    }
+    if (!state.followsLayout) {
+        state.followsLayout = true
+        addOnLayoutChangeListener { view, _, _, _, _, _, _, _, _ -> view.cyl_refreshBadge() }
+    }
+}
+
+private fun View.cyl_detachBadge(badge: CYLBadgeView) {
+    val state = cyl_badgeState
+    state.overlayHost?.let { overlayHost -> overlayHost.overlay.remove(badge); state.overlayHost = null }
+    (badge.parent as? ViewGroup)?.removeView(badge)
+}
+
+/**
+ * [EN] `-[UIView cyl_layoutBadgeAtTopRightCorner]`: the badge's left and top for an anchor whose top-right corner is
+ *      (`anchorRight`, `anchorTop`): its center at (right + 2, top) plus `cyl_badgeCenterOffset`, as on iOS.
+ * [CN] 锚点右上角为 (`anchorRight`, `anchorTop`) 时角标的 left 与 top：中心位于 (right + 2, top) 再加上 `cyl_badgeCenterOffset`，与 iOS 相同。
+ */
+internal fun cyl_badgeOrigin(anchorRight: Int, anchorTop: Int, badge: View, offset: CYLOffset, density: Float): Pair<Int, Int> {
+    val left = (anchorRight + CYL_BADGE_CORNER_GAP_DP * density - badge.measuredWidth / 2f + offset.horizontal * density).toInt()
+    val top = (anchorTop - badge.measuredHeight / 2f + offset.vertical * density).toInt()
+    return left to top
+}
+
+/** [EN] iOS puts a badge's center 2 pt right of its host's right edge. [CN] iOS 把角标中心放在宿主右边缘右侧 2 pt 处。 */
+internal const val CYL_BADGE_CORNER_GAP_DP = 2f
+
 /** [EN] `-cyl_refreshBadge`: places the badge at the top-right corner plus `cyl_badgeCenterOffset`. [CN] 把角标放到右上角并加上偏移。 */
 fun View.cyl_refreshBadge() {
     val state = cyl_badgeState
     val badge = state.badge ?: return
-    val host = badge.parent as? ViewGroup ?: return
     badge.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED)
     val density = resources.displayMetrics.density
+    state.overlayHost?.let {
+        // [EN] In the parent's overlay: the view's top-right corner in the parent's coordinates. [CN] 在父视图的 overlay 中：视图右上角在父视图中的坐标。
+        val (left, top) = cyl_badgeOrigin(right, top, badge, state.centerOffset, density)
+        badge.layout(left, top, left + badge.measuredWidth, top + badge.measuredHeight)
+        return
+    }
+    val host = badge.parent as? ViewGroup ?: return
     val anchor = when (this) { is CYLTabBarItemButton -> iconView; is CYLPlusButton -> imageView; else -> this }
     val anchorRight = if (host === this) anchor.right else right
     val anchorTop = if (host === this) anchor.top else top
+    // [EN] The plus button places its badge itself (`CYLPlusButton.onLayout`), with no margins: margins make the FrameLayout
+    //      measure itself around the badge, so each new badge value widened the button by half a badge and stretched its image.
+    // [CN] PlusButton 自己放置角标（`CYLPlusButton.onLayout`），不使用 margin：margin 会让 FrameLayout 把角标计入自身尺寸，每次角标变化都会把按钮
+    //      加宽半个角标并拉伸图片。
+    if (host is CYLPlusButton) {
+        (badge.layoutParams as? ViewGroup.MarginLayoutParams)?.let { params -> params.setMargins(0, 0, 0, 0); badge.layoutParams = params }
+        host.requestLayout()
+        badge.bringToFront()
+        return
+    }
     val params = badge.layoutParams as? FrameLayout.LayoutParams ?: FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
     params.leftMargin = (anchorRight - badge.measuredWidth / 2 + state.centerOffset.horizontal * density).toInt()
     params.topMargin = (anchorTop - badge.measuredHeight / 2 + state.centerOffset.vertical * density).toInt()
-    if (host is FrameLayout) badge.layoutParams = params else badge.layout(params.leftMargin, params.topMargin, params.leftMargin + badge.measuredWidth, params.topMargin + badge.measuredHeight)
+    if (host is FrameLayout) badge.layoutParams = params
+    else badge.layout(params.leftMargin, params.topMargin, params.leftMargin + badge.measuredWidth, params.topMargin + badge.measuredHeight)
     badge.bringToFront()
 }
 

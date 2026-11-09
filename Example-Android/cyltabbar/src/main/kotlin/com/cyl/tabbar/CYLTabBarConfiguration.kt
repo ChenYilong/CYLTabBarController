@@ -74,7 +74,11 @@ object CYLTabBarConfiguration {
                 throw CYLConfigurationException(CYLTabBarConfigurationError.FileNotFound, "$path: ${error.message}")
             }
         }
-        return parse(data, CYLTabBarConfigurationParser.formatForPathExtension(path.substringAfterLast('/').substringAfterLast('.', "")))
+        val configuration = parse(data, CYLTabBarConfigurationParser.formatForPathExtension(path.substringAfterLast('/').substringAfterLast('.', "")))
+        if (CYLConstants.CYLTabBarControllerLocalization !in configuration) return configuration
+        // [EN] A relative `CYLTabBarLocalizationPath` is resolved against this file (or asset). [CN] 相对的 `CYLTabBarLocalizationPath` 相对于本文件（或 asset）。
+        val source = if (file.isFile) (file.absoluteFile.parent ?: "") else "asset:" + path.substringBeforeLast('/', "")
+        return configuration + (CYLTabBarConfigurationLocalization.FILE_DIRECTORY_KEY to source)
     }
 
     /** [EN] Reads at most 5 MB (API 23: no `readNBytes`). [CN] 最多读取 5 MB（API 23 没有 `readNBytes`）。 */
@@ -188,6 +192,23 @@ object CYLTabBarConfiguration {
 
     @JvmStatic
     fun sizeValue(value: Any?): CYLSize? = numbers(value, 2, listOf("width", "height"))?.let { CYLSize(it[0], it[1]) }
+
+    /**
+     * [EN] A tap animation name ("none", "scale", "zoomIn", "bounce", "bounceWithFireworks", "rotation", "flip", "fume") or
+     *      its number, as `CYLTabBarControllerTabButtonTapAnimation` on iOS; null when it is neither.
+     * [CN] 点击动画名称（"none"、"scale"、"zoomIn"、"bounce"、"bounceWithFireworks"、"rotation"、"flip"、"fume"）或其数字，与 iOS 的
+     *      `CYLTabBarControllerTabButtonTapAnimation` 相同；两者都不是时返回 null。
+     */
+    @JvmStatic
+    fun tapAnimationValue(value: Any?): CYLEnums.CYLTabButtonTapAnimationType? {
+        val names = listOf("none", "scale", "zoomin", "bounce", "bouncewithfireworks", "rotation", "flip", "fume")
+        val index = when (value) {
+            is String -> names.indexOf(value.trim().lowercase())
+            is Number -> value.toInt().takeIf { it in names.indices } ?: -1
+            else -> -1
+        }
+        return CYLEnums.CYLTabButtonTapAnimationType.values().firstOrNull { it.rawValue == index && index >= 0 }
+    }
 
     /** [EN] "#RGB", "#RRGGBB" or "#RRGGBBAA" (the iOS order). [CN] 三种十六进制写法（与 iOS 相同的顺序）。 */
     @JvmStatic

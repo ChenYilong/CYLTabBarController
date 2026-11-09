@@ -84,7 +84,16 @@ NS_ASSUME_NONNULL_BEGIN
       Set CYLExternPlusButton.cyl_shouldNotSelect = YES; when initializing the PlusButton to stop this protocol
       method from firing the plusButton callback
  */
-@property (nonatomic, assign, getter=cyl_shouldNotSelect, setter=cyl_setShouldNotSelect:) BOOL cyl_shouldNotSelect;
+/*!
+ * ⚠️ [EN] Deprecated: it did two jobs at once, the app's switch for the plus button's `tabBarController:didSelectControl:`
+ *      reports and the library's lock on the selected tab button, which turned the plus button's reports off once its
+ *      page was selected. Use `CYLPlusButton.reportsTapsToDelegate`. Still works: while `reportsTapsToDelegate` is not
+ *      set, YES here keeps the plus button's taps out of the delegate, as before.
+ * ⚠️ [CN] 已废弃：它同时承担两件事——App 控制 PlusButton 是否回调 `tabBarController:didSelectControl:` 的开关，以及库对已选中 Tab 按钮的锁定，
+ *      导致 PlusButton 页面选中后不再上报点击。请使用 `CYLPlusButton.reportsTapsToDelegate`。仍然有效：未设置 `reportsTapsToDelegate` 时，
+ *      这里设为 YES 仍会阻止 PlusButton 的点击回调代理，与以前相同。
+ */
+@property (nonatomic, assign, getter=cyl_shouldNotSelect, setter=cyl_setShouldNotSelect:) BOOL cyl_shouldNotSelect CYL_DEPRECATED("Use CYLPlusButton.reportsTapsToDelegate");
 /*!
  * same as cyl_userInteractionDisabled.
  * [CN] 对于- (void)tabBarController:(CYLTabBarController *)tabBarController didSelectControl:(UIControl *)control;
@@ -95,7 +104,16 @@ NS_ASSUME_NONNULL_BEGIN
       Set CYLExternPlusButton.cyl_userInteractionDisabled = YES; when initializing the PlusButton to stop this
       protocol method from firing the plusButton callback
  */
-@property (nonatomic, assign, getter=cyl_userInteractionDisabled, setter=cyl_setUserInteractionDisabled:) BOOL cyl_userInteractionDisabled;
+/*!
+ * ⚠️ [EN] Deprecated: it did two jobs at once, the app's switch for the plus button's `tabBarController:didSelectControl:`
+ *      reports and the library's lock on the selected tab button, which turned the plus button's reports off once its
+ *      page was selected. Use `CYLPlusButton.reportsTapsToDelegate`. Still works: while `reportsTapsToDelegate` is not
+ *      set, YES here keeps the plus button's taps out of the delegate, as before.
+ * ⚠️ [CN] 已废弃：它同时承担两件事——App 控制 PlusButton 是否回调 `tabBarController:didSelectControl:` 的开关，以及库对已选中 Tab 按钮的锁定，
+ *      导致 PlusButton 页面选中后不再上报点击。请使用 `CYLPlusButton.reportsTapsToDelegate`。仍然有效：未设置 `reportsTapsToDelegate` 时，
+ *      这里设为 YES 仍会阻止 PlusButton 的点击回调代理，与以前相同。
+ */
+@property (nonatomic, assign, getter=cyl_userInteractionDisabled, setter=cyl_setUserInteractionDisabled:) BOOL cyl_userInteractionDisabled CYL_DEPRECATED("Use CYLPlusButton.reportsTapsToDelegate");
 
 /*!
  * [EN] Adds a Lottie animation view loaded from `lottieURL` in place of the tab image; does nothing if one already exists or for the plus button.

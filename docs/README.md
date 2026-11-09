@@ -18,17 +18,21 @@
 | [Android 演示迁移](Android-Demo-Migration.md) | [Android demo migration](Android-Demo-Migration.md) |
 | [Android 版 PAG、GIF、Rive 示例](Android-Examples.md) | [The Android PAG, GIF and Rive examples](Android-Examples.md) |
 | [Android 版 CYLTabBarController](Android-Library.md) | [CYLTabBarController for Android](Android-Library.md) |
-| [Android 库与 QMUI_Android 的 Tab 对比](Android-QMUI-Comparison.md) | [The Android library compared with QMUI_Android's tabs](Android-QMUI-Comparison.md) |
+| [Android 液态玻璃](Android-Liquid-Glass.md) | [Android Liquid Glass](Android-Liquid-Glass.md) |
+| [Android 库与 QMUI_Android、XUI 的 Tab 对比](Android-QMUI-Comparison.md) | [The Android library compared with QMUI_Android's and XUI's tabs](Android-QMUI-Comparison.md) |
 | [中英文双语文档](Bilingual-Documentation.md) | [Bilingual Documentation](Bilingual-Documentation.md) |
 | [CYLUtils 通用工具：超出父视图响应点击、点击动画与图片加载](CYLUtils-Helpers.md) | [CYLUtils helpers: responding outside the superview, a tap animation, and image loading](CYLUtils-Helpers.md) |
 | [Carthage 集成演示工程](Carthage-Example.md) | [Carthage integration demo project](Carthage-Example.md) |
 | [使用 Carthage 集成](Carthage.md) | [Integrating with Carthage](Carthage.md) |
 | [一个配置文件生成 TabBarController](Configuration-File.md) | [One configuration file, one TabBarController](Configuration-File.md) |
+| [配置文件的本地化文本](Configuration-Localization.md) | [Localized texts in a configuration file](Configuration-Localization.md) |
 | [配置文件相关脚本：导出、边界情况与测试](Configuration-Scripts.md) | [Configuration scripts: export, edge cases and tests](Configuration-Scripts.md) |
+| [React Native 与 Flutter 组件](Cross-Platform-Components.md) | [React Native and Flutter components](Cross-Platform-Components.md) |
 | [自定义 TabBar 功能清单](Custom-Tab-Bar-Features.md) | [Custom Tab Bar Feature Checklist](Custom-Tab-Bar-Features.md) |
 | [Demo 测试列表：设置分组与纯 Swift 版本](Demo-Test-List.md) | [The demo test list: settings groups and a pure Swift version](Demo-Test-List.md) |
 | [CYLTabBarController 常见问题](FAQ.md) | [CYLTabBarController FAQ](FAQ.md) |
 | [FlatDesign × UITabBarAppearance](FlatDesign-StandardAppearance.md) | [FlatDesign × UITabBarAppearance](FlatDesign-StandardAppearance.md) |
+| [Flutter 接入：flutter_cyltabbar](Flutter-Component.md) | [Flutter integration: flutter_cyltabbar](Flutter-Component.md) |
 | [GIF Tab 图标：循环的图片，或点击播放一次的动画](GIF-Animation.md) | [GIF tab icons: a looping image, or an animation that plays once when tapped](GIF-Animation.md) |
 | [纯图标 Tab 的自动居中](Image-Only-Tabs.md) | [Automatic centering of image-only tabs](Image-Only-Tabs.md) |
 | [液态玻璃的健壮性改进](Liquid-Glass-Robustness.md) | [Liquid Glass Robustness](Liquid-Glass-Robustness.md) |
@@ -46,6 +50,7 @@
 | [PlusButton 点击范围：扩大、按倍数放大与调试显示](PlusButton-Touchable-Area.md) | [PlusButton touchable area: grow it, scale it, and see it](PlusButton-Touchable-Area.md) |
 | [PlusButton 的实现：真实按钮、液态玻璃替身与选中态图片](PlusButton.md) | [How the PlusButton works: the real button, its Liquid Glass stand-in and selected images](PlusButton.md) |
 | [在任意位置获取导航控制器并 Push](Push-From-Anywhere.md) | [Get the navigation controller and push from anywhere](Push-From-Anywhere.md) |
+| [React Native 接入：react-native-cyltabbar](React-Native-Component.md) | [React Native integration: react-native-cyltabbar](React-Native-Component.md) |
 | [Rive 动画 Tab 图标（与 Lottie、PAG 用法相同）](Rive-Animation.md) | [Rive animated tab icons (used like Lottie and PAG)](Rive-Animation.md) |
 | [selectedIndex 与 PlusButton：选中的文字与图片一致](SelectedIndex-PlusButton.md) | [selectedIndex and the PlusButton: the selected title and image match](SelectedIndex-PlusButton.md) |
 | [在 Swift 项目中使用 CYLTabBarController](Swift-Guide.md) | [Using CYLTabBarController in Swift](Swift-Guide.md) |
@@ -71,6 +76,8 @@
 | [换肤实现评估：与 QMUI 的差距、架构符合度与改进建议](Theme-Switching-QMUI-Evaluation.md) | [Theme switching evaluation: the gap to QMUI, fit with the original design, and what to improve](Theme-Switching-QMUI-Evaluation.md) |
 | [换肤（主题切换）](Theme-Switching.md) | [Theme switching (skins)](Theme-Switching.md) |
 | [原地更新 Tab：标题、图标、网络图标与替换页面](Update-Tab-Bar-Items-In-Place.md) | [Update Tabs in Place: Titles, Icons, Network Icons and Pages](Update-Tab-Bar-Items-In-Place.md) |
+| [提交前准备规则](commit-readiness-2026-11-09.md) | [Commit Readiness Rules](commit-readiness-2026-11-09.md) |
+| [文档文件夹说明](instructions.md) | [Documentation Folder Instructions](instructions.md) |
 
 <!-- navigation:end -->
 
@@ -91,22 +98,28 @@ docs/
 ├── Android-Demo-Migration.md
 ├── Android-Examples.md
 ├── Android-Library.md
+├── Android-Liquid-Glass.md
 ├── Android-QMUI-Comparison.md
 ├── Bilingual-Documentation.md
 ├── CYLUtils-Helpers.md
 ├── Carthage-Example.md
 ├── Carthage.md
 ├── Configuration-File.md
+├── Configuration-Localization.md
 ├── Configuration-Scripts.md
+├── Cross-Platform-Components.md
 ├── Custom-Tab-Bar-Features.md
 ├── Demo-Test-List.md
 ├── FAQ.md
 ├── FlatDesign-StandardAppearance.md
+├── Flutter-Component.md
 ├── GIF-Animation.md
 ├── Image-Only-Tabs.md
 ├── Liquid-Glass-Robustness.md
 ├── Login-Required-Tabs.md
 ├── Mac-CI-CD.md
+├── ObjC-Example-Parity/
+│   └── README.md
 ├── PAG-Animation.md
 ├── Per-Tab-Animation.md
 ├── Plus-Child-Theme-Switching-Test.md
@@ -120,6 +133,7 @@ docs/
 ├── PlusButton.md
 ├── Push-From-Anywhere.md
 ├── README.md
+├── React-Native-Component.md
 ├── Rive-Animation.md
 ├── SelectedIndex-PlusButton.md
 ├── Swift-Guide.md
@@ -145,84 +159,132 @@ docs/
 ├── Theme-Switching-QMUI-Evaluation.md
 ├── Theme-Switching.md
 ├── Update-Tab-Bar-Items-In-Place.md
-└── assets/
-    ├── demo-test-list-objc-classic.png
-    ├── docs-navigation-index.png
-    ├── flatdesign-standard-appearance-mapping.svg
-    ├── gif-classic.png
-    ├── gif-flat-design.png
-    ├── gif-liquid-glass.png
-    ├── login-required-tabs-flow.svg
-    ├── pag-animation-tab-icons.png
-    ├── pag-animation-test-list.png
-    ├── pag-classic.png
-    ├── pag-flat-design.png
-    ├── pag-liquid-glass.png
-    ├── plus-child-theme-switching.png
-    ├── plusbutton-background-image-liquid-glass-selected.png
-    ├── plusbutton-background-image-liquid-glass-swiftui.png
-    ├── plusbutton-background-image-liquid-glass.png
-    ├── plusbutton-background-title-centered-pag.png
-    ├── plusbutton-image-loaded-later.png
-    ├── plusbutton-overlap-classic.png
-    ├── plusbutton-overlap-flat.png
-    ├── plusbutton-overlap-lg.png
-    ├── plusbutton-subview-touches-issue-202.png
-    ├── readme-english-before-reading.png
-    ├── readme-english-bilingual-contents.png
-    ├── readme-english-header-badges.png
-    ├── rive-animation-onboarding-button.png
-    ├── rive-animation-plus-button.png
-    ├── rive-animation-search-tab-frames.png
-    ├── rive-animation-swiftui-test-list.png
-    ├── rive-animation-tab-icons.png
-    ├── rive-animation-test-list.png
-    ├── rive-classic.png
-    ├── rive-flat-design.png
-    ├── rive-liquid-glass.png
-    ├── tab-interactions-long-press-classic.png
-    ├── tab-interactions-long-press-flatdesign.png
-    ├── tab-interactions-long-press-liquid-glass.png
-    ├── tab-interactions-navigation-bar-hidden-classic.png
-    ├── tab-interactions-outside-superview-classic.png
-    ├── tab-interactions-outside-superview-liquid-glass.png
-    ├── tab-interactions-slide-transition.png
-    ├── tab-interactions-star-fireworks-flatdesign.png
-    ├── tab-interactions-swipe-classic.png
-    ├── tab-interactions-swipe-liquid-glass.png
-    ├── tab-interactions-swipe-login-classic.png
-    ├── theme-switching-flat-design.png
-    ├── theme-switching-holiday-icons.png
-    ├── theme-switching-liquid-glass.png
-    ├── theme-switching-objc-flat-design-grapefruit.png
-    ├── theme-switching-objc-liquid-glass-grapefruit.png
-    ├── theme-switching-pag-grapefruit.png
-    ├── theme-switching-rive-grapefruit.png
-    ├── theme-switching-runtime-christmas-to-pink-rose.png
-    ├── theme-switching-swiftui-rive-grapefruit.png
-    ├── update-tab-bar-items-all-local-icons.png
-    ├── update-tab-bar-items-all-network-icons-badges.png
-    ├── update-tab-bar-items-all-network-icons-restored.png
-    ├── update-tab-bar-items-badges-on-symbol-icons.png
-    ├── update-tab-bar-items-change-all-titles.png
-    ├── update-tab-bar-items-change-tab-title.png
-    ├── update-tab-bar-items-download-network-icon.png
-    ├── update-tab-bar-items-flatdesign-changed.png
-    ├── update-tab-bar-items-flatdesign-restored.png
-    ├── update-tab-bar-items-gif-icon.png
-    ├── update-tab-bar-items-image-url-keys.png
-    ├── update-tab-bar-items-issue-434-flatdesign.png
-    ├── update-tab-bar-items-issue-434-liquid-glass.png
-    ├── update-tab-bar-items-plus-button-local-icon.png
-    ├── update-tab-bar-items-plus-button-network-icon.png
-    ├── update-tab-bar-items-plus-button-restored.png
-    ├── update-tab-bar-items-plus-button-title.png
-    ├── update-tab-bar-items-replace-neighbors-restored.png
-    ├── update-tab-bar-items-replace-neighbors.png
-    ├── update-tab-bar-items-switch-tab-icon.png
-    ├── update-tab-bar-items-tab-item-badge-selected-layer.png
-    ├── update-tab-bar-items-wrapped-cells-flatdesign.png
-    └── update-tab-bar-items-wrapped-cells.png
+├── assets/
+│   ├── android-liquid-glass-surface-000.png
+│   ├── android-liquid-glass-surface-040.png
+│   ├── android-liquid-glass-surface-100.png
+│   ├── android-liquid-glass-surface-slider.png
+│   ├── configuration-localization-en.png
+│   ├── configuration-localization-zh-hans.png
+│   ├── demo-test-list-objc-classic.png
+│   ├── docs-navigation-index.png
+│   ├── flatdesign-standard-appearance-mapping.svg
+│   ├── flutter-component-android-bar.png
+│   ├── flutter-component-android.png
+│   ├── flutter-component-ios-bar.png
+│   ├── flutter-component-ios.png
+│   ├── flutter-pag-android-bar.png
+│   ├── flutter-pag-ios-bar.png
+│   ├── flutter-rive-android-bar.png
+│   ├── flutter-rive-ios-bar.png
+│   ├── gif-classic.png
+│   ├── gif-flat-design.png
+│   ├── gif-liquid-glass.png
+│   ├── login-required-tabs-flow.svg
+│   ├── login-required-tabs-flutter-ios-logged-in.png
+│   ├── login-required-tabs-react-native-android-alert.png
+│   ├── pag-animation-tab-icons.png
+│   ├── pag-animation-test-list.png
+│   ├── pag-classic.png
+│   ├── pag-flat-design.png
+│   ├── pag-liquid-glass.png
+│   ├── plus-child-theme-switching.png
+│   ├── plusbutton-background-image-liquid-glass-selected.png
+│   ├── plusbutton-background-image-liquid-glass-swiftui.png
+│   ├── plusbutton-background-image-liquid-glass.png
+│   ├── plusbutton-background-title-centered-pag.png
+│   ├── plusbutton-badge-after-3-taps.png
+│   ├── plusbutton-badge-before.png
+│   ├── plusbutton-image-loaded-later.png
+│   ├── plusbutton-lottie-423-me.png
+│   ├── plusbutton-lottie-423-messages.png
+│   ├── plusbutton-overlap-classic.png
+│   ├── plusbutton-overlap-flat.png
+│   ├── plusbutton-overlap-lg.png
+│   ├── plusbutton-slot-flatdesign.png
+│   ├── plusbutton-slot-liquid-glass-titles-changed.png
+│   ├── plusbutton-subview-touches-issue-202.png
+│   ├── plusbutton-touchable-area-1x.png
+│   ├── plusbutton-touchable-area-2x.png
+│   ├── react-native-component-android-bar.png
+│   ├── react-native-component-android.png
+│   ├── react-native-component-ios-bar.png
+│   ├── react-native-component-ios.png
+│   ├── react-native-pag-android-bar.png
+│   ├── react-native-pag-ios-bar.png
+│   ├── react-native-pag-menu.png
+│   ├── react-native-rive-android-bar.png
+│   ├── react-native-rive-chat.png
+│   ├── react-native-rive-ios-bar.png
+│   ├── react-native-rive-search.png
+│   ├── react-native-rive-start.png
+│   ├── react-native-rive-user.png
+│   ├── readme-english-before-reading.png
+│   ├── readme-english-bilingual-contents.png
+│   ├── readme-english-header-badges.png
+│   ├── rive-animation-onboarding-button.png
+│   ├── rive-animation-plus-button.png
+│   ├── rive-animation-search-tab-frames.png
+│   ├── rive-animation-swiftui-test-list.png
+│   ├── rive-animation-tab-icons.png
+│   ├── rive-animation-test-list.png
+│   ├── rive-classic.png
+│   ├── rive-flat-design.png
+│   ├── rive-liquid-glass.png
+│   ├── tab-accessibility-labels-after-title-change.png
+│   ├── tab-interactions-long-press-classic.png
+│   ├── tab-interactions-long-press-flatdesign.png
+│   ├── tab-interactions-long-press-liquid-glass.png
+│   ├── tab-interactions-navigation-bar-hidden-classic.png
+│   ├── tab-interactions-outside-superview-classic.png
+│   ├── tab-interactions-outside-superview-liquid-glass.png
+│   ├── tab-interactions-slide-transition.png
+│   ├── tab-interactions-star-fireworks-flatdesign.png
+│   ├── tab-interactions-swipe-classic.png
+│   ├── tab-interactions-swipe-liquid-glass.png
+│   ├── tab-interactions-swipe-login-classic.png
+│   ├── theme-switching-flat-design.png
+│   ├── theme-switching-holiday-icons.png
+│   ├── theme-switching-liquid-glass.png
+│   ├── theme-switching-objc-flat-design-grapefruit.png
+│   ├── theme-switching-objc-liquid-glass-grapefruit.png
+│   ├── theme-switching-pag-grapefruit.png
+│   ├── theme-switching-rive-grapefruit.png
+│   ├── theme-switching-runtime-christmas-to-pink-rose.png
+│   ├── theme-switching-swiftui-rive-grapefruit.png
+│   ├── update-tab-android-activity-title-changed.png
+│   ├── update-tab-android-activity-title-restored.png
+│   ├── update-tab-bar-items-all-local-icons.png
+│   ├── update-tab-bar-items-all-network-icons-badges.png
+│   ├── update-tab-bar-items-all-network-icons-restored.png
+│   ├── update-tab-bar-items-badges-on-symbol-icons.png
+│   ├── update-tab-bar-items-change-all-titles.png
+│   ├── update-tab-bar-items-change-tab-title.png
+│   ├── update-tab-bar-items-download-network-icon.png
+│   ├── update-tab-bar-items-flatdesign-changed.png
+│   ├── update-tab-bar-items-flatdesign-restored.png
+│   ├── update-tab-bar-items-gif-icon.png
+│   ├── update-tab-bar-items-image-url-keys.png
+│   ├── update-tab-bar-items-issue-434-flatdesign.png
+│   ├── update-tab-bar-items-issue-434-liquid-glass.png
+│   ├── update-tab-bar-items-plus-button-local-icon.png
+│   ├── update-tab-bar-items-plus-button-network-icon.png
+│   ├── update-tab-bar-items-plus-button-restored.png
+│   ├── update-tab-bar-items-plus-button-title.png
+│   ├── update-tab-bar-items-replace-neighbors-restored.png
+│   ├── update-tab-bar-items-replace-neighbors.png
+│   ├── update-tab-bar-items-switch-tab-icon.png
+│   ├── update-tab-bar-items-tab-item-badge-selected-layer.png
+│   ├── update-tab-bar-items-wrapped-cells-flatdesign.png
+│   ├── update-tab-bar-items-wrapped-cells.png
+│   ├── update-tab-navigation-title-changed.png
+│   ├── update-tab-navigation-title-restored.png
+│   ├── update-tab-navigation-title-skin.png
+│   ├── update-tab-network-icons-plus-button.png
+│   ├── update-tab-plus-page-navigation-title-changed.png
+│   └── update-tab-plus-page-navigation-title.png
+├── commit-readiness-2026-11-09.md
+└── instructions.md
 ```
 
 <!-- navigation:end -->

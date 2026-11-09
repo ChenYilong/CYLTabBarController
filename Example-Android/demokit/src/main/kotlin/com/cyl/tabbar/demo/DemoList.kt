@@ -67,6 +67,15 @@ class DemoListFragment : Fragment() {
         val context = inflater.context
         val list = ListView(context).apply {
             adapter = this@DemoListFragment.adapter
+            // [EN] Under a floating bar (FlatDesign, Liquid Glass) the page's bottom inset is the bar's height: the last rows
+            //      scroll above the bar, and the rows still pass under it while scrolling, as an iOS table view does.
+            // [CN] 浮动 TabBar（扁平样式、液态玻璃）下，页面的底部 inset 就是 TabBar 的高度：最后几行可滚到 TabBar 上方，滚动时各行仍从 TabBar 下方经过，
+            //      与 iOS 的 table view 相同。
+            clipToPadding = false
+            androidx.core.view.ViewCompat.setOnApplyWindowInsetsListener(this) { view, insets ->
+                view.setPadding(view.paddingLeft, view.paddingTop, view.paddingRight, insets.getInsets(androidx.core.view.WindowInsetsCompat.Type.systemBars()).bottom)
+                insets
+            }
             setOnItemClickListener { _, _, position, _ -> (this@DemoListFragment.adapter.getItem(position) as? DemoRow)?.let(::run) }
             // [EN] A context menu on long press, as the iOS rows have (and the scroll hiding simulation "long press a row"). [CN] 长按弹出菜单，与 iOS 行一致（也用于滚动隐藏模拟 "长按某行"）。
             setOnItemLongClickListener { _, view, position, _ ->

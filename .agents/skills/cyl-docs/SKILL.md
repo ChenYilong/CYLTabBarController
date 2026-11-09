@@ -54,6 +54,11 @@ two places**:
 - **Debugging screenshots** that show the feature working (no bugs visible) are kept: save them in `docs/assets/` and
   embed them in the feature's `docs/` file.
 - **Final screenshots** of the finished feature also go into `README.md`.
+- **Screenshot layout**: a matrix (e.g. styles × libraries) stays a grid. Any other set of screenshots is stacked **top to
+  bottom**, one per row (a two-column table row each, or one image per line), never side by side: stacked, the same tab
+  bar item lines up vertically, so its states (selected, pressed, a value of a setting, before and after a fix) compare
+  at a glance. Crop each screenshot to the same region and width (e.g. only the tab bar), and label each row with the
+  state it shows. Example: `docs/Android-Liquid-Glass.md` (the dock at three surface opacities).
 - If a change could not be run (no simulator or device), say so in the document instead of adding screenshots, and
   never present a mock-up or a diagram as a screenshot.
 - **Attachment layout (Obsidian rule)**: a Markdown file's attachments live in an `assets/` folder **next to that file**,
@@ -63,6 +68,25 @@ two places**:
   - No absolute paths, no `../` paths for attachments, no other attachment folders. Use lowercase, hyphenated file
     names that name the feature, e.g. `assets/login-required-tabs-alert.png`.
 - Diagrams are welcome: Mermaid blocks in the Markdown, and optionally an SVG copy in `assets/`.
+
+### Stale notes before every commit
+
+Before every commit, search every document in `docs/` and `README.md` for the keywords **`TODO`** and **`Linux`**, and
+for other notes written where the code could not run (no Xcode, no simulator, no screenshots):
+
+```sh
+grep -rn -i -E "TODO|Linux|without Xcode|no (iOS )?simulator|no screenshots?|无法(编译|运行)|没有截图|暂无(测试)?截图" docs README.md
+```
+
+- Test each feature such a note is about: build it, run its unit tests, and run its demo on the simulator or emulator
+  (`scripts/free-ram.sh` first; drive the UI through accessibility labels, see the `cyl-verify` skill).
+- Replace the note with what was verified (device, OS, tool versions, the checks done) and the bug-free test
+  screenshots, saved in `docs/assets/` and laid out as "Screenshot layout" above. Update the `README.md` section too
+  when the feature appears there.
+- A finished TODO becomes DONE with its evidence. A TODO only the maintainer can do (a repository setting, a release)
+  stays, stating what was checked and when.
+- A bug found while testing is fixed in the same change, and its document says so.
+- Notes that are true where they are (a Linux CI job, GNUstep tests of the parser) stay.
 
 ## 2. Navigation is generated — keep it up to date
 

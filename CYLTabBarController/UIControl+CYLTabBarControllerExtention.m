@@ -16,6 +16,7 @@
 
 #import "UITabBarItem+CYLTabBarControllerExtention.h"
 #import "CYLPlusButton.h"
+#import "CYLTabBarController+CYLPrivate.h"
 
 /*!
  * FIX: issue #653 (iPhone Duo, vertical bar)
@@ -150,23 +151,23 @@ static void CYLTrackViewInTabButton(UIControl *tabBarButton, UIView *newView, CG
     return isChildViewControllerPlusButton;
 }
 
+CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_PUSH
 - (void)cyl_setUserInteractionDisabled:(BOOL)cyl_userInteractionDisabled {
-    [self cyl_setShouldNotSelect:cyl_userInteractionDisabled];
+    CYLControlSetSelectionLocked(self, cyl_userInteractionDisabled);
 }
 
 - (BOOL)cyl_userInteractionDisabled {
-    return self.cyl_shouldNotSelect;
+    return CYLControlIsSelectionLocked(self);
 }
 
 - (BOOL)cyl_shouldNotSelect {
-    NSNumber *shouldNotSelectObject = objc_getAssociatedObject(self, @selector(cyl_shouldNotSelect));
-    return [shouldNotSelectObject boolValue];
+    return CYLControlIsSelectionLocked(self);
 }
 
 - (void)cyl_setShouldNotSelect:(BOOL)shouldNotSelect {
-    NSNumber *shouldNotSelectObject = @(shouldNotSelect);
-    objc_setAssociatedObject(self, @selector(cyl_shouldNotSelect), shouldNotSelectObject, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    CYLControlSetSelectionLocked(self, shouldNotSelect);
 }
+CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
 
 - (NSInteger)cyl_tabBarItemVisibleIndex {
     if (!self.cyl_isTabButton && !self.cyl_isPlusButton) {
@@ -723,3 +724,27 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
 }
 
 @end
+
+/// [EN] The key the deprecated `cyl_shouldNotSelect` used: apps that still set it keep their behavior.
+/// [CN] 废弃的 `cyl_shouldNotSelect` 使用的键：仍在设置它的 App 行为不变。
+static const void *CYLControlSelectionLockedKey = &CYLControlSelectionLockedKey;
+
+BOOL CYLControlIsSelectionLocked(UIControl *control) {
+    return control && [objc_getAssociatedObject(control, CYLControlSelectionLockedKey) boolValue];
+}
+
+void CYLControlSetSelectionLocked(UIControl *control, BOOL locked) {
+    if (control) {
+        objc_setAssociatedObject(control, CYLControlSelectionLockedKey, @(locked), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    }
+}
+
+BOOL CYLControlReportsTaps(UIControl *control) {
+    if (!control) {
+        return NO;
+    }
+    if ([control isKindOfClass:[CYLPlusButton class]]) {
+        return ((CYLPlusButton *)control).reportsTapsToDelegate;
+    }
+    return !CYLControlIsSelectionLocked(control);
+}

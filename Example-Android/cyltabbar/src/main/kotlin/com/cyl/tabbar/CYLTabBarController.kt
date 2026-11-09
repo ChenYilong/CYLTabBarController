@@ -16,6 +16,9 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import androidx.annotation.ColorInt
+import androidx.core.graphics.Insets
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager
@@ -28,6 +31,8 @@ import java.util.WeakHashMap
  * [CN] Android 版 `CYLTabBarController`：`CYLTabBar` 上方的页面（Fragment），按下标选中，带 iOS 库的 PlusButton、角标、标识、登录拦截、主题、
  *      手势、滚动隐藏、页面注册表与配置。创建后显示 `view`（例如 `activity.setContentView(controller.view)`）。
  */
+private val SYSTEM_BAR_TYPES = WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout()
+
 open class CYLTabBarController(val activity: FragmentActivity) {
 
     constructor(activity: FragmentActivity, viewControllers: List<Fragment>, tabBarItemsAttributes: List<Map<String, Any?>>) :
@@ -58,7 +63,12 @@ open class CYLTabBarController(val activity: FragmentActivity) {
     /** [EN] The root view: the pages above the tab bar. [CN] 根视图：页面在 TabBar 之上。 */
     val view: ViewGroup = CYLTabBarControllerView(activity).also { it.controller = this }
     /** [EN] The container of the pages. [CN] 页面容器。 */
-    val pagesContainer: FrameLayout = CYLTabBarPagesContainer(activity, this).apply { id = View.generateViewId() }
+    val pagesContainer: FrameLayout = CYLTabBarPagesContainer(activity, this).apply {
+        id = View.generateViewId()
+        // [EN] The root view does not clip (the plus button rises above the bar), so the pages clip themselves to their bounds. [CN] 根视图不裁剪（PlusButton 凸出 TabBar），因此页面自己按边界裁剪。
+        outlineProvider = android.view.ViewOutlineProvider.BOUNDS
+        clipToOutline = true
+    }
     /** [EN] `tabBar` / `cyl_tabBar`. [CN] TabBar。 */
     val tabBar: CYLTabBar = CYLTabBar(activity).apply { tabBarController = this@CYLTabBarController }
     val cyl_tabBar: CYLTabBar get() = tabBar
@@ -67,19 +77,94 @@ open class CYLTabBarController(val activity: FragmentActivity) {
 
     private var pagesCommitPending = false
 
+    private var receivedInsetsSinceAttach = false
+
+    /**
+     * [EN] The safe area, as on iOS: the pages keep clear of the status bar and the sides, and the tab bar grows by the
+     *      navigation bar (`cyl_safeAreaBottom`) with its items above it, so the system bars neither cover nor cut them.
+     * [CN] 安全区，与 iOS 相同：页面避开状态栏与两侧，TabBar 增高导航栏的高度（`cyl_safeAreaBottom`），各 Item 位于其上方，系统栏不会遮挡或切割它们。
+     */
+    private fun applySafeArea(bars: Insets) {
+        view.setPadding(bars.left, bars.top, bars.right, 0)
+        tabBar.cyl_safeAreaBottom = bars.bottom
+    }
+
+    /** [EN] A bar floating over the pages (FlatDesign, Liquid Glass) is their bottom inset, so a list can scroll its last rows above it. [CN] 浮在页面之上的 TabBar（扁平样式、液态玻璃）作为页面的底部 inset，列表可把最后几行滚到 TabBar 上方。 */
+    private fun pagesBottomInset(): Int = if (tabBar.styleRenderer.drawsPagesUnderTabBar) cyl_overlayTabBarHeight() else 0
+
+    /** [EN] The part of the window's system bars that overlaps this view on screen. [CN] 窗口系统栏与本视图在屏幕上重叠的部分。 */
+    private fun applySafeAreaFromWindow() {
+        val window = ViewCompat.getRootWindowInsets(view) ?: return
+        val raw = window.getInsets(SYSTEM_BAR_TYPES)
+        val location = IntArray(2)
+        view.getLocationInWindow(location)
+        val root = view.rootView
+        val bars = Insets.of(
+            maxOf(0, raw.left - location[0]),
+            maxOf(0, raw.top - location[1]),
+            maxOf(0, location[0] + view.width - (root.width - raw.right)),
+            maxOf(0, location[1] + view.height - (root.height - raw.bottom)),
+        )
+        applySafeArea(bars)
+        ViewCompat.dispatchApplyWindowInsets(pagesContainer, WindowInsetsCompat.Builder(window).setInsets(SYSTEM_BAR_TYPES, Insets.of(0, 0, 0, pagesBottomInset())).build())
+    }
+
+    /**
+     * [EN] A bar that shows the pages through it (FlatDesign's blur, Liquid Glass) draws again when the pages changed in this
+     *      frame (scrolling, an animation), and only then: invalidating it on every frame asked for the next frame forever
+     *      (60 fps while idle), which kept the main thread busy and delayed switching pages.
+     * [CN] 透出页面的 TabBar（扁平样式的模糊、液态玻璃）只在页面本帧有变化时（滚动、动画）重绘：每帧都 invalidate 会不断请求下一帧（空闲时也 60 fps），
+     *      使主线程一直忙碌，延迟页面切换。
+     */
+    private val backdropListener = android.view.ViewTreeObserver.OnPreDrawListener {
+        if (tabBar.styleRenderer.drawsPagesUnderTabBar && pagesContainer.isDirty) tabBar.invalidate()
+        true
+    }
+
+    /** [EN] The height of a bar floating over the pages, in px. [CN] 浮在页面之上的 TabBar 的高度（像素）。 */
+    internal fun cyl_overlayTabBarHeight(): Int {
+        val itemsHeight = (tabBarHeight * activity.resources.displayMetrics.density).toInt()
+        return tabBar.styleRenderer.barHeight(tabBar, itemsHeight, tabBar.cyl_safeAreaBottom)
+    }
+
     init {
         view.addView(pagesContainer, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, 1f))
         view.addView(tabBar, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT))
+        // [EN] Edge-to-edge windows (forced from Android 15) draw under the system bars, as iOS does: the pages keep clear of
+        //      the status bar and the sides, and the tab bar grows by the navigation bar like iOS's bottom safe area, so the
+        //      system bar no longer covers or cuts the items. The bars' insets stop here; the keyboard's go on to the pages.
+        // [CN] edge-to-edge 窗口（Android 15 起强制）绘制到系统栏下方，与 iOS 相同：页面避开状态栏与两侧，TabBar 像 iOS 的底部安全区一样
+        //      增高导航栏的高度，系统栏不再遮挡或切割各 Item。系统栏的 insets 在此消费，键盘的 insets 继续传给页面。
+        ViewCompat.setOnApplyWindowInsetsListener(view) { _, insets ->
+            receivedInsetsSinceAttach = true
+            applySafeArea(insets.getInsets(SYSTEM_BAR_TYPES))
+            WindowInsetsCompat.Builder(insets).setInsets(SYSTEM_BAR_TYPES, Insets.of(0, 0, 0, pagesBottomInset())).build()
+        }
+        // [EN] A controller shown in place of another (`setContentView` again, e.g. to switch styles) may get no insets: AppCompat's
+        //      action bar layout passes them to its content only when they change. Then the safe area is worked out from the
+        //      window's insets and where this view is on screen, as iOS does, or the system bars would cover the tabs.
+        // [CN] 替换另一个控制器显示时（再次 `setContentView`，例如切换样式）可能收不到 insets：AppCompat 的 ActionBar 布局只在 insets 变化时
+        //      才传给内容。此时按窗口的 insets 与本视图在屏幕上的位置计算安全区，与 iOS 相同，否则系统栏会遮挡各 Tab。
+        view.addOnAttachStateChangeListener(object : View.OnAttachStateChangeListener {
+            override fun onViewAttachedToWindow(v: View) {
+                receivedInsetsSinceAttach = false
+                ViewCompat.requestApplyInsets(v)
+                v.post { if (!receivedInsetsSinceAttach) applySafeAreaFromWindow() }
+            }
+            override fun onViewDetachedFromWindow(v: View) = Unit
+        })
         // [EN] Fragments need their container in the window: transactions wait until `view` is attached. [CN] Fragment 需要容器已在窗口中：事务等到 `view` 附加后再提交。
         pagesContainer.addOnAttachStateChangeListener(object : View.OnAttachStateChangeListener {
             override fun onViewAttachedToWindow(v: View) {
                 if (pagesCommitPending) commitPages()
                 v.viewTreeObserver.addOnWindowFocusChangeListener(windowFocusListener)
                 v.viewTreeObserver.addOnGlobalLayoutListener(keyboardListener)
+                v.viewTreeObserver.addOnPreDrawListener(backdropListener)
             }
             override fun onViewDetachedFromWindow(v: View) {
                 v.viewTreeObserver.removeOnWindowFocusChangeListener(windowFocusListener)
                 v.viewTreeObserver.removeOnGlobalLayoutListener(keyboardListener)
+                v.viewTreeObserver.removeOnPreDrawListener(backdropListener)
             }
         })
         // [EN] The activity pausing (a call, another app, the recents screen) shows a bar hidden by scrolling (#13). [CN] Activity 暂停（来电、其他 App、最近任务）时恢复滚动隐藏的 TabBar（#13）。
@@ -103,12 +188,31 @@ open class CYLTabBarController(val activity: FragmentActivity) {
             if (index == selectedIndex && page.isDetached) transaction.attach(page)
             if (index == selectedIndex) transaction.show(page) else transaction.hide(page)
         }
+        // [EN] The plus button's page (`plusChildViewController`) leaves the screen when a tab is selected; it was added last,
+        //      so left shown it would cover the selected tab's page. On iOS it is one of the view controllers and is replaced.
+        // [CN] 选中 Tab 时 PlusButton 的页面（`plusChildViewController`）离开屏幕；它最后添加，若仍显示会盖住选中 Tab 的页面。iOS 上它是 viewControllers
+        //      之一，会被替换。
+        val plusChild = fragmentManager.findFragmentByTag("$fragmentTag-plus")
+        if (plusChild != null && plusChild.isAdded && !plusChild.isHidden && !tabBar.plusButtonActive) transaction.hide(plusChild)
         transaction.commitNowAllowingStateLoss()
     }
 
     // MARK: - CYLTabBarController properties 属性
 
+    /**
+     * [EN] `tabBarStyleType`: the classic bar (`Default` / `System`), FlatDesign (translated from iOS `CYLFlatDesignTabBar`) or
+     *      Liquid Glass (a floating glass capsule, after Kyant's AndroidLiquidGlass). FlatDesign and Liquid Glass float over
+     *      the pages, which get the bar's height as their bottom inset. See `CYLTabBarStyle.kt`.
+     * [CN] `tabBarStyleType`：经典 TabBar（`Default` / `System`）、扁平样式（由 iOS 的 `CYLFlatDesignTabBar` 翻译）或液态玻璃（浮动的玻璃胶囊，
+     *      参考 Kyant 的 AndroidLiquidGlass）。扁平样式与液态玻璃浮在页面之上，页面以 TabBar 的高度作为底部 inset。见 `CYLTabBarStyle.kt`。
+     */
     var tabBarStyleType: CYLEnums.CYLTabBarStyleType = CYLEnums.CYLTabBarStyleType.Default
+        set(value) {
+            field = value
+            tabBar.styleRenderer = CYLTabBarStyleRenderer.forStyle(value)
+            ViewCompat.requestApplyInsets(view)
+            view.requestLayout()
+        }
     /** [EN] `context`: selects the plus button (`CYLPlusButtonSubclassing.tabBarContext`). [CN] 选择 PlusButton 的 context。 */
     var context: String? = null
         set(value) { field = value; tabBar.context_ = value }
@@ -200,13 +304,16 @@ open class CYLTabBarController(val activity: FragmentActivity) {
         set(value) {
             if (value < 0 || value >= viewControllers.size) return
             val previous = field
+            // [EN] Back from the plus button's page to the same tab: its animation plays again. [CN] 从 PlusButton 页面回到同一个 Tab：其动画再次播放。
+            val fromPlusPage = tabBar.plusButtonActive
             field = value
             tabBar.plusButtonActive = false
             showSelectedPage()
             tabBar.refreshSelection()
+            cyl_applyNavigationTitleOfSelectedPage()
             // [EN] Another tab: a bar hidden by scrolling comes back (issue #13, as on iOS). [CN] 切换到其他 Tab：滚动隐藏的 TabBar 恢复显示（issue #13，与 iOS 一致）。
             if (previous != value) cyl_restoreTabBarHiddenByScroll()
-            if (previous != value) cyl_playSelectedTabBarItemAnimation(defaultSelected = false)
+            if (previous != value || fromPlusPage) cyl_playSelectedTabBarItemAnimation(defaultSelected = false)
             if (previous != value && !revertingTransition) runTransition(previous, value)
         }
 
@@ -286,7 +393,9 @@ open class CYLTabBarController(val activity: FragmentActivity) {
     private fun initWithConfiguration(configuration: Map<String, Any?>) {
         val appVersion = try { activity.packageManager.getPackageInfo(activity.packageName, 0).versionName } catch (error: Exception) { null }
         val darkMode = (activity.resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) == android.content.res.Configuration.UI_MODE_NIGHT_YES
-        val normalized = CYLTabBarConfiguration.cyl_normalizedConfiguration(configuration, "android", appVersion, darkMode)
+        // [EN] Localized texts first, as on iOS (CYLTabBarControllerLocalization). [CN] 与 iOS 一样先本地化文本。
+        val localized = CYLTabBarConfigurationLocalization.localize(activity, configuration)
+        val normalized = CYLTabBarConfiguration.cyl_normalizedConfiguration(localized, "android", appVersion, darkMode)
         @Suppress("UNCHECKED_CAST")
         var items = (normalized[CYLConstants.CYLTabBarControllerTabBarItemsAttributes] as? List<Map<String, Any?>>) ?: emptyList()
         @Suppress("UNCHECKED_CAST")
@@ -301,7 +410,22 @@ open class CYLTabBarController(val activity: FragmentActivity) {
         titlePositionAdjustment = (normalized[CYLConstants.CYLTabBarControllerTitlePositionAdjustment] as? CYLOffset) ?: CYLTabBarConfiguration.offsetValue(normalized[CYLConstants.CYLTabBarControllerTitlePositionAdjustment]) ?: CYLOffset.zero
         tabBarStyleType = (normalized[CYLConstants.CYLTabBarControllerStyleType] as? CYLEnums.CYLTabBarStyleType) ?: CYLEnums.CYLTabBarStyleType.Default
         context = normalized[CYLConstants.CYLTabBarControllerContext] as? String
+        // [EN] Before the tabs are set: the tab bar looks up the plus button of its context. [CN] 在设置 Tab 之前：TabBar 会查找其 context 的 PlusButton。
+        // [EN] A plus button page (`CYLTabBarItemPageIdentifier`) is found like a tab's page. [CN] PlusButton 的页面按 Tab 页面的方式查找。
+        CYLConfigurationPlusButton.registerIfNeeded(activity, normalized, context, items.size) { identifier ->
+            CYLTabBarPageRegistry.pagesOfTabs(listOf(mapOf(CYLConstants.CYLTabBarItemPageIdentifier to identifier)), cyl_pageRegistry, cyl_pageResolver,
+                cyl_pageLookupOrder, ArrayList(), ArrayList()).firstOrNull()
+        }
         (normalized[CYLConstants.CYLTabBarControllerTabBarItemAnimationSpeed]?.toString()?.toFloatOrNull())?.takeIf { it > 0 && it.isFinite() }?.let { tabBarItemAnimationSpeed = it }
+        // [EN] Interactions of the configuration; `CYLTabBarControllerUserInterfaceStyle` is iOS only (Android follows the system).
+        // [CN] 配置中的交互；`CYLTabBarControllerUserInterfaceStyle` 仅用于 iOS（Android 跟随系统）。
+        CYLTabBarConfiguration.tapAnimationValue(normalized[CYLConstants.CYLTabBarControllerTabButtonTapAnimation])?.let { cyl_tabButtonTapAnimationType = it }
+        CYLTabBarConfiguration.boolValue(normalized[CYLConstants.CYLTabBarControllerSwipeToSwitchTab])?.let { cyl_swipeToSwitchTabEnabled = it }
+        // [EN] Tabs that need login: a list of strings, or a comma-separated string (as iOS). [CN] 需要登录的 Tab：字符串列表或逗号分隔的字符串（与 iOS 相同）。
+        when (val loginRequired = normalized[CYLConstants.CYLTabBarControllerLoginRequiredTabBarItemIdentifiers]) {
+            is String -> cyl_loginRequiredTabBarItemIdentifiers = loginRequired.split(',').map { it.trim() }.filter { it.isNotEmpty() }
+            is List<*> -> cyl_loginRequiredTabBarItemIdentifiers = loginRequired.mapNotNull { (it as? String)?.trim()?.takeIf { identifier -> identifier.isNotEmpty() } }
+        }
         setViewControllers(pages, items)
         cyl_adoptPendingPages()
         (normalized[CYLConfigurationThemes.INFO_KEY] as? CYLConfigurationThemes.Info)?.let { cyl_applyConfigurationThemes(it) }
@@ -319,7 +443,10 @@ open class CYLTabBarController(val activity: FragmentActivity) {
         info.managerName?.let { cyl_themeManager = CYLThemeManagerCenter.themeManagerWithName(it) }
         val manager = cyl_themeManager
         for (theme in info.themes) manager.addThemeIdentifier(theme.identifier, theme)
-        val current = manager.currentThemeIdentifier
+        // [EN] A skin of an earlier configuration that this one does not have is not a choice to keep (as iOS).
+        // [CN] 之前配置中的皮肤、而本配置中没有，不属于需要保留的选择（与 iOS 相同）。
+        val stale = manager.currentTheme is CYLTabBarConfigurationTheme && info.themes.none { it.identifier == manager.currentThemeIdentifier }
+        val current = manager.currentThemeIdentifier.takeUnless { stale }
         if (current == null) manager.currentThemeIdentifier = info.initial
         val keepsChoice = current != null && current != info.base && current != info.dark
         val dark = info.dark
@@ -389,6 +516,7 @@ open class CYLTabBarController(val activity: FragmentActivity) {
         cyl_addTabBarItemAnimations()
         loadImageURLs()
         cyl_applyLaunchTabBarThemeIfNeeded()
+        cyl_applyNavigationTitleOfSelectedPage()
         viewDidLayoutSubviewsBlock?.invoke(this)
     }
 
@@ -450,6 +578,7 @@ open class CYLTabBarController(val activity: FragmentActivity) {
     // MARK: - Tab taps 点击
 
     internal fun cyl_tabButtonTapped(button: CYLTabBarItemButton) {
+        if (!button.item.isEnabled) return
         val index = button.index
         val page = viewControllers.getOrNull(index) ?: return
         val delegate = delegate
@@ -556,6 +685,13 @@ open class CYLTabBarController(val activity: FragmentActivity) {
             plusButton.cyl_plusViewControllerEverAdded = true
             tabBar.plusButtonActive = true
             tabBar.refreshSelection()
+            cyl_applyNavigationTitleOfSelectedPage()
+            // [EN] The tab selected before goes back to its unselected look, its animation too, as on iOS, where the system
+            //      deselects the tab when the plus button's page is selected. Before, its animation kept the selected frame
+            //      until another tab was selected.
+            // [CN] 之前选中的 Tab 恢复未选中外观（包括其动画），与 iOS 相同：选中 PlusButton 的页面时系统会取消该 Tab 的选中。此前其动画一直停在选中帧，
+            //      直到选中另一个 Tab。
+            cyl_playSelectedTabBarItemAnimation(defaultSelected = false)
             delegate?.tabBarController_didSelectViewController(this, child)
         }
         cyl_playTabButtonAnimationForControl(plusButton)
@@ -595,9 +731,64 @@ open class CYLTabBarController(val activity: FragmentActivity) {
     /** [EN] `-updateTabBarItemAtIndex:attributes:` (#601): one tab's title / icons in place. [CN] 原地更新一个 Tab（#601）。 */
     fun updateTabBarItemAtIndex(index: Int, attributes: Map<String, Any?>) {
         val current = tabBarItemsAttributes.getOrNull(index) ?: return
+        val previous = tabBarItemsAttributes
         val merged = ArrayList(tabBarItemsAttributes)
         merged[index] = current + attributes
         setViewControllers(viewControllers, merged)
+        cyl_postTabBarItemChanges(previous, tabBarItemsAttributes)
+    }
+
+    // MARK: - Tab change notifications (as on iOS) Tab 变化通知（与 iOS 相同）
+
+    /**
+     * [EN] Posts `name` about the tab at `index`, as iOS does: object is the tab's page; userInfo holds the controller, the
+     *      index, the page, the tab's identifier and item, plus `extra`. The plus button's page has the index
+     *      `viewControllers.size` (see `-cyl_tabIndexOfControl:`).
+     * [CN] 与 iOS 相同地发送关于下标为 `index` 的 Tab 的通知 `name`：object 为该 Tab 的页面；userInfo 包含控制器、下标、页面、Tab 的标识与 item，
+     *      以及 `extra`。PlusButton 的页面下标为 `viewControllers.size`（见 `-cyl_tabIndexOfControl:`）。
+     */
+    private fun cyl_postTabBarItemNotification(name: String, index: Int, page: Any?, extra: Map<String, Any?>) {
+        val userInfo = LinkedHashMap<String, Any?>()
+        userInfo[CYLConstants.CYLTabBarControllerKey] = this
+        userInfo[CYLConstants.CYLTabBarItemIndexKey] = index
+        (page as? Fragment)?.let { userInfo[CYLConstants.CYLTabBarItemViewControllerKey] = it }
+        tabBarItems.getOrNull(index)?.let { item ->
+            userInfo[CYLConstants.CYLTabBarItemKey] = item
+            item.cyl_tabBarItemIdentifier?.let { userInfo[CYLConstants.CYLTabBarItemIdentifier] = it }
+        }
+        userInfo.putAll(extra)
+        CYLNotificationCenter.post(name, page, userInfo)
+    }
+
+    /**
+     * [EN] Compares each tab's attributes before and after an in-place change and, for every tab that changed, posts
+     *      `CYLTabBarItemTitleDidChangeNotification` (title or selected title), `CYLTabBarItemIconDidChangeNotification`
+     *      (image keys) and `CYLTabBarItemDidChangeNotification`, in this order, with the changed attributes. A skin replaces
+     *      every tab's attributes at once on Android, so each tab is compared, not only the ones an update named.
+     * [CN] 比较每个 Tab 在原地变化前后的属性，对每个有变化的 Tab 依次发送 `CYLTabBarItemTitleDidChangeNotification`（标题或选中标题）、
+     *      `CYLTabBarItemIconDidChangeNotification`（图片 key）与 `CYLTabBarItemDidChangeNotification`，并附上变化的属性。Android 上皮肤一次替换所有 Tab
+     *      的属性，因此逐个比较所有 Tab，而不只是更新时指定的 Tab。
+     */
+    private fun cyl_postTabBarItemChanges(previous: List<Map<String, Any?>>, current: List<Map<String, Any?>>) {
+        if (previous.size != current.size) return
+        for (index in current.indices) {
+            val old = previous[index]
+            val new = current[index]
+            val changed = (old.keys + new.keys).filter { old[it] != new[it] }.associateWith { new[it] }
+            if (changed.isEmpty()) continue
+            val page = viewControllers.getOrNull(index)
+            val base = mapOf(CYLConstants.CYLTabBarItemChangedAttributesKey to changed)
+            if (CYLConstants.CYLTabBarItemTitle in changed || CYLConstants.CYLTabBarItemSelectedTitle in changed) {
+                cyl_postTabBarItemNotification(CYLConstants.CYLTabBarItemTitleDidChangeNotification, index, page, base + mapOf(
+                    CYLConstants.CYLTabBarItemTitle to new[CYLConstants.CYLTabBarItemTitle],
+                    CYLConstants.CYLTabBarItemSelectedTitle to new[CYLConstants.CYLTabBarItemSelectedTitle],
+                    CYLConstants.CYLTabBarItemOldTitleKey to old[CYLConstants.CYLTabBarItemTitle]))
+            }
+            if (changed.keys.any { it in ICON_ATTRIBUTE_KEYS }) {
+                cyl_postTabBarItemNotification(CYLConstants.CYLTabBarItemIconDidChangeNotification, index, page, base)
+            }
+            cyl_postTabBarItemNotification(CYLConstants.CYLTabBarItemDidChangeNotification, index, page, base)
+        }
     }
 
     fun updateTabBarItemForViewController(viewController: Fragment, attributes: Map<String, Any?>) {
@@ -617,6 +808,7 @@ open class CYLTabBarController(val activity: FragmentActivity) {
         item.selectedImage = selectedIcon ?: icon ?: item.selectedImage
         size?.let { item.cyl_iconSize = it }
         tabBar.refreshSelection()
+        cyl_postTabBarItemNotification(CYLConstants.CYLTabBarItemIconDidChangeNotification, index, viewControllers.getOrNull(index), emptyMap())
     }
 
     /** [EN] `-setTabBarItemIconWithURL:selectedURL:size:atIndex:`: downloads on a background thread. [CN] 后台线程下载图标。 */
@@ -665,13 +857,29 @@ open class CYLTabBarController(val activity: FragmentActivity) {
         val button = tabBar.cyl_tabBarButtonWithTabIndex(index) ?: return
         button.cyl_iconViewProvider = provider
         button.cyl_applyIconViewProvider()
+        cyl_postTabBarItemNotification(CYLConstants.CYLTabBarItemIconDidChangeNotification, index, viewControllers.getOrNull(index),
+            mapOf(CYLConstants.CYLTabBarItemIconViewProviderKey to provider))
     }
 
     fun updatePlusButtonWithAttributes(attributes: Map<String, Any?>) {
         val plus = tabBar.plusButton ?: return
+        val oldTitle = plus.cyl_title
         plus.cyl_updateTitle(attributes[CYLConstants.CYLTabBarItemTitle] as? String,
             (attributes[CYLConstants.CYLTabBarItemImage] as? String)?.let { CYLTabBarConfiguration.imageResolver.drawable(activity, it) },
             (attributes[CYLConstants.CYLTabBarItemSelectedImage] as? String)?.let { CYLTabBarConfiguration.imageResolver.drawable(activity, it) })
+        cyl_applyNavigationTitleOfSelectedPage()
+        // [EN] As on iOS: object is the plus button's page, or the plus button when it has none. [CN] 与 iOS 相同：object 为 PlusButton 的页面，没有页面时为 PlusButton。
+        val plusChild = plus.provider?.plusChildViewController()
+        val base = mapOf(CYLConstants.CYLTabBarItemChangedAttributesKey to attributes, CYLConstants.CYLPlusButtonKey to plus)
+        val post = { name: String, extra: Map<String, Any?> ->
+            cyl_postTabBarItemNotification(name, if (plusChild != null) viewControllers.size else -1, plusChild ?: plus, base + extra)
+        }
+        if (attributes.containsKey(CYLConstants.CYLTabBarItemTitle) && plus.cyl_title != oldTitle) {
+            post(CYLConstants.CYLTabBarItemTitleDidChangeNotification, mapOf(
+                CYLConstants.CYLTabBarItemTitle to plus.cyl_title, CYLConstants.CYLTabBarItemOldTitleKey to oldTitle))
+        }
+        if (attributes.keys.any { it in ICON_ATTRIBUTE_KEYS }) post(CYLConstants.CYLTabBarItemIconDidChangeNotification, emptyMap())
+        post(CYLConstants.CYLTabBarItemDidChangeNotification, emptyMap())
     }
 
     /** [EN] `-replaceViewControllerAtIndex:withViewController:attributes:` (#481). [CN] 替换页面（#481）。 */
@@ -763,9 +971,24 @@ open class CYLTabBarController(val activity: FragmentActivity) {
 
     // MARK: - CYLLogin (#19) 登录
 
-    /** [EN] Whether the user is logged in: `cyl_loginStateProvider` when set, else the cached value. [CN] 用户是否已登录：设置了 `cyl_loginStateProvider` 时用它，否则为缓存值。 */
-    var cyl_loggedIn: Boolean = false
-        get() = cyl_loginStateProvider?.invoke() ?: field
+    /**
+     * [EN] Whether the user is logged in: `cyl_loginStateProvider` when set, else the cached value. As iOS (NSUserDefaults), the
+     *      cached value is kept across launches, in the app's SharedPreferences.
+     * [CN] 用户是否已登录：设置了 `cyl_loginStateProvider` 时用它，否则为缓存值。与 iOS（NSUserDefaults）相同，缓存值保存在 App 的 SharedPreferences 中，重启后保留。
+     */
+    var cyl_loggedIn: Boolean
+        get() = cyl_loginStateProvider?.invoke() ?: loginPreferences().getBoolean(LOGGED_IN_KEY, false)
+        set(value) {
+            loginPreferences().edit().putBoolean(LOGGED_IN_KEY, value).apply()
+            // [EN] As iOS: logging out while a tab that needs login is selected selects the first tab that does not.
+            // [CN] 与 iOS 相同：选中需要登录的 Tab 时退出登录，会选中第一个不需要登录的 Tab。
+            if (value) return
+            fun requiresLogin(page: Fragment) = delegate?.tabBarController_requiresLoginToSelectViewController(this, page) ?: cyl_isLoginRequiredForViewController(page)
+            val selected = viewControllers.getOrNull(selectedIndex) ?: return
+            if (!requiresLogin(selected)) return
+            viewControllers.indexOfFirst { !requiresLogin(it) }.takeIf { it >= 0 }?.let { selectedIndex = it }
+        }
+    private fun loginPreferences() = activity.getSharedPreferences(LOGIN_PREFERENCES, android.content.Context.MODE_PRIVATE)
     /** [EN] `cyl_loginStateProvider`: your app's own login state. [CN] App 自己的登录状态。 */
     var cyl_loginStateProvider: (() -> Boolean)? = null
     /** [EN] `cyl_loginHandler`: shows the login screen, then calls the completion with the result (`cyl_presentLoginBlock`). [CN] 展示登录界面，然后用结果调用 completion（即 `cyl_presentLoginBlock`）。 */
@@ -825,7 +1048,7 @@ open class CYLTabBarController(val activity: FragmentActivity) {
     @ColorInt var cyl_tabBarItemSelectedImageColor: Int? = null
         set(value) { field = value; tabBar.refreshSelection() }
     @ColorInt var cyl_tabBarBackgroundColor: Int? = null
-        set(value) { field = value; tabBar.setBackgroundColor(value ?: 0xFFF9F9F9.toInt()) }
+        set(value) { field = value; tabBar.styleRenderer.applyBackgroundColor(tabBar, value) }
     @ColorInt var cyl_tabBarShadowColor: Int? = 0x33000000
         set(value) { field = value; tabBar.cyl_shadowColor = value; tabBar.refreshSelection() }
     var cyl_fixesOpaqueTabBarSafeAreaInsets: Boolean = true
@@ -1105,9 +1328,11 @@ open class CYLTabBarController(val activity: FragmentActivity) {
     /** [EN] `-cyl_applyTabBarTheme:`: a `CYLTabBarTheme` (null restores the launch attributes). [CN] 应用主题（null 恢复启动时的属性）。 */
     fun cyl_applyTabBarTheme(theme: Any?) {
         if (originalAttributes == null) originalAttributes = tabBarItemsAttributes
+        val previous = tabBarItemsAttributes
         val tabBarTheme = theme as? CYLTabBarTheme
         if (tabBarTheme == null) {
             originalAttributes?.let { setViewControllers(viewControllers, it) }
+            cyl_postThemeDidApply(previous, null)
             return
         }
         tabBarTheme.cyl_tabBarItemsAttributesForTabBarController(this)?.let { attributes ->
@@ -1122,8 +1347,36 @@ open class CYLTabBarController(val activity: FragmentActivity) {
             appearance.selectedTitleColor?.let { cyl_tabBarItemSelectedTitleColor = it }
             appearance.iconColor?.let { cyl_tabBarItemImageColor = it }
             appearance.selectedIconColor?.let { cyl_tabBarItemSelectedImageColor = it }
+            // [EN] The bar's images and item layout go to the bar's appearance, which the classic and FlatDesign styles draw. [CN] TabBar 的图片与 Item 布局写入 TabBar 的外观，由经典与扁平样式绘制。
+            if (appearance.backgroundImage != null || appearance.shadowImage != null || appearance.stackedItemPositioningCentered) {
+                val current = tabBar.standardAppearance ?: CYLTabBarAppearance()
+                tabBar.standardAppearance = current.copy(
+                    backgroundImage = appearance.backgroundImage ?: current.backgroundImage,
+                    shadowImage = appearance.shadowImage ?: current.shadowImage,
+                    stackedItemPositioningCentered = appearance.stackedItemPositioningCentered || current.stackedItemPositioningCentered,
+                    stackedItemWidth = if (appearance.stackedItemPositioningCentered) appearance.stackedItemWidth else current.stackedItemWidth,
+                    stackedItemSpacing = if (appearance.stackedItemPositioningCentered) appearance.stackedItemSpacing else current.stackedItemSpacing,
+                )
+            }
         }
         tabBarTheme.cyl_customizeTabBarController(this)
+        cyl_postThemeDidApply(previous, tabBarTheme)
+    }
+
+    /**
+     * [EN] The per-tab notifications of the tabs a skin changed, then `CYLTabBarControllerThemeDidApplyNotification` about every
+     *      tab (a skin applies to all of them), with their indexes and identifiers, as on iOS.
+     * [CN] 先为皮肤改变的每个 Tab 发送各自的通知，再发送关于所有 Tab（皮肤作用于全部 Tab）的 `CYLTabBarControllerThemeDidApplyNotification`，附上其下标与标识，
+     *      与 iOS 相同。
+     */
+    private fun cyl_postThemeDidApply(previous: List<Map<String, Any?>>, theme: CYLTabBarTheme?) {
+        cyl_postTabBarItemChanges(previous, tabBarItemsAttributes)
+        if (viewControllers.isEmpty()) return
+        CYLNotificationCenter.post(CYLConstants.CYLTabBarControllerThemeDidApplyNotification, this, mapOf(
+            CYLConstants.CYLTabBarControllerKey to this,
+            CYLConstants.CYLTabBarThemeKey to theme,
+            CYLConstants.CYLTabBarItemIndexesKey to viewControllers.indices.toList(),
+            CYLConstants.CYLTabBarItemIdentifiersKey to tabBarItems.mapNotNull { it.cyl_tabBarItemIdentifier }))
     }
 
     // MARK: - Asynchronous pages 异步页面
@@ -1191,6 +1444,13 @@ open class CYLTabBarController(val activity: FragmentActivity) {
         internal fun cyl_liveTabBarControllers(): List<CYLTabBarController> = synchronized(active) { active.entries.sortedBy { it.value }.map { it.key } }
 
         /** [EN] `+cyl_tabBarControllerForContext:`: the most recent live controller of that context. [CN] 该 context 最近创建且仍存活的控制器。 */
+        /** [EN] Where the login state is cached; the key is the iOS NSUserDefaults key. [CN] 登录状态的缓存位置；键与 iOS 的 NSUserDefaults 键相同。 */
+        private const val LOGIN_PREFERENCES = "CYLTabBarController"
+        private const val LOGGED_IN_KEY = "CYLTabBarControllerLoggedIn"
+        /** [EN] The keys whose change posts `CYLTabBarItemIconDidChangeNotification`, as on iOS. [CN] 变化时发送 `CYLTabBarItemIconDidChangeNotification` 的 key，与 iOS 相同。 */
+        private val ICON_ATTRIBUTE_KEYS = setOf(CYLConstants.CYLTabBarItemImage, CYLConstants.CYLTabBarItemSelectedImage,
+            CYLConstants.CYLTabBarItemDarkImage, CYLConstants.CYLTabBarItemSelectedDarkImage, CYLConstants.CYLTabBarItemImageURL,
+            CYLConstants.CYLTabBarItemSelectedImageURL, CYLConstants.CYLTabBarItemImageURLSize)
         @JvmStatic fun cyl_tabBarControllerForContext(context: String?): CYLTabBarController? = synchronized(active) {
             active.entries.filter { (it.key.context ?: CYLPlusButton.DEFAULT_TAB_BAR_CONTEXT) == (context ?: CYLPlusButton.DEFAULT_TAB_BAR_CONTEXT) }.maxByOrNull { it.value }?.key
         }
@@ -1275,8 +1535,33 @@ class CYLTabBarControllerView(context: Context) : LinearLayout(context) {
     internal var controller: CYLTabBarController? = null
     private var routedToPlus = false
 
+    private val overlaysPages: Boolean get() = controller?.tabBar?.styleRenderer?.drawsPagesUnderTabBar == true
+
+    /** [EN] FlatDesign and Liquid Glass: the pages fill the view and the bar floats over their bottom. [CN] 扁平样式与液态玻璃：页面铺满视图，TabBar 浮在页面底部之上。 */
+    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+        val controller = controller
+        if (!overlaysPages || controller == null) return super.onMeasure(widthMeasureSpec, heightMeasureSpec)
+        val width = MeasureSpec.getSize(widthMeasureSpec)
+        val height = MeasureSpec.getSize(heightMeasureSpec)
+        val innerWidth = MeasureSpec.makeMeasureSpec(width - paddingLeft - paddingRight, MeasureSpec.EXACTLY)
+        controller.pagesContainer.measure(innerWidth, MeasureSpec.makeMeasureSpec(height - paddingTop, MeasureSpec.EXACTLY))
+        controller.tabBar.measure(innerWidth, MeasureSpec.makeMeasureSpec(height, MeasureSpec.AT_MOST))
+        setMeasuredDimension(width, height)
+    }
+
+    override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
+        val controller = controller
+        if (!overlaysPages || controller == null) return super.onLayout(changed, l, t, r, b)
+        val pages = controller.pagesContainer
+        pages.layout(paddingLeft, paddingTop, paddingLeft + pages.measuredWidth, paddingTop + pages.measuredHeight)
+        val bar = controller.tabBar
+        bar.layout(paddingLeft, height - bar.measuredHeight, paddingLeft + bar.measuredWidth, height)
+    }
+
     init {
         orientation = VERTICAL
+        // [EN] The tab bar's plus button draws above the bar, over the pages. [CN] TabBar 的 PlusButton 绘制在 TabBar 上方、页面之上。
+        clipChildren = false
     }
 
     override fun dispatchTouchEvent(event: MotionEvent): Boolean {

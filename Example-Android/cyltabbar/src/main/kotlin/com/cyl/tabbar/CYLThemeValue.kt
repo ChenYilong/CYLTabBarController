@@ -73,7 +73,7 @@ import java.util.concurrent.ConcurrentHashMap
  */
 
 /** [EN] Android only: a theme that is an Android style; value names are its theme attributes. [CN] 仅 Android：以 Android style 表示的主题；值名称为其主题属性。 */
-data class CYLThemeStyle(@StyleRes val styleRes: Int)
+data class CYLThemeStyle(@param:StyleRes val styleRes: Int)
 
 /** [EN] Android only: a theme object that answers value names itself. [CN] 仅 Android：自行返回值名称对应值的主题对象。 */
 fun interface CYLThemeValueProviding {
@@ -220,7 +220,7 @@ fun interface CYLThemeItemDecoration {
 }
 
 /** [EN] Android only: a text color span that follows the theme value `name` (QMUI's skin spans). [CN] 仅 Android：跟随主题值 `name` 的文字颜色 span（QMUI 的换肤 span）。 */
-class CYLThemeColorSpan(val name: String, @ColorInt private var color: Int = Color.BLACK) : CharacterStyle(), UpdateAppearance, CYLThemeSpan {
+class CYLThemeColorSpan(val name: String, @param:ColorInt private var color: Int = Color.BLACK) : CharacterStyle(), UpdateAppearance, CYLThemeSpan {
     override fun updateDrawState(paint: TextPaint) { paint.color = color }
 
     override fun cyl_themeDidChange(view: TextView, manager: CYLThemeManager?) {
@@ -387,9 +387,13 @@ object CYLThemeValues {
 
     private val builtInHandlers: Map<String, CYLThemeRuleHandler> = mapOf(
         CYLThemeValueBuilder.BACKGROUND to CYLThemeRuleHandler { view, _, value ->
-            val background = view.background
-            val color = (value.raw as? Int) ?: (value.raw as? CYLThemeColor)?.cyl_rawColor
-            if (color != null && background is GradientDrawable) background.setColor(color) else setBackgroundKeepingPadding(view, value.drawable)
+            val gradient = view.background as? GradientDrawable
+            val color = when (val raw = value.raw) {
+                is Int -> raw
+                is CYLThemeColor -> raw.cyl_rawColor
+                else -> null
+            }
+            if (gradient != null && color != null) gradient.setColor(color) else setBackgroundKeepingPadding(view, value.drawable)
         },
         CYLThemeValueBuilder.BG_TINT_COLOR to CYLThemeRuleHandler { view, _, value -> view.backgroundTintList = value.colorStateList },
         CYLThemeValueBuilder.TEXT_COLOR to CYLThemeRuleHandler { view, _, value -> value.colorStateList?.let { (view as? TextView)?.setTextColor(it) } },

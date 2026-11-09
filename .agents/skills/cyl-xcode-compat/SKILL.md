@@ -77,6 +77,11 @@ to 15.0 (FlatDesign's project level, `Example-Swift-04`'s app target).
 - No effective deployment target newer than the CI SDK: no `IPHONEOS_DEPLOYMENT_TARGET` of 27 or more, not even at the
   project level when a target overrides it.
 - Scheme files (`*.xcscheme`) may keep `version="1.7"`; Xcode 15 and later read it.
+- **Exception**: `CrossPlatform/flutter_cyltabbar/example*/ios/Runner.xcodeproj` (`example`, `example_pag`, `example_rive`) keeps `objectVersion = 54` (Xcode 12
+  format, no folder sync), because `flutter build` sets it back to 54 on every build; its `compatibilityVersion` is
+  still `"Xcode 3.2"`. `example` uses Swift Package Manager (`XCLocalSwiftPackageReference` to Flutter's generated package),
+  which Flutter adds; `example_pag` and `example_rive` use CocoaPods. The React Native examples (`CrossPlatform/react-native-cyltabbar/example*/ios`) follow the rule
+  (46), with React Native's minimum deployment target, 15.1.
 
 **Check it** (each line must print `46` and `"Xcode 3.2"` and nothing else):
 
@@ -92,3 +97,7 @@ done
   `LC_ALL=C.UTF-8`) and make sure every file in its build phases exists on disk.
 - Say in the PR that the project was not opened in Xcode when it could not be; the `Demo …` CI jobs on `macos-26` are
   the real check.
+
+## Podfile, app icon, launch screen
+
+Every Xcode project checks its Podfile (top lines `platform :ios, '15.0'`, `ENV['SWIFT_VERSION'] = '5'`, `project '<name>.xcodeproj'`; a `post_install` hook that sets `IPHONEOS_DEPLOYMENT_TARGET` to 15.0 on every pod), and copies the ObjC example's app icon and launch screen when it has none. Full rule and exceptions (one `post_install` only, React Native minimum 15.1): AGENTS.md, "Xcode projects: Podfile, app icon, launch screen".

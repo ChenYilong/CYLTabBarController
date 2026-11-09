@@ -146,6 +146,9 @@ Pod::Spec.new do |s|
     # 公开：PAG 的 key 与 `CYLTabBarItemsAttributesAddingPAGFiles()` 位于这里，而不是 Core 中。
     pag.public_header_files = 'CYLTabBarController/CYLTabBarItemAnimation/PAG/*.h'
     pag.dependency 'libpag', '>= 4.0'
+    # [EN] libpag's PAGSurface.h names the deprecated OpenGL ES classes; building its module would warn here.
+    # [CN] libpag 的 PAGSurface.h 引用了已弃用的 OpenGL ES 类，编译其模块时会在此产生警告。
+    pag.pod_target_xcconfig = { 'GCC_PREPROCESSOR_DEFINITIONS' => '$(inherited) GLES_SILENCE_DEPRECATION=1' }
   end
 
   # FIX: issue #604 — the same with PAG Enterprise (`libpag-enterprise`: audio, 3D, movie layers…), like the two Lottie
@@ -222,7 +225,11 @@ Pod::Spec.new do |s|
     'OTHER_LIBTOOLFLAGS' => '-no_warning_for_no_symbols',
     'WARNING_CFLAGS' => [
     '-Werror=undeclared-selector',
-    '-Werror=incomplete-implementation'
+    '-Werror=incomplete-implementation',
+    # libpag's umbrella header `libpag.h` leaves out its C++ headers (pag/*.h), so every file of this pod that sees the
+    # libpag module warns "umbrella header for module 'libpag' does not include header". Third-party module map: not ours to fix.
+    # libpag 的 umbrella 头文件 `libpag.h` 未包含其 C++ 头文件（pag/*.h），本 pod 中看到 libpag 模块的文件都会报该警告。属于第三方模块映射，不由本库修复。
+    '-Wno-incomplete-umbrella'
     ]
   }
   

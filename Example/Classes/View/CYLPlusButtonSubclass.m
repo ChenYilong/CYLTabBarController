@@ -182,11 +182,12 @@ static CGFloat const CYLDemoPlusButtonWidth = 55;
     [button removeTarget:self action:action forControlEvents:UIControlEventTouchUpInside];
     [button addTarget:button action:action forControlEvents:UIControlEventTouchUpInside];
     
-    if ([CYLPlusButton plusChildViewControllerForTabBarContext:[self matchedTabBarContext]] && button.isLayoutCentered) {
-        [button cyl_setUserInteractionDisabled:NO];
-    } else {
-        [button cyl_setUserInteractionDisabled:YES];
-    }
+    // [EN] Every tap reaches `tabBarController:didSelectControl:`, which bumps the plus button's badge (#535,
+    //      MainTabBarController.m). It used the deprecated `cyl_userInteractionDisabled`, set from the layout at creation:
+    //      this raised button never reported, so the badge stayed at 1.
+    // [CN] 每次点击都会到达 `tabBarController:didSelectControl:`，并增加 PlusButton 的角标（#535，MainTabBarController.m）。以前使用已废弃的
+    //      `cyl_userInteractionDisabled`，并在创建时按布局决定：这个凸起的按钮从不上报，角标一直是 1。
+    button.reportsTapsToDelegate = YES;
     
     // [CN] ===== iOS 15 以下：手动设置 imageView / titleLabel 位置 =====
     // [EN] ===== Below iOS 15: manually set the imageView / titleLabel positions =====
@@ -283,11 +284,7 @@ static CGFloat const CYLDemoPlusButtonWidth = 55;
  [button removeTarget:self action:action forControlEvents:UIControlEventTouchUpInside];
  [button addTarget:button action:action forControlEvents:UIControlEventTouchUpInside];
  
- if (CYLPlusChildViewController && button.isLayoutCentered) {
- [button cyl_setUserInteractionDisabled:NO];
- } else {
- button.cyl_shouldNotSelect = YES;
- }
+ button.reportsTapsToDelegate = YES;
  return button;
  }
  
@@ -420,10 +417,15 @@ static CGFloat const CYLDemoPlusButtonWidth = 55;
 + (UIViewController *)plusChildViewController {
     UIViewController *plusChildViewController = [[UIViewController alloc] init];
 //    plusChildViewController.view.backgroundColor = [UIColor redColor];
-    plusChildViewController.navigationItem.title = CYLLocalizedString(@"PlusChildViewController");
+    // [EN] The navigation bar title is the plus button's title, also after it changes (a skin, `-updatePlusButtonWithAttributes:`).
+    // [CN] 导航栏标题即 PlusButton 的标题，标题变化后（换肤、`-updatePlusButtonWithAttributes:`）也会同步。
+    CYL_NAVIGATION_TITLE_FOLLOWS_TAB_BAR_ITEM(plusChildViewController);
     UIViewController *plusChildNavigationController = [[UINavigationController alloc]
                                                    initWithRootViewController:plusChildViewController];
-    plusChildNavigationController.title = NSLocalizedString(@"发布", nil);
+    // [EN] The library's localization (AGENTS.md): NSLocalizedString read the app's own table, which has no translation, so
+    //      FlatDesign showed "发布" under the plus button in every language. [CN] 使用库的本地化（AGENTS.md）：NSLocalizedString 读取
+    //      App 自己的表，没有译文，扁平样式下 PlusButton 下方在所有语言中都显示「发布」。
+    plusChildNavigationController.title = CYLLocalizedString(@"发布");
     return plusChildNavigationController;
 }
 
@@ -468,10 +470,6 @@ static CGFloat const CYLDemoPlusButtonWidth = 55;
 //+ (NSString *)tabBarContext {
 //    return NSStringFromClass([CYLMainRootViewController class]);
 //}
-
-- (CGRect)touchableRect {
-    return self.frame;
-}
 
 + (UIImage *)selectedContentImage {
     UIImage *hlightButtonImage = [UIImage imageNamed:@"post_highlight"];

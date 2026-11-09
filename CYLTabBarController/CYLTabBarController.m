@@ -83,14 +83,42 @@ NSString *const CYLTabBarControllerPageResolver = @"CYLTabBarControllerPageResol
 NSString *const CYLTabBarControllerPageLookupOrder = @"CYLTabBarControllerPageLookupOrder";
 NSString *const CYLTabBarControllerAutomaticPageRegistration = @"CYLTabBarControllerAutomaticPageRegistration";
 NSString *const CYLTabBarControllerTabBarItemAnimationSpeed = @"CYLTabBarControllerTabBarItemAnimationSpeed";
+NSString *const CYLTabBarControllerPlusButton = @"CYLTabBarControllerPlusButton";
+NSString *const CYLTabBarControllerPlusButtonAction = @"CYLTabBarControllerPlusButtonAction";
+/// [EN] Defined in CYLPlusButton.m: the plus button page, passed with its attributes. [CN] 定义在 CYLPlusButton.m：随属性传递的 PlusButton 页面。
+FOUNDATION_EXTERN NSString *const CYLConfigurationPlusButtonPageKey;
+NSString *const CYLPlusButtonBackgroundImage = @"CYLPlusButtonBackgroundImage";
+NSString *const CYLPlusButtonIndexInTabBar = @"CYLPlusButtonIndexInTabBar";
+NSString *const CYLPlusButtonCenterYMultiplier = @"CYLPlusButtonCenterYMultiplier";
+NSString *const CYLPlusButtonCenterYOffset = @"CYLPlusButtonCenterYOffset";
+NSString *const CYLPlusButtonAlignsTitle = @"CYLPlusButtonAlignsTitle";
+NSString *const CYLPlusButtonKeepsTitleVisible = @"CYLPlusButtonKeepsTitleVisible";
+NSString *const CYLPlusButtonShowsSelection = @"CYLPlusButtonShowsSelection";
+/// [EN] Set from `CYLPlusButtonShowsSelection` of a configuration. [CN] 由配置中的 `CYLPlusButtonShowsSelection` 设置。
+static const void *const CYLPlusButtonShowsSelectionKey = &CYLPlusButtonShowsSelectionKey;
+NSString *const CYLPlusButtonSize = @"CYLPlusButtonSize";
+NSString *const CYLPlusButtonImageSize = @"CYLPlusButtonImageSize";
+NSString *const CYLTabBarControllerUserInterfaceStyle = @"CYLTabBarControllerUserInterfaceStyle";
+NSString *const CYLTabBarControllerTabButtonTapAnimation = @"CYLTabBarControllerTabButtonTapAnimation";
+NSString *const CYLTabBarControllerSwipeToSwitchTab = @"CYLTabBarControllerSwipeToSwitchTab";
+NSString *const CYLTabBarControllerLoginRequiredTabBarItemIdentifiers = @"CYLTabBarControllerLoginRequiredTabBarItemIdentifiers";
 NSString *const CYLTabBarControllerThemes = @"CYLTabBarControllerThemes";
 NSString *const CYLTabBarControllerThemeIdentifier = @"CYLTabBarControllerThemeIdentifier";
 NSString *const CYLTabBarControllerDarkThemeIdentifier = @"CYLTabBarControllerDarkThemeIdentifier";
 NSString *const CYLTabBarControllerThemeManagerName = @"CYLTabBarControllerThemeManagerName";
+NSString *const CYLTabBarControllerLocalization = @"CYLTabBarControllerLocalization";
+NSString *const CYLTabBarLocalizationTableName = @"CYLTabBarLocalizationTableName";
+NSString *const CYLTabBarLocalizationPath = @"CYLTabBarLocalizationPath";
+NSString *const CYLTabBarLocalizationBundleName = @"CYLTabBarLocalizationBundleName";
 NSString *const CYLTabBarThemeIdentifier = @"CYLTabBarThemeIdentifier";
 NSString *const CYLTabBarThemeValues = @"CYLTabBarThemeValues";
 NSString *const CYLTabBarBackgroundColor = @"CYLTabBarBackgroundColor";
 NSString *const CYLTabBarShadowColor = @"CYLTabBarShadowColor";
+NSString *const CYLTabBarBackgroundImage = @"CYLTabBarBackgroundImage";
+NSString *const CYLTabBarShadowImage = @"CYLTabBarShadowImage";
+NSString *const CYLTabBarStackedItemPositioning = @"CYLTabBarStackedItemPositioning";
+NSString *const CYLTabBarStackedItemWidth = @"CYLTabBarStackedItemWidth";
+NSString *const CYLTabBarStackedItemSpacing = @"CYLTabBarStackedItemSpacing";
 NSString *const CYLTabBarAnimationOptions = @"CYLTabBarAnimationOptions";
 /// [EN] Private: marks a tab left out by `CYLTabBarItemPlatforms` / `CYLTabBarItemMinimumAppVersion` (set by the normalization).
 /// [CN] 私有：标记被 `CYLTabBarItemPlatforms` / `CYLTabBarItemMinimumAppVersion` 排除的 Tab（由规范化设置）。
@@ -193,6 +221,85 @@ static void CYLSetNeedsUpdateTabBarItemSelectedTitles(CYLTabBarController *tabBa
     });
 }
 NSNotificationName const CYLTabBarLoginStateDidChangeNotification = @"CYLTabBarLoginStateDidChangeNotification";
+NSNotificationName const CYLTabBarItemTitleDidChangeNotification = @"CYLTabBarItemTitleDidChangeNotification";
+NSNotificationName const CYLTabBarItemDidChangeNotification = @"CYLTabBarItemDidChangeNotification";
+NSString *const CYLTabBarItemChangedAttributesKey = @"CYLTabBarItemChangedAttributesKey";
+NSString *const CYLTabBarItemIndexKey = @"CYLTabBarItemIndexKey";
+NSNotificationName const CYLTabBarItemIconDidChangeNotification = @"CYLTabBarItemIconDidChangeNotification";
+NSString *const CYLTabBarItemIndexesKey = @"CYLTabBarItemIndexesKey";
+NSString *const CYLTabBarItemIdentifiersKey = @"CYLTabBarItemIdentifiersKey";
+NSString *const CYLTabBarControllerKey = @"CYLTabBarControllerKey";
+NSString *const CYLTabBarItemViewControllerKey = @"CYLTabBarItemViewControllerKey";
+NSString *const CYLTabBarItemKey = @"CYLTabBarItemKey";
+NSString *const CYLPlusButtonKey = @"CYLPlusButtonKey";
+NSString *const CYLTabBarItemOldTitleKey = @"CYLTabBarItemOldTitleKey";
+NSString *const CYLTabBarItemIconViewProviderKey = @"CYLTabBarItemIconViewProviderKey";
+NSNotificationName const CYLTabBarControllerThemeDidApplyNotification = @"CYLTabBarControllerThemeDidApplyNotification";
+NSString *const CYLTabBarThemeKey = @"CYLTabBarThemeKey";
+
+static const void *CYLNavigationTitleFollowsTabBarItemTitleKey = &CYLNavigationTitleFollowsTabBarItemTitleKey;
+
+/// [EN] Sets the navigation bar title of a page that follows its tab title. [CN] 为跟随 Tab 标题的页面设置导航栏标题。
+static void CYLApplyNavigationTitleOfFollowingPage(UIViewController *viewController, NSString *_Nullable title) {
+    UIViewController *page = [viewController cyl_getViewControllerInsteadOfNavigationController] ?: viewController;
+    if (title.length > 0 && [objc_getAssociatedObject(page, CYLNavigationTitleFollowsTabBarItemTitleKey) boolValue]) {
+        page.navigationItem.title = title;
+    }
+}
+
+/*!
+ * [EN] Posts a tab notification. The object is the tab's page; userInfo names exactly what changed: the tab bar controller,
+ *      the tab's index, its entry in `viewControllers`, its tab bar item (`cyl_tabBarItem` on FlatDesign), plus `extra`.
+ * [CN] 发送 Tab 通知。object 为该 Tab 的页面；userInfo 精确指出变化的对象：TabBar 控制器、Tab 下标、它在 `viewControllers` 中的控制器、
+ *      它的 tabBarItem（扁平样式为 `cyl_tabBarItem`），以及 `extra`。
+ */
+static void CYLPostTabBarItemNotification(NSNotificationName name, CYLTabBarController *tabBarController, NSUInteger index,
+                                          NSDictionary *_Nullable extra) {
+    if (index >= tabBarController.viewControllers.count) {
+        return;
+    }
+    UIViewController *viewController = tabBarController.viewControllers[index];
+    UIViewController *page = [viewController cyl_getViewControllerInsteadOfNavigationController] ?: viewController;
+    NSMutableDictionary *userInfo = [NSMutableDictionary dictionary];
+    userInfo[CYLTabBarControllerKey] = tabBarController;
+    userInfo[CYLTabBarItemIndexKey] = @(index);
+    userInfo[CYLTabBarItemViewControllerKey] = viewController;
+    // [EN] The tab's identifier (`CYLTabBarItemIdentifier`), more exact than its index. [CN] Tab 的 ID（`CYLTabBarItemIdentifier`），比下标更精确。
+    NSString *identifier = viewController.cyl_tabBarItemIdentifier ?: page.cyl_tabBarItemIdentifier;
+    if (identifier.length > 0) {
+        userInfo[CYLTabBarItemIdentifier] = identifier;
+    }
+    id tabBarItem = viewController.tabBarItem;
+#if CYL_FLATDESIGN_AVAILABLE
+    if (CYLTabBarStyleTypeFlatDesign == tabBarController.tabBarStyleType && viewController.cyl_tabBarItem) {
+        tabBarItem = viewController.cyl_tabBarItem;
+    }
+#endif
+    if (tabBarItem) {
+        userInfo[CYLTabBarItemKey] = tabBarItem;
+    }
+    if (extra.count > 0) {
+        [userInfo addEntriesFromDictionary:extra];
+    }
+    [[NSNotificationCenter defaultCenter] postNotificationName:name object:page userInfo:[userInfo copy]];
+}
+
+/// [EN] The image keys of `attributes` (an icon change), empty when there is none. [CN] `attributes` 中的图片 key（图标变化），没有时为空。
+static NSDictionary *CYLTabBarItemIconAttributes(NSDictionary *attributes) {
+    static NSArray<NSString *> *iconKeys;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        iconKeys = @[ CYLTabBarItemImage, CYLTabBarItemSelectedImage, CYLTabBarItemDarkImage, CYLTabBarItemSelectedDarkImage,
+                      CYLTabBarItemImageURL, CYLTabBarItemSelectedImageURL, CYLTabBarItemImageURLSize ];
+    });
+    NSMutableDictionary *iconAttributes = [NSMutableDictionary dictionary];
+    for (NSString *key in iconKeys) {
+        if (attributes[key]) {
+            iconAttributes[key] = attributes[key];
+        }
+    }
+    return [iconAttributes copy];
+}
 NSString *const CYLTabBarLottieDarkURL = @"CYLTabBarLottieDarkURL";
 NSString *const CYLTabBarLottieDarkFilePath = @"CYLTabBarLottieDarkFilePath";
 NSString *const CYLTabBarLottieDarkColors = @"CYLTabBarLottieDarkColors";
@@ -270,7 +377,51 @@ static void CYLSetAdditionalSafeAreaBottom(UIViewController *viewController, CGF
 #else
 #endif
 
+/*!
+ * [EN] FIX: issue #91 — iOS 26 and later put the tab bar in a wrapper view only as tall as the bar, so UIKit never asks
+ *      `-[CYLTabBar hitTest:withEvent:]` about a point above the bar: the raised part of the plus button and a touchable
+ *      area grown with `touchableAreaOutsets` / `touchableAreaScale` went to the page behind (or to the scroll edge
+ *      effect's touch blocker). This transparent view, in front of everything in the controller's view, asks the tab bar
+ *      about points above the bar and keeps only the plus button (and its subviews); every other point returns nil, so
+ *      the pages get their touches as before. The classic style and FlatDesign do not need it: their bar's superview is
+ *      the controller's view, which already asks the tab bar.
+ * [CN] FIX: issue #91 — iOS 26 及以上把 TabBar 放在只有 TabBar 高度的容器视图中，UIKit 不会就 TabBar 上方的点询问
+ *      `-[CYLTabBar hitTest:withEvent:]`：PlusButton 凸出的部分、以及用 `touchableAreaOutsets` / `touchableAreaScale` 扩大的点击区域，
+ *      触摸会交给后面的页面（或滚动边缘效果的触摸拦截视图）。这个透明视图位于控制器视图的最前面，就 TabBar 上方的点询问 TabBar，
+ *      只保留 PlusButton（及其子视图）；其他点返回 nil，页面照常接收触摸。经典样式与扁平样式不需要它：其 TabBar 的父视图就是控制器的视图，
+ *      已经会询问 TabBar。
+ */
+@interface CYLTabBarOverflowTouchView : UIView
+@property (nonatomic, weak) UITabBar *tabBar;
+@end
+
+@implementation CYLTabBarOverflowTouchView
+
+- (UIView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event {
+    UITabBar *tabBar = self.tabBar;
+    if (!tabBar.window || tabBar.hidden || tabBar.alpha < 0.01 || !tabBar.userInteractionEnabled
+        || ![tabBar isKindOfClass:[CYLTabBar class]]) {
+        return nil;
+    }
+    CGPoint tabBarPoint = [self convertPoint:point toView:tabBar];
+    // [EN] On the bar itself UIKit already routes the touch. [CN] TabBar 本身范围内的触摸 UIKit 已经能正确分发。
+    if ([tabBar pointInside:tabBarPoint withEvent:event]) {
+        return nil;
+    }
+    UIView *plusButton = ((CYLTabBar *)tabBar).plusButton;
+    if (!plusButton) {
+        return nil;
+    }
+    UIView *hit = [tabBar hitTest:tabBarPoint withEvent:event];
+    return [hit isDescendantOfView:plusButton] ? hit : nil;
+}
+
+@end
+
 @interface CYLTabBarController () <UITabBarControllerDelegate>
+
+/// [EN] iOS 26+: routes points above the bar to the plus button (issue #91). [CN] iOS 26+：把 TabBar 上方的点交给 PlusButton（issue #91）。
+@property (nonatomic, strong, nullable) CYLTabBarOverflowTouchView *cyl_overflowTouchView;
 
 /// [EN] Page registry state (docs/Tab-Page-Registry.md): whether the tabs came from page IDs, the sources, the pages by
 ///      ID (for `-reloadTabBarItemsWithAttributes:`) and the skipped tabs.
@@ -1175,6 +1326,8 @@ static const void *const CYLPlusButtonGlassLayoutRetryPendingKey = &CYLPlusButto
     // Issue #601: tab buttons created again (e.g. after a rotation) get their icon views again.
     [self cyl_setNeedsUpdateTabBarItemIconViews];
     [self cyl_fixOpaqueTabBarSafeAreaInsetsIfNeeded];
+    // [EN] FIX: issue #91 — points above the bar reach the plus button on iOS 26+ too. [CN] iOS 26+ 上 TabBar 上方的点也能到达 PlusButton。
+    [self cyl_updateOverflowTouchView];
     CYL_IF_NOT_FLATDESIGN_BEGIN     //Not CYLTabBarStyleTypeFlatDesign
         // FIX: issue #585, #543 (follow-up to #93, #392)
         // [EN] The forced `-layoutSubviews` below is an iOS 10 workaround: #93 (iOS 10.0–10.2) and #392 (iOS 10.3.x, items
@@ -1277,6 +1430,36 @@ static const void *const CYLPlusButtonGlassLayoutRetryPendingKey = &CYLPlusButto
         !self.viewDidLayoutSubviewsBlock ?: self.viewDidLayoutSubviewsBlock(self);
     }
 
+}
+
+/*!
+ * [EN] FIX: issue #91 — installs `CYLTabBarOverflowTouchView` in front of the controller's view while the tab bar lives in
+ *      a wrapper view of its own (iOS 26 and later), and removes it otherwise.
+ * [CN] FIX: issue #91 — TabBar 位于自己的容器视图中时（iOS 26 及以上）在控制器视图最前面安装 `CYLTabBarOverflowTouchView`，否则移除。
+ */
+- (void)cyl_updateOverflowTouchView {
+    UITabBar *tabBar = self.tabBar;
+    BOOL needed = self.isViewLoaded && tabBar.superview && tabBar.superview != self.view;
+    CYLTabBarOverflowTouchView *touchView = self.cyl_overflowTouchView;
+    if (!needed) {
+        [touchView removeFromSuperview];
+        self.cyl_overflowTouchView = nil;
+        return;
+    }
+    if (!touchView) {
+        touchView = [[CYLTabBarOverflowTouchView alloc] initWithFrame:self.view.bounds];
+        touchView.backgroundColor = UIColor.clearColor;
+        touchView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+        touchView.accessibilityElementsHidden = YES;   // [EN] Not a control: VoiceOver reads the plus button. [CN] 不是控件：VoiceOver 读 PlusButton。
+        self.cyl_overflowTouchView = touchView;
+    }
+    touchView.tabBar = tabBar;
+    if (touchView.superview != self.view) {
+        [self.view addSubview:touchView];
+    } else if (self.view.subviews.lastObject != touchView) {
+        [self.view bringSubviewToFront:touchView];
+    }
+    touchView.frame = self.view.bounds;
 }
 
 - (void)viewWillLayoutSubviews {
@@ -1813,6 +1996,9 @@ static const void *const CYLPlusButtonGlassLayoutRetryPendingKey = &CYLPlusButto
             // [EN] The title shown while the tab is selected.
             // [CN] 选中时显示的标题。
             CYLRememberTabBarItemSelectedTitle(viewController, attributes, setup.title);
+            // [EN] A page that follows its tab title gets it as its navigation bar title as soon as the tab is set up.
+            // [CN] 跟随 Tab 标题的页面在 Tab 设置时即获得导航栏标题。
+            CYLApplyNavigationTitleOfFollowingPage(viewController, setup.title);
             setup.titlePositionAdjustment = [attributes[CYLTabBarItemTitlePositionAdjustment] UIOffsetValue];
             setup.imagePositionAdjustment = [attributes[CYLTabBarItemImagePositionAdjustment] UIOffsetValue];
             setup.imageInsets = [attributes[CYLTabBarItemImageInsets] UIEdgeInsetsValue];
@@ -1827,6 +2013,9 @@ static const void *const CYLPlusButtonGlassLayoutRetryPendingKey = &CYLPlusButto
          *      See: https://github.com/ChenYilong/CYLTabBarController/issues/563
          **/
         setup.title = @"";
+        // [EN] The plus button's page that follows its tab title gets the plus button's title.
+        // [CN] 跟随 Tab 标题的 PlusButton 页面获得 PlusButton 的标题。
+        CYLApplyNavigationTitleOfFollowingPage(viewController, [CYLPlusButton plusButtonForOwner:self].cyl_title);
         // [EN] Guarded by the data (`-cyl_tabBarItemsAttributesIncludePlusSlot`), not by the style.
         // [CN] 按数据判断（`-cyl_tabBarItemsAttributesIncludePlusSlot`），而不是按样式。
         if (![self cyl_tabBarItemsAttributesIncludePlusSlot]) {
@@ -2145,10 +2334,48 @@ static NSMutableDictionary<NSString *, NSMutableArray<UIViewController *> *> *CY
     UIOffset titlePositionAdjustment = titlePositionAdjustmentValue ? titlePositionAdjustmentValue.UIOffsetValue : UIOffsetZero;
     CYLTabBarStyleType styleType = (CYLTabBarStyleType)[normalized[CYLTabBarControllerStyleType] integerValue];
     NSString *context = normalized[CYLTabBarControllerContext];
+    // [EN] Before the tab bar is made: it looks up the plus button of its context. [CN] 在创建 TabBar 之前：TabBar 会查找其 context 的 PlusButton。
+    BOOL plusButtonShowsSelection = NO;
+    if (normalized[CYLTabBarControllerPlusButton]) {
+        NSMutableDictionary *plusButtonAttributes = [normalized[CYLTabBarControllerPlusButton] mutableCopy];
+        plusButtonShowsSelection = [plusButtonAttributes[CYLPlusButtonShowsSelection] boolValue];
+        // [EN] A page of its own (`CYLTabBarItemPageIdentifier`), found like a tab's page; it needs a place among the tabs,
+        //      the middle when none is given. [CN] 自己的页面（`CYLTabBarItemPageIdentifier`），按 Tab 页面的方式查找；它需要在各 Tab 中的位置，
+        //      未给出时居中。
+        NSString *plusPageIdentifier = plusButtonAttributes[CYLTabBarItemPageIdentifier];
+        if ([plusPageIdentifier isKindOfClass:[NSString class]] && plusPageIdentifier.length > 0) {
+            NSArray<UIViewController *> *pages = [CYLTabBarPageRegistry pagesOfTabs:@[ @{ CYLTabBarItemPageIdentifier : plusPageIdentifier } ]
+                                                                           registry:[normalized[CYLTabBarControllerPageRegistry] conformsToProtocol:@protocol(CYLTabBarPageProviding)] ? normalized[CYLTabBarControllerPageRegistry] : nil
+                                                                           resolver:normalized[CYLTabBarControllerPageResolver]
+                                                                        lookupOrder:CYLPageLookupOrderOfConfiguration(normalized)
+                                                                           keptTabs:nil
+                                                                            skipped:nil];
+            if (pages.firstObject) {
+                // [EN] A page without a title takes the plus button's, as `plusChildViewController.title` in the example: on
+                //      Liquid Glass the system tab of the selected plus page shows it.
+                // [CN] 没有标题的页面使用 PlusButton 的标题，与示例中的 `plusChildViewController.title` 相同：液态玻璃下选中 PlusButton
+                //      页面时，系统 Tab 显示该标题。
+                NSString *plusTitle = plusButtonAttributes[CYLTabBarItemTitle];
+                if (pages.firstObject.title.length == 0 && [plusTitle isKindOfClass:[NSString class]] && plusTitle.length > 0) {
+                    pages.firstObject.title = plusTitle;
+                }
+                plusButtonAttributes[CYLConfigurationPlusButtonPageKey] = pages.firstObject;
+                if (!plusButtonAttributes[CYLPlusButtonIndexInTabBar]) {
+                    plusButtonAttributes[CYLPlusButtonIndexInTabBar] = @(tabBarItemsAttributes.count / 2);
+                }
+            }
+        }
+        [CYLPlusButton cyl_registerPlusButtonWithAttributes:plusButtonAttributes
+                                                      action:normalized[CYLTabBarControllerPlusButtonAction]
+                                                     context:context];
+    }
     if (self = [super init]) {
         _imageInsets = imageInsets;
         _titlePositionAdjustment = titlePositionAdjustment;
         _tabBarItemsAttributes = tabBarItemsAttributes;
+        if (plusButtonShowsSelection) {
+            objc_setAssociatedObject(self, CYLPlusButtonShowsSelectionKey, @YES, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+        }
         _adjustTabBarItemImageViewSizeDependOnSuperView = YES;
         _pagesFromPageIdentifiers = !viewControllersFromCode;
         _pageRegistry = pageRegistry;
@@ -2208,6 +2435,26 @@ static NSMutableDictionary<NSString *, NSMutableArray<UIViewController *> *> *CY
         if (animationSpeed) {
             // [EN] Validated by the normalizer (B28). [CN] 已由规范化检查（B28）。
             self.tabBarItemAnimationSpeed = animationSpeed.doubleValue;
+        }
+        // [EN] Appearance and interactions of the configuration, validated by the normalizer.
+        // [CN] 配置中的外观与交互，已由规范化检查。
+        NSNumber *userInterfaceStyle = normalized[CYLTabBarControllerUserInterfaceStyle];
+        if (userInterfaceStyle) {
+            if (@available(iOS 13.0, *)) {
+                self.overrideUserInterfaceStyle = (UIUserInterfaceStyle)userInterfaceStyle.integerValue;
+            }
+        }
+        NSNumber *tapAnimation = normalized[CYLTabBarControllerTabButtonTapAnimation];
+        if (tapAnimation) {
+            self.cyl_tabButtonTapAnimationType = (CYLTabButtonTapAnimationType)tapAnimation.integerValue;
+        }
+        NSNumber *swipeToSwitchTab = normalized[CYLTabBarControllerSwipeToSwitchTab];
+        if (swipeToSwitchTab) {
+            self.cyl_swipeToSwitchTabEnabled = swipeToSwitchTab.boolValue;
+        }
+        NSArray<NSString *> *loginRequired = normalized[CYLTabBarControllerLoginRequiredTabBarItemIdentifiers];
+        if (loginRequired) {
+            self.cyl_loginRequiredTabBarItemIdentifiers = loginRequired;
         }
         // [EN] Skins of the configuration (`CYLTabBarControllerThemes`): registered with the theme manager, the first one applied.
         // [CN] 配置中的皮肤（`CYLTabBarControllerThemes`）：注册到主题管理器，并应用首个皮肤。
@@ -2765,6 +3012,35 @@ static NSString *const CYLTabBarItemPlusSlotPlaceholderKey = @"CYLTabBarItemPlus
 }
 
 - (BOOL)updateTabBarItemAtIndex:(NSUInteger)index attributes:(NSDictionary<NSString *, id> *)attributes {
+    NSString *oldTitle = (index < _viewControllers.count) ? [self tabBarItemAttributesAtIndex:index][CYLTabBarItemTitle] : nil;
+    BOOL updated = [self cyl_applyTabBarItemUpdateAtIndex:index attributes:attributes];
+    if (updated) {
+        // [EN] After the tab shows the change: the title and icon notifications for their keys, then one for every change.
+        // [CN] Tab 显示变化之后：标题与图标 key 分别发送标题、图标通知，然后每次变化发送一次通用通知。
+        if (attributes[CYLTabBarItemTitle] || attributes[CYLTabBarItemSelectedTitle]) {
+            NSDictionary *current = [self tabBarItemAttributesAtIndex:index];
+            NSMutableDictionary *titleInfo = [NSMutableDictionary dictionary];
+            titleInfo[CYLTabBarItemTitle] = current[CYLTabBarItemTitle] ?: @"";
+            titleInfo[CYLTabBarItemSelectedTitle] = current[CYLTabBarItemSelectedTitle];
+            titleInfo[CYLTabBarItemOldTitleKey] = oldTitle;
+            titleInfo[CYLTabBarItemChangedAttributesKey] = [attributes dictionaryWithValuesForKeys:
+                [@[ CYLTabBarItemTitle, CYLTabBarItemSelectedTitle ] filteredArrayUsingPredicate:
+                 [NSPredicate predicateWithBlock:^BOOL(NSString *key, NSDictionary *bindings) { return attributes[key] != nil; }]]];
+            CYLPostTabBarItemNotification(CYLTabBarItemTitleDidChangeNotification, self, index, titleInfo);
+        }
+        NSDictionary *iconAttributes = CYLTabBarItemIconAttributes(attributes);
+        if (iconAttributes.count > 0) {
+            CYLPostTabBarItemNotification(CYLTabBarItemIconDidChangeNotification, self, index,
+                                          @{ CYLTabBarItemChangedAttributesKey : iconAttributes });
+        }
+        CYLPostTabBarItemNotification(CYLTabBarItemDidChangeNotification, self, index,
+                                      @{ CYLTabBarItemChangedAttributesKey : [attributes copy] });
+    }
+    return updated;
+}
+
+/// [EN] The in-place update itself; `-updateTabBarItemAtIndex:attributes:` posts the notification. [CN] 原地更新本身；通知由 `-updateTabBarItemAtIndex:attributes:` 发送。
+- (BOOL)cyl_applyTabBarItemUpdateAtIndex:(NSUInteger)index attributes:(NSDictionary<NSString *, id> *)attributes {
     if (index >= _viewControllers.count || attributes.count == 0) {
         return NO;
     }
@@ -2828,6 +3104,9 @@ static NSString *const CYLTabBarItemPlusSlotPlaceholderKey = @"CYLTabBarItemPlus
         if (title) { tabBarItem.title = title; }
         if (image) { tabBarItem.image = image; }
         if (selectedImage) { tabBarItem.selectedImage = selectedImage; }
+        if (title) {
+            CYLApplyNavigationTitleOfFollowingPage(viewController, title);
+        }
         // FIX: issue #433
         // [EN] The selected tab shows its selected title, not the new normal title.
         // [CN] 选中的 Tab 显示选中标题，而不是新的普通标题。
@@ -2852,6 +3131,9 @@ static NSString *const CYLTabBarItemPlusSlotPlaceholderKey = @"CYLTabBarItemPlus
         if (title) { tabBarItem.title = title; }
         if (image) { tabBarItem.image = image; }
         if (selectedImage) { tabBarItem.selectedImage = selectedImage; }
+    }
+    if (title) {
+        CYLApplyNavigationTitleOfFollowingPage(viewController, title);
     }
     // FIX: issue #433
     // [EN] The selected tab shows its selected title, not the new normal title.
@@ -2956,6 +3238,8 @@ static char CYLTabBarItemIconViewsProviderKey;
     // [CN] TabBar 重新布局其按钮，与选中 Tab 时相同。
     [self.tabBar setNeedsLayout];
     [self cyl_setNeedsUpdateTabBarItemIconViews];
+    CYLPostTabBarItemNotification(CYLTabBarItemIconDidChangeNotification, self, index,
+                                  provider ? @{ CYLTabBarItemIconViewProviderKey : [provider copy] } : nil);
     return YES;
 }
 
@@ -3086,6 +3370,29 @@ static UIImage *CYLImageScaledToSize(UIImage *image, CGSize size) {
     CYLLoadTabBarItemIcon(icon, completion);
 }
 
+/*!
+ * [EN] A change of the plus button: its page (the plus child view controller), when it has one, follows a new title, and
+ *      the tab notification is posted with `CYLPlusButtonKey`. The object is that page, or the plus button without one
+ *      (no index or tab bar item then).
+ * [CN] PlusButton 的变化：它有页面（PlusButton 子控制器）时，页面跟随新标题；发送带有 `CYLPlusButtonKey` 的 Tab 通知。object 为该页面，
+ *      没有页面时为 PlusButton（此时没有下标与 tabBarItem）。
+ */
+- (void)cyl_plusButton:(CYLPlusButton *)plusButton didChangeWithNotification:(NSNotificationName)name info:(NSDictionary *)info {
+    NSMutableDictionary *extra = [info mutableCopy];
+    extra[CYLPlusButtonKey] = plusButton;
+    UIViewController *plusChild = [self cyl_contextPlusChildViewController];
+    NSUInteger index = plusChild ? [_viewControllers indexOfObject:plusChild] : NSNotFound;
+    if (name == CYLTabBarItemTitleDidChangeNotification && plusChild) {
+        CYLApplyNavigationTitleOfFollowingPage(plusChild, info[CYLTabBarItemTitle]);
+    }
+    if (index != NSNotFound) {
+        CYLPostTabBarItemNotification(name, self, index, extra);
+        return;
+    }
+    extra[CYLTabBarControllerKey] = self;
+    [[NSNotificationCenter defaultCenter] postNotificationName:name object:plusButton userInfo:[extra copy]];
+}
+
 - (BOOL)updatePlusButtonWithAttributes:(NSDictionary<NSString *, id> *)attributes {
     CYLPlusButton *plusButton = [CYLPlusButton plusButtonForOwner:self];
     if (!plusButton || attributes.count == 0) {
@@ -3093,8 +3400,22 @@ static UIImage *CYLImageScaledToSize(UIImage *image, CGSize size) {
     }
     NSString *title = attributes[CYLTabBarItemTitle];
     if (title) {
+        NSString *oldTitle = plusButton.cyl_title;
         [plusButton cyl_updateTitle:title image:nil selectedImage:nil];
+        // [EN] The plus button's page follows its title like any tab, and the title notification names the plus button.
+        // [CN] PlusButton 的页面与其他 Tab 一样跟随其标题，标题通知中带有 PlusButton。
+        NSMutableDictionary *titleInfo = [NSMutableDictionary dictionaryWithObject:title forKey:CYLTabBarItemTitle];
+        titleInfo[CYLTabBarItemOldTitleKey] = oldTitle;
+        titleInfo[CYLTabBarItemChangedAttributesKey] = @{ CYLTabBarItemTitle : title };
+        [self cyl_plusButton:plusButton didChangeWithNotification:CYLTabBarItemTitleDidChangeNotification info:titleInfo];
     }
+    if (attributes[CYLTabBarItemImage] || attributes[CYLTabBarItemSelectedImage] || attributes[CYLTabBarItemImageURL] ||
+        attributes[CYLTabBarItemSelectedImageURL]) {
+        [self cyl_plusButton:plusButton didChangeWithNotification:CYLTabBarItemIconDidChangeNotification
+                        info:@{ CYLTabBarItemChangedAttributesKey : CYLTabBarItemIconAttributes(attributes) }];
+    }
+    [self cyl_plusButton:plusButton didChangeWithNotification:CYLTabBarItemDidChangeNotification
+                    info:@{ CYLTabBarItemChangedAttributesKey : [attributes copy] }];
     id icon = attributes[CYLTabBarItemImageURL] ?: attributes[CYLTabBarItemImage];
     id selectedIcon = attributes[CYLTabBarItemSelectedImageURL] ?: attributes[CYLTabBarItemSelectedImage];
     NSValue *sizeValue = attributes[CYLTabBarItemImageURLSize];
@@ -4399,6 +4720,8 @@ static void CYLApplyExplicitAccessibility(NSObject<UIAccessibilityIdentification
     }
 }
 
+static void CYLApplyDefaultAccessibilityLabel(UITabBarItem *item, NSString *title);
+
 /*!
  * [EN] Gives every tab (and the plus button) an `accessibilityIdentifier` and the explicit accessibility values of its
  *      attributes. Runs on layout (`-cyl_syncTabBarAppearances`); only changed values are written.
@@ -4407,6 +4730,9 @@ static void CYLApplyExplicitAccessibility(NSObject<UIAccessibilityIdentification
  */
 - (void)cyl_syncTabBarItemAccessibility {
     NSArray<UIViewController *> *viewControllers = self.viewControllers;
+    // [EN] Not FlatDesign: on iOS 26 `+isLiquidGlassActive` is YES with the FlatDesign tab bar too.
+    // [CN] 不是扁平样式：iOS 26 上使用扁平样式 TabBar 时 `+isLiquidGlassActive` 也为 YES。
+    BOOL isLiquidGlassTabBar = (CYLTabBarStyleTypeFlatDesign != self.tabBarStyleType && [CYLConstants isLiquidGlassActive]);
     for (NSUInteger index = 0; index < viewControllers.count; index++) {
         UIViewController *viewController = viewControllers[index];
         // [EN] The plus child view controller's tab sits under the plus button, which gets the identifier instead.
@@ -4430,11 +4756,52 @@ static void CYLApplyExplicitAccessibility(NSObject<UIAccessibilityIdentification
         if (attributes) {
             CYLApplyExplicitAccessibility(element, attributes);
         }
+        if (isLiquidGlassTabBar) {
+            CYLApplyDefaultAccessibilityLabel(viewController.tabBarItem, viewController.tabBarItem.title);
+        }
     }
     UIButton *plusButton = [self cyl_contextPlusButton];
     if (plusButton && [self hasPlusButton]) {
         CYLApplyDefaultAccessibilityIdentifier(plusButton, plusButton.cyl_tabBarItemIdentifier);
+        // [EN] Liquid Glass: the plus child view controller's tab sits under the plus button and reads as the plus button.
+        //      Its label was set once, at setup, and kept the old title after the plus button's title changed.
+        // [CN] 液态玻璃：PlusButton 子控制器的 Tab 位于 PlusButton 下方，读作 PlusButton。其 label 以前只在设置时写入一次，
+        //      PlusButton 标题变化后仍为旧标题。
+        UIViewController *plusChildViewController = [self cyl_contextPlusChildViewController];
+        NSString *plusLabel = plusButton.accessibilityLabel;
+        if (isLiquidGlassTabBar && plusChildViewController && plusLabel.length > 0 &&
+            ![plusChildViewController.tabBarItem.accessibilityLabel isEqualToString:plusLabel]) {
+            plusChildViewController.tabBarItem.accessibilityLabel = plusLabel;
+        }
     }
+}
+
+/// [EN] The label the library wrote on a tab item, so a later title change updates it while a label the app set is kept.
+/// [CN] 本库写入 TabBarItem 的 label，使标题变化时可以更新它，同时保留 App 自己设置的 label。
+static char CYLAccessibilityLabelSetByCYLKey;
+
+/*!
+ * [EN] Liquid Glass draws each tab twice, in the normal layer and in the selected layer (the lens), and VoiceOver reads the
+ *      selected layer's button. That button reads the item's own `accessibilityLabel` when it has one, else the title it
+ *      got when it was created: after an in-place title change (`-updateTabBarItemAtIndex:attributes:`, a skin), VoiceOver
+ *      read the old title. So the item's title is written as its label, unless the app set a different label itself.
+ * [CN] 液态玻璃中每个 Tab 绘制两次：普通图层与选中图层（放大镜），VoiceOver 读取选中图层中的按钮。该按钮有 item 自己的
+ *      `accessibilityLabel` 时读取它，否则读取创建时得到的标题：原地修改标题后（`-updateTabBarItemAtIndex:attributes:`、换肤），
+ *      VoiceOver 读出旧标题。因此把 item 的标题写为其 label，除非 App 自己设置了其他 label。
+ */
+static void CYLApplyDefaultAccessibilityLabel(UITabBarItem *item, NSString *title) {
+    if (!item || title.length == 0) {
+        return;
+    }
+    NSString *current = item.accessibilityLabel;
+    NSString *setByCYL = objc_getAssociatedObject(item, &CYLAccessibilityLabelSetByCYLKey);
+    // [EN] Without a label of its own, the item reports its title. [CN] 没有自己的 label 时，item 返回其标题。
+    BOOL ownedByApp = current.length > 0 && ![current isEqualToString:setByCYL ?: @""] && ![current isEqualToString:title];
+    if (ownedByApp || [setByCYL isEqualToString:title]) {
+        return;
+    }
+    item.accessibilityLabel = title;
+    objc_setAssociatedObject(item, &CYLAccessibilityLabelSetByCYLKey, title, OBJC_ASSOCIATION_COPY_NONATOMIC);
 }
 
 /// [EN] Marks the tab buttons (and the controller) the library filled with a selected background color.
@@ -4995,7 +5362,7 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
                               shouldSelectViewController:(UIViewController *)viewController
                                             shouldSelect:(BOOL)shouldSelect {
     CYL_IF_NOT_FLATDESIGN_BEGIN     //Not CYLTabBarStyleTypeFlatDesign
-    [[viewController.tabBarItem cyl_tabButton] cyl_setUserInteractionDisabled:!shouldSelect];
+    CYLControlSetSelectionLocked([viewController.tabBarItem cyl_tabButton], !shouldSelect);
     if (!shouldSelect) {
         return;
     }
@@ -5084,6 +5451,11 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
         return YES;
     }
 
+    // [EN] `CYLPlusButtonShowsSelection`: the selection stays under the plus button while its page is selected.
+    // [CN] `CYLPlusButtonShowsSelection`：选中 PlusButton 的页面时，选中效果保留在 PlusButton 下方。
+    if ([objc_getAssociatedObject(self, CYLPlusButtonShowsSelectionKey) boolValue]) {
+        return YES;
+    }
     if ([tabBarController.selectedViewController isEqual:[self cyl_contextPlusChildViewController]] && ![tabBarController.tabBar isPlusButtonLayoutCentered]) {
         return NO;
     }
@@ -5167,6 +5539,18 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
 - (void)cyl_sendDidSelectControl:(UIControl *)control {
     [self cyl_playTabButtonAnimationForControl:control];
     [self cyl_playTabButtonTapFeedback];
+    // [EN] The plus button of a configuration (`CYLTabBarControllerPlusButtonAction`): its action, once per reported tap.
+    // [CN] 配置中的 PlusButton（`CYLTabBarControllerPlusButtonAction`）：每次上报的点击执行一次其回调。
+    if (control.cyl_isPlusControl) {
+        CYLPlusButton *plusButton = [CYLPlusButton plusButtonForTabBarContext:self.context];
+        SEL tapped = NSSelectorFromString(@"cyl_configurationPlusButtonTapped");
+        if ([plusButton respondsToSelector:tapped]) {
+            CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS
+            (
+             [plusButton performSelector:tapped];
+             );
+        }
+    }
     SEL action = @selector(tabBarController:didSelectControl:);
     if ([self.delegate respondsToSelector:action]) {
         CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS
@@ -5183,7 +5567,7 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
     
     BOOL shouldSelectViewController =  YES;
     @try {
-        shouldSelectViewController = (!control.cyl_userInteractionDisabled) && (!control.hidden) ;
+        shouldSelectViewController = CYLControlReportsTaps(control) && (!control.hidden);
     } @catch (NSException *exception) {
 #if defined(DEBUG) || defined(BETA)
         NSLog(CYLLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
@@ -5199,6 +5583,12 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
             [self.cyl_tabBar cyl_setSelectedControl:[self cyl_contextPlusButton]];
         }
         
+        // [EN] Liquid Glass with a plus child view controller: the plus button's stand-in in the selected layer keeps its own
+        //      state (`-cyl_updateSelectedContentViewImage`); selecting it here left it with the old image after a theme change
+        //      (plus child theme test) once the plus button reported its taps.
+        // [CN] 液态玻璃且有 PlusButton 子控制器：PlusButton 在选中图层中的替身自己维护状态（`-cyl_updateSelectedContentViewImage`）；
+        //      PlusButton 上报点击时若在这里选中它，换肤后替身会保留旧图片（PlusButton 子控制器换肤测试）。
+        BOOL plusButtonKeepsItsOwnState = [CYLConstants isLiquidGlassActive] && [self hasPlusChildViewController] && [control cyl_isPlusControl];
         if (shouldSelectViewController) {
             //TODO:  pure tabbar
             CYLTabBar *cyl_tabBar = (CYLTabBar *)self.cyl_tabBar;
@@ -5209,7 +5599,9 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
             [cyl_tabBar.cyl_platterSelectedContentViews enumerateObjectsUsingBlock:^(UIControl * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
                 obj.selected = NO;
             }];
-            contentControl.selected = YES;
+            if (!plusButtonKeepsItsOwnState) {
+                contentControl.selected = YES;
+            }
             selectedContentControl.selected = YES;
             // [CN] 非液态玻璃 与 液态玻璃逻辑共用，Lottie播放逻辑都在 tabChangedToSelectedIndex 中。
             // [EN] Shared logic for non-Liquid Glass and Liquid Glass; all Lottie playback logic lives in
@@ -5224,16 +5616,16 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
     //      of `plusChildViewController`. A tap could be reported with that system tab button, which `-cyl_isPlusButton`
     //      does not recognize, or not at all: when the plus child view controller is already selected,
     //      `-updateSelectionStatusIfNeededForTabBarController:shouldSelectViewController:` disables that tab button and the
-    //      check above skipped the report. Report the plus button itself instead (its own `cyl_userInteractionDisabled`
+    //      check above skipped the report. Report the plus button itself instead (its own `reportsTapsToDelegate`
     //      still opts out), so the delegate always gets the same control for the plus button, as in a direct tap.
     // [CN] 带子控制器的 PlusButton 有两个图层：PlusButton 本身，以及其下方 `plusChildViewController` 的系统 Tab 按钮。点击时可能上报
     //      的是该系统 Tab 按钮（`-cyl_isPlusButton` 不认识它），或者根本不上报：子控制器已选中时，
     //      `-updateSelectionStatusIfNeededForTabBarController:shouldSelectViewController:` 会禁用该 Tab 按钮，上面的判断就跳过了回调。
-    //      这里统一上报 PlusButton 本身（其 `cyl_userInteractionDisabled` 仍可关闭回调），代理每次都拿到同一个控件。
+    //      这里统一上报 PlusButton 本身（其 `reportsTapsToDelegate` 仍可关闭回调），代理每次都拿到同一个控件。
     UIControl *reportedControl = [self cyl_reportedControlForControl:control_];
     BOOL shouldReport = shouldSelectViewController;
     if (reportedControl != control_) {
-        shouldReport = !reportedControl.cyl_userInteractionDisabled;
+        shouldReport = CYLControlReportsTaps(reportedControl);
     }
     // [EN] One report per tap, only for a plus button with a child view controller. On Liquid Glass a tap on a plus button with a child view controller runs
     //      `-plusChildViewControllerButtonClicked:` → `-setSelectedIndex:`, which reports through the
@@ -6299,7 +6691,7 @@ static BOOL CYLIsImplementedOutsideSystemFrameworks(Class cls, SEL selector) {
  *      （`-plusChildViewControllerButtonClicked:`，或其下方的 Tab 按钮）、没有子控制器的 PlusButton（`-cyl_flatDesignPlusButtonTouchUpInside:`）。
  */
 - (void)cyl_flatDesignReportDidSelectControl:(UIControl *)control {
-    if (!control || control.cyl_userInteractionDisabled) {
+    if (!CYLControlReportsTaps(control)) {
         return;
     }
     [self cyl_sendDidSelectControl:control];
@@ -7337,6 +7729,45 @@ static char CYLFixesOpaqueTabBarSafeAreaInsetsKey;
 
 - (BOOL)cyl_pagesFromPageIdentifiers {
     return self.pagesFromPageIdentifiers;
+}
+
+@end
+
+#pragma mark - UIViewController (CYLTabBarItemTitle)
+
+@implementation UIViewController (CYLTabBarItemTitle)
+
+- (nullable NSString *)cyl_tabBarItemTitle {
+    UIViewController *tab = self.navigationController.viewControllers.firstObject == self ? self.navigationController : self;
+    // [EN] The plus button's page: the plus button's title. [CN] PlusButton 的页面：PlusButton 的标题。
+    CYLTabBarController *tabBarController = tab.cyl_tabBarController;
+    if (tabBarController && tab == [tabBarController cyl_contextPlusChildViewController]) {
+        return [CYLPlusButton plusButtonForOwner:tabBarController].cyl_title;
+    }
+    // [EN] The normal title, also while the selected title shows (#433). [CN] 普通标题，显示选中标题时也是（#433）。
+    NSString *normalTitle = objc_getAssociatedObject(tab, CYLTabBarItemNormalTitleKey);
+    if (normalTitle.length > 0) {
+        return normalTitle;
+    }
+#if CYL_FLATDESIGN_AVAILABLE
+    NSString *flatTitle = tab.cyl_tabBarItem.title;
+    if (flatTitle.length > 0 && tab.cyl_tabBarController.tabBarStyleType == CYLTabBarStyleTypeFlatDesign) {
+        return flatTitle;
+    }
+#endif
+    return tab.tabBarItem.title.length > 0 ? tab.tabBarItem.title : nil;
+}
+
+- (BOOL)cyl_navigationTitleFollowsTabBarItemTitle {
+    return [objc_getAssociatedObject(self, CYLNavigationTitleFollowsTabBarItemTitleKey) boolValue];
+}
+
+- (void)setCyl_navigationTitleFollowsTabBarItemTitle:(BOOL)follows {
+    objc_setAssociatedObject(self, CYLNavigationTitleFollowsTabBarItemTitleKey, @(follows), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    NSString *title = follows ? self.cyl_tabBarItemTitle : nil;
+    if (title) {
+        self.navigationItem.title = title;
+    }
 }
 
 @end

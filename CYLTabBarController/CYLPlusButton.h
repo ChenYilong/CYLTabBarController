@@ -282,6 +282,7 @@ FOUNDATION_EXTERN UIViewController *CYLPlusChildViewController;
  */
 + (void)registerPlusButton;
 
+
 /*!
  * [EN] Lays the plus button out again when its class returns YES from `+alignsTitleWithTabBarItemTitles`, so its title
  *      follows the tab item titles. The tab bars call it after their own layout; call it after moving the tab titles
@@ -303,6 +304,17 @@ FOUNDATION_EXTERN UIViewController *CYLPlusChildViewController;
  *      默认为 0。适用于所有样式（经典、液态玻璃、扁平）。可在 `+plusButton` 中设置，也可之后在实例上修改。
  */
 @property (nonatomic, assign) UIEdgeInsets touchableAreaOutsets;
+
+/*!
+ * [EN] Whether a tap on this plus button is reported through `tabBarController:didSelectControl:`. Default YES; set NO when
+ *      the plus button's own target-action is all you want. Unlike the deprecated `cyl_userInteractionDisabled`, it does
+ *      not change when the plus button's page is selected, so every tap is reported (e.g. a badge that counts taps).
+ *      While it is not set, the deprecated `cyl_userInteractionDisabled = YES` still keeps the taps out, as before.
+ * [CN] 点击本 PlusButton 是否通过 `tabBarController:didSelectControl:` 上报。默认 YES；只需要 PlusButton 自己的 target-action 时设为 NO。
+ *      与已废弃的 `cyl_userInteractionDisabled` 不同，它不会因为 PlusButton 页面被选中而改变，因此每次点击都会上报（例如统计点击次数的角标）。
+ *      未设置时，已废弃的 `cyl_userInteractionDisabled = YES` 仍会阻止上报，与以前相同。
+ */
+@property (nonatomic, assign) BOOL reportsTapsToDelegate;
 
 /*!
  * [EN] Scales the touchable area around the plus button's center, before `touchableAreaOutsets`: 1 is the frame
@@ -550,6 +562,24 @@ FOUNDATION_EXTERN UIViewController *CYLPlusChildViewController;
  *      扁平样式与经典 TabBar 使用它。见上面的链接。
  */
 - (void)cyl_updateTitle:(nullable NSString *)title image:(nullable UIImage *)image selectedImage:(nullable UIImage *)selectedImage;
+
+@end
+
+@interface CYLPlusButton (CYLConfigurationPlusButton)
+
+/*!
+ * [EN] Registers a plus button made from attributes for `context` (nil: the default context), the way
+ *      `CYLTabBarControllerPlusButton` of a configuration does: `CYLTabBarItemTitle`, `CYLTabBarItemImage` (a UIImage),
+ *      `CYLTabBarItemSelectedTitle`, `CYLTabBarItemSelectedTitleColor` (a UIColor). `action` runs on each tap. Without an
+ *      image, nothing is registered. Each context keeps its own plus button, attributes and action; registering again for
+ *      the same context replaces them.
+ * [CN] 根据属性为 `context`（nil 为默认 context）注册一个 PlusButton，与配置中的 `CYLTabBarControllerPlusButton` 相同：
+ *      `CYLTabBarItemTitle`、`CYLTabBarItemImage`（UIImage）、`CYLTabBarItemSelectedTitle`、`CYLTabBarItemSelectedTitleColor`（UIColor）。
+ *      每次点击执行 `action`。没有图片时不注册。每个 context 有自己的 PlusButton、属性与点击回调；为同一 context 再次注册会替换它们。
+ */
++ (void)cyl_registerPlusButtonWithAttributes:(NSDictionary<NSString *, id> *)attributes
+                                      action:(nullable void (^)(CYLPlusButton *plusButton))action
+                                     context:(nullable NSString *)context;
 
 @end
 

@@ -209,7 +209,7 @@
  "CYLBadgeAppearance": {
   "status": "done",
   "android": "CYLBadgeAppearance",
-  "note": "Android defaults: 11 sp font, 2 dp margin"
+  "note": "Android defaults as on iOS: bold 9 sp font, 8 dp margin; the badge centered 2 dp right of its anchor's top-right corner (tabs: the 22 dp image view on Liquid Glass, else the image)"
  },
  "CYLBadgeAppearance -reset": {
   "status": "done",
@@ -513,100 +513,104 @@
   "android": "CYLPlusButton.CYLExternPlusButton"
  },
  "CYLFlatDesignTabBar": {
-  "status": "n/a",
-  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+  "status": "done",
+  "android": "typealias CYLFlatDesignTabBar = CYLTabBar (tabBarStyleType = FlatDesign)"
  },
  "CYLFlatDesignTabBar -addItemWithTitle:tabBarItemImage:tabBarItemSelectedImage:index:titlePositionAdjustment:imageInsets:lottieFilePath:lottieSizeValue:": {
   "status": "n/a",
   "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
  },
  "CYLFlatDesignTabBar -hasPlusButton": {
-  "status": "n/a",
-  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+  "status": "done",
+  "android": "CYLTabBar.hasPlusButton()"
  },
  "CYLFlatDesignTabBar -hasPlusChildViewController": {
-  "status": "n/a",
-  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+  "status": "done",
+  "android": "CYLTabBar.hasPlusChildViewController()"
  },
  "CYLFlatDesignTabBar 0": {
   "status": "n/a",
   "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
  },
  "CYLFlatDesignTabBar backgroundImage": {
-  "status": "n/a",
-  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+  "status": "done",
+  "android": "CYLTabBar.backgroundImage"
  },
  "CYLFlatDesignTabBar barTintColor": {
-  "status": "n/a",
-  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+  "status": "done",
+  "android": "CYLTabBar.barTintColor"
  },
  "CYLFlatDesignTabBar context": {
-  "status": "n/a",
-  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+  "status": "done",
+  "android": "CYLTabBar.context_"
  },
  "CYLFlatDesignTabBar delegate": {
   "status": "n/a",
   "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
  },
  "CYLFlatDesignTabBar items": {
-  "status": "n/a",
-  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+  "status": "partial",
+  "android": "CYLTabBarController.tabBarItems",
+  "note": "on the controller"
  },
  "CYLFlatDesignTabBar respectsVerticalStatusBarSafeArea": {
-  "status": "n/a",
-  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+  "status": "partial",
+  "android": "CYLTabBar.respectsVerticalStatusBarSafeArea",
+  "note": "kept for the API; Android has no vertical status bar"
  },
  "CYLFlatDesignTabBar selectedIndex": {
-  "status": "n/a",
-  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+  "status": "partial",
+  "android": "CYLTabBarController.selectedIndex",
+  "note": "on the controller"
  },
  "CYLFlatDesignTabBar selectedItem": {
   "status": "n/a",
   "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
  },
  "CYLFlatDesignTabBar shadowImage": {
-  "status": "n/a",
-  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+  "status": "done",
+  "android": "CYLTabBar.shadowImage"
  },
  "CYLFlatDesignTabBar tabBarButtons": {
-  "status": "n/a",
-  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+  "status": "done",
+  "android": "CYLTabBar.tabBarButtonArray"
  },
  "CYLFlatDesignTabBar tabBarItems": {
-  "status": "n/a",
-  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+  "status": "done",
+  "android": "CYLTabBar.tabBarButtonArray"
  },
  "CYLFlatDesignTabBar tintColor": {
-  "status": "n/a",
-  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+  "status": "done",
+  "android": "CYLTabBar.tintColor"
  },
  "CYLFlatDesignTabBar useLayoutSafeAreaInsets": {
-  "status": "n/a",
-  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+  "status": "partial",
+  "android": "CYLTabBar.useLayoutSafeAreaInsets",
+  "note": "kept for the API; the controller's root view always keeps the items clear of the system bars"
  },
  "CYLFlatDesignTabBarButton": {
-  "status": "n/a",
-  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+  "status": "done",
+  "android": "typealias CYLFlatDesignTabBarButton = CYLTabBarItemButton"
  },
  "CYLFlatDesignTabBarButton -actualBadgeSuperView": {
-  "status": "n/a",
-  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+  "status": "done",
+  "android": "View.cyl_getActualBadgeSuperView()"
  },
  "CYLFlatDesignTabBarButton -initWithTabBarItem:": {
   "status": "n/a",
   "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
  },
  "CYLFlatDesignTabBarButton imageView": {
-  "status": "n/a",
-  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+  "status": "done",
+  "android": "CYLTabBarItemButton.iconView"
  },
  "CYLFlatDesignTabBarButton tabBarItem": {
-  "status": "n/a",
-  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+  "status": "done",
+  "android": "CYLTabBarItemButton.item"
  },
  "CYLFlatDesignTabBarButton titleLabel": {
-  "status": "n/a",
-  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+  "status": "done",
+  "android": "CYLTabBarItemButton.titleLabel"
  },
  "CYLFlatDesignTabBarDelegate": {
   "status": "n/a",
@@ -621,12 +625,12 @@
   "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
  },
  "CYLFlatDesignTabBarItem": {
-  "status": "n/a",
-  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+  "status": "done",
+  "android": "typealias CYLFlatDesignTabBarItem = CYLTabBarItem"
  },
  "CYLFlatDesignTabBarItem -actualBadgeSuperView": {
-  "status": "n/a",
-  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+  "status": "done",
+  "android": "View.cyl_getActualBadgeSuperView()"
  },
  "CYLFlatDesignTabBarItem -badgeTextAttributesForState:": {
   "status": "n/a",
@@ -661,12 +665,13 @@
   "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
  },
  "CYLFlatDesignTabBarItem backgroundColor": {
-  "status": "n/a",
-  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+  "status": "done",
+  "android": "CYLTabBarItem.cyl_backgroundColor"
  },
  "CYLFlatDesignTabBarItem badgeColor": {
-  "status": "n/a",
-  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+  "status": "partial",
+  "android": "View.cyl_badgeBackgroundColor",
+  "note": "on the tab button"
  },
  "CYLFlatDesignTabBarItem badgeContentInset": {
   "status": "n/a",
@@ -681,8 +686,8 @@
   "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
  },
  "CYLFlatDesignTabBarItem badgeValue": {
-  "status": "n/a",
-  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+  "status": "done",
+  "android": "CYLTabBarItem.badgeValue"
  },
  "CYLFlatDesignTabBarItem childViewController": {
   "status": "n/a",
@@ -693,60 +698,60 @@
   "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
  },
  "CYLFlatDesignTabBarItem enabled": {
-  "status": "n/a",
-  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+  "status": "done",
+  "android": "CYLTabBarItem.isEnabled"
  },
  "CYLFlatDesignTabBarItem image": {
-  "status": "n/a",
-  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+  "status": "done",
+  "android": "CYLTabBarItem.image"
  },
  "CYLFlatDesignTabBarItem imageInsets": {
-  "status": "n/a",
-  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+  "status": "done",
+  "android": "CYLTabBarItem.cyl_imageInsets"
  },
  "CYLFlatDesignTabBarItem imagePositionAdjustment": {
-  "status": "n/a",
-  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+  "status": "done",
+  "android": "CYLTabBarItem.imagePositionAdjustment"
  },
  "CYLFlatDesignTabBarItem index": {
   "status": "n/a",
   "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
  },
  "CYLFlatDesignTabBarItem layoutCentered": {
-  "status": "n/a",
-  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+  "status": "done",
+  "android": "CYLTabBarItem.layoutCentered"
  },
  "CYLFlatDesignTabBarItem lottieFilePath": {
   "status": "n/a",
   "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
  },
  "CYLFlatDesignTabBarItem lottieSizeValue": {
-  "status": "n/a",
-  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+  "status": "done",
+  "android": "CYLTabBarItem.cyl_lottieSizeValue"
  },
  "CYLFlatDesignTabBarItem lottieURL": {
-  "status": "n/a",
-  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+  "status": "done",
+  "android": "CYLTabBarItem.cyl_lottieURL"
  },
  "CYLFlatDesignTabBarItem selectedBackgroundColor": {
-  "status": "n/a",
-  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+  "status": "done",
+  "android": "CYLTabBarItem.cyl_selectedBackgroundColor"
  },
  "CYLFlatDesignTabBarItem selectedImage": {
-  "status": "n/a",
-  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+  "status": "done",
+  "android": "CYLTabBarItem.selectedImage"
  },
  "CYLFlatDesignTabBarItem tabBarButton": {
-  "status": "n/a",
-  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+  "status": "done",
+  "android": "CYLTabBarItem.cyl_visiableTabButton"
  },
  "CYLFlatDesignTabBarItem title": {
-  "status": "n/a",
-  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+  "status": "done",
+  "android": "CYLTabBarItem.title"
  },
  "CYLFlatDesignTabBarItem titlePositionAdjustment": {
-  "status": "n/a",
-  "note": "FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`)"
+  "status": "done",
+  "android": "CYLTabBarItem.titlePositionAdjustment"
  },
  "CYLFlatDesignTabBarItemDidChange": {
   "status": "n/a",
@@ -2224,6 +2229,98 @@
   "status": "done",
   "android": "CYLConstants.CYLTabBarControllerThemeManagerName"
  },
+ "CYLTabBarControllerLocalization": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarControllerLocalization",
+  "note": "read by CYLTabBarConfigurationLocalization (the same .strings files and location routes)"
+ },
+ "CYLTabBarLocalizationTableName": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarLocalizationTableName"
+ },
+ "CYLTabBarLocalizationPath": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarLocalizationPath"
+ },
+ "CYLTabBarLocalizationBundleName": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarLocalizationBundleName"
+ },
+ "CYLTabBarItemTitleDidChangeNotification": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarItemTitleDidChangeNotification",
+  "note": "observe with CYLNotificationCenter.addObserver"
+ },
+ "CYLTabBarItemDidChangeNotification": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarItemDidChangeNotification",
+  "note": "observe with CYLNotificationCenter.addObserver"
+ },
+ "CYLTabBarItemChangedAttributesKey": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarItemChangedAttributesKey"
+ },
+ "CYLTabBarItemIndexKey": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarItemIndexKey"
+ },
+ "CYLTabBarItemIconDidChangeNotification": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarItemIconDidChangeNotification",
+  "note": "observe with CYLNotificationCenter.addObserver"
+ },
+ "CYLTabBarItemIconViewProviderKey": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarItemIconViewProviderKey"
+ },
+ "CYLTabBarControllerThemeDidApplyNotification": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarControllerThemeDidApplyNotification",
+  "note": "observe with CYLNotificationCenter.addObserver"
+ },
+ "CYLTabBarThemeKey": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarThemeKey"
+ },
+ "CYLTabBarItemIndexesKey": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarItemIndexesKey",
+  "note": "a List<Int> (iOS: NSIndexSet)"
+ },
+ "CYLTabBarItemIdentifiersKey": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarItemIdentifiersKey"
+ },
+ "CYLTabBarControllerKey": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarControllerKey"
+ },
+ "CYLTabBarItemViewControllerKey": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarItemViewControllerKey"
+ },
+ "CYLTabBarItemKey": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarItemKey",
+  "note": "the tab's CYLTabBarItem"
+ },
+ "CYLPlusButtonKey": {
+  "status": "done",
+  "android": "CYLConstants.CYLPlusButtonKey"
+ },
+ "CYLTabBarItemOldTitleKey": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarItemOldTitleKey"
+ },
+ "UIViewController(CYLTabBarItemTitle) cyl_tabBarItemTitle": {
+  "status": "done",
+  "android": "Fragment.cyl_tabBarItemTitle"
+ },
+ "UIViewController(CYLTabBarItemTitle) cyl_navigationTitleFollowsTabBarItemTitle": {
+  "status": "done",
+  "android": "Fragment.cyl_navigationTitleFollowsTabBarItemTitle",
+  "note": "one action bar per activity: the activity's title follows the selected page's tab title"
+ },
  "CYLTabBarControllerThemes": {
   "status": "done",
   "android": "CYLConstants.CYLTabBarControllerThemes"
@@ -3025,6 +3122,26 @@
  "CYLTabBarShadowColor": {
   "status": "done",
   "android": "CYLConstants.CYLTabBarShadowColor"
+ },
+ "CYLTabBarBackgroundImage": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarBackgroundImage"
+ },
+ "CYLTabBarShadowImage": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarShadowImage"
+ },
+ "CYLTabBarStackedItemPositioning": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarStackedItemPositioning"
+ },
+ "CYLTabBarStackedItemWidth": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarStackedItemWidth"
+ },
+ "CYLTabBarStackedItemSpacing": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarStackedItemSpacing"
  },
  "CYLTabBarSkippedTab": {
   "status": "done",
@@ -5274,5 +5391,202 @@
  "UIWindow(CYLLocalization) -cyl_setRootViewControllerProvider:": {
   "status": "n/a",
   "note": "the iOS bundle localization; Android uses resources"
+ },
+ "CYLTabBarControllerPlusButton": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarControllerPlusButton"
+ },
+ "CYLTabBarControllerPlusButtonAction": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarControllerPlusButtonAction",
+  "note": "(CYLPlusButton) -> Unit"
+ },
+ "CYLPlusButtonBackgroundImage": {
+  "status": "done",
+  "android": "CYLConstants.CYLPlusButtonBackgroundImage"
+ },
+ "CYLPlusButtonIndexInTabBar": {
+  "status": "done",
+  "android": "CYLConstants.CYLPlusButtonIndexInTabBar"
+ },
+ "CYLPlusButtonCenterYMultiplier": {
+  "status": "done",
+  "android": "CYLConstants.CYLPlusButtonCenterYMultiplier"
+ },
+ "CYLPlusButtonCenterYOffset": {
+  "status": "done",
+  "android": "CYLConstants.CYLPlusButtonCenterYOffset"
+ },
+ "CYLPlusButtonAlignsTitle": {
+  "status": "done",
+  "android": "CYLConstants.CYLPlusButtonAlignsTitle"
+ },
+ "CYLPlusButtonKeepsTitleVisible": {
+  "status": "done",
+  "android": "CYLConstants.CYLPlusButtonKeepsTitleVisible"
+ },
+ "CYLTabBarControllerTabButtonTapAnimation": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarControllerTabButtonTapAnimation"
+ },
+ "CYLTabBarControllerSwipeToSwitchTab": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarControllerSwipeToSwitchTab"
+ },
+ "CYLTabBarControllerUserInterfaceStyle": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarControllerUserInterfaceStyle",
+  "note": "read but not applied: Android follows the system night mode"
+ },
+ "CYLPlusButton(CYLConfigurationPlusButton) +cyl_registerPlusButtonWithAttributes:action:context:": {
+  "status": "done",
+  "android": "CYLPlusButton.cyl_registerPlusButtonWithAttributes"
+ },
+ "CYLPlusButton(CYLConfigurationPlusButton)": {
+  "status": "done",
+  "android": "CYLConfigurationPlusButton"
+ },
+ "CYLTabBarHostView": {
+  "status": "done",
+  "android": "CYLTabBarHostView"
+ },
+ "CYLTabBarHostView configuration": {
+  "status": "done",
+  "android": "CYLTabBarHostView.configuration"
+ },
+ "CYLTabBarHostView -setConfigurationJSON:": {
+  "status": "done",
+  "android": "CYLTabBarHostView.setConfigurationJSON"
+ },
+ "CYLTabBarHostView imageResolver": {
+  "status": "done",
+  "android": "CYLTabBarHostView.imageResolver",
+  "note": "(Any?) -> Drawable?"
+ },
+ "CYLTabBarHostView selectedIndex": {
+  "status": "done",
+  "android": "CYLTabBarHostView.selectedIndex"
+ },
+ "CYLTabBarHostView badgeValues": {
+  "status": "done",
+  "android": "CYLTabBarHostView.badgeValues"
+ },
+ "CYLTabBarHostView heightIncludesOverflow": {
+  "status": "done",
+  "android": "CYLTabBarHostView.heightIncludesOverflow"
+ },
+ "CYLTabBarHostView preferredHeight": {
+  "status": "done",
+  "android": "CYLTabBarHostView.preferredHeight",
+  "note": "dp"
+ },
+ "CYLTabBarHostView didSelectTab": {
+  "status": "done",
+  "android": "CYLTabBarHostView.didSelectTab"
+ },
+ "CYLTabBarHostView didTapPlusButton": {
+  "status": "done",
+  "android": "CYLTabBarHostView.didTapPlusButton"
+ },
+ "CYLTabBarHostView preferredHeightDidChange": {
+  "status": "done",
+  "android": "CYLTabBarHostView.preferredHeightDidChange"
+ },
+ "CYLTabBarHostView touchableRects": {
+  "status": "done",
+  "android": "CYLTabBarHostView.touchableRects",
+  "note": "List<RectF> in dp"
+ },
+ "CYLTabBarHostView touchableRectsDidChange": {
+  "status": "done",
+  "android": "CYLTabBarHostView.touchableRectsDidChange"
+ },
+ "CYLTabBarHostView tabBarController": {
+  "status": "done",
+  "android": "CYLTabBarHostView.tabBarController"
+ },
+ "CYLTabBarHostView plusButtonBadgeValue": {
+  "status": "done",
+  "android": "CYLTabBarHostView.plusButtonBadgeValue"
+ },
+ "CYLTabBarHostView badgeAnimationType": {
+  "status": "done",
+  "android": "CYLTabBarHostView.badgeAnimationType"
+ },
+ "CYLTabBarHostView didLongPressTab": {
+  "status": "done",
+  "android": "CYLTabBarHostView.didLongPressTab"
+ },
+ "CYLPlusButtonImageSize": {
+  "status": "done",
+  "android": "CYLConstants.CYLPlusButtonImageSize"
+ },
+ "CYLPlusButtonShowsSelection": {
+  "status": "done",
+  "android": "CYLConstants.CYLPlusButtonShowsSelection",
+  "note": "Android always shows the selection"
+ },
+ "CYLPlusButtonSize": {
+  "status": "done",
+  "android": "CYLConstants.CYLPlusButtonSize"
+ },
+ "CYLTabBarControllerLoginRequiredTabBarItemIdentifiers": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarControllerLoginRequiredTabBarItemIdentifiers",
+  "note": "a list or one comma-separated string"
+ },
+ "CYLTabBarHostBadgeAnimation": {
+  "status": "done",
+  "android": "CYLTabBarHostView.BADGE_ANIMATION"
+ },
+ "CYLTabBarHostBadgeCenterOffset": {
+  "status": "done",
+  "android": "CYLTabBarHostView.BADGE_CENTER_OFFSET"
+ },
+ "CYLTabBarHostBadgeColor": {
+  "status": "done",
+  "android": "CYLTabBarHostView.BADGE_COLOR"
+ },
+ "CYLTabBarHostBadgeRadius": {
+  "status": "done",
+  "android": "CYLTabBarHostView.BADGE_RADIUS"
+ },
+ "CYLTabBarHostBadgeValue": {
+  "status": "done",
+  "android": "CYLTabBarHostView.BADGE_VALUE"
+ },
+ "CYLTabBarHostView -resetLoggedIn": {
+  "status": "done",
+  "android": "CYLTabBarHostView.resetLoggedIn()"
+ },
+ "CYLTabBarHostView badgeAttributes": {
+  "status": "done",
+  "android": "CYLTabBarHostView.badgeAttributes"
+ },
+ "CYLTabBarHostView didRequestLogin": {
+  "status": "done",
+  "android": "CYLTabBarHostView.didRequestLogin"
+ },
+ "CYLTabBarHostView loggedIn": {
+  "status": "done",
+  "android": "CYLTabBarHostView.loggedIn",
+  "note": "cached in SharedPreferences, as NSUserDefaults on iOS"
+ },
+ "CYLTabBarHostView loginStateDidChange": {
+  "status": "done",
+  "android": "CYLTabBarHostView.loginStateDidChange"
+ },
+ "CYLTabBarHostView plusButtonBadgeAttributes": {
+  "status": "done",
+  "android": "CYLTabBarHostView.plusButtonBadgeAttributes"
+ },
+ "CYLTabBarHostView tabCoverImages": {
+  "status": "done",
+  "android": "CYLTabBarHostView.tabCoverImages",
+  "note": "CYLTabBarItemButton.cyl_coverView"
+ },
+ "UIViewController(CYLTabBarItemTitle)": {
+  "status": "done",
+  "android": "UIViewController+CYLTabBarItemTitle.kt (Fragment extensions)"
  }
 }

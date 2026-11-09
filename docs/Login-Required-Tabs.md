@@ -38,6 +38,7 @@ flowchart LR
 | &nbsp;&nbsp;&nbsp;&nbsp;↳ [Swift](#swift) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [Swift](#swift) |
 | [API](#api) | [API](#api) |
 | [关系图](#关系图--relationship-map) | [Relationship map](#关系图--relationship-map) |
+| [配置文件、Android 与跨平台](#配置文件android-与跨平台--configuration-file-android-and-cross-platform) | [Configuration file, Android and cross-platform](#配置文件android-与跨平台--configuration-file-android-and-cross-platform) |
 | [Demo](#demo) | [Demo](#demo) |
 | [截图](#截图--screenshots) | [Screenshots](#截图--screenshots) |
 
@@ -221,6 +222,16 @@ sequenceDiagram
     end
 ```
 
+## 配置文件、Android 与跨平台 / Configuration file, Android and cross-platform
+
+| 中文 | English |
+|:---|:---|
+| 配置文件用 `CYLTabBarControllerLoginRequiredTabBarItemIdentifiers` 列出需要登录的 Tab（字符串数组，或用逗号分隔的字符串），见[配置文件](Configuration-File.md)。 | A configuration file lists the tabs that need login with `CYLTabBarControllerLoginRequiredTabBarItemIdentifiers` (a list of strings, or one comma-separated string); see [Configuration file](Configuration-File.md). |
+| Android 库与 iOS 相同：`cyl_loggedIn` 保存在 App 的 SharedPreferences 中（文件 `CYLTabBarController`，键 `CYLTabBarControllerLoggedIn`，与 iOS 的 NSUserDefaults 键相同），重启后保留。 | The Android library works as iOS: `cyl_loggedIn` is kept in the app's SharedPreferences (file `CYLTabBarController`, key `CYLTabBarControllerLoggedIn`, the iOS NSUserDefaults key), across launches. |
+| `CYLTabBarHostView`（iOS 与 Android，React Native 与 Flutter 组件都基于它）：`loggedIn` 设置登录状态；未登录时点击需要登录的 Tab 不会选中它，而是调用 `didRequestLogin`（下标、标识、标题），由 App 展示登录界面。登录后设置 `loggedIn`，之前设置的 `selectedIndex` 随即生效（两者的设置顺序不影响结果）。在需要登录的 Tab 上退出登录，会选中第一个不需要登录的 Tab，并通过 `didSelectTab` 报告。 | `CYLTabBarHostView` (iOS and Android; the React Native and Flutter components are built on it): `loggedIn` sets the login state. While logged out, tapping a tab that needs login does not select it but calls `didRequestLogin` (index, identifier, title), and the app shows its login screen. After login, set `loggedIn`: the `selectedIndex` set before then applies (the order of the two does not matter). Logging out on such a tab selects the first tab that does not need login, reported by `didSelectTab`. |
+| App 未设置 `loggedIn` 时，宿主使用库缓存的状态，并在 TabBar 创建后通过 `loginStateDidChange` 报告；`resetLoggedIn` 让之后创建的 TabBar 重新使用缓存的状态。 | Until the app sets `loggedIn`, the host uses the state the library cached and reports it with `loginStateDidChange` once the tab bar is built; `resetLoggedIn` makes the next tab bar use the cached state again. |
+| React Native：`loggedIn`、`onLoginRequest(index, identifier, title)`、`onLoginStateChange(loggedIn)`。Flutter：`loggedIn`（`bool?`）、`onLoginRequest`、`onLoginStateChange`。`loggedIn` 留空（`undefined` / `null`）时使用缓存的状态，因此示例从 `onLoginStateChange` 开始，重启后登录状态保留，与 Objective-C 示例相同。 | React Native: `loggedIn`, `onLoginRequest(index, identifier, title)`, `onLoginStateChange(loggedIn)`. Flutter: `loggedIn` (`bool?`), `onLoginRequest`, `onLoginStateChange`. Left empty (`undefined` / `null`), `loggedIn` uses the cached state, so the examples start from `onLoginStateChange` and keep the login across launches, as the Objective-C example. |
+
 ## Demo
 
 | 中文 | English |
@@ -232,4 +243,7 @@ sequenceDiagram
 
 | 中文 | English |
 |:---|:---|
-| 本次开发环境没有 iOS 模拟器或真机，无法运行 Demo，因此暂无测试截图；上方为流程示意图。在设备上验证后，请将截图放入 `docs/assets/` 并在此引用，例如 `![未登录时点击「我的」](assets/login-required-tabs-alert.png)`。 | This change was developed without an iOS simulator or device, so there are no test screenshots yet; the figure above is a flow diagram. After testing on a device, put screenshots in `docs/assets/` and reference them here, e.g. `![Tapping "Me" while logged out](assets/login-required-tabs-alert.png)`. |
+| 未登录时点击「Messages」：弹出登录弹窗，不切换 Tab（React Native，Android）。 | Tapping "Messages" while logged out: a login alert, the tab does not switch (React Native, Android). |
+| ![未登录时点击 Messages / Tapping Messages while logged out](assets/login-required-tabs-react-native-android-alert.png) | ![未登录时点击 Messages / Tapping Messages while logged out](assets/login-required-tabs-react-native-android-alert.png) |
+| 点「Log in」后选中「Messages」，「Login state」行显示已登录（Flutter，iOS）。 | After "Log in", "Messages" is selected and the "Login state" row shows logged in (Flutter, iOS). |
+| ![登录后 / After logging in](assets/login-required-tabs-flutter-ios-logged-in.png) | ![登录后 / After logging in](assets/login-required-tabs-flutter-ios-logged-in.png) |

@@ -11,6 +11,7 @@ import com.cyl.tabbar.CYLPlusButton
 import com.cyl.tabbar.CYLTabBarController
 import com.cyl.tabbar.CYLTabBarIndicator
 import com.cyl.tabbar.CYLTabBarScrollMode
+import com.cyl.tabbar.cyl_navigationTitleFollowsTabBarItemTitle
 import com.cyl.tabbar.cyl_showBadgeValue
 
 /**
@@ -58,7 +59,12 @@ class MainActivity : AppCompatActivity() {
         }
         this.controller = controller
         setContentView(controller.view)
-        title = getString(R.string.app_name) + " · " + style.name
+        // [EN] As in the iOS example: the action bar shows the selected page's tab title, also after it changes in place
+        //      ("Change every title", skins, the plus button's title). The plus button's page follows the plus button's title.
+        // [CN] 与 iOS 示例相同：ActionBar 显示选中页面的 Tab 标题，原地修改后（「Change every title」、皮肤、PlusButton 的标题）也会同步。
+        //      PlusButton 的页面跟随 PlusButton 的标题。
+        controller.viewControllers.forEach { it.cyl_navigationTitleFollowsTabBarItemTitle = true }
+        DemoPlusButton.Provider.plusChildViewController().cyl_navigationTitleFollowsTabBarItemTitle = true
         controller.tabBar.tabBarButtonArray.getOrNull(1)?.cyl_showBadgeValue("12")
         controller.tabBar.tabBarButtonArray.getOrNull(3)?.cyl_showBadgeValue("")
         applyAndroidExtras(controller)

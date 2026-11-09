@@ -70,7 +70,9 @@ STYLE_NAMES = {'Default': 'default', 'System': 'system', 'FlatDesign': 'flatDesi
                'default': 'default', 'system': 'system', 'flatDesign': 'flatDesign', 'liquidGlass': 'liquidGlass'}
 # Field numbers of cyl_tabbar_configuration.proto. cyl_tabbar_configuration.proto 的字段编号。
 PROTO_TOP = {ITEMS_KEY: 1, 'CYLTabBarControllerImageInsets': 2, 'CYLTabBarControllerTitlePositionAdjustment': 3,
-             'CYLTabBarControllerStyleType': 4, 'CYLTabBarControllerContext': 5, 'CYLTabBarControllerTabBarItemAnimationSpeed': 7}
+             'CYLTabBarControllerStyleType': 4, 'CYLTabBarControllerContext': 5, 'CYLTabBarControllerTabBarItemAnimationSpeed': 7,
+             # [EN] A CYLTabBarItem message. [CN] 一个 CYLTabBarItem 消息。
+             'CYLTabBarControllerPlusButton': 12}
 PROTO_ITEM = {key: number for number, key in enumerate(ITEM_KEYS[:17], 1)}
 # 19 and 20 (class names) and the top-level 6 are reserved: removed before release. 19、20（类名）与顶层的 6 为保留编号：发布前已移除。
 PROTO_ITEM.update({'CYLTabBarLottieDarkColors': 18, 'CYLTabBarItemSelectedTitle': 21})
@@ -1065,7 +1067,12 @@ def write_binpb(c, report):
     for item in items:
         out += field(PROTO_TOP[ITEMS_KEY], item_message(item, report))
     for k, v in top:
-        out += field(PROTO_TOP[k], str(v).encode())
+        if k not in PROTO_TOP:
+            report.append('%s has no protobuf field; left out of .binpb' % k)
+        elif isinstance(v, dict):
+            out += field(PROTO_TOP[k], item_message(v, report))
+        else:
+            out += field(PROTO_TOP[k], str(v).encode())
     return bytes(out)
 
 

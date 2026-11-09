@@ -158,7 +158,13 @@ open class CYLPlusButton(context: Context) : FrameLayout(context) {
 
     override fun setSelected(selected: Boolean) {
         super.setSelected(selected)
-        imageView.setImageDrawable(if (selected && selectedImage != null) selectedImage else normalImage)
+        // [EN] As iOS (docs/PlusButton.md): with a page of its own on Liquid Glass, the plus button keeps its normal image
+        //      while selected; the selection shows under it. FlatDesign and the classic bar keep the selected image.
+        // [CN] 与 iOS 相同（docs/PlusButton.md）：液态玻璃下 PlusButton 有自己的页面时，选中后仍显示普通图片，选中效果显示在其下方。
+        //      扁平样式与经典样式仍使用选中图片。
+        val keepsNormalImage = provider?.plusChildViewController() != null &&
+            (parent as? CYLTabBar)?.styleRenderer is CYLLiquidGlassTabBarStyle
+        imageView.setImageDrawable(if (selected && selectedImage != null && !keepsNormalImage) selectedImage else normalImage)
         val content = selectedContent ?: provider?.selectedContentView(context)?.also { selectedContent = it; addView(it, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT)) }
         content?.visibility = if (selected) View.VISIBLE else View.GONE
         imageView.visibility = if (selected && content != null) View.INVISIBLE else View.VISIBLE
@@ -261,8 +267,26 @@ open class CYLPlusButton(context: Context) : FrameLayout(context) {
         val imageWidth = imageView.drawable?.intrinsicWidth?.coerceAtMost(width) ?: width
         val imageTop = (height - titleHeight - imageHeight) / 2
         imageView.layout((width - imageWidth) / 2, imageTop, (width + imageWidth) / 2, imageTop + imageHeight)
-        titleLabel.layout(0, height - titleHeight, width, height)
+        // [EN] Measured at the button's width, so the title is centered under the icon: measured at its text width and laid out
+        //      wider, a TextView draws its text at the left of the box.
+        // [CN] 按按钮宽度测量，使标题在图标下方居中：按文字宽度测量后再以更宽的范围布局时，TextView 会把文字画在左侧。
+        if (titleHeight > 0) titleLabel.measure(MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(titleHeight, MeasureSpec.EXACTLY))
+        // [EN] A button with only a background image (no icon) shows its title on the image, at its center, as iOS does
+        //      (Example-PAG's "Menu"); below it, a white selected title would vanish on the bar.
+        // [CN] 只有背景图片（没有图标）的按钮把标题显示在图片中心，与 iOS 相同（Example-PAG 的 "Menu"）；若放在下方，白色的选中标题会在 TabBar 上看不见。
+        val titleTop = if (imageView.drawable == null && background != null) (height - titleHeight) / 2 else height - titleHeight
+        titleLabel.layout(0, titleTop, width, titleTop + titleHeight)
         selectedContent?.layout(0, 0, width, height)
+        // [EN] Badges sit on the icon's top-right corner plus `cyl_badgeCenterOffset`, as on the tab buttons. [CN] 角标位于图标右上角并加上 `cyl_badgeCenterOffset`，与 Tab 按钮相同。
+        val density = resources.displayMetrics.density
+        val state = cyl_badgeState
+        for (index in 0 until childCount) {
+            val badge = getChildAt(index) as? CYLBadgeView ?: continue
+            if (badge.measuredWidth == 0) badge.measure(MeasureSpec.UNSPECIFIED, MeasureSpec.UNSPECIFIED)
+            val badgeLeft = (imageView.right - badge.measuredWidth / 2 + state.centerOffset.horizontal * density).toInt()
+            val badgeTop = (imageView.top - badge.measuredHeight / 2 + state.centerOffset.vertical * density).toInt()
+            badge.layout(badgeLeft, badgeTop, badgeLeft + badge.measuredWidth, badgeTop + badge.measuredHeight)
+        }
     }
 
     companion object {

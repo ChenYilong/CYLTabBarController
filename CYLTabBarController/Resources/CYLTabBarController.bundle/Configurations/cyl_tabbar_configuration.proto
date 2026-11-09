@@ -32,6 +32,9 @@ message CYLTabBarConfiguration {
   string CYLTabBarControllerThemeIdentifier = 9;
   string CYLTabBarControllerDarkThemeIdentifier = 10;
   string CYLTabBarControllerThemeManagerName = 11;
+  // [EN] The plus button: CYLTabBarItemTitle, CYLTabBarItemImage, CYLTabBarItemSelectedTitle, CYLTabBarItemSelectedTitleColor.
+  // [CN] PlusButton：CYLTabBarItemTitle、CYLTabBarItemImage、CYLTabBarItemSelectedTitle、CYLTabBarItemSelectedTitleColor。
+  CYLTabBarItem CYLTabBarControllerPlusButton = 12;
 }
 
 message CYLTabBarTheme {

@@ -6,6 +6,7 @@
 //
 
 #import <XCTest/XCTest.h>
+#import <stdatomic.h>
 #import <CYLTabBarController/CYLTabBarController.h>
 
 /// [EN] A page registered automatically under "registry-tests-auto". [CN] 自动按 "registry-tests-auto" 注册的页面。
@@ -151,7 +152,7 @@ static NSDictionary *CYLTestTab(NSString *title, NSString *pageIdentifier) {
     } forPageIdentifiers:@[ @"first", @"second" ]];
     NSArray *tabs = @[ @"not a tab", @{ CYLTabBarItemTitle : @"No ID" }, CYLTestTab(@"Raises", @"raises"), CYLTestTab(@"Nested", @"nested"),
                        CYLTestTab(@"First", @"first"), CYLTestTab(@"Second", @"second"), CYLTestTab(@"Unknown", @"unknown") ];
-    NSMutableArray<NSDictionary *> *kept = [NSMutableArray array];
+    NSMutableArray<NSDictionary<NSString *, id> *> *kept = [NSMutableArray array];
     NSMutableArray<CYLTabBarSkippedTab *> *skipped = [NSMutableArray array];
     NSArray *pages = [CYLTabBarPageRegistry pagesOfTabs:tabs registry:registry resolver:nil
                                             lookupOrder:@[ CYLTabBarPageSourceInstanceRegistry ] keptTabs:kept skipped:skipped];
@@ -219,12 +220,22 @@ static NSDictionary *CYLTestTab(NSString *title, NSString *pageIdentifier) {
 - (void)testAsynchronousPageIsSwappedInAndAFailedOneRemovesTheTab {
     CYLTabBarPageRegistry *registry = [[CYLTabBarPageRegistry alloc] init];
     [registry registerPageProvider:CYLTestPage(@"home") forPageIdentifier:@"home"];
+    // [EN] The pages arrive off the main thread, from the test's own queue: a busy CI runner may run the shared global
+    //      queues late. `completions` tells a failure apart: no delivery at all, or a delivery that was not applied.
+    // [CN] 页面从测试自己的队列、在非主线程送达：繁忙的 CI 机器可能延后执行共享的全局队列。`completions` 用于区分失败原因：完全没有送达，
+    //      还是送达后未被应用。
+    dispatch_queue_t deliveryQueue = dispatch_queue_create("CYLTabBarPageRegistryTests.delivery",
+                                                           dispatch_queue_attr_make_with_qos_class(DISPATCH_QUEUE_SERIAL, QOS_CLASS_USER_INITIATED, 0));
+    __block atomic_int completions = 0;
     [registry registerAsyncPageFactory:^UIViewController *(CYLTabBarPageRequest *request, CYLTabBarPageCompletion completion) {
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.05 * NSEC_PER_SEC)), dispatch_get_global_queue(QOS_CLASS_UTILITY, 0), ^{
-            UIViewController *page = [request.pageIdentifier isEqualToString:@"later"] ? [[UIViewController alloc] init] : nil;
-            page.title = request.title;
+        // [EN] The page is made on the main thread (UIKit); only its delivery comes from the background queue.
+        // [CN] 页面在主线程创建（UIKit 要求）；只有交付来自后台队列。
+        UIViewController *page = [request.pageIdentifier isEqualToString:@"later"] ? [[UIViewController alloc] init] : nil;
+        page.title = request.title;
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.05 * NSEC_PER_SEC)), deliveryQueue, ^{
             completion(page);
             completion(page); // [EN] A second call is ignored. [CN] 第二次调用被忽略。
+            atomic_fetch_add(&completions, 1);
         });
         return nil;
     } forPageIdentifiers:@[ @"later", @"never" ]];
@@ -242,9 +253,9 @@ static NSDictionary *CYLTestTab(NSString *title, NSString *pageIdentifier) {
     NSPredicate *delivered = [NSPredicate predicateWithBlock:^BOOL(CYLTabBarController *controller, NSDictionary *bindings) {
         return controller.cyl_pendingPages.count == 0;
     }];
-    [self waitForExpectations:@[ [[XCTNSPredicateExpectation alloc] initWithPredicate:delivered object:tabBarController] ] timeout:10];
+    [self waitForExpectations:@[ [[XCTNSPredicateExpectation alloc] initWithPredicate:delivered object:tabBarController] ] timeout:20];
 
-    XCTAssertEqual(tabBarController.cyl_pendingPages.count, 0u);
+    XCTAssertEqual(tabBarController.cyl_pendingPages.count, 0u, @"factory completions run: %d of 2", atomic_load(&completions));
     XCTAssertEqualObjects([tabBarController.viewControllers valueForKey:@"title"], (@[ @"Later", @"home" ]), @"\"later\" swapped in, \"never\" removed");
     XCTAssertFalse([tabBarController.viewControllers[0] isKindOfClass:[CYLTabBarPagePlaceholder class]]);
     XCTAssertEqual(tabBarController.tabBarItemsAttributes.count, 2u);
