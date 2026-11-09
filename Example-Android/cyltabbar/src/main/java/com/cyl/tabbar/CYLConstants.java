@@ -165,6 +165,30 @@ public final class CYLConstants {
     public static final String CYLThemeDidChangeNotification = "CYLThemeDidChangeNotification";
     public static final String CYLTabBarMinimizeDidChangeNotification = "CYLTabBarMinimizeDidChangeNotification";
 
+    // MARK: - Tab change notifications Tab 变化通知 (as on iOS; observe with CYLNotificationCenter)
+
+    /** [EN] A tab's title (or selected title) changed in place; object: the tab's page. [CN] Tab 的标题（或选中标题）原地变化；object 为该 Tab 的页面。 */
+    public static final String CYLTabBarItemTitleDidChangeNotification = "CYLTabBarItemTitleDidChangeNotification";
+    /** [EN] A tab's icon changed (image keys, URLs, `setTabBarItemIcon`, an icon view provider); object: the tab's page. [CN] Tab 的图标变化；object 为该 Tab 的页面。 */
+    public static final String CYLTabBarItemIconDidChangeNotification = "CYLTabBarItemIconDidChangeNotification";
+    /** [EN] Any in-place change of a tab, after the two above; object: the tab's page. [CN] Tab 的任何原地变化，在上面两个之后发送；object 为该 Tab 的页面。 */
+    public static final String CYLTabBarItemDidChangeNotification = "CYLTabBarItemDidChangeNotification";
+    /** [EN] A skin was applied (or removed); object: the tab bar controller. [CN] 应用（或移除）了皮肤；object 为 TabBarController。 */
+    public static final String CYLTabBarControllerThemeDidApplyNotification = "CYLTabBarControllerThemeDidApplyNotification";
+    /** [EN] userInfo keys. [CN] userInfo 的 key。 */
+    public static final String CYLTabBarControllerKey = "CYLTabBarControllerKey";
+    public static final String CYLTabBarItemIndexKey = "CYLTabBarItemIndexKey";
+    public static final String CYLTabBarItemViewControllerKey = "CYLTabBarItemViewControllerKey";
+    public static final String CYLTabBarItemKey = "CYLTabBarItemKey";
+    public static final String CYLTabBarItemChangedAttributesKey = "CYLTabBarItemChangedAttributesKey";
+    public static final String CYLTabBarItemOldTitleKey = "CYLTabBarItemOldTitleKey";
+    public static final String CYLTabBarItemIconViewProviderKey = "CYLTabBarItemIconViewProviderKey";
+    public static final String CYLPlusButtonKey = "CYLPlusButtonKey";
+    public static final String CYLTabBarThemeKey = "CYLTabBarThemeKey";
+    /** [EN] The tab indexes a skin applies to (`List<Int>`; iOS: `NSIndexSet`). [CN] 皮肤作用的 Tab 下标（`List<Int>`；iOS 为 `NSIndexSet`）。 */
+    public static final String CYLTabBarItemIndexesKey = "CYLTabBarItemIndexesKey";
+    public static final String CYLTabBarItemIdentifiersKey = "CYLTabBarItemIdentifiersKey";
+
     // MARK: - Sizes 尺寸 (dp)
 
     /** [EN] The icon placeholder size, in dp (iOS: 30 pt). [CN] 图标占位尺寸（dp；iOS 为 30 pt）。 */

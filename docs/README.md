@@ -252,6 +252,8 @@ docs/
 │   ├── theme-switching-rive-grapefruit.png
 │   ├── theme-switching-runtime-christmas-to-pink-rose.png
 │   ├── theme-switching-swiftui-rive-grapefruit.png
+│   ├── update-tab-android-activity-title-changed.png
+│   ├── update-tab-android-activity-title-restored.png
 │   ├── update-tab-bar-items-all-local-icons.png
 │   ├── update-tab-bar-items-all-network-icons-badges.png
 │   ├── update-tab-bar-items-all-network-icons-restored.png

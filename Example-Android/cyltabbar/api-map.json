@@ -2247,71 +2247,79 @@
   "android": "CYLConstants.CYLTabBarLocalizationBundleName"
  },
  "CYLTabBarItemTitleDidChangeNotification": {
-  "status": "planned",
-  "note": "Android pages have no navigation bar title of their own yet"
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarItemTitleDidChangeNotification",
+  "note": "observe with CYLNotificationCenter.addObserver"
  },
  "CYLTabBarItemDidChangeNotification": {
-  "status": "planned",
-  "note": "tab change notifications: Android listeners planned"
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarItemDidChangeNotification",
+  "note": "observe with CYLNotificationCenter.addObserver"
  },
  "CYLTabBarItemChangedAttributesKey": {
-  "status": "planned",
-  "note": "tab change notifications: Android listeners planned"
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarItemChangedAttributesKey"
  },
  "CYLTabBarItemIndexKey": {
-  "status": "planned",
-  "note": "tab change notifications: Android listeners planned"
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarItemIndexKey"
  },
  "CYLTabBarItemIconDidChangeNotification": {
-  "status": "planned",
-  "note": "tab change notifications: Android listeners planned"
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarItemIconDidChangeNotification",
+  "note": "observe with CYLNotificationCenter.addObserver"
  },
  "CYLTabBarItemIconViewProviderKey": {
-  "status": "planned",
-  "note": "tab change notifications: Android listeners planned"
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarItemIconViewProviderKey"
  },
  "CYLTabBarControllerThemeDidApplyNotification": {
-  "status": "planned",
-  "note": "tab change notifications: Android listeners planned"
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarControllerThemeDidApplyNotification",
+  "note": "observe with CYLNotificationCenter.addObserver"
  },
  "CYLTabBarThemeKey": {
-  "status": "planned",
-  "note": "tab change notifications: Android listeners planned"
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarThemeKey"
  },
  "CYLTabBarItemIndexesKey": {
-  "status": "planned",
-  "note": "tab change notifications: Android listeners planned"
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarItemIndexesKey",
+  "note": "a List<Int> (iOS: NSIndexSet)"
  },
  "CYLTabBarItemIdentifiersKey": {
-  "status": "planned",
-  "note": "tab change notifications: Android listeners planned"
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarItemIdentifiersKey"
  },
  "CYLTabBarControllerKey": {
-  "status": "planned",
-  "note": "tab change notifications: Android listeners planned"
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarControllerKey"
  },
  "CYLTabBarItemViewControllerKey": {
-  "status": "planned",
-  "note": "tab change notifications: Android listeners planned"
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarItemViewControllerKey"
  },
  "CYLTabBarItemKey": {
-  "status": "planned",
-  "note": "tab change notifications: Android listeners planned"
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarItemKey",
+  "note": "the tab's CYLTabBarItem"
  },
  "CYLPlusButtonKey": {
-  "status": "planned",
-  "note": "tab change notifications: Android listeners planned"
+  "status": "done",
+  "android": "CYLConstants.CYLPlusButtonKey"
  },
  "CYLTabBarItemOldTitleKey": {
-  "status": "planned",
-  "note": "tab change notifications: Android listeners planned"
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarItemOldTitleKey"
  },
  "UIViewController(CYLTabBarItemTitle) cyl_tabBarItemTitle": {
-  "status": "planned"
+  "status": "done",
+  "android": "Fragment.cyl_tabBarItemTitle"
  },
  "UIViewController(CYLTabBarItemTitle) cyl_navigationTitleFollowsTabBarItemTitle": {
-  "status": "planned",
-  "note": "Android pages have no navigation bar title of their own yet"
+  "status": "done",
+  "android": "Fragment.cyl_navigationTitleFollowsTabBarItemTitle",
+  "note": "one action bar per activity: the activity's title follows the selected page's tab title"
  },
  "CYLTabBarControllerThemes": {
   "status": "done",
@@ -5576,5 +5584,9 @@
   "status": "done",
   "android": "CYLTabBarHostView.tabCoverImages",
   "note": "CYLTabBarItemButton.cyl_coverView"
+ },
+ "UIViewController(CYLTabBarItemTitle)": {
+  "status": "done",
+  "android": "UIViewController+CYLTabBarItemTitle.kt (Fragment extensions)"
  }
 }
