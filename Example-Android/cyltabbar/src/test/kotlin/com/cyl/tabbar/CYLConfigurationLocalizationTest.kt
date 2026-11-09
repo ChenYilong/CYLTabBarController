@@ -100,6 +100,6 @@ class CYLConfigurationLocalizationTest {
         assertEquals(mapOf("k" to "值"), CYLTabBarConfigurationLocalization.parseStrings(utf16))
         assertEquals(listOf("zh-Hans", "zh", "Base", "en"), CYLTabBarConfigurationLocalization.candidates(Locale.SIMPLIFIED_CHINESE))
         assertEquals(listOf("zh-Hant", "zh", "Base", "en"), CYLTabBarConfigurationLocalization.candidates(Locale.TRADITIONAL_CHINESE))
-        assertEquals(listOf("pt-BR", "pt", "Base", "en"), CYLTabBarConfigurationLocalization.candidates(Locale("pt", "BR")))
+        assertEquals(listOf("pt-BR", "pt", "Base", "en"), CYLTabBarConfigurationLocalization.candidates(Locale.forLanguageTag("pt-BR")))
     }
 }

@@ -66,32 +66,33 @@ object CYLTabBarConfigurationLocalization {
         ).distinct()
     }
 
-    private fun location(context: Context, value: Any?, source: String?): Pair<Location, String>? {
-        var table = "Localizable"
-        val assetsRoot = Location("", null)
-        when (value) {
-            is Boolean -> return if (value) assetsRoot to table else null
-            is String -> {
-                val text = value.trim()
-                return when (text.lowercase()) {
-                    "true", "yes" -> assetsRoot to table
-                    "", "false", "no" -> null
-                    else -> assetsRoot to text
-                }
-            }
-            is Map<*, *> -> {
-                (value[CYLConstants.CYLTabBarLocalizationTableName] as? String)?.takeIf { it.isNotBlank() }?.let { table = it.removeSuffix(".strings") }
-                (value[CYLConstants.CYLTabBarLocalizationPath] as? String)?.takeIf { it.isNotBlank() }?.let { return resolve(context, it, source) to table }
-                val bundle = (value[CYLConstants.CYLTabBarLocalizationBundleName] as? String)?.takeIf { it.isNotBlank() && it != "main" }
-                    ?: return assetsRoot to table
-                return Location(if (bundle.endsWith(".bundle")) bundle else "$bundle.bundle", null) to table
-            }
-            else -> {
-                android.util.Log.w("CYLTabBarController", "configuration: invalid ${CYLConstants.CYLTabBarControllerLocalization}: $value")
-                return null
-            }
+    private val assetsRoot = Location("", null)
+
+    private fun location(context: Context, value: Any?, source: String?): Pair<Location, String>? = when (value) {
+        is Boolean -> if (value) assetsRoot to DEFAULT_TABLE else null
+        is String -> when (value.trim().lowercase()) {
+            "true", "yes" -> assetsRoot to DEFAULT_TABLE
+            "", "false", "no" -> null
+            else -> assetsRoot to value.trim()
+        }
+        is Map<*, *> -> dictionaryLocation(context, value, source)
+        else -> {
+            android.util.Log.w("CYLTabBarController", "configuration: invalid ${CYLConstants.CYLTabBarControllerLocalization}: $value")
+            null
         }
     }
+
+    /** [EN] The dictionary form: a table name, then a path or a bundle name. [CN] 字典形式：表名，然后是路径或 bundle 名称。 */
+    private fun dictionaryLocation(context: Context, value: Map<*, *>, source: String?): Pair<Location, String> {
+        val table = (value[CYLConstants.CYLTabBarLocalizationTableName] as? String)?.takeIf { it.isNotBlank() }?.removeSuffix(".strings") ?: DEFAULT_TABLE
+        val path = (value[CYLConstants.CYLTabBarLocalizationPath] as? String)?.takeIf { it.isNotBlank() }
+        if (path != null) return resolve(context, path, source) to table
+        val bundle = (value[CYLConstants.CYLTabBarLocalizationBundleName] as? String)?.takeIf { it.isNotBlank() && it != "main" }
+            ?: return assetsRoot to table
+        return Location(if (bundle.endsWith(".bundle")) bundle else "$bundle.bundle", null) to table
+    }
+
+    private const val DEFAULT_TABLE = "Localizable"
 
     /** [EN] `CYLTabBarLocalizationPath` to a folder. [CN] 把 `CYLTabBarLocalizationPath` 解析为目录。 */
     private fun resolve(context: Context, path: String, source: String?): Location {
@@ -139,57 +140,81 @@ object CYLTabBarConfigurationLocalization {
      * [CN] `.strings` 文件：`"键" = "值";` 行、`//` 与 `/* */` 注释、UTF-8 或 UTF-16（带字节顺序标记），以及转义 `\"`、`\\`、`\n`、`\t`、`\r`
      *      与后跟四位十六进制数的 `\U`/`\u`。
      */
-    internal fun parseStrings(bytes: ByteArray): Map<String, String> {
-        val text = when {
-            bytes.size >= 2 && bytes[0] == 0xFF.toByte() && bytes[1] == 0xFE.toByte() -> String(bytes, 2, bytes.size - 2, Charsets.UTF_16LE)
-            bytes.size >= 2 && bytes[0] == 0xFE.toByte() && bytes[1] == 0xFF.toByte() -> String(bytes, 2, bytes.size - 2, Charsets.UTF_16BE)
-            bytes.size >= 3 && bytes[0] == 0xEF.toByte() && bytes[1] == 0xBB.toByte() && bytes[2] == 0xBF.toByte() -> String(bytes, 3, bytes.size - 3, Charsets.UTF_8)
+    internal fun parseStrings(bytes: ByteArray): Map<String, String> = CYLStringsScanner(decodeStrings(bytes)).entries()
+
+    /** [EN] The text of a `.strings` file, by its byte order mark (UTF-8 without one). [CN] 按字节顺序标记解码 `.strings` 文件（没有标记时为 UTF-8）。 */
+    private fun decodeStrings(bytes: ByteArray): String {
+        fun startsWith(vararg mark: Int) = bytes.size >= mark.size && mark.indices.all { bytes[it] == mark[it].toByte() }
+        return when {
+            startsWith(0xFF, 0xFE) -> String(bytes, 2, bytes.size - 2, Charsets.UTF_16LE)
+            startsWith(0xFE, 0xFF) -> String(bytes, 2, bytes.size - 2, Charsets.UTF_16BE)
+            startsWith(0xEF, 0xBB, 0xBF) -> String(bytes, 3, bytes.size - 3, Charsets.UTF_8)
             else -> String(bytes, Charsets.UTF_8)
         }
-        val result = LinkedHashMap<String, String>()
-        var index = 0
-        fun skip() {
+    }
+
+    /** [EN] Reads `"key" = "value";` entries from the text of a `.strings` file. [CN] 从 `.strings` 文件的文本中读取 `"键" = "值";` 条目。 */
+    private class CYLStringsScanner(private val text: String) {
+        private var index = 0
+
+        fun entries(): Map<String, String> {
+            val result = LinkedHashMap<String, String>()
+            while (true) {
+                skipSpacesAndComments()
+                val key = quoted() ?: break
+                if (!consume('=')) break
+                val value = quoted() ?: break
+                result[key] = value
+                consume(';')
+            }
+            return result
+        }
+
+        /** [EN] Skips spaces and comments, then takes `char` when it comes next. [CN] 跳过空白与注释，下一个字符为 `char` 时读取它。 */
+        private fun consume(char: Char): Boolean {
+            skipSpacesAndComments()
+            if (index >= text.length || text[index] != char) return false
+            index++
+            skipSpacesAndComments()
+            return true
+        }
+
+        private fun skipSpacesAndComments() {
             while (index < text.length) {
-                when {
-                    text[index].isWhitespace() -> index++
-                    text.startsWith("//", index) -> index = text.indexOf('\n', index).let { if (it < 0) text.length else it + 1 }
-                    text.startsWith("/*", index) -> index = text.indexOf("*/", index + 2).let { if (it < 0) text.length else it + 2 }
+                index = when {
+                    text[index].isWhitespace() -> index + 1
+                    text.startsWith("//", index) -> text.indexOf('\n', index).let { if (it < 0) text.length else it + 1 }
+                    text.startsWith("/*", index) -> text.indexOf("*/", index + 2).let { if (it < 0) text.length else it + 2 }
                     else -> return
                 }
             }
         }
-        fun quoted(): String? {
+
+        private fun quoted(): String? {
             if (index >= text.length || text[index] != '"') return null
             index++
             val builder = StringBuilder()
             while (index < text.length && text[index] != '"') {
-                val c = text[index++]
-                if (c != '\\' || index >= text.length) { builder.append(c); continue }
-                when (val e = text[index++]) {
-                    'n' -> builder.append('\n')
-                    't' -> builder.append('\t')
-                    'r' -> builder.append('\r')
-                    'u', 'U' -> {
-                        val hex = text.substring(index, minOf(index + 4, text.length))
-                        hex.toIntOrNull(16)?.let { builder.append(it.toChar()); index += 4 } ?: builder.append(e)
-                    }
-                    else -> builder.append(e)
-                }
+                val char = text[index++]
+                if (char == '\\' && index < text.length) appendEscape(builder) else builder.append(char)
             }
             index++
             return builder.toString()
         }
-        while (true) {
-            skip()
-            val key = quoted() ?: break
-            skip()
-            if (index < text.length && text[index] == '=') { index++; skip() } else break
-            val value = quoted() ?: break
-            result[key] = value
-            skip()
-            if (index < text.length && text[index] == ';') index++
+
+        /** [EN] The character after a backslash: `\n`, `\t`, `\r`, `\U`/`\u` + four hex digits, or itself. [CN] 反斜杠后的字符。 */
+        private fun appendEscape(builder: StringBuilder) {
+            when (val escaped = text[index++]) {
+                'n' -> builder.append('\n')
+                't' -> builder.append('\t')
+                'r' -> builder.append('\r')
+                'u', 'U' -> {
+                    val code = text.substring(index, minOf(index + 4, text.length)).toIntOrNull(16)
+                    if (code != null) { builder.append(code.toChar()); index += 4 } else builder.append(escaped)
+                }
+                else -> builder.append(escaped)
+            }
         }
-        return result
     }
 
     private fun translate(value: Any?, strings: Map<String, String>): Any? = when (value) {
