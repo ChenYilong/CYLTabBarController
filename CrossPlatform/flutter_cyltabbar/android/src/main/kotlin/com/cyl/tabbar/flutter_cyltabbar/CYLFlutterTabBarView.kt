@@ -55,6 +55,9 @@ internal class CYLFlutterTabBarView(
     }
     hostView.loginStateDidChange = { loggedIn -> channel.invokeMethod("onLoginStateChange", loggedIn) }
     applyLoggedIn(arguments["loggedIn"])
+    // [EN] Before the configuration, so it is built once, in this language. [CN] 在配置之前，使 TabBar 以该语言只创建一次。
+    hostView.language = (arguments["language"] as? String)?.takeIf { it.isNotEmpty() }
+    hostView.tabBarHidden = arguments["tabBarHidden"] == true
     hostView.plusButtonBadgeValue = arguments["plusButtonBadgeValue"] as? String
     hostView.badgeAnimationType = badgeAnimation(arguments["badgeAnimation"])
     hostView.selectedIndex = (arguments["selectedIndex"] as? Number)?.toInt() ?: -1
@@ -83,6 +86,8 @@ internal class CYLFlutterTabBarView(
       "setPlusButtonBadge" -> hostView.plusButtonBadgeAttributes = badgeStyle(call.arguments)
       "setTabCoverImages" -> hostView.tabCoverImages = (call.arguments as? List<*>).orEmpty()
       "setLoggedIn" -> applyLoggedIn(call.arguments)
+      "setTabBarHidden" -> hostView.tabBarHidden = call.arguments == true
+      "setLanguage" -> hostView.language = (call.arguments as? String)?.takeIf { it.isNotEmpty() }
       else -> return result.notImplemented()
     }
     result.success(null)

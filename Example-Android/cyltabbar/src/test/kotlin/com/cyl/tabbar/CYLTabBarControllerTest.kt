@@ -117,7 +117,12 @@ class CYLTabBarControllerTest {
         assertFalse(button.cyl_isPauseBadge())
         button.cyl_clearBadge()
         assertNull(button.cyl_badge)
-        assertEquals("3 new items", CYLBadgeAccessibilityDescription("3"))
+        // [EN] As iOS (CYLBadgeAccessibilityDescription): a dot, a number, "99+", 0 and text. [CN] 与 iOS 相同：红点、数字、"99+"、0 与文字。
+        assertEquals("New content", CYLBadgeAccessibilityDescription(button.context, ""))
+        assertEquals("3 new messages", CYLBadgeAccessibilityDescription(button.context, "3"))
+        assertEquals("99+ new messages", CYLBadgeAccessibilityDescription(button.context, "99+"))
+        assertNull(CYLBadgeAccessibilityDescription(button.context, "0"))
+        assertEquals("NEW", CYLBadgeAccessibilityDescription(button.context, "NEW"))
     }
 
     object TestPlusButton : CYLPlusButtonSubclassing {

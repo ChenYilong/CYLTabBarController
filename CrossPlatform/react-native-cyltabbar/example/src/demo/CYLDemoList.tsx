@@ -1,14 +1,16 @@
 /**
  * The demo list of the Objective-C example, shown on every tab (UIViewController+CYLSettingsSection.m and the badge
  * samples of UITableViewCell+CYLBadgeExtention.m). The rows come from Example-Shared/CYLDemoList/demo-list.json, copied
- * here by scripts/sync-example-shared.py; `values` fills in the "{name}" parts, `onRow` handles a tap.
+ * here by scripts/sync-example-shared.py; `values` fills in the "{name}" parts, `onRow` handles a tap. Every text is shown
+ * in the current language (CYLLocalization.ts).
  * Objective-C 示例的演示列表，每个 Tab 都显示。行数据来自 Example-Shared/CYLDemoList/demo-list.json（由 scripts/sync-example-shared.py
- * 复制到这里）；`values` 填入「{name}」部分，`onRow` 处理点击。
+ * 复制到这里）；`values` 填入「{name}」部分，`onRow` 处理点击。所有文字使用当前语言显示（CYLLocalization.ts）。
  */
 import { Image, Platform, Pressable, SectionList, StyleSheet, Switch, Text, View, type ImageSourcePropType } from 'react-native';
 import { CYLBadgeView, type CYLBadgeSample } from './CYLBadgeView';
 import { DEMO_ICONS } from './icons';
 import { SKINS, THEME_ICONS, type CYLSkin } from '../CYLSkins';
+import { CYLDemoLanguage, CYLFlaggedLanguageName, CYLLanguageName, t, tDevice } from './CYLLocalization';
 
 const DATA = require('./demo-list.json') as {
   sections: { id: string; title: string; rows: CYLDemoRow[]; skins?: boolean }[];
@@ -44,31 +46,47 @@ type Props = {
   onSwitch: (row: CYLDemoRow, on: boolean) => void;
 };
 
-const fill = (text: string, values: Record<string, string>) => text.replace(/\{(\w+)\}/g, (_, name) => values[name] ?? '-');
-
 /** How VoiceOver / TalkBack reads a badge, as `CYLBadge`: "New content", "3 new messages" or its text. 读屏软件读出的角标内容。 */
 export function badgeAccessibilityText(value: string) {
-  if (value === '') return 'New content';
-  return /^\d+$/.test(value) ? `${value} new messages` : value;
+  if (value === '') return t('New content');
+  return /^\d+$/.test(value) ? t('{count} new messages', { count: value }) : value;
+}
+
+/**
+ * A row's texts in the current language. The language row shows the language (`-cyl_languageCellForTableView:`), its
+ * subtitle in the device language so it stays readable; the login row shows its state.
+ * 当前语言中的行文字。语言行显示当前语言（`-cyl_languageCellForTableView:`），副标题使用设备语言以便始终能看懂；登录行显示登录状态。
+ */
+function rowTexts(row: CYLDemoRow, values: Record<string, string>, switches: Record<string, boolean>) {
+  if (row.id === 'language') {
+    const language = CYLDemoLanguage();
+    return {
+      title: `🌐 ${t('Language')}：${CYLFlaggedLanguageName(language)}`,
+      subtitle: tDevice('Tap to change the language'),
+      label: `${t('Language')}, ${CYLLanguageName(language)}`,
+    };
+  }
+  const title = row.id === 'login' ? t(switches.login ? 'Login state: logged in' : 'Login state: logged out') : t(row.title, values);
+  return { title, subtitle: t(row.subtitle, values), label: undefined };
 }
 
 export function CYLDemoList({ colors, tint, values, switches, currentSkin, badgeSubtitle, header, onRow, onSwitch }: Props) {
   const sections = [
     ...DATA.sections.map((section) => ({
-      title: section.title,
+      title: t(section.title),
       data: section.skins
         ? SKINS.map<CYLDemoRow>((skin) => ({
             id: `skin:${skin.name}`,
             icon: null,
-            title: skin.name,
-            subtitle: skin.network ? 'Network icons, titles and colors' : skin.icons ? 'Holiday icons and colors' : 'Colors only',
+            title: t(skin.name),
+            subtitle: t(skin.network ? 'Network icons, titles and colors' : skin.icons ? 'Holiday icons and colors' : 'Colors only'),
             accessory: 'none',
             skin,
           }))
         : section.rows,
     })),
     {
-      title: 'Badges',
+      title: t('Badges'),
       data: DATA.badgeSamples.map<CYLDemoRow>(({ title, ...badge }, index) => ({
         id: `badge:${index}`,
         icon: '@cyl_badge_sample_icon',
@@ -145,9 +163,9 @@ export function CYLDemoList({ colors, tint, values, switches, currentSkin, badge
         // 带按钮的行（箭头、「Tap me」）让这些按钮可被访问。
         const isSwitch = item.accessory === 'switch';
         const grouped = item.accessory !== 'arrows' && !item.button;
-        const label = [fill(item.title, values), item.badge ? badgeSubtitle : fill(item.subtitle, values), item.badge ? badgeAccessibilityText(item.badge.value) : '']
-          .filter(Boolean)
-          .join(', ');
+        const texts = item.skin ? { title: item.title, subtitle: item.subtitle, label: undefined } : rowTexts(item, values, switches);
+        const subtitle = item.badge ? badgeSubtitle : texts.subtitle;
+        const label = texts.label ?? [texts.title, subtitle, item.badge ? badgeAccessibilityText(item.badge.value) : ''].filter(Boolean).join(', ');
         return (
           <Pressable
             accessible={grouped}
@@ -164,10 +182,10 @@ export function CYLDemoList({ colors, tint, values, switches, currentSkin, badge
           >
             {icon(item)}
             <View style={styles.texts}>
-              <Text style={[styles.title, { color: item.link ? tint : colors.label }]}>{fill(item.title, values)}</Text>
-              {item.subtitle ? (
+              <Text style={[styles.title, { color: item.link ? tint : colors.label }]}>{texts.title}</Text>
+              {subtitle ? (
                 <Text style={[styles.subtitle, { color: colors.secondaryLabel }]} ellipsizeMode={item.badge ? 'middle' : 'tail'}>
-                  {fill(item.subtitle, values)}
+                  {subtitle}
                 </Text>
               ) : null}
               {item.button ? (

@@ -1,0 +1,17 @@
+{
+  "comment": "[EN] Texts the React Native and Flutter examples show outside demo-list.json (tab titles, navigation bar, alerts, skin and value names), in English. scripts/sync-example-shared.py translates them, with demo-list.json, from the library's string tables. [CN] React Native 与 Flutter 示例在 demo-list.json 之外显示的文字（Tab 标题、导航栏、弹窗、皮肤与取值名称），英文。scripts/sync-example-shared.py 根据库的字符串表翻译它们与 demo-list.json。",
+  "texts": [
+    "Home", "Nearby", "Post", "Messages", "Me", "Refresh",
+    "Flat Design", "Skin", "Liquid Glass",
+    "Choose a theme", "Follow the system Dark Mode",
+    "Login required", "Log in to view “{title}”", "Log in", "Cancel",
+    "Login state: logged in", "Login state: logged out",
+    "Language", "Follow system", "Tap to change the language",
+    "Original", "None",
+    "Network icons, titles and colors", "Holiday icons and colors", "Colors only", "Badges",
+    "New content", "{count} new messages", "{page} CYLTabBarController on iOS {version}",
+    "Default", "Grapefruit", "Grass", "Pink Rose", "Dark", "Network icons",
+    "Spring Festival", "Christmas", "Halloween", "Valentine's Day", "Mid-Autumn", "Easter", "New Year", "Summer",
+    "Birthday", "Space", "Ocean"
+  ]
+}

@@ -308,6 +308,10 @@ static UIImage *CYLTabBarHostOriginalImage(UIImage *image) {
     tabBarController.view.backgroundColor = UIColor.clearColor;
     tabBarController.view.frame = self.bounds;
     tabBarController.view.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    [self applyLayoutDirectionToTabBarController:tabBarController];
+    if (_tabBarHidden) {
+        [tabBarController setTabBarHidden:YES animated:NO];
+    }
     UIViewController *parent = [self cyl_hostViewController];
     [parent addChildViewController:tabBarController];
     [self addSubview:tabBarController.view];
@@ -402,7 +406,7 @@ static BOOL CYLTabBarHostRectsContainPoint(NSArray<NSValue *> *rects, CGPoint po
 /// [CN] TabBar，以及 PlusButton 与其上的内容（角标），视图坐标。
 - (NSArray<NSValue *> *)currentTouchableRects {
     UITabBar *tabBar = _tabBarController.tabBar;
-    if (!tabBar) {
+    if (!tabBar || _tabBarHidden) {
         return @[];
     }
     NSMutableArray<NSValue *> *rects = [NSMutableArray arrayWithObject:[NSValue valueWithCGRect:[tabBar convertRect:tabBar.bounds toView:self]]];
@@ -429,6 +433,37 @@ static BOOL CYLTabBarHostRectsContainPoint(NSArray<NSValue *> *rects, CGPoint po
 }
 
 #pragma mark - Selection and badges
+
+- (void)setLanguage:(NSString *)language {
+    if (language == _language || [language isEqualToString:_language]) {
+        return;
+    }
+    _language = [language copy];
+    CYLSetLocalizationLanguage(_language);
+    // [EN] Built again: the library's texts and the layout direction are set when the tab bar is created.
+    // [CN] 重新创建：库的文字与布局方向在创建 TabBar 时设置。
+    if (_tabBarController && _configuration) {
+        self.configuration = _configuration;
+    }
+}
+
+/// [EN] Right to left for a right-to-left language (e.g. Arabic), as the Objective-C example's `[UIView appearance]`.
+/// [CN] 从右到左的语言（如阿拉伯语）使用从右到左布局，与 Objective-C 示例的 `[UIView appearance]` 相同。
+- (void)applyLayoutDirectionToTabBarController:(CYLTabBarController *)tabBarController {
+    BOOL rightToLeft = [NSLocale characterDirectionForLanguage:CYLLocalizationLanguage()] == NSLocaleLanguageDirectionRightToLeft;
+    UISemanticContentAttribute attribute = rightToLeft ? UISemanticContentAttributeForceRightToLeft : UISemanticContentAttributeUnspecified;
+    tabBarController.view.semanticContentAttribute = attribute;
+    tabBarController.tabBar.semanticContentAttribute = attribute;
+}
+
+- (void)setTabBarHidden:(BOOL)tabBarHidden {
+    if (tabBarHidden == _tabBarHidden) {
+        return;
+    }
+    _tabBarHidden = tabBarHidden;
+    [_tabBarController setTabBarHidden:tabBarHidden animated:YES];
+    [self updateTouchableRects];
+}
 
 - (void)resetLoggedIn {
     _loggedInSet = NO;

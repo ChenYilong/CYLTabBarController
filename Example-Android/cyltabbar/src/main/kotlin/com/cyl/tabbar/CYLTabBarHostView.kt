@@ -181,6 +181,42 @@ open class CYLTabBarHostView @JvmOverloads constructor(context: Context, attrs: 
     fun resetLoggedIn() {
         loggedInSet = false
     }
+
+    /**
+     * [EN] The language of the library's own texts and of the layout direction, as the iOS host: a BCP 47 tag such as "ar"
+     *      or "zh-Hans", or null for the device language. Sets [CYLLocalization.language], lays the tab bar out right to
+     *      left for a right-to-left language, and builds the tab bar again, as the Objective-C example rebuilds its root.
+     *      The tab titles come from the configuration: translate them there.
+     * [CN] 库自身文字与布局方向使用的语言，与 iOS 宿主相同：BCP 47 语言标签，如 "ar"、"zh-Hans"；null 表示设备语言。设置
+     *      [CYLLocalization.language]，从右到左的语言使 TabBar 从右到左布局，并重新创建 TabBar，与 Objective-C 示例重建根控制器相同。
+     *      Tab 标题来自配置：请在配置中翻译。
+     */
+    /**
+     * [EN] Hides or shows the tab bar, animated (`CYLTabBarController.setTabBarHidden`), as the iOS host. A hidden tab bar
+     *      takes no touches: [touchableRects] is empty and the page under it gets them.
+     * [CN] 隐藏或显示 TabBar（带动画，`CYLTabBarController.setTabBarHidden`），与 iOS 宿主相同。隐藏的 TabBar 不接收触摸：
+     *      [touchableRects] 为空，触摸交给其下方的页面。
+     */
+    var tabBarHidden: Boolean = false
+        set(value) {
+            if (field == value) return
+            field = value
+            tabBarController?.setTabBarHidden(value, true)
+            updateTouchableRects()
+        }
+
+    var language: String? = null
+        set(value) {
+            if (field == value) return
+            field = value
+            CYLLocalization.language = value
+            layoutDirection = when {
+                value == null -> View.LAYOUT_DIRECTION_LOCALE
+                CYLLocalization.isRightToLeft(value) -> View.LAYOUT_DIRECTION_RTL
+                else -> View.LAYOUT_DIRECTION_LTR
+            }
+            if (tabBarController != null) configuration = configuration
+        }
     var preferredHeightDidChange: ((height: Float) -> Unit)? = null
 
     /**
@@ -225,6 +261,8 @@ open class CYLTabBarHostView @JvmOverloads constructor(context: Context, attrs: 
      * [CN] [heightIncludesOverflow] 时，从透明区域开始、且不在 PlusButton 与其角标上的触摸不被接收：父视图把它交给下方的视图。
      */
     override fun dispatchTouchEvent(event: MotionEvent): Boolean {
+        // [EN] A hidden tab bar takes no touches: they go to the page under it. [CN] 隐藏的 TabBar 不接收触摸：交给其下方的页面。
+        if (event.actionMasked == MotionEvent.ACTION_DOWN && tabBarHidden) return false
         if (event.actionMasked == MotionEvent.ACTION_DOWN && heightIncludesOverflow && touchableRectsInPixels.isNotEmpty() &&
             touchableRectsInPixels.none { it.contains(event.x.toInt(), event.y.toInt()) }) return false
         return super.dispatchTouchEvent(event)
@@ -360,6 +398,7 @@ open class CYLTabBarHostView @JvmOverloads constructor(context: Context, attrs: 
         }
         loginStateDidChange?.invoke(loggedIn)
         // [EN] The app shows the login screen: the tab is not selected now (see [didRequestLogin]). [CN] 由 App 展示登录界面：此时不选中该 Tab。
+        if (tabBarHidden) controller.setTabBarHidden(true, false)
         controller.cyl_loginHandler = { tabBarController, page, completion ->
             completion(false)
             val index = tabBarController.viewControllers.indexOf(page)
@@ -553,7 +592,7 @@ open class CYLTabBarHostView @JvmOverloads constructor(context: Context, attrs: 
     private fun updateTouchableRects() {
         val tabBar = tabBarController?.tabBar
         val rects = mutableListOf<Rect>()
-        if (tabBar != null && tabBar.isLaidOut) {
+        if (tabBar != null && tabBar.isLaidOut && !tabBarHidden) {
             rects += rectInView(tabBar, Rect(0, 0, tabBar.width, tabBar.height))
             val plusButton = tabBar.plusButton
             if (plusButton != null && plusButton.isAttachedToWindow && plusButton.visibility == VISIBLE) {
@@ -571,6 +610,7 @@ open class CYLTabBarHostView @JvmOverloads constructor(context: Context, attrs: 
                 touchDelegate = null
             }
         }
+        if (rects.isEmpty()) touchDelegate = null
         if (rects == touchableRectsInPixels) return
         touchableRectsInPixels = rects
         val density = resources.displayMetrics.density

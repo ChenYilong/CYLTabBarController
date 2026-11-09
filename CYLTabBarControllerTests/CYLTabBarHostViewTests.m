@@ -292,6 +292,42 @@ static NSString *const CYLHostTestsLoggedInKey = @"CYLTabBarControllerLoggedIn";
     [NSUserDefaults.standardUserDefaults setBool:saved forKey:CYLHostTestsLoggedInKey];
 }
 
+- (void)testALanguageTranslatesTheLibraryAndLaysARightToLeftOneOutRightToLeft {
+    CYLTabBarHostView *hostView = [self hostViewInWindow];
+    hostView.language = @"ar";
+    hostView.configuration = [self loginConfiguration];
+    [self waitForTabBarControllerOf:hostView];
+    XCTAssertEqualObjects(CYLLocalizationLanguage(), @"ar");
+    XCTAssertEqualObjects(CYLLocalizedString(@"加号按钮"), @"زر الإضافة");
+    XCTAssertEqual(hostView.tabBarController.tabBar.semanticContentAttribute, UISemanticContentAttributeForceRightToLeft);
+    // [EN] Another language builds the tab bar again, left to right. [CN] 切换语言会重新创建 TabBar，从左到右。
+    CYLTabBarController *arabic = hostView.tabBarController;
+    hostView.language = @"es";
+    NSPredicate *rebuilt = [NSPredicate predicateWithBlock:^BOOL(CYLTabBarHostView *view, NSDictionary *bindings) {
+        [view layoutIfNeeded];
+        return view.tabBarController && view.tabBarController != arabic;
+    }];
+    [self waitForExpectations:@[ [self expectationForPredicate:rebuilt evaluatedWithObject:hostView handler:nil] ] timeout:5];
+    XCTAssertEqualObjects(CYLLocalizedString(@"加号按钮"), @"Botón más");
+    XCTAssertEqual(hostView.tabBarController.tabBar.semanticContentAttribute, UISemanticContentAttributeUnspecified);
+    hostView.language = nil;
+    XCTAssertNotEqualObjects(CYLLocalizationLanguage(), @"es");
+}
+
+- (void)testAHiddenTabBarTakesNoTouches {
+    CYLTabBarHostView *hostView = [self hostViewInWindow];
+    hostView.configuration = [self loginConfiguration];
+    [self waitForTabBarControllerOf:hostView];
+    [hostView layoutIfNeeded];
+    XCTAssertGreaterThan(hostView.touchableRects.count, 0u);
+    hostView.tabBarHidden = YES;
+    XCTAssertTrue(hostView.tabBarController.isTabBarHidden);
+    XCTAssertEqual(hostView.touchableRects.count, 0u);
+    hostView.tabBarHidden = NO;
+    XCTAssertFalse(hostView.tabBarController.isTabBarHidden);
+    XCTAssertGreaterThan(hostView.touchableRects.count, 0u);
+}
+
 - (void)testInvalidJSONChangesNothing {
     CYLTabBarHostView *hostView = [[CYLTabBarHostView alloc] init];
     XCTAssertFalse([hostView setConfigurationJSON:@"[1, 2]"]);

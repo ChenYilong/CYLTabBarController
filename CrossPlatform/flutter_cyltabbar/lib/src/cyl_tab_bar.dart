@@ -204,6 +204,8 @@ class CYLTabBar extends StatefulWidget {
     this.loggedIn,
     this.onLoginRequest,
     this.onLoginStateChange,
+    this.language,
+    this.tabBarHidden = false,
   });
 
   /// The tabs: `CYLTabBarControllerTabBarItemsAttributes`.
@@ -267,6 +269,15 @@ class CYLTabBar extends StatefulWidget {
   /// The login state the tab bar uses, sent once it is built: start from it to keep the login across launches.
   final ValueChanged<bool>? onLoginStateChange;
 
+  /// The language of the library's own texts (badge and plus button accessibility texts) and of the layout direction: a
+  /// language code such as 'ar' or 'zh-Hans'; null for the device language. A right-to-left language lays the tab bar out
+  /// right to left. The tab titles come from [items]: translate them there.
+  final String? language;
+
+  /// Hides or shows the tab bar, animated, in every style (`-[CYLTabBarController setTabBarHidden:animated:]`). A hidden
+  /// tab bar takes no touches: the page under it gets them.
+  final bool tabBarHidden;
+
   /// The configuration sent to the native library.
   Map<String, Object?> buildConfiguration() => {
         if (styleType != null) 'CYLTabBarControllerStyleType': styleType,
@@ -300,6 +311,8 @@ class _CYLTabBarState extends State<CYLTabBar> {
         'plusButtonBadge': widget.plusButtonBadge?.toMap(),
         'tabCoverImages': _coverImages(widget),
         'loggedIn': widget.loggedIn,
+        'language': widget.language,
+        'tabBarHidden': widget.tabBarHidden,
       };
 
   static List<Map<String, Object?>?> _badgeStyles(CYLTabBar bar) => [for (final badge in bar.badgeStyles) badge?.toMap()];
@@ -338,6 +351,12 @@ class _CYLTabBarState extends State<CYLTabBar> {
     final coverImages = _coverImages(widget);
     if (!listEquals(coverImages, _coverImages(oldWidget))) {
       channel?.invokeMethod<void>('setTabCoverImages', coverImages);
+    }
+    if (widget.tabBarHidden != oldWidget.tabBarHidden) {
+      channel?.invokeMethod<void>('setTabBarHidden', widget.tabBarHidden);
+    }
+    if (widget.language != oldWidget.language) {
+      channel?.invokeMethod<void>('setLanguage', widget.language);
     }
     if (widget.loggedIn != oldWidget.loggedIn) {
       channel?.invokeMethod<void>('setLoggedIn', widget.loggedIn);

@@ -119,8 +119,16 @@ open class CYLPlusButton(context: Context) : FrameLayout(context) {
         addView(titleLabel, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT, Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL))
         isClickable = true
         isFocusable = true
-        contentDescription = "Menu"
     }
+
+    /**
+     * [EN] What TalkBack says, as iOS `-accessibilityLabel`: the description the app set, else the title shown, else
+     *      "Plus button" in [CYLLocalization.language].
+     * [CN] TalkBack 朗读的内容，与 iOS `-accessibilityLabel` 相同：App 设置的描述，其次为显示的标题，否则为 [CYLLocalization.language]
+     *      中的“加号按钮”。
+     */
+    override fun getContentDescription(): CharSequence? =
+        super.getContentDescription() ?: currentTitle?.takeIf { it.isNotEmpty() } ?: CYLLocalization.string(context, R.string.cyl_plus_button)
 
     /** [EN] `setImage:forState:UIControlStateNormal`. [CN] 常态图片。 */
     open fun setImageDrawable(drawable: Drawable?) {

@@ -123,6 +123,22 @@ class CYLTabBarHostViewTest {
     }
 
     @Test
+    fun aHiddenTabBarTakesNoTouches() = withActivity { activity ->
+        val host = hostView(activity)
+        host.configuration = mapOf(CYLConstants.CYLTabBarControllerTabBarItemsAttributes to items("A", "B"))
+        val controller = waitForController(host)
+        host.tabBarHidden = true
+        shadowOf(Looper.getMainLooper()).idle()
+        assertTrue(controller.tabBar.visibility != android.view.View.VISIBLE || controller.tabBar.translationY > 0f)
+        assertTrue(host.touchableRects.isEmpty())
+        val down = android.view.MotionEvent.obtain(0, 0, android.view.MotionEvent.ACTION_DOWN, 10f, 10f, 0)
+        assertFalse(host.dispatchTouchEvent(down))
+        host.tabBarHidden = false
+        shadowOf(Looper.getMainLooper()).idle()
+        assertEquals(android.view.View.VISIBLE, controller.tabBar.visibility)
+    }
+
+    @Test
     fun invalidJSONChangesNothing() = withActivity { activity ->
         val host = CYLTabBarHostView(activity)
         assertFalse(host.setConfigurationJSON("[1, 2]"))

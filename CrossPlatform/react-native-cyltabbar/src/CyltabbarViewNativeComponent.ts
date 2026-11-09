@@ -47,6 +47,10 @@ export interface NativeProps extends ViewProps {
   tabCoverImages?: ReadonlyArray<string>;
   /** Whether the user is logged in (`cyl_loggedIn`, issue #19): 1 yes, 0 no, -1 not set (the state the library cached). */
   loginState?: CodegenTypes.WithDefault<CodegenTypes.Int32, -1>;
+  /** The language of the library's texts and layout direction ("ar", "zh-Hans"); "" for the device language. */
+  language?: string;
+  /** Hides the tab bar, animated (`setTabBarHidden:animated:`); a hidden tab bar takes no touches. */
+  tabBarHidden?: boolean;
   onTabLongPress?: CodegenTypes.DirectEventHandler<TabLongPressEvent>;
   /** A tab that needs login was tapped while logged out; it is not selected. */
   onLoginRequest?: CodegenTypes.DirectEventHandler<TabLongPressEvent>;

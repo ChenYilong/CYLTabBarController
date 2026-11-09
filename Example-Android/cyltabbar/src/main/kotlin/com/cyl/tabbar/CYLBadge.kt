@@ -220,11 +220,17 @@ private val badgeStates = java.util.WeakHashMap<View, CYLBadgeState>()
 val View.cyl_badgeState: CYLBadgeState
     get() = synchronized(badgeStates) { badgeStates.getOrPut(this) { CYLBadgeState() } }
 
-/** [EN] `CYLBadgeAccessibilityDescription()`: what VoiceOver / TalkBack says for a badge value. [CN] 无障碍朗读的角标描述。 */
-fun CYLBadgeAccessibilityDescription(value: String?): String? = when {
+/**
+ * [EN] `CYLBadgeAccessibilityDescription()`: what TalkBack says for a badge value, as iOS: "New content" for a dot, "N new
+ *      messages" for a number ("99+" too; nothing for 0), the text itself otherwise. In [CYLLocalization.language].
+ * [CN] TalkBack 朗读的角标描述，与 iOS 相同：红点为“有新内容”，数字（含“99+”；0 不朗读）为“N 条新消息”，其他为文字本身。
+ *      使用 [CYLLocalization.language]。
+ */
+fun CYLBadgeAccessibilityDescription(context: Context, value: String?): String? = when {
     value == null -> null
-    value.isEmpty() -> "New"
-    value.toIntOrNull() != null -> "$value new items"
+    value.isEmpty() -> CYLLocalization.string(context, R.string.cyl_badge_new_content)
+    Regex("^[0-9]+\\+?$").matches(value) ->
+        if ((value.trimEnd('+').toLongOrNull() ?: 0L) > 0L) CYLLocalization.string(context, R.string.cyl_badge_new_messages, value) else null
     else -> value
 }
 
@@ -256,6 +262,10 @@ fun View.cyl_showBadgeValue(value: String, animationType: CYLEnums.CYLBadgeAnima
         value.isEmpty() -> null
         number != null && number > state.maximumBadgeNumber -> "${state.maximumBadgeNumber}+"
         number != null && number <= 0 -> null
+        // [EN] "new" / "NEW" are tokens, shown in [CYLLocalization.language], as iOS `-cyl_showNewBadge:`.
+        // [CN] "new" / "NEW" 是标记，使用 [CYLLocalization.language] 显示，与 iOS `-cyl_showNewBadge:` 相同。
+        value == "new" -> CYLLocalization.string(context, R.string.cyl_badge_new_lowercase)
+        value == "NEW" -> CYLLocalization.string(context, R.string.cyl_badge_new_uppercase)
         else -> value
     }
     if (number != null && number <= 0) {
@@ -270,7 +280,7 @@ fun View.cyl_showBadgeValue(value: String, animationType: CYLEnums.CYLBadgeAnima
     badge.badgeCornerRadius = state.cornerRadius
     badge.badgeFont = state.font
     badge.badgeMargin = state.margin
-    badge.contentDescription = CYLBadgeAccessibilityDescription(value)
+    badge.contentDescription = CYLBadgeAccessibilityDescription(context, value)
     badge.visibility = if (state.paused) View.INVISIBLE else View.VISIBLE
     cyl_refreshBadge()
     val reduceMotion = state.respectsReduceMotion && android.provider.Settings.Global.getFloat(context.contentResolver, android.provider.Settings.Global.ANIMATOR_DURATION_SCALE, 1f) == 0f

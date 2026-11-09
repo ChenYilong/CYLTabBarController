@@ -74,6 +74,18 @@ class CyltabbarViewManager : SimpleViewManager<CyltabbarView>(),
     if (value >= 0) view?.loggedIn = value == 1 else view?.resetLoggedIn()
   }
 
+  /** [EN] The language of the library's texts and layout direction; "" for the device language. [CN] 库文字与布局方向使用的语言；"" 表示设备语言。 */
+  @ReactProp(name = "language")
+  override fun setLanguage(view: CyltabbarView?, value: String?) {
+    view?.language = value?.takeIf { it.isNotEmpty() }
+  }
+
+  /** [EN] Hides the tab bar, animated; a hidden tab bar takes no touches. [CN] 隐藏 TabBar（带动画）；隐藏的 TabBar 不接收触摸。 */
+  @ReactProp(name = "tabBarHidden")
+  override fun setTabBarHidden(view: CyltabbarView?, value: Boolean) {
+    view?.tabBarHidden = value
+  }
+
   @ReactProp(name = "tabCoverImages")
   override fun setTabCoverImages(view: CyltabbarView?, value: ReadableArray?) {
     view?.tabCoverImages = (0 until (value?.size() ?: 0)).map { value?.getString(it)?.takeIf { image -> image.isNotEmpty() } }

@@ -108,6 +108,17 @@ export type CYLTabBarProps = ViewProps & {
   onLoginRequest?: (index: number, identifier: string, title: string) => void;
   /** The login state the tab bar uses, sent once it is built: start from it to keep the login across launches. */
   onLoginStateChange?: (loggedIn: boolean) => void;
+  /**
+   * The language of the library's own texts (badge and plus button accessibility texts) and of the layout direction: a
+   * language code such as 'ar' or 'zh-Hans'; undefined for the device language. A right-to-left language lays the tab bar
+   * out right to left. The tab titles come from `items`: translate them there.
+   */
+  language?: string;
+  /**
+   * Hides or shows the tab bar, animated, in every style (`-[CYLTabBarController setTabBarHidden:animated:]`). A hidden
+   * tab bar takes no touches: the page under it gets them.
+   */
+  tabBarHidden?: boolean;
 };
 
 /**
@@ -202,6 +213,8 @@ export function CYLTabBar(props: CYLTabBarProps) {
     onLoginRequest,
     onLoginStateChange,
     loggedIn,
+    language,
+    tabBarHidden,
     selectedIndex,
     badgeValues,
     plusButtonBadgeValue,
@@ -231,6 +244,8 @@ export function CYLTabBar(props: CYLTabBarProps) {
       plusButtonBadgeStyle={plusButtonBadge ? JSON.stringify(plusButtonBadge) : ''}
       tabCoverImages={(tabCoverImages ?? []).map(imageValue)}
       loginState={loggedIn === undefined ? -1 : loggedIn ? 1 : 0}
+      language={language ?? ''}
+      tabBarHidden={tabBarHidden ?? false}
       onLoginStateChange={(event) => onLoginStateChange?.(event.nativeEvent.loggedIn)}
       onLoginRequest={(event) =>
         onLoginRequest?.(event.nativeEvent.index, event.nativeEvent.identifier, event.nativeEvent.title)
