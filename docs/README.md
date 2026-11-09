@@ -195,6 +195,8 @@ docs/
     ├── plusbutton-overlap-classic.png
     ├── plusbutton-overlap-flat.png
     ├── plusbutton-overlap-lg.png
+    ├── plusbutton-slot-flatdesign.png
+    ├── plusbutton-slot-liquid-glass-titles-changed.png
     ├── plusbutton-subview-touches-issue-202.png
     ├── plusbutton-touchable-area-1x.png
     ├── plusbutton-touchable-area-2x.png

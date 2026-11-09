@@ -420,7 +420,10 @@ static CGFloat const CYLDemoPlusButtonWidth = 55;
     plusChildViewController.navigationItem.title = CYLLocalizedString(@"PlusChildViewController");
     UIViewController *plusChildNavigationController = [[UINavigationController alloc]
                                                    initWithRootViewController:plusChildViewController];
-    plusChildNavigationController.title = NSLocalizedString(@"发布", nil);
+    // [EN] The library's localization (AGENTS.md): NSLocalizedString read the app's own table, which has no translation, so
+    //      FlatDesign showed "发布" under the plus button in every language. [CN] 使用库的本地化（AGENTS.md）：NSLocalizedString 读取
+    //      App 自己的表，没有译文，扁平样式下 PlusButton 下方在所有语言中都显示「发布」。
+    plusChildNavigationController.title = CYLLocalizedString(@"发布");
     return plusChildNavigationController;
 }
 
