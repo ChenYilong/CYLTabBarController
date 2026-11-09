@@ -213,9 +213,9 @@ The root `Podfile` is the reference: it already has the top lines and the hook.
   SonarCloud's "lock file is missing" findings (`text:S8564` package.json, `text:S8568` Gemfile, `text:S8571`
   pubspec.yaml) are therefore avoided by excluding those manifests in `.sonarcloud.properties` (`sonar.exclusions`;
   automatic analysis ignores `sonar.issue.ignore.*` there), never by committing a lock file.
-- **Before every commit, check `docs/` for stale notes**: search every document in `docs/` (and `README.md`) for `TODO`
-  and for notes left by an environment that could not run the code ("Linux", "without Xcode", "no simulator",
-  "no screenshots", `无法运行`, `没有截图`):
+- **Before every commit, check `docs/` for stale notes**: search every document in `docs/` (and `README.md`) for the
+  keywords **`TODO`** and **`Linux`**, and for other notes left by an environment that could not run the code
+  ("without Xcode", "no simulator", "no screenshots", `无法运行`, `没有截图`):
 
   ```sh
   grep -rn -i -E "TODO|Linux|without Xcode|no (iOS )?simulator|no screenshots?|无法(编译|运行)|没有截图|暂无(测试)?截图" docs README.md

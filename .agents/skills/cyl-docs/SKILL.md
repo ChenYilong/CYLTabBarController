@@ -71,7 +71,8 @@ two places**:
 
 ### Stale notes before every commit
 
-Before every commit, search `docs/` and `README.md` for `TODO` and for notes written where the code could not run:
+Before every commit, search every document in `docs/` and `README.md` for the keywords **`TODO`** and **`Linux`**, and
+for other notes written where the code could not run (no Xcode, no simulator, no screenshots):
 
 ```sh
 grep -rn -i -E "TODO|Linux|without Xcode|no (iOS )?simulator|no screenshots?|无法(编译|运行)|没有截图|暂无(测试)?截图" docs README.md
