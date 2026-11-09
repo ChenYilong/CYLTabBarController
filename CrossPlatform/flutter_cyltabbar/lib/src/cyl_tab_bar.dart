@@ -33,6 +33,9 @@ class CYLTabBarItem {
     this.image,
     this.selectedImage,
     this.identifier,
+    this.iconRenderingMode,
+    this.iconColor,
+    this.selectedIconColor,
     this.attributes = const {},
   });
 
@@ -43,6 +46,14 @@ class CYLTabBarItem {
   /// `CYLTabBarItemIdentifier`, reported by [CYLTabBar.onTabSelect].
   final String? identifier;
 
+  /// Issue #787: `'template'` (one image, tinted with [iconColor] / [selectedIconColor], else the bar's tint),
+  /// `'original'` (keeps its colors) or `'automatic'`. Wins over [CYLTabBar.iconRenderingMode].
+  final String? iconRenderingMode;
+
+  /// Icon colors such as `#8E8E93`, unselected and selected.
+  final String? iconColor;
+  final String? selectedIconColor;
+
   /// Any other key of a tab in the configuration file, e.g. `CYLTabBarItemTitlePositionAdjustment`.
   final Map<String, Object?> attributes;
 
@@ -52,6 +63,9 @@ class CYLTabBarItem {
         if (identifier != null) 'CYLTabBarItemIdentifier': identifier,
         if (image != null) 'CYLTabBarItemImage': image!.value,
         if (selectedImage != null) 'CYLTabBarItemSelectedImage': selectedImage!.value,
+        if (iconRenderingMode != null) 'CYLTabBarItemIconRenderingMode': iconRenderingMode,
+        if (iconColor != null) 'CYLTabBarItemIconColor': iconColor,
+        if (selectedIconColor != null) 'CYLTabBarItemSelectedIconColor': selectedIconColor,
       };
 }
 
@@ -189,6 +203,9 @@ class CYLTabBar extends StatefulWidget {
     this.tapAnimation,
     this.swipeToSwitchTab,
     this.animationSpeed,
+    this.iconRenderingMode,
+    this.iconColor,
+    this.selectedIconColor,
     this.plusButton,
     this.configurationRoute,
     this.manifestRoute,
@@ -230,6 +247,13 @@ class CYLTabBar extends StatefulWidget {
 
   /// The playback speed of the animated tab icons (1: the file's own).
   final double? animationSpeed;
+
+  /// Issue #787: the icon rendering mode of every tab without its own: `'template'`, `'original'` or `'automatic'`.
+  final String? iconRenderingMode;
+
+  /// The icon colors of every tab without its own, such as `#8E8E93`, unselected and selected.
+  final String? iconColor;
+  final String? selectedIconColor;
 
   final CYLTabBarPlusButton? plusButton;
 
@@ -314,6 +338,9 @@ class CYLTabBar extends StatefulWidget {
         if (tapAnimation != null) 'CYLTabBarControllerTabButtonTapAnimation': tapAnimation,
         if (swipeToSwitchTab != null) 'CYLTabBarControllerSwipeToSwitchTab': swipeToSwitchTab,
         if (animationSpeed != null) 'CYLTabBarControllerTabBarItemAnimationSpeed': animationSpeed,
+        if (iconRenderingMode != null) 'CYLTabBarControllerIconRenderingMode': iconRenderingMode,
+        if (iconColor != null) 'CYLTabBarControllerIconColor': iconColor,
+        if (selectedIconColor != null) 'CYLTabBarControllerSelectedIconColor': selectedIconColor,
         if (items.isNotEmpty)
           'CYLTabBarControllerTabBarItemsAttributes': [for (final item in items) item.toConfiguration()],
         if (plusButton != null) 'CYLTabBarControllerPlusButton': plusButton!.toConfiguration(),

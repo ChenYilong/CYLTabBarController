@@ -37,9 +37,9 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 
 /**
  * [EN] The tab bar gallery (docs/Tab-Bar-Gallery.md), ported from the iOS `CYLGalleryProvider`: the same 10 sections and
- *      44 scenes, each a tab bar built with the public API. Scenes that exist only in UIKit (the system "More" editor,
+ *      46 scenes, each a tab bar built with the public API. Scenes that exist only in UIKit (the system "More" editor,
  *      `UITab`, the Liquid Glass plus stand-in) say so instead of faking it.
- * [CN] TabBar 场景展示（docs/Tab-Bar-Gallery.md），移植自 iOS 的 `CYLGalleryProvider`：同样的 10 个分组与 44 个场景，每个都是用公开 API 构建的
+ * [CN] TabBar 场景展示（docs/Tab-Bar-Gallery.md），移植自 iOS 的 `CYLGalleryProvider`：同样的 10 个分组与 46 个场景，每个都是用公开 API 构建的
  *      TabBar。只存在于 UIKit 的场景（系统 "More" 编辑、`UITab`、液态玻璃 PlusButton 替身）会说明原因，而不是伪造。
  */
 class DemoGalleryActivity : AppCompatActivity() {
@@ -110,6 +110,28 @@ object DemoGallery {
                            context: String? = null, extra: (Int) -> Map<String, Any?> = { emptyMap() },
                            page: (Int) -> Fragment = { TextPageFragment.newInstance(titles[it]) }): CYLTabBarController =
         CYLTabBarController(activity, (0 until count).map(page), attributes(activity, count, extra), style, context)
+
+    /**
+     * [EN] Issue #787: Home and Video are templates (one gray image, red / bar tint when selected), Favor keeps its yellow
+     *      star although it has an icon color ("original"), Shop is "automatic" without an icon color (drawn as it is).
+     * [CN] Issue #787：Home 与 Video 为模板（一张灰色图片，选中时为红色 / TabBar 着色），Favor 虽有图标颜色仍保持黄色星星（"original"），
+     *      Shop 为 "automatic" 且没有图标颜色（按原图绘制）。
+     */
+    private fun iconRenderingController(activity: FragmentActivity, style: CYLEnums.CYLTabBarStyleType): CYLTabBarController {
+        val star = { ContextCompat.getDrawable(activity, android.R.drawable.btn_star_big_on) }
+        val tabs = listOf(
+            mapOf(CYLConstants.CYLTabBarItemIconRenderingMode to "template", CYLConstants.CYLTabBarItemIconColor to Color.GRAY, CYLConstants.CYLTabBarItemSelectedIconColor to Color.rgb(255, 59, 48)),
+            mapOf(CYLConstants.CYLTabBarItemIconRenderingMode to "template"),
+            mapOf(CYLConstants.CYLTabBarItemIconRenderingMode to "original", CYLConstants.CYLTabBarItemIconColor to Color.GRAY, CYLConstants.CYLTabBarItemImage to star()),
+            mapOf(CYLConstants.CYLTabBarItemImage to star()),
+        )
+        val pages = listOf(0, 1, 5, 6)
+        val attributes = pages.mapIndexed { index, title ->
+            mapOf(CYLConstants.CYLTabBarItemTitle to titles[title], CYLConstants.CYLTabBarItemImage to ContextCompat.getDrawable(activity, icons[title]),
+                  CYLConstants.CYLTabBarItemIdentifier to titles[title].lowercase()) + tabs[index]
+        }
+        return CYLTabBarController(activity, pages.map { TextPageFragment.newInstance(titles[it]) }, attributes, style, null)
+    }
 
     /** [EN] "Photo" opens a dialog instead of its page (`cyl_customActionTabBarItemIdentifiers`). [CN] "Photo" 打开弹窗而不是其页面。 */
     private fun photoOpensDialog(controller: CYLTabBarController) {
@@ -292,6 +314,12 @@ object DemoGallery {
                               CYLConstants.CYLTabBarItemSelectedTitleFont to CYLFont(12f, Typeface.DEFAULT_BOLD),
                               CYLConstants.CYLTabBarItemSelectedBackgroundColor to Color.argb(40, Color.red(colors[index]), Color.green(colors[index]), Color.blue(colors[index])))
                     })
+                },
+                tabBar("Icon rendering mode (#787)", "template: one image, two colors · original: own colors · automatic") { activity ->
+                    iconRenderingController(activity, CYLEnums.CYLTabBarStyleType.Default)
+                },
+                tabBar("Icon rendering mode on Liquid Glass (#787)", "template icons take the bar's tint without an icon color") { activity ->
+                    iconRenderingController(activity, CYLEnums.CYLTabBarStyleType.LiquidGlass)
                 },
                 tabBar("Accessibility identifiers", "Each tab has CYLTabBarItemAccessibilityIdentifier (home, video...) for UI tests") { activity ->
                     controller(activity, 4, extra = { mapOf(CYLConstants.CYLTabBarItemAccessibilityIdentifier to titles[it].lowercase(), CYLConstants.CYLTabBarItemAccessibilityLabel to titles[it]) }).also { c ->

@@ -10,9 +10,20 @@ export type CYLTabBarItem = {
   image?: CYLTabBarImage;
   selectedImage?: CYLTabBarImage;
   identifier?: string;
+  /**
+   * Issue #787: "template" (one image, tinted with `iconColor` / `selectedIconColor`, else the bar's tint), "original"
+   * (keeps its colors) or "automatic". Wins over the tab bar's `iconRenderingMode`.
+   */
+  iconRenderingMode?: CYLTabBarIconRenderingMode;
+  /** Icon colors such as "#8E8E93", unselected and selected. */
+  iconColor?: string;
+  selectedIconColor?: string;
   /** Any other key of the configuration file, e.g. CYLTabBarItemTitlePositionAdjustment. */
   [key: string]: unknown;
 };
+
+/** How a tab icon takes its colors (issue #787). */
+export type CYLTabBarIconRenderingMode = 'template' | 'original' | 'automatic';
 
 export type CYLTabBarPlusButton = {
   title?: string;
@@ -79,6 +90,11 @@ export type CYLTabBarProps = ViewProps & {
   swipeToSwitchTab?: boolean;
   /** The playback speed of the animated tab icons (1: the file's own). */
   animationSpeed?: number;
+  /** Issue #787: the icon rendering mode of every tab without its own. */
+  iconRenderingMode?: CYLTabBarIconRenderingMode;
+  /** The icon colors of every tab without its own, such as "#8E8E93", unselected and selected. */
+  iconColor?: string;
+  selectedIconColor?: string;
   plusButton?: CYLTabBarPlusButton;
   /**
    * A resource route to a configuration file built into the app or in its sandbox (docs/Resource-Routes.md), e.g.
@@ -181,11 +197,17 @@ const CONTROLLER_KEYS: CYLKeyMap = [
   ['tapAnimation', 'CYLTabBarControllerTabButtonTapAnimation', 'truthy'],
   ['swipeToSwitchTab', 'CYLTabBarControllerSwipeToSwitchTab', 'defined'],
   ['animationSpeed', 'CYLTabBarControllerTabBarItemAnimationSpeed', 'defined'],
+  ['iconRenderingMode', 'CYLTabBarControllerIconRenderingMode', 'truthy'],
+  ['iconColor', 'CYLTabBarControllerIconColor', 'truthy'],
+  ['selectedIconColor', 'CYLTabBarControllerSelectedIconColor', 'truthy'],
 ];
 
 const ITEM_KEYS: CYLKeyMap = [
   ['title', 'CYLTabBarItemTitle', 'defined'],
   ['identifier', 'CYLTabBarItemIdentifier', 'defined'],
+  ['iconRenderingMode', 'CYLTabBarItemIconRenderingMode', 'truthy'],
+  ['iconColor', 'CYLTabBarItemIconColor', 'truthy'],
+  ['selectedIconColor', 'CYLTabBarItemSelectedIconColor', 'truthy'],
 ];
 
 const PLUS_BUTTON_KEYS: CYLKeyMap = [
@@ -216,9 +238,9 @@ function copyKeys(target: Record<string, unknown>, source: object, keys: CYLKeyM
   }
 }
 
-function itemAttributes({ title, image, selectedImage, identifier, ...rest }: CYLTabBarItem): Record<string, unknown> {
+function itemAttributes({ title, image, selectedImage, identifier, iconRenderingMode, iconColor, selectedIconColor, ...rest }: CYLTabBarItem): Record<string, unknown> {
   const item: Record<string, unknown> = { ...rest };
-  copyKeys(item, { title, identifier }, ITEM_KEYS);
+  copyKeys(item, { title, identifier, iconRenderingMode, iconColor, selectedIconColor }, ITEM_KEYS);
   addImage(item, 'CYLTabBarItemImage', image);
   addImage(item, 'CYLTabBarItemSelectedImage', selectedImage);
   return item;
@@ -274,6 +296,9 @@ export function CYLTabBar(props: CYLTabBarProps) {
     tapAnimation: _tapAnimation,
     swipeToSwitchTab: _swipeToSwitchTab,
     animationSpeed: _animationSpeed,
+    iconRenderingMode: _iconRenderingMode,
+    iconColor: _iconColor,
+    selectedIconColor: _selectedIconColor,
     onTabSelect,
     onPlusButtonPress,
     onTabLongPress,
@@ -299,7 +324,7 @@ export function CYLTabBar(props: CYLTabBarProps) {
     () => JSON.stringify(buildConfiguration(props)),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [props.items, props.styleType, props.plusButton, props.configuration, props.configurationRoute, props.manifestRoute, props.userInterfaceStyle, props.tapAnimation,
-      props.swipeToSwitchTab, props.animationSpeed]
+      props.swipeToSwitchTab, props.animationSpeed, props.iconRenderingMode, props.iconColor, props.selectedIconColor]
   );
   return (
     <NativeCyltabbarView

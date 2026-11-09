@@ -328,6 +328,29 @@ class CYLTabBarControllerTest {
         assertNotNull(controller.tabBar.tabBarButtonArray[1].iconView.colorFilter)
     }
 
+    /**
+     * [EN] FIX: issue #787. Liquid Glass: a template icon without an icon color takes the bar's unselected tint, and its
+     *      selected tint once selected, like the titles.
+     * [CN] FIX: issue #787。液态玻璃：没有图标颜色的模板图标使用 TabBar 的未选中着色，选中后使用选中着色，与标题一致。
+     */
+    @Test
+    fun templateIconsOnLiquidGlassTakeTheBarTint() = withActivity { activity ->
+        val icon = { android.graphics.drawable.ColorDrawable(Color.BLUE).apply { setBounds(0, 0, 24, 24) } }
+        val tabs = listOf("A", "B").map { mapOf(CYLConstants.CYLTabBarItemTitle to it, CYLConstants.CYLTabBarItemImage to icon(), CYLConstants.CYLTabBarItemIconRenderingMode to "template") }
+        val controller = CYLTabBarController(activity, listOf(Page(), Page()), tabs, CYLEnums.CYLTabBarStyleType.LiquidGlass, null)
+        activity.setContentView(controller.view)
+        idle()
+        val bar = controller.tabBar
+        val filter = { color: Int -> android.graphics.PorterDuffColorFilter(color, android.graphics.PorterDuff.Mode.SRC_IN) }
+        assertEquals(filter(bar.selectedTintColor), bar.tabBarButtonArray[0].iconView.colorFilter)
+        assertEquals(filter(bar.unselectedTintColor), bar.tabBarButtonArray[1].iconView.colorFilter)
+        assertEquals("the title has the same color", bar.unselectedTintColor, bar.tabBarButtonArray[1].titleLabel.currentTextColor)
+        bar.tabBarButtonArray[1].performClick()
+        idle()
+        assertEquals(filter(bar.selectedTintColor), controller.tabBar.tabBarButtonArray[1].iconView.colorFilter)
+        assertEquals(filter(bar.unselectedTintColor), controller.tabBar.tabBarButtonArray[0].iconView.colorFilter)
+    }
+
     @Test
     fun asynchronousPagesAreSwappedIn() = withActivity { activity ->
         val registry = CYLTabBarPageRegistry()

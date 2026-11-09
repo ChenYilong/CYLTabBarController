@@ -252,6 +252,7 @@ docs/
 │   ├── tab-interactions-swipe-classic.png
 │   ├── tab-interactions-swipe-liquid-glass.png
 │   ├── tab-interactions-swipe-login-classic.png
+│   ├── tab-item-icon-rendering-android.png
 │   ├── theme-switching-flat-design.png
 │   ├── theme-switching-holiday-icons.png
 │   ├── theme-switching-liquid-glass.png
