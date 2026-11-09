@@ -136,6 +136,13 @@ export default function App() {
   );
 }
 
+/** CYLDemoTitleVerticalOffsets: the next offset after `current`; one not in the list goes to the first. 下一个偏移；不在列表中时为第一个。 */
+const TITLE_VERTICAL_OFFSETS = [0, -4, 4];
+function nextTitleOffset(current: number): number {
+  const index = TITLE_VERTICAL_OFFSETS.findIndex((offset) => Math.abs(offset - current) < 0.5);
+  return TITLE_VERTICAL_OFFSETS[index < 0 ? 0 : (index + 1) % TITLE_VERTICAL_OFFSETS.length]!;
+}
+
 /**
  * -[UIViewController cyl_presentLanguagePicker]: the five languages, "Follow system" and "Cancel"; iOS shows an action
  * sheet, Android a list (its alerts hold three buttons only). The choice calls `onChoose` (undefined: follow the device).
@@ -388,6 +395,11 @@ function CYLMainTabBar({
   // -[UIViewController cyl_simulateMemoryWarningAndShowResult]: each tap asks the tab bar for one simulated memory warning.
   // 每次点击请求 TabBar 模拟一次内存警告。
   const [memoryWarningRequest, setMemoryWarningRequest] = useState(0);
+  // CYLSwitchTitlePositionAdjustment(): the title row cycles the vertical offset of every title through 0, -4 and 4 at
+  // runtime (`setTitlePositionAdjustment:`); undefined is the configuration's -3.5. 标题行在运行时依次切换所有标题的垂直偏移：
+  // 0、-4、4；undefined 为配置中的 -3.5。
+  const [titleOffset, setTitleOffset] = useState<number | undefined>(undefined);
+  const shownTitleOffset = titleOffset ?? (CONFIGURATION.CYLTabBarControllerTitlePositionAdjustment[1] as number);
   // As the Objective-C example, the cover goes on after the tab icons: a skin's icons replace the tab's icon views, so
   // the cover is put back once they are in (network icons are downloaded first). 与 Objective-C 示例相同，封面在 Tab 图标之后添加：
   // 皮肤的图标会替换 Tab 的图标视图，因此在其就绪后重新添加封面（网络图标需要先下载）。
@@ -458,7 +470,7 @@ function CYLMainTabBar({
           colors={colors}
           tint={skin.tint ?? colors.tint}
           values={{
-            titleOffset: '(0, -3.5)',
+            titleOffset: `(0, ${shownTitleOffset})`,
             appearance: t('Original'),
             skin: t(skin.name),
             scrollBehavior: 'Automatic',
@@ -489,6 +501,7 @@ function CYLMainTabBar({
             if (row.id === 'skin') return setSkinMenuVisible(true);
             if (row.id === 'flatShowHide') return setTabBarHidden((hidden) => !hidden);
             if (row.id === 'memoryWarning') return setMemoryWarningRequest((request) => request + 1);
+            if (row.id === 'titleOffset') return setTitleOffset(nextTitleOffset(shownTitleOffset));
             if (row.id === 'language') return presentLanguagePicker(onLanguageChange, () => setLanguageMenuVisible(true));
             if (row.badge) {
               // -[CYLHomeViewController tableView:didSelectRowAtIndexPath:]: an orange page (the "Home (n)" navigation title
@@ -527,6 +540,7 @@ function CYLMainTabBar({
         language={language}
         tabBarHidden={tabBarHidden}
         memoryWarningRequest={memoryWarningRequest}
+        titlePositionAdjustment={titleOffset === undefined ? undefined : [0, titleOffset]}
         onMemoryWarning={(report) => Alert.alert(t('Memory warning'), report, [{ text: t('OK') }])}
         // -[MainTabBarController cyl_demo_presentLoginForViewController:completion:]: "Messages" and "Me" need login; the
         // alert logs in, then selects the tapped tab. 「Messages」「Me」需要登录；弹窗登录后选中所点击的 Tab。

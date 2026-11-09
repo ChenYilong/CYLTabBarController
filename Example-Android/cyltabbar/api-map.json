@@ -5501,5 +5501,9 @@
  "CYLTabBarHostView -simulateMemoryWarning": {
   "status": "done",
   "android": "CYLTabBarHostView.simulateMemoryWarning()"
+ },
+ "CYLTabBarHostView titlePositionAdjustment": {
+  "status": "done",
+  "android": "CYLTabBarHostView.titlePositionAdjustment"
  }
 }

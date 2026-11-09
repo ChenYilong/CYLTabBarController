@@ -223,6 +223,20 @@ open class CYLTabBarHostView @JvmOverloads constructor(context: Context, attrs: 
      */
     fun simulateMemoryWarning(): String = CYLSimulateMemoryWarningReport(context, tabBarController)
 
+    /**
+     * [EN] The title offset of every tab, set at runtime (`CYLTabBarController.titlePositionAdjustment`) without building the
+     *      tab bar again; it wins over the configuration's `CYLTabBarControllerTitlePositionAdjustment`, as the iOS host. A
+     *      plus button that aligns its title follows. null keeps the configuration's.
+     * [CN] 所有 Tab 的标题偏移，在运行时设置（`CYLTabBarController.titlePositionAdjustment`），不重新创建 TabBar；优先于配置中的
+     *      `CYLTabBarControllerTitlePositionAdjustment`，与 iOS 宿主相同。对齐标题的 PlusButton 随之移动。null 时使用配置中的值。
+     */
+    var titlePositionAdjustment: CYLOffset? = null
+        set(value) {
+            if (field == value) return
+            field = value
+            if (value != null) tabBarController?.titlePositionAdjustment = value
+        }
+
     var language: String? = null
         set(value) {
             if (field == value) return
@@ -417,6 +431,7 @@ open class CYLTabBarHostView @JvmOverloads constructor(context: Context, attrs: 
         loginStateDidChange?.invoke(loggedIn)
         // [EN] The app shows the login screen: the tab is not selected now (see [didRequestLogin]). [CN] 由 App 展示登录界面：此时不选中该 Tab。
         if (tabBarHidden) controller.setTabBarHidden(true, false)
+        titlePositionAdjustment?.let { controller.titlePositionAdjustment = it }
         controller.cyl_loginHandler = { tabBarController, page, completion ->
             completion(false)
             val index = tabBarController.viewControllers.indexOf(page)

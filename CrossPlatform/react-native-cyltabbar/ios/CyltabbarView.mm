@@ -70,6 +70,11 @@ static id CYLRNJSONObject(NSString *JSON);
   }
   _hostView.selectedIndex = newViewProps.selectedIndex;
   _hostView.tabBarHidden = newViewProps.tabBarHidden;
+  // [EN] [horizontal, vertical]; empty keeps the configuration's offset. [CN] [水平, 垂直]；为空时使用配置中的偏移。
+  const auto &titleOffset = newViewProps.titlePositionAdjustment;
+  _hostView.titlePositionAdjustment = titleOffset.size() >= 2
+      ? [NSValue valueWithUIOffset:UIOffsetMake(titleOffset[0], titleOffset[1])]
+      : nil;
   // [EN] A new request simulates a memory warning once. [CN] 新的请求模拟一次内存警告。
   if (newViewProps.memoryWarningRequest > _memoryWarningRequest) {
     NSString *report = [_hostView simulateMemoryWarning];
@@ -140,6 +145,7 @@ static id CYLRNJSONObject(NSString *JSON)
   _hostView.tabCoverImages = nil;
   [_hostView resetLoggedIn];
   _hostView.tabBarHidden = NO;
+  _hostView.titlePositionAdjustment = nil;
   _memoryWarningRequest = 0;
   _badgeStylesJSON = nil;
   _plusButtonBadgeStyleJSON = nil;

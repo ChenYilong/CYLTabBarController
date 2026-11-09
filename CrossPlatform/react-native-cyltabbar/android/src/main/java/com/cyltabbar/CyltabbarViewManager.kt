@@ -92,6 +92,12 @@ class CyltabbarViewManager : SimpleViewManager<CyltabbarView>(),
     view?.memoryWarningRequest = value
   }
 
+  /** [EN] [horizontal, vertical], set at runtime; empty keeps the configuration's. [CN] [水平, 垂直]，运行时设置；为空时使用配置中的值。 */
+  @ReactProp(name = "titlePositionAdjustment")
+  override fun setTitlePositionAdjustment(view: CyltabbarView?, value: ReadableArray?) {
+    view?.titlePositionAdjustment = value?.takeIf { it.size() >= 2 }?.let { com.cyl.tabbar.CYLOffset(it.getDouble(0).toFloat(), it.getDouble(1).toFloat()) }
+  }
+
   @ReactProp(name = "tabCoverImages")
   override fun setTabCoverImages(view: CyltabbarView?, value: ReadableArray?) {
     view?.tabCoverImages = (0 until (value?.size() ?: 0)).map { value?.getString(it)?.takeIf { image -> image.isNotEmpty() } }

@@ -186,6 +186,15 @@ FOUNDATION_EXTERN NSString *const CYLTabBarHostBadgeCenterOffset;
  *      `CYLTabBarControllerKeepsLoadedTabBarItemIdentifiers`。
  */
 - (NSString *)simulateMemoryWarning;
+/*!
+ * [EN] The title offset of every tab (an `NSValue` of `UIOffset`), set at runtime with
+ *      `-[CYLTabBarController setTitlePositionAdjustment:]`, without building the tab bar again; it wins over the
+ *      configuration's `CYLTabBarControllerTitlePositionAdjustment`. A plus button that aligns its title follows. nil keeps
+ *      the configuration's.
+ * [CN] 所有 Tab 的标题偏移（`UIOffset` 的 `NSValue`），在运行时通过 `-[CYLTabBarController setTitlePositionAdjustment:]` 设置，
+ *      不重新创建 TabBar；优先于配置中的 `CYLTabBarControllerTitlePositionAdjustment`。对齐标题的 PlusButton 随之移动。nil 时使用配置中的值。
+ */
+@property (nonatomic, copy, nullable) NSValue *titlePositionAdjustment;
 
 /// [EN] The plus button of `CYLTabBarControllerPlusButton` was tapped. [CN] 点击了 `CYLTabBarControllerPlusButton` 的 PlusButton。
 @property (nonatomic, copy, nullable) void (^didTapPlusButton)(void);

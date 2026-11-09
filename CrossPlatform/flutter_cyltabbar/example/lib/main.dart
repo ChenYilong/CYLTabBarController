@@ -131,6 +131,16 @@ const _configuration = {
   },
 };
 
+/// CYLDemoTitleVerticalOffsets: the next offset after `current`; one not in the list goes to the first. 下一个偏移；不在列表中时为第一个。
+const _titleVerticalOffsets = [0.0, -4.0, 4.0];
+double _nextTitleOffset(double current) {
+  final index = _titleVerticalOffsets.indexWhere((offset) => (offset - current).abs() < 0.5);
+  return _titleVerticalOffsets[index < 0 ? 0 : (index + 1) % _titleVerticalOffsets.length];
+}
+
+/// As `%g`: "-3.5", "0", "4". 与 `%g` 相同：「-3.5」「0」「4」。
+String _formatOffset(double offset) => offset == offset.roundToDouble() ? offset.toInt().toString() : offset.toString();
+
 /// A tab with its titles in the current language, as CYLLocalizedTabBarItemsAttributes(). 标题使用当前语言的 Tab。
 CYLTabBarItem _translated(CYLTabBarItem item) => CYLTabBarItem(
   title: t(item.title!),
@@ -453,6 +463,11 @@ class _ExamplePageState extends State<CYLExamplePage> {
   // -[UIViewController cyl_simulateMemoryWarningAndShowResult]: each tap asks the tab bar for one simulated memory warning.
   // 每次点击请求 TabBar 模拟一次内存警告。
   int _memoryWarningRequest = 0;
+  // CYLSwitchTitlePositionAdjustment(): the title row cycles the vertical offset of every title through 0, -4 and 4 at
+  // runtime (`setTitlePositionAdjustment:`); null is the configuration's -3.5. 标题行在运行时依次切换所有标题的垂直偏移：
+  // 0、-4、4；null 为配置中的 -3.5。
+  double? _titleOffset;
+  double get _shownTitleOffset => _titleOffset ?? (_configuration['CYLTabBarControllerTitlePositionAdjustment'] as List)[1] as double;
   bool _plusPageSelected = false;
   List<CYLTabBarBadge?> _badges = const [];
   bool _decorated = false;
@@ -772,7 +787,7 @@ class _ExamplePageState extends State<CYLExamplePage> {
                                 ? const Color(0xFF0A84FF)
                                 : const Color(0xFF007AFF)),
                       values: {
-                        'titleOffset': '(0, -3.5)',
+                        'titleOffset': '(0, ${_formatOffset(_shownTitleOffset)})',
                         'appearance': t('Original'),
                         'skin': t(skin.name),
                         'scrollBehavior': 'Automatic',
@@ -802,6 +817,9 @@ class _ExamplePageState extends State<CYLExamplePage> {
                         }
                         if (row.id == 'skin') return _showSkinMenu(dark);
                         if (row.id == 'language') return _showLanguagePicker();
+                        if (row.id == 'titleOffset') {
+                          return setState(() => _titleOffset = _nextTitleOffset(_shownTitleOffset));
+                        }
                         if (row.id == 'memoryWarning') {
                           return setState(() => _memoryWarningRequest++);
                         }
@@ -861,6 +879,7 @@ class _ExamplePageState extends State<CYLExamplePage> {
         language: widget.language,
         tabBarHidden: _tabBarHidden,
         memoryWarningRequest: _memoryWarningRequest,
+        titlePositionAdjustment: _titleOffset == null ? null : Offset(0, _titleOffset!),
         onMemoryWarning: (report) => showDialog<void>(
           context: context,
           builder: (dialogContext) => AlertDialog.adaptive(

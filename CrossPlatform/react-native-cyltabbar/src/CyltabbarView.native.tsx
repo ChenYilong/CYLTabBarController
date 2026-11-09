@@ -127,6 +127,12 @@ export type CYLTabBarProps = ViewProps & {
    */
   memoryWarningRequest?: number;
   onMemoryWarning?: (report: string) => void;
+  /**
+   * The title offset of every tab, [horizontal, vertical], set at runtime (`-[CYLTabBarController setTitlePositionAdjustment:]`)
+   * without building the tab bar again; it wins over `CYLTabBarControllerTitlePositionAdjustment` of the configuration. A
+   * plus button that aligns its title follows. Undefined keeps the configuration's.
+   */
+  titlePositionAdjustment?: [number, number];
 };
 
 /**
@@ -225,6 +231,7 @@ export function CYLTabBar(props: CYLTabBarProps) {
     tabBarHidden,
     memoryWarningRequest,
     onMemoryWarning,
+    titlePositionAdjustment,
     selectedIndex,
     badgeValues,
     plusButtonBadgeValue,
@@ -257,6 +264,7 @@ export function CYLTabBar(props: CYLTabBarProps) {
       language={language ?? ''}
       tabBarHidden={tabBarHidden ?? false}
       memoryWarningRequest={memoryWarningRequest ?? 0}
+      titlePositionAdjustment={titlePositionAdjustment ?? []}
       onMemoryWarning={(event) => onMemoryWarning?.(event.nativeEvent.report)}
       onLoginStateChange={(event) => onLoginStateChange?.(event.nativeEvent.loggedIn)}
       onLoginRequest={(event) =>

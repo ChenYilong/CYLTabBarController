@@ -217,6 +217,26 @@ class CYLTabBarHostViewTest {
     }
 
     @Test
+    fun theTitleOffsetChangesAtRuntimeAndWinsOverTheConfiguration() = withActivity { activity ->
+        val host = hostView(activity)
+        val configuration = mapOf(
+            CYLConstants.CYLTabBarControllerTabBarItemsAttributes to items("A", "B"),
+            CYLConstants.CYLTabBarControllerTitlePositionAdjustment to listOf(0, -3.5),
+        )
+        host.configuration = configuration
+        val controller = waitForController(host)
+        assertEquals(-3.5f, controller.titlePositionAdjustment.vertical)
+        host.titlePositionAdjustment = CYLOffset(0f, 4f)
+        // [EN] The same tab bar, its titles moved. [CN] 同一个 TabBar，标题已移动。
+        assertSame(controller, host.tabBarController)
+        assertEquals(4f, controller.titlePositionAdjustment.vertical)
+        // [EN] A tab bar built again keeps the offset set at runtime. [CN] 重新创建的 TabBar 保留运行时设置的偏移。
+        host.configuration = null
+        host.configuration = configuration
+        assertEquals(4f, waitForController(host).titlePositionAdjustment.vertical)
+    }
+
+    @Test
     fun invalidJSONChangesNothing() = withActivity { activity ->
         val host = CYLTabBarHostView(activity)
         assertFalse(host.setConfigurationJSON("[1, 2]"))

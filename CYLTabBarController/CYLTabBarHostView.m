@@ -312,6 +312,9 @@ static UIImage *CYLTabBarHostOriginalImage(UIImage *image) {
     if (_tabBarHidden) {
         [tabBarController setTabBarHidden:YES animated:NO];
     }
+    if (_titlePositionAdjustment) {
+        tabBarController.titlePositionAdjustment = _titlePositionAdjustment.UIOffsetValue;
+    }
     UIViewController *parent = [self cyl_hostViewController];
     [parent addChildViewController:tabBarController];
     [self addSubview:tabBarController.view];
@@ -454,6 +457,17 @@ static BOOL CYLTabBarHostRectsContainPoint(NSArray<NSValue *> *rects, CGPoint po
     UISemanticContentAttribute attribute = rightToLeft ? UISemanticContentAttributeForceRightToLeft : UISemanticContentAttributeUnspecified;
     tabBarController.view.semanticContentAttribute = attribute;
     tabBarController.tabBar.semanticContentAttribute = attribute;
+}
+
+- (void)setTitlePositionAdjustment:(NSValue *)titlePositionAdjustment {
+    // [EN] -isEqual:, not -isEqualToValue:, which crashes on nil. [CN] 使用 -isEqual:，-isEqualToValue: 遇到 nil 会崩溃。
+    if (titlePositionAdjustment == _titlePositionAdjustment || [titlePositionAdjustment isEqual:_titlePositionAdjustment]) {
+        return;
+    }
+    _titlePositionAdjustment = [titlePositionAdjustment copy];
+    if (_titlePositionAdjustment) {
+        _tabBarController.titlePositionAdjustment = _titlePositionAdjustment.UIOffsetValue;
+    }
 }
 
 - (NSString *)simulateMemoryWarning {

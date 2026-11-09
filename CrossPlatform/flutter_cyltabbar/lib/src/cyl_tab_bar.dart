@@ -208,6 +208,7 @@ class CYLTabBar extends StatefulWidget {
     this.tabBarHidden = false,
     this.memoryWarningRequest = 0,
     this.onMemoryWarning,
+    this.titlePositionAdjustment,
   });
 
   /// The tabs: `CYLTabBarControllerTabBarItemsAttributes`.
@@ -287,6 +288,12 @@ class CYLTabBar extends StatefulWidget {
   final int memoryWarningRequest;
   final ValueChanged<String>? onMemoryWarning;
 
+  /// The title offset of every tab (dx horizontal, dy vertical), set at runtime
+  /// (`-[CYLTabBarController setTitlePositionAdjustment:]`) without building the tab bar again; it wins over
+  /// `CYLTabBarControllerTitlePositionAdjustment` of the configuration. A plus button that aligns its title follows. Null
+  /// keeps the configuration's.
+  final Offset? titlePositionAdjustment;
+
   /// The configuration sent to the native library.
   Map<String, Object?> buildConfiguration() => {
         if (styleType != null) 'CYLTabBarControllerStyleType': styleType,
@@ -322,7 +329,13 @@ class _CYLTabBarState extends State<CYLTabBar> {
         'loggedIn': widget.loggedIn,
         'language': widget.language,
         'tabBarHidden': widget.tabBarHidden,
+        'titlePositionAdjustment': _titleOffset(widget),
       };
+
+  static List<double>? _titleOffset(CYLTabBar bar) {
+    final offset = bar.titlePositionAdjustment;
+    return offset == null ? null : [offset.dx, offset.dy];
+  }
 
   static List<Map<String, Object?>?> _badgeStyles(CYLTabBar bar) => [for (final badge in bar.badgeStyles) badge?.toMap()];
 
@@ -365,6 +378,9 @@ class _CYLTabBarState extends State<CYLTabBar> {
       channel?.invokeMethod<String>('simulateMemoryWarning').then((report) {
         if (report != null) widget.onMemoryWarning?.call(report);
       });
+    }
+    if (widget.titlePositionAdjustment != oldWidget.titlePositionAdjustment) {
+      channel?.invokeMethod<void>('setTitlePositionAdjustment', _titleOffset(widget));
     }
     if (widget.tabBarHidden != oldWidget.tabBarHidden) {
       channel?.invokeMethod<void>('setTabBarHidden', widget.tabBarHidden);

@@ -57,6 +57,8 @@ export interface NativeProps extends ViewProps {
   tabBarHidden?: boolean;
   /** Each increase simulates a memory warning once; the report comes with onMemoryWarning. */
   memoryWarningRequest?: CodegenTypes.WithDefault<CodegenTypes.Int32, 0>;
+  /** The title offset of every tab, [horizontal, vertical], set at runtime; empty keeps the configuration's. */
+  titlePositionAdjustment?: ReadonlyArray<CodegenTypes.Double>;
   onTabLongPress?: CodegenTypes.DirectEventHandler<TabLongPressEvent>;
   /** A tab that needs login was tapped while logged out; it is not selected. */
   onLoginRequest?: CodegenTypes.DirectEventHandler<TabLongPressEvent>;

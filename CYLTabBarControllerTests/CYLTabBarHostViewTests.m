@@ -358,6 +358,25 @@ static NSString *const CYLHostTestsLoggedInKey = @"CYLTabBarControllerLoggedIn";
     hostView.language = nil;
 }
 
+- (void)testTheTitleOffsetChangesAtRuntimeAndWinsOverTheConfiguration {
+    CYLTabBarHostView *hostView = [self hostViewInWindow];
+    NSMutableDictionary *configuration = [[self loginConfiguration] mutableCopy];
+    configuration[CYLTabBarControllerTitlePositionAdjustment] = @"{0, -3.5}";
+    hostView.configuration = configuration;
+    [self waitForTabBarControllerOf:hostView];
+    CYLTabBarController *tabBarController = hostView.tabBarController;
+    XCTAssertEqual(tabBarController.titlePositionAdjustment.vertical, -3.5);
+    hostView.titlePositionAdjustment = [NSValue valueWithUIOffset:UIOffsetMake(0, 4)];
+    // [EN] The same tab bar, its titles moved. [CN] 同一个 TabBar，标题已移动。
+    XCTAssertEqual(hostView.tabBarController, tabBarController);
+    XCTAssertEqual(tabBarController.titlePositionAdjustment.vertical, 4);
+    // [EN] A tab bar built again keeps the offset set at runtime. [CN] 重新创建的 TabBar 保留运行时设置的偏移。
+    hostView.configuration = nil;
+    hostView.configuration = configuration;
+    [self waitForTabBarControllerOf:hostView];
+    XCTAssertEqual(hostView.tabBarController.titlePositionAdjustment.vertical, 4);
+}
+
 - (void)testInvalidJSONChangesNothing {
     CYLTabBarHostView *hostView = [[CYLTabBarHostView alloc] init];
     XCTAssertFalse([hostView setConfigurationJSON:@"[1, 2]"]);
