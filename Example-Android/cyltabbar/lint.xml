@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  [EN] Lint settings of the library module.
+       - LocaleFolder: values-b+he and values-b+id use the BCP 47 codes (he, id), the same as the iOS .lproj folders;
+         Android resolves BCP 47 resource folders since API 21 (minSdk is 23), so the legacy iw / in names are not needed.
+       - AppBundleLocaleChanges: CYLLocalization changes the language of the library's own strings at runtime; the app,
+         not this library, decides how it is packaged (an app bundle that splits languages must keep the library's ones).
+  [CN] 库模块的 lint 设置。
+       - LocaleFolder：values-b+he 与 values-b+id 使用 BCP 47 语言代码（he、id），与 iOS 的 .lproj 目录一致；Android 自 API 21 起支持
+         BCP 47 资源目录（minSdk 为 23），因此不需要旧的 iw / in 名称。
+       - AppBundleLocaleChanges：CYLLocalization 在运行时切换库自身字符串的语言；打包方式由 App 而不是本库决定（按语言拆分的 app bundle
+         需要保留库的语言）。
+-->
+<lint>
+    <issue id="LocaleFolder" severity="ignore" />
+    <issue id="AppBundleLocaleChanges" severity="ignore" />
+</lint>

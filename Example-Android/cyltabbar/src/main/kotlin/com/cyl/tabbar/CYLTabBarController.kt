@@ -175,12 +175,39 @@ open class CYLTabBarController(val activity: FragmentActivity) {
     }
 
     /** [EN] Adds the pages to the container and shows the selected one, now or once the view is attached. [CN] 把页面加入容器并显示选中的页面，立即或等视图附加后。 */
+    /**
+     * [EN] Android only: where the pages live when they are not the controller's own fragments, e.g. an app's ViewPager2
+     *      (`cyl_setupWithViewPager2`). The controller then asks it to show the selected page instead of showing and hiding
+     *      fragments itself.
+     * [CN] 仅 Android：页面不由控制器自己的 Fragment 事务管理时页面所在的位置，例如 App 的 ViewPager2（`cyl_setupWithViewPager2`）。此时控制器让它显示
+     *      选中的页面，而不是自己显示和隐藏 Fragment。
+     */
+    internal interface CYLPagesHost {
+        fun cyl_showPage(index: Int)
+        fun cyl_pagesDidChange()
+    }
+
+    internal var cyl_pagesHost: CYLPagesHost? = null
+
+    /** [EN] The host's pages come back after the plus button's page hid them; the plus button's page leaves; the host shows the selected page. [CN] PlusButton 的页面隐藏过的宿主页面重新显示；PlusButton 的页面离开；宿主显示选中的页面。 */
+    private fun commitPagesToHost(host: CYLPagesHost) {
+        val transaction = fragmentManager.beginTransaction()
+        for (page in viewControllers) if (page.isAdded && page.isHidden) transaction.show(page)
+        fragmentManager.findFragmentByTag("$fragmentTag-plus")?.takeIf { it.isAdded && !it.isHidden && !tabBar.plusButtonActive }?.let { transaction.hide(it) }
+        transaction.commitNowAllowingStateLoss()
+        host.cyl_showPage(selectedIndex)
+    }
+
     private fun commitPages() {
         if (!pagesContainer.isAttachedToWindow || fragmentManager.isDestroyed) {
             pagesCommitPending = true
             return
         }
         pagesCommitPending = false
+        cyl_pagesHost?.let { host ->
+            commitPagesToHost(host)
+            return
+        }
         val transaction = fragmentManager.beginTransaction()
         viewControllers.forEachIndexed { index, page ->
             if (!page.isAdded) transaction.add(pagesContainer.id, page, "$fragmentTag-$index")
@@ -295,7 +322,8 @@ open class CYLTabBarController(val activity: FragmentActivity) {
     private fun cyl_playSelectedTabBarItemAnimation(defaultSelected: Boolean) {
         if (tabBarItemAnimationURLs.isEmpty()) return
         val selected = if (tabBar.plusButtonActive) tabBar.plusButton else tabBar.cyl_tabBarButtonWithTabIndex(selectedIndex)
-        val item = (selected as? CYLTabBarItemButton)?.item
+        // [EN] The plus button has no tab item. [CN] PlusButton 没有 Tab item。
+        val item = if (tabBar.plusButtonActive) null else tabBar.cyl_tabBarButtonWithTabIndex(selectedIndex)?.item
         tabBar.cyl_animationLottieImageWithSelectedControl(selected, item?.cyl_tabBarItemAnimationURL, item?.cyl_tabBarItemAnimationSizeValue, defaultSelected, tabBarItemAnimationViewContentMode())
     }
 
@@ -327,6 +355,8 @@ open class CYLTabBarController(val activity: FragmentActivity) {
      *      让拖动驱动转场。取消的交互转场会重新选中之前的 Tab。
      */
     private fun runTransition(previous: Int, index: Int) {
+        // [EN] A pager (`cyl_setupWithViewPager2`) moves its own pages. [CN] 翻页控件（`cyl_setupWithViewPager2`）自己移动页面。
+        if (cyl_pagesHost != null) return
         val delegate = delegate ?: return
         val from = viewControllers.getOrNull(previous) ?: return
         val to = viewControllers.getOrNull(index) ?: return
@@ -510,6 +540,7 @@ open class CYLTabBarController(val activity: FragmentActivity) {
             CYLTabBarPageRegistry.pageIdentifierOfTab(tabBarItemsAttributes.getOrNull(index) ?: emptyMap())?.let { pagesByPageIdentifier.getOrPut(it) { ArrayList() } += page }
         }
         if (selectedIndex >= viewControllers.size) selectedIndex = 0
+        cyl_pagesHost?.cyl_pagesDidChange()
         commitPages()
         tabBar.cyl_reloadTabButtons()
         cyl_addTabBarItemAnimations()
@@ -639,9 +670,12 @@ open class CYLTabBarController(val activity: FragmentActivity) {
     var cyl_swipesBetweenPages: Boolean = false
 
     /** [EN] The page at `index` when a tap would select it now (no custom action, no login, `shouldSelect`), else null. [CN] 点击能立即选中时返回第 `index` 个页面（无自定义动作、无需登录、`shouldSelect`），否则为 null。 */
-    internal fun cyl_swipeTargetPage(index: Int): Fragment? {
+    internal fun cyl_swipeTargetPage(index: Int): Fragment? = cyl_gestureSelectablePage(index)?.takeIf { it.isAdded }
+
+    /** [EN] The page at `index` when a gesture may select it (as a tap would), added or not. [CN] 手势可以选中（与点击一样）时返回第 `index` 个页面，无论是否已添加。 */
+    internal fun cyl_gestureSelectablePage(index: Int): Fragment? {
         val page = viewControllers.getOrNull(index) ?: return null
-        if (tabBar.plusButtonActive || !page.isAdded) return null
+        if (tabBar.plusButtonActive) return null
         val delegate = delegate
         if (delegate?.tabBarController_shouldPerformCustomActionForViewController(this, page) ?: cyl_isCustomActionTabViewController(page)) return null
         if (!cyl_loggedIn && (delegate?.tabBarController_requiresLoginToSelectViewController(this, page) ?: cyl_isLoginRequiredForViewController(page))) return null
@@ -937,7 +971,8 @@ open class CYLTabBarController(val activity: FragmentActivity) {
      *      `shouldUnloadViewOfViewController` 返回 false 的 Tab 保留。
      */
     fun unloadViewsOfUnselectedViewControllers() {
-        if (fragmentManager.isDestroyed || fragmentManager.isStateSaved) return
+        // [EN] A pager (`cyl_setupWithViewPager2`) keeps its own pages. [CN] 翻页控件（`cyl_setupWithViewPager2`）自己管理页面。
+        if (fragmentManager.isDestroyed || fragmentManager.isStateSaved || cyl_pagesHost != null) return
         val transaction = fragmentManager.beginTransaction()
         var changed = false
         viewControllers.forEachIndexed { index, page ->

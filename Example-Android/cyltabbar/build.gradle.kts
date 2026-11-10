@@ -42,6 +42,9 @@ dependencies {
     api(project(":tabpages"))
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.fragment.ktx)
+    // [EN] Only for `cyl_setupWithViewPager2`: an app that uses it adds ViewPager2 itself. [CN] 仅用于 `cyl_setupWithViewPager2`：使用它的 App 自行添加 ViewPager2。
+    compileOnly(libs.androidx.viewpager2)
+    testImplementation(libs.androidx.viewpager2)
     testImplementation(libs.junit)
     testImplementation(libs.robolectric)
     // [EN] Only to test the Lottie animator found by reflection; apps add Lottie themselves. [CN] 仅用于测试通过反射找到的 Lottie animator；App 自行添加 Lottie。
