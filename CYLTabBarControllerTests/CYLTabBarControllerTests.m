@@ -374,6 +374,52 @@
     window.hidden = YES;
 }
 
+/// [EN] FIX: the FlatDesign "More" tab had no icon (the 1×1 transparent placeholder). With 8 tabs it now shows a real image
+///      and the "More" title.
+/// [CN] FIX：扁平样式的「More」Tab 没有图标（1×1 透明占位图）。8 个 Tab 时现在显示真实图片与「More」标题。
+- (void)testFlatDesignMoreTabHasAnIcon {
+    Class buttonClass = NSClassFromString(@"CYLFlatDesignTabBarButton");
+    if (!buttonClass) {
+        XCTSkip(@"FlatDesign is not compiled into this target");
+    }
+    NSMutableArray<NSDictionary *> *tabs = [NSMutableArray array];
+    for (NSUInteger index = 0; index < 8; index++) {
+        [tabs addObject:@{ CYLTabBarItemIdentifier : [NSString stringWithFormat:@"t%@", @(index)],
+                           CYLTabBarItemTitle : [NSString stringWithFormat:@"T%@", @(index)],
+                           CYLTabBarItemImage : [UIImage systemImageNamed:@"house"] }];
+    }
+    CYLTabBarController *tabBarController = [CYLTabBarController tabBarControllerWithConfiguration:@{
+        CYLTabBarControllerContext : [NSUUID UUID].UUIDString,
+        CYLTabBarControllerStyleType : @"flatDesign",
+        CYLTabBarControllerTabBarItemsAttributes : tabs,
+        CYLTabBarControllerPageResolver : ^UIViewController *(NSString *pageIdentifier, NSDictionary *attributes) {
+            return [[UIViewController alloc] init];
+        },
+    }];
+    UIWindow *window = [[UIWindow alloc] initWithFrame:CGRectMake(0, 0, 390, 844)];
+    window.rootViewController = tabBarController;
+    window.hidden = NO;
+    [tabBarController.view setNeedsLayout];
+    [tabBarController.view layoutIfNeeded];
+    NSMutableDictionary<NSString *, NSValue *> *sizes = [NSMutableDictionary dictionary];
+    NSMutableArray<UIView *> *queue = [NSMutableArray arrayWithObject:tabBarController.view];
+    while (queue.count > 0) {
+        UIView *view = queue.firstObject;
+        [queue removeObjectAtIndex:0];
+        if ([view isKindOfClass:buttonClass] && !view.hidden) {
+            UILabel *titleLabel = [view valueForKey:@"titleLabel"];
+            UIImageView *imageView = [view valueForKey:@"imageView"];
+            sizes[titleLabel.text ?: @"(nil)"] = [NSValue valueWithCGSize:imageView.image.size];
+        }
+        [queue addObjectsFromArray:view.subviews];
+    }
+    window.hidden = YES;
+    NSLog(@"FlatDesign buttons: %@", sizes);
+    NSString *moreTitle = [sizes.allKeys filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"NOT (SELF BEGINSWITH 'T')"]].firstObject;
+    XCTAssertNotNil(moreTitle, @"a More button: %@", sizes);
+    XCTAssertGreaterThan(sizes[moreTitle].CGSizeValue.width, 1, @"More (%@) has a real icon, not the 1x1 placeholder: %@", moreTitle, sizes);
+}
+
 - (void)testPerformanceExample {
     // This is an example of a performance test case.
     [self measureBlock:^{

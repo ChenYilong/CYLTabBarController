@@ -879,11 +879,27 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
 - (CYLFlatDesignTabBarItem *)cyl_tabBarItem {
     CYLFlatDesignTabBarItem *tabBarItem = objc_getAssociatedObject(self, @selector(cyl_tabBarItem));
     if (!tabBarItem) {
+        // [EN] FIX: the FlatDesign "More" tab had no icon. The values came from `tabBarItem`, the local variable that is nil
+        //      here, so every item got the transparent placeholder; they now come from UIKit's `self.tabBarItem`. The
+        //      system "More" item (`UITabBarSystemItemMore`) has no `image` (UIKit draws it), so it gets "ellipsis".
+        // [CN] FIX：扁平样式的「More」Tab 没有图标。原先的值取自此处为 nil 的局部变量 `tabBarItem`，因此每个 item 都得到透明占位图；
+        //      现在取自 UIKit 的 `self.tabBarItem`。系统的「More」item（`UITabBarSystemItemMore`）没有 `image`（由 UIKit 绘制），
+        //      因此使用 "ellipsis"。
+        UITabBarItem *systemItem = self.tabBarItem;
+        UIImage *systemImage = systemItem.image;
+        UIImage *systemSelectedImage = systemItem.selectedImage;
+        // [EN] Matched by class name, so the lazy `moreNavigationController` getter is never triggered from here.
+        // [CN] 按类名匹配，避免在这里触发懒加载的 `moreNavigationController` getter。
+        if (!systemImage && [NSStringFromClass([self class]) isEqualToString:@"UIMoreNavigationController"]) {
+            if (@available(iOS 13.0, *)) {
+                systemImage = [UIImage systemImageNamed:@"ellipsis"];
+                systemSelectedImage = systemImage;
+            }
+        }
         // No title (e.g. the slot under the plus button) stays empty: "test" used to be shown, and read by VoiceOver.
-        NSString *title = tabBarItem.title ?: self.title ?: @"";
-        UIImage *image = tabBarItem.image ?: [UIImage cyl_tabItemPlaceholderImage];
-        ;
-        UIImage *selectedImage = tabBarItem.selectedImage ?: [UIImage cyl_tabItemPlaceholderImage];
+        NSString *title = systemItem.title ?: self.title ?: @"";
+        UIImage *image = systemImage ?: [UIImage cyl_tabItemPlaceholderImage];
+        UIImage *selectedImage = systemSelectedImage ?: systemImage ?: [UIImage cyl_tabItemPlaceholderImage];
         
         tabBarItem = [[CYLFlatDesignTabBarItem alloc] initWithTitle:title image:image selectedImage:selectedImage];
         tabBarItem.index = NSNotFound;

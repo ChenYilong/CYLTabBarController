@@ -177,6 +177,7 @@ docs/
 │   ├── configuration-manifest-themes-bar.png
 │   ├── demo-test-list-objc-classic.png
 │   ├── docs-navigation-index.png
+│   ├── flat-design-more-icon-fix-ios.png
 │   ├── flatdesign-standard-appearance-mapping.svg
 │   ├── flutter-component-android-bar.png
 │   ├── flutter-component-android.png
@@ -189,6 +190,8 @@ docs/
 │   ├── gif-classic.png
 │   ├── gif-flat-design.png
 │   ├── gif-liquid-glass.png
+│   ├── liquid-glass-robustness-more-ios.png
+│   ├── liquid-glass-robustness-plus-stand-in-ios.png
 │   ├── login-required-tabs-flow.svg
 │   ├── login-required-tabs-flutter-ios-logged-in.png
 │   ├── login-required-tabs-react-native-android-alert.png
@@ -242,6 +245,7 @@ docs/
 │   ├── rive-flat-design.png
 │   ├── rive-liquid-glass.png
 │   ├── swiftui-integration-ios.png
+│   ├── swiftui-plus-title-blur-ios.png
 │   ├── tab-accessibility-labels-after-title-change.png
 │   ├── tab-bar-gallery-sections-ios.png
 │   ├── tab-custom-action-ios.png
