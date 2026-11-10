@@ -420,6 +420,43 @@
     XCTAssertGreaterThan(sizes[moreTitle].CGSizeValue.width, 1, @"More (%@) has a real icon, not the 1x1 placeholder: %@", moreTitle, sizes);
 }
 
+/// [EN] FIX: issue #515. With a plus button that is not in the middle (4 tabs, plus button at index 1), every
+///      `-setSelectedIndex:` selects one tab whose title and image belong together: the selected tab bar item is the
+///      selected view controller's own.
+/// [CN] FIX: issue #515。PlusButton 不在中间（4 个 Tab，PlusButton 位于下标 1）时，每次 `-setSelectedIndex:` 选中的 Tab 的标题与图片
+///      属于同一个 Tab：选中的 tab bar item 就是选中控制器自己的。
+- (void)testSelectedIndexWithAnOffCenterPlusButton {
+    NSMutableArray<NSDictionary *> *tabs = [NSMutableArray array];
+    for (NSString *name in @[ @"A", @"B", @"C", @"D" ]) {
+        [tabs addObject:@{ CYLTabBarItemIdentifier : name.lowercaseString, CYLTabBarItemTitle : name, CYLTabBarItemImage : [UIImage systemImageNamed:@"house"] }];
+    }
+    CYLTabBarController *tabBarController = [CYLTabBarController tabBarControllerWithConfiguration:@{
+        CYLTabBarControllerContext : [NSUUID UUID].UUIDString,
+        CYLTabBarControllerTabBarItemsAttributes : tabs,
+        CYLTabBarControllerPageResolver : ^UIViewController *(NSString *pageIdentifier, NSDictionary *attributes) {
+            return [[UIViewController alloc] init];
+        },
+        CYLTabBarControllerPlusButton : @{ CYLTabBarItemTitle : @"Post", CYLTabBarItemImage : [UIImage systemImageNamed:@"plus.circle"],
+                                           CYLPlusButtonIndexInTabBar : @1 },
+    }];
+    UIWindow *window = [[UIWindow alloc] initWithFrame:CGRectMake(0, 0, 390, 844)];
+    window.rootViewController = tabBarController;
+    window.hidden = NO;
+    [tabBarController.view layoutIfNeeded];
+    for (NSUInteger index = 0; index < tabBarController.viewControllers.count; index++) {
+        UIViewController *viewController = tabBarController.viewControllers[index];
+        if (viewController.cyl_isPlaceholder) {
+            continue;
+        }
+        tabBarController.selectedIndex = index;
+        [tabBarController.view layoutIfNeeded];
+        XCTAssertEqual(tabBarController.selectedViewController, viewController, @"index %@", @(index));
+        XCTAssertEqual(tabBarController.tabBar.selectedItem, viewController.tabBarItem, @"index %@: the selected item is that tab's", @(index));
+        XCTAssertEqualObjects(tabBarController.tabBar.selectedItem.title, viewController.tabBarItem.title);
+    }
+    window.hidden = YES;
+}
+
 - (void)testPerformanceExample {
     // This is an example of a performance test case.
     [self measureBlock:^{

@@ -138,4 +138,6 @@ tabBarController.tabBar.standardAppearance = appearance
 
 | 中文 | English |
 |:---|:---|
-| 本次开发环境没有 iOS 模拟器或真机，无法运行 Demo，因此暂无测试截图。上方示意图为映射关系图，不是运行截图。在设备上验证后，请将截图放入 `docs/assets/` 并在此处引用，例如 `![FlatDesign 深色主题](assets/flatdesign-theme-dark.png)`。 | This change was developed without an iOS simulator or device, so the demo could not be run and there are no test screenshots yet. The figure above is a mapping diagram, not a screenshot. After testing on a device, put screenshots in `docs/assets/` and reference them here, e.g. `![FlatDesign dark theme](assets/flatdesign-theme-dark.png)`. |
+| 已验证（2026-11-10，iOS 26.1，iPhone 17 Pro Max 模拟器，ObjC 示例）：点击导航栏「Flat Design」切换到扁平样式，再多次点击「standardAppearance theme (shared by Liquid Glass and FlatDesign)」行。从上到下：红色标题主题、深色主题、粉色选中背景主题、恢复默认；扁平 TabBar 的背景、标题颜色与选中背景都随 `standardAppearance` 变化。 | Verified (2026-11-10, iOS 26.1, iPhone 17 Pro Max simulator, ObjC example): "Flat Design" in the navigation bar switches to FlatDesign, then the "standardAppearance theme (shared by Liquid Glass and FlatDesign)" row is tapped several times. Top to bottom: a red-title theme, a dark theme, a pink selected-background theme, back to the default; the flat tab bar's background, title colors and selected background all follow `standardAppearance`. |
+
+![FlatDesign standardAppearance themes](assets/flatdesign-standard-appearance-ios.png)

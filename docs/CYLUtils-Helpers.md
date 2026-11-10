@@ -105,4 +105,4 @@ UIImage *sample = CYLImageInBundle(CYLResourceBundle(), nil, @"cyl_badge_sample_
 
 | 中文 | English |
 |:---|:---|
-| 本次修改在没有 Xcode 与 iOS 模拟器的环境（Linux）中完成，无法编译运行，因此暂无测试截图。已通过 `pod lib lint --quick`，以及对 CYLUtils 单独进行的 clang 语法检查（使用模拟的 UIKit 头文件）。 | This change was made in an environment without Xcode or an iOS simulator (Linux), so it could not be built or run, and there are no test screenshots. It passed `pod lib lint --quick` and a clang syntax check of CYLUtils on its own (against stand-in UIKit headers). |
+| 已验证（2026-11-10，macOS，Xcode）：CYLUtils 作为库的一部分编译，`xcodebuild analyze`（CYLTabBarController-Framework）无警告，`pod lib lint --quick` 通过，单元测试（117 个）在 iPhone 17 Pro Max 模拟器（iOS 26.1）上通过；这些辅助方法本身没有界面，因此没有截图。第一版在 Linux 上完成。 | Verified (2026-11-10, macOS, Xcode): CYLUtils builds as part of the library, `xcodebuild analyze` (CYLTabBarController-Framework) reports no warning, `pod lib lint --quick` passes, and the unit tests (117) pass on an iPhone 17 Pro Max simulator (iOS 26.1); the helpers have no UI of their own, so there is no screenshot. The first version was made on Linux. |

@@ -178,6 +178,7 @@ docs/
 │   ├── demo-test-list-objc-classic.png
 │   ├── docs-navigation-index.png
 │   ├── flat-design-more-icon-fix-ios.png
+│   ├── flatdesign-standard-appearance-ios.png
 │   ├── flatdesign-standard-appearance-mapping.svg
 │   ├── flutter-component-android-bar.png
 │   ├── flutter-component-android.png
@@ -190,6 +191,7 @@ docs/
 │   ├── gif-classic.png
 │   ├── gif-flat-design.png
 │   ├── gif-liquid-glass.png
+│   ├── image-only-tabs-ios.png
 │   ├── liquid-glass-robustness-more-ios.png
 │   ├── liquid-glass-robustness-plus-stand-in-ios.png
 │   ├── login-required-tabs-flow.svg
