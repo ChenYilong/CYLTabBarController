@@ -4029,6 +4029,40 @@ static UIImage *CYLImageScaledToSize(UIImage *image, CGSize size) {
 }
 #endif
 
+/*!
+ * [EN] FIX: more than five tabs showed only the first five on the classic style and Liquid Glass, with no "More": that
+ *      path installs the tabs with -addChildViewController:, and UIKit builds its "More" tab only in -setViewControllers:,
+ *      so the sixth tab and later could not be reached. With more than five tabs they are handed to UIKit too, as
+ *      FlatDesign does; five or fewer keep the old path unchanged.
+ * [CN] FIX：经典样式与液态玻璃下超过 5 个 Tab 时只显示前 5 个且没有「More」：这条路径用 -addChildViewController: 安装 Tab，而 UIKit
+ *      只在 -setViewControllers: 中生成「More」，因此第 6 个及之后的 Tab 无法访问。超过 5 个时也交给 UIKit（与扁平样式相同）；
+ *      5 个及以内保持原来的路径不变。
+ */
+- (void)cyl_handTabsToUIKitIfMoreThanFive {
+    if (_viewControllers.count <= 5) {
+        return;
+    }
+    // [EN] UIKit adds "More" only for view controllers that are not children yet (found with a plain
+    //      UITabBarController: -addChildViewController: then -setViewControllers: gives five tabs and no More), so the
+    //      children this path added are taken out first; UIKit adds them back.
+    // [CN] UIKit 只为尚未成为子控制器的视图控制器生成「More」（用普通 UITabBarController 验证：先 -addChildViewController: 再
+    //      -setViewControllers: 只有 5 个 Tab 且没有 More），因此先移除这条路径添加的子控制器，由 UIKit 重新添加。
+    NSArray<UIViewController *> *tabs = _viewControllers;
+    for (UIViewController *viewController in tabs) {
+        if (viewController.parentViewController == self) {
+            [viewController willMoveToParentViewController:nil];
+            [viewController removeFromParentViewController];
+        }
+    }
+    // [EN] `viewControllers` is this class's own list (`@synthesize`), which UIKit reads as the old tabs: with the same
+    //      array it saw no change and added nothing. The list is empty while UIKit takes the tabs, then restored.
+    // [CN] `viewControllers` 是本类自己的数组（`@synthesize`），UIKit 会把它当作旧 Tab 读取：数组相同时它认为没有变化，什么也不添加。
+    //      UIKit 接收 Tab 期间该数组为空，之后恢复。
+    _viewControllers = nil;
+    [super setViewControllers:tabs animated:NO];
+    _viewControllers = tabs;
+}
+
 - (void)setViewControllers:(NSArray<__kindof UIViewController *> *)viewControllers {
     // Known from now on (`+cyl_tabBarControllerForContext:`), but not "active" until it appears. Only with view
     // controllers: a nil / empty array is also what a tear-down sends, when no weak reference may be formed.
@@ -4099,6 +4133,7 @@ static UIImage *CYLImageScaledToSize(UIImage *image, CGSize size) {
             //      in again dropped the plus child view controller (or kept a stale slot it carried).
             // [CN] FIX：占位导致的数量不匹配——`_viewControllers` 已在上面对齐；以前这里又赋值为传入的数组，丢失 PlusButton 子控制器
             //      （或保留了数组自带的旧 slot）。
+            [self cyl_handTabsToUIKitIfMoreThanFive];
             return;
         }
         CYLTabBar *cyl_tabBar = (CYLTabBar *)self.cyl_tabBar;
@@ -4169,6 +4204,7 @@ static UIImage *CYLImageScaledToSize(UIImage *image, CGSize size) {
         
             idx++;
         }
+        [self cyl_handTabsToUIKitIfMoreThanFive];
     } else {/**  CYLTabBarStyleTypeFlatDesign*/}
 
     if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType) {
@@ -6222,7 +6258,10 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
     [self cyl_setNeedsUpdateTabBarItemIconViews];
     [self cyl_setNeedsUpdateSelectedBackgroundColors];
     NSUInteger indexOfSelectedViewController = [self.childViewControllers indexOfObject:selectedViewController];
-    if (NSNotFound == indexOfSelectedViewController) { return; }
+    // [EN] A tab shown under "More" (more than five tabs) is a child of the More navigation controller, not of this
+    //      controller: it is still one of the tabs, so it can be selected.
+    // [CN] 收在「More」下的 Tab（超过 5 个 Tab 时）是 More 导航控制器的子控制器而不是本控制器的：它仍是一个 Tab，可以被选中。
+    if (NSNotFound == indexOfSelectedViewController && ![self.viewControllers containsObject:selectedViewController]) { return; }
     [super setSelectedViewController:selectedViewController];
     _selectedViewController = selectedViewController;
     // FIX: issue #433

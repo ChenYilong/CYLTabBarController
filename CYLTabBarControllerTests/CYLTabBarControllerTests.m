@@ -457,6 +457,54 @@
     window.hidden = YES;
 }
 
+/// [EN] FIX: more than five tabs on the classic style / Liquid Glass showed the first five and no "More". With eight tabs
+///      UIKit's "More" tab is there and a later tab can be selected; five tabs are unchanged; a plus button with eight
+///      tabs does not crash.
+/// [CN] FIX：经典样式 / 液态玻璃下超过 5 个 Tab 时只显示前 5 个且没有「More」。8 个 Tab 时有 UIKit 的「More」，之后的 Tab 也能选中；
+///      5 个 Tab 不受影响；有 PlusButton 且 8 个 Tab 时不崩溃。
+- (void)testMoreTabWithMoreThanFiveTabs {
+    CYLTabBarController * (^make)(NSUInteger, NSDictionary *) = ^CYLTabBarController *(NSUInteger count, NSDictionary *plus) {
+        NSMutableArray<NSDictionary *> *tabs = [NSMutableArray array];
+        for (NSUInteger index = 0; index < count; index++) {
+            [tabs addObject:@{ CYLTabBarItemIdentifier : [NSString stringWithFormat:@"t%@", @(index)],
+                               CYLTabBarItemTitle : [NSString stringWithFormat:@"T%@", @(index)],
+                               CYLTabBarItemImage : [UIImage systemImageNamed:@"house"] }];
+        }
+        NSMutableDictionary *configuration = [@{
+            CYLTabBarControllerContext : [NSUUID UUID].UUIDString,
+            CYLTabBarControllerTabBarItemsAttributes : tabs,
+            CYLTabBarControllerPageResolver : ^UIViewController *(NSString *pageIdentifier, NSDictionary *attributes) {
+                return [[UIViewController alloc] init];
+            },
+        } mutableCopy];
+        if (plus) {
+            configuration[CYLTabBarControllerPlusButton] = plus;
+        }
+        return [CYLTabBarController tabBarControllerWithConfiguration:configuration];
+    };
+    UIWindow *window = [[UIWindow alloc] initWithFrame:CGRectMake(0, 0, 440, 956)];
+    window.hidden = NO;
+
+    CYLTabBarController *eight = make(8, nil);
+    window.rootViewController = eight;
+    [eight.view layoutIfNeeded];
+    XCTAssertTrue([eight.tabBar.items containsObject:eight.moreNavigationController.tabBarItem], @"a More tab");
+    eight.selectedIndex = 6;
+    XCTAssertEqual(eight.selectedViewController, eight.viewControllers[6], @"the seventh tab can be selected");
+
+    CYLTabBarController *five = make(5, nil);
+    window.rootViewController = five;
+    [five.view layoutIfNeeded];
+    XCTAssertEqual(five.tabBar.items.count, 5u);
+    XCTAssertFalse([five.tabBar.items containsObject:five.moreNavigationController.tabBarItem], @"five tabs: no More");
+
+    CYLTabBarController *withPlus = make(8, @{ CYLTabBarItemTitle : @"Post", CYLTabBarItemImage : [UIImage systemImageNamed:@"plus.circle"] });
+    window.rootViewController = withPlus;
+    [withPlus.view layoutIfNeeded];
+    XCTAssertGreaterThan(withPlus.tabBar.items.count, 0u);
+    window.hidden = YES;
+}
+
 - (void)testPerformanceExample {
     // This is an example of a performance test case.
     [self measureBlock:^{
