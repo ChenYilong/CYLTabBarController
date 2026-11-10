@@ -200,6 +200,7 @@ docs/
 │   ├── pag-classic.png
 │   ├── pag-flat-design.png
 │   ├── pag-liquid-glass.png
+│   ├── per-tab-animation-pag-ios.png
 │   ├── plus-child-theme-switching.png
 │   ├── plusbutton-background-image-liquid-glass-selected.png
 │   ├── plusbutton-background-image-liquid-glass-swiftui.png
@@ -215,6 +216,7 @@ docs/
 │   ├── plusbutton-overlap-lg.png
 │   ├── plusbutton-slot-flatdesign.png
 │   ├── plusbutton-slot-liquid-glass-titles-changed.png
+│   ├── plusbutton-subview-touches-ios.png
 │   ├── plusbutton-subview-touches-issue-202.png
 │   ├── plusbutton-touchable-area-1x.png
 │   ├── plusbutton-touchable-area-2x.png
