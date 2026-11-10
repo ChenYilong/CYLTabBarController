@@ -102,11 +102,15 @@ NSString *const CYLTabBarControllerUserInterfaceStyle = @"CYLTabBarControllerUse
 NSString *const CYLTabBarControllerTabButtonTapAnimation = @"CYLTabBarControllerTabButtonTapAnimation";
 NSString *const CYLTabBarControllerSwipeToSwitchTab = @"CYLTabBarControllerSwipeToSwitchTab";
 NSString *const CYLTabBarControllerLoginRequiredTabBarItemIdentifiers = @"CYLTabBarControllerLoginRequiredTabBarItemIdentifiers";
+NSString *const CYLTabBarControllerUnloadsUnselectedViewsOnMemoryWarning = @"CYLTabBarControllerUnloadsUnselectedViewsOnMemoryWarning";
+NSString *const CYLTabBarControllerKeepsLoadedTabBarItemIdentifiers = @"CYLTabBarControllerKeepsLoadedTabBarItemIdentifiers";
 NSString *const CYLTabBarControllerThemes = @"CYLTabBarControllerThemes";
 NSString *const CYLTabBarControllerThemeIdentifier = @"CYLTabBarControllerThemeIdentifier";
 NSString *const CYLTabBarControllerDarkThemeIdentifier = @"CYLTabBarControllerDarkThemeIdentifier";
 NSString *const CYLTabBarControllerThemeManagerName = @"CYLTabBarControllerThemeManagerName";
 NSString *const CYLTabBarControllerLocalization = @"CYLTabBarControllerLocalization";
+NSString *const CYLTabBarControllerConfigurationRoute = @"CYLTabBarControllerConfigurationRoute";
+NSString *const CYLTabBarControllerManifestRoute = @"CYLTabBarControllerManifestRoute";
 NSString *const CYLTabBarLocalizationTableName = @"CYLTabBarLocalizationTableName";
 NSString *const CYLTabBarLocalizationPath = @"CYLTabBarLocalizationPath";
 NSString *const CYLTabBarLocalizationBundleName = @"CYLTabBarLocalizationBundleName";
@@ -129,6 +133,10 @@ NSString *const CYLTabBarItemTitleColor = @"CYLTabBarItemTitleColor";
 NSString *const CYLTabBarItemSelectedTitleColor = @"CYLTabBarItemSelectedTitleColor";
 NSString *const CYLTabBarItemIconColor = @"CYLTabBarItemIconColor";
 NSString *const CYLTabBarItemSelectedIconColor = @"CYLTabBarItemSelectedIconColor";
+NSString *const CYLTabBarItemIconRenderingMode = @"CYLTabBarItemIconRenderingMode";
+NSString *const CYLTabBarControllerIconRenderingMode = @"CYLTabBarControllerIconRenderingMode";
+NSString *const CYLTabBarControllerIconColor = @"CYLTabBarControllerIconColor";
+NSString *const CYLTabBarControllerSelectedIconColor = @"CYLTabBarControllerSelectedIconColor";
 NSString *const CYLTabBarItemSelectedBackgroundColor = @"CYLTabBarItemSelectedBackgroundColor";
 NSString *const CYLTabBarItemBackgroundColor = @"CYLTabBarItemBackgroundColor";
 NSString *const CYLTabBarLottieLoopsWhenUnselected = @"CYLTabBarLottieLoopsWhenUnselected";
@@ -539,6 +547,56 @@ static NSString *const CYLImageOnlyTabAppliedTitleKey = @"appliedTitle";
  */
 static inline id _Nullable CYLObjectAtIndex(NSArray * _Nullable array, NSUInteger index) {
     return index < array.count ? array[index] : nil;
+}
+
+/*!
+ * [EN] FIX: issue #787. A tab's images in its `CYLTabBarItemIconRenderingMode`: "template" makes both images templates (the
+ *      selected one falls back to the normal one, so one image is enough), "original" keeps their colors; otherwise the
+ *      image infos are returned as they are.
+ * [CN] FIX: issue #787。按 Tab 的 `CYLTabBarItemIconRenderingMode` 处理其图片："template" 把两张图片都设为模板（没有选中图片时使用普通图片，
+ *      因此一张图即可），"original" 保持原色；否则原样返回图片信息。
+ */
+/*!
+ * [EN] FIX: issue #787 — `image` in `renderingMode`, keeping its dark image: `-imageWithRenderingMode:` alone returns the
+ *      current appearance only, so a tab with `CYLTabBarItemDarkImage` stayed light in Dark Mode. Both appearances are
+ *      converted and combined again.
+ * [CN] FIX: issue #787——以 `renderingMode` 返回 `image`，并保留其深色图片：单独调用 `-imageWithRenderingMode:` 只返回当前外观的那张，
+ *      带 `CYLTabBarItemDarkImage` 的 Tab 在深色模式下仍为浅色。因此两种外观分别转换后重新合成。
+ */
+static UIImage *CYLImageWithRenderingMode(UIImage *image, UIImageRenderingMode renderingMode) {
+    if (@available(iOS 13.0, *)) {
+        UIImageAsset *imageAsset = image.imageAsset;
+        UIImage *lightImage = [imageAsset imageWithTraitCollection:[UITraitCollection traitCollectionWithUserInterfaceStyle:UIUserInterfaceStyleLight]];
+        UIImage *darkImage = [imageAsset imageWithTraitCollection:[UITraitCollection traitCollectionWithUserInterfaceStyle:UIUserInterfaceStyleDark]];
+        if (lightImage && darkImage && ![lightImage isEqual:darkImage]) {
+            return [UIImage cyl_imageWithLightImage:[lightImage imageWithRenderingMode:renderingMode]
+                                          darkImage:[darkImage imageWithRenderingMode:renderingMode]];
+        }
+    }
+    return [image imageWithRenderingMode:renderingMode];
+}
+
+static void CYLApplyIconRenderingMode(NSDictionary *attributes, id _Nullable *_Nonnull normalImageInfo, id _Nullable *_Nonnull selectedImageInfo) {
+    NSString *mode = [attributes[CYLTabBarItemIconRenderingMode] isKindOfClass:[NSString class]] ? attributes[CYLTabBarItemIconRenderingMode] : nil;
+    UIImageRenderingMode renderingMode;
+    if ([mode isEqualToString:@"template"]) {
+        renderingMode = UIImageRenderingModeAlwaysTemplate;
+    } else if ([mode isEqualToString:@"original"]) {
+        renderingMode = UIImageRenderingModeAlwaysOriginal;
+    } else {
+        return;
+    }
+    UIImage *normal = *normalImageInfo ? [UIImage cyl_imageNamed:*normalImageInfo] : nil;
+    UIImage *selected = *selectedImageInfo ? [UIImage cyl_imageNamed:*selectedImageInfo] : nil;
+    if (!selected && renderingMode == UIImageRenderingModeAlwaysTemplate) {
+        selected = normal;
+    }
+    if (normal) {
+        *normalImageInfo = CYLImageWithRenderingMode(normal, renderingMode);
+    }
+    if (selected) {
+        *selectedImageInfo = CYLImageWithRenderingMode(selected, renderingMode);
+    }
 }
 
 @implementation CYLTabBarController {
@@ -1570,7 +1628,16 @@ static const void *const CYLPlusButtonGlassLayoutRetryPendingKey = &CYLPlusButto
 }
 
 - (BOOL)shouldUnloadViewOfViewController:(UIViewController *)viewController {
-    return YES;
+    NSString *identifier = viewController.cyl_tabBarItemIdentifier;
+    return !(identifier && [self.cyl_keepsLoadedTabBarItemIdentifiers containsObject:identifier]);
+}
+
+- (NSArray<NSString *> *)cyl_keepsLoadedTabBarItemIdentifiers {
+    return objc_getAssociatedObject(self, @selector(cyl_keepsLoadedTabBarItemIdentifiers)) ?: @[];
+}
+
+- (void)setCyl_keepsLoadedTabBarItemIdentifiers:(NSArray<NSString *> *)identifiers {
+    objc_setAssociatedObject(self, @selector(cyl_keepsLoadedTabBarItemIdentifiers), [identifiers copy], OBJC_ASSOCIATION_COPY_NONATOMIC);
 }
 
 - (void)unloadViewsOfUnselectedViewControllers {
@@ -1986,6 +2053,11 @@ static const void *const CYLPlusButtonGlassLayoutRetryPendingKey = &CYLPlusButto
                                                        darkImageInfo:attributes[CYLTabBarItemDarkImage]];
             setup.selectedImageInfo = [UIImage cyl_imageWithImageInfo:attributes[CYLTabBarItemSelectedImage]
                                                          darkImageInfo:attributes[CYLTabBarItemSelectedDarkImage]];
+            id normalImageInfo = setup.normalImageInfo;
+            id selectedImageInfo = setup.selectedImageInfo;
+            CYLApplyIconRenderingMode(attributes, &normalImageInfo, &selectedImageInfo);
+            setup.normalImageInfo = normalImageInfo;
+            setup.selectedImageInfo = selectedImageInfo;
             NSString *animationFilePath = nil;
             setup.animationURL = CYLTabBarItemAnimationURLFromAttributes(attributes, &animationFilePath);
             setup.animationFilePath = animationFilePath;
@@ -2455,6 +2527,14 @@ static NSMutableDictionary<NSString *, NSMutableArray<UIViewController *> *> *CY
         NSArray<NSString *> *loginRequired = normalized[CYLTabBarControllerLoginRequiredTabBarItemIdentifiers];
         if (loginRequired) {
             self.cyl_loginRequiredTabBarItemIdentifiers = loginRequired;
+        }
+        NSNumber *unloads = normalized[CYLTabBarControllerUnloadsUnselectedViewsOnMemoryWarning];
+        if (unloads) {
+            self.unloadsUnselectedViewsOnMemoryWarning = unloads.boolValue;
+        }
+        NSArray<NSString *> *keepsLoaded = normalized[CYLTabBarControllerKeepsLoadedTabBarItemIdentifiers];
+        if (keepsLoaded) {
+            self.cyl_keepsLoadedTabBarItemIdentifiers = keepsLoaded;
         }
         // [EN] Skins of the configuration (`CYLTabBarControllerThemes`): registered with the theme manager, the first one applied.
         // [CN] 配置中的皮肤（`CYLTabBarControllerThemes`）：注册到主题管理器，并应用首个皮肤。
@@ -3082,13 +3162,24 @@ static NSString *const CYLTabBarItemPlusSlotPlaceholderKey = @"CYLTabBarItemPlus
 
     // As when the tab was set up (`-setViewControllers:`), so a dark image is combined with its light one (#620).
     NSString *title = attributes[CYLTabBarItemTitle];
-    BOOL updatesImage = attributes[CYLTabBarItemImage] || attributes[CYLTabBarItemDarkImage];
-    BOOL updatesSelectedImage = attributes[CYLTabBarItemSelectedImage] || attributes[CYLTabBarItemSelectedDarkImage];
+    // FIX: issue #787 — a new rendering mode alone redraws both images. [CN] 只更新渲染方式时也重新绘制两张图片。
+    BOOL updatesRenderingMode = attributes[CYLTabBarItemIconRenderingMode] != nil;
+    BOOL updatesImage = attributes[CYLTabBarItemImage] || attributes[CYLTabBarItemDarkImage] || updatesRenderingMode;
+    BOOL updatesSelectedImage = attributes[CYLTabBarItemSelectedImage] || attributes[CYLTabBarItemSelectedDarkImage] || updatesRenderingMode;
     UIImage *image = updatesImage ? [UIImage cyl_imageNamed:[UIImage cyl_imageWithImageInfo:newAttributes[CYLTabBarItemImage]
                                                                                darkImageInfo:newAttributes[CYLTabBarItemDarkImage]]] : nil;
     UIImage *selectedImage = updatesSelectedImage ?
         [UIImage cyl_imageNamed:[UIImage cyl_imageWithImageInfo:newAttributes[CYLTabBarItemSelectedImage]
                                                   darkImageInfo:newAttributes[CYLTabBarItemSelectedDarkImage]]] : nil;
+    if (updatesImage || updatesSelectedImage) {
+        // FIX: issue #787 — the tab's rendering mode applies to images updated in place too.
+        // [CN] Tab 的渲染方式同样作用于原地更新的图片。
+        id normalInfo = image;
+        id selectedInfo = selectedImage;
+        CYLApplyIconRenderingMode(newAttributes, &normalInfo, &selectedInfo);
+        image = normalInfo;
+        selectedImage = selectedInfo;
+    }
 
     // FIX: issue #216 — an animation key (e.g. from a `CYLTabBarTheme`) replaces the tab's animation in place, in every style.
     // 动画 key（例如来自 `CYLTabBarTheme`）在所有样式下原地替换该 Tab 的动画。
@@ -3938,6 +4029,40 @@ static UIImage *CYLImageScaledToSize(UIImage *image, CGSize size) {
 }
 #endif
 
+/*!
+ * [EN] FIX: more than five tabs showed only the first five on the classic style and Liquid Glass, with no "More": that
+ *      path installs the tabs with -addChildViewController:, and UIKit builds its "More" tab only in -setViewControllers:,
+ *      so the sixth tab and later could not be reached. With more than five tabs they are handed to UIKit too, as
+ *      FlatDesign does; five or fewer keep the old path unchanged.
+ * [CN] FIX：经典样式与液态玻璃下超过 5 个 Tab 时只显示前 5 个且没有「More」：这条路径用 -addChildViewController: 安装 Tab，而 UIKit
+ *      只在 -setViewControllers: 中生成「More」，因此第 6 个及之后的 Tab 无法访问。超过 5 个时也交给 UIKit（与扁平样式相同）；
+ *      5 个及以内保持原来的路径不变。
+ */
+- (void)cyl_handTabsToUIKitIfMoreThanFive {
+    if (_viewControllers.count <= 5) {
+        return;
+    }
+    // [EN] UIKit adds "More" only for view controllers that are not children yet (found with a plain
+    //      UITabBarController: -addChildViewController: then -setViewControllers: gives five tabs and no More), so the
+    //      children this path added are taken out first; UIKit adds them back.
+    // [CN] UIKit 只为尚未成为子控制器的视图控制器生成「More」（用普通 UITabBarController 验证：先 -addChildViewController: 再
+    //      -setViewControllers: 只有 5 个 Tab 且没有 More），因此先移除这条路径添加的子控制器，由 UIKit 重新添加。
+    NSArray<UIViewController *> *tabs = _viewControllers;
+    for (UIViewController *viewController in tabs) {
+        if (viewController.parentViewController == self) {
+            [viewController willMoveToParentViewController:nil];
+            [viewController removeFromParentViewController];
+        }
+    }
+    // [EN] `viewControllers` is this class's own list (`@synthesize`), which UIKit reads as the old tabs: with the same
+    //      array it saw no change and added nothing. The list is empty while UIKit takes the tabs, then restored.
+    // [CN] `viewControllers` 是本类自己的数组（`@synthesize`），UIKit 会把它当作旧 Tab 读取：数组相同时它认为没有变化，什么也不添加。
+    //      UIKit 接收 Tab 期间该数组为空，之后恢复。
+    _viewControllers = nil;
+    [super setViewControllers:tabs animated:NO];
+    _viewControllers = tabs;
+}
+
 - (void)setViewControllers:(NSArray<__kindof UIViewController *> *)viewControllers {
     // Known from now on (`+cyl_tabBarControllerForContext:`), but not "active" until it appears. Only with view
     // controllers: a nil / empty array is also what a tear-down sends, when no weak reference may be formed.
@@ -4008,6 +4133,7 @@ static UIImage *CYLImageScaledToSize(UIImage *image, CGSize size) {
             //      in again dropped the plus child view controller (or kept a stale slot it carried).
             // [CN] FIX：占位导致的数量不匹配——`_viewControllers` 已在上面对齐；以前这里又赋值为传入的数组，丢失 PlusButton 子控制器
             //      （或保留了数组自带的旧 slot）。
+            [self cyl_handTabsToUIKitIfMoreThanFive];
             return;
         }
         CYLTabBar *cyl_tabBar = (CYLTabBar *)self.cyl_tabBar;
@@ -4078,6 +4204,7 @@ static UIImage *CYLImageScaledToSize(UIImage *image, CGSize size) {
         
             idx++;
         }
+        [self cyl_handTabsToUIKitIfMoreThanFive];
     } else {/**  CYLTabBarStyleTypeFlatDesign*/}
 
     if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType) {
@@ -6131,7 +6258,10 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
     [self cyl_setNeedsUpdateTabBarItemIconViews];
     [self cyl_setNeedsUpdateSelectedBackgroundColors];
     NSUInteger indexOfSelectedViewController = [self.childViewControllers indexOfObject:selectedViewController];
-    if (NSNotFound == indexOfSelectedViewController) { return; }
+    // [EN] A tab shown under "More" (more than five tabs) is a child of the More navigation controller, not of this
+    //      controller: it is still one of the tabs, so it can be selected.
+    // [CN] 收在「More」下的 Tab（超过 5 个 Tab 时）是 More 导航控制器的子控制器而不是本控制器的：它仍是一个 Tab，可以被选中。
+    if (NSNotFound == indexOfSelectedViewController && ![self.viewControllers containsObject:selectedViewController]) { return; }
     [super setSelectedViewController:selectedViewController];
     _selectedViewController = selectedViewController;
     // FIX: issue #433

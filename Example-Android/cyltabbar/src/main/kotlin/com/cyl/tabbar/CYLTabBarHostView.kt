@@ -26,7 +26,16 @@ import java.net.URI
 import java.util.concurrent.Executors
 
 /** [EN] The page of every tab of a [CYLTabBarHostView]: the host draws the pages, so it is empty. [CN] [CYLTabBarHostView] 每个 Tab 的页面：页面由宿主绘制，因此为空。 */
-class CYLTabBarHostEmptyPage : Fragment()
+/**
+ * [EN] The page of every tab of a host: an empty, transparent view, as the iOS host's pages, so a memory warning can unload
+ *      it and selecting the tab loads it again (`CYLSimulateMemoryWarningReport`).
+ * [CN] 宿主中每个 Tab 的页面：空白透明的视图，与 iOS 宿主的页面相同，因此内存警告可以卸载它，选中该 Tab 时重新加载
+ *      （`CYLSimulateMemoryWarningReport`）。
+ */
+class CYLTabBarHostEmptyPage : Fragment() {
+    override fun onCreateView(inflater: android.view.LayoutInflater, container: android.view.ViewGroup?, savedInstanceState: android.os.Bundle?): View =
+        View(inflater.context)
+}
 
 /**
  * [EN] `CYLTabBarHostView`: a view that shows only the tab bar of a [CYLTabBarController] made from a configuration
@@ -57,10 +66,16 @@ open class CYLTabBarHostView @JvmOverloads constructor(context: Context, attrs: 
     var configuration: Map<String, Any?>? = null
         set(value) {
             field = value
-            generation++
-            pendingConfiguration = null
-            if (value == null) removeController() else loadImages(value, generation)
+            reloadConfiguration()
         }
+
+    /** [EN] Builds the controller again from `configuration` (images first). [CN] 由 `configuration` 重新创建控制器（先加载图片）。 */
+    private fun reloadConfiguration() {
+        generation++
+        pendingConfiguration = null
+        val current = configuration
+        if (current == null) removeController() else loadImages(current, generation)
+    }
 
     /** [EN] The activity that hosts the fragments; by default the one the view's context wraps. [CN] 承载 Fragment 的 Activity；默认为视图 context 所包装的 Activity。 */
     var activityProvider: () -> FragmentActivity? = { findActivity(context) }
@@ -181,6 +196,65 @@ open class CYLTabBarHostView @JvmOverloads constructor(context: Context, attrs: 
     fun resetLoggedIn() {
         loggedInSet = false
     }
+
+    /**
+     * [EN] The language of the library's own texts and of the layout direction, as the iOS host: a BCP 47 tag such as "ar"
+     *      or "zh-Hans", or null for the device language. Sets [CYLLocalization.language], lays the tab bar out right to
+     *      left for a right-to-left language, and builds the tab bar again, as the Objective-C example rebuilds its root.
+     *      The tab titles come from the configuration: translate them there.
+     * [CN] 库自身文字与布局方向使用的语言，与 iOS 宿主相同：BCP 47 语言标签，如 "ar"、"zh-Hans"；null 表示设备语言。设置
+     *      [CYLLocalization.language]，从右到左的语言使 TabBar 从右到左布局，并重新创建 TabBar，与 Objective-C 示例重建根控制器相同。
+     *      Tab 标题来自配置：请在配置中翻译。
+     */
+    /**
+     * [EN] Hides or shows the tab bar, animated (`CYLTabBarController.setTabBarHidden`), as the iOS host. A hidden tab bar
+     *      takes no touches: [touchableRects] is empty and the page under it gets them.
+     * [CN] 隐藏或显示 TabBar（带动画，`CYLTabBarController.setTabBarHidden`），与 iOS 宿主相同。隐藏的 TabBar 不接收触摸：
+     *      [touchableRects] 为空，触摸交给其下方的页面。
+     */
+    var tabBarHidden: Boolean = false
+        set(value) {
+            if (field == value) return
+            field = value
+            tabBarController?.setTabBarHidden(value, true)
+            updateTouchableRects()
+        }
+
+    /**
+     * [EN] Simulates a memory warning for the tab bar controller and returns what happened to each tab, one line per tab,
+     *      in [CYLLocalization.language] (`CYLSimulateMemoryWarningReport`, #426), as the iOS host. The configuration decides
+     *      what is unloaded: `CYLTabBarControllerUnloadsUnselectedViewsOnMemoryWarning`, `CYLTabBarControllerKeepsLoadedTabBarItemIdentifiers`.
+     * [CN] 对 TabBarController 模拟内存警告，并返回每个 Tab 的结果（每个 Tab 一行），使用 [CYLLocalization.language]
+     *      （`CYLSimulateMemoryWarningReport`，#426），与 iOS 宿主相同。卸载哪些 Tab 由配置决定。
+     */
+    fun simulateMemoryWarning(): String = CYLSimulateMemoryWarningReport(context, tabBarController)
+
+    /**
+     * [EN] The title offset of every tab, set at runtime (`CYLTabBarController.titlePositionAdjustment`) without building the
+     *      tab bar again; it wins over the configuration's `CYLTabBarControllerTitlePositionAdjustment`, as the iOS host. A
+     *      plus button that aligns its title follows. null keeps the configuration's.
+     * [CN] 所有 Tab 的标题偏移，在运行时设置（`CYLTabBarController.titlePositionAdjustment`），不重新创建 TabBar；优先于配置中的
+     *      `CYLTabBarControllerTitlePositionAdjustment`，与 iOS 宿主相同。对齐标题的 PlusButton 随之移动。null 时使用配置中的值。
+     */
+    var titlePositionAdjustment: CYLOffset? = null
+        set(value) {
+            if (field == value) return
+            field = value
+            if (value != null) tabBarController?.titlePositionAdjustment = value
+        }
+
+    var language: String? = null
+        set(value) {
+            if (field == value) return
+            field = value
+            CYLLocalization.language = value
+            layoutDirection = when {
+                value == null -> View.LAYOUT_DIRECTION_LOCALE
+                CYLLocalization.isRightToLeft(value) -> View.LAYOUT_DIRECTION_RTL
+                else -> View.LAYOUT_DIRECTION_LTR
+            }
+            if (tabBarController != null) reloadConfiguration()
+        }
     var preferredHeightDidChange: ((height: Float) -> Unit)? = null
 
     /**
@@ -225,6 +299,8 @@ open class CYLTabBarHostView @JvmOverloads constructor(context: Context, attrs: 
      * [CN] [heightIncludesOverflow] 时，从透明区域开始、且不在 PlusButton 与其角标上的触摸不被接收：父视图把它交给下方的视图。
      */
     override fun dispatchTouchEvent(event: MotionEvent): Boolean {
+        // [EN] A hidden tab bar takes no touches: they go to the page under it. [CN] 隐藏的 TabBar 不接收触摸：交给其下方的页面。
+        if (event.actionMasked == MotionEvent.ACTION_DOWN && tabBarHidden) return false
         if (event.actionMasked == MotionEvent.ACTION_DOWN && heightIncludesOverflow && touchableRectsInPixels.isNotEmpty() &&
             touchableRectsInPixels.none { it.contains(event.x.toInt(), event.y.toInt()) }) return false
         return super.dispatchTouchEvent(event)
@@ -309,11 +385,21 @@ open class CYLTabBarHostView @JvmOverloads constructor(context: Context, attrs: 
         super.onDetachedFromWindow()
         // [EN] Rebuilt when attached again: the fragments cannot outlive the view tree. [CN] 再次附加时重新创建：Fragment 不能比视图树存活更久。
         if (tabBarController != null && configuration != null) {
-            // [EN] Setting the same configuration again runs its setter, which builds the controller on the next attach.
-            // [CN] 再次设置同一配置会执行其 setter，在下次附加时重新创建控制器。
-            val current = configuration
+            // [EN] Loading the same configuration again builds the controller on the next attach.
+            // [CN] 再次加载同一配置，在下次附加时重新创建控制器。
             removeController()
-            configuration = current
+            reloadConfiguration()
+        }
+    }
+
+    /** [EN] What a tap on the plus button reports. [CN] 点击 PlusButton 时报告的内容。 */
+    private fun plusButtonAction(plus: Map<*, *>): (CYLPlusButton) -> Unit {
+        val plusIdentifier = (plus[CYLConstants.CYLTabBarItemIdentifier] as? String).orEmpty()
+        val plusHasPage = !(plus[CYLConstants.CYLTabBarItemPageIdentifier] as? String).isNullOrEmpty()
+        return {
+            didTapPlusButton?.invoke()
+            // [EN] Its own page is shown: reported like iOS, index -1. [CN] 显示其自己的页面：与 iOS 相同，报告下标 -1。
+            if (plusHasPage) didSelectTab?.invoke(-1, plusIdentifier)
         }
     }
 
@@ -330,13 +416,7 @@ open class CYLTabBarHostView @JvmOverloads constructor(context: Context, attrs: 
         configuration[CYLConstants.CYLTabBarControllerPageResolver] = { _: String, _: Map<String, Any?> -> CYLTabBarHostEmptyPage() }
         configuration[CYLConstants.CYLTabBarControllerPageLookupOrder] = listOf(CYLTabBarPageSource.RESOLVER.key)
         (configuration[CYLConstants.CYLTabBarControllerPlusButton] as? Map<*, *>)?.let { plus ->
-            val plusIdentifier = (plus[CYLConstants.CYLTabBarItemIdentifier] as? String).orEmpty()
-            val plusHasPage = !(plus[CYLConstants.CYLTabBarItemPageIdentifier] as? String).isNullOrEmpty()
-            configuration[CYLConstants.CYLTabBarControllerPlusButtonAction] = { _: CYLPlusButton ->
-                didTapPlusButton?.invoke()
-                // [EN] Its own page is shown: reported like iOS, index -1. [CN] 显示其自己的页面：与 iOS 相同，报告下标 -1。
-                if (plusHasPage) didSelectTab?.invoke(-1, plusIdentifier)
-            }
+            configuration[CYLConstants.CYLTabBarControllerPlusButtonAction] = plusButtonAction(plus)
         }
         val controller = CYLTabBarController.tabBarControllerWithConfiguration(activity, configuration)
         if (controller.viewControllers.isEmpty()) return
@@ -363,6 +443,8 @@ open class CYLTabBarHostView @JvmOverloads constructor(context: Context, attrs: 
         }
         loginStateDidChange?.invoke(loggedIn)
         // [EN] The app shows the login screen: the tab is not selected now (see [didRequestLogin]). [CN] 由 App 展示登录界面：此时不选中该 Tab。
+        if (tabBarHidden) controller.setTabBarHidden(true, false)
+        titlePositionAdjustment?.let { controller.titlePositionAdjustment = it }
         controller.cyl_loginHandler = { tabBarController, page, completion ->
             completion(false)
             val index = tabBarController.viewControllers.indexOf(page)
@@ -410,11 +492,15 @@ open class CYLTabBarHostView @JvmOverloads constructor(context: Context, attrs: 
 
     private fun applyBadgeValues() {
         val controller = tabBarController ?: return
-        val values = badgeValues
-        val animation = badgeAnimationType
-        // [EN] Badges sit on the tab buttons, which exist once the bar is laid out. [CN] 角标位于 Tab 按钮上，TabBar 布局后按钮才存在。
-        val styles = badgeAttributes
+        // [EN] Badges sit on the tab buttons, which exist once the bar is laid out. The values are read when the block runs, not
+        //      now: a block can wait for a layout pass for a long time (React Native lays this view out itself, outside one), and
+        //      run after later values were applied, which it must not undo.
+        // [CN] 角标位于 Tab 按钮上，TabBar 布局后按钮才存在。在 block 执行时读取值，而不是现在：block 可能长时间等待一次布局
+        //      （React Native 自行布局本视图，不经过布局流程），并在之后的值应用后才执行，不能把它们改回去。
         controller.performWhenTabBarItemsReady { tabBarController ->
+            val values = badgeValues
+            val animation = badgeAnimationType
+            val styles = badgeAttributes
             tabBarController.tabBarItems.forEachIndexed { index, item ->
                 val button = item.cyl_visiableTabButton ?: return@forEachIndexed
                 val style = styles.getOrNull(index)?.takeIf { it.isNotEmpty() } ?: mapOf(BADGE_VALUE to values.getOrNull(index).orEmpty())
@@ -497,8 +583,10 @@ open class CYLTabBarHostView @JvmOverloads constructor(context: Context, attrs: 
     /** [EN] Covers the tab buttons with the loaded images; a tab without one shows its icon. [CN] 用已加载的图片覆盖 Tab 按钮；没有图片的 Tab 显示其图标。 */
     private fun applyTabCoverImages() {
         val controller = tabBarController ?: return
-        val images = loadedTabCoverImages ?: return
+        if (loadedTabCoverImages == null) return
+        // [EN] Read when the block runs, as the badges. [CN] 与角标相同，在 block 执行时读取。
         controller.performWhenTabBarItemsReady { tabBarController ->
+            val images = loadedTabCoverImages ?: return@performWhenTabBarItemsReady
             tabBarController.tabBarItems.forEachIndexed { index, item ->
                 val button = item.cyl_visiableTabButton ?: return@forEachIndexed
                 button.cyl_coverView = images.getOrNull(index)?.let { image ->
@@ -556,7 +644,7 @@ open class CYLTabBarHostView @JvmOverloads constructor(context: Context, attrs: 
     private fun updateTouchableRects() {
         val tabBar = tabBarController?.tabBar
         val rects = mutableListOf<Rect>()
-        if (tabBar != null && tabBar.isLaidOut) {
+        if (tabBar != null && tabBar.isLaidOut && !tabBarHidden) {
             rects += rectInView(tabBar, Rect(0, 0, tabBar.width, tabBar.height))
             val plusButton = tabBar.plusButton?.takeIf { it.isAttachedToWindow && it.visibility == VISIBLE }
             if (plusButton != null) {
@@ -569,6 +657,7 @@ open class CYLTabBarHostView @JvmOverloads constructor(context: Context, attrs: 
                 touchDelegate = null
             }
         }
+        if (rects.isEmpty()) touchDelegate = null
         if (rects == touchableRectsInPixels) return
         touchableRectsInPixels = rects
         val density = resources.displayMetrics.density

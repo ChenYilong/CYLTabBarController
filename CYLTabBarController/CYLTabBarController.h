@@ -13,6 +13,8 @@
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Configuration-File.md
 //   - Localized texts in a configuration file / 配置文件的本地化文本
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Configuration-Localization.md
+//   - Tab bar configuration manifest / TabBar 配置清单
+//     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Configuration-Manifest.md
 //   - Custom Tab Bar Feature Checklist / 自定义 TabBar 功能清单
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Custom-Tab-Bar-Features.md
 //   - The demo test list: settings groups and a pure Swift version / Demo 测试列表：设置分组与纯 Swift 版本
@@ -118,6 +120,7 @@
 #import "CYLTabBarConfigurationParser.h"
 #import "CYLTabBarPageRegistry.h"
 #import "CYLTabBarHostView.h"
+#import "CYLTabBarManifest.h"
 #import "UIViewController+CYLSettingsSection.h"
 #import "UIViewController+CYLThemeSettings.h"
 #import "NSObject+CYLTabBarControllerExtention.h"
@@ -545,6 +548,11 @@ FOUNDATION_EXTERN NSString *const CYLPlusButtonImageSize;
  *      - `CYLTabBarControllerLoginRequiredTabBarItemIdentifiers`: the identifiers (`CYLTabBarItemIdentifier`) of the tabs
  *        that need login (`cyl_loginRequiredTabBarItemIdentifiers`, issue #19), e.g. ["message", "mine"]; an array of
  *        strings or a comma-separated string.
+ *      - `CYLTabBarControllerUnloadsUnselectedViewsOnMemoryWarning`: BOOL, a memory warning unloads the views of the tabs
+ *        that are not selected (`unloadsUnselectedViewsOnMemoryWarning`, issue #426).
+ *      - `CYLTabBarControllerKeepsLoadedTabBarItemIdentifiers`: the identifiers of the tabs a memory warning never unloads
+ *        (`cyl_keepsLoadedTabBarItemIdentifiers`), what overriding `-shouldUnloadViewOfViewController:` does in code; an
+ *        array of strings or a comma-separated string.
  * [CN] 配置中的交互与外观键：
  *      - `CYLTabBarControllerUserInterfaceStyle`："light"、"dark" 或 "system"（默认）：TabBarController 的 `overrideUserInterfaceStyle`
  *        （iOS 13+），例如为白色图标使用深色玻璃。
@@ -553,11 +561,17 @@ FOUNDATION_EXTERN NSString *const CYLPlusButtonImageSize;
  *      - `CYLTabBarControllerSwipeToSwitchTab`：BOOL，在 TabBar 上滑动切换 Tab（`cyl_swipeToSwitchTabEnabled`）。
  *      - `CYLTabBarControllerLoginRequiredTabBarItemIdentifiers`：需要登录的 Tab 的标识（`CYLTabBarItemIdentifier`）
  *        （`cyl_loginRequiredTabBarItemIdentifiers`，issue #19），例如 ["message", "mine"]；字符串数组或逗号分隔的字符串。
+ *      - `CYLTabBarControllerUnloadsUnselectedViewsOnMemoryWarning`：BOOL，收到内存警告时卸载未选中 Tab 的视图
+ *        （`unloadsUnselectedViewsOnMemoryWarning`，issue #426）。
+ *      - `CYLTabBarControllerKeepsLoadedTabBarItemIdentifiers`：内存警告时不卸载的 Tab 的标识（`cyl_keepsLoadedTabBarItemIdentifiers`），
+ *        相当于在代码中重写 `-shouldUnloadViewOfViewController:`；字符串数组或逗号分隔的字符串。
  */
 FOUNDATION_EXTERN NSString *const CYLTabBarControllerUserInterfaceStyle;
 FOUNDATION_EXTERN NSString *const CYLTabBarControllerTabButtonTapAnimation;
 FOUNDATION_EXTERN NSString *const CYLTabBarControllerSwipeToSwitchTab;
 FOUNDATION_EXTERN NSString *const CYLTabBarControllerLoginRequiredTabBarItemIdentifiers;
+FOUNDATION_EXTERN NSString *const CYLTabBarControllerUnloadsUnselectedViewsOnMemoryWarning;
+FOUNDATION_EXTERN NSString *const CYLTabBarControllerKeepsLoadedTabBarItemIdentifiers;
 
 /*!
  * [EN] Skins in a configuration (see docs/Configuration-File.md, "Skins"; the named values follow QMUI's skins):
@@ -611,6 +625,27 @@ FOUNDATION_EXTERN NSString *const CYLTabBarControllerThemeManagerName;
  *      没有译文的键保持原样，与 `NSLocalizedString` 相同。Android 读取同样的文件，一份配置及其字符串表适用于所有平台。
  */
 FOUNDATION_EXTERN NSString *const CYLTabBarControllerLocalization;
+/*!
+ * [EN] Configuration key: a resource route (`CYLResourceRoute`, docs/Resource-Routes.md) to a configuration file, built
+ *      into the app or in its sandbox, e.g. "bundle:Configurations?name=tabbar" or "sandbox:Caches/tabbar?name=tabbar&theme=dark".
+ *      The file's keys are read first, then the other keys of this configuration win over them, so code (or React Native
+ *      and Flutter, which send a dictionary) can change a few values of a file. A route that matches no file is logged and
+ *      ignored. Android reads the same key.
+ * [CN] 配置键：指向配置文件的资源路由（`CYLResourceRoute`，docs/Resource-Routes.md），文件可以内置在 App 中或位于沙盒，例如
+ *      "bundle:Configurations?name=tabbar" 或 "sandbox:Caches/tabbar?name=tabbar&theme=dark"。先读取文件中的键，再由本配置中的其他键
+ *      覆盖，因此代码（以及发送字典的 React Native 与 Flutter）可以修改文件中的少数值。没有匹配文件的路由会打印日志并被忽略。Android 读取同一个键。
+ */
+FOUNDATION_EXTERN NSString *const CYLTabBarControllerConfigurationRoute;
+/*!
+ * [EN] Configuration key: a resource route to a tab bar manifest (`CYLTabBarManifest`, docs/Configuration-Manifest.md).
+ *      The manifest's configuration (`-[CYLTabBarManifest configuration]`) is read first, then the other keys win over it;
+ *      React Native's `manifestRoute` prop and Flutter's `manifestRoute` parameter write it. A route that is not a
+ *      manifest this app may use (platform, app version, time) is logged and ignored. Android reads the same key.
+ * [CN] 配置键：指向 TabBar 配置清单的资源路由（`CYLTabBarManifest`，docs/Configuration-Manifest.md）。先读取清单的配置
+ *      （`-[CYLTabBarManifest configuration]`），再由其他键覆盖；React Native 的 `manifestRoute` 属性与 Flutter 的 `manifestRoute` 参数写入该键。
+ *      不是本 App 可以使用的清单（平台、App 版本、时间）时打印日志并忽略。Android 读取同一个键。
+ */
+FOUNDATION_EXTERN NSString *const CYLTabBarControllerManifestRoute;
 /// [EN] The strings table, without ".strings" (default "Localizable"). [CN] 字符串表名，不含 ".strings"（默认 "Localizable"）。
 FOUNDATION_EXTERN NSString *const CYLTabBarLocalizationTableName;
 /*!
@@ -726,6 +761,32 @@ FOUNDATION_EXTERN NSString *const CYLTabBarItemTitleColor;
 FOUNDATION_EXTERN NSString *const CYLTabBarItemSelectedTitleColor;
 FOUNDATION_EXTERN NSString *const CYLTabBarItemIconColor;
 FOUNDATION_EXTERN NSString *const CYLTabBarItemSelectedIconColor;
+
+/*!
+ * [EN] FIX: issue #787 (and #159, #465, #588). How a tab's icon takes its colors, after Kongzue Tabbar's `noDyeing` and
+ *      `focusColor` / `normalColor`:
+ *      - `CYLTabBarItemIconRenderingMode` (a tab) / `CYLTabBarControllerIconRenderingMode` (every tab without its own):
+ *        "template": the icon is tinted, so one image serves both states (no selected image needed): unselected with
+ *        `CYLTabBarItemIconColor`, selected with `CYLTabBarItemSelectedIconColor`, else the tab bar's tint colors.
+ *        "original": the icon keeps its own colors, even when an icon color is set (the fix for gray icons, #465 / #588).
+ *        "automatic" (default): as before: on iOS image names keep their colors and template images (SF Symbols) are
+ *        tinted; on Android an icon is tinted when it has an icon color.
+ *      - `CYLTabBarControllerIconColor` / `CYLTabBarControllerSelectedIconColor`: the icon colors of every tab without its
+ *        own ("#RRGGBB" in a file, or a UIColor), like Kongzue Tabbar's `normalColor` / `focusColor` for icons.
+ *      iOS and Android (`CYLConstants`, same keys); React Native and Flutter are a TODO in docs/Tab-Item-Colors.md.
+ * [CN] FIX: issue #787（以及 #159、#465、#588）。Tab 图标如何取色，参照 Kongzue Tabbar 的 `noDyeing` 与 `focusColor` / `normalColor`：
+ *      - `CYLTabBarItemIconRenderingMode`（单个 Tab）/ `CYLTabBarControllerIconRenderingMode`（没有单独设置的所有 Tab）：
+ *        "template"：图标被着色，因此一张图即可用于两种状态（无需选中图片）：未选中使用 `CYLTabBarItemIconColor`，选中使用
+ *        `CYLTabBarItemSelectedIconColor`，否则使用 TabBar 的着色。"original"：图标保持原色，即使设置了图标颜色（解决图标变灰，#465 / #588）。
+ *        "automatic"（默认）：与之前相同：iOS 上图片名保持原色、模板图片（SF Symbols）被着色；Android 上有图标颜色时着色。
+ *      - `CYLTabBarControllerIconColor` / `CYLTabBarControllerSelectedIconColor`：没有单独设置的所有 Tab 的图标颜色（文件中为 "#RRGGBB"，
+ *        或 UIColor），相当于 Kongzue Tabbar 中用于图标的 `normalColor` / `focusColor`。
+ *      iOS 与 Android（`CYLConstants`，键相同）已支持；React Native 与 Flutter 见 docs/Tab-Item-Colors.md 的 TODO。
+ */
+FOUNDATION_EXTERN NSString *const CYLTabBarItemIconRenderingMode;
+FOUNDATION_EXTERN NSString *const CYLTabBarControllerIconRenderingMode;
+FOUNDATION_EXTERN NSString *const CYLTabBarControllerIconColor;
+FOUNDATION_EXTERN NSString *const CYLTabBarControllerSelectedIconColor;
 FOUNDATION_EXTERN NSString *const CYLTabBarItemSelectedBackgroundColor;
 /*!
  * [EN] Optional background of the tab while NOT selected (UIColor), the counterpart of
@@ -1125,10 +1186,19 @@ didRecognizeTabBarItemGesture:(CYLTabBarItemGesture)gesture
 @property (nonatomic, assign) BOOL unloadsUnselectedViewsOnMemoryWarning;
 
 /*!
+ * [EN] Issue #426: the identifiers (`CYLTabBarItemIdentifier`) of the tabs `-unloadViewsOfUnselectedViewControllers` never
+ *      unloads, without a subclass (e.g. from a configuration, `CYLTabBarControllerKeepsLoadedTabBarItemIdentifiers`).
+ * [CN] Issue #426：`-unloadViewsOfUnselectedViewControllers` 不会卸载的 Tab 的标识（`CYLTabBarItemIdentifier`），无需子类
+ *      （例如来自配置的 `CYLTabBarControllerKeepsLoadedTabBarItemIdentifiers`）。
+ */
+@property (nonatomic, copy) NSArray<NSString *> *cyl_keepsLoadedTabBarItemIdentifiers;
+
+/*!
  * [EN] Issue #426: whether `-unloadViewsOfUnselectedViewControllers` may unload this tab's view controller (an element of
- *      `viewControllers`). Default is YES; override in a subclass to keep some tabs loaded.
+ *      `viewControllers`). Default: YES, except for the tabs in `cyl_keepsLoadedTabBarItemIdentifiers`; override in a
+ *      subclass to keep other tabs loaded.
  * [CN] Issue #426：`-unloadViewsOfUnselectedViewControllers` 是否可以卸载该 Tab 的 ViewController（`viewControllers` 中的元素）。
- *      默认 YES，可在子类中重写以保留部分 Tab。
+ *      默认 YES，`cyl_keepsLoadedTabBarItemIdentifiers` 中的 Tab 除外；可在子类中重写以保留其他 Tab。
  */
 - (BOOL)shouldUnloadViewOfViewController:(UIViewController *)viewController;
 
@@ -2597,6 +2667,25 @@ typedef void (^CYLTabBarConfigurationCompletion)(NSDictionary<NSString *, id> *_
 
 /// [EN] Convenience constructor for `-initWithConfigurationFile:error:`. [CN] `-initWithConfigurationFile:error:` 的便利构造方法。
 + (nullable instancetype)tabBarControllerWithConfigurationFile:(NSString *)filePath error:(NSError *_Nullable *_Nullable)error;
+
+/*!
+ * [EN] Reads the configuration file a resource route points to (`CYLResourceRoute`, docs/Resource-Routes.md): built into
+ *      the app or in its sandbox, and with a query, the one file that matches a name, theme, version and format, e.g.
+ *      @"bundle:Configurations?name=tabbar" or @"sandbox:Caches/tabbar?name=tabbar&theme=dark&version=2.1&format=json".
+ *      A route without a prefix is relative to the app's resources. Returns nil and
+ *      `CYLTabBarConfigurationErrorFileNotFound` when the route matches no file.
+ * [CN] 读取资源路由（`CYLResourceRoute`，docs/Resource-Routes.md）指向的配置文件：App 内置或位于沙盒中；带查询参数时，选出与名称、主题、
+ *      版本、格式匹配的唯一文件，例如 @"bundle:Configurations?name=tabbar" 或
+ *      @"sandbox:Caches/tabbar?name=tabbar&theme=dark&version=2.1&format=json"。没有前缀的路由相对于 App 资源。路由没有匹配的文件时
+ *      返回 nil 与 `CYLTabBarConfigurationErrorFileNotFound`。
+ */
++ (nullable NSDictionary<NSString *, id> *)configurationWithRoute:(NSString *)route error:(NSError *_Nullable *_Nullable)error;
+
+/// [EN] `-initWithConfigurationFile:error:` with a resource route (see `+configurationWithRoute:error:`). [CN] 使用资源路由的 `-initWithConfigurationFile:error:`（见 `+configurationWithRoute:error:`）。
+- (nullable instancetype)initWithConfigurationRoute:(NSString *)route error:(NSError *_Nullable *_Nullable)error;
+
+/// [EN] Convenience constructor for `-initWithConfigurationRoute:error:`. [CN] `-initWithConfigurationRoute:error:` 的便利构造方法。
++ (nullable instancetype)tabBarControllerWithConfigurationRoute:(NSString *)route error:(NSError *_Nullable *_Nullable)error;
 
 /*!
  * [EN] Downloads a configuration (http, https, or a file URL) and parses it; `completion` runs on the main queue. The

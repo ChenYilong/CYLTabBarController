@@ -365,7 +365,9 @@ internal class CYLLiquidGlassTabBarStyle : CYLTabBarStyleRenderer {
         if (width <= 0f || tabBar.cyl_selectedSlot() < 0) return
         val frame = tabBar.cyl_itemsFrame
         val bubbleHeight = BUBBLE_HEIGHT * density
-        val centerX = frame.left + (position.value + 0.5f) * width + offset
+        // [EN] Counted from the right in a right-to-left layout, where the first tab is on the right. [CN] 从右到左布局中从右侧计算，第一个 Tab 在最右侧。
+        val slotCenter = (position.value + 0.5f) * width
+        val centerX = (if (tabBar.cyl_isRightToLeftLayout) frame.right - slotCenter else frame.left + slotCenter) + offset
         val centerY = panel.centerY()
         val velocity = position.velocity / 10f
         val sx = scaleX.value / (1f - (velocity * 0.75f).coerceIn(-0.2f, 0.2f))
@@ -436,7 +438,7 @@ internal class CYLLiquidGlassTabBarStyle : CYLTabBarStyleRenderer {
                 val dx = event.x - lastX
                 lastX = event.x
                 val width = slotWidth(tabBar).takeIf { it > 0f } ?: return true
-                val rtl = tabBar.layoutDirection == View.LAYOUT_DIRECTION_RTL
+                val rtl = tabBar.cyl_isRightToLeftLayout
                 val last = (tabBar.cyl_slotCount() - 1).toFloat()
                 position.target = (position.target + dx / width * (if (rtl) -1f else 1f)).coerceIn(0f, last)
                 position.snap(position.target)

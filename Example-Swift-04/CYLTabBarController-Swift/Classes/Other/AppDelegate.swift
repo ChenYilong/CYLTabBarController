@@ -10,7 +10,7 @@ import UIKit
 import CYLTabBarController
 
 @UIApplicationMain
-class AppDelegate: UIResponder, UIApplicationDelegate,UITabBarControllerDelegate {
+class AppDelegate: UIResponder, UIApplicationDelegate {
   
     var window: UIWindow?
 
@@ -20,18 +20,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate,UITabBarControllerDelegate
 
         // The window is created in SceneDelegate (UIScene life cycle).
 
-        //tabbar背景色
-//        UITabBar.appearance().backgroundColor = UIColor.white
-        // [CN] tabbar字体颜色
-        // [EN] tabbar font color
+        // [EN] The tab bar's tint color. [CN] TabBar 的着色。
         UITabBar.appearance().tintColor = UIColor(red: 1.0, green: 102.0 / 255.0, blue: 0, alpha: 1.0)
 
         return true
     }
 
-    func application(_ _: UIApplication, configurationForConnecting connectingSceneSession: UISceneSession, options _: UIScene.ConnectionOptions) -> UISceneConfiguration {
-        return UISceneConfiguration(name: "Default Configuration", sessionRole: connectingSceneSession.role)
-    }
+    // [EN] No `application(_:configurationForConnecting:options:)`: Info.plist names the "Default Configuration" and its
+    //      SceneDelegate, which UIKit uses without it. [CN] 不实现 `application(_:configurationForConnecting:options:)`：Info.plist
+    //      已声明 "Default Configuration" 及其 SceneDelegate，UIKit 会直接使用。
 
     func makeMainTabBarController() -> MainTabBarController {
         // Dark Mode (#620): "home_normal" also loads home_normal_dark (naming convention), the message tab names its dark

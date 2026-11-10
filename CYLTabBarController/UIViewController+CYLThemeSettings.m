@@ -145,9 +145,21 @@ static NSArray<NSDictionary *> *CYLDemoRealTabsAttributes(CYLTabBarController *t
     return attributes;
 }
 
-/// [EN] A theme icon from the library's resource bundle, in its own colors. [CN] 本库资源包中的主题图标，保持原色。
+/*!
+ * [EN] A theme icon in its own colors. The icons belong to the app, not to the library: Example-Shared/Configurations,
+ *      bundled as "Configurations", holds `Skins/<version>/<theme>/<icon>@3x.png` (version, theme, item), read through
+ *      a resource route (docs/Resource-Routes.md). The theme folder is the identifier in lowercase with "-" for spaces
+ *      ("Spring Festival" → "spring-festival"). An app without the folder gets no icon, and the theme keeps its colors.
+ * [CN] 保持原色的主题图标。图标属于 App 而不属于本库：Example-Shared/Configurations（以 "Configurations" 打包）中的
+ *      `Skins/<版本>/<主题>/<图标>@3x.png`（版本、主题、项），通过资源路由读取（docs/Resource-Routes.md）。主题文件夹为小写的标识，
+ *      空格换成 "-"（"Spring Festival" → "spring-festival"）。没有该文件夹的 App 得不到图标，主题仍使用其配色。
+ */
 - (nullable UIImage *)iconNamed:(NSString *)iconName {
-    UIImage *image = [UIImage imageNamed:[@"cyl_theme_" stringByAppendingString:iconName] inBundle:CYLResourceBundle() compatibleWithTraitCollection:nil];
+    NSString *folder = [[[self.identifier lowercaseString] stringByReplacingOccurrencesOfString:@"'" withString:@""]
+                        stringByReplacingOccurrencesOfString:@" " withString:@"-"];
+    NSString *route = [NSString stringWithFormat:@"bundle:Configurations/Skins/1.0.0/%@/%@@3x.png", folder, iconName];
+    NSString *path = [CYLResourceRoute pathForRoute:route baseDirectory:nil];
+    UIImage *image = path ? [UIImage imageWithContentsOfFile:path] : nil;
     return [image imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
 }
 

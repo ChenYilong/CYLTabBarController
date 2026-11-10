@@ -169,7 +169,7 @@ CYLTabBarController *tabBarController = [[CYLTabBarController alloc] initWithVie
 ```
 
 ```swift
-// Swift — from Example-PAG/HealthyHome/Tool/TabBarCommon.swift
+// Swift — from Example-Swift-03/HealthyHome/Tool/TabBarCommon.swift (#if CYL_DEMO_PAG, compiled by Example-PAG)
 let pagAttributes = CYLTabBarItemsAttributesAddingPAGFiles(tabBarItemsAttributes, ["like", "PAG_LOGO", "test2", "replacement"], nil)
 return pagAttributes.map { item in
     var item = item

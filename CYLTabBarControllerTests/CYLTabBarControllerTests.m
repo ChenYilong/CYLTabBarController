@@ -236,6 +236,275 @@
     XCTAssertEqualObjects(plusNavigation.tabBarItem.accessibilityLabel, @"★ Post", @"not the first title, \"Post\"");
 }
 
+/// [EN] FIX: issue #787. `CYLTabBarItemIconRenderingMode` and the tab bar's defaults (`CYLTabBarControllerIconRenderingMode`,
+///      `CYLTabBarControllerIconColor`, `CYLTabBarControllerSelectedIconColor`): "template" tints one image in both states,
+///      "original" keeps the image's colors, a tab's own value wins, an unknown value is dropped, and an in-place update
+///      keeps the tab's mode.
+/// [CN] FIX: issue #787。`CYLTabBarItemIconRenderingMode` 与 TabBar 的默认值：「template」让一张图片在两种状态下着色，「original」保持原色，
+///      Tab 自己的值优先，未知值被丢弃，原地更新时保持 Tab 的渲染方式。
+- (void)testIconRenderingMode {
+    UIImage * (^drawn)(UIColor *) = ^UIImage *(UIColor *color) {
+        return [[[UIGraphicsImageRenderer alloc] initWithSize:CGSizeMake(8, 8)] imageWithActions:^(UIGraphicsImageRendererContext *context) {
+            [color setFill];
+            [context fillRect:CGRectMake(0, 0, 8, 8)];
+        }];
+    };
+    UIImage *icon = drawn(UIColor.blueColor);
+    XCTAssertEqual(icon.renderingMode, UIImageRenderingModeAutomatic);
+    CYLTabBarController *tabBarController = [CYLTabBarController tabBarControllerWithConfiguration:@{
+        CYLTabBarControllerContext : [NSUUID UUID].UUIDString,
+        CYLTabBarControllerIconRenderingMode : @"Template",
+        CYLTabBarControllerIconColor : @"#FF0000",
+        CYLTabBarControllerSelectedIconColor : @"#00FF00",
+        CYLTabBarControllerTabBarItemsAttributes : @[
+            @{ CYLTabBarItemIdentifier : @"a", CYLTabBarItemTitle : @"A", CYLTabBarItemImage : icon },
+            @{ CYLTabBarItemIdentifier : @"b", CYLTabBarItemTitle : @"B", CYLTabBarItemImage : icon, CYLTabBarItemSelectedImage : drawn(UIColor.redColor),
+               CYLTabBarItemIconRenderingMode : @"original", CYLTabBarItemIconColor : UIColor.purpleColor },
+            @{ CYLTabBarItemIdentifier : @"c", CYLTabBarItemTitle : @"C", CYLTabBarItemImage : icon, CYLTabBarItemIconRenderingMode : @"bogus" },
+        ],
+        CYLTabBarControllerPageResolver : ^UIViewController *(NSString *pageIdentifier, NSDictionary *attributes) {
+            return [[UIViewController alloc] init];
+        },
+    }];
+    NSArray<NSDictionary *> *attributes = tabBarController.tabBarItemsAttributes;
+    XCTAssertEqual(attributes.count, 3u);
+    XCTAssertEqualObjects(attributes[0][CYLTabBarItemIconRenderingMode], @"template", @"the tab bar's default, lowercased");
+    XCTAssertTrue([attributes[0][CYLTabBarItemIconColor] isKindOfClass:[UIColor class]], @"the tab bar's icon color, parsed");
+    XCTAssertTrue([attributes[0][CYLTabBarItemSelectedIconColor] isKindOfClass:[UIColor class]]);
+    XCTAssertEqualObjects(attributes[1][CYLTabBarItemIconRenderingMode], @"original", @"a tab's own mode wins");
+    XCTAssertEqualObjects(attributes[1][CYLTabBarItemIconColor], UIColor.purpleColor, @"a tab's own color wins");
+    XCTAssertNil(attributes[2][CYLTabBarItemIconRenderingMode], @"an unknown mode is dropped");
+
+    [tabBarController loadViewIfNeeded];
+    UITabBarItem *a = tabBarController.viewControllers[0].tabBarItem;
+    UITabBarItem *b = tabBarController.viewControllers[1].tabBarItem;
+    UITabBarItem *c = tabBarController.viewControllers[2].tabBarItem;
+    XCTAssertEqual(a.image.renderingMode, UIImageRenderingModeAlwaysTemplate);
+    XCTAssertEqual(a.selectedImage.renderingMode, UIImageRenderingModeAlwaysTemplate, @"one image serves both states");
+    XCTAssertEqual(b.image.renderingMode, UIImageRenderingModeAlwaysOriginal);
+    XCTAssertEqual(b.selectedImage.renderingMode, UIImageRenderingModeAlwaysOriginal);
+    XCTAssertNotEqual(c.image.renderingMode, UIImageRenderingModeAlwaysTemplate, @"no mode: the image as it is");
+
+    // [EN] In place: a new image keeps the tab's mode; a new mode alone redraws both images.
+    // [CN] 原地更新：新图片保持 Tab 的渲染方式；只更新渲染方式也会重新绘制两张图片。
+    XCTAssertTrue([tabBarController updateTabBarItemAtIndex:0 attributes:@{ CYLTabBarItemImage : drawn(UIColor.greenColor) }]);
+    XCTAssertEqual(a.image.renderingMode, UIImageRenderingModeAlwaysTemplate);
+    XCTAssertTrue([tabBarController updateTabBarItemAtIndex:0 attributes:@{ CYLTabBarItemIconRenderingMode : @"original" }]);
+    XCTAssertEqual(a.image.renderingMode, UIImageRenderingModeAlwaysOriginal);
+}
+
+/// [EN] FIX: issue #787. A tab with a dark image (`CYLTabBarItemDarkImage`) and "template" still switches to the dark image
+///      in Dark Mode, and both variants stay templates.
+/// [CN] FIX: issue #787。带深色图片（`CYLTabBarItemDarkImage`）且为 "template" 的 Tab，在深色模式下仍切换为深色图片，两种外观都保持模板。
+- (void)testIconRenderingModeKeepsTheDarkImage {
+    UIImage * (^drawn)(CGFloat) = ^UIImage *(CGFloat side) {
+        return [[[UIGraphicsImageRenderer alloc] initWithSize:CGSizeMake(side, side)] imageWithActions:^(UIGraphicsImageRendererContext *context) {
+            [UIColor.blueColor setFill];
+            [context fillRect:CGRectMake(0, 0, side, side)];
+        }];
+    };
+    CYLTabBarController *tabBarController = [CYLTabBarController tabBarControllerWithConfiguration:@{
+        CYLTabBarControllerContext : [NSUUID UUID].UUIDString,
+        CYLTabBarControllerTabBarItemsAttributes : @[
+            @{ CYLTabBarItemIdentifier : @"a", CYLTabBarItemTitle : @"A", CYLTabBarItemImage : drawn(8), CYLTabBarItemDarkImage : drawn(12),
+               CYLTabBarItemIconRenderingMode : @"template" },
+            @{ CYLTabBarItemIdentifier : @"b", CYLTabBarItemTitle : @"B", CYLTabBarItemImage : drawn(8) },
+        ],
+        CYLTabBarControllerPageResolver : ^UIViewController *(NSString *pageIdentifier, NSDictionary *attributes) {
+            return [[UIViewController alloc] init];
+        },
+    }];
+    [tabBarController loadViewIfNeeded];
+    UIImage *image = tabBarController.viewControllers[0].tabBarItem.image;
+    XCTAssertEqual(image.renderingMode, UIImageRenderingModeAlwaysTemplate);
+    UITraitCollection *dark = [UITraitCollection traitCollectionWithUserInterfaceStyle:UIUserInterfaceStyleDark];
+    UITraitCollection *light = [UITraitCollection traitCollectionWithUserInterfaceStyle:UIUserInterfaceStyleLight];
+    UIImage *darkVariant = [image imageWithConfiguration:[UIImageConfiguration configurationWithTraitCollection:dark]];
+    UIImage *lightVariant = [image imageWithConfiguration:[UIImageConfiguration configurationWithTraitCollection:light]];
+    XCTAssertEqualWithAccuracy(darkVariant.size.width, 12, 0.01, @"the dark image in Dark Mode");
+    XCTAssertEqualWithAccuracy(lightVariant.size.width, 8, 0.01, @"the light image otherwise");
+    XCTAssertEqual(darkVariant.renderingMode, UIImageRenderingModeAlwaysTemplate, @"still a template in Dark Mode");
+    XCTAssertEqual(tabBarController.viewControllers[0].tabBarItem.selectedImage.renderingMode, UIImageRenderingModeAlwaysTemplate);
+}
+
+/// [EN] FIX: issue #787. FlatDesign draws a "template" tab's image as a template (tinted by its image view) and an
+///      "original" tab's image with its own colors.
+/// [CN] FIX: issue #787。扁平样式把 "template" Tab 的图片作为模板绘制（由其图片视图着色），"original" Tab 的图片保持原色。
+- (void)testIconRenderingModeInFlatDesign {
+    Class buttonClass = NSClassFromString(@"CYLFlatDesignTabBarButton");
+    if (!buttonClass) {
+        XCTSkip(@"FlatDesign is not compiled into this target");
+    }
+    UIImage *icon = [[[UIGraphicsImageRenderer alloc] initWithSize:CGSizeMake(8, 8)] imageWithActions:^(UIGraphicsImageRendererContext *context) {
+        [UIColor.blueColor setFill];
+        [context fillRect:CGRectMake(0, 0, 8, 8)];
+    }];
+    CYLTabBarController *tabBarController = [CYLTabBarController tabBarControllerWithConfiguration:@{
+        CYLTabBarControllerContext : [NSUUID UUID].UUIDString,
+        CYLTabBarControllerStyleType : @"flatDesign",
+        CYLTabBarControllerTabBarItemsAttributes : @[
+            @{ CYLTabBarItemIdentifier : @"t", CYLTabBarItemTitle : @"Template", CYLTabBarItemImage : icon, CYLTabBarItemIconRenderingMode : @"template" },
+            @{ CYLTabBarItemIdentifier : @"o", CYLTabBarItemTitle : @"Original", CYLTabBarItemImage : icon, CYLTabBarItemIconRenderingMode : @"original" },
+        ],
+        CYLTabBarControllerPageResolver : ^UIViewController *(NSString *pageIdentifier, NSDictionary *attributes) {
+            return [[UIViewController alloc] init];
+        },
+    }];
+    UIWindow *window = [[UIWindow alloc] initWithFrame:CGRectMake(0, 0, 390, 844)];
+    window.rootViewController = tabBarController;
+    window.hidden = NO;
+    [tabBarController.view setNeedsLayout];
+    [tabBarController.view layoutIfNeeded];
+    NSMutableDictionary<NSString *, UIImage *> *images = [NSMutableDictionary dictionary];
+    NSMutableArray<UIView *> *queue = [NSMutableArray arrayWithObject:tabBarController.view];
+    while (queue.count > 0) {
+        UIView *view = queue.firstObject;
+        [queue removeObjectAtIndex:0];
+        if ([view isKindOfClass:buttonClass]) {
+            UILabel *titleLabel = [view valueForKey:@"titleLabel"];
+            UIImageView *imageView = [view valueForKey:@"imageView"];
+            if (titleLabel.text && imageView.image) {
+                images[titleLabel.text] = imageView.image;
+            }
+        }
+        [queue addObjectsFromArray:view.subviews];
+    }
+    XCTAssertEqual(images[@"Template"].renderingMode, UIImageRenderingModeAlwaysTemplate, @"%@", images);
+    XCTAssertEqual(images[@"Original"].renderingMode, UIImageRenderingModeAlwaysOriginal, @"%@", images);
+    window.hidden = YES;
+}
+
+/// [EN] FIX: the FlatDesign "More" tab had no icon (the 1×1 transparent placeholder). With 8 tabs it now shows a real image
+///      and the "More" title.
+/// [CN] FIX：扁平样式的「More」Tab 没有图标（1×1 透明占位图）。8 个 Tab 时现在显示真实图片与「More」标题。
+- (void)testFlatDesignMoreTabHasAnIcon {
+    Class buttonClass = NSClassFromString(@"CYLFlatDesignTabBarButton");
+    if (!buttonClass) {
+        XCTSkip(@"FlatDesign is not compiled into this target");
+    }
+    NSMutableArray<NSDictionary *> *tabs = [NSMutableArray array];
+    for (NSUInteger index = 0; index < 8; index++) {
+        [tabs addObject:@{ CYLTabBarItemIdentifier : [NSString stringWithFormat:@"t%@", @(index)],
+                           CYLTabBarItemTitle : [NSString stringWithFormat:@"T%@", @(index)],
+                           CYLTabBarItemImage : [UIImage systemImageNamed:@"house"] }];
+    }
+    CYLTabBarController *tabBarController = [CYLTabBarController tabBarControllerWithConfiguration:@{
+        CYLTabBarControllerContext : [NSUUID UUID].UUIDString,
+        CYLTabBarControllerStyleType : @"flatDesign",
+        CYLTabBarControllerTabBarItemsAttributes : tabs,
+        CYLTabBarControllerPageResolver : ^UIViewController *(NSString *pageIdentifier, NSDictionary *attributes) {
+            return [[UIViewController alloc] init];
+        },
+    }];
+    UIWindow *window = [[UIWindow alloc] initWithFrame:CGRectMake(0, 0, 390, 844)];
+    window.rootViewController = tabBarController;
+    window.hidden = NO;
+    [tabBarController.view setNeedsLayout];
+    [tabBarController.view layoutIfNeeded];
+    NSMutableDictionary<NSString *, NSValue *> *sizes = [NSMutableDictionary dictionary];
+    NSMutableArray<UIView *> *queue = [NSMutableArray arrayWithObject:tabBarController.view];
+    while (queue.count > 0) {
+        UIView *view = queue.firstObject;
+        [queue removeObjectAtIndex:0];
+        if ([view isKindOfClass:buttonClass] && !view.hidden) {
+            UILabel *titleLabel = [view valueForKey:@"titleLabel"];
+            UIImageView *imageView = [view valueForKey:@"imageView"];
+            sizes[titleLabel.text ?: @"(nil)"] = [NSValue valueWithCGSize:imageView.image.size];
+        }
+        [queue addObjectsFromArray:view.subviews];
+    }
+    window.hidden = YES;
+    NSLog(@"FlatDesign buttons: %@", sizes);
+    NSString *moreTitle = [sizes.allKeys filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"NOT (SELF BEGINSWITH 'T')"]].firstObject;
+    XCTAssertNotNil(moreTitle, @"a More button: %@", sizes);
+    XCTAssertGreaterThan(sizes[moreTitle].CGSizeValue.width, 1, @"More (%@) has a real icon, not the 1x1 placeholder: %@", moreTitle, sizes);
+}
+
+/// [EN] FIX: issue #515. With a plus button that is not in the middle (4 tabs, plus button at index 1), every
+///      `-setSelectedIndex:` selects one tab whose title and image belong together: the selected tab bar item is the
+///      selected view controller's own.
+/// [CN] FIX: issue #515。PlusButton 不在中间（4 个 Tab，PlusButton 位于下标 1）时，每次 `-setSelectedIndex:` 选中的 Tab 的标题与图片
+///      属于同一个 Tab：选中的 tab bar item 就是选中控制器自己的。
+- (void)testSelectedIndexWithAnOffCenterPlusButton {
+    NSMutableArray<NSDictionary *> *tabs = [NSMutableArray array];
+    for (NSString *name in @[ @"A", @"B", @"C", @"D" ]) {
+        [tabs addObject:@{ CYLTabBarItemIdentifier : name.lowercaseString, CYLTabBarItemTitle : name, CYLTabBarItemImage : [UIImage systemImageNamed:@"house"] }];
+    }
+    CYLTabBarController *tabBarController = [CYLTabBarController tabBarControllerWithConfiguration:@{
+        CYLTabBarControllerContext : [NSUUID UUID].UUIDString,
+        CYLTabBarControllerTabBarItemsAttributes : tabs,
+        CYLTabBarControllerPageResolver : ^UIViewController *(NSString *pageIdentifier, NSDictionary *attributes) {
+            return [[UIViewController alloc] init];
+        },
+        CYLTabBarControllerPlusButton : @{ CYLTabBarItemTitle : @"Post", CYLTabBarItemImage : [UIImage systemImageNamed:@"plus.circle"],
+                                           CYLPlusButtonIndexInTabBar : @1 },
+    }];
+    UIWindow *window = [[UIWindow alloc] initWithFrame:CGRectMake(0, 0, 390, 844)];
+    window.rootViewController = tabBarController;
+    window.hidden = NO;
+    [tabBarController.view layoutIfNeeded];
+    for (NSUInteger index = 0; index < tabBarController.viewControllers.count; index++) {
+        UIViewController *viewController = tabBarController.viewControllers[index];
+        if (viewController.cyl_isPlaceholder) {
+            continue;
+        }
+        tabBarController.selectedIndex = index;
+        [tabBarController.view layoutIfNeeded];
+        XCTAssertEqual(tabBarController.selectedViewController, viewController, @"index %@", @(index));
+        XCTAssertEqual(tabBarController.tabBar.selectedItem, viewController.tabBarItem, @"index %@: the selected item is that tab's", @(index));
+        XCTAssertEqualObjects(tabBarController.tabBar.selectedItem.title, viewController.tabBarItem.title);
+    }
+    window.hidden = YES;
+}
+
+/// [EN] FIX: more than five tabs on the classic style / Liquid Glass showed the first five and no "More". With eight tabs
+///      UIKit's "More" tab is there and a later tab can be selected; five tabs are unchanged; a plus button with eight
+///      tabs does not crash.
+/// [CN] FIX：经典样式 / 液态玻璃下超过 5 个 Tab 时只显示前 5 个且没有「More」。8 个 Tab 时有 UIKit 的「More」，之后的 Tab 也能选中；
+///      5 个 Tab 不受影响；有 PlusButton 且 8 个 Tab 时不崩溃。
+- (void)testMoreTabWithMoreThanFiveTabs {
+    CYLTabBarController * (^make)(NSUInteger, NSDictionary *) = ^CYLTabBarController *(NSUInteger count, NSDictionary *plus) {
+        NSMutableArray<NSDictionary *> *tabs = [NSMutableArray array];
+        for (NSUInteger index = 0; index < count; index++) {
+            [tabs addObject:@{ CYLTabBarItemIdentifier : [NSString stringWithFormat:@"t%@", @(index)],
+                               CYLTabBarItemTitle : [NSString stringWithFormat:@"T%@", @(index)],
+                               CYLTabBarItemImage : [UIImage systemImageNamed:@"house"] }];
+        }
+        NSMutableDictionary *configuration = [@{
+            CYLTabBarControllerContext : [NSUUID UUID].UUIDString,
+            CYLTabBarControllerTabBarItemsAttributes : tabs,
+            CYLTabBarControllerPageResolver : ^UIViewController *(NSString *pageIdentifier, NSDictionary *attributes) {
+                return [[UIViewController alloc] init];
+            },
+        } mutableCopy];
+        if (plus) {
+            configuration[CYLTabBarControllerPlusButton] = plus;
+        }
+        return [CYLTabBarController tabBarControllerWithConfiguration:configuration];
+    };
+    UIWindow *window = [[UIWindow alloc] initWithFrame:CGRectMake(0, 0, 440, 956)];
+    window.hidden = NO;
+
+    CYLTabBarController *eight = make(8, nil);
+    window.rootViewController = eight;
+    [eight.view layoutIfNeeded];
+    XCTAssertTrue([eight.tabBar.items containsObject:eight.moreNavigationController.tabBarItem], @"a More tab");
+    eight.selectedIndex = 6;
+    XCTAssertEqual(eight.selectedViewController, eight.viewControllers[6], @"the seventh tab can be selected");
+
+    CYLTabBarController *five = make(5, nil);
+    window.rootViewController = five;
+    [five.view layoutIfNeeded];
+    XCTAssertEqual(five.tabBar.items.count, 5u);
+    XCTAssertFalse([five.tabBar.items containsObject:five.moreNavigationController.tabBarItem], @"five tabs: no More");
+
+    CYLTabBarController *withPlus = make(8, @{ CYLTabBarItemTitle : @"Post", CYLTabBarItemImage : [UIImage systemImageNamed:@"plus.circle"] });
+    window.rootViewController = withPlus;
+    [withPlus.view layoutIfNeeded];
+    XCTAssertGreaterThan(withPlus.tabBar.items.count, 0u);
+    window.hidden = YES;
+}
+
 - (void)testPerformanceExample {
     // This is an example of a performance test case.
     [self measureBlock:^{

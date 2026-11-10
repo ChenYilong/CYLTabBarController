@@ -16,6 +16,8 @@ static id CYLRNJSONObject(NSString *JSON);
   NSString *_configurationJSON;
   NSString *_badgeStylesJSON;
   NSString *_plusButtonBadgeStyleJSON;
+  /// [EN] The last memory warning request handled. [CN] 最近处理的内存警告请求。
+  int _memoryWarningRequest;
 }
 
 + (ComponentDescriptorProvider)componentDescriptorProvider
@@ -57,12 +59,31 @@ static id CYLRNJSONObject(NSString *JSON);
 - (void)updateProps:(Props::Shared const &)props oldProps:(Props::Shared const &)oldProps
 {
   const auto &newViewProps = *std::static_pointer_cast<CyltabbarViewProps const>(props);
+  // [EN] Before the configuration: a new language would build that configuration's tab bar again.
+  // [CN] 在配置之前：否则新的语言会把该配置的 TabBar 再创建一次。
+  NSString *language = [NSString stringWithUTF8String:newViewProps.language.c_str()];
+  _hostView.language = language.length > 0 ? language : nil;
   NSString *configuration = [NSString stringWithUTF8String:newViewProps.configuration.c_str()];
   if (![configuration isEqualToString:_configurationJSON ?: @""]) {
     _configurationJSON = configuration;
     [_hostView setConfigurationJSON:configuration];
   }
   _hostView.selectedIndex = newViewProps.selectedIndex;
+  _hostView.tabBarHidden = newViewProps.tabBarHidden;
+  // [EN] [horizontal, vertical]; empty keeps the configuration's offset. [CN] [水平, 垂直]；为空时使用配置中的偏移。
+  const auto &titleOffset = newViewProps.titlePositionAdjustment;
+  _hostView.titlePositionAdjustment = titleOffset.size() >= 2
+      ? [NSValue valueWithUIOffset:UIOffsetMake(titleOffset[0], titleOffset[1])]
+      : nil;
+  // [EN] A new request simulates a memory warning once. [CN] 新的请求模拟一次内存警告。
+  if (newViewProps.memoryWarningRequest > _memoryWarningRequest) {
+    NSString *report = [_hostView simulateMemoryWarning];
+    if (_eventEmitter) {
+      std::static_pointer_cast<CyltabbarViewEventEmitter const>(_eventEmitter)
+          ->onMemoryWarning(CyltabbarViewEventEmitter::OnMemoryWarning{.report = std::string(report.UTF8String)});
+    }
+  }
+  _memoryWarningRequest = newViewProps.memoryWarningRequest;
   // [EN] After the selection: logging out may move it away from a tab that needs login. [CN] 在选中之后：退出登录可能使选中离开需要登录的 Tab。
   // [EN] -1: not set, the host uses the cached state. [CN] -1：未设置，宿主使用缓存的状态。
   if (newViewProps.loginState >= 0) {
@@ -123,6 +144,9 @@ static id CYLRNJSONObject(NSString *JSON)
   _hostView.plusButtonBadgeAttributes = nil;
   _hostView.tabCoverImages = nil;
   [_hostView resetLoggedIn];
+  _hostView.tabBarHidden = NO;
+  _hostView.titlePositionAdjustment = nil;
+  _memoryWarningRequest = 0;
   _badgeStylesJSON = nil;
   _plusButtonBadgeStyleJSON = nil;
   _hostView.selectedIndex = -1;

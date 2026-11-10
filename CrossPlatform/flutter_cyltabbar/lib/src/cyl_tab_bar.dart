@@ -33,6 +33,9 @@ class CYLTabBarItem {
     this.image,
     this.selectedImage,
     this.identifier,
+    this.iconRenderingMode,
+    this.iconColor,
+    this.selectedIconColor,
     this.attributes = const {},
   });
 
@@ -43,6 +46,14 @@ class CYLTabBarItem {
   /// `CYLTabBarItemIdentifier`, reported by [CYLTabBar.onTabSelect].
   final String? identifier;
 
+  /// Issue #787: `'template'` (one image, tinted with [iconColor] / [selectedIconColor], else the bar's tint),
+  /// `'original'` (keeps its colors) or `'automatic'`. Wins over [CYLTabBar.iconRenderingMode].
+  final String? iconRenderingMode;
+
+  /// Icon colors such as `#8E8E93`, unselected and selected.
+  final String? iconColor;
+  final String? selectedIconColor;
+
   /// Any other key of a tab in the configuration file, e.g. `CYLTabBarItemTitlePositionAdjustment`.
   final Map<String, Object?> attributes;
 
@@ -52,6 +63,9 @@ class CYLTabBarItem {
         if (identifier != null) 'CYLTabBarItemIdentifier': identifier,
         if (image != null) 'CYLTabBarItemImage': image!.value,
         if (selectedImage != null) 'CYLTabBarItemSelectedImage': selectedImage!.value,
+        if (iconRenderingMode != null) 'CYLTabBarItemIconRenderingMode': iconRenderingMode,
+        if (iconColor != null) 'CYLTabBarItemIconColor': iconColor,
+        if (selectedIconColor != null) 'CYLTabBarItemSelectedIconColor': selectedIconColor,
       };
 }
 
@@ -189,7 +203,12 @@ class CYLTabBar extends StatefulWidget {
     this.tapAnimation,
     this.swipeToSwitchTab,
     this.animationSpeed,
+    this.iconRenderingMode,
+    this.iconColor,
+    this.selectedIconColor,
     this.plusButton,
+    this.configurationRoute,
+    this.manifestRoute,
     this.configuration = const {},
     this.selectedIndex,
     this.badgeValues = const [],
@@ -204,6 +223,11 @@ class CYLTabBar extends StatefulWidget {
     this.loggedIn,
     this.onLoginRequest,
     this.onLoginStateChange,
+    this.language,
+    this.tabBarHidden = false,
+    this.memoryWarningRequest = 0,
+    this.onMemoryWarning,
+    this.titlePositionAdjustment,
   });
 
   /// The tabs: `CYLTabBarControllerTabBarItemsAttributes`.
@@ -223,6 +247,13 @@ class CYLTabBar extends StatefulWidget {
 
   /// The playback speed of the animated tab icons (1: the file's own).
   final double? animationSpeed;
+
+  /// Issue #787: the icon rendering mode of every tab without its own: `'template'`, `'original'` or `'automatic'`.
+  final String? iconRenderingMode;
+
+  /// The icon colors of every tab without its own, such as `#8E8E93`, unselected and selected.
+  final String? iconColor;
+  final String? selectedIconColor;
 
   final CYLTabBarPlusButton? plusButton;
 
@@ -267,13 +298,49 @@ class CYLTabBar extends StatefulWidget {
   /// The login state the tab bar uses, sent once it is built: start from it to keep the login across launches.
   final ValueChanged<bool>? onLoginStateChange;
 
+  /// The language of the library's own texts (badge and plus button accessibility texts) and of the layout direction: a
+  /// language code such as 'ar' or 'zh-Hans'; null for the device language. A right-to-left language lays the tab bar out
+  /// right to left. The tab titles come from [items]: translate them there.
+  final String? language;
+
+  /// Hides or shows the tab bar, animated, in every style (`-[CYLTabBarController setTabBarHidden:animated:]`). A hidden
+  /// tab bar takes no touches: the page under it gets them.
+  final bool tabBarHidden;
+
+  /// Issue #426: each increase simulates a memory warning once (`+[CYLTabBarController cyl_simulateMemoryWarningForTabBarController:]`);
+  /// [onMemoryWarning] then reports what happened to each tab, one line per tab, in the library's language. The
+  /// configuration decides what is unloaded (`CYLTabBarControllerUnloadsUnselectedViewsOnMemoryWarning`,
+  /// `CYLTabBarControllerKeepsLoadedTabBarItemIdentifiers`).
+  final int memoryWarningRequest;
+  final ValueChanged<String>? onMemoryWarning;
+
+  /// The title offset of every tab (dx horizontal, dy vertical), set at runtime
+  /// (`-[CYLTabBarController setTitlePositionAdjustment:]`) without building the tab bar again; it wins over
+  /// `CYLTabBarControllerTitlePositionAdjustment` of the configuration. A plus button that aligns its title follows. Null
+  /// keeps the configuration's.
+  final Offset? titlePositionAdjustment;
+
+  /// A resource route to a configuration file built into the app or in its sandbox (docs/Resource-Routes.md), e.g.
+  /// `bundle:Configurations?name=tabbar` or `sandbox:Caches/tabbar?name=tabbar&theme=dark`. The file is read first; the
+  /// other parameters and [configuration] win over its keys.
+  final String? configurationRoute;
+
+  /// A resource route to a tab bar manifest (docs/Configuration-Manifest.md): tabs, plus button, themes and their images,
+  /// version, platforms. The manifest is read first; the other parameters and [configuration] win over it.
+  final String? manifestRoute;
+
   /// The configuration sent to the native library.
   Map<String, Object?> buildConfiguration() => {
+        if (configurationRoute != null) 'CYLTabBarControllerConfigurationRoute': configurationRoute,
+        if (manifestRoute != null) 'CYLTabBarControllerManifestRoute': manifestRoute,
         if (styleType != null) 'CYLTabBarControllerStyleType': styleType,
         if (userInterfaceStyle != null) 'CYLTabBarControllerUserInterfaceStyle': userInterfaceStyle,
         if (tapAnimation != null) 'CYLTabBarControllerTabButtonTapAnimation': tapAnimation,
         if (swipeToSwitchTab != null) 'CYLTabBarControllerSwipeToSwitchTab': swipeToSwitchTab,
         if (animationSpeed != null) 'CYLTabBarControllerTabBarItemAnimationSpeed': animationSpeed,
+        if (iconRenderingMode != null) 'CYLTabBarControllerIconRenderingMode': iconRenderingMode,
+        if (iconColor != null) 'CYLTabBarControllerIconColor': iconColor,
+        if (selectedIconColor != null) 'CYLTabBarControllerSelectedIconColor': selectedIconColor,
         if (items.isNotEmpty)
           'CYLTabBarControllerTabBarItemsAttributes': [for (final item in items) item.toConfiguration()],
         if (plusButton != null) 'CYLTabBarControllerPlusButton': plusButton!.toConfiguration(),
@@ -300,7 +367,15 @@ class _CYLTabBarState extends State<CYLTabBar> {
         'plusButtonBadge': widget.plusButtonBadge?.toMap(),
         'tabCoverImages': _coverImages(widget),
         'loggedIn': widget.loggedIn,
+        'language': widget.language,
+        'tabBarHidden': widget.tabBarHidden,
+        'titlePositionAdjustment': _titleOffset(widget),
       };
+
+  static List<double>? _titleOffset(CYLTabBar bar) {
+    final offset = bar.titlePositionAdjustment;
+    return offset == null ? null : [offset.dx, offset.dy];
+  }
 
   static List<Map<String, Object?>?> _badgeStyles(CYLTabBar bar) => [for (final badge in bar.badgeStyles) badge?.toMap()];
 
@@ -338,6 +413,20 @@ class _CYLTabBarState extends State<CYLTabBar> {
     final coverImages = _coverImages(widget);
     if (!listEquals(coverImages, _coverImages(oldWidget))) {
       channel?.invokeMethod<void>('setTabCoverImages', coverImages);
+    }
+    if (widget.memoryWarningRequest > oldWidget.memoryWarningRequest) {
+      channel?.invokeMethod<String>('simulateMemoryWarning').then((report) {
+        if (report != null) widget.onMemoryWarning?.call(report);
+      });
+    }
+    if (widget.titlePositionAdjustment != oldWidget.titlePositionAdjustment) {
+      channel?.invokeMethod<void>('setTitlePositionAdjustment', _titleOffset(widget));
+    }
+    if (widget.tabBarHidden != oldWidget.tabBarHidden) {
+      channel?.invokeMethod<void>('setTabBarHidden', widget.tabBarHidden);
+    }
+    if (widget.language != oldWidget.language) {
+      channel?.invokeMethod<void>('setLanguage', widget.language);
     }
     if (widget.loggedIn != oldWidget.loggedIn) {
       channel?.invokeMethod<void>('setLoggedIn', widget.loggedIn);

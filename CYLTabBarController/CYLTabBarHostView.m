@@ -308,6 +308,13 @@ static UIImage *CYLTabBarHostOriginalImage(UIImage *image) {
     tabBarController.view.backgroundColor = UIColor.clearColor;
     tabBarController.view.frame = self.bounds;
     tabBarController.view.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    [self applyLayoutDirectionToTabBarController:tabBarController];
+    if (_tabBarHidden) {
+        [tabBarController setTabBarHidden:YES animated:NO];
+    }
+    if (_titlePositionAdjustment) {
+        tabBarController.titlePositionAdjustment = _titlePositionAdjustment.UIOffsetValue;
+    }
     UIViewController *parent = [self cyl_hostViewController];
     [parent addChildViewController:tabBarController];
     [self addSubview:tabBarController.view];
@@ -402,7 +409,7 @@ static BOOL CYLTabBarHostRectsContainPoint(NSArray<NSValue *> *rects, CGPoint po
 /// [CN] TabBar，以及 PlusButton 与其上的内容（角标），视图坐标。
 - (NSArray<NSValue *> *)currentTouchableRects {
     UITabBar *tabBar = _tabBarController.tabBar;
-    if (!tabBar) {
+    if (!tabBar || _tabBarHidden) {
         return @[];
     }
     NSMutableArray<NSValue *> *rects = [NSMutableArray arrayWithObject:[NSValue valueWithCGRect:[tabBar convertRect:tabBar.bounds toView:self]]];
@@ -429,6 +436,52 @@ static BOOL CYLTabBarHostRectsContainPoint(NSArray<NSValue *> *rects, CGPoint po
 }
 
 #pragma mark - Selection and badges
+
+- (void)setLanguage:(NSString *)language {
+    if (language == _language || [language isEqualToString:_language]) {
+        return;
+    }
+    _language = [language copy];
+    CYLSetLocalizationLanguage(_language);
+    // [EN] Built again: the library's texts and the layout direction are set when the tab bar is created.
+    // [CN] 重新创建：库的文字与布局方向在创建 TabBar 时设置。
+    if (_tabBarController && _configuration) {
+        self.configuration = _configuration;
+    }
+}
+
+/// [EN] Right to left for a right-to-left language (e.g. Arabic), as the Objective-C example's `[UIView appearance]`.
+/// [CN] 从右到左的语言（如阿拉伯语）使用从右到左布局，与 Objective-C 示例的 `[UIView appearance]` 相同。
+- (void)applyLayoutDirectionToTabBarController:(CYLTabBarController *)tabBarController {
+    BOOL rightToLeft = [NSLocale characterDirectionForLanguage:CYLLocalizationLanguage()] == NSLocaleLanguageDirectionRightToLeft;
+    UISemanticContentAttribute attribute = rightToLeft ? UISemanticContentAttributeForceRightToLeft : UISemanticContentAttributeUnspecified;
+    tabBarController.view.semanticContentAttribute = attribute;
+    tabBarController.tabBar.semanticContentAttribute = attribute;
+}
+
+- (void)setTitlePositionAdjustment:(NSValue *)titlePositionAdjustment {
+    // [EN] -isEqual:, not -isEqualToValue:, which crashes on nil. [CN] 使用 -isEqual:，-isEqualToValue: 遇到 nil 会崩溃。
+    if (titlePositionAdjustment == _titlePositionAdjustment || [titlePositionAdjustment isEqual:_titlePositionAdjustment]) {
+        return;
+    }
+    _titlePositionAdjustment = [titlePositionAdjustment copy];
+    if (_titlePositionAdjustment) {
+        _tabBarController.titlePositionAdjustment = _titlePositionAdjustment.UIOffsetValue;
+    }
+}
+
+- (NSString *)simulateMemoryWarning {
+    return CYLSimulateMemoryWarningReport(_tabBarController);
+}
+
+- (void)setTabBarHidden:(BOOL)tabBarHidden {
+    if (tabBarHidden == _tabBarHidden) {
+        return;
+    }
+    _tabBarHidden = tabBarHidden;
+    [_tabBarController setTabBarHidden:tabBarHidden animated:YES];
+    [self updateTouchableRects];
+}
 
 - (void)resetLoggedIn {
     _loggedInSet = NO;
@@ -497,12 +550,20 @@ static BOOL CYLTabBarHostRectsContainPoint(NSArray<NSValue *> *rects, CGPoint po
 }
 
 - (void)applyBadgeValues {
-    NSArray<NSString *> *badgeValues = _badgeValues;
-    NSArray *badgeAttributes = _badgeAttributes;
-    NSDictionary *plusButtonBadge = _plusButtonBadgeAttributes.count > 0 ? _plusButtonBadgeAttributes : @{ CYLTabBarHostBadgeValue : _plusButtonBadgeValue ?: @"" };
-    CYLBadgeAnimationType animationType = (CYLBadgeAnimationType)_badgeAnimationType;
-    // [EN] Badges sit on the tab buttons, which exist once the tab bar is laid out. [CN] 角标位于 Tab 按钮上，TabBar 布局后按钮才存在。
+    // [EN] Badges sit on the tab buttons, which exist once the tab bar is laid out. The values are read when the block runs, as
+    //      the Android host: a block that waited for a layout shows the current badges, never older ones.
+    // [CN] 角标位于 Tab 按钮上，TabBar 布局后按钮才存在。与 Android 宿主相同，在 block 执行时读取值：等待布局的 block 显示当前的角标，
+    //      而不是旧的。
+    __weak __typeof(self) weakSelf = self;
     [_tabBarController performWhenTabBarItemsReady:^(CYLTabBarController *tabBarController) {
+        __strong __typeof(weakSelf) host = weakSelf;
+        if (!host) {
+            return;
+        }
+        NSArray<NSString *> *badgeValues = host->_badgeValues;
+        NSArray *badgeAttributes = host->_badgeAttributes;
+        NSDictionary *plusButtonBadge = host->_plusButtonBadgeAttributes.count > 0 ? host->_plusButtonBadgeAttributes : @{ CYLTabBarHostBadgeValue : host->_plusButtonBadgeValue ?: @"" };
+        CYLBadgeAnimationType animationType = (CYLBadgeAnimationType)host->_badgeAnimationType;
         [CYLTabBarHostPages(tabBarController) enumerateObjectsUsingBlock:^(UIViewController *page, NSUInteger index, BOOL *stop) {
             NSDictionary *attributes = index < badgeAttributes.count && [badgeAttributes[index] isKindOfClass:[NSDictionary class]] ? badgeAttributes[index] : nil;
             if (attributes.count == 0) {
@@ -548,11 +609,12 @@ static BOOL CYLTabBarHostRectsContainPoint(NSArray<NSValue *> *rects, CGPoint po
 /// [CN] 用已加载的图片覆盖 Tab 按钮，先移除之前列表的覆盖。
 - (void)applyTabCoverImages {
     CYLTabBarController *controller = _tabBarController;
-    NSArray *images = _loadedTabCoverImages;
-    if (!controller || !images) {
+    if (!controller || !_loadedTabCoverImages) {
         return;
     }
+    // [EN] Read when the block runs, as the badges. [CN] 与角标相同，在 block 执行时读取。
     [controller performWhenTabBarItemsReady:^(CYLTabBarController *tabBarController) {
+        NSArray *images = self->_loadedTabCoverImages;
         for (NSArray *covered in self->_coveredTabButtons) {
             UIControl *button = covered[0];
             [covered[1] removeFromSuperview];

@@ -1,0 +1,260 @@
+{
+  "schemaVersion": 1,
+  "id": "7c1d2b0e-5f6a-4b8e-9c3d-1a2b3c4d5e6f",
+  "version": "2.1.0",
+  "createdAt": "2026-11-10T00:00:00Z",
+  "runtime": {
+    "platforms": [
+      "ios",
+      "android"
+    ],
+    "minAppVersion": "1.0.0",
+    "maxAppVersion": "",
+    "startTime": "",
+    "endTime": ""
+  },
+  "fallback": {
+    "onError": "previous"
+  },
+  "assets": {
+    "baseRoute": "../Skins/2.1.0",
+    "list": [
+      {
+        "key": "discover",
+        "theme": "light",
+        "state": "normal",
+        "path": "light/discover@3x.png",
+        "contentType": "image/png",
+        "hash": "sha256-Xy58CYJeE_jRqD9owJdTXrOBIxeigzu32xP82X81qqQ"
+      },
+      {
+        "key": "discover",
+        "theme": "light",
+        "state": "selected",
+        "path": "light/discover_selected@3x.png",
+        "contentType": "image/png",
+        "hash": "sha256-KjPr8U-M7a4ugZ0xFR9kh0e9kprfXG0_09nMhEPiQrg"
+      },
+      {
+        "key": "home",
+        "theme": "light",
+        "state": "normal",
+        "path": "light/home@3x.png",
+        "contentType": "image/png",
+        "hash": "sha256-pYkWZgpSltqofHW3G_xkza3CN2HfpTKYBHII6DmNchY"
+      },
+      {
+        "key": "home",
+        "theme": "light",
+        "state": "selected",
+        "path": "light/home_selected@3x.png",
+        "contentType": "image/png",
+        "hash": "sha256-_M5-uGjNBrZK24ZJrWb9w3TiMRwu-1qpWlYu63mOJ90"
+      },
+      {
+        "key": "me",
+        "theme": "light",
+        "state": "normal",
+        "path": "light/me@3x.png",
+        "contentType": "image/png",
+        "hash": "sha256-Sdt6Qfw4omz7smJ2Q2MZfjh7NzL_o5OCL68REXljlX4"
+      },
+      {
+        "key": "me",
+        "theme": "light",
+        "state": "selected",
+        "path": "light/me_selected@3x.png",
+        "contentType": "image/png",
+        "hash": "sha256-gDwxk3-iD7EOAYe_4JRO6QDIcmwR7_3c3zyULaMzaNM"
+      },
+      {
+        "key": "message",
+        "theme": "light",
+        "state": "normal",
+        "path": "light/message@3x.png",
+        "contentType": "image/png",
+        "hash": "sha256-OOxHQ_JEmmsGY_vuTpNp-nfG86R1x8p6lonP5t1VS2k"
+      },
+      {
+        "key": "message",
+        "theme": "light",
+        "state": "selected",
+        "path": "light/message_selected@3x.png",
+        "contentType": "image/png",
+        "hash": "sha256-zVXMmVWuj2U0bbgolbB4x9SK6u91e4MWTgTh-MPAhjo"
+      },
+      {
+        "key": "plus",
+        "theme": "light",
+        "state": "normal",
+        "path": "light/plus@3x.png",
+        "contentType": "image/png",
+        "hash": "sha256-AehaNWAwK00wFv4cKuESr6c9QmPxTqaIiHoGV61ubds"
+      },
+      {
+        "key": "home",
+        "theme": "dark",
+        "state": "normal",
+        "path": "dark/home@3x.png",
+        "contentType": "image/png",
+        "hash": "sha256-4-8xRGQI6_yqZkZAAxhHBJRVwmDC6o4rng7iWVjBEm4"
+      },
+      {
+        "key": "me",
+        "theme": "dark",
+        "state": "normal",
+        "path": "dark/me@3x.png",
+        "contentType": "image/png",
+        "hash": "sha256-FpjF0phs3wCqRBwPGcTAEE54ktslIqNBmifypjsdasA"
+      },
+      {
+        "key": "message",
+        "theme": "dark",
+        "state": "normal",
+        "path": "dark/message@3x.png",
+        "contentType": "image/png",
+        "hash": "sha256-w-LWvdql3iRoZmGi9__5kIuDN9XBkaq8yYcgJ5hZiHk"
+      },
+      {
+        "key": "discover",
+        "theme": "christmas",
+        "state": "normal",
+        "path": "christmas/discover@3x.png",
+        "contentType": "image/png",
+        "hash": "sha256-PyidLIS4IQUzl5WCTzHk_T2Gni7X-x71EbH-Xt4Cy_M"
+      },
+      {
+        "key": "home",
+        "theme": "christmas",
+        "state": "normal",
+        "path": "christmas/home@3x.png",
+        "contentType": "image/png",
+        "hash": "sha256-YCg9hVfZcIEXgF53w-QoMNlkNsVVmaVVd74mbKsO9Rw"
+      },
+      {
+        "key": "me",
+        "theme": "christmas",
+        "state": "normal",
+        "path": "christmas/me@3x.png",
+        "contentType": "image/png",
+        "hash": "sha256-FlJV3fhWpG__zdAOpBAVTMabgt8ykHMVctE78CZB9GY"
+      },
+      {
+        "key": "message",
+        "theme": "christmas",
+        "state": "normal",
+        "path": "christmas/message@3x.png",
+        "contentType": "image/png",
+        "hash": "sha256-ZNIkhPXu_g3nr5TTR4aZ9RPfSf2seVqwP5fOL0zJ9zI"
+      },
+      {
+        "key": "plus",
+        "theme": "christmas",
+        "state": "normal",
+        "path": "christmas/plus@3x.png",
+        "contentType": "image/png",
+        "hash": "sha256-IxpedK2f9y1k_tsg1XIzLry3xC3Ofl70uMUQD3mLklM"
+      }
+    ]
+  },
+  "themes": {
+    "default": "light",
+    "darkMode": "dark",
+    "list": {
+      "light": {
+        "tabColor": "#8E8E93",
+        "tabSelectedColor": "#007AFF",
+        "tabBackgroundColor": "#FFFFFF"
+      },
+      "dark": {
+        "tabColor": "#8E8E93",
+        "tabSelectedColor": "#0A84FF",
+        "tabBackgroundColor": "#1C1C1E"
+      },
+      "christmas": {
+        "tabColor": "#2E7D32",
+        "tabSelectedColor": "#C62828",
+        "tabBackgroundColor": "#FFF8E1"
+      }
+    },
+    "managerName": "CYLConfigurationDemo"
+  },
+  "tabBar": {
+    "styleType": "liquidGlass",
+    "color": "@tabColor",
+    "selectedColor": "@tabSelectedColor",
+    "backgroundColor": "@tabBackgroundColor",
+    "list": [
+      {
+        "key": "home",
+        "pagePath": "home",
+        "text": "Home",
+        "iconPath": "asset:home",
+        "selectedIconPath": "asset:home?state=selected"
+      },
+      {
+        "key": "message",
+        "pagePath": "message",
+        "text": "Message",
+        "iconPath": "asset:message",
+        "selectedIconPath": "asset:message?state=selected",
+        "platforms": [
+          "all"
+        ]
+      },
+      {
+        "key": "discover",
+        "pagePath": "discover",
+        "text": "Discover",
+        "iconPath": "asset:discover",
+        "selectedIconPath": "asset:discover?state=selected",
+        "platforms": [
+          "ios"
+        ]
+      },
+      {
+        "key": "me",
+        "pagePath": "me",
+        "text": "Me",
+        "iconPath": "asset:me",
+        "selectedIconPath": "asset:me?state=selected",
+        "minAppVersion": "2.0.0"
+      }
+    ],
+    "midButton": {
+      "key": "plus",
+      "index": 2,
+      "text": "Post",
+      "width": 55,
+      "height": 80,
+      "iconPath": "asset:plus",
+      "backgroundImage": "",
+      "action": "page",
+      "pagePath": "publish",
+      "platforms": [
+        "ios",
+        "android"
+      ]
+    }
+  },
+  "localization": {
+    "tableName": "ConfigurationDemo",
+    "route": "../Localization"
+  },
+  "conditions": [
+    {
+      "name": "android_new",
+      "expression": "device.os == 'android' && app.version >= '2.0.0'"
+    }
+  ],
+  "overrides": [
+    {
+      "condition": "android_new",
+      "tabBar": {
+        "midButton": {
+          "height": 64
+        }
+      }
+    }
+  ]
+}

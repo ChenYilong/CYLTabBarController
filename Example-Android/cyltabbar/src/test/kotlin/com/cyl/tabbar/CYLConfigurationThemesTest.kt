@@ -31,18 +31,6 @@ class CYLConfigurationThemesTest {
 
     class Page : Fragment()
 
-    private fun <T> withActivity(qualifiers: String? = null, block: (FragmentActivity) -> T): T {
-        if (qualifiers != null) org.robolectric.RuntimeEnvironment.setQualifiers(qualifiers)
-        val controller = Robolectric.buildActivity(FragmentActivity::class.java).setup()
-        try {
-            return block(controller.get())
-        } finally {
-            controller.pause().stop().destroy()
-        }
-    }
-
-    private fun idle() = shadowOf(Looper.getMainLooper()).idle()
-
     private fun configuration(managerName: String, themes: Any?, extra: Map<String, Any?> = emptyMap()): Map<String, Any?> = mapOf(
         CYLConstants.CYLTabBarControllerViewControllers to listOf(Page(), Page()),
         CYLConstants.CYLTabBarControllerThemeManagerName to managerName,
@@ -147,10 +135,13 @@ class CYLConfigurationThemesTest {
         val folder = java.io.File(System.getProperty("cyl.sharedConfiguration") ?: return).parentFile
         val expected = CYLConfigurationThemes.themes(CYLTabBarConfigurationParser.dictionaryWithContentsOfFile(java.io.File(folder, "cyl_tabbar_configuration.json").path)[CYLConstants.CYLTabBarControllerThemes])
         assertEquals(setOf("light", "dark"), expected?.keys)
-        for (extension in listOf("yaml", "yml", "textproto")) {
-            val parsed = CYLTabBarConfigurationParser.dictionaryWithContentsOfFile(java.io.File(folder, "cyl_tabbar_configuration.$extension").path)
-            assertEquals(extension, expected, CYLConfigurationThemes.themes(parsed[CYLConstants.CYLTabBarControllerThemes]))
-            assertEquals(extension, "dark", parsed[CYLConstants.CYLTabBarControllerDarkThemeIdentifier])
+        // [EN] Every sample file, binary Protobuf and plist included. [CN] 每个示例文件，包括二进制 Protobuf 与 plist。
+        val files = folder.listFiles().orEmpty().filter { it.isFile && it.name.startsWith("cyl_tabbar_configuration") && it.extension != "proto" }
+        assertEquals(17, files.size)
+        for (file in files) {
+            val parsed = CYLTabBarConfigurationParser.dictionaryWithContentsOfFile(file.path)
+            assertEquals(file.name, expected, CYLConfigurationThemes.themes(parsed[CYLConstants.CYLTabBarControllerThemes]))
+            assertEquals(file.name, "dark", parsed[CYLConstants.CYLTabBarControllerDarkThemeIdentifier])
         }
     }
 

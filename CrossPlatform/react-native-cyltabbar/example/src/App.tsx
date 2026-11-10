@@ -7,11 +7,12 @@
  * 同样的 TabBar（由配置创建）：四个 Lottie Tab、带自己页面的「发布」PlusButton、启动 1.5 秒后的角标与第一个 Tab 的封面；页面跟随系统深色 / 浅色模式。
  */
 import { useEffect, useRef, useState, type ReactNode } from 'react';
-import { Alert, Animated, Image, Modal, Platform, Pressable, ScrollView, StatusBar, StyleSheet, Text, View, useColorScheme } from 'react-native';
+import { ActionSheetIOS, Alert, Animated, Image, Modal, Platform, Pressable, ScrollView, StatusBar, StyleSheet, Text, View, useColorScheme } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { CYLTabBar, type CYLTabBarBadge, type CYLTabBarItem, type CYLTabBarPlusButton } from 'react-native-cyltabbar';
 import { SKINS, THEME_ICONS, type CYLSkin } from './CYLSkins';
 import { CYLDemoList, type CYLDemoRow } from './demo/CYLDemoList';
+import { CYL_PICKER_LANGUAGES, CYLDemoLanguage, CYLFlaggedLanguageName, CYLIsRightToLeft, CYLLanguageName, CYLSetDemoLanguage, t, tDevice } from './demo/CYLLocalization';
 
 /** A required image's URL, for the keys the component passes as they are. 被原样传递的键使用 require 图片的 URL。 */
 const uri = (image: number) => Image.resolveAssetSource(image)?.uri ?? '';
@@ -96,6 +97,11 @@ export default function App() {
   // 因此与 Objective-C 示例相同，重启 App 后登录状态保留。
   const [loggedIn, setLoggedIn] = useState<boolean | undefined>(undefined);
   const [followsSystem, setFollowsSystem] = useState(false);
+  // The language belongs to the app (CYLSetLocalizationLanguage()); undefined follows the device. Not saved, as the
+  // Objective-C example: a new launch follows the device again. 语言属于整个 App；undefined 跟随设备。与 Objective-C 示例相同不保存：重新启动后再次跟随设备。
+  const [language, setLanguage] = useState<string | undefined>(undefined);
+  CYLSetDemoLanguage(language);
+  const shownLanguage = CYLDemoLanguage();
   const dark = useColorScheme() === 'dark';
   const effectiveName = effectiveSkinName(skinName, followsSystem, dark);
   const skin = SKINS.find((candidate) => candidate.name === effectiveName) ?? SKINS[0]!;
@@ -109,8 +115,77 @@ export default function App() {
     },
     toggleFollowsSystem: () => setFollowsSystem((current) => !current),
   };
+  // -[UIWindow cyl_setRootViewControllerProvider:]: a new language builds everything again (a new key), so every text is
+  // created in it; a right-to-left language (Arabic) flips the layout. 新的语言会重新创建全部内容（新的 key），所有文字都用新语言创建；
+  // 从右到左的语言（阿拉伯语）翻转布局。
   return (
-    <CYLMainTabBar key={generation} styleType={styleType} onRebuild={rebuild} skinPicker={skinPicker} loggedIn={loggedIn} onLoggedInChange={setLoggedIn} />
+    <View key={shownLanguage} style={[styles.container, { direction: CYLIsRightToLeft(shownLanguage) ? 'rtl' : 'ltr' }]}>
+      <CYLMainTabBar
+        key={generation}
+        styleType={styleType}
+        onRebuild={rebuild}
+        skinPicker={skinPicker}
+        loggedIn={loggedIn}
+        onLoggedInChange={setLoggedIn}
+        language={language}
+        onLanguageChange={setLanguage}
+      />
+    </View>
+  );
+}
+
+/** CYLDemoTitleVerticalOffsets: the next offset after `current`; one not in the list goes to the first. 下一个偏移；不在列表中时为第一个。 */
+const TITLE_VERTICAL_OFFSETS = [0, -4, 4];
+function nextTitleOffset(current: number): number {
+  const index = TITLE_VERTICAL_OFFSETS.findIndex((offset) => Math.abs(offset - current) < 0.5);
+  return TITLE_VERTICAL_OFFSETS[index < 0 ? 0 : (index + 1) % TITLE_VERTICAL_OFFSETS.length]!;
+}
+
+/**
+ * -[UIViewController cyl_presentLanguagePicker]: the five languages, "Follow system" and "Cancel"; iOS shows an action
+ * sheet, Android a list (its alerts hold three buttons only). The choice calls `onChoose` (undefined: follow the device).
+ * 五种语言、「跟随系统」与「取消」；iOS 显示操作表，Android 显示列表（其弹窗最多三个按钮）。选择后调用 `onChoose`（undefined：跟随设备）。
+ */
+function presentLanguagePicker(onChoose: (language: string | undefined) => void, showAndroidList: () => void) {
+  if (Platform.OS !== 'ios') return showAndroidList();
+  const options = [...CYL_PICKER_LANGUAGES.map(CYLFlaggedLanguageName), t('Follow system'), t('Cancel')];
+  ActionSheetIOS.showActionSheetWithOptions(
+    { title: t('Language'), message: tDevice('Tap to change the language'), options, cancelButtonIndex: options.length - 1 },
+    (index) => {
+      if (index < CYL_PICKER_LANGUAGES.length) onChoose(CYL_PICKER_LANGUAGES[index]);
+      else if (index === CYL_PICKER_LANGUAGES.length) onChoose(undefined);
+    }
+  );
+}
+
+/** The Android language list, in the skin menu's style. Android 的语言列表，与换肤菜单样式相同。 */
+function CYLLanguageMenu({ visible, colors, onChoose, onClose }: Readonly<{ visible: boolean; colors: typeof LIGHT; onChoose: (language: string | undefined) => void; onClose: () => void }>) {
+  const row = (key: string, title: string, label: string, onPress: () => void) => (
+    <Pressable
+      key={key}
+      accessibilityRole="button"
+      accessibilityLabel={label}
+      style={styles.menuRow}
+      onPress={() => {
+        onClose();
+        onPress();
+      }}
+    >
+      <Text style={[styles.menuTitle, styles.languageTitle, { color: colors.label }]}>{title}</Text>
+    </Pressable>
+  );
+  return (
+    <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
+      <Pressable style={[styles.menuBackdrop, styles.languageBackdrop]} onPress={onClose} accessibilityLabel={t('Cancel')} accessibilityRole="button">
+        <View style={[styles.menu, { backgroundColor: colors.menu }]} onStartShouldSetResponder={() => true}>
+          <Text style={styles.menuHeader}>{t('Language')}</Text>
+          <Text style={[styles.menuHeader, styles.languageMessage]}>{tDevice('Tap to change the language')}</Text>
+          {CYL_PICKER_LANGUAGES.map((language) => row(language, CYLFlaggedLanguageName(language), CYLLanguageName(language), () => onChoose(language)))}
+          {row('system', t('Follow system'), t('Follow system'), () => onChoose(undefined))}
+          {row('cancel', t('Cancel'), t('Cancel'), () => {})}
+        </View>
+      </Pressable>
+    </Modal>
   );
 }
 
@@ -119,7 +194,10 @@ type CYLSkinPicker = { skin: CYLSkin; followsSystem: boolean; choose: (name: str
 /** The tabs in a skin: holiday or network icons instead of the Lottie ones. 皮肤中的 Tab：用节日或网络图标替换 Lottie 图标。 */
 function skinnedItems(skin: CYLSkin): CYLTabBarItem[] {
   return ITEMS.map((item, index) => {
-    const base: CYLTabBarItem = { title: item.title, identifier: item.identifier, CYLTabBarItemSelectedTitle: item.CYLTabBarItemSelectedTitle };
+    // The titles in the current language, as CYLLocalizedTabBarItemsAttributes(). 当前语言中的标题。
+    const title = t(item.title as string);
+    const selectedTitle = item.CYLTabBarItemSelectedTitle ? t(item.CYLTabBarItemSelectedTitle as string) : undefined;
+    const base: CYLTabBarItem = { title, identifier: item.identifier, CYLTabBarItemSelectedTitle: selectedTitle };
     if (skin.icons) {
       const icon = THEME_ICONS[skin.icons[index % skin.icons.length]!]!;
       return { ...base, image: icon.faded, selectedImage: icon.image };
@@ -128,27 +206,28 @@ function skinnedItems(skin: CYLSkin): CYLTabBarItem[] {
       const [image, selectedImage] = skin.network.tabs[index % skin.network.tabs.length]!;
       return {
         ...base,
-        title: `${skin.network.titlePrefix} ${item.title}`,
+        title: `${skin.network.titlePrefix} ${title}`,
         image: item.image,
         CYLTabBarItemImageURL: image,
         CYLTabBarItemSelectedImageURL: selectedImage,
         CYLTabBarItemImageURLSize: [24, 24],
       };
     }
-    return item;
+    return { ...item, title, CYLTabBarItemSelectedTitle: selectedTitle };
   });
 }
 
 /** The plus button in a skin (`cyl_plusButtonAttributesForTabBarController:`). 皮肤中的 PlusButton。 */
 function skinnedPlusButton(skin: CYLSkin): CYLTabBarPlusButton {
+  const plusButton = { ...PLUS_BUTTON, title: t(PLUS_BUTTON.title as string) };
   if (skin.icons) {
     const icon = THEME_ICONS[skin.icons.at(-1)!]!.image;
-    return { ...PLUS_BUTTON, image: icon, selectedImage: icon };
+    return { ...plusButton, image: icon, selectedImage: icon };
   }
   if (skin.network) {
-    return { ...PLUS_BUTTON, image: skin.network.plusButton[0], selectedImage: skin.network.plusButton[1] };
+    return { ...plusButton, image: skin.network.plusButton[0], selectedImage: skin.network.plusButton[1] };
   }
-  return PLUS_BUTTON;
+  return plusButton;
 }
 
 /** The bar's colors in a skin (`cyl_tabBarAppearanceForTabBarController:`). 皮肤中 TabBar 的颜色。 */
@@ -195,7 +274,7 @@ function CYLSkinMenu({ visible, picker, colors, onClose }: Readonly<{ visible: b
         {/* The menu takes the touches inside it, so a tap after a scroll reaches its row, not the backdrop that closes it.
             菜单接收其内部的触摸，滚动后的点击会到达对应行，而不是关闭菜单的背景。 */}
         <View style={[styles.menu, { backgroundColor: colors.menu }]} onStartShouldSetResponder={() => true}>
-          <Text style={styles.menuHeader}>Choose a theme</Text>
+          <Text style={styles.menuHeader}>{t('Choose a theme')}</Text>
           <ScrollView>
             {SKINS.map((skin) => {
               const firstIcon = skin.icons ? THEME_ICONS[skin.icons[0]!]!.image : undefined;
@@ -206,9 +285,9 @@ function CYLSkinMenu({ visible, picker, colors, onClose }: Readonly<{ visible: b
                   {skin.network ? <Text style={styles.menuSwatchGlyph}>↓</Text> : null}
                 </View>
               );
-              return row(skin.name, icon, skin.name, !picker.followsSystem && skin.name === picker.skin.name, () => picker.choose(skin.name));
+              return row(skin.name, icon, t(skin.name), !picker.followsSystem && skin.name === picker.skin.name, () => picker.choose(skin.name));
             })}
-            {row('system', <Text style={[styles.menuIcon, styles.menuGlyph, { color: colors.label }]}>◐</Text>, 'Follow the system Dark Mode', picker.followsSystem, picker.toggleFollowsSystem)}
+            {row('system', <Text style={[styles.menuIcon, styles.menuGlyph, { color: colors.label }]}>◐</Text>, t('Follow the system Dark Mode'), picker.followsSystem, picker.toggleFollowsSystem)}
           </ScrollView>
         </View>
       </Pressable>
@@ -280,9 +359,9 @@ function effectiveSkinName(skinName: string, followsSystem: boolean, dark: boole
  */
 function homePageTitle(selectedIndex: number, styleType: CYLStyleType): string {
   if (selectedIndex !== 0) {
-    return ITEMS[selectedIndex]!.title as string;
+    return t(ITEMS[selectedIndex]!.title as string);
   }
-  return styleType === 'liquidGlass' ? 'Home (Liquid)' : 'Home';
+  return styleType === 'liquidGlass' ? `${t('Home')} (Liquid)` : t('Home');
 }
 
 /**
@@ -297,21 +376,22 @@ function badgesInSkin(badges: (CYLTabBarBadge | null)[], styleType: CYLStyleType
   return badges.map((badge) => (badge && !badge.color ? { ...badge, color: skin.tint } : badge));
 }
 
-/** [EN] The values the demo rows show, as the Objective-C example. [CN] 演示列表各行显示的值，与 Objective-C 示例相同。 */
-function demoValues(skinName: string, selectedIndex: number, loggedIn: boolean | undefined): Record<string, string> {
+/** [EN] The values the demo rows show, in the current language, as the Objective-C example. [CN] 演示列表各行显示的值，使用当前语言，与 Objective-C 示例相同。 */
+function demoValues(skinName: string, selectedIndex: number, titleOffset: number): Record<string, string> {
   const selectedTitle = selectedIndex === 0 ? 'Refresh' : (ITEMS[selectedIndex]!.title as string);
   return {
-    titleOffset: '(0, -3.5)',
-    appearance: 'Original',
-    skin: skinName,
+    titleOffset: `(0, ${titleOffset})`,
+    appearance: t('Original'),
+    skin: t(skinName),
     scrollBehavior: 'Automatic',
     indexWithoutPlus: String(selectedIndex),
     selectedIndex: String(selectedIndex < 2 ? selectedIndex : selectedIndex + 1),
-    selectedTitle,
-    login: loggedIn === true ? 'logged in' : 'logged out',
-    touchScale: '1.0x',
-    tapAnimation: 'None',
-    tapSound: 'None',
+    selectedTitle: t(selectedTitle),
+    loginTabs: [t('Messages'), t('Me')].join(', '),
+    bundleImage: 'Found CYLImagePathInBundle ✓ (cyl_badge_sample_icon@3x.png) · CYLBundleImagePath ✓ · CYLBundleImageData 11 KB · CYLBundleImageFromData ✓ (@3x) · CYLImageNamed ✓',
+    touchScale: '1.0',
+    tapAnimation: t('None'),
+    tapSound: t('None'),
     longPress: '0.5',
     doubleTap: '0.35',
     adjacent: '-',
@@ -331,18 +411,30 @@ function systemVersionText(): string {
   return `Android ${release}`;
 }
 
+/** [EN] The badge samples' subtitle; the library translates the iOS one. [CN] 角标样例的副标题；库翻译了 iOS 的写法。 */
+function badgeSubtitle(pageTitle: string): string {
+  if (Platform.OS === 'ios') {
+    return t('{page} CYLTabBarController on iOS {version}', { page: pageTitle, version: String(Platform.Version) });
+  }
+  return `${pageTitle} CYLTabBarController on ${systemVersionText()}`;
+}
+
 function CYLMainTabBar({
   styleType,
   onRebuild,
   skinPicker,
   loggedIn,
   onLoggedInChange,
+  language,
+  onLanguageChange,
 }: Readonly<{
   styleType: CYLStyleType;
   onRebuild: (styleType: CYLStyleType) => void;
   skinPicker: CYLSkinPicker;
   loggedIn: boolean | undefined;
   onLoggedInChange: (loggedIn: boolean) => void;
+  language: string | undefined;
+  onLanguageChange: (language: string | undefined) => void;
 }>) {
   const dark = useColorScheme() === 'dark';
   const colors = dark ? DARK : LIGHT;
@@ -374,6 +466,18 @@ function CYLMainTabBar({
   // 「Flat Design」与「Liquid Glass」按钮上的随机颜色红点。
   const [navigationBadgeColors] = useState(() => [randomColor(), randomColor()]);
   const [skinMenuVisible, setSkinMenuVisible] = useState(false);
+  const [languageMenuVisible, setLanguageMenuVisible] = useState(false);
+  // -[CYLFlatDesignTableViewController tableView:didSelectRowAtIndexPath:]: setTabBarHidden:!isTabBarHidden animated:YES,
+  // in every style. 在所有样式下切换 TabBar 的显示与隐藏。
+  const [tabBarHidden, setTabBarHidden] = useState(false);
+  // -[UIViewController cyl_simulateMemoryWarningAndShowResult]: each tap asks the tab bar for one simulated memory warning.
+  // 每次点击请求 TabBar 模拟一次内存警告。
+  const [memoryWarningRequest, setMemoryWarningRequest] = useState(0);
+  // CYLSwitchTitlePositionAdjustment(): the title row cycles the vertical offset of every title through 0, -4 and 4 at
+  // runtime (`setTitlePositionAdjustment:`); undefined is the configuration's -3.5. 标题行在运行时依次切换所有标题的垂直偏移：
+  // 0、-4、4；undefined 为配置中的 -3.5。
+  const [titleOffset, setTitleOffset] = useState<number | undefined>(undefined);
+  const shownTitleOffset = titleOffset ?? (CONFIGURATION.CYLTabBarControllerTitlePositionAdjustment[1] as number);
   // As the Objective-C example, the cover goes on after the tab icons: a skin's icons replace the tab's icon views, so
   // the cover is put back once they are in (network icons are downloaded first). 与 Objective-C 示例相同，封面在 Tab 图标之后添加：
   // 皮肤的图标会替换 Tab 的图标视图，因此在其就绪后重新添加封面（网络图标需要先下载）。
@@ -411,15 +515,15 @@ function CYLMainTabBar({
       {!plusPageSelected && selectedIndex === 0 && (
         <View style={styles.navigationBar}>
           <CYLNavigationButton
-            title="Flat Design"
+            title={t('Flat Design')}
             colors={colors}
             onPress={() => onRebuild('flatDesign')}
             badge={<CYLNavigationBadge color={navigationBadgeColors[0]!} animation="breathe" />}
           />
           <View style={styles.page} />
-          <CYLNavigationButton title="Skin" colors={colors} onPress={() => setSkinMenuVisible(true)} />
+          <CYLNavigationButton title={t('Skin')} colors={colors} onPress={() => setSkinMenuVisible(true)} />
           <CYLNavigationButton
-            title="Liquid Glass"
+            title={t('Liquid Glass')}
             colors={colors}
             onPress={() => onRebuild('liquidGlass')}
             badge={<CYLNavigationBadge color={navigationBadgeColors[1]!} animation="shake" />}
@@ -427,6 +531,7 @@ function CYLMainTabBar({
         </View>
       )}
       <CYLSkinMenu visible={skinMenuVisible} picker={skinPicker} colors={colors} onClose={() => setSkinMenuVisible(false)} />
+      <CYLLanguageMenu visible={languageMenuVisible} colors={colors} onChoose={onLanguageChange} onClose={() => setLanguageMenuVisible(false)} />
       {/* The page: React Native draws it; the native component draws only the bar. Every tab shows the demo list
           (item 51); the plus button's page shows its title. 页面由 RN 绘制，组件只绘制 TabBar。每个 Tab 都显示演示列表（第 51 项）；
           PlusButton 的页面显示其标题。 */}
@@ -438,13 +543,17 @@ function CYLMainTabBar({
         <CYLDemoList
           colors={colors}
           tint={skin.tint ?? colors.tint}
-          values={demoValues(skin.name, selectedIndex, loggedIn)}
+          values={demoValues(skin.name, selectedIndex, shownTitleOffset)}
           switches={{ login: loggedIn === true }}
           currentSkin={skinPicker.followsSystem ? '' : skin.name}
-          badgeSubtitle={`${pageTitle} CYLTabBarController on ${systemVersionText()}`}
+          badgeSubtitle={badgeSubtitle(pageTitle)}
           onRow={(row: CYLDemoRow) => {
             if (row.skin) return skinPicker.choose(row.skin.name);
             if (row.id === 'skin') return setSkinMenuVisible(true);
+            if (row.id === 'flatShowHide') return setTabBarHidden((hidden) => !hidden);
+            if (row.id === 'memoryWarning') return setMemoryWarningRequest((request) => request + 1);
+            if (row.id === 'titleOffset') return setTitleOffset(nextTitleOffset(shownTitleOffset));
+            if (row.id === 'language') return presentLanguagePicker(onLanguageChange, () => setLanguageMenuVisible(true));
             if (row.badge) {
               // -[CYLHomeViewController tableView:didSelectRowAtIndexPath:]: an orange page (the "Home (n)" navigation title
               // is not shown: the home page's navigation bar shows only its buttons). 推入橙色页面（导航标题「Home (n)」不显示：
@@ -479,13 +588,18 @@ function CYLMainTabBar({
         }}
         loggedIn={loggedIn}
         onLoginStateChange={onLoggedInChange}
+        language={language}
+        tabBarHidden={tabBarHidden}
+        memoryWarningRequest={memoryWarningRequest}
+        titlePositionAdjustment={titleOffset === undefined ? undefined : [0, titleOffset]}
+        onMemoryWarning={(report) => Alert.alert(t('Memory warning'), report, [{ text: t('OK') }])}
         // -[MainTabBarController cyl_demo_presentLoginForViewController:completion:]: "Messages" and "Me" need login; the
         // alert logs in, then selects the tapped tab. 「Messages」「Me」需要登录；弹窗登录后选中所点击的 Tab。
         onLoginRequest={(index, _identifier, title) =>
-          Alert.alert('Login required', `Log in to view “${title}”`, [
-            { text: 'Cancel', style: 'cancel' },
+          Alert.alert(t('Login required'), t('Log in to view “{title}”', { title }), [
+            { text: t('Cancel'), style: 'cancel' },
             {
-              text: 'Log in',
+              text: t('Log in'),
               onPress: () => {
                 onLoggedInChange(true);
                 setPlusPageSelected(false);
@@ -536,6 +650,10 @@ const CONFIGURATION = {
   CYLTabBarControllerTitlePositionAdjustment: [0, -3.5],
   // -[MainTabBarController setUpLoginRequiredTabs] (issue #19). 需要登录的 Tab。
   CYLTabBarControllerLoginRequiredTabBarItemIdentifiers: ['message', 'CYLMineViewController'],
+  // MainTabBarController: unloadsUnselectedViewsOnMemoryWarning = YES and -shouldUnloadViewOfViewController: keeps the home
+  // tab (issue #426). 卸载未选中的 Tab，并保留首页 Tab。
+  CYLTabBarControllerUnloadsUnselectedViewsOnMemoryWarning: true,
+  CYLTabBarControllerKeepsLoadedTabBarItemIdentifiers: ['home'],
   CYLTabBarControllerThemes: {
     Default: {
       CYLTabBarItemTitleColor: '#FF0000',
@@ -572,4 +690,10 @@ const styles = StyleSheet.create({
   menuSwatchGlyph: { color: '#FFFFFF', fontSize: 15, fontWeight: '700' },
   menuGlyph: { fontSize: 20, textAlign: 'center' },
   menuTitle: { fontSize: 17, flexShrink: 1 },
+  // A dialog over a dimmed page, as an action sheet. 变暗页面上的对话框，与操作表相同。
+  languageBackdrop: { alignItems: 'center', justifyContent: 'center', paddingTop: 0, paddingRight: 0, backgroundColor: '#00000066' },
+  // The whole row: Android measures Devanagari ("हिन्दी") narrower than it draws, which wrapped and clipped it.
+  // 占满整行：Android 测量天城文（「हिन्दी」）比实际绘制更窄，导致换行并被裁剪。
+  languageTitle: { flex: 1, paddingHorizontal: 8 },
+  languageMessage: { fontSize: 13 },
 });

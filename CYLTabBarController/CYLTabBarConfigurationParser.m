@@ -2032,6 +2032,10 @@ static NSDictionary<NSString *, NSDictionary<NSNumber *, NSArray<NSString *> *> 
                 // [EN] `CYLTabBarControllerPlusButton`: the item keys it uses (title, image, selected title and color).
                 // [CN] `CYLTabBarControllerPlusButton`：使用 item 的键（标题、图片、选中标题与颜色）。
                 @12 : @[ @"CYLTabBarControllerPlusButton", @"message:CYLTabBarItem" ],
+                // [EN] FIX: issue #787 — icon tint of every tab. [CN] 所有 Tab 的图标着色。
+                @13 : @[ @"CYLTabBarControllerIconRenderingMode", @"string" ],
+                @14 : @[ @"CYLTabBarControllerIconColor", @"string" ],
+                @15 : @[ @"CYLTabBarControllerSelectedIconColor", @"string" ],
             },
             @"CYLTabBarTheme" : @{
                 @1 : @[ @"CYLTabBarThemeIdentifier", @"string" ],
@@ -2098,6 +2102,7 @@ static NSDictionary<NSString *, NSDictionary<NSNumber *, NSArray<NSString *> *> 
                 @59 : @[ @"CYLTabBarGIFSize", @"string" ],
                 @60 : @[ @"CYLTabBarGIFDarkURL", @"string" ],
                 @61 : @[ @"CYLTabBarGIFDarkFilePath", @"string" ],
+                @62 : @[ @"CYLTabBarItemIconRenderingMode", @"string" ],
             },
             @"CYLMapEntry" : @{
                 @1 : @[ @"key", @"string" ],

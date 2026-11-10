@@ -159,6 +159,42 @@ FOUNDATION_EXTERN NSString *const CYLTabBarHostBadgeCenterOffset;
  * [CN] 忘记 App 通过 `loggedIn` 设置的状态：之后创建的 TabBar 重新使用缓存的状态。
  */
 - (void)resetLoggedIn;
+/*!
+ * [EN] The language of the library's own texts and of the layout direction: a language code such as @"ar" or
+ *      @"zh-Hans", or nil for the device language. Calls `CYLSetLocalizationLanguage()` (it applies to the whole library),
+ *      lays the tab bar out right to left for a right-to-left language, and builds the tab bar again, as
+ *      `-[UIWindow cyl_setRootViewControllerProvider:]` rebuilds the root in the Objective-C example. The tab titles come
+ *      from the configuration: translate them there.
+ * [CN] 库自身文字与布局方向使用的语言：语言代码，如 @"ar"、@"zh-Hans"；nil 表示设备语言。调用 `CYLSetLocalizationLanguage()`（作用于整个库），
+ *      从右到左的语言使 TabBar 从右到左布局，并重新创建 TabBar，与 Objective-C 示例中 `-[UIWindow cyl_setRootViewControllerProvider:]`
+ *      重建根控制器相同。Tab 标题来自配置：请在配置中翻译。
+ */
+@property (nonatomic, copy, nullable) NSString *language;
+/*!
+ * [EN] Hides or shows the tab bar, animated, in every style (`-[CYLTabBarController setTabBarHidden:animated:]`). A hidden
+ *      tab bar takes no touches: `touchableRects` is empty, so the page under it gets them.
+ * [CN] 隐藏或显示 TabBar（带动画），所有样式都生效（`-[CYLTabBarController setTabBarHidden:animated:]`）。隐藏的 TabBar 不接收触摸：
+ *      `touchableRects` 为空，触摸交给其下方的页面。
+ */
+@property (nonatomic, assign) BOOL tabBarHidden;
+/*!
+ * [EN] Simulates a memory warning for the tab bar controller and returns what happened to each tab, one line per tab, in
+ *      the library's language (`CYLSimulateMemoryWarningReport()`, issue #426). The configuration decides what is unloaded:
+ *      `CYLTabBarControllerUnloadsUnselectedViewsOnMemoryWarning`, `CYLTabBarControllerKeepsLoadedTabBarItemIdentifiers`.
+ * [CN] 对 TabBarController 模拟内存警告，并返回每个 Tab 的结果（每个 Tab 一行），使用库的语言（`CYLSimulateMemoryWarningReport()`，
+ *      issue #426）。卸载哪些 Tab 由配置决定：`CYLTabBarControllerUnloadsUnselectedViewsOnMemoryWarning`、
+ *      `CYLTabBarControllerKeepsLoadedTabBarItemIdentifiers`。
+ */
+- (NSString *)simulateMemoryWarning;
+/*!
+ * [EN] The title offset of every tab (an `NSValue` of `UIOffset`), set at runtime with
+ *      `-[CYLTabBarController setTitlePositionAdjustment:]`, without building the tab bar again; it wins over the
+ *      configuration's `CYLTabBarControllerTitlePositionAdjustment`. A plus button that aligns its title follows. nil keeps
+ *      the configuration's.
+ * [CN] 所有 Tab 的标题偏移（`UIOffset` 的 `NSValue`），在运行时通过 `-[CYLTabBarController setTitlePositionAdjustment:]` 设置，
+ *      不重新创建 TabBar；优先于配置中的 `CYLTabBarControllerTitlePositionAdjustment`。对齐标题的 PlusButton 随之移动。nil 时使用配置中的值。
+ */
+@property (nonatomic, copy, nullable) NSValue *titlePositionAdjustment;
 
 /// [EN] The plus button of `CYLTabBarControllerPlusButton` was tapped. [CN] 点击了 `CYLTabBarControllerPlusButton` 的 PlusButton。
 @property (nonatomic, copy, nullable) void (^didTapPlusButton)(void);

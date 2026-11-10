@@ -1859,6 +1859,15 @@ UISearchTab 会从 TabBar 分离出来单独显示。
         // 竖向栏中 Tab 按钮不在本 TabBar 内，上面的 hitTest 为 nil，导致选中状态下再次点击不回调 didSelectControl，这里按触摸点查找 Tab 按钮。
         hitView = [self cyl_verticalBarTabButtonAtWindowPoint:[gestureRecognizer locationInView:nil]];
     }
+    // [EN] FIX: issue #202 — on Liquid Glass a subview of the plus button that takes touches (e.g. an X button) got
+    //      none: the hit test above returns it, but UIKit's selection gesture still began, selected the stand-in tab
+    //      under the plus button and cancelled the subview's touch. Such a subview keeps the touch for itself.
+    // [CN] 液态玻璃下，PlusButton 中自己接收触摸的子视图（例如 X 按钮）收不到触摸：上面的 hitTest 已返回它，但 UIKit 的选中手势仍会开始，
+    //      选中 PlusButton 下方的替身 Tab 并取消该子视图的触摸。这样的子视图自己保留这次触摸。
+    UIView *plusButtonView = self.plusButton;
+    if (plusButtonView && hitView && hitView != plusButtonView && [hitView isDescendantOfView:plusButtonView]) {
+        return NO;
+    }
     SEL actin = @selector(tabChangedToControl:);
     CYLTabBarController *tabBarController = [self tabBarController];
     if (([hitView cyl_isTabButton] || [hitView isKindOfClass:[CYLPlusButton class]] ) && [tabBarController respondsToSelector:actin]) {

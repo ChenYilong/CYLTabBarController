@@ -23,7 +23,6 @@ object CYLTabBarConfigurationLocalization {
 
     /** [EN] Private: where the configuration came from, set by the file loader ("asset:<folder>" or a folder path). [CN] 私有：配置的来源，由文件加载方法设置（"asset:<目录>" 或目录路径）。 */
     const val FILE_DIRECTORY_KEY = "_CYLTabBarControllerConfigurationFileDirectory"
-    private const val ASSET_PREFIX = "asset:"
 
     private val textKeys = setOf(
         CYLConstants.CYLTabBarItemTitle, CYLConstants.CYLTabBarItemSelectedTitle,
@@ -94,30 +93,10 @@ object CYLTabBarConfigurationLocalization {
 
     private const val DEFAULT_TABLE = "Localizable"
 
-    /** [EN] `CYLTabBarLocalizationPath` to a folder. [CN] 把 `CYLTabBarLocalizationPath` 解析为目录。 */
+    /** [EN] `CYLTabBarLocalizationPath`, a location route (`CYLResourceRoute`), to a folder. [CN] 把位置路由 `CYLTabBarLocalizationPath`（`CYLResourceRoute`）解析为目录。 */
     private fun resolve(context: Context, path: String, source: String?): Location {
-        val dataFolder = context.filesDir.parentFile ?: context.filesDir
-        // [EN] The location routes (docs/Configuration-Localization.md), in this order, as on iOS. [CN] 位置路由
-        //      （docs/Configuration-Localization.md），与 iOS 顺序相同。
-        return when {
-            path.startsWith("bundle:") -> Location(path.removePrefix("bundle:").trim('/'), null)
-            path.startsWith("file:") -> Location(null, File(java.net.URI(path).path ?: path.removePrefix("file:")))
-            path.startsWith("sandbox:") -> {
-                val rest = path.removePrefix("sandbox:").trimStart('/')
-                val first = rest.substringBefore('/')
-                val remainder = if ('/' in rest) rest.substringAfter('/') else ""
-                when (first) {
-                    "Documents" -> Location(null, File(context.filesDir, remainder))
-                    "Caches", "tmp" -> Location(null, File(context.cacheDir, remainder))
-                    else -> Location(null, File(dataFolder, rest))
-                }
-            }
-            path.startsWith("~/") -> Location(null, File(dataFolder, path.removePrefix("~/")))
-            path.startsWith("/") -> Location(null, File(path))
-            source != null && source.startsWith(ASSET_PREFIX) -> Location(join(source.removePrefix(ASSET_PREFIX), path), null)
-            source != null -> Location(null, File(source, path))
-            else -> Location(path.trimEnd('/'), null)
-        }
+        val location = CYLResourceRoute.locationForRoute(context, path, source) ?: return assetsRoot
+        return Location(location.assetPath?.trimEnd('/'), location.file)
     }
 
     private fun join(folder: String, path: String): String = listOf(folder, path).filter { it.isNotEmpty() }.joinToString("/").trimEnd('/')

@@ -119,7 +119,37 @@ open class CYLPlusButton(context: Context) : FrameLayout(context) {
         addView(titleLabel, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT, Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL))
         isClickable = true
         isFocusable = true
-        contentDescription = "Menu"
+        cyl_refreshDefaultContentDescription()
+    }
+
+    /** [EN] The description the app set itself, which wins over the default one. [CN] App 自己设置的描述，优先于默认描述。 */
+    private var appContentDescription: CharSequence? = null
+    private var settingDefaultContentDescription = false
+
+    /**
+     * [EN] What TalkBack says, as iOS `-accessibilityLabel`: the description the app set, else the title shown, else
+     *      "Plus button" in [CYLLocalization.language]. Set as the view's description (lint asks not to override the getter),
+     *      again whenever the title or the selection changes; null gives the default back.
+     * [CN] TalkBack 朗读的内容，与 iOS `-accessibilityLabel` 相同：App 设置的描述，其次为显示的标题，否则为 [CYLLocalization.language]
+     *      中的“加号按钮”。作为视图的描述设置（lint 建议不要重写 getter），标题或选中状态变化时重新设置；设为 null 时恢复默认描述。
+     */
+    override fun setContentDescription(contentDescription: CharSequence?) {
+        if (settingDefaultContentDescription) {
+            super.setContentDescription(contentDescription)
+            return
+        }
+        appContentDescription = contentDescription
+        if (contentDescription != null) super.setContentDescription(contentDescription) else cyl_refreshDefaultContentDescription()
+    }
+
+    private fun cyl_refreshDefaultContentDescription() {
+        if (appContentDescription != null) return
+        settingDefaultContentDescription = true
+        try {
+            setContentDescription(currentTitle?.takeIf { it.isNotEmpty() } ?: CYLLocalization.string(context, R.string.cyl_plus_button))
+        } finally {
+            settingDefaultContentDescription = false
+        }
     }
 
     /** [EN] `setImage:forState:UIControlStateNormal`. [CN] 常态图片。 */
@@ -151,6 +181,7 @@ open class CYLPlusButton(context: Context) : FrameLayout(context) {
 
     private fun applyTitle() {
         titleLabel.text = currentTitle ?: ""
+        cyl_refreshDefaultContentDescription()
         titleLabel.visibility = if (cyl_showsTitleInTabBarItem()) View.VISIBLE else View.GONE
         if (isSelected && cyl_selectedTitleColor != null) titleLabel.setTextColor(cyl_selectedTitleColor!!)
         requestLayout()
@@ -158,6 +189,7 @@ open class CYLPlusButton(context: Context) : FrameLayout(context) {
 
     override fun setSelected(selected: Boolean) {
         super.setSelected(selected)
+        cyl_refreshDefaultContentDescription()
         // [EN] As iOS (docs/PlusButton.md): with a page of its own on Liquid Glass, the plus button keeps its normal image
         //      while selected; the selection shows under it. FlatDesign and the classic bar keep the selected image.
         // [CN] 与 iOS 相同（docs/PlusButton.md）：液态玻璃下 PlusButton 有自己的页面时，选中后仍显示普通图片，选中效果显示在其下方。

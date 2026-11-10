@@ -25,7 +25,9 @@ object CYLTabBarConfiguration {
 
     /** [EN] `CYLTabBarConfigurationError` codes (the iOS values). [CN] 错误码（与 iOS 相同）。 */
     enum class CYLTabBarConfigurationError(val code: Int) {
-        FileNotFound(1), UnknownFormat(2), InvalidSyntax(3), NotADictionary(4), Network(5), Empty(6), TooLarge(7), TooDeep(8), NoTabs(9), MainThreadRequired(10), NoPages(11);
+        FileNotFound(1), UnknownFormat(2), InvalidSyntax(3), NotADictionary(4), Network(5), Empty(6), TooLarge(7), TooDeep(8), NoTabs(9), MainThreadRequired(10), NoPages(11),
+        // [EN] Manifests (docs/Configuration-Manifest.md), as on iOS. [CN] 配置清单（docs/Configuration-Manifest.md），与 iOS 相同。
+        UnsupportedManifest(12), NotEligible(13), AssetInvalid(14);
 
         companion object {
             /** [EN] The error of a parser error code (`UnsupportedFormat` is `UnknownFormat`). [CN] 解析器错误码对应的错误（`UnsupportedFormat` 即 `UnknownFormat`）。 */
@@ -77,8 +79,55 @@ object CYLTabBarConfiguration {
         val configuration = parse(data, CYLTabBarConfigurationParser.formatForPathExtension(path.substringAfterLast('/').substringAfterLast('.', "")))
         if (CYLConstants.CYLTabBarControllerLocalization !in configuration) return configuration
         // [EN] A relative `CYLTabBarLocalizationPath` is resolved against this file (or asset). [CN] 相对的 `CYLTabBarLocalizationPath` 相对于本文件（或 asset）。
-        val source = if (file.isFile) (file.absoluteFile.parent ?: "") else "asset:" + path.substringBeforeLast('/', "")
+        val source = if (file.isFile) (file.absoluteFile.parent ?: "") else CYLResourceRoute.ASSET_PREFIX + path.substringBeforeLast('/', "")
         return configuration + (CYLTabBarConfigurationLocalization.FILE_DIRECTORY_KEY to source)
+    }
+
+    /**
+     * [EN] `+configurationWithRoute:error:`: the configuration file a resource route points to (`CYLResourceRoute`,
+     *      docs/Resource-Routes.md), e.g. "bundle:Configurations?name=tabbar" or
+     *      "sandbox:Caches/tabbar?name=tabbar&theme=dark&version=2.1&format=json"; `FileNotFound` when it matches no file.
+     * [CN] 读取资源路由（`CYLResourceRoute`，docs/Resource-Routes.md）指向的配置文件，例如 "bundle:Configurations?name=tabbar" 或
+     *      "sandbox:Caches/tabbar?name=tabbar&theme=dark&version=2.1&format=json"；没有匹配的文件时抛出 `FileNotFound`。
+     */
+    @JvmStatic
+    @Throws(CYLConfigurationException::class)
+    fun configurationWithRoute(context: Context, route: String): Map<String, Any?> {
+        val path = CYLResourceRoute.pathForRoute(context, route)?.takeIf { it.isNotEmpty() }
+            ?: throw CYLConfigurationException(CYLTabBarConfigurationError.FileNotFound, "No configuration file matches the route \"$route\".")
+        return configurationWithContentsOfFile(context, path)
+    }
+
+    /**
+     * [EN] `CYLTabBarControllerConfigurationRoute`: the routed file's keys, then the other keys of `configuration` over them;
+     *      a route that matches no file is logged and ignored, as on iOS.
+     * [CN] `CYLTabBarControllerConfigurationRoute`：先取路由指向文件中的键，再用 `configuration` 中的其他键覆盖；没有匹配文件的路由会打印日志
+     *      并被忽略，与 iOS 相同。
+     */
+    @JvmStatic
+    fun withRoutedFile(context: Context, configuration: Map<String, Any?>): Map<String, Any?> {
+        val withManifest = withManifest(context, configuration)
+        if (withManifest !== configuration) return withRoutedFile(context, withManifest)
+        val route = configuration[CYLConstants.CYLTabBarControllerConfigurationRoute] ?: return configuration
+        val rest = configuration - CYLConstants.CYLTabBarControllerConfigurationRoute
+        val file = (route as? String)?.let { runCatching { configurationWithRoute(context, it) }.getOrNull() }
+        if (file == null) {
+            android.util.Log.w("CYLTabBarController", "configuration: invalid ${CYLConstants.CYLTabBarControllerConfigurationRoute}: $route")
+            return rest
+        }
+        return file + rest
+    }
+
+    /** [EN] `CYLTabBarControllerManifestRoute`: a manifest the app may use, as a configuration, under the other keys. [CN] 本 App 可以使用的清单，转换为配置，再由其他键覆盖。 */
+    private fun withManifest(context: Context, configuration: Map<String, Any?>): Map<String, Any?> {
+        val route = configuration[CYLConstants.CYLTabBarControllerManifestRoute] ?: return configuration
+        val rest = configuration - CYLConstants.CYLTabBarControllerManifestRoute
+        val manifest = (route as? String)?.let { runCatching { CYLTabBarManifest.manifestWithRoute(context, it) }.getOrNull() }?.takeIf { it.isEligible() }
+        if (manifest == null) {
+            android.util.Log.w("CYLTabBarController", "configuration: invalid ${CYLConstants.CYLTabBarControllerManifestRoute}: $route")
+            return rest
+        }
+        return manifest.configuration() + rest
     }
 
     /** [EN] Reads at most 5 MB (API 23: no `readNBytes`). [CN] 最多读取 5 MB（API 23 没有 `readNBytes`）。 */
@@ -238,6 +287,15 @@ object CYLTabBarConfiguration {
         return if (numbers.size == count && numbers.all { it.isFinite() }) numbers else null
     }
 
+    /** [EN] Icon rendering modes (#787). [CN] 图标渲染方式（#787）。 */
+    const val ICON_RENDERING_TEMPLATE = "template"
+    const val ICON_RENDERING_ORIGINAL = "original"
+    private val iconRenderingModes = setOf(ICON_RENDERING_TEMPLATE, ICON_RENDERING_ORIGINAL, "automatic")
+
+    /** [EN] `CYLTabBarItemIconRenderingMode` (#787), lowercased; null when not one of the three. [CN] 转为小写的渲染方式；不是三者之一时为 null。 */
+    @JvmStatic
+    fun iconRenderingModeValue(value: Any?): String? = (value as? String)?.lowercase()?.takeIf { it in iconRenderingModes }
+
     /** [EN] A BOOL: true / false, yes / no, 1 / 0. [CN] 布尔值。 */
     @JvmStatic
     fun boolValue(value: Any?): Boolean? = when (value) {
@@ -271,11 +329,14 @@ object CYLTabBarConfiguration {
             else -> emptyList()
         }
         val seen = HashSet<String>()
+        val iconDefaults = iconDefaults(normalized)
         normalized[CYLConstants.CYLTabBarControllerTabBarItemsAttributes] = items.map { item ->
             val references = LinkedHashMap<String, String>()
             itemReferences += references
             val raw = (item as? Map<*, *>)?.entries?.associate { it.key.toString() to it.value } ?: return@map emptyMap<String, Any?>()
-            val attributes = (if (initialValues != null) CYLConfigurationThemes.resolve(raw, initialValues, references) else raw).toMutableMap()
+            // [EN] FIX: issue #787 — the bar's icon defaults, for a tab without its own. [CN] TabBar 的图标默认值，用于没有单独设置的 Tab。
+            val attributes = (if (initialValues != null) CYLConfigurationThemes.resolve(iconDefaults + raw, initialValues, references) else iconDefaults + raw).toMutableMap()
+            normalizeIconRenderingMode(attributes)
             val tab = com.cyl.tabbar.pages.TabItem(attributes)
             val reason = TabConfiguration.exclusionReason(tab, platform, appVersion)
             if (reason != null) {
@@ -284,16 +345,7 @@ object CYLTabBarConfiguration {
                     CYLConstants.CYLTabBarItemIdentifier to attributes[CYLConstants.CYLTabBarItemIdentifier],
                     CYLConstants.CYLTabBarItemPageIdentifier to attributes[CYLConstants.CYLTabBarItemPageIdentifier])
             }
-            val identifier = attributes[CYLConstants.CYLTabBarItemIdentifier] as? String
-            if (identifier != null) {
-                var unique: String = identifier
-                var n = 2
-                while (!seen.add(unique)) {
-                    unique = "$identifier-$n"
-                    n++
-                }
-                attributes[CYLConstants.CYLTabBarItemIdentifier] = unique
-            }
+            (attributes[CYLConstants.CYLTabBarItemIdentifier] as? String)?.let { attributes[CYLConstants.CYLTabBarItemIdentifier] = uniqueIdentifier(it, seen) }
             attributes
         }
         normalized[CYLConstants.CYLTabBarControllerPageLookupOrder] =
@@ -306,6 +358,36 @@ object CYLTabBarConfiguration {
         }
         return normalized
     }
+
+    /** [EN] `CYLTabBarItemIconRenderingMode` lowercased, or removed with a warning when unknown (#787). [CN] 渲染方式转为小写；未知值输出警告并移除（#787）。 */
+    private fun normalizeIconRenderingMode(attributes: MutableMap<String, Any?>) {
+        val mode = attributes[CYLConstants.CYLTabBarItemIconRenderingMode] ?: return
+        val valid = iconRenderingModeValue(mode)
+        if (valid != null) {
+            attributes[CYLConstants.CYLTabBarItemIconRenderingMode] = valid
+        } else {
+            android.util.Log.w("CYLTabBarController", "configuration: invalid ${CYLConstants.CYLTabBarItemIconRenderingMode}: $mode")
+            attributes.remove(CYLConstants.CYLTabBarItemIconRenderingMode)
+        }
+    }
+
+    /** [EN] `identifier`, or "identifier-2", "-3"... when `seen` has it; added to `seen`. [CN] `identifier`，已在 `seen` 中时为 "identifier-2"、"-3"……；并加入 `seen`。 */
+    private fun uniqueIdentifier(identifier: String, seen: MutableSet<String>): String {
+        var unique = identifier
+        var n = 2
+        while (!seen.add(unique)) {
+            unique = "$identifier-$n"
+            n++
+        }
+        return unique
+    }
+
+    /** [EN] The tab bar's icon keys (#787) as tab keys. [CN] TabBar 的图标键（#787），转为 Tab 的键。 */
+    private fun iconDefaults(configuration: Map<String, Any?>): Map<String, Any?> = listOf(
+        CYLConstants.CYLTabBarControllerIconRenderingMode to CYLConstants.CYLTabBarItemIconRenderingMode,
+        CYLConstants.CYLTabBarControllerIconColor to CYLConstants.CYLTabBarItemIconColor,
+        CYLConstants.CYLTabBarControllerSelectedIconColor to CYLConstants.CYLTabBarItemSelectedIconColor,
+    ).mapNotNull { (barKey, itemKey) -> configuration[barKey]?.let { itemKey to it } }.toMap()
 
     const val EXCLUDED_KEY = "_CYLTabBarItemExcluded"
     const val EXCLUSION_REASON_KEY = "_CYLTabBarItemExclusionReason"

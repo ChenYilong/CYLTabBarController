@@ -234,7 +234,8 @@ static UIColor *CYLGalleryGray(CGFloat white) {
 
 #pragma mark - Navigation controller
 
-/// [EN] Light navigation bar; pages pushed after the root hide the tab bar. [CN] 浅色导航栏；根页面之后 push 的页面隐藏 TabBar。
+/// [EN] Light navigation bar; pages pushed after the root hide the tab bar, except under a list (the reselect scene).
+/// [CN] 浅色导航栏；根页面之后 push 的页面隐藏 TabBar，列表（重复点击场景）之下的除外。
 @interface CYLGalleryNavigationController : UINavigationController
 @end
 
@@ -257,7 +258,12 @@ static UIColor *CYLGalleryGray(CGFloat white) {
 }
 
 - (void)pushViewController:(UIViewController *)viewController animated:(BOOL)animated {
-    if (self.viewControllers.count > 0) {
+    // [EN] The reselect scene (a list at the root) keeps the tab bar on pushed pages: its rows say "tap the tab again to go
+    //      back", which needs the tab bar. Found while taking its screenshots: the bar was hidden, so it could not be done.
+    // [CN] 重复点击场景（根页面为列表）在 push 的页面上保留 TabBar：其行写着「再次点击 Tab 返回」，需要能看到 TabBar。截图时发现：
+    //      TabBar 被隐藏，因此无法操作。
+    BOOL keepsTabBar = [self.viewControllers.firstObject isKindOfClass:[CYLGalleryListViewController class]];
+    if (self.viewControllers.count > 0 && !keepsTabBar) {
         viewController.hidesBottomBarWhenPushed = YES;
     }
     [super pushViewController:viewController animated:animated];
@@ -521,6 +527,20 @@ static NSArray<NSDictionary *> *CYLGalleryAttributes(NSUInteger count, BOOL show
         [attributes addObject:item];
     }
     return attributes;
+}
+
+/// [EN] The tabs of the icon rendering mode scenes (#787), with the example's own colored images.
+/// [CN] 图标渲染方式场景（#787）的 Tab，使用示例自带的彩色图片。
+static NSArray<NSDictionary *> *CYLGalleryIconRenderingAttributes(void) {
+    return @[
+        @{ CYLTabBarItemTitle : @"Home", CYLTabBarItemImage : @"home_normal", CYLTabBarItemIdentifier : @"home",
+           CYLTabBarItemIconRenderingMode : @"template", CYLTabBarItemIconColor : UIColor.systemGrayColor, CYLTabBarItemSelectedIconColor : UIColor.systemRedColor },
+        @{ CYLTabBarItemTitle : @"Video", CYLTabBarItemImage : CYLGallerySymbol(@"play.rectangle", NO, 20), CYLTabBarItemIdentifier : @"video",
+           CYLTabBarItemIconRenderingMode : @"template" },
+        @{ CYLTabBarItemTitle : @"Fishpond", CYLTabBarItemImage : @"fishpond_highlight", CYLTabBarItemIdentifier : @"fishpond",
+           CYLTabBarItemIconRenderingMode : @"original", CYLTabBarItemIconColor : UIColor.systemGrayColor },
+        @{ CYLTabBarItemTitle : @"Account", CYLTabBarItemImage : @"account_highlight", CYLTabBarItemIdentifier : @"account" },
+    ];
 }
 
 static CYLTabBarController *CYLGalleryTabBarController(NSArray<UIViewController *> *pages, NSArray<NSDictionary *> *attributes,
@@ -1291,6 +1311,16 @@ static UIView *CYLGalleryStarView(void) {
                           CYLTabBarItemSelectedBackgroundColor : [color colorWithAlphaComponent:0.12] };
             });
             return CYLGalleryTabBarController(CYLGalleryPages(5, NO), attributes, CYLTabBarStyleTypeDefault, CYLGalleryContext);
+        }],
+        // [EN] Issue #787: Home and Video are templates (Home with its own gray / red icon colors, Video with the bar's tint),
+        //      Fishpond keeps its colors although it has an icon color ("original"), Account is "automatic" (drawn as is).
+        // [CN] Issue #787：Home 与 Video 为模板（Home 使用自己的灰 / 红图标颜色，Video 使用 TabBar 着色），Fishpond 虽有图标颜色仍保持原色
+        //      （"original"），Account 为 "automatic"（按原图绘制）。
+        [CYLGalleryScene sceneWithTitle:@"Icon rendering mode (#787)" subtitle:@"template: one image, two colors · original: own colors · automatic" builder:^UIViewController *{
+            return CYLGalleryTabBarController(CYLGalleryPages(4, NO), CYLGalleryIconRenderingAttributes(), CYLTabBarStyleTypeDefault, CYLGalleryContext);
+        }],
+        [CYLGalleryScene sceneWithTitle:@"Icon rendering mode on Liquid Glass (#787)" subtitle:@"template icons take the bar's tint without an icon color" builder:^UIViewController *{
+            return CYLGalleryTabBarController(CYLGalleryPages(4, NO), CYLGalleryIconRenderingAttributes(), CYLTabBarStyleTypeLiquidGlass, CYLGalleryContext);
         }],
         [CYLGalleryScene sceneWithTitle:@"Accessibility identifiers" subtitle:@"Each tab is app.tabBars.buttons[\"home\"] etc. in UI tests" builder:^UIViewController *{
             CYLTabBarController *tabBarController = [self defaultTabBarControllerWithCount:5];

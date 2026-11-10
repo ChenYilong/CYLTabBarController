@@ -48,6 +48,11 @@ class CYLTabBarItem(attributes: Map<String, Any?> = emptyMap()) {
     var cyl_tabBarItemIdentifier: String? = attributes[CYLConstants.CYLTabBarItemIdentifier] as? String
     /** [EN] `CYLTabBarItemSelectedTitle` (#433): the title shown while selected. [CN] 选中时显示的标题（#433）。 */
     var cyl_selectedTitle: String? = attributes[CYLConstants.CYLTabBarItemSelectedTitle] as? String
+    /**
+     * [EN] `CYLTabBarItemIconRenderingMode` (#787): "template", "original" or "automatic" (null: automatic).
+     * [CN] `CYLTabBarItemIconRenderingMode`（#787）："template"、"original" 或 "automatic"（null 即 automatic）。
+     */
+    var cyl_iconRenderingMode: String? = CYLTabBarConfiguration.iconRenderingModeValue(attributes[CYLConstants.CYLTabBarItemIconRenderingMode])
     /** [EN] The tab's animation file URL (Lottie, PAG, Rive...) and view size. [CN] 该 Tab 的动画文件 URL 与视图尺寸。 */
     var cyl_tabBarItemAnimationURL: String? = null
     var cyl_tabBarItemAnimationSizeValue: CYLSize? = null

@@ -9,80 +9,17 @@ import CYLTabBarController
 import UIKit
 class MainTabBarController: CYLTabBarController {
     
-    // MARK: - Your main designated initializer
-    override init(
-        viewControllers: [UIViewController],
-        tabBarItemsAttributes: [[AnyHashable: Any]],
-        imageInsets: UIEdgeInsets,
-        titlePositionAdjustment: UIOffset,
-        
-        context: String?
-    ) {
-        super.init(
-            viewControllers: viewControllers,
-            tabBarItemsAttributes: tabBarItemsAttributes,
-            imageInsets: imageInsets,
-            titlePositionAdjustment: titlePositionAdjustment,
-            context: context
-        )
-    }
-    override init(
-        viewControllers: [UIViewController],
-        tabBarItemsAttributes: [[AnyHashable: Any]],
-        imageInsets: UIEdgeInsets,
-        titlePositionAdjustment: UIOffset,
-        styleType: CYLTabBarStyleType,
-        context: String?
-    ) {
-        super.init(
-            viewControllers: viewControllers,
-            tabBarItemsAttributes: tabBarItemsAttributes,
-            imageInsets: imageInsets,
-            titlePositionAdjustment: titlePositionAdjustment,
-            styleType: styleType,
-            context: context
-        )
-    }
-  
-//    override init() {
-//            super.init()
-//    }
+    // [EN] No designated initializer here, so every initializer of CYLTabBarController is inherited, `init(coder:)` and
+    //      `init(nibName:bundle:)` included: the ObjC initializers forward through `self`, and an initializer that a Swift
+    //      subclass loses fails with "Use of unimplemented initializer".
+    // [CN] 这里不声明指定初始化方法，因此继承 CYLTabBarController 的全部初始化方法（包括 `init(coder:)` 与 `init(nibName:bundle:)`）：
+    //      ObjC 初始化方法通过 `self` 互相转发，Swift 子类缺失的初始化方法会报错 "Use of unimplemented initializer"。
 
-    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
-            super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
-    }
-
-//    required init(coder aDecoder: NSCoder) {
-//            super.init(coder: aDecoder)
-//    }
-
-    
     convenience init(context: String = "") {
         let imageInsets = UIEdgeInsets.zero
         let titlePositionAdjustment = UIOffset(horizontal: 0, vertical: -3.5)
         
         self.init(viewControllers: Self.makeViewControllers(), tabBarItemsAttributes: Self.makeTabBarItemsAttributes(), imageInsets: imageInsets, titlePositionAdjustment: titlePositionAdjustment, context: context)
-    }
-    // MARK: - REQUIRED by UIKit (🔥 Fix here)
-//    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
-//        
-//        let imageInsets = UIEdgeInsets.zero
-//        let titlePositionAdjustment = UIOffset(horizontal: 0, vertical: -3.5)
-//        
-//        super.init(
-//            viewControllers: Self.makeViewControllers(),
-//            tabBarItemsAttributes: Self.makeTabBarItemsAttributes(),
-//            imageInsets: imageInsets,
-//            titlePositionAdjustment: titlePositionAdjustment,
-//            context: ""
-//        )
-//        
-////        self.tabBarStyleType = .liquidGlass
-//    }
-    
-    // MARK: - REQUIRED
-    required init?(coder _: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
     }
     
     override func viewDidLoad() {

@@ -26,6 +26,7 @@
 | [使用 Carthage 集成](Carthage.md) | [Integrating with Carthage](Carthage.md) |
 | [一个配置文件生成 TabBarController](Configuration-File.md) | [One configuration file, one TabBarController](Configuration-File.md) |
 | [配置文件的本地化文本](Configuration-Localization.md) | [Localized texts in a configuration file](Configuration-Localization.md) |
+| [TabBar 配置清单](Configuration-Manifest.md) | [Tab bar configuration manifest](Configuration-Manifest.md) |
 | [配置文件相关脚本：导出、边界情况与测试](Configuration-Scripts.md) | [Configuration scripts: export, edge cases and tests](Configuration-Scripts.md) |
 | [React Native 与 Flutter 组件](Cross-Platform-Components.md) | [React Native and Flutter components](Cross-Platform-Components.md) |
 | [自定义 TabBar 功能清单](Custom-Tab-Bar-Features.md) | [Custom Tab Bar Feature Checklist](Custom-Tab-Bar-Features.md) |
@@ -51,6 +52,7 @@
 | [PlusButton 的实现：真实按钮、液态玻璃替身与选中态图片](PlusButton.md) | [How the PlusButton works: the real button, its Liquid Glass stand-in and selected images](PlusButton.md) |
 | [在任意位置获取导航控制器并 Push](Push-From-Anywhere.md) | [Get the navigation controller and push from anywhere](Push-From-Anywhere.md) |
 | [React Native 接入：react-native-cyltabbar](React-Native-Component.md) | [React Native integration: react-native-cyltabbar](React-Native-Component.md) |
+| [资源路由](Resource-Routes.md) | [Resource routes](Resource-Routes.md) |
 | [Rive 动画 Tab 图标（与 Lottie、PAG 用法相同）](Rive-Animation.md) | [Rive animated tab icons (used like Lottie and PAG)](Rive-Animation.md) |
 | [selectedIndex 与 PlusButton：选中的文字与图片一致](SelectedIndex-PlusButton.md) | [selectedIndex and the PlusButton: the selected title and image match](SelectedIndex-PlusButton.md) |
 | [在 Swift 项目中使用 CYLTabBarController](Swift-Guide.md) | [Using CYLTabBarController in Swift](Swift-Guide.md) |
@@ -106,6 +108,7 @@ docs/
 ├── Carthage.md
 ├── Configuration-File.md
 ├── Configuration-Localization.md
+├── Configuration-Manifest.md
 ├── Configuration-Scripts.md
 ├── Cross-Platform-Components.md
 ├── Custom-Tab-Bar-Features.md
@@ -134,6 +137,7 @@ docs/
 ├── Push-From-Anywhere.md
 ├── README.md
 ├── React-Native-Component.md
+├── Resource-Routes.md
 ├── Rive-Animation.md
 ├── SelectedIndex-PlusButton.md
 ├── Swift-Guide.md
@@ -164,10 +168,17 @@ docs/
 │   ├── android-liquid-glass-surface-040.png
 │   ├── android-liquid-glass-surface-100.png
 │   ├── android-liquid-glass-surface-slider.png
+│   ├── carthage-example-ios.png
+│   ├── configuration-demo-json-zh-hans.png
 │   ├── configuration-localization-en.png
 │   ├── configuration-localization-zh-hans.png
+│   ├── configuration-manifest-christmas.png
+│   ├── configuration-manifest-light.png
+│   ├── configuration-manifest-themes-bar.png
 │   ├── demo-test-list-objc-classic.png
 │   ├── docs-navigation-index.png
+│   ├── flat-design-more-icon-fix-ios.png
+│   ├── flatdesign-standard-appearance-ios.png
 │   ├── flatdesign-standard-appearance-mapping.svg
 │   ├── flutter-component-android-bar.png
 │   ├── flutter-component-android.png
@@ -180,14 +191,19 @@ docs/
 │   ├── gif-classic.png
 │   ├── gif-flat-design.png
 │   ├── gif-liquid-glass.png
+│   ├── image-only-tabs-ios.png
+│   ├── liquid-glass-robustness-more-ios.png
+│   ├── liquid-glass-robustness-plus-stand-in-ios.png
 │   ├── login-required-tabs-flow.svg
 │   ├── login-required-tabs-flutter-ios-logged-in.png
 │   ├── login-required-tabs-react-native-android-alert.png
+│   ├── more-tab-eight-tabs-liquid-glass-ios.png
 │   ├── pag-animation-tab-icons.png
 │   ├── pag-animation-test-list.png
 │   ├── pag-classic.png
 │   ├── pag-flat-design.png
 │   ├── pag-liquid-glass.png
+│   ├── per-tab-animation-pag-ios.png
 │   ├── plus-child-theme-switching.png
 │   ├── plusbutton-background-image-liquid-glass-selected.png
 │   ├── plusbutton-background-image-liquid-glass-swiftui.png
@@ -203,9 +219,11 @@ docs/
 │   ├── plusbutton-overlap-lg.png
 │   ├── plusbutton-slot-flatdesign.png
 │   ├── plusbutton-slot-liquid-glass-titles-changed.png
+│   ├── plusbutton-subview-touches-ios.png
 │   ├── plusbutton-subview-touches-issue-202.png
 │   ├── plusbutton-touchable-area-1x.png
 │   ├── plusbutton-touchable-area-2x.png
+│   ├── push-from-anywhere-ios.png
 │   ├── react-native-component-android-bar.png
 │   ├── react-native-component-android.png
 │   ├── react-native-component-ios-bar.png
@@ -222,6 +240,7 @@ docs/
 │   ├── readme-english-before-reading.png
 │   ├── readme-english-bilingual-contents.png
 │   ├── readme-english-header-badges.png
+│   ├── resource-route-sandbox-zh-hans.png
 │   ├── rive-animation-onboarding-button.png
 │   ├── rive-animation-plus-button.png
 │   ├── rive-animation-search-tab-frames.png
@@ -231,7 +250,11 @@ docs/
 │   ├── rive-classic.png
 │   ├── rive-flat-design.png
 │   ├── rive-liquid-glass.png
+│   ├── swiftui-integration-ios.png
+│   ├── swiftui-plus-title-blur-ios.png
 │   ├── tab-accessibility-labels-after-title-change.png
+│   ├── tab-bar-gallery-sections-ios.png
+│   ├── tab-custom-action-ios.png
 │   ├── tab-interactions-long-press-classic.png
 │   ├── tab-interactions-long-press-flatdesign.png
 │   ├── tab-interactions-long-press-liquid-glass.png
@@ -243,6 +266,12 @@ docs/
 │   ├── tab-interactions-swipe-classic.png
 │   ├── tab-interactions-swipe-liquid-glass.png
 │   ├── tab-interactions-swipe-login-classic.png
+│   ├── tab-item-icon-rendering-android.png
+│   ├── tab-item-icon-rendering-ios.png
+│   ├── tab-item-positioning-ios.png
+│   ├── tab-page-registry-android.png
+│   ├── tab-reselect-pop-to-root-ios.png
+│   ├── tabbaritem-gestures-ios.png
 │   ├── theme-switching-flat-design.png
 │   ├── theme-switching-holiday-icons.png
 │   ├── theme-switching-liquid-glass.png

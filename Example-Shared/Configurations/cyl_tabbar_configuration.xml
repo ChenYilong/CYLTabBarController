@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- XML: elements are keys; <item> children make a list; an <item> may also use attributes. -->
+<!-- XML：元素即键；<item> 子元素组成列表；<item> 也可以使用属性。 -->
+<CYLTabBarController>
+    <CYLTabBarControllerContext>CYLConfigurationDemo</CYLTabBarControllerContext>
+    <CYLTabBarControllerLocalization>
+        <CYLTabBarLocalizationTableName>ConfigurationDemo</CYLTabBarLocalizationTableName>
+        <CYLTabBarLocalizationPath>Localization</CYLTabBarLocalizationPath>
+    </CYLTabBarControllerLocalization>
+    <CYLTabBarControllerThemeManagerName>CYLConfigurationDemo</CYLTabBarControllerThemeManagerName>
+    <CYLTabBarControllerThemeIdentifier>light</CYLTabBarControllerThemeIdentifier>
+    <CYLTabBarControllerDarkThemeIdentifier>dark</CYLTabBarControllerDarkThemeIdentifier>
+    <CYLTabBarControllerThemes>
+        <light>
+            <CYLTabBarItemSelectedTitleColor>#007AFF</CYLTabBarItemSelectedTitleColor>
+            <CYLTabBarItemSelectedIconColor>#007AFF</CYLTabBarItemSelectedIconColor>
+        </light>
+        <dark>
+            <CYLTabBarItemSelectedTitleColor>#0A84FF</CYLTabBarItemSelectedTitleColor>
+            <CYLTabBarItemSelectedIconColor>#0A84FF</CYLTabBarItemSelectedIconColor>
+            <CYLTabBarBackgroundColor>#1C1C1E</CYLTabBarBackgroundColor>
+        </dark>
+    </CYLTabBarControllerThemes>
+    <CYLTabBarControllerStyleType>default</CYLTabBarControllerStyleType>
+    <CYLTabBarControllerImageInsets>{0, 0, 0, 0}</CYLTabBarControllerImageInsets>
+    <CYLTabBarControllerTitlePositionAdjustment>{0, -2}</CYLTabBarControllerTitlePositionAdjustment>
+    <CYLTabBarControllerTabBarItemsAttributes>
+        <item>
+            <CYLTabBarItemTitle>XML</CYLTabBarItemTitle>
+            <CYLTabBarItemImage>system:house</CYLTabBarItemImage>
+            <CYLTabBarItemSelectedImage>system:house.fill</CYLTabBarItemSelectedImage>
+            <CYLTabBarItemIdentifier>home</CYLTabBarItemIdentifier>
+        </item>
+        <item CYLTabBarItemTitle="Message" CYLTabBarItemImage="system:message" CYLTabBarItemSelectedImage="system:message.fill"
+              CYLTabBarItemIdentifier="message" CYLTabBarItemPlatforms="ios,android"/>
+        <item CYLTabBarItemTitle="Discover" CYLTabBarItemImage="system:safari" CYLTabBarItemSelectedImage="system:safari.fill"
+              CYLTabBarItemIdentifier="discover" CYLTabBarItemPageIdentifier="web"
+              CYLTabBarItemImageInsets="{1, 0, -1, 0}">
+            <CYLTabBarItemPageParameters>
+                <url>https://github.com/ChenYilong/CYLTabBarController</url>
+            </CYLTabBarItemPageParameters>
+        </item>
+        <item CYLTabBarItemTitle="Me" CYLTabBarItemImage="system:person" CYLTabBarItemSelectedImage="system:person.fill"
+              CYLTabBarItemIdentifier="me" CYLTabBarItemMinimumAppVersion="1.0.0"
+              CYLTabBarItemTitlePositionAdjustment="{0, -1}"/>
+    </CYLTabBarControllerTabBarItemsAttributes>
+</CYLTabBarController>

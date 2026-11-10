@@ -31,6 +31,17 @@ public final class CYLConstants {
     public static final String CYLTabBarItemSelectedTitleColor = "CYLTabBarItemSelectedTitleColor";
     public static final String CYLTabBarItemIconColor = "CYLTabBarItemIconColor";
     public static final String CYLTabBarItemSelectedIconColor = "CYLTabBarItemSelectedIconColor";
+    /**
+     * [EN] FIX: issue #787. How a tab's icon takes its colors: "template" (tinted with the icon colors, else the bar's tint;
+     *      one image serves both states), "original" (keeps its own colors, even with an icon color set) or "automatic"
+     *      (default: tinted when it has an icon color). The controller keys are the defaults of every tab without its own.
+     * [CN] FIX: issue #787。Tab 图标如何取色："template"（用图标颜色着色，否则用 TabBar 的着色；一张图用于两种状态）、"original"
+     *      （保持原色，即使设置了图标颜色）或 "automatic"（默认：有图标颜色时着色）。Controller 级的键是没有单独设置的所有 Tab 的默认值。
+     */
+    public static final String CYLTabBarItemIconRenderingMode = "CYLTabBarItemIconRenderingMode";
+    public static final String CYLTabBarControllerIconRenderingMode = "CYLTabBarControllerIconRenderingMode";
+    public static final String CYLTabBarControllerIconColor = "CYLTabBarControllerIconColor";
+    public static final String CYLTabBarControllerSelectedIconColor = "CYLTabBarControllerSelectedIconColor";
     public static final String CYLTabBarItemBackgroundColor = "CYLTabBarItemBackgroundColor";
     public static final String CYLTabBarItemSelectedBackgroundColor = "CYLTabBarItemSelectedBackgroundColor";
     public static final String CYLTabBarItemTitleFont = "CYLTabBarItemTitleFont";
@@ -133,6 +144,10 @@ public final class CYLConstants {
     public static final String CYLTabBarControllerSwipeToSwitchTab = "CYLTabBarControllerSwipeToSwitchTab";
     /** [EN] The identifiers of the tabs that need login (`cyl_loginRequiredTabBarItemIdentifiers`, #19). [CN] 需要登录的 Tab 的标识（#19）。 */
     public static final String CYLTabBarControllerLoginRequiredTabBarItemIdentifiers = "CYLTabBarControllerLoginRequiredTabBarItemIdentifiers";
+    /** [EN] A memory warning unloads the unselected tabs (`unloadsUnselectedViewsOnMemoryWarning`, #426). [CN] 内存警告时卸载未选中的 Tab（#426）。 */
+    public static final String CYLTabBarControllerUnloadsUnselectedViewsOnMemoryWarning = "CYLTabBarControllerUnloadsUnselectedViewsOnMemoryWarning";
+    /** [EN] The tabs a memory warning never unloads (`cyl_keepsLoadedTabBarItemIdentifiers`). [CN] 内存警告时不卸载的 Tab（`cyl_keepsLoadedTabBarItemIdentifiers`）。 */
+    public static final String CYLTabBarControllerKeepsLoadedTabBarItemIdentifiers = "CYLTabBarControllerKeepsLoadedTabBarItemIdentifiers";
     // [EN] Skins of a configuration (see CYLTabBarConfigurationTheme). [CN] 配置中的皮肤（见 CYLTabBarConfigurationTheme）。
     public static final String CYLTabBarControllerThemes = "CYLTabBarControllerThemes";
     public static final String CYLTabBarControllerThemeIdentifier = "CYLTabBarControllerThemeIdentifier";
@@ -141,6 +156,12 @@ public final class CYLConstants {
     // [EN] Localized texts of a configuration (see CYLTabBarConfigurationLocalization, docs/Configuration-File.md).
     // [CN] 配置中的本地化文本（见 CYLTabBarConfigurationLocalization、docs/Configuration-File.md）。
     public static final String CYLTabBarControllerLocalization = "CYLTabBarControllerLocalization";
+    // [EN] A resource route to a configuration file (CYLResourceRoute, docs/Resource-Routes.md); the other keys win over the file's.
+    // [CN] 指向配置文件的资源路由（CYLResourceRoute，docs/Resource-Routes.md）；其他键覆盖文件中的键。
+    public static final String CYLTabBarControllerConfigurationRoute = "CYLTabBarControllerConfigurationRoute";
+    // [EN] A resource route to a tab bar manifest (CYLTabBarManifest); the other keys win over its configuration.
+    // [CN] 指向 TabBar 配置清单的资源路由（CYLTabBarManifest）；其他键覆盖清单的配置。
+    public static final String CYLTabBarControllerManifestRoute = "CYLTabBarControllerManifestRoute";
     public static final String CYLTabBarLocalizationTableName = "CYLTabBarLocalizationTableName";
     public static final String CYLTabBarLocalizationPath = "CYLTabBarLocalizationPath";
     public static final String CYLTabBarLocalizationBundleName = "CYLTabBarLocalizationBundleName";

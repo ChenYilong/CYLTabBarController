@@ -8,7 +8,6 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
-import org.robolectric.Robolectric
 import org.robolectric.Shadows.shadowOf
 import java.time.Duration
 
@@ -18,21 +17,11 @@ class CYLTestPage : Fragment() {
 }
 
 /**
- * [EN] What the Robolectric tests of the tab bar controller share: an activity, the main looper, and a controller on screen.
- * [CN] TabBarController 的 Robolectric 测试共用的部分：Activity、主线程 looper，以及显示在屏幕上的控制器。
+ * [EN] What the Robolectric tests of the tab bar controller share besides CYLTestSupport.kt: the main looper run for a while, and a controller on screen.
+ * [CN] 除 CYLTestSupport.kt 外，TabBarController 的 Robolectric 测试共用的部分：运行一段时间的主线程 looper，以及显示在屏幕上的控制器。
  */
 abstract class CYLRobolectricTestCase {
-    protected fun attributes(vararg titles: String) = titles.map { mapOf(CYLConstants.CYLTabBarItemTitle to it, CYLConstants.CYLTabBarItemIdentifier to it.lowercase()) }
-
-    protected fun <T> withActivity(block: (FragmentActivity) -> T): T {
-        val controller = Robolectric.buildActivity(FragmentActivity::class.java).setup()
-        try {
-            return block(controller.get())
-        } finally {
-            controller.pause().stop().destroy()
-        }
-    }
-
+    /** [EN] Runs the main looper for `seconds`, so animators end (`withActivity` and `attributes` come from CYLTestSupport.kt). [CN] 让主线程 Looper 运行 `seconds` 秒，使动画结束（`withActivity` 与 `attributes` 来自 CYLTestSupport.kt）。 */
     protected fun idle(seconds: Long = 1) {
         shadowOf(Looper.getMainLooper()).idleFor(Duration.ofSeconds(seconds))
     }

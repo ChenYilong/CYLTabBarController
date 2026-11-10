@@ -35,19 +35,6 @@ class CYLTabBarStyleTest {
     private val statusBar = 63
     private val navigationBar = 48
 
-    private fun attributes(vararg titles: String) = titles.map { mapOf(CYLConstants.CYLTabBarItemTitle to it, CYLConstants.CYLTabBarItemIdentifier to it.lowercase()) }
-
-    private fun <T> withActivity(block: (FragmentActivity) -> T): T {
-        val activity = Robolectric.buildActivity(FragmentActivity::class.java).setup()
-        try {
-            return block(activity.get())
-        } finally {
-            activity.pause().stop().destroy()
-        }
-    }
-
-    private fun idle() = shadowOf(Looper.getMainLooper()).idle()
-
     /** [EN] Shows a controller in `style` with a status bar and a navigation bar, laid out on a 1080 × 2400 screen. [CN] 以 `style` 显示控制器，带状态栏与导航栏，在 1080 × 2400 的屏幕上布局。 */
     private fun show(activity: FragmentActivity, style: CYLEnums.CYLTabBarStyleType, vararg titles: String = arrayOf("Home", "Message", "Me")): CYLTabBarController {
         val controller = CYLTabBarController(activity, titles.map { Page() }, attributes(*titles), style, null)

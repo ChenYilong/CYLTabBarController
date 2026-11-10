@@ -589,6 +589,13 @@ static UIColor *CYLCloseSubviewCurrentColor = nil;
     [closeButton addTarget:button action:@selector(closeButtonTapped:) forControlEvents:UIControlEventTouchUpInside];
     [button addSubview:closeButton];
     button->_closeButton = closeButton;
+    // [EN] VoiceOver: the plus button is one accessibility element, so its X is offered as a custom action.
+    // [CN] VoiceOver：PlusButton 是一个无障碍元素，因此把其中的 X 作为自定义操作提供。
+    __weak CYLCloseSubviewPlusButtonSubclass *weakButton = button;
+    button.accessibilityCustomActions = @[ [[UIAccessibilityCustomAction alloc] initWithName:@"X" actionHandler:^BOOL(UIAccessibilityCustomAction *action) {
+        [weakButton closeButtonTapped:weakButton.closeButton];
+        return YES;
+    }] ];
     return button;
 }
 

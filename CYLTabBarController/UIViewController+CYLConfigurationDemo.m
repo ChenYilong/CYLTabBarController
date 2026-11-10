@@ -10,9 +10,17 @@
 #import "CYLLocalization.h"
 #import <objc/runtime.h>
 
-NSString *const CYLSampleConfigurationURLString = @"https://raw.githubusercontent.com/ChenYilong/CYLTabBarController/master/CYLTabBarController/Resources/CYLTabBarController.bundle/Configurations/cyl_tabbar_configuration.yaml";
+NSString *const CYLSampleConfigurationURLString = @"https://raw.githubusercontent.com/ChenYilong/CYLTabBarController/master/Example-Shared/Configurations/cyl_tabbar_configuration.yaml";
 
 static NSString *const CYLConfigurationDemoCellIdentifier = @"CYLConfigurationDemoCell";
+
+/// [EN] Text shown as is in every language: resource routes, file names and manifest themes. The annotation tells the
+///      static analyzer's localizability checker that this is intended.
+/// [CN] 在所有语言中原样显示的文字：资源路由、文件名与清单主题。该标注告知静态分析器的本地化检查这是有意为之。
+static NSString *CYLConfigurationDemoUntranslatedText(NSString *text) CYL_RETURNS_LOCALIZED_STRING;
+static NSString *CYLConfigurationDemoUntranslatedText(NSString *text) {
+    return text;
+}
 
 @interface CYLTabBarController (CYLConfigurationDemo)
 - (void)cyl_dismissConfigurationDemo;
@@ -77,7 +85,7 @@ static UIViewController *CYLConfigurationDemoPage(NSString *title, NSString *tex
 
 /*!
  * [EN] The pages of the sample files and the simulated failures, in the shared registry: "home", "message",
- *      "discover", "me", "tab" (one page per call), and "web", which shows the URL of its CYLTabBarItemPageParameters.
+ *      "discover", "me", "tab", "publish" (one page per call), and "web", which shows the URL of its CYLTabBarItemPageParameters.
  *      An app registers its own pages the same way, once at launch (see docs/Tab-Page-Registry.md).
  * [CN] 示例文件与模拟意外情况使用的页面，注册到全局注册表："home"、"message"、"discover"、"me"、"tab"（每次调用创建一个页面），以及
  *      显示其 CYLTabBarItemPageParameters 中 URL 的 "web"。App 以同样的方式在启动时注册一次自己的页面（见 docs/Tab-Page-Registry.md）。
@@ -88,7 +96,7 @@ static void CYLRegisterConfigurationDemoPages(void) {
         CYLTabBarPageRegistry *registry = CYLTabBarPageRegistry.sharedRegistry;
         [registry registerPageProvider:^UIViewController *(NSString *pageIdentifier, NSDictionary<NSString *, id> *tabAttributes) {
             return CYLConfigurationDemoPage(CYLConfigurationDemoTitle(pageIdentifier, tabAttributes), [NSString stringWithFormat:@"page ID: %@", pageIdentifier]);
-        } forPageIdentifiers:@[ @"home", @"message", @"discover", @"me", @"tab" ]];
+        } forPageIdentifiers:@[ @"home", @"message", @"discover", @"me", @"tab", @"publish" ]];
         [registry registerPageProvider:^UIViewController *(NSString *pageIdentifier, NSDictionary<NSString *, id> *tabAttributes) {
             NSDictionary *parameters = tabAttributes[CYLTabBarItemPageParameters];
             NSString *URLString = [parameters[@"url"] isKindOfClass:[NSString class]] ? parameters[@"url"] : @"(no url)";
@@ -97,10 +105,66 @@ static void CYLRegisterConfigurationDemoPages(void) {
     });
 }
 
+/*!
+ * [EN] Stands in for a download: copies the bundled samples into Caches/CYLConfigurationDemo with the names of
+ *      docs/Resource-Routes.md (tabbar@1.0.json, tabbar@2.0.json, tabbar-dark@1.0.json, tabbar-dark@2.0.yaml) and the
+ *      string tables in Localization/.
+ * [CN] 代替下载：把内置示例复制到 Caches/CYLConfigurationDemo，文件名遵循 docs/Resource-Routes.md（tabbar@1.0.json、tabbar@2.0.json、
+ *      tabbar-dark@1.0.json、tabbar-dark@2.0.yaml），字符串表放在 Localization/ 中。
+ */
+static void CYLCopySamplesIntoSandbox(NSString *samples) {
+    NSFileManager *manager = NSFileManager.defaultManager;
+    NSString *folder = [CYLResourceRoute pathForRoute:@"sandbox:Caches/CYLConfigurationDemo" baseDirectory:nil];
+    [manager removeItemAtPath:folder error:NULL];
+    [manager createDirectoryAtPath:folder withIntermediateDirectories:YES attributes:nil error:NULL];
+    NSDictionary<NSString *, NSString *> *copies = @{
+        @"tabbar@1.0.json" : @"cyl_tabbar_configuration.json",
+        @"tabbar@2.0.json" : @"cyl_tabbar_configuration.json",
+        @"tabbar-dark@1.0.json" : @"cyl_tabbar_configuration.json",
+        @"tabbar-dark@2.0.yaml" : @"cyl_tabbar_configuration.yaml",
+    };
+    [copies enumerateKeysAndObjectsUsingBlock:^(NSString *name, NSString *source, BOOL *stop) {
+        [manager copyItemAtPath:[samples stringByAppendingPathComponent:source] toPath:[folder stringByAppendingPathComponent:name] error:NULL];
+    }];
+    [manager copyItemAtPath:[samples stringByAppendingPathComponent:@"Localization"] toPath:[folder stringByAppendingPathComponent:@"Localization"] error:NULL];
+}
+
+/*!
+ * [EN] Stands in for a server: copies the built-in manifest and its 2.1.0 images into tmp/CYLManifestServer/, as a server
+ *      would publish them (assets next to the manifest), and returns the manifest's file URL. `broken`: one hash is wrong,
+ *      so the loader falls back.
+ * [CN] 代替服务器：把内置清单及其 2.1.0 图片复制到 tmp/CYLManifestServer/，与服务器发布的方式相同（资源位于清单旁边），返回清单的文件 URL。
+ *      `broken`：有一个哈希错误，因此加载器会回退。
+ */
+static NSURL *CYLPublishDemoManifest(BOOL broken) {
+    NSFileManager *manager = NSFileManager.defaultManager;
+    NSString *server = [NSTemporaryDirectory() stringByAppendingPathComponent:@"CYLManifestServer"];
+    NSString *skins = [CYLResourceRoute pathForRoute:@"bundle:Configurations/Skins/2.1.0" baseDirectory:nil];
+    [manager removeItemAtPath:server error:NULL];
+    [manager createDirectoryAtPath:server withIntermediateDirectories:YES attributes:nil error:NULL];
+    for (NSString *theme in [manager contentsOfDirectoryAtPath:skins error:NULL]) {
+        [manager copyItemAtPath:[skins stringByAppendingPathComponent:theme] toPath:[server stringByAppendingPathComponent:theme] error:NULL];
+    }
+    NSString *path = [CYLResourceRoute pathForRoute:@"bundle:Configurations/Manifests/cyl_tabbar_manifest.json" baseDirectory:nil];
+    NSMutableDictionary *manifest = [[NSJSONSerialization JSONObjectWithData:[NSData dataWithContentsOfFile:path] options:NSJSONReadingMutableContainers error:NULL] mutableCopy];
+    if (broken) {
+        manifest[@"version"] = @"9.0.0";
+        NSMutableArray *list = manifest[@"assets"][@"list"];
+        NSMutableDictionary *first = [list.firstObject mutableCopy];
+        first[@"hash"] = @"sha256-tampered";
+        list[0] = first;
+    }
+    NSString *published = [server stringByAppendingPathComponent:broken ? @"manifest-broken.json" : @"manifest.json"];
+    [[NSJSONSerialization dataWithJSONObject:manifest options:0 error:NULL] writeToFile:published atomically:YES];
+    return [NSURL fileURLWithPath:published];
+}
+
 @implementation UIViewController (CYLConfigurationDemo)
 
 + (NSArray<NSString *> *)cyl_sampleConfigurationFilePaths {
-    NSString *directory = [CYLResourceBundle().resourcePath stringByAppendingPathComponent:@"Configurations"];
+    // [EN] The samples belong to the app (Example-Shared/Configurations, bundled as "Configurations"), not to the library.
+    // [CN] 示例文件属于 App（Example-Shared/Configurations，以 "Configurations" 文件夹打包），不属于本库。
+    NSString *directory = [CYLResourceRoute pathForRoute:@"bundle:Configurations" baseDirectory:nil];
     NSArray<NSString *> *names = [[[NSFileManager defaultManager] contentsOfDirectoryAtPath:directory error:NULL]
                                   sortedArrayUsingSelector:@selector(compare:)];
     NSMutableArray<NSString *> *paths = [NSMutableArray array];
@@ -147,6 +211,83 @@ static void CYLRegisterConfigurationDemoPages(void) {
                                                         sourceText:CYLConfigurationSourceText(path, configuration)
                                                              error:error];
         }]];
+    }
+    // [EN] A resource route instead of a path (docs/Resource-Routes.md): the folder, then the file by name, theme, version, format.
+    // [CN] 用资源路由代替路径（docs/Resource-Routes.md）：先找目录，再按名称、主题、版本、格式选出文件。
+    NSString *route = @"bundle:Configurations?name=cyl_tabbar_configuration";
+    NSString *routedPath = [CYLResourceRoute pathForRoute:route baseDirectory:nil];
+    if (routedPath) {
+        [sheet addAction:[UIAlertAction actionWithTitle:CYLConfigurationDemoUntranslatedText(route) style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+            NSError *error = nil;
+            CYLTabBarController *tabBarController = [CYLTabBarController tabBarControllerWithConfigurationRoute:route error:&error];
+            NSDictionary *configuration = [CYLTabBarController configurationWithRoute:route error:NULL];
+            [weakSelf cyl_presentConfigurationDemoTabBarController:tabBarController
+                                                            source:[NSString stringWithFormat:@"%@\n→ %@", route, routedPath.lastPathComponent]
+                                                        sourceText:CYLConfigurationSourceText(routedPath, configuration)
+                                                             error:error];
+        }]];
+    }
+    // [EN] Resources downloaded into the sandbox: the samples are copied into Caches as a download would save them (several
+    //      versions and themes, and the string tables next to them), then the route picks one file.
+    // [CN] 下载到沙盒的资源：把示例文件按下载后的方式复制到 Caches（多个版本与主题，字符串表放在旁边），再由路由选出一个文件。
+    NSString *sandboxRoute = @"sandbox:Caches/CYLConfigurationDemo?name=tabbar&theme=dark";
+    if (routedPath) {
+        [sheet addAction:[UIAlertAction actionWithTitle:CYLConfigurationDemoUntranslatedText(sandboxRoute) style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+            CYLCopySamplesIntoSandbox(routedPath.stringByDeletingLastPathComponent);
+            NSError *error = nil;
+            CYLTabBarController *tabBarController = [CYLTabBarController tabBarControllerWithConfigurationRoute:sandboxRoute error:&error];
+            NSString *path = [CYLResourceRoute pathForRoute:sandboxRoute baseDirectory:nil];
+            NSDictionary *configuration = path ? [CYLTabBarController configurationWithContentsOfFile:path error:NULL] : nil;
+            [weakSelf cyl_presentConfigurationDemoTabBarController:tabBarController
+                                                            source:[NSString stringWithFormat:@"%@\n→ %@", sandboxRoute, path.lastPathComponent ?: @"-"]
+                                                        sourceText:CYLConfigurationSourceText(path, configuration)
+                                                             error:error];
+        }]];
+    }
+    // [EN] Manifests (docs/Configuration-Manifest.md): built in; downloaded (a local "server" folder) into the sandbox; and a
+    //      download whose asset fails its hash, which falls back to the cached or built-in manifest.
+    // [CN] 配置清单（docs/Configuration-Manifest.md）：App 内置；下载（本地模拟服务器目录）到沙盒；以及资源哈希校验失败的下载，回退到缓存或内置清单。
+    NSString *manifestRoute = @"bundle:Configurations/Manifests/cyl_tabbar_manifest.json";
+    if ([CYLResourceRoute pathForRoute:manifestRoute baseDirectory:nil] && [NSFileManager.defaultManager fileExistsAtPath:[CYLResourceRoute pathForRoute:manifestRoute baseDirectory:nil]]) {
+        for (NSString *theme in @[ @"light", @"christmas" ]) {
+            NSString *title = [NSString stringWithFormat:@"Manifest · %@ · %@", theme, manifestRoute];
+            [sheet addAction:[UIAlertAction actionWithTitle:CYLConfigurationDemoUntranslatedText(title) style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+                NSError *error = nil;
+                CYLTabBarManifest *manifest = [CYLTabBarManifest manifestWithRoute:manifestRoute error:&error];
+                CYLTabBarController *tabBarController = [manifest tabBarControllerWithError:&error];
+                // [EN] After the manifest registered its themes; a skin other than light / dark stops following the system.
+                // [CN] 在清单注册其主题之后；浅色 / 深色以外的皮肤停止跟随系统外观。
+                CYLThemeManager *manager = [CYLThemeManagerCenter themeManagerWithName:@"CYLConfigurationDemo"];
+                if (![theme isEqualToString:@"light"]) {
+                    if (@available(iOS 13.0, *)) {
+                        manager.respondsSystemStyleAutomatically = NO;
+                    }
+                    manager.identifierForTrait = nil;
+                }
+                manager.currentThemeIdentifier = theme;
+                [weakSelf cyl_presentConfigurationDemoTabBarController:tabBarController
+                                                                source:[NSString stringWithFormat:@"%@\nversion %@ · theme %@", manifestRoute, manifest.version, theme]
+                                                            sourceText:CYLConfigurationSourceText([CYLResourceRoute pathForRoute:manifestRoute baseDirectory:nil], manifest.dictionary)
+                                                                 error:error];
+            }]];
+        }
+        for (NSNumber *broken in @[ @NO, @YES ]) {
+            NSString *title = broken.boolValue ? @"Manifest · download with a bad asset → fallback" : @"Manifest · download into sandbox:Caches";
+            [sheet addAction:[UIAlertAction actionWithTitle:CYLConfigurationDemoUntranslatedText(title) style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+                NSURL *URL = CYLPublishDemoManifest(broken.boolValue);
+                CYLTabBarManifestLoader *loader = [[CYLTabBarManifestLoader alloc] init];
+                loader.embeddedManifestRoute = manifestRoute;
+                [loader loadManifestWithURL:URL completion:^(CYLTabBarManifest *manifest, CYLTabBarManifestSource source, NSError *error) {
+                    NSArray<NSString *> *sources = @[ @"none", @"remote", @"cache", @"embedded" ];
+                    NSError *createError = nil;
+                    CYLTabBarController *tabBarController = [manifest tabBarControllerWithError:&createError];
+                    NSString *summary = [NSString stringWithFormat:@"%@\nsource: %@ · version %@%@", URL.lastPathComponent, sources[(NSUInteger)source],
+                                         manifest.version ?: @"-", error ? [@"\nfallback because: " stringByAppendingString:error.localizedDescription] : @""];
+                    [weakSelf cyl_presentConfigurationDemoTabBarController:tabBarController source:summary
+                                                                sourceText:CYLConfigurationSourceText(nil, manifest.dictionary) error:createError];
+                }];
+            }]];
+        }
     }
     [sheet addAction:[UIAlertAction actionWithTitle:CYLLocalizedString(@"从网络 URL 加载") style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
         NSURL *URL = [NSURL URLWithString:CYLSampleConfigurationURLString];

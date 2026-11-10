@@ -82,6 +82,10 @@ static UIImage *CYLFlutterAssetImage(NSString *asset, NSObject<FlutterPluginRegi
             [weakChannel invokeMethod:@"onLoginStateChange" arguments:@(loggedIn)];
         };
         [self applyLoggedIn:arguments[@"loggedIn"]];
+        // [EN] Before the configuration, so it is built once, in this language. [CN] 在配置之前，使 TabBar 以该语言只创建一次。
+        [self applyLanguage:arguments[@"language"]];
+        _hostView.tabBarHidden = [arguments[@"tabBarHidden"] isKindOfClass:[NSNumber class]] && [arguments[@"tabBarHidden"] boolValue];
+        [self applyTitlePositionAdjustment:arguments[@"titlePositionAdjustment"]];
         id selectedIndex = arguments[@"selectedIndex"];
         _hostView.selectedIndex = [selectedIndex isKindOfClass:[NSNumber class]] ? [selectedIndex integerValue] : -1;
         id badgeValues = arguments[@"badgeValues"];
@@ -115,6 +119,19 @@ static UIImage *CYLFlutterAssetImage(NSString *asset, NSObject<FlutterPluginRegi
     _hostView.plusButtonBadgeAttributes = [value isKindOfClass:[NSDictionary class]] ? value : nil;
 }
 
+/// [EN] [horizontal, vertical], or null for the configuration's offset. [CN] [水平, 垂直]；null 时使用配置中的偏移。
+- (void)applyTitlePositionAdjustment:(id)value {
+    NSArray *offset = [value isKindOfClass:[NSArray class]] ? value : nil;
+    _hostView.titlePositionAdjustment = offset.count >= 2 && [offset[0] isKindOfClass:[NSNumber class]] && [offset[1] isKindOfClass:[NSNumber class]]
+        ? [NSValue valueWithUIOffset:UIOffsetMake([offset[0] doubleValue], [offset[1] doubleValue])]
+        : nil;
+}
+
+/// [EN] A language code, or null for the device language. [CN] 语言代码；null 表示设备语言。
+- (void)applyLanguage:(id)value {
+    _hostView.language = [value isKindOfClass:[NSString class]] && [value length] > 0 ? value : nil;
+}
+
 /// [EN] A bool sets the app's login state; null leaves it to the state the library cached. [CN] 布尔值设置 App 的登录状态；null 时使用库缓存的状态。
 - (void)applyLoggedIn:(id)value {
     if ([value isKindOfClass:[NSNumber class]]) {
@@ -146,6 +163,15 @@ static UIImage *CYLFlutterAssetImage(NSString *asset, NSObject<FlutterPluginRegi
         [self applyPlusButtonBadge:arguments];
     } else if ([call.method isEqualToString:@"setTabCoverImages"]) {
         [self applyTabCoverImages:arguments];
+    } else if ([call.method isEqualToString:@"setTitlePositionAdjustment"]) {
+        [self applyTitlePositionAdjustment:arguments];
+    } else if ([call.method isEqualToString:@"simulateMemoryWarning"]) {
+        result([_hostView simulateMemoryWarning]);
+        return;
+    } else if ([call.method isEqualToString:@"setTabBarHidden"]) {
+        _hostView.tabBarHidden = [arguments isKindOfClass:[NSNumber class]] && [arguments boolValue];
+    } else if ([call.method isEqualToString:@"setLanguage"]) {
+        [self applyLanguage:arguments];
     } else if ([call.method isEqualToString:@"setLoggedIn"]) {
         [self applyLoggedIn:arguments];
     } else {

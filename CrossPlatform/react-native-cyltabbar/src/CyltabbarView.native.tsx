@@ -10,9 +10,20 @@ export type CYLTabBarItem = {
   image?: CYLTabBarImage;
   selectedImage?: CYLTabBarImage;
   identifier?: string;
+  /**
+   * Issue #787: "template" (one image, tinted with `iconColor` / `selectedIconColor`, else the bar's tint), "original"
+   * (keeps its colors) or "automatic". Wins over the tab bar's `iconRenderingMode`.
+   */
+  iconRenderingMode?: CYLTabBarIconRenderingMode;
+  /** Icon colors such as "#8E8E93", unselected and selected. */
+  iconColor?: string;
+  selectedIconColor?: string;
   /** Any other key of the configuration file, e.g. CYLTabBarItemTitlePositionAdjustment. */
   [key: string]: unknown;
 };
+
+/** How a tab icon takes its colors (issue #787). */
+export type CYLTabBarIconRenderingMode = 'template' | 'original' | 'automatic';
 
 export type CYLTabBarPlusButton = {
   title?: string;
@@ -79,7 +90,23 @@ export type CYLTabBarProps = ViewProps & {
   swipeToSwitchTab?: boolean;
   /** The playback speed of the animated tab icons (1: the file's own). */
   animationSpeed?: number;
+  /** Issue #787: the icon rendering mode of every tab without its own. */
+  iconRenderingMode?: CYLTabBarIconRenderingMode;
+  /** The icon colors of every tab without its own, such as "#8E8E93", unselected and selected. */
+  iconColor?: string;
+  selectedIconColor?: string;
   plusButton?: CYLTabBarPlusButton;
+  /**
+   * A resource route to a configuration file built into the app or in its sandbox (docs/Resource-Routes.md), e.g.
+   * "bundle:Configurations?name=tabbar" or "sandbox:Caches/tabbar?name=tabbar&theme=dark". The file is read first;
+   * the other props and `configuration` win over its keys.
+   */
+  configurationRoute?: string;
+  /**
+   * A resource route to a tab bar manifest (docs/Configuration-Manifest.md): tabs, plus button, themes and their images,
+   * version, platforms. The manifest is read first; the other props and `configuration` win over it.
+   */
+  manifestRoute?: string;
   /** Any other key of the configuration file (docs/Configuration-File.md); it wins over the props above. */
   configuration?: Record<string, unknown>;
   selectedIndex?: number;
@@ -108,6 +135,31 @@ export type CYLTabBarProps = ViewProps & {
   onLoginRequest?: (index: number, identifier: string, title: string) => void;
   /** The login state the tab bar uses, sent once it is built: start from it to keep the login across launches. */
   onLoginStateChange?: (loggedIn: boolean) => void;
+  /**
+   * The language of the library's own texts (badge and plus button accessibility texts) and of the layout direction: a
+   * language code such as 'ar' or 'zh-Hans'; undefined for the device language. A right-to-left language lays the tab bar
+   * out right to left. The tab titles come from `items`: translate them there.
+   */
+  language?: string;
+  /**
+   * Hides or shows the tab bar, animated, in every style (`-[CYLTabBarController setTabBarHidden:animated:]`). A hidden
+   * tab bar takes no touches: the page under it gets them.
+   */
+  tabBarHidden?: boolean;
+  /**
+   * Issue #426: each increase simulates a memory warning once (`+[CYLTabBarController cyl_simulateMemoryWarningForTabBarController:]`);
+   * `onMemoryWarning` then reports what happened to each tab, one line per tab, in the library's language. The
+   * configuration decides what is unloaded (`CYLTabBarControllerUnloadsUnselectedViewsOnMemoryWarning`,
+   * `CYLTabBarControllerKeepsLoadedTabBarItemIdentifiers`).
+   */
+  memoryWarningRequest?: number;
+  onMemoryWarning?: (report: string) => void;
+  /**
+   * The title offset of every tab, [horizontal, vertical], set at runtime (`-[CYLTabBarController setTitlePositionAdjustment:]`)
+   * without building the tab bar again; it wins over `CYLTabBarControllerTitlePositionAdjustment` of the configuration. A
+   * plus button that aligns its title follows. Undefined keeps the configuration's.
+   */
+  titlePositionAdjustment?: [number, number];
 };
 
 /**
@@ -145,11 +197,17 @@ const CONTROLLER_KEYS: CYLKeyMap = [
   ['tapAnimation', 'CYLTabBarControllerTabButtonTapAnimation', 'truthy'],
   ['swipeToSwitchTab', 'CYLTabBarControllerSwipeToSwitchTab', 'defined'],
   ['animationSpeed', 'CYLTabBarControllerTabBarItemAnimationSpeed', 'defined'],
+  ['iconRenderingMode', 'CYLTabBarControllerIconRenderingMode', 'truthy'],
+  ['iconColor', 'CYLTabBarControllerIconColor', 'truthy'],
+  ['selectedIconColor', 'CYLTabBarControllerSelectedIconColor', 'truthy'],
 ];
 
 const ITEM_KEYS: CYLKeyMap = [
   ['title', 'CYLTabBarItemTitle', 'defined'],
   ['identifier', 'CYLTabBarItemIdentifier', 'defined'],
+  ['iconRenderingMode', 'CYLTabBarItemIconRenderingMode', 'truthy'],
+  ['iconColor', 'CYLTabBarItemIconColor', 'truthy'],
+  ['selectedIconColor', 'CYLTabBarItemSelectedIconColor', 'truthy'],
 ];
 
 const PLUS_BUTTON_KEYS: CYLKeyMap = [
@@ -180,9 +238,9 @@ function copyKeys(target: Record<string, unknown>, source: object, keys: CYLKeyM
   }
 }
 
-function itemAttributes({ title, image, selectedImage, identifier, ...rest }: CYLTabBarItem): Record<string, unknown> {
+function itemAttributes({ title, image, selectedImage, identifier, iconRenderingMode, iconColor, selectedIconColor, ...rest }: CYLTabBarItem): Record<string, unknown> {
   const item: Record<string, unknown> = { ...rest };
-  copyKeys(item, { title, identifier }, ITEM_KEYS);
+  copyKeys(item, { title, identifier, iconRenderingMode, iconColor, selectedIconColor }, ITEM_KEYS);
   addImage(item, 'CYLTabBarItemImage', image);
   addImage(item, 'CYLTabBarItemSelectedImage', selectedImage);
   return item;
@@ -199,6 +257,12 @@ function plusButtonAttributes(plusButton: CYLTabBarPlusButton): Record<string, u
 
 export function buildConfiguration(props: CYLTabBarProps): Record<string, unknown> {
   const configuration: Record<string, unknown> = {};
+  if (props.configurationRoute) {
+    configuration.CYLTabBarControllerConfigurationRoute = props.configurationRoute;
+  }
+  if (props.manifestRoute) {
+    configuration.CYLTabBarControllerManifestRoute = props.manifestRoute;
+  }
   copyKeys(configuration, props, CONTROLLER_KEYS);
   if (props.items) {
     configuration.CYLTabBarControllerTabBarItemsAttributes = props.items.map(itemAttributes);
@@ -232,12 +296,20 @@ export function CYLTabBar(props: CYLTabBarProps) {
     tapAnimation: _tapAnimation,
     swipeToSwitchTab: _swipeToSwitchTab,
     animationSpeed: _animationSpeed,
+    iconRenderingMode: _iconRenderingMode,
+    iconColor: _iconColor,
+    selectedIconColor: _selectedIconColor,
     onTabSelect,
     onPlusButtonPress,
     onTabLongPress,
     onLoginRequest,
     onLoginStateChange,
     loggedIn,
+    language,
+    tabBarHidden,
+    memoryWarningRequest,
+    onMemoryWarning,
+    titlePositionAdjustment,
     selectedIndex,
     badgeValues,
     plusButtonBadgeValue,
@@ -251,8 +323,8 @@ export function CYLTabBar(props: CYLTabBarProps) {
   const configuration = useMemo(
     () => JSON.stringify(buildConfiguration(props)),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [props.items, props.styleType, props.plusButton, props.configuration, props.userInterfaceStyle, props.tapAnimation,
-      props.swipeToSwitchTab, props.animationSpeed]
+    [props.items, props.styleType, props.plusButton, props.configuration, props.configurationRoute, props.manifestRoute, props.userInterfaceStyle, props.tapAnimation,
+      props.swipeToSwitchTab, props.animationSpeed, props.iconRenderingMode, props.iconColor, props.selectedIconColor]
   );
   return (
     <NativeCyltabbarView
@@ -267,6 +339,11 @@ export function CYLTabBar(props: CYLTabBarProps) {
       plusButtonBadgeStyle={plusButtonBadge ? JSON.stringify(plusButtonBadge) : ''}
       tabCoverImages={(tabCoverImages ?? []).map(imageValue)}
       loginState={loginStateValue(loggedIn)}
+      language={language ?? ''}
+      tabBarHidden={tabBarHidden ?? false}
+      memoryWarningRequest={memoryWarningRequest ?? 0}
+      titlePositionAdjustment={titlePositionAdjustment ?? []}
+      onMemoryWarning={(event) => onMemoryWarning?.(event.nativeEvent.report)}
       onLoginStateChange={(event) => onLoginStateChange?.(event.nativeEvent.loggedIn)}
       onLoginRequest={(event) =>
         onLoginRequest?.(event.nativeEvent.index, event.nativeEvent.identifier, event.nativeEvent.title)

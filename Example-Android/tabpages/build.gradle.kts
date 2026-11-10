@@ -39,5 +39,5 @@ dependencies {
 tasks.test {
     useJUnitPlatform()
     // The shared configuration file of the iOS library. iOS 库共用的配置文件。
-    systemProperty("cyl.sharedConfiguration", rootProject.file("../CYLTabBarController/Resources/CYLTabBarController.bundle/Configurations/cyl_tabbar_configuration.json").absolutePath)
+    systemProperty("cyl.sharedConfiguration", rootProject.file("../Example-Shared/Configurations/cyl_tabbar_configuration.json").absolutePath)
 }

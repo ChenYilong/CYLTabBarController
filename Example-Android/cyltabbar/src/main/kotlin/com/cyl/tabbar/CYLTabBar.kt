@@ -275,9 +275,19 @@ class CYLTabBarItemButton(context: Context, val item: CYLTabBarItem, val index: 
         return item.cyl_titleColor ?: controller?.cyl_tabBarItemTitleColor ?: tabBar.unselectedTintColor
     }
 
+    /**
+     * [EN] The icon's tint, or null to draw it as it is. FIX: issue #787 — "original" never tints; "template" always tints,
+     *      with the bar's tint colors when no icon color is set.
+     * [CN] 图标的着色；null 表示按原图绘制。FIX: issue #787——"original" 从不着色；"template" 总是着色，没有图标颜色时使用 TabBar 的着色。
+     */
     private fun iconColor(selected: Boolean, tabBar: CYLTabBar): Int? {
         val controller = tabBar.tabBarController
-        return if (selected) item.cyl_selectedIconColor ?: controller?.cyl_tabBarItemSelectedImageColor else item.cyl_iconColor ?: controller?.cyl_tabBarItemImageColor
+        val color = if (selected) item.cyl_selectedIconColor ?: controller?.cyl_tabBarItemSelectedImageColor else item.cyl_iconColor ?: controller?.cyl_tabBarItemImageColor
+        return when (item.cyl_iconRenderingMode) {
+            CYLTabBarConfiguration.ICON_RENDERING_ORIGINAL -> null
+            CYLTabBarConfiguration.ICON_RENDERING_TEMPLATE -> color ?: if (selected) tabBar.selectedTintColor else tabBar.unselectedTintColor
+            else -> color
+        }
     }
 
     /**
@@ -850,6 +860,27 @@ class CYLTabBar(context: Context) : ViewGroup(context) {
 
     private fun slotLeft(slot: Int): Int { var left = cyl_itemsFrame.left + slot * styleRenderer.itemSpacing(this); for (index in 0 until slot) left += slotWidths.getOrElse(index) { 0 }; return left }
 
+    /**
+     * [EN] Right to left: the language chosen with [CYLLocalization.language] when there is one, else the resolved layout
+     *      direction. The language decides on its own because Android resolves a view's direction to left to right in an
+     *      app without `android:supportsRtl="true"` (the Flutter template, for one).
+     * [CN] 是否从右到左：设置了 [CYLLocalization.language] 时由该语言决定，否则使用解析后的布局方向。由语言单独决定，是因为 App 未声明
+     *      `android:supportsRtl="true"` 时（例如 Flutter 模板），Android 会把视图方向解析为从左到右。
+     */
+    val cyl_isRightToLeftLayout: Boolean
+        get() = CYLLocalization.language?.let(CYLLocalization::isRightToLeft) ?: (layoutDirection == View.LAYOUT_DIRECTION_RTL)
+
+    /**
+     * [EN] Where a slot starts on screen: mirrored in a right-to-left layout (e.g. Arabic), so the first tab is on the
+     *      right, as iOS (`-changeXForChildView:…`).
+     * [CN] 槽位在屏幕上的起点：从右到左布局（如阿拉伯语）下镜像，使第一个 Tab 位于最右侧，与 iOS 相同（`-changeXForChildView:…`）。
+     */
+    private fun slotStart(slot: Int): Int {
+        val left = slotLeft(slot)
+        if (!cyl_isRightToLeftLayout) return left
+        return cyl_itemsFrame.left + cyl_itemsFrame.right - left - slotWidths.getOrElse(slot) { 0 }
+    }
+
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
         val density = resources.displayMetrics.density
         styleRenderer.itemsFrame(this, width, height, ((tabBarController?.tabBarHeight ?: CYLConstants.CYLTabBarHeight) * density).toInt(), cyl_safeAreaBottom, cyl_itemsFrame)
@@ -858,13 +889,13 @@ class CYLTabBar(context: Context) : ViewGroup(context) {
         var slot = 0
         for ((index, button) in buttons.withIndex()) {
             if (index == plusIndex) slot++
-            val slotStart = slotLeft(slot)
+            val slotStart = slotStart(slot)
             val left = slotStart + (cyl_itemEdgeInsets.left * density).toInt()
             val itemsTop = cyl_itemsFrame.top
             button.layout(left, itemsTop + (cyl_itemEdgeInsets.top * density).toInt(), slotStart + slotWidths.getOrElse(slot) { 0 } - (cyl_itemEdgeInsets.right * density).toInt(), itemsTop + itemsHeight - (cyl_itemEdgeInsets.bottom * density).toInt())
             slot++
         }
-        plusButton?.let { plus -> val plusWidth = slotWidths.getOrElse(plusIndex) { 0 }; layoutPlusButton(plus, slotLeft(plusIndex) + plusWidth / 2, plusWidth, density) }
+        plusButton?.let { plus -> val plusWidth = slotWidths.getOrElse(plusIndex) { 0 }; layoutPlusButton(plus, slotStart(plusIndex) + plusWidth / 2, plusWidth, density) }
         if (scrollX > maxScrollX) scrollTo(maxScrollX, 0)
         layoutFixedChildren()
         if (changed || indicatorAnimator == null) layoutIndicator(animated = false)

@@ -50,19 +50,6 @@ class CYLTabBarControllerPortTest {
         }
     }
 
-    private fun attributes(vararg titles: String) = titles.map { mapOf(CYLConstants.CYLTabBarItemTitle to it, CYLConstants.CYLTabBarItemIdentifier to it.lowercase()) }
-
-    private fun <T> withActivity(block: (FragmentActivity) -> T): T {
-        val controller = Robolectric.buildActivity(FragmentActivity::class.java).setup()
-        try {
-            return block(controller.get())
-        } finally {
-            controller.pause().stop().destroy()
-        }
-    }
-
-    private fun idle() = shadowOf(Looper.getMainLooper()).idle()
-
     private fun controllerIn(activity: FragmentActivity, pages: List<Fragment>, attributes: List<Map<String, Any?>>): CYLTabBarController {
         val controller = CYLTabBarController(activity, pages, attributes)
         activity.setContentView(controller.view)
