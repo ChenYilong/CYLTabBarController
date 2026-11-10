@@ -27,6 +27,11 @@ scripts/publish-android.sh staging                          # Android library: M
 
 The `CYLTabBarController` scheme has no test action: use `scripts/unit-tests.sh`. Static analysis: `xcodebuild analyze` must report no warnings.
 
+Screenshots of the ObjC demo without driving the UI (it shows a splash ad for about 10 s first, so wait about 18 s):
+`xcrun simctl launch <udid> CYL.CYLTabBarController -CYLDemoGalleryScene 8.1` opens gallery scene 8.1 (section.row, as the
+list numbers it; docs/Tab-Bar-Gallery.md), and `-CYLDemoManifestTheme light|dark|christmas` builds the tab bar from the
+configuration manifest. Taps with axe are often swallowed under load: prefer these launch arguments.
+
 ## Common failures
 
 | Symptom | Cause | Fix |

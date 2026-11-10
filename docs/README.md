@@ -241,6 +241,8 @@ docs/
 │   ├── rive-flat-design.png
 │   ├── rive-liquid-glass.png
 │   ├── tab-accessibility-labels-after-title-change.png
+│   ├── tab-bar-gallery-sections-ios.png
+│   ├── tab-custom-action-ios.png
 │   ├── tab-interactions-long-press-classic.png
 │   ├── tab-interactions-long-press-flatdesign.png
 │   ├── tab-interactions-long-press-liquid-glass.png
@@ -254,6 +256,8 @@ docs/
 │   ├── tab-interactions-swipe-login-classic.png
 │   ├── tab-item-icon-rendering-android.png
 │   ├── tab-item-icon-rendering-ios.png
+│   ├── tab-item-positioning-ios.png
+│   ├── tab-reselect-pop-to-root-ios.png
 │   ├── theme-switching-flat-design.png
 │   ├── theme-switching-holiday-icons.png
 │   ├── theme-switching-liquid-glass.png

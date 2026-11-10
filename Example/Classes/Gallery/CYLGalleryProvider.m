@@ -234,7 +234,8 @@ static UIColor *CYLGalleryGray(CGFloat white) {
 
 #pragma mark - Navigation controller
 
-/// [EN] Light navigation bar; pages pushed after the root hide the tab bar. [CN] 浅色导航栏；根页面之后 push 的页面隐藏 TabBar。
+/// [EN] Light navigation bar; pages pushed after the root hide the tab bar, except under a list (the reselect scene).
+/// [CN] 浅色导航栏；根页面之后 push 的页面隐藏 TabBar，列表（重复点击场景）之下的除外。
 @interface CYLGalleryNavigationController : UINavigationController
 @end
 
@@ -257,7 +258,12 @@ static UIColor *CYLGalleryGray(CGFloat white) {
 }
 
 - (void)pushViewController:(UIViewController *)viewController animated:(BOOL)animated {
-    if (self.viewControllers.count > 0) {
+    // [EN] The reselect scene (a list at the root) keeps the tab bar on pushed pages: its rows say "tap the tab again to go
+    //      back", which needs the tab bar. Found while taking its screenshots: the bar was hidden, so it could not be done.
+    // [CN] 重复点击场景（根页面为列表）在 push 的页面上保留 TabBar：其行写着「再次点击 Tab 返回」，需要能看到 TabBar。截图时发现：
+    //      TabBar 被隐藏，因此无法操作。
+    BOOL keepsTabBar = [self.viewControllers.firstObject isKindOfClass:[CYLGalleryListViewController class]];
+    if (self.viewControllers.count > 0 && !keepsTabBar) {
         viewController.hidesBottomBarWhenPushed = YES;
     }
     [super pushViewController:viewController animated:animated];

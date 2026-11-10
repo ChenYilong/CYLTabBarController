@@ -18,6 +18,26 @@ static NSString *const CYLGalleryCellIdentifier = @"CYLGalleryCell";
 
 @implementation CYLGalleryViewController
 
++ (nullable NSString *)cyl_launchSceneNumber {
+    NSString *number = [[NSUserDefaults standardUserDefaults] stringForKey:@"CYLDemoGalleryScene"];
+    return number.length > 0 ? number : nil;
+}
+
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+    static BOOL opened = NO;
+    NSArray<NSString *> *parts = [[CYLGalleryViewController cyl_launchSceneNumber] componentsSeparatedByString:@"."];
+    if (opened || parts.count != 2) {
+        return;
+    }
+    opened = YES;
+    NSInteger section = parts[0].integerValue - 1;
+    NSInteger row = parts[1].integerValue - 1;
+    if (section >= 0 && section < (NSInteger)self.sections.count && row >= 0 && row < (NSInteger)self.sections[(NSUInteger)section].scenes.count) {
+        [self tableView:self.tableView didSelectRowAtIndexPath:[NSIndexPath indexPathForRow:row inSection:section]];
+    }
+}
+
 - (instancetype)init {
     return [super initWithStyle:UITableViewStyleInsetGrouped];
 }

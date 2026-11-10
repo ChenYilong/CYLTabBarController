@@ -23,6 +23,17 @@
 
 @implementation CYLHomeViewController 
 
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+    // [EN] `-CYLDemoGalleryScene 8.1`: opens the gallery once at launch, which then opens that scene (screenshots).
+    // [CN] `-CYLDemoGalleryScene 8.1`：启动时打开一次图库，再由图库打开该场景（用于截图）。
+    static BOOL opened = NO;
+    if (!opened && [CYLGalleryViewController cyl_launchSceneNumber] && self.navigationController) {
+        opened = YES;
+        [self.navigationController pushViewController:[[CYLGalleryViewController alloc] init] animated:NO];
+    }
+}
+
 
 - (instancetype)init {
     // [EN] Inset grouped sections with rounded corners, as in the Settings app.
