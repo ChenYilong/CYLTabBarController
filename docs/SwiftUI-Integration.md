@@ -207,4 +207,6 @@ class CYLPlusButtonSubclass: CYLPlusButton, CYLPlusButtonSubclassing {
 
 | 中文 | English |
 |:---|:---|
-| 本示例在 Linux 环境中编写，无法运行 Xcode 和 iOS 模拟器，因此**没有截图**，也未编译验证。请在 Xcode 中运行 `Example-SwiftUI`，确认各 Tab、PlusButton 页面、角标、按标识选中、push 与 PlusButton 点击范围均正常。验证后的截图请放在 `docs/assets/` 中，并用 `![](assets/文件名.png)` 引用。 | This example was written on Linux, where Xcode and the iOS simulator cannot run, so there are **no screenshots** and it has not been compiled. Run `Example-SwiftUI` in Xcode and check the tabs, the plus button's page, badges, selecting by identifier, push, and the plus button's touchable area. Put screenshots from that check in `docs/assets/` and reference them as `![](assets/file-name.png)`. |
+| 已验证（2026-11-10，iOS 26.1，iPhone 17 Pro Max 模拟器，液态玻璃）：`Example-SwiftUI` 编译并运行。从上到下：① 角标：第二个 Tab 显示「3」、第三个 Tab 显示红点；② 按标识选中「me」；③ push 一个 SwiftUI 页面（TabBar 按设计隐藏）；④ PlusButton 的页面（子控制器为 `UIHostingController`）。PlusButton 可点击区域开关本次未测试。 | Verified (2026-11-10, iOS 26.1, iPhone 17 Pro Max simulator, Liquid Glass): `Example-SwiftUI` builds and runs. Top to bottom: ① badges: "3" on the second tab, a red dot on the third; ② selecting "me" by identifier; ③ a pushed SwiftUI page (the tab bar hidden, as designed); ④ the plus button's page (its child view controller is a `UIHostingController`). The plus button's touchable-area switch was not tested this time. |
+
+![SwiftUI example on iOS 26](assets/swiftui-integration-ios.png)

@@ -136,6 +136,11 @@ Every new feature and user-visible change ships with bilingual documentation in 
   `-setTabBarItemIcon:…`), and a cover added after them stays on top. Every example (iOS, Android, React Native,
   Flutter) does the same: when the tab icons change (a new skin, icons downloaded from the network), the example adds
   the cover again once the new icons are in. Do not change the library to keep a cover over icons that replace it later.
+- **Demo table rows: never on the first tab, spread over the others.** In every example (Swift, SwiftUI, Android,
+  React Native, Flutter), a new table-view demo row goes on a tab item **other than the first**, and each new one goes on
+  the **next tab in turn** (the second, then the third, and so on, back to the second after the last), so the rows spread
+  over the tabs instead of piling up on one. The **first tab item always imitates the Objective-C example's table view**
+  (the sections and rows of `Example/Classes/Module/Home/CYLHomeViewController`): change it only to follow a change there.
 - **New demos** follow the `cyl-new-project` skill. **PlusButton with forced title alignment**: give it a title; see `cyl-plus-button`.
 - **Xcode project files** keep the ObjC example's format (`objectVersion = 46`, `compatibilityVersion = "Xcode 3.2"`, no folder sync, deployment target below 27), or CI on Xcode 26 fails. Check before committing any `.xcodeproj` change. Full rules: the `cyl-xcode-compat` skill.
 - **Clean before every build and run**: build into an empty derived data folder (delete it first, or pass a new

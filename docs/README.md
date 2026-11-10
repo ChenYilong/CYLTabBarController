@@ -168,6 +168,7 @@ docs/
 │   ├── android-liquid-glass-surface-040.png
 │   ├── android-liquid-glass-surface-100.png
 │   ├── android-liquid-glass-surface-slider.png
+│   ├── carthage-example-ios.png
 │   ├── configuration-demo-json-zh-hans.png
 │   ├── configuration-localization-en.png
 │   ├── configuration-localization-zh-hans.png
@@ -240,6 +241,7 @@ docs/
 │   ├── rive-classic.png
 │   ├── rive-flat-design.png
 │   ├── rive-liquid-glass.png
+│   ├── swiftui-integration-ios.png
 │   ├── tab-accessibility-labels-after-title-change.png
 │   ├── tab-bar-gallery-sections-ios.png
 │   ├── tab-custom-action-ios.png
@@ -258,6 +260,7 @@ docs/
 │   ├── tab-item-icon-rendering-ios.png
 │   ├── tab-item-positioning-ios.png
 │   ├── tab-reselect-pop-to-root-ios.png
+│   ├── tabbaritem-gestures-ios.png
 │   ├── theme-switching-flat-design.png
 │   ├── theme-switching-holiday-icons.png
 │   ├── theme-switching-liquid-glass.png
