@@ -12,7 +12,7 @@ class MeVC: ViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.navigationItem.title = CYLLocalizedString("我的")
+        self.navigationItem.title = CYLDemoLocalizedString("我的")
         #if CYL_DEMO_PAG
         self.view.backgroundColor = .systemBackground
         // [EN] The test list shared by every Swift demo (every settings row of the library, grouped), as a child.

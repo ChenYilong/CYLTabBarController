@@ -22,6 +22,8 @@
 		B5460ED0CD486FD5E8E97CD5 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E2CBA27DDE9C559CCDC2C661 /* LaunchScreen.storyboard */; };
 		CF487C58E7F6AA9E34CE7479 /* TradeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = DCFC552167E2C45C89819AD7 /* TradeViewController.m */; };
 		E5BEE7708A933B32F70F9288 /* WealthViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = AFC183EE7C750A6D3D2672EC /* WealthViewController.m */; };
+		B2F05B13819A7EB23F57507B /* CYLDemoLocalization.m in Sources */ = {isa = PBXBuildFile; fileRef = 16DFA15B7CF9EA08E94D18A8 /* CYLDemoLocalization.m */; };
+		FD7111B3D03D7F81E278857D /* CYLDemo.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 26721A6A438810C95F465F64 /* CYLDemo.bundle */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -53,6 +55,9 @@
 		E1E8C43D5D5FB5BBC6A77077 /* HomeViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HomeViewController.h; sourceTree = "<group>"; };
 		E6E7304E6F343975074248E1 /* InfoViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = InfoViewController.h; sourceTree = "<group>"; };
 		F634F20BCCEC68994215E263 /* TradeViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TradeViewController.h; sourceTree = "<group>"; };
+		16DFA15B7CF9EA08E94D18A8 /* CYLDemoLocalization.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = CYLDemoLocalization.m; path = "../Example-Shared/CYLDemoLocalization.m"; sourceTree = SOURCE_ROOT; };
+		BF3CD42EAFBAB9804AC92CE4 /* CYLDemoLocalization.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = CYLDemoLocalization.h; path = "../Example-Shared/CYLDemoLocalization.h"; sourceTree = SOURCE_ROOT; };
+		26721A6A438810C95F465F64 /* CYLDemo.bundle */ = {isa = PBXFileReference; lastKnownFileType = wrapper.plug-in; name = CYLDemo.bundle; path = "../Example-Shared/CYLDemo.bundle"; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -83,6 +88,9 @@
 				85552CA12F92063700DA4D20 /* Products */,
 				803F7D509089676E122274DA /* Pods */,
 				B915B01B686CAA7FF6F8CD6E /* Frameworks */,
+				16DFA15B7CF9EA08E94D18A8 /* CYLDemoLocalization.m */,
+				BF3CD42EAFBAB9804AC92CE4 /* CYLDemoLocalization.h */,
+				26721A6A438810C95F465F64 /* CYLDemo.bundle */,
 			);
 			sourceTree = "<group>";
 		};
@@ -194,6 +202,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FD7111B3D03D7F81E278857D /* CYLDemo.bundle in Resources */,
 				8303E4F9E7636FCC829CB4C7 /* Assets.xcassets in Resources */,
 				B5460ED0CD486FD5E8E97CD5 /* LaunchScreen.storyboard in Resources */,
 				9553CA2E41813ED174E31430 /* Main.storyboard in Resources */,
@@ -269,6 +278,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B2F05B13819A7EB23F57507B /* CYLDemoLocalization.m in Sources */,
 				5203DC5996AF4DAE12EACEC8 /* AppDelegate.m in Sources */,
 				C1A5CE4E0000000000000021 /* SceneDelegate.m in Sources */,
 				24910CE121BD68F0C806DCA1 /* HomeViewController.m in Sources */,

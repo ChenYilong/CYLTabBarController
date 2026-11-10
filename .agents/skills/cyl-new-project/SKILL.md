@@ -81,6 +81,14 @@ func scene(_ scene: UIScene, willConnectTo _: UISceneSession, options _: UIScene
 5. Add it to the table in section 1 and to the demo list in `README.md`.
 6. Build: `scripts/ci-build-example.sh <folder>`, then follow `cyl-verify`.
 7. Check the project format with the commands in `cyl-xcode-compat`.
+8. Localization: a project must have at least two different macros that read the localized files of two different layers.
+   The library's own texts come from the **core** macro (`CYLLocalizedString`, `CYLTabBarController.bundle`); the demo's own
+   texts come from the **example** macro (iOS: `CYLDemoLocalizedString` reading `Example-Shared/CYLDemo.bundle`). In a demo
+   project add `Example-Shared/CYLDemoLocalization.swift` (Swift) or `.m` + `.h` (Objective-C) and `CYLDemo.bundle` to the app
+   target (file references with `SOURCE_ROOT`, as the other demos do), and call the example macro for every demo-only text.
+   Never read the core bundle with `NSLocalizedString` / `NSBundle` calls of your own, and never leave loose `.lproj` folders.
+   Check with `python3 scripts/check-localization-macros.py`. Other platforms: the same two layers in their own package form
+   (AGENTS.md, "Localization (i18n / l10n) file structure").
 
 ## Podfile, app icon, launch screen
 

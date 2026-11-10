@@ -13,6 +13,7 @@
 #import "InfoViewController.h"
 #import "MineViewController.h"
 #import "MainTabBarController.h"
+#import "CYLDemoLocalization.h"
 
 @interface SceneDelegate ()
 @property (strong, nonatomic) MainTabBarController *tabBarController;
@@ -44,11 +45,11 @@
     
     // [CN] 3. 包装导航控制器
     // [EN] 3. Wrap them in navigation controllers.
-    UINavigationController *homeNav = [self wrapNavWithVC:homeVC title:CYLLocalizedString(@"首页")];
-    UINavigationController *wealthNav = [self wrapNavWithVC:wealthVC title:CYLLocalizedString(@"理财")];
-    UINavigationController *tradeNav = [self wrapNavWithVC:tradeVC title:CYLLocalizedString(@"交易")];
-    UINavigationController *infoNav = [self wrapNavWithVC:infoVC title:CYLLocalizedString(@"资讯")];
-    UINavigationController *mineNav = [self wrapNavWithVC:mineVC title:CYLLocalizedString(@"我的")];
+    UINavigationController *homeNav = [self wrapNavWithVC:homeVC title:CYLDemoLocalizedString(@"首页")];
+    UINavigationController *wealthNav = [self wrapNavWithVC:wealthVC title:CYLDemoLocalizedString(@"理财")];
+    UINavigationController *tradeNav = [self wrapNavWithVC:tradeVC title:CYLDemoLocalizedString(@"交易")];
+    UINavigationController *infoNav = [self wrapNavWithVC:infoVC title:CYLDemoLocalizedString(@"资讯")];
+    UINavigationController *mineNav = [self wrapNavWithVC:mineVC title:CYLDemoLocalizedString(@"我的")];
     
     // [CN] 1. 创建 TabBar 主控制器（图片使用 UIImage，非字符串）
     // [EN] 1. Create the tab bar controller (the images are UIImages, not names).
@@ -60,7 +61,7 @@
     self.tabBarController = [[MainTabBarController alloc] initWithViewControllers:@[homeNav, wealthNav, tradeNav, infoNav, mineNav] tabBarItemsAttributes:@[
         // [CN] 首页
         // [EN] Home
-        @{CYLTabBarItemTitle : CYLLocalizedString(@"首页"),
+        @{CYLTabBarItemTitle : CYLDemoLocalizedString(@"首页"),
           CYLTabBarItemImage : [UIImage systemImageNamed:@"house"],
           CYLTabBarItemSelectedImage : [UIImage systemImageNamed:@"house.fill"],
           CYLTabBarItemImageURL : @"https://cdn-icons-png.flaticon.com/512/3132/3132732.png",
@@ -69,7 +70,7 @@
         
         // [CN] 行情
         // [EN] Markets
-        @{CYLTabBarItemTitle : CYLLocalizedString(@"行情"),
+        @{CYLTabBarItemTitle : CYLDemoLocalizedString(@"行情"),
           CYLTabBarItemImage : [UIImage systemImageNamed:@"chart.line.uptrend.xyaxis"],
           CYLTabBarItemSelectedImage : [UIImage systemImageNamed:@"chart.line.uptrend.xyaxis"],
           CYLTabBarItemImageURL : @"https://cdn-icons-png.flaticon.com/512/1828/1828884.png",
@@ -78,7 +79,7 @@
         
         // [CN] 交易
         // [EN] Trade
-        @{CYLTabBarItemTitle : CYLLocalizedString(@"交易"),
+        @{CYLTabBarItemTitle : CYLDemoLocalizedString(@"交易"),
           CYLTabBarItemImage : [UIImage systemImageNamed:@"plus.circle"],
           CYLTabBarItemSelectedImage : [UIImage systemImageNamed:@"plus.circle.fill"],
           CYLTabBarItemImageURL : @"https://cdn-icons-png.flaticon.com/512/3132/3132732.png",
@@ -87,7 +88,7 @@
         
         // [CN] 资讯
         // [EN] News
-        @{CYLTabBarItemTitle : CYLLocalizedString(@"资讯"),
+        @{CYLTabBarItemTitle : CYLDemoLocalizedString(@"资讯"),
           CYLTabBarItemImage : [UIImage systemImageNamed:@"newspaper"],
           CYLTabBarItemSelectedImage : [UIImage systemImageNamed:@"newspaper.fill"],
           CYLTabBarItemImageURL : @"https://cdn-icons-png.flaticon.com/512/1828/1828884.png",
@@ -99,7 +100,7 @@
         // FIX: issue #605
         // [EN] An animated GIF icon; any URL works, a file URL here.
         // [CN] GIF 动图图标；任何 URL 都可以，这里使用本地文件 URL。
-        @{CYLTabBarItemTitle : CYLLocalizedString(@"我的"),
+        @{CYLTabBarItemTitle : CYLDemoLocalizedString(@"我的"),
           CYLTabBarItemImage : [UIImage systemImageNamed:@"person"],
           CYLTabBarItemSelectedImage : [UIImage systemImageNamed:@"person.fill"],
           CYLTabBarItemImageURL : [[NSBundle mainBundle] URLForResource:@"tab_animated" withExtension:@"gif"],
@@ -123,7 +124,7 @@
 - (void)updateTitleAfterPurchase {
     // [EN] FIX: issue #601 — e.g. after a purchase: the title of a tab, in place.
     // [CN] 例如购买课程后：原地更新某个 Tab 的标题。
-    [self.tabBarController updateTabBarItemAtIndex:1 attributes:@{CYLTabBarItemTitle : CYLLocalizedString(@"已购课程")}];
+    [self.tabBarController updateTabBarItemAtIndex:1 attributes:@{CYLTabBarItemTitle : CYLDemoLocalizedString(@"已购课程")}];
 }
 
 @end

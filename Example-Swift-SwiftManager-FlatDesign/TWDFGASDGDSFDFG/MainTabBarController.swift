@@ -150,10 +150,10 @@ class MainTabBarController: CYLTabBarController, CYLFlatDesignUITabBarController
         // [EN] 1. Title configuration
         var title: String {
             switch self {
-            case .home: return CYLLocalizedString("首页")
-            case .room: return CYLLocalizedString("房间")
-            case .chat: return CYLLocalizedString("消息")
-            case .mine: return CYLLocalizedString("我的")
+            case .home: return CYLDemoLocalizedString("首页")
+            case .room: return CYLDemoLocalizedString("房间")
+            case .chat: return CYLDemoLocalizedString("消息")
+            case .mine: return CYLDemoLocalizedString("我的")
             }
         }
         
@@ -344,7 +344,7 @@ class MainTabBarController: CYLTabBarController, CYLFlatDesignUITabBarController
         let root = viewController.cyl_getViewControllerInsteadOfNavigation()
         // [CN] 此处判断逻辑已根据 ViewController 标题解耦
         // [EN] The check here has been decoupled based on the ViewController title
-        currentTheme = (root.navigationItem.title == CYLLocalizedString("房间")) ? .roomStyle : .normal
+        currentTheme = (root.navigationItem.title == CYLDemoLocalizedString("房间")) ? .roomStyle : .normal
     }
 }
 

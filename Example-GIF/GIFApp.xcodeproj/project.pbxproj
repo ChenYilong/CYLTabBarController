@@ -30,6 +30,8 @@
 		29B5FBC7CF242F1F12769B22 /* CYLDemoTabBarStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 863ECC7ADA9F01AD11686382 /* CYLDemoTabBarStyle.swift */; };
 		C1A5CE0E2E00000000000001 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1A5CE0E2E00000000000002 /* SceneDelegate.swift */; };
 		DD17472BCA9743B7B160F884 /* CYLPlusButtonBadgeDemo.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6B9DA7EE87C4B448F2A9C22 /* CYLPlusButtonBadgeDemo.swift */; };
+		71AEA93ED30237538010454F /* CYLDemoLocalization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D5219E67C001E73250DF2DF /* CYLDemoLocalization.swift */; };
+		1CB632357B8E3CCE9E6BA02F /* CYLDemo.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 56985C2EDDA0C8652F2D7553 /* CYLDemo.bundle */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -60,6 +62,8 @@
 		D29B96195DFAC3AA0ECC45FD /* tab_star.gif */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.gif; path = tab_star.gif; sourceTree = "<group>"; };
 		D6B9DA7EE87C4B448F2A9C22 /* CYLPlusButtonBadgeDemo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CYLPlusButtonBadgeDemo.swift; path = "../Example-Shared/CYLPlusButtonBadgeDemo.swift"; sourceTree = SOURCE_ROOT; };
 		D9539E3C35FC9862B9097017 /* Pods_GIFApp.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_GIFApp.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		7D5219E67C001E73250DF2DF /* CYLDemoLocalization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CYLDemoLocalization.swift; path = "../Example-Shared/CYLDemoLocalization.swift"; sourceTree = SOURCE_ROOT; };
+		56985C2EDDA0C8652F2D7553 /* CYLDemo.bundle */ = {isa = PBXFileReference; lastKnownFileType = wrapper.plug-in; name = CYLDemo.bundle; path = "../Example-Shared/CYLDemo.bundle"; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -105,6 +109,8 @@
 				6961000247EFFCCDCECEE099 /* Frameworks */,
 				10B2B41390DA6BE0F43BB0E1 /* CYLSettingsDemoTableViewController.swift */,
 				863ECC7ADA9F01AD11686382 /* CYLDemoTabBarStyle.swift */,
+				7D5219E67C001E73250DF2DF /* CYLDemoLocalization.swift */,
+				56985C2EDDA0C8652F2D7553 /* CYLDemo.bundle */,
 			);
 			sourceTree = "<group>";
 		};
@@ -282,6 +288,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1CB632357B8E3CCE9E6BA02F /* CYLDemo.bundle in Resources */,
 				F618DA17597B437580976BF5 /* Configurations in Resources */,
 				922DCEEB1FF63399005C89BE /* LaunchScreen.storyboard in Resources */,
 				922DCEE81FF63399005C89BE /* Assets.xcassets in Resources */,
@@ -357,6 +364,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				71AEA93ED30237538010454F /* CYLDemoLocalization.swift in Sources */,
 				DD17472BCA9743B7B160F884 /* CYLPlusButtonBadgeDemo.swift in Sources */,
 				922DCF0C1FF63402005C89BE /* ViewController.swift in Sources */,
 				922DCF151FF63402005C89BE /* CYLPlusButtonSubclass.swift in Sources */,

@@ -45,6 +45,8 @@
 		184F198E23F7E8A3002DBAE4 /* NextVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 184F198D23F7E8A3002DBAE4 /* NextVC.swift */; };
 		184F199023F7EE40002DBAE4 /* APPDelegate+Categories.swift in Sources */ = {isa = PBXBuildFile; fileRef = 184F198F23F7EE40002DBAE4 /* APPDelegate+Categories.swift */; };
 		C1A5CE0E2E00000000000003 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1A5CE0E2E00000000000004 /* SceneDelegate.swift */; };
+		E4F5697A425A6E2157CCAF46 /* CYLDemoLocalization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181A67BD78EBBCE60EFE7B6A /* CYLDemoLocalization.swift */; };
+		52FDFD40292BAB0829125B67 /* CYLDemo.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 01E7316A72136FD26B4F472A /* CYLDemo.bundle */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -117,6 +119,8 @@
 		184F198D23F7E8A3002DBAE4 /* NextVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NextVC.swift; sourceTree = "<group>"; };
 		184F198F23F7EE40002DBAE4 /* APPDelegate+Categories.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "APPDelegate+Categories.swift"; sourceTree = "<group>"; };
 		C1A5CE0E2E00000000000004 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
+		181A67BD78EBBCE60EFE7B6A /* CYLDemoLocalization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CYLDemoLocalization.swift; path = "../Example-Shared/CYLDemoLocalization.swift"; sourceTree = SOURCE_ROOT; };
+		01E7316A72136FD26B4F472A /* CYLDemo.bundle */ = {isa = PBXFileReference; lastKnownFileType = wrapper.plug-in; name = CYLDemo.bundle; path = "../Example-Shared/CYLDemo.bundle"; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -154,6 +158,8 @@
 				184C1CA323F65A2A00B23C7F /* HealthyHomeTests */,
 				184C1CAE23F65A2A00B23C7F /* HealthyHomeUITests */,
 				184C1C8B23F65A2800B23C7F /* Products */,
+				181A67BD78EBBCE60EFE7B6A /* CYLDemoLocalization.swift */,
+				01E7316A72136FD26B4F472A /* CYLDemo.bundle */,
 			);
 			sourceTree = "<group>";
 		};
@@ -466,6 +472,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				52FDFD40292BAB0829125B67 /* CYLDemo.bundle in Resources */,
 				E8FCA38200F100B31770553D /* green_lottie_tab_home.json in Resources */,
 				8DE790C58E38D43E804F2D47 /* green_lottie_tab_discover.json in Resources */,
 				455FC5338BB131186424C880 /* green_lottie_tab_news.json in Resources */,
@@ -497,6 +504,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E4F5697A425A6E2157CCAF46 /* CYLDemoLocalization.swift in Sources */,
 				C0529A55706B44468DEF8058 /* CYLPlusButtonBadgeDemo.swift in Sources */,
 				184C1CCC23F65A6700B23C7F /* FriendsVC.swift in Sources */,
 				184F198723F7C811002DBAE4 /* UIColor+Extension.swift in Sources */,

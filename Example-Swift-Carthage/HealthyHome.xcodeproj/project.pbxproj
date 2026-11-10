@@ -44,6 +44,8 @@
 		C1A5CE0E2E00000000000003 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1A5CE0E2E00000000000004 /* SceneDelegate.swift */; };
 		F0D378B6FAC34A5E99CE238D /* CYLPlusButtonBadgeDemo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78BCD0BDB8E54748A466D7E9 /* CYLPlusButtonBadgeDemo.swift */; };
 		F3D51020DB28828D225553AB /* CYLTabBarController.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CADE395AEB2151005A1EB5B1 /* CYLTabBarController.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		775189F0879268F68F84265E /* CYLDemoLocalization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62643A9AE52BBCF3BAD6B603 /* CYLDemoLocalization.swift */; };
+		B2BBD9743C13C0E27C29162D /* CYLDemo.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 3E409A01756B44242CF745F6 /* CYLDemo.bundle */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -123,6 +125,8 @@
 		A593EAE45850977BFCF8C68A /* green_lottie_tab_discover.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = green_lottie_tab_discover.json; path = ../Example/Classes/Other/LottieResources/green_lottie_tab_discover.json; sourceTree = SOURCE_ROOT; };
 		C1A5CE0E2E00000000000004 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SceneDelegate.swift; path = "../Example-Swift-03/HealthyHome/Public/Main/SceneDelegate.swift"; sourceTree = SOURCE_ROOT; };
 		CADE395AEB2151005A1EB5B1 /* CYLTabBarController.xcframework */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = wrapper.xcframework; name = CYLTabBarController.xcframework; path = Carthage/Build/CYLTabBarController.xcframework; sourceTree = SOURCE_ROOT; };
+		62643A9AE52BBCF3BAD6B603 /* CYLDemoLocalization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CYLDemoLocalization.swift; path = "../Example-Shared/CYLDemoLocalization.swift"; sourceTree = SOURCE_ROOT; };
+		3E409A01756B44242CF745F6 /* CYLDemo.bundle */ = {isa = PBXFileReference; lastKnownFileType = wrapper.plug-in; name = CYLDemo.bundle; path = "../Example-Shared/CYLDemo.bundle"; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -169,6 +173,8 @@
 				184C1CAE23F65A2A00B23C7F /* HealthyHomeUITests */,
 				184C1C8B23F65A2800B23C7F /* Products */,
 				0D2E3A8622A6521A9771DB87 /* Frameworks */,
+				62643A9AE52BBCF3BAD6B603 /* CYLDemoLocalization.swift */,
+				3E409A01756B44242CF745F6 /* CYLDemo.bundle */,
 			);
 			sourceTree = "<group>";
 		};
@@ -484,6 +490,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B2BBD9743C13C0E27C29162D /* CYLDemo.bundle in Resources */,
 				61DAEAC8826B3FA13591202F /* green_lottie_tab_home.json in Resources */,
 				7E36C3D378B559F4FFC753C7 /* green_lottie_tab_discover.json in Resources */,
 				A520A43B0231F8A9A36D72A4 /* green_lottie_tab_news.json in Resources */,
@@ -515,6 +522,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				775189F0879268F68F84265E /* CYLDemoLocalization.swift in Sources */,
 				F0D378B6FAC34A5E99CE238D /* CYLPlusButtonBadgeDemo.swift in Sources */,
 				184C1CCC23F65A6700B23C7F /* FriendsVC.swift in Sources */,
 				184F198723F7C811002DBAE4 /* UIColor+Extension.swift in Sources */,

@@ -16,6 +16,7 @@ scripts/ci-build-example.sh <demo folder>                   # one demo, as CI bu
 scripts/plus-child-theme-test.sh "iPhone 17 Pro Max"        # plus child + theme, on a simulator
 scripts/scroll-hide-self-test.sh                            # scroll hiding, on a simulator
 python3 scripts/update-docs-navigation.py --check
+python3 scripts/check-localization-macros.py                    # localization acceptance: a core macro and an example macro, each reading its own bundle
 python3 scripts/sync-agent-skills.py --check
 scripts/publish-android.sh staging                          # Android library: Maven bundle, checked (local | staging | central | github)
 (cd Example-Android && LC_ALL=C.UTF-8 gradle testDebugUnitTest :tabpages:test lintDebug assembleRelease)   # Android, as .github/workflows/android.yml runs it
@@ -25,6 +26,14 @@ scripts/publish-android.sh staging                          # Android library: M
 #   (Swift Package Manager, the plugin depends on this repository's Package.swift) / flutter build apk (JDK 17)
 # Library: CYLTabBarHostViewTests (scripts/unit-tests.sh), CYLTabBarHostViewTest (Android, Robolectric)
 ```
+
+Localization acceptance (AGENTS.md, "Localization (i18n / l10n) file structure"): a project must have at least two different
+macros that read the localized files of two different layers, and a project is accepted only when both exist and are used:
+the **core** macro (iOS: `CYLLocalizedString`, reading `CYLTabBarController.bundle`) and the **example** macro (iOS:
+`CYLDemoLocalizedString`, reading `Example-Shared/CYLDemo.bundle`). Other platforms use another package form, name and folder
+name, but still one macro or helper per layer. `scripts/check-localization-macros.py` checks the iOS side and every example
+Xcode project that compiles a file calling the example macro (it must also compile `CYLDemoLocalization.m` or `.swift` and
+ship `CYLDemo.bundle`); after adding a localized text or a demo project, run it, then build that demo.
 
 The `CYLTabBarController` scheme has no test action: use `scripts/unit-tests.sh`. Static analysis: `xcodebuild analyze` must report no warnings.
 

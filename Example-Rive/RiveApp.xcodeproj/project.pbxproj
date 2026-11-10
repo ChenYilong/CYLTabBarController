@@ -45,6 +45,8 @@
 		F2EA4C27D59FFEFFD097501A /* confetti.riv in Resources */ = {isa = PBXBuildFile; fileRef = C78A77277F5BF044CE896CCF /* confetti.riv */; };
 		F432E9BCEE4F345D5C02A425 /* shapes.riv in Resources */ = {isa = PBXBuildFile; fileRef = 8EEB743298095836BF9377D6 /* shapes.riv */; };
 		F6B77B5916BCCA956213941A /* Course.swift in Sources */ = {isa = PBXBuildFile; fileRef = 699EFCFF1B05220558FC4D31 /* Course.swift */; };
+		202DCAF62BA7ED5420B71D1B /* CYLDemoLocalization.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECDB16DD646E7F3ACB02BBD5 /* CYLDemoLocalization.swift */; };
+		344E45B762854B40E287BB6C /* CYLDemo.bundle in Resources */ = {isa = PBXBuildFile; fileRef = DA3A6EC7AC41D27E62A83CF5 /* CYLDemo.bundle */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -90,6 +92,8 @@
 		E2E65C33F57E037E0E98F612 /* button.riv */ = {isa = PBXFileReference; includeInIndex = 1; path = button.riv; sourceTree = "<group>"; };
 		E8DF93C34F3E7B872BF47F0F /* check.riv */ = {isa = PBXFileReference; includeInIndex = 1; path = check.riv; sourceTree = "<group>"; };
 		FF928D71D024B7F90696E769 /* Assets.xcassets */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		ECDB16DD646E7F3ACB02BBD5 /* CYLDemoLocalization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CYLDemoLocalization.swift; path = "../Example-Shared/CYLDemoLocalization.swift"; sourceTree = SOURCE_ROOT; };
+		DA3A6EC7AC41D27E62A83CF5 /* CYLDemo.bundle */ = {isa = PBXFileReference; lastKnownFileType = wrapper.plug-in; name = CYLDemo.bundle; path = "../Example-Shared/CYLDemo.bundle"; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -164,6 +168,8 @@
 				44BEF7973B94924E60D5369A /* Shared (Example-SwiftUI-Rive) */,
 				2CE3363CA18A1182962E0C20 /* Example-Shared */,
 				3FE99F7B37D197C3D84C7574 /* Pods */,
+				ECDB16DD646E7F3ACB02BBD5 /* CYLDemoLocalization.swift */,
+				DA3A6EC7AC41D27E62A83CF5 /* CYLDemo.bundle */,
 			);
 			sourceTree = "<group>";
 		};
@@ -331,6 +337,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				344E45B762854B40E287BB6C /* CYLDemo.bundle in Resources */,
 				527C6E5F73574D8296899296 /* Configurations in Resources */,
 				6501E84D2037A29884A2FDA7 /* Assets.xcassets in Resources */,
 				D6CC2F0CF401AE5AA8949682 /* LaunchScreen.storyboard in Resources */,
@@ -419,6 +426,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				202DCAF62BA7ED5420B71D1B /* CYLDemoLocalization.swift in Sources */,
 				B0D4999FF5EE129B8EE2C3CD /* AppDelegate.swift in Sources */,
 				C1A5CE4E0000000000000001 /* SceneDelegate.swift in Sources */,
 				8C7CC7F169DF6D09CFED6CBE /* TabViewControllers.swift in Sources */,

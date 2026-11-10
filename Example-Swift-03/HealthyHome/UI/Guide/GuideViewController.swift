@@ -49,7 +49,7 @@ class GuideViewController: UIViewController,UIScrollViewDelegate {
         
         let timeBtn = UIButton.init(frame: CGRect(x: frame.size.width - CGFloat(70), y: CGFloat(statusBarHeight), width: CGFloat(55), height: CGFloat(35)))
         timeBtn.backgroundColor = .lineColor()
-        timeBtn.setTitle(String(time) + " " + CYLLocalizedString("跳过"), for: .normal)
+        timeBtn.setTitle(String(time) + " " + CYLDemoLocalizedString("跳过"), for: .normal)
         timeBtn.setTitleColor(.blue, for: .normal)
         timeBtn.layer.masksToBounds = true
         timeBtn.layer.cornerRadius = 8
@@ -79,7 +79,7 @@ class GuideViewController: UIViewController,UIScrollViewDelegate {
         disTimer.setEventHandler { [weak self] in
             guard let self = self else { return }
             self.time -= 1
-            timeBtn.setTitle(String(self.time) + " " + CYLLocalizedString("跳过"), for: .normal)
+            timeBtn.setTitle(String(self.time) + " " + CYLDemoLocalizedString("跳过"), for: .normal)
             if self.time <= 0 {
                 self.timeClicked()
             }

@@ -75,7 +75,7 @@ final class DemoPlusButton: CYLPlusButton, CYLPlusButtonSubclassing {
     static func plusButton() -> Any {
         let configuration = UIImage.SymbolConfiguration(pointSize: 28, weight: .regular)
         let image = UIImage(systemName: "plus.circle.fill", withConfiguration: configuration) ?? UIImage()
-        return DemoPlusButton.cyl_plusButton(with: image, title: CYLLocalizedString("发布"),
+        return DemoPlusButton.cyl_plusButton(with: image, title: CYLDemoLocalizedString("发布"),
                                              selectedTitle: nil, selectedTitleColor: nil)
     }
 
@@ -102,9 +102,9 @@ extension CYLTabBarController {
         cyl_swipeToSwitchTabEnabled = true
         cyl_didLongPressControlBlock = { tabBarController, control in
             let name = control.cyl_tabBarItemDisplayName
-            let alert = UIAlertController(title: String(format: CYLLocalizedString("长按了「%@」"), name),
+            let alert = UIAlertController(title: String(format: CYLDemoLocalizedString("长按了「%@」"), name),
                                           message: nil, preferredStyle: .alert)
-            alert.addAction(UIAlertAction(title: CYLLocalizedString("取消"), style: .cancel))
+            alert.addAction(UIAlertAction(title: CYLDemoLocalizedString("取消"), style: .cancel))
             tabBarController.present(alert, animated: true)
         }
     }

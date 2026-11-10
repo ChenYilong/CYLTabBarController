@@ -146,7 +146,7 @@ extension MainTabBarController {
             // [EN] Long press: an action sheet for the tab.
             // [CN] 长按：弹出该 Tab 的操作菜单。
             let sheet = UIAlertController(title: control.cyl_tabBarItemIdentifier, message: "Long press (#152)", preferredStyle: .actionSheet)
-            sheet.addAction(UIAlertAction(title: CYLLocalizedString("取消"), style: .cancel))
+            sheet.addAction(UIAlertAction(title: CYLDemoLocalizedString("取消"), style: .cancel))
             sheet.popoverPresentationController?.sourceView = control
             sheet.popoverPresentationController?.sourceRect = control.bounds
             if presentedViewController == nil {

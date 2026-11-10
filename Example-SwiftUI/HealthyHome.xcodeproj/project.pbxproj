@@ -46,6 +46,8 @@
 		C1A5CE0E2E00000000000103 /* SwiftUITabViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1A5CE0E2E00000000000104 /* SwiftUITabViews.swift */; };
 		E462EF3903016B48B7150636 /* Pods_HealthyHome_HealthyHomeUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 791B5EAC446039618D1575F4 /* Pods_HealthyHome_HealthyHomeUITests.framework */; };
 		F0D378B6FAC34A5E99CE238D /* CYLPlusButtonBadgeDemo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78BCD0BDB8E54748A466D7E9 /* CYLPlusButtonBadgeDemo.swift */; };
+		E294727BF8BD35CE3D75D28F /* CYLDemoLocalization.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC1C276DBF56972710C23781 /* CYLDemoLocalization.swift */; };
+		AB93CAA394E1BCEDCE38F927 /* CYLDemo.bundle in Resources */ = {isa = PBXBuildFile; fileRef = DF7C6D8580C8A7298215FBF1 /* CYLDemo.bundle */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -120,6 +122,8 @@
 		C1A5CE0E2E00000000000004 /* SwiftUIApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftUIApp.swift; sourceTree = "<group>"; };
 		C1A5CE0E2E00000000000104 /* SwiftUITabViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftUITabViews.swift; sourceTree = "<group>"; };
 		D496295660CB726F51EEFE39 /* Pods-HealthyHomeTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HealthyHomeTests.release.xcconfig"; path = "Target Support Files/Pods-HealthyHomeTests/Pods-HealthyHomeTests.release.xcconfig"; sourceTree = "<group>"; };
+		EC1C276DBF56972710C23781 /* CYLDemoLocalization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CYLDemoLocalization.swift; path = "../Example-Shared/CYLDemoLocalization.swift"; sourceTree = SOURCE_ROOT; };
+		DF7C6D8580C8A7298215FBF1 /* CYLDemo.bundle */ = {isa = PBXFileReference; lastKnownFileType = wrapper.plug-in; name = CYLDemo.bundle; path = "../Example-Shared/CYLDemo.bundle"; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -171,6 +175,8 @@
 				184C1C8B23F65A2800B23C7F /* Products */,
 				F45CB2C42A8D05A6BD28059F /* Pods */,
 				0D2E3A8622A6521A9771DB87 /* Frameworks */,
+				EC1C276DBF56972710C23781 /* CYLDemoLocalization.swift */,
+				DF7C6D8580C8A7298215FBF1 /* CYLDemo.bundle */,
 			);
 			sourceTree = "<group>";
 		};
@@ -504,6 +510,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AB93CAA394E1BCEDCE38F927 /* CYLDemo.bundle in Resources */,
 				61DAEAC8826B3FA13591202F /* green_lottie_tab_home.json in Resources */,
 				7E36C3D378B559F4FFC753C7 /* green_lottie_tab_discover.json in Resources */,
 				A520A43B0231F8A9A36D72A4 /* green_lottie_tab_news.json in Resources */,
@@ -640,6 +647,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E294727BF8BD35CE3D75D28F /* CYLDemoLocalization.swift in Sources */,
 				F0D378B6FAC34A5E99CE238D /* CYLPlusButtonBadgeDemo.swift in Sources */,
 				184C1CCC23F65A6700B23C7F /* FriendsVC.swift in Sources */,
 				184F198723F7C811002DBAE4 /* UIColor+Extension.swift in Sources */,

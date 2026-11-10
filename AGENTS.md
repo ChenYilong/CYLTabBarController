@@ -133,6 +133,18 @@ Every new feature and user-visible change ships with bilingual documentation in 
     its bundle and table, so callers never spell the bundle out: the core one is `CYLLocalizedString(@"…")`; an
     example's is, for instance, `CYLDemoLocalizedString(@"…")` over `NSLocalizedStringFromTableInBundle`. Declare it
     with `NS_FORMAT_ARGUMENT(1)` and `CYL_RETURNS_LOCALIZED_STRING`, like the core one.
+  - **Acceptance criterion: at least two different macros, one per layer.** A project passes only when it has at least
+    two different macros (and a Swift function of the same name) that read the localized files of two different
+    layers: (1) a **core** macro that reads the localized files inside the library's own bundle; (2) an **example**
+    macro that reads the localized files at the example level. On iOS these are `CYLLocalizedString` →
+    `CYLTabBarController.bundle` and `CYLDemoLocalizedString` → `Example-Shared/CYLDemo.bundle`. Other platforms use a
+    different package form, name and folder name (Android `res/values*/` per module, a table file per example for React
+    Native and Flutter), but each layer is still a folder or package of per-language files reached through its own
+    macro or helper. It fails when one macro reads both layers, when an example reads the core bundle through
+    `NSLocalizedString` or `NSBundle` calls of its own, when an example's texts sit in the core bundle, or when
+    loose `.lproj` folders are left in a target. An example project that compiles a file calling the example macro
+    must also compile the macro's source (`CYLDemoLocalization.m` / `.swift`) and ship `CYLDemo.bundle`. Run
+    `python3 scripts/check-localization-macros.py` for the iOS side; it exits 1 and names each failure.
   - **Other platforms, the same way.** Android: the library's strings in the library module's `res/values*/` (the core
     tables: kept, updated carefully, generated from the iOS tables by `scripts/android-library-strings.py`), an
     example's strings in its own module's `res/values*/`, each reached through one helper (`CYLLocalization.string` for
