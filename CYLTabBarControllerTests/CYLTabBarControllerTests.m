@@ -293,6 +293,87 @@
     XCTAssertEqual(a.image.renderingMode, UIImageRenderingModeAlwaysOriginal);
 }
 
+/// [EN] FIX: issue #787. A tab with a dark image (`CYLTabBarItemDarkImage`) and "template" still switches to the dark image
+///      in Dark Mode, and both variants stay templates.
+/// [CN] FIX: issue #787。带深色图片（`CYLTabBarItemDarkImage`）且为 "template" 的 Tab，在深色模式下仍切换为深色图片，两种外观都保持模板。
+- (void)testIconRenderingModeKeepsTheDarkImage {
+    UIImage * (^drawn)(CGFloat) = ^UIImage *(CGFloat side) {
+        return [[[UIGraphicsImageRenderer alloc] initWithSize:CGSizeMake(side, side)] imageWithActions:^(UIGraphicsImageRendererContext *context) {
+            [UIColor.blueColor setFill];
+            [context fillRect:CGRectMake(0, 0, side, side)];
+        }];
+    };
+    CYLTabBarController *tabBarController = [CYLTabBarController tabBarControllerWithConfiguration:@{
+        CYLTabBarControllerContext : [NSUUID UUID].UUIDString,
+        CYLTabBarControllerTabBarItemsAttributes : @[
+            @{ CYLTabBarItemIdentifier : @"a", CYLTabBarItemTitle : @"A", CYLTabBarItemImage : drawn(8), CYLTabBarItemDarkImage : drawn(12),
+               CYLTabBarItemIconRenderingMode : @"template" },
+            @{ CYLTabBarItemIdentifier : @"b", CYLTabBarItemTitle : @"B", CYLTabBarItemImage : drawn(8) },
+        ],
+        CYLTabBarControllerPageResolver : ^UIViewController *(NSString *pageIdentifier, NSDictionary *attributes) {
+            return [[UIViewController alloc] init];
+        },
+    }];
+    [tabBarController loadViewIfNeeded];
+    UIImage *image = tabBarController.viewControllers[0].tabBarItem.image;
+    XCTAssertEqual(image.renderingMode, UIImageRenderingModeAlwaysTemplate);
+    UITraitCollection *dark = [UITraitCollection traitCollectionWithUserInterfaceStyle:UIUserInterfaceStyleDark];
+    UITraitCollection *light = [UITraitCollection traitCollectionWithUserInterfaceStyle:UIUserInterfaceStyleLight];
+    UIImage *darkVariant = [image imageWithConfiguration:[UIImageConfiguration configurationWithTraitCollection:dark]];
+    UIImage *lightVariant = [image imageWithConfiguration:[UIImageConfiguration configurationWithTraitCollection:light]];
+    XCTAssertEqualWithAccuracy(darkVariant.size.width, 12, 0.01, @"the dark image in Dark Mode");
+    XCTAssertEqualWithAccuracy(lightVariant.size.width, 8, 0.01, @"the light image otherwise");
+    XCTAssertEqual(darkVariant.renderingMode, UIImageRenderingModeAlwaysTemplate, @"still a template in Dark Mode");
+    XCTAssertEqual(tabBarController.viewControllers[0].tabBarItem.selectedImage.renderingMode, UIImageRenderingModeAlwaysTemplate);
+}
+
+/// [EN] FIX: issue #787. FlatDesign draws a "template" tab's image as a template (tinted by its image view) and an
+///      "original" tab's image with its own colors.
+/// [CN] FIX: issue #787。扁平样式把 "template" Tab 的图片作为模板绘制（由其图片视图着色），"original" Tab 的图片保持原色。
+- (void)testIconRenderingModeInFlatDesign {
+    Class buttonClass = NSClassFromString(@"CYLFlatDesignTabBarButton");
+    if (!buttonClass) {
+        XCTSkip(@"FlatDesign is not compiled into this target");
+    }
+    UIImage *icon = [[[UIGraphicsImageRenderer alloc] initWithSize:CGSizeMake(8, 8)] imageWithActions:^(UIGraphicsImageRendererContext *context) {
+        [UIColor.blueColor setFill];
+        [context fillRect:CGRectMake(0, 0, 8, 8)];
+    }];
+    CYLTabBarController *tabBarController = [CYLTabBarController tabBarControllerWithConfiguration:@{
+        CYLTabBarControllerContext : [NSUUID UUID].UUIDString,
+        CYLTabBarControllerStyleType : @"flatDesign",
+        CYLTabBarControllerTabBarItemsAttributes : @[
+            @{ CYLTabBarItemIdentifier : @"t", CYLTabBarItemTitle : @"Template", CYLTabBarItemImage : icon, CYLTabBarItemIconRenderingMode : @"template" },
+            @{ CYLTabBarItemIdentifier : @"o", CYLTabBarItemTitle : @"Original", CYLTabBarItemImage : icon, CYLTabBarItemIconRenderingMode : @"original" },
+        ],
+        CYLTabBarControllerPageResolver : ^UIViewController *(NSString *pageIdentifier, NSDictionary *attributes) {
+            return [[UIViewController alloc] init];
+        },
+    }];
+    UIWindow *window = [[UIWindow alloc] initWithFrame:CGRectMake(0, 0, 390, 844)];
+    window.rootViewController = tabBarController;
+    window.hidden = NO;
+    [tabBarController.view setNeedsLayout];
+    [tabBarController.view layoutIfNeeded];
+    NSMutableDictionary<NSString *, UIImage *> *images = [NSMutableDictionary dictionary];
+    NSMutableArray<UIView *> *queue = [NSMutableArray arrayWithObject:tabBarController.view];
+    while (queue.count > 0) {
+        UIView *view = queue.firstObject;
+        [queue removeObjectAtIndex:0];
+        if ([view isKindOfClass:buttonClass]) {
+            UILabel *titleLabel = [view valueForKey:@"titleLabel"];
+            UIImageView *imageView = [view valueForKey:@"imageView"];
+            if (titleLabel.text && imageView.image) {
+                images[titleLabel.text] = imageView.image;
+            }
+        }
+        [queue addObjectsFromArray:view.subviews];
+    }
+    XCTAssertEqual(images[@"Template"].renderingMode, UIImageRenderingModeAlwaysTemplate, @"%@", images);
+    XCTAssertEqual(images[@"Original"].renderingMode, UIImageRenderingModeAlwaysOriginal, @"%@", images);
+    window.hidden = YES;
+}
+
 - (void)testPerformanceExample {
     // This is an example of a performance test case.
     [self measureBlock:^{

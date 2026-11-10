@@ -556,6 +556,26 @@ static inline id _Nullable CYLObjectAtIndex(NSArray * _Nullable array, NSUIntege
  * [CN] FIX: issue #787。按 Tab 的 `CYLTabBarItemIconRenderingMode` 处理其图片："template" 把两张图片都设为模板（没有选中图片时使用普通图片，
  *      因此一张图即可），"original" 保持原色；否则原样返回图片信息。
  */
+/*!
+ * [EN] FIX: issue #787 — `image` in `renderingMode`, keeping its dark image: `-imageWithRenderingMode:` alone returns the
+ *      current appearance only, so a tab with `CYLTabBarItemDarkImage` stayed light in Dark Mode. Both appearances are
+ *      converted and combined again.
+ * [CN] FIX: issue #787——以 `renderingMode` 返回 `image`，并保留其深色图片：单独调用 `-imageWithRenderingMode:` 只返回当前外观的那张，
+ *      带 `CYLTabBarItemDarkImage` 的 Tab 在深色模式下仍为浅色。因此两种外观分别转换后重新合成。
+ */
+static UIImage *CYLImageWithRenderingMode(UIImage *image, UIImageRenderingMode renderingMode) {
+    if (@available(iOS 13.0, *)) {
+        UIImageAsset *imageAsset = image.imageAsset;
+        UIImage *lightImage = [imageAsset imageWithTraitCollection:[UITraitCollection traitCollectionWithUserInterfaceStyle:UIUserInterfaceStyleLight]];
+        UIImage *darkImage = [imageAsset imageWithTraitCollection:[UITraitCollection traitCollectionWithUserInterfaceStyle:UIUserInterfaceStyleDark]];
+        if (lightImage && darkImage && ![lightImage isEqual:darkImage]) {
+            return [UIImage cyl_imageWithLightImage:[lightImage imageWithRenderingMode:renderingMode]
+                                          darkImage:[darkImage imageWithRenderingMode:renderingMode]];
+        }
+    }
+    return [image imageWithRenderingMode:renderingMode];
+}
+
 static void CYLApplyIconRenderingMode(NSDictionary *attributes, id _Nullable *_Nonnull normalImageInfo, id _Nullable *_Nonnull selectedImageInfo) {
     NSString *mode = [attributes[CYLTabBarItemIconRenderingMode] isKindOfClass:[NSString class]] ? attributes[CYLTabBarItemIconRenderingMode] : nil;
     UIImageRenderingMode renderingMode;
@@ -572,10 +592,10 @@ static void CYLApplyIconRenderingMode(NSDictionary *attributes, id _Nullable *_N
         selected = normal;
     }
     if (normal) {
-        *normalImageInfo = [normal imageWithRenderingMode:renderingMode];
+        *normalImageInfo = CYLImageWithRenderingMode(normal, renderingMode);
     }
     if (selected) {
-        *selectedImageInfo = [selected imageWithRenderingMode:renderingMode];
+        *selectedImageInfo = CYLImageWithRenderingMode(selected, renderingMode);
     }
 }
 
