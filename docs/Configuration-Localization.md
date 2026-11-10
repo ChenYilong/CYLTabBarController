@@ -29,6 +29,7 @@
 | [流程](#cn流程) | [Flow](#enflow) |
 | [限制](#cn限制) | [Limits](#enlimits) |
 | [测试与截图](#cn测试与截图) | [Testing and screenshots](#entesting-and-screenshots) |
+| [待办](#cn待办) | [TODO](#entodo) |
 
 <!-- navigation:end -->
 
@@ -136,3 +137,14 @@ flowchart LR
 | ![英文标题](assets/configuration-localization-en.png) | ![English titles](assets/configuration-localization-en.png) |
 | 简体中文： | Simplified Chinese: |
 | ![简体中文标题](assets/configuration-localization-zh-hans.png) | ![Simplified Chinese titles](assets/configuration-localization-zh-hans.png) |
+
+## [CN]待办
+## [EN]TODO
+
+| 中文 | English |
+|:---|:---|
+| 规则见 `AGENTS.md`「Localization (i18n / l10n) file structure」（2026-11-10）：本地化文件按所有者放进 `.bundle`，核心 bundle 永久保留并谨慎更新，示例使用示例级 bundle，每个 bundle 有一个宏。以下为当前不符合之处（2026-11-10 统计）。 | The rule is in `AGENTS.md`, "Localization (i18n / l10n) file structure" (2026-11-10): localized files go into one `.bundle` per owner, the core bundle is permanent and updated carefully, examples use example-level bundles, and every bundle has one macro. Below are the current gaps (counted on 2026-11-10). |
+| TODO（示例文字在核心 bundle 中，0/100）：示例通过核心宏 `CYLLocalizedString` 读取核心 bundle 中的示例文字：ObjC `Example/` 139 处、`Example-Swift-03` 17 处、`Example-Swift-02` 8 处、`Example-SwiftUI` 6 处、`Example-Swift` 3 处、`Example-Shared` 3 处。待做：把只属于示例的键移入示例级 bundle（例如 `Example-Shared/CYLDemo.bundle`，33 种语言），新增 `CYLDemoLocalizedString` 宏与同名 Swift 函数，再从核心表中移除这些键（先确认库代码不再读取）。风险：核心表中的键是否被 App 使用无法确定，移除前需在发布说明中写明；示例工程需加入新 bundle（保持 `cyl-xcode-compat` 的工程格式）。验证：33 个表键一致、所有示例编译、语言切换截图。 | TODO (example texts in the core bundle, 0/100): the examples read their texts from the core bundle through the core macro `CYLLocalizedString`: 139 uses in the ObjC `Example/`, 17 in `Example-Swift-03`, 8 in `Example-Swift-02`, 6 in `Example-SwiftUI`, 3 in `Example-Swift`, 3 in `Example-Shared`. To do: move the keys only the examples use into an example-level bundle (e.g. `Example-Shared/CYLDemo.bundle`, 33 languages), add a `CYLDemoLocalizedString` macro and a Swift function of the same name, then remove those keys from the core tables (after checking that no library code reads them). Risk: whether apps read keys of the core tables cannot be known, so the removal goes into the release notes; the example projects must add the new bundle (keeping the project format of `cyl-xcode-compat`). Verify: the same keys in all 33 tables, every example builds, screenshots after switching the language. |
+| TODO（示例配置的字符串表为散落的 `.lproj`，0/100）：`Example-Shared/Configurations/Localization/` 下有 33 个 `.lproj`（`ConfigurationDemo.strings`），随 `Configurations` 文件夹引用打包，没有放进 `.bundle`。它们是 `CYLTabBarLocalizationPath`（值为 `Localization`）资源路由的示例：改为 `.bundle` 时需同时更新 17 种格式的示例配置、iOS 与 Android 的路由测试和本文档。验证：`scripts/configuration-tests/run-tests.sh`、iOS `CYLResourceRouteTests`、Android `CYLResourceRouteTest` 与本文的语言截图。 | TODO (the sample configuration tables are loose `.lproj` folders, 0/100): `Example-Shared/Configurations/Localization/` holds 33 `.lproj` folders (`ConfigurationDemo.strings`), packaged with the `Configurations` folder reference, not in a `.bundle`. They are the sample of the `CYLTabBarLocalizationPath` resource route (value `Localization`): moving them into a `.bundle` also changes the sample configurations in 17 formats, the iOS and Android route tests and this document. Verify: `scripts/configuration-tests/run-tests.sh`, iOS `CYLResourceRouteTests`, Android `CYLResourceRouteTest` and the language screenshots here. |
+| TODO（Android 示例字符串，未检查）：`Example-Android/demokit` 自有 `res/values`、`res/values-zh-rCN`，与 iOS 的 33 种语言不一致；示例使用的辅助函数未统一。验证：列出 demokit 与 app 模块的字符串键，与示例级 iOS bundle 对照。 | TODO (Android example strings, not checked): `Example-Android/demokit` has its own `res/values` and `res/values-zh-rCN`, unlike iOS's 33 languages, and no single helper reads them. Verify: list the string keys of the demokit and app modules and compare them with the example-level iOS bundle. |
+
