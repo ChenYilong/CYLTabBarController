@@ -152,6 +152,8 @@
 		9AE942E81BDC933E00354519 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9AE942CD1BDC933E00354519 /* LaunchScreen.storyboard */; };
 		9AE942EF1BDC933E00354519 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9AE942E31BDC933E00354519 /* Images.xcassets */; };
 		65B0CB475B214ECEB59FABD0 /* Configurations in Resources */ = {isa = PBXBuildFile; fileRef = 683A69728D1A4BDBA50F0D5A /* Configurations */; };
+		18C9CF92D56B49E483F059AD /* CYLDemo.bundle in Resources */ = {isa = PBXBuildFile; fileRef = FF9F2AB372724E429E82DE06 /* CYLDemo.bundle */; };
+		BB6CC09AA0154F56A950AF65 /* CYLDemoLocalization.m in Sources */ = {isa = PBXBuildFile; fileRef = 33E91BC228994983BD78F8C3 /* CYLDemoLocalization.m */; };
 		9AE942F11BDC933E00354519 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 9AE942E51BDC933E00354519 /* main.m */; };
 		9D9B22007B3D39D38DC6EA83 /* _CYLFlatDesignTabBarControllerTransitionContext.h in Headers */ = {isa = PBXBuildFile; fileRef = 7DBDB36FCFF032EEBBF40B92 /* _CYLFlatDesignTabBarControllerTransitionContext.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		9F683CC12AF7F4A5CB5652B4 /* green_lottie_tab_home_dark.json in Resources */ = {isa = PBXBuildFile; fileRef = 7F01DDCC6E3492E356050263 /* green_lottie_tab_home_dark.json */; };
@@ -470,6 +472,9 @@
 		9AE942CE1BDC933E00354519 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		9AE942E31BDC933E00354519 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		683A69728D1A4BDBA50F0D5A /* Configurations */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Configurations; path = "Example-Shared/Configurations"; sourceTree = SOURCE_ROOT; };
+		FF9F2AB372724E429E82DE06 /* CYLDemo.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; name = CYLDemo.bundle; path = "Example-Shared/CYLDemo.bundle"; sourceTree = SOURCE_ROOT; };
+		5C32835C16354530A5737E3D /* CYLDemoLocalization.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = CYLDemoLocalization.h; path = "Example-Shared/CYLDemoLocalization.h"; sourceTree = SOURCE_ROOT; };
+		33E91BC228994983BD78F8C3 /* CYLDemoLocalization.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = CYLDemoLocalization.m; path = "Example-Shared/CYLDemoLocalization.m"; sourceTree = SOURCE_ROOT; };
 		9AE942E41BDC933E00354519 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		9AE942E51BDC933E00354519 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		9B2C3D4E5F60718293A4B5C6 /* UIViewController+CYLSettingsSection.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "UIViewController+CYLSettingsSection.m"; sourceTree = "<group>"; };
@@ -977,6 +982,9 @@
 				9AE942CD1BDC933E00354519 /* LaunchScreen.storyboard */,
 				9AE942E31BDC933E00354519 /* Images.xcassets */,
 				683A69728D1A4BDBA50F0D5A /* Configurations */,
+				FF9F2AB372724E429E82DE06 /* CYLDemo.bundle */,
+				5C32835C16354530A5737E3D /* CYLDemoLocalization.h */,
+				33E91BC228994983BD78F8C3 /* CYLDemoLocalization.m */,
 				9AE942E41BDC933E00354519 /* Info.plist */,
 				9AE942E51BDC933E00354519 /* main.m */,
 			);
@@ -1393,6 +1401,7 @@
 				9F683CC12AF7F4A5CB5652B4 /* green_lottie_tab_home_dark.json in Resources */,
 				9AE942EF1BDC933E00354519 /* Images.xcassets in Resources */,
 				65B0CB475B214ECEB59FABD0 /* Configurations in Resources */,
+				18C9CF92D56B49E483F059AD /* CYLDemo.bundle in Resources */,
 				9A98017F2461249F00E65289 /* green_lottie_tab_news.json in Resources */,
 				9AD7F5BE22B7D695004BF0A0 /* img_tab_home_0.png in Resources */,
 				9AD7F5B122B7D4B6004BF0A0 /* gray_tabbar_home_animation.json in Resources */,
@@ -1591,6 +1600,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BB6CC09AA0154F56A950AF65 /* CYLDemoLocalization.m in Sources */,
 				9A1559DC1CB6D56500CAB1AF /* CYLMessageViewController.m in Sources */,
 				9A9180BD2FCACE6D002DC8F3 /* CYLFlatDesignTabBarDemoViewController.m in Sources */,
 				9A9180BE2FCACE6D002DC8F3 /* CYLFlatDesignSystemTabBarController.m in Sources */,

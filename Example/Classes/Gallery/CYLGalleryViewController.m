@@ -9,6 +9,7 @@
 #import "CYLGalleryViewController.h"
 #import "CYLGalleryProvider.h"
 #import <CYLTabBarController/CYLTabBarController.h>
+#import "CYLDemoLocalization.h"
 
 static NSString *const CYLGalleryCellIdentifier = @"CYLGalleryCell";
 
@@ -44,7 +45,7 @@ static NSString *const CYLGalleryCellIdentifier = @"CYLGalleryCell";
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.navigationItem.title = CYLLocalizedString(@"TabBar 场景展示");
+    self.navigationItem.title = CYLDemoLocalizedString(@"TabBar 场景展示");
     self.sections = [CYLGalleryProvider sections];
 }
 

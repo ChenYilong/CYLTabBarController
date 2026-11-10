@@ -8,6 +8,7 @@
 
 #import "CYLGalleryProvider.h"
 #import <CYLTabBarController/CYLTabBarController.h>
+#import "CYLDemoLocalization.h"
 
 /// [EN] The context of the gallery's tab bars: no plus button is registered for it. [CN] 图库 TabBar 的 context：没有为它注册 PlusButton。
 static NSString *const CYLGalleryContext = @"CYLGallery";
@@ -132,7 +133,7 @@ static UIColor *CYLGalleryGray(CGFloat white) {
 
     UIColor *buttonColor = CYLGalleryGray(100);
     self.closeButton = [UIButton buttonWithType:UIButtonTypeCustom];
-    [self.closeButton setTitle:[NSString stringWithFormat:@"  %@  ", CYLLocalizedString(@"点击返回或关闭")] forState:UIControlStateNormal];
+    [self.closeButton setTitle:[NSString stringWithFormat:@"  %@  ", CYLDemoLocalizedString(@"点击返回或关闭")] forState:UIControlStateNormal];
     [self.closeButton setTitleColor:buttonColor forState:UIControlStateNormal];
     self.closeButton.layer.borderWidth = 2;
     self.closeButton.layer.borderColor = buttonColor.CGColor;
@@ -185,7 +186,7 @@ static UIColor *CYLGalleryGray(CGFloat white) {
 
 - (void)pushDetailPage {
     CYLGalleryPageViewController *detail = [[CYLGalleryPageViewController alloc] init];
-    detail.title = CYLLocalizedString(@"详情");
+    detail.title = CYLDemoLocalizedString(@"详情");
     detail.hidesBottomBarWhenPushed = YES;
     if (self.navigationController) {
         [self.navigationController pushViewController:detail animated:YES];
@@ -437,9 +438,9 @@ static CYLTabButtonBlockAnimation *CYLGalleryBadgeScaleAnimation(void) {
     UIViewController *presenter = [self cyl_owningTabBarController];
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         UIAlertController *sheet = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
-        [sheet addAction:[UIAlertAction actionWithTitle:CYLLocalizedString(@"拍照") style:UIAlertActionStyleDefault handler:nil]];
-        [sheet addAction:[UIAlertAction actionWithTitle:CYLLocalizedString(@"从相册选择") style:UIAlertActionStyleDefault handler:nil]];
-        [sheet addAction:[UIAlertAction actionWithTitle:CYLLocalizedString(@"取消") style:UIAlertActionStyleCancel handler:nil]];
+        [sheet addAction:[UIAlertAction actionWithTitle:CYLDemoLocalizedString(@"拍照") style:UIAlertActionStyleDefault handler:nil]];
+        [sheet addAction:[UIAlertAction actionWithTitle:CYLDemoLocalizedString(@"从相册选择") style:UIAlertActionStyleDefault handler:nil]];
+        [sheet addAction:[UIAlertAction actionWithTitle:CYLDemoLocalizedString(@"取消") style:UIAlertActionStyleCancel handler:nil]];
         sheet.popoverPresentationController.sourceView = self;
         sheet.popoverPresentationController.sourceRect = self.bounds;
         [presenter presentViewController:sheet animated:YES completion:nil];
@@ -581,9 +582,9 @@ static void CYLGalleryPresentMoreFeatures(UIViewController *presenter, void (^di
         dismissed();
     };
     UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"More features" message:nil preferredStyle:UIAlertControllerStyleAlert];
-    [alert addAction:[UIAlertAction actionWithTitle:CYLLocalizedString(@"设置") style:UIAlertActionStyleDefault handler:handler]];
-    [alert addAction:[UIAlertAction actionWithTitle:CYLLocalizedString(@"关于我们") style:UIAlertActionStyleDefault handler:handler]];
-    [alert addAction:[UIAlertAction actionWithTitle:CYLLocalizedString(@"取消") style:UIAlertActionStyleCancel handler:handler]];
+    [alert addAction:[UIAlertAction actionWithTitle:CYLDemoLocalizedString(@"设置") style:UIAlertActionStyleDefault handler:handler]];
+    [alert addAction:[UIAlertAction actionWithTitle:CYLDemoLocalizedString(@"关于我们") style:UIAlertActionStyleDefault handler:handler]];
+    [alert addAction:[UIAlertAction actionWithTitle:CYLDemoLocalizedString(@"取消") style:UIAlertActionStyleCancel handler:handler]];
     [presenter presentViewController:alert animated:YES completion:nil];
 }
 
@@ -799,7 +800,7 @@ static void CYLGallerySetTabBarBackgroundColor(UITabBarController *tabBarControl
 }
 
 static UIViewController *CYLGalleryEmbed(CYLTabBarController *tabBarController) {
-    tabBarController.title = CYLLocalizedString(@"示例");
+    tabBarController.title = CYLDemoLocalizedString(@"示例");
     return [[CYLGalleryNavigationController alloc] initWithRootViewController:tabBarController];
 }
 
@@ -906,7 +907,7 @@ static NSDictionary *CYLGalleryRedTabAttributes(void) {
 
 + (UIViewController *)plusChildViewController {
     CYLGalleryPageViewController *page = [[CYLGalleryPageViewController alloc] init];
-    page.title = CYLLocalizedString(@"撰写");
+    page.title = CYLDemoLocalizedString(@"撰写");
     return page;
 }
 
@@ -1183,7 +1184,7 @@ static UIView *CYLGalleryStarView(void) {
                 // [CN] 气泡加在 TabBar 上而不是按钮上，因此 "Photo" 对话框交换页面时不会丢失。
                 CGFloat width = 120;
                 CGRect buttonFrame = [button convertRect:button.bounds toView:tabBar];
-                UIView *bubble = CYLGalleryAddBubble(tabBar, CYLLocalizedString(@"新版本"), [UIColor colorWithWhite:0 alpha:0.75],
+                UIView *bubble = CYLGalleryAddBubble(tabBar, CYLDemoLocalizedString(@"新版本"), [UIColor colorWithWhite:0 alpha:0.75],
                                                      CGRectMake(CGRectGetMaxX(buttonFrame) - width, CGRectGetMinY(buttonFrame) - 40, width, 36),
                                                      [UIFont systemFontOfSize:14]);
                 bubble.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin;
@@ -1416,7 +1417,7 @@ static UIView *CYLGalleryStarView(void) {
                     [NSString stringWithFormat:@"cyl_tabBarButtonWithTabIndex: %@", (id)[tabBar cyl_tabBarButtonWithTabIndex:99] ?: @"nil"],
                 ];
                 UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Index 99" message:[lines componentsJoinedByString:@"\n"] preferredStyle:UIAlertControllerStyleAlert];
-                [alert addAction:[UIAlertAction actionWithTitle:CYLLocalizedString(@"好") style:UIAlertActionStyleCancel handler:nil]];
+                [alert addAction:[UIAlertAction actionWithTitle:CYLDemoLocalizedString(@"好") style:UIAlertActionStyleCancel handler:nil]];
                 [controller presentViewController:alert animated:YES completion:nil];
             });
             return CYLGalleryEmbed(tabBarController);
@@ -1469,7 +1470,7 @@ static UIView *CYLGalleryStarView(void) {
         }],
         [CYLGalleryScene sceneWithTitle:@"More editing with 8 tabs" subtitle:@"Pushed. More → Edit → drag → Done: the star (a marked view) hides while editing and comes back after" pushingBuilder:^UIViewController *{
             CYLTabBarController *tabBarController = [self defaultTabBarControllerWithCount:8];
-            tabBarController.title = CYLLocalizedString(@"编辑更多");
+            tabBarController.title = CYLDemoLocalizedString(@"编辑更多");
             [tabBarController performWhenTabBarItemsReady:^(CYLTabBarController *controller) {
                 UIControl *homeButton = controller.viewControllers.firstObject.cyl_tabButton;
                 [homeButton cyl_replaceTabImageViewWithNewView:CYLGalleryStarView() show:YES];
@@ -1535,7 +1536,7 @@ static UIView *CYLGalleryStarView(void) {
                 controller.selectedIndex = 4;
             }]];
         }];
-        [menu addAction:[UIAlertAction actionWithTitle:CYLLocalizedString(@"取消") style:UIAlertActionStyleCancel handler:nil]];
+        [menu addAction:[UIAlertAction actionWithTitle:CYLDemoLocalizedString(@"取消") style:UIAlertActionStyleCancel handler:nil]];
         UIControl *slotButton = controller.viewControllers.lastObject.cyl_tabButton;
         menu.popoverPresentationController.sourceView = slotButton ?: controller.tabBar;
         menu.popoverPresentationController.sourceRect = (slotButton ?: controller.tabBar).bounds;

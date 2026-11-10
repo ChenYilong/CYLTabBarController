@@ -21,6 +21,7 @@
 #if CYL_FLATDESIGN_AVAILABLE
 #import <CYLTabBarController/CYLFlatDesignTabBar.h>
 #endif
+#import "CYLDemoLocalization.h"
 
 #if CYL_FLATDESIGN_AVAILABLE
 @interface CYLFlatDesignTabBarDemoViewController ()<UITableViewDelegate, UITableViewDataSource, CYLFlatDesignTabBarDelegate>
@@ -46,12 +47,12 @@
 - (NSArray<NSString *> *)datas {
     if (!_datas) {
         _datas = @[
-            CYLLocalizedString(@"设置 barTintColor"),
-            CYLLocalizedString(@"设置 backgroundImage"),
-            CYLLocalizedString(@"设置 shadowImage"),
-            CYLLocalizedString(@"设置 tintColor"),
-            CYLLocalizedString(@"设置 items"),
-            CYLLocalizedString(@"设置 清空"),
+            CYLDemoLocalizedString(@"设置 barTintColor"),
+            CYLDemoLocalizedString(@"设置 backgroundImage"),
+            CYLDemoLocalizedString(@"设置 shadowImage"),
+            CYLDemoLocalizedString(@"设置 tintColor"),
+            CYLDemoLocalizedString(@"设置 items"),
+            CYLDemoLocalizedString(@"设置 清空"),
         ];
     }
     return _datas;
@@ -65,7 +66,7 @@
 
 - (void)initSubviews {
     
-    NSArray *titles = @[CYLLocalizedString(@"主页"), CYLLocalizedString(@"同城"), CYLLocalizedString(@"消息")];
+    NSArray *titles = @[CYLDemoLocalizedString(@"主页"), CYLDemoLocalizedString(@"同城"), CYLDemoLocalizedString(@"消息")];
     NSArray *images = @[@"home_normal", @"fishpond_normal", @"message_normal"];
     NSArray *selectedImages = @[@"home_highlight", @"fishpond_highlight", @"message_highlight"];
     NSMutableArray *items = [NSMutableArray array];

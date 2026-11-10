@@ -8,6 +8,7 @@
 
 #import "CYLPlusDemoChildViewController.h"
 #import "CYLTabBarController.h"
+#import "CYLDemoLocalization.h"
 
 @interface CYLPlusDemoChildViewController ()
 
@@ -26,7 +27,7 @@
 }
 
 - (void)dealloc {
-    NSLog(CYLLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), @"");
+    NSLog(CYLDemoLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), @"");
 }
 /*
 #pragma mark - Navigation

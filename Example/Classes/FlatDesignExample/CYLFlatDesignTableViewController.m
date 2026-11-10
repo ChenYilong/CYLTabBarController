@@ -17,6 +17,7 @@
 #import "MainTabBarController.h"
 #import "CYLMainRootViewController.h"
 #import "CYLPlusButtonSubclass.h"
+#import "CYLDemoLocalization.h"
 
 @interface CYLFlatDesignDemoTabBar : UITabBar
 
@@ -59,7 +60,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     [UITableViewCell cyl_setUpAutomaticRowHeightForTableView:self.tableView];
-    NSLog(CYLLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), self);
+    NSLog(CYLDemoLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), self);
     self.view.backgroundColor = UIColor.systemBackgroundColor; // [EN] Dark Mode. [CN] 适配深色模式。
     self.navigationItem.title = self.title; //✅sets navigation bar title.The right way to set the title of the navigation
     //    self.tabBarItem.title = @"首页";   //❌sets tab bar title. Even the `tabBarItem.title` changed, this will be ignored in tabbar.
@@ -68,13 +69,13 @@
     //    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"home_normal"] style:UIBarButtonItemStylePlain target:self action:@selector(refreshTabBar:)];
     //    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"home_normal"] style:UIBarButtonItemStylePlain target:self action:@selector(refresh)];
     
-    UIBarButtonItem *leftBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:CYLLocalizedString(@"FlatDesign") style:UIBarButtonItemStylePlain target:self action:@selector(flatDesignTabBar:)];
+    UIBarButtonItem *leftBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:CYLDemoLocalizedString(@"FlatDesign") style:UIBarButtonItemStylePlain target:self action:@selector(flatDesignTabBar:)];
     // [CN] leftBarButtonItem.tintColor = UIColor.redColor; // 确保使用原图色
     // [EN] leftBarButtonItem.tintColor = UIColor.redColor; // Make sure the original image color is used
     self.navigationItem.leftBarButtonItem = leftBarButtonItem;
     
     
-    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:CYLLocalizedString(@"LiquidGlass") style:UIBarButtonItemStylePlain target:self action:@selector(refreshTabBar:)];
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:CYLDemoLocalizedString(@"LiquidGlass") style:UIBarButtonItemStylePlain target:self action:@selector(refreshTabBar:)];
     //    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"CYLTabBar" style:UIBarButtonItemStylePlain target:self action:@selector(refresh)];
     
     [self.navigationItem.leftBarButtonItem setTintColor:UIColor.redColor];
@@ -89,7 +90,7 @@
     UIMenu *themeMenu = [self cyl_themeMenuWithCompletion:^{
         [weakSelf.tableView reloadData];
     }];
-    UIBarButtonItem *themeBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:CYLLocalizedString(@"换肤") menu:themeMenu];
+    UIBarButtonItem *themeBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:CYLDemoLocalizedString(@"换肤") menu:themeMenu];
     self.navigationItem.rightBarButtonItems = [self.navigationItem.rightBarButtonItems arrayByAddingObject:themeBarButtonItem];
     
     // ✅ iOS 26修复方案
@@ -158,7 +159,7 @@
         return nil;
     }
     return [UIContextMenuConfiguration configurationWithIdentifier:nil previewProvider:nil actionProvider:^UIMenu *(NSArray<UIMenuElement *> *suggestedActions) {
-        UIAction *copy = [UIAction actionWithTitle:CYLLocalizedString(@"复制") image:[UIImage systemImageNamed:@"doc.on.doc"] identifier:nil handler:^(__kindof UIAction *action) {
+        UIAction *copy = [UIAction actionWithTitle:CYLDemoLocalizedString(@"复制") image:[UIImage systemImageNamed:@"doc.on.doc"] identifier:nil handler:^(__kindof UIAction *action) {
             UIPasteboard.generalPasteboard.string = [tableView cellForRowAtIndexPath:indexPath].textLabel.text;
         }];
         return [UIMenu menuWithTitle:@"" children:@[ copy ]];
@@ -166,7 +167,7 @@
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
-    return section < [self cyl_demoSectionCount] ? [self cyl_demoTitleForSection:section] : CYLLocalizedString(@"角标");
+    return section < [self cyl_demoSectionCount] ? [self cyl_demoTitleForSection:section] : CYLDemoLocalizedString(@"角标");
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -180,7 +181,7 @@
     // [EN] The badge sample is the title, the page the subtitle, as in the other demos.
     // [CN] 与其他演示一致，以角标样例为主标题、页面为副标题。
     cell.textLabel.text = [UITableViewCell cyl_badgeTitleForRow:indexPath.row];
-    cell.detailTextLabel.text = [NSString localizedStringWithFormat:CYLLocalizedString(@"%@ CYLTabBarController on iOS %@"), self.title, @([[[UIDevice currentDevice] systemVersion] floatValue])];
+    cell.detailTextLabel.text = [NSString localizedStringWithFormat:CYLDemoLocalizedString(@"%@ CYLTabBarController on iOS %@"), self.title, @([[[UIDevice currentDevice] systemVersion] floatValue])];
     [cell cyl_wrapsTextLabels];
     [cell cyl_showBadgeForRow:indexPath.row];
     return cell;
@@ -268,42 +269,42 @@ static char CYLTabBarDemoItemTitleKey;
     BOOL pushes = NO;
     switch (row) {
         case CYLTabBarDemoRowShowHideTabBar:
-            title = CYLLocalizedString(@"Show / hide CYLFlatDesignTabBar");
+            title = CYLDemoLocalizedString(@"Show / hide CYLFlatDesignTabBar");
             symbolName = @"eye";
             break;
         case CYLTabBarDemoRowItemNotCentered:
-            title = CYLLocalizedString(@"Change CYLFlatDesignTabBarItem 不居中显示（系统效果）");
+            title = CYLDemoLocalizedString(@"Change CYLFlatDesignTabBarItem 不居中显示（系统效果）");
             symbolName = @"text.alignleft";
             break;
         case CYLTabBarDemoRowItemCentered:
-            title = CYLLocalizedString(@"Change CYLFlatDesignTabBarItem 居中显示");
+            title = CYLDemoLocalizedString(@"Change CYLFlatDesignTabBarItem 居中显示");
             symbolName = @"text.aligncenter";
             break;
         case CYLTabBarDemoRowItemBackgroundColor:
-            title = CYLLocalizedString(@"设置 CYLFlatDesignTabBarItem 背景色");
+            title = CYLDemoLocalizedString(@"设置 CYLFlatDesignTabBarItem 背景色");
             symbolName = @"paintbrush";
             break;
         case CYLTabBarDemoRowTabBarHeight:
-            title = CYLLocalizedString(@"改变 CYLFlatDesignTabBar 高度");
+            title = CYLDemoLocalizedString(@"改变 CYLFlatDesignTabBar 高度");
             symbolName = @"arrow.up.and.down";
             break;
         case CYLTabBarDemoRowCompareSystemTabBar:
-            title = CYLLocalizedString(@"和系统 UITabBar 比较");
+            title = CYLDemoLocalizedString(@"和系统 UITabBar 比较");
             symbolName = @"rectangle.split.2x1";
             pushes = YES;
             break;
         case CYLTabBarDemoRowPushSystemStyle:
-            title = CYLLocalizedString(@"Push To 系统 UITabBarController（另一个 PlusButton）");
+            title = CYLDemoLocalizedString(@"Push To 系统 UITabBarController（另一个 PlusButton）");
             symbolName = @"square.stack";
             pushes = YES;
             break;
         case CYLTabBarDemoRowPushFlatDesign:
-            title = CYLLocalizedString(@"Push To 另一个 CYLFlatDesignTabBarController（另一个 PlusButton）");
+            title = CYLDemoLocalizedString(@"Push To 另一个 CYLFlatDesignTabBarController（另一个 PlusButton）");
             symbolName = @"square.stack.3d.up";
             pushes = YES;
             break;
         default:
-            title = CYLLocalizedString(@"cyl_pop / cyl_push 系列方法演示");
+            title = CYLDemoLocalizedString(@"cyl_pop / cyl_push 系列方法演示");
             symbolName = @"arrow.uturn.left";
             pushes = YES;
             break;
@@ -311,8 +312,8 @@ static char CYLTabBarDemoItemTitleKey;
     BOOL supported = [self cyl_isTabBarDemoRowSupported:row];
     cell.textLabel.text = title;
     cell.detailTextLabel.text = supported ? nil : (row == CYLTabBarDemoRowTabBarHeight ?
-        CYLLocalizedString(@"液态玻璃不支持：TabBar 高度由系统决定（扁平样式与经典样式支持）") :
-        CYLLocalizedString(@"当前 TabBar 样式不支持：仅扁平样式（CYLFlatDesignTabBar）支持"));
+        CYLDemoLocalizedString(@"液态玻璃不支持：TabBar 高度由系统决定（扁平样式与经典样式支持）") :
+        CYLDemoLocalizedString(@"当前 TabBar 样式不支持：仅扁平样式（CYLFlatDesignTabBar）支持"));
     cell.imageView.image = [UIImage systemImageNamed:symbolName];
     cell.accessoryType = pushes ? UITableViewCellAccessoryDisclosureIndicator : UITableViewCellAccessoryNone;
     [cell cyl_wrapsTextLabels];
@@ -323,12 +324,12 @@ static char CYLTabBarDemoItemTitleKey;
 - (void)cyl_didSelectTabBarDemoRow:(NSInteger)row inTableView:(UITableView *)tableView {
     if (![self cyl_isTabBarDemoRowSupported:row]) {
         NSString *message = (row == CYLTabBarDemoRowTabBarHeight) ?
-            CYLLocalizedString(@"液态玻璃不支持：TabBar 高度由系统决定（扁平样式与经典样式支持）") :
-            CYLLocalizedString(@"该功能需要扁平样式的 TabBarItem（CYLFlatDesignTabBarItem）。液态玻璃与经典样式的 TabBarItem 由系统绘制，不支持修改布局与背景色。");
-        UIAlertController *alert = [UIAlertController alertControllerWithTitle:CYLLocalizedString(@"当前 TabBar 样式不支持")
+            CYLDemoLocalizedString(@"液态玻璃不支持：TabBar 高度由系统决定（扁平样式与经典样式支持）") :
+            CYLDemoLocalizedString(@"该功能需要扁平样式的 TabBarItem（CYLFlatDesignTabBarItem）。液态玻璃与经典样式的 TabBarItem 由系统绘制，不支持修改布局与背景色。");
+        UIAlertController *alert = [UIAlertController alertControllerWithTitle:CYLDemoLocalizedString(@"当前 TabBar 样式不支持")
                                                                        message:message
                                                                 preferredStyle:UIAlertControllerStyleAlert];
-        [alert addAction:[UIAlertAction actionWithTitle:CYLLocalizedString(@"OK") style:UIAlertActionStyleCancel handler:nil]];
+        [alert addAction:[UIAlertAction actionWithTitle:CYLDemoLocalizedString(@"OK") style:UIAlertActionStyleCancel handler:nil]];
         [self presentViewController:alert animated:YES completion:nil];
         return;
     }
@@ -484,8 +485,8 @@ static const void *const CYLScrollHideSimulationListExpandedKey = &CYLScrollHide
     }
     BOOL expanded = [self cyl_isScrollHideSimulationListExpanded];
     cell.textLabel.text = expanded
-        ? CYLLocalizedString(@"收起模拟列表")
-        : [NSString stringWithFormat:CYLLocalizedString(@"展开全部 %@ 个模拟"), @([self cyl_scrollHideSimulationRowCount])];
+        ? CYLDemoLocalizedString(@"收起模拟列表")
+        : [NSString stringWithFormat:CYLDemoLocalizedString(@"展开全部 %@ 个模拟"), @([self cyl_scrollHideSimulationRowCount])];
     if (@available(iOS 13.0, *)) {
         cell.imageView.image = [UIImage systemImageNamed:expanded ? @"chevron.up" : @"chevron.down"];
     }
@@ -559,7 +560,7 @@ static const void *const CYLScrollHideSimulationListExpandedKey = &CYLScrollHide
                     [simulationRows addObject:[CYLDemoRow scrollHideSimulationRow:simulationRow]];
                 }
             }
-            [sections addObject:@{ @"title" : CYLLocalizedString(@"滚动隐藏：模拟意外情况（issue #13）"), @"rows" : simulationRows }];
+            [sections addObject:@{ @"title" : CYLDemoLocalizedString(@"滚动隐藏：模拟意外情况（issue #13）"), @"rows" : simulationRows }];
         }
         if (settingsGroup == CYLSettingsGroupPlusButton) {
             // [EN] Issue #216: every skin, one row each (color themes and holiday skins).
@@ -571,7 +572,7 @@ static const void *const CYLScrollHideSimulationListExpandedKey = &CYLScrollHide
             [sections addObject:@{ @"title" : [self cyl_themeListSectionTitle], @"rows" : themeRows }];
         }
     }
-    [sections addObject:@{ @"title" : CYLLocalizedString(@"跳转与对比"),
+    [sections addObject:@{ @"title" : CYLDemoLocalizedString(@"跳转与对比"),
                            @"rows" : @[ [CYLDemoRow tabBarDemoRow:CYLTabBarDemoRowCompareSystemTabBar],
                                         [CYLDemoRow tabBarDemoRow:CYLTabBarDemoRowPushSystemStyle],
                                         [CYLDemoRow tabBarDemoRow:CYLTabBarDemoRowPushFlatDesign],

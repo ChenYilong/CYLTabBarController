@@ -13,6 +13,7 @@
 #else
 #import "CYLTabBarController.h"
 #endif
+#import "CYLDemoLocalization.h"
 
 typedef void (^CYLPopPushDemoAction)(void);
 
@@ -41,7 +42,7 @@ typedef void (^CYLPopPushDemoAction)(void);
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.view.backgroundColor = [UIColor systemTealColor];
-    self.navigationItem.title = CYLLocalizedString(@"另一个类型的页面");
+    self.navigationItem.title = CYLDemoLocalizedString(@"另一个类型的页面");
 }
 @end
 
@@ -68,7 +69,7 @@ typedef void (^CYLPopPushDemoAction)(void);
     // The tab bar controller, the tabs and the stack depth may have changed while this page was not visible.
     // 本页面不可见时，TabBarController、Tab 和栈深度都可能已经改变。
     NSUInteger level = [self.navigationController.viewControllers indexOfObject:self];
-    self.navigationItem.title = [NSString stringWithFormat:CYLLocalizedString(@"cyl_pop / cyl_push（第 %@ 层）"), @(level)];
+    self.navigationItem.title = [NSString stringWithFormat:CYLDemoLocalizedString(@"cyl_pop / cyl_push（第 %@ 层）"), @(level)];
     [self reloadRows];
 }
 
@@ -83,7 +84,7 @@ typedef void (^CYLPopPushDemoAction)(void);
 - (NSString *)titleOfTabAtIndex:(NSUInteger)index {
     NSArray<UIViewController *> *viewControllers = [self demoTabBarController].viewControllers;
     if (index >= viewControllers.count) {
-        return CYLLocalizedString(@"不存在");
+        return CYLDemoLocalizedString(@"不存在");
     }
     UIViewController *viewController = viewControllers[index];
     return viewController.tabBarItem.title ?: viewController.title ?: NSStringFromClass([viewController class]);
@@ -113,13 +114,13 @@ typedef void (^CYLPopPushDemoAction)(void);
 
     NSArray<CYLPopPushDemoRow *> *popSelectRows = @[
         [CYLPopPushDemoRow rowWithTitle:@"cyl_popSelectTabBarChildViewControllerAtIndex:"
-                                 detail:[NSString stringWithFormat:CYLLocalizedString(@"Pop 当前导航栈到栈底，并选中「%@」（index %@），无动画"), lastTitle, @(lastIndex)]
+                                 detail:[NSString stringWithFormat:CYLDemoLocalizedString(@"Pop 当前导航栈到栈底，并选中「%@」（index %@），无动画"), lastTitle, @(lastIndex)]
                                  action:^{ [weakSelf cyl_popSelectTabBarChildViewControllerAtIndex:lastIndex]; }],
         [CYLPopPushDemoRow rowWithTitle:@"…AtIndex:animated:"
-                                 detail:[NSString stringWithFormat:CYLLocalizedString(@"同上，选中「%@」（index 1），带 pop 动画"), secondTitle]
+                                 detail:[NSString stringWithFormat:CYLDemoLocalizedString(@"同上，选中「%@」（index 1），带 pop 动画"), secondTitle]
                                  action:^{ [weakSelf cyl_popSelectTabBarChildViewControllerAtIndex:1 animated:YES]; }],
         [CYLPopPushDemoRow rowWithTitle:@"…AtIndex:completion:"
-                                 detail:[NSString stringWithFormat:CYLLocalizedString(@"选中「%@」，并在 completion 中向该 Tab push 一个新的演示页"), lastTitle]
+                                 detail:[NSString stringWithFormat:CYLDemoLocalizedString(@"选中「%@」，并在 completion 中向该 Tab push 一个新的演示页"), lastTitle]
                                  action:^{
             [weakSelf cyl_popSelectTabBarChildViewControllerAtIndex:lastIndex completion:^(__kindof UIViewController *selectedTabBarChildViewController) {
                 CYLPopPushDemoViewController *next = [[CYLPopPushDemoViewController alloc] init];
@@ -128,10 +129,10 @@ typedef void (^CYLPopPushDemoAction)(void);
             }];
         }],
         [CYLPopPushDemoRow rowWithTitle:@"…ForClassType:"
-                                 detail:[NSString stringWithFormat:CYLLocalizedString(@"选中第一个类型为 %@ 的 Tab（「%@」，index %@）"), NSStringFromClass(classType), [self titleOfTabAtIndex:classIndex], @(classIndex)]
+                                 detail:[NSString stringWithFormat:CYLDemoLocalizedString(@"选中第一个类型为 %@ 的 Tab（「%@」，index %@）"), NSStringFromClass(classType), [self titleOfTabAtIndex:classIndex], @(classIndex)]
                                  action:^{ [weakSelf cyl_popSelectTabBarChildViewControllerForClassType:classType]; }],
         [CYLPopPushDemoRow rowWithTitle:@"…ForClassType:completion:"
-                                 detail:CYLLocalizedString(@"同上，并在 completion 中向该 Tab push 一个新的演示页")
+                                 detail:CYLDemoLocalizedString(@"同上，并在 completion 中向该 Tab push 一个新的演示页")
                                  action:^{
             [weakSelf cyl_popSelectTabBarChildViewControllerForClassType:classType completion:^(__kindof UIViewController *selectedTabBarChildViewController) {
                 CYLPopPushDemoViewController *next = [[CYLPopPushDemoViewController alloc] init];
@@ -140,13 +141,13 @@ typedef void (^CYLPopPushDemoAction)(void);
             }];
         }],
         [CYLPopPushDemoRow rowWithTitle:@"…ForTabBarItemIdentifier:"
-                                 detail:[NSString stringWithFormat:CYLLocalizedString(@"选中标识为「%@」的 Tab（「%@」，index %@）"), lastIdentifier, lastTitle, @(lastIndex)]
+                                 detail:[NSString stringWithFormat:CYLDemoLocalizedString(@"选中标识为「%@」的 Tab（「%@」，index %@）"), lastIdentifier, lastTitle, @(lastIndex)]
                                  action:^{ [weakSelf cyl_popSelectTabBarChildViewControllerForTabBarItemIdentifier:lastIdentifier]; }],
         [CYLPopPushDemoRow rowWithTitle:@"…ForTabBarItemIdentifier:animated:"
-                                 detail:[NSString stringWithFormat:CYLLocalizedString(@"同上，选中标识为「%@」的 Tab（「%@」），带 pop 动画"), secondIdentifier, secondTitle]
+                                 detail:[NSString stringWithFormat:CYLDemoLocalizedString(@"同上，选中标识为「%@」的 Tab（「%@」），带 pop 动画"), secondIdentifier, secondTitle]
                                  action:^{ [weakSelf cyl_popSelectTabBarChildViewControllerForTabBarItemIdentifier:secondIdentifier animated:YES]; }],
         [CYLPopPushDemoRow rowWithTitle:@"…ForTabBarItemIdentifier:completion:"
-                                 detail:CYLLocalizedString(@"同上，并在 completion 中向该 Tab push 一个新的演示页")
+                                 detail:CYLDemoLocalizedString(@"同上，并在 completion 中向该 Tab push 一个新的演示页")
                                  action:^{
             [weakSelf cyl_popSelectTabBarChildViewControllerForTabBarItemIdentifier:lastIdentifier completion:^(__kindof UIViewController *selectedTabBarChildViewController) {
                 CYLPopPushDemoViewController *next = [[CYLPopPushDemoViewController alloc] init];
@@ -155,47 +156,47 @@ typedef void (^CYLPopPushDemoAction)(void);
             }];
         }],
         [CYLPopPushDemoRow rowWithTitle:@"…ForTabBarItemIdentifier:@\"unknown\""
-                                 detail:CYLLocalizedString(@"返回 nil：不 pop、不切换 Tab")
+                                 detail:CYLDemoLocalizedString(@"返回 nil：不 pop、不切换 Tab")
                                  action:^{
             UIViewController *selected = [weakSelf cyl_popSelectTabBarChildViewControllerForTabBarItemIdentifier:@"unknown"];
-            [weakSelf showMessage:[NSString stringWithFormat:CYLLocalizedString(@"返回值：%@"), selected ?: @"nil"]];
+            [weakSelf showMessage:[NSString stringWithFormat:CYLDemoLocalizedString(@"返回值：%@"), selected ?: @"nil"]];
         }],
-        [CYLPopPushDemoRow rowWithTitle:CYLLocalizedString(@"…AtIndex:99（无效 index）")
-                                 detail:CYLLocalizedString(@"返回 nil：不 pop、不切换 Tab")
+        [CYLPopPushDemoRow rowWithTitle:CYLDemoLocalizedString(@"…AtIndex:99（无效 index）")
+                                 detail:CYLDemoLocalizedString(@"返回 nil：不 pop、不切换 Tab")
                                  action:^{
             UIViewController *selected = [weakSelf cyl_popSelectTabBarChildViewControllerAtIndex:99];
-            [weakSelf showMessage:[NSString stringWithFormat:CYLLocalizedString(@"返回值：%@"), selected ?: @"nil"]];
+            [weakSelf showMessage:[NSString stringWithFormat:CYLDemoLocalizedString(@"返回值：%@"), selected ?: @"nil"]];
         }],
     ];
 
     NSArray<CYLPopPushDemoRow *> *pushRows = @[
-        [CYLPopPushDemoRow rowWithTitle:CYLLocalizedString(@"pushViewController:animated:（普通 push）")
-                                 detail:CYLLocalizedString(@"再 push 一层演示页，用来加深导航栈")
+        [CYLPopPushDemoRow rowWithTitle:CYLDemoLocalizedString(@"pushViewController:animated:（普通 push）")
+                                 detail:CYLDemoLocalizedString(@"再 push 一层演示页，用来加深导航栈")
                                  action:^{
             CYLPopPushDemoViewController *next = [[CYLPopPushDemoViewController alloc] init];
             next.hidesBottomBarWhenPushed = YES;
             [weakSelf.navigationController pushViewController:next animated:YES];
         }],
-        [CYLPopPushDemoRow rowWithTitle:CYLLocalizedString(@"cyl_pushViewController:（与栈顶同类型）")
-                                 detail:CYLLocalizedString(@"栈顶已经是演示页，push 另一个演示页会被忽略，防止重复 push")
+        [CYLPopPushDemoRow rowWithTitle:CYLDemoLocalizedString(@"cyl_pushViewController:（与栈顶同类型）")
+                                 detail:CYLDemoLocalizedString(@"栈顶已经是演示页，push 另一个演示页会被忽略，防止重复 push")
                                  action:^{
             NSUInteger count = weakSelf.navigationController.viewControllers.count;
             CYLPopPushDemoViewController *next = [[CYLPopPushDemoViewController alloc] init];
             next.hidesBottomBarWhenPushed = YES;
             [weakSelf cyl_pushViewController:next animated:YES];
             if (weakSelf.navigationController.viewControllers.count == count) {
-                [weakSelf showMessage:CYLLocalizedString(@"已忽略：栈顶已是同类型页面")];
+                [weakSelf showMessage:CYLDemoLocalizedString(@"已忽略：栈顶已是同类型页面")];
             }
         }],
-        [CYLPopPushDemoRow rowWithTitle:CYLLocalizedString(@"cyl_pushViewController:（不同类型）")
-                                 detail:CYLLocalizedString(@"push 一个不同类型的页面，正常 push")
+        [CYLPopPushDemoRow rowWithTitle:CYLDemoLocalizedString(@"cyl_pushViewController:（不同类型）")
+                                 detail:CYLDemoLocalizedString(@"push 一个不同类型的页面，正常 push")
                                  action:^{
             CYLPopPushDemoOtherViewController *other = [[CYLPopPushDemoOtherViewController alloc] init];
             other.hidesBottomBarWhenPushed = YES;
             [weakSelf cyl_pushViewController:other animated:YES];
         }],
-        [CYLPopPushDemoRow rowWithTitle:CYLLocalizedString(@"cyl_pushOrPopToViewController:（栈中有同类型时 Pop）")
-                                 detail:CYLLocalizedString(@"栈中已有演示页时，Pop 回最早的那个；否则 push 一个新的演示页")
+        [CYLPopPushDemoRow rowWithTitle:CYLDemoLocalizedString(@"cyl_pushOrPopToViewController:（栈中有同类型时 Pop）")
+                                 detail:CYLDemoLocalizedString(@"栈中已有演示页时，Pop 回最早的那个；否则 push 一个新的演示页")
                                  action:^{
             CYLPopPushDemoViewController *next = [[CYLPopPushDemoViewController alloc] init];
             next.hidesBottomBarWhenPushed = YES;
@@ -203,8 +204,8 @@ typedef void (^CYLPopPushDemoAction)(void);
                 completionHandler(viewControllers.count > 0, viewControllers.firstObject, NO, 0);
             }];
         }],
-        [CYLPopPushDemoRow rowWithTitle:CYLLocalizedString(@"cyl_pushOrPopToViewController:（切换 Tab 后 Push）")
-                                 detail:[NSString stringWithFormat:CYLLocalizedString(@"Pop 当前导航栈、选中「%@」，再向该 Tab push 一个新的演示页"), lastTitle]
+        [CYLPopPushDemoRow rowWithTitle:CYLDemoLocalizedString(@"cyl_pushOrPopToViewController:（切换 Tab 后 Push）")
+                                 detail:[NSString stringWithFormat:CYLDemoLocalizedString(@"Pop 当前导航栈、选中「%@」，再向该 Tab push 一个新的演示页"), lastTitle]
                                  action:^{
             CYLPopPushDemoViewController *next = [[CYLPopPushDemoViewController alloc] init];
             next.hidesBottomBarWhenPushed = YES;
@@ -213,7 +214,7 @@ typedef void (^CYLPopPushDemoAction)(void);
             }];
         }],
         [CYLPopPushDemoRow rowWithTitle:@"cyl_pushOrPopToViewController:…tabBarItemIdentifier:callback:"
-                                 detail:[NSString stringWithFormat:CYLLocalizedString(@"Pop 当前导航栈、选中标识为「%@」的 Tab，再向该 Tab push 一个新的演示页"), lastIdentifier]
+                                 detail:[NSString stringWithFormat:CYLDemoLocalizedString(@"Pop 当前导航栈、选中标识为「%@」的 Tab，再向该 Tab push 一个新的演示页"), lastIdentifier]
                                  action:^{
             CYLPopPushDemoViewController *next = [[CYLPopPushDemoViewController alloc] init];
             next.hidesBottomBarWhenPushed = YES;
@@ -225,13 +226,13 @@ typedef void (^CYLPopPushDemoAction)(void);
     ];
 
     self.sections = @[popSelectRows, pushRows];
-    self.sectionTitles = @[CYLLocalizedString(@"Pop & Select（Pop 到栈底并切换 Tab）"), CYLLocalizedString(@"Push（防重复 Push / Push 或 Pop）")];
+    self.sectionTitles = @[CYLDemoLocalizedString(@"Pop & Select（Pop 到栈底并切换 Tab）"), CYLDemoLocalizedString(@"Push（防重复 Push / Push 或 Pop）")];
     [self.tableView reloadData];
 }
 
 - (void)showMessage:(NSString *)message {
     UIAlertController *alert = [UIAlertController alertControllerWithTitle:nil message:message preferredStyle:UIAlertControllerStyleAlert];
-    [alert addAction:[UIAlertAction actionWithTitle:CYLLocalizedString(@"OK") style:UIAlertActionStyleDefault handler:nil]];
+    [alert addAction:[UIAlertAction actionWithTitle:CYLDemoLocalizedString(@"OK") style:UIAlertActionStyleDefault handler:nil]];
     [self presentViewController:alert animated:YES completion:nil];
 }
 

@@ -14,6 +14,7 @@
 #else
 #import "UIColor+CYLTabBarControllerExtention.h"
 #endif
+#import "CYLDemoLocalization.h"
 @interface CYLPlusButtonSubclass () {
     CGFloat _buttonImageHeight;
 }
@@ -321,11 +322,11 @@ static CGFloat const CYLDemoPlusButtonWidth = 55;
     NSString *nextPlusButtonTitle = [nextPlusButtonClass plusButtonTitle];
     
     UIAlertController *actionSheet = [UIAlertController
-                                      alertControllerWithTitle:CYLLocalizedString(@"Switch Style 切换样式")
-                                      message:[NSString stringWithFormat:CYLLocalizedString(@"PlusButton → 「%@」"), nextPlusButtonTitle]
+                                      alertControllerWithTitle:CYLDemoLocalizedString(@"Switch Style 切换样式")
+                                      message:[NSString stringWithFormat:CYLDemoLocalizedString(@"PlusButton → 「%@」"), nextPlusButtonTitle]
                                       preferredStyle:UIAlertControllerStyleActionSheet];
     
-    [actionSheet addAction:[UIAlertAction actionWithTitle:CYLLocalizedString(@"Liquid Glass液态玻璃")
+    [actionSheet addAction:[UIAlertAction actionWithTitle:CYLDemoLocalizedString(@"Liquid Glass液态玻璃")
                                                     style:UIAlertActionStyleDefault
                                                   handler:^(UIAlertAction *action) {
         // handle choose
@@ -335,7 +336,7 @@ static CGFloat const CYLDemoPlusButtonWidth = 55;
 
     }]];
     
-    [actionSheet addAction:[UIAlertAction actionWithTitle:CYLLocalizedString(@"FlatDesign扁平设计样式")
+    [actionSheet addAction:[UIAlertAction actionWithTitle:CYLDemoLocalizedString(@"FlatDesign扁平设计样式")
                                                     style:UIAlertActionStyleDefault
                                                   handler:^(UIAlertAction *action) {
         // handle choose
@@ -347,7 +348,7 @@ static CGFloat const CYLDemoPlusButtonWidth = 55;
     
     
     
-    [actionSheet addAction:[UIAlertAction actionWithTitle:CYLLocalizedString(@"取消")
+    [actionSheet addAction:[UIAlertAction actionWithTitle:CYLDemoLocalizedString(@"取消")
                                                     style:UIAlertActionStyleCancel
                                                   handler:nil]];
     
@@ -425,7 +426,7 @@ static CGFloat const CYLDemoPlusButtonWidth = 55;
     // [EN] The library's localization (AGENTS.md): NSLocalizedString read the app's own table, which has no translation, so
     //      FlatDesign showed "发布" under the plus button in every language. [CN] 使用库的本地化（AGENTS.md）：NSLocalizedString 读取
     //      App 自己的表，没有译文，扁平样式下 PlusButton 下方在所有语言中都显示「发布」。
-    plusChildNavigationController.title = CYLLocalizedString(@"发布");
+    plusChildNavigationController.title = CYLDemoLocalizedString(@"发布");
     return plusChildNavigationController;
 }
 
@@ -447,9 +448,9 @@ static CGFloat const CYLDemoPlusButtonWidth = 55;
 + (BOOL)shouldSelectPlusChildViewController {
     BOOL isSelected = [CYLPlusButton plusButtonForTabBarContext:[self matchedTabBarContext]].selected;
     if  (isSelected) {
-        NSLog(CYLLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), @"PlusButton is selected");
+        NSLog(CYLDemoLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), @"PlusButton is selected");
     } else {
-        NSLog(CYLLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), @"PlusButton is not selected");
+        NSLog(CYLDemoLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), @"PlusButton is not selected");
     }
     return YES;
 }
@@ -482,7 +483,7 @@ static CGFloat const CYLDemoPlusButtonWidth = 55;
 }
 
 + (NSString *)plusButtonTitle {
-    return CYLLocalizedString(@"发布");
+    return CYLDemoLocalizedString(@"发布");
 }
 
 + (Class)alternatePlusButtonClassForOwner:(id)owner {
@@ -513,7 +514,7 @@ static CGFloat const CYLDemoPlusButtonWidth = 55;
 }
 
 + (NSString *)plusButtonTitle {
-    return CYLLocalizedString(@"拍摄");
+    return CYLDemoLocalizedString(@"拍摄");
 }
 
 // Only the icon differs: a camera (SF Symbol, iOS 13+), the other plus button keeps the `post_*` images.
@@ -566,7 +567,7 @@ static UIColor *CYLCloseSubviewCurrentColor = nil;
 }
 
 + (NSString *)plusButtonTitle {
-    return CYLLocalizedString(@"子控件");
+    return CYLDemoLocalizedString(@"子控件");
 }
 
 + (UIColor *)currentCloseColor {

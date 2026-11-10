@@ -20,6 +20,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
 #import "CYLMessageViewController.h"
 #import "CYLMineViewController.h"
 #import "CYLSameCityViewController.h"
+#import "CYLDemoLocalization.h"
 
 
 @interface MainTabBarController ()<CYLTabBarControllerDelegate, CYLFlatDesignUITabBarControllerDelegate>
@@ -230,12 +231,12 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
     // Dark 外观（推荐）。关闭 Lottie 时显示这些图标；开启时由下方的 Lottie 动画代替。另见扁平样式的演示页。
     //    CGFloat firstXOffset = -12/2;
     NSDictionary *firstTabBarItemsAttributes = @{
-        CYLTabBarItemTitle : CYLLocalizedString(@"首页"),
+        CYLTabBarItemTitle : CYLDemoLocalizedString(@"首页"),
         // [EN] #433: like JD, the selected Home tab reads "Refresh"; a re-tap replays its Lottie animation and is
         //      reported to `cyl_tabBarItemGestureHandler` (-setUpTabBarItemGestures).
         // [CN] #433：与京东一样，选中的「首页」显示「刷新」；再次点击重播 Lottie 动画，并回调 `cyl_tabBarItemGestureHandler`
         //      （-setUpTabBarItemGestures）。
-        CYLTabBarItemSelectedTitle : CYLLocalizedString(@"刷新"),
+        CYLTabBarItemSelectedTitle : CYLDemoLocalizedString(@"刷新"),
         CYLTabBarItemIdentifier : @"home",  // #408: stays right when tabs are added or removed. Tab 增减后依然准确。
         // A name also loads "<name>_dark" when that image exists: here home_normal_dark (UIImage.cyl_darkImageNameSuffix).
         // 图片名会同时加载存在的「<name>_dark」：这里是 home_normal_dark（UIImage.cyl_darkImageNameSuffix）。
@@ -252,7 +253,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
     };
     //    CGFloat secondXOffset = (-25+2)/2;
     NSDictionary *secondTabBarItemsAttributes = @{
-        CYLTabBarItemTitle : CYLLocalizedString(@"同城"),
+        CYLTabBarItemTitle : CYLDemoLocalizedString(@"同城"),
         CYLTabBarItemIdentifier : @"city",
         CYLTabBarItemImage :@"fishpond_normal",
         CYLTabBarItemSelectedImage : @"fishpond_highlight",
@@ -269,7 +270,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
     };
     
     NSDictionary *thirdTabBarItemsAttributes = @{
-        CYLTabBarItemTitle : CYLLocalizedString(@"消息"),
+        CYLTabBarItemTitle : CYLDemoLocalizedString(@"消息"),
         CYLTabBarItemIdentifier : @"message",
         // A dark image under any name. Names are the prepared form (rendered as original, #465); a UIImage object for
         // the same is `[UIImage cyl_imageWithImageInfo:@"message_normal" darkImageInfo:@"message_normal_night"]`.
@@ -287,7 +288,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
         //                                                 CYLTabBarLottieSize: [NSValue valueWithCGSize:CGSizeMake(22, 22)]
     };
     NSDictionary *fourthTabBarItemsAttributes = @{
-        CYLTabBarItemTitle : CYLLocalizedString(@"我的"),
+        CYLTabBarItemTitle : CYLDemoLocalizedString(@"我的"),
         // No CYLTabBarItemIdentifier: the default is the class name, "CYLMineViewController" (#408).
         // 未设置 CYLTabBarItemIdentifier：默认值为类名 "CYLMineViewController"（#408）。
         // account_normal has its own Dark appearance in Images.xcassets; it wins over any "_dark" image.
@@ -518,7 +519,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
         [[NSNotificationCenter defaultCenter] removeObserver:self];
     } @catch (NSException *exception) {
 #if defined(DEBUG) || defined(BETA)
-        NSLog(CYLLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
+        NSLog(CYLDemoLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
 #endif
     }
 }
@@ -702,7 +703,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
             // [CN] #535：PlusButton 也显示角标，与 Tab 一致；每次点击数字加 1（见 -didSelectControl:）。
             [tabBarController cyl_demo_showPlusButtonBadge];
         } @catch (NSException *exception) {
-            NSLog(CYLLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
+            NSLog(CYLDemoLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
         }
         
         // [CN] 添加仿淘宝tabbar，第一个tab选中后有图标覆盖
@@ -726,7 +727,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
     // test for issue #642
     //    self.selectedIndex = [self.viewControllers indexOfObject:viewController];
     
-    NSLog(CYLLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：index%@ title%@"), @(__PRETTY_FUNCTION__), @(__LINE__), @([self.viewControllers indexOfObject:viewController]), viewController.title);
+    NSLog(CYLDemoLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：index%@ title%@"), @(__PRETTY_FUNCTION__), @(__LINE__), @([self.viewControllers indexOfObject:viewController]), viewController.title);
 #endif
     if ([tabButton cyl_isPlusControl]) {
         // [CN] FIXME:  to delete 玻璃效果下， 不能调用 updateSelectionStatusIfNeededForTabBarController，selectedViewController， selectedIndex 否则无法实现plusButton的点击事件响应， 响应的仅仅是tabButton
@@ -1029,13 +1030,13 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
 
 - (void)cyl_demo_presentLoginForViewController:(UIViewController *)viewController completion:(CYLTabBarLoginCompletion)completion {
     NSString *title = viewController.tabBarItem.title ?: [viewController cyl_getViewControllerInsteadOfNavigationController].title ?: @"";
-    UIAlertController *alert = [UIAlertController alertControllerWithTitle:CYLLocalizedString(@"需要登录")
-                                                                   message:[NSString stringWithFormat:CYLLocalizedString(@"「%@」需要登录后才能查看"), title]
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:CYLDemoLocalizedString(@"需要登录")
+                                                                   message:[NSString stringWithFormat:CYLDemoLocalizedString(@"「%@」需要登录后才能查看"), title]
                                                             preferredStyle:UIAlertControllerStyleAlert];
-    [alert addAction:[UIAlertAction actionWithTitle:CYLLocalizedString(@"取消") style:UIAlertActionStyleCancel handler:^(UIAlertAction *action) {
+    [alert addAction:[UIAlertAction actionWithTitle:CYLDemoLocalizedString(@"取消") style:UIAlertActionStyleCancel handler:^(UIAlertAction *action) {
         completion(NO);
     }]];
-    [alert addAction:[UIAlertAction actionWithTitle:CYLLocalizedString(@"登录") style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+    [alert addAction:[UIAlertAction actionWithTitle:CYLDemoLocalizedString(@"登录") style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
         // A real app logs in here first. 实际 App 在这里先完成登录。
         completion(YES);
     }]];
@@ -1090,15 +1091,15 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
 - (void)cyl_demo_showActionsForControl:(UIControl *)control {
     NSString *identifier = control.cyl_tabBarItemIdentifier;
     UIAlertController *sheet = [UIAlertController alertControllerWithTitle:identifier
-                                                                    message:CYLLocalizedString(@"长按（#152）")
+                                                                    message:CYLDemoLocalizedString(@"长按（#152）")
                                                              preferredStyle:UIAlertControllerStyleActionSheet];
     __weak __typeof(self) weakSelf = self;
     if (identifier.length > 0 && ![control cyl_isPlusButton]) {
-        [sheet addAction:[UIAlertAction actionWithTitle:CYLLocalizedString(@"选中") style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+        [sheet addAction:[UIAlertAction actionWithTitle:CYLDemoLocalizedString(@"选中") style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
             [weakSelf cyl_selectTabBarItemWithIdentifier:identifier];
         }]];
     }
-    [sheet addAction:[UIAlertAction actionWithTitle:CYLLocalizedString(@"取消") style:UIAlertActionStyleCancel handler:nil]];
+    [sheet addAction:[UIAlertAction actionWithTitle:CYLDemoLocalizedString(@"取消") style:UIAlertActionStyleCancel handler:nil]];
     sheet.popoverPresentationController.sourceView = control;
     sheet.popoverPresentationController.sourceRect = control.bounds;
     UIViewController *presenter = self.presentedViewController ? nil : self;

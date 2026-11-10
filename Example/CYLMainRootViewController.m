@@ -16,6 +16,7 @@
 #import "CYLMessageViewController.h"
 #import "CYLMineViewController.h"
 #import "CYLPlusDemoChildViewController.h"
+#import "CYLDemoLocalization.h"
 
 @interface CYLMainRootViewController ()
 
@@ -188,7 +189,7 @@
         //                     selectedImageName:selectedImages[i]
         //                        lottieFilePath:lottieFilePaths[i]];
         
-        nav.cyl_getViewControllerInsteadOfNavigationController.title  = [NSString stringWithFormat:@"%@%@", firstTabBarItemsAttributes[CYLTabBarItemTitle],CYLLocalizedString(@"（扁平）")];
+        nav.cyl_getViewControllerInsteadOfNavigationController.title  = [NSString stringWithFormat:@"%@%@", firstTabBarItemsAttributes[CYLTabBarItemTitle],CYLDemoLocalizedString(@"（扁平）")];
 
         
         //        if (i == 0) {
