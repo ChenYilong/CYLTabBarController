@@ -2,20 +2,15 @@ package com.cyl.tabbar
 
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
-import android.os.Bundle
-import android.os.Looper
 import android.os.SystemClock
 import android.text.SpannableString
 import android.text.Spanned
 import android.text.TextPaint
-import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
-import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentActivity
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotEquals
@@ -26,9 +21,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.Robolectric
 import org.robolectric.RobolectricTestRunner
-import org.robolectric.Shadows.shadowOf
 import org.robolectric.annotation.Config
-import java.time.Duration
 
 /**
  * [EN] The Android-only features adapted from QMUI_Android: the tab bar indicator and scrollable mode, swiping between pages,
@@ -37,33 +30,7 @@ import java.time.Duration
  */
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34])
-class CYLQMUIAdaptedFeaturesTest {
-
-    /** [EN] A page with a view, so swipes have something to move. [CN] 带视图的页面，滑动时有内容可移动。 */
-    class Page : Fragment() {
-        override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View = FrameLayout(inflater.context)
-    }
-
-    private fun attributes(vararg titles: String) = titles.map { mapOf(CYLConstants.CYLTabBarItemTitle to it, CYLConstants.CYLTabBarItemIdentifier to it.lowercase()) }
-
-    private fun <T> withActivity(block: (FragmentActivity) -> T): T {
-        val controller = Robolectric.buildActivity(FragmentActivity::class.java).setup()
-        try {
-            return block(controller.get())
-        } finally {
-            controller.pause().stop().destroy()
-        }
-    }
-
-    private fun idle(seconds: Long = 1) = shadowOf(Looper.getMainLooper()).idleFor(Duration.ofSeconds(seconds))
-
-    private fun controllerWith(activity: FragmentActivity, vararg titles: String): CYLTabBarController {
-        val controller = CYLTabBarController(activity, titles.map { Page() }, attributes(*titles))
-        activity.setContentView(controller.view)
-        idle()
-        return controller
-    }
-
+class CYLQMUIAdaptedFeaturesTest : CYLRobolectricTestCase() {
     // MARK: - Indicator 指示条
 
     @Test

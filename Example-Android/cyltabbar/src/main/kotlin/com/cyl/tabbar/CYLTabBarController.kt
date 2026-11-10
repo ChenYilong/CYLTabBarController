@@ -189,6 +189,15 @@ open class CYLTabBarController(val activity: FragmentActivity) {
 
     internal var cyl_pagesHost: CYLPagesHost? = null
 
+    /** [EN] The host's pages come back after the plus button's page hid them; the plus button's page leaves; the host shows the selected page. [CN] PlusButton 的页面隐藏过的宿主页面重新显示；PlusButton 的页面离开；宿主显示选中的页面。 */
+    private fun commitPagesToHost(host: CYLPagesHost) {
+        val transaction = fragmentManager.beginTransaction()
+        for (page in viewControllers) if (page.isAdded && page.isHidden) transaction.show(page)
+        fragmentManager.findFragmentByTag("$fragmentTag-plus")?.takeIf { it.isAdded && !it.isHidden && !tabBar.plusButtonActive }?.let { transaction.hide(it) }
+        transaction.commitNowAllowingStateLoss()
+        host.cyl_showPage(selectedIndex)
+    }
+
     private fun commitPages() {
         if (!pagesContainer.isAttachedToWindow || fragmentManager.isDestroyed) {
             pagesCommitPending = true
@@ -196,12 +205,7 @@ open class CYLTabBarController(val activity: FragmentActivity) {
         }
         pagesCommitPending = false
         cyl_pagesHost?.let { host ->
-            // [EN] The host's pages come back after the plus button's page hid them; the plus button's page leaves. [CN] PlusButton 的页面隐藏过的宿主页面重新显示；PlusButton 的页面离开。
-            val transaction = fragmentManager.beginTransaction()
-            for (page in viewControllers) if (page.isAdded && page.isHidden) transaction.show(page)
-            fragmentManager.findFragmentByTag("$fragmentTag-plus")?.takeIf { it.isAdded && !it.isHidden && !tabBar.plusButtonActive }?.let { transaction.hide(it) }
-            transaction.commitNowAllowingStateLoss()
-            host.cyl_showPage(selectedIndex)
+            commitPagesToHost(host)
             return
         }
         val transaction = fragmentManager.beginTransaction()
@@ -318,7 +322,8 @@ open class CYLTabBarController(val activity: FragmentActivity) {
     private fun cyl_playSelectedTabBarItemAnimation(defaultSelected: Boolean) {
         if (tabBarItemAnimationURLs.isEmpty()) return
         val selected = if (tabBar.plusButtonActive) tabBar.plusButton else tabBar.cyl_tabBarButtonWithTabIndex(selectedIndex)
-        val item = (selected as? CYLTabBarItemButton)?.item
+        // [EN] The plus button has no tab item. [CN] PlusButton 没有 Tab item。
+        val item = if (tabBar.plusButtonActive) null else tabBar.cyl_tabBarButtonWithTabIndex(selectedIndex)?.item
         tabBar.cyl_animationLottieImageWithSelectedControl(selected, item?.cyl_tabBarItemAnimationURL, item?.cyl_tabBarItemAnimationSizeValue, defaultSelected, tabBarItemAnimationViewContentMode())
     }
 

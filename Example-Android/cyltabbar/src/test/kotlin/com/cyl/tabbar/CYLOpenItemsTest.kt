@@ -1,24 +1,14 @@
 package com.cyl.tabbar
 
-import android.os.Bundle
-import android.os.Looper
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.widget.FrameLayout
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.widget.ViewPager2
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.robolectric.Robolectric
 import org.robolectric.RobolectricTestRunner
-import org.robolectric.Shadows.shadowOf
 import org.robolectric.annotation.Config
-import java.time.Duration
 import java.util.UUID
 
 /**
@@ -28,32 +18,7 @@ import java.util.UUID
  */
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34])
-class CYLOpenItemsTest {
-
-    class Page : Fragment() {
-        override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View = FrameLayout(inflater.context)
-    }
-
-    private fun attributes(vararg titles: String) = titles.map { mapOf(CYLConstants.CYLTabBarItemTitle to it, CYLConstants.CYLTabBarItemIdentifier to it.lowercase()) }
-
-    private fun <T> withActivity(block: (FragmentActivity) -> T): T {
-        val controller = Robolectric.buildActivity(FragmentActivity::class.java).setup()
-        try {
-            return block(controller.get())
-        } finally {
-            controller.pause().stop().destroy()
-        }
-    }
-
-    private fun idle(seconds: Long = 1) = shadowOf(Looper.getMainLooper()).idleFor(Duration.ofSeconds(seconds))
-
-    private fun controllerWith(activity: FragmentActivity, vararg titles: String): CYLTabBarController {
-        val controller = CYLTabBarController(activity, titles.map { Page() }, attributes(*titles))
-        activity.setContentView(controller.view)
-        idle()
-        return controller
-    }
-
+class CYLOpenItemsTest : CYLRobolectricTestCase() {
     @Test
     fun tabWidthsFollowTheirWeights() = withActivity { activity ->
         val controller = controllerWith(activity, "A", "B", "C")
@@ -120,7 +85,7 @@ class CYLOpenItemsTest {
         assertEquals(0, pager.currentItem)
 
         // [EN] New pages reach the pager. [CN] 新的页面会同步到翻页控件。
-        controller.setViewControllers(listOf(Page(), Page()), attributes("One", "Two"))
+        controller.setViewControllers(listOf(CYLTestPage(), CYLTestPage()), attributes("One", "Two"))
         idle()
         assertEquals(2, pager.adapter?.itemCount)
         assertTrue(controller.viewControllers.all { it.isAdded })
