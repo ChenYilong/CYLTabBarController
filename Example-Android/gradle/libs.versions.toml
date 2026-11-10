@@ -13,6 +13,7 @@ lottie = "6.6.2"
 libpag = "4.5.98"
 rive = "10.3.0"
 androidx-test-core = "1.6.1"
+viewpager2 = "1.0.0"
 
 [libraries]
 androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompat" }
@@ -25,6 +26,7 @@ lottie = { module = "com.airbnb.android:lottie", version.ref = "lottie" }
 libpag = { module = "com.tencent.tav:libpag", version.ref = "libpag" }
 rive = { module = "app.rive:rive-android", version.ref = "rive" }
 androidx-test-core = { module = "androidx.test:core", version.ref = "androidx-test-core" }
+androidx-viewpager2 = { module = "androidx.viewpager2:viewpager2", version.ref = "viewpager2" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

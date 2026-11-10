@@ -466,6 +466,15 @@ class CYLTabBar(context: Context) : ViewGroup(context) {
     /** [EN] Android only: the room added to each tab's content in the scrollable mode, in dp (default 24). [CN] 仅 Android：滚动模式下每个 Tab 内容之外的空间（dp，默认 24）。 */
     var cyl_itemSpaceInScrollMode: Float = 24f
         set(value) { field = value; requestLayout() }
+    /**
+     * [EN] Android only (QMUI's space weight): the width weight of each tab in the fixed mode, in tab order, e.g.
+     *      `listOf(1f, 2f, 1f)` makes the second tab twice as wide. A missing, zero or invalid weight counts as 1; the plus
+     *      button keeps an equal share. Null (default): equal tabs, as on iOS.
+     * [CN] 仅 Android（QMUI 的按权重分配宽度）：固定模式下每个 Tab 的宽度权重，按 Tab 顺序，例如 `listOf(1f, 2f, 1f)` 让第二个 Tab 宽一倍。缺少、为 0 或
+     *      无效的权重按 1 计；PlusButton 保持等分宽度。null（默认）：等宽，与 iOS 一致。
+     */
+    var cyl_itemWidthWeights: List<Float>? = null
+        set(value) { field = value; requestLayout() }
     private var slotWidths = IntArray(0)
 
     /**
@@ -809,6 +818,7 @@ class CYLTabBar(context: Context) : ViewGroup(context) {
         val slots = slotCount()
         val spacing = styleRenderer.itemSpacing(this)
         val equal = IntArray(slots) { (width - spacing * maxOf(slots - 1, 0)) / maxOf(slots, 1) }
+        cyl_weightedSlotWidths(slots, equal)?.let { return it }
         if (cyl_scrollMode == CYLTabBarScrollMode.Fixed || slots == 0) return equal
         val space = (cyl_itemSpaceInScrollMode * resources.displayMetrics.density).toInt()
         val plusIndex = plusButtonIndex()
@@ -818,6 +828,24 @@ class CYLTabBar(context: Context) : ViewGroup(context) {
             else buttons[button++].cyl_contentWidth() + space
         }
         return if (widths.sum() <= width) equal else widths
+    }
+
+    /**
+     * [EN] `cyl_itemWidthWeights` in the fixed mode (QMUI's space weight): the plus button keeps an equal share, the tabs
+     *      share the rest by weight (a missing, zero or invalid weight counts as 1). Null without weights.
+     * [CN] 固定模式下的 `cyl_itemWidthWeights`（QMUI 的按权重分配宽度）：PlusButton 保持等分宽度，其余宽度按权重分给各 Tab（缺少、为 0 或无效的权重按 1 计）。
+     *      没有权重时为 null。
+     */
+    private fun cyl_weightedSlotWidths(slots: Int, equal: IntArray): IntArray? {
+        val weights = cyl_itemWidthWeights ?: return null
+        if (cyl_scrollMode != CYLTabBarScrollMode.Fixed || buttons.isEmpty()) return null
+        val plusIndex = plusButtonIndex()
+        val share = equal.firstOrNull() ?: 0
+        val available = equal.sum() - (if (plusIndex >= 0) share else 0)
+        val tabWeights = buttons.indices.map { index -> weights.getOrNull(index)?.takeIf { it.isFinite() && it > 0f } ?: 1f }
+        val total = tabWeights.sum()
+        var button = 0
+        return IntArray(slots) { slot -> if (slot == plusIndex) share else (available * tabWeights[button++] / total).toInt() }
     }
 
     private fun slotLeft(slot: Int): Int { var left = cyl_itemsFrame.left + slot * styleRenderer.itemSpacing(this); for (index in 0 until slot) left += slotWidths.getOrElse(index) { 0 }; return left }

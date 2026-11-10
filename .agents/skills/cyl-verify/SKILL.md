@@ -18,6 +18,7 @@ scripts/scroll-hide-self-test.sh                            # scroll hiding, on 
 python3 scripts/update-docs-navigation.py --check
 python3 scripts/sync-agent-skills.py --check
 scripts/publish-android.sh staging                          # Android library: Maven bundle, checked (local | staging | central | github)
+(cd Example-Android && LC_ALL=C.UTF-8 gradle testDebugUnitTest :tabpages:test lintDebug assembleRelease)   # Android, as .github/workflows/android.yml runs it
 # React Native component (CrossPlatform/react-native-cyltabbar): yarn; yarn tsc --noEmit; in example/ios: LANG=en_US.UTF-8 pod install,
 # then xcodebuild; in example/android: JAVA_HOME=<JDK 17> ./gradlew :app:assembleDebug
 # Flutter component (CrossPlatform/flutter_cyltabbar): flutter analyze; flutter test; in example: flutter build ios --simulator

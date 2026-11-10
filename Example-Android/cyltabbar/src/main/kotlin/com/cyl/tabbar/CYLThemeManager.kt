@@ -90,7 +90,14 @@ class CYLThemeManager(val name: String = CYLThemeManagerNameDefault) {
 
     /** [EN] `persistsCurrentThemeIdentifier`: remembered across launches through `persistIn(context)`. [CN] 通过 `persistIn(context)` 跨启动记住当前主题。 */
     var persistsCurrentThemeIdentifier: Boolean = false
-    var themeChangeAnimationDuration: Double = 0.25
+    /**
+     * [EN] `themeChangeAnimationDuration`: when greater than 0, a theme change cross-fades over this many seconds, as on
+     *      iOS: each window of the live tab bar controllers (and each registered root) is covered by a snapshot of itself,
+     *      restyled underneath, and the snapshot fades out. Default 0 (no animation), as on iOS.
+     * [CN] 大于 0 时，主题切换以该秒数交叉淡入淡出，与 iOS 一致：存活 TabBarController 的每个窗口（以及每个登记的根视图）先被自身截图覆盖，在其下更新样式，
+     *      然后截图淡出。默认 0（无动画），与 iOS 一致。
+     */
+    var themeChangeAnimationDuration: Double = 0.0
     /** [EN] `themeGenerator`: makes a theme for an unknown identifier. [CN] 为未知标识生成主题。 */
     var themeGenerator: ((Any) -> Any?)? = null
     /** [EN] `themeIdentifierGenerator`: the identifier of a theme. [CN] 主题的标识。 */

@@ -387,11 +387,55 @@ internal object CYLThemeDispatcher {
     fun dispatch(manager: CYLThemeManager, identifier: Any?, theme: Any?) {
         val activities = LinkedHashSet<androidx.fragment.app.FragmentActivity>()
         for (controller in CYLTabBarController.cyl_liveTabBarControllers()) activities += controller.activity
+        // [EN] `themeChangeAnimationDuration`: snapshots over the windows before they are restyled. [CN] `themeChangeAnimationDuration`：在更新样式之前用截图覆盖窗口。
+        val snapshots = if (manager.themeChangeAnimationDuration > 0) {
+            val roots = LinkedHashSet<View>()
+            activities.mapNotNullTo(roots) { it.window?.decorView }
+            CYLThemeValues.registeredRootViews(manager).mapTo(roots) { it.rootView }
+            roots.mapNotNull { snapshot(it) }
+        } else emptyList()
         for (activity in activities) {
             activity.window?.decorView?.cyl_themeDidChangeByManager(manager, identifier, theme)
             if (!activity.supportFragmentManager.isDestroyed) for (page in activity.supportFragmentManager.fragments) page.cyl_themeDidChangeByManager(manager, identifier, theme)
         }
         // [EN] Then the roots registered with `CYLThemeValues.register` (dialogs, other activities). [CN] 然后是用 `CYLThemeValues.register` 登记的根对象（对话框、其他 Activity）。
         for (root in CYLThemeValues.registeredRootViews(manager)) root.cyl_themeDidChangeByManager(manager, identifier, theme)
+        fade(snapshots, manager.themeChangeAnimationDuration)
+    }
+
+    private class Snapshot(val root: View, val drawable: android.graphics.drawable.BitmapDrawable)
+
+    /** [EN] Snapshots on screen now (for tests). [CN] 当前显示中的截图数量（测试用）。 */
+    internal var cyl_snapshotCount = 0
+        private set
+
+    /** [EN] The window as it looks now, laid over it (`ViewOverlay`), or null when it is not on screen. [CN] 窗口当前的样子，覆盖在其上（`ViewOverlay`）；不在屏幕上时为 null。 */
+    private fun snapshot(root: View): Snapshot? {
+        if (!root.isAttachedToWindow || root.width <= 0 || root.height <= 0 || root.visibility != View.VISIBLE) return null
+        val bitmap = android.graphics.Bitmap.createBitmap(root.width, root.height, android.graphics.Bitmap.Config.ARGB_8888)
+        root.draw(Canvas(bitmap))
+        val drawable = android.graphics.drawable.BitmapDrawable(root.resources, bitmap).apply { setBounds(0, 0, root.width, root.height) }
+        root.overlay.add(drawable)
+        cyl_snapshotCount++
+        return Snapshot(root, drawable)
+    }
+
+    /** [EN] Fades the snapshots out, then removes them. [CN] 让截图淡出，然后移除。 */
+    private fun fade(snapshots: List<Snapshot>, duration: Double) {
+        if (snapshots.isEmpty()) return
+        android.animation.ValueAnimator.ofInt(255, 0).apply {
+            this.duration = (duration * 1000).toLong()
+            addUpdateListener { animator -> snapshots.forEach { it.drawable.alpha = animator.animatedValue as Int } }
+            addListener(object : android.animation.AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animation: android.animation.Animator) {
+                    for (snapshot in snapshots) {
+                        snapshot.root.overlay.remove(snapshot.drawable)
+                        snapshot.drawable.bitmap.recycle()
+                        cyl_snapshotCount--
+                    }
+                }
+            })
+            start()
+        }
     }
 }
