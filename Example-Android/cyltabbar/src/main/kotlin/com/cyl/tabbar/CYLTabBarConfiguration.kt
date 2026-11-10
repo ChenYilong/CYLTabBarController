@@ -336,15 +336,7 @@ object CYLTabBarConfiguration {
             val raw = (item as? Map<*, *>)?.entries?.associate { it.key.toString() to it.value } ?: return@map emptyMap<String, Any?>()
             // [EN] FIX: issue #787 — the bar's icon defaults, for a tab without its own. [CN] TabBar 的图标默认值，用于没有单独设置的 Tab。
             val attributes = (if (initialValues != null) CYLConfigurationThemes.resolve(iconDefaults + raw, initialValues, references) else iconDefaults + raw).toMutableMap()
-            attributes[CYLConstants.CYLTabBarItemIconRenderingMode]?.let { mode ->
-                val valid = iconRenderingModeValue(mode)
-                if (valid != null) {
-                    attributes[CYLConstants.CYLTabBarItemIconRenderingMode] = valid
-                } else {
-                    android.util.Log.w("CYLTabBarController", "configuration: invalid ${CYLConstants.CYLTabBarItemIconRenderingMode}: $mode")
-                    attributes.remove(CYLConstants.CYLTabBarItemIconRenderingMode)
-                }
-            }
+            normalizeIconRenderingMode(attributes)
             val tab = com.cyl.tabbar.pages.TabItem(attributes)
             val reason = TabConfiguration.exclusionReason(tab, platform, appVersion)
             if (reason != null) {
@@ -353,16 +345,7 @@ object CYLTabBarConfiguration {
                     CYLConstants.CYLTabBarItemIdentifier to attributes[CYLConstants.CYLTabBarItemIdentifier],
                     CYLConstants.CYLTabBarItemPageIdentifier to attributes[CYLConstants.CYLTabBarItemPageIdentifier])
             }
-            val identifier = attributes[CYLConstants.CYLTabBarItemIdentifier] as? String
-            if (identifier != null) {
-                var unique: String = identifier
-                var n = 2
-                while (!seen.add(unique)) {
-                    unique = "$identifier-$n"
-                    n++
-                }
-                attributes[CYLConstants.CYLTabBarItemIdentifier] = unique
-            }
+            (attributes[CYLConstants.CYLTabBarItemIdentifier] as? String)?.let { attributes[CYLConstants.CYLTabBarItemIdentifier] = uniqueIdentifier(it, seen) }
             attributes
         }
         normalized[CYLConstants.CYLTabBarControllerPageLookupOrder] =
@@ -374,6 +357,29 @@ object CYLTabBarConfiguration {
             normalized[CYLConfigurationThemes.INFO_KEY] = themes
         }
         return normalized
+    }
+
+    /** [EN] `CYLTabBarItemIconRenderingMode` lowercased, or removed with a warning when unknown (#787). [CN] 渲染方式转为小写；未知值输出警告并移除（#787）。 */
+    private fun normalizeIconRenderingMode(attributes: MutableMap<String, Any?>) {
+        val mode = attributes[CYLConstants.CYLTabBarItemIconRenderingMode] ?: return
+        val valid = iconRenderingModeValue(mode)
+        if (valid != null) {
+            attributes[CYLConstants.CYLTabBarItemIconRenderingMode] = valid
+        } else {
+            android.util.Log.w("CYLTabBarController", "configuration: invalid ${CYLConstants.CYLTabBarItemIconRenderingMode}: $mode")
+            attributes.remove(CYLConstants.CYLTabBarItemIconRenderingMode)
+        }
+    }
+
+    /** [EN] `identifier`, or "identifier-2", "-3"... when `seen` has it; added to `seen`. [CN] `identifier`，已在 `seen` 中时为 "identifier-2"、"-3"……；并加入 `seen`。 */
+    private fun uniqueIdentifier(identifier: String, seen: MutableSet<String>): String {
+        var unique = identifier
+        var n = 2
+        while (!seen.add(unique)) {
+            unique = "$identifier-$n"
+            n++
+        }
+        return unique
     }
 
     /** [EN] The tab bar's icon keys (#787) as tab keys. [CN] TabBar 的图标键（#787），转为 Tab 的键。 */
