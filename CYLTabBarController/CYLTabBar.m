@@ -572,10 +572,47 @@ static NSDictionary<NSAttributedStringKey, id> *CYLTitleAttributesWithColor(NSDi
     [self cyl_setInsertedViewsHiddenForCustomizing:YES];
     [super beginCustomizingItems:items];
     [self cyl_setContainerRespondsOutsideBoundsForCustomizing:YES];
+    [self cyl_waitForCustomizingEndWithPolls:0 sawCustomizing:NO];
 }
 
 - (BOOL)endCustomizingAnimated:(BOOL)animated {
     BOOL changed = [super endCustomizingAnimated:animated];
+    [self cyl_didEndCustomizing];
+    return changed;
+}
+
+/*!
+ * [EN] FIX: after More editing → Done, Home's icon was missing. UIKit ends the editing without calling
+ *      `-endCustomizingAnimated:` (checked with a log: `-beginCustomizingItems:` is called, the end method never is), so
+ *      the marked views stayed hidden, and the container kept answering outside its bounds. The end is found by asking
+ *      `isCustomizing` every 0.1 s after editing began; it also stops once `-endCustomizingAnimated:` ran.
+ * [CN] FIX：「More」编辑 → Done 之后 Home 的图标不见了。UIKit 结束编辑时不会调用 `-endCustomizingAnimated:`（用日志确认：
+ *      `-beginCustomizingItems:` 会被调用，结束方法从不被调用），所以被标记的视图一直隐藏，容器也一直在范围之外响应点击。编辑开始后每 0.1 秒
+ *      询问一次 `isCustomizing` 来发现结束；`-endCustomizingAnimated:` 被调用时同样会结束。
+ */
+- (void)cyl_waitForCustomizingEndWithPolls:(NSUInteger)polls sawCustomizing:(BOOL)sawCustomizing {
+    __weak __typeof(self) weakSelf = self;
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        __strong __typeof(weakSelf) self = weakSelf;
+        if (!self || !self.cyl_isCustomizingItems) {
+            return;
+        }
+        BOOL isCustomizing = self.isCustomizing;
+        // [EN] Never seen as customizing within 3 s (no editing screen): end as well, so nothing stays hidden.
+        // [CN] 3 秒内始终没有处于编辑状态（没有出现编辑界面）：同样结束，避免视图一直隐藏。
+        if (!isCustomizing && (sawCustomizing || polls >= 30)) {
+            [self cyl_didEndCustomizing];
+            return;
+        }
+        [self cyl_waitForCustomizingEndWithPolls:polls + 1 sawCustomizing:(sawCustomizing || isCustomizing)];
+    });
+}
+
+/// [EN] Editing ended: gives back the container's hit test, the hidden views and the layout. [CN] 编辑结束：恢复容器的点击判定、被隐藏的视图与布局。
+- (void)cyl_didEndCustomizing {
+    if (!self.cyl_isCustomizingItems) {
+        return;
+    }
     [self cyl_setContainerRespondsOutsideBoundsForCustomizing:NO];
     self.cyl_isCustomizingItems = NO;
     [self cyl_setInsertedViewsHiddenForCustomizing:NO];
@@ -585,7 +622,6 @@ static NSDictionary<NSAttributedStringKey, id> *CYLTitleAttributesWithColor(NSDi
     dispatch_async(dispatch_get_main_queue(), ^{
         [weakSelf setNeedsLayout];
     });
-    return changed;
 }
 
 /*!
