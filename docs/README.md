@@ -222,6 +222,7 @@ docs/
 │   ├── plusbutton-subview-touches-issue-202.png
 │   ├── plusbutton-touchable-area-1x.png
 │   ├── plusbutton-touchable-area-2x.png
+│   ├── push-from-anywhere-ios.png
 │   ├── react-native-component-android-bar.png
 │   ├── react-native-component-android.png
 │   ├── react-native-component-ios-bar.png
@@ -267,6 +268,7 @@ docs/
 │   ├── tab-item-icon-rendering-android.png
 │   ├── tab-item-icon-rendering-ios.png
 │   ├── tab-item-positioning-ios.png
+│   ├── tab-page-registry-android.png
 │   ├── tab-reselect-pop-to-root-ios.png
 │   ├── tabbaritem-gestures-ios.png
 │   ├── theme-switching-flat-design.png
