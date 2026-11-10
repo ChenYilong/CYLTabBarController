@@ -457,6 +457,49 @@
     window.hidden = YES;
 }
 
+/// [EN] FIX: long titles next to the plus button moved its slot off the middle. With a plus button a long title is cut
+///      with "…" to one slot, keeps its full text as the accessibility label, short titles stay as they are, and a new
+///      title set by the app is used again.
+/// [CN] FIX：PlusButton 旁的长标题使其 slot 偏离中间。有 PlusButton 时长标题以「…」截断为一个 slot 宽，完整文字作为无障碍标签，
+///      短标题保持不变，App 设置的新标题会重新生效。
+- (void)testLongTitlesNextToThePlusButtonAreCut {
+    NSString *longTitle = @"Scene one: review filter and more";
+    NSMutableArray<NSDictionary *> *tabs = [NSMutableArray array];
+    for (NSString *name in @[ longTitle, @"Scene two: search and sort", @"C", @"D" ]) {
+        [tabs addObject:@{ CYLTabBarItemIdentifier : [NSUUID UUID].UUIDString, CYLTabBarItemTitle : name, CYLTabBarItemImage : [UIImage systemImageNamed:@"house"] }];
+    }
+    CYLTabBarController *tabBarController = [CYLTabBarController tabBarControllerWithConfiguration:@{
+        CYLTabBarControllerContext : [NSUUID UUID].UUIDString,
+        CYLTabBarControllerTabBarItemsAttributes : tabs,
+        CYLTabBarControllerPageResolver : ^UIViewController *(NSString *pageIdentifier, NSDictionary *attributes) {
+            return [[UIViewController alloc] init];
+        },
+        CYLTabBarControllerPlusButton : @{ CYLTabBarItemImage : [UIImage systemImageNamed:@"plus.circle"] },
+    }];
+    UIWindow *window = [[UIWindow alloc] initWithFrame:CGRectMake(0, 0, 390, 844)];
+    window.rootViewController = tabBarController;
+    window.hidden = NO;
+    void (^layOut)(void) = ^{
+        for (NSUInteger pass = 0; pass < 3; pass++) {
+            [tabBarController.tabBar setNeedsLayout];
+            [tabBarController.view layoutIfNeeded];
+            [[NSRunLoop mainRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.2]];
+        }
+    };
+    layOut();
+    UITabBarItem *firstItem = tabBarController.viewControllers.firstObject.tabBarItem;
+    XCTAssertTrue([firstItem.title hasSuffix:@"…"], @"cut: %@", firstItem.title);
+    XCTAssertLessThan(firstItem.title.length, longTitle.length);
+    XCTAssertEqualObjects(firstItem.accessibilityLabel, longTitle);
+    XCTAssertEqualObjects(tabBarController.viewControllers.lastObject.tabBarItem.title, @"D", @"a short title stays");
+    firstItem.title = @"A";
+    layOut();
+    XCTAssertEqualObjects(firstItem.title, @"A", @"the app's new title is used");
+    // [EN] Unset again: UIKit then reads the title. [CN] 再次清除：UIKit 随后读取标题。
+    XCTAssertEqualObjects(firstItem.accessibilityLabel, @"A");
+    window.hidden = YES;
+}
+
 /// [EN] FIX: more than five tabs on the classic style / Liquid Glass showed the first five and no "More". With eight tabs
 ///      UIKit's "More" tab is there and a later tab can be selected; five tabs are unchanged; a plus button with eight
 ///      tabs does not crash.

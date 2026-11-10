@@ -38,6 +38,7 @@ flowchart LR
 | [静态排查：guard 与下标](#静态排查guard-与下标--static-audit-guards-and-indexes) | [Static audit: guards and indexes](#静态排查guard-与下标--static-audit-guards-and-indexes) |
 | [各样式](#各样式--by-style) | [By style](#各样式--by-style) |
 | [用法](#用法--usage) | [Usage](#用法--usage) |
+| [长标题](#长标题--long-titles) | [Long titles](#长标题--long-titles) |
 | [限制](#限制--limits) | [Limits](#限制--limits) |
 
 <!-- navigation:end -->
@@ -115,6 +116,17 @@ flowchart LR
 tabBarController.viewControllers = @[home, nearby, messages, me];
 tabBarController.viewControllers = tabBarController.viewControllers;
 ```
+
+## 长标题 / Long titles
+
+| 中文 | English |
+|:---|:---|
+| **问题**：PlusButton 左侧两个 Tab 的标题都很长时，PlusButton 与它的 slot 错开，标题还盖住了 PlusButton（下图上半部分）。液态玻璃下 UIKit 把 Tab 按钮的宽度设为内容宽度加按钮内边距（iOS 26.1 实测每侧约 16 pt），只有所有按钮都放得下时才等宽；长标题的按钮变宽，其后的每个 slot 都右移，而 PlusButton 居中于 platter（`-[CYLTabBar plusButtonIndex]`），不再覆盖它的 slot。 | **Problem**: with long titles on both tabs left of the PlusButton, the PlusButton and its slot no longer lined up, and the titles ran over the PlusButton (top of the picture below). On Liquid Glass UIKit makes a tab button as wide as its content plus the button's padding (about 16 pt on each side, measured on iOS 26.1), and only when every button fits are they all equally wide; a button with a long title gets wider, every slot after it moves right, and the PlusButton, centered on the platter (`-[CYLTabBar plusButtonIndex]`), no longer covers its slot. |
+| **方案**（`-[CYLTabBar cyl_limitTabTitleWidthsForPlusButton]`，每次布局时执行，仅在有 PlusButton 时）：每个标题限制为一个 slot 的宽度，计算方式与 PlusButton 中心点相同。液态玻璃：platter 宽度 ÷ slot 数（含 PlusButton 的 slot）− 两侧按钮内边距；经典布局：`cyl_tabBarItemWidth` − 两侧各 4 pt。更长的标题按完整字符截断并以「…」结尾；测量使用各标签字体中最宽的一个，截断结果不随选中变化。完整标题作为 item 的 `accessibilityLabel`（VoiceOver 读完整标题）；有足够空间时（如旋转）恢复完整标题；App 之后设置的新标题作为新的完整标题。 | **Solution** (`-[CYLTabBar cyl_limitTabTitleWidthsForPlusButton]`, on every layout pass, only with a PlusButton): each title is limited to the width of one slot, found as the PlusButton's center is. Liquid Glass: platter width ÷ number of slots (the PlusButton's slot included) − the button padding on both sides; classic layout: `cyl_tabBarItemWidth` − 4 pt on each side. A longer title is cut at whole characters and ends with "…"; it is measured with the widest of the labels' fonts, so the cut does not change with the selection. The full title becomes the item's `accessibilityLabel` (VoiceOver reads it); it comes back when there is room again (e.g. rotation); a title the app sets later becomes the new full title. |
+| **演示**：Gallery →「Liquid Glass robustness」→「Long titles left of the plus button」（启动参数 `-CYLDemoGalleryScene 9.7`）。**验证**（iOS 26.1 模拟器，iPhone 17 Pro Max）：修复前两个长标题重叠、PlusButton 偏离 slot；修复后显示「Scene…」「Scene t…」，五个按钮等宽，PlusButton 位于中间，依次选中 Home、Find、Favor 时截断结果不变（下图下半部分）。单元测试 `testLongTitlesNextToThePlusButtonAreCut`。 | **Demo**: Gallery → "Liquid Glass robustness" → "Long titles left of the plus button" (launch argument `-CYLDemoGalleryScene 9.7`). **Verified** (iOS 26.1 simulator, iPhone 17 Pro Max): before the fix the two long titles overlapped and the PlusButton was off its slot; after it they show "Scene…" and "Scene t…", the five buttons are equally wide, the PlusButton is in the middle, and the cut stays the same while selecting Home, Find and Favor (bottom of the picture). Unit test `testLongTitlesNextToThePlusButtonAreCut`. |
+| TODO：经典布局（iOS 18 及更早、或关闭液态玻璃）中的截断未在模拟器上截图验证（当前模拟器为 iOS 26.1）；按钮内边距 16 pt 为 iOS 26.1 实测值，系统改变内边距时需更新 `CYLLiquidGlassTabButtonTitlePadding`。 | TODO: the cut in the classic layout (iOS 18 and earlier, or Liquid Glass off) is not verified with a screenshot (the simulator here runs iOS 26.1); the 16 pt button padding was measured on iOS 26.1, and `CYLLiquidGlassTabButtonTitlePadding` needs updating if the system changes it. |
+
+![Long titles left of the PlusButton: before (top) and after (bottom)](assets/plus-button-long-titles-liquid-glass-ios.png)
 
 ## 限制 / Limits
 

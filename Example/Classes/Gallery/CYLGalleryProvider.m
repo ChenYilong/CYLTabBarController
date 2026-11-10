@@ -1372,6 +1372,28 @@ static UIView *CYLGalleryStarView(void) {
     return CYLGalleryTabBarController(pages, attributes, CYLTabBarStyleTypeDefault, CYLGalleryPlusPageContext);
 }
 
+/*!
+ * [EN] The plus button scene with long titles on both tabs left of the plus button. Before the title width limit,
+ *      Liquid Glass made those tab buttons wider, so the plus button's slot moved right of the middle while the plus
+ *      button stayed in the middle.
+ * [CN] PlusButton 左侧两个 Tab 都使用长标题的场景。限制标题宽度之前，液态玻璃会把这两个 Tab 按钮变宽，PlusButton 的占位 slot
+ *      偏到中间右侧，而 PlusButton 仍在中间，两者错开。
+ */
++ (CYLTabBarController *)longTitlesTabBarController {
+    [CYLGalleryPagePlusButton registerPlusButton];
+    NSMutableArray<NSDictionary *> *attributes = [CYLGalleryAttributes(5, YES, 20, nil) mutableCopy];
+    [attributes removeObjectAtIndex:2];
+    NSArray<NSString *> *longTitles = @[ @"Scene one: review filter", @"Scene two: search and sort" ];
+    for (NSUInteger index = 0; index < longTitles.count; index++) {
+        NSMutableDictionary *item = [attributes[index] mutableCopy];
+        item[CYLTabBarItemTitle] = longTitles[index];
+        attributes[index] = item;
+    }
+    NSMutableArray<UIViewController *> *pages = [CYLGalleryPages(5, NO) mutableCopy];
+    [pages removeObjectAtIndex:2];
+    return CYLGalleryTabBarController(pages, attributes, CYLTabBarStyleTypeDefault, CYLGalleryPlusPageContext);
+}
+
 /// [EN] Shows how many marked views the tab bar holds, in the navigation bar. [CN] 在导航栏中显示 TabBar 中被标记视图的数量。
 + (void)showMarkedViewCountOfTabBarController:(CYLTabBarController *)tabBarController {
     NSArray<UIView *> *views = CYLGalleryMarkedViews(tabBarController.tabBar);
@@ -1476,6 +1498,9 @@ static UIView *CYLGalleryStarView(void) {
                 [homeButton cyl_replaceTabImageViewWithNewView:CYLGalleryStarView() show:YES];
             }];
             return tabBarController;
+        }],
+        [CYLGalleryScene sceneWithTitle:@"Long titles left of the plus button" subtitle:@"Both tabs left of the plus button have long titles: they are cut to the width of one tab, so the plus button stays in the middle" builder:^UIViewController *{
+            return CYLGalleryEmbed([self longTitlesTabBarController]);
         }],
     ];
     return [CYLGallerySection sectionWithTitle:@"Liquid Glass robustness" scenes:scenes];
