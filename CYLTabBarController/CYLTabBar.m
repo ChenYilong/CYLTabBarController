@@ -16,6 +16,11 @@
 #import "UIView+CYLTabBarControllerExtention.h"
 #import "UIImage+CYLTabBarControllerExtention.h"
 #import "UIControl+CYLTabBarItemAnimation.h"
+#if __has_include("CYLUtils/UIView+CYLHitTestOutsideBounds.h")
+#import "CYLUtils/UIView+CYLHitTestOutsideBounds.h"
+#else
+#import "UIView+CYLHitTestOutsideBounds.h"
+#endif
 
 static void *const CYLTabBarContext = (void*)&CYLTabBarContext;
 static void *const CYLTabBarAlpha = (void*)&CYLTabBarAlpha;
@@ -556,10 +561,12 @@ static NSDictionary<NSAttributedStringKey, id> *CYLTitleAttributesWithColor(NSDi
     self.cyl_isCustomizingItems = YES;
     [self cyl_setInsertedViewsHiddenForCustomizing:YES];
     [super beginCustomizingItems:items];
+    [self cyl_setContainerRespondsOutsideBoundsForCustomizing:YES];
 }
 
 - (BOOL)endCustomizingAnimated:(BOOL)animated {
     BOOL changed = [super endCustomizingAnimated:animated];
+    [self cyl_setContainerRespondsOutsideBoundsForCustomizing:NO];
     self.cyl_isCustomizingItems = NO;
     [self cyl_setInsertedViewsHiddenForCustomizing:NO];
     [self setNeedsLayout];
@@ -569,6 +576,25 @@ static NSDictionary<NSAttributedStringKey, id> *CYLTitleAttributesWithColor(NSDi
         [weakSelf setNeedsLayout];
     });
     return changed;
+}
+
+/*!
+ * [EN] FIX: More editing could not be closed: its "Done" (and every place above the bar) got no tap. UIKit puts the
+ *      editing view (`UITabBarCustomizeView`) next to this tab bar in `_UITabBarContainerView`, whose superview
+ *      (`_UITabBarContainerWrapperView`) is only as tall as the bar, so hit testing never reached it and the tap went to
+ *      the More page's "Edit" below (seen with lldb; the system `UITabBarController` puts it in its full-screen view).
+ *      While editing, that container answers outside its superview's bounds (`-cyl_setRespondsOutsideSuperviewBounds:`);
+ *      afterwards it no longer does, so it never takes the page's touches.
+ * [CN] FIX：「More」编辑无法关闭：其 "Done"（以及 TabBar 上方的任何位置）收不到点击。UIKit 把编辑视图（`UITabBarCustomizeView`）放在本 TabBar
+ *      旁边、`_UITabBarContainerView` 之中，而它的父视图（`_UITabBarContainerWrapperView`）只有 TabBar 那么高，所以点击判定到达不了，点击落到了
+ *      下方 More 页面的 "Edit" 上（用 lldb 确认；系统的 `UITabBarController` 把它放在全屏视图中）。编辑期间，该容器在父视图范围之外也响应点击
+ *      （`-cyl_setRespondsOutsideSuperviewBounds:`）；编辑结束后取消，不会拦截页面的触摸。
+ */
+- (void)cyl_setContainerRespondsOutsideBoundsForCustomizing:(BOOL)responds {
+    UIView *container = self.superview;
+    if ([NSStringFromClass([container class]) containsString:@"TabBarContainer"]) {
+        [container cyl_setRespondsOutsideSuperviewBounds:responds];
+    }
 }
 
 /// [EN] Hides (YES) or restores (NO) the plus button and every inserted view inside this tab bar, in one pass.
