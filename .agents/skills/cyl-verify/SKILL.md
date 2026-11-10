@@ -7,6 +7,14 @@ description: "How to build, test and check CYLTabBarController and its demos, ru
 
 Say plainly what could not be verified. Never call something fixed from a build alone if it is a visual change.
 
+## Before every build of a project that depends on CYLTabBarController
+
+Find the latest commit again, every time: `scripts/latest-cyl-commit.sh` prints the newest commit on any branch by commit
+timestamp (`<sha> <date> <branch>`). A project not named CYLTabBarController must depend on exactly that commit
+(`pod 'CYLTabBarController', :git => '…', :commit => '<sha>'`, then `pod install`); a project named CYLTabBarController uses
+the relative path to the folder with the podspec (`:path => '../'` from a demo). Name the commit in the report. AGENTS.md,
+"Depending on CYLTabBarController".
+
 ## Commands
 
 ```sh

@@ -72,6 +72,15 @@ func scene(_ scene: UIScene, willConnectTo _: UISceneSession, options _: UIScene
 - Objective-C: `README.md`, steps 2 to 4, and `Example/SceneDelegate.m`. SwiftUI: [SwiftUI-Integration](../../../docs/SwiftUI-Integration.md).
 - Plus button: `cyl-plus-button`. Animated icons: `cyl-tab-animation` and [Tab-Icon-Animation-Quick-Start](../../../docs/Tab-Icon-Animation-Quick-Start.md); suggest running the matching demo first. Skins: `cyl-theme`.
 
+### How the Podfile depends on CYLTabBarController
+
+Always CocoaPods, always the latest commit of CYLTabBarController on any branch (AGENTS.md, "Depending on CYLTabBarController").
+Before every build run `scripts/latest-cyl-commit.sh --podfile` (by its absolute path from another project) and put the line it
+prints into the Podfile: `pod 'CYLTabBarController', :git => 'https://github.com/ChenYilong/CYLTabBarController.git', :commit => '<sha>'`;
+then `pod install`. Not a version number, not a branch, not a tag. The only exception is a project named CYLTabBarController (this
+repository and its demos): `pod 'CYLTabBarController', :path => '<relative path to the folder with CYLTabBarController.podspec>'`,
+for example `:path => '../'` in a demo folder.
+
 ## 4. A demo inside this repository, in addition
 
 1. Copy the nearest demo above; do not start from an Xcode template, which writes a newer project format.

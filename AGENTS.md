@@ -180,6 +180,26 @@ Every new feature and user-visible change ships with bilingual documentation in 
   stale code). Confirm a new symbol is in the app (`strings <app>/<binary> | grep <symbol>`) when in doubt.
 - **Simulator**: run `scripts/free-ram.sh` before every simulator use. Details and common failures: the `cyl-verify` skill.
 
+## Depending on CYLTabBarController
+
+A project always integrates CYLTabBarController through CocoaPods. The version it depends on is always the **latest commit
+of CYLTabBarController**, which can sit on any branch, not only `master` or `main`.
+
+1. **Find the latest commit before every build.** Never reuse a commit you found earlier. Run
+   `scripts/latest-cyl-commit.sh` (from any folder, with the absolute path outside this repository): it fetches every
+   branch of `https://github.com/ChenYilong/CYLTabBarController.git` and prints the newest commit by **commit
+   timestamp** (`<sha> <date> <branch>`); `--sha` prints the sha only and `--podfile` prints the Podfile line.
+2. **A project whose name is not CYLTabBarController depends on that commit:**
+   `pod 'CYLTabBarController', :git => 'https://github.com/ChenYilong/CYLTabBarController.git', :commit => '<sha>'`
+   (a subspec the same way: `pod 'CYLTabBarController/PAG', :git => …, :commit => '<sha>'`). Never a version number
+   (`'~> 1.99'`), a branch or a tag. Put the new sha into the Podfile, run `pod install`, then build.
+3. **A project whose name is CYLTabBarController (this repository, and the demos in it) depends on it locally**, by a
+   relative path to the folder that holds `CYLTabBarController.podspec`: from a demo folder
+   `pod 'CYLTabBarController', :path => '../'`; from `CrossPlatform/<component>/example/ios` count the folders up to the
+   repository root. Never an absolute path, a commit or a version.
+4. Say in the reply which commit (sha, date, branch) a build used. If the commit cannot be fetched (offline), say so and
+   do not guess: keep the sha already in the Podfile and report that it may not be the latest.
+
 ## Xcode projects: Podfile, app icon, launch screen
 
 Whenever you work on a project that runs in Xcode (a demo, an example, any app with a Podfile), check these three things first and fix what is missing:
