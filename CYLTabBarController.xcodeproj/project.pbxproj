@@ -29,7 +29,7 @@
 		F86EAD1B424CC7C8FD0797F6 /* UIViewController+CYLTheme.h in Headers */ = {isa = PBXBuildFile; fileRef = B7867273EDC0A1A56B351CBE /* UIViewController+CYLTheme.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		273FB0BC9320322CD96E79E1 /* UIViewController+CYLTheme.m in Sources */ = {isa = PBXBuildFile; fileRef = 20C039F83546F91858D4A40C /* UIViewController+CYLTheme.m */; };
 		097BA5790ABC6FE0F936312C /* CYLGalleryProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 2235759C0549079BA7160DF4 /* CYLGalleryProvider.m */; };
-		3AA9A8C1CFFED294DB877EAF /* CYLGalleryViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8A93305C6DEB3D45BD52B623 /* CYLGalleryViewController.m */; };
+		3AA9A8C1CFFED294DB877EAF /* CYLGalleryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A93305C6DEB3D45BD52B623 /* CYLGalleryViewController.swift */; };
 		002ACFDEC3236108A0445E6F /* UIColor+CYLTabBarControllerExtention.h in Headers */ = {isa = PBXBuildFile; fileRef = A494E02A66D2AE6B5B42B9E8 /* UIColor+CYLTabBarControllerExtention.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		028FAD0320AE983F53C7A9E6 /* CYLTabBar+CYLTabBarControllerExtention.h in Headers */ = {isa = PBXBuildFile; fileRef = 120EBF27E7ADE9A221F1993A /* CYLTabBar+CYLTabBarControllerExtention.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		0449CC45FB05A319E018D55D /* CYLTabBarController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1DC11E059CBAAB32DA0354D3 /* CYLTabBarController.m */; };
@@ -314,8 +314,7 @@
 		20C039F83546F91858D4A40C /* UIViewController+CYLTheme.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "UIViewController+CYLTheme.m"; sourceTree = "<group>"; };
 		6DFB1797FF9392354939CEEB /* CYLGalleryProvider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLGalleryProvider.h; sourceTree = "<group>"; };
 		2235759C0549079BA7160DF4 /* CYLGalleryProvider.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLGalleryProvider.m; sourceTree = "<group>"; };
-		D384C6A734E0625DEE351CEC /* CYLGalleryViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLGalleryViewController.h; sourceTree = "<group>"; };
-		8A93305C6DEB3D45BD52B623 /* CYLGalleryViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLGalleryViewController.m; sourceTree = "<group>"; };
+		8A93305C6DEB3D45BD52B623 /* CYLGalleryViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CYLGalleryViewController.swift; sourceTree = "<group>"; };
 		021F00425FA55C661271AEF0 /* CYLTabBar.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CYLTabBar.h; sourceTree = "<group>"; };
 		03B1BCBF0EEDBBE6ABF3CF72 /* green_lottie_tab_mine_dark.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = green_lottie_tab_mine_dark.json; sourceTree = "<group>"; };
 		04C2AF4F5157DB1DB2A68D1B /* _CYLFlatDesignTabBarControllerTransitionAnimator.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = _CYLFlatDesignTabBarControllerTransitionAnimator.h; sourceTree = "<group>"; };
@@ -609,8 +608,7 @@
 			children = (
 				6DFB1797FF9392354939CEEB /* CYLGalleryProvider.h */,
 				2235759C0549079BA7160DF4 /* CYLGalleryProvider.m */,
-				D384C6A734E0625DEE351CEC /* CYLGalleryViewController.h */,
-				8A93305C6DEB3D45BD52B623 /* CYLGalleryViewController.m */,
+				8A93305C6DEB3D45BD52B623 /* CYLGalleryViewController.swift */,
 			);
 			path = Gallery;
 			sourceTree = "<group>";
@@ -1622,7 +1620,7 @@
 				9AC0181B1FE90AA1001EC2D6 /* CYLPlusDemoChildViewController.swift in Sources */,
 				30F844E1260777C69B048E2C /* CYLPopPushDemoViewController.m in Sources */,
 				097BA5790ABC6FE0F936312C /* CYLGalleryProvider.m in Sources */,
-				3AA9A8C1CFFED294DB877EAF /* CYLGalleryViewController.m in Sources */,
+				3AA9A8C1CFFED294DB877EAF /* CYLGalleryViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

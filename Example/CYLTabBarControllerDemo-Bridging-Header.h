@@ -7,3 +7,5 @@
 //  [CN] 过渡用：示例移植到 Swift 期间，Swift 文件仍在使用的 Objective-C 类（AGENTS.md：示例只使用 Swift）。为空时删除本文件与
 //       SWIFT_OBJC_BRIDGING_HEADER。
 //
+
+#import "CYLGalleryProvider.h"

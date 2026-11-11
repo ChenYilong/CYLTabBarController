@@ -14,7 +14,7 @@
 #import "CYLPlusButtonSubclass.h"
 #import "MainTabBarController.h"
 #import "CYLMainRootViewController.h"
-#import "CYLGalleryViewController.h"
+#import "CYLTabBarControllerDemo-Swift.h"
 #import <MJRefresh/MJRefresh.h>
 #import "CYLDemoLocalization.h"
 
