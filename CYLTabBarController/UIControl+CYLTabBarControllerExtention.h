@@ -330,8 +330,10 @@ NS_ASSUME_NONNULL_BEGIN
 /// [EN] YES once the animation view has been added and laid out. [CN] 动画视图已添加并完成布局时返回 YES。
 - (BOOL)cyl_isTabBarItemAnimationReady;
 
-/// [EN] Adds the animation at `URL` (a local file) in place of the tab's icon, once; a zero `size` uses the placeholder size.
-/// [CN] 用 `URL`（本地文件）的动画替换 Tab 图标显示（只添加一次）；size 为 CGSizeZero 时使用占位尺寸。
+/*!
+ * [EN] Adds the animation at `URL` (a local file) in place of the tab's icon, once; a zero `size` uses the placeholder size.
+ * [CN] 用 `URL`（本地文件）的动画替换 Tab 图标显示（只添加一次）；size 为 CGSizeZero 时使用占位尺寸。
+ */
 - (void)cyl_addTabBarItemAnimationWithURL:(nullable NSURL *)URL
                                      size:(CGSize)size
                               contentMode:(UIViewContentMode)contentMode;

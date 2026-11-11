@@ -9,8 +9,10 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-/// [EN] Rows, each one switching one thing on the tab, or back.
-/// [CN] 每行切换 Tab 的一项，或恢复。
+/*!
+ * [EN] Rows, each one switching one thing on the tab, or back.
+ * [CN] 每行切换 Tab 的一项，或恢复。
+ */
 typedef NS_ENUM(NSInteger, CYLTabBarItemUpdateRow) {
     CYLTabBarItemUpdateRowTitle,        // `-updateTabBarItemForViewController:attributes:`
     CYLTabBarItemUpdateRowIconView,     // `-setTabBarItemIconViewProvider:atIndex:`

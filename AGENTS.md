@@ -107,6 +107,20 @@ Every new feature and user-visible change ships with bilingual documentation in 
   - Sample apps follow it too: React Native and Flutter components, helpers and assets of the examples use `CYL`
     (`CYLBadgeView`, `cyl_badge_sample_icon`), unless the platform's own naming forbids it (e.g. Dart file names are
     snake_case: `cyl_badge_view.dart`).
+- **Comments on public API: one documentation block, never stacked single-line comments.** A caller reads a public
+  API's comment through the IDE's documentation (Xcode Quick Help, the generated Swift interface, Android Studio, editor
+  hovers), and only a documentation comment gets there whole. So a multi-line comment on a public declaration is one
+  documentation block:
+  - **iOS, Objective-C public headers**: `/*! … */`, one `*` per line (` * [EN] …`, ` * [CN] …`), right before the
+    declaration with nothing in between. Xcode shows it in Quick Help for Objective-C callers and in the Swift interface
+    generated from the header, so Swift callers see it too. A one-line comment may stay `/// …`.
+  - **iOS, public API written in Swift**: `/** … */` or `///` lines (Swift Markup); Swift does not read `/*!` as
+    documentation.
+  - **Android (Kotlin / Java)**: KDoc / Javadoc `/** … */`.
+  - **React Native (TypeScript / JavaScript)**: TSDoc / JSDoc `/** … */`.
+  - **Flutter (Dart)**: `///` lines, the form Effective Dart requires for doc comments (not `/** */`).
+  Check the iOS public headers with `python3 scripts/check-public-api-comments.py` (`--fix` rewrites stacked `//` / `///`
+  lines into a `/*! … */` block with the same text).
 - **Comments are bilingual**: write `[EN]` / `[CN]` blocks; mark fixes with `FIX: issue #N`. A comment written in
   Chinese is tagged `[CN]` and is followed directly by its English translation tagged `[EN]`, in the same comment style
   (`//`, `///`, or inside the same block comment; for a trailing comment, on the next line). Comments that only

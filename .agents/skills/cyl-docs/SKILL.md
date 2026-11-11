@@ -71,6 +71,14 @@ two places**:
     names that name the feature, e.g. `assets/login-required-tabs-alert.png`.
 - Diagrams are welcome: Mermaid blocks in the Markdown, and optionally an SVG copy in `assets/`.
 
+### Comments on public API
+
+A multi-line comment on a public declaration is one documentation block, never stacked `//` lines, so callers see all of it
+in the IDE's documentation: Objective-C public headers `/*! … */` (Quick Help and the generated Swift interface); public API
+written in Swift `/** … */` or `///`; Kotlin / Java `/** … */` (KDoc / Javadoc); TypeScript / JavaScript `/** … */`
+(TSDoc / JSDoc); Dart `///`. Check with `python3 scripts/check-public-api-comments.py` (`--fix` rewrites). AGENTS.md,
+"Comments on public API".
+
 ### Commit message author line
 
 Every commit message carries the line `By  @ChenYilong <luohanchenyilong@163.com>` (exactly as written, two spaces after

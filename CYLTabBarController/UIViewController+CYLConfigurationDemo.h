@@ -36,8 +36,10 @@ FOUNDATION_EXTERN NSString *const CYLSampleConfigurationURLString;
 /// [EN] The cell of the demo row. [CN] 演示行的 cell。
 - (UITableViewCell *)cyl_configurationDemoCellForTableView:(UITableView *)tableView;
 
-/// [EN] Shows the choice of files (and the URL), then presents the tab bar controller created from it.
-/// [CN] 显示文件（及 URL）选择，然后展示由其生成的 TabBarController。
+/*!
+ * [EN] Shows the choice of files (and the URL), then presents the tab bar controller created from it.
+ * [CN] 显示文件（及 URL）选择，然后展示由其生成的 TabBarController。
+ */
 - (void)cyl_presentConfigurationDemo;
 
 @end

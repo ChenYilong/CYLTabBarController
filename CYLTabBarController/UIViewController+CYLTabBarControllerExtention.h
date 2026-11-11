@@ -45,13 +45,17 @@ typedef void (^CYLPushOrPopCallback)(NSArray<__kindof UIViewController *> *viewC
 // [CN] TODO: 分类统一放置到一个独立的文件中， 方便管理。
 // [EN] TODO: Put the categories in one separate file for easier management.
 
-// [CN] 如果未显式设置，则根据视图控制器的标题自动延迟创建
-// [EN] If not set explicitly, it is created lazily from the view controller's title.
+/*!
+ * [CN] 如果未显式设置，则根据视图控制器的标题自动延迟创建
+ * [EN] If not set explicitly, it is created lazily from the view controller's title.
+ */
 @property (null_resettable, nonatomic, strong, getter=cyl_tabBarItem, setter=cyl_setTabBarItem:) CYLFlatDesignTabBarItem *cyl_tabBarItem;
 
-// 返回控制器的tabBarController，可能为nil
-// [EN] Shares one lookup with `-cyl_tabBarController`, see `-[NSObject cyl_tabBarControllerForStyleType:]` in CYLTabBarController.h.
-// [CN] 与 `-cyl_tabBarController` 共用同一个查找，见 CYLTabBarController.h 中的 `-[NSObject cyl_tabBarControllerForStyleType:]`。
+/*!
+ * 返回控制器的tabBarController，可能为nil
+ * [EN] Shares one lookup with `-cyl_tabBarController`, see `-[NSObject cyl_tabBarControllerForStyleType:]` in CYLTabBarController.h.
+ * [CN] 与 `-cyl_tabBarController` 共用同一个查找，见 CYLTabBarController.h 中的 `-[NSObject cyl_tabBarControllerForStyleType:]`。
+ */
 @property (nullable, nonatomic, weak, getter=cylflatdesign_tabBarController, setter=cylflatdesign_setTabBarController:) UIViewController __kindof *cylflatdesign_tabBarController;
 
 #endif

@@ -113,13 +113,17 @@ public final class CYLConstants {
     public static final String CYLTabBarControllerPageLookupOrder = "CYLTabBarControllerPageLookupOrder";
     public static final String CYLTabBarControllerAutomaticPageRegistration = "CYLTabBarControllerAutomaticPageRegistration";
     public static final String CYLTabBarControllerTabBarItemAnimationSpeed = "CYLTabBarControllerTabBarItemAnimationSpeed";
-    // [EN] The plus button of a configuration (CYLConfigurationPlusButton): a map, and a code-only tap action.
-    // [CN] 配置中的 PlusButton（CYLConfigurationPlusButton）：一个 map，以及仅代码可用的点击回调。
+    /**
+     * [EN] The plus button of a configuration (CYLConfigurationPlusButton): a map, and a code-only tap action.
+     * [CN] 配置中的 PlusButton（CYLConfigurationPlusButton）：一个 map，以及仅代码可用的点击回调。
+     */
     public static final String CYLTabBarControllerPlusButton = "CYLTabBarControllerPlusButton";
     public static final String CYLTabBarControllerPlusButtonAction = "CYLTabBarControllerPlusButtonAction";
-    // [EN] More keys of the plus button map: a background image with the title on it, its place, its vertical center, title
-    //      alignment, a title kept visible, and a page of its own (CYLTabBarItemPageIdentifier). Same names as iOS.
-    // [CN] PlusButton map 的更多键：标题画在其上的背景图、位置、垂直中心、标题对齐、保持显示标题，以及自己的页面（CYLTabBarItemPageIdentifier）。与 iOS 同名。
+    /**
+     * [EN] More keys of the plus button map: a background image with the title on it, its place, its vertical center, title
+     *      alignment, a title kept visible, and a page of its own (CYLTabBarItemPageIdentifier). Same names as iOS.
+     * [CN] PlusButton map 的更多键：标题画在其上的背景图、位置、垂直中心、标题对齐、保持显示标题，以及自己的页面（CYLTabBarItemPageIdentifier）。与 iOS 同名。
+     */
     public static final String CYLPlusButtonBackgroundImage = "CYLPlusButtonBackgroundImage";
     public static final String CYLPlusButtonIndexInTabBar = "CYLPlusButtonIndexInTabBar";
     public static final String CYLPlusButtonCenterYMultiplier = "CYLPlusButtonCenterYMultiplier";
@@ -136,9 +140,11 @@ public final class CYLConstants {
     public static final String CYLPlusButtonSize = "CYLPlusButtonSize";
     /** [EN] The size (dp) the plus button's images are drawn at, aspect fit. [CN] PlusButton 图片的绘制尺寸（dp），等比缩放。 */
     public static final String CYLPlusButtonImageSize = "CYLPlusButtonImageSize";
-    // [EN] Appearance and interactions: "light" / "dark" / "system" (iOS only: Android follows the system), a tap animation
-    //      name ("bounce"...), swiping on the tab bar to switch tabs.
-    // [CN] 外观与交互："light" / "dark" / "system"（仅 iOS：Android 跟随系统）、点击动画名称（"bounce" 等）、在 TabBar 上滑动切换 Tab。
+    /**
+     * [EN] Appearance and interactions: "light" / "dark" / "system" (iOS only: Android follows the system), a tap animation
+     *      name ("bounce"...), swiping on the tab bar to switch tabs.
+     * [CN] 外观与交互："light" / "dark" / "system"（仅 iOS：Android 跟随系统）、点击动画名称（"bounce" 等）、在 TabBar 上滑动切换 Tab。
+     */
     public static final String CYLTabBarControllerUserInterfaceStyle = "CYLTabBarControllerUserInterfaceStyle";
     public static final String CYLTabBarControllerTabButtonTapAnimation = "CYLTabBarControllerTabButtonTapAnimation";
     public static final String CYLTabBarControllerSwipeToSwitchTab = "CYLTabBarControllerSwipeToSwitchTab";
@@ -153,14 +159,20 @@ public final class CYLConstants {
     public static final String CYLTabBarControllerThemeIdentifier = "CYLTabBarControllerThemeIdentifier";
     public static final String CYLTabBarControllerDarkThemeIdentifier = "CYLTabBarControllerDarkThemeIdentifier";
     public static final String CYLTabBarControllerThemeManagerName = "CYLTabBarControllerThemeManagerName";
-    // [EN] Localized texts of a configuration (see CYLTabBarConfigurationLocalization, docs/Configuration-File.md).
-    // [CN] 配置中的本地化文本（见 CYLTabBarConfigurationLocalization、docs/Configuration-File.md）。
+    /**
+     * [EN] Localized texts of a configuration (see CYLTabBarConfigurationLocalization, docs/Configuration-File.md).
+     * [CN] 配置中的本地化文本（见 CYLTabBarConfigurationLocalization、docs/Configuration-File.md）。
+     */
     public static final String CYLTabBarControllerLocalization = "CYLTabBarControllerLocalization";
-    // [EN] A resource route to a configuration file (CYLResourceRoute, docs/Resource-Routes.md); the other keys win over the file's.
-    // [CN] 指向配置文件的资源路由（CYLResourceRoute，docs/Resource-Routes.md）；其他键覆盖文件中的键。
+    /**
+     * [EN] A resource route to a configuration file (CYLResourceRoute, docs/Resource-Routes.md); the other keys win over the file's.
+     * [CN] 指向配置文件的资源路由（CYLResourceRoute，docs/Resource-Routes.md）；其他键覆盖文件中的键。
+     */
     public static final String CYLTabBarControllerConfigurationRoute = "CYLTabBarControllerConfigurationRoute";
-    // [EN] A resource route to a tab bar manifest (CYLTabBarManifest); the other keys win over its configuration.
-    // [CN] 指向 TabBar 配置清单的资源路由（CYLTabBarManifest）；其他键覆盖清单的配置。
+    /**
+     * [EN] A resource route to a tab bar manifest (CYLTabBarManifest); the other keys win over its configuration.
+     * [CN] 指向 TabBar 配置清单的资源路由（CYLTabBarManifest）；其他键覆盖清单的配置。
+     */
     public static final String CYLTabBarControllerManifestRoute = "CYLTabBarControllerManifestRoute";
     public static final String CYLTabBarLocalizationTableName = "CYLTabBarLocalizationTableName";
     public static final String CYLTabBarLocalizationPath = "CYLTabBarLocalizationPath";

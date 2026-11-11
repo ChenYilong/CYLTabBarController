@@ -1779,8 +1779,10 @@ typedef UIView * _Nullable (^CYLTabBarItemIconViewProvider)(BOOL selected);
 
 //TODO:  , CYLFlatDesignUITabBarControllerDelegate
 
-// [CN] 代理
-// [EN] Delegate
+/*!
+ * [CN] 代理
+ * [EN] Delegate
+ */
 @property (nonatomic, weak, nullable) id<CYLTabBarControllerDelegate, CYLFlatDesignUITabBarControllerDelegate> delegate;
 
 //@property (nonatomic, assign, readonly) CYLTabBarStyleType tabBarStyleType;
@@ -2854,9 +2856,11 @@ FOUNDATION_EXTERN NSString *const CYLTabBarItemLottieAnimationViewDidAddNotifica
 FOUNDATION_EXTERN NSNotificationName const CYLTabBarItemAnimationPlayingNotification;
 FOUNDATION_EXTERN NSNotificationName const CYLTabBarItemAnimationViewDidAddNotification;
 
-// [CN] * 液态玻璃开关变化
-// [EN] Liquid Glass toggle changed
  //TODO:  
+/*!
+ * [CN] * 液态玻璃开关变化
+ * [EN] Liquid Glass toggle changed
+ */
  FOUNDATION_EXTERN NSString *const CYLTabBarStyleTypeDidChangeNotification;
 // FxxOUNDATION_EXTERN NSString *const CYLTabBarDarkModeShowDarkDidChangeNotification;
 FOUNDATION_EXTERN NSString *const CYLTabBarItemWidthDidChangeNotification;
@@ -2952,15 +2956,19 @@ FOUNDATION_EXTERN NSString *const CYLTabBarItemIconViewProviderKey;
 FOUNDATION_EXTERN NSNotificationName const CYLTabBarControllerThemeDidApplyNotification;
 /// [EN] userInfo key: the applied theme. [CN] userInfo key：应用的主题。
 FOUNDATION_EXTERN NSString *const CYLTabBarThemeKey;
-/// [EN] userInfo key of `CYLTabBarControllerThemeDidApplyNotification`: the indexes (in `viewControllers`) of the tabs a skin
-///      changed (NSIndexSet); by default every tab, the plus button's tab excepted.
-/// [CN] `CYLTabBarControllerThemeDidApplyNotification` 的 userInfo key：皮肤修改的 Tab 下标（`viewControllers` 中，NSIndexSet）；默认为全部 Tab，
-///      PlusButton 的 Tab 除外。
+/*!
+ * [EN] userInfo key of `CYLTabBarControllerThemeDidApplyNotification`: the indexes (in `viewControllers`) of the tabs a skin
+ *      changed (NSIndexSet); by default every tab, the plus button's tab excepted.
+ * [CN] `CYLTabBarControllerThemeDidApplyNotification` 的 userInfo key：皮肤修改的 Tab 下标（`viewControllers` 中，NSIndexSet）；默认为全部 Tab，
+ *      PlusButton 的 Tab 除外。
+ */
 FOUNDATION_EXTERN NSString *const CYLTabBarItemIndexesKey;
-/// [EN] userInfo key of `CYLTabBarControllerThemeDidApplyNotification`: the identifiers (`CYLTabBarItemIdentifier`) of the
-///      tabs it changed, in tab order (NSArray<NSString *>); tabs without an identifier are left out.
-/// [CN] `CYLTabBarControllerThemeDidApplyNotification` 的 userInfo key：修改的 Tab 的 ID（`CYLTabBarItemIdentifier`），按 Tab 顺序
-///      （NSArray<NSString *>）；没有 ID 的 Tab 不在其中。
+/*!
+ * [EN] userInfo key of `CYLTabBarControllerThemeDidApplyNotification`: the identifiers (`CYLTabBarItemIdentifier`) of the
+ *      tabs it changed, in tab order (NSArray<NSString *>); tabs without an identifier are left out.
+ * [CN] `CYLTabBarControllerThemeDidApplyNotification` 的 userInfo key：修改的 Tab 的 ID（`CYLTabBarItemIdentifier`），按 Tab 顺序
+ *      （NSArray<NSString *>）；没有 ID 的 Tab 不在其中。
+ */
 FOUNDATION_EXTERN NSString *const CYLTabBarItemIdentifiersKey;
 
 /*!

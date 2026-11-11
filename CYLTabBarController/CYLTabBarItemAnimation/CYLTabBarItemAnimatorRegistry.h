@@ -59,8 +59,10 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CYLTabBarItemAnimatorRegistry : NSObject <CYLTabBarItemAnimatorRegistering>
 
-/// [EN] The instance `+load` of each animation subspec registers into; the class methods below forward to it.
-/// [CN] 各动画子库在 `+load` 中注册到的实例；下面的类方法都转发给它。
+/*!
+ * [EN] The instance `+load` of each animation subspec registers into; the class methods below forward to it.
+ * [CN] 各动画子库在 `+load` 中注册到的实例；下面的类方法都转发给它。
+ */
 + (instancetype)sharedRegistry;
 
 /// [EN] Adds `animator`, replacing a registered one with the same identifier. [CN] 添加 `animator`；已注册同名 animator 时替换。

@@ -90,8 +90,10 @@ typedef NS_ENUM(NSInteger, CYLTabBarConfigurationErrorCode) {
 
 /// [EN] The largest file or response read: 5 MB. [CN] 读取的文件或响应的最大长度：5 MB。
 FOUNDATION_EXTERN const NSUInteger CYLTabBarConfigurationMaximumLength;
-/// [EN] The deepest nesting accepted: 64 levels, far more than a configuration needs, far less than overflows the stack.
-/// [CN] 接受的最大嵌套层数：64 层，远多于配置所需，远少于导致栈溢出的层数。
+/*!
+ * [EN] The deepest nesting accepted: 64 levels, far more than a configuration needs, far less than overflows the stack.
+ * [CN] 接受的最大嵌套层数：64 层，远多于配置所需，远少于导致栈溢出的层数。
+ */
 FOUNDATION_EXTERN const NSUInteger CYLTabBarConfigurationMaximumDepth;
 
 /*!

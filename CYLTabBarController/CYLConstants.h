@@ -141,8 +141,10 @@ typedef NS_ENUM(NSInteger, CYLTabBarMinimizeBehavior) {
  */
 + (NSValue *)cyl_getTureLottieSizeValue:(NSValue *)lottieSizeValue fromNormalImage:(UIImage *)normalImage DEPRECATED_MSG_ATTRIBUTE("Use +cyl_tabBarItemAnimationSizeValue:fromNormalImage:");
 
-/// [EN] The size of a tab's animation: `sizeValue`, or the normal image's size, or the placeholder size (any library).
-/// [CN] Tab 动画的尺寸：`sizeValue`，否则为普通图片的尺寸，再否则为占位尺寸（任意动画库）。
+/*!
+ * [EN] The size of a tab's animation: `sizeValue`, or the normal image's size, or the placeholder size (any library).
+ * [CN] Tab 动画的尺寸：`sizeValue`，否则为普通图片的尺寸，再否则为占位尺寸（任意动画库）。
+ */
 + (NSValue *)cyl_tabBarItemAnimationSizeValue:(NSValue *)sizeValue fromNormalImage:(UIImage *)normalImage;
 
 /*!

@@ -43,6 +43,7 @@ scripts/plus-child-theme-test.sh "iPhone 17 Pro Max"        # plus child + theme
 scripts/scroll-hide-self-test.sh                            # scroll hiding, on a simulator
 python3 scripts/update-docs-navigation.py --check
 python3 scripts/check-localization-macros.py                    # localization acceptance: a core macro and an example macro, each reading its own bundle
+python3 scripts/check-public-api-comments.py                    # public API comments are /*! ... */ blocks, not stacked //
 python3 scripts/sync-agent-skills.py --check
 scripts/publish-android.sh staging                          # Android library: Maven bundle, checked (local | staging | central | github)
 (cd Example-Android && LC_ALL=C.UTF-8 gradle testDebugUnitTest :tabpages:test lintDebug assembleRelease)   # Android, as .github/workflows/android.yml runs it

@@ -60,12 +60,16 @@ FOUNDATION_EXTERN NSString *const CYLTabBarHostBadgeCenterOffset;
 
 @interface CYLTabBarHostView : UIView
 
-/// [EN] The configuration (the keys of `-[CYLTabBarController initWithConfiguration:]`). Setting it rebuilds the tab bar.
-/// [CN] 配置（`-[CYLTabBarController initWithConfiguration:]` 的键）。设置后重新创建 TabBar。
+/*!
+ * [EN] The configuration (the keys of `-[CYLTabBarController initWithConfiguration:]`). Setting it rebuilds the tab bar.
+ * [CN] 配置（`-[CYLTabBarController initWithConfiguration:]` 的键）。设置后重新创建 TabBar。
+ */
 @property (nonatomic, copy, nullable) NSDictionary<NSString *, id> *configuration;
 
-/// [EN] Sets `configuration` from JSON text; returns NO (and changes nothing) when it is not a JSON object.
-/// [CN] 用 JSON 文本设置 `configuration`；不是 JSON 对象时返回 NO，且不做任何修改。
+/*!
+ * [EN] Sets `configuration` from JSON text; returns NO (and changes nothing) when it is not a JSON object.
+ * [CN] 用 JSON 文本设置 `configuration`；不是 JSON 对象时返回 NO，且不做任何修改。
+ */
 - (BOOL)setConfigurationJSON:(nullable NSString *)JSON;
 
 /*!
@@ -86,8 +90,10 @@ FOUNDATION_EXTERN NSString *const CYLTabBarHostBadgeCenterOffset;
 /// [EN] The plus button's badge: @"" or nil none, @"dot" a red dot, anything else a text. [CN] PlusButton 的角标：@"" 或 nil 无，@"dot" 红点，其他为文字。
 @property (nonatomic, copy, nullable) NSString *plusButtonBadgeValue;
 
-/// [EN] The animation of text badges (tabs and plus button), `CYLBadgeAnimationTypeNone` by default.
-/// [CN] 文字角标（Tab 与 PlusButton）的动画，默认 `CYLBadgeAnimationTypeNone`。
+/*!
+ * [EN] The animation of text badges (tabs and plus button), `CYLBadgeAnimationTypeNone` by default.
+ * [CN] 文字角标（Tab 与 PlusButton）的动画，默认 `CYLBadgeAnimationTypeNone`。
+ */
 @property (nonatomic, assign) NSInteger badgeAnimationType;
 
 /*!
@@ -103,8 +109,10 @@ FOUNDATION_EXTERN NSString *const CYLTabBarHostBadgeCenterOffset;
  */
 @property (nonatomic, copy, nullable) NSArray *badgeAttributes;
 
-/// [EN] The plus button's badge with a style, as an entry of `badgeAttributes`; wins over `plusButtonBadgeValue`.
-/// [CN] 带样式的 PlusButton 角标，写法同 `badgeAttributes` 的一项；优先于 `plusButtonBadgeValue`。
+/*!
+ * [EN] The plus button's badge with a style, as an entry of `badgeAttributes`; wins over `plusButtonBadgeValue`.
+ * [CN] 带样式的 PlusButton 角标，写法同 `badgeAttributes` 的一项；优先于 `plusButtonBadgeValue`。
+ */
 @property (nonatomic, copy, nullable) NSDictionary<NSString *, id> *plusButtonBadgeAttributes;
 
 /*!

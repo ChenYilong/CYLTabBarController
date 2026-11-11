@@ -38,8 +38,10 @@ static const CYLTabBarItemAnimatorPriority CYLTabBarItemAnimatorPriorityFallback
  */
 @protocol CYLTabBarItemAnimationFileMatching <NSObject>
 
-/// [EN] A unique name, e.g. @"Lottie", @"PAG"; registering the same name again replaces the animator.
-/// [CN] 唯一名称，例如 @"Lottie"、@"PAG"；再次注册同名 animator 会替换原来的。
+/*!
+ * [EN] A unique name, e.g. @"Lottie", @"PAG"; registering the same name again replaces the animator.
+ * [CN] 唯一名称，例如 @"Lottie"、@"PAG"；再次注册同名 animator 会替换原来的。
+ */
 @property (nonatomic, copy, readonly) NSString *identifier;
 
 /// [EN] YES for an animation file this library plays. [CN] 本动画库能播放的动画文件返回 YES。

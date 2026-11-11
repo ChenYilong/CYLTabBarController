@@ -61,8 +61,10 @@ typedef NS_ENUM(NSInteger, CYLTabBarManifestSource) {
                                   baseDirectory:(nullable NSString *)baseDirectory
                                           error:(NSError *_Nullable *_Nullable)error;
 
-/// [EN] A manifest from a resource route (docs/Resource-Routes.md), e.g. @"bundle:Configurations/Manifests?name=cyl_tabbar_manifest".
-/// [CN] 由资源路由创建清单（docs/Resource-Routes.md），例如 @"bundle:Configurations/Manifests?name=cyl_tabbar_manifest"。
+/*!
+ * [EN] A manifest from a resource route (docs/Resource-Routes.md), e.g. @"bundle:Configurations/Manifests?name=cyl_tabbar_manifest".
+ * [CN] 由资源路由创建清单（docs/Resource-Routes.md），例如 @"bundle:Configurations/Manifests?name=cyl_tabbar_manifest"。
+ */
 + (nullable instancetype)manifestWithRoute:(NSString *)route error:(NSError *_Nullable *_Nullable)error;
 
 /*!
