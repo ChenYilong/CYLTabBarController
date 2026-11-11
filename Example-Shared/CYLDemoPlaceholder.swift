@@ -133,7 +133,10 @@ final class CYLDemoPlaceholder: NSObject {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.8, execute: finish)
             }
         }
-        let refreshingBlock: CYLRefreshComponentAction = holdsRefresh ? {} : listRefreshingBlock
+        let refreshingBlock: CYLRefreshComponentAction = holdsRefresh ? {
+            // [EN] Intentionally empty: `-CYLDemoHoldRefresh YES` keeps the header refreshing for screenshots.
+            // [CN] 有意留空：`-CYLDemoHoldRefresh YES` 让刷新头保持刷新状态，用于截图。
+        } : listRefreshingBlock
         // [EN] The animated refresh header first: a list's own header keeps its block and becomes an animation header.
         //      The arrow and spinner header stays only when no refresh icon of the kind is bundled.
         // [CN] 优先使用动画刷新头：列表自带的刷新头保留其回调，换成动画刷新头。资源包中没有该类型的刷新图标时才保留箭头与菊花刷新头。

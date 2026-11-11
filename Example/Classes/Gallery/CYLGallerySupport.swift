@@ -191,20 +191,29 @@ enum CYLGallery {
             //      up, then everything is restored.
             // [CN] 在下一个 runloop（点击处理之外）执行：对话框显示期间，"Photo" 显示为选中而页面保持不变，关闭后全部恢复。
             DispatchQueue.main.async { [weak controller, weak viewController] in
-                guard let controller, let photoPage = viewController,
-                      let photoIndex = controller.viewControllers?.firstIndex(of: photoPage) else {
-                    return
+                if let controller, let viewController {
+                    showMoreFeatures(of: controller, photoPage: viewController)
                 }
-                let currentIndex = controller.selectedIndex
-                let swapped = swapPages(of: controller, currentIndex, photoIndex)
-                if swapped {
-                    controller.selectedIndex = photoIndex
-                }
-                presentMoreFeatures(from: controller) { [weak controller] in
-                    if swapped, let controller, swapPages(of: controller, currentIndex, photoIndex) {
-                        controller.selectedIndex = currentIndex
-                    }
-                }
+            }
+        }
+    }
+
+    /**
+     * [EN] Shows "Photo" as selected over the current page while the dialog is up, then restores both.
+     * [CN] 对话框显示期间让 "Photo" 显示为选中而页面保持不变，关闭后两者都恢复。
+     */
+    private static func showMoreFeatures(of controller: CYLTabBarController, photoPage: UIViewController) {
+        guard let photoIndex = controller.viewControllers?.firstIndex(of: photoPage) else {
+            return
+        }
+        let currentIndex = controller.selectedIndex
+        let swapped = swapPages(of: controller, currentIndex, photoIndex)
+        if swapped {
+            controller.selectedIndex = photoIndex
+        }
+        presentMoreFeatures(from: controller) { [weak controller] in
+            if swapped, let controller, swapPages(of: controller, currentIndex, photoIndex) {
+                controller.selectedIndex = currentIndex
             }
         }
     }

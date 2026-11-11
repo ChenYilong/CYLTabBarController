@@ -104,14 +104,17 @@ def compiled_callers(pbx, text):
             continue
         ref_path = match.group(1) or match.group(2)
         name = os.path.basename(ref_path)
-        for caller in callers.get(name, []):
-            caller_abs = os.path.join(ROOT, caller)
-            if "/" in ref_path:
-                if os.path.normpath(os.path.join(project_dir, ref_path)) == os.path.normpath(caller_abs):
-                    found.append(name)
-            elif caller_abs.startswith(project_dir + os.sep):
-                found.append(name)
+        if any(references_caller(project_dir, ref_path, caller) for caller in callers.get(name, [])):
+            found.append(name)
     return sorted(set(found))
+
+
+def references_caller(project_dir, ref_path, caller):
+    """Whether the reference `ref_path` of the project in `project_dir` is the file `caller`."""
+    caller_abs = os.path.join(ROOT, caller)
+    if "/" in ref_path:
+        return os.path.normpath(os.path.join(project_dir, ref_path)) == os.path.normpath(caller_abs)
+    return caller_abs.startswith(project_dir + os.sep)
 
 
 for pbx in projects:

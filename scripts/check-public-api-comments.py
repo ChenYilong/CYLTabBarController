@@ -31,19 +31,169 @@ import re
 import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-LINE_COMMENT = re.compile(r'^(\s*)//+[!]? ?(.*)$')
 TODO_ONLY = re.compile(r'^\s*//\s*TODO:\s*$')
-FILE_HEADER = re.compile(r'^//  |^//\s*$')
 MARK = re.compile(r'^\s*//\s*(MARK|pragma)\b')
-CODE = re.compile(r'^\s*//+\s*(@|[-+]\s*\(|#|typedef\b|FOUNDATION_EXTERN|static |return |if \(|\}|\{|\*|/\*|.*;\s*$)')
 DECLARATION = re.compile(
     r'^\s*(@interface|@protocol|@property|[-+]\s*\(|FOUNDATION_EXTERN|UIKIT_EXTERN|extern |typedef|NS_ENUM|NS_OPTIONS|'
     r'static inline|CYL_EXTERN|#define|[A-Za-z_][\w\s\*]*\([^;]*\)\s*(NS_|CYL_|;))')
-ENUM_CASE = re.compile(r'^\s*[A-Za-z_]\w*\s*(=\s*[^,;{}/]*)?\s*(NS_SWIFT_NAME\([^)]*\)\s*)?,?\s*(//.*)?$')
-ONE_LINE_BLOCK = re.compile(r'^(\s*)/\*[!*](?!\*)\s*(.*?)\s*\*/\s*$')
-TRAILING_DOC = re.compile(r'^(\s*)(\S.*?)\s*(?:///<|//!<)\s?(.*?)\s*$|^(\s*)(\S.*?)\s*/\*[!*]<\s*(.*?)\s*\*/\s*$')
-TRAILING_LINE = re.compile(r'^(\s*)(.*?;)\s*//+ ?(.+?)\s*$')
+IDENTIFIER = re.compile(r'[A-Za-z_]\w*')
+# [EN] The parsers below are string operations, not regular expressions: the expressions they replace backtracked
+#      (SonarCloud python:S8786 / S5843). Each docstring gives the expression it implements.
+# [CN] 下面的解析使用字符串操作而不是正则表达式：被替换的表达式存在回溯（SonarCloud python:S8786 / S5843）。每个 docstring
+#      给出它实现的表达式。
+CODE_PREFIXES = ('@', '#', '}', '{', '*', 'FOUNDATION_EXTERN', 'static ', 'return ', 'if (')
+SWIFT_NAME = 'NS_SWIFT_NAME('
 
+
+def split_indent(line):
+    """[EN] (leading whitespace, the rest). [CN]（行首空白，其余部分）。"""
+    rest = line.lstrip()
+    return line[:len(line) - len(rest)], rest
+
+
+def is_word_char(char):
+    return char.isalnum() or char == '_'
+
+
+def line_comment(line):
+    r"""[EN] (indent, text) of a `//` comment line, else None: `^(\s*)//+!? ?(.*)$`.
+    [CN] `//` 注释行的（缩进，文字），否则为 None。"""
+    indent, rest = split_indent(line)
+    if not rest.startswith('//'):
+        return None
+    text = rest[2:].lstrip('/')
+    if text.startswith('!'):
+        text = text[1:]
+    if text.startswith(' '):
+        text = text[1:]
+    return indent, text
+
+
+def is_file_header(line):
+    r"""[EN] `^// {2}|^//\s*$`. [CN] 文件头注释行。"""
+    return line.startswith('//  ') or (line.startswith('//') and not line[2:].strip())
+
+
+def is_commented_code(line):
+    r"""[EN] A comment holding code: `^\s*//+\s*(@|[-+]\s*\(|#|typedef\b|FOUNDATION_EXTERN|static |return |if \(|\}|\{|\*|/\*|.*;\s*$)`.
+    [CN] 注释掉的代码。"""
+    rest = line.lstrip()
+    if not rest.startswith('//'):
+        return False
+    body = rest[2:].lstrip('/').lstrip()
+    if body.startswith(CODE_PREFIXES) or body.rstrip().endswith(';'):
+        return True
+    if body[:1] in ('-', '+') and body[1:].lstrip().startswith('('):
+        return True
+    return body.startswith('typedef') and not is_word_char(body[7:8])
+
+
+def enum_case_tail_is_valid(rest):
+    r"""[EN] `,?\s*(//.*)?$` after optional whitespace. [CN] 枚举项的结尾。"""
+    rest = rest.lstrip()
+    if rest.startswith(','):
+        rest = rest[1:].lstrip()
+    return not rest or rest.startswith('//')
+
+
+def swift_name_then_tail(rest):
+    r"""[EN] `(NS_SWIFT_NAME\([^)]*\)\s*)?,?\s*(//.*)?$`. [CN] 可选的 NS_SWIFT_NAME 与结尾。"""
+    if enum_case_tail_is_valid(rest):
+        return True
+    if not rest.startswith(SWIFT_NAME):
+        return False
+    close = rest.find(')', len(SWIFT_NAME))
+    return close >= 0 and enum_case_tail_is_valid(rest[close + 1:])
+
+
+def is_enum_case(line):
+    r"""[EN] An enum case line: `^\s*[A-Za-z_]\w*\s*(=\s*[^,;{}/]*)?\s*(NS_SWIFT_NAME\([^)]*\)\s*)?,?\s*(//.*)?$`.
+    [CN] 枚举项所在的行。"""
+    match = IDENTIFIER.match(line.lstrip())
+    if not match:
+        return False
+    rest = line.lstrip()[match.end():].lstrip()
+    if swift_name_then_tail(rest):
+        return True
+    if not rest.startswith('='):
+        return False
+    value = rest[1:]
+    end = len(value)
+    for index, char in enumerate(value):
+        if char in ',;{}/':
+            end = index
+            break
+    # [EN] The value may stop before an NS_SWIFT_NAME(...) holding characters a value cannot have.
+    # [CN] 值可以在 NS_SWIFT_NAME(...) 之前结束，括号内可以有值中不允许的字符。
+    starts = [end] + [index for index in range(end) if value.startswith(SWIFT_NAME, index)]
+    return any(swift_name_then_tail(value[index:].lstrip()) for index in starts)
+
+
+def one_line_block(line):
+    r"""[EN] (indent, text) of a one-line doc block, else None: `^(\s*)/\*[!*](?!\*)\s*(.*?)\s*\*/\s*$`.
+    [CN] 单行文档注释块的（缩进，文字），否则为 None。"""
+    indent, rest = split_indent(line)
+    if not (rest.startswith('/*') and rest[2:3] in ('!', '*') and rest[3:4] != '*'):
+        return None
+    body = rest[3:].rstrip()
+    if not body.endswith('*/'):
+        return None
+    return indent, body[:-2].strip()
+
+
+def first_marker(line, start, markers):
+    """[EN] The first index at or after `start` where one of `markers` begins, else -1. [CN] 第一个标记的位置。"""
+    found = [index for index in (line.find(marker, start) for marker in markers) if index >= 0]
+    return min(found) if found else -1
+
+
+def trailing_doc(line):
+    r"""[EN] (indent, code, text) of a code line ending in `///<` / `//!<` / `/*!< */`, else None:
+    `^(\s*)(\S.*?)\s*(?:///<|//!<)\s?(.*?)\s*$|^(\s*)(\S.*?)\s*/\*[!*]<\s*(.*?)\s*\*/\s*$`.
+    [CN] 以尾随文档注释结尾的代码行的（缩进，代码，文字），否则为 None。"""
+    indent, rest = split_indent(line)
+    if not rest:
+        return None
+    start = len(indent) + 1
+    marker = first_marker(line, start, ('///<', '//!<'))
+    if marker >= 0:
+        text = line[marker + 4:]
+        if text[:1].isspace():
+            text = text[1:]
+        return indent, line[len(indent):marker].rstrip(), text.rstrip()
+    marker = first_marker(line, start, ('/*!<', '/**<'))
+    if marker < 0:
+        return None
+    body = line[marker + 4:].rstrip()
+    if not body.endswith('*/'):
+        return None
+    return indent, line[len(indent):marker].rstrip(), body[:-2].strip()
+
+
+def trailing_comment_text(tail, slashes):
+    r"""[EN] `( ?)(.+?)\s*$` after `//+`; `slashes` extra slashes can be given back. [CN] `//+` 之后的注释文字。"""
+    if tail.startswith(' ') and tail[1:]:
+        tail = tail[1:]
+    if tail:
+        return tail.rstrip() or tail[0]
+    return '/' if slashes > 0 else None
+
+
+def trailing_line(line):
+    r"""[EN] (indent, code, text) of `code; // text`, else None: `^(\s*)(.*?;)\s*//+ ?(.+?)\s*$`.
+    [CN] `代码; // 文字` 的（缩进，代码，文字），否则为 None。"""
+    indent, _ = split_indent(line)
+    semicolon = line.find(';', len(indent))
+    while semicolon >= 0:
+        rest = line[semicolon + 1:].lstrip()
+        if rest.startswith('//'):
+            after = rest[2:]
+            tail = after.lstrip('/')
+            text = trailing_comment_text(tail, len(after) - len(tail))
+            if text is not None:
+                return indent, line[len(indent):semicolon + 1], text
+        semicolon = line.find(';', semicolon + 1)
+    return None
 
 def files():
     """[EN] (path, language) of every public API file. [CN] 每个公开 API 文件的（路径，语言）。"""
@@ -78,6 +228,34 @@ def block(indent, opener, texts):
     return [indent + opener] + [(indent + ' * ' + t).rstrip() for t in texts] + [indent + ' */']
 
 
+def is_documenting_comment(line):
+    return line_comment(line) is not None and not MARK.match(line)
+
+
+def documenting_run(lines, start, in_enum):
+    """[EN] (end, TODO-only lines) of the comment run at `start`, and whether it documents the line after it.
+    [CN] 从 `start` 开始的注释段的（结束位置，只有 TODO 的行），以及它是否为其后的一行写文档。"""
+    end = start
+    while end < len(lines) and is_documenting_comment(lines[end]):
+        end += 1
+    todos = [k for k in range(start, end) if TODO_ONLY.match(lines[k])]
+    text = [k for k in range(start, end) if k not in todos]
+    following = lines[end] if end < len(lines) else ''
+    attached = DECLARATION.match(following) or (in_enum and following.strip() and is_enum_case(following))
+    triple = any(lines[k].lstrip().startswith('///') for k in text)
+    documents = bool(text) and bool(attached or triple) and not any(is_commented_code(lines[k]) for k in text)
+    return end, todos, documents
+
+
+def enum_state(line, in_enum):
+    """[EN] Whether the lines after `line` are inside an enum. [CN] `line` 之后的行是否在枚举中。"""
+    if re.search(r'NS_(ENUM|OPTIONS|CLOSED_ENUM|ERROR_ENUM)\(', line):
+        return True
+    if in_enum and line.strip().startswith('}'):
+        return False
+    return in_enum
+
+
 def objc_line_comment_runs(lines):
     """[EN] Runs of `//` / `///` comments that document something in a header. [CN] 头文件中起文档作用的 `//`、`///` 注释。"""
     in_enum = False
@@ -85,78 +263,87 @@ def objc_line_comment_runs(lines):
     i = 0
     while i < len(lines):
         line = lines[i]
-        if in_header and not (FILE_HEADER.match(line) or not line.strip()):
+        if in_header and not (is_file_header(line) or not line.strip()):
             in_header = False
-        if re.search(r'NS_(ENUM|OPTIONS|CLOSED_ENUM|ERROR_ENUM)\(', line):
-            in_enum = True
-        elif in_enum and line.strip().startswith('}'):
-            in_enum = False
-        if not in_header and LINE_COMMENT.match(line) and not MARK.match(line):
-            j = i
-            while j < len(lines) and LINE_COMMENT.match(lines[j]) and not MARK.match(lines[j]):
-                j += 1
-            todos = [k for k in range(i, j) if TODO_ONLY.match(lines[k])]
-            text = [k for k in range(i, j) if k not in todos]
-            following = lines[j] if j < len(lines) else ''
-            attached = DECLARATION.match(following) or (in_enum and following.strip() and ENUM_CASE.match(following))
-            triple = any(lines[k].lstrip().startswith('///') for k in text)
-            if text and (attached or triple) and not any(CODE.match(lines[k]) for k in text):
-                yield i, j, todos
-            i = j
+        in_enum = enum_state(line, in_enum)
+        if in_header or not is_documenting_comment(line):
+            i += 1
             continue
-        i += 1
+        end, todos, documents = documenting_run(lines, i, in_enum)
+        if documents:
+            yield i, end, todos
+        i = end
 
 
-def process(lines, language):
-    """[EN] (new lines, findings) for one file. [CN] 一个文件的（新内容，问题数）。"""
+def trailing_code_and_text(line, language):
+    """[EN] (indent, code, text) of a line with a trailing comment to move, else None. [CN] 需要移动尾随注释的行。"""
+    if not line.lstrip().startswith(('/', '*')):
+        found = trailing_doc(line)
+        if found:
+            return found
+    if language == 'objc' and DECLARATION.match(line) and 'http' not in line:
+        return trailing_line(line)
+    return None
+
+
+def move_trailing_comments(lines, language, opener):
+    """[EN] Step 1: trailing doc comments → above the code line; returns the count. [CN] 第 1 步：尾随文档注释移到代码行上方。"""
     findings = 0
-    opener = '/*!' if language == 'objc' else '/**'
-    if language == 'dart':
-        return lines, sum(1 for l in lines if l.lstrip().startswith('/**'))
-    # 1. Trailing doc comments → above the code line.
-    i = len(lines) - 1
-    while i >= 0:
-        line = lines[i]
-        match = TRAILING_DOC.match(line)
-        code_and_text = None
-        if match and not line.lstrip().startswith(('/', '*')):
-            groups = match.groups()
-            code_and_text = (groups[0], groups[1], groups[2]) if groups[1] is not None else (groups[3], groups[4], groups[5])
-        elif language == 'objc' and DECLARATION.match(line) and TRAILING_LINE.match(line) and 'http' not in line:
-            m = TRAILING_LINE.match(line)
-            code_and_text = (m.group(1), m.group(2), m.group(3))
-        if code_and_text and code_and_text[2]:
-            indent, code, text = code_and_text
-            findings += 1
-            lines[i] = indent + code
-            if not merge_into_previous_block(lines, i, [text]):
-                lines[i:i] = block(indent, opener, [text])
-        i -= 1
-    # 2. Objective-C: documenting `//` / `///` runs → blocks.
-    if language == 'objc':
-        for start, end, todos in sorted(objc_line_comment_runs(lines), reverse=True):
-            findings += 1
-            indent = LINE_COMMENT.match(lines[start]).group(1)
-            texts = [LINE_COMMENT.match(lines[k]).group(2).rstrip() for k in range(start, end) if k not in todos]
-            todo_lines = [lines[k] for k in todos]
-            del lines[start:end]
-            if merge_into_previous_block(lines, start, texts):
-                lines[start:start] = todo_lines
-            else:
-                lines[start:start] = todo_lines + block(indent, opener, texts)
-    # 3. One-line blocks → three lines; Objective-C `/**` → `/*!`.
+    for i in range(len(lines) - 1, -1, -1):
+        code_and_text = trailing_code_and_text(lines[i], language)
+        if not (code_and_text and code_and_text[2]):
+            continue
+        indent, code, text = code_and_text
+        findings += 1
+        lines[i] = indent + code
+        if not merge_into_previous_block(lines, i, [text]):
+            lines[i:i] = block(indent, opener, [text])
+    return findings
+
+
+def convert_line_comment_runs(lines, opener):
+    """[EN] Step 2 (Objective-C): documenting `//` / `///` runs → blocks; returns the count.
+    [CN] 第 2 步（Objective-C）：起文档作用的 `//`、`///` 注释改为注释块。"""
+    runs = sorted(objc_line_comment_runs(lines), reverse=True)
+    for start, end, todos in runs:
+        indent = line_comment(lines[start])[0]
+        texts = [line_comment(lines[k])[1].rstrip() for k in range(start, end) if k not in todos]
+        todo_lines = [lines[k] for k in todos]
+        del lines[start:end]
+        if merge_into_previous_block(lines, start, texts):
+            lines[start:start] = todo_lines
+        else:
+            lines[start:start] = todo_lines + block(indent, opener, texts)
+    return len(runs)
+
+
+def expand_one_line_blocks(lines, language, opener):
+    """[EN] Step 3: one-line blocks → three lines; Objective-C `/**` → `/*!`. [CN] 第 3 步：单行注释块展开为三行。"""
+    findings = 0
     result = []
     for line in lines:
-        match = ONE_LINE_BLOCK.match(line)
-        if match and match.group(2):
+        found = one_line_block(line)
+        if found and found[1]:
             findings += 1
-            result.extend(block(match.group(1), opener, [match.group(2)]))
+            result.extend(block(found[0], opener, [found[1]]))
             continue
         if language == 'objc' and re.match(r'^\s*/\*\*(\s|$)', line):
             findings += 1
             line = line.replace('/**', '/*!', 1)
         result.append(line)
     return result, findings
+
+
+def process(lines, language):
+    """[EN] (new lines, findings) for one file. [CN] 一个文件的（新内容，问题数）。"""
+    if language == 'dart':
+        return lines, sum(1 for l in lines if l.lstrip().startswith('/**'))
+    opener = '/*!' if language == 'objc' else '/**'
+    findings = move_trailing_comments(lines, language, opener)
+    if language == 'objc':
+        findings += convert_line_comment_runs(lines, opener)
+    result, expanded = expand_one_line_blocks(lines, language, opener)
+    return result, findings + expanded
 
 
 def main():

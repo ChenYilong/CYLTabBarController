@@ -444,7 +444,11 @@ EVALUATORS = (evaluate_string, evaluate_localized, evaluate_scalar, evaluate_ima
 def evaluate(expr):
     """The configuration value of an Objective-C / Swift expression, or raises Unresolved.
     Objective-C / Swift 表达式对应的配置值，无法解析时抛出 Unresolved。"""
-    e = re.sub(r'\s+as\s+Any$', '', expr.strip())
+    e = expr.strip()
+    # [EN] A Swift `as Any` cast (string operations: a regular expression here backtracks). [CN] Swift 的 `as Any` 类型转换。
+    head, separator, tail = e.rpartition(' as ')
+    if separator and tail.strip() == 'Any':
+        e = head.rstrip()
     while e.endswith(('!', '?')):
         e = e[:-1].strip()
     for evaluator in EVALUATORS:

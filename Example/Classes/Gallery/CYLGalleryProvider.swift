@@ -394,10 +394,7 @@ enum CYLGalleryProvider {
             CYLGalleryScene(title: "Accessibility identifiers", subtitle: "Each tab is app.tabBars.buttons[\"home\"] etc. in UI tests") {
                 let tabBarController = defaultTabBarController(count: 5)
                 CYLGallery.whenTabBarItemsReady(tabBarController) { controller in
-                    let identifiers = (controller.viewControllers ?? []).map {
-                        $0.tabBarItem.accessibilityIdentifier ?? $0.cyl_tabBarItemIdentifier ?? "-"
-                    }
-                    controller.navigationItem.title = identifiers.joined(separator: ", ")
+                    controller.navigationItem.title = tabIdentifiers(of: controller)
                 }
                 return CYLGallery.embed(tabBarController)
             },
@@ -447,6 +444,67 @@ enum CYLGalleryProvider {
     /**
      * [EN] Shows how many marked views the tab bar holds, in the navigation bar. [CN] 在导航栏中显示 TabBar 中被标记视图的数量。
      */
+    /**
+     * [EN] The accessibility identifier of every tab, joined. [CN] 每个 Tab 的无障碍标识，用逗号连接。
+     */
+    private static func tabIdentifiers(of controller: CYLTabBarController) -> String {
+        (controller.viewControllers ?? []).map(tabIdentifier(of:)).joined(separator: ", ")
+    }
+
+    private static func tabIdentifier(of viewController: UIViewController) -> String {
+        viewController.tabBarItem.accessibilityIdentifier ?? viewController.cyl_tabBarItemIdentifier ?? "-"
+    }
+
+    /**
+     * [EN] The class name of `object`, or "nil". [CN] `object` 的类名，没有时为 "nil"。
+     */
+    private static func className(of object: AnyObject?) -> String {
+        guard let object else {
+            return "nil"
+        }
+        return NSStringFromClass(type(of: object))
+    }
+
+    /**
+     * [EN] `value` as text, or "nil". [CN] `value` 的文字描述，没有时为 "nil"。
+     */
+    private static func describe(_ value: Any?) -> String {
+        guard let value else {
+            return "nil"
+        }
+        return "\(value)"
+    }
+
+    /**
+     * [EN] A star replaces Home's icon, then the marked views are counted on the next run loop turn.
+     * [CN] 用星星替换 Home 的图标，然后在下一个 runloop 统计被标记的视图。
+     */
+    private static func markHomeIconWithStar(in controller: CYLTabBarController) {
+        controller.viewControllers?.first?.cyl_tabButton?.cyl_replaceTabImageView(withNewView: CYLGallery.starView(), show: true)
+        DispatchQueue.main.async { [weak controller] in
+            if let controller {
+                showMarkedViewCount(of: controller)
+            }
+        }
+    }
+
+    /**
+     * [EN] Hides every marked view when any is shown, else shows them all, in one pass.
+     * [CN] 只要有被标记的视图在显示就全部隐藏，否则全部显示，一次完成。
+     */
+    private static func toggleMarkedViews(in controller: CYLTabBarController) {
+        let views = CYLGallery.markedViews(in: controller.tabBar)
+        let hides = views.contains(where: isShown(_:))
+        for view in views {
+            view.isHidden = hides
+        }
+        showMarkedViewCount(of: controller)
+    }
+
+    private static func isShown(_ view: UIView) -> Bool {
+        !view.isHidden
+    }
+
     private static func showMarkedViewCount(of tabBarController: CYLTabBarController) {
         let views = CYLGallery.markedViews(in: tabBarController.tabBar)
         let hiddenCount = views.filter(\.isHidden).count
@@ -462,8 +520,7 @@ enum CYLGalleryProvider {
                         return
                     }
                     let tabBar = controller.tabBar
-                    let selectedControl = tabBar.cyl_selectedControl
-                    controller.navigationItem.title = "index \(tabBar.cyl_selectedIndex()), \(selectedControl.map { NSStringFromClass(type(of: $0)) } ?? "nil")"
+                    controller.navigationItem.title = "index \(tabBar.cyl_selectedIndex()), \(className(of: tabBar.cyl_selectedControl))"
                 }
                 tabBarController.navigationItem.rightBarButtonItem = CYLGallery.barButtonItem("Read", read)
                 CYLGallery.whenTabBarItemsReady(tabBarController) { _ in read() }
@@ -476,7 +533,6 @@ enum CYLGalleryProvider {
                         return
                     }
                     let tabBar = controller.tabBar
-                    let describe: (Any?) -> String = { value in value.map { "\($0)" } ?? "nil" }
                     let lines = [
                         "cyl_platterContentViewWithIndex: \(describe(tabBar.cyl_platterContentView(with: 99)))",
                         "cyl_platterSelectedContentViewWithIndex: \(describe(tabBar.cyl_platterSelectedContentView(with: 99)))",
@@ -491,19 +547,13 @@ enum CYLGalleryProvider {
             CYLGalleryScene(title: "Marked views in tab buttons", subtitle: "A star replaces Home's icon; \"Hide\" / \"Show\" toggles every marked view in one pass") {
                 let tabBarController = defaultTabBarController(count: 5)
                 CYLGallery.whenTabBarItemsReady(tabBarController) { controller in
-                    controller.viewControllers?.first?.cyl_tabButton?.cyl_replaceTabImageView(withNewView: CYLGallery.starView(), show: true)
-                    DispatchQueue.main.async {
-                        showMarkedViewCount(of: controller)
-                    }
+                    markHomeIconWithStar(in: controller)
                 }
                 tabBarController.navigationItem.rightBarButtonItem = CYLGallery.barButtonItem("Hide / Show") { [weak tabBarController] in
                     guard let controller = tabBarController else {
                         return
                     }
-                    let views = CYLGallery.markedViews(in: controller.tabBar)
-                    let hides = views.contains { !$0.isHidden }
-                    views.forEach { $0.isHidden = hides }
-                    showMarkedViewCount(of: controller)
+                    toggleMarkedViews(in: controller)
                 }
                 return CYLGallery.embed(tabBarController)
             },
