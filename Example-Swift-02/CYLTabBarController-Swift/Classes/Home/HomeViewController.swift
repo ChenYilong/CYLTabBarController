@@ -13,6 +13,17 @@ private let cellIdentifier = "cell"
 
 final class HomeViewController: UITableViewController {
 
+    /// [EN] Inset grouped, like the other demo lists: each section has its own rounded background.
+    /// [CN] 与其他示例列表一样使用 inset grouped：每个分组都有自己的圆角背景。
+    init() {
+        super.init(style: .insetGrouped)
+    }
+
+    @available(*, unavailable)
+    required init?(coder _: NSCoder) {
+        fatalError("init(coder:) is not supported")
+    }
+
     override func viewDidLoad() {
         super.viewDidLoad()
         self.navigationItem.title = cylDemoLocalizedString("首页")
