@@ -19,7 +19,8 @@ Read the document for the feature before using its API. The public API is in the
 | The demo settings list | [Demo-Test-List](../../../docs/Demo-Test-List.md) |
 | FAQ | [FAQ](../../../docs/FAQ.md) |
 | Plus button rules | [PlusButton](../../../docs/PlusButton.md) |
-| Plus button: slot, counts | [PlusButton-Slot](../../../docs/PlusButton-Slot.md) |
+| Plus button: slot, counts; on Liquid Glass it follows its slot's center, titles are not cut | [PlusButton-Slot](../../../docs/PlusButton-Slot.md) |
+| Examples' pull to refresh and placeholders (CYLTableViewPlaceHolder: `CYLRefreshAnimationHeader`, empty / no-network placeholders), problems that library causes | [CYLTableViewPlaceHolder-Integration-Issues](../../../docs/CYLTableViewPlaceHolder-Integration-Issues.md) |
 | Plus button: badge | [PlusButton-Badge](../../../docs/PlusButton-Badge.md) |
 | Plus button: background image | [PlusButton-Background-Image-Liquid-Glass](../../../docs/PlusButton-Background-Image-Liquid-Glass.md) |
 | Plus button: touchable area | [PlusButton-Touchable-Area](../../../docs/PlusButton-Touchable-Area.md) |

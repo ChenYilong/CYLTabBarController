@@ -457,15 +457,16 @@
     window.hidden = YES;
 }
 
-/// [EN] FIX: long titles next to the plus button moved its slot off the middle. With a plus button a long title is cut
-///      with "…" to one slot, keeps its full text as the accessibility label, short titles stay as they are, and a new
-///      title set by the app is used again.
-/// [CN] FIX：PlusButton 旁的长标题使其 slot 偏离中间。有 PlusButton 时长标题以「…」截断为一个 slot 宽，完整文字作为无障碍标签，
-///      短标题保持不变，App 设置的新标题会重新生效。
-- (void)testLongTitlesNextToThePlusButtonAreCut {
-    NSString *longTitle = @"Scene one: review filter and more";
+/// [EN] FIX: long titles next to the plus button moved its slot off the middle. On Liquid Glass the plus button now follows
+///      its slot (the tab button it covers) horizontally, and every title keeps its full text, also a new title set by
+///      the app.
+/// [CN] FIX：PlusButton 旁的长标题使其 slot 偏离中间。液态玻璃下 PlusButton 现在水平跟随它的 slot（它覆盖的 Tab 按钮），每个标题
+///      都保持完整文字，App 之后设置的新标题也一样。
+- (void)testLongTitlesNextToThePlusButtonKeepItOnItsSlot {
+    NSString *longTitle = @"Scene one: review";
+    NSString *secondTitle = @"Scene two: search";
     NSMutableArray<NSDictionary *> *tabs = [NSMutableArray array];
-    for (NSString *name in @[ longTitle, @"Scene two: search and sort", @"C", @"D" ]) {
+    for (NSString *name in @[ longTitle, secondTitle, @"C", @"D" ]) {
         [tabs addObject:@{ CYLTabBarItemIdentifier : [NSUUID UUID].UUIDString, CYLTabBarItemTitle : name, CYLTabBarItemImage : [UIImage systemImageNamed:@"house"] }];
     }
     CYLTabBarController *tabBarController = [CYLTabBarController tabBarControllerWithConfiguration:@{
@@ -474,9 +475,9 @@
         CYLTabBarControllerPageResolver : ^UIViewController *(NSString *pageIdentifier, NSDictionary *attributes) {
             return [[UIViewController alloc] init];
         },
-        CYLTabBarControllerPlusButton : @{ CYLTabBarItemImage : [UIImage systemImageNamed:@"plus.circle"] },
+        CYLTabBarControllerPlusButton : @{ CYLTabBarItemTitle : @"Post", CYLTabBarItemImage : [UIImage systemImageNamed:@"plus.circle"] },
     }];
-    UIWindow *window = [[UIWindow alloc] initWithFrame:CGRectMake(0, 0, 390, 844)];
+    UIWindow *window = [[UIWindow alloc] initWithFrame:CGRectMake(0, 0, 402, 874)];
     window.rootViewController = tabBarController;
     window.hidden = NO;
     void (^layOut)(void) = ^{
@@ -486,23 +487,41 @@
             [[NSRunLoop mainRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.2]];
         }
     };
+    CYLTabBar *tabBar = (CYLTabBar *)tabBarController.tabBar;
+    void (^checkPlusButtonOnSlot)(NSString *) = ^(NSString *step) {
+        if (![CYLConstants isLiquidGlassActive]) {
+            return;
+        }
+        NSUInteger slotIndex = NSNotFound;
+        for (NSUInteger index = 0; index < tabBarController.viewControllers.count; index++) {
+            if (tabBarController.viewControllers[index].cyl_isPlaceholder) {
+                slotIndex = index;
+            }
+        }
+        NSArray<UIControl *> *tabButtons = [tabBar cyl_tabBarSubviews];
+        XCTAssertLessThan(slotIndex, tabButtons.count, @"%@", step);
+        if (slotIndex >= tabButtons.count) {
+            return;
+        }
+        UIControl *slot = tabButtons[slotIndex];
+        CGFloat slotCenterX = [slot.superview convertPoint:slot.center toView:tabBar].x;
+        CGFloat plusCenterX = [tabBar.plusButton.superview convertPoint:tabBar.plusButton.center toView:tabBar].x;
+        XCTAssertEqualWithAccuracy(plusCenterX, slotCenterX, 1, @"%@: the plus button is on its slot", step);
+    };
     layOut();
     UITabBarItem *firstItem = tabBarController.viewControllers.firstObject.tabBarItem;
-    XCTAssertTrue([firstItem.title hasSuffix:@"…"], @"cut: %@", firstItem.title);
-    XCTAssertLessThan(firstItem.title.length, longTitle.length);
-    XCTAssertEqualObjects(firstItem.accessibilityLabel, longTitle);
-    XCTAssertEqualObjects(tabBarController.viewControllers.lastObject.tabBarItem.title, @"D", @"a short title stays");
+    XCTAssertEqualObjects(firstItem.title, longTitle, @"not cut");
+    XCTAssertEqualObjects(tabBarController.viewControllers[1].tabBarItem.title, secondTitle, @"not cut");
+    checkPlusButtonOnSlot(@"long titles");
     firstItem.title = @"A";
     layOut();
     XCTAssertEqualObjects(firstItem.title, @"A", @"the app's new title is used");
-    // [EN] Unset again: UIKit then reads the title. [CN] 再次清除：UIKit 随后读取标题。
-    XCTAssertEqualObjects(firstItem.accessibilityLabel, @"A");
+    checkPlusButtonOnSlot(@"after a title change");
     window.hidden = YES;
 }
 
-/// [EN] The title width limit is isolated to a tab bar with a plus button (iOS 26+, Liquid Glass, not FlatDesign): without
-///      a plus button a long title is left as it is.
-/// [CN] 标题宽度限制只用于有 PlusButton 的 TabBar（iOS 26+、液态玻璃、非扁平样式）：没有 PlusButton 时长标题保持不变。
+/// [EN] Without a plus button a long title is left as it is.
+/// [CN] 没有 PlusButton 时长标题保持不变。
 - (void)testLongTitlesWithoutAPlusButtonAreNotCut {
     NSString *longTitle = @"Scene one: review filter and more";
     NSMutableArray<NSDictionary *> *tabs = [NSMutableArray array];
@@ -526,69 +545,6 @@
     }
     XCTAssertFalse([tabBarController hasPlusButton]);
     XCTAssertEqualObjects(tabBarController.viewControllers.firstObject.tabBarItem.title, longTitle, @"not cut without a plus button");
-    window.hidden = YES;
-}
-
-/// [EN] FIX: the title width limit cut titles that fit ("Ne…" for "Nearby"): it measured them with the 17 pt font of an
-///      image-only tab's empty label. While the tab buttons stay evenly spread nothing is cut; when a title does widen its
-///      button ("Messages"), only that title is cut, and the titles that fit ("Nearby", "Me") stay whole.
-/// [CN] FIX：标题宽度限制截断了放得下的标题（「Nearby」显示为「Ne…」）：它用只有图片的 Tab 的空标签的 17 pt 字体测量标题。Tab 按钮
-///      均匀分布时不截断；某个标题确实使按钮变宽时（「Messages」），只截断该标题，放得下的标题（「Nearby」「Me」）保持完整。
-- (void)testTitlesThatFitAreNotCut {
-    NSArray<NSString *> *titles = @[ @"", @"Nearby", @"Chat", @"Me" ];
-    NSMutableArray<NSDictionary *> *tabs = [NSMutableArray array];
-    for (NSString *name in titles) {
-        NSMutableDictionary *tab = [@{ CYLTabBarItemIdentifier : [NSUUID UUID].UUIDString, CYLTabBarItemImage : [UIImage systemImageNamed:@"house"] } mutableCopy];
-        if (name.length > 0) {
-            tab[CYLTabBarItemTitle] = name;
-        }
-        [tabs addObject:tab];
-    }
-    CYLTabBarController *tabBarController = [CYLTabBarController tabBarControllerWithConfiguration:@{
-        CYLTabBarControllerContext : [NSUUID UUID].UUIDString,
-        CYLTabBarControllerTabBarItemsAttributes : tabs,
-        CYLTabBarControllerPageResolver : ^UIViewController *(NSString *pageIdentifier, NSDictionary *attributes) {
-            return [[UIViewController alloc] init];
-        },
-        CYLTabBarControllerPlusButton : @{ CYLTabBarItemTitle : @"Post", CYLTabBarItemImage : [UIImage systemImageNamed:@"plus.circle"] },
-    }];
-    UIWindow *window = [[UIWindow alloc] initWithFrame:CGRectMake(0, 0, 402, 874)];
-    window.rootViewController = tabBarController;
-    window.hidden = NO;
-    void (^layOut)(void) = ^{
-        for (NSUInteger pass = 0; pass < 3; pass++) {
-            [tabBarController.tabBar setNeedsLayout];
-            [tabBarController.view layoutIfNeeded];
-            [[NSRunLoop mainRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.2]];
-        }
-    };
-    NSArray<UITabBarItem *> * (^tabItems)(void) = ^NSArray<UITabBarItem *> *{
-        NSMutableArray<UITabBarItem *> *items = [NSMutableArray array];
-        for (UIViewController *viewController in tabBarController.viewControllers) {
-            if (!viewController.cyl_isPlaceholder) {
-                [items addObject:viewController.tabBarItem];
-            }
-        }
-        return items;
-    };
-    layOut();
-    XCTAssertTrue([tabBarController hasPlusButton]);
-    XCTAssertEqualObjects(tabItems()[1].title, @"Nearby", @"evenly spread: nothing is cut");
-    XCTAssertEqualObjects(tabItems()[2].title, @"Chat");
-    // [EN] The empty label of the image-only tab with the larger font seen in the demo (17 pt, iOS 26.1).
-    // [CN] 只有图片的 Tab 的空标签使用示例中出现的较大字体（iOS 26.1 上为 17 pt）。
-    for (UIControl *tabButton in [(CYLTabBar *)tabBarController.tabBar tabBarButtonArray]) {
-        UILabel *label = tabButton.cyl_tabLabel;
-        if (label && label.text.length == 0) {
-            label.font = [UIFont systemFontOfSize:17];
-        }
-    }
-    tabItems()[2].title = @"Messages";
-    layOut();
-    XCTAssertEqualObjects(tabItems()[1].title, @"Nearby", @"a title that fits stays whole");
-    XCTAssertEqualObjects(tabItems()[3].title, @"Me");
-    NSString *cut = tabItems()[2].title;
-    XCTAssertTrue([cut hasPrefix:@"Mess"] && [cut hasSuffix:@"…"], @"only the title that widened its button is cut: %@", cut);
     window.hidden = YES;
 }
 

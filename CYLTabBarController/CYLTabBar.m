@@ -44,16 +44,6 @@ static void *const CYLTabBarItemBadgeValueContext = (void*)&CYLTabBarItemBadgeVa
 /// [EN] Key of the `hidden` value a view inserted by the library had before More editing hid it.
 /// [CN] 「More」编辑隐藏本库插入的视图之前，该视图原来的 `hidden` 值的 key。
 static const void *const CYLHiddenBeforeCustomizingKey = &CYLHiddenBeforeCustomizingKey;
-/// [EN] An item's full title, and the title it shows, while its title is cut to the tab width (`-cyl_limitTabTitleWidthsForPlusButton`).
-/// [CN] 标题被截断为 Tab 宽度时（`-cyl_limitTabTitleWidthsForPlusButton`），item 的完整标题及其显示的标题。
-static const void *const CYLFullTitleKey = &CYLFullTitleKey;
-static const void *const CYLShownTitleKey = &CYLShownTitleKey;
-/// [EN] The platter width when titles were last cut. [CN] 上次截断标题时的 platter 宽度。
-static const void *const CYLLimitedPlatterWidthKey = &CYLLimitedPlatterWidthKey;
-/// [EN] The padding on each side of the title in a Liquid Glass tab button (`_UITabButton`, measured on iOS 26.1: 15.5–16).
-/// [CN] 液态玻璃 Tab 按钮（`_UITabButton`）中标题每侧的内边距（iOS 26.1 实测 15.5–16）。
-static const CGFloat CYLLiquidGlassTabButtonTitlePadding = 16;
-static NSString *CYLTitleFittingWidth(NSString *title, CGFloat width, UIFont *font);
 
 // [EN] FIX: issue #152 / #535 — implemented in CYLTabBarController+CYLInteraction.m.
 // [CN] FIX: issue #152 / #535 — 实现位于 CYLTabBarController+CYLInteraction.m。
@@ -798,237 +788,6 @@ static NSDictionary<NSAttributedStringKey, id> *CYLTitleAttributesWithColor(NSDi
     }];
 }
 
-/*!
- * [EN] FIX: long titles next to the plus button broke the layout: on Liquid Glass UIKit made a tab with a long title
- *      wider, so the plus button's slot moved off the middle while the plus button stayed in the middle (centered on the
- *      platter, `-plusButtonIndex`). Titles are cut only when that happened: with the full titles, the tab buttons are
- *      measured after UIKit's layout, and while they are all equally wide (evenly spread, every slot in place) nothing is
- *      cut, however close a title comes to the slot width. Only when a button is wider than the others is each title
- *      limited to the width of one slot, found as the plus button's center is: the platter width shared by every slot.
- *      A longer title is cut with "…"; the full title stays the item's accessibility label, and comes back, to be measured
- *      again, when the platter grows (rotation) or when the app sets a new title.
- *      Isolated to that case only (`-cyl_shouldLimitTabTitleWidthsForPlusButton`): iOS 26 and later, Liquid Glass active,
- *      not the FlatDesign style, and a plus button in this tab bar. Outside it nothing is cut, and titles cut before (e.g.
- *      before the app switched to FlatDesign or removed the plus button) get their full text back.
- * [CN] FIX：PlusButton 旁的长标题导致布局错乱：液态玻璃下 UIKit 会把长标题的 Tab 变宽，PlusButton 的 slot 偏离中间，而 PlusButton
- *      仍居中（居中于 platter，见 `-plusButtonIndex`）。只有发生这种情况时才截断：在完整标题下，于 UIKit 布局之后测量 Tab 按钮，只要它们
- *      全部等宽（均匀分布，每个 slot 都在原位），就不截断，无论标题多接近 slot 宽度。只有某个按钮比其他按钮宽时，才把每个标题限制为一个
- *      slot 的宽度，计算方式与 PlusButton 中心点相同：platter 宽度由所有 slot 平分。更长的标题以「…」截断；完整标题作为 item 的无障碍标签，
- *      platter 变宽时（如旋转）或 App 设置新标题时恢复完整标题并重新测量。
- *      只在这一种情况下生效（`-cyl_shouldLimitTabTitleWidthsForPlusButton`）：iOS 26 及以上、液态玻璃生效、非扁平样式、本 TabBar 有
- *      PlusButton。其他情况不截断，之前截断过的标题（例如 App 切换到扁平样式或移除 PlusButton 之前）恢复完整文字。
- */
-- (void)cyl_limitTabTitleWidthsForPlusButton {
-    NSArray<UITabBarItem *> *items = self.items;
-    if (items.count == 0) {
-        return;
-    }
-    if (![self cyl_shouldLimitTabTitleWidthsForPlusButton]) {
-        [self cyl_restoreLimitedTabTitles];
-        return;
-    }
-    CGFloat platterWidth = CGRectGetWidth(self.cyl_contentView.bounds);
-    if (platterWidth <= 0) {
-        return;
-    }
-    if ([self cyl_hasLimitedTabTitles]) {
-        // [EN] Cut titles keep the buttons even, so they cannot be measured: give the full titles back, to be measured in
-        //      the next layout pass, only when there may be room now (a wider platter) or the app set a new title.
-        // [CN] 截断后的标题使按钮保持等宽，无法据此测量：只有可能已有足够空间（platter 变宽）或 App 设置了新标题时，才恢复完整标题，
-        //      在下一次布局中重新测量。
-        CGFloat limitedPlatterWidth = [objc_getAssociatedObject(self, CYLLimitedPlatterWidthKey) doubleValue];
-        if (platterWidth > limitedPlatterWidth + 0.5 || [self cyl_hasTabTitleSetByAppSinceLimit]) {
-            [self cyl_restoreLimitedTabTitles];
-            [self cyl_setNeedsLayoutAfterTabTitleChange];
-            return;
-        }
-        // [EN] VoiceOver reads the full title of a cut item. [CN] VoiceOver 读出被截断 item 的完整标题。
-        for (UITabBarItem *item in items) {
-            NSString *fullTitle = objc_getAssociatedObject(item, CYLFullTitleKey);
-            if (fullTitle && ![item.accessibilityLabel isEqualToString:fullTitle]) {
-                item.accessibilityLabel = fullTitle;
-            }
-        }
-        return;
-    }
-    // [EN] The buttons' frames after UIKit laid them out with the current (full) titles.
-    // [CN] UIKit 以当前（完整）标题布局之后的按钮 frame。
-    [self.cyl_contentView layoutIfNeeded];
-    if (![self cyl_tabButtonsHaveUnevenWidths]) {
-        return;
-    }
-    CGFloat maxWidth = [self cyl_liquidGlassMaxTabTitleWidthForSlotCount:items.count];
-    // [EN] The widest of the title labels' fonts (the selected one can be bolder), so the cut does not change with the
-    //      selection. Only labels that show a title: an empty label (an image-only tab) can keep a larger default font
-    //      (17 pt against 10 pt for the titles, iOS 26.1), which cut titles that fit ("Ne…" for "Nearby").
-    // [CN] 取各标题标签字体中最宽的一个（选中的可能更粗），使截断结果不随选中变化。只取显示标题的标签：空标签（只有图片的 Tab）可能
-    //      保留更大的默认字体（iOS 26.1 上为 17 pt，标题为 10 pt），会把放得下的标题截断（「Nearby」显示为「Ne…」）。
-    UIFont *font = nil;
-    CGFloat fontSampleWidth = 0;
-    for (UIControl *tabButton in self.tabBarButtonArray) {
-        UILabel *label = tabButton.cyl_tabLabel;
-        if (label.text.length == 0) {
-            continue;
-        }
-        UIFont *labelFont = label.font;
-        CGFloat sampleWidth = labelFont ? [@"Wg" sizeWithAttributes:@{ NSFontAttributeName : labelFont }].width : 0;
-        if (sampleWidth > fontSampleWidth) {
-            font = labelFont;
-            fontSampleWidth = sampleWidth;
-        }
-    }
-    if (maxWidth <= 0 || !font) {
-        return;
-    }
-    BOOL didCut = NO;
-    for (UITabBarItem *item in items) {
-        NSString *fullTitle = item.title;
-        if (fullTitle.length == 0) {
-            continue;
-        }
-        NSString *fittingTitle = CYLTitleFittingWidth(fullTitle, maxWidth, font);
-        if ([fittingTitle isEqualToString:fullTitle]) {
-            continue;
-        }
-        didCut = YES;
-        objc_setAssociatedObject(item, CYLFullTitleKey, fullTitle, OBJC_ASSOCIATION_COPY_NONATOMIC);
-        objc_setAssociatedObject(item, CYLShownTitleKey, fittingTitle, OBJC_ASSOCIATION_COPY_NONATOMIC);
-        item.accessibilityLabel = fullTitle;
-        item.title = fittingTitle;
-    }
-    if (didCut) {
-        objc_setAssociatedObject(self, CYLLimitedPlatterWidthKey, @(platterWidth), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-    }
-}
-
-/// [EN] YES while a title is cut by `-cyl_limitTabTitleWidthsForPlusButton`. [CN] 有标题被 `-cyl_limitTabTitleWidthsForPlusButton` 截断时为 YES。
-- (BOOL)cyl_hasLimitedTabTitles {
-    for (UITabBarItem *item in self.items) {
-        if (objc_getAssociatedObject(item, CYLFullTitleKey)) {
-            return YES;
-        }
-    }
-    return NO;
-}
-
-/// [EN] YES when the app set the title of a cut item since it was cut. [CN] 被截断的 item 在截断之后由 App 设置了标题时为 YES。
-- (BOOL)cyl_hasTabTitleSetByAppSinceLimit {
-    for (UITabBarItem *item in self.items) {
-        NSString *shownTitle = objc_getAssociatedObject(item, CYLShownTitleKey);
-        if (shownTitle && ![item.title isEqualToString:shownTitle]) {
-            return YES;
-        }
-    }
-    return NO;
-}
-
-/*!
- * [EN] YES when UIKit made a tab button wider than the others (a title too long for an even slot). NO while they are all
- *      equally wide, and before they are laid out.
- * [CN] UIKit 把某个 Tab 按钮变得比其他按钮宽时（标题放不进均分的 slot）为 YES。全部等宽时，以及尚未布局时为 NO。
- */
-- (BOOL)cyl_tabButtonsHaveUnevenWidths {
-    CGFloat minWidth = CGFLOAT_MAX;
-    CGFloat maxWidth = 0;
-    for (UIControl *tabButton in self.tabBarButtonArray) {
-        CGFloat width = CGRectGetWidth(tabButton.frame);
-        if (width <= 0) {
-            return NO;
-        }
-        minWidth = MIN(minWidth, width);
-        maxWidth = MAX(maxWidth, width);
-    }
-    return self.tabBarButtonArray.count > 1 && maxWidth - minWidth > 1;
-}
-
-/// [EN] Lays the bar out again once UIKit has applied changed titles to the tab buttons. [CN] UIKit 把修改后的标题应用到 Tab 按钮之后，再次布局 TabBar。
-- (void)cyl_setNeedsLayoutAfterTabTitleChange {
-    __weak __typeof(self) weakSelf = self;
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [weakSelf setNeedsLayout];
-    });
-}
-
-/// [EN] The only case the title width limit is for: iOS 26 and later, Liquid Glass active, not the FlatDesign style, a plus
-///      button in this tab bar, and the horizontal bar (not the iOS 27.1 vertical bar, which shows no titles).
-/// [CN] 标题宽度限制只适用的情况：iOS 26 及以上、液态玻璃生效、非扁平样式、本 TabBar 有 PlusButton，且为横向栏（iOS 27.1 竖向栏不显示标题）。
-- (BOOL)cyl_shouldLimitTabTitleWidthsForPlusButton {
-    if (@available(iOS 26.0, *)) {
-        // [EN] Checked one by one below. [CN] 以下逐项检查。
-    } else {
-        return NO;
-    }
-    if (![CYLConstants isLiquidGlassActive]) {
-        return NO;
-    }
-    if (CYLTabBarStyleTypeFlatDesign == self.tabBarController.tabBarStyleType) {
-        return NO;
-    }
-    if (!self.hasPlusButton) {
-        return NO;
-    }
-    return ![self cyl_showsVerticalBar];
-}
-
-/// [EN] Gives every item cut by `-cyl_limitTabTitleWidthsForPlusButton` its full title back, unless the app set another one.
-/// [CN] 把被 `-cyl_limitTabTitleWidthsForPlusButton` 截断的每个 item 恢复为完整标题，App 已设置其他标题时除外。
-- (void)cyl_restoreLimitedTabTitles {
-    for (UITabBarItem *item in self.items) {
-        NSString *fullTitle = objc_getAssociatedObject(item, CYLFullTitleKey);
-        NSString *shownTitle = objc_getAssociatedObject(item, CYLShownTitleKey);
-        if (!fullTitle) {
-            continue;
-        }
-        objc_setAssociatedObject(item, CYLFullTitleKey, nil, OBJC_ASSOCIATION_COPY_NONATOMIC);
-        objc_setAssociatedObject(item, CYLShownTitleKey, nil, OBJC_ASSOCIATION_COPY_NONATOMIC);
-        item.accessibilityLabel = nil;
-        if ([item.title isEqualToString:shownTitle]) {
-            item.title = fullTitle;
-        }
-    }
-}
-
-/*!
- * [EN] Liquid Glass: the widest title that keeps every tab button within one platter slot. UIKit makes a tab button as
- *      wide as its content plus its own padding (`CYLLiquidGlassTabButtonTitlePadding` on each side), and only when
- *      every button fits are they all equally wide; a wider button moves every slot after it, and the plus button,
- *      centered on the platter (`-plusButtonIndex`), no longer covers its slot. The slot is found as the plus button's
- *      center is: the platter width shared by every slot. 0 before the platter is laid out.
- * [CN] 液态玻璃：使每个 Tab 按钮都不超过 platter 一个 slot 的最大标题宽度。UIKit 把 Tab 按钮的宽度设为内容宽度加按钮自身的内边距（两侧各
- *      `CYLLiquidGlassTabButtonTitlePadding`），只有所有按钮都放得下时才等宽；一个按钮变宽会让其后的每个 slot 都移动，居中于 platter 的
- *      PlusButton（`-plusButtonIndex`）就不再覆盖它的 slot。slot 的计算方式与 PlusButton 中心点相同：platter 宽度由所有 slot 平分。
- *      platter 尚未布局时为 0。
- */
-- (CGFloat)cyl_liquidGlassMaxTabTitleWidthForSlotCount:(NSUInteger)slotCount {
-    UIView *platterView = self.cyl_contentView;
-    CGFloat platterWidth = CGRectGetWidth(platterView.bounds);
-    if (platterWidth <= 0 || slotCount == 0) {
-        return 0;
-    }
-    return floor(platterWidth / slotCount - 2 * CYLLiquidGlassTabButtonTitlePadding);
-}
-
-/// [EN] `title`, or its longest start followed by "…", that fits in `width`. [CN] 能放进 `width` 的 `title`，或其后接「…」的最长前缀。
-static NSString *CYLTitleFittingWidth(NSString *title, CGFloat width, UIFont *font) {
-    NSDictionary<NSAttributedStringKey, id> *attributes = @{ NSFontAttributeName : font };
-    if (ceil([title sizeWithAttributes:attributes].width) <= width) {
-        return title;
-    }
-    static NSString *const ellipsis = @"\u2026";
-    NSString *fitting = ellipsis;
-    // [EN] Cut at whole characters (emoji, CJK), longest start first. [CN] 按完整字符截断（emoji、中日韩文字），从最长前缀开始尝试。
-    NSUInteger end = title.length;
-    while (end > 0) {
-        end = [title rangeOfComposedCharacterSequenceAtIndex:end - 1].location;
-        NSString *candidate = [[[title substringToIndex:end] stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceCharacterSet] stringByAppendingString:ellipsis];
-        if (ceil([candidate sizeWithAttributes:attributes].width) <= width) {
-            fitting = candidate;
-            break;
-        }
-    }
-    return fitting;
-}
-
 - (void)cyl_layoutTabBarSubviews {
     self.tabBarButtonArray = [self cyl_originalTabBarButtons];
     
@@ -1064,7 +823,6 @@ static NSString *CYLTitleFittingWidth(NSString *title, CGFloat width, UIFont *fo
             }
         }
     }
-    [self cyl_limitTabTitleWidthsForPlusButton];
     if (!self.plusButtonActive) {
         [self cyl_layoutTabButtonsWithItemEdgeInsetsIfNeeded];
         if (self.didLayoutSubViewsBlock) {
@@ -1530,12 +1288,20 @@ UISearchTab 会从 TabBar 分离出来单独显示。
             systemDefaultY = platterCenter.y;
         }
         
+        // FIX: long titles next to the plus button (PlusButton-Slot.md, "Long titles").
+        // [EN] Horizontally on the center of its slot, the tab button it covers: UIKit makes a tab with a long title
+        //      wider, which moves the slots after it, so the platter's center is no longer the slot's. Titles keep their
+        //      full text. The platter's center only while the slot is not laid out.
+        // [CN] 水平方向居中于它的 slot（它覆盖的 Tab 按钮）：UIKit 会把长标题的 Tab 变宽，其后的 slot 随之移动，platter 中心不再是
+        //      slot 的中心。标题保持完整文字。slot 尚未布局时才使用 platter 中心。
+        CGFloat centerX = platterCenter.x;
+        UIView *slot = [self cyl_liquidGlassPlusButtonSlotAtIndex:plusButtonIndex];
+        if (slot) {
+            centerX = [slot.superview convertPoint:slot.center toView:self].x;
+        }
         // [CN] 计算最终中心
         // [EN] Compute the final center
-        CGPoint finalCenter = CGPointMake(
-                                          platterCenter.x ,
-                                          systemDefaultY
-                                          );
+        CGPoint finalCenter = CGPointMake(centerX, systemDefaultY);
         // Issue #636: with the title in the tab item, the image above its title, on the title's vertical center line.
         // 标题由 TabBarItem 显示时：图片位于标题上方，与标题竖向中心线对齐。
         finalCenter = [[CYLPlusButton plusButtonForOwner:self] cyl_alignedCenterForCenter:finalCenter];
@@ -1544,12 +1310,19 @@ UISearchTab 会从 TabBar 分离出来单独显示。
         // [CN] 禁止隐式动画
         // [EN] Disable implicit animations
         // ===============================
-        [CATransaction begin];
-        [CATransaction setDisableActions:YES];
-        
-        self.plusButton.center = finalCenter;
-        
-        [CATransaction commit];
+        if (!CGPointEqualToPoint(self.plusButton.center, finalCenter)) {
+            [CATransaction begin];
+            [CATransaction setDisableActions:YES];
+            self.plusButton.center = finalCenter;
+            [CATransaction commit];
+            // [EN] UIKit may resize the tab buttons after this pass (a title changed): check again on the next run loop;
+            //      nothing happens once the position is unchanged.
+            // [CN] UIKit 可能在本次布局之后才改变 Tab 按钮的宽度（标题改变）：下一个 run loop 再校正一次；位置不变时不会再次触发。
+            __weak typeof(self) weakSelf = self;
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [weakSelf setNeedsLayout];
+            });
+        }
     }
     [[CYLPlusButton plusButtonForOwner:self] cyl_setTabBarChildViewControllerIndex:plusButtonIndex];
 
@@ -1692,6 +1465,25 @@ UISearchTab 会从 TabBar 分离出来单独显示。
     CGFloat platterWidth = CGRectGetWidth([platterView convertRect:platterView.bounds toView:self]);
     CGFloat tabBarWidth = CGRectGetWidth(self.bounds);
     return platterWidth > 0 && tabBarWidth > 0 && platterWidth < tabBarWidth * 0.5;
+}
+
+/*!
+ * [EN] The tab button the plus button covers on the horizontal Liquid Glass bar (its slot), laid out in the platter; nil
+ *      before it is laid out.
+ * [CN] 横向液态玻璃 TabBar 上 PlusButton 覆盖的 Tab 按钮（它的 slot），已在 platter 中布局；尚未布局时返回 nil。
+ */
+- (UIView *)cyl_liquidGlassPlusButtonSlotAtIndex:(NSUInteger)index {
+    UIView *platterView = self.cyl_contentView;
+    [platterView layoutIfNeeded];
+    NSArray<UIControl *> *tabButtons = [self cyl_tabBarSubviews];
+    if (index == NSNotFound || index >= tabButtons.count) {
+        return nil;
+    }
+    UIView *slot = tabButtons[index];
+    if (CGRectGetWidth(slot.bounds) <= 0 || !slot.superview || ![slot isDescendantOfView:platterView]) {
+        return nil;
+    }
+    return slot;
 }
 
 /*!

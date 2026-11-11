@@ -209,6 +209,7 @@ docs/
 │   ├── pag-flat-design.png
 │   ├── pag-liquid-glass.png
 │   ├── per-tab-animation-pag-ios.png
+│   ├── plus-button-follows-slot-long-titles-ios.png
 │   ├── plus-button-long-titles-liquid-glass-ios.png
 │   ├── plus-button-titles-fit-liquid-glass-ios.png
 │   ├── plus-child-theme-switching.png
