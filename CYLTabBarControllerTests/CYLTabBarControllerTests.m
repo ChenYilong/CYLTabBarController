@@ -520,6 +520,90 @@
     window.hidden = YES;
 }
 
+/// [EN] FIX: titles too long for the platter overlapped. Only then are titles cut, the longest ones only: the short titles
+///      keep their text, the tab buttons no longer overlap, the plus button stays on its slot, the full title is the
+///      accessibility label, and a new title set by the app is used again.
+/// [CN] FIX：超出 platter 的长标题互相重叠。只有这时才截断标题，并且只截断最长的：短标题保持文字，Tab 按钮不再重叠，PlusButton 仍在
+///      它的 slot 上，完整标题作为无障碍标签，App 之后设置的新标题会重新生效。
+- (void)testOnlyTitlesOverflowingThePlatterAreCut {
+    if (![CYLConstants isLiquidGlassActive]) {
+        return;
+    }
+    NSString *longTitle = @"Scene one: review filter and more";
+    NSString *secondTitle = @"Scene two: search and sort";
+    NSMutableArray<NSDictionary *> *tabs = [NSMutableArray array];
+    for (NSString *name in @[ longTitle, secondTitle, @"C", @"D" ]) {
+        [tabs addObject:@{ CYLTabBarItemIdentifier : [NSUUID UUID].UUIDString, CYLTabBarItemTitle : name, CYLTabBarItemImage : [UIImage systemImageNamed:@"house"] }];
+    }
+    CYLTabBarController *tabBarController = [CYLTabBarController tabBarControllerWithConfiguration:@{
+        CYLTabBarControllerContext : [NSUUID UUID].UUIDString,
+        CYLTabBarControllerTabBarItemsAttributes : tabs,
+        CYLTabBarControllerPageResolver : ^UIViewController *(NSString *pageIdentifier, NSDictionary *attributes) {
+            return [[UIViewController alloc] init];
+        },
+        CYLTabBarControllerPlusButton : @{ CYLTabBarItemTitle : @"Post", CYLTabBarItemImage : [UIImage systemImageNamed:@"plus.circle"] },
+    }];
+    UIWindow *window = [[UIWindow alloc] initWithFrame:CGRectMake(0, 0, 402, 874)];
+    window.rootViewController = tabBarController;
+    window.hidden = NO;
+    void (^layOut)(void) = ^{
+        for (NSUInteger pass = 0; pass < 5; pass++) {
+            [tabBarController.tabBar setNeedsLayout];
+            [tabBarController.view layoutIfNeeded];
+            [[NSRunLoop mainRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.2]];
+        }
+    };
+    CYLTabBar *tabBar = (CYLTabBar *)tabBarController.tabBar;
+    void (^checkLayout)(NSString *) = ^(NSString *step) {
+        // [EN] Every title whole in its label, and no two labels overlapping (the buttons themselves always overlap a little).
+        // [CN] 每个标题在其标签中完整显示，且任意两个标签不重叠（按钮本身总会略微重叠）。
+        NSMutableArray<NSValue *> *labelFrames = [NSMutableArray array];
+        for (UIControl *tabButton in [tabBar cyl_tabBarSubviews]) {
+            UILabel *label = tabButton.cyl_tabLabel;
+            if (label.text.length == 0) {
+                continue;
+            }
+            XCTAssertLessThanOrEqual([label sizeThatFits:CGSizeMake(CGFLOAT_MAX, CGFLOAT_MAX)].width, CGRectGetWidth(label.bounds) + 0.5,
+                                     @"%@: %@ is not squeezed", step, label.text);
+            [labelFrames addObject:[NSValue valueWithCGRect:[label convertRect:label.bounds toView:tabBar]]];
+        }
+        [labelFrames sortUsingComparator:^NSComparisonResult(NSValue *first, NSValue *second) {
+            return [@(CGRectGetMinX(first.CGRectValue)) compare:@(CGRectGetMinX(second.CGRectValue))];
+        }];
+        for (NSUInteger index = 1; index < labelFrames.count; index++) {
+            XCTAssertLessThanOrEqual(CGRectGetMaxX(labelFrames[index - 1].CGRectValue), CGRectGetMinX(labelFrames[index].CGRectValue),
+                                     @"%@: titles %@ and %@ do not overlap", step, @(index - 1), @(index));
+        }
+        NSUInteger slotIndex = NSNotFound;
+        for (NSUInteger index = 0; index < tabBarController.viewControllers.count; index++) {
+            if (tabBarController.viewControllers[index].cyl_isPlaceholder) {
+                slotIndex = index;
+            }
+        }
+        NSArray<UIControl *> *buttons = [tabBar cyl_tabBarSubviews];
+        if (slotIndex < buttons.count) {
+            UIControl *slot = buttons[slotIndex];
+            CGFloat slotCenterX = [slot.superview convertPoint:slot.center toView:tabBar].x;
+            CGFloat plusCenterX = [tabBar.plusButton.superview convertPoint:tabBar.plusButton.center toView:tabBar].x;
+            XCTAssertEqualWithAccuracy(plusCenterX, slotCenterX, 1, @"%@: the plus button is on its slot", step);
+        }
+    };
+    layOut();
+    UITabBarItem *firstItem = tabBarController.viewControllers[0].tabBarItem;
+    UITabBarItem *secondItem = tabBarController.viewControllers[1].tabBarItem;
+    XCTAssertTrue([firstItem.title hasSuffix:@"…"], @"the longest title is cut: %@", firstItem.title);
+    XCTAssertEqualObjects(firstItem.accessibilityLabel, longTitle);
+    XCTAssertEqualObjects(tabBarController.viewControllers.lastObject.tabBarItem.title, @"D", @"a short title stays");
+    XCTAssertGreaterThan(firstItem.title.length + secondItem.title.length, 20, @"only what overflows is cut: %@ / %@", firstItem.title, secondItem.title);
+    checkLayout(@"overflowing titles");
+    firstItem.title = @"A";
+    layOut();
+    XCTAssertEqualObjects(firstItem.title, @"A", @"the app's new title is used");
+    XCTAssertEqualObjects(secondItem.title, secondTitle, @"fits again: the full title is back");
+    checkLayout(@"after a title change");
+    window.hidden = YES;
+}
+
 /// [EN] Without a plus button a long title is left as it is.
 /// [CN] 没有 PlusButton 时长标题保持不变。
 - (void)testLongTitlesWithoutAPlusButtonAreNotCut {

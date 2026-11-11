@@ -44,6 +44,13 @@ static void *const CYLTabBarItemBadgeValueContext = (void*)&CYLTabBarItemBadgeVa
 /// [EN] Key of the `hidden` value a view inserted by the library had before More editing hid it.
 /// [CN] 「More」编辑隐藏本库插入的视图之前，该视图原来的 `hidden` 值的 key。
 static const void *const CYLHiddenBeforeCustomizingKey = &CYLHiddenBeforeCustomizingKey;
+/// [EN] An item's full title, and the title it shows, while it is cut because the titles overflow the platter.
+/// [CN] 标题因超出 platter 而被截断时，item 的完整标题及其显示的标题。
+static const void *const CYLFullTitleKey = &CYLFullTitleKey;
+static const void *const CYLShownTitleKey = &CYLShownTitleKey;
+/// [EN] The platter width when titles were last cut. [CN] 上次截断标题时的 platter 宽度。
+static const void *const CYLCutPlatterWidthKey = &CYLCutPlatterWidthKey;
+static NSString *CYLTitleFittingWidth(NSString *title, CGFloat width, UIFont *font);
 
 // [EN] FIX: issue #152 / #535 — implemented in CYLTabBarController+CYLInteraction.m.
 // [CN] FIX: issue #152 / #535 — 实现位于 CYLTabBarController+CYLInteraction.m。
@@ -788,6 +795,237 @@ static NSDictionary<NSAttributedStringKey, id> *CYLTitleAttributesWithColor(NSDi
     }];
 }
 
+/*!
+ * [EN] FIX: titles too long for the platter overlapped. The plus button follows its slot (`-plusButtonIndex`), so a
+ *      long title is normally left whole; but when the tab buttons together are wider than the platter, UIKit lets them
+ *      overlap and the titles run into each other. Only then, and only the longest titles, are cut with "…": after
+ *      UIKit's layout the overlap of the buttons is measured, and the longest titles lose that width, the longest first,
+ *      so the others keep their full text. Checked again on each layout pass until nothing overlaps. The full title
+ *      stays the item's accessibility label, and comes back, to be measured again, when the platter grows (rotation) or
+ *      the app sets a new title. Only for the horizontal Liquid Glass bar with a plus button
+ *      (`-cyl_shouldCutOverflowingTabTitles`); elsewhere cut titles get their full text back.
+ * [CN] FIX：超出 platter 的长标题互相重叠。PlusButton 跟随它的 slot（`-plusButtonIndex`），所以长标题通常保持完整；但 Tab 按钮总宽度
+ *      超过 platter 时，UIKit 让按钮重叠，标题文字互相覆盖。只有这时，并且只截断最长的标题（以「…」结尾）：在 UIKit 布局之后测量按钮的
+ *      重叠宽度，由最长的标题依次让出这段宽度，其他标题保持完整。每次布局都再检查一次，直到没有重叠。完整标题作为 item 的无障碍标签，
+ *      platter 变宽时（如旋转）或 App 设置新标题时恢复完整标题并重新测量。只用于有 PlusButton 的横向液态玻璃 TabBar
+ *      （`-cyl_shouldCutOverflowingTabTitles`）；其他情况下被截断的标题恢复完整文字。
+ */
+- (void)cyl_cutOverflowingTabTitlesIfNeeded {
+    NSArray<UITabBarItem *> *items = self.items;
+    if (items.count == 0) {
+        return;
+    }
+    if (![self cyl_shouldCutOverflowingTabTitles]) {
+        [self cyl_restoreCutTabTitles];
+        return;
+    }
+    UIView *platterView = self.cyl_contentView;
+    CGFloat platterWidth = CGRectGetWidth(platterView.bounds);
+    if (platterWidth <= 0) {
+        return;
+    }
+    if ([self cyl_hasCutTabTitles]) {
+        CGFloat cutPlatterWidth = [objc_getAssociatedObject(self, CYLCutPlatterWidthKey) doubleValue];
+        if (platterWidth > cutPlatterWidth + 0.5 || [self cyl_hasTabTitleSetByAppSinceCut]) {
+            [self cyl_restoreCutTabTitles];
+            [self cyl_setNeedsLayoutOnNextRunLoop];
+            return;
+        }
+        // [EN] VoiceOver reads the full title of a cut item. [CN] VoiceOver 读出被截断 item 的完整标题。
+        for (UITabBarItem *item in items) {
+            NSString *fullTitle = objc_getAssociatedObject(item, CYLFullTitleKey);
+            if (fullTitle && ![item.accessibilityLabel isEqualToString:fullTitle]) {
+                item.accessibilityLabel = fullTitle;
+            }
+        }
+    }
+    [platterView layoutIfNeeded];
+    NSArray<UIControl *> *tabButtons = [self cyl_tabBarSubviews];
+    if (tabButtons.count != items.count) {
+        return;
+    }
+    CGFloat excess = [self cyl_overflowOfTabButtons:tabButtons inPlatterWidth:platterWidth];
+    if (excess <= 0.5) {
+        return;
+    }
+    // [EN] The width each title shows now, in its own label's font. [CN] 每个标题当前显示的宽度，使用其标签的字体。
+    NSMutableArray<NSNumber *> *widths = [NSMutableArray arrayWithCapacity:items.count];
+    for (NSUInteger index = 0; index < items.count; index++) {
+        UILabel *label = tabButtons[index].cyl_tabLabel;
+        NSString *title = items[index].title;
+        CGFloat width = (label.font && title.length > 0) ? ceil([title sizeWithAttributes:@{ NSFontAttributeName : label.font }].width) : 0;
+        [widths addObject:@(width)];
+    }
+    CGFloat cap = CYLTitleWidthCapRemovingWidth(widths, excess + 1);
+    BOOL didCut = NO;
+    for (NSUInteger index = 0; index < items.count; index++) {
+        if (widths[index].doubleValue <= cap) {
+            continue;
+        }
+        UITabBarItem *item = items[index];
+        UIFont *font = tabButtons[index].cyl_tabLabel.font;
+        NSString *fullTitle = objc_getAssociatedObject(item, CYLFullTitleKey) ?: item.title;
+        NSString *fittingTitle = CYLTitleFittingWidth(fullTitle, cap, font);
+        if ([fittingTitle isEqualToString:item.title]) {
+            continue;
+        }
+        didCut = YES;
+        objc_setAssociatedObject(item, CYLFullTitleKey, fullTitle, OBJC_ASSOCIATION_COPY_NONATOMIC);
+        objc_setAssociatedObject(item, CYLShownTitleKey, fittingTitle, OBJC_ASSOCIATION_COPY_NONATOMIC);
+        item.accessibilityLabel = fullTitle;
+        item.title = fittingTitle;
+    }
+    if (didCut) {
+        objc_setAssociatedObject(self, CYLCutPlatterWidthKey, @(platterWidth), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+        [self cyl_setNeedsLayoutOnNextRunLoop];
+    }
+}
+
+/*!
+ * [EN] How much title width is missing: UIKit's tab buttons always overlap a little (about 20 pt on iOS 26.1), so their
+ *      frames do not show it; when the titles overflow, UIKit squeezes the title labels instead. So: each label's
+ *      missing width (its text against its width), plus labels closer than `CYLMinimumTabTitleGap` (UIKit's own gap is about
+ *      5 pt) or running past the platter. 0 when every title fits or nothing is laid out.
+ * [CN] 缺少多少标题宽度：UIKit 的 Tab 按钮本来就会略微重叠（iOS 26.1 上约 20 pt），按钮 frame 看不出溢出；标题溢出时 UIKit 改为压缩标题
+ *      标签。因此取：每个标签缺少的宽度（文字宽度减标签宽度），加上间距小于 `CYLMinimumTabTitleGap`（UIKit 自身的间距约 5 pt）或超出 platter 的部分。所有标题都放得下
+ *      或尚未布局时为 0。
+ */
+- (CGFloat)cyl_overflowOfTabButtons:(NSArray<UIControl *> *)tabButtons inPlatterWidth:(CGFloat)platterWidth {
+    static const CGFloat CYLMinimumTabTitleGap = 2;
+    UIView *platterView = self.cyl_contentView;
+    NSMutableArray<NSValue *> *labelFrames = [NSMutableArray array];
+    CGFloat excess = 0;
+    for (UIControl *tabButton in tabButtons) {
+        if (CGRectGetWidth(tabButton.frame) <= 0) {
+            return 0;
+        }
+        UILabel *label = tabButton.cyl_tabLabel;
+        if (label.text.length == 0 || label.hidden || label.alpha <= 0.01) {
+            continue;
+        }
+        CGFloat textWidth = [label sizeThatFits:CGSizeMake(CGFLOAT_MAX, CGFLOAT_MAX)].width;
+        excess += MAX(0, textWidth - CGRectGetWidth(label.bounds));
+        [labelFrames addObject:[NSValue valueWithCGRect:[label convertRect:label.bounds toView:platterView]]];
+    }
+    [labelFrames sortUsingComparator:^NSComparisonResult(NSValue *first, NSValue *second) {
+        return [@(CGRectGetMinX(first.CGRectValue)) compare:@(CGRectGetMinX(second.CGRectValue))];
+    }];
+    for (NSUInteger index = 0; index < labelFrames.count; index++) {
+        CGRect frame = labelFrames[index].CGRectValue;
+        if (index > 0) {
+            CGFloat gap = CGRectGetMinX(frame) - CGRectGetMaxX(labelFrames[index - 1].CGRectValue);
+            excess += MAX(0, CYLMinimumTabTitleGap - gap);
+        }
+        excess += MAX(0, -CGRectGetMinX(frame)) + MAX(0, CGRectGetMaxX(frame) - platterWidth);
+    }
+    return excess;
+}
+
+/// [EN] The only case titles are cut for: iOS 26 and later, Liquid Glass active, not the FlatDesign style, a plus button in
+///      this tab bar, and the horizontal bar (not the iOS 27.1 vertical bar, which shows no titles).
+/// [CN] 只在这种情况下截断标题：iOS 26 及以上、液态玻璃生效、非扁平样式、本 TabBar 有 PlusButton，且为横向栏（iOS 27.1 竖向栏不显示标题）。
+- (BOOL)cyl_shouldCutOverflowingTabTitles {
+    if (@available(iOS 26.0, *)) {
+        // [EN] Checked one by one below. [CN] 以下逐项检查。
+    } else {
+        return NO;
+    }
+    if (![CYLConstants isLiquidGlassActive] || CYLTabBarStyleTypeFlatDesign == self.tabBarController.tabBarStyleType ||
+        !self.hasPlusButton) {
+        return NO;
+    }
+    return ![self cyl_showsVerticalBar];
+}
+
+/// [EN] YES while a title is cut. [CN] 有标题被截断时为 YES。
+- (BOOL)cyl_hasCutTabTitles {
+    for (UITabBarItem *item in self.items) {
+        if (objc_getAssociatedObject(item, CYLFullTitleKey)) {
+            return YES;
+        }
+    }
+    return NO;
+}
+
+/// [EN] YES when the app set the title of a cut item since it was cut. [CN] 被截断的 item 在截断之后由 App 设置了标题时为 YES。
+- (BOOL)cyl_hasTabTitleSetByAppSinceCut {
+    for (UITabBarItem *item in self.items) {
+        NSString *shownTitle = objc_getAssociatedObject(item, CYLShownTitleKey);
+        if (shownTitle && ![item.title isEqualToString:shownTitle]) {
+            return YES;
+        }
+    }
+    return NO;
+}
+
+/// [EN] Gives every cut item its full title back, unless the app set another one. [CN] 把每个被截断的 item 恢复为完整标题，App 已设置其他标题时除外。
+- (void)cyl_restoreCutTabTitles {
+    for (UITabBarItem *item in self.items) {
+        NSString *fullTitle = objc_getAssociatedObject(item, CYLFullTitleKey);
+        NSString *shownTitle = objc_getAssociatedObject(item, CYLShownTitleKey);
+        if (!fullTitle) {
+            continue;
+        }
+        objc_setAssociatedObject(item, CYLFullTitleKey, nil, OBJC_ASSOCIATION_COPY_NONATOMIC);
+        objc_setAssociatedObject(item, CYLShownTitleKey, nil, OBJC_ASSOCIATION_COPY_NONATOMIC);
+        item.accessibilityLabel = nil;
+        if ([item.title isEqualToString:shownTitle]) {
+            item.title = fullTitle;
+        }
+    }
+}
+
+/// [EN] Lays the bar out again on the next run loop, once UIKit has applied changed titles. [CN] 在下一个 run loop（UIKit 应用修改后的标题之后）再次布局 TabBar。
+- (void)cyl_setNeedsLayoutOnNextRunLoop {
+    __weak __typeof(self) weakSelf = self;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [weakSelf setNeedsLayout];
+    });
+}
+
+/*!
+ * [EN] The widest title width that frees `width` when every wider title is cut to it, taking from the longest titles
+ *      first (`widths` holds every title's width).
+ * [CN] 把所有更宽的标题截断到该宽度后能让出 `width` 的最大标题宽度，先从最长的标题中让出（`widths` 为各标题的宽度）。
+ */
+static CGFloat CYLTitleWidthCapRemovingWidth(NSArray<NSNumber *> *widths, CGFloat width) {
+    NSArray<NSNumber *> *sorted = [widths sortedArrayUsingComparator:^NSComparisonResult(NSNumber *first, NSNumber *second) {
+        return [second compare:first];
+    }];
+    CGFloat sum = 0;
+    for (NSUInteger count = 1; count <= sorted.count; count++) {
+        sum += sorted[count - 1].doubleValue;
+        CGFloat next = (count < sorted.count) ? sorted[count].doubleValue : 0;
+        // [EN] Cutting the `count` longest titles to `cap` frees `sum - count * cap`. [CN] 把最长的 `count` 个标题截断到 `cap` 可让出 `sum - count * cap`。
+        CGFloat cap = (sum - width) / count;
+        if (cap >= next) {
+            return MAX(0, floor(cap));
+        }
+    }
+    return 0;
+}
+
+/// [EN] `title`, or its longest start followed by "…", that fits in `width`. [CN] 能放进 `width` 的 `title`，或其后接「…」的最长前缀。
+static NSString *CYLTitleFittingWidth(NSString *title, CGFloat width, UIFont *font) {
+    NSDictionary<NSAttributedStringKey, id> *attributes = @{ NSFontAttributeName : font };
+    if (ceil([title sizeWithAttributes:attributes].width) <= width) {
+        return title;
+    }
+    static NSString *const ellipsis = @"\u2026";
+    NSString *fitting = ellipsis;
+    // [EN] Cut at whole characters (emoji, CJK), longest start first. [CN] 按完整字符截断（emoji、中日韩文字），从最长前缀开始尝试。
+    NSUInteger end = title.length;
+    while (end > 0) {
+        end = [title rangeOfComposedCharacterSequenceAtIndex:end - 1].location;
+        NSString *candidate = [[[title substringToIndex:end] stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceCharacterSet] stringByAppendingString:ellipsis];
+        if (ceil([candidate sizeWithAttributes:attributes].width) <= width) {
+            fitting = candidate;
+            break;
+        }
+    }
+    return fitting;
+}
+
 - (void)cyl_layoutTabBarSubviews {
     self.tabBarButtonArray = [self cyl_originalTabBarButtons];
     
@@ -823,6 +1061,7 @@ static NSDictionary<NSAttributedStringKey, id> *CYLTitleAttributesWithColor(NSDi
             }
         }
     }
+    [self cyl_cutOverflowingTabTitlesIfNeeded];
     if (!self.plusButtonActive) {
         [self cyl_layoutTabButtonsWithItemEdgeInsetsIfNeeded];
         if (self.didLayoutSubViewsBlock) {
