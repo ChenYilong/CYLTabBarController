@@ -186,12 +186,19 @@
     [tabBarController updateTabBarItemAtIndex:1 attributes:@{ CYLTabBarItemTitle : @"★ B" }];
     [tabBarController.view setNeedsLayout];
     [tabBarController.view layoutIfNeeded];
-    XCTAssertEqualObjects(tabBarController.viewControllers[0].tabBarItem.accessibilityLabel, @"★ A");
+    // [EN] The library writes the default label on Liquid Glass only: the classic tab buttons read the title themselves,
+    //      and the item's label stays nil there (iOS 17.5 simulator).
+    // [CN] 库只在液态玻璃下写入默认 label：经典样式的 Tab 按钮自己读取标题，item 的 label 保持为 nil（iOS 17.5 模拟器）。
+    BOOL writesDefaultLabels = [CYLConstants isLiquidGlassActive];
+    NSString * (^expected)(NSString *) = ^NSString *(NSString *title) {
+        return writesDefaultLabels ? title : nil;
+    };
+    XCTAssertEqualObjects(tabBarController.viewControllers[0].tabBarItem.accessibilityLabel, expected(@"★ A"));
     XCTAssertEqualObjects(appLabeledItem.accessibilityLabel, @"Custom", @"the app's own label is kept");
     [tabBarController updateTabBarItemAtIndex:0 attributes:@{ CYLTabBarItemTitle : @"A" }];
     [tabBarController.view setNeedsLayout];
     [tabBarController.view layoutIfNeeded];
-    XCTAssertEqualObjects(tabBarController.viewControllers[0].tabBarItem.accessibilityLabel, @"A", @"follows the title back");
+    XCTAssertEqualObjects(tabBarController.viewControllers[0].tabBarItem.accessibilityLabel, expected(@"A"), @"follows the title back");
 }
 
 /// [EN] The plus button's page follows the plus button's title: `-updatePlusButtonWithAttributes:` sets its navigation bar
