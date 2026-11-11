@@ -101,7 +101,16 @@ final class CYLDemoPlaceholder: NSObject {
                         refresh: ((@escaping () -> Void) -> Void)? = nil) {
         CYLPlaceholderNetworkMonitor.shared.startMonitoring()
         installPlaceholder(on: scrollView, animation: animation)
-        let refreshingBlock = scrollView.cyl_header?.refreshingBlock ?? { [weak scrollView] in
+        // [EN] Launch argument `-CYLDemoHoldRefresh YES` (screenshots, UI tests): every list starts refreshing and stays
+        //      in that state, so its refresh icon can be captured.
+        // [CN] 启动参数 `-CYLDemoHoldRefresh YES`（截图、UI 测试）：每个列表开始刷新并保持刷新状态，便于截取刷新图标。
+        let holdsRefresh = UserDefaults.standard.bool(forKey: "CYLDemoHoldRefresh")
+        if holdsRefresh {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak scrollView] in
+                scrollView?.cyl_header?.beginRefreshing()
+            }
+        }
+        let listRefreshingBlock: CYLRefreshComponentAction = scrollView.cyl_header?.refreshingBlock ?? { [weak scrollView] in
             let finish = {
                 reload(scrollView)
                 scrollView?.cyl_header?.endRefreshing()
@@ -112,6 +121,7 @@ final class CYLDemoPlaceholder: NSObject {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.8, execute: finish)
             }
         }
+        let refreshingBlock: CYLRefreshComponentAction = holdsRefresh ? {} : listRefreshingBlock
         // [EN] The animated refresh header first: a list's own header keeps its block and becomes an animation header.
         //      The arrow and spinner header stays only when no refresh icon of the kind is bundled.
         // [CN] 优先使用动画刷新头：列表自带的刷新头保留其回调，换成动画刷新头。资源包中没有该类型的刷新图标时才保留箭头与菊花刷新头。
@@ -130,6 +140,33 @@ final class CYLDemoPlaceholder: NSObject {
                                                queue: .main) { [weak scrollView] _ in
             reload(scrollView)
         }
+    }
+
+    /**
+     * [EN] A second tap on the selected tab: scrolls the page's list back to the top and starts its pull to refresh
+     *      (`cyl_header`). Returns NO when the page has no list with a refresh header.
+     * [CN] 再次点击已选中的 Tab：把页面的列表滚动回顶部并开始下拉刷新（`cyl_header`）。页面中没有带刷新头的列表时返回 NO。
+     */
+    @objc(refreshListOfViewController:)
+    @discardableResult
+    static func refreshList(of viewController: UIViewController) -> Bool {
+        guard viewController.isViewLoaded else {
+            return false
+        }
+        var views: [UIView] = [viewController.view]
+        while !views.isEmpty {
+            let view = views.removeFirst()
+            if let scrollView = view as? UIScrollView, let header = scrollView.cyl_header {
+                if !header.isRefreshing {
+                    scrollView.setContentOffset(CGPoint(x: scrollView.contentOffset.x, y: -scrollView.adjustedContentInset.top),
+                                                animated: false)
+                    header.beginRefreshing()
+                }
+                return true
+            }
+            views.append(contentsOf: view.subviews)
+        }
+        return false
     }
 
     /**

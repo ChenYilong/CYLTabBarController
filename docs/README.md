@@ -177,6 +177,7 @@ docs/
 │   ├── configuration-manifest-christmas.png
 │   ├── configuration-manifest-light.png
 │   ├── configuration-manifest-themes-bar.png
+│   ├── cyltableviewplaceholder-refresh-icons-40ec453-ios.png
 │   ├── cyltableviewplaceholder-refresh-icons-ios.png
 │   ├── demo-test-list-objc-classic.png
 │   ├── docs-navigation-index.png

@@ -233,7 +233,7 @@ tabBarController.cyl_tabBarItemGestureHandler = { _, gesture, control, viewContr
 
 | Demo | 中文 | English |
 |:---|:---|:---|
-| `Example`（ObjC，`MainTabBarController`） | block 方式：再次点击滚动到顶部，双击调用页面的 `-refresh`，长按弹出菜单（可选中该 Tab）。替换了以前在 `shouldSelectViewController` 中的"再次点击刷新"。 | Block API: reselect scrolls to the top, double tap calls the page's `-refresh`, long press shows a menu (with a way to select the tab). Replaces the old "re-tap to refresh" in `shouldSelectViewController`. |
+| `Example`（ObjC，`MainTabBarController`） | block 方式：再次点击回到顶部并开始页面列表的下拉刷新（`+[CYLDemoPlaceholder refreshListOfViewController:]`，2026-11-12；没有带刷新头的列表时只滚动到顶部），双击不再另行刷新（其第二次点击已作为 Reselect 刷新），长按弹出菜单（可选中该 Tab）。替换了以前在 `shouldSelectViewController` 中的"再次点击刷新"。 | Block API: a reselect scrolls the page's list back to the top and starts its pull to refresh (`+[CYLDemoPlaceholder refreshListOfViewController:]`, 2026-11-12; a page without a list with a refresh header only scrolls to the top); a double tap does not refresh again (its second tap already refreshed as a Reselect); a long press shows a menu (which can select that tab). Replaces the old "tap again to refresh" in `shouldSelectViewController`. |
 | `Example`（扁平样式，`CYLFlatDesignMainTabBarController`） | 代理方法，行为与上一行相同。 | The delegate method, with the same behavior. |
 | `Example-Swift` | Swift 代理方法：再次点击滚动到顶部，双击重新加载并在导航栏提示 1 秒，长按弹出菜单。 | The Swift delegate method: reselect scrolls to the top, double tap reloads and shows a 1-second prompt in the navigation bar, long press shows a menu. |
 

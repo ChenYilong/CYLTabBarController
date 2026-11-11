@@ -21,6 +21,7 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
 #import "CYLMineViewController.h"
 #import "CYLSameCityViewController.h"
 #import "CYLDemoLocalization.h"
+#import "CYLTabBarControllerDemo-Swift.h"
 
 
 @interface MainTabBarController ()<CYLTabBarControllerDelegate, CYLFlatDesignUITabBarControllerDelegate>
@@ -635,7 +636,26 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
     __weak __typeof(self) weakSelf = self;
     [self setViewDidLayoutSubViewsBlockInvokeOnce:YES block:^(CYLTabBarController *tabBarController) {
         [weakSelf cyl_demo_decorateTabBarController:tabBarController];
+        [weakSelf cyl_demo_selectTabFromLaunchArgumentOfTabBarController:tabBarController];
     }];
+}
+
+/*!
+ * [EN] Launch argument `-CYLDemoSelectedTab <identifier>` (screenshots, UI tests): logs in and selects that tab (e.g.
+ *      `city`, `message`, `CYLMineViewController`) 2 s after launch, after the demo has decorated the tab bar.
+ * [CN] 启动参数 `-CYLDemoSelectedTab <identifier>`（截图、UI 测试）：启动 2 秒后（示例装饰 TabBar 之后）登录并选中该 Tab
+ *      （如 `city`、`message`、`CYLMineViewController`）。
+ */
+- (void)cyl_demo_selectTabFromLaunchArgumentOfTabBarController:(CYLTabBarController *)tabBarController {
+    NSString *identifier = [[NSUserDefaults standardUserDefaults] stringForKey:@"CYLDemoSelectedTab"];
+    if (identifier.length == 0) {
+        return;
+    }
+    __weak CYLTabBarController *weakTabBarController = tabBarController;
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        weakTabBarController.cyl_loggedIn = YES;
+        [weakTabBarController cyl_selectTabBarItemWithIdentifier:identifier];
+    });
 }
 
 /*!
@@ -1056,14 +1076,15 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
     NSLog(@"🟣 #152 gesture %@ on \"%@\"", @(gesture), control.cyl_tabBarItemIdentifier);
     switch (gesture) {
         case CYLTabBarItemGestureReselect:
-            [self cyl_demo_scrollToTop:contentViewController];
+            // [EN] A second tap refreshes the page's list (back to the top first); a page without one scrolls to the top.
+            // [CN] 再次点击刷新页面的列表（先回到顶部）；没有列表的页面只滚动到顶部。
+            if (![CYLDemoPlaceholder refreshListOfViewController:contentViewController]) {
+                [self cyl_demo_scrollToTop:contentViewController];
+            }
             break;
         case CYLTabBarItemGestureDoubleTap:
-            if ([contentViewController respondsToSelector:@selector(refresh)]) {
-                CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS(
-                    [contentViewController performSelector:@selector(refresh)];
-                );
-            }
+            // [EN] The second tap of a double tap is reported as a Reselect first, which already refreshes.
+            // [CN] 双击的第二次点击会先作为 Reselect 回调，已经触发刷新。
             break;
         case CYLTabBarItemGestureLongPress:
             [self cyl_demo_showActionsForControl:control];
