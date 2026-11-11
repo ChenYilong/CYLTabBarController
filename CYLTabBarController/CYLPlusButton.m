@@ -1264,6 +1264,8 @@ static NSDictionary<NSNumber *, NSNumber *> *CYLPlusButtonDerivedImageStates(voi
     if ([self cyl_standInFollowsPlusButton]) {
         [self cyl_placeSelectedContentView];
     }
+    // [EN] Every tab bar layout pass, also after the selection moved. [CN] TabBar 每次布局都执行，包括选中项改变之后。
+    [self cyl_updateLiquidGlassMask];
 }
 
 /// [EN] Puts the stand-in in place (`CYLPlusButtonCenterOfStandIn()`). [CN] 放置替身（`CYLPlusButtonCenterOfStandIn()`）。
@@ -1280,12 +1282,80 @@ static NSDictionary<NSNumber *, NSNumber *> *CYLPlusButtonDerivedImageStates(voi
     [self cyl_updateLiquidGlassMask];
 }
 
-//TODO:  update to layoutSubviewsOfSelectedContentView name
+/*!
+ * [EN] Liquid Glass, the plus button selected with its stand-in in the lens: the real button lies under the platter,
+ *      and the lens blurs whatever is under it, so its title and the lower part of its icon showed as a blurred copy
+ *      under the stand-in's crisp ones. While the stand-in shows, the real button is masked out under the lens: the whole
+ *      lens area when all its content is inside it, else the title's strip only (the part above the platter stays); the
+ *      mask goes when another tab is selected.
+ * [CN] 液态玻璃下 PlusButton 选中、替身显示在放大镜中时：真实按钮位于玻璃底板之下，放大镜会模糊其下方的内容，因此它的标题和图标下半部分
+ *      在替身清晰的标题与图标下形成一层模糊重影。替身显示期间，真实按钮在放大镜下被遮住：内容全部在放大镜内时遮住整个放大镜区域，否则只遮住
+ *      标题所在的横条（底板以上的部分保留）；选中其他 Tab 后移除遮罩。
+ */
 - (void)cyl_updateLiquidGlassMask {
-    // showing selected plusbutton. you can update plusbutton focus, spotlight , in selected plusbutton
-    //didShowSelectChildVIewControllerPlusbuttonDidAppear
-    //layoutSubviewsOfSelectedContentView
-    return;
+    UIButton *standIn = _selectedContentView;
+    UIControl *standInTabButton = standIn.cyl_insertedForTabControl ?: (UIControl *)standIn.superview;
+    // [EN] The plus button's own `selected` flag stays NO while its page is selected: ask the tab bar controller.
+    // [CN] PlusButton 的页面被选中时，按钮自身的 `selected` 仍为 NO：以 TabBarController 的选中为准。
+    UIViewController *plusPage = [CYLPlusButton plusChildViewControllerForOwner:self];
+    UIViewController *selectedPage = [self cyl_owningTabBarController].selectedViewController;
+    BOOL plusPageSelected = plusPage && (selectedPage == plusPage || selectedPage == plusPage.navigationController);
+    BOOL masks = plusPageSelected && standIn && standIn != self && standIn.window && standIn.window == self.window &&
+                 !standIn.hidden && standInTabButton && ![self cyl_isInPlatterSelectedLayer] &&
+                 CYLPlusButtonIsInLiquidGlassTabBar(self);
+    // [EN] A mask the app set itself is kept. [CN] 保留 App 自己设置的遮罩。
+    BOOL ownsMask = !self.layer.mask || [self.layer.mask.name isEqualToString:@"CYLPlusButtonLensMask"];
+    CGRect hidden = CGRectNull;
+    if (masks && ownsMask) {
+        // [EN] Calls from the tab bar's layout can come before the button laid its content out.
+        // [CN] 来自 TabBar 布局的调用可能早于按钮对内容的布局。
+        [self layoutIfNeeded];
+        CGRect lens = [standInTabButton convertRect:standInTabButton.bounds toView:self];
+        CGRect content = CGRectNull;
+        if (self.currentImage && !self.imageView.hidden) {
+            content = CGRectUnion(content, self.imageView.frame);
+        }
+        if (self.currentBackgroundImage) {
+            content = CGRectUnion(content, self.bounds);
+        }
+        UILabel *titleLabel = self.titleLabel;
+        BOOL hasTitle = titleLabel.text.length > 0 && !titleLabel.hidden && titleLabel.alpha > 0;
+        CGRect title = hasTitle ? [titleLabel convertRect:titleLabel.bounds toView:self] : CGRectNull;
+        if (!CGRectIsNull(title)) {
+            content = CGRectUnion(content, title);
+        }
+        if (!CGRectIsNull(content) && !CGRectIsEmpty(content) && CGRectContainsRect(CGRectInset(lens, -1, -1), content)) {
+            // [EN] Everything inside the lens: hide the whole lens area. [CN] 内容全部在放大镜内：遮住整个放大镜区域。
+            hidden = lens;
+        } else if (!CGRectIsNull(title) && !CGRectIsEmpty(title)) {
+            // [EN] The icon reaches above the platter: only the title's strip, because the lens draws the stand-in a little
+            //      apart from the real button and masking the icon too left a gap across it.
+            // [CN] 图标超出底板：只遮住标题所在的横条，因为放大镜中的替身与真实按钮略有错位，连图标一起遮住会在图标上留下缝隙。
+            CGFloat top = MAX(CGRectGetMinY(lens), CGRectGetMinY(title) - 2);
+            hidden = CGRectMake(CGRectGetMinX(lens), top, CGRectGetWidth(lens), MAX(0, CGRectGetMaxY(lens) - top));
+        }
+    }
+    if (CGRectIsNull(hidden)) {
+        if (ownsMask && self.layer.mask) {
+            self.layer.mask = nil;
+        }
+        return;
+    }
+    CGRect visible = CGRectInset(self.bounds, -CGRectGetWidth(self.bounds), -CGRectGetHeight(self.bounds));
+    UIBezierPath *path = [UIBezierPath bezierPathWithRect:visible];
+    [path appendPath:[UIBezierPath bezierPathWithRect:hidden]];
+    CAShapeLayer *mask = (CAShapeLayer *)self.layer.mask;
+    if (!mask) {
+        mask = [CAShapeLayer layer];
+        mask.name = @"CYLPlusButtonLensMask";
+        mask.fillRule = kCAFillRuleEvenOdd;
+        self.layer.mask = mask;
+    }
+    [CATransaction begin];
+    [CATransaction setDisableActions:YES];
+    mask.frame = self.bounds;
+    mask.path = path.CGPath;
+    [CATransaction commit];
 }
 
 - (void)setSelected:(BOOL)selected {
@@ -1572,18 +1642,18 @@ static NSDictionary<NSNumber *, NSNumber *> *CYLPlusButtonDerivedImageStates(voi
 /// The image-above-title layout of `+cyl_plusButtonWithImage:…`; other plus buttons keep UIButton's layout.
 - (void)layoutSubviews {
     [super layoutSubviews];
-    [self cyl_updateLiquidGlassMask];
     // [EN] Issue #91: keep the touchable area overlay on the button.
     // [CN] 保持可点击区域覆盖层与按钮一致。
     if (_showsTouchableArea) {
         [self cyl_updateTouchableAreaView];
     }
-    if (![objc_getAssociatedObject(self, @selector(cyl_plusButtonWithImage:title:selectedTitle:selectedTitleColor:)) boolValue]) {
-        return;
+    if ([objc_getAssociatedObject(self, @selector(cyl_plusButtonWithImage:title:selectedTitle:selectedTitleColor:)) boolValue]) {
+        [self cyl_layOutContentOnce:^{
+            [self cyl_layOutImageAndTitle];
+        }];
     }
-    [self cyl_layOutContentOnce:^{
-        [self cyl_layOutImageAndTitle];
-    }];
+    // [EN] Last: the mask follows the title's final frame. [CN] 最后执行：遮罩跟随标题的最终位置。
+    [self cyl_updateLiquidGlassMask];
 }
 
 - (void)cyl_layOutImageAndTitle {

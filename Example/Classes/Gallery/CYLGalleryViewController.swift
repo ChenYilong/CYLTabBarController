@@ -68,6 +68,27 @@ final class CYLGalleryViewController: UITableViewController {
             return
         }
         tableView(tableView, didSelectRowAt: IndexPath(row: row, section: section))
+        rotateForLaunchArgumentIfNeeded()
+    }
+
+    /**
+     * [EN] `-CYLDemoOrientation landscape` (with `-CYLDemoGalleryScene`): turns the scene to landscape 3 s after the scene
+     *      opens, for screenshots of the rotated tab bar; `simctl` cannot rotate the simulator.
+     * [CN] `-CYLDemoOrientation landscape`（与 `-CYLDemoGalleryScene` 一起使用）：场景打开 3 秒后把界面转为横屏，用于截取旋转后的
+     *      TabBar；`simctl` 无法旋转模拟器。
+     */
+    private func rotateForLaunchArgumentIfNeeded() {
+        guard UserDefaults.standard.string(forKey: "CYLDemoOrientation") == "landscape" else {
+            return
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3) { [weak self] in
+            guard #available(iOS 16.0, *), let windowScene = self?.view.window?.windowScene else {
+                return
+            }
+            windowScene.requestGeometryUpdate(.iOS(interfaceOrientations: .landscapeRight)) { error in
+                NSLog("CYLDemoOrientation: %@", error.localizedDescription)
+            }
+        }
     }
 
     // MARK: - UITableViewDataSource

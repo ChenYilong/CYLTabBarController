@@ -606,6 +606,73 @@
 
 /// [EN] Without a plus button a long title is left as it is.
 /// [CN] 没有 PlusButton 时长标题保持不变。
+/*!
+ * [EN] Liquid Glass: with the plus button's page selected, the real plus button (under the platter) is masked where its
+ *      title meets the lens, so the lens does not show a blurred copy of the title under the stand-in's; the mask goes
+ *      when another tab is selected.
+ * [CN] 液态玻璃：PlusButton 的页面被选中时，真实 PlusButton（位于底板之下）在标题与放大镜重叠的区域被遮住，放大镜不再在替身标题下
+ *      显示一层模糊的标题；选中其他 Tab 后遮罩移除。
+ */
+- (void)testTheSelectedPlusButtonTitleIsNotBlurredUnderTheLens {
+    if (![CYLConstants isLiquidGlassActive]) {
+        return;
+    }
+    UIViewController *menu = [[UIViewController alloc] init];
+    NSString *context = [NSUUID UUID].UUIDString;
+    CYLTabBarController *tabBarController = [CYLTabBarController tabBarControllerWithConfiguration:@{
+        CYLTabBarControllerContext : context,
+        CYLTabBarControllerTabBarItemsAttributes : @[ @{ CYLTabBarItemTitle : @"A", CYLTabBarItemImage : [UIImage systemImageNamed:@"house"] },
+                                                      @{ CYLTabBarItemTitle : @"B", CYLTabBarItemImage : [UIImage systemImageNamed:@"star"] } ],
+        CYLTabBarControllerPageResolver : ^UIViewController *(NSString *pageIdentifier, NSDictionary *attributes) {
+            return [pageIdentifier isEqualToString:@"menu"] ? menu : [[UIViewController alloc] init];
+        },
+        CYLTabBarControllerPlusButton : @{ CYLTabBarItemTitle : @"Menu", CYLTabBarItemImage : [UIImage systemImageNamed:@"plus.circle"],
+                                           CYLTabBarItemPageIdentifier : @"menu" },
+    }];
+    UIWindow *window = [[UIWindow alloc] initWithFrame:CGRectMake(0, 0, 402, 874)];
+    window.rootViewController = tabBarController;
+    // [EN] In the app's scene and key: the selected layer renders only in a visible window.
+    // [CN] 放入 App 的 scene 并设为 key：选中图层只在可见的窗口中渲染。
+    for (UIScene *scene in UIApplication.sharedApplication.connectedScenes) {
+        if ([scene isKindOfClass:[UIWindowScene class]]) {
+            window.windowScene = (UIWindowScene *)scene;
+            break;
+        }
+    }
+    [window makeKeyAndVisible];
+    void (^layOut)(void) = ^{
+        for (NSUInteger pass = 0; pass < 6; pass++) {
+            [tabBarController.tabBar setNeedsLayout];
+            [tabBarController.view layoutIfNeeded];
+            [[NSRunLoop mainRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.2]];
+        }
+    };
+    layOut();
+    CYLPlusButton *plusButton = [CYLPlusButton plusButtonForTabBarContext:context];
+    XCTAssertNotNil(plusButton);
+    XCTAssertNil(plusButton.layer.mask, @"no mask while another tab is selected");
+    tabBarController.selectedViewController = [CYLPlusButton plusChildViewControllerForTabBarContext:context];
+    layOut();
+    UIButton *standIn = [plusButton valueForKey:@"selectedContentView"];
+    if (!standIn.window || standIn == plusButton) {
+        // [EN] Selected in code, the test host does not build the lens's stand-in; the masked title is checked on the
+        //      simulator instead (docs/SwiftUI-Integration.md). [CN] 用代码选中时，测试宿主不会创建放大镜中的替身；遮住标题的效果
+        //      改在模拟器上检查（docs/SwiftUI-Integration.md）。
+        XCTSkip(@"the lens's stand-in is not built when the plus page is selected in code");
+    }
+    CAShapeLayer *mask = (CAShapeLayer *)plusButton.layer.mask;
+    XCTAssertTrue([mask isKindOfClass:[CAShapeLayer class]], @"the selected plus button is masked under the lens");
+    CGPoint titleCenter = [plusButton.titleLabel convertPoint:CGPointMake(CGRectGetMidX(plusButton.titleLabel.bounds),
+                                                                          CGRectGetMidY(plusButton.titleLabel.bounds))
+                                                       toView:plusButton];
+    XCTAssertFalse(CGPathContainsPoint(mask.path, NULL, titleCenter, YES), @"the title is masked out");
+    XCTAssertTrue(CGPathContainsPoint(mask.path, NULL, CGPointMake(CGRectGetMidX(plusButton.bounds), 1), YES),
+                  @"the top of the icon, above the platter, stays");
+    tabBarController.selectedIndex = 0;
+    layOut();
+    XCTAssertNil(plusButton.layer.mask, @"the mask goes once another tab is selected");
+}
+
 - (void)testLongTitlesWithoutAPlusButtonAreNotCut {
     NSString *longTitle = @"Scene one: review filter and more";
     NSMutableArray<NSDictionary *> *tabs = [NSMutableArray array];

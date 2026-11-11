@@ -199,6 +199,7 @@ docs/
 │   ├── gif-liquid-glass.png
 │   ├── image-only-tabs-ios.png
 │   ├── inset-grouped-sections-demo-ios.png
+│   ├── liquid-glass-plus-stand-in-landscape-ios.png
 │   ├── liquid-glass-robustness-more-ios.png
 │   ├── liquid-glass-robustness-plus-stand-in-ios.png
 │   ├── login-required-tabs-flow.svg
@@ -213,6 +214,7 @@ docs/
 │   ├── pag-liquid-glass.png
 │   ├── per-tab-animation-pag-ios.png
 │   ├── plus-button-follows-slot-long-titles-ios.png
+│   ├── plus-button-lens-crisp-ios.png
 │   ├── plus-button-long-titles-liquid-glass-ios.png
 │   ├── plus-button-titles-fit-liquid-glass-ios.png
 │   ├── plus-child-theme-switching.png
