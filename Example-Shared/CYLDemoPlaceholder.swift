@@ -102,7 +102,7 @@ final class CYLDemoPlaceholder: NSObject {
         // [EN] The animated refresh icon first; the arrow and spinner stay when no file of the kind is bundled.
         // [CN] 优先使用动画刷新图标；资源包中没有该类型的文件时保留箭头与菊花。
         if let header = scrollView.cyl_header, let iconName = refreshIconFileName(for: animation) {
-            _ = header.setIconAnimation(bundled: iconName, size: CGSize(width: 28, height: 28), for: .idle)
+            _ = header.setIconAnimation(bundled: iconName, size: CGSize(width: 30, height: 30), for: .idle)
         }
         // [EN] The red bar at the top while the network is not reachable, removed when it is again.
         // [CN] 网络不可用时页面顶部显示红色状态条，恢复后移除。
