@@ -1291,8 +1291,28 @@ static NSDictionary<NSNumber *, NSNumber *> *CYLPlusButtonDerivedImageStates(voi
  * [CN] 液态玻璃下 PlusButton 选中、替身显示在放大镜中时：真实按钮位于玻璃底板之下，放大镜会模糊其下方的内容，因此它的标题和图标下半部分
  *      在替身清晰的标题与图标下形成一层模糊重影。替身显示期间，真实按钮在放大镜下被遮住：内容全部在放大镜内时遮住整个放大镜区域，否则只遮住
  *      标题所在的横条（底板以上的部分保留）；选中其他 Tab 后移除遮罩。
+ *
+ * TODO (2026-11-12, docs/SwiftUI-Integration.md "Task log"):
+ * [EN] KNOWN RISK, kept OFF until fully tested (`CYLPlusButtonLensMaskEnabled` is NO). A mask here once cut the plus
+ *      button in two: iOS 26+, Liquid Glass (not FlatDesign), a plus button with a plus child view controller; select
+ *      the plus button, then drag the Liquid Glass lens to another item: the lens leaves the plus slot while the plus
+ *      page is still selected, so the masked part of the real button is no longer drawn by the stand-in either. The
+ *      maintainer removed the earlier implementation for that reason. Turn it on only after a test drags the lens
+ *      away from a selected plus button and the plus button stays whole during and after the drag.
+ * [CN] 已知风险，在完整测试之前保持关闭（`CYLPlusButtonLensMaskEnabled` 为 NO）。这里的遮罩曾把 PlusButton 切成两半：iOS 26+、液态玻璃
+ *      （非扁平样式）、PlusButton 有子控制器；选中 PlusButton 后把液态玻璃放大镜拖到其他 item：放大镜离开 PlusButton 的位置时 PlusButton
+ *      的页面仍处于选中状态，真实按钮被遮住的部分也不再由替身绘制。维护者曾因此删除之前的实现。只有在测试中把放大镜从选中的 PlusButton
+ *      拖走、拖动期间与之后 PlusButton 都保持完整时，才能开启。
  */
+static BOOL const CYLPlusButtonLensMaskEnabled = NO;
+
 - (void)cyl_updateLiquidGlassMask {
+    if (!CYLPlusButtonLensMaskEnabled) {
+        if ([self.layer.mask.name isEqualToString:@"CYLPlusButtonLensMask"]) {
+            self.layer.mask = nil;
+        }
+        return;
+    }
     UIButton *standIn = _selectedContentView;
     UIControl *standInTabButton = standIn.cyl_insertedForTabControl ?: (UIControl *)standIn.superview;
     // [EN] The plus button's own `selected` flag stays NO while its page is selected: ask the tab bar controller.
