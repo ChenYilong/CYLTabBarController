@@ -11,8 +11,8 @@ import CYLTabBarController
 @main
 final class AppDelegate: UIResponder, UIApplicationDelegate {
 
-    func application(_ application: UIApplication,
-                     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+    func application(_ _: UIApplication,
+                     didFinishLaunchingWithOptions _: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // [EN] FIX: issue #601 — how long and how much the icons from the network stay cached (memory and sandbox), as
         //      SDWebImage's SDImageCacheConfig.
         // [CN] 网络图标在内存与沙盒中的缓存时长与大小，参考 SDWebImage 的 SDImageCacheConfig。

@@ -14,11 +14,11 @@ import CYLTabBarController
 final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     var window: UIWindow?
-    private var tabBarController: MainTabBarController?
+    private var tabBarController: CYLTabBarController?
 
     // [EN] Creates the window for the scene: apps built with the iOS 27 SDK must adopt the UIScene life cycle.
     // [CN] 为 scene 创建 window：使用 iOS 27 SDK 构建的 App 必须采用 UIScene 生命周期。
-    func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
+    func scene(_ scene: UIScene, willConnectTo _: UISceneSession, options _: UIScene.ConnectionOptions) {
         guard let windowScene = scene as? UIWindowScene else {
             return
         }
@@ -38,10 +38,10 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // [CN] 3. 包装导航控制器
         // [EN] 3. Wrap them in navigation controllers.
         let homeNav = wrapInNavigation(HomeViewController(), title: cylDemoLocalizedString("首页"))
-        let wealthNav = wrapInNavigation(WealthViewController(), title: cylDemoLocalizedString("理财"))
-        let tradeNav = wrapInNavigation(TradeViewController(), title: cylDemoLocalizedString("交易"))
-        let infoNav = wrapInNavigation(InfoViewController(), title: cylDemoLocalizedString("资讯"))
-        let mineNav = wrapInNavigation(MineViewController(), title: cylDemoLocalizedString("我的"))
+        let wealthNav = wrapInNavigation(DemoPageViewController(), title: cylDemoLocalizedString("理财"))
+        let tradeNav = wrapInNavigation(DemoPageViewController(), title: cylDemoLocalizedString("交易"))
+        let infoNav = wrapInNavigation(DemoPageViewController(), title: cylDemoLocalizedString("资讯"))
+        let mineNav = wrapInNavigation(DemoPageViewController(), title: cylDemoLocalizedString("我的"))
 
         // [CN] 1. 创建 TabBar 主控制器（图片使用 UIImage，非字符串）
         // [EN] 1. Create the tab bar controller (the images are UIImages, not names).
@@ -51,34 +51,37 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // [CN] CYLTabBarItemImage 是默认图标及占位图；CYLTabBarItemImageURL 下载完成后覆盖它（带缓存，保持图片自身颜色，适用于所有样式，
         //      也能覆盖 Lottie 图标）。
         let iconSize = NSValue(cgSize: CGSize(width: 24, height: 24))
+        // [EN] The icon URLs are a parameter of the app, in Info.plist (`CYLDemoNetworkIconURLs`), not literals in code.
+        // [CN] 图标 URL 是 App 的参数，放在 Info.plist（`CYLDemoNetworkIconURLs`）中，而不是写在代码里。
+        let urls = Bundle.main.object(forInfoDictionaryKey: "CYLDemoNetworkIconURLs") as? [String: String] ?? [:]
         let attributes: [[AnyHashable: Any]] = [
             // [CN] 首页 [EN] Home
             [CYLTabBarItemTitle: cylDemoLocalizedString("首页"),
              CYLTabBarItemImage: UIImage(systemName: "house") as Any,
              CYLTabBarItemSelectedImage: UIImage(systemName: "house.fill") as Any,
-             CYLTabBarItemImageURL: "https://cdn-icons-png.flaticon.com/512/3132/3132732.png",
-             CYLTabBarItemSelectedImageURL: "https://cdn-icons-png.flaticon.com/512/3132/3132779.png",
+             CYLTabBarItemImageURL: urls["home"] as Any,
+             CYLTabBarItemSelectedImageURL: urls["homeSelected"] as Any,
              CYLTabBarItemImageURLSize: iconSize],
             // [CN] 行情 [EN] Markets
             [CYLTabBarItemTitle: cylDemoLocalizedString("行情"),
              CYLTabBarItemImage: UIImage(systemName: "chart.line.uptrend.xyaxis") as Any,
              CYLTabBarItemSelectedImage: UIImage(systemName: "chart.line.uptrend.xyaxis") as Any,
-             CYLTabBarItemImageURL: "https://cdn-icons-png.flaticon.com/512/1828/1828884.png",
-             CYLTabBarItemSelectedImageURL: "https://cdn-icons-png.flaticon.com/512/1828/1828925.png",
+             CYLTabBarItemImageURL: urls["markets"] as Any,
+             CYLTabBarItemSelectedImageURL: urls["marketsSelected"] as Any,
              CYLTabBarItemImageURLSize: iconSize],
             // [CN] 交易 [EN] Trade
             [CYLTabBarItemTitle: cylDemoLocalizedString("交易"),
              CYLTabBarItemImage: UIImage(systemName: "plus.circle") as Any,
              CYLTabBarItemSelectedImage: UIImage(systemName: "plus.circle.fill") as Any,
-             CYLTabBarItemImageURL: "https://cdn-icons-png.flaticon.com/512/3132/3132732.png",
-             CYLTabBarItemSelectedImageURL: "https://cdn-icons-png.flaticon.com/512/3132/3132779.png",
+             CYLTabBarItemImageURL: urls["trade"] as Any,
+             CYLTabBarItemSelectedImageURL: urls["tradeSelected"] as Any,
              CYLTabBarItemImageURLSize: iconSize],
             // [CN] 资讯 [EN] News
             [CYLTabBarItemTitle: cylDemoLocalizedString("资讯"),
              CYLTabBarItemImage: UIImage(systemName: "newspaper") as Any,
              CYLTabBarItemSelectedImage: UIImage(systemName: "newspaper.fill") as Any,
-             CYLTabBarItemImageURL: "https://cdn-icons-png.flaticon.com/512/1828/1828884.png",
-             CYLTabBarItemSelectedImageURL: "https://cdn-icons-png.flaticon.com/512/1828/1828925.png",
+             CYLTabBarItemImageURL: urls["news"] as Any,
+             CYLTabBarItemSelectedImageURL: urls["newsSelected"] as Any,
              CYLTabBarItemImageURLSize: iconSize],
             // [CN] 我的 [EN] Me
             // FIX: issue #605
@@ -90,10 +93,10 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
              CYLTabBarItemImageURL: Bundle.main.url(forResource: "tab_animated", withExtension: "gif") as Any,
              CYLTabBarItemImageURLSize: iconSize],
         ]
-        let tabBarController = MainTabBarController(viewControllers: [homeNav, wealthNav, tradeNav, infoNav, mineNav],
-                                                    tabBarItemsAttributes: attributes,
-                                                    styleType: style,
-                                                    context: nil)
+        let tabBarController = CYLTabBarController(viewControllers: [homeNav, wealthNav, tradeNav, infoNav, mineNav],
+                                                   tabBarItemsAttributes: attributes,
+                                                   styleType: style,
+                                                   context: nil)
         self.tabBarController = tabBarController
 
         // [CN] 6. 设置 Window 根控制器

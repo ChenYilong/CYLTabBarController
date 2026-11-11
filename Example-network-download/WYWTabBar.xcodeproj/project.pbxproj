@@ -7,20 +7,14 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		1451E156838093A26278E327 /* InfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B039B795361AA6F37AEE19C6 /* InfoViewController.swift */; };
 		24910CE121BD68F0C806DCA1 /* HomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 564BCD43A74F15C8CD0EE7A2 /* HomeViewController.swift */; };
-		3445839205F8D12863A9A8AF /* MainTabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73F8B8BF12586A7379F132D6 /* MainTabBarController.swift */; };
 		4B4EF46F03FF34ED85F73821 /* tab_animated.gif in Resources */ = {isa = PBXBuildFile; fileRef = D4C6EF7A0B308B79160AE947 /* tab_animated.gif */; };
-		4C5393FD43A498284E4BA671 /* MineViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77245C6AF47464D0D6DDAB1F /* MineViewController.swift */; };
 		C1A5CE4E0000000000000021 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1A5CE4E0000000000000022 /* SceneDelegate.swift */; };
 		5203DC5996AF4DAE12EACEC8 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C58891BEC8DA2EDBF61C45F0 /* AppDelegate.swift */; };
 		6DF169E35E6F99538B7AC68F /* Pods_WYWTabBar.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5031C36E5DC7A12E3186861A /* Pods_WYWTabBar.framework */; };
 		8303E4F9E7636FCC829CB4C7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 58064AE1293CF29F4E5D62D7 /* Assets.xcassets */; };
-		9553CA2E41813ED174E31430 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 41578591FAF6725C0C272E40 /* Main.storyboard */; };
-		AE46AC3F71B6720BB289BCB1 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84960483F7001E1C8B225A9A /* ViewController.swift */; };
 		B5460ED0CD486FD5E8E97CD5 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E2CBA27DDE9C559CCDC2C661 /* LaunchScreen.storyboard */; };
-		CF487C58E7F6AA9E34CE7479 /* TradeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCFC552167E2C45C89819AD7 /* TradeViewController.swift */; };
-		E5BEE7708A933B32F70F9288 /* WealthViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFC183EE7C750A6D3D2672EC /* WealthViewController.swift */; };
+		E5BEE7708A933B32F70F9288 /* DemoPageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFC183EE7C750A6D3D2672EC /* DemoPageViewController.swift */; };
 		B2F05B13819A7EB23F57507B /* CYLDemoLocalization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16DFA15B7CF9EA08E94D18A8 /* CYLDemoLocalization.swift */; };
 		FD7111B3D03D7F81E278857D /* CYLDemo.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 26721A6A438810C95F465F64 /* CYLDemo.bundle */; };
 /* End PBXBuildFile section */
@@ -32,18 +26,12 @@
 		564BCD43A74F15C8CD0EE7A2 /* HomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewController.swift; sourceTree = "<group>"; };
 		58064AE1293CF29F4E5D62D7 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		5D28E288B59563014FCC6806 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
-		73F8B8BF12586A7379F132D6 /* MainTabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabBarController.swift; sourceTree = "<group>"; };
-		77245C6AF47464D0D6DDAB1F /* MineViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MineViewController.swift; sourceTree = "<group>"; };
 		802CB14173D366127FAAEB65 /* Pods-WYWTabBar.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-WYWTabBar.release.xcconfig"; path = "Target Support Files/Pods-WYWTabBar/Pods-WYWTabBar.release.xcconfig"; sourceTree = "<group>"; };
-		84960483F7001E1C8B225A9A /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		85552CA02F92063700DA4D20 /* WYWTabBar.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WYWTabBar.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		AFC183EE7C750A6D3D2672EC /* WealthViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WealthViewController.swift; sourceTree = "<group>"; };
-		B039B795361AA6F37AEE19C6 /* InfoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfoViewController.swift; sourceTree = "<group>"; };
+		AFC183EE7C750A6D3D2672EC /* DemoPageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DemoPageViewController.swift; sourceTree = "<group>"; };
 		C1A5CE4E0000000000000022 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		C58891BEC8DA2EDBF61C45F0 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		D3D4DAA493884BEC6F37E7BB /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		D4C6EF7A0B308B79160AE947 /* tab_animated.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = tab_animated.gif; sourceTree = "<group>"; };
-		DCFC552167E2C45C89819AD7 /* TradeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TradeViewController.swift; sourceTree = "<group>"; };
 		16DFA15B7CF9EA08E94D18A8 /* CYLDemoLocalization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CYLDemoLocalization.swift; path = "../Example-Shared/CYLDemoLocalization.swift"; sourceTree = SOURCE_ROOT; };
 		26721A6A438810C95F465F64 /* CYLDemo.bundle */ = {isa = PBXFileReference; lastKnownFileType = wrapper.plug-in; name = CYLDemo.bundle; path = "../Example-Shared/CYLDemo.bundle"; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
@@ -97,15 +85,9 @@
 				58064AE1293CF29F4E5D62D7 /* Assets.xcassets */,
 				564BCD43A74F15C8CD0EE7A2 /* HomeViewController.swift */,
 				20EA68D87FA77E20D0D66CEE /* Info.plist */,
-				B039B795361AA6F37AEE19C6 /* InfoViewController.swift */,
 				E2CBA27DDE9C559CCDC2C661 /* LaunchScreen.storyboard */,
-				41578591FAF6725C0C272E40 /* Main.storyboard */,
-				73F8B8BF12586A7379F132D6 /* MainTabBarController.swift */,
-				77245C6AF47464D0D6DDAB1F /* MineViewController.swift */,
 				D4C6EF7A0B308B79160AE947 /* tab_animated.gif */,
-				DCFC552167E2C45C89819AD7 /* TradeViewController.swift */,
-				84960483F7001E1C8B225A9A /* ViewController.swift */,
-				AFC183EE7C750A6D3D2672EC /* WealthViewController.swift */,
+				AFC183EE7C750A6D3D2672EC /* DemoPageViewController.swift */,
 			);
 			path = WYWTabBar;
 			sourceTree = "<group>";
@@ -182,7 +164,6 @@
 				FD7111B3D03D7F81E278857D /* CYLDemo.bundle in Resources */,
 				8303E4F9E7636FCC829CB4C7 /* Assets.xcassets in Resources */,
 				B5460ED0CD486FD5E8E97CD5 /* LaunchScreen.storyboard in Resources */,
-				9553CA2E41813ED174E31430 /* Main.storyboard in Resources */,
 				4B4EF46F03FF34ED85F73821 /* tab_animated.gif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -259,26 +240,13 @@
 				5203DC5996AF4DAE12EACEC8 /* AppDelegate.swift in Sources */,
 				C1A5CE4E0000000000000021 /* SceneDelegate.swift in Sources */,
 				24910CE121BD68F0C806DCA1 /* HomeViewController.swift in Sources */,
-				1451E156838093A26278E327 /* InfoViewController.swift in Sources */,
-				3445839205F8D12863A9A8AF /* MainTabBarController.swift in Sources */,
-				4C5393FD43A498284E4BA671 /* MineViewController.swift in Sources */,
-				CF487C58E7F6AA9E34CE7479 /* TradeViewController.swift in Sources */,
-				AE46AC3F71B6720BB289BCB1 /* ViewController.swift in Sources */,
-				E5BEE7708A933B32F70F9288 /* WealthViewController.swift in Sources */,
+				E5BEE7708A933B32F70F9288 /* DemoPageViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXVariantGroup section */
-		41578591FAF6725C0C272E40 /* Main.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				D3D4DAA493884BEC6F37E7BB /* Base */,
-			);
-			name = Main.storyboard;
-			sourceTree = "<group>";
-		};
 		E2CBA27DDE9C559CCDC2C661 /* LaunchScreen.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (

@@ -86,13 +86,23 @@ for folder in sorted(os.listdir(ROOT)):
             if entry.endswith(".xcodeproj") and os.path.isfile(pbx):
                 projects.append(pbx)
 projects.append(os.path.join(ROOT, "CYLTabBarController.xcodeproj", "project.pbxproj"))
+# [EN] One file reference per line in a project.pbxproj; a quoted or a bare path, matched without backtracking.
+REFERENCE_PATH = re.compile(r'\bpath = (?:"([^"]*)"|([^;"]*));')
+
+
 def compiled_callers(pbx, text):
     """Callers this project really references: a reference with a folder in its path is resolved from the project
     folder; a bare file name only matches a caller inside the project's own folder (another example may have a file
     with the same name)."""
     project_dir = os.path.dirname(os.path.dirname(pbx))
     found = []
-    for ref_path in re.findall(r"isa = PBXFileReference;[^}]*?path = \"?([^\";]+)\"?;", text):
+    for line in text.splitlines():
+        if "isa = PBXFileReference;" not in line:
+            continue
+        match = REFERENCE_PATH.search(line)
+        if not match:
+            continue
+        ref_path = match.group(1) or match.group(2)
         name = os.path.basename(ref_path)
         for caller in callers.get(name, []):
             caller_abs = os.path.join(ROOT, caller)
