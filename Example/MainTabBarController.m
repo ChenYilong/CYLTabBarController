@@ -654,6 +654,13 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
  *      （如 `city`、`message`、`CYLMineViewController`）。
  */
 - (void)cyl_demo_selectTabFromLaunchArgumentOfTabBarController:(CYLTabBarController *)tabBarController {
+    // [EN] `-CYLDemoPlaceholderPreview <kind>`: the empty-list placeholder, full screen. [CN] 全屏展示空列表占位图。
+    __weak CYLTabBarController *weakController = tabBarController;
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        if (weakController) {
+            [CYLDemoPlaceholder presentPlaceholderPreviewIfRequestedFrom:weakController];
+        }
+    });
     NSString *identifier = [[NSUserDefaults standardUserDefaults] stringForKey:@"CYLDemoSelectedTab"];
     if (identifier.length == 0) {
         return;

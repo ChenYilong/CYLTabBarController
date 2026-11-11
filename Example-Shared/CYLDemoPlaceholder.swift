@@ -48,6 +48,18 @@ enum CYLDemoPlaceholderAnimation: Int {
     }
 
     /**
+     * [EN] Options some bundled placeholder files need to play, by file name (CYLTableViewPlaceHolder's
+     *      `CYLScenarioAnimationOptions`). [CN] 部分资源包占位动画播放所需的选项，按文件名（CYLTableViewPlaceHolder 的
+     *      `CYLScenarioAnimationOptions`）。
+     */
+    var placeholderAnimationOptions: [String: [String: String]] {
+        switch self {
+        case .rive: return ["CYLPlaceholderLoading.riv": ["legacy": "1"]]
+        case .lottie, .pag, .gif: return [:]
+        }
+    }
+
+    /**
      * [EN] Preferred refresh icons for the idle and pulling states (the first one bundled wins); any refresh icon of the
      *      kind otherwise. Refresh-themed files only (`CYLRefreshAnimationHeader.bundledIconAnimationFileNames`).
      * [CN] 空闲与下拉状态的首选刷新图标（取第一个存在的文件）；都没有时取该类型的任意刷新图标。只用刷新主题的文件
@@ -198,6 +210,13 @@ final class CYLDemoPlaceholder: NSObject {
         if let name = firstBundled(animation.placeholderFileNames, in: CYLPlaceholderView.bundledAnimationFileNames()),
            let path = CYLPlaceholderView.path(forBundledAnimation: name) {
             attributes[CYLPlaceholderItemAnimationFilePath] = path
+            // [EN] Bundled Rive files without a view model play through Rive's legacy runtime, as in CYLTableViewPlaceHolder's
+            //      scenarios (`CYLScenarioAnimationOptions`); without it the file never loaded and the static image stayed.
+            // [CN] 资源包中没有 view model 的 Rive 文件通过 Rive 的旧版运行时播放，与 CYLTableViewPlaceHolder 场景示例相同
+            //      （`CYLScenarioAnimationOptions`）；以前没有该选项，文件无法加载，一直显示静态图。
+            if let options = animation.placeholderAnimationOptions[name] {
+                attributes[CYLPlaceholderItemAnimationOptions] = options
+            }
         }
         return (try? CYLPlaceholderView(itemAttributes: attributes, imageBundle: nil))
             ?? CYLPlaceholderView(style: .empty, message: .empty)
@@ -222,6 +241,31 @@ final class CYLDemoPlaceholder: NSObject {
             header.setIconAnimation(bundled: refreshingName, size: size, for: .refreshing)
         }
         return header
+    }
+
+    /**
+     * [EN] `-CYLDemoPlaceholderPreview lottie|pag|rive|gif` (screenshots): presents the empty-list placeholder of that kind
+     *      full screen over `viewController` (the example lists always have data, so the placeholder never shows on its own).
+     *      Returns whether it was presented.
+     * [CN] `-CYLDemoPlaceholderPreview lottie|pag|rive|gif`（截图用）：在 `viewController` 上全屏展示该类型的空列表占位图（示例列表总有数据，
+     *      占位图不会自己出现）。返回是否已展示。
+     */
+    @objc(presentPlaceholderPreviewIfRequestedFrom:)
+    @discardableResult
+    static func presentPlaceholderPreviewIfRequested(from viewController: UIViewController) -> Bool {
+        let kinds: [String: CYLDemoPlaceholderAnimation] = ["lottie": .lottie, "pag": .pag, "rive": .rive, "gif": .gif]
+        guard let name = UserDefaults.standard.string(forKey: "CYLDemoPlaceholderPreview"), let kind = kinds[name] else {
+            return false
+        }
+        let preview = UIViewController()
+        preview.view.backgroundColor = .systemBackground
+        let placeholder = placeholderView(animation: kind)
+        placeholder.frame = preview.view.bounds
+        placeholder.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        preview.view.addSubview(placeholder)
+        preview.modalPresentationStyle = .fullScreen
+        viewController.present(preview, animated: false)
+        return true
     }
 
     private static func firstBundled(_ preferred: [String], in bundled: [String]) -> String? {
