@@ -48,26 +48,41 @@ enum CYLDemoPlaceholderAnimation: Int {
     }
 
     /**
-     * [EN] Preferred refresh icons, the first one bundled wins; any refresh icon of the kind otherwise.
-     * [CN] 首选的刷新图标，取第一个存在的文件；都没有时取该类型的任意刷新图标。
+     * [EN] Preferred refresh icons for the idle and pulling states (the first one bundled wins); any refresh icon of the
+     *      kind otherwise. Refresh-themed files only (`CYLRefreshAnimationHeader.bundledIconAnimationFileNames`).
+     * [CN] 空闲与下拉状态的首选刷新图标（取第一个存在的文件）；都没有时取该类型的任意刷新图标。只用刷新主题的文件
+     *      （`CYLRefreshAnimationHeader.bundledIconAnimationFileNames`）。
      */
     var refreshIconFileNames: [String] {
         switch self {
-        case .lottie: return ["CYLPlaceholderRefresh.json"]
-        case .pag: return ["CYLPlaceholderPullHint.pag", "CYLPlaceholderLoading.pag"]
-        case .rive: return ["CYLPlaceholderPullToRefresh.riv"]
-        case .gif: return []
+        case .lottie: return ["CYLRefreshPullArrow.json", "CYLPlaceholderRefresh.json"]
+        case .pag: return ["CYLPlaceholderProgress.pag"]
+        case .rive: return ["CYLRefreshIcon.riv"]
+        case .gif: return ["CYLRefreshArrows.gif"]
+        }
+    }
+
+    /**
+     * [EN] Preferred refresh icons while refreshing; the idle icon stays when none is bundled.
+     * [CN] 刷新中状态的首选刷新图标；都没有时沿用空闲状态的图标。
+     */
+    var refreshingIconFileNames: [String] {
+        switch self {
+        case .lottie: return ["CYLRefreshMaterialSpinner.json", "CYLRefreshSpinnerRing.json"]
+        case .pag, .rive: return []
+        case .gif: return ["CYLRefreshRing.gif"]
         }
     }
 }
 
 /**
  * [EN] Gives an example scroll view what every example list has, with CYLTableViewPlaceHolder (written after its
- *      `Examples/Example-Scenarios`): pull to refresh with an animated icon (`cyl_header`), an animated empty-data
- *      placeholder, a no-network placeholder while offline, and the red status bar at the top of the page while offline
- *      (`cyl_showsStatusViewWhenOffline`). Call it once, in `viewDidLoad`.
+ *      `Examples/Example-Scenarios`): pull to refresh with an animated icon (`cyl_header`, a `CYLRefreshAnimationHeader`),
+ *      an animated empty-data placeholder, a no-network placeholder while offline, and the red status bar at the top of
+ *      the page while offline (`cyl_showsStatusViewWhenOffline`). Call it once, in `viewDidLoad`.
  * [CN] 用 CYLTableViewPlaceHolder 为示例中的滚动视图提供所有示例列表都具备的功能（参照其 `Examples/Example-Scenarios`）：带动画图标的
- *      下拉刷新（`cyl_header`）、带动画的无数据占位图、断网时的无网络占位图，以及断网时页面顶部的红色状态条（`cyl_showsStatusViewWhenOffline`）。
+ *      下拉刷新（`cyl_header`，即 `CYLRefreshAnimationHeader`）、带动画的无数据占位图、断网时的无网络占位图，以及断网时页面顶部的
+ *      红色状态条（`cyl_showsStatusViewWhenOffline`）。
  *      在 `viewDidLoad` 中调用一次。
  */
 @objc(CYLDemoPlaceholder)
@@ -76,9 +91,9 @@ final class CYLDemoPlaceholder: NSObject {
     /**
      * [EN] Installs refresh, placeholders and the offline bar on `scrollView`, shown by `viewController`, with the
      *      animations of `animation`. `refresh` loads the data and calls its completion; without it, a refresh reloads the
-     *      list after a short delay. A header the list already has keeps its block and gets the animated icon.
+     *      list after a short delay. A header the list already has is replaced by an animation header with its block.
      * [CN] 为 `viewController` 显示的 `scrollView` 安装刷新、占位图与断网状态条，使用 `animation` 类型的动画。`refresh` 加载数据并调用其
-     *      完成回调；未提供时，刷新会在短暂延迟后重新加载列表。列表已有的刷新头保留其回调，并换上动画图标。
+     *      完成回调；未提供时，刷新会在短暂延迟后重新加载列表。列表已有的刷新头替换为保留其回调的动画刷新头。
      */
     @objc(installOnScrollView:viewController:animation:refresh:)
     static func install(on scrollView: UIScrollView, in viewController: UIViewController,
@@ -86,23 +101,24 @@ final class CYLDemoPlaceholder: NSObject {
                         refresh: ((@escaping () -> Void) -> Void)? = nil) {
         CYLPlaceholderNetworkMonitor.shared.startMonitoring()
         installPlaceholder(on: scrollView, animation: animation)
-        if scrollView.cyl_header == nil {
-            scrollView.cyl_header = CYLRefreshNormalHeader { [weak scrollView] in
-                let finish = {
-                    reload(scrollView)
-                    scrollView?.cyl_header?.endRefreshing()
-                }
-                if let refresh {
-                    refresh(finish)
-                } else {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.8, execute: finish)
-                }
+        let refreshingBlock = scrollView.cyl_header?.refreshingBlock ?? { [weak scrollView] in
+            let finish = {
+                reload(scrollView)
+                scrollView?.cyl_header?.endRefreshing()
+            }
+            if let refresh {
+                refresh(finish)
+            } else {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.8, execute: finish)
             }
         }
-        // [EN] The animated refresh icon first; the arrow and spinner stay when no file of the kind is bundled.
-        // [CN] 优先使用动画刷新图标；资源包中没有该类型的文件时保留箭头与菊花。
-        if let header = scrollView.cyl_header, let iconName = refreshIconFileName(for: animation) {
-            _ = header.setIconAnimation(bundled: iconName, size: CGSize(width: 30, height: 30), for: .idle)
+        // [EN] The animated refresh header first: a list's own header keeps its block and becomes an animation header.
+        //      The arrow and spinner header stays only when no refresh icon of the kind is bundled.
+        // [CN] 优先使用动画刷新头：列表自带的刷新头保留其回调，换成动画刷新头。资源包中没有该类型的刷新图标时才保留箭头与菊花刷新头。
+        if let header = animationHeader(for: animation, refreshingBlock: refreshingBlock) {
+            scrollView.cyl_header = header
+        } else if scrollView.cyl_header == nil {
+            scrollView.cyl_header = CYLRefreshNormalHeader(refreshingBlock: refreshingBlock)
         }
         // [EN] The red bar at the top while the network is not reachable, removed when it is again.
         // [CN] 网络不可用时页面顶部显示红色状态条，恢复后移除。
@@ -150,11 +166,25 @@ final class CYLDemoPlaceholder: NSObject {
             ?? CYLPlaceholderView(style: .empty, message: .empty)
     }
 
-    private static func refreshIconFileName(for animation: CYLDemoPlaceholderAnimation) -> String? {
-        let names = CYLRefreshComponent.bundledIconAnimationFileNames
-        return firstBundled(animation.refreshIconFileNames, in: names)
-            ?? names.first { ($0 as NSString).pathExtension == animation.fileExtension && $0.hasPrefix("CYLRefresh") }
-            ?? names.first { ($0 as NSString).pathExtension == animation.fileExtension }
+    /**
+     * [EN] A `CYLRefreshAnimationHeader` with the refresh icons of `animation` at the library's default size, or nil when
+     *      no refresh icon of the kind is bundled.
+     * [CN] 使用 `animation` 类型刷新图标（库的默认尺寸）的 `CYLRefreshAnimationHeader`；资源包中没有该类型的刷新图标时返回 nil。
+     */
+    private static func animationHeader(for animation: CYLDemoPlaceholderAnimation,
+                                        refreshingBlock: @escaping CYLRefreshComponentAction) -> CYLRefreshAnimationHeader? {
+        let names = CYLRefreshAnimationHeader.bundledIconAnimationFileNames
+        guard let idleName = firstBundled(animation.refreshIconFileNames, in: names)
+            ?? names.first(where: { ($0 as NSString).pathExtension == animation.fileExtension }) else {
+            return nil
+        }
+        let header = CYLRefreshAnimationHeader(refreshingBlock: refreshingBlock)
+        let size = CGSize(width: 30, height: 30)
+        header.setIconAnimation(bundled: idleName, size: size, for: .idle)
+        if let refreshingName = firstBundled(animation.refreshingIconFileNames, in: names) {
+            header.setIconAnimation(bundled: refreshingName, size: size, for: .refreshing)
+        }
+        return header
     }
 
     private static func firstBundled(_ preferred: [String], in bundled: [String]) -> String? {
