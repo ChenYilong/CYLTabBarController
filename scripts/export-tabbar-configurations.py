@@ -306,8 +306,8 @@ def evaluate_string(e):
 
 
 def evaluate_localized(e):
-    """The key of `CYLLocalizedString("key")` / `NSLocalizedString("key", ...)`. 本地化 key。"""
-    for callee in ('CYLLocalizedString', 'NSLocalizedString'):
+    """The key of `CYLLocalizedString("key")` / `CYLDemoLocalizedString("key")` / `NSLocalizedString("key", ...)`. 本地化 key。"""
+    for callee in ('CYLLocalizedString', 'CYLDemoLocalizedString', 'cylDemoLocalizedString', 'NSLocalizedString'):
         inside = call_inside(e, callee)
         arguments = split_top(inside) if inside is not None else []
         value = string_value(arguments[0]) if arguments else None
@@ -444,7 +444,7 @@ EVALUATORS = (evaluate_string, evaluate_localized, evaluate_scalar, evaluate_ima
 def evaluate(expr):
     """The configuration value of an Objective-C / Swift expression, or raises Unresolved.
     Objective-C / Swift 表达式对应的配置值，无法解析时抛出 Unresolved。"""
-    e = expr.strip()
+    e = re.sub(r'\s+as\s+Any$', '', expr.strip())
     while e.endswith(('!', '?')):
         e = e[:-1].strip()
     for evaluator in EVALUATORS:
@@ -732,7 +732,7 @@ def example_speeds(path):
     example = os.path.join(ROOT, os.path.relpath(path, ROOT).split(os.sep)[0])
     for directory, dirs, files in os.walk(example):
         dirs[:] = [d for d in dirs if d not in ('Pods', 'Configurations', 'build')]
-        for name in (n for n in files if n.endswith(('.m', '.swift'))):
+        for name in (n for n in files if n.endswith(('.m', '.swift')) and not n.startswith('._')):
             found = SPEED_PATTERN.findall(strip_comments(open(os.path.join(directory, name), encoding='utf-8').read()))
             if found:
                 values += found
@@ -890,7 +890,7 @@ def extract(path):
 def sources(paths):
     """Source files that define tab bar item attributes. 定义了 TabBarItem 属性的源文件。"""
     for base in paths:
-        files = [base] if os.path.isfile(base) else [os.path.join(d, f) for d, _, fs in os.walk(base) for f in fs]
+        files = [base] if os.path.isfile(base) else [os.path.join(d, f) for d, _, fs in os.walk(base) for f in fs if not f.startswith('._')]
         for path in sorted(files):
             if not path.endswith(('.m', '.swift')) or 'Tests' in path or '/Pods/' in path:
                 continue

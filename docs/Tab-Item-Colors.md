@@ -27,7 +27,7 @@
 | [API](#api) | [API](#api) |
 | [限制](#限制--limits) | [Limits](#限制--limits) |
 | [截图](#截图--screenshots) | [Screenshots](#截图--screenshots) |
-| [TODO](#todo) | [TODO](#todo) |
+| [状态](#状态--status) | [Status](#状态--status) |
 
 <!-- navigation:end -->
 
@@ -144,7 +144,7 @@ NSDictionary *live = @{
 
 ![Icon rendering mode on iOS](assets/tab-item-icon-rendering-ios.png)
 
-## TODO
+## 状态 / Status
 
 | 中文 | English |
 |:---|:---|

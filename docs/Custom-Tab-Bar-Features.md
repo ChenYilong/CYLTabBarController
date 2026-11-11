@@ -15,7 +15,7 @@
 
 | 中文 | English |
 |:---|:---|
-| 本文逐项列出一个高度自定义的 TabBar 组件应具备的功能，说明 CYLTabBarController 用哪些接口实现每一项，以及 ObjC Demo「Tab Bar Gallery」中对应的演示行（见 [Tab-Bar-Gallery.md](Tab-Bar-Gallery.md)）。对照过程中发现的缺失项记录在文末的 TODO 中，并已全部实现。 | This document lists, item by item, what a highly customizable tab bar component should offer, which CYLTabBarController APIs implement each item, and the matching row of the ObjC demo's "Tab Bar Gallery" (see [Tab-Bar-Gallery.md](Tab-Bar-Gallery.md)). The gaps found while comparing are recorded in the TODO list at the end, and all of them are implemented. |
+| 本文逐项列出一个高度自定义的 TabBar 组件应具备的功能，说明 CYLTabBarController 用哪些接口实现每一项，以及 ObjC Demo「Tab Bar Gallery」中对应的演示行（见 [Tab-Bar-Gallery.md](Tab-Bar-Gallery.md)）。对照过程中发现的缺失项记录在文末的「缺失项」中，并已全部实现。 | This document lists, item by item, what a highly customizable tab bar component should offer, which CYLTabBarController APIs implement each item, and the matching row of the ObjC demo's "Tab Bar Gallery" (see [Tab-Bar-Gallery.md](Tab-Bar-Gallery.md)). The gaps found while comparing are recorded under "Gaps" at the end, and all of them are implemented. |
 
 ## 目录 / Contents
 
@@ -35,7 +35,7 @@
 | [9. 自定义提醒样式](#9-自定义提醒样式--custom-reminder-styles) | [Custom reminder styles](#9-自定义提醒样式--custom-reminder-styles) |
 | [10. Lottie / Lottie](#10-lottie--lottie) | [10. Lottie / Lottie](#10-lottie--lottie) |
 | [11. iOS 26 液态玻璃](#11-ios-26-液态玻璃--ios-26-liquid-glass) | [iOS 26 Liquid Glass](#11-ios-26-液态玻璃--ios-26-liquid-glass) |
-| [待办](#待办--todo) | [TODO](#待办--todo) |
+| [缺失项](#缺失项--gaps) | [Gaps](#缺失项--gaps) |
 | [验证](#验证--verification) | [Verification](#验证--verification) |
 
 <!-- navigation:end -->
@@ -130,11 +130,11 @@
 | 所有系统使用传统布局：设置 `CYLTabBarStyleTypeFlatDesign`，或保留 Info.plist 中的 `UIDesignRequiresCompatibility`，iOS 26+ 与 iOS 26 以下表现一致。演示：Basic 1.11。 | The traditional layout on every system: `CYLTabBarStyleTypeFlatDesign`, or `UIDesignRequiresCompatibility` in Info.plist, so iOS 26+ looks like earlier systems. Demo: Basic 1.11. |
 | 玻璃 + 角标：未选中的 Tab 显示角标，选中的 Tab 隐藏角标：`cyl_hidesBadgeOfSelectedTab = YES`（所有样式）。演示：Basic 1.12。 | Glass with badges: unselected tabs show their badges and the selected tab hides its own: `cyl_hidesBadgeOfSelectedTab = YES` (every style). Demo: Basic 1.12. |
 
-## 待办 / TODO
+## 缺失项 / Gaps
 
 | 中文 | English |
 |:---|:---|
-| 以下是对照上述清单时发现的缺失项。全部已实现，当前没有未完成的 TODO。 | These are the gaps found while going through the checklist above. All of them are implemented; there is no open TODO. |
+| 以下是对照上述清单时发现的缺失项。全部已实现，当前没有未完成项。 | These are the gaps found while going through the checklist above. All of them are implemented; none is open. |
 
 | 状态 / Status | 中文 | English |
 |:---|:---|:---|

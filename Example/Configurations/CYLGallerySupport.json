@@ -1,0 +1,23 @@
+{
+  "CYLTabBarControllerTabBarItemsAttributes": [
+    {
+      "CYLTabBarItemTitle": "Home",
+      "CYLTabBarItemImage": "home_normal",
+      "CYLTabBarItemIdentifier": "home"
+    },
+    {
+      "CYLTabBarItemTitle": "Video",
+      "CYLTabBarItemIdentifier": "video"
+    },
+    {
+      "CYLTabBarItemTitle": "Fishpond",
+      "CYLTabBarItemImage": "fishpond_highlight",
+      "CYLTabBarItemIdentifier": "fishpond"
+    },
+    {
+      "CYLTabBarItemTitle": "Account",
+      "CYLTabBarItemImage": "account_highlight",
+      "CYLTabBarItemIdentifier": "account"
+    }
+  ]
+}
