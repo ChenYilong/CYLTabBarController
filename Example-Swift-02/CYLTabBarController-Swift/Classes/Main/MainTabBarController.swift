@@ -58,7 +58,7 @@ class MainTabBarController: CYLTabBarController {
             issue610Label.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -16),
             issue610Label.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 8),
         ])
-        navigationItem.rightBarButtonItem = UIBarButtonItem(title: CYLDemoLocalizedString("Swap icons"), style: .plain,
+        navigationItem.rightBarButtonItem = UIBarButtonItem(title: cylDemoLocalizedString("Swap icons"), style: .plain,
                                                             target: self, action: #selector(issue610SwapIcons))
         let arguments = ProcessInfo.processInfo.arguments
         if arguments.contains("-CYL610Landscape"), #available(iOS 16.0, *) {

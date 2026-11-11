@@ -33,7 +33,6 @@
 		184C1CE423F65A9A00B23C7F /* RootNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 184C1CDE23F65A9A00B23C7F /* RootNavigationController.swift */; };
 		184C1CE623F65A9A00B23C7F /* RootTabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 184C1CE023F65A9A00B23C7F /* RootTabBarController.swift */; };
 		184C1CE723F65A9A00B23C7F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 184C1CE323F65A9A00B23C7F /* AppDelegate.swift */; };
-		184C1CEB23F65B0B00B23C7F /* OCSwift.m in Sources */ = {isa = PBXBuildFile; fileRef = 184C1CEA23F65B0B00B23C7F /* OCSwift.m */; };
 		184C1CF123F686AE00B23C7F /* TabBarCommon.swift in Sources */ = {isa = PBXBuildFile; fileRef = 184C1CF023F686AE00B23C7F /* TabBarCommon.swift */; };
 		184C1CF323F6898300B23C7F /* CYLPlusButtonSubclass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 184C1CF223F6898300B23C7F /* CYLPlusButtonSubclass.swift */; };
 		184F198223F7C707002DBAE4 /* ChilderVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 184F198123F7C707002DBAE4 /* ChilderVC.swift */; };
@@ -97,7 +96,6 @@
 		184C1CC323F65A6700B23C7F /* WisdomVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WisdomVC.swift; sourceTree = "<group>"; };
 		184C1CC523F65A6700B23C7F /* MeVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MeVC.swift; sourceTree = "<group>"; };
 		184C1CC723F65A6700B23C7F /* FriendsVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FriendsVC.swift; sourceTree = "<group>"; };
-		184C1CCF23F65A7400B23C7F /* ImageHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ImageHelper.h; sourceTree = "<group>"; };
 		184C1CD023F65A7400B23C7F /* ImageVIewExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageVIewExtension.swift; sourceTree = "<group>"; };
 		184C1CD123F65A7400B23C7F /* ImageHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageHelper.swift; sourceTree = "<group>"; };
 		184C1CD323F65A7400B23C7F /* ToastView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ToastView.swift; sourceTree = "<group>"; };
@@ -105,9 +103,6 @@
 		184C1CDE23F65A9A00B23C7F /* RootNavigationController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RootNavigationController.swift; sourceTree = "<group>"; };
 		184C1CE023F65A9A00B23C7F /* RootTabBarController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RootTabBarController.swift; sourceTree = "<group>"; };
 		184C1CE323F65A9A00B23C7F /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		184C1CE823F65B0B00B23C7F /* HealthyHome-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "HealthyHome-Bridging-Header.h"; path = "HealthyHome/HealthyHome-Bridging-Header.h"; sourceTree = SOURCE_ROOT; };
-		184C1CE923F65B0B00B23C7F /* OCSwift.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OCSwift.h; sourceTree = "<group>"; };
-		184C1CEA23F65B0B00B23C7F /* OCSwift.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OCSwift.m; sourceTree = "<group>"; };
 		184C1CF023F686AE00B23C7F /* TabBarCommon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarCommon.swift; sourceTree = "<group>"; };
 		184C1CF223F6898300B23C7F /* CYLPlusButtonSubclass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CYLPlusButtonSubclass.swift; sourceTree = "<group>"; };
 		184F198123F7C707002DBAE4 /* ChilderVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChilderVC.swift; sourceTree = "<group>"; };
@@ -184,9 +179,6 @@
 				184C1C9623F65A2A00B23C7F /* Assets.xcassets */,
 				184C1C9823F65A2A00B23C7F /* LaunchScreen.storyboard */,
 				184C1C9B23F65A2A00B23C7F /* Info.plist */,
-				184C1CE923F65B0B00B23C7F /* OCSwift.h */,
-				184C1CEA23F65B0B00B23C7F /* OCSwift.m */,
-				184C1CE823F65B0B00B23C7F /* HealthyHome-Bridging-Header.h */,
 			);
 			name = HealthyHome;
 			path = "../Example-Swift-03/HealthyHome";
@@ -279,7 +271,6 @@
 		184C1CCE23F65A7400B23C7F /* imageHelper */ = {
 			isa = PBXGroup;
 			children = (
-				184C1CCF23F65A7400B23C7F /* ImageHelper.h */,
 				184C1CD123F65A7400B23C7F /* ImageHelper.swift */,
 				184C1CD023F65A7400B23C7F /* ImageVIewExtension.swift */,
 			);
@@ -531,7 +522,6 @@
 				184F199023F7EE40002DBAE4 /* APPDelegate+Categories.swift in Sources */,
 				184C1CF323F6898300B23C7F /* CYLPlusButtonSubclass.swift in Sources */,
 				184F198A23F7E046002DBAE4 /* PrefixPch.swift in Sources */,
-				184C1CEB23F65B0B00B23C7F /* OCSwift.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -715,7 +705,6 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.HealthyHome;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_OBJC_BRIDGING_HEADER = "HealthyHome/HealthyHome-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -736,7 +725,6 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.HealthyHome;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_OBJC_BRIDGING_HEADER = "HealthyHome/HealthyHome-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};

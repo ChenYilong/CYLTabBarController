@@ -154,6 +154,6 @@ func debugLog<T>(message: T,
 func debugLog<T>(_ msg:T,fileName:String = #file,methodName:String = #function,lineNum:Int = #line){
     #if DEBUG
         let logStr = fileName.components(separatedBy: "/").last!.replacingOccurrences(of: "swift", with: "");
-        print(String(format: CYLDemoLocalizedString("类：%@ 行：[%@] 方法：%@ 数据：%@"), logStr, "\(lineNum)", methodName, "\(msg)"))
+        print(String(format: cylDemoLocalizedString("类：%@ 行：[%@] 方法：%@ 数据：%@"), logStr, "\(lineNum)", methodName, "\(msg)"))
     #endif
 }

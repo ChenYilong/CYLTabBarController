@@ -7,12 +7,13 @@
 //
 
 import UIKit
+import CYLTabBarController
 
 class HomeVC: ViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.navigationItem.title = CYLDemoLocalizedString("首页")
+        self.navigationItem.title = cylDemoLocalizedString("首页")
         self.view.backgroundColor = .red
 
         addRightBarButtonItemImage("屏幕全屏", self, action: #selector(tapAction))

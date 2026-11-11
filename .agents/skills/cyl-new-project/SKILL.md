@@ -92,7 +92,7 @@ for example `:path => '../'` in a demo folder.
 7. Check the project format with the commands in `cyl-xcode-compat`.
 8. Localization: a project must have at least two different macros that read the localized files of two different layers.
    The library's own texts come from the **core** macro (`CYLLocalizedString`, `CYLTabBarController.bundle`); the demo's own
-   texts come from the **example** macro (iOS: `CYLDemoLocalizedString` reading `Example-Shared/CYLDemo.bundle`). In a demo
+   texts come from the **example** macro (iOS: `CYLDemoLocalizedString`, in Swift `cylDemoLocalizedString`, reading `Example-Shared/CYLDemo.bundle`). In a demo
    project add `Example-Shared/CYLDemoLocalization.swift` (Swift) or `.m` + `.h` (Objective-C) and `CYLDemo.bundle` to the app
    target (file references with `SOURCE_ROOT`, as the other demos do), and call the example macro for every demo-only text.
    Never read the core bundle with `NSLocalizedString` / `NSBundle` calls of your own, and never leave loose `.lproj` folders.

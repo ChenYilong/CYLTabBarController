@@ -38,7 +38,7 @@ scripts/publish-android.sh staging                          # Android library: M
 Localization acceptance (AGENTS.md, "Localization (i18n / l10n) file structure"): a project must have at least two different
 macros that read the localized files of two different layers, and a project is accepted only when both exist and are used:
 the **core** macro (iOS: `CYLLocalizedString`, reading `CYLTabBarController.bundle`) and the **example** macro (iOS:
-`CYLDemoLocalizedString`, reading `Example-Shared/CYLDemo.bundle`). Other platforms use another package form, name and folder
+`CYLDemoLocalizedString`, in Swift `cylDemoLocalizedString`, reading `Example-Shared/CYLDemo.bundle`). Other platforms use another package form, name and folder
 name, but still one macro or helper per layer. `scripts/check-localization-macros.py` checks the iOS side and every example
 Xcode project that compiles a file calling the example macro (it must also compile `CYLDemoLocalization.m` or `.swift` and
 ship `CYLDemo.bundle`); after adding a localized text or a demo project, run it, then build that demo.

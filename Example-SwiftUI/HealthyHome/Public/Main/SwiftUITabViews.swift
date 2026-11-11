@@ -26,10 +26,10 @@ enum SwiftUITab: CaseIterable {
 
     var title: String {
         switch self {
-        case .home: return CYLDemoLocalizedString("首页")
-        case .healthy: return CYLDemoLocalizedString("健康")
-        case .friends: return CYLDemoLocalizedString("朋友圈")
-        case .me: return CYLDemoLocalizedString("我的")
+        case .home: return cylDemoLocalizedString("首页")
+        case .healthy: return cylDemoLocalizedString("健康")
+        case .friends: return cylDemoLocalizedString("朋友圈")
+        case .me: return cylDemoLocalizedString("我的")
         }
     }
 

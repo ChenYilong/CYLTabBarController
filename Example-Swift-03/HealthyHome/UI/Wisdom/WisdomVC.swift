@@ -7,12 +7,13 @@
 //
 
 import UIKit
+import CYLTabBarController
 
 class WisdomVC: ViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.navigationItem.title = CYLDemoLocalizedString("菜单")
+        self.navigationItem.title = cylDemoLocalizedString("菜单")
         self.view.backgroundColor = .orange
 
     }

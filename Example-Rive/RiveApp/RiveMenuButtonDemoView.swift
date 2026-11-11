@@ -43,7 +43,7 @@ final class RiveMenuButtonDemoView: UIView {
         }
 
         let button = UIButton(type: .system)
-        button.setTitle(CYLDemoLocalizedString("播放 / 停止"), for: .normal)
+        button.setTitle(cylDemoLocalizedString("播放 / 停止"), for: .normal)
         button.titleLabel?.font = .preferredFont(forTextStyle: .headline)
         button.addTarget(self, action: #selector(toggle), for: .touchUpInside)
 

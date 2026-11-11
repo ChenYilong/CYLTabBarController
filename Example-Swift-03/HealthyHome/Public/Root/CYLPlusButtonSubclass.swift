@@ -10,6 +10,7 @@
 import SwiftUI
 #endif
 import UIKit
+import CYLTabBarController
 
 class CYLPlusButtonSubclass: CYLPlusButton, CYLPlusButtonSubclassing {
     
@@ -25,10 +26,10 @@ class CYLPlusButtonSubclass: CYLPlusButton, CYLPlusButtonSubclassing {
         
         button.titleLabel?.font = UIFont.systemFont(ofSize: 15)
         
-        button.setTitle(CYLDemoLocalizedString("菜单"), for: .normal)
+        button.setTitle(cylDemoLocalizedString("菜单"), for: .normal)
         button.setTitleColor(.white, for: .normal)
         
-        button.setTitle(CYLDemoLocalizedString("菜单"), for: .selected)
+        button.setTitle(cylDemoLocalizedString("菜单"), for: .selected)
         button.setTitleColor(.white, for: .selected)
         
         // An explicit highlighted image is drawn as is, so the button does not darken on touch
@@ -61,7 +62,7 @@ class CYLPlusButtonSubclass: CYLPlusButton, CYLPlusButtonSubclassing {
         // [EN] SwiftUI demo: the plus button's page is a SwiftUI view in a UIHostingController.
         // [CN] SwiftUI 演示：PlusButton 对应的页面是放在 UIHostingController 中的 SwiftUI 视图。
         let publish = UIHostingController(rootView: PublishView())
-        publish.title = CYLDemoLocalizedString("发布")
+        publish.title = cylDemoLocalizedString("发布")
         return RootNavigationController(rootViewController: publish)
         #else
         let wisdom = WisdomVC()

@@ -62,7 +62,7 @@ Read the document for the feature before using its API. The public API is in the
 | A tab runs an action | [Tab-Custom-Action](../../../docs/Tab-Custom-Action.md) |
 | Login-required tabs (also the config key, Android persistence, `CYLTabBarHostView` / React Native / Flutter `loggedIn`, `onLoginRequest`, `onLoginStateChange`) | [Login-Required-Tabs](../../../docs/Login-Required-Tabs.md) |
 | Localization and language switch (`CYLLocalizedString`, `CYLSetLocalizationLanguage`, `-cyl_presentLanguagePicker`, right to left; Android `CYLLocalization.language`; `CYLTabBarHostView` / React Native / Flutter `language`) | [README, Localization](../../../README.md#cn多语言本地化) |
-| Example-level texts (not library API): `CYLDemoLocalizedString` (Objective-C macro, Swift function) reading `Example-Shared/CYLDemo.bundle`; the library's own texts use `CYLLocalizedString`; a project needs both layers, checked by `scripts/check-localization-macros.py` | [AGENTS.md, Localization file structure](../../../AGENTS.md) |
+| Example-level texts (not library API): `CYLDemoLocalizedString` (Objective-C macro; the Swift function is `cylDemoLocalizedString`) reading `Example-Shared/CYLDemo.bundle`; the library's own texts use `CYLLocalizedString`; a project needs both layers, checked by `scripts/check-localization-macros.py` | [AGENTS.md, Localization file structure](../../../AGENTS.md) |
 | Hide or minimize on scroll | [TabBar-Minimize-On-Scroll](../../../docs/TabBar-Minimize-On-Scroll.md) |
 | Push from anywhere | [Push-From-Anywhere](../../../docs/Push-From-Anywhere.md) |
 | Accessibility identifiers, XCUITest | [Tab-Accessibility](../../../docs/Tab-Accessibility.md) |

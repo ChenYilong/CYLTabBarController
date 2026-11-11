@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import CYLTabBarController
 
 class ChilderVC: ViewController {
 

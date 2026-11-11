@@ -2,7 +2,7 @@
 """Acceptance check for the localization rule in AGENTS.md ("Localization (i18n / l10n) file structure").
 
 A project passes only when it has at least two different macros (a function of the same name in Swift) that read the
-localized files of different layers:
+localized files of different layers (the Swift function is named in Swift style, `cylDemoLocalizedString`):
   1. the core macro `CYLLocalizedString`, reading the library bundle (CYLTabBarController/Resources/CYLTabBarController.bundle);
   2. the example macro `CYLDemoLocalizedString`, reading the example-level bundle (Example-Shared/CYLDemo.bundle).
 It also checks that every example Xcode project that compiles a file calling the example macro has the macro's source
@@ -48,8 +48,8 @@ demo_header = read("Example-Shared/CYLDemoLocalization.h")
 demo_objc = read("Example-Shared/CYLDemoLocalization.m")
 demo_swift = read("Example-Shared/CYLDemoLocalization.swift")
 check("CYLDemoLocalizedString(" in demo_header, "example macro `CYLDemoLocalizedString` is not declared in CYLDemoLocalization.h")
-check(re.search(r"func\s+CYLDemoLocalizedString\(", demo_swift) is not None,
-      "the Swift function `CYLDemoLocalizedString` is missing in CYLDemoLocalization.swift")
+check(re.search(r"func\s+cylDemoLocalizedString\(", demo_swift) is not None,
+      "the Swift function `cylDemoLocalizedString` is missing in CYLDemoLocalization.swift")
 demo_bundle = "Example-Shared/CYLDemo.bundle"
 check(os.path.isdir(os.path.join(ROOT, demo_bundle)), "example bundle is missing: " + demo_bundle)
 check("CYLDemo" in demo_objc and "CYLDemo" in demo_swift, "the example macro does not read CYLDemo.bundle / table `CYLDemo`")
@@ -65,7 +65,7 @@ check(demo_languages <= core_languages | {"en.lproj"},
       "the example bundle has languages the core bundle lacks: " + ", ".join(sorted(demo_languages - core_languages)))
 
 # --- every example project that compiles a file calling the example macro has the macro's source and the bundle
-call = re.compile(r"CYLDemoLocalizedString\(")
+call = re.compile(r"(?:CYLDemoLocalizedString|cylDemoLocalizedString)\(")
 callers = {}
 for folder in sorted(os.listdir(ROOT)):
     if not folder.startswith("Example") or folder == "Example-Android":

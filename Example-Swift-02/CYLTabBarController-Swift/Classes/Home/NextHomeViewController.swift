@@ -63,11 +63,11 @@ class NextHomeViewController: UIViewController {
         // An unknown identifier returns nil: nothing is popped or selected. 未知标识返回 nil：不 pop、不切换 Tab。
         sheet.addAction(UIAlertAction(title: "forTabBarItemIdentifier: \"unknown\"", style: .default) { [weak self] _ in
             let selected = self?.cyl_popSelectTabBarChildViewController(forTabBarItemIdentifier: "unknown")
-            let alert = UIAlertController(title: nil, message: String(format: CYLDemoLocalizedString("返回值：%@"), selected.map { "\($0)" } ?? "nil"), preferredStyle: .alert)
-            alert.addAction(UIAlertAction(title: CYLDemoLocalizedString("OK"), style: .default))
+            let alert = UIAlertController(title: nil, message: String(format: cylDemoLocalizedString("返回值：%@"), selected.map { "\($0)" } ?? "nil"), preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: cylDemoLocalizedString("OK"), style: .default))
             self?.present(alert, animated: true)
         })
-        sheet.addAction(UIAlertAction(title: CYLDemoLocalizedString("取消"), style: .cancel))
+        sheet.addAction(UIAlertAction(title: cylDemoLocalizedString("取消"), style: .cancel))
         sheet.popoverPresentationController?.barButtonItem = navigationItem.rightBarButtonItem
         present(sheet, animated: true)
     }

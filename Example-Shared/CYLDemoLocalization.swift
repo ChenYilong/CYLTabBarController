@@ -11,12 +11,12 @@ import CYLTabBarController
 
 /// [EN] The texts only the Swift examples show, read from the example-level `CYLDemo.bundle` (table `CYLDemo`), in the
 ///      language of `CYLLocalizationLanguage()`; English when the language has none; a key missing from the demo table
-///      falls back to the library's `CYLLocalizedString()`. The Swift twin of the Objective-C `CYLDemoLocalizedString()`
-///      in `CYLDemoLocalization.m` (AGENTS.md, "Localization file structure").
+///      falls back to the library's `CYLLocalizedString()`. The Swift counterpart of the Objective-C `CYLDemoLocalizedString()`
+///      in `CYLDemoLocalization.m`, named in Swift style (lowerCamelCase, SwiftLint / SonarCloud S100) (AGENTS.md, "Localization file structure").
 /// [CN] 只有 Swift 示例显示的文字，从示例级的 `CYLDemo.bundle`（表 `CYLDemo`）读取，语言跟随 `CYLLocalizationLanguage()`；该语言没有时
 ///      使用英语；示例表中没有的键回退到库的 `CYLLocalizedString()`。是 `CYLDemoLocalization.m` 中 Objective-C 版
-///      `CYLDemoLocalizedString()` 的 Swift 对应版本（AGENTS.md「Localization file structure」）。
-func CYLDemoLocalizedString(_ key: String) -> String {
+///      `CYLDemoLocalizedString()` 的 Swift 对应版本，按 Swift 规范使用小驼峰命名（AGENTS.md「Localization file structure」）。
+func cylDemoLocalizedString(_ key: String) -> String {
     if key.isEmpty {
         return key
     }

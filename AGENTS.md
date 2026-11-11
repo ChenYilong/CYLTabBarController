@@ -129,12 +129,13 @@ Every new feature and user-visible change ships with bilingual documentation in 
   - **Examples have their own bundle, at the example level.** Texts that only an example shows go into a bundle that
     belongs to the example (in its own folder, or in `Example-Shared/` when several examples share it), not into the
     core bundle. Xcode's `Base.lproj` for storyboards and launch screens stays where Xcode puts it.
-  - **Always a macro per bundle.** Each bundle gets one macro (and a Swift function of the same name) that maps a key to
+  - **Always a macro per bundle.** Each bundle gets one macro (and a Swift function named in Swift style, lowerCamelCase: `cylDemoLocalizedString` for
+    `CYLDemoLocalizedString`, as SonarCloud rule swift:S100 requires) that maps a key to
     its bundle and table, so callers never spell the bundle out: the core one is `CYLLocalizedString(@"…")`; an
     example's is, for instance, `CYLDemoLocalizedString(@"…")` over `NSLocalizedStringFromTableInBundle`. Declare it
     with `NS_FORMAT_ARGUMENT(1)` and `CYL_RETURNS_LOCALIZED_STRING`, like the core one.
   - **Acceptance criterion: at least two different macros, one per layer.** A project passes only when it has at least
-    two different macros (and a Swift function of the same name) that read the localized files of two different
+    two different macros (and their Swift-style Swift functions) that read the localized files of two different
     layers: (1) a **core** macro that reads the localized files inside the library's own bundle; (2) an **example**
     macro that reads the localized files at the example level. On iOS these are `CYLLocalizedString` →
     `CYLTabBarController.bundle` and `CYLDemoLocalizedString` → `Example-Shared/CYLDemo.bundle`. Other platforms use a
