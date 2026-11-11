@@ -264,6 +264,18 @@ The root `Podfile` is the reference: it already has the top lines and the hook.
    - Test helpers shared by several test files go into one file (Android: `CYLTestSupport.kt`; scripts:
      `scripts/configuration-tests/confined_paths.py`).
 
+## CI/CD and where tests run
+
+- **GitHub CI/CD for iOS runs on macOS 26 by default.** Before you rely on a CI environment, always read
+  [`.github/workflows/ios.yml` on master](https://github.com/ChenYilong/CYLTabBarController/blob/master/.github/workflows/ios.yml)
+  to confirm it: its macOS jobs use `runs-on: ${{ vars.MACOS_RUNNER || 'macos-26' }}`, so the repository variable
+  `MACOS_RUNNER` (e.g. `xcode-27`) can move them to another runner. Code that must pass CI builds with the Xcode of that
+  runner (`xcodebuild -version` is printed in the job log).
+- **Running locally ignores that limit.** "Local" means not going through GitHub CI/CD but testing directly on this Mac:
+  the default local system is **macOS 27**, with **Xcode 27** (`/Applications/Xcode.app`, never Xcode-beta) and its
+  simulators, which you can run directly (`xcrun simctl`, `scripts/unit-tests.sh`, the scripts under `scripts/`).
+- Say in the report where a check ran: GitHub CI (which runner) or locally (macOS and Xcode version).
+
 ## Git and pull requests
 
 - **Before every Commitizen-style (`git cz`) commit**, run this first in the repository root, so the vault's auto sync does not commit or push in the middle of it:

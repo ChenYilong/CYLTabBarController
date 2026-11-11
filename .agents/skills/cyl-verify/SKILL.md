@@ -21,6 +21,14 @@ Every commit message carries the line `By  @ChenYilong <luohanchenyilong@163.com
 `By`) in its body, after the description and before trailers such as `Claude-Session:`. Check it before every push
 (`git log -1 --format=%B`); amend a commit that lacks it. AGENTS.md, "Commit messages".
 
+## Where a check runs: GitHub CI or locally
+
+GitHub CI/CD for iOS runs on **macOS 26** by default: always read `.github/workflows/ios.yml` on master first to confirm it
+(`runs-on: ${{ vars.MACOS_RUNNER || 'macos-26' }}`; the `MACOS_RUNNER` variable can change it). Running **locally** (not
+through GitHub CI/CD, directly on this Mac) ignores that limit: the default local system is **macOS 27** with **Xcode 27**
+and its simulators. Name the environment (runner, or local macOS and Xcode versions) in every report. AGENTS.md,
+"CI/CD and where tests run".
+
 ## Commands
 
 ```sh
