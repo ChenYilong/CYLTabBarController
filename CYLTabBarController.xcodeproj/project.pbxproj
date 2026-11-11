@@ -230,9 +230,9 @@
 		F86EAD1B424CC7C8FD0797F6 /* UIViewController+CYLTheme.h in Headers */ = {isa = PBXBuildFile; fileRef = B7867273EDC0A1A56B351CBE /* UIViewController+CYLTheme.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		FB0B8528E2C479F633297CB8 /* UIControl+CYLBadgeExtention.m in Sources */ = {isa = PBXBuildFile; fileRef = 6D6AE8A15AA260E26D8CD7D6 /* UIControl+CYLBadgeExtention.m */; };
 		FB7CE7413A924BD5A352F058 /* UIBarItem+CYLUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = A012D43E4A5C46A2A98D54A5 /* UIBarItem+CYLUtils.m */; };
+		FC2645E143BEC2310AF550C3 /* CYLDemoPlaceholder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3328D7F6D42DD55B99C24546 /* CYLDemoPlaceholder.swift */; };
 		FD29E0C76D2E410F2694CE36 /* UIControl+CYLTabBarControllerExtention.m in Sources */ = {isa = PBXBuildFile; fileRef = 97F0C0695D1F49C4E912FD4A /* UIControl+CYLTabBarControllerExtention.m */; };
 		FEC9F8C46A3B167916110B50 /* CYLTabBarItemAnimationEngine.h in Headers */ = {isa = PBXBuildFile; fileRef = 5423B525B553B0DAE94BC048 /* CYLTabBarItemAnimationEngine.h */; };
-		FC2645E143BEC2310AF550C3 /* CYLDemoPlaceholder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3328D7F6D42DD55B99C24546 /* CYLDemoPlaceholder.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -339,6 +339,7 @@
 		2E1F8E2833934403B43D5016 /* CYLTabBarManifest.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = CYLTabBarManifest.m; sourceTree = "<group>"; };
 		2E493ADD327F40C89992ADAA /* UIView+CYLUtils.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "UIView+CYLUtils.h"; sourceTree = "<group>"; };
 		2E966353182D5871057B2DFC /* UINavigationController+CYLFlatDesignTabBarPrivate.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "UINavigationController+CYLFlatDesignTabBarPrivate.m"; sourceTree = "<group>"; };
+		3328D7F6D42DD55B99C24546 /* CYLDemoPlaceholder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CYLDemoPlaceholder.swift; path = "Example-Shared/CYLDemoPlaceholder.swift"; sourceTree = SOURCE_ROOT; };
 		33E91BC228994983BD78F8C3 /* CYLDemoLocalization.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = CYLDemoLocalization.m; path = "Example-Shared/CYLDemoLocalization.m"; sourceTree = SOURCE_ROOT; };
 		34CF54405D95A87F65F52E05 /* CYLFlatDesignTabBarItem.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = CYLFlatDesignTabBarItem.m; sourceTree = "<group>"; };
 		3820D2513ECDA3B496E0524A /* CYLLottieTabBarItemAnimator.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = CYLLottieTabBarItemAnimator.m; sourceTree = "<group>"; };
@@ -544,7 +545,6 @@
 		FDA399B9EAA0AC3847147370 /* CYLTabBarItemAnimatorRegistry.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = CYLTabBarItemAnimatorRegistry.m; sourceTree = "<group>"; };
 		FEAE77FC4A017D57E648057E /* CYLThemeManager.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CYLThemeManager.h; sourceTree = "<group>"; };
 		FF9F2AB372724E429E82DE06 /* CYLDemo.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; name = CYLDemo.bundle; path = "Example-Shared/CYLDemo.bundle"; sourceTree = SOURCE_ROOT; };
-		3328D7F6D42DD55B99C24546 /* CYLDemoPlaceholder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CYLDemoPlaceholder.swift; path = "Example-Shared/CYLDemoPlaceholder.swift"; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1450,10 +1450,14 @@
 			inputPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-CYLTabBarController/Pods-CYLTabBarController-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/lottie-ios/Lottie.framework",
+				"${PODS_XCFRAMEWORKS_BUILD_DIR}/RiveRuntime/RiveRuntime.framework/RiveRuntime",
+				"${PODS_XCFRAMEWORKS_BUILD_DIR}/libpag/libpag.framework/libpag",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Lottie.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RiveRuntime.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/libpag.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -1472,6 +1476,7 @@
 				"${PODS_ROOT}/CYLTableViewPlaceHolder/CYLTableViewPlaceHolder/CYLTableViewPlaceHolder/LICENSE.placeholder-third-party",
 				"${PODS_ROOT}/CYLTableViewPlaceHolder/CYLTableViewPlaceHolder/CYLRefresh/PrivacyInfo.xcprivacy",
 				"${PODS_ROOT}/CYLTableViewPlaceHolder/CYLTableViewPlaceHolder/CYLRefresh/LICENSE.third-party",
+				"${PODS_CONFIGURATION_BUILD_DIR}/RiveRuntime/runtime_ios_privacy.bundle",
 			);
 			name = "[CP] Copy Pods Resources";
 			outputPaths = (
@@ -1480,6 +1485,7 @@
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/LICENSE.placeholder-third-party",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/PrivacyInfo.xcprivacy",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/LICENSE.third-party",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/runtime_ios_privacy.bundle",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
