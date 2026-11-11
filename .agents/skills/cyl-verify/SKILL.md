@@ -15,6 +15,12 @@ timestamp (`<sha> <date> <branch>`). A project not named CYLTabBarController mus
 the relative path to the folder with the podspec (`:path => '../'` from a demo). Name the commit in the report. AGENTS.md,
 "Depending on CYLTabBarController".
 
+## Commit message author line
+
+Every commit message carries the line `By  @ChenYilong <luohanchenyilong@163.com>` (exactly as written, two spaces after
+`By`) in its body, after the description and before trailers such as `Claude-Session:`. Check it before every push
+(`git log -1 --format=%B`); amend a commit that lacks it. AGENTS.md, "Commit messages".
+
 ## Commands
 
 ```sh

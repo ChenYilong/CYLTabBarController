@@ -310,6 +310,9 @@ The root `Podfile` is the reference: it already has the top lines and the hook.
   Use HTTPS with the `gh` credential helper only when SSH fails: its token has no `workflow` scope, so GitHub rejects
   any push that changes `.github/workflows/*` ("refusing to allow an OAuth App to create or update workflow").
 - Branch from the latest `master` for each issue or feature.
+- **Every commit message carries the author line** `By  @ChenYilong <luohanchenyilong@163.com>` (exactly as written,
+  two spaces after `By`) on its own line in the body, after the description and before any trailers such as
+  `Claude-Session:` or `Co-authored-by:`. A commit without it is incomplete: amend it before pushing.
 - Commit messages are in English, Conventional Commits as configured for commitizen in `package.json`
   (`feat: ✨ …`, `fix: 🐛 …`, `docs: 📝 …`).
 - Follow the Commitizen defaults: emojis are enabled and the format is

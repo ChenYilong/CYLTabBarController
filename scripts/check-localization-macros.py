@@ -86,10 +86,28 @@ for folder in sorted(os.listdir(ROOT)):
             if entry.endswith(".xcodeproj") and os.path.isfile(pbx):
                 projects.append(pbx)
 projects.append(os.path.join(ROOT, "CYLTabBarController.xcodeproj", "project.pbxproj"))
+def compiled_callers(pbx, text):
+    """Callers this project really references: a reference with a folder in its path is resolved from the project
+    folder; a bare file name only matches a caller inside the project's own folder (another example may have a file
+    with the same name)."""
+    project_dir = os.path.dirname(os.path.dirname(pbx))
+    found = []
+    for ref_path in re.findall(r"isa = PBXFileReference;[^}]*?path = \"?([^\";]+)\"?;", text):
+        name = os.path.basename(ref_path)
+        for caller in callers.get(name, []):
+            caller_abs = os.path.join(ROOT, caller)
+            if "/" in ref_path:
+                if os.path.normpath(os.path.join(project_dir, ref_path)) == os.path.normpath(caller_abs):
+                    found.append(name)
+            elif caller_abs.startswith(project_dir + os.sep):
+                found.append(name)
+    return sorted(set(found))
+
+
 for pbx in projects:
     with open(pbx, encoding="utf-8", errors="ignore") as handle:
         text = handle.read()
-    compiled = [name for name in callers if re.search(r"\b" + re.escape(name) + r"\b", text)]
+    compiled = compiled_callers(pbx, text)
     if not compiled:
         continue
     swift = any(name.endswith(".swift") for name in compiled)

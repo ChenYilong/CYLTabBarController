@@ -71,6 +71,12 @@ two places**:
     names that name the feature, e.g. `assets/login-required-tabs-alert.png`.
 - Diagrams are welcome: Mermaid blocks in the Markdown, and optionally an SVG copy in `assets/`.
 
+### Commit message author line
+
+Every commit message carries the line `By  @ChenYilong <luohanchenyilong@163.com>` (exactly as written, two spaces after
+`By`) in its body, after the description and before trailers such as `Claude-Session:`. Check it before every push
+(`git log -1 --format=%B`); amend a commit that lacks it. AGENTS.md, "Commit messages".
+
 ### Stale notes before every commit
 
 Before every commit, search every document in `docs/` and `README.md` for the keywords **`TODO`** and **`Linux`**, and
