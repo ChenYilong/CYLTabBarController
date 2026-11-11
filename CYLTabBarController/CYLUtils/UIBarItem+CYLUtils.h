@@ -31,10 +31,12 @@ NS_ASSUME_NONNULL_BEGIN
 @interface UITabBarItem (CYLUtils)
 
 /*!
- * [EN] The button UIKit draws for the item in its tab bar (`UITabBarButton` / `_UITabButton`).
- * [CN] UIKit 在 TabBar 中为该 item 绘制的按钮（`UITabBarButton` / `_UITabButton`）。
+ * [EN] The button UIKit draws for the item in its tab bar (`UITabBarButton` / `_UITabButton`); nil before the tab bar has
+ *      drawn it. `nullable` so Swift sees it as optional, as it always behaved (Objective-C is unchanged).
+ * [CN] UIKit 在 TabBar 中为该 item 绘制的按钮（`UITabBarButton` / `_UITabButton`）；TabBar 尚未绘制时为 nil。标注 `nullable`，使 Swift
+ *      将其视为可选值，与其一贯的行为一致（Objective-C 不变）。
  */
-@property (nonatomic, readonly) UIControl *cyl_tabButton;
+@property (nonatomic, readonly, nullable) UIControl *cyl_tabButton;
 
 @end
 
