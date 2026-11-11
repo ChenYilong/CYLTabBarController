@@ -86,6 +86,13 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
                                           UIControl *control, UIViewController *viewController) {
         [weakSelf cyl_demo_handleTabBarItemGesture:gesture control:control viewController:viewController];
     };
+    // [EN] `-CYLDemoDoubleTapInterval 0.8`: a longer double tap interval, so automated taps on the simulator (about 0.5 s
+    //      apart) can make a double tap. [CN] `-CYLDemoDoubleTapInterval 0.8`：加长双击间隔，使模拟器上的自动点击（间隔约 0.5 秒）
+    //      也能构成双击。
+    double doubleTapInterval = [[NSUserDefaults standardUserDefaults] doubleForKey:@"CYLDemoDoubleTapInterval"];
+    if (doubleTapInterval > 0) {
+        self.cyl_tabBarItemDoubleTapInterval = doubleTapInterval;
+    }
 }
 
 /*!

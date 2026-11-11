@@ -286,6 +286,7 @@ docs/
 │   ├── tab-item-positioning-ios.png
 │   ├── tab-page-registry-android.png
 │   ├── tab-reselect-pop-to-root-ios.png
+│   ├── tabbaritem-double-tap-refresh-ios.png
 │   ├── tabbaritem-gestures-ios.png
 │   ├── theme-switching-flat-design.png
 │   ├── theme-switching-holiday-icons.png

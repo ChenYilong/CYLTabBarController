@@ -11,6 +11,12 @@
 #import <XCTest/XCTest.h>
 #import <CYLTabBarController/CYLTabBarController.h>
 
+/// [EN] The tap counting of the tab bar item gestures (CYLTabBarController+CYLTabBarItemGesture.m), for the timing tests.
+/// [CN] TabBarItem 手势的点击计数（CYLTabBarController+CYLTabBarItemGesture.m），用于时间相关的测试。
+@interface CYLTabBarController (CYLGestureTests)
+- (void)cyl_recognizeTapOnControl:(UIControl *)control viewController:(UIViewController *)viewController isReselect:(BOOL)isReselect;
+@end
+
 @interface CYLTabBarControllerTests : XCTestCase
 
 @end
@@ -248,6 +254,66 @@
         }
     }
     XCTAssertGreaterThan(stillPulsing, 0u, @"the scale badge still animates after the titles changed");
+}
+
+/// [EN] Gestures: two taps on the same tab within `cyl_tabBarItemDoubleTapInterval` report Reselect, then DoubleTap; a
+///      slower second tap reports Reselect only, and a third quick tap starts a new pair. Run in each style (classic on
+///      iOS 25 and earlier, Liquid Glass on iOS 26+, FlatDesign) by the style of the controller; the counting is shared.
+/// [CN] 手势：在 `cyl_tabBarItemDoubleTapInterval` 内两次点击同一 Tab，先上报 Reselect，再上报 DoubleTap；较慢的第二次点击只上报
+///      Reselect，快速的第三次点击重新开始计数。按控制器样式分别运行（iOS 25 及更早为经典样式，iOS 26+ 为液态玻璃，以及扁平样式）；计数逻辑共用。
+- (void)testDoubleTapTimingInEveryStyle {
+    for (NSNumber *style in @[ @(CYLTabBarStyleTypeDefault), @(CYLTabBarStyleTypeFlatDesign) ]) {
+        CYLTabBarController *tabBarController =
+            [[CYLTabBarController alloc] initWithViewControllers:@[ [UIViewController new], [UIViewController new] ]
+                                           tabBarItemsAttributes:@[ @{ CYLTabBarItemTitle : @"A" }, @{ CYLTabBarItemTitle : @"B" } ]
+                                                       styleType:style.integerValue
+                                                         context:[NSUUID UUID].UUIDString];
+        NSMutableArray<NSNumber *> *gestures = [NSMutableArray array];
+        tabBarController.cyl_tabBarItemGestureHandler = ^(CYLTabBarController *controller, CYLTabBarItemGesture gesture, UIControl *control, UIViewController *viewController) {
+            [gestures addObject:@(gesture)];
+        };
+        tabBarController.cyl_tabBarItemDoubleTapInterval = 0.35;
+        UIControl *control = [[UIControl alloc] init];
+        UIViewController *selected = tabBarController.viewControllers[0];
+        [tabBarController cyl_recognizeTapOnControl:control viewController:selected isReselect:YES];
+        [tabBarController cyl_recognizeTapOnControl:control viewController:selected isReselect:YES];
+        XCTAssertEqualObjects(gestures, (@[ @(CYLTabBarItemGestureReselect), @(CYLTabBarItemGestureReselect), @(CYLTabBarItemGestureDoubleTap) ]),
+                              @"style %@: Reselect, then Reselect and DoubleTap", style);
+        [gestures removeAllObjects];
+        [tabBarController cyl_recognizeTapOnControl:control viewController:selected isReselect:YES];
+        XCTAssertEqualObjects(gestures, @[ @(CYLTabBarItemGestureReselect) ], @"style %@: a third tap starts a new pair", style);
+        [gestures removeAllObjects];
+        [[NSRunLoop mainRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.45]];
+        [tabBarController cyl_recognizeTapOnControl:control viewController:selected isReselect:YES];
+        XCTAssertEqualObjects(gestures, @[ @(CYLTabBarItemGestureReselect) ], @"style %@: a slow second tap is no DoubleTap", style);
+    }
+}
+
+/// [EN] Gestures without a handler, block or delegate method: no long press recognizer is added to the tab bar
+///      controller's view; it comes once a handler is set.
+/// [CN] 没有 handler、block 或代理方法时：不会给 TabBarController 的 view 添加长按手势；设置 handler 后才添加。
+- (void)testNoGestureRecognizerWithoutAReceiver {
+    CYLTabBarController *tabBarController = [[CYLTabBarController alloc] initWithViewControllers:@[ [UIViewController new], [UIViewController new] ]
+                                                                           tabBarItemsAttributes:@[ @{ CYLTabBarItemTitle : @"A" }, @{ CYLTabBarItemTitle : @"B" } ]];
+    UIWindow *window = [[UIWindow alloc] initWithFrame:CGRectMake(0, 0, 393, 852)];
+    window.rootViewController = tabBarController;
+    window.hidden = NO;
+    [tabBarController.view layoutIfNeeded];
+    NSUInteger (^longPresses)(void) = ^NSUInteger {
+        NSUInteger count = 0;
+        for (UIGestureRecognizer *recognizer in tabBarController.view.gestureRecognizers) {
+            if ([NSStringFromClass(recognizer.class) isEqualToString:@"CYLTabButtonLongPressGestureRecognizer"]) {
+                count++;
+            }
+        }
+        return count;
+    };
+    XCTAssertEqual(longPresses(), 0u, @"nothing is added without a receiver");
+    tabBarController.cyl_tabBarItemGestureHandler = ^(CYLTabBarController *controller, CYLTabBarItemGesture gesture, UIControl *control, UIViewController *viewController) {};
+    [tabBarController.view setNeedsLayout];
+    [tabBarController.view layoutIfNeeded];
+    [[NSRunLoop mainRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.2]];
+    XCTAssertEqual(longPresses(), 1u, @"the long press comes with a handler");
 }
 
 /// [EN] VoiceOver reads a tab's new title after an in-place change, and a label the app set on the tab item is kept.
