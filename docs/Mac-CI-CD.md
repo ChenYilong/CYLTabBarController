@@ -35,6 +35,7 @@
 | [风险与注意事项](#cn风险与注意事项) | [Risks and notes](#enrisks-and-notes) |
 | [TODO：维护者需要完成的步骤](#cntodo维护者需要完成的步骤) | [TODO: steps for the maintainer](#entodo-steps-for-the-maintainer) |
 | [来源](#cn来源) | [Sources](#ensources) |
+| [任务记录](#任务记录--task-log) | [Task log](#任务记录--task-log) |
 
 <!-- navigation:end -->
 
@@ -297,3 +298,9 @@ jobs:
 - [actions/runner-images: macos-26 release notes](https://github.com/actions/runner-images/releases/tag/macos-26%2F20260729.0423)
 - [Xcode Cloud](https://developer.apple.com/xcode-cloud/)
 - [GitHub Developer Program](https://docs.github.com/en/enterprise-cloud@latest/integrations/concepts/github-developer-program)
+
+## 任务记录 / Task log
+
+| 中文 | English |
+|:---|:---|
+| TODO（2026-11-12，SonarCloud PR #788）：用户提示词：「修复静态分析bug https://sonarcloud.io/project/issues?id=ChenYilong_CYLTabBarController&pullRequest=788&issueStatuses=OPEN,CONFIRMED&sinceLeakPeriod=true」。要求：修复 PR #788 新代码中所有 OPEN / CONFIRMED 的 SonarCloud 问题。上下文：共 25 个：`scripts/check-public-api-comments.py` 的正则复杂度 / 回溯与认知复杂度（17 个），`scripts/export-tabbar-configurations.py:447` 正则回溯（本次新加的 `as Any` 正则），`scripts/check-localization-macros.py:93` 认知复杂度，`Example-Shared/CYLDemoPlaceholder.swift:124` 空闭包，`Example/Classes/Gallery/CYLGalleryProvider.swift` 与 `CYLGallerySupport.swift` 闭包嵌套超过 2 层（7 个）。 | TODO (2026-11-12, SonarCloud PR #788): user prompt: "修复静态分析bug https://sonarcloud.io/project/issues?id=ChenYilong_CYLTabBarController&pullRequest=788&issueStatuses=OPEN,CONFIRMED&sinceLeakPeriod=true". Requirement: fix every OPEN / CONFIRMED SonarCloud issue in PR #788's new code. Context: 25 issues: regex complexity / backtracking and cognitive complexity in `scripts/check-public-api-comments.py` (17), regex backtracking at `scripts/export-tabbar-configurations.py:447` (the `as Any` regex added today), cognitive complexity at `scripts/check-localization-macros.py:93`, an empty closure at `Example-Shared/CYLDemoPlaceholder.swift:124`, closures nested more than 2 deep in `Example/Classes/Gallery/CYLGalleryProvider.swift` and `CYLGallerySupport.swift` (7). |

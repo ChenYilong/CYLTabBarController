@@ -87,6 +87,10 @@ Every commit message carries the line `By  @ChenYilong <luohanchenyilong@163.com
 `By`) in its body, after the description and before trailers such as `Claude-Session:`. Check it before every push
 (`git log -1 --format=%B`); amend a commit that lacks it. AGENTS.md, "Commit messages".
 
+### Record every task before starting it
+
+- **Record every task in `docs/` before starting it (added 2026-11-12)**: before any task, find the most relevant existing document in `docs/` (create one only when none fits) and add a `TODO` entry with the task's full context, the user's requirements, and the user's prompt quoted verbatim. Then start the work. When the task is finished, change that entry to `DONE` with the result and its evidence (commits, tests, screenshots). Purpose: if the work is interrupted, the next session can find the context again.
+
 ### Pull request for every new branch
 
 - **Every new branch gets a pull request, automatically (added 2026-11-12)**: after creating a branch and pushing its first commit, open a pull request right away, without asking. Target branch: the branch it was created from (preferred); otherwise `main` or `master`.

@@ -35,6 +35,7 @@ flowchart LR
 | [规则](#规则--rules) | [Rules](#规则--rules) |
 | [限制](#限制--limits) | [Limits](#限制--limits) |
 | [截图](#截图--screenshots) | [Screenshots](#截图--screenshots) |
+| [任务记录](#任务记录--task-log) | [Task log](#任务记录--task-log) |
 
 <!-- navigation:end -->
 
@@ -89,3 +90,9 @@ tabBarController.tabBar.itemSpacing = 24;
 | 已验证（2026-11-10，iOS 26.1，iPhone 17 Pro Max 模拟器）。上：图库「8.8 Centered tabs around a plus button」（`itemPositioning = Centered`、`itemWidth` 64、`itemSpacing` 12），Tab 围绕中间的 PlusButton 排列；下：「8.9 Edge insets and gaps between tabs」，iOS 26 的液态玻璃 TabBar 由系统布局，`cyl_itemEdgeInsets` 只对经典 TabBar（iOS 25 及更早，或 iOS 26 兼容模式）生效，因此这里与普通布局相同。 | Verified (2026-11-10, iOS 26.1, iPhone 17 Pro Max simulator). Top: gallery "8.8 Centered tabs around a plus button" (`itemPositioning = Centered`, `itemWidth` 64, `itemSpacing` 12): the tabs sit around the middle plus button. Bottom: "8.9 Edge insets and gaps between tabs": the iOS 26 Liquid Glass tab bar is laid out by the system, and `cyl_itemEdgeInsets` applies only to the classic tab bar (iOS 25 and earlier, or iOS 26 compatibility mode), so it looks like the plain layout here. |
 
 ![Centered tabs and edge insets on iOS 26](assets/tab-item-positioning-ios.png)
+
+## 任务记录 / Task log
+
+| 中文 | English |
+|:---|:---|
+| TODO（2026-11-12，issue #561）：用户提示词：「我看到你支持了横屏展示icon与title中心点对齐了。请测试该功能是否符合 该issue要求。如果符合，关联issue并回复issue附带截图展示。https://github.com/ChenYilong/CYLTabBarController/issues/561」。上下文：issue #561「iPad 横排按钮 做个适配 竖排 横排 可以切换」（iPad 上 Tab 按钮的图标与标题横向排列（inline）与竖向排列（stacked）的适配与切换）。要求：测试横屏 / 横向排列时图标与标题中心对齐的功能是否满足该 issue；满足则在提交中关联 issue，并在 issue 中回复截图。 | TODO (2026-11-12, issue #561): user prompt: "我看到你支持了横屏展示icon与title中心点对齐了。请测试该功能是否符合 该issue要求。如果符合，关联issue并回复issue附带截图展示。https://github.com/ChenYilong/CYLTabBarController/issues/561". Context: issue #561 "iPad 横排按钮 做个适配 竖排 横排 可以切换" (on iPad, support tab buttons with icon and title side by side (inline) and stacked, and switching between them). Requirement: test whether the landscape / side-by-side layout with icon and title centered meets the issue; if it does, link the issue in a commit and reply on the issue with screenshots. |
