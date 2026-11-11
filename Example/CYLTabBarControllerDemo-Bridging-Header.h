@@ -8,4 +8,3 @@
 //       SWIFT_OBJC_BRIDGING_HEADER。
 //
 
-#import "CYLGalleryProvider.h"
