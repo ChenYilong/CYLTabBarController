@@ -500,6 +500,35 @@
     window.hidden = YES;
 }
 
+/// [EN] The title width limit is isolated to a tab bar with a plus button (iOS 26+, Liquid Glass, not FlatDesign): without
+///      a plus button a long title is left as it is.
+/// [CN] 标题宽度限制只用于有 PlusButton 的 TabBar（iOS 26+、液态玻璃、非扁平样式）：没有 PlusButton 时长标题保持不变。
+- (void)testLongTitlesWithoutAPlusButtonAreNotCut {
+    NSString *longTitle = @"Scene one: review filter and more";
+    NSMutableArray<NSDictionary *> *tabs = [NSMutableArray array];
+    for (NSString *name in @[ longTitle, @"Scene two: search and sort", @"C", @"D" ]) {
+        [tabs addObject:@{ CYLTabBarItemIdentifier : [NSUUID UUID].UUIDString, CYLTabBarItemTitle : name, CYLTabBarItemImage : [UIImage systemImageNamed:@"house"] }];
+    }
+    CYLTabBarController *tabBarController = [CYLTabBarController tabBarControllerWithConfiguration:@{
+        CYLTabBarControllerContext : [NSUUID UUID].UUIDString,
+        CYLTabBarControllerTabBarItemsAttributes : tabs,
+        CYLTabBarControllerPageResolver : ^UIViewController *(NSString *pageIdentifier, NSDictionary *attributes) {
+            return [[UIViewController alloc] init];
+        },
+    }];
+    UIWindow *window = [[UIWindow alloc] initWithFrame:CGRectMake(0, 0, 390, 844)];
+    window.rootViewController = tabBarController;
+    window.hidden = NO;
+    for (NSUInteger pass = 0; pass < 3; pass++) {
+        [tabBarController.tabBar setNeedsLayout];
+        [tabBarController.view layoutIfNeeded];
+        [[NSRunLoop mainRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.2]];
+    }
+    XCTAssertFalse([tabBarController hasPlusButton]);
+    XCTAssertEqualObjects(tabBarController.viewControllers.firstObject.tabBarItem.title, longTitle, @"not cut without a plus button");
+    window.hidden = YES;
+}
+
 /// [EN] FIX: more than five tabs on the classic style / Liquid Glass showed the first five and no "More". With eight tabs
 ///      UIKit's "More" tab is there and a later tab can be selected; five tabs are unchanged; a plus button with eight
 ///      tabs does not crash.
