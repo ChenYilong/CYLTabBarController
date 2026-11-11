@@ -654,6 +654,24 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
  *      （如 `city`、`message`、`CYLMineViewController`）。
  */
 - (void)cyl_demo_selectTabFromLaunchArgumentOfTabBarController:(CYLTabBarController *)tabBarController {
+    // [EN] `-CYLDemoOrientation landscape` without `-CYLDemoGalleryScene`: the main tab bar in landscape 3 s after launch
+    //      (`simctl` cannot rotate the simulator); a gallery scene rotates itself.
+    // [CN] 没有 `-CYLDemoGalleryScene` 时的 `-CYLDemoOrientation landscape`：启动 3 秒后主 TabBar 转为横屏（`simctl` 无法旋转模拟器）；
+    //      图库场景自己处理旋转。
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    if ([[defaults stringForKey:@"CYLDemoOrientation"] isEqualToString:@"landscape"] && [defaults stringForKey:@"CYLDemoGalleryScene"].length == 0) {
+        __weak CYLTabBarController *rotatingController = tabBarController;
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            if (@available(iOS 16.0, *)) {
+                UIWindowScene *scene = rotatingController.view.window.windowScene;
+                UIWindowSceneGeometryPreferencesIOS *preferences =
+                    [[UIWindowSceneGeometryPreferencesIOS alloc] initWithInterfaceOrientations:UIInterfaceOrientationMaskLandscapeRight];
+                [scene requestGeometryUpdateWithPreferences:preferences errorHandler:^(NSError *error) {
+                    NSLog(@"CYLDemoOrientation: %@", error.localizedDescription);
+                }];
+            }
+        });
+    }
     // [EN] `-CYLDemoPlaceholderPreview <kind>`: the empty-list placeholder, full screen. [CN] 全屏展示空列表占位图。
     __weak CYLTabBarController *weakController = tabBarController;
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{

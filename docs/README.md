@@ -201,6 +201,7 @@ docs/
 │   ├── image-only-tabs-gallery-3-3-ios17.png
 │   ├── image-only-tabs-ios.png
 │   ├── inset-grouped-sections-demo-ios.png
+│   ├── issue-561-ipad-tab-bars-ios.png
 │   ├── liquid-glass-plus-stand-in-landscape-ios.png
 │   ├── liquid-glass-robustness-more-ios.png
 │   ├── liquid-glass-robustness-plus-stand-in-ios.png
