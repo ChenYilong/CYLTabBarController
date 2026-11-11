@@ -15,7 +15,7 @@
 #import "MainTabBarController.h"
 #import "CYLMainRootViewController.h"
 #import "CYLTabBarControllerDemo-Swift.h"
-#import <MJRefresh/MJRefresh.h>
+#import <CYLTableViewPlaceHolder/CYLTableViewPlaceHolder.h>
 #import "CYLDemoLocalization.h"
 
 @interface CYLHomeViewController ()
@@ -91,6 +91,9 @@
             // Fallback on earlier versions
         }
         }
+    // [EN] Pull to refresh, empty / no-network placeholders and the offline red bar (CYLTableViewPlaceHolder).
+    // [CN] 下拉刷新、无数据 / 无网络占位图与断网红条（CYLTableViewPlaceHolder）。
+    [CYLDemoPlaceholder installOnScrollView:self.tableView viewController:self refresh:nil];
 }
 
 - (void)viewDidLayoutSubviews {
@@ -111,11 +114,11 @@
 }
 
 - (void)refresh {
-    [self.tableView.mj_header beginRefreshing];
+    [self.tableView.cyl_header beginRefreshing];
     NSTimeInterval delaySeconds = 1;
     dispatch_time_t when = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delaySeconds * NSEC_PER_SEC));
     dispatch_after(when, dispatch_get_main_queue(), ^{
-        [self.tableView.mj_header endRefreshing];
+        [self.tableView.cyl_header endRefreshing];
     });
 }
 

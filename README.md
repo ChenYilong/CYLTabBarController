@@ -312,6 +312,7 @@ Analyst.ai [App Store Link](https://itunes.apple.com/us/app/analyst-ai/id1345754
 | [Android 液态玻璃](docs/Android-Liquid-Glass.md) | [Android Liquid Glass](docs/Android-Liquid-Glass.md) |
 | [Android 库与 QMUI_Android、XUI 的 Tab 对比](docs/Android-QMUI-Comparison.md) | [The Android library compared with QMUI_Android's and XUI's tabs](docs/Android-QMUI-Comparison.md) |
 | [中英文双语文档](docs/Bilingual-Documentation.md) | [Bilingual Documentation](docs/Bilingual-Documentation.md) |
+| [CYLTableViewPlaceHolder 集成问题](docs/CYLTableViewPlaceHolder-Integration-Issues.md) | [CYLTableViewPlaceHolder Integration Issues](docs/CYLTableViewPlaceHolder-Integration-Issues.md) |
 | [CYLUtils 通用工具：超出父视图响应点击、点击动画与图片加载](docs/CYLUtils-Helpers.md) | [CYLUtils helpers: responding outside the superview, a tap animation, and image loading](docs/CYLUtils-Helpers.md) |
 | [Carthage 集成演示工程](docs/Carthage-Example.md) | [Carthage integration demo project](docs/Carthage-Example.md) |
 | [使用 Carthage 集成](docs/Carthage.md) | [Integrating with Carthage](docs/Carthage.md) |

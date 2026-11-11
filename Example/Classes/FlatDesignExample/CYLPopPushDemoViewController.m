@@ -14,6 +14,7 @@
 #import "CYLTabBarController.h"
 #endif
 #import "CYLDemoLocalization.h"
+#import "CYLTabBarControllerDemo-Swift.h"
 
 typedef void (^CYLPopPushDemoAction)(void);
 
@@ -62,6 +63,9 @@ typedef void (^CYLPopPushDemoAction)(void);
     self.tableView.delegate = self;
     self.tableView.dataSource = self;
     [self.view addSubview:self.tableView];
+    // [EN] Pull to refresh, empty / no-network placeholders and the offline red bar (CYLTableViewPlaceHolder).
+    // [CN] 下拉刷新、无数据 / 无网络占位图与断网红条（CYLTableViewPlaceHolder）。
+    [CYLDemoPlaceholder installOnScrollView:self.tableView viewController:self refresh:nil];
 }
 
 - (void)viewWillAppear:(BOOL)animated {

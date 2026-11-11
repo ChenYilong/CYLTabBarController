@@ -21,6 +21,7 @@
 | [Android 液态玻璃](Android-Liquid-Glass.md) | [Android Liquid Glass](Android-Liquid-Glass.md) |
 | [Android 库与 QMUI_Android、XUI 的 Tab 对比](Android-QMUI-Comparison.md) | [The Android library compared with QMUI_Android's and XUI's tabs](Android-QMUI-Comparison.md) |
 | [中英文双语文档](Bilingual-Documentation.md) | [Bilingual Documentation](Bilingual-Documentation.md) |
+| [CYLTableViewPlaceHolder 集成问题](CYLTableViewPlaceHolder-Integration-Issues.md) | [CYLTableViewPlaceHolder Integration Issues](CYLTableViewPlaceHolder-Integration-Issues.md) |
 | [CYLUtils 通用工具：超出父视图响应点击、点击动画与图片加载](CYLUtils-Helpers.md) | [CYLUtils helpers: responding outside the superview, a tap animation, and image loading](CYLUtils-Helpers.md) |
 | [Carthage 集成演示工程](Carthage-Example.md) | [Carthage integration demo project](Carthage-Example.md) |
 | [使用 Carthage 集成](Carthage.md) | [Integrating with Carthage](Carthage.md) |
@@ -103,6 +104,7 @@ docs/
 ├── Android-Liquid-Glass.md
 ├── Android-QMUI-Comparison.md
 ├── Bilingual-Documentation.md
+├── CYLTableViewPlaceHolder-Integration-Issues.md
 ├── CYLUtils-Helpers.md
 ├── Carthage-Example.md
 ├── Carthage.md
@@ -192,6 +194,7 @@ docs/
 │   ├── gif-flat-design.png
 │   ├── gif-liquid-glass.png
 │   ├── image-only-tabs-ios.png
+│   ├── inset-grouped-sections-demo-ios.png
 │   ├── liquid-glass-robustness-more-ios.png
 │   ├── liquid-glass-robustness-plus-stand-in-ios.png
 │   ├── login-required-tabs-flow.svg

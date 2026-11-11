@@ -52,6 +52,9 @@ final class CYLGalleryViewController: UITableViewController {
         super.viewDidLoad()
         navigationItem.title = cylDemoLocalizedString("TabBar 场景展示")
         sections = CYLGalleryProvider.sections()
+        // [EN] Pull to refresh, empty / no-network placeholders and the offline red bar (CYLTableViewPlaceHolder).
+        // [CN] 下拉刷新、无数据 / 无网络占位图与断网红条（CYLTableViewPlaceHolder）。
+        CYLDemoPlaceholder.install(on: tableView, in: self)
     }
 
     override func viewDidAppear(_ animated: Bool) {

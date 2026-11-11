@@ -22,6 +22,7 @@
 #import <CYLTabBarController/CYLFlatDesignTabBar.h>
 #endif
 #import "CYLDemoLocalization.h"
+#import "CYLTabBarControllerDemo-Swift.h"
 
 #if CYL_FLATDESIGN_AVAILABLE
 @interface CYLFlatDesignTabBarDemoViewController ()<UITableViewDelegate, UITableViewDataSource, CYLFlatDesignTabBarDelegate>
@@ -62,6 +63,9 @@
     [super viewDidLoad];
     self.view.backgroundColor = UIColor.systemGroupedBackgroundColor; // [EN] The grouped background, so the rounded sections stand out. [CN] 分组背景色，使圆角分组清晰可见。
     [self initSubviews];
+    // [EN] Pull to refresh, empty / no-network placeholders and the offline red bar (CYLTableViewPlaceHolder).
+    // [CN] 下拉刷新、无数据 / 无网络占位图与断网红条（CYLTableViewPlaceHolder）。
+    [CYLDemoPlaceholder installOnScrollView:_tableView viewController:self refresh:nil];
 }
 
 - (void)initSubviews {

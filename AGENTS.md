@@ -229,6 +229,24 @@ of CYLTabBarController**, which can sit on any branch, not only `master` or `mai
 4. Say in the reply which commit (sha, date, branch) a build used. If the commit cannot be fetched (offline), say so and
    do not guess: keep the sha already in the Podfile and report that it may not be the latest.
 
+### Depending on CYLTableViewPlaceHolder (every example)
+
+Every example, existing and new, also integrates **CYLTableViewPlaceHolder** through CocoaPods at its **latest commit on
+any branch**, found by commit timestamp before every build, exactly as for CYLTabBarController above:
+`CYL_REPO_URL=https://github.com/ChenYilong/CYLTableViewPlaceHolder.git CYL_COMMIT_CACHE=$TMPDIR/cyl-placeholder-latest.git scripts/latest-cyl-commit.sh --sha`,
+then `pod 'CYLTableViewPlaceHolder', :git => 'https://github.com/ChenYilong/CYLTableViewPlaceHolder.git', :commit => '<sha>'`
+(with the `LottieSwift` subspec for animated placeholders, the same `:git` and `:commit`). Never a version, a branch or
+a tag. Then, in the iOS examples:
+- **Every scroll view** (table, collection, plain `UIScrollView`) supports pull to refresh (`cyl_header`, e.g.
+  `CYLRefreshNormalHeader`) and shows a placeholder when it has no data (`cyl_placeholderViewBlock:`), a no-network
+  placeholder when the device is offline, and a red bar at the top while offline. Prefer animated icons (the Lottie
+  files in `CYLTableViewPlaceHolder.bundle/Animations/`). Follow the scenario example of CYLTableViewPlaceHolder
+  (`Examples/Example-Scenarios`) for the code.
+- **No MJRefresh.** Its pod is not used; its API maps to CYLTableViewPlaceHolder's refresh component by renaming
+  `mj_` to `cyl_` and the `MJRefresh` class prefix to `CYLRefresh`.
+- A build error that CYLTableViewPlaceHolder causes is not worked around silently: it is listed with its cause in
+  `docs/CYLTableViewPlaceHolder-Integration-Issues.md`, so it can be fixed in that library.
+
 ### How the examples set CYLTabBarController up (the default)
 
 Unless a task says otherwise, every CYLTabBarController in the example layer is integrated the same way:

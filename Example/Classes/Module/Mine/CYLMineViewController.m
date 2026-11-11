@@ -11,8 +11,9 @@
 #import <CYLTabBarController/UITableViewCell+CYLBadgeExtention.h>
 #import <CYLTabBarController/UIViewController+CYLSettingsSection.h>
 #import "CYLDetailsViewController.h"
-#import <MJRefresh/MJRefresh.h>
+#import <CYLTableViewPlaceHolder/CYLTableViewPlaceHolder.h>
 #import "CYLDemoLocalization.h"
+#import "CYLTabBarControllerDemo-Swift.h"
 
 @implementation CYLMineViewController
 
@@ -60,11 +61,11 @@
     }
 
     __weak __typeof(self) weakSelf = self;
-    self.tableView.mj_header =
-    [MJRefreshNormalHeader headerWithRefreshingBlock:^{
+    self.tableView.cyl_header =
+    [CYLRefreshNormalHeader headerWithRefreshingBlock:^{
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)),
                        dispatch_get_main_queue(), ^{
-            [weakSelf.tableView.mj_header endRefreshing];
+            [weakSelf.tableView.cyl_header endRefreshing];
         });
     }];
     if (@available(iOS 13.0, *)) {
@@ -72,15 +73,18 @@
         // [EN] Triggers a dark mode switch, which relayouts the tabBar; useful for testing common tabBar layout bugs
         self.overrideUserInterfaceStyle = UIUserInterfaceStyleDark;
     }
+    // [EN] Pull to refresh, empty / no-network placeholders and the offline red bar (CYLTableViewPlaceHolder).
+    // [CN] 下拉刷新、无数据 / 无网络占位图与断网红条（CYLTableViewPlaceHolder）。
+    [CYLDemoPlaceholder installOnScrollView:self.tableView viewController:self refresh:nil];
 }
 
 
 - (void)refresh {
-    [self.tableView.mj_header beginRefreshing];
+    [self.tableView.cyl_header beginRefreshing];
     NSTimeInterval delaySeconds = 1;
     dispatch_time_t when = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delaySeconds * NSEC_PER_SEC));
     dispatch_after(when, dispatch_get_main_queue(), ^{
-        [self.tableView.mj_header endRefreshing];
+        [self.tableView.cyl_header endRefreshing];
     });
 }
 #pragma mark - Methods
