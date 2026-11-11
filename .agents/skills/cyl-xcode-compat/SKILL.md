@@ -8,6 +8,9 @@ description: "Xcode and iOS version compatibility of CYLTabBarController: projec
 CI vs local: GitHub CI/CD for iOS runs on macOS 26 by default (read `.github/workflows/ios.yml` on master first; the
 `MACOS_RUNNER` variable can change it), so CI builds with that runner's Xcode. Locally (directly on this Mac, not through
 GitHub CI/CD) the default is macOS 27 with Xcode 27. AGENTS.md, "CI/CD and where tests run".
+Before every local build, check the first line of `.github/workflows/ios.yml`, the local environment comment
+(`# local-run-environment: macOS …, Xcode …`): run `scripts/local-run-environment.sh`, which adds it when missing, leaves it
+when the versions are unchanged and rewrites it when macOS or Xcode differs (Xcode of `/Applications/Xcode.app`).
 
 
 Source of truth: code, then `docs/`, then `README.md`. If they disagree, fix the wrong one first (usually `README.md`), then this skill.

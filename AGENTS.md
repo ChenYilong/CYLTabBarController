@@ -274,6 +274,13 @@ The root `Podfile` is the reference: it already has the top lines and the hook.
 - **Running locally ignores that limit.** "Local" means not going through GitHub CI/CD but testing directly on this Mac:
   the default local system is **macOS 27**, with **Xcode 27** (`/Applications/Xcode.app`, never Xcode-beta) and its
   simulators, which you can run directly (`xcrun simctl`, `scripts/unit-tests.sh`, the scripts under `scripts/`).
+- **Before every local build, check the local environment comment** at the top of
+  [`.github/workflows/ios.yml`](.github/workflows/ios.yml) (read that file first, as above): its first line records the local
+  run environment, e.g. `# local-run-environment: macOS 27.3 (26C5035r), Xcode 27.2 (27B52)`. The local environment is
+  agreed to stay the same: add the comment when it is missing, leave it when macOS and Xcode are unchanged, and rewrite it
+  when either version differs. `scripts/local-run-environment.sh` does exactly that (`--check` only reports); it reads the
+  Xcode of `/Applications/Xcode.app`, not the `xcode-select` default (which may be a beta). Commit a changed comment with
+  the work it belongs to.
 - Say in the report where a check ran: GitHub CI (which runner) or locally (macOS and Xcode version).
 
 ## Git and pull requests

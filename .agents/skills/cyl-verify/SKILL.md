@@ -29,6 +29,10 @@ through GitHub CI/CD, directly on this Mac) ignores that limit: the default loca
 and its simulators. Name the environment (runner, or local macOS and Xcode versions) in every report. AGENTS.md,
 "CI/CD and where tests run".
 
+Before every local build, check the first line of `.github/workflows/ios.yml`, the local environment comment
+(`# local-run-environment: macOS …, Xcode …`): run `scripts/local-run-environment.sh`, which adds it when missing, leaves it
+when the versions are unchanged and rewrites it when macOS or Xcode differs (Xcode of `/Applications/Xcode.app`).
+
 ## Commands
 
 ```sh
