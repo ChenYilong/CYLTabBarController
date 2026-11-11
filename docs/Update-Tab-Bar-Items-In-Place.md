@@ -41,7 +41,7 @@
 | [截图](#截图--screenshots) | [Screenshots](#截图--screenshots) |
 | [角标](#角标--badges) | [Badges](#角标--badges) |
 | [限制](#限制--limits) | [Limits](#限制--limits) |
-| [TODO](#todo) | [TODO](#todo) |
+| [状态](#状态--status) | [Status](#状态--status) |
 
 <!-- navigation:end -->
 
@@ -314,11 +314,11 @@ val title = cyl_tabBarItemTitle               // the current tab title 当前的
 | 替换页面会重新设置 TabBar：直接添加到 Tab 按钮上的视图（如封面、角标）需要在新按钮创建后重新添加，例如在 `-performWhenTabBarItemsReady:` 中。 | Replacing a page sets the tab bar up again: views added to the tab buttons yourself (covers, badges) must be added again to the new buttons, e.g. in `-performWhenTabBarItemsReady:`. |
 | 本次在 iOS 26.5 模拟器上验证了液态玻璃与扁平样式；经典样式（iOS 25 及更早）未在本次重新运行。 | Verified this time on the iOS 26.5 simulator with Liquid Glass and FlatDesign; the classic style (iOS 25 and earlier) was not run again this time. |
 
-## TODO
+## 状态 / Status
 
 | 中文 | English |
 |:---|:---|
 | 状态（2026-11-09）：iOS 上的标题、导航栏标题跟随与通知已完成，并经单元测试与 iOS 26.1 模拟器验证（含 PlusButton 页面）。 | Status (2026-11-09): titles, following navigation titles and notifications are done on iOS, verified by unit tests and on the iOS 26.1 simulator (the plus button's page included). |
 | DONE（2026-11-09）：原地更换标题后，液态玻璃下 VoiceOver 曾读出旧标题。现在读出新标题，恢复后读出原标题，见 [Tab 的无障碍](Tab-Accessibility.md)（`axe describe-ui` 验证，三个单元测试）。 | DONE (2026-11-09): after an in-place title change on Liquid Glass, VoiceOver used to read the old titles. It now reads the new ones, and the original ones after restoring; see [Tab accessibility](Tab-Accessibility.md) (checked with `axe describe-ui`, three unit tests). |
-| 已知缺陷：批量更换标题后，「附近」角标中的「8」字体变小。 | Known defect: after "Change all titles", the "8" in the Nearby badge is drawn in a smaller font. |
+| 已核实，不是缺陷（2026-11-12）：「批量更换标题」后「附近」角标中的「8」看起来变小，是因为 ObjC 示例给它设置了一直循环的缩放动画（`CYLBadgeAnimationTypeScale`，「Scale (forever)」），截图恰好截到缩小的一帧。单元测试 `testABadgeKeepsItsFontWhenTheTitlesChangeInPlace`（iOS 26.1 模拟器）：没有动画的角标在原地修改所有标题后字体不变、没有缩放；带缩放动画的角标修改后仍在播放动画、字体不变。 | Checked, not a defect (2026-11-12): after "Change all titles" the "8" in the Nearby badge looked smaller because the ObjC example gives it a scale animation that loops forever (`CYLBadgeAnimationTypeScale`, "Scale (forever)"), and the screenshot caught a small frame. Unit test `testABadgeKeepsItsFontWhenTheTitlesChangeInPlace` (iOS 26.1 simulator): a badge without animation keeps its font and is not scaled after every title changes in place; a badge with the scale animation still animates afterwards, with the same font. |
 | DONE（2026-11-09）：Android 提供跟随的标题与 Tab 变化通知，事件与参数与 iOS 相同，见 [Android](#android)（Robolectric 测试 `CYLTabChangeNotificationsTest`、模拟器验证）。 | DONE (2026-11-09): Android has the following titles and the tab change notifications, with the same events and parameters as iOS; see [Android](#android) (Robolectric `CYLTabChangeNotificationsTest`, checked on an emulator). |

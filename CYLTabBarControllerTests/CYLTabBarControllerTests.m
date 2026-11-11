@@ -173,6 +173,83 @@
     XCTAssertEqual(iconNotes.firstObject.userInfo[CYLTabBarItemChangedAttributesKey][CYLTabBarItemImage], image);
 }
 
+/// [EN] A badge keeps its font when every title changes in place ("Change all titles" in the ObjC example).
+/// [CN] 原地修改所有标题后，角标字体保持不变（ObjC 示例的「批量更换标题」）。
+- (void)testABadgeKeepsItsFontWhenTheTitlesChangeInPlace {
+    CYLTabBarController *tabBarController = [[CYLTabBarController alloc] initWithViewControllers:@[ [UIViewController new], [UIViewController new], [UIViewController new] ]
+                                                                           tabBarItemsAttributes:@[ @{ CYLTabBarItemTitle : @"Home", CYLTabBarItemImage : [UIImage systemImageNamed:@"house"] },
+                                                                                                    @{ CYLTabBarItemTitle : @"Nearby", CYLTabBarItemImage : [UIImage systemImageNamed:@"map"] },
+                                                                                                    @{ CYLTabBarItemTitle : @"Me", CYLTabBarItemImage : [UIImage systemImageNamed:@"person"] } ]];
+    UIWindow *window = [[UIWindow alloc] initWithFrame:CGRectMake(0, 0, 402, 874)];
+    window.rootViewController = tabBarController;
+    window.hidden = NO;
+    void (^layOut)(void) = ^{
+        for (NSUInteger pass = 0; pass < 4; pass++) {
+            [tabBarController.tabBar setNeedsLayout];
+            [tabBarController.view layoutIfNeeded];
+            [[NSRunLoop mainRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.2]];
+        }
+    };
+    layOut();
+    [tabBarController.viewControllers[1].tabBarItem cyl_showBadgeValue:@"8" animationType:CYLBadgeAnimationTypeNone];
+    layOut();
+    NSArray<UILabel *> * (^badgeLabels)(void) = ^NSArray<UILabel *> * {
+        NSMutableArray<UILabel *> *labels = [NSMutableArray array];
+        NSMutableArray<UIView *> *queue = [NSMutableArray arrayWithObject:tabBarController.tabBar];
+        while (queue.count) {
+            UIView *view = queue.firstObject;
+            [queue removeObjectAtIndex:0];
+            if ([view isKindOfClass:[UILabel class]] && [((UILabel *)view).text isEqualToString:@"8"]) {
+                [labels addObject:(UILabel *)view];
+            }
+            [queue addObjectsFromArray:view.subviews];
+        }
+        return labels;
+    };
+    NSArray<UILabel *> *before = badgeLabels();
+    XCTAssertGreaterThan(before.count, 0u, @"the badge is shown");
+    NSMutableArray<UIFont *> *fontsBefore = [NSMutableArray array];
+    for (UILabel *label in before) {
+        [fontsBefore addObject:label.font];
+    }
+    [tabBarController updateTabBarItemsWithAttributes:@[ @{ CYLTabBarItemTitle : @"★ Home" }, @{ CYLTabBarItemTitle : @"★ Nearby" }, @{ CYLTabBarItemTitle : @"★ Me" } ]];
+    layOut();
+    NSArray<UILabel *> *after = badgeLabels();
+    XCTAssertEqual(after.count, before.count);
+    for (NSUInteger index = 0; index < MIN(after.count, fontsBefore.count); index++) {
+        XCTAssertEqualObjects(after[index].font, fontsBefore[index], @"badge %@ keeps its font", @(index));
+        XCTAssertTrue(CGAffineTransformIsIdentity(after[index].transform), @"badge %@ is not scaled", @(index));
+    }
+    // [EN] The ObjC example's "8" pulses forever (`CYLBadgeAnimationTypeScale`): after the change it still pulses and keeps
+    //      its font, rather than stopping at a small size. [CN] ObjC 示例中的「8」一直缩放（`CYLBadgeAnimationTypeScale`）：修改后
+    //      仍在缩放、字体不变，而不是停在较小的尺寸。
+    [tabBarController.viewControllers[2].tabBarItem cyl_showBadgeValue:@"8" animationType:CYLBadgeAnimationTypeScale];
+    layOut();
+    NSArray<UILabel *> *pulsing = [badgeLabels() filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(UILabel *label, NSDictionary *bindings) {
+        for (CALayer *layer = label.layer; layer; layer = layer.superlayer) {
+            if (layer.animationKeys.count > 0) {
+                return YES;
+            }
+        }
+        return NO;
+    }]];
+    XCTAssertGreaterThan(pulsing.count, 0u, @"the scale badge animates");
+    UIFont *pulsingFont = pulsing.firstObject.font;
+    [tabBarController updateTabBarItemsWithAttributes:@[ @{ CYLTabBarItemTitle : @"Home" }, @{ CYLTabBarItemTitle : @"Nearby" }, @{ CYLTabBarItemTitle : @"Me" } ]];
+    layOut();
+    NSUInteger stillPulsing = 0;
+    for (UILabel *label in badgeLabels()) {
+        for (CALayer *layer = label.layer; layer; layer = layer.superlayer) {
+            if (layer.animationKeys.count > 0) {
+                stillPulsing++;
+                XCTAssertEqualObjects(label.font, pulsingFont, @"the pulsing badge keeps its font");
+                break;
+            }
+        }
+    }
+    XCTAssertGreaterThan(stillPulsing, 0u, @"the scale badge still animates after the titles changed");
+}
+
 /// [EN] VoiceOver reads a tab's new title after an in-place change, and a label the app set on the tab item is kept.
 /// [CN] 原地修改标题后 VoiceOver 读出新标题，App 自己给 TabBarItem 设置的 label 保持不变。
 - (void)testTabAccessibilityLabelsFollowTitlesAndKeepTheAppsLabels {

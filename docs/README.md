@@ -207,6 +207,7 @@ docs/
 │   ├── login-required-tabs-react-native-android-alert.png
 │   ├── more-editing-done-star-comes-back-liquid-glass-ios.png
 │   ├── more-tab-eight-tabs-liquid-glass-ios.png
+│   ├── objc-demo-classic-ios17.png
 │   ├── pag-animation-tab-icons.png
 │   ├── pag-animation-test-list.png
 │   ├── pag-classic.png
