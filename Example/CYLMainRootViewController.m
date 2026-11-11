@@ -15,7 +15,7 @@
 #import "CYLSameCityViewController.h"
 #import "CYLMessageViewController.h"
 #import "CYLMineViewController.h"
-#import "CYLPlusDemoChildViewController.h"
+#import "CYLTabBarControllerDemo-Swift.h"
 #import "CYLDemoLocalization.h"
 
 @interface CYLMainRootViewController ()
