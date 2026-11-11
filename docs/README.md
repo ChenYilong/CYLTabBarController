@@ -210,6 +210,7 @@ docs/
 │   ├── pag-liquid-glass.png
 │   ├── per-tab-animation-pag-ios.png
 │   ├── plus-button-long-titles-liquid-glass-ios.png
+│   ├── plus-button-titles-fit-liquid-glass-ios.png
 │   ├── plus-child-theme-switching.png
 │   ├── plusbutton-background-image-liquid-glass-selected.png
 │   ├── plusbutton-background-image-liquid-glass-swiftui.png

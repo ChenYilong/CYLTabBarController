@@ -529,6 +529,69 @@
     window.hidden = YES;
 }
 
+/// [EN] FIX: the title width limit cut titles that fit ("Ne…" for "Nearby"): it measured them with the 17 pt font of an
+///      image-only tab's empty label. While the tab buttons stay evenly spread nothing is cut; when a title does widen its
+///      button ("Messages"), only that title is cut, and the titles that fit ("Nearby", "Me") stay whole.
+/// [CN] FIX：标题宽度限制截断了放得下的标题（「Nearby」显示为「Ne…」）：它用只有图片的 Tab 的空标签的 17 pt 字体测量标题。Tab 按钮
+///      均匀分布时不截断；某个标题确实使按钮变宽时（「Messages」），只截断该标题，放得下的标题（「Nearby」「Me」）保持完整。
+- (void)testTitlesThatFitAreNotCut {
+    NSArray<NSString *> *titles = @[ @"", @"Nearby", @"Chat", @"Me" ];
+    NSMutableArray<NSDictionary *> *tabs = [NSMutableArray array];
+    for (NSString *name in titles) {
+        NSMutableDictionary *tab = [@{ CYLTabBarItemIdentifier : [NSUUID UUID].UUIDString, CYLTabBarItemImage : [UIImage systemImageNamed:@"house"] } mutableCopy];
+        if (name.length > 0) {
+            tab[CYLTabBarItemTitle] = name;
+        }
+        [tabs addObject:tab];
+    }
+    CYLTabBarController *tabBarController = [CYLTabBarController tabBarControllerWithConfiguration:@{
+        CYLTabBarControllerContext : [NSUUID UUID].UUIDString,
+        CYLTabBarControllerTabBarItemsAttributes : tabs,
+        CYLTabBarControllerPageResolver : ^UIViewController *(NSString *pageIdentifier, NSDictionary *attributes) {
+            return [[UIViewController alloc] init];
+        },
+        CYLTabBarControllerPlusButton : @{ CYLTabBarItemTitle : @"Post", CYLTabBarItemImage : [UIImage systemImageNamed:@"plus.circle"] },
+    }];
+    UIWindow *window = [[UIWindow alloc] initWithFrame:CGRectMake(0, 0, 402, 874)];
+    window.rootViewController = tabBarController;
+    window.hidden = NO;
+    void (^layOut)(void) = ^{
+        for (NSUInteger pass = 0; pass < 3; pass++) {
+            [tabBarController.tabBar setNeedsLayout];
+            [tabBarController.view layoutIfNeeded];
+            [[NSRunLoop mainRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.2]];
+        }
+    };
+    NSArray<UITabBarItem *> * (^tabItems)(void) = ^NSArray<UITabBarItem *> *{
+        NSMutableArray<UITabBarItem *> *items = [NSMutableArray array];
+        for (UIViewController *viewController in tabBarController.viewControllers) {
+            if (!viewController.cyl_isPlaceholder) {
+                [items addObject:viewController.tabBarItem];
+            }
+        }
+        return items;
+    };
+    layOut();
+    XCTAssertTrue([tabBarController hasPlusButton]);
+    XCTAssertEqualObjects(tabItems()[1].title, @"Nearby", @"evenly spread: nothing is cut");
+    XCTAssertEqualObjects(tabItems()[2].title, @"Chat");
+    // [EN] The empty label of the image-only tab with the larger font seen in the demo (17 pt, iOS 26.1).
+    // [CN] 只有图片的 Tab 的空标签使用示例中出现的较大字体（iOS 26.1 上为 17 pt）。
+    for (UIControl *tabButton in [(CYLTabBar *)tabBarController.tabBar tabBarButtonArray]) {
+        UILabel *label = tabButton.cyl_tabLabel;
+        if (label && label.text.length == 0) {
+            label.font = [UIFont systemFontOfSize:17];
+        }
+    }
+    tabItems()[2].title = @"Messages";
+    layOut();
+    XCTAssertEqualObjects(tabItems()[1].title, @"Nearby", @"a title that fits stays whole");
+    XCTAssertEqualObjects(tabItems()[3].title, @"Me");
+    NSString *cut = tabItems()[2].title;
+    XCTAssertTrue([cut hasPrefix:@"Mess"] && [cut hasSuffix:@"…"], @"only the title that widened its button is cut: %@", cut);
+    window.hidden = YES;
+}
+
 /// [EN] FIX: more than five tabs on the classic style / Liquid Glass showed the first five and no "More". With eight tabs
 ///      UIKit's "More" tab is there and a later tab can be selected; five tabs are unchanged; a plus button with eight
 ///      tabs does not crash.
