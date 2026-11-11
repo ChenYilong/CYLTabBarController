@@ -29,7 +29,9 @@ NS_ASSUME_NONNULL_BEGIN
  *      `imageNamed:` 相同。
  */
 
-/// [EN] `+[UIImage imageNamed:]`: cached by the system. [CN] `+[UIImage imageNamed:]`：由系统缓存。
+/*!
+ * [EN] `+[UIImage imageNamed:]`: cached by the system. [CN] `+[UIImage imageNamed:]`：由系统缓存。
+ */
 CG_INLINE UIImage *_Nullable CYLImageNamed(NSString *_Nullable imageName) {
     if (imageName.length == 0) {
         return nil;
@@ -53,13 +55,17 @@ CG_INLINE NSString *_Nullable CYLImagePathInBundle(NSBundle *_Nullable bundle, N
     return name ? [directory stringByAppendingPathComponent:name] : nil;
 }
 
-/// [EN] An image from `bundle`, not cached (`imageWithContentsOfFile:`). [CN] `bundle` 中的图片，不缓存（`imageWithContentsOfFile:`）。
+/*!
+ * [EN] An image from `bundle`, not cached (`imageWithContentsOfFile:`). [CN] `bundle` 中的图片，不缓存（`imageWithContentsOfFile:`）。
+ */
 CG_INLINE UIImage *_Nullable CYLImageInBundle(NSBundle *_Nullable bundle, NSString *_Nullable subfolderPath, NSString *fileName) {
     NSString *path = CYLImagePathInBundle(bundle, subfolderPath, fileName);
     return path ? [UIImage imageWithContentsOfFile:path] : nil;
 }
 
-/// [EN] The path of an image in a bundle of the main bundle, or nil. [CN] 主 bundle 中某个 bundle 内图片的路径，没有时为 nil。
+/*!
+ * [EN] The path of an image in a bundle of the main bundle, or nil. [CN] 主 bundle 中某个 bundle 内图片的路径，没有时为 nil。
+ */
 CG_INLINE NSString *_Nullable CYLBundleImagePath(NSString *_Nullable folderReferenceName,
                                                  NSString *bundleName,
                                                  NSString *_Nullable subfolderPath,
@@ -80,7 +86,9 @@ CG_INLINE NSString *_Nullable CYLBundleImagePath(NSString *_Nullable folderRefer
     return [bundlePath stringByAppendingPathComponent:name];
 }
 
-/// [EN] An image from a bundle, not cached (`imageWithContentsOfFile:`). [CN] bundle 中的图片，不缓存（`imageWithContentsOfFile:`）。
+/*!
+ * [EN] An image from a bundle, not cached (`imageWithContentsOfFile:`). [CN] bundle 中的图片，不缓存（`imageWithContentsOfFile:`）。
+ */
 CG_INLINE UIImage *_Nullable CYLBundleImage(NSString *_Nullable folderReferenceName,
                                             NSString *bundleName,
                                             NSString *_Nullable subfolderPath,
@@ -89,7 +97,9 @@ CG_INLINE UIImage *_Nullable CYLBundleImage(NSString *_Nullable folderReferenceN
     return path ? [UIImage imageWithContentsOfFile:path] : nil;
 }
 
-/// [EN] The data of an image file in a bundle. [CN] bundle 中图片文件的数据。
+/*!
+ * [EN] The data of an image file in a bundle. [CN] bundle 中图片文件的数据。
+ */
 CG_INLINE NSData *_Nullable CYLBundleImageData(NSString *_Nullable folderReferenceName,
                                                NSString *bundleName,
                                                NSString *_Nullable subfolderPath,

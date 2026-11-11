@@ -128,35 +128,49 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol CYLBadgeProtocol <NSObject>
 
 @required
-/** badge entity, which is adviced not to set manually */
+/*!
+ * badge entity, which is adviced not to set manually
+ */
 //@property (nonatomic, strong, getter=cyl_badge, setter=cyl_setBadge:) UIView __kindof *cyl_badge;
-/** `CYLBadgeAppearance.font` if not set, [UIFont boldSystemFontOfSize:9] by default */
+/*!
+ * `CYLBadgeAppearance.font` if not set, [UIFont boldSystemFontOfSize:9] by default
+ */
 /*!
  * [EN] nil goes back to `[CYLBadgeAppearance globalAppearance]` (null_resettable). [CN] 设为 nil 时恢复为 `[CYLBadgeAppearance globalAppearance]` 的值（null_resettable）。
  */
 @property (nonatomic, strong, null_resettable, getter=cyl_badgeFont, setter=cyl_setBadgeFont:) UIFont *cyl_badgeFont;
-/** `CYLBadgeAppearance.backgroundColor` if not set, red by default */
+/*!
+ * `CYLBadgeAppearance.backgroundColor` if not set, red by default
+ */
 @property (nonatomic, strong, null_resettable, getter=cyl_badgeBackgroundColor, setter=cyl_setBadgeBackgroundColor:) UIColor *cyl_badgeBackgroundColor;
-/** `CYLBadgeAppearance.textColor` if not set, white by default */
+/*!
+ * `CYLBadgeAppearance.textColor` if not set, white by default
+ */
 @property (nonatomic, strong, null_resettable, getter=cyl_badgeTextColor, setter=cyl_setBadgeTextColor:) UIColor *cyl_badgeTextColor;
-/** we have optimized the badge frame and center. This property is adviced not to set manually */
+/*!
+ * we have optimized the badge frame and center. This property is adviced not to set manually
+ */
 @property (nonatomic, assign, getter=cyl_badgeFrame, setter=cyl_setBadgeFrame:) CGRect cyl_badgeFrame;
 
 @property (nonatomic, strong, getter=cyl_badgeFrameValue, setter=cyl_setBadgeFrameValue:) NSValue *cyl_badgeFrameValue;
 
-/** offset from right-top corner. `CYLBadgeAppearance.centerOffset` if not set, {0,0} by default
+/*! offset from right-top corner. `CYLBadgeAppearance.centerOffset` if not set, {0,0} by default
  For x, negative number means left offset
  For y, positive number means bottom offset (the center's y is the offset itself; the doc used to say the opposite)
  */
 @property (nonatomic, assign, getter=cyl_badgeCenterOffset, setter=cyl_setBadgeCenterOffset:) CGPoint cyl_badgeCenterOffset;
 @property (nonatomic, strong, getter=cyl_badgeCenterOffsetValue, setter=cyl_setBadgeCenterOffsetValue:) NSValue *cyl_badgeCenterOffsetValue;
 
-/** NOTE that this is not animation type of badge's appearing, nor  hidding*/
+/*!
+ * NOTE that this is not animation type of badge's appearing, nor  hidding
+ */
 @property (nonatomic, assign, getter=cyl_badgeAnimationType, setter=cyl_setBadgeAnimationType:) CYLBadgeAnimationType cyl_badgeAnimationType;
 
 @property (nonatomic, strong, getter=cyl_badgeAnimationTypeValue, setter=cyl_setBadgeAnimationTypeValue:) NSNumber *cyl_badgeAnimationTypeValue;
 
-/** for CYLBadgeStyleNumber style badge,if badge value is above badgeMaximumBadgeNumber, "badgeMaximumBadgeNumber+" will be printed. */
+/*!
+ * for CYLBadgeStyleNumber style badge,if badge value is above badgeMaximumBadgeNumber, "badgeMaximumBadgeNumber+" will be printed.
+ */
 @property (nonatomic, assign, getter=cyl_badgeMaximumBadgeNumber, setter=cyl_setBadgeMaximumBadgeNumber:) NSInteger cyl_badgeMaximumBadgeNumber;
 
 @property (nonatomic, strong, getter=cyl_badgeMaximumBadgeNumberValue, setter=cyl_setBadgeMaximumBadgeNumberValue:) NSNumber *cyl_badgeMaximumBadgeNumberValue;
@@ -165,7 +179,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, strong, getter=cyl_badgeRadiusValue, setter=cyl_setBadgeRadiusValue:) NSNumber *cyl_badgeRadiusValue;
 
-/** normal use for text and number style of badge, 8 by default*/
+/*!
+ * normal use for text and number style of badge, 8 by default
+ */
 @property (nonatomic, assign, getter=cyl_badgeMargin, setter=cyl_setBadgeMargin:) CGFloat cyl_badgeMargin;
 
 @property (nonatomic, strong, getter=cyl_badgeMarginValue, setter=cyl_setBadgeMarginValue:) NSNumber *cyl_badgeMarginValue;
@@ -176,14 +192,14 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, assign, getter=cyl_delayIfNeededForSeconds, setter=cyl_setDelayIfNeededForSeconds:) CGFloat cyl_delayIfNeededForSeconds;
 
-/**
+/*!
  *  @attention 展示红点，注意该方法是基于 UIViewController ，所以内部使用[self cyl_getViewControllerInsteadOfNavigationController] 以防止将红点展示在 UINavigationController上，而导致展示与隐藏红点不一致。
  * [EN] Returns YES if a badge is currently shown.
  * [CN] 判断当前是否正在显示角标。
  */
 - (BOOL)cyl_isShowBadge;
 
-/**
+/*!
  *  show badge with red dot style and CYLBadgeAnimationTypeNone by default.
  *  @attention 展示红点，注意该方法是基于 UIViewController ，所以内部使用[self cyl_getViewControllerInsteadOfNavigationController] 以防止将红点展示在 UINavigationController上，而导致展示与隐藏红点不一致。
  * [EN] Shows a red-dot badge with no animation.
@@ -191,7 +207,7 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)cyl_showBadge;
 
-/**
+/*!
  *
  *  @param value String value, default is `nil`. if value equal @"" means red dot style.
  *  @param animationType  animationType
@@ -206,7 +222,7 @@ NS_ASSUME_NONNULL_BEGIN
 //- (void)cyl_showBadgeValue:(NSString *)value
 //             animationTypeValue:(NSNumber *)animationTypeValue;
 
-/**
+/*!
  *  clear badge(hide badge)
  *  @attention 隐藏红点，注意该方法是基于 UIViewController ，所以内部使用[self cyl_getViewControllerInsteadOfNavigationController] 以防止将红点展示在 UINavigationController上，而导致展示与隐藏红点不一致。
  * [EN] Hides the badge.
@@ -214,7 +230,7 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)cyl_clearBadge;
 
-/**
+/*!
  *  make bage(if existing) not hiden
  * [EN] Shows the badge again if one exists and was hidden.
  * [CN] 若角标存在且被隐藏，则重新显示。

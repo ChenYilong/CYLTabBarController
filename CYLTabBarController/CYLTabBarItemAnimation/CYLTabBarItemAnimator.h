@@ -15,9 +15,13 @@ NS_ASSUME_NONNULL_BEGIN
  * [CN] animator 的查找顺序：数值大的优先；相同优先级按注册顺序。
  */
 typedef NSInteger CYLTabBarItemAnimatorPriority NS_TYPED_EXTENSIBLE_ENUM;
-/// [EN] An animator that recognizes its own files (the default). [CN] 只识别自己文件类型的 animator（默认）。
+/*!
+ * [EN] An animator that recognizes its own files (the default). [CN] 只识别自己文件类型的 animator（默认）。
+ */
 static const CYLTabBarItemAnimatorPriority CYLTabBarItemAnimatorPriorityDefault = 0;
-/// [EN] An animator that takes any file no other animator takes (Lottie). [CN] 接收其他 animator 都不处理的文件的 animator（Lottie）。
+/*!
+ * [EN] An animator that takes any file no other animator takes (Lottie). [CN] 接收其他 animator 都不处理的文件的 animator（Lottie）。
+ */
 static const CYLTabBarItemAnimatorPriority CYLTabBarItemAnimatorPriorityFallback = -1000;
 
 /*!

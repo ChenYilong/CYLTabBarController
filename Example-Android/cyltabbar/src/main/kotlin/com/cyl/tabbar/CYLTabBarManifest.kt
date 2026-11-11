@@ -23,26 +23,38 @@ import java.util.Locale
  *      `assets.list` 中查找：每张图片由版本、主题、Tab 与状态唯一确定。
  */
 class CYLTabBarManifest private constructor(
-    /** [EN] The manifest after the overrides of its matching conditions. [CN] 合并成立条件覆盖项后的清单。 */
+    /**
+     * [EN] The manifest after the overrides of its matching conditions. [CN] 合并成立条件覆盖项后的清单。
+     */
     val dictionary: Map<String, Any?>,
-    /** [EN] Where relative routes start: a folder, or "asset:<folder>". [CN] 相对路由的起点：目录或 "asset:<目录>"。 */
+    /**
+     * [EN] Where relative routes start: a folder, or "asset:<folder>". [CN] 相对路由的起点：目录或 "asset:<目录>"。
+     */
     val baseDirectory: String?,
     private val context: Context,
 ) {
-    /** [EN] Where an applied manifest came from. [CN] 已生效清单的来源。 */
+    /**
+     * [EN] Where an applied manifest came from. [CN] 已生效清单的来源。
+     */
     enum class CYLTabBarManifestSource { None, Remote, Cache, Embedded }
 
     val identifier: String? get() = string(dictionary, "id")
     val version: String? get() = string(dictionary, "version")
 
     companion object {
-        /** [EN] The manifest format this library reads. [CN] 本库读取的清单格式版本。 */
+        /**
+         * [EN] The manifest format this library reads. [CN] 本库读取的清单格式版本。
+         */
         const val supportedSchemaVersion = 1
         private const val ASSET_NAME_PREFIX = "cyl.asset."
-        /** [EN] The scheme of an asset reference ("asset:home?state=selected"). [CN] 资源引用的 scheme。 */
+        /**
+         * [EN] The scheme of an asset reference ("asset:home?state=selected"). [CN] 资源引用的 scheme。
+         */
         private const val ASSET_REFERENCE_PREFIX = "asset:"
 
-        /** [EN] A manifest from a dictionary; `UnsupportedManifest` when it is not one. [CN] 由字典创建清单；不是清单时抛出 `UnsupportedManifest`。 */
+        /**
+         * [EN] A manifest from a dictionary; `UnsupportedManifest` when it is not one. [CN] 由字典创建清单；不是清单时抛出 `UnsupportedManifest`。
+         */
         @JvmStatic
         @Throws(CYLConfigurationException::class)
         fun manifestWithDictionary(context: Context, dictionary: Map<String, Any?>, baseDirectory: String?): CYLTabBarManifest {
@@ -66,7 +78,9 @@ class CYLTabBarManifest private constructor(
             return CYLTabBarManifest(merged, baseDirectory, context.applicationContext)
         }
 
-        /** [EN] A manifest from a resource route (docs/Resource-Routes.md). [CN] 由资源路由创建清单（docs/Resource-Routes.md）。 */
+        /**
+         * [EN] A manifest from a resource route (docs/Resource-Routes.md). [CN] 由资源路由创建清单（docs/Resource-Routes.md）。
+         */
         @JvmStatic
         @Throws(CYLConfigurationException::class)
         fun manifestWithRoute(context: Context, route: String): CYLTabBarManifest {
@@ -90,7 +104,9 @@ class CYLTabBarManifest private constructor(
             return merged
         }
 
-        /** [EN] "1.10.0" > "1.9": each number compared as a number, missing parts count as 0. [CN] 逐段按数值比较，缺少的段视为 0。 */
+        /**
+         * [EN] "1.10.0" > "1.9": each number compared as a number, missing parts count as 0. [CN] 逐段按数值比较，缺少的段视为 0。
+         */
         internal fun compareVersions(first: String, second: String): Int {
             val a = first.split('.')
             val b = second.split('.')
@@ -116,7 +132,9 @@ class CYLTabBarManifest private constructor(
             "0"
         }
 
-        /** [EN] "sha256-" and the Base64URL digest, without padding (Expo's asset hash). [CN] "sha256-" 加无填充的 Base64URL 摘要（Expo 的资源哈希）。 */
+        /**
+         * [EN] "sha256-" and the Base64URL digest, without padding (Expo's asset hash). [CN] "sha256-" 加无填充的 Base64URL 摘要（Expo 的资源哈希）。
+         */
         @JvmStatic
         fun hashOf(data: ByteArray): String {
             val digest = MessageDigest.getInstance("SHA-256").digest(data)
@@ -125,7 +143,9 @@ class CYLTabBarManifest private constructor(
         }
     }
 
-    /** [EN] Whether this app may use it (platforms, app versions, time window); the reason otherwise. [CN] 本 App 能否使用（平台、App 版本、时间段）；否则给出原因。 */
+    /**
+     * [EN] Whether this app may use it (platforms, app versions, time window); the reason otherwise. [CN] 本 App 能否使用（平台、App 版本、时间段）；否则给出原因。
+     */
     fun eligibilityError(nowMillis: Long = System.currentTimeMillis()): CYLConfigurationException? {
         val runtime = dictionary["runtime"] as? Map<*, *>
         val app = appVersion(context)
@@ -146,7 +166,9 @@ class CYLTabBarManifest private constructor(
 
     fun isEligible(nowMillis: Long = System.currentTimeMillis()) = eligibilityError(nowMillis) == null
 
-    /** [EN] An ISO 8601 time ("2026-12-01T00:00:00Z", "+08:00"); java.time needs API 26. [CN] ISO 8601 时间；java.time 需要 API 26。 */
+    /**
+     * [EN] An ISO 8601 time ("2026-12-01T00:00:00Z", "+08:00"); java.time needs API 26. [CN] ISO 8601 时间；java.time 需要 API 26。
+     */
     private fun isoMillis(text: String): Long? {
         val normalized = text.replace(Regex("Z$"), "+0000").replace(Regex("([+-]\\d{2}):(\\d{2})$"), "$1$2")
         return runCatching { java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.US).parse(normalized)?.time }.getOrNull()
@@ -161,7 +183,9 @@ class CYLTabBarManifest private constructor(
     internal fun assetEntries(): List<Map<*, *>> = ((dictionary["assets"] as? Map<*, *>)?.get("list") as? List<*>).orEmpty()
         .filterIsInstance<Map<*, *>>().filter { string(it, "key") != null && string(it, "path") != null && allowsAndroid(it["platforms"]) }
 
-    /** [EN] An entry's file or asset path inside the assets folder only ("../" cannot leave it). [CN] 资源项在资源目录内的路径（"../" 不能跳出）。 */
+    /**
+     * [EN] An entry's file or asset path inside the assets folder only ("../" cannot leave it). [CN] 资源项在资源目录内的路径（"../" 不能跳出）。
+     */
     internal fun pathOfEntry(entry: Map<*, *>): String? {
         val location = assetsLocation ?: return null
         val relative = string(entry, "path") ?: return null
@@ -220,7 +244,9 @@ class CYLTabBarManifest private constructor(
         return null
     }
 
-    /** [EN] The path an asset reference ("asset:home?state=selected") leads to. [CN] 资源引用对应的路径。 */
+    /**
+     * [EN] The path an asset reference ("asset:home?state=selected") leads to. [CN] 资源引用对应的路径。
+     */
     fun pathForAssetReference(reference: String): String? {
         if (!reference.startsWith(ASSET_REFERENCE_PREFIX)) return null
         val rest = reference.removePrefix(ASSET_REFERENCE_PREFIX)
@@ -229,7 +255,9 @@ class CYLTabBarManifest private constructor(
         return pathOfAsset(key, query["theme"], query["state"])
     }
 
-    /** [EN] Every asset exists and matches its `hash`; the first problem otherwise. [CN] 每个资源都存在并与其 `hash` 一致；否则给出第一个问题。 */
+    /**
+     * [EN] Every asset exists and matches its `hash`; the first problem otherwise. [CN] 每个资源都存在并与其 `hash` 一致；否则给出第一个问题。
+     */
     fun assetError(): CYLConfigurationException? {
         for (entry in assetEntries()) {
             val data = pathOfEntry(entry)?.let { read(it) }
@@ -247,7 +275,9 @@ class CYLTabBarManifest private constructor(
         return (list?.get(theme) as? Map<*, *>)?.get(name) ?: (list?.get(defaultTheme) as? Map<*, *>)?.get(name)
     }
 
-    /** [EN] An image value: an asset reference, a resource route, or an `@name` of the themes. [CN] 图片值：资源引用、资源路由或主题中的 `@名称`。 */
+    /**
+     * [EN] An image value: an asset reference, a resource route, or an `@name` of the themes. [CN] 图片值：资源引用、资源路由或主题中的 `@名称`。
+     */
     private fun imagePath(value: Any?, theme: String?): String? {
         val text = resolved(value, theme) as? String ?: return null
         if (text.isEmpty()) return null
@@ -259,7 +289,9 @@ class CYLTabBarManifest private constructor(
         return location.file?.takeIf { it.isFile }?.path ?: location.assetPath?.takeIf { exists(CYLResourceRoute.ASSET_PREFIX + it) }
     }
 
-    /** [EN] A path `CYLTabBarController` reads: a file path, or an asset name. [CN] `CYLTabBarController` 能读取的路径：文件路径或 asset 名称。 */
+    /**
+     * [EN] A path `CYLTabBarController` reads: a file path, or an asset name. [CN] `CYLTabBarController` 能读取的路径：文件路径或 asset 名称。
+     */
     private fun imageValue(path: String) = path.removePrefix(CYLResourceRoute.ASSET_PREFIX)
 
     private fun isForThisApp(item: Map<*, *>): Boolean {
@@ -325,7 +357,9 @@ class CYLTabBarManifest private constructor(
         return configuration
     }
 
-    /** [EN] The plus button's attributes from `tabBar.midButton`. [CN] 由 `tabBar.midButton` 得到的 PlusButton 属性。 */
+    /**
+     * [EN] The plus button's attributes from `tabBar.midButton`. [CN] 由 `tabBar.midButton` 得到的 PlusButton 属性。
+     */
     private fun plusButton(mid: Map<*, *>, defaultName: String?): Map<String, Any?> {
         val plus = linkedMapOf<String, Any?>(
             CYLConstants.CYLTabBarItemIdentifier to string(mid, "key"),
@@ -341,7 +375,9 @@ class CYLTabBarManifest private constructor(
         return plus.filterValues { it != null }
     }
 
-    /** [EN] The localization keys from `localization`. [CN] 由 `localization` 得到的本地化键。 */
+    /**
+     * [EN] The localization keys from `localization`. [CN] 由 `localization` 得到的本地化键。
+     */
     private fun localization(localization: Map<*, *>): Map<String, Any?> {
         val value = LinkedHashMap<String, Any?>()
         string(localization, "tableName")?.let { value[CYLConstants.CYLTabBarLocalizationTableName] = it }
@@ -354,7 +390,9 @@ class CYLTabBarManifest private constructor(
 
     private fun format(value: Double) = if (value == Math.floor(value)) value.toLong().toString() else value.toString()
 
-    /** [EN] A tab bar controller from [configuration]; `NoPages` when no tab finds its page. [CN] 由 [configuration] 创建 TabBarController；没有 Tab 找到页面时抛出 `NoPages`。 */
+    /**
+     * [EN] A tab bar controller from [configuration]; `NoPages` when no tab finds its page. [CN] 由 [configuration] 创建 TabBarController；没有 Tab 找到页面时抛出 `NoPages`。
+     */
     @Throws(CYLConfigurationException::class)
     fun tabBarController(activity: FragmentActivity): CYLTabBarController {
         val controller = CYLTabBarController.tabBarControllerWithConfiguration(activity, configuration())
@@ -362,7 +400,9 @@ class CYLTabBarManifest private constructor(
         return controller
     }
 
-    /** [EN] A copy whose assets are read from `folder` (a cached download). [CN] 从 `folder` 读取资源的副本（缓存的下载）。 */
+    /**
+     * [EN] A copy whose assets are read from `folder` (a cached download). [CN] 从 `folder` 读取资源的副本（缓存的下载）。
+     */
     internal fun cachedCopy(folder: File): CYLTabBarManifest {
         val assets = LinkedHashMap<String, Any?>()
         (dictionary["assets"] as? Map<*, *>)?.forEach { (key, value) -> if (key is String) assets[key] = value }
@@ -371,7 +411,9 @@ class CYLTabBarManifest private constructor(
     }
 }
 
-/** [EN] Firebase Remote Config's expression subset: device.os, app.version, device.language, percent. [CN] Firebase Remote Config 表达式的子集。 */
+/**
+ * [EN] Firebase Remote Config's expression subset: device.os, app.version, device.language, percent. [CN] Firebase Remote Config 表达式的子集。
+ */
 internal object CYLManifestConditions {
     private val comparison = Regex("""^(device\.os|app\.version|percent)\s*(==|!=|>=|<=|>|<)\s*(.+)$""")
     private val between = Regex("""^percent\s+between\s+(\d+)\s+and\s+(\d+)$""")
@@ -386,7 +428,9 @@ internal object CYLManifestConditions {
         "==" -> order == 0; "!=" -> order != 0; ">=" -> order >= 0; "<=" -> order <= 0; ">" -> order > 0; "<" -> order < 0; else -> false
     }
 
-    /** [EN] 0–99, the same for this install. [CN] 0–99，本次安装固定不变。 */
+    /**
+     * [EN] 0–99, the same for this install. [CN] 0–99，本次安装固定不变。
+     */
     private fun percentile(context: Context): Int {
         val preferences = context.getSharedPreferences("cyl_tabbar_manifest", Context.MODE_PRIVATE)
         if (!preferences.contains("percentile")) preferences.edit().putInt("percentile", java.security.SecureRandom().nextInt(100)).apply()
@@ -437,12 +481,16 @@ class CYLTabBarManifestLoader(context: Context) {
     private val context = context.applicationContext
     var delegate: Delegate? = null
     var embeddedManifestRoute: String? = null
-    /** [EN] The time the window is checked against (default: now; for tests). [CN] 检查时间段使用的时间（默认：现在；用于测试）。 */
+    /**
+     * [EN] The time the window is checked against (default: now; for tests). [CN] 检查时间段使用的时间（默认：现在；用于测试）。
+     */
     var nowMillis: Long? = null
 
     private val cacheDirectory get() = File(context.cacheDir, "CYLTabBarManifest")
 
-    /** [EN] The newest verified manifest in the cache. [CN] 缓存中最新的已验证清单。 */
+    /**
+     * [EN] The newest verified manifest in the cache. [CN] 缓存中最新的已验证清单。
+     */
     fun cachedManifest(): CYLTabBarManifest? {
         val versions = cacheDirectory.listFiles().orEmpty().filter { it.isDirectory && !it.name.endsWith(".download") }
             .sortedWith { a, b -> CYLTabBarManifest.compareVersions(b.name, a.name) }
@@ -456,7 +504,9 @@ class CYLTabBarManifestLoader(context: Context) {
         return null
     }
 
-    /** [EN] Loads `url` (http, https or file) on a background thread. [CN] 在后台线程加载 `url`（http、https 或 file）。 */
+    /**
+     * [EN] Loads `url` (http, https or file) on a background thread. [CN] 在后台线程加载 `url`（http、https 或 file）。
+     */
     fun loadManifestWithURL(url: String, completion: (CYLTabBarManifest?, CYLTabBarManifest.CYLTabBarManifestSource, CYLConfigurationException?) -> Unit) {
         Thread {
             var failed: Map<String, Any?>? = null
@@ -479,7 +529,9 @@ class CYLTabBarManifestLoader(context: Context) {
         }.start()
     }
 
-    /** [EN] Downloads every asset next to the manifest, keeps the folder only when all match (Expo). [CN] 下载清单旁边的每个资源，全部一致才保留目录（Expo）。 */
+    /**
+     * [EN] Downloads every asset next to the manifest, keeps the folder only when all match (Expo). [CN] 下载清单旁边的每个资源，全部一致才保留目录（Expo）。
+     */
     private fun save(manifest: CYLTabBarManifest, url: String): CYLTabBarManifest {
         val version = manifest.version ?: "0"
         if ('/' in version || ".." in version) throw CYLConfigurationException(CYLTabBarConfigurationError.UnsupportedManifest, "The manifest version is not a valid folder name.")

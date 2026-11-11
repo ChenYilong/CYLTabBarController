@@ -98,7 +98,9 @@ typedef void(^CYLTabBarDidLayoutSubViewsBlock)(CYLTabBar *tabBar);
  */
 @property (nonatomic, assign) UIEdgeInsets cyl_itemEdgeInsets;
 
-/** [CN] 发布按钮 */
+/*!
+ * [CN] 发布按钮
+ */
 /* [EN] Publish button */
 @property (nonatomic, strong, nullable) CYLPlusButton<CYLPlusButtonSubclassing> *plusButton;
 @property (nonatomic, assign) CGFloat tabBarItemWidth;

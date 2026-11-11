@@ -32,12 +32,16 @@ import kotlin.math.sin
  *      （Ramotion 的 animated-tab-bar，MIT）。
  */
 
-/** [EN] The default duration of the animations (0.5 s on iOS). [CN] 动画默认时长（iOS 为 0.5 秒）。 */
+/**
+ * [EN] The default duration of the animations (0.5 s on iOS). [CN] 动画默认时长（iOS 为 0.5 秒）。
+ */
 internal const val CYLTabButtonAnimationDuration = 0.5
 
 private fun View.dp(value: Float) = value * resources.displayMetrics.density
 
-/** [EN] A keyframe animation of `property` with evenly spaced `values` or the given `times`. [CN] `property` 的关键帧动画。 */
+/**
+ * [EN] A keyframe animation of `property` with evenly spaced `values` or the given `times`. [CN] `property` 的关键帧动画。
+ */
 private fun keyframes(target: View, property: String, values: FloatArray, times: FloatArray? = null, duration: Double = CYLTabButtonAnimationDuration): ObjectAnimator {
     val frames = values.mapIndexed { index, value -> Keyframe.ofFloat(times?.get(index) ?: (index.toFloat() / (values.size - 1)), value) }
     val holder = PropertyValuesHolder.ofKeyframe(property, *frames.toTypedArray())
@@ -47,7 +51,9 @@ private fun keyframes(target: View, property: String, values: FloatArray, times:
 private fun scaleKeyframes(target: View, values: FloatArray, times: FloatArray? = null, duration: Double = CYLTabButtonAnimationDuration): Animator =
     AnimatorSet().apply { playTogether(keyframes(target, "scaleX", values, times, duration), keyframes(target, "scaleY", values, times, duration)) }
 
-/** [EN] Tagged animators of a view, so a reset can cancel them (the iOS animation keys). [CN] 视图上带标签的动画，便于重置时取消（对应 iOS 的动画 key）。 */
+/**
+ * [EN] Tagged animators of a view, so a reset can cancel them (the iOS animation keys). [CN] 视图上带标签的动画，便于重置时取消（对应 iOS 的动画 key）。
+ */
 private val runningAnimators = java.util.WeakHashMap<View, MutableMap<String, Animator>>()
 
 private fun View.cyl_start(key: String, animator: Animator) {
@@ -63,7 +69,9 @@ private fun View.cyl_cancel(key: String) {
 
 // MARK: - Fireworks 烟花
 
-/** [EN] A round particle in `color` (the iOS dot image). [CN] `color` 颜色的圆点粒子（iOS 的圆点图片）。 */
+/**
+ * [EN] A round particle in `color` (the iOS dot image). [CN] `color` 颜色的圆点粒子（iOS 的圆点图片）。
+ */
 private class CYLDotDrawable(private val color: Int) : Drawable() {
     private val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = this@CYLDotDrawable.color }
     override fun draw(canvas: Canvas) {
@@ -113,9 +121,13 @@ internal fun CYLTabButtonPlayFireworks(view: View, image: Drawable?) {
 
 // MARK: - The animation classes 动画类
 
-/** [EN] Scale up then down: 1.0 → 1.5 → 0.8 → 1.0. [CN] 先放大再缩小：1.0 → 1.5 → 0.8 → 1.0。 */
+/**
+ * [EN] Scale up then down: 1.0 → 1.5 → 0.8 → 1.0. [CN] 先放大再缩小：1.0 → 1.5 → 0.8 → 1.0。
+ */
 open class CYLTabButtonScaleAnimation : CYLTabButtonAnimation {
-    /** [EN] Default 0.5 s. [CN] 默认 0.5 秒。 */
+    /**
+     * [EN] Default 0.5 s. [CN] 默认 0.5 秒。
+     */
     var duration: Double = CYLTabButtonAnimationDuration
 
     override fun cyl_playSelectAnimationWithTabButton(button: View, iconView: View, titleLabel: TextView?) {
@@ -123,9 +135,13 @@ open class CYLTabButtonScaleAnimation : CYLTabButtonAnimation {
     }
 }
 
-/** [EN] The icon grows from small to its size with a slight overshoot. [CN] 图标从小放大到原尺寸，略有回弹。 */
+/**
+ * [EN] The icon grows from small to its size with a slight overshoot. [CN] 图标从小放大到原尺寸，略有回弹。
+ */
 open class CYLTabButtonZoomInAnimation : CYLTabButtonAnimation {
-    /** [EN] Default 0.5 s. [CN] 默认 0.5 秒。 */
+    /**
+     * [EN] Default 0.5 s. [CN] 默认 0.5 秒。
+     */
     var duration: Double = CYLTabButtonAnimationDuration
 
     override fun cyl_playSelectAnimationWithTabButton(button: View, iconView: View, titleLabel: TextView?) {
@@ -133,11 +149,17 @@ open class CYLTabButtonZoomInAnimation : CYLTabButtonAnimation {
     }
 }
 
-/** [EN] Elastic bounce of the icon, optionally with fireworks. [CN] 图标弹性跳动，可选烟花。 */
+/**
+ * [EN] Elastic bounce of the icon, optionally with fireworks. [CN] 图标弹性跳动，可选烟花。
+ */
 open class CYLTabButtonBounceAnimation : CYLTabButtonAnimation {
-    /** [EN] Plays fireworks around the icon. Default false. [CN] 是否在图标周围播放烟花，默认 false。 */
+    /**
+     * [EN] Plays fireworks around the icon. Default false. [CN] 是否在图标周围播放烟花，默认 false。
+     */
     var playsFireworks: Boolean = false
-    /** [EN] The firework particle; null: a small dot in the icon's tint. [CN] 烟花粒子；null 时为图标着色的小圆点。 */
+    /**
+     * [EN] The firework particle; null: a small dot in the icon's tint. [CN] 烟花粒子；null 时为图标着色的小圆点。
+     */
     var fireworksImage: Drawable? = null
 
     override fun cyl_playSelectAnimationWithTabButton(button: View, iconView: View, titleLabel: TextView?) {
@@ -146,7 +168,9 @@ open class CYLTabButtonBounceAnimation : CYLTabButtonAnimation {
     }
 }
 
-/** [EN] One full turn of the icon. [CN] 图标旋转一圈。 */
+/**
+ * [EN] One full turn of the icon. [CN] 图标旋转一圈。
+ */
 open class CYLTabButtonRotationAnimation : CYLTabButtonAnimation {
     override fun cyl_playSelectAnimationWithTabButton(button: View, iconView: View, titleLabel: TextView?) {
         iconView.rotation = 0f
@@ -154,11 +178,15 @@ open class CYLTabButtonRotationAnimation : CYLTabButtonAnimation {
     }
 }
 
-/** [EN] The keys of the fume animation's running animators. [CN] 飘散动画正在运行的 animator 的键。 */
+/**
+ * [EN] The keys of the fume animation's running animators. [CN] 飘散动画正在运行的 animator 的键。
+ */
 private const val FUME_ICON = "fume.icon"
 private const val FUME_TITLE = "fume.title"
 
-/** [EN] The icon moves down while the title floats up and fades out; deselecting brings them back. [CN] 图标下移、标题上浮并淡出；取消选中时恢复。 */
+/**
+ * [EN] The icon moves down while the title floats up and fades out; deselecting brings them back. [CN] 图标下移、标题上浮并淡出；取消选中时恢复。
+ */
 open class CYLTabButtonFumeAnimation : CYLTabButtonAnimation {
     override fun cyl_playSelectAnimationWithTabButton(button: View, iconView: View, titleLabel: TextView?) {
         iconView.cyl_start(FUME_ICON, ObjectAnimator.ofFloat(iconView, "translationY", 0f, iconView.dp(4f)).setDuration((CYLTabButtonAnimationDuration / 2 * 1000).toLong()))
@@ -203,9 +231,13 @@ open class CYLTabButtonFumeAnimation : CYLTabButtonAnimation {
     }
 }
 
-/** [EN] The icon shrinks while pressed and springs back when the finger lifts; no select animation. [CN] 按下时图标缩小，抬起时弹回；没有选中动画。 */
+/**
+ * [EN] The icon shrinks while pressed and springs back when the finger lifts; no select animation. [CN] 按下时图标缩小，抬起时弹回；没有选中动画。
+ */
 open class CYLTabButtonPressAnimation : CYLTabButtonAnimation {
-    /** [EN] The icon's scale while pressed. Default 0.85. [CN] 按压时图标的缩放比例，默认 0.85。 */
+    /**
+     * [EN] The icon's scale while pressed. Default 0.85. [CN] 按压时图标的缩放比例，默认 0.85。
+     */
     var pressedScale: Float = 0.85f
 
     override fun cyl_playSelectAnimationWithTabButton(button: View, iconView: View, titleLabel: TextView?) {
@@ -224,9 +256,13 @@ open class CYLTabButtonPressAnimation : CYLTabButtonAnimation {
     }
 }
 
-/** [EN] The block type of `CYLTabButtonBlockAnimation`: the arguments of the protocol methods. [CN] `CYLTabButtonBlockAnimation` 的回调类型。 */
+/**
+ * [EN] The block type of `CYLTabButtonBlockAnimation`: the arguments of the protocol methods. [CN] `CYLTabButtonBlockAnimation` 的回调类型。
+ */
 typealias CYLTabButtonAnimationBlock = (button: View, iconView: View, titleLabel: TextView?) -> Unit
-/** [EN] The block type of `badgeChangedAnimation`. [CN] `badgeChangedAnimation` 的回调类型。 */
+/**
+ * [EN] The block type of `badgeChangedAnimation`. [CN] `badgeChangedAnimation` 的回调类型。
+ */
 typealias CYLTabButtonBadgeAnimationBlock = (button: View, iconView: View, badgeView: View?) -> Unit
 
 /**
@@ -249,7 +285,9 @@ open class CYLTabButtonBlockAnimation : CYLTabButtonAnimation {
     override fun cyl_playDehighlightAnimationWithTabButton(button: View, iconView: View, titleLabel: TextView?) { dehighlightAnimation?.invoke(button, iconView, titleLabel) }
     override fun cyl_playBadgeChangedAnimationWithTabButton(button: View, iconView: View, badgeView: View?) { badgeChangedAnimation?.invoke(button, iconView, badgeView) }
 
-    /** [EN] A method counts as implemented only while its block is set. [CN] 只有设置了 block 的方法才算已实现。 */
+    /**
+     * [EN] A method counts as implemented only while its block is set. [CN] 只有设置了 block 的方法才算已实现。
+     */
     override fun cyl_respondsToSelector(selector: String): Boolean = when (selector) {
         "cyl_playSelectAnimationWithTabButton" -> selectAnimation != null
         "cyl_playDeselectAnimationWithTabButton" -> deselectAnimation != null
@@ -268,7 +306,9 @@ open class CYLTabButtonBlockAnimation : CYLTabButtonAnimation {
  */
 open class CYLTabButtonFlipAnimation : CYLTabButtonAnimation {
     var direction: Int = 1
-    /** [EN] No animation when the button is deselected. Default false. [CN] 取消选中时不播放动画，默认 false。 */
+    /**
+     * [EN] No animation when the button is deselected. Default false. [CN] 取消选中时不播放动画，默认 false。
+     */
     var disablesDeselectAnimation: Boolean = false
 
     private fun clampedDirection() = direction.coerceIn(1, 6)
@@ -302,7 +342,9 @@ open class CYLTabButtonFlipAnimation : CYLTabButtonAnimation {
  */
 open class CYLTabButtonFrameAnimation : CYLTabButtonAnimation {
     var images: List<Drawable>? = null
-    /** [EN] Plays fireworks around the icon. Default false. [CN] 是否在图标周围播放烟花，默认 false。 */
+    /**
+     * [EN] Plays fireworks around the icon. Default false. [CN] 是否在图标周围播放烟花，默认 false。
+     */
     var playsFireworks: Boolean = false
     var fireworksImage: Drawable? = null
 
@@ -345,7 +387,9 @@ open class CYLTabButtonFrameAnimation : CYLTabButtonAnimation {
     }
 }
 
-/** [EN] The animation object of a `CYLTabButtonTapAnimationType` (iOS `CYLTabButtonAnimationForType`). [CN] 点击动画类型对应的动画对象。 */
+/**
+ * [EN] The animation object of a `CYLTabButtonTapAnimationType` (iOS `CYLTabButtonAnimationForType`). [CN] 点击动画类型对应的动画对象。
+ */
 internal fun CYLTabButtonAnimationForType(type: CYLEnums.CYLTabButtonTapAnimationType): CYLTabButtonAnimation? = when (type) {
     CYLEnums.CYLTabButtonTapAnimationType.Scale -> CYLTabButtonScaleAnimation()
     CYLEnums.CYLTabButtonTapAnimationType.ZoomIn -> CYLTabButtonZoomInAnimation()
@@ -358,7 +402,9 @@ internal fun CYLTabButtonAnimationForType(type: CYLEnums.CYLTabButtonTapAnimatio
     else -> null
 }
 
-/** [EN] The steps of a tap animation, with the names of their two spellings. [CN] 点击动画的步骤及其两种写法的方法名。 */
+/**
+ * [EN] The steps of a tap animation, with the names of their two spellings. [CN] 点击动画的步骤及其两种写法的方法名。
+ */
 internal enum class CYLTabButtonAnimationStep(val camelCase: String, val underscore: String) {
     Select("cylPlaySelectAnimationWithTabButton", "cyl_playSelectAnimationWithTabButton"),
     Deselect("cylPlayDeselectAnimationWithTabButton", "cyl_playDeselectAnimationWithTabButton"),
@@ -371,7 +417,9 @@ internal enum class CYLTabButtonAnimationStep(val camelCase: String, val undersc
 internal fun CYLTabButtonAnimation?.cyl_implements(step: CYLTabButtonAnimationStep): Boolean =
     this != null && (cyl_respondsToSelector(step.camelCase) || cyl_respondsToSelector(step.underscore))
 
-/** [EN] Plays `step`: the `cylPlay…` method when implemented, otherwise the `cyl_play…` one. [CN] 播放 `step`：实现了 `cylPlay…` 时调用它，否则调用 `cyl_play…`。 */
+/**
+ * [EN] Plays `step`: the `cylPlay…` method when implemented, otherwise the `cyl_play…` one. [CN] 播放 `step`：实现了 `cylPlay…` 时调用它，否则调用 `cyl_play…`。
+ */
 internal fun CYLTabButtonAnimation.cyl_play(step: CYLTabButtonAnimationStep, button: View, iconView: View, titleLabel: TextView?, badgeView: View? = null) {
     val camelCase = cyl_respondsToSelector(step.camelCase)
     if (!camelCase && !cyl_respondsToSelector(step.underscore)) return
@@ -389,7 +437,9 @@ internal fun CYLTabButtonAnimation.cyl_play(step: CYLTabButtonAnimationStep, but
 
 private val pageTabButtonAnimations = java.util.WeakHashMap<androidx.fragment.app.Fragment, CYLTabButtonAnimation>()
 
-/** [EN] `cyl_tabButtonAnimation`: the tap animation of this page's tab; takes precedence over the controller's. [CN] 本页面 Tab 的点击动画，优先于控制器的设置。 */
+/**
+ * [EN] `cyl_tabButtonAnimation`: the tap animation of this page's tab; takes precedence over the controller's. [CN] 本页面 Tab 的点击动画，优先于控制器的设置。
+ */
 var androidx.fragment.app.Fragment.cyl_tabButtonAnimation: CYLTabButtonAnimation?
     get() = pageTabButtonAnimations[this]
     set(value) { if (value == null) pageTabButtonAnimations.remove(this) else pageTabButtonAnimations[this] = value }

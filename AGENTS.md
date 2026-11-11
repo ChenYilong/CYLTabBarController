@@ -107,27 +107,32 @@ Every new feature and user-visible change ships with bilingual documentation in 
   - Sample apps follow it too: React Native and Flutter components, helpers and assets of the examples use `CYL`
     (`CYLBadgeView`, `cyl_badge_sample_icon`), unless the platform's own naming forbids it (e.g. Dart file names are
     snake_case: `cyl_badge_view.dart`).
-- **Comments on public API: one documentation block, never stacked single-line comments.** A caller reads a public
-  API's comment through the IDE's documentation (Xcode Quick Help, the generated Swift interface, Android Studio, editor
-  hovers), and only a documentation comment gets there whole. So a multi-line comment on a public declaration is one
-  documentation block:
-  - **iOS, Objective-C public headers**: `/*! … */`, one `*` per line (` * [EN] …`, ` * [CN] …`), right before the
-    declaration with nothing in between. Xcode shows it in Quick Help for Objective-C callers and in the Swift interface
-    generated from the header, so Swift callers see it too.   - **iOS, public API written in Swift**: `/** … */` or `///` lines (Swift Markup); Swift does not read `/*!` as
-    documentation.
-  - **Android (Kotlin / Java)**: KDoc / Javadoc `/** … */`.
-  - **React Native (TypeScript / JavaScript)**: TSDoc / JSDoc `/** … */`.
-  - **Flutter (Dart)**: `///` lines, the form Effective Dart requires for doc comments (not `/** */`).
-  **The same format applies to one-line comments on public API**, and a file with public API keeps one comment format
-  for all of it: in an Objective-C public header every comment on a declaration, an enum case or a trailing comment
-  after a declaration is a `/*! … */` block (a trailing comment moves into the declaration's block); in Kotlin / Java and
-  TypeScript every doc comment is `/** … */`; in Dart every doc comment is `///`. This holds for every platform and
-  language. Check the iOS public headers with `python3 scripts/check-public-api-comments.py` (`--fix` rewrites `//` /
-  `///` comments, one line or several, into a `/*! … */` block with the same text, merged into the declaration's existing
-  block when it has one).
+- **Comments on public API: one documentation block format, for one line or many.** A caller reads a public API's
+  comment through the IDE's documentation (Xcode Quick Help, the generated Swift interface, Android Studio, editor
+  hovers), and only a documentation comment gets there whole. **The official documentation rules of each language are
+  the reference**; within them:
+  - **One-line comments use the block format too.** A one-line comment on public API is written like a multi-line one:
+    three lines above the declaration (`/*!`, ` * text`, ` */` in Objective-C). Never `/*! text */` on one line, and
+    never a trailing comment after a declaration or an enum case (`/**< */`, `/*!< */`, `///<`, `//`).
+  - **One format per public file**, for short and long comments alike.
+  - **Every platform and language**, each in its documentation tool's block form:
+    - Objective-C public headers: `/*! … */` (HeaderDoc; Xcode shows it to Objective-C callers and in the Swift interface
+      generated from the header).
+    - Swift: `/** … */` (Swift Markup; Swift does not read `/*!` as documentation).
+    - Kotlin, Java, TypeScript, JavaScript: `/** … */` (KDoc, Javadoc, TSDoc / JSDoc).
+    - Python: a triple-quoted docstring on its own lines.
+    - Go: `/* … */`; C#: `/** … */` with XML tags; Rust: `/** … */`.
+    - A language without a block form uses its only documentation comment form in the whole file.
+    - Where a language's official rule names one form, that rule wins: Dart keeps `///` (Effective Dart requires it for
+      doc comments), and the official guides of Go (`//`), C# and Rust (`///`) prefer line comments; follow them in those
+      languages.
+  Check with `python3 scripts/check-public-api-comments.py` (iOS public headers, the Android library modules, the React
+  Native sources, the Flutter sources); `--fix` rewrites one-line blocks into three lines, `//` / `///` comments in
+  Objective-C headers into `/*! … */` blocks, and moves trailing comments above the declaration (merged into its existing
+  block when it has one, since a second block would hide the first).
 - **Comments are bilingual**: write `[EN]` / `[CN]` blocks; mark fixes with `FIX: issue #N`. A comment written in
   Chinese is tagged `[CN]` and is followed directly by its English translation tagged `[EN]`, in the same comment style
-  (`//`, `///`, or inside the same block comment; for a trailing comment, on the next line). Comments that only
+  (inside the same block comment on public API; `//` lines elsewhere). Comments that only
   contain a person's name, and commented-out code, need no translation.
 - **No Chinese text in code**: every string literal that contains Chinese, including log, assert and debug messages,
   goes through `CYLLocalizedString(@"<original Chinese text>")` (Swift: `CYLLocalizedString("...")`), with

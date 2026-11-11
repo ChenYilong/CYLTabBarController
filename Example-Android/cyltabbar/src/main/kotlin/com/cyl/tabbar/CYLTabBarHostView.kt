@@ -25,7 +25,9 @@ import org.json.JSONObject
 import java.net.URI
 import java.util.concurrent.Executors
 
-/** [EN] The page of every tab of a [CYLTabBarHostView]: the host draws the pages, so it is empty. [CN] [CYLTabBarHostView] 每个 Tab 的页面：页面由宿主绘制，因此为空。 */
+/**
+ * [EN] The page of every tab of a [CYLTabBarHostView]: the host draws the pages, so it is empty. [CN] [CYLTabBarHostView] 每个 Tab 的页面：页面由宿主绘制，因此为空。
+ */
 /**
  * [EN] The page of every tab of a host: an empty, transparent view, as the iOS host's pages, so a memory warning can unload
  *      it and selecting the tab loads it again (`CYLSimulateMemoryWarningReport`).
@@ -62,14 +64,18 @@ class CYLTabBarHostEmptyPage : Fragment() {
  */
 open class CYLTabBarHostView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) : FrameLayout(context, attrs) {
 
-    /** [EN] The configuration; setting it rebuilds the tab bar. [CN] 配置；设置后重新创建 TabBar。 */
+    /**
+     * [EN] The configuration; setting it rebuilds the tab bar. [CN] 配置；设置后重新创建 TabBar。
+     */
     var configuration: Map<String, Any?>? = null
         set(value) {
             field = value
             reloadConfiguration()
         }
 
-    /** [EN] Builds the controller again from `configuration` (images first). [CN] 由 `configuration` 重新创建控制器（先加载图片）。 */
+    /**
+     * [EN] Builds the controller again from `configuration` (images first). [CN] 由 `configuration` 重新创建控制器（先加载图片）。
+     */
     private fun reloadConfiguration() {
         generation++
         pendingConfiguration = null
@@ -77,34 +83,46 @@ open class CYLTabBarHostView @JvmOverloads constructor(context: Context, attrs: 
         if (current == null) removeController() else loadImages(current, generation)
     }
 
-    /** [EN] The activity that hosts the fragments; by default the one the view's context wraps. [CN] 承载 Fragment 的 Activity；默认为视图 context 所包装的 Activity。 */
+    /**
+     * [EN] The activity that hosts the fragments; by default the one the view's context wraps. [CN] 承载 Fragment 的 Activity；默认为视图 context 所包装的 Activity。
+     */
     var activityProvider: () -> FragmentActivity? = { findActivity(context) }
 
-    /** [EN] Turns an image value into a Drawable on a background thread; null lets the view handle it. [CN] 在后台线程把图片值转为 Drawable；返回 null 时由视图处理。 */
+    /**
+     * [EN] Turns an image value into a Drawable on a background thread; null lets the view handle it. [CN] 在后台线程把图片值转为 Drawable；返回 null 时由视图处理。
+     */
     var imageResolver: ((Any?) -> Drawable?)? = null
 
-    /** [EN] The selected tab, -1 to leave it to the user's taps. [CN] 选中的 Tab，-1 表示由用户点击决定。 */
+    /**
+     * [EN] The selected tab, -1 to leave it to the user's taps. [CN] 选中的 Tab，-1 表示由用户点击决定。
+     */
     var selectedIndex: Int = -1
         set(value) {
             field = value
             applySelectedIndex()
         }
 
-    /** [EN] A badge per tab: "" none, "dot" a red dot, anything else a text. [CN] 每个 Tab 一个角标：""无，"dot"红点，其他为文字。 */
+    /**
+     * [EN] A badge per tab: "" none, "dot" a red dot, anything else a text. [CN] 每个 Tab 一个角标：""无，"dot"红点，其他为文字。
+     */
     var badgeValues: List<String> = emptyList()
         set(value) {
             field = value
             applyBadgeValues()
         }
 
-    /** [EN] The plus button's badge: "" or null none, "dot" a red dot, anything else a text. [CN] PlusButton 的角标："" 或 null 无，"dot" 红点，其他为文字。 */
+    /**
+     * [EN] The plus button's badge: "" or null none, "dot" a red dot, anything else a text. [CN] PlusButton 的角标："" 或 null 无，"dot" 红点，其他为文字。
+     */
     var plusButtonBadgeValue: String? = null
         set(value) {
             field = value
             applyBadgeValues()
         }
 
-    /** [EN] The animation of text badges (tabs and plus button). [CN] 文字角标（Tab 与 PlusButton）的动画。 */
+    /**
+     * [EN] The animation of text badges (tabs and plus button). [CN] 文字角标（Tab 与 PlusButton）的动画。
+     */
     var badgeAnimationType: CYLEnums.CYLBadgeAnimationType = CYLEnums.CYLBadgeAnimationType.None
         set(value) {
             field = value
@@ -128,7 +146,9 @@ open class CYLTabBarHostView @JvmOverloads constructor(context: Context, attrs: 
             applyBadgeValues()
         }
 
-    /** [EN] The plus button's badge with a style, as an entry of [badgeAttributes]; wins over [plusButtonBadgeValue]. [CN] 带样式的 PlusButton 角标，写法同 [badgeAttributes] 的一项；优先于 [plusButtonBadgeValue]。 */
+    /**
+     * [EN] The plus button's badge with a style, as an entry of [badgeAttributes]; wins over [plusButtonBadgeValue]. [CN] 带样式的 PlusButton 角标，写法同 [badgeAttributes] 的一项；优先于 [plusButtonBadgeValue]。
+     */
     var plusButtonBadgeAttributes: Map<String, Any?>? = null
         set(value) {
             field = value
@@ -147,16 +167,24 @@ open class CYLTabBarHostView @JvmOverloads constructor(context: Context, attrs: 
             loadTabCoverImages(value)
         }
 
-    /** [EN] Also count what rises above the bar (plus button, badges) in [preferredHeight], for hosts that clip, like Flutter. [CN] [preferredHeight] 同时包含高出 TabBar 的部分，供会裁剪的宿主使用，例如 Flutter。 */
+    /**
+     * [EN] Also count what rises above the bar (plus button, badges) in [preferredHeight], for hosts that clip, like Flutter. [CN] [preferredHeight] 同时包含高出 TabBar 的部分，供会裁剪的宿主使用，例如 Flutter。
+     */
     var heightIncludesOverflow: Boolean = false
 
-    /** [EN] The height the view needs, in dp; 0 before the tab bar is built. [CN] 视图需要的高度（dp）；创建 TabBar 之前为 0。 */
+    /**
+     * [EN] The height the view needs, in dp; 0 before the tab bar is built. [CN] 视图需要的高度（dp）；创建 TabBar 之前为 0。
+     */
     var preferredHeight: Float = 0f
         private set
 
-    /** [EN] A tab was tapped (index, identifier); the plus button's own page reports -1 and its identifier. [CN] 点击了 Tab（下标、标识）；PlusButton 自己的页面报告 -1 与其标识。 */
+    /**
+     * [EN] A tab was tapped (index, identifier); the plus button's own page reports -1 and its identifier. [CN] 点击了 Tab（下标、标识）；PlusButton 自己的页面报告 -1 与其标识。
+     */
     var didSelectTab: ((index: Int, identifier: String) -> Unit)? = null
-    /** [EN] A long press on a tab (its index) or on the plus button (-1), with the title it shows. [CN] 长按 Tab（其下标）或 PlusButton（-1），以及显示的标题。 */
+    /**
+     * [EN] A long press on a tab (its index) or on the plus button (-1), with the title it shows. [CN] 长按 Tab（其下标）或 PlusButton（-1），以及显示的标题。
+     */
     var didLongPressTab: ((index: Int, identifier: String, title: String) -> Unit)? = null
     var didTapPlusButton: (() -> Unit)? = null
 
@@ -189,10 +217,14 @@ open class CYLTabBarHostView @JvmOverloads constructor(context: Context, attrs: 
      * [CN] TabBar 使用的登录状态，在 TabBar 创建后报告：App 设置 [loggedIn] 之前为库缓存的状态（`cyl_loggedIn`，重启后保留），App 可以从它开始。
      */
     var loginStateDidChange: ((loggedIn: Boolean) -> Unit)? = null
-    /** [EN] The app set [loggedIn]. [CN] App 设置过 [loggedIn]。 */
+    /**
+     * [EN] The app set [loggedIn]. [CN] App 设置过 [loggedIn]。
+     */
     private var loggedInSet = false
 
-    /** [EN] Forgets the state the app set with [loggedIn]: the next tab bar built uses the cached state again. [CN] 忘记 App 通过 [loggedIn] 设置的状态：之后创建的 TabBar 重新使用缓存的状态。 */
+    /**
+     * [EN] Forgets the state the app set with [loggedIn]: the next tab bar built uses the cached state again. [CN] 忘记 App 通过 [loggedIn] 设置的状态：之后创建的 TabBar 重新使用缓存的状态。
+     */
     fun resetLoggedIn() {
         loggedInSet = false
     }
@@ -269,10 +301,14 @@ open class CYLTabBarHostView @JvmOverloads constructor(context: Context, attrs: 
         private set
     var touchableRectsDidChange: ((rects: List<RectF>) -> Unit)? = null
 
-    /** [EN] [touchableRects] in pixels. [CN] 以像素表示的 [touchableRects]。 */
+    /**
+     * [EN] [touchableRects] in pixels. [CN] 以像素表示的 [touchableRects]。
+     */
     private var touchableRectsInPixels: List<Rect> = emptyList()
 
-    /** [EN] The tab bar controller, null until it is built. [CN] TabBarController，创建之前为 null。 */
+    /**
+     * [EN] The tab bar controller, null until it is built. [CN] TabBarController，创建之前为 null。
+     */
     var tabBarController: CYLTabBarController? = null
         private set
 
@@ -311,7 +347,9 @@ open class CYLTabBarHostView @JvmOverloads constructor(context: Context, attrs: 
         updateTouchableRects()
     }
 
-    /** [EN] Sets [configuration] from JSON text; false (and nothing changes) when it is not a JSON object. [CN] 用 JSON 文本设置 [configuration]；不是 JSON 对象时返回 false 且不做修改。 */
+    /**
+     * [EN] Sets [configuration] from JSON text; false (and nothing changes) when it is not a JSON object. [CN] 用 JSON 文本设置 [configuration]；不是 JSON 对象时返回 false 且不做修改。
+     */
     fun setConfigurationJSON(json: String?): Boolean {
         val map = runCatching { toMap(JSONObject(json ?: return false)) }.getOrNull() ?: return false
         configuration = map
@@ -392,7 +430,9 @@ open class CYLTabBarHostView @JvmOverloads constructor(context: Context, attrs: 
         }
     }
 
-    /** [EN] What a tap on the plus button reports. [CN] 点击 PlusButton 时报告的内容。 */
+    /**
+     * [EN] What a tap on the plus button reports. [CN] 点击 PlusButton 时报告的内容。
+     */
     private fun plusButtonAction(plus: Map<*, *>): (CYLPlusButton) -> Unit {
         val plusIdentifier = (plus[CYLConstants.CYLTabBarItemIdentifier] as? String).orEmpty()
         val plusHasPage = !(plus[CYLConstants.CYLTabBarItemPageIdentifier] as? String).isNullOrEmpty()
@@ -510,7 +550,9 @@ open class CYLTabBarHostView @JvmOverloads constructor(context: Context, attrs: 
         }
     }
 
-    /** [EN] The plus button and the badge last shown on it. [CN] 最近显示角标的 PlusButton 与角标值。 */
+    /**
+     * [EN] The plus button and the badge last shown on it. [CN] 最近显示角标的 PlusButton 与角标值。
+     */
     private var shownPlusButtonBadge: Pair<CYLPlusButton, Map<String, Any?>>? = null
 
     /**
@@ -529,7 +571,9 @@ open class CYLTabBarHostView @JvmOverloads constructor(context: Context, attrs: 
         plusButton.post { updatePreferredHeight() }
     }
 
-    /** [EN] Shows the badge `style` describes on `target` (a tab button or the plus button), its look first. [CN] 在 `target`（Tab 按钮或 PlusButton）上显示 `style` 描述的角标，先设置外观。 */
+    /**
+     * [EN] Shows the badge `style` describes on `target` (a tab button or the plus button), its look first. [CN] 在 `target`（Tab 按钮或 PlusButton）上显示 `style` 描述的角标，先设置外观。
+     */
     private fun showBadge(target: View, style: Map<String, Any?>, fallback: CYLEnums.CYLBadgeAnimationType) {
         val text = when (val value = style[BADGE_VALUE]) { is String -> value; is Number -> value.toString(); else -> "" }
         when (val color = style[BADGE_COLOR]) {
@@ -557,7 +601,9 @@ open class CYLTabBarHostView @JvmOverloads constructor(context: Context, attrs: 
         else -> null
     }
 
-    /** [EN] [tabCoverImages] loaded (Drawable or null). [CN] 已加载的 [tabCoverImages]（Drawable 或 null）。 */
+    /**
+     * [EN] [tabCoverImages] loaded (Drawable or null). [CN] 已加载的 [tabCoverImages]（Drawable 或 null）。
+     */
     private var loadedTabCoverImages: List<Drawable?>? = null
     private var coverGeneration = 0
 
@@ -580,7 +626,9 @@ open class CYLTabBarHostView @JvmOverloads constructor(context: Context, attrs: 
         }
     }
 
-    /** [EN] Covers the tab buttons with the loaded images; a tab without one shows its icon. [CN] 用已加载的图片覆盖 Tab 按钮；没有图片的 Tab 显示其图标。 */
+    /**
+     * [EN] Covers the tab buttons with the loaded images; a tab without one shows its icon. [CN] 用已加载的图片覆盖 Tab 按钮；没有图片的 Tab 显示其图标。
+     */
     private fun applyTabCoverImages() {
         val controller = tabBarController ?: return
         if (loadedTabCoverImages == null) return
@@ -682,7 +730,9 @@ open class CYLTabBarHostView @JvmOverloads constructor(context: Context, attrs: 
         return frame
     }
 
-    /** [EN] `rect`, in the coordinates of `view`, in this view's coordinates. [CN] 把 `view` 坐标中的 `rect` 转为本视图坐标。 */
+    /**
+     * [EN] `rect`, in the coordinates of `view`, in this view's coordinates. [CN] 把 `view` 坐标中的 `rect` 转为本视图坐标。
+     */
     private fun rectInView(view: View, rect: Rect): Rect {
         val location = IntArray(2)
         val own = IntArray(2)
@@ -692,16 +742,22 @@ open class CYLTabBarHostView @JvmOverloads constructor(context: Context, attrs: 
     }
 
     companion object {
-        /** [EN] Keys of [badgeAttributes] / [plusButtonBadgeAttributes], as on iOS. [CN] [badgeAttributes] / [plusButtonBadgeAttributes] 的键，与 iOS 相同。 */
+        /**
+         * [EN] Keys of [badgeAttributes] / [plusButtonBadgeAttributes], as on iOS. [CN] [badgeAttributes] / [plusButtonBadgeAttributes] 的键，与 iOS 相同。
+         */
         const val BADGE_VALUE = "value"
         const val BADGE_COLOR = "color"
         const val BADGE_ANIMATION = "animation"
         const val BADGE_RADIUS = "radius"
         const val BADGE_CENTER_OFFSET = "centerOffset"
 
-        /** [EN] The room left above the icons for a badge, in dp. [CN] 图标上方为角标留出的空间（dp）。 */
+        /**
+         * [EN] The room left above the icons for a badge, in dp. [CN] 图标上方为角标留出的空间（dp）。
+         */
         private const val BADGE_ROOM_DP = 8f
-        /** [EN] The room an animated badge grows into, in dp. [CN] 动画角标放大时占用的空间（dp）。 */
+        /**
+         * [EN] The room an animated badge grows into, in dp. [CN] 动画角标放大时占用的空间（dp）。
+         */
         private const val BADGE_ANIMATION_ROOM_DP = 4f
 
         private val imageLoader = Executors.newCachedThreadPool()
@@ -715,7 +771,9 @@ open class CYLTabBarHostView @JvmOverloads constructor(context: Context, attrs: 
             return null
         }
 
-        /** [EN] A JSON object as the maps and lists of a configuration. [CN] 把 JSON 对象转为配置使用的 map 与 list。 */
+        /**
+         * [EN] A JSON object as the maps and lists of a configuration. [CN] 把 JSON 对象转为配置使用的 map 与 list。
+         */
         @JvmStatic
         fun toMap(json: JSONObject): Map<String, Any?> = json.keys().asSequence().associateWith { toValue(json.opt(it)) }
 

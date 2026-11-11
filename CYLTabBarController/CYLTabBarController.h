@@ -1327,7 +1327,7 @@ didRecognizeTabBarItemGesture:(CYLTabBarItemGesture)gesture
  */
 @property (nonatomic, assign) BOOL adjustTabBarItemImageViewSizeDependOnSuperView;
 
-/** 可以不设置， 默认为 CYLTabBarController，如果设置了，请实现 CYLPlusButton 里 的 +[CYLPlusButton tabBarContext] 并保持一致。如果两个都不是实现，默认为一致均为 CYLTabBarController
+/*! 可以不设置， 默认为 CYLTabBarController，如果设置了，请实现 CYLPlusButton 里 的 +[CYLPlusButton tabBarContext] 并保持一致。如果两个都不是实现，默认为一致均为 CYLTabBarController
  *
  * [EN] The key that binds a tab bar controller to its plus button. Several plus buttons can be registered at the same
  *      time (one per `+[CYLPlusButton tabBarContext]`), and each tab bar controller uses the one registered for its own
@@ -1785,7 +1785,7 @@ typedef UIView * _Nullable (^CYLTabBarItemIconViewProvider)(BOOL selected);
  */
 @property (nonatomic, strong, readonly) NSMutableArray *tabBarItemAnimationSizes;
 
-/**
+/*!
  [CN] 显示或隐藏 TabBar，所有样式都生效：扁平样式为 CYLFlatDesignTabBar，液态玻璃与经典样式为系统 TabBar（iOS 18 起由 UIKit 执行动画；iOS 18 以前的经典样式使用与扁平样式相同的下移动画）。
  如果设置了 hidesBottomBarWhenPushed，则 hidesBottomBarWhenPushed 优先级更高。滚动隐藏（`cyl_tabBarMinimizeBehavior`，issue #13）
  在扁平样式与经典样式下也通过它隐藏、显示 TabBar。声明位于 CYL_FLATDESIGN_AVAILABLE 之外，不含扁平样式子库时同样可用。
@@ -3082,9 +3082,13 @@ FOUNDATION_EXTERN NSString *const CYLTabBarItemIdentifiersKey;
 
 @end
 
-/// [EN] The current tab title of `viewController` (e.g. `self` in `-viewDidLoad`). [CN] `viewController` 的当前 Tab 标题（例如在 `-viewDidLoad` 中传入 `self`）。
+/*!
+ * [EN] The current tab title of `viewController` (e.g. `self` in `-viewDidLoad`). [CN] `viewController` 的当前 Tab 标题（例如在 `-viewDidLoad` 中传入 `self`）。
+ */
 #define CYL_TAB_BAR_ITEM_TITLE(viewController) ([(viewController) cyl_tabBarItemTitle])
-/// [EN] Makes the navigation bar title of `viewController` follow its tab title. [CN] 让 `viewController` 的导航栏标题跟随其 Tab 标题。
+/*!
+ * [EN] Makes the navigation bar title of `viewController` follow its tab title. [CN] 让 `viewController` 的导航栏标题跟随其 Tab 标题。
+ */
 #define CYL_NAVIGATION_TITLE_FOLLOWS_TAB_BAR_ITEM(viewController) ((viewController).cyl_navigationTitleFollowsTabBarItemTitle = YES)
 
 NS_ASSUME_NONNULL_END

@@ -34,39 +34,69 @@ import org.xml.sax.helpers.DefaultHandler
  *      `java.util.Date`，`<data>` 为 `ByteArray`。
  */
 
-/** [EN] `CYLTabBarConfigurationErrorDomain`. [CN] 配置错误的错误域。 */
+/**
+ * [EN] `CYLTabBarConfigurationErrorDomain`. [CN] 配置错误的错误域。
+ */
 const val CYLTabBarConfigurationErrorDomain: String = "CYLTabBarConfigurationErrorDomain"
-/** [EN] `CYLTabBarConfigurationMaximumLength`: the largest configuration read, 5 MB. [CN] 读取配置的最大长度，5 MB。 */
+/**
+ * [EN] `CYLTabBarConfigurationMaximumLength`: the largest configuration read, 5 MB. [CN] 读取配置的最大长度，5 MB。
+ */
 const val CYLTabBarConfigurationMaximumLength: Int = 5 * 1024 * 1024
-/** [EN] `CYLTabBarConfigurationMaximumDepth`: the deepest nesting accepted, 64 levels. [CN] 允许的最大嵌套层数，64 层。 */
+/**
+ * [EN] `CYLTabBarConfigurationMaximumDepth`: the deepest nesting accepted, 64 levels. [CN] 允许的最大嵌套层数，64 层。
+ */
 const val CYLTabBarConfigurationMaximumDepth: Int = 64
 
-/** [EN] `CYLTabBarConfigurationFormat`, with the iOS raw values. [CN] 配置文件格式，原始值与 iOS 相同。 */
+/**
+ * [EN] `CYLTabBarConfigurationFormat`, with the iOS raw values. [CN] 配置文件格式，原始值与 iOS 相同。
+ */
 enum class CYLTabBarConfigurationFormat(val rawValue: Int) {
     Unknown(0),
-    /** [EN] .json [CN] .json */
+    /**
+     * [EN] .json [CN] .json
+     */
     JSON(1),
-    /** [EN] .json5 / .jsonc: comments, trailing commas, single quotes, unquoted keys. [CN] 注释、尾逗号、单引号、不加引号的键。 */
+    /**
+     * [EN] .json5 / .jsonc: comments, trailing commas, single quotes, unquoted keys. [CN] 注释、尾逗号、单引号、不加引号的键。
+     */
     JSON5(2),
-    /** [EN] .plist / .strings: XML, binary or OpenStep property lists. [CN] XML、二进制或 OpenStep 属性列表。 */
+    /**
+     * [EN] .plist / .strings: XML, binary or OpenStep property lists. [CN] XML、二进制或 OpenStep 属性列表。
+     */
     PropertyList(3),
-    /** [EN] .yaml / .yml [CN] .yaml / .yml */
+    /**
+     * [EN] .yaml / .yml [CN] .yaml / .yml
+     */
     YAML(4),
-    /** [EN] .toml [CN] .toml */
+    /**
+     * [EN] .toml [CN] .toml
+     */
     TOML(5),
-    /** [EN] .ini / .cfg / .conf: `[section.path]` and `key = value`. [CN] `[节.路径]` 与 `key = value`。 */
+    /**
+     * [EN] .ini / .cfg / .conf: `[section.path]` and `key = value`. [CN] `[节.路径]` 与 `key = value`。
+     */
     INI(6),
-    /** [EN] .properties / .env: `dotted.key.path = value`. [CN] `点.分隔.路径 = value`。 */
+    /**
+     * [EN] .properties / .env: `dotted.key.path = value`. [CN] `点.分隔.路径 = value`。
+     */
     Properties(7),
-    /** [EN] .xml (not a plist): elements are keys, `<item>` children make an array. [CN] 元素即键，`<item>` 子元素组成数组。 */
+    /**
+     * [EN] .xml (not a plist): elements are keys, `<item>` children make an array. [CN] 元素即键，`<item>` 子元素组成数组。
+     */
     XML(8),
-    /** [EN] .textproto / .txtpb / .pbtxt / .prototxt: Protocol Buffers text format. [CN] Protocol Buffers 文本格式。 */
+    /**
+     * [EN] .textproto / .txtpb / .pbtxt / .prototxt: Protocol Buffers text format. [CN] Protocol Buffers 文本格式。
+     */
     ProtobufText(9),
-    /** [EN] .binpb / .pb / .protobuf: a binary `cyl.CYLTabBarConfiguration` message. [CN] 二进制 `cyl.CYLTabBarConfiguration` 消息。 */
+    /**
+     * [EN] .binpb / .pb / .protobuf: a binary `cyl.CYLTabBarConfiguration` message. [CN] 二进制 `cyl.CYLTabBarConfiguration` 消息。
+     */
     Protobuf(10),
 }
 
-/** [EN] `CYLTabBarConfigurationErrorCode`, with the iOS raw values. [CN] 配置错误码，原始值与 iOS 相同。 */
+/**
+ * [EN] `CYLTabBarConfigurationErrorCode`, with the iOS raw values. [CN] 配置错误码，原始值与 iOS 相同。
+ */
 enum class CYLTabBarConfigurationErrorCode(val rawValue: Int) {
     FileNotFound(1), UnsupportedFormat(2), InvalidSyntax(3), NotADictionary(4), Network(5), Empty(6), TooLarge(7),
     TooDeep(8), NoTabs(9), MainThreadRequired(10), NoPages(11),
@@ -77,13 +107,17 @@ enum class CYLTabBarConfigurationErrorCode(val rawValue: Int) {
  * [CN] `CYLTabBarConfigurationErrorDomain` 的 `NSError`：`code` 与描述（`message`）。
  */
 class CYLTabBarConfigurationException(val code: CYLTabBarConfigurationErrorCode, message: String) : Exception(message) {
-    /** [EN] Always `CYLTabBarConfigurationErrorDomain`. [CN] 始终为 `CYLTabBarConfigurationErrorDomain`。 */
+    /**
+     * [EN] Always `CYLTabBarConfigurationErrorDomain`. [CN] 始终为 `CYLTabBarConfigurationErrorDomain`。
+     */
     val domain: String get() = CYLTabBarConfigurationErrorDomain
 }
 
 // MARK: - Helpers 工具
 
-/** [EN] The iOS `NSNull` while parsing; turned into `null` at the end. [CN] 解析过程中代表 iOS 的 `NSNull`，最后转换为 `null`。 */
+/**
+ * [EN] The iOS `NSNull` while parsing; turned into `null` at the end. [CN] 解析过程中代表 iOS 的 `NSNull`，最后转换为 `null`。
+ */
 private object CYLNull
 
 private class CYLCursor(var index: Int)
@@ -112,7 +146,9 @@ private const val FORMAT_PROPERTY_LIST = "Property List"
 private const val INVALID_PROPERTY_LIST = "invalid property list"
 private const val INVALID_CONTENT = "invalid content"
 
-/** [EN] The deepest nesting of { [ ( outside quoted strings. [CN] 引号外 { [ ( 的最大嵌套深度。 */
+/**
+ * [EN] The deepest nesting of { [ ( outside quoted strings. [CN] 引号外 { [ ( 的最大嵌套深度。
+ */
 private fun bracketDepth(text: String): Int {
     var depth = 0
     var deepest = 0
@@ -134,7 +170,9 @@ private fun bracketDepth(text: String): Int {
     return deepest
 }
 
-/** [EN] The deepest nesting of <dict> / <array> of an XML property list. [CN] XML 属性列表中 <dict> / <array> 的最大嵌套深度。 */
+/**
+ * [EN] The deepest nesting of <dict> / <array> of an XML property list. [CN] XML 属性列表中 <dict> / <array> 的最大嵌套深度。
+ */
 private fun xmlPropertyListDepth(text: String): Int {
     var depth = 0
     var deepest = 0
@@ -161,7 +199,9 @@ private fun isInlineSpace(c: Char) = c == ' ' || c == '\t'
 private fun isSpaceOrNewline(c: Char) = c == ' ' || c == '\t' || c == '\n' || c == '\r'
 private fun trimmed(text: String) = text.trim()
 
-/** [EN] UTF-16 / UTF-32 text with a BOM re-encoded as UTF-8 (A16); anything else as it is. [CN] 带 BOM 的 UTF-16 / UTF-32 文本转为 UTF-8（A16）；其他原样返回。 */
+/**
+ * [EN] UTF-16 / UTF-32 text with a BOM re-encoded as UTF-8 (A16); anything else as it is. [CN] 带 BOM 的 UTF-16 / UTF-32 文本转为 UTF-8（A16）；其他原样返回。
+ */
 private fun utf8DataFromData(data: ByteArray): ByteArray {
     fun b(i: Int) = data[i].toInt() and 0xFF
     val (charset, bom) = when {
@@ -182,7 +222,9 @@ private fun strictDecode(bytes: ByteArray, charset: Charset): String? = try {
     null
 }
 
-/** [EN] The UTF-8 text of `data` without its BOM, or null when it is not UTF-8. [CN] `data` 的 UTF-8 文本（去掉 BOM），不是 UTF-8 时为 null。 */
+/**
+ * [EN] The UTF-8 text of `data` without its BOM, or null when it is not UTF-8. [CN] `data` 的 UTF-8 文本（去掉 BOM），不是 UTF-8 时为 null。
+ */
 private fun stringFromData(data: ByteArray): String? {
     val text = strictDecode(data, Charsets.UTF_8) ?: return null
     return if (text.startsWith('\uFEFF')) text.substring(1) else text
@@ -195,7 +237,9 @@ private fun hexValue(text: String): Long? {
     return java.lang.Long.parseUnsignedLong(text, 16)
 }
 
-/** [EN] A decimal or hexadecimal integer, or a float; `allowsUnderscores`: TOML's digit separators. [CN] 十进制或十六进制整数，或浮点数；`allowsUnderscores`：TOML 的数字分隔符。 */
+/**
+ * [EN] A decimal or hexadecimal integer, or a float; `allowsUnderscores`: TOML's digit separators. [CN] 十进制或十六进制整数，或浮点数；`allowsUnderscores`：TOML 的数字分隔符。
+ */
 private fun numberFromString(string: String, allowsUnderscores: Boolean): Number? {
     val text = if (allowsUnderscores) string.replace("_", "") else string
     if (text.isEmpty()) return null
@@ -232,7 +276,9 @@ private fun decimalNumber(text: String, start: Int): Number? {
     return text.toLongOrNull() ?: if (text.startsWith('-')) Long.MIN_VALUE else Long.MAX_VALUE
 }
 
-/** [EN] An unquoted scalar: booleans, null / ~ (YAML), numbers, else the text itself. [CN] 未加引号的标量：布尔值、null / ~（YAML）、数字，否则为文本本身。 */
+/**
+ * [EN] An unquoted scalar: booleans, null / ~ (YAML), numbers, else the text itself. [CN] 未加引号的标量：布尔值、null / ~（YAML）、数字，否则为文本本身。
+ */
 private fun typedScalar(raw: String, allowsNull: Boolean): Any {
     val text = trimmed(raw)
     val lowercase = text.lowercase()
@@ -254,7 +300,9 @@ private fun simpleEscape(e: Char): String? = when (e) {
     else -> null
 }
 
-/** [EN] A double-quoted string at `cursor` (on the quote), with JSON / TOML / YAML escapes; null when it is not closed. [CN] `cursor` 处的双引号字符串；未闭合时为 null。 */
+/**
+ * [EN] A double-quoted string at `cursor` (on the quote), with JSON / TOML / YAML escapes; null when it is not closed. [CN] `cursor` 处的双引号字符串；未闭合时为 null。
+ */
 private fun readDoubleQuoted(text: String, cursor: CYLCursor): String? {
     val output = StringBuilder()
     var i = cursor.index + 1
@@ -274,7 +322,9 @@ private fun readDoubleQuoted(text: String, cursor: CYLCursor): String? {
     return null
 }
 
-/** [EN] Appends the escape at `i` (on the backslash); the index after it, or null when a \u escape is invalid. [CN] 追加 `i` 处（反斜杠）的转义；返回其后的下标，\u 转义无效时为 null。 */
+/**
+ * [EN] Appends the escape at `i` (on the backslash); the index after it, or null when a \u escape is invalid. [CN] 追加 `i` 处（反斜杠）的转义；返回其后的下标，\u 转义无效时为 null。
+ */
 private fun appendEscape(text: String, i: Int, output: StringBuilder): Int? {
     val e = text[i + 1]
     if (e != 'u' && e != 'U') {
@@ -287,7 +337,9 @@ private fun appendEscape(text: String, i: Int, output: StringBuilder): Int? {
     return start + count
 }
 
-/** [EN] A single-quoted string; `doubledQuoteEscapes`: YAML's '' for one quote. [CN] 单引号字符串；`doubledQuoteEscapes`：YAML 用 '' 表示一个引号。 */
+/**
+ * [EN] A single-quoted string; `doubledQuoteEscapes`: YAML's '' for one quote. [CN] 单引号字符串；`doubledQuoteEscapes`：YAML 用 '' 表示一个引号。
+ */
 private fun readSingleQuoted(text: String, cursor: CYLCursor, doubledQuoteEscapes: Boolean): String? {
     val output = StringBuilder()
     var i = cursor.index + 1
@@ -323,7 +375,9 @@ private fun unquotedOrTypedValue(raw: String): Any {
     return typedScalar(text, false)
 }
 
-/** [EN] The iOS `-description` of a scalar used as a key. [CN] 作为键的标量的 iOS `-description`。 */
+/**
+ * [EN] The iOS `-description` of a scalar used as a key. [CN] 作为键的标量的 iOS `-description`。
+ */
 private fun describe(value: Any?): String = when (value) {
     is String -> value
     is Boolean -> if (value) "1" else "0"
@@ -363,7 +417,9 @@ private fun readDottedKeyPart(key: String, cursor: CYLCursor): String? {
     return trimmed(key.substring(start, cursor.index))
 }
 
-/** [EN] `a.b."c.d"` as its parts; null when it is invalid or deeper than the limit. [CN] 拆分点分键；无效或超过深度限制时为 null。 */
+/**
+ * [EN] `a.b."c.d"` as its parts; null when it is invalid or deeper than the limit. [CN] 拆分点分键；无效或超过深度限制时为 null。
+ */
 private fun splitDottedKey(key: String): List<String>? {
     val parts = ArrayList<String>()
     val cursor = CYLCursor(0)
@@ -385,7 +441,9 @@ private fun skipInlineSpace(text: String, cursor: CYLCursor) {
     while (cursor.index < text.length && isInlineSpace(text[cursor.index])) cursor.index++
 }
 
-/** [EN] Dictionaries whose keys are all non-negative integers become arrays, in the order of the numbers. [CN] 键全为非负整数的字典转为数组，按数字排序。 */
+/**
+ * [EN] Dictionaries whose keys are all non-negative integers become arrays, in the order of the numbers. [CN] 键全为非负整数的字典转为数组，按数字排序。
+ */
 private fun arraysFromNumericKeys(value: Any?): Any? = when (value) {
     is Map<*, *> -> {
         val converted = LinkedHashMap<String, Any?>()
@@ -401,7 +459,9 @@ private fun arraysFromNumericKeys(value: Any?): Any? = when (value) {
     else -> value
 }
 
-/** [EN] The final value: `CYLNull` becomes null, containers become plain maps and lists. [CN] 最终值：`CYLNull` 转为 null，容器转为普通 Map 与 List。 */
+/**
+ * [EN] The final value: `CYLNull` becomes null, containers become plain maps and lists. [CN] 最终值：`CYLNull` 转为 null，容器转为普通 Map 与 List。
+ */
 private fun finished(value: Any?): Any? = when (value) {
     CYLNull -> null
     is Map<*, *> -> LinkedHashMap<String, Any?>().also { map -> for ((key, element) in value) map[key.toString()] = finished(element) }
@@ -411,7 +471,9 @@ private fun finished(value: Any?): Any? = when (value) {
 
 // MARK: - JSON
 
-/** [EN] A strict JSON reader with the rules of `NSJSONSerialization` (a top-level object or array). [CN] 遵循 `NSJSONSerialization` 规则的严格 JSON 读取器（顶层为对象或数组）。 */
+/**
+ * [EN] A strict JSON reader with the rules of `NSJSONSerialization` (a top-level object or array). [CN] 遵循 `NSJSONSerialization` 规则的严格 JSON 读取器（顶层为对象或数组）。
+ */
 private class CYLJSONReader(private val text: String) {
     private var index = 0
 
@@ -536,7 +598,9 @@ private class CYLJSONReader(private val text: String) {
     }
 }
 
-/** [EN] JSON5 / JSONC to JSON: no comments or trailing commas, single quotes and unquoted keys turned into JSON. [CN] JSON5 / JSONC 转为 JSON：去掉注释与尾逗号，单引号与无引号键转为 JSON。 */
+/**
+ * [EN] JSON5 / JSONC to JSON: no comments or trailing commas, single quotes and unquoted keys turned into JSON. [CN] JSON5 / JSONC 转为 JSON：去掉注释与尾逗号，单引号与无引号键转为 JSON。
+ */
 private object CYLJSON5 {
     fun toJSON(text: String): String? {
         val output = StringBuilder(text.length)
@@ -601,7 +665,9 @@ private object CYLJSON5 {
 
 private class CYLYAMLLine(var indent: Int, var text: String, val number: Int)
 
-/** [EN] The YAML subset of configurations (no anchors, tags or multi-document streams). [CN] 配置中常用的 YAML 子集（不支持锚点、标签与多文档）。 */
+/**
+ * [EN] The YAML subset of configurations (no anchors, tags or multi-document streams). [CN] 配置中常用的 YAML 子集（不支持锚点、标签与多文档）。
+ */
 private class CYLYAMLParser(text: String) {
     private val rawLines = lines(text)
     private val lines = ArrayList<CYLYAMLLine>()
@@ -903,7 +969,9 @@ private class CYLYAMLParser(text: String) {
 
 // MARK: - TOML
 
-/** [EN] TOML without dates. [CN] 不含日期的 TOML。 */
+/**
+ * [EN] TOML without dates. [CN] 不含日期的 TOML。
+ */
 private class CYLTOMLParser(private val text: String) {
     private var index = 0
     private var depth = 0
@@ -965,7 +1033,9 @@ private class CYLTOMLParser(private val text: String) {
         return parts
     }
 
-    /** [EN] A bare TOML key: ASCII letters, digits, '_' and '-'. [CN] TOML 裸键：ASCII 字母、数字、'_' 与 '-'。 */
+    /**
+     * [EN] A bare TOML key: ASCII letters, digits, '_' and '-'. [CN] TOML 裸键：ASCII 字母、数字、'_' 与 '-'。
+     */
     private fun isBareKey(part: String) = part.all { (it.isLetterOrDigit() && it.code < 128) || it == '_' || it == '-' }
 
     private fun parseValue(): Any? {
@@ -1174,7 +1244,9 @@ private object CYLFlatFormats {
         return arraysFromNumericKeys(root)
     }
 
-    /** [EN] The first '=' or ':' of an INI line, -1 without one. [CN] INI 行中第一个 '=' 或 ':'，没有时为 -1。 */
+    /**
+     * [EN] The first '=' or ':' of an INI line, -1 without one. [CN] INI 行中第一个 '=' 或 ':'，没有时为 -1。
+     */
     private fun iniSeparatorIndex(line: String): Int {
         val equals = line.indexOf('=')
         val colon = line.indexOf(':')
@@ -1252,7 +1324,9 @@ private object CYLFlatFormats {
         return arraysFromNumericKeys(root)
     }
 
-    /** [EN] One `key = value` line (continuations joined) of a properties or dotenv file. [CN] properties 或 dotenv 文件中的一行 `key = value`（已合并续行）。 */
+    /**
+     * [EN] One `key = value` line (continuations joined) of a properties or dotenv file. [CN] properties 或 dotenv 文件中的一行 `key = value`（已合并续行）。
+     */
     private fun setProperty(root: MutableMap<String, Any?>, logicalLine: String, number: Int) {
         val line = if (logicalLine.startsWith("export ")) trimmed(logicalLine.substring(7)) else logicalLine
         val separator = separatorIndex(line)
@@ -1294,12 +1368,16 @@ private class CYLXMLTreeBuilder : DefaultHandler() {
         stack.removeAt(stack.size - 1)
     }
 
-    /** [EN] External entities resolve to nothing (XXE, A14). [CN] 外部实体解析为空（XXE，A14）。 */
+    /**
+     * [EN] External entities resolve to nothing (XXE, A14). [CN] 外部实体解析为空（XXE，A14）。
+     */
     override fun resolveEntity(publicId: String?, systemId: String?): InputSource = InputSource(StringReader(""))
 }
 
 private object CYLXMLFormat {
-    /** [EN] Secure processing where the parser supports it; external entities always resolve to nothing (`resolveEntity`). [CN] 解析器支持时开启安全处理；外部实体始终解析为空（`resolveEntity`）。 */
+    /**
+     * [EN] Secure processing where the parser supports it; external entities always resolve to nothing (`resolveEntity`). [CN] 解析器支持时开启安全处理；外部实体始终解析为空（`resolveEntity`）。
+     */
     private fun secureFactory(): SAXParserFactory = SAXParserFactory.newInstance().apply {
         isNamespaceAware = false
         isValidating = false
@@ -1331,7 +1409,9 @@ private object CYLXMLFormat {
         throw configurationError(CYLTabBarConfigurationErrorCode.NotADictionary, "XML configuration: the root element must contain elements")
     }
 
-    /** [EN] An element as a value: an array of `<item>`s, a dictionary of children and attributes, or its text. [CN] 元素的值：`<item>` 数组、子元素与属性的字典，或其文本。 */
+    /**
+     * [EN] An element as a value: an array of `<item>`s, a dictionary of children and attributes, or its text. [CN] 元素的值：`<item>` 数组、子元素与属性的字典，或其文本。
+     */
     private fun value(node: CYLXMLNode): Any? {
         val type = node.attributes["type"]
         val attributes = node.attributes - "type"
@@ -1352,7 +1432,9 @@ private object CYLXMLFormat {
 
 // MARK: - Protocol Buffers text format
 
-/** [EN] Protocol Buffers text format, without a schema; a name written several times makes an array. [CN] 无需结构定义的 Protocol Buffers 文本格式；同名字段写多次组成数组。 */
+/**
+ * [EN] Protocol Buffers text format, without a schema; a name written several times makes an array. [CN] 无需结构定义的 Protocol Buffers 文本格式；同名字段写多次组成数组。
+ */
 private class CYLTextProtoParser(private val text: String) {
     private var index = 0
     private var depth = 0
@@ -1497,7 +1579,9 @@ private class CYLTextProtoParser(private val text: String) {
         return protobufScalarToken(token)
     }
 
-    /** [EN] true / false (True, t...), a number (a float suffix f allowed), or the identifier itself (an enum value). [CN] true / false（True、t……）、数字（允许浮点后缀 f），或标识符本身（枚举值）。 */
+    /**
+     * [EN] true / false (True, t...), a number (a float suffix f allowed), or the identifier itself (an enum value). [CN] true / false（True、t……）、数字（允许浮点后缀 f），或标识符本身（枚举值）。
+     */
     private fun protobufScalarToken(token: String): Any = when (token) {
         "true", "True", "t" -> true
         "false", "False", "f" -> false
@@ -1564,7 +1648,9 @@ private class CYLTextProtoParser(private val text: String) {
         }
     }
 
-    /** [EN] The fields of a message until `terminator` (0: the end of the text). [CN] 读取消息字段直到 `terminator`（0 表示文本结尾）。 */
+    /**
+     * [EN] The fields of a message until `terminator` (0: the end of the text). [CN] 读取消息字段直到 `terminator`（0 表示文本结尾）。
+     */
     fun parseFieldsUntil(terminator: Char): MutableMap<String, Any?>? {
         val message = LinkedHashMap<String, Any?>()
         val repeated = HashSet<String>()
@@ -1587,7 +1673,9 @@ private class CYLTextProtoParser(private val text: String) {
         return if (error != null) null else message
     }
 
-    /** [EN] The ':' after a field name (optional before a message); false, with the error set, when missing. [CN] 字段名后的 ':'（消息前可省略）；缺少时设置错误并返回 false。 */
+    /**
+     * [EN] The ':' after a field name (optional before a message); false, with the error set, when missing. [CN] 字段名后的 ':'（消息前可省略）；缺少时设置错误并返回 false。
+     */
     private fun skipFieldSeparator(name: String): Boolean {
         skipSpaceAndComments()
         when (peek()) {
@@ -1607,7 +1695,9 @@ private class CYLTextProtoParser(private val text: String) {
 
 // MARK: - Protocol Buffers binary
 
-/** [EN] The built-in schema of Configurations/cyl_tabbar_configuration.proto: message -> field number -> (name, kind). [CN] 内置结构定义：消息 -> 字段编号 -> （名称，类型）。 */
+/**
+ * [EN] The built-in schema of Configurations/cyl_tabbar_configuration.proto: message -> field number -> (name, kind). [CN] 内置结构定义：消息 -> 字段编号 -> （名称，类型）。
+ */
 private object CYLProtobufSchema {
     private val itemFields = listOf(
         "CYLTabBarItemTitle", "CYLTabBarItemImage", "CYLTabBarItemSelectedImage", "CYLTabBarItemDarkImage", "CYLTabBarItemSelectedDarkImage",
@@ -1656,7 +1746,9 @@ private object CYLProtobufSchema {
 }
 
 private class CYLProtobufReader(private val bytes: ByteArray) {
-    /** [EN] A varint at `offset`; null when it runs past `end` or is longer than 10 bytes. [CN] `offset` 处的 varint；越界或超过 10 字节时为 null。 */
+    /**
+     * [EN] A varint at `offset`; null when it runs past `end` or is longer than 10 bytes. [CN] `offset` 处的 varint；越界或超过 10 字节时为 null。
+     */
     private fun varint(cursor: CYLCursor, end: Int): Long? {
         var result = 0L
         var shift = 0
@@ -1670,7 +1762,9 @@ private class CYLProtobufReader(private val bytes: ByteArray) {
         return null
     }
 
-    /** [EN] Decodes one message of the schema in [start, end); null on malformed data. [CN] 解码 [start, end) 中的一个消息；数据无效时为 null。 */
+    /**
+     * [EN] Decodes one message of the schema in [start, end); null on malformed data. [CN] 解码 [start, end) 中的一个消息；数据无效时为 null。
+     */
     fun message(start: Int, end: Int, name: String): MutableMap<String, Any?>? {
         val fields = CYLProtobufSchema.messages[name] ?: emptyMap()
         val message = LinkedHashMap<String, Any?>()
@@ -1685,7 +1779,9 @@ private class CYLProtobufReader(private val bytes: ByteArray) {
         return message
     }
 
-    /** [EN] One field by its wire type: varints and fixed sizes are skipped, length-delimited ones read; false when broken. [CN] 按线路类型处理一个字段：跳过 varint 与定长字段，读取长度分隔字段；损坏时返回 false。 */
+    /**
+     * [EN] One field by its wire type: varints and fixed sizes are skipped, length-delimited ones read; false when broken. [CN] 按线路类型处理一个字段：跳过 varint 与定长字段，读取长度分隔字段；损坏时返回 false。
+     */
     private fun skipOrReadField(wireType: Int, cursor: CYLCursor, end: Int, field: Pair<String, String>?, message: MutableMap<String, Any?>): Boolean = when (wireType) {
         0 -> varint(cursor, end) != null
         1, 5 -> {
@@ -1734,7 +1830,9 @@ private fun dataHasPrefix(data: ByteArray, prefix: String): Boolean =
 
 // MARK: - Property lists 属性列表
 
-/** [EN] Binary property lists ("bplist00"): the structure check of iOS (no recursion) and the decoder. [CN] 二进制属性列表：iOS 的结构检查（非递归）与解码。 */
+/**
+ * [EN] Binary property lists ("bplist00"): the structure check of iOS (no recursion) and the decoder. [CN] 二进制属性列表：iOS 的结构检查（非递归）与解码。
+ */
 private class CYLBinaryPropertyList(private val bytes: ByteArray) {
     private var offsetSize = 0
     private var referenceSize = 0
@@ -1765,7 +1863,9 @@ private class CYLBinaryPropertyList(private val bytes: ByteArray) {
 
     private fun objectOffset(objectIndex: Long): Long = readBigEndian(tableOffset + objectIndex * offsetSize, offsetSize)
 
-    /** [EN] The count of a container or string at `offset` and the position after it; null when invalid. [CN] `offset` 处容器或字符串的数量及其后的位置；无效时为 null。 */
+    /**
+     * [EN] The count of a container or string at `offset` and the position after it; null when invalid. [CN] `offset` 处容器或字符串的数量及其后的位置；无效时为 null。
+     */
     private fun countAndPosition(offset: Long): Pair<Long, Long>? {
         val count = (bytes[offset.toInt()].toInt() and 0x0F).toLong()
         val position = offset + 1
@@ -1778,7 +1878,9 @@ private class CYLBinaryPropertyList(private val bytes: ByteArray) {
         return readBigEndian(position + 1, size) to position + 1 + size
     }
 
-    /** [EN] Every offset and reference in bounds, no container deeper than the limit, a bounded number of visits. [CN] 所有偏移与引用都在范围内，容器不超过深度限制，访问次数有上限。 */
+    /**
+     * [EN] Every offset and reference in bounds, no container deeper than the limit, a bounded number of visits. [CN] 所有偏移与引用都在范围内，容器不超过深度限制，访问次数有上限。
+     */
     fun isSafe(): Boolean {
         tooDeep = false
         if (!readTrailer()) return false
@@ -1793,7 +1895,9 @@ private class CYLBinaryPropertyList(private val bytes: ByteArray) {
         return true
     }
 
-    /** [EN] Checks one object and pushes the objects an array, set or dictionary refers to; false when unsafe. [CN] 检查一个对象，并压入数组、集合或字典引用的对象；不安全时返回 false。 */
+    /**
+     * [EN] Checks one object and pushes the objects an array, set or dictionary refers to; false when unsafe. [CN] 检查一个对象，并压入数组、集合或字典引用的对象；不安全时返回 false。
+     */
     private fun pushChildren(objectIndex: Long, depth: Int, stack: ArrayDeque<Pair<Long, Int>>): Boolean {
         if (objectIndex !in 0 until objectCount) return false
         val offset = objectOffset(objectIndex)
@@ -1811,7 +1915,9 @@ private class CYLBinaryPropertyList(private val bytes: ByteArray) {
         return true
     }
 
-    /** [EN] The decoded top object (call after `isSafe()`). [CN] 解码后的顶层对象（在 `isSafe()` 之后调用）。 */
+    /**
+     * [EN] The decoded top object (call after `isSafe()`). [CN] 解码后的顶层对象（在 `isSafe()` 之后调用）。
+     */
     fun decode(): Any? = try {
         value(topObject)
     } catch (error: IndexOutOfBoundsException) {
@@ -1840,7 +1946,9 @@ private class CYLBinaryPropertyList(private val bytes: ByteArray) {
         }
     }
 
-    /** [EN] 1, 2 and 4-byte integers are unsigned, 8-byte ones signed (two's complement), as in the format. [CN] 1、2、4 字节整数无符号，8 字节有符号。 */
+    /**
+     * [EN] 1, 2 and 4-byte integers are unsigned, 8-byte ones signed (two's complement), as in the format. [CN] 1、2、4 字节整数无符号，8 字节有符号。
+     */
     private fun integer(position: Long, size: Int): Long = readBigEndian(position, minOf(size, 8))
 
     private fun real(position: Long, size: Int): Double =
@@ -1853,7 +1961,9 @@ private class CYLBinaryPropertyList(private val bytes: ByteArray) {
     }
 }
 
-/** [EN] XML property lists, external entities off. [CN] XML 属性列表，关闭外部实体。 */
+/**
+ * [EN] XML property lists, external entities off. [CN] XML 属性列表，关闭外部实体。
+ */
 private object CYLXMLPropertyList {
     fun parse(text: String): Any? {
         val factory = DocumentBuilderFactory.newInstance().apply {
@@ -1933,7 +2043,9 @@ private object CYLXMLPropertyList {
     }
 }
 
-/** [EN] OpenStep (old-style) property lists and .strings: every scalar is a string, `<hex>` is data. [CN] OpenStep（旧式）属性列表与 .strings：标量均为字符串，`<hex>` 为数据。 */
+/**
+ * [EN] OpenStep (old-style) property lists and .strings: every scalar is a string, `<hex>` is data. [CN] OpenStep（旧式）属性列表与 .strings：标量均为字符串，`<hex>` 为数据。
+ */
 private class CYLOpenStepParser(private val text: String) {
     private var index = 0
 
@@ -2058,7 +2170,9 @@ private class CYLOpenStepParser(private val text: String) {
 
     private fun isAt(c: Char) = !atEnd() && text[index] == c
 
-    /** [EN] The value after a key: `= value;`, or the key itself for a .strings entry `"key";`. [CN] 键之后的值：`= value;`，或 .strings 条目 `"key";` 的键本身。 */
+    /**
+     * [EN] The value after a key: `= value;`, or the key itself for a .strings entry `"key";`. [CN] 键之后的值：`= value;`，或 .strings 条目 `"key";` 的键本身。
+     */
     private fun entryValue(key: String): Any? {
         skipSpaceAndComments()
         if (isAt(';')) {
@@ -2078,7 +2192,9 @@ private class CYLOpenStepParser(private val text: String) {
 }
 
 private object CYLPropertyList {
-    /** [EN] `NSPropertyListSerialization`: binary, XML or OpenStep by the content. [CN] 按内容判断二进制、XML 或 OpenStep。 */
+    /**
+     * [EN] `NSPropertyListSerialization`: binary, XML or OpenStep by the content. [CN] 按内容判断二进制、XML 或 OpenStep。
+     */
     fun parse(data: ByteArray, text: String?): Any? {
         if (dataHasPrefix(data, "bplist")) {
             val plist = CYLBinaryPropertyList(data)
@@ -2125,16 +2241,22 @@ object CYLTabBarConfigurationParser {
         "protobuf" to CYLTabBarConfigurationFormat.Protobuf,
     )
 
-    /** [EN] `+supportedPathExtensions`, sorted. [CN] 支持的文件扩展名（已排序）。 */
+    /**
+     * [EN] `+supportedPathExtensions`, sorted. [CN] 支持的文件扩展名（已排序）。
+     */
     @JvmStatic
     fun supportedPathExtensions(): List<String> = formatsByPathExtension.keys.sorted()
 
-    /** [EN] `+formatForPathExtension:`. [CN] 扩展名对应的格式。 */
+    /**
+     * [EN] `+formatForPathExtension:`. [CN] 扩展名对应的格式。
+     */
     @JvmStatic
     fun formatForPathExtension(pathExtension: String?): CYLTabBarConfigurationFormat =
         pathExtension?.let { formatsByPathExtension[it.lowercase()] } ?: CYLTabBarConfigurationFormat.Unknown
 
-    /** [EN] `+formatForMIMEType:`: the format of an HTTP Content-Type. [CN] HTTP Content-Type 对应的格式。 */
+    /**
+     * [EN] `+formatForMIMEType:`: the format of an HTTP Content-Type. [CN] HTTP Content-Type 对应的格式。
+     */
     @JvmStatic
     fun formatForMIMEType(mimeType: String?): CYLTabBarConfigurationFormat {
         val type = trimmed(mimeType?.split(';')?.firstOrNull()?.lowercase() ?: "")
@@ -2154,7 +2276,9 @@ object CYLTabBarConfigurationParser {
         }
     }
 
-    /** [EN] `+nameOfFormat:`. [CN] 格式名称。 */
+    /**
+     * [EN] `+nameOfFormat:`. [CN] 格式名称。
+     */
     @JvmStatic
     fun nameOfFormat(format: CYLTabBarConfigurationFormat): String = when (format) {
         CYLTabBarConfigurationFormat.JSON -> "JSON"
@@ -2186,7 +2310,9 @@ object CYLTabBarConfigurationParser {
         return candidates
     }
 
-    /** [EN] `+formatBySniffingData:`: the format of `data` by its content; `Unknown` when none fits. [CN] 按内容判断 `data` 的格式；都不匹配时为 `Unknown`。 */
+    /**
+     * [EN] `+formatBySniffingData:`: the format of `data` by its content; `Unknown` when none fits. [CN] 按内容判断 `data` 的格式；都不匹配时为 `Unknown`。
+     */
     @JvmStatic
     fun formatBySniffingData(data: ByteArray): CYLTabBarConfigurationFormat {
         val utf8 = utf8DataFromData(data)
@@ -2207,7 +2333,9 @@ object CYLTabBarConfigurationParser {
         } ?: CYLTabBarConfigurationFormat.Unknown
     }
 
-    /** [EN] Whether `data` reads as `format` (too deep counts: the format is right). [CN] `data` 能否按 `format` 读取（过深也算：格式正确）。 */
+    /**
+     * [EN] Whether `data` reads as `format` (too deep counts: the format is right). [CN] `data` 能否按 `format` 读取（过深也算：格式正确）。
+     */
     private fun readsAs(data: ByteArray, format: CYLTabBarConfigurationFormat): Boolean = try {
         parseData(data, format)
         true

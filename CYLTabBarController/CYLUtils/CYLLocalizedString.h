@@ -16,7 +16,9 @@
 
 #import <UIKit/UIKit.h>
 
-/// Marks a function that returns translated text, for the static analyzer's localizability checker.
+/*!
+ * Marks a function that returns translated text, for the static analyzer's localizability checker.
+ */
 #ifndef CYL_RETURNS_LOCALIZED_STRING
 #define CYL_RETURNS_LOCALIZED_STRING __attribute__((annotate("returns_localized_nsstring")))
 #endif

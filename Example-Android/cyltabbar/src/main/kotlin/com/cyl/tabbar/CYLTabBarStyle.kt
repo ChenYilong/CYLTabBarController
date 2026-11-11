@@ -34,29 +34,47 @@ typealias CYLFlatDesignTabBarItem = CYLTabBarItem
  *      控制器 `tabBarStyleType` 选出的 `styleRenderer`，因此每种样式都集中在一处。
  */
 internal interface CYLTabBarStyleRenderer {
-    /** [EN] The pages extend under the bar, which floats over them. [CN] 页面延伸到 TabBar 下方，TabBar 浮在页面之上。 */
+    /**
+     * [EN] The pages extend under the bar, which floats over them. [CN] 页面延伸到 TabBar 下方，TabBar 浮在页面之上。
+     */
     val drawsPagesUnderTabBar: Boolean get() = false
-    /** [EN] The default selected and unselected tint, when the app sets none. [CN] App 未设置时的默认选中与未选中颜色。 */
+    /**
+     * [EN] The default selected and unselected tint, when the app sets none. [CN] App 未设置时的默认选中与未选中颜色。
+     */
     fun defaultTintColors(tabBar: CYLTabBar): Pair<Int, Int> = 0xFF007AFF.toInt() to 0xFF8E8E93.toInt()
-    /** [EN] The bar's height for items of `itemsHeight` above a bottom safe area of `safeBottom`. [CN] Item 高度为 `itemsHeight`、底部安全区为 `safeBottom` 时 TabBar 的高度。 */
+    /**
+     * [EN] The bar's height for items of `itemsHeight` above a bottom safe area of `safeBottom`. [CN] Item 高度为 `itemsHeight`、底部安全区为 `safeBottom` 时 TabBar 的高度。
+     */
     fun barHeight(tabBar: CYLTabBar, itemsHeight: Int, safeBottom: Int): Int = itemsHeight + safeBottom
-    /** [EN] The frame of the items inside the bar. [CN] Item 在 TabBar 中的区域。 */
+    /**
+     * [EN] The frame of the items inside the bar. [CN] Item 在 TabBar 中的区域。
+     */
     fun itemsFrame(tabBar: CYLTabBar, width: Int, height: Int, itemsHeight: Int, safeBottom: Int, out: Rect) {
         out.set(0, 0, width, itemsHeight)
     }
-    /** [EN] The space between two slots, in px (FlatDesign's `stackedItemSpacing`). [CN] 相邻 slot 之间的间距（像素，扁平样式的 `stackedItemSpacing`）。 */
+    /**
+     * [EN] The space between two slots, in px (FlatDesign's `stackedItemSpacing`). [CN] 相邻 slot 之间的间距（像素，扁平样式的 `stackedItemSpacing`）。
+     */
     fun itemSpacing(tabBar: CYLTabBar): Int = 0
     fun onAttach(tabBar: CYLTabBar) { /* [EN] Optional: a style may take over the bar's background. [CN] 可选：样式可以接管 TabBar 的背景。 */ }
     fun onDetach(tabBar: CYLTabBar) { /* [EN] Optional: a style may stop its animations. [CN] 可选：样式可以停止其动画。 */ }
-    /** [EN] Drawn behind the items. [CN] 绘制在 Item 后面。 */
+    /**
+     * [EN] Drawn behind the items. [CN] 绘制在 Item 后面。
+     */
     fun drawBehindItems(tabBar: CYLTabBar, canvas: Canvas) { /* [EN] Optional: nothing by default. [CN] 可选：默认不绘制。 */ }
-    /** [EN] Drawn above the items. [CN] 绘制在 Item 上面。 */
+    /**
+     * [EN] Drawn above the items. [CN] 绘制在 Item 上面。
+     */
     fun drawAboveItems(tabBar: CYLTabBar, canvas: Canvas) { /* [EN] Optional: nothing by default. [CN] 可选：默认不绘制。 */ }
-    /** [EN] The selected tab changed. [CN] 选中的 Tab 已改变。 */
+    /**
+     * [EN] The selected tab changed. [CN] 选中的 Tab 已改变。
+     */
     fun onSelectionChanged(tabBar: CYLTabBar, animated: Boolean) { /* [EN] Optional: only styles that follow the selection (the glass bubble). [CN] 可选：只有跟随选中的样式需要（玻璃气泡）。 */ }
     fun onInterceptTouchEvent(tabBar: CYLTabBar, event: MotionEvent): Boolean = false
     fun onTouchEvent(tabBar: CYLTabBar, event: MotionEvent): Boolean = false
-    /** [EN] The bar's background color changed (`cyl_tabBarBackgroundColor`). [CN] TabBar 背景色已改变（`cyl_tabBarBackgroundColor`）。 */
+    /**
+     * [EN] The bar's background color changed (`cyl_tabBarBackgroundColor`). [CN] TabBar 背景色已改变（`cyl_tabBarBackgroundColor`）。
+     */
     fun applyBackgroundColor(tabBar: CYLTabBar, @ColorInt color: Int?) { /* [EN] Optional: each style uses the color its own way. [CN] 可选：每种样式按自己的方式使用该颜色。 */ }
 
     companion object {
@@ -90,7 +108,9 @@ internal fun CYLTabBar.centeredItemsFrame(width: Int, itemsHeight: Int, out: Rec
     return space.roundToInt()
 }
 
-/** [EN] The bar's background image: the appearance's, else the bar's own; false when there is none. [CN] TabBar 的背景图片：外观中的，否则为 TabBar 自己的；没有时返回 false。 */
+/**
+ * [EN] The bar's background image: the appearance's, else the bar's own; false when there is none. [CN] TabBar 的背景图片：外观中的，否则为 TabBar 自己的；没有时返回 false。
+ */
 internal fun CYLTabBar.drawBackgroundImage(canvas: Canvas): Boolean {
     val image = cyl_effectiveAppearance()?.backgroundImage ?: backgroundImage ?: return false
     image.setBounds(0, 0, width, height)
@@ -98,7 +118,9 @@ internal fun CYLTabBar.drawBackgroundImage(canvas: Canvas): Boolean {
     return true
 }
 
-/** [EN] The bar's top-line image: the appearance's, else the bar's own; false when there is none. [CN] TabBar 顶部线条图片：外观中的，否则为 TabBar 自己的；没有时返回 false。 */
+/**
+ * [EN] The bar's top-line image: the appearance's, else the bar's own; false when there is none. [CN] TabBar 顶部线条图片：外观中的，否则为 TabBar 自己的；没有时返回 false。
+ */
 internal fun CYLTabBar.drawShadowImage(canvas: Canvas): Boolean {
     val image = cyl_effectiveAppearance()?.shadowImage ?: shadowImage ?: return false
     image.setBounds(0, 0, width, image.intrinsicHeight.takeIf { it > 0 } ?: 1)
@@ -106,7 +128,9 @@ internal fun CYLTabBar.drawShadowImage(canvas: Canvas): Boolean {
     return true
 }
 
-/** [EN] Whether the app runs in Dark Mode. [CN] App 是否处于深色模式。 */
+/**
+ * [EN] Whether the app runs in Dark Mode. [CN] App 是否处于深色模式。
+ */
 private fun View.isInDarkMode(): Boolean =
     (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
 
@@ -131,7 +155,9 @@ internal object CYLClassicTabBarStyle : CYLTabBarStyleRenderer {
         tabBar.cyl_itemSpacing = tabBar.centeredItemsFrame(width, itemsHeight, out) ?: run { out.set(0, 0, width, itemsHeight); 0 }
     }
 
-    /** [EN] `backgroundImage` / `shadowImage` of the appearance (or the bar), over the background color and the hairline. [CN] 外观（或 TabBar）的 `backgroundImage` / `shadowImage`，绘制在背景色与细线之上。 */
+    /**
+     * [EN] `backgroundImage` / `shadowImage` of the appearance (or the bar), over the background color and the hairline. [CN] 外观（或 TabBar）的 `backgroundImage` / `shadowImage`，绘制在背景色与细线之上。
+     */
     override fun drawBehindItems(tabBar: CYLTabBar, canvas: Canvas) {
         tabBar.drawBackgroundImage(canvas)
         tabBar.drawShadowImage(canvas)
@@ -224,12 +250,16 @@ internal class CYLLiquidGlassTabBarStyle : CYLTabBarStyleRenderer {
     private var tint: Int? = null
     private var host: CYLTabBar? = null
 
-    /** [EN] The bubble's position, in slots. [CN] 气泡的位置（以 slot 为单位）。 */
+    /**
+     * [EN] The bubble's position, in slots. [CN] 气泡的位置（以 slot 为单位）。
+     */
     private val position = CYLSpring(0f, 1f, 1000f, 0.001f)
     private val pressProgress = CYLSpring(0f, 1f, 1000f, 0.001f)
     private val scaleX = CYLSpring(1f, 0.6f, 250f, 0.001f)
     private val scaleY = CYLSpring(1f, 0.7f, 250f, 0.001f)
-    /** [EN] The drag offset that nudges the panel (up to 4 dp), back to 0 with a spring. [CN] 拖动产生的面板偏移（最多 4 dp），用弹簧回到 0。 */
+    /**
+     * [EN] The drag offset that nudges the panel (up to 4 dp), back to 0 with a spring. [CN] 拖动产生的面板偏移（最多 4 dp），用弹簧回到 0。
+     */
     private val panelDrag = CYLSpring(0f, 0.5f, 300f, 0.5f)
     private var positioned = false
     private var frameTime = 0L
@@ -319,7 +349,9 @@ internal class CYLLiquidGlassTabBarStyle : CYLTabBarStyleRenderer {
         return if (count == 0) 0f else frame.width() / count.toFloat()
     }
 
-    /** [EN] `LiquidBottomTabs`' panel offset: 4 dp at most, eased. [CN] `LiquidBottomTabs` 的面板偏移：最多 4 dp，带缓动。 */
+    /**
+     * [EN] `LiquidBottomTabs`' panel offset: 4 dp at most, eased. [CN] `LiquidBottomTabs` 的面板偏移：最多 4 dp，带缓动。
+     */
     private fun panelOffset(tabBar: CYLTabBar): Float {
         val width = tabBar.width.toFloat().takeIf { it > 0f } ?: return 0f
         val fraction = (panelDrag.value / width).coerceIn(-1f, 1f)
@@ -390,7 +422,9 @@ internal class CYLLiquidGlassTabBarStyle : CYLTabBarStyleRenderer {
 
     private val shadowPath = android.graphics.Path()
 
-    /** [EN] The dock's shadow with the dock itself cut out. [CN] 挖掉胶囊本身的胶囊阴影。 */
+    /**
+     * [EN] The dock's shadow with the dock itself cut out. [CN] 挖掉胶囊本身的胶囊阴影。
+     */
     private fun drawShadowOutside(canvas: Canvas, shape: RectF, radius: Float, density: Float, dark: Boolean) {
         shadowPath.rewind()
         shadowPath.addRoundRect(shape, radius, radius, android.graphics.Path.Direction.CW)

@@ -24,42 +24,58 @@ import java.lang.reflect.Method;
  */
 public interface CYLTabButtonAnimation {
 
-    /** [EN] Plays the animation of a button that is being selected. [CN] 播放按钮被选中的动画。 */
+    /**
+     * [EN] Plays the animation of a button that is being selected. [CN] 播放按钮被选中的动画。
+     */
     default void cyl_playSelectAnimationWithTabButton(@NonNull View button, @NonNull View iconView, @Nullable TextView titleLabel) {
         // [EN] Optional. [CN] 可选。
     }
 
-    /** [EN] `cyl_playSelectAnimationWithTabButton` without the underscore. [CN] 去掉下划线的写法。 */
+    /**
+     * [EN] `cyl_playSelectAnimationWithTabButton` without the underscore. [CN] 去掉下划线的写法。
+     */
     default void cylPlaySelectAnimationWithTabButton(@NonNull View button, @NonNull View iconView, @Nullable TextView titleLabel) {
         // [EN] Optional. [CN] 可选。
     }
 
-    /** [EN] `cyl_playDeselectAnimationWithTabButton` without the underscore. [CN] 去掉下划线的写法。 */
+    /**
+     * [EN] `cyl_playDeselectAnimationWithTabButton` without the underscore. [CN] 去掉下划线的写法。
+     */
     default void cylPlayDeselectAnimationWithTabButton(@NonNull View button, @NonNull View iconView, @Nullable TextView titleLabel) {
         // [EN] Optional. [CN] 可选。
     }
 
-    /** [EN] `cyl_playReselectAnimationWithTabButton` without the underscore. [CN] 去掉下划线的写法。 */
+    /**
+     * [EN] `cyl_playReselectAnimationWithTabButton` without the underscore. [CN] 去掉下划线的写法。
+     */
     default void cylPlayReselectAnimationWithTabButton(@NonNull View button, @NonNull View iconView, @Nullable TextView titleLabel) {
         // [EN] Optional. [CN] 可选。
     }
 
-    /** [EN] `cyl_playHighlightAnimationWithTabButton` without the underscore. [CN] 去掉下划线的写法。 */
+    /**
+     * [EN] `cyl_playHighlightAnimationWithTabButton` without the underscore. [CN] 去掉下划线的写法。
+     */
     default void cylPlayHighlightAnimationWithTabButton(@NonNull View button, @NonNull View iconView, @Nullable TextView titleLabel) {
         // [EN] Optional. [CN] 可选。
     }
 
-    /** [EN] `cyl_playDehighlightAnimationWithTabButton` without the underscore. [CN] 去掉下划线的写法。 */
+    /**
+     * [EN] `cyl_playDehighlightAnimationWithTabButton` without the underscore. [CN] 去掉下划线的写法。
+     */
     default void cylPlayDehighlightAnimationWithTabButton(@NonNull View button, @NonNull View iconView, @Nullable TextView titleLabel) {
         // [EN] Optional. [CN] 可选。
     }
 
-    /** [EN] `cyl_playBadgeChangedAnimationWithTabButton` without the underscore. [CN] 去掉下划线的写法。 */
+    /**
+     * [EN] `cyl_playBadgeChangedAnimationWithTabButton` without the underscore. [CN] 去掉下划线的写法。
+     */
     default void cylPlayBadgeChangedAnimationWithTabButton(@NonNull View button, @NonNull View iconView, @Nullable View badgeView) {
         // [EN] Optional. [CN] 可选。
     }
 
-    /** [EN] Plays the animation of the button selected before, when another button gets selected. [CN] 另一个按钮被选中时，播放之前选中按钮的动画。 */
+    /**
+     * [EN] Plays the animation of the button selected before, when another button gets selected. [CN] 另一个按钮被选中时，播放之前选中按钮的动画。
+     */
     default void cyl_playDeselectAnimationWithTabButton(@NonNull View button, @NonNull View iconView, @Nullable TextView titleLabel) {
         // [EN] Optional. [CN] 可选。
     }
@@ -73,7 +89,9 @@ public interface CYLTabButtonAnimation {
         // [EN] Optional. [CN] 可选。
     }
 
-    /** [EN] `cyl_fromLeft`, set before the select animation: true when the button selected before is on the left. [CN] 选中动画前设置：之前选中的按钮在左侧时为 true。 */
+    /**
+     * [EN] `cyl_fromLeft`, set before the select animation: true when the button selected before is on the left. [CN] 选中动画前设置：之前选中的按钮在左侧时为 true。
+     */
     default boolean cyl_isFromLeft() {
         return false;
     }
@@ -82,7 +100,9 @@ public interface CYLTabButtonAnimation {
         // [EN] Optional: implement it together with `cyl_isFromLeft`. [CN] 可选：与 `cyl_isFromLeft` 一起实现。
     }
 
-    /** [EN] `cyl_toRight`, set before the deselect animation: true when the button selected next is on the right. [CN] 取消选中动画前设置：之后选中的按钮在右侧时为 true。 */
+    /**
+     * [EN] `cyl_toRight`, set before the deselect animation: true when the button selected next is on the right. [CN] 取消选中动画前设置：之后选中的按钮在右侧时为 true。
+     */
     default boolean cyl_isToRight() {
         return false;
     }
@@ -91,22 +111,30 @@ public interface CYLTabButtonAnimation {
         // [EN] Optional: implement it together with `cyl_isToRight`. [CN] 可选：与 `cyl_isToRight` 一起实现。
     }
 
-    /** [EN] A tap on the selected button (a reselect); without it the select animation plays again. [CN] 再次点击已选中的按钮；未实现时再次播放选中动画。 */
+    /**
+     * [EN] A tap on the selected button (a reselect); without it the select animation plays again. [CN] 再次点击已选中的按钮；未实现时再次播放选中动画。
+     */
     default void cyl_playReselectAnimationWithTabButton(@NonNull View button, @NonNull View iconView, @Nullable TextView titleLabel) {
         // [EN] Optional. [CN] 可选。
     }
 
-    /** [EN] A finger went down on the button (pressed). [CN] 手指按下按钮。 */
+    /**
+     * [EN] A finger went down on the button (pressed). [CN] 手指按下按钮。
+     */
     default void cyl_playHighlightAnimationWithTabButton(@NonNull View button, @NonNull View iconView, @Nullable TextView titleLabel) {
         // [EN] Optional. [CN] 可选。
     }
 
-    /** [EN] The finger lifted from a pressed button, or its touch was cancelled. [CN] 手指从按下的按钮抬起，或触摸被取消。 */
+    /**
+     * [EN] The finger lifted from a pressed button, or its touch was cancelled. [CN] 手指从按下的按钮抬起，或触摸被取消。
+     */
     default void cyl_playDehighlightAnimationWithTabButton(@NonNull View button, @NonNull View iconView, @Nullable TextView titleLabel) {
         // [EN] Optional. [CN] 可选。
     }
 
-    /** [EN] The button's badge appeared or changed (not removed). [CN] 按钮的角标出现或改变（不含移除）。 */
+    /**
+     * [EN] The button's badge appeared or changed (not removed). [CN] 按钮的角标出现或改变（不含移除）。
+     */
     default void cyl_playBadgeChangedAnimationWithTabButton(@NonNull View button, @NonNull View iconView, @Nullable View badgeView) {
         // [EN] Optional. [CN] 可选。
     }

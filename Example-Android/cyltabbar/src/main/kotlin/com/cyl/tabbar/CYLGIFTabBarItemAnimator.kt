@@ -24,7 +24,9 @@ import android.widget.ImageView
  *      （`CYLGIFTabBarItemAnimationView`）自己播放。GIF 由系统解码（如同 iOS 的 ImageIO），因此总会注册。作为 `CYLTabBarItemImage` 传入的 GIF 是图片，不是动画。
  */
 object CYLGIFTabBarItemAnimator {
-    /** [EN] The registered animator, e.g. to inject another view provider. [CN] 已注册的 animator，例如用于注入其他视图 provider。 */
+    /**
+     * [EN] The registered animator, e.g. to inject another view provider. [CN] 已注册的 animator，例如用于注入其他视图 provider。
+     */
     @JvmStatic
     val animator: CYLTabBarItemViewAnimator by lazy {
         CYLTabBarItemViewAnimator("GIF", listOf("gif"), mapOf(
@@ -50,10 +52,14 @@ class CYLGIFTabBarItemAnimationView internal constructor(context: Context, priva
     View(context), CYLTabBarItemAnimationPlayableView {
 
     private var movie: android.graphics.Movie? = null
-    /** [EN] The time shown, in ms. [CN] 显示的时刻（毫秒）。 */
+    /**
+     * [EN] The time shown, in ms. [CN] 显示的时刻（毫秒）。
+     */
     private var time = 0
     private var animator: ValueAnimator? = null
-    /** [EN] The GIF's length in ms (1 s when the file gives none). [CN] GIF 的时长（毫秒，文件未给出时为 1 秒）。 */
+    /**
+     * [EN] The GIF's length in ms (1 s when the file gives none). [CN] GIF 的时长（毫秒，文件未给出时为 1 秒）。
+     */
     val duration: Int get() = movie?.duration()?.takeIf { it > 0 } ?: 1000
 
     init {
@@ -113,7 +119,9 @@ class CYLGIFTabBarItemAnimationView internal constructor(context: Context, priva
         super.onDetachedFromWindow()
     }
 
-    /** [EN] Provides the views of `CYLGIFTabBarItemAnimator`. [CN] 为 `CYLGIFTabBarItemAnimator` 提供视图。 */
+    /**
+     * [EN] Provides the views of `CYLGIFTabBarItemAnimator`. [CN] 为 `CYLGIFTabBarItemAnimator` 提供视图。
+     */
     object Provider : CYLTabBarItemAnimationViewProviding {
         override fun cyl_animationViewWithFileURL(context: Context, fileURL: String, options: Map<String, String>, contentMode: ImageView.ScaleType): View {
             val view = CYLGIFTabBarItemAnimationView(context, contentMode)
@@ -160,11 +168,15 @@ class CYLGIFDrawable private constructor(private val movie: android.graphics.Mov
     companion object {
         private const val FRAME_MILLIS = 16L
 
-        /** [EN] Whether `bytes` start with a GIF signature (GIF87a / GIF89a). [CN] `bytes` 是否以 GIF 签名（GIF87a / GIF89a）开头。 */
+        /**
+         * [EN] Whether `bytes` start with a GIF signature (GIF87a / GIF89a). [CN] `bytes` 是否以 GIF 签名（GIF87a / GIF89a）开头。
+         */
         @JvmStatic
         fun isGIF(bytes: ByteArray): Boolean = bytes.size >= 6 && String(bytes, 0, 6, Charsets.US_ASCII).let { it == "GIF87a" || it == "GIF89a" }
 
-        /** [EN] A looping drawable for GIF `bytes`; null when they are not a GIF. [CN] GIF `bytes` 的循环 Drawable；不是 GIF 时为 null。 */
+        /**
+         * [EN] A looping drawable for GIF `bytes`; null when they are not a GIF. [CN] GIF `bytes` 的循环 Drawable；不是 GIF 时为 null。
+         */
         @JvmStatic
         fun fromBytes(bytes: ByteArray): CYLGIFDrawable? {
             if (!isGIF(bytes)) return null

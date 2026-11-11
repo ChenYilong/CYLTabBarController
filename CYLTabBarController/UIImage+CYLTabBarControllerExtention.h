@@ -264,7 +264,7 @@ typedef NS_ENUM(NSInteger, CYLImageCacheExpireType) {
  */
 + (nullable UIImage *)cyl_getImageFromImageInfo:(id)imageInfo;
 
-/**
+/*!
  *  tabItemPlaceholderImage
  *
  *  @return UIImage

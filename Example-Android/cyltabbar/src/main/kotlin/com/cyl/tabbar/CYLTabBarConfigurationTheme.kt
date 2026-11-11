@@ -18,31 +18,47 @@ import android.graphics.drawable.Drawable
  *      的换肤：视图引用皮肤中的值）。
  */
 class CYLTabBarConfigurationTheme internal constructor(
-    /** [EN] The skin's identifier, e.g. "dark". [CN] 皮肤的标识，例如 "dark"。 */
+    /**
+     * [EN] The skin's identifier, e.g. "dark". [CN] 皮肤的标识，例如 "dark"。
+     */
     val identifier: String,
-    /** [EN] The named values, with the base skin's values for the names this skin does not give. [CN] 命名值；本皮肤没有的名称使用基础皮肤的值。 */
+    /**
+     * [EN] The named values, with the base skin's values for the names this skin does not give. [CN] 命名值；本皮肤没有的名称使用基础皮肤的值。
+     */
     val values: Map<String, Any?>,
-    /** [EN] Per tab (its identifier, or its position without one): item key -> value name. [CN] 每个 Tab（其标识，没有时为位置）：item 键 -> 值名称。 */
+    /**
+     * [EN] Per tab (its identifier, or its position without one): item key -> value name. [CN] 每个 Tab（其标识，没有时为位置）：item 键 -> 值名称。
+     */
     private val references: Map<Any, Map<String, String>>,
 ) : CYLTabBarTheme, CYLThemeValueProviding {
 
-    /** [EN] `-valueForName:`: the value as written in the file. [CN] 文件中写的值。 */
+    /**
+     * [EN] `-valueForName:`: the value as written in the file. [CN] 文件中写的值。
+     */
     fun valueForName(name: String): Any? = values[name]
 
-    /** [EN] `-colorForName:`: "#RGB", "#RRGGBB" or "#RRGGBBAA" (the iOS order), or null. [CN] 颜色（与 iOS 相同的写法），否则为 null。 */
+    /**
+     * [EN] `-colorForName:`: "#RGB", "#RRGGBB" or "#RRGGBBAA" (the iOS order), or null. [CN] 颜色（与 iOS 相同的写法），否则为 null。
+     */
     fun colorForName(name: String): Int? = CYLTabBarConfiguration.colorValue(values[name])
 
-    /** [EN] `-fontForName:`: "15", "bold:15" or "Family-Style:12", or null. [CN] 字体，否则为 null。 */
+    /**
+     * [EN] `-fontForName:`: "15", "bold:15" or "Family-Style:12", or null. [CN] 字体，否则为 null。
+     */
     fun fontForName(name: String): CYLFont? = CYLFont.fromConfigurationValue(values[name])
 
-    /** [EN] `-imageForName:`: through `CYLTabBarConfiguration.imageResolver`, or null. [CN] 通过 `CYLTabBarConfiguration.imageResolver` 解析的图片，否则为 null。 */
+    /**
+     * [EN] `-imageForName:`: through `CYLTabBarConfiguration.imageResolver`, or null. [CN] 通过 `CYLTabBarConfiguration.imageResolver` 解析的图片，否则为 null。
+     */
     fun imageForName(context: Context, name: String): Drawable? = when (val value = values[name]) {
         is Drawable -> value
         is String -> CYLTabBarConfiguration.imageResolver.drawable(context, value)
         else -> null
     }
 
-    /** [EN] Theme values (`View.cyl_themeValue`): a color of the file becomes an ARGB Int, the rest stays as written. [CN] 主题值：文件中的颜色转换为 ARGB 整数，其他保持原样。 */
+    /**
+     * [EN] Theme values (`View.cyl_themeValue`): a color of the file becomes an ARGB Int, the rest stays as written. [CN] 主题值：文件中的颜色转换为 ARGB 整数，其他保持原样。
+     */
     override fun cyl_themeValueForName(name: String, context: Context): Any? {
         val value = values[name] ?: return null
         return (value as? String)?.takeIf { it.trim().startsWith("#") }?.let { colorForName(name) } ?: value
@@ -117,7 +133,9 @@ class CYLTabBarConfigurationTheme internal constructor(
 internal object CYLConfigurationThemes {
     const val INFO_KEY = "_CYLTabBarControllerConfigurationThemes"
 
-    /** [EN] What the normalization hands to the controller. [CN] 规范化交给控制器的信息。 */
+    /**
+     * [EN] What the normalization hands to the controller. [CN] 规范化交给控制器的信息。
+     */
     class Info(val values: Map<String, Map<String, Any?>>, val base: String, val dark: String?, val initial: String, val managerName: String?) {
         var themes: List<CYLTabBarConfigurationTheme> = emptyList()
             internal set
@@ -134,7 +152,9 @@ internal object CYLConfigurationThemes {
         return map.entries.filter { it.key is String && it.value != null }.associate { it.key as String to it.value }
     }
 
-    /** [EN] identifier -> named values; null when there is no valid skin. [CN] 标识 -> 命名值；没有有效皮肤时为 null。 */
+    /**
+     * [EN] identifier -> named values; null when there is no valid skin. [CN] 标识 -> 命名值；没有有效皮肤时为 null。
+     */
     fun themes(value: Any?): Map<String, Map<String, Any?>>? {
         val themes = LinkedHashMap<String, Map<String, Any?>>()
         val list: List<*> = when {
@@ -174,7 +194,9 @@ internal object CYLConfigurationThemes {
         return Info(merged, base, dark, initial, managerName)
     }
 
-    /** [EN] A tab with its "@name" values taken from `values`; the keys that refer to a name go to `references`. [CN] 用 `values` 替换 Tab 中的 "@name" 值；引用名称的键记录到 `references`。 */
+    /**
+     * [EN] A tab with its "@name" values taken from `values`; the keys that refer to a name go to `references`. [CN] 用 `values` 替换 Tab 中的 "@name" 值；引用名称的键记录到 `references`。
+     */
     fun resolve(item: Map<String, Any?>, values: Map<String, Any?>, references: MutableMap<String, String>): Map<String, Any?> {
         val resolved = LinkedHashMap(item)
         for ((key, value) in item) {
@@ -195,7 +217,9 @@ internal object CYLConfigurationThemes {
         return resolved
     }
 
-    /** [EN] The skins, with the "@name" keys of every kept tab (by identifier, or position without one). [CN] 生成皮肤，带上每个保留 Tab 的 "@name" 键（按标识，没有时按位置）。 */
+    /**
+     * [EN] The skins, with the "@name" keys of every kept tab (by identifier, or position without one). [CN] 生成皮肤，带上每个保留 Tab 的 "@name" 键（按标识，没有时按位置）。
+     */
     fun finish(info: Info, items: List<Map<String, Any?>>, itemReferences: List<Map<String, String>>) {
         val references = LinkedHashMap<Any, Map<String, String>>()
         var position = 0

@@ -9,7 +9,9 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-/// [EN] Main actor in Swift: views are used on the main thread. [CN] 在 Swift 中属于主 actor：视图只在主线程使用。
+/*!
+ * [EN] Main actor in Swift: views are used on the main thread. [CN] 在 Swift 中属于主 actor：视图只在主线程使用。
+ */
 #ifndef NS_SWIFT_UI_ACTOR
 #define NS_SWIFT_UI_ACTOR
 #endif

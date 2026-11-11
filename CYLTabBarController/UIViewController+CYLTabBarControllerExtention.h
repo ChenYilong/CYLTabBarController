@@ -97,7 +97,7 @@ typedef void (^CYLPushOrPopCallback)(NSArray<__kindof UIViewController *> *viewC
  * [CN] 判断当前控制器对应的 Tab 上是否正在显示角标。
  */
 - (BOOL)cyl_isShowBadge;
-/**
+/*!
  *  show badge with red dot style and CYLBadgeAnimationTypeNone by default.
  *
  * @attention 如果如果涉及到outlayout， 建议在autolayout布局方法后面，添加layoutIfNeeded方法，再去尝试获取frame。 推荐使用 UIViewController 进行调用该方法， 并在 setViewDidLayoutSubViewsBlockInvokeOnce  展示， 因为 如果使用 UIViewController setViewDidLayoutSubViewsBlockInvokeOnce中调用， 可以保证 cyl_showBadge 在 layoutSubviews之后调用。
@@ -124,7 +124,7 @@ typedef void (^CYLPushOrPopCallback)(NSArray<__kindof UIViewController *> *viewC
  */
 - (void)cyl_showBadge;
 
-/**
+/*!
  *
  *  @param value String value, default is `nil`. if value equal @"" means red dot style.
  *  @param animationType animationType
@@ -137,14 +137,14 @@ typedef void (^CYLPushOrPopCallback)(NSArray<__kindof UIViewController *> *viewC
 - (void)cyl_showBadgeValue:(NSString *)value
              animationType:(CYLBadgeAnimationType)animationType;
 
-/**
+/*!
  *  clear badge(hide badge)
  * [EN] Hides the badge on this view controller's tab.
  * [CN] 隐藏当前控制器对应 Tab 上的角标。
  */
 - (void)cyl_clearBadge;
 
-/**
+/*!
  *  make bage(if existing) not hiden
  * [EN] Shows the badge again if one exists and was hidden.
  * [CN] 若角标存在且被隐藏，则重新显示。

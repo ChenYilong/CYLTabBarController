@@ -42,13 +42,17 @@ fun CYLTabBarController.cyl_setupWithViewPager2(viewPager: ViewPager2) {
     binding.attach()
 }
 
-/** [EN] The pager behind `cyl_setupWithViewPager2`, or null. [CN] `cyl_setupWithViewPager2` 绑定的翻页控件，没有时为 null。 */
+/**
+ * [EN] The pager behind `cyl_setupWithViewPager2`, or null. [CN] `cyl_setupWithViewPager2` 绑定的翻页控件，没有时为 null。
+ */
 val CYLTabBarController.cyl_viewPager2: ViewPager2? get() = (cyl_pagesHost as? CYLViewPager2Host)?.viewPager
 
 internal class CYLViewPager2Host(private val controller: CYLTabBarController, val viewPager: ViewPager2) : CYLTabBarController.CYLPagesHost {
     private var syncing = false
 
-    /** [EN] Pages by identity, so a replaced page is a new item. [CN] 按对象标识区分页面，被替换的页面是新的项。 */
+    /**
+     * [EN] Pages by identity, so a replaced page is a new item. [CN] 按对象标识区分页面，被替换的页面是新的项。
+     */
     private val adapter = object : FragmentStateAdapter(controller.activity) {
         override fun getItemCount(): Int = controller.viewControllers.size
         override fun createFragment(position: Int): Fragment = controller.viewControllers[position]
@@ -82,7 +86,9 @@ internal class CYLViewPager2Host(private val controller: CYLTabBarController, va
         showPage(controller.selectedIndex, smooth = false)
     }
 
-    /** [EN] Every page alive, as the controller keeps them (no state lost when leaving a tab). [CN] 所有页面保持存活，与控制器一致（离开 Tab 不丢失状态）。 */
+    /**
+     * [EN] Every page alive, as the controller keeps them (no state lost when leaving a tab). [CN] 所有页面保持存活，与控制器一致（离开 Tab 不丢失状态）。
+     */
     private fun keepEveryPage() {
         viewPager.offscreenPageLimit = maxOf(1, controller.viewControllers.size - 1)
     }

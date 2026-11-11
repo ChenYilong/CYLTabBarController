@@ -25,7 +25,9 @@ import androidx.annotation.ColorInt
  */
 class CYLBadgeView(context: Context) : View(context), CYLBadgeTextDisplaying {
 
-    /** [EN] The view the badge belongs to. [CN] 角标所属的视图。 */
+    /**
+     * [EN] The view the badge belongs to. [CN] 角标所属的视图。
+     */
     var host: View? = null
         internal set
     override var text: String? = null
@@ -33,22 +35,30 @@ class CYLBadgeView(context: Context) : View(context), CYLBadgeTextDisplaying {
             field = value
             requestLayout(); invalidate()
         }
-    /** [EN] `CYLBadgeTextDisplaying.font`: `badgeFont`. [CN] 即 `badgeFont`。 */
+    /**
+     * [EN] `CYLBadgeTextDisplaying.font`: `badgeFont`. [CN] 即 `badgeFont`。
+     */
     override var font: CYLFont
         get() = badgeFont
         set(value) { badgeFont = value; requestLayout() }
-    /** [EN] `CYLBadgeTextDisplaying.textColor`: `badgeTextColor`. [CN] 即 `badgeTextColor`。 */
+    /**
+     * [EN] `CYLBadgeTextDisplaying.textColor`: `badgeTextColor`. [CN] 即 `badgeTextColor`。
+     */
     override var textColor: Int
         get() = badgeTextColor
         set(value) { badgeTextColor = value; invalidate() }
-    /** [EN] `textAlignment` as a `Gravity` (start, center or end). [CN] 以 `Gravity` 表示的对齐方式。 */
+    /**
+     * [EN] `textAlignment` as a `Gravity` (start, center or end). [CN] 以 `Gravity` 表示的对齐方式。
+     */
     override var textGravity: Int = android.view.Gravity.CENTER
         set(value) { field = value; invalidate() }
     @ColorInt var badgeBackgroundColor: Int = Color.RED
     @ColorInt var badgeTextColor: Int = Color.WHITE
     @ColorInt var badgeBorderColor: Int? = null
     var badgeBorderWidth: Float = 0f
-    /** [EN] The dot radius in dp (`cyl_badgeRadius`). [CN] 红点半径（dp）。 */
+    /**
+     * [EN] The dot radius in dp (`cyl_badgeRadius`). [CN] 红点半径（dp）。
+     */
     var badgeRadius: Float = 4f
         set(value) { field = value; requestLayout(); invalidate() }
     var badgeCornerRadius: Float? = null
@@ -75,7 +85,9 @@ class CYLBadgeView(context: Context) : View(context), CYLBadgeTextDisplaying {
     private val textPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { textAlign = Paint.Align.CENTER }
     private val density get() = resources.displayMetrics.density
 
-    /** [EN] A dot when the text is empty. [CN] 文字为空时为红点。 */
+    /**
+     * [EN] A dot when the text is empty. [CN] 文字为空时为红点。
+     */
     val isDot: Boolean get() = text.isNullOrEmpty()
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
@@ -126,7 +138,9 @@ class CYLBadgeView(context: Context) : View(context), CYLBadgeTextDisplaying {
 
     private var running: android.animation.Animator? = null
 
-    /** [EN] Stops the running animation and resets the transform. [CN] 停止正在播放的动画并重置变换。 */
+    /**
+     * [EN] Stops the running animation and resets the transform. [CN] 停止正在播放的动画并重置变换。
+     */
     fun stopAnimation() {
         running?.cancel()
         running = null
@@ -157,7 +171,9 @@ class CYLBadgeView(context: Context) : View(context), CYLBadgeTextDisplaying {
         animator.start()
     }
 
-    /** [EN] Plays a custom `animator` on the badge (the iOS factory animations); `stopAnimation` stops it. [CN] 在角标上播放自定义 `animator`（iOS 的工厂动画）；`stopAnimation` 会停止它。 */
+    /**
+     * [EN] Plays a custom `animator` on the badge (the iOS factory animations); `stopAnimation` stops it. [CN] 在角标上播放自定义 `animator`（iOS 的工厂动画）；`stopAnimation` 会停止它。
+     */
     internal fun playAnimator(animator: android.animation.Animator) {
         stopAnimation()
         running = animator
@@ -179,7 +195,9 @@ class CYLBadgeView(context: Context) : View(context), CYLBadgeTextDisplaying {
  */
 class CYLBadgeState internal constructor() {
     var badge: CYLBadgeView? = null
-    /** [EN] The parent whose overlay holds the badge of a view that cannot hold children. [CN] 不能包含子视图的视图，其角标所在 overlay 的父视图。 */
+    /**
+     * [EN] The parent whose overlay holds the badge of a view that cannot hold children. [CN] 不能包含子视图的视图，其角标所在 overlay 的父视图。
+     */
     internal var overlayHost: ViewGroup? = null
     internal var followsLayout = false
     var value: String? = null
@@ -216,7 +234,9 @@ class CYLBadgeState internal constructor() {
 
 private val badgeStates = java.util.WeakHashMap<View, CYLBadgeState>()
 
-/** [EN] The badge state of a view (created on first use). [CN] 视图的角标状态（首次使用时创建）。 */
+/**
+ * [EN] The badge state of a view (created on first use). [CN] 视图的角标状态（首次使用时创建）。
+ */
 val View.cyl_badgeState: CYLBadgeState
     get() = synchronized(badgeStates) { badgeStates.getOrPut(this) { CYLBadgeState() } }
 
@@ -234,19 +254,29 @@ fun CYLBadgeAccessibilityDescription(context: Context, value: String?): String? 
     else -> value
 }
 
-/** [EN] `cyl_badge`: the badge view, or null before `cyl_showBadge`. [CN] 角标视图；`cyl_showBadge` 之前为 null。 */
+/**
+ * [EN] `cyl_badge`: the badge view, or null before `cyl_showBadge`. [CN] 角标视图；`cyl_showBadge` 之前为 null。
+ */
 val View.cyl_badge: CYLBadgeView? get() = cyl_badgeState.badge
 
-/** [EN] `-cyl_isShowBadge`. [CN] 角标是否显示。 */
+/**
+ * [EN] `-cyl_isShowBadge`. [CN] 角标是否显示。
+ */
 fun View.cyl_isShowBadge(): Boolean = cyl_badgeState.badge?.visibility == View.VISIBLE
 
-/** [EN] `-cyl_showBadge`: a red dot. [CN] 显示红点。 */
+/**
+ * [EN] `-cyl_showBadge`: a red dot. [CN] 显示红点。
+ */
 fun View.cyl_showBadge() = cyl_showBadgeValue("", cyl_badgeState.animationType)
 
-/** [EN] `-cyl_showBadgeValue:`: "" a dot, a number (capped), or a text. [CN] "" 为红点，数字（有上限）或文字。 */
+/**
+ * [EN] `-cyl_showBadgeValue:`: "" a dot, a number (capped), or a text. [CN] "" 为红点，数字（有上限）或文字。
+ */
 fun View.cyl_showBadgeValue(value: String) = cyl_showBadgeValue(value, cyl_badgeState.animationType)
 
-/** [EN] `-cyl_showBadgeValue:animationType:`. [CN] 显示角标并播放动画。 */
+/**
+ * [EN] `-cyl_showBadgeValue:animationType:`. [CN] 显示角标并播放动画。
+ */
 fun View.cyl_showBadgeValue(value: String, animationType: CYLEnums.CYLBadgeAnimationType) {
     val state = cyl_badgeState
     state.value = value
@@ -287,7 +317,9 @@ fun View.cyl_showBadgeValue(value: String, animationType: CYLEnums.CYLBadgeAnima
     if (!reduceMotion) badge.play(animationType)
 }
 
-/** [EN] `-cyl_clearBadge`: removes the badge. [CN] 移除角标。 */
+/**
+ * [EN] `-cyl_clearBadge`: removes the badge. [CN] 移除角标。
+ */
 fun View.cyl_clearBadge() {
     val state = cyl_badgeState
     state.badge?.let { badge -> badge.stopAnimation(); cyl_detachBadge(badge) }
@@ -296,24 +328,32 @@ fun View.cyl_clearBadge() {
     state.paused = false
 }
 
-/** [EN] `-cyl_resumeBadge`: shows a paused badge again. [CN] 重新显示暂停的角标。 */
+/**
+ * [EN] `-cyl_resumeBadge`: shows a paused badge again. [CN] 重新显示暂停的角标。
+ */
 fun View.cyl_resumeBadge() {
     val state = cyl_badgeState
     state.paused = false
     state.badge?.visibility = View.VISIBLE
 }
 
-/** [EN] `-cyl_isPauseBadge`: hidden but kept (e.g. the selected tab with `cyl_hidesBadgeOfSelectedTab`). [CN] 是否暂停（隐藏但保留）。 */
+/**
+ * [EN] `-cyl_isPauseBadge`: hidden but kept (e.g. the selected tab with `cyl_hidesBadgeOfSelectedTab`). [CN] 是否暂停（隐藏但保留）。
+ */
 fun View.cyl_isPauseBadge(): Boolean = cyl_badgeState.paused
 
-/** [EN] Hides the badge without removing it (the iOS "pause"). [CN] 隐藏但不移除角标（iOS 的“暂停”）。 */
+/**
+ * [EN] Hides the badge without removing it (the iOS "pause"). [CN] 隐藏但不移除角标（iOS 的“暂停”）。
+ */
 fun View.cyl_pauseBadge() {
     val state = cyl_badgeState
     state.paused = true
     state.badge?.visibility = View.INVISIBLE
 }
 
-/** [EN] `-cyl_isHidden`: the view or one of its parents is hidden. [CN] 视图或其父视图是否隐藏。 */
+/**
+ * [EN] `-cyl_isHidden`: the view or one of its parents is hidden. [CN] 视图或其父视图是否隐藏。
+ */
 fun View.cyl_isHidden(): Boolean {
     var view: View? = this
     while (view != null) {
@@ -323,13 +363,19 @@ fun View.cyl_isHidden(): Boolean {
     return false
 }
 
-/** [EN] `-cyl_getActualBadgeSuperView`: the parent the badge is added to. [CN] 角标实际添加到的父视图。 */
+/**
+ * [EN] `-cyl_getActualBadgeSuperView`: the parent the badge is added to. [CN] 角标实际添加到的父视图。
+ */
 fun View.cyl_getActualBadgeSuperView(): ViewGroup? = (this as? CYLTabBarItemButton) ?: (this as? CYLPlusButton) ?: (parent as? ViewGroup)
 
-/** [EN] `-cyl_isReady`: the view is laid out. [CN] 视图已布局。 */
+/**
+ * [EN] `-cyl_isReady`: the view is laid out. [CN] 视图已布局。
+ */
 fun View.cyl_isReady(): Boolean = width > 0 && height > 0
 
-/** [EN] `-cyl_findBarButtonContentView`: this view (Android bar buttons are plain views). [CN] 本视图（Android 的栏按钮即普通视图）。 */
+/**
+ * [EN] `-cyl_findBarButtonContentView`: this view (Android bar buttons are plain views). [CN] 本视图（Android 的栏按钮即普通视图）。
+ */
 fun View.cyl_findBarButtonContentView(): View = this
 
 /**
@@ -378,10 +424,14 @@ internal fun cyl_badgeOrigin(anchorRight: Int, anchorTop: Int, badge: View, offs
     return left to top
 }
 
-/** [EN] iOS puts a badge's center 2 pt right of its host's right edge. [CN] iOS 把角标中心放在宿主右边缘右侧 2 pt 处。 */
+/**
+ * [EN] iOS puts a badge's center 2 pt right of its host's right edge. [CN] iOS 把角标中心放在宿主右边缘右侧 2 pt 处。
+ */
 internal const val CYL_BADGE_CORNER_GAP_DP = 2f
 
-/** [EN] `-cyl_refreshBadge`: places the badge at the top-right corner plus `cyl_badgeCenterOffset`. [CN] 把角标放到右上角并加上偏移。 */
+/**
+ * [EN] `-cyl_refreshBadge`: places the badge at the top-right corner plus `cyl_badgeCenterOffset`. [CN] 把角标放到右上角并加上偏移。
+ */
 fun View.cyl_refreshBadge() {
     val state = cyl_badgeState
     val badge = state.badge ?: return
@@ -415,7 +465,9 @@ fun View.cyl_refreshBadge() {
     badge.bringToFront()
 }
 
-/** [EN] `-cyl_resetBadgeAppearance`: drops the values set on this view, so it follows `CYLBadgeAppearance` again. [CN] 清除本视图上设置的值，重新跟随 `CYLBadgeAppearance`。 */
+/**
+ * [EN] `-cyl_resetBadgeAppearance`: drops the values set on this view, so it follows `CYLBadgeAppearance` again. [CN] 清除本视图上设置的值，重新跟随 `CYLBadgeAppearance`。
+ */
 fun View.cyl_resetBadgeAppearance() {
     val state = cyl_badgeState
     state.explicitBackgroundColor = null; state.explicitTextColor = null; state.explicitBorderColor = null; state.explicitBorderWidth = null
@@ -468,10 +520,14 @@ var View.cyl_badgeHostReplacedByIconView: Boolean
 var View.cyl_keepShowingPlusButtonLabel: Boolean
     get() = cyl_badgeState.keepShowingPlusButtonLabel
     set(value) { cyl_badgeState.keepShowingPlusButtonLabel = value }
-/** [EN] `cyl_delayIfNeededForSeconds`: iOS delays the badge until the tab bar is laid out; Android lays out synchronously, so the value is kept only. [CN] iOS 延迟到 TabBar 布局完成；Android 同步布局，只保存该值。 */
+/**
+ * [EN] `cyl_delayIfNeededForSeconds`: iOS delays the badge until the tab bar is laid out; Android lays out synchronously, so the value is kept only. [CN] iOS 延迟到 TabBar 布局完成；Android 同步布局，只保存该值。
+ */
 var View.cyl_delayIfNeededForSeconds: Double
     get() = cyl_badgeState.delayIfNeededForSeconds
     set(value) { cyl_badgeState.delayIfNeededForSeconds = value }
-/** [EN] `cyl_badgeFrame`: the badge's frame in its parent, in px. [CN] 角标在父视图中的位置（px）。 */
+/**
+ * [EN] `cyl_badgeFrame`: the badge's frame in its parent, in px. [CN] 角标在父视图中的位置（px）。
+ */
 val View.cyl_badgeFrame: RectF
     get() = cyl_badge?.let { RectF(it.left.toFloat(), it.top.toFloat(), it.right.toFloat(), it.bottom.toFloat()) } ?: RectF()

@@ -31,11 +31,15 @@ import kotlin.math.abs
 class CYLTabBarItemButton(context: Context, val item: CYLTabBarItem, val index: Int) : FrameLayout(context) {
 
     val iconView = ImageView(context).apply { scaleType = ImageView.ScaleType.CENTER_INSIDE }
-    /** [EN] The view of `setTabBarItemIconViewProvider`, laid out in place of the icon. [CN] `setTabBarItemIconViewProvider` 提供的视图，代替图标布局。 */
+    /**
+     * [EN] The view of `setTabBarItemIconViewProvider`, laid out in place of the icon. [CN] `setTabBarItemIconViewProvider` 提供的视图，代替图标布局。
+     */
     internal var cyl_customIconView: View? = null
     internal var cyl_iconViewProvider: CYLTabBarItemIconViewProvider? = null
 
-    /** [EN] Asks the icon view provider for the view of the current selection. [CN] 向图标视图 provider 请求当前选中状态的视图。 */
+    /**
+     * [EN] Asks the icon view provider for the view of the current selection. [CN] 向图标视图 provider 请求当前选中状态的视图。
+     */
     internal fun cyl_applyIconViewProvider() {
         cyl_customIconView?.let { removeView(it) }
         cyl_customIconView = cyl_iconViewProvider?.invoke(isSelected)?.also { custom -> (custom.parent as? ViewGroup)?.removeView(custom); addView(custom) }
@@ -227,13 +231,17 @@ class CYLTabBarItemButton(context: Context, val item: CYLTabBarItem, val index: 
         return if (!hasIcon && item.layoutCentered) (height - titleHeight) / 2 else height - titleHeight - (2 * density).toInt()
     }
 
-    /** [EN] FlatDesign: the icon centered above the title, or centered for a lone icon with `layoutCentered`. [CN] 扁平样式：图标在标题上方居中；只有图标且 `layoutCentered` 时居中。 */
+    /**
+     * [EN] FlatDesign: the icon centered above the title, or centered for a lone icon with `layoutCentered`. [CN] 扁平样式：图标在标题上方居中；只有图标且 `layoutCentered` 时居中。
+     */
     private fun flatIconTop(iconSize: Int, titleTop: Int, hasTitle: Boolean, density: Float): Int {
         val centerTop = if (!hasTitle && item.layoutCentered) (height - iconSize) / 2f else (titleTop - iconSize) / 2f
         return (centerTop + item.cyl_imageInsets.top * density + item.cyl_imagePositionAdjustment.vertical * density).toInt()
     }
 
-    /** [EN] Applies the item's title, images and colors for the current selection. [CN] 按当前选中状态应用标题、图片与颜色。 */
+    /**
+     * [EN] Applies the item's title, images and colors for the current selection. [CN] 按当前选中状态应用标题、图片与颜色。
+     */
     fun apply(selected: Boolean, tabBar: CYLTabBar) {
         val selectionChanged = isSelected != selected
         isSelected = selected
@@ -302,7 +310,9 @@ class CYLTabBarItemButton(context: Context, val item: CYLTabBarItem, val index: 
         if (normal != null && selected != null) iconView.setColorFilter(CYLTabBarIndicator.blend(normal, selected, fraction), PorterDuff.Mode.SRC_IN)
     }
 
-    /** [EN] The width of the content (the title, or the icon without a title), in px. [CN] 内容宽度（标题，没有标题时为图标），像素。 */
+    /**
+     * [EN] The width of the content (the title, or the icon without a title), in px. [CN] 内容宽度（标题，没有标题时为图标），像素。
+     */
     internal fun cyl_contentWidth(): Int {
         val title = titleLabel.text
         if (title.isNotEmpty()) return kotlin.math.ceil(titleLabel.paint.measureText(title.toString())).toInt() + titleLabel.paddingLeft + titleLabel.paddingRight
@@ -319,35 +329,57 @@ class CYLTabBarItemButton(context: Context, val item: CYLTabBarItem, val index: 
  */
 class CYLTabBar(context: Context) : ViewGroup(context) {
 
-    /** [EN] `tabBarController`: the owner. [CN] 所属控制器。 */
+    /**
+     * [EN] `tabBarController`: the owner. [CN] 所属控制器。
+     */
     internal var tabBarController: CYLTabBarController? = null
     fun tabBarController(): CYLTabBarController? = tabBarController
 
-    /** [EN] `context` (the plus button context). [CN] context（PlusButton 的 context）。 */
+    /**
+     * [EN] `context` (the plus button context). [CN] context（PlusButton 的 context）。
+     */
     var context_: String? = null
-    /** [EN] `tabImageViewDefaultOffset`: moves every icon, in dp. [CN] 所有图标的默认偏移（dp）。 */
+    /**
+     * [EN] `tabImageViewDefaultOffset`: moves every icon, in dp. [CN] 所有图标的默认偏移（dp）。
+     */
     var tabImageViewDefaultOffset: Float = 0f
-    /** [EN] `cyl_itemEdgeInsets`: insets of every tab button. [CN] 每个 Tab 按钮的边距。 */
+    /**
+     * [EN] `cyl_itemEdgeInsets`: insets of every tab button. [CN] 每个 Tab 按钮的边距。
+     */
     var cyl_itemEdgeInsets: CYLEdgeInsets = CYLEdgeInsets.zero
-    /** [EN] `didLayoutSubViewsBlock`. [CN] 布局完成回调。 */
+    /**
+     * [EN] `didLayoutSubViewsBlock`. [CN] 布局完成回调。
+     */
     var didLayoutSubViewsBlock: CYLTabBarDidLayoutSubViewsBlock? = null
     var syncsClassicStylesToAppearance = true
-    /** [EN] `plusButton`: the plus button of this bar, or null. [CN] 本 TabBar 的 PlusButton，没有则为 null。 */
+    /**
+     * [EN] `plusButton`: the plus button of this bar, or null. [CN] 本 TabBar 的 PlusButton，没有则为 null。
+     */
     var plusButton: CYLPlusButton? = null
         internal set
-    /** [EN] `plusButtonActive`: whether the plus button's own page is selected. [CN] PlusButton 的页面是否被选中。 */
+    /**
+     * [EN] `plusButtonActive`: whether the plus button's own page is selected. [CN] PlusButton 的页面是否被选中。
+     */
     var plusButtonActive: Boolean = false
         internal set
-    /** [EN] `tabBarButtonArray` (`cyl_subTabBarButtons`): one button per tab, in order. [CN] 每个 Tab 一个按钮，按顺序。 */
+    /**
+     * [EN] `tabBarButtonArray` (`cyl_subTabBarButtons`): one button per tab, in order. [CN] 每个 Tab 一个按钮，按顺序。
+     */
     val tabBarButtonArray: List<CYLTabBarItemButton> get() = buttons.toList()
-    /** [EN] `tabBarItemWidth`: the width of one tab, in dp. [CN] 一个 Tab 的宽度（dp）。 */
+    /**
+     * [EN] `tabBarItemWidth`: the width of one tab, in dp. [CN] 一个 Tab 的宽度（dp）。
+     */
     val tabBarItemWidth: Float get() = if (slotCount() == 0) 0f else width / slotCount().toFloat() / resources.displayMetrics.density
-    /** [EN] The selected tint; by default the style's (blue, or the Liquid Glass accent). [CN] 选中颜色；默认使用样式的颜色（蓝色，或液态玻璃的强调色）。 */
+    /**
+     * [EN] The selected tint; by default the style's (blue, or the Liquid Glass accent). [CN] 选中颜色；默认使用样式的颜色（蓝色，或液态玻璃的强调色）。
+     */
     @get:ColorInt @setparam:ColorInt
     var selectedTintColor: Int
         get() = customSelectedTintColor ?: styleRenderer.defaultTintColors(this).first
         set(value) { customSelectedTintColor = value; refreshSelection() }
-    /** [EN] The unselected tint; by default the style's (gray, or the Liquid Glass label color). [CN] 未选中颜色；默认使用样式的颜色（灰色，或液态玻璃的文字颜色）。 */
+    /**
+     * [EN] The unselected tint; by default the style's (gray, or the Liquid Glass label color). [CN] 未选中颜色；默认使用样式的颜色（灰色，或液态玻璃的文字颜色）。
+     */
     @get:ColorInt @setparam:ColorInt
     var unselectedTintColor: Int
         get() = customUnselectedTintColor ?: styleRenderer.defaultTintColors(this).second
@@ -357,7 +389,9 @@ class CYLTabBar(context: Context) : ViewGroup(context) {
 
     // MARK: - Styles (classic, FlatDesign, Liquid Glass) 样式（经典、扁平、液态玻璃）
 
-    /** [EN] Draws and lays out the bar in the controller's `tabBarStyleType` (see `CYLTabBarStyle.kt`). [CN] 按控制器的 `tabBarStyleType` 绘制与布局 TabBar（见 `CYLTabBarStyle.kt`）。 */
+    /**
+     * [EN] Draws and lays out the bar in the controller's `tabBarStyleType` (see `CYLTabBarStyle.kt`). [CN] 按控制器的 `tabBarStyleType` 绘制与布局 TabBar（见 `CYLTabBarStyle.kt`）。
+     */
     internal var styleRenderer: CYLTabBarStyleRenderer = CYLClassicTabBarStyle
         set(value) {
             if (field === value) return
@@ -368,30 +402,44 @@ class CYLTabBar(context: Context) : ViewGroup(context) {
             requestLayout()
             invalidate()
         }
-    /** [EN] The frame of the items inside the bar, from the style. [CN] Item 在 TabBar 中的区域，由样式给出。 */
+    /**
+     * [EN] The frame of the items inside the bar, from the style. [CN] Item 在 TabBar 中的区域，由样式给出。
+     */
     internal val cyl_itemsFrame = Rect()
-    /** [EN] The space between slots that the style chose in its last `itemsFrame` (centered items). [CN] 样式在最近一次 `itemsFrame` 中确定的 slot 间距（居中的 Item）。 */
+    /**
+     * [EN] The space between slots that the style chose in its last `itemsFrame` (centered items). [CN] 样式在最近一次 `itemsFrame` 中确定的 slot 间距（居中的 Item）。
+     */
     internal var cyl_itemSpacing: Int = 0
     internal val cyl_touchSlop: Int get() = touchSlop
 
     // MARK: - CYLFlatDesignTabBar (FlatDesign style) 扁平样式
 
-    /** [EN] `CYLFlatDesignTabBar.tintColor`: the selected tint (`selectedTintColor`). [CN] 选中颜色（`selectedTintColor`）。 */
+    /**
+     * [EN] `CYLFlatDesignTabBar.tintColor`: the selected tint (`selectedTintColor`). [CN] 选中颜色（`selectedTintColor`）。
+     */
     @get:ColorInt @setparam:ColorInt
     var tintColor: Int
         get() = selectedTintColor
         set(value) { selectedTintColor = value }
-    /** [EN] `barTintColor`: a color over the FlatDesign blur (default clear). [CN] 叠加在扁平样式模糊之上的颜色（默认透明）。 */
+    /**
+     * [EN] `barTintColor`: a color over the FlatDesign blur (default clear). [CN] 叠加在扁平样式模糊之上的颜色（默认透明）。
+     */
     @get:ColorInt @setparam:ColorInt
     var barTintColor: Int = Color.TRANSPARENT
         set(value) { field = value; invalidate() }
-    /** [EN] `backgroundImage`: replaces the FlatDesign blur. [CN] 代替扁平样式的模糊。 */
+    /**
+     * [EN] `backgroundImage`: replaces the FlatDesign blur. [CN] 代替扁平样式的模糊。
+     */
     var backgroundImage: android.graphics.drawable.Drawable? = null
         set(value) { field = value; invalidate() }
-    /** [EN] `shadowImage`: the FlatDesign top line (none by default). [CN] 扁平样式顶部的线条（默认没有）。 */
+    /**
+     * [EN] `shadowImage`: the FlatDesign top line (none by default). [CN] 扁平样式顶部的线条（默认没有）。
+     */
     var shadowImage: android.graphics.drawable.Drawable? = null
         set(value) { field = value; invalidate() }
-    /** [EN] `standardAppearance`: the FlatDesign appearance; the selected item's own one wins. [CN] 扁平样式的外观；选中 item 自身的优先。 */
+    /**
+     * [EN] `standardAppearance`: the FlatDesign appearance; the selected item's own one wins. [CN] 扁平样式的外观；选中 item 自身的优先。
+     */
     var standardAppearance: CYLTabBarAppearance? = null
         set(value) { field = value; refreshSelection(); requestLayout(); invalidate() }
     /**
@@ -422,7 +470,9 @@ class CYLTabBar(context: Context) : ViewGroup(context) {
         set(value) { field = value; invalidate() }
     var respectsVerticalStatusBarSafeArea: Boolean = false
 
-    /** [EN] The appearance drawn now: the selected item's, else the bar's. [CN] 当前绘制所用的外观：选中 item 的，否则为 TabBar 的。 */
+    /**
+     * [EN] The appearance drawn now: the selected item's, else the bar's. [CN] 当前绘制所用的外观：选中 item 的，否则为 TabBar 的。
+     */
     internal fun cyl_effectiveAppearance(): CYLTabBarAppearance? {
         val selected = tabBarController?.selectedIndex ?: -1
         return buttons.getOrNull(selected)?.item?.standardAppearance ?: standardAppearance
@@ -434,7 +484,9 @@ class CYLTabBar(context: Context) : ViewGroup(context) {
 
     internal fun cyl_slotCount(): Int = slotCount()
 
-    /** [EN] The slot of the selected tab (the plus button's when it is active), or -1. [CN] 选中 Tab 的 slot（PlusButton 激活时为其 slot），没有则为 -1。 */
+    /**
+     * [EN] The slot of the selected tab (the plus button's when it is active), or -1. [CN] 选中 Tab 的 slot（PlusButton 激活时为其 slot），没有则为 -1。
+     */
     internal fun cyl_selectedSlot(): Int {
         val plusIndex = plusButtonIndex()
         if (plusButtonActive && plusIndex >= 0) return plusIndex
@@ -443,14 +495,18 @@ class CYLTabBar(context: Context) : ViewGroup(context) {
         return if (plusIndex in 0..index) index + 1 else index
     }
 
-    /** [EN] The tab slot nearest to `position`, skipping a plus button without a page. [CN] 离 `position` 最近的 Tab slot，跳过没有页面的 PlusButton。 */
+    /**
+     * [EN] The tab slot nearest to `position`, skipping a plus button without a page. [CN] 离 `position` 最近的 Tab slot，跳过没有页面的 PlusButton。
+     */
     internal fun cyl_nearestTabSlot(position: Float): Int {
         val plusIndex = plusButtonIndex()
         val selectable = (0 until slotCount()).filter { it != plusIndex || hasPlusChildViewController() }
         return selectable.minByOrNull { abs(it - position) } ?: 0
     }
 
-    /** [EN] Selects the tab at `slot`, as a tap on it does. [CN] 选中 `slot` 处的 Tab，与点击它相同。 */
+    /**
+     * [EN] Selects the tab at `slot`, as a tap on it does. [CN] 选中 `slot` 处的 Tab，与点击它相同。
+     */
     internal fun cyl_selectSlot(slot: Int) {
         val plusIndex = plusButtonIndex()
         if (slot == plusIndex) { plusButton?.performClick(); return }
@@ -465,15 +521,23 @@ class CYLTabBar(context: Context) : ViewGroup(context) {
 
     // MARK: - Indicator and scroll mode (Android only, adapted from QMUITabSegment) 指示器与滚动模式（仅 Android，改编自 QMUITabSegment）
 
-    /** [EN] Android only: the selection indicator (`CYLTabBarIndicator`), or null (default, as on iOS). [CN] 仅 Android：选中指示条（`CYLTabBarIndicator`），默认 null（与 iOS 一致）。 */
+    /**
+     * [EN] Android only: the selection indicator (`CYLTabBarIndicator`), or null (default, as on iOS). [CN] 仅 Android：选中指示条（`CYLTabBarIndicator`），默认 null（与 iOS 一致）。
+     */
     var cyl_indicator: CYLTabBarIndicator? = null
         set(value) { field = value; indicatorIndex = -1; layoutIndicator(animated = false); invalidate() }
-    /** [EN] Android only: the duration of the indicator's move to a newly selected tab, in seconds (default 0.2). [CN] 仅 Android：指示条移动到新选中 Tab 的时长（秒，默认 0.2）。 */
+    /**
+     * [EN] Android only: the duration of the indicator's move to a newly selected tab, in seconds (default 0.2). [CN] 仅 Android：指示条移动到新选中 Tab 的时长（秒，默认 0.2）。
+     */
     var cyl_indicatorAnimationDuration: Double = 0.2
-    /** [EN] Android only: `Fixed` (default) or `Scrollable` (`CYLTabBarScrollMode`). [CN] 仅 Android：`Fixed`（默认）或 `Scrollable`（`CYLTabBarScrollMode`）。 */
+    /**
+     * [EN] Android only: `Fixed` (default) or `Scrollable` (`CYLTabBarScrollMode`). [CN] 仅 Android：`Fixed`（默认）或 `Scrollable`（`CYLTabBarScrollMode`）。
+     */
     var cyl_scrollMode: CYLTabBarScrollMode = CYLTabBarScrollMode.Fixed
         set(value) { field = value; scrollTo(0, 0); requestLayout() }
-    /** [EN] Android only: the room added to each tab's content in the scrollable mode, in dp (default 24). [CN] 仅 Android：滚动模式下每个 Tab 内容之外的空间（dp，默认 24）。 */
+    /**
+     * [EN] Android only: the room added to each tab's content in the scrollable mode, in dp (default 24). [CN] 仅 Android：滚动模式下每个 Tab 内容之外的空间（dp，默认 24）。
+     */
     var cyl_itemSpaceInScrollMode: Float = 24f
         set(value) { field = value; requestLayout() }
     /**
@@ -501,7 +565,9 @@ class CYLTabBar(context: Context) : ViewGroup(context) {
             requestLayout()
         }
 
-    /** [EN] The height of the items' area: the bar without the bottom safe area. [CN] Item 区域的高度：不含底部安全区的 TabBar 高度。 */
+    /**
+     * [EN] The height of the items' area: the bar without the bottom safe area. [CN] Item 区域的高度：不含底部安全区的 TabBar 高度。
+     */
     private val itemsHeight: Int get() = cyl_itemsFrame.height().takeIf { it > 0 } ?: (height - cyl_safeAreaBottom)
     private var contentWidth = 0
     private var indicatorIndex = -1
@@ -517,14 +583,22 @@ class CYLTabBar(context: Context) : ViewGroup(context) {
 
     // MARK: - UITabBar (CYLBarBackground) 背景
 
-    /** [EN] `cyl_shadowImageView`: the shadow line at the top of the bar (`cyl_tabBarShadowColor`). [CN] TabBar 顶部的阴影线。 */
+    /**
+     * [EN] `cyl_shadowImageView`: the shadow line at the top of the bar (`cyl_tabBarShadowColor`). [CN] TabBar 顶部的阴影线。
+     */
     val cyl_shadowImageView: View get() = shadow
-    /** [EN] `cyl_backgroundView`: a full-size view behind the tabs, for a background color, image or drawable. [CN] Tab 后面的全尺寸视图，用于背景颜色、图片或 drawable。 */
+    /**
+     * [EN] `cyl_backgroundView`: a full-size view behind the tabs, for a background color, image or drawable. [CN] Tab 后面的全尺寸视图，用于背景颜色、图片或 drawable。
+     */
     val cyl_backgroundView: View by lazy { View(context).also { addView(it, 0) } }
     private var effectView: View? = null
-    /** [EN] `cyl_effectViews`: the effect views behind the tabs (the blur of `cyl_backgroundEffect`). [CN] Tab 后面的效果视图（`cyl_backgroundEffect` 的模糊）。 */
+    /**
+     * [EN] `cyl_effectViews`: the effect views behind the tabs (the blur of `cyl_backgroundEffect`). [CN] Tab 后面的效果视图（`cyl_backgroundEffect` 的模糊）。
+     */
     val cyl_effectViews: List<View> get() = listOfNotNull(effectView)
-    /** [EN] `cyl_effectView`: the first effect view, or null. [CN] 第一个效果视图，没有时为 null。 */
+    /**
+     * [EN] `cyl_effectView`: the first effect view, or null. [CN] 第一个效果视图，没有时为 null。
+     */
     val cyl_effectView: View? get() = effectView
     /**
      * [EN] `cyl_backgroundEffect`: an effect drawn behind the tabs: a `RenderEffect` (Android 12+, e.g. a blur of
@@ -547,7 +621,9 @@ class CYLTabBar(context: Context) : ViewGroup(context) {
             else if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) view.setRenderEffect(effect as? android.graphics.RenderEffect)
             applyEffectForeground()
         }
-    /** [EN] `cyl_effectForegroundColor`: a color laid over the effect view (a tint of the blur). [CN] 叠加在效果视图上的颜色（模糊的着色）。 */
+    /**
+     * [EN] `cyl_effectForegroundColor`: a color laid over the effect view (a tint of the blur). [CN] 叠加在效果视图上的颜色（模糊的着色）。
+     */
     @ColorInt var cyl_effectForegroundColor: Int? = null
         set(value) { field = value; applyEffectForeground() }
 
@@ -568,21 +644,31 @@ class CYLTabBar(context: Context) : ViewGroup(context) {
         clipToPadding = false
     }
 
-    /** [EN] `-hasPlusButton`. [CN] 是否有 PlusButton。 */
+    /**
+     * [EN] `-hasPlusButton`. [CN] 是否有 PlusButton。
+     */
     fun hasPlusButton(): Boolean = plusButton != null
 
-    /** [EN] `-hasPlusChildViewController`. [CN] PlusButton 是否有子页面。 */
+    /**
+     * [EN] `-hasPlusChildViewController`. [CN] PlusButton 是否有子页面。
+     */
     fun hasPlusChildViewController(): Boolean = CYLPlusButton.hasPlusChildViewControllerForTabBarContext(context_)
 
-    /** [EN] `-plusButtonIndex`: the slot of the plus button among the tabs, or -1. [CN] PlusButton 在 Tab 中的 slot 下标，没有则为 -1。 */
+    /**
+     * [EN] `-plusButtonIndex`: the slot of the plus button among the tabs, or -1. [CN] PlusButton 在 Tab 中的 slot 下标，没有则为 -1。
+     */
     fun plusButtonIndex(): Int = if (plusButton == null) -1 else CYLPlusButton.indexForTabbarItemsCount(buttons.size, context_)
 
-    /** [EN] `-isPlusButtonLayoutCentered`. [CN] PlusButton 是否居中布局。 */
+    /**
+     * [EN] `-isPlusButtonLayoutCentered`. [CN] PlusButton 是否居中布局。
+     */
     fun isPlusButtonLayoutCentered(): Boolean = plusButton?.isLayoutCentered() ?: false
 
     private fun slotCount(): Int = buttons.size + (if (plusButton != null) 1 else 0)
 
-    /** [EN] `-cyl_reloadTabButtons`: builds the buttons again from the controller's items. [CN] 根据控制器的 item 重新创建按钮。 */
+    /**
+     * [EN] `-cyl_reloadTabButtons`: builds the buttons again from the controller's items. [CN] 根据控制器的 item 重新创建按钮。
+     */
     fun cyl_reloadTabButtons() {
         val controller = tabBarController ?: return
         for (button in buttons) removeView(button)
@@ -612,7 +698,9 @@ class CYLTabBar(context: Context) : ViewGroup(context) {
         updateGlobals()
     }
 
-    /** [EN] Dark Mode changed: every tab's animation swaps to the current style (#442). [CN] 深色模式变化：每个 Tab 的动画切换为当前风格（#442）。 */
+    /**
+     * [EN] Dark Mode changed: every tab's animation swaps to the current style (#442). [CN] 深色模式变化：每个 Tab 的动画切换为当前风格（#442）。
+     */
     override fun onConfigurationChanged(newConfig: android.content.res.Configuration?) {
         super.onConfigurationChanged(newConfig)
         for (button in buttons) button.cyl_reloadTabBarItemAnimationViewForCurrentStyle()
@@ -621,7 +709,9 @@ class CYLTabBar(context: Context) : ViewGroup(context) {
         newConfig?.let { configuration -> tabBarController?.cyl_themeManager?.takeIf { it.identifierForTrait != null }?.updateThemeForTraitCollection(configuration) }
     }
 
-    /** [EN] The iOS globals `CYLTabbarItemsCount`, `CYLPlusButtonIndex`, `CYLPlusButtonWidth`, `CYLTabBarItemWidth`, `CYLTabBarHeight`: the latest tab bar's values. [CN] iOS 的全局变量：最近布局的 TabBar 的值。 */
+    /**
+     * [EN] The iOS globals `CYLTabbarItemsCount`, `CYLPlusButtonIndex`, `CYLPlusButtonWidth`, `CYLTabBarItemWidth`, `CYLTabBarHeight`: the latest tab bar's values. [CN] iOS 的全局变量：最近布局的 TabBar 的值。
+     */
     private fun updateGlobals() {
         CYLTabbarItemsCount = buttons.size
         CYLPlusButtonIndex = plusButtonIndex()
@@ -641,7 +731,9 @@ class CYLTabBar(context: Context) : ViewGroup(context) {
         invalidate()
     }
 
-    /** [EN] The plus button's selection and title colors, after a selection change. [CN] 选中状态变化后，PlusButton 的选中状态与标题颜色。 */
+    /**
+     * [EN] The plus button's selection and title colors, after a selection change. [CN] 选中状态变化后，PlusButton 的选中状态与标题颜色。
+     */
     private fun refreshPlusButtonTitle(plus: CYLPlusButton, controller: CYLTabBarController) {
         plus.isSelected = plusButtonActive
         if (plus.cyl_alignsTitleWithTabBarItemTitles()) {
@@ -669,7 +761,9 @@ class CYLTabBar(context: Context) : ViewGroup(context) {
 
     private fun indicatorTarget(): Int = if (plusButtonActive) -1 else tabBarController?.selectedIndex ?: -1
 
-    /** [EN] `layoutIndicator`: puts the indicator on the selected tab, moving it there when `animated`. [CN] 把指示条放到选中 Tab 上，`animated` 时移动过去。 */
+    /**
+     * [EN] `layoutIndicator`: puts the indicator on the selected tab, moving it there when `animated`. [CN] 把指示条放到选中 Tab 上，`animated` 时移动过去。
+     */
     private fun layoutIndicator(animated: Boolean) {
         val indicator = cyl_indicator ?: return
         val target = indicatorTarget()
@@ -702,7 +796,9 @@ class CYLTabBar(context: Context) : ViewGroup(context) {
 
     private fun indicatorWidth(button: CYLTabBarItemButton, follows: Boolean): Int = if (follows) minOf(button.width, button.cyl_contentWidth()) else button.width
 
-    /** [EN] `layoutIndicatorInTransition`: between two tabs, position, width and color blended by `fraction`. [CN] 在两个 Tab 之间，按 `fraction` 渐变位置、宽度与颜色。 */
+    /**
+     * [EN] `layoutIndicatorInTransition`: between two tabs, position, width and color blended by `fraction`. [CN] 在两个 Tab 之间，按 `fraction` 渐变位置、宽度与颜色。
+     */
     private fun layoutIndicatorInTransition(from: CYLTabBarItemButton, to: CYLTabBarItemButton, fraction: Float) {
         val indicator = cyl_indicator ?: return
         val follows = indicator.widthFollowsContent
@@ -734,7 +830,9 @@ class CYLTabBar(context: Context) : ViewGroup(context) {
         layoutIndicatorInTransition(from, to, fraction)
     }
 
-    /** [EN] In the scrollable mode, scrolls the selected tab to the middle when it can. [CN] 滚动模式下，尽量把选中 Tab 滚动到中间。 */
+    /**
+     * [EN] In the scrollable mode, scrolls the selected tab to the middle when it can. [CN] 滚动模式下，尽量把选中 Tab 滚动到中间。
+     */
     private fun scrollSelectedTabIntoView() {
         if (maxScrollX <= 0) return
         val button = buttons.getOrNull(indicatorTarget()) ?: return
@@ -745,7 +843,9 @@ class CYLTabBar(context: Context) : ViewGroup(context) {
         startScrollStep()
     }
 
-    /** [EN] Drives the scroller once per frame (not from `computeScroll`, so it also runs without a draw pass). [CN] 每帧推进 scroller（不依赖 `computeScroll`，没有绘制时也能运行）。 */
+    /**
+     * [EN] Drives the scroller once per frame (not from `computeScroll`, so it also runs without a draw pass). [CN] 每帧推进 scroller（不依赖 `computeScroll`，没有绘制时也能运行）。
+     */
     private val scrollStep = Runnable { stepScroll() }
 
     private fun stepScroll() {
@@ -908,8 +1008,12 @@ class CYLTabBar(context: Context) : ViewGroup(context) {
         didLayoutSubViewsBlock?.invoke(this)
     }
 
-    /** [EN] The plus button centered on `centerX`, its centerY from the multiplier and offset, grown down to the tab titles' line when the title is aligned. [CN] PlusButton 以 `centerX` 居中，centerY 来自倍数与偏移；标题对齐时向下延伸到 Tab 标题所在的线。 */
-    /** [EN] The shadow line, background and effect views stay in place while the tabs scroll. [CN] 阴影线、背景与效果视图在 Tab 滚动时保持不动。 */
+    /**
+     * [EN] The plus button centered on `centerX`, its centerY from the multiplier and offset, grown down to the tab titles' line when the title is aligned. [CN] PlusButton 以 `centerX` 居中，centerY 来自倍数与偏移；标题对齐时向下延伸到 Tab 标题所在的线。
+     */
+    /**
+     * [EN] The shadow line, background and effect views stay in place while the tabs scroll. [CN] 阴影线、背景与效果视图在 Tab 滚动时保持不动。
+     */
     private fun layoutFixedChildren() {
         val density = resources.displayMetrics.density
         shadow.layout(scrollX, 0, scrollX + width, maxOf(1, (0.5f * density).toInt()))
@@ -953,10 +1057,14 @@ class CYLTabBar(context: Context) : ViewGroup(context) {
 
     private val touchableAreaPaint = Paint(Paint.ANTI_ALIAS_FLAG)
 
-    /** [EN] True while the plus button is drawn on its own, after everything else. [CN] 单独绘制 PlusButton（在其他内容之后）时为 true。 */
+    /**
+     * [EN] True while the plus button is drawn on its own, after everything else. [CN] 单独绘制 PlusButton（在其他内容之后）时为 true。
+     */
     private var drawingPlusButtonLast = false
 
-    /** [EN] The plus button is skipped in the children's pass and drawn last by `dispatchDraw`. [CN] PlusButton 在子视图的绘制中跳过，由 `dispatchDraw` 最后绘制。 */
+    /**
+     * [EN] The plus button is skipped in the children's pass and drawn last by `dispatchDraw`. [CN] PlusButton 在子视图的绘制中跳过，由 `dispatchDraw` 最后绘制。
+     */
     override fun drawChild(canvas: Canvas, child: View, drawingTime: Long): Boolean {
         if (child === plusButton && !drawingPlusButtonLast) return false
         return super.drawChild(canvas, child, drawingTime)
@@ -989,10 +1097,14 @@ class CYLTabBar(context: Context) : ViewGroup(context) {
         }
     }
 
-    /** [EN] Whether a touch (in this bar's coordinates) falls in the plus button's touchable rect, inside or outside the bar (#91). [CN] 触摸（本 TabBar 坐标）是否落在 PlusButton 的可点击矩形内，无论在 TabBar 内外（#91）。 */
+    /**
+     * [EN] Whether a touch (in this bar's coordinates) falls in the plus button's touchable rect, inside or outside the bar (#91). [CN] 触摸（本 TabBar 坐标）是否落在 PlusButton 的可点击矩形内，无论在 TabBar 内外（#91）。
+     */
     fun cyl_plusButtonTouchable(x: Float, y: Float): Boolean = plusButton?.touchableRect()?.contains((x + scrollX).toInt(), y.toInt()) ?: false
 
-    /** [EN] Sends a touch (in this bar's coordinates) to the plus button. [CN] 把触摸（本 TabBar 坐标）交给 PlusButton。 */
+    /**
+     * [EN] Sends a touch (in this bar's coordinates) to the plus button. [CN] 把触摸（本 TabBar 坐标）交给 PlusButton。
+     */
     fun cyl_dispatchTouchToPlusButton(event: MotionEvent): Boolean {
         val plus = plusButton ?: return false
         val forwarded = MotionEvent.obtain(event).apply { offsetLocation(scrollX - plus.left.toFloat(), -plus.top.toFloat()) }
@@ -1015,11 +1127,15 @@ class CYLTabBar(context: Context) : ViewGroup(context) {
 
     private var plusRoutedTouch = false
 
-    /** [EN] `-cyl_tabBarButtonWithTabIndex:`. [CN] 第 `index` 个 Tab 的按钮。 */
+    /**
+     * [EN] `-cyl_tabBarButtonWithTabIndex:`. [CN] 第 `index` 个 Tab 的按钮。
+     */
     fun cyl_tabBarButtonWithTabIndex(index: Int): CYLTabBarItemButton? = buttons.getOrNull(index)
 
     companion object {
-        /** [EN] The iOS globals (`CYLTabBarController.h`), updated by the latest tab bar layout. [CN] iOS 的全局变量，由最近一次 TabBar 布局更新。 */
+        /**
+         * [EN] The iOS globals (`CYLTabBarController.h`), updated by the latest tab bar layout. [CN] iOS 的全局变量，由最近一次 TabBar 布局更新。
+         */
         @JvmStatic var CYLTabbarItemsCount: Int = 0
         @JvmStatic var CYLPlusButtonIndex: Int = -1
         @JvmStatic var CYLPlusButtonWidth: Float = 0f
@@ -1028,5 +1144,7 @@ class CYLTabBar(context: Context) : ViewGroup(context) {
     }
 }
 
-/** [EN] The size of a tab's image view in UIKit's Liquid Glass tab bar, where iOS anchors its badge. [CN] UIKit 液态玻璃 TabBar 中 Tab 图片视图的尺寸，iOS 角标锚定于此。 */
+/**
+ * [EN] The size of a tab's image view in UIKit's Liquid Glass tab bar, where iOS anchors its badge. [CN] UIKit 液态玻璃 TabBar 中 Tab 图片视图的尺寸，iOS 角标锚定于此。
+ */
 internal const val CYL_LIQUID_GLASS_TAB_IMAGE_DP = 22f

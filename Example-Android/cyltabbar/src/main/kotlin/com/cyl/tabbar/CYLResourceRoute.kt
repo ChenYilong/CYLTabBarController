@@ -23,16 +23,24 @@ import java.io.File
  *      本库从不内置这些资源：字符串表与配置文件属于 App。
  */
 object CYLResourceRoute {
-    /** [EN] The prefix of a folder in the assets, for `baseDirectory`. [CN] `baseDirectory` 中表示 assets 目录的前缀。 */
+    /**
+     * [EN] The prefix of a folder in the assets, for `baseDirectory`. [CN] `baseDirectory` 中表示 assets 目录的前缀。
+     */
     const val ASSET_PREFIX = "asset:"
 
-    /** [EN] Where a route leads: a path in the assets, or a file on disk. [CN] 路由指向的位置：assets 中的路径，或磁盘上的文件。 */
+    /**
+     * [EN] Where a route leads: a path in the assets, or a file on disk. [CN] 路由指向的位置：assets 中的路径，或磁盘上的文件。
+     */
     class Location(val assetPath: String?, val file: File?) {
-        /** [EN] A path `configurationWithContentsOfFile` reads (a file path or an asset name). [CN] `configurationWithContentsOfFile` 可读取的路径（文件路径或 asset 名称）。 */
+        /**
+         * [EN] A path `configurationWithContentsOfFile` reads (a file path or an asset name). [CN] `configurationWithContentsOfFile` 可读取的路径（文件路径或 asset 名称）。
+         */
         val path: String get() = file?.path ?: assetPath.orEmpty()
     }
 
-    /** [EN] The extensions in the order a route without `format` prefers them; the same as iOS. [CN] 不写 `format` 时的扩展名优先顺序，与 iOS 相同。 */
+    /**
+     * [EN] The extensions in the order a route without `format` prefers them; the same as iOS. [CN] 不写 `format` 时的扩展名优先顺序，与 iOS 相同。
+     */
     internal val formats = listOf(
         "json", "json5", "jsonc", "yaml", "yml", "plist", "xml", "toml", "ini", "cfg", "conf", "properties",
         "env", "textproto", "txtpb", "pbtxt", "prototxt", "binpb", "pb", "protobuf", "strings",
@@ -43,12 +51,16 @@ object CYLResourceRoute {
         listOf("textproto", "txtpb", "pbtxt", "prototxt"), listOf("binpb", "pb", "protobuf"),
     )
 
-    /** [EN] The local path of `route` (see `Location.path`), or null when it is empty or its query matches no file. [CN] `route` 的本地路径；为空或查询参数没有匹配的文件时为 null。 */
+    /**
+     * [EN] The local path of `route` (see `Location.path`), or null when it is empty or its query matches no file. [CN] `route` 的本地路径；为空或查询参数没有匹配的文件时为 null。
+     */
     @JvmStatic
     @JvmOverloads
     fun pathForRoute(context: Context, route: String, baseDirectory: String? = null): String? = locationForRoute(context, route, baseDirectory)?.path
 
-    /** [EN] Where `route` leads; without a query whether it exists or not. [CN] `route` 指向的位置；没有查询参数时无论是否存在都返回。 */
+    /**
+     * [EN] Where `route` leads; without a query whether it exists or not. [CN] `route` 指向的位置；没有查询参数时无论是否存在都返回。
+     */
     @JvmStatic
     @JvmOverloads
     fun locationForRoute(context: Context, route: String, baseDirectory: String? = null): Location? {
@@ -65,7 +77,9 @@ object CYLResourceRoute {
         return location.file?.let { Location(null, File(it, file)) } ?: Location(join(location.assetPath.orEmpty(), file), null)
     }
 
-    /** [EN] The location of a route without its query. [CN] 不含查询参数的路由对应的位置。 */
+    /**
+     * [EN] The location of a route without its query. [CN] 不含查询参数的路由对应的位置。
+     */
     private fun locationOf(context: Context, location: String, baseDirectory: String?): Location {
         val dataFolder = context.filesDir.parentFile ?: context.filesDir
         return when {
@@ -94,7 +108,9 @@ object CYLResourceRoute {
         if (key.isEmpty() || value.isEmpty()) null else key to value
     }.toMap()
 
-    /** [EN] `folder/path` with "." and ".." resolved (assets have no "..", so "Manifests/../Skins" is "Skins"). [CN] 解析 "." 与 ".." 后的 `folder/path`（assets 不支持 ".."）。 */
+    /**
+     * [EN] `folder/path` with "." and ".." resolved (assets have no "..", so "Manifests/../Skins" is "Skins"). [CN] 解析 "." 与 ".." 后的 `folder/path`（assets 不支持 ".."）。
+     */
     private fun join(folder: String, path: String): String {
         val parts = ArrayList<String>()
         for (part in "$folder/$path".split('/')) {
@@ -107,7 +123,9 @@ object CYLResourceRoute {
         return parts.joinToString("/")
     }
 
-    /** [EN] "1.10" > "1.9": numeric parts compare as numbers. [CN] "1.10" > "1.9"：数字部分按数值比较。 */
+    /**
+     * [EN] "1.10" > "1.9": numeric parts compare as numbers. [CN] "1.10" > "1.9"：数字部分按数值比较。
+     */
     internal fun compareVersions(first: String, second: String): Int {
         val a = first.split('.')
         val b = second.split('.')
@@ -123,10 +141,14 @@ object CYLResourceRoute {
         return 0
     }
 
-    /** [EN] A file name split as {name}[-{theme}][@{version}].{extension}. [CN] 按 {name}[-{theme}][@{version}].{extension} 拆分的文件名。 */
+    /**
+     * [EN] A file name split as {name}[-{theme}][@{version}].{extension}. [CN] 按 {name}[-{theme}][@{version}].{extension} 拆分的文件名。
+     */
     private class CYLRouteCandidate(val file: String, val theme: String?, val version: String?, val extension: String)
 
-    /** [EN] `file` split after `name`; null when it is not one of `name`'s files. [CN] 以 `name` 拆分 `file`；不属于 `name` 时为 null。 */
+    /**
+     * [EN] `file` split after `name`; null when it is not one of `name`'s files. [CN] 以 `name` 拆分 `file`；不属于 `name` 时为 null。
+     */
     private fun candidate(file: String, name: String): CYLRouteCandidate? {
         if (file.startsWith(".") || '.' !in file) return null
         // [EN] {name}[-{theme}][@{version}]: the version after the last "@", the theme after "-". [CN] 版本位于最后一个 "@" 之后，主题位于 "-" 之后。
@@ -143,14 +165,18 @@ object CYLResourceRoute {
         return CYLRouteCandidate(file, theme, version, file.substringAfterLast('.').lowercase())
     }
 
-    /** [EN] The candidate has the theme and version the query asks for. [CN] 候选文件符合查询要求的主题与版本。 */
+    /**
+     * [EN] The candidate has the theme and version the query asks for. [CN] 候选文件符合查询要求的主题与版本。
+     */
     private fun matches(candidate: CYLRouteCandidate, theme: String?, version: String?): Boolean {
         val themeMatches = if (theme.isNullOrEmpty()) candidate.theme.isNullOrEmpty() else candidate.theme == theme
         val versionMatches = version.isNullOrEmpty() || (candidate.version != null && compareVersions(candidate.version, version) == 0)
         return themeMatches && versionMatches
     }
 
-    /** [EN] `candidate` beats `best`: the newer version, then the preferred format. [CN] `candidate` 优于 `best`：版本更新，其次格式更优先。 */
+    /**
+     * [EN] `candidate` beats `best`: the newer version, then the preferred format. [CN] `candidate` 优于 `best`：版本更新，其次格式更优先。
+     */
     private fun isBetter(candidate: CYLRouteCandidate, best: CYLRouteCandidate?): Boolean {
         if (best == null) return true
         val order = when {
@@ -162,7 +188,9 @@ object CYLResourceRoute {
         return order > 0 || (order == 0 && formats.indexOf(candidate.extension) < formats.indexOf(best.extension))
     }
 
-    /** [EN] The file of `names` that matches, as the route query. [CN] `names` 中与查询参数匹配的文件。 */
+    /**
+     * [EN] The file of `names` that matches, as the route query. [CN] `names` 中与查询参数匹配的文件。
+     */
     @JvmStatic
     fun pickFile(names: List<String>, name: String, theme: String?, version: String?, format: String?): String? {
         val extensions = format?.takeIf { it.isNotEmpty() }?.lowercase()?.let { wanted -> formatGroups.firstOrNull { wanted in it } ?: listOf(wanted) } ?: formats

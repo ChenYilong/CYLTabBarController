@@ -73,13 +73,13 @@ two places**:
 
 ### Comments on public API
 
-A multi-line comment on a public declaration is one documentation block, never stacked `//` lines, so callers see all of it
-in the IDE's documentation: Objective-C public headers `/*! … */` (Quick Help and the generated Swift interface); public API
-written in Swift `/** … */` or `///`; Kotlin / Java `/** … */` (KDoc / Javadoc); TypeScript / JavaScript `/** … */`
-(TSDoc / JSDoc); Dart `///`. Check with `python3 scripts/check-public-api-comments.py` (`--fix` rewrites). AGENTS.md,
-"Comments on public API".
-The same format applies to one-line comments on public API (and to trailing comments after a declaration, which move into
-its block), and a file with public API keeps one comment format throughout, on every platform and in every language.
+Every comment on public API, one line or several, is a documentation block written on its own lines above the
+declaration (Objective-C: `/*!`, ` * text`, ` */`), never `/*! text */` on one line and never a trailing `/**< */`,
+`/*!< */`, `///<` or `//`. One format per public file. Forms: Objective-C headers `/*! … */`; Swift `/** … */`; Kotlin,
+Java, TypeScript, JavaScript `/** … */`; Python a docstring on its own lines; Go `/* */`, C# `/** */` with XML tags, Rust
+`/** */`; a language without a block form uses its only doc form. The official documentation rules of each language are
+the reference and win where they name one form (Dart `///`; Go `//`, C# and Rust `///`). Check with
+`python3 scripts/check-public-api-comments.py` (`--fix` rewrites). AGENTS.md, "Comments on public API".
 
 ### Commit message author line
 

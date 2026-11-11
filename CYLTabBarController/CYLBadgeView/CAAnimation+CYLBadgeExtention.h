@@ -17,13 +17,15 @@ typedef NS_ENUM(NSUInteger, CYLAxis) {
     CYLAxisZ
 };
 
-// Degrees to radians
+/*!
+ * Degrees to radians
+ */
 #define CYL_DEGREES_TO_RADIANS(angle) ((angle) / 180.0 * M_PI)
 #define CYL_RADIANS_TO_DEGREES(radians) ((radians) * (180.0 / M_PI))
 
 @interface CAAnimation (CYLBadgeExtention)
 
-/**
+/*!
  *  breathing forever
  *
  *  @param time duritaion, from clear to fully seen
@@ -34,7 +36,7 @@ typedef NS_ENUM(NSUInteger, CYLAxis) {
  */
 + (CABasicAnimation *)cyl_opacityForever_Animation:(float)time;
 
-/**
+/*!
  *  breathing with fixed repeated times
  *
  *  @param repeatTimes times
@@ -46,7 +48,7 @@ typedef NS_ENUM(NSUInteger, CYLAxis) {
  */
 + (CABasicAnimation *)cyl_opacityTimes_Animation:(float)repeatTimes durTimes:(float)time;
 
-/**
+/*!
  *  //rotate
  *
  *  @param dur         duration
@@ -61,7 +63,7 @@ typedef NS_ENUM(NSUInteger, CYLAxis) {
 + (CABasicAnimation *)cyl_rotation:(float)dur degree:(float)degree direction:(CYLAxis)axis repeatCount:(int)repeatCount;
 
 
-/**
+/*!
  *  scale animation
  *
  *  @param fromScale   the original scale value, 1.0 by default
@@ -74,7 +76,7 @@ typedef NS_ENUM(NSUInteger, CYLAxis) {
  * [CN] 返回从 fromScale 缩放到 toScale 的缩放动画。
  */
 + (CABasicAnimation *)cyl_scaleFrom:(CGFloat)fromScale toScale:(CGFloat)toScale durTimes:(float)time rep:(float)repeatTimes;
-/**
+/*!
  *  shake
  *
  *  @param repeatTimes time
@@ -86,7 +88,7 @@ typedef NS_ENUM(NSUInteger, CYLAxis) {
  */
 + (CAKeyframeAnimation *)cyl_shake_AnimationRepeatTimes:(float)repeatTimes durTimes:(float)time forObj:(id)obj;
 
-/**
+/*!
  *  bounce
  *
  *  @param repeatTimes time
@@ -219,7 +221,7 @@ typedef NS_ENUM(NSUInteger, CYLAxis) {
                        forKey:@"cyl.badge.rolling"];
  */
  
-/**
+/*!
  *  default scale animation
  *
  *  @param repeatTimes repeat counts
@@ -232,7 +234,7 @@ typedef NS_ENUM(NSUInteger, CYLAxis) {
 + (CABasicAnimation *)cyl_badge_once_scale_AnimationRepeatTimes:(float)repeatTimes
                                                     durTimes:(float)time;
 
-/**
+/*!
  *  left to right animation
  *
  *  @param moveDistance move distance
@@ -247,7 +249,7 @@ typedef NS_ENUM(NSUInteger, CYLAxis) {
                                                     repeatTimes:(float)repeatTimes
                                                        durTimes:(float)time;
 
-/**
+/*!
  *  right to left animation
  *
  *  @param moveDistance move distance
@@ -262,7 +264,7 @@ typedef NS_ENUM(NSUInteger, CYLAxis) {
                                                     repeatTimes:(float)repeatTimes
                                                        durTimes:(float)time;
 
-/**
+/*!
  *  fade in animation
  *
  *  @param repeatTimes repeat counts
@@ -275,7 +277,7 @@ typedef NS_ENUM(NSUInteger, CYLAxis) {
 + (CABasicAnimation *)cyl_badge_once_fadeIn_AnimationRepeatTimes:(float)repeatTimes
                                                    durTimes:(float)time;
 
-/**
+/*!
  *  rolling animation
  *
  *  @param repeatTimes repeat counts

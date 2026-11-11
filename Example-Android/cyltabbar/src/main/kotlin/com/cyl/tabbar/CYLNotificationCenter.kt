@@ -22,7 +22,9 @@ class CYLNotification(val name: String, val `object`: Any?, val userInfo: Map<St
  */
 object CYLNotificationCenter {
 
-    /** [EN] What `addObserver` returns; pass it to `removeObserver`. [CN] `addObserver` 的返回值，传给 `removeObserver`。 */
+    /**
+     * [EN] What `addObserver` returns; pass it to `removeObserver`. [CN] `addObserver` 的返回值，传给 `removeObserver`。
+     */
     class Token internal constructor(internal val name: String?, internal val sender: Any?, internal val block: (CYLNotification) -> Unit)
 
     private val tokens = ArrayList<Token>()

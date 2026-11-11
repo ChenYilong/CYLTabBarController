@@ -57,14 +57,38 @@ FOUNDATION_EXTERN const NSInteger CYLSettingsSection;
  *      （`Example-Shared/CYLSettingsDemoTableViewController.swift`）使用相同的分组。
  */
 typedef NS_ENUM(NSInteger, CYLSettingsGroup) {
-    CYLSettingsGroupGeneral,              ///< [EN] Language, memory warning, and rows a newer version adds. [CN] 语言、内存警告，以及新版本新增的行。
-    CYLSettingsGroupTabBarAppearance,     ///< [EN] Title offset, standardAppearance, scroll minimize. [CN] 标题偏移、standardAppearance、滚动缩小。
-    CYLSettingsGroupTabBarItemUpdate,     ///< [EN] In-place tab item updates (#601). [CN] 原地更新 Tab（#601）。
-    CYLSettingsGroupPagesSelectionLogin,  ///< [EN] Replace pages (#481), selectedIndex (#515), login (#19). [CN] 替换页面、selectedIndex、登录。
-    CYLSettingsGroupPlusButton,           ///< [EN] The plus button's touchable area (#91), an image set later. [CN] PlusButton 可点击区域（#91）、之后才加载的图片。
-    CYLSettingsGroupTabInteractions,      ///< [EN] Tap animation, sound, long press, swipe (#535, #118). [CN] 点击动画、声音、长按、滑动。
-    CYLSettingsGroupHelpers,              ///< [EN] No base class, CYLUtils helpers (#535). [CN] 无需继承基类、CYLUtils 工具方法。
-    CYLSettingsGroupConfiguration,        ///< [EN] A tab bar controller from a configuration file, and the simulated failures. [CN] 由配置文件创建 TabBarController，以及模拟意外情况。
+    /*!
+     * [EN] Language, memory warning, and rows a newer version adds. [CN] 语言、内存警告，以及新版本新增的行。
+     */
+    CYLSettingsGroupGeneral,
+    /*!
+     * [EN] Title offset, standardAppearance, scroll minimize. [CN] 标题偏移、standardAppearance、滚动缩小。
+     */
+    CYLSettingsGroupTabBarAppearance,
+    /*!
+     * [EN] In-place tab item updates (#601). [CN] 原地更新 Tab（#601）。
+     */
+    CYLSettingsGroupTabBarItemUpdate,
+    /*!
+     * [EN] Replace pages (#481), selectedIndex (#515), login (#19). [CN] 替换页面、selectedIndex、登录。
+     */
+    CYLSettingsGroupPagesSelectionLogin,
+    /*!
+     * [EN] The plus button's touchable area (#91), an image set later. [CN] PlusButton 可点击区域（#91）、之后才加载的图片。
+     */
+    CYLSettingsGroupPlusButton,
+    /*!
+     * [EN] Tap animation, sound, long press, swipe (#535, #118). [CN] 点击动画、声音、长按、滑动。
+     */
+    CYLSettingsGroupTabInteractions,
+    /*!
+     * [EN] No base class, CYLUtils helpers (#535). [CN] 无需继承基类、CYLUtils 工具方法。
+     */
+    CYLSettingsGroupHelpers,
+    /*!
+     * [EN] A tab bar controller from a configuration file, and the simulated failures. [CN] 由配置文件创建 TabBarController，以及模拟意外情况。
+     */
+    CYLSettingsGroupConfiguration,
 };
 
 /*!

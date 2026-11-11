@@ -14,11 +14,15 @@ import java.util.Locale
  *      `CYLLocalizationLanguage()`：null 跟随设备语言。文字是由 iOS 字符串表生成的资源（scripts/android-library-strings.py）。
  */
 object CYLLocalization {
-    /** [EN] A BCP 47 tag such as "ar" or "zh-Hans", or null for the device language. [CN] BCP 47 语言标签，如 "ar"、"zh-Hans"；null 表示设备语言。 */
+    /**
+     * [EN] A BCP 47 tag such as "ar" or "zh-Hans", or null for the device language. [CN] BCP 47 语言标签，如 "ar"、"zh-Hans"；null 表示设备语言。
+     */
     @JvmStatic
     var language: String? = null
 
-    /** [EN] `context` with [language] applied, or `context` itself when it follows the device. [CN] 应用 [language] 后的 `context`；跟随设备时为 `context` 本身。 */
+    /**
+     * [EN] `context` with [language] applied, or `context` itself when it follows the device. [CN] 应用 [language] 后的 `context`；跟随设备时为 `context` 本身。
+     */
     @JvmStatic
     fun localizedContext(context: Context): Context {
         val tag = language ?: return context
@@ -27,12 +31,16 @@ object CYLLocalization {
         return context.createConfigurationContext(configuration)
     }
 
-    /** [EN] A library text in [language]. [CN] [language] 中的库文字。 */
+    /**
+     * [EN] A library text in [language]. [CN] [language] 中的库文字。
+     */
     @JvmStatic
     fun string(context: Context, id: Int, vararg arguments: Any): String =
         localizedContext(context).resources.getString(id, *arguments)
 
-    /** [EN] Whether `tag` (or the device language when null) is written right to left, e.g. Arabic. [CN] `tag`（null 时为设备语言）是否从右到左书写，如阿拉伯语。 */
+    /**
+     * [EN] Whether `tag` (or the device language when null) is written right to left, e.g. Arabic. [CN] `tag`（null 时为设备语言）是否从右到左书写，如阿拉伯语。
+     */
     @JvmStatic
     fun isRightToLeft(tag: String?): Boolean {
         val locale = if (tag == null) Locale.getDefault() else Locale.forLanguageTag(tag)

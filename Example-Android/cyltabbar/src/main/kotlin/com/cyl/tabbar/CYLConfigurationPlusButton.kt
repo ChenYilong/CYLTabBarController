@@ -22,7 +22,9 @@ import androidx.fragment.app.Fragment
  */
 class CYLConfigurationPlusButton(context: Context, private val action: ((CYLPlusButton) -> Unit)?) : CYLPlusButton(context) {
 
-    /** [EN] The constructor layout tools use: no tap action. [CN] 布局工具使用的构造方法：没有点击操作。 */
+    /**
+     * [EN] The constructor layout tools use: no tap action. [CN] 布局工具使用的构造方法：没有点击操作。
+     */
     constructor(context: Context) : this(context, null)
 
     /**
@@ -41,7 +43,9 @@ class CYLConfigurationPlusButton(context: Context, private val action: ((CYLPlus
             titleLabel.setText(titleLabel.text?.toString() ?: "", android.widget.TextView.BufferType.SPANNABLE)
         }
 
-    /** [EN] The color the title is drawn in now, or null for the tab bar's tint. [CN] 当前标题的绘制颜色；null 时使用 TabBar 的着色。 */
+    /**
+     * [EN] The color the title is drawn in now, or null for the tab bar's tint. [CN] 当前标题的绘制颜色；null 时使用 TabBar 的着色。
+     */
     internal val cyl_titleDrawColor: Int?
         get() = if (isSelected) cyl_selectedTitleColor ?: cyl_configurationTitleColor else cyl_configurationTitleColor
 
@@ -55,7 +59,9 @@ class CYLConfigurationPlusButton(context: Context, private val action: ((CYLPlus
         }
     }
 
-    /** [EN] `CYLPlusButtonSize` in pixels, or null for the size of the image and the title. [CN] 以像素表示的 `CYLPlusButtonSize`；null 时为图片与标题的尺寸。 */
+    /**
+     * [EN] `CYLPlusButtonSize` in pixels, or null for the size of the image and the title. [CN] 以像素表示的 `CYLPlusButtonSize`；null 时为图片与标题的尺寸。
+     */
     internal var cyl_configurationSize: android.util.Size? = null
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
@@ -177,7 +183,9 @@ class CYLConfigurationPlusButton(context: Context, private val action: ((CYLPlus
             return android.graphics.Rect(left, top, right + 1, bottom + 1)
         }
 
-        /** [EN] The alpha above which a pixel counts as visible. [CN] 高于此值的像素视为可见。 */
+        /**
+         * [EN] The alpha above which a pixel counts as visible. [CN] 高于此值的像素视为可见。
+         */
         private const val VISIBLE_ALPHA = 0x20
 
         /**
@@ -204,7 +212,9 @@ class CYLConfigurationPlusButton(context: Context, private val action: ((CYLPlus
             CYLPlusButton.cyl_registerPlusButtonWithAttributes(viewContext, attributes, action, tabBarContext)
         }
 
-        /** [EN] Internal: the plus button's page, passed with its attributes. [CN] 内部使用：随属性传递的 PlusButton 页面。 */
+        /**
+         * [EN] Internal: the plus button's page, passed with its attributes. [CN] 内部使用：随属性传递的 PlusButton 页面。
+         */
         internal const val PAGE_KEY = "CYLConfigurationPlusButtonPage"
 
         private fun drawable(viewContext: Context, value: Any?): Drawable? = when (value) {

@@ -340,12 +340,16 @@ do { \
 #define CYL_UIDesignOldVersionCYLTabBarWithoutiOS26 ((!CYL_IS_IOS_26) && (![CYLConstants isUsedLiquidGlass]))
 #define CYL_UIDesignClassicCYLTabBar CYL_UIDesignOldVersionCYLTabBar
 
-// [CN] TODO: 下个版本完善， 这个版本不推荐使用
-// [EN] TODO: To be improved in the next version; not recommended in this version
+/*!
+ * [CN] TODO: 下个版本完善， 这个版本不推荐使用
+ * [EN] TODO: To be improved in the next version; not recommended in this version
+ */
 #define CYL_UIDesignNewCYLTabBar (CYL_NoNeed_UIDesignRequiresCompatibility_with_iOS26)
 
-// [CN] TODO: 临时版本， 使用UITabBar重写
-// [EN] TODO: Temporary version, to be rewritten with UITabBar
+/*!
+ * [CN] TODO: 临时版本， 使用UITabBar重写
+ * [EN] TODO: Temporary version, to be rewritten with UITabBar
+ */
 #define CYL_UIDesignNewPureCustomTabBar (CYL_IS_IOS_26) && (![[[NSBundle mainBundle] objectForInfoDictionaryKey:@"UIDesignRequiresCompatibility"] boolValue]))
 
 #define CYL_NoNeed_UIDesignRequiresCompatibility (self.cyl_tabBarController.noNeedUIDesignCompatibility)
@@ -392,7 +396,7 @@ CG_INLINE UIFont * CYLScaleBoldFont(CGFloat fontSize) {
     return [UIFont boldSystemFontOfSize:CYLScaleValue(fontSize)];
 }
 
-/**
+/*!
  * [CN] 判断两个字符串是否相等（两个都为 nil 也算相等）
  * [EN] Check whether two strings are equal (two nil values also count as equal)
  */
@@ -405,7 +409,7 @@ CG_INLINE CGFloat CYLHalfOfDiff(CGFloat value1, CGFloat value2) {
 }
 #pragma mark - Ivar
 
-/**
+/*!
  [CN] 用于判断一个给定的 type encoding（const char *）或者 Ivar 是哪种类型的系列函数。
  [EN] A family of functions for determining which type a given type encoding (const char *) or Ivar is.
  

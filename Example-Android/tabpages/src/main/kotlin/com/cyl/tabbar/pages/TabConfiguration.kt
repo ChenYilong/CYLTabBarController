@@ -22,7 +22,9 @@ data class TabItem(val attributes: Map<String, Any?>) {
             .map { (attributes[it] as? String)?.trim().orEmpty() }
             .firstOrNull { it.isNotEmpty() }
 
-    /** [EN] `CYLTabBarItemPageParameters`, or empty. [CN] `CYLTabBarItemPageParameters`，没有则为空。 */
+    /**
+     * [EN] `CYLTabBarItemPageParameters`, or empty. [CN] `CYLTabBarItemPageParameters`，没有则为空。
+     */
     val pageParameters: Map<String, String>
         get() = (attributes[TabConfiguration.PAGE_PARAMETERS] as? Map<*, *>)
             ?.entries?.associate { it.key.toString() to it.value.toString() }
@@ -36,16 +38,24 @@ data class TabItem(val attributes: Map<String, Any?>) {
  * [CN] 按 iOS 库的规则读取 TabBar 配置文件（JSON）：按顺序返回各 Tab，去掉在本平台（`CYLTabBarItemPlatforms`）或本 App 版本
  *      （`CYLTabBarItemMinimumAppVersion`）不显示的 Tab。无效值会被忽略并输出警告，与 iOS 一致（边界情况 B23–B25）。
  */
-/** [EN] Where a page is looked up, in the iOS order. [CN] 查找页面的来源，顺序与 iOS 相同。 */
+/**
+ * [EN] Where a page is looked up, in the iOS order. [CN] 查找页面的来源，顺序与 iOS 相同。
+ */
 enum class PageSource(val key: String) { INSTANCE("instance"), RESOLVER("resolver"), SHARED("shared"), AUTOMATIC("automatic") }
 
-/** [EN] Why a tab got no page (the iOS `CYLTabBarPageSkipReason`). [CN] Tab 没有页面的原因（对应 iOS 的 `CYLTabBarPageSkipReason`）。 */
+/**
+ * [EN] Why a tab got no page (the iOS `CYLTabBarPageSkipReason`). [CN] Tab 没有页面的原因（对应 iOS 的 `CYLTabBarPageSkipReason`）。
+ */
 enum class SkipReason { INVALID_TAB, MISSING_IDENTIFIER, UNREGISTERED, EXCLUDED, PROVIDER_FAILED }
 
-/** [EN] A tab without a page, and why. [CN] 没有页面的 Tab 及其原因。 */
+/**
+ * [EN] A tab without a page, and why. [CN] 没有页面的 Tab 及其原因。
+ */
 data class SkippedTab(val reason: SkipReason, val pageId: String?, val tab: TabItem?, val detail: String? = null)
 
-/** [EN] A parsed configuration: see [TabConfiguration.configuration]. [CN] 解析后的配置：见 [TabConfiguration.configuration]。 */
+/**
+ * [EN] A parsed configuration: see [TabConfiguration.configuration]. [CN] 解析后的配置：见 [TabConfiguration.configuration]。
+ */
 data class TabBarConfiguration(
     val attributes: Map<String, Any?>,
     val tabs: List<TabItem>,
@@ -132,7 +142,9 @@ object TabConfiguration {
         return result
     }
 
-    /** [EN] Why a tab is left out, or null. [CN] Tab 被排除的原因，没有则为 null。 */
+    /**
+     * [EN] Why a tab is left out, or null. [CN] Tab 被排除的原因，没有则为 null。
+     */
     fun exclusionReason(tab: TabItem, platform: String, appVersion: String?): String? {
         val platforms = platforms(tab.attributes[PLATFORMS])
         if (platforms != null && platform.lowercase() !in platforms) {
@@ -148,7 +160,9 @@ object TabConfiguration {
         return if (isLower(appNumbers, minimumNumbers)) "it needs version $minimum (this app is $appVersion)" else null
     }
 
-    /** [EN] A list of strings or a comma-separated string, as lowercase names; null when missing or invalid. [CN] 字符串数组或逗号分隔的字符串，转为小写名称；未设置或无效时为 null。 */
+    /**
+     * [EN] A list of strings or a comma-separated string, as lowercase names; null when missing or invalid. [CN] 字符串数组或逗号分隔的字符串，转为小写名称；未设置或无效时为 null。
+     */
     fun platforms(value: Any?): List<String>? {
         val names: List<Any?> = when (value) {
             null -> return null
@@ -167,7 +181,9 @@ object TabConfiguration {
         return platforms
     }
 
-    /** [EN] "2.10.1" -> [2, 10, 1]; null when a part is not a number. [CN] "2.10.1" -> [2, 10, 1]；某部分不是数字时为 null。 */
+    /**
+     * [EN] "2.10.1" -> [2, 10, 1]; null when a part is not a number. [CN] "2.10.1" -> [2, 10, 1]；某部分不是数字时为 null。
+     */
     fun versionNumbers(version: String): List<Long>? {
         val parts = version.trim().split(".")
         if (parts.isEmpty() || parts.any { part -> part.isEmpty() || !part.all { it.isDigit() } }) return null

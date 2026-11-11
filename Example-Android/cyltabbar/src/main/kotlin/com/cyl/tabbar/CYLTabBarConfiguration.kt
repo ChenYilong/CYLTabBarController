@@ -23,14 +23,18 @@ import java.net.HttpURLConnection
  */
 object CYLTabBarConfiguration {
 
-    /** [EN] `CYLTabBarConfigurationError` codes (the iOS values). [CN] 错误码（与 iOS 相同）。 */
+    /**
+     * [EN] `CYLTabBarConfigurationError` codes (the iOS values). [CN] 错误码（与 iOS 相同）。
+     */
     enum class CYLTabBarConfigurationError(val code: Int) {
         FileNotFound(1), UnknownFormat(2), InvalidSyntax(3), NotADictionary(4), Network(5), Empty(6), TooLarge(7), TooDeep(8), NoTabs(9), MainThreadRequired(10), NoPages(11),
         // [EN] Manifests (docs/Configuration-Manifest.md), as on iOS. [CN] 配置清单（docs/Configuration-Manifest.md），与 iOS 相同。
         UnsupportedManifest(12), NotEligible(13), AssetInvalid(14);
 
         companion object {
-            /** [EN] The error of a parser error code (`UnsupportedFormat` is `UnknownFormat`). [CN] 解析器错误码对应的错误（`UnsupportedFormat` 即 `UnknownFormat`）。 */
+            /**
+             * [EN] The error of a parser error code (`UnsupportedFormat` is `UnknownFormat`). [CN] 解析器错误码对应的错误（`UnsupportedFormat` 即 `UnknownFormat`）。
+             */
             @JvmStatic
             fun of(code: CYLTabBarConfigurationErrorCode): CYLTabBarConfigurationError = entries.first { it.code == code.rawValue }
         }
@@ -38,12 +42,16 @@ object CYLTabBarConfiguration {
 
     class CYLConfigurationException(val error: CYLTabBarConfigurationError, message: String) : Exception(message)
 
-    /** [EN] Resolves image names of a configuration ("system:house", a drawable name, a file path) to drawables. [CN] 把配置中的图片名称解析为 drawable。 */
+    /**
+     * [EN] Resolves image names of a configuration ("system:house", a drawable name, a file path) to drawables. [CN] 把配置中的图片名称解析为 drawable。
+     */
     fun interface CYLTabBarImageResolver {
         fun drawable(context: Context, name: String): Drawable?
     }
 
-    /** [EN] The default resolver: a drawable resource by name, or a file path. [CN] 默认解析器：按名称查找 drawable 资源，或文件路径。 */
+    /**
+     * [EN] The default resolver: a drawable resource by name, or a file path. [CN] 默认解析器：按名称查找 drawable 资源，或文件路径。
+     */
     @JvmStatic
     var imageResolver: CYLTabBarImageResolver = CYLTabBarImageResolver { context, name ->
         val resourceName = name.removePrefix("system:").substringBefore('.').replace('-', '_')
@@ -59,7 +67,9 @@ object CYLTabBarConfiguration {
 
     const val maximumFileSize = 5 * 1024 * 1024
 
-    /** [EN] `+configurationWithContentsOfFile:error:`: a file path or an asset name. [CN] 文件路径或 asset 名称。 */
+    /**
+     * [EN] `+configurationWithContentsOfFile:error:`: a file path or an asset name. [CN] 文件路径或 asset 名称。
+     */
     @JvmStatic
     @Throws(CYLConfigurationException::class)
     fun configurationWithContentsOfFile(context: Context, path: String): Map<String, Any?> {
@@ -118,7 +128,9 @@ object CYLTabBarConfiguration {
         return file + rest
     }
 
-    /** [EN] `CYLTabBarControllerManifestRoute`: a manifest the app may use, as a configuration, under the other keys. [CN] 本 App 可以使用的清单，转换为配置，再由其他键覆盖。 */
+    /**
+     * [EN] `CYLTabBarControllerManifestRoute`: a manifest the app may use, as a configuration, under the other keys. [CN] 本 App 可以使用的清单，转换为配置，再由其他键覆盖。
+     */
     private fun withManifest(context: Context, configuration: Map<String, Any?>): Map<String, Any?> {
         val route = configuration[CYLConstants.CYLTabBarControllerManifestRoute] ?: return configuration
         val rest = configuration - CYLConstants.CYLTabBarControllerManifestRoute
@@ -130,7 +142,9 @@ object CYLTabBarConfiguration {
         return manifest.configuration() + rest
     }
 
-    /** [EN] Reads at most 5 MB (API 23: no `readNBytes`). [CN] 最多读取 5 MB（API 23 没有 `readNBytes`）。 */
+    /**
+     * [EN] Reads at most 5 MB (API 23: no `readNBytes`). [CN] 最多读取 5 MB（API 23 没有 `readNBytes`）。
+     */
     private fun readLimited(stream: java.io.InputStream, name: String): ByteArray {
         val output = java.io.ByteArrayOutputStream()
         val buffer = ByteArray(64 * 1024)
@@ -164,7 +178,9 @@ object CYLTabBarConfiguration {
         return root
     }
 
-    /** [EN] Parses a configuration text in one of the `tabpages` formats. [CN] 按 `tabpages` 的格式解析配置文本。 */
+    /**
+     * [EN] Parses a configuration text in one of the `tabpages` formats. [CN] 按 `tabpages` 的格式解析配置文本。
+     */
     @JvmStatic
     @Throws(CYLConfigurationException::class)
     fun parse(text: String, format: com.cyl.tabbar.pages.TabConfigurationFormat): Map<String, Any?> = parse(text.toByteArray(Charsets.UTF_8), when (format.name.lowercase()) {
@@ -174,7 +190,9 @@ object CYLTabBarConfiguration {
         else -> CYLTabBarConfigurationFormat.Unknown
     })
 
-    /** [EN] `+loadConfigurationWithURL:completion:`: downloads on a background thread (15 s timeout), completes on the main thread. [CN] 后台线程下载（15 秒超时），主线程回调。 */
+    /**
+     * [EN] `+loadConfigurationWithURL:completion:`: downloads on a background thread (15 s timeout), completes on the main thread. [CN] 后台线程下载（15 秒超时），主线程回调。
+     */
     @JvmStatic
     fun loadConfigurationWithURL(url: String, completion: (Map<String, Any?>?, CYLConfigurationException?) -> Unit) =
         loadConfigurationWithURLRequest(CYLURLRequest(url), completion)
@@ -192,7 +210,9 @@ object CYLTabBarConfiguration {
         val allowsCache: Boolean = true,
     )
 
-    /** [EN] `+loadConfigurationWithURLRequest:completion:`: like `loadConfigurationWithURL` with your own request; the completion runs on the main thread. [CN] 使用自己的请求加载配置；回调在主线程执行。 */
+    /**
+     * [EN] `+loadConfigurationWithURLRequest:completion:`: like `loadConfigurationWithURL` with your own request; the completion runs on the main thread. [CN] 使用自己的请求加载配置；回调在主线程执行。
+     */
     fun loadConfigurationWithURLRequest(request: CYLURLRequest, completion: (Map<String, Any?>?, CYLConfigurationException?) -> Unit) {
         val main = Handler(Looper.getMainLooper())
         val url = request.url
@@ -229,7 +249,9 @@ object CYLTabBarConfiguration {
 
     // MARK: - Value conversions 值转换
 
-    /** [EN] "{a, b, c, d}", [a, b, c, d] or {top:, left:, bottom:, right:}. [CN] 边距的三种写法。 */
+    /**
+     * [EN] "{a, b, c, d}", [a, b, c, d] or {top:, left:, bottom:, right:}. [CN] 边距的三种写法。
+     */
     @JvmStatic
     fun edgeInsetsValue(value: Any?): CYLEdgeInsets? {
         val numbers = numbers(value, 4, listOf("top", "left", "bottom", "right")) ?: return null
@@ -259,7 +281,9 @@ object CYLTabBarConfiguration {
         return CYLEnums.CYLTabButtonTapAnimationType.values().firstOrNull { it.rawValue == index && index >= 0 }
     }
 
-    /** [EN] "#RGB", "#RRGGBB" or "#RRGGBBAA" (the iOS order). [CN] 三种十六进制写法（与 iOS 相同的顺序）。 */
+    /**
+     * [EN] "#RGB", "#RRGGBB" or "#RRGGBBAA" (the iOS order). [CN] 三种十六进制写法（与 iOS 相同的顺序）。
+     */
     @JvmStatic
     fun colorValue(value: Any?): Int? {
         val text = (value as? String)?.trim()?.removePrefix("#") ?: return value as? Int
@@ -287,16 +311,22 @@ object CYLTabBarConfiguration {
         return if (numbers.size == count && numbers.all { it.isFinite() }) numbers else null
     }
 
-    /** [EN] Icon rendering modes (#787). [CN] 图标渲染方式（#787）。 */
+    /**
+     * [EN] Icon rendering modes (#787). [CN] 图标渲染方式（#787）。
+     */
     const val ICON_RENDERING_TEMPLATE = "template"
     const val ICON_RENDERING_ORIGINAL = "original"
     private val iconRenderingModes = setOf(ICON_RENDERING_TEMPLATE, ICON_RENDERING_ORIGINAL, "automatic")
 
-    /** [EN] `CYLTabBarItemIconRenderingMode` (#787), lowercased; null when not one of the three. [CN] 转为小写的渲染方式；不是三者之一时为 null。 */
+    /**
+     * [EN] `CYLTabBarItemIconRenderingMode` (#787), lowercased; null when not one of the three. [CN] 转为小写的渲染方式；不是三者之一时为 null。
+     */
     @JvmStatic
     fun iconRenderingModeValue(value: Any?): String? = (value as? String)?.lowercase()?.takeIf { it in iconRenderingModes }
 
-    /** [EN] A BOOL: true / false, yes / no, 1 / 0. [CN] 布尔值。 */
+    /**
+     * [EN] A BOOL: true / false, yes / no, 1 / 0. [CN] 布尔值。
+     */
     @JvmStatic
     fun boolValue(value: Any?): Boolean? = when (value) {
         is Boolean -> value
@@ -359,7 +389,9 @@ object CYLTabBarConfiguration {
         return normalized
     }
 
-    /** [EN] `CYLTabBarItemIconRenderingMode` lowercased, or removed with a warning when unknown (#787). [CN] 渲染方式转为小写；未知值输出警告并移除（#787）。 */
+    /**
+     * [EN] `CYLTabBarItemIconRenderingMode` lowercased, or removed with a warning when unknown (#787). [CN] 渲染方式转为小写；未知值输出警告并移除（#787）。
+     */
     private fun normalizeIconRenderingMode(attributes: MutableMap<String, Any?>) {
         val mode = attributes[CYLConstants.CYLTabBarItemIconRenderingMode] ?: return
         val valid = iconRenderingModeValue(mode)
@@ -371,7 +403,9 @@ object CYLTabBarConfiguration {
         }
     }
 
-    /** [EN] `identifier`, or "identifier-2", "-3"... when `seen` has it; added to `seen`. [CN] `identifier`，已在 `seen` 中时为 "identifier-2"、"-3"……；并加入 `seen`。 */
+    /**
+     * [EN] `identifier`, or "identifier-2", "-3"... when `seen` has it; added to `seen`. [CN] `identifier`，已在 `seen` 中时为 "identifier-2"、"-3"……；并加入 `seen`。
+     */
     private fun uniqueIdentifier(identifier: String, seen: MutableSet<String>): String {
         var unique = identifier
         var n = 2
@@ -382,7 +416,9 @@ object CYLTabBarConfiguration {
         return unique
     }
 
-    /** [EN] The tab bar's icon keys (#787) as tab keys. [CN] TabBar 的图标键（#787），转为 Tab 的键。 */
+    /**
+     * [EN] The tab bar's icon keys (#787) as tab keys. [CN] TabBar 的图标键（#787），转为 Tab 的键。
+     */
     private fun iconDefaults(configuration: Map<String, Any?>): Map<String, Any?> = listOf(
         CYLConstants.CYLTabBarControllerIconRenderingMode to CYLConstants.CYLTabBarItemIconRenderingMode,
         CYLConstants.CYLTabBarControllerIconColor to CYLConstants.CYLTabBarItemIconColor,

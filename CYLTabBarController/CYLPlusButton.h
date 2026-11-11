@@ -137,7 +137,7 @@ if ([tabBarController.selectedViewController isEqual:CYLPlusChildViewController]
  */
 + (BOOL)shouldSelectPlusChildViewController;
 
-/** 可以不设置， 默认为 CYLTabBarController，如果设置了，请 与 CYLTabBarController 里 context 并保持一致。如果两个都不是实现，默认为一致均为 CYLTabBarController
+/*! 可以不设置， 默认为 CYLTabBarController，如果设置了，请 与 CYLTabBarController 里 context 并保持一致。如果两个都不是实现，默认为一致均为 CYLTabBarController
  * [EN] Returns the context this plus button belongs to; must match `CYLTabBarController.context`. Defaults to "CYLTabBarController".
  * [CN] 返回 PlusButton 所属的 context，需与 CYLTabBarController 的 context 保持一致，默认为 "CYLTabBarController"。
  */

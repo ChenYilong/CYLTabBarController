@@ -35,7 +35,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong, nullable, getter=cyl_tabBarItemAnimationSizeValue, setter=cyl_setTabBarItemAnimationSizeValue:) NSValue *cyl_tabBarItemAnimationSizeValue;
 @property (nonatomic, assign, getter=cyl_imagePositionAdjustment, setter=cyl_setImagePositionAdjustment:) UIOffset cyl_imagePositionAdjustment;
 
-/**
+/*!
  * 获取一个UITabBarItem内显示图标的UIImageView，如果找不到则返回nil
  * [EN] Returns the image view that shows this item's icon, or nil.
  * [CN] 返回该 Item 用于显示图标的图片视图，找不到时返回 nil。

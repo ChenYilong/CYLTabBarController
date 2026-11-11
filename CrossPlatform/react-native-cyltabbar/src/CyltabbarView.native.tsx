@@ -2,7 +2,9 @@ import { useMemo, useState } from 'react';
 import { Image, type ImageSourcePropType, type ViewProps } from 'react-native';
 import NativeCyltabbarView from './CyltabbarViewNativeComponent';
 
-/** A tab image: a name ("home", "system:house.fill"), or an image required from JS (`require('./home.png')`). */
+/**
+ * A tab image: a name ("home", "system:house.fill"), or an image required from JS (`require('./home.png')`).
+ */
 export type CYLTabBarImage = string | ImageSourcePropType;
 
 export type CYLTabBarItem = {
@@ -15,48 +17,78 @@ export type CYLTabBarItem = {
    * (keeps its colors) or "automatic". Wins over the tab bar's `iconRenderingMode`.
    */
   iconRenderingMode?: CYLTabBarIconRenderingMode;
-  /** Icon colors such as "#8E8E93", unselected and selected. */
+  /**
+   * Icon colors such as "#8E8E93", unselected and selected.
+   */
   iconColor?: string;
   selectedIconColor?: string;
-  /** Any other key of the configuration file, e.g. CYLTabBarItemTitlePositionAdjustment. */
+  /**
+   * Any other key of the configuration file, e.g. CYLTabBarItemTitlePositionAdjustment.
+   */
   [key: string]: unknown;
 };
 
-/** How a tab icon takes its colors (issue #787). */
+/**
+ * How a tab icon takes its colors (issue #787).
+ */
 export type CYLTabBarIconRenderingMode = 'template' | 'original' | 'automatic';
 
 export type CYLTabBarPlusButton = {
   title?: string;
-  /** The button's image; or `backgroundImage`, a picture with the title drawn on it. */
+  /**
+   * The button's image; or `backgroundImage`, a picture with the title drawn on it.
+   */
   image?: CYLTabBarImage;
-  /** The image while it is selected or touched. */
+  /**
+   * The image while it is selected or touched.
+   */
   selectedImage?: CYLTabBarImage;
   backgroundImage?: CYLTabBarImage;
-  /** Its size in points / dp, `[width, height]` (default: its image and title). */
+  /**
+   * Its size in points / dp, `[width, height]` (default: its image and title).
+   */
   size?: [number, number];
-  /** The size its images are drawn at, aspect fit, `[width, height]` (e.g. a 512 px network image). */
+  /**
+   * The size its images are drawn at, aspect fit, `[width, height]` (e.g. a 512 px network image).
+   */
   imageSize?: [number, number];
   titleColor?: string;
   selectedTitleColor?: string;
-  /** A font as in a configuration file: a size (15), "bold:15", "Menlo-Regular:12". */
+  /**
+   * A font as in a configuration file: a size (15), "bold:15", "Menlo-Regular:12".
+   */
   titleFont?: string | number;
-  /** Its place among the tabs (default: the middle). */
+  /**
+   * Its place among the tabs (default: the middle).
+   */
   index?: number;
-  /** Its vertical center: `multiplier * tabBarHeight + offset`. */
+  /**
+   * Its vertical center: `multiplier * tabBarHeight + offset`.
+   */
   centerYMultiplier?: number;
   centerYOffset?: number;
-  /** Whether the title lines up with the tab titles (default: with a title and no background image). */
+  /**
+   * Whether the title lines up with the tab titles (default: with a title and no background image).
+   */
   alignsTitle?: boolean;
-  /** Keeps the title visible on Liquid Glass. */
+  /**
+   * Keeps the title visible on Liquid Glass.
+   */
   keepsTitleVisible?: boolean;
-  /** Liquid Glass: the selection stays under the button while its own page is selected (Android always shows it). */
+  /**
+   * Liquid Glass: the selection stays under the button while its own page is selected (Android always shows it).
+   */
   showsSelection?: boolean;
   identifier?: string;
-  /** The plus button selects a page of its own: `onTabSelect(-1, identifier)`. */
+  /**
+   * The plus button selects a page of its own: `onTabSelect(-1, identifier)`.
+   */
   pageIdentifier?: string;
 };
 
-/** Names of `CYLBadgeAnimationType`. */
+/**
+ * Names of `CYLBadgeAnimationType`.
+ */
 export type CYLTabBarBadgeAnimation =
   | 'none' | 'scale' | 'shake' | 'bounce' | 'breathe' | 'leftRightOnce' | 'rightLeftOnce' | 'fadeInOnce' | 'rollingOnce' | 'scaleOnce';
 
@@ -64,35 +96,61 @@ const BADGE_ANIMATIONS: CYLTabBarBadgeAnimation[] = [
   'none', 'scale', 'shake', 'bounce', 'breathe', 'leftRightOnce', 'rightLeftOnce', 'fadeInOnce', 'rollingOnce', 'scaleOnce',
 ];
 
-/** A badge with a style (`CYLTabBarHostView.badgeAttributes`). */
+/**
+ * A badge with a style (`CYLTabBarHostView.badgeAttributes`).
+ */
 export type CYLTabBarBadge = {
-  /** "" none, "dot" a red dot, anything else a number or text. */
+  /**
+   * "" none, "dot" a red dot, anything else a number or text.
+   */
   value: string;
-  /** A color such as "#AF52DE". */
+  /**
+   * A color such as "#AF52DE".
+   */
   color?: string;
   animation?: CYLTabBarBadgeAnimation;
-  /** The dot's radius. */
+  /**
+   * The dot's radius.
+   */
   radius?: number;
-  /** Moves the badge from the icon's top-right corner, `[x, y]`. */
+  /**
+   * Moves the badge from the icon's top-right corner, `[x, y]`.
+   */
   centerOffset?: [number, number];
 };
 
 export type CYLTabBarProps = ViewProps & {
-  /** The tabs. They become CYLTabBarControllerTabBarItemsAttributes. */
+  /**
+   * The tabs. They become CYLTabBarControllerTabBarItemsAttributes.
+   */
   items?: CYLTabBarItem[];
-  /** "default" | "system" | "flatDesign" | "liquidGlass". */
+  /**
+   * "default" | "system" | "flatDesign" | "liquidGlass".
+   */
   styleType?: string;
-  /** "light" | "dark" | "system": the tab bar's appearance (iOS). */
+  /**
+   * "light" | "dark" | "system": the tab bar's appearance (iOS).
+   */
   userInterfaceStyle?: 'light' | 'dark' | 'system';
-  /** The tap animation of the tab buttons: "bounce", "scale", "zoomIn", "rotation", "flip", "fume"... */
+  /**
+   * The tap animation of the tab buttons: "bounce", "scale", "zoomIn", "rotation", "flip", "fume"...
+   */
   tapAnimation?: string;
-  /** Swiping on the tab bar switches tabs. */
+  /**
+   * Swiping on the tab bar switches tabs.
+   */
   swipeToSwitchTab?: boolean;
-  /** The playback speed of the animated tab icons (1: the file's own). */
+  /**
+   * The playback speed of the animated tab icons (1: the file's own).
+   */
   animationSpeed?: number;
-  /** Issue #787: the icon rendering mode of every tab without its own. */
+  /**
+   * Issue #787: the icon rendering mode of every tab without its own.
+   */
   iconRenderingMode?: CYLTabBarIconRenderingMode;
-  /** The icon colors of every tab without its own, such as "#8E8E93", unselected and selected. */
+  /**
+   * The icon colors of every tab without its own, such as "#8E8E93", unselected and selected.
+   */
   iconColor?: string;
   selectedIconColor?: string;
   plusButton?: CYLTabBarPlusButton;
@@ -107,23 +165,37 @@ export type CYLTabBarProps = ViewProps & {
    * version, platforms. The manifest is read first; the other props and `configuration` win over it.
    */
   manifestRoute?: string;
-  /** Any other key of the configuration file (docs/Configuration-File.md); it wins over the props above. */
+  /**
+   * Any other key of the configuration file (docs/Configuration-File.md); it wins over the props above.
+   */
   configuration?: Record<string, unknown>;
   selectedIndex?: number;
   badgeValues?: string[];
-  /** The plus button's badge: "" none, "dot" a red dot, anything else a text. */
+  /**
+   * The plus button's badge: "" none, "dot" a red dot, anything else a text.
+   */
   plusButtonBadgeValue?: string;
   badgeAnimation?: CYLTabBarBadgeAnimation;
-  /** Badges with a style, one per tab (null leaves the tab to `badgeValues`). */
+  /**
+   * Badges with a style, one per tab (null leaves the tab to `badgeValues`).
+   */
   badgeStyles?: (CYLTabBarBadge | null)[];
-  /** The plus button's badge with a style; wins over `plusButtonBadgeValue`. */
+  /**
+   * The plus button's badge with a style; wins over `plusButtonBadgeValue`.
+   */
   plusButtonBadge?: CYLTabBarBadge;
-  /** An image covering each tab's icon in both states, null for none. */
+  /**
+   * An image covering each tab's icon in both states, null for none.
+   */
   tabCoverImages?: (CYLTabBarImage | null)[];
-  /** A tab was tapped; the plus button's own page (`plusButton.pageIdentifier`) gives index -1. */
+  /**
+   * A tab was tapped; the plus button's own page (`plusButton.pageIdentifier`) gives index -1.
+   */
   onTabSelect?: (index: number, identifier: string) => void;
   onPlusButtonPress?: () => void;
-  /** A long press on a tab (its index) or the plus button (-1), with the title it shows. */
+  /**
+   * A long press on a tab (its index) or the plus button (-1), with the title it shows.
+   */
   onTabLongPress?: (index: number, identifier: string, title: string) => void;
   /**
    * Login (issue #19): whether the user is logged in. While logged out, tapping a tab listed in the configuration's
@@ -133,7 +205,9 @@ export type CYLTabBarProps = ViewProps & {
    */
   loggedIn?: boolean;
   onLoginRequest?: (index: number, identifier: string, title: string) => void;
-  /** The login state the tab bar uses, sent once it is built: start from it to keep the login across launches. */
+  /**
+   * The login state the tab bar uses, sent once it is built: start from it to keep the login across launches.
+   */
   onLoginStateChange?: (loggedIn: boolean) => void;
   /**
    * The language of the library's own texts (badge and plus button accessibility texts) and of the layout direction: a
@@ -180,14 +254,18 @@ function addImage(target: Record<string, unknown>, key: string, image?: CYLTabBa
   }
 }
 
-/** A required image's URL, or a name / URL string as it is; "" for none. */
+/**
+ * A required image's URL, or a name / URL string as it is; "" for none.
+ */
 function imageValue(image?: CYLTabBarImage | null): string {
   if (image == null) return '';
   if (typeof image === 'string') return image;
   return Image.resolveAssetSource(image)?.uri ?? '';
 }
 
-/** [EN] How a prop is copied: when truthy, or when not null. [CN] 属性的复制条件：为真值时，或不为 null 时。 */
+/**
+ * [EN] How a prop is copied: when truthy, or when not null. [CN] 属性的复制条件：为真值时，或不为 null 时。
+ */
 type CYLKeyRule = 'truthy' | 'defined';
 type CYLKeyMap = ReadonlyArray<readonly [prop: string, key: string, rule: CYLKeyRule]>;
 
@@ -227,7 +305,9 @@ const PLUS_BUTTON_KEYS: CYLKeyMap = [
   ['imageSize', 'CYLPlusButtonImageSize', 'truthy'],
 ];
 
-/** [EN] Copies the props of `source` that pass their rule into `target`, under their keys. [CN] 把 `source` 中满足条件的属性按 key 复制到 `target`。 */
+/**
+ * [EN] Copies the props of `source` that pass their rule into `target`, under their keys. [CN] 把 `source` 中满足条件的属性按 key 复制到 `target`。
+ */
 function copyKeys(target: Record<string, unknown>, source: object, keys: CYLKeyMap): void {
   const values = source as Record<string, unknown>;
   for (const [prop, key, rule] of keys) {
@@ -273,7 +353,9 @@ export function buildConfiguration(props: CYLTabBarProps): Record<string, unknow
   return { ...configuration, ...props.configuration };
 }
 
-/** [EN] The native login state: -1 unknown (the library's cached state is used), 1 logged in, 0 logged out. [CN] 原生登录状态：-1 未知（使用库缓存的状态），1 已登录，0 未登录。 */
+/**
+ * [EN] The native login state: -1 unknown (the library's cached state is used), 1 logged in, 0 logged out. [CN] 原生登录状态：-1 未知（使用库缓存的状态），1 已登录，0 未登录。
+ */
 function loginStateValue(loggedIn: boolean | undefined): number {
   if (loggedIn === undefined) {
     return -1;

@@ -62,7 +62,9 @@ class CYLTabBarIndicator @JvmOverloads constructor(
     private val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.FILL }
     private var placed = false
 
-    /** [EN] `updateInfo`: the indicator's left and width in the bar's content, and its color. [CN] 指示条在 TabBar 内容中的左边与宽度，以及颜色。 */
+    /**
+     * [EN] `updateInfo`: the indicator's left and width in the bar's content, and its color. [CN] 指示条在 TabBar 内容中的左边与宽度，以及颜色。
+     */
     internal fun update(left: Int, width: Int, @ColorInt tabColor: Int) {
         rect.left = left
         rect.right = left + width
@@ -73,10 +75,14 @@ class CYLTabBarIndicator @JvmOverloads constructor(
 
     internal fun hide() { placed = false }
 
-    /** [EN] Where the indicator is, in the bar's content, or null when hidden. [CN] 指示条在 TabBar 内容中的位置，隐藏时为 null。 */
+    /**
+     * [EN] Where the indicator is, in the bar's content, or null when hidden. [CN] 指示条在 TabBar 内容中的位置，隐藏时为 null。
+     */
     internal val cyl_bounds: Rect? get() = if (placed) Rect(rect) else null
 
-    /** [EN] Draws at the top or the bottom of `[viewTop, viewBottom]`. [CN] 绘制在 `[viewTop, viewBottom]` 的顶部或底部。 */
+    /**
+     * [EN] Draws at the top or the bottom of `[viewTop, viewBottom]`. [CN] 绘制在 `[viewTop, viewBottom]` 的顶部或底部。
+     */
     internal fun draw(canvas: Canvas, viewTop: Int, viewBottom: Int, density: Float) {
         if (!placed || rect.width() <= 0) return
         val barHeight = drawable?.intrinsicHeight?.takeIf { it > 0 } ?: maxOf(1, (height * density).toInt())
@@ -92,7 +98,9 @@ class CYLTabBarIndicator @JvmOverloads constructor(
     }
 
     internal companion object {
-        /** [EN] `QMUIColorHelper.computeColor`: `from` blended towards `to` by `fraction`. [CN] 按 `fraction` 从 `from` 向 `to` 渐变的颜色。 */
+        /**
+         * [EN] `QMUIColorHelper.computeColor`: `from` blended towards `to` by `fraction`. [CN] 按 `fraction` 从 `from` 向 `to` 渐变的颜色。
+         */
         @ColorInt
         fun blend(@ColorInt from: Int, @ColorInt to: Int, fraction: Float): Int {
             val f = fraction.coerceIn(0f, 1f)

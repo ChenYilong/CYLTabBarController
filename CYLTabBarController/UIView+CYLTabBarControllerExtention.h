@@ -217,7 +217,7 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)cyl_bringSubviewToTop:(UIView *)view;
 
-/**
+/*!
  使用 cyl_isViewAddedToPlatterView判断是否添加view成功
  * [EN] Adds `view` to the Liquid Glass platter view (or to the receiver when there is none), then brings it to the front.
  * [CN] 将 view 添加到液态玻璃 Platter 视图上（没有 Platter 时添加到自身），然后置于前面。

@@ -31,10 +31,14 @@ import java.util.WeakHashMap
  *      及其页面，与 iOS 一致。
  */
 
-/** [EN] `CYLThemeManagerNameDefault`: the name of `CYLThemeManagerCenter.defaultThemeManager`. [CN] 默认主题管理器的名称。 */
+/**
+ * [EN] `CYLThemeManagerNameDefault`: the name of `CYLThemeManagerCenter.defaultThemeManager`. [CN] 默认主题管理器的名称。
+ */
 const val CYLThemeManagerNameDefault: String = CYLThemeManager.CYLThemeManagerNameDefault
 
-/** [EN] `CYLThemeManagerCenter`: hands out the theme managers, one per name. [CN] 按名称提供主题管理器，每个名称一个。 */
+/**
+ * [EN] `CYLThemeManagerCenter`: hands out the theme managers, one per name. [CN] 按名称提供主题管理器，每个名称一个。
+ */
 object CYLThemeManagerCenter {
     private val managers = LinkedHashMap<Any, CYLThemeManager>()
 
@@ -42,18 +46,24 @@ object CYLThemeManagerCenter {
         synchronized(managers) { if (!managers.containsKey(manager.name)) managers[manager.name] = manager }
     }
 
-    /** [EN] The manager named `CYLThemeManagerNameDefault`. [CN] 名为 `CYLThemeManagerNameDefault` 的管理器。 */
+    /**
+     * [EN] The manager named `CYLThemeManagerNameDefault`. [CN] 名为 `CYLThemeManagerNameDefault` 的管理器。
+     */
     @JvmStatic
     val defaultThemeManager: CYLThemeManager get() = CYLThemeManager.defaultManager
 
-    /** [EN] Every manager created so far. [CN] 目前创建的所有管理器。 */
+    /**
+     * [EN] Every manager created so far. [CN] 目前创建的所有管理器。
+     */
     @JvmStatic
     val themeManagers: List<CYLThemeManager> get() {
         defaultThemeManager
         return synchronized(managers) { managers.values.toList() }
     }
 
-    /** [EN] The manager named `name`, created on first use. [CN] 名为 `name` 的管理器，首次使用时创建。 */
+    /**
+     * [EN] The manager named `name`, created on first use. [CN] 名为 `name` 的管理器，首次使用时创建。
+     */
     @JvmStatic
     fun themeManagerWithName(name: Any): CYLThemeManager {
         if (name == CYLThemeManagerNameDefault) return defaultThemeManager
@@ -76,11 +86,17 @@ object CYLThemeManagerCenter {
     }
 }
 
-/** [EN] `CYLThemeColorProvider`: the color (ARGB) for the current theme of `manager`. [CN] `manager` 当前主题下的颜色（ARGB）。 */
+/**
+ * [EN] `CYLThemeColorProvider`: the color (ARGB) for the current theme of `manager`. [CN] `manager` 当前主题下的颜色（ARGB）。
+ */
 typealias CYLThemeColorProvider = (manager: CYLThemeManager, identifier: Any?, theme: Any?) -> Int
-/** [EN] `CYLThemeImageProvider`: the image for the current theme of `manager`. [CN] `manager` 当前主题下的图片。 */
+/**
+ * [EN] `CYLThemeImageProvider`: the image for the current theme of `manager`. [CN] `manager` 当前主题下的图片。
+ */
 typealias CYLThemeImageProvider = (manager: CYLThemeManager, identifier: Any?, theme: Any?) -> Drawable?
-/** [EN] `CYLThemeEffectProvider`: the effect (a `RenderEffect` on Android 12+) for the current theme of `manager`. [CN] `manager` 当前主题下的效果（Android 12+ 为 `RenderEffect`）。 */
+/**
+ * [EN] `CYLThemeEffectProvider`: the effect (a `RenderEffect` on Android 12+) for the current theme of `manager`. [CN] `manager` 当前主题下的效果（Android 12+ 为 `RenderEffect`）。
+ */
 typealias CYLThemeEffectProvider = (manager: CYLThemeManager, identifier: Any?, theme: Any?) -> Any?
 
 /**
@@ -89,17 +105,23 @@ typealias CYLThemeEffectProvider = (manager: CYLThemeManager, identifier: Any?, 
  * [CN] 跟随管理器主题的颜色。`cyl_rawColor` 每次都询问 provider；用 `View.cyl_setThemeColor` 设置的视图颜色会跟随主题变化。
  */
 class CYLThemeColor private constructor(private val managerName: Any, val cyl_themeColorName: String?, private val provider: CYLThemeColorProvider) {
-    /** [EN] true for a color created by the factory methods. [CN] 由工厂方法创建的颜色为 true。 */
+    /**
+     * [EN] true for a color created by the factory methods. [CN] 由工厂方法创建的颜色为 true。
+     */
     val cyl_isThemeColor: Boolean get() = true
 
-    /** [EN] The value in the current theme. [CN] 当前主题下的值。 */
+    /**
+     * [EN] The value in the current theme. [CN] 当前主题下的值。
+     */
     val cyl_rawColor: Int
         get() {
             val manager = CYLThemeManagerCenter.themeManagerWithName(managerName)
             return provider(manager, manager.currentThemeIdentifier, manager.currentTheme)
         }
 
-    /** [EN] A `ColorStateList` of the current value. [CN] 当前值的 `ColorStateList`。 */
+    /**
+     * [EN] A `ColorStateList` of the current value. [CN] 当前值的 `ColorStateList`。
+     */
     fun toColorStateList(): ColorStateList = ColorStateList.valueOf(cyl_rawColor)
 
     override fun toString(): String = "CYLThemeColor(${cyl_themeColorName ?: ""})"
@@ -126,13 +148,19 @@ class CYLThemeImage private constructor(private val managerName: Any, val cyl_th
         cyl_refresh()
     }
 
-    /** [EN] true for an image created by the factory methods. [CN] 由工厂方法创建的图片为 true。 */
+    /**
+     * [EN] true for an image created by the factory methods. [CN] 由工厂方法创建的图片为 true。
+     */
     val cyl_isThemeImage: Boolean get() = true
 
-    /** [EN] The provider's image for the current theme (not a theme image). [CN] provider 为当前主题返回的图片（非主题图片）。 */
+    /**
+     * [EN] The provider's image for the current theme (not a theme image). [CN] provider 为当前主题返回的图片（非主题图片）。
+     */
     val cyl_rawImage: Drawable? get() { cyl_refresh(); return current }
 
-    /** [EN] Asks the provider again when the theme changed. [CN] 主题变化时重新询问 provider。 */
+    /**
+     * [EN] Asks the provider again when the theme changed. [CN] 主题变化时重新询问 provider。
+     */
     internal fun cyl_refresh(): Boolean {
         val manager = CYLThemeManagerCenter.themeManagerWithName(managerName)
         val key = manager.currentThemeIdentifier
@@ -172,10 +200,14 @@ class CYLThemeImage private constructor(private val managerName: Any, val cyl_th
  * [CN] 跟随管理器主题的效果；Android 12+ 上用 `View.cyl_setThemeEffect` 设置的 `RenderEffect`（模糊）在主题变化时替换。provider 返回 null 时清除。
  */
 class CYLThemeEffect private constructor(private val managerName: Any, private val provider: CYLThemeEffectProvider) {
-    /** [EN] true for an effect created by the factory methods. [CN] 由工厂方法创建的效果为 true。 */
+    /**
+     * [EN] true for an effect created by the factory methods. [CN] 由工厂方法创建的效果为 true。
+     */
     val cyl_isThemeEffect: Boolean get() = true
 
-    /** [EN] The provider's effect for the current theme. [CN] provider 为当前主题返回的效果。 */
+    /**
+     * [EN] The provider's effect for the current theme. [CN] provider 为当前主题返回的效果。
+     */
     val cyl_rawEffect: Any?
         get() {
             val manager = CYLThemeManagerCenter.themeManagerWithName(managerName)
@@ -190,7 +222,9 @@ class CYLThemeEffect private constructor(private val managerName: Any, private v
 
 // MARK: - Views 视图
 
-/** [EN] A view or a page that wants to know about theme changes (the overridable `-cyl_themeDidChangeByManager:…`). [CN] 需要知道主题变化的视图或页面（可重写的 `-cyl_themeDidChangeByManager:…`）。 */
+/**
+ * [EN] A view or a page that wants to know about theme changes (the overridable `-cyl_themeDidChangeByManager:…`). [CN] 需要知道主题变化的视图或页面（可重写的 `-cyl_themeDidChangeByManager:…`）。
+ */
 fun interface CYLThemeChangeObserving {
     fun cyl_themeDidChangeByManager(manager: CYLThemeManager?, identifier: Any?, theme: Any?)
 }
@@ -211,7 +245,9 @@ private fun resolvedColor(color: Any?): Int? = when (color) {
     else -> null
 }
 
-/** [EN] Sets the color property `key` of the view from `color`. [CN] 用 `color` 设置视图的颜色属性 `key`。 */
+/**
+ * [EN] Sets the color property `key` of the view from `color`. [CN] 用 `color` 设置视图的颜色属性 `key`。
+ */
 private fun View.applyColor(key: String, color: Int?) {
     val density = resources.displayMetrics.density
     when (key) {
@@ -239,7 +275,9 @@ private fun View.applyColor(key: String, color: Int?) {
     }
 }
 
-/** [EN] The stroke of the view's shape background (the "border" theme value rule). [CN] 视图形状背景的描边（主题值规则 "border"）。 */
+/**
+ * [EN] The stroke of the view's shape background (the "border" theme value rule). [CN] 视图形状背景的描边（主题值规则 "border"）。
+ */
 internal fun View.cyl_applyThemeBorder(color: Int?) = applyColor("borderColor", color)
 
 /**
@@ -259,29 +297,41 @@ fun View.cyl_setThemeColor(color: Any?, key: String) {
     applyColor(key, resolvedColor(color))
 }
 
-/** [EN] `-cyl_themeColorForKey:`: the color set for `key`, else null. [CN] 为 `key` 设置的颜色，没有时为 null。 */
+/**
+ * [EN] `-cyl_themeColorForKey:`: the color set for `key`, else null. [CN] 为 `key` 设置的颜色，没有时为 null。
+ */
 fun View.cyl_themeColorForKey(key: String): Any? = themeState(false)?.colors?.get(key)
 
-/** [EN] `-cyl_updateThemeColors`: sets the colors of `cyl_setThemeColor` again, for this view and its subviews. [CN] 为本视图及子视图重新设置 `cyl_setThemeColor` 的颜色。 */
+/**
+ * [EN] `-cyl_updateThemeColors`: sets the colors of `cyl_setThemeColor` again, for this view and its subviews. [CN] 为本视图及子视图重新设置 `cyl_setThemeColor` 的颜色。
+ */
 fun View.cyl_updateThemeColors() {
     themeState(false)?.colors?.forEach { (key, color) -> applyColor(key, resolvedColor(color)) }
     (this as? ViewGroup)?.let { group -> for (index in 0 until group.childCount) group.getChildAt(index).cyl_updateThemeColors() }
 }
 
-/** [EN] `cyl_themeBackgroundColor` (`-cyl_setThemeColor:forKey:` with "backgroundColor"). [CN] 背景主题颜色。 */
+/**
+ * [EN] `cyl_themeBackgroundColor` (`-cyl_setThemeColor:forKey:` with "backgroundColor"). [CN] 背景主题颜色。
+ */
 var View.cyl_themeBackgroundColor: Any?
     get() = cyl_themeColorForKey("backgroundColor")
     set(value) = cyl_setThemeColor(value, "backgroundColor")
-/** [EN] `cyl_themeBorderColor`: the stroke of the view's shape background. [CN] 视图形状背景的描边颜色。 */
+/**
+ * [EN] `cyl_themeBorderColor`: the stroke of the view's shape background. [CN] 视图形状背景的描边颜色。
+ */
 var View.cyl_themeBorderColor: Any?
     get() = cyl_themeColorForKey("borderColor")
     set(value) = cyl_setThemeColor(value, "borderColor")
-/** [EN] `cyl_themeShadowColor`: the outline shadow colors (Android 9+). [CN] 轮廓阴影颜色（Android 9+）。 */
+/**
+ * [EN] `cyl_themeShadowColor`: the outline shadow colors (Android 9+). [CN] 轮廓阴影颜色（Android 9+）。
+ */
 var View.cyl_themeShadowColor: Any?
     get() = cyl_themeColorForKey("shadowColor")
     set(value) = cyl_setThemeColor(value, "shadowColor")
 
-/** [EN] Sets a theme effect on the view (`RenderEffect`, Android 12+), replaced when the theme changes. [CN] 为视图设置主题效果（Android 12+ 的 `RenderEffect`），主题变化时替换。 */
+/**
+ * [EN] Sets a theme effect on the view (`RenderEffect`, Android 12+), replaced when the theme changes. [CN] 为视图设置主题效果（Android 12+ 的 `RenderEffect`），主题变化时替换。
+ */
 fun View.cyl_setThemeEffect(effect: CYLThemeEffect?) {
     themeState(effect != null)?.effect = effect
     applyEffect(effect?.cyl_rawEffect)
@@ -300,10 +350,14 @@ private fun View.applyEffect(effect: Any?) {
  */
 fun View.cyl_registerThemeColorProperties(getters: List<String>) { themeState(true)!!.properties += getters }
 
-/** [EN] `-cyl_unregisterThemeColorProperties:`. [CN] 移除登记的属性。 */
+/**
+ * [EN] `-cyl_unregisterThemeColorProperties:`. [CN] 移除登记的属性。
+ */
 fun View.cyl_unregisterThemeColorProperties(getters: List<String>) { themeState(false)?.properties?.removeAll(getters.toSet()) }
 
-/** [EN] `cyl_themeDidChangeBlock`: runs at the end of `cyl_themeDidChangeByManager`. [CN] 在 `cyl_themeDidChangeByManager` 末尾运行。 */
+/**
+ * [EN] `cyl_themeDidChangeBlock`: runs at the end of `cyl_themeDidChangeByManager`. [CN] 在 `cyl_themeDidChangeByManager` 末尾运行。
+ */
 var View.cyl_themeDidChangeBlock: (() -> Unit)?
     get() = themeState(false)?.block
     set(value) { themeState(value != null)?.block = value }
@@ -364,7 +418,9 @@ private fun View.applyThemeChange(manager: CYLThemeManager?, identifier: Any?, t
     themeState(false)?.block?.invoke()
 }
 
-/** [EN] `-cyl_applyCurrentTheme`: brings the view and its subviews to the current themes now. [CN] 立即让本视图及子视图使用当前主题。 */
+/**
+ * [EN] `-cyl_applyCurrentTheme`: brings the view and its subviews to the current themes now. [CN] 立即让本视图及子视图使用当前主题。
+ */
 fun View.cyl_applyCurrentTheme() = cyl_themeDidChangeByManager(null, null, null)
 
 // MARK: - Pages 页面
@@ -382,7 +438,9 @@ fun Fragment.cyl_themeDidChangeByManager(manager: CYLThemeManager, identifier: A
     }
 }
 
-/** [EN] Tells the windows and pages of the live tab bar controllers about a theme change. [CN] 把主题变化通知存活 TabBarController 的窗口与页面。 */
+/**
+ * [EN] Tells the windows and pages of the live tab bar controllers about a theme change. [CN] 把主题变化通知存活 TabBarController 的窗口与页面。
+ */
 internal object CYLThemeDispatcher {
     fun dispatch(manager: CYLThemeManager, identifier: Any?, theme: Any?) {
         val activities = LinkedHashSet<androidx.fragment.app.FragmentActivity>()
@@ -405,11 +463,15 @@ internal object CYLThemeDispatcher {
 
     private class Snapshot(val root: View, val drawable: android.graphics.drawable.BitmapDrawable)
 
-    /** [EN] Snapshots on screen now (for tests). [CN] 当前显示中的截图数量（测试用）。 */
+    /**
+     * [EN] Snapshots on screen now (for tests). [CN] 当前显示中的截图数量（测试用）。
+     */
     internal var cyl_snapshotCount = 0
         private set
 
-    /** [EN] The window as it looks now, laid over it (`ViewOverlay`), or null when it is not on screen. [CN] 窗口当前的样子，覆盖在其上（`ViewOverlay`）；不在屏幕上时为 null。 */
+    /**
+     * [EN] The window as it looks now, laid over it (`ViewOverlay`), or null when it is not on screen. [CN] 窗口当前的样子，覆盖在其上（`ViewOverlay`）；不在屏幕上时为 null。
+     */
     private fun snapshot(root: View): Snapshot? {
         if (!root.isAttachedToWindow || root.width <= 0 || root.height <= 0 || root.visibility != View.VISIBLE) return null
         val bitmap = android.graphics.Bitmap.createBitmap(root.width, root.height, android.graphics.Bitmap.Config.ARGB_8888)
@@ -420,7 +482,9 @@ internal object CYLThemeDispatcher {
         return Snapshot(root, drawable)
     }
 
-    /** [EN] Fades the snapshots out, then removes them. [CN] 让截图淡出，然后移除。 */
+    /**
+     * [EN] Fades the snapshots out, then removes them. [CN] 让截图淡出，然后移除。
+     */
     private fun fade(snapshots: List<Snapshot>, duration: Double) {
         if (snapshots.isEmpty()) return
         android.animation.ValueAnimator.ofInt(255, 0).apply {

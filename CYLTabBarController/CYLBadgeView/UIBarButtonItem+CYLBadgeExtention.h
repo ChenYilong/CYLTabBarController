@@ -20,14 +20,14 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (BOOL)cyl_isShowBadge;
 
-/**
+/*!
  *  show badge with red dot style and CYLBadgeAnimationTypeNone by default.
  * [EN] Shows a red-dot badge on this bar button item with no animation.
  * [CN] 在当前BarButtonItem上显示红点角标，无动画。
  */
 - (void)cyl_showBadge;
 
-/**
+/*!
  *  cyl_showBadge
  *
  *  @param value String value, default is `nil`. if value equal @"" means red dot style.
@@ -55,14 +55,14 @@ NS_ASSUME_NONNULL_BEGIN
            backgroundColor:(nullable UIColor *)backgroundColor;
 
 
-/**
+/*!
  *  clear badge(hide badge)
  * [EN] Hides the badge on this bar button item.
  * [CN] 隐藏当前BarButtonItem上的角标。
  */
 - (void)cyl_clearBadge;
 
-/**
+/*!
  *  make bage(if existing) not hiden
  * [EN] Shows the badge again if one exists and was hidden.
  * [CN] 若角标存在且被隐藏，则重新显示。
