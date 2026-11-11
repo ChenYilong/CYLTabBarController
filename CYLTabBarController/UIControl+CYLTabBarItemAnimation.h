@@ -14,21 +14,27 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface UIView (CYLTabBarItemAnimation)
 
-/// [EN] YES for a view made by a `CYLTabBarItemAnimator`. [CN] 由 `CYLTabBarItemAnimator` 创建的视图返回 YES。
+/*!
+ * [EN] YES for a view made by a `CYLTabBarItemAnimator`. [CN] 由 `CYLTabBarItemAnimator` 创建的视图返回 YES。
+ */
 - (BOOL)cyl_isTabBarItemAnimationView;
 
 @end
 
 @interface CYLTabBar (CYLTabBarItemAnimation)
 
-/// [EN] Plays the animation on `selectedControl`. [CN] 在 `selectedControl` 上播放动画。
+/*!
+ * [EN] Plays the animation on `selectedControl`. [CN] 在 `selectedControl` 上播放动画。
+ */
 - (void)cyl_playTabBarItemAnimationWithSelectedControl:(nullable UIControl *)selectedControl
                                                    URL:(nullable NSURL *)URL
                                                   size:(CGSize)size
                                        defaultSelected:(BOOL)defaultSelected
                                            contentMode:(UIViewContentMode)contentMode;
 
-/// [EN] Stops the animations of every tab, selected-state layer included. [CN] 停止所有 Tab 的动画，包括选中态图层。
+/*!
+ * [EN] Stops the animations of every tab, selected-state layer included. [CN] 停止所有 Tab 的动画，包括选中态图层。
+ */
 - (void)cyl_stopAllTabBarItemAnimations;
 
 @end

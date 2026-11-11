@@ -144,13 +144,21 @@ typedef NS_ENUM(NSInteger, CYLSettingsGroup) {
  *      1.5 秒后触发。分组列表以一个 section 显示；设置分组中有一行，用操作表列出全部模拟（`CYLSettingsSection`，所有 Demo）。
  */
 @interface UIViewController (CYLScrollHideSimulation)
-/// [EN] Number of simulations. [CN] 模拟的数量。
+/*!
+ * [EN] Number of simulations. [CN] 模拟的数量。
+ */
 - (NSInteger)cyl_scrollHideSimulationRowCount;
-/// [EN] The cell of simulation `row`. [CN] 第 `row` 个模拟的 cell。
+/*!
+ * [EN] The cell of simulation `row`. [CN] 第 `row` 个模拟的 cell。
+ */
 - (UITableViewCell *)cyl_scrollHideSimulationCellForTableView:(UITableView *)tableView row:(NSInteger)row;
-/// [EN] Runs simulation `row` after 1.5 s. [CN] 1.5 秒后执行第 `row` 个模拟。
+/*!
+ * [EN] Runs simulation `row` after 1.5 s. [CN] 1.5 秒后执行第 `row` 个模拟。
+ */
 - (void)cyl_didSelectScrollHideSimulationRow:(NSInteger)row;
-/// [EN] Lists every simulation in an action sheet. [CN] 用操作表列出全部模拟。
+/*!
+ * [EN] Lists every simulation in an action sheet. [CN] 用操作表列出全部模拟。
+ */
 - (void)cyl_presentScrollHideSimulationMenu;
 /*!
  * [EN] The automatic self-test: runs every automatic simulation on this page, checks the expected result and reports

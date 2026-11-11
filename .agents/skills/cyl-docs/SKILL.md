@@ -78,6 +78,8 @@ in the IDE's documentation: Objective-C public headers `/*! … */` (Quick Help 
 written in Swift `/** … */` or `///`; Kotlin / Java `/** … */` (KDoc / Javadoc); TypeScript / JavaScript `/** … */`
 (TSDoc / JSDoc); Dart `///`. Check with `python3 scripts/check-public-api-comments.py` (`--fix` rewrites). AGENTS.md,
 "Comments on public API".
+The same format applies to one-line comments on public API (and to trailing comments after a declaration, which move into
+its block), and a file with public API keeps one comment format throughout, on every platform and in every language.
 
 ### Commit message author line
 

@@ -70,13 +70,19 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (NSString *)cyl_themeListSectionTitle;
 
-/// [EN] Number of rows of the theme list section. [CN] 主题列表 section 的行数。
+/*!
+ * [EN] Number of rows of the theme list section. [CN] 主题列表 section 的行数。
+ */
 - (NSInteger)cyl_themeListRowCount;
 
-/// [EN] The cell of a theme: its name, its first icon (or color), a checkmark when current. [CN] 主题的 cell：名字、第一个图标（或颜色）、当前主题显示勾号。
+/*!
+ * [EN] The cell of a theme: its name, its first icon (or color), a checkmark when current. [CN] 主题的 cell：名字、第一个图标（或颜色）、当前主题显示勾号。
+ */
 - (UITableViewCell *)cyl_themeListCellForTableView:(UITableView *)tableView row:(NSInteger)row;
 
-/// [EN] Applies the theme of `row`; reload the section afterwards for the checkmark. [CN] 应用第 `row` 行的主题；之后请刷新该 section 以更新勾号。
+/*!
+ * [EN] Applies the theme of `row`; reload the section afterwards for the checkmark. [CN] 应用第 `row` 行的主题；之后请刷新该 section 以更新勾号。
+ */
 - (void)cyl_didSelectThemeListRow:(NSInteger)row;
 
 @end

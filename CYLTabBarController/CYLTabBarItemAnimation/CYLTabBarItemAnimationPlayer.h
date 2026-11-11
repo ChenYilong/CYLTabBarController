@@ -28,24 +28,36 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @protocol CYLTabBarItemAnimationPlayer <NSObject>
 
-/// [EN] The view it controls. [CN] 它所控制的视图。
+/*!
+ * [EN] The view it controls. [CN] 它所控制的视图。
+ */
 @property (nonatomic, weak, readonly, nullable) UIView *animationView;
 
-/// [EN] Plays once, from the first frame. [CN] 从第一帧开始播放一次。
+/*!
+ * [EN] Plays once, from the first frame. [CN] 从第一帧开始播放一次。
+ */
 - (void)play;
 
-/// [EN] Shows the last frame without playing (the tab selected at launch, #389). [CN] 不播放，直接显示最后一帧（启动时选中的 Tab，#389）。
+/*!
+ * [EN] Shows the last frame without playing (the tab selected at launch, #389). [CN] 不播放，直接显示最后一帧（启动时选中的 Tab，#389）。
+ */
 - (void)showLastFrame;
 
-/// [EN] Stops if it has started, back to the first frame. [CN] 若已开始播放则停止，并回到第一帧。
+/*!
+ * [EN] Stops if it has started, back to the first frame. [CN] 若已开始播放则停止，并回到第一帧。
+ */
 - (void)stop;
 
 @optional
 
-/// [EN] The playback position, 0…1; setting it draws that frame. [CN] 播放位置，0…1；设置后绘制该帧。
+/*!
+ * [EN] The playback position, 0…1; setting it draws that frame. [CN] 播放位置，0…1；设置后绘制该帧。
+ */
 @property (nonatomic, assign) CGFloat progress;
 
-/// [EN] The playback speed (`lottieAnimationSpeed`, #428); libraries without one leave it out. [CN] 播放速度（#428）；没有播放速度的动画库不实现。
+/*!
+ * [EN] The playback speed (`lottieAnimationSpeed`, #428); libraries without one leave it out. [CN] 播放速度（#428）；没有播放速度的动画库不实现。
+ */
 @property (nonatomic, assign) CGFloat animationSpeed;
 
 /*!
@@ -79,7 +91,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
 
-/// [EN] The view it controls, held weakly. [CN] 它所控制的视图（弱引用）。
+/*!
+ * [EN] The view it controls, held weakly. [CN] 它所控制的视图（弱引用）。
+ */
 @property (nonatomic, weak, readonly, nullable) UIView *animationView;
 
 @end

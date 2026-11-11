@@ -57,7 +57,9 @@ extern NSString *const CYLFlatDesignTabBarItemDidChange;
 @property (nullable, nonatomic, strong) CYLFlatDesignTabBarButton *tabBarButton;
 
 #pragma mark - 系统 UITabBarItem 有的属性
-// default is YES
+/*!
+ * default is YES
+ */
 @property (nonatomic, assign, getter=isEnabled) BOOL enabled;
 @property (nonatomic, assign) NSUInteger index;
 
@@ -126,7 +128,9 @@ extern NSString *const CYLFlatDesignTabBarItemDidChange;
  * [EN] If badgeSize is CGSizeZero, the badge size is calculated automatically. Defaults to CGSizeZero
  */
 @property (nonatomic, readwrite, assign) CGSize badgeSize;
-// default {1, 6, 1, 6}
+/*!
+ * default {1, 6, 1, 6}
+ */
 @property (nonatomic, readwrite, assign) UIEdgeInsets badgeContentInset UI_APPEARANCE_SELECTOR;
 @property (nonatomic, readwrite, assign) UIOffset badgePositionAdjustment UI_APPEARANCE_SELECTOR;
 @property (nonatomic, readwrite, assign) UIOffset imagePositionAdjustment UI_APPEARANCE_SELECTOR;

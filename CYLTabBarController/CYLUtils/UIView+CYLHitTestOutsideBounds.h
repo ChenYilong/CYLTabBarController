@@ -26,7 +26,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface UIView (CYLHitTestOutsideBounds)
 
-/// [EN] Default NO. [CN] 默认 NO。
+/*!
+ * [EN] Default NO. [CN] 默认 NO。
+ */
 @property (nonatomic, assign, getter=cyl_respondsOutsideSuperviewBounds, setter=cyl_setRespondsOutsideSuperviewBounds:) BOOL cyl_respondsOutsideSuperviewBounds;
 
 @end

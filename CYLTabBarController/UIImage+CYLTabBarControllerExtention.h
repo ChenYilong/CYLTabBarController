@@ -23,15 +23,25 @@ NS_ASSUME_NONNULL_BEGIN
  * [CN] 单次图片加载的选项（`+[UIImage cyl_loadImageWithURL:options:completion:]`），参考 SDWebImage 的 `SDWebImageOptions`。
  */
 typedef NS_OPTIONS(NSUInteger, CYLImageLoadOptions) {
-    /// [EN] Memory, then disk, then the network; the image is stored as `CYLImageCache` allows. [CN] 内存、磁盘、网络依次查找；按 `CYLImageCache` 设置缓存。
+    /*!
+     * [EN] Memory, then disk, then the network; the image is stored as `CYLImageCache` allows. [CN] 内存、磁盘、网络依次查找；按 `CYLImageCache` 设置缓存。
+     */
     CYLImageLoadOptionsDefault = 0,
-    /// [EN] Downloads again, ignoring the cached image, and stores the new one: for a URL whose image changes. [CN] 忽略缓存重新下载并缓存新图片：用于图片会变化的 URL。
+    /*!
+     * [EN] Downloads again, ignoring the cached image, and stores the new one: for a URL whose image changes. [CN] 忽略缓存重新下载并缓存新图片：用于图片会变化的 URL。
+     */
     CYLImageLoadOptionsRefreshCached = 1 << 0,
-    /// [EN] Only from the caches, never downloads: nil when not cached. [CN] 只从缓存读取，不下载：未缓存时为 nil。
+    /*!
+     * [EN] Only from the caches, never downloads: nil when not cached. [CN] 只从缓存读取，不下载：未缓存时为 nil。
+     */
     CYLImageLoadOptionsFromCacheOnly = 1 << 1,
-    /// [EN] Keeps the image in memory only, not on disk. [CN] 只缓存在内存，不写入磁盘。
+    /*!
+     * [EN] Keeps the image in memory only, not on disk. [CN] 只缓存在内存，不写入磁盘。
+     */
     CYLImageLoadOptionsMemoryCacheOnly = 1 << 2,
-    /// [EN] Does not keep the image in memory (the disk cache still applies). [CN] 不缓存在内存（磁盘缓存仍然有效）。
+    /*!
+     * [EN] Does not keep the image in memory (the disk cache still applies). [CN] 不缓存在内存（磁盘缓存仍然有效）。
+     */
     CYLImageLoadOptionsAvoidMemoryCache = 1 << 3,
 };
 
@@ -40,9 +50,13 @@ typedef NS_OPTIONS(NSUInteger, CYLImageLoadOptions) {
  * [CN] 磁盘缓存文件的过期依据，参考 SDWebImage 的 `SDImageCacheConfigExpireType`。
  */
 typedef NS_ENUM(NSInteger, CYLImageCacheExpireType) {
-    /// [EN] Time since the file was last read (each hit renews it). Default. [CN] 距上次读取的时间（每次命中都会续期）。默认值。
+    /*!
+     * [EN] Time since the file was last read (each hit renews it). Default. [CN] 距上次读取的时间（每次命中都会续期）。默认值。
+     */
     CYLImageCacheExpireTypeAccessDate,
-    /// [EN] Time since the file was downloaded. [CN] 距下载的时间。
+    /*!
+     * [EN] Time since the file was downloaded. [CN] 距下载的时间。
+     */
     CYLImageCacheExpireTypeModificationDate,
 };
 
@@ -66,39 +80,71 @@ typedef NS_ENUM(NSInteger, CYLImageCacheExpireType) {
  */
 @interface CYLImageCache : NSObject
 
-/// [EN] The cache used by the loads. [CN] 加载时使用的缓存。
+/*!
+ * [EN] The cache used by the loads. [CN] 加载时使用的缓存。
+ */
 + (instancetype)sharedImageCache;
 
-/// [EN] Whether images are kept in memory. Default YES. [CN] 是否缓存在内存。默认 YES。
+/*!
+ * [EN] Whether images are kept in memory. Default YES. [CN] 是否缓存在内存。默认 YES。
+ */
 @property (nonatomic, assign) BOOL shouldCacheImagesInMemory;
-/// [EN] Whether images are written to the disk cache. Default YES. [CN] 是否写入磁盘缓存。默认 YES。
+/*!
+ * [EN] Whether images are written to the disk cache. Default YES. [CN] 是否写入磁盘缓存。默认 YES。
+ */
 @property (nonatomic, assign) BOOL shouldCacheImagesOnDisk;
-/// [EN] The most images in memory; 0 for no limit. Default 100. [CN] 内存中最多的图片数；0 表示不限制。默认 100。
+/*!
+ * [EN] The most images in memory; 0 for no limit. Default 100. [CN] 内存中最多的图片数；0 表示不限制。默认 100。
+ */
 @property (nonatomic, assign) NSUInteger maxMemoryCount;
-/// [EN] The most bytes (pixels × 4) of images in memory; 0 for no limit. Default 0. [CN] 内存中图片的最大字节数（像素数 × 4）；0 表示不限制。默认 0。
+/*!
+ * [EN] The most bytes (pixels × 4) of images in memory; 0 for no limit. Default 0. [CN] 内存中图片的最大字节数（像素数 × 4）；0 表示不限制。默认 0。
+ */
 @property (nonatomic, assign) NSUInteger maxMemoryCost;
-/// [EN] How long a file stays in the disk cache, see `diskCacheExpireType`; 0 or less: never expires. Default 7 days. [CN] 文件在磁盘缓存中的保留时长，见 `diskCacheExpireType`；小于等于 0 表示永不过期。默认 7 天。
+/*!
+ * [EN] How long a file stays in the disk cache, see `diskCacheExpireType`; 0 or less: never expires. Default 7 days. [CN] 文件在磁盘缓存中的保留时长，见 `diskCacheExpireType`；小于等于 0 表示永不过期。默认 7 天。
+ */
 @property (nonatomic, assign) NSTimeInterval maxDiskAge;
-/// [EN] What `maxDiskAge` counts from. Default `CYLImageCacheExpireTypeAccessDate`. [CN] `maxDiskAge` 的计算起点。默认 `CYLImageCacheExpireTypeAccessDate`。
+/*!
+ * [EN] What `maxDiskAge` counts from. Default `CYLImageCacheExpireTypeAccessDate`. [CN] `maxDiskAge` 的计算起点。默认 `CYLImageCacheExpireTypeAccessDate`。
+ */
 @property (nonatomic, assign) CYLImageCacheExpireType diskCacheExpireType;
-/// [EN] The most bytes of the disk cache; the least recently used files go first, down to half of it. 0 for no limit. Default 0. [CN] 磁盘缓存的最大字节数；超出时先删除最久未用的文件，直到降到一半。0 表示不限制。默认 0。
+/*!
+ * [EN] The most bytes of the disk cache; the least recently used files go first, down to half of it. 0 for no limit. Default 0. [CN] 磁盘缓存的最大字节数；超出时先删除最久未用的文件，直到降到一半。0 表示不限制。默认 0。
+ */
 @property (nonatomic, assign) NSUInteger maxDiskSize;
-/// [EN] The directory of the disk cache, in the sandbox. Default `Library/Caches/CYLTabBarController/RemoteImages`. [CN] 磁盘缓存目录（沙盒中）。默认 `Library/Caches/CYLTabBarController/RemoteImages`。
+/*!
+ * [EN] The directory of the disk cache, in the sandbox. Default `Library/Caches/CYLTabBarController/RemoteImages`. [CN] 磁盘缓存目录（沙盒中）。默认 `Library/Caches/CYLTabBarController/RemoteImages`。
+ */
 @property (nonatomic, copy) NSString *diskCachePath;
-/// [EN] Timeout of a download, in seconds. Default 15. [CN] 下载超时时间（秒）。默认 15。
+/*!
+ * [EN] Timeout of a download, in seconds. Default 15. [CN] 下载超时时间（秒）。默认 15。
+ */
 @property (nonatomic, assign) NSTimeInterval downloadTimeout;
 
-/// [EN] The cached image of `URL`, from memory or disk; nil when not cached or expired. [CN] `URL` 的缓存图片（内存或磁盘）；未缓存或已过期时为 nil。
+/*!
+ * [EN] The cached image of `URL`, from memory or disk; nil when not cached or expired. [CN] `URL` 的缓存图片（内存或磁盘）；未缓存或已过期时为 nil。
+ */
 - (nullable UIImage *)imageFromCacheForURL:(NSURL *)URL;
-/// [EN] Removes the image of `URL` from memory and disk. [CN] 从内存和磁盘删除 `URL` 的图片。
+/*!
+ * [EN] Removes the image of `URL` from memory and disk. [CN] 从内存和磁盘删除 `URL` 的图片。
+ */
 - (void)removeImageForURL:(NSURL *)URL;
-/// [EN] Empties the memory cache. [CN] 清空内存缓存。
+/*!
+ * [EN] Empties the memory cache. [CN] 清空内存缓存。
+ */
 - (void)clearMemory;
-/// [EN] Removes every file of the disk cache. [CN] 删除磁盘缓存中的所有文件。
+/*!
+ * [EN] Removes every file of the disk cache. [CN] 删除磁盘缓存中的所有文件。
+ */
 - (void)clearDiskOnCompletion:(nullable void (^)(void))completion;
-/// [EN] Removes the expired files, then the least recently used ones while the cache is over `maxDiskSize`. [CN] 删除过期文件，若仍超出 `maxDiskSize`，再删除最久未用的文件。
+/*!
+ * [EN] Removes the expired files, then the least recently used ones while the cache is over `maxDiskSize`. [CN] 删除过期文件，若仍超出 `maxDiskSize`，再删除最久未用的文件。
+ */
 - (void)deleteOldFilesWithCompletion:(nullable void (^)(void))completion;
-/// [EN] Bytes of the disk cache. [CN] 磁盘缓存的字节数。
+/*!
+ * [EN] Bytes of the disk cache. [CN] 磁盘缓存的字节数。
+ */
 - (NSUInteger)totalDiskSize;
 
 @end

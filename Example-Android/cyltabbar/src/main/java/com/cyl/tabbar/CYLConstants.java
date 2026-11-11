@@ -154,7 +154,9 @@ public final class CYLConstants {
     public static final String CYLTabBarControllerUnloadsUnselectedViewsOnMemoryWarning = "CYLTabBarControllerUnloadsUnselectedViewsOnMemoryWarning";
     /** [EN] The tabs a memory warning never unloads (`cyl_keepsLoadedTabBarItemIdentifiers`). [CN] 内存警告时不卸载的 Tab（`cyl_keepsLoadedTabBarItemIdentifiers`）。 */
     public static final String CYLTabBarControllerKeepsLoadedTabBarItemIdentifiers = "CYLTabBarControllerKeepsLoadedTabBarItemIdentifiers";
-    // [EN] Skins of a configuration (see CYLTabBarConfigurationTheme). [CN] 配置中的皮肤（见 CYLTabBarConfigurationTheme）。
+    /**
+     * [EN] Skins of a configuration (see CYLTabBarConfigurationTheme). [CN] 配置中的皮肤（见 CYLTabBarConfigurationTheme）。
+     */
     public static final String CYLTabBarControllerThemes = "CYLTabBarControllerThemes";
     public static final String CYLTabBarControllerThemeIdentifier = "CYLTabBarControllerThemeIdentifier";
     public static final String CYLTabBarControllerDarkThemeIdentifier = "CYLTabBarControllerDarkThemeIdentifier";

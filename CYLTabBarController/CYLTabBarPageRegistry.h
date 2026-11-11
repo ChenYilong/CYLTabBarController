@@ -41,7 +41,9 @@ typedef UIViewController *_Nullable (^CYLTabBarPageProvider)(NSString *pageIdent
  */
 typedef UIViewController *_Nullable (^CYLTabBarPageFactory)(CYLTabBarPageRequest *request);
 
-/// [EN] Delivers the page of an asynchronous factory; nil removes the tab. Any thread. [CN] 交付异步工厂的页面；nil 则移除该 Tab。任意线程。
+/*!
+ * [EN] Delivers the page of an asynchronous factory; nil removes the tab. Any thread. [CN] 交付异步工厂的页面；nil 则移除该 Tab。任意线程。
+ */
 typedef void (^CYLTabBarPageCompletion)(UIViewController *_Nullable page);
 
 /*!
@@ -62,26 +64,46 @@ typedef UIViewController *_Nullable (^CYLTabBarAsyncPageFactory)(CYLTabBarPageRe
  *      `+[CYLTabBarPageRegistry defaultPageLookupOrder]`。
  */
 typedef NSString *CYLTabBarPageSource NS_TYPED_ENUM;
-/// [EN] "instance": the registry passed as `CYLTabBarControllerPageRegistry`. [CN] "instance"：作为 `CYLTabBarControllerPageRegistry` 传入的注册表。
+/*!
+ * [EN] "instance": the registry passed as `CYLTabBarControllerPageRegistry`. [CN] "instance"：作为 `CYLTabBarControllerPageRegistry` 传入的注册表。
+ */
 FOUNDATION_EXTERN CYLTabBarPageSource const CYLTabBarPageSourceInstanceRegistry;
-/// [EN] "resolver": the `CYLTabBarControllerPageResolver` block. [CN] "resolver"：`CYLTabBarControllerPageResolver` 回调。
+/*!
+ * [EN] "resolver": the `CYLTabBarControllerPageResolver` block. [CN] "resolver"：`CYLTabBarControllerPageResolver` 回调。
+ */
 FOUNDATION_EXTERN CYLTabBarPageSource const CYLTabBarPageSourceResolver;
-/// [EN] "shared": `+[CYLTabBarPageRegistry sharedRegistry]`. [CN] "shared"：`+[CYLTabBarPageRegistry sharedRegistry]`。
+/*!
+ * [EN] "shared": `+[CYLTabBarPageRegistry sharedRegistry]`. [CN] "shared"：`+[CYLTabBarPageRegistry sharedRegistry]`。
+ */
 FOUNDATION_EXTERN CYLTabBarPageSource const CYLTabBarPageSourceSharedRegistry;
-/// [EN] "automatic": the classes that adopt `CYLTabBarPage`. [CN] "automatic"：遵守 `CYLTabBarPage` 的类。
+/*!
+ * [EN] "automatic": the classes that adopt `CYLTabBarPage`. [CN] "automatic"：遵守 `CYLTabBarPage` 的类。
+ */
 FOUNDATION_EXTERN CYLTabBarPageSource const CYLTabBarPageSourceAutomaticRegistration;
 
-/// [EN] Why a tab got no page. [CN] Tab 没有页面的原因。
+/*!
+ * [EN] Why a tab got no page. [CN] Tab 没有页面的原因。
+ */
 typedef NS_ENUM(NSInteger, CYLTabBarPageSkipReason) {
-    /// [EN] The tab's attributes are not a dictionary (placeholder, edge case B4). [CN] Tab 的属性不是字典（占位，边界情况 B4）。
+    /*!
+     * [EN] The tab's attributes are not a dictionary (placeholder, edge case B4). [CN] Tab 的属性不是字典（占位，边界情况 B4）。
+     */
     CYLTabBarPageSkipReasonInvalidTab = 1,
-    /// [EN] Neither `CYLTabBarItemPageIdentifier` nor `CYLTabBarItemIdentifier`. [CN] 既没有 `CYLTabBarItemPageIdentifier` 也没有 `CYLTabBarItemIdentifier`。
+    /*!
+     * [EN] Neither `CYLTabBarItemPageIdentifier` nor `CYLTabBarItemIdentifier`. [CN] 既没有 `CYLTabBarItemPageIdentifier` 也没有 `CYLTabBarItemIdentifier`。
+     */
     CYLTabBarPageSkipReasonMissingIdentifier = 2,
-    /// [EN] No source has a page for the ID. [CN] 没有任何来源提供该 ID 的页面。
+    /*!
+     * [EN] No source has a page for the ID. [CN] 没有任何来源提供该 ID 的页面。
+     */
     CYLTabBarPageSkipReasonUnregistered = 3,
-    /// [EN] Left out by `CYLTabBarItemPlatforms` or `CYLTabBarItemMinimumAppVersion`. [CN] 因 `CYLTabBarItemPlatforms` 或 `CYLTabBarItemMinimumAppVersion` 被排除。
+    /*!
+     * [EN] Left out by `CYLTabBarItemPlatforms` or `CYLTabBarItemMinimumAppVersion`. [CN] 因 `CYLTabBarItemPlatforms` 或 `CYLTabBarItemMinimumAppVersion` 被排除。
+     */
     CYLTabBarPageSkipReasonExcluded = 4,
-    /// [EN] Every provider returned nil, raised, or returned a page that cannot be a tab. [CN] 所有提供者都返回 nil、抛出异常或返回了不能作为 Tab 的页面。
+    /*!
+     * [EN] Every provider returned nil, raised, or returned a page that cannot be a tab. [CN] 所有提供者都返回 nil、抛出异常或返回了不能作为 Tab 的页面。
+     */
     CYLTabBarPageSkipReasonProviderFailed = 5,
 };
 
@@ -92,7 +114,9 @@ typedef NS_ENUM(NSInteger, CYLTabBarPageSkipReason) {
  *      `CYLTabBarControllerPageRegistry` 传入。
  */
 @protocol CYLTabBarPageProviding <NSObject>
-/// [EN] The provider of a page ID, or nil to go on looking. [CN] 页面 ID 的提供者；返回 nil 则继续查找。
+/*!
+ * [EN] The provider of a page ID, or nil to go on looking. [CN] 页面 ID 的提供者；返回 nil 则继续查找。
+ */
 - (nullable CYLTabBarPageProvider)pageProviderForPageIdentifier:(NSString *)pageIdentifier;
 @end
 
@@ -103,33 +127,55 @@ typedef NS_ENUM(NSInteger, CYLTabBarPageSkipReason) {
  */
 @interface CYLTabBarPageRequest : NSObject
 
-/// [EN] The page ID (`CYLTabBarItemPageIdentifier`, else `CYLTabBarItemIdentifier`). [CN] 页面 ID（`CYLTabBarItemPageIdentifier`，否则 `CYLTabBarItemIdentifier`）。
+/*!
+ * [EN] The page ID (`CYLTabBarItemPageIdentifier`, else `CYLTabBarItemIdentifier`). [CN] 页面 ID（`CYLTabBarItemPageIdentifier`，否则 `CYLTabBarItemIdentifier`）。
+ */
 @property (nonatomic, copy, readonly) NSString *pageIdentifier;
-/// [EN] `CYLTabBarItemIdentifier`, or nil. [CN] `CYLTabBarItemIdentifier`，没有则为 nil。
+/*!
+ * [EN] `CYLTabBarItemIdentifier`, or nil. [CN] `CYLTabBarItemIdentifier`，没有则为 nil。
+ */
 @property (nonatomic, copy, readonly, nullable) NSString *tabIdentifier;
-/// [EN] `CYLTabBarItemTitle`, or nil. [CN] `CYLTabBarItemTitle`，没有则为 nil。
+/*!
+ * [EN] `CYLTabBarItemTitle`, or nil. [CN] `CYLTabBarItemTitle`，没有则为 nil。
+ */
 @property (nonatomic, copy, readonly, nullable) NSString *title;
-/// [EN] `CYLTabBarItemPageParameters`; empty when none. [CN] `CYLTabBarItemPageParameters`；没有则为空字典。
+/*!
+ * [EN] `CYLTabBarItemPageParameters`; empty when none. [CN] `CYLTabBarItemPageParameters`；没有则为空字典。
+ */
 @property (nonatomic, copy, readonly) NSDictionary<NSString *, id> *parameters;
-/// [EN] Every public attribute of the tab (no key that starts with "_"). [CN] Tab 的全部公开属性（不含以 "_" 开头的键）。
+/*!
+ * [EN] Every public attribute of the tab (no key that starts with "_"). [CN] Tab 的全部公开属性（不含以 "_" 开头的键）。
+ */
 @property (nonatomic, copy, readonly) NSDictionary<NSString *, id> *attributes;
 
-/// [EN] A request for a page ID and a tab's attributes. [CN] 由页面 ID 与 Tab 属性创建请求。
+/*!
+ * [EN] A request for a page ID and a tab's attributes. [CN] 由页面 ID 与 Tab 属性创建请求。
+ */
 + (instancetype)requestWithPageIdentifier:(NSString *)pageIdentifier attributes:(nullable NSDictionary<NSString *, id> *)attributes;
 
 @end
 
-/// [EN] A tab that got no page, and why. See `-[CYLTabBarController cyl_skippedTabs]`. [CN] 没有页面的 Tab 及其原因。见 `-[CYLTabBarController cyl_skippedTabs]`。
+/*!
+ * [EN] A tab that got no page, and why. See `-[CYLTabBarController cyl_skippedTabs]`. [CN] 没有页面的 Tab 及其原因。见 `-[CYLTabBarController cyl_skippedTabs]`。
+ */
 @interface CYLTabBarSkippedTab : NSObject
 
 @property (nonatomic, assign, readonly) CYLTabBarPageSkipReason reason;
-/// [EN] The page ID, or nil. [CN] 页面 ID，没有则为 nil。
+/*!
+ * [EN] The page ID, or nil. [CN] 页面 ID，没有则为 nil。
+ */
 @property (nonatomic, copy, readonly, nullable) NSString *pageIdentifier;
-/// [EN] `CYLTabBarItemTitle`, or nil. [CN] `CYLTabBarItemTitle`，没有则为 nil。
+/*!
+ * [EN] `CYLTabBarItemTitle`, or nil. [CN] `CYLTabBarItemTitle`，没有则为 nil。
+ */
 @property (nonatomic, copy, readonly, nullable) NSString *title;
-/// [EN] The tab's attributes as given. [CN] Tab 的原始属性。
+/*!
+ * [EN] The tab's attributes as given. [CN] Tab 的原始属性。
+ */
 @property (nonatomic, copy, readonly) NSDictionary<NSString *, id> *attributes;
-/// [EN] Details in English (the source that failed, the exception...), or nil. [CN] 英文详情（失败的来源、异常等），没有则为 nil。
+/*!
+ * [EN] Details in English (the source that failed, the exception...), or nil. [CN] 英文详情（失败的来源、异常等），没有则为 nil。
+ */
 @property (nonatomic, copy, readonly, nullable) NSString *detail;
 
 + (instancetype)skippedTabWithReason:(CYLTabBarPageSkipReason)reason
@@ -177,30 +223,44 @@ typedef NS_ENUM(NSInteger, CYLTabBarPageSkipReason) {
  */
 @interface CYLTabBarPageRegistry : NSObject <CYLTabBarPageProviding>
 
-/// [EN] The global registry. [CN] 全局注册表。
+/*!
+ * [EN] The global registry. [CN] 全局注册表。
+ */
 @property (class, nonatomic, readonly) CYLTabBarPageRegistry *sharedRegistry NS_SWIFT_NAME(shared);
 
-/// [EN] Registers (or replaces) the provider of a page ID; an empty ID is ignored. [CN] 注册（或替换）页面 ID 的提供者；空 ID 会被忽略。
+/*!
+ * [EN] Registers (or replaces) the provider of a page ID; an empty ID is ignored. [CN] 注册（或替换）页面 ID 的提供者；空 ID 会被忽略。
+ */
 - (void)registerPageProvider:(CYLTabBarPageProvider)provider
            forPageIdentifier:(NSString *)pageIdentifier NS_SWIFT_NAME(register(_:forPageIdentifier:));
 
-/// [EN] Registers one provider for several page IDs (e.g. several web pages). [CN] 为多个页面 ID 注册同一个提供者（例如多个网页）。
+/*!
+ * [EN] Registers one provider for several page IDs (e.g. several web pages). [CN] 为多个页面 ID 注册同一个提供者（例如多个网页）。
+ */
 - (void)registerPageProvider:(CYLTabBarPageProvider)provider
           forPageIdentifiers:(NSArray<NSString *> *)pageIdentifiers NS_SWIFT_NAME(register(_:forPageIdentifiers:));
 
-/// [EN] Registers (or replaces) an asynchronous page factory for a page ID. [CN] 为页面 ID 注册（或替换）异步页面工厂。
+/*!
+ * [EN] Registers (or replaces) an asynchronous page factory for a page ID. [CN] 为页面 ID 注册（或替换）异步页面工厂。
+ */
 - (void)registerAsyncPageFactory:(CYLTabBarAsyncPageFactory)factory
                forPageIdentifier:(NSString *)pageIdentifier NS_SWIFT_NAME(register(asyncFactory:forPageIdentifier:));
 
-/// [EN] Registers one asynchronous page factory for several page IDs. [CN] 为多个页面 ID 注册同一个异步页面工厂。
+/*!
+ * [EN] Registers one asynchronous page factory for several page IDs. [CN] 为多个页面 ID 注册同一个异步页面工厂。
+ */
 - (void)registerAsyncPageFactory:(CYLTabBarAsyncPageFactory)factory
               forPageIdentifiers:(NSArray<NSString *> *)pageIdentifiers NS_SWIFT_NAME(register(asyncFactory:forPageIdentifiers:));
 
-/// [EN] Registers (or replaces) a page factory (typed request) for a page ID. [CN] 为页面 ID 注册（或替换）页面工厂（类型化请求）。
+/*!
+ * [EN] Registers (or replaces) a page factory (typed request) for a page ID. [CN] 为页面 ID 注册（或替换）页面工厂（类型化请求）。
+ */
 - (void)registerPageFactory:(CYLTabBarPageFactory)factory
           forPageIdentifier:(NSString *)pageIdentifier NS_SWIFT_NAME(register(factory:forPageIdentifier:));
 
-/// [EN] Registers one page factory for several page IDs. [CN] 为多个页面 ID 注册同一个页面工厂。
+/*!
+ * [EN] Registers one page factory for several page IDs. [CN] 为多个页面 ID 注册同一个页面工厂。
+ */
 - (void)registerPageFactory:(CYLTabBarPageFactory)factory
          forPageIdentifiers:(NSArray<NSString *> *)pageIdentifiers NS_SWIFT_NAME(register(factory:forPageIdentifiers:));
 
@@ -212,16 +272,24 @@ typedef NS_ENUM(NSInteger, CYLTabBarPageSkipReason) {
  */
 - (void)registerPageClass:(Class)pageClass NS_SWIFT_NAME(register(pageClass:));
 
-/// [EN] Removes the provider of a page ID. [CN] 移除页面 ID 的提供者。
+/*!
+ * [EN] Removes the provider of a page ID. [CN] 移除页面 ID 的提供者。
+ */
 - (void)unregisterPageIdentifier:(NSString *)pageIdentifier NS_SWIFT_NAME(unregister(pageIdentifier:));
 
-/// [EN] Removes every provider. [CN] 移除所有提供者。
+/*!
+ * [EN] Removes every provider. [CN] 移除所有提供者。
+ */
 - (void)removeAllPageProviders;
 
-/// [EN] The provider of a page ID, or nil. [CN] 页面 ID 的提供者，没有则为 nil。
+/*!
+ * [EN] The provider of a page ID, or nil. [CN] 页面 ID 的提供者，没有则为 nil。
+ */
 - (nullable CYLTabBarPageProvider)pageProviderForPageIdentifier:(NSString *)pageIdentifier NS_SWIFT_NAME(pageProvider(forPageIdentifier:));
 
-/// [EN] The registered page IDs, sorted. [CN] 已注册的页面 ID（已排序）。
+/*!
+ * [EN] The registered page IDs, sorted. [CN] 已注册的页面 ID（已排序）。
+ */
 @property (nonatomic, readonly, copy) NSArray<NSString *> *registeredPageIdentifiers;
 
 /*!
@@ -245,7 +313,9 @@ typedef NS_ENUM(NSInteger, CYLTabBarPageSkipReason) {
  */
 + (void)prepareAutomaticRegistrationInBackground;
 
-/// [EN] `[instance, resolver, shared, automatic]`. [CN] `[instance, resolver, shared, automatic]`。
+/*!
+ * [EN] `[instance, resolver, shared, automatic]`. [CN] `[instance, resolver, shared, automatic]`。
+ */
 @property (class, nonatomic, readonly, copy) NSArray<CYLTabBarPageSource> *defaultPageLookupOrder;
 
 /*!
@@ -282,11 +352,15 @@ typedef NS_ENUM(NSInteger, CYLTabBarPageSkipReason) {
  */
 @protocol CYLTabBarPage <NSObject>
 
-/// [EN] The page ID of this class, e.g. @"home". [CN] 此类的页面 ID，例如 @"home"。
+/*!
+ * [EN] The page ID of this class, e.g. @"home". [CN] 此类的页面 ID，例如 @"home"。
+ */
 + (NSString *)cylTabBarPageIdentifier;
 
 @optional
-/// [EN] Creates the page for a tab (e.g. wrapped in a navigation controller); nil skips the tab. [CN] 为 Tab 创建页面（例如包裹在导航控制器中）；返回 nil 则跳过该 Tab。
+/*!
+ * [EN] Creates the page for a tab (e.g. wrapped in a navigation controller); nil skips the tab. [CN] 为 Tab 创建页面（例如包裹在导航控制器中）；返回 nil 则跳过该 Tab。
+ */
 + (nullable UIViewController *)cylTabBarPageWithAttributes:(NSDictionary<NSString *, id> *)tabAttributes;
 
 @end
@@ -306,13 +380,21 @@ typedef NS_ENUM(NSInteger, CYLTabBarPageSkipReason) {
  */
 @interface UIViewController (CYLTabBarPageLoading)
 
-/// [EN] A placeholder whose page has not been delivered yet. [CN] 页面尚未交付的占位。
+/*!
+ * [EN] A placeholder whose page has not been delivered yet. [CN] 页面尚未交付的占位。
+ */
 @property (nonatomic, readonly) BOOL cyl_isPendingPage;
-/// [EN] The delivered page, until it is swapped in. [CN] 已交付、尚未换入的页面。
+/*!
+ * [EN] The delivered page, until it is swapped in. [CN] 已交付、尚未换入的页面。
+ */
 @property (nonatomic, readonly, nullable) UIViewController *cyl_loadedPage;
-/// [EN] The factory delivered nil (the tab will be removed). [CN] 工厂交付了 nil（该 Tab 将被移除）。
+/*!
+ * [EN] The factory delivered nil (the tab will be removed). [CN] 工厂交付了 nil（该 Tab 将被移除）。
+ */
 @property (nonatomic, readonly) BOOL cyl_pageLoadFailed;
-/// [EN] Called on the main thread when the page is delivered; set by the tab bar controller. [CN] 页面交付时在主线程调用；由 TabBarController 设置。
+/*!
+ * [EN] Called on the main thread when the page is delivered; set by the tab bar controller. [CN] 页面交付时在主线程调用；由 TabBarController 设置。
+ */
 @property (nonatomic, copy, nullable) void (^cyl_pageLoadHandler)(UIViewController *placeholder);
 
 @end

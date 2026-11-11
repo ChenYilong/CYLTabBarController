@@ -11,15 +11,25 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class CYLTabBarController;
 
-/// [EN] Where an applied manifest came from. [CN] 已生效清单的来源。
+/*!
+ * [EN] Where an applied manifest came from. [CN] 已生效清单的来源。
+ */
 typedef NS_ENUM(NSInteger, CYLTabBarManifestSource) {
-    /// [EN] Nothing was applied. [CN] 没有清单生效。
+    /*!
+     * [EN] Nothing was applied. [CN] 没有清单生效。
+     */
     CYLTabBarManifestSourceNone = 0,
-    /// [EN] Downloaded now. [CN] 本次下载。
+    /*!
+     * [EN] Downloaded now. [CN] 本次下载。
+     */
     CYLTabBarManifestSourceRemote = 1,
-    /// [EN] The last verified manifest in the sandbox cache. [CN] 沙盒缓存中上一份已验证的清单。
+    /*!
+     * [EN] The last verified manifest in the sandbox cache. [CN] 沙盒缓存中上一份已验证的清单。
+     */
     CYLTabBarManifestSourceCache = 2,
-    /// [EN] The manifest built into the app (`fallback.embeddedRoute`). [CN] App 内置的清单（`fallback.embeddedRoute`）。
+    /*!
+     * [EN] The manifest built into the app (`fallback.embeddedRoute`). [CN] App 内置的清单（`fallback.embeddedRoute`）。
+     */
     CYLTabBarManifestSourceEmbedded = 3,
 };
 
@@ -39,16 +49,26 @@ typedef NS_ENUM(NSInteger, CYLTabBarManifestSource) {
  */
 @interface CYLTabBarManifest : NSObject
 
-/// [EN] The manifest format this library reads: 1. [CN] 本库读取的清单格式版本：1。
+/*!
+ * [EN] The manifest format this library reads: 1. [CN] 本库读取的清单格式版本：1。
+ */
 @property (class, nonatomic, readonly) NSInteger supportedSchemaVersion;
 
-/// [EN] The manifest as read, after the overrides of its matching conditions. [CN] 读取后的清单，已合并成立条件的覆盖项。
+/*!
+ * [EN] The manifest as read, after the overrides of its matching conditions. [CN] 读取后的清单，已合并成立条件的覆盖项。
+ */
 @property (nonatomic, copy, readonly) NSDictionary<NSString *, id> *dictionary;
-/// [EN] `id`. [CN] `id`。
+/*!
+ * [EN] `id`. [CN] `id`。
+ */
 @property (nonatomic, copy, readonly, nullable) NSString *identifier;
-/// [EN] `version` (semantic versioning). [CN] `version`（语义化版本）。
+/*!
+ * [EN] `version` (semantic versioning). [CN] `version`（语义化版本）。
+ */
 @property (nonatomic, copy, readonly, nullable) NSString *version;
-/// [EN] The folder its relative routes start from (the file's folder). [CN] 相对路由的起点（文件所在目录）。
+/*!
+ * [EN] The folder its relative routes start from (the file's folder). [CN] 相对路由的起点（文件所在目录）。
+ */
 @property (nonatomic, copy, readonly, nullable) NSString *baseDirectory;
 
 /*!
@@ -92,7 +112,9 @@ typedef NS_ENUM(NSInteger, CYLTabBarManifestSource) {
  */
 - (nullable NSString *)pathOfAssetWithKey:(NSString *)key theme:(nullable NSString *)theme state:(nullable NSString *)state;
 
-/// [EN] The path an asset reference ("asset:home?state=selected") leads to, or nil. [CN] 资源引用（"asset:home?state=selected"）对应的路径，没有时为 nil。
+/*!
+ * [EN] The path an asset reference ("asset:home?state=selected") leads to, or nil. [CN] 资源引用（"asset:home?state=selected"）对应的路径，没有时为 nil。
+ */
 - (nullable NSString *)pathForAssetReference:(NSString *)reference;
 
 /*!
@@ -118,18 +140,28 @@ typedef NS_ENUM(NSInteger, CYLTabBarManifestSource) {
 
 @class CYLTabBarManifestLoader;
 
-/// [EN] The callbacks of a manifest loader, on the main queue. [CN] 清单加载器的回调，在主队列执行。
+/*!
+ * [EN] The callbacks of a manifest loader, on the main queue. [CN] 清单加载器的回调，在主队列执行。
+ */
 @protocol CYLTabBarManifestLoaderDelegate <NSObject>
 @optional
-/// [EN] Checked and about to be used; return NO to refuse it (e.g. the app's own rollout). [CN] 校验通过、即将使用；返回 NO 可以拒绝（例如 App 自己的灰度规则）。
+/*!
+ * [EN] Checked and about to be used; return NO to refuse it (e.g. the app's own rollout). [CN] 校验通过、即将使用；返回 NO 可以拒绝（例如 App 自己的灰度规则）。
+ */
 - (BOOL)manifestLoader:(CYLTabBarManifestLoader *)loader shouldApplyManifest:(CYLTabBarManifest *)manifest source:(CYLTabBarManifestSource)source;
-/// [EN] Applied. [CN] 已生效。
+/*!
+ * [EN] Applied. [CN] 已生效。
+ */
 - (void)manifestLoader:(CYLTabBarManifestLoader *)loader didApplyManifest:(CYLTabBarManifest *)manifest source:(CYLTabBarManifestSource)source;
-/// [EN] The remote manifest could not be used: why, and the source used instead (None: nothing). [CN] 远程清单无法使用：原因，以及改用的来源（None 表示没有）。
+/*!
+ * [EN] The remote manifest could not be used: why, and the source used instead (None: nothing). [CN] 远程清单无法使用：原因，以及改用的来源（None 表示没有）。
+ */
 - (void)manifestLoader:(CYLTabBarManifestLoader *)loader didFailWithError:(NSError *)error fallbackSource:(CYLTabBarManifestSource)fallbackSource;
 @end
 
-/// [EN] The result of a load. [CN] 加载结果。
+/*!
+ * [EN] The result of a load. [CN] 加载结果。
+ */
 typedef void (^CYLTabBarManifestCompletion)(CYLTabBarManifest *_Nullable manifest, CYLTabBarManifestSource source, NSError *_Nullable error);
 
 /*!
@@ -144,15 +176,23 @@ typedef void (^CYLTabBarManifestCompletion)(CYLTabBarManifest *_Nullable manifes
 @interface CYLTabBarManifestLoader : NSObject
 
 @property (nonatomic, weak, nullable) id<CYLTabBarManifestLoaderDelegate> delegate;
-/// [EN] The built-in manifest used when nothing else can be (default: the remote manifest's `fallback.embeddedRoute`). [CN] 其他都无法使用时的内置清单（默认：远程清单的 `fallback.embeddedRoute`）。
+/*!
+ * [EN] The built-in manifest used when nothing else can be (default: the remote manifest's `fallback.embeddedRoute`). [CN] 其他都无法使用时的内置清单（默认：远程清单的 `fallback.embeddedRoute`）。
+ */
 @property (nonatomic, copy, nullable) NSString *embeddedManifestRoute;
-/// [EN] The date the time window is checked against (default: now; for tests). [CN] 检查时间段使用的日期（默认：现在；用于测试）。
+/*!
+ * [EN] The date the time window is checked against (default: now; for tests). [CN] 检查时间段使用的日期（默认：现在；用于测试）。
+ */
 @property (nonatomic, copy, nullable) NSDate *date;
 
-/// [EN] The newest verified manifest in the cache, or nil. [CN] 缓存中最新的已验证清单，没有时为 nil。
+/*!
+ * [EN] The newest verified manifest in the cache, or nil. [CN] 缓存中最新的已验证清单，没有时为 nil。
+ */
 - (nullable CYLTabBarManifest *)cachedManifest;
 
-/// [EN] Loads `URL` (http, https or file), falling back as above. [CN] 加载 `URL`（http、https 或 file），按上述规则回退。
+/*!
+ * [EN] Loads `URL` (http, https or file), falling back as above. [CN] 加载 `URL`（http、https 或 file），按上述规则回退。
+ */
 - (void)loadManifestWithURL:(NSURL *)URL completion:(CYLTabBarManifestCompletion)completion;
 
 @end

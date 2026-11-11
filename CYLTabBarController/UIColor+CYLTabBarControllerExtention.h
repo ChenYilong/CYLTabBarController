@@ -116,10 +116,14 @@ NS_ASSUME_NONNULL_BEGIN
 
 /* lightTextColor is always light, and darkTextColor is always dark, regardless of the current UIUserInterfaceStyle.
  * When possible, we recommend using `labelColor` and its variants, instead.
+ * for a dark background
  */
-@property(class, nonatomic, readonly) UIColor *cyl_lightTextColor;    // for a dark background
+@property(class, nonatomic, readonly) UIColor *cyl_lightTextColor;
 
-@property(class, nonatomic, readonly) UIColor *cyl_darkTextColor;     // for a light background
+/*!
+ * for a light background
+ */
+@property(class, nonatomic, readonly) UIColor *cyl_darkTextColor;
 
 #pragma mark Dark Mode
 
@@ -152,8 +156,9 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * [CN] 每次读取都返回一个新的随机颜色：色相任意，饱和度和亮度保持在 0.5～1 之间，白色角标文字在其上依然清晰。Demo 用它给角标
  *      设置随机颜色（示例见上）。
+ * Swift would drop "Color"
  */
-@property (class, nonatomic, readonly) UIColor *cyl_randomColor NS_SWIFT_NAME(cyl_randomColor); // Swift would drop "Color"
+@property (class, nonatomic, readonly) UIColor *cyl_randomColor NS_SWIFT_NAME(cyl_randomColor);
 
 @end
 

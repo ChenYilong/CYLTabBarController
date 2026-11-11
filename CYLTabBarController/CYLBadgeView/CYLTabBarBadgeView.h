@@ -26,7 +26,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-/// `UILabel` already implements everything in `CYLBadgeTextDisplaying`; this only declares the conformance.
+/*!
+ * `UILabel` already implements everything in `CYLBadgeTextDisplaying`; this only declares the conformance.
+ */
 @interface UILabel (CYLBadgeTextDisplaying) <CYLBadgeTextDisplaying>
 @end
 
@@ -53,13 +55,15 @@ NS_ASSUME_NONNULL_BEGIN
 
 /*!
  * //@property (nonatomic, copy) NSString *badgeValue;
+ * default is nil
  */
-@property(nullable, nonatomic,copy) NSString *text; // default is nil
+@property(nullable, nonatomic,copy) NSString *text;
 
 /*!
  * badgeTextFont;
+ * default is nil (system font 17 plain)
  */
-@property(null_resettable, nonatomic,strong) UIFont *font;// default is nil (system font 17 plain)
+@property(null_resettable, nonatomic,strong) UIFont *font;
 
 @end
 

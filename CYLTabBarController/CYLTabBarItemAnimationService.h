@@ -18,13 +18,21 @@ NS_ASSUME_NONNULL_BEGIN
  *      （`CYLTabBarItemAnimationDefaultStyleSource()`）；引擎只依赖本协议。
  */
 @protocol CYLTabBarItemAnimationStyleSource <NSObject>
-/// [EN] YES when any animation has a dark version or dark colors. [CN] 任意动画有深色版本或深色颜色时返回 YES。
+/*!
+ * [EN] YES when any animation has a dark version or dark colors. [CN] 任意动画有深色版本或深色颜色时返回 YES。
+ */
 - (BOOL)hasStyleVariants;
-/// [EN] YES when `URL` has a dark version or dark colors. [CN] `URL` 有深色版本或深色颜色时返回 YES。
+/*!
+ * [EN] YES when `URL` has a dark version or dark colors. [CN] `URL` 有深色版本或深色颜色时返回 YES。
+ */
 - (BOOL)hasStyleVariantForURL:(nullable NSURL *)URL;
-/// [EN] The version of `URL` for `traitCollection`. [CN] `URL` 在 `traitCollection` 下的版本。
+/*!
+ * [EN] The version of `URL` for `traitCollection`. [CN] `URL` 在 `traitCollection` 下的版本。
+ */
 - (nullable NSURL *)URL:(nullable NSURL *)URL forTraitCollection:(nullable UITraitCollection *)traitCollection;
-/// [EN] Keypath -> dark color for `URL`. [CN] `URL` 的「keypath -> 深色颜色」。
+/*!
+ * [EN] Keypath -> dark color for `URL`. [CN] `URL` 的「keypath -> 深色颜色」。
+ */
 - (nullable NSDictionary<NSString *, UIColor *> *)darkColorsForURL:(nullable NSURL *)URL;
 @optional
 /*!
@@ -43,19 +51,33 @@ NS_ASSUME_NONNULL_BEGIN
  *      （`CYLTabBarItemAnimationDefaultHost()`）。
  */
 @protocol CYLTabBarItemAnimationHost <NSObject>
-/// [EN] YES for the plus button, which never animates. [CN] 加号按钮返回 YES，它不播放动画。
+/*!
+ * [EN] YES for the plus button, which never animates. [CN] 加号按钮返回 YES，它不播放动画。
+ */
 - (BOOL)isPlusControl:(UIControl *)control;
-/// [EN] YES when `animationView` (nil: none) of `control` is laid out. [CN] `control` 的 `animationView`（nil 表示没有）已布局时返回 YES。
+/*!
+ * [EN] YES when `animationView` (nil: none) of `control` is laid out. [CN] `control` 的 `animationView`（nil 表示没有）已布局时返回 YES。
+ */
 - (BOOL)isAnimationView:(nullable UIView *)animationView readyInControl:(UIControl *)control;
-/// [EN] The size of an animation added without one. [CN] 未设置尺寸时动画视图的尺寸。
+/*!
+ * [EN] The size of an animation added without one. [CN] 未设置尺寸时动画视图的尺寸。
+ */
 - (CGSize)defaultAnimationSize;
-/// [EN] Shows `animationView` in place of the tab's image. [CN] 用 `animationView` 替换 Tab 的图片并显示。
+/*!
+ * [EN] Shows `animationView` in place of the tab's image. [CN] 用 `animationView` 替换 Tab 的图片并显示。
+ */
 - (void)showAnimationView:(UIView *)animationView inControl:(UIControl *)control;
-/// [EN] Moves the layout tracking (#653) of `view` to `newView`. [CN] 把 `view` 的布局跟踪（#653）改为跟随 `newView`。
+/*!
+ * [EN] Moves the layout tracking (#653) of `view` to `newView`. [CN] 把 `view` 的布局跟踪（#653）改为跟随 `newView`。
+ */
 - (void)replaceTrackedSubview:(UIView *)view withView:(UIView *)newView inSuperview:(UIView *)superview;
-/// [EN] Tells observers that `control` got its animation view (#428). [CN] 通知观察者 `control` 已添加动画视图（#428）。
+/*!
+ * [EN] Tells observers that `control` got its animation view (#428). [CN] 通知观察者 `control` 已添加动画视图（#428）。
+ */
 - (void)animationViewDidAddInControl:(UIControl *)control;
-/// [EN] Tells the other tabs that `control` starts playing, so they reset. [CN] 通知其他 Tab：`control` 开始播放，以便它们复位。
+/*!
+ * [EN] Tells the other tabs that `control` starts playing, so they reset. [CN] 通知其他 Tab：`control` 开始播放，以便它们复位。
+ */
 - (void)animationWillPlayInControl:(UIControl *)control;
 @end
 
@@ -73,13 +95,19 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @protocol CYLTabBarItemAnimationService <NSObject>
 
-/// [EN] The animation view in `control` (two levels deep); nil for the plus button. [CN] `control` 中的动画视图（向下查找两层）；PlusButton 返回 nil。
+/*!
+ * [EN] The animation view in `control` (two levels deep); nil for the plus button. [CN] `control` 中的动画视图（向下查找两层）；PlusButton 返回 nil。
+ */
 - (nullable UIView *)animationViewInControl:(UIControl *)control;
 
-/// [EN] YES for an animation view of any library. [CN] 任意动画库的动画视图返回 YES。
+/*!
+ * [EN] YES for an animation view of any library. [CN] 任意动画库的动画视图返回 YES。
+ */
 - (BOOL)isAnimationView:(UIView *)view;
 
-/// [EN] YES once `control`'s animation view has been added and laid out. [CN] `control` 的动画视图已添加并完成布局时返回 YES。
+/*!
+ * [EN] YES once `control`'s animation view has been added and laid out. [CN] `control` 的动画视图已添加并完成布局时返回 YES。
+ */
 - (BOOL)isAnimationReadyInControl:(UIControl *)control;
 
 /*!
@@ -94,20 +122,28 @@ NS_ASSUME_NONNULL_BEGIN
              animationSpeed:(CGFloat)animationSpeed
                   toControl:(UIControl *)control;
 
-/// [EN] Sets the playback speed of `control`'s animation. [CN] 设置 `control` 动画的播放速度。
+/*!
+ * [EN] Sets the playback speed of `control`'s animation. [CN] 设置 `control` 动画的播放速度。
+ */
 - (void)setAnimationSpeed:(CGFloat)animationSpeed inControl:(UIControl *)control;
 
-/// [EN] Swaps `control`'s animation for the version matching the current style (#442). [CN] 将 `control` 的动画替换为与当前风格相符的版本（#442）。
+/*!
+ * [EN] Swaps `control`'s animation for the version matching the current style (#442). [CN] 将 `control` 的动画替换为与当前风格相符的版本（#442）。
+ */
 - (void)reloadAnimationForCurrentStyleInControl:(UIControl *)control;
 
-/// [EN] Adds the animation if needed and plays it (`defaultSelected`: its last frame). [CN] 必要时添加动画并播放（`defaultSelected`：显示最后一帧）。
+/*!
+ * [EN] Adds the animation if needed and plays it (`defaultSelected`: its last frame). [CN] 必要时添加动画并播放（`defaultSelected`：显示最后一帧）。
+ */
 - (void)playAnimationWithURL:(NSURL *)URL
                         size:(CGSize)size
              defaultSelected:(BOOL)defaultSelected
                  contentMode:(UIViewContentMode)contentMode
                    inControl:(UIControl *)control;
 
-/// [EN] Stops `control`'s animation if it has started. [CN] 若 `control` 的动画已开始播放，则停止。
+/*!
+ * [EN] Stops `control`'s animation if it has started. [CN] 若 `control` 的动画已开始播放，则停止。
+ */
 - (void)stopAnimationInControl:(UIControl *)control;
 
 /*!
@@ -143,7 +179,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)refreshAnimationColorsInControl:(UIControl *)control;
 
-/// [EN] The file extensions the libraries in the build play, in lookup order. [CN] 构建中各动画库能播放的文件扩展名，按查找顺序排列。
+/*!
+ * [EN] The file extensions the libraries in the build play, in lookup order. [CN] 构建中各动画库能播放的文件扩展名，按查找顺序排列。
+ */
 - (NSArray<NSString *> *)animationFileExtensions;
 
 @end
@@ -155,15 +193,21 @@ NS_ASSUME_NONNULL_BEGIN
  */
 FOUNDATION_EXTERN id<CYLTabBarItemAnimationStyleSource> CYLTabBarItemAnimationDefaultStyleSource(void);
 
-/// [EN] Core's host. [CN] Core 提供的宿主实现。
+/*!
+ * [EN] Core's host. [CN] Core 提供的宿主实现。
+ */
 FOUNDATION_EXTERN id<CYLTabBarItemAnimationHost> CYLTabBarItemAnimationDefaultHost(void);
 
 FOUNDATION_EXTERN void CYLTabBarItemAnimationSetService(id<CYLTabBarItemAnimationService> _Nullable service);
 
-/// [EN] The service, or nil without an animation library. [CN] 动画服务；没有动画库时为 nil。
+/*!
+ * [EN] The service, or nil without an animation library. [CN] 动画服务；没有动画库时为 nil。
+ */
 FOUNDATION_EXTERN id<CYLTabBarItemAnimationService> _Nullable CYLTabBarItemAnimationGetService(void);
 
-/// [EN] YES when an animation library is in the build. [CN] 构建中包含动画库时返回 YES。
+/*!
+ * [EN] YES when an animation library is in the build. [CN] 构建中包含动画库时返回 YES。
+ */
 static inline BOOL CYLTabBarItemAnimationIsAvailable(void) {
     return CYLTabBarItemAnimationGetService() != nil;
 }

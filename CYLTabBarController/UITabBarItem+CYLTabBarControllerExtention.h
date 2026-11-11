@@ -25,9 +25,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, strong, getter=cyl_lottieSizeValue, setter=cyl_setLottieSizeValue:) NSValue *cyl_lottieSizeValue DEPRECATED_MSG_ATTRIBUTE("Use cyl_tabBarItemAnimationSizeValue");
 
-/// [EN] FIX: issue #604 — the item's animation file, for any library. [CN] 该 item 的动画文件，适用于任意动画库。
+/*!
+ * [EN] FIX: issue #604 — the item's animation file, for any library. [CN] 该 item 的动画文件，适用于任意动画库。
+ */
 @property (nonatomic, strong, nullable, getter=cyl_tabBarItemAnimationURL, setter=cyl_setTabBarItemAnimationURL:) NSURL *cyl_tabBarItemAnimationURL;
-/// [EN] FIX: issue #604 — the item's animation size (NSValue of CGSize), for any library. [CN] 该 item 的动画尺寸（CGSize 的 NSValue），适用于任意动画库。
+/*!
+ * [EN] FIX: issue #604 — the item's animation size (NSValue of CGSize), for any library. [CN] 该 item 的动画尺寸（CGSize 的 NSValue），适用于任意动画库。
+ */
 @property (nonatomic, strong, nullable, getter=cyl_tabBarItemAnimationSizeValue, setter=cyl_setTabBarItemAnimationSizeValue:) NSValue *cyl_tabBarItemAnimationSizeValue;
 @property (nonatomic, assign, getter=cyl_imagePositionAdjustment, setter=cyl_setImagePositionAdjustment:) UIOffset cyl_imagePositionAdjustment;
 

@@ -91,17 +91,25 @@ typedef NS_ENUM(NSInteger, CYLTabBarStyleType) {
  *      各个取值与 `UITabBarMinimizeBehavior` 一一对应。
  */
 typedef NS_ENUM(NSInteger, CYLTabBarMinimizeBehavior) {
-    /// [EN] Liquid Glass: the system default. FlatDesign and classic: same as Never.
-    /// [CN] 液态玻璃：系统默认行为。扁平样式与经典样式：等同于 Never。
+    /*!
+     * [EN] Liquid Glass: the system default. FlatDesign and classic: same as Never.
+     * [CN] 液态玻璃：系统默认行为。扁平样式与经典样式：等同于 Never。
+     */
     CYLTabBarMinimizeBehaviorAutomatic = 0,
-    /// [EN] The tab bar never minimizes or hides on scroll. [CN] 滚动时 TabBar 不缩小、不隐藏。
+    /*!
+     * [EN] The tab bar never minimizes or hides on scroll. [CN] 滚动时 TabBar 不缩小、不隐藏。
+     */
     CYLTabBarMinimizeBehaviorNever,
-    /// [EN] Minimizes (FlatDesign and classic: hides) when scrolling down, expands when scrolling back up.
-    /// [CN] 向下滚动时缩小（扁平样式与经典样式：隐藏），向上滚动时恢复。
+    /*!
+     * [EN] Minimizes (FlatDesign and classic: hides) when scrolling down, expands when scrolling back up.
+     * [CN] 向下滚动时缩小（扁平样式与经典样式：隐藏），向上滚动时恢复。
+     */
     CYLTabBarMinimizeBehaviorOnScrollDown,
-    /// [EN] Minimizes (FlatDesign and classic: hides) when scrolling up, expands when scrolling back down; for content
-    ///      aligned to the bottom, such as a chat.
-    /// [CN] 向上滚动时缩小（扁平样式与经典样式：隐藏），向下滚动时恢复；适合底部对齐的内容，如聊天页面。
+    /*!
+     * [EN] Minimizes (FlatDesign and classic: hides) when scrolling up, expands when scrolling back down; for content
+     *      aligned to the bottom, such as a chat.
+     * [CN] 向上滚动时缩小（扁平样式与经典样式：隐藏），向下滚动时恢复；适合底部对齐的内容，如聊天页面。
+     */
     CYLTabBarMinimizeBehaviorOnScrollUp,
 };
 
@@ -205,7 +213,9 @@ typedef NS_ENUM(NSInteger, CYLTabBarMinimizeBehavior) {
  */
 + (BOOL)isLottieEnabledFromlottieURLs:(NSMutableArray *)lottieURLs tabBarItemsAttributes:(NSArray<NSDictionary *> *)tabBarItemsAttributes DEPRECATED_MSG_ATTRIBUTE("Use +isTabBarItemAnimationEnabledWithURLs:tabBarItemsAttributes:");
 
-/// [EN] YES when `URLs` is not empty or a tab item has an animation file (any library). [CN] `URLs` 非空或某个 Tab item 有动画文件时返回 YES（任意动画库）。
+/*!
+ * [EN] YES when `URLs` is not empty or a tab item has an animation file (any library). [CN] `URLs` 非空或某个 Tab item 有动画文件时返回 YES（任意动画库）。
+ */
 + (BOOL)isTabBarItemAnimationEnabledWithURLs:(NSArray<NSURL *> *)URLs tabBarItemsAttributes:(NSArray<NSDictionary *> *)tabBarItemsAttributes;
 
 @end

@@ -30,10 +30,14 @@ FOUNDATION_EXTERN NSString *const CYLSampleConfigurationURLString;
  */
 @interface UIViewController (CYLConfigurationDemo)
 
-/// [EN] The sample configuration files in the library's resource bundle, sorted by name. [CN] 本库资源包中的示例配置文件，按名称排序。
+/*!
+ * [EN] The sample configuration files in the library's resource bundle, sorted by name. [CN] 本库资源包中的示例配置文件，按名称排序。
+ */
 + (NSArray<NSString *> *)cyl_sampleConfigurationFilePaths;
 
-/// [EN] The cell of the demo row. [CN] 演示行的 cell。
+/*!
+ * [EN] The cell of the demo row. [CN] 演示行的 cell。
+ */
 - (UITableViewCell *)cyl_configurationDemoCellForTableView:(UITableView *)tableView;
 
 /*!
@@ -54,7 +58,9 @@ FOUNDATION_EXTERN NSString *const CYLSampleConfigurationURLString;
  *      TabBarController（点击“查看”打开）。每行以 docs/Configuration-File.md（“边界情况与评分”）中对应情况的编号命名。
  */
 - (NSInteger)cyl_configurationEdgeCaseRowCount;
-/// [EN] The localized title of the section. [CN] 该分组的本地化标题。
+/*!
+ * [EN] The localized title of the section. [CN] 该分组的本地化标题。
+ */
 + (NSString *)cyl_configurationEdgeCaseSectionTitle;
 - (UITableViewCell *)cyl_configurationEdgeCaseCellForTableView:(UITableView *)tableView row:(NSInteger)row;
 - (void)cyl_runConfigurationEdgeCaseAtRow:(NSInteger)row;

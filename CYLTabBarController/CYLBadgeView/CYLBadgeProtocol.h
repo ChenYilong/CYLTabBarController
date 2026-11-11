@@ -70,7 +70,9 @@ typedef NS_ENUM(NSUInteger, CYLBadgeAnimationType) {
     CYLBadgeAnimationTypeScaleOnce         /*ScaleOnce animation*/
 };
 
-/// The key of the animation a type plays, nil for `CYLBadgeAnimationTypeNone` (and unknown values).
+/*!
+ * The key of the animation a type plays, nil for `CYLBadgeAnimationTypeNone` (and unknown values).
+ */
 static inline NSString * _Nullable CYLBadgeAnimationKeyForType(CYLBadgeAnimationType animationType) {
     switch (animationType) {
         case CYLBadgeAnimationTypeScale:         return CYLBadgeScaleAnimationKey;
@@ -87,7 +89,9 @@ static inline NSString * _Nullable CYLBadgeAnimationKeyForType(CYLBadgeAnimation
     }
 }
 
-/// YES for the types that repeat until stopped (Scale, Shake, Bounce, Breathe); NO for None and the "Once" types.
+/*!
+ * YES for the types that repeat until stopped (Scale, Shake, Bounce, Breathe); NO for None and the "Once" types.
+ */
 static inline BOOL CYLBadgeAnimationTypeRepeats(CYLBadgeAnimationType animationType) {
     switch (animationType) {
         case CYLBadgeAnimationTypeScale:
@@ -100,7 +104,9 @@ static inline BOOL CYLBadgeAnimationTypeRepeats(CYLBadgeAnimationType animationT
     }
 }
 
-/// Every key a badge animation may be under (including `CYLBadgeRotateAnimationKey`), to remove them all at once.
+/*!
+ * Every key a badge animation may be under (including `CYLBadgeRotateAnimationKey`), to remove them all at once.
+ */
 static inline NSArray<NSString *> * _Nonnull CYLBadgeAllAnimationKeys(void) {
     return @[CYLBadgeScaleAnimationKey, CYLBadgeShakeAnimationKey, CYLBadgeBounceAnimationKey,
              CYLBadgeBreatheAnimationKey, CYLBadgeRotateAnimationKey, CYLBadgeLeftRightOnceAnimationKey,
@@ -125,7 +131,9 @@ NS_ASSUME_NONNULL_BEGIN
 /** badge entity, which is adviced not to set manually */
 //@property (nonatomic, strong, getter=cyl_badge, setter=cyl_setBadge:) UIView __kindof *cyl_badge;
 /** `CYLBadgeAppearance.font` if not set, [UIFont boldSystemFontOfSize:9] by default */
-// [EN] nil goes back to `[CYLBadgeAppearance globalAppearance]` (null_resettable). [CN] 设为 nil 时恢复为 `[CYLBadgeAppearance globalAppearance]` 的值（null_resettable）。
+/*!
+ * [EN] nil goes back to `[CYLBadgeAppearance globalAppearance]` (null_resettable). [CN] 设为 nil 时恢复为 `[CYLBadgeAppearance globalAppearance]` 的值（null_resettable）。
+ */
 @property (nonatomic, strong, null_resettable, getter=cyl_badgeFont, setter=cyl_setBadgeFont:) UIFont *cyl_badgeFont;
 /** `CYLBadgeAppearance.backgroundColor` if not set, red by default */
 @property (nonatomic, strong, null_resettable, getter=cyl_badgeBackgroundColor, setter=cyl_setBadgeBackgroundColor:) UIColor *cyl_badgeBackgroundColor;

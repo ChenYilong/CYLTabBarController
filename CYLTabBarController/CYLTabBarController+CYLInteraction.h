@@ -20,21 +20,37 @@ NS_ASSUME_NONNULL_BEGIN
  * [CN] 内置的点击动画，见 `cyl_tabButtonTapAnimationType`。
  */
 typedef NS_ENUM(NSInteger, CYLTabButtonTapAnimationType) {
-    /// [EN] No animation (default). [CN] 无动画（默认）。
+    /*!
+     * [EN] No animation (default). [CN] 无动画（默认）。
+     */
     CYLTabButtonTapAnimationTypeNone = 0,
-    /// [EN] 1.0 → 1.5 → 0.8 → 1.0, `CYLTabButtonScaleAnimation`. [CN] 放大再缩小。
+    /*!
+     * [EN] 1.0 → 1.5 → 0.8 → 1.0, `CYLTabButtonScaleAnimation`. [CN] 放大再缩小。
+     */
     CYLTabButtonTapAnimationTypeScale,
-    /// [EN] Grows from small, `CYLTabButtonZoomInAnimation`. [CN] 从小放大。
+    /*!
+     * [EN] Grows from small, `CYLTabButtonZoomInAnimation`. [CN] 从小放大。
+     */
     CYLTabButtonTapAnimationTypeZoomIn,
-    /// [EN] Elastic bounce, `CYLTabButtonBounceAnimation`. [CN] 弹性动画。
+    /*!
+     * [EN] Elastic bounce, `CYLTabButtonBounceAnimation`. [CN] 弹性动画。
+     */
     CYLTabButtonTapAnimationTypeBounce,
-    /// [EN] Bounce with fireworks. [CN] 弹性动画加烟花。
+    /*!
+     * [EN] Bounce with fireworks. [CN] 弹性动画加烟花。
+     */
     CYLTabButtonTapAnimationTypeBounceWithFireworks,
-    /// [EN] One full turn, `CYLTabButtonRotationAnimation`. [CN] 旋转一圈。
+    /*!
+     * [EN] One full turn, `CYLTabButtonRotationAnimation`. [CN] 旋转一圈。
+     */
     CYLTabButtonTapAnimationTypeRotation,
-    /// [EN] Flip from left, `CYLTabButtonFlipAnimation`. [CN] 从左翻转。
+    /*!
+     * [EN] Flip from left, `CYLTabButtonFlipAnimation`. [CN] 从左翻转。
+     */
     CYLTabButtonTapAnimationTypeFlip,
-    /// [EN] Icon down, title floats away, `CYLTabButtonFumeAnimation`. [CN] 图标下移、标题飘散。
+    /*!
+     * [EN] Icon down, title floats away, `CYLTabButtonFumeAnimation`. [CN] 图标下移、标题飘散。
+     */
     CYLTabButtonTapAnimationTypeFume,
 };
 

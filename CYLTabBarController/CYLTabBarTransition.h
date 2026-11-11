@@ -37,9 +37,13 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CYLTabBarSlideTransitionAnimator : NSObject <UIViewControllerAnimatedTransitioning>
 
-/// [EN] UIRectEdgeLeft or UIRectEdgeRight. [CN] UIRectEdgeLeft 或 UIRectEdgeRight。
+/*!
+ * [EN] UIRectEdgeLeft or UIRectEdgeRight. [CN] UIRectEdgeLeft 或 UIRectEdgeRight。
+ */
 @property (nonatomic, assign, readonly) UIRectEdge targetEdge;
-/// [EN] Default 0.35 s. [CN] 默认 0.35 秒。
+/*!
+ * [EN] Default 0.35 s. [CN] 默认 0.35 秒。
+ */
 @property (nonatomic, assign) NSTimeInterval duration;
 
 - (instancetype)initWithTargetEdge:(UIRectEdge)targetEdge NS_DESIGNATED_INITIALIZER;

@@ -113,14 +113,18 @@ Every new feature and user-visible change ships with bilingual documentation in 
   documentation block:
   - **iOS, Objective-C public headers**: `/*! … */`, one `*` per line (` * [EN] …`, ` * [CN] …`), right before the
     declaration with nothing in between. Xcode shows it in Quick Help for Objective-C callers and in the Swift interface
-    generated from the header, so Swift callers see it too. A one-line comment may stay `/// …`.
-  - **iOS, public API written in Swift**: `/** … */` or `///` lines (Swift Markup); Swift does not read `/*!` as
+    generated from the header, so Swift callers see it too.   - **iOS, public API written in Swift**: `/** … */` or `///` lines (Swift Markup); Swift does not read `/*!` as
     documentation.
   - **Android (Kotlin / Java)**: KDoc / Javadoc `/** … */`.
   - **React Native (TypeScript / JavaScript)**: TSDoc / JSDoc `/** … */`.
   - **Flutter (Dart)**: `///` lines, the form Effective Dart requires for doc comments (not `/** */`).
-  Check the iOS public headers with `python3 scripts/check-public-api-comments.py` (`--fix` rewrites stacked `//` / `///`
-  lines into a `/*! … */` block with the same text).
+  **The same format applies to one-line comments on public API**, and a file with public API keeps one comment format
+  for all of it: in an Objective-C public header every comment on a declaration, an enum case or a trailing comment
+  after a declaration is a `/*! … */` block (a trailing comment moves into the declaration's block); in Kotlin / Java and
+  TypeScript every doc comment is `/** … */`; in Dart every doc comment is `///`. This holds for every platform and
+  language. Check the iOS public headers with `python3 scripts/check-public-api-comments.py` (`--fix` rewrites `//` /
+  `///` comments, one line or several, into a `/*! … */` block with the same text, merged into the declaration's existing
+  block when it has one).
 - **Comments are bilingual**: write `[EN]` / `[CN]` blocks; mark fixes with `FIX: issue #N`. A comment written in
   Chinese is tagged `[CN]` and is followed directly by its English translation tagged `[EN]`, in the same comment style
   (`//`, `///`, or inside the same block comment; for a trailing comment, on the next line). Comments that only

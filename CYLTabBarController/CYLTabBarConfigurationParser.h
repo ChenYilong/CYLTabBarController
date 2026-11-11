@@ -26,69 +26,123 @@ NS_ASSUME_NONNULL_BEGIN
  *      其键即配置键与 item 键（`CYLTabBarControllerContext`、`CYLTabBarItemTitle` 等）。
  */
 typedef NS_ENUM(NSInteger, CYLTabBarConfigurationFormat) {
-    /// [EN] Detected from the content. [CN] 根据内容自动识别。
+    /*!
+     * [EN] Detected from the content. [CN] 根据内容自动识别。
+     */
     CYLTabBarConfigurationFormatUnknown = 0,
-    /// .json
+    /*!
+     * .json
+     */
     CYLTabBarConfigurationFormatJSON,
-    /// .json5 / .jsonc: JSON with comments, trailing commas, single quotes and unquoted keys.
-    /// JSON 加注释、尾逗号、单引号与不加引号的键。
+    /*!
+     * .json5 / .jsonc: JSON with comments, trailing commas, single quotes and unquoted keys.
+     * JSON 加注释、尾逗号、单引号与不加引号的键。
+     */
     CYLTabBarConfigurationFormatJSON5,
-    /// .plist / .strings: XML, binary or OpenStep (old-style) property lists. XML、二进制或 OpenStep（旧式）属性列表。
+    /*!
+     * .plist / .strings: XML, binary or OpenStep (old-style) property lists. XML、二进制或 OpenStep（旧式）属性列表。
+     */
     CYLTabBarConfigurationFormatPropertyList,
-    /// .yaml / .yml
+    /*!
+     * .yaml / .yml
+     */
     CYLTabBarConfigurationFormatYAML,
-    /// .toml
+    /*!
+     * .toml
+     */
     CYLTabBarConfigurationFormatTOML,
-    /// .ini / .cfg / .conf: `[section.path]` and `key = value`. `[节.路径]` 与 `key = value`。
+    /*!
+     * .ini / .cfg / .conf: `[section.path]` and `key = value`. `[节.路径]` 与 `key = value`。
+     */
     CYLTabBarConfigurationFormatINI,
-    /// .properties / .env: `dotted.key.path = value`. `点.分隔.路径 = value`。
+    /*!
+     * .properties / .env: `dotted.key.path = value`. `点.分隔.路径 = value`。
+     */
     CYLTabBarConfigurationFormatProperties,
-    /// .xml (not a plist): elements are keys, `<item>` children make an array. 非 plist 的 XML：元素即键，`<item>` 子元素组成数组。
+    /*!
+     * .xml (not a plist): elements are keys, `<item>` children make an array. 非 plist 的 XML：元素即键，`<item>` 子元素组成数组。
+     */
     CYLTabBarConfigurationFormatXML,
-    /// .textproto / .txtpb / .pbtxt / .prototxt: Protocol Buffers text format, no schema needed; a field written several
-    /// times makes an array. Protocol Buffers 文本格式，无需结构定义；同名字段写多次时组成数组。
+    /*!
+     * .textproto / .txtpb / .pbtxt / .prototxt: Protocol Buffers text format, no schema needed; a field written several
+     * times makes an array. Protocol Buffers 文本格式，无需结构定义；同名字段写多次时组成数组。
+     */
     CYLTabBarConfigurationFormatProtobufText,
-    /// .binpb / .pb / .protobuf: a binary `cyl.CYLTabBarConfiguration` message (schema built in, see
-    /// Configurations/cyl_tabbar_configuration.proto; no protobuf runtime needed).
-    /// 二进制 `cyl.CYLTabBarConfiguration` 消息（内置结构定义，见 Configurations/cyl_tabbar_configuration.proto；无需 protobuf 运行库）。
+    /*!
+     * .binpb / .pb / .protobuf: a binary `cyl.CYLTabBarConfiguration` message (schema built in, see
+     * Configurations/cyl_tabbar_configuration.proto; no protobuf runtime needed).
+     * 二进制 `cyl.CYLTabBarConfiguration` 消息（内置结构定义，见 Configurations/cyl_tabbar_configuration.proto；无需 protobuf 运行库）。
+     */
     CYLTabBarConfigurationFormatProtobuf,
 };
 
-/// [EN] Error domain of the configuration parser and loaders. [CN] 配置解析与加载的错误域。
+/*!
+ * [EN] Error domain of the configuration parser and loaders. [CN] 配置解析与加载的错误域。
+ */
 FOUNDATION_EXTERN NSString *const CYLTabBarConfigurationErrorDomain;
 
 typedef NS_ENUM(NSInteger, CYLTabBarConfigurationErrorCode) {
-    /// [EN] The file does not exist. [CN] 文件不存在。
+    /*!
+     * [EN] The file does not exist. [CN] 文件不存在。
+     */
     CYLTabBarConfigurationErrorFileNotFound = 1,
-    /// [EN] The format could not be detected. [CN] 无法识别格式。
+    /*!
+     * [EN] The format could not be detected. [CN] 无法识别格式。
+     */
     CYLTabBarConfigurationErrorUnsupportedFormat = 2,
-    /// [EN] The content is not valid in its format; `NSLocalizedDescriptionKey` says where. [CN] 内容不符合格式，描述中说明位置。
+    /*!
+     * [EN] The content is not valid in its format; `NSLocalizedDescriptionKey` says where. [CN] 内容不符合格式，描述中说明位置。
+     */
     CYLTabBarConfigurationErrorInvalidSyntax = 3,
-    /// [EN] The top level is not a dictionary. [CN] 顶层不是字典。
+    /*!
+     * [EN] The top level is not a dictionary. [CN] 顶层不是字典。
+     */
     CYLTabBarConfigurationErrorNotADictionary = 4,
-    /// [EN] The download failed (`NSUnderlyingErrorKey` holds the network error). [CN] 下载失败（`NSUnderlyingErrorKey` 为网络错误）。
+    /*!
+     * [EN] The download failed (`NSUnderlyingErrorKey` holds the network error). [CN] 下载失败（`NSUnderlyingErrorKey` 为网络错误）。
+     */
     CYLTabBarConfigurationErrorNetwork = 5,
-    /// [EN] The file or response is empty, or holds only whitespace and comments. [CN] 文件或响应为空，或只有空白与注释。
+    /*!
+     * [EN] The file or response is empty, or holds only whitespace and comments. [CN] 文件或响应为空，或只有空白与注释。
+     */
     CYLTabBarConfigurationErrorEmpty = 6,
-    /// [EN] Larger than `CYLTabBarConfigurationMaximumLength`. [CN] 超过 `CYLTabBarConfigurationMaximumLength`。
+    /*!
+     * [EN] Larger than `CYLTabBarConfigurationMaximumLength`. [CN] 超过 `CYLTabBarConfigurationMaximumLength`。
+     */
     CYLTabBarConfigurationErrorTooLarge = 7,
-    /// [EN] Nested deeper than `CYLTabBarConfigurationMaximumDepth`. [CN] 嵌套层数超过 `CYLTabBarConfigurationMaximumDepth`。
+    /*!
+     * [EN] Nested deeper than `CYLTabBarConfigurationMaximumDepth`. [CN] 嵌套层数超过 `CYLTabBarConfigurationMaximumDepth`。
+     */
     CYLTabBarConfigurationErrorTooDeep = 8,
-    /// [EN] The configuration has no tab (e.g. an HTML page was downloaded). [CN] 配置中没有 Tab（例如下载到的是 HTML 页面）。
+    /*!
+     * [EN] The configuration has no tab (e.g. an HTML page was downloaded). [CN] 配置中没有 Tab（例如下载到的是 HTML 页面）。
+     */
     CYLTabBarConfigurationErrorNoTabs = 9,
-    /// [EN] A controller can only be created on the main thread. [CN] 只能在主线程创建控制器。
+    /*!
+     * [EN] A controller can only be created on the main thread. [CN] 只能在主线程创建控制器。
+     */
     CYLTabBarConfigurationErrorMainThreadRequired = 10,
-    /// [EN] No tab found its page (see `CYLTabBarPageRegistry`). [CN] 没有任何 Tab 找到页面（见 `CYLTabBarPageRegistry`）。
+    /*!
+     * [EN] No tab found its page (see `CYLTabBarPageRegistry`). [CN] 没有任何 Tab 找到页面（见 `CYLTabBarPageRegistry`）。
+     */
     CYLTabBarConfigurationErrorNoPages = 11,
-    /// [EN] A manifest of an unknown `schemaVersion`, or not a manifest. [CN] 未知 `schemaVersion` 的清单，或不是清单。
+    /*!
+     * [EN] A manifest of an unknown `schemaVersion`, or not a manifest. [CN] 未知 `schemaVersion` 的清单，或不是清单。
+     */
     CYLTabBarConfigurationErrorUnsupportedManifest = 12,
-    /// [EN] A manifest that is not for this platform, app version or time (`runtime`). [CN] 清单不适用于当前平台、App 版本或时间（`runtime`）。
+    /*!
+     * [EN] A manifest that is not for this platform, app version or time (`runtime`). [CN] 清单不适用于当前平台、App 版本或时间（`runtime`）。
+     */
     CYLTabBarConfigurationErrorNotEligible = 13,
-    /// [EN] A manifest asset is missing or does not match its `hash`. [CN] 清单资源缺失或与其 `hash` 不一致。
+    /*!
+     * [EN] A manifest asset is missing or does not match its `hash`. [CN] 清单资源缺失或与其 `hash` 不一致。
+     */
     CYLTabBarConfigurationErrorAssetInvalid = 14,
 };
 
-/// [EN] The largest file or response read: 5 MB. [CN] 读取的文件或响应的最大长度：5 MB。
+/*!
+ * [EN] The largest file or response read: 5 MB. [CN] 读取的文件或响应的最大长度：5 MB。
+ */
 FOUNDATION_EXTERN const NSUInteger CYLTabBarConfigurationMaximumLength;
 /*!
  * [EN] The deepest nesting accepted: 64 levels, far more than a configuration needs, far less than overflows the stack.
@@ -113,19 +167,29 @@ FOUNDATION_EXTERN const NSUInteger CYLTabBarConfigurationMaximumDepth;
  */
 @interface CYLTabBarConfigurationParser : NSObject
 
-/// [EN] The file name extensions recognized, lowercase, e.g. @"json", @"yaml". [CN] 可识别的扩展名（小写），如 @"json"、@"yaml"。
+/*!
+ * [EN] The file name extensions recognized, lowercase, e.g. @"json", @"yaml". [CN] 可识别的扩展名（小写），如 @"json"、@"yaml"。
+ */
 + (NSArray<NSString *> *)supportedPathExtensions;
 
-/// [EN] The format of a file name extension (case-insensitive), or Unknown. [CN] 扩展名（不区分大小写）对应的格式，未知时为 Unknown。
+/*!
+ * [EN] The format of a file name extension (case-insensitive), or Unknown. [CN] 扩展名（不区分大小写）对应的格式，未知时为 Unknown。
+ */
 + (CYLTabBarConfigurationFormat)formatForPathExtension:(nullable NSString *)pathExtension;
 
-/// [EN] The format of an HTTP `Content-Type` (parameters ignored), or Unknown. [CN] HTTP `Content-Type` 对应的格式（忽略参数），未知时为 Unknown。
+/*!
+ * [EN] The format of an HTTP `Content-Type` (parameters ignored), or Unknown. [CN] HTTP `Content-Type` 对应的格式（忽略参数），未知时为 Unknown。
+ */
 + (CYLTabBarConfigurationFormat)formatForMIMEType:(nullable NSString *)MIMEType;
 
-/// [EN] The format guessed from the content, or Unknown. [CN] 根据内容推测的格式，无法推测时为 Unknown。
+/*!
+ * [EN] The format guessed from the content, or Unknown. [CN] 根据内容推测的格式，无法推测时为 Unknown。
+ */
 + (CYLTabBarConfigurationFormat)formatBySniffingData:(NSData *)data;
 
-/// [EN] A short name of a format, e.g. @"YAML". [CN] 格式的简称，如 @"YAML"。
+/*!
+ * [EN] A short name of a format, e.g. @"YAML". [CN] 格式的简称，如 @"YAML"。
+ */
 + (NSString *)nameOfFormat:(CYLTabBarConfigurationFormat)format;
 
 /*!

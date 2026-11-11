@@ -324,10 +324,14 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface UIControl (CYLTabBarItemAnimation)
 
-/// [EN] The tab's animation view (searching two levels deep); nil for the plus button. [CN] Tab 的动画视图（向下查找两层）；PlusButton 返回 nil。
+/*!
+ * [EN] The tab's animation view (searching two levels deep); nil for the plus button. [CN] Tab 的动画视图（向下查找两层）；PlusButton 返回 nil。
+ */
 - (nullable UIView *)cyl_tabBarItemAnimationView;
 
-/// [EN] YES once the animation view has been added and laid out. [CN] 动画视图已添加并完成布局时返回 YES。
+/*!
+ * [EN] YES once the animation view has been added and laid out. [CN] 动画视图已添加并完成布局时返回 YES。
+ */
 - (BOOL)cyl_isTabBarItemAnimationReady;
 
 /*!
@@ -338,16 +342,22 @@ NS_ASSUME_NONNULL_BEGIN
                                      size:(CGSize)size
                               contentMode:(UIViewContentMode)contentMode;
 
-/// [EN] The same, and sets `animationSpeed` when this call adds the view (#428). [CN] 同上，本次调用新添加视图时设置 `animationSpeed`（#428）。
+/*!
+ * [EN] The same, and sets `animationSpeed` when this call adds the view (#428). [CN] 同上，本次调用新添加视图时设置 `animationSpeed`（#428）。
+ */
 - (void)cyl_addTabBarItemAnimationWithURL:(nullable NSURL *)URL
                                      size:(CGSize)size
                               contentMode:(UIViewContentMode)contentMode
                            animationSpeed:(CGFloat)animationSpeed;
 
-/// [EN] Sets the playback speed; nothing for a value of 0 or less, or a library without speed. [CN] 设置播放速度；小于等于 0 或动画库没有播放速度时不做处理。
+/*!
+ * [EN] Sets the playback speed; nothing for a value of 0 or less, or a library without speed. [CN] 设置播放速度；小于等于 0 或动画库没有播放速度时不做处理。
+ */
 - (void)cyl_setTabBarItemAnimationSpeed:(CGFloat)animationSpeed;
 
-/// [EN] Swaps the view for the version of its animation matching the current style (#442). [CN] 将视图替换为与当前界面风格相符的动画版本（#442）。
+/*!
+ * [EN] Swaps the view for the version of its animation matching the current style (#442). [CN] 将视图替换为与当前界面风格相符的动画版本（#442）。
+ */
 - (void)cyl_reloadTabBarItemAnimationViewForCurrentStyle;
 
 /*!
@@ -368,13 +378,17 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)cyl_refreshTabBarItemAnimationColors;
 
-/// [EN] Adds the animation if needed and plays it (`defaultSelected`: shows its last frame). [CN] 必要时添加动画并播放（`defaultSelected`：显示最后一帧）。
+/*!
+ * [EN] Adds the animation if needed and plays it (`defaultSelected`: shows its last frame). [CN] 必要时添加动画并播放（`defaultSelected`：显示最后一帧）。
+ */
 - (void)cyl_playTabBarItemAnimationWithURL:(NSURL *)URL
                                       size:(CGSize)size
                            defaultSelected:(BOOL)defaultSelected
                                contentMode:(UIViewContentMode)contentMode;
 
-/// [EN] Stops the tab's animation if it has started. [CN] 若 Tab 的动画已开始播放，则停止。
+/*!
+ * [EN] Stops the tab's animation if it has started. [CN] 若 Tab 的动画已开始播放，则停止。
+ */
 - (void)cyl_stopTabBarItemAnimation;
 
 @end

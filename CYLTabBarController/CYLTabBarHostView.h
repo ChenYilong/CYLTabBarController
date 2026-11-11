@@ -50,8 +50,8 @@ NS_ASSUME_NONNULL_BEGIN
  *        `imageResolver` 处理。
  *      - 配置没有给出 `CYLTabBarControllerContext` 时，每个视图使用自己的 context，因此屏幕上可以同时有多个。
  *      - 下标（`selectedIndex`、`badgeValues`、`didSelectTab`）按配置中的 Tab 计算，不含 PlusButton。
+ * [EN] Keys of `badgeAttributes` / `plusButtonBadgeAttributes`. [CN] `badgeAttributes` / `plusButtonBadgeAttributes` 的键。
  */
-/// [EN] Keys of `badgeAttributes` / `plusButtonBadgeAttributes`. [CN] `badgeAttributes` / `plusButtonBadgeAttributes` 的键。
 FOUNDATION_EXTERN NSString *const CYLTabBarHostBadgeValue;
 FOUNDATION_EXTERN NSString *const CYLTabBarHostBadgeColor;
 FOUNDATION_EXTERN NSString *const CYLTabBarHostBadgeAnimation;
@@ -81,13 +81,19 @@ FOUNDATION_EXTERN NSString *const CYLTabBarHostBadgeCenterOffset;
  */
 @property (nonatomic, copy, nullable) UIImage *_Nullable (^imageResolver)(id value);
 
-/// [EN] The selected tab, -1 to leave it to the user's taps. [CN] 选中的 Tab，-1 表示由用户点击决定。
+/*!
+ * [EN] The selected tab, -1 to leave it to the user's taps. [CN] 选中的 Tab，-1 表示由用户点击决定。
+ */
 @property (nonatomic, assign) NSInteger selectedIndex;
 
-/// [EN] A badge per tab: @"" none, @"dot" a red dot, anything else a text. [CN] 每个 Tab 一个角标：@"" 无，@"dot" 红点，其他为文字。
+/*!
+ * [EN] A badge per tab: @"" none, @"dot" a red dot, anything else a text. [CN] 每个 Tab 一个角标：@"" 无，@"dot" 红点，其他为文字。
+ */
 @property (nonatomic, copy) NSArray<NSString *> *badgeValues;
 
-/// [EN] The plus button's badge: @"" or nil none, @"dot" a red dot, anything else a text. [CN] PlusButton 的角标：@"" 或 nil 无，@"dot" 红点，其他为文字。
+/*!
+ * [EN] The plus button's badge: @"" or nil none, @"dot" a red dot, anything else a text. [CN] PlusButton 的角标：@"" 或 nil 无，@"dot" 红点，其他为文字。
+ */
 @property (nonatomic, copy, nullable) NSString *plusButtonBadgeValue;
 
 /*!
@@ -131,7 +137,9 @@ FOUNDATION_EXTERN NSString *const CYLTabBarHostBadgeCenterOffset;
  */
 @property (nonatomic, assign) BOOL heightIncludesOverflow;
 
-/// [EN] The height the view needs, 0 before the tab bar is built. [CN] 视图需要的高度，创建 TabBar 之前为 0。
+/*!
+ * [EN] The height the view needs, 0 before the tab bar is built. [CN] 视图需要的高度，创建 TabBar 之前为 0。
+ */
 @property (nonatomic, assign, readonly) CGFloat preferredHeight;
 
 /*!
@@ -142,7 +150,9 @@ FOUNDATION_EXTERN NSString *const CYLTabBarHostBadgeCenterOffset;
  */
 @property (nonatomic, copy, nullable) void (^didSelectTab)(NSInteger index, NSString *identifier);
 
-/// [EN] A long press on a tab (its index) or on the plus button (-1), with the title it shows. [CN] 长按 Tab（其下标）或 PlusButton（-1），以及显示的标题。
+/*!
+ * [EN] A long press on a tab (its index) or on the plus button (-1), with the title it shows. [CN] 长按 Tab（其下标）或 PlusButton（-1），以及显示的标题。
+ */
 @property (nonatomic, copy, nullable) void (^didLongPressTab)(NSInteger index, NSString *identifier, NSString *title);
 
 /*!
@@ -204,10 +214,14 @@ FOUNDATION_EXTERN NSString *const CYLTabBarHostBadgeCenterOffset;
  */
 @property (nonatomic, copy, nullable) NSValue *titlePositionAdjustment;
 
-/// [EN] The plus button of `CYLTabBarControllerPlusButton` was tapped. [CN] 点击了 `CYLTabBarControllerPlusButton` 的 PlusButton。
+/*!
+ * [EN] The plus button of `CYLTabBarControllerPlusButton` was tapped. [CN] 点击了 `CYLTabBarControllerPlusButton` 的 PlusButton。
+ */
 @property (nonatomic, copy, nullable) void (^didTapPlusButton)(void);
 
-/// [EN] `preferredHeight` changed. [CN] `preferredHeight` 发生变化。
+/*!
+ * [EN] `preferredHeight` changed. [CN] `preferredHeight` 发生变化。
+ */
 @property (nonatomic, copy, nullable) void (^preferredHeightDidChange)(CGFloat height);
 
 /*!
@@ -219,10 +233,14 @@ FOUNDATION_EXTERN NSString *const CYLTabBarHostBadgeCenterOffset;
  */
 @property (nonatomic, copy, readonly) NSArray<NSValue *> *touchableRects;
 
-/// [EN] `touchableRects` changed. [CN] `touchableRects` 发生变化。
+/*!
+ * [EN] `touchableRects` changed. [CN] `touchableRects` 发生变化。
+ */
 @property (nonatomic, copy, nullable) void (^touchableRectsDidChange)(NSArray<NSValue *> *rects);
 
-/// [EN] The tab bar controller, nil until it is built. [CN] TabBarController，创建之前为 nil。
+/*!
+ * [EN] The tab bar controller, nil until it is built. [CN] TabBarController，创建之前为 nil。
+ */
 @property (nonatomic, strong, readonly, nullable) CYLTabBarController *tabBarController;
 
 @end
