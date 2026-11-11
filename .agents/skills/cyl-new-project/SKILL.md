@@ -102,3 +102,11 @@ for example `:path => '../'` in a demo folder.
 ## Podfile, app icon, launch screen
 
 Every Xcode project checks its Podfile (top lines `platform :ios, '15.0'`, `ENV['SWIFT_VERSION'] = '5'`, `project '<name>.xcodeproj'`; a `post_install` hook that sets `IPHONEOS_DEPLOYMENT_TARGET` to 15.0 on every pod), and copies the ObjC example's app icon and launch screen when it has none. Full rule and exceptions (one `post_install` only, React Native minimum 15.1): AGENTS.md, "Xcode projects: Podfile, app icon, launch screen".
+
+### Default setup in the examples
+
+Unless the task says otherwise, an example's CYLTabBarController has a plus button **with its own page**
+(`plusChildViewController`) and is created **from a local configuration file** with
+`+tabBarControllerWithConfigurationFile:error:` (tabs in `CYLTabBarControllerTabBarItemsAttributes`, the plus button in
+`CYLTabBarControllerPlusButton`, its page by `CYLTabBarItemPageIdentifier`). Another setup is used only on purpose and named
+in the demo. AGENTS.md, "How the examples set CYLTabBarController up".

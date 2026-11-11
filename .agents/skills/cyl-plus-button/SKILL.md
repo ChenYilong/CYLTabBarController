@@ -51,3 +51,11 @@ With YES on Liquid Glass the title moves into the tab item under the button (#63
 - `selectedIndex` and the slot: [SelectedIndex-PlusButton](../../../docs/SelectedIndex-PlusButton.md), [PlusButton-Slot](../../../docs/PlusButton-Slot.md).
 - Its page's navigation title: `CYL_NAVIGATION_TITLE_FOLLOWS_TAB_BAR_ITEM(plusChildViewController)` makes it follow the plus button's title (`cyl_title`), at setup and after `-updatePlusButtonWithAttributes:` / skins; the tab notifications then carry `CYLPlusButtonKey`. Android: `plusChildViewController().cyl_navigationTitleFollowsTabBarItemTitle = true` (the activity title while the plus page is selected). See [Update-Tab-Bar-Items-In-Place](../../../docs/Update-Tab-Bar-Items-In-Place.md).
 - Badge: [PlusButton-Badge](../../../docs/PlusButton-Badge.md). Background image: [PlusButton-Background-Image-Liquid-Glass](../../../docs/PlusButton-Background-Image-Liquid-Glass.md).
+
+### Default setup in the examples
+
+Unless the task says otherwise, an example's CYLTabBarController has a plus button **with its own page**
+(`plusChildViewController`) and is created **from a local configuration file** with
+`+tabBarControllerWithConfigurationFile:error:` (tabs in `CYLTabBarControllerTabBarItemsAttributes`, the plus button in
+`CYLTabBarControllerPlusButton`, its page by `CYLTabBarItemPageIdentifier`). Another setup is used only on purpose and named
+in the demo. AGENTS.md, "How the examples set CYLTabBarController up".

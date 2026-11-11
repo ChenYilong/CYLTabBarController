@@ -206,6 +206,19 @@ of CYLTabBarController**, which can sit on any branch, not only `master` or `mai
 4. Say in the reply which commit (sha, date, branch) a build used. If the commit cannot be fetched (offline), say so and
    do not guess: keep the sha already in the Podfile and report that it may not be the latest.
 
+### How the examples set CYLTabBarController up (the default)
+
+Unless a task says otherwise, every CYLTabBarController in the example layer is integrated the same way:
+1. **With a plus button that has its own page** (a `plusChildViewController`): the plus button selects a page, it is not
+   only an action.
+2. **Initialized from a local configuration file** in the app (`Example-Shared/Configurations/cyl_tabbar_configuration.*`
+   or the example's own copy), with `+[CYLTabBarController tabBarControllerWithConfigurationFile:error:]`: the tabs come
+   from `CYLTabBarControllerTabBarItemsAttributes`, the plus button from `CYLTabBarControllerPlusButton`, and the plus
+   button's page from `CYLTabBarItemPageIdentifier` inside it (resolved like a tab's page: the configuration's resolver,
+   the page registry or the global registry). See [docs/Configuration-File.md](docs/Configuration-File.md).
+A demo that shows another setup on purpose (no plus button, a plus button without a page, attributes built in code, a
+`CYLPlusButtonSubclassing` subclass) says so in its title or comment.
+
 ## Xcode projects: Podfile, app icon, launch screen
 
 Whenever you work on a project that runs in Xcode (a demo, an example, any app with a Podfile), check these three things first and fix what is missing:
