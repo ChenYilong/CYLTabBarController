@@ -20,7 +20,11 @@ pod 'CYLTabBarController/CYLFlatDesignTabBar', :path => './'
 # Placeholders (empty data, no network) and pull to refresh, at the latest commit of CYLTableViewPlaceHolder on any
 # branch (AGENTS.md, "Depending on CYLTableViewPlaceHolder"; find it with scripts/latest-cyl-commit.sh). Replaces MJRefresh.
 pod 'CYLTableViewPlaceHolder', :git => 'https://github.com/ChenYilong/CYLTableViewPlaceHolder.git', :commit => '44e16c465e2c046bc425e3917bb86e4e912d088c'
+# Every animation type of CYLTableViewPlaceHolder: each demo list uses another one (CYLDemoPlaceholderAnimation).
 pod 'CYLTableViewPlaceHolder/LottieSwift', :git => 'https://github.com/ChenYilong/CYLTableViewPlaceHolder.git', :commit => '44e16c465e2c046bc425e3917bb86e4e912d088c'
+pod 'CYLTableViewPlaceHolder/PAG', :git => 'https://github.com/ChenYilong/CYLTableViewPlaceHolder.git', :commit => '44e16c465e2c046bc425e3917bb86e4e912d088c'
+pod 'CYLTableViewPlaceHolder/Rive', :git => 'https://github.com/ChenYilong/CYLTableViewPlaceHolder.git', :commit => '44e16c465e2c046bc425e3917bb86e4e912d088c'
+pod 'CYLTableViewPlaceHolder/GIF', :git => 'https://github.com/ChenYilong/CYLTableViewPlaceHolder.git', :commit => '44e16c465e2c046bc425e3917bb86e4e912d088c'
 
 end
 

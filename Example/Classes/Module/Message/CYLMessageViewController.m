@@ -47,7 +47,7 @@
 
     // [EN] Pull to refresh, empty / no-network placeholders and the offline red bar (CYLTableViewPlaceHolder).
     // [CN] 下拉刷新、无数据 / 无网络占位图与断网红条（CYLTableViewPlaceHolder）。
-    [CYLDemoPlaceholder installOnScrollView:self.tableView viewController:self refresh:nil];
+    [CYLDemoPlaceholder installOnScrollView:self.tableView viewController:self animation:CYLDemoPlaceholderAnimationRive refresh:nil];
 }
 
 - (void)refresh {

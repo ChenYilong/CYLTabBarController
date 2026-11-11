@@ -169,7 +169,7 @@ final class CYLGalleryListViewController: UITableViewController {
         super.viewDidLoad()
         // [EN] Pull to refresh, empty / no-network placeholders and the offline red bar (CYLTableViewPlaceHolder).
         // [CN] 下拉刷新、无数据 / 无网络占位图与断网红条（CYLTableViewPlaceHolder）。
-        CYLDemoPlaceholder.install(on: tableView, in: self)
+        CYLDemoPlaceholder.install(on: tableView, in: self, animation: .lottie)
     }
 
     override func tableView(_: UITableView, numberOfRowsInSection _: Int) -> Int {
