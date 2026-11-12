@@ -1,0 +1,9 @@
+<!-- [EN] One canvas per animation, labeled for accessibility when `label` is set. [CN] 每个动画一个画布；设置 `label` 时带无障碍标签。 -->
+<canvas
+  type="2d"
+  id="{{cylCanvasId}}"
+  class="cyl-lottie-canvas"
+  aria-role="img"
+  aria-label="{{label}}"
+  aria-hidden="{{!label}}"
+></canvas>

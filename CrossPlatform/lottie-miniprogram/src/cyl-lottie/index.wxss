@@ -1,0 +1,12 @@
+/* [EN] The canvas fills the component; size the component from outside. [CN] 画布填满组件；组件尺寸由外部设置。 */
+:host {
+  display: inline-block;
+  width: 100px;
+  height: 100px;
+}
+
+.cyl-lottie-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}

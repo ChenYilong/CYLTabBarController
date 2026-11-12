@@ -26,7 +26,7 @@ module.exports = {
         options: {
           multiple: [{
             search: `'__LOTTIE_CANVAS__'`,
-            replace: fs.readFileSync('./node_modules/lottie-web/build/player/lottie_canvas.js', {encoding: 'utf8'}),
+            replace: fs.readFileSync('./node_modules/lottie-web/build/player/lottie_light_canvas.js', {encoding: 'utf8'}),
           }, {
             search: '__[STANDALONE]__',
             replace: '',
@@ -47,6 +47,12 @@ module.exports = {
         { 
           from: path.resolve(__dirname, 'src', 'index.d.ts'), 
           to: path.resolve(__dirname, 'miniprogram_dist', 'index.d.ts')
+        },
+        {
+          // [EN] The cyl-lottie component, copied as is (it requires ../index.js). [CN] cyl-lottie 组件，原样复制（它引用 ../index.js）。
+          from: path.resolve(__dirname, 'src', 'cyl-lottie'),
+          to: path.resolve(__dirname, 'miniprogram_dist', 'cyl-lottie'),
+          globOptions: {ignore: ['**/._*']},
         },
       ],
     }),

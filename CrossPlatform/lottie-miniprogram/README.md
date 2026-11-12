@@ -1,4 +1,43 @@
-# Lottie for MiniProgram
+# cyl-lottie-miniprogram
+
+The CYLTabBarController fork of [wechat-miniprogram/lottie-miniprogram](https://github.com/wechat-miniprogram/lottie-miniprogram)
+(MIT, imported at 49066a6): the library, with the upstream's open pull requests merged and its issues fixed (status
+table: [docs/WeChat-Mini-Program.md](../../docs/WeChat-Mini-Program.md#enlottie-miniprogram-issues)), plus the
+`cyl-lottie` component.
+
+| Change | Upstream reference |
+|:---|:---|
+| lottie-web 5.13 light canvas build: no `eval` (animations with expressions play without them), 210 KB instead of 268 KB | PR #45, issues #2, #8, #40, #51, #56 |
+| Frames from `canvas.requestAnimationFrame` of the latest live canvas; several canvases at once; load again after `destroy()` | PR #50, issues #16, #55, #58 |
+| `destroy(name)` | PR #17, issues #1, #13 |
+| `path`: network URL or a package / user data file, loaded before lottie starts; `DOMLoaded` / `data_failed`; zip / .lottie refused clearly | issues #15, #42, #47 |
+| Offscreen canvas for image processing, base64 images written to files, images from the animation's own canvas | issues #4, #10, #29, #30, #36 |
+| `setFrameInterval(ms)`, clear `setup()` errors, `XMLHttpRequest` declared in the module (mini games) | issues #28, #32, #53 |
+| TypeScript types without DOM typings; default export | issues #18, #41 |
+
+## cyl-lottie component
+
+```json
+{ "usingComponents": { "cyl-lottie": "cyl-lottie-miniprogram/cyl-lottie/index" } }
+```
+
+```xml
+<cyl-lottie path="/assets/home.json" loop="{{false}}" autoplay colors="{{ {'**.Fill 1': '#FF0000'} }}" style="width: 60px; height: 60px" />
+```
+
+Properties: `path`, `animationData`, `loop`, `autoplay`, `speed`, `colors` (keypath -> color), `fit` (contain, cover,
+fill), `restingFrame` (first, last), `label`. Events: `ready`, `complete`, `loopcomplete`, `error`. Methods:
+`cyl_play`, `cyl_pause`, `cyl_stop`, `cyl_playFromStart`, `cyl_goToAndStop`, `cyl_goToAndPlay`, `cyl_playSegments`,
+`cyl_setSpeed`, `cyl_animation`. The canvas is sized for the pixel ratio, so animations stay sharp on devices
+(issues #12, #23, #26).
+
+Build: `npm install && npm run build` (writes `miniprogram_dist`, committed); test: `npm test`.
+
+---
+
+## Upstream README
+
+### Lottie for MiniProgram
 
 [![](https://img.shields.io/npm/v/lottie-miniprogram)](https://www.npmjs.com/package/lottie-miniprogram)
 [![](https://img.shields.io/npm/l/lottie-miniprogram)](https://github.com/wechat-miniprogram/lottie-miniprogram)
