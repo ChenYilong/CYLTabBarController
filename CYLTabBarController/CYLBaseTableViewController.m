@@ -7,6 +7,13 @@
  */
 
 
+// CYL-SWIFT-MIGRATION: objc-shell — [EN] `CYLBaseTableViewController` stays an Objective-C class because Objective-C code subclasses it
+//      (the demo's view controllers, apps); it holds no logic: each lifecycle method only calls the
+//      `-cyl_…NavigationSetting` methods of `UIViewController (CYLTabBarControllerExtention)`, which move to Swift
+//      with that category (docs/Swift-Migration.md).
+//      [CN] `CYLBaseTableViewController` 保留为 Objective-C 类，因为 Objective-C 代码会继承它（示例中的控制器、App）；它不含逻辑：每个生命周期
+//      方法只调用 `UIViewController (CYLTabBarControllerExtention)` 的 `-cyl_…NavigationSetting` 方法，这些方法随该类别迁移到
+//      Swift（docs/Swift-Migration.md）。
 #import "CYLBaseTableViewController.h"
 #import "CYLTabBarController.h"
 
