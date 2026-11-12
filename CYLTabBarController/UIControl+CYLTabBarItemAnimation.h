@@ -12,14 +12,15 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface UIView (CYLTabBarItemAnimation)
-
 /*!
- * [EN] YES for a view made by a `CYLTabBarItemAnimator`. [CN] 由 `CYLTabBarItemAnimator` 创建的视图返回 YES。
+ * [EN] `UIView (CYLTabBarItemAnimation)` and the service functions are implemented in Swift
+ *      (`Swift/UIControl+CYLTabBarItemAnimation.swift`) and declared by the generated Swift interface imported at the end
+ *      (docs/Swift-Migration.md).
+ * [CN] `UIView (CYLTabBarItemAnimation)` 与服务函数在 Swift 中实现（`Swift/UIControl+CYLTabBarItemAnimation.swift`），由末尾导入的
+ *      Swift 生成接口声明（docs/Swift-Migration.md）。
  */
-- (BOOL)cyl_isTabBarItemAnimationView;
 
-@end
+
 
 @interface CYLTabBar (CYLTabBarItemAnimation)
 
@@ -78,3 +79,5 @@ FOUNDATION_EXTERN NSURL * _Nullable CYLTabBarItemAnimationURLFromAttributes(NSDi
 @end
 
 NS_ASSUME_NONNULL_END
+
+#import "CYLSwiftInterface.h"
