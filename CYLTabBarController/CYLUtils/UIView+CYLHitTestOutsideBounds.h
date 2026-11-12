@@ -10,6 +10,13 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /*!
+ * [EN] Implemented in Swift (`Swift/UIView+CYLHitTestOutsideBounds.swift`); declared here for Objective-C callers only, and hidden from Swift
+ *      (`__swift__`), which uses the Swift extension itself (docs/Swift-Migration.md).
+ * [CN] 在 Swift 中实现（`Swift/UIView+CYLHitTestOutsideBounds.swift`）；这里只为 Objective-C 调用方声明，并对 Swift 隐藏（`__swift__`），
+ *      Swift 直接使用该 Swift 扩展（docs/Swift-Migration.md）。
+ */
+#ifndef __swift__
+/*!
  * FIX: issue #535
  * [EN] A subview that sticks out of its superview does not get touches outside the superview: UIKit stops at the
  *      superview's bounds. Set `cyl_respondsOutsideSuperviewBounds = YES` on such a subview (e.g. a raised button on a
@@ -32,5 +39,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign, getter=cyl_respondsOutsideSuperviewBounds, setter=cyl_setRespondsOutsideSuperviewBounds:) BOOL cyl_respondsOutsideSuperviewBounds;
 
 @end
+#endif
 
 NS_ASSUME_NONNULL_END

@@ -16,6 +16,13 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+/*!
+ * [EN] Implemented in Swift (`Swift/NSObject+CYLUtils.swift`); declared here for Objective-C callers only, and hidden from Swift
+ *      (`__swift__`), which uses the Swift extension itself (docs/Swift-Migration.md).
+ * [CN] 在 Swift 中实现（`Swift/NSObject+CYLUtils.swift`）；这里只为 Objective-C 调用方声明，并对 Swift 隐藏（`__swift__`），
+ *      Swift 直接使用该 Swift 扩展（docs/Swift-Migration.md）。
+ */
+#ifndef __swift__
 @interface NSObject (CYLUtils)
 
 /*!
@@ -55,5 +62,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (nullable id)cyl_weakAssociatedObjectForKey:(const void *)key;
 
 @end
+#endif
 
 NS_ASSUME_NONNULL_END
