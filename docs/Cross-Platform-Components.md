@@ -45,6 +45,7 @@
 |:---|:---|:---|
 | [React Native 接入](React-Native-Component.md) | [React Native integration](React-Native-Component.md) | 运行示例、添加依赖、pod install、属性与事件、常见问题。 / Running the example, the dependency, pod install, props and events, troubleshooting. |
 | [Flutter 接入](Flutter-Component.md) | [Flutter integration](Flutter-Component.md) | 运行示例、`FlutterFragmentActivity`、Swift Package Manager 或 CocoaPods、字段、常见问题。 / Running the example, `FlutterFragmentActivity`, Swift Package Manager or CocoaPods, fields, troubleshooting. |
+| [微信小程序版](WeChat-Mini-Program.md) | [WeChat Mini Program](WeChat-Mini-Program.md) | `cyl-tab-bar` 组件（纯小程序实现，读取相同的配置键）、示例、评分与待办。 / The `cyl-tab-bar` component (pure mini program code reading the same configuration keys), the example, the score and the TODO list. |
 
 ## [CN]动效图标示例
 ## [EN]Animated-icon demos
@@ -186,4 +187,4 @@ bar.setConfigurationJSON(assets.open("tabbar.json").bufferedReader().readText())
 
 | 中文                | English                                                                                                                                                                                                                                                             |
 | :---------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| 本条按用户要求使用英文（见右列）。 | TODO (2026-11-12): a third component, **WeChat Mini Program**, in `CrossPlatform/wechat-miniprogram-cyltabbar`, scored against the configuration keys of the iOS library: see [WeChat-Mini-Program.md](WeChat-Mini-Program.md) (task, prompt, plan, score 0 / 100). |
+| 本条按用户要求使用英文（见右列）。 | TODO (2026-11-12): a third component, **WeChat Mini Program**, in `CrossPlatform/wechat-miniprogram-cyltabbar`, scored against the configuration keys of the iOS library: see [WeChat-Mini-Program.md](WeChat-Mini-Program.md) (task, prompt, plan, score). 2026-11-13: the component `cyl-tab-bar` and its example are in (commit `08734ef`), checked in WeChat DevTools with screenshots; **63 / 100**, the remaining keys are listed under TODO there. It is a pure mini program component (WXML / WXSS / JS), not a wrapper of `CYLTabBarHostView`: a mini program cannot embed native views. |

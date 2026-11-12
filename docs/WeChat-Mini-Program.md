@@ -21,7 +21,11 @@
 |:---|:---|
 | [任务](#cn任务) | [Task](#entask) |
 | [评分](#cn评分) | [Score](#enscore) |
+| &nbsp;&nbsp;&nbsp;&nbsp;↳ [item 键](#cnitem-键) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [Item keys](#enitem-keys) |
 | [方案](#cn方案) | [Plan](#enplan) |
+| [运行与使用](#cn运行与使用) | [Run and use](#enrun-and-use) |
+| [截图](#cn截图) | [Screenshots](#enscreenshots) |
+| [待办](#cn待办) | [TODO](#entodo) |
 | [参考](#cn参考) | [References](#enreferences) |
 | [进度](#cn进度) | [Progress](#enprogress) |
 
@@ -40,7 +44,39 @@
 
 | 中文 | English |
 |:---|:---|
-| 见右列。 | Score = 100 × implemented / total, over the 24 configuration keys of [Configuration-File.md](Configuration-File.md#enconfiguration-keys) and the per-tab item keys (`CYLTabBarItem…`) the iOS library reads; a key counts when the component honors it on a device or in the WeChat DevTools simulator, with a screenshot. 2026-11-12: **0 / 100** (folder not created yet). |
+| 分数 = 100 × 已实现 / 适用的键。范围：[配置键](Configuration-File.md#cn配置键)表中的 24 个键，加上 iOS 库读取的 19 组 item 键（[新增的 item 键](Configuration-File.md#cn新增的-item-键与文件中的写法)表的每一行，以及标题、图片、选中图片、标识这组基础键）。只能在 iOS 代码中设置、在小程序中没有对应概念的键记为「不适用」，不计入分母。2026-11-13：**63 / 100**（35 个适用项中实现 22 个）。 | Score = 100 × implemented / applicable keys, over the 24 keys of [the configuration keys table](Configuration-File.md#enconfiguration-keys) and 19 groups of item keys the iOS library reads (each row of [the new item keys table](Configuration-File.md#ennew-item-keys-and-file-values), plus the basic group: title, image, selected image, identifier). A key a mini program has no counterpart for (set only in iOS code, or about iOS view controllers and memory) is "N/A" and left out of the total. A key counts when the component honors it in the WeChat DevTools simulator, with a screenshot or a test. 2026-11-13: **63 / 100** (22 of 35 applicable keys). |
+
+| 范围 | Scope | 适用 / Applicable | 已实现 / Implemented |
+|:---|:---|:---|:---|
+| 顶层配置键（24 个，8 个不适用） | Top-level keys (24, 8 N/A) | 16 | 15：除 `CYLTabBarControllerSwipeToSwitchTab` 外全部 / all but `CYLTabBarControllerSwipeToSwitchTab` |
+| item 键（19 组） | Item keys (19 groups) | 19 | 7：基础键、`CYLTabBarItemPageIdentifier`、`CYLTabBarItemPageParameters`、`CYLTabBarItemPlatforms`、`CYLTabBarItemMinimumAppVersion`、图片键 / image keys（`system:` 经 / via `symbolsByTheme`、名称 / names、路径 / paths、URL）、`CYLTabBarItemImageInsets` 等 / and the like |
+| 合计 | Total | 35 | 22 → 63 / 100 |
+
+### [CN]item 键
+### [EN]Item keys
+
+| 键 / Key | 微信小程序 / WeChat Mini Program |
+|:---|:---|
+| `CYLTabBarItemTitle`、`CYLTabBarItemImage`、`CYLTabBarItemSelectedImage`、`CYLTabBarItemIdentifier` | ✅ |
+| `CYLTabBarItemPageIdentifier` | ✅ 页面路径 / page path `pages/<pageIdentifier>/index` |
+| `CYLTabBarItemPageParameters` | ✅ 在 `select` 事件中 / in the `select` event |
+| `CYLTabBarItemPlatforms` | ✅ 平台名 / platform names `miniprogram`、`wechat`、`weixin`、`wechat-miniprogram`、`all` |
+| `CYLTabBarItemMinimumAppVersion` | ✅ 与组件属性 / against the property `appVersion` |
+| 图片键 / image keys | ✅ `system:<name>` 通过 / through `symbolsByTheme`（每个皮肤一张表 / one table per skin）；名称与相对路径在 / names and relative paths under `imageBasePath` 下 |
+| `CYLTabBarItemImageInsets`、`CYLTabBarItemTitlePositionAdjustment` | ✅ |
+| `CYLTabBarItemImageURLSize`、`CYLTabBarLottieSize` | ❌ |
+| `CYLTabBarLottieURL`、`CYLTabBarLottieDarkURL` | ❌ |
+| `CYLTabBarLottieDarkColors` | ❌ |
+| `CYLTabBarAnimation…`（通用动画键 / generic animation keys） | ❌ |
+| `CYLTabBarPAG…`、`CYLTabBarRive…` | ❌ |
+| `CYLTabBarGIF…` | ❌ |
+| `CYLTabBarAnimationOptions` | ❌ |
+| `CYLTabBarAnimationColors`、`CYLTabBarAnimationDarkColors` | ❌ |
+| `CYLTabBarLottieLoopsWhenUnselected` | ❌ |
+| 颜色键 / color keys | 部分，记为 ❌ / partial, counted as ❌：标题与背景颜色已实现，`CYLTabBarItemIconColor` / `CYLTabBarItemSelectedIconColor` 未实现 / title and background colors done, icon colors not |
+| `CYLTabBarItemIconRenderingMode`、`CYLTabBarControllerIconRenderingMode`、`CYLTabBarControllerIconColor`、`CYLTabBarControllerSelectedIconColor` | ❌ |
+| `CYLTabBarItemTitleFont`、`CYLTabBarItemSelectedTitleFont` | ❌ |
+| `CYLTabBarItemAccessibilityIdentifier`、`CYLTabBarItemAccessibilityLabel`、`CYLTabBarItemAccessibilityHint`、`CYLTabBarItemSelectedTitle` | ✅（`aria-label`、`id`；hint 已读取、未朗读 / read, not spoken） |
 
 ## [CN]方案
 ## [EN]Plan
@@ -51,6 +87,42 @@
 | | **Order**: ① tabs from `CYLTabBarControllerTabBarItemsAttributes` (title, image, selected image, colors) and selection; ② the plus button (`CYLTabBarControllerPlusButton`), raised above the bar, with and without its own page; ③ badges (number, dot); ④ appearance keys (background, title offsets, image insets, item colors, style type); ⑤ themes / skins (`CYLTabBarControllerThemes`), localization, login-required tabs; ⑥ the remaining keys of the table. |
 | | **Example**: a mini program project inside the folder that opens the shared `Example-Shared/Configurations/cyl_tabbar_configuration.json`, as the React Native and Flutter examples do. |
 | | **Verify**: WeChat DevTools (simulator and the automation SDK `miniprogram-automator` for tests), screenshots in `docs/assets/`. |
+
+## [CN]运行与使用
+## [EN]Run and use
+
+| 中文 | English |
+|:---|:---|
+| 见右列。 | **Run the example**: import `CrossPlatform/wechat-miniprogram-cyltabbar` in WeChat DevTools (it holds `project.config.json`, AppID `wx5e29c9d33906f074`) and compile. On macOS, allow DevTools to access files on a removable volume when the repository is on an external drive. The tab bar reads `miniprogram/shared/configuration.js`, a copy of `Example-Shared/Configurations/cyl_tabbar_configuration.json` written by `npm run sync` (`scripts/cyl_sync_shared.js`, which also copies the localization tables and the skin images of `Manifests/cyl_tabbar_manifest.json`; `npm run sync:check` fails when a copy is out of date). The example adds a raised plus button with its own page (`publish`) and a `christmas` skin (`miniprogram/utils/cyl_demo_configuration.js`). Tests: `npm test` (Node 18+). |
+| | **Use the component**: `"tabBar": {"custom": true, "list": […]}` in `app.json`, then `<cyl-tab-bar configuration="{{configuration}}" selected-identifier="{{selected}}" bind:select="onSelect" />` in `custom-tab-bar/index.wxml`, and `wx.switchTab` in `onSelect`. Events: `select`, `reselect`, `plustap`, `loginrequired` (detail: `index`, `identifier`, `pageIdentifier`, `pageParameters`, `context`, `isPlusButton`). Methods: `cyl_selectIdentifier`, `cyl_showBadgeValue`, `cyl_showBadgeDot`, `cyl_removeBadge`, `cyl_setThemeIdentifier`, `cyl_themeIdentifiers`. Every tab page has its own `custom-tab-bar` instance, so the example keeps badges, skin and overrides in `App` and each instance follows them. |
+| | **Accessibility**: the bar is a `tablist`; each tab is a `tab` with `aria-label` (badge included, e.g. "Discover, 3") and `aria-selected`; the plus button is a `button`; icons, titles and badges are hidden from accessibility because the tab reads them. |
+
+## [CN]截图
+## [EN]Screenshots
+
+| 中文 | English |
+|:---|:---|
+| 平台：微信小程序。环境：macOS 27.3，微信开发者工具 Stable 2.02.2609250 模拟器（iPhone 12/13 Pro，390 × 844 @3x），基础库 3.18.0。代码：[`08734ef`](https://github.com/ChenYilong/CYLTabBarController/commit/08734ef)（分支 `feat/cross-platform-components`）。时间：2026-11-13 01:23–01:24 NZDT。由 agent skill `wechatide` 0.3.11 截取的原始截图。 | Platform: WeChat Mini Program. Environment: macOS 27.3, WeChat DevTools Stable 2.02.2609250 simulator (iPhone 12/13 Pro, 390 × 844 @3x), base library 3.18.0. Code: [`08734ef`](https://github.com/ChenYilong/CYLTabBarController/commit/08734ef) (branch `feat/cross-platform-components`). Time: 2026-11-13 01:23–01:24 NZDT. Original screenshots taken with the agent skill `wechatide` 0.3.11. |
+
+| 默认样式与共用配置（Message 因 `CYLTabBarItemPlatforms` 不显示） | The default style and the shared configuration (Message left out by `CYLTabBarItemPlatforms`) |
+|:---|:---|
+| ![WeChat Mini Program, home](assets/wechat-miniprogram-home.png) | ![WeChat Mini Program, home](assets/wechat-miniprogram-home.png) |
+| 角标：数字与小红点 | Badges: a number and a dot |
+| ![WeChat Mini Program, badges](assets/wechat-miniprogram-badges.png) | ![WeChat Mini Program, badges](assets/wechat-miniprogram-badges.png) |
+| 圣诞皮肤、液态玻璃、99+ | The christmas skin, Liquid Glass, 99+ |
+| ![WeChat Mini Program, christmas skin and Liquid Glass](assets/wechat-miniprogram-christmas-glass.png) | ![WeChat Mini Program, christmas skin and Liquid Glass](assets/wechat-miniprogram-christmas-glass.png) |
+| FlatDesign 与需要登录的 Tab（`CYLTabBarControllerLoginRequiredTabBarItemIdentifiers`） | FlatDesign and a tab that needs login (`CYLTabBarControllerLoginRequiredTabBarItemIdentifiers`) |
+| ![WeChat Mini Program, FlatDesign and login](assets/wechat-miniprogram-flat-login.png) | ![WeChat Mini Program, FlatDesign and login](assets/wechat-miniprogram-flat-login.png) |
+
+## [CN]待办
+## [EN]TODO
+
+| 中文 | English |
+|:---|:---|
+| 见右列。 | TODO (2026-11-13, score 63 / 100), in order: ① icon tinting (`CYLTabBarItemIconColor`, `CYLTabBarItemSelectedIconColor`, `CYLTabBarItemIconRenderingMode` and the tab bar defaults): WXSS cannot load package images, so tinting needs another way (pre-tinted images from the sync script, or `<image>` with a CSS filter); ② animated icons (Lottie with `lottie-miniprogram`, GIF in `<image>`; PAG and Rive have no mini program runtime, so they fall back to the image as on platforms without the library); ③ `CYLTabBarItemTitleFont`, `CYLTabBarItemImageURLSize`, `CYLTabBarControllerSwipeToSwitchTab` (a page behavior with touch handlers); ④ `CYLPlusButtonShowsSelection`; ⑤ automated UI tests with `miniprogram-automator` in CI. |
+| | Known defect: the dark skin of `Manifests/cyl_tabbar_manifest.json` has no `discover` or `plus` image, so the sync script falls back to the light images, which are dark lines on the dark bar and hard to see (iOS tints them). Fix with ① or by adding dark images to `Skins/2.1.0/dark`. |
+| | Limits: a mini program opens web pages only from business domains set in the WeChat admin console, so the `web` page shows and copies its URL; `CYLTabBarItemMinimumAppVersion` is checked only when the app passes `appVersion` (the DevTools have no release version); the first tab does not imitate the Objective-C example's table yet (AGENTS.md "Demo table rows"). |
+| | The rule "Upstream projects used for translation" of AGENTS.md: the five reference projects were used for the approach only, no code was translated (see the component's NOTICE); listing their open issues and pull requests is still TODO if a port of one of them is wanted. |
 
 ## [CN]参考
 ## [EN]References
@@ -65,4 +137,5 @@
 | 中文 | English |
 |:---|:---|
 | 见右列。 | 2026-11-12: task recorded; the configuration keys table has the "WeChat Mini Program" column (all ❌). Not started. |
-| 见右列。 | TODO (2026-11-13): start the implementation. User prompts, verbatim: "在本项目crossplatform文件夹下创建小程序文件夹， 全英文， 并根据要求创建文件 ，创建小程序项目： 4. **项目根目录需包含有效的 `project.config.json`**，且其中 `appid` 字段有效（空字符串、`\"touristappid\"` 视为无效）。 请填写。\|AppID(小程序ID) wx5e29c9d33906f074" and "阅读docs文档找到小程序相关要求实现本项目代码". In English: create the mini program folder under `CrossPlatform/` (all English), with a valid `project.config.json` whose `appid` is `wx5e29c9d33906f074`, and implement this document's plan. Environment: WeChat DevTools Stable 2.02.2609250 with its agent skill `wechatide` 0.3.11 (service port on, client `Claude` authorized), used to open, compile, screenshot and drive the simulator. |
+| 见右列。 | DONE (2026-11-13): start the implementation. User prompts, verbatim: "在本项目crossplatform文件夹下创建小程序文件夹， 全英文， 并根据要求创建文件 ，创建小程序项目： 4. **项目根目录需包含有效的 `project.config.json`**，且其中 `appid` 字段有效（空字符串、`\"touristappid\"` 视为无效）。 请填写。\|AppID(小程序ID) wx5e29c9d33906f074" and "阅读docs文档找到小程序相关要求实现本项目代码". In English: create the mini program folder under `CrossPlatform/` (all English), with a valid `project.config.json` whose `appid` is `wx5e29c9d33906f074`, and implement this document's plan. Environment: WeChat DevTools Stable 2.02.2609250 with its agent skill `wechatide` 0.3.11 (service port on, client `Claude` authorized), used to open, compile, screenshot and drive the simulator. |
+| 见右列。 | 2026-11-13 result: `CrossPlatform/wechat-miniprogram-cyltabbar` with `cyl-tab-bar` and the example, commit [`08734ef`](https://github.com/ChenYilong/CYLTabBarController/commit/08734ef); Node tests 8 / 8; checked in WeChat DevTools (screenshots above): tabs, raised plus button and its page, badges, skins, Dark Mode, the three styles, the login prompt. Two bugs found and fixed while testing: arrays inside the `configuration` property arrive as array-like objects (`{"0": "me"}`), and choosing the dark skin by hand did not switch the bar to dark colors. Score 63 / 100; the 2026-11-12 goal (100 / 100) stays TODO, see [TODO](#entodo). |

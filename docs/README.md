@@ -346,7 +346,11 @@ docs/
 │   ├── update-tab-navigation-title-skin.png
 │   ├── update-tab-network-icons-plus-button.png
 │   ├── update-tab-plus-page-navigation-title-changed.png
-│   └── update-tab-plus-page-navigation-title.png
+│   ├── update-tab-plus-page-navigation-title.png
+│   ├── wechat-miniprogram-badges.png
+│   ├── wechat-miniprogram-christmas-glass.png
+│   ├── wechat-miniprogram-flat-login.png
+│   └── wechat-miniprogram-home.png
 ├── commit-readiness-2026-11-09.md
 └── instructions.md
 ```

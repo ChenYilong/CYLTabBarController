@@ -22,7 +22,7 @@ Read the document for the feature before using its API. The public API is in the
 | Plus button: slot, counts; on Liquid Glass it follows its slot's center; titles are cut (longest first) only when they overflow the platter | [PlusButton-Slot](../../../docs/PlusButton-Slot.md) |
 | Swift migration of the iOS core layer: plan, order, score (`scripts/swift-migration-score.py`), progress | [Swift-Migration](../../../docs/Swift-Migration.md) |
 | Swift coding style: names, `@objc` compatibility, comments, formatting | [Swift-Coding-Style](../../../docs/Swift-Coding-Style.md) |
-| WeChat Mini Program component: plan, references, score against the configuration keys | [WeChat-Mini-Program](../../../docs/WeChat-Mini-Program.md) |
+| WeChat Mini Program: `CrossPlatform/wechat-miniprogram-cyltabbar`, the `cyl-tab-bar` component (pure mini program code, not a `CYLTabBarHostView` wrapper) reading the configuration keys, events `select` / `reselect` / `plustap` / `loginrequired`, badge and skin methods, `symbolsByTheme` for `system:` images, `npm run sync` from `Example-Shared/Configurations`, `npm test`, running it in WeChat DevTools, plan, score and TODO | [WeChat-Mini-Program](../../../docs/WeChat-Mini-Program.md) |
 | Examples' pull to refresh and placeholders (CYLTableViewPlaceHolder: `CYLRefreshAnimationHeader`, empty / no-network placeholders), problems that library causes | [CYLTableViewPlaceHolder-Integration-Issues](../../../docs/CYLTableViewPlaceHolder-Integration-Issues.md) |
 | Plus button: badge | [PlusButton-Badge](../../../docs/PlusButton-Badge.md) |
 | Plus button: background image | [PlusButton-Background-Image-Liquid-Glass](../../../docs/PlusButton-Background-Image-Liquid-Glass.md) |
