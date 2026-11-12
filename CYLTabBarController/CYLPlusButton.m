@@ -1292,7 +1292,8 @@ static NSDictionary<NSNumber *, NSNumber *> *CYLPlusButtonDerivedImageStates(voi
  *      在替身清晰的标题与图标下形成一层模糊重影。替身显示期间，真实按钮在放大镜下被遮住：内容全部在放大镜内时遮住整个放大镜区域，否则只遮住
  *      标题所在的横条（底板以上的部分保留）；选中其他 Tab 后移除遮罩。
  *
- * DONE (2026-11-12, docs/SwiftUI-Integration.md "Task log"), kept ON after a drag test:
+ * TODO (2026-11-12, docs/Liquid-Glass-Robustness.md "Task log"): OFF (`CYL_PLUS_BUTTON_LENS_MASK_ENABLED` 0) while plus button
+ *      bugs are investigated. History:
  * [EN] A mask here once cut the plus button in two (iOS 26+, Liquid Glass, not FlatDesign, a plus child view controller:
  *      select the plus button, drag the lens to another item); the maintainer had removed an earlier implementation
  *      for that reason. The mask is now off while UIKit's Liquid Glass gesture presses or drags
@@ -1300,15 +1301,23 @@ static NSDictionary<NSNumber *, NSNumber *> *CYLPlusButtonDerivedImageStates(voi
  *      `testDraggingTheLensAwayFromTheSelectedPlusButton` (raised plus, Example-SwiftUI) and
  *      `testDraggingTheLensAwayFromAFlatSelectedPlusButton` (flat plus, ObjC gallery 9.4), recorded on video: the
  *      plus button stays whole during and after the drag; without the suspension the flat plus button disappears
- *      while the lens is held elsewhere. Switch `CYLPlusButtonLensMaskEnabled` off if a new UIKit version cuts it again.
+ *      while the lens is held elsewhere. On any plus button bug, test with it off first (AGENTS.md).
  * [CN] 这里的遮罩曾把 PlusButton 切成两半（iOS 26+、液态玻璃、非扁平样式、有 PlusButton 子控制器：选中 PlusButton 后把放大镜拖到其他
  *      item）；维护者曾因此删除之前的实现。现在系统液态玻璃手势按压或拖动期间关闭遮罩（`-cyl_setLiquidGlassLensMaskSuspended:`），
  *      放大镜停稳后再判断。已用 UI 测试 `testDraggingTheLensAwayFromTheSelectedPlusButton`（凸起的 PlusButton，Example-SwiftUI）与
  *      `testDraggingTheLensAwayFromAFlatSelectedPlusButton`（平的 PlusButton，ObjC 图库 9.4）录屏验证：拖动期间与之后 PlusButton
- *      都保持完整；没有该暂停时，放大镜停在别处期间平的 PlusButton 会消失。若新的 UIKit 版本再次切割，把
- *      `CYLPlusButtonLensMaskEnabled` 设为 NO。
+ *      都保持完整；没有该暂停时，放大镜停在别处期间平的 PlusButton 会消失。PlusButton 出现任何 bug 时，先关闭它再测试（AGENTS.md）。
  */
-static BOOL const CYLPlusButtonLensMaskEnabled = YES;
+#ifndef CYL_PLUS_BUTTON_LENS_MASK_ENABLED
+/*!
+ * [EN] 0 (default): `-cyl_updateLiquidGlassMask` returns on its first line, the mask is off (maintainer's rule, 2026-11-12:
+ *      rule the mask out first on any plus button bug; AGENTS.md). 1 turns the implementation below back on, only after
+ *      the drag and first-display tests pass.
+ * [CN] 0（默认）：`-cyl_updateLiquidGlassMask` 第一行直接返回，遮罩关闭（维护者规则，2026-11-12：PlusButton 出现任何 bug 时先排除
+ *      遮罩；见 AGENTS.md）。1 重新开启下面的实现，仅在拖动与首次显示测试都通过后使用。
+ */
+#define CYL_PLUS_BUTTON_LENS_MASK_ENABLED 0
+#endif
 
 /*!
  * [EN] The fix for the cut: while UIKit's Liquid Glass gesture is pressing or dragging (`began` / `changed`, forwarded by
@@ -1359,8 +1368,11 @@ static BOOL const CYLPlusButtonLensMaskEnabled = YES;
 }
 
 - (void)cyl_updateLiquidGlassMask {
+#if !CYL_PLUS_BUTTON_LENS_MASK_ENABLED
+    return;
+#else
     BOOL suspended = [objc_getAssociatedObject(self, @selector(cyl_setLiquidGlassLensMaskSuspended:)) boolValue];
-    if (!CYLPlusButtonLensMaskEnabled || suspended) {
+    if (suspended) {
         if ([self.layer.mask.name isEqualToString:@"CYLPlusButtonLensMask"]) {
             self.layer.mask = nil;
         }
@@ -1443,6 +1455,7 @@ static BOOL const CYLPlusButtonLensMaskEnabled = YES;
     mask.frame = self.bounds;
     mask.path = path.CGPath;
     [CATransaction commit];
+#endif
 }
 
 - (void)setSelected:(BOOL)selected {
