@@ -145,3 +145,9 @@ flowchart LR
 
 | 中文 | English |
 |:---|:---|
+| TODO（2026-11-12，遮罩与 PlusButton 标题颜色）：用户提示词：「cyl_updateLiquidGlassMask  实现导致plusbutton的 title 字体异常。字体颜色与其他item 字体颜色不同 见附件中第二张截图，禁用该实现查看差异。如无法保证不会引发异常，继续禁用该方法实现。continue」。现象：附图第二行（放大镜拖到 Nearby 时），PlusButton 的标题「Post」颜色与其他 item 标题不同。要求：关闭 `-cyl_updateLiquidGlassMask`（`CYL_PLUS_BUTTON_LENS_MASK_ENABLED` 设为 0），重新录制同一拖动测试并对比；无法保证不引发异常时，保持关闭。 | TODO (2026-11-12, mask and the plus button's title color): user prompt: "cyl_updateLiquidGlassMask  实现导致plusbutton的 title 字体异常。字体颜色与其他item 字体颜色不同 见附件中第二张截图，禁用该实现查看差异。如无法保证不会引发异常，继续禁用该方法实现。continue". Symptom: in the second row of the screenshot (the lens dragged to Nearby), the plus button's title "Post" has a different color from the other items' titles. Requirement: disable `-cyl_updateLiquidGlassMask` (`CYL_PLUS_BUTTON_LENS_MASK_ENABLED` 0), record the same drag test again and compare; keep it disabled unless it can be shown not to cause problems. |
+
+![Report: plus button title color with the mask on (second row)](assets/plus-button-title-color-mask-report-ios.png)
+
+| 中文 | English |
+|:---|:---|
