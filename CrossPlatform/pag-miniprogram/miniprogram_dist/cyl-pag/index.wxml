@@ -1,0 +1,2 @@
+<!-- [EN] One WebGL canvas per PAG animation. [CN] 每个 PAG 动画一个 WebGL 画布。 -->
+<canvas type="webgl" id="{{cylCanvasId}}" class="cyl-pag-canvas" aria-role="img" aria-label="{{label}}" aria-hidden="{{!label}}"></canvas>

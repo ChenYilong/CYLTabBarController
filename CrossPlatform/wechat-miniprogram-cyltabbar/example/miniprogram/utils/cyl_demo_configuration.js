@@ -7,6 +7,22 @@
  *      examples set CYLTabBarController up」）。
  */
 const cylSharedConfiguration = require('../shared/configuration');
+const cylAnimations = require('../shared/animations');
+
+/**
+ * [EN] The PAG files that are in the package (scripts/cyl_sync_shared.js copies them when they were downloaded).
+ * [CN] 包内存在的 PAG 文件（下载后由 scripts/cyl_sync_shared.js 复制）。
+ */
+function cylAvailablePAGFiles() {
+  return cylAnimations.pag.filter((file) => {
+    try {
+      wx.getFileSystemManager().accessSync(file);
+      return true;
+    } catch (error) {
+      return false;
+    }
+  });
+}
 
 const CYL_DEMO_PLUS_BUTTON = {
   CYLTabBarItemTitle: 'Post',
@@ -65,6 +81,17 @@ function cylDemoPlatforms(items) {
     : attributes));
 }
 
+/**
+ * [EN] PAG tab icons (CYLTabBarPAGFilePath): pag-android/2J.pag, the iOS examples' PAG file that libpag-lite plays.
+ * [CN] PAG Tab 图标（CYLTabBarPAGFilePath）：pag-android/2J.pag，iOS 示例中 libpag-lite 能播放的 PAG 文件。
+ */
+function cylDemoPAGItems(items, file) {
+  return items.map((attributes) => Object.assign({}, attributes, {
+    CYLTabBarPAGFilePath: file,
+    CYLTabBarPAGSize: '{30, 30}',
+  }));
+}
+
 function cylDemoLottieItems(items) {
   return items.map((attributes) => {
     const name = CYL_DEMO_LOTTIE[attributes.CYLTabBarItemIdentifier];
@@ -84,12 +111,20 @@ function cylDemoLottieItems(items) {
 function cylDemoConfiguration(overrides) {
   const options = overrides || {};
   const sharedItems = cylDemoPlatforms(cylSharedConfiguration.CYLTabBarControllerTabBarItemsAttributes);
-  let items = options.cylDemoLottie === false ? sharedItems : cylDemoLottieItems(sharedItems);
+  const icons = options.cylDemoIcons || (options.cylDemoLottie === false ? 'images' : 'lottie');
+  const pagFile = icons === 'pag' ? cylAvailablePAGFiles()[0] : '';
+  let items = sharedItems;
+  if (pagFile) {
+    items = cylDemoPAGItems(sharedItems, pagFile);
+  } else if (icons !== 'images') {
+    items = cylDemoLottieItems(sharedItems);
+  }
   if (options.cylDemoBoldTitles) {
     items = items.map((attributes) => Object.assign({}, attributes, { CYLTabBarItemSelectedTitleFont: 'bold:11' }));
   }
   const configurationOverrides = Object.assign({}, options);
   delete configurationOverrides.cylDemoLottie;
+  delete configurationOverrides.cylDemoIcons;
   delete configurationOverrides.cylDemoBoldTitles;
   return Object.assign({}, cylSharedConfiguration, {
     CYLTabBarControllerTabBarItemsAttributes: items,
@@ -102,4 +137,4 @@ function cylDemoConfiguration(overrides) {
   }, configurationOverrides);
 }
 
-module.exports = { cylDemoConfiguration };
+module.exports = { cylDemoConfiguration, cylAvailablePAGFiles };

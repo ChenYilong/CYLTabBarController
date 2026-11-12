@@ -147,7 +147,7 @@ test('arrays handed over as array-like objects by the base library', () => {
   assert.equal(model.items[0].imageStyle, 'transform: translate(0px, 1px);');
 });
 
-test('Lottie, generic animation and GIF keys; PAG and Rive fall back to the image (B29)', () => {
+test('Lottie, PAG, Rive, generic animation and GIF keys', () => {
   const env = { animationBasePath: '/shared/lottie', isDark: false };
   const lottie = reader.cylLottie({
     CYLTabBarLottieURL: 'home.json',
@@ -157,6 +157,7 @@ test('Lottie, generic animation and GIF keys; PAG and Rive fall back to the imag
     CYLTabBarLottieLoopsWhenUnselected: true,
   }, env);
   assert.deepEqual(lottie, {
+    library: 'lottie',
     path: '/shared/lottie/home.json',
     darkPath: 'https://x/home_dark.json',
     width: 30,
@@ -169,6 +170,12 @@ test('Lottie, generic animation and GIF keys; PAG and Rive fall back to the imag
   assert.equal(generic.path, '/a/b.json');
   assert.equal(generic.height, 24);
   assert.equal(reader.cylLottie({ CYLTabBarAnimationURL: 'https://x/a.riv', CYLTabBarPAGFilePath: 'a.pag' }, env), null);
+  const pag = reader.cylPAG({ CYLTabBarPAGFilePath: '2J.pag', CYLTabBarPAGDarkFilePath: '2J_dark.pag', CYLTabBarPAGSize: '{32, 32}' }, env);
+  assert.deepEqual([pag.library, pag.path, pag.darkPath, pag.width], ['pag', '/shared/lottie/2J.pag', '/shared/lottie/2J_dark.pag', 32]);
+  assert.equal(reader.cylPAG({ CYLTabBarAnimationFilePath: '/p/a.pag' }, env).path, '/p/a.pag');
+  const rive = reader.cylRive({ CYLTabBarRiveURL: 'https://x/a.riv', CYLTabBarRiveDarkColors: { a: '#FFFFFF' } }, env);
+  assert.deepEqual([rive.library, rive.path, rive.darkColors], ['rive', 'https://x/a.riv', { a: '#FFFFFF' }]);
+  assert.equal(reader.cylRive({ CYLTabBarAnimationURL: 'https://x/a.json' }, env), null);
   assert.equal(reader.cylGIF({ CYLTabBarGIFFilePath: 'a.gif', CYLTabBarGIFDarkFilePath: 'b.gif' }, env, true), '/shared/lottie/b.gif');
   assert.equal(reader.cylGIF({ CYLTabBarAnimationURL: 'https://x/a.gif' }, env, false), 'https://x/a.gif');
 });

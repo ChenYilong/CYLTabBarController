@@ -321,21 +321,56 @@ function cylColorMap(value) {
  *      CYLTabBarAnimationDarkColors，前提是文件为 .json（与 iOS 一样由文件类型决定动画库）。
  */
 function cylLottie(attributes, environment) {
-  const isJSON = (route) => typeof route === 'string' && /\.json(\?|#|$)/i.test(route.trim())
-  const generic = [attributes.CYLTabBarAnimationURL, attributes.CYLTabBarAnimationFilePath].find(isJSON)
-  const path = cylAnimationPath(attributes.CYLTabBarLottieURL, environment) || cylAnimationPath(generic, environment)
+  return cylAnimationIcon(attributes, environment, 'Lottie', /\.json(\?|#|$)/i)
+}
+
+/**
+ * [EN] The PAG icon of a tab, or null: CYLTabBarPAGURL / CYLTabBarPAGFilePath (and their Dark variants),
+ *      CYLTabBarPAGSize, then the generic animation keys when the file is a .pag.
+ * [CN] Tab 的 PAG 图标，没有时返回 null：先读 CYLTabBarPAGURL / CYLTabBarPAGFilePath（及其 Dark 版本）、
+ *      CYLTabBarPAGSize，再读文件为 .pag 的通用动画键。
+ */
+function cylPAG(attributes, environment) {
+  return cylAnimationIcon(attributes, environment, 'PAG', /\.pag(\.bin)?(\?|#|$)/i)
+}
+
+/**
+ * [EN] The Rive icon of a tab, or null: CYLTabBarRiveURL / CYLTabBarRiveFilePath (and their Dark variants),
+ *      CYLTabBarRiveSize, CYLTabBarRiveDarkColors, then the generic animation keys when the file is a .riv.
+ * [CN] Tab 的 Rive 图标，没有时返回 null：先读 CYLTabBarRiveURL / CYLTabBarRiveFilePath（及其 Dark 版本）、
+ *      CYLTabBarRiveSize、CYLTabBarRiveDarkColors，再读文件为 .riv 的通用动画键。
+ */
+function cylRive(attributes, environment) {
+  return cylAnimationIcon(attributes, environment, 'Rive', /\.riv(\.bin)?(\?|#|$)/i)
+}
+
+/**
+ * [EN] The animated icon of one library: its own keys (CYLTabBar<Library>URL / FilePath / DarkURL / DarkFilePath /
+ *      Size / DarkColors; Lottie also LoopsWhenUnselected), then the generic CYLTabBarAnimation… keys whose file has
+ *      the library's file type.
+ * [CN] 某个动画库的动画图标：先读它自己的键（CYLTabBar<库>URL / FilePath / DarkURL / DarkFilePath / Size / DarkColors；
+ *      Lottie 另有 LoopsWhenUnselected），再读文件类型属于该库的通用 CYLTabBarAnimation… 键。
+ */
+function cylAnimationIcon(attributes, environment, library, pattern) {
+  const ofType = (route) => typeof route === 'string' && pattern.test(route.trim())
+  const own = (suffix) => attributes[`CYLTabBar${library}${suffix}`]
+  const generic = [attributes.CYLTabBarAnimationURL, attributes.CYLTabBarAnimationFilePath].find(ofType)
+  const path = cylAnimationPath(own('URL'), environment) || cylAnimationPath(own('FilePath'), environment)
+    || cylAnimationPath(generic, environment)
   if (!path) {
     return null
   }
-  const genericDark = [attributes.CYLTabBarAnimationDarkURL, attributes.CYLTabBarAnimationDarkFilePath].find(isJSON)
-  const size = cylSize(attributes.CYLTabBarLottieSize) || cylSize(attributes.CYLTabBarAnimationSize)
+  const genericDark = [attributes.CYLTabBarAnimationDarkURL, attributes.CYLTabBarAnimationDarkFilePath].find(ofType)
+  const size = cylSize(own('Size')) || cylSize(attributes.CYLTabBarAnimationSize)
   return {
+    library: library.toLowerCase(),
     path,
-    darkPath: cylAnimationPath(attributes.CYLTabBarLottieDarkURL, environment) || cylAnimationPath(genericDark, environment),
+    darkPath: cylAnimationPath(own('DarkURL'), environment) || cylAnimationPath(own('DarkFilePath'), environment)
+      || cylAnimationPath(genericDark, environment),
     width: size ? size.width : 28,
     height: size ? size.height : 28,
     colors: cylColorMap(attributes.CYLTabBarAnimationColors),
-    darkColors: cylColorMap(attributes.CYLTabBarLottieDarkColors) || cylColorMap(attributes.CYLTabBarAnimationDarkColors),
+    darkColors: cylColorMap(own('DarkColors')) || cylColorMap(attributes.CYLTabBarAnimationDarkColors),
     loopsWhenUnselected: cylBool(attributes.CYLTabBarLottieLoopsWhenUnselected, false),
   }
 }
@@ -443,7 +478,7 @@ function cylItem(attributes, environment, theme, defaults) {
     accessibilityLabel: String(attributes.CYLTabBarItemAccessibilityLabel || '') || title || identifier,
     accessibilityHint: String(attributes.CYLTabBarItemAccessibilityHint || ''),
     accessibilityIdentifier: String(attributes.CYLTabBarItemAccessibilityIdentifier || '') || identifier,
-    lottie: cylLottie(attributes, environment),
+    lottie: cylLottie(attributes, environment) || cylPAG(attributes, environment) || cylRive(attributes, environment),
     gif: cylGIF(attributes, environment, Boolean(environment.isDark)),
     titleFontStyle: cylFont(attributes.CYLTabBarItemTitleFont),
     selectedTitleFontStyle: cylFont(attributes.CYLTabBarItemSelectedTitleFont) || cylFont(attributes.CYLTabBarItemTitleFont),
@@ -581,6 +616,8 @@ function cylReadConfiguration(configuration, environment) {
 
 module.exports = {
   cylReadConfiguration,
+  cylPAG,
+  cylRive,
   cylFont,
   cylRenderingMode,
   cylLottie,

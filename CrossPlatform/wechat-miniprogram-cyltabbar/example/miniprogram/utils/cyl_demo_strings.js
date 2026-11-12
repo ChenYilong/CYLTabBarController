@@ -60,7 +60,8 @@ module.exports = {
     "Events": "Events",
     "Loop": "Loop",
     "Four tabs and a plus button, as in the iOS example: the shared configuration limits Message to iOS and Android (CYLTabBarItemPlatforms), so this example adds the mini program.": "Four tabs and a plus button, as in the iOS example: the shared configuration limits Message to iOS and Android (CYLTabBarItemPlatforms), so this example adds the mini program.",
-    "cyl-tab-bar-item playground": "cyl-tab-bar-item playground"
+    "cyl-tab-bar-item playground": "cyl-tab-bar-item playground",
+    "Run the PAG download first": "Run the PAG download first"
   },
   "zh-Hans": {
     "Home": "首页",
@@ -118,7 +119,8 @@ module.exports = {
     "Events": "事件",
     "Loop": "循环",
     "Four tabs and a plus button, as in the iOS example: the shared configuration limits Message to iOS and Android (CYLTabBarItemPlatforms), so this example adds the mini program.": "与 iOS 示例一样显示四个 Tab 与 PlusButton：共用配置把 Message 限定为 iOS 与 Android（CYLTabBarItemPlatforms），因此本示例加上了小程序平台。",
-    "cyl-tab-bar-item playground": "cyl-tab-bar-item 演示"
+    "cyl-tab-bar-item playground": "cyl-tab-bar-item 演示",
+    "Run the PAG download first": "请先下载 PAG 文件"
   },
   "zh-Hant": {
     "Home": "首頁",
@@ -176,6 +178,7 @@ module.exports = {
     "Events": "事件",
     "Loop": "循環",
     "Four tabs and a plus button, as in the iOS example: the shared configuration limits Message to iOS and Android (CYLTabBarItemPlatforms), so this example adds the mini program.": "與 iOS 示例一樣顯示四個 Tab 與 PlusButton：共用設定把 Message 限定為 iOS 與 Android（CYLTabBarItemPlatforms），因此本示例加上了小程式平台。",
-    "cyl-tab-bar-item playground": "cyl-tab-bar-item 演示"
+    "cyl-tab-bar-item playground": "cyl-tab-bar-item 演示",
+    "Run the PAG download first": "請先下載 PAG 檔案"
   }
 };

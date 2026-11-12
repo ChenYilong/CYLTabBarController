@@ -1,0 +1,17 @@
+{
+  "name": "cyl-pag-miniprogram",
+  "version": "0.1.0",
+  "description": "PAG animations for WeChat Mini Program: the cyl-pag component on libpag-lite-miniprogram (Tencent/libpag web/lite 0.0.6, vendored)",
+  "license": "MIT",
+  "author": "ChenYilong <luohanchenyilong@163.com>",
+  "homepage": "https://github.com/ChenYilong/CYLTabBarController/tree/master/CrossPlatform/pag-miniprogram",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ChenYilong/CYLTabBarController.git",
+    "directory": "CrossPlatform/pag-miniprogram"
+  },
+  "keywords": ["miniprogram", "pag", "libpag", "CYLTabBarController"],
+  "miniprogram": "miniprogram_dist",
+  "main": "miniprogram_dist/libpag/pag.js",
+  "files": ["miniprogram_dist", "README.md", "LICENSE", "NOTICE"]
+}

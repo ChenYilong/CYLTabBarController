@@ -7,10 +7,12 @@
  */
 const reader = require('../cyl-tab-bar/cyl_configuration');
 
+// [EN] A mini program code package leaves out .pag and .riv files, so package copies are named *.pag.bin / *.riv.bin.
+// [CN] 小程序代码包不包含 .pag 与 .riv 文件，因此包内副本命名为 *.pag.bin / *.riv.bin。
 const CYL_ANIMATION_TYPES = [
   ['lottie', /\.json(\?|#|$)/i],
-  ['pag', /\.pag(\?|#|$)/i],
-  ['rive', /\.riv(\?|#|$)/i],
+  ['pag', /\.pag(\.bin)?(\?|#|$)/i],
+  ['rive', /\.riv(\.bin)?(\?|#|$)/i],
 ];
 
 /**

@@ -6,7 +6,7 @@
  *      所有 TabBar 实例都会跟随：角标、皮肤、样式、点击动画与需要登录的 Tab。
  */
 const cylTabPage = require('../../utils/cyl_tab_page');
-const { cylDemoConfiguration } = require('../../utils/cyl_demo_configuration');
+const { cylDemoConfiguration, cylAvailablePAGFiles } = require('../../utils/cyl_demo_configuration');
 
 const CYL_STYLE_TYPES = ['default', 'flatDesign', 'liquidGlass'];
 const CYL_TAP_ANIMATIONS = [['none', 'None'], ['bounce', 'Bounce'], ['rotation', 'Rotation'], ['scale', 'Scale']];
@@ -20,7 +20,8 @@ Component({
     state: {},
     currentStyleType: '',
     currentTapAnimation: '',
-    usesLottie: true,
+    icons: 'lottie',
+    pagAvailable: false,
   },
   lifetimes: {
     attached() {
@@ -45,7 +46,8 @@ Component({
         state,
         currentStyleType: configuration.CYLTabBarControllerStyleType,
         currentTapAnimation: configuration.CYLTabBarControllerTabButtonTapAnimation,
-        usesLottie: (state.overrides || {}).cylDemoLottie !== false,
+        icons: (state.overrides || {}).cylDemoIcons || ((state.overrides || {}).cylDemoLottie === false ? 'images' : 'lottie'),
+        pagAvailable: cylAvailablePAGFiles().length > 0,
       });
     },
     cyl_update(change) {
@@ -82,7 +84,12 @@ Component({
       wx.navigateTo({ url: '/pages/lottie/index' });
     },
     cyl_icons(event) {
-      this.cyl_override({ cylDemoLottie: event.currentTarget.dataset.value === 'lottie' });
+      const icons = event.currentTarget.dataset.value;
+      if (icons === 'pag' && !this.data.pagAvailable) {
+        wx.showToast({ title: this.t('Run the PAG download first'), icon: 'none' });
+        return;
+      }
+      this.cyl_override({ cylDemoIcons: icons, cylDemoLottie: icons !== 'images' });
     },
     cyl_swipeOption(event) {
       this.cyl_override({ CYLTabBarControllerSwipeToSwitchTab: event.detail.value });

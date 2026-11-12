@@ -1,6 +1,20 @@
 <view class="cyl-page">
   <view class="cyl-lottie-stage">
+    <cyl-pag
+      wx:if="{{isPAG}}"
+      id="cyl-playground"
+      class="cyl-lottie-view"
+      path="{{path}}"
+      loop="{{loop}}"
+      fit="{{fit}}"
+      label="{{texts['Animation']}}, {{file}}"
+      bind:ready="cyl_event"
+      bind:complete="cyl_event"
+      bind:loopcomplete="cyl_event"
+      bind:error="cyl_event"
+    />
     <cyl-lottie
+      wx:else
       id="cyl-playground"
       class="cyl-lottie-view"
       path="{{path}}"

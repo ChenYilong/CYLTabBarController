@@ -6,6 +6,8 @@
 const { t } = require('../../utils/cyl_demo_localization');
 const cylDemoStrings = require('../../utils/cyl_demo_strings');
 
+const { cylAvailablePAGFiles } = require('../../utils/cyl_demo_configuration');
+
 const CYL_FILES = ['green_lottie_tab_home', 'green_lottie_tab_discover', 'green_lottie_tab_mine'];
 
 Page({
@@ -24,6 +26,9 @@ Page({
   },
 
   onLoad() {
+    // [EN] The PAG file (cyl-pag) joins the list when it was downloaded. [CN] 下载了 PAG 文件时加入列表（cyl-pag）。
+    this.cylPAGFiles = cylAvailablePAGFiles();
+    this.setData({ files: CYL_FILES.concat(this.cylPAGFiles.map((file) => file.split('/').pop().replace(/\.bin$/, ''))) });
     const texts = {};
     Object.keys(cylDemoStrings.en).forEach((key) => {
       texts[key] = t(key);
@@ -36,7 +41,8 @@ Page({
   },
   cyl_file(event) {
     const file = event.currentTarget.dataset.value;
-    this.setData({ file, path: `/shared/lottie/${file}.json` });
+    const pag = this.cylPAGFiles.find((candidate) => candidate.endsWith(`/${file}.bin`));
+    this.setData({ file, path: pag || `/shared/lottie/${file}.json`, isPAG: Boolean(pag) });
   },
   cyl_play() {
     this.cyl_lottie().cyl_play();
