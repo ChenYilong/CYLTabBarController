@@ -1,15 +1,15 @@
 /**
- * [EN] Tests of the configuration reader of cyl-tab-bar (miniprogram/components/cyl-tab-bar/cyl_configuration.js),
+ * [EN] Tests of the configuration reader of cyl-tab-bar (src/cyl-tab-bar/cyl_configuration.js),
  *      with the shared sample configuration and edge cases. Run: `npm test` (node --test).
  * [CN] cyl-tab-bar 配置读取器（miniprogram/components/cyl-tab-bar/cyl_configuration.js）的测试，使用共用示例配置与
  *      边界情况。运行：`npm test`（node --test）。
  */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const reader = require('../miniprogram/components/cyl-tab-bar/cyl_configuration');
-const sharedConfiguration = require('../miniprogram/shared/configuration');
-const symbolsByTheme = require('../miniprogram/shared/symbols');
-const localization = require('../miniprogram/shared/localization');
+const reader = require('../src/cyl-tab-bar/cyl_configuration');
+const sharedConfiguration = require('../example/miniprogram/shared/configuration');
+const symbolsByTheme = require('../example/miniprogram/shared/symbols');
+const localization = require('../example/miniprogram/shared/localization');
 
 const CYL_PLUS_BUTTON = {
   CYLTabBarItemTitle: 'Post',
@@ -145,4 +145,59 @@ test('arrays handed over as array-like objects by the base library', () => {
   assert.deepEqual(model.items.map((item) => item.identifier), ['a', 'b']);
   assert.deepEqual(model.loginRequiredIdentifiers, ['b']);
   assert.equal(model.items[0].imageStyle, 'transform: translate(0px, 1px);');
+});
+
+test('Lottie, generic animation and GIF keys; PAG and Rive fall back to the image (B29)', () => {
+  const env = { animationBasePath: '/shared/lottie', isDark: false };
+  const lottie = reader.cylLottie({
+    CYLTabBarLottieURL: 'home.json',
+    CYLTabBarLottieDarkURL: 'https://x/home_dark.json',
+    CYLTabBarLottieSize: '{30, 30}',
+    CYLTabBarLottieDarkColors: { '**.Fill 1': '#FFFFFF', bad: 'red' },
+    CYLTabBarLottieLoopsWhenUnselected: true,
+  }, env);
+  assert.deepEqual(lottie, {
+    path: '/shared/lottie/home.json',
+    darkPath: 'https://x/home_dark.json',
+    width: 30,
+    height: 30,
+    colors: null,
+    darkColors: { '**.Fill 1': '#FFFFFF' },
+    loopsWhenUnselected: true,
+  });
+  const generic = reader.cylLottie({ CYLTabBarAnimationFilePath: '/a/b.json#loop=1', CYLTabBarAnimationSize: [20, 24] }, env);
+  assert.equal(generic.path, '/a/b.json');
+  assert.equal(generic.height, 24);
+  assert.equal(reader.cylLottie({ CYLTabBarAnimationURL: 'https://x/a.riv', CYLTabBarPAGFilePath: 'a.pag' }, env), null);
+  assert.equal(reader.cylGIF({ CYLTabBarGIFFilePath: 'a.gif', CYLTabBarGIFDarkFilePath: 'b.gif' }, env, true), '/shared/lottie/b.gif');
+  assert.equal(reader.cylGIF({ CYLTabBarAnimationURL: 'https://x/a.gif' }, env, false), 'https://x/a.gif');
+});
+
+test('title fonts, image URL size, icon rendering mode and colors (#787), plus button selection', () => {
+  assert.equal(reader.cylFont(15), 'font-size: 15px; line-height: 18px;');
+  assert.equal(reader.cylFont({ name: 'Menlo', size: 12, weight: 'semibold' }),
+    'font-size: 12px; line-height: 14px; font-weight: 600; font-family: "Menlo";');
+  assert.equal(reader.cylFont('bold:0'), '');
+  assert.equal(reader.cylRenderingMode('Template'), 'template');
+  assert.equal(reader.cylRenderingMode('tinted'), '');
+  const model = reader.cylReadConfiguration({
+    CYLTabBarControllerIconColor: '#111111',
+    CYLTabBarControllerSelectedIconColor: '#222222',
+    CYLTabBarControllerTabBarItemsAttributes: [
+      { CYLTabBarItemIdentifier: 'symbol', CYLTabBarItemImage: 'system:house' },
+      { CYLTabBarItemIdentifier: 'png', CYLTabBarItemImage: 'a.png' },
+      { CYLTabBarItemIdentifier: 'template', CYLTabBarItemImage: 'a.png', CYLTabBarItemIconRenderingMode: 'template',
+        CYLTabBarItemSelectedIconColor: '#333333' },
+      { CYLTabBarItemIdentifier: 'original', CYLTabBarItemImage: 'system:house', CYLTabBarItemIconRenderingMode: 'original',
+        CYLTabBarItemTitleFont: 'bold:12', CYLTabBarItemImageURLSize: '{24, 24}' },
+    ],
+    CYLTabBarControllerPlusButton: { CYLTabBarItemIdentifier: 'plus', CYLPlusButtonShowsSelection: 'true' },
+  }, { symbols: { house: '/h.png' } });
+  const [symbol, png, template, original] = model.items;
+  assert.deepEqual([symbol.iconTint, symbol.selectedIconTint], ['#111111', '#222222']);
+  assert.deepEqual([png.iconTint, png.selectedIconTint], ['', '']);
+  assert.deepEqual([template.iconTint, template.selectedIconTint], ['#111111', '#333333']);
+  assert.deepEqual([original.iconTint, original.titleFontStyle, original.imageSize],
+    ['', 'font-size: 12px; line-height: 14px; font-weight: 700;', { width: 24, height: 24 }]);
+  assert.equal(model.plusButton.showsSelection, true);
 });

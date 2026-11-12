@@ -1,0 +1,19 @@
+<view class="cyl-page" bindtouchstart="cyl_onSwipeStart" bindtouchend="cyl_onSwipeEnd">
+  <view class="cyl-header">
+    <text class="cyl-header-title" aria-role="heading">{{texts['Discover']}}</text>
+  </view>
+  <text class="cyl-section-title" aria-role="heading">{{texts['Page parameters']}}</text>
+  <view class="cyl-section">
+    <view class="cyl-row" aria-label="{{texts['Page identifier']}}, web">
+      <text aria-hidden="true">{{texts['Page identifier']}}</text>
+      <text class="cyl-row-value" aria-hidden="true">web</text>
+    </view>
+    <view class="cyl-row" aria-label="url, {{url}}">
+      <text aria-hidden="true">url</text>
+      <text class="cyl-row-value" aria-hidden="true">{{url}}</text>
+    </view>
+    <view class="cyl-row cyl-row-action" bindtap="cyl_copyLink" aria-role="button" aria-label="{{texts['Copy link']}}">
+      <text aria-hidden="true">{{texts['Copy link']}}</text>
+    </view>
+  </view>
+</view>

@@ -1,12 +1,23 @@
 {
-  "name": "wechat-miniprogram-cyltabbar",
-  "version": "0.1.0",
-  "description": "CYLTabBarController for WeChat Mini Program: a custom tab bar component configured with the CYLTabBarController configuration keys",
-  "private": true,
+  "name": "cyl-tabbar-miniprogram",
+  "version": "0.2.0",
+  "description": "CYLTabBarController for WeChat Mini Program: the cyl-tab-bar custom tab bar component, configured with the CYLTabBarController configuration keys, with Lottie tab icons through cyl-lottie-miniprogram",
   "license": "MIT",
+  "author": "ChenYilong <luohanchenyilong@163.com>",
+  "homepage": "https://github.com/ChenYilong/CYLTabBarController/tree/master/CrossPlatform/wechat-miniprogram-cyltabbar",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ChenYilong/CYLTabBarController.git",
+    "directory": "CrossPlatform/wechat-miniprogram-cyltabbar"
+  },
+  "keywords": ["miniprogram", "tabbar", "custom-tab-bar", "lottie", "CYLTabBarController"],
+  "miniprogram": "src",
+  "main": "src/cyl-tab-bar/cyl_configuration.js",
+  "files": ["src", "README.md", "LICENSE", "NOTICE"],
+  "dependencies": {
+    "cyl-lottie-miniprogram": "file:../lottie-miniprogram"
+  },
   "scripts": {
-    "sync": "node scripts/cyl_sync_shared.js",
-    "sync:check": "node scripts/cyl_sync_shared.js --check",
     "test": "node --test test/*.test.js"
   }
 }

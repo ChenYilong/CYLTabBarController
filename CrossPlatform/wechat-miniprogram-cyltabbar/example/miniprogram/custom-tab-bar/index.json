@@ -1,0 +1,6 @@
+{
+  "component": true,
+  "usingComponents": {
+    "cyl-tab-bar": "cyl-tabbar-miniprogram/cyl-tab-bar/index"
+  }
+}

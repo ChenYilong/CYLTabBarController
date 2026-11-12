@@ -1,6 +1,0 @@
-<view class="cyl-page">
-  <view class="cyl-header">
-    <text class="cyl-header-title" aria-role="heading">{{texts['Post']}}</text>
-    <text class="cyl-header-subtitle">{{texts["The plus button's own page (CYLTabBarItemPageIdentifier: publish)."]}}</text>
-  </view>
-</view>

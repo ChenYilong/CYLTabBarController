@@ -85,6 +85,18 @@ Component({
         this.cylAnimation.setSpeed(speed)
       }
     },
+    'loop, autoplay, restingFrame': function (loop, autoplay) {
+      const animation = this.cylAnimation
+      if (!animation || !animation.isLoaded) {
+        return
+      }
+      animation.setLoop(loop)
+      if (autoplay) {
+        animation.play()
+      } else if (animation.isPaused) {
+        this.cyl_rest()
+      }
+    },
   },
 
   lifetimes: {
@@ -175,14 +187,19 @@ Component({
             this.setData({animationData: data, path: ''})
             return
           }
+          // [EN] A `path` load returns a stand-in; from here on use the animation itself. [CN] `path` 加载返回替身；此后使用动画本身。
+          this.cylAnimation = animation.cylAnimation || animation
           if (speed > 0 && speed !== 1) {
-            animation.setSpeed(speed)
+            this.cylAnimation.setSpeed(speed)
           }
           this.cyl_rest()
           if (autoplay) {
-            animation.play()
+            this.cylAnimation.play()
           }
-          this.triggerEvent('ready', {totalFrames: animation.totalFrames, duration: animation.getDuration(false)})
+          this.triggerEvent('ready', {
+            totalFrames: this.cylAnimation.totalFrames,
+            duration: this.cylAnimation.getDuration(false),
+          })
         })
         animation.addEventListener('complete', () => this.triggerEvent('complete', {}))
         animation.addEventListener('loopComplete', () => this.triggerEvent('loopcomplete', {}))

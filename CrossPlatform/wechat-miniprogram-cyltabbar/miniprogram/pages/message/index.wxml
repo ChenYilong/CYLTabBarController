@@ -1,6 +1,0 @@
-<view class="cyl-page">
-  <view class="cyl-header">
-    <text class="cyl-header-title" aria-role="heading">{{texts['Message']}}</text>
-    <text class="cyl-header-subtitle">{{texts['Message is hidden here: its CYLTabBarItemPlatforms is "ios,android".']}}</text>
-  </view>
-</view>

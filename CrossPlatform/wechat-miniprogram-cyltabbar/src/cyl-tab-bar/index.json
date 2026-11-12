@@ -1,0 +1,6 @@
+{
+  "component": true,
+  "usingComponents": {
+    "cyl-lottie": "cyl-lottie-miniprogram/cyl-lottie/index"
+  }
+}

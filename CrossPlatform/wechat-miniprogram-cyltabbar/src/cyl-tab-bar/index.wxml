@@ -1,0 +1,48 @@
+<!-- [EN] The tab bar: a tab list with one tab per item and the raised plus button. [CN] TabBar：每项一个 Tab 的列表，以及凸起的 PlusButton。 -->
+<view class="cyl-tab-bar cyl-style-{{cylStyleType}} {{cylIsDark ? 'cyl-dark' : ''}}" style="{{cylBarStyle}}" aria-role="tablist">
+  <view
+    wx:for="{{cylSlots}}"
+    wx:key="key"
+    class="cyl-tab {{item.selected ? 'cyl-selected' : ''}} {{item.isPlusButton ? 'cyl-plus-slot' : ''}}"
+    style="{{item.itemStyle}}"
+    data-key="{{item.key}}"
+    id="{{item.accessibilityIdentifier}}"
+    bindtap="cyl_onTap"
+    aria-role="{{item.isPlusButton ? 'button' : 'tab'}}"
+    aria-label="{{item.accessibilityLabel}}"
+    aria-selected="{{item.selected}}"
+  >
+    <block wx:if="{{item.isPlusButton}}">
+      <view wx:if="{{item.showsSelection}}" class="cyl-plus-selection" aria-hidden="true"></view>
+      <view class="cyl-plus-button {{cylAnimatingIdentifier === item.key ? 'cyl-animate-' + cylTapAnimation : ''}}" style="{{item.buttonStyle}} {{cylAnimationStyle}}">
+        <image wx:if="{{item.backgroundImage}}" class="cyl-plus-background" src="{{item.backgroundImage}}" mode="aspectFit" aria-hidden="true" />
+        <image wx:if="{{item.image}}" class="cyl-plus-image" src="{{item.image}}" style="{{item.imageStyle}}" mode="aspectFit" aria-hidden="true" />
+        <text wx:if="{{item.title}}" class="cyl-title" style="{{item.titleStyle}}" aria-hidden="true">{{item.title}}</text>
+      </view>
+    </block>
+    <block wx:else>
+      <view class="cyl-tab-content {{cylAnimatingIdentifier === item.key ? 'cyl-animate-' + cylTapAnimation : ''}}" style="{{cylAnimationStyle}}">
+        <view class="cyl-icon-box" style="{{item.lottieStyle}}">
+          <cyl-lottie
+            wx:if="{{item.lottiePath}}"
+            id="cyl-lottie-{{item.key}}"
+            class="cyl-lottie"
+            style="{{item.lottieStyle}} {{item.imageStyle}}"
+            path="{{item.lottiePath}}"
+            colors="{{item.lottieColors}}"
+            loop="{{item.lottieLoop}}"
+            autoplay="{{item.lottieAutoplay}}"
+            resting-frame="{{item.lottieResting}}"
+          />
+          <view wx:elif="{{item.image && item.tint}}" class="cyl-tint-box" style="{{item.imageStyle}} {{item.imageSizeStyle}}" aria-hidden="true">
+            <image class="cyl-icon cyl-tinted" src="{{item.image}}" style="{{item.imageSizeStyle}} filter: drop-shadow({{item.tint}} 200px 0);" mode="aspectFit" />
+          </view>
+          <image wx:elif="{{item.image}}" class="cyl-icon" src="{{item.image}}" style="{{item.imageStyle}} {{item.imageSizeStyle}}" mode="aspectFit" aria-hidden="true" />
+          <text wx:if="{{item.badge}}" class="cyl-badge" aria-hidden="true">{{item.badge}}</text>
+          <view wx:if="{{item.showsDot}}" class="cyl-badge-dot" aria-hidden="true"></view>
+        </view>
+        <text wx:if="{{item.title}}" class="cyl-title" style="{{item.titleStyle}}" aria-hidden="true">{{item.title}}</text>
+      </view>
+    </block>
+  </view>
+</view>

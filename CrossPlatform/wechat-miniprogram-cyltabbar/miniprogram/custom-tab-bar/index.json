@@ -1,6 +1,0 @@
-{
-  "component": true,
-  "usingComponents": {
-    "cyl-tab-bar": "/components/cyl-tab-bar/index"
-  }
-}

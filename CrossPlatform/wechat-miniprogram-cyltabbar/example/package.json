@@ -1,0 +1,16 @@
+{
+  "name": "cyl-tabbar-miniprogram-example",
+  "version": "0.2.0",
+  "private": true,
+  "description": "The example mini program of cyl-tabbar-miniprogram (AppID wx5e29c9d33906f074)",
+  "license": "MIT",
+  "dependencies": {
+    "cyl-tabbar-miniprogram": "file:.."
+  },
+  "scripts": {
+    "setup": "node scripts/cyl_install_components.js && node scripts/cyl_sync_shared.js",
+    "install-components": "node scripts/cyl_install_components.js",
+    "sync": "node scripts/cyl_sync_shared.js",
+    "check": "node scripts/cyl_install_components.js --check && node scripts/cyl_sync_shared.js --check"
+  }
+}
