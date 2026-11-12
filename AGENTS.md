@@ -259,6 +259,7 @@ Unless a task says otherwise, every CYLTabBarController in the example layer is 
    the page registry or the global registry). See [docs/Configuration-File.md](docs/Configuration-File.md).
 A demo that shows another setup on purpose (no plus button, a plus button without a page, attributes built in code, a
 `CYLPlusButtonSubclassing` subclass) says so in its title or comment.
+3. **A raised plus button (added 2026-11-12)**: when an example demonstrates the plus button, always prefer the raised look: the top of the plus button reaches above the top edge of the tab bar (an image taller than the bar, and/or `+multiplierOfTabBarHeight:` below 0.5 or a negative `+constantOfPlusButtonCenterYOffsetForTabBarHeight:`), in every style (classic, Liquid Glass, FlatDesign). A demo that needs a flat plus button (inside the bar) says so in its title or comment.
 
 ## Xcode projects: Podfile, app icon, launch screen
 

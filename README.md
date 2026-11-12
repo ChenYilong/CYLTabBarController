@@ -347,7 +347,9 @@ Analyst.ai [App Store Link](https://itunes.apple.com/us/app/analyst-ai/id1345754
 | [资源路由](docs/Resource-Routes.md) | [Resource routes](docs/Resource-Routes.md) |
 | [Rive 动画 Tab 图标（与 Lottie、PAG 用法相同）](docs/Rive-Animation.md) | [Rive animated tab icons (used like Lottie and PAG)](docs/Rive-Animation.md) |
 | [selectedIndex 与 PlusButton：选中的文字与图片一致](docs/SelectedIndex-PlusButton.md) | [selectedIndex and the PlusButton: the selected title and image match](docs/SelectedIndex-PlusButton.md) |
+| [Swift 编码规范](docs/Swift-Coding-Style.md) | [Swift coding style](docs/Swift-Coding-Style.md) |
 | [在 Swift 项目中使用 CYLTabBarController](docs/Swift-Guide.md) | [Using CYLTabBarController in Swift](docs/Swift-Guide.md) |
+| [iOS 核心层迁移到 Swift](docs/Swift-Migration.md) | [Migrating the iOS core layer to Swift](docs/Swift-Migration.md) |
 | [在 SwiftUI 项目中集成 CYLTabBarController](docs/SwiftUI-Integration.md) | [Integrating CYLTabBarController in a SwiftUI app](docs/SwiftUI-Integration.md) |
 | [Tab 的无障碍与 UI 测试](docs/Tab-Accessibility.md) | [Tab Accessibility and UI Tests](docs/Tab-Accessibility.md) |
 | [TabBar 图库](docs/Tab-Bar-Gallery.md) | [Tab Bar Gallery](docs/Tab-Bar-Gallery.md) |
