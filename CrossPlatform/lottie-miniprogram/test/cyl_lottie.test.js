@@ -16,7 +16,7 @@ const cylFiles = {}
 
 global.wx = {
   getSystemInfoSync: () => ({pixelRatio: 3}),
-  env: {USER_DATA_PATH: 'wxfile://usr'},
+  env: {USER_DATA_PATH: 'http://usr'},
   request({url, success, fail}) {
     setTimeout(() => {
       if (url.endsWith('/missing.json')) {
@@ -30,7 +30,7 @@ global.wx = {
   },
   getFileSystemManager: () => ({
     readFileSync(filePath) {
-      if (filePath === '/assets/home.json') {
+      if (filePath === '/assets/home.json' || filePath === 'http://usr/home.json') {
         return fs.readFileSync(CYL_SAMPLE, 'utf8')
       }
       throw new Error('no such file')
@@ -172,6 +172,10 @@ test('path: package file, network URL, HTTP error, zip (#15, #42, #47)', async (
   const local = cylLoad(canvas, {animationData: undefined, path: '/assets/home.json'})
   assert.ok(local.totalFrames > 0 || local.cylAnimation)
   local.destroy()
+  // [EN] The DevTools user data folder is an http URL, read as a file. [CN] 开发者工具的用户数据目录是 http 地址，按文件读取。
+  const userData = cylLoad(canvas, {animationData: undefined, path: 'http://usr/home.json'})
+  assert.ok(userData.cylAnimation, 'read synchronously from the file system, not requested over the network')
+  userData.destroy()
 
   let ready = false
   const remote = cylLoad(canvas, {animationData: undefined, path: 'https://example.com/home.json', autoplay: false})
@@ -251,5 +255,57 @@ test('many speed changes in a row keep the animation running (#27)', async () =>
   }
   const before = animation.currentFrame
   assert.ok(await cylWaitFor(() => animation.currentFrame !== before))
+  animation.destroy()
+})
+
+test('embedded images load from the canvas node even when context.canvas is another object (#31, #4, #36)', async () => {
+  const canvas = cylCanvas('images')
+  const realContext = canvas.getContext('2d')
+  const context = new Proxy(realContext, {
+    get(target, key) {
+      return key === 'canvas' ? {width: 300, height: 300} : target[key]
+    },
+    set(target, key, value) {
+      return key === 'canvas' ? true : Reflect.set(target, key, value)
+    },
+  })
+  canvas.getContext = () => context
+  // [EN] Like the base library's Image: `src` is an accessor on the prototype. [CN] 与基础库的 Image 一样：`src` 是原型上的访问器。
+  class CYLFakeImage {
+    constructor() {
+      this.width = 1
+      this.height = 1
+      this.listeners = {}
+      this.source = ''
+    }
+    addEventListener(name, callback) {
+      this.listeners[name] = callback
+    }
+    get src() {
+      return this.source
+    }
+    set src(value) {
+      this.source = value
+      setTimeout(() => this.listeners.load && this.listeners.load(), 1)
+    }
+  }
+  canvas.createImage = () => new CYLFakeImage()
+  const data = cylAnimationData()
+  data.assets = (data.assets || []).concat({
+    id: 'image_0', w: 1, h: 1, u: '', e: 1,
+    p: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
+  })
+  data.layers.unshift({
+    ddd: 0, ind: 98, ty: 2, nm: 'Image', refId: 'image_0', sr: 1, ao: 0, ip: 0, op: data.op, st: 0, bm: 0,
+    ks: {o: {a: 0, k: 100}, r: {a: 0, k: 0}, p: {a: 0, k: [0, 0, 0]}, a: {a: 0, k: [0, 0, 0]}, s: {a: 0, k: [100, 100, 100]}},
+  })
+  lottie.setup(canvas)
+  let loaded = false
+  const animation = lottie.loadAnimation({loop: true, autoplay: true, animationData: data, rendererSettings: {context}})
+  animation.addEventListener('DOMLoaded', () => {
+    loaded = true
+  })
+  assert.ok(await cylWaitFor(() => loaded && animation.currentFrame > 0))
+  assert.ok(Object.keys(cylFiles).some((file) => file.endsWith('.png')), 'the base64 image was written to a file')
   animation.destroy()
 })

@@ -49,6 +49,21 @@ g.navigator = g.window.navigator = {
  * [EN] The canvas that drives the frames and creates images: the latest canvas still registered.
  * [CN] 驱动帧并创建图片的 canvas：仍在注册中的最新 canvas。
  */
+/**
+ * [EN] The canvas node of each 2D context passed through setup(): `context.canvas` is not always that node (in the
+ *      DevTools it is an object without createImage), and images must come from the node (upstream issue #31).
+ * [CN] 每个经过 setup() 的 2D context 对应的 canvas 节点：`context.canvas` 并不总是该节点（在开发者工具中它是没有
+ *      createImage 的对象），而图片必须由节点创建（上游 issue #31）。
+ */
+const contextCanvases = new WeakMap()
+
+export function canvasOfContext(context) {
+  if (!context) {
+    return null
+  }
+  return contextCanvases.get(context) || (context.canvas && typeof context.canvas.createImage === 'function' ? context.canvas : null)
+}
+
 function currentCanvas() {
   return g.canvases.length > 0 ? g.canvases[g.canvases.length - 1] : null
 }
@@ -205,8 +220,11 @@ export const setup = (canvas) => {
     // [CN] issue #32：context 为 null 时，后面会报出误导性的错误。
     throw new Error('lottie.setup(canvas): canvas.getContext("2d") returned null; use <canvas type="2d">.')
   }
+  contextCanvases.set(ctx, canvas)
   if (!ctx.canvas) {
-    ctx.canvas = canvas
+    try {
+      ctx.canvas = canvas
+    } catch (e) {}
   }
   g.canvases = g.canvases.filter(item => item !== canvas)
   g.canvases.push(canvas)

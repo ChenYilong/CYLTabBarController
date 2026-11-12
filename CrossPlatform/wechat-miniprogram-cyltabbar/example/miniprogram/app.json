@@ -4,7 +4,8 @@
     "pages/message/index",
     "pages/publish/index",
     "pages/web/index",
-    "pages/me/index"
+    "pages/me/index",
+    "pages/lottie/index"
   ],
   "window": {
     "navigationBarTitleText": "CYLTabBarController",
@@ -19,11 +20,26 @@
     "color": "#8e8e93",
     "selectedColor": "#007aff",
     "list": [
-      { "pagePath": "pages/home/index", "text": "Home" },
-      { "pagePath": "pages/message/index", "text": "Message" },
-      { "pagePath": "pages/publish/index", "text": "Post" },
-      { "pagePath": "pages/web/index", "text": "Discover" },
-      { "pagePath": "pages/me/index", "text": "Me" }
+      {
+        "pagePath": "pages/home/index",
+        "text": "Home"
+      },
+      {
+        "pagePath": "pages/message/index",
+        "text": "Message"
+      },
+      {
+        "pagePath": "pages/publish/index",
+        "text": "Post"
+      },
+      {
+        "pagePath": "pages/web/index",
+        "text": "Discover"
+      },
+      {
+        "pagePath": "pages/me/index",
+        "text": "Me"
+      }
     ]
   },
   "usingComponents": {},

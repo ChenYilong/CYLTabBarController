@@ -1,4 +1,4 @@
-import {setup, g, restore, setFrameInterval, OffscreenCanvas as CYLOffscreenCanvas} from './adapter'
+import {setup, g, restore, setFrameInterval, canvasOfContext, OffscreenCanvas as CYLOffscreenCanvas} from './adapter'
 const {window, document, navigator} = g
 // [EN] Issue #53: lottie-web calls `new XMLHttpRequest()`; a mini game has no such global and strict mode forbids
 //      assigning one, so the name is declared in this module instead.
@@ -25,6 +25,12 @@ const lottieWeb = (function (module, exports, define, globalThis, self) {
  * [CN] 路径是否为网络地址。
  */
 function isNetworkPath(path) {
+  // [EN] The user data folder is "http://usr" in the DevTools and "wxfile://usr" on devices: always a file.
+  // [CN] 用户数据目录在开发者工具中为 "http://usr"，在真机上为 "wxfile://usr"：始终是文件。
+  const userDataPath = (typeof wx !== 'undefined' && wx.env && wx.env.USER_DATA_PATH) || ''
+  if (userDataPath && path.indexOf(userDataPath) === 0) {
+    return false
+  }
   return /^https?:\/\//.test(path)
 }
 
@@ -192,7 +198,7 @@ function loadAnimation(options) {
   if (!options.rendererSettings || !options.rendererSettings.context) {
     throw new Error(`Parameter 'rendererSettings.context' should be a CanvasRenderingContext2D.`)
   }
-  const canvas = options.rendererSettings.context.canvas
+  const canvas = canvasOfContext(options.rendererSettings.context)
   if (canvas) {
     // [EN] Issues #36, #55: images and frames use this animation's own canvas, so several canvases work together.
     // [CN] issue #36、#55：图片与帧使用该动画自己的 canvas，因此多个 canvas 可以同时工作。

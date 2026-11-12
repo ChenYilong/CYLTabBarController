@@ -49,7 +49,17 @@ module.exports = {
     "Lottie": "Lottie",
     "Swipe to switch tabs": "Swipe to switch tabs",
     "Bold selected titles": "Bold selected titles",
-    "Options": "Options"
+    "Options": "Options",
+    "cyl-lottie playground": "cyl-lottie playground",
+    "Play": "Play",
+    "Pause": "Pause",
+    "Stop": "Stop",
+    "Speed": "Speed",
+    "Fit": "Fit",
+    "Recolor": "Recolor",
+    "Animation": "Animation",
+    "Events": "Events",
+    "Loop": "Loop"
   },
   "zh-Hans": {
     "Home": "首页",
@@ -96,7 +106,17 @@ module.exports = {
     "Lottie": "Lottie",
     "Swipe to switch tabs": "滑动切换 Tab",
     "Bold selected titles": "选中标题加粗",
-    "Options": "选项"
+    "Options": "选项",
+    "cyl-lottie playground": "cyl-lottie 演示",
+    "Play": "播放",
+    "Pause": "暂停",
+    "Stop": "停止",
+    "Speed": "速度",
+    "Fit": "缩放方式",
+    "Recolor": "换色",
+    "Animation": "动画",
+    "Events": "事件",
+    "Loop": "循环"
   },
   "zh-Hant": {
     "Home": "首頁",
@@ -143,6 +163,16 @@ module.exports = {
     "Lottie": "Lottie",
     "Swipe to switch tabs": "滑動切換 Tab",
     "Bold selected titles": "選中標題加粗",
-    "Options": "選項"
+    "Options": "選項",
+    "cyl-lottie playground": "cyl-lottie 演示",
+    "Play": "播放",
+    "Pause": "暫停",
+    "Stop": "停止",
+    "Speed": "速度",
+    "Fit": "縮放方式",
+    "Recolor": "換色",
+    "Animation": "動畫",
+    "Events": "事件",
+    "Loop": "循環"
   }
 };

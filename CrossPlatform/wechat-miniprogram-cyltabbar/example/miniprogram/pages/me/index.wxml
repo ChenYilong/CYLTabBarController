@@ -1,4 +1,8 @@
 <view class="cyl-page" bindtouchstart="cyl_onSwipeStart" bindtouchend="cyl_onSwipeEnd">
+  <view class="cyl-section">
+    <view class="cyl-row cyl-row-action" bindtap="cyl_openPlayground" aria-role="button" aria-label="{{texts['cyl-lottie playground']}}"><text aria-hidden="true">{{texts['cyl-lottie playground']}}</text></view>
+  </view>
+
   <text class="cyl-section-title" aria-role="heading">{{texts['Badges']}}</text>
   <view class="cyl-section">
     <view class="cyl-row cyl-row-action" bindtap="cyl_badge" data-identifier="discover" data-value="3" aria-role="button" aria-label="{{texts['Number on Discover']}}"><text aria-hidden="true">{{texts['Number on Discover']}}</text></view>

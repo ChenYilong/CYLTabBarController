@@ -203,6 +203,10 @@ Component({
         })
         animation.addEventListener('complete', () => this.triggerEvent('complete', {}))
         animation.addEventListener('loopComplete', () => this.triggerEvent('loopcomplete', {}))
+        animation.addEventListener('error', (event) => {
+          const native = event && (event.nativeError || event)
+          this.triggerEvent('error', {message: (native && native.message) || 'cyl-lottie: rendering failed.'})
+        })
         animation.addEventListener('data_failed', (error) => {
           this.triggerEvent('error', {message: (error && error.message) || 'cyl-lottie: loading failed.'})
         })
