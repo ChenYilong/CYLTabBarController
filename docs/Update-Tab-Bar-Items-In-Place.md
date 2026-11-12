@@ -8,7 +8,7 @@
 |:---|:---|
 | 绑定的代码类 `CYLTabBarController`：[`CYLTabBarController/CYLTabBarController.h`](../CYLTabBarController/CYLTabBarController.h) | Bound to the class `CYLTabBarController`: [`CYLTabBarController/CYLTabBarController.h`](../CYLTabBarController/CYLTabBarController.h) |
 | 绑定的代码类 `CYLPlusButton`：[`CYLTabBarController/CYLPlusButton.h`](../CYLTabBarController/CYLPlusButton.h) | Bound to the class `CYLPlusButton`: [`CYLTabBarController/CYLPlusButton.h`](../CYLTabBarController/CYLPlusButton.h) |
-| 绑定的代码类 `CYLImageCache`：[`CYLTabBarController/UIImage+CYLTabBarControllerExtention.h`](../CYLTabBarController/UIImage%2BCYLTabBarControllerExtention.h) | Bound to the class `CYLImageCache`: [`CYLTabBarController/UIImage+CYLTabBarControllerExtention.h`](../CYLTabBarController/UIImage%2BCYLTabBarControllerExtention.h) |
+| 绑定的代码类 `CYLImageCache`：[`CYLTabBarController/Swift/UIImage+CYLTabBarControllerExtention.swift`](../CYLTabBarController/Swift/UIImage%2BCYLTabBarControllerExtention.swift) | Bound to the class `CYLImageCache`: [`CYLTabBarController/Swift/UIImage+CYLTabBarControllerExtention.swift`](../CYLTabBarController/Swift/UIImage%2BCYLTabBarControllerExtention.swift) |
 
 <!-- binding:end -->
 
