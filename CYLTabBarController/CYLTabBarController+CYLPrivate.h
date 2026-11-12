@@ -50,6 +50,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)cyl_setBackgroundImageDidChangeHandler:(nullable void (^)(void))handler;
 /// [EN] Removes the image from the plus button and its stand-in, in every state. [CN] 移除 PlusButton 及其替身所有状态的图片。
 - (void)cyl_removeImage;
+/// [EN] While the Liquid Glass gesture presses or drags, the lens mask is off; it is checked again once the lens settles.
+/// [CN] 液态玻璃手势按压或拖动期间关闭放大镜遮罩；放大镜停稳后再重新判断。
+- (void)cyl_setLiquidGlassLensMaskSuspended:(BOOL)suspended;
 @end
 
 /// [EN] Implemented in CYLTabBarController.m (CYLTheme, issue #216). [CN] 实现见 CYLTabBarController.m 中的 CYLTheme（issue #216）。

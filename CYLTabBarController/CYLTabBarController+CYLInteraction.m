@@ -7,6 +7,7 @@
 
 #import "CYLTabBarController+CYLInteraction.h"
 #import "CYLTabBarController.h"
+#import "CYLTabBarController+CYLPrivate.h"
 #import "UIControl+CYLTabBarControllerExtention.h"
 #import <objc/runtime.h>
 #import <AudioToolbox/AudioToolbox.h>
@@ -866,6 +867,13 @@ static const void *CYLHighlightedTabControlKey = &CYLHighlightedTabControlKey;
     // [CN] 按压动画跟随每一次液态玻璃按压，与下方是否处理其他手势无关。
     if ([CYLConstants isLiquidGlassActive]) {
         [self cyl_updateTabButtonHighlightForLiquidGlassGestureRecognizer:gestureRecognizer];
+        // [EN] The plus button's lens mask is off while the lens is pressed or dragged (it cut the plus button in two).
+        // [CN] 放大镜被按住或拖动期间关闭 PlusButton 的放大镜遮罩（它曾把 PlusButton 切成两半）。
+        UIGestureRecognizerState state = gestureRecognizer.state;
+        BOOL lensIsMoving = (state == UIGestureRecognizerStateBegan || state == UIGestureRecognizerStateChanged);
+        if ([self hasPlusButton]) {
+            [[self cyl_contextPlusButton] cyl_setLiquidGlassLensMaskSuspended:lensIsMoving];
+        }
     }
     BOOL handlesLongPress = [self cyl_handlesTabButtonLongPress];
     BOOL handlesTaps = [self cyl_hasTabBarItemTapReceiver];
