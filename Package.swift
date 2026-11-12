@@ -38,7 +38,7 @@ let package = Package(
         .target(
             name: "CYLTabBarControllerSwift",
             path: "CYLTabBarController",
-            sources: ["CYLUtils/Swift", "CYLBadgeView/Swift"],
+            sources: ["CYLUtils/Swift", "CYLBadgeView/Swift", "Swift", "CYLFlatDesignTabBar/CYLFlatDesignTabBar-ObjectiveC/Swift"],
             // [EN] The resource bundle belongs to the target that reads it (`CYLResourceBundle()`, now in Swift).
             // [CN] 资源包属于读取它的 target（`CYLResourceBundle()`，现在用 Swift 实现）。
             resources: [.copy("Resources/CYLTabBarController.bundle")]
@@ -55,7 +55,7 @@ let package = Package(
             //      this target cannot hold Swift, so it is left out; `CYLTabBarItemAnimation/Rive/` is then empty, like `PAG/`.
             // [CN] `RiveSwift`：CocoaPods `Rive` 子库的 Swift 桥接。这里的 SPM 不提供 RiveRuntime，且本 target 不能包含 Swift，因此排除它；
             //      `CYLTabBarItemAnimation/Rive/` 随之为空，与 `PAG/` 相同。
-            exclude: ["LottieSwift", "RiveSwift", "CYLUtils/Swift", "CYLBadgeView/Swift", "Resources/CYLTabBarController.bundle"],
+            exclude: ["LottieSwift", "RiveSwift", "CYLUtils/Swift", "CYLBadgeView/Swift", "Swift", "CYLFlatDesignTabBar/CYLFlatDesignTabBar-ObjectiveC/Swift", "Resources/CYLTabBarController.bundle"],
             // `include/` holds the module map plus `CYLTabBarController/*.h` shims, so the
             // CocoaPods-style `<CYLTabBarController/...>` imports and `__has_include` checks
             // (which enable FlatDesign and Lottie code) also resolve under SPM.

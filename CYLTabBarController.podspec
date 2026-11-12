@@ -47,7 +47,7 @@ Pod::Spec.new do |s|
   s.subspec 'Core' do |core|
     core.dependency 'CYLTabBarController/CYLUtils'
     core.dependency 'CYLTabBarController/CYLBadgeView'
-    core.source_files = 'CYLTabBarController', 'CYLTabBarController/**/*.{h,m}'
+    core.source_files = 'CYLTabBarController', 'CYLTabBarController/**/*.{h,m}', 'CYLTabBarController/Swift/*.swift'
     core.exclude_files = [
     'CYLTabBarController/include/**/*', # SPM-only module map and header shims
     'CYLTabBarController/CYLUtils/**/*', # the CYLUtils subspec above
