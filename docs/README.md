@@ -202,6 +202,7 @@ docs/
 │   ├── flutter-pag-ios-bar.png
 │   ├── flutter-rive-android-bar.png
 │   ├── flutter-rive-ios-bar.png
+│   ├── flutter-viewpager2-fix-android-bar.png
 │   ├── gif-classic.png
 │   ├── gif-flat-design.png
 │   ├── gif-liquid-glass.png
