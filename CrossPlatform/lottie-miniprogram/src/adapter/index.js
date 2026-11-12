@@ -87,17 +87,17 @@ export const setup = (canvas) => {
   g._cancelAnimationFrame = window.cancelAnimationFrame
   // lottie 对象是单例，内部状态（_stopped）在多页面下会混乱，保持 rAF 持续运行可规避
   window.requestAnimationFrame = function requestAnimationFrame(cb) {
-    let called = false
+    // PR #50: on iOS a setTimeout fallback sometimes fires before canvas.requestAnimationFrame; use the canvas
+    // frame callback when the canvas has one, and the timer only without it.
+    if (typeof canvas.requestAnimationFrame === 'function') {
+      canvas.requestAnimationFrame((timeStamp) => {
+        typeof cb === 'function' && cb(timeStamp)
+      })
+      return
+    }
     setTimeout(() => {
-      if (called) return
-      called = true
       typeof cb === 'function' && cb(Date.now())
     }, 100)
-    canvas.requestAnimationFrame((timeStamp) => {
-      if (called) return
-      called = true
-      typeof cb === 'function' && cb(timeStamp)
-    })
   }
   window.cancelAnimationFrame = canvas.cancelAnimationFrame.bind(canvas)
 

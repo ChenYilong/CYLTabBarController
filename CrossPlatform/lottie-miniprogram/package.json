@@ -1,7 +1,7 @@
 {
   "name": "cyl-lottie-miniprogram",
-  "version": "1.0.12",
-  "description": "lottie for miniprogram",
+  "version": "1.0.13",
+  "description": "lottie for miniprogram (the CYLTabBarController fork of wechat-miniprogram/lottie-miniprogram) and the cyl-lottie component",
   "main": "miniprogram_dist/index.js",
   "scripts": {
     "dev": "webpack --mode=development",
@@ -11,18 +11,19 @@
   "miniprogram": "miniprogram_dist",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/wechat-miniprogram/lottie-miniprogram.git"
+    "url": "git+https://github.com/ChenYilong/CYLTabBarController.git",
+    "directory": "CrossPlatform/lottie-miniprogram"
   },
   "keywords": [
     "lottie",
     "miniprogram"
   ],
-  "author": "wechat-miniprogram",
+  "author": "ChenYilong <luohanchenyilong@163.com> (fork of wechat-miniprogram/lottie-miniprogram)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/wechat-miniprogram/lottie-miniprogram/issues"
+    "url": "https://github.com/ChenYilong/CYLTabBarController/issues"
   },
-  "homepage": "https://github.com/wechat-miniprogram/lottie-miniprogram#readme",
+  "homepage": "https://github.com/ChenYilong/CYLTabBarController/tree/master/CrossPlatform/lottie-miniprogram",
   "devDependencies": {
     "@babel/core": "^7.5.5",
     "@babel/plugin-proposal-class-properties": "^7.5.5",
@@ -34,7 +35,7 @@
     "string-replace-loader": "^2.2.0",
     "webpack": "^4.39.1",
     "webpack-cli": "^3.3.6",
-    "lottie-web": "^5.7.4",
+    "lottie-web": "^5.12.2",
     "copy-webpack-plugin": "^6.0.3"
   }
 }

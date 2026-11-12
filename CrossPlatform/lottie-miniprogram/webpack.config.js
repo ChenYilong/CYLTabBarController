@@ -15,12 +15,11 @@ module.exports = {
     rules: [{
       test: /\.js$/i,
       use: [{
-        loader: 'eslint-loader',
-      }, {
         loader: 'babel-loader',
         options: {
           presets: ['@babel/preset-env'],
           plugins: ['@babel/plugin-proposal-class-properties'],
+          sourceType: 'unambiguous',
         },
       }, {
         loader: 'string-replace-loader',
@@ -32,8 +31,8 @@ module.exports = {
             search: '__[STANDALONE]__',
             replace: '',
           }]
-        }
-      }],
+        },
+      }, 'eslint-loader'],
       exclude: /node_modules/
     }]
   },

@@ -32,11 +32,26 @@ function loadAnimation(options) {
   return _aniItem
 }
 
-const {freeze, unfreeze} = window.lottie
+const {freeze, unfreeze, getRegisteredAnimations} = window.lottie
+const lottieDestroy = window.lottie.destroy
+
+// PR #17: destroy every animation (or the ones with this name) when a page is unloaded, so the animations work again
+// the next time the page renders them; lottie-web reads `wrapper.innerHTML` while destroying, which a mini program has
+// no DOM for.
+function destroy(name) {
+  const animations = getRegisteredAnimations() || []
+  animations.forEach(animation => {
+    animation.wrapper = {
+      innerHTML: ''
+    }
+  })
+  lottieDestroy(name)
+}
 
 export {
   setup,
   loadAnimation,
   freeze,
   unfreeze,
+  destroy,
 }
