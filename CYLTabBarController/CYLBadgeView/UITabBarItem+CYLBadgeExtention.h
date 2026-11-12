@@ -59,6 +59,13 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (BOOL)cyl_isPauseBadge;
 
+/*!
+ * [EN] Classic style: moves the badge to the tab button UIKit created in place of the one that showed it (called by the
+ *      tab bar's layout; an app does not need to call it).
+ * [CN] 经典样式：把角标移到 UIKit 替换后新建的 Tab 按钮上（由 TabBar 布局时调用，App 无需调用）。
+ */
+- (void)cyl_moveBadgeToCurrentTabButtonIfNeeded;
+
 @end
 
 NS_ASSUME_NONNULL_END

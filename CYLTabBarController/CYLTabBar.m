@@ -483,6 +483,10 @@ static NSDictionary<NSAttributedStringKey, id> *CYLTitleAttributesWithColor(NSDi
     // [CN] UIKit 在本次布局中（晚于控制器的 `-viewDidLayoutSubviews`）生成 `items`：此时执行
     //      `-performWhenTabBarItemsReady:` / `-reloadBadgesWithBlock:` 的 block。
     [self.tabBarController cyl_runPendingReloadBadgesBlocksIfReady];
+    // [EN] Classic style: badges of tab buttons UIKit replaced follow to the new buttons. [CN] 经典样式：角标跟随到 UIKit 替换后的新按钮。
+    for (UITabBarItem *item in self.items) {
+        [item cyl_moveBadgeToCurrentTabButtonIfNeeded];
+    }
     // The tab titles may have moved: lay the plus button out again so its title follows them
     // (`+alignsTitleWithTabBarItemTitles`).
     [[CYLPlusButton plusButtonForOwner:self] cyl_setNeedsTitleAlignment];

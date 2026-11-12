@@ -211,6 +211,9 @@ static UIView *CYLBadgeIconViewInView(UIView *view) {
     
     UIControl *selfControl = self.cyl_tabButton;
     if (![selfControl isKindOfClass:[UIControl class]] || ![CYLUtils isLiquidGlassActive]) {
+        if ([selfControl isKindOfClass:[UIControl class]]) {
+            objc_setAssociatedObject(self, @selector(cyl_moveBadgeToCurrentTabButtonIfNeeded), selfControl, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+        }
         CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS
         (
          [selfControl performSelector:aSelector withObject:object1 withObject:object2];
@@ -246,6 +249,53 @@ static UIView *CYLBadgeIconViewInView(UIView *view) {
          }
      }
      );
+#endif
+}
+
+/*!
+ * [EN] Classic style (not Liquid Glass): UIKit replaces a tab button when its item changes, even for a new `title`
+ *      (iOS 17), and the badge shown on the old button went away with it (found by
+ *      `testABadgeKeepsItsFontWhenTheTitlesChangeInPlace` on iOS 17.5). Called on every layout of `CYLTabBar`: when the
+ *      button that showed this item's badge is no longer the current one, the badge's settings move to the current
+ *      button and the badge is shown there again, with the same value and animation. Liquid Glass keeps its badges.
+ * [CN] 经典样式（非液态玻璃）：item 变化时 UIKit 会替换 Tab 按钮，即使只是修改 `title`（iOS 17），旧按钮上显示的角标随之消失
+ *      （由 iOS 17.5 上的 `testABadgeKeepsItsFontWhenTheTitlesChangeInPlace` 发现）。`CYLTabBar` 每次布局时调用：显示该 item 角标的按钮
+ *      不再是当前按钮时，把角标的设置移到当前按钮并重新显示，值与动画不变。液态玻璃会保留自己的角标。
+ */
+- (void)cyl_moveBadgeToCurrentTabButtonIfNeeded {
+#if CYL_BADGE_CORE_AVAILABLE
+    UIControl *oldButton = objc_getAssociatedObject(self, _cmd);
+    UIControl *currentButton = self.cyl_tabButton;
+    if (!oldButton || ![currentButton isKindOfClass:[UIControl class]] || oldButton == currentButton ||
+        [CYLUtils isLiquidGlassActive]) {
+        return;
+    }
+    UIView *oldHost = [oldButton cyl_getActualBadgeSuperView];
+    UIView *newHost = [currentButton cyl_getActualBadgeSuperView];
+    if (!oldHost || !newHost) {
+        return;
+    }
+    objc_setAssociatedObject(self, _cmd, currentButton, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    UIView<CYLBadgeTextDisplaying> *badge = oldHost.cyl_badge;
+    if (!badge || ![oldHost cyl_isShowBadge]) {
+        return;
+    }
+    newHost.cyl_badgeFont = oldHost.cyl_badgeFont;
+    newHost.cyl_badgeBackgroundColor = oldHost.cyl_badgeBackgroundColor;
+    newHost.cyl_badgeTextColor = oldHost.cyl_badgeTextColor;
+    newHost.cyl_badgeBorderColor = oldHost.cyl_badgeBorderColor;
+    newHost.cyl_badgeBorderWidth = oldHost.cyl_badgeBorderWidth;
+    newHost.cyl_badgeRespectsReduceMotion = oldHost.cyl_badgeRespectsReduceMotion;
+    newHost.cyl_badgeFrameValue = oldHost.cyl_badgeFrameValue;
+    newHost.cyl_badgeCenterOffsetValue = oldHost.cyl_badgeCenterOffsetValue;
+    newHost.cyl_badgeMaximumBadgeNumberValue = oldHost.cyl_badgeMaximumBadgeNumberValue;
+    newHost.cyl_badgeRadiusValue = oldHost.cyl_badgeRadiusValue;
+    newHost.cyl_badgeMarginValue = oldHost.cyl_badgeMarginValue;
+    newHost.cyl_badgeCornerRadiusValue = oldHost.cyl_badgeCornerRadiusValue;
+    NSString *value = badge.text ?: @"";
+    NSNumber *animationTypeValue = oldHost.cyl_badgeAnimationTypeValue ?: @(CYLBadgeAnimationTypeNone);
+    [oldHost cyl_clearBadge];
+    [self cyl_showBadgeValue:value animationTypeValue:animationTypeValue];
 #endif
 }
 
