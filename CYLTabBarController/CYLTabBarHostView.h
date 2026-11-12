@@ -24,6 +24,14 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /*!
+ * [EN] The string constants of this header are macros for Objective-C and Swift constants for Swift
+ *      (`Swift/CYLConstants+Keys.swift`); each `#ifndef __swift__` hides a macro from Swift (docs/Swift-Migration.md).
+ * [CN] 本头文件中的字符串常量对 Objective-C 是宏，对 Swift 是常量（`Swift/CYLConstants+Keys.swift`）；每个 `#ifndef __swift__`
+ *      对 Swift 隐藏一个宏（docs/Swift-Migration.md）。
+ */
+
+
+/*!
  * [EN] A view that shows only the tab bar of a CYLTabBarController made from a configuration
  *      (`+[CYLTabBarController tabBarControllerWithConfiguration:]`, see docs/Configuration-File.md). The pages belong to
  *      someone else: React Native, Flutter, or an app that draws its own content. Every tab gets a transparent, empty page.
@@ -52,11 +60,21 @@ NS_ASSUME_NONNULL_BEGIN
  *      - 下标（`selectedIndex`、`badgeValues`、`didSelectTab`）按配置中的 Tab 计算，不含 PlusButton。
  * [EN] Keys of `badgeAttributes` / `plusButtonBadgeAttributes`. [CN] `badgeAttributes` / `plusButtonBadgeAttributes` 的键。
  */
-FOUNDATION_EXTERN NSString *const CYLTabBarHostBadgeValue;
-FOUNDATION_EXTERN NSString *const CYLTabBarHostBadgeColor;
-FOUNDATION_EXTERN NSString *const CYLTabBarHostBadgeAnimation;
-FOUNDATION_EXTERN NSString *const CYLTabBarHostBadgeRadius;
-FOUNDATION_EXTERN NSString *const CYLTabBarHostBadgeCenterOffset;
+#ifndef __swift__
+#define CYLTabBarHostBadgeValue @"value"
+#endif
+#ifndef __swift__
+#define CYLTabBarHostBadgeColor @"color"
+#endif
+#ifndef __swift__
+#define CYLTabBarHostBadgeAnimation @"animation"
+#endif
+#ifndef __swift__
+#define CYLTabBarHostBadgeRadius @"radius"
+#endif
+#ifndef __swift__
+#define CYLTabBarHostBadgeCenterOffset @"centerOffset"
+#endif
 
 @interface CYLTabBarHostView : UIView
 

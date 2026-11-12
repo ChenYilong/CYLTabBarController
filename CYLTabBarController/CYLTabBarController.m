@@ -53,99 +53,19 @@
 //#import "NSObject+CYLTabBarControllerExtention.h"
 #endif
 
-NSString *const CYLTabBarItemTitle = @"CYLTabBarItemTitle";
-NSString *const CYLTabBarItemImage = @"CYLTabBarItemImage";
-NSString *const CYLTabBarItemSelectedImage = @"CYLTabBarItemSelectedImage";
-NSString *const CYLTabBarItemDarkImage = @"CYLTabBarItemDarkImage";
-NSString *const CYLTabBarItemSelectedDarkImage = @"CYLTabBarItemSelectedDarkImage";
-NSString *const CYLTabBarItemImageURL = @"CYLTabBarItemImageURL";
-NSString *const CYLTabBarItemSelectedImageURL = @"CYLTabBarItemSelectedImageURL";
-NSString *const CYLTabBarItemImageURLSize = @"CYLTabBarItemImageURLSize";
-NSString *const CYLTabBarItemImageInsets = @"CYLTabBarItemImageInsets";
-NSString *const CYLTabBarItemTitlePositionAdjustment = @"CYLTabBarItemTitlePositionAdjustment";
-NSString *const CYLTabBarItemImagePositionAdjustment = @"CYLTabBarItemImagePositionAdjustment";
 NSString *const CYLTabBarLottieFilePath = @"CYLTabBarLottieFilePath";
 NSString *const CYLTabBarLottieURL = @"CYLTabBarLottieURL";
 NSString *const CYLTabBarLottieSize = @"CYLTabBarLottieSize";
-NSString *const CYLTabBarItemIdentifier = @"CYLTabBarItemIdentifier";
-NSString *const CYLTabBarItemPageIdentifier = @"CYLTabBarItemPageIdentifier";
-NSString *const CYLTabBarItemPageParameters = @"CYLTabBarItemPageParameters";
-NSString *const CYLTabBarItemPlatforms = @"CYLTabBarItemPlatforms";
-NSString *const CYLTabBarItemMinimumAppVersion = @"CYLTabBarItemMinimumAppVersion";
-NSString *const CYLTabBarControllerViewControllers = @"CYLTabBarControllerViewControllers";
-NSString *const CYLTabBarControllerTabBarItemsAttributes = @"CYLTabBarControllerTabBarItemsAttributes";
-NSString *const CYLTabBarControllerImageInsets = @"CYLTabBarControllerImageInsets";
-NSString *const CYLTabBarControllerTitlePositionAdjustment = @"CYLTabBarControllerTitlePositionAdjustment";
-NSString *const CYLTabBarControllerStyleType = @"CYLTabBarControllerStyleType";
-NSString *const CYLTabBarControllerContext = @"CYLTabBarControllerContext";
-NSString *const CYLTabBarControllerPageRegistry = @"CYLTabBarControllerPageRegistry";
-NSString *const CYLTabBarControllerPageResolver = @"CYLTabBarControllerPageResolver";
-NSString *const CYLTabBarControllerPageLookupOrder = @"CYLTabBarControllerPageLookupOrder";
-NSString *const CYLTabBarControllerAutomaticPageRegistration = @"CYLTabBarControllerAutomaticPageRegistration";
-NSString *const CYLTabBarControllerTabBarItemAnimationSpeed = @"CYLTabBarControllerTabBarItemAnimationSpeed";
-NSString *const CYLTabBarControllerPlusButton = @"CYLTabBarControllerPlusButton";
-NSString *const CYLTabBarControllerPlusButtonAction = @"CYLTabBarControllerPlusButtonAction";
 /// [EN] Defined in CYLPlusButton.m: the plus button page, passed with its attributes. [CN] 定义在 CYLPlusButton.m：随属性传递的 PlusButton 页面。
 FOUNDATION_EXTERN NSString *const CYLConfigurationPlusButtonPageKey;
-NSString *const CYLPlusButtonBackgroundImage = @"CYLPlusButtonBackgroundImage";
-NSString *const CYLPlusButtonIndexInTabBar = @"CYLPlusButtonIndexInTabBar";
-NSString *const CYLPlusButtonCenterYMultiplier = @"CYLPlusButtonCenterYMultiplier";
-NSString *const CYLPlusButtonCenterYOffset = @"CYLPlusButtonCenterYOffset";
-NSString *const CYLPlusButtonAlignsTitle = @"CYLPlusButtonAlignsTitle";
-NSString *const CYLPlusButtonKeepsTitleVisible = @"CYLPlusButtonKeepsTitleVisible";
-NSString *const CYLPlusButtonShowsSelection = @"CYLPlusButtonShowsSelection";
 /// [EN] Set from `CYLPlusButtonShowsSelection` of a configuration. [CN] 由配置中的 `CYLPlusButtonShowsSelection` 设置。
 static const void *const CYLPlusButtonShowsSelectionKey = &CYLPlusButtonShowsSelectionKey;
-NSString *const CYLPlusButtonSize = @"CYLPlusButtonSize";
-NSString *const CYLPlusButtonImageSize = @"CYLPlusButtonImageSize";
-NSString *const CYLTabBarControllerUserInterfaceStyle = @"CYLTabBarControllerUserInterfaceStyle";
-NSString *const CYLTabBarControllerTabButtonTapAnimation = @"CYLTabBarControllerTabButtonTapAnimation";
-NSString *const CYLTabBarControllerSwipeToSwitchTab = @"CYLTabBarControllerSwipeToSwitchTab";
-NSString *const CYLTabBarControllerLoginRequiredTabBarItemIdentifiers = @"CYLTabBarControllerLoginRequiredTabBarItemIdentifiers";
-NSString *const CYLTabBarControllerUnloadsUnselectedViewsOnMemoryWarning = @"CYLTabBarControllerUnloadsUnselectedViewsOnMemoryWarning";
-NSString *const CYLTabBarControllerKeepsLoadedTabBarItemIdentifiers = @"CYLTabBarControllerKeepsLoadedTabBarItemIdentifiers";
-NSString *const CYLTabBarControllerThemes = @"CYLTabBarControllerThemes";
-NSString *const CYLTabBarControllerThemeIdentifier = @"CYLTabBarControllerThemeIdentifier";
-NSString *const CYLTabBarControllerDarkThemeIdentifier = @"CYLTabBarControllerDarkThemeIdentifier";
-NSString *const CYLTabBarControllerThemeManagerName = @"CYLTabBarControllerThemeManagerName";
-NSString *const CYLTabBarControllerLocalization = @"CYLTabBarControllerLocalization";
-NSString *const CYLTabBarControllerConfigurationRoute = @"CYLTabBarControllerConfigurationRoute";
-NSString *const CYLTabBarControllerManifestRoute = @"CYLTabBarControllerManifestRoute";
-NSString *const CYLTabBarLocalizationTableName = @"CYLTabBarLocalizationTableName";
-NSString *const CYLTabBarLocalizationPath = @"CYLTabBarLocalizationPath";
-NSString *const CYLTabBarLocalizationBundleName = @"CYLTabBarLocalizationBundleName";
-NSString *const CYLTabBarThemeIdentifier = @"CYLTabBarThemeIdentifier";
-NSString *const CYLTabBarThemeValues = @"CYLTabBarThemeValues";
-NSString *const CYLTabBarBackgroundColor = @"CYLTabBarBackgroundColor";
-NSString *const CYLTabBarShadowColor = @"CYLTabBarShadowColor";
-NSString *const CYLTabBarBackgroundImage = @"CYLTabBarBackgroundImage";
-NSString *const CYLTabBarShadowImage = @"CYLTabBarShadowImage";
-NSString *const CYLTabBarStackedItemPositioning = @"CYLTabBarStackedItemPositioning";
-NSString *const CYLTabBarStackedItemWidth = @"CYLTabBarStackedItemWidth";
-NSString *const CYLTabBarStackedItemSpacing = @"CYLTabBarStackedItemSpacing";
-NSString *const CYLTabBarAnimationOptions = @"CYLTabBarAnimationOptions";
 /// [EN] Private: marks a tab left out by `CYLTabBarItemPlatforms` / `CYLTabBarItemMinimumAppVersion` (set by the normalization).
 /// [CN] 私有：标记被 `CYLTabBarItemPlatforms` / `CYLTabBarItemMinimumAppVersion` 排除的 Tab（由规范化设置）。
 static NSString *const CYLTabBarItemExcludedKey = @"_CYLTabBarItemExcluded";
 /// [EN] Private: set by the parameter initializers, which keep an empty view controller list (C9). [CN] 私有：由参数初始化方法设置，保持空的子控制器列表（C9）。
 static NSString *const CYLTabBarControllerKeepsEmptyViewControllersKey = @"_CYLTabBarControllerKeepsEmptyViewControllers";
-NSString *const CYLTabBarItemTitleColor = @"CYLTabBarItemTitleColor";
-NSString *const CYLTabBarItemSelectedTitleColor = @"CYLTabBarItemSelectedTitleColor";
-NSString *const CYLTabBarItemIconColor = @"CYLTabBarItemIconColor";
-NSString *const CYLTabBarItemSelectedIconColor = @"CYLTabBarItemSelectedIconColor";
-NSString *const CYLTabBarItemIconRenderingMode = @"CYLTabBarItemIconRenderingMode";
-NSString *const CYLTabBarControllerIconRenderingMode = @"CYLTabBarControllerIconRenderingMode";
-NSString *const CYLTabBarControllerIconColor = @"CYLTabBarControllerIconColor";
-NSString *const CYLTabBarControllerSelectedIconColor = @"CYLTabBarControllerSelectedIconColor";
-NSString *const CYLTabBarItemSelectedBackgroundColor = @"CYLTabBarItemSelectedBackgroundColor";
-NSString *const CYLTabBarItemBackgroundColor = @"CYLTabBarItemBackgroundColor";
 NSString *const CYLTabBarLottieLoopsWhenUnselected = @"CYLTabBarLottieLoopsWhenUnselected";
-NSString *const CYLTabBarItemTitleFont = @"CYLTabBarItemTitleFont";
-NSString *const CYLTabBarItemSelectedTitleFont = @"CYLTabBarItemSelectedTitleFont";
-NSString *const CYLTabBarItemAccessibilityIdentifier = @"CYLTabBarItemAccessibilityIdentifier";
-NSString *const CYLTabBarItemAccessibilityLabel = @"CYLTabBarItemAccessibilityLabel";
-NSString *const CYLTabBarItemAccessibilityHint = @"CYLTabBarItemAccessibilityHint";
-NSString *const CYLTabBarItemSelectedTitle = @"CYLTabBarItemSelectedTitle";
 
 #pragma mark - Selected title (FIX: issue #433)
 
@@ -228,22 +148,6 @@ static void CYLSetNeedsUpdateTabBarItemSelectedTitles(CYLTabBarController *tabBa
         CYLApplyTabBarItemSelectedTitles(weakTabBarController);
     });
 }
-NSNotificationName const CYLTabBarLoginStateDidChangeNotification = @"CYLTabBarLoginStateDidChangeNotification";
-NSNotificationName const CYLTabBarItemTitleDidChangeNotification = @"CYLTabBarItemTitleDidChangeNotification";
-NSNotificationName const CYLTabBarItemDidChangeNotification = @"CYLTabBarItemDidChangeNotification";
-NSString *const CYLTabBarItemChangedAttributesKey = @"CYLTabBarItemChangedAttributesKey";
-NSString *const CYLTabBarItemIndexKey = @"CYLTabBarItemIndexKey";
-NSNotificationName const CYLTabBarItemIconDidChangeNotification = @"CYLTabBarItemIconDidChangeNotification";
-NSString *const CYLTabBarItemIndexesKey = @"CYLTabBarItemIndexesKey";
-NSString *const CYLTabBarItemIdentifiersKey = @"CYLTabBarItemIdentifiersKey";
-NSString *const CYLTabBarControllerKey = @"CYLTabBarControllerKey";
-NSString *const CYLTabBarItemViewControllerKey = @"CYLTabBarItemViewControllerKey";
-NSString *const CYLTabBarItemKey = @"CYLTabBarItemKey";
-NSString *const CYLPlusButtonKey = @"CYLPlusButtonKey";
-NSString *const CYLTabBarItemOldTitleKey = @"CYLTabBarItemOldTitleKey";
-NSString *const CYLTabBarItemIconViewProviderKey = @"CYLTabBarItemIconViewProviderKey";
-NSNotificationName const CYLTabBarControllerThemeDidApplyNotification = @"CYLTabBarControllerThemeDidApplyNotification";
-NSString *const CYLTabBarThemeKey = @"CYLTabBarThemeKey";
 
 static const void *CYLNavigationTitleFollowsTabBarItemTitleKey = &CYLNavigationTitleFollowsTabBarItemTitleKey;
 
@@ -311,13 +215,6 @@ static NSDictionary *CYLTabBarItemIconAttributes(NSDictionary *attributes) {
 NSString *const CYLTabBarLottieDarkURL = @"CYLTabBarLottieDarkURL";
 NSString *const CYLTabBarLottieDarkFilePath = @"CYLTabBarLottieDarkFilePath";
 NSString *const CYLTabBarLottieDarkColors = @"CYLTabBarLottieDarkColors";
-NSString *const CYLTabBarAnimationURL = @"CYLTabBarAnimationURL";
-NSString *const CYLTabBarAnimationFilePath = @"CYLTabBarAnimationFilePath";
-NSString *const CYLTabBarAnimationSize = @"CYLTabBarAnimationSize";
-NSString *const CYLTabBarAnimationDarkURL = @"CYLTabBarAnimationDarkURL";
-NSString *const CYLTabBarAnimationDarkFilePath = @"CYLTabBarAnimationDarkFilePath";
-NSString *const CYLTabBarAnimationDarkColors = @"CYLTabBarAnimationDarkColors";
-NSString *const CYLTabBarAnimationColors = @"CYLTabBarAnimationColors";
 
 NSUInteger CYLTabbarItemsCount = 0;
 NSUInteger CYLPlusButtonIndex = 0;
@@ -325,12 +222,9 @@ CGFloat CYLTabBarItemWidth = 0.0f;
 CGFloat CYLTabBarHeight = 49.0f;
 static const CGFloat kCYLDefaultTabBarHeight = 49.0f;
 
-NSString *const CYLTabBarItemWidthDidChangeNotification = @"CYLTabBarItemWidthDidChangeNotification";
 NSString *const CYLTabBarItemLottieAnimationPlayingNotification = @"CYLTabBarItemLottieAnimationPlayingNotification";
 NSString *const CYLTabBarItemLottieAnimationViewDidAddNotification = @"CYLTabBarItemLottieAnimationViewDidAddNotification";
 // [EN] The same values as the Lottie names, so both names reach the same observers. [CN] 与 Lottie 名称取值相同，两个名称对应同一批观察者。
-NSNotificationName const CYLTabBarItemAnimationPlayingNotification = @"CYLTabBarItemLottieAnimationPlayingNotification";
-NSNotificationName const CYLTabBarItemAnimationViewDidAddNotification = @"CYLTabBarItemLottieAnimationViewDidAddNotification";
 
 NSString *const CYLTabBarStyleTypeDidChangeNotification = @"CYLTabBarStyleTypeDidChangeNotification";
 static void * const CYLTabImageViewDefaultOffsetContext = (void*)&CYLTabImageViewDefaultOffsetContext;
@@ -7867,9 +7761,9 @@ static char CYLFixesOpaqueTabBarSafeAreaInsetsKey;
 
 @end
 
-#pragma mark - UIViewController (CYLTabBarItemTitle)
+#pragma mark - UIViewController (CYLTabBarItemTitleSupport)
 
-@implementation UIViewController (CYLTabBarItemTitle)
+@implementation UIViewController (CYLTabBarItemTitleSupport)
 
 - (nullable NSString *)cyl_tabBarItemTitle {
     UIViewController *tab = self.navigationController.viewControllers.firstObject == self ? self.navigationController : self;

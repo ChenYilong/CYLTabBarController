@@ -10,7 +10,6 @@
 #import "CYLLocalization.h"
 #import <objc/runtime.h>
 
-NSString *const CYLSampleConfigurationURLString = @"https://raw.githubusercontent.com/ChenYilong/CYLTabBarController/master/Example-Shared/Configurations/cyl_tabbar_configuration.yaml";
 
 static NSString *const CYLConfigurationDemoCellIdentifier = @"CYLConfigurationDemoCell";
 
