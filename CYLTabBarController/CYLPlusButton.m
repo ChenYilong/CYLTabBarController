@@ -1292,8 +1292,8 @@ static NSDictionary<NSNumber *, NSNumber *> *CYLPlusButtonDerivedImageStates(voi
  *      在替身清晰的标题与图标下形成一层模糊重影。替身显示期间，真实按钮在放大镜下被遮住：内容全部在放大镜内时遮住整个放大镜区域，否则只遮住
  *      标题所在的横条（底板以上的部分保留）；选中其他 Tab 后移除遮罩。
  *
- * TODO (2026-11-12, docs/Liquid-Glass-Robustness.md "Task log"): OFF (`CYL_PLUS_BUTTON_LENS_MASK_ENABLED` 0) while plus button
- *      bugs are investigated. History:
+ * 2026-11-12 (docs/Liquid-Glass-Robustness.md "Task log"): ON (`CYL_PLUS_BUTTON_LENS_MASK_ENABLED` 1) with the scope the
+ *      maintainer narrowed: the title only, never the icon, and only with `+alignsTitleWithTabBarItemTitles`. History:
  * [EN] A mask here once cut the plus button in two (iOS 26+, Liquid Glass, not FlatDesign, a plus child view controller:
  *      select the plus button, drag the lens to another item); the maintainer had removed an earlier implementation
  *      for that reason. The mask is now off while UIKit's Liquid Glass gesture presses or drags
@@ -1310,13 +1310,12 @@ static NSDictionary<NSNumber *, NSNumber *> *CYLPlusButtonDerivedImageStates(voi
  */
 #ifndef CYL_PLUS_BUTTON_LENS_MASK_ENABLED
 /*!
- * [EN] 0 (default): `-cyl_updateLiquidGlassMask` returns on its first line, the mask is off (maintainer's rule, 2026-11-12:
- *      rule the mask out first on any plus button bug; AGENTS.md). 1 turns the implementation below back on, only after
- *      the drag and first-display tests pass.
- * [CN] 0（默认）：`-cyl_updateLiquidGlassMask` 第一行直接返回，遮罩关闭（维护者规则，2026-11-12：PlusButton 出现任何 bug 时先排除
- *      遮罩；见 AGENTS.md）。1 重新开启下面的实现，仅在拖动与首次显示测试都通过后使用。
+ * [EN] 1 (default since 2026-11-12, title-only scope, after the drag and first-display tests): the mask below is on. 0 makes
+ *      `-cyl_updateLiquidGlassMask` return on its first line: on any plus button bug, set 0 first and test again (AGENTS.md).
+ * [CN] 1（2026-11-12 起默认，只作用于标题，已通过拖动与首次显示测试）：开启下面的遮罩。0 让 `-cyl_updateLiquidGlassMask` 第一行
+ *      直接返回：PlusButton 出现任何 bug 时，先设为 0 再测试（AGENTS.md）。
  */
-#define CYL_PLUS_BUTTON_LENS_MASK_ENABLED 0
+#define CYL_PLUS_BUTTON_LENS_MASK_ENABLED 1
 #endif
 
 /*!
@@ -1409,29 +1408,18 @@ static NSDictionary<NSNumber *, NSNumber *> *CYLPlusButtonDerivedImageStates(voi
         // [EN] Calls from the tab bar's layout can come before the button laid its content out.
         // [CN] 来自 TabBar 布局的调用可能早于按钮对内容的布局。
         [self layoutIfNeeded];
-        CGRect lens = [standInTabButton convertRect:standInTabButton.bounds toView:self];
-        CGRect content = CGRectNull;
-        if (self.currentImage && !self.imageView.hidden) {
-            content = CGRectUnion(content, self.imageView.frame);
-        }
-        if (self.currentBackgroundImage) {
-            content = CGRectUnion(content, self.bounds);
-        }
+        // [EN] The title only, never the icon (the maintainer's narrowed scope, 2026-11-12): the title's own frame, 2 pt wider
+        //      on each side, and only when the app aligns the plus button's title with the tab titles
+        //      (`+alignsTitleWithTabBarItemTitles`). The icon is never masked, so the lens can never cut it.
+        // [CN] 只遮住标题，从不遮住图标（维护者 2026-11-12 缩小的范围）：标题自身的区域，每边各宽 2pt；并且只在 App 让 PlusButton
+        //      标题与 Tab 标题对齐时（`+alignsTitleWithTabBarItemTitles`）生效。图标从不被遮住，放大镜也就无法切割它。
         UILabel *titleLabel = self.titleLabel;
         BOOL hasTitle = titleLabel.text.length > 0 && !titleLabel.hidden && titleLabel.alpha > 0;
-        CGRect title = hasTitle ? [titleLabel convertRect:titleLabel.bounds toView:self] : CGRectNull;
-        if (!CGRectIsNull(title)) {
-            content = CGRectUnion(content, title);
-        }
-        if (!CGRectIsNull(content) && !CGRectIsEmpty(content) && CGRectContainsRect(CGRectInset(lens, -1, -1), content)) {
-            // [EN] Everything inside the lens: hide the whole lens area. [CN] 内容全部在放大镜内：遮住整个放大镜区域。
-            hidden = lens;
-        } else if (!CGRectIsNull(title) && !CGRectIsEmpty(title)) {
-            // [EN] The icon reaches above the platter: only the title's strip, because the lens draws the stand-in a little
-            //      apart from the real button and masking the icon too left a gap across it.
-            // [CN] 图标超出底板：只遮住标题所在的横条，因为放大镜中的替身与真实按钮略有错位，连图标一起遮住会在图标上留下缝隙。
-            CGFloat top = MAX(CGRectGetMinY(lens), CGRectGetMinY(title) - 2);
-            hidden = CGRectMake(CGRectGetMinX(lens), top, CGRectGetWidth(lens), MAX(0, CGRectGetMaxY(lens) - top));
+        if (hasTitle && [self cyl_alignsTitleWithTabBarItemTitles]) {
+            CGRect title = [titleLabel convertRect:titleLabel.bounds toView:self];
+            if (!CGRectIsEmpty(title)) {
+                hidden = CGRectInset(title, -2, -2);
+            }
         }
     }
     if (CGRectIsNull(hidden)) {

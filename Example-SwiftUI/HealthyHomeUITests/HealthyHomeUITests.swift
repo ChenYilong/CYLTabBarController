@@ -76,6 +76,31 @@ class HealthyHomeUITests: XCTestCase {
         attach(app, "2 after the drag")
     }
 
+    /**
+     * [EN] The ObjC demo's main tab bar: a raised plus button with a title and `+alignsTitleWithTabBarItemTitles`, the only
+     *      case the title-only lens mask applies to. Select it, drag the lens to "Nearby" and hold, then lift.
+     * [CN] ObjC 示例的主 TabBar：带标题、实现了 `+alignsTitleWithTabBarItemTitles` 的凸起 PlusButton，是只遮标题的放大镜遮罩唯一
+     *      生效的情况。选中它，把放大镜拖到 "Nearby" 并按住，然后抬起。
+     */
+    func testDraggingTheLensAwayFromTheDemoPlusButtonWithAlignedTitle() {
+        let app = XCUIApplication(bundleIdentifier: "CYL.CYLTabBarController")
+        app.launch()
+        let plus = app.buttons.matching(identifier: "plus").firstMatch
+        XCTAssertTrue(plus.waitForExistence(timeout: 15))
+        sleep(3)
+        plus.tap()
+        sleep(2)
+        attach(app, "1 plus selected")
+        let tabs = app.tabBars.firstMatch
+        let nearby = tabs.buttons.matching(NSPredicate(format: "label == %@", "Nearby")).firstMatch
+        XCTAssertTrue(nearby.exists)
+        let start = plus.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.85))
+        let end = nearby.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5))
+        start.press(forDuration: 0.6, thenDragTo: end, withVelocity: .slow, thenHoldForDuration: 3)
+        sleep(2)
+        attach(app, "2 after the drag")
+    }
+
     private func attach(_ app: XCUIApplication, _ name: String) {
         let attachment = XCTAttachment(screenshot: app.screenshot())
         attachment.name = name
