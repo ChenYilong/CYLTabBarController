@@ -21,28 +21,30 @@
       </view>
     </block>
     <block wx:else>
-      <view class="cyl-tab-content {{cylAnimatingIdentifier === item.key ? 'cyl-animate-' + cylTapAnimation : ''}}" style="{{cylAnimationStyle}}">
-        <view class="cyl-icon-box" style="{{item.lottieStyle}}">
-          <cyl-lottie
-            wx:if="{{item.lottiePath}}"
-            id="cyl-lottie-{{item.key}}"
-            class="cyl-lottie"
-            style="{{item.lottieStyle}} {{item.imageStyle}}"
-            path="{{item.lottiePath}}"
-            colors="{{item.lottieColors}}"
-            loop="{{item.lottieLoop}}"
-            autoplay="{{item.lottieAutoplay}}"
-            resting-frame="{{item.lottieResting}}"
-          />
-          <view wx:elif="{{item.image && item.tint}}" class="cyl-tint-box" style="{{item.imageStyle}} {{item.imageSizeStyle}}" aria-hidden="true">
-            <image class="cyl-icon cyl-tinted" src="{{item.image}}" style="{{item.imageSizeStyle}} filter: drop-shadow({{item.tint}} 200px 0);" mode="aspectFit" />
-          </view>
-          <image wx:elif="{{item.image}}" class="cyl-icon" src="{{item.image}}" style="{{item.imageStyle}} {{item.imageSizeStyle}}" mode="aspectFit" aria-hidden="true" />
-          <text wx:if="{{item.badge}}" class="cyl-badge" aria-hidden="true">{{item.badge}}</text>
-          <view wx:if="{{item.showsDot}}" class="cyl-badge-dot" aria-hidden="true"></view>
-        </view>
-        <text wx:if="{{item.title}}" class="cyl-title" style="{{item.titleStyle}}" aria-hidden="true">{{item.title}}</text>
-      </view>
+      <cyl-tab-bar-item
+        id="cyl-item-{{item.key}}"
+        class="cyl-tab-item"
+        index="{{item.item.index}}"
+        title="{{item.item.title}}"
+        image="{{item.item.image}}"
+        selected-image="{{item.item.selectedImage}}"
+        selected="{{item.item.selected}}"
+        animation-path="{{item.item.animationPath}}"
+        animation-size="{{item.item.animationSize}}"
+        animation-colors="{{item.item.animationColors}}"
+        loops-when-unselected="{{item.item.loopsWhenUnselected}}"
+        image-size="{{item.item.imageSize}}"
+        image-insets="{{item.item.imageInsets}}"
+        title-position-adjustment="{{item.item.titlePositionAdjustment}}"
+        icon-tint="{{item.item.iconTint}}"
+        selected-icon-tint="{{item.item.selectedIconTint}}"
+        background-color="{{item.item.backgroundColor}}"
+        selected-background-color="{{item.item.selectedBackgroundColor}}"
+        title-text-attributes="{{item.item.titleTextAttributes}}"
+        badge-value="{{item.showsDot ? '•' : item.badge}}"
+        animation-class="{{cylAnimatingIdentifier === item.key ? 'cyl-animate-' + cylTapAnimation : ''}}"
+        animation-duration="{{cylAnimationDuration}}"
+      />
     </block>
   </view>
 </view>

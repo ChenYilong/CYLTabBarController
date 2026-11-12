@@ -38,6 +38,15 @@ function cylSystemTheme() {
   }
 }
 
+/**
+ * [EN] A CSS font weight as its CYLTabBarItemTitleFont name.
+ * [CN] 把 CSS 字重转为 CYLTabBarItemTitleFont 的名称。
+ */
+function cylWeightName(weight) {
+  return { 100: 'ultralight', 200: 'thin', 300: 'light', 400: 'regular', 500: 'medium', 600: 'semibold', 700: 'bold',
+    800: 'heavy', 900: 'black' }[weight] || '';
+}
+
 Component({
   options: {
     addGlobalClass: false,
@@ -150,6 +159,11 @@ Component({
       if (model.plusButton) {
         slots.splice(model.plusButton.index, 0, this.cyl_plusSlot(model.plusButton, selected));
       }
+      slots.forEach((slot, index) => {
+        if (slot.item) {
+          slot.item.index = index;
+        }
+      });
       this.setData({
         cylSlots: slots,
         cylStyleType: model.styleType,
@@ -158,6 +172,7 @@ Component({
         cylThemeIdentifier: model.themeIdentifier,
         cylTapAnimation: model.tapAnimation,
         cylAnimationStyle: `animation-duration: ${model.animationDuration}ms;`,
+        cylAnimationDuration: model.animationDuration,
       }, () => this.cyl_syncLottie(selected));
     },
 
@@ -183,9 +198,9 @@ Component({
      */
     cyl_playLottie(identifier) {
       const key = identifier || this.cylLottieSelected;
-      const lottie = this.selectComponent(`#cyl-lottie-${key}`);
-      if (lottie) {
-        lottie.cyl_playFromStart();
+      const item = this.selectComponent(`#cyl-item-${key}`);
+      if (item) {
+        item.cyl_playAnimation();
       }
     },
 
@@ -200,26 +215,54 @@ Component({
       const badge = cylBadgeText(this.cylBadges[item.identifier]);
       const isDot = badge === '•';
       const color = selected ? item.selectedTitleColor : item.titleColor;
-      const background = selected ? item.selectedBackgroundColor : item.backgroundColor;
       const lottie = item.lottie;
       const isDarkBar = this.cylModel ? this.cylModel.isDark : false;
+      const titleFont = (fontStyle) => {
+        const size = /font-size: ([\d.]+)px/.exec(fontStyle || '');
+        const weight = /font-weight: (\d+)/.exec(fontStyle || '');
+        const family = /font-family: "([^"]+)"/.exec(fontStyle || '');
+        if (!size) {
+          return undefined;
+        }
+        return { name: family ? family[1] : '', size: Number(size[1]), weight: weight ? cylWeightName(Number(weight[1])) : '' };
+      };
+      // [EN] The tab is drawn by cyl-tab-bar-item, with the iOS CYLFlatDesignTabBarItem property names.
+      // [CN] Tab 由 cyl-tab-bar-item 绘制，使用 iOS CYLFlatDesignTabBarItem 的属性名。
+      const itemProperties = {
+        index: 0,
+        title: selected ? item.selectedTitle : item.title,
+        image: item.image,
+        selectedImage: item.gif || item.selectedImage,
+        selected,
+        animationPath: lottie ? ((isDarkBar && lottie.darkPath) || lottie.path) : '',
+        animationSize: lottie ? `{${lottie.width}, ${lottie.height}}` : null,
+        animationColors: lottie ? ((isDarkBar && lottie.darkColors) || lottie.colors) : null,
+        loopsWhenUnselected: Boolean(lottie && lottie.loopsWhenUnselected),
+        imageSize: item.imageSize ? `{${item.imageSize.width}, ${item.imageSize.height}}` : null,
+        imageInsets: item.imageInsets,
+        titlePositionAdjustment: item.titleOffset,
+        iconTint: item.iconTint,
+        selectedIconTint: item.selectedIconTint,
+        backgroundColor: item.backgroundColor,
+        selectedBackgroundColor: item.selectedBackgroundColor,
+        titleTextAttributes: {
+          normal: { color: item.titleColor || '#8E8E93', font: titleFont(item.titleFontStyle) },
+          selected: { color: item.selectedTitleColor || (isDarkBar ? '#0A84FF' : '#007AFF'), font: titleFont(item.selectedTitleFontStyle) },
+        },
+      };
       return {
         key: item.identifier,
         isPlusButton: false,
         selected,
+        item: itemProperties,
         title: selected ? item.selectedTitle : item.title,
         image: selected && item.gif ? item.gif : (selected ? item.selectedImage : item.image),
-        lottiePath: lottie ? ((isDarkBar && lottie.darkPath) || lottie.path) : '',
-        lottieColors: lottie ? ((isDarkBar && lottie.darkColors) || lottie.colors) : null,
-        lottieLoop: Boolean(lottie && !selected && lottie.loopsWhenUnselected),
-        lottieAutoplay: Boolean(lottie && !selected && lottie.loopsWhenUnselected),
-        lottieResting: selected ? 'last' : 'first',
-        lottieStyle: lottie ? `width: ${lottie.width}px; height: ${lottie.height}px;` : '',
         imageStyle: item.imageStyle,
         imageSizeStyle: item.imageSize ? `width: ${item.imageSize.width}px; height: ${item.imageSize.height}px;` : '',
         tint: selected ? item.selectedIconTint : item.iconTint,
         titleStyle: `${item.titleStyle}${color ? `color: ${color};` : ''}${selected ? item.selectedTitleFontStyle : item.titleFontStyle}`,
-        itemStyle: background ? `background-color: ${background};` : '',
+        // [EN] cyl-tab-bar-item draws the background. [CN] 背景由 cyl-tab-bar-item 绘制。
+        itemStyle: '',
         badge: isDot ? '' : badge,
         showsDot: isDot,
         accessibilityLabel: badge && !isDot ? `${item.accessibilityLabel}, ${badge}` : item.accessibilityLabel,

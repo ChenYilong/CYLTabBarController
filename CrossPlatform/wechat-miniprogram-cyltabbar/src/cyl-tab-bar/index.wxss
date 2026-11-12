@@ -1,3 +1,5 @@
+@import "./cyl_tap_animations.wxss";
+
 /* [EN] Classic bar (default, system): a 50 pt bar with a hairline on top, above the home indicator. [CN] 经典 TabBar（default、system）：50 pt 高、顶部一条细线，位于 Home 指示条之上。 */
 .cyl-tab-bar {
   position: fixed;
@@ -150,7 +152,7 @@
   box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.06);
 }
 
-.cyl-style-flatDesign .cyl-selected:not(.cyl-plus-slot) .cyl-tab-content {
+.cyl-style-flatDesign .cyl-selected:not(.cyl-plus-slot) .cyl-tab-item {
   padding: 2px 14px;
   border-radius: 18px;
   background-color: rgba(0, 122, 255, 0.12);
@@ -180,35 +182,8 @@
   height: 62px;
 }
 
-.cyl-style-liquidGlass .cyl-selected:not(.cyl-plus-slot) .cyl-tab-content {
+.cyl-style-liquidGlass .cyl-selected:not(.cyl-plus-slot) .cyl-tab-item {
   padding: 4px 12px;
   border-radius: 24px;
   background-color: rgba(0, 0, 0, 0.06);
 }
-
-/* [EN] Tap animations of CYLTabBarControllerTabButtonTapAnimation. [CN] CYLTabBarControllerTabButtonTapAnimation 的点击动画。 */
-.cyl-animate-scale,
-.cyl-animate-zoomIn,
-.cyl-animate-bounce,
-.cyl-animate-bounceWithFireworks,
-.cyl-animate-rotation,
-.cyl-animate-flip,
-.cyl-animate-fume {
-  animation-timing-function: ease-out;
-  animation-fill-mode: both;
-}
-
-.cyl-animate-scale { animation-name: cyl-scale; }
-.cyl-animate-zoomIn { animation-name: cyl-zoom-in; }
-.cyl-animate-bounce,
-.cyl-animate-bounceWithFireworks { animation-name: cyl-bounce; }
-.cyl-animate-rotation { animation-name: cyl-rotation; }
-.cyl-animate-flip { animation-name: cyl-flip; }
-.cyl-animate-fume { animation-name: cyl-fume; }
-
-@keyframes cyl-scale { 0% { transform: scale(1); } 50% { transform: scale(0.8); } 100% { transform: scale(1); } }
-@keyframes cyl-zoom-in { 0% { transform: scale(1); } 50% { transform: scale(1.25); } 100% { transform: scale(1); } }
-@keyframes cyl-bounce { 0% { transform: translateY(0); } 30% { transform: translateY(-8px); } 60% { transform: translateY(0); } 80% { transform: translateY(-3px); } 100% { transform: translateY(0); } }
-@keyframes cyl-rotation { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-@keyframes cyl-flip { 0% { transform: perspective(200px) rotateY(0deg); } 100% { transform: perspective(200px) rotateY(360deg); } }
-@keyframes cyl-fume { 0% { opacity: 1; transform: scale(1); } 50% { opacity: 0.3; transform: scale(1.2); } 100% { opacity: 1; transform: scale(1); } }

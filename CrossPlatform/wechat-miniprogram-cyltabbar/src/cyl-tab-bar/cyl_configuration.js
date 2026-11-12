@@ -436,6 +436,8 @@ function cylItem(attributes, environment, theme, defaults) {
     backgroundColor: cylColor(attributes.CYLTabBarItemBackgroundColor) || cylColor(theme.CYLTabBarItemBackgroundColor),
     selectedBackgroundColor: cylColor(attributes.CYLTabBarItemSelectedBackgroundColor)
       || cylColor(theme.CYLTabBarItemSelectedBackgroundColor),
+    imageInsets,
+    titleOffset,
     imageStyle: cylTranslateStyle((imageInsets.left - imageInsets.right) / 2, (imageInsets.top - imageInsets.bottom) / 2),
     titleStyle: cylTranslateStyle(titleOffset.horizontal, titleOffset.vertical),
     accessibilityLabel: String(attributes.CYLTabBarItemAccessibilityLabel || '') || title || identifier,

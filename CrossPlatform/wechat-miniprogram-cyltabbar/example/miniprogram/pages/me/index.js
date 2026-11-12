@@ -75,6 +75,9 @@ Component({
     cyl_tapAnimation(event) {
       this.cyl_override({ CYLTabBarControllerTabButtonTapAnimation: event.currentTarget.dataset.value });
     },
+    cyl_openItemPlayground() {
+      wx.navigateTo({ url: '/pages/item/index' });
+    },
     cyl_openPlayground() {
       wx.navigateTo({ url: '/pages/lottie/index' });
     },

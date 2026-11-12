@@ -1,6 +1,6 @@
 {
   "component": true,
   "usingComponents": {
-    "cyl-lottie": "cyl-lottie-miniprogram/cyl-lottie/index"
+    "cyl-tab-bar-item": "../cyl-tab-bar-item/index"
   }
 }

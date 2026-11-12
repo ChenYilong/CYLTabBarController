@@ -1,0 +1,85 @@
+@import "../cyl-tab-bar/cyl_tap_animations.wxss";
+
+/* [EN] The icon above the title, centered in the item. [CN] 图标在标题上方，在 Item 中居中。 */
+:host {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cyl-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+}
+
+.cyl-item-icon-box {
+  position: relative;
+  width: 28px;
+  height: 28px;
+}
+
+.cyl-item-animation,
+.cyl-item-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* [EN] Tinting (#787): the image is drawn outside the clipped box and its drop shadow lands in place. [CN] 着色（#787）：图片画在裁剪框外，投影落在原位。 */
+.cyl-item-tint {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.cyl-item-tinted {
+  transform: translateX(-200px);
+}
+
+.cyl-item-title {
+  margin-top: 2px;
+  font-size: 10px;
+  line-height: 12px;
+  color: #8e8e93;
+}
+
+.cyl-item-selected .cyl-item-title {
+  color: #007aff;
+}
+
+.cyl-item-centered .cyl-item-title {
+  margin-top: 0;
+}
+
+.cyl-item-badge {
+  position: absolute;
+  top: -4px;
+  left: 18px;
+  min-width: 18px;
+  height: 18px;
+  box-sizing: border-box;
+  border-radius: 9px;
+  background-color: #ff3b30;
+  color: #ffffff;
+  font-size: 11px;
+  line-height: 16px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.cyl-item-badge-dot {
+  position: absolute;
+  top: -2px;
+  left: 24px;
+  width: 9px;
+  height: 9px;
+  padding: 0 !important;
+  border-radius: 5px;
+  background-color: #ff3b30;
+}

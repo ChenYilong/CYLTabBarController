@@ -1,0 +1,27 @@
+<!-- [EN] An animated icon (or an image) with its badge, and a title. [CN] 动画图标（或图片）与角标，以及标题。 -->
+<view
+  class="cyl-item {{m.selected ? 'cyl-item-selected' : ''}} {{m.centered ? 'cyl-item-centered' : ''}} {{animationClass}}"
+  style="{{m.itemStyle}}"
+  bindtap="cyl_onTap"
+  aria-hidden="true"
+>
+  <view wx:if="{{m.image || m.animationPath}}" class="cyl-item-icon-box" style="{{m.iconBoxStyle}}">
+    <cyl-lottie
+      wx:if="{{m.animationType === 'lottie'}}"
+      id="cyl-item-animation"
+      class="cyl-item-animation"
+      path="{{m.animationPath}}"
+      colors="{{animationColors}}"
+      loop="{{!m.selected && loopsWhenUnselected}}"
+      autoplay="{{!m.selected && loopsWhenUnselected}}"
+      resting-frame="{{m.selected ? 'last' : 'first'}}"
+    />
+    <view wx:elif="{{m.image && m.iconTint}}" class="cyl-item-tint">
+      <image class="cyl-item-image cyl-item-tinted" src="{{m.image}}" style="filter: drop-shadow({{m.iconTint}} 200px 0);" mode="aspectFit" />
+    </view>
+    <image wx:elif="{{m.image}}" class="cyl-item-image" src="{{m.image}}" mode="aspectFit" />
+    <text wx:if="{{m.showsBadge && !m.badgeIsDot}}" class="cyl-item-badge" style="{{m.badgeStyle}}">{{m.badgeText}}</text>
+    <view wx:if="{{m.showsBadge && m.badgeIsDot}}" class="cyl-item-badge-dot" style="{{m.badgeStyle}}"></view>
+  </view>
+  <text wx:if="{{m.title}}" class="cyl-item-title" style="{{m.titleStyle}}">{{m.title}}</text>
+</view>
