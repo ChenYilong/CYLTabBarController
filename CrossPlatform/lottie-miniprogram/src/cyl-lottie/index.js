@@ -193,7 +193,9 @@ Component({
             this.cylAnimation.setSpeed(speed)
           }
           this.cyl_rest()
-          if (autoplay) {
+          if (this.cylPendingPlay) {
+            this.cyl_playFromStart()
+          } else if (autoplay) {
             this.cylAnimation.play()
           }
           this.triggerEvent('ready', {
@@ -256,9 +258,16 @@ Component({
      * [CN] 从第一帧开始播放（Tab 被选中时）。
      */
     cyl_playFromStart() {
-      if (this.cylAnimation) {
-        this.cylAnimation.goToAndPlay(0, true)
+      if (!this.cylAnimation) {
+        // [EN] A play request made while the file loads (a new tab page's tab bar selects its tab at once) runs when it
+        //      is ready; dropping it showed the selected icon on its last frame with no animation.
+        // [CN] 文件加载期间的播放请求（新 Tab 页面的 TabBar 会立即选中其 Tab）在就绪后执行；之前被丢弃，选中的图标
+        //      直接停在最后一帧，没有动画。
+        this.cylPendingPlay = true
+        return
       }
+      this.cylPendingPlay = false
+      this.cylAnimation.goToAndPlay(0, true)
     },
 
     cyl_goToAndStop(value, isFrame) {
