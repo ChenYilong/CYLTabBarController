@@ -360,6 +360,8 @@ docs/
 │   ├── wechat-miniprogram-api-11-lottie-playground.png
 │   ├── wechat-miniprogram-api-12-lottie-recolor-cover.png
 │   ├── wechat-miniprogram-api-13-issue31-lottie.png
+│   ├── wechat-miniprogram-api-14-interface-style-dark.png
+│   ├── wechat-miniprogram-api-15-plus-tap-without-page.png
 │   ├── wechat-miniprogram-badges.png
 │   ├── wechat-miniprogram-christmas-glass.png
 │   ├── wechat-miniprogram-flat-login.png

@@ -10,4 +10,6 @@ docs/WeChat-Mini-Program.md lists these WeChat custom tab bar projects as refere
 They were used for the approach only (app.json "tabBar": {"custom": true} with a custom-tab-bar component, a raised
 middle button, getTabBar() in the tab pages). No source code, image or other file of them is included here.
 
-The skin images in miniprogram/shared/skins are copies of Example-Shared/Configurations/Skins of this repository.
+The files in example/miniprogram/shared are copies of Example-Shared/Configurations (skins, localization) and of
+Example/Classes/Other/LottieResources (Lottie icons) of this repository, written by example/scripts/cyl_sync_shared.js.
+cyl-lottie-miniprogram (../lottie-miniprogram) is a fork of wechat-miniprogram/lottie-miniprogram (MIT).

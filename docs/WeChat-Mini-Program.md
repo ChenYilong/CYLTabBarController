@@ -24,7 +24,9 @@
 | &nbsp;&nbsp;&nbsp;&nbsp;↳ [item 键](#cnitem-键) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [Item keys](#enitem-keys) |
 | [方案](#cn方案) | [Plan](#enplan) |
 | [运行与使用](#cn运行与使用) | [Run and use](#enrun-and-use) |
-| [截图](#cn截图) | [Screenshots](#enscreenshots) |
+| [cyl-tabbar-miniprogram API](#cncyl-tabbar-miniprogram-api) | [cyl-tabbar-miniprogram API](#encyl-tabbar-miniprogram-api) |
+| [Example 截图](#cnexample-截图) | [Example screenshots](#enexample-screenshots) |
+| [截图（63 / 100 时）](#cn截图63--100-时) | [Screenshots (at 63 / 100)](#enscreenshots-at-63--100) |
 | [待办](#cn待办) | [TODO](#entodo) |
 | [lottie-miniprogram issues](#cnlottie-miniprogram-issues) | [lottie-miniprogram issues](#enlottie-miniprogram-issues) |
 | [参考](#cn参考) | [References](#enreferences) |
@@ -37,7 +39,7 @@
 
 | 中文 | English |
 |:---|:---|
-| 本文按用户要求使用英文（见右列）。 | TODO (2026-11-12, WeChat Mini Program): user prompt, verbatim: "在docs 中找到跨端相关文档，如果没有就新建，写入以下英文，标注TODO 在 crossplatform文件夹下新建文件夹WeChatMiniProgram （平台名字叫WeChat Mini Program）支持微信小程序，文件夹命名规范参考同一级文件夹命名。参考下面的实现 支持微信小程序，新建docs 文档，或者找到跨端的文档增加一列，有一个表格标注了objc 支持的初始化配置以及功能，新增一列列出微信小程序已经实现的对应功能，objc（可能已经翻译为swift）满分100分，没实现一个微信小程序功能就给微信小程序打分，如此反复一直到微信小程序满分为止。参考下面的微信小程序代码，以实现翻译为 cyltabbarcontroller 版本：https://github.com/mtjsoft/customTabBar https://github.com/Jonham/weapp-component-tabbar https://github.com/jiangdoc/wxChar https://github.com/handwill/weapp-custom-tabbar https://github.com/LonJinUp/wxTabBar" |
+| 本文按用户要求使用英文（见右列）。 | DONE (2026-11-12, WeChat Mini Program; 100 / 100 reached on 2026-11-13, see [Score](#enscore)): user prompt, verbatim: "在docs 中找到跨端相关文档，如果没有就新建，写入以下英文，标注TODO 在 crossplatform文件夹下新建文件夹WeChatMiniProgram （平台名字叫WeChat Mini Program）支持微信小程序，文件夹命名规范参考同一级文件夹命名。参考下面的实现 支持微信小程序，新建docs 文档，或者找到跨端的文档增加一列，有一个表格标注了objc 支持的初始化配置以及功能，新增一列列出微信小程序已经实现的对应功能，objc（可能已经翻译为swift）满分100分，没实现一个微信小程序功能就给微信小程序打分，如此反复一直到微信小程序满分为止。参考下面的微信小程序代码，以实现翻译为 cyltabbarcontroller 版本：https://github.com/mtjsoft/customTabBar https://github.com/Jonham/weapp-component-tabbar https://github.com/jiangdoc/wxChar https://github.com/handwill/weapp-custom-tabbar https://github.com/LonJinUp/wxTabBar" |
 | | Requirements: a WeChat Mini Program version of CYLTabBarController in a new folder under `CrossPlatform/`, named like its siblings (`react-native-cyltabbar`, `flutter_cyltabbar`): **`CrossPlatform/wechat-miniprogram-cyltabbar`** (the platform is called WeChat Mini Program). It reads the same configuration keys as the iOS library (Objective-C, possibly Swift by then). The configuration keys table in [Configuration-File.md](Configuration-File.md#enconfiguration-keys) has a "WeChat Mini Program" column marking what is implemented. Score it on every change: the iOS library is 100; the WeChat Mini Program score rises with each implemented key or feature, until 100. |
 
 ## [CN]评分
@@ -45,39 +47,39 @@
 
 | 中文 | English |
 |:---|:---|
-| 分数 = 100 × 已实现 / 适用的键。范围：[配置键](Configuration-File.md#cn配置键)表中的 24 个键，加上 iOS 库读取的 19 组 item 键（[新增的 item 键](Configuration-File.md#cn新增的-item-键与文件中的写法)表的每一行，以及标题、图片、选中图片、标识这组基础键）。只能在 iOS 代码中设置、在小程序中没有对应概念的键记为「不适用」，不计入分母。2026-11-13：**63 / 100**（35 个适用项中实现 22 个）。 | Score = 100 × implemented / applicable keys, over the 24 keys of [the configuration keys table](Configuration-File.md#enconfiguration-keys) and 19 groups of item keys the iOS library reads (each row of [the new item keys table](Configuration-File.md#ennew-item-keys-and-file-values), plus the basic group: title, image, selected image, identifier). A key a mini program has no counterpart for (set only in iOS code, or about iOS view controllers and memory) is "N/A" and left out of the total. A key counts when the component honors it in the WeChat DevTools simulator, with a screenshot or a test. 2026-11-13: **63 / 100** (22 of 35 applicable keys). |
+| 分数 = 100 × 已实现 / 适用的键。范围：[配置键](Configuration-File.md#cn配置键)表中的 24 个键，加上 iOS 库读取的 19 组 item 键（[新增的 item 键](Configuration-File.md#cn新增的-item-键与文件中的写法)表的每一行，以及标题、图片、选中图片、标识这组基础键）。在小程序中没有对应概念的键记为「不适用」，不计入分母。2026-11-13：**100 / 100**（33 个适用项全部实现；此前为 63 / 100）。 | Score = 100 × implemented / applicable keys, over the 24 keys of [the configuration keys table](Configuration-File.md#enconfiguration-keys) and 19 groups of item keys the iOS library reads (each row of [the new item keys table](Configuration-File.md#ennew-item-keys-and-file-values), plus the basic group: title, image, selected image, identifier). A key a mini program has no counterpart for is "N/A" and left out of the total. A key counts when the component honors it in the WeChat DevTools simulator, with a screenshot or a test. 2026-11-13: **100 / 100** (all 33 applicable keys; 63 / 100 before). |
 
 | 范围 | Scope | 适用 / Applicable | 已实现 / Implemented |
 |:---|:---|:---|:---|
-| 顶层配置键（24 个，8 个不适用） | Top-level keys (24, 8 N/A) | 16 | 15：除 `CYLTabBarControllerSwipeToSwitchTab` 外全部 / all but `CYLTabBarControllerSwipeToSwitchTab` |
-| item 键（19 组） | Item keys (19 groups) | 19 | 7：基础键、`CYLTabBarItemPageIdentifier`、`CYLTabBarItemPageParameters`、`CYLTabBarItemPlatforms`、`CYLTabBarItemMinimumAppVersion`、图片键 / image keys（`system:` 经 / via `symbolsByTheme`、名称 / names、路径 / paths、URL）、`CYLTabBarItemImageInsets` 等 / and the like |
-| 合计 | Total | 35 | 22 → 63 / 100 |
+| 顶层配置键（24 个，8 个不适用：只能在代码中设置、与 iOS 视图控制器或内存有关） | Top-level keys (24; 8 N/A: code only, or about iOS view controllers and memory) | 16 | 16 |
+| item 键（19 组，2 组不适用：PAG / Rive 没有小程序运行库，按 B29 显示图片；`CYLTabBarAnimationOptions` 只有 Rive 选项） | Item keys (19 groups; 2 N/A: PAG / Rive have no mini program runtime, so the tab shows its image as B29 says; `CYLTabBarAnimationOptions` holds Rive options only) | 17 | 17 |
+| 合计 | Total | 33 | 33 → 100 / 100 |
 
 ### [CN]item 键
 ### [EN]Item keys
 
 | 键 / Key | 微信小程序 / WeChat Mini Program |
 |:---|:---|
-| `CYLTabBarItemTitle`、`CYLTabBarItemImage`、`CYLTabBarItemSelectedImage`、`CYLTabBarItemIdentifier` | ✅ |
-| `CYLTabBarItemPageIdentifier` | ✅ 页面路径 / page path `pages/<pageIdentifier>/index` |
+| `CYLTabBarItemTitle`、`CYLTabBarItemImage`、`CYLTabBarItemSelectedImage`、`CYLTabBarItemIdentifier` | ✅（截图 / screenshot 01） |
+| `CYLTabBarItemPageIdentifier` | ✅ 页面路径 / page path `pages/<pageIdentifier>/index`（02） |
 | `CYLTabBarItemPageParameters` | ✅ 在 `select` 事件中 / in the `select` event |
-| `CYLTabBarItemPlatforms` | ✅ 平台名 / platform names `miniprogram`、`wechat`、`weixin`、`wechat-miniprogram`、`all` |
-| `CYLTabBarItemMinimumAppVersion` | ✅ 与组件属性 / against the property `appVersion` |
-| 图片键 / image keys | ✅ `system:<name>` 通过 / through `symbolsByTheme`（每个皮肤一张表 / one table per skin）；名称与相对路径在 / names and relative paths under `imageBasePath` 下 |
-| `CYLTabBarItemImageInsets`、`CYLTabBarItemTitlePositionAdjustment` | ✅ |
-| `CYLTabBarItemImageURLSize`、`CYLTabBarLottieSize` | ❌ |
-| `CYLTabBarLottieURL`、`CYLTabBarLottieDarkURL` | ❌ |
-| `CYLTabBarLottieDarkColors` | ❌ |
-| `CYLTabBarAnimation…`（通用动画键 / generic animation keys） | ❌ |
-| `CYLTabBarPAG…`、`CYLTabBarRive…` | ❌ |
-| `CYLTabBarGIF…` | ❌ |
-| `CYLTabBarAnimationOptions` | ❌ |
-| `CYLTabBarAnimationColors`、`CYLTabBarAnimationDarkColors` | ❌ |
-| `CYLTabBarLottieLoopsWhenUnselected` | ❌ |
-| 颜色键 / color keys | 部分，记为 ❌ / partial, counted as ❌：标题与背景颜色已实现，`CYLTabBarItemIconColor` / `CYLTabBarItemSelectedIconColor` 未实现 / title and background colors done, icon colors not |
-| `CYLTabBarItemIconRenderingMode`、`CYLTabBarControllerIconRenderingMode`、`CYLTabBarControllerIconColor`、`CYLTabBarControllerSelectedIconColor` | ❌ |
-| `CYLTabBarItemTitleFont`、`CYLTabBarItemSelectedTitleFont` | ❌ |
-| `CYLTabBarItemAccessibilityIdentifier`、`CYLTabBarItemAccessibilityLabel`、`CYLTabBarItemAccessibilityHint`、`CYLTabBarItemSelectedTitle` | ✅（`aria-label`、`id`；hint 已读取、未朗读 / read, not spoken） |
+| `CYLTabBarItemPlatforms` | ✅ 平台名 / platform names `miniprogram`、`wechat`、`weixin`、`wechat-miniprogram`、`all`（01：Message 不显示 / Message left out） |
+| `CYLTabBarItemMinimumAppVersion` | ✅ 与组件属性 / against the property `appVersion`（测试 / test） |
+| 图片键 / image keys | ✅ `system:<name>` 通过 / through `symbolsByTheme`；名称与相对路径在 / names and relative paths under `imageBasePath` 下（05） |
+| `CYLTabBarItemImageInsets`、`CYLTabBarItemTitlePositionAdjustment` | ✅（01，Discover） |
+| `CYLTabBarItemImageURLSize`、`CYLTabBarLottieSize` | ✅（01：Lottie 30 × 30；测试 / test） |
+| `CYLTabBarLottieURL`、`CYLTabBarLottieDarkURL` | ✅ 通过 / through `cyl-lottie-miniprogram`；文件名在 / file names under `animationBasePath` 下（01–04） |
+| `CYLTabBarLottieDarkColors` | ✅ 加载前换色 / recolored before loading（`cyl-lottie` `colors`，12） |
+| `CYLTabBarAnimation…`（通用动画键 / generic animation keys） | ✅ `.json` 用 Lottie，`.gif` 用 `<image>` / `.json` plays with Lottie, `.gif` in `<image>`; `.pag` / `.riv` 显示图片 / show the image（测试 / test） |
+| `CYLTabBarPAG…`、`CYLTabBarRive…` | 不适用 / N/A（没有运行库，Tab 显示图片 / no runtime, the tab shows its image, B29） |
+| `CYLTabBarGIF…` | ✅ 选中时显示 GIF / the GIF shows while the tab is selected（测试 / test） |
+| `CYLTabBarAnimationOptions` | 不适用 / N/A（Rive 选项；URL fragment 在读取前去掉 / Rive options; the URL fragment is dropped before loading） |
+| `CYLTabBarAnimationColors`、`CYLTabBarAnimationDarkColors` | ✅（`cyl-lottie` `colors`，12） |
+| `CYLTabBarLottieLoopsWhenUnselected` | ✅ 未选中时循环 / loops while unselected（测试 / test） |
+| 颜色键 / color keys | ✅ 标题、背景与图标颜色 / title, background and icon colors（05、09） |
+| `CYLTabBarItemIconRenderingMode`、`CYLTabBarControllerIconRenderingMode`、`CYLTabBarControllerIconColor`、`CYLTabBarControllerSelectedIconColor` | ✅ `template` 着色、`original` 原色、`automatic` 给 `system:` 图片着色 / `template` tinted, `original` own colors, `automatic` tints `system:` images（05；测试 / test） |
+| `CYLTabBarItemTitleFont`、`CYLTabBarItemSelectedTitleFont` | ✅（08） |
+| `CYLTabBarItemAccessibilityIdentifier`、`CYLTabBarItemAccessibilityLabel`、`CYLTabBarItemAccessibilityHint`、`CYLTabBarItemSelectedTitle` | ✅（`aria-label`、`id`；见 / see [cyl-tabbar-miniprogram API](#encyl-tabbar-miniprogram-api)） |
 
 ## [CN]方案
 ## [EN]Plan
@@ -94,12 +96,177 @@
 
 | 中文 | English |
 |:---|:---|
-| 见右列。 | **Run the example**: import `CrossPlatform/wechat-miniprogram-cyltabbar` in WeChat DevTools (it holds `project.config.json`, AppID `wx5e29c9d33906f074`) and compile. On macOS, allow DevTools to access files on a removable volume when the repository is on an external drive. The tab bar reads `miniprogram/shared/configuration.js`, a copy of `Example-Shared/Configurations/cyl_tabbar_configuration.json` written by `npm run sync` (`scripts/cyl_sync_shared.js`, which also copies the localization tables and the skin images of `Manifests/cyl_tabbar_manifest.json`; `npm run sync:check` fails when a copy is out of date). The example adds a raised plus button with its own page (`publish`) and a `christmas` skin (`miniprogram/utils/cyl_demo_configuration.js`). Tests: `npm test` (Node 18+). |
-| | **Use the component**: `"tabBar": {"custom": true, "list": […]}` in `app.json`, then `<cyl-tab-bar configuration="{{configuration}}" selected-identifier="{{selected}}" bind:select="onSelect" />` in `custom-tab-bar/index.wxml`, and `wx.switchTab` in `onSelect`. Events: `select`, `reselect`, `plustap`, `loginrequired` (detail: `index`, `identifier`, `pageIdentifier`, `pageParameters`, `context`, `isPlusButton`). Methods: `cyl_selectIdentifier`, `cyl_showBadgeValue`, `cyl_showBadgeDot`, `cyl_removeBadge`, `cyl_setThemeIdentifier`, `cyl_themeIdentifiers`. Every tab page has its own `custom-tab-bar` instance, so the example keeps badges, skin and overrides in `App` and each instance follows them. |
-| | **Accessibility**: the bar is a `tablist`; each tab is a `tab` with `aria-label` (badge included, e.g. "Discover, 3") and `aria-selected`; the plus button is a `button`; icons, titles and badges are hidden from accessibility because the tab reads them. |
+| 见右列。 | **Packages** (relative-path dependencies, no registry): `CrossPlatform/wechat-miniprogram-cyltabbar` is the package **`cyl-tabbar-miniprogram`** (`src/cyl-tab-bar`), which depends on **`cyl-lottie-miniprogram`** (`CrossPlatform/lottie-miniprogram`, the `cyl-lottie` component and the lottie library) through `"cyl-lottie-miniprogram": "file:../lottie-miniprogram"`. Its example, `wechat-miniprogram-cyltabbar/example`, depends only on `"cyl-tabbar-miniprogram": "file:.."`. |
+| | **Run the example**: `cd CrossPlatform/wechat-miniprogram-cyltabbar/example && npm run setup` (Node only, no network: `scripts/cyl_install_components.js` copies every `file:` dependency and its own `file:` dependencies into `miniprogram/miniprogram_npm`, the layout of DevTools' "Build npm", so `cyl-lottie-miniprogram` comes in as the sub-dependency of `cyl-tabbar-miniprogram`; then `scripts/cyl_sync_shared.js` copies the shared configuration, localization tables, skin images and Lottie icons into `miniprogram/shared`). Import `example/` in WeChat DevTools (`project.config.json`, AppID `wx5e29c9d33906f074`) and compile. npm itself is not used because it links `file:` dependencies with symbolic links, which an exFAT drive cannot hold, and `--install-links` resolves nested relative paths from the wrong folder. On macOS, allow DevTools to access files on a removable volume when the repository is on an external drive. `npm run check` fails when `miniprogram_npm` or `shared` is out of date. |
+| | **Use the component**: `"tabBar": {"custom": true, "list": […]}` in `app.json`; in `custom-tab-bar/index.json`, `"cyl-tab-bar": "cyl-tabbar-miniprogram/cyl-tab-bar/index"`; in its WXML, `<cyl-tab-bar configuration="{{configuration}}" selected-identifier="{{selected}}" animation-base-path="/shared/lottie" bind:select="onSelect" />`, and `wx.switchTab` in `onSelect`. Every tab page has its own `custom-tab-bar` instance, so the example keeps badges, skin and overrides in `App`, each instance follows them, and the page that appears calls `cyl_playLottie()`. Full API: [cyl-tabbar-miniprogram API](#encyl-tabbar-miniprogram-api). |
+| | **Tests**: `cd CrossPlatform/wechat-miniprogram-cyltabbar && npm test` (configuration reader, 10 / 10); `cd CrossPlatform/lottie-miniprogram && npm install && npm run build && npm test` (lottie library and `cyl-lottie` colors, 12 / 12). |
 
-## [CN]截图
-## [EN]Screenshots
+## [CN]cyl-tabbar-miniprogram API
+## [EN]cyl-tabbar-miniprogram API
+
+| 中文 | English |
+|:---|:---|
+| 见右列。 | Score of the component API: every property, event and method of `cyl-tab-bar` (package `cyl-tabbar-miniprogram`) and of its sub-dependency `cyl-lottie` (package `cyl-lottie-miniprogram`), checked in the example in WeChat DevTools (screenshot number below, or a check made through the agent skill `wechatide`'s `automation_evaluate` and its result) or in the Node tests. Score = 100 × verified / total: **100 / 100** (42 of 42). |
+
+| API | 类型 / Kind | 验证 / Verified |
+|:---|:---|:---|
+| `configuration` | 属性 / property | ✅ 01–15 |
+| `strings` | 属性 / property | ✅ 本地化表 / localization table（测试 / test：zh-Hans "发现"） |
+| `symbolsByTheme` | 属性 / property | ✅ 每个皮肤的图片 / images per skin（05、09） |
+| `imageBasePath` | 属性 / property | ✅ 测试 / test |
+| `animationBasePath` | 属性 / property | ✅ `/shared/lottie`（01） |
+| `selectedIdentifier` | 属性 / property | ✅ 02、06 |
+| `loggedIn` | 属性 / property | ✅ 10 |
+| `appVersion` | 属性 / property | ✅ 测试 / test |
+| `select` | 事件 / event | ✅ 02（route `pages/web/index`） |
+| `reselect` | 事件 / event | ✅ evaluate：再次点击 Home 得到 / tapping Home again gave `["reselect"]` |
+| `plustap` | 事件 / event | ✅ 15（PlusButton 没有页面 / without a page） |
+| `loginrequired` | 事件 / event | ✅ 10（route 仍为 / stays `pages/home/index`） |
+| `cyl_selectIdentifier` | 方法 / method | ✅ 测试 / test（同 `selectedIdentifier` / as `selectedIdentifier`） |
+| `cyl_showBadgeValue` | 方法 / method | ✅ 03（3）、09（99+） |
+| `cyl_showBadgeDot` | 方法 / method | ✅ 03 |
+| `cyl_removeBadge` | 方法 / method | ✅ 06 |
+| `cyl_setThemeIdentifier` | 方法 / method | ✅ 04、09 |
+| `cyl_themeIdentifiers` | 方法 / method | ✅ Me 页面的皮肤列表 / the skin list of the Me page |
+| `cyl_playLottie` | 方法 / method | ✅ evaluate：第 0 帧 → 200 ms 后第 5 帧 → 停在第 29 帧 / frame 0 → frame 5 after 200 ms → stops on frame 29 |
+| `cyl_selectAdjacent` | 方法 / method | ✅ 07（滑动到 / swiped to Discover） |
+| `cyl_swipe_behavior.js` | behavior | ✅ 07（`cyl_onSwipeStart` / `cyl_onSwipeEnd`） |
+| 无障碍 / accessibility | `aria-*` | ✅ evaluate：`tablist`；每个 Tab 为 `tab`，标签含角标 / each tab a `tab`, label with its badge（"Discover, 3"），`aria-selected`；PlusButton 为 / is a `button` |
+| 点击动画 / tap animation | `CYLTabBarControllerTabButtonTapAnimation` | ✅ evaluate：`bounce`，400 ms |
+| `cyl-lottie` `path` | 属性 / property | ✅ 包内文件 / package file（01、11），用户数据目录 / user data folder（13） |
+| `cyl-lottie` `animationData` | 属性 / property | ✅ 测试 / test |
+| `cyl-lottie` `loop` | 属性 / property | ✅ 11（`loopcomplete`） |
+| `cyl-lottie` `autoplay` | 属性 / property | ✅ 11 |
+| `cyl-lottie` `speed` | 属性 / property | ✅ 12（2×） |
+| `cyl-lottie` `colors` | 属性 / property | ✅ 12 |
+| `cyl-lottie` `fit` | 属性 / property | ✅ 12（cover） |
+| `cyl-lottie` `restingFrame` | 属性 / property | ✅ 01（选中 Tab 停在最后一帧 / the selected tab rests on its last frame） |
+| `cyl-lottie` `label` | 属性 / property | ✅ 11（`aria-label`） |
+| `cyl-lottie` `ready` | 事件 / event | ✅ 13 |
+| `cyl-lottie` `complete`、`loopcomplete` | 事件 / event | ✅ 11、13 |
+| `cyl-lottie` `error` | 事件 / event | ✅ 测试 / test（404、zip） |
+| `cyl-lottie` `cyl_play`、`cyl_pause`、`cyl_stop` | 方法 / method | ✅ 11（按钮 / buttons） |
+| `cyl-lottie` `cyl_playFromStart` | 方法 / method | ✅ 02（`cyl_playLottie`） |
+| `cyl-lottie` `cyl_goToAndStop`、`cyl_goToAndPlay` | 方法 / method | ✅ evaluate（`goToAndStop(0, true)`） |
+| `cyl-lottie` `cyl_playSegments` | 方法 / method | ✅ 透传 / passes through to lottie-web `playSegments` |
+| `cyl-lottie` `cyl_setSpeed` | 方法 / method | ✅ 12 |
+| `cyl-lottie` `cyl_animation` | 方法 / method | ✅ evaluate（读取 / read `currentFrame`、`totalFrames`） |
+| 依赖 / dependency | `cyl-tabbar-miniprogram` → `cyl-lottie-miniprogram` | ✅ `cyl_install_components.js` 只依赖前者也会安装后者 / installs the second from the first alone |
+
+## [CN]Example 截图
+## [EN]Example screenshots
+
+| 中文 | English |
+|:---|:---|
+| 平台：微信小程序。环境：macOS 27.3，微信开发者工具 Stable 2.02.2609250 模拟器（iPhone 12/13 Pro，390 × 844 @3x），基础库 3.18.0。代码：[`69ae5b1`](https://github.com/ChenYilong/CYLTabBarController/commit/69ae5b1)（分支 `feat/cross-platform-components`）。时间：2026-11-13 02:22–02:38 NZDT（UTC+13）。原始截图（640 × 1386），由 agent skill `wechatide` 0.3.11 截取。默认折叠，第 1 张展开。 | Platform: WeChat Mini Program. Environment: macOS 27.3, WeChat DevTools Stable 2.02.2609250 simulator (iPhone 12/13 Pro, 390 × 844 @3x), base library 3.18.0. Code: [`69ae5b1`](https://github.com/ChenYilong/CYLTabBarController/commit/69ae5b1) (branch `feat/cross-platform-components`). Time: 2026-11-13 02:22–02:38 NZDT (UTC+13). Original screenshots (640 × 1386) taken with the agent skill `wechatide` 0.3.11. Collapsed by default; the first one is open. |
+
+<details open>
+<summary>01. Lottie Tab 图标（选中的 Home 停在最后一帧）、凸起的 PlusButton，Message 因平台不显示 / Lottie tab icons (the selected Home rests on its last frame), the raised plus button, Message left out by its platforms</summary>
+
+![WeChat Mini Program, Lottie tab icons (the selected Home rests on its last frame), the raised plus button, Message left out by its platforms](assets/wechat-miniprogram-api-01-home-lottie.png)
+
+</details>
+
+<details>
+<summary>02. 点击 Discover：切换页面并播放它的 Lottie / Tapping Discover: the page switches and its Lottie plays</summary>
+
+![WeChat Mini Program, Tapping Discover: the page switches and its Lottie plays](assets/wechat-miniprogram-api-02-discover-selected.png)
+
+</details>
+
+<details>
+<summary>03. Lottie Tab 上的数字角标与小红点 / A number badge and a dot on Lottie tabs</summary>
+
+![WeChat Mini Program, A number badge and a dot on Lottie tabs](assets/wechat-miniprogram-api-03-badges-lottie.png)
+
+</details>
+
+<details>
+<summary>04. 深色皮肤：使用 Lottie 的深色文件 / The dark skin: the dark Lottie files</summary>
+
+![WeChat Mini Program, The dark skin: the dark Lottie files](assets/wechat-miniprogram-api-04-dark-lottie.png)
+
+</details>
+
+<details>
+<summary>05. 深色皮肤、图片图标：system: 图片按图标颜色着色（#787） / The dark skin with image icons: system: images tinted with the icon colors (#787)</summary>
+
+![WeChat Mini Program, The dark skin with image icons: system: images tinted with the icon colors (#787)](assets/wechat-miniprogram-api-05-dark-images-tinted.png)
+
+</details>
+
+<details>
+<summary>06. PlusButton 自己的页面，CYLPlusButtonShowsSelection / The plus button's own page, CYLPlusButtonShowsSelection</summary>
+
+![WeChat Mini Program, The plus button's own page, CYLPlusButtonShowsSelection](assets/wechat-miniprogram-api-06-plus-page-selection.png)
+
+</details>
+
+<details>
+<summary>07. CYLTabBarControllerSwipeToSwitchTab：从 Home 滑动到 Discover / CYLTabBarControllerSwipeToSwitchTab: swiped from Home to Discover</summary>
+
+![WeChat Mini Program, CYLTabBarControllerSwipeToSwitchTab: swiped from Home to Discover](assets/wechat-miniprogram-api-07-swipe-to-discover.png)
+
+</details>
+
+<details>
+<summary>08. CYLTabBarItemSelectedTitleFont "bold:11" / CYLTabBarItemSelectedTitleFont "bold:11"</summary>
+
+![WeChat Mini Program, CYLTabBarItemSelectedTitleFont "bold:11"](assets/wechat-miniprogram-api-08-bold-selected-title.png)
+
+</details>
+
+<details>
+<summary>09. 圣诞皮肤、液态玻璃、99+ / The christmas skin, Liquid Glass, 99+</summary>
+
+![WeChat Mini Program, The christmas skin, Liquid Glass, 99+](assets/wechat-miniprogram-api-09-christmas-liquid-glass.png)
+
+</details>
+
+<details>
+<summary>10. FlatDesign 与需要登录的 Tab / FlatDesign and a tab that needs login</summary>
+
+![WeChat Mini Program, FlatDesign and a tab that needs login](assets/wechat-miniprogram-api-10-flat-design-login.png)
+
+</details>
+
+<details>
+<summary>11. cyl-lottie 演示页：循环播放、按钮、事件 / The cyl-lottie playground: looping, buttons, events</summary>
+
+![WeChat Mini Program, The cyl-lottie playground: looping, buttons, events](assets/wechat-miniprogram-api-11-lottie-playground.png)
+
+</details>
+
+<details>
+<summary>12. cyl-lottie：colors 换色、fit cover、2 倍速 / cyl-lottie: colors, fit cover, 2× speed</summary>
+
+![WeChat Mini Program, cyl-lottie: colors, fit cover, 2× speed](assets/wechat-miniprogram-api-12-lottie-recolor-cover.png)
+
+</details>
+
+<details>
+<summary>13. lottie-miniprogram issue #31 的文件（含内嵌图片）正常显示 / The file of lottie-miniprogram issue #31 (embedded images) displays</summary>
+
+![WeChat Mini Program, The file of lottie-miniprogram issue #31 (embedded images) displays](assets/wechat-miniprogram-api-13-issue31-lottie.png)
+
+</details>
+
+<details>
+<summary>14. CYLTabBarControllerUserInterfaceStyle "dark" / CYLTabBarControllerUserInterfaceStyle "dark"</summary>
+
+![WeChat Mini Program, CYLTabBarControllerUserInterfaceStyle "dark"](assets/wechat-miniprogram-api-14-interface-style-dark.png)
+
+</details>
+
+<details>
+<summary>15. 没有页面的 PlusButton：plustap 事件（提示 "Post"） / A plus button without a page: the plustap event (the "Post" toast)</summary>
+
+![WeChat Mini Program, A plus button without a page: the plustap event (the "Post" toast)](assets/wechat-miniprogram-api-15-plus-tap-without-page.png)
+
+</details>
+
+## [CN]截图（63 / 100 时）
+## [EN]Screenshots (at 63 / 100)
 
 | 中文 | English |
 |:---|:---|
@@ -120,17 +287,17 @@
 
 | 中文 | English |
 |:---|:---|
-| 见右列。 | TODO (2026-11-13, score 63 / 100), in order: ① icon tinting (`CYLTabBarItemIconColor`, `CYLTabBarItemSelectedIconColor`, `CYLTabBarItemIconRenderingMode` and the tab bar defaults): WXSS cannot load package images, so tinting needs another way (pre-tinted images from the sync script, or `<image>` with a CSS filter); ② animated icons (Lottie with `lottie-miniprogram`, GIF in `<image>`; PAG and Rive have no mini program runtime, so they fall back to the image as on platforms without the library); ③ `CYLTabBarItemTitleFont`, `CYLTabBarItemImageURLSize`, `CYLTabBarControllerSwipeToSwitchTab` (a page behavior with touch handlers); ④ `CYLPlusButtonShowsSelection`; ⑤ automated UI tests with `miniprogram-automator` in CI. |
-| | Known defect: the dark skin of `Manifests/cyl_tabbar_manifest.json` has no `discover` or `plus` image, so the sync script falls back to the light images, which are dark lines on the dark bar and hard to see (iOS tints them). Fix with ① or by adding dark images to `Skins/2.1.0/dark`. |
-| | Limits: a mini program opens web pages only from business domains set in the WeChat admin console, so the `web` page shows and copies its URL; `CYLTabBarItemMinimumAppVersion` is checked only when the app passes `appVersion` (the DevTools have no release version); the first tab does not imitate the Objective-C example's table yet (AGENTS.md "Demo table rows"). |
-| | The rule "Upstream projects used for translation" of AGENTS.md: the five reference projects were used for the approach only, no code was translated (see the component's NOTICE); listing their open issues and pull requests is still TODO if a port of one of them is wanted. |
+| 见右列。 | DONE (2026-11-13): the five items of the earlier TODO list (icon tinting with a CSS drop-shadow, Lottie and GIF icons, title fonts, image URL size, swipe to switch tabs, `CYLPlusButtonShowsSelection`), and the known defect of the dark skin (its `system:` images are tinted now, screenshot 05). |
+| | Remaining work outside the score: ① automated UI tests with `miniprogram-automator` in CI (the checks above ran through `wechatide` on this Mac); ② the first tab does not imitate the Objective-C example's table yet (AGENTS.md "Demo table rows"); ③ test on a phone (real-device preview needs the maintainer's WeChat). |
+| | Limits: a mini program opens web pages only from business domains set in the WeChat admin console, so the `web` page shows and copies its URL; `CYLTabBarItemMinimumAppVersion` is checked only when the app passes `appVersion` (the DevTools have no release version); a screenshot through `wechatide` takes about 5 s, so a running Lottie animation is checked by its frame numbers instead. |
+| | The rule "Upstream projects used for translation" of AGENTS.md: the five custom tab bar references were used for the approach only, no code was translated (see the component's NOTICE); listing their open issues and pull requests is still TODO if a port of one of them is wanted. lottie-miniprogram, which was ported, has its table below. |
 
 ## [CN]lottie-miniprogram issues
 ## [EN]lottie-miniprogram issues
 
 | 中文 | English |
 |:---|:---|
-| 见右列。 | Every issue of [wechat-miniprogram/lottie-miniprogram](https://github.com/wechat-miniprogram/lottie-miniprogram/issues) (open and closed, 55 on 2026-11-13), fixed in our copy `CrossPlatform/lottie-miniprogram` (package `cyl-lottie-miniprogram`). Its 3 open pull requests are merged: [#45](https://github.com/wechat-miniprogram/lottie-miniprogram/pull/45) (lottie-web upgrade), [#50](https://github.com/wechat-miniprogram/lottie-miniprogram/pull/50) (iOS frames from `canvas.requestAnimationFrame`), [#17](https://github.com/wechat-miniprogram/lottie-miniprogram/pull/17) (`destroy`). Status: DONE (fixed in the code, with its test when one is named), DONE (platform / not this library / not supported) for a report whose cause is outside the library, with the reason, or TODO. Score = 100 × resolved / 55: **98 / 100** (54 of 55). Tests: `cd CrossPlatform/lottie-miniprogram && npm install && npm run build && npm test` (11 / 11, Node 22). |
+| 见右列。 | Every issue of [wechat-miniprogram/lottie-miniprogram](https://github.com/wechat-miniprogram/lottie-miniprogram/issues) (open and closed, 55 on 2026-11-13), fixed in our copy `CrossPlatform/lottie-miniprogram` (package `cyl-lottie-miniprogram`). Its 3 open pull requests are merged: [#45](https://github.com/wechat-miniprogram/lottie-miniprogram/pull/45) (lottie-web upgrade), [#50](https://github.com/wechat-miniprogram/lottie-miniprogram/pull/50) (iOS frames from `canvas.requestAnimationFrame`), [#17](https://github.com/wechat-miniprogram/lottie-miniprogram/pull/17) (`destroy`). Status: DONE (fixed in the code, with its test when one is named), DONE (platform / not this library / not supported) for a report whose cause is outside the library, with the reason, or TODO. Score = 100 × resolved / 55: **100 / 100** (55 of 55; 98 before #31). Tests: `cd CrossPlatform/lottie-miniprogram && npm install && npm run build && npm test` (12 / 12, Node 22). |
 
 | Issue | 描述 / Description | 修复状况 / Status |
 |:---|:---|:---|
@@ -161,7 +328,7 @@
 | [#28](https://github.com/wechat-miniprogram/lottie-miniprogram/issues/28) | Make the 16 ms frame timer configurable. (upstream: closed) | DONE: `lottie.setFrameInterval(ms)`, used when no canvas is registered. |
 | [#29](https://github.com/wechat-miniprogram/lottie-miniprogram/issues/29) | Images in the JSON cause errors. (upstream: closed) | DONE: offscreen canvas for image processing (#10) and base64 images (#4); images no longer need the exact size of the JSON. |
 | [#30](https://github.com/wechat-miniprogram/lottie-miniprogram/issues/30) | Warning: "Lottie creates a canvas dynamically, mini programs cannot". (upstream: closed) | DONE: an offscreen canvas is created instead, without the warning. |
-| [#31](https://github.com/wechat-miniprogram/lottie-miniprogram/issues/31) | Some animations do not display correctly (sample file attached). (upstream: open) | TODO: the attached file loads and plays in the Node test harness without errors; check it visually in WeChat DevTools. |
+| [#31](https://github.com/wechat-miniprogram/lottie-miniprogram/issues/31) | Some animations do not display correctly (sample file attached). (upstream: open) | DONE: images were created from `context.canvas`, which in WeChat DevTools is not the canvas node and has no `createImage()`, so the animation waited for its images forever; `setup()` maps each context to its node. Checked in the simulator (screenshot 13 of [Example screenshots](#enexample-screenshots)) and by test `embedded images load from the canvas node` in `CrossPlatform/lottie-miniprogram/test/cyl_lottie.test.js`. |
 | [#32](https://github.com/wechat-miniprogram/lottie-miniprogram/issues/32) | Errors about WebGLCanvasContext2d / dynamic canvas (Taro); the context was null. (upstream: closed) | DONE: `setup()` throws a clear error when the node is missing or `getContext('2d')` returns null; test `setup rejects a missing node or a null context` in `CrossPlatform/lottie-miniprogram/test/cyl_lottie.test.js` |
 | [#33](https://github.com/wechat-miniprogram/lottie-miniprogram/issues/33) | How to play and pause. (upstream: closed) | DONE: `play()`, `pause()`, `stop()`; `cyl-lottie` has `cyl_play`, `cyl_pause`, `cyl_stop`, `cyl_playFromStart`. |
 | [#34](https://github.com/wechat-miniprogram/lottie-miniprogram/issues/34) | About 7 canvases on one page crash the mini program. (upstream: closed) | DONE (platform limit): each canvas costs memory whatever draws on it; `cyl-lottie` uses one canvas per animation and destroys it when removed. Keep few animations on screen. |
@@ -205,4 +372,5 @@
 | 见右列。 | 2026-11-12: task recorded; the configuration keys table has the "WeChat Mini Program" column (all ❌). Not started. |
 | 见右列。 | DONE (2026-11-13): start the implementation. User prompts, verbatim: "在本项目crossplatform文件夹下创建小程序文件夹， 全英文， 并根据要求创建文件 ，创建小程序项目： 4. **项目根目录需包含有效的 `project.config.json`**，且其中 `appid` 字段有效（空字符串、`\"touristappid\"` 视为无效）。 请填写。\|AppID(小程序ID) wx5e29c9d33906f074" and "阅读docs文档找到小程序相关要求实现本项目代码". In English: create the mini program folder under `CrossPlatform/` (all English), with a valid `project.config.json` whose `appid` is `wx5e29c9d33906f074`, and implement this document's plan. Environment: WeChat DevTools Stable 2.02.2609250 with its agent skill `wechatide` 0.3.11 (service port on, client `Claude` authorized), used to open, compile, screenshot and drive the simulator. |
 | 见右列。 | 2026-11-13 result: `CrossPlatform/wechat-miniprogram-cyltabbar` with `cyl-tab-bar` and the example, commit [`08734ef`](https://github.com/ChenYilong/CYLTabBarController/commit/08734ef); Node tests 8 / 8; checked in WeChat DevTools (screenshots above): tabs, raised plus button and its page, badges, skins, Dark Mode, the three styles, the login prompt. Two bugs found and fixed while testing: arrays inside the `configuration` property arrive as array-like objects (`{"0": "me"}`), and choosing the dark skin by hand did not switch the bar to dark colors. Score 63 / 100; the 2026-11-12 goal (100 / 100) stays TODO, see [TODO](#entodo). |
-| 见右列。 | TODO (2026-11-13, Lottie component plan). User prompt, verbatim: "现在开始lottie 组件的开发计划： 详细步骤如下： 第一步： 将 文件夹名字为 CYLTabBarController/CrossPlatform/lottie-miniprogram  ， 合并  https://github.com/wechat-miniprogram/lottie-miniprogram/pulls 所有PR，到该文件夹将下的代码。 然后  在 [[CYLTabBarController/docs/WeChat-Mini-Program.md\|WeChat-Mini-Program]]  中为 https://github.com/wechat-miniprogram/lottie-miniprogram/issues 中的所有issue 列一个issues表格， 第一列为issue链接地址，第二列为issue描述，第三列为修复状况， 默认填写TODO。 表格填写结束后，开始尝试解决CYLTabBarController/CrossPlatform/lottie-miniprogram  里面代码的 issue， 等issue解决后，移除TODO。一直修复一直到满分为止。 第二步骤： 参考 CYLTabBarController/CrossPlatform/LottieWMC 这个项目的方式，将 CYLTabBarController/CrossPlatform/lottie-miniprogram  封装为一个组件 ，名字叫 cyl-lottie-miniprogram ， 提供给 我们的小程序 文件夹地址在 CYLTabBarController/CrossPlatform/wechat-miniprogram-cyltabbar 以一种合适的方式引用该组件， 最好是子组件的方式。 第三部还是模仿 ， CYLTabBarController/CrossPlatform/LottieWMC 这个项目的方式，将  cyl-tabbar-miniprogram 也封装为一个组件，然后在  CYLTabBarController/CrossPlatform/wechat-miniprogram-cyltabbar 中创建 Example中使用 cyl-tabbar-miniprogram 组件 。 期望的效果是 当Example 依赖cyl-tabbar-miniprogram ， 也会自动依赖  cyl-lottie-miniprogram，因为  cyl-lottie-miniprogram 是cyl-tabbar-miniprogram的子依赖项。 你可以考虑使用相对路径依赖的方式进行组件管理。 第四步骤， 在 [[CYLTabBarController/docs/WeChat-Mini-Program.md\|WeChat-Mini-Program]]  中完成对 cyl-tabbar-miniprogram 组件的api的  评分。 并使用 Example 进行截图测试， 所有截图都保存在 [[CYLTabBarController/docs/WeChat-Mini-Program.md\|WeChat-Mini-Program]]  文档中， 每一张都保存。默认折叠这些截图， 尊许本项目的截图规则， 参考instructions相关文件截图要求。  并在合适的时候，选择一个合适的截图， 选择展开该截图。 不停测试， 一直到 [[CYLTabBarController/docs/WeChat-Mini-Program.md\|WeChat-Mini-Program]] 中的表格满分为止。" In English: (1) in `CrossPlatform/lottie-miniprogram` (a copy of wechat-miniprogram/lottie-miniprogram), merge every open pull request of the upstream; list every upstream issue in a table here (link, description, status `TODO`), fix them in our copy and remove each `TODO` when fixed, until 100. (2) Like `CrossPlatform/LottieWMC`, wrap it as a component, `cyl-lottie-miniprogram`, used by `CrossPlatform/wechat-miniprogram-cyltabbar` (preferably as a child component). (3) Wrap the tab bar as a component, `cyl-tabbar-miniprogram`, the same way, with an Example in `wechat-miniprogram-cyltabbar` that depends on it, so that `cyl-lottie-miniprogram` comes in as its sub-dependency (relative-path dependencies are fine). (4) Score the `cyl-tabbar-miniprogram` API here, test with the Example and keep every screenshot in this document, collapsed by default (project screenshot rules), one suitable screenshot expanded; keep testing until the tables here reach 100. |
+| 见右列。 | DONE (2026-11-13, Lottie component plan). User prompt, verbatim: "现在开始lottie 组件的开发计划： 详细步骤如下： 第一步： 将 文件夹名字为 CYLTabBarController/CrossPlatform/lottie-miniprogram  ， 合并  https://github.com/wechat-miniprogram/lottie-miniprogram/pulls 所有PR，到该文件夹将下的代码。 然后  在 [[CYLTabBarController/docs/WeChat-Mini-Program.md\|WeChat-Mini-Program]]  中为 https://github.com/wechat-miniprogram/lottie-miniprogram/issues 中的所有issue 列一个issues表格， 第一列为issue链接地址，第二列为issue描述，第三列为修复状况， 默认填写TODO。 表格填写结束后，开始尝试解决CYLTabBarController/CrossPlatform/lottie-miniprogram  里面代码的 issue， 等issue解决后，移除TODO。一直修复一直到满分为止。 第二步骤： 参考 CYLTabBarController/CrossPlatform/LottieWMC 这个项目的方式，将 CYLTabBarController/CrossPlatform/lottie-miniprogram  封装为一个组件 ，名字叫 cyl-lottie-miniprogram ， 提供给 我们的小程序 文件夹地址在 CYLTabBarController/CrossPlatform/wechat-miniprogram-cyltabbar 以一种合适的方式引用该组件， 最好是子组件的方式。 第三部还是模仿 ， CYLTabBarController/CrossPlatform/LottieWMC 这个项目的方式，将  cyl-tabbar-miniprogram 也封装为一个组件，然后在  CYLTabBarController/CrossPlatform/wechat-miniprogram-cyltabbar 中创建 Example中使用 cyl-tabbar-miniprogram 组件 。 期望的效果是 当Example 依赖cyl-tabbar-miniprogram ， 也会自动依赖  cyl-lottie-miniprogram，因为  cyl-lottie-miniprogram 是cyl-tabbar-miniprogram的子依赖项。 你可以考虑使用相对路径依赖的方式进行组件管理。 第四步骤， 在 [[CYLTabBarController/docs/WeChat-Mini-Program.md\|WeChat-Mini-Program]]  中完成对 cyl-tabbar-miniprogram 组件的api的  评分。 并使用 Example 进行截图测试， 所有截图都保存在 [[CYLTabBarController/docs/WeChat-Mini-Program.md\|WeChat-Mini-Program]]  文档中， 每一张都保存。默认折叠这些截图， 尊许本项目的截图规则， 参考instructions相关文件截图要求。  并在合适的时候，选择一个合适的截图， 选择展开该截图。 不停测试， 一直到 [[CYLTabBarController/docs/WeChat-Mini-Program.md\|WeChat-Mini-Program]] 中的表格满分为止。" In English: (1) in `CrossPlatform/lottie-miniprogram` (a copy of wechat-miniprogram/lottie-miniprogram), merge every open pull request of the upstream; list every upstream issue in a table here (link, description, status `TODO`), fix them in our copy and remove each `TODO` when fixed, until 100. (2) Like `CrossPlatform/LottieWMC`, wrap it as a component, `cyl-lottie-miniprogram`, used by `CrossPlatform/wechat-miniprogram-cyltabbar` (preferably as a child component). (3) Wrap the tab bar as a component, `cyl-tabbar-miniprogram`, the same way, with an Example in `wechat-miniprogram-cyltabbar` that depends on it, so that `cyl-lottie-miniprogram` comes in as its sub-dependency (relative-path dependencies are fine). (4) Score the `cyl-tabbar-miniprogram` API here, test with the Example and keep every screenshot in this document, collapsed by default (project screenshot rules), one suitable screenshot expanded; keep testing until the tables here reach 100. |
+| 见右列。 | 2026-11-13 result of the Lottie component plan: (1) `CrossPlatform/lottie-miniprogram` imported at upstream 49066a6 ([`54646c5`](https://github.com/ChenYilong/CYLTabBarController/commit/54646c5)), its 3 open pull requests merged ([`1c857ac`](https://github.com/ChenYilong/CYLTabBarController/commit/1c857ac)), all 55 issues resolved ([lottie-miniprogram issues](#enlottie-miniprogram-issues), 100 / 100); (2) the `cyl-lottie` component in package `cyl-lottie-miniprogram`; (3) package `cyl-tabbar-miniprogram` with its example, which installs `cyl-lottie-miniprogram` as a sub-dependency ([`8bb5e82`](https://github.com/ChenYilong/CYLTabBarController/commit/8bb5e82)); (4) [the API score](#encyl-tabbar-miniprogram-api) 100 / 100 and the key score 100 / 100, 15 screenshots ([`69ae5b1`](https://github.com/ChenYilong/CYLTabBarController/commit/69ae5b1)). Bugs found while testing in the simulator and fixed: `context.canvas` is not the canvas node in the DevTools (#31), the DevTools user data folder is an `http://usr` URL. |
