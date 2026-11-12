@@ -13,8 +13,6 @@
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Custom-Tab-Bar-Features.md
 //   - Automatic centering of image-only tabs / 纯图标 Tab 的自动居中
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Image-Only-Tabs.md
-//   - Long Press in Liquid Glass: Fixing the Tab Switching Freeze / 液态玻璃下的长按：修复切换 Tab 卡死
-//     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Liquid-Glass-Long-Press.md
 //   - Liquid Glass Robustness / 液态玻璃的健壮性改进
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Liquid-Glass-Robustness.md
 //   - The PlusButton Slot: Placeholders and Matching Counts / PlusButton 的 slot：占位与数量一致

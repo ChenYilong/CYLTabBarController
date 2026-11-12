@@ -68,16 +68,13 @@
  * FIX: issue #152 / #535 — long press, Reselect and DoubleTap in Liquid Glass.
  * [EN] One press on a tab button, followed through UIKit's own Liquid Glass gestures (the continuous selection and the
  *      long press that lifts the lens), which `CYLTabBar` forwards: in Liquid Glass they receive every touch on the tab
- *      buttons, and a gesture added by the library does not. The press is one tap when it ends where it began, and not a
- *      tap when the finger moves to switch tabs. The tab buttons' long press is off in Liquid Glass (it froze UIKit's
- *      tab switching); a press held for `cyl_tabButtonLongPressMinimumDuration` is then not a tap either, when a long
- *      press listener is set.
+ *      buttons, and a gesture added by the library does not. The press is one tap when it ends where it began, a long
+ *      press when it is held for `cyl_tabButtonLongPressMinimumDuration`, and neither when the finger moves to switch tabs.
  *      The idea of one tracker for tap, long tap and double tap, with the item found by its position rather than by
  *      `hitTest`, follows Telegram-iOS's tab bar (`TapLongTapOrDoubleTapGestureRecognizer`); no code is taken from it.
  * [CN] 一次按在 Tab 按钮上的触摸，通过 `CYLTabBar` 转发的系统液态玻璃手势（连续选择手势与抬起 lens 的长按手势）跟踪：液态玻璃下
- *      Tab 按钮上的每次触摸都由它们接收，库自己添加的手势收不到。在按下的位置结束算一次点击，手指移动去切换 Tab 时不算点击。
- *      液态玻璃下关闭 Tab 按钮的长按（它会让系统切换 Tab 卡死）；设置了长按监听时，按住达到
- *      `cyl_tabButtonLongPressMinimumDuration` 的触摸也不算点击。用一个跟踪器同时处理点击、长按与双击、
+ *      Tab 按钮上的每次触摸都由它们接收，库自己添加的手势收不到。在按下的位置结束算一次点击，按住
+ *      `cyl_tabButtonLongPressMinimumDuration` 算长按，手指移动去切换 Tab 时两者都不算。用一个跟踪器同时处理点击、长按与双击、
  *      按位置而不是 `hitTest` 找到 Tab，这一思路参考 Telegram-iOS 的 TabBar（`TapLongTapOrDoubleTapGestureRecognizer`），未使用其代码。
  */
 @interface CYLTabBarLiquidGlassPress : NSObject
@@ -87,8 +84,9 @@
 @property (nonatomic, weak, nullable) UIViewController *selectedViewControllerAtTouchDown;
 @property (nonatomic, assign) CGPoint windowStartPoint;
 @property (nonatomic, assign) BOOL moved;
-/// [EN] When the press began, to tell a held press from a tap. [CN] 触摸开始的时间，用于区分按住与点击。
-@property (nonatomic, assign) CFTimeInterval startTime;
+@property (nonatomic, assign) BOOL longPressReported;
+/// [EN] Tells a pending long press timer whether it still belongs to this press. [CN] 用于判断尚未触发的长按计时是否仍属于本次触摸。
+@property (nonatomic, assign) NSUInteger generation;
 @end
 
 @implementation CYLTabBarLiquidGlassPress
@@ -869,19 +867,9 @@ static const void *CYLHighlightedTabControlKey = &CYLHighlightedTabControlKey;
     if ([CYLConstants isLiquidGlassActive]) {
         [self cyl_updateTabButtonHighlightForLiquidGlassGestureRecognizer:gestureRecognizer];
     }
-    // [EN] FIX: the Liquid Glass long press freeze. The custom long press of the tab buttons is off in Liquid Glass: it was
-    //      recognized from UIKit's own gestures and, to keep the tab unselected, cancelled them in the middle of their
-    //      lift animation (`enabled = NO` then `YES`). That broke UIKit's selection state machine: switching tabs by the
-    //      system gesture stuttered and then froze, and Xcode logged "cannot handle … to 0 from … - dropping". Only taps
-    //      (Reselect / DoubleTap) are followed here now, and UIKit's gestures are never touched. The plus button's long
-    //      press keeps the library's own recognizer.
-    // [CN] FIX: 液态玻璃下长按导致卡死。液态玻璃下关闭 Tab 按钮的自定义长按：它由系统手势识别，并且为了不选中该 Tab，会在系统
-    //      抬起动画进行中取消系统手势（先 `enabled = NO` 再 `YES`），破坏了系统的选择状态机：用系统手势切换 Tab 时先卡顿、后卡死，
-    //      Xcode 输出 "cannot handle … to 0 from … - dropping"。现在这里只跟踪点击（Reselect / DoubleTap），从不改动系统手势。
-    //      PlusButton 的长按仍由库自己的手势识别。
-    BOOL holdIsNotTap = [self cyl_handlesTabButtonLongPress];
+    BOOL handlesLongPress = [self cyl_handlesTabButtonLongPress];
     BOOL handlesTaps = [self cyl_hasTabBarItemTapReceiver];
-    if (!handlesTaps || ![self cyl_liquidGlassReceivesTabTouches]) {
+    if ((!handlesLongPress && !handlesTaps) || ![self cyl_liquidGlassReceivesTabTouches]) {
         return;
     }
     CYLTabBarLiquidGlassPress *press = [self cyl_liquidGlassPress];
@@ -907,8 +895,11 @@ static const void *CYLHighlightedTabControlKey = &CYLHighlightedTabControlKey;
             newPress.control = control;
             newPress.selectedViewControllerAtTouchDown = self.selectedViewController;
             newPress.windowStartPoint = windowPoint;
-            newPress.startTime = CACurrentMediaTime();
+            newPress.generation = press.generation + 1;
             objc_setAssociatedObject(self, CYLLiquidGlassPressKey, newPress, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+            if (handlesLongPress) {
+                [self cyl_scheduleLiquidGlassLongPressForPress:newPress];
+            }
             break;
         }
         case UIGestureRecognizerStateChanged: {
@@ -930,11 +921,7 @@ static const void *CYLHighlightedTabControlKey = &CYLHighlightedTabControlKey;
             }
             objc_setAssociatedObject(self, CYLLiquidGlassPressKey, nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
             UIControl *control = press.control;
-            // [EN] While a long press listener is set, a press held for the long press duration is not a tap, as in the
-            //      classic style (no long press is reported for it in Liquid Glass).
-            // [CN] 设置了长按监听时，按住达到长按时长的触摸不算点击，与经典样式一致（液态玻璃下不会为它上报长按）。
-            BOOL held = holdIsNotTap && (CACurrentMediaTime() - press.startTime) >= self.cyl_tabButtonLongPressMinimumDuration;
-            if (control && !press.moved && !held) {
+            if (handlesTaps && control && !press.moved && !press.longPressReported) {
                 [self cyl_recognizeLiquidGlassTapOnControl:control selectedViewControllerAtTouchDown:press.selectedViewControllerAtTouchDown];
             }
             break;
@@ -949,6 +936,37 @@ static const void *CYLHighlightedTabControlKey = &CYLHighlightedTabControlKey;
         default:
             break;
     }
+}
+
+/*!
+ * [EN] Reports the long press when the press is still held, and has not moved, after the long press duration.
+ *      While a `didLongPressControl` listener is set, UIKit's gesture is then cancelled, so lifting the finger does not
+ *      select the tab, as that API documents (#535); with only `CYLTabBarItemGestureLongPress` it still does (#152).
+ * [CN] 经过长按时长后，触摸仍在按住且未移动时上报长按。设置了 `didLongPressControl` 监听时，随后取消系统手势，
+ *      抬起手指时不会选中该 Tab（与该 API 的文档一致，#535）；只使用 `CYLTabBarItemGestureLongPress` 时仍会选中（#152）。
+ */
+- (void)cyl_scheduleLiquidGlassLongPressForPress:(CYLTabBarLiquidGlassPress *)press {
+    NSUInteger generation = press.generation;
+    __weak __typeof(self) weakSelf = self;
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(self.cyl_tabButtonLongPressMinimumDuration * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        __strong __typeof(weakSelf) strongSelf = weakSelf;
+        CYLTabBarLiquidGlassPress *currentPress = [strongSelf cyl_liquidGlassPress];
+        UIGestureRecognizer *gestureRecognizer = currentPress.gestureRecognizer;
+        UIControl *control = currentPress.control;
+        if (!strongSelf || currentPress.generation != generation || currentPress.moved || !control || !gestureRecognizer) {
+            return;
+        }
+        UIGestureRecognizerState state = gestureRecognizer.state;
+        if (state != UIGestureRecognizerStateBegan && state != UIGestureRecognizerStateChanged) {
+            return;
+        }
+        currentPress.longPressReported = YES;
+        [strongSelf cyl_reportLongPressOnControl:control];
+        if ([strongSelf cyl_handlesDidLongPressControl] && gestureRecognizer.enabled) {
+            gestureRecognizer.enabled = NO;
+            gestureRecognizer.enabled = YES;
+        }
+    });
 }
 
 #pragma mark - Swipe
