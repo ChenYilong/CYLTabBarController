@@ -19,7 +19,6 @@ module.exports = {
     "Tabs": "Tabs",
     "Plus button": "Plus button",
     "Raised, with its own page": "Raised, with its own page",
-    "Message is hidden here: its CYLTabBarItemPlatforms is \"ios,android\".": "Message is hidden here: its CYLTabBarItemPlatforms is \"ios,android\".",
     "The plus button's own page (CYLTabBarItemPageIdentifier: publish).": "The plus button's own page (CYLTabBarItemPageIdentifier: publish).",
     "Page identifier": "Page identifier",
     "Page parameters": "Page parameters",
@@ -59,7 +58,8 @@ module.exports = {
     "Recolor": "Recolor",
     "Animation": "Animation",
     "Events": "Events",
-    "Loop": "Loop"
+    "Loop": "Loop",
+    "Four tabs and a plus button, as in the iOS example: the shared configuration limits Message to iOS and Android (CYLTabBarItemPlatforms), so this example adds the mini program.": "Four tabs and a plus button, as in the iOS example: the shared configuration limits Message to iOS and Android (CYLTabBarItemPlatforms), so this example adds the mini program."
   },
   "zh-Hans": {
     "Home": "首页",
@@ -76,7 +76,6 @@ module.exports = {
     "Tabs": "Tab",
     "Plus button": "PlusButton",
     "Raised, with its own page": "凸起，有自己的页面",
-    "Message is hidden here: its CYLTabBarItemPlatforms is \"ios,android\".": "此处不显示 Message：它的 CYLTabBarItemPlatforms 为 \"ios,android\"。",
     "The plus button's own page (CYLTabBarItemPageIdentifier: publish).": "PlusButton 自己的页面（CYLTabBarItemPageIdentifier：publish）。",
     "Page identifier": "页面标识",
     "Page parameters": "页面参数",
@@ -116,7 +115,8 @@ module.exports = {
     "Recolor": "换色",
     "Animation": "动画",
     "Events": "事件",
-    "Loop": "循环"
+    "Loop": "循环",
+    "Four tabs and a plus button, as in the iOS example: the shared configuration limits Message to iOS and Android (CYLTabBarItemPlatforms), so this example adds the mini program.": "与 iOS 示例一样显示四个 Tab 与 PlusButton：共用配置把 Message 限定为 iOS 与 Android（CYLTabBarItemPlatforms），因此本示例加上了小程序平台。"
   },
   "zh-Hant": {
     "Home": "首頁",
@@ -133,7 +133,6 @@ module.exports = {
     "Tabs": "Tab",
     "Plus button": "PlusButton",
     "Raised, with its own page": "凸起，有自己的頁面",
-    "Message is hidden here: its CYLTabBarItemPlatforms is \"ios,android\".": "此處不顯示 Message：它的 CYLTabBarItemPlatforms 為 \"ios,android\"。",
     "The plus button's own page (CYLTabBarItemPageIdentifier: publish).": "PlusButton 自己的頁面（CYLTabBarItemPageIdentifier：publish）。",
     "Page identifier": "頁面標識",
     "Page parameters": "頁面參數",
@@ -173,6 +172,7 @@ module.exports = {
     "Recolor": "換色",
     "Animation": "動畫",
     "Events": "事件",
-    "Loop": "循環"
+    "Loop": "循環",
+    "Four tabs and a plus button, as in the iOS example: the shared configuration limits Message to iOS and Android (CYLTabBarItemPlatforms), so this example adds the mini program.": "與 iOS 示例一樣顯示四個 Tab 與 PlusButton：共用設定把 Message 限定為 iOS 與 Android（CYLTabBarItemPlatforms），因此本示例加上了小程式平台。"
   }
 };

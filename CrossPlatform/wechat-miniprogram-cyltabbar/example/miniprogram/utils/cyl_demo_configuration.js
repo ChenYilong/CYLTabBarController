@@ -48,9 +48,22 @@ const CYL_DEMO_CHRISTMAS_THEME = {
  */
 const CYL_DEMO_LOTTIE = {
   home: 'green_lottie_tab_home',
+  message: 'green_lottie_tab_news',
   discover: 'green_lottie_tab_discover',
   me: 'green_lottie_tab_mine',
 };
+
+/**
+ * [EN] Four tabs and the plus button, as the iOS example: the shared configuration limits Message to iOS and Android
+ *      (CYLTabBarItemPlatforms "ios,android", which the Platforms key demonstrates), so the example adds this platform.
+ * [CN] 与 iOS 示例一样显示四个 Tab 与 PlusButton：共用配置把 Message 限定为 iOS 与 Android（CYLTabBarItemPlatforms
+ *      "ios,android"，用于演示 Platforms 键），因此示例为它加上本平台。
+ */
+function cylDemoPlatforms(items) {
+  return items.map((attributes) => (attributes.CYLTabBarItemPlatforms
+    ? Object.assign({}, attributes, { CYLTabBarItemPlatforms: `${attributes.CYLTabBarItemPlatforms},miniprogram` })
+    : attributes));
+}
 
 function cylDemoLottieItems(items) {
   return items.map((attributes) => {
@@ -70,9 +83,8 @@ function cylDemoLottieItems(items) {
  */
 function cylDemoConfiguration(overrides) {
   const options = overrides || {};
-  let items = options.cylDemoLottie === false
-    ? cylSharedConfiguration.CYLTabBarControllerTabBarItemsAttributes
-    : cylDemoLottieItems(cylSharedConfiguration.CYLTabBarControllerTabBarItemsAttributes);
+  const sharedItems = cylDemoPlatforms(cylSharedConfiguration.CYLTabBarControllerTabBarItemsAttributes);
+  let items = options.cylDemoLottie === false ? sharedItems : cylDemoLottieItems(sharedItems);
   if (options.cylDemoBoldTitles) {
     items = items.map((attributes) => Object.assign({}, attributes, { CYLTabBarItemSelectedTitleFont: 'bold:11' }));
   }

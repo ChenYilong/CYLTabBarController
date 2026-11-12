@@ -10,5 +10,5 @@
       <text class="cyl-row-value" aria-hidden="true">{{item.value}}</text>
     </view>
   </view>
-  <text class="cyl-header-subtitle">{{texts['Message is hidden here: its CYLTabBarItemPlatforms is "ios,android".']}}</text>
+  <text class="cyl-header-subtitle">{{texts['Four tabs and a plus button, as in the iOS example: the shared configuration limits Message to iOS and Android (CYLTabBarItemPlatforms), so this example adds the mini program.']}}</text>
 </view>

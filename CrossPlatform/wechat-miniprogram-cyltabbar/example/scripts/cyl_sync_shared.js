@@ -45,7 +45,7 @@ const CYL_SYMBOL_ASSETS = {
  * [CN] 本示例使用的 Objective-C 示例 Lottie Tab 图标（shared/lottie）。
  */
 const CYL_LOTTIE_SOURCE = path.join(CYL_REPOSITORY_ROOT, 'Example', 'Classes', 'Other', 'LottieResources');
-const CYL_LOTTIE_FILES = ['home', 'discover', 'mine'].flatMap((name) => [
+const CYL_LOTTIE_FILES = ['home', 'news', 'discover', 'mine'].flatMap((name) => [
   `green_lottie_tab_${name}.json`,
   `green_lottie_tab_${name}_dark.json`,
 ]);
