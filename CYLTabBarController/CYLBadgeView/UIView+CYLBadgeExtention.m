@@ -38,6 +38,49 @@ static const NSUInteger kCYLBadgeMaximumLayoutRetryCount = 3;
 @interface CYLBadgeLabel : UILabel
 @end
 
+#pragma mark - Animation of a badge type
+
+// [EN] Was in CAAnimation+CYLBadgeExtention.m; stays Objective-C while `CYLBadgeAnimationType` is an Objective-C enum
+//      (declared in CYLBadgeViewDefines.h, docs/Swift-Migration.md). The repeating animations keep running after the app
+//      returns from the background.
+// [CN] 原在 CAAnimation+CYLBadgeExtention.m；在 `CYLBadgeAnimationType` 仍为 Objective-C 枚举期间保留为 Objective-C（声明在
+//      CYLBadgeViewDefines.h，见 docs/Swift-Migration.md）。循环动画在 App 从后台返回后继续播放。
+CAAnimation *CYLBadgeAnimationForType(CYLBadgeAnimationType animationType, CGSize badgeSize) {
+    CGFloat moveDistance = badgeSize.width * 1.5;
+    switch (animationType) {
+        case CYLBadgeAnimationTypeBreathe:
+            return [CAAnimation cyl_opacityForeverAnimationWithDuration:1.4];
+        case CYLBadgeAnimationTypeShake: {
+            // Relative (`transform.translation.x`), so an anchored badge can still move with its host while shaking.
+            CAAnimation *animation = [CAAnimation cyl_shakeAnimationRepeatTimes:HUGE_VALF duration:1 offset:badgeSize.width / 4];
+            animation.removedOnCompletion = NO;   // keeps running after the app comes back from the background
+            return animation;
+        }
+        case CYLBadgeAnimationTypeScale:
+            return [CAAnimation cyl_scaleAnimationFromScale:1.4 toScale:0.6 duration:1 repeatTimes:MAXFLOAT];
+        case CYLBadgeAnimationTypeBounce: {
+            // [CN] Relative (`transform.translation.y`), see Shake. 相对位移，见 Shake。
+            // [EN] Relative (`transform.translation.y`), see Shake.
+            CAAnimation *animation = [CAAnimation cyl_bounceAnimationRepeatTimes:HUGE_VALF duration:1 offset:badgeSize.height / 4];
+            animation.removedOnCompletion = NO;
+            return animation;
+        }
+        case CYLBadgeAnimationTypeLeftRightOnce:
+            return [CAAnimation cyl_badge_once_leftRight_AnimationMoveDistance:moveDistance repeatTimes:1 duration:0.5];
+        case CYLBadgeAnimationTypeRightLeftOnce:
+            return [CAAnimation cyl_badge_once_rightLeft_AnimationMoveDistance:moveDistance repeatTimes:1 duration:0.5];
+        case CYLBadgeAnimationTypeFadeInOnce:
+            return [CAAnimation cyl_badge_once_fadeIn_AnimationRepeatTimes:1 duration:1.5];
+        case CYLBadgeAnimationTypeRollingOnce:
+            return [CAAnimation cyl_badge_once_rolling_AnimationRepeatTimes:1 duration:0.5];
+        case CYLBadgeAnimationTypeScaleOnce:
+            return [CAAnimation cyl_badge_once_scale_AnimationRepeatTimes:1 duration:0.5];
+        case CYLBadgeAnimationTypeNone:
+        default:
+            return nil;
+    }
+}
+
 @implementation CYLBadgeLabel
 
 - (void)didMoveToWindow {
