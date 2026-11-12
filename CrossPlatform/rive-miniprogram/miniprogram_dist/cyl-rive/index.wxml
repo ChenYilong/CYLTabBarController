@@ -1,0 +1,2 @@
+<!-- [EN] One 2D canvas per Rive animation. [CN] 每个 Rive 动画一个 2D 画布。 -->
+<canvas type="2d" id="{{cylCanvasId}}" class="cyl-rive-canvas" aria-role="img" aria-label="{{label}}" aria-hidden="{{!label}}"></canvas>

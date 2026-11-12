@@ -345,6 +345,33 @@ function cylRive(attributes, environment) {
 }
 
 /**
+ * [EN] The options of an animation route: its fragment, plus CYLTabBarAnimationOptions (option name -> string; numbers
+ *      become strings; not a dictionary: ignored, B28), as "name=value&…"; '' without any.
+ * [CN] 动画路由的选项：其 fragment，加上 CYLTabBarAnimationOptions（选项名 -> 字符串；数字转为字符串；不是字典时忽略，
+ *      B28），写成 "name=value&…"；没有时返回 ''。
+ */
+function cylAnimationFragment(route, extra) {
+  const options = {}
+  const index = String(route).indexOf('#')
+  if (index >= 0) {
+    String(route).slice(index + 1).split('&').forEach((pair) => {
+      const [key, value] = pair.split('=')
+      if (key && value !== undefined) {
+        options[key] = decodeURIComponent(value)
+      }
+    })
+  }
+  if (extra && typeof extra === 'object' && !Array.isArray(extra)) {
+    Object.keys(extra).forEach((key) => {
+      if (typeof extra[key] === 'string' || typeof extra[key] === 'number') {
+        options[key] = String(extra[key])
+      }
+    })
+  }
+  return Object.keys(options).map((key) => `${key}=${encodeURIComponent(options[key])}`).join('&')
+}
+
+/**
  * [EN] The animated icon of one library: its own keys (CYLTabBar<Library>URL / FilePath / DarkURL / DarkFilePath /
  *      Size / DarkColors; Lottie also LoopsWhenUnselected), then the generic CYLTabBarAnimation… keys whose file has
  *      the library's file type.
@@ -362,9 +389,14 @@ function cylAnimationIcon(attributes, environment, library, pattern) {
   }
   const genericDark = [attributes.CYLTabBarAnimationDarkURL, attributes.CYLTabBarAnimationDarkFilePath].find(ofType)
   const size = cylSize(own('Size')) || cylSize(attributes.CYLTabBarAnimationSize)
+  // [EN] Rive reads its options (artboard, state machine, input…) from the fragment, as CYLTabBarAnimationURLWithOptions()
+  //      writes them on iOS; CYLTabBarAnimationOptions adds to them. [CN] Rive 从 fragment 读取选项（画板、状态机、输入…），
+  //      与 iOS 的 CYLTabBarAnimationURLWithOptions() 写入方式相同；CYLTabBarAnimationOptions 会补充这些选项。
+  const route = [own('URL'), own('FilePath'), generic].find((value) => typeof value === 'string' && value.trim() !== '') || ''
+  const fragment = cylAnimationFragment(route, attributes.CYLTabBarAnimationOptions)
   return {
     library: library.toLowerCase(),
-    path,
+    path: library === 'Rive' && fragment ? `${path}#${fragment}` : path,
     darkPath: cylAnimationPath(own('DarkURL'), environment) || cylAnimationPath(own('DarkFilePath'), environment)
       || cylAnimationPath(genericDark, environment),
     width: size ? size.width : 28,
@@ -616,6 +648,7 @@ function cylReadConfiguration(configuration, environment) {
 
 module.exports = {
   cylReadConfiguration,
+  cylAnimationFragment,
   cylPAG,
   cylRive,
   cylFont,

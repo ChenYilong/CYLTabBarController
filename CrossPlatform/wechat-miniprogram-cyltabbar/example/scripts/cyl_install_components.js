@@ -49,7 +49,7 @@ function cylPackages(packageFolder, found = {}) {
     if (!fs.existsSync(distFolder)) {
       throw new Error(`${name}: ${path.relative(CYL_EXAMPLE, distFolder)} is missing; build the package first.`)
     }
-    found[name] = {folder, distFolder}
+    found[name] = {folder, distFolder, assets: dependency.cylMiniprogramAssets || []}
     cylPackages(folder, found)
   })
   return found
@@ -64,6 +64,18 @@ function cylMain() {
       expected[path.join(name, file)] = path.join(distFolder, file)
     })
   })
+  // [EN] Files a package lists in "cylMiniprogramAssets" also go to miniprogram/<package>/: a mini program cannot read
+  //      files under miniprogram_npm (readFileSync and WXWebAssembly answer "permission denied"), e.g. Rive's WebAssembly.
+  // [CN] 包在 "cylMiniprogramAssets" 中列出的文件同时复制到 miniprogram/<包名>/：小程序不能读取 miniprogram_npm 下的
+  //      文件（readFileSync 与 WXWebAssembly 返回 "permission denied"），例如 Rive 的 WebAssembly。
+  const assets = {}
+  Object.entries(packages).forEach(([name, {folder, assets: list}]) => {
+    list.forEach((file) => {
+      assets[path.join(CYL_EXAMPLE, 'miniprogram', name, path.basename(file))] = path.join(folder, file)
+    })
+  })
+  const staleAssets = Object.keys(assets).filter((target) => !fs.existsSync(target)
+    || !fs.readFileSync(target).equals(fs.readFileSync(assets[target])))
   const existing = fs.existsSync(CYL_TARGET) ? cylFiles(CYL_TARGET) : []
   const stale = existing.filter((file) => !expected[file])
   const changed = Object.keys(expected).filter((file) => {
@@ -71,8 +83,9 @@ function cylMain() {
     return !fs.existsSync(target) || !fs.readFileSync(target).equals(fs.readFileSync(expected[file]))
   })
   if (check) {
-    if (stale.length + changed.length > 0) {
-      console.error(`miniprogram_npm is out of date, run node scripts/cyl_install_components.js:\n  ${stale.concat(changed).join('\n  ')}`)
+    if (stale.length + changed.length + staleAssets.length > 0) {
+      const names = stale.concat(changed, staleAssets.map((target) => path.relative(CYL_EXAMPLE, target)))
+      console.error(`miniprogram_npm is out of date, run node scripts/cyl_install_components.js:\n  ${names.join('\n  ')}`)
       process.exit(1)
     }
     console.log('miniprogram_npm is up to date.')
@@ -83,6 +96,10 @@ function cylMain() {
     const target = path.join(CYL_TARGET, file)
     fs.mkdirSync(path.dirname(target), {recursive: true})
     fs.copyFileSync(expected[file], target)
+  })
+  staleAssets.forEach((target) => {
+    fs.mkdirSync(path.dirname(target), {recursive: true})
+    fs.copyFileSync(assets[target], target)
   })
   console.log(`Installed ${Object.keys(packages).join(', ')} into miniprogram/miniprogram_npm (${changed.length} file(s) updated, ${stale.length} removed).`)
 }

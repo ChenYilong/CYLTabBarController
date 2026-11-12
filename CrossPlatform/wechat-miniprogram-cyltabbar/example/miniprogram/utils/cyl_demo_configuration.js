@@ -92,6 +92,24 @@ function cylDemoPAGItems(items, file) {
   }));
 }
 
+/**
+ * [EN] Rive tab icons (CYLTabBarRiveFilePath) as in the iOS Rive examples: one artboard of icons.riv per tab, its
+ *      "<ARTBOARD>_Interactivity" state machine and the "active" input, 32 x 32.
+ * [CN] 与 iOS Rive 示例相同的 Rive Tab 图标（CYLTabBarRiveFilePath）：每个 Tab 使用 icons.riv 的一个画板、其
+ *      "<画板>_Interactivity" 状态机与 "active" 输入，32 x 32。
+ */
+const CYL_DEMO_RIVE = { home: 'CHAT', discover: 'SEARCH', message: 'BELL', me: 'USER' };
+
+function cylDemoRiveItems(items) {
+  return items.map((attributes) => {
+    const artboard = CYL_DEMO_RIVE[attributes.CYLTabBarItemIdentifier];
+    return artboard ? Object.assign({}, attributes, {
+      CYLTabBarRiveFilePath: `${cylAnimations.rive[0]}#artboard=${artboard}&stateMachine=${artboard}_Interactivity&input=active`,
+      CYLTabBarRiveSize: '{32, 32}',
+    }) : attributes;
+  });
+}
+
 function cylDemoLottieItems(items) {
   return items.map((attributes) => {
     const name = CYL_DEMO_LOTTIE[attributes.CYLTabBarItemIdentifier];
@@ -116,6 +134,8 @@ function cylDemoConfiguration(overrides) {
   let items = sharedItems;
   if (pagFile) {
     items = cylDemoPAGItems(sharedItems, pagFile);
+  } else if (icons === 'rive') {
+    items = cylDemoRiveItems(sharedItems);
   } else if (icons !== 'images') {
     items = cylDemoLottieItems(sharedItems);
   }

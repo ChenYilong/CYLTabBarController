@@ -25,6 +25,15 @@
       autoplay="{{!m.selected && loopsWhenUnselected}}"
       resting-frame="{{m.selected ? 'last' : 'first'}}"
     />
+    <cyl-rive
+      wx:elif="{{m.animationType === 'rive'}}"
+      id="cyl-item-animation"
+      class="cyl-item-animation"
+      path="{{m.animationPath}}"
+      colors="{{animationColors}}"
+      loop="{{!m.selected && loopsWhenUnselected}}"
+      autoplay="{{!m.selected && loopsWhenUnselected}}"
+    />
     <view wx:elif="{{m.image && m.iconTint}}" class="cyl-item-tint">
       <image class="cyl-item-image cyl-item-tinted" src="{{m.image}}" style="filter: drop-shadow({{m.iconTint}} 200px 0);" mode="aspectFit" />
     </view>

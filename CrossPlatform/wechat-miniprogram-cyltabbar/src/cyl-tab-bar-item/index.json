@@ -2,6 +2,7 @@
   "component": true,
   "usingComponents": {
     "cyl-lottie": "cyl-lottie-miniprogram/cyl-lottie/index",
-    "cyl-pag": "cyl-pag-miniprogram/cyl-pag/index"
+    "cyl-pag": "cyl-pag-miniprogram/cyl-pag/index",
+    "cyl-rive": "cyl-rive-miniprogram/cyl-rive/index"
   }
 }

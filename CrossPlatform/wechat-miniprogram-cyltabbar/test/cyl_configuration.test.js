@@ -176,6 +176,11 @@ test('Lottie, PAG, Rive, generic animation and GIF keys', () => {
   const rive = reader.cylRive({ CYLTabBarRiveURL: 'https://x/a.riv', CYLTabBarRiveDarkColors: { a: '#FFFFFF' } }, env);
   assert.deepEqual([rive.library, rive.path, rive.darkColors], ['rive', 'https://x/a.riv', { a: '#FFFFFF' }]);
   assert.equal(reader.cylRive({ CYLTabBarAnimationURL: 'https://x/a.json' }, env), null);
+  const fragment = reader.cylRive({ CYLTabBarRiveFilePath: '/shared/rive/icons.riv.bin#artboard=BELL&input=active',
+    CYLTabBarAnimationOptions: { stateMachine: 'BELL_Interactivity' } }, env);
+  assert.equal(fragment.path.split('#')[0], '/shared/rive/icons.riv.bin');
+  assert.match(fragment.path, /artboard=BELL/);
+  assert.match(fragment.path, /stateMachine=BELL_Interactivity/);
   assert.equal(reader.cylGIF({ CYLTabBarGIFFilePath: 'a.gif', CYLTabBarGIFDarkFilePath: 'b.gif' }, env, true), '/shared/lottie/b.gif');
   assert.equal(reader.cylGIF({ CYLTabBarAnimationURL: 'https://x/a.gif' }, env, false), 'https://x/a.gif');
 });

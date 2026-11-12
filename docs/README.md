@@ -364,6 +364,7 @@ docs/
 │   ├── wechat-miniprogram-api-15-plus-tap-without-page.png
 │   ├── wechat-miniprogram-api-16-tab-bar-item-playground.png
 │   ├── wechat-miniprogram-api-17-four-tabs-like-ios.png
+│   ├── wechat-miniprogram-api-18-rive-dark.png
 │   ├── wechat-miniprogram-badges.png
 │   ├── wechat-miniprogram-christmas-glass.png
 │   ├── wechat-miniprogram-flat-login.png
