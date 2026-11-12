@@ -25,6 +25,15 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+/*!
+ * [EN] Implemented in Swift (`Swift/CYLLocalizedString.swift`, each function exported under its C name with
+ *      `@_cdecl`); declared here for Objective-C callers only, and hidden from Swift (`__swift__`), which uses the
+ *      Swift functions and constant (docs/Swift-Migration.md).
+ * [CN] 在 Swift 中实现（`Swift/CYLLocalizedString.swift`，每个函数用 `@_cdecl` 以 C 名称导出）；这里只为 Objective-C 调用方声明，
+ *      并对 Swift 隐藏（`__swift__`），Swift 直接使用 Swift 函数与常量（docs/Swift-Migration.md）。
+ */
+#ifndef __swift__
+
 
 /*!
  * [EN] Returns the translation of `key` from the library's string table (`CYLTabBarController.strings`, shipped in the
@@ -50,7 +59,7 @@ NS_ASSUME_NONNULL_BEGIN
  *      没有时使用英文。因此本库不会显示 App 本身不支持的语言；声明了 `CFBundleLocalizations` 的 App 会跟随设备语言。
  *      可用 `CYLSetLocalizationLanguage()` 指定。线程安全。
  */
-FOUNDATION_EXTERN NSString *CYLLocalizedString(NSString *key) CYL_RETURNS_LOCALIZED_STRING NS_FORMAT_ARGUMENT(1);
+FOUNDATION_EXTERN NSString *CYLLocalizedString(NSString * _Nullable key) CYL_RETURNS_LOCALIZED_STRING NS_FORMAT_ARGUMENT(1);
 
 /*!
  * [EN] The library's resource bundle, `CYLTabBarController.bundle` (CYLUtils, no extra import). It holds the `*.lproj` string
@@ -80,7 +89,7 @@ FOUNDATION_EXTERN void CYLSetLocalizationLanguage(NSString * _Nullable language)
  *      observes it to rebuild the screen in the new language.
  * [CN] 由 `CYLSetLocalizationLanguage()` 在主队列发送。`-[UIWindow cyl_setRootViewControllerProvider:]` 监听它，用新语言重建界面。
  */
-FOUNDATION_EXTERN NSString *const CYLLocalizationLanguageDidChangeNotification;
+#define CYLLocalizationLanguageDidChangeNotification @"CYLLocalizationLanguageDidChangeNotification"
 
 /*!
  * [EN] Like `CYLLocalizedString()`, but in `language` (matched to the closest translation); nil means the device language
@@ -89,12 +98,14 @@ FOUNDATION_EXTERN NSString *const CYLLocalizationLanguageDidChangeNotification;
  * [CN] 同 `CYLLocalizedString()`，但使用 `language`（匹配最接近的译文）；传 nil 表示设备语言（`[NSLocale preferredLanguages]`），
  *      与 App 当前语言无关。用于切换到看不懂的语言后用户仍需读懂的提示，例如语言设置的副标题。
  */
-FOUNDATION_EXTERN NSString *CYLLocalizedStringForLanguage(NSString *key, NSString * _Nullable language) CYL_RETURNS_LOCALIZED_STRING NS_FORMAT_ARGUMENT(1);
+FOUNDATION_EXTERN NSString *CYLLocalizedStringForLanguage(NSString * _Nullable key, NSString * _Nullable language) CYL_RETURNS_LOCALIZED_STRING NS_FORMAT_ARGUMENT(1);
 
 /*!
  * [EN] The language `CYLLocalizedString()` currently uses, e.g. @"zh-Hans".
  * [CN] `CYLLocalizedString()` 当前使用的语言，例如 @"zh-Hans"。
  */
 FOUNDATION_EXTERN NSString *CYLLocalizationLanguage(void);
+
+#endif
 
 NS_ASSUME_NONNULL_END
