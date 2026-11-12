@@ -254,7 +254,7 @@ static NSURL *CYLPublishDemoManifest(BOOL broken) {
             [sheet addAction:[UIAlertAction actionWithTitle:CYLConfigurationDemoUntranslatedText(title) style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
                 NSError *error = nil;
                 CYLTabBarManifest *manifest = [CYLTabBarManifest manifestWithRoute:manifestRoute error:&error];
-                CYLTabBarController *tabBarController = [manifest tabBarControllerWithError:&error];
+                CYLTabBarController *tabBarController = (CYLTabBarController *)[manifest tabBarControllerWithError:&error];
                 // [EN] After the manifest registered its themes; a skin other than light / dark stops following the system.
                 // [CN] 在清单注册其主题之后；浅色 / 深色以外的皮肤停止跟随系统外观。
                 CYLThemeManager *manager = [CYLThemeManagerCenter themeManagerWithName:@"CYLConfigurationDemo"];
@@ -280,7 +280,7 @@ static NSURL *CYLPublishDemoManifest(BOOL broken) {
                 [loader loadManifestWithURL:URL completion:^(CYLTabBarManifest *manifest, CYLTabBarManifestSource source, NSError *error) {
                     NSArray<NSString *> *sources = @[ @"none", @"remote", @"cache", @"embedded" ];
                     NSError *createError = nil;
-                    CYLTabBarController *tabBarController = [manifest tabBarControllerWithError:&createError];
+                    CYLTabBarController *tabBarController = (CYLTabBarController *)[manifest tabBarControllerWithError:&createError];
                     NSString *summary = [NSString stringWithFormat:@"%@\nsource: %@ · version %@%@", URL.lastPathComponent, sources[(NSUInteger)source],
                                          manifest.version ?: @"-", error ? [@"\nfallback because: " stringByAppendingString:error.localizedDescription] : @""];
                     [weakSelf cyl_presentConfigurationDemoTabBarController:tabBarController source:summary

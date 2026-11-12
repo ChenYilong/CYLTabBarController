@@ -115,7 +115,7 @@
     });
     NSError *error = nil;
     CYLTabBarManifest *manifest = [CYLTabBarManifest manifestWithRoute:@"bundle:Configurations/Manifests/cyl_tabbar_manifest.json" error:&error];
-    CYLTabBarController *tabBarController = [manifest tabBarControllerWithError:&error];
+    CYLTabBarController *tabBarController = (CYLTabBarController *)[manifest tabBarControllerWithError:&error];
     if (!tabBarController) {
         NSLog(@"🔴 CYLDemoManifestTheme: %@", error.localizedDescription);
         return NO;
