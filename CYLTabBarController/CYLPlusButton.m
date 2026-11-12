@@ -1335,6 +1335,29 @@ static BOOL const CYLPlusButtonLensMaskEnabled = YES;
     });
 }
 
+/*!
+ * [EN] Whether the Liquid Glass lens, as drawn now (its presentation layer), is centered on `tabButton` (within 2 pt).
+ *      YES when no lens view is found (nothing moves then).
+ * [CN] 当前显示的液态玻璃放大镜（presentation layer）是否居中于 `tabButton`（误差 2pt 以内）。找不到放大镜视图时返回 YES。
+ */
+- (BOOL)cyl_lensIsOnTabButton:(UIView *)tabButton {
+    UIView *platter = tabButton.superview.superview;
+    UIView *lens = nil;
+    for (UIView *subview in platter.subviews) {
+        if ([NSStringFromClass([subview class]) containsString:@"LiquidLens"]) {
+            lens = subview;
+            break;
+        }
+    }
+    if (!lens) {
+        return YES;
+    }
+    CALayer *drawn = lens.layer.presentationLayer ?: lens.layer;
+    CGRect lensFrame = [platter.layer convertRect:drawn.frame fromLayer:drawn.superlayer ?: platter.layer];
+    CGRect slotFrame = [tabButton convertRect:tabButton.bounds toView:platter];
+    return fabs(CGRectGetMidX(lensFrame) - CGRectGetMidX(slotFrame)) < 2;
+}
+
 - (void)cyl_updateLiquidGlassMask {
     BOOL suspended = [objc_getAssociatedObject(self, @selector(cyl_setLiquidGlassLensMaskSuspended:)) boolValue];
     if (!CYLPlusButtonLensMaskEnabled || suspended) {
@@ -1353,6 +1376,20 @@ static BOOL const CYLPlusButtonLensMaskEnabled = YES;
     BOOL masks = plusPageSelected && standIn && standIn != self && standIn.window && standIn.window == self.window &&
                  !standIn.hidden && standInTabButton && ![self cyl_isInPlatterSelectedLayer] &&
                  CYLPlusButtonIsInLiquidGlassTabBar(self);
+    // [EN] FIX: first display / selection in code — UIKit animates the lens from the previous tab to the plus slot, while
+    //      the plus page already counts as selected. Masked before the lens arrived, the plus button was gone during the
+    //      travel and half cut as the lens came in (gallery 9.4). Only mask once the lens, as drawn now (its presentation
+    //      layer), sits on the plus slot; until then check again every 0.1 s.
+    // [CN] FIX：首次显示 / 用代码选中——系统把放大镜从上一个 Tab 动画移到 PlusButton 的位置，而 PlusButton 的页面已经算作选中。
+    //      放大镜到达之前就遮住，PlusButton 在移动过程中消失、放大镜进入时被切掉一半（图库 9.4）。只有当前显示的放大镜
+    //      （presentation layer）停在 PlusButton 的位置上时才遮住；在此之前每 0.1 秒重新判断。
+    if (masks && ![self cyl_lensIsOnTabButton:standInTabButton]) {
+        masks = NO;
+        __weak __typeof(self) weakSelf = self;
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            [weakSelf cyl_updateLiquidGlassMask];
+        });
+    }
     // [EN] A mask the app set itself is kept. [CN] 保留 App 自己设置的遮罩。
     BOOL ownsMask = !self.layer.mask || [self.layer.mask.name isEqualToString:@"CYLPlusButtonLensMask"];
     CGRect hidden = CGRectNull;
