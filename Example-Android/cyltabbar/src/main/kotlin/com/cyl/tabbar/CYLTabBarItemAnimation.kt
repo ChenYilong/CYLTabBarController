@@ -791,8 +791,18 @@ class CYLRiveTabBarItemAnimationView private constructor(context: Context, priva
 
     private fun setActive(active: Boolean) {
         val machine = stateMachine ?: return
+        if (!hasInput(machine, booleanInput)) return
         CYLReflection.call(rive, "setBooleanState", machine, booleanInput, active)
     }
+
+    /**
+     * [EN] Whether the state machine has the input: rive-android throws `StateMachineInputException` on its render
+     *      thread for a missing one (the default boolean input "active" of a file without it), which crashes the app;
+     *      on iOS, RiveRuntime's `setInput` only logs. Unknown (an older rive-android without `getInputNames`): true.
+     * [CN] 状态机是否有该输入：rive-android 对不存在的输入（没有默认布尔输入 "active" 的文件）会在渲染线程抛出 `StateMachineInputException`，
+     *      导致应用崩溃；iOS 上 RiveRuntime 的 `setInput` 只打印日志。无法判断时（没有 `getInputNames` 的旧版 rive-android）返回 true。
+     */
+    internal fun hasInput(machine: String, input: String): Boolean = CYLRiveInputs.hasInput(rive, machine, input)
 
     override fun cyl_playAnimationView() {
         handler.removeCallbacksAndMessages(null)
@@ -801,7 +811,7 @@ class CYLRiveTabBarItemAnimationView private constructor(context: Context, priva
         val animation = options[CYLConstants.CYLTabBarAnimationOptionRiveAnimation]
         val default = CYLReflection.DEFAULT
         when {
-            machine != null && trigger != null -> CYLReflection.call(rive, "fireState", machine, trigger)
+            machine != null && trigger != null -> { if (hasInput(machine, trigger)) CYLReflection.call(rive, "fireState", machine, trigger) }
             machine != null -> {
                 setActive(true)
                 if (activeDuration > 0) handler.postDelayed({ setActive(false) }, (activeDuration * 1000).toLong())
@@ -879,4 +889,21 @@ class CYLRiveTabBarItemAnimationView private constructor(context: Context, priva
             }
         }
     }
+}
+
+/**
+ * [EN] The inputs of a `RiveAnimationView`'s state machines, read by reflection (`getStateMachines()`, `getName()`,
+ *      `getInputNames()` of rive-android): a missing input is skipped instead of crashing. Unknown answers are true.
+ * [CN] 通过反射读取 `RiveAnimationView` 状态机的输入（rive-android 的 `getStateMachines()`、`getName()`、`getInputNames()`）：
+ *      跳过不存在的输入，避免崩溃。无法判断时返回 true。
+ */
+internal object CYLRiveInputs {
+    fun hasInput(rive: Any, machine: String, input: String): Boolean {
+        val machines = try { rive.javaClass.getMethod("getStateMachines").invoke(rive) as? List<*> } catch (error: Exception) { null } ?: return true
+        val instance = machines.firstOrNull { machineName(it) == machine } ?: return machines.isEmpty()
+        val names = try { instance.javaClass.getMethod("getInputNames").invoke(instance) as? List<*> } catch (error: Exception) { null } ?: return true
+        return names.contains(input)
+    }
+
+    private fun machineName(instance: Any?): String? = try { instance?.javaClass?.getMethod("getName")?.invoke(instance) as? String } catch (error: Exception) { null }
 }
