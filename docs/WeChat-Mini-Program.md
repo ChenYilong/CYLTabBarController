@@ -25,6 +25,8 @@
 | [方案](#cn方案) | [Plan](#enplan) |
 | [运行与使用](#cn运行与使用) | [Run and use](#enrun-and-use) |
 | [cyl-tabbar-miniprogram API](#cncyl-tabbar-miniprogram-api) | [cyl-tabbar-miniprogram API](#encyl-tabbar-miniprogram-api) |
+| [cyl-tab-bar-item 与 CYLFlatDesignTabBarItem](#cncyl-tab-bar-item-与-cylflatdesigntabbaritem) | [cyl-tab-bar-item and CYLFlatDesignTabBarItem](#encyl-tab-bar-item-and-cylflatdesigntabbaritem) |
+| [动画方案评估](#cn动画方案评估) | [Animation approach evaluation](#enanimation-approach-evaluation) |
 | [Example 截图](#cnexample-截图) | [Example screenshots](#enexample-screenshots) |
 | [截图（63 / 100 时）](#cn截图63--100-时) | [Screenshots (at 63 / 100)](#enscreenshots-at-63--100) |
 | [待办](#cn待办) | [TODO](#entodo) |
@@ -153,6 +155,57 @@
 | `cyl-lottie` `cyl_animation` | 方法 / method | ✅ evaluate（读取 / read `currentFrame`、`totalFrames`） |
 | 依赖 / dependency | `cyl-tabbar-miniprogram` → `cyl-lottie-miniprogram` | ✅ `cyl_install_components.js` 只依赖前者也会安装后者 / installs the second from the first alone |
 
+## [CN]cyl-tab-bar-item 与 CYLFlatDesignTabBarItem
+## [EN]cyl-tab-bar-item and CYLFlatDesignTabBarItem
+
+| 中文 | English |
+|:---|:---|
+| 见右列。 | `cyl-tab-bar-item` (package `cyl-tabbar-miniprogram`, `src/cyl-tab-bar-item`) is the animated icon and title of a tab, modeled on the iOS FlatDesign item, [`CYLFlatDesignTabBarItem`](../CYLTabBarController/CYLFlatDesignTabBar/CYLFlatDesignTabBar-ObjectiveC/CYLFlatDesignTabBar/CYLFlatDesignTabBarItem.h). `cyl-tab-bar` draws every tab with it, so the Lottie tab icons verify it (screenshots 01–05, 17), and it works alone (the `cyl-tab-bar-item` playground, screenshot 16). Its icon is an image or an animation picked by file type, like `CYLTabBarAnimationFilePath`: `.json` Lottie, `.pag` PAG, `.riv` Rive. Column 1: the iOS API; column 2: ours (properties keep the iOS names; methods add the `cyl_` prefix). Score = 100 × matched / 32: **100 / 100**. Tests: `test/cyl_tab_bar_item.test.js` (5 tests, one per group). |
+
+| iOS `CYLFlatDesignTabBarItem` | 小程序 / Mini program `cyl-tab-bar-item` |
+|:---|:---|
+| `-initWithTitle:image:` | ✅ `title` + `image` 属性 / properties（16） |
+| `-initWithTitle:image:selectedImage:` | ✅ `title` + `image` + `selectedImage`（16） |
+| `-initWithTitle:image:selectedImage:index:titlePositionAdjustment:imagePositionAdjustment:imageInsets:lottieFilePath:lottieSizeValue:` | ✅ 同名属性 / the properties of the same names（16，测试 / test） |
+| `tabBarButton` | ✅ `cyl_tabBarButton()`（返回组件本身 / returns the component; evaluate） |
+| `enabled` | ✅ `enabled`，默认 YES；NO 时不发出 `itemtap` / default YES; NO sends no `itemtap`（16，evaluate） |
+| `index` | ✅ `index`（`itemtap` / `change` 的 detail / their detail） |
+| `title` | ✅ `title` |
+| `image` | ✅ `image` |
+| `selectedImage` | ✅ `selectedImage`（16：Home） |
+| `childViewController` | ✅ Tab 的页面 / the tab's page: `cyl-tab-bar` 的 `pageIdentifier`（`select` 事件 / event） |
+| `badgeValue` | ✅ `badgeValue`，"•" 为小红点 / "•" for a dot（16，03） |
+| `badgeColor` | ✅ `badgeColor`（16：Badge） |
+| `cylflatdesign_tabBarController` | ✅ `cyl_tabBarController()`：所属的 `cyl-tab-bar`，单独使用时为 null / the owning `cyl-tab-bar`, null alone（evaluate） |
+| `titlePositionAdjustment` | ✅ `titlePositionAdjustment`（16：Offset） |
+| `standardAppearance` | ✅ `standardAppearance`（`stackedLayoutAppearance.normal/selected` 的 / its `iconColor`、`titleTextAttributes`、`badgeBackgroundColor`、`badgeTextAttributes`；16：Appear） |
+| `-setTitleTextAttributes:forState:` | ✅ `titleTextAttributes` 属性 / property + `cyl_setTitleTextAttributes(attributes, state)`（16：Styled，evaluate） |
+| `-titleTextAttributesForState:` | ✅ `cyl_titleTextAttributesForState(state)`（evaluate） |
+| `-setBadgeTextAttributes:forState:` | ✅ `badgeTextAttributes` + `cyl_setBadgeTextAttributes(attributes, state)`（16：Inset） |
+| `-badgeTextAttributesForState:` | ✅ `cyl_badgeTextAttributesForState(state)`（evaluate） |
+| `badgeSize` | ✅ `badgeSize`；为 0 时自动计算 / zero sizes itself（16：Dot） |
+| `badgeContentInset` | ✅ `badgeContentInset`，默认 / default {1, 6, 1, 6}（16：Inset） |
+| `badgePositionAdjustment` | ✅ `badgePositionAdjustment`（16：Dot） |
+| `imagePositionAdjustment` | ✅ `imagePositionAdjustment`（16：Offset） |
+| `layoutCentered` | ✅ `layoutCentered`（16：Centered） |
+| `backgroundColor` | ✅ `backgroundColor` |
+| `selectedBackgroundColor` | ✅ `selectedBackgroundColor`（16：Bg） |
+| `imageInsets` | ✅ `imageInsets`（16：Insets） |
+| `lottieURL` | ✅ `lottieURL`（网络地址 / network URL；测试 / test） |
+| `lottieFilePath` | ✅ `lottieFilePath`（16：Lottie；01） |
+| `lottieSizeValue` | ✅ `lottieSizeValue`（16：Lottie 36 × 36） |
+| `-actualBadgeSuperView` | ✅ `cyl_actualBadgeSuperView()` → `{component, selector: ".cyl-item-icon-box"}`（evaluate） |
+| `CYLFlatDesignTabBarItemDidChange`（通知 / notification） | ✅ `change` 事件 / event（evaluate：修改 `title` 后收到 / received after changing `title`） |
+
+## [CN]动画方案评估
+## [EN]Animation approach evaluation
+
+| 中文 | English |
+|:---|:---|
+| 见右列。 | **RiveViewer-miniapp** (`CrossPlatform/RiveViewer-miniapp`, its README searched for Lottie and Rive): in the mini program it previews `.riv` files only; Lottie and PAG are supported only by its H5 / JOJO web version (README lines 255–260), and its mini program code (`utils`, `components`, `pages`) has no Lottie or PAG player. Its own code is licensed PolyForm-Noncommercial-1.0.0, which this MIT project cannot include; only the MIT Rive runtime it ships (`@rive-app/canvas-advanced` 2.39.1 with its WASM) and its approach can be reused. **Not usable as is** for Lottie, PAG and Rive icons, so every step is done separately: Lottie (`cyl-lottie-miniprogram`), PAG, Rive. |
+| | **How RiveViewer-miniapp shows Rive** (README, architecture): a `<canvas type="2d">`, the full `@rive-app/canvas-advanced` runtime adapted to the WeChat environment, and its WASM loaded with `WXWebAssembly` from Brotli files in the package (`vendor/rive`: `canvas_advanced.js`, `rive.wasm.br`, `rive_fallback.wasm.br`, about 573 KB each); WebGL2 failed on phones, so the mini program stays on Canvas 2D. |
+| | **libpag-lite-miniprogram** (Tencent/libpag `web/lite`, npm 0.0.6, 64 KB of JavaScript, WebGL, no WebAssembly): it plays only PAG files made of **one BMP video sequence** and decodes them with `wx.createVideoDecoder`. Checked on all 44 PAG files of `Example-Shared/PAGResources`: the 4 iOS tab icons (`tab-icons/tab_home.pag`, `tab_health.pag`, `tab_me.pag`, `tab_moments.pag`) are vector files ("PAGFile has no BMP video sequence!"), so the lite library cannot play them; `pag-android/2J.pag` (60 KB, MIT) is one BMP sequence and is the example's PAG file. Vector PAG icons need the full `libpag-miniprogram` (WebAssembly, 4.6 MB unpacked). |
+
 ## [CN]Example 截图
 ## [EN]Example screenshots
 
@@ -262,6 +315,20 @@
 <summary>15. 没有页面的 PlusButton：plustap 事件（提示 "Post"） / A plus button without a page: the plustap event (the "Post" toast)</summary>
 
 ![WeChat Mini Program, A plus button without a page: the plustap event (the "Post" toast)](assets/wechat-miniprogram-api-15-plus-tap-without-page.png)
+
+</details>
+
+<details>
+<summary>16. cyl-tab-bar-item 演示页：单独使用 Item，每格对应 iOS CYLFlatDesignTabBarItem 的一组 API / The cyl-tab-bar-item playground: the item alone, one tile per group of the iOS CYLFlatDesignTabBarItem API</summary>
+
+![WeChat Mini Program, The cyl-tab-bar-item playground: the item alone, one tile per group of the iOS CYLFlatDesignTabBarItem API](assets/wechat-miniprogram-api-16-tab-bar-item-playground.png)
+
+</details>
+
+<details>
+<summary>17. 与 iOS 示例一样的四个 Tab 与 PlusButton，每个 Tab 由 cyl-tab-bar-item 绘制 / Four tabs and the plus button as in the iOS example, each tab drawn by cyl-tab-bar-item</summary>
+
+![WeChat Mini Program, Four tabs and the plus button as in the iOS example, each tab drawn by cyl-tab-bar-item](assets/wechat-miniprogram-api-17-four-tabs-like-ios.png)
 
 </details>
 
