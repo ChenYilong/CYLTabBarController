@@ -37,7 +37,7 @@ Pod::Spec.new do |s|
   # 不包含 TabBar 代码。Core 依赖它，因此其他所有 subspec 都已包含，现有 Podfile 无需修改。
   s.subspec 'CYLBadgeView' do |badge|
     badge.dependency 'CYLTabBarController/CYLUtils'
-    badge.source_files = 'CYLTabBarController/CYLBadgeView/**/*.{h,m}'
+    badge.source_files = 'CYLTabBarController/CYLBadgeView/**/*.{h,m,swift}'
     badge.public_header_files = 'CYLTabBarController/CYLBadgeView/**/*.h'
     # Shared by the badge sources only; tells a standalone build from one with Core (tab bar). 仅供角标源文件使用，用于区分是否包含 Core。
     badge.private_header_files = 'CYLTabBarController/CYLBadgeView/CYLBadgeViewDefines.h'
