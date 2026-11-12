@@ -28,6 +28,7 @@
 | [发布到 Maven](#cn发布到-maven) | [Publishing to Maven](#enpublishing-to-maven) |
 | [测试](#cn测试) | [Tests](#entests) |
 | [限制](#cn限制) | [Limits](#enlimits) |
+| [任务记录](#任务记录--task-log) | [Task log](#任务记录--task-log) |
 
 <!-- navigation:end -->
 
@@ -200,3 +201,9 @@ gradle :app:assembleDebug             # the demo app (needs the Android SDK)
 | 滚动隐藏（#13）：与 iOS 一样，滚动隐藏的 TabBar 在切换 Tab、push / pop、弹窗或其他窗口获得焦点、Activity 暂停、键盘弹出、内存警告、关闭滚动隐藏之后恢复；App 自己用 `setTabBarHidden` 隐藏的 TabBar 保持隐藏，键盘弹出时滚动不隐藏。`ListView` 滚动不改变 `scrollY`，需要把滚动距离交给 `cyl_scrollDidChange`（演示列表即如此）。 | Scroll hiding (#13): as on iOS, a bar hidden by scrolling comes back after a tab switch, a push / pop, a dialog or another window taking the focus, the activity pausing, the keyboard, a memory warning, or scroll hiding turned off; a bar the app hid with `setTabBarHidden` stays hidden, and scrolling with the keyboard up does not hide it. A `ListView` scrolls without changing `scrollY`: pass the distance to `cyl_scrollDidChange` (the demo list does). |
 | 图片：`CYLTabBarItemDarkImage` / `CYLTabBarItemSelectedDarkImage` 在夜间模式下使用；通过 URL 加载的 Tab 图标（`CYLTabBarItemImageURL`、`setTabBarItemIconWithURL`）由所有 TabBar 共用的队列下载，并按 URL 缓存已解码的图片（与 iOS 的 `+cyl_loadImageWithURL:` 一致）；作为图片传入的 GIF 循环播放（`CYLGIFDrawable`）。 | Images: `CYLTabBarItemDarkImage` / `CYLTabBarItemSelectedDarkImage` apply in night mode; tab icons loaded from URLs (`CYLTabBarItemImageURL`, `setTabBarItemIconWithURL`) are downloaded by one queue shared by every tab bar and cached decoded by URL (as iOS `+cyl_loadImageWithURL:`); a GIF given as an image loops (`CYLGIFDrawable`). |
 | 差异：翻转动画的卷曲（direction 5、6）以图标上 / 下边为轴折叠（Android 没有翻页卷曲）；按压回弹用 Overshoot 插值代替弹簧；角标示例标题只有英文。 | Differences: the curl of the flip animation (direction 5, 6) folds the icon around its top / bottom edge (Android has no page curl); the press spring-back uses an overshoot interpolator instead of a spring; the badge sample titles are English only. |
+
+## 任务记录 / Task log
+
+| 中文 | English |
+|:---|:---|
+| 本条按用户要求使用英文（见右列）。 | TODO (2026-11-12, HarmonyOS NEXT): user prompt, verbatim: "找到docs android相关文档写一个英文TODO：android 与跨端平台（REactNative flutter，先flutter，flutter测试通过后再适配 REactNative）支持适配 android 鸿蒙 NEXT系统。" Requirement: support HarmonyOS NEXT for the Android library and the cross-platform components, in this order: ① the Android library (`Example-Android/cyltabbar`, `tabpages`); ② Flutter (`CrossPlatform/flutter_cyltabbar`); ③ React Native (`CrossPlatform/react-native-cyltabbar`), started only after the Flutter version passes its tests. Context to check first: HarmonyOS NEXT no longer runs Android APKs, so this means native ArkTS / ArkUI implementations (a HarmonyOS package of the tab bar with the same configuration keys and events), the OpenHarmony Flutter SDK for ②, and the React Native for OpenHarmony port for ③. Verify on a HarmonyOS NEXT emulator or device: the tab bar from the shared configuration file, selection events, badges, the plus button, and the examples' screenshots. Status: not started. |
