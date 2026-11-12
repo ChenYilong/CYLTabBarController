@@ -65,3 +65,4 @@
 | 中文 | English |
 |:---|:---|
 | 见右列。 | 2026-11-12: task recorded; the configuration keys table has the "WeChat Mini Program" column (all ❌). Not started. |
+| 见右列。 | TODO (2026-11-13): start the implementation. User prompts, verbatim: "在本项目crossplatform文件夹下创建小程序文件夹， 全英文， 并根据要求创建文件 ，创建小程序项目： 4. **项目根目录需包含有效的 `project.config.json`**，且其中 `appid` 字段有效（空字符串、`\"touristappid\"` 视为无效）。 请填写。\|AppID(小程序ID) wx5e29c9d33906f074" and "阅读docs文档找到小程序相关要求实现本项目代码". In English: create the mini program folder under `CrossPlatform/` (all English), with a valid `project.config.json` whose `appid` is `wx5e29c9d33906f074`, and implement this document's plan. Environment: WeChat DevTools Stable 2.02.2609250 with its agent skill `wechatide` 0.3.11 (service port on, client `Claude` authorized), used to open, compile, screenshot and drive the simulator. |
