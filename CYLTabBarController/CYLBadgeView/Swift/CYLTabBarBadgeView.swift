@@ -74,7 +74,7 @@ open class CYLTabBarBadgeView: UIView, CYLBadgeTextDisplaying {
     }
 
     @available(*, unavailable)
-    public required init?(coder: NSCoder) {
+    public required init?(coder _: NSCoder) {
         fatalError("CYLTabBarBadgeView is not loaded from a storyboard")
     }
 
@@ -145,7 +145,7 @@ open class CYLTabBarBadgeView: UIView, CYLBadgeTextDisplaying {
         didSet { syncBadgeLabelWithBounds() }
     }
 
-    override open func sizeThatFits(_ size: CGSize) -> CGSize {
+    override open func sizeThatFits(_: CGSize) -> CGSize {
         guard let text, !text.isEmpty else {
             return .zero
         }

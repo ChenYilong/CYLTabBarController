@@ -43,7 +43,7 @@ extension UIView {
      * [CN] 与 `-hitTest:withEvent:` 交换：在这里调用它即执行系统的实现。
      */
     @objc(cyl_outsideBoundsHitTest:withEvent:)
-    dynamic func cyl_outsideBoundsHitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
+    dynamic func cyl_outsideBoundsHitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? { // NOSONAR: kept API name
         let view = cyl_outsideBoundsHitTest(point, with: event)
         if view != nil || !CYLHitTestOutsideBounds.isInstalled {
             return view

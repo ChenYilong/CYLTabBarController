@@ -75,7 +75,9 @@ enum CYLThemeImage {
     }
 
     // [EN] A 1×1 empty image for a provider that gives none. [CN] 当 provider 没有给出图片时使用的 1×1 空图片。
-    private static let emptyImage = UIGraphicsImageRenderer(size: CGSize(width: 1, height: 1)).image { _ in }
+    private static let emptyImage = UIGraphicsImageRenderer(size: CGSize(width: 1, height: 1)).image { _ in
+        // [EN] Nothing to draw: the image stays empty. [CN] 无需绘制：图片保持为空。
+    }
 
     fileprivate static var defaultManagerName: NSCopying & NSObjectProtocol {
         CYLThemeManagerNameDefault as NSString
@@ -96,7 +98,7 @@ extension UIImage {
      * [CN] 默认管理器的主题图片。
      */
     @objc(cyl_imageWithThemeProvider:)
-    public class func cyl_image(themeProvider provider: @escaping CYLThemeImageProvider) -> UIImage {
+    public class func cyl_image(themeProvider provider: @escaping CYLThemeImageProvider) -> UIImage { // NOSONAR: kept API name
         CYLThemeImage.make(nil, CYLThemeImage.defaultManagerName, provider)
     }
 
@@ -105,7 +107,8 @@ extension UIImage {
      * [CN] 默认管理器的具名主题图片。
      */
     @objc(cyl_imageWithName:themeProvider:)
-    public class func cyl_image(withName name: String?, themeProvider provider: @escaping CYLThemeImageProvider) -> UIImage {
+    public class func cyl_image(withName name: String?, // NOSONAR: kept API name
+                                themeProvider provider: @escaping CYLThemeImageProvider) -> UIImage {
         CYLThemeImage.make(name, CYLThemeImage.defaultManagerName, provider)
     }
 
@@ -114,7 +117,7 @@ extension UIImage {
      * [CN] 名为 `managerName` 的管理器的主题图片。
      */
     @objc(cyl_imageWithThemeManagerName:provider:)
-    public class func cyl_image(withThemeManagerName managerName: (NSCopying & NSObjectProtocol)?,
+    public class func cyl_image(withThemeManagerName managerName: (NSCopying & NSObjectProtocol)?, // NOSONAR: kept API name
                                 provider: @escaping CYLThemeImageProvider) -> UIImage {
         CYLThemeImage.make(nil, managerName ?? CYLThemeImage.defaultManagerName, provider)
     }
@@ -124,7 +127,8 @@ extension UIImage {
      * [CN] 名为 `managerName` 的管理器（为 nil 时为默认管理器）的具名主题图片。
      */
     @objc(cyl_imageWithName:themeManagerName:provider:)
-    public class func cyl_image(withName name: String?, themeManagerName managerName: (NSCopying & NSObjectProtocol)?,
+    public class func cyl_image(withName name: String?, // NOSONAR: kept API name
+                                themeManagerName managerName: (NSCopying & NSObjectProtocol)?,
                                 provider: @escaping CYLThemeImageProvider) -> UIImage {
         CYLThemeImage.make(name, managerName ?? CYLThemeImage.defaultManagerName, provider)
     }

@@ -22,7 +22,8 @@ extension UIViewController {
      * [CN] 主题切换时对可见窗口中的每个控制器调用：子控制器、被 present 的控制器，以及不在窗口中的视图。子类需调用 super。
      */
     @objc(cyl_themeDidChangeByManager:identifier:theme:)
-    open dynamic func cyl_themeDidChange(by manager: CYLThemeManager, identifier: (NSCopying & NSObjectProtocol)?,
+    open dynamic func cyl_themeDidChange(by manager: CYLThemeManager, // NOSONAR: kept API name
+                                         identifier: (NSCopying & NSObjectProtocol)?,
                                          theme: NSObject?) {
         for child in children {
             child.cyl_themeDidChange(by: manager, identifier: identifier, theme: theme)
@@ -35,7 +36,7 @@ extension UIViewController {
         }
         setNeedsStatusBarAppearanceUpdate()
         if view.window == nil, view.superview == nil {
-            view.cyl_themeDidChange(by: manager, identifier: identifier, theme: theme, enumeratesSubviews: true)
+            view.applyThemeChange(by: manager, identifier: identifier, theme: theme, enumeratesSubviews: true)
         }
     }
 }

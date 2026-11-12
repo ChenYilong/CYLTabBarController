@@ -37,6 +37,7 @@ flowchart LR
 | [「More」编辑](#more编辑--more-editing) | [More editing](#more编辑--more-editing) |
 | [演示](#演示--demo) | [Demo](#演示--demo) |
 | [限制与验证](#限制与验证--limits-and-verification) | [Limits and verification](#限制与验证--limits-and-verification) |
+| [任务记录](#任务记录--task-log) | [Task log](#任务记录--task-log) |
 
 <!-- navigation:end -->
 

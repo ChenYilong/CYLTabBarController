@@ -12,7 +12,7 @@ import UIKit
  * [CN] 管理器的当前主题变化时发出（object 为该管理器）。
  */
 extension NSNotification.Name {
-    public static let CYLThemeDidChange = NSNotification.Name("CYLThemeDidChangeNotification")
+    public static let CYLThemeDidChange = NSNotification.Name("CYLThemeDidChangeNotification") // NOSONAR: kept API name
 }
 
 /**
@@ -48,7 +48,7 @@ public class CYLThemeManager: NSObject {
     init(name: NSCopying & NSObjectProtocol) {
         self.name = (name.copy() as? NSCopying & NSObjectProtocol) ?? name
         super.init()
-        NotificationCenter.default.addObserver(self, selector: #selector(cyl_applicationDidBecomeActive(_:)),
+        NotificationCenter.default.addObserver(self, selector: #selector(applicationDidBecomeActive(_:)),
                                                name: UIApplication.didBecomeActiveNotification, object: nil)
     }
 
@@ -98,7 +98,7 @@ public class CYLThemeManager: NSObject {
         currentThemeIdentifier = identifier
     }
 
-    @objc private func cyl_applicationDidBecomeActive(_ notification: Notification) {
+    @objc private func applicationDidBecomeActive(_: Notification) {
         if respondsSystemStyleAutomatically {
             updateTheme(for: currentTraitCollection)
         }
@@ -319,10 +319,10 @@ public class CYLThemeManager: NSObject {
                 continue
             }
             root.cyl_themeDidChange(by: self, identifier: identifier, theme: theme)
-            window.cyl_themeDidChange(by: self, identifier: identifier, theme: theme, enumeratesSubviews: true)
+            window.applyThemeChange(by: self, identifier: identifier, theme: theme, enumeratesSubviews: true)
         }
         for view in CYLThemeRuntime.trackedViews {
-            view.cyl_themeDidChange(by: self, identifier: identifier, theme: theme, enumeratesSubviews: true)
+            view.applyThemeChange(by: self, identifier: identifier, theme: theme, enumeratesSubviews: true)
         }
         if !snapshots.isEmpty {
             UIView.animate(withDuration: themeChangeAnimationDuration, delay: 0, options: .beginFromCurrentState, animations: {

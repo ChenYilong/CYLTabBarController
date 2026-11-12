@@ -57,6 +57,8 @@ BINDING_END = "<!-- binding:end -->"
 HEADER_START = "// docs-binding:start"
 HEADER_END = "// docs-binding:end"
 CLASS_DECLARATION = re.compile(r"^@interface\s+(\w+)\s*:", re.M)
+# A class translated to Swift keeps its Objective-C name with "@objc(Name)" right above "class Name" (docs/Swift-Migration.md).
+SWIFT_CLASS_DECLARATION = re.compile(r"^@objc\((\w+)\)\s*\n(?:\s*@\w+.*\n)*\s*(?:public |open )?(?:final )?class\s+\1\b", re.M)
 
 # Pages with more than this many level-2 and level-3 headings list level 2 only.
 MAX_ROWS_WITH_LEVEL_3 = 50
@@ -359,12 +361,31 @@ def source_headers():
                 yield os.path.relpath(path, ROOT), handle.read()
 
 
+def swift_sources():
+    """(path relative to the repository, text) of every Swift file under CYLTabBarController/."""
+    for directory, folders, files in os.walk(SOURCES):
+        folders[:] = sorted(f for f in folders if not f.startswith("."))
+        for name in sorted(f for f in files if f.endswith(".swift") and not f.startswith(".")):
+            path = os.path.join(directory, name)
+            with open(path, encoding=ENCODING, errors="replace") as handle:
+                yield os.path.relpath(path, ROOT), handle.read()
+
+
 def class_headers(headers):
-    """Class name -> header path for every "@interface Name :" declaration in `headers`."""
+    """Class name -> header path for every "@interface Name :" declaration in `headers`.
+
+    A class translated to Swift ("@objc(Name)" above "class Name" in a Swift file) is bound to the header of the same
+    name, which stays for Objective-C callers; without such a header, to the Swift file itself.
+    """
     found = {}
+    by_file_name = {}
     for path, text in headers:
+        by_file_name.setdefault(os.path.basename(path), path)
         for class_name in CLASS_DECLARATION.findall(text):
             found.setdefault(class_name, path)
+    for path, text in swift_sources():
+        for class_name in SWIFT_CLASS_DECLARATION.findall(text):
+            found.setdefault(class_name, by_file_name.get(class_name + ".h", path))
     return found
 
 

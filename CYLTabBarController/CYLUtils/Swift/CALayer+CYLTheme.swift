@@ -24,7 +24,7 @@ extension CALayer {
      * [CN] 为 `CGColor` 属性 `key` 设置主题颜色；传 nil 则移除并清空该属性。
      */
     @objc(cyl_setThemeColor:forKey:)
-    public func cyl_setThemeColor(_ color: UIColor?, forKey key: String) {
+    public func cyl_setThemeColor(_ color: UIColor?, forKey key: String) { // NOSONAR: kept API name
         guard !key.isEmpty else {
             return
         }
@@ -38,10 +38,10 @@ extension CALayer {
             objc_setAssociatedObject(self, &CALayer.cyl_themeLayerColorsKey, colors, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
         }
         colors[key] = color
-        cyl_applyThemeColor(color, forKey: key)
+        applyThemeColor(color, forKey: key)
         if let view = cyl_themeView {
             CYLThemeRuntime.track(view)
-            cyl_followTraitChanges(of: view)
+            followTraitChanges(of: view)
         }
     }
 
@@ -50,7 +50,7 @@ extension CALayer {
      * [CN] 为 `key` 设置的主题颜色。
      */
     @objc(cyl_themeColorForKey:)
-    public func cyl_themeColor(forKey key: String) -> UIColor? {
+    public func cyl_themeColor(forKey key: String) -> UIColor? { // NOSONAR: kept API name
         cyl_themeLayerColors?[key] as? UIColor
     }
 
@@ -59,10 +59,10 @@ extension CALayer {
      * [CN] 重新解析本图层的主题颜色，以及不属于视图的子图层的主题颜色。
      */
     @objc(cyl_updateThemeColors)
-    public func cyl_updateThemeColors() {
+    public func cyl_updateThemeColors() { // NOSONAR: kept API name
         if let colors = cyl_themeLayerColors?.copy() as? NSDictionary {
             for case let (key as String, color as UIColor) in colors {
-                cyl_applyThemeColor(color, forKey: key)
+                applyThemeColor(color, forKey: key)
             }
         }
         for sublayer in sublayers ?? [] where !(sublayer.delegate is UIView) {
@@ -115,12 +115,12 @@ extension CALayer {
         return nil
     }
 
-    private func cyl_applyThemeColor(_ color: UIColor, forKey key: String) {
+    private func applyThemeColor(_ color: UIColor, forKey key: String) {
         let traitCollection = cyl_themeView?.traitCollection ?? UITraitCollection.current
         setValue(color.resolvedColor(with: traitCollection).cgColor, forKey: key)
     }
 
-    private func cyl_followTraitChanges(of view: UIView) {
+    private func followTraitChanges(of view: UIView) {
         guard #available(iOS 17.0, *),
               objc_getAssociatedObject(self, &CALayer.cyl_themeTraitRegistrationKey) == nil else {
             return

@@ -176,6 +176,7 @@ docs/
 │   ├── android-liquid-glass-surface-040.png
 │   ├── android-liquid-glass-surface-100.png
 │   ├── android-liquid-glass-surface-slider.png
+│   ├── android-more-than-five-tabs-report.png
 │   ├── carthage-example-ios.png
 │   ├── configuration-demo-json-zh-hans.png
 │   ├── configuration-localization-en.png
@@ -223,10 +224,17 @@ docs/
 │   ├── pag-flat-design.png
 │   ├── pag-liquid-glass.png
 │   ├── per-tab-animation-pag-ios.png
+│   ├── plus-button-first-display-fixed-ios.png
+│   ├── plus-button-first-display-glitch-ios.jpg
 │   ├── plus-button-follows-slot-long-titles-ios.png
+│   ├── plus-button-glitch-report-2-ios.png
 │   ├── plus-button-lens-crisp-ios.png
 │   ├── plus-button-lens-mask-drag-ios.png
 │   ├── plus-button-long-titles-liquid-glass-ios.png
+│   ├── plus-button-mask-off-first-display-ios.png
+│   ├── plus-button-title-color-mask-on-off-ios.png
+│   ├── plus-button-title-color-mask-report-ios.png
+│   ├── plus-button-title-only-mask-drag-ios.png
 │   ├── plus-button-titles-fit-liquid-glass-ios.png
 │   ├── plus-child-theme-switching.png
 │   ├── plusbutton-background-image-liquid-glass-selected.png
@@ -274,6 +282,8 @@ docs/
 │   ├── rive-classic.png
 │   ├── rive-flat-design.png
 │   ├── rive-liquid-glass.png
+│   ├── swift-migration-badges-ios.png
+│   ├── swift-migration-localization-ios.png
 │   ├── swiftui-integration-ios.png
 │   ├── swiftui-plus-title-blur-ios.png
 │   ├── tab-accessibility-labels-after-title-change.png

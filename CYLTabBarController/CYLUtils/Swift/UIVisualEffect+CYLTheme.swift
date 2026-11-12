@@ -106,7 +106,7 @@ extension UIVisualEffect {
      * [CN] 默认管理器的主题效果。
      */
     @objc(cyl_effectWithThemeProvider:)
-    public class func cyl_effect(themeProvider provider: @escaping CYLThemeEffectProvider) -> UIVisualEffect {
+    public class func cyl_effect(themeProvider provider: @escaping CYLThemeEffectProvider) -> UIVisualEffect { // NOSONAR: kept API name
         CYLThemeEffect.make(nil, CYLThemeEffect.defaultManagerName, provider)
     }
 
@@ -115,7 +115,7 @@ extension UIVisualEffect {
      * [CN] 名为 `managerName` 的管理器（为 nil 时为默认管理器）的主题效果。
      */
     @objc(cyl_effectWithThemeManagerName:provider:)
-    public class func cyl_effect(withThemeManagerName managerName: (NSCopying & NSObjectProtocol)?,
+    public class func cyl_effect(withThemeManagerName managerName: (NSCopying & NSObjectProtocol)?, // NOSONAR: kept API name
                                 provider: @escaping CYLThemeEffectProvider) -> UIVisualEffect {
         CYLThemeEffect.make(nil, managerName ?? CYLThemeEffect.defaultManagerName, provider)
     }
