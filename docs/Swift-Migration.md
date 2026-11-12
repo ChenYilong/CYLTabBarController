@@ -32,14 +32,14 @@
 | 中文 | English |
 |:---|:---|
 | 本文按用户要求使用英文（见右列）。 | TODO (2026-11-12, Swift migration of the iOS core layer): user prompt, verbatim: "将下面的任务找一个合适的文档，标注 TODO：全英文写入：注意本操作仅仅设计iOS端，重点修改 本项目的Core核心层面代码。 不涉及第三方库，首先创建swift编码规范文档，更新instructions和skills相关文档。如果网络有现成的swift skills请直接复制安装到本项目中，按照swift编码规范以及swift相关skilla，将Core 核心层面代码全部转录为Swift代码，如果无必要不要修改example层代码。在该文档中记录swift翻译进度。以项目中不存在objc代码为准，如果无法翻译为swift以宏定义 关键字形式 进行兼容swift的也可以算作翻译成功。不存在objc代码为满分，每提交一次就打一次分。每提交一次检查是否满分。一直到满分为止。" |
-| | Requirements: iOS only. Translate the core layer (the `Core` subspec and its dependencies `CYLUtils` and `CYLBadgeView`) from Objective-C to Swift; third-party libraries and their adapters (Lottie, PAG, Rive, GIF, FlatDesign) are out of scope. First write the Swift coding standard ([Swift-Coding-Style.md](Swift-Coding-Style.md)) and update the instructions and skills. Install ready-made Swift skills when they exist. Leave the example layer alone unless a change is needed. Record the progress here. Full marks (100) means no Objective-C code is left in the core layer; what cannot be written in Swift and stays as macros or keywords for Swift compatibility counts as translated. Score every commit and check for full marks; continue until 100. |
+| | Requirements: iOS only. Translate the core layer (the `Core` subspec, its dependencies `CYLUtils` and `CYLBadgeView`, and the FlatDesign tab bar `CYLFlatDesignTabBar`) from Objective-C to Swift; third-party libraries and their adapters (Lottie, PAG, Rive, GIF) are out of scope. First write the Swift coding standard ([Swift-Coding-Style.md](Swift-Coding-Style.md)) and update the instructions and skills. Install ready-made Swift skills when they exist. Leave the example layer alone unless a change is needed. Record the progress here. Full marks (100) means no Objective-C code is left in the core layer; what cannot be written in Swift and stays as macros or keywords for Swift compatibility counts as translated. Score every commit and check for full marks; continue until 100. |
 
 ## [CN]评分
 ## [EN]Score
 
 | 中文 | English |
 |:---|:---|
-| 见右列。 | `python3 scripts/swift-migration-score.py` prints the score and the files still in Objective-C. Every `.m` line counts; a `.h` file counts unless it only holds preprocessor lines, comments and Swift compatibility markers. Score = 100 × (1 − remaining / 55 876), rounded down. Every commit of this migration puts the score in its body and adds a row to "Progress". |
+| 见右列。 | `python3 scripts/swift-migration-score.py` prints the score and the files still in Objective-C. Every `.m` line counts; a `.h` file counts unless it only holds preprocessor lines, comments and Swift compatibility markers. Score = 100 × (1 − remaining / 59 391), rounded down. Every commit of this migration puts the score in its body and adds a row to "Progress". |
 
 ## [CN]方案
 ## [EN]Plan
@@ -61,3 +61,4 @@
 |:---|:---|
 | 见右列。 | 2026-11-12: baseline 55 876 Objective-C lines in 124 files; score **0 / 100**. Coding standard, instructions, skills and the scoring script are in place; no file is translated yet. |
 | | 2026-11-12, step 1: `CYLUtils/UIViewController+CYLUtils` → `CYLUtils/Swift/UIViewController+CYLUtils.swift` (the `.m` is gone; the header keeps the Objective-C declaration behind `#ifndef __swift__`). Build plumbing for every later step: the podspec takes `.swift` in `CYLUtils`, `Package.swift` has a lower `CYLTabBarControllerSwift` target (SwiftPM cannot mix languages), the Xcode framework target compiles the file. Lesson: keep the Swift name Clang gave the method (`cyl_getViewControllerInsteadOfNavigation()`), see the style guide. Verified: unit tests 129 on iOS 26.1 pass; on iOS 17.5 two failures of one test that also fail without this step (a classic badge bug, TODO in [Update-Tab-Bar-Items-In-Place](Update-Tab-Bar-Items-In-Place.md)); the Objective-C demo (CocoaPods), `Example-Swift` (CocoaPods, local path) and the SwiftPM package build. Score **0 / 100** (55 856 lines left; the score rounds down). |
+| | 2026-11-12: scope correction by the maintainer ("FlatDesign subspecs wrap belongs to core code"): `CYLFlatDesignTabBar` (3 499 lines) joins the core layer; the baseline is now 59 391 lines (FlatDesign included), 59 378 left. Score **0 / 100**. |

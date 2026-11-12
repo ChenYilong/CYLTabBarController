@@ -2,9 +2,10 @@
 """
 [EN] Score of the Objective-C → Swift migration of the iOS core layer (docs/Swift-Migration.md).
 
-The core layer is the `Core` subspec and the two subspecs it depends on (`CYLUtils`, `CYLBadgeView`): the root of
-CYLTabBarController/ plus CYLTabBarController/CYLUtils/ and CYLTabBarController/CYLBadgeView/. Third-party adapters
-(Lottie, PAG, Rive, GIF, FlatDesign) are not in scope.
+The core layer is the `Core` subspec, the two subspecs it depends on (`CYLUtils`, `CYLBadgeView`) and the FlatDesign
+tab bar (`CYLFlatDesignTabBar`, core code by the maintainer's decision of 2026-11-12): the root of CYLTabBarController/
+plus its CYLUtils/, CYLBadgeView/ and CYLFlatDesignTabBar/ folders. Third-party adapters (Lottie, PAG, Rive, GIF) are
+not in scope.
 
 Every line of a `.m` file counts as Objective-C. A `.h` file counts too, unless it only holds what Swift cannot
 express and the rules accept as Swift compatibility: preprocessor lines (macros, `#import`, `#if`), comments, and
@@ -24,8 +25,8 @@ import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 LIBRARY = os.path.join(ROOT, 'CYLTabBarController')
-# [EN] Objective-C lines of the core layer on 2026-11-12, before the migration started. [CN] 迁移开始前（2026-11-12）的行数。
-BASELINE = 55876
+# [EN] Objective-C lines of the core layer on 2026-11-12, before the migration started (FlatDesign included). [CN] 迁移开始前（2026-11-12）的行数。
+BASELINE = 59391
 COMPATIBLE = re.compile(r'^\s*(#|//|/\*|\*|\*/|NS_ASSUME_NONNULL_(BEGIN|END)|$)')
 
 
@@ -35,7 +36,7 @@ def core_files():
     for name in os.listdir(LIBRARY):
         if name.endswith(('.h', '.m')) and not name.startswith('._'):
             found.append(os.path.join(LIBRARY, name))
-    for folder in ('CYLUtils', 'CYLBadgeView'):
+    for folder in ('CYLUtils', 'CYLBadgeView', 'CYLFlatDesignTabBar'):
         for directory, _, names in os.walk(os.path.join(LIBRARY, folder)):
             found += [os.path.join(directory, n) for n in names if n.endswith(('.h', '.m')) and not n.startswith('._')]
     return sorted(found)

@@ -34,6 +34,7 @@
 | [在原生 App 中使用 CYLTabBarHostView](#cn在原生-app-中使用-cyltabbarhostview) | [CYLTabBarHostView in a native app](#encyltabbarhostview-in-a-native-app) |
 | [限制](#cn限制) | [Limits](#enlimits) |
 | [测试与截图](#cn测试与截图) | [Testing and screenshots](#entesting-and-screenshots) |
+| [任务记录](#任务记录--task-log) | [Task log](#任务记录--task-log) |
 
 <!-- navigation:end -->
 
@@ -180,3 +181,9 @@ bar.setConfigurationJSON(assets.open("tabbar.json").bufferedReader().readText())
 | 中文 | English |
 |:---|:---|
 | 六个示例（基础、PAG、Rive，各有 React Native 与 Flutter 版本）各在 iOS 与 Android 上运行，在 iPhone 17 Pro 模拟器（iOS 26.5）与 Android 模拟器（API 35，arm64）上逐项验证：点击每个 Tab、PlusButton 与它的页面、角标递增、长按、样式切换、Rive 的 Play / Stop。单元测试：iOS `CYLTabBarHostViewTests`（17 个：透明区域的触摸与 `touchableRects`、PlusButton 键与每个 context 独立、新的 PlusButton 键与顶层键、Protobuf / JSON / 文本格式中的 PlusButton、宿主视图的创建、下标、PlusButton 页面、长按、角标、图片加载、高度）；Android `CYLTabBarHostViewTest`（14 个：另含配置的标题颜色、角标位置、透明区域）；Flutter `cyl_touch_regions_test.dart`。透明区域在 iOS 与 Android 上都实际点击验证：区域中的点击交给下方页面，PlusButton 伸入区域的部分可以点击。React Native Android 的 debug 版通过 `adb reverse tcp:8081 tcp:8081` 连接 Metro；Flutter 的 PAG 与 Rive 示例另以开启 R8 的发布版验证。没有在真机上运行。 | Six examples (basic, PAG and Rive, each in React Native and Flutter), each on iOS and Android, were checked one by one on an iPhone 17 Pro simulator (iOS 26.5) and an Android emulator (API 35, arm64): every tab, the plus button and its page, the badge counting up, long press, style switching, Rive's Play / Stop. Unit tests: iOS `CYLTabBarHostViewTests` (17: touches in the transparent strip and `touchableRects`, the plus button key and one per context, the new plus button and top-level keys, the plus button in Protobuf / JSON / text format, building the host view, indexes, the plus button's page, long press, badges, image loading, height); Android `CYLTabBarHostViewTest` (14: also the configured title color, the badge position, the strip); Flutter `cyl_touch_regions_test.dart`. The strip was tapped on iOS and Android: a tap in it reaches the page below, and the plus button's part in it can be tapped. React Native Android debug builds reach Metro through `adb reverse tcp:8081 tcp:8081`; the Flutter PAG and Rive demos were also checked as R8-minified release builds. Not run on a device. |
+
+## 任务记录 / Task log
+
+| 中文 | English |
+|:---|:---|
+| 本条按用户要求使用英文（见右列）。 | TODO (2026-11-12): a third component, **WeChat Mini Program**, in `CrossPlatform/wechat-miniprogram-cyltabbar`, scored against the configuration keys of the iOS library: see [WeChat-Mini-Program.md](WeChat-Mini-Program.md) (task, prompt, plan, score 0 / 100). |

@@ -81,32 +81,32 @@ let tabBarController = CYLTabBarController(configuration: [
 ### [CN]配置键
 ### [EN]Configuration keys
 
-| 键 Key | 代码中的类型 Type in code | 文件中的写法 In a file | 默认值 Default |
-|:---|:---|:---|:---|
-| `CYLTabBarControllerViewControllers` | `NSArray<UIViewController *>`，按下标对应 / matched by index | 不支持（仅代码） / not supported (code only) | 按页面 ID 获得 / from the page IDs |
-| `CYLTabBarControllerTabBarItemsAttributes` | `NSArray<NSDictionary *>` | 字典数组 / a list of dictionaries | `@[]` |
-| `CYLTabBarControllerImageInsets` | `NSValue` (UIEdgeInsets) | `"{top, left, bottom, right}"`、`[t, l, b, r]`、`{top: …}` | `UIEdgeInsetsZero` |
-| `CYLTabBarControllerTitlePositionAdjustment` | `NSValue` (UIOffset) | `"{horizontal, vertical}"`、`[h, v]`、`{horizontal: …}` | `UIOffsetZero` |
-| `CYLTabBarControllerStyleType` | `NSNumber` (CYLTabBarStyleType) | `default`、`system`、`flatDesign`、`liquidGlass` 或数字 / or a number | `default` |
-| `CYLTabBarControllerContext` | `NSString` | 字符串 / a string | `nil` |
-| `CYLTabBarControllerPlusButton` | `NSDictionary`：`CYLTabBarItemTitle`、`CYLTabBarItemImage`（UIImage 或名称 / or a name）、可选 / optional `CYLTabBarItemSelectedTitle`、`CYLTabBarItemSelectedTitleColor` | 字典，图片写名称、`"system:…"` 或路径；Protobuf 字段 12（`CYLTabBarItem` 消息） / a dictionary, the image as a name, `"system:…"` or a path; Protobuf field 12 (a `CYLTabBarItem` message) | 不注册 PlusButton / no plus button |
-| `CYLTabBarControllerPlusButtonAction` | `void (^)(CYLPlusButton *)` block，每次点击执行 / run on each tap | 不支持（仅代码） / not supported (code only) | `nil` |
-| `CYLTabBarControllerPlusButton` 中的其他键 / more keys inside `CYLTabBarControllerPlusButton` | `CYLPlusButtonBackgroundImage`（背景图，标题画在上面，按钮采用图片尺寸 / a background image with the title drawn on it; the button takes its size）、`CYLPlusButtonIndexInTabBar`（NSNumber，位置 / its place）、`CYLPlusButtonCenterYMultiplier` / `CYLPlusButtonCenterYOffset`（NSNumber，垂直中心 / its vertical center）、`CYLPlusButtonAlignsTitle`、`CYLPlusButtonKeepsTitleVisible`（BOOL）、`CYLPlusButtonShowsSelection`（BOOL，液态玻璃下选中 PlusButton 的页面时在其下方显示选中效果，等同代理方法返回 YES；Android 总是显示 / Liquid Glass shows the selection under it while its page is selected, as the delegate returning YES; Android always shows it）、`CYLPlusButtonSize`（按钮尺寸，如 / the button's size, e.g. "{55, 80}"）、`CYLPlusButtonImageSize`（图片按此尺寸等比绘制，例如 512px 的网络图片 / the images drawn aspect fit in this size, e.g. a 512 px network image），以及 / plus `CYLTabBarItemSelectedImage`（选中图片 / the selected image）、`CYLTabBarItemTitleColor`、`CYLTabBarItemTitleFont`、`CYLTabBarItemIdentifier`、`CYLTabBarItemPageIdentifier`（PlusButton 自己的页面 / the plus button's own page） | 同左，图片写名称或路径，布尔写 `true` / `false` / the same, images as names or paths, booleans as `true` / `false` | 居中；有标题且无背景图时对齐标题 / the middle; titles aligned when it has a title and no background image |
-| `CYLTabBarControllerUserInterfaceStyle` | `NSString`：`light`、`dark`、`system`（TabBarController 的 `overrideUserInterfaceStyle`，iOS 13+；Android 跟随系统 / the controller's `overrideUserInterfaceStyle`, iOS 13+; Android follows the system） | 字符串 / a string | `system` |
-| `CYLTabBarControllerTabButtonTapAnimation` | `NSString`：`none`、`scale`、`zoomIn`、`bounce`、`bounceWithFireworks`、`rotation`、`flip`、`fume`（`cyl_tabButtonTapAnimationType`） | 字符串 / a string | `none` |
-| `CYLTabBarControllerSwipeToSwitchTab` | `NSNumber`（BOOL，`cyl_swipeToSwitchTabEnabled`） | `true` / `false` | `false` |
-| `CYLTabBarControllerPageRegistry` | `CYLTabBarPageRegistry` 或任何 `CYLTabBarPageProviding` / or any `CYLTabBarPageProviding` | 不支持（仅代码） / not supported (code only) | `nil`：只用全局注册表 / the shared registry only |
-| `CYLTabBarControllerPageResolver` | `CYLTabBarPageProvider` block | 不支持（仅代码） / not supported (code only) | `nil` |
-| `CYLTabBarControllerPageLookupOrder` | `NSArray<CYLTabBarPageSource>` | `"instance, shared"` 或数组 / or a list of `instance`、`resolver`、`shared`、`automatic` | 全部四个，顺序同左 / all four, in that order |
-| `CYLTabBarControllerAutomaticPageRegistration` | `NSNumber`（BOOL） | `true` / `false`、`yes` / `no`、`1` / `0` | `true` |
-| `CYLTabBarControllerTabBarItemAnimationSpeed` | `NSNumber`（`tabBarItemAnimationSpeed`） | 大于 0 的数字，如 `1.5` / a number above 0, e.g. `1.5` | 库的默认速度 / the library's default |
-| `CYLTabBarControllerLoginRequiredTabBarItemIdentifiers` | `NSArray<NSString *>`：需要登录的 Tab 的标识（`cyl_loginRequiredTabBarItemIdentifiers`，见[需要登录的 Tab](Login-Required-Tabs.md)） / the identifiers of the tabs that need login (see [Tabs That Need Login](Login-Required-Tabs.md)) | 字符串数组，或用逗号分隔的字符串 / a list of strings, or one comma-separated string | 无 / none |
-| `CYLTabBarControllerUnloadsUnselectedViewsOnMemoryWarning` | `NSNumber`（BOOL，`unloadsUnselectedViewsOnMemoryWarning`，issue #426） | `true` / `false` | `false` |
-| `CYLTabBarControllerKeepsLoadedTabBarItemIdentifiers` | `NSArray<NSString *>`：内存警告时不卸载的 Tab（`cyl_keepsLoadedTabBarItemIdentifiers`，相当于重写 `-shouldUnloadViewOfViewController:`） / the tabs a memory warning never unloads (`cyl_keepsLoadedTabBarItemIdentifiers`, what overriding `-shouldUnloadViewOfViewController:` does) | 字符串数组，或用逗号分隔的字符串 / a list of strings, or one comma-separated string | 无 / none |
-| `CYLTabBarControllerThemes` | `NSDictionary`（标识 → 命名值）或数组 / (identifier → named values) or a list | `{light: {…}, dark: {…}}`，或 `[{CYLTabBarThemeIdentifier: …, CYLTabBarThemeValues: {…}}]`（见[皮肤](#cn皮肤) / see [Skins](#enskins)） | 无皮肤 / no skins |
-| `CYLTabBarControllerThemeIdentifier` | `NSString` | 字符串 / a string | 按字母顺序的第一个皮肤 / the first skin alphabetically |
-| `CYLTabBarControllerDarkThemeIdentifier` | `NSString` | 字符串 / a string | 不跟随深色模式 / no Dark Mode skin |
-| `CYLTabBarControllerThemeManagerName` | `NSString` | 字符串 / a string | TabBarController 的 `cyl_themeManager` / the controller's `cyl_themeManager` |
+| 键 Key | 代码中的类型 Type in code | 文件中的写法 In a file | 默认值 Default | 微信小程序 WeChat Mini Program |
+|:---|:---|:---|:---|:---|
+| `CYLTabBarControllerViewControllers` | `NSArray<UIViewController *>`，按下标对应 / matched by index | 不支持（仅代码） / not supported (code only) | 按页面 ID 获得 / from the page IDs | ❌ |
+| `CYLTabBarControllerTabBarItemsAttributes` | `NSArray<NSDictionary *>` | 字典数组 / a list of dictionaries | `@[]` | ❌ |
+| `CYLTabBarControllerImageInsets` | `NSValue` (UIEdgeInsets) | `"{top, left, bottom, right}"`、`[t, l, b, r]`、`{top: …}` | `UIEdgeInsetsZero` | ❌ |
+| `CYLTabBarControllerTitlePositionAdjustment` | `NSValue` (UIOffset) | `"{horizontal, vertical}"`、`[h, v]`、`{horizontal: …}` | `UIOffsetZero` | ❌ |
+| `CYLTabBarControllerStyleType` | `NSNumber` (CYLTabBarStyleType) | `default`、`system`、`flatDesign`、`liquidGlass` 或数字 / or a number | `default` | ❌ |
+| `CYLTabBarControllerContext` | `NSString` | 字符串 / a string | `nil` | ❌ |
+| `CYLTabBarControllerPlusButton` | `NSDictionary`：`CYLTabBarItemTitle`、`CYLTabBarItemImage`（UIImage 或名称 / or a name）、可选 / optional `CYLTabBarItemSelectedTitle`、`CYLTabBarItemSelectedTitleColor` | 字典，图片写名称、`"system:…"` 或路径；Protobuf 字段 12（`CYLTabBarItem` 消息） / a dictionary, the image as a name, `"system:…"` or a path; Protobuf field 12 (a `CYLTabBarItem` message) | 不注册 PlusButton / no plus button | ❌ |
+| `CYLTabBarControllerPlusButtonAction` | `void (^)(CYLPlusButton *)` block，每次点击执行 / run on each tap | 不支持（仅代码） / not supported (code only) | `nil` | ❌ |
+| `CYLTabBarControllerPlusButton` 中的其他键 / more keys inside `CYLTabBarControllerPlusButton` | `CYLPlusButtonBackgroundImage`（背景图，标题画在上面，按钮采用图片尺寸 / a background image with the title drawn on it; the button takes its size）、`CYLPlusButtonIndexInTabBar`（NSNumber，位置 / its place）、`CYLPlusButtonCenterYMultiplier` / `CYLPlusButtonCenterYOffset`（NSNumber，垂直中心 / its vertical center）、`CYLPlusButtonAlignsTitle`、`CYLPlusButtonKeepsTitleVisible`（BOOL）、`CYLPlusButtonShowsSelection`（BOOL，液态玻璃下选中 PlusButton 的页面时在其下方显示选中效果，等同代理方法返回 YES；Android 总是显示 / Liquid Glass shows the selection under it while its page is selected, as the delegate returning YES; Android always shows it）、`CYLPlusButtonSize`（按钮尺寸，如 / the button's size, e.g. "{55, 80}"）、`CYLPlusButtonImageSize`（图片按此尺寸等比绘制，例如 512px 的网络图片 / the images drawn aspect fit in this size, e.g. a 512 px network image），以及 / plus `CYLTabBarItemSelectedImage`（选中图片 / the selected image）、`CYLTabBarItemTitleColor`、`CYLTabBarItemTitleFont`、`CYLTabBarItemIdentifier`、`CYLTabBarItemPageIdentifier`（PlusButton 自己的页面 / the plus button's own page） | 同左，图片写名称或路径，布尔写 `true` / `false` / the same, images as names or paths, booleans as `true` / `false` | 居中；有标题且无背景图时对齐标题 / the middle; titles aligned when it has a title and no background image | ❌ |
+| `CYLTabBarControllerUserInterfaceStyle` | `NSString`：`light`、`dark`、`system`（TabBarController 的 `overrideUserInterfaceStyle`，iOS 13+；Android 跟随系统 / the controller's `overrideUserInterfaceStyle`, iOS 13+; Android follows the system） | 字符串 / a string | `system` | ❌ |
+| `CYLTabBarControllerTabButtonTapAnimation` | `NSString`：`none`、`scale`、`zoomIn`、`bounce`、`bounceWithFireworks`、`rotation`、`flip`、`fume`（`cyl_tabButtonTapAnimationType`） | 字符串 / a string | `none` | ❌ |
+| `CYLTabBarControllerSwipeToSwitchTab` | `NSNumber`（BOOL，`cyl_swipeToSwitchTabEnabled`） | `true` / `false` | `false` | ❌ |
+| `CYLTabBarControllerPageRegistry` | `CYLTabBarPageRegistry` 或任何 `CYLTabBarPageProviding` / or any `CYLTabBarPageProviding` | 不支持（仅代码） / not supported (code only) | `nil`：只用全局注册表 / the shared registry only | ❌ |
+| `CYLTabBarControllerPageResolver` | `CYLTabBarPageProvider` block | 不支持（仅代码） / not supported (code only) | `nil` | ❌ |
+| `CYLTabBarControllerPageLookupOrder` | `NSArray<CYLTabBarPageSource>` | `"instance, shared"` 或数组 / or a list of `instance`、`resolver`、`shared`、`automatic` | 全部四个，顺序同左 / all four, in that order | ❌ |
+| `CYLTabBarControllerAutomaticPageRegistration` | `NSNumber`（BOOL） | `true` / `false`、`yes` / `no`、`1` / `0` | `true` | ❌ |
+| `CYLTabBarControllerTabBarItemAnimationSpeed` | `NSNumber`（`tabBarItemAnimationSpeed`） | 大于 0 的数字，如 `1.5` / a number above 0, e.g. `1.5` | 库的默认速度 / the library's default | ❌ |
+| `CYLTabBarControllerLoginRequiredTabBarItemIdentifiers` | `NSArray<NSString *>`：需要登录的 Tab 的标识（`cyl_loginRequiredTabBarItemIdentifiers`，见[需要登录的 Tab](Login-Required-Tabs.md)） / the identifiers of the tabs that need login (see [Tabs That Need Login](Login-Required-Tabs.md)) | 字符串数组，或用逗号分隔的字符串 / a list of strings, or one comma-separated string | 无 / none | ❌ |
+| `CYLTabBarControllerUnloadsUnselectedViewsOnMemoryWarning` | `NSNumber`（BOOL，`unloadsUnselectedViewsOnMemoryWarning`，issue #426） | `true` / `false` | `false` | ❌ |
+| `CYLTabBarControllerKeepsLoadedTabBarItemIdentifiers` | `NSArray<NSString *>`：内存警告时不卸载的 Tab（`cyl_keepsLoadedTabBarItemIdentifiers`，相当于重写 `-shouldUnloadViewOfViewController:`） / the tabs a memory warning never unloads (`cyl_keepsLoadedTabBarItemIdentifiers`, what overriding `-shouldUnloadViewOfViewController:` does) | 字符串数组，或用逗号分隔的字符串 / a list of strings, or one comma-separated string | 无 / none | ❌ |
+| `CYLTabBarControllerThemes` | `NSDictionary`（标识 → 命名值）或数组 / (identifier → named values) or a list | `{light: {…}, dark: {…}}`，或 `[{CYLTabBarThemeIdentifier: …, CYLTabBarThemeValues: {…}}]`（见[皮肤](#cn皮肤) / see [Skins](#enskins)） | 无皮肤 / no skins | ❌ |
+| `CYLTabBarControllerThemeIdentifier` | `NSString` | 字符串 / a string | 按字母顺序的第一个皮肤 / the first skin alphabetically | ❌ |
+| `CYLTabBarControllerDarkThemeIdentifier` | `NSString` | 字符串 / a string | 不跟随深色模式 / no Dark Mode skin | ❌ |
+| `CYLTabBarControllerThemeManagerName` | `NSString` | 字符串 / a string | TabBarController 的 `cyl_themeManager` / the controller's `cyl_themeManager` | ❌ |
 
 ### [CN]新增的 item 键与文件中的写法
 ### [EN]New item keys and file values
