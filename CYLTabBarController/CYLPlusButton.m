@@ -1292,8 +1292,8 @@ static NSDictionary<NSNumber *, NSNumber *> *CYLPlusButtonDerivedImageStates(voi
  *      在替身清晰的标题与图标下形成一层模糊重影。替身显示期间，真实按钮在放大镜下被遮住：内容全部在放大镜内时遮住整个放大镜区域，否则只遮住
  *      标题所在的横条（底板以上的部分保留）；选中其他 Tab 后移除遮罩。
  *
- * 2026-11-12 (docs/Liquid-Glass-Robustness.md "Task log"): ON (`CYL_PLUS_BUTTON_LENS_MASK_ENABLED` 1) with the scope the
- *      maintainer narrowed: the title only, never the icon, and only with `+alignsTitleWithTabBarItemTitles`. History:
+ * TODO (2026-11-12, docs/Liquid-Glass-Robustness.md "Task log"): OFF (`CYL_PLUS_BUTTON_LENS_MASK_ENABLED` 0). The code below
+ *      has the scope the maintainer narrowed: the title only, never the icon, and only with `+alignsTitleWithTabBarItemTitles`. History:
  * [EN] A mask here once cut the plus button in two (iOS 26+, Liquid Glass, not FlatDesign, a plus child view controller:
  *      select the plus button, drag the lens to another item); the maintainer had removed an earlier implementation
  *      for that reason. The mask is now off while UIKit's Liquid Glass gesture presses or drags
@@ -1310,12 +1310,13 @@ static NSDictionary<NSNumber *, NSNumber *> *CYLPlusButtonDerivedImageStates(voi
  */
 #ifndef CYL_PLUS_BUTTON_LENS_MASK_ENABLED
 /*!
- * [EN] 1 (default since 2026-11-12, title-only scope, after the drag and first-display tests): the mask below is on. 0 makes
- *      `-cyl_updateLiquidGlassMask` return on its first line: on any plus button bug, set 0 first and test again (AGENTS.md).
- * [CN] 1（2026-11-12 起默认，只作用于标题，已通过拖动与首次显示测试）：开启下面的遮罩。0 让 `-cyl_updateLiquidGlassMask` 第一行
- *      直接返回：PlusButton 出现任何 bug 时，先设为 0 再测试（AGENTS.md）。
+ * [EN] 0 (default; OFF again since 2026-11-12, maintainer's decision after a title color report): `-cyl_updateLiquidGlassMask`
+ *      returns on its first line. 1 turns on the title-only implementation below; on any plus button bug, set 0 first and test
+ *      again (AGENTS.md).
+ * [CN] 0（默认；2026-11-12 因标题颜色问题由维护者决定再次关闭）：`-cyl_updateLiquidGlassMask` 第一行直接返回。1 开启下面只作用于
+ *      标题的实现；PlusButton 出现任何 bug 时，先设为 0 再测试（AGENTS.md）。
  */
-#define CYL_PLUS_BUTTON_LENS_MASK_ENABLED 1
+#define CYL_PLUS_BUTTON_LENS_MASK_ENABLED 0
 #endif
 
 /*!
