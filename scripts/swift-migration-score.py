@@ -12,6 +12,10 @@ express and the rules accept as Swift compatibility: preprocessor lines (macros,
 `NS_SWIFT_NAME` / `NS_REFINED_FOR_SWIFT` / `NS_ASSUME_NONNULL` markers. Score = 100 × (1 − remaining / baseline),
 rounded down; 100 means no Objective-C is left.
 
+A file with the marker comment `CYL-SWIFT-MIGRATION: objc-shell` is the thin Objective-C shell of a subclassable class
+whose logic is in Swift (Objective-C cannot subclass a Swift class; the maintainer's decision of 2026-11-13): it counts
+as compatibility code, and is listed under "Objective-C shells" with its size, so a shell that grows logic is visible.
+
     python3 scripts/swift-migration-score.py            # score and the remaining files
     python3 scripts/swift-migration-score.py --brief    # the score line only
 
@@ -27,6 +31,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 LIBRARY = os.path.join(ROOT, 'CYLTabBarController')
 # [EN] Objective-C lines of the core layer on 2026-11-12, before the migration started (FlatDesign included). [CN] 迁移开始前（2026-11-12）的行数。
 BASELINE = 59391
+SHELL_MARKER = 'CYL-SWIFT-MIGRATION: objc-shell'
 COMPATIBLE = re.compile(r'^\s*(#|//|/\*|\*|\*/|NS_ASSUME_NONNULL_(BEGIN|END)|$)')
 
 
@@ -42,10 +47,18 @@ def core_files():
     return sorted(found)
 
 
+def is_shell(path):
+    """[EN] Whether the file is a marked Objective-C shell. [CN] 是否为带标记的 Objective-C 外壳文件。"""
+    with open(path, encoding='utf-8', errors='replace') as handle:
+        return SHELL_MARKER in handle.read()
+
+
 def objc_lines(path):
     """[EN] Lines that still count as Objective-C. [CN] 仍算作 Objective-C 的行数。"""
     with open(path, encoding='utf-8', errors='replace') as handle:
         lines = handle.read().split('\n')
+    if SHELL_MARKER in '\n'.join(lines):
+        return 0
     if path.endswith('.m'):
         return len(lines)
     remaining = [line for line in lines if not COMPATIBLE.match(line)]
@@ -61,6 +74,12 @@ def main():
         for count, path in sorted(counted, reverse=True):
             if count:
                 print('%6d  %s' % (count, os.path.relpath(path, ROOT)))
+        shells = [path for _, path in counted if is_shell(path)]
+        if shells:
+            print('Objective-C shells (compatibility code, not counted):')
+            for path in shells:
+                with open(path, encoding='utf-8', errors='replace') as handle:
+                    print('%6d  %s' % (len(handle.read().split('\n')), os.path.relpath(path, ROOT)))
     return 0
 
 
