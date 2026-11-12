@@ -13,55 +13,17 @@
  */
 
 #import <UIKit/UIKit.h>
+#import "CYLSwiftInterface.h"
 #import "NSObject+CYLUtils.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 /*!
- * [EN] Implemented in Swift (`Swift/UIView+CYLUtils.swift`); declared here for Objective-C callers only, and hidden from Swift
- *      (`__swift__`), which uses the Swift extension itself (docs/Swift-Migration.md).
- * [CN] 在 Swift 中实现（`Swift/UIView+CYLUtils.swift`）；这里只为 Objective-C 调用方声明，并对 Swift 隐藏（`__swift__`），
- *      Swift 直接使用该 Swift 扩展（docs/Swift-Migration.md）。
+ * [EN] Implemented in Swift (`CYLUtils/Swift/UIView+CYLUtils.swift`). Objective-C callers get its declarations, with their
+ *      documentation, from the generated Swift interface imported above (`CYLSwiftInterface.h`); nothing is declared twice
+ *      (docs/Swift-Migration.md).
+ * [CN] 在 Swift 中实现（`CYLUtils/Swift/UIView+CYLUtils.swift`）。Objective-C 调用方从上面导入的 Swift 生成接口（`CYLSwiftInterface.h`）获得
+ *      声明及其文档；不重复声明（docs/Swift-Migration.md）。
  */
-#ifndef __swift__
-@interface UIView (CYLUtils)
-
-/*!
- * [EN] Hides or shows the receiver, also updating alpha, opaque and userInteractionEnabled together.
- * [CN] 隐藏或显示当前视图，同时联动修改 alpha、opaque 与 userInteractionEnabled。
- */
-- (void)cyl_setHidden:(BOOL)hidden;
-
-/*!
- * [EN] Returns YES if the view is effectively invisible: hidden, alpha ≈ 0, zero size, or not in a superview.
- * [CN] 判断视图是否实际不可见：hidden、alpha 接近 0、尺寸为零或没有父视图。
- */
-- (BOOL)cyl_isInvisiable;
-
-/*!
- * [EN] Returns YES if the view cannot receive touches: invisible, interaction disabled, or a placeholder.
- * [CN] 判断视图是否无法响应事件：不可见、禁用交互或为占位视图。
- */
-- (BOOL)cyl_canNotResponseEvent;
-
-/*!
- * FIX: issue #535
- * [EN] The keyframe animation suggested in the issue, for any view: scale 1.5, then 0.8, then back to 1.0 in 0.5 s,
- *      with UIView keyframes (it sets `transform`, so use it on views whose transform you do not set yourself).
- * [CN] issue 中建议的关键帧动画，可用于任意视图：0.5 秒内放大到 1.5 倍，缩小到 0.8 倍，再恢复到 1.0（使用 UIView 关键帧，会设置
- *      `transform`，请勿用于自己设置了 transform 的视图）。
- */
-- (void)cyl_addScaleBounceAnimationWithCompletion:(nullable void (^)(BOOL finished))completion;
-
-/*!
- * [EN] The receiver or its nearest superview that is a `UIControl`, looking up to `stopView` but not at it (nil: up to the
- *      window). For a hit-tested subview (an image view or a label inside a button), this is the button it belongs to.
- * [CN] 接收者本身或最近的 `UIControl` 父视图，向上查找到 `stopView` 为止且不包括它（nil：一直查找到 window）。对 hitTest 得到的
- *      子视图（按钮内的 imageView 或 label）而言，就是它所属的按钮。
- */
-- (nullable UIControl *)cyl_nearestControlBelowView:(nullable UIView *)stopView;
-
-@end
-#endif
 
 NS_ASSUME_NONNULL_END

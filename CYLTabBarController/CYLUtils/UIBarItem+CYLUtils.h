@@ -13,39 +13,16 @@
  */
 
 #import <UIKit/UIKit.h>
+#import "CYLSwiftInterface.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 /*!
- * [EN] Implemented in Swift (`Swift/UIBarItem+CYLUtils.swift`); declared here for Objective-C callers only, and hidden from Swift
- *      (`__swift__`), which uses the Swift extension itself (docs/Swift-Migration.md).
- * [CN] 在 Swift 中实现（`Swift/UIBarItem+CYLUtils.swift`）；这里只为 Objective-C 调用方声明，并对 Swift 隐藏（`__swift__`），
- *      Swift 直接使用该 Swift 扩展（docs/Swift-Migration.md）。
+ * [EN] Implemented in Swift (`CYLUtils/Swift/UIBarItem+CYLUtils.swift`). Objective-C callers get its declarations, with their
+ *      documentation, from the generated Swift interface imported above (`CYLSwiftInterface.h`); nothing is declared twice
+ *      (docs/Swift-Migration.md).
+ * [CN] 在 Swift 中实现（`CYLUtils/Swift/UIBarItem+CYLUtils.swift`）。Objective-C 调用方从上面导入的 Swift 生成接口（`CYLSwiftInterface.h`）获得
+ *      声明及其文档；不重复声明（docs/Swift-Migration.md）。
  */
-#ifndef __swift__
-@interface UIBarItem (CYLUtils)
-
-/*!
- * [EN] The view UIKit draws for the item (`UIBarButtonItem` and `UITabBarItem` only; `UIBarItem` itself has none).
- *      Since iOS 11 it exists only once the item is on screen, so it can be nil before that.
- * [CN] UIKit 为该 item 绘制的视图（仅 `UIBarButtonItem`、`UITabBarItem` 有，`UIBarItem` 本身没有）。iOS 11 起，item 显示后才会创建，
- *      之前可能为 nil。
- */
-- (nullable UIView *)cyl_view;
-
-@end
-
-@interface UITabBarItem (CYLUtils)
-
-/*!
- * [EN] The button UIKit draws for the item in its tab bar (`UITabBarButton` / `_UITabButton`); nil before the tab bar has
- *      drawn it. `nullable` so Swift sees it as optional, as it always behaved (Objective-C is unchanged).
- * [CN] UIKit 在 TabBar 中为该 item 绘制的按钮（`UITabBarButton` / `_UITabButton`）；TabBar 尚未绘制时为 nil。标注 `nullable`，使 Swift
- *      将其视为可选值，与其一贯的行为一致（Objective-C 不变）。
- */
-@property (nonatomic, readonly, nullable) UIControl *cyl_tabButton;
-
-@end
-#endif
 
 NS_ASSUME_NONNULL_END
