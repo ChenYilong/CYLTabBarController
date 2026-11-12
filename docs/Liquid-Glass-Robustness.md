@@ -112,3 +112,14 @@ flowchart LR
 ![FlatDesign More icon before and after](assets/flat-design-more-icon-fix-ios.png)
 
 ![More editing: before, More list, editing, after Done](assets/more-editing-done-star-comes-back-liquid-glass-ios.png)
+
+## 任务记录 / Task log
+
+| 中文 | English |
+|:---|:---|
+| TODO（2026-11-12，PlusButton 首次显示时偏移、消失后才正常）：用户提示词：「请排查 截图中右上角的截图中 plusbutton为何会出现不显示，显示后又位置偏移，偏移后又恢复正常。预期效果是 位置不会偏移一开始就正常。修复。写入文档标注todo附带该截图」。上下文：截图为拖动测试录屏（ObjC 图库 9.4「首次显示时 PlusButton 所在 Tab 已选中」，iOS 26.1，iPhone 17 Pro 模拟器，液态玻璃）每秒 3 帧的拼图。右上角一帧（场景刚打开）中 PlusButton 位置偏下；下一帧 PlusButton 不显示；再下一帧才在正确位置。要求：找出原因并修复，PlusButton 从第一帧起就在正确位置，不偏移、不消失；修复后用录屏逐帧验证。 | TODO (2026-11-12, plus button offset, then gone, then right, on first display): user prompt: "请排查 截图中右上角的截图中 plusbutton为何会出现不显示，显示后又位置偏移，偏移后又恢复正常。预期效果是 位置不会偏移一开始就正常。修复。写入文档标注todo附带该截图". Context: the screenshot is a 3 fps contact sheet of the drag test's video (ObjC gallery 9.4, "plus tab selected on first display", iOS 26.1, iPhone 17 Pro simulator, Liquid Glass). In the top-right frame (the scene just opened) the plus button is too low; in the next frame it is not shown; only the frame after shows it in place. Requirement: find the cause and fix it, so the plus button is in place from the first frame, never offset or missing; verify frame by frame on a recording. |
+
+![First display of gallery 9.4: plus button offset (top right), then missing, then in place](assets/plus-button-first-display-glitch-ios.jpg)
+
+| 中文 | English |
+|:---|:---|
