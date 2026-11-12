@@ -1,6 +1,6 @@
-"""Path checks shared by the configuration test scripts (lower.py, make-fixtures.py).
+"""Path checks shared by the configuration test scripts (make-fixtures.py).
 
-[EN] Python 3 standard library only. [CN] 配置测试脚本（lower.py、make-fixtures.py）共用的路径检查，仅使用 Python 3 标准库。
+[EN] Python 3 standard library only. [CN] 配置测试脚本（make-fixtures.py）共用的路径检查，仅使用 Python 3 标准库。
 """
 import os
 import sys
