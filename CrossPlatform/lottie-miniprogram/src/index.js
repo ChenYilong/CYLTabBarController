@@ -1,4 +1,4 @@
-import {setup, g, restore, setFrameInterval} from './adapter'
+import {setup, g, restore, setFrameInterval, OffscreenCanvas as CYLOffscreenCanvas} from './adapter'
 const {window, document, navigator} = g
 // [EN] Issue #53: lottie-web calls `new XMLHttpRequest()`; a mini game has no such global and strict mode forbids
 //      assigning one, so the name is declared in this module instead.
@@ -6,6 +6,10 @@ const {window, document, navigator} = g
 //      因此在本模块中声明这个名称。
 // eslint-disable-next-line no-unused-vars
 const XMLHttpRequest = g.XMLHttpRequest
+// [EN] Issue #38: lottie-web measures text with `new OffscreenCanvas()`, which a mini program does not define.
+// [CN] issue #38：lottie-web 用 `new OffscreenCanvas()` 测量文字，小程序没有定义它。
+// eslint-disable-next-line no-unused-vars
+const OffscreenCanvas = CYLOffscreenCanvas
 // [EN] The UMD wrapper of lottie-web writes to `module.exports` when `module` exists; it is hidden from it so the
 //      factory result lands on `window.lottie` (the light canvas build has no `eval`, issues #2, #51, #56).
 // [CN] lottie-web 的 UMD 包装在 `module` 存在时写入 `module.exports`；这里对它隐藏，使工厂函数的结果写到
@@ -144,6 +148,41 @@ function createPendingAnimation(options, canvas) {
   return pending
 }
 
+/**
+ * [EN] Issue #38: a text layer whose font is missing from `fonts.list` stops lottie-web ("Cannot read property
+ *      'fStyle' of undefined", or an animation stuck on its first frame). Adds every missing font, as a system font
+ *      with a regular style, to a copy of the data; returns the data itself when nothing is missing.
+ * [CN] issue #38：文字图层使用的字体不在 `fonts.list` 中时，lottie-web 会出错（"Cannot read property 'fStyle' of
+ *      undefined"，或动画停在第一帧）。把缺少的字体作为常规样式的系统字体补到数据副本中；没有缺少时返回原数据。
+ */
+function completeFonts(animationData) {
+  if (!animationData || typeof animationData !== 'object') {
+    return animationData
+  }
+  const used = new Set()
+  const visit = (layers) => (layers || []).forEach((layer) => {
+    if (layer && layer.ty === 5 && layer.t && layer.t.d && Array.isArray(layer.t.d.k)) {
+      layer.t.d.k.forEach((keyframe) => {
+        if (keyframe && keyframe.s && keyframe.s.f) {
+          used.add(keyframe.s.f)
+        }
+      })
+    }
+  })
+  visit(animationData.layers)
+  ;(animationData.assets || []).forEach((asset) => visit(asset.layers))
+  const list = (animationData.fonts && Array.isArray(animationData.fonts.list)) ? animationData.fonts.list : []
+  const missing = Array.from(used).filter((name) => !list.some((font) => font && font.fName === name))
+  if (missing.length === 0) {
+    return animationData
+  }
+  return Object.assign({}, animationData, {
+    fonts: {
+      list: list.concat(missing.map((name) => ({fName: name, fFamily: 'sans-serif', fStyle: 'Regular', ascent: 75}))),
+    },
+  })
+}
+
 function loadAnimation(options) {
   ['wrapper', 'container'].forEach(key => {
     if (key in options) {
@@ -171,7 +210,7 @@ function loadAnimation(options) {
     })
     return pending
   }
-  const settings = Object.assign({}, options, {renderer: 'canvas'})
+  const settings = Object.assign({}, options, {renderer: 'canvas', animationData: completeFonts(options.animationData)})
   delete settings.path
   return wrapDestroy(lottieWeb.loadAnimation(settings), canvas)
 }

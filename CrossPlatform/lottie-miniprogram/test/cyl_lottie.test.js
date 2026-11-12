@@ -56,6 +56,9 @@ function cylCanvas(name) {
       if (key === 'canvas') {
         return undefined
       }
+      if (key === 'measureText') {
+        return () => ({width: 10})
+      }
       return () => {
         calls.draw += 1
       }
@@ -92,6 +95,18 @@ const lottie = require('../miniprogram_dist/index.js')
 const cylAnimationData = () => JSON.parse(fs.readFileSync(CYL_SAMPLE, 'utf8'))
 const cylWait = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 
+/**
+ * [EN] Waits until `condition()` is true, up to `timeout` ms, so timing on a busy machine does not fail a test.
+ * [CN] 等待 `condition()` 为真，最多 `timeout` 毫秒，避免繁忙的机器上因时间不足而失败。
+ */
+async function cylWaitFor(condition, timeout = 1500) {
+  const start = Date.now()
+  while (!condition() && Date.now() - start < timeout) {
+    await cylWait(10)
+  }
+  return condition()
+}
+
 function cylLoad(canvas, extra) {
   lottie.setup(canvas)
   return lottie.loadAnimation(Object.assign({
@@ -119,9 +134,7 @@ test('setup rejects a missing node or a null context (#32)', () => {
 test('an animation plays on its canvas and stops after destroy', async () => {
   const canvas = cylCanvas('a')
   const animation = cylLoad(canvas)
-  await cylWait(80)
-  assert.ok(canvas.calls.frames > 3)
-  assert.ok(animation.currentFrame > 0)
+  assert.ok(await cylWaitFor(() => canvas.calls.frames > 3 && animation.currentFrame > 0))
   animation.destroy()
   const frames = canvas.calls.frames
   await cylWait(40)
@@ -132,8 +145,7 @@ test('load again after destroy works (#58, #13, #1)', async () => {
   const canvas = cylCanvas('b')
   cylLoad(canvas).destroy()
   const again = cylLoad(canvas)
-  await cylWait(60)
-  assert.ok(again.currentFrame > 0)
+  assert.ok(await cylWaitFor(() => again.currentFrame > 0))
   again.destroy()
 })
 
@@ -142,11 +154,10 @@ test('several canvases play together, and destroying one keeps the other going (
   const second = cylCanvas('second')
   const a = cylLoad(first)
   const b = cylLoad(second)
-  await cylWait(60)
+  assert.ok(await cylWaitFor(() => a.currentFrame > 0 && b.currentFrame > 0))
   const before = a.currentFrame
   b.destroy()
-  await cylWait(80)
-  assert.ok(a.currentFrame !== before, 'the first animation keeps playing after the second canvas is gone')
+  assert.ok(await cylWaitFor(() => a.currentFrame !== before), 'the first animation keeps playing after the second canvas is gone')
   a.destroy()
 })
 
@@ -168,8 +179,7 @@ test('path: package file, network URL, HTTP error, zip (#15, #42, #47)', async (
     ready = true
   })
   assert.equal(remote.isLoaded, false)
-  await cylWait(40)
-  assert.equal(ready, true)
+  assert.ok(await cylWaitFor(() => ready))
   remote.destroy()
 
   let failure = null
@@ -177,7 +187,7 @@ test('path: package file, network URL, HTTP error, zip (#15, #42, #47)', async (
   missing.addEventListener('data_failed', (error) => {
     failure = error
   })
-  await cylWait(30)
+  await cylWaitFor(() => failure)
   assert.match(String(failure && failure.message), /404/)
 
   let zipError = null
@@ -185,7 +195,7 @@ test('path: package file, network URL, HTTP error, zip (#15, #42, #47)', async (
   zip.addEventListener('data_failed', (error) => {
     zipError = error
   })
-  await cylWait(5)
+  await cylWaitFor(() => zipError)
   assert.match(String(zipError && zipError.message), /zip/)
 })
 
@@ -216,4 +226,30 @@ test('cyl-lottie colors: keypaths with * and **, invalid colors, input unchanged
   assert.ok(fills.every((value) => JSON.stringify(value) === JSON.stringify([0, 1, 0, 1])))
   assert.equal(colors.cylApplyLottieColors(data, {}), data)
   assert.equal(colors.cylApplyLottieColors(data, {'**': 'red'}), data)
+})
+
+test('a text layer whose font is missing from fonts.list still plays (#38)', async () => {
+  const data = cylAnimationData()
+  data.layers.unshift({
+    ddd: 0, ind: 99, ty: 5, nm: 'Text', sr: 1, ao: 0, ip: 0, op: data.op, st: 0, bm: 0,
+    ks: {o: {a: 0, k: 100}, r: {a: 0, k: 0}, p: {a: 0, k: [30, 30, 0]}, a: {a: 0, k: [0, 0, 0]}, s: {a: 0, k: [100, 100, 100]}},
+    t: {d: {k: [{s: {s: 12, f: 'Missing-Font', t: 'A', j: 0, tr: 0, lh: 14, ls: 0, fc: [0, 0, 0]}, t: 0}]},
+      p: {}, m: {g: 1, a: {a: 0, k: [0, 0]}}, a: []},
+  })
+  delete data.fonts
+  const canvas = cylCanvas('text')
+  const animation = cylLoad(canvas, {animationData: data})
+  assert.ok(await cylWaitFor(() => animation.currentFrame > 0))
+  animation.destroy()
+})
+
+test('many speed changes in a row keep the animation running (#27)', async () => {
+  const canvas = cylCanvas('speed')
+  const animation = cylLoad(canvas)
+  for (let index = 0; index < 500; index += 1) {
+    animation.setSpeed((index % 7) + 0.25)
+  }
+  const before = animation.currentFrame
+  assert.ok(await cylWaitFor(() => animation.currentFrame !== before))
+  animation.destroy()
 })

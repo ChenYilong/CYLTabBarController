@@ -35,8 +35,10 @@ g.window = {
   devicePixelRatio: systemInfo().pixelRatio,
   XMLHttpRequest: XHR,
 }
+// [EN] No `body`: lottie-web then measures text on a canvas instead of DOM nodes a mini program does not have
+//      (issue #38). [CN] 不提供 `body`：lottie-web 因此在画布上测量文字，而不使用小程序没有的 DOM 节点（issue #38）。
 g.document = g.window.document = {
-  body: {},
+  body: null,
   createElement: createElementWithoutCanvas,
 }
 g.navigator = g.window.navigator = {
@@ -108,10 +110,10 @@ function createImg(canvas) {
  * [CN] lottie 为图片处理创建的 canvas：基础库支持时（2.16.1+）使用离屏 canvas，使尺寸与 JSON 不一致的图片与遮罩可用
  *      （issue #10、#29、#30）；否则使用占位对象。
  */
-function createCanvas() {
+function createCanvas(width, height) {
   if (typeof wx.createOffscreenCanvas === 'function') {
     try {
-      const offscreen = wx.createOffscreenCanvas({type: '2d', width: 1, height: 1})
+      const offscreen = wx.createOffscreenCanvas({type: '2d', width: width || 1, height: height || 1})
       if (offscreen && typeof offscreen.getContext === 'function') {
         offscreen.style = {}
         return offscreen
@@ -125,6 +127,8 @@ function createCanvas() {
         fillRect: noop,
         drawImage: noop,
         fillStyle: '',
+        font: '',
+        measureText: (text) => ({width: String(text || '').length * 50}),
       }
     },
   }
@@ -206,7 +210,6 @@ export const setup = (canvas) => {
   }
   g.canvases = g.canvases.filter(item => item !== canvas)
   g.canvases.push(canvas)
-  g.document.body = {}
   g.document.createElement = createElement
 
   wrapMethodFatory(ctx, 'setLineDash', wrapSetLineDash)
@@ -236,6 +239,15 @@ export const setFrameInterval = (interval) => {
   if (Number.isFinite(value) && value > 0) {
     g.frameInterval = value
   }
+}
+
+/**
+ * [EN] `new OffscreenCanvas(width, height)` for lottie-web's text measuring (issue #38), backed by
+ *      wx.createOffscreenCanvas.
+ * [CN] 供 lottie-web 测量文字使用的 `new OffscreenCanvas(width, height)`（issue #38），由 wx.createOffscreenCanvas 实现。
+ */
+export function OffscreenCanvas(width, height) {
+  return createCanvas(width, height)
 }
 
 export {g}
