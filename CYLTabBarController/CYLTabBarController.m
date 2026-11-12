@@ -426,7 +426,11 @@ static void CYLSetAdditionalSafeAreaBottom(UIViewController *viewController, CGF
 
 @end
 
-@interface CYLTabBarController () <UITabBarControllerDelegate>
+// [EN] `CYLTabBarControllerMemoryWarningSeam` (Swift, docs/Swift-Migration.md): lets the Swift memory warning demo read
+//      `unloadsUnselectedViewsOnMemoryWarning` and `-shouldUnloadViewOfViewController:`; removed when this class is Swift.
+// [CN] `CYLTabBarControllerMemoryWarningSeam`（Swift，docs/Swift-Migration.md）：让 Swift 版内存警告示例读取
+//      `unloadsUnselectedViewsOnMemoryWarning` 与 `-shouldUnloadViewOfViewController:`；本类迁移到 Swift 后删除。
+@interface CYLTabBarController () <UITabBarControllerDelegate, CYLTabBarControllerMemoryWarningSeam>
 
 /// [EN] iOS 26+: routes points above the bar to the plus button (issue #91). [CN] iOS 26+：把 TabBar 上方的点交给 PlusButton（issue #91）。
 @property (nonatomic, strong, nullable) CYLTabBarOverflowTouchView *cyl_overflowTouchView;

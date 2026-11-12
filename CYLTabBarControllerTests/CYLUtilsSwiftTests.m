@@ -103,4 +103,29 @@ static char CYLUtilsSwiftTestsWeakKey;
     XCTAssertNil([[UIBarItem new] cyl_view], @"a plain UIBarItem has no view");
 }
 
+/*!
+ * [EN] The seam of the Swift memory warning demo (docs/Swift-Migration.md, step 12): `CYLTabBarController` adopts
+ *      `CYLTabBarControllerMemoryWarningSeam`, and the report reads its settings and lists every tab.
+ * [CN] Swift 版内存警告示例的接缝（docs/Swift-Migration.md，第 12 步）：`CYLTabBarController` 遵守
+ *      `CYLTabBarControllerMemoryWarningSeam`，报告读取其设置并列出每个 Tab。
+ */
+- (void)testMemoryWarningReportThroughTheSeam {
+    CYLTabBarController *tabBarController = [[CYLTabBarController alloc] init];
+    XCTAssertTrue([tabBarController conformsToProtocol:@protocol(CYLTabBarControllerMemoryWarningSeam)]);
+    UIViewController *first = [[UIViewController alloc] init];
+    first.title = @"First";
+    UIViewController *second = [[UIViewController alloc] init];
+    second.title = @"Second";
+    tabBarController.viewControllers = @[first, second];
+    tabBarController.unloadsUnselectedViewsOnMemoryWarning = NO;
+    NSString *report = CYLSimulateMemoryWarningReport(tabBarController);
+    NSArray<NSString *> *lines = [report componentsSeparatedByString:@"\n"];
+    XCTAssertEqual(lines.count, 3u, @"%@", report);
+    XCTAssertTrue([lines[0] containsString:@"unloadsUnselectedViewsOnMemoryWarning"], @"%@", report);
+    XCTAssertTrue([lines[1] hasPrefix:@"First: "], @"%@", report);
+    XCTAssertTrue([lines[2] hasPrefix:@"Second: "], @"%@", report);
+    NSString *noController = CYLSimulateMemoryWarningReport(nil);
+    XCTAssertFalse([noController containsString:@"\n"], @"%@", noController);
+}
+
 @end
