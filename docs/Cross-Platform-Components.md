@@ -184,6 +184,6 @@ bar.setConfigurationJSON(assets.open("tabbar.json").bufferedReader().readText())
 
 ## 任务记录 / Task log
 
-| 中文 | English |
-|:---|:---|
+| 中文                | English                                                                                                                                                                                                                                                             |
+| :---------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | 本条按用户要求使用英文（见右列）。 | TODO (2026-11-12): a third component, **WeChat Mini Program**, in `CrossPlatform/wechat-miniprogram-cyltabbar`, scored against the configuration keys of the iOS library: see [WeChat-Mini-Program.md](WeChat-Mini-Program.md) (task, prompt, plan, score 0 / 100). |
