@@ -111,7 +111,7 @@ public func CYLBundleImageFromData(_ folderReferenceName: String?, _ bundleName:
     return UIImage(data: data, scale: scale)
 }
 
-/// The file name with `.png` added when it has no extension. 没有扩展名时补上 `.png` 的文件名。
+// [EN] The file name with `.png` added when it has no extension. [CN] 没有扩展名时补上 `.png` 的文件名。
 private func CYLImageFileName(_ fileName: String) -> String? {
     let name = fileName as NSString
     return name.pathExtension.isEmpty ? name.appendingPathExtension("png") : fileName

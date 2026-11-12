@@ -500,7 +500,7 @@ static BOOL CYLDemoSameImage(UIImage *image, UIImage *otherImage) {
 static UIButton * _Nullable CYLDemoCheckPlusChildStandIn(NSString *phase) {
     CYLTabBarController *tabBarController = [CYLTabBarController cyl_activeTabBarController];
     CYLPlusButton<CYLPlusButtonSubclassing> *plusButton = [CYLPlusButton plusButtonForOwner:tabBarController];
-    NSString *theme = CYLThemeManagerCenter.defaultThemeManager.currentThemeIdentifier;
+    id theme = CYLThemeManagerCenter.defaultThemeManager.currentThemeIdentifier;
     if (!plusButton) {
         CYLDemoTestLog(@"plus child theme test: SKIP %@ theme=%@: no plus button", phase, theme);
         return nil;

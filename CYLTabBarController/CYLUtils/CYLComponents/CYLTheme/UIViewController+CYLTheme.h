@@ -10,6 +10,14 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+/*!
+ * [EN] Implemented in Swift (`CYLUtils/Swift/UIViewController+CYLTheme.swift`); declared here for Objective-C callers only and hidden from
+ *      Swift (`__swift__`), which uses the Swift declarations (docs/Swift-Migration.md).
+ * [CN] 在 Swift 中实现（`CYLUtils/Swift/UIViewController+CYLTheme.swift`）；这里只为 Objective-C 调用方声明，并对 Swift 隐藏（`__swift__`），Swift 直接使用
+ *      Swift 声明（docs/Swift-Migration.md）。
+ */
+#ifndef __swift__
+
 @class CYLThemeManager;
 
 /*!
@@ -42,5 +50,7 @@ NS_ASSUME_NONNULL_BEGIN
                               theme:(nullable __kindof NSObject *)theme NS_REQUIRES_SUPER;
 
 @end
+
+#endif
 
 NS_ASSUME_NONNULL_END

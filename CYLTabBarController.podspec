@@ -21,9 +21,9 @@ Pod::Spec.new do |s|
     # [CN] Swift 迁移（docs/Swift-Migration.md）：已翻译的文件放在 Objective-C 文件旁的 `Swift/` 目录中。
     utils.source_files = 'CYLTabBarController/CYLUtils/**/*.{h,m,swift}'
     utils.public_header_files = 'CYLTabBarController/CYLUtils/**/*.h'
-    # FIX: issue #216 — theme switching (skins) lives in `CYLUtils/CYLComponents/CYLTheme/`; its private header stays private.
-    # 换肤（主题切换）位于 `CYLUtils/CYLComponents/CYLTheme/`，其私有头文件不公开。
-    utils.private_header_files = 'CYLTabBarController/CYLUtils/CYLComponents/CYLTheme/CYLThemePrivate.h'
+    # FIX: issue #216 — theme switching (skins): public headers in `CYLUtils/CYLComponents/CYLTheme/`, implementation in
+    # Swift (`CYLUtils/Swift/`); its private helpers are internal Swift. [CN] 换肤（主题切换）：公开头文件位于
+    # `CYLUtils/CYLComponents/CYLTheme/`，实现为 Swift（`CYLUtils/Swift/`）；私有辅助方法为 Swift 内部代码。
     # The library's resource bundle (localized strings now, images can go in it too), shipped as is, so its layout is
     # the same in every integration (see `CYLResourceBundle()`).
     utils.resources = ['CYLTabBarController/Resources/CYLTabBarController.bundle']

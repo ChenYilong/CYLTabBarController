@@ -11,6 +11,14 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /*!
+ * [EN] Implemented in Swift (`CYLUtils/Swift/CALayer+CYLTheme.swift`); declared here for Objective-C callers only and hidden from
+ *      Swift (`__swift__`), which uses the Swift declarations (docs/Swift-Migration.md).
+ * [CN] 在 Swift 中实现（`CYLUtils/Swift/CALayer+CYLTheme.swift`）；这里只为 Objective-C 调用方声明，并对 Swift 隐藏（`__swift__`），Swift 直接使用
+ *      Swift 声明（docs/Swift-Migration.md）。
+ */
+#ifndef __swift__
+
+/*!
  * FIX: issue #216
  * [EN] Layer colors that follow the theme, without method swizzling. A layer draws a `CGColor`, which is a fixed value:
  *      `layer.borderColor = themeColor.CGColor` keeps the value of the theme current at that moment. Set the
@@ -62,5 +70,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong, nullable, setter=cyl_setThemeShadowColor:) UIColor *cyl_themeShadowColor;
 
 @end
+
+#endif
 
 NS_ASSUME_NONNULL_END

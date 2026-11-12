@@ -10,6 +10,14 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+/*!
+ * [EN] Implemented in Swift (`CYLUtils/Swift/UIVisualEffect+CYLTheme.swift`); declared here for Objective-C callers only and hidden from
+ *      Swift (`__swift__`), which uses the Swift declarations (docs/Swift-Migration.md).
+ * [CN] 在 Swift 中实现（`CYLUtils/Swift/UIVisualEffect+CYLTheme.swift`）；这里只为 Objective-C 调用方声明，并对 Swift 隐藏（`__swift__`），Swift 直接使用
+ *      Swift 声明（docs/Swift-Migration.md）。
+ */
+#ifndef __swift__
+
 @class CYLThemeManager;
 
 /*!
@@ -63,5 +71,7 @@ typedef UIVisualEffect *_Nullable (^CYLThemeEffectProvider)(__kindof CYLThemeMan
 @property (nonatomic, strong, readonly) UIVisualEffect *cyl_rawEffect;
 
 @end
+
+#endif
 
 NS_ASSUME_NONNULL_END
