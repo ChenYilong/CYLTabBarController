@@ -37,6 +37,7 @@
 | [常见问题](#cn常见问题) | [Troubleshooting](#entroubleshooting) |
 | [限制](#cn限制) | [Limits](#enlimits) |
 | [测试与截图](#cn测试与截图) | [Testing and screenshots](#entesting-and-screenshots) |
+| [任务记录](#任务记录--task-log) | [Task log](#任务记录--task-log) |
 
 <!-- navigation:end -->
 
@@ -206,3 +207,10 @@ class _HomePageState extends State<HomePage> {
 | iOS | Android |
 |:---|:---|
 | ![Flutter, iOS tab bar](assets/flutter-component-ios-bar.png) | ![Flutter, Android tab bar](assets/flutter-component-android-bar.png) |
+
+## 任务记录 / Task log
+
+| 中文 | English |
+|:---|:---|
+| TODO（2026-11-13，分支 `fix/flutter-viewpager2`）：从 `feat/cross-platform-components` 的 `50d9018` 起，Android 上 `flutter_cyltabbar` 编译失败：插件直接编译 `cyltabbar` 的源码，`CYLViewPager2Binding.kt` 用到 ViewPager2，`cyltabbar` 以 `compileOnly` 声明它，插件却没有声明（`Unresolved reference 'viewpager2'`）。在 CYLSearchViewController 的 Flutter 示例（`flutter_cylsearch`）中集成本插件时发现。要求：插件在使用本地源码时同样以 `compileOnly` 声明 ViewPager2，与 `cyltabbar` 一致；修复后在示例中验证。用户提示词（CYLSearchViewController 中）：“continue”（继续 Flutter 示例集成 CYLTabBarController 的 Flutter TabBar）。 | TODO (2026-11-13, branch `fix/flutter-viewpager2`): since `50d9018` of `feat/cross-platform-components`, `flutter_cyltabbar` fails to build on Android: the plugin compiles the `cyltabbar` sources directly, `CYLViewPager2Binding.kt` uses ViewPager2, which `cyltabbar` declares `compileOnly`, but the plugin does not declare it (`Unresolved reference 'viewpager2'`). Found while integrating this plugin in CYLSearchViewController's Flutter example (`flutter_cylsearch`). Requirement: with the local sources, the plugin declares ViewPager2 `compileOnly` too, as `cyltabbar` does; verify in that example after the fix. The user's prompt (in CYLSearchViewController): "continue" (continuing the Flutter example's integration of CYLTabBarController's Flutter tab bar). |
+
