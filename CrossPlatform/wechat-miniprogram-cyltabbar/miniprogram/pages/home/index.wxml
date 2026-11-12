@@ -1,0 +1,14 @@
+<view class="cyl-page">
+  <view class="cyl-header">
+    <text class="cyl-header-title">{{texts['CYLTabBarController for WeChat Mini Program']}}</text>
+    <text class="cyl-header-subtitle">{{texts['The tab bar below is the cyl-tab-bar component, configured with Example-Shared/Configurations/cyl_tabbar_configuration.json and a raised plus button.']}}</text>
+  </view>
+  <text class="cyl-section-title" aria-role="heading">{{texts['Configuration']}}</text>
+  <view class="cyl-section">
+    <view wx:for="{{rows}}" wx:key="label" class="cyl-row" aria-label="{{item.label}}, {{item.value}}">
+      <text aria-hidden="true">{{item.label}}</text>
+      <text class="cyl-row-value" aria-hidden="true">{{item.value}}</text>
+    </view>
+  </view>
+  <text class="cyl-header-subtitle">{{texts['Message is hidden here: its CYLTabBarItemPlatforms is "ios,android".']}}</text>
+</view>

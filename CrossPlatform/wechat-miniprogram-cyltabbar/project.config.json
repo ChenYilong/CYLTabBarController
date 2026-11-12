@@ -1,0 +1,22 @@
+{
+  "appid": "wx5e29c9d33906f074",
+  "projectname": "wechat-miniprogram-cyltabbar",
+  "description": "CYLTabBarController for WeChat Mini Program: the cyl-tab-bar component and its example",
+  "compileType": "miniprogram",
+  "miniprogramRoot": "miniprogram/",
+  "libVersion": "latest",
+  "setting": {
+    "urlCheck": true,
+    "es6": true,
+    "enhance": true,
+    "postcss": true,
+    "minified": true
+  },
+  "packOptions": {
+    "ignore": [
+      { "type": "regexp", "value": "(^|/)\\._" }
+    ],
+    "include": []
+  },
+  "condition": {}
+}

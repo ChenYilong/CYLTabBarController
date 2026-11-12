@@ -1,0 +1,38 @@
+<view class="cyl-page">
+  <text class="cyl-section-title" aria-role="heading">{{texts['Badges']}}</text>
+  <view class="cyl-section">
+    <view class="cyl-row cyl-row-action" bindtap="cyl_badge" data-identifier="discover" data-value="3" aria-role="button" aria-label="{{texts['Number on Discover']}}"><text aria-hidden="true">{{texts['Number on Discover']}}</text></view>
+    <view class="cyl-row cyl-row-action" bindtap="cyl_badge" data-identifier="discover" data-value="120" aria-role="button" aria-label="{{texts['99+ on Discover']}}"><text aria-hidden="true">{{texts['99+ on Discover']}}</text></view>
+    <view class="cyl-row cyl-row-action" bindtap="cyl_badge" data-identifier="me" data-value="•" aria-role="button" aria-label="{{texts['Dot on Me']}}"><text aria-hidden="true">{{texts['Dot on Me']}}</text></view>
+    <view class="cyl-row cyl-row-action" bindtap="cyl_badge" data-value="clear" aria-role="button" aria-label="{{texts['Remove badges']}}"><text aria-hidden="true">{{texts['Remove badges']}}</text></view>
+  </view>
+
+  <text class="cyl-section-title" aria-role="heading">{{texts['Skins']}}</text>
+  <view class="cyl-section">
+    <view wx:for="{{skins}}" wx:key="*this" class="cyl-row {{state.themeIdentifier === item ? 'cyl-row-selected' : ''}}" bindtap="cyl_skin" data-value="{{item}}" aria-role="button" aria-selected="{{state.themeIdentifier === item}}" aria-label="{{item || texts['Follow the configuration']}}">
+      <text aria-hidden="true">{{item || texts['Follow the configuration']}}</text>
+    </view>
+  </view>
+
+  <text class="cyl-section-title" aria-role="heading">{{texts['Style']}}</text>
+  <view class="cyl-section">
+    <view wx:for="{{styleTypes}}" wx:key="*this" class="cyl-row {{currentStyleType === item ? 'cyl-row-selected' : ''}}" bindtap="cyl_style" data-value="{{item}}" aria-role="button" aria-selected="{{currentStyleType === item}}" aria-label="{{item}}">
+      <text aria-hidden="true">{{item}}</text>
+    </view>
+  </view>
+
+  <text class="cyl-section-title" aria-role="heading">{{texts['Tap animation']}}</text>
+  <view class="cyl-section">
+    <view wx:for="{{tapAnimations}}" wx:key="value" class="cyl-row {{currentTapAnimation === item.value ? 'cyl-row-selected' : ''}}" bindtap="cyl_tapAnimation" data-value="{{item.value}}" aria-role="button" aria-selected="{{currentTapAnimation === item.value}}" aria-label="{{item.label}}">
+      <text aria-hidden="true">{{item.label}}</text>
+    </view>
+  </view>
+
+  <text class="cyl-section-title" aria-role="heading">{{texts['Login']}}</text>
+  <view class="cyl-section">
+    <view class="cyl-row">
+      <text aria-hidden="true">{{texts['Me needs login']}}</text>
+      <switch checked="{{state.overrides.CYLTabBarControllerLoginRequiredTabBarItemIdentifiers.length > 0}}" bindchange="cyl_loginRequired" aria-label="{{texts['Me needs login']}}" />
+    </view>
+  </view>
+</view>

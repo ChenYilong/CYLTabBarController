@@ -1,0 +1,12 @@
+{
+  "name": "wechat-miniprogram-cyltabbar",
+  "version": "0.1.0",
+  "description": "CYLTabBarController for WeChat Mini Program: a custom tab bar component configured with the CYLTabBarController configuration keys",
+  "private": true,
+  "license": "MIT",
+  "scripts": {
+    "sync": "node scripts/cyl_sync_shared.js",
+    "sync:check": "node scripts/cyl_sync_shared.js --check",
+    "test": "node --test test/*.test.js"
+  }
+}

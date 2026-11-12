@@ -1,0 +1,187 @@
+/* [EN] Classic bar (default, system): a 50 pt bar with a hairline on top, above the home indicator. [CN] 经典 TabBar（default、system）：50 pt 高、顶部一条细线，位于 Home 指示条之上。 */
+.cyl-tab-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  height: 50px;
+  padding-bottom: env(safe-area-inset-bottom);
+  background-color: #f9f9f9;
+  border-top: 1rpx solid rgba(0, 0, 0, 0.15);
+  overflow: visible;
+  z-index: 100;
+}
+
+.cyl-tab-bar.cyl-dark {
+  background-color: #1c1c1e;
+  border-top-color: rgba(255, 255, 255, 0.15);
+}
+
+.cyl-tab {
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 50px;
+  overflow: visible;
+}
+
+.cyl-tab-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.cyl-icon-box {
+  position: relative;
+  width: 28px;
+  height: 28px;
+}
+
+.cyl-icon {
+  width: 28px;
+  height: 28px;
+}
+
+.cyl-title {
+  margin-top: 2px;
+  font-size: 10px;
+  line-height: 12px;
+  color: #8e8e93;
+}
+
+.cyl-selected .cyl-title {
+  color: #007aff;
+}
+
+.cyl-dark .cyl-title {
+  color: #8e8e93;
+}
+
+.cyl-dark .cyl-selected .cyl-title {
+  color: #0a84ff;
+}
+
+/* [EN] Badges: a number or text in a red capsule, or a dot, at the icon's top right. [CN] 角标：红色胶囊中的数字或文字，或小红点，位于图标右上角。 */
+.cyl-badge {
+  position: absolute;
+  top: -4px;
+  left: 18px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  box-sizing: border-box;
+  border-radius: 9px;
+  background-color: #ff3b30;
+  color: #ffffff;
+  font-size: 11px;
+  line-height: 18px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.cyl-badge-dot {
+  position: absolute;
+  top: -2px;
+  left: 24px;
+  width: 9px;
+  height: 9px;
+  border-radius: 5px;
+  background-color: #ff3b30;
+}
+
+/* [EN] The plus button: positioned from the bar's top, so a negative top raises it above the bar. [CN] PlusButton：从 TabBar 顶部定位，top 为负时凸出 TabBar。 */
+.cyl-plus-button {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.cyl-plus-background {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.cyl-plus-image {
+  position: relative;
+}
+
+/* [EN] FlatDesign: a flat bar without hairline; the selected tab sits in a rounded pill. [CN] FlatDesign：没有细线的扁平 TabBar；选中的 Tab 位于圆角胶囊中。 */
+.cyl-style-flatDesign {
+  border-top: none;
+  background-color: #ffffff;
+  box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.06);
+}
+
+.cyl-style-flatDesign .cyl-selected:not(.cyl-plus-slot) .cyl-tab-content {
+  padding: 2px 14px;
+  border-radius: 18px;
+  background-color: rgba(0, 122, 255, 0.12);
+}
+
+/* [EN] Liquid Glass: a floating translucent capsule; the selected tab shows a lens. [CN] 液态玻璃：悬浮的半透明胶囊；选中的 Tab 显示透镜。 */
+.cyl-style-liquidGlass {
+  left: 16px;
+  right: 16px;
+  bottom: calc(8px + env(safe-area-inset-bottom));
+  height: 62px;
+  padding-bottom: 0;
+  border: 1rpx solid rgba(255, 255, 255, 0.6);
+  border-radius: 31px;
+  background-color: rgba(250, 250, 250, 0.72);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.cyl-style-liquidGlass.cyl-dark {
+  border-color: rgba(255, 255, 255, 0.12);
+  background-color: rgba(28, 28, 30, 0.72);
+}
+
+.cyl-style-liquidGlass .cyl-tab {
+  height: 62px;
+}
+
+.cyl-style-liquidGlass .cyl-selected:not(.cyl-plus-slot) .cyl-tab-content {
+  padding: 4px 12px;
+  border-radius: 24px;
+  background-color: rgba(0, 0, 0, 0.06);
+}
+
+/* [EN] Tap animations of CYLTabBarControllerTabButtonTapAnimation. [CN] CYLTabBarControllerTabButtonTapAnimation 的点击动画。 */
+.cyl-animate-scale,
+.cyl-animate-zoomIn,
+.cyl-animate-bounce,
+.cyl-animate-bounceWithFireworks,
+.cyl-animate-rotation,
+.cyl-animate-flip,
+.cyl-animate-fume {
+  animation-timing-function: ease-out;
+  animation-fill-mode: both;
+}
+
+.cyl-animate-scale { animation-name: cyl-scale; }
+.cyl-animate-zoomIn { animation-name: cyl-zoom-in; }
+.cyl-animate-bounce,
+.cyl-animate-bounceWithFireworks { animation-name: cyl-bounce; }
+.cyl-animate-rotation { animation-name: cyl-rotation; }
+.cyl-animate-flip { animation-name: cyl-flip; }
+.cyl-animate-fume { animation-name: cyl-fume; }
+
+@keyframes cyl-scale { 0% { transform: scale(1); } 50% { transform: scale(0.8); } 100% { transform: scale(1); } }
+@keyframes cyl-zoom-in { 0% { transform: scale(1); } 50% { transform: scale(1.25); } 100% { transform: scale(1); } }
+@keyframes cyl-bounce { 0% { transform: translateY(0); } 30% { transform: translateY(-8px); } 60% { transform: translateY(0); } 80% { transform: translateY(-3px); } 100% { transform: translateY(0); } }
+@keyframes cyl-rotation { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+@keyframes cyl-flip { 0% { transform: perspective(200px) rotateY(0deg); } 100% { transform: perspective(200px) rotateY(360deg); } }
+@keyframes cyl-fume { 0% { opacity: 1; transform: scale(1); } 50% { opacity: 0.3; transform: scale(1.2); } 100% { opacity: 1; transform: scale(1); } }
