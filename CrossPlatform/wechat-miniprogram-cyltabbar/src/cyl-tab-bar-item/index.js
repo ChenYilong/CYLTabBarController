@@ -185,11 +185,15 @@ Component({
       return this.selectComponent('#cyl-item-animation');
     },
 
-    /** [EN] Plays the animation from its first frame (a tab that becomes selected). [CN] 从首帧播放动画。 */
-    cyl_playAnimation() {
+    /**
+     * [EN] Plays the animation from its first frame (a tab that becomes selected), or `offset` seconds in, to continue
+     *      a playback another tab bar started.
+     * [CN] 从首帧播放动画（Tab 被选中时），或从第 `offset` 秒开始，以继续另一个 TabBar 已开始的播放。
+     */
+    cyl_playAnimation(offset) {
       const view = this.cyl_animationView();
       if (view && typeof view.cyl_playFromStart === 'function') {
-        view.cyl_playFromStart();
+        view.cyl_playFromStart(offset);
       }
     },
 

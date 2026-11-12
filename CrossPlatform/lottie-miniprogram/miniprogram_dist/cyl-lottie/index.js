@@ -194,7 +194,8 @@ Component({
           }
           this.cyl_rest()
           if (this.cylPendingPlay) {
-            this.cyl_playFromStart()
+            const pending = this.cylPendingPlay
+            this.cyl_playFromStart(pending.seconds + (Date.now() - pending.requestedAt) / 1000)
           } else if (autoplay) {
             this.cylAnimation.play()
           }
@@ -257,17 +258,27 @@ Component({
      * [EN] Plays from the first frame (a tab that becomes selected).
      * [CN] 从第一帧开始播放（Tab 被选中时）。
      */
-    cyl_playFromStart() {
+    cyl_playFromStart(offset) {
+      // [EN] `offset` (seconds) continues a playback another tab bar started: each tab page has its own tab bar.
+      // [CN] `offset`（秒）继续另一个 TabBar 已开始的播放：每个 Tab 页面都有自己的 TabBar。
+      const seconds = Number(offset) > 0 ? Number(offset) : 0
       if (!this.cylAnimation) {
         // [EN] A play request made while the file loads (a new tab page's tab bar selects its tab at once) runs when it
         //      is ready; dropping it showed the selected icon on its last frame with no animation.
         // [CN] 文件加载期间的播放请求（新 Tab 页面的 TabBar 会立即选中其 Tab）在就绪后执行；之前被丢弃，选中的图标
         //      直接停在最后一帧，没有动画。
-        this.cylPendingPlay = true
+        this.cylPendingPlay = {seconds, requestedAt: Date.now()}
         return
       }
-      this.cylPendingPlay = false
-      this.cylAnimation.goToAndPlay(0, true)
+      this.cylPendingPlay = null
+      const animation = this.cylAnimation
+      const speed = Math.abs(animation.playSpeed || 1)
+      const frame = Math.floor(seconds * (animation.frameRate || 30) * speed)
+      if (frame >= animation.totalFrames - 1) {
+        animation.goToAndStop(Math.max(0, animation.totalFrames - 1), true)
+        return
+      }
+      animation.goToAndPlay(frame, true)
     },
 
     cyl_goToAndStop(value, isFrame) {

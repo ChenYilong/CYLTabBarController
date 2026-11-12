@@ -17,6 +17,17 @@ const { cylReadConfiguration } = require('./cyl_configuration');
  * [EN] The badge text shown for a value: numbers above 99 read "99+"; '' means no badge.
  * [CN] 角标显示的文字：大于 99 的数字显示 "99+"；'' 表示没有角标。
  */
+/**
+ * [EN] The selected icon playback of every tab bar of the app. A mini program gives each tab page its own tab bar, so
+ *      the tapped bar starts the icon at once and records when; the bar of the page that appears continues from that
+ *      moment instead of starting again (before, the animation started 100-300 ms late on a new bar, half over).
+ * [CN] App 中所有 TabBar 共享的选中图标播放记录。小程序中每个 Tab 页面都有自己的 TabBar，因此被点击的 TabBar 立即
+ *      开始播放并记录时间；出现的页面的 TabBar 从该时刻继续，而不是重新开始（之前动画在新 TabBar 上晚 100-300 ms
+ *      才开始，已过一半）。
+ */
+const cylPlayback = { key: '', startedAt: 0 };
+const CYL_PLAYBACK_WINDOW = 3000;
+
 function cylBadgeText(value) {
   if (value === undefined || value === null || value === '') {
     return '';
@@ -199,9 +210,18 @@ Component({
     cyl_playLottie(identifier) {
       const key = identifier || this.cylLottieSelected;
       const item = this.selectComponent(`#cyl-item-${key}`);
-      if (item) {
-        item.cyl_playAnimation();
+      if (!item) {
+        return;
       }
+      const recordKey = `${(this.cylModel && this.cylModel.context) || ''}/${key}`;
+      const elapsed = Date.now() - cylPlayback.startedAt;
+      if (cylPlayback.key === recordKey && elapsed < CYL_PLAYBACK_WINDOW) {
+        item.cyl_playAnimation(elapsed / 1000);
+        return;
+      }
+      cylPlayback.key = recordKey;
+      cylPlayback.startedAt = Date.now();
+      item.cyl_playAnimation(0);
     },
 
     /**
@@ -333,7 +353,14 @@ Component({
         return;
       }
       const currentIdentifier = this.data.selectedIdentifier || (model.items[0] ? model.items[0].identifier : '');
-      this.triggerEvent(item.identifier === currentIdentifier ? 'reselect' : 'select', detail);
+      if (item.identifier === currentIdentifier) {
+        this.triggerEvent('reselect', detail);
+        return;
+      }
+      // [EN] Select and play at once on the tapped bar; the page's own bar continues the playback (cylPlayback).
+      // [CN] 在被点击的 TabBar 上立即选中并播放；页面自己的 TabBar 继续该播放（cylPlayback）。
+      this.setData({ selectedIdentifier: item.identifier });
+      this.triggerEvent('select', detail);
     },
 
     /**

@@ -163,7 +163,8 @@ Component({
         }
         this.triggerEvent('ready', { duration: view.duration() })
         if (this.cylPendingPlay) {
-          this.cyl_playFromStart()
+          const pending = this.cylPendingPlay
+          this.cyl_playFromStart(pending.seconds + (Date.now() - pending.requestedAt) / 1000)
         }
       } catch (error) {
         this.cylView = null
@@ -198,16 +199,21 @@ Component({
     },
 
     /** [EN] Plays from the beginning (a tab that becomes selected). [CN] 从头播放（Tab 被选中时）。 */
-    cyl_playFromStart() {
+    cyl_playFromStart(offset) {
+      // [EN] `offset` (seconds) continues a playback another tab bar started: each tab page has its own tab bar.
+      // [CN] `offset`（秒）继续另一个 TabBar 已开始的播放：每个 Tab 页面都有自己的 TabBar。
+      const seconds = Number(offset) > 0 ? Number(offset) : 0
       const view = this.cylView
       if (!view) {
         // [EN] A play request made while the file loads (a new tab page's tab bar selects its tab at once) runs when it is ready.
         // [CN] 文件加载期间的播放请求（新 Tab 页面的 TabBar 会立即选中其 Tab）在就绪后执行。
-        this.cylPendingPlay = true
+        this.cylPendingPlay = {seconds, requestedAt: Date.now()}
         return
       }
-      this.cylPendingPlay = false
-      Promise.resolve(view.setProgress(0)).then(() => view.play())
+      this.cylPendingPlay = null
+      const duration = Number(view.duration()) || 0
+      const progress = duration > 0 ? Math.min(1, seconds / duration) : 0
+      Promise.resolve(view.setProgress(progress)).then(() => (progress < 1 ? view.play() : null))
     },
 
     /** [EN] Moves to a progress between 0 and 1. [CN] 跳到 0 到 1 之间的进度。 */

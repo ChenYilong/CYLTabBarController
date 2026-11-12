@@ -229,7 +229,10 @@ Component({
         stateMachine: isStateMachine ? machine.name : '',
         inputs: isStateMachine ? this.cyl_inputNames() : [],
       })
-      if ((this.data.autoplay && this.data.loop) || this.cylPendingPlay) {
+      if (this.cylPendingPlay) {
+        const pending = this.cylPendingPlay
+        this.cyl_playFromStart(pending.seconds + (Date.now() - pending.requestedAt) / 1000)
+      } else if (this.data.autoplay && this.data.loop) {
         this.cyl_playFromStart()
       }
     },
@@ -240,6 +243,11 @@ Component({
      */
     cyl_bindViewModel(state) {
       try {
+        // [EN] Ask only when the file has view models: the runtime logs an error for an artboard without one.
+        // [CN] 只在文件有 view model 时获取：画板没有 view model 时运行时会输出错误。
+        if (typeof state.file.viewModelCount === 'function' && state.file.viewModelCount() === 0) {
+          return null
+        }
         const viewModel = state.file.defaultArtboardViewModel(state.artboard)
         if (!viewModel) {
           return null
@@ -331,15 +339,18 @@ Component({
      * [CN] 播放图标：把布尔输入 / view model 布尔属性设为 true 并保持 `duration` 秒，或触发 trigger；没有输入的文件
      *      重新播放其动画。
      */
-    cyl_playFromStart() {
+    cyl_playFromStart(offset) {
+      // [EN] `offset` (seconds) continues a playback another tab bar started: each tab page has its own tab bar.
+      // [CN] `offset`（秒）继续另一个 TabBar 已开始的播放：每个 Tab 页面都有自己的 TabBar。
+      const seconds = Number(offset) > 0 ? Number(offset) : 0
       const state = this.cylState
       if (!state) {
         // [EN] A play request made while the file loads (a new tab page's tab bar selects its tab at once) runs when it is ready.
         // [CN] 文件加载期间的播放请求（新 Tab 页面的 TabBar 会立即选中其 Tab）在就绪后执行。
-        this.cylPendingPlay = true
+        this.cylPendingPlay = {seconds, requestedAt: Date.now()}
         return
       }
-      this.cylPendingPlay = false
+      this.cylPendingPlay = null
       state.playing = true
       const { options } = state
       clearTimeout(state.inputTimer)
@@ -364,11 +375,15 @@ Component({
       }
       if (boolInput || activeProperty) {
         setActive(true)
+        if (seconds > 0 && state.instance && typeof state.instance.advance === 'function') {
+          // [EN] Catch up with the playback the previous tab bar started. [CN] 追上前一个 TabBar 已开始的播放。
+          state.instance.advance(Math.min(seconds, 2))
+        }
         if (options.duration > 0) {
           state.inputTimer = setTimeout(() => {
             setActive(false)
             this.triggerEvent('complete', {})
-          }, options.duration * 1000)
+          }, Math.max(0, options.duration - seconds) * 1000)
         }
         return
       }
