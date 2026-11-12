@@ -19,7 +19,7 @@ import UIKit
  * [EN] `+[UIImage imageNamed:]`, or nil for an empty name.
  * [CN] `+[UIImage imageNamed:]`，名称为空时返回 nil。
  */
-public func CYLImageNamed(_ imageName: String?) -> UIImage? { // NOSONAR: kept API name
+public func CYLImageNamed(_ imageName: String?) -> UIImage? {
     guard let imageName, !imageName.isEmpty else {
         return nil
     }
@@ -31,7 +31,7 @@ public func CYLImageNamed(_ imageName: String?) -> UIImage? { // NOSONAR: kept A
  *      extension. Nil without a bundle path or a file name.
  * [CN] `bundle` 中（给出 `subfolderPath` 时在该子目录中）图片文件的路径；没有扩展名的文件名补上 `.png`。没有 bundle 路径或文件名时返回 nil。
  */
-public func CYLImagePathInBundle(_ bundle: Bundle?, // NOSONAR: kept API name
+public func CYLImagePathInBundle(_ bundle: Bundle?,
                                  _ subfolderPath: String?, _ fileName: String) -> String? {
     guard let bundlePath = bundle?.bundlePath, !fileName.isEmpty else {
         return nil
@@ -50,7 +50,7 @@ public func CYLImagePathInBundle(_ bundle: Bundle?, // NOSONAR: kept API name
  * [EN] The image at `CYLImagePathInBundle()`, read from the file (not cached).
  * [CN] `CYLImagePathInBundle()` 处的图片，从文件读取（不缓存）。
  */
-public func CYLImageInBundle(_ bundle: Bundle?, // NOSONAR: kept API name
+public func CYLImageInBundle(_ bundle: Bundle?,
                              _ subfolderPath: String?, _ fileName: String) -> UIImage? {
     CYLImagePathInBundle(bundle, subfolderPath, fileName).flatMap { UIImage(contentsOfFile: $0) }
 }
@@ -61,7 +61,7 @@ public func CYLImageInBundle(_ bundle: Bundle?, // NOSONAR: kept API name
  * [CN] 主 bundle 中 `<bundleName>.bundle` 里图片的路径（给出 `folderReferenceName` 时在该文件夹引用中，给出 `subfolderPath` 时在
  *      bundle 的该子目录中）。
  */
-public func CYLBundleImagePath(_ folderReferenceName: String?, // NOSONAR: kept API name
+public func CYLBundleImagePath(_ folderReferenceName: String?,
                                _ bundleName: String, _ subfolderPath: String?,
                                _ fileName: String) -> String? {
     guard !bundleName.isEmpty, !fileName.isEmpty else {
@@ -86,7 +86,7 @@ public func CYLBundleImagePath(_ folderReferenceName: String?, // NOSONAR: kept 
  * [EN] The image at `CYLBundleImagePath()`, read from the file.
  * [CN] `CYLBundleImagePath()` 处的图片，从文件读取。
  */
-public func CYLBundleImage(_ folderReferenceName: String?, // NOSONAR: kept API name
+public func CYLBundleImage(_ folderReferenceName: String?,
                            _ bundleName: String, _ subfolderPath: String?,
                            _ fileName: String) -> UIImage? {
     CYLBundleImagePath(folderReferenceName, bundleName, subfolderPath, fileName).flatMap { UIImage(contentsOfFile: $0) }
@@ -96,7 +96,7 @@ public func CYLBundleImage(_ folderReferenceName: String?, // NOSONAR: kept API 
  * [EN] The data of the file at `CYLBundleImagePath()`.
  * [CN] `CYLBundleImagePath()` 处文件的数据。
  */
-public func CYLBundleImageData(_ folderReferenceName: String?, // NOSONAR: kept API name
+public func CYLBundleImageData(_ folderReferenceName: String?,
                                _ bundleName: String, _ subfolderPath: String?,
                                _ fileName: String) -> Data? {
     CYLBundleImagePath(folderReferenceName, bundleName, subfolderPath, fileName).flatMap { FileManager.default.contents(atPath: $0) }
@@ -106,7 +106,7 @@ public func CYLBundleImageData(_ folderReferenceName: String?, // NOSONAR: kept 
  * [EN] The image made from `CYLBundleImageData()`, with the scale its name ends with (`@2x`, `@3x`, else 1).
  * [CN] 由 `CYLBundleImageData()` 生成的图片，倍率取自文件名结尾（`@2x`、`@3x`，否则为 1）。
  */
-public func CYLBundleImageFromData(_ folderReferenceName: String?, // NOSONAR: kept API name
+public func CYLBundleImageFromData(_ folderReferenceName: String?,
                                    _ bundleName: String, _ subfolderPath: String?,
                                    _ fileName: String) -> UIImage? {
     guard let data = CYLBundleImageData(folderReferenceName, bundleName, subfolderPath, fileName) else {

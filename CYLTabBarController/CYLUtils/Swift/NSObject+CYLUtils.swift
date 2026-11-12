@@ -24,7 +24,7 @@ extension NSObject {
      * [CN] 对接收者没有的 key 返回 nil 而不是抛出异常的 `valueForKey:`。
      */
     @objc(cyl_valueForKey:)
-    public func cyl_value(forKey key: String) -> Any? { // NOSONAR: kept API name
+    public func cyl_value(forKey key: String) -> Any? {
         guard CYLKeyValueCoding.resolves(key, of: self, setting: false, value: nil) else {
             CYLKeyValueCoding.log("KVC failed", key: key, of: self)
             return nil
@@ -38,7 +38,7 @@ extension NSObject {
      * [CN] 对接收者没有的 key（或给标量传 nil）不做任何事而不是抛出异常的 `setValue:forKey:`。
      */
     @objc(cyl_setValue:forKey:)
-    public func cyl_setValue(_ value: Any?, forKey key: String) { // NOSONAR: kept API name
+    public func cyl_setValue(_ value: Any?, forKey key: String) {
         guard CYLKeyValueCoding.resolves(key, of: self, setting: true, value: value) else {
             CYLKeyValueCoding.log("KVC set failed", key: key, of: self)
             return
@@ -79,7 +79,7 @@ extension NSObject {
      * [CN] 以弱引用方式在 `key` 下保存 `object`；传 nil 则移除。
      */
     @objc(cyl_setWeakAssociatedObject:forKey:)
-    public func cyl_setWeakAssociatedObject(_ object: Any?, forKey key: UnsafeRawPointer) { // NOSONAR: kept API name
+    public func cyl_setWeakAssociatedObject(_ object: Any?, forKey key: UnsafeRawPointer) {
         guard let object = object as AnyObject? else {
             objc_setAssociatedObject(self, key, nil, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
             return
@@ -92,7 +92,7 @@ extension NSObject {
      * [CN] 用 `-cyl_setWeakAssociatedObject:forKey:` 保存的对象，释放后为 nil。
      */
     @objc(cyl_weakAssociatedObjectForKey:)
-    public func cyl_weakAssociatedObject(forKey key: UnsafeRawPointer) -> Any? { // NOSONAR: kept API name
+    public func cyl_weakAssociatedObject(forKey key: UnsafeRawPointer) -> Any? {
         (objc_getAssociatedObject(self, key) as? CYLWeakBox)?.object
     }
 }

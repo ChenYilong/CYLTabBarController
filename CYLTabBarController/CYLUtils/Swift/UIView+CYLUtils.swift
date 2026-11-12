@@ -19,7 +19,7 @@ extension UIView {
      * [CN] 隐藏（或显示）视图，同时关闭（或开启）交互，并设置 opaque 与 alpha。
      */
     @objc(cyl_setHidden:)
-    public func cyl_setHidden(_ hidden: Bool) { // NOSONAR: kept API name
+    public func cyl_setHidden(_ hidden: Bool) {
         isOpaque = !hidden
         isHidden = hidden
         alpha = hidden ? 0 : 1
@@ -31,7 +31,7 @@ extension UIView {
      * [CN] 视图是否不可见：隐藏、透明、没有父视图或尺寸为零。
      */
     @objc(cyl_isInvisiable)
-    public func cyl_isInvisiable() -> Bool { // NOSONAR: kept API name
+    public func cyl_isInvisiable() -> Bool {
         isHidden || alpha <= 0.01 || superview == nil || frame.size == .zero
     }
 
@@ -40,7 +40,7 @@ extension UIView {
      * [CN] 视图是否无法响应触摸：不可见、关闭了交互或是占位视图。
      */
     @objc(cyl_canNotResponseEvent)
-    public func cyl_canNotResponseEvent() -> Bool { // NOSONAR: kept API name
+    public func cyl_canNotResponseEvent() -> Bool {
         cyl_isInvisiable() || !isUserInteractionEnabled || cyl_isPlaceholder
     }
 
@@ -49,7 +49,7 @@ extension UIView {
      * [CN] 将视图放大、缩小再复原（0.5 秒），然后调用 `completion`。
      */
     @objc(cyl_addScaleBounceAnimationWithCompletion:)
-    public func cyl_addScaleBounceAnimation(completion: ((Bool) -> Void)?) { // NOSONAR: kept API name
+    public func cyl_addScaleBounceAnimation(completion: ((Bool) -> Void)?) {
         transform = .identity
         UIView.animateKeyframes(withDuration: 0.5, delay: 0, options: [], animations: {
             UIView.addKeyframe(withRelativeStartTime: 0, relativeDuration: 1.0 / 3.0) {
@@ -69,7 +69,7 @@ extension UIView {
      * [CN] 接收者或其最近的 `UIControl` 祖先视图，向上查找到 `stopView` 为止（不含）。
      */
     @objc(cyl_nearestControlBelowView:)
-    public func cyl_nearestControl(below stopView: UIView?) -> UIControl? { // NOSONAR: kept API name
+    public func cyl_nearestControl(below stopView: UIView?) -> UIControl? {
         var view: UIView? = self
         while let current = view, current !== stopView {
             if let control = current as? UIControl {

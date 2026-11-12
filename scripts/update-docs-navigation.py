@@ -57,8 +57,6 @@ BINDING_END = "<!-- binding:end -->"
 HEADER_START = "// docs-binding:start"
 HEADER_END = "// docs-binding:end"
 CLASS_DECLARATION = re.compile(r"^@interface\s+(\w+)\s*:", re.M)
-# A class translated to Swift keeps its Objective-C name with "@objc(Name)" right above "class Name" (docs/Swift-Migration.md).
-SWIFT_CLASS_DECLARATION = re.compile(r"^@objc\((\w+)\)\s*\n(?:\s*@\w+.*\n)*\s*(?:public |open )?(?:final )?class\s+\1\b", re.M)
 
 # Pages with more than this many level-2 and level-3 headings list level 2 only.
 MAX_ROWS_WITH_LEVEL_3 = 50
@@ -384,9 +382,30 @@ def class_headers(headers):
         for class_name in CLASS_DECLARATION.findall(text):
             found.setdefault(class_name, path)
     for path, text in swift_sources():
-        for class_name in SWIFT_CLASS_DECLARATION.findall(text):
+        for class_name in swift_class_names(text):
             found.setdefault(class_name, by_file_name.get(class_name + ".h", path))
     return found
+
+
+def swift_class_names(text):
+    """Classes of a Swift file that keep an Objective-C name: "@objc(Name)" on its own line, then (after other
+    attributes) "class Name". Parsed line by line, without a backtracking regex."""
+    names = []
+    lines = [line.strip() for line in text.split("\n")]
+    for index, line in enumerate(lines):
+        if not (line.startswith("@objc(") and line.endswith(")")):
+            continue
+        name = line[len("@objc("):-1]
+        if not name.isidentifier():
+            continue
+        following = index + 1
+        while following < len(lines) and lines[following].startswith("@"):
+            following += 1
+        if following < len(lines):
+            words = lines[following].replace(":", " ").split()
+            if "class" in words and words.index("class") + 1 < len(words) and words[words.index("class") + 1] == name:
+                names.append(name)
+    return names
 
 
 def bound_declaration(line):

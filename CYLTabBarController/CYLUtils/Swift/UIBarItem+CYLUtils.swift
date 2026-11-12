@@ -19,7 +19,7 @@ extension UIBarItem {
      * [CN] `UIBarButtonItem` 或 `UITabBarItem` 的视图（UIKit 延迟创建：显示之前为 nil）。
      */
     @objc(cyl_view)
-    public func cyl_view() -> UIView? { // NOSONAR: kept API name
+    public func cyl_view() -> UIView? {
         guard responds(to: CYLBarItemSelectors.view) else {
             return nil
         }

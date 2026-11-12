@@ -21,14 +21,14 @@ import UIKit
  * [EN] Posted on the main thread after `CYLSetLocalizationLanguage()` changed the language.
  * [CN] `CYLSetLocalizationLanguage()` 修改语言后在主线程发送。
  */
-public let CYLLocalizationLanguageDidChangeNotification = // NOSONAR: kept API name
+public let CYLLocalizationLanguageDidChangeNotification =
     "CYLLocalizationLanguageDidChangeNotification"
 
 /**
  * [EN] The string of `key` in the library's string table, in the current language; `key` itself when there is none.
  * [CN] 本库字符串表中 `key` 在当前语言下的字符串；没有时返回 `key` 本身。
  */
-public func CYLLocalizedString(_ key: String) -> String { // NOSONAR: kept API name
+public func CYLLocalizedString(_ key: String) -> String {
     CYLLocalization.string(key, bundle: CYLLocalization.languageBundle().bundle)
 }
 
@@ -37,7 +37,7 @@ public func CYLLocalizedString(_ key: String) -> String { // NOSONAR: kept API n
  *      Carthage and a copied folder.
  * [CN] 本库的资源包（`CYLTabBarController.bundle`），在 CocoaPods、SwiftPM、Carthage 与直接拖入时以同样方式找到。
  */
-public func CYLResourceBundle() -> Bundle { // NOSONAR: kept API name
+public func CYLResourceBundle() -> Bundle {
     CYLLocalization.resourceBundle
 }
 
@@ -46,7 +46,7 @@ public func CYLResourceBundle() -> Bundle { // NOSONAR: kept API name
  *      `CYLLocalizationLanguageDidChangeNotification` on the main thread.
  * [CN] 设置本库字符串的语言；传 nil 恢复跟随 App。在主线程发送 `CYLLocalizationLanguageDidChangeNotification`。
  */
-public func CYLSetLocalizationLanguage(_ language: String?) { // NOSONAR: kept API name
+public func CYLSetLocalizationLanguage(_ language: String?) {
     CYLLocalization.setLanguage(language)
 }
 
@@ -54,7 +54,7 @@ public func CYLSetLocalizationLanguage(_ language: String?) { // NOSONAR: kept A
  * [EN] The string of `key` in `language` (nil: the system's preferred languages).
  * [CN] `key` 在 `language` 中的字符串（nil：系统的首选语言）。
  */
-public func CYLLocalizedStringForLanguage(_ key: String, _ language: String?) -> String { // NOSONAR: kept API name
+public func CYLLocalizedStringForLanguage(_ key: String, _ language: String?) -> String {
     let closest = CYLLocalization.closestLanguage(language.map { [$0] } ?? Locale.preferredLanguages)
     return CYLLocalization.string(key, bundle: CYLLocalization.bundle(forLanguage: closest))
 }
@@ -63,7 +63,7 @@ public func CYLLocalizedStringForLanguage(_ key: String, _ language: String?) ->
  * [EN] The language the library's strings are in now.
  * [CN] 本库字符串当前使用的语言。
  */
-public func CYLLocalizationLanguage() -> String { // NOSONAR: kept API name
+public func CYLLocalizationLanguage() -> String {
     CYLLocalization.languageBundle().language
 }
 

@@ -94,7 +94,7 @@ extension UIColor {
      * [CN] 默认管理器的主题颜色。
      */
     @objc(cyl_colorWithThemeProvider:)
-    public class func cyl_color(themeProvider provider: @escaping CYLThemeColorProvider) -> UIColor { // NOSONAR: kept API name
+    public class func cyl_color(themeProvider provider: @escaping CYLThemeColorProvider) -> UIColor {
         CYLThemeColor.make(nil, CYLThemeColor.defaultManagerName, provider)
     }
 
@@ -103,7 +103,7 @@ extension UIColor {
      * [CN] 默认管理器的具名主题颜色。
      */
     @objc(cyl_colorWithName:themeProvider:)
-    public class func cyl_color(withName name: String?, // NOSONAR: kept API name
+    public class func cyl_color(withName name: String?,
                                 themeProvider provider: @escaping CYLThemeColorProvider) -> UIColor {
         CYLThemeColor.make(name, CYLThemeColor.defaultManagerName, provider)
     }
@@ -113,7 +113,7 @@ extension UIColor {
      * [CN] 名为 `managerName` 的管理器的主题颜色。
      */
     @objc(cyl_colorWithThemeManagerName:provider:)
-    public class func cyl_color(withThemeManagerName managerName: (NSCopying & NSObjectProtocol)?, // NOSONAR: kept API name
+    public class func cyl_color(withThemeManagerName managerName: (NSCopying & NSObjectProtocol)?,
                                 provider: @escaping CYLThemeColorProvider) -> UIColor {
         CYLThemeColor.make(nil, managerName ?? CYLThemeColor.defaultManagerName, provider)
     }
@@ -123,7 +123,7 @@ extension UIColor {
      * [CN] 名为 `managerName` 的管理器（为 nil 时为默认管理器）的具名主题颜色。
      */
     @objc(cyl_colorWithName:themeManagerName:provider:)
-    public class func cyl_color(withName name: String?, // NOSONAR: kept API name
+    public class func cyl_color(withName name: String?,
                                 themeManagerName managerName: (NSCopying & NSObjectProtocol)?,
                                 provider: @escaping CYLThemeColorProvider) -> UIColor {
         CYLThemeColor.make(name, managerName ?? CYLThemeColor.defaultManagerName, provider)

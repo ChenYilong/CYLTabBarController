@@ -11,7 +11,7 @@ import UIKit
  * [EN] The name of the default theme manager.
  * [CN] 默认主题管理器的名称。
  */
-public let CYLThemeManagerNameDefault = "Default" // NOSONAR: kept API name
+public let CYLThemeManagerNameDefault = "Default"
 
 /**
  * [EN] Holds the theme managers by name. Translated from Objective-C (docs/Swift-Migration.md); Objective-C callers get

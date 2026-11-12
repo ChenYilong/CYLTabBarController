@@ -12,7 +12,7 @@ import UIKit
  * [CN] 管理器的当前主题变化时发出（object 为该管理器）。
  */
 extension NSNotification.Name {
-    public static let CYLThemeDidChange = NSNotification.Name("CYLThemeDidChangeNotification") // NOSONAR: kept API name
+    public static let CYLThemeDidChange = NSNotification.Name("CYLThemeDidChangeNotification")
 }
 
 /**

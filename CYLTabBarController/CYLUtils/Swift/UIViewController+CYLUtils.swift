@@ -20,7 +20,7 @@ extension UIViewController {
      * [CN] 若自身是导航控制器则返回其第一个子控制器，否则返回自身。
      */
     @objc(cyl_getViewControllerInsteadOfNavigationController)
-    public func cyl_getViewControllerInsteadOfNavigation() -> UIViewController { // NOSONAR: kept API name
+    public func cyl_getViewControllerInsteadOfNavigation() -> UIViewController {
         if let navigationController = self as? UINavigationController,
            let rootViewController = navigationController.viewControllers.first {
             return rootViewController
