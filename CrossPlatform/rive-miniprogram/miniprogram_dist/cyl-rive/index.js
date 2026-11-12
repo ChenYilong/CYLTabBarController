@@ -229,7 +229,7 @@ Component({
         stateMachine: isStateMachine ? machine.name : '',
         inputs: isStateMachine ? this.cyl_inputNames() : [],
       })
-      if (this.data.autoplay && this.data.loop) {
+      if ((this.data.autoplay && this.data.loop) || this.cylPendingPlay) {
         this.cyl_playFromStart()
       }
     },
@@ -334,8 +334,12 @@ Component({
     cyl_playFromStart() {
       const state = this.cylState
       if (!state) {
+        // [EN] A play request made while the file loads (a new tab page's tab bar selects its tab at once) runs when it is ready.
+        // [CN] 文件加载期间的播放请求（新 Tab 页面的 TabBar 会立即选中其 Tab）在就绪后执行。
+        this.cylPendingPlay = true
         return
       }
+      this.cylPendingPlay = false
       state.playing = true
       const { options } = state
       clearTimeout(state.inputTimer)

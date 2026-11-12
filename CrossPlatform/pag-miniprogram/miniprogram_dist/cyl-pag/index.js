@@ -162,6 +162,9 @@ Component({
           view.play()
         }
         this.triggerEvent('ready', { duration: view.duration() })
+        if (this.cylPendingPlay) {
+          this.cyl_playFromStart()
+        }
       } catch (error) {
         this.cylView = null
         this.triggerEvent('error', { message: `cyl-pag: ${error.message || error}` })
@@ -197,9 +200,14 @@ Component({
     /** [EN] Plays from the beginning (a tab that becomes selected). [CN] 从头播放（Tab 被选中时）。 */
     cyl_playFromStart() {
       const view = this.cylView
-      if (view) {
-        Promise.resolve(view.setProgress(0)).then(() => view.play())
+      if (!view) {
+        // [EN] A play request made while the file loads (a new tab page's tab bar selects its tab at once) runs when it is ready.
+        // [CN] 文件加载期间的播放请求（新 Tab 页面的 TabBar 会立即选中其 Tab）在就绪后执行。
+        this.cylPendingPlay = true
+        return
       }
+      this.cylPendingPlay = false
+      Promise.resolve(view.setProgress(0)).then(() => view.play())
     },
 
     /** [EN] Moves to a progress between 0 and 1. [CN] 跳到 0 到 1 之间的进度。 */

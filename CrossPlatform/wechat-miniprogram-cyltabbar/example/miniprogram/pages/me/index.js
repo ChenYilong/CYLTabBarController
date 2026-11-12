@@ -89,7 +89,16 @@ Component({
         wx.showToast({ title: this.t('Run the PAG download first'), icon: 'none' });
         return;
       }
-      this.cyl_override({ cylDemoIcons: icons, cylDemoLottie: icons !== 'images' });
+      const state = getApp().globalData.cylTabBarState;
+      const change = { overrides: Object.assign({}, state.overrides, { cylDemoIcons: icons, cylDemoLottie: icons !== 'images' }) };
+      // [EN] The Rive icons (the iOS examples' icons.riv) are white strokes: like Example-Rive and Example-SwiftUI-Rive,
+      //      which run in dark mode, Rive mode picks the dark skin when no other skin was chosen.
+      // [CN] Rive 图标（iOS 示例的 icons.riv）是白色线条：与运行在深色模式下的 Example-Rive、Example-SwiftUI-Rive 一样，
+      //      未选择其他皮肤时，Rive 模式使用深色皮肤。
+      if (icons === 'rive' && (!state.themeIdentifier || state.themeIdentifier === 'light')) {
+        change.themeIdentifier = 'dark';
+      }
+      this.cyl_update(change);
     },
     cyl_swipeOption(event) {
       this.cyl_override({ CYLTabBarControllerSwipeToSwitchTab: event.detail.value });

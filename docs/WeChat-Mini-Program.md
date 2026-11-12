@@ -74,7 +74,7 @@
 | `CYLTabBarLottieDarkColors` | ✅ 加载前换色 / recolored before loading（`cyl-lottie` `colors`，12） |
 | `CYLTabBarAnimation…`（通用动画键 / generic animation keys） | ✅ `.json` 用 Lottie，`.gif` 用 `<image>` / `.json` plays with Lottie, `.gif` in `<image>`; `.pag` 用 `cyl-pag`，`.riv` 用 `cyl-rive` / `.pag` plays in `cyl-pag`, `.riv` in `cyl-rive`（测试 / test） |
 | `CYLTabBarPAG…` | ✅ `cyl-pag`（libpag-lite：只播放单个 BMP 序列帧的 PAG 文件，开发者工具的视频解码器不出帧，需真机验证 / libpag-lite plays only PAG files made of one BMP sequence; the DevTools video decoder yields no frame, a device check is TODO） |
-| `CYLTabBarRive…` | ✅ `cyl-rive`（`@rive-app/canvas-advanced` 2.39.1 + WXWebAssembly，画板 / 状态机 / 输入 / 颜色；18 / artboard, state machine, input, colors; screenshot 18） |
+| `CYLTabBarRive…` | ✅ `cyl-rive`（`@rive-app/canvas-advanced` 2.39.1 + WXWebAssembly，画板 / 状态机 / 输入 / 颜色；18；每个 Tab 页面都有自己的 TabBar，加载期间的播放请求在就绪后执行（实测：就绪后 73 ms `active` = true，1 秒后 false）；icons.riv 是白色线条，示例的 Rive 模式与 iOS Rive 示例一样使用深色皮肤 / artboard, state machine, input, colors; screenshot 18; every tab page has its own tab bar, so a play request made while the file loads runs once it is ready (measured: `active` true 73 ms after ready, false 1 s later); icons.riv is white strokes, so the example's Rive mode picks the dark skin, as the iOS Rive examples run in dark mode） |
 | `CYLTabBarGIF…` | ✅ 选中时显示 GIF / the GIF shows while the tab is selected（测试 / test） |
 | `CYLTabBarAnimationOptions` | ✅ 与路径的 URL fragment 合并后传给 `cyl-rive` / merged into the path's URL fragment and passed to `cyl-rive`（测试 / test） |
 | `CYLTabBarAnimationColors`、`CYLTabBarAnimationDarkColors` | ✅（`cyl-lottie` `colors`，12） |
