@@ -17,7 +17,9 @@ Pod::Spec.new do |s|
   # `-cyl_tabButton`...), `+[CYLUtils isLiquidGlassActive]`, the string table (`CYLLocalizedString()`) and the resource
   # bundle. Both depend on it. Core 与 CYLBadgeView 共用的宏、工具方法、字符串表与资源包，二者都依赖它。
   s.subspec 'CYLUtils' do |utils|
-    utils.source_files = 'CYLTabBarController/CYLUtils/**/*.{h,m}'
+    # [EN] Swift migration (docs/Swift-Migration.md): translated files live in `Swift/` folders next to the Objective-C ones.
+    # [CN] Swift 迁移（docs/Swift-Migration.md）：已翻译的文件放在 Objective-C 文件旁的 `Swift/` 目录中。
+    utils.source_files = 'CYLTabBarController/CYLUtils/**/*.{h,m,swift}'
     utils.public_header_files = 'CYLTabBarController/CYLUtils/**/*.h'
     # FIX: issue #216 — theme switching (skins) lives in `CYLUtils/CYLComponents/CYLTheme/`; its private header stays private.
     # 换肤（主题切换）位于 `CYLUtils/CYLComponents/CYLTheme/`，其私有头文件不公开。

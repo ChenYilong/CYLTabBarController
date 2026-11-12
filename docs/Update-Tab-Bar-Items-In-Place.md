@@ -42,6 +42,7 @@
 | [角标](#角标--badges) | [Badges](#角标--badges) |
 | [限制](#限制--limits) | [Limits](#限制--limits) |
 | [状态](#状态--status) | [Status](#状态--status) |
+| [任务记录](#任务记录--task-log) | [Task log](#任务记录--task-log) |
 
 <!-- navigation:end -->
 
@@ -322,3 +323,9 @@ val title = cyl_tabBarItemTitle               // the current tab title 当前的
 | DONE（2026-11-09）：原地更换标题后，液态玻璃下 VoiceOver 曾读出旧标题。现在读出新标题，恢复后读出原标题，见 [Tab 的无障碍](Tab-Accessibility.md)（`axe describe-ui` 验证，三个单元测试）。 | DONE (2026-11-09): after an in-place title change on Liquid Glass, VoiceOver used to read the old titles. It now reads the new ones, and the original ones after restoring; see [Tab accessibility](Tab-Accessibility.md) (checked with `axe describe-ui`, three unit tests). |
 | 已核实，不是缺陷（2026-11-12）：「批量更换标题」后「附近」角标中的「8」看起来变小，是因为 ObjC 示例给它设置了一直循环的缩放动画（`CYLBadgeAnimationTypeScale`，「Scale (forever)」），截图恰好截到缩小的一帧。单元测试 `testABadgeKeepsItsFontWhenTheTitlesChangeInPlace`（iOS 26.1 模拟器）：没有动画的角标在原地修改所有标题后字体不变、没有缩放；带缩放动画的角标修改后仍在播放动画、字体不变。 | Checked, not a defect (2026-11-12): after "Change all titles" the "8" in the Nearby badge looked smaller because the ObjC example gives it a scale animation that loops forever (`CYLBadgeAnimationTypeScale`, "Scale (forever)"), and the screenshot caught a small frame. Unit test `testABadgeKeepsItsFontWhenTheTitlesChangeInPlace` (iOS 26.1 simulator): a badge without animation keeps its font and is not scaled after every title changes in place; a badge with the scale animation still animates afterwards, with the same font. |
 | DONE（2026-11-09）：Android 提供跟随的标题与 Tab 变化通知，事件与参数与 iOS 相同，见 [Android](#android)（Robolectric 测试 `CYLTabChangeNotificationsTest`、模拟器验证）。 | DONE (2026-11-09): Android has the following titles and the tab change notifications, with the same events and parameters as iOS; see [Android](#android) (Robolectric `CYLTabChangeNotificationsTest`, checked on an emulator). |
+
+## 任务记录 / Task log
+
+| 中文 | English |
+|:---|:---|
+| TODO（2026-11-12 发现，经典样式角标在原地改标题后消失）：单元测试 `testABadgeKeepsItsFontWhenTheTitlesChangeInPlace` 在 iOS 17.5（经典样式）失败：`cyl_showBadgeValue:` 显示的角标「8」在 `-updateTabBarItemsWithAttributes:` 原地修改所有标题后不见了（Tab 中只剩三个标题 label）；iOS 26.1（液态玻璃）通过。CI 只在 iOS 26 上运行测试，因此没有发现。待做：找出经典样式下角标视图被移除的原因（UIKit 重建 Tab 按钮，或库在更新时移除了角标），修复后让角标保留；验证：该测试在 iOS 17.5 与 iOS 26.1 上都通过，并在 iOS 17.5 的 ObjC 示例中「批量更换标题」后截图。 | TODO (found 2026-11-12, classic badge gone after an in-place title change): the unit test `testABadgeKeepsItsFontWhenTheTitlesChangeInPlace` fails on iOS 17.5 (classic style): the "8" badge shown with `cyl_showBadgeValue:` is gone after `-updateTabBarItemsWithAttributes:` changes every title in place (only the three title labels are left in the tabs); it passes on iOS 26.1 (Liquid Glass). CI runs the tests on iOS 26 only, so it was not caught. To do: find why the badge view goes away on the classic style (UIKit rebuilding the tab buttons, or the library removing the badge during the update), and keep the badge. Verify: the test passes on iOS 17.5 and iOS 26.1, plus a screenshot of the ObjC example after "Change all titles" on iOS 17.5. |
