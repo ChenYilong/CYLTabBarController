@@ -69,3 +69,4 @@
 
 | 中文 | English |
 |:---|:---|
+| | 2026-11-12, step 4: `CYLResourceRoute` (a class, declared through `CYLSwiftInterface.h`; written with `NSString`'s path methods so routes resolve exactly as before) and `UIImage+CYLUtils` (header-only `CG_INLINE` functions; now Swift functions exported under their C names with `@_cdecl`, the header keeps plain declarations). The existing `CYLResourceRouteTests` caught one difference (a non-string route must give nil, not raise); the Swift method now takes `Any?` and checks the type. Verified: 134 unit tests on iOS 26.1 and 17.5, `xcodebuild analyze` clean, the SwiftPM package, the Objective-C demo and `Example-Swift` build. Swift migration score: 0 / 100 (58808 of 59391 Objective-C lines left). |

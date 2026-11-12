@@ -9,6 +9,15 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+/*!
+ * [EN] Implemented in Swift (`Swift/UIImage+CYLUtils.swift`, each function exported under its C name with `@_cdecl`);
+ *      declared here for Objective-C callers only, and hidden from Swift (`__swift__`), which uses the Swift functions
+ *      (docs/Swift-Migration.md).
+ * [CN] 在 Swift 中实现（`Swift/UIImage+CYLUtils.swift`，每个函数用 `@_cdecl` 以 C 名称导出）；这里只为 Objective-C 调用方声明，
+ *      并对 Swift 隐藏（`__swift__`），Swift 直接使用 Swift 函数（docs/Swift-Migration.md）。
+ */
+#ifndef __swift__
+
 #pragma mark - Loading images from anywhere (issue #535)
 
 /*!
@@ -32,12 +41,7 @@ NS_ASSUME_NONNULL_BEGIN
 /*!
  * [EN] `+[UIImage imageNamed:]`: cached by the system. [CN] `+[UIImage imageNamed:]`：由系统缓存。
  */
-CG_INLINE UIImage *_Nullable CYLImageNamed(NSString *_Nullable imageName) {
-    if (imageName.length == 0) {
-        return nil;
-    }
-    return [UIImage imageNamed:(NSString *_Nonnull)imageName];
-}
+FOUNDATION_EXTERN UIImage *_Nullable CYLImageNamed(NSString *_Nullable imageName);
 
 /*!
  * [EN] The path of an image file in `bundle` (e.g. a framework's resource bundle such as `CYLResourceBundle()`, which
@@ -46,83 +50,34 @@ CG_INLINE UIImage *_Nullable CYLImageNamed(NSString *_Nullable imageName) {
  * [CN] `bundle` 中图片文件的路径，没有时为 nil。`bundle` 可以是 framework 的资源包，例如 `CYLResourceBundle()`（使用 `use_frameworks!`
  *      时它位于 framework 内，而不在主 bundle 中）。没有扩展名的文件名会自动补 ".png"。
  */
-CG_INLINE NSString *_Nullable CYLImagePathInBundle(NSBundle *_Nullable bundle, NSString *_Nullable subfolderPath, NSString *fileName) {
-    if (!bundle.bundlePath || fileName.length == 0) {
-        return nil;
-    }
-    NSString *directory = subfolderPath.length > 0 ? [bundle.bundlePath stringByAppendingPathComponent:(NSString *_Nonnull)subfolderPath] : bundle.bundlePath;
-    NSString *name = fileName.pathExtension.length > 0 ? fileName : [fileName stringByAppendingPathExtension:@"png"];
-    return name ? [directory stringByAppendingPathComponent:name] : nil;
-}
+FOUNDATION_EXTERN NSString *_Nullable CYLImagePathInBundle(NSBundle *_Nullable bundle, NSString *_Nullable subfolderPath, NSString *_Nullable fileName);
 
 /*!
  * [EN] An image from `bundle`, not cached (`imageWithContentsOfFile:`). [CN] `bundle` 中的图片，不缓存（`imageWithContentsOfFile:`）。
  */
-CG_INLINE UIImage *_Nullable CYLImageInBundle(NSBundle *_Nullable bundle, NSString *_Nullable subfolderPath, NSString *fileName) {
-    NSString *path = CYLImagePathInBundle(bundle, subfolderPath, fileName);
-    return path ? [UIImage imageWithContentsOfFile:path] : nil;
-}
+FOUNDATION_EXTERN UIImage *_Nullable CYLImageInBundle(NSBundle *_Nullable bundle, NSString *_Nullable subfolderPath, NSString *_Nullable fileName);
 
 /*!
  * [EN] The path of an image in a bundle of the main bundle, or nil. [CN] 主 bundle 中某个 bundle 内图片的路径，没有时为 nil。
  */
-CG_INLINE NSString *_Nullable CYLBundleImagePath(NSString *_Nullable folderReferenceName,
-                                                 NSString *bundleName,
-                                                 NSString *_Nullable subfolderPath,
-                                                 NSString *fileName) {
-    if (bundleName.length == 0 || fileName.length == 0) {
-        return nil;
-    }
-    NSString *bundlePath = folderReferenceName.length > 0
-        ? [[NSBundle mainBundle] pathForResource:bundleName ofType:@"bundle" inDirectory:folderReferenceName]
-        : [[NSBundle mainBundle] pathForResource:bundleName ofType:@"bundle"];
-    if (!bundlePath) {
-        return nil;
-    }
-    if (subfolderPath.length > 0) {
-        bundlePath = [bundlePath stringByAppendingPathComponent:subfolderPath];
-    }
-    NSString *name = fileName.pathExtension.length > 0 ? fileName : [fileName stringByAppendingPathExtension:@"png"];
-    return [bundlePath stringByAppendingPathComponent:name];
-}
+FOUNDATION_EXTERN NSString *_Nullable CYLBundleImagePath(NSString *_Nullable folderReferenceName, NSString *_Nullable bundleName, NSString *_Nullable subfolderPath, NSString *_Nullable fileName);
 
 /*!
  * [EN] An image from a bundle, not cached (`imageWithContentsOfFile:`). [CN] bundle 中的图片，不缓存（`imageWithContentsOfFile:`）。
  */
-CG_INLINE UIImage *_Nullable CYLBundleImage(NSString *_Nullable folderReferenceName,
-                                            NSString *bundleName,
-                                            NSString *_Nullable subfolderPath,
-                                            NSString *fileName) {
-    NSString *path = CYLBundleImagePath(folderReferenceName, bundleName, subfolderPath, fileName);
-    return path ? [UIImage imageWithContentsOfFile:path] : nil;
-}
+FOUNDATION_EXTERN UIImage *_Nullable CYLBundleImage(NSString *_Nullable folderReferenceName, NSString *_Nullable bundleName, NSString *_Nullable subfolderPath, NSString *_Nullable fileName);
 
 /*!
  * [EN] The data of an image file in a bundle. [CN] bundle 中图片文件的数据。
  */
-CG_INLINE NSData *_Nullable CYLBundleImageData(NSString *_Nullable folderReferenceName,
-                                               NSString *bundleName,
-                                               NSString *_Nullable subfolderPath,
-                                               NSString *fileName) {
-    NSString *path = CYLBundleImagePath(folderReferenceName, bundleName, subfolderPath, fileName);
-    return path ? [NSData dataWithContentsOfFile:path] : nil;
-}
+FOUNDATION_EXTERN NSData *_Nullable CYLBundleImageData(NSString *_Nullable folderReferenceName, NSString *_Nullable bundleName, NSString *_Nullable subfolderPath, NSString *_Nullable fileName);
 
 /*!
  * [EN] An image decoded from a bundle file's data, with the scale its name gives ("@2x", "@3x"; 1 otherwise).
  * [CN] 由 bundle 中文件数据解码的图片，scale 取自文件名（"@2x"、"@3x"，否则为 1）。
  */
-CG_INLINE UIImage *_Nullable CYLBundleImageFromData(NSString *_Nullable folderReferenceName,
-                                                    NSString *bundleName,
-                                                    NSString *_Nullable subfolderPath,
-                                                    NSString *fileName) {
-    NSData *data = CYLBundleImageData(folderReferenceName, bundleName, subfolderPath, fileName);
-    if (!data) {
-        return nil;
-    }
-    NSString *baseName = fileName.stringByDeletingPathExtension;
-    CGFloat scale = [baseName hasSuffix:@"@3x"] ? 3.0 : ([baseName hasSuffix:@"@2x"] ? 2.0 : 1.0);
-    return [UIImage imageWithData:data scale:scale];
-}
+FOUNDATION_EXTERN UIImage *_Nullable CYLBundleImageFromData(NSString *_Nullable folderReferenceName, NSString *_Nullable bundleName, NSString *_Nullable subfolderPath, NSString *_Nullable fileName);
+
+#endif
 
 NS_ASSUME_NONNULL_END
