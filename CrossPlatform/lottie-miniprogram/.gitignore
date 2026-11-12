@@ -1,0 +1,5 @@
+node_modules
+miniprogram_dev
+dist
+.DS_Store
+._*

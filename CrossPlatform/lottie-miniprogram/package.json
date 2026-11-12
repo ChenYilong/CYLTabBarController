@@ -1,0 +1,40 @@
+{
+  "name": "cyl-lottie-miniprogram",
+  "version": "1.0.12",
+  "description": "lottie for miniprogram",
+  "main": "miniprogram_dist/index.js",
+  "scripts": {
+    "dev": "webpack --mode=development",
+    "build": "webpack --mode=production",
+    "lint": "eslint \"src/**/*.js\""
+  },
+  "miniprogram": "miniprogram_dist",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wechat-miniprogram/lottie-miniprogram.git"
+  },
+  "keywords": [
+    "lottie",
+    "miniprogram"
+  ],
+  "author": "wechat-miniprogram",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/wechat-miniprogram/lottie-miniprogram/issues"
+  },
+  "homepage": "https://github.com/wechat-miniprogram/lottie-miniprogram#readme",
+  "devDependencies": {
+    "@babel/core": "^7.5.5",
+    "@babel/plugin-proposal-class-properties": "^7.5.5",
+    "@babel/preset-env": "^7.5.5",
+    "babel-eslint": "^10.0.2",
+    "babel-loader": "^8.0.6",
+    "eslint": "^6.1.0",
+    "eslint-loader": "^2.2.1",
+    "string-replace-loader": "^2.2.0",
+    "webpack": "^4.39.1",
+    "webpack-cli": "^3.3.6",
+    "lottie-web": "^5.7.4",
+    "copy-webpack-plugin": "^6.0.3"
+  }
+}
