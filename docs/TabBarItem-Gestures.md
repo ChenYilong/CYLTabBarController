@@ -36,6 +36,7 @@
 | [液态玻璃下的手势](#cn液态玻璃下的手势) | [Gestures in Liquid Glass](#engestures-in-liquid-glass) |
 | [注意事项](#cn注意事项) | [Notes](#ennotes) |
 | [测试与截图](#cn测试与截图) | [Testing and screenshots](#entesting-and-screenshots) |
+| [任务记录](#任务记录--task-log) | [Task log](#任务记录--task-log) |
 
 <!-- navigation:end -->
 
@@ -272,3 +273,9 @@ tabBarController.cyl_tabBarItemGestureHandler = { _, gesture, control, viewContr
 ![Tab gestures on iOS 26](assets/tabbaritem-gestures-ios.png)
 
 ![Double tap refreshes: iOS 26.1 Liquid Glass (top), iOS 17.5 classic (bottom)](assets/tabbaritem-double-tap-refresh-ios.png)
+
+## 任务记录 / Task log
+
+| 中文 | English |
+|:---|:---|
+| TODO（2026-11-12，保留液态玻璃 Tab 长按；#781 报告的卡死待验证）：用户提示词：「This commit disables long press on Liquid Glass tab buttons, 废弃该分支，直接close不要合并。我想保留long press on Liquid Glass tab buttons, 功能」。上下文：PR #781（`024ffc5`）为修复卡死而关闭液态玻璃下 Tab 按钮的长按；维护者决定保留长按，#781 的合并已撤销（`cad569e`）。#781 报告的问题：设置了 `didLongPressControl` 监听时，长按后在系统抬起动画中把系统手势 `enabled = NO` 再 `YES`，可能打乱系统的选择状态机，用系统手势切换 Tab 先卡顿后卡死，控制台输出 `cannot handle … to 0 from … - dropping`（`-cyl_scheduleLiquidGlassLongPressForPress:`）。待做：在保留长按的前提下复现并修复（例如不再切换系统手势的 `enabled`，改用其他方式阻止抬起后选中）。验证：iOS 26+ 液态玻璃，设置 `didLongPressControl` 后多次长按、再用系统手势拖动切换 Tab，不卡顿、无该日志。 | TODO (2026-11-12, keep the Liquid Glass tab long press; #781's freeze to verify): user prompt: "This commit disables long press on Liquid Glass tab buttons, 废弃该分支，直接close不要合并。我想保留long press on Liquid Glass tab buttons, 功能". Context: PR #781 (`024ffc5`) turned the tab buttons' long press off on Liquid Glass to fix a freeze; the maintainer keeps the long press, so the #781 merge is reverted (`cad569e`). #781's report: with a `didLongPressControl` listener, after a long press UIKit's gesture is set `enabled = NO` then `YES` during its lift animation, which may break UIKit's selection state machine: switching tabs by the system gesture stutters, then freezes, with `cannot handle … to 0 from … - dropping` in the console (`-cyl_scheduleLiquidGlassLongPressForPress:`). To do: reproduce and fix it while keeping the long press (e.g. stop toggling the system gesture's `enabled` and keep the tab unselected some other way). Verify: iOS 26+ Liquid Glass, with `didLongPressControl` set, several long presses, then switching tabs by dragging: no stutter and no such log. |
