@@ -206,6 +206,7 @@ docs/
 │   ├── flutter-rive-android-bar.png
 │   ├── flutter-rive-ios-bar.png
 │   ├── flutter-search-plus-title-missing-when-selected-ios.png
+│   ├── flutter-viewpager2-fix-android-bar.png
 │   ├── gif-classic.png
 │   ├── gif-flat-design.png
 │   ├── gif-liquid-glass.png
