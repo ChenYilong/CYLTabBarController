@@ -8,17 +8,16 @@
 import UIKit
 
 /**
- * [EN] Seam (docs/Swift-Migration.md): the tab item keys, the same strings as `CYLTabBarItemTitle` … of
- *      `CYLTabBarController.h`, which are still Objective-C constants the Swift layer cannot see. Removed when
- *      `CYLTabBarController`'s constants move to Swift.
+ * [EN] Short names for the tab item keys (`CYLTabBarItemTitle` …, now Swift constants in `CYLConstants+Keys.swift`; a seam
+ *      with copied strings until they moved, docs/Swift-Migration.md).
  * [CN] 接缝（docs/Swift-Migration.md）：TabBarItem 的 key，与 `CYLTabBarController.h` 中的 `CYLTabBarItemTitle` … 字符串相同；这些常量
  *      仍是 Swift 层看不到的 Objective-C 常量。`CYLTabBarController` 的常量迁移到 Swift 后删除。
  */
 enum CYLLocalizationItemKeys {
-    static let title = "CYLTabBarItemTitle"
-    static let image = "CYLTabBarItemImage"
-    static let selectedImage = "CYLTabBarItemSelectedImage"
-    static let darkImage = "CYLTabBarItemDarkImage"
+    static let title = CYLTabBarItemTitle
+    static let image = CYLTabBarItemImage
+    static let selectedImage = CYLTabBarItemSelectedImage
+    static let darkImage = CYLTabBarItemDarkImage
 }
 
 /**

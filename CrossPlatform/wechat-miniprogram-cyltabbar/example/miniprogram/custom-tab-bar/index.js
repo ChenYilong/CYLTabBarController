@@ -47,7 +47,13 @@ Component({
      * [CN] 把 App 的 TabBar 状态应用到本实例。
      */
     cyl_apply(state) {
-      this.setData({ configuration: cylDemoConfiguration(state.overrides), loggedIn: state.loggedIn }, () => {
+      this.setData({
+        configuration: cylDemoConfiguration(state.overrides),
+        loggedIn: state.loggedIn,
+        itemStyle: state.itemStyle || '',
+        animationSpeed: state.animationSpeed || 1,
+        animationLoop: Boolean(state.animationLoop),
+      }, () => {
         const tabBar = this.selectComponent('#cyl-tab-bar');
         if (!tabBar) {
           return;

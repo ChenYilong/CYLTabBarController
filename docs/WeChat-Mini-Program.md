@@ -73,7 +73,7 @@
 | `CYLTabBarLottieURL`、`CYLTabBarLottieDarkURL` | ✅ 通过 / through `cyl-lottie-miniprogram`；文件名在 / file names under `animationBasePath` 下（01–04） |
 | `CYLTabBarLottieDarkColors` | ✅ 加载前换色 / recolored before loading（`cyl-lottie` `colors`，12） |
 | `CYLTabBarAnimation…`（通用动画键 / generic animation keys） | ✅ `.json` 用 Lottie，`.gif` 用 `<image>` / `.json` plays with Lottie, `.gif` in `<image>`; `.pag` 用 `cyl-pag`，`.riv` 用 `cyl-rive` / `.pag` plays in `cyl-pag`, `.riv` in `cyl-rive`（测试 / test） |
-| `CYLTabBarPAG…` | ✅ `cyl-pag`（libpag-lite：只播放单个 BMP 序列帧的 PAG 文件，开发者工具的视频解码器不出帧，需真机验证 / libpag-lite plays only PAG files made of one BMP sequence; the DevTools video decoder yields no frame, a device check is TODO） |
+| `CYLTabBarPAG…` | ✅ `cyl-pag`（完整 libpag-miniprogram 4.5.85，WebAssembly + WebGL，播放 iOS 示例的矢量 Tab 图标，开发者工具已验证（19、20），真机待验证 / the full libpag-miniprogram 4.5.85, WebAssembly + WebGL, plays the iOS example's vector tab icons, checked in DevTools (19, 20); a device check is TODO） |
 | `CYLTabBarRive…` | ✅ `cyl-rive`（`@rive-app/canvas-advanced` 2.39.1 + WXWebAssembly，画板 / 状态机 / 输入 / 颜色；18；每个 Tab 页面都有自己的 TabBar，加载期间的播放请求在就绪后执行（实测：就绪后 73 ms `active` = true，1 秒后 false）；icons.riv 是白色线条，示例的 Rive 模式与 iOS Rive 示例一样使用深色皮肤 / artboard, state machine, input, colors; screenshot 18; every tab page has its own tab bar, so a play request made while the file loads runs once it is ready (measured: `active` true 73 ms after ready, false 1 s later); icons.riv is white strokes, so the example's Rive mode picks the dark skin, as the iOS Rive examples run in dark mode） |
 | `CYLTabBarGIF…` | ✅ 选中时显示 GIF / the GIF shows while the tab is selected（测试 / test） |
 | `CYLTabBarAnimationOptions` | ✅ 与路径的 URL fragment 合并后传给 `cyl-rive` / merged into the path's URL fragment and passed to `cyl-rive`（测试 / test） |
@@ -99,9 +99,10 @@
 
 | 中文 | English |
 |:---|:---|
-| 见右列。 | **Packages** (relative-path dependencies, no registry): `CrossPlatform/wechat-miniprogram-cyltabbar` is the package **`cyl-tabbar-miniprogram`** (`src/cyl-tab-bar`), which depends on **`cyl-lottie-miniprogram`** (`CrossPlatform/lottie-miniprogram`, the `cyl-lottie` component and the lottie library) through `"cyl-lottie-miniprogram": "file:../lottie-miniprogram"`, plus **`cyl-pag-miniprogram`** (`../pag-miniprogram`) and **`cyl-rive-miniprogram`** (`../rive-miniprogram`). A mini program code package leaves out `.pag` and `.riv` files, so the example's copies are named `*.pag.bin` and `icons.riv.bin`; it cannot read files under `miniprogram_npm` either, so the installer also copies Rive's WebAssembly (`cylMiniprogramAssets` in the package's `package.json`) to `miniprogram/cyl-rive-miniprogram/rive.wasm.br`, `cyl-rive`'s default `wasmPath`. Its example, `wechat-miniprogram-cyltabbar/example`, depends only on `"cyl-tabbar-miniprogram": "file:.."`. |
-| | **Run the example**: `cd CrossPlatform/wechat-miniprogram-cyltabbar/example && npm run setup` (Node only, no network: `scripts/cyl_install_components.js` copies every `file:` dependency and its own `file:` dependencies into `miniprogram/miniprogram_npm`, the layout of DevTools' "Build npm", so `cyl-lottie-miniprogram` comes in as the sub-dependency of `cyl-tabbar-miniprogram`; then `scripts/cyl_sync_shared.js` copies the shared configuration, localization tables, skin images and Lottie icons into `miniprogram/shared`). Import `example/` in WeChat DevTools (`project.config.json`, AppID `wx5e29c9d33906f074`) and compile. npm itself is not used because it links `file:` dependencies with symbolic links, which an exFAT drive cannot hold, and `--install-links` resolves nested relative paths from the wrong folder. On macOS, allow DevTools to access files on a removable volume when the repository is on an external drive. `npm run check` fails when `miniprogram_npm` or `shared` is out of date. |
-| | **Use the component**: `"tabBar": {"custom": true, "list": […]}` in `app.json`; in `custom-tab-bar/index.json`, `"cyl-tab-bar": "cyl-tabbar-miniprogram/cyl-tab-bar/index"`; in its WXML, `<cyl-tab-bar configuration="{{configuration}}" selected-identifier="{{selected}}" animation-base-path="/shared/lottie" bind:select="onSelect" />`, and `wx.switchTab` in `onSelect`. Every tab page has its own `custom-tab-bar` instance, so the example keeps badges, skin and overrides in `App`, each instance follows them, and the page that appears calls `cyl_playLottie()`. Full API: [cyl-tabbar-miniprogram API](#encyl-tabbar-miniprogram-api). |
+| 见右列。 | **Packages** (relative-path dependencies, no registry): `CrossPlatform/wechat-miniprogram-cyltabbar` is the package **`cyl-tabbar-miniprogram`** (`src/cyl-tab-bar`, `src/cyl-tab-bar-item`, `src/cyl-animation-placeholder`) and **depends on no animation library**. Animated tab icons come from four optional packages, one per library, so the 2 MB main code package holds only the runtime an app uses: **`cyl-lottie-miniprogram`** (`CrossPlatform/lottie-miniprogram`, `cyl-lottie`), **`cyl-pag-miniprogram`** (`../pag-miniprogram`, `cyl-pag`, full libpag), **`cyl-rive-miniprogram`** (`../rive-miniprogram`, `cyl-rive`) and **`cyl-gif-miniprogram`** (`../gif-miniprogram`: no component, GIF plays in `<image>`; it holds the GIF icons). `cyl-tab-bar` and `cyl-tab-bar-item` take the components through abstract nodes (`componentGenerics`: `cyl-lottie-view`, `cyl-pag-view`, `cyl-rive-view`, defaulting to `cyl-animation-placeholder`, an empty view that emits `error`); `cyl-tab-bar` forwards them to every item. Each animation package lists its sample icons in `cylExampleResources` of its `package.json` (folder, source folder in this repository, files) and its WebAssembly in `cylMiniprogramAssets`. A mini program code package leaves out `.pag` and `.riv` files, so the copies end in `.bin`; it cannot read files under `miniprogram_npm`, so the installer copies each WebAssembly to `miniprogram/<package>/` (`/cyl-rive-miniprogram/rive.wasm.br`, `/cyl-pag-miniprogram/libpag.wasm.br`) and leaves it out of `miniprogram_npm`. |
+| | **Run the example**: `cd CrossPlatform/wechat-miniprogram-cyltabbar/example && npm run setup` (Node only, no network) installs `cyl-tabbar-miniprogram` and **one** animation package, Lottie by default (`cylExampleAnimation` in its `package.json`); choose another with `npm run setup -- --animation=pag` (`lottie`, `pag`, `rive`, `gif`, remembered in `.cyl-animation`). `scripts/cyl_install_components.js` copies the packages into `miniprogram/miniprogram_npm` (the layout of DevTools' "Build npm"), removes the others, and points the animation tags of `custom-tab-bar/index.json` and `pages/lottie/index.json` at the chosen component (the placeholder for the rest); `scripts/cyl_sync_shared.js` copies the shared configuration, localization tables, skin images and the chosen package's icons into `miniprogram/shared` (the animation folders and `animations.js` are generated, not committed). The Me page lists the installed animation and Images. Measured code package (all files): Lottie 0.45 MB, PAG 1.20 MB, Rive 0.85 MB, GIF 0.33 MB (2.25 MB with Lottie, PAG and Rive together). Import `example/` in WeChat DevTools (`project.config.json`, AppID `wx5e29c9d33906f074`) and compile. npm itself is not used because it links `file:` dependencies with symbolic links, which an exFAT drive cannot hold. On macOS, allow DevTools to access files on a removable volume when the repository is on an external drive. `npm run check` fails when `miniprogram_npm`, the page files or `shared` are out of date. |
+| | **Use the component**: `"tabBar": {"custom": true, "list": […]}` in `app.json`; in `custom-tab-bar/index.json`, `"cyl-tab-bar": "cyl-tabbar-miniprogram/cyl-tab-bar/index"` plus the animation component you installed (e.g. `"cyl-lottie": "cyl-lottie-miniprogram/cyl-lottie/index"`); in its WXML, `<cyl-tab-bar generic:cyl-lottie-view="cyl-lottie" configuration="{{configuration}}" selected-identifier="{{selected}}" animation-base-path="/shared/lottie" bind:select="onSelect" />`, and `wx.switchTab` in `onSelect`. Every tab page has its own `custom-tab-bar` instance, so the example keeps badges, skin and overrides in `App`, each instance follows them, and the page that appears calls `cyl_playLottie()`. Full API: [cyl-tabbar-miniprogram API](#encyl-tabbar-miniprogram-api). |
+| | **Drive it in DevTools**: `source CrossPlatform/wechat-miniprogram-cyltabbar/example/scripts/cyl_devtools.sh` (outside a sandbox; DevTools' service port on, `wechatide` authorized for client "Claude"), then `cyl_refresh`, `cyl_state "{overrides:{cylDemoIcons:'rive'}}"`, `cyl_tap discover`, `cyl_shot <name>` (to `docs/assets`), `cyl_playback <tab>` (taps the tab and prints the selected icon's frames, or the Rive `active` input, every 100 ms). |
 | | **Tests**: `cd CrossPlatform/wechat-miniprogram-cyltabbar && npm test` (configuration reader and `cyl-tab-bar-item`, 15 / 15); `cd CrossPlatform/rive-miniprogram && npm install && npm run build && npm test` (Rive options, 3 / 3); `cd CrossPlatform/lottie-miniprogram && npm install && npm run build && npm test` (lottie library and `cyl-lottie` colors, 12 / 12). |
 
 ## [CN]cyl-tabbar-miniprogram API
@@ -109,7 +110,7 @@
 
 | 中文 | English |
 |:---|:---|
-| 见右列。 | Score of the component API: every property, event and method of `cyl-tab-bar` (package `cyl-tabbar-miniprogram`) and of its sub-dependency `cyl-lottie` (package `cyl-lottie-miniprogram`), checked in the example in WeChat DevTools (screenshot number below, or a check made through the agent skill `wechatide`'s `automation_evaluate` and its result) or in the Node tests. Score = 100 × verified / total: **100 / 100** (42 of 42). |
+| 见右列。 | Score of the component API: every property, event and method of `cyl-tab-bar` (package `cyl-tabbar-miniprogram`) and of its sub-dependency `cyl-lottie` (package `cyl-lottie-miniprogram`), checked in the example in WeChat DevTools (screenshot number below, or a check made through the agent skill `wechatide`'s `automation_evaluate` and its result) or in the Node tests. Score = 100 × verified / total: **100 / 100** (48 of 48). |
 
 | API | 类型 / Kind | 验证 / Verified |
 |:---|:---|:---|
@@ -136,6 +137,12 @@
 | `cyl_swipe_behavior.js` | behavior | ✅ 07（`cyl_onSwipeStart` / `cyl_onSwipeEnd`） |
 | 无障碍 / accessibility | `aria-*` | ✅ evaluate：`tablist`；每个 Tab 为 `tab`，标签含角标 / each tab a `tab`, label with its badge（"Discover, 3"），`aria-selected`；PlusButton 为 / is a `button` |
 | 点击动画 / tap animation | `CYLTabBarControllerTabButtonTapAnimation` | ✅ evaluate：`bounce`，400 ms |
+| `CYLTabBarItemStyle`（`flat`、`liquidGlass`） | 枚举 / enum | ✅ 测试 / test `cyl_tab_bar_item_style.test.js`；`cyl-tab-bar` 与 `cyl-tab-bar-item` 共用 / shared by both（`require('cyl-tabbar-miniprogram/cyl-tab-bar/cyl_tab_bar_item_style')`） |
+| `itemStyle`（`cyl-tab-bar`、`cyl-tab-bar-item`） | 属性 / property | ✅ evaluate：`liquidGlass` → TabBar `cylStyleType` liquidGlass，Item `cylItemStyle` liquidGlass（25、26）；为空时由 / empty: from `CYLTabBarControllerStyleType` |
+| `cyl_setItemStyle` | 方法 / method | ✅ Me → Item style 切换 flat / liquidGlass / switches flat / liquidGlass（25、26） |
+| `cyl_playAll`、`animationSpeed`、`animationLoop`（`cyl_setAnimationSpeed`、`cyl_setAnimationLoop`） | 方法、属性 / methods, properties | ✅ evaluate：2× 循环时四个 Lottie 图标同时从第 0 帧开始，每 0.6 s 重复；关闭循环后停止 / at 2× with loop the four Lottie icons start at frame 0 together and repeat every 0.6 s; loop off stops them（33） |
+| `cyl-pag` `speed`、`cyl-rive` `speed`、`loop` | 属性 / properties | ✅ evaluate：PAG 时长 1.83 s → 2× 时 0.92 s；Rive 2× 循环：active 0.5 s，关闭 0.2 s 后再次打开 / PAG duration 1.83 s → 0.92 s at 2×; Rive at 2× with loop: active 0.5 s, on again 0.2 s after off |
+| `cyl-lottie-view`、`cyl-pag-view`、`cyl-rive-view` | 抽象节点 / abstract nodes | ✅ evaluate：每个 Tab 的动画组件为所传组件 / each tab's animation component is the one passed（cyl-lottie / cyl-pag / cyl-rive，21–23）；未传时为 `cyl-animation-placeholder` / the placeholder when none is passed |
 | `cyl-lottie` `path` | 属性 / property | ✅ 包内文件 / package file（01、11），用户数据目录 / user data folder（13） |
 | `cyl-lottie` `animationData` | 属性 / property | ✅ 测试 / test |
 | `cyl-lottie` `loop` | 属性 / property | ✅ 11（`loopcomplete`） |
@@ -154,7 +161,7 @@
 | `cyl-lottie` `cyl_playSegments` | 方法 / method | ✅ 透传 / passes through to lottie-web `playSegments` |
 | `cyl-lottie` `cyl_setSpeed` | 方法 / method | ✅ 12 |
 | `cyl-lottie` `cyl_animation` | 方法 / method | ✅ evaluate（读取 / read `currentFrame`、`totalFrames`） |
-| 依赖 / dependency | `cyl-tabbar-miniprogram` → `cyl-lottie-miniprogram` | ✅ `cyl_install_components.js` 只依赖前者也会安装后者 / installs the second from the first alone |
+| 依赖 / dependency | 动画包可选 / animation packages optional | ✅ `cyl-tabbar-miniprogram` 不依赖动画库；示例只安装所选的一个 / depends on no animation library; the example installs the chosen one only（21–24） |
 
 ## [CN]cyl-tab-bar-item 与 CYLFlatDesignTabBarItem
 ## [EN]cyl-tab-bar-item and CYLFlatDesignTabBarItem
@@ -205,7 +212,8 @@
 |:---|:---|
 | 见右列。 | **RiveViewer-miniapp** (`CrossPlatform/RiveViewer-miniapp`, its README searched for Lottie and Rive): in the mini program it previews `.riv` files only; Lottie and PAG are supported only by its H5 / JOJO web version (README lines 255–260), and its mini program code (`utils`, `components`, `pages`) has no Lottie or PAG player. Its own code is licensed PolyForm-Noncommercial-1.0.0, which this MIT project cannot include; only the MIT Rive runtime it ships (`@rive-app/canvas-advanced` 2.39.1 with its WASM) and its approach can be reused. **Not usable as is** for Lottie, PAG and Rive icons, so every step is done separately: Lottie (`cyl-lottie-miniprogram`), PAG, Rive. |
 | | **How RiveViewer-miniapp shows Rive** (README, architecture): a `<canvas type="2d">`, the full `@rive-app/canvas-advanced` runtime adapted to the WeChat environment, and its WASM loaded with `WXWebAssembly` from Brotli files in the package (`vendor/rive`: `canvas_advanced.js`, `rive.wasm.br`, `rive_fallback.wasm.br`, about 573 KB each); WebGL2 failed on phones, so the mini program stays on Canvas 2D. |
-| | **libpag-lite-miniprogram** (Tencent/libpag `web/lite`, npm 0.0.6, 64 KB of JavaScript, WebGL, no WebAssembly): it plays only PAG files made of **one BMP video sequence** and decodes them with `wx.createVideoDecoder`. Checked on all 44 PAG files of `Example-Shared/PAGResources`: the 4 iOS tab icons (`tab-icons/tab_home.pag`, `tab_health.pag`, `tab_me.pag`, `tab_moments.pag`) are vector files ("PAGFile has no BMP video sequence!"), so the lite library cannot play them; `pag-android/2J.pag` (60 KB, MIT) is one BMP sequence and is the example's PAG file. Vector PAG icons need the full `libpag-miniprogram` (WebAssembly, 4.6 MB unpacked). |
+| | **libpag-lite-miniprogram** (replaced on 2026-11-13 by the full libpag-miniprogram 4.5.85, which plays vector files) (Tencent/libpag `web/lite`, npm 0.0.6, 64 KB of JavaScript, WebGL, no WebAssembly): it plays only PAG files made of **one BMP video sequence** and decodes them with `wx.createVideoDecoder`. Checked on all 44 PAG files of `Example-Shared/PAGResources`: the 4 iOS tab icons (`tab-icons/tab_home.pag`, `tab_health.pag`, `tab_me.pag`, `tab_moments.pag`) are vector files ("PAGFile has no BMP video sequence!"), so the lite library cannot play them; `pag-android/2J.pag` (60 KB, MIT) is one BMP sequence and is the example's PAG file. Vector PAG icons need the full `libpag-miniprogram` (WebAssembly, 4.6 MB unpacked). |
+| | **Lottie: one engine with PAG and Rive, or its own? (2026-11-13)** RiveViewer-miniapp has no Lottie player in the mini program (its Lottie support is the H5 version only) and the Rive runtime cannot read Lottie JSON, so Lottie cannot share the Rive engine. Measured in DevTools: lottie-web (light canvas, 210 KB of JavaScript, no WebAssembly) draws a tab icon frame in about 0.03 ms, against Rive's 573 KB WebAssembly; rendering is correct (the home icon fills gray → green over frames 0 → 29, as on iOS). The weak tap effect was not the engine but the page model: every tab page has its own tab bar, so the tapped bar played nothing and the new page's bar started 100–300 ms late, half over. **Decision: fuse.** Keep the three engines (best fit and size for each file type) behind one item component (`cyl-tab-bar-item`) and one playback driver shared by all three: the tapped bar selects and plays at once, records the start time, and the new page's bar continues from it (`cyl_playFromStart(offset)` in `cyl-lottie`, `cyl-pag`, `cyl-rive`). Measured: playback starts 60–100 ms after the tap on the tapped bar; the new bar picks up at the same frame (8 / 9), Rive `active` on at 102 ms, off at 1.1 s. |
 
 ## [CN]Example 截图
 ## [EN]Example screenshots
@@ -340,6 +348,223 @@
 
 </details>
 
+<details>
+<summary>19. PAG 图标（iOS PAG 示例的 tab_home、tab_moments、tab_health、tab_me，完整 libpag 4.5.85，选中 Home）/ PAG icons (the iOS PAG example's tab_home, tab_moments, tab_health, tab_me on the full libpag 4.5.85, Home selected). WeChat Mini Program, WeChat DevTools simulator (iPhone, macOS 27.3), base library 3.17.6, branch feat/cross-platform-components after c895b11, 2026-11-13 12:44 (UTC+13)</summary>
+
+![WeChat Mini Program, PAG tab icons on the full libpag, Home selected](assets/wechat-miniprogram-api-19-pag-home.png)
+
+</details>
+
+<details>
+<summary>20. PAG 图标，点击 Me 后播放结束停在最后一帧 / PAG icons after tapping Me: the animation ends on its last frame. Same environment as 19</summary>
+
+![WeChat Mini Program, PAG tab icons after tapping Me](assets/wechat-miniprogram-api-20-pag-me.png)
+
+</details>
+
+<details>
+<summary>21. 只安装 Lottie 包（默认），选中 Messages / Only the Lottie package installed (the default), Messages selected. WeChat Mini Program, WeChat DevTools simulator (iPhone, macOS 27.3), base library 3.17.6, branch feat/cross-platform-components after d52b146, 2026-11-13 14:0x (UTC+13)</summary>
+
+![Only the Lottie package installed (the default), Messages selected](assets/wechat-miniprogram-api-21-split-lottie.png)
+
+</details>
+
+<details>
+<summary>22. 只安装 PAG 包，选中 Messages / Only the PAG package installed, Messages selected. WeChat Mini Program, WeChat DevTools simulator (iPhone, macOS 27.3), base library 3.17.6, branch feat/cross-platform-components after d52b146, 2026-11-13 14:0x (UTC+13)</summary>
+
+![Only the PAG package installed, Messages selected](assets/wechat-miniprogram-api-22-split-pag.png)
+
+</details>
+
+<details>
+<summary>23. 只安装 Rive 包：Me 页面只列出 Rive 与 Images / Only the Rive package installed: the Me page lists Rive and Images only. WeChat Mini Program, WeChat DevTools simulator (iPhone, macOS 27.3), base library 3.17.6, branch feat/cross-platform-components after d52b146, 2026-11-13 14:0x (UTC+13)</summary>
+
+![Only the Rive package installed: the Me page lists Rive and Images only](assets/wechat-miniprogram-api-23-split-rive-me.png)
+
+</details>
+
+<details>
+<summary>24. 只安装 GIF 包：选中的 Messages 显示星星 GIF，Discover 作为普通图片循环播放火焰 GIF / Only the GIF package installed: the selected Messages shows the star GIF, Discover loops the fire GIF as a plain image. WeChat Mini Program, WeChat DevTools simulator (iPhone, macOS 27.3), base library 3.17.6, branch feat/cross-platform-components after d52b146, 2026-11-13 14:0x (UTC+13)</summary>
+
+![Only the GIF package installed: the selected Messages shows the star GIF, Discover loops the fire GIF as a plain image](assets/wechat-miniprogram-api-24-split-gif.png)
+
+</details>
+
+<details>
+<summary>25. CYLTabBarItemStyle liquidGlass，浅色：悬浮玻璃胶囊，选中的 Home 位于玻璃透镜上 / CYLTabBarItemStyle liquidGlass, light: the floating glass capsule, the selected Home on its glass lens. WeChat Mini Program, WeChat DevTools simulator (iPhone, macOS 27.3), base library 3.17.6, branch feat/cross-platform-components after 33aa7bf (retaken with the lens fix), 2026-11-13 14:41 (UTC+13)</summary>
+
+![CYLTabBarItemStyle liquidGlass, light](assets/wechat-miniprogram-api-25-glass-light.png)
+
+</details>
+
+<details>
+<summary>26. CYLTabBarItemStyle liquidGlass，深色皮肤，选中 Discover / CYLTabBarItemStyle liquidGlass, dark skin, Discover selected. Same environment as 25</summary>
+
+![CYLTabBarItemStyle liquidGlass, dark skin](assets/wechat-miniprogram-api-26-glass-dark.png)
+
+</details>
+
+<details>
+<summary>31. Bug：液态玻璃透镜间距不对（维护者截图）/ Bug: the Liquid Glass lens spacing is wrong (the maintainer's screenshot). WeChat Mini Program, WeChat DevTools simulator (iPhone, macOS 27.3), base library 3.17.6, commit e1e9c04, 2026-11-13 14:28 (UTC+13)</summary>
+
+![Bug: the Liquid Glass lens spacing is wrong](assets/wechat-miniprogram-api-31-bug-lens-spacing.png)
+
+</details>
+
+<details>
+<summary>32. 修复后：透镜占满选中位置，TabBar 距两侧与底边 21 pt，与 iOS 示例一致 / Fixed: the lens fills the selected slot, the bar 21 pt from the sides and the bottom, as in the iOS example. WeChat Mini Program, WeChat DevTools simulator (iPhone, macOS 27.3), base library 3.17.6, branch feat/cross-platform-components after 33aa7bf, 2026-11-13 14:41 (UTC+13)</summary>
+
+![Fixed: the lens fills the selected slot, as in the iOS example](assets/wechat-miniprogram-api-32-fix-lens-spacing.png)
+
+</details>
+
+<details>
+<summary>33. 播放控件：全部播放、速度滑块（1.5×）、循环开关（Me 页面，Lottie 图标播放中）/ Playback controls: Play all, speed slider (1.5×), loop switch (Me page, the Lottie icons playing). WeChat Mini Program, WeChat DevTools simulator (iPhone, macOS 27.3), base library 3.17.6, branch feat/cross-platform-components after b571a64, 2026-11-13 14:50 (UTC+13)</summary>
+
+![Playback controls: Play all, speed slider, loop switch](assets/wechat-miniprogram-api-33-playback-controls-lottie.png)
+
+</details>
+
+<details>
+<summary>34. 修复前（维护者截图）：深色液态玻璃 TabBar / Before (the maintainer's screenshot): the dark Liquid Glass bar. WeChat DevTools, 2026-11-13</summary>
+
+![Before: the dark Liquid Glass bar](assets/wechat-miniprogram-api-34-plus-before-dark.jpg)
+
+</details>
+
+<details>
+<summary>35. 选中 PlusButton（液态玻璃，浅色）：PlusButton 位置的透镜与选中 Tab 的透镜相同，与 iOS 一致 / Plus button selected (Liquid Glass, light): the plus slot gets the same lens as a selected tab, as on iOS. WeChat Mini Program, WeChat DevTools simulator (iPhone, macOS 27.3), base library 3.17.6, branch feat/cross-platform-components after 0910a3d, 2026-11-13 15:01 (UTC+13)</summary>
+
+![Plus button selected (Liquid Glass, light): the plus slot gets the same lens as a selected tab, as on iOS](assets/wechat-miniprogram-api-35-plus-selected-liquidGlass.png)
+
+</details>
+
+<details>
+<summary>35. 选中 PlusButton（液态玻璃，深色） / Plus button selected (Liquid Glass, dark). WeChat Mini Program, WeChat DevTools simulator (iPhone, macOS 27.3), base library 3.17.6, branch feat/cross-platform-components after 0910a3d, 2026-11-13 15:01 (UTC+13)</summary>
+
+![Plus button selected (Liquid Glass, dark)](assets/wechat-miniprogram-api-35-plus-selected-liquidGlass-dark.png)
+
+</details>
+
+<details>
+<summary>35. 选中 PlusButton（默认样式）：没有选中背景，与 iOS 一致 / Plus button selected (default style): no selection background, as on iOS. WeChat Mini Program, WeChat DevTools simulator (iPhone, macOS 27.3), base library 3.17.6, branch feat/cross-platform-components after 0910a3d, 2026-11-13 15:01 (UTC+13)</summary>
+
+![Plus button selected (default style): no selection background, as on iOS](assets/wechat-miniprogram-api-35-plus-selected-default.png)
+
+</details>
+
+<details>
+<summary>36. Bug（维护者截图）：默认样式下选中 PlusButton 出现玻璃背景 / Bug (the maintainer's screenshot): a glass background under the selected plus button in the default style. WeChat DevTools, 2026-11-13</summary>
+
+![Bug: a glass background under the selected plus button in the default style](assets/wechat-miniprogram-api-36-bug-flat-plus-glass.jpg)
+
+</details>
+
+<details>
+<summary>37. FlatDesign，选中 Discover：只有选中图片与标题颜色 / FlatDesign, Discover selected: only the selected image and title color. WeChat Mini Program, WeChat DevTools simulator (iPhone, macOS 27.3), base library 3.17.6, branch feat/cross-platform-components after eecc9f6, 2026-11-13 15:06–15:09 (UTC+13)</summary>
+
+![FlatDesign, Discover selected: only the selected image and title color](assets/wechat-miniprogram-api-37-flatDesign-tab.png)
+
+</details>
+
+<details>
+<summary>37. FlatDesign，选中 PlusButton：没有背景 / FlatDesign, plus button selected: no background. WeChat Mini Program, WeChat DevTools simulator (iPhone, macOS 27.3), base library 3.17.6, branch feat/cross-platform-components after eecc9f6, 2026-11-13 15:06–15:09 (UTC+13)</summary>
+
+![FlatDesign, plus button selected: no background](assets/wechat-miniprogram-api-37-flatDesign-plus.png)
+
+</details>
+
+<details>
+<summary>37. 默认样式，选中 Discover / Default style, Discover selected. WeChat Mini Program, WeChat DevTools simulator (iPhone, macOS 27.3), base library 3.17.6, branch feat/cross-platform-components after eecc9f6, 2026-11-13 15:06–15:09 (UTC+13)</summary>
+
+![Default style, Discover selected](assets/wechat-miniprogram-api-37-default-tab.png)
+
+</details>
+
+<details>
+<summary>37. 默认样式，选中 PlusButton：没有背景 / Default style, plus button selected: no background. WeChat Mini Program, WeChat DevTools simulator (iPhone, macOS 27.3), base library 3.17.6, branch feat/cross-platform-components after eecc9f6, 2026-11-13 15:06–15:09 (UTC+13)</summary>
+
+![Default style, plus button selected: no background](assets/wechat-miniprogram-api-37-default-plus.png)
+
+</details>
+
+<details>
+<summary>37. 液态玻璃，选中 Discover：Tab 透镜 / Liquid Glass, Discover selected: the tab lens. WeChat Mini Program, WeChat DevTools simulator (iPhone, macOS 27.3), base library 3.17.6, branch feat/cross-platform-components after eecc9f6, 2026-11-13 15:06–15:09 (UTC+13)</summary>
+
+![Liquid Glass, Discover selected: the tab lens](assets/wechat-miniprogram-api-37-default-liquidGlass-tab.png)
+
+</details>
+
+<details>
+<summary>37. 液态玻璃，选中 PlusButton：PlusButton 透镜 / Liquid Glass, plus button selected: the plus lens. WeChat Mini Program, WeChat DevTools simulator (iPhone, macOS 27.3), base library 3.17.6, branch feat/cross-platform-components after eecc9f6, 2026-11-13 15:06–15:09 (UTC+13)</summary>
+
+![Liquid Glass, plus button selected: the plus lens](assets/wechat-miniprogram-api-37-default-liquidGlass-plus.png)
+
+</details>
+
+<details>
+<summary>38. 参考（维护者截图）：画廊 TabBar 中选中 Feed 的玻璃透镜 / Reference (the maintainer's screenshot): the glass lens of the selected Feed in the gallery bar. WeChat DevTools, 2026-11-13</summary>
+
+![Reference: the glass lens of a selected tab](assets/wechat-miniprogram-api-38-tab-lens-reference.jpg)
+
+</details>
+
+<details>
+<summary>39. cyl-glass-lens：选中 Discover / cyl-glass-lens: Discover selected. WeChat Mini Program, WeChat DevTools simulator (iPhone, macOS 27.3), base library 3.17.6, branch feat/cross-platform-components after 44e2a2b, 2026-11-13 15:16–15:18 (UTC+13)</summary>
+
+![cyl-glass-lens: Discover selected](assets/wechat-miniprogram-api-39-lens-tab.png)
+
+</details>
+
+<details>
+<summary>39. cyl-glass-lens：选中 PlusButton，与 Tab 透镜相同 / cyl-glass-lens: plus button selected, the same lens as a tab. WeChat Mini Program, WeChat DevTools simulator (iPhone, macOS 27.3), base library 3.17.6, branch feat/cross-platform-components after 44e2a2b, 2026-11-13 15:16–15:18 (UTC+13)</summary>
+
+![cyl-glass-lens: plus button selected, the same lens as a tab](assets/wechat-miniprogram-api-39-lens-plus.png)
+
+</details>
+
+<details>
+<summary>39. cyl-glass-lens：选中 Discover（深色） / cyl-glass-lens: Discover selected (dark). WeChat Mini Program, WeChat DevTools simulator (iPhone, macOS 27.3), base library 3.17.6, branch feat/cross-platform-components after 44e2a2b, 2026-11-13 15:16–15:18 (UTC+13)</summary>
+
+![cyl-glass-lens: Discover selected (dark)](assets/wechat-miniprogram-api-39-lens-tab-dark.png)
+
+</details>
+
+<details>
+<summary>39. cyl-glass-lens：选中 PlusButton（深色） / cyl-glass-lens: plus button selected (dark). WeChat Mini Program, WeChat DevTools simulator (iPhone, macOS 27.3), base library 3.17.6, branch feat/cross-platform-components after 44e2a2b, 2026-11-13 15:16–15:18 (UTC+13)</summary>
+
+![cyl-glass-lens: plus button selected (dark)](assets/wechat-miniprogram-api-39-lens-plus-dark.png)
+
+</details>
+
+<details>
+<summary>27. 液态玻璃画廊：打卡（参考 sports-checkin） / Liquid Glass gallery: Check-in (after sports-checkin). WeChat Mini Program, WeChat DevTools simulator (iPhone, macOS 27.3), base library 3.17.6, branch feat/cross-platform-components after e1e9c04, 2026-11-13 14:36 (UTC+13)</summary>
+
+![Liquid Glass gallery: Check-in (after sports-checkin)](assets/wechat-miniprogram-api-27-gallery-checkin.png)
+
+</details>
+
+<details>
+<summary>28. 画廊：导航栏、搜索框、标签与信息流（参考 chatnote） / Gallery: navigation bar, search box, tags and feed (after chatnote). WeChat Mini Program, WeChat DevTools simulator (iPhone, macOS 27.3), base library 3.17.6, branch feat/cross-platform-components after e1e9c04, 2026-11-13 14:36 (UTC+13)</summary>
+
+![Gallery: navigation bar, search box, tags and feed (after chatnote)](assets/wechat-miniprogram-api-28-gallery-feed.png)
+
+</details>
+
+<details>
+<summary>29. 画廊：两列集合视图 / Gallery: two-column collection view. WeChat Mini Program, WeChat DevTools simulator (iPhone, macOS 27.3), base library 3.17.6, branch feat/cross-platform-components after e1e9c04, 2026-11-13 14:36 (UTC+13)</summary>
+
+![Gallery: two-column collection view](assets/wechat-miniprogram-api-29-gallery-cards.png)
+
+</details>
+
+<details>
+<summary>30. 画廊：落地页（参考 mirror-landing）、核心点击动画与两种 Item 样式 / Gallery: landing (after mirror-landing), core tap animations and both item styles. WeChat Mini Program, WeChat DevTools simulator (iPhone, macOS 27.3), base library 3.17.6, branch feat/cross-platform-components after e1e9c04, 2026-11-13 14:36 (UTC+13)</summary>
+
+![Gallery: landing (after mirror-landing), core tap animations and both item styles](assets/wechat-miniprogram-api-30-gallery-landing.png)
+
+</details>
+
 ## [CN]截图（63 / 100 时）
 ## [EN]Screenshots (at 63 / 100)
 
@@ -450,3 +675,15 @@
 | 见右列。 | DONE (2026-11-13, Lottie component plan). User prompt, verbatim: "现在开始lottie 组件的开发计划： 详细步骤如下： 第一步： 将 文件夹名字为 CYLTabBarController/CrossPlatform/lottie-miniprogram  ， 合并  https://github.com/wechat-miniprogram/lottie-miniprogram/pulls 所有PR，到该文件夹将下的代码。 然后  在 [[CYLTabBarController/docs/WeChat-Mini-Program.md\|WeChat-Mini-Program]]  中为 https://github.com/wechat-miniprogram/lottie-miniprogram/issues 中的所有issue 列一个issues表格， 第一列为issue链接地址，第二列为issue描述，第三列为修复状况， 默认填写TODO。 表格填写结束后，开始尝试解决CYLTabBarController/CrossPlatform/lottie-miniprogram  里面代码的 issue， 等issue解决后，移除TODO。一直修复一直到满分为止。 第二步骤： 参考 CYLTabBarController/CrossPlatform/LottieWMC 这个项目的方式，将 CYLTabBarController/CrossPlatform/lottie-miniprogram  封装为一个组件 ，名字叫 cyl-lottie-miniprogram ， 提供给 我们的小程序 文件夹地址在 CYLTabBarController/CrossPlatform/wechat-miniprogram-cyltabbar 以一种合适的方式引用该组件， 最好是子组件的方式。 第三部还是模仿 ， CYLTabBarController/CrossPlatform/LottieWMC 这个项目的方式，将  cyl-tabbar-miniprogram 也封装为一个组件，然后在  CYLTabBarController/CrossPlatform/wechat-miniprogram-cyltabbar 中创建 Example中使用 cyl-tabbar-miniprogram 组件 。 期望的效果是 当Example 依赖cyl-tabbar-miniprogram ， 也会自动依赖  cyl-lottie-miniprogram，因为  cyl-lottie-miniprogram 是cyl-tabbar-miniprogram的子依赖项。 你可以考虑使用相对路径依赖的方式进行组件管理。 第四步骤， 在 [[CYLTabBarController/docs/WeChat-Mini-Program.md\|WeChat-Mini-Program]]  中完成对 cyl-tabbar-miniprogram 组件的api的  评分。 并使用 Example 进行截图测试， 所有截图都保存在 [[CYLTabBarController/docs/WeChat-Mini-Program.md\|WeChat-Mini-Program]]  文档中， 每一张都保存。默认折叠这些截图， 尊许本项目的截图规则， 参考instructions相关文件截图要求。  并在合适的时候，选择一个合适的截图， 选择展开该截图。 不停测试， 一直到 [[CYLTabBarController/docs/WeChat-Mini-Program.md\|WeChat-Mini-Program]] 中的表格满分为止。" In English: (1) in `CrossPlatform/lottie-miniprogram` (a copy of wechat-miniprogram/lottie-miniprogram), merge every open pull request of the upstream; list every upstream issue in a table here (link, description, status `TODO`), fix them in our copy and remove each `TODO` when fixed, until 100. (2) Like `CrossPlatform/LottieWMC`, wrap it as a component, `cyl-lottie-miniprogram`, used by `CrossPlatform/wechat-miniprogram-cyltabbar` (preferably as a child component). (3) Wrap the tab bar as a component, `cyl-tabbar-miniprogram`, the same way, with an Example in `wechat-miniprogram-cyltabbar` that depends on it, so that `cyl-lottie-miniprogram` comes in as its sub-dependency (relative-path dependencies are fine). (4) Score the `cyl-tabbar-miniprogram` API here, test with the Example and keep every screenshot in this document, collapsed by default (project screenshot rules), one suitable screenshot expanded; keep testing until the tables here reach 100. |
 | 见右列。 | 2026-11-13 result of the Lottie component plan: (1) `CrossPlatform/lottie-miniprogram` imported at upstream 49066a6 ([`54646c5`](https://github.com/ChenYilong/CYLTabBarController/commit/54646c5)), its 3 open pull requests merged ([`1c857ac`](https://github.com/ChenYilong/CYLTabBarController/commit/1c857ac)), all 55 issues resolved ([lottie-miniprogram issues](#enlottie-miniprogram-issues), 100 / 100); (2) the `cyl-lottie` component in package `cyl-lottie-miniprogram`; (3) package `cyl-tabbar-miniprogram` with its example, which installs `cyl-lottie-miniprogram` as a sub-dependency ([`8bb5e82`](https://github.com/ChenYilong/CYLTabBarController/commit/8bb5e82)); (4) [the API score](#encyl-tabbar-miniprogram-api) 100 / 100 and the key score 100 / 100, 15 screenshots ([`69ae5b1`](https://github.com/ChenYilong/CYLTabBarController/commit/69ae5b1)). Bugs found while testing in the simulator and fixed: `context.canvas` is not the canvas node in the DevTools (#31), the DevTools user data folder is an `http://usr` URL. |
 | 见右列。 | DONE (2026-11-13, layout, animated item component, PAG, Rive): four tabs like iOS ([`0cb54fe`](https://github.com/ChenYilong/CYLTabBarController/commit/0cb54fe)); `cyl-tab-bar-item` with the CYLFlatDesignTabBarItem table at 100 ([`e0d2e76`](https://github.com/ChenYilong/CYLTabBarController/commit/e0d2e76)); PAG through `cyl-pag-miniprogram` ([`81dd8d4`](https://github.com/ChenYilong/CYLTabBarController/commit/81dd8d4)); Rive through `cyl-rive-miniprogram` (screenshot 18, tests 3 / 3 and 15 / 15). Open: PAG frames on a real device. Original entry: TODO (2026-11-13, layout, animated item component, PAG, Rive). User prompt, verbatim: "继续。排查按钮为什么是三个tabbar item 一个PlusButton，而非iOS端的Example的结构， 四个tabbar item 一个PlusButton，是不是ui布局异常， 如果是异常的话修复，如果不是异常，请更新到和iOS端一样的布局。  完成lottie 动画集成后，请先对比 同时 请评估， 如果 需要先参考 CYLTabBarController/CrossPlatform/RiveViewer-miniapp/README.md 先在  [[CYLTabBarController/CrossPlatform/RiveViewer-miniapp/README.md\|README]]  里搜索lottie ， 对比两个方案的差别，评估直接使用  直接使用CYLTabBarController/CrossPlatform/RiveViewer-miniapp 该项目用来展示 lottie pag rive icon的可行性。 如果不可行就继续下面的操作， 如果可行， 直接学习 提取动画播放组件后，进行下面的封装步骤， 跳过pag与rive的单独集成步骤。 如果不可行， 完整执行下面的步骤：   Example需要的资源在iOS端里找  。 复制一份， 或者本地相对路径依赖。 需要封装一个动画 icon 和title 的组件。 参考iOS端里面扁平样式      tabbaritem 的封装逻辑 。    封装的视图， 也做一个表格， 放进 。 [[CYLTabBarController/docs/WeChat-Mini-Program.md\|WeChat-Mini-Program]]  ， 对比 iOS端里面扁平样式      tabbaritem 的封装API 与    小程序 里我们的对应封装的接口， 制作表格， 第一列是iOS端iOS端里面扁平样式      tabbaritem 的封装API  API 名， 第二列是上面提到的小程序的 封装一个动画 icon 和title 的组件。默认天TODO。  完全一致就是满分， 否则一直修复到满分为止。并通过上面已经集成好的lottie动画，来验证该组件可行性。 封装好之后开始集成 集成 PAG 动效。   集成 PAG 动效， 使用的https://github.com/Tencent/libpag/   里面的 libpag-lite-miniprogram库。 同样创建Example 展示 pag动画。 同样本项目iOS端也有。  完成PAG集成后， 开始集成， Rive动画。 集成过程中， 需要先参考 CYLTabBarController/CrossPlatform/RiveViewer-miniapp/README.md 先搜索 rive 关键词， 找到Rive在小程序上展示的基本原理， 然后基于他的代码， 改造刚刚我们提到的封装好的动画组件， 以支持Rive动画icon， 模仿上面对lottie和pag的要求， 处理Rive ，以及Rive的Example。" In English: (1) find out why the example shows three tabs and a plus button instead of the iOS example's four tabs and a plus button; fix it if it is a layout bug, otherwise match the iOS layout; (2) compare RiveViewer-miniapp (search its README for Lottie) and judge whether it can show Lottie, PAG and Rive icons directly; if not, do all the following steps; (3) a component for an animated icon and a title, modeled on the iOS FlatDesign tab bar item, with a table here comparing the iOS API (column 1) with ours (column 2, TODO by default) until it matches (100), verified with the Lottie icons; (4) PAG icons with libpag-lite-miniprogram of Tencent/libpag, with an example (the iOS side has one); (5) Rive icons, based on how RiveViewer-miniapp shows Rive in a mini program, in the same component, with an example. Resources come from the iOS side (copied or by relative path). |
+| 见右列。 | DONE (2026-11-13, code layout and tab icon playback): (1) Playback: on a tab page's first visit, its own tab bar asks the still-loading icon to play; cyl-lottie dropped the request and showed the selected icon on its last frame. It now keeps the request ([`b439873`](https://github.com/ChenYilong/CYLTabBarController/commit/b439873); cyl-pag and cyl-rive the same in [`6698cc9`](https://github.com/ChenYilong/CYLTabBarController/commit/6698cc9)). Measured with `cyl_playback`: Discover and Message play frames 0 → 29 in 1.1 s on first and second visits (before: jumped to 29); Rive `active` true 73 ms after load, false 1 s later. (2) Layout: the four packages (`wechat-miniprogram-cyltabbar`, `lottie-miniprogram`, `pag-miniprogram`, `rive-miniprogram`) were already in `CrossPlatform/`; the DevTools driver used during testing moved in as `example/scripts/cyl_devtools.sh`; the temporary smoke-test project was removed. Not removed: the maintainer's untracked reference projects `CrossPlatform/LottieWMC` and `CrossPlatform/RiveViewer-miniapp` (not part of the repository; the Obsidian CLI did not respond, so no shell deletion). Original entry: TODO (2026-11-13, code layout and tab icon playback). User prompt, verbatim: "整理代码结构， 将上面我们已经使用的小程序代码， 全部放在CYLTabBarController/CrossPlatform 文件夹下管理， 无关的代码可以移除。 依稀调试动画播放细节， 现在点击icon后的动画播放效果很差， 基本没有动画效果。 禁忌你在你在me中提供的preview push到该页面后，这个页面内部的动画效果是符合预期的。tabbaritem里的播放效果差" English: organize the code: keep all the mini program code we use under CrossPlatform, remove unrelated code; debug the playback: tapping a tab icon shows almost no animation, while the playground page pushed from Me plays as expected. |
+| 见右列。 | DONE (2026-11-13, see the next entry). Original entry: TODO (bug, 2026-11-13): **PAG tab icons do not show** when Me → Tab icons → PAG is chosen. Checked commit [`81dd8d4`](https://github.com/ChenYilong/CYLTabBarController/commit/81dd8d4): it ships the player (`cyl-pag`, libpag-lite 0.0.6) and the example's PAG mode, but **no PAG file**: the repository does not distribute PAG files, `miniprogram/shared/pag/` is in `.gitignore`, and `scripts/cyl_sync_shared.js` copies `pag-android/2J.pag` only after `python3 scripts/fetch-animation-resources.py PAGResources` (a fresh clone shows the toast "Run the PAG download first"). With the file present (59 KB `2J.pag.bin`), WeChat DevTools' video decoder returns no frame (`getFrame 0`), so the icon stays blank. Remaining: (1) check on a real phone; (2) `2J.pag` is a full animation, not a tab icon, and the iOS tab icons (`tab-icons/*.pag`) are vector PAG files that libpag-lite cannot play: real PAG tab icons need the full `libpag-miniprogram` (WebAssembly, 4.6 MB unpacked, beyond the 2 MB main package: a subpackage or remote WASM); (3) decide whether the example ships a small PAG file of its own. |
+| 见右列。 | DONE (2026-11-13, Lottie playback evaluation, PAG check). User prompt, verbatim: "尤其是lottie，播放效果很差。 考虑 三个动画共用一个组件， lottie 之前是单独实现的， 并没和pag rive 一样使用 CYLTabBarController/CrossPlatform/RiveViewer-miniapp 。 评估lottie 也把代码改统一。 或者你评估哪一个效果好。或者两个实现都保留， 供用户自由选择。 或者两个方案融合。 以运行效果， 以及性能表现好，为准则。 在Me 中选择tab icons 为 PAG 时， 无法显示图标。 请标注为bug TODO 请排查commit 81dd8d4 PAG icons 是否正确提供" English: Lottie plays badly; evaluate one shared component for the three animations, keeping both implementations, or fusing them, judged by playback and performance; mark the PAG icons not showing as a bug TODO; check whether commit 81dd8d4 provides the PAG icons. Result: see "Lottie: one engine with PAG and Rive, or its own?" in the Animation approach evaluation (fused: three engines, one item component, one shared playback driver) and the PAG bug TODO above. |
+| 见右列。 | DONE (2026-11-13, PAG tab icons on full libpag): `cyl-pag` runs on the full **libpag-miniprogram 4.5.85** (August 2026; the newest 4.4.76, 6 days old, fails in `PAGInit` with "UnboundTypeError: Cannot call VectorString.push_back due to unbound types" in DevTools). The example shows the four vector tab icons of the iOS PAG example (home → `tab_home`, message → `tab_moments`, discover → `tab_health`, me → `tab_me`), screenshots 19 and 20. Measured with a playback probe in DevTools: tapping Message, the tapped bar is at 6 % after 151 ms, the new page's bar continues (24 % at 457 ms) to 100 % at 1.85 s (duration 1.83 s), then stops; Me: 36 % at 447 ms, 100 % at 1.24 s (duration 1.17 s). The installer no longer copies `cylMiniprogramAssets` into `miniprogram_npm` (a second copy of each WebAssembly, unreadable there): the example's files went from 3.36 MB to 2.25 MB. Open: a real device check; the main package is still above 2 MB, see the package split task below. Tests: `npm test` 15 / 15. Original entry: TODO (2026-11-13, PAG tab icons on full libpag). User prompt, verbatim: "continue 阅读docs里小程序相关文档，以及最新小程序相关提交继续TODO任务。" English: read the mini program docs and the latest mini program commits, and continue the TODO tasks. Context: the code layout and playback task is DONE (`b439873`, `5cf9723`, `7f2a184`); the open TODO is the PAG bug above. Plan: `cyl-pag` moves from libpag-lite (BMP sequences only) to the full `libpag-miniprogram` 4.4.76 (Apache-2.0, WebAssembly + WebGL: 337 KB of JavaScript plus a 590 KB Brotli WASM, not 4.6 MB, which counted the source map and the raw WASM), so the vector iOS tab icons (`tab-icons/tab_home.pag`, `tab_moments.pag`, `tab_health.pag`, `tab_me.pag`) play; the WASM is copied to `miniprogram/cyl-pag-miniprogram/` like Rive's; check in WeChat DevTools with `cyl_playback` and a screenshot. |
+| 见右列。 | DONE (2026-11-13, one package per animation library): `cyl-tabbar-miniprogram` depends on no animation library; `cyl-tab-bar-item` and `cyl-tab-bar` take `cyl-lottie-view`, `cyl-pag-view` and `cyl-rive-view` as abstract nodes (default `cyl-animation-placeholder`), checked in DevTools: each tab's animation component is the one passed. Four packages: `cyl-lottie-miniprogram`, `cyl-pag-miniprogram`, `cyl-rive-miniprogram` and the new `cyl-gif-miniprogram` (no component: GIF plays in `<image>`; it holds the GIF icons); each lists its icons in `cylExampleResources`. The example installs one, Lottie by default (`npm run setup -- --animation=pag`), copies only its icons, and its Me page lists only it and Images. Measured code package: Lottie 0.45 MB, PAG 1.20 MB, Rive 0.85 MB, GIF 0.33 MB, against 2.25 MB with all three runtimes; screenshots 21–24; `npm test` 15 / 15, `npm run check` passes. Open: the first compile after switching packages logged "Component is not found in path wx://not-found" once in DevTools (gone after a second compile); with Rive installed by default the light skin made its white icons faint (fixed 2026-11-13: the example starts on the dark skin when the Rive package is installed); a real device check. Original entry: TODO (2026-11-13, one package per animation library). User prompt, verbatim: "包大小限制问题可以通过将不同的代码拆分为子组件的方式，比如动效可以拆分为四个包gif lottie pag live分别一个包，供用户在集成式自由选择，我们的example也可以用这种方式保留一种动效，同时比如资源文件也应该打到对应的子组件中。进一步缩小包体积。" English: solve the package size limit by splitting the code into sub-components: one package per animation (GIF, Lottie, PAG, Rive), which integrators choose freely; the example keeps one animation the same way; resource files also go into the matching sub-component, to shrink the package further. Context: after the PAG fix the example is 2.25 MB, above the 2 MB main package (Lottie 0.21 MB, PAG 0.93 MB, Rive 0.67 MB of it). Plan: (1) `cyl-tabbar-miniprogram` no longer depends on the animation packages: `cyl-tab-bar-item` gets abstract nodes (`componentGenerics`: `cyl-lottie-view`, `cyl-pag-view`, `cyl-rive-view`, `cyl-gif-view`, each defaulting to an empty view) which `cyl-tab-bar` forwards, and the app names the component it installed (`generic:cyl-lottie-view="cyl-lottie"`); (2) a fourth package `cyl-gif-miniprogram` for GIF icons; (3) each package carries its sample icons; (4) the example installs one animation package, chosen at setup (`npm run setup -- --animation=lottie`, default Lottie), and the Me page lists only the installed one; (5) measure the package per choice, check each in DevTools with a screenshot. |
+| 见右列。 | DONE (2026-11-13, Liquid Glass tab bar item and style enum): (1) licenses: chatnote-miniprogram and sports-checkin-miniprogram state MIT in their READMEs (no LICENSE file), mirror-landing has none; only their design ideas were used, no code copied. (2) Core ([`e1e9c04`](https://github.com/ChenYilong/CYLTabBarController/commit/e1e9c04)): `CYLTabBarItemStyle` (`flat`, `liquidGlass`) shared by `cyl-tab-bar` and `cyl-tab-bar-item`; the lens lives in `cyl-tab-bar-item`; `cyl-tab-bar` takes `item-style` at initialization (else from `CYLTabBarControllerStyleType`) and `cyl_setItemStyle()` at run time; screenshots 25, 26; tests 16 / 16. (3) Example: `pages/glass`, the Liquid Glass gallery, opened from the Message tab, with a custom navigation bar, a search box, a feed list, two collection grids and a landing panel, switched by the core `cyl-tab-bar` (`item-style="liquidGlass"`, no glass code for the bar in the example); the reference animations (fade up, slide up, scale in, floating blobs) are rewritten there, next to the core tap animations and both item styles; data from `/data/*.json`; screenshots 27–30. Checked in DevTools: tapping the gallery bar switches the panel (`feed`), the style switch turns bar and items to `flat`. Open: lens spacing bug, see the next entry. Original entry: TODO (2026-11-13, Liquid Glass tab bar item and style enum). User prompt, verbatim: "为小程序相关文档添加todo项目：当前的样式定义为扁平样式，再增加液态玻璃与扁平风格样式之间的切换逻辑。定义枚举用于初始化时指定样式。参考：https://github.com/tyfuser/chatnote-miniprogram  https://github.com/1994Umbrella/mirror-landing  与 https://github.com/Akenaiai/sports-checkin-miniprogram  里面的UI设计思路完成液态玻璃样式的代码实现，完成液态玻璃tabbar的代码实现。优先将液态玻璃代码封装到我们已经实现好的 icon加title的组合中。禁止在example层实现液态玻璃。Core 层现有代码已经实现了扁平样式的tabbaritem仅需封装现有样式为扁平样式，并封装一个枚举以定义扁平样式与液态玻璃样式。再在整个tabbar初始化时候使用相同的枚举，为tabbaritem 指定样式。tabbaritem与tabbar 复用同一个枚举定义。并将以上的GitHub链接里的项目提取关键UI 尤其是液态玻璃样式的页面追加不同页面到我们的小程序主example中，采用不同tabbaritem的点击切换的方式展示。如果以上GitHub里面有任何动效相关的代码，也提取出来作为我们封装好的动效组件的示例追加到合适页面展示。我们现在的example还缺少导航栏以及搜索框以及feed tableview collectionview相关的页面展示，如果这些项目中有相关页面是使用我提到的可以提取页面进入我们的example中。数据层，可以优先使用本地固化的json文件用来进行数据展示。then continue" English: the current item style is flat; add switching between Liquid Glass and flat, with an enum that sets the style at initialization. Following the UI ideas of tyfuser/chatnote-miniprogram, 1994Umbrella/mirror-landing and Akenaiai/sports-checkin-miniprogram, implement the Liquid Glass style and the Liquid Glass tab bar, preferably inside our icon + title component (`cyl-tab-bar-item`); never implement Liquid Glass in the example layer. The core already draws a flat item: wrap it as the flat style and define one enum for flat and Liquid Glass, used both by `cyl-tab-bar-item` and by `cyl-tab-bar` at initialization (the bar gives its items the style); item and bar share the same enum. Add the key UI of those projects, above all their Liquid Glass pages, as separate pages of the main example, reached by tapping different tab items; any animation code in them becomes an example of our animation components on a fitting page. The example still lacks navigation bar, search box, feed (table view) and collection view pages: bring in such pages from these projects when they have them. Data: local fixed JSON files first. Plan: (1) read the three repositories and their licenses (copy code only when the license allows; otherwise reimplement the design); (2) `CYL_TAB_BAR_ITEM_STYLES` enum in the core (`flat`, `liquidGlass`), `itemStyle` on `cyl-tab-bar-item`, `cyl-tab-bar` passes it from `CYLTabBarControllerStyleType`; (3) Liquid Glass CSS in `cyl-tab-bar-item` (frosted lens, highlight, press animation) and the glass bar in `cyl-tab-bar`; (4) example pages from the references: navigation bar + search, feed list, collection grid, glass showcase, with local JSON; (5) tests, DevTools screenshots, score. |
+| 见右列。 | DONE (bug, 2026-11-13, Liquid Glass lens spacing): the item fills the bar's height and the lens fills its slot, 5 px from the top and bottom, neutral gray with a faint top highlight and no colored edge (`cyl-tab-bar-item`); the capsule sits 21 px from the screen sides and from the bottom edge, inside the safe area, with the tabs 4 px inside it (`cyl-tab-bar`). Measured in DevTools (390 x 753 pt window, safe area 34): bar 21 / 21 pt from the sides, 21 pt from the bottom, 62 high; lens 67.6 x 52 pt, 5 pt inside the bar on the left and top (iOS: 73 x 52 pt on a 402 pt screen, the same share of the slot, about 4 pt inside). Screenshots: [32](assets/wechat-miniprogram-api-32-fix-lens-spacing.png) (fixed), 25, 26 and 28 retaken with the fix; 31 keeps the bug. Tests 16 / 16. Original entry: TODO (bug, 2026-11-13, Liquid Glass lens spacing). User prompt, verbatim: "在docs相关文档中找到，找到小程序文档 写入英文TODO并带上截图，描述bug，玻璃遮罩，也就是选中后的 tabbaritem上面的 小玻璃效果。 间距有问题。请像素级对比iOS example ，对比效果 修复 布局问题。continue" English: write an English TODO with a screenshot in the mini program document describing the bug: the glass lens, the small glass effect on the selected tab item, has wrong spacing; compare pixel by pixel with the iOS example and fix the layout. Screenshot: [31](assets/wechat-miniprogram-api-31-bug-lens-spacing.png) (the maintainer's, CYLTabBarItemStyle liquidGlass, Home selected). Measured against the iOS example ([plus-button-titles-fit-liquid-glass-ios.png](assets/plus-button-titles-fit-liquid-glass-ios.png), iPhone, 3x) in points: iOS lens about 73 x 52 pt, about 4 pt inside the bar on top, bottom and left, as wide as the tab slot, flat neutral gray, no colored edge; mini program lens 61 x 36 pt, a fixed 64 px width, 3 px inside an item shorter than the bar, so it floats at mid height with large gaps above and below; white with a pink / blue iridescent edge. Bar: iOS 21 pt from the screen sides and 21 pt from the bottom edge, 61 pt high; mini program 15 pt from the sides, 41 pt from the bottom (8 px + the safe area), 62 px high. Fix plan: the item fills the bar height; the lens fills the slot with 4 px insets; neutral iOS colors; the bar 21 px from the sides and from the bottom edge (inside the safe area as on iOS). |
+| 见右列。 | DONE (2026-11-13, plus button selected, against iOS): compared with the iOS screenshots of the selected plus button on Liquid Glass ([plusbutton-background-image-liquid-glass-selected.png](assets/plusbutton-background-image-liquid-glass-selected.png), [liquid-glass-robustness-plus-stand-in-ios.png](assets/liquid-glass-robustness-plus-stand-in-ios.png)): on iOS the plus slot gets the same lens as a selected tab (whole slot, full bar height inside the capsule, neutral gray), the raised button stays above it with its normal image, its title takes the selected color; `CYLPlusButtonShowsSelection` shows that selection on Liquid Glass only. Two differences fixed in `cyl-tab-bar`: (1) the mini program drew a narrower gray shape (8 px in from the sides, 4 px from top and bottom, 51.6 x 54) and it stood out from the tab lens; it is now the tab lens: 67.6 x 52 at y 676 in a 62 px bar, exactly the measurements of a selected tab's lens, same colors (dark too) and spring; (2) it also showed in the default style, where iOS shows none; now only on Liquid Glass. Screenshots 35 (Liquid Glass light, dark, default). Tests 16 / 16. Original entry: TODO (2026-11-13, plus button selected, against iOS). User prompt, verbatim: "在小程序上测试点击plus button后的显示效果图并对比 iOS端效果，如果效果有差异，修复到和iOS端一致" English: test on the mini program what the tab bar looks like after tapping the plus button, compare with iOS, and fix any difference to match iOS. Context: the maintainer attached the gallery bar and the dark Liquid Glass bar ([34](assets/wechat-miniprogram-api-34-plus-before-dark.jpg)); the example's plus button has its own page (`CYLPlusButtonShowsSelection`). Plan: screenshot the plus button selected in the mini program (classic, Liquid Glass light and dark), compare with the iOS screenshots of the selected plus button (`docs/PlusButton.md`, `plusbutton-background-image-liquid-glass-selected.png`), list each difference and fix it in the core. |
+| 见右列。 | DONE (bug, 2026-11-13, flat style shows no selection background): the selection background follows CYLTabBarItemStyle only: flat (the default and flatDesign styles) shows the selected state by the selected image or tint and the title color, with no lens and no pill (the FlatDesign pill was removed from `cyl-tab-bar`, like iOS CYLFlatDesignTabBar); liquidGlass shows the lens under a selected tab and, with `CYLPlusButtonShowsSelection`, under the selected plus button (the look the maintainer wants on Liquid Glass, see the follow-up prompt below). Checked in DevTools after a fresh compile for each style, Discover then the plus button selected: flatDesign: no tab lens, no plus lens; default: no tab lens, no plus lens; liquidGlass: tab lens on Discover, plus lens on the plus page. Screenshots 37. Tests 16 / 16. Follow-up prompt, verbatim: "备注我在液态玻璃样式上确实想要的是选中后plusbutton 展示此种样式，你需要将你刚刚的逻辑，移植到液态玻璃样式中。并移除扁平样式选中后plus button的背景液态玻璃效果。continue" English: on Liquid Glass I do want the selected plus button to show this look: move that logic into the Liquid Glass style, and remove the glass background behind the selected plus button in the flat style. (Done by the same change.) Original entry: TODO (bug, 2026-11-13, flat style shows no selection background). User prompt, verbatim: "以上截图为错误使用样式，tabbar初始化如果是指定扁平样式 则忽略选中后的玻璃效果样式。扁平样式更新的选中状态是icon对应的选中图片或者是修改icon的tintcolor渲染后的效果。只在tabbar初始化如果是指定液态玻璃效果时候，才考虑plus button的液态玻璃遮罩添加逻辑。模仿iOS端实现" English: the screenshot ([36](assets/wechat-miniprogram-api-36-bug-flat-plus-glass.jpg), default style, a gray glass shape under the selected plus button) uses the wrong style: when the tab bar is initialized with the flat style, the glass selection is ignored; the flat style shows the selected state only by the icon's selected image or its tint; only a tab bar initialized with Liquid Glass adds the plus button\'s glass lens, as on iOS. Checked: the plus part was fixed in `5a827b0` (the plus selection only with CYLTabBarItemStyle liquidGlass); still wrong: the `flatDesign` style draws a blue pill behind the selected tab, which iOS FlatDesign does not ([plusbutton-slot-flatdesign.png](assets/plusbutton-slot-flatdesign.png): only the selected image and title color change). Plan: remove that pill; check default, flatDesign and Liquid Glass with a tab and the plus button selected. |
+| 见右列。 | DONE (2026-11-13, one glass lens component for tabs and the plus button): new core component `cyl-glass-lens` (`src/cyl-glass-lens`): the lens's geometry (fills the slot, 5 px from top and bottom), tint with blur and saturation, top highlight, dark variant and spring live in this one component; `cyl-tab-bar-item` uses it for a selected tab and `cyl-tab-bar` for the selected plus button on Liquid Glass; the separate `.cyl-plus-selection` styles (which had no blur, so the plus lens looked flatter than the tab lens) are gone. Measured in DevTools, light and dark: plus lens 67.6 x 52 centered on its slot at (195.0, 702.0), tab lens (Discover) 67.6 x 52 centered on its slot at (262.6, 702.0): same size, same vertical center, both centered in their slot; the gallery bar's Feed lens 84.5 x 52 (a wider slot, 4 tabs). Screenshots 39 (tab, plus, light and dark), 28 retaken. Tests 16 / 16. Original entry: TODO (2026-11-13, one glass lens component for tabs and the plus button). User prompt, verbatim: "备注我在液态玻璃样式上确实想要的是选中后plusbutton 展示此种样式，你需要将你刚刚的逻辑，移植到液态玻璃样式中。并移除扁平样式选中后plus button的背景液态玻璃效果。continue 刚刚你的实现基本符合预期，但样式细节需要修复。请复用截图中选中普通tabbaritem后的玻璃遮罩组件，应用到 plus button 上，提供一致的UI显示效果。包括中心点位置，背景颜色 边框大小，间距大小。等细节保持一致" English: the implementation is close, but the details need fixing: reuse the glass lens of a selected tab item (screenshot [38](assets/wechat-miniprogram-api-38-tab-lens-reference.jpg), the gallery bar with Feed selected) for the plus button, so both look the same: center, background color, border, spacing. Plan: move the lens into its own core component `cyl-glass-lens` (one WXML and one WXSS: geometry, color, blur, highlight, spring), used by `cyl-tab-bar-item` for a selected tab and by `cyl-tab-bar` for the selected plus button on Liquid Glass; remove the separate `.cyl-plus-selection` styles; measure both lenses in DevTools (center, size, colors) and compare. |
+| 见右列。 | REVERTED (2026-11-13, white frosted lens): the white frosted lens ([`7e59e21`](https://github.com/ChenYilong/CYLTabBarController/commit/7e59e21)) is reverted at the maintainer's request. Prompt, verbatim: "撤回该修改，还是以这个效果为准" English: revert that change; the effect in this image ([41](assets/wechat-miniprogram-api-41-lens-keep-reference.jpg), the gallery bar with Feed selected) is the reference. `cyl-glass-lens` is back to the lens of [`b6d4d05`](https://github.com/ChenYilong/CYLTabBarController/commit/b6d4d05) (neutral tint rgba(120, 120, 128, 0.14) with blur and saturation, top highlight), shared by selected tabs and the plus button; screenshots 39 and 28 are back to that version. Original entry: TODO (2026-11-13, white frosted lens). User prompt, verbatim: "你确实复用组件后，保障了一致性，但复用的组件请替换为图片中的组件。同样保持一致性" English: reusing the component made them consistent, but replace the reused component with the one in the image ([40](assets/wechat-miniprogram-api-40-lens-white-reference.jpg), the gallery bar with Feed selected), keeping the consistency. Finding: the image shows the same `cyl-glass-lens`; measured inside (225, 221, 219) on a warm bar (229, 213, 197), lighter and neutral; on the white main bar the same lens reads gray, (231, 231, 233) on (247, 247, 250), the iOS look. Asked; the maintainer chose "white frosted everywhere": the lens becomes a white frosted lens with a soft rim and shadow, so it looks like the image on any bar (it no longer matches the gray lens of the iOS example). |
+| 见右列。 | TODO (2026-11-13, why the same lens looks different). User prompt, verbatim: "我怀疑在不同截图中用的不是一个cyl-glass-lens 因为圆角不同背景颜色也不同。请排查⚠️，如果用的一个为什么效果不同。排查参数是否有不同。请在cyl-glass-lens内部更新默认样式实现。达到我想要的效果。" English: I suspect the screenshots do not use the same cyl-glass-lens, because the corner radius and the background color differ ([gallery](assets/wechat-miniprogram-api-42-lens-question-gallery.png), [plus](assets/wechat-miniprogram-api-42-lens-question-plus.png)); investigate: if it is one component, why does it look different; check whether the parameters differ; update the default style inside cyl-glass-lens to get the look I want (the gallery lens of screenshot 41). Plan: in DevTools, read the component path, size, radius and computed styles of both lenses; explain each difference; make the default style independent of what is behind it, so it looks like screenshot 41 on any bar. |

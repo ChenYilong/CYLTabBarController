@@ -1,7 +1,13 @@
 <!-- [EN] The mini program's custom tab bar: the cyl-tab-bar component of the cyl-tabbar-miniprogram package (miniprogram_npm) with the example's configuration. [CN] 小程序的自定义 TabBar：cyl-tabbar-miniprogram 包（miniprogram_npm）中的 cyl-tab-bar 组件，带有示例配置。 -->
 <cyl-tab-bar
   id="cyl-tab-bar"
+  generic:cyl-lottie-view="cyl-lottie"
+  generic:cyl-pag-view="cyl-pag"
+  generic:cyl-rive-view="cyl-rive"
   configuration="{{configuration}}"
+  item-style="{{itemStyle}}"
+  animation-speed="{{animationSpeed}}"
+  animation-loop="{{animationLoop}}"
   strings="{{strings}}"
   symbols-by-theme="{{symbolsByTheme}}"
   animation-base-path="/shared/lottie"

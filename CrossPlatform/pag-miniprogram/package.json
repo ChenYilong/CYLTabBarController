@@ -1,7 +1,7 @@
 {
   "name": "cyl-pag-miniprogram",
   "version": "0.1.0",
-  "description": "PAG animations for WeChat Mini Program: the cyl-pag component on libpag-lite-miniprogram (Tencent/libpag web/lite 0.0.6, vendored)",
+  "description": "PAG animations for WeChat Mini Program: the cyl-pag component on libpag-miniprogram 4.5.85 (Tencent/libpag, full WebAssembly + WebGL build, vendored)",
   "license": "MIT",
   "author": "ChenYilong <luohanchenyilong@163.com>",
   "homepage": "https://github.com/ChenYilong/CYLTabBarController/tree/master/CrossPlatform/pag-miniprogram",
@@ -12,6 +12,13 @@
   },
   "keywords": ["miniprogram", "pag", "libpag", "CYLTabBarController"],
   "miniprogram": "miniprogram_dist",
-  "main": "miniprogram_dist/libpag/pag.js",
+  "main": "miniprogram_dist/libpag/libpag.js",
+  "cylMiniprogramAssets": ["miniprogram_dist/libpag/libpag.wasm.br"],
+  "cylExampleResources": {
+    "folder": "pag",
+    "source": "Example-Shared/PAGResources/tab-icons",
+    "files": ["tab_home.pag", "tab_moments.pag", "tab_health.pag", "tab_me.pag", "LICENSE.txt"],
+    "download": "python3 scripts/fetch-animation-resources.py PAGResources"
+  },
   "files": ["miniprogram_dist", "README.md", "LICENSE", "NOTICE"]
 }

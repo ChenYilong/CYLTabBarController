@@ -83,3 +83,33 @@
   border-radius: 5px;
   background-color: #ff3b30;
 }
+
+/*
+ * [EN] CYLTabBarItemStyle "flat": the rules above, unchanged (the item as it always was).
+ *      CYLTabBarItemStyle "liquidGlass": the selected item sits on a frosted glass lens, a translucent tint with blur
+ *      and saturation and an inner top highlight, sized and colored like the iOS lens. The lens
+ *      springs in when the tab becomes selected, and any glass item presses in on touch. Design ideas from
+ *      tyfuser/chatnote-miniprogram (layered glass tokens), Akenaiai/sports-checkin-miniprogram (spring easing
+ *      cubic-bezier(0.19, 1, 0.22, 1), scale-in); size and colors measured on the iOS example. No code copied.
+ * [CN] CYLTabBarItemStyle "flat"：上面的规则，不变（Item 原有的样子）。
+ *      CYLTabBarItemStyle "liquidGlass"：选中的 Item 位于磨砂玻璃透镜上：带模糊与饱和度的半透明底色、亮边、顶部内高光
+ *      ，尺寸与颜色与 iOS 透镜一致。Tab 被选中时透镜弹入，玻璃 Item 按下时内缩。设计思路来自
+ *      tyfuser/chatnote-miniprogram（分层玻璃变量）、Akenaiai/sports-checkin-miniprogram（弹性曲线
+ *      cubic-bezier(0.19, 1, 0.22, 1)、缩放进入）；尺寸与颜色按 iOS 示例测量。未复制代码。
+ */
+.cyl-item-style-liquidGlass {
+  position: relative;
+  transition: transform 0.35s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.cyl-item-style-liquidGlass.cyl-item-pressed {
+  transform: scale(0.92);
+}
+
+.cyl-item-style-liquidGlass .cyl-item-icon-box,
+.cyl-item-style-liquidGlass .cyl-item-title {
+  position: relative;
+  z-index: 1;
+}
+
+/* [EN] The lens itself: the cyl-glass-lens component. [CN] 透镜本身：cyl-glass-lens 组件。 */

@@ -1,8 +1,17 @@
 {
   "component": true,
   "usingComponents": {
-    "cyl-lottie": "cyl-lottie-miniprogram/cyl-lottie/index",
-    "cyl-pag": "cyl-pag-miniprogram/cyl-pag/index",
-    "cyl-rive": "cyl-rive-miniprogram/cyl-rive/index"
+    "cyl-glass-lens": "../cyl-glass-lens/index"
+  },
+  "componentGenerics": {
+    "cyl-lottie-view": {
+      "default": "../cyl-animation-placeholder/index"
+    },
+    "cyl-pag-view": {
+      "default": "../cyl-animation-placeholder/index"
+    },
+    "cyl-rive-view": {
+      "default": "../cyl-animation-placeholder/index"
+    }
   }
 }

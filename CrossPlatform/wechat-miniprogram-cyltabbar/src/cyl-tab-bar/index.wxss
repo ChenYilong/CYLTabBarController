@@ -67,15 +67,7 @@
 }
 
 /* [EN] CYLPlusButtonShowsSelection: a selection under the plus button while its page is selected. [CN] CYLPlusButtonShowsSelection：PlusButton 的页面被选中时，在其下方显示选中效果。 */
-.cyl-plus-selection {
-  position: absolute;
-  left: 8px;
-  right: 8px;
-  top: 4px;
-  bottom: 4px;
-  border-radius: 21px;
-  background-color: rgba(0, 0, 0, 0.06);
-}
+/* [EN] The plus button's selection on Liquid Glass is the cyl-glass-lens component, the same lens as a selected tab. [CN] 液态玻璃下 PlusButton 的选中效果为 cyl-glass-lens 组件，与选中 Tab 的透镜相同。 */
 
 .cyl-title {
   margin-top: 2px;
@@ -145,26 +137,32 @@
   position: relative;
 }
 
-/* [EN] FlatDesign: a flat bar without hairline; the selected tab sits in a rounded pill. [CN] FlatDesign：没有细线的扁平 TabBar；选中的 Tab 位于圆角胶囊中。 */
+/* [EN] FlatDesign: a flat bar without hairline. [CN] FlatDesign：没有细线的扁平 TabBar。 */
 .cyl-style-flatDesign {
   border-top: none;
   background-color: #ffffff;
   box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.06);
 }
 
-.cyl-style-flatDesign .cyl-selected:not(.cyl-plus-slot) .cyl-tab-item {
-  padding: 2px 14px;
-  border-radius: 18px;
-  background-color: rgba(0, 122, 255, 0.12);
-}
+/*
+ * [EN] Like iOS CYLFlatDesignTabBar, a selected tab gets no background: the flat item style (CYLTabBarItemStyle flat)
+ *      shows the selection only with the selected image or the tint of the icon and the title color.
+ * [CN] 与 iOS CYLFlatDesignTabBar 一致，选中的 Tab 没有背景：扁平 Item 样式（CYLTabBarItemStyle flat）只通过选中图片或
+ *      图标着色以及标题颜色表示选中。
+ */
 
 /* [EN] Liquid Glass: a floating translucent capsule; the selected tab shows a lens. [CN] 液态玻璃：悬浮的半透明胶囊；选中的 Tab 显示透镜。 */
 .cyl-style-liquidGlass {
-  left: 16px;
-  right: 16px;
-  bottom: calc(8px + env(safe-area-inset-bottom));
+  /* [EN] As the iOS example (measured in points on a 3x screenshot): 21 pt from the screen sides and from the bottom
+   *      edge (the bar sits inside the home indicator's safe area), 61 pt high, the tabs 4 pt inside the capsule.
+   * [CN] 与 iOS 示例一致（在 3x 截图上按 pt 测量）：距屏幕两侧与底边 21 pt（TabBar 位于 Home 指示条的安全区内），
+   *      高 61 pt，Tab 位于胶囊内 4 pt。 */
+  left: 21px;
+  right: 21px;
+  bottom: max(8px, calc(env(safe-area-inset-bottom) - 13px));
   height: 62px;
-  padding-bottom: 0;
+  box-sizing: border-box;
+  padding: 0 4px;
   border: 1rpx solid rgba(255, 255, 255, 0.6);
   border-radius: 31px;
   background-color: rgba(250, 250, 250, 0.72);
@@ -182,8 +180,10 @@
   height: 62px;
 }
 
-.cyl-style-liquidGlass .cyl-selected:not(.cyl-plus-slot) .cyl-tab-item {
-  padding: 4px 12px;
-  border-radius: 24px;
-  background-color: rgba(0, 0, 0, 0.06);
+/* [EN] The item fills its slot, so its lens can span the bar's height as on iOS. [CN] Item 填满其位置，透镜才能像 iOS 一样占满 TabBar 的高度。 */
+.cyl-style-liquidGlass .cyl-tab:not(.cyl-plus-slot) .cyl-tab-item {
+  width: 100%;
+  height: 100%;
 }
+
+/* [EN] The selected tab's lens is drawn by cyl-tab-bar-item (CYLTabBarItemStyle liquidGlass). [CN] 选中 Tab 的透镜由 cyl-tab-bar-item 绘制（CYLTabBarItemStyle liquidGlass）。 */

@@ -1,0 +1,120 @@
+/*
+ * [EN] The gallery pages' own look (backgrounds, cards, lists, grids). The tab bar and its Liquid Glass lens are not
+ *      styled here: they come from the core (CYLTabBarItemStyle liquidGlass). Ideas from sports-checkin-miniprogram
+ *      (purple-blue gradient, translucent cards, spring easing), chatnote-miniprogram (layered glass, pills, search) and
+ *      mirror-landing (floating blobs, iridescent mark); written anew, no code copied.
+ * [CN] 画廊页面自身的外观（背景、卡片、列表、网格）。TabBar 及其液态玻璃透镜不在这里定义：它们来自核心层
+ *      （CYLTabBarItemStyle liquidGlass）。思路来自 sports-checkin-miniprogram（紫蓝渐变、半透明卡片、弹性曲线）、
+ *      chatnote-miniprogram（分层玻璃、胶囊标签、搜索）与 mirror-landing（浮动光晕、虹彩标志）；重新编写，未复制代码。
+ */
+.cyl-glass-page {
+  position: relative;
+  min-height: 100vh;
+  overflow: hidden;
+  color: #ffffff;
+  background: linear-gradient(160deg, #667eea 0%, #764ba2 100%);
+}
+
+.cyl-glass-page-feed { background: linear-gradient(160deg, #0f2027 0%, #203a43 50%, #2c5364 100%); }
+.cyl-glass-page-cards { background: linear-gradient(160deg, #3a1c71 0%, #d76d77 60%, #ffaf7b 100%); }
+.cyl-glass-page-landing { background: #0b0b14; }
+
+/* [EN] Floating light blobs. [CN] 浮动光晕。 */
+.cyl-glass-blobs { position: absolute; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; }
+.cyl-glass-blob { position: absolute; width: 320px; height: 320px; border-radius: 50%; filter: blur(60px); opacity: 0.55; animation: cyl-glass-float 18s ease-in-out infinite; }
+.cyl-glass-blob-1 { top: -80px; left: -60px; background: #7f5af0; }
+.cyl-glass-blob-2 { top: 40%; right: -120px; background: #2cb67d; animation-delay: -6s; }
+.cyl-glass-blob-3 { bottom: -120px; left: 10%; background: #ff8906; animation-delay: -12s; }
+
+@keyframes cyl-glass-float {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(40px, -30px) scale(1.08); }
+  66% { transform: translate(-30px, 30px) scale(0.94); }
+}
+
+/* [EN] Entry animations: fade up, slide up, scale in, with spring easing. [CN] 进入动画：淡入上移、上滑、缩放进入，弹性曲线。 */
+.cyl-glass-fade-up { animation: cyl-glass-fade-up 0.7s ease-out both; }
+.cyl-glass-slide-up { animation: cyl-glass-slide-up 0.6s cubic-bezier(0.19, 1, 0.22, 1) both; }
+.cyl-glass-scale-in { animation: cyl-glass-scale-in 0.45s cubic-bezier(0.19, 1, 0.22, 1) both; }
+@keyframes cyl-glass-fade-up { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+@keyframes cyl-glass-slide-up { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: none; } }
+@keyframes cyl-glass-scale-in { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+
+/* [EN] Navigation bar and search box. [CN] 导航栏与搜索框。 */
+.cyl-glass-nav { position: fixed; top: 0; left: 0; right: 0; z-index: 10; padding-bottom: 8px; background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(20px) saturate(160%); -webkit-backdrop-filter: blur(20px) saturate(160%); border-bottom: 1rpx solid rgba(255, 255, 255, 0.18); }
+.cyl-glass-nav-bar { display: flex; align-items: center; padding-left: 8px; box-sizing: border-box; }
+.cyl-glass-nav-back { width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; font-size: 30px; line-height: 30px; }
+.cyl-glass-nav-title { flex: 1; text-align: center; font-size: 17px; font-weight: 600; margin-right: -36px; }
+.cyl-glass-search { display: flex; align-items: center; margin: 4px 16px 0; height: 36px; padding: 0 12px; border-radius: 18px; background: rgba(255, 255, 255, 0.14); border: 1rpx solid rgba(255, 255, 255, 0.22); }
+.cyl-glass-search-icon { font-size: 14px; margin-right: 8px; }
+.cyl-glass-search-input { flex: 1; font-size: 15px; color: #ffffff; }
+
+.cyl-glass-content { position: relative; height: 100vh; box-sizing: border-box; }
+.cyl-glass-panel { padding: 140px 16px calc(130px + env(safe-area-inset-bottom)); }
+.cyl-glass-page-feed .cyl-glass-panel { padding-top: 160px; }
+.cyl-glass-search-placeholder { color: rgba(255, 255, 255, 0.6); }
+
+/* [EN] Translucent cards. [CN] 半透明卡片。 */
+.cyl-glass-card { box-sizing: border-box; border-radius: 20px; padding: 16px; background: rgba(255, 255, 255, 0.15); border: 1rpx solid rgba(255, 255, 255, 0.25); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25), 0 10px 30px rgba(0, 0, 0, 0.12); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); }
+.cyl-glass-card + .cyl-glass-card { margin-top: 12px; }
+.cyl-glass-caption { display: block; font-size: 13px; opacity: 0.75; text-align: center; }
+.cyl-glass-section-title { display: block; margin: 22px 4px 10px; font-size: 13px; letter-spacing: 1px; text-transform: uppercase; opacity: 0.75; }
+
+/* [EN] Check-in. [CN] 打卡。 */
+.cyl-glass-checkin { margin: 14px auto 6px; width: 180px; height: 180px; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #ffffff; background: linear-gradient(135deg, #ff6b6b, #ffd93d); box-shadow: 0 12px 30px rgba(255, 107, 107, 0.4); transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1); }
+.cyl-glass-checkin::after { border: none; }
+.cyl-glass-checkin:active { transform: scale(0.95); }
+.cyl-glass-checked { background: linear-gradient(135deg, #2cb67d, #7fdbb6); box-shadow: 0 12px 30px rgba(44, 182, 125, 0.4); animation: cyl-glass-scale-in 0.45s cubic-bezier(0.19, 1, 0.22, 1); }
+.cyl-glass-checkin-icon { font-size: 44px; line-height: 52px; }
+.cyl-glass-checkin-text { font-size: 15px; font-weight: 600; }
+.cyl-glass-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.cyl-glass-sport { display: flex; flex-direction: column; align-items: center; padding: 12px 0; border-radius: 16px; background: rgba(255, 255, 255, 0.12); border: 1rpx solid rgba(255, 255, 255, 0.2); transition: transform 0.3s cubic-bezier(0.19, 1, 0.22, 1); }
+.cyl-glass-sport-selected { background: rgba(255, 255, 255, 0.32); transform: scale(1.06); }
+.cyl-glass-sport-emoji { font-size: 26px; }
+.cyl-glass-sport-name { margin-top: 4px; font-size: 12px; }
+.cyl-glass-stats { display: flex; gap: 10px; margin-top: 16px; }
+.cyl-glass-stats .cyl-glass-card { margin-top: 0; }
+.cyl-glass-stat { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 14px 0; }
+.cyl-glass-stat-number { font-size: 26px; font-weight: 700; }
+.cyl-glass-stat-label { margin-top: 2px; font-size: 12px; opacity: 0.75; }
+.cyl-glass-week { display: flex; justify-content: space-between; }
+.cyl-glass-day { display: flex; flex-direction: column; align-items: center; }
+.cyl-glass-day-dot { width: 22px; height: 22px; border-radius: 11px; border: 2px solid rgba(255, 255, 255, 0.4); box-sizing: border-box; }
+.cyl-glass-day-done { border: none; background: linear-gradient(135deg, #ffd93d, #ff6b6b); }
+.cyl-glass-day-name { margin-top: 6px; font-size: 11px; opacity: 0.8; }
+
+/* [EN] Feed. [CN] 信息流。 */
+.cyl-glass-tags { white-space: nowrap; margin-bottom: 12px; }
+.cyl-glass-pill { display: inline-block; margin-right: 8px; padding: 6px 14px; border-radius: 16px; font-size: 13px; background: rgba(255, 255, 255, 0.12); border: 1rpx solid rgba(255, 255, 255, 0.2); }
+.cyl-glass-pill-selected { background: rgba(255, 255, 255, 0.9); color: #203a43; }
+.cyl-glass-empty { text-align: center; opacity: 0.8; }
+.cyl-glass-post-header { display: flex; align-items: center; }
+.cyl-glass-avatar { width: 36px; height: 36px; border-radius: 18px; background: rgba(255, 255, 255, 0.2); text-align: center; line-height: 36px; font-size: 20px; }
+.cyl-glass-post-meta { flex: 1; margin-left: 10px; display: flex; flex-direction: column; }
+.cyl-glass-post-author { font-size: 14px; font-weight: 600; }
+.cyl-glass-post-time { font-size: 11px; opacity: 0.6; }
+.cyl-glass-tag { display: flex; align-items: center; padding: 2px 8px; border: 1px solid; border-radius: 10px; font-size: 11px; background: rgba(255, 255, 255, 0.9); }
+.cyl-glass-tag-dot { width: 6px; height: 6px; border-radius: 3px; margin-right: 4px; }
+.cyl-glass-post-title { display: block; margin-top: 10px; font-size: 16px; font-weight: 600; }
+.cyl-glass-post-preview { display: block; margin-top: 6px; font-size: 13px; line-height: 19px; opacity: 0.8; }
+.cyl-glass-post-footer { display: flex; gap: 18px; margin-top: 10px; font-size: 12px; opacity: 0.7; }
+
+/* [EN] Cards: two-column grid. [CN] 卡片：两列网格。 */
+.cyl-glass-grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+.cyl-glass-tile { border-radius: 20px; padding: 10px; background: rgba(255, 255, 255, 0.16); border: 1rpx solid rgba(255, 255, 255, 0.25); transition: transform 0.35s cubic-bezier(0.19, 1, 0.22, 1); }
+.cyl-glass-tile:active { transform: scale(0.96); }
+.cyl-glass-tile-reviewed { border-color: rgba(255, 255, 255, 0.8); }
+.cyl-glass-tile-cover { height: 96px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 40px; }
+.cyl-glass-tile-title { display: block; margin-top: 8px; font-size: 14px; font-weight: 600; }
+.cyl-glass-tile-subtitle { display: block; margin-top: 2px; font-size: 11px; opacity: 0.75; }
+
+/* [EN] Landing. [CN] 落地页。 */
+.cyl-glass-hero { text-align: center; padding: 28px 20px; }
+.cyl-glass-hero-mark { display: inline-block; font-size: 34px; background: linear-gradient(120deg, #7f5af0, #2cb67d, #ff8906); -webkit-background-clip: text; color: transparent; }
+.cyl-glass-hero-title { display: block; margin-top: 6px; font-size: 30px; font-weight: 700; }
+.cyl-glass-hero-subtitle { display: block; margin-top: 8px; font-size: 14px; opacity: 0.75; }
+.cyl-glass-cta { margin-top: 18px; border-radius: 22px; font-size: 14px; color: #0b0b14; background: rgba(255, 255, 255, 0.92); }
+.cyl-glass-cta::after { border: none; }
+.cyl-glass-items { display: flex; justify-content: space-around; }
+.cyl-glass-item-cell { width: 90px; height: 60px; }
+.cyl-glass-item { display: block; width: 100%; height: 100%; }

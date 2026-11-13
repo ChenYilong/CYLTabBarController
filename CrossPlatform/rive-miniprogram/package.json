@@ -14,6 +14,11 @@
   "miniprogram": "miniprogram_dist",
   "main": "miniprogram_dist/rive/canvas_advanced.js",
   "cylMiniprogramAssets": ["miniprogram_dist/rive/rive.wasm.br"],
+  "cylExampleResources": {
+    "folder": "rive",
+    "source": "Example-SwiftUI-Rive/AnimatedApp/RiveAssets",
+    "files": ["icons.riv"]
+  },
   "files": ["miniprogram_dist", "README.md", "LICENSE", "NOTICE"],
   "scripts": {
     "build": "node scripts/cyl_build.js",

@@ -7,10 +7,11 @@
   "dependencies": {
     "cyl-tabbar-miniprogram": "file:.."
   },
+  "cylExampleAnimation": "lottie",
   "scripts": {
-    "setup": "node scripts/cyl_install_components.js && node scripts/cyl_sync_shared.js",
+    "setup": "node scripts/cyl_setup.js",
     "install-components": "node scripts/cyl_install_components.js",
     "sync": "node scripts/cyl_sync_shared.js",
-    "check": "node scripts/cyl_install_components.js --check && node scripts/cyl_sync_shared.js --check"
+    "check": "node scripts/cyl_setup.js --check"
   }
 }

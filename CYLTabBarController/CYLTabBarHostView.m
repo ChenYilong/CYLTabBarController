@@ -37,11 +37,6 @@ static const CGFloat CYLTabBarHostBadgeRoom = 8;
 @property (nonatomic, assign, readwrite) CGFloat preferredHeight;
 @end
 
-NSString *const CYLTabBarHostBadgeValue = @"value";
-NSString *const CYLTabBarHostBadgeColor = @"color";
-NSString *const CYLTabBarHostBadgeAnimation = @"animation";
-NSString *const CYLTabBarHostBadgeRadius = @"radius";
-NSString *const CYLTabBarHostBadgeCenterOffset = @"centerOffset";
 
 /// [EN] "#RRGGBB" / "#RRGGBBAA" or a UIColor; nil otherwise. [CN] "#RRGGBB" / "#RRGGBBAA" 或 UIColor；其他为 nil。
 static UIColor *_Nullable CYLTabBarHostColor(id value) {

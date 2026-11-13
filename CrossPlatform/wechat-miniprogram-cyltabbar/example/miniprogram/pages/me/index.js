@@ -6,7 +6,13 @@
  *      所有 TabBar 实例都会跟随：角标、皮肤、样式、点击动画与需要登录的 Tab。
  */
 const cylTabPage = require('../../utils/cyl_tab_page');
-const { cylDemoConfiguration, cylAvailablePAGFiles } = require('../../utils/cyl_demo_configuration');
+const { cylDemoConfiguration, cylInstalledAnimation, cylAvailableAnimationFiles } = require('../../utils/cyl_demo_configuration');
+
+// [EN] Row titles of the animation packages. [CN] 动画包的行标题。
+const CYL_ANIMATION_LABELS = { lottie: 'Lottie', pag: 'PAG', rive: 'Rive', gif: 'GIF' };
+
+// [EN] The core's CYLTabBarItemStyle enum, shared by cyl-tab-bar and cyl-tab-bar-item. [CN] 核心层的 CYLTabBarItemStyle 枚举，cyl-tab-bar 与 cyl-tab-bar-item 共用。
+const { CYLTabBarItemStyle } = require('cyl-tabbar-miniprogram/cyl-tab-bar/cyl_tab_bar_item_style');
 
 const CYL_STYLE_TYPES = ['default', 'flatDesign', 'liquidGlass'];
 const CYL_TAP_ANIMATIONS = [['none', 'None'], ['bounce', 'Bounce'], ['rotation', 'Rotation'], ['scale', 'Scale']];
@@ -16,12 +22,18 @@ Component({
   data: {
     skins: [],
     styleTypes: CYL_STYLE_TYPES,
+    itemStyles: [''].concat(Object.values(CYLTabBarItemStyle)),
+    currentItemStyle: '',
+    animationSpeed: 1,
+    animationLoop: false,
     tapAnimations: [],
     state: {},
     currentStyleType: '',
     currentTapAnimation: '',
     icons: 'lottie',
-    pagAvailable: false,
+    installed: 'lottie',
+    installedLabel: 'Lottie',
+    animationAvailable: true,
   },
   lifetimes: {
     attached() {
@@ -45,9 +57,15 @@ Component({
       this.setData({
         state,
         currentStyleType: configuration.CYLTabBarControllerStyleType,
+        currentItemStyle: state.itemStyle || '',
+        animationSpeed: state.animationSpeed || 1,
+        animationLoop: Boolean(state.animationLoop),
         currentTapAnimation: configuration.CYLTabBarControllerTabButtonTapAnimation,
-        icons: (state.overrides || {}).cylDemoIcons || ((state.overrides || {}).cylDemoLottie === false ? 'images' : 'lottie'),
-        pagAvailable: cylAvailablePAGFiles().length > 0,
+        icons: (state.overrides || {}).cylDemoIcons === 'images' || (state.overrides || {}).cylDemoLottie === false
+          ? 'images' : cylInstalledAnimation(),
+        installed: cylInstalledAnimation(),
+        installedLabel: this.t(CYL_ANIMATION_LABELS[cylInstalledAnimation()]),
+        animationAvailable: cylInstalledAnimation() === 'lottie' || cylAvailableAnimationFiles().length > 0,
       });
     },
     cyl_update(change) {
@@ -71,6 +89,24 @@ Component({
     cyl_skin(event) {
       this.cyl_update({ themeIdentifier: event.currentTarget.dataset.value });
     },
+    cyl_playAll() {
+      const tabBar = this.getTabBar && this.getTabBar();
+      const bar = tabBar && tabBar.selectComponent('#cyl-tab-bar');
+      if (bar) {
+        bar.cyl_playAll();
+      }
+    },
+    cyl_speed(event) {
+      if (Number(event.detail.value) !== getApp().globalData.cylTabBarState.animationSpeed) {
+        this.cyl_update({ animationSpeed: Number(event.detail.value) });
+      }
+    },
+    cyl_loop(event) {
+      this.cyl_update({ animationLoop: event.detail.value });
+    },
+    cyl_itemStyle(event) {
+      this.cyl_update({ itemStyle: event.currentTarget.dataset.value });
+    },
     cyl_style(event) {
       this.cyl_override({ CYLTabBarControllerStyleType: event.currentTarget.dataset.value });
     },
@@ -85,7 +121,7 @@ Component({
     },
     cyl_icons(event) {
       const icons = event.currentTarget.dataset.value;
-      if (icons === 'pag' && !this.data.pagAvailable) {
+      if (icons !== 'images' && !this.data.animationAvailable) {
         wx.showToast({ title: this.t('Run the PAG download first'), icon: 'none' });
         return;
       }

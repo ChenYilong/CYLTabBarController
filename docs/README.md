@@ -36,6 +36,7 @@
 | [FlatDesign × UITabBarAppearance](FlatDesign-StandardAppearance.md) | [FlatDesign × UITabBarAppearance](FlatDesign-StandardAppearance.md) |
 | [Flutter 接入：flutter_cyltabbar](Flutter-Component.md) | [Flutter integration: flutter_cyltabbar](Flutter-Component.md) |
 | [GIF Tab 图标：循环的图片，或点击播放一次的动画](GIF-Animation.md) | [GIF tab icons: a looping image, or an animation that plays once when tapped](GIF-Animation.md) |
+| [鸿蒙 API 对照表](HarmonyOS-API-Map.md) | [The HarmonyOS API map](HarmonyOS-API-Map.md) |
 | [纯图标 Tab 的自动居中](Image-Only-Tabs.md) | [Automatic centering of image-only tabs](Image-Only-Tabs.md) |
 | [液态玻璃的健壮性改进](Liquid-Glass-Robustness.md) | [Liquid Glass Robustness](Liquid-Glass-Robustness.md) |
 | [需要登录的 Tab](Login-Required-Tabs.md) | [Tabs That Need Login](Login-Required-Tabs.md) |
@@ -122,6 +123,7 @@ docs/
 ├── FlatDesign-StandardAppearance.md
 ├── Flutter-Component.md
 ├── GIF-Animation.md
+├── HarmonyOS-API-Map.md
 ├── Image-Only-Tabs.md
 ├── Liquid-Glass-Robustness.md
 ├── Login-Required-Tabs.md
@@ -177,6 +179,7 @@ docs/
 │   ├── android-liquid-glass-surface-100.png
 │   ├── android-liquid-glass-surface-slider.png
 │   ├── android-more-than-five-tabs-report.png
+│   ├── animated-icons-demo-controls-request-android.jpg
 │   ├── carthage-example-ios.png
 │   ├── configuration-demo-json-zh-hans.png
 │   ├── configuration-localization-en.png
@@ -204,6 +207,7 @@ docs/
 │   ├── flutter-plus-title-hidden-report.png
 │   ├── flutter-rive-android-bar.png
 │   ├── flutter-rive-ios-bar.png
+│   ├── flutter-search-plus-title-missing-when-selected-ios.png
 │   ├── flutter-viewpager2-fix-android-bar.png
 │   ├── gif-classic.png
 │   ├── gif-flat-design.png
@@ -368,6 +372,41 @@ docs/
 │   ├── wechat-miniprogram-api-16-tab-bar-item-playground.png
 │   ├── wechat-miniprogram-api-17-four-tabs-like-ios.png
 │   ├── wechat-miniprogram-api-18-rive-dark.png
+│   ├── wechat-miniprogram-api-19-pag-home.png
+│   ├── wechat-miniprogram-api-20-pag-me.png
+│   ├── wechat-miniprogram-api-21-split-lottie.png
+│   ├── wechat-miniprogram-api-22-split-pag.png
+│   ├── wechat-miniprogram-api-23-split-rive-me.png
+│   ├── wechat-miniprogram-api-24-split-gif.png
+│   ├── wechat-miniprogram-api-25-glass-light.png
+│   ├── wechat-miniprogram-api-26-glass-dark.png
+│   ├── wechat-miniprogram-api-27-gallery-checkin.png
+│   ├── wechat-miniprogram-api-28-gallery-feed.png
+│   ├── wechat-miniprogram-api-29-gallery-cards.png
+│   ├── wechat-miniprogram-api-30-gallery-landing.png
+│   ├── wechat-miniprogram-api-31-bug-lens-spacing.png
+│   ├── wechat-miniprogram-api-32-fix-lens-spacing.png
+│   ├── wechat-miniprogram-api-33-playback-controls-lottie.png
+│   ├── wechat-miniprogram-api-34-plus-before-dark.jpg
+│   ├── wechat-miniprogram-api-35-plus-selected-default.png
+│   ├── wechat-miniprogram-api-35-plus-selected-liquidGlass-dark.png
+│   ├── wechat-miniprogram-api-35-plus-selected-liquidGlass.png
+│   ├── wechat-miniprogram-api-36-bug-flat-plus-glass.jpg
+│   ├── wechat-miniprogram-api-37-default-liquidGlass-plus.png
+│   ├── wechat-miniprogram-api-37-default-liquidGlass-tab.png
+│   ├── wechat-miniprogram-api-37-default-plus.png
+│   ├── wechat-miniprogram-api-37-default-tab.png
+│   ├── wechat-miniprogram-api-37-flatDesign-plus.png
+│   ├── wechat-miniprogram-api-37-flatDesign-tab.png
+│   ├── wechat-miniprogram-api-38-tab-lens-reference.jpg
+│   ├── wechat-miniprogram-api-39-lens-plus-dark.png
+│   ├── wechat-miniprogram-api-39-lens-plus.png
+│   ├── wechat-miniprogram-api-39-lens-tab-dark.png
+│   ├── wechat-miniprogram-api-39-lens-tab.png
+│   ├── wechat-miniprogram-api-40-lens-white-reference.jpg
+│   ├── wechat-miniprogram-api-41-lens-keep-reference.jpg
+│   ├── wechat-miniprogram-api-42-lens-question-gallery.png
+│   ├── wechat-miniprogram-api-42-lens-question-plus.png
 │   ├── wechat-miniprogram-badges.png
 │   ├── wechat-miniprogram-christmas-glass.png
 │   ├── wechat-miniprogram-flat-login.png

@@ -10,13 +10,14 @@
  *      它也可以单独使用。事件：`itemtap`、`change`（CYLFlatDesignTabBarItemDidChange）。
  */
 const { cylItemModel, cylStateKey } = require('./cyl_tab_bar_item_model');
+const { CYLTabBarItemStyle, cylTabBarItemStyle } = require('../cyl-tab-bar/cyl_tab_bar_item_style');
 
 const CYL_PROPERTIES = ['title', 'image', 'selectedImage', 'index', 'titlePositionAdjustment', 'imagePositionAdjustment',
   'imageInsets', 'lottieFilePath', 'lottieURL', 'lottieSizeValue', 'enabled', 'selected', 'badgeValue', 'badgeColor',
   'badgeSize', 'badgeContentInset', 'badgePositionAdjustment', 'layoutCentered', 'backgroundColor',
   'selectedBackgroundColor', 'titleTextAttributes', 'badgeTextAttributes', 'standardAppearance', 'animationPath',
   'animationSize', 'imageSize', 'iconTint', 'selectedIconTint', 'label', 'animationColors', 'loopsWhenUnselected',
-  'animationClass', 'animationDuration'];
+  'animationClass', 'animationDuration', 'itemStyle', 'isDark', 'animationSpeed', 'animationLoop'];
 
 Component({
   properties: {
@@ -86,15 +87,32 @@ Component({
     animationClass: { type: String, value: '' },
     /** [EN] The tap animation's duration in ms. [CN] 点击动画时长（毫秒）。 */
     animationDuration: { type: Number, value: 400 },
+    /**
+     * [EN] CYLTabBarItemStyle (cyl-tab-bar/cyl_tab_bar_item_style.js): "flat" (default) or "liquidGlass", the selected
+     *      item on a frosted glass lens. cyl-tab-bar sets it for every item.
+     * [CN] CYLTabBarItemStyle（cyl-tab-bar/cyl_tab_bar_item_style.js）："flat"（默认）或 "liquidGlass"，选中的 Item 位于
+     *      磨砂玻璃透镜上。cyl-tab-bar 为每个 Item 设置。
+     */
+    itemStyle: { type: String, value: CYLTabBarItemStyle.flat },
+    /** [EN] Dark appearance of the glass (cyl-tab-bar passes its skin). [CN] 玻璃的深色外观（cyl-tab-bar 传入其皮肤）。 */
+    isDark: { type: Boolean, value: false },
+    /** [EN] Playback speed of the icon animation, above 0, applied live. [CN] 图标动画的播放速度，大于 0，实时生效。 */
+    animationSpeed: { type: Number, value: 1 },
+    /** [EN] Repeats the icon animation until turned off, applied live. [CN] 重复播放图标动画直到关闭，实时生效。 */
+    animationLoop: { type: Boolean, value: false },
   },
 
   data: {
     m: {},
+    cylItemStyle: CYLTabBarItemStyle.flat,
   },
 
   observers: {
     [CYL_PROPERTIES.join(', ')]: function () {
       this.cyl_update();
+    },
+    itemStyle(value) {
+      this.setData({ cylItemStyle: cylTabBarItemStyle(value) });
     },
   },
 
@@ -185,11 +203,15 @@ Component({
       return this.selectComponent('#cyl-item-animation');
     },
 
-    /** [EN] Plays the animation from its first frame (a tab that becomes selected). [CN] 从首帧播放动画。 */
-    cyl_playAnimation() {
+    /**
+     * [EN] Plays the animation from its first frame (a tab that becomes selected), or `offset` seconds in, to continue
+     *      a playback another tab bar started.
+     * [CN] 从首帧播放动画（Tab 被选中时），或从第 `offset` 秒开始，以继续另一个 TabBar 已开始的播放。
+     */
+    cyl_playAnimation(offset) {
       const view = this.cyl_animationView();
       if (view && typeof view.cyl_playFromStart === 'function') {
-        view.cyl_playFromStart();
+        view.cyl_playFromStart(offset);
       }
     },
 

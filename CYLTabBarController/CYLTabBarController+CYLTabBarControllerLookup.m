@@ -134,7 +134,7 @@ static CYLTabBarController *CYLTabBarControllerOwningTabBar(UIResponder *respond
     return [delegate isKindOfClass:[CYLTabBarController class]] ? delegate : nil;
 }
 
-@implementation CYLTabBarController (CYLTabBarItemIdentifier)
+@implementation CYLTabBarController (CYLTabBarItemIdentifierSupport)
 
 /// This tab bar controller's plus button (its own copy with several tab bar controllers), if any.
 - (UIControl *)cyl_identifiedPlusButton {

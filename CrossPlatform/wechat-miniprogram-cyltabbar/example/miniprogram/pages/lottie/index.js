@@ -6,7 +6,7 @@
 const { t } = require('../../utils/cyl_demo_localization');
 const cylDemoStrings = require('../../utils/cyl_demo_strings');
 
-const { cylAvailablePAGFiles } = require('../../utils/cyl_demo_configuration');
+const { cylInstalledAnimation, cylAvailableAnimationFiles } = require('../../utils/cyl_demo_configuration');
 
 const CYL_FILES = ['green_lottie_tab_home', 'green_lottie_tab_discover', 'green_lottie_tab_mine'];
 
@@ -26,9 +26,13 @@ Page({
   },
 
   onLoad() {
-    // [EN] The PAG file (cyl-pag) joins the list when it was downloaded. [CN] 下载了 PAG 文件时加入列表（cyl-pag）。
-    this.cylPAGFiles = cylAvailablePAGFiles();
-    this.setData({ files: CYL_FILES.concat(this.cylPAGFiles.map((file) => file.split('/').pop().replace(/\.bin$/, ''))) });
+    // [EN] The files of the installed package: Lottie (cyl-lottie) or, with PAG installed, the PAG icons (cyl-pag).
+    // [CN] 已安装包的文件：Lottie（cyl-lottie），或安装 PAG 时的 PAG 图标（cyl-pag）。
+    this.cylPAGFiles = cylInstalledAnimation() === 'pag' ? cylAvailableAnimationFiles() : [];
+    if (this.cylPAGFiles.length) {
+      const names = this.cylPAGFiles.map((file) => file.split('/').pop().replace(/\.bin$/, ''));
+      this.setData({ files: names, file: names[0], path: this.cylPAGFiles[0], isPAG: true });
+    }
     const texts = {};
     Object.keys(cylDemoStrings.en).forEach((key) => {
       texts[key] = t(key);

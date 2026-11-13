@@ -10,10 +10,20 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /*!
+ * [EN] The string constants of this header are macros for Objective-C and Swift constants for Swift
+ *      (`Swift/CYLConstants+Keys.swift`); each `#ifndef __swift__` hides a macro from Swift (docs/Swift-Migration.md).
+ * [CN] 本头文件中的字符串常量对 Objective-C 是宏，对 Swift 是常量（`Swift/CYLConstants+Keys.swift`）；每个 `#ifndef __swift__`
+ *      对 Swift 隐藏一个宏（docs/Swift-Migration.md）。
+ */
+
+
+/*!
  * [EN] The URL of a sample configuration on GitHub, used by the demo's "load from a URL" action.
  * [CN] GitHub 上示例配置文件的 URL，用于演示中的“从网络 URL 加载”。
  */
-FOUNDATION_EXTERN NSString *const CYLSampleConfigurationURLString;
+#ifndef __swift__
+#define CYLSampleConfigurationURLString @"https://raw.githubusercontent.com/ChenYilong/CYLTabBarController/master/Example-Shared/Configurations/cyl_tabbar_configuration.yaml"
+#endif
 
 /*!
  * [EN] A demo row of the settings section (see `UIViewController+CYLSettingsSection.h`): one configuration file creates a

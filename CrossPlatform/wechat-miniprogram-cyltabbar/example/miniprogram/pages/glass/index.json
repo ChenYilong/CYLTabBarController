@@ -1,0 +1,7 @@
+{
+  "navigationStyle": "custom",
+  "usingComponents": {
+    "cyl-tab-bar": "cyl-tabbar-miniprogram/cyl-tab-bar/index",
+    "cyl-tab-bar-item": "cyl-tabbar-miniprogram/cyl-tab-bar-item/index"
+  }
+}

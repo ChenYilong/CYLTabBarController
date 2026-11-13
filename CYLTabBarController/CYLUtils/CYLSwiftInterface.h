@@ -15,6 +15,18 @@
  *      否则会把 Swift 自己的声明再导入回去。
  */
 #ifndef __swift__
+/*!
+ * [EN] Objective-C declarations the generated interface uses and that stay Objective-C for now: they must come first, as the
+ *      first header that imports this file may not have seen them (step 21: `UIView (CYLBadgeExtention)` adopts
+ *      `CYLBadgeProtocol` and uses `CYLBadgeAnimationType`). Only headers that import nothing of this module go here.
+ * [CN] 生成的接口所用、目前仍为 Objective-C 的声明：必须先导入，因为第一个导入本文件的头文件可能还没有看到它们（第 21 步：
+ *      `UIView (CYLBadgeExtention)` 遵守 `CYLBadgeProtocol` 并使用 `CYLBadgeAnimationType`）。这里只放不导入本模块其他头文件的头文件。
+ */
+#if __has_include(<CYLTabBarController/CYLBadgeProtocol.h>)
+#import <CYLTabBarController/CYLBadgeProtocol.h>
+#elif __has_include("CYLBadgeProtocol.h")
+#import "CYLBadgeProtocol.h"
+#endif
 #if defined(SWIFT_PACKAGE)
 @import CYLTabBarControllerSwift;
 #elif __has_include(<CYLTabBarController/CYLTabBarController-Swift.h>)

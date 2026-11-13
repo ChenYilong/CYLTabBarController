@@ -10,11 +10,21 @@ const cylSharedConfiguration = require('../shared/configuration');
 const cylAnimations = require('../shared/animations');
 
 /**
- * [EN] The PAG files that are in the package (scripts/cyl_sync_shared.js copies them when they were downloaded).
- * [CN] 包内存在的 PAG 文件（下载后由 scripts/cyl_sync_shared.js 复制）。
+ * [EN] The example installs one animation package (`npm run setup -- --animation=lottie|pag|rive|gif`, see
+ *      scripts/cyl_animation_choice.js); shared/animations.js names it and lists its icons.
+ * [CN] 示例只安装一个动画包（`npm run setup -- --animation=lottie|pag|rive|gif`，见 scripts/cyl_animation_choice.js）；
+ *      shared/animations.js 给出它的名称并列出其图标。
  */
-function cylAvailablePAGFiles() {
-  return cylAnimations.pag.filter((file) => {
+function cylInstalledAnimation() {
+  return cylAnimations.installed;
+}
+
+/**
+ * [EN] The icons of the installed animation package that are in the code package (PAG files may not be downloaded).
+ * [CN] 已安装动画包中存在于代码包内的图标（PAG 文件可能未下载）。
+ */
+function cylAvailableAnimationFiles() {
+  return cylAnimations.files.filter((file) => {
     try {
       wx.getFileSystemManager().accessSync(file);
       return true;
@@ -82,14 +92,20 @@ function cylDemoPlatforms(items) {
 }
 
 /**
- * [EN] PAG tab icons (CYLTabBarPAGFilePath): pag-android/2J.pag, the iOS examples' PAG file that libpag-lite plays.
- * [CN] PAG Tab 图标（CYLTabBarPAGFilePath）：pag-android/2J.pag，iOS 示例中 libpag-lite 能播放的 PAG 文件。
+ * [EN] PAG tab icons (CYLTabBarPAGFilePath) as in the iOS PAG example (Example-PAG): one vector PAG file per tab.
+ * [CN] 与 iOS PAG 示例（Example-PAG）相同的 PAG Tab 图标（CYLTabBarPAGFilePath）：每个 Tab 一个矢量 PAG 文件。
  */
-function cylDemoPAGItems(items, file) {
-  return items.map((attributes) => Object.assign({}, attributes, {
-    CYLTabBarPAGFilePath: file,
-    CYLTabBarPAGSize: '{30, 30}',
-  }));
+const CYL_DEMO_PAG = { home: 'tab_home', message: 'tab_moments', discover: 'tab_health', me: 'tab_me' };
+
+function cylDemoPAGItems(items, files) {
+  return items.map((attributes) => {
+    const name = CYL_DEMO_PAG[attributes.CYLTabBarItemIdentifier];
+    const file = name && files.find((path) => path.endsWith(`/${name}.pag.bin`));
+    return file ? Object.assign({}, attributes, {
+      CYLTabBarPAGFilePath: file,
+      CYLTabBarPAGSize: '{30, 30}',
+    }) : attributes;
+  });
 }
 
 /**
@@ -100,11 +116,11 @@ function cylDemoPAGItems(items, file) {
  */
 const CYL_DEMO_RIVE = { home: 'CHAT', discover: 'SEARCH', message: 'BELL', me: 'USER' };
 
-function cylDemoRiveItems(items) {
+function cylDemoRiveItems(items, files) {
   return items.map((attributes) => {
     const artboard = CYL_DEMO_RIVE[attributes.CYLTabBarItemIdentifier];
     return artboard ? Object.assign({}, attributes, {
-      CYLTabBarRiveFilePath: `${cylAnimations.rive[0]}#artboard=${artboard}&stateMachine=${artboard}_Interactivity&input=active`,
+      CYLTabBarRiveFilePath: `${files[0]}#artboard=${artboard}&stateMachine=${artboard}_Interactivity&input=active`,
       CYLTabBarRiveSize: '{32, 32}',
     }) : attributes;
   });
@@ -122,6 +138,26 @@ function cylDemoLottieItems(items) {
 }
 
 /**
+ * [EN] GIF tab icons as in the iOS Example-GIF: Home and Message use animation keys (CYLTabBarGIFFilePath,
+ *      CYLTabBarAnimationFilePath with a .gif), shown while selected; Discover passes the GIF as a plain image; Me keeps
+ *      its static image.
+ * [CN] 与 iOS Example-GIF 相同的 GIF Tab 图标：Home 与 Message 使用动画键（CYLTabBarGIFFilePath、文件为 .gif 的
+ *      CYLTabBarAnimationFilePath），选中时显示；Discover 把 GIF 作为普通图片传入；Me 保留静态图片。
+ */
+function cylDemoGIFItems(items, files) {
+  const file = (name) => files.find((candidate) => candidate.endsWith(`/${name}.gif`));
+  const keys = {
+    home: { CYLTabBarGIFFilePath: file('tab_rocket'), CYLTabBarGIFSize: '{30, 30}' },
+    message: { CYLTabBarAnimationFilePath: file('tab_star'), CYLTabBarGIFSize: '{30, 30}' },
+    discover: { CYLTabBarItemImage: file('tab_fire'), CYLTabBarItemSelectedImage: file('tab_fire') },
+  };
+  return items.map((attributes) => {
+    const extra = keys[attributes.CYLTabBarItemIdentifier];
+    return extra && Object.values(extra)[0] ? Object.assign({}, attributes, extra) : attributes;
+  });
+}
+
+/**
  * [EN] The configuration with the example's overrides (style type, tap animation, login-required tabs), which the Me
  *      page changes at run time.
  * [CN] 带有示例覆盖项（样式、点击动画、需要登录的 Tab）的配置，Me 页面会在运行时修改这些覆盖项。
@@ -129,25 +165,28 @@ function cylDemoLottieItems(items) {
 function cylDemoConfiguration(overrides) {
   const options = overrides || {};
   const sharedItems = cylDemoPlatforms(cylSharedConfiguration.CYLTabBarControllerTabBarItemsAttributes);
-  const icons = options.cylDemoIcons || (options.cylDemoLottie === false ? 'images' : 'lottie');
-  const pagFile = icons === 'pag' ? cylAvailablePAGFiles()[0] : '';
-  let items = sharedItems;
-  if (pagFile) {
-    items = cylDemoPAGItems(sharedItems, pagFile);
-  } else if (icons === 'rive') {
-    items = cylDemoRiveItems(sharedItems);
-  } else if (icons !== 'images') {
-    items = cylDemoLottieItems(sharedItems);
-  }
+  // [EN] "images" or the installed animation (the default). [CN] "images" 或已安装的动画（默认）。
+  const icons = options.cylDemoIcons === 'images' || options.cylDemoLottie === false ? 'images' : cylInstalledAnimation();
+  const files = icons === 'images' ? [] : cylAvailableAnimationFiles();
+  const builders = {
+    lottie: cylDemoLottieItems,
+    pag: cylDemoPAGItems,
+    rive: cylDemoRiveItems,
+    gif: cylDemoGIFItems,
+  };
+  // [EN] Lottie icons are named by tab; the others need their files. [CN] Lottie 图标按 Tab 命名；其他需要文件。
+  const items = icons !== 'images' && (icons === 'lottie' || files.length)
+    ? builders[icons](sharedItems, files) : sharedItems;
+  let styledItems = items;
   if (options.cylDemoBoldTitles) {
-    items = items.map((attributes) => Object.assign({}, attributes, { CYLTabBarItemSelectedTitleFont: 'bold:11' }));
+    styledItems = items.map((attributes) => Object.assign({}, attributes, { CYLTabBarItemSelectedTitleFont: 'bold:11' }));
   }
   const configurationOverrides = Object.assign({}, options);
   delete configurationOverrides.cylDemoLottie;
   delete configurationOverrides.cylDemoIcons;
   delete configurationOverrides.cylDemoBoldTitles;
   return Object.assign({}, cylSharedConfiguration, {
-    CYLTabBarControllerTabBarItemsAttributes: items,
+    CYLTabBarControllerTabBarItemsAttributes: styledItems,
     CYLTabBarControllerPlusButton: CYL_DEMO_PLUS_BUTTON,
     CYLTabBarControllerThemes: Object.assign({}, cylSharedConfiguration.CYLTabBarControllerThemes, {
       dark: Object.assign({}, cylSharedConfiguration.CYLTabBarControllerThemes.dark, CYL_DEMO_DARK_ICON_COLORS),
@@ -157,4 +196,4 @@ function cylDemoConfiguration(overrides) {
   }, configurationOverrides);
 }
 
-module.exports = { cylDemoConfiguration, cylAvailablePAGFiles };
+module.exports = { cylDemoConfiguration, cylInstalledAnimation, cylAvailableAnimationFiles };

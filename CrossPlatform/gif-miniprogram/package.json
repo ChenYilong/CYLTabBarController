@@ -1,0 +1,21 @@
+{
+  "name": "cyl-gif-miniprogram",
+  "version": "0.1.0",
+  "description": "GIF tab icons for cyl-tabbar-miniprogram: GIF needs no runtime (the tab bar shows it with <image>), so this package carries the example's GIF icons and the configuration notes",
+  "license": "MIT",
+  "author": "ChenYilong <luohanchenyilong@163.com>",
+  "homepage": "https://github.com/ChenYilong/CYLTabBarController/tree/master/CrossPlatform/gif-miniprogram",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ChenYilong/CYLTabBarController.git",
+    "directory": "CrossPlatform/gif-miniprogram"
+  },
+  "keywords": ["miniprogram", "gif", "CYLTabBarController"],
+  "miniprogram": "miniprogram_dist",
+  "cylExampleResources": {
+    "folder": "gif",
+    "source": "Example-GIF/GIFApp/Resources",
+    "files": ["tab_rocket.gif", "tab_star.gif", "tab_fire.gif"]
+  },
+  "files": ["miniprogram_dist", "README.md", "LICENSE"]
+}
