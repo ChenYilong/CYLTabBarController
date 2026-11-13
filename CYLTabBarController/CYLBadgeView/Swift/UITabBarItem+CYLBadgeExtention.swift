@@ -122,12 +122,12 @@ extension UITabBarItem {
      */
     @objc(cyl_showBadge)
     dynamic func cyl_showBadge() {
-        cyl_perform(#selector(UIView.cyl_showBadge))
+        cyl_perform(NSSelectorFromString("cyl_showBadge"))
     }
 
     @objc(cyl_showBadgeValue:animationTypeValue:)
     dynamic func cyl_showBadgeValue(_ value: String, animationTypeValue: NSNumber) {
-        cyl_perform(#selector(UIView.cyl_showBadgeValue(_:animationTypeValue:)), with: value, with: animationTypeValue)
+        cyl_perform(NSSelectorFromString("cyl_showBadgeValue:animationTypeValue:"), with: value, with: animationTypeValue)
     }
 
     @objc(cyl_showBadgeValue:animationType:)
@@ -137,12 +137,12 @@ extension UITabBarItem {
 
     @objc(cyl_clearBadge)
     dynamic func cyl_clearBadge() {
-        cyl_perform(#selector(UIView.cyl_clearBadge))
+        cyl_perform(NSSelectorFromString("cyl_clearBadge"))
     }
 
     @objc(cyl_resumeBadge)
     dynamic func cyl_resumeBadge() {
-        cyl_perform(#selector(UIView.cyl_resumeBadge))
+        cyl_perform(NSSelectorFromString("cyl_resumeBadge"))
     }
 
     @objc(cyl_isShowBadge)
