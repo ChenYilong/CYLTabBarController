@@ -1,6 +1,6 @@
 <view class="cyl-page" bindtouchstart="cyl_onSwipeStart" bindtouchend="cyl_onSwipeEnd">
   <view class="cyl-section">
-    <view class="cyl-row cyl-row-action" bindtap="cyl_openPlayground" aria-role="button" aria-label="{{texts['cyl-lottie playground']}}"><text aria-hidden="true">{{texts['cyl-lottie playground']}}</text></view>
+    <view wx:if="{{installed === 'lottie' || installed === 'pag'}}" class="cyl-row cyl-row-action" bindtap="cyl_openPlayground" aria-role="button" aria-label="{{texts['cyl-lottie playground']}}"><text aria-hidden="true">{{texts['cyl-lottie playground']}}</text></view>
     <view class="cyl-row cyl-row-action" bindtap="cyl_openItemPlayground" aria-role="button" aria-label="{{texts['cyl-tab-bar-item playground']}}"><text aria-hidden="true">{{texts['cyl-tab-bar-item playground']}}</text></view>
   </view>
 
@@ -14,9 +14,7 @@
 
   <text class="cyl-section-title" aria-role="heading">{{texts['Tab icons']}}</text>
   <view class="cyl-section">
-    <view class="cyl-row {{icons === 'lottie' ? 'cyl-row-selected' : ''}}" bindtap="cyl_icons" data-value="lottie" aria-role="button" aria-selected="{{icons === 'lottie'}}" aria-label="{{texts['Lottie']}}"><text aria-hidden="true">{{texts['Lottie']}}</text></view>
-    <view class="cyl-row {{icons === 'pag' ? 'cyl-row-selected' : ''}}" bindtap="cyl_icons" data-value="pag" aria-role="button" aria-selected="{{icons === 'pag'}}" aria-disabled="{{!pagAvailable}}" aria-label="PAG"><text aria-hidden="true">PAG{{pagAvailable ? '' : ' (—)'}}</text></view>
-    <view class="cyl-row {{icons === 'rive' ? 'cyl-row-selected' : ''}}" bindtap="cyl_icons" data-value="rive" aria-role="button" aria-selected="{{icons === 'rive'}}" aria-label="Rive"><text aria-hidden="true">Rive</text></view>
+    <view class="cyl-row {{icons === installed ? 'cyl-row-selected' : ''}}" bindtap="cyl_icons" data-value="{{installed}}" aria-role="button" aria-selected="{{icons === installed}}" aria-disabled="{{!animationAvailable}}" aria-label="{{installedLabel}}"><text aria-hidden="true">{{installedLabel}}{{animationAvailable ? '' : ' (—)'}}</text></view>
     <view class="cyl-row {{icons === 'images' ? 'cyl-row-selected' : ''}}" bindtap="cyl_icons" data-value="images" aria-role="button" aria-selected="{{icons === 'images'}}" aria-label="{{texts['Images']}}"><text aria-hidden="true">{{texts['Images']}}</text></view>
   </view>
 

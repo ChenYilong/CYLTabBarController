@@ -6,7 +6,10 @@
  *      所有 TabBar 实例都会跟随：角标、皮肤、样式、点击动画与需要登录的 Tab。
  */
 const cylTabPage = require('../../utils/cyl_tab_page');
-const { cylDemoConfiguration, cylAvailablePAGFiles } = require('../../utils/cyl_demo_configuration');
+const { cylDemoConfiguration, cylInstalledAnimation, cylAvailableAnimationFiles } = require('../../utils/cyl_demo_configuration');
+
+// [EN] Row titles of the animation packages. [CN] 动画包的行标题。
+const CYL_ANIMATION_LABELS = { lottie: 'Lottie', pag: 'PAG', rive: 'Rive', gif: 'GIF' };
 
 const CYL_STYLE_TYPES = ['default', 'flatDesign', 'liquidGlass'];
 const CYL_TAP_ANIMATIONS = [['none', 'None'], ['bounce', 'Bounce'], ['rotation', 'Rotation'], ['scale', 'Scale']];
@@ -21,7 +24,9 @@ Component({
     currentStyleType: '',
     currentTapAnimation: '',
     icons: 'lottie',
-    pagAvailable: false,
+    installed: 'lottie',
+    installedLabel: 'Lottie',
+    animationAvailable: true,
   },
   lifetimes: {
     attached() {
@@ -46,8 +51,11 @@ Component({
         state,
         currentStyleType: configuration.CYLTabBarControllerStyleType,
         currentTapAnimation: configuration.CYLTabBarControllerTabButtonTapAnimation,
-        icons: (state.overrides || {}).cylDemoIcons || ((state.overrides || {}).cylDemoLottie === false ? 'images' : 'lottie'),
-        pagAvailable: cylAvailablePAGFiles().length > 0,
+        icons: (state.overrides || {}).cylDemoIcons === 'images' || (state.overrides || {}).cylDemoLottie === false
+          ? 'images' : cylInstalledAnimation(),
+        installed: cylInstalledAnimation(),
+        installedLabel: this.t(CYL_ANIMATION_LABELS[cylInstalledAnimation()]),
+        animationAvailable: cylInstalledAnimation() === 'lottie' || cylAvailableAnimationFiles().length > 0,
       });
     },
     cyl_update(change) {
@@ -85,7 +93,7 @@ Component({
     },
     cyl_icons(event) {
       const icons = event.currentTarget.dataset.value;
-      if (icons === 'pag' && !this.data.pagAvailable) {
+      if (icons !== 'images' && !this.data.animationAvailable) {
         wx.showToast({ title: this.t('Run the PAG download first'), icon: 'none' });
         return;
       }
