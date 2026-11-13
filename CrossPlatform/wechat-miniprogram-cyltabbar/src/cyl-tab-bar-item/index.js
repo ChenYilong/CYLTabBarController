@@ -17,7 +17,7 @@ const CYL_PROPERTIES = ['title', 'image', 'selectedImage', 'index', 'titlePositi
   'badgeSize', 'badgeContentInset', 'badgePositionAdjustment', 'layoutCentered', 'backgroundColor',
   'selectedBackgroundColor', 'titleTextAttributes', 'badgeTextAttributes', 'standardAppearance', 'animationPath',
   'animationSize', 'imageSize', 'iconTint', 'selectedIconTint', 'label', 'animationColors', 'loopsWhenUnselected',
-  'animationClass', 'animationDuration', 'itemStyle', 'isDark', 'animationSpeed', 'animationLoop'];
+  'animationClass', 'animationDuration', 'itemStyle', 'glassLensStyle', 'isDark', 'animationSpeed', 'animationLoop'];
 
 Component({
   properties: {
@@ -96,6 +96,11 @@ Component({
     itemStyle: { type: String, value: CYLTabBarItemStyle.flat },
     /** [EN] Dark appearance of the glass (cyl-tab-bar passes its skin). [CN] 玻璃的深色外观（cyl-tab-bar 传入其皮肤）。 */
     isDark: { type: Boolean, value: false },
+    /**
+     * [EN] CYLGlassLensStyle of the lens with liquidGlass: "regular" (default) or "skeuomorphic". cyl-tab-bar sets it.
+     * [CN] liquidGlass 下透镜的 CYLGlassLensStyle："regular"（默认）或 "skeuomorphic"。cyl-tab-bar 为其设置。
+     */
+    glassLensStyle: { type: String, value: 'regular' },
     /** [EN] Playback speed of the icon animation, above 0, applied live. [CN] 图标动画的播放速度，大于 0，实时生效。 */
     animationSpeed: { type: Number, value: 1 },
     /** [EN] Repeats the icon animation until turned off, applied live. [CN] 重复播放图标动画直到关闭，实时生效。 */

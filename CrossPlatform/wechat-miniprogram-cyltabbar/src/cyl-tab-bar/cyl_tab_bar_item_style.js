@@ -37,4 +37,31 @@ function cylTabBarItemStyleForStyleType(styleType) {
   return styleType === 'liquidGlass' ? CYLTabBarItemStyle.liquidGlass : CYLTabBarItemStyle.flat;
 }
 
-module.exports = { CYLTabBarItemStyle, cylTabBarItemStyle, cylTabBarItemStyleForStyleType };
+/**
+ * [EN] CYLGlassLensStyle: the two looks of the Liquid Glass lens (CYLTabBarItemStyle liquidGlass only; flat shows no
+ *      lens). `regular` (default, "liquid"): a nearly opaque tint, the color measured on the reference lens, so the
+ *      lens looks the same on any bar. `skeuomorphic` ("skeuomorphic liquid"): a see-through tint that takes the color
+ *      of what is behind it, like real glass, so it looks lighter on a white bar and warmer on a colored one.
+ * [CN] CYLGlassLensStyle：液态玻璃透镜的两种外观（仅 CYLTabBarItemStyle liquidGlass；flat 不显示透镜）。`regular`
+ *      （默认，"液态"）：接近不透明的底色，取自参考透镜测得的颜色，透镜在任何 TabBar 上看起来一致。`skeuomorphic`
+ *      （"拟物风液态"）：透出背后颜色的半透明底色，像真实的玻璃，在白色 TabBar 上更浅，在彩色 TabBar 上更暖。
+ */
+const CYLGlassLensStyle = Object.freeze({
+  regular: 'regular',
+  skeuomorphic: 'skeuomorphic',
+});
+
+/**
+ * [EN] The lens style for a value: a CYLGlassLensStyle name or number (0 regular, 1 skeuomorphic); anything else is
+ *      regular.
+ * [CN] 某个值对应的透镜样式：CYLGlassLensStyle 的名称或数字（0 regular，1 skeuomorphic）；其他值为 regular。
+ */
+function cylGlassLensStyle(value) {
+  const names = Object.values(CYLGlassLensStyle);
+  const name = typeof value === 'number' ? names[value] : value;
+  return names.includes(name) ? name : CYLGlassLensStyle.regular;
+}
+
+module.exports = {
+  CYLTabBarItemStyle, cylTabBarItemStyle, cylTabBarItemStyleForStyleType, CYLGlassLensStyle, cylGlassLensStyle,
+};

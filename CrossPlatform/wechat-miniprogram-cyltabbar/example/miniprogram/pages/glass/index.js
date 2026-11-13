@@ -61,6 +61,8 @@ Page({
     configuration: {},
     symbolsByTheme: cylSymbols,
     itemStyle: CYLTabBarItemStyle.liquidGlass,
+    // [EN] The lens look chosen on Me (CYLGlassLensStyle). [CN] 在「我的」中选择的透镜外观（CYLGlassLensStyle）。
+    glassLensStyle: 'regular',
     navigation: { statusBar: 20, height: 44, capsuleRight: 96 },
     checkin: { sports: [], stats: {}, week: [] },
     checkedIn: false,
@@ -84,6 +86,7 @@ Page({
     const feed = cylReadJSON('/data/cyl_glass_feed.json');
     this.setData({
       texts,
+      glassLensStyle: getApp().globalData.cylTabBarState.glassLensStyle || 'regular',
       navigation: this.cyl_navigationMetrics(),
       configuration: cylGalleryConfiguration(),
       checkin: cylReadJSON('/data/cyl_glass_checkin.json'),

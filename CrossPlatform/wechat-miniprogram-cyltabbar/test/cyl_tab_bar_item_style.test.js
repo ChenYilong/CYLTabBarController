@@ -23,3 +23,16 @@ test('CYLTabBarItemStyle: names, numbers, fallback, style types, export', () => 
   });
   assert.equal(configuration.CYLTabBarItemStyle, CYLTabBarItemStyle);
 });
+
+test('CYLGlassLensStyle: names, numbers, fallback, export', () => {
+  const { CYLGlassLensStyle, cylGlassLensStyle } = require('../src/cyl-tab-bar/cyl_tab_bar_item_style');
+  assert.deepEqual(Object.values(CYLGlassLensStyle), ['regular', 'skeuomorphic']);
+  assert.ok(Object.isFrozen(CYLGlassLensStyle));
+  assert.equal(cylGlassLensStyle('skeuomorphic'), 'skeuomorphic');
+  assert.equal(cylGlassLensStyle(1), 'skeuomorphic');
+  assert.equal(cylGlassLensStyle(0), 'regular');
+  ['', 'clear', undefined, null, 7].forEach((value) => {
+    assert.equal(cylGlassLensStyle(value), 'regular');
+  });
+  assert.equal(configuration.CYLGlassLensStyle, CYLGlassLensStyle);
+});

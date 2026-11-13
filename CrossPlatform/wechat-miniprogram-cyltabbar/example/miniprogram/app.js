@@ -14,6 +14,8 @@ App({
       loggedIn: false,
       // [EN] CYLTabBarItemStyle of the core ('' follows the style type). [CN] 核心层的 CYLTabBarItemStyle（'' 跟随样式）。
       itemStyle: '',
+      // [EN] CYLGlassLensStyle of the Liquid Glass lens. [CN] 液态玻璃透镜的 CYLGlassLensStyle。
+      glassLensStyle: 'regular',
       // [EN] Playback controls of the tab icon animations (docs/Tab-Icon-Animation-Quick-Start.md). [CN] Tab 图标动画的播放控件。
       animationSpeed: 1,
       animationLoop: false,

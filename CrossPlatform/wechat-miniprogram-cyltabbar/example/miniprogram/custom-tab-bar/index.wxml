@@ -6,6 +6,7 @@
   generic:cyl-rive-view="cyl-rive"
   configuration="{{configuration}}"
   item-style="{{itemStyle}}"
+  glass-lens-style="{{glassLensStyle}}"
   animation-speed="{{animationSpeed}}"
   animation-loop="{{animationLoop}}"
   strings="{{strings}}"

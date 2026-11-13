@@ -648,6 +648,7 @@ function cylReadConfiguration(configuration, environment) {
 
 module.exports = {
   CYLTabBarItemStyle: require('./cyl_tab_bar_item_style').CYLTabBarItemStyle,
+  CYLGlassLensStyle: require('./cyl_tab_bar_item_style').CYLGlassLensStyle,
   cylReadConfiguration,
   cylAnimationFragment,
   cylPAG,

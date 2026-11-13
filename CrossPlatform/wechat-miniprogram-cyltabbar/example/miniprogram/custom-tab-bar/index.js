@@ -51,6 +51,7 @@ Component({
         configuration: cylDemoConfiguration(state.overrides),
         loggedIn: state.loggedIn,
         itemStyle: state.itemStyle || '',
+        glassLensStyle: state.glassLensStyle || 'regular',
         animationSpeed: state.animationSpeed || 1,
         animationLoop: Boolean(state.animationLoop),
       }, () => {

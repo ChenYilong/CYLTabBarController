@@ -12,7 +12,10 @@ const { cylDemoConfiguration, cylInstalledAnimation, cylAvailableAnimationFiles 
 const CYL_ANIMATION_LABELS = { lottie: 'Lottie', pag: 'PAG', rive: 'Rive', gif: 'GIF' };
 
 // [EN] The core's CYLTabBarItemStyle enum, shared by cyl-tab-bar and cyl-tab-bar-item. [CN] 核心层的 CYLTabBarItemStyle 枚举，cyl-tab-bar 与 cyl-tab-bar-item 共用。
-const { CYLTabBarItemStyle } = require('cyl-tabbar-miniprogram/cyl-tab-bar/cyl_tab_bar_item_style');
+const { CYLTabBarItemStyle, CYLGlassLensStyle } = require('cyl-tabbar-miniprogram/cyl-tab-bar/cyl_tab_bar_item_style');
+
+// [EN] Row titles of the CYLGlassLensStyle values. [CN] CYLGlassLensStyle 各值的行标题。
+const CYL_GLASS_LENS_LABELS = { regular: 'Liquid', skeuomorphic: 'Skeuomorphic liquid' };
 
 const CYL_STYLE_TYPES = ['default', 'flatDesign', 'liquidGlass'];
 const CYL_TAP_ANIMATIONS = [['none', 'None'], ['bounce', 'Bounce'], ['rotation', 'Rotation'], ['scale', 'Scale']];
@@ -24,6 +27,8 @@ Component({
     styleTypes: CYL_STYLE_TYPES,
     itemStyles: [''].concat(Object.values(CYLTabBarItemStyle)),
     currentItemStyle: '',
+    glassLensStyles: [],
+    currentGlassLensStyle: 'regular',
     animationSpeed: 1,
     animationLoop: false,
     tapAnimations: [],
@@ -40,6 +45,9 @@ Component({
       const themes = Object.keys(cylDemoConfiguration().CYLTabBarControllerThemes || {}).sort();
       this.setData({
         skins: [''].concat(themes),
+        glassLensStyles: Object.values(CYLGlassLensStyle).map((value) => ({
+          value, label: `${this.t(CYL_GLASS_LENS_LABELS[value])} · ${value}`,
+        })),
         tapAnimations: CYL_TAP_ANIMATIONS.map(([value, key]) => ({ value, label: this.t(key) })),
       });
       this.cylUnsubscribe = getApp().cyl_subscribe((state) => this.cyl_showState(state));
@@ -58,6 +66,7 @@ Component({
         state,
         currentStyleType: configuration.CYLTabBarControllerStyleType,
         currentItemStyle: state.itemStyle || '',
+        currentGlassLensStyle: state.glassLensStyle || 'regular',
         animationSpeed: state.animationSpeed || 1,
         animationLoop: Boolean(state.animationLoop),
         currentTapAnimation: configuration.CYLTabBarControllerTabButtonTapAnimation,
@@ -106,6 +115,9 @@ Component({
     },
     cyl_itemStyle(event) {
       this.cyl_update({ itemStyle: event.currentTarget.dataset.value });
+    },
+    cyl_glassLensStyle(event) {
+      this.cyl_update({ glassLensStyle: event.currentTarget.dataset.value });
     },
     cyl_style(event) {
       this.cyl_override({ CYLTabBarControllerStyleType: event.currentTarget.dataset.value });

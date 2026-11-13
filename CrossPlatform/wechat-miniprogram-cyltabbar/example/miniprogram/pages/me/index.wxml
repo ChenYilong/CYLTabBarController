@@ -54,6 +54,14 @@
     </view>
   </view>
 
+  <!-- [EN] CYLGlassLensStyle: the look of the Liquid Glass lens (liquidGlass item style only). [CN] CYLGlassLensStyle：液态玻璃透镜的外观（仅 liquidGlass Item 样式）。 -->
+  <text class="cyl-section-title" aria-role="heading">{{texts['Glass lens']}}</text>
+  <view class="cyl-section">
+    <view wx:for="{{glassLensStyles}}" wx:key="value" class="cyl-row {{currentGlassLensStyle === item.value ? 'cyl-row-selected' : ''}}" bindtap="cyl_glassLensStyle" data-value="{{item.value}}" aria-role="button" aria-selected="{{currentGlassLensStyle === item.value}}" aria-label="{{item.label}}">
+      <text aria-hidden="true">{{item.label}}</text>
+    </view>
+  </view>
+
   <text class="cyl-section-title" aria-role="heading">{{texts['Tap animation']}}</text>
   <view class="cyl-section">
     <view wx:for="{{tapAnimations}}" wx:key="value" class="cyl-row {{currentTapAnimation === item.value ? 'cyl-row-selected' : ''}}" bindtap="cyl_tapAnimation" data-value="{{item.value}}" aria-role="button" aria-selected="{{currentTapAnimation === item.value}}" aria-label="{{item.label}}">

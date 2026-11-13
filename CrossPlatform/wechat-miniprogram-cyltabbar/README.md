@@ -57,11 +57,11 @@ package it installed.
 <cyl-tab-bar generic:cyl-lottie-view="cyl-lottie" configuration="{{configuration}}" selected-identifier="{{selected}}" animation-base-path="/assets/lottie" bind:select="onSelect" />
 ```
 
-Properties: `itemStyle` (CYLTabBarItemStyle `flat` / `liquidGlass`), `animationSpeed`, `animationLoop`, `configuration`, `strings`, `symbolsByTheme`, `imageBasePath`, `animationBasePath`, `selectedIdentifier`,
+Properties: `itemStyle` (CYLTabBarItemStyle `flat` / `liquidGlass`), `glassLensStyle` (CYLGlassLensStyle `regular`, the default "liquid", / `skeuomorphic`, "skeuomorphic liquid"; Liquid Glass only), `animationSpeed`, `animationLoop`, `configuration`, `strings`, `symbolsByTheme`, `imageBasePath`, `animationBasePath`, `selectedIdentifier`,
 `loggedIn`, `appVersion`. Events: `select`, `reselect`, `plustap`, `loginrequired` (detail: `index`, `identifier`,
 `pageIdentifier`, `pageParameters`, `context`, `isPlusButton`). Methods: `cyl_selectIdentifier`, `cyl_showBadgeValue`,
 `cyl_showBadgeDot`, `cyl_removeBadge`, `cyl_setThemeIdentifier`, `cyl_themeIdentifiers`, `cyl_playLottie`,
-`cyl_selectAdjacent`, `cyl_setItemStyle`, `cyl_playAll`, `cyl_setAnimationSpeed`, `cyl_setAnimationLoop`. Page behavior for swiping between tabs: `cyl-tabbar-miniprogram/cyl-tab-bar/cyl_swipe_behavior`.
+`cyl_selectAdjacent`, `cyl_setItemStyle`, `cyl_setGlassLensStyle`, `cyl_playAll`, `cyl_setAnimationSpeed`, `cyl_setAnimationLoop`. Page behavior for swiping between tabs: `cyl-tabbar-miniprogram/cyl-tab-bar/cyl_swipe_behavior`.
 
 ## Layout
 

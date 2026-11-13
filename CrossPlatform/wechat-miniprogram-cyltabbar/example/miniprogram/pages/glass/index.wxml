@@ -102,5 +102,5 @@
   </scroll-view>
 
   <!-- [EN] The core's tab bar switches the panels; its Liquid Glass look comes from CYLTabBarItemStyle. [CN] 核心层 TabBar 切换面板；液态玻璃外观来自 CYLTabBarItemStyle。 -->
-  <cyl-tab-bar id="cyl-gallery-tab-bar" configuration="{{configuration}}" symbols-by-theme="{{symbolsByTheme}}" selected-identifier="{{panel}}" item-style="{{itemStyle}}" bind:select="cyl_onSelect" />
+  <cyl-tab-bar id="cyl-gallery-tab-bar" configuration="{{configuration}}" symbols-by-theme="{{symbolsByTheme}}" selected-identifier="{{panel}}" item-style="{{itemStyle}}" glass-lens-style="{{glassLensStyle}}" bind:select="cyl_onSelect" />
 </view>

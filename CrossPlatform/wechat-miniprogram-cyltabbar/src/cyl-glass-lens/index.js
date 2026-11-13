@@ -13,5 +13,10 @@ Component({
   properties: {
     /** [EN] Dark appearance (the bar's skin). [CN] 深色外观（TabBar 的皮肤）。 */
     isDark: { type: Boolean, value: false },
+    /**
+     * [EN] CYLGlassLensStyle (cyl-tab-bar/cyl_tab_bar_item_style.js): "regular" (default) or "skeuomorphic".
+     * [CN] CYLGlassLensStyle（cyl-tab-bar/cyl_tab_bar_item_style.js）："regular"（默认）或 "skeuomorphic"。
+     */
+    lensStyle: { type: String, value: 'regular' },
   },
 });

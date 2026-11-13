@@ -12,7 +12,7 @@
  *      `cyl_setThemeIdentifier`。
  */
 const { cylReadConfiguration } = require('./cyl_configuration');
-const { cylTabBarItemStyle, cylTabBarItemStyleForStyleType } = require('./cyl_tab_bar_item_style');
+const { cylTabBarItemStyle, cylTabBarItemStyleForStyleType, cylGlassLensStyle } = require('./cyl_tab_bar_item_style');
 
 /**
  * [EN] The badge text shown for a value: numbers above 99 read "99+"; '' means no badge.
@@ -101,6 +101,15 @@ Component({
      */
     itemStyle: { type: null, value: '' },
     /**
+     * [EN] CYLGlassLensStyle (cyl_tab_bar_item_style.js) of the Liquid Glass lens, for tabs and the plus button:
+     *      "regular" (default, nearly opaque, the same on any bar) or "skeuomorphic" (see-through, like real glass); also
+     *      its number, 0 or 1. Used with the liquidGlass item style only. cyl_setGlassLensStyle() switches it later.
+     * [CN] 液态玻璃透镜的 CYLGlassLensStyle（cyl_tab_bar_item_style.js），Tab 与 PlusButton 共用："regular"（默认，
+     *      接近不透明，在任何 TabBar 上一致）或 "skeuomorphic"（半透明，像真实的玻璃）；也可用其数字 0 或 1。仅在
+     *      liquidGlass Item 样式下使用。之后用 cyl_setGlassLensStyle() 切换。
+     */
+    glassLensStyle: { type: null, value: '' },
+    /**
      * [EN] Playback speed of every tab icon animation (Lottie, PAG, Rive), above 0, applied live; GIF has none.
      * [CN] 所有 Tab 图标动画（Lottie、PAG、Rive）的播放速度，大于 0，实时生效；GIF 不支持。
      */
@@ -131,6 +140,7 @@ Component({
     cylSlots: [],
     cylStyleType: 'default',
     cylItemStyle: 'flat',
+    cylGlassLensStyle: 'regular',
     cylIsDark: false,
     cylBarStyle: '',
     cylThemeIdentifier: '',
@@ -140,7 +150,7 @@ Component({
   },
 
   observers: {
-    'configuration, strings, symbolsByTheme, imageBasePath, animationBasePath, selectedIdentifier, appVersion, itemStyle': function () {
+    'configuration, strings, symbolsByTheme, imageBasePath, animationBasePath, selectedIdentifier, appVersion, itemStyle, glassLensStyle': function () {
       this.cyl_render();
     },
   },
@@ -208,6 +218,8 @@ Component({
       this.setData({
         cylSlots: slots,
         cylItemStyle: itemStyle,
+        cylGlassLensStyle: cylGlassLensStyle(this.cylRequestedGlassLensStyle !== undefined
+          ? this.cylRequestedGlassLensStyle : this.data.glassLensStyle),
         cylStyleType: styleType,
         cylIsDark: model.isDark,
         cylBarStyle: model.backgroundColor ? `background-color: ${model.backgroundColor};` : '',
@@ -512,6 +524,17 @@ Component({
      */
     cyl_setItemStyle(style) {
       this.cylRequestedItemStyle = style === '' || style === null ? undefined : cylTabBarItemStyle(style);
+      this.cyl_render();
+    },
+
+    /**
+     * [EN] Switches the Liquid Glass lens to a CYLGlassLensStyle at run time ("regular" or "skeuomorphic"); '' goes back
+     *      to the `glassLensStyle` property.
+     * [CN] 在运行时把液态玻璃透镜切换为某个 CYLGlassLensStyle（"regular" 或 "skeuomorphic"）；'' 恢复 `glassLensStyle`
+     *      属性。
+     */
+    cyl_setGlassLensStyle(style) {
+      this.cylRequestedGlassLensStyle = style === '' || style === null ? undefined : cylGlassLensStyle(style);
       this.cyl_render();
     },
 
