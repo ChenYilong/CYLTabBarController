@@ -14,11 +14,22 @@ App({
       loggedIn: false,
       // [EN] CYLTabBarItemStyle of the core ('' follows the style type). [CN] 核心层的 CYLTabBarItemStyle（'' 跟随样式）。
       itemStyle: '',
+      // [EN] Playback controls of the tab icon animations (docs/Tab-Icon-Animation-Quick-Start.md). [CN] Tab 图标动画的播放控件。
+      animationSpeed: 1,
+      animationLoop: false,
     },
   },
 
   onLaunch() {
     this.cylListeners = [];
+    // [EN] The Rive icons (the iOS examples' icons.riv) are white strokes: with the Rive package installed, the example
+    //      starts on the dark skin, as Example-Rive and Example-SwiftUI-Rive run in dark mode.
+    // [CN] Rive 图标（iOS 示例的 icons.riv）是白色线条：安装 Rive 包时示例以深色皮肤启动，与运行在深色模式下的
+    //      Example-Rive、Example-SwiftUI-Rive 一致。
+    const { cylInstalledAnimation } = require('./utils/cyl_demo_configuration');
+    if (cylInstalledAnimation() === 'rive') {
+      this.globalData.cylTabBarState.themeIdentifier = 'dark';
+    }
   },
 
   /**

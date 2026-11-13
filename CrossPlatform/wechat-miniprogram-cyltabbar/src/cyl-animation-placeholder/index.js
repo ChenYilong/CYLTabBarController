@@ -19,6 +19,7 @@ Component({
     loop: { type: Boolean, value: false },
     autoplay: { type: Boolean, value: true },
     restingFrame: { type: String, value: 'first' },
+    speed: { type: Number, value: 1 },
     colors: { type: Object, value: null },
     label: { type: String, value: '' },
   },
@@ -41,6 +42,7 @@ Component({
     cyl_goToAndStop: cylNothing,
     cyl_goToAndPlay: cylNothing,
     cyl_setProgress: cylNothing,
+    cyl_setSpeed: cylNothing,
     /** [EN] Always null: no animation. [CN] 始终为 null：没有动画。 */
     cyl_animation() {
       return null

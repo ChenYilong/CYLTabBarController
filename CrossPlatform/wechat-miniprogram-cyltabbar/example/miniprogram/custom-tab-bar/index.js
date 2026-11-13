@@ -51,6 +51,8 @@ Component({
         configuration: cylDemoConfiguration(state.overrides),
         loggedIn: state.loggedIn,
         itemStyle: state.itemStyle || '',
+        animationSpeed: state.animationSpeed || 1,
+        animationLoop: Boolean(state.animationLoop),
       }, () => {
         const tabBar = this.selectComponent('#cyl-tab-bar');
         if (!tabBar) {

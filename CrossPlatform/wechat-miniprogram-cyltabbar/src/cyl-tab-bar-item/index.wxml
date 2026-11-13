@@ -16,7 +16,8 @@
       class="cyl-item-animation"
       path="{{m.animationPath}}"
       colors="{{animationColors}}"
-      loop="{{!m.selected && loopsWhenUnselected}}"
+      loop="{{animationLoop || (!m.selected && loopsWhenUnselected)}}"
+      speed="{{animationSpeed}}"
       autoplay="{{!m.selected && loopsWhenUnselected}}"
       resting-frame="{{m.selected ? 'last' : 'first'}}"
     />
@@ -25,7 +26,8 @@
       id="cyl-item-animation"
       class="cyl-item-animation"
       path="{{m.animationPath}}"
-      loop="{{!m.selected && loopsWhenUnselected}}"
+      loop="{{animationLoop || (!m.selected && loopsWhenUnselected)}}"
+      speed="{{animationSpeed}}"
       autoplay="{{!m.selected && loopsWhenUnselected}}"
       resting-frame="{{m.selected ? 'last' : 'first'}}"
     />
@@ -35,7 +37,8 @@
       class="cyl-item-animation"
       path="{{m.animationPath}}"
       colors="{{animationColors}}"
-      loop="{{!m.selected && loopsWhenUnselected}}"
+      loop="{{animationLoop || (!m.selected && loopsWhenUnselected)}}"
+      speed="{{animationSpeed}}"
       autoplay="{{!m.selected && loopsWhenUnselected}}"
     />
     <view wx:elif="{{m.image && m.iconTint}}" class="cyl-item-tint">

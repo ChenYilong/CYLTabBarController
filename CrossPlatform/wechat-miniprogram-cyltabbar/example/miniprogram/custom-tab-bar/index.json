@@ -2,8 +2,8 @@
   "component": true,
   "usingComponents": {
     "cyl-tab-bar": "cyl-tabbar-miniprogram/cyl-tab-bar/index",
-    "cyl-lottie": "cyl-lottie-miniprogram/cyl-lottie/index",
-    "cyl-pag": "cyl-tabbar-miniprogram/cyl-animation-placeholder/index",
+    "cyl-lottie": "cyl-tabbar-miniprogram/cyl-animation-placeholder/index",
+    "cyl-pag": "cyl-pag-miniprogram/cyl-pag/index",
     "cyl-rive": "cyl-tabbar-miniprogram/cyl-animation-placeholder/index"
   }
 }

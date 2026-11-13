@@ -24,6 +24,8 @@ Component({
     styleTypes: CYL_STYLE_TYPES,
     itemStyles: [''].concat(Object.values(CYLTabBarItemStyle)),
     currentItemStyle: '',
+    animationSpeed: 1,
+    animationLoop: false,
     tapAnimations: [],
     state: {},
     currentStyleType: '',
@@ -56,6 +58,8 @@ Component({
         state,
         currentStyleType: configuration.CYLTabBarControllerStyleType,
         currentItemStyle: state.itemStyle || '',
+        animationSpeed: state.animationSpeed || 1,
+        animationLoop: Boolean(state.animationLoop),
         currentTapAnimation: configuration.CYLTabBarControllerTabButtonTapAnimation,
         icons: (state.overrides || {}).cylDemoIcons === 'images' || (state.overrides || {}).cylDemoLottie === false
           ? 'images' : cylInstalledAnimation(),
@@ -84,6 +88,21 @@ Component({
     },
     cyl_skin(event) {
       this.cyl_update({ themeIdentifier: event.currentTarget.dataset.value });
+    },
+    cyl_playAll() {
+      const tabBar = this.getTabBar && this.getTabBar();
+      const bar = tabBar && tabBar.selectComponent('#cyl-tab-bar');
+      if (bar) {
+        bar.cyl_playAll();
+      }
+    },
+    cyl_speed(event) {
+      if (Number(event.detail.value) !== getApp().globalData.cylTabBarState.animationSpeed) {
+        this.cyl_update({ animationSpeed: Number(event.detail.value) });
+      }
+    },
+    cyl_loop(event) {
+      this.cyl_update({ animationLoop: event.detail.value });
     },
     cyl_itemStyle(event) {
       this.cyl_update({ itemStyle: event.currentTarget.dataset.value });

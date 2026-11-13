@@ -101,6 +101,16 @@ Component({
      */
     itemStyle: { type: null, value: '' },
     /**
+     * [EN] Playback speed of every tab icon animation (Lottie, PAG, Rive), above 0, applied live; GIF has none.
+     * [CN] 所有 Tab 图标动画（Lottie、PAG、Rive）的播放速度，大于 0，实时生效；GIF 不支持。
+     */
+    animationSpeed: { type: Number, value: 1 },
+    /**
+     * [EN] Repeats the tab icon animations until turned off (off: they play once and stop), applied live.
+     * [CN] 重复播放 Tab 图标动画直到关闭（关闭时播放一次后停止），实时生效。
+     */
+    animationLoop: { type: Boolean, value: false },
+    /**
      * [EN] The identifier of the selected tab (CYLTabBarItemIdentifier).
      * [CN] 选中 Tab 的标识（CYLTabBarItemIdentifier）。
      */
@@ -467,6 +477,32 @@ Component({
         return cylTabBarItemStyle(requested);
       }
       return cylTabBarItemStyleForStyleType((model || this.cylModel || {}).styleType);
+    },
+
+    /**
+     * [EN] Plays every tab icon animation once from progress 0 (with `animationLoop`, they repeat). The playback
+     *      controls of the examples call it ("Play all").
+     * [CN] 让所有 Tab 图标动画从进度 0 播放一次（开启 `animationLoop` 时重复）。示例的播放控件调用它（"Play all"）。
+     */
+    cyl_playAll() {
+      (this.data.cylSlots || []).forEach((slot) => {
+        const item = slot.item ? this.selectComponent(`#cyl-item-${slot.key}`) : null;
+        if (item && typeof item.cyl_playAnimation === 'function') {
+          item.cyl_playAnimation(0);
+        }
+      });
+    },
+
+    /** [EN] Sets `animationSpeed` at run time. [CN] 在运行时设置 `animationSpeed`。 */
+    cyl_setAnimationSpeed(speed) {
+      if (Number(speed) > 0) {
+        this.setData({ animationSpeed: Number(speed) });
+      }
+    },
+
+    /** [EN] Sets `animationLoop` at run time. [CN] 在运行时设置 `animationLoop`。 */
+    cyl_setAnimationLoop(loop) {
+      this.setData({ animationLoop: Boolean(loop) });
     },
 
     /**

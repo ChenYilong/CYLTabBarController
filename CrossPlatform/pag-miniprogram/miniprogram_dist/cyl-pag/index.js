@@ -85,6 +85,8 @@ Component({
     /** [EN] Accepted for parity with cyl-lottie; PAG files carry their own colors. [CN] 为与 cyl-lottie 一致而保留；PAG 文件自带颜色。 */
     colors: { type: Object, value: null },
     label: { type: String, value: '' },
+    /** [EN] Playback speed, above 0 (PAGFile.setDuration), also while playing. [CN] 播放速度，大于 0（PAGFile.setDuration），播放中同样生效。 */
+    speed: { type: Number, value: 1 },
     /** [EN] libpag.wasm.br in the code package. [CN] 代码包内的 libpag.wasm.br。 */
     wasmPath: { type: String, value: CYL_DEFAULT_WASM },
   },
@@ -96,6 +98,9 @@ Component({
       if (this.cylReady) {
         this.cyl_load()
       }
+    },
+    speed() {
+      this.cyl_applySpeed()
     },
     'loop, autoplay, restingFrame': function (loop, autoplay) {
       const view = this.cylView
@@ -199,6 +204,8 @@ Component({
         }
         this.cylFile = file
         this.cylView = view
+        this.cylOriginalDuration = Number(file.duration()) || 0
+        this.cyl_applySpeed()
         view.setScaleMode(CYL_SCALE_MODES[this.data.fit] || CYL_SCALE_MODES.contain)
         view.setRepeatCount(this.data.loop ? 0 : 1)
         view.addListener('onAnimationEnd', () => this.triggerEvent('complete', {}))
@@ -222,6 +229,24 @@ Component({
           this.cyl_destroy()
           this.triggerEvent('error', { message: `cyl-pag: ${(error && error.message) || error}` })
         }
+      }
+    },
+
+    /**
+     * [EN] Applies `speed`: the file's duration becomes its original duration divided by the speed.
+     * [CN] 应用 `speed`：文件时长变为原始时长除以速度。
+     */
+    cyl_applySpeed() {
+      const speed = Number(this.data.speed) > 0 ? Number(this.data.speed) : 1
+      if (this.cylFile && this.cylOriginalDuration > 0 && typeof this.cylFile.setDuration === 'function') {
+        this.cylFile.setDuration(Math.round(this.cylOriginalDuration / speed))
+      }
+    },
+
+    /** [EN] Changes the speed, also of the playing animation. [CN] 修改速度，正在播放的动画同样生效。 */
+    cyl_setSpeed(speed) {
+      if (Number(speed) > 0) {
+        this.setData({ speed: Number(speed) })
       }
     },
 

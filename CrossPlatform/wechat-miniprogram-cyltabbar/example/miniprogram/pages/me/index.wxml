@@ -18,6 +18,21 @@
     <view class="cyl-row {{icons === 'images' ? 'cyl-row-selected' : ''}}" bindtap="cyl_icons" data-value="images" aria-role="button" aria-selected="{{icons === 'images'}}" aria-label="{{texts['Images']}}"><text aria-hidden="true">{{texts['Images']}}</text></view>
   </view>
 
+  <!-- [EN] Playback controls: Play all, speed, loop; they combine and apply live. [CN] 播放控件：全部播放、速度、循环；组合使用，实时生效。 -->
+  <text class="cyl-section-title" aria-role="heading">{{texts['Playback']}}</text>
+  <view class="cyl-section">
+    <view class="cyl-row cyl-row-action" bindtap="cyl_playAll" aria-role="button" aria-label="{{texts['Play all']}}"><text aria-hidden="true">{{texts['Play all']}}</text></view>
+    <view class="cyl-row cyl-row-slider">
+      <text aria-hidden="true">{{texts['Speed']}}</text>
+      <slider class="cyl-slider" min="0.25" max="3" step="0.25" value="{{animationSpeed}}" block-size="20" bindchanging="cyl_speed" bindchange="cyl_speed" aria-label="{{texts['Speed']}}, {{animationSpeed}} {{texts['times']}}" />
+      <text class="cyl-row-value" aria-hidden="true">{{animationSpeed}}×</text>
+    </view>
+    <view class="cyl-row">
+      <text aria-hidden="true">{{texts['Loop']}}</text>
+      <switch checked="{{animationLoop}}" bindchange="cyl_loop" aria-label="{{texts['Loop']}}, {{animationLoop ? texts['on'] : texts['off']}}" />
+    </view>
+  </view>
+
   <text class="cyl-section-title" aria-role="heading">{{texts['Skins']}}</text>
   <view class="cyl-section">
     <view wx:for="{{skins}}" wx:key="*this" class="cyl-row {{state.themeIdentifier === item ? 'cyl-row-selected' : ''}}" bindtap="cyl_skin" data-value="{{item}}" aria-role="button" aria-selected="{{state.themeIdentifier === item}}" aria-label="{{item || texts['Follow the configuration']}}">

@@ -99,8 +99,14 @@ Component({
     duration: { type: null, value: null },
     /** [EN] View model color path -> "#RRGGBB" (CYLTabBarRiveDarkColors). [CN] view model 颜色路径 -> 颜色。 */
     colors: { type: Object, value: null },
+    /**
+     * [EN] Repeats the play: after the input goes back to false, it turns true again until `loop` is off.
+     * [CN] 重复播放：输入恢复为 false 后再次设为 true，直到关闭 `loop`。
+     */
     loop: { type: Boolean, value: false },
     autoplay: { type: Boolean, value: true },
+    /** [EN] Playback speed, above 0 (the render clock and the input duration). [CN] 播放速度，大于 0（渲染时钟与输入时长）。 */
+    speed: { type: Number, value: 1 },
     restingFrame: { type: String, value: 'first' },
     fit: { type: String, value: 'contain' },
     label: { type: String, value: '' },
@@ -312,7 +318,7 @@ Component({
       if (!state) {
         return
       }
-      const elapsed = state.last ? Math.min(0.1, (time - state.last) / 1000) : 0
+      const elapsed = (state.last ? Math.min(0.1, (time - state.last) / 1000) : 0) * this.cyl_speed()
       state.last = time
       const { rive, renderer, artboard, instance, canvas } = state
       CYLRiveEnvironment.canvas = canvas
@@ -380,15 +386,38 @@ Component({
           state.instance.advance(Math.min(seconds, 2))
         }
         if (options.duration > 0) {
+          const speed = this.cyl_speed()
           state.inputTimer = setTimeout(() => {
             setActive(false)
             this.triggerEvent('complete', {})
-          }, Math.max(0, options.duration - seconds) * 1000)
+            // [EN] Loop: play again after the icon settles, while `loop` is on. [CN] 循环：图标复位后再次播放，直到关闭 `loop`。
+            if (this.data.loop) {
+              state.inputTimer = setTimeout(() => {
+                if (this.data.loop && this.cylState === state) {
+                  this.triggerEvent('loopcomplete', {})
+                  this.cyl_playFromStart()
+                }
+              }, 400 / speed)
+            }
+          }, Math.max(0, options.duration - seconds) * 1000 / speed)
         }
         return
       }
       if (!state.isStateMachine && state.instance) {
         state.instance.time = 0
+      }
+    },
+
+    /** [EN] The speed in use (1 when not above 0). [CN] 当前速度（不大于 0 时为 1）。 */
+    cyl_speed() {
+      const speed = Number(this.data.speed)
+      return speed > 0 ? speed : 1
+    },
+
+    /** [EN] Changes the speed, also of the playing animation. [CN] 修改速度，正在播放的动画同样生效。 */
+    cyl_setSpeed(speed) {
+      if (Number(speed) > 0) {
+        this.setData({ speed: Number(speed) })
       }
     },
 

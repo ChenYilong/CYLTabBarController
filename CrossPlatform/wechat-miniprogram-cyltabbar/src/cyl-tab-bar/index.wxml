@@ -48,6 +48,8 @@
         animation-class="{{cylAnimatingIdentifier === item.key ? 'cyl-animate-' + cylTapAnimation : ''}}"
         animation-duration="{{cylAnimationDuration}}"
         item-style="{{cylItemStyle}}"
+        animation-speed="{{animationSpeed}}"
+        animation-loop="{{animationLoop}}"
         is-dark="{{cylIsDark}}"
       />
     </block>
