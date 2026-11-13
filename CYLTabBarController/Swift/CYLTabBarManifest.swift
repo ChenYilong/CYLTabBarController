@@ -36,35 +36,35 @@ import CryptoKit
 }
 
 /**
- * [EN] Seam (docs/Swift-Migration.md): configuration keys of `CYLTabBarController.h` (still Objective-C constants the Swift
- *      layer cannot see); each key's string is its own name. Removed when those constants move to Swift.
- * [CN] 接缝（docs/Swift-Migration.md）：`CYLTabBarController.h` 中的配置键（仍是 Swift 层看不到的 Objective-C 常量）；每个键的字符串就是
- *      它自己的名称。这些常量迁移到 Swift 后删除。
+ * [EN] Short names for the configuration keys the manifest writes (the constants of `CYLConstants+Keys.swift`). Was a seam
+ *      with copied strings until the constants moved to Swift (docs/Swift-Migration.md).
+ * [CN] 清单写入的配置键的简称（即 `CYLConstants+Keys.swift` 中的常量）。在常量迁移到 Swift 之前是复制字符串的接缝
+ *      （docs/Swift-Migration.md）。
  */
 enum CYLConfigurationKeys {
-    static let styleType = "CYLTabBarControllerStyleType"
-    static let itemsAttributes = "CYLTabBarControllerTabBarItemsAttributes"
-    static let themes = "CYLTabBarControllerThemes"
-    static let themeIdentifier = "CYLTabBarControllerThemeIdentifier"
-    static let darkThemeIdentifier = "CYLTabBarControllerDarkThemeIdentifier"
-    static let themeManagerName = "CYLTabBarControllerThemeManagerName"
-    static let plusButton = "CYLTabBarControllerPlusButton"
-    static let context = "CYLTabBarControllerContext"
-    static let localization = "CYLTabBarControllerLocalization"
-    static let itemIdentifier = "CYLTabBarItemIdentifier"
-    static let itemTitle = "CYLTabBarItemTitle"
-    static let itemImage = "CYLTabBarItemImage"
-    static let itemSelectedImage = "CYLTabBarItemSelectedImage"
-    static let itemPageIdentifier = "CYLTabBarItemPageIdentifier"
-    static let itemMinimumAppVersion = "CYLTabBarItemMinimumAppVersion"
-    static let itemTitleColor = "CYLTabBarItemTitleColor"
-    static let itemSelectedTitleColor = "CYLTabBarItemSelectedTitleColor"
-    static let backgroundColor = "CYLTabBarBackgroundColor"
-    static let plusButtonBackgroundImage = "CYLPlusButtonBackgroundImage"
-    static let plusButtonIndexInTabBar = "CYLPlusButtonIndexInTabBar"
-    static let plusButtonSize = "CYLPlusButtonSize"
-    static let localizationTableName = "CYLTabBarLocalizationTableName"
-    static let localizationPath = "CYLTabBarLocalizationPath"
+    static let styleType = CYLTabBarControllerStyleType
+    static let itemsAttributes = CYLTabBarControllerTabBarItemsAttributes
+    static let themes = CYLTabBarControllerThemes
+    static let themeIdentifier = CYLTabBarControllerThemeIdentifier
+    static let darkThemeIdentifier = CYLTabBarControllerDarkThemeIdentifier
+    static let themeManagerName = CYLTabBarControllerThemeManagerName
+    static let plusButton = CYLTabBarControllerPlusButton
+    static let context = CYLTabBarControllerContext
+    static let localization = CYLTabBarControllerLocalization
+    static let itemIdentifier = CYLTabBarItemIdentifier
+    static let itemTitle = CYLTabBarItemTitle
+    static let itemImage = CYLTabBarItemImage
+    static let itemSelectedImage = CYLTabBarItemSelectedImage
+    static let itemPageIdentifier = CYLTabBarItemPageIdentifier
+    static let itemMinimumAppVersion = CYLTabBarItemMinimumAppVersion
+    static let itemTitleColor = CYLTabBarItemTitleColor
+    static let itemSelectedTitleColor = CYLTabBarItemSelectedTitleColor
+    static let backgroundColor = CYLTabBarBackgroundColor
+    static let plusButtonBackgroundImage = CYLPlusButtonBackgroundImage
+    static let plusButtonIndexInTabBar = CYLPlusButtonIndexInTabBar
+    static let plusButtonSize = CYLPlusButtonSize
+    static let localizationTableName = CYLTabBarLocalizationTableName
+    static let localizationPath = CYLTabBarLocalizationPath
 }
 
 /**

@@ -324,6 +324,7 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface UIControl (CYLTabBarItemAnimation)
 
+#ifndef __swift__ // [EN] Implemented in Swift (Swift/UIControl+CYLTabBarItemAnimation.swift). [CN] 在 Swift 中实现。
 /*!
  * [EN] The tab's animation view (searching two levels deep); nil for the plus button. [CN] Tab 的动画视图（向下查找两层）；PlusButton 返回 nil。
  */
@@ -390,6 +391,7 @@ NS_ASSUME_NONNULL_BEGIN
  * [EN] Stops the tab's animation if it has started. [CN] 若 Tab 的动画已开始播放，则停止。
  */
 - (void)cyl_stopTabBarItemAnimation;
+#endif
 
 @end
 

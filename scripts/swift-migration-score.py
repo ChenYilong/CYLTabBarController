@@ -32,6 +32,9 @@ LIBRARY = os.path.join(ROOT, 'CYLTabBarController')
 # [EN] Objective-C lines of the core layer on 2026-11-12, before the migration started (FlatDesign included). [CN] 迁移开始前（2026-11-12）的行数。
 BASELINE = 59391
 SHELL_MARKER = 'CYL-SWIFT-MIGRATION: objc-shell'
+# [EN] Objective-C that Swift cannot replace (e.g. catching an Objective-C exception), listed with its size.
+# [CN] Swift 无法替代的 Objective-C（例如捕获 Objective-C 异常），会连同行数一起列出。
+REQUIRED_MARKER = 'CYL-SWIFT-MIGRATION: objc-required'
 COMPATIBLE = re.compile(r'^\s*(#|//|/\*|\*|\*/|NS_ASSUME_NONNULL_(BEGIN|END)|$)')
 
 
@@ -50,14 +53,15 @@ def core_files():
 def is_shell(path):
     """[EN] Whether the file is a marked Objective-C shell. [CN] 是否为带标记的 Objective-C 外壳文件。"""
     with open(path, encoding='utf-8', errors='replace') as handle:
-        return SHELL_MARKER in handle.read()
+        text = handle.read()
+        return SHELL_MARKER in text or REQUIRED_MARKER in text
 
 
 def objc_lines(path):
     """[EN] Lines that still count as Objective-C. [CN] 仍算作 Objective-C 的行数。"""
     with open(path, encoding='utf-8', errors='replace') as handle:
         lines = handle.read().split('\n')
-    if SHELL_MARKER in '\n'.join(lines):
+    if SHELL_MARKER in '\n'.join(lines) or REQUIRED_MARKER in '\n'.join(lines):
         return 0
     if path.endswith('.m'):
         return len(lines)
@@ -76,7 +80,7 @@ def main():
                 print('%6d  %s' % (count, os.path.relpath(path, ROOT)))
         shells = [path for _, path in counted if is_shell(path)]
         if shells:
-            print('Objective-C shells (compatibility code, not counted):')
+            print('Objective-C shells and required Objective-C (compatibility code, not counted):')
             for path in shells:
                 with open(path, encoding='utf-8', errors='replace') as handle:
                     print('%6d  %s' % (len(handle.read().split('\n')), os.path.relpath(path, ROOT)))
