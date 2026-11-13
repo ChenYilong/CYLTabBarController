@@ -10,9 +10,33 @@
     "url": "git+https://github.com/ChenYilong/CYLTabBarController.git",
     "directory": "CrossPlatform/pag-miniprogram"
   },
-  "keywords": ["miniprogram", "pag", "libpag", "CYLTabBarController"],
+  "keywords": [
+    "miniprogram",
+    "pag",
+    "libpag",
+    "CYLTabBarController"
+  ],
   "miniprogram": "miniprogram_dist",
   "main": "miniprogram_dist/libpag/libpag.js",
-  "cylMiniprogramAssets": ["miniprogram_dist/libpag/libpag.wasm.br"],
-  "files": ["miniprogram_dist", "README.md", "LICENSE", "NOTICE"]
+  "cylMiniprogramAssets": [
+    "miniprogram_dist/libpag/libpag.wasm.br"
+  ],
+  "cylExampleResources": {
+    "folder": "pag",
+    "source": "Example-Shared/PAGResources/tab-icons",
+    "files": [
+      "tab_home.pag",
+      "tab_moments.pag",
+      "tab_health.pag",
+      "tab_me.pag",
+      "LICENSE.txt"
+    ],
+    "download": "python3 scripts/fetch-animation-resources.py PAGResources"
+  },
+  "files": [
+    "miniprogram_dist",
+    "README.md",
+    "LICENSE",
+    "NOTICE"
+  ]
 }
