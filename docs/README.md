@@ -36,6 +36,7 @@
 | [FlatDesign × UITabBarAppearance](FlatDesign-StandardAppearance.md) | [FlatDesign × UITabBarAppearance](FlatDesign-StandardAppearance.md) |
 | [Flutter 接入：flutter_cyltabbar](Flutter-Component.md) | [Flutter integration: flutter_cyltabbar](Flutter-Component.md) |
 | [GIF Tab 图标：循环的图片，或点击播放一次的动画](GIF-Animation.md) | [GIF tab icons: a looping image, or an animation that plays once when tapped](GIF-Animation.md) |
+| [鸿蒙 API 对照表](HarmonyOS-API-Map.md) | [The HarmonyOS API map](HarmonyOS-API-Map.md) |
 | [纯图标 Tab 的自动居中](Image-Only-Tabs.md) | [Automatic centering of image-only tabs](Image-Only-Tabs.md) |
 | [液态玻璃的健壮性改进](Liquid-Glass-Robustness.md) | [Liquid Glass Robustness](Liquid-Glass-Robustness.md) |
 | [需要登录的 Tab](Login-Required-Tabs.md) | [Tabs That Need Login](Login-Required-Tabs.md) |
@@ -122,6 +123,7 @@ docs/
 ├── FlatDesign-StandardAppearance.md
 ├── Flutter-Component.md
 ├── GIF-Animation.md
+├── HarmonyOS-API-Map.md
 ├── Image-Only-Tabs.md
 ├── Liquid-Glass-Robustness.md
 ├── Login-Required-Tabs.md
@@ -177,6 +179,7 @@ docs/
 │   ├── android-liquid-glass-surface-100.png
 │   ├── android-liquid-glass-surface-slider.png
 │   ├── android-more-than-five-tabs-report.png
+│   ├── animated-icons-demo-controls-request-android.jpg
 │   ├── carthage-example-ios.png
 │   ├── configuration-demo-json-zh-hans.png
 │   ├── configuration-localization-en.png
@@ -365,6 +368,8 @@ docs/
 │   ├── wechat-miniprogram-api-16-tab-bar-item-playground.png
 │   ├── wechat-miniprogram-api-17-four-tabs-like-ios.png
 │   ├── wechat-miniprogram-api-18-rive-dark.png
+│   ├── wechat-miniprogram-api-19-pag-home.png
+│   ├── wechat-miniprogram-api-20-pag-me.png
 │   ├── wechat-miniprogram-badges.png
 │   ├── wechat-miniprogram-christmas-glass.png
 │   ├── wechat-miniprogram-flat-login.png
