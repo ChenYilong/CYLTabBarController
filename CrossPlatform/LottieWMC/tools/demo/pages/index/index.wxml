@@ -1,3 +1,0 @@
-<view class="container">
-    <lottie data="{{catrim}}" direction="-1" speed="2" />
-</view>

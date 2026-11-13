@@ -1,8 +1,0 @@
-{
-  "usingComponents": {
-    "navigation-bar": "/components/navigation-bar/navigation-bar",
-    "preview-panel": "/components/preview-panel/preview-panel"
-  },
-  "navigationStyle": "custom",
-  "enablePullDownRefresh": false
-}
