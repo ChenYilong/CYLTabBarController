@@ -10,29 +10,16 @@
     "url": "git+https://github.com/ChenYilong/CYLTabBarController.git",
     "directory": "CrossPlatform/rive-miniprogram"
   },
-  "keywords": [
-    "miniprogram",
-    "rive",
-    "CYLTabBarController"
-  ],
+  "keywords": ["miniprogram", "rive", "CYLTabBarController"],
   "miniprogram": "miniprogram_dist",
   "main": "miniprogram_dist/rive/canvas_advanced.js",
-  "cylMiniprogramAssets": [
-    "miniprogram_dist/rive/rive.wasm.br"
-  ],
+  "cylMiniprogramAssets": ["miniprogram_dist/rive/rive.wasm.br"],
   "cylExampleResources": {
     "folder": "rive",
     "source": "Example-SwiftUI-Rive/AnimatedApp/RiveAssets",
-    "files": [
-      "icons.riv"
-    ]
+    "files": ["icons.riv"]
   },
-  "files": [
-    "miniprogram_dist",
-    "README.md",
-    "LICENSE",
-    "NOTICE"
-  ],
+  "files": ["miniprogram_dist", "README.md", "LICENSE", "NOTICE"],
   "scripts": {
     "build": "node scripts/cyl_build.js",
     "test": "node --test test/*.test.js"

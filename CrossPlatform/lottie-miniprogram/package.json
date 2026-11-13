@@ -29,10 +29,7 @@
     "url": "git+https://github.com/ChenYilong/CYLTabBarController.git",
     "directory": "CrossPlatform/lottie-miniprogram"
   },
-  "keywords": [
-    "lottie",
-    "miniprogram"
-  ],
+  "keywords": ["lottie", "miniprogram"],
   "author": "ChenYilong <luohanchenyilong@163.com> (fork of wechat-miniprogram/lottie-miniprogram)",
   "license": "MIT",
   "bugs": {
