@@ -15,6 +15,35 @@ const { cylReadConfiguration } = require('./cyl_configuration');
 const { cylTabBarItemStyle, cylTabBarItemStyleForStyleType, cylGlassLensStyle } = require('./cyl_tab_bar_item_style');
 
 /**
+ * [EN] Heights in px from the stylesheets: the bar (index.wxss `.cyl-tab`, Liquid Glass `.cyl-style-liquidGlass .cyl-tab`),
+ *      a tab's default icon and its title (cyl-tab-bar-item: 2 gap + 12 line) and the plus title (2 gap + 12 line).
+ * [CN] 来自样式表的高度（px）：TabBar（index.wxss `.cyl-tab`，液态玻璃 `.cyl-style-liquidGlass .cyl-tab`）、Tab 的默认图标
+ *      及其标题（cyl-tab-bar-item：间距 2 + 行 12）以及 PlusButton 标题（间距 2 + 行 12）。
+ */
+const CYL_BAR_HEIGHT = 50;
+const CYL_LIQUID_GLASS_BAR_HEIGHT = 62;
+const CYL_ITEM_ICON_HEIGHT = 28;
+const CYL_ITEM_TITLE_HEIGHT = 14;
+const CYL_PLUS_TITLE_HEIGHT = 14;
+
+/**
+ * [EN] The line of the tab titles, from the first tab: its icon height (animation or image size, else 28 px, as
+ *      cyl-tab-bar-item draws it) and the vertical offset of its title (CYLTabBarItemTitlePositionAdjustment).
+ * [CN] Tab 标题所在的行，取自第一个 Tab：其图标高度（动画或图片尺寸，否则 28 px，与 cyl-tab-bar-item 的绘制一致）与其
+ *      标题的垂直偏移（CYLTabBarItemTitlePositionAdjustment）。
+ */
+function cylTitleLine(slots) {
+  const slot = slots.find((candidate) => candidate.item);
+  const size = slot ? (slot.item.animationSize || slot.item.imageSize) : null;
+  const match = /,\s*([\d.]+)\s*\}/.exec(size || '');
+  const offset = slot && slot.item.titlePositionAdjustment ? Number(slot.item.titlePositionAdjustment.vertical) : 0;
+  return {
+    iconHeight: match ? Number(match[1]) : CYL_ITEM_ICON_HEIGHT,
+    titleOffset: Number.isFinite(offset) ? offset : 0,
+  };
+}
+
+/**
  * [EN] The badge text shown for a value: numbers above 99 read "99+"; '' means no badge.
  * [CN] 角标显示的文字：大于 99 的数字显示 "99+"；'' 表示没有角标。
  */
@@ -199,7 +228,9 @@ Component({
       const selected = this.data.selectedIdentifier || (model.items[0] ? model.items[0].identifier : '');
       const slots = model.items.map((item) => this.cyl_slot(item, selected));
       if (model.plusButton) {
-        slots.splice(model.plusButton.index, 0, this.cyl_plusSlot(model.plusButton, selected));
+        slots.splice(model.plusButton.index, 0, this.cyl_plusSlot(model.plusButton, selected,
+          this.cyl_itemStyle(model) === 'liquidGlass' ? CYL_LIQUID_GLASS_BAR_HEIGHT : CYL_BAR_HEIGHT,
+          cylTitleLine(slots)));
       }
       slots.forEach((slot, index) => {
         if (slot.item) {
@@ -339,14 +370,22 @@ Component({
      * [CN] PlusButton 的渲染数据：按 CYLPlusButtonCenterYMultiplier（50 pt 高的 TabBar）与 CYLPlusButtonCenterYOffset
      *      凸起，尺寸由 CYLPlusButtonSize / CYLPlusButtonImageSize 决定。
      */
-    cyl_plusSlot(plus, selectedIdentifier) {
+    cyl_plusSlot(plus, selectedIdentifier, barHeight = CYL_BAR_HEIGHT, titleLine = { iconHeight: CYL_ITEM_ICON_HEIGHT, titleOffset: 0 }) {
       const selected = plus.hasPage && plus.identifier === selectedIdentifier;
       const imageWidth = plus.imageWidth || plus.width || 56;
       const imageHeight = plus.imageHeight || plus.height || 56;
       const titleHeight = plus.title && plus.keepsTitleVisible ? 16 : 0;
       const height = plus.height || imageHeight + titleHeight;
       const centerY = 50 * plus.centerYMultiplier + plus.centerYOffset;
-      const top = plus.alignsTitle && titleHeight ? 50 - height : centerY - imageHeight / 2;
+      // [EN] CYLPlusButtonAlignsTitle (default: a title and no background image): the title on the same line as the tab
+      //      titles. A tab centers its icon and title in the bar, so its title ends half of (icon + title) below the
+      //      bar's middle, moved by its title offset; the plus title ends CYL_PLUS_TITLE_HEIGHT below the plus image.
+      // [CN] CYLPlusButtonAlignsTitle（默认：有标题且没有背景图）：标题与 Tab 标题在同一行。Tab 的图标与标题在 TabBar
+      //      中居中，因此其标题底边位于 TabBar 中线下方（图标 + 标题）的一半处，再加上其标题偏移；PlusButton 标题底边位于其图片下方
+      //      CYL_PLUS_TITLE_HEIGHT。
+      const alignedTop = barHeight / 2 + (titleLine.iconHeight + CYL_ITEM_TITLE_HEIGHT) / 2 + titleLine.titleOffset
+        - CYL_PLUS_TITLE_HEIGHT - imageHeight;
+      const top = plus.alignsTitle && titleHeight ? alignedTop : centerY - imageHeight / 2;
       const color = selected ? plus.selectedTitleColor : plus.titleColor;
       return {
         key: plus.identifier || 'cyl-plus-button',
