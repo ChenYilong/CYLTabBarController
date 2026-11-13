@@ -34,6 +34,7 @@
 | &nbsp;&nbsp;&nbsp;&nbsp;↳ [配置文件与 Android](#cn配置文件与-android) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [Configuration files and Android](#enconfiguration-files-and-android) |
 | [注意事项](#cn注意事项) | [Things to watch for](#enthings-to-watch-for) |
 | [深入阅读](#cn深入阅读) | [Read more](#enread-more) |
+| [示例中的动画播放控件](#cn示例中的动画播放控件) | [Playback controls in the animation examples](#enplayback-controls-in-the-animation-examples) |
 
 <!-- navigation:end -->
 
@@ -218,3 +219,16 @@ NSDictionary *home = @{
 | 中文 | English |
 |:---|:---|
 | [Tab-Bar-Item-Animation.md](Tab-Bar-Item-Animation.md)：子库的设计，以及如何接入新的动画库。[PAG-Animation.md](PAG-Animation.md)、[Rive-Animation.md](Rive-Animation.md)、[GIF-Animation.md](GIF-Animation.md)：各动画库的所有 key 与选项。[Per-Tab-Animation.md](Per-Tab-Animation.md)：混用动画库与静态 Tab。 | [Tab-Bar-Item-Animation.md](Tab-Bar-Item-Animation.md): how the subspec is designed and how to add a library. [PAG-Animation.md](PAG-Animation.md) and [Rive-Animation.md](Rive-Animation.md): every key and option. [Per-Tab-Animation.md](Per-Tab-Animation.md): mixing libraries and static tabs. |
+
+## [CN]示例中的动画播放控件
+## [EN]Playback controls in the animation examples
+
+| 中文 | English |
+|:---|:---|
+| 本节按用户要求使用英文（见右列）。 | TODO (2026-11-13, rule for every example that shows tab icon animations): user prompt, verbatim: "在docs 中找到example演示规则，找到相关文档及相关章节，如果没有就新建，确保写入成功：全英文写入：instructions相关相关文档中中记录 相关skills中记录引用该文档去，在展示动效相关example展示中，除了一次性play all ，触发重新开始从0进度开始播放， 额外增加倍速滑块，以及循环播放switch。这几个组件可以组合控制动效播放策略。请在example相关页面实现，如有必要可以修改core核心代码，以支持该演示策略。通过调整这些组件可以实时控制动效的播放策略。标记为TODO事项：举例说明，截图中的页面就可以应用该策略。此要求适用于所有层面的example包括iOS端 android端，跨端 rn flutter 小程序 鸿蒙 continue" |
+| | **Rule**: every example page that shows tab icon animations (Lottie, PAG, Rive, GIF) offers three controls that combine into one playback policy, applied live: ① **Play all**: plays every tab icon animation once, each restarting from progress 0 (not continuing from where it stopped); ② a **speed slider** (e.g. 0.25× to 3×, the current value shown next to it) that changes the speed of the playing and the next animations at once; ③ a **loop switch** that makes the animations repeat until it is turned off (off: they play once and stop). Changing any control takes effect immediately, during playback. |
+| | **Scope**: all example layers: iOS (Objective-C, Swift, SwiftUI), Android, the cross-platform examples (React Native, Flutter), the WeChat Mini Program and HarmonyOS. Example: the "Animated icons" page in the screenshot below (the CollectionViewClassifyMenu Android example, today showing only a speed button "1x" and "Play all") is one page to update. |
+| | **Library support**: change the core when an example needs it, on every platform, e.g. a playback speed and a loop mode per tab animation that apply to the animation already playing, and "play from progress 0". The animation APIs that exist today (`-cyl_setTabBarItemAnimationSpeed:`, `CYLTabBarLottieLoopsWhenUnselected`, `CYLTabBarAnimationOptions`) are the starting point. |
+| | **Done when**: each example page has the three controls with accessibility labels and values (VoiceOver / TalkBack read "Speed, 1.5 times" and "Loop, on"), works on a simulator or emulator, and has labeled screenshots in `docs/assets/`. Status: not started. |
+
+![Request: the Animated icons page to give speed slider and loop switch controls (Android)](assets/animated-icons-demo-controls-request-android.jpg)

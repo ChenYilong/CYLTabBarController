@@ -40,3 +40,7 @@ A new animation library, key, limit or demo also updates [Tab-Icon-Animation-Qui
 - Core and CYLUtils get no library switch. A library's keys exist only with that library: its header defines `CYL_<LIBRARY>_AVAILABLE` (`__has_include`), and the header's content and the `.m` definitions sit inside it. The released Lottie keys stay defined and are marked `CYL_LOTTIE_REQUIRED`.
 - A new library is one more folder, one more animator class and one more subspec, with no change anywhere else. The animator registers itself in `+load` with `CYLTabBarItemAnimatorRegistry`.
 - Rive's Metal shader warnings in the console (`program_source ... Compilation succeeded`) come from the `RiveRuntime` binary. They are harmless and cannot be fixed here.
+
+## Animated icon examples: playback controls (TODO, 2026-11-13)
+
+Every example page that shows tab icon animations, on every platform, offers "Play all" (each animation restarts from progress 0), a speed slider and a loop switch, combined into one playback policy applied live (accessibility labels and values included). Change the core when an example needs it. Rule, scope and status: [docs/Tab-Icon-Animation-Quick-Start.md](../../../docs/Tab-Icon-Animation-Quick-Start.md#enplayback-controls-in-the-animation-examples).

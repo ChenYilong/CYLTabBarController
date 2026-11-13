@@ -123,3 +123,7 @@ offline. MJRefresh is not used (`mj_` → `cyl_`, `MJRefresh…` → `CYLRefresh
 ## Plus button in demos
 
 - **A raised plus button (added 2026-11-12)**: when an example demonstrates the plus button, always prefer the raised look: the top of the plus button reaches above the top edge of the tab bar (an image taller than the bar, and/or `+multiplierOfTabBarHeight:` below 0.5 or a negative `+constantOfPlusButtonCenterYOffsetForTabBarHeight:`), in every style (classic, Liquid Glass, FlatDesign). A demo that needs a flat plus button (inside the bar) says so in its title or comment.
+
+## Animated icon examples: playback controls (TODO, 2026-11-13)
+
+Every example page that shows tab icon animations, on every platform, offers "Play all" (each animation restarts from progress 0), a speed slider and a loop switch, combined into one playback policy applied live (accessibility labels and values included). Change the core when an example needs it. Rule, scope and status: [docs/Tab-Icon-Animation-Quick-Start.md](../../../docs/Tab-Icon-Animation-Quick-Start.md#enplayback-controls-in-the-animation-examples).
