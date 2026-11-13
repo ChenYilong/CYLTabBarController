@@ -52,7 +52,7 @@ def comment_of(path, name):
 def rows():
     out = []
     for row in android.inventory():
-        row['comment'] = comment_of(row['header'], row['name'])
+        row['comment'] = row.get('comment') or comment_of(row['header'], row['name'])
         out.append(row)
     return out
 
