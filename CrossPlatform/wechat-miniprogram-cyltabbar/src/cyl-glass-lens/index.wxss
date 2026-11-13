@@ -19,10 +19,15 @@
   height: 100%;
   box-sizing: border-box;
   border-radius: 999px;
-  background-color: rgba(120, 120, 128, 0.14);
+  /* [EN] Nearly opaque, so the lens looks the same on any bar: the color measured on the reference lens (the gallery
+   *      bar, screenshot 41: (225, 221, 219)). A translucent tint took the color of what was behind it, so the same lens
+   *      looked gray on the white main bar and light on the colored gallery bar.
+   * [CN] 接近不透明，使透镜在任何 TabBar 上看起来一致：取自参考透镜测得的颜色（画廊 TabBar，截图 41：(225, 221, 219)）。
+   *      半透明底色会带上背后的颜色，因此同一透镜在白色主 TabBar 上显灰，在彩色画廊 TabBar 上显亮。 */
+  background-color: rgba(225, 222, 220, 0.92);
   backdrop-filter: blur(16px) saturate(180%);
   -webkit-backdrop-filter: blur(16px) saturate(180%);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
   animation: cyl-glass-lens-in 0.45s cubic-bezier(0.19, 1, 0.22, 1) both;
 }
 
