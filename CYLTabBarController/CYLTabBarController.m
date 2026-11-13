@@ -5507,6 +5507,12 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
         [tabBarController.tabBar.cyl_platterLiquidLensViewContentView cyl_setHidden:YES];
         tabBarController.tabBar.liquidGlassContinuousGestureRecognizer.enabled = NO;
         tabBarController.tabBar.liquidGlassLongGestureRecognizer.enabled = NO;
+        // [EN] Selecting the plus button's page hid its title for the stand-in in the lens
+        //      (`-updateSelectionStatusIfNeededForTabBarController:shouldSelectViewController:`); with the lens hidden the
+        //      stand-in never shows, so the plus button keeps its own title (Flutter example, docs/Liquid-Glass-Robustness.md).
+        // [CN] 选中 PlusButton 的页面时，其标题为放大镜中的替身而隐藏；放大镜隐藏时替身不会显示，因此 PlusButton 保留自己的标题
+        //      （Flutter 示例，docs/Liquid-Glass-Robustness.md）。
+        [[self cyl_contextPlusButton] setTabLabelHidden:NO];
     }
 }
 
