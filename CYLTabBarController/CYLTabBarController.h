@@ -1442,6 +1442,22 @@ didRecognizeTabBarItemGesture:(CYLTabBarItemGesture)gesture
 @property (nonatomic, assign) CGFloat tabBarItemAnimationSpeed;
 
 /*!
+ * [EN] Whether the tab icon animations repeat until this is set to NO (default NO: each plays once). Settable at any time:
+ *      the views already added change at once, during playback too. Only for libraries with a loop mode (Lottie, PAG).
+ * [CN] Tab 图标动画是否循环播放，直到设为 NO（默认 NO：每次播放一次）。可随时设置：已添加的视图立即生效，播放中也是。只适用于有循环模式的
+ *      动画库（Lottie、PAG）。
+ */
+@property (nonatomic, assign) BOOL tabBarItemAnimationLoops;
+
+/*!
+ * [EN] Plays the icon animation of every tab once more, each from progress 0 (not from where it stopped), with the current
+ *      `tabBarItemAnimationSpeed` and `tabBarItemAnimationLoops`. The selected tab does not change.
+ * [CN] 重新播放所有 Tab 的图标动画，每个都从进度 0 开始（而不是从停止处继续），使用当前的 `tabBarItemAnimationSpeed` 与
+ *      `tabBarItemAnimationLoops`。选中的 Tab 不变。
+ */
+- (void)cyl_playAllTabBarItemAnimations;
+
+/*!
  * To set both Item label text attributes in the tabBar,
  * use the following to tweak the relative position of the label within the tab button (for handling visual centering corrections if needed because of custom text attributes)
  *

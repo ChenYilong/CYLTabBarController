@@ -61,6 +61,13 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign) CGFloat animationSpeed;
 
 /*!
+ * [EN] Whether it repeats until this is set to NO (NO: plays once and stops). Applies to the animation already playing.
+ *      Libraries without a loop mode leave it out.
+ * [CN] 是否循环播放，直到设为 NO（NO：播放一次后停止）。对正在播放的动画立即生效。没有循环模式的动画库不实现。
+ */
+@property (nonatomic, assign) BOOL loops;
+
+/*!
  * [EN] Applies `darkColors` (keypath -> color, `CYLTabBarAnimationDarkColors`, #442) where `traitCollection` is dark, and
  *      removes them otherwise; libraries without color overrides leave it out.
  * [CN] `traitCollection` 为深色时应用 `darkColors`（keypath -> 颜色，`CYLTabBarAnimationDarkColors`，#442），否则移除；不支持颜色覆盖的动画库不实现。

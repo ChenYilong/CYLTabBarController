@@ -107,3 +107,10 @@
 "需要登录" = "Vyžaduje sa prihlásenie";
 "（扁平）" = " (plochý)";
 "🔴类名与方法名：%@（在第%@行）, 描述：index%@ title%@" = "🔴 Trieda a metóda: %@ (riadok %@), popis: index %@ názov %@";
+
+/* [EN] Playback controls of the tab icon animations (CYLDemoPlaybackControlsView). [CN] Tab 图标动画的播放控件。 */
+"Playback" = "Prehrávanie";
+"Play all" = "Prehrať všetko";
+"Speed" = "Rýchlosť";
+"Loop" = "Slučka";
+"%@ times" = "%@-krát";

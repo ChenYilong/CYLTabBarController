@@ -122,6 +122,23 @@
     self.lottieView.animationSpeed = animationSpeed;
 }
 
+- (BOOL)loops {
+    return self.lottieView.loopAnimation;
+}
+
+- (void)setLoops:(BOOL)loops {
+    LOTAnimationView *lottieView = self.lottieView;
+    if (lottieView.loopAnimation == loops) {
+        return;
+    }
+    lottieView.loopAnimation = loops;
+    // [EN] Lottie 2.x reads it when a play starts: a playing view continues from where it is under the new mode.
+    // [CN] Lottie 2.x 在开始播放时读取该值：正在播放的视图从当前位置按新模式继续播放。
+    if (lottieView.isAnimationPlaying) {
+        [lottieView play];
+    }
+}
+
 @end
 #endif
 
@@ -205,6 +222,20 @@
     CYLCompatibleLOTAnimationView *lottieView = self.lottieView;
     if ([lottieView respondsToSelector:@selector(setAnimationSpeed:)]) {
         lottieView.animationSpeed = animationSpeed;
+    }
+}
+
+- (BOOL)loops {
+    CYLCompatibleLOTAnimationView *lottieView = self.lottieView;
+    return [lottieView respondsToSelector:@selector(loopAnimationCount)] && lottieView.loopAnimationCount == -1;
+}
+
+- (void)setLoops:(BOOL)loops {
+    // [EN] -1 loops; 1 plays once. Lottie 4.x applies a new loop mode to the animation in flight.
+    // [CN] -1 表示循环；1 表示播放一次。Lottie 4.x 会把新的循环模式应用到正在播放的动画。
+    CYLCompatibleLOTAnimationView *lottieView = self.lottieView;
+    if ([lottieView respondsToSelector:@selector(setLoopAnimationCount:)]) {
+        lottieView.loopAnimationCount = loops ? -1 : 1;
     }
 }
 

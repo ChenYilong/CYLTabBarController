@@ -107,3 +107,10 @@
 "需要登录" = "Inloggen vereist";
 "（扁平）" = " (Flat)";
 "🔴类名与方法名：%@（在第%@行）, 描述：index%@ title%@" = "🔴 Klasse en methode: %@ (regel %@), beschrijving: index %@ titel %@";
+
+/* [EN] Playback controls of the tab icon animations (CYLDemoPlaybackControlsView). [CN] Tab 图标动画的播放控件。 */
+"Playback" = "Afspelen";
+"Play all" = "Alles afspelen";
+"Speed" = "Snelheid";
+"Loop" = "Herhalen";
+"%@ times" = "%@ keer";

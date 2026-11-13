@@ -107,3 +107,10 @@
 "需要登录" = "Cal iniciar sessió";
 "（扁平）" = " (pla)";
 "🔴类名与方法名：%@（在第%@行）, 描述：index%@ title%@" = "🔴 Classe i mètode: %@ (línia %@), descripció: índex %@ títol %@";
+
+/* [EN] Playback controls of the tab icon animations (CYLDemoPlaybackControlsView). [CN] Tab 图标动画的播放控件。 */
+"Playback" = "Reproducció";
+"Play all" = "Reprodueix-ho tot";
+"Speed" = "Velocitat";
+"Loop" = "Bucle";
+"%@ times" = "%@ vegades";

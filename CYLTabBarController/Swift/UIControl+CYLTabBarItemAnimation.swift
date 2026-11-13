@@ -276,6 +276,24 @@ extension UIControl {
     }
 
     /**
+     * [EN] Makes this control's animation repeat (`loops`) or play once, applied to the animation already playing.
+     * [CN] 让本控件的动画循环播放（`loops`）或只播放一次，对正在播放的动画立即生效。
+     */
+    @objc(cyl_setTabBarItemAnimationLoops:)
+    public func cyl_setTabBarItemAnimationLoops(_ loops: Bool) {
+        CYLTabBarItemAnimationCore.service?.setAnimationLoops?(loops, in: self)
+    }
+
+    /**
+     * [EN] Plays this control's animation once more from progress 0, without resetting the other tabs.
+     * [CN] 从进度 0 重新播放本控件的动画，不重置其他 Tab。
+     */
+    @objc(cyl_restartTabBarItemAnimation)
+    public func cyl_restartTabBarItemAnimation() {
+        CYLTabBarItemAnimationCore.service?.restartAnimation?(in: self)
+    }
+
+    /**
      * [EN] Reloads this control's animation for the current light / dark style.
      * [CN] 按当前浅色/深色风格重新加载本控件的动画。
      */

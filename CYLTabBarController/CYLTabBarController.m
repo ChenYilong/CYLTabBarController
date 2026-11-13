@@ -2477,8 +2477,32 @@ static NSMutableDictionary<NSString *, NSMutableArray<UIViewController *> *> *CY
 
 - (void)setTabBarItemAnimationSpeed:(CGFloat)tabBarItemAnimationSpeed {
     self.lottieAnimationSpeed = tabBarItemAnimationSpeed;
+    [self cyl_applyTabBarItemAnimationPlayback];
 }
 #pragma clang diagnostic pop
+
+- (void)setTabBarItemAnimationLoops:(BOOL)tabBarItemAnimationLoops {
+    _tabBarItemAnimationLoops = tabBarItemAnimationLoops;
+    [self cyl_applyTabBarItemAnimationPlayback];
+}
+
+/// [EN] The speed and the loop mode, to the views already added (none before the tab bar is laid out).
+/// [CN] 把速度与循环模式应用到已添加的视图（TabBar 布局前没有视图）。
+- (void)cyl_applyTabBarItemAnimationPlayback {
+    if (!CYLTabBarItemAnimationIsAvailable() || ![self isViewLoaded] || ![self.cyl_tabBar isKindOfClass:[CYLTabBar class]]) {
+        return;
+    }
+    [(CYLTabBar *)self.cyl_tabBar cyl_setAllTabBarItemAnimationsSpeed:self.tabBarItemAnimationSpeed
+                                                                loops:self.tabBarItemAnimationLoops];
+}
+
+- (void)cyl_playAllTabBarItemAnimations {
+    if (!CYLTabBarItemAnimationIsAvailable() || ![self.cyl_tabBar isKindOfClass:[CYLTabBar class]]) {
+        return;
+    }
+    [self cyl_applyTabBarItemAnimationPlayback];
+    [(CYLTabBar *)self.cyl_tabBar cyl_restartAllTabBarItemAnimations];
+}
 
 + (instancetype)tabBarControllerWithViewControllers:(NSArray<UIViewController *> *)viewControllers
                               tabBarItemsAttributes:(NSArray<NSDictionary *> *)tabBarItemsAttributes
@@ -5826,6 +5850,7 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
         }
         CGSize lottieSize = [lottieSizeValue CGSizeValue];
         [control cyl_addTabBarItemAnimationWithURL:lottieURL size:lottieSize contentMode:self.tabBarItemAnimationViewContentMode animationSpeed:self.tabBarItemAnimationSpeed];
+        [control cyl_setTabBarItemAnimationLoops:self.tabBarItemAnimationLoops];
         if (animation) {
             // Library-neutral (#604): any animation library (Lottie, PAG). 与动画库无关：任意动画库（Lottie、PAG）。
             [self.cyl_tabBar cyl_playTabBarItemAnimationWithSelectedControl:control URL:lottieURL size:lottieSize defaultSelected:defaultSelected contentMode:self.tabBarItemAnimationViewContentMode];
@@ -5899,6 +5924,7 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
     }
     CGSize lottieSize = [lottieSizeValue CGSizeValue];
     [control cyl_addTabBarItemAnimationWithURL:lottieURL size:lottieSize contentMode:self.tabBarItemAnimationViewContentMode animationSpeed:self.tabBarItemAnimationSpeed];
+    [control cyl_setTabBarItemAnimationLoops:self.tabBarItemAnimationLoops];
     
     if (![self.cyl_tabBar isKindOfClass:[CYLTabBar class]]) {
         return;
@@ -5907,6 +5933,7 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
     
     if (selectedContentControl) {
         [selectedContentControl cyl_addTabBarItemAnimationWithURL:lottieURL size:lottieSize contentMode:self.tabBarItemAnimationViewContentMode animationSpeed:self.tabBarItemAnimationSpeed];
+        [selectedContentControl cyl_setTabBarItemAnimationLoops:self.tabBarItemAnimationLoops];
     }
     
     if (animation) {

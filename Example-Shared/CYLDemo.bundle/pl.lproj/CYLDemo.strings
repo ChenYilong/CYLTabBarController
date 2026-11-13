@@ -107,3 +107,10 @@
 "需要登录" = "Wymagane logowanie";
 "（扁平）" = " (płaski)";
 "🔴类名与方法名：%@（在第%@行）, 描述：index%@ title%@" = "🔴 Klasa i metoda: %@ (linia %@), opis: indeks %@ tytuł %@";
+
+/* [EN] Playback controls of the tab icon animations (CYLDemoPlaybackControlsView). [CN] Tab 图标动画的播放控件。 */
+"Playback" = "Odtwarzanie";
+"Play all" = "Odtwórz wszystko";
+"Speed" = "Prędkość";
+"Loop" = "Pętla";
+"%@ times" = "%@ razy";

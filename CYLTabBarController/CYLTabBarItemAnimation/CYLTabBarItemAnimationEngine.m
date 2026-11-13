@@ -386,6 +386,22 @@ static const void *CYLTabBarItemAnimationShownURLKey = &CYLTabBarItemAnimationSh
     [[self.factory playerForView:[self animationViewInControl:control]] stop];
 }
 
+- (void)restartAnimationInControl:(UIControl *)control {
+    if (!control || [self.host isPlusControl:control]) {
+        return;
+    }
+    // [EN] `-play` starts from the first frame in every library. [CN] 各动画库的 `-play` 都从第一帧开始。
+    [[self.factory playerForView:[self animationViewInControl:control]] play];
+}
+
+- (void)setAnimationLoops:(BOOL)loops inControl:(UIControl *)control {
+    id<CYLTabBarItemAnimationPlayer> player = [self.factory playerForView:[self animationViewInControl:control]];
+    // Libraries without a loop mode (Rive, GIF) do not implement it. 没有循环模式的动画库（Rive、GIF）不实现该方法。
+    if ([player respondsToSelector:@selector(setLoops:)]) {
+        player.loops = loops;
+    }
+}
+
 #pragma mark - Attributes
 
 - (NSString *)attributeKeyForGenericKey:(NSString *)genericKey inAttributes:(NSDictionary *)attributes {

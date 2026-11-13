@@ -107,3 +107,10 @@
 "需要登录" = "Innlogging kreves";
 "（扁平）" = " (flat)";
 "🔴类名与方法名：%@（在第%@行）, 描述：index%@ title%@" = "🔴 Klasse og metode: %@ (linje %@), beskrivelse: indeks %@ tittel %@";
+
+/* [EN] Playback controls of the tab icon animations (CYLDemoPlaybackControlsView). [CN] Tab 图标动画的播放控件。 */
+"Playback" = "Avspilling";
+"Play all" = "Spill av alle";
+"Speed" = "Hastighet";
+"Loop" = "Gjenta";
+"%@ times" = "%@ ganger";

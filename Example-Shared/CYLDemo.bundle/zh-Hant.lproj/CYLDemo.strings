@@ -107,3 +107,10 @@
 "需要登录" = "需要登入";
 "（扁平）" = "（扁平）";
 "🔴类名与方法名：%@（在第%@行）, 描述：index%@ title%@" = "🔴類別名稱與方法名稱：%@（在第%@行），描述：索引 %@ 標題 %@";
+
+/* [EN] Playback controls of the tab icon animations (CYLDemoPlaybackControlsView). [CN] Tab 图标动画的播放控件。 */
+"Playback" = "播放";
+"Play all" = "全部播放";
+"Speed" = "倍速";
+"Loop" = "循環播放";
+"%@ times" = "%@ 倍";

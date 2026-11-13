@@ -38,6 +38,18 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)cyl_stopAllTabBarItemAnimations;
 
+/*!
+ * [EN] Plays the animation of every tab once more from progress 0, selected-state layer included.
+ * [CN] 从进度 0 重新播放所有 Tab 的动画，包括选中态图层。
+ */
+- (void)cyl_restartAllTabBarItemAnimations;
+
+/*!
+ * [EN] Applies `speed` and `loops` to the animation of every tab, selected-state layer included, also while playing.
+ * [CN] 把 `speed` 与 `loops` 应用到所有 Tab 的动画（包括选中态图层），播放中也立即生效。
+ */
+- (void)cyl_setAllTabBarItemAnimationsSpeed:(CGFloat)speed loops:(BOOL)loops;
+
 @end
 
 /*!

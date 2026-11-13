@@ -164,4 +164,14 @@ public protocol CYLTabBarItemAnimationService: NSObjectProtocol {
      * [CN] 本动画库可播放的文件扩展名。
      */
     @objc(animationFileExtensions) optional func animationFileExtensions() -> [String]
+    /**
+     * [EN] Plays the animation of `control` once more from progress 0, without resetting the other tabs.
+     * [CN] 从进度 0 重新播放 `control` 的动画，不重置其他 Tab。
+     */
+    @objc(restartAnimationInControl:) optional func restartAnimation(in control: UIControl)
+    /**
+     * [EN] Makes the animation of `control` repeat (`loops`) or play once, applied to the animation already playing.
+     * [CN] 让 `control` 的动画循环播放（`loops`）或只播放一次，对正在播放的动画立即生效。
+     */
+    @objc(setAnimationLoops:inControl:) optional func setAnimationLoops(_ loops: Bool, in control: UIControl)
 }

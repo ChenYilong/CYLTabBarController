@@ -48,6 +48,9 @@
     // [EN] Pull to refresh, empty / no-network placeholders and the offline red bar (CYLTableViewPlaceHolder).
     // [CN] 下拉刷新、无数据 / 无网络占位图与断网红条（CYLTableViewPlaceHolder）。
     [CYLDemoPlaceholder installOnScrollView:self.tableView viewController:self animation:CYLDemoPlaceholderAnimationRive refresh:nil];
+    // [EN] Play all, speed slider and loop switch for the tab icon animations (AGENTS.md, "Animated icon examples").
+    // [CN] Tab 图标动画的「全部播放」、倍速滑块与循环开关（AGENTS.md「Animated icon examples」）。
+    [CYLDemoPlaybackControlsView installOnTableView:self.tableView viewController:self];
 }
 
 - (void)refresh {

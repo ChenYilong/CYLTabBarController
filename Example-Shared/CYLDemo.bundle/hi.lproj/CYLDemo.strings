@@ -107,3 +107,10 @@
 "需要登录" = "लॉगिन आवश्यक";
 "（扁平）" = " (फ़्लैट)";
 "🔴类名与方法名：%@（在第%@行）, 描述：index%@ title%@" = "🔴 क्लास और मेथड: %@ (लाइन %@), विवरण: इंडेक्स %@ शीर्षक %@";
+
+/* [EN] Playback controls of the tab icon animations (CYLDemoPlaybackControlsView). [CN] Tab 图标动画的播放控件。 */
+"Playback" = "प्लेबैक";
+"Play all" = "सभी चलाएँ";
+"Speed" = "गति";
+"Loop" = "लूप";
+"%@ times" = "%@ गुना";

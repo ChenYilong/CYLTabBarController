@@ -121,6 +121,10 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
     // Issue #426: on a memory warning, unload the views of the tabs that are not selected; they load again when selected.
     // Issue #426：收到内存警告时卸载未选中 Tab 的视图，切换到该 Tab 时重新加载。
     self.unloadsUnselectedViewsOnMemoryWarning = YES;
+    // [EN] Issue #428: plays the tab icons 1.5 times as fast. Set, not a getter override, so the Playback controls on the
+    //      Message tab can change it live.
+    // [CN] Issue #428：Tab 图标以 1.5 倍速播放。用赋值而不是重写 getter，使「消息」页的播放控件可以实时修改它。
+    self.tabBarItemAnimationSpeed = 1.5;
     [super viewDidLoad];
     [self observeLottieAnimationViewDidAdd];
     // FIX: issue #22
@@ -152,14 +156,6 @@ static CGFloat const CYLTabBarControllerHeight = 40.f;
         NSLog(@"🟢 Lottie view added: tab %@, animationSpeed %@", @(tabButton.cyl_tabBarChildViewControllerIndex),
               [(id)tabButton.cyl_tabBarItemAnimationView valueForKey:@"animationSpeed"]);
     }];
-}
-
-/*!
- * [EN] Issue #428: plays the Lottie icons 1.5 times as fast. No need to wait for the Lottie views to be added.
- * [CN] Issue #428：Lottie 图标以 1.5 倍速播放，无需等待 Lottie 视图添加完成。
- */
-- (CGFloat)tabBarItemAnimationSpeed {
-    return 1.5;
 }
 
 - (NSArray *)viewControllersForTabBar {

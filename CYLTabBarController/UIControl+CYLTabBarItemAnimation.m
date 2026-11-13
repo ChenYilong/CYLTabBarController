@@ -88,12 +88,32 @@ NSURL *CYLTabBarItemAnimationURLFromAttributes(NSDictionary *attributes, NSStrin
 }
 
 - (void)cyl_stopAllTabBarItemAnimations {
-    [self.cyl_visibleControls enumerateObjectsUsingBlock:^(UIControl * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-        [obj cyl_stopTabBarItemAnimation];
+    [self cyl_enumerateAnimatedControlsUsingBlock:^(UIControl *control) {
+        [control cyl_stopTabBarItemAnimation];
     }];
-    [self.cyl_platterSelectedContentViews enumerateObjectsUsingBlock:^(UIControl * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-        [obj cyl_stopTabBarItemAnimation];
+}
+
+- (void)cyl_restartAllTabBarItemAnimations {
+    [self cyl_enumerateAnimatedControlsUsingBlock:^(UIControl *control) {
+        [control cyl_restartTabBarItemAnimation];
     }];
+}
+
+- (void)cyl_setAllTabBarItemAnimationsSpeed:(CGFloat)speed loops:(BOOL)loops {
+    [self cyl_enumerateAnimatedControlsUsingBlock:^(UIControl *control) {
+        [control cyl_setTabBarItemAnimationSpeed:speed];
+        [control cyl_setTabBarItemAnimationLoops:loops];
+    }];
+}
+
+/// [EN] The tab buttons, then the selected-state layers (Liquid Glass). [CN] Tab 按钮，然后是选中态图层（液态玻璃）。
+- (void)cyl_enumerateAnimatedControlsUsingBlock:(void (^)(UIControl *control))block {
+    for (UIControl *control in self.cyl_visibleControls) {
+        block(control);
+    }
+    for (UIControl *control in self.cyl_platterSelectedContentViews) {
+        block(control);
+    }
 }
 
 @end
