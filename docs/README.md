@@ -375,7 +375,8 @@ docs/
 │   ├── wechat-miniprogram-api-20-pag-me.png
 │   ├── wechat-miniprogram-api-21-split-lottie.png
 │   ├── wechat-miniprogram-api-22-split-pag.png
-│   ├── wechat-miniprogram-api-23-split-rive.png
+│   ├── wechat-miniprogram-api-23-split-rive-me.png
+│   ├── wechat-miniprogram-api-24-split-gif.png
 │   ├── wechat-miniprogram-badges.png
 │   ├── wechat-miniprogram-christmas-glass.png
 │   ├── wechat-miniprogram-flat-login.png
