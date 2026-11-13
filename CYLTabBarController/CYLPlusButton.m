@@ -1320,6 +1320,16 @@ static NSDictionary<NSNumber *, NSNumber *> *CYLPlusButtonDerivedImageStates(voi
 #endif
 
 /*!
+ * [EN] TODO (2026-11-13, to verify): a second change of what the lens shows over a selected plus button, as risky as this
+ *      mask: PR #793 keeps the lens on the plus page when the plus button's title is drawn by its tab item
+ *      (`CYL_PLUS_BUTTON_TITLE_KEEPS_LENS_ENABLED`, `-[CYLTabBarController cyl_plusButtonTitleIsDrawnByItsTabItem]`). On any plus
+ *      button bug after selection, turn both off first and test again.
+ * [CN] TODO（2026-11-13，待验证）：第二处改变选中 PlusButton 时放大镜显示内容的修改，与本遮罩一样危险：PR #793 在 PlusButton 标题由其
+ *      TabBarItem 绘制时，PlusButton 页面保留放大镜（`CYL_PLUS_BUTTON_TITLE_KEEPS_LENS_ENABLED`）。选中后出现任何 PlusButton bug 时，
+ *      先把两者都关闭再测试。
+ */
+
+/*!
  * [EN] The fix for the cut: while UIKit's Liquid Glass gesture is pressing or dragging (`began` / `changed`, forwarded by
  *      `CYLTabBar`), the lens can leave the plus slot while the plus page is still selected, and a masked part of the real
  *      button would then be drawn by nobody. The mask is off for the whole gesture, and checked again 0.45 s after it
