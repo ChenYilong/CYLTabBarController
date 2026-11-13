@@ -397,6 +397,7 @@ docs/
 │   ├── wechat-miniprogram-api-37-default-tab.png
 │   ├── wechat-miniprogram-api-37-flatDesign-plus.png
 │   ├── wechat-miniprogram-api-37-flatDesign-tab.png
+│   ├── wechat-miniprogram-api-38-tab-lens-reference.jpg
 │   ├── wechat-miniprogram-badges.png
 │   ├── wechat-miniprogram-christmas-glass.png
 │   ├── wechat-miniprogram-flat-login.png
