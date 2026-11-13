@@ -67,43 +67,7 @@
 }
 
 /* [EN] CYLPlusButtonShowsSelection: a selection under the plus button while its page is selected. [CN] CYLPlusButtonShowsSelection：PlusButton 的页面被选中时，在其下方显示选中效果。 */
-/*
- * [EN] The plus button's selection on Liquid Glass: the same lens as a selected tab (cyl-tab-bar-item's
- *      .cyl-item-glass-lens), as on iOS: the whole slot, 5 px from the top and bottom, neutral gray, springing in.
- * [CN] 液态玻璃下 PlusButton 的选中效果：与选中 Tab 的透镜相同（cyl-tab-bar-item 的 .cyl-item-glass-lens），与 iOS
- *      一致：占满整个位置，距上下各 5 px，中性灰，弹入。
- */
-.cyl-plus-selection {
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 5px;
-  bottom: 5px;
-  border-radius: 999px;
-  background-color: rgba(120, 120, 128, 0.14);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55);
-  animation: cyl-plus-selection-in 0.45s cubic-bezier(0.19, 1, 0.22, 1) both;
-}
-
-.cyl-dark .cyl-plus-selection {
-  background-color: rgba(255, 255, 255, 0.14);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18);
-}
-
-@keyframes cyl-plus-selection-in {
-  0% {
-    opacity: 0;
-    transform: scale(0.6);
-  }
-  60% {
-    opacity: 1;
-    transform: scale(1.06);
-  }
-  100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
+/* [EN] The plus button's selection on Liquid Glass is the cyl-glass-lens component, the same lens as a selected tab. [CN] 液态玻璃下 PlusButton 的选中效果为 cyl-glass-lens 组件，与选中 Tab 的透镜相同。 */
 
 .cyl-title {
   margin-top: 2px;

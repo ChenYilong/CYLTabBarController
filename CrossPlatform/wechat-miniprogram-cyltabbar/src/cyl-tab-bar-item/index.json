@@ -1,6 +1,8 @@
 {
   "component": true,
-  "usingComponents": {},
+  "usingComponents": {
+    "cyl-glass-lens": "../cyl-glass-lens/index"
+  },
   "componentGenerics": {
     "cyl-lottie-view": {
       "default": "../cyl-animation-placeholder/index"

@@ -8,7 +8,7 @@
   aria-hidden="true"
 >
   <!-- [EN] Liquid Glass: the lens behind the selected icon and title (decoration). [CN] 液态玻璃：选中图标与标题后的透镜（装饰）。 -->
-  <view wx:if="{{cylItemStyle === 'liquidGlass' && m.selected}}" class="cyl-item-glass-lens" aria-hidden="true"></view>
+  <cyl-glass-lens wx:if="{{cylItemStyle === 'liquidGlass' && m.selected}}" class="cyl-item-glass-lens" is-dark="{{isDark}}" aria-hidden="true" />
   <view wx:if="{{m.image || m.animationPath}}" class="cyl-item-icon-box" style="{{m.iconBoxStyle}}">
     <cyl-lottie-view
       wx:if="{{m.animationType === 'lottie'}}"

@@ -1,7 +1,8 @@
 {
   "component": true,
   "usingComponents": {
-    "cyl-tab-bar-item": "../cyl-tab-bar-item/index"
+    "cyl-tab-bar-item": "../cyl-tab-bar-item/index",
+    "cyl-glass-lens": "../cyl-glass-lens/index"
   },
   "componentGenerics": {
     "cyl-lottie-view": {
