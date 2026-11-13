@@ -390,6 +390,7 @@ docs/
 │   ├── wechat-miniprogram-api-35-plus-selected-default.png
 │   ├── wechat-miniprogram-api-35-plus-selected-liquidGlass-dark.png
 │   ├── wechat-miniprogram-api-35-plus-selected-liquidGlass.png
+│   ├── wechat-miniprogram-api-36-bug-flat-plus-glass.jpg
 │   ├── wechat-miniprogram-badges.png
 │   ├── wechat-miniprogram-christmas-glass.png
 │   ├── wechat-miniprogram-flat-login.png
