@@ -417,6 +417,8 @@ docs/
 │   ├── wechat-miniprogram-api-49-home-table-gallery-badges.png
 │   ├── wechat-miniprogram-api-49-home-table-skins.png
 │   ├── wechat-miniprogram-api-49-home-table-top.png
+│   ├── wechat-miniprogram-api-50-milestone-regular.png
+│   ├── wechat-miniprogram-api-50-milestone-skeuomorphic.png
 │   ├── wechat-miniprogram-badges.png
 │   ├── wechat-miniprogram-christmas-glass.png
 │   ├── wechat-miniprogram-flat-login.png

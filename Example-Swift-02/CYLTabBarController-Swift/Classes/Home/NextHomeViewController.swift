@@ -48,7 +48,7 @@ class NextHomeViewController: UIViewController {
             self?.cyl_popSelectTabBarChildViewController(forTabBarItemIdentifier: "mine") { selected in
                 let next = NextHomeViewController()
                 next.hidesBottomBarWhenPushed = true
-                selected.navigationController?.pushViewController(next, animated: true)
+                selected?.navigationController?.pushViewController(next, animated: true)
             }
         })
         // Pops the current stack, selects the "city" tab, then pushes a page onto it. Pop 当前导航栈、选中「同城」，再向该 Tab push 一个页面。
