@@ -408,6 +408,9 @@ docs/
 │   ├── wechat-miniprogram-api-42-lens-question-plus.png
 │   ├── wechat-miniprogram-api-43-lens-plus.png
 │   ├── wechat-miniprogram-api-43-lens-tab.png
+│   ├── wechat-miniprogram-api-44-lens-me-rows.png
+│   ├── wechat-miniprogram-api-44-lens-regular-discover.png
+│   ├── wechat-miniprogram-api-44-lens-skeuomorphic-discover.png
 │   ├── wechat-miniprogram-badges.png
 │   ├── wechat-miniprogram-christmas-glass.png
 │   ├── wechat-miniprogram-flat-login.png
