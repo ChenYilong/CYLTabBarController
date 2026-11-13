@@ -17,7 +17,7 @@ A mini program code package leaves out `.riv` files: name package copies `*.riv.
 
 Properties: `path` (with optional options in its fragment), `artboard`, `stateMachine`, `input` / `triggerInput` (legacy
 state machine inputs), `active` / `trigger` (view model properties), `duration` (seconds the input stays true, default 1),
-`colors` (view model color path -> color), `loop`, `autoplay`, `fit`, `label`, `wasmPath` (default
+`colors` (view model color path -> color), `loop` (turns the input on again after each play), `speed` (render clock and input duration, applied live), `autoplay`, `fit`, `label`, `wasmPath` (default
 `/cyl-rive-miniprogram/rive.wasm.br`). A mini program cannot read files under `miniprogram_npm` (`readFileSync` and
 `WXWebAssembly` answer "permission denied"), so copy `miniprogram_dist/rive/rive.wasm.br` to that path in your package
 (listed in `cylMiniprogramAssets` of `package.json`; the example's installer does it) or set `wasmPath`. Events: `ready` (artboard, state machine, inputs),
