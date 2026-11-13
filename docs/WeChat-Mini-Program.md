@@ -110,7 +110,7 @@
 
 | 中文 | English |
 |:---|:---|
-| 见右列。 | Score of the component API: every property, event and method of `cyl-tab-bar` (package `cyl-tabbar-miniprogram`) and of its sub-dependency `cyl-lottie` (package `cyl-lottie-miniprogram`), checked in the example in WeChat DevTools (screenshot number below, or a check made through the agent skill `wechatide`'s `automation_evaluate` and its result) or in the Node tests. Score = 100 × verified / total: **100 / 100** (43 of 43). |
+| 见右列。 | Score of the component API: every property, event and method of `cyl-tab-bar` (package `cyl-tabbar-miniprogram`) and of its sub-dependency `cyl-lottie` (package `cyl-lottie-miniprogram`), checked in the example in WeChat DevTools (screenshot number below, or a check made through the agent skill `wechatide`'s `automation_evaluate` and its result) or in the Node tests. Score = 100 × verified / total: **100 / 100** (46 of 46). |
 
 | API | 类型 / Kind | 验证 / Verified |
 |:---|:---|:---|
@@ -137,6 +137,9 @@
 | `cyl_swipe_behavior.js` | behavior | ✅ 07（`cyl_onSwipeStart` / `cyl_onSwipeEnd`） |
 | 无障碍 / accessibility | `aria-*` | ✅ evaluate：`tablist`；每个 Tab 为 `tab`，标签含角标 / each tab a `tab`, label with its badge（"Discover, 3"），`aria-selected`；PlusButton 为 / is a `button` |
 | 点击动画 / tap animation | `CYLTabBarControllerTabButtonTapAnimation` | ✅ evaluate：`bounce`，400 ms |
+| `CYLTabBarItemStyle`（`flat`、`liquidGlass`） | 枚举 / enum | ✅ 测试 / test `cyl_tab_bar_item_style.test.js`；`cyl-tab-bar` 与 `cyl-tab-bar-item` 共用 / shared by both（`require('cyl-tabbar-miniprogram/cyl-tab-bar/cyl_tab_bar_item_style')`） |
+| `itemStyle`（`cyl-tab-bar`、`cyl-tab-bar-item`） | 属性 / property | ✅ evaluate：`liquidGlass` → TabBar `cylStyleType` liquidGlass，Item `cylItemStyle` liquidGlass（25、26）；为空时由 / empty: from `CYLTabBarControllerStyleType` |
+| `cyl_setItemStyle` | 方法 / method | ✅ Me → Item style 切换 flat / liquidGlass / switches flat / liquidGlass（25、26） |
 | `cyl-lottie-view`、`cyl-pag-view`、`cyl-rive-view` | 抽象节点 / abstract nodes | ✅ evaluate：每个 Tab 的动画组件为所传组件 / each tab's animation component is the one passed（cyl-lottie / cyl-pag / cyl-rive，21–23）；未传时为 `cyl-animation-placeholder` / the placeholder when none is passed |
 | `cyl-lottie` `path` | 属性 / property | ✅ 包内文件 / package file（01、11），用户数据目录 / user data folder（13） |
 | `cyl-lottie` `animationData` | 属性 / property | ✅ 测试 / test |
@@ -382,6 +385,20 @@
 <summary>24. 只安装 GIF 包：选中的 Messages 显示星星 GIF，Discover 作为普通图片循环播放火焰 GIF / Only the GIF package installed: the selected Messages shows the star GIF, Discover loops the fire GIF as a plain image. WeChat Mini Program, WeChat DevTools simulator (iPhone, macOS 27.3), base library 3.17.6, branch feat/cross-platform-components after d52b146, 2026-11-13 14:0x (UTC+13)</summary>
 
 ![Only the GIF package installed: the selected Messages shows the star GIF, Discover loops the fire GIF as a plain image](assets/wechat-miniprogram-api-24-split-gif.png)
+
+</details>
+
+<details>
+<summary>25. CYLTabBarItemStyle liquidGlass，浅色：悬浮玻璃胶囊，选中的 Home 位于玻璃透镜上 / CYLTabBarItemStyle liquidGlass, light: the floating glass capsule, the selected Home on its glass lens. WeChat Mini Program, WeChat DevTools simulator (iPhone, macOS 27.3), base library 3.17.6, branch feat/cross-platform-components after 58446e1, 2026-11-13 14:28 (UTC+13)</summary>
+
+![CYLTabBarItemStyle liquidGlass, light](assets/wechat-miniprogram-api-25-glass-light.png)
+
+</details>
+
+<details>
+<summary>26. CYLTabBarItemStyle liquidGlass，深色皮肤，选中 Discover / CYLTabBarItemStyle liquidGlass, dark skin, Discover selected. Same environment as 25</summary>
+
+![CYLTabBarItemStyle liquidGlass, dark skin](assets/wechat-miniprogram-api-26-glass-dark.png)
 
 </details>
 
