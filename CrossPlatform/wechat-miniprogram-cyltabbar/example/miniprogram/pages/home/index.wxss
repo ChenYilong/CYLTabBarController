@@ -1,0 +1,109 @@
+/* [EN] Subtitle cells of the Objective-C table: wrapping title and gray subtitle, an accessory on the right. [CN] Objective-C 表格的副标题单元格：可换行的标题与灰色副标题，右侧为附件。 */
+.cyl-home-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  min-height: 44px;
+  padding: 10px 16px;
+  box-sizing: border-box;
+}
+
+.cyl-home-row + .cyl-home-row {
+  border-top: 1rpx solid rgba(0, 0, 0, 0.12);
+}
+
+.cyl-home-row-pressed {
+  background-color: rgba(0, 0, 0, 0.06);
+}
+
+.cyl-home-texts {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.cyl-home-title {
+  font-size: 16px;
+  line-height: 21px;
+}
+
+.cyl-home-subtitle {
+  margin-top: 2px;
+  font-size: 13px;
+  line-height: 17px;
+  color: #8e8e93;
+}
+
+.cyl-home-chevron {
+  margin-left: 8px;
+  font-size: 22px;
+  color: #c4c4c7;
+}
+
+.cyl-home-badge-title {
+  flex: 1;
+}
+
+/* [EN] A 28 px host with the badge at a corner, as UITableViewCell+CYLBadgeExtention. [CN] 28 px 的宿主，角标位于角上，与 UITableViewCell+CYLBadgeExtention 一致。 */
+.cyl-home-badge-host {
+  position: relative;
+  width: 28px;
+  height: 28px;
+  margin-left: 12px;
+  border-radius: 6px;
+  background-color: #e5e5ea;
+}
+
+/* [EN] The CYLBadgeAppearance defaults: red, bold 9 pt text, margin 8, dot radius 4. [CN] CYLBadgeAppearance 默认值：红色、粗体 9pt 文字、边距 8、红点半径 4。 */
+.cyl-home-badge {
+  position: absolute;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  box-sizing: border-box;
+  border-radius: 8px;
+  background-color: #ff3b30;
+  color: #ffffff;
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 16px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.cyl-home-badge-topRight { top: -8px; left: 22px; }
+.cyl-home-badge-topLeft { top: -8px; right: 22px; }
+.cyl-home-badge-bottomLeft { bottom: -8px; right: 22px; }
+.cyl-home-badge-bottomRight { bottom: -8px; left: 22px; }
+
+.cyl-home-badge-dot {
+  min-width: 0;
+  width: 8px;
+  height: 8px;
+  padding: 0;
+  border-radius: 50%;
+}
+
+.cyl-home-badge-dot.cyl-home-badge-topRight { top: -4px; left: 26px; }
+
+.cyl-home-badge-scale { animation: cyl-badge-scale 0.8s ease-in-out infinite; }
+.cyl-home-badge-shake { animation: cyl-badge-shake 0.6s ease-in-out infinite; }
+.cyl-home-badge-bounce { animation: cyl-badge-bounce 0.8s ease-in-out infinite; }
+.cyl-home-badge-breathe { animation: cyl-badge-breathe 1.6s ease-in-out infinite; }
+.cyl-home-badge-rotation { animation: cyl-badge-rotation 1.2s linear infinite; }
+
+@keyframes cyl-badge-scale { 50% { transform: scale(1.4); } }
+@keyframes cyl-badge-shake { 25% { transform: translateX(-3px); } 75% { transform: translateX(3px); } }
+@keyframes cyl-badge-bounce { 50% { transform: translateY(-4px); } }
+@keyframes cyl-badge-breathe { 50% { opacity: 0.2; } }
+@keyframes cyl-badge-rotation { to { transform: rotate(360deg); } }
+
+@media (prefers-color-scheme: dark) {
+  .cyl-home-row + .cyl-home-row {
+    border-top-color: rgba(255, 255, 255, 0.15);
+  }
+  .cyl-home-badge-host {
+    background-color: #3a3a3c;
+  }
+}

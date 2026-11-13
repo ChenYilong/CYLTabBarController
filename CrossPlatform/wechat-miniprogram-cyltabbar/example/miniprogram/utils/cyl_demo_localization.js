@@ -47,4 +47,4 @@ function cylConfigurationTable() {
   return cylConfigurationStrings[cylLanguage(cylConfigurationStrings)] || {};
 }
 
-module.exports = { t, cylConfigurationTable };
+module.exports = { t, cylConfigurationTable, cylLanguage };
