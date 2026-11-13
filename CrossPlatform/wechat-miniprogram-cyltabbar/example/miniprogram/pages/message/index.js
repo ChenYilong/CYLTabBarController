@@ -6,4 +6,20 @@
  */
 const cylTabPage = require('../../utils/cyl_tab_page');
 
-Component({ behaviors: [cylTabPage] });
+Component({
+  behaviors: [cylTabPage],
+  data: {
+    // [EN] The Liquid Glass gallery's panels (pages/glass). [CN] 液态玻璃画廊的面板（pages/glass）。
+    galleryRows: [
+      { panel: 'checkin', title: 'Liquid Glass gallery: Check-in' },
+      { panel: 'feed', title: 'Navigation bar, search and feed' },
+      { panel: 'cards', title: 'Collection view' },
+      { panel: 'landing', title: 'Landing, tap animations and item styles' },
+    ],
+  },
+  methods: {
+    cyl_openGallery(event) {
+      wx.navigateTo({ url: `/pages/glass/index?panel=${event.currentTarget.dataset.panel}` });
+    },
+  },
+});

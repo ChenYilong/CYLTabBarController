@@ -379,6 +379,10 @@ docs/
 │   ├── wechat-miniprogram-api-24-split-gif.png
 │   ├── wechat-miniprogram-api-25-glass-light.png
 │   ├── wechat-miniprogram-api-26-glass-dark.png
+│   ├── wechat-miniprogram-api-27-gallery-checkin.png
+│   ├── wechat-miniprogram-api-28-gallery-feed.png
+│   ├── wechat-miniprogram-api-29-gallery-cards.png
+│   ├── wechat-miniprogram-api-30-gallery-landing.png
 │   ├── wechat-miniprogram-badges.png
 │   ├── wechat-miniprogram-christmas-glass.png
 │   ├── wechat-miniprogram-flat-login.png

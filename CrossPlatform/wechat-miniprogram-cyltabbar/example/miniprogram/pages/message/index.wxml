@@ -3,4 +3,9 @@
     <text class="cyl-header-title" aria-role="heading">{{texts['Message']}}</text>
     <text class="cyl-header-subtitle">{{texts['Four tabs and a plus button, as in the iOS example: the shared configuration limits Message to iOS and Android (CYLTabBarItemPlatforms), so this example adds the mini program.']}}</text>
   </view>
+
+  <text class="cyl-section-title" aria-role="heading">{{texts['Liquid Glass']}}</text>
+  <view class="cyl-section">
+    <view wx:for="{{galleryRows}}" wx:key="panel" class="cyl-row cyl-row-action" bindtap="cyl_openGallery" data-panel="{{item.panel}}" aria-role="button" aria-label="{{texts[item.title]}}"><text aria-hidden="true">{{texts[item.title]}}</text></view>
+  </view>
 </view>

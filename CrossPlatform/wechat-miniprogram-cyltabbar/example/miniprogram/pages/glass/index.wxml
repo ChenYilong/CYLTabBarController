@@ -1,0 +1,106 @@
+<!-- [EN] The Liquid Glass gallery: a custom navigation bar, four panels, and the core's glass cyl-tab-bar that switches them. [CN] 液态玻璃画廊：自定义导航栏、四个面板，以及切换它们的核心层玻璃 cyl-tab-bar。 -->
+<view class="cyl-glass-page cyl-glass-page-{{panel}}">
+  <!-- [EN] Floating light blobs (mirror-landing idea). [CN] 浮动光晕（mirror-landing 的思路）。 -->
+  <view class="cyl-glass-blobs" aria-hidden="true">
+    <view class="cyl-glass-blob cyl-glass-blob-1"></view>
+    <view class="cyl-glass-blob cyl-glass-blob-2"></view>
+    <view class="cyl-glass-blob cyl-glass-blob-3"></view>
+  </view>
+
+  <!-- [EN] Navigation bar: back, title, and the search box on the Feed panel. [CN] 导航栏：返回、标题，动态面板上还有搜索框。 -->
+  <view class="cyl-glass-nav" style="padding-top: {{navigation.statusBar}}px;">
+    <view class="cyl-glass-nav-bar" style="height: {{navigation.height}}px; padding-right: {{navigation.capsuleRight}}px;">
+      <view class="cyl-glass-nav-back" bindtap="cyl_back" aria-role="button" aria-label="{{texts['Back']}}"><text aria-hidden="true">‹</text></view>
+      <text class="cyl-glass-nav-title" aria-role="heading">{{panelTitle}}</text>
+    </view>
+    <view wx:if="{{panel === 'feed'}}" class="cyl-glass-search">
+      <text class="cyl-glass-search-icon" aria-hidden="true">🔍</text>
+      <input class="cyl-glass-search-input" placeholder-class="cyl-glass-search-placeholder" placeholder="{{texts['Search posts']}}" value="{{keyword}}" bindinput="cyl_search" confirm-type="search" aria-label="{{texts['Search posts']}}" />
+    </view>
+  </view>
+
+  <scroll-view class="cyl-glass-content" scroll-y enhanced show-scrollbar="{{false}}">
+    <!-- [EN] Check-in (sports-checkin idea). [CN] 打卡（sports-checkin 的思路）。 -->
+    <view wx:if="{{panel === 'checkin'}}" class="cyl-glass-panel">
+      <view class="cyl-glass-card cyl-glass-slide-up">
+        <text class="cyl-glass-caption">{{texts['Today']}}</text>
+        <button class="cyl-glass-checkin {{checkedIn ? 'cyl-glass-checked' : ''}}" bindtap="cyl_checkIn" aria-label="{{checkedIn ? texts['Checked in today'] : texts['Start a workout']}}">
+          <text class="cyl-glass-checkin-icon" aria-hidden="true">{{checkedIn ? '✓' : '💪'}}</text>
+          <text class="cyl-glass-checkin-text" aria-hidden="true">{{checkedIn ? texts['Checked in today'] : texts['Start a workout']}}</text>
+        </button>
+      </view>
+      <text class="cyl-glass-section-title" aria-role="heading">{{texts['Choose a sport']}}</text>
+      <!-- [EN] A collection view: a 4-column grid. [CN] 集合视图：4 列网格。 -->
+      <view class="cyl-glass-grid-4">
+        <view wx:for="{{checkin.sports}}" wx:key="id" class="cyl-glass-sport cyl-glass-scale-in {{selectedSport === item.id ? 'cyl-glass-sport-selected' : ''}}" style="animation-delay: {{index * 40}}ms;" bindtap="cyl_selectSport" data-id="{{item.id}}" aria-role="button" aria-selected="{{selectedSport === item.id}}" aria-label="{{item.name}}">
+          <text class="cyl-glass-sport-emoji" aria-hidden="true">{{item.emoji}}</text>
+          <text class="cyl-glass-sport-name" aria-hidden="true">{{item.name}}</text>
+        </view>
+      </view>
+      <view class="cyl-glass-stats">
+        <view class="cyl-glass-card cyl-glass-stat" aria-label="{{texts['This week']}}, {{checkin.stats.week}}"><text class="cyl-glass-stat-number" aria-hidden="true">{{checkin.stats.week}}</text><text class="cyl-glass-stat-label" aria-hidden="true">{{texts['This week']}}</text></view>
+        <view class="cyl-glass-card cyl-glass-stat" aria-label="{{texts['Total']}}, {{checkin.stats.total}}"><text class="cyl-glass-stat-number" aria-hidden="true">{{checkin.stats.total}}</text><text class="cyl-glass-stat-label" aria-hidden="true">{{texts['Total']}}</text></view>
+        <view class="cyl-glass-card cyl-glass-stat" aria-label="{{texts['Streak']}}, {{checkin.stats.streak}}"><text class="cyl-glass-stat-number" aria-hidden="true">{{checkin.stats.streak}}</text><text class="cyl-glass-stat-label" aria-hidden="true">{{texts['Streak']}}</text></view>
+      </view>
+      <view class="cyl-glass-card cyl-glass-week">
+        <view wx:for="{{checkin.week}}" wx:key="day" class="cyl-glass-day" aria-label="{{item.day}}, {{item.done ? texts['Done'] : texts['Rest']}}">
+          <view class="cyl-glass-day-dot {{item.done ? 'cyl-glass-day-done' : ''}}" aria-hidden="true"></view>
+          <text class="cyl-glass-day-name" aria-hidden="true">{{item.day}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- [EN] Feed (chatnote notes and community idea): tag pills and a feed list (table view). [CN] 动态（chatnote 笔记与社区的思路）：标签与信息流列表（表格视图）。 -->
+    <view wx:if="{{panel === 'feed'}}" class="cyl-glass-panel">
+      <scroll-view class="cyl-glass-tags" scroll-x enhanced show-scrollbar="{{false}}">
+        <view wx:for="{{tags}}" wx:key="*this" class="cyl-glass-pill {{tag === item ? 'cyl-glass-pill-selected' : ''}}" bindtap="cyl_selectTag" data-tag="{{item}}" aria-role="button" aria-selected="{{tag === item}}" aria-label="{{item}}"><text aria-hidden="true">{{item}}</text></view>
+      </scroll-view>
+      <view wx:if="{{!posts.length}}" class="cyl-glass-card cyl-glass-empty" aria-label="{{texts['No posts']}}"><text aria-hidden="true">📝 {{texts['No posts']}}</text></view>
+      <view wx:for="{{posts}}" wx:key="id" class="cyl-glass-card cyl-glass-post cyl-glass-slide-up" style="animation-delay: {{index * 60}}ms;" aria-label="{{item.title}}, {{item.author}}, {{item.time}}, {{item.likes}} {{texts['likes']}}">
+        <view class="cyl-glass-post-header" aria-hidden="true">
+          <text class="cyl-glass-avatar">{{item.avatar}}</text>
+          <view class="cyl-glass-post-meta"><text class="cyl-glass-post-author">{{item.author}}</text><text class="cyl-glass-post-time">{{item.time}}</text></view>
+          <view class="cyl-glass-tag" style="border-color: {{item.color}}; color: {{item.color}};"><view class="cyl-glass-tag-dot" style="background-color: {{item.color}};"></view>{{item.tag}}</view>
+        </view>
+        <text class="cyl-glass-post-title" aria-hidden="true">{{item.title}}</text>
+        <text class="cyl-glass-post-preview" aria-hidden="true">{{item.preview}}</text>
+        <view class="cyl-glass-post-footer" aria-hidden="true"><text>♥ {{item.likes}}</text><text>💬 {{item.comments}}</text></view>
+      </view>
+    </view>
+
+    <!-- [EN] Cards: a two-column collection view; tapping marks a card reviewed. [CN] 卡片：两列集合视图；点击标记已复习。 -->
+    <view wx:if="{{panel === 'cards'}}" class="cyl-glass-panel">
+      <view class="cyl-glass-grid-2">
+        <view wx:for="{{cards}}" wx:key="id" class="cyl-glass-tile cyl-glass-scale-in {{reviewed[item.id] ? 'cyl-glass-tile-reviewed' : ''}}" style="animation-delay: {{index * 50}}ms;" bindtap="cyl_toggleCard" data-id="{{item.id}}" aria-role="button" aria-selected="{{!!reviewed[item.id]}}" aria-label="{{item.title}}, {{item.subtitle}}">
+          <view class="cyl-glass-tile-cover" style="background: linear-gradient(135deg, {{item.from}}, {{item.to}});" aria-hidden="true"><text>{{reviewed[item.id] ? '✓' : item.emoji}}</text></view>
+          <text class="cyl-glass-tile-title" aria-hidden="true">{{item.title}}</text>
+          <text class="cyl-glass-tile-subtitle" aria-hidden="true">{{item.subtitle}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- [EN] Landing (mirror-landing idea), the core tap animations and the item style switch. [CN] 落地页（mirror-landing 的思路）、核心层点击动画与 Item 样式切换。 -->
+    <view wx:if="{{panel === 'landing'}}" class="cyl-glass-panel">
+      <view class="cyl-glass-card cyl-glass-hero cyl-glass-fade-up">
+        <text class="cyl-glass-hero-mark" aria-hidden="true">✦</text>
+        <text class="cyl-glass-hero-title" aria-role="heading">{{texts['Liquid Glass']}}</text>
+        <text class="cyl-glass-hero-subtitle">{{texts['A tab bar you can see through: one enum, two styles.']}}</text>
+        <button class="cyl-glass-cta" bindtap="cyl_toggleItemStyle" aria-label="{{texts['Switch item style']}}, {{itemStyle}}">{{texts['Switch item style']}} · {{itemStyle}}</button>
+      </view>
+      <text class="cyl-glass-section-title" aria-role="heading">{{texts['Tap animations']}}</text>
+      <view class="cyl-glass-card cyl-glass-items">
+        <view wx:for="{{tapAnimations}}" wx:key="*this" class="cyl-glass-item-cell" bindtap="cyl_playTapAnimation" data-name="{{item}}" aria-role="button" aria-label="{{item}}">
+          <cyl-tab-bar-item class="cyl-glass-item" title="{{item}}" image="/shared/skins/2.1.0/light/home@3x.png" selected-image="/shared/skins/2.1.0/light/home_selected@3x.png" selected="{{true}}" item-style="{{itemStyle}}" animation-class="{{playing[item]}}" animation-duration="{{500}}" />
+        </view>
+      </view>
+      <text class="cyl-glass-section-title" aria-role="heading">{{texts['Item styles']}}</text>
+      <view class="cyl-glass-card cyl-glass-items">
+        <view class="cyl-glass-item-cell" aria-label="flat"><cyl-tab-bar-item class="cyl-glass-item" title="flat" image="/shared/skins/2.1.0/light/discover@3x.png" selected-image="/shared/skins/2.1.0/light/discover_selected@3x.png" selected="{{true}}" item-style="flat" /></view>
+        <view class="cyl-glass-item-cell" aria-label="liquidGlass"><cyl-tab-bar-item class="cyl-glass-item" title="liquidGlass" image="/shared/skins/2.1.0/light/discover@3x.png" selected-image="/shared/skins/2.1.0/light/discover_selected@3x.png" selected="{{true}}" item-style="liquidGlass" /></view>
+      </view>
+    </view>
+  </scroll-view>
+
+  <!-- [EN] The core's tab bar switches the panels; its Liquid Glass look comes from CYLTabBarItemStyle. [CN] 核心层 TabBar 切换面板；液态玻璃外观来自 CYLTabBarItemStyle。 -->
+  <cyl-tab-bar id="cyl-gallery-tab-bar" configuration="{{configuration}}" symbols-by-theme="{{symbolsByTheme}}" selected-identifier="{{panel}}" item-style="{{itemStyle}}" bind:select="cyl_onSelect" />
+</view>
