@@ -1,5 +1,5 @@
 {
- "source": "Public API of the Objective-C headers at 1fddee2 (2026-11-12), the commit before the Swift migration began; generated once from those headers (with the comments of scripts/harmonyos-api-map.py). The Public API rule forbids removing any of these symbols.",
+ "source": "Public API of the Objective-C headers at 1fddee2 (2026-11-12), the commit before the Swift migration began; generated once from those headers (with the comments of scripts/harmonyos-api-map.py). The Public API rule forbids removing any of these symbols. Later public symbols whose declarations moved into Swift are appended (2026-11-13: -cyl_moveBadgeToCurrentTabButtonIfNeeded).",
  "symbols": [
   {
    "header": "CYLTabBarController/CYLBadgeView/CAAnimation+CYLBadgeExtention.h",
@@ -864,6 +864,14 @@
    "name": "-cyl_isPauseBadge",
    "key": "UITabBarItem(CYLBadgeExtention) -cyl_isPauseBadge",
    "comment": ""
+  },
+  {
+   "header": "CYLTabBarController/CYLBadgeView/UITabBarItem+CYLBadgeExtention.h",
+   "kind": "method",
+   "owner": "UITabBarItem(CYLBadgeExtention)",
+   "name": "-cyl_moveBadgeToCurrentTabButtonIfNeeded",
+   "key": "UITabBarItem(CYLBadgeExtention) -cyl_moveBadgeToCurrentTabButtonIfNeeded",
+   "comment": "Classic style (not Liquid Glass): moves a badge to the tab button UIKit created in place of the old one when the item changed, with the same value and animation. Called by CYLTabBar's layout."
   },
   {
    "header": "CYLTabBarController/CYLBadgeView/UIView+CYLBadgeExtention.h",
