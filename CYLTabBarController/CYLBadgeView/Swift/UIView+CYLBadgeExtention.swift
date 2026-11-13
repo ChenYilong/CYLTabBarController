@@ -199,7 +199,7 @@ final class CYLBadgeHostOverlayView: UIView {
         // [EN] FIX: issue #601 — a host hidden for the view shown in its place keeps its badge visible, above that view too,
         //      which is added to the tab button later.
         // [CN] 被替换显示而隐藏的宿主，角标仍可见，并位于之后添加到 Tab 按钮中的替换视图之上。
-        if host?.cyl_isBadgeHostReplacedByIconView ?? false {
+        if host?.cyl_badgeHostReplacedByIconView ?? false {
             layer.zPosition = (hostLayer?.zPosition ?? 0) + 1
             isHidden = false
             alpha = 1
@@ -284,7 +284,7 @@ private func cylBadgeHostDrawsAsTemplate(_ host: UIView) -> Bool {
 private func cylBadgeContainer(forHost host: UIView) -> UIView {
     var token = objc_getAssociatedObject(host, CYLBadgeViewKeys.overlayToken) as? CYLBadgeHostOverlayToken
     let hostClips = host.clipsToBounds || host.layer.masksToBounds || host.layer.mask != nil
-    let needsOverlay = hostClips || host.cyl_isBadgeHostReplacedByIconView || cylBadgeHostDrawsAsTemplate(host)
+    let needsOverlay = hostClips || host.cyl_badgeHostReplacedByIconView || cylBadgeHostDrawsAsTemplate(host)
     if !needsOverlay || host.superview == nil {
         if let overlay = token?.overlay {
             overlay.cyl_detach()
@@ -853,8 +853,8 @@ extension UIView {
      * [EN] YES while this view is hidden for a view shown in its place (#601); its badge then shows on an overlay above it.
      * [CN] 本视图因被替换显示而隐藏时为 YES（#601）；此时其角标显示在它上方的浮层上。
      */
-    @objc(cyl_isBadgeHostReplacedByIconView)
-    public dynamic var cyl_isBadgeHostReplacedByIconView: Bool {
+    @objc(cyl_badgeHostReplacedByIconView)
+    public dynamic var cyl_badgeHostReplacedByIconView: Bool {
         @objc(cyl_isBadgeHostReplacedByIconView) get {
             (objc_getAssociatedObject(self, CYLBadgeViewKeys.hostReplacedByIconView) as? NSNumber)?.boolValue ?? false
         }
