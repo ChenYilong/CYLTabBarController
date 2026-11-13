@@ -809,7 +809,9 @@ public class CYLTabBarManifestLoader: NSObject {
                     error = saveError
                 }
             }
-            let failed: Any? = saved == nil ? (remote ?? dictionary) : nil
+            // The manifest that failed to save, else the raw dictionary; the two optionals have different types.
+            let fallback: Any? = remote.map { $0 as Any } ?? dictionary.map { $0 as Any }
+            let failed: Any? = saved == nil ? fallback : nil
             DispatchQueue.main.async {
                 self.finish(remote: saved, fallbackFrom: failed, error: error, completion: completion)
             }
