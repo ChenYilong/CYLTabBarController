@@ -131,7 +131,6 @@ Component({
     cylSlots: [],
     cylStyleType: 'default',
     cylItemStyle: 'flat',
-    cylPlusLensStyle: '',
     cylIsDark: false,
     cylBarStyle: '',
     cylThemeIdentifier: '',
@@ -216,10 +215,7 @@ Component({
         cylTapAnimation: model.tapAnimation,
         cylAnimationStyle: `animation-duration: ${model.animationDuration}ms;`,
         cylAnimationDuration: model.animationDuration,
-      }, () => {
-        this.cyl_syncLottie(selected);
-        this.cyl_centerPlusLens();
-      });
+      }, () => this.cyl_syncLottie(selected));
     },
 
     /**
@@ -228,34 +224,6 @@ Component({
      * [CN] 播放刚被选中的 Tab 的 Lottie 图标（播放一次，停在最后一帧），其他 Tab 停在首帧或循环播放
      *      （CYLTabBarLottieLoopsWhenUnselected）。
      */
-    /**
-     * [EN] Centers the plus button's glass lens on the plus button and its title, as a tab's lens is centered on its
-     *      icon and title: the raised button sits above the slot's center, so a lens centered on the slot looked low
-     *      (17 px in the example). Same size as a tab's lens (the slot's width, the bar's height minus 10 px).
-     * [CN] 让 PlusButton 的玻璃透镜以 PlusButton 及其标题为中心，与 Tab 的透镜以图标和标题为中心一致：凸起的按钮高于
-     *      位置中心，透镜以位置为中心时看起来偏下（示例中 17 px）。尺寸与 Tab 的透镜相同（位置宽度、TabBar 高度减 10 px）。
-     */
-    cyl_centerPlusLens() {
-      const plus = (this.data.cylSlots || []).find((slot) => slot.isPlusButton);
-      if (!plus || !plus.showsSelection || this.data.cylStyleType !== 'liquidGlass') {
-        return;
-      }
-      this.createSelectorQuery()
-        .select('.cyl-plus-slot').boundingClientRect()
-        .select('.cyl-plus-button').boundingClientRect()
-        .exec(([slot, button]) => {
-          if (!slot || !button) {
-            return;
-          }
-          const height = Math.max(0, slot.height - 10);
-          const top = (button.top + button.bottom) / 2 - slot.top - height / 2;
-          const style = `top: ${top.toFixed(1)}px; bottom: auto; height: ${height}px;`;
-          if (style !== this.data.cylPlusLensStyle) {
-            this.setData({ cylPlusLensStyle: style });
-          }
-        });
-    },
-
     cyl_syncLottie(selected) {
       const previous = this.cylLottieSelected;
       this.cylLottieSelected = selected;

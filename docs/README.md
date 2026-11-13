@@ -406,7 +406,6 @@ docs/
 │   ├── wechat-miniprogram-api-41-lens-keep-reference.jpg
 │   ├── wechat-miniprogram-api-42-lens-question-gallery.png
 │   ├── wechat-miniprogram-api-42-lens-question-plus.png
-│   ├── wechat-miniprogram-api-43-gallery-now.png
 │   ├── wechat-miniprogram-api-43-lens-plus.png
 │   ├── wechat-miniprogram-api-43-lens-tab.png
 │   ├── wechat-miniprogram-badges.png
