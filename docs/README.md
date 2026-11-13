@@ -386,6 +386,7 @@ docs/
 │   ├── wechat-miniprogram-api-31-bug-lens-spacing.png
 │   ├── wechat-miniprogram-api-32-fix-lens-spacing.png
 │   ├── wechat-miniprogram-api-33-playback-controls-lottie.png
+│   ├── wechat-miniprogram-api-34-plus-before-dark.jpg
 │   ├── wechat-miniprogram-badges.png
 │   ├── wechat-miniprogram-christmas-glass.png
 │   ├── wechat-miniprogram-flat-login.png
