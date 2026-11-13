@@ -716,7 +716,7 @@ extension UIView {
             container.addSubview(view)
         }
         container.bringSubviewToFront(view)
-        view.layer.zPosition = .greatestFiniteMagnitude
+        view.layer.zPosition = .cyl_topZPosition
     }
 
     private func cyl_resetRedDotBadgeFrame() {

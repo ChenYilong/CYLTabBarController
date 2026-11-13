@@ -70,7 +70,7 @@ open class CYLTabBarBadgeView: UIView, CYLBadgeTextDisplaying {
         badgeLabel.textColor = .white
         addSubview(badgeLabel)
         bringSubviewToFront(badgeLabel)
-        badgeLabel.layer.zPosition = .greatestFiniteMagnitude
+        badgeLabel.layer.zPosition = .cyl_topZPosition
     }
 
     @available(*, unavailable)

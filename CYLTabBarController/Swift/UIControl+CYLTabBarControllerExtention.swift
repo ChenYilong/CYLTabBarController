@@ -627,7 +627,7 @@ extension UIControl {
         cover.cyl_tabButtonCoverView = show
         if show {
             bringSubviewToFront(cover)
-            cover.layer.zPosition = .greatestFiniteMagnitude
+            cover.layer.zPosition = .cyl_topZPosition
         } else {
             cover.layer.zPosition = 0
         }

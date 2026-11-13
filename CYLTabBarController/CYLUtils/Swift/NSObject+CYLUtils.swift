@@ -101,6 +101,16 @@ extension NSObject {
  * [EN] Association keys shared with Objective-C: the selector, as the Objective-C version used.
  * [CN] 与 Objective-C 共用的关联对象 key：与 Objective-C 版本一样使用 selector。
  */
+extension CGFloat {
+    /**
+     * [EN] `MAXFLOAT`, the top `zPosition` (as in Objective-C): `CGFloat.greatestFiniteMagnitude` is Double's maximum, which
+     *      CoreAnimation rejects ("zPosition should be within (-FLT_MAX, FLT_MAX) range").
+     * [CN] `MAXFLOAT`，最上层的 `zPosition`（与 Objective-C 相同）：`CGFloat.greatestFiniteMagnitude` 是 Double 的最大值，CoreAnimation
+     *      不接受（"zPosition should be within (-FLT_MAX, FLT_MAX) range"）。
+     */
+    static let cyl_topZPosition = CGFloat(Float.greatestFiniteMagnitude)
+}
+
 enum CYLUtilsKeys {
     static let isPlaceholder = CYLUtilsKeys.key("cyl_isPlaceholder")
     static let respondsOutsideSuperviewBounds = CYLUtilsKeys.key("cyl_respondsOutsideSuperviewBounds")

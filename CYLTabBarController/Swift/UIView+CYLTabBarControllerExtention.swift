@@ -353,7 +353,7 @@ extension UIView {
     public func cyl_bringSubview(toTop view: UIView) {
         addSubview(view)
         bringSubviewToFront(view)
-        view.layer.zPosition = .greatestFiniteMagnitude
+        view.layer.zPosition = .cyl_topZPosition
     }
 
     // MARK: Snapshots

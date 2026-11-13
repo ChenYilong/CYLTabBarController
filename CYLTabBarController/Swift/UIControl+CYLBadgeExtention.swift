@@ -345,7 +345,7 @@ extension UIControl {
                 addSubview(anchorView)
             }
             bringSubviewToFront(anchorView)
-            anchorView.layer.zPosition = .greatestFiniteMagnitude
+            anchorView.layer.zPosition = .cyl_topZPosition
         } else {
             if anchorView.superview !== container {
                 anchorView.removeFromSuperview()
