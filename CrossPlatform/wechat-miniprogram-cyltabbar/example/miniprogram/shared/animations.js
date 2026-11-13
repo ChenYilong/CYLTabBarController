@@ -4,6 +4,9 @@ module.exports = {
     "/shared/rive/icons.riv.bin"
   ],
   "pag": [
-    "/shared/pag/2J.pag.bin"
+    "/shared/pag/tab_home.pag.bin",
+    "/shared/pag/tab_moments.pag.bin",
+    "/shared/pag/tab_health.pag.bin",
+    "/shared/pag/tab_me.pag.bin"
   ]
 };

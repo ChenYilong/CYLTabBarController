@@ -82,14 +82,20 @@ function cylDemoPlatforms(items) {
 }
 
 /**
- * [EN] PAG tab icons (CYLTabBarPAGFilePath): pag-android/2J.pag, the iOS examples' PAG file that libpag-lite plays.
- * [CN] PAG Tab 图标（CYLTabBarPAGFilePath）：pag-android/2J.pag，iOS 示例中 libpag-lite 能播放的 PAG 文件。
+ * [EN] PAG tab icons (CYLTabBarPAGFilePath) as in the iOS PAG example (Example-PAG): one vector PAG file per tab.
+ * [CN] 与 iOS PAG 示例（Example-PAG）相同的 PAG Tab 图标（CYLTabBarPAGFilePath）：每个 Tab 一个矢量 PAG 文件。
  */
-function cylDemoPAGItems(items, file) {
-  return items.map((attributes) => Object.assign({}, attributes, {
-    CYLTabBarPAGFilePath: file,
-    CYLTabBarPAGSize: '{30, 30}',
-  }));
+const CYL_DEMO_PAG = { home: 'tab_home', message: 'tab_moments', discover: 'tab_health', me: 'tab_me' };
+
+function cylDemoPAGItems(items, files) {
+  return items.map((attributes) => {
+    const name = CYL_DEMO_PAG[attributes.CYLTabBarItemIdentifier];
+    const file = name && files.find((path) => path.endsWith(`/${name}.pag.bin`));
+    return file ? Object.assign({}, attributes, {
+      CYLTabBarPAGFilePath: file,
+      CYLTabBarPAGSize: '{30, 30}',
+    }) : attributes;
+  });
 }
 
 /**
@@ -130,10 +136,10 @@ function cylDemoConfiguration(overrides) {
   const options = overrides || {};
   const sharedItems = cylDemoPlatforms(cylSharedConfiguration.CYLTabBarControllerTabBarItemsAttributes);
   const icons = options.cylDemoIcons || (options.cylDemoLottie === false ? 'images' : 'lottie');
-  const pagFile = icons === 'pag' ? cylAvailablePAGFiles()[0] : '';
+  const pagFiles = icons === 'pag' ? cylAvailablePAGFiles() : [];
   let items = sharedItems;
-  if (pagFile) {
-    items = cylDemoPAGItems(sharedItems, pagFile);
+  if (pagFiles.length) {
+    items = cylDemoPAGItems(sharedItems, pagFiles);
   } else if (icons === 'rive') {
     items = cylDemoRiveItems(sharedItems);
   } else if (icons !== 'images') {

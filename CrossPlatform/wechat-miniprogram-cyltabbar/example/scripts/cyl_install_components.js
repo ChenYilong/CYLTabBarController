@@ -59,8 +59,13 @@ function cylMain() {
   const check = process.argv.includes('--check')
   const packages = cylPackages(CYL_EXAMPLE)
   const expected = {}
-  Object.entries(packages).forEach(([name, {distFolder}]) => {
-    cylFiles(distFolder).forEach((file) => {
+  // [EN] Assets (below) are left out of miniprogram_npm: the mini program cannot read them there, and a second copy of
+  //      each WebAssembly (about 0.6 MB) counts toward the 2 MB main package.
+  // [CN] 资源文件（见下）不复制到 miniprogram_npm：小程序在那里读取不到，而每个 WebAssembly 的第二份副本（约 0.6 MB）
+  //      会计入 2 MB 的主包。
+  Object.entries(packages).forEach(([name, {folder, distFolder, assets}]) => {
+    const skipped = assets.map((file) => path.resolve(folder, file))
+    cylFiles(distFolder).filter((file) => !skipped.includes(path.join(distFolder, file))).forEach((file) => {
       expected[path.join(name, file)] = path.join(distFolder, file)
     })
   })

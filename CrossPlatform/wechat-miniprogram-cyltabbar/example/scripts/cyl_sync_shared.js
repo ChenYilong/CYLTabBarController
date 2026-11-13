@@ -51,17 +51,20 @@ const CYL_LOTTIE_FILES = ['home', 'news', 'discover', 'mine'].flatMap((name) => 
 ]);
 
 /**
- * [EN] PAG files of the iOS examples that libpag-lite-miniprogram can play (one BMP video sequence). The repository does
- *      not distribute PAG files: they are downloaded by `python3 scripts/fetch-animation-resources.py PAGResources`
- *      (or `pod install` in Example-PAG) into Example-Shared/PAGResources, copied here when present (shared/pag is in
- *      .gitignore); shared/animations.js lists them and the example offers PAG icons only when they are there.
- * [CN] libpag-lite-miniprogram 能播放的 iOS 示例 PAG 文件（单个 BMP 视频序列帧）。本仓库不分发 PAG 文件：它们由
- *      `python3 scripts/fetch-animation-resources.py PAGResources`（或在 Example-PAG 中 `pod install`）下载到
- *      Example-Shared/PAGResources，存在时复制到这里（shared/pag 已加入 .gitignore），并列在 shared/animations.js 中，
- *      shared/animations.js 列出它们，只有文件存在时示例才提供 PAG 图标。
+ * [EN] The PAG tab icons of the iOS PAG example (Example-PAG: tab_home, tab_moments, tab_health, tab_me, vector files
+ *      that cyl-pag plays with the full libpag). The repository does not distribute PAG files: they are downloaded by
+ *      `python3 scripts/fetch-animation-resources.py PAGResources` (or `pod install` in Example-PAG) into
+ *      Example-Shared/PAGResources, copied here when present (shared/pag is in .gitignore); shared/animations.js lists
+ *      them and the example offers PAG icons only when they are there.
+ * [CN] iOS PAG 示例（Example-PAG）的 PAG Tab 图标：tab_home、tab_moments、tab_health、tab_me，是 cyl-pag 用完整
+ *      libpag 播放的矢量文件。本仓库不分发 PAG 文件：它们由 `python3 scripts/fetch-animation-resources.py PAGResources`
+ *      （或在 Example-PAG 中 `pod install`）下载到 Example-Shared/PAGResources，存在时复制到这里（shared/pag 已加入
+ *      .gitignore）；shared/animations.js 列出它们，只有文件存在时示例才提供 PAG 图标。
  */
 const CYL_PAG_SOURCE = path.join(CYL_REPOSITORY_ROOT, 'Example-Shared', 'PAGResources');
-const CYL_PAG_FILES = ['pag-android/2J.pag', 'pag-android/LICENSE'];
+const CYL_PAG_FILES = ['tab_home', 'tab_moments', 'tab_health', 'tab_me']
+  .map((name) => `tab-icons/${name}.pag`)
+  .concat(['tab-icons/LICENSE.txt']);
 
 /**
  * [EN] The Rive tab icons of the iOS examples (Example-SwiftUI-Rive / Example-Rive): the course's icons.riv, one artboard

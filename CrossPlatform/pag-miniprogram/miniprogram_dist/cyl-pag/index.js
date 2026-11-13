@@ -1,17 +1,42 @@
 /**
- * [EN] cyl-pag: a PAG animation component on libpag-lite-miniprogram (Tencent/libpag web/lite, vendored in ../libpag),
- *      with the same properties, events and methods as cyl-lottie, so cyl-tab-bar-item switches by file type. It sets
- *      up its own <canvas type="webgl">, sized for the pixel ratio, reads `path` (a package file, a user data file or
- *      a network URL) as an ArrayBuffer and plays it. libpag-lite plays PAG files made of one BMP video sequence only
- *      (export the composition as BMP); other files emit `error`. Events: `ready`, `complete`, `loopcomplete`,
- *      `error`. Methods: cyl_play, cyl_pause, cyl_stop, cyl_playFromStart, cyl_setProgress, cyl_animation.
- * [CN] cyl-pag：基于 libpag-lite-miniprogram（Tencent/libpag web/lite，内置于 ../libpag）的 PAG 动画组件，属性、事件与
- *      方法与 cyl-lottie 相同，因此 cyl-tab-bar-item 可以按文件类型切换。组件自己创建 <canvas type="webgl">，按像素比
- *      设置尺寸，把 `path`（包内文件、用户数据目录文件或网络地址）读为 ArrayBuffer 并播放。libpag-lite 只能播放由单个
- *      BMP 视频序列帧组成的 PAG 文件（导出时选择 BMP）；其他文件发出 `error`。事件：`ready`、`complete`、
- *      `loopcomplete`、`error`。方法：cyl_play、cyl_pause、cyl_stop、cyl_playFromStart、cyl_setProgress、cyl_animation。
+ * [EN] cyl-pag: a PAG animation component on libpag-miniprogram (Tencent/libpag web, the full WebAssembly + WebGL build,
+ *      vendored in ../libpag), with the same properties, events and methods as cyl-lottie, so cyl-tab-bar-item
+ *      switches by file type. It sets up its own <canvas type="webgl">, sized for the pixel ratio, reads `path` (a
+ *      package file, a user data file or a network URL) as an ArrayBuffer and plays it. The full build plays vector
+ *      PAG files such as the iOS example's tab icons (libpag-lite played BMP sequences only). Events: `ready`
+ *      (duration in seconds), `complete`, `loopcomplete`, `error`. Methods: cyl_play, cyl_pause, cyl_stop,
+ *      cyl_playFromStart, cyl_setProgress, cyl_animation.
+ * [CN] cyl-pag：基于 libpag-miniprogram（Tencent/libpag web 的完整 WebAssembly + WebGL 版本，内置于 ../libpag）的 PAG
+ *      动画组件，属性、事件与方法与 cyl-lottie 相同，因此 cyl-tab-bar-item 可以按文件类型切换。组件自己创建
+ *      <canvas type="webgl">，按像素比设置尺寸，把 `path`（包内文件、用户数据目录文件或网络地址）读为 ArrayBuffer
+ *      并播放。完整版本可以播放矢量 PAG 文件，例如 iOS 示例的 Tab 图标（libpag-lite 只能播放 BMP 序列帧）。事件：
+ *      `ready`（时长，单位秒）、`complete`、`loopcomplete`、`error`。方法：cyl_play、cyl_pause、cyl_stop、
+ *      cyl_playFromStart、cyl_setProgress、cyl_animation。
  */
-const { PAGView } = require('../libpag/pag.js')
+const { PAGInit } = require('../libpag/libpag.js')
+
+// [EN] A mini program cannot read files under miniprogram_npm, so the WebAssembly is copied to the package root
+//      (cylMiniprogramAssets in package.json); set `wasmPath` when it lives elsewhere.
+// [CN] 小程序不能读取 miniprogram_npm 下的文件，因此 WebAssembly 被复制到代码包根目录（package.json 中的
+//      cylMiniprogramAssets）；放在其他位置时设置 `wasmPath`。
+const CYL_DEFAULT_WASM = '/cyl-pag-miniprogram/libpag.wasm.br'
+// [EN] PAGScaleMode of libpag. [CN] libpag 的 PAGScaleMode。
+const CYL_SCALE_MODES = { fill: 1, contain: 2, cover: 3 }
+let cylModule = null
+
+/**
+ * [EN] The libpag module, loaded once for every cyl-pag; a failed load is retried by the next cyl-pag.
+ * [CN] libpag 模块，所有 cyl-pag 只加载一次；加载失败时由下一个 cyl-pag 重试。
+ */
+function cylLoadPAG(wasmPath) {
+  if (!cylModule) {
+    cylModule = PAGInit({ locateFile: () => wasmPath }).catch((error) => {
+      cylModule = null
+      throw error
+    })
+  }
+  return cylModule
+}
 
 function cylPixelRatio() {
   try {
@@ -60,6 +85,8 @@ Component({
     /** [EN] Accepted for parity with cyl-lottie; PAG files carry their own colors. [CN] 为与 cyl-lottie 一致而保留；PAG 文件自带颜色。 */
     colors: { type: Object, value: null },
     label: { type: String, value: '' },
+    /** [EN] libpag.wasm.br in the code package. [CN] 代码包内的 libpag.wasm.br。 */
+    wasmPath: { type: String, value: CYL_DEFAULT_WASM },
   },
 
   data: { cylCanvasId: '' },
@@ -78,7 +105,7 @@ Component({
       view.setRepeatCount(loop ? 0 : 1)
       if (autoplay) {
         view.play()
-      } else if (!view.isPlaying()) {
+      } else if (!view.isPlaying) {
         this.cyl_rest()
       }
     },
@@ -108,6 +135,12 @@ Component({
           this.cylView.destroy()
         } catch (error) {}
         this.cylView = null
+      }
+      if (this.cylFile) {
+        try {
+          this.cylFile.destroy()
+        } catch (error) {}
+        this.cylFile = null
       }
     },
 
@@ -141,19 +174,32 @@ Component({
               this.triggerEvent('error', { message: error.message })
               return
             }
-            this.cyl_start(data, canvas)
+            this.cyl_start(data, canvas, token)
           })
         })
     },
 
-    cyl_start(data, canvas) {
+    async cyl_start(data, canvas, token) {
+      const current = () => token === this.cylLoadToken && this.cylReady
+      let file = null
       try {
-        const view = PAGView.init(data, canvas)
-        this.cylView = view
-        const scaleModes = { contain: 'LetterBox', cover: 'Zoom', fill: 'Stretch' }
-        if (typeof view.setScaleMode === 'function') {
-          view.setScaleMode(scaleModes[this.data.fit] || 'LetterBox')
+        const PAG = await cylLoadPAG(this.data.wasmPath)
+        file = current() ? await PAG.PAGFile.load(data) : null
+        if (!file || !current()) {
+          if (file) {
+            file.destroy()
+          }
+          return
         }
+        const view = await PAG.PAGView.init(file, canvas, { firstFrame: false })
+        if (!current()) {
+          view.destroy()
+          file.destroy()
+          return
+        }
+        this.cylFile = file
+        this.cylView = view
+        view.setScaleMode(CYL_SCALE_MODES[this.data.fit] || CYL_SCALE_MODES.contain)
         view.setRepeatCount(this.data.loop ? 0 : 1)
         view.addListener('onAnimationEnd', () => this.triggerEvent('complete', {}))
         view.addListener('onAnimationRepeat', () => this.triggerEvent('loopcomplete', {}))
@@ -161,21 +207,34 @@ Component({
         if (this.data.autoplay) {
           view.play()
         }
-        this.triggerEvent('ready', { duration: view.duration() })
+        this.triggerEvent('ready', { duration: this.cyl_duration() })
         if (this.cylPendingPlay) {
           const pending = this.cylPendingPlay
           this.cyl_playFromStart(pending.seconds + (Date.now() - pending.requestedAt) / 1000)
         }
       } catch (error) {
-        this.cylView = null
-        this.triggerEvent('error', { message: `cyl-pag: ${error.message || error}` })
+        if (file && file !== this.cylFile) {
+          try {
+            file.destroy()
+          } catch (destroyError) {}
+        }
+        if (current()) {
+          this.cyl_destroy()
+          this.triggerEvent('error', { message: `cyl-pag: ${(error && error.message) || error}` })
+        }
       }
+    },
+
+    /** [EN] The duration in seconds (libpag counts microseconds). [CN] 时长，单位秒（libpag 以微秒计）。 */
+    cyl_duration() {
+      return this.cylView ? (Number(this.cylView.duration()) || 0) / 1000000 : 0
     },
 
     /** [EN] Shows the resting frame without playing. [CN] 不播放，显示静止帧。 */
     cyl_rest() {
       if (this.cylView) {
         this.cylView.setProgress(this.data.restingFrame === 'last' ? 1 : 0)
+        this.cylView.flush()
       }
     },
 
@@ -211,19 +270,26 @@ Component({
         return
       }
       this.cylPendingPlay = null
-      const duration = Number(view.duration()) || 0
+      const duration = this.cyl_duration()
       const progress = duration > 0 ? Math.min(1, seconds / duration) : 0
-      Promise.resolve(view.setProgress(progress)).then(() => (progress < 1 ? view.play() : null))
+      view.pause()
+      view.setProgress(progress)
+      if (progress < 1) {
+        view.play()
+      } else {
+        view.flush()
+      }
     },
 
     /** [EN] Moves to a progress between 0 and 1. [CN] 跳到 0 到 1 之间的进度。 */
     cyl_setProgress(progress) {
       if (this.cylView) {
         this.cylView.setProgress(Math.min(1, Math.max(0, Number(progress) || 0)))
+        this.cylView.flush()
       }
     },
 
-    /** [EN] The libpag-lite PAGView, or null. [CN] libpag-lite 的 PAGView，没有时为 null。 */
+    /** [EN] The libpag PAGView, or null. [CN] libpag 的 PAGView，没有时为 null。 */
     cyl_animation() {
       return this.cylView || null
     },
