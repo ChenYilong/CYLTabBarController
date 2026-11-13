@@ -37,7 +37,8 @@ def check(condition, message):
 
 # --- layer 1: the core macro and its bundle
 core_header = read("CYLTabBarController/CYLUtils/CYLLocalizedString.h")
-core_source = read("CYLTabBarController/CYLUtils/CYLLocalizedString.m")
+# [EN] Implemented in Swift since the migration (docs/Swift-Migration.md). [CN] 迁移后在 Swift 中实现。
+core_source = read("CYLTabBarController/CYLUtils/Swift/CYLLocalizedString.swift")
 check("CYLLocalizedString(" in core_header, "core macro `CYLLocalizedString` is not declared in CYLLocalizedString.h")
 core_bundle = "CYLTabBarController/Resources/CYLTabBarController.bundle"
 check(os.path.isdir(os.path.join(ROOT, core_bundle)), "core bundle is missing: " + core_bundle)
