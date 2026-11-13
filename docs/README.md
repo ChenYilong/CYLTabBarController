@@ -403,6 +403,7 @@ docs/
 │   ├── wechat-miniprogram-api-39-lens-tab-dark.png
 │   ├── wechat-miniprogram-api-39-lens-tab.png
 │   ├── wechat-miniprogram-api-40-lens-white-reference.jpg
+│   ├── wechat-miniprogram-api-41-lens-keep-reference.jpg
 │   ├── wechat-miniprogram-badges.png
 │   ├── wechat-miniprogram-christmas-glass.png
 │   ├── wechat-miniprogram-flat-login.png
