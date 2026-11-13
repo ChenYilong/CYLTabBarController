@@ -1,0 +1,15 @@
+{
+  "name": "rive-host-server",
+  "version": "1.0.0",
+  "private": true,
+  "license": "PolyForm-Noncommercial-1.0.0",
+  "type": "module",
+  "engines": {
+    "node": ">=18.19.0"
+  },
+  "scripts": {
+    "start": "node src/server.mjs",
+    "test": "node --test --test-concurrency=1 tests/*.test.mjs",
+    "seed:examples": "node scripts/seed-examples.mjs"
+  }
+}

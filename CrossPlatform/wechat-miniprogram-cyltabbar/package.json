@@ -1,7 +1,7 @@
 {
   "name": "cyl-tabbar-miniprogram",
   "version": "0.2.0",
-  "description": "CYLTabBarController for WeChat Mini Program: the cyl-tab-bar custom tab bar component, configured with the CYLTabBarController configuration keys, with Lottie, PAG and Rive tab icons through cyl-lottie-miniprogram, cyl-pag-miniprogram and cyl-rive-miniprogram",
+  "description": "CYLTabBarController for WeChat Mini Program: the cyl-tab-bar custom tab bar component, configured with the CYLTabBarController configuration keys. Animated tab icons come from optional packages (cyl-lottie-miniprogram, cyl-pag-miniprogram, cyl-rive-miniprogram, cyl-gif-miniprogram) through abstract nodes",
   "license": "MIT",
   "author": "ChenYilong <luohanchenyilong@163.com>",
   "homepage": "https://github.com/ChenYilong/CYLTabBarController/tree/master/CrossPlatform/wechat-miniprogram-cyltabbar",
@@ -25,11 +25,6 @@
     "LICENSE",
     "NOTICE"
   ],
-  "dependencies": {
-    "cyl-lottie-miniprogram": "file:../lottie-miniprogram",
-    "cyl-pag-miniprogram": "file:../pag-miniprogram",
-    "cyl-rive-miniprogram": "file:../rive-miniprogram"
-  },
   "scripts": {
     "test": "node --test test/*.test.js"
   }

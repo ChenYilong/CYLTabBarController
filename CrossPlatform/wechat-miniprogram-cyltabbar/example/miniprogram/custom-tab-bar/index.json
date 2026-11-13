@@ -1,6 +1,9 @@
 {
   "component": true,
   "usingComponents": {
-    "cyl-tab-bar": "cyl-tabbar-miniprogram/cyl-tab-bar/index"
+    "cyl-tab-bar": "cyl-tabbar-miniprogram/cyl-tab-bar/index",
+    "cyl-lottie": "cyl-lottie-miniprogram/cyl-lottie/index",
+    "cyl-pag": "cyl-pag-miniprogram/cyl-pag/index",
+    "cyl-rive": "cyl-rive-miniprogram/cyl-rive/index"
   }
 }

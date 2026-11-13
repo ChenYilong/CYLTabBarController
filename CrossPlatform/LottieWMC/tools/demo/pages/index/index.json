@@ -1,0 +1,5 @@
+{
+  "usingComponents": {
+    "lottie": "../../components/lottie"
+  }
+}

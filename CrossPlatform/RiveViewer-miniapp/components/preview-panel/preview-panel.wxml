@@ -1,0 +1,400 @@
+<navigation-bar title="Rive 预览" back="{{true}}" external-back="{{true}}" bindback="closeEmbedded" color="#f2f0e8" background="#0b0f14"></navigation-bar>
+
+<image
+  wx:if="{{previewTransitionVisible}}"
+  class="preview-transition-cover {{previewTransitionExpanding ? 'is-expanding' : ''}} {{previewTransitionLeaving ? 'is-leaving' : ''}}"
+  style="{{previewTransitionStyle}}"
+  src="{{previewTransitionCover}}"
+  mode="aspectFill"
+  aria-hidden="true"
+></image>
+
+<view class="preview-page">
+  <view class="file-heading">
+    <view class="file-heading__copy">
+      <text class="file-heading__name">{{file.name}}</text>
+      <view class="file-heading__meta">
+        <text>{{file.displaySize}}{{dimensions ? ' / ' + dimensions : ''}}</text>
+        <text class="file-heading__status file-heading__timecode">{{timelineTimecode}}</text>
+        <text class="file-heading__status file-heading__fps">{{fps || '--'}} FPS</text>
+      </view>
+    </view>
+    <button class="file-heading__save" bindtap="showSaveMenu" hover-class="is-pressed" hover-start-time="0" hover-stay-time="70" aria-label="保存或发送文件">
+      <image src="/assets/icons/download.svg"></image>
+    </button>
+  </view>
+
+  <view
+    class="canvas-card canvas-card--{{canvasTone}} {{stageDragging ? 'canvas-card--dragging' : ''}}"
+    style="width: {{stageWidth}}rpx; height: {{stageHeight}}rpx;"
+  >
+    <canvas
+      id="riveCanvas"
+      class="rive-canvas"
+      type="2d"
+      disable-scroll="{{true}}"
+      bindtouchstart="canvasTouchStart"
+      bindtouchmove="canvasTouchMove"
+      bindtouchend="canvasTouchEnd"
+      bindtouchcancel="canvasTouchEnd"
+    ></canvas>
+
+    <view wx:if="{{loading}}" class="canvas-state canvas-state--loading">
+      <view class="loading-ring">
+        <view class="loading-ring__spinner"></view>
+        <text class="loading-ring__value">{{loadingProgress}}%</text>
+      </view>
+      <text class="loading-phase">{{loadingPhase}}</text>
+      <view class="loading-track" aria-hidden="true">
+        <view class="loading-track__value" style="width: {{loadingProgress}}%;"></view>
+      </view>
+    </view>
+
+    <view wx:if="{{error}}" class="canvas-state canvas-state--error">
+      <text class="canvas-state__title">Rive 文件未能加载</text>
+      <text class="canvas-state__message">{{error}}</text>
+      <button
+        class="canvas-state__action"
+        bindtap="retryNative"
+        hover-class="is-pressed"
+        hover-start-time="0"
+        hover-stay-time="70"
+      >重新加载</button>
+    </view>
+
+  </view>
+
+  <view
+    class="stage-resizer {{stageDragging ? 'is-dragging' : ''}} {{stageResizeMenuActive ? 'is-selecting' : ''}} {{stageResizeTapOpen ? 'is-tap-open' : ''}} {{stageResizePressActive ? 'is-press-active' : ''}}"
+    data-stage-resizer="true"
+    catchtouchstart="stageResizeStart"
+    catchtouchmove="stageResizeMove"
+    catchtouchend="stageResizeEnd"
+    catchtouchcancel="stageResizeCancel"
+    catchlongpress="stageResizeLongPress"
+    role="slider"
+    aria-label="单击展开完整或铺满并在三秒后收起，上下拖动画板高度，按住后左右滑动选择，双击切换完整或铺满"
+    aria-valuemin="{{stageMinHeight}}"
+    aria-valuemax="{{stageMaxHeight}}"
+    aria-valuenow="{{stageHeight}}"
+  >
+    <view
+      wx:if="{{showResizeGuide && !stageResizeMenuActive}}"
+      class="resize-guide {{resizeGuideLeaving ? 'is-leaving' : ''}}"
+      catchtap="stopResizeGuideTouch"
+    >
+      <text>双击切换</text>
+      <view
+        class="resize-guide__dismiss"
+        catchtap="dismissResizeGuide"
+        hover-class="is-pressed"
+        hover-start-time="0"
+        hover-stay-time="70"
+        role="button"
+        aria-label="知道了"
+      >✓</view>
+    </view>
+    <view class="stage-resizer__surface" data-stage-resizer="true">
+      <view class="stage-resizer__grip" data-stage-resizer="true">
+        <view data-stage-resizer="true"></view>
+      </view>
+      <view class="stage-resizer__modes" aria-hidden="{{!stageResizeMenuActive}}">
+        <view class="stage-resizer__mode stage-resizer__mode--contain {{fit === 'contain' ? 'is-current' : ''}} {{stageResizeHoverFit === 'contain' ? 'is-hovered' : ''}}" data-fit="contain" hover-class="is-hovered" hover-start-time="0" hover-stay-time="70" role="button" aria-label="完整显示">
+          <view class="stage-resizer__mode-icon-wrap">
+            <image class="stage-resizer__mode-icon stage-resizer__mode-icon--default" src="/assets/icons/arrows-in-simple.svg"></image>
+            <image class="stage-resizer__mode-icon stage-resizer__mode-icon--active" src="/assets/icons/arrows-in-simple-active.svg"></image>
+          </view>
+          <text>完整</text>
+        </view>
+        <view class="stage-resizer__mode stage-resizer__mode--cover {{fit === 'cover' ? 'is-current' : ''}} {{stageResizeHoverFit === 'cover' ? 'is-hovered' : ''}}" data-fit="cover" hover-class="is-hovered" hover-start-time="0" hover-stay-time="70" role="button" aria-label="铺满显示">
+          <view class="stage-resizer__mode-icon-wrap">
+            <image class="stage-resizer__mode-icon stage-resizer__mode-icon--default" src="/assets/icons/arrows-out-simple.svg"></image>
+            <image class="stage-resizer__mode-icon stage-resizer__mode-icon--active" src="/assets/icons/arrows-out-simple-active.svg"></image>
+          </view>
+          <text>铺满</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="transport">
+    <view class="transport__primary transport__slot--replay" bindtap="resetAnimation" hover-class="is-pressed" hover-start-time="0" hover-stay-time="70" role="button" aria-label="重播">
+      <image class="transport__icon" src="/assets/icons/restore.svg"></image>
+    </view>
+    <view
+      class="transport__secondary transport__slot--play"
+      bindtap="togglePlay"
+      hover-class="is-pressed"
+      hover-start-time="0"
+      hover-stay-time="70"
+      role="button"
+      aria-label="{{isPlaying ? '暂停' : '播放'}}"
+    >
+      <image
+        class="transport__icon"
+        src="{{isPlaying ? '/assets/icons/player-pause.svg' : '/assets/icons/player-play.svg'}}"
+      ></image>
+    </view>
+    <view
+      class="speed-menu transport__slot--speed"
+      data-speed-control="true"
+      bindtouchstart="speedTouchStart"
+      bindtouchmove="speedTouchMove"
+      bindtouchend="speedTouchEnd"
+      bindtouchcancel="speedTouchCancel"
+      hover-class="is-pressed"
+      hover-start-time="0"
+      hover-stay-time="70"
+      role="button"
+      aria-label="当前播放速度 {{speedLabel}}，轻点切换，按住选择"
+    >
+      <image class="speed-menu__icon" data-speed-control="true" src="/assets/icons/gauge.svg"></image>
+      <text class="speed-menu__value" data-speed-control="true">{{speedLabel}}</text>
+    </view>
+    <view
+      wx:if="{{showFileNavigation}}"
+      class="transport__file-button transport__slot--previous {{!hasPreviousFile ? 'is-disabled' : ''}}"
+      data-file-navigation="true"
+      data-offset="-1"
+      bindtouchstart="fileNavigationTouchStart"
+      bindtouchmove="fileNavigationTouchMove"
+      bindtouchend="fileNavigationTouchEnd"
+      bindtouchcancel="fileNavigationTouchCancel"
+      hover-class="is-pressed"
+      hover-start-time="0"
+      hover-stay-time="70"
+      role="button"
+      aria-disabled="{{!hasPreviousFile}}"
+      aria-label="上一个文件，按住查看文件列表"
+    >
+      <image class="transport__file-icon" data-file-navigation="true" src="/assets/icons/arrow-left.svg"></image>
+    </view>
+    <view
+      wx:if="{{showFileNavigation}}"
+      class="transport__file-button transport__slot--next {{!hasNextFile ? 'is-disabled' : ''}}"
+      data-file-navigation="true"
+      data-offset="1"
+      bindtouchstart="fileNavigationTouchStart"
+      bindtouchmove="fileNavigationTouchMove"
+      bindtouchend="fileNavigationTouchEnd"
+      bindtouchcancel="fileNavigationTouchCancel"
+      hover-class="is-pressed"
+      hover-start-time="0"
+      hover-stay-time="70"
+      role="button"
+      aria-disabled="{{!hasNextFile}}"
+      aria-label="下一个文件，按住查看文件列表"
+    >
+      <image class="transport__file-icon" data-file-navigation="true" src="/assets/icons/arrow-right.svg"></image>
+    </view>
+  </view>
+
+  <scroll-view
+    class="control-scroll"
+    scroll-y
+    enhanced
+    show-scrollbar="{{false}}"
+  >
+    <view class="control-panel">
+      <view class="parameter-row">
+        <text class="parameter-row__label">画板</text>
+        <view class="parameter-actions">
+          <parameter-tag
+            compact="{{true}}"
+            wx:for="{{artboardNames}}"
+            wx:key="*this"
+            label="{{item}}"
+            selected="{{artboardIndex === index}}"
+            tagindex="{{index}}"
+            tagvalue="{{item}}"
+            bind:select="selectArtboardTag"
+          ></parameter-tag>
+          <button
+            wx:if="{{!artboardCatalogLoaded && artboardRemainingCount > 0}}"
+            class="parameter-disclosure {{artboardCatalogLoading ? 'is-loading' : ''}}"
+            bindtap="expandArtboardCatalog"
+            disabled="{{artboardCatalogLoading}}"
+            hover-class="is-pressed"
+            hover-start-time="0"
+            hover-stay-time="70"
+            aria-label="{{artboardCatalogLoading ? '正在解析画板列表 ' + artboardCatalogProgress + '%' : '展开其余 ' + artboardRemainingCount + ' 个画板'}}"
+          >
+            <view
+              wx:if="{{artboardCatalogLoading}}"
+              class="parameter-disclosure__progress"
+              style="width: {{artboardCatalogProgress}}%;"
+              aria-hidden="true"
+            ></view>
+            <text class="parameter-disclosure__label">{{artboardCatalogLoading ? '正在解析 ' + artboardCatalogProgress + '%' : '展开其余 ' + artboardRemainingCount + ' 个'}}</text>
+          </button>
+          <text wx:if="{{artboardNames.length === 0}}" class="parameter-empty">无画板</text>
+        </view>
+      </view>
+
+      <view class="parameter-row">
+        <text class="parameter-row__label">状态机</text>
+        <view class="parameter-actions">
+          <parameter-tag
+            compact="{{true}}"
+            wx:for="{{stateMachineNames}}"
+            wx:key="*this"
+            label="{{item}}"
+            selected="{{stateMachineIndex === index}}"
+            tagindex="{{index}}"
+            tagvalue="{{item}}"
+            bind:select="selectStateMachineTag"
+          ></parameter-tag>
+          <text wx:if="{{stateMachineNames.length === 0}}" class="parameter-empty">无状态机</text>
+        </view>
+      </view>
+
+      <view class="parameter-row">
+        <text class="parameter-row__label">时间轴</text>
+        <view class="parameter-actions timeline-actions">
+          <parameter-tag
+            compact="{{true}}"
+            wx:for="{{animationNames}}"
+            wx:key="*this"
+            label="{{item}}"
+            active="{{isPlaying && activeAnimation === item}}"
+            progress="{{animationProgress}}"
+            progressvisible="{{isPlaying && activeAnimation === item}}"
+            tagvalue="{{item}}"
+            arialabel="播放 {{item}}"
+            bind:select="playAnimation"
+          ></parameter-tag>
+          <text wx:if="{{animationNames.length === 0}}" class="parameter-empty">无时间轴</text>
+        </view>
+      </view>
+
+      <view class="parameter-row parameter-row--inputs">
+        <text class="parameter-row__label">状态机输入</text>
+        <view class="parameter-actions">
+          <parameter-tag
+            compact="{{true}}"
+            wx:for="{{inputs}}"
+            wx:key="name"
+            label="{{item.name}}"
+            detail="{{item.type === 'trigger' ? '' : (item.type === 'boolean' ? (item.value ? '开' : '关') : item.value)}}"
+            selected="{{item.type === 'boolean' && item.value}}"
+            tagindex="{{index}}"
+            tagvalue="{{item.name}}"
+            bind:select="handleInputTag"
+          ></parameter-tag>
+          <text wx:if="{{inputs.length === 0}}" class="parameter-empty">无输入</text>
+        </view>
+      </view>
+
+      <view class="parameter-row">
+        <text class="parameter-row__label">预览背景</text>
+        <view class="tone-options">
+          <view class="tone tone--mist {{canvasTone === 'mist' ? 'is-active' : ''}}" data-tone="mist" bindtap="setCanvasTone" hover-class="is-pressed" hover-start-time="0" hover-stay-time="70" role="button" aria-label="浅灰背景"></view>
+          <view class="tone tone--paper {{canvasTone === 'paper' ? 'is-active' : ''}}" data-tone="paper" bindtap="setCanvasTone" hover-class="is-pressed" hover-start-time="0" hover-stay-time="70" role="button" aria-label="米白背景"></view>
+          <view class="tone tone--white {{canvasTone === 'white' ? 'is-active' : ''}}" data-tone="white" bindtap="setCanvasTone" hover-class="is-pressed" hover-start-time="0" hover-stay-time="70" role="button" aria-label="纯白背景"></view>
+          <view class="tone tone--yellow {{canvasTone === 'yellow' ? 'is-active' : ''}}" data-tone="yellow" bindtap="setCanvasTone" hover-class="is-pressed" hover-start-time="0" hover-stay-time="70" role="button" aria-label="黄色背景"></view>
+          <view class="tone tone--ink {{canvasTone === 'ink' ? 'is-active' : ''}}" data-tone="ink" bindtap="setCanvasTone" hover-class="is-pressed" hover-start-time="0" hover-stay-time="70" role="button" aria-label="深色背景"></view>
+        </view>
+      </view>
+
+      <view wx:if="{{hasAudio}}" class="parameter-row">
+        <text class="parameter-row__label">声音</text>
+        <view class="parameter-actions">
+          <parameter-tag
+            compact="{{true}}"
+            label="{{audioSupported ? (audioEnabled ? '开启' : '静音') : (audioBlockedReason === '大文件已启用性能保护' ? '性能保护' : '不可用')}}"
+            selected="{{audioEnabled && audioSupported}}"
+            tagvalue="audio"
+            arialabel="{{audioSupported ? (audioEnabled ? '声音已开启，点击静音' : '声音已静音，点击开启') : (audioBlockedReason || '当前设备不支持声音')}}"
+            bind:select="toggleAudio"
+          ></parameter-tag>
+        </view>
+      </view>
+
+      <view class="parameter-row">
+        <text class="parameter-row__label">渲染质量</text>
+        <view class="compact-switch">
+          <button
+            wx:for="{{qualityOptions}}"
+            wx:key="key"
+            class="compact-option {{qualityMode === item.key ? 'is-active' : ''}}"
+            data-key="{{item.key}}"
+            bindtap="selectQuality"
+            hover-class="is-pressed"
+            hover-start-time="0"
+            hover-stay-time="70"
+          >{{item.label}}</button>
+        </view>
+      </view>
+
+      <view class="parameter-row parameter-row--last">
+        <text class="parameter-row__label">缩放方式</text>
+        <view class="compact-switch">
+          <button
+            wx:for="{{fitOptions}}"
+            wx:key="key"
+            class="compact-option {{fit === item.key ? 'is-active' : ''}}"
+            data-key="{{item.key}}"
+            bindtap="selectFit"
+            hover-class="is-pressed"
+            hover-start-time="0"
+            hover-stay-time="70"
+          >{{item.label}}</button>
+        </view>
+      </view>
+    </view>
+  </scroll-view>
+</view>
+
+<root-portal enable="{{showSpeedMenu || showFileMenu}}">
+  <cover-view
+    wx:if="{{showSpeedMenu || showFileMenu}}"
+    class="native-menu-backdrop"
+    catchtap="dismissNativeMenus"
+    aria-label="关闭菜单"
+  ></cover-view>
+  <cover-view
+    wx:if="{{showSpeedMenu}}"
+    class="native-menu-overlay speed-popover {{speedMenuLeaving ? 'is-leaving' : ''}}"
+    style="{{speedMenuStyle}}"
+    data-speed-control="true"
+  >
+    <cover-view
+      wx:for="{{speedMenuOptions}}"
+      wx:key="value"
+      class="speed-popover__option {{speedValue === item.value ? 'is-current' : ''}} {{speedHoverValue === item.value ? 'is-hovered' : ''}}"
+      data-speed-control="true"
+      data-value="{{item.value}}"
+      data-label="{{item.label}}"
+      bindtap="selectSpeedOption"
+      hover-class="is-pressed"
+      hover-start-time="0"
+      hover-stay-time="70"
+      role="button"
+    >{{item.label}}</cover-view>
+    <cover-view class="speed-popover__arrow" data-speed-control="true"></cover-view>
+  </cover-view>
+
+  <cover-view
+    wx:if="{{showFileMenu}}"
+    class="native-menu-overlay file-popover {{fileMenuLeaving ? 'is-leaving' : ''}}"
+    style="{{fileMenuStyle}}"
+    data-file-navigation="true"
+  >
+    <cover-view
+      wx:for="{{fileMenuOptions}}"
+      wx:key="id"
+      class="file-popover__option {{item.current ? 'is-current' : ''}} {{fileHoverId === item.id ? 'is-hovered' : ''}}"
+      data-file-navigation="true"
+      data-id="{{item.id}}"
+      bindtap="selectFileFromMenu"
+      hover-class="is-hovered is-pressed"
+      hover-start-time="0"
+      hover-stay-time="70"
+      role="button"
+    >
+      <cover-view class="file-popover__name" data-file-navigation="true">{{item.name}}</cover-view>
+      <cover-view wx:if="{{item.current}}" class="file-popover__current" data-file-navigation="true">当前</cover-view>
+    </cover-view>
+    <cover-view class="file-popover__arrow" data-file-navigation="true"></cover-view>
+  </cover-view>
+</root-portal>

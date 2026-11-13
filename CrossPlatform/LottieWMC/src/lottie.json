@@ -1,0 +1,7 @@
+{
+  "component": true,
+  "usingComponents": {},
+  "componentGenerics": {
+    "genericsTest": true
+  }
+}

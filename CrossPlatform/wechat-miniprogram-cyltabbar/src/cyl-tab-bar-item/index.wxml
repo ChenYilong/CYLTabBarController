@@ -6,7 +6,7 @@
   aria-hidden="true"
 >
   <view wx:if="{{m.image || m.animationPath}}" class="cyl-item-icon-box" style="{{m.iconBoxStyle}}">
-    <cyl-lottie
+    <cyl-lottie-view
       wx:if="{{m.animationType === 'lottie'}}"
       id="cyl-item-animation"
       class="cyl-item-animation"
@@ -16,7 +16,7 @@
       autoplay="{{!m.selected && loopsWhenUnselected}}"
       resting-frame="{{m.selected ? 'last' : 'first'}}"
     />
-    <cyl-pag
+    <cyl-pag-view
       wx:elif="{{m.animationType === 'pag'}}"
       id="cyl-item-animation"
       class="cyl-item-animation"
@@ -25,7 +25,7 @@
       autoplay="{{!m.selected && loopsWhenUnselected}}"
       resting-frame="{{m.selected ? 'last' : 'first'}}"
     />
-    <cyl-rive
+    <cyl-rive-view
       wx:elif="{{m.animationType === 'rive'}}"
       id="cyl-item-animation"
       class="cyl-item-animation"

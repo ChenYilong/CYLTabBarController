@@ -5,7 +5,10 @@
   "description": "The example mini program of cyl-tabbar-miniprogram (AppID wx5e29c9d33906f074)",
   "license": "MIT",
   "dependencies": {
-    "cyl-tabbar-miniprogram": "file:.."
+    "cyl-tabbar-miniprogram": "file:..",
+    "cyl-lottie-miniprogram": "file:../../lottie-miniprogram",
+    "cyl-pag-miniprogram": "file:../../pag-miniprogram",
+    "cyl-rive-miniprogram": "file:../../rive-miniprogram"
   },
   "scripts": {
     "setup": "node scripts/cyl_install_components.js && node scripts/cyl_sync_shared.js",

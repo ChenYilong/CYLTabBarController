@@ -23,6 +23,9 @@
     <block wx:else>
       <cyl-tab-bar-item
         id="cyl-item-{{item.key}}"
+        generic:cyl-lottie-view="cyl-lottie-view"
+        generic:cyl-pag-view="cyl-pag-view"
+        generic:cyl-rive-view="cyl-rive-view"
         class="cyl-tab-item"
         index="{{item.item.index}}"
         title="{{item.item.title}}"

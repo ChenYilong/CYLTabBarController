@@ -1,0 +1,62 @@
+// 由 scripts/sync-rive-policy.mjs 生成，请只修改 rive-policy.json。
+const rivePolicy = {
+  "speeds": [
+    0.5,
+    1,
+    1.5,
+    2,
+    8
+  ],
+  "canvasTones": [
+    {
+      "key": "mist",
+      "label": "浅灰"
+    },
+    {
+      "key": "paper",
+      "label": "米白"
+    },
+    {
+      "key": "white",
+      "label": "纯白"
+    },
+    {
+      "key": "yellow",
+      "label": "黄色"
+    },
+    {
+      "key": "ink",
+      "label": "深色"
+    }
+  ],
+  "gesture": {
+    "menuDismissMs": 3000,
+    "miniDoubleTapMs": 500,
+    "miniDragFrameMs": 16,
+    "miniSlopRpx": 16,
+    "webDoubleClickMs": 320,
+    "webSlopPx": 4
+  },
+  "telemetry": {
+    "webProgressMs": 100,
+    "webMetadataMs": 100,
+    "webEventLogEntries": 200,
+    "miniProgressMs": 180,
+    "fpsMs": 700
+  },
+  "complexity": {
+    "sourceBytes": 2097152,
+    "mini": {
+      "artboards": 32,
+      "animations": 120,
+      "stateMachines": 64
+    },
+    "web": {
+      "artboards": 24,
+      "animations": 48,
+      "stateMachines": 24
+    }
+  }
+}
+
+module.exports = rivePolicy

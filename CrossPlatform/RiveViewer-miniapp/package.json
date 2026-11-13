@@ -1,0 +1,19 @@
+{
+  "name": "cyl-riveviewer-miniapp",
+  "version": "1.0.8",
+  "private": true,
+  "description": "微信小程序 Rive 文件本地预览工具",
+  "scripts": {
+    "vendor:icons": "node scripts/vendor-phosphor-icons.mjs",
+    "vendor:rive": "node scripts/vendor-rive.mjs",
+    "inspect:rive": "node scripts/inspect-rive.mjs",
+    "benchmark:rive": "node scripts/benchmark-rive.mjs",
+    "verify:interactions": "node scripts/verify-rive-interactions.mjs",
+    "test:gestures": "node --test tests/preview-resizer.test.mjs",
+    "check": "node scripts/check-project.mjs && npm run test:gestures"
+  },
+  "dependencies": {
+    "@phosphor-icons/core": "^2.1.1",
+    "@rive-app/canvas-advanced": "2.39.1"
+  }
+}

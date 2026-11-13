@@ -1,0 +1,8 @@
+{
+  "usingComponents": {
+    "navigation-bar": "/components/navigation-bar/navigation-bar",
+    "parameter-tag": "/components/parameter-tag/parameter-tag"
+  },
+  "navigationStyle": "custom",
+  "disableScroll": true
+}
