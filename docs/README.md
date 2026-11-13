@@ -384,6 +384,7 @@ docs/
 │   ├── wechat-miniprogram-api-29-gallery-cards.png
 │   ├── wechat-miniprogram-api-30-gallery-landing.png
 │   ├── wechat-miniprogram-api-31-bug-lens-spacing.png
+│   ├── wechat-miniprogram-api-32-fix-lens-spacing.png
 │   ├── wechat-miniprogram-badges.png
 │   ├── wechat-miniprogram-christmas-glass.png
 │   ├── wechat-miniprogram-flat-login.png
