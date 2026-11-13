@@ -14,7 +14,7 @@ WebGL build, vendored in `miniprogram_dist/libpag`). It plays vector PAG files, 
 ```
 
 Properties: `path` (package file, user data file or http(s) URL), `loop`, `autoplay`, `restingFrame` (first, last),
-`fit` (contain, cover, fill), `label`, `wasmPath`; `colors` is accepted for parity with `cyl-lottie` and ignored. Events: `ready`,
+`fit` (contain, cover, fill), `label`, `wasmPath`, `speed` (applied live through `PAGFile.setDuration`); `colors` is accepted for parity with `cyl-lottie` and ignored. Events: `ready`,
 `complete`, `loopcomplete`, `error`. Methods: `cyl_play`, `cyl_pause`, `cyl_stop`, `cyl_playFromStart`,
 `cyl_setProgress`, `cyl_animation`.
 
