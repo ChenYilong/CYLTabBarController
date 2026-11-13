@@ -12,6 +12,8 @@ App({
       themeIdentifier: '',
       overrides: {},
       loggedIn: false,
+      // [EN] CYLTabBarItemStyle of the core ('' follows the style type). [CN] 核心层的 CYLTabBarItemStyle（'' 跟随样式）。
+      itemStyle: '',
     },
   },
 

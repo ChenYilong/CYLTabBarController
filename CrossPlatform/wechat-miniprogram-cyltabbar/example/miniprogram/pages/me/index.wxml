@@ -32,6 +32,13 @@
     </view>
   </view>
 
+  <text class="cyl-section-title" aria-role="heading">{{texts['Item style']}}</text>
+  <view class="cyl-section">
+    <view wx:for="{{itemStyles}}" wx:key="*this" class="cyl-row {{currentItemStyle === item ? 'cyl-row-selected' : ''}}" bindtap="cyl_itemStyle" data-value="{{item}}" aria-role="button" aria-selected="{{currentItemStyle === item}}" aria-label="{{item ? item : texts['Follow the style']}}">
+      <text aria-hidden="true">{{item ? item : texts['Follow the style']}}</text>
+    </view>
+  </view>
+
   <text class="cyl-section-title" aria-role="heading">{{texts['Tap animation']}}</text>
   <view class="cyl-section">
     <view wx:for="{{tapAnimations}}" wx:key="value" class="cyl-row {{currentTapAnimation === item.value ? 'cyl-row-selected' : ''}}" bindtap="cyl_tapAnimation" data-value="{{item.value}}" aria-role="button" aria-selected="{{currentTapAnimation === item.value}}" aria-label="{{item.label}}">

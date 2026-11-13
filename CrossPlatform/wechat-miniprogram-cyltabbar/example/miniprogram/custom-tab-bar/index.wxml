@@ -5,6 +5,7 @@
   generic:cyl-pag-view="cyl-pag"
   generic:cyl-rive-view="cyl-rive"
   configuration="{{configuration}}"
+  item-style="{{itemStyle}}"
   strings="{{strings}}"
   symbols-by-theme="{{symbolsByTheme}}"
   animation-base-path="/shared/lottie"

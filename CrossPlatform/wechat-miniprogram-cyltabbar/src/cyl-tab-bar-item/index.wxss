@@ -83,3 +83,99 @@
   border-radius: 5px;
   background-color: #ff3b30;
 }
+
+/*
+ * [EN] CYLTabBarItemStyle "flat": the rules above, unchanged (the item as it always was).
+ *      CYLTabBarItemStyle "liquidGlass": the selected item sits on a frosted glass lens, a translucent tint with blur
+ *      and saturation, a light rim, an inner top highlight and a soft shadow, with a specular sheen on top. The lens
+ *      springs in when the tab becomes selected, and any glass item presses in on touch. Design ideas from
+ *      tyfuser/chatnote-miniprogram (layered glass tokens), Akenaiai/sports-checkin-miniprogram (spring easing
+ *      cubic-bezier(0.19, 1, 0.22, 1), scale-in) and 1994Umbrella/mirror-landing (iridescent rim); no code copied.
+ * [CN] CYLTabBarItemStyle "flat"：上面的规则，不变（Item 原有的样子）。
+ *      CYLTabBarItemStyle "liquidGlass"：选中的 Item 位于磨砂玻璃透镜上：带模糊与饱和度的半透明底色、亮边、顶部内高光
+ *      与柔和阴影，表面有一道镜面光泽。Tab 被选中时透镜弹入，玻璃 Item 按下时内缩。设计思路来自
+ *      tyfuser/chatnote-miniprogram（分层玻璃变量）、Akenaiai/sports-checkin-miniprogram（弹性曲线
+ *      cubic-bezier(0.19, 1, 0.22, 1)、缩放进入）与 1994Umbrella/mirror-landing（虹彩边）；未复制代码。
+ */
+.cyl-item-style-liquidGlass {
+  position: relative;
+  transition: transform 0.35s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.cyl-item-style-liquidGlass.cyl-item-pressed {
+  transform: scale(0.92);
+}
+
+.cyl-item-style-liquidGlass .cyl-item-icon-box,
+.cyl-item-style-liquidGlass .cyl-item-title {
+  position: relative;
+  z-index: 1;
+}
+
+.cyl-item-glass-lens {
+  position: absolute;
+  top: 3px;
+  bottom: 3px;
+  left: 50%;
+  width: 64px;
+  margin-left: -32px;
+  box-sizing: border-box;
+  overflow: hidden;
+  border: 1rpx solid rgba(255, 255, 255, 0.75);
+  border-radius: 999px;
+  background-color: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9), inset 0 -1px 2px rgba(0, 0, 0, 0.04),
+    0 4px 14px rgba(0, 0, 0, 0.12);
+  animation: cyl-glass-lens-in 0.45s cubic-bezier(0.19, 1, 0.22, 1) both;
+}
+
+/* [EN] The specular sheen and the iridescent edge of the lens. [CN] 透镜的镜面光泽与虹彩边缘。 */
+.cyl-item-glass-lens::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 55%;
+  border-radius: 999px 999px 40% 40%;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0));
+}
+
+.cyl-item-glass-lens::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 999px;
+  background: linear-gradient(120deg, rgba(120, 180, 255, 0.18), rgba(255, 255, 255, 0) 40%,
+    rgba(255, 150, 220, 0.14));
+}
+
+.cyl-item-dark .cyl-item-glass-lens {
+  border-color: rgba(255, 255, 255, 0.18);
+  background-color: rgba(255, 255, 255, 0.14);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25), 0 4px 14px rgba(0, 0, 0, 0.4);
+}
+
+.cyl-item-dark .cyl-item-glass-lens::before {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0));
+}
+
+@keyframes cyl-glass-lens-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.06);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}

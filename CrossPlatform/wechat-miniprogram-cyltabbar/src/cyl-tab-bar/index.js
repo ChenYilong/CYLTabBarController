@@ -12,6 +12,7 @@
  *      `cyl_setThemeIdentifier`。
  */
 const { cylReadConfiguration } = require('./cyl_configuration');
+const { cylTabBarItemStyle, cylTabBarItemStyleForStyleType } = require('./cyl_tab_bar_item_style');
 
 /**
  * [EN] The badge text shown for a value: numbers above 99 read "99+"; '' means no badge.
@@ -91,6 +92,15 @@ Component({
      */
     animationBasePath: { type: String, value: '' },
     /**
+     * [EN] CYLTabBarItemStyle (cyl_tab_bar_item_style.js) of every item at initialization: "flat" or "liquidGlass"
+     *      (also its number, 0 or 1). Empty: from CYLTabBarControllerStyleType ("liquidGlass" gives liquidGlass). With
+     *      liquidGlass the bar is a floating glass capsule. cyl_setItemStyle() switches it later.
+     * [CN] 初始化时每个 Item 的 CYLTabBarItemStyle（cyl_tab_bar_item_style.js）："flat" 或 "liquidGlass"（也可用其数字
+     *      0 或 1）。为空时由 CYLTabBarControllerStyleType 推出（"liquidGlass" 对应 liquidGlass）。liquidGlass 时 TabBar
+     *      为悬浮的玻璃胶囊。之后用 cyl_setItemStyle() 切换。
+     */
+    itemStyle: { type: null, value: '' },
+    /**
      * [EN] The identifier of the selected tab (CYLTabBarItemIdentifier).
      * [CN] 选中 Tab 的标识（CYLTabBarItemIdentifier）。
      */
@@ -110,6 +120,7 @@ Component({
   data: {
     cylSlots: [],
     cylStyleType: 'default',
+    cylItemStyle: 'flat',
     cylIsDark: false,
     cylBarStyle: '',
     cylThemeIdentifier: '',
@@ -119,7 +130,7 @@ Component({
   },
 
   observers: {
-    'configuration, strings, symbolsByTheme, imageBasePath, animationBasePath, selectedIdentifier, appVersion': function () {
+    'configuration, strings, symbolsByTheme, imageBasePath, animationBasePath, selectedIdentifier, appVersion, itemStyle': function () {
       this.cyl_render();
     },
   },
@@ -175,9 +186,19 @@ Component({
           slot.item.index = index;
         }
       });
+      // [EN] One enum for the bar and its items: the item style decides the glass capsule too.
+      // [CN] TabBar 与 Item 共用一个枚举：Item 样式同时决定玻璃胶囊。
+      const itemStyle = this.cyl_itemStyle(model);
+      let styleType = model.styleType;
+      if (itemStyle === 'liquidGlass') {
+        styleType = 'liquidGlass';
+      } else if (styleType === 'liquidGlass') {
+        styleType = 'default';
+      }
       this.setData({
         cylSlots: slots,
-        cylStyleType: model.styleType,
+        cylItemStyle: itemStyle,
+        cylStyleType: styleType,
         cylIsDark: model.isDark,
         cylBarStyle: model.backgroundColor ? `background-color: ${model.backgroundColor};` : '',
         cylThemeIdentifier: model.themeIdentifier,
@@ -431,6 +452,30 @@ Component({
      */
     cyl_removeBadge(identifier) {
       delete this.cylBadges[identifier];
+      this.cyl_render();
+    },
+
+    /**
+     * [EN] The item style in use: the one set by cyl_setItemStyle(), else the `itemStyle` property, else the one
+     *      CYLTabBarControllerStyleType implies.
+     * [CN] 当前使用的 Item 样式：cyl_setItemStyle() 设置的，否则为 `itemStyle` 属性，否则由 CYLTabBarControllerStyleType
+     *      推出。
+     */
+    cyl_itemStyle(model) {
+      const requested = this.cylRequestedItemStyle !== undefined ? this.cylRequestedItemStyle : this.data.itemStyle;
+      if (requested !== '' && requested !== null && requested !== undefined) {
+        return cylTabBarItemStyle(requested);
+      }
+      return cylTabBarItemStyleForStyleType((model || this.cylModel || {}).styleType);
+    },
+
+    /**
+     * [EN] Switches every item to a CYLTabBarItemStyle at run time ("flat" or "liquidGlass"); '' goes back to the
+     *      initial style.
+     * [CN] 在运行时把所有 Item 切换为某个 CYLTabBarItemStyle（"flat" 或 "liquidGlass"）；'' 恢复初始样式。
+     */
+    cyl_setItemStyle(style) {
+      this.cylRequestedItemStyle = style === '' || style === null ? undefined : cylTabBarItemStyle(style);
       this.cyl_render();
     },
 

@@ -11,6 +11,9 @@ const { cylDemoConfiguration, cylInstalledAnimation, cylAvailableAnimationFiles 
 // [EN] Row titles of the animation packages. [CN] 动画包的行标题。
 const CYL_ANIMATION_LABELS = { lottie: 'Lottie', pag: 'PAG', rive: 'Rive', gif: 'GIF' };
 
+// [EN] The core's CYLTabBarItemStyle enum, shared by cyl-tab-bar and cyl-tab-bar-item. [CN] 核心层的 CYLTabBarItemStyle 枚举，cyl-tab-bar 与 cyl-tab-bar-item 共用。
+const { CYLTabBarItemStyle } = require('cyl-tabbar-miniprogram/cyl-tab-bar/cyl_tab_bar_item_style');
+
 const CYL_STYLE_TYPES = ['default', 'flatDesign', 'liquidGlass'];
 const CYL_TAP_ANIMATIONS = [['none', 'None'], ['bounce', 'Bounce'], ['rotation', 'Rotation'], ['scale', 'Scale']];
 
@@ -19,6 +22,8 @@ Component({
   data: {
     skins: [],
     styleTypes: CYL_STYLE_TYPES,
+    itemStyles: [''].concat(Object.values(CYLTabBarItemStyle)),
+    currentItemStyle: '',
     tapAnimations: [],
     state: {},
     currentStyleType: '',
@@ -50,6 +55,7 @@ Component({
       this.setData({
         state,
         currentStyleType: configuration.CYLTabBarControllerStyleType,
+        currentItemStyle: state.itemStyle || '',
         currentTapAnimation: configuration.CYLTabBarControllerTabButtonTapAnimation,
         icons: (state.overrides || {}).cylDemoIcons === 'images' || (state.overrides || {}).cylDemoLottie === false
           ? 'images' : cylInstalledAnimation(),
@@ -78,6 +84,9 @@ Component({
     },
     cyl_skin(event) {
       this.cyl_update({ themeIdentifier: event.currentTarget.dataset.value });
+    },
+    cyl_itemStyle(event) {
+      this.cyl_update({ itemStyle: event.currentTarget.dataset.value });
     },
     cyl_style(event) {
       this.cyl_override({ CYLTabBarControllerStyleType: event.currentTarget.dataset.value });

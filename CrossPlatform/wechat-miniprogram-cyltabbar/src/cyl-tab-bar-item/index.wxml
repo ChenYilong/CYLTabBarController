@@ -1,10 +1,14 @@
 <!-- [EN] An animated icon (or an image) with its badge, and a title. [CN] 动画图标（或图片）与角标，以及标题。 -->
 <view
-  class="cyl-item {{m.selected ? 'cyl-item-selected' : ''}} {{m.centered ? 'cyl-item-centered' : ''}} {{animationClass}}"
+  class="cyl-item cyl-item-style-{{cylItemStyle}} {{isDark ? 'cyl-item-dark' : ''}} {{m.selected ? 'cyl-item-selected' : ''}} {{m.centered ? 'cyl-item-centered' : ''}} {{animationClass}}"
+  hover-class="cyl-item-pressed"
+  hover-stay-time="120"
   style="{{m.itemStyle}}"
   bindtap="cyl_onTap"
   aria-hidden="true"
 >
+  <!-- [EN] Liquid Glass: the lens behind the selected icon and title (decoration). [CN] 液态玻璃：选中图标与标题后的透镜（装饰）。 -->
+  <view wx:if="{{cylItemStyle === 'liquidGlass' && m.selected}}" class="cyl-item-glass-lens" aria-hidden="true"></view>
   <view wx:if="{{m.image || m.animationPath}}" class="cyl-item-icon-box" style="{{m.iconBoxStyle}}">
     <cyl-lottie-view
       wx:if="{{m.animationType === 'lottie'}}"

@@ -182,8 +182,4 @@
   height: 62px;
 }
 
-.cyl-style-liquidGlass .cyl-selected:not(.cyl-plus-slot) .cyl-tab-item {
-  padding: 4px 12px;
-  border-radius: 24px;
-  background-color: rgba(0, 0, 0, 0.06);
-}
+/* [EN] The selected tab's lens is drawn by cyl-tab-bar-item (CYLTabBarItemStyle liquidGlass). [CN] 选中 Tab 的透镜由 cyl-tab-bar-item 绘制（CYLTabBarItemStyle liquidGlass）。 */

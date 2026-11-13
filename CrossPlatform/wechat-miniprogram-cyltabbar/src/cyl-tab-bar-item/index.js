@@ -10,13 +10,14 @@
  *      它也可以单独使用。事件：`itemtap`、`change`（CYLFlatDesignTabBarItemDidChange）。
  */
 const { cylItemModel, cylStateKey } = require('./cyl_tab_bar_item_model');
+const { CYLTabBarItemStyle, cylTabBarItemStyle } = require('../cyl-tab-bar/cyl_tab_bar_item_style');
 
 const CYL_PROPERTIES = ['title', 'image', 'selectedImage', 'index', 'titlePositionAdjustment', 'imagePositionAdjustment',
   'imageInsets', 'lottieFilePath', 'lottieURL', 'lottieSizeValue', 'enabled', 'selected', 'badgeValue', 'badgeColor',
   'badgeSize', 'badgeContentInset', 'badgePositionAdjustment', 'layoutCentered', 'backgroundColor',
   'selectedBackgroundColor', 'titleTextAttributes', 'badgeTextAttributes', 'standardAppearance', 'animationPath',
   'animationSize', 'imageSize', 'iconTint', 'selectedIconTint', 'label', 'animationColors', 'loopsWhenUnselected',
-  'animationClass', 'animationDuration'];
+  'animationClass', 'animationDuration', 'itemStyle', 'isDark'];
 
 Component({
   properties: {
@@ -86,15 +87,28 @@ Component({
     animationClass: { type: String, value: '' },
     /** [EN] The tap animation's duration in ms. [CN] 点击动画时长（毫秒）。 */
     animationDuration: { type: Number, value: 400 },
+    /**
+     * [EN] CYLTabBarItemStyle (cyl-tab-bar/cyl_tab_bar_item_style.js): "flat" (default) or "liquidGlass", the selected
+     *      item on a frosted glass lens. cyl-tab-bar sets it for every item.
+     * [CN] CYLTabBarItemStyle（cyl-tab-bar/cyl_tab_bar_item_style.js）："flat"（默认）或 "liquidGlass"，选中的 Item 位于
+     *      磨砂玻璃透镜上。cyl-tab-bar 为每个 Item 设置。
+     */
+    itemStyle: { type: String, value: CYLTabBarItemStyle.flat },
+    /** [EN] Dark appearance of the glass (cyl-tab-bar passes its skin). [CN] 玻璃的深色外观（cyl-tab-bar 传入其皮肤）。 */
+    isDark: { type: Boolean, value: false },
   },
 
   data: {
     m: {},
+    cylItemStyle: CYLTabBarItemStyle.flat,
   },
 
   observers: {
     [CYL_PROPERTIES.join(', ')]: function () {
       this.cyl_update();
+    },
+    itemStyle(value) {
+      this.setData({ cylItemStyle: cylTabBarItemStyle(value) });
     },
   },
 

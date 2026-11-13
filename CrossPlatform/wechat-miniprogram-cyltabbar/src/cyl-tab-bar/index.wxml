@@ -47,6 +47,8 @@
         badge-value="{{item.showsDot ? '•' : item.badge}}"
         animation-class="{{cylAnimatingIdentifier === item.key ? 'cyl-animate-' + cylTapAnimation : ''}}"
         animation-duration="{{cylAnimationDuration}}"
+        item-style="{{cylItemStyle}}"
+        is-dark="{{cylIsDark}}"
       />
     </block>
   </view>
