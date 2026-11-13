@@ -200,6 +200,7 @@ docs/
 │   ├── flutter-component-ios.png
 │   ├── flutter-pag-android-bar.png
 │   ├── flutter-pag-ios-bar.png
+│   ├── flutter-plus-title-hidden-report.png
 │   ├── flutter-rive-android-bar.png
 │   ├── flutter-rive-ios-bar.png
 │   ├── flutter-viewpager2-fix-android-bar.png
