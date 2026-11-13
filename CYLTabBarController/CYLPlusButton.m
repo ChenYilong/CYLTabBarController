@@ -2364,7 +2364,7 @@ static void CYLPlusButtonHideStandInFromAccessibility(UIButton *plusButton, UIBu
     selectedContentView.contentMode = UIViewContentModeCenter;
     selectedContentView.imageView.contentMode = UIViewContentModeScaleAspectFit;
     
-    // FIX: issue #653 — placed by frame (see `_CYLTabButtonLayoutTracker`), not by Auto Layout.
+    // FIX: issue #653 — placed by frame (see `CYLTabButtonLayoutTracker`), not by Auto Layout.
     selectedContentView.translatesAutoresizingMaskIntoConstraints = YES;
     selectedContentView.userInteractionEnabled = false;
     [selectedContentView sizeToFit];

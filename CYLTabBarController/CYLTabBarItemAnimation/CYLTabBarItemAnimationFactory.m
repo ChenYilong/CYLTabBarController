@@ -62,7 +62,7 @@ static const void *CYLTabBarItemAnimationPlayerKey = &CYLTabBarItemAnimationPlay
     animationView.frame = CGRectMake(0, 0, size.width, size.height);
     animationView.userInteractionEnabled = NO;
     animationView.contentMode = contentMode;
-    animationView.translatesAutoresizingMaskIntoConstraints = YES; // FIX: issue #653, see `_CYLTabButtonLayoutTracker`
+    animationView.translatesAutoresizingMaskIntoConstraints = YES; // FIX: issue #653, see `CYLTabButtonLayoutTracker`
     animationView.clipsToBounds = NO;
     return animationView;
 }

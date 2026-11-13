@@ -411,6 +411,12 @@ docs/
 │   ├── wechat-miniprogram-api-44-lens-me-rows.png
 │   ├── wechat-miniprogram-api-44-lens-regular-discover.png
 │   ├── wechat-miniprogram-api-44-lens-skeuomorphic-discover.png
+│   ├── wechat-miniprogram-api-47-plus-title-default.png
+│   ├── wechat-miniprogram-api-47-plus-title-flat-design.png
+│   ├── wechat-miniprogram-api-47-plus-title-liquid-glass.png
+│   ├── wechat-miniprogram-api-49-home-table-gallery-badges.png
+│   ├── wechat-miniprogram-api-49-home-table-skins.png
+│   ├── wechat-miniprogram-api-49-home-table-top.png
 │   ├── wechat-miniprogram-badges.png
 │   ├── wechat-miniprogram-christmas-glass.png
 │   ├── wechat-miniprogram-flat-login.png

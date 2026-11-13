@@ -150,8 +150,8 @@ public func cylTabBarItemsAttributesAddingLottieFilesEntryPoint(_ attributes: NS
                                                                 _ bundle: Bundle?) -> NSArray {
     let items = attributes.compactMap { $0 as? [AnyHashable: Any] }
     return CYLTabBarItemAnimationCore.attributes(items, addingFiles: lottieFileNames as? [Any] ?? [], bundle: bundle,
-                                                 fileType: "json", filePathKey: CYLTabBarLottieFilePath,
-                                                 darkFilePathKey: CYLTabBarLottieDarkFilePath) as NSArray
+                                                 fileType: "json", filePathKey: "CYLTabBarLottieFilePath" /* CYLTabBarLottieFilePath, deprecated without Lottie */,
+                                                 darkFilePathKey: "CYLTabBarLottieDarkFilePath" /* CYLTabBarLottieDarkFilePath, deprecated without Lottie */) as NSArray
 }
 
 @_cdecl("CYLTabBarAnimationURLWithOptions")
