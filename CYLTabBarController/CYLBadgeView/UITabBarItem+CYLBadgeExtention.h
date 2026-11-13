@@ -12,61 +12,18 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+/*!
+ * [EN] `UITabBarItem (CYLBadgeExtention)` is implemented in Swift (`CYLBadgeView/Swift/UITabBarItem+CYLBadgeExtention.swift`,
+ *      docs/Swift-Migration.md, step 23): every badge call goes to the badge host of the item's tab button, in both Liquid
+ *      Glass layers. The conformance is declared here; the protocol's members are internal in Swift, so the generated header
+ *      does not import the umbrella header. `-cyl_moveBadgeToCurrentTabButtonIfNeeded` comes from the generated interface.
+ * [CN] `UITabBarItem (CYLBadgeExtention)` 在 Swift 中实现（`CYLBadgeView/Swift/UITabBarItem+CYLBadgeExtention.swift`，
+ *      docs/Swift-Migration.md，第 23 步）：每个角标调用都转给 item 的 Tab 按钮的角标宿主，并作用于液态玻璃的两个图层。遵守关系声明在
+ *      这里；协议成员在 Swift 中为 internal，生成的头文件因此不会导入伞头文件。`-cyl_moveBadgeToCurrentTabButtonIfNeeded` 来自生成的接口。
+ */
 @interface UITabBarItem (CYLBadgeExtention)<CYLBadgeProtocol>
-
-/*!
- * [EN] Returns YES if a badge is currently shown on this tab bar item.
- * [CN] 判断当前TabBarItem上是否正在显示角标。
- */
-- (BOOL)cyl_isShowBadge;
-/*!
- *  show badge with red dot style and CYLBadgeAnimationTypeNone by default.
- * [EN] Shows a red-dot badge on this tab bar item with no animation.
- * [CN] 在当前TabBarItem上显示红点角标，无动画。
- */
-- (void)cyl_showBadge;
-
-/*!
- *
- *  @param value String value, default is `nil`. if value equal @"" means red dot style.
- *  @param animationType animationType
- *  @attention
-                - 调用该方法前已经添加了系统的角标，调用该方法后，系统的角标并未被移除，只是被隐藏，调用 `-cyl_removeTabBadgePoint` 后会重新展示。
-                - 不支持 CYLPlusChildViewController 对应的 TabBarItem 角标设置，调用会被忽略。
- * [EN] Shows a badge with `value` (@"" for a red dot) and the given animation on this tab bar item.
- * [CN] 在当前TabBarItem上显示值为 value 的角标（传 @"" 为红点），并使用指定动画。
- */
-- (void)cyl_showBadgeValue:(NSString *)value
-             animationType:(CYLBadgeAnimationType)animationType;
-
-/*!
- *  clear badge(hide badge)
- * [EN] Hides the badge on this tab bar item.
- * [CN] 隐藏当前TabBarItem上的角标。
- */
-- (void)cyl_clearBadge;
-
-/*!
- *  make bage(if existing) not hiden
- * [EN] Shows the badge again if one exists and was hidden.
- * [CN] 若角标存在且被隐藏，则重新显示。
- */
-- (void)cyl_resumeBadge;
-
-/*!
- * [EN] Returns YES if the badge is paused (hidden but kept).
- * [CN] 判断角标是否处于暂停（隐藏但保留）状态。
- */
-- (BOOL)cyl_isPauseBadge;
-
-/*!
- * [EN] Classic style: moves the badge to the tab button UIKit created in place of the one that showed it (called by the
- *      tab bar's layout; an app does not need to call it).
- * [CN] 经典样式：把角标移到 UIKit 替换后新建的 Tab 按钮上（由 TabBar 布局时调用，App 无需调用）。
- */
-- (void)cyl_moveBadgeToCurrentTabButtonIfNeeded;
-
 @end
 
 NS_ASSUME_NONNULL_END
 
+#import "CYLSwiftInterface.h"
