@@ -1,0 +1,173 @@
+/**
+ * [EN] UI tests of the example in WeChat DevTools, through miniprogram-automator. They drive the real simulator: the
+ *      custom tab bar of the current page, its slots, tab switching, the item style and the glass lens look, the plus
+ *      button title line and the playback controls. Run: `npm run test-ui` (DevTools installed, logged in, with
+ *      "Settings > Security > Service port" on). CYL_DEVTOOLS_CLI overrides the DevTools command line tool;
+ *      CYL_AUTOMATOR_WS connects to a DevTools already started with `cli auto --auto-port <port>`.
+ * [CN] 通过 miniprogram-automator 在微信开发者工具中运行的示例 UI 测试。驱动真实模拟器：当前页面的自定义 TabBar、
+ *      其各个位置、切换 Tab、Item 样式与玻璃镜片外观、PlusButton 标题行以及播放控件。运行：`npm run test-ui`（已安装并
+ *      登录开发者工具，且开启「设置 > 安全 > 服务端口」）。CYL_DEVTOOLS_CLI 指定开发者工具命令行；CYL_AUTOMATOR_WS
+ *      连接已用 `cli auto --auto-port <端口>` 启动的开发者工具。
+ */
+const { test, before, after } = require('node:test');
+const assert = require('node:assert/strict');
+const path = require('node:path');
+const automator = require('miniprogram-automator');
+
+const CYL_PROJECT = path.resolve(__dirname, '..');
+const CYL_CLI = process.env.CYL_DEVTOOLS_CLI || '/Applications/wechatwebdevtools.app/Contents/MacOS/cli';
+// [EN] State changes reach the pages on the next turn of the app's event loop. [CN] 状态变化在 App 事件循环的下一轮到达页面。
+const CYL_SETTLE_MS = 800;
+
+let miniProgram;
+
+const cylSleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+/**
+ * [EN] The render data of the current page's tab bar. [CN] 当前页面 TabBar 的渲染数据。
+ */
+function cylTabBar() {
+  return miniProgram.evaluate(() => {
+    const pages = getCurrentPages();
+    const bar = pages[pages.length - 1].getTabBar().selectComponent('#cyl-tab-bar');
+    return {
+      route: pages[pages.length - 1].route,
+      slots: bar.data.cylSlots.map((slot) => ({ key: slot.key, selected: Boolean(slot.selected), isPlusButton: Boolean(slot.isPlusButton) })),
+      itemStyle: bar.data.cylItemStyle,
+      styleType: bar.data.cylStyleType,
+      glassLensStyle: bar.data.cylGlassLensStyle,
+      animationSpeed: bar.data.animationSpeed,
+      animationLoop: bar.data.animationLoop,
+    };
+  });
+}
+
+/**
+ * [EN] Changes the example's tab bar state (app.js) and waits for the bars to follow it.
+ * [CN] 修改示例的 TabBar 状态（app.js），并等待 TabBar 跟随。
+ */
+async function cylSetState(change) {
+  await miniProgram.evaluate((value) => {
+    setTimeout(() => getApp().cyl_updateTabBarState(value), 0);
+  }, change);
+  await cylSleep(CYL_SETTLE_MS);
+}
+
+/**
+ * [EN] Taps a tab of the current page's bar, as a finger does (the bar's tap handler). [CN] 像手指一样点击当前页面 TabBar 的一个 Tab（TabBar 的点击处理）。
+ */
+async function cylTap(key) {
+  await miniProgram.evaluate((identifier) => {
+    setTimeout(() => {
+      const pages = getCurrentPages();
+      pages[pages.length - 1].getTabBar().selectComponent('#cyl-tab-bar')
+        .cyl_onTap({ currentTarget: { dataset: { key: identifier } } });
+    }, 0);
+  }, key);
+  await cylSleep(CYL_SETTLE_MS * 2);
+}
+
+/**
+ * [EN] The vertical extent of every title on the bar, the plus button's included. [CN] TabBar 上每个标题（含 PlusButton 的）的纵向范围。
+ */
+function cylTitleRects() {
+  return miniProgram.evaluate(() => new Promise((resolve) => {
+    const pages = getCurrentPages();
+    const bar = pages[pages.length - 1].getTabBar().selectComponent('#cyl-tab-bar');
+    bar.createSelectorQuery()
+      .selectAll('.cyl-plus-slot .cyl-title').boundingClientRect()
+      .selectAll('.cyl-tab-item >>> .cyl-item-title').boundingClientRect()
+      .exec((result) => resolve({
+        plus: (result[0] || []).map((rect) => ({ top: rect.top, bottom: rect.bottom })),
+        tabs: (result[1] || []).map((rect) => ({ top: rect.top, bottom: rect.bottom })),
+      }));
+  }));
+}
+
+before(async () => {
+  miniProgram = process.env.CYL_AUTOMATOR_WS
+    ? await automator.connect({ wsEndpoint: process.env.CYL_AUTOMATOR_WS })
+    : await automator.launch({ cliPath: CYL_CLI, projectPath: CYL_PROJECT });
+  await miniProgram.reLaunch('/pages/home/index');
+  await cylSleep(CYL_SETTLE_MS * 2);
+  await cylSetState({ loggedIn: true, itemStyle: '', glassLensStyle: 'regular' });
+});
+
+after(async () => {
+  if (!miniProgram) {
+    return;
+  }
+  await cylSetState({ loggedIn: false, itemStyle: '', glassLensStyle: 'regular' });
+  await miniProgram.reLaunch('/pages/home/index');
+  if (process.env.CYL_AUTOMATOR_WS) {
+    miniProgram.disconnect();
+  } else {
+    await miniProgram.close();
+  }
+});
+
+test('the bar has the four tabs and the plus button, Home selected', async () => {
+  const bar = await cylTabBar();
+  assert.equal(bar.route, 'pages/home/index');
+  assert.deepEqual(bar.slots.filter((slot) => !slot.isPlusButton).map((slot) => slot.key), ['home', 'message', 'discover', 'me']);
+  assert.equal(bar.slots.filter((slot) => slot.isPlusButton).length, 1);
+  assert.deepEqual(bar.slots.filter((slot) => slot.selected).map((slot) => slot.key), ['home']);
+});
+
+test('a tap on a tab opens its page and selects it', async () => {
+  await cylTap('message');
+  let bar = await cylTabBar();
+  assert.equal(bar.route, 'pages/message/index');
+  assert.deepEqual(bar.slots.filter((slot) => slot.selected).map((slot) => slot.key), ['message']);
+  await cylTap('home');
+  bar = await cylTabBar();
+  assert.equal(bar.route, 'pages/home/index');
+});
+
+test('the item style and the glass lens look follow the app state', async () => {
+  await cylSetState({ itemStyle: 'liquidGlass', glassLensStyle: 'skeuomorphic' });
+  let bar = await cylTabBar();
+  assert.equal(bar.itemStyle, 'liquidGlass');
+  assert.equal(bar.styleType, 'liquidGlass');
+  assert.equal(bar.glassLensStyle, 'skeuomorphic');
+  await cylSetState({ itemStyle: 'flat', glassLensStyle: 'regular' });
+  bar = await cylTabBar();
+  assert.equal(bar.itemStyle, 'flat');
+  assert.equal(bar.glassLensStyle, 'regular');
+});
+
+test('the plus button title lines up with the tab titles (default and Liquid Glass)', async () => {
+  for (const itemStyle of ['', 'liquidGlass']) {
+    await cylSetState({ itemStyle });
+    const rects = await cylTitleRects();
+    assert.equal(rects.plus.length, 1, `plus title (${itemStyle || 'default'})`);
+    assert.ok(rects.tabs.length >= 4, `tab titles (${itemStyle || 'default'})`);
+    rects.tabs.forEach((tab) => {
+      assert.ok(Math.abs(tab.top - rects.plus[0].top) <= 1, `top ${tab.top} vs plus ${rects.plus[0].top} (${itemStyle || 'default'})`);
+      assert.ok(Math.abs(tab.bottom - rects.plus[0].bottom) <= 1, `bottom ${tab.bottom} vs plus ${rects.plus[0].bottom} (${itemStyle || 'default'})`);
+    });
+  }
+  await cylSetState({ itemStyle: '' });
+});
+
+test('the playback controls reach the bar: speed, loop, Play all', async () => {
+  const result = await miniProgram.evaluate(() => new Promise((resolve) => {
+    setTimeout(() => {
+      const pages = getCurrentPages();
+      const bar = pages[pages.length - 1].getTabBar().selectComponent('#cyl-tab-bar');
+      bar.cyl_setAnimationSpeed(2);
+      bar.cyl_setAnimationLoop(true);
+      bar.cyl_playAll();
+      resolve({ speed: bar.data.animationSpeed, loop: bar.data.animationLoop });
+    }, 0);
+  }));
+  assert.deepEqual(result, { speed: 2, loop: true });
+  const reset = await miniProgram.evaluate(() => {
+    const pages = getCurrentPages();
+    const bar = pages[pages.length - 1].getTabBar().selectComponent('#cyl-tab-bar');
+    bar.cyl_setAnimationSpeed(1);
+    bar.cyl_setAnimationLoop(false);
+    return { speed: bar.data.animationSpeed, loop: bar.data.animationLoop };
+  });
+  assert.deepEqual(reset, { speed: 1, loop: false });
+});
