@@ -984,7 +984,7 @@ extension UIView {
         }
     }
 
-    dynamic var cyl_badgeFont: UIFont! {
+    @objc(cyl_badgeFont) dynamic var cyl_badgeFont: UIFont! {
         @objc(cyl_badgeFont) get {
             objc_getAssociatedObject(self, CYLBadgeViewKeys.font) as? UIFont ?? CYLBadgeAppearance.global.font
         }
@@ -998,7 +998,7 @@ extension UIView {
         }
     }
 
-    dynamic var cyl_badgeBackgroundColor: UIColor! {
+    @objc(cyl_badgeBackgroundColor) dynamic var cyl_badgeBackgroundColor: UIColor! {
         @objc(cyl_badgeBackgroundColor) get {
             objc_getAssociatedObject(self, CYLBadgeViewKeys.backgroundColor) as? UIColor ?? CYLBadgeAppearance.global.backgroundColor
         }
@@ -1011,7 +1011,7 @@ extension UIView {
         }
     }
 
-    dynamic var cyl_badgeTextColor: UIColor! {
+    @objc(cyl_badgeTextColor) dynamic var cyl_badgeTextColor: UIColor! {
         @objc(cyl_badgeTextColor) get {
             objc_getAssociatedObject(self, CYLBadgeViewKeys.textColor) as? UIColor ?? CYLBadgeAppearance.global.textColor
         }
@@ -1024,7 +1024,7 @@ extension UIView {
         }
     }
 
-    dynamic var cyl_badgeAnimationType: CYLBadgeAnimationType {
+    @objc(cyl_badgeAnimationType) dynamic var cyl_badgeAnimationType: CYLBadgeAnimationType {
         @objc(cyl_badgeAnimationType) get {
             (objc_getAssociatedObject(self, CYLBadgeViewKeys.animationType) as? NSNumber)
                 .flatMap { CYLBadgeAnimationType(rawValue: $0.uintValue) } ?? .none
@@ -1039,7 +1039,7 @@ extension UIView {
         }
     }
 
-    dynamic var cyl_badgeAnimationTypeValue: NSNumber {
+    @objc(cyl_badgeAnimationTypeValue) dynamic var cyl_badgeAnimationTypeValue: NSNumber {
         @objc(cyl_badgeAnimationTypeValue) get {
             NSNumber(value: cyl_badgeAnimationType.rawValue)
         }
@@ -1048,7 +1048,7 @@ extension UIView {
         }
     }
 
-    dynamic var cyl_badgeFrame: CGRect {
+    @objc(cyl_badgeFrame) dynamic var cyl_badgeFrame: CGRect {
         @objc(cyl_badgeFrame) get {
             guard let info = objc_getAssociatedObject(self, CYLBadgeViewKeys.frame) as? [String: NSNumber], info.count == 4 else {
                 return .zero
@@ -1076,7 +1076,7 @@ extension UIView {
         }
     }
 
-    dynamic var cyl_badgeFrameValue: NSValue {
+    @objc(cyl_badgeFrameValue) dynamic var cyl_badgeFrameValue: NSValue {
         @objc(cyl_badgeFrameValue) get {
             NSValue(cgRect: cyl_badgeFrame)
         }
@@ -1085,7 +1085,7 @@ extension UIView {
         }
     }
 
-    dynamic var cyl_badgeCornerRadius: CGFloat {
+    @objc(cyl_badgeCornerRadius) dynamic var cyl_badgeCornerRadius: CGFloat {
         @objc(cyl_badgeCornerRadius) get {
             (objc_getAssociatedObject(self, CYLBadgeViewKeys.cornerRadius) as? NSNumber).map { CGFloat($0.doubleValue) }
                 ?? CYLBadgeAppearance.global.cornerRadius
@@ -1096,7 +1096,7 @@ extension UIView {
         }
     }
 
-    dynamic var cyl_badgeCornerRadiusValue: NSNumber {
+    @objc(cyl_badgeCornerRadiusValue) dynamic var cyl_badgeCornerRadiusValue: NSNumber {
         @objc(cyl_badgeCornerRadiusValue) get {
             NSNumber(value: Double(cyl_badgeCornerRadius))
         }
@@ -1105,7 +1105,7 @@ extension UIView {
         }
     }
 
-    dynamic var cyl_badgeCenterOffset: CGPoint {
+    @objc(cyl_badgeCenterOffset) dynamic var cyl_badgeCenterOffset: CGPoint {
         @objc(cyl_badgeCenterOffset) get {
             guard let info = objc_getAssociatedObject(self, CYLBadgeViewKeys.centerOffset) as? [String: NSNumber], info.count == 2 else {
                 return CYLBadgeAppearance.global.centerOffset
@@ -1125,7 +1125,7 @@ extension UIView {
         }
     }
 
-    dynamic var cyl_badgeCenterOffsetValue: NSValue {
+    @objc(cyl_badgeCenterOffsetValue) dynamic var cyl_badgeCenterOffsetValue: NSValue {
         @objc(cyl_badgeCenterOffsetValue) get {
             NSValue(cgPoint: cyl_badgeCenterOffset)
         }
@@ -1134,7 +1134,7 @@ extension UIView {
         }
     }
 
-    dynamic var cyl_badgeRadius: CGFloat {
+    @objc(cyl_badgeRadius) dynamic var cyl_badgeRadius: CGFloat {
         @objc(cyl_badgeRadius) get {
             (objc_getAssociatedObject(self, CYLBadgeViewKeys.radius) as? NSNumber).map { CGFloat($0.doubleValue) }
                 ?? CYLBadgeAppearance.global.radius
@@ -1147,7 +1147,7 @@ extension UIView {
         }
     }
 
-    dynamic var cyl_badgeRadiusValue: NSNumber {
+    @objc(cyl_badgeRadiusValue) dynamic var cyl_badgeRadiusValue: NSNumber {
         @objc(cyl_badgeRadiusValue) get {
             NSNumber(value: Double(cyl_badgeRadius))
         }
@@ -1156,7 +1156,7 @@ extension UIView {
         }
     }
 
-    dynamic var cyl_badgeMargin: CGFloat {
+    @objc(cyl_badgeMargin) dynamic var cyl_badgeMargin: CGFloat {
         @objc(cyl_badgeMargin) get {
             (objc_getAssociatedObject(self, CYLBadgeViewKeys.margin) as? NSNumber).map { CGFloat($0.doubleValue) }
                 ?? CYLBadgeAppearance.global.margin
@@ -1169,7 +1169,7 @@ extension UIView {
         }
     }
 
-    dynamic var cyl_badgeMarginValue: NSNumber {
+    @objc(cyl_badgeMarginValue) dynamic var cyl_badgeMarginValue: NSNumber {
         @objc(cyl_badgeMarginValue) get {
             NSNumber(value: Double(cyl_badgeMargin))
         }
@@ -1178,7 +1178,7 @@ extension UIView {
         }
     }
 
-    dynamic var cyl_badgeMaximumBadgeNumber: Int {
+    @objc(cyl_badgeMaximumBadgeNumber) dynamic var cyl_badgeMaximumBadgeNumber: Int {
         @objc(cyl_badgeMaximumBadgeNumber) get {
             (objc_getAssociatedObject(self, CYLBadgeViewKeys.maximumBadgeNumber) as? NSNumber)?.intValue
                 ?? CYLBadgeAppearance.global.maximumBadgeNumber
@@ -1191,7 +1191,7 @@ extension UIView {
         }
     }
 
-    dynamic var cyl_badgeMaximumBadgeNumberValue: NSNumber {
+    @objc(cyl_badgeMaximumBadgeNumberValue) dynamic var cyl_badgeMaximumBadgeNumberValue: NSNumber {
         @objc(cyl_badgeMaximumBadgeNumberValue) get {
             NSNumber(value: cyl_badgeMaximumBadgeNumber)
         }
@@ -1246,7 +1246,7 @@ extension UIView {
         }
     }
 
-    dynamic var cyl_delayIfNeededForSeconds: CGFloat {
+    @objc(cyl_delayIfNeededForSeconds) dynamic var cyl_delayIfNeededForSeconds: CGFloat {
         @objc(cyl_delayIfNeededForSeconds) get {
             (objc_getAssociatedObject(self, CYLBadgeViewKeys.delayIfNeededForSeconds) as? NSNumber).map { CGFloat($0.doubleValue) }
                 ?? CYLBadgeViewKeys.defaultDelayIfNeededForSeconds
@@ -1259,7 +1259,7 @@ extension UIView {
         }
     }
 
-    dynamic var cyl_delayIfNeededForSecondsValue: NSNumber {
+    @objc(cyl_delayIfNeededForSecondsValue) dynamic var cyl_delayIfNeededForSecondsValue: NSNumber {
         @objc(cyl_delayIfNeededForSecondsValue) get {
             NSNumber(value: Double(cyl_delayIfNeededForSeconds))
         }
