@@ -13,7 +13,8 @@
     aria-selected="{{item.selected}}"
   >
     <block wx:if="{{item.isPlusButton}}">
-      <view wx:if="{{item.showsSelection}}" class="cyl-plus-selection" aria-hidden="true"></view>
+      <!-- [EN] As iOS (CYLPlusButtonShowsSelection): the selection under the plus button exists on Liquid Glass only. [CN] 与 iOS 一致（CYLPlusButtonShowsSelection）：PlusButton 下方的选中效果只在液态玻璃下出现。 -->
+      <view wx:if="{{item.showsSelection && cylStyleType === 'liquidGlass'}}" class="cyl-plus-selection" aria-hidden="true"></view>
       <view class="cyl-plus-button {{cylAnimatingIdentifier === item.key ? 'cyl-animate-' + cylTapAnimation : ''}}" style="{{item.buttonStyle}} {{cylAnimationStyle}}">
         <image wx:if="{{item.backgroundImage}}" class="cyl-plus-background" src="{{item.backgroundImage}}" mode="aspectFit" aria-hidden="true" />
         <image wx:if="{{item.image}}" class="cyl-plus-image" src="{{item.image}}" style="{{item.imageStyle}}" mode="aspectFit" aria-hidden="true" />
