@@ -173,18 +173,19 @@
   position: relative;
 }
 
-/* [EN] FlatDesign: a flat bar without hairline; the selected tab sits in a rounded pill. [CN] FlatDesign：没有细线的扁平 TabBar；选中的 Tab 位于圆角胶囊中。 */
+/* [EN] FlatDesign: a flat bar without hairline. [CN] FlatDesign：没有细线的扁平 TabBar。 */
 .cyl-style-flatDesign {
   border-top: none;
   background-color: #ffffff;
   box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.06);
 }
 
-.cyl-style-flatDesign .cyl-selected:not(.cyl-plus-slot) .cyl-tab-item {
-  padding: 2px 14px;
-  border-radius: 18px;
-  background-color: rgba(0, 122, 255, 0.12);
-}
+/*
+ * [EN] Like iOS CYLFlatDesignTabBar, a selected tab gets no background: the flat item style (CYLTabBarItemStyle flat)
+ *      shows the selection only with the selected image or the tint of the icon and the title color.
+ * [CN] 与 iOS CYLFlatDesignTabBar 一致，选中的 Tab 没有背景：扁平 Item 样式（CYLTabBarItemStyle flat）只通过选中图片或
+ *      图标着色以及标题颜色表示选中。
+ */
 
 /* [EN] Liquid Glass: a floating translucent capsule; the selected tab shows a lens. [CN] 液态玻璃：悬浮的半透明胶囊；选中的 Tab 显示透镜。 */
 .cyl-style-liquidGlass {
