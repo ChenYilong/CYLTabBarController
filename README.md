@@ -1844,6 +1844,12 @@ CYLTabBar(items: items, styleType: 'liquidGlass', selectedIndex: index, badgeVal
 
 ![WeChat Mini Program tab bar: Lottie icons, badges, dark skin with tinted icons, christmas skin with Liquid Glass](assets/wechat-miniprogram-bar.png)
 
+| 中文 | English |
+|:---|:---|
+| **微信小程序：液态玻璃**：`CYLTabBarItemStyle`（`flat`、`liquidGlass`）由 TabBar 与 Item 共用；液态玻璃透镜有两种外观 `CYLGlassLensStyle`：`regular`（默认「液态」，接近不透明，在任何 TabBar 上一致）与 `skeuomorphic`（「拟物风液态」，半透明，像真实的玻璃）；PlusButton 的标题默认与 Tab 标题在同一行。下图从上到下：液态玻璃 regular、skeuomorphic，PlusButton 标题对齐（默认样式、液态玻璃）（微信开发者工具模拟器，iPhone，基础库 3.17.6，macOS 27.3，提交 [`91236d5`](https://github.com/ChenYilong/CYLTabBarController/commit/91236d5) 之后，2026-11-13）。见[微信小程序版](docs/WeChat-Mini-Program.md)。 | **WeChat Mini Program: Liquid Glass**: `CYLTabBarItemStyle` (`flat`, `liquidGlass`) is shared by the bar and its items; the Liquid Glass lens has two looks, `CYLGlassLensStyle`: `regular` (the default "liquid", nearly opaque, the same on any bar) and `skeuomorphic` ("skeuomorphic liquid", see-through, like real glass); the plus button's title sits on the line of the tab titles by default. Below, top to bottom: Liquid Glass regular, skeuomorphic, the plus title aligned (default style, Liquid Glass) (WeChat DevTools simulator, iPhone, base library 3.17.6, macOS 27.3, after commit [`91236d5`](https://github.com/ChenYilong/CYLTabBarController/commit/91236d5), 2026-11-13). See [WeChat Mini Program](docs/WeChat-Mini-Program.md). |
+
+![WeChat Mini Program Liquid Glass: regular lens, skeuomorphic lens, plus title aligned on the default bar and on Liquid Glass](assets/wechat-miniprogram-liquid-glass.png)
+
 ### [CN]在 Swift 项目中使用 CYLTabBarController
 ### [EN]Using CYLTabBarController in a Swift project
 
