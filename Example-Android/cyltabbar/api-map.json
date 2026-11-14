@@ -5798,5 +5798,22 @@
  "CYLTabBarControllerSelectedIconColor": {
   "status": "done",
   "android": "CYLConstants.CYLTabBarControllerSelectedIconColor"
+ },
+ "CYLTabBarController tabBarItemAnimationLoops": {
+  "status": "done",
+  "android": "CYLTabBarController.tabBarItemAnimationLoops"
+ },
+ "CYLTabBarController -cyl_playAllTabBarItemAnimations": {
+  "status": "done",
+  "android": "CYLTabBarController.cyl_playAllTabBarItemAnimations()"
+ },
+ "CYLTabBarItemAnimationPlayer loops": {
+  "status": "done",
+  "android": "CYLTabBarItemAnimationPlayer.loops",
+  "note": "Lottie (repeat count) and PAG; the other libraries ignore it"
+ },
+ "CYLCatchException()": {
+  "status": "n/a",
+  "note": "Catches an Objective-C exception for Swift callers (Swift cannot catch NSException); Kotlin has try / catch"
  }
 }

@@ -73,7 +73,11 @@ object DemoCatalog {
                 }))
                 sections += DemoSection("Badges", badgeRows(page, maxOf(30, cyl_badgeStyleCount())))
             }
-            MESSAGE -> sections += DemoSection("Badges", messageRows() + badgeRows(page, maxOf(15, cyl_badgeStyleCount())).drop(2))
+            MESSAGE -> {
+                // [EN] Not on the first tab (AGENTS.md "Demo table rows"). [CN] 不放在第一个 Tab（AGENTS.md「Demo table rows」）。
+                sections += playbackSection()
+                sections += DemoSection("Badges", messageRows() + badgeRows(page, maxOf(15, cyl_badgeStyleCount())).drop(2))
+            }
             DISCOVER -> sections += DemoSection("Badges", badgeRows(page, maxOf(15, cyl_badgeStyleCount())))
             else -> sections += DemoSection("Badges", badgeRows(page, maxOf(30, cyl_badgeStyleCount())))
         }
@@ -91,7 +95,20 @@ object DemoCatalog {
         DemoSection("Tab interactions", DemoInteractions.interactionRows()),
         DemoSection("No base class, and helpers", DemoInteractions.helperRows()),
         DemoSection("Configuration file", DemoConfiguration.rows()),
+        playbackSection(),
     )
+
+    /**
+     * [EN] Playback of the tab icon animations: Play all, speed, loop (AGENTS.md "Animated icon examples").
+     * [CN] Tab 图标动画的播放：全部播放、倍速、循环（AGENTS.md「Animated icon examples」）。
+     */
+    private fun playbackSection() = DemoSection("Playback", listOf(DemoRow("Tab icon animations: Play all, speed, loop", {
+        val controller = tabBarController
+        "Speed ${DemoPlaybackControls.speedText(controller?.tabBarItemAnimationSpeed?.takeIf { it > 0 && it.isFinite() } ?: 1f)}, loop ${if (controller?.tabBarItemAnimationLoops == true) "on" else "off"}; tap for the controls"
+    }) {
+        val controller = tabBarController ?: return@DemoRow
+        DemoPlaybackControls.show(requireContext(), controller) { reload() }
+    }))
 
     // MARK: - General 通用
 
