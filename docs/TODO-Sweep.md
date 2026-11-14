@@ -108,3 +108,4 @@
 | 中文 | English |
 |:---|:---|
 | 2026-11-14：建立本清单。A1：第 33 步完成（设置分组迁移到 Swift，41 / 100，135 个单元测试在 iOS 26.3 通过）。B 类未进行：当时 Mac 负载均值为 500–950，`simctl install` 卡住。 | 2026-11-14: this list is created. A1: step 33 is done (the settings section in Swift, 41 / 100, 135 unit tests pass on iOS 26.3). Nothing of B was run: the Mac's load average was 500–950 and `simctl install` hung. |
+| 2026-11-14：A1 第 34 步完成（角标样例列表迁移到 Swift，135 个单元测试在 iOS 26.3 通过）。A3 已核对并写入四个待做步骤。 | 2026-11-14: A1 step 34 is done (the badge sample list in Swift, 135 unit tests pass on iOS 26.3). A3 is checked, with its four steps written down. |
