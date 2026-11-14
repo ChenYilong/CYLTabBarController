@@ -514,6 +514,16 @@ test('the cells of the example act on tap (the request of 2026-11-15)', async ()
   await cylSleep(CYL_SETTLE_MS);
 });
 
+/**
+ * [EN] With CYL_SCREENSHOT_DIR set, saves a screenshot of the simulator there (for docs/assets).
+ * [CN] 设置 CYL_SCREENSHOT_DIR 时，把模拟器截图保存到该目录（供 docs/assets 使用）。
+ */
+async function cylScreenshot(name) {
+  if (process.env.CYL_SCREENSHOT_DIR) {
+    await miniProgram.screenshot({ path: path.join(process.env.CYL_SCREENSHOT_DIR, `${name}.png`) });
+  }
+}
+
 test('the feeds of Message, Discover and Me act as on iOS (the request of 2026-11-15)', async () => {
   // [EN] Message row 1 (#202): a pushed tab bar whose plus button has a tappable X. [CN] 消息第 1 行（#202）：push 的 TabBar，PlusButton 带可点击的 X。
   await miniProgram.reLaunch('/pages/message/index');
@@ -526,6 +536,7 @@ test('the feeds of Message, Discover and Me act as on iOS (the request of 2026-1
   const before = current.data.closeColor;
   await cylTapElement('#cyl-pushed-close');
   assert.notEqual((await current.page.data()).closeColor, before);
+  await cylScreenshot('1-message-close-plus');
   // [EN] Discover: the details page; a tap goes to Me and pushes the red page. [CN] 发现：详情页；点击跳到「我的」并 push 红色页面。
   await miniProgram.reLaunch('/pages/web/index');
   await cylSleep(CYL_SETTLE_MS * 2);
@@ -533,6 +544,7 @@ test('the feeds of Message, Discover and Me act as on iOS (the request of 2026-1
   current = await cylCurrentPage();
   assert.equal(current.route, 'pages/pushed/locked');
   assert.equal(current.data.toMe, true);
+  await cylScreenshot('2-discover-details');
   await cylTapElement('.cyl-pushed', CYL_SETTLE_MS * 3);
   current = await cylCurrentPage();
   assert.equal(current.route, 'pages/pushed/locked');
@@ -540,6 +552,9 @@ test('the feeds of Message, Discover and Me act as on iOS (the request of 2026-1
   // [EN] Me: the row number becomes Me's badge. [CN] 我的：行号成为「我的」的角标。
   await miniProgram.reLaunch('/pages/me/index');
   await cylSleep(CYL_SETTLE_MS * 2);
+  await miniProgram.pageScrollTo(4000);
+  await cylSleep(CYL_SETTLE_MS);
+  await cylScreenshot('3-me-feed');
   await cylTapElement('.cyl-feed-row[data-index="5"]', CYL_SETTLE_MS * 2);
   assert.equal((await miniProgram.evaluate(() => getApp().globalData.cylTabBarState)).badges.me, '5');
   assert.equal((await cylCurrentPage()).route, 'pages/pushed/locked');
