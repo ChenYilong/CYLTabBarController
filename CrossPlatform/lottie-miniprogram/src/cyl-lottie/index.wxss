@@ -17,8 +17,14 @@
   height: 100%;
 }
 
-/* [EN] WeChat DevTools: hidden under the still image, still drawn. [CN] 微信开发者工具：被静态图片覆盖时隐藏，仍会绘制。 */
+/* [EN] WeChat DevTools: out of sight while the still image shows, still drawn. `visibility: hidden` alone was not always
+   honored there (the moving canvas showed through), so the canvas also moves off screen.
+   [CN] 微信开发者工具：显示静态图片时移出视野，仍会绘制。仅用 `visibility: hidden` 在开发者工具中并不总是生效（移动的画布
+   仍会透出），因此同时把画布移出屏幕。 */
 .cyl-lottie-canvas-covered {
+  position: absolute;
+  left: -10000px;
+  top: 0;
   visibility: hidden;
 }
 
