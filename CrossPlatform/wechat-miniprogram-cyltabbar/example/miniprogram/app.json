@@ -9,7 +9,9 @@
     "pages/item/index",
     "pages/glass/index",
     "pages/demo/index",
-    "pages/post/index"
+    "pages/post/index",
+    "pages/pushed/index",
+    "pages/pushed/locked"
   ],
   "window": {
     "navigationBarTitleText": "CYLTabBarController",

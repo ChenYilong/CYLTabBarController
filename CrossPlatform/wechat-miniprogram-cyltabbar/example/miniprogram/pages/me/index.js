@@ -6,6 +6,7 @@
  *      所有 TabBar 实例都会跟随：角标、皮肤、样式、点击动画与需要登录的 Tab。
  */
 const cylTabPage = require('../../utils/cyl_tab_page');
+const { cylFeedRows } = require('../../utils/cyl_feed_rows');
 const { cylDemoConfiguration, cylInstalledAnimation, cylAvailableAnimationFiles } = require('../../utils/cyl_demo_configuration');
 
 // [EN] Row titles of the animation packages. [CN] 动画包的行标题。
@@ -23,6 +24,7 @@ const CYL_TAP_ANIMATIONS = [['none', 'None'], ['bounce', 'Bounce'], ['rotation',
 Component({
   behaviors: [cylTabPage],
   data: {
+    feedRows: [],
     skins: [],
     styleTypes: CYL_STYLE_TYPES,
     itemStyles: [''].concat(Object.values(CYLTabBarItemStyle)),
@@ -44,6 +46,7 @@ Component({
     attached() {
       const themes = Object.keys(cylDemoConfiguration().CYLTabBarControllerThemes || {}).sort();
       this.setData({
+        feedRows: cylFeedRows(),
         skins: [''].concat(themes),
         glassLensStyles: Object.values(CYLGlassLensStyle).map((value) => ({
           value, label: `${this.t(CYL_GLASS_LENS_LABELS[value])} · ${value}`,
@@ -94,6 +97,13 @@ Component({
         badges[event.currentTarget.dataset.identifier] = value;
       }
       this.cyl_update({ badges });
+    },
+    // [EN] CYLMineViewController: shows the row number as Me's badge, then pushes a red page with the pop gesture off.
+    // [CN] CYLMineViewController：把行号显示为「我的」的角标，然后 push 一个关闭返回手势的红色页面。
+    cyl_onFeedRow(event) {
+      const badges = Object.assign({}, getApp().globalData.cylTabBarState.badges, { me: String(event.currentTarget.dataset.index) });
+      this.cyl_update({ badges });
+      wx.navigateTo({ url: `/pages/pushed/locked?color=red&note=${encodeURIComponent('Pushed by Me: the pop gesture is off')}` });
     },
     cyl_skin(event) {
       this.cyl_update({ themeIdentifier: event.currentTarget.dataset.value });

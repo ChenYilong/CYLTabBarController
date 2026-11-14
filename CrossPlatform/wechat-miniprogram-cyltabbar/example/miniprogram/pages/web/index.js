@@ -6,14 +6,16 @@
  */
 const cylTabPage = require('../../utils/cyl_tab_page');
 const { cylDemoConfiguration } = require('../../utils/cyl_demo_configuration');
+const { cylFeedRows } = require('../../utils/cyl_feed_rows');
 
 Component({
   behaviors: [cylTabPage],
-  data: { url: '' },
+  data: { url: '', feedRows: [] },
   lifetimes: {
     attached() {
       const item = cylDemoConfiguration().CYLTabBarControllerTabBarItemsAttributes
         .find((attributes) => attributes.CYLTabBarItemPageIdentifier === 'web');
+      this.setData({ feedRows: cylFeedRows() });
       this.setData({ url: item && item.CYLTabBarItemPageParameters ? item.CYLTabBarItemPageParameters.url : '' });
     },
   },
@@ -21,6 +23,12 @@ Component({
     // [EN] A parameter row: copies its value. [CN] 参数行：复制其值。
     cyl_copyValue(event) {
       wx.setClipboardData({ data: String(event.currentTarget.dataset.value) });
+    },
+
+    // [EN] CYLSameCityViewController: pushes CYLDetailsViewController (orange, no navigation bar, pop gesture off).
+    // [CN] CYLSameCityViewController：push CYLDetailsViewController（橙色、无导航栏、关闭返回手势）。
+    cyl_onFeedRow() {
+      wx.navigateTo({ url: `/pages/pushed/locked?color=orange&toMe=1&note=${encodeURIComponent('Tap the screen to go to Me and run testPush')}` });
     },
 
     cyl_copyLink() {

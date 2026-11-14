@@ -472,11 +472,11 @@ test('the cells of the example act on tap (the request of 2026-11-15)', async ()
   await cylTapElement('.cyl-home-row[data-id="flatShowHide"]');
   assert.equal((await state()).tabBarHidden, false);
 
-  // [EN] The first badge row puts its badge on Discover, a second tap removes it. [CN] 第一个角标行把角标放到「发现」上，再点一次移除。
-  await cylTapElement('.cyl-home-row[data-index="0"]');
-  assert.equal((await state()).badges.discover, '3');
-  await cylTapElement('.cyl-home-row[data-index="0"]');
-  assert.equal((await state()).badges.discover, '');
+  // [EN] A badge row, as CYLHomeViewController: pushes an orange page without navigation bar. [CN] 角标行，与 CYLHomeViewController 相同：push 无导航栏的橙色页面。
+  await cylTapElement('.cyl-home-row[data-index="2"]', CYL_SETTLE_MS * 2);
+  assert.equal((await cylCurrentPage()).route, 'pages/pushed/index');
+  await miniProgram.navigateBack();
+  await cylSleep(CYL_SETTLE_MS);
 
   // [EN] Configuration-file rows open the demo page with the core's result. [CN] 配置文件行打开演示页，显示核心层的结果。
   await cylTapElement('.cyl-home-row[data-id="configurationA13"]', CYL_SETTLE_MS * 2);
@@ -510,6 +510,40 @@ test('the cells of the example act on tap (the request of 2026-11-15)', async ()
   await cylTapElement('.cyl-post-send');
   const comments = (await current.page.data()).comments;
   assert.equal(comments[comments.length - 1].text, 'Nice');
+  await miniProgram.reLaunch('/pages/home/index');
+  await cylSleep(CYL_SETTLE_MS);
+});
+
+test('the feeds of Message, Discover and Me act as on iOS (the request of 2026-11-15)', async () => {
+  // [EN] Message row 1 (#202): a pushed tab bar whose plus button has a tappable X. [CN] 消息第 1 行（#202）：push 的 TabBar，PlusButton 带可点击的 X。
+  await miniProgram.reLaunch('/pages/message/index');
+  await cylSleep(CYL_SETTLE_MS * 2);
+  await cylTapElement('.cyl-feed-row[data-index="1"]', CYL_SETTLE_MS * 2);
+  let current = await cylCurrentPage();
+  assert.equal(current.route, 'pages/pushed/index');
+  assert.equal(current.data.bar, 'close');
+  assert.ok(await current.page.$('#cyl-pushed-tab-bar'), 'a live tab bar');
+  const before = current.data.closeColor;
+  await cylTapElement('#cyl-pushed-close');
+  assert.notEqual((await current.page.data()).closeColor, before);
+  // [EN] Discover: the details page; a tap goes to Me and pushes the red page. [CN] 发现：详情页；点击跳到「我的」并 push 红色页面。
+  await miniProgram.reLaunch('/pages/web/index');
+  await cylSleep(CYL_SETTLE_MS * 2);
+  await cylTapElement('.cyl-feed-row[data-index="0"]', CYL_SETTLE_MS * 2);
+  current = await cylCurrentPage();
+  assert.equal(current.route, 'pages/pushed/locked');
+  assert.equal(current.data.toMe, true);
+  await cylTapElement('.cyl-pushed', CYL_SETTLE_MS * 3);
+  current = await cylCurrentPage();
+  assert.equal(current.route, 'pages/pushed/locked');
+  assert.equal(current.data.color, '#FF3B30');
+  // [EN] Me: the row number becomes Me's badge. [CN] 我的：行号成为「我的」的角标。
+  await miniProgram.reLaunch('/pages/me/index');
+  await cylSleep(CYL_SETTLE_MS * 2);
+  await cylTapElement('.cyl-feed-row[data-index="5"]', CYL_SETTLE_MS * 2);
+  assert.equal((await miniProgram.evaluate(() => getApp().globalData.cylTabBarState)).badges.me, '5');
+  assert.equal((await cylCurrentPage()).route, 'pages/pushed/locked');
+  await miniProgram.evaluate(() => getApp().cyl_updateTabBarState({ badges: {} }));
   await miniProgram.reLaunch('/pages/home/index');
   await cylSleep(CYL_SETTLE_MS);
 });

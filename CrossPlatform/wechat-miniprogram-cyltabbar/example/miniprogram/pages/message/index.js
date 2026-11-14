@@ -5,6 +5,8 @@
  *      页面保留在 app.json 中，供显示它的配置使用。
  */
 const cylTabPage = require('../../utils/cyl_tab_page');
+const { cylFeedRows } = require('../../utils/cyl_feed_rows');
+const { t } = require('../../utils/cyl_demo_localization');
 
 Component({
   behaviors: [cylTabPage],
@@ -12,12 +14,23 @@ Component({
     // [EN] The Liquid Glass gallery's panels (pages/glass). [CN] 液态玻璃画廊的面板（pages/glass）。
     discoverHidden: false,
     tabBarHidden: false,
+    feedRows: [],
     galleryRows: [
       { panel: 'checkin', title: 'Liquid Glass gallery: Check-in' },
       { panel: 'feed', title: 'Navigation bar, search and feed' },
       { panel: 'cards', title: 'Collection view' },
       { panel: 'landing', title: 'Landing, tap animations and item styles' },
     ],
+  },
+  lifetimes: {
+    attached() {
+      // [EN] CYLMessageViewController: rows 0 and 1 push tab bar controllers, the others the other plus button.
+      // [CN] CYLMessageViewController：第 0、1 行 push TabBarController，其余 push 另一个 PlusButton。
+      const rows = cylFeedRows();
+      rows[0] = Object.assign({}, rows[0], { title: t('Push a tab bar controller of the same context (same plus button class)'), subtitle: rows[0].title });
+      rows[1] = Object.assign({}, rows[1], { title: t('Push a tab bar controller of a new context (plus button with a tappable X, issue #202)'), subtitle: t('Tap the X at the top right of the plus button: the X changes color, the plus button does not respond') });
+      this.setData({ feedRows: rows });
+    },
   },
   pageLifetimes: {
     show() {
@@ -46,6 +59,13 @@ Component({
       if (typeof this.getTabBar === 'function' && this.getTabBar()) {
         this.getTabBar().cyl_setTabBarHidden(hidden);
       }
+    },
+
+    cyl_onFeedRow(event) {
+      const index = Number(event.currentTarget.dataset.index);
+      const bar = ['same', 'close'][index] || 'other';
+      const notes = { same: 'Same context, same plus button class', close: 'New context: the plus button has a tappable X', other: 'The other plus button' };
+      wx.navigateTo({ url: `/pages/pushed/index?bar=${bar}&color=orange&note=${encodeURIComponent(notes[bar])}` });
     },
 
     cyl_openGallery(event) {

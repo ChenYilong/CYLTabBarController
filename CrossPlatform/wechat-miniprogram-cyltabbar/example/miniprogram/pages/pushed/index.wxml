@@ -1,0 +1,9 @@
+<view class="cyl-pushed" style="background-color: {{color}};" bindtap="cyl_tapPage" aria-label="{{note}}">
+  <view class="cyl-pushed-back" catchtap="cyl_back" aria-role="button" aria-label="{{texts.Back}}"><text aria-hidden="true">‹ {{texts.Back}}</text></view>
+  <text wx:if="{{note}}" class="cyl-pushed-note" aria-hidden="true">{{note}}</text>
+  <!-- [EN] The tab bar controller iOS pushes from Message. [CN] iOS 从消息页 push 的 TabBarController。 -->
+  <view wx:if="{{bar}}" class="cyl-pushed-frame" catchtap="">
+    <cyl-tab-bar id="cyl-pushed-tab-bar" configuration="{{configuration}}" selected-identifier="home" bind:plustap="cyl_plusTap" />
+    <view wx:if="{{bar === 'close'}}" id="cyl-pushed-close" class="cyl-pushed-close" style="background-color: {{closeColor}};" catchtap="cyl_tapClose" aria-role="button" aria-label="{{texts.close}}"><text aria-hidden="true">✕</text></view>
+  </view>
+</view>

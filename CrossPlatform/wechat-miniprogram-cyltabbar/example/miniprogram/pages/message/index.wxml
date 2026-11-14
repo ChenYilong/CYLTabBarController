@@ -1,3 +1,4 @@
+<import src="/templates/cyl_feed.wxml" />
 <view class="cyl-page" bindtouchstart="cyl_onSwipeStart" bindtouchend="cyl_onSwipeEnd">
   <view class="cyl-header">
     <text class="cyl-header-title" aria-role="heading">{{texts['Message']}}</text>
@@ -21,4 +22,5 @@
   <view class="cyl-section">
     <view wx:for="{{galleryRows}}" wx:key="panel" class="cyl-row cyl-row-action" bindtap="cyl_openGallery" data-panel="{{item.panel}}" aria-role="button" aria-label="{{texts[item.title]}}"><text aria-hidden="true">{{texts[item.title]}}</text></view>
   </view>
+  <template is="cylFeed" data="{{rows: feedRows, title: texts['Feed']}}" />
 </view>

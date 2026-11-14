@@ -1,3 +1,4 @@
+<import src="/templates/cyl_feed.wxml" />
 <view class="cyl-page" bindtouchstart="cyl_onSwipeStart" bindtouchend="cyl_onSwipeEnd">
   <view class="cyl-section">
     <view wx:if="{{installed === 'lottie' || installed === 'pag'}}" class="cyl-row cyl-row-action" bindtap="cyl_openPlayground" aria-role="button" aria-label="{{texts['cyl-lottie playground']}}"><text aria-hidden="true">{{texts['cyl-lottie playground']}}</text></view>
@@ -88,4 +89,5 @@
       <switch checked="{{state.overrides.CYLTabBarControllerLoginRequiredTabBarItemIdentifiers.length > 0}}" bindchange="cyl_loginRequired" aria-label="{{texts['Me needs login']}}" />
     </view>
   </view>
+  <template is="cylFeed" data="{{rows: feedRows, title: texts['Feed']}}" />
 </view>

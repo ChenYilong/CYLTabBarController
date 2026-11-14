@@ -5,6 +5,17 @@
  */
 module.exports = {
   "en": {
+    "Close button of the plus button": "Close button of the plus button",
+    "Home (%@)": "Home (%@)",
+    "Push a tab bar controller of the same context (same plus button class)": "Push a tab bar controller of the same context (same plus button class)",
+    "Push a tab bar controller of a new context (plus button with a tappable X, issue #202)": "Push a tab bar controller of a new context (plus button with a tappable X, issue #202)",
+    "Tap the X at the top right of the plus button: the X changes color, the plus button does not respond": "Tap the X at the top right of the plus button: the X changes color, the plus button does not respond",
+    "Same context, same plus button class": "Same context, same plus button class",
+    "New context: the plus button has a tappable X": "New context: the plus button has a tappable X",
+    "The other plus button": "The other plus button",
+    "Tap the screen to go to Me and run testPush": "Tap the screen to go to Me and run testPush",
+    "Pushed by Me: the pop gesture is off": "Pushed by Me: the pop gesture is off",
+    "Pushed by Home: the navigation bar is hidden": "Pushed by Home: the navigation bar is hidden",
     "A case written in code on iOS; here the same input goes through cylReadConfiguration.": "A case written in code on iOS; here the same input goes through cylReadConfiguration.",
     "A request without a URL.": "A request without a URL.",
     "A tab whose icon is a GIF file.": "A tab whose icon is a GIF file.",
@@ -161,6 +172,17 @@ module.exports = {
     "Run the PAG download first": "Run the PAG download first"
   },
   "zh-Hans": {
+    "Close button of the plus button": "PlusButton 的关闭按钮",
+    "Home (%@)": "首页(%@)",
+    "Push a tab bar controller of the same context (same plus button class)": "Push 同一个 context 的 TabBarController（同一个 PlusButton 类）",
+    "Push a tab bar controller of a new context (plus button with a tappable X, issue #202)": "Push 新 context 的 TabBarController（PlusButton 带可点击的 X 子按钮，issue #202）",
+    "Tap the X at the top right of the plus button: the X changes color, the plus button does not respond": "点击 PlusButton 右上角的 X：X 随机改变颜色，PlusButton 不响应",
+    "Same context, same plus button class": "同一个 context，同一个 PlusButton 类",
+    "New context: the plus button has a tappable X": "新 context：PlusButton 带可点击的 X",
+    "The other plus button": "另一个 PlusButton",
+    "Tap the screen to go to Me and run testPush": "点击屏幕可跳转到“我的”，执行testPush",
+    "Pushed by Me: the pop gesture is off": "由「我的」push：返回手势已关闭",
+    "Pushed by Home: the navigation bar is hidden": "由首页 push：导航栏已隐藏",
     "A case written in code on iOS; here the same input goes through cylReadConfiguration.": "iOS 上用代码编写的用例；这里把同样的输入交给 cylReadConfiguration。",
     "A request without a URL.": "没有 URL 的请求。",
     "A tab whose icon is a GIF file.": "图标为 GIF 文件的 Tab。",
@@ -317,6 +339,17 @@ module.exports = {
     "Run the PAG download first": "请先下载 PAG 文件"
   },
   "zh-Hant": {
+    "Close button of the plus button": "PlusButton 的關閉按鈕",
+    "Home (%@)": "首頁(%@)",
+    "Push a tab bar controller of the same context (same plus button class)": "Push 同一個 context 的 TabBarController（同一個 PlusButton 類）",
+    "Push a tab bar controller of a new context (plus button with a tappable X, issue #202)": "Push 新 context 的 TabBarController（PlusButton 帶可點擊的 X 子按鈕，issue #202）",
+    "Tap the X at the top right of the plus button: the X changes color, the plus button does not respond": "點擊 PlusButton 右上角的 X：X 隨機改變顏色，PlusButton 不響應",
+    "Same context, same plus button class": "同一個 context，同一個 PlusButton 類",
+    "New context: the plus button has a tappable X": "新 context：PlusButton 帶可點擊的 X",
+    "The other plus button": "另一個 PlusButton",
+    "Tap the screen to go to Me and run testPush": "點擊螢幕可跳轉到「我的」，執行testPush",
+    "Pushed by Me: the pop gesture is off": "由「我的」push：返回手勢已關閉",
+    "Pushed by Home: the navigation bar is hidden": "由首頁 push：導覽列已隱藏",
     "A case written in code on iOS; here the same input goes through cylReadConfiguration.": "iOS 上用程式碼編寫的用例；這裡把同樣的輸入交給 cylReadConfiguration。",
     "A request without a URL.": "沒有 URL 的請求。",
     "A tab whose icon is a GIF file.": "圖示為 GIF 檔案的 Tab。",

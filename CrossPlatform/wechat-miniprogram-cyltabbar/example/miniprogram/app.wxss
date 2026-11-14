@@ -84,3 +84,11 @@ page {
 
 /* [EN] Pressed rows. [CN] 按下的行。 */
 .cyl-row-pressed { background-color: rgba(0, 0, 0, 0.05); }
+
+/* [EN] The feed of badge rows (templates/cyl_feed.wxml). [CN] 角标行信息流（templates/cyl_feed.wxml）。 */
+.cyl-feed-row { display: flex; align-items: center; }
+.cyl-feed-texts { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+.cyl-feed-title { font-size: 15px; }
+.cyl-feed-subtitle { font-size: 12px; opacity: 0.6; margin-top: 2px; }
+.cyl-feed-badge { min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; background: #FF3B30; color: #fff; font-size: 11px; line-height: 18px; text-align: center; box-sizing: border-box; }
+.cyl-feed-dot { min-width: 8px; width: 8px; height: 8px; padding: 0; }

@@ -240,13 +240,12 @@ Component({
      * [EN] A badge row: shows its sample badge on the Discover tab (tap again to remove it).
      * [CN] 角标行：在「发现」Tab 上显示该示例角标（再次点击移除）。
      */
+    // [EN] CYLHomeViewController: the navigation title becomes "Home (N)", then an orange page without navigation bar is pushed.
+    // [CN] CYLHomeViewController：导航标题变为「首页(N)」，然后 push 一个无导航栏的橙色页面。
     cyl_onBadge(event) {
-      const sample = cylDemoList.badgeSamples[event.currentTarget.dataset.index];
-      const badges = Object.assign({}, getApp().globalData.cylTabBarState.badges);
-      const value = sample.value ? this.cyl_badgeText(sample) : '•';
-      badges.discover = badges.discover === value ? '' : value;
-      this.cyl_update({ badges });
-      wx.showToast({ title: badges.discover ? `${this.t('Discover')}: ${value}` : this.t('Remove badges'), icon: 'none' });
+      const index = Number(event.currentTarget.dataset.index);
+      wx.setNavigationBarTitle({ title: this.t('Home (%@)').replace('%@', index) });
+      wx.navigateTo({ url: `/pages/pushed/index?color=orange&note=${encodeURIComponent('Pushed by Home: the navigation bar is hidden')}` });
     },
 
     /**
