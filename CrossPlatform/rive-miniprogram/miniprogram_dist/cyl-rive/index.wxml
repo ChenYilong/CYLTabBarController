@@ -1,0 +1,5 @@
+<!-- [EN] One 2D canvas per Rive animation. In WeChat DevTools the canvas only draws, off screen, and one image of it shows the animation (CYL_USES_SNAPSHOTS in index.js). [CN] 每个 Rive 动画一个 2D 画布。在微信开发者工具中，画布只在屏幕外绘制，由其一张图片显示动画（见 index.js 中的 CYL_USES_SNAPSHOTS）。 -->
+<view class="cyl-rive-box">
+  <canvas type="2d" id="{{cylCanvasId}}" class="cyl-rive-canvas {{cylCovered ? 'cyl-rive-canvas-covered' : ''}}" aria-role="img" aria-label="{{label}}" aria-hidden="{{!label}}"></canvas>
+  <image wx:if="{{cylCovered && cylSnapshot}}" class="cyl-rive-snapshot" src="{{cylSnapshot}}" mode="scaleToFill" aria-hidden="true" />
+</view>

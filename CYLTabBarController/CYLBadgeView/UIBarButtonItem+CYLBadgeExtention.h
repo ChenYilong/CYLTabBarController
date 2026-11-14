@@ -12,31 +12,17 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface UIBarButtonItem (CYLBadgeExtention)<CYLBadgeProtocol>
-
 /*!
- * [EN] Returns YES if a badge is currently shown on this bar button item.
- * [CN] 判断当前BarButtonItem上是否正在显示角标。
+ * [EN] `UIBarButtonItem (CYLBadgeExtention)` is implemented in Swift (`CYLBadgeView/Swift/UIBarButtonItem+CYLBadgeExtention.swift`,
+ *      docs/Swift-Migration.md, step 24): the badge goes on the image or title inside the item's button, and on iOS 26+ with
+ *      Liquid Glass it is the system badge. The conformance is declared here; the protocol's members are internal in Swift,
+ *      so the generated header does not import the umbrella header. For the same reason
+ *      `-cyl_showBadgeValue:animationType:backgroundColor:` (it takes `CYLBadgeAnimationType`) is declared below.
+ * [CN] `UIBarButtonItem (CYLBadgeExtention)` 在 Swift 中实现（`CYLBadgeView/Swift/UIBarButtonItem+CYLBadgeExtention.swift`，
+ *      docs/Swift-Migration.md，第 24 步）：角标放在 item 按钮内的图片或标题上，iOS 26+ 液态玻璃下使用系统角标。遵守关系声明在这里；
+ *      协议成员在 Swift 中为 internal，生成的头文件因此不会导入伞头文件。`-cyl_showBadgeValue:animationType:backgroundColor:`（参数为 `CYLBadgeAnimationType`）也因此在下方声明。
  */
-- (BOOL)cyl_isShowBadge;
-
-/**
- *  show badge with red dot style and CYLBadgeAnimationTypeNone by default.
- * [EN] Shows a red-dot badge on this bar button item with no animation.
- * [CN] 在当前BarButtonItem上显示红点角标，无动画。
- */
-- (void)cyl_showBadge;
-
-/**
- *  cyl_showBadge
- *
- *  @param value String value, default is `nil`. if value equal @"" means red dot style.
- *  @param animationType animationType
- * [EN] Shows a badge with `value` (@"" for a red dot) and the given animation on this bar button item.
- * [CN] 在当前BarButtonItem上显示值为 value 的角标（传 @"" 为红点），并使用指定动画。
- */
-- (void)cyl_showBadgeValue:(NSString *)value
-         animationType:(CYLBadgeAnimationType)animationType;
+@interface UIBarButtonItem (CYLBadgeExtention)<CYLBadgeProtocol>
 
 /*!
  * [EN] Same as `-cyl_showBadgeValue:animationType:`, with the badge's background color set first (nil keeps the
@@ -54,28 +40,8 @@ NS_ASSUME_NONNULL_BEGIN
              animationType:(CYLBadgeAnimationType)animationType
            backgroundColor:(nullable UIColor *)backgroundColor;
 
-
-/**
- *  clear badge(hide badge)
- * [EN] Hides the badge on this bar button item.
- * [CN] 隐藏当前BarButtonItem上的角标。
- */
-- (void)cyl_clearBadge;
-
-/**
- *  make bage(if existing) not hiden
- * [EN] Shows the badge again if one exists and was hidden.
- * [CN] 若角标存在且被隐藏，则重新显示。
- */
-- (void)cyl_resumeBadge;
-
-/*!
- * [EN] Returns YES if the badge is paused (hidden but kept).
- * [CN] 判断角标是否处于暂停（隐藏但保留）状态。
- */
-- (BOOL)cyl_isPauseBadge;
-
 @end
 
 NS_ASSUME_NONNULL_END
 
+#import "CYLSwiftInterface.h"

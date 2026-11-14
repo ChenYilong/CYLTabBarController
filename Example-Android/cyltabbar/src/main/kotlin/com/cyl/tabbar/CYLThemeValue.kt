@@ -72,10 +72,14 @@ import java.util.concurrent.ConcurrentHashMap
  *      `CYLThemeValues.installLayoutInflaterFactory` 的 factory 读取）设置规则。
  */
 
-/** [EN] Android only: a theme that is an Android style; value names are its theme attributes. [CN] 仅 Android：以 Android style 表示的主题；值名称为其主题属性。 */
+/**
+ * [EN] Android only: a theme that is an Android style; value names are its theme attributes. [CN] 仅 Android：以 Android style 表示的主题；值名称为其主题属性。
+ */
 data class CYLThemeStyle(@param:StyleRes val styleRes: Int)
 
-/** [EN] Android only: a theme object that answers value names itself. [CN] 仅 Android：自行返回值名称对应值的主题对象。 */
+/**
+ * [EN] Android only: a theme object that answers value names itself. [CN] 仅 Android：自行返回值名称对应值的主题对象。
+ */
 fun interface CYLThemeValueProviding {
     fun cyl_themeValueForName(name: String, context: Context): Any?
 }
@@ -103,14 +107,18 @@ class CYLThemeValueBuilder {
     fun textCompoundRightSrc(name: String) = custom(TEXT_COMPOUND_RIGHT_SRC, name)
     fun textCompoundBottomSrc(name: String) = custom(TEXT_COMPOUND_BOTTOM_SRC, name)
 
-    /** [EN] A rule of `CYLThemeValues.setRuleHandler`, or a built-in one. [CN] `CYLThemeValues.setRuleHandler` 注册的规则，或内置规则。 */
+    /**
+     * [EN] A rule of `CYLThemeValues.setRuleHandler`, or a built-in one. [CN] `CYLThemeValues.setRuleHandler` 注册的规则，或内置规则。
+     */
     fun custom(rule: String, name: String): CYLThemeValueBuilder = apply {
         val key = rule.trim()
         val value = name.trim().removePrefix("?attr/").removePrefix("?")
         if (key.isNotEmpty() && value.isNotEmpty()) values[key] = value
     }
 
-    /** [EN] `convertFrom`: adds the rules of a "rule:name|rule:name" string. [CN] 添加 "rule:name|rule:name" 字符串中的规则。 */
+    /**
+     * [EN] `convertFrom`: adds the rules of a "rule:name|rule:name" string. [CN] 添加 "rule:name|rule:name" 字符串中的规则。
+     */
     fun convertFrom(value: String?): CYLThemeValueBuilder = apply {
         value?.split('|')?.forEach { item ->
             val parts = item.split(':')
@@ -120,7 +128,9 @@ class CYLThemeValueBuilder {
 
     fun isEmpty(): Boolean = values.isEmpty()
     fun clear() = values.clear()
-    /** [EN] The rules, in the order they were added. [CN] 按添加顺序的规则。 */
+    /**
+     * [EN] The rules, in the order they were added. [CN] 按添加顺序的规则。
+     */
     fun rules(): Map<String, String> = LinkedHashMap(values)
     fun build(): String = values.entries.joinToString("|") { "${it.key}:${it.value}" }
 
@@ -195,17 +205,23 @@ class CYLThemeValue internal constructor(val name: String, val raw: Any?, privat
     }
 }
 
-/** [EN] Android only, QMUI `IQMUISkinRuleHandler`: applies one rule's value to a view. [CN] 仅 Android，QMUI 的 `IQMUISkinRuleHandler`：把一条规则的值应用到视图。 */
+/**
+ * [EN] Android only, QMUI `IQMUISkinRuleHandler`: applies one rule's value to a view. [CN] 仅 Android，QMUI 的 `IQMUISkinRuleHandler`：把一条规则的值应用到视图。
+ */
 fun interface CYLThemeRuleHandler {
     fun cyl_applyThemeValue(view: View, rule: String, value: CYLThemeValue)
 }
 
-/** [EN] Android only, QMUI `IQMUISkinDispatchInterceptor`: a view that returns true keeps a theme change from itself and its subviews. [CN] 仅 Android：返回 true 的视图让主题变化不再分发到自身及子视图。 */
+/**
+ * [EN] Android only, QMUI `IQMUISkinDispatchInterceptor`: a view that returns true keeps a theme change from itself and its subviews. [CN] 仅 Android：返回 true 的视图让主题变化不再分发到自身及子视图。
+ */
 fun interface CYLThemeDispatchInterceptor {
     fun cyl_interceptThemeDispatch(manager: CYLThemeManager, identifier: Any?, theme: Any?): Boolean
 }
 
-/** [EN] Android only, QMUI `IQMUISkinHandlerSpan`: a span of a `TextView`'s text told about theme changes. [CN] 仅 Android：`TextView` 文本中会收到主题变化通知的 span。 */
+/**
+ * [EN] Android only, QMUI `IQMUISkinHandlerSpan`: a span of a `TextView`'s text told about theme changes. [CN] 仅 Android：`TextView` 文本中会收到主题变化通知的 span。
+ */
 fun interface CYLThemeSpan {
     fun cyl_themeDidChange(view: TextView, manager: CYLThemeManager?)
 }
@@ -219,7 +235,9 @@ fun interface CYLThemeItemDecoration {
     fun cyl_themeDidChange(recyclerView: ViewGroup, manager: CYLThemeManager?)
 }
 
-/** [EN] Android only: a text color span that follows the theme value `name` (QMUI's skin spans). [CN] 仅 Android：跟随主题值 `name` 的文字颜色 span（QMUI 的换肤 span）。 */
+/**
+ * [EN] Android only: a text color span that follows the theme value `name` (QMUI's skin spans). [CN] 仅 Android：跟随主题值 `name` 的文字颜色 span（QMUI 的换肤 span）。
+ */
 class CYLThemeColorSpan(val name: String, @param:ColorInt private var color: Int = Color.BLACK) : CharacterStyle(), UpdateAppearance, CYLThemeSpan {
     override fun updateDrawState(paint: TextPaint) { paint.color = color }
 
@@ -245,10 +263,14 @@ var View.cyl_themeValue: String?
         CYLThemeValues.applyThemeValues(this, force = true)
     }
 
-/** [EN] Android only: sets `cyl_themeValue` from a builder. [CN] 仅 Android：用构建器设置 `cyl_themeValue`。 */
+/**
+ * [EN] Android only: sets `cyl_themeValue` from a builder. [CN] 仅 Android：用构建器设置 `cyl_themeValue`。
+ */
 fun View.cyl_setThemeValue(builder: CYLThemeValueBuilder) { cyl_themeValue = builder.build() }
 
-/** [EN] Android only: the manager whose theme the view's values follow (default: `CYLThemeManagerCenter.defaultThemeManager`). [CN] 仅 Android：视图主题值跟随的管理器（默认 `CYLThemeManagerCenter.defaultThemeManager`）。 */
+/**
+ * [EN] Android only: the manager whose theme the view's values follow (default: `CYLThemeManagerCenter.defaultThemeManager`). [CN] 仅 Android：视图主题值跟随的管理器（默认 `CYLThemeManagerCenter.defaultThemeManager`）。
+ */
 var View.cyl_themeValueManager: CYLThemeManager
     get() = (getTag(R.id.cyl_theme_attach_listener) as? CYLThemeValues.AttachState)?.manager ?: CYLThemeManagerCenter.defaultThemeManager
     set(value) {
@@ -256,12 +278,16 @@ var View.cyl_themeValueManager: CYLThemeManager
         CYLThemeValues.applyThemeValues(this, force = true)
     }
 
-/** [EN] Android only, QMUI `setInterceptSkinDispatch`: true keeps theme changes from this view and its subviews. [CN] 仅 Android：true 时主题变化不再分发到本视图及子视图。 */
+/**
+ * [EN] Android only, QMUI `setInterceptSkinDispatch`: true keeps theme changes from this view and its subviews. [CN] 仅 Android：true 时主题变化不再分发到本视图及子视图。
+ */
 var View.cyl_interceptsThemeDispatch: Boolean
     get() = getTag(R.id.cyl_theme_intercept_dispatch) == true
     set(value) = setTag(R.id.cyl_theme_intercept_dispatch, value.takeIf { it })
 
-/** [EN] Android only, QMUI `setIgnoreSkinApply`: true skips this view itself, still reaching its subviews. [CN] 仅 Android：true 时跳过本视图自身，仍分发到子视图。 */
+/**
+ * [EN] Android only, QMUI `setIgnoreSkinApply`: true skips this view itself, still reaching its subviews. [CN] 仅 Android：true 时跳过本视图自身，仍分发到子视图。
+ */
 var View.cyl_ignoresThemeApply: Boolean
     get() = getTag(R.id.cyl_theme_ignore_apply) == true
     set(value) = setTag(R.id.cyl_theme_ignore_apply, value.takeIf { it })
@@ -280,7 +306,9 @@ object CYLThemeValues {
         override fun onViewDetachedFromWindow(v: View) = Unit
     }
 
-    /** [EN] A newly attached view (a list cell, a dialog) catches up with the current theme. [CN] 新附加到窗口的视图（列表 cell、对话框）跟上当前主题。 */
+    /**
+     * [EN] A newly attached view (a list cell, a dialog) catches up with the current theme. [CN] 新附加到窗口的视图（列表 cell、对话框）跟上当前主题。
+     */
     internal fun watchAttach(view: View): AttachState {
         (view.getTag(R.id.cyl_theme_attach_listener) as? AttachState)?.let { return it }
         return AttachState(CYLThemeManagerCenter.defaultThemeManager).also { state ->
@@ -289,13 +317,17 @@ object CYLThemeValues {
         }
     }
 
-    /** [EN] `setRuleHandler`: a handler for `rule` (a new rule, or replacing a built-in one); null restores the built-in one. [CN] 为 `rule` 设置处理器（新规则或替换内置规则）；null 恢复内置处理器。 */
+    /**
+     * [EN] `setRuleHandler`: a handler for `rule` (a new rule, or replacing a built-in one); null restores the built-in one. [CN] 为 `rule` 设置处理器（新规则或替换内置规则）；null 恢复内置处理器。
+     */
     @JvmStatic
     fun setRuleHandler(rule: String, handler: CYLThemeRuleHandler?) {
         if (handler == null) ruleHandlers.remove(rule) else ruleHandlers[rule] = handler
     }
 
-    /** [EN] The value `name` of `manager`'s current theme, seen from `context`, or null. [CN] `manager` 当前主题中名为 `name` 的值（以 `context` 读取），没有时为 null。 */
+    /**
+     * [EN] The value `name` of `manager`'s current theme, seen from `context`, or null. [CN] `manager` 当前主题中名为 `name` 的值（以 `context` 读取），没有时为 null。
+     */
     @JvmStatic
     @JvmOverloads
     fun value(context: Context, name: String, manager: CYLThemeManager = CYLThemeManagerCenter.defaultThemeManager): CYLThemeValue? {
@@ -348,7 +380,9 @@ object CYLThemeValues {
         }
     }
 
-    /** [EN] Tells the `CYLThemeSpan`s of a text view and the `CYLThemeItemDecoration`s of a RecyclerView. [CN] 通知文本视图中的 `CYLThemeSpan` 与 RecyclerView 的 `CYLThemeItemDecoration`。 */
+    /**
+     * [EN] Tells the `CYLThemeSpan`s of a text view and the `CYLThemeItemDecoration`s of a RecyclerView. [CN] 通知文本视图中的 `CYLThemeSpan` 与 RecyclerView 的 `CYLThemeItemDecoration`。
+     */
     internal fun dispatchSpansAndDecorations(view: View, manager: CYLThemeManager?) {
         if (view is TextView) {
             val text = view.text
@@ -365,7 +399,9 @@ object CYLThemeValues {
         }
     }
 
-    /** [EN] `RecyclerView` by reflection, with the methods looked up once. [CN] 通过反射访问 `RecyclerView`，方法只查找一次。 */
+    /**
+     * [EN] `RecyclerView` by reflection, with the methods looked up once. [CN] 通过反射访问 `RecyclerView`，方法只查找一次。
+     */
     private object RecyclerViews {
         private const val CLASS_NAME = "androidx.recyclerview.widget.RecyclerView"
         private val recyclerClass: Class<*>? by lazy { CYLReflection.type(CLASS_NAME) }
@@ -420,7 +456,9 @@ object CYLThemeValues {
         CYLThemeValueBuilder.TEXT_COMPOUND_BOTTOM_SRC to compoundHandler(3),
     )
 
-    /** [EN] The compound drawable at `position` (left, top, right, bottom), at its intrinsic size; the others are kept. [CN] 位于 `position`（左、上、右、下）的 compound drawable，使用其固有尺寸；其他保持不变。 */
+    /**
+     * [EN] The compound drawable at `position` (left, top, right, bottom), at its intrinsic size; the others are kept. [CN] 位于 `position`（左、上、右、下）的 compound drawable，使用其固有尺寸；其他保持不变。
+     */
     private fun compoundHandler(position: Int) = CYLThemeRuleHandler { view, _, value ->
         val text = view as? TextView ?: return@CYLThemeRuleHandler
         val drawables = text.compoundDrawables.copyOf()
@@ -428,7 +466,9 @@ object CYLThemeValues {
         text.setCompoundDrawables(drawables[0], drawables[1], drawables[2], drawables[3])
     }
 
-    /** [EN] `QMUIViewHelper.setBackgroundKeepingPadding`. [CN] 设置背景并保留 padding。 */
+    /**
+     * [EN] `QMUIViewHelper.setBackgroundKeepingPadding`. [CN] 设置背景并保留 padding。
+     */
     private fun setBackgroundKeepingPadding(view: View, drawable: Drawable?) {
         val padding = intArrayOf(view.paddingLeft, view.paddingTop, view.paddingRight, view.paddingBottom)
         view.background = drawable
@@ -514,7 +554,9 @@ object CYLThemeValues {
         rootView(target)?.cyl_themeDidChangeByManager(manager, manager.currentThemeIdentifier, manager.currentTheme)
     }
 
-    /** [EN] QMUI `unRegister`. [CN] 取消登记。 */
+    /**
+     * [EN] QMUI `unRegister`. [CN] 取消登记。
+     */
     @JvmStatic
     @JvmOverloads
     fun unregister(target: Any, manager: CYLThemeManager = CYLThemeManagerCenter.defaultThemeManager) {

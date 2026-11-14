@@ -63,37 +63,49 @@ NS_ASSUME_NONNULL_BEGIN
                                     iconView:(UIView *)iconView
                                   titleLabel:(nullable UILabel *)titleLabel;
 
-/// [EN] `-cyl_playSelectAnimationWithTabButton:…` without the underscore. [CN] 去掉下划线的 `-cyl_playSelectAnimationWithTabButton:…`。
+/*!
+ * [EN] `-cyl_playSelectAnimationWithTabButton:…` without the underscore. [CN] 去掉下划线的 `-cyl_playSelectAnimationWithTabButton:…`。
+ */
 - (void)cylPlaySelectAnimationWithTabButton:(UIControl *)button
                                    iconView:(UIView *)iconView
                                  titleLabel:(nullable UILabel *)titleLabel
     NS_SWIFT_NAME(cylPlaySelectAnimation(withTabButton:iconView:titleLabel:));
 
-/// [EN] `-cyl_playDeselectAnimationWithTabButton:…` without the underscore. [CN] 去掉下划线的 `-cyl_playDeselectAnimationWithTabButton:…`。
+/*!
+ * [EN] `-cyl_playDeselectAnimationWithTabButton:…` without the underscore. [CN] 去掉下划线的 `-cyl_playDeselectAnimationWithTabButton:…`。
+ */
 - (void)cylPlayDeselectAnimationWithTabButton:(UIControl *)button
                                      iconView:(UIView *)iconView
                                    titleLabel:(nullable UILabel *)titleLabel
     NS_SWIFT_NAME(cylPlayDeselectAnimation(withTabButton:iconView:titleLabel:));
 
-/// [EN] `-cyl_playReselectAnimationWithTabButton:…` without the underscore. [CN] 去掉下划线的 `-cyl_playReselectAnimationWithTabButton:…`。
+/*!
+ * [EN] `-cyl_playReselectAnimationWithTabButton:…` without the underscore. [CN] 去掉下划线的 `-cyl_playReselectAnimationWithTabButton:…`。
+ */
 - (void)cylPlayReselectAnimationWithTabButton:(UIControl *)button
                                      iconView:(UIView *)iconView
                                    titleLabel:(nullable UILabel *)titleLabel
     NS_SWIFT_NAME(cylPlayReselectAnimation(withTabButton:iconView:titleLabel:));
 
-/// [EN] `-cyl_playHighlightAnimationWithTabButton:…` without the underscore. [CN] 去掉下划线的 `-cyl_playHighlightAnimationWithTabButton:…`。
+/*!
+ * [EN] `-cyl_playHighlightAnimationWithTabButton:…` without the underscore. [CN] 去掉下划线的 `-cyl_playHighlightAnimationWithTabButton:…`。
+ */
 - (void)cylPlayHighlightAnimationWithTabButton:(UIControl *)button
                                       iconView:(UIView *)iconView
                                     titleLabel:(nullable UILabel *)titleLabel
     NS_SWIFT_NAME(cylPlayHighlightAnimation(withTabButton:iconView:titleLabel:));
 
-/// [EN] `-cyl_playDehighlightAnimationWithTabButton:…` without the underscore. [CN] 去掉下划线的 `-cyl_playDehighlightAnimationWithTabButton:…`。
+/*!
+ * [EN] `-cyl_playDehighlightAnimationWithTabButton:…` without the underscore. [CN] 去掉下划线的 `-cyl_playDehighlightAnimationWithTabButton:…`。
+ */
 - (void)cylPlayDehighlightAnimationWithTabButton:(UIControl *)button
                                         iconView:(UIView *)iconView
                                       titleLabel:(nullable UILabel *)titleLabel
     NS_SWIFT_NAME(cylPlayDehighlightAnimation(withTabButton:iconView:titleLabel:));
 
-/// [EN] `-cyl_playBadgeChangedAnimationWithTabButton:…` without the underscore. [CN] 去掉下划线的 `-cyl_playBadgeChangedAnimationWithTabButton:…`。
+/*!
+ * [EN] `-cyl_playBadgeChangedAnimationWithTabButton:…` without the underscore. [CN] 去掉下划线的 `-cyl_playBadgeChangedAnimationWithTabButton:…`。
+ */
 - (void)cylPlayBadgeChangedAnimationWithTabButton:(UIControl *)button
                                          iconView:(UIView *)iconView
                                         badgeView:(nullable UIView *)badgeView
@@ -175,7 +187,9 @@ NS_ASSUME_NONNULL_BEGIN
  * [CN] 放大再缩小：1.0 → 1.5 → 0.8 → 1.0（issue #535 中的“点击放大再缩小”）。
  */
 @interface CYLTabButtonScaleAnimation : NSObject <CYLTabButtonAnimation>
-/// [EN] Default 0.5 s. [CN] 默认 0.5 秒。
+/*!
+ * [EN] Default 0.5 s. [CN] 默认 0.5 秒。
+ */
 @property (nonatomic, assign) NSTimeInterval duration;
 @end
 
@@ -184,7 +198,9 @@ NS_ASSUME_NONNULL_BEGIN
  * [CN] 图标从小放大到原尺寸并略微回弹（issue #535 中的“图片从小放大”）。
  */
 @interface CYLTabButtonZoomInAnimation : NSObject <CYLTabButtonAnimation>
-/// [EN] Default 0.5 s. [CN] 默认 0.5 秒。
+/*!
+ * [EN] Default 0.5 s. [CN] 默认 0.5 秒。
+ */
 @property (nonatomic, assign) NSTimeInterval duration;
 @end
 
@@ -193,9 +209,13 @@ NS_ASSUME_NONNULL_BEGIN
  * [CN] 图标弹性动画（TLBounceAnimation），可选烟花效果。
  */
 @interface CYLTabButtonBounceAnimation : NSObject <CYLTabButtonAnimation>
-/// [EN] Plays fireworks around the icon. Default NO. [CN] 是否在图标周围播放烟花效果，默认 NO。
+/*!
+ * [EN] Plays fireworks around the icon. Default NO. [CN] 是否在图标周围播放烟花效果，默认 NO。
+ */
 @property (nonatomic, assign) BOOL playsFireworks;
-/// [EN] The firework particle; nil: a small dot in the button's tint color. [CN] 烟花粒子图片；nil 时为按钮 tintColor 的小圆点。
+/*!
+ * [EN] The firework particle; nil: a small dot in the button's tint color. [CN] 烟花粒子图片；nil 时为按钮 tintColor 的小圆点。
+ */
 @property (nonatomic, strong, nullable) UIImage *fireworksImage;
 @end
 
@@ -221,7 +241,9 @@ NS_ASSUME_NONNULL_BEGIN
  *      或某个 Tab 的 `cyl_tabButtonAnimation`。
  */
 @interface CYLTabButtonPressAnimation : NSObject <CYLTabButtonAnimation>
-/// [EN] The icon's scale while pressed. Default 0.85. [CN] 按压时图标的缩放比例，默认 0.85。
+/*!
+ * [EN] The icon's scale while pressed. Default 0.85. [CN] 按压时图标的缩放比例，默认 0.85。
+ */
 @property (nonatomic, assign) CGFloat pressedScale;
 @end
 
@@ -258,17 +280,29 @@ typedef void (^CYLTabButtonBadgeAnimationBlock)(UIControl *button, UIView *iconV
  *      时按下不播放动画）。
  */
 @interface CYLTabButtonBlockAnimation : NSObject <CYLTabButtonAnimation>
-/// [EN] `-cyl_playSelectAnimationWithTabButton:…`; nil plays nothing. [CN] `-cyl_playSelectAnimationWithTabButton:…`；nil 时不播放。
+/*!
+ * [EN] `-cyl_playSelectAnimationWithTabButton:…`; nil plays nothing. [CN] `-cyl_playSelectAnimationWithTabButton:…`；nil 时不播放。
+ */
 @property (nonatomic, copy, nullable) CYLTabButtonAnimationBlock selectAnimation;
-/// [EN] `-cyl_playDeselectAnimationWithTabButton:…`. [CN] `-cyl_playDeselectAnimationWithTabButton:…`。
+/*!
+ * [EN] `-cyl_playDeselectAnimationWithTabButton:…`. [CN] `-cyl_playDeselectAnimationWithTabButton:…`。
+ */
 @property (nonatomic, copy, nullable) CYLTabButtonAnimationBlock deselectAnimation;
-/// [EN] `-cyl_playReselectAnimationWithTabButton:…`. [CN] `-cyl_playReselectAnimationWithTabButton:…`。
+/*!
+ * [EN] `-cyl_playReselectAnimationWithTabButton:…`. [CN] `-cyl_playReselectAnimationWithTabButton:…`。
+ */
 @property (nonatomic, copy, nullable) CYLTabButtonAnimationBlock reselectAnimation;
-/// [EN] `-cyl_playHighlightAnimationWithTabButton:…` (finger down). [CN] `-cyl_playHighlightAnimationWithTabButton:…`（手指按下）。
+/*!
+ * [EN] `-cyl_playHighlightAnimationWithTabButton:…` (finger down). [CN] `-cyl_playHighlightAnimationWithTabButton:…`（手指按下）。
+ */
 @property (nonatomic, copy, nullable) CYLTabButtonAnimationBlock highlightAnimation;
-/// [EN] `-cyl_playDehighlightAnimationWithTabButton:…` (finger up). [CN] `-cyl_playDehighlightAnimationWithTabButton:…`（手指抬起）。
+/*!
+ * [EN] `-cyl_playDehighlightAnimationWithTabButton:…` (finger up). [CN] `-cyl_playDehighlightAnimationWithTabButton:…`（手指抬起）。
+ */
 @property (nonatomic, copy, nullable) CYLTabButtonAnimationBlock dehighlightAnimation;
-/// [EN] `-cyl_playBadgeChangedAnimationWithTabButton:…`. [CN] `-cyl_playBadgeChangedAnimationWithTabButton:…`。
+/*!
+ * [EN] `-cyl_playBadgeChangedAnimationWithTabButton:…`. [CN] `-cyl_playBadgeChangedAnimationWithTabButton:…`。
+ */
 @property (nonatomic, copy, nullable) CYLTabButtonBadgeAnimationBlock badgeChangedAnimation;
 @end
 
@@ -279,7 +313,9 @@ typedef void (^CYLTabButtonBadgeAnimationBlock)(UIControl *button, UIView *iconV
  */
 @interface CYLTabButtonFlipAnimation : NSObject <CYLTabButtonAnimation>
 @property (nonatomic, assign) NSUInteger direction;
-/// [EN] No animation when the button is deselected. Default NO. [CN] 取消选中时不播放动画，默认 NO。
+/*!
+ * [EN] No animation when the button is deselected. Default NO. [CN] 取消选中时不播放动画，默认 NO。
+ */
 @property (nonatomic, assign) BOOL disablesDeselectAnimation;
 @end
 
@@ -290,7 +326,9 @@ typedef void (^CYLTabButtonBadgeAnimationBlock)(UIControl *button, UIView *iconV
  */
 @interface CYLTabButtonFrameAnimation : NSObject <CYLTabButtonAnimation>
 @property (nonatomic, copy, nullable) NSArray<UIImage *> *images;
-/// [EN] Plays fireworks around the icon. Default NO. [CN] 是否在图标周围播放烟花效果，默认 NO。
+/*!
+ * [EN] Plays fireworks around the icon. Default NO. [CN] 是否在图标周围播放烟花效果，默认 NO。
+ */
 @property (nonatomic, assign) BOOL playsFireworks;
 @property (nonatomic, strong, nullable) UIImage *fireworksImage;
 @end

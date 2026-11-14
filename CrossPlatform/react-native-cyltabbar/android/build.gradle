@@ -65,6 +65,8 @@ dependencies {
   if (cylUseLocalSources) {
     implementation "androidx.appcompat:appcompat:1.7.0"
     implementation "androidx.fragment:fragment-ktx:1.8.5"
+    // As in cyltabbar: CYLViewPager2Binding compiles against ViewPager2, which an app adds when it uses it.
+    compileOnly "androidx.viewpager2:viewpager2:1.0.0"
   } else {
     implementation "io.github.chenyilong:cyltabbarcontroller:${cylAndroidVersion}"
   }

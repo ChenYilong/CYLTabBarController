@@ -141,7 +141,10 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nullable, nonatomic, copy) UITabBarAppearance *standardAppearance API_AVAILABLE(ios(13.0));
 
 @property (null_resettable, nonatomic, strong) UIColor *tintColor;
-@property (nullable, nonatomic, strong) UIColor *barTintColor UI_APPEARANCE_SELECTOR;  // default is nil
+/*!
+ * default is nil
+ */
+@property (nullable, nonatomic, strong) UIColor *barTintColor UI_APPEARANCE_SELECTOR;
 
 /* The background image will be tiled to fit, even if it was not created via the UIImage resizableImage methods.
  */

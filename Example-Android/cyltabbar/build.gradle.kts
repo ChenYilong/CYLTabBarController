@@ -42,6 +42,9 @@ dependencies {
     api(project(":tabpages"))
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.fragment.ktx)
+    // [EN] Only for `cyl_setupWithViewPager2`: an app that uses it adds ViewPager2 itself. [CN] 仅用于 `cyl_setupWithViewPager2`：使用它的 App 自行添加 ViewPager2。
+    compileOnly(libs.androidx.viewpager2)
+    testImplementation(libs.androidx.viewpager2)
     testImplementation(libs.junit)
     testImplementation(libs.robolectric)
     // [EN] Only to test the Lottie animator found by reflection; apps add Lottie themselves. [CN] 仅用于测试通过反射找到的 Lottie animator；App 自行添加 Lottie。
@@ -53,7 +56,7 @@ dependencies {
 tasks.withType<Test> {
     // The shared configuration file of the iOS library, and Robolectric's Android jars from Google's Maven Central mirror.
     // iOS 库共用的配置文件；Robolectric 的 Android jar 从 Google 的 Maven Central 镜像下载。
-    systemProperty("cyl.sharedConfiguration", rootProject.file("../CYLTabBarController/Resources/CYLTabBarController.bundle/Configurations/cyl_tabbar_configuration.json").absolutePath)
+    systemProperty("cyl.sharedConfiguration", rootProject.file("../Example-Shared/Configurations/cyl_tabbar_configuration.json").absolutePath)
     systemProperty("robolectric.dependency.repo.url", "https://maven-central.storage-download.googleapis.com/maven2")
     systemProperty("robolectric.dependency.repo.id", "central-mirror")
 }

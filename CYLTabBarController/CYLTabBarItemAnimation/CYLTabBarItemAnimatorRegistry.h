@@ -25,15 +25,23 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol CYLTabBarItemAnimatorRegistering <NSObject>
 - (void)registerAnimator:(id<CYLTabBarItemAnimator>)animator;
 - (void)unregisterAnimatorWithIdentifier:(NSString *)identifier;
-/// [EN] By priority, then registration order. [CN] 按优先级、再按注册顺序。
+/*!
+ * [EN] By priority, then registration order. [CN] 按优先级、再按注册顺序。
+ */
 - (NSArray<id<CYLTabBarItemAnimator>> *)animators;
 - (nullable id<CYLTabBarItemAnimator>)animatorWithIdentifier:(NSString *)identifier;
-/// [EN] The animator bound to `URL`, else the first that can play its file. [CN] 绑定到 `URL` 的 animator，否则为第一个能播放该文件的。
+/*!
+ * [EN] The animator bound to `URL`, else the first that can play its file. [CN] 绑定到 `URL` 的 animator，否则为第一个能播放该文件的。
+ */
 - (nullable id<CYLTabBarItemAnimator>)animatorForURL:(nullable NSURL *)URL;
-/// [EN] The first animator whose own keys have a value in `attributes`. [CN] 第一个在 `attributes` 中有值的自有 key 所属的 animator。
+/*!
+ * [EN] The first animator whose own keys have a value in `attributes`. [CN] 第一个在 `attributes` 中有值的自有 key 所属的 animator。
+ */
 - (nullable id<CYLTabBarItemAnimator>)animatorForAttributes:(nullable NSDictionary *)attributes;
 - (nullable NSString *)attributeKeyForGenericKey:(NSString *)genericKey inAttributes:(nullable NSDictionary *)attributes;
-/// [EN] Binds `URL` to `animator` (nil removes the binding). [CN] 把 `URL` 绑定到 `animator`（nil 移除绑定）。
+/*!
+ * [EN] Binds `URL` to `animator` (nil removes the binding). [CN] 把 `URL` 绑定到 `animator`（nil 移除绑定）。
+ */
 - (void)bindURL:(NSURL *)URL toAnimator:(nullable id<CYLTabBarItemAnimator>)animator;
 - (NSArray<NSString *> *)attributeKeysForGenericKey:(NSString *)genericKey;
 - (NSArray<NSString *> *)fileExtensions;
@@ -59,20 +67,30 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CYLTabBarItemAnimatorRegistry : NSObject <CYLTabBarItemAnimatorRegistering>
 
-/// [EN] The instance `+load` of each animation subspec registers into; the class methods below forward to it.
-/// [CN] 各动画子库在 `+load` 中注册到的实例；下面的类方法都转发给它。
+/*!
+ * [EN] The instance `+load` of each animation subspec registers into; the class methods below forward to it.
+ * [CN] 各动画子库在 `+load` 中注册到的实例；下面的类方法都转发给它。
+ */
 + (instancetype)sharedRegistry;
 
-/// [EN] Adds `animator`, replacing a registered one with the same identifier. [CN] 添加 `animator`；已注册同名 animator 时替换。
+/*!
+ * [EN] Adds `animator`, replacing a registered one with the same identifier. [CN] 添加 `animator`；已注册同名 animator 时替换。
+ */
 + (void)registerAnimator:(id<CYLTabBarItemAnimator>)animator;
 
-/// [EN] Removes the animator with `identifier`, if any. [CN] 移除名称为 `identifier` 的 animator（若存在）。
+/*!
+ * [EN] Removes the animator with `identifier`, if any. [CN] 移除名称为 `identifier` 的 animator（若存在）。
+ */
 + (void)unregisterAnimatorWithIdentifier:(NSString *)identifier;
 
-/// [EN] The registered animators, in lookup order (priority, then registration order). [CN] 已注册的 animator，按查找顺序（优先级，然后注册顺序）。
+/*!
+ * [EN] The registered animators, in lookup order (priority, then registration order). [CN] 已注册的 animator，按查找顺序（优先级，然后注册顺序）。
+ */
 + (NSArray<id<CYLTabBarItemAnimator>> *)animators;
 
-/// [EN] The animator with `identifier`, or nil. [CN] 名称为 `identifier` 的 animator；没有时为 nil。
+/*!
+ * [EN] The animator with `identifier`, or nil. [CN] 名称为 `identifier` 的 animator；没有时为 nil。
+ */
 + (nullable id<CYLTabBarItemAnimator>)animatorWithIdentifier:(NSString *)identifier;
 
 /*!
@@ -111,10 +129,14 @@ NS_ASSUME_NONNULL_BEGIN
  */
 + (void)bindURL:(NSURL *)URL toAnimator:(nullable id<CYLTabBarItemAnimator>)animator;
 
-/// [EN] Every animator's key for `genericKey`, in lookup order (`-attributeKeys`). [CN] 各 animator 与 `genericKey` 对应的 key，按查找顺序（`-attributeKeys`）。
+/*!
+ * [EN] Every animator's key for `genericKey`, in lookup order (`-attributeKeys`). [CN] 各 animator 与 `genericKey` 对应的 key，按查找顺序（`-attributeKeys`）。
+ */
 + (NSArray<NSString *> *)attributeKeysForGenericKey:(NSString *)genericKey;
 
-/// [EN] Every animator's file extensions, in lookup order, without duplicates. [CN] 各 animator 的文件扩展名，按查找顺序，去重。
+/*!
+ * [EN] Every animator's file extensions, in lookup order, without duplicates. [CN] 各 animator 的文件扩展名，按查找顺序，去重。
+ */
 + (NSArray<NSString *> *)fileExtensions;
 
 @end

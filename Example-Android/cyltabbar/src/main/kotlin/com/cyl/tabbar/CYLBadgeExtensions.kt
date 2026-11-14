@@ -41,34 +41,56 @@ import androidx.fragment.app.Fragment
 // [EN] kotlin:S6515: a class with one shared instance on purpose, as iOS `+[CYLBadgeAppearance appearance]`; the instance type stays public API. [CN] kotlin:S6515：刻意为只有一个共享实例的类，与 iOS `+[CYLBadgeAppearance appearance]` 相同；实例类型是公开 API。
 @Suppress("kotlin:S6515")
 class CYLBadgeAppearance private constructor() {
-    /** [EN] Background color, red by default (`reset()` restores it). [CN] 背景色，默认红色（`reset()` 恢复）。 */
+    /**
+     * [EN] Background color, red by default (`reset()` restores it). [CN] 背景色，默认红色（`reset()` 恢复）。
+     */
     @ColorInt var backgroundColor: Int = Color.RED
-    /** [EN] Text color, white by default. [CN] 文字颜色，默认白色。 */
+    /**
+     * [EN] Text color, white by default. [CN] 文字颜色，默认白色。
+     */
     @ColorInt var textColor: Int = Color.WHITE
-    /** [EN] Text font, bold 9 sp by default, as on iOS. [CN] 字体，默认粗体 9 sp，与 iOS 相同。 */
+    /**
+     * [EN] Text font, bold 9 sp by default, as on iOS. [CN] 字体，默认粗体 9 sp，与 iOS 相同。
+     */
     var font: CYLFont = DEFAULT_FONT
-    /** [EN] Offset of the badge center from the host's top-right corner (dp); not finite: 0. [CN] 角标中心相对宿主右上角的偏移（dp）；非有限值视为 0。 */
+    /**
+     * [EN] Offset of the badge center from the host's top-right corner (dp); not finite: 0. [CN] 角标中心相对宿主右上角的偏移（dp）；非有限值视为 0。
+     */
     var centerOffset: CYLOffset = CYLOffset.zero
         set(value) { field = CYLOffset(value.horizontal.takeIf { it.isFinite() } ?: 0f, value.vertical.takeIf { it.isFinite() } ?: 0f) }
-    /** [EN] Radius of the red dot (dp); 0, negative or not finite restores 4. [CN] 红点半径（dp）；0、负数或非有限值恢复为 4。 */
+    /**
+     * [EN] Radius of the red dot (dp); 0, negative or not finite restores 4. [CN] 红点半径（dp）；0、负数或非有限值恢复为 4。
+     */
     var radius: Float = DEFAULT_RADIUS
         set(value) { field = if (value > 0 && value.isFinite()) value else DEFAULT_RADIUS }
-    /** [EN] Space added once to the text's width and height in number and text badges (dp), 8 by default as on iOS; negative or not finite: 0. [CN] 数字与文字角标在文字宽度与高度上各加一次的边距（dp），默认 8，与 iOS 相同；负数或非有限值视为 0。 */
+    /**
+     * [EN] Space added once to the text's width and height in number and text badges (dp), 8 by default as on iOS; negative or not finite: 0. [CN] 数字与文字角标在文字宽度与高度上各加一次的边距（dp），默认 8，与 iOS 相同；负数或非有限值视为 0。
+     */
     var margin: Float = DEFAULT_MARGIN
         set(value) { field = if (value.isFinite()) value.coerceAtLeast(0f) else 0f }
-    /** [EN] Numbers above it show as "<maximum>+"; below 1: 1. [CN] 超过它的数字显示为 "<maximum>+"；小于 1 时为 1。 */
+    /**
+     * [EN] Numbers above it show as "<maximum>+"; below 1: 1. [CN] 超过它的数字显示为 "<maximum>+"；小于 1 时为 1。
+     */
     var maximumBadgeNumber: Int = 99
         set(value) { field = value.coerceAtLeast(1) }
-    /** [EN] Corner radius of number and text badges (dp); 0 means a capsule. [CN] 数字与文字角标的圆角（dp）；0 表示胶囊形。 */
+    /**
+     * [EN] Corner radius of number and text badges (dp); 0 means a capsule. [CN] 数字与文字角标的圆角（dp）；0 表示胶囊形。
+     */
     var cornerRadius: Float = 0f
         set(value) { field = if (value.isFinite()) value.coerceAtLeast(0f) else 0f }
-    /** [EN] Border color, drawn only when `borderWidth` > 0. [CN] 边框颜色，`borderWidth` > 0 时才绘制。 */
+    /**
+     * [EN] Border color, drawn only when `borderWidth` > 0. [CN] 边框颜色，`borderWidth` > 0 时才绘制。
+     */
     @ColorInt var borderColor: Int? = null
-    /** [EN] Border width (dp); negative or not finite: 0. [CN] 边框宽度（dp）；负数或非有限值视为 0。 */
+    /**
+     * [EN] Border width (dp); negative or not finite: 0. [CN] 边框宽度（dp）；负数或非有限值视为 0。
+     */
     var borderWidth: Float = 0f
         set(value) { field = if (value.isFinite()) value.coerceAtLeast(0f) else 0f }
 
-    /** [EN] `-reset`: every property back to its built-in default. [CN] 把所有属性恢复为内置默认值。 */
+    /**
+     * [EN] `-reset`: every property back to its built-in default. [CN] 把所有属性恢复为内置默认值。
+     */
     fun reset() {
         backgroundColor = Color.RED; textColor = Color.WHITE; font = DEFAULT_FONT; centerOffset = CYLOffset.zero
         radius = DEFAULT_RADIUS; margin = DEFAULT_MARGIN; maximumBadgeNumber = 99; cornerRadius = 0f; borderColor = null; borderWidth = 0f
@@ -79,23 +101,31 @@ class CYLBadgeAppearance private constructor() {
         private val DEFAULT_FONT = CYLFont(9f, bold = true)
         private const val DEFAULT_RADIUS = 4f
         private const val DEFAULT_MARGIN = 8f
-        /** [EN] The shared global appearance. [CN] 共享的全局外观。 */
+        /**
+         * [EN] The shared global appearance. [CN] 共享的全局外观。
+         */
         @JvmStatic
         val globalAppearance: CYLBadgeAppearance = CYLBadgeAppearance()
     }
 }
 
-/** [EN] `CYLBadgeTextDisplaying`: what a badge's text view provides. [CN] 角标文字视图提供的能力。 */
+/**
+ * [EN] `CYLBadgeTextDisplaying`: what a badge's text view provides. [CN] 角标文字视图提供的能力。
+ */
 interface CYLBadgeTextDisplaying {
     var text: String?
     var font: CYLFont
     @get:ColorInt @setparam:ColorInt
     var textColor: Int
-    /** [EN] `textAlignment` as a horizontal `Gravity`. [CN] 以水平 `Gravity` 表示的 `textAlignment`。 */
+    /**
+     * [EN] `textAlignment` as a horizontal `Gravity`. [CN] 以水平 `Gravity` 表示的 `textAlignment`。
+     */
     var textGravity: Int
 }
 
-/** [EN] `UILabel (CYLBadgeTextDisplaying)`: a TextView seen as `CYLBadgeTextDisplaying`. [CN] 把 TextView 视为 `CYLBadgeTextDisplaying`。 */
+/**
+ * [EN] `UILabel (CYLBadgeTextDisplaying)`: a TextView seen as `CYLBadgeTextDisplaying`. [CN] 把 TextView 视为 `CYLBadgeTextDisplaying`。
+ */
 class CYLTextViewBadgeTextDisplaying(val textView: TextView) : CYLBadgeTextDisplaying {
     override var text: String?
         get() = textView.text?.toString()
@@ -117,7 +147,9 @@ class CYLTextViewBadgeTextDisplaying(val textView: TextView) : CYLBadgeTextDispl
         set(value) { textView.gravity = value or Gravity.CENTER_VERTICAL }
 }
 
-/** [EN] `TextView` as `CYLBadgeTextDisplaying` (`UILabel (CYLBadgeTextDisplaying)`). [CN] 把 TextView 作为 `CYLBadgeTextDisplaying`。 */
+/**
+ * [EN] `TextView` as `CYLBadgeTextDisplaying` (`UILabel (CYLBadgeTextDisplaying)`). [CN] 把 TextView 作为 `CYLBadgeTextDisplaying`。
+ */
 fun TextView.cyl_badgeTextDisplaying(): CYLBadgeTextDisplaying = CYLTextViewBadgeTextDisplaying(this)
 
 /**
@@ -125,9 +157,13 @@ fun TextView.cyl_badgeTextDisplaying(): CYLBadgeTextDisplaying = CYLTextViewBadg
  * [CN] `CYLTabBarBadgeView`：由 `badgeContentInset` 内的标签（`badgeLabel`）组成的角标视图，用于自定义角标。
  */
 open class CYLTabBarBadgeView(context: Context) : FrameLayout(context), CYLBadgeTextDisplaying {
-    /** [EN] The label that draws the badge text. [CN] 绘制角标文字的标签。 */
+    /**
+     * [EN] The label that draws the badge text. [CN] 绘制角标文字的标签。
+     */
     val badgeLabel: TextView = TextView(context).apply { gravity = Gravity.CENTER; maxLines = 1; setTextColor(Color.WHITE); textSize = 11f }
-    /** [EN] The insets around the label (dp). [CN] 标签周围的边距（dp）。 */
+    /**
+     * [EN] The insets around the label (dp). [CN] 标签周围的边距（dp）。
+     */
     var badgeContentInset: CYLEdgeInsets = CYLEdgeInsets(0f, 4f, 0f, 4f)
         set(value) { field = value; applyInset() }
     private val adapter = CYLTextViewBadgeTextDisplaying(badgeLabel)
@@ -143,9 +179,13 @@ open class CYLTabBarBadgeView(context: Context) : FrameLayout(context), CYLBadge
         setPadding((badgeContentInset.left * density).toInt(), (badgeContentInset.top * density).toInt(), (badgeContentInset.right * density).toInt(), (badgeContentInset.bottom * density).toInt())
     }
 
-    /** [EN] Default centered. [CN] 默认居中。 */
+    /**
+     * [EN] Default centered. [CN] 默认居中。
+     */
     override var textGravity: Int by adapter::textGravity
-    /** [EN] Default white. [CN] 默认白色。 */
+    /**
+     * [EN] Default white. [CN] 默认白色。
+     */
     override var textColor: Int by adapter::textColor
     override var text: String? by adapter::text
     override var font: CYLFont by adapter::font
@@ -155,7 +195,9 @@ open class CYLTabBarBadgeView(context: Context) : FrameLayout(context), CYLBadge
 
 // MARK: - UITabBarItem (CYLBadgeExtention)
 
-/** [EN] `-[UITabBarItem cyl_isShowBadge]`: the badge of the item's tab button. [CN] item 的 Tab 按钮上的角标是否显示。 */
+/**
+ * [EN] `-[UITabBarItem cyl_isShowBadge]`: the badge of the item's tab button. [CN] item 的 Tab 按钮上的角标是否显示。
+ */
 fun CYLTabBarItem.cyl_isShowBadge(): Boolean = cyl_visiableTabButton?.cyl_isShowBadge() ?: false
 fun CYLTabBarItem.cyl_showBadge() { cyl_visiableTabButton?.cyl_showBadge() }
 fun CYLTabBarItem.cyl_showBadgeValue(value: String, animationType: CYLEnums.CYLBadgeAnimationType) { cyl_visiableTabButton?.cyl_showBadgeValue(value, animationType) }
@@ -165,7 +207,9 @@ fun CYLTabBarItem.cyl_isPauseBadge(): Boolean = cyl_visiableTabButton?.cyl_isPau
 
 // MARK: - UIBarButtonItem (CYLBadgeExtention): menu items of a Toolbar 工具栏菜单项
 
-/** [EN] The view of a menu item in a visible toolbar: its action view, else its button in an `ActionMenuView`. [CN] 菜单项在可见工具栏中的视图：其 action view，否则为 `ActionMenuView` 中的按钮。 */
+/**
+ * [EN] The view of a menu item in a visible toolbar: its action view, else its button in an `ActionMenuView`. [CN] 菜单项在可见工具栏中的视图：其 action view，否则为 `ActionMenuView` 中的按钮。
+ */
 fun MenuItem.cyl_findBarButtonContentView(): View? {
     actionView?.let { return it }
     for (controller in CYLTabBarController.cyl_liveTabBarControllers()) {
@@ -181,7 +225,9 @@ private fun findMenuItemView(view: View, item: MenuItem): View? {
     return null
 }
 
-/** [EN] Runs `action` on the item's view, now or once the toolbar laid it out (a few frames). [CN] 在菜单项的视图上执行 `action`，立即或等工具栏布局后。 */
+/**
+ * [EN] Runs `action` on the item's view, now or once the toolbar laid it out (a few frames). [CN] 在菜单项的视图上执行 `action`，立即或等工具栏布局后。
+ */
 private fun MenuItem.withBarButtonView(attempts: Int = 10, action: (View) -> Unit) {
     val view = cyl_findBarButtonContentView()
     if (view != null) return action(view)
@@ -192,7 +238,9 @@ private fun MenuItem.withBarButtonView(attempts: Int = 10, action: (View) -> Uni
 fun MenuItem.cyl_isShowBadge(): Boolean = cyl_findBarButtonContentView()?.cyl_isShowBadge() ?: false
 fun MenuItem.cyl_showBadge() = withBarButtonView { it.cyl_showBadge() }
 fun MenuItem.cyl_showBadgeValue(value: String, animationType: CYLEnums.CYLBadgeAnimationType) = withBarButtonView { it.cyl_showBadgeValue(value, animationType) }
-/** [EN] `-cyl_showBadgeValue:animationType:backgroundColor:`: null keeps the default color. [CN] null 保持默认颜色。 */
+/**
+ * [EN] `-cyl_showBadgeValue:animationType:backgroundColor:`: null keeps the default color. [CN] null 保持默认颜色。
+ */
 fun MenuItem.cyl_showBadgeValue(value: String, animationType: CYLEnums.CYLBadgeAnimationType, @ColorInt backgroundColor: Int?) = withBarButtonView { view ->
     backgroundColor?.let { view.cyl_badgeBackgroundColor = it }
     view.cyl_showBadgeValue(value, animationType)
@@ -203,7 +251,9 @@ fun MenuItem.cyl_isPauseBadge(): Boolean = cyl_findBarButtonContentView()?.cyl_i
 
 // MARK: - The badge samples (UITableViewCell (CYLBadgeExtention)) 角标示例
 
-/** [EN] `CYLBadgeRowHeight`: a row height that leaves room around the icon for its badge (dp). [CN] 为图标的角标留出空间的行高（dp）。 */
+/**
+ * [EN] `CYLBadgeRowHeight`: a row height that leaves room around the icon for its badge (dp). [CN] 为图标的角标留出空间的行高（dp）。
+ */
 const val CYLBadgeRowHeight: Float = 60f
 
 private data class CYLBadgeSample(
@@ -221,11 +271,15 @@ private data class CYLBadgeSample(
     val cornerRadius: Float? = null,
     val reduceMotion: Boolean = false,
     val position: String? = null,
-    /** [EN] An iOS factory animation (`CYLBadgeHelperAnimation`) that no `CYLBadgeAnimationType` matches. [CN] 没有对应 `CYLBadgeAnimationType` 的 iOS 工厂动画（`CYLBadgeHelperAnimation`）。 */
+    /**
+     * [EN] An iOS factory animation (`CYLBadgeHelperAnimation`) that no `CYLBadgeAnimationType` matches. [CN] 没有对应 `CYLBadgeAnimationType` 的 iOS 工厂动画（`CYLBadgeHelperAnimation`）。
+     */
     val factory: ((CYLBadgeView) -> android.animation.Animator)? = null,
 )
 
-/** [EN] `cyl_rotationAnimationWithDuration:2 degree:2π direction:CYLAxisZ repeatCount:HUGE_VALF`: a full turn in the screen plane every 2 s. [CN] 每 2 秒在屏幕平面内转一整圈。 */
+/**
+ * [EN] `cyl_rotationAnimationWithDuration:2 degree:2π direction:CYLAxisZ repeatCount:HUGE_VALF`: a full turn in the screen plane every 2 s. [CN] 每 2 秒在屏幕平面内转一整圈。
+ */
 private val CYLBadgeRotationForever: (CYLBadgeView) -> android.animation.Animator = { badge ->
     android.animation.ObjectAnimator.ofFloat(badge, View.ROTATION, 0f, 360f).setDuration(2000).apply {
         repeatCount = android.animation.ObjectAnimator.INFINITE
@@ -233,12 +287,16 @@ private val CYLBadgeRotationForever: (CYLBadgeView) -> android.animation.Animato
     }
 }
 
-/** [EN] `cyl_rotationAnimationWithDuration:1 degree:π direction:CYLAxisY repeatCount:2`: half a turn around the vertical axis, twice. [CN] 绕竖直轴转半圈，共两次。 */
+/**
+ * [EN] `cyl_rotationAnimationWithDuration:1 degree:π direction:CYLAxisY repeatCount:2`: half a turn around the vertical axis, twice. [CN] 绕竖直轴转半圈，共两次。
+ */
 private val CYLBadgeFlipTwice: (CYLBadgeView) -> android.animation.Animator = { badge ->
     android.animation.ObjectAnimator.ofFloat(badge, View.ROTATION_Y, 0f, 180f).setDuration(1000).apply { repeatCount = 1 }
 }
 
-/** [EN] Every badge style and animation, in the order of the iOS samples. [CN] 每种角标样式与动画，顺序与 iOS 示例相同。 */
+/**
+ * [EN] Every badge style and animation, in the order of the iOS samples. [CN] 每种角标样式与动画，顺序与 iOS 示例相同。
+ */
 private val CYLBadgeSamples: List<CYLBadgeSample> = run {
     listOf(
         CYLBadgeSample("Scale (forever)", "CYLBadgeAnimationTypeScale", "3", CYLEnums.CYLBadgeAnimationType.Scale),
@@ -281,14 +339,18 @@ private val CYLBadgeSamples: List<CYLBadgeSample> = run {
 
 private fun sampleForRow(row: Int) = CYLBadgeSamples[row.coerceAtLeast(0) % CYLBadgeSamples.size]
 
-/** [EN] `+cyl_badgeTitleForRow:`: "<row + 1>. <title> (<API>)". [CN] 第 row 行示例的标题与核心 API。 */
+/**
+ * [EN] `+cyl_badgeTitleForRow:`: "<row + 1>. <title> (<API>)". [CN] 第 row 行示例的标题与核心 API。
+ */
 fun cyl_badgeTitleForRow(row: Int): String {
     val sample = sampleForRow(row)
     val title = if (sample.api != null && !sample.title.contains(sample.api)) "${sample.title} (${sample.api})" else sample.title
     return "${row + 1}. $title"
 }
 
-/** [EN] `+cyl_badgeStyleCount`: the number of samples. [CN] 示例数量。 */
+/**
+ * [EN] `+cyl_badgeStyleCount`: the number of samples. [CN] 示例数量。
+ */
 fun cyl_badgeStyleCount(): Int = CYLBadgeSamples.size
 
 /**
@@ -326,7 +388,9 @@ fun ImageView.cyl_showBadgeForRow(row: Int) {
     sample.factory?.let { factory -> cyl_badge?.let { badge -> badge.playAnimator(factory(badge)) } }
 }
 
-/** [EN] The appearance options of a sample row. [CN] 示例行的外观选项。 */
+/**
+ * [EN] The appearance options of a sample row. [CN] 示例行的外观选项。
+ */
 private fun ImageView.applyBadgeSample(sample: CYLBadgeSample) {
     if (sample.colors) { cyl_badgeBackgroundColor = Color.rgb(128, 0, 128); cyl_badgeTextColor = Color.YELLOW }
     if (sample.font) cyl_badgeFont = CYLFont(12f, Typeface.create(Typeface.DEFAULT, Typeface.ITALIC))
@@ -346,7 +410,9 @@ private fun ImageView.applyBadgeSample(sample: CYLBadgeSample) {
     cyl_badgeRespectsReduceMotion = sample.reduceMotion
 }
 
-/** [EN] The CAAnimation factory samples: the same animation, repeated a few times or forever. [CN] CAAnimation 工厂示例：同一动画重复几次或一直重复。 */
+/**
+ * [EN] The CAAnimation factory samples: the same animation, repeated a few times or forever. [CN] CAAnimation 工厂示例：同一动画重复几次或一直重复。
+ */
 private fun ImageView.repeatBadgeSampleAnimation(sample: CYLBadgeSample) {
     val badge = cyl_badge ?: return
     var left = sample.repeats
@@ -357,13 +423,17 @@ private fun ImageView.repeatBadgeSampleAnimation(sample: CYLBadgeSample) {
     again()
 }
 
-/** [EN] `-cyl_wrapsTextLabels`: the row's texts wrap onto as many lines as they need, never ellipsized. [CN] 行中的文字按需换行，不省略。 */
+/**
+ * [EN] `-cyl_wrapsTextLabels`: the row's texts wrap onto as many lines as they need, never ellipsized. [CN] 行中的文字按需换行，不省略。
+ */
 fun View.cyl_wrapsTextLabels() {
     if (this is TextView) { maxLines = Int.MAX_VALUE; ellipsize = null; setSingleLine(false) }
     (this as? ViewGroup)?.let { group -> for (index in 0 until group.childCount) group.getChildAt(index).cyl_wrapsTextLabels() }
 }
 
-/** [EN] `+cyl_setUpAutomaticRowHeightForTableView:`: rows as high as their text, at least `CYLBadgeRowHeight`. [CN] 行高随文字变化，至少为 `CYLBadgeRowHeight`。 */
+/**
+ * [EN] `+cyl_setUpAutomaticRowHeightForTableView:`: rows as high as their text, at least `CYLBadgeRowHeight`. [CN] 行高随文字变化，至少为 `CYLBadgeRowHeight`。
+ */
 fun cyl_setUpAutomaticRowHeightForTableView(listView: AbsListView) {
     val minimum = (CYLBadgeRowHeight * listView.resources.displayMetrics.density).toInt()
     listView.setRecyclerListener { it.minimumHeight = minimum }
@@ -408,7 +478,9 @@ private fun findToolbar(view: View): androidx.appcompat.widget.Toolbar? {
  * [CN] 列出每个角标示例（每行一个），前面是内存警告行。点击示例清除其角标，同时模拟内存警告并输出 TabBar 的状态。
  */
 open class CYLBadgeHelperTableViewController : Fragment() {
-    /** [EN] Called after a row is tapped: section 0 the settings row, section 1 the samples. [CN] 点击行之后调用：section 0 为设置行，section 1 为示例。 */
+    /**
+     * [EN] Called after a row is tapped: section 0 the settings row, section 1 the samples. [CN] 点击行之后调用：section 0 为设置行，section 1 为示例。
+     */
     var didSelectRowHandler: ((section: Int, row: Int) -> Unit)? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -455,7 +527,9 @@ open class CYLBadgeHelperTableViewController : Fragment() {
     }
 }
 
-/** [EN] `-cyl_addBadgeHelperTable`: adds a `CYLBadgeHelperTableViewController` as a child filling this page's view. [CN] 添加填满本页面视图的 `CYLBadgeHelperTableViewController` 子页面。 */
+/**
+ * [EN] `-cyl_addBadgeHelperTable`: adds a `CYLBadgeHelperTableViewController` as a child filling this page's view. [CN] 添加填满本页面视图的 `CYLBadgeHelperTableViewController` 子页面。
+ */
 fun Fragment.cyl_addBadgeHelperTable(): CYLBadgeHelperTableViewController {
     val table = CYLBadgeHelperTableViewController()
     cyl_addChildViewController(table)
@@ -464,15 +538,17 @@ fun Fragment.cyl_addBadgeHelperTable(): CYLBadgeHelperTableViewController {
 
 // MARK: - UIViewController (CYLMemoryWarning)
 
-/** [EN] `-cyl_memoryWarningCellForTableView:`: the row of the memory warning check. [CN] 内存警告检查的行。 */
+/**
+ * [EN] `-cyl_memoryWarningCellForTableView:`: the row of the memory warning check. [CN] 内存警告检查的行。
+ */
 fun Fragment.cyl_memoryWarningCellForTableView(parent: ViewGroup): View {
     val context = parent.context
     val density = context.resources.displayMetrics.density
     return LinearLayout(context).apply {
         orientation = LinearLayout.VERTICAL
         setPadding((16 * density).toInt(), (10 * density).toInt(), (16 * density).toInt(), (10 * density).toInt())
-        addView(TextView(context).apply { setText(R.string.cyl_memory_warning_title); textSize = 15f; setTypeface(typeface, Typeface.BOLD) })
-        addView(TextView(context).apply { setText(R.string.cyl_memory_warning_detail); setTextColor(Color.GRAY) })
+        addView(TextView(context).apply { text = CYLLocalization.string(context, R.string.cyl_memory_warning_title); textSize = 15f; setTypeface(typeface, Typeface.BOLD) })
+        addView(TextView(context).apply { text = CYLLocalization.string(context, R.string.cyl_memory_warning_detail); setTextColor(Color.GRAY) })
     }
 }
 
@@ -484,34 +560,64 @@ fun Fragment.cyl_memoryWarningCellForTableView(parent: ViewGroup): View {
 fun Fragment.cyl_simulateMemoryWarningAndShowResult() {
     val context = context ?: return
     val controller = cyl_owningTabBarController() ?: cyl_tabBarController ?: CYLTabBarController.cyl_activeTabBarController()
+    val message = CYLSimulateMemoryWarningReport(context, controller)
+    AlertDialog.Builder(context).setTitle(CYLLocalization.string(context, R.string.cyl_memory_warning_alert_title)).setMessage(message)
+        .setPositiveButton(android.R.string.ok, null).show()
+}
+
+/**
+ * [EN] The tab's title, or `fallback` without a tab item. [CN] Tab 的标题；没有 Tab 项时为 `fallback`。
+ */
+private fun CYLMemoryWarningTabTitle(item: CYLTabBarItem?, selected: Boolean, fallback: String): String {
+    if (item == null) return fallback
+    val selectedTitle = if (selected) item.cyl_selectedTitle else null
+    return selectedTitle ?: item.title ?: fallback
+}
+
+/**
+ * [EN] `CYLSimulateMemoryWarningReport()`: simulates a memory warning for `controller` and returns what happened to each tab,
+ *      one line per tab, in [CYLLocalization.language]: the message of `cyl_simulateMemoryWarningAndShowResult`, for any UI
+ *      (e.g. `CYLTabBarHostView`).
+ * [CN] 对 `controller` 模拟内存警告，并返回每个 Tab 的结果（每个 Tab 一行），使用 [CYLLocalization.language]：即
+ *      `cyl_simulateMemoryWarningAndShowResult` 弹窗的内容，可用于任何界面（例如 `CYLTabBarHostView`）。
+ */
+fun CYLSimulateMemoryWarningReport(context: Context, controller: CYLTabBarController?): String {
     val pages = controller?.viewControllers.orEmpty()
     val wasLoaded = pages.map { it.view != null }
     CYLTabBarController.cyl_simulateMemoryWarningForTabBarController(controller)
+    val text = { id: Int -> CYLLocalization.string(context, id) }
     val lines = ArrayList<String>()
     when {
-        controller == null -> lines += context.getString(R.string.cyl_memory_warning_no_controller)
-        !controller.unloadsUnselectedViewsOnMemoryWarning -> lines += context.getString(R.string.cyl_memory_warning_disabled)
+        controller == null -> lines += text(R.string.cyl_memory_warning_no_controller)
+        !controller.unloadsUnselectedViewsOnMemoryWarning -> lines += text(R.string.cyl_memory_warning_disabled)
     }
+    val items = controller?.tabBarItems.orEmpty()
+    val selectedIndex = controller?.selectedIndex
     pages.forEachIndexed { index, page ->
-        val title = controller?.tabBarItems?.getOrNull(index)?.title ?: page.javaClass.simpleName
+        // [EN] The title the tab shows, as iOS `tabBarItem.title`: the selected title on the selected tab. [CN] Tab 显示的标题，与 iOS 相同：选中的 Tab 显示选中标题。
+        val title = CYLMemoryWarningTabTitle(items.getOrNull(index), index == selectedIndex, page.javaClass.simpleName)
         val status = when {
             !wasLoaded[index] -> R.string.cyl_memory_warning_not_loaded
             page.view == null -> R.string.cyl_memory_warning_unloaded
-            index == controller?.selectedIndex -> R.string.cyl_memory_warning_kept_selected
+            index == selectedIndex -> R.string.cyl_memory_warning_kept_selected
             controller?.unloadsUnselectedViewsOnMemoryWarning == true && !controller.shouldUnloadViewOfViewController(page) -> R.string.cyl_memory_warning_kept_should_unload
             else -> R.string.cyl_memory_warning_kept
         }
-        lines += "$title: ${context.getString(status)}"
+        lines += "$title: ${text(status)}"
     }
-    AlertDialog.Builder(context).setTitle(R.string.cyl_memory_warning_alert_title).setMessage(lines.joinToString("\n")).setPositiveButton(android.R.string.ok, null).show()
+    return lines.joinToString("\n")
 }
 
 // MARK: - Base view controllers 基类
 
-/** [EN] `CYLBaseViewController`: a base page. [CN] 页面基类。 */
+/**
+ * [EN] `CYLBaseViewController`: a base page. [CN] 页面基类。
+ */
 open class CYLBaseViewController : Fragment()
 
-/** [EN] `CYLBaseTableViewController`: a base page whose view is a list (`listView`). [CN] 视图为列表（`listView`）的页面基类。 */
+/**
+ * [EN] `CYLBaseTableViewController`: a base page whose view is a list (`listView`). [CN] 视图为列表（`listView`）的页面基类。
+ */
 open class CYLBaseTableViewController : Fragment() {
     var listView: ListView? = null
         private set
@@ -538,7 +644,9 @@ open class CYLBaseNavigationController() : Fragment() {
 
     constructor(rootViewController: Fragment) : this() { root = rootViewController }
 
-    /** [EN] The pages of the stack, root first. [CN] 栈中的页面，根页面在前。 */
+    /**
+     * [EN] The pages of the stack, root first. [CN] 栈中的页面，根页面在前。
+     */
     val viewControllers: List<Fragment> get() = childFragmentManager.fragments.filter { it.id == containerId }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
@@ -551,7 +659,9 @@ open class CYLBaseNavigationController() : Fragment() {
         childFragmentManager.addOnBackStackChangedListener { toggleTabBarHidden() }
     }
 
-    /** [EN] `-pushViewController:animated:`. [CN] push 页面。 */
+    /**
+     * [EN] `-pushViewController:animated:`. [CN] push 页面。
+     */
     open fun pushViewController(viewController: Fragment, animated: Boolean) {
         childFragmentManager.beginTransaction().apply {
             if (animated) setTransition(androidx.fragment.app.FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
@@ -561,10 +671,14 @@ open class CYLBaseNavigationController() : Fragment() {
         }.commit()
     }
 
-    /** [EN] `-popViewControllerAnimated:`. [CN] 弹出页面。 */
+    /**
+     * [EN] `-popViewControllerAnimated:`. [CN] 弹出页面。
+     */
     open fun popViewControllerAnimated(animated: Boolean) { childFragmentManager.popBackStack() }
 
-    /** [EN] `-popToRootViewControllerAnimated:`. [CN] 回到根页面。 */
+    /**
+     * [EN] `-popToRootViewControllerAnimated:`. [CN] 回到根页面。
+     */
     open fun popToRootViewControllerAnimated(animated: Boolean) {
         if (childFragmentManager.backStackEntryCount > 0) childFragmentManager.popBackStack(childFragmentManager.getBackStackEntryAt(0).id, androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE)
     }
@@ -577,25 +691,37 @@ open class CYLBaseNavigationController() : Fragment() {
 
 // MARK: - Deprecated badge points (UIViewController / UIControl (CYLTabBarControllerExtentionDeprecated)) 已废弃的角标点
 
-/** [EN] `-cyl_showTabBadgePoint` (deprecated): use `cyl_showBadge`. [CN] 已废弃，请使用 `cyl_showBadge`。 */
+/**
+ * [EN] `-cyl_showTabBadgePoint` (deprecated): use `cyl_showBadge`. [CN] 已废弃，请使用 `cyl_showBadge`。
+ */
 @Deprecated("Use cyl_showBadge", ReplaceWith("cyl_showBadge()"))
 fun View.cyl_showTabBadgePoint() = cyl_showBadge()
-/** [EN] `-cyl_removeTabBadgePoint` (deprecated): use `cyl_clearBadge`. [CN] 已废弃，请使用 `cyl_clearBadge`。 */
+/**
+ * [EN] `-cyl_removeTabBadgePoint` (deprecated): use `cyl_clearBadge`. [CN] 已废弃，请使用 `cyl_clearBadge`。
+ */
 @Deprecated("Use cyl_clearBadge", ReplaceWith("cyl_clearBadge()"))
 fun View.cyl_removeTabBadgePoint() = cyl_clearBadge()
-/** [EN] `-cyl_isShowTabBadgePoint` (deprecated): use `cyl_isShowBadge`. [CN] 已废弃，请使用 `cyl_isShowBadge`。 */
+/**
+ * [EN] `-cyl_isShowTabBadgePoint` (deprecated): use `cyl_isShowBadge`. [CN] 已废弃，请使用 `cyl_isShowBadge`。
+ */
 @Deprecated("Use cyl_isShowBadge", ReplaceWith("cyl_isShowBadge()"))
 fun View.cyl_isShowTabBadgePoint(): Boolean = cyl_isShowBadge()
-/** [EN] `cyl_tabBadgePointView` (deprecated): the badge view. [CN] 已废弃：角标视图。 */
+/**
+ * [EN] `cyl_tabBadgePointView` (deprecated): the badge view. [CN] 已废弃：角标视图。
+ */
 @Deprecated("Use cyl_badge", ReplaceWith("cyl_badge"))
 val View.cyl_tabBadgePointView: View? get() = cyl_badge
-/** [EN] `cyl_tabBadgePointViewOffset` (deprecated): `cyl_badgeCenterOffset`. [CN] 已废弃：即 `cyl_badgeCenterOffset`。 */
+/**
+ * [EN] `cyl_tabBadgePointViewOffset` (deprecated): `cyl_badgeCenterOffset`. [CN] 已废弃：即 `cyl_badgeCenterOffset`。
+ */
 @Deprecated("Use cyl_badgeCenterOffset", ReplaceWith("cyl_badgeCenterOffset"))
 var View.cyl_tabBadgePointViewOffset: CYLOffset
     get() = cyl_badgeCenterOffset
     set(value) { cyl_badgeCenterOffset = value }
 
-/** [EN] The page's tab button versions. [CN] 页面 Tab 按钮上的版本。 */
+/**
+ * [EN] The page's tab button versions. [CN] 页面 Tab 按钮上的版本。
+ */
 @Deprecated("Use cyl_showBadge", ReplaceWith("cyl_showBadge()"))
 fun Fragment.cyl_showTabBadgePoint() = cyl_showBadge()
 @Deprecated("Use cyl_clearBadge", ReplaceWith("cyl_clearBadge()"))

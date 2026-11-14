@@ -12,24 +12,43 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface UIView (CYLTabBarItemAnimation)
+/*!
+ * [EN] `UIView (CYLTabBarItemAnimation)` and the service functions are implemented in Swift
+ *      (`Swift/UIControl+CYLTabBarItemAnimation.swift`) and declared by the generated Swift interface imported at the end
+ *      (docs/Swift-Migration.md).
+ * [CN] `UIView (CYLTabBarItemAnimation)` 与服务函数在 Swift 中实现（`Swift/UIControl+CYLTabBarItemAnimation.swift`），由末尾导入的
+ *      Swift 生成接口声明（docs/Swift-Migration.md）。
+ */
 
-/// [EN] YES for a view made by a `CYLTabBarItemAnimator`. [CN] 由 `CYLTabBarItemAnimator` 创建的视图返回 YES。
-- (BOOL)cyl_isTabBarItemAnimationView;
 
-@end
 
 @interface CYLTabBar (CYLTabBarItemAnimation)
 
-/// [EN] Plays the animation on `selectedControl`. [CN] 在 `selectedControl` 上播放动画。
+/*!
+ * [EN] Plays the animation on `selectedControl`. [CN] 在 `selectedControl` 上播放动画。
+ */
 - (void)cyl_playTabBarItemAnimationWithSelectedControl:(nullable UIControl *)selectedControl
                                                    URL:(nullable NSURL *)URL
                                                   size:(CGSize)size
                                        defaultSelected:(BOOL)defaultSelected
                                            contentMode:(UIViewContentMode)contentMode;
 
-/// [EN] Stops the animations of every tab, selected-state layer included. [CN] 停止所有 Tab 的动画，包括选中态图层。
+/*!
+ * [EN] Stops the animations of every tab, selected-state layer included. [CN] 停止所有 Tab 的动画，包括选中态图层。
+ */
 - (void)cyl_stopAllTabBarItemAnimations;
+
+/*!
+ * [EN] Plays the animation of every tab once more from progress 0, selected-state layer included.
+ * [CN] 从进度 0 重新播放所有 Tab 的动画，包括选中态图层。
+ */
+- (void)cyl_restartAllTabBarItemAnimations;
+
+/*!
+ * [EN] Applies `speed` and `loops` to the animation of every tab, selected-state layer included, also while playing.
+ * [CN] 把 `speed` 与 `loops` 应用到所有 Tab 的动画（包括选中态图层），播放中也立即生效。
+ */
+- (void)cyl_setAllTabBarItemAnimationsSpeed:(CGFloat)speed loops:(BOOL)loops;
 
 @end
 
@@ -72,3 +91,5 @@ FOUNDATION_EXTERN NSURL * _Nullable CYLTabBarItemAnimationURLFromAttributes(NSDi
 @end
 
 NS_ASSUME_NONNULL_END
+
+#import "CYLSwiftInterface.h"

@@ -55,7 +55,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CYLRiveTabBarItemAnimator : NSObject
 
-/// [EN] The registered animator, e.g. to inject another view provider. [CN] 已注册的 animator，例如用于注入其他视图 provider。
+/*!
+ * [EN] The registered animator, e.g. to inject another view provider. [CN] 已注册的 animator，例如用于注入其他视图 provider。
+ */
 @property (class, nonatomic, readonly) CYLTabBarItemViewAnimator *animator;
 
 @end

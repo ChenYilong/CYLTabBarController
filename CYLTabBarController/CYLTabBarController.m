@@ -53,91 +53,19 @@
 //#import "NSObject+CYLTabBarControllerExtention.h"
 #endif
 
-NSString *const CYLTabBarItemTitle = @"CYLTabBarItemTitle";
-NSString *const CYLTabBarItemImage = @"CYLTabBarItemImage";
-NSString *const CYLTabBarItemSelectedImage = @"CYLTabBarItemSelectedImage";
-NSString *const CYLTabBarItemDarkImage = @"CYLTabBarItemDarkImage";
-NSString *const CYLTabBarItemSelectedDarkImage = @"CYLTabBarItemSelectedDarkImage";
-NSString *const CYLTabBarItemImageURL = @"CYLTabBarItemImageURL";
-NSString *const CYLTabBarItemSelectedImageURL = @"CYLTabBarItemSelectedImageURL";
-NSString *const CYLTabBarItemImageURLSize = @"CYLTabBarItemImageURLSize";
-NSString *const CYLTabBarItemImageInsets = @"CYLTabBarItemImageInsets";
-NSString *const CYLTabBarItemTitlePositionAdjustment = @"CYLTabBarItemTitlePositionAdjustment";
-NSString *const CYLTabBarItemImagePositionAdjustment = @"CYLTabBarItemImagePositionAdjustment";
 NSString *const CYLTabBarLottieFilePath = @"CYLTabBarLottieFilePath";
 NSString *const CYLTabBarLottieURL = @"CYLTabBarLottieURL";
 NSString *const CYLTabBarLottieSize = @"CYLTabBarLottieSize";
-NSString *const CYLTabBarItemIdentifier = @"CYLTabBarItemIdentifier";
-NSString *const CYLTabBarItemPageIdentifier = @"CYLTabBarItemPageIdentifier";
-NSString *const CYLTabBarItemPageParameters = @"CYLTabBarItemPageParameters";
-NSString *const CYLTabBarItemPlatforms = @"CYLTabBarItemPlatforms";
-NSString *const CYLTabBarItemMinimumAppVersion = @"CYLTabBarItemMinimumAppVersion";
-NSString *const CYLTabBarControllerViewControllers = @"CYLTabBarControllerViewControllers";
-NSString *const CYLTabBarControllerTabBarItemsAttributes = @"CYLTabBarControllerTabBarItemsAttributes";
-NSString *const CYLTabBarControllerImageInsets = @"CYLTabBarControllerImageInsets";
-NSString *const CYLTabBarControllerTitlePositionAdjustment = @"CYLTabBarControllerTitlePositionAdjustment";
-NSString *const CYLTabBarControllerStyleType = @"CYLTabBarControllerStyleType";
-NSString *const CYLTabBarControllerContext = @"CYLTabBarControllerContext";
-NSString *const CYLTabBarControllerPageRegistry = @"CYLTabBarControllerPageRegistry";
-NSString *const CYLTabBarControllerPageResolver = @"CYLTabBarControllerPageResolver";
-NSString *const CYLTabBarControllerPageLookupOrder = @"CYLTabBarControllerPageLookupOrder";
-NSString *const CYLTabBarControllerAutomaticPageRegistration = @"CYLTabBarControllerAutomaticPageRegistration";
-NSString *const CYLTabBarControllerTabBarItemAnimationSpeed = @"CYLTabBarControllerTabBarItemAnimationSpeed";
-NSString *const CYLTabBarControllerPlusButton = @"CYLTabBarControllerPlusButton";
-NSString *const CYLTabBarControllerPlusButtonAction = @"CYLTabBarControllerPlusButtonAction";
 /// [EN] Defined in CYLPlusButton.m: the plus button page, passed with its attributes. [CN] 定义在 CYLPlusButton.m：随属性传递的 PlusButton 页面。
 FOUNDATION_EXTERN NSString *const CYLConfigurationPlusButtonPageKey;
-NSString *const CYLPlusButtonBackgroundImage = @"CYLPlusButtonBackgroundImage";
-NSString *const CYLPlusButtonIndexInTabBar = @"CYLPlusButtonIndexInTabBar";
-NSString *const CYLPlusButtonCenterYMultiplier = @"CYLPlusButtonCenterYMultiplier";
-NSString *const CYLPlusButtonCenterYOffset = @"CYLPlusButtonCenterYOffset";
-NSString *const CYLPlusButtonAlignsTitle = @"CYLPlusButtonAlignsTitle";
-NSString *const CYLPlusButtonKeepsTitleVisible = @"CYLPlusButtonKeepsTitleVisible";
-NSString *const CYLPlusButtonShowsSelection = @"CYLPlusButtonShowsSelection";
 /// [EN] Set from `CYLPlusButtonShowsSelection` of a configuration. [CN] 由配置中的 `CYLPlusButtonShowsSelection` 设置。
 static const void *const CYLPlusButtonShowsSelectionKey = &CYLPlusButtonShowsSelectionKey;
-NSString *const CYLPlusButtonSize = @"CYLPlusButtonSize";
-NSString *const CYLPlusButtonImageSize = @"CYLPlusButtonImageSize";
-NSString *const CYLTabBarControllerUserInterfaceStyle = @"CYLTabBarControllerUserInterfaceStyle";
-NSString *const CYLTabBarControllerTabButtonTapAnimation = @"CYLTabBarControllerTabButtonTapAnimation";
-NSString *const CYLTabBarControllerSwipeToSwitchTab = @"CYLTabBarControllerSwipeToSwitchTab";
-NSString *const CYLTabBarControllerLoginRequiredTabBarItemIdentifiers = @"CYLTabBarControllerLoginRequiredTabBarItemIdentifiers";
-NSString *const CYLTabBarControllerThemes = @"CYLTabBarControllerThemes";
-NSString *const CYLTabBarControllerThemeIdentifier = @"CYLTabBarControllerThemeIdentifier";
-NSString *const CYLTabBarControllerDarkThemeIdentifier = @"CYLTabBarControllerDarkThemeIdentifier";
-NSString *const CYLTabBarControllerThemeManagerName = @"CYLTabBarControllerThemeManagerName";
-NSString *const CYLTabBarControllerLocalization = @"CYLTabBarControllerLocalization";
-NSString *const CYLTabBarLocalizationTableName = @"CYLTabBarLocalizationTableName";
-NSString *const CYLTabBarLocalizationPath = @"CYLTabBarLocalizationPath";
-NSString *const CYLTabBarLocalizationBundleName = @"CYLTabBarLocalizationBundleName";
-NSString *const CYLTabBarThemeIdentifier = @"CYLTabBarThemeIdentifier";
-NSString *const CYLTabBarThemeValues = @"CYLTabBarThemeValues";
-NSString *const CYLTabBarBackgroundColor = @"CYLTabBarBackgroundColor";
-NSString *const CYLTabBarShadowColor = @"CYLTabBarShadowColor";
-NSString *const CYLTabBarBackgroundImage = @"CYLTabBarBackgroundImage";
-NSString *const CYLTabBarShadowImage = @"CYLTabBarShadowImage";
-NSString *const CYLTabBarStackedItemPositioning = @"CYLTabBarStackedItemPositioning";
-NSString *const CYLTabBarStackedItemWidth = @"CYLTabBarStackedItemWidth";
-NSString *const CYLTabBarStackedItemSpacing = @"CYLTabBarStackedItemSpacing";
-NSString *const CYLTabBarAnimationOptions = @"CYLTabBarAnimationOptions";
 /// [EN] Private: marks a tab left out by `CYLTabBarItemPlatforms` / `CYLTabBarItemMinimumAppVersion` (set by the normalization).
 /// [CN] 私有：标记被 `CYLTabBarItemPlatforms` / `CYLTabBarItemMinimumAppVersion` 排除的 Tab（由规范化设置）。
 static NSString *const CYLTabBarItemExcludedKey = @"_CYLTabBarItemExcluded";
 /// [EN] Private: set by the parameter initializers, which keep an empty view controller list (C9). [CN] 私有：由参数初始化方法设置，保持空的子控制器列表（C9）。
 static NSString *const CYLTabBarControllerKeepsEmptyViewControllersKey = @"_CYLTabBarControllerKeepsEmptyViewControllers";
-NSString *const CYLTabBarItemTitleColor = @"CYLTabBarItemTitleColor";
-NSString *const CYLTabBarItemSelectedTitleColor = @"CYLTabBarItemSelectedTitleColor";
-NSString *const CYLTabBarItemIconColor = @"CYLTabBarItemIconColor";
-NSString *const CYLTabBarItemSelectedIconColor = @"CYLTabBarItemSelectedIconColor";
-NSString *const CYLTabBarItemSelectedBackgroundColor = @"CYLTabBarItemSelectedBackgroundColor";
-NSString *const CYLTabBarItemBackgroundColor = @"CYLTabBarItemBackgroundColor";
 NSString *const CYLTabBarLottieLoopsWhenUnselected = @"CYLTabBarLottieLoopsWhenUnselected";
-NSString *const CYLTabBarItemTitleFont = @"CYLTabBarItemTitleFont";
-NSString *const CYLTabBarItemSelectedTitleFont = @"CYLTabBarItemSelectedTitleFont";
-NSString *const CYLTabBarItemAccessibilityIdentifier = @"CYLTabBarItemAccessibilityIdentifier";
-NSString *const CYLTabBarItemAccessibilityLabel = @"CYLTabBarItemAccessibilityLabel";
-NSString *const CYLTabBarItemAccessibilityHint = @"CYLTabBarItemAccessibilityHint";
-NSString *const CYLTabBarItemSelectedTitle = @"CYLTabBarItemSelectedTitle";
 
 #pragma mark - Selected title (FIX: issue #433)
 
@@ -220,22 +148,6 @@ static void CYLSetNeedsUpdateTabBarItemSelectedTitles(CYLTabBarController *tabBa
         CYLApplyTabBarItemSelectedTitles(weakTabBarController);
     });
 }
-NSNotificationName const CYLTabBarLoginStateDidChangeNotification = @"CYLTabBarLoginStateDidChangeNotification";
-NSNotificationName const CYLTabBarItemTitleDidChangeNotification = @"CYLTabBarItemTitleDidChangeNotification";
-NSNotificationName const CYLTabBarItemDidChangeNotification = @"CYLTabBarItemDidChangeNotification";
-NSString *const CYLTabBarItemChangedAttributesKey = @"CYLTabBarItemChangedAttributesKey";
-NSString *const CYLTabBarItemIndexKey = @"CYLTabBarItemIndexKey";
-NSNotificationName const CYLTabBarItemIconDidChangeNotification = @"CYLTabBarItemIconDidChangeNotification";
-NSString *const CYLTabBarItemIndexesKey = @"CYLTabBarItemIndexesKey";
-NSString *const CYLTabBarItemIdentifiersKey = @"CYLTabBarItemIdentifiersKey";
-NSString *const CYLTabBarControllerKey = @"CYLTabBarControllerKey";
-NSString *const CYLTabBarItemViewControllerKey = @"CYLTabBarItemViewControllerKey";
-NSString *const CYLTabBarItemKey = @"CYLTabBarItemKey";
-NSString *const CYLPlusButtonKey = @"CYLPlusButtonKey";
-NSString *const CYLTabBarItemOldTitleKey = @"CYLTabBarItemOldTitleKey";
-NSString *const CYLTabBarItemIconViewProviderKey = @"CYLTabBarItemIconViewProviderKey";
-NSNotificationName const CYLTabBarControllerThemeDidApplyNotification = @"CYLTabBarControllerThemeDidApplyNotification";
-NSString *const CYLTabBarThemeKey = @"CYLTabBarThemeKey";
 
 static const void *CYLNavigationTitleFollowsTabBarItemTitleKey = &CYLNavigationTitleFollowsTabBarItemTitleKey;
 
@@ -303,13 +215,6 @@ static NSDictionary *CYLTabBarItemIconAttributes(NSDictionary *attributes) {
 NSString *const CYLTabBarLottieDarkURL = @"CYLTabBarLottieDarkURL";
 NSString *const CYLTabBarLottieDarkFilePath = @"CYLTabBarLottieDarkFilePath";
 NSString *const CYLTabBarLottieDarkColors = @"CYLTabBarLottieDarkColors";
-NSString *const CYLTabBarAnimationURL = @"CYLTabBarAnimationURL";
-NSString *const CYLTabBarAnimationFilePath = @"CYLTabBarAnimationFilePath";
-NSString *const CYLTabBarAnimationSize = @"CYLTabBarAnimationSize";
-NSString *const CYLTabBarAnimationDarkURL = @"CYLTabBarAnimationDarkURL";
-NSString *const CYLTabBarAnimationDarkFilePath = @"CYLTabBarAnimationDarkFilePath";
-NSString *const CYLTabBarAnimationDarkColors = @"CYLTabBarAnimationDarkColors";
-NSString *const CYLTabBarAnimationColors = @"CYLTabBarAnimationColors";
 
 NSUInteger CYLTabbarItemsCount = 0;
 NSUInteger CYLPlusButtonIndex = 0;
@@ -317,12 +222,9 @@ CGFloat CYLTabBarItemWidth = 0.0f;
 CGFloat CYLTabBarHeight = 49.0f;
 static const CGFloat kCYLDefaultTabBarHeight = 49.0f;
 
-NSString *const CYLTabBarItemWidthDidChangeNotification = @"CYLTabBarItemWidthDidChangeNotification";
 NSString *const CYLTabBarItemLottieAnimationPlayingNotification = @"CYLTabBarItemLottieAnimationPlayingNotification";
 NSString *const CYLTabBarItemLottieAnimationViewDidAddNotification = @"CYLTabBarItemLottieAnimationViewDidAddNotification";
 // [EN] The same values as the Lottie names, so both names reach the same observers. [CN] 与 Lottie 名称取值相同，两个名称对应同一批观察者。
-NSNotificationName const CYLTabBarItemAnimationPlayingNotification = @"CYLTabBarItemLottieAnimationPlayingNotification";
-NSNotificationName const CYLTabBarItemAnimationViewDidAddNotification = @"CYLTabBarItemLottieAnimationViewDidAddNotification";
 
 NSString *const CYLTabBarStyleTypeDidChangeNotification = @"CYLTabBarStyleTypeDidChangeNotification";
 static void * const CYLTabImageViewDefaultOffsetContext = (void*)&CYLTabImageViewDefaultOffsetContext;
@@ -418,7 +320,11 @@ static void CYLSetAdditionalSafeAreaBottom(UIViewController *viewController, CGF
 
 @end
 
-@interface CYLTabBarController () <UITabBarControllerDelegate>
+// [EN] `CYLTabBarControllerMemoryWarningSeam` (Swift, docs/Swift-Migration.md): lets the Swift memory warning demo read
+//      `unloadsUnselectedViewsOnMemoryWarning` and `-shouldUnloadViewOfViewController:`; removed when this class is Swift.
+// [CN] `CYLTabBarControllerMemoryWarningSeam`（Swift，docs/Swift-Migration.md）：让 Swift 版内存警告示例读取
+//      `unloadsUnselectedViewsOnMemoryWarning` 与 `-shouldUnloadViewOfViewController:`；本类迁移到 Swift 后删除。
+@interface CYLTabBarController () <UITabBarControllerDelegate, CYLTabBarControllerMemoryWarningSeam>
 
 /// [EN] iOS 26+: routes points above the bar to the plus button (issue #91). [CN] iOS 26+：把 TabBar 上方的点交给 PlusButton（issue #91）。
 @property (nonatomic, strong, nullable) CYLTabBarOverflowTouchView *cyl_overflowTouchView;
@@ -539,6 +445,56 @@ static NSString *const CYLImageOnlyTabAppliedTitleKey = @"appliedTitle";
  */
 static inline id _Nullable CYLObjectAtIndex(NSArray * _Nullable array, NSUInteger index) {
     return index < array.count ? array[index] : nil;
+}
+
+/*!
+ * [EN] FIX: issue #787. A tab's images in its `CYLTabBarItemIconRenderingMode`: "template" makes both images templates (the
+ *      selected one falls back to the normal one, so one image is enough), "original" keeps their colors; otherwise the
+ *      image infos are returned as they are.
+ * [CN] FIX: issue #787。按 Tab 的 `CYLTabBarItemIconRenderingMode` 处理其图片："template" 把两张图片都设为模板（没有选中图片时使用普通图片，
+ *      因此一张图即可），"original" 保持原色；否则原样返回图片信息。
+ */
+/*!
+ * [EN] FIX: issue #787 — `image` in `renderingMode`, keeping its dark image: `-imageWithRenderingMode:` alone returns the
+ *      current appearance only, so a tab with `CYLTabBarItemDarkImage` stayed light in Dark Mode. Both appearances are
+ *      converted and combined again.
+ * [CN] FIX: issue #787——以 `renderingMode` 返回 `image`，并保留其深色图片：单独调用 `-imageWithRenderingMode:` 只返回当前外观的那张，
+ *      带 `CYLTabBarItemDarkImage` 的 Tab 在深色模式下仍为浅色。因此两种外观分别转换后重新合成。
+ */
+static UIImage *CYLImageWithRenderingMode(UIImage *image, UIImageRenderingMode renderingMode) {
+    if (@available(iOS 13.0, *)) {
+        UIImageAsset *imageAsset = image.imageAsset;
+        UIImage *lightImage = [imageAsset imageWithTraitCollection:[UITraitCollection traitCollectionWithUserInterfaceStyle:UIUserInterfaceStyleLight]];
+        UIImage *darkImage = [imageAsset imageWithTraitCollection:[UITraitCollection traitCollectionWithUserInterfaceStyle:UIUserInterfaceStyleDark]];
+        if (lightImage && darkImage && ![lightImage isEqual:darkImage]) {
+            return [UIImage cyl_imageWithLightImage:[lightImage imageWithRenderingMode:renderingMode]
+                                          darkImage:[darkImage imageWithRenderingMode:renderingMode]];
+        }
+    }
+    return [image imageWithRenderingMode:renderingMode];
+}
+
+static void CYLApplyIconRenderingMode(NSDictionary *attributes, id _Nullable *_Nonnull normalImageInfo, id _Nullable *_Nonnull selectedImageInfo) {
+    NSString *mode = [attributes[CYLTabBarItemIconRenderingMode] isKindOfClass:[NSString class]] ? attributes[CYLTabBarItemIconRenderingMode] : nil;
+    UIImageRenderingMode renderingMode;
+    if ([mode isEqualToString:@"template"]) {
+        renderingMode = UIImageRenderingModeAlwaysTemplate;
+    } else if ([mode isEqualToString:@"original"]) {
+        renderingMode = UIImageRenderingModeAlwaysOriginal;
+    } else {
+        return;
+    }
+    UIImage *normal = *normalImageInfo ? [UIImage cyl_imageNamed:*normalImageInfo] : nil;
+    UIImage *selected = *selectedImageInfo ? [UIImage cyl_imageNamed:*selectedImageInfo] : nil;
+    if (!selected && renderingMode == UIImageRenderingModeAlwaysTemplate) {
+        selected = normal;
+    }
+    if (normal) {
+        *normalImageInfo = CYLImageWithRenderingMode(normal, renderingMode);
+    }
+    if (selected) {
+        *selectedImageInfo = CYLImageWithRenderingMode(selected, renderingMode);
+    }
 }
 
 @implementation CYLTabBarController {
@@ -1312,6 +1268,19 @@ static const void *const CYLPlusButtonGlassLayoutRetryPendingKey = &CYLPlusButto
     }
 }
 
+/*!
+ * FIX: issue #216
+ * [EN] The theme callback of every view controller. The override stays here, in Objective-C: a public Swift override of it would put an
+ *      extension of this class into the generated Swift header, before the class. The work is `-cyl_tabBarThemeDidChangeByManager:theme:`
+ *      (CYLTabBarController+CYLTheme.swift).
+ * [CN] 每个控制器的主题回调。重写保留在这里（Objective-C）：public 的 Swift 重写会让生成的 Swift 头文件在该类之前出现它的 extension。实际工作在
+ *      `-cyl_tabBarThemeDidChangeByManager:theme:`（CYLTabBarController+CYLTheme.swift）。
+ */
+- (void)cyl_themeDidChangeByManager:(CYLThemeManager *)manager identifier:(nullable __kindof NSObject<NSCopying> *)identifier theme:(nullable __kindof NSObject *)theme {
+    [super cyl_themeDidChangeByManager:manager identifier:identifier theme:theme];
+    [self cyl_tabBarThemeDidChangeByManager:manager theme:theme];
+}
+
 - (void)viewDidLayoutSubviews {
     [super viewDidLayoutSubviews];
     // [EN] Lottie views are added during layout: start the looping ones (`CYLTabBarLottieLoopsWhenUnselected`).
@@ -1570,7 +1539,16 @@ static const void *const CYLPlusButtonGlassLayoutRetryPendingKey = &CYLPlusButto
 }
 
 - (BOOL)shouldUnloadViewOfViewController:(UIViewController *)viewController {
-    return YES;
+    NSString *identifier = viewController.cyl_tabBarItemIdentifier;
+    return !(identifier && [self.cyl_keepsLoadedTabBarItemIdentifiers containsObject:identifier]);
+}
+
+- (NSArray<NSString *> *)cyl_keepsLoadedTabBarItemIdentifiers {
+    return objc_getAssociatedObject(self, @selector(cyl_keepsLoadedTabBarItemIdentifiers)) ?: @[];
+}
+
+- (void)setCyl_keepsLoadedTabBarItemIdentifiers:(NSArray<NSString *> *)identifiers {
+    objc_setAssociatedObject(self, @selector(cyl_keepsLoadedTabBarItemIdentifiers), [identifiers copy], OBJC_ASSOCIATION_COPY_NONATOMIC);
 }
 
 - (void)unloadViewsOfUnselectedViewControllers {
@@ -1986,6 +1964,11 @@ static const void *const CYLPlusButtonGlassLayoutRetryPendingKey = &CYLPlusButto
                                                        darkImageInfo:attributes[CYLTabBarItemDarkImage]];
             setup.selectedImageInfo = [UIImage cyl_imageWithImageInfo:attributes[CYLTabBarItemSelectedImage]
                                                          darkImageInfo:attributes[CYLTabBarItemSelectedDarkImage]];
+            id normalImageInfo = setup.normalImageInfo;
+            id selectedImageInfo = setup.selectedImageInfo;
+            CYLApplyIconRenderingMode(attributes, &normalImageInfo, &selectedImageInfo);
+            setup.normalImageInfo = normalImageInfo;
+            setup.selectedImageInfo = selectedImageInfo;
             NSString *animationFilePath = nil;
             setup.animationURL = CYLTabBarItemAnimationURLFromAttributes(attributes, &animationFilePath);
             setup.animationFilePath = animationFilePath;
@@ -2456,6 +2439,14 @@ static NSMutableDictionary<NSString *, NSMutableArray<UIViewController *> *> *CY
         if (loginRequired) {
             self.cyl_loginRequiredTabBarItemIdentifiers = loginRequired;
         }
+        NSNumber *unloads = normalized[CYLTabBarControllerUnloadsUnselectedViewsOnMemoryWarning];
+        if (unloads) {
+            self.unloadsUnselectedViewsOnMemoryWarning = unloads.boolValue;
+        }
+        NSArray<NSString *> *keepsLoaded = normalized[CYLTabBarControllerKeepsLoadedTabBarItemIdentifiers];
+        if (keepsLoaded) {
+            self.cyl_keepsLoadedTabBarItemIdentifiers = keepsLoaded;
+        }
         // [EN] Skins of the configuration (`CYLTabBarControllerThemes`): registered with the theme manager, the first one applied.
         // [CN] 配置中的皮肤（`CYLTabBarControllerThemes`）：注册到主题管理器，并应用首个皮肤。
         [self cyl_applyConfigurationThemes:normalized];
@@ -2499,8 +2490,32 @@ static NSMutableDictionary<NSString *, NSMutableArray<UIViewController *> *> *CY
 
 - (void)setTabBarItemAnimationSpeed:(CGFloat)tabBarItemAnimationSpeed {
     self.lottieAnimationSpeed = tabBarItemAnimationSpeed;
+    [self cyl_applyTabBarItemAnimationPlayback];
 }
 #pragma clang diagnostic pop
+
+- (void)setTabBarItemAnimationLoops:(BOOL)tabBarItemAnimationLoops {
+    _tabBarItemAnimationLoops = tabBarItemAnimationLoops;
+    [self cyl_applyTabBarItemAnimationPlayback];
+}
+
+/// [EN] The speed and the loop mode, to the views already added (none before the tab bar is laid out).
+/// [CN] 把速度与循环模式应用到已添加的视图（TabBar 布局前没有视图）。
+- (void)cyl_applyTabBarItemAnimationPlayback {
+    if (!CYLTabBarItemAnimationIsAvailable() || ![self isViewLoaded] || ![self.cyl_tabBar isKindOfClass:[CYLTabBar class]]) {
+        return;
+    }
+    [(CYLTabBar *)self.cyl_tabBar cyl_setAllTabBarItemAnimationsSpeed:self.tabBarItemAnimationSpeed
+                                                                loops:self.tabBarItemAnimationLoops];
+}
+
+- (void)cyl_playAllTabBarItemAnimations {
+    if (!CYLTabBarItemAnimationIsAvailable() || ![self.cyl_tabBar isKindOfClass:[CYLTabBar class]]) {
+        return;
+    }
+    [self cyl_applyTabBarItemAnimationPlayback];
+    [(CYLTabBar *)self.cyl_tabBar cyl_restartAllTabBarItemAnimations];
+}
 
 + (instancetype)tabBarControllerWithViewControllers:(NSArray<UIViewController *> *)viewControllers
                               tabBarItemsAttributes:(NSArray<NSDictionary *> *)tabBarItemsAttributes
@@ -3082,13 +3097,24 @@ static NSString *const CYLTabBarItemPlusSlotPlaceholderKey = @"CYLTabBarItemPlus
 
     // As when the tab was set up (`-setViewControllers:`), so a dark image is combined with its light one (#620).
     NSString *title = attributes[CYLTabBarItemTitle];
-    BOOL updatesImage = attributes[CYLTabBarItemImage] || attributes[CYLTabBarItemDarkImage];
-    BOOL updatesSelectedImage = attributes[CYLTabBarItemSelectedImage] || attributes[CYLTabBarItemSelectedDarkImage];
+    // FIX: issue #787 — a new rendering mode alone redraws both images. [CN] 只更新渲染方式时也重新绘制两张图片。
+    BOOL updatesRenderingMode = attributes[CYLTabBarItemIconRenderingMode] != nil;
+    BOOL updatesImage = attributes[CYLTabBarItemImage] || attributes[CYLTabBarItemDarkImage] || updatesRenderingMode;
+    BOOL updatesSelectedImage = attributes[CYLTabBarItemSelectedImage] || attributes[CYLTabBarItemSelectedDarkImage] || updatesRenderingMode;
     UIImage *image = updatesImage ? [UIImage cyl_imageNamed:[UIImage cyl_imageWithImageInfo:newAttributes[CYLTabBarItemImage]
                                                                                darkImageInfo:newAttributes[CYLTabBarItemDarkImage]]] : nil;
     UIImage *selectedImage = updatesSelectedImage ?
         [UIImage cyl_imageNamed:[UIImage cyl_imageWithImageInfo:newAttributes[CYLTabBarItemSelectedImage]
                                                   darkImageInfo:newAttributes[CYLTabBarItemSelectedDarkImage]]] : nil;
+    if (updatesImage || updatesSelectedImage) {
+        // FIX: issue #787 — the tab's rendering mode applies to images updated in place too.
+        // [CN] Tab 的渲染方式同样作用于原地更新的图片。
+        id normalInfo = image;
+        id selectedInfo = selectedImage;
+        CYLApplyIconRenderingMode(newAttributes, &normalInfo, &selectedInfo);
+        image = normalInfo;
+        selectedImage = selectedInfo;
+    }
 
     // FIX: issue #216 — an animation key (e.g. from a `CYLTabBarTheme`) replaces the tab's animation in place, in every style.
     // 动画 key（例如来自 `CYLTabBarTheme`）在所有样式下原地替换该 Tab 的动画。
@@ -3938,6 +3964,40 @@ static UIImage *CYLImageScaledToSize(UIImage *image, CGSize size) {
 }
 #endif
 
+/*!
+ * [EN] FIX: more than five tabs showed only the first five on the classic style and Liquid Glass, with no "More": that
+ *      path installs the tabs with -addChildViewController:, and UIKit builds its "More" tab only in -setViewControllers:,
+ *      so the sixth tab and later could not be reached. With more than five tabs they are handed to UIKit too, as
+ *      FlatDesign does; five or fewer keep the old path unchanged.
+ * [CN] FIX：经典样式与液态玻璃下超过 5 个 Tab 时只显示前 5 个且没有「More」：这条路径用 -addChildViewController: 安装 Tab，而 UIKit
+ *      只在 -setViewControllers: 中生成「More」，因此第 6 个及之后的 Tab 无法访问。超过 5 个时也交给 UIKit（与扁平样式相同）；
+ *      5 个及以内保持原来的路径不变。
+ */
+- (void)cyl_handTabsToUIKitIfMoreThanFive {
+    if (_viewControllers.count <= 5) {
+        return;
+    }
+    // [EN] UIKit adds "More" only for view controllers that are not children yet (found with a plain
+    //      UITabBarController: -addChildViewController: then -setViewControllers: gives five tabs and no More), so the
+    //      children this path added are taken out first; UIKit adds them back.
+    // [CN] UIKit 只为尚未成为子控制器的视图控制器生成「More」（用普通 UITabBarController 验证：先 -addChildViewController: 再
+    //      -setViewControllers: 只有 5 个 Tab 且没有 More），因此先移除这条路径添加的子控制器，由 UIKit 重新添加。
+    NSArray<UIViewController *> *tabs = _viewControllers;
+    for (UIViewController *viewController in tabs) {
+        if (viewController.parentViewController == self) {
+            [viewController willMoveToParentViewController:nil];
+            [viewController removeFromParentViewController];
+        }
+    }
+    // [EN] `viewControllers` is this class's own list (`@synthesize`), which UIKit reads as the old tabs: with the same
+    //      array it saw no change and added nothing. The list is empty while UIKit takes the tabs, then restored.
+    // [CN] `viewControllers` 是本类自己的数组（`@synthesize`），UIKit 会把它当作旧 Tab 读取：数组相同时它认为没有变化，什么也不添加。
+    //      UIKit 接收 Tab 期间该数组为空，之后恢复。
+    _viewControllers = nil;
+    [super setViewControllers:tabs animated:NO];
+    _viewControllers = tabs;
+}
+
 - (void)setViewControllers:(NSArray<__kindof UIViewController *> *)viewControllers {
     // Known from now on (`+cyl_tabBarControllerForContext:`), but not "active" until it appears. Only with view
     // controllers: a nil / empty array is also what a tear-down sends, when no weak reference may be formed.
@@ -4008,6 +4068,7 @@ static UIImage *CYLImageScaledToSize(UIImage *image, CGSize size) {
             //      in again dropped the plus child view controller (or kept a stale slot it carried).
             // [CN] FIX：占位导致的数量不匹配——`_viewControllers` 已在上面对齐；以前这里又赋值为传入的数组，丢失 PlusButton 子控制器
             //      （或保留了数组自带的旧 slot）。
+            [self cyl_handTabsToUIKitIfMoreThanFive];
             return;
         }
         CYLTabBar *cyl_tabBar = (CYLTabBar *)self.cyl_tabBar;
@@ -4078,6 +4139,7 @@ static UIImage *CYLImageScaledToSize(UIImage *image, CGSize size) {
         
             idx++;
         }
+        [self cyl_handTabsToUIKitIfMoreThanFive];
     } else {/**  CYLTabBarStyleTypeFlatDesign*/}
 
     if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType) {
@@ -5443,6 +5505,41 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
     return should;
 }
 
+#ifndef CYL_PLUS_BUTTON_TITLE_KEEPS_LENS_ENABLED
+/*!
+ * [EN] 1 (default): the Liquid Glass lens stays on the plus page when the plus button's title is drawn by its tab item
+ *      (PR #793). 0 hides it there as before. TODO (2026-11-13, to verify): set 0 first on any plus button bug after
+ *      selection, like `CYL_PLUS_BUTTON_LENS_MASK_ENABLED` (see the comment of `-cyl_plusButtonTitleIsDrawnByItsTabItem`).
+ * [CN] 1（默认）：PlusButton 的标题由其 TabBarItem 绘制时，PlusButton 页面保留液态玻璃放大镜（PR #793）。0 与以前一样在此隐藏。
+ *      TODO（2026-11-13，待验证）：选中后出现任何 PlusButton bug 时，先设为 0，与 `CYL_PLUS_BUTTON_LENS_MASK_ENABLED` 相同。
+ */
+#define CYL_PLUS_BUTTON_TITLE_KEEPS_LENS_ENABLED 1
+#endif
+
+/*!
+ * [EN] TODO (2026-11-13, to verify): PR #793 (`8b397a8`, then `8ae53a7`, merged in `6db8487`) changed `-tabBarController:shouldShowPlatterLiquidLensViewForControl:` (CYLTabBarController.m): when the plus button's title is drawn by its tab item (`-cyl_plusButtonTitleIsDrawnByItsTabItem`: `+alignsTitleWithTabBarItemTitles`, no title drawn over a background image, the plus child view controller's tab item has a title), the Liquid Glass lens now stays on the plus page instead of being hidden when the plus button is not layout-centered. The maintainer considers this as risky as `-[CYLPlusButton cyl_updateLiquidGlassMask]`: it changes what the lens draws while the plus page is selected. Verify again, as for the mask: Liquid Glass on iOS 26+, a plus child view controller, raised and flat plus buttons: select the plus button, drag the lens away and back, select the plus tab in code, first display; the plus button must never be cut, missing, offset, doubled, or lose its title. Check in CYLSearchViewController's Flutter example and the Objective-C gallery 9.4 / 9.5, with UI test recordings. Until then, on any plus button bug after selection, turn this off first (`CYL_PLUS_BUTTON_TITLE_KEEPS_LENS_ENABLED` 0), together with the mask, and test again.
+ * [CN] TODO（2026-11-13，待验证）：PR #793 让 PlusButton 标题由其 TabBarItem 绘制时，PlusButton 页面保留液态玻璃放大镜。维护者认为这与
+ *      `-cyl_updateLiquidGlassMask` 一样危险，需要按遮罩的方式再次验证（选中、拖动放大镜、代码选中、首次显示，凸起与平的 PlusButton），
+ *      确保选中后 PlusButton 不会被切割、消失、偏移、重影或丢失标题。验证前出现问题时先关闭（`CYL_PLUS_BUTTON_TITLE_KEEPS_LENS_ENABLED` 0）。
+ *
+ * [EN] YES when the plus button's title is drawn by the tab item under it: the plus button class aligns its title with the
+ *      tab titles (`+alignsTitleWithTabBarItemTitles`), its picture is not a background image with the title on it, and
+ *      the plus child view controller's tab item has a title.
+ * [CN] PlusButton 的标题由其下方的 TabBarItem 绘制时为 YES：PlusButton 类要求标题与 Tab 标题对齐（`+alignsTitleWithTabBarItemTitles`），
+ *      其图片不是标题画在上面的背景图，且 PlusButton 子控制器的 TabBarItem 有标题。
+ */
+- (BOOL)cyl_plusButtonTitleIsDrawnByItsTabItem {
+    UIButton *plusButton = [self cyl_contextPlusButton];
+    Class plusButtonClass = [plusButton class];
+    if (![plusButton isKindOfClass:[CYLPlusButton class]] ||
+        ![plusButtonClass respondsToSelector:@selector(alignsTitleWithTabBarItemTitles)] ||
+        ![(Class<CYLPlusButtonSubclassing>)plusButtonClass alignsTitleWithTabBarItemTitles] ||
+        [(CYLPlusButton *)plusButton cyl_drawsTitleOverBackgroundImage]) {
+        return NO;
+    }
+    return [self cyl_contextPlusChildViewController].tabBarItem.title.length > 0;
+}
+
 - (BOOL)tabBarController:(CYLTabBarController *)tabBarController shouldShowPlatterLiquidLensViewForControl:(UIControl *)control {
     if (![CYLConstants isLiquidGlassActive] || ![tabBarController.tabBar isKindOfClass:[CYLTabBar class]]) {
         return NO;
@@ -5454,6 +5551,16 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
     // [EN] `CYLPlusButtonShowsSelection`: the selection stays under the plus button while its page is selected.
     // [CN] `CYLPlusButtonShowsSelection`：选中 PlusButton 的页面时，选中效果保留在 PlusButton 下方。
     if ([objc_getAssociatedObject(self, CYLPlusButtonShowsSelectionKey) boolValue]) {
+        return YES;
+    }
+    // [EN] A plus button whose title is aligned with the tab titles leaves the title to its tab item, drawn by UIKit; the
+    //      selected tab's title is part of the lens content, so hiding the lens on the plus page hid the title as well
+    //      (CYLSearchViewController's Flutter example, docs/Liquid-Glass-Robustness.md). Keep the selection then.
+    // [CN] 标题与 Tab 标题对齐的 PlusButton 把标题交给其 TabBarItem，由 UIKit 绘制；选中 Tab 的标题属于放大镜内容，因此在 PlusButton
+    //      页面隐藏放大镜也会隐藏标题（CYLSearchViewController 的 Flutter 示例，docs/Liquid-Glass-Robustness.md）。此时保留选中效果。
+    // [EN] TODO (2026-11-13, to verify): as risky as `-cyl_updateLiquidGlassMask`; see `-cyl_plusButtonTitleIsDrawnByItsTabItem`.
+    // [CN] TODO（2026-11-13，待验证）：与 `-cyl_updateLiquidGlassMask` 一样危险，见 `-cyl_plusButtonTitleIsDrawnByItsTabItem`。
+    if (CYL_PLUS_BUTTON_TITLE_KEEPS_LENS_ENABLED && [self cyl_plusButtonTitleIsDrawnByItsTabItem]) {
         return YES;
     }
     if ([tabBarController.selectedViewController isEqual:[self cyl_contextPlusChildViewController]] && ![tabBarController.tabBar isPlusButtonLayoutCentered]) {
@@ -5756,6 +5863,7 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
         }
         CGSize lottieSize = [lottieSizeValue CGSizeValue];
         [control cyl_addTabBarItemAnimationWithURL:lottieURL size:lottieSize contentMode:self.tabBarItemAnimationViewContentMode animationSpeed:self.tabBarItemAnimationSpeed];
+        [control cyl_setTabBarItemAnimationLoops:self.tabBarItemAnimationLoops];
         if (animation) {
             // Library-neutral (#604): any animation library (Lottie, PAG). 与动画库无关：任意动画库（Lottie、PAG）。
             [self.cyl_tabBar cyl_playTabBarItemAnimationWithSelectedControl:control URL:lottieURL size:lottieSize defaultSelected:defaultSelected contentMode:self.tabBarItemAnimationViewContentMode];
@@ -5829,6 +5937,7 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
     }
     CGSize lottieSize = [lottieSizeValue CGSizeValue];
     [control cyl_addTabBarItemAnimationWithURL:lottieURL size:lottieSize contentMode:self.tabBarItemAnimationViewContentMode animationSpeed:self.tabBarItemAnimationSpeed];
+    [control cyl_setTabBarItemAnimationLoops:self.tabBarItemAnimationLoops];
     
     if (![self.cyl_tabBar isKindOfClass:[CYLTabBar class]]) {
         return;
@@ -5837,6 +5946,7 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
     
     if (selectedContentControl) {
         [selectedContentControl cyl_addTabBarItemAnimationWithURL:lottieURL size:lottieSize contentMode:self.tabBarItemAnimationViewContentMode animationSpeed:self.tabBarItemAnimationSpeed];
+        [selectedContentControl cyl_setTabBarItemAnimationLoops:self.tabBarItemAnimationLoops];
     }
     
     if (animation) {
@@ -6131,7 +6241,10 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
     [self cyl_setNeedsUpdateTabBarItemIconViews];
     [self cyl_setNeedsUpdateSelectedBackgroundColors];
     NSUInteger indexOfSelectedViewController = [self.childViewControllers indexOfObject:selectedViewController];
-    if (NSNotFound == indexOfSelectedViewController) { return; }
+    // [EN] A tab shown under "More" (more than five tabs) is a child of the More navigation controller, not of this
+    //      controller: it is still one of the tabs, so it can be selected.
+    // [CN] 收在「More」下的 Tab（超过 5 个 Tab 时）是 More 导航控制器的子控制器而不是本控制器的：它仍是一个 Tab，可以被选中。
+    if (NSNotFound == indexOfSelectedViewController && ![self.viewControllers containsObject:selectedViewController]) { return; }
     [super setSelectedViewController:selectedViewController];
     _selectedViewController = selectedViewController;
     // FIX: issue #433
@@ -7733,9 +7846,9 @@ static char CYLFixesOpaqueTabBarSafeAreaInsetsKey;
 
 @end
 
-#pragma mark - UIViewController (CYLTabBarItemTitle)
+#pragma mark - UIViewController (CYLTabBarItemTitleSupport)
 
-@implementation UIViewController (CYLTabBarItemTitle)
+@implementation UIViewController (CYLTabBarItemTitleSupport)
 
 - (nullable NSString *)cyl_tabBarItemTitle {
     UIViewController *tab = self.navigationController.viewControllers.firstObject == self ? self.navigationController : self;

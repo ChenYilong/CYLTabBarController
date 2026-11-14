@@ -1,0 +1,62 @@
+# WeChat Mini Program (CrossPlatform/wechat-miniprogram-cyltabbar, CrossPlatform/lottie-miniprogram).
+# - unit-tests: the Node tests of the component and of cyl-lottie-miniprogram, on every change to them.
+# - ui-tests: the miniprogram-automator UI tests of the example (example/test-ui), started by hand. They need WeChat
+#   DevTools logged in to a WeChat account, which GitHub's own runners cannot do, so they run on a self-hosted macOS
+#   runner labeled "wechat-devtools" (DevTools installed, logged in, "Settings > Security > Service port" on).
+# Run them locally with: cd CrossPlatform/wechat-miniprogram-cyltabbar/example && npm install && npm run setup && npm run test-ui
+name: WeChat Mini Program
+
+on:
+  pull_request:
+    paths:
+      - "CrossPlatform/wechat-miniprogram-cyltabbar/**"
+      - "CrossPlatform/lottie-miniprogram/**"
+      - ".github/workflows/wechat-miniprogram.yml"
+  push:
+    branches: [master, feat/cross-platform-components]
+    paths:
+      - "CrossPlatform/wechat-miniprogram-cyltabbar/**"
+      - "CrossPlatform/lottie-miniprogram/**"
+      - ".github/workflows/wechat-miniprogram.yml"
+  workflow_dispatch:
+    inputs:
+      ui-tests:
+        description: "Also run the UI tests on the self-hosted runner labeled wechat-devtools"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  unit-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: cyl-tabbar-miniprogram
+        working-directory: CrossPlatform/wechat-miniprogram-cyltabbar
+        run: npm test
+      - name: cyl-lottie-miniprogram
+        working-directory: CrossPlatform/lottie-miniprogram
+        run: npm test
+
+  ui-tests:
+    if: github.event_name == 'workflow_dispatch' && inputs.ui-tests
+    needs: unit-tests
+    runs-on: [self-hosted, macOS, wechat-devtools]
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: CrossPlatform/wechat-miniprogram-cyltabbar/example
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install
+        run: npm install --no-package-lock
+      - name: Set up the example (components and shared files)
+        run: npm run setup
+      - name: UI tests (Lottie, PAG, Rive and GIF in turn)
+        run: npm run test-ui-all

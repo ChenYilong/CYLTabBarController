@@ -17,8 +17,14 @@ pod 'CYLTabBarController/CYLFlatDesignTabBar', :path => './'
 
 #only for test
 #pod 'CYLTabBarController/CYLFlatDesignTabBar', :git => 'https://github.com/ChenYilong/CYLTabBarController.git', :branch => 'fix/flatdesign-tabbar-position-during-transition'
-# Third-party code: its warnings are not ours to fix.
-pod 'MJRefresh', :inhibit_warnings => true
+# Placeholders (empty data, no network) and pull to refresh, at the latest commit of CYLTableViewPlaceHolder on any
+# branch (AGENTS.md, "Depending on CYLTableViewPlaceHolder"; find it with scripts/latest-cyl-commit.sh). Replaces MJRefresh.
+pod 'CYLTableViewPlaceHolder', :git => 'https://github.com/ChenYilong/CYLTableViewPlaceHolder.git', :commit => 'b9e6af5c17ccda2c6c279083826c439b2765de1c'
+# Every animation type of CYLTableViewPlaceHolder: each demo list uses another one (CYLDemoPlaceholderAnimation).
+pod 'CYLTableViewPlaceHolder/LottieSwift', :git => 'https://github.com/ChenYilong/CYLTableViewPlaceHolder.git', :commit => 'b9e6af5c17ccda2c6c279083826c439b2765de1c'
+pod 'CYLTableViewPlaceHolder/PAG', :git => 'https://github.com/ChenYilong/CYLTableViewPlaceHolder.git', :commit => 'b9e6af5c17ccda2c6c279083826c439b2765de1c'
+pod 'CYLTableViewPlaceHolder/Rive', :git => 'https://github.com/ChenYilong/CYLTableViewPlaceHolder.git', :commit => 'b9e6af5c17ccda2c6c279083826c439b2765de1c'
+pod 'CYLTableViewPlaceHolder/GIF', :git => 'https://github.com/ChenYilong/CYLTableViewPlaceHolder.git', :commit => 'b9e6af5c17ccda2c6c279083826c439b2765de1c'
 
 end
 

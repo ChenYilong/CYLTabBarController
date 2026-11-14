@@ -93,6 +93,15 @@ NSArray<NSDictionary *> *CYLTabBarItemsAttributesAddingPAGFiles(NSArray<NSDictio
     [pagView flush];
 }
 
+- (BOOL)loops {
+    return [self.pagView repeatCount] == 0;
+}
+
+/// [EN] PAG repeats forever with a repeat count of 0; 1 plays once. [CN] PAG 的重复次数为 0 时无限循环；1 表示播放一次。
+- (void)setLoops:(BOOL)loops {
+    [self.pagView setRepeatCount:loops ? 0 : 1];
+}
+
 @end
 
 @implementation CYLPAGTabBarItemAnimator

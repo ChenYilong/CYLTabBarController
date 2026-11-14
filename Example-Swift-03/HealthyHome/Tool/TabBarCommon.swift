@@ -19,8 +19,10 @@ class TabBarCommon: NSObject {
         CYLPlusButtonSubclass.register()
         // Rebuilt after a language change too, so every text shows in the new language.
         UIApplication.shared.delegate?.window??.cyl_setRootViewControllerProvider {
-            let tabBarController = RootTabBarController(viewControllers: viewControllers(), tabBarItemsAttributes: tabBarItemsAttributesForController())
+            let tabBarController = makeRootTabBarController()
+            #if !CYL_DEMO_PAG
             tabBarController.tabBarStyleType = .liquidGlass
+            #endif
             tabBarController.selectedIndex = selectIndex
             return tabBarController
         }
@@ -46,8 +48,25 @@ class TabBarCommon: NSObject {
         CYLPlusButtonSubclass.register()
         // Rebuilt after a language change, so every text shows in the new language.
         UIApplication.shared.delegate?.window??.cyl_setRootViewControllerProvider {
-            RootTabBarController(viewControllers: viewControllers(), tabBarItemsAttributes: tabBarItemsAttributesForController())
+            makeRootTabBarController()
         }
+        #if CYL_DEMO_PAG
+        // [EN] The navigation bar button of the settings list rebuilds the tab bar in the other style.
+        // [CN] 设置列表的导航栏按钮以另一种样式重建 TabBar。
+        CYLDemoTabBarStyle.rebuildRootViewController = {
+            setUpRootTabBarController()
+        }
+        #endif
+    }
+
+    /// [EN] Example-PAG (`CYL_DEMO_PAG`) builds the style chosen in its settings list (`CYLDemoTabBarStyle`).
+    /// [CN] Example-PAG（`CYL_DEMO_PAG`）使用其设置列表中选择的样式（`CYLDemoTabBarStyle`）。
+    private class func makeRootTabBarController() -> RootTabBarController {
+        #if CYL_DEMO_PAG
+        return RootTabBarController(viewControllers: viewControllers(), tabBarItemsAttributes: tabBarItemsAttributesForController(), styleType: CYLDemoTabBarStyle.styleType, context: nil)
+        #else
+        return RootTabBarController(viewControllers: viewControllers(), tabBarItemsAttributes: tabBarItemsAttributesForController())
+        #endif
     }
     
     // [CN] MARK:主界面
@@ -67,32 +86,54 @@ class TabBarCommon: NSObject {
     
     class func tabBarItemsAttributesForController() -> [[AnyHashable: Any]] {
             
-        let tabBarItemHome = [CYLTabBarItemTitle: CYLLocalizedString("首页"),
+        let tabBarItemHome = [CYLTabBarItemTitle: cylDemoLocalizedString("首页"),
                               CYLTabBarItemImage: "Home",
                               CYLTabBarItemSelectedImage: "HomeSelected"]
         
         // Dark Mode (#620): "Home" also loads Home_dark (naming convention), this tab names its dark image, "Me" has its
         // own Dark appearance. 深色模式：见 README「适配深色模式」。
-        let tabBarItemHealthy = [CYLTabBarItemTitle: CYLLocalizedString("健康"),
+        let tabBarItemHealthy = [CYLTabBarItemTitle: cylDemoLocalizedString("健康"),
                               CYLTabBarItemImage: "Message",
                               CYLTabBarItemDarkImage: "Message_night",
                               CYLTabBarItemSelectedImage: "MessageSelected"]
 
-        let tabBarItemFriends = [CYLTabBarItemTitle: CYLLocalizedString("朋友圈"),
+        let tabBarItemFriends = [CYLTabBarItemTitle: cylDemoLocalizedString("朋友圈"),
                               CYLTabBarItemImage: "lianxiren",
                               CYLTabBarItemSelectedImage: "lianxirenSelected"]
         
-        let tabBarItemMe = [CYLTabBarItemTitle: CYLLocalizedString("我的"),
+        let tabBarItemMe = [CYLTabBarItemTitle: cylDemoLocalizedString("我的"),
                               CYLTabBarItemImage: "Me",
                               CYLTabBarItemSelectedImage: "MeSelected"]
 
         let tabBarItemsAttributes = [tabBarItemHome, tabBarItemHealthy, tabBarItemFriends, tabBarItemMe]
+        #if CYL_DEMO_PAG
+        // [EN] #604: PAG animations (Tencent libpag) instead of Lottie, with the `CYLTabBarController/PAG` subspec. Each name is
+        //      "<name>.pag" in the main bundle (Example-Shared/PAGResources/tab-icons, fetched by `pod install`); "<name>_dark.pag" would be its Dark Mode version.
+        //      Without the subspec the PAG keys are ignored and the images show.
+        // [CN] #604：使用 PAG 动画（腾讯 libpag）代替 Lottie，需引入 `CYLTabBarController/PAG` 子库。每个名称对应 main bundle 中的
+        //      「<名称>.pag」（Example-Shared/PAGResources/tab-icons，由 `pod install` 下载）；「<名称>_dark.pag」为其深色模式版本。未引入子库时忽略 PAG key，显示图片。
+        // [EN] #477: each tab takes its own file through `CYLTabBarItemAttributesAddingAnimationFile()` ("<name>.pag": PAG,
+        //      "<name>.json": Lottie, or the file type of any library added later); "" would leave a tab with its images.
+        //      A tab icon's first frame shows until it is selected, so these files start with the icon visible.
+        // [CN] #477：每个 Tab 通过 `CYLTabBarItemAttributesAddingAnimationFile()` 使用自己的文件（「名称.pag」为 PAG，
+        //      「名称.json」为 Lottie，或以后新增动画库的文件类型）；"" 表示该 Tab 保持图片。
+        //      选中之前显示动画的第一帧，因此这些文件的第一帧就能看到图标。
+        let animationFiles = ["tab_home.pag", "tab_health.pag", "tab_moments.pag", "tab_me.pag"]
+        return zip(tabBarItemsAttributes, animationFiles).map { attributes, fileName in
+            var item = CYLTabBarItemAttributesAddingAnimationFile(attributes, fileName, nil)
+            // [EN] The generic size key, for any animation library: `CYLTabBarAnimationSize` (only for the animated tabs).
+            // [CN] 通用的尺寸 key，适用于任意动画库：`CYLTabBarAnimationSize`（仅用于有动画的 Tab）。
+            if item[CYLTabBarAnimationFilePath] != nil {
+                item[CYLTabBarAnimationSize] = NSValue(cgSize: CGSize(width: 33, height: 33))
+            }
+            return item
+        }
         // #442 (Lottie 4.x): one Lottie file per tab follows Dark Mode, its colors set with Lottie's value providers.
         // Shown in SwiftManager (SPM, Lottie 4.x); this project's Core subspec keeps the images.
         // 每个 Tab 一份 Lottie 文件适配深色模式。SwiftManager（SPM，Lottie 4.x）中显示；本工程只引入 Core 子库，仍显示图片。
         // [EN] Only with Lottie: in a build without it the Lottie keys warn (`CYL_LOTTIE_REQUIRED`) and would be ignored.
         // [CN] 仅在引入 Lottie 时：没有 Lottie 的构建中 Lottie key 会给出警告（`CYL_LOTTIE_REQUIRED`），且不起作用。
-        #if canImport(Lottie)
+        #elseif canImport(Lottie)
         let lottieAttributes = CYLTabBarItemsAttributesAddingLottieFiles(tabBarItemsAttributes, ["green_lottie_tab_home", "green_lottie_tab_discover", "green_lottie_tab_news", "green_lottie_tab_mine"], nil)
         let darkColors = ["Icon_Shop", "Icon_Discovery", "Icon_Knowledge", "Icon_Mine"].map { layer -> [String: UIColor] in
             // Gray outline of the unselected icon → light gray, pale fill of the selected one → dark green.

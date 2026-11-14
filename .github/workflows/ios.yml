@@ -1,3 +1,4 @@
+# local-run-environment: macOS 27.3 (26C5035r), Xcode 27.2 (27B52)
 # [EN] iOS CI on GitHub-hosted macOS runners (free for this public repository). See docs/Mac-CI-CD.md.
 #      Runner: `macos-26` (Apple Silicon, stable image, default Xcode 26.x). To use another runner without editing this
 #      file, set the repository variable MACOS_RUNNER (Settings → Secrets and variables → Actions → Variables), e.g.

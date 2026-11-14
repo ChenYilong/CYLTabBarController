@@ -1,0 +1,34 @@
+:host {
+  display: inline-block;
+  width: 100px;
+  height: 100px;
+}
+
+.cyl-rive-box {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.cyl-rive-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* [EN] WeChat DevTools: the canvas only draws, off screen and transparent; its image shows the animation (see cyl-lottie). [CN] 微信开发者工具：画布只在屏幕外透明地绘制，由其图片显示动画（见 cyl-lottie）。 */
+.cyl-rive-canvas-covered {
+  position: absolute;
+  left: -10000px;
+  top: 0;
+  visibility: hidden;
+  opacity: 0;
+}
+
+.cyl-rive-snapshot {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+}

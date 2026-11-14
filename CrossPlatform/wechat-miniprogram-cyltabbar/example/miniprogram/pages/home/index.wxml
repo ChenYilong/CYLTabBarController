@@ -1,0 +1,28 @@
+<!-- [EN] The Objective-C example's home table (CYLHomeViewController): demo sections, the gallery, badge rows. [CN] Objective-C 示例的首页表格（CYLHomeViewController）：演示 section、图库、角标行。 -->
+<view class="cyl-page" bindtouchstart="cyl_onSwipeStart" bindtouchend="cyl_onSwipeEnd">
+  <view class="cyl-header">
+    <text class="cyl-header-title">{{texts['CYLTabBarController for WeChat Mini Program']}}</text>
+    <text class="cyl-header-subtitle">{{texts['The tab bar below is the cyl-tab-bar component, configured with Example-Shared/Configurations/cyl_tabbar_configuration.json and a raised plus button.']}}</text>
+  </view>
+  <block wx:for="{{sections}}" wx:for-item="section" wx:key="id">
+    <text class="cyl-section-title" aria-role="heading">{{section.title}}</text>
+    <view wx:if="{{section.rows}}" class="cyl-section">
+      <view wx:for="{{section.rows}}" wx:for-item="row" wx:key="id" class="cyl-home-row {{row.selected ? 'cyl-row-selected' : ''}}" hover-class="cyl-home-row-pressed" bindtap="cyl_onRow" data-id="{{row.id}}" aria-role="button" aria-label="{{row.title}}, {{row.subtitle}}">
+        <view class="cyl-home-texts" aria-hidden="true">
+          <text class="cyl-home-title">{{row.title}}</text>
+          <text wx:if="{{row.subtitle}}" class="cyl-home-subtitle">{{row.subtitle}}</text>
+        </view>
+        <switch wx:if="{{row.accessory === 'switch'}}" checked="{{row.checked}}" catchchange="cyl_onSwitch" catchtap="cyl_noop" data-id="{{row.id}}" aria-label="{{row.title}}" />
+        <text wx:elif="{{row.accessory === 'chevron'}}" class="cyl-home-chevron" aria-hidden="true">›</text>
+      </view>
+    </view>
+    <view wx:if="{{section.badges}}" class="cyl-section">
+      <view wx:for="{{section.badges}}" wx:for-item="badge" wx:key="key" class="cyl-home-row" aria-label="{{badge.title}}, {{badge.text || '•'}}">
+        <text class="cyl-home-title cyl-home-badge-title" aria-hidden="true">{{badge.title}}</text>
+        <view class="cyl-home-badge-host" aria-hidden="true">
+          <view class="cyl-home-badge cyl-home-badge-{{badge.position}} {{badge.dot ? 'cyl-home-badge-dot' : ''}} {{badge.animation ? 'cyl-home-badge-' + badge.animation : ''}}" style="{{badge.style}}">{{badge.dot ? '' : badge.text}}</view>
+        </view>
+      </view>
+    </view>
+  </block>
+</view>

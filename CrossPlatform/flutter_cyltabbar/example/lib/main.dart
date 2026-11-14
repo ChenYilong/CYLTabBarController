@@ -9,22 +9,30 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:math';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_cyltabbar/flutter_cyltabbar.dart';
 
 import 'demo/cyl_badge_view.dart';
 import 'demo/cyl_demo_list.dart';
+import 'demo/cyl_localization.dart';
+import 'demo/cyl_playback_controls.dart';
 import 'cyl_skins.dart';
 
-void main() => runApp(
-  MaterialApp(
-    debugShowCheckedModeBanner: false,
-    theme: ThemeData(brightness: Brightness.light),
-    darkTheme: ThemeData(brightness: Brightness.dark),
-    themeMode: ThemeMode.system,
-    home: const CYLExampleApp(),
-  ),
-);
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  // The translations, before the first frame. 在第一帧之前加载译文。
+  await CYLLocalization.load();
+  runApp(
+    MaterialApp(
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(brightness: Brightness.light),
+      darkTheme: ThemeData(brightness: Brightness.dark),
+      themeMode: ThemeMode.system,
+      home: const CYLExampleApp(),
+    ),
+  );
+}
 
 /// The Lottie files of MainTabBarController.m, light and dark. MainTabBarController.m 的 Lottie 文件（浅色与深色）。
 Map<String, Object?> _lottie(String name) => {
@@ -78,7 +86,7 @@ CYLTabBarPlusButton _plusButton({
   CYLTabBarImage? image,
   CYLTabBarImage? selectedImage,
 }) => CYLTabBarPlusButton(
-  title: 'Post',
+  title: t('Post'),
   image: image ?? const CYLTabBarImage.asset('assets/post_normal.png'),
   selectedImage:
       selectedImage ?? const CYLTabBarImage.asset('assets/post_highlight.png'),
@@ -109,6 +117,10 @@ const _configuration = {
     'message',
     'CYLMineViewController',
   ],
+  // MainTabBarController: unloadsUnselectedViewsOnMemoryWarning = YES and -shouldUnloadViewOfViewController: keeps the home
+  // tab (issue #426). 卸载未选中的 Tab，并保留首页 Tab。
+  'CYLTabBarControllerUnloadsUnselectedViewsOnMemoryWarning': true,
+  'CYLTabBarControllerKeepsLoadedTabBarItemIdentifiers': ['home'],
   'CYLTabBarControllerThemes': {
     'Default': {
       'CYLTabBarItemTitleColor': '#FF0000',
@@ -120,42 +132,62 @@ const _configuration = {
   },
 };
 
+/// CYLDemoTitleVerticalOffsets: the next offset after `current`; one not in the list goes to the first. 下一个偏移；不在列表中时为第一个。
+const _titleVerticalOffsets = [0.0, -4.0, 4.0];
+double _nextTitleOffset(double current) {
+  final index = _titleVerticalOffsets.indexWhere((offset) => (offset - current).abs() < 0.5);
+  return _titleVerticalOffsets[index < 0 ? 0 : (index + 1) % _titleVerticalOffsets.length];
+}
+
+/// As `%g`: "-3.5", "0", "4". 与 `%g` 相同：「-3.5」「0」「4」。
+String _formatOffset(double offset) => offset == offset.roundToDouble() ? offset.toInt().toString() : offset.toString();
+
+/// A tab with its titles in the current language, as CYLLocalizedTabBarItemsAttributes(). 标题使用当前语言的 Tab。
+CYLTabBarItem _translated(CYLTabBarItem item) => CYLTabBarItem(
+  title: t(item.title!),
+  identifier: item.identifier,
+  image: item.image,
+  selectedImage: item.selectedImage,
+  attributes: {
+    ...item.attributes,
+    if (item.attributes['CYLTabBarItemSelectedTitle'] is String)
+      'CYLTabBarItemSelectedTitle': t(item.attributes['CYLTabBarItemSelectedTitle'] as String),
+  },
+);
+
 /// The tabs in a skin: holiday or network icons instead of the Lottie ones. 皮肤中的 Tab：用节日或网络图标替换 Lottie 图标。
 List<CYLTabBarItem> _skinnedItems(CYLSkin skin) => [
-  for (final (index, item) in _items.indexed)
-    if (skin.icons != null)
-      CYLTabBarItem(
-        title: item.title,
-        identifier: item.identifier,
-        image: CYLTabBarImage.asset(
-          themeIcon(skin.icons![index % skin.icons!.length], faded: true),
-        ),
-        selectedImage: CYLTabBarImage.asset(
-          themeIcon(skin.icons![index % skin.icons!.length]),
-        ),
-        attributes: {
-          'CYLTabBarItemSelectedTitle':
-              item.attributes['CYLTabBarItemSelectedTitle'],
-        },
-      )
-    else if (skin.network != null)
-      CYLTabBarItem(
-        title: '${skin.network!.titlePrefix} ${item.title}',
-        identifier: item.identifier,
-        image: item.image,
-        attributes: {
-          'CYLTabBarItemSelectedTitle':
-              item.attributes['CYLTabBarItemSelectedTitle'],
-          'CYLTabBarItemImageURL':
-              skin.network!.tabs[index % skin.network!.tabs.length][0],
-          'CYLTabBarItemSelectedImageURL':
-              skin.network!.tabs[index % skin.network!.tabs.length][1],
-          'CYLTabBarItemImageURLSize': [24, 24],
-        },
-      )
-    else
-      item,
+  for (final (index, item) in _items.indexed) _skinnedItem(skin, index, _translated(item)),
 ];
+
+CYLTabBarItem _skinnedItem(CYLSkin skin, int index, CYLTabBarItem item) {
+  final selectedTitle = item.attributes['CYLTabBarItemSelectedTitle'];
+  final icons = skin.icons;
+  if (icons != null) {
+    return CYLTabBarItem(
+      title: item.title,
+      identifier: item.identifier,
+      image: CYLTabBarImage.asset(themeIcon(icons[index % icons.length], faded: true)),
+      selectedImage: CYLTabBarImage.asset(themeIcon(icons[index % icons.length])),
+      attributes: {'CYLTabBarItemSelectedTitle': selectedTitle},
+    );
+  }
+  final network = skin.network;
+  if (network != null) {
+    return CYLTabBarItem(
+      title: '${network.titlePrefix} ${item.title}',
+      identifier: item.identifier,
+      image: item.image,
+      attributes: {
+        'CYLTabBarItemSelectedTitle': selectedTitle,
+        'CYLTabBarItemImageURL': network.tabs[index % network.tabs.length][0],
+        'CYLTabBarItemSelectedImageURL': network.tabs[index % network.tabs.length][1],
+        'CYLTabBarItemImageURLSize': [24, 24],
+      },
+    );
+  }
+  return item;
+}
 
 /// The plus button in a skin (`cyl_plusButtonAttributesForTabBarController:`). 皮肤中的 PlusButton。
 CYLTabBarPlusButton _skinnedPlusButton(CYLSkin skin) {
@@ -245,9 +277,14 @@ class _ExampleAppState extends State<CYLExampleApp> {
   // 登录状态（issue #19）属于整个 App，与 `cyl_loggedIn` 相同：替换 TabBar 时保持不变。TabBar 报告库缓存的状态之前为 null，
   // 因此与 Objective-C 示例相同，重启 App 后登录状态保留。
   bool? _loggedIn;
+  // The language belongs to the app (CYLSetLocalizationLanguage()); null follows the device. Not saved, as the
+  // Objective-C example: a new launch follows the device again. 语言属于整个 App；null 跟随设备。与 Objective-C 示例相同不保存：重新启动后再次跟随设备。
+  String? _language;
 
   @override
   Widget build(BuildContext context) {
+    CYLLocalization.language = _language;
+    final shownLanguage = CYLLocalization.language;
     final dark = MediaQuery.platformBrightnessOf(context) == Brightness.dark;
     // CYLDemoSetFollowsSystem: Dark in dark mode; in light mode back to Default from Dark, otherwise the skin chosen.
     // 跟随系统：深色时为 Dark；浅色时从 Dark 回到 Default，否则为所选皮肤。
@@ -258,6 +295,17 @@ class _ExampleAppState extends State<CYLExampleApp> {
       (candidate) => candidate.name == name,
       orElse: () => skins.first,
     );
+    // -[UIWindow cyl_setRootViewControllerProvider:]: a new language builds everything again (a new key), so every text is
+    // created in it; a right-to-left language (Arabic) flips the layout. 新的语言会重新创建全部内容（新的 key），所有文字都用新语言创建；
+    // 从右到左的语言（阿拉伯语）翻转布局。
+    return Directionality(
+      key: ValueKey(shownLanguage),
+      textDirection: CYLLocalization.isRightToLeft(shownLanguage) ? TextDirection.rtl : TextDirection.ltr,
+      child: _page(skin),
+    );
+  }
+
+  Widget _page(CYLSkin skin) {
     return CYLExamplePage(
       key: ValueKey(_generation),
       styleType: _styleType,
@@ -276,6 +324,8 @@ class _ExampleAppState extends State<CYLExampleApp> {
           setState(() => _followsSystem = !_followsSystem),
       loggedIn: _loggedIn,
       onLoggedInChange: (loggedIn) => setState(() => _loggedIn = loggedIn),
+      language: _language,
+      onLanguageChange: (language) => setState(() => _language = language),
     );
   }
 }
@@ -387,6 +437,8 @@ class CYLExamplePage extends StatefulWidget {
     required this.onToggleFollowsSystem,
     required this.loggedIn,
     required this.onLoggedInChange,
+    required this.language,
+    required this.onLanguageChange,
   });
 
   final String styleType;
@@ -397,6 +449,8 @@ class CYLExamplePage extends StatefulWidget {
   final VoidCallback onToggleFollowsSystem;
   final bool? loggedIn;
   final ValueChanged<bool> onLoggedInChange;
+  final String? language;
+  final ValueChanged<String?> onLanguageChange;
 
   @override
   State<CYLExamplePage> createState() => _ExamplePageState();
@@ -404,6 +458,23 @@ class CYLExamplePage extends StatefulWidget {
 
 class _ExamplePageState extends State<CYLExamplePage> {
   int _selectedIndex = 0;
+  // -[CYLFlatDesignTableViewController tableView:didSelectRowAtIndexPath:]: setTabBarHidden:!isTabBarHidden animated:YES,
+  // in every style. 在所有样式下切换 TabBar 的显示与隐藏。
+  bool _tabBarHidden = false;
+  // -[UIViewController cyl_simulateMemoryWarningAndShowResult]: each tap asks the tab bar for one simulated memory warning.
+  // 每次点击请求 TabBar 模拟一次内存警告。
+  int _memoryWarningRequest = 0;
+  // The playback controls of the tab icon animations (Play all, speed, loop): one policy, applied live. The Objective-C
+  // example's first tab imitates its home table, so they are on the other tabs. 播放控件：一个实时生效的策略，在其他 Tab 上
+  // （Objective-C 示例的第一个 Tab 模仿其首页表格）。
+  int _playAllRequest = 0;
+  double _animationSpeed = 1;
+  bool _animationLoops = false;
+  // CYLSwitchTitlePositionAdjustment(): the title row cycles the vertical offset of every title through 0, -4 and 4 at
+  // runtime (`setTitlePositionAdjustment:`); null is the configuration's -3.5. 标题行在运行时依次切换所有标题的垂直偏移：
+  // 0、-4、4；null 为配置中的 -3.5。
+  double? _titleOffset;
+  double get _shownTitleOffset => _titleOffset ?? (_configuration['CYLTabBarControllerTitlePositionAdjustment'] as List)[1] as double;
   bool _plusPageSelected = false;
   List<CYLTabBarBadge?> _badges = const [];
   bool _decorated = false;
@@ -418,8 +489,67 @@ class _ExamplePageState extends State<CYLExamplePage> {
   /// badge row changes only the navigation title ("Home (n)").
   /// 液态玻璃下第一个页面的标题加上「 (Liquid)」。角标样例副标题使用它；点击角标行只修改导航标题（「Home (n)」）。
   String get _pageTitle => _selectedIndex == 0
-      ? 'Home${widget.styleType == 'liquidGlass' ? ' (Liquid)' : ''}'
-      : _items[_selectedIndex].title!;
+      ? '${t('Home')}${widget.styleType == 'liquidGlass' ? ' (Liquid)' : ''}'
+      : t(_items[_selectedIndex].title!);
+
+  /// -[UIViewController cyl_presentLanguagePicker]: the five languages, "Follow system" and "Cancel" (an action sheet on
+  /// iOS, a dialog on Android). 五种语言、「跟随系统」与「取消」（iOS 为操作表，Android 为对话框）。
+  void _showLanguagePicker() {
+    final cupertino = Theme.of(context).platform == TargetPlatform.iOS;
+    final choices = <(String, String, String?)>[
+      for (final language in cylPickerLanguages)
+        (CYLLocalization.flaggedName(language), CYLLocalization.name(language), language),
+      (t('Follow system'), t('Follow system'), null),
+    ];
+    void choose(BuildContext sheetContext, String? language) {
+      Navigator.of(sheetContext).pop();
+      widget.onLanguageChange(language);
+    }
+    if (cupertino) {
+      showCupertinoModalPopup<void>(
+        context: context,
+        builder: (sheetContext) => CupertinoActionSheet(
+          title: Text(t('Language')),
+          message: Text(CYLLocalization.device('Tap to change the language')),
+          actions: [
+            for (final (title, label, language) in choices)
+              Semantics(
+                label: label,
+                excludeSemantics: true,
+                button: true,
+                child: CupertinoActionSheetAction(onPressed: () => choose(sheetContext, language), child: Text(title)),
+              ),
+          ],
+          cancelButton: CupertinoActionSheetAction(
+            isDefaultAction: true,
+            onPressed: () => Navigator.of(sheetContext).pop(),
+            child: Text(t('Cancel')),
+          ),
+        ),
+      );
+      return;
+    }
+    showDialog<void>(
+      context: context,
+      builder: (dialogContext) => SimpleDialog(
+        title: Text(t('Language')),
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(24, 0, 24, 8),
+            child: Text(CYLLocalization.device('Tap to change the language')),
+          ),
+          for (final (title, label, language) in choices)
+            Semantics(
+              label: label,
+              excludeSemantics: true,
+              button: true,
+              child: SimpleDialogOption(onPressed: () => choose(dialogContext, language), child: Text(title)),
+            ),
+          SimpleDialogOption(onPressed: () => Navigator.of(dialogContext).pop(), child: Text(t('Cancel'))),
+        ],
+      ),
+    );
+  }
 
   /// The system version shown in the badge samples' subtitle. 角标样例副标题中的系统版本。
   String get _systemVersion {
@@ -524,11 +654,11 @@ class _ExamplePageState extends State<CYLExamplePage> {
                 shrinkWrap: true,
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 children: [
-                  const Padding(
-                    padding: EdgeInsets.fromLTRB(20, 0, 20, 8),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
                     child: Text(
-                      'Choose a theme',
-                      style: TextStyle(fontSize: 15, color: Color(0xFF8E8E93)),
+                      t('Choose a theme'),
+                      style: const TextStyle(fontSize: 15, color: Color(0xFF8E8E93)),
                     ),
                   ),
                   for (final skin in skins)
@@ -552,7 +682,7 @@ class _ExamplePageState extends State<CYLExamplePage> {
                                     )
                                   : null,
                             ),
-                      skin.name,
+                      t(skin.name),
                       !widget.followsSystem && skin.name == widget.skin.name,
                       () => widget.onChooseSkin(skin.name),
                     ),
@@ -563,7 +693,7 @@ class _ExamplePageState extends State<CYLExamplePage> {
                         style: TextStyle(fontSize: 20, color: label),
                       ),
                     ),
-                    'Follow the system Dark Mode',
+                    t('Follow the system Dark Mode'),
                     widget.followsSystem,
                     widget.onToggleFollowsSystem,
                   ),
@@ -615,7 +745,7 @@ class _ExamplePageState extends State<CYLExamplePage> {
                 child: Row(
                   children: [
                     _CYLNavigationButton(
-                      title: 'Flat Design',
+                      title: t('Flat Design'),
                       dark: dark,
                       onPressed: () => widget.onRebuild('flatDesign'),
                       badge: _CYLNavigationBadge(
@@ -625,13 +755,13 @@ class _ExamplePageState extends State<CYLExamplePage> {
                     ),
                     const Spacer(),
                     _CYLNavigationButton(
-                      title: 'Skin',
+                      title: t('Skin'),
                       dark: dark,
                       onPressed: () => _showSkinMenu(dark),
                     ),
                     const SizedBox(width: 12),
                     _CYLNavigationButton(
-                      title: 'Liquid Glass',
+                      title: t('Liquid Glass'),
                       dark: dark,
                       onPressed: () => widget.onRebuild('liquidGlass'),
                       badge: _CYLNavigationBadge(
@@ -644,6 +774,20 @@ class _ExamplePageState extends State<CYLExamplePage> {
               ),
             // Every tab shows the demo list (item 51); the plus button's page shows its title.
             // 每个 Tab 都显示演示列表（第 51 项）；PlusButton 的页面显示其标题。
+            if (!_plusPageSelected && _selectedIndex != 0)
+              CYLPlaybackControls(
+                colors: CYLDemoColors(dark),
+                tint: skin.tint != null
+                    ? hexColor(skin.tint!)
+                    : (dark ? const Color(0xFF0A84FF) : const Color(0xFF007AFF)),
+                speed: _animationSpeed,
+                loops: _animationLoops,
+                onPlayAll: () => setState(() => _playAllRequest++),
+                onSpeedChanged: (value) => setState(
+                  () => _animationSpeed = (value / 0.05).round() * 0.05,
+                ),
+                onLoopsChanged: (value) => setState(() => _animationLoops = value),
+              ),
             Expanded(
               child: _plusPageSelected
                   ? Center(
@@ -664,20 +808,20 @@ class _ExamplePageState extends State<CYLExamplePage> {
                                 ? const Color(0xFF0A84FF)
                                 : const Color(0xFF007AFF)),
                       values: {
-                        'titleOffset': '(0, -3.5)',
-                        'appearance': 'Original',
-                        'skin': skin.name,
+                        'titleOffset': '(0, ${_formatOffset(_shownTitleOffset)})',
+                        'appearance': t('Original'),
+                        'skin': t(skin.name),
                         'scrollBehavior': 'Automatic',
                         'indexWithoutPlus': '$_selectedIndex',
                         'selectedIndex':
                             '${_selectedIndex < 2 ? _selectedIndex : _selectedIndex + 1}',
-                        'selectedTitle': _selectedIndex == 0
-                            ? 'Refresh'
-                            : _items[_selectedIndex].title!,
-                        'login': widget.loggedIn == true ? 'logged in' : 'logged out',
-                        'touchScale': '1.0x',
-                        'tapAnimation': 'None',
-                        'tapSound': 'None',
+                        'selectedTitle': t(_selectedIndex == 0 ? 'Refresh' : _items[_selectedIndex].title!),
+                        'loginTabs': [t('Messages'), t('Me')].join(', '),
+                        'bundleImage':
+                            'Found CYLImagePathInBundle ✓ (cyl_badge_sample_icon@3x.png) · CYLBundleImagePath ✓ · CYLBundleImageData 11 KB · CYLBundleImageFromData ✓ (@3x) · CYLImageNamed ✓',
+                        'touchScale': '1.0',
+                        'tapAnimation': t('None'),
+                        'tapSound': t('None'),
                         'longPress': '0.5',
                         'doubleTap': '0.35',
                         'adjacent': '-',
@@ -685,13 +829,24 @@ class _ExamplePageState extends State<CYLExamplePage> {
                       },
                       switches: {'login': widget.loggedIn == true},
                       currentSkin: widget.followsSystem ? '' : skin.name,
-                      badgeSubtitle:
-                          '$_pageTitle CYLTabBarController on ${Theme.of(context).platform == TargetPlatform.iOS ? 'iOS' : 'Android'} $_systemVersion',
+                      badgeSubtitle: Theme.of(context).platform == TargetPlatform.iOS
+                          ? t('{page} CYLTabBarController on iOS {version}', {'page': _pageTitle, 'version': _systemVersion})
+                          : '$_pageTitle CYLTabBarController on Android $_systemVersion',
                       onRow: (row, index) {
                         if (row.skin != null) {
                           return widget.onChooseSkin(row.skin!.name);
                         }
                         if (row.id == 'skin') return _showSkinMenu(dark);
+                        if (row.id == 'language') return _showLanguagePicker();
+                        if (row.id == 'titleOffset') {
+                          return setState(() => _titleOffset = _nextTitleOffset(_shownTitleOffset));
+                        }
+                        if (row.id == 'memoryWarning') {
+                          return setState(() => _memoryWarningRequest++);
+                        }
+                        if (row.id == 'flatShowHide') {
+                          return setState(() => _tabBarHidden = !_tabBarHidden);
+                        }
                         if (row.badge != null) {
                           // -[CYLHomeViewController tableView:didSelectRowAtIndexPath:]: a full screen orange page without a
                           // navigation bar, tap to go back (the "Home (n)" navigation title is not shown: the home page's
@@ -742,17 +897,37 @@ class _ExamplePageState extends State<CYLExamplePage> {
             : const [],
         loggedIn: widget.loggedIn,
         onLoginStateChange: widget.onLoggedInChange,
+        language: widget.language,
+        tabBarHidden: _tabBarHidden,
+        memoryWarningRequest: _memoryWarningRequest,
+        playbackSpeed: _animationSpeed,
+        playbackLoops: _animationLoops,
+        playAllRequest: _playAllRequest,
+        titlePositionAdjustment: _titleOffset == null ? null : Offset(0, _titleOffset!),
+        onMemoryWarning: (report) => showDialog<void>(
+          context: context,
+          builder: (dialogContext) => AlertDialog.adaptive(
+            title: Text(t('Memory warning')),
+            content: Text(report),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(dialogContext).pop(),
+                child: Text(t('OK')),
+              ),
+            ],
+          ),
+        ),
         // -[MainTabBarController cyl_demo_presentLoginForViewController:completion:]: "Messages" and "Me" need login; the
         // alert logs in, then selects the tapped tab. 「Messages」「Me」需要登录；弹窗登录后选中所点击的 Tab。
         onLoginRequest: (index, identifier, title) => showDialog<void>(
           context: context,
           builder: (dialogContext) => AlertDialog.adaptive(
-            title: const Text('Login required'),
-            content: Text('Log in to view “$title”'),
+            title: Text(t('Login required')),
+            content: Text(t('Log in to view “{title}”', {'title': title})),
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(dialogContext).pop(),
-                child: const Text('Cancel'),
+                child: Text(t('Cancel')),
               ),
               TextButton(
                 onPressed: () {
@@ -760,7 +935,7 @@ class _ExamplePageState extends State<CYLExamplePage> {
                   widget.onLoggedInChange(true);
                   setState(() => _select(index));
                 },
-                child: const Text('Log in'),
+                child: Text(t('Log in')),
               ),
             ],
           ),

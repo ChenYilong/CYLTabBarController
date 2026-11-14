@@ -10,6 +10,10 @@ on:
       - "CYLTabBarController/**/*.h"
       - "scripts/update-docs-navigation.py"
       - "scripts/sync-agent-skills.py"
+      - "scripts/sync-example-shared.py"
+      - "scripts/android-library-strings.py"
+      - "CYLTabBarController/Resources/**"
+      - "CrossPlatform/**"
       - ".agents/**"
       - ".claude/**"
       - "Example*/**"
@@ -21,6 +25,10 @@ on:
       - "CYLTabBarController/**/*.h"
       - "scripts/update-docs-navigation.py"
       - "scripts/sync-agent-skills.py"
+      - "scripts/sync-example-shared.py"
+      - "scripts/android-library-strings.py"
+      - "CYLTabBarController/Resources/**"
+      - "CrossPlatform/**"
       - ".agents/**"
       - ".claude/**"
       - "Example*/**"
@@ -37,3 +45,8 @@ jobs:
         run: python3 scripts/update-docs-navigation.py --check
       - name: Check the agent skills
         run: python3 scripts/sync-agent-skills.py --check
+      # [EN] Copies generated from the library's string tables and Example-Shared. [CN] 由库的字符串表与 Example-Shared 生成的副本。
+      - name: Check the examples' shared data and translations
+        run: python3 scripts/sync-example-shared.py --check
+      - name: Check the Android library strings
+        run: python3 scripts/android-library-strings.py --check

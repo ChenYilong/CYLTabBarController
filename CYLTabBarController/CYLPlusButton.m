@@ -1264,6 +1264,8 @@ static NSDictionary<NSNumber *, NSNumber *> *CYLPlusButtonDerivedImageStates(voi
     if ([self cyl_standInFollowsPlusButton]) {
         [self cyl_placeSelectedContentView];
     }
+    // [EN] Every tab bar layout pass, also after the selection moved. [CN] TabBar 每次布局都执行，包括选中项改变之后。
+    [self cyl_updateLiquidGlassMask];
 }
 
 /// [EN] Puts the stand-in in place (`CYLPlusButtonCenterOfStandIn()`). [CN] 放置替身（`CYLPlusButtonCenterOfStandIn()`）。
@@ -1280,12 +1282,179 @@ static NSDictionary<NSNumber *, NSNumber *> *CYLPlusButtonDerivedImageStates(voi
     [self cyl_updateLiquidGlassMask];
 }
 
-//TODO:  update to layoutSubviewsOfSelectedContentView name
+/*!
+ * [EN] Liquid Glass, the plus button selected with its stand-in in the lens: the real button lies under the platter,
+ *      and the lens blurs whatever is under it, so its title and the lower part of its icon showed as a blurred copy
+ *      under the stand-in's crisp ones. While the stand-in shows, the real button is masked out under the lens: the whole
+ *      lens area when all its content is inside it, else the title's strip only (the part above the platter stays); the
+ *      mask goes when another tab is selected.
+ * [CN] 液态玻璃下 PlusButton 选中、替身显示在放大镜中时：真实按钮位于玻璃底板之下，放大镜会模糊其下方的内容，因此它的标题和图标下半部分
+ *      在替身清晰的标题与图标下形成一层模糊重影。替身显示期间，真实按钮在放大镜下被遮住：内容全部在放大镜内时遮住整个放大镜区域，否则只遮住
+ *      标题所在的横条（底板以上的部分保留）；选中其他 Tab 后移除遮罩。
+ *
+ * TODO (2026-11-12, docs/Liquid-Glass-Robustness.md "Task log"): OFF (`CYL_PLUS_BUTTON_LENS_MASK_ENABLED` 0). The code below
+ *      has the scope the maintainer narrowed: the title only, never the icon, and only with `+alignsTitleWithTabBarItemTitles`. History:
+ * [EN] A mask here once cut the plus button in two (iOS 26+, Liquid Glass, not FlatDesign, a plus child view controller:
+ *      select the plus button, drag the lens to another item); the maintainer had removed an earlier implementation
+ *      for that reason. The mask is now off while UIKit's Liquid Glass gesture presses or drags
+ *      (`-cyl_setLiquidGlassLensMaskSuspended:`) and checked again once the lens settles. Verified with the UI tests
+ *      `testDraggingTheLensAwayFromTheSelectedPlusButton` (raised plus, Example-SwiftUI) and
+ *      `testDraggingTheLensAwayFromAFlatSelectedPlusButton` (flat plus, ObjC gallery 9.4), recorded on video: the
+ *      plus button stays whole during and after the drag; without the suspension the flat plus button disappears
+ *      while the lens is held elsewhere. On any plus button bug, test with it off first (AGENTS.md).
+ * [CN] 这里的遮罩曾把 PlusButton 切成两半（iOS 26+、液态玻璃、非扁平样式、有 PlusButton 子控制器：选中 PlusButton 后把放大镜拖到其他
+ *      item）；维护者曾因此删除之前的实现。现在系统液态玻璃手势按压或拖动期间关闭遮罩（`-cyl_setLiquidGlassLensMaskSuspended:`），
+ *      放大镜停稳后再判断。已用 UI 测试 `testDraggingTheLensAwayFromTheSelectedPlusButton`（凸起的 PlusButton，Example-SwiftUI）与
+ *      `testDraggingTheLensAwayFromAFlatSelectedPlusButton`（平的 PlusButton，ObjC 图库 9.4）录屏验证：拖动期间与之后 PlusButton
+ *      都保持完整；没有该暂停时，放大镜停在别处期间平的 PlusButton 会消失。PlusButton 出现任何 bug 时，先关闭它再测试（AGENTS.md）。
+ */
+#ifndef CYL_PLUS_BUTTON_LENS_MASK_ENABLED
+/*!
+ * [EN] 0 (default; OFF again since 2026-11-12, maintainer's decision after a title color report): `-cyl_updateLiquidGlassMask`
+ *      returns on its first line. 1 turns on the title-only implementation below; on any plus button bug, set 0 first and test
+ *      again (AGENTS.md).
+ * [CN] 0（默认；2026-11-12 因标题颜色问题由维护者决定再次关闭）：`-cyl_updateLiquidGlassMask` 第一行直接返回。1 开启下面只作用于
+ *      标题的实现；PlusButton 出现任何 bug 时，先设为 0 再测试（AGENTS.md）。
+ */
+#define CYL_PLUS_BUTTON_LENS_MASK_ENABLED 0
+#endif
+
+/*!
+ * [EN] TODO (2026-11-13, to verify): a second change of what the lens shows over a selected plus button, as risky as this
+ *      mask: PR #793 keeps the lens on the plus page when the plus button's title is drawn by its tab item
+ *      (`CYL_PLUS_BUTTON_TITLE_KEEPS_LENS_ENABLED`, `-[CYLTabBarController cyl_plusButtonTitleIsDrawnByItsTabItem]`). On any plus
+ *      button bug after selection, turn both off first and test again.
+ * [CN] TODO（2026-11-13，待验证）：第二处改变选中 PlusButton 时放大镜显示内容的修改，与本遮罩一样危险：PR #793 在 PlusButton 标题由其
+ *      TabBarItem 绘制时，PlusButton 页面保留放大镜（`CYL_PLUS_BUTTON_TITLE_KEEPS_LENS_ENABLED`）。选中后出现任何 PlusButton bug 时，
+ *      先把两者都关闭再测试。
+ */
+
+/*!
+ * [EN] The fix for the cut: while UIKit's Liquid Glass gesture is pressing or dragging (`began` / `changed`, forwarded by
+ *      `CYLTabBar`), the lens can leave the plus slot while the plus page is still selected, and a masked part of the real
+ *      button would then be drawn by nobody. The mask is off for the whole gesture, and checked again 0.45 s after it
+ *      ends, when the lens has settled (on the plus slot: masked again; elsewhere: the plus page is no longer selected).
+ * [CN] 针对切割问题的修复：系统液态玻璃手势按压或拖动期间（`began` / `changed`，由 `CYLTabBar` 转发），放大镜可能在 PlusButton
+ *      页面仍选中时离开 PlusButton 的位置，此时真实按钮被遮住的部分没有任何视图绘制。整个手势期间关闭遮罩，手势结束 0.45 秒、
+ *      放大镜停稳后再判断（停在 PlusButton 上：重新遮住；停在其他位置：PlusButton 页面已不再选中）。
+ */
+- (void)cyl_setLiquidGlassLensMaskSuspended:(BOOL)suspended {
+    BOOL wasSuspended = [objc_getAssociatedObject(self, _cmd) boolValue];
+    if (wasSuspended == suspended) {
+        return;
+    }
+    objc_setAssociatedObject(self, _cmd, suspended ? @YES : nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    [self cyl_updateLiquidGlassMask];
+    if (suspended) {
+        return;
+    }
+    __weak __typeof(self) weakSelf = self;
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.45 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [weakSelf cyl_updateLiquidGlassMask];
+    });
+}
+
+/*!
+ * [EN] Whether the Liquid Glass lens, as drawn now (its presentation layer), is centered on `tabButton` (within 2 pt).
+ *      YES when no lens view is found (nothing moves then).
+ * [CN] 当前显示的液态玻璃放大镜（presentation layer）是否居中于 `tabButton`（误差 2pt 以内）。找不到放大镜视图时返回 YES。
+ */
+- (BOOL)cyl_lensIsOnTabButton:(UIView *)tabButton {
+    UIView *platter = tabButton.superview.superview;
+    UIView *lens = nil;
+    for (UIView *subview in platter.subviews) {
+        if ([NSStringFromClass([subview class]) containsString:@"LiquidLens"]) {
+            lens = subview;
+            break;
+        }
+    }
+    if (!lens) {
+        return YES;
+    }
+    CALayer *drawn = lens.layer.presentationLayer ?: lens.layer;
+    CGRect lensFrame = [platter.layer convertRect:drawn.frame fromLayer:drawn.superlayer ?: platter.layer];
+    CGRect slotFrame = [tabButton convertRect:tabButton.bounds toView:platter];
+    return fabs(CGRectGetMidX(lensFrame) - CGRectGetMidX(slotFrame)) < 2;
+}
+
 - (void)cyl_updateLiquidGlassMask {
-    // showing selected plusbutton. you can update plusbutton focus, spotlight , in selected plusbutton
-    //didShowSelectChildVIewControllerPlusbuttonDidAppear
-    //layoutSubviewsOfSelectedContentView
+#if !CYL_PLUS_BUTTON_LENS_MASK_ENABLED
     return;
+#else
+    BOOL suspended = [objc_getAssociatedObject(self, @selector(cyl_setLiquidGlassLensMaskSuspended:)) boolValue];
+    if (suspended) {
+        if ([self.layer.mask.name isEqualToString:@"CYLPlusButtonLensMask"]) {
+            self.layer.mask = nil;
+        }
+        return;
+    }
+    UIButton *standIn = _selectedContentView;
+    UIControl *standInTabButton = standIn.cyl_insertedForTabControl ?: (UIControl *)standIn.superview;
+    // [EN] The plus button's own `selected` flag stays NO while its page is selected: ask the tab bar controller.
+    // [CN] PlusButton 的页面被选中时，按钮自身的 `selected` 仍为 NO：以 TabBarController 的选中为准。
+    UIViewController *plusPage = [CYLPlusButton plusChildViewControllerForOwner:self];
+    UIViewController *selectedPage = [self cyl_owningTabBarController].selectedViewController;
+    BOOL plusPageSelected = plusPage && (selectedPage == plusPage || selectedPage == plusPage.navigationController);
+    BOOL masks = plusPageSelected && standIn && standIn != self && standIn.window && standIn.window == self.window &&
+                 !standIn.hidden && standInTabButton && ![self cyl_isInPlatterSelectedLayer] &&
+                 CYLPlusButtonIsInLiquidGlassTabBar(self);
+    // [EN] FIX: first display / selection in code — UIKit animates the lens from the previous tab to the plus slot, while
+    //      the plus page already counts as selected. Masked before the lens arrived, the plus button was gone during the
+    //      travel and half cut as the lens came in (gallery 9.4). Only mask once the lens, as drawn now (its presentation
+    //      layer), sits on the plus slot; until then check again every 0.1 s.
+    // [CN] FIX：首次显示 / 用代码选中——系统把放大镜从上一个 Tab 动画移到 PlusButton 的位置，而 PlusButton 的页面已经算作选中。
+    //      放大镜到达之前就遮住，PlusButton 在移动过程中消失、放大镜进入时被切掉一半（图库 9.4）。只有当前显示的放大镜
+    //      （presentation layer）停在 PlusButton 的位置上时才遮住；在此之前每 0.1 秒重新判断。
+    if (masks && ![self cyl_lensIsOnTabButton:standInTabButton]) {
+        masks = NO;
+        __weak __typeof(self) weakSelf = self;
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            [weakSelf cyl_updateLiquidGlassMask];
+        });
+    }
+    // [EN] A mask the app set itself is kept. [CN] 保留 App 自己设置的遮罩。
+    BOOL ownsMask = !self.layer.mask || [self.layer.mask.name isEqualToString:@"CYLPlusButtonLensMask"];
+    CGRect hidden = CGRectNull;
+    if (masks && ownsMask) {
+        // [EN] Calls from the tab bar's layout can come before the button laid its content out.
+        // [CN] 来自 TabBar 布局的调用可能早于按钮对内容的布局。
+        [self layoutIfNeeded];
+        // [EN] The title only, never the icon (the maintainer's narrowed scope, 2026-11-12): the title's own frame, 2 pt wider
+        //      on each side, and only when the app aligns the plus button's title with the tab titles
+        //      (`+alignsTitleWithTabBarItemTitles`). The icon is never masked, so the lens can never cut it.
+        // [CN] 只遮住标题，从不遮住图标（维护者 2026-11-12 缩小的范围）：标题自身的区域，每边各宽 2pt；并且只在 App 让 PlusButton
+        //      标题与 Tab 标题对齐时（`+alignsTitleWithTabBarItemTitles`）生效。图标从不被遮住，放大镜也就无法切割它。
+        UILabel *titleLabel = self.titleLabel;
+        BOOL hasTitle = titleLabel.text.length > 0 && !titleLabel.hidden && titleLabel.alpha > 0;
+        if (hasTitle && [self cyl_alignsTitleWithTabBarItemTitles]) {
+            CGRect title = [titleLabel convertRect:titleLabel.bounds toView:self];
+            if (!CGRectIsEmpty(title)) {
+                hidden = CGRectInset(title, -2, -2);
+            }
+        }
+    }
+    if (CGRectIsNull(hidden)) {
+        if (ownsMask && self.layer.mask) {
+            self.layer.mask = nil;
+        }
+        return;
+    }
+    CGRect visible = CGRectInset(self.bounds, -CGRectGetWidth(self.bounds), -CGRectGetHeight(self.bounds));
+    UIBezierPath *path = [UIBezierPath bezierPathWithRect:visible];
+    [path appendPath:[UIBezierPath bezierPathWithRect:hidden]];
+    CAShapeLayer *mask = (CAShapeLayer *)self.layer.mask;
+    if (!mask) {
+        mask = [CAShapeLayer layer];
+        mask.name = @"CYLPlusButtonLensMask";
+        mask.fillRule = kCAFillRuleEvenOdd;
+        self.layer.mask = mask;
+    }
+    [CATransaction begin];
+    [CATransaction setDisableActions:YES];
+    mask.frame = self.bounds;
+    mask.path = path.CGPath;
+    [CATransaction commit];
+#endif
 }
 
 - (void)setSelected:(BOOL)selected {
@@ -1572,18 +1741,18 @@ static NSDictionary<NSNumber *, NSNumber *> *CYLPlusButtonDerivedImageStates(voi
 /// The image-above-title layout of `+cyl_plusButtonWithImage:…`; other plus buttons keep UIButton's layout.
 - (void)layoutSubviews {
     [super layoutSubviews];
-    [self cyl_updateLiquidGlassMask];
     // [EN] Issue #91: keep the touchable area overlay on the button.
     // [CN] 保持可点击区域覆盖层与按钮一致。
     if (_showsTouchableArea) {
         [self cyl_updateTouchableAreaView];
     }
-    if (![objc_getAssociatedObject(self, @selector(cyl_plusButtonWithImage:title:selectedTitle:selectedTitleColor:)) boolValue]) {
-        return;
+    if ([objc_getAssociatedObject(self, @selector(cyl_plusButtonWithImage:title:selectedTitle:selectedTitleColor:)) boolValue]) {
+        [self cyl_layOutContentOnce:^{
+            [self cyl_layOutImageAndTitle];
+        }];
     }
-    [self cyl_layOutContentOnce:^{
-        [self cyl_layOutImageAndTitle];
-    }];
+    // [EN] Last: the mask follows the title's final frame. [CN] 最后执行：遮罩跟随标题的最终位置。
+    [self cyl_updateLiquidGlassMask];
 }
 
 - (void)cyl_layOutImageAndTitle {
@@ -2195,7 +2364,7 @@ static void CYLPlusButtonHideStandInFromAccessibility(UIButton *plusButton, UIBu
     selectedContentView.contentMode = UIViewContentModeCenter;
     selectedContentView.imageView.contentMode = UIViewContentModeScaleAspectFit;
     
-    // FIX: issue #653 — placed by frame (see `_CYLTabButtonLayoutTracker`), not by Auto Layout.
+    // FIX: issue #653 — placed by frame (see `CYLTabButtonLayoutTracker`), not by Auto Layout.
     selectedContentView.translatesAutoresizingMaskIntoConstraints = YES;
     selectedContentView.userInteractionEnabled = false;
     [selectedContentView sizeToFit];

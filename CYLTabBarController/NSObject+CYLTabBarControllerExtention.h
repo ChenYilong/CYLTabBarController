@@ -17,86 +17,37 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface NSObject (CYLTabBarControllerExtention)
-
-@property (nonatomic, copy, nullable, getter=cyl_context, setter=cyl_setContext:) NSString *cyl_context;
-
-@property (nonatomic, assign, getter=cyl_isForceLandscape, setter=cyl_setIsForceLandscape:) BOOL cyl_isForceLandscape;
-
 /*!
- * [EN] Forces the interface to rotate to `orientation`, updating the app delegate's forced-landscape flag.
- * [CN] 强制将界面旋转到指定方向，同时更新 AppDelegate 的强制横屏标记。
+ * [EN] The rest of `NSObject (CYLTabBarControllerExtention)` is implemented in Swift (`Swift/NSObject+CYLTabBarControllerExtention.swift`)
+ *      and declared by the generated Swift interface imported at the end of this header. These two methods stay Objective-C:
+ *      they catch an Objective-C exception, which Swift cannot (docs/Swift-Migration.md).
+ * [CN] `NSObject (CYLTabBarControllerExtention)` 的其他部分在 Swift 中实现（`Swift/NSObject+CYLTabBarControllerExtention.swift`），由本头文件末尾
+ *      导入的 Swift 生成接口声明。这两个方法保留为 Objective-C：它们需要捕获 Objective-C 异常，而 Swift 做不到（docs/Swift-Migration.md）。
  */
-- (void)cyl_forceUpdateInterfaceOrientation:(UIInterfaceOrientation)orientation;
+@interface NSObject (CYLTabBarControllerExtentionKVOSafety)
 
 /*!
- * [EN] Returns the shared application delegate.
- * [CN] 返回应用的 AppDelegate 单例。
- */
-- (UIResponder<UIApplicationDelegate> *)cyl_sharedAppDelegate;
-
-/*!
- * [EN] Returns the topmost visible view controller, following presented, navigation and tab bar controllers from the root.
- * [CN] 从根控制器开始，沿 present、导航与 TabBar 控制器查找并返回最顶层可见的控制器。
- */
-+ (UIViewController * __nullable)cyl_topmostViewController;
-
-/*!
- * [EN] Returns the navigation controller of the topmost view controller, so you can push from anywhere (issue #283):
- *      `[[UIViewController cyl_currentNavigationController] pushViewController:vc animated:YES];`
- *      An alert (`UIAlertController`) or a controller being dismissed is skipped. Returns nil when the topmost
- *      view controller is not in a navigation controller (e.g. a tab or a modal that is not wrapped in one).
- * [CN] 返回最顶层控制器所在的导航控制器，可在任意位置 push（issue #283）：
- *      `[[UIViewController cyl_currentNavigationController] pushViewController:vc animated:YES];`
- *      会跳过弹窗（`UIAlertController`）和正在 dismiss 的控制器。最顶层控制器不在导航控制器中时
- *      （例如没有用导航控制器包裹的 Tab 或 modal 页面）返回 nil。
- */
-+ (UINavigationController * __nullable)cyl_currentNavigationController;
-
-/*!
- * [EN] Dismisses all presented view controllers from the root, then calls `completion`.
- * [CN] 从根控制器开始 dismiss 所有被 present 的控制器，完成后调用 completion。
- */
-+ (void)cyl_dismissAll:(void (^ __nullable)(void))completion;
-
-/*!
- * [EN] Returns a readable list of the object's ivars (debugging aid, uses a private API).
- * [CN] 返回对象成员变量列表的可读字符串（调试用，依赖私有 API）。
- */
-- (NSString *)cyl_ivarList;
-
-/*!
- * [EN] Returns YES if the receiver is a private continuous gesture recognizer used by the system tab bar.
- * [CN] 判断当前对象是否为系统 TabBar 使用的私有连续手势识别器。
- */
-- (BOOL)cyl_isContinuousGestureRecognizer;
-
-/*!
- * [EN] Returns YES if the receiver is a UILongPressGestureRecognizer.
- * [CN] 判断当前对象是否为长按手势识别器（UILongPressGestureRecognizer）。
- */
-- (BOOL)cyl_isLongGestureRecognizer;
-
-/*!
- * [EN] Returns YES if `viewControllers` contains the plus child view controller (directly or wrapped in a navigation controller).
- * [CN] 判断 viewControllers 中是否包含 PlusButton 子控制器（直接包含或被导航控制器包裹）。
- */
-- (BOOL)cyl_isPlusViewControllerAdded:(nullable NSArray *)viewControllers;
-
-/*!
- * [EN] `removeObserver:forKeyPath:` that catches exceptions (e.g. when the observer was not registered).
- * [CN] 安全地移除 KVO 观察者，捕获异常（例如观察者未注册时）。
+ * [EN] `-removeObserver:forKeyPath:` that logs (DEBUG) instead of raising when `observer` is not registered.
+ * [CN] 观察者未注册时只打印日志（DEBUG）而不抛出异常的 `-removeObserver:forKeyPath:`。
  */
 - (void)cyl_removeObserver:(NSObject *)observer forKeyPath:(NSString *)keyPath;
 
 /*!
- * [EN] `removeObserver:forKeyPath:context:` that catches exceptions. Prefer it: the `context` makes sure only the
- *      registration made with that context is removed, never one a superclass made for the same key path.
- * [CN] 安全地移除指定 `context` 的 KVO 观察者，捕获异常。优先使用它：`context` 保证只移除用该 context 注册的观察，
- *      不会误删父类对同一 keyPath 的注册。
+ * [EN] `-removeObserver:forKeyPath:context:` that logs (DEBUG) instead of raising when `observer` is not registered.
+ * [CN] 观察者未注册时只打印日志（DEBUG）而不抛出异常的 `-removeObserver:forKeyPath:context:`。
  */
 - (void)cyl_removeObserver:(NSObject *)observer forKeyPath:(NSString *)keyPath context:(nullable void *)context;
 
 @end
 
+/*!
+ * [EN] Runs `block` and returns the Objective-C exception it raises, or nil. For the library's Swift code, which cannot
+ *      catch Objective-C exceptions (e.g. around a page provider written by the app). Internal.
+ * [CN] 执行 `block` 并返回它抛出的 Objective-C 异常，没有则为 nil。供本库的 Swift 代码使用（Swift 无法捕获 Objective-C 异常，例如调用
+ *      App 编写的页面提供者时）。内部使用。
+ */
+FOUNDATION_EXTERN NSException *_Nullable CYLCatchException(NS_NOESCAPE void (^block)(void));
+
 NS_ASSUME_NONNULL_END
+
+#import "CYLSwiftInterface.h"

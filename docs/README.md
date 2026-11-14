@@ -21,11 +21,13 @@
 | [Android 液态玻璃](Android-Liquid-Glass.md) | [Android Liquid Glass](Android-Liquid-Glass.md) |
 | [Android 库与 QMUI_Android、XUI 的 Tab 对比](Android-QMUI-Comparison.md) | [The Android library compared with QMUI_Android's and XUI's tabs](Android-QMUI-Comparison.md) |
 | [中英文双语文档](Bilingual-Documentation.md) | [Bilingual Documentation](Bilingual-Documentation.md) |
+| [CYLTableViewPlaceHolder 集成问题](CYLTableViewPlaceHolder-Integration-Issues.md) | [CYLTableViewPlaceHolder Integration Issues](CYLTableViewPlaceHolder-Integration-Issues.md) |
 | [CYLUtils 通用工具：超出父视图响应点击、点击动画与图片加载](CYLUtils-Helpers.md) | [CYLUtils helpers: responding outside the superview, a tap animation, and image loading](CYLUtils-Helpers.md) |
 | [Carthage 集成演示工程](Carthage-Example.md) | [Carthage integration demo project](Carthage-Example.md) |
 | [使用 Carthage 集成](Carthage.md) | [Integrating with Carthage](Carthage.md) |
 | [一个配置文件生成 TabBarController](Configuration-File.md) | [One configuration file, one TabBarController](Configuration-File.md) |
 | [配置文件的本地化文本](Configuration-Localization.md) | [Localized texts in a configuration file](Configuration-Localization.md) |
+| [TabBar 配置清单](Configuration-Manifest.md) | [Tab bar configuration manifest](Configuration-Manifest.md) |
 | [配置文件相关脚本：导出、边界情况与测试](Configuration-Scripts.md) | [Configuration scripts: export, edge cases and tests](Configuration-Scripts.md) |
 | [React Native 与 Flutter 组件](Cross-Platform-Components.md) | [React Native and Flutter components](Cross-Platform-Components.md) |
 | [自定义 TabBar 功能清单](Custom-Tab-Bar-Features.md) | [Custom Tab Bar Feature Checklist](Custom-Tab-Bar-Features.md) |
@@ -34,6 +36,7 @@
 | [FlatDesign × UITabBarAppearance](FlatDesign-StandardAppearance.md) | [FlatDesign × UITabBarAppearance](FlatDesign-StandardAppearance.md) |
 | [Flutter 接入：flutter_cyltabbar](Flutter-Component.md) | [Flutter integration: flutter_cyltabbar](Flutter-Component.md) |
 | [GIF Tab 图标：循环的图片，或点击播放一次的动画](GIF-Animation.md) | [GIF tab icons: a looping image, or an animation that plays once when tapped](GIF-Animation.md) |
+| [鸿蒙 API 对照表](HarmonyOS-API-Map.md) | [The HarmonyOS API map](HarmonyOS-API-Map.md) |
 | [纯图标 Tab 的自动居中](Image-Only-Tabs.md) | [Automatic centering of image-only tabs](Image-Only-Tabs.md) |
 | [液态玻璃的健壮性改进](Liquid-Glass-Robustness.md) | [Liquid Glass Robustness](Liquid-Glass-Robustness.md) |
 | [需要登录的 Tab](Login-Required-Tabs.md) | [Tabs That Need Login](Login-Required-Tabs.md) |
@@ -51,10 +54,14 @@
 | [PlusButton 的实现：真实按钮、液态玻璃替身与选中态图片](PlusButton.md) | [How the PlusButton works: the real button, its Liquid Glass stand-in and selected images](PlusButton.md) |
 | [在任意位置获取导航控制器并 Push](Push-From-Anywhere.md) | [Get the navigation controller and push from anywhere](Push-From-Anywhere.md) |
 | [React Native 接入：react-native-cyltabbar](React-Native-Component.md) | [React Native integration: react-native-cyltabbar](React-Native-Component.md) |
+| [资源路由](Resource-Routes.md) | [Resource routes](Resource-Routes.md) |
 | [Rive 动画 Tab 图标（与 Lottie、PAG 用法相同）](Rive-Animation.md) | [Rive animated tab icons (used like Lottie and PAG)](Rive-Animation.md) |
 | [selectedIndex 与 PlusButton：选中的文字与图片一致](SelectedIndex-PlusButton.md) | [selectedIndex and the PlusButton: the selected title and image match](SelectedIndex-PlusButton.md) |
+| [Swift 编码规范](Swift-Coding-Style.md) | [Swift coding style](Swift-Coding-Style.md) |
 | [在 Swift 项目中使用 CYLTabBarController](Swift-Guide.md) | [Using CYLTabBarController in Swift](Swift-Guide.md) |
+| [iOS 核心层迁移到 Swift](Swift-Migration.md) | [Migrating the iOS core layer to Swift](Swift-Migration.md) |
 | [在 SwiftUI 项目中集成 CYLTabBarController](SwiftUI-Integration.md) | [Integrating CYLTabBarController in a SwiftUI app](SwiftUI-Integration.md) |
+| [TODO 总览与清理进度](TODO-Sweep.md) | [TODO sweep: every open TODO and its status](TODO-Sweep.md) |
 | [Tab 的无障碍与 UI 测试](Tab-Accessibility.md) | [Tab Accessibility and UI Tests](Tab-Accessibility.md) |
 | [TabBar 图库](Tab-Bar-Gallery.md) | [Tab Bar Gallery](Tab-Bar-Gallery.md) |
 | [Tab 图标动画共用子库：CYLTabBarItemAnimation（面向协议，可扩展任意动画库）](Tab-Bar-Item-Animation.md) | [The shared tab icon animation subspec: CYLTabBarItemAnimation (protocol-oriented, open to any library)](Tab-Bar-Item-Animation.md) |
@@ -76,6 +83,7 @@
 | [换肤实现评估：与 QMUI 的差距、架构符合度与改进建议](Theme-Switching-QMUI-Evaluation.md) | [Theme switching evaluation: the gap to QMUI, fit with the original design, and what to improve](Theme-Switching-QMUI-Evaluation.md) |
 | [换肤（主题切换）](Theme-Switching.md) | [Theme switching (skins)](Theme-Switching.md) |
 | [原地更新 Tab：标题、图标、网络图标与替换页面](Update-Tab-Bar-Items-In-Place.md) | [Update Tabs in Place: Titles, Icons, Network Icons and Pages](Update-Tab-Bar-Items-In-Place.md) |
+| [微信小程序版 CYLTabBarController](WeChat-Mini-Program.md) | [CYLTabBarController for WeChat Mini Program](WeChat-Mini-Program.md) |
 | [提交前准备规则](commit-readiness-2026-11-09.md) | [Commit Readiness Rules](commit-readiness-2026-11-09.md) |
 | [文档文件夹说明](instructions.md) | [Documentation Folder Instructions](instructions.md) |
 
@@ -101,11 +109,13 @@ docs/
 ├── Android-Liquid-Glass.md
 ├── Android-QMUI-Comparison.md
 ├── Bilingual-Documentation.md
+├── CYLTableViewPlaceHolder-Integration-Issues.md
 ├── CYLUtils-Helpers.md
 ├── Carthage-Example.md
 ├── Carthage.md
 ├── Configuration-File.md
 ├── Configuration-Localization.md
+├── Configuration-Manifest.md
 ├── Configuration-Scripts.md
 ├── Cross-Platform-Components.md
 ├── Custom-Tab-Bar-Features.md
@@ -114,6 +124,7 @@ docs/
 ├── FlatDesign-StandardAppearance.md
 ├── Flutter-Component.md
 ├── GIF-Animation.md
+├── HarmonyOS-API-Map.md
 ├── Image-Only-Tabs.md
 ├── Liquid-Glass-Robustness.md
 ├── Login-Required-Tabs.md
@@ -134,10 +145,14 @@ docs/
 ├── Push-From-Anywhere.md
 ├── README.md
 ├── React-Native-Component.md
+├── Resource-Routes.md
 ├── Rive-Animation.md
 ├── SelectedIndex-PlusButton.md
+├── Swift-Coding-Style.md
 ├── Swift-Guide.md
+├── Swift-Migration.md
 ├── SwiftUI-Integration.md
+├── TODO-Sweep.md
 ├── Tab-Accessibility.md
 ├── Tab-Bar-Gallery.md
 ├── Tab-Bar-Item-Animation.md
@@ -159,15 +174,31 @@ docs/
 ├── Theme-Switching-QMUI-Evaluation.md
 ├── Theme-Switching.md
 ├── Update-Tab-Bar-Items-In-Place.md
+├── WeChat-Mini-Program.md
 ├── assets/
 │   ├── android-liquid-glass-surface-000.png
 │   ├── android-liquid-glass-surface-040.png
 │   ├── android-liquid-glass-surface-100.png
 │   ├── android-liquid-glass-surface-slider.png
+│   ├── android-more-than-five-tabs-report.png
+│   ├── android-playback-controls-pag-example-api35-b57c844.png
+│   ├── animated-icons-demo-controls-request-android.jpg
+│   ├── carthage-example-ios.png
+│   ├── configuration-demo-json-zh-hans.png
 │   ├── configuration-localization-en.png
 │   ├── configuration-localization-zh-hans.png
+│   ├── configuration-manifest-christmas.png
+│   ├── configuration-manifest-light.png
+│   ├── configuration-manifest-themes-bar.png
+│   ├── cyltableviewplaceholder-empty-placeholders-ios.png
+│   ├── cyltableviewplaceholder-refresh-icons-2e748b7-ios.png
+│   ├── cyltableviewplaceholder-refresh-icons-40ec453-ios.png
+│   ├── cyltableviewplaceholder-refresh-icons-ios.png
+│   ├── demo-second-tap-refresh-ios.png
 │   ├── demo-test-list-objc-classic.png
 │   ├── docs-navigation-index.png
+│   ├── flat-design-more-icon-fix-ios.png
+│   ├── flatdesign-standard-appearance-ios.png
 │   ├── flatdesign-standard-appearance-mapping.svg
 │   ├── flutter-component-android-bar.png
 │   ├── flutter-component-android.png
@@ -175,19 +206,47 @@ docs/
 │   ├── flutter-component-ios.png
 │   ├── flutter-pag-android-bar.png
 │   ├── flutter-pag-ios-bar.png
+│   ├── flutter-playback-controls-android-api35-93abe96.png
+│   ├── flutter-plus-title-hidden-report.png
 │   ├── flutter-rive-android-bar.png
 │   ├── flutter-rive-ios-bar.png
+│   ├── flutter-search-plus-title-missing-when-selected-ios.png
+│   ├── flutter-viewpager2-fix-android-bar.png
 │   ├── gif-classic.png
 │   ├── gif-flat-design.png
 │   ├── gif-liquid-glass.png
+│   ├── image-only-tabs-gallery-3-3-ios17.png
+│   ├── image-only-tabs-ios.png
+│   ├── inset-grouped-sections-demo-ios.png
+│   ├── ios-playback-controls-message-tab-iphone17pro-ios26.1-dc04439.png
+│   ├── issue-561-ipad-tab-bars-ios.png
+│   ├── liquid-glass-plus-stand-in-landscape-ios.png
+│   ├── liquid-glass-robustness-more-ios.png
+│   ├── liquid-glass-robustness-plus-stand-in-ios.png
 │   ├── login-required-tabs-flow.svg
 │   ├── login-required-tabs-flutter-ios-logged-in.png
 │   ├── login-required-tabs-react-native-android-alert.png
+│   ├── more-editing-done-star-comes-back-liquid-glass-ios.png
+│   ├── more-tab-eight-tabs-liquid-glass-ios.png
+│   ├── objc-demo-classic-ios17.png
 │   ├── pag-animation-tab-icons.png
 │   ├── pag-animation-test-list.png
 │   ├── pag-classic.png
 │   ├── pag-flat-design.png
 │   ├── pag-liquid-glass.png
+│   ├── per-tab-animation-pag-ios.png
+│   ├── plus-button-first-display-fixed-ios.png
+│   ├── plus-button-first-display-glitch-ios.jpg
+│   ├── plus-button-follows-slot-long-titles-ios.png
+│   ├── plus-button-glitch-report-2-ios.png
+│   ├── plus-button-lens-crisp-ios.png
+│   ├── plus-button-lens-mask-drag-ios.png
+│   ├── plus-button-long-titles-liquid-glass-ios.png
+│   ├── plus-button-mask-off-first-display-ios.png
+│   ├── plus-button-title-color-mask-on-off-ios.png
+│   ├── plus-button-title-color-mask-report-ios.png
+│   ├── plus-button-title-only-mask-drag-ios.png
+│   ├── plus-button-titles-fit-liquid-glass-ios.png
 │   ├── plus-child-theme-switching.png
 │   ├── plusbutton-background-image-liquid-glass-selected.png
 │   ├── plusbutton-background-image-liquid-glass-swiftui.png
@@ -203,9 +262,11 @@ docs/
 │   ├── plusbutton-overlap-lg.png
 │   ├── plusbutton-slot-flatdesign.png
 │   ├── plusbutton-slot-liquid-glass-titles-changed.png
+│   ├── plusbutton-subview-touches-ios.png
 │   ├── plusbutton-subview-touches-issue-202.png
 │   ├── plusbutton-touchable-area-1x.png
 │   ├── plusbutton-touchable-area-2x.png
+│   ├── push-from-anywhere-ios.png
 │   ├── react-native-component-android-bar.png
 │   ├── react-native-component-android.png
 │   ├── react-native-component-ios-bar.png
@@ -213,6 +274,7 @@ docs/
 │   ├── react-native-pag-android-bar.png
 │   ├── react-native-pag-ios-bar.png
 │   ├── react-native-pag-menu.png
+│   ├── react-native-playback-controls-android-api35-3357382.png
 │   ├── react-native-rive-android-bar.png
 │   ├── react-native-rive-chat.png
 │   ├── react-native-rive-ios-bar.png
@@ -222,6 +284,7 @@ docs/
 │   ├── readme-english-before-reading.png
 │   ├── readme-english-bilingual-contents.png
 │   ├── readme-english-header-badges.png
+│   ├── resource-route-sandbox-zh-hans.png
 │   ├── rive-animation-onboarding-button.png
 │   ├── rive-animation-plus-button.png
 │   ├── rive-animation-search-tab-frames.png
@@ -231,7 +294,13 @@ docs/
 │   ├── rive-classic.png
 │   ├── rive-flat-design.png
 │   ├── rive-liquid-glass.png
+│   ├── swift-migration-badges-ios.png
+│   ├── swift-migration-localization-ios.png
+│   ├── swiftui-integration-ios.png
+│   ├── swiftui-plus-title-blur-ios.png
 │   ├── tab-accessibility-labels-after-title-change.png
+│   ├── tab-bar-gallery-sections-ios.png
+│   ├── tab-custom-action-ios.png
 │   ├── tab-interactions-long-press-classic.png
 │   ├── tab-interactions-long-press-flatdesign.png
 │   ├── tab-interactions-long-press-liquid-glass.png
@@ -243,6 +312,13 @@ docs/
 │   ├── tab-interactions-swipe-classic.png
 │   ├── tab-interactions-swipe-liquid-glass.png
 │   ├── tab-interactions-swipe-login-classic.png
+│   ├── tab-item-icon-rendering-android.png
+│   ├── tab-item-icon-rendering-ios.png
+│   ├── tab-item-positioning-ios.png
+│   ├── tab-page-registry-android.png
+│   ├── tab-reselect-pop-to-root-ios.png
+│   ├── tabbaritem-double-tap-refresh-ios.png
+│   ├── tabbaritem-gestures-ios.png
 │   ├── theme-switching-flat-design.png
 │   ├── theme-switching-holiday-icons.png
 │   ├── theme-switching-liquid-glass.png
@@ -282,7 +358,84 @@ docs/
 │   ├── update-tab-navigation-title-skin.png
 │   ├── update-tab-network-icons-plus-button.png
 │   ├── update-tab-plus-page-navigation-title-changed.png
-│   └── update-tab-plus-page-navigation-title.png
+│   ├── update-tab-plus-page-navigation-title.png
+│   ├── wechat-miniprogram-api-01-home-lottie.png
+│   ├── wechat-miniprogram-api-02-discover-selected.png
+│   ├── wechat-miniprogram-api-03-badges-lottie.png
+│   ├── wechat-miniprogram-api-04-dark-lottie.png
+│   ├── wechat-miniprogram-api-05-dark-images-tinted.png
+│   ├── wechat-miniprogram-api-06-plus-page-selection.png
+│   ├── wechat-miniprogram-api-07-swipe-to-discover.png
+│   ├── wechat-miniprogram-api-08-bold-selected-title.png
+│   ├── wechat-miniprogram-api-09-christmas-liquid-glass.png
+│   ├── wechat-miniprogram-api-10-flat-design-login.png
+│   ├── wechat-miniprogram-api-11-lottie-playground.png
+│   ├── wechat-miniprogram-api-12-lottie-recolor-cover.png
+│   ├── wechat-miniprogram-api-13-issue31-lottie.png
+│   ├── wechat-miniprogram-api-14-interface-style-dark.png
+│   ├── wechat-miniprogram-api-15-plus-tap-without-page.png
+│   ├── wechat-miniprogram-api-16-tab-bar-item-playground.png
+│   ├── wechat-miniprogram-api-17-four-tabs-like-ios.png
+│   ├── wechat-miniprogram-api-18-rive-dark.png
+│   ├── wechat-miniprogram-api-19-pag-home.png
+│   ├── wechat-miniprogram-api-20-pag-me.png
+│   ├── wechat-miniprogram-api-21-split-lottie.png
+│   ├── wechat-miniprogram-api-22-split-pag.png
+│   ├── wechat-miniprogram-api-23-split-rive-me.png
+│   ├── wechat-miniprogram-api-24-split-gif.png
+│   ├── wechat-miniprogram-api-25-glass-light.png
+│   ├── wechat-miniprogram-api-26-glass-dark.png
+│   ├── wechat-miniprogram-api-27-gallery-checkin.png
+│   ├── wechat-miniprogram-api-28-gallery-feed.png
+│   ├── wechat-miniprogram-api-29-gallery-cards.png
+│   ├── wechat-miniprogram-api-30-gallery-landing.png
+│   ├── wechat-miniprogram-api-31-bug-lens-spacing.png
+│   ├── wechat-miniprogram-api-32-fix-lens-spacing.png
+│   ├── wechat-miniprogram-api-33-playback-controls-lottie.png
+│   ├── wechat-miniprogram-api-34-plus-before-dark.jpg
+│   ├── wechat-miniprogram-api-35-plus-selected-default.png
+│   ├── wechat-miniprogram-api-35-plus-selected-liquidGlass-dark.png
+│   ├── wechat-miniprogram-api-35-plus-selected-liquidGlass.png
+│   ├── wechat-miniprogram-api-36-bug-flat-plus-glass.jpg
+│   ├── wechat-miniprogram-api-37-default-liquidGlass-plus.png
+│   ├── wechat-miniprogram-api-37-default-liquidGlass-tab.png
+│   ├── wechat-miniprogram-api-37-default-plus.png
+│   ├── wechat-miniprogram-api-37-default-tab.png
+│   ├── wechat-miniprogram-api-37-flatDesign-plus.png
+│   ├── wechat-miniprogram-api-37-flatDesign-tab.png
+│   ├── wechat-miniprogram-api-38-tab-lens-reference.jpg
+│   ├── wechat-miniprogram-api-39-lens-plus-dark.png
+│   ├── wechat-miniprogram-api-39-lens-plus.png
+│   ├── wechat-miniprogram-api-39-lens-tab-dark.png
+│   ├── wechat-miniprogram-api-39-lens-tab.png
+│   ├── wechat-miniprogram-api-40-lens-white-reference.jpg
+│   ├── wechat-miniprogram-api-41-lens-keep-reference.jpg
+│   ├── wechat-miniprogram-api-42-lens-question-gallery.png
+│   ├── wechat-miniprogram-api-42-lens-question-plus.png
+│   ├── wechat-miniprogram-api-43-lens-plus.png
+│   ├── wechat-miniprogram-api-43-lens-tab.png
+│   ├── wechat-miniprogram-api-44-lens-me-rows.png
+│   ├── wechat-miniprogram-api-44-lens-regular-discover.png
+│   ├── wechat-miniprogram-api-44-lens-skeuomorphic-discover.png
+│   ├── wechat-miniprogram-api-47-plus-title-default.png
+│   ├── wechat-miniprogram-api-47-plus-title-flat-design.png
+│   ├── wechat-miniprogram-api-47-plus-title-liquid-glass.png
+│   ├── wechat-miniprogram-api-49-home-table-gallery-badges.png
+│   ├── wechat-miniprogram-api-49-home-table-skins.png
+│   ├── wechat-miniprogram-api-49-home-table-top.png
+│   ├── wechat-miniprogram-api-50-milestone-regular.png
+│   ├── wechat-miniprogram-api-50-milestone-skeuomorphic.png
+│   ├── wechat-miniprogram-badges.png
+│   ├── wechat-miniprogram-christmas-glass.png
+│   ├── wechat-miniprogram-flat-login.png
+│   ├── wechat-miniprogram-home.png
+│   ├── wechat-miniprogram-one-icon-layer-lottie-pag-rive-devtools-sdk3.17.6-e612393.png
+│   ├── wechat-miniprogram-rive-home-feed-one-layer-devtools-sdk3.17.6-e264ea2.png
+│   ├── wechat-miniprogram-scroll-icons-devtools-sdk3.17.6-88dd149.png
+│   ├── wechat-miniprogram-scroll-icons-still-images-devtools-sdk3.17.6-a157c97.png
+│   ├── wechat-miniprogram-two-icon-layers-user-1-devtools.jpg
+│   ├── wechat-miniprogram-two-icon-layers-user-2-devtools.jpg
+│   └── wechat-miniprogram-visibility-hidden-identifiers-devtools-sdk3.17.6-49df44f.png
 ├── commit-readiness-2026-11-09.md
 └── instructions.md
 ```

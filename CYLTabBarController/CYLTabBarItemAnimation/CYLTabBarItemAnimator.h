@@ -15,9 +15,13 @@ NS_ASSUME_NONNULL_BEGIN
  * [CN] animator 的查找顺序：数值大的优先；相同优先级按注册顺序。
  */
 typedef NSInteger CYLTabBarItemAnimatorPriority NS_TYPED_EXTENSIBLE_ENUM;
-/// [EN] An animator that recognizes its own files (the default). [CN] 只识别自己文件类型的 animator（默认）。
+/*!
+ * [EN] An animator that recognizes its own files (the default). [CN] 只识别自己文件类型的 animator（默认）。
+ */
 static const CYLTabBarItemAnimatorPriority CYLTabBarItemAnimatorPriorityDefault = 0;
-/// [EN] An animator that takes any file no other animator takes (Lottie). [CN] 接收其他 animator 都不处理的文件的 animator（Lottie）。
+/*!
+ * [EN] An animator that takes any file no other animator takes (Lottie). [CN] 接收其他 animator 都不处理的文件的 animator（Lottie）。
+ */
 static const CYLTabBarItemAnimatorPriority CYLTabBarItemAnimatorPriorityFallback = -1000;
 
 /*!
@@ -38,16 +42,22 @@ static const CYLTabBarItemAnimatorPriority CYLTabBarItemAnimatorPriorityFallback
  */
 @protocol CYLTabBarItemAnimationFileMatching <NSObject>
 
-/// [EN] A unique name, e.g. @"Lottie", @"PAG"; registering the same name again replaces the animator.
-/// [CN] 唯一名称，例如 @"Lottie"、@"PAG"；再次注册同名 animator 会替换原来的。
+/*!
+ * [EN] A unique name, e.g. @"Lottie", @"PAG"; registering the same name again replaces the animator.
+ * [CN] 唯一名称，例如 @"Lottie"、@"PAG"；再次注册同名 animator 会替换原来的。
+ */
 @property (nonatomic, copy, readonly) NSString *identifier;
 
-/// [EN] YES for an animation file this library plays. [CN] 本动画库能播放的动画文件返回 YES。
+/*!
+ * [EN] YES for an animation file this library plays. [CN] 本动画库能播放的动画文件返回 YES。
+ */
 - (BOOL)canAnimateFileAtURL:(NSURL *)URL;
 
 @optional
 
-/// [EN] The lookup order (default `CYLTabBarItemAnimatorPriorityDefault`). [CN] 查找顺序（默认 `CYLTabBarItemAnimatorPriorityDefault`）。
+/*!
+ * [EN] The lookup order (default `CYLTabBarItemAnimatorPriorityDefault`). [CN] 查找顺序（默认 `CYLTabBarItemAnimatorPriorityDefault`）。
+ */
 @property (nonatomic, readonly) CYLTabBarItemAnimatorPriority priority;
 
 /*!
@@ -88,7 +98,9 @@ static const CYLTabBarItemAnimatorPriority CYLTabBarItemAnimatorPriorityFallback
 
 @end
 
-/// [EN] An animation library for tab icons: Lottie, PAG, or any library added later. [CN] Tab 图标动画库：Lottie、PAG 或以后新增的任意动画库。
+/*!
+ * [EN] An animation library for tab icons: Lottie, PAG, or any library added later. [CN] Tab 图标动画库：Lottie、PAG 或以后新增的任意动画库。
+ */
 @protocol CYLTabBarItemAnimator <CYLTabBarItemAnimationFileMatching, CYLTabBarItemAnimationViewFactory>
 @end
 

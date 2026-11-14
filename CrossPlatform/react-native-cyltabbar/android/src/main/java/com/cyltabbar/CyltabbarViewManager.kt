@@ -74,6 +74,48 @@ class CyltabbarViewManager : SimpleViewManager<CyltabbarView>(),
     if (value >= 0) view?.loggedIn = value == 1 else view?.resetLoggedIn()
   }
 
+  /** [EN] The language of the library's texts and layout direction; "" for the device language. [CN] 库文字与布局方向使用的语言；"" 表示设备语言。 */
+  @ReactProp(name = "language")
+  override fun setLanguage(view: CyltabbarView?, value: String?) {
+    view?.language = value?.takeIf { it.isNotEmpty() }
+  }
+
+  /** [EN] Hides the tab bar, animated; a hidden tab bar takes no touches. [CN] 隐藏 TabBar（带动画）；隐藏的 TabBar 不接收触摸。 */
+  @ReactProp(name = "tabBarHidden")
+  override fun setTabBarHidden(view: CyltabbarView?, value: Boolean) {
+    view?.tabBarHidden = value
+  }
+
+  /** [EN] Each increase simulates a memory warning once (onMemoryWarning). [CN] 每次增大模拟一次内存警告（onMemoryWarning）。 */
+  @ReactProp(name = "memoryWarningRequest", defaultInt = 0)
+  override fun setMemoryWarningRequest(view: CyltabbarView?, value: Int) {
+    view?.memoryWarningRequest = value
+  }
+
+  /** [EN] The playback speed of every tab icon animation; 0 or less: the library's default. [CN] 所有 Tab 图标动画的播放速度；0 或更小表示库的默认值。 */
+  @ReactProp(name = "playbackSpeed", defaultFloat = 0f)
+  override fun setPlaybackSpeed(view: CyltabbarView?, value: Float) {
+    view?.animationSpeed = value
+  }
+
+  /** [EN] Whether the tab icon animations repeat until this is false. [CN] Tab 图标动画是否重复播放直到设为 false。 */
+  @ReactProp(name = "playbackLoops")
+  override fun setPlaybackLoops(view: CyltabbarView?, value: Boolean) {
+    view?.animationLoops = value
+  }
+
+  /** [EN] Each increase plays every tab icon animation again from progress 0 ("Play all"). [CN] 每次增大让所有 Tab 图标动画从进度 0 重新播放（「全部播放」）。 */
+  @ReactProp(name = "playAllRequest", defaultInt = 0)
+  override fun setPlayAllRequest(view: CyltabbarView?, value: Int) {
+    view?.playAllRequest = value
+  }
+
+  /** [EN] [horizontal, vertical], set at runtime; empty keeps the configuration's. [CN] [水平, 垂直]，运行时设置；为空时使用配置中的值。 */
+  @ReactProp(name = "titlePositionAdjustment")
+  override fun setTitlePositionAdjustment(view: CyltabbarView?, value: ReadableArray?) {
+    view?.titlePositionAdjustment = value?.takeIf { it.size() >= 2 }?.let { com.cyl.tabbar.CYLOffset(it.getDouble(0).toFloat(), it.getDouble(1).toFloat()) }
+  }
+
   @ReactProp(name = "tabCoverImages")
   override fun setTabCoverImages(view: CyltabbarView?, value: ReadableArray?) {
     view?.tabCoverImages = (0 until (value?.size() ?: 0)).map { value?.getString(it)?.takeIf { image -> image.isNotEmpty() } }
@@ -86,6 +128,7 @@ class CyltabbarViewManager : SimpleViewManager<CyltabbarView>(),
     "topTabLongPress" to mapOf("registrationName" to "onTabLongPress"),
     "topLoginRequest" to mapOf("registrationName" to "onLoginRequest"),
     "topLoginStateChange" to mapOf("registrationName" to "onLoginStateChange"),
+    "topMemoryWarning" to mapOf("registrationName" to "onMemoryWarning"),
   )
 
   companion object {

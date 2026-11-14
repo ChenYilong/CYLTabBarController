@@ -9,7 +9,9 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-/// [EN] Main actor in Swift: views are used on the main thread. [CN] 在 Swift 中属于主 actor：视图只在主线程使用。
+/*!
+ * [EN] Main actor in Swift: views are used on the main thread. [CN] 在 Swift 中属于主 actor：视图只在主线程使用。
+ */
 #ifndef NS_SWIFT_UI_ACTOR
 #define NS_SWIFT_UI_ACTOR
 #endif
@@ -28,13 +30,19 @@ NS_ASSUME_NONNULL_BEGIN
 NS_SWIFT_UI_ACTOR
 @protocol CYLTabBarItemAnimationPlayableView <NSObject>
 
-/// [EN] Plays once, from the start. [CN] 从头播放一次。
+/*!
+ * [EN] Plays once, from the start. [CN] 从头播放一次。
+ */
 - (void)cyl_playAnimationView NS_SWIFT_NAME(playAnimation());
 
-/// [EN] Shows the end state without playing (the tab selected at launch, #389). [CN] 不播放，直接显示结束状态（启动时选中的 Tab，#389）。
+/*!
+ * [EN] Shows the end state without playing (the tab selected at launch, #389). [CN] 不播放，直接显示结束状态（启动时选中的 Tab，#389）。
+ */
 - (void)cyl_showAnimationViewLastFrame NS_SWIFT_NAME(showAnimationLastFrame());
 
-/// [EN] Stops, back to the start. [CN] 停止并回到起始状态。
+/*!
+ * [EN] Stops, back to the start. [CN] 停止并回到起始状态。
+ */
 - (void)cyl_stopAnimationView NS_SWIFT_NAME(stopAnimation());
 
 @optional

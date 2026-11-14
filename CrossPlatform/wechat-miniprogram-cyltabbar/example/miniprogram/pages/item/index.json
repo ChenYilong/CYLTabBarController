@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "cyl-tab-bar-item",
+  "usingComponents": {
+    "cyl-tab-bar-item": "cyl-tabbar-miniprogram/cyl-tab-bar-item/index"
+  }
+}

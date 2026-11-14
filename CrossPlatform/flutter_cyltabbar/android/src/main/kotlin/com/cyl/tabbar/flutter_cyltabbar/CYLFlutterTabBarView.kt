@@ -10,6 +10,7 @@ import android.util.Log
 import android.view.View
 import androidx.fragment.app.FragmentActivity
 import com.cyl.tabbar.CYLEnums
+import com.cyl.tabbar.CYLOffset
 import com.cyl.tabbar.CYLTabBarHostView
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.plugin.common.MethodCall
@@ -55,6 +56,12 @@ internal class CYLFlutterTabBarView(
     }
     hostView.loginStateDidChange = { loggedIn -> channel.invokeMethod("onLoginStateChange", loggedIn) }
     applyLoggedIn(arguments["loggedIn"])
+    // [EN] Before the configuration, so it is built once, in this language. [CN] 在配置之前，使 TabBar 以该语言只创建一次。
+    hostView.language = (arguments["language"] as? String)?.takeIf { it.isNotEmpty() }
+    hostView.tabBarHidden = arguments["tabBarHidden"] == true
+    hostView.animationSpeed = (arguments["playbackSpeed"] as? Number)?.toFloat() ?: 0f
+    hostView.animationLoops = arguments["playbackLoops"] == true
+    hostView.titlePositionAdjustment = titleOffset(arguments["titlePositionAdjustment"])
     hostView.plusButtonBadgeValue = arguments["plusButtonBadgeValue"] as? String
     hostView.badgeAnimationType = badgeAnimation(arguments["badgeAnimation"])
     hostView.selectedIndex = (arguments["selectedIndex"] as? Number)?.toInt() ?: -1
@@ -83,6 +90,13 @@ internal class CYLFlutterTabBarView(
       "setPlusButtonBadge" -> hostView.plusButtonBadgeAttributes = badgeStyle(call.arguments)
       "setTabCoverImages" -> hostView.tabCoverImages = (call.arguments as? List<*>).orEmpty()
       "setLoggedIn" -> applyLoggedIn(call.arguments)
+      "setTabBarHidden" -> hostView.tabBarHidden = call.arguments == true
+      "setPlaybackSpeed" -> hostView.animationSpeed = (call.arguments as? Number)?.toFloat() ?: 0f
+      "setPlaybackLoops" -> hostView.animationLoops = call.arguments == true
+      "playAllAnimations" -> hostView.playAllAnimations()
+      "setTitlePositionAdjustment" -> hostView.titlePositionAdjustment = titleOffset(call.arguments)
+      "simulateMemoryWarning" -> return result.success(hostView.simulateMemoryWarning())
+      "setLanguage" -> hostView.language = (call.arguments as? String)?.takeIf { it.isNotEmpty() }
       else -> return result.notImplemented()
     }
     result.success(null)
@@ -106,6 +120,13 @@ internal class CYLFlutterTabBarView(
       return BitmapDrawable(hostView.resources, bitmap)
     }
     return null
+  }
+
+  /** [EN] [horizontal, vertical], or null for the configuration's offset. [CN] [水平, 垂直]；null 时使用配置中的偏移。 */
+  private fun titleOffset(value: Any?): CYLOffset? = (value as? List<*>)?.takeIf { it.size >= 2 }?.let { offset ->
+    val horizontal = (offset[0] as? Number)?.toFloat() ?: return@let null
+    val vertical = (offset[1] as? Number)?.toFloat() ?: return@let null
+    CYLOffset(horizontal, vertical)
   }
 
   /** [EN] A bool sets the app's login state; null leaves it to the state the library cached. [CN] 布尔值设置 App 的登录状态；null 时使用库缓存的状态。 */

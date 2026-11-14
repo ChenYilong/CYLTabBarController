@@ -1,0 +1,34 @@
+<view class="cyl-page">
+  <view class="cyl-item-grid">
+    <view wx:for="{{tiles}}" wx:key="caption" class="cyl-item-tile" aria-label="{{item.caption}}">
+      <cyl-tab-bar-item
+        id="cyl-demo-item-{{index}}"
+        class="cyl-item-demo"
+        index="{{index}}"
+        title="{{item.props.title}}"
+        image="{{item.props.image}}"
+        selected-image="{{item.props.selectedImage}}"
+        selected="{{item.props.selected}}"
+        lottie-file-path="{{item.props.lottieFilePath}}"
+        lottie-size-value="{{item.props.lottieSizeValue}}"
+        badge-value="{{item.props.badgeValue}}"
+        badge-color="{{item.props.badgeColor}}"
+        badge-size="{{item.props.badgeSize}}"
+        badge-content-inset="{{item.props.badgeContentInset}}"
+        badge-position-adjustment="{{item.props.badgePositionAdjustment}}"
+        badge-text-attributes="{{item.props.badgeTextAttributes}}"
+        title-text-attributes="{{item.props.titleTextAttributes}}"
+        title-position-adjustment="{{item.props.titlePositionAdjustment}}"
+        image-position-adjustment="{{item.props.imagePositionAdjustment}}"
+        image-insets="{{item.props.imageInsets}}"
+        layout-centered="{{item.props.layoutCentered}}"
+        background-color="{{item.props.backgroundColor}}"
+        selected-background-color="{{item.props.selectedBackgroundColor}}"
+        standard-appearance="{{item.props.standardAppearance}}"
+        enabled="{{item.props.enabled !== false}}"
+        bind:itemtap="cyl_itemTap"
+      />
+      <text class="cyl-item-caption" aria-hidden="true">{{item.caption}}</text>
+    </view>
+  </view>
+</view>

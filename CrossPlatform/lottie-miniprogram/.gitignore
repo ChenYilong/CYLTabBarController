@@ -1,0 +1,6 @@
+node_modules
+miniprogram_dev
+dist
+.DS_Store
+._*
+package-lock.json

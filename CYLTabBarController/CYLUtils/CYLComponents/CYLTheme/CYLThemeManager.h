@@ -62,6 +62,7 @@
  */
 
 #import <UIKit/UIKit.h>
+#import "CYLSwiftInterface.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -72,137 +73,15 @@ NS_ASSUME_NONNULL_BEGIN
  * [CN] 某个管理器的当前主题改变时发送（通知的 `object` 为该管理器），先于视图控制器与视图的
  *      `-cyl_themeDidChangeByManager:identifier:theme:`。适合在这里保存新的 `currentThemeIdentifier`。
  */
-FOUNDATION_EXTERN NSNotificationName const CYLThemeDidChangeNotification;
-
-@interface CYLThemeManager : NSObject
-
-- (instancetype)init NS_UNAVAILABLE;
-+ (instancetype)new NS_UNAVAILABLE;
+#ifndef __swift__
+#define CYLThemeDidChangeNotification ((NSNotificationName)@"CYLThemeDidChangeNotification")
+#endif
 
 /*!
- * [EN] The name the manager was created with, see `+[CYLThemeManagerCenter themeManagerWithName:]`.
- * [CN] 管理器的名字，见 `+[CYLThemeManagerCenter themeManagerWithName:]`。
+ * [EN] `CYLThemeManager` is implemented in Swift (`CYLUtils/Swift/CYLThemeManager.swift`) and declared by the Swift interface
+ *      (`CYLSwiftInterface.h`), as a class cannot be declared twice (docs/Swift-Migration.md).
+ * [CN] `CYLThemeManager` 在 Swift 中实现（`CYLUtils/Swift/CYLThemeManager.swift`），由 Swift 接口（`CYLSwiftInterface.h`）声明，因为一个类不能声明两次
+ *      （docs/Swift-Migration.md）。
  */
-@property (nonatomic, copy, readonly) __kindof NSObject<NSCopying> *name;
-
-/*!
- * [EN] Follows the system Dark Mode (iOS 13+), default NO. When YES, a change of the system appearance is turned into a
- *      theme identifier by `identifierForTrait`, which then becomes `currentThemeIdentifier`. Set `identifierForTrait`
- *      first. Changes while the app is in the background are ignored (iOS takes snapshots in both appearances there) and
- *      checked again when it becomes active. `CYLTabBarController` reports appearance changes; without one, call
- *      `-updateThemeForTraitCollection:` from your root view controller's `-traitCollectionDidChange:`.
- * [CN] 跟随系统深色模式（iOS 13+），默认 NO。为 YES 时，系统外观的变化会通过 `identifierForTrait` 转换为主题 identifier，并设为
- *      `currentThemeIdentifier`。请先设置 `identifierForTrait`。App 在后台时的变化会被忽略（iOS 会在后台以两种外观各截一次图），
- *      回到前台时重新检查。`CYLTabBarController` 会上报外观变化；不使用它时，请在根控制器的 `-traitCollectionDidChange:` 中调用
- *      `-updateThemeForTraitCollection:`。
- */
-@property (nonatomic, assign) BOOL respondsSystemStyleAutomatically API_AVAILABLE(ios(13.0));
-
-/*!
- * [EN] Turns the system appearance (`trait.userInterfaceStyle`) into the identifier of the theme to use, when
- *      `respondsSystemStyleAutomatically` is YES. Return nil to keep the current theme.
- * [CN] `respondsSystemStyleAutomatically` 为 YES 时，将系统外观（`trait.userInterfaceStyle`）转换为要使用的主题 identifier。
- *      返回 nil 则保持当前主题。
- */
-@property (nonatomic, copy, nullable) __kindof NSObject<NSCopying> *_Nullable (^identifierForTrait)(UITraitCollection *trait) API_AVAILABLE(ios(13.0));
-
-/*!
- * [EN] The identifiers of every registered theme, in the order they were added; nil when there is none.
- * [CN] 所有已注册主题的 identifier，按添加顺序；没有时为 nil。
- */
-@property (nonatomic, copy, readonly, nullable) NSArray<__kindof NSObject<NSCopying> *> *themeIdentifiers;
-
-/*!
- * [EN] Every registered theme object, in the order they were added; nil when there is none.
- * [CN] 所有已注册的主题对象，按添加顺序；没有时为 nil。
- */
-@property (nonatomic, copy, readonly, nullable) NSArray<__kindof NSObject *> *themes;
-
-/*!
- * [EN] The identifier of the current theme. Setting it also sets `currentTheme`. Setting an identifier that is not
- *      registered asks `themeGenerator` for its theme; without one, the change is ignored. The first value set is not
- *      a change (nothing is posted): set it at launch before the UI is shown. Main thread only (asserted in debug).
- * [CN] 当前主题的 identifier，设置时会同时设置 `currentTheme`。设置未注册的 identifier 时会通过 `themeGenerator` 生成主题；
- *      没有 `themeGenerator` 时忽略本次设置。第一次设置不视为切换（不发送通知）：请在启动时、界面显示之前设置。仅限主线程（debug 下断言）。
- */
-@property (nonatomic, copy, nullable) __kindof NSObject<NSCopying> *currentThemeIdentifier;
-
-/*!
- * [EN] The current theme object. Setting it also sets `currentThemeIdentifier`; an unregistered theme asks
- *      `themeIdentifierGenerator` for its identifier, without one the change is ignored.
- * [CN] 当前主题对象，设置时会同时设置 `currentThemeIdentifier`；未注册的主题会通过 `themeIdentifierGenerator` 生成 identifier，
- *      没有时忽略本次设置。
- */
-@property (nonatomic, strong, nullable) __kindof NSObject *currentTheme;
-
-/*!
- * [EN] Saves the identifier of the current theme in `NSUserDefaults` (key `CYLThemeManager.<name>.currentThemeIdentifier`)
- *      on every change, and makes the saved one current again: when this is set to YES, and when its theme is
- *      registered later, as long as no theme is current yet. Only an `NSString` or `NSNumber` identifier is saved.
- *      Default NO. Set it at launch, before setting a theme.
- * [CN] 每次切换时把当前主题的 identifier 保存到 `NSUserDefaults`（key 为 `CYLThemeManager.<name>.currentThemeIdentifier`），并重新使用保存的
- *      主题：设为 YES 时，以及之后注册该主题时，前提是尚无当前主题。只保存 `NSString` 或 `NSNumber` 类型的 identifier。默认 NO。请在启动时、
- *      设置主题之前设置。
- */
-@property (nonatomic, assign) BOOL persistsCurrentThemeIdentifier;
-
-/*!
- * [EN] When greater than 0, a theme change cross-fades over this many seconds: each visible window is covered by a
- *      snapshot of itself, restyled underneath, and the snapshot fades out. Default 0 (no animation).
- * [CN] 大于 0 时，主题切换以该秒数交叉淡入淡出：每个可见 window 先被自身截图覆盖，在其下更新样式，然后截图淡出。默认 0（无动画）。
- */
-@property (nonatomic, assign) NSTimeInterval themeChangeAnimationDuration;
-
-/*!
- * [EN] Creates the theme of an identifier that is not registered yet, when it becomes current; the pair is registered.
- * [CN] 未注册的 identifier 成为当前主题时，用它生成对应的主题对象，并注册这一对。
- */
-@property (nonatomic, copy, nullable) __kindof NSObject *_Nullable (^themeGenerator)(__kindof NSObject<NSCopying> *identifier);
-
-/*!
- * [EN] Creates the identifier of a theme that is not registered yet, when it becomes current; the pair is registered.
- * [CN] 未注册的主题对象成为当前主题时，用它生成对应的 identifier，并注册这一对。
- */
-@property (nonatomic, copy, nullable) __kindof NSObject<NSCopying> *_Nullable (^themeIdentifierGenerator)(__kindof NSObject *theme);
-
-/*!
- * [EN] Registers a theme under `identifier`. A duplicate identifier or theme is ignored.
- * [CN] 以 `identifier` 注册一个主题。重复的 identifier 或主题会被忽略。
- */
-- (void)addThemeIdentifier:(__kindof NSObject<NSCopying> *)identifier theme:(__kindof NSObject *)theme;
-
-/*!
- * [EN] Removes the theme registered under `identifier` (the pair).
- * [CN] 移除以 `identifier` 注册的主题（成对移除）。
- */
-- (void)removeThemeIdentifier:(__kindof NSObject<NSCopying> *)identifier;
-
-/*!
- * [EN] Removes `theme` and its identifier.
- * [CN] 移除 `theme` 及其 identifier。
- */
-- (void)removeTheme:(__kindof NSObject *)theme;
-
-/*!
- * [EN] The theme registered under `identifier`, or nil.
- * [CN] 以 `identifier` 注册的主题，没有时为 nil。
- */
-- (nullable __kindof NSObject *)themeForIdentifier:(__kindof NSObject<NSCopying> *)identifier;
-
-/*!
- * [EN] The identifier of `theme`, or nil.
- * [CN] `theme` 的 identifier，没有时为 nil。
- */
-- (nullable __kindof NSObject<NSCopying> *)identifierForTheme:(__kindof NSObject *)theme;
-
-/*!
- * [EN] Applies `identifierForTrait` to `traitCollection` when `respondsSystemStyleAutomatically` is YES (ignored while
- *      the app is in the background). `CYLTabBarController` calls it when the system appearance changes.
- * [CN] `respondsSystemStyleAutomatically` 为 YES 时，对 `traitCollection` 应用 `identifierForTrait`（App 在后台时忽略）。
- *      系统外观变化时 `CYLTabBarController` 会调用它。
- */
-- (void)updateThemeForTraitCollection:(UITraitCollection *)traitCollection API_AVAILABLE(ios(13.0));
-
-@end
 
 NS_ASSUME_NONNULL_END

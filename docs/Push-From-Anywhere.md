@@ -160,4 +160,6 @@ UIViewController *anyViewController = [UIViewController cyl_topmostViewControlle
 
 | 中文 | English |
 |:---|:---|
-| 本次修改在没有 Xcode 与模拟器的 Linux 环境中完成，未能在模拟器或真机上运行，因此没有截图；该环境也没有 CocoaPods，未能运行 `pod lib lint`，也未能编译。Demo 中 `CYLPopPushDemoViewController`（扁平样式示例）演示了 `cyl_pushViewController:animated:` 与 `cyl_pushOrPopToViewController:` 的行为。 | This change was made on Linux without Xcode or a simulator, so it could not be run on a simulator or device and there are no screenshots; CocoaPods is not installed there either, so `pod lib lint` and a build could not be run. `CYLPopPushDemoViewController` in the demo (FlatDesign example) shows how `cyl_pushViewController:animated:` and `cyl_pushOrPopToViewController:` behave. |
+| 已验证（2026-11-10，iOS 26.1，iPhone 17 Pro Max 模拟器，ObjC 示例「cyl_pop / cyl_push method demo」）。上：演示页（第 1 层）列出各个 `cyl_popSelectTabBarChildViewController…` 与 push 方法；下：点击「…AtIndex:completion:」后，当前导航栈 pop 到栈底、选中「Me」，并在 completion 中向「Me」push 了新的演示页，返回后停在「Me」的根页面。 | Verified (2026-11-10, iOS 26.1, iPhone 17 Pro Max simulator, ObjC example "cyl_pop / cyl_push method demo"). Top: the demo page (level 1) lists the `cyl_popSelectTabBarChildViewController…` and push methods; bottom: after "…AtIndex:completion:" the current stack is popped to its root, "Me" is selected and a new demo page is pushed onto "Me" in the completion; going back lands on "Me"'s root page. |
+
+![Push from anywhere on iOS 26](assets/push-from-anywhere-ios.png)

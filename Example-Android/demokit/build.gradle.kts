@@ -27,7 +27,7 @@ android {
     sourceSets {
         getByName("main") {
             // [EN] The same configuration files as iOS, not a copy. [CN] 与 iOS 共用同一份配置文件，而不是副本。
-            assets.srcDir("../../CYLTabBarController/Resources/CYLTabBarController.bundle/Configurations")
+            assets.srcDir("../../Example-Shared/Configurations")
             // [EN] The library's iOS resource bundle (the holiday skin icons, the sample GIF), read by `DemoAssets`; the apps
             //      leave out its .lproj folders (`ignoreAssetsPatterns`).
             // [CN] 库的 iOS 资源 bundle（节日皮肤图标、示例 GIF），由 `DemoAssets` 读取；App 排除其中的 .lproj 目录（`ignoreAssetsPatterns`）。

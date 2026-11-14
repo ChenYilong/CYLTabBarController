@@ -1,0 +1,22 @@
+<!-- [EN] The mini program's custom tab bar: the cyl-tab-bar component of the cyl-tabbar-miniprogram package (miniprogram_npm) with the example's configuration. [CN] 小程序的自定义 TabBar：cyl-tabbar-miniprogram 包（miniprogram_npm）中的 cyl-tab-bar 组件，带有示例配置。 -->
+<cyl-tab-bar
+  id="cyl-tab-bar"
+  generic:cyl-lottie-view="cyl-lottie"
+  generic:cyl-pag-view="cyl-pag"
+  generic:cyl-rive-view="cyl-rive"
+  configuration="{{configuration}}"
+  item-style="{{itemStyle}}"
+  glass-lens-style="{{glassLensStyle}}"
+  animation-speed="{{animationSpeed}}"
+  animation-loop="{{animationLoop}}"
+  hidden-identifiers="{{hiddenIdentifiers}}"
+  strings="{{strings}}"
+  symbols-by-theme="{{symbolsByTheme}}"
+  animation-base-path="/shared/lottie"
+  selected-identifier="{{selectedIdentifier}}"
+  logged-in="{{loggedIn}}"
+  bind:select="cyl_onSelect"
+  bind:reselect="cyl_onReselect"
+  bind:plustap="cyl_onPlusTap"
+  bind:loginrequired="cyl_onLoginRequired"
+/>

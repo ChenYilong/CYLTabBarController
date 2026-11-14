@@ -414,7 +414,7 @@ static UIImage *CYLTestImage(CGFloat side, UIColor *color) {
     XCTAssertTrue([home[CYLTabBarItemTitleColor] isKindOfClass:[UIColor class]], @"a named value goes through the same conversion");
     XCTAssertEqualObjects([self itemWithIdentifier:@"me" ofTabBarController:tabBarController][CYLTabBarItemTitle], @"@me", @"\"@@\" is a literal \"@\"");
 
-    CYLTabBarConfigurationTheme *dark = [manager themeForIdentifier:@"dark"];
+    CYLTabBarConfigurationTheme *dark = (CYLTabBarConfigurationTheme *)[manager themeForIdentifier:@"dark"];
     XCTAssertTrue([dark isKindOfClass:[CYLTabBarConfigurationTheme class]]);
     XCTAssertEqualObjects([dark valueForName:@"accent"], @"#FF0000", @"a name the skin does not give comes from the base skin");
     NSArray<NSDictionary *> *darkItems = [dark cyl_tabBarItemsAttributesForTabBarController:tabBarController];

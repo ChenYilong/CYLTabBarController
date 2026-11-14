@@ -21,6 +21,8 @@
 #if CYL_FLATDESIGN_AVAILABLE
 #import <CYLTabBarController/CYLFlatDesignTabBar.h>
 #endif
+#import "CYLDemoLocalization.h"
+#import "CYLTabBarControllerDemo-Swift.h"
 
 #if CYL_FLATDESIGN_AVAILABLE
 @interface CYLFlatDesignTabBarDemoViewController ()<UITableViewDelegate, UITableViewDataSource, CYLFlatDesignTabBarDelegate>
@@ -46,12 +48,12 @@
 - (NSArray<NSString *> *)datas {
     if (!_datas) {
         _datas = @[
-            CYLLocalizedString(@"设置 barTintColor"),
-            CYLLocalizedString(@"设置 backgroundImage"),
-            CYLLocalizedString(@"设置 shadowImage"),
-            CYLLocalizedString(@"设置 tintColor"),
-            CYLLocalizedString(@"设置 items"),
-            CYLLocalizedString(@"设置 清空"),
+            CYLDemoLocalizedString(@"设置 barTintColor"),
+            CYLDemoLocalizedString(@"设置 backgroundImage"),
+            CYLDemoLocalizedString(@"设置 shadowImage"),
+            CYLDemoLocalizedString(@"设置 tintColor"),
+            CYLDemoLocalizedString(@"设置 items"),
+            CYLDemoLocalizedString(@"设置 清空"),
         ];
     }
     return _datas;
@@ -59,13 +61,16 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.view.backgroundColor = UIColor.systemBackgroundColor; // [EN] Dark Mode. [CN] 适配深色模式。
+    self.view.backgroundColor = UIColor.systemGroupedBackgroundColor; // [EN] The grouped background, so the rounded sections stand out. [CN] 分组背景色，使圆角分组清晰可见。
     [self initSubviews];
+    // [EN] Pull to refresh, empty / no-network placeholders and the offline red bar (CYLTableViewPlaceHolder).
+    // [CN] 下拉刷新、无数据 / 无网络占位图与断网红条（CYLTableViewPlaceHolder）。
+    [CYLDemoPlaceholder installOnScrollView:_tableView viewController:self animation:CYLDemoPlaceholderAnimationPag refresh:nil];
 }
 
 - (void)initSubviews {
     
-    NSArray *titles = @[CYLLocalizedString(@"主页"), CYLLocalizedString(@"同城"), CYLLocalizedString(@"消息")];
+    NSArray *titles = @[CYLDemoLocalizedString(@"主页"), CYLDemoLocalizedString(@"同城"), CYLDemoLocalizedString(@"消息")];
     NSArray *images = @[@"home_normal", @"fishpond_normal", @"message_normal"];
     NSArray *selectedImages = @[@"home_highlight", @"fishpond_highlight", @"message_highlight"];
     NSMutableArray *items = [NSMutableArray array];
@@ -95,7 +100,7 @@
 
     [self.view addSubview:_uitabBar];
     
-    _tableView = [[UITableView alloc] initWithFrame:self.view.bounds style:UITableViewStylePlain];
+    _tableView = [[UITableView alloc] initWithFrame:self.view.bounds style:UITableViewStyleInsetGrouped];
     _tableView.delegate = self;
     _tableView.dataSource = self;
     [UITableViewCell cyl_setUpAutomaticRowHeightForTableView:_tableView];

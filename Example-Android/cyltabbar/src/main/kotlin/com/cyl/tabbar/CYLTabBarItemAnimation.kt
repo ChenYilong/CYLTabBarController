@@ -29,15 +29,23 @@ import java.util.concurrent.Executors
  *      rive-android）存在时通过反射自动注册，就像 iOS 只在链接了动画库时才编译对应的 animator；没有动画库时忽略其 key，Tab 显示图片。
  */
 
-/** [EN] `CYLTabBarAnimationOption`: an option name of `CYLTabBarAnimationURLWithOptions()`. [CN] `CYLTabBarAnimationURLWithOptions()` 的选项名。 */
+/**
+ * [EN] `CYLTabBarAnimationOption`: an option name of `CYLTabBarAnimationURLWithOptions()`. [CN] `CYLTabBarAnimationURLWithOptions()` 的选项名。
+ */
 typealias CYLTabBarAnimationOption = String
 
-/** [EN] `CYLTabBarItemAnimatorPriority`: higher first; equal priorities keep their registration order. [CN] 优先级高的先查找；相同时保持注册顺序。 */
+/**
+ * [EN] `CYLTabBarItemAnimatorPriority`: higher first; equal priorities keep their registration order. [CN] 优先级高的先查找；相同时保持注册顺序。
+ */
 typealias CYLTabBarItemAnimatorPriority = Int
 
-/** [EN] An animator that recognizes its own files (the default). [CN] 只识别自己文件类型的 animator（默认）。 */
+/**
+ * [EN] An animator that recognizes its own files (the default). [CN] 只识别自己文件类型的 animator（默认）。
+ */
 const val CYLTabBarItemAnimatorPriorityDefault: CYLTabBarItemAnimatorPriority = 0
-/** [EN] An animator that takes any file no other animator takes (Lottie). [CN] 接收其他 animator 都不处理的文件的 animator（Lottie）。 */
+/**
+ * [EN] An animator that takes any file no other animator takes (Lottie). [CN] 接收其他 animator 都不处理的文件的 animator（Lottie）。
+ */
 const val CYLTabBarItemAnimatorPriorityFallback: CYLTabBarItemAnimatorPriority = -1000
 
 /**
@@ -53,14 +61,18 @@ fun CYLTabBarAnimationURLWithOptions(fileURL: String?, options: Map<CYLTabBarAni
     return if (items.isEmpty()) base else base + "#" + items.joinToString("&")
 }
 
-/** [EN] Splits a tab's animation URL into the file and its options (the reverse of `CYLTabBarAnimationURLWithOptions()`). [CN] 把 Tab 的动画 URL 拆成文件与选项。 */
+/**
+ * [EN] Splits a tab's animation URL into the file and its options (the reverse of `CYLTabBarAnimationURLWithOptions()`). [CN] 把 Tab 的动画 URL 拆成文件与选项。
+ */
 internal fun CYLTabBarAnimationFileAndOptions(url: String): Pair<String, Map<String, String>> {
     val fragment = url.substringAfter('#', "")
     val options = fragment.split('&').filter { it.contains('=') }.associate { Uri.decode(it.substringBefore('=')) to Uri.decode(it.substringAfter('=')) }
     return url.substringBefore('#') to options
 }
 
-/** [EN] The lowercase extension of a URL or path, without options or query. [CN] URL 或路径的小写扩展名（不含选项与查询）。 */
+/**
+ * [EN] The lowercase extension of a URL or path, without options or query. [CN] URL 或路径的小写扩展名（不含选项与查询）。
+ */
 internal fun CYLTabBarAnimationFileExtension(url: String): String =
     url.substringBefore('#').substringBefore('?').substringAfterLast('/').substringAfterLast('.', "").lowercase()
 
@@ -72,23 +84,45 @@ internal fun CYLTabBarAnimationFileExtension(url: String): String =
  * [CN] 控制一个 Tab 图标动画视图，无论其动画库。可选成员的默认实现不做任何事。
  */
 interface CYLTabBarItemAnimationPlayer {
-    /** [EN] The view it controls (held weakly). [CN] 它所控制的视图（弱引用）。 */
+    /**
+     * [EN] The view it controls (held weakly). [CN] 它所控制的视图（弱引用）。
+     */
     val animationView: View?
-    /** [EN] Plays once, from the first frame. [CN] 从第一帧开始播放一次。 */
+    /**
+     * [EN] Plays once, from the first frame. [CN] 从第一帧开始播放一次。
+     */
     fun play()
-    /** [EN] Shows the last frame without playing (the tab selected at launch, #389). [CN] 不播放，直接显示最后一帧（#389）。 */
+    /**
+     * [EN] Shows the last frame without playing (the tab selected at launch, #389). [CN] 不播放，直接显示最后一帧（#389）。
+     */
     fun showLastFrame()
-    /** [EN] Stops, back to the first frame. [CN] 停止并回到第一帧。 */
+    /**
+     * [EN] Stops, back to the first frame. [CN] 停止并回到第一帧。
+     */
     fun stop()
-    /** [EN] The playback position, 0…1. [CN] 播放位置，0…1。 */
+    /**
+     * [EN] The playback position, 0…1. [CN] 播放位置，0…1。
+     */
     var progress: Float
         get() = 0f
         set(@Suppress("UNUSED_PARAMETER") value) { /* [EN] Optional. [CN] 可选。 */ }
-    /** [EN] The playback speed (#428); libraries without one ignore it. [CN] 播放速度（#428）；没有播放速度的动画库忽略它。 */
+    /**
+     * [EN] The playback speed (#428); libraries without one ignore it. [CN] 播放速度（#428）；没有播放速度的动画库忽略它。
+     */
     var animationSpeed: Float
         get() = 1f
         set(@Suppress("UNUSED_PARAMETER") value) { /* [EN] Optional. [CN] 可选。 */ }
-    /** [EN] Applies `darkColors` (keypath → color, #442) where `configuration` is dark, removes them otherwise. [CN] 深色模式下应用 `darkColors`，否则移除。 */
+    /**
+     * [EN] Whether the animation repeats until this is turned off (iOS `loops`); false: it plays once. Applies to the
+     *      animation already playing. Libraries without a loop ignore it.
+     * [CN] 动画是否重复播放直到关闭（iOS 的 `loops`）；false 时只播放一次。对正在播放的动画同样生效。没有循环的动画库忽略它。
+     */
+    var loops: Boolean
+        get() = false
+        set(@Suppress("UNUSED_PARAMETER") value) { /* [EN] Optional. [CN] 可选。 */ }
+    /**
+     * [EN] Applies `darkColors` (keypath → color, #442) where `configuration` is dark, removes them otherwise. [CN] 深色模式下应用 `darkColors`，否则移除。
+     */
     fun applyDarkColors(darkColors: Map<String, Int>, configuration: Configuration) { /* [EN] Optional. [CN] 可选。 */ }
     /**
      * [EN] Applies `colors` (keypath → color, resolved for `configuration`: `CYLTabBarAnimationColors` plus the dark colors
@@ -99,7 +133,9 @@ interface CYLTabBarItemAnimationPlayer {
     fun applyColors(colors: Map<String, Int>?, configuration: Configuration) = applyDarkColors(colors.orEmpty(), configuration)
 }
 
-/** [EN] `CYLTabBarItemAnimationBasePlayer`: a convenient superclass that keeps the view weakly. [CN] 便捷父类，弱引用视图。 */
+/**
+ * [EN] `CYLTabBarItemAnimationBasePlayer`: a convenient superclass that keeps the view weakly. [CN] 便捷父类，弱引用视图。
+ */
 abstract class CYLTabBarItemAnimationBasePlayer(animationView: View) : CYLTabBarItemAnimationPlayer {
     private val viewReference = WeakReference(animationView)
     override val animationView: View? get() = viewReference.get()
@@ -107,44 +143,74 @@ abstract class CYLTabBarItemAnimationBasePlayer(animationView: View) : CYLTabBar
 
 // MARK: - Animators 动画库
 
-/** [EN] `CYLTabBarItemAnimationFileMatching`: which files a library plays, and how it is looked up. [CN] 动画库播放哪些文件、如何被查找。 */
+/**
+ * [EN] `CYLTabBarItemAnimationFileMatching`: which files a library plays, and how it is looked up. [CN] 动画库播放哪些文件、如何被查找。
+ */
 interface CYLTabBarItemAnimationFileMatching {
-    /** [EN] A unique name, e.g. "Lottie"; registering the same name again replaces the animator. [CN] 唯一名称；重复注册同名时替换。 */
+    /**
+     * [EN] A unique name, e.g. "Lottie"; registering the same name again replaces the animator. [CN] 唯一名称；重复注册同名时替换。
+     */
     val identifier: String
-    /** [EN] true for an animation file this library plays. [CN] 本动画库能播放的文件返回 true。 */
+    /**
+     * [EN] true for an animation file this library plays. [CN] 本动画库能播放的文件返回 true。
+     */
     fun canAnimateFileAtURL(url: String): Boolean
-    /** [EN] The lookup order (default `CYLTabBarItemAnimatorPriorityDefault`). [CN] 查找顺序。 */
+    /**
+     * [EN] The lookup order (default `CYLTabBarItemAnimatorPriorityDefault`). [CN] 查找顺序。
+     */
     val priority: CYLTabBarItemAnimatorPriority get() = CYLTabBarItemAnimatorPriorityDefault
-    /** [EN] The file extensions it plays, e.g. ["pag"], to find "<name>.<ext>" for a bare name. [CN] 它播放的文件扩展名。 */
+    /**
+     * [EN] The file extensions it plays, e.g. ["pag"], to find "<name>.<ext>" for a bare name. [CN] 它播放的文件扩展名。
+     */
     val fileExtensions: List<String> get() = emptyList()
-    /** [EN] Its own attribute keys by the generic key they stand for, e.g. { CYLTabBarAnimationURL: CYLTabBarPAGURL }. [CN] 自有 key 与通用 key 的对应。 */
+    /**
+     * [EN] Its own attribute keys by the generic key they stand for, e.g. { CYLTabBarAnimationURL: CYLTabBarPAGURL }. [CN] 自有 key 与通用 key 的对应。
+     */
     val attributeKeys: Map<String, String> get() = emptyMap()
 }
 
-/** [EN] `CYLTabBarItemAnimationViewFactory`: the views a library makes, and a player for each. [CN] 动画库创建的视图及其播放器。 */
+/**
+ * [EN] `CYLTabBarItemAnimationViewFactory`: the views a library makes, and a player for each. [CN] 动画库创建的视图及其播放器。
+ */
 interface CYLTabBarItemAnimationViewFactory {
-    /** [EN] A view showing the first frame of the animation at `url`; null when the file cannot be loaded. [CN] 显示 `url` 动画第一帧的视图；无法加载时为 null。 */
+    /**
+     * [EN] A view showing the first frame of the animation at `url`; null when the file cannot be loaded. [CN] 显示 `url` 动画第一帧的视图；无法加载时为 null。
+     */
     fun animationViewWithURL(context: Context, url: String, size: CYLSize, contentMode: ImageView.ScaleType): View?
-    /** [EN] A player for `view` when it is one of this library's views, else null. [CN] `view` 属于本动画库时返回其播放器，否则 null。 */
+    /**
+     * [EN] A player for `view` when it is one of this library's views, else null. [CN] `view` 属于本动画库时返回其播放器，否则 null。
+     */
     fun playerForAnimationView(view: View): CYLTabBarItemAnimationPlayer?
 }
 
-/** [EN] `CYLTabBarItemAnimator`: an animation library for tab icons. [CN] Tab 图标动画库。 */
+/**
+ * [EN] `CYLTabBarItemAnimator`: an animation library for tab icons. [CN] Tab 图标动画库。
+ */
 interface CYLTabBarItemAnimator : CYLTabBarItemAnimationFileMatching, CYLTabBarItemAnimationViewFactory
 
-/** [EN] `CYLTabBarItemAnimatorRegistering`: what the engine and the factory need from a registry. [CN] 引擎与工厂需要的注册表能力。 */
+/**
+ * [EN] `CYLTabBarItemAnimatorRegistering`: what the engine and the factory need from a registry. [CN] 引擎与工厂需要的注册表能力。
+ */
 interface CYLTabBarItemAnimatorRegistering {
     fun registerAnimator(animator: CYLTabBarItemAnimator)
     fun unregisterAnimatorWithIdentifier(identifier: String)
-    /** [EN] By priority, then registration order. [CN] 按优先级、再按注册顺序。 */
+    /**
+     * [EN] By priority, then registration order. [CN] 按优先级、再按注册顺序。
+     */
     fun animators(): List<CYLTabBarItemAnimator>
     fun animatorWithIdentifier(identifier: String): CYLTabBarItemAnimator?
-    /** [EN] The animator bound to `url`, else the first that can play its file. [CN] 绑定到 `url` 的 animator，否则第一个能播放的。 */
+    /**
+     * [EN] The animator bound to `url`, else the first that can play its file. [CN] 绑定到 `url` 的 animator，否则第一个能播放的。
+     */
     fun animatorForURL(url: String?): CYLTabBarItemAnimator?
-    /** [EN] The first animator whose own keys have a value in `attributes`. [CN] 第一个在 `attributes` 中有值的自有 key 所属的 animator。 */
+    /**
+     * [EN] The first animator whose own keys have a value in `attributes`. [CN] 第一个在 `attributes` 中有值的自有 key 所属的 animator。
+     */
     fun animatorForAttributes(attributes: Map<String, Any?>?): CYLTabBarItemAnimator?
     fun attributeKeyForGenericKey(genericKey: String, attributes: Map<String, Any?>?): String?
-    /** [EN] Binds `url` to `animator` (null removes the binding). [CN] 把 `url` 绑定到 `animator`（null 移除绑定）。 */
+    /**
+     * [EN] Binds `url` to `animator` (null removes the binding). [CN] 把 `url` 绑定到 `animator`（null 移除绑定）。
+     */
     fun bindURL(url: String, animator: CYLTabBarItemAnimator?)
     fun attributeKeysForGenericKey(genericKey: String): List<String>
     fun fileExtensions(): List<String>
@@ -199,7 +265,9 @@ open class CYLTabBarItemAnimatorRegistry : CYLTabBarItemAnimatorRegistering {
     override fun fileExtensions(): List<String> = animators().flatMap { it.fileExtensions }.map { it.lowercase() }.distinct()
 
     companion object {
-        /** [EN] The instance the animators register into. [CN] animator 注册到的共享实例。 */
+        /**
+         * [EN] The instance the animators register into. [CN] animator 注册到的共享实例。
+         */
         @JvmStatic
         val sharedRegistry: CYLTabBarItemAnimatorRegistry by lazy {
             CYLTabBarItemAnimatorRegistry().apply {
@@ -225,7 +293,9 @@ open class CYLTabBarItemAnimatorRegistry : CYLTabBarItemAnimatorRegistering {
 
 // MARK: - Factory 工厂
 
-/** [EN] `CYLTabBarItemAnimationViewMaking`: makes animation views and finds their players. [CN] 创建动画视图并查找其播放器。 */
+/**
+ * [EN] `CYLTabBarItemAnimationViewMaking`: makes animation views and finds their players. [CN] 创建动画视图并查找其播放器。
+ */
 interface CYLTabBarItemAnimationViewMaking {
     fun animationViewWithURL(context: Context, url: String, size: CYLSize, contentMode: ImageView.ScaleType): View?
     fun playerForView(view: View?): CYLTabBarItemAnimationPlayer?
@@ -269,20 +339,28 @@ open class CYLTabBarItemAnimationFactory(val registry: CYLTabBarItemAnimatorRegi
 
 // MARK: - The short path: views that play themselves 简便路径：自己播放的视图
 
-/** [EN] `CYLTabBarItemAnimationPlayableView`: a view that plays, stops and shows its last frame. [CN] 能播放、停止并显示最后一帧的视图。 */
+/**
+ * [EN] `CYLTabBarItemAnimationPlayableView`: a view that plays, stops and shows its last frame. [CN] 能播放、停止并显示最后一帧的视图。
+ */
 interface CYLTabBarItemAnimationPlayableView {
     fun cyl_playAnimationView()
     fun cyl_showAnimationViewLastFrame()
     fun cyl_stopAnimationView()
-    /** [EN] Colors for Dark Mode, already resolved; null restores the light colors. [CN] 深色模式颜色（已解析）；null 恢复浅色。 */
+    /**
+     * [EN] Colors for Dark Mode, already resolved; null restores the light colors. [CN] 深色模式颜色（已解析）；null 恢复浅色。
+     */
     fun cyl_applyAnimationViewColors(colors: Map<String, Int>?) { /* [EN] Optional. [CN] 可选。 */ }
 }
 
-/** [EN] `CYLTabBarItemAnimationViewProviding`: makes playable views for `CYLTabBarItemViewAnimator`. [CN] 为 `CYLTabBarItemViewAnimator` 创建可播放视图。 */
+/**
+ * [EN] `CYLTabBarItemAnimationViewProviding`: makes playable views for `CYLTabBarItemViewAnimator`. [CN] 为 `CYLTabBarItemViewAnimator` 创建可播放视图。
+ */
 // [EN] kotlin:S6517: a plain interface on purpose; its implementations are named objects (`CYLGIFTabBarItemAnimationView.Provider`...) that are public API. [CN] kotlin:S6517：刻意使用普通接口；其实现是作为公开 API 的具名对象（`CYLGIFTabBarItemAnimationView.Provider` 等）。
 @Suppress("kotlin:S6517")
 interface CYLTabBarItemAnimationViewProviding {
-    /** [EN] A view for `fileURL` with the `options` of the tab's URL; null when it cannot be made. [CN] `fileURL` 的视图（带 Tab URL 中的选项）；无法创建时为 null。 */
+    /**
+     * [EN] A view for `fileURL` with the `options` of the tab's URL; null when it cannot be made. [CN] `fileURL` 的视图（带 Tab URL 中的选项）；无法创建时为 null。
+     */
     fun cyl_animationViewWithFileURL(context: Context, fileURL: String, options: Map<String, String>, contentMode: ImageView.ScaleType): View?
 }
 
@@ -299,7 +377,9 @@ open class CYLTabBarItemViewAnimator(
 ) : CYLTabBarItemAnimator {
     override val fileExtensions: List<String> = fileExtensions.map { it.lowercase() }
     override val attributeKeys: Map<String, String> = attributeKeys.orEmpty()
-    /** [EN] Where the views come from; null goes back to the provider given at initialization. [CN] 视图来源；设为 null 恢复初始化时的 provider。 */
+    /**
+     * [EN] Where the views come from; null goes back to the provider given at initialization. [CN] 视图来源；设为 null 恢复初始化时的 provider。
+     */
     var viewProvider: CYLTabBarItemAnimationViewProviding? = defaultViewProvider
         get() = field ?: defaultViewProvider
         set(value) { field = value ?: defaultViewProvider }
@@ -343,7 +423,9 @@ open class CYLTabBarItemViewAnimator(
  * [CN] 打开 Tab 的动画文件：`http(s)` URL（下载一次到缓存）、`file:` URL 或绝对路径、`file:///android_asset/…`、`asset:…`、
  *      `android.resource:` / `content:` URI，或 App assets 中的文件名。对加载路径的动画库（PAG）返回本地文件，对其他（Lottie、Rive）返回流。
  */
-/** [EN] The URL prefix of a file in the app's assets. [CN] App assets 中文件的 URL 前缀。 */
+/**
+ * [EN] The URL prefix of a file in the app's assets. [CN] App assets 中文件的 URL 前缀。
+ */
 private const val ANDROID_ASSET_PREFIX = "file:///android_asset/"
 
 object CYLTabBarItemAnimationFiles {
@@ -352,7 +434,9 @@ object CYLTabBarItemAnimationFiles {
 
     fun isRemote(url: String) = url.startsWith("http://") || url.startsWith("https://")
 
-    /** [EN] The asset name of `url`, or null when it is not an asset. [CN] `url` 对应的 asset 名称；不是 asset 时为 null。 */
+    /**
+     * [EN] The asset name of `url`, or null when it is not an asset. [CN] `url` 对应的 asset 名称；不是 asset 时为 null。
+     */
     fun assetName(url: String): String? = when {
         url.startsWith(ANDROID_ASSET_PREFIX) -> url.removePrefix(ANDROID_ASSET_PREFIX)
         url.startsWith("asset:///") -> url.removePrefix("asset:///")
@@ -361,7 +445,9 @@ object CYLTabBarItemAnimationFiles {
         else -> url
     }
 
-    /** [EN] A stream of a local `url`, or null. [CN] 本地 `url` 的流，或 null。 */
+    /**
+     * [EN] A stream of a local `url`, or null. [CN] 本地 `url` 的流，或 null。
+     */
     fun openLocal(context: Context, url: String): InputStream? = try {
         when {
             isRemote(url) -> null
@@ -372,7 +458,9 @@ object CYLTabBarItemAnimationFiles {
         }
     } catch (error: java.io.IOException) { null } catch (error: SecurityException) { null }
 
-    /** [EN] A local file of `url` (copied to the cache when it is an asset, a stream or remote), delivered on the main thread. [CN] `url` 的本地文件（asset、流或远程文件会复制到缓存），在主线程回调。 */
+    /**
+     * [EN] A local file of `url` (copied to the cache when it is an asset, a stream or remote), delivered on the main thread. [CN] `url` 的本地文件（asset、流或远程文件会复制到缓存），在主线程回调。
+     */
     fun localFile(context: Context, url: String, completion: (File?) -> Unit) {
         if (url.startsWith("/") && File(url).exists()) return completion(File(url))
         if (url.startsWith("file:") && !url.startsWith(ANDROID_ASSET_PREFIX)) return completion(Uri.parse(url).path?.let { File(it) }?.takeIf { it.exists() })
@@ -394,11 +482,15 @@ object CYLTabBarItemAnimationFiles {
 
 // MARK: - Reflection helpers 反射工具
 
-/** [EN] Calls a method by name with arguments adapted to its parameters; null when it cannot. [CN] 按名称调用方法并适配参数；无法调用时返回 null。 */
+/**
+ * [EN] Calls a method by name with arguments adapted to its parameters; null when it cannot. [CN] 按名称调用方法并适配参数；无法调用时返回 null。
+ */
 internal object CYLReflection {
     fun type(name: String): Class<*>? = try { Class.forName(name) } catch (error: ClassNotFoundException) { null } catch (error: LinkageError) { null }
 
-    /** [EN] Public methods by class, name and parameter count, looked up once (theme changes call setters often). [CN] 按类、名称与参数个数缓存的公开方法，只查找一次（主题变化会频繁调用 setter）。 */
+    /**
+     * [EN] Public methods by class, name and parameter count, looked up once (theme changes call setters often). [CN] 按类、名称与参数个数缓存的公开方法，只查找一次（主题变化会频繁调用 setter）。
+     */
     private val methodCache = java.util.concurrent.ConcurrentHashMap<String, List<java.lang.reflect.Method>>()
 
     private fun methods(type: Class<*>, name: String, count: Int): List<java.lang.reflect.Method> =
@@ -413,14 +505,18 @@ internal object CYLReflection {
         return null
     }
 
-    /** [EN] Calls the overload of `name` with the fewest parameters, filling the missing ones with defaults. [CN] 调用参数最少的 `name` 重载，用默认值补齐缺少的参数。 */
+    /**
+     * [EN] Calls the overload of `name` with the fewest parameters, filling the missing ones with defaults. [CN] 调用参数最少的 `name` 重载，用默认值补齐缺少的参数。
+     */
     fun callWithDefaults(target: Any, name: String, provided: Map<Class<*>, Any?> = emptyMap()): Any? {
         val method = target.javaClass.methods.filter { it.name == name }.minByOrNull { it.parameterTypes.size } ?: return null
         val args = method.parameterTypes.map { type -> provided.entries.firstOrNull { type.isAssignableFrom(it.key) }?.value ?: defaultValue(type) }
         return try { method.invoke(target, *args.toTypedArray()) ?: Unit } catch (error: ReflectiveOperationException) { null } catch (error: RuntimeException) { null }
     }
 
-    /** [EN] A placeholder for a parameter left to its Kotlin default (`callKotlin`). [CN] 使用 Kotlin 默认值的参数占位（`callKotlin`）。 */
+    /**
+     * [EN] A placeholder for a parameter left to its Kotlin default (`callKotlin`). [CN] 使用 Kotlin 默认值的参数占位（`callKotlin`）。
+     */
     val DEFAULT = Any()
 
     /**
@@ -465,7 +561,9 @@ internal object CYLReflection {
         return values
     }
 
-    /** [EN] The constant `name` of the enum `className`, or null. [CN] 枚举 `className` 中名为 `name` 的常量，或 null。 */
+    /**
+     * [EN] The constant `name` of the enum `className`, or null. [CN] 枚举 `className` 中名为 `name` 的常量，或 null。
+     */
     fun enumConstant(className: String, name: String): Any? = type(className)?.enumConstants?.firstOrNull { (it as? Enum<*>)?.name == name }
 
     private fun defaultValue(type: Class<*>): Any? = when {
@@ -579,8 +677,14 @@ object CYLLottieTabBarItemAnimator : CYLTabBarItemAnimator {
         override var animationSpeed: Float
             get() = animationView?.let { CYLReflection.call(it, "getSpeed") as? Float } ?: 1f
             set(value) { animationView?.let { CYLReflection.call(it, "setSpeed", value) } }
+        // [EN] LottieDrawable.INFINITE is -1; 0 plays once. [CN] LottieDrawable.INFINITE 为 -1；0 表示播放一次。
+        override var loops: Boolean
+            get() = animationView?.let { CYLReflection.call(it, "getRepeatCount") as? Int } == -1
+            set(value) { animationView?.let { CYLReflection.call(it, "setRepeatCount", if (value) -1 else 0) } }
 
-        /** [EN] Colors by keypath ("Layer.Group.Fill 1.Color" or with "**"), through `addValueCallback(KeyPath, LottieProperty.COLOR, …)`. [CN] 按 keypath 设置颜色，通过 `addValueCallback`。 */
+        /**
+         * [EN] Colors by keypath ("Layer.Group.Fill 1.Color" or with "**"), through `addValueCallback(KeyPath, LottieProperty.COLOR, …)`. [CN] 按 keypath 设置颜色，通过 `addValueCallback`。
+         */
         override fun applyColors(colors: Map<String, Int>?, configuration: Configuration) {
             val view = animationView ?: return
             val keyPathClass = CYLReflection.type("com.airbnb.lottie.model.KeyPath") ?: return
@@ -639,7 +743,10 @@ object CYLPAGTabBarItemAnimator : CYLTabBarItemAnimator {
         if (CYLReflection.type(VIEW_CLASS)?.isInstance(view) == true) PAGPlayer(view) else null
 
     private class PAGPlayer(view: View) : CYLTabBarItemAnimationBasePlayer(view) {
-        override fun play() { animationView?.let { CYLReflection.call(it, "setRepeatCount", 1); CYLReflection.call(it, "setProgress", 0.0); CYLReflection.call(it, "play") } }
+        // [EN] PAGView.setRepeatCount: 0 repeats without end, 1 plays once. [CN] PAGView.setRepeatCount：0 为无限重复，1 为播放一次。
+        override var loops: Boolean = false
+            set(value) { field = value; animationView?.let { CYLReflection.call(it, "setRepeatCount", if (value) 0 else 1) } }
+        override fun play() { animationView?.let { CYLReflection.call(it, "setRepeatCount", if (loops) 0 else 1); CYLReflection.call(it, "setProgress", 0.0); CYLReflection.call(it, "play") } }
         override fun showLastFrame() { animationView?.let { CYLReflection.call(it, "stop"); CYLReflection.call(it, "setProgress", 1.0); CYLReflection.call(it, "flush") } }
         override fun stop() { animationView?.let { CYLReflection.call(it, "stop"); CYLReflection.call(it, "setProgress", 0.0); CYLReflection.call(it, "flush") } }
         override var progress: Float
@@ -661,7 +768,9 @@ object CYLRiveTabBarItemAnimator {
     internal const val VIEW_CLASS = "app.rive.runtime.kotlin.RiveAnimationView"
     val isAvailable: Boolean get() = CYLReflection.type(VIEW_CLASS) != null
 
-    /** [EN] The registered animator, e.g. to inject another view provider. [CN] 已注册的 animator，例如用于注入其他视图 provider。 */
+    /**
+     * [EN] The registered animator, e.g. to inject another view provider. [CN] 已注册的 animator，例如用于注入其他视图 provider。
+     */
     @JvmStatic
     val animator: CYLTabBarItemViewAnimator by lazy {
         CYLTabBarItemViewAnimator("Rive", listOf("riv"), mapOf(
@@ -697,8 +806,18 @@ class CYLRiveTabBarItemAnimationView private constructor(context: Context, priva
 
     private fun setActive(active: Boolean) {
         val machine = stateMachine ?: return
+        if (!hasInput(machine, booleanInput)) return
         CYLReflection.call(rive, "setBooleanState", machine, booleanInput, active)
     }
+
+    /**
+     * [EN] Whether the state machine has the input: rive-android throws `StateMachineInputException` on its render
+     *      thread for a missing one (the default boolean input "active" of a file without it), which crashes the app;
+     *      on iOS, RiveRuntime's `setInput` only logs. Unknown (an older rive-android without `getInputNames`): true.
+     * [CN] 状态机是否有该输入：rive-android 对不存在的输入（没有默认布尔输入 "active" 的文件）会在渲染线程抛出 `StateMachineInputException`，
+     *      导致应用崩溃；iOS 上 RiveRuntime 的 `setInput` 只打印日志。无法判断时（没有 `getInputNames` 的旧版 rive-android）返回 true。
+     */
+    internal fun hasInput(machine: String, input: String): Boolean = CYLRiveInputs.hasInput(rive, machine, input)
 
     override fun cyl_playAnimationView() {
         handler.removeCallbacksAndMessages(null)
@@ -707,7 +826,7 @@ class CYLRiveTabBarItemAnimationView private constructor(context: Context, priva
         val animation = options[CYLConstants.CYLTabBarAnimationOptionRiveAnimation]
         val default = CYLReflection.DEFAULT
         when {
-            machine != null && trigger != null -> CYLReflection.call(rive, "fireState", machine, trigger)
+            machine != null && trigger != null -> { if (hasInput(machine, trigger)) CYLReflection.call(rive, "fireState", machine, trigger) }
             machine != null -> {
                 setActive(true)
                 if (activeDuration > 0) handler.postDelayed({ setActive(false) }, (activeDuration * 1000).toLong())
@@ -728,7 +847,9 @@ class CYLRiveTabBarItemAnimationView private constructor(context: Context, priva
         if (stateMachine != null) setActive(false) else { CYLReflection.call(rive, "stop"); CYLReflection.call(rive, "reset") }
     }
 
-    /** [EN] Provides the views of `CYLRiveTabBarItemAnimator`. [CN] 为 `CYLRiveTabBarItemAnimator` 提供视图。 */
+    /**
+     * [EN] Provides the views of `CYLRiveTabBarItemAnimator`. [CN] 为 `CYLRiveTabBarItemAnimator` 提供视图。
+     */
     object Provider : CYLTabBarItemAnimationViewProviding {
         @Volatile private var riveInitialized = false
 
@@ -783,4 +904,21 @@ class CYLRiveTabBarItemAnimationView private constructor(context: Context, priva
             }
         }
     }
+}
+
+/**
+ * [EN] The inputs of a `RiveAnimationView`'s state machines, read by reflection (`getStateMachines()`, `getName()`,
+ *      `getInputNames()` of rive-android): a missing input is skipped instead of crashing. Unknown answers are true.
+ * [CN] 通过反射读取 `RiveAnimationView` 状态机的输入（rive-android 的 `getStateMachines()`、`getName()`、`getInputNames()`）：
+ *      跳过不存在的输入，避免崩溃。无法判断时返回 true。
+ */
+internal object CYLRiveInputs {
+    fun hasInput(rive: Any, machine: String, input: String): Boolean {
+        val machines = try { rive.javaClass.getMethod("getStateMachines").invoke(rive) as? List<*> } catch (error: Exception) { null } ?: return true
+        val instance = machines.firstOrNull { machineName(it) == machine } ?: return machines.isEmpty()
+        val names = try { instance.javaClass.getMethod("getInputNames").invoke(instance) as? List<*> } catch (error: Exception) { null } ?: return true
+        return names.contains(input)
+    }
+
+    private fun machineName(instance: Any?): String? = try { instance?.javaClass?.getMethod("getName")?.invoke(instance) as? String } catch (error: Exception) { null }
 }

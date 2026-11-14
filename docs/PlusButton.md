@@ -76,7 +76,7 @@
 
 | 角色 / Role | 位置 / Where | 说明 / Notes |
 |:---|:---|:---|
-| 真实 PlusButton / The real plus button | `CYLPlusButton`，位于 `CYLTabBar` 中 / in `CYLTabBar` | 不再被 mask，玻璃下方也会绘制；`-cyl_updateLiquidGlassMask` 目前是空实现，保留为选中态布局的钩子 / no longer masked, so it is drawn under the glass too; `-cyl_updateLiquidGlassMask` is empty for now, kept as a hook for the selected layout |
+| 真实 PlusButton / The real plus button | `CYLPlusButton`，位于 `CYLTabBar` 中 / in `CYLTabBar` | 不再被 mask，玻璃下方也会绘制；`-cyl_updateLiquidGlassMask` 目前是空实现，保留为选中态布局的钩子 / no longer masked, so it is drawn under the glass too; `-cyl_updateLiquidGlassMask` is empty for now, kept as a hook for the selected layout TODO (2026-11-13, to verify): PR #793 also keeps the lens on the plus page when the plus title is drawn by its tab item (`CYL_PLUS_BUTTON_TITLE_KEEPS_LENS_ENABLED`); as risky as the mask, see [Liquid-Glass-Robustness](Liquid-Glass-Robustness.md). |
 | 替身 / The stand-in | `-[CYLPlusButton selectedContentView]`，位于选中图层的 Tab 按钮中 / in the tab button of the selected layer | 位置由 `CYLPlusButtonCenterOfStandIn()` 经坐标转换得到：标题对齐时对齐图标，其他布局对齐按钮中心 / placed by `CYLPlusButtonCenterOfStandIn()` through a coordinate conversion: by icon with an aligned title, by button center otherwise |
 | 规则判断 / The rule | `-[CYLPlusButton cyl_standInShowsNormalImageOnly]` | 唯一决定替身是否只用普通状态图片的地方：`CYLPlusButtonIsInLiquidGlassTabBar()` 且有 PlusButton 子控制器 / the one place that decides whether the stand-in uses the normal image only: `CYLPlusButtonIsInLiquidGlassTabBar()` and a plus child |
 | 图片同步 / Image sync | `-[CYLPlusButton cyl_updateSelectedContentViewImage]` | 本文限制的唯一实现处，可重复调用 / the one place that implements the rule; idempotent |

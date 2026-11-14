@@ -1,0 +1,69 @@
+<view class="cyl-page">
+  <view class="cyl-lottie-stage">
+    <cyl-pag
+      wx:if="{{isPAG}}"
+      id="cyl-playground"
+      class="cyl-lottie-view"
+      path="{{path}}"
+      loop="{{loop}}"
+      fit="{{fit}}"
+      label="{{texts['Animation']}}, {{file}}"
+      bind:ready="cyl_event"
+      bind:complete="cyl_event"
+      bind:loopcomplete="cyl_event"
+      bind:error="cyl_event"
+    />
+    <cyl-lottie
+      wx:else
+      id="cyl-playground"
+      class="cyl-lottie-view"
+      path="{{path}}"
+      loop="{{loop}}"
+      speed="{{speed}}"
+      fit="{{fit}}"
+      colors="{{colors}}"
+      label="{{texts['Animation']}}, {{file}}"
+      bind:ready="cyl_event"
+      bind:complete="cyl_event"
+      bind:loopcomplete="cyl_event"
+      bind:error="cyl_event"
+    />
+  </view>
+
+  <text class="cyl-section-title" aria-role="heading">{{texts['Animation']}}</text>
+  <view class="cyl-section">
+    <view wx:for="{{files}}" wx:key="*this" class="cyl-row {{file === item ? 'cyl-row-selected' : ''}}" bindtap="cyl_file" data-value="{{item}}" aria-role="button" aria-selected="{{file === item}}" aria-label="{{item}}"><text aria-hidden="true">{{item}}</text></view>
+  </view>
+
+  <view class="cyl-section cyl-buttons">
+    <view class="cyl-row cyl-row-action" bindtap="cyl_play" aria-role="button" aria-label="{{texts['Play']}}"><text aria-hidden="true">{{texts['Play']}}</text></view>
+    <view class="cyl-row cyl-row-action" bindtap="cyl_pause" aria-role="button" aria-label="{{texts['Pause']}}"><text aria-hidden="true">{{texts['Pause']}}</text></view>
+    <view class="cyl-row cyl-row-action" bindtap="cyl_stop" aria-role="button" aria-label="{{texts['Stop']}}"><text aria-hidden="true">{{texts['Stop']}}</text></view>
+  </view>
+
+  <text class="cyl-section-title" aria-role="heading">{{texts['Speed']}}</text>
+  <view class="cyl-section">
+    <view wx:for="{{speeds}}" wx:key="*this" class="cyl-row {{speed === item ? 'cyl-row-selected' : ''}}" bindtap="cyl_speed" data-value="{{item}}" aria-role="button" aria-selected="{{speed === item}}" aria-label="{{texts['Speed']}} {{item}}"><text aria-hidden="true">{{item}}×</text></view>
+  </view>
+
+  <text class="cyl-section-title" aria-role="heading">{{texts['Fit']}}</text>
+  <view class="cyl-section">
+    <view wx:for="{{fits}}" wx:key="*this" class="cyl-row {{fit === item ? 'cyl-row-selected' : ''}}" bindtap="cyl_fit" data-value="{{item}}" aria-role="button" aria-selected="{{fit === item}}" aria-label="{{item}}"><text aria-hidden="true">{{item}}</text></view>
+  </view>
+
+  <view class="cyl-section cyl-buttons">
+    <view class="cyl-row">
+      <text aria-hidden="true">{{texts['Loop']}}</text>
+      <switch checked="{{loop}}" bindchange="cyl_loop" aria-label="{{texts['Loop']}}" />
+    </view>
+    <view class="cyl-row">
+      <text aria-hidden="true">{{texts['Recolor']}}</text>
+      <switch checked="{{colors !== null}}" bindchange="cyl_recolor" aria-label="{{texts['Recolor']}}" />
+    </view>
+  </view>
+
+  <text class="cyl-section-title" aria-role="heading">{{texts['Events']}}</text>
+  <view class="cyl-section">
+    <view wx:for="{{events}}" wx:key="index" class="cyl-row" aria-label="{{item}}"><text class="cyl-row-value" aria-hidden="true">{{item}}</text></view>
+  </view>
+</view>

@@ -11,6 +11,8 @@
 // [CN] 与此类绑定的文档：
 //   - CYLUtils helpers: responding outside the superview, a tap animation, and image loading / CYLUtils 通用工具：超出父视图响应点击、点击动画与图片加载
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/CYLUtils-Helpers.md
+//   - Resource routes / 资源路由
+//     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Resource-Routes.md
 // docs-binding:end
 
 /*!
@@ -22,6 +24,7 @@
 #import <UIKit/UIKit.h>
 #import "CYLUtilsMacros.h"
 #import "CYLLocalizedString.h"
+#import "CYLResourceRoute.h"
 #import "NSObject+CYLUtils.h"
 #import "UIView+CYLUtils.h"
 #import "UIViewController+CYLUtils.h"
@@ -38,19 +41,15 @@
 // [CN] FIX: issue #535 — Core、CYLBadgeView 与 App 都可以使用的通用工具。
 #import "UIView+CYLHitTestOutsideBounds.h"
 #import "UIImage+CYLUtils.h"
+/*!
+ * [EN] `CYLUtils` (`+isLiquidGlassActive`) is implemented in Swift (`Swift/CYLUtils.swift`) and declared by the Swift
+ *      interface (`CYLSwiftInterface.h`).
+ * [CN] `CYLUtils`（`+isLiquidGlassActive`）在 Swift 中实现（`Swift/CYLUtils.swift`），由 Swift 接口（`CYLSwiftInterface.h`）声明。
+ */
+#import "CYLSwiftInterface.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface CYLUtils : NSObject
 
-/*!
- * [EN] YES when the system draws Liquid Glass bars: always on iOS 27, and on iOS 26 unless the app opts out with
- *      `UIDesignRequiresCompatibility`. Computed once. `+[CYLConstants isLiquidGlassActive]` returns the same.
- * [CN] 系统是否使用液态玻璃样式：iOS 27 始终是；iOS 26 上除非 App 通过 `UIDesignRequiresCompatibility` 关闭。只计算一次。
- *      `+[CYLConstants isLiquidGlassActive]` 返回相同结果。
- */
-+ (BOOL)isLiquidGlassActive;
-
-@end
 
 NS_ASSUME_NONNULL_END

@@ -17,6 +17,7 @@
 #else
 #import "CYLTabBarController.h"
 #endif
+#import "CYLDemoLocalization.h"
 
 #if CYL_FLATDESIGN_AVAILABLE
 @interface CYLFlatDesignMainTabBarController ()<CYLFlatDesignUITabBarControllerDelegate>
@@ -305,7 +306,7 @@ presentLoginForViewController:(UIViewController *)viewController
                 // #535：PlusButton 也显示角标，与 Tab 一致；每次点击数字加 1（见 -didSelectControl:）。
                 [tabBarController cyl_demo_showPlusButtonBadge];
             } @catch (NSException *exception) {
-                NSLog(CYLLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
+                NSLog(CYLDemoLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
             }
             
             // [CN] 添加仿淘宝tabbar，第一个tab选中后有图标覆盖
@@ -369,7 +370,7 @@ presentLoginForViewController:(UIViewController *)viewController
                 [tabBarController.viewControllers[4] cyl_showBadgeValue:@"NEW" animationType:CYLBadgeAnimationTypeBreathe];
             }
         } @catch (NSException *exception) {
-            NSLog(CYLLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
+            NSLog(CYLDemoLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
         }
         
         
@@ -482,25 +483,25 @@ presentLoginForViewController:(UIViewController *)viewController
 
 - (void)tabBarController:(CYLTabBarController *)tabBarController willShowTabBar:(CYLFlatDesignTabBar *)tabBar {
 #if defined(DEBUG) || defined(BETA)
-    NSLog(CYLLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), @"");
+    NSLog(CYLDemoLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), @"");
 #endif
 }
 
 - (void)tabBarController:(CYLTabBarController *)tabBarController didShowTabBar:(CYLFlatDesignTabBar *)tabBar {
 #if defined(DEBUG) || defined(BETA)
-    NSLog(CYLLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), @"");
+    NSLog(CYLDemoLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), @"");
 #endif
 }
 
 - (void)tabBarController:(CYLTabBarController *)tabBarController willHideTabBar:(CYLFlatDesignTabBar *)tabBar {
 #if defined(DEBUG) || defined(BETA)
-    NSLog(CYLLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), @"");
+    NSLog(CYLDemoLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), @"");
 #endif
 }
 
 - (void)tabBarController:(CYLTabBarController *)tabBarController didHideTabBar:(CYLFlatDesignTabBar *)tabBar {
 #if defined(DEBUG) || defined(BETA)
-    NSLog(CYLLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), @"");
+    NSLog(CYLDemoLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), @"");
 #endif
 }
 
@@ -521,7 +522,7 @@ didRecognizeTabBarItemGesture:(CYLTabBarItemGesture)gesture
 - (void)tabBarController:(CYLTabBarController *)tabBarController didSelectControl:(UIControl *)control {
     
 #if defined(DEBUG) || defined(BETA)
-NSLog(CYLLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), control);
+NSLog(CYLDemoLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), control);
     // #610 / #408: called for every tab button and for the plus button in the flat design style too; the identifier tells
     // which one was tapped. 扁平样式下点击每个 Tab 按钮和 PlusButton 也会调用；用标识区分是哪一个。
     NSLog(@"🟢 #610 flat design tapped \"%@\" (%@)", control.cyl_tabBarItemIdentifier, [control cyl_isPlusButton] ? @"plus button" : @"tab button");

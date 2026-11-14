@@ -46,25 +46,39 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CYLTabBarItemAnimationFactory : NSObject <CYLTabBarItemAnimationViewMaking>
 
-/// [EN] The animators this factory chooses from. [CN] 本工厂从中选择 animator 的注册表。
+/*!
+ * [EN] The animators this factory chooses from. [CN] 本工厂从中选择 animator 的注册表。
+ */
 @property (nonatomic, strong, readonly) id<CYLTabBarItemAnimatorRegistering> registry;
 
-/// [EN] A factory over `registry`. [CN] 基于 `registry` 的工厂。
+/*!
+ * [EN] A factory over `registry`. [CN] 基于 `registry` 的工厂。
+ */
 - (instancetype)initWithRegistry:(id<CYLTabBarItemAnimatorRegistering>)registry NS_DESIGNATED_INITIALIZER;
-/// [EN] A factory over the shared registry. [CN] 基于共享注册表的工厂。
+/*!
+ * [EN] A factory over the shared registry. [CN] 基于共享注册表的工厂。
+ */
 - (instancetype)init;
 
-/// [EN] The factory over the shared registry; the class methods below forward to it. [CN] 基于共享注册表的工厂；下面的类方法都转发给它。
+/*!
+ * [EN] The factory over the shared registry; the class methods below forward to it. [CN] 基于共享注册表的工厂；下面的类方法都转发给它。
+ */
 + (instancetype)sharedFactory;
 
-/// [EN] A ready view for the animation at `URL`, with its player attached; nil when no library plays it. [CN] `URL` 动画的视图（已绑定播放器）；没有动画库能播放时返回 nil。
+/*!
+ * [EN] A ready view for the animation at `URL`, with its player attached; nil when no library plays it. [CN] `URL` 动画的视图（已绑定播放器）；没有动画库能播放时返回 nil。
+ */
 + (nullable UIView *)animationViewWithURL:(NSURL *)URL size:(CGSize)size contentMode:(UIViewContentMode)contentMode
     NS_SWIFT_NAME(animationView(url:size:contentMode:));
 
-/// [EN] The player of `view`, nil when it is no library's view. [CN] `view` 的播放器；不是任何动画库的视图时返回 nil。
+/*!
+ * [EN] The player of `view`, nil when it is no library's view. [CN] `view` 的播放器；不是任何动画库的视图时返回 nil。
+ */
 + (nullable id<CYLTabBarItemAnimationPlayer>)playerForView:(nullable UIView *)view NS_SWIFT_NAME(player(for:));
 
-/// [EN] YES for a view of any library. [CN] 任意动画库的视图返回 YES。
+/*!
+ * [EN] YES for a view of any library. [CN] 任意动画库的视图返回 YES。
+ */
 + (BOOL)isAnimationView:(nullable UIView *)view NS_SWIFT_NAME(isAnimationView(_:));
 
 @end

@@ -13,29 +13,16 @@
  */
 
 #import <UIKit/UIKit.h>
+#import "CYLSwiftInterface.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface UIBarItem (CYLUtils)
-
 /*!
- * [EN] The view UIKit draws for the item (`UIBarButtonItem` and `UITabBarItem` only; `UIBarItem` itself has none).
- *      Since iOS 11 it exists only once the item is on screen, so it can be nil before that.
- * [CN] UIKit 为该 item 绘制的视图（仅 `UIBarButtonItem`、`UITabBarItem` 有，`UIBarItem` 本身没有）。iOS 11 起，item 显示后才会创建，
- *      之前可能为 nil。
+ * [EN] Implemented in Swift (`CYLUtils/Swift/UIBarItem+CYLUtils.swift`). Objective-C callers get its declarations, with their
+ *      documentation, from the generated Swift interface imported above (`CYLSwiftInterface.h`); nothing is declared twice
+ *      (docs/Swift-Migration.md).
+ * [CN] 在 Swift 中实现（`CYLUtils/Swift/UIBarItem+CYLUtils.swift`）。Objective-C 调用方从上面导入的 Swift 生成接口（`CYLSwiftInterface.h`）获得
+ *      声明及其文档；不重复声明（docs/Swift-Migration.md）。
  */
-- (nullable UIView *)cyl_view;
-
-@end
-
-@interface UITabBarItem (CYLUtils)
-
-/*!
- * [EN] The button UIKit draws for the item in its tab bar (`UITabBarButton` / `_UITabButton`).
- * [CN] UIKit 在 TabBar 中为该 item 绘制的按钮（`UITabBarButton` / `_UITabButton`）。
- */
-@property (nonatomic, readonly) UIControl *cyl_tabButton;
-
-@end
 
 NS_ASSUME_NONNULL_END

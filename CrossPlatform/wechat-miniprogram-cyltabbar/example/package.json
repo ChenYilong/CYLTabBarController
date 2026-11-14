@@ -1,0 +1,24 @@
+{
+  "name": "cyl-tabbar-miniprogram-example",
+  "version": "0.2.0",
+  "private": true,
+  "description": "The example mini program of cyl-tabbar-miniprogram (AppID wx5e29c9d33906f074)",
+  "license": "MIT",
+  "dependencies": {
+    "cyl-tabbar-miniprogram": "file:.."
+  },
+  "cylExampleAnimation": "lottie",
+  "scripts": {
+    "setup": "node scripts/cyl_setup.js",
+    "install-components": "node scripts/cyl_install_components.js",
+    "sync": "node scripts/cyl_sync_shared.js",
+    "check": "node scripts/cyl_setup.js --check",
+    "test-ui": "node --test --test-timeout=180000 test-ui/*.test.js",
+    "test-ui-all": "node scripts/cyl_test_ui_all.js"
+  },
+  "devDependencies": {
+    "miniprogram-automator": "0.13.0",
+    "pixelmatch": "4.0.2",
+    "pngjs": "3.4.0"
+  }
+}

@@ -21,19 +21,24 @@ import java.util.Locale
  */
 object CYLTabBarConfigurationLocalization {
 
-    /** [EN] Private: where the configuration came from, set by the file loader ("asset:<folder>" or a folder path). [CN] 私有：配置的来源，由文件加载方法设置（"asset:<目录>" 或目录路径）。 */
+    /**
+     * [EN] Private: where the configuration came from, set by the file loader ("asset:<folder>" or a folder path). [CN] 私有：配置的来源，由文件加载方法设置（"asset:<目录>" 或目录路径）。
+     */
     const val FILE_DIRECTORY_KEY = "_CYLTabBarControllerConfigurationFileDirectory"
-    private const val ASSET_PREFIX = "asset:"
 
     private val textKeys = setOf(
         CYLConstants.CYLTabBarItemTitle, CYLConstants.CYLTabBarItemSelectedTitle,
         CYLConstants.CYLTabBarItemAccessibilityLabel, CYLConstants.CYLTabBarItemAccessibilityHint,
     )
 
-    /** [EN] A folder of tables: in the assets or on disk. [CN] 字符串表所在目录：位于 assets 或磁盘上。 */
+    /**
+     * [EN] A folder of tables: in the assets or on disk. [CN] 字符串表所在目录：位于 assets 或磁盘上。
+     */
     private class Location(val assetFolder: String?, val folder: File?)
 
-    /** [EN] `configuration` with its texts translated, without the private source key. [CN] 翻译文本后的配置，并移除私有来源键。 */
+    /**
+     * [EN] `configuration` with its texts translated, without the private source key. [CN] 翻译文本后的配置，并移除私有来源键。
+     */
     @JvmStatic
     fun localize(context: Context, configuration: Map<String, Any?>): Map<String, Any?> {
         val source = configuration[FILE_DIRECTORY_KEY] as? String
@@ -49,11 +54,15 @@ object CYLTabBarConfigurationLocalization {
         return translate(plain, strings) as Map<String, Any?>
     }
 
-    /** [EN] The app's language (API 23 too, through `ConfigurationCompat`). [CN] App 的语言（通过 `ConfigurationCompat`，也支持 API 23）。 */
+    /**
+     * [EN] The app's language (API 23 too, through `ConfigurationCompat`). [CN] App 的语言（通过 `ConfigurationCompat`，也支持 API 23）。
+     */
     private fun locale(context: Context): Locale =
         androidx.core.os.ConfigurationCompat.getLocales(context.resources.configuration)[0] ?: Locale.getDefault()
 
-    /** [EN] The `.lproj` names to try, as on iOS: the language, its script, its code, "Base", "en". [CN] 依次尝试的 `.lproj` 名称，与 iOS 相同：语言、其文字、语言代码、"Base"、"en"。 */
+    /**
+     * [EN] The `.lproj` names to try, as on iOS: the language, its script, its code, "Base", "en". [CN] 依次尝试的 `.lproj` 名称，与 iOS 相同：语言、其文字、语言代码、"Base"、"en"。
+     */
     internal fun candidates(locale: Locale): List<String> {
         val language = locale.language.ifEmpty { "en" }
         val script = locale.script.ifEmpty {
@@ -82,7 +91,9 @@ object CYLTabBarConfigurationLocalization {
         }
     }
 
-    /** [EN] The dictionary form: a table name, then a path or a bundle name. [CN] 字典形式：表名，然后是路径或 bundle 名称。 */
+    /**
+     * [EN] The dictionary form: a table name, then a path or a bundle name. [CN] 字典形式：表名，然后是路径或 bundle 名称。
+     */
     private fun dictionaryLocation(context: Context, value: Map<*, *>, source: String?): Pair<Location, String> {
         val table = (value[CYLConstants.CYLTabBarLocalizationTableName] as? String)?.takeIf { it.isNotBlank() }?.removeSuffix(".strings") ?: DEFAULT_TABLE
         val path = (value[CYLConstants.CYLTabBarLocalizationPath] as? String)?.takeIf { it.isNotBlank() }
@@ -94,30 +105,12 @@ object CYLTabBarConfigurationLocalization {
 
     private const val DEFAULT_TABLE = "Localizable"
 
-    /** [EN] `CYLTabBarLocalizationPath` to a folder. [CN] 把 `CYLTabBarLocalizationPath` 解析为目录。 */
+    /**
+     * [EN] `CYLTabBarLocalizationPath`, a location route (`CYLResourceRoute`), to a folder. [CN] 把位置路由 `CYLTabBarLocalizationPath`（`CYLResourceRoute`）解析为目录。
+     */
     private fun resolve(context: Context, path: String, source: String?): Location {
-        val dataFolder = context.filesDir.parentFile ?: context.filesDir
-        // [EN] The location routes (docs/Configuration-Localization.md), in this order, as on iOS. [CN] 位置路由
-        //      （docs/Configuration-Localization.md），与 iOS 顺序相同。
-        return when {
-            path.startsWith("bundle:") -> Location(path.removePrefix("bundle:").trim('/'), null)
-            path.startsWith("file:") -> Location(null, File(java.net.URI(path).path ?: path.removePrefix("file:")))
-            path.startsWith("sandbox:") -> {
-                val rest = path.removePrefix("sandbox:").trimStart('/')
-                val first = rest.substringBefore('/')
-                val remainder = if ('/' in rest) rest.substringAfter('/') else ""
-                when (first) {
-                    "Documents" -> Location(null, File(context.filesDir, remainder))
-                    "Caches", "tmp" -> Location(null, File(context.cacheDir, remainder))
-                    else -> Location(null, File(dataFolder, rest))
-                }
-            }
-            path.startsWith("~/") -> Location(null, File(dataFolder, path.removePrefix("~/")))
-            path.startsWith("/") -> Location(null, File(path))
-            source != null && source.startsWith(ASSET_PREFIX) -> Location(join(source.removePrefix(ASSET_PREFIX), path), null)
-            source != null -> Location(null, File(source, path))
-            else -> Location(path.trimEnd('/'), null)
-        }
+        val location = CYLResourceRoute.locationForRoute(context, path, source) ?: return assetsRoot
+        return Location(location.assetPath?.trimEnd('/'), location.file)
     }
 
     private fun join(folder: String, path: String): String = listOf(folder, path).filter { it.isNotEmpty() }.joinToString("/").trimEnd('/')
@@ -142,7 +135,9 @@ object CYLTabBarConfigurationLocalization {
      */
     internal fun parseStrings(bytes: ByteArray): Map<String, String> = CYLStringsScanner(decodeStrings(bytes)).entries()
 
-    /** [EN] The text of a `.strings` file, by its byte order mark (UTF-8 without one). [CN] 按字节顺序标记解码 `.strings` 文件（没有标记时为 UTF-8）。 */
+    /**
+     * [EN] The text of a `.strings` file, by its byte order mark (UTF-8 without one). [CN] 按字节顺序标记解码 `.strings` 文件（没有标记时为 UTF-8）。
+     */
     private fun decodeStrings(bytes: ByteArray): String {
         fun startsWith(vararg mark: Int) = bytes.size >= mark.size && mark.indices.all { bytes[it] == mark[it].toByte() }
         return when {
@@ -153,7 +148,9 @@ object CYLTabBarConfigurationLocalization {
         }
     }
 
-    /** [EN] Reads `"key" = "value";` entries from the text of a `.strings` file. [CN] 从 `.strings` 文件的文本中读取 `"键" = "值";` 条目。 */
+    /**
+     * [EN] Reads `"key" = "value";` entries from the text of a `.strings` file. [CN] 从 `.strings` 文件的文本中读取 `"键" = "值";` 条目。
+     */
     private class CYLStringsScanner(private val text: String) {
         private var index = 0
 
@@ -170,7 +167,9 @@ object CYLTabBarConfigurationLocalization {
             return result
         }
 
-        /** [EN] Skips spaces and comments, then takes `char` when it comes next. [CN] 跳过空白与注释，下一个字符为 `char` 时读取它。 */
+        /**
+         * [EN] Skips spaces and comments, then takes `char` when it comes next. [CN] 跳过空白与注释，下一个字符为 `char` 时读取它。
+         */
         private fun consume(char: Char): Boolean {
             skipSpacesAndComments()
             if (index >= text.length || text[index] != char) return false
@@ -202,7 +201,9 @@ object CYLTabBarConfigurationLocalization {
             return builder.toString()
         }
 
-        /** [EN] The character after a backslash: `\n`, `\t`, `\r`, `\U`/`\u` + four hex digits, or itself. [CN] 反斜杠后的字符。 */
+        /**
+         * [EN] The character after a backslash: `\n`, `\t`, `\r`, `\U`/`\u` + four hex digits, or itself. [CN] 反斜杠后的字符。
+         */
         private fun appendEscape(builder: StringBuilder) {
             when (val escaped = text[index++]) {
                 'n' -> builder.append('\n')

@@ -24,163 +24,23 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /*!
- * [EN] A view that shows only the tab bar of a CYLTabBarController made from a configuration
- *      (`+[CYLTabBarController tabBarControllerWithConfiguration:]`, see docs/Configuration-File.md). The pages belong to
- *      someone else: React Native, Flutter, or an app that draws its own content. Every tab gets a transparent, empty page.
- *      The React Native and Flutter components of `CrossPlatform/` are thin wrappers around it.
- *
- *      - The tab bar controller is built once the view is in a window with a real width (a bar laid out at width 0 keeps
- *        its titles cut), and added as a child of the nearest view controller.
- *      - Image values given as URL strings (a file, or a dev server) are loaded on a background queue first, then the tab
- *        bar is built on the main queue; `imageResolver` handles other values (e.g. a Flutter asset).
- *      - Each view uses its own `CYLTabBarControllerContext` unless the configuration gives one, so several can be on screen.
- *      - Indexes (`selectedIndex`, `badgeValues`, `didSelectTab`) count the tabs of the configuration; the plus button is
- *        left out.
- *
- *          CYLTabBarHostView *bar = [[CYLTabBarHostView alloc] init];
- *          bar.didSelectTab = ^(NSInteger index, NSString *identifier) { [self showPageAtIndex:index]; };
- *          bar.configuration = @{ CYLTabBarControllerTabBarItemsAttributes : items };
- *
- * [CN] 只显示 TabBar 的视图：TabBar 来自根据配置创建的 CYLTabBarController（`+[CYLTabBarController tabBarControllerWithConfiguration:]`，
- *      见 docs/Configuration-File.md）。页面由别人绘制：React Native、Flutter，或自己绘制内容的 App。每个 Tab 得到一个透明的空页面。
- *      `CrossPlatform/` 中的 React Native 与 Flutter 组件都是它的薄封装。
- *
- *      - 视图进入 window 并有真实宽度后才创建 TabBarController（宽度为 0 时布局的 TabBar 会一直截断标题），并加入最近的视图控制器。
- *      - 以 URL 字符串给出的图片（文件或开发服务器）先在后台队列加载，再在主队列创建 TabBar；其他值（例如 Flutter asset）由
- *        `imageResolver` 处理。
- *      - 配置没有给出 `CYLTabBarControllerContext` 时，每个视图使用自己的 context，因此屏幕上可以同时有多个。
- *      - 下标（`selectedIndex`、`badgeValues`、`didSelectTab`）按配置中的 Tab 计算，不含 PlusButton。
+ * [EN] The string constants of this header are macros for Objective-C and Swift constants for Swift
+ *      (`Swift/CYLConstants+Keys.swift`); each `#ifndef __swift__` hides a macro from Swift (docs/Swift-Migration.md).
+ * [CN] 本头文件中的字符串常量对 Objective-C 是宏，对 Swift 是常量（`Swift/CYLConstants+Keys.swift`）；每个 `#ifndef __swift__`
+ *      对 Swift 隐藏一个宏（docs/Swift-Migration.md）。
  */
-/// [EN] Keys of `badgeAttributes` / `plusButtonBadgeAttributes`. [CN] `badgeAttributes` / `plusButtonBadgeAttributes` 的键。
-FOUNDATION_EXTERN NSString *const CYLTabBarHostBadgeValue;
-FOUNDATION_EXTERN NSString *const CYLTabBarHostBadgeColor;
-FOUNDATION_EXTERN NSString *const CYLTabBarHostBadgeAnimation;
-FOUNDATION_EXTERN NSString *const CYLTabBarHostBadgeRadius;
-FOUNDATION_EXTERN NSString *const CYLTabBarHostBadgeCenterOffset;
 
-@interface CYLTabBarHostView : UIView
-
-/// [EN] The configuration (the keys of `-[CYLTabBarController initWithConfiguration:]`). Setting it rebuilds the tab bar.
-/// [CN] 配置（`-[CYLTabBarController initWithConfiguration:]` 的键）。设置后重新创建 TabBar。
-@property (nonatomic, copy, nullable) NSDictionary<NSString *, id> *configuration;
-
-/// [EN] Sets `configuration` from JSON text; returns NO (and changes nothing) when it is not a JSON object.
-/// [CN] 用 JSON 文本设置 `configuration`；不是 JSON 对象时返回 NO，且不做任何修改。
-- (BOOL)setConfigurationJSON:(nullable NSString *)JSON;
 
 /*!
- * [EN] Turns an image value of a tab or of the plus button (`CYLTabBarItemImage`, `CYLTabBarItemSelectedImage`) into a
- *      UIImage. Called on a background queue; return nil to let the view handle the value: a URL string is downloaded,
- *      anything else (an image name, `system:…`, a path) goes to the library as it is.
- * [CN] 把 Tab 或 PlusButton 的图片值（`CYLTabBarItemImage`、`CYLTabBarItemSelectedImage`）转为 UIImage。在后台队列调用；返回 nil
- *      时由视图处理：URL 字符串会被下载，其他值（图片名称、`system:…`、路径）原样交给库。
+ * [EN] `CYLTabBarHostView` is implemented in Swift (`Swift/CYLTabBarHostView.swift`, every property and selector kept) and
+ *      declared by the generated Swift interface (`CYLSwiftInterface.h`), imported at the end of this header
+ *      (docs/Swift-Migration.md, step 36). The badge attribute keys above stay macros for Objective-C; Swift has them as
+ *      constants in `CYLConstants+Keys.swift`.
+ * [CN] `CYLTabBarHostView` 在 Swift 中实现（`Swift/CYLTabBarHostView.swift`，所有属性与 selector 不变），由本头文件末尾导入的 Swift 生成接口
+ *      （`CYLSwiftInterface.h`）声明（docs/Swift-Migration.md，第 36 步）。上面的角标属性 key 对 Objective-C 仍是宏；Swift 使用
+ *      `CYLConstants+Keys.swift` 中的常量。
  */
-@property (nonatomic, copy, nullable) UIImage *_Nullable (^imageResolver)(id value);
-
-/// [EN] The selected tab, -1 to leave it to the user's taps. [CN] 选中的 Tab，-1 表示由用户点击决定。
-@property (nonatomic, assign) NSInteger selectedIndex;
-
-/// [EN] A badge per tab: @"" none, @"dot" a red dot, anything else a text. [CN] 每个 Tab 一个角标：@"" 无，@"dot" 红点，其他为文字。
-@property (nonatomic, copy) NSArray<NSString *> *badgeValues;
-
-/// [EN] The plus button's badge: @"" or nil none, @"dot" a red dot, anything else a text. [CN] PlusButton 的角标：@"" 或 nil 无，@"dot" 红点，其他为文字。
-@property (nonatomic, copy, nullable) NSString *plusButtonBadgeValue;
-
-/// [EN] The animation of text badges (tabs and plus button), `CYLBadgeAnimationTypeNone` by default.
-/// [CN] 文字角标（Tab 与 PlusButton）的动画，默认 `CYLBadgeAnimationTypeNone`。
-@property (nonatomic, assign) NSInteger badgeAnimationType;
-
-/*!
- * [EN] Badges with a style, one per tab, taking precedence over `badgeValues` for the tabs they cover: dictionaries with
- *      `CYLTabBarHostBadgeValue` (as in `badgeValues`), and optionally `CYLTabBarHostBadgeColor` (a UIColor or
- *      "#RRGGBB"), `CYLTabBarHostBadgeAnimation` (a `CYLBadgeAnimationType` number or its name: "scale", "shake",
- *      "bounce", "breathe"...), `CYLTabBarHostBadgeRadius` (the dot's radius) and `CYLTabBarHostBadgeCenterOffset`
- *      ([x, y] or an NSValue of CGPoint). An empty dictionary or NSNull leaves the tab to `badgeValues`.
- * [CN] 带样式的角标，每个 Tab 一个，覆盖 `badgeValues` 中对应的 Tab：字典包含 `CYLTabBarHostBadgeValue`（写法同 `badgeValues`），可选
- *      `CYLTabBarHostBadgeColor`（UIColor 或 "#RRGGBB"）、`CYLTabBarHostBadgeAnimation`（`CYLBadgeAnimationType` 数字或名称："scale"、
- *      "shake"、"bounce"、"breathe" 等）、`CYLTabBarHostBadgeRadius`（红点半径）与 `CYLTabBarHostBadgeCenterOffset`（[x, y] 或 CGPoint 的
- *      NSValue）。空字典或 NSNull 表示该 Tab 使用 `badgeValues`。
- */
-@property (nonatomic, copy, nullable) NSArray *badgeAttributes;
-
-/// [EN] The plus button's badge with a style, as an entry of `badgeAttributes`; wins over `plusButtonBadgeValue`.
-/// [CN] 带样式的 PlusButton 角标，写法同 `badgeAttributes` 的一项；优先于 `plusButtonBadgeValue`。
-@property (nonatomic, copy, nullable) NSDictionary<NSString *, id> *plusButtonBadgeAttributes;
-
-/*!
- * [EN] An image covering each tab's icon, in both states (`-[UIControl cyl_coverVisiableTabImageViewOrTabButton:...]`),
- *      or NSNull for none: a UIImage, an image name or a URL (loaded on a background queue, or by `imageResolver`).
- * [CN] 覆盖每个 Tab 图标的图片（两种状态，`-[UIControl cyl_coverVisiableTabImageViewOrTabButton:...]`），NSNull 表示没有：UIImage、图片名称或
- *      URL（在后台队列加载，或由 `imageResolver` 加载）。
- */
-@property (nonatomic, copy, nullable) NSArray *tabCoverImages;
-
-/*!
- * [EN] NO (the default): `preferredHeight` is the bar's height, bottom safe area included; the plus button may rise above
- *      the view. YES: it also includes what rises above the bar (the plus button, a badge), for hosts that clip, like Flutter.
- * [CN] NO（默认）：`preferredHeight` 为 TabBar 的高度，包含底部安全区；PlusButton 可以超出视图上方。YES：同时包含高出 TabBar 的部分
- *      （PlusButton、角标），供会裁剪的宿主使用，例如 Flutter。
- */
-@property (nonatomic, assign) BOOL heightIncludesOverflow;
-
-/// [EN] The height the view needs, 0 before the tab bar is built. [CN] 视图需要的高度，创建 TabBar 之前为 0。
-@property (nonatomic, assign, readonly) CGFloat preferredHeight;
-
-/*!
- * [EN] A tab was tapped: its index and its `CYLTabBarItemIdentifier`. The plus button's own page
- *      (`CYLTabBarItemPageIdentifier` in `CYLTabBarControllerPlusButton`) reports index -1 and the plus button's identifier.
- * [CN] 点击了 Tab：下标与 `CYLTabBarItemIdentifier`。PlusButton 自己的页面（`CYLTabBarControllerPlusButton` 中的
- *      `CYLTabBarItemPageIdentifier`）报告下标 -1 与 PlusButton 的标识。
- */
-@property (nonatomic, copy, nullable) void (^didSelectTab)(NSInteger index, NSString *identifier);
-
-/// [EN] A long press on a tab (its index) or on the plus button (-1), with the title it shows. [CN] 长按 Tab（其下标）或 PlusButton（-1），以及显示的标题。
-@property (nonatomic, copy, nullable) void (^didLongPressTab)(NSInteger index, NSString *identifier, NSString *title);
-
-/*!
- * [EN] Login (issue #19): `loggedIn` is the controller's `cyl_loggedIn`. While logged out, a tap on a tab listed in
- *      `CYLTabBarControllerLoginRequiredTabBarItemIdentifiers` does not select it: `didRequestLogin` reports it (index,
- *      identifier, title), and the app shows its login screen, then sets `loggedIn` and `selectedIndex` once logged in.
- *      Logging out while such a tab is selected selects the first tab that does not need login, reported by `didSelectTab`.
- * [CN] 登录（issue #19）：`loggedIn` 即控制器的 `cyl_loggedIn`。未登录时，点击 `CYLTabBarControllerLoginRequiredTabBarItemIdentifiers` 中的 Tab
- *      不会选中它：`didRequestLogin` 报告该 Tab（下标、标识、标题），App 展示登录界面，登录后设置 `loggedIn` 与 `selectedIndex`。
- *      选中这类 Tab 时退出登录，会选中第一个不需要登录的 Tab，并通过 `didSelectTab` 报告。
- */
-@property (nonatomic, assign) BOOL loggedIn;
-@property (nonatomic, copy, nullable) void (^didRequestLogin)(NSInteger index, NSString *identifier, NSString *title);
-/*!
- * [EN] The login state the tab bar uses, reported once it is built: until the app sets `loggedIn`, the state the library
- *      cached (`cyl_loggedIn`, kept across launches), so the app can start from it.
- * [CN] TabBar 使用的登录状态，在 TabBar 创建后报告：App 设置 `loggedIn` 之前为库缓存的状态（`cyl_loggedIn`，App 重启后保留），App 可以从它开始。
- */
-@property (nonatomic, copy, nullable) void (^loginStateDidChange)(BOOL loggedIn);
-/*!
- * [EN] Forgets the state the app set with `loggedIn`: the next tab bar built uses the cached state again.
- * [CN] 忘记 App 通过 `loggedIn` 设置的状态：之后创建的 TabBar 重新使用缓存的状态。
- */
-- (void)resetLoggedIn;
-
-/// [EN] The plus button of `CYLTabBarControllerPlusButton` was tapped. [CN] 点击了 `CYLTabBarControllerPlusButton` 的 PlusButton。
-@property (nonatomic, copy, nullable) void (^didTapPlusButton)(void);
-
-/// [EN] `preferredHeight` changed. [CN] `preferredHeight` 发生变化。
-@property (nonatomic, copy, nullable) void (^preferredHeightDidChange)(CGFloat height);
-
-/*!
- * [EN] The parts of the view that take touches, in its coordinates (NSValue of CGRect): the tab bar, and the plus button with
- *      its badge. With `heightIncludesOverflow`, the strip above the bar is transparent: a touch there outside these rects
- *      goes to the views below. Hosts that hit-test themselves (Flutter) read them; empty before the tab bar is built.
- * [CN] 视图中接收触摸的部分（视图坐标，CGRect 的 NSValue）：TabBar，以及 PlusButton 与其角标。`heightIncludesOverflow` 时 TabBar 上方的区域
- *      是透明的：落在这些矩形之外的触摸交给下方的视图。自己做命中测试的宿主（Flutter）读取它；创建 TabBar 之前为空。
- */
-@property (nonatomic, copy, readonly) NSArray<NSValue *> *touchableRects;
-
-/// [EN] `touchableRects` changed. [CN] `touchableRects` 发生变化。
-@property (nonatomic, copy, nullable) void (^touchableRectsDidChange)(NSArray<NSValue *> *rects);
-
-/// [EN] The tab bar controller, nil until it is built. [CN] TabBarController，创建之前为 nil。
-@property (nonatomic, strong, readonly, nullable) CYLTabBarController *tabBarController;
-
-@end
 
 NS_ASSUME_NONNULL_END
+
+#import "CYLSwiftInterface.h"

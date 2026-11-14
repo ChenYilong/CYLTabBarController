@@ -1,0 +1,83 @@
+/* [EN] Shared page styles: inset grouped sections on the grouped background, as the other examples. [CN] 共用页面样式：分组背景上的圆角分组，与其他示例一致。 */
+page {
+  background-color: #f2f2f7;
+  color: #000000;
+  font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  page {
+    background-color: #000000;
+    color: #ffffff;
+  }
+  .cyl-section {
+    background-color: #1c1c1e;
+  }
+  .cyl-row + .cyl-row {
+    border-top-color: rgba(255, 255, 255, 0.15);
+  }
+}
+
+.cyl-page {
+  padding: 16px 16px calc(120px + env(safe-area-inset-bottom));
+}
+
+.cyl-header {
+  margin: 8px 4px 16px;
+}
+
+.cyl-header-title {
+  display: block;
+  font-size: 22px;
+  font-weight: 600;
+}
+
+.cyl-header-subtitle {
+  display: block;
+  margin-top: 6px;
+  font-size: 14px;
+  color: #8e8e93;
+}
+
+.cyl-section-title {
+  display: block;
+  margin: 20px 16px 6px;
+  font-size: 13px;
+  color: #8e8e93;
+  text-transform: uppercase;
+}
+
+.cyl-section {
+  border-radius: 10px;
+  background-color: #ffffff;
+  overflow: hidden;
+}
+
+.cyl-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 44px;
+  padding: 0 16px;
+  font-size: 16px;
+}
+
+.cyl-row + .cyl-row {
+  border-top: 1rpx solid rgba(0, 0, 0, 0.12);
+}
+
+.cyl-row-value {
+  color: #8e8e93;
+  font-size: 15px;
+  text-align: right;
+}
+
+.cyl-row-action {
+  color: #007aff;
+}
+
+.cyl-row-selected::after {
+  content: "✓";
+  color: #007aff;
+}

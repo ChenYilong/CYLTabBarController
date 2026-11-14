@@ -1,0 +1,38 @@
+/* [EN] The canvas fills the component; size the component from outside. [CN] 画布填满组件；组件尺寸由外部设置。 */
+:host {
+  display: inline-block;
+  width: 100px;
+  height: 100px;
+}
+
+.cyl-lottie-box {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.cyl-lottie-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* [EN] WeChat DevTools: the canvas only draws, out of sight; its image shows the animation. `visibility: hidden` alone was
+   not always honored there (the moving canvas showed through), so the canvas also moves off screen and is transparent.
+   [CN] 微信开发者工具：画布只在视野外绘制，由其图片显示动画。仅用 `visibility: hidden` 在开发者工具中并不总是生效（移动的
+   画布仍会透出），因此画布同时移出屏幕并设为透明。 */
+.cyl-lottie-canvas-covered {
+  position: absolute;
+  left: -10000px;
+  top: 0;
+  visibility: hidden;
+  opacity: 0;
+}
+
+.cyl-lottie-snapshot {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+}

@@ -50,6 +50,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)cyl_setBackgroundImageDidChangeHandler:(nullable void (^)(void))handler;
 /// [EN] Removes the image from the plus button and its stand-in, in every state. [CN] 移除 PlusButton 及其替身所有状态的图片。
 - (void)cyl_removeImage;
+/// [EN] While the Liquid Glass gesture presses or drags, the lens mask is off; it is checked again once the lens settles.
+/// [CN] 液态玻璃手势按压或拖动期间关闭放大镜遮罩；放大镜停稳后再重新判断。
+- (void)cyl_setLiquidGlassLensMaskSuspended:(BOOL)suspended;
 @end
 
 /// [EN] Implemented in CYLTabBarController.m (CYLTheme, issue #216). [CN] 实现见 CYLTabBarController.m 中的 CYLTheme（issue #216）。
@@ -58,6 +61,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)cyl_applyConfigurationThemes:(NSDictionary<NSString *, id> *)normalizedConfiguration;
 /// [EN] Once, when first shown: the theme chosen at launch. [CN] 首次显示时执行一次：应用启动时选择的主题。
 - (void)cyl_applyLaunchTabBarThemeIfNeeded;
+/// [EN] The tab bar's part of the theme callback, implemented in Swift (CYLTabBarController+CYLTheme.swift). [CN] 主题回调中 TabBar 的部分，由 Swift 实现（CYLTabBarController+CYLTheme.swift）。
+- (void)cyl_tabBarThemeDidChangeByManager:(nullable CYLThemeManager *)manager theme:(nullable NSObject *)theme;
 /// [EN] Implemented in the main implementation (tabBar.standardAppearance). [CN] 实现于主 implementation（tabBar.standardAppearance）。
 - (void)cyl_syncTabBarAppearances;
 /// [EN] The icon view providers by view controller (theme icons use them). [CN] 按子控制器保存的图标视图 provider（主题图标会使用）。

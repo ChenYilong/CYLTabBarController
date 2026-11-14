@@ -1,0 +1,32 @@
+.cyl-item-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.cyl-item-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 31%;
+  margin-bottom: 12px;
+  padding: 12px 4px 8px;
+  box-sizing: border-box;
+  border-radius: 10px;
+  background-color: #ffffff;
+}
+
+.cyl-item-demo {
+  width: 72px;
+  height: 56px;
+  border-radius: 12px;
+}
+
+.cyl-item-caption {
+  margin-top: 6px;
+  font-size: 10px;
+  line-height: 13px;
+  color: #8e8e93;
+  text-align: center;
+  word-break: break-all;
+}

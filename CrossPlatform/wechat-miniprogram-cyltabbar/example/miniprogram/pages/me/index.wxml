@@ -1,0 +1,91 @@
+<view class="cyl-page" bindtouchstart="cyl_onSwipeStart" bindtouchend="cyl_onSwipeEnd">
+  <view class="cyl-section">
+    <view wx:if="{{installed === 'lottie' || installed === 'pag'}}" class="cyl-row cyl-row-action" bindtap="cyl_openPlayground" aria-role="button" aria-label="{{texts['cyl-lottie playground']}}"><text aria-hidden="true">{{texts['cyl-lottie playground']}}</text></view>
+    <view class="cyl-row cyl-row-action" bindtap="cyl_openItemPlayground" aria-role="button" aria-label="{{texts['cyl-tab-bar-item playground']}}"><text aria-hidden="true">{{texts['cyl-tab-bar-item playground']}}</text></view>
+  </view>
+
+  <text class="cyl-section-title" aria-role="heading">{{texts['Badges']}}</text>
+  <view class="cyl-section">
+    <view class="cyl-row cyl-row-action" bindtap="cyl_badge" data-identifier="discover" data-value="3" aria-role="button" aria-label="{{texts['Number on Discover']}}"><text aria-hidden="true">{{texts['Number on Discover']}}</text></view>
+    <view class="cyl-row cyl-row-action" bindtap="cyl_badge" data-identifier="discover" data-value="120" aria-role="button" aria-label="{{texts['99+ on Discover']}}"><text aria-hidden="true">{{texts['99+ on Discover']}}</text></view>
+    <view class="cyl-row cyl-row-action" bindtap="cyl_badge" data-identifier="me" data-value="•" aria-role="button" aria-label="{{texts['Dot on Me']}}"><text aria-hidden="true">{{texts['Dot on Me']}}</text></view>
+    <view class="cyl-row cyl-row-action" bindtap="cyl_badge" data-value="clear" aria-role="button" aria-label="{{texts['Remove badges']}}"><text aria-hidden="true">{{texts['Remove badges']}}</text></view>
+  </view>
+
+  <text class="cyl-section-title" aria-role="heading">{{texts['Tab icons']}}</text>
+  <view class="cyl-section">
+    <view class="cyl-row {{icons === installed ? 'cyl-row-selected' : ''}}" bindtap="cyl_icons" data-value="{{installed}}" aria-role="button" aria-selected="{{icons === installed}}" aria-disabled="{{!animationAvailable}}" aria-label="{{installedLabel}}"><text aria-hidden="true">{{installedLabel}}{{animationAvailable ? '' : ' (—)'}}</text></view>
+    <view class="cyl-row {{icons === 'images' ? 'cyl-row-selected' : ''}}" bindtap="cyl_icons" data-value="images" aria-role="button" aria-selected="{{icons === 'images'}}" aria-label="{{texts['Images']}}"><text aria-hidden="true">{{texts['Images']}}</text></view>
+  </view>
+
+  <!-- [EN] Playback controls: Play all, speed, loop; they combine and apply live. [CN] 播放控件：全部播放、速度、循环；组合使用，实时生效。 -->
+  <text class="cyl-section-title" aria-role="heading">{{texts['Playback']}}</text>
+  <view class="cyl-section">
+    <view class="cyl-row cyl-row-action" bindtap="cyl_playAll" aria-role="button" aria-label="{{texts['Play all']}}"><text aria-hidden="true">{{texts['Play all']}}</text></view>
+    <view class="cyl-row cyl-row-slider">
+      <text aria-hidden="true">{{texts['Speed']}}</text>
+      <slider class="cyl-slider" min="0.25" max="3" step="0.25" value="{{animationSpeed}}" block-size="20" bindchanging="cyl_speed" bindchange="cyl_speed" aria-label="{{texts['Speed']}}, {{animationSpeed}} {{texts['times']}}" />
+      <text class="cyl-row-value" aria-hidden="true">{{animationSpeed}}×</text>
+    </view>
+    <view class="cyl-row">
+      <text aria-hidden="true">{{texts['Loop']}}</text>
+      <switch checked="{{animationLoop}}" bindchange="cyl_loop" aria-label="{{texts['Loop']}}, {{animationLoop ? texts['on'] : texts['off']}}" />
+    </view>
+  </view>
+
+  <text class="cyl-section-title" aria-role="heading">{{texts['Skins']}}</text>
+  <view class="cyl-section">
+    <view wx:for="{{skins}}" wx:key="*this" class="cyl-row {{state.themeIdentifier === item ? 'cyl-row-selected' : ''}}" bindtap="cyl_skin" data-value="{{item}}" aria-role="button" aria-selected="{{state.themeIdentifier === item}}" aria-label="{{item || texts['Follow the configuration']}}">
+      <text aria-hidden="true">{{item || texts['Follow the configuration']}}</text>
+    </view>
+  </view>
+
+  <text class="cyl-section-title" aria-role="heading">{{texts['Style']}}</text>
+  <view class="cyl-section">
+    <view wx:for="{{styleTypes}}" wx:key="*this" class="cyl-row {{currentStyleType === item ? 'cyl-row-selected' : ''}}" bindtap="cyl_style" data-value="{{item}}" aria-role="button" aria-selected="{{currentStyleType === item}}" aria-label="{{item}}">
+      <text aria-hidden="true">{{item}}</text>
+    </view>
+  </view>
+
+  <text class="cyl-section-title" aria-role="heading">{{texts['Item style']}}</text>
+  <view class="cyl-section">
+    <view wx:for="{{itemStyles}}" wx:key="*this" class="cyl-row {{currentItemStyle === item ? 'cyl-row-selected' : ''}}" bindtap="cyl_itemStyle" data-value="{{item}}" aria-role="button" aria-selected="{{currentItemStyle === item}}" aria-label="{{item ? item : texts['Follow the style']}}">
+      <text aria-hidden="true">{{item ? item : texts['Follow the style']}}</text>
+    </view>
+  </view>
+
+  <!-- [EN] CYLGlassLensStyle: the look of the Liquid Glass lens (liquidGlass item style only). [CN] CYLGlassLensStyle：液态玻璃透镜的外观（仅 liquidGlass Item 样式）。 -->
+  <text class="cyl-section-title" aria-role="heading">{{texts['Glass lens']}}</text>
+  <view class="cyl-section">
+    <view wx:for="{{glassLensStyles}}" wx:key="value" class="cyl-row {{currentGlassLensStyle === item.value ? 'cyl-row-selected' : ''}}" bindtap="cyl_glassLensStyle" data-value="{{item.value}}" aria-role="button" aria-selected="{{currentGlassLensStyle === item.value}}" aria-label="{{item.label}}">
+      <text aria-hidden="true">{{item.label}}</text>
+    </view>
+  </view>
+
+  <text class="cyl-section-title" aria-role="heading">{{texts['Tap animation']}}</text>
+  <view class="cyl-section">
+    <view wx:for="{{tapAnimations}}" wx:key="value" class="cyl-row {{currentTapAnimation === item.value ? 'cyl-row-selected' : ''}}" bindtap="cyl_tapAnimation" data-value="{{item.value}}" aria-role="button" aria-selected="{{currentTapAnimation === item.value}}" aria-label="{{item.label}}">
+      <text aria-hidden="true">{{item.label}}</text>
+    </view>
+  </view>
+
+  <text class="cyl-section-title" aria-role="heading">{{texts['Options']}}</text>
+  <view class="cyl-section">
+    <view class="cyl-row">
+      <text aria-hidden="true">{{texts['Swipe to switch tabs']}}</text>
+      <switch checked="{{state.overrides.CYLTabBarControllerSwipeToSwitchTab}}" bindchange="cyl_swipeOption" aria-label="{{texts['Swipe to switch tabs']}}" />
+    </view>
+    <view class="cyl-row">
+      <text aria-hidden="true">{{texts['Bold selected titles']}}</text>
+      <switch checked="{{state.overrides.cylDemoBoldTitles}}" bindchange="cyl_boldTitles" aria-label="{{texts['Bold selected titles']}}" />
+    </view>
+  </view>
+
+  <text class="cyl-section-title" aria-role="heading">{{texts['Login']}}</text>
+  <view class="cyl-section">
+    <view class="cyl-row">
+      <text aria-hidden="true">{{texts['Me needs login']}}</text>
+      <switch checked="{{state.overrides.CYLTabBarControllerLoginRequiredTabBarItemIdentifiers.length > 0}}" bindchange="cyl_loginRequired" aria-label="{{texts['Me needs login']}}" />
+    </view>
+  </view>
+</view>

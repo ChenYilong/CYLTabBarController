@@ -10,6 +10,7 @@
 #import "CYLMineViewController.h"
 #import "CYLSameCityViewController.h"
 #import "CYLHomeViewController.h"
+#import "CYLDemoLocalization.h"
 @interface CYLDetailsViewController ()
 
 @end
@@ -22,7 +23,7 @@
     self.view.backgroundColor = [UIColor orangeColor];
     
     UILabel *label = [[UILabel alloc] init];
-    label.text = CYLLocalizedString(@"点击屏幕可跳转到“我的”，执行testPush");
+    label.text = CYLDemoLocalizedString(@"点击屏幕可跳转到“我的”，执行testPush");
     label.frame = CGRectMake(20, 150, CGRectGetWidth(self.view.frame) - 2 * 20, 20);
     label.autoresizingMask = UIViewAutoresizingFlexibleWidth;
     label.textAlignment = NSTextAlignmentCenter;
@@ -56,7 +57,7 @@
         @try {
             [mineViewController testPush];
         } @catch (NSException *exception) {
-            NSLog(CYLLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
+            NSLog(CYLDemoLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
         }
     }];
 }

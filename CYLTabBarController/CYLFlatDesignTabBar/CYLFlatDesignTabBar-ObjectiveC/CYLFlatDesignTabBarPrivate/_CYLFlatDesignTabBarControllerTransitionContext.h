@@ -7,24 +7,15 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "CYLSwiftInterface.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface _CYLFlatDesignUITabBarControllerTransitionContext : NSObject<UIViewControllerContextTransitioning>
-
-@property (nonatomic, copy) void(^completionBlock)(BOOL didComplete);
-
-@property (nonatomic, assign, getter=isAnimated) BOOL animated;
-@property (nonatomic, assign, getter=isInteractive) BOOL interactive;
-
 /*!
- * [EN] Creates a transition context for switching from `sourceViewController` to `destinationViewController` inside `containerView`.
- * [CN] 创建转场上下文，用于在 containerView 中从 sourceViewController 切换到 destinationViewController。
+ * [EN] `_CYLFlatDesignUITabBarControllerTransitionContext` is implemented in Swift (`../Swift/_CYLFlatDesignTabBarControllerTransition.swift`) and declared
+ *      by the generated Swift interface (`CYLSwiftInterface.h`), as a class cannot be declared twice (docs/Swift-Migration.md).
+ * [CN] `_CYLFlatDesignUITabBarControllerTransitionContext` 在 Swift 中实现（`../Swift/_CYLFlatDesignTabBarControllerTransition.swift`），由 Swift 生成接口（`CYLSwiftInterface.h`）
+ *      声明，因为一个类不能声明两次（docs/Swift-Migration.md）。
  */
-- (instancetype)initWithSourceViewController:(nullable UIViewController *)sourceViewController
-                   destinationViewController:(nullable __kindof UIViewController *)destinationViewController
-                               containerView:(__kindof UIView *)containerView;
-
-@end
 
 NS_ASSUME_NONNULL_END

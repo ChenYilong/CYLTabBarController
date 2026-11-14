@@ -31,9 +31,22 @@ let package = Package(
             ],
             path: "CYLTabBarController/LottieSwift"
         ),
+        // [EN] Swift migration (docs/Swift-Migration.md): SwiftPM cannot mix Swift and Objective-C in one target, so the
+        //      translated files (the `Swift/` folders) are a lower target the Objective-C target depends on.
+        // [CN] Swift 迁移（docs/Swift-Migration.md）：SwiftPM 不能在一个 target 中混用 Swift 与 Objective-C，因此已翻译的文件
+        //      （各 `Swift/` 目录）组成一个更底层的 target，由 Objective-C target 依赖。
+        .target(
+            name: "CYLTabBarControllerSwift",
+            path: "CYLTabBarController",
+            sources: ["CYLUtils/Swift", "CYLBadgeView/Swift", "Swift", "CYLFlatDesignTabBar/CYLFlatDesignTabBar-ObjectiveC/Swift"],
+            // [EN] The resource bundle belongs to the target that reads it (`CYLResourceBundle()`, now in Swift).
+            // [CN] 资源包属于读取它的 target（`CYLResourceBundle()`，现在用 Swift 实现）。
+            resources: [.copy("Resources/CYLTabBarController.bundle")]
+        ),
         .target(
             name: "CYLTabBarController",
             dependencies: [
+                "CYLTabBarControllerSwift",
                 "CYLTabBarControllerLottieSwift",
                 .product(name: "Lottie", package: "lottie-spm"),
             ],
@@ -42,8 +55,7 @@ let package = Package(
             //      this target cannot hold Swift, so it is left out; `CYLTabBarItemAnimation/Rive/` is then empty, like `PAG/`.
             // [CN] `RiveSwift`：CocoaPods `Rive` 子库的 Swift 桥接。这里的 SPM 不提供 RiveRuntime，且本 target 不能包含 Swift，因此排除它；
             //      `CYLTabBarItemAnimation/Rive/` 随之为空，与 `PAG/` 相同。
-            exclude: ["LottieSwift", "RiveSwift"],
-            resources: [.copy("Resources/CYLTabBarController.bundle")],
+            exclude: ["LottieSwift", "RiveSwift", "CYLUtils/Swift", "CYLBadgeView/Swift", "Swift", "CYLFlatDesignTabBar/CYLFlatDesignTabBar-ObjectiveC/Swift", "Resources/CYLTabBarController.bundle"],
             // `include/` holds the module map plus `CYLTabBarController/*.h` shims, so the
             // CocoaPods-style `<CYLTabBarController/...>` imports and `__has_include` checks
             // (which enable FlatDesign and Lottie code) also resolve under SPM.

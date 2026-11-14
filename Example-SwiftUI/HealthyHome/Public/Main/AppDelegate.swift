@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import CYLTabBarController
 
 // [EN] SwiftUI demo: the entry point is `HealthyHomeSwiftUIApp` (SwiftUI `App`), which keeps this delegate through
 //      `@UIApplicationDelegateAdaptor`; SwiftUI creates the window and the scenes.

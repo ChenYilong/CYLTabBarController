@@ -13,7 +13,9 @@
 #import "CYLMainRootViewController.h"
 #import "CYLPlusButtonSubclass.h"
 #import "MainTabBarController.h"
-#import <MJRefresh/MJRefresh.h>
+#import <CYLTableViewPlaceHolder/CYLTableViewPlaceHolder.h>
+#import "CYLDemoLocalization.h"
+#import "CYLTabBarControllerDemo-Swift.h"
 
 @implementation CYLMessageViewController
 
@@ -29,28 +31,34 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     [UITableViewCell cyl_setUpAutomaticRowHeightForTableView:self.tableView];
-    NSLog(CYLLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), self);
+    NSLog(CYLDemoLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), self);
 
-    self.view.backgroundColor = UIColor.systemBackgroundColor; // [EN] Dark Mode. [CN] 适配深色模式。
+    self.view.backgroundColor = UIColor.systemGroupedBackgroundColor; // [EN] The grouped background, so the rounded sections stand out. [CN] 分组背景色，使圆角分组清晰可见。
     __weak __typeof(self) weakSelf = self;
-    self.tableView.mj_header = [MJRefreshNormalHeader headerWithRefreshingBlock:^{
+    self.tableView.cyl_header = [CYLRefreshNormalHeader headerWithRefreshingBlock:^{
         //Call this Block When enter the refresh status automatically
         NSTimeInterval delaySeconds = 1;
         dispatch_time_t when = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delaySeconds * NSEC_PER_SEC));
         dispatch_after(when, dispatch_get_main_queue(), ^{
-            [weakSelf.tableView.mj_header endRefreshing];
+            [weakSelf.tableView.cyl_header endRefreshing];
         });
     }];
 //    [self.view layoutIfNeeded];
 
+    // [EN] Pull to refresh, empty / no-network placeholders and the offline red bar (CYLTableViewPlaceHolder).
+    // [CN] 下拉刷新、无数据 / 无网络占位图与断网红条（CYLTableViewPlaceHolder）。
+    [CYLDemoPlaceholder installOnScrollView:self.tableView viewController:self animation:CYLDemoPlaceholderAnimationRive refresh:nil];
+    // [EN] Play all, speed slider and loop switch for the tab icon animations (AGENTS.md, "Animated icon examples").
+    // [CN] Tab 图标动画的「全部播放」、倍速滑块与循环开关（AGENTS.md「Animated icon examples」）。
+    [CYLDemoPlaybackControlsView installOnTableView:self.tableView viewController:self];
 }
 
 - (void)refresh {
-    [self.tableView.mj_header beginRefreshing];
+    [self.tableView.cyl_header beginRefreshing];
     NSTimeInterval delaySeconds = 1;
     dispatch_time_t when = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delaySeconds * NSEC_PER_SEC));
     dispatch_after(when, dispatch_get_main_queue(), ^{
-        [self.tableView.mj_header endRefreshing];
+        [self.tableView.cyl_header endRefreshing];
     });
 }
 #pragma mark - Methods
@@ -69,19 +77,19 @@
     if (0 == indexPath.row) {
         // [EN] Pushes a tab bar controller of the SAME context, see `-tableView:didSelectRowAtIndexPath:`.
         // [CN] 推入同一个 context 的 TabBarController，见 `-tableView:didSelectRowAtIndexPath:`。
-        cell.textLabel.text = CYLLocalizedString(@"Push 同一个 context 的 TabBarController（同一个 PlusButton 类）");
+        cell.textLabel.text = CYLDemoLocalizedString(@"Push 同一个 context 的 TabBarController（同一个 PlusButton 类）");
         cell.detailTextLabel.text = [UITableViewCell cyl_badgeTitleForRow:indexPath.row];
         return;
     }
     if (1 == indexPath.row) {
         // [EN] Issue #202: pushes a tab bar controller whose plus button has a tappable X subview.
         // [CN] 推入一个 TabBarController，其 PlusButton 带有可点击的 X 子按钮。
-        [[cell textLabel] setText:CYLLocalizedString(@"Push 新 context 的 TabBarController（PlusButton 带可点击的 X 子按钮，issue #202）")];
-        cell.detailTextLabel.text = CYLLocalizedString(@"点击 PlusButton 右上角的 X：X 随机改变颜色，PlusButton 不响应");
+        [[cell textLabel] setText:CYLDemoLocalizedString(@"Push 新 context 的 TabBarController（PlusButton 带可点击的 X 子按钮，issue #202）")];
+        cell.detailTextLabel.text = CYLDemoLocalizedString(@"点击 PlusButton 右上角的 X：X 随机改变颜色，PlusButton 不响应");
         return;
     }
     cell.textLabel.text = [UITableViewCell cyl_badgeTitleForRow:indexPath.row];
-    cell.detailTextLabel.text = [NSString stringWithFormat:CYLLocalizedString(@"%@ CYLTabBarController on iOS %@"), self.title, @([[[UIDevice currentDevice] systemVersion] floatValue])];
+    cell.detailTextLabel.text = [NSString stringWithFormat:CYLDemoLocalizedString(@"%@ CYLTabBarController on iOS %@"), self.title, @([[[UIDevice currentDevice] systemVersion] floatValue])];
 }
 
 #pragma mark - Table view
@@ -149,7 +157,7 @@
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
-    return section < [self cyl_demoSectionCount] ? [self cyl_demoTitleForSection:section] : CYLLocalizedString(@"角标");
+    return section < [self cyl_demoSectionCount] ? [self cyl_demoTitleForSection:section] : CYLDemoLocalizedString(@"角标");
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {

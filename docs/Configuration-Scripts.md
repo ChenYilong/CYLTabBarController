@@ -88,7 +88,7 @@ python3 scripts/export-tabbar-configurations.py
 
 | 中文 | English |
 |:---|:---|
-| 为防止路径穿越，`paths` 与 `--output`（以及测试脚本 `lower.py`、`make-fixtures.py` 的参数）必须位于仓库（`scripts/` 的上一级目录）或系统临时目录内，否则脚本报错退出。把脚本复制到自己的项目时，请放在项目根目录的 `scripts/` 下。 | Against path traversal, `paths` and `--output` (and the arguments of the test scripts `lower.py` and `make-fixtures.py`) must lie inside the repository (the folder above `scripts/`) or the system temporary folder; otherwise the script exits with an error. When you copy the script into your project, put it in `scripts/` at the project's root. |
+| 为防止路径穿越，`paths` 与 `--output`（以及测试脚本 `make-fixtures.py` 的参数）必须位于仓库（`scripts/` 的上一级目录）或系统临时目录内，否则脚本报错退出。把脚本复制到自己的项目时，请放在项目根目录的 `scripts/` 下。 | Against path traversal, `paths` and `--output` (and the arguments of the test script `make-fixtures.py`) must lie inside the repository (the folder above `scripts/`) or the system temporary folder; otherwise the script exits with an error. When you copy the script into your project, put it in `scripts/` at the project's root. |
 
 | `--format` | 文件 File | 中文 | English |
 |:---|:---|:---|:---|
@@ -184,19 +184,18 @@ scripts/configuration-tests/run-tests.sh
 
 | 中文 | English |
 |:---|:---|
-| 一条命令编译并运行 `CYLTabBarConfigurationParser` 的测试，全部通过时退出码为 0，可用于 CI。共三组检查，每个文件都按扩展名与按内容识别各解析一次：①资源包中的 17 个示例文件都得到与 JSON 示例相同的字典；②`make-fixtures.py` 生成的 43 个边界情况文件（嵌套 10 万层的各种格式、损坏与截断的二进制数据、空文件、只有注释、6 MB 文件、UTF-16 / UTF-32、扩展名不符、XXE、HTML 页面、各格式的解析细节）得到预期的错误码或值；③所有 Example 以 12 种格式导出的文件都与其 JSON 版本相同。在 Linux 上还会检查解析器源码在 `-Wall -Wextra -Wshadow` 下没有警告。 | One command builds and runs the tests of `CYLTabBarConfigurationParser`; the exit status is 0 when everything passes, for CI. Three groups of checks, each file parsed once from its extension and once from its content: ① the 17 sample files of the resource bundle give the dictionary of the JSON sample; ② the 43 edge-case files of `make-fixtures.py` (100,000 levels of nesting in every format, corrupted and truncated binary data, empty files, comments only, a 6 MB file, UTF-16 / UTF-32, wrong extensions, XXE, an HTML page, parsing details of each format) give the expected error code or values; ③ every Example exported in the 12 formats gives the same dictionary as its JSON twin. On Linux it also checks that the parser's source has no warning with `-Wall -Wextra -Wshadow`. |
+| 一条命令编译并运行 `CYLTabBarConfigurationParser` 的测试，全部通过时退出码为 0，可用于 CI。共三组检查，每个文件都按扩展名与按内容识别各解析一次：①资源包中的 17 个示例文件都得到与 JSON 示例相同的字典；②`make-fixtures.py` 生成的 43 个边界情况文件（嵌套 10 万层的各种格式、损坏与截断的二进制数据、空文件、只有注释、6 MB 文件、UTF-16 / UTF-32、扩展名不符、XXE、HTML 页面、各格式的解析细节）得到预期的错误码或值；③所有 Example 以 12 种格式导出的文件都与其 JSON 版本相同。解析器已迁移到 Swift（2026-11-13，docs/Swift-Migration.md）：脚本用 swiftc 编译解析器并生成其 Objective-C 头文件，再与 Objective-C 测试程序链接。 | One command builds and runs the tests of `CYLTabBarConfigurationParser`; the exit status is 0 when everything passes, for CI. Three groups of checks, each file parsed once from its extension and once from its content: ① the 17 sample files of the resource bundle give the dictionary of the JSON sample; ② the 43 edge-case files of `make-fixtures.py` (100,000 levels of nesting in every format, corrupted and truncated binary data, empty files, comments only, a 6 MB file, UTF-16 / UTF-32, wrong extensions, XXE, an HTML page, parsing details of each format) give the expected error code or values; ③ every Example exported in the 12 formats gives the same dictionary as its JSON twin. The parser is Swift since 2026-11-13 (docs/Swift-Migration.md): the script compiles it with swiftc, with its Objective-C header, and links it with the Objective-C test program. |
 
 | 平台 Platform | 需要 Requirements | 中文 | English |
 |:---|:---|:---|:---|
-| macOS | Xcode 命令行工具 / Xcode command line tools | 直接用 clang 与 Foundation 编译真实源码（ARC） | Builds the real sources with clang and Foundation (ARC) |
-| Linux | `sudo apt-get install clang libgnustep-base-dev gnustep-make` | GNUstep 基于 GCC 运行时，不支持对象下标与属性自动合成：`lower.py` 只改写测试用的副本，库本身不变 | GNUstep uses the GCC runtime, without object subscripting or auto-synthesized properties: `lower.py` rewrites a test copy only; the library is not changed |
+| macOS | Xcode 命令行工具 / Xcode command line tools | 用 swiftc 将真实的 Swift 解析器编译为一个目标文件并生成 Objective-C 头文件（`CYLTabBarController-Swift.h`），再用 clang 编译 Objective-C 测试程序并链接 | Compiles the real Swift parser with swiftc into one object with its Objective-C header (`CYLTabBarController-Swift.h`), then builds the Objective-C test program with clang and links them |
+| Ubuntu / Debian | 不再支持 / no longer supported | 解析器迁移到 Swift 后（2026-11-13）不再支持：Linux 上的 Swift 不支持 Objective-C 互操作，Objective-C 测试程序无法调用它；脚本会提示改在 macOS 上运行。原先用于 GNUstep 的 `lower.py`、`cyl_sub.h` 已删除 | No longer supported since the parser moved to Swift (2026-11-13): Swift on Linux has no Objective-C interop, so the Objective-C test program cannot call it; the script says to run on macOS. `lower.py` and `cyl_sub.h`, used for GNUstep, are removed |
 
 | 文件 File | 中文 | English |
 |:---|:---|:---|
 | `run-tests.sh` | 生成测试文件、导出所有 Example、编译、运行 | Writes the fixtures, exports every Example, builds, runs |
 | `make-fixtures.py` | 写出边界情况文件与 `manifest.json`（每个文件的预期错误码、需要相等的文件、键路径上的预期值） | Writes the edge-case files and `manifest.json` (each file's expected error code, the file it must equal, expected values at key paths) |
-| `ConfigurationParserTests.m` | 测试程序（不使用 block、下标与属性，两种平台都能编译） | The test program (no blocks, subscripts or properties, so it builds on both platforms) |
-| `lower.py`、`cyl_sub.h` | 仅 Linux：为 GCC 运行时改写解析器副本 | Linux only: rewrites a copy of the parser for the GCC runtime |
+| `ConfigurationParserTests.m` | 测试程序（Objective-C，通过生成的头文件调用 Swift 解析器） | The test program (Objective-C, calling the Swift parser through the generated header) |
 
 | 中文 | English |
 |:---|:---|
@@ -220,4 +219,4 @@ python3 scripts/check-comment-blocks.py path/to/File.h   # given files or folder
 
 | 中文 | English |
 |:---|:---|
-| 三个脚本都在 Linux（Ubuntu 24.04、Python 3、clang、GNUstep base 1.29）上运行：导出脚本处理了所有 Example（`--check` 通过），`configuration-edge-cases.py --check` 通过，`run-tests.sh` 的 312 项检查全部通过。macOS 分支（Apple clang + Foundation）未在此环境中运行。脚本是命令行工具，没有截图。 | The three scripts were run on Linux (Ubuntu 24.04, Python 3, clang, GNUstep base 1.29): the export script processed every Example (`--check` passes), `configuration-edge-cases.py --check` passes, and all 312 checks of `run-tests.sh` pass. The macOS branch (Apple clang + Foundation) was not run in this environment. The scripts are command line tools: there are no screenshots. |
+| 2026-11-12 在 macOS 27.3（Xcode 27.2、Apple clang + Foundation、Python 3）上运行：`export-tabbar-configurations.py --check` 通过，`configuration-edge-cases.py --check` 通过（第 17 轮 100/100），`run-tests.sh` 的 426 项检查全部通过。运行中发现并修复了两个问题：导出脚本会读取外置磁盘上的 AppleDouble `._*` 文件而崩溃（现在跳过）；示例改用 `CYLDemoLocalizedString` / `cylDemoLocalizedString` 与 Swift 的 `as Any` 后，导出的标题与图片丢失（现在都能识别），并据此重新导出了各示例的 `Configurations/`。之前在 Ubuntu 24.04（clang、GNUstep base 1.29）上的运行通过了当时的 312 项检查。脚本是命令行工具，没有截图。 | Run on 2026-11-12 on macOS 27.3 (Xcode 27.2, Apple clang + Foundation, Python 3): `export-tabbar-configurations.py --check` passes, `configuration-edge-cases.py --check` passes (round 17, 100/100), and all 426 checks of `run-tests.sh` pass. The run found and fixed two problems: the export script crashed on AppleDouble `._*` files on external volumes (now skipped), and after the examples moved to `CYLDemoLocalizedString` / `cylDemoLocalizedString` and Swift's `as Any`, the exported titles and images were lost (both are read now); every example's `Configurations/` was exported again. An earlier run on Ubuntu 24.04 (clang, GNUstep base 1.29) passed the 312 checks of that time. The scripts are command line tools: there are no screenshots. |

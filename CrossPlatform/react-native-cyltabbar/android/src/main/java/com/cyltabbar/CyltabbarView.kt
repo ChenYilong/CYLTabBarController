@@ -38,6 +38,20 @@ class CyltabbarView(private val reactContext: ThemedReactContext) : CYLTabBarHos
 
   private var configurationJSON: String? = null
 
+  /** [EN] The last memory warning request handled; a higher one simulates a memory warning once. [CN] 最近处理的内存警告请求；更大的值模拟一次内存警告。 */
+  var memoryWarningRequest = 0
+    set(value) {
+      if (value > field) dispatch(MemoryWarningEvent(surfaceId(), id, simulateMemoryWarning()))
+      field = value
+    }
+
+  /** [EN] The last "Play all" request handled; a higher one plays every tab icon animation again. [CN] 最近处理的「全部播放」请求；更大的值让所有 Tab 图标动画重新播放。 */
+  var playAllRequest = 0
+    set(value) {
+      if (value > field) playAllAnimations()
+      field = value
+    }
+
   fun applyConfigurationJSON(json: String?) {
     if (json == configurationJSON) return
     configurationJSON = json
@@ -86,6 +100,11 @@ class TabLongPressEvent(
     putString("identifier", identifier)
     putString("title", title)
   }
+}
+
+class MemoryWarningEvent(surfaceId: Int, viewId: Int, private val report: String) : Event<MemoryWarningEvent>(surfaceId, viewId) {
+  override fun getEventName() = "topMemoryWarning"
+  override fun getEventData(): WritableMap = Arguments.createMap().apply { putString("report", report) }
 }
 
 class LoginStateEvent(surfaceId: Int, viewId: Int, private val loggedIn: Boolean) : Event<LoginStateEvent>(surfaceId, viewId) {

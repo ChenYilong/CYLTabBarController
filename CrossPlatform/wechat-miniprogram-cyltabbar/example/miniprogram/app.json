@@ -1,0 +1,51 @@
+{
+  "pages": [
+    "pages/home/index",
+    "pages/message/index",
+    "pages/publish/index",
+    "pages/web/index",
+    "pages/me/index",
+    "pages/lottie/index",
+    "pages/item/index",
+    "pages/glass/index"
+  ],
+  "window": {
+    "navigationBarTitleText": "CYLTabBarController",
+    "navigationBarBackgroundColor": "@navigationBarBackgroundColor",
+    "navigationBarTextStyle": "@navigationBarTextStyle",
+    "backgroundColor": "@backgroundColor"
+  },
+  "darkmode": true,
+  "themeLocation": "theme.json",
+  "tabBar": {
+    "custom": true,
+    "color": "#8e8e93",
+    "selectedColor": "#007aff",
+    "list": [
+      {
+        "pagePath": "pages/home/index",
+        "text": "Home"
+      },
+      {
+        "pagePath": "pages/message/index",
+        "text": "Message"
+      },
+      {
+        "pagePath": "pages/publish/index",
+        "text": "Post"
+      },
+      {
+        "pagePath": "pages/web/index",
+        "text": "Discover"
+      },
+      {
+        "pagePath": "pages/me/index",
+        "text": "Me"
+      }
+    ]
+  },
+  "usingComponents": {},
+  "style": "v2",
+  "sitemapLocation": "sitemap.json",
+  "lazyCodeLoading": "requiredComponents"
+}

@@ -15,7 +15,7 @@
 
 | 中文 | English |
 |:---|:---|
-| 本文逐项列出一个高度自定义的 TabBar 组件应具备的功能，说明 CYLTabBarController 用哪些接口实现每一项，以及 ObjC Demo「Tab Bar Gallery」中对应的演示行（见 [Tab-Bar-Gallery.md](Tab-Bar-Gallery.md)）。对照过程中发现的缺失项记录在文末的 TODO 中，并已全部实现。 | This document lists, item by item, what a highly customizable tab bar component should offer, which CYLTabBarController APIs implement each item, and the matching row of the ObjC demo's "Tab Bar Gallery" (see [Tab-Bar-Gallery.md](Tab-Bar-Gallery.md)). The gaps found while comparing are recorded in the TODO list at the end, and all of them are implemented. |
+| 本文逐项列出一个高度自定义的 TabBar 组件应具备的功能，说明 CYLTabBarController 用哪些接口实现每一项，以及 ObjC Demo「Tab Bar Gallery」中对应的演示行（见 [Tab-Bar-Gallery.md](Tab-Bar-Gallery.md)）。对照过程中发现的缺失项记录在文末的「缺失项」中，并已全部实现。 | This document lists, item by item, what a highly customizable tab bar component should offer, which CYLTabBarController APIs implement each item, and the matching row of the ObjC demo's "Tab Bar Gallery" (see [Tab-Bar-Gallery.md](Tab-Bar-Gallery.md)). The gaps found while comparing are recorded under "Gaps" at the end, and all of them are implemented. |
 
 ## 目录 / Contents
 
@@ -35,7 +35,7 @@
 | [9. 自定义提醒样式](#9-自定义提醒样式--custom-reminder-styles) | [Custom reminder styles](#9-自定义提醒样式--custom-reminder-styles) |
 | [10. Lottie / Lottie](#10-lottie--lottie) | [10. Lottie / Lottie](#10-lottie--lottie) |
 | [11. iOS 26 液态玻璃](#11-ios-26-液态玻璃--ios-26-liquid-glass) | [iOS 26 Liquid Glass](#11-ios-26-液态玻璃--ios-26-liquid-glass) |
-| [待办](#待办--todo) | [TODO](#待办--todo) |
+| [缺失项](#缺失项--gaps) | [Gaps](#缺失项--gaps) |
 | [验证](#验证--verification) | [Verification](#验证--verification) |
 
 <!-- navigation:end -->
@@ -130,11 +130,11 @@
 | 所有系统使用传统布局：设置 `CYLTabBarStyleTypeFlatDesign`，或保留 Info.plist 中的 `UIDesignRequiresCompatibility`，iOS 26+ 与 iOS 26 以下表现一致。演示：Basic 1.11。 | The traditional layout on every system: `CYLTabBarStyleTypeFlatDesign`, or `UIDesignRequiresCompatibility` in Info.plist, so iOS 26+ looks like earlier systems. Demo: Basic 1.11. |
 | 玻璃 + 角标：未选中的 Tab 显示角标，选中的 Tab 隐藏角标：`cyl_hidesBadgeOfSelectedTab = YES`（所有样式）。演示：Basic 1.12。 | Glass with badges: unselected tabs show their badges and the selected tab hides its own: `cyl_hidesBadgeOfSelectedTab = YES` (every style). Demo: Basic 1.12. |
 
-## 待办 / TODO
+## 缺失项 / Gaps
 
 | 中文 | English |
 |:---|:---|
-| 以下是对照上述清单时发现的缺失项。全部已实现，当前没有未完成的 TODO。 | These are the gaps found while going through the checklist above. All of them are implemented; there is no open TODO. |
+| 以下是对照上述清单时发现的缺失项。全部已实现，当前没有未完成项。 | These are the gaps found while going through the checklist above. All of them are implemented; none is open. |
 
 | 状态 / Status | 中文 | English |
 |:---|:---|:---|
@@ -154,4 +154,4 @@
 
 | 中文 | English |
 |:---|:---|
-| 本次开发环境没有 iOS 模拟器或真机，以上代码与 Demo 未经编译和运行，因此暂无截图。在设备上逐行验证 Tab Bar Gallery 后，请将截图放入 `docs/assets/` 并在本文与 [Tab-Bar-Gallery.md](Tab-Bar-Gallery.md) 中引用。 | This was developed without an iOS simulator or device; the code and the demo have not been compiled or run, so there are no screenshots yet. After checking each row of the Tab Bar Gallery on a device, put screenshots in `docs/assets/` and reference them here and in [Tab-Bar-Gallery.md](Tab-Bar-Gallery.md). |
+| 已验证（2026-11-10，iOS 26.1，iPhone 17 Pro Max 模拟器）：图库各分组的场景在模拟器上运行，截图见 [Tab-Bar-Gallery.md](Tab-Bar-Gallery.md#截图--screenshots)；重复点击、自定义点击与居中排列另见 [Tab-Reselect](Tab-Reselect.md)、[Tab-Custom-Action](Tab-Custom-Action.md)、[Tab-Item-Positioning](Tab-Item-Positioning.md)。测试中修复：重复点击场景 push 的页面隐藏了 TabBar，无法「再次点击 Tab 返回」，现在列表之下 push 的页面保留 TabBar。 | Verified (2026-11-10, iOS 26.1, iPhone 17 Pro Max simulator): the gallery scenes of every section ran on the simulator; screenshots in [Tab-Bar-Gallery.md](Tab-Bar-Gallery.md#截图--screenshots), and for reselect, custom click and centered tabs in [Tab-Reselect](Tab-Reselect.md), [Tab-Custom-Action](Tab-Custom-Action.md) and [Tab-Item-Positioning](Tab-Item-Positioning.md). Fixed during testing: the reselect scene's pushed pages hid the tab bar, so "tap the tab again to go back" could not be done; pages pushed under the list now keep the tab bar. |

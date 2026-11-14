@@ -14,14 +14,26 @@
 #import "CYLPlusButtonSubclass.h"
 #import "MainTabBarController.h"
 #import "CYLMainRootViewController.h"
-#import "CYLGalleryViewController.h"
-#import <MJRefresh/MJRefresh.h>
+#import "CYLTabBarControllerDemo-Swift.h"
+#import <CYLTableViewPlaceHolder/CYLTableViewPlaceHolder.h>
+#import "CYLDemoLocalization.h"
 
 @interface CYLHomeViewController ()
 @property (nonatomic, strong) id<UIInteraction> bottomEdgeInteraction;
 @end
 
 @implementation CYLHomeViewController 
+
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+    // [EN] `-CYLDemoGalleryScene 8.1`: opens the gallery once at launch, which then opens that scene (screenshots).
+    // [CN] `-CYLDemoGalleryScene 8.1`：启动时打开一次图库，再由图库打开该场景（用于截图）。
+    static BOOL opened = NO;
+    if (!opened && [CYLGalleryViewController cyl_launchSceneNumber] && self.navigationController) {
+        opened = YES;
+        [self.navigationController pushViewController:[[CYLGalleryViewController alloc] init] animated:NO];
+    }
+}
 
 
 - (instancetype)init {
@@ -35,22 +47,22 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     [UITableViewCell cyl_setUpAutomaticRowHeightForTableView:self.tableView];
-    NSLog(CYLLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), self);
-    self.view.backgroundColor = UIColor.systemBackgroundColor; // [EN] Dark Mode. [CN] 适配深色模式。
+    NSLog(CYLDemoLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), self);
+    self.view.backgroundColor = UIColor.systemGroupedBackgroundColor; // [EN] The grouped background, so the rounded sections stand out. [CN] 分组背景色，使圆角分组清晰可见。
 //    [self.navigationController.tabBarItem setBadgeValue:@"3"];
 //    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"home_normal"] style:UIBarButtonItemStylePlain target:self action:@selector(refreshTabBar:)];
 //    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"home_normal"] style:UIBarButtonItemStylePlain target:self action:@selector(refresh)];
     
-    UIBarButtonItem *leftBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:CYLLocalizedString(@"FlatDesign") style:UIBarButtonItemStylePlain target:self action:@selector(flatDesignTabBar:)];
+    UIBarButtonItem *leftBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:CYLDemoLocalizedString(@"FlatDesign") style:UIBarButtonItemStylePlain target:self action:@selector(flatDesignTabBar:)];
 // [CN] leftBarButtonItem.tintColor = UIColor.redColor; // 确保使用原图色
 // [EN] leftBarButtonItem.tintColor = UIColor.redColor; // Make sure the original image color is used
     self.navigationItem.leftBarButtonItem = leftBarButtonItem;
 
 
-    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:CYLLocalizedString(@"LiquidGlass") style:UIBarButtonItemStylePlain target:self action:@selector(refreshTabBar:)];
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:CYLDemoLocalizedString(@"LiquidGlass") style:UIBarButtonItemStylePlain target:self action:@selector(refreshTabBar:)];
     // [EN] Issue #216: the skin button opens the theme picker; the tab bar restyles in place in every style.
     // [CN] Issue #216：换肤按钮打开主题选择器，TabBar 在所有样式中原地更换外观。
-    UIBarButtonItem *themeBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:CYLLocalizedString(@"换肤") style:UIBarButtonItemStylePlain target:self action:@selector(showThemePicker:)];
+    UIBarButtonItem *themeBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:CYLDemoLocalizedString(@"换肤") style:UIBarButtonItemStylePlain target:self action:@selector(showThemePicker:)];
     self.navigationItem.rightBarButtonItems = @[ self.navigationItem.rightBarButtonItem, themeBarButtonItem ];
 //    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"CYLTabBar" style:UIBarButtonItemStylePlain target:self action:@selector(refresh)];
 
@@ -79,6 +91,9 @@
             // Fallback on earlier versions
         }
         }
+    // [EN] Pull to refresh, empty / no-network placeholders and the offline red bar (CYLTableViewPlaceHolder).
+    // [CN] 下拉刷新、无数据 / 无网络占位图与断网红条（CYLTableViewPlaceHolder）。
+    [CYLDemoPlaceholder installOnScrollView:self.tableView viewController:self animation:CYLDemoPlaceholderAnimationLottie refresh:nil];
 }
 
 - (void)viewDidLayoutSubviews {
@@ -99,11 +114,11 @@
 }
 
 - (void)refresh {
-    [self.tableView.mj_header beginRefreshing];
+    [self.tableView.cyl_header beginRefreshing];
     NSTimeInterval delaySeconds = 1;
     dispatch_time_t when = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delaySeconds * NSEC_PER_SEC));
     dispatch_after(when, dispatch_get_main_queue(), ^{
-        [self.tableView.mj_header endRefreshing];
+        [self.tableView.cyl_header endRefreshing];
     });
 }
 
@@ -142,7 +157,7 @@
     // [EN] The badge sample is the title, the page the subtitle; both wrap.
     // [CN] 角标样例为主标题，页面为副标题；均可换行。
     cell.textLabel.text = [UITableViewCell cyl_badgeTitleForRow:indexPath.row];
-    cell.detailTextLabel.text = [NSString stringWithFormat:CYLLocalizedString(@"%@ CYLTabBarController on iOS %@"), self.title, @([[[UIDevice currentDevice] systemVersion] floatValue])];
+    cell.detailTextLabel.text = [NSString stringWithFormat:CYLDemoLocalizedString(@"%@ CYLTabBarController on iOS %@"), self.title, @([[[UIDevice currentDevice] systemVersion] floatValue])];
     [cell cyl_wrapsTextLabels];
 }
 
@@ -155,8 +170,8 @@
     if ([self isGallerySection:indexPath.section]) {
         UITableViewCell *galleryCell = [tableView dequeueReusableCellWithIdentifier:@"GalleryCell"] ?:
             [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"GalleryCell"];
-        galleryCell.textLabel.text = CYLLocalizedString(@"打开 TabBar 场景展示");
-        galleryCell.detailTextLabel.text = CYLLocalizedString(@"每个场景都是用公开 API 构建的 TabBar：样式、动画、提醒、Lottie 以及较新的 Tab API");
+        galleryCell.textLabel.text = CYLDemoLocalizedString(@"打开 TabBar 场景展示");
+        galleryCell.detailTextLabel.text = CYLDemoLocalizedString(@"每个场景都是用公开 API 构建的 TabBar：样式、动画、提醒、Lottie 以及较新的 Tab API");
         [galleryCell cyl_wrapsTextLabels];
         galleryCell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
         return galleryCell;
@@ -200,7 +215,7 @@
     if ([self isGallerySection:section]) {
         return @"Tab Bar Gallery";
     }
-    return section < [self cyl_demoSectionCount] ? [self cyl_demoTitleForSection:section] : CYLLocalizedString(@"角标");
+    return section < [self cyl_demoSectionCount] ? [self cyl_demoTitleForSection:section] : CYLDemoLocalizedString(@"角标");
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
@@ -224,7 +239,7 @@
         return;
     }
     NSNumber *badgeNumber = @(indexPath.row);
-    self.navigationItem.title = [NSString stringWithFormat:CYLLocalizedString(@"首页(%@)"), badgeNumber]; //sets navigation bar title.
+    self.navigationItem.title = [NSString stringWithFormat:CYLDemoLocalizedString(@"首页(%@)"), badgeNumber]; //sets navigation bar title.
     
 //    [self.navigationController.tabBarItem setBadgeValue:[NSString stringWithFormat:@"%@", badgeNumber]];
     

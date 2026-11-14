@@ -1,0 +1,52 @@
+<!-- [EN] An animated icon (or an image) with its badge, and a title. [CN] 动画图标（或图片）与角标，以及标题。 -->
+<view
+  class="cyl-item cyl-item-style-{{cylItemStyle}} {{isDark ? 'cyl-item-dark' : ''}} {{m.selected ? 'cyl-item-selected' : ''}} {{m.centered ? 'cyl-item-centered' : ''}} {{animationClass}}"
+  hover-class="cyl-item-pressed"
+  hover-stay-time="120"
+  style="{{m.itemStyle}}"
+  bindtap="cyl_onTap"
+  aria-hidden="true"
+>
+  <!-- [EN] Liquid Glass: the lens behind the selected icon and title (decoration). [CN] 液态玻璃：选中图标与标题后的透镜（装饰）。 -->
+  <cyl-glass-lens wx:if="{{cylItemStyle === 'liquidGlass' && m.selected}}" class="cyl-item-glass-lens" is-dark="{{isDark}}" lens-style="{{glassLensStyle}}" aria-hidden="true" />
+  <view wx:if="{{m.image || m.animationPath}}" class="cyl-item-icon-box" style="{{m.iconBoxStyle}}">
+    <cyl-lottie-view
+      wx:if="{{m.animationType === 'lottie'}}"
+      id="cyl-item-animation"
+      class="cyl-item-animation"
+      path="{{m.animationPath}}"
+      colors="{{animationColors}}"
+      loop="{{animationLoop || (!m.selected && loopsWhenUnselected)}}"
+      speed="{{animationSpeed}}"
+      autoplay="{{!m.selected && loopsWhenUnselected}}"
+      resting-frame="{{m.selected ? 'last' : 'first'}}"
+    />
+    <cyl-pag-view
+      wx:elif="{{m.animationType === 'pag'}}"
+      id="cyl-item-animation"
+      class="cyl-item-animation"
+      path="{{m.animationPath}}"
+      loop="{{animationLoop || (!m.selected && loopsWhenUnselected)}}"
+      speed="{{animationSpeed}}"
+      autoplay="{{!m.selected && loopsWhenUnselected}}"
+      resting-frame="{{m.selected ? 'last' : 'first'}}"
+    />
+    <cyl-rive-view
+      wx:elif="{{m.animationType === 'rive'}}"
+      id="cyl-item-animation"
+      class="cyl-item-animation"
+      path="{{m.animationPath}}"
+      colors="{{animationColors}}"
+      loop="{{animationLoop || (!m.selected && loopsWhenUnselected)}}"
+      speed="{{animationSpeed}}"
+      autoplay="{{!m.selected && loopsWhenUnselected}}"
+    />
+    <view wx:elif="{{m.image && m.iconTint}}" class="cyl-item-tint">
+      <image class="cyl-item-image cyl-item-tinted" src="{{m.image}}" style="filter: drop-shadow({{m.iconTint}} 200px 0);" mode="aspectFit" />
+    </view>
+    <image wx:elif="{{m.image}}" class="cyl-item-image" src="{{m.image}}" mode="aspectFit" />
+    <text wx:if="{{m.showsBadge && !m.badgeIsDot}}" class="cyl-item-badge" style="{{m.badgeStyle}}">{{m.badgeText}}</text>
+    <view wx:if="{{m.showsBadge && m.badgeIsDot}}" class="cyl-item-badge-dot" style="{{m.badgeStyle}}"></view>
+  </view>
+  <text wx:if="{{m.title}}" class="cyl-item-title" style="{{m.titleStyle}}">{{m.title}}</text>
+</view>

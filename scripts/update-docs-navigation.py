@@ -359,13 +359,53 @@ def source_headers():
                 yield os.path.relpath(path, ROOT), handle.read()
 
 
+def swift_sources():
+    """(path relative to the repository, text) of every Swift file under CYLTabBarController/."""
+    for directory, folders, files in os.walk(SOURCES):
+        folders[:] = sorted(f for f in folders if not f.startswith("."))
+        for name in sorted(f for f in files if f.endswith(".swift") and not f.startswith(".")):
+            path = os.path.join(directory, name)
+            with open(path, encoding=ENCODING, errors="replace") as handle:
+                yield os.path.relpath(path, ROOT), handle.read()
+
+
 def class_headers(headers):
-    """Class name -> header path for every "@interface Name :" declaration in `headers`."""
+    """Class name -> header path for every "@interface Name :" declaration in `headers`.
+
+    A class translated to Swift ("@objc(Name)" above "class Name" in a Swift file) is bound to the header of the same
+    name, which stays for Objective-C callers; without such a header, to the Swift file itself.
+    """
     found = {}
+    by_file_name = {}
     for path, text in headers:
+        by_file_name.setdefault(os.path.basename(path), path)
         for class_name in CLASS_DECLARATION.findall(text):
             found.setdefault(class_name, path)
+    for path, text in swift_sources():
+        for class_name in swift_class_names(text):
+            found.setdefault(class_name, by_file_name.get(class_name + ".h", path))
     return found
+
+
+def swift_class_names(text):
+    """Classes of a Swift file that keep an Objective-C name: "@objc(Name)" on its own line, then (after other
+    attributes) "class Name". Parsed line by line, without a backtracking regex."""
+    names = []
+    lines = [line.strip() for line in text.split("\n")]
+    for index, line in enumerate(lines):
+        if not (line.startswith("@objc(") and line.endswith(")")):
+            continue
+        name = line[len("@objc("):-1]
+        if not name.isidentifier():
+            continue
+        following = index + 1
+        while following < len(lines) and lines[following].startswith("@"):
+            following += 1
+        if following < len(lines):
+            words = lines[following].replace(":", " ").split()
+            if "class" in words and words.index("class") + 1 < len(words) and words[words.index("class") + 1] == name:
+                names.append(name)
+    return names
 
 
 def bound_declaration(line):

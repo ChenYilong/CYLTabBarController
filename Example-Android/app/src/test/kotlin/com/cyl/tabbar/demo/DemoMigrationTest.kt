@@ -44,7 +44,7 @@ class DemoMigrationTest {
     fun countsMatchTheIOSExample() {
         assertEquals("configuration edge cases", 46, DemoConfiguration.edgeCaseCount)
         assertEquals("scroll hiding simulations", 39, DemoScrollHide.count)
-        assertEquals("gallery scenes", 44, DemoGallery.sceneCount)
+        assertEquals("gallery scenes", 46, DemoGallery.sceneCount)
         assertEquals("gallery sections", 10, DemoGallery.sections.size)
         assertEquals("skins", 17, DemoTheme.all.size)
     }

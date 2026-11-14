@@ -1,0 +1,59 @@
+<!-- [EN] The tab bar: a tab list with one tab per item and the raised plus button. [CN] TabBar：每项一个 Tab 的列表，以及凸起的 PlusButton。 -->
+<view class="cyl-tab-bar cyl-style-{{cylStyleType}} {{cylIsDark ? 'cyl-dark' : ''}} {{tabBarHidden ? 'cyl-tab-bar-hidden' : ''}}" style="{{cylBarStyle}}" aria-role="tablist" aria-hidden="{{tabBarHidden}}">
+  <view
+    wx:for="{{cylSlots}}"
+    wx:key="key"
+    class="cyl-tab {{item.selected ? 'cyl-selected' : ''}} {{item.isPlusButton ? 'cyl-plus-slot' : ''}}"
+    style="{{item.itemStyle}}"
+    data-key="{{item.key}}"
+    id="{{item.accessibilityIdentifier}}"
+    bindtap="cyl_onTap"
+    aria-role="{{item.isPlusButton ? 'button' : 'tab'}}"
+    aria-label="{{item.accessibilityLabel}}"
+    aria-selected="{{item.selected}}"
+  >
+    <block wx:if="{{item.isPlusButton}}">
+      <!-- [EN] As iOS (CYLPlusButtonShowsSelection): the selection under the plus button exists on Liquid Glass only; it is the same cyl-glass-lens as a selected tab's. [CN] 与 iOS 一致（CYLPlusButtonShowsSelection）：PlusButton 下方的选中效果只在液态玻璃下出现。 -->
+      <cyl-glass-lens wx:if="{{item.showsSelection && cylStyleType === 'liquidGlass'}}" class="cyl-plus-selection" is-dark="{{cylIsDark}}" lens-style="{{cylGlassLensStyle}}" aria-hidden="true" />
+      <view class="cyl-plus-button {{cylAnimatingIdentifier === item.key ? 'cyl-animate-' + cylTapAnimation : ''}}" style="{{item.buttonStyle}} {{cylAnimationStyle}}">
+        <image wx:if="{{item.backgroundImage}}" class="cyl-plus-background" src="{{item.backgroundImage}}" mode="aspectFit" aria-hidden="true" />
+        <image wx:if="{{item.image}}" class="cyl-plus-image" src="{{item.image}}" style="{{item.imageStyle}}" mode="aspectFit" aria-hidden="true" />
+        <text wx:if="{{item.title}}" class="cyl-title" style="{{item.titleStyle}}" aria-hidden="true">{{item.title}}</text>
+      </view>
+    </block>
+    <block wx:else>
+      <cyl-tab-bar-item
+        id="cyl-item-{{item.key}}"
+        generic:cyl-lottie-view="cyl-lottie-view"
+        generic:cyl-pag-view="cyl-pag-view"
+        generic:cyl-rive-view="cyl-rive-view"
+        class="cyl-tab-item"
+        index="{{item.item.index}}"
+        title="{{item.item.title}}"
+        image="{{item.item.image}}"
+        selected-image="{{item.item.selectedImage}}"
+        selected="{{item.item.selected}}"
+        animation-path="{{item.item.animationPath}}"
+        animation-size="{{item.item.animationSize}}"
+        animation-colors="{{item.item.animationColors}}"
+        loops-when-unselected="{{item.item.loopsWhenUnselected}}"
+        image-size="{{item.item.imageSize}}"
+        image-insets="{{item.item.imageInsets}}"
+        title-position-adjustment="{{item.item.titlePositionAdjustment}}"
+        icon-tint="{{item.item.iconTint}}"
+        selected-icon-tint="{{item.item.selectedIconTint}}"
+        background-color="{{item.item.backgroundColor}}"
+        selected-background-color="{{item.item.selectedBackgroundColor}}"
+        title-text-attributes="{{item.item.titleTextAttributes}}"
+        badge-value="{{item.showsDot ? '•' : item.badge}}"
+        animation-class="{{cylAnimatingIdentifier === item.key ? 'cyl-animate-' + cylTapAnimation : ''}}"
+        animation-duration="{{cylAnimationDuration}}"
+        item-style="{{cylItemStyle}}"
+        glass-lens-style="{{cylGlassLensStyle}}"
+        animation-speed="{{animationSpeed}}"
+        animation-loop="{{animationLoop}}"
+        is-dark="{{cylIsDark}}"
+      />
+    </block>
+  </view>
+</view>

@@ -1,0 +1,9 @@
+cyl-pag-miniprogram
+Copyright (c) ChenYilong. The cyl-pag component is licensed under the MIT License (see LICENSE).
+
+miniprogram_dist/libpag/libpag.js and miniprogram_dist/libpag/libpag.wasm.br are libpag-miniprogram 4.5.85 (npm),
+built from https://github.com/Tencent/libpag/tree/main/web, copied unchanged
+(SHA-256 libpag.js c6150e11084715790cba04f26047b60ba9103d257322b5a25583137680e29f0d,
+libpag.wasm.br 69f788180355946fcf104b7b341db707180e07984efd4733200c052afdf586ef).
+Copyright (C) Tencent. Licensed under the Apache License 2.0; the full license text of libpag is in
+miniprogram_dist/libpag/LICENSE.txt.

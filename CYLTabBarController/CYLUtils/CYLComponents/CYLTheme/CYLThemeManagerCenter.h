@@ -16,6 +16,7 @@
 // docs-binding:end
 
 #import <UIKit/UIKit.h>
+#import "CYLSwiftInterface.h"
 #import "CYLThemeManager.h"
 
 NS_ASSUME_NONNULL_BEGIN
@@ -24,44 +25,15 @@ NS_ASSUME_NONNULL_BEGIN
  * [EN] The name of `CYLThemeManagerCenter.defaultThemeManager`.
  * [CN] `CYLThemeManagerCenter.defaultThemeManager` 的名字。
  */
-FOUNDATION_EXTERN NSString *const CYLThemeManagerNameDefault;
+#ifndef __swift__
+#define CYLThemeManagerNameDefault @"Default"
+#endif
 
 /*!
- * FIX: issue #216
- * [EN] Hands out the theme managers, one per name (one per dimension of themes), see `CYLThemeManager`.
- * [CN] 按名字提供主题管理器（每个主题维度一个），见 `CYLThemeManager`。
+ * [EN] `CYLThemeManagerCenter` is implemented in Swift (`CYLUtils/Swift/CYLThemeManagerCenter.swift`) and declared by the Swift interface
+ *      (`CYLSwiftInterface.h`), as a class cannot be declared twice (docs/Swift-Migration.md).
+ * [CN] `CYLThemeManagerCenter` 在 Swift 中实现（`CYLUtils/Swift/CYLThemeManagerCenter.swift`），由 Swift 接口（`CYLSwiftInterface.h`）声明，因为一个类不能声明两次
+ *      （docs/Swift-Migration.md）。
  */
-@interface CYLThemeManagerCenter : NSObject
-
-/*!
- * [EN] The manager named `CYLThemeManagerNameDefault`; enough for an app with one set of themes.
- * [CN] 名为 `CYLThemeManagerNameDefault` 的管理器；只有一套主题的 App 使用它即可。
- */
-@property (class, nonatomic, strong, readonly) CYLThemeManager *defaultThemeManager;
-
-/*!
- * [EN] Every manager created so far.
- * [CN] 目前已创建的所有管理器。
- */
-@property (class, nonatomic, copy, readonly) NSArray<CYLThemeManager *> *themeManagers;
-
-/*!
- * [EN] The manager named `name`, created on first use.
- * [CN] 名为 `name` 的管理器，首次使用时创建。
- */
-+ (CYLThemeManager *)themeManagerWithName:(__kindof NSObject<NSCopying> *)name;
-
-/*!
- * [EN] `-[CYLThemeManager updateThemeForTraitCollection:]` for every manager. `CYLTabBarController` calls it when the
- *      system appearance changes; call it yourself from a root view controller that is not one. When no theme
- *      switches, the layer colors set with `-[CALayer cyl_setThemeColor:forKey:]` are resolved again for the new
- *      appearance (a `CGColor` does not follow it by itself).
- * [CN] 对所有管理器调用 `-[CYLThemeManager updateThemeForTraitCollection:]`。系统外观变化时 `CYLTabBarController` 会调用；
- *      根控制器不是 `CYLTabBarController` 时请自行调用。没有主题切换时，通过 `-[CALayer cyl_setThemeColor:forKey:]` 设置的 layer
- *      颜色会按新外观重新解析（`CGColor` 不会自动跟随外观）。
- */
-+ (void)updateThemesForTraitCollection:(UITraitCollection *)traitCollection API_AVAILABLE(ios(13.0));
-
-@end
 
 NS_ASSUME_NONNULL_END

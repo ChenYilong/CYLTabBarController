@@ -11,6 +11,12 @@
 #import "CYLPlusButtonSubclass.h"
 #import "CYLFlatDesignMainTabBarController.h"
 #import "CYLFlatDesignTableViewController.h"
+#import "CYLHomeViewController.h"
+#import "CYLSameCityViewController.h"
+#import "CYLMessageViewController.h"
+#import "CYLMineViewController.h"
+#import "CYLTabBarControllerDemo-Swift.h"
+#import "CYLDemoLocalization.h"
 
 @interface CYLMainRootViewController ()
 
@@ -31,8 +37,14 @@
     //      starts on the FlatDesign tab bar, which code can hide on every system (Liquid Glass is minimized by the system).
     // [CN] 滚动隐藏自测（issue #13，scripts/scroll-hide-self-test.sh）：`-CYLScrollHideSelfTestFlatDesign YES` 以扁平样式 TabBar 启动，
     //      在所有系统上都可以用代码隐藏（液态玻璃由系统缩小）。
+    // [EN] `-CYLDemoManifestTheme light|dark|christmas`: the tab bar comes from the configuration manifest built into the app
+    //      (docs/Configuration-Manifest.md) instead of code.
+    // [CN] `-CYLDemoManifestTheme light|dark|christmas`：TabBar 来自 App 内置的配置清单（docs/Configuration-Manifest.md），而不是代码。
+    NSString *manifestTheme = [[NSUserDefaults standardUserDefaults] stringForKey:@"CYLDemoManifestTheme"];
     if ([[NSUserDefaults standardUserDefaults] boolForKey:@"CYLScrollHideSelfTestFlatDesign"]) {
         [self createFlatDesignTabBar];
+    } else if (manifestTheme.length > 0 && [self createManifestTabBarWithTheme:manifestTheme]) {
+        // [EN] Built from the manifest. [CN] 已由清单创建。
     } else {
         [self createLiquidGlassTabBar];
     }
@@ -77,6 +89,51 @@
     tabBarController.allowsVerticalBar = YES;
     self.viewControllers = @[tabBarController];
     return tabBarController;
+}
+
+#pragma mark -
+#pragma mark - createManifestTabBar
+// MARK: createManifestTabBar
+
+/*!
+ * [EN] A tab bar from a configuration manifest (docs/Configuration-Manifest.md): the manifest, its string tables and
+ *      the images of every version and theme are in Example-Shared/Configurations, bundled as "Configurations"; its page
+ *      IDs open this example's own pages, registered once. `theme` is one of `themes.list` (light, dark, christmas).
+ * [CN] 由配置清单创建 TabBar（docs/Configuration-Manifest.md）：清单、字符串表与各版本、各主题的图片都在 Example-Shared/Configurations 中，
+ *      以 "Configurations" 打包；清单中的页面 ID 打开本示例自己的页面，只注册一次。`theme` 为 `themes.list` 之一（light、dark、christmas）。
+ */
+- (BOOL)createManifestTabBarWithTheme:(NSString *)theme {
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        NSDictionary<NSString *, Class> *pages = @{ @"home" : [CYLHomeViewController class], @"discover" : [CYLSameCityViewController class],
+                                                   @"message" : [CYLMessageViewController class], @"me" : [CYLMineViewController class],
+                                                   @"publish" : [CYLPlusDemoChildViewController class] };
+        [CYLTabBarPageRegistry.sharedRegistry registerPageProvider:^UIViewController *(NSString *pageIdentifier, NSDictionary<NSString *, id> *tabAttributes) {
+            UIViewController *page = [[pages[pageIdentifier] alloc] init];
+            return [[CYLBaseNavigationController alloc] initWithRootViewController:page];
+        } forPageIdentifiers:pages.allKeys];
+    });
+    NSError *error = nil;
+    CYLTabBarManifest *manifest = [CYLTabBarManifest manifestWithRoute:@"bundle:Configurations/Manifests/cyl_tabbar_manifest.json" error:&error];
+    CYLTabBarController *tabBarController = (CYLTabBarController *)[manifest tabBarControllerWithError:&error];
+    if (!tabBarController) {
+        NSLog(@"🔴 CYLDemoManifestTheme: %@", error.localizedDescription);
+        return NO;
+    }
+    // [EN] After the manifest registered its themes. A skin other than the light / dark pair stops following the system
+    //      appearance, which would choose light or dark again.
+    // [CN] 在清单注册其主题之后。浅色 / 深色以外的皮肤停止跟随系统外观，否则系统会重新选择浅色或深色。
+    NSDictionary *themes = manifest.dictionary[@"themes"];
+    CYLThemeManager *manager = [CYLThemeManagerCenter themeManagerWithName:themes[@"managerName"] ?: @"CYLConfigurationDemo"];
+    if (![theme isEqual:themes[@"default"]] && ![theme isEqual:themes[@"darkMode"]]) {
+        if (@available(iOS 13.0, *)) {
+            manager.respondsSystemStyleAutomatically = NO;
+        }
+        manager.identifierForTrait = nil;
+    }
+    manager.currentThemeIdentifier = theme;
+    self.viewControllers = @[ tabBarController ];
+    return YES;
 }
 
 #pragma mark -
@@ -132,7 +189,7 @@
         //                     selectedImageName:selectedImages[i]
         //                        lottieFilePath:lottieFilePaths[i]];
         
-        nav.cyl_getViewControllerInsteadOfNavigationController.title  = [NSString stringWithFormat:@"%@%@", firstTabBarItemsAttributes[CYLTabBarItemTitle],CYLLocalizedString(@"（扁平）")];
+        nav.cyl_getViewControllerInsteadOfNavigationController.title  = [NSString stringWithFormat:@"%@%@", firstTabBarItemsAttributes[CYLTabBarItemTitle],CYLDemoLocalizedString(@"（扁平）")];
 
         
         //        if (i == 0) {

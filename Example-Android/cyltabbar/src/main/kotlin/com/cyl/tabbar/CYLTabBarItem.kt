@@ -18,7 +18,9 @@ import androidx.fragment.app.Fragment
  */
 class CYLTabBarItem(attributes: Map<String, Any?> = emptyMap()) {
 
-    /** [EN] The attributes the item was created from. [CN] 创建该 item 的属性。 */
+    /**
+     * [EN] The attributes the item was created from. [CN] 创建该 item 的属性。
+     */
     var attributes: Map<String, Any?> = attributes
         internal set
 
@@ -44,49 +46,82 @@ class CYLTabBarItem(attributes: Map<String, Any?> = emptyMap()) {
 
     // MARK: - UITabBarItem (CYLTabBarControllerExtention)
 
-    /** [EN] `CYLTabBarItemIdentifier`, see `CYLTabBarController (CYLTabBarItemIdentifier)`. [CN] Tab 标识。 */
+    /**
+     * [EN] `CYLTabBarItemIdentifier`, see `CYLTabBarController (CYLTabBarItemIdentifier)`. [CN] Tab 标识。
+     */
     var cyl_tabBarItemIdentifier: String? = attributes[CYLConstants.CYLTabBarItemIdentifier] as? String
-    /** [EN] `CYLTabBarItemSelectedTitle` (#433): the title shown while selected. [CN] 选中时显示的标题（#433）。 */
+    /**
+     * [EN] `CYLTabBarItemSelectedTitle` (#433): the title shown while selected. [CN] 选中时显示的标题（#433）。
+     */
     var cyl_selectedTitle: String? = attributes[CYLConstants.CYLTabBarItemSelectedTitle] as? String
-    /** [EN] The tab's animation file URL (Lottie, PAG, Rive...) and view size. [CN] 该 Tab 的动画文件 URL 与视图尺寸。 */
+    /**
+     * [EN] `CYLTabBarItemIconRenderingMode` (#787): "template", "original" or "automatic" (null: automatic).
+     * [CN] `CYLTabBarItemIconRenderingMode`（#787）："template"、"original" 或 "automatic"（null 即 automatic）。
+     */
+    var cyl_iconRenderingMode: String? = CYLTabBarConfiguration.iconRenderingModeValue(attributes[CYLConstants.CYLTabBarItemIconRenderingMode])
+    /**
+     * [EN] The tab's animation file URL (Lottie, PAG, Rive...) and view size. [CN] 该 Tab 的动画文件 URL 与视图尺寸。
+     */
     var cyl_tabBarItemAnimationURL: String? = null
     var cyl_tabBarItemAnimationSizeValue: CYLSize? = null
-    /** [EN] `cyl_lottieURL` (deprecated): `cyl_tabBarItemAnimationURL`. [CN] 已废弃：即 `cyl_tabBarItemAnimationURL`。 */
+    /**
+     * [EN] `cyl_lottieURL` (deprecated): `cyl_tabBarItemAnimationURL`. [CN] 已废弃：即 `cyl_tabBarItemAnimationURL`。
+     */
     @Deprecated("Use cyl_tabBarItemAnimationURL", ReplaceWith("cyl_tabBarItemAnimationURL"))
     var cyl_lottieURL: String?
         get() = cyl_tabBarItemAnimationURL
         set(value) { cyl_tabBarItemAnimationURL = value }
-    /** [EN] `cyl_lottieSizeValue` (deprecated): `cyl_tabBarItemAnimationSizeValue`. [CN] 已废弃：即 `cyl_tabBarItemAnimationSizeValue`。 */
+    /**
+     * [EN] `cyl_lottieSizeValue` (deprecated): `cyl_tabBarItemAnimationSizeValue`. [CN] 已废弃：即 `cyl_tabBarItemAnimationSizeValue`。
+     */
     @Deprecated("Use cyl_tabBarItemAnimationSizeValue", ReplaceWith("cyl_tabBarItemAnimationSizeValue"))
     var cyl_lottieSizeValue: CYLSize?
         get() = cyl_tabBarItemAnimationSizeValue
         set(value) { cyl_tabBarItemAnimationSizeValue = value }
-    /** [EN] `cyl_imagePositionAdjustment`: moves the icon. [CN] 图标偏移。 */
+    /**
+     * [EN] `cyl_imagePositionAdjustment`: moves the icon. [CN] 图标偏移。
+     */
     var cyl_imagePositionAdjustment: CYLOffset = CYLOffset.zero
-    /** [EN] `CYLFlatDesignTabBarItem.imagePositionAdjustment`. [CN] 图标位置偏移。 */
+    /**
+     * [EN] `CYLFlatDesignTabBarItem.imagePositionAdjustment`. [CN] 图标位置偏移。
+     */
     var imagePositionAdjustment: CYLOffset
         get() = cyl_imagePositionAdjustment
         set(value) { cyl_imagePositionAdjustment = value }
-    /** [EN] `CYLFlatDesignTabBarItem.titlePositionAdjustment`. [CN] 标题位置偏移。 */
+    /**
+     * [EN] `CYLFlatDesignTabBarItem.titlePositionAdjustment`. [CN] 标题位置偏移。
+     */
     var titlePositionAdjustment: CYLOffset
         get() = cyl_titlePositionAdjustment
         set(value) { cyl_titlePositionAdjustment = value }
-    /** [EN] `CYLFlatDesignTabBarItem.standardAppearance`: while this item is selected, it styles the whole FlatDesign bar. [CN] 该 item 选中时，作用于整个扁平样式 TabBar 的外观。 */
+    /**
+     * [EN] `CYLFlatDesignTabBarItem.standardAppearance`: while this item is selected, it styles the whole FlatDesign bar. [CN] 该 item 选中时，作用于整个扁平样式 TabBar 的外观。
+     */
     var standardAppearance: CYLTabBarAppearance? = null
         set(value) { field = value; cyl_visiableTabButton?.let { button -> (button.parent as? CYLTabBar)?.refreshSelection() } }
-    /** [EN] `CYLFlatDesignTabBarItem.layoutCentered`: an item with only an icon or only a title centers it (FlatDesign). [CN] 只有图标或只有标题的 item 居中显示（扁平样式）。 */
+    /**
+     * [EN] `CYLFlatDesignTabBarItem.layoutCentered`: an item with only an icon or only a title centers it (FlatDesign). [CN] 只有图标或只有标题的 item 居中显示（扁平样式）。
+     */
     var layoutCentered: Boolean = false
         set(value) { field = value; cyl_visiableTabButton?.requestLayout() }
-    /** [EN] `CYLFlatDesignTabBarItem.enabled`: a disabled item ignores taps. [CN] 禁用的 item 忽略点击。 */
+    /**
+     * [EN] `CYLFlatDesignTabBarItem.enabled`: a disabled item ignores taps. [CN] 禁用的 item 忽略点击。
+     */
     var isEnabled: Boolean = true
         set(value) { field = value; cyl_visiableTabButton?.isEnabled = value }
     var cyl_titlePositionAdjustment: CYLOffset = CYLOffset.zero
     var cyl_imageInsets: CYLEdgeInsets = CYLEdgeInsets.zero
-    /** [EN] An icon size (dp) set by `setTabBarItemIcon:selectedIcon:size:atIndex:` / `CYLTabBarItemImageURLSize`; null: the placeholder size. [CN] 由图标接口或 `CYLTabBarItemImageURLSize` 设置的图标尺寸（dp）；null 为占位尺寸。 */
+    /**
+     * [EN] An icon size (dp) set by `setTabBarItemIcon:selectedIcon:size:atIndex:` / `CYLTabBarItemImageURLSize`; null: the placeholder size. [CN] 由图标接口或 `CYLTabBarItemImageURLSize` 设置的图标尺寸（dp）；null 为占位尺寸。
+     */
     var cyl_iconSize: CYLSize? = null
-    /** [EN] `cyl_doubleTapBlock`: called with the item and its index on a double tap (#535). [CN] 双击回调（#535）。 */
+    /**
+     * [EN] `cyl_doubleTapBlock`: called with the item and its index on a double tap (#535). [CN] 双击回调（#535）。
+     */
     var cyl_doubleTapBlock: ((CYLTabBarItem, Int) -> Unit)? = null
-    /** [EN] `cyl_viewDidLayoutSubviewsBlock`: called after the tab bar laid the tab's button out. [CN] 该 Tab 按钮布局完成后的回调。 */
+    /**
+     * [EN] `cyl_viewDidLayoutSubviewsBlock`: called after the tab bar laid the tab's button out. [CN] 该 Tab 按钮布局完成后的回调。
+     */
     var cyl_viewDidLayoutSubviewsBlock: ((CYLTabBar, CYLTabBarItem, Int) -> Unit)? = null
 
     // MARK: - Per-item styles (CYLTabBarItemTitleColor..., #758)
@@ -100,48 +135,64 @@ class CYLTabBarItem(attributes: Map<String, Any?> = emptyMap()) {
     var cyl_titleFont: CYLFont? = null
     var cyl_selectedTitleFont: CYLFont? = null
 
-    /** [EN] The tab's button once the tab bar built it (`cyl_visiableTabButton`). [CN] TabBar 创建后该 Tab 的按钮。 */
+    /**
+     * [EN] The tab's button once the tab bar built it (`cyl_visiableTabButton`). [CN] TabBar 创建后该 Tab 的按钮。
+     */
     var cyl_visiableTabButton: CYLTabBarItemButton? = null
         internal set
     val cyl_selectedTabButton: CYLTabBarItemButton?
         get() = cyl_visiableTabButton?.takeIf { it.isSelected }
 
-    /** [EN] `-cyl_imageView`: the icon view of the tab's button. [CN] Tab 按钮的图标视图。 */
+    /**
+     * [EN] `-cyl_imageView`: the icon view of the tab's button. [CN] Tab 按钮的图标视图。
+     */
     fun cyl_imageView() = cyl_visiableTabButton?.iconView
     fun cyl_imageViewInTabBarButton() = cyl_imageView()
 
-    /** [EN] The display name for logs and alerts: the title, else the identifier. [CN] 用于日志与提示的名称：标题，否则标识。 */
+    /**
+     * [EN] The display name for logs and alerts: the title, else the identifier. [CN] 用于日志与提示的名称：标题，否则标识。
+     */
     val cyl_tabBarItemDisplayName: String
         get() = title ?: cyl_tabBarItemIdentifier ?: ""
 
     override fun toString(): String = "CYLTabBarItem(title=$title, identifier=$cyl_tabBarItemIdentifier)"
 }
 
-/** [EN] CGSize. [CN] 尺寸。 */
+/**
+ * [EN] CGSize. [CN] 尺寸。
+ */
 data class CYLSize(val width: Float, val height: Float) {
     companion object {
         @JvmField val zero = CYLSize(0f, 0f)
     }
 }
 
-/** [EN] UIOffset. [CN] 偏移。 */
+/**
+ * [EN] UIOffset. [CN] 偏移。
+ */
 data class CYLOffset(val horizontal: Float, val vertical: Float) {
     companion object {
         @JvmField val zero = CYLOffset(0f, 0f)
     }
 }
 
-/** [EN] UIEdgeInsets. [CN] 边距。 */
+/**
+ * [EN] UIEdgeInsets. [CN] 边距。
+ */
 data class CYLEdgeInsets(val top: Float, val left: Float, val bottom: Float, val right: Float) {
     companion object {
         @JvmField val zero = CYLEdgeInsets(0f, 0f, 0f, 0f)
     }
 }
 
-/** [EN] UIFont: a size in sp and an optional typeface. [CN] 字体：字号（sp）与可选的 Typeface。 */
+/**
+ * [EN] UIFont: a size in sp and an optional typeface. [CN] 字体：字号（sp）与可选的 Typeface。
+ */
 data class CYLFont(val size: Float, val typeface: Typeface? = null, val bold: Boolean = false) {
     companion object {
-        /** [EN] "15", "bold:15" or "Family-Style:12" as in a configuration file. [CN] 配置文件中的写法。 */
+        /**
+         * [EN] "15", "bold:15" or "Family-Style:12" as in a configuration file. [CN] 配置文件中的写法。
+         */
         @JvmStatic
         fun fromConfigurationValue(value: Any?): CYLFont? {
             val text = when (value) {
@@ -164,5 +215,7 @@ data class CYLFont(val size: Float, val typeface: Typeface? = null, val bold: Bo
     }
 }
 
-/** [EN] The page of a tab: a Fragment (the iOS `UIViewController`). [CN] Tab 的页面：Fragment（对应 iOS 的 `UIViewController`）。 */
+/**
+ * [EN] The page of a tab: a Fragment (the iOS `UIViewController`). [CN] Tab 的页面：Fragment（对应 iOS 的 `UIViewController`）。
+ */
 typealias CYLViewController = Fragment

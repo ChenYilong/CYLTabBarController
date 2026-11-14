@@ -25,7 +25,6 @@
 		184C1CE423F65A9A00B23C7F /* RootNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 184C1CDE23F65A9A00B23C7F /* RootNavigationController.swift */; };
 		184C1CE623F65A9A00B23C7F /* RootTabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 184C1CE023F65A9A00B23C7F /* RootTabBarController.swift */; };
 		184C1CE723F65A9A00B23C7F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 184C1CE323F65A9A00B23C7F /* AppDelegate.swift */; };
-		184C1CEB23F65B0B00B23C7F /* OCSwift.m in Sources */ = {isa = PBXBuildFile; fileRef = 184C1CEA23F65B0B00B23C7F /* OCSwift.m */; };
 		184C1CF123F686AE00B23C7F /* TabBarCommon.swift in Sources */ = {isa = PBXBuildFile; fileRef = 184C1CF023F686AE00B23C7F /* TabBarCommon.swift */; };
 		184C1CF323F6898300B23C7F /* CYLPlusButtonSubclass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 184C1CF223F6898300B23C7F /* CYLPlusButtonSubclass.swift */; };
 		184F198223F7C707002DBAE4 /* ChilderVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 184F198123F7C707002DBAE4 /* ChilderVC.swift */; };
@@ -44,6 +43,8 @@
 		C1A5CE0E2E00000000000003 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1A5CE0E2E00000000000004 /* SceneDelegate.swift */; };
 		F0D378B6FAC34A5E99CE238D /* CYLPlusButtonBadgeDemo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78BCD0BDB8E54748A466D7E9 /* CYLPlusButtonBadgeDemo.swift */; };
 		F3D51020DB28828D225553AB /* CYLTabBarController.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CADE395AEB2151005A1EB5B1 /* CYLTabBarController.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		775189F0879268F68F84265E /* CYLDemoLocalization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62643A9AE52BBCF3BAD6B603 /* CYLDemoLocalization.swift */; };
+		B2BBD9743C13C0E27C29162D /* CYLDemo.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 3E409A01756B44242CF745F6 /* CYLDemo.bundle */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -79,7 +80,7 @@
 
 /* Begin PBXFileReference section */
 		184C1C8A23F65A2800B23C7F /* HealthyHome.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HealthyHome.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		184C1C9123F65A2800B23C7F /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		184C1C9123F65A2800B23C7F /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ViewController.swift; path = "../Example-Swift-03/HealthyHome/Public/Root/ViewController.swift"; sourceTree = SOURCE_ROOT; };
 		184C1C9423F65A2800B23C7F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		184C1C9623F65A2A00B23C7F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		184C1C9923F65A2A00B23C7F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -90,39 +91,37 @@
 		184C1CAB23F65A2A00B23C7F /* HealthyHomeUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HealthyHomeUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		184C1CAF23F65A2A00B23C7F /* HealthyHomeUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthyHomeUITests.swift; sourceTree = "<group>"; };
 		184C1CB123F65A2A00B23C7F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		184C1CBF23F65A6700B23C7F /* HomeVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HomeVC.swift; sourceTree = "<group>"; };
-		184C1CC123F65A6700B23C7F /* HealthyVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HealthyVC.swift; sourceTree = "<group>"; };
-		184C1CC323F65A6700B23C7F /* WisdomVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WisdomVC.swift; sourceTree = "<group>"; };
-		184C1CC523F65A6700B23C7F /* MeVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MeVC.swift; sourceTree = "<group>"; };
-		184C1CC723F65A6700B23C7F /* FriendsVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FriendsVC.swift; sourceTree = "<group>"; };
-		184C1CCF23F65A7400B23C7F /* ImageHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ImageHelper.h; sourceTree = "<group>"; };
-		184C1CD023F65A7400B23C7F /* ImageVIewExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageVIewExtension.swift; sourceTree = "<group>"; };
-		184C1CD123F65A7400B23C7F /* ImageHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageHelper.swift; sourceTree = "<group>"; };
-		184C1CD323F65A7400B23C7F /* ToastView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ToastView.swift; sourceTree = "<group>"; };
-		184C1CD823F65A8C00B23C7F /* Common.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Common.swift; sourceTree = "<group>"; };
-		184C1CDE23F65A9A00B23C7F /* RootNavigationController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RootNavigationController.swift; sourceTree = "<group>"; };
-		184C1CE023F65A9A00B23C7F /* RootTabBarController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RootTabBarController.swift; sourceTree = "<group>"; };
-		184C1CE323F65A9A00B23C7F /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		184C1CE823F65B0B00B23C7F /* HealthyHome-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "HealthyHome-Bridging-Header.h"; sourceTree = "<group>"; };
-		184C1CE923F65B0B00B23C7F /* OCSwift.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OCSwift.h; sourceTree = "<group>"; };
-		184C1CEA23F65B0B00B23C7F /* OCSwift.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OCSwift.m; sourceTree = "<group>"; };
-		184C1CF023F686AE00B23C7F /* TabBarCommon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarCommon.swift; sourceTree = "<group>"; };
-		184C1CF223F6898300B23C7F /* CYLPlusButtonSubclass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CYLPlusButtonSubclass.swift; sourceTree = "<group>"; };
-		184F198123F7C707002DBAE4 /* ChilderVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChilderVC.swift; sourceTree = "<group>"; };
-		184F198323F7C811002DBAE4 /* UIView+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIView+Extension.swift"; sourceTree = "<group>"; };
-		184F198423F7C811002DBAE4 /* UIColor+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIColor+Extension.swift"; sourceTree = "<group>"; };
-		184F198523F7C811002DBAE4 /* UIIamge+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIIamge+Extension.swift"; sourceTree = "<group>"; };
-		184F198923F7E046002DBAE4 /* PrefixPch.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PrefixPch.swift; sourceTree = "<group>"; };
-		184F198B23F7E651002DBAE4 /* GuideViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GuideViewController.swift; sourceTree = "<group>"; };
-		184F198D23F7E8A3002DBAE4 /* NextVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NextVC.swift; sourceTree = "<group>"; };
-		184F198F23F7EE40002DBAE4 /* APPDelegate+Categories.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "APPDelegate+Categories.swift"; sourceTree = "<group>"; };
+		184C1CBF23F65A6700B23C7F /* HomeVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = HomeVC.swift; path = "../Example-Swift-03/HealthyHome/UI/Home/HomeVC.swift"; sourceTree = SOURCE_ROOT; };
+		184C1CC123F65A6700B23C7F /* HealthyVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = HealthyVC.swift; path = "../Example-Swift-03/HealthyHome/UI/Healthy/HealthyVC.swift"; sourceTree = SOURCE_ROOT; };
+		184C1CC323F65A6700B23C7F /* WisdomVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = WisdomVC.swift; path = "../Example-Swift-03/HealthyHome/UI/Wisdom/WisdomVC.swift"; sourceTree = SOURCE_ROOT; };
+		184C1CC523F65A6700B23C7F /* MeVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MeVC.swift; path = "../Example-Swift-03/HealthyHome/UI/Me/MeVC.swift"; sourceTree = SOURCE_ROOT; };
+		184C1CC723F65A6700B23C7F /* FriendsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FriendsVC.swift; path = "../Example-Swift-03/HealthyHome/UI/Friends/FriendsVC.swift"; sourceTree = SOURCE_ROOT; };
+		184C1CD023F65A7400B23C7F /* ImageVIewExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ImageVIewExtension.swift; path = "../Example-Swift-03/HealthyHome/Libs/imageHelper/ImageVIewExtension.swift"; sourceTree = SOURCE_ROOT; };
+		184C1CD123F65A7400B23C7F /* ImageHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ImageHelper.swift; path = "../Example-Swift-03/HealthyHome/Libs/imageHelper/ImageHelper.swift"; sourceTree = SOURCE_ROOT; };
+		184C1CD323F65A7400B23C7F /* ToastView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ToastView.swift; path = "../Example-Swift-03/HealthyHome/Libs/HUD/ToastView.swift"; sourceTree = SOURCE_ROOT; };
+		184C1CD823F65A8C00B23C7F /* Common.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Common.swift; path = "../Example-Swift-03/HealthyHome/Tool/Common.swift"; sourceTree = SOURCE_ROOT; };
+		184C1CDE23F65A9A00B23C7F /* RootNavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = RootNavigationController.swift; path = "../Example-Swift-03/HealthyHome/Public/Root/RootNavigationController.swift"; sourceTree = SOURCE_ROOT; };
+		184C1CE023F65A9A00B23C7F /* RootTabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = RootTabBarController.swift; path = "../Example-Swift-03/HealthyHome/Public/Root/RootTabBarController.swift"; sourceTree = SOURCE_ROOT; };
+		184C1CE323F65A9A00B23C7F /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = "../Example-Swift-03/HealthyHome/Public/Main/AppDelegate.swift"; sourceTree = SOURCE_ROOT; };
+		184C1CF023F686AE00B23C7F /* TabBarCommon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = TabBarCommon.swift; path = "../Example-Swift-03/HealthyHome/Tool/TabBarCommon.swift"; sourceTree = SOURCE_ROOT; };
+		184C1CF223F6898300B23C7F /* CYLPlusButtonSubclass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CYLPlusButtonSubclass.swift; path = "../Example-Swift-03/HealthyHome/Public/Root/CYLPlusButtonSubclass.swift"; sourceTree = SOURCE_ROOT; };
+		184F198123F7C707002DBAE4 /* ChilderVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ChilderVC.swift; path = "../Example-Swift-03/HealthyHome/UI/Home/ChilderVC.swift"; sourceTree = SOURCE_ROOT; };
+		184F198323F7C811002DBAE4 /* UIView+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "UIView+Extension.swift"; path = "../Example-Swift-03/HealthyHome/Public/Extenstion/UIView+Extension.swift"; sourceTree = SOURCE_ROOT; };
+		184F198423F7C811002DBAE4 /* UIColor+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "UIColor+Extension.swift"; path = "../Example-Swift-03/HealthyHome/Public/Extenstion/UIColor+Extension.swift"; sourceTree = SOURCE_ROOT; };
+		184F198523F7C811002DBAE4 /* UIIamge+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "UIIamge+Extension.swift"; path = "../Example-Swift-03/HealthyHome/Public/Extenstion/UIIamge+Extension.swift"; sourceTree = SOURCE_ROOT; };
+		184F198923F7E046002DBAE4 /* PrefixPch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = PrefixPch.swift; path = "../Example-Swift-03/HealthyHome/Public/Macros/PrefixPch.swift"; sourceTree = SOURCE_ROOT; };
+		184F198B23F7E651002DBAE4 /* GuideViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = GuideViewController.swift; path = "../Example-Swift-03/HealthyHome/UI/Guide/GuideViewController.swift"; sourceTree = SOURCE_ROOT; };
+		184F198D23F7E8A3002DBAE4 /* NextVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = NextVC.swift; path = "../Example-Swift-03/HealthyHome/UI/Home/NextVC.swift"; sourceTree = SOURCE_ROOT; };
+		184F198F23F7EE40002DBAE4 /* APPDelegate+Categories.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "APPDelegate+Categories.swift"; path = "../Example-Swift-03/HealthyHome/Public/Main/APPDelegate+Categories.swift"; sourceTree = SOURCE_ROOT; };
 		346F662B91D3859FF99D0822 /* green_lottie_tab_news.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = green_lottie_tab_news.json; path = ../Example/Classes/Other/LottieResources/green_lottie_tab_news.json; sourceTree = SOURCE_ROOT; };
 		4922A55212D47F955B7CC7B6 /* green_lottie_tab_home.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = green_lottie_tab_home.json; path = ../Example/Classes/Other/LottieResources/green_lottie_tab_home.json; sourceTree = SOURCE_ROOT; };
 		6E1E0ABEF12843137AA02521 /* green_lottie_tab_mine.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = green_lottie_tab_mine.json; path = ../Example/Classes/Other/LottieResources/green_lottie_tab_mine.json; sourceTree = SOURCE_ROOT; };
 		78BCD0BDB8E54748A466D7E9 /* CYLPlusButtonBadgeDemo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CYLPlusButtonBadgeDemo.swift; path = "../Example-Shared/CYLPlusButtonBadgeDemo.swift"; sourceTree = SOURCE_ROOT; };
 		A593EAE45850977BFCF8C68A /* green_lottie_tab_discover.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = green_lottie_tab_discover.json; path = ../Example/Classes/Other/LottieResources/green_lottie_tab_discover.json; sourceTree = SOURCE_ROOT; };
-		C1A5CE0E2E00000000000004 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
+		C1A5CE0E2E00000000000004 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SceneDelegate.swift; path = "../Example-Swift-03/HealthyHome/Public/Main/SceneDelegate.swift"; sourceTree = SOURCE_ROOT; };
 		CADE395AEB2151005A1EB5B1 /* CYLTabBarController.xcframework */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = wrapper.xcframework; name = CYLTabBarController.xcframework; path = Carthage/Build/CYLTabBarController.xcframework; sourceTree = SOURCE_ROOT; };
+		62643A9AE52BBCF3BAD6B603 /* CYLDemoLocalization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CYLDemoLocalization.swift; path = "../Example-Shared/CYLDemoLocalization.swift"; sourceTree = SOURCE_ROOT; };
+		3E409A01756B44242CF745F6 /* CYLDemo.bundle */ = {isa = PBXFileReference; lastKnownFileType = wrapper.plug-in; name = CYLDemo.bundle; path = "../Example-Shared/CYLDemo.bundle"; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -169,6 +168,8 @@
 				184C1CAE23F65A2A00B23C7F /* HealthyHomeUITests */,
 				184C1C8B23F65A2800B23C7F /* Products */,
 				0D2E3A8622A6521A9771DB87 /* Frameworks */,
+				62643A9AE52BBCF3BAD6B603 /* CYLDemoLocalization.swift */,
+				3E409A01756B44242CF745F6 /* CYLDemo.bundle */,
 			);
 			sourceTree = "<group>";
 		};
@@ -193,9 +194,6 @@
 				184C1C9623F65A2A00B23C7F /* Assets.xcassets */,
 				184C1C9823F65A2A00B23C7F /* LaunchScreen.storyboard */,
 				184C1C9B23F65A2A00B23C7F /* Info.plist */,
-				184C1CE923F65B0B00B23C7F /* OCSwift.h */,
-				184C1CEA23F65B0B00B23C7F /* OCSwift.m */,
-				184C1CE823F65B0B00B23C7F /* HealthyHome-Bridging-Header.h */,
 			);
 			path = HealthyHome;
 			sourceTree = "<group>";
@@ -285,7 +283,6 @@
 		184C1CCE23F65A7400B23C7F /* imageHelper */ = {
 			isa = PBXGroup;
 			children = (
-				184C1CCF23F65A7400B23C7F /* ImageHelper.h */,
 				184C1CD123F65A7400B23C7F /* ImageHelper.swift */,
 				184C1CD023F65A7400B23C7F /* ImageVIewExtension.swift */,
 			);
@@ -484,6 +481,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B2BBD9743C13C0E27C29162D /* CYLDemo.bundle in Resources */,
 				61DAEAC8826B3FA13591202F /* green_lottie_tab_home.json in Resources */,
 				7E36C3D378B559F4FFC753C7 /* green_lottie_tab_discover.json in Resources */,
 				A520A43B0231F8A9A36D72A4 /* green_lottie_tab_news.json in Resources */,
@@ -515,6 +513,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				775189F0879268F68F84265E /* CYLDemoLocalization.swift in Sources */,
 				F0D378B6FAC34A5E99CE238D /* CYLPlusButtonBadgeDemo.swift in Sources */,
 				184C1CCC23F65A6700B23C7F /* FriendsVC.swift in Sources */,
 				184F198723F7C811002DBAE4 /* UIColor+Extension.swift in Sources */,
@@ -540,7 +539,6 @@
 				184F199023F7EE40002DBAE4 /* APPDelegate+Categories.swift in Sources */,
 				184C1CF323F6898300B23C7F /* CYLPlusButtonSubclass.swift in Sources */,
 				184F198A23F7E046002DBAE4 /* PrefixPch.swift in Sources */,
-				184C1CEB23F65B0B00B23C7F /* OCSwift.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -717,13 +715,13 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 35GDVZ2Q5K;
 				INFOPLIST_FILE = HealthyHome/Info.plist;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) CYL_DEMO_FLATDESIGN_DELEGATE";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.HealthyHome.Carthage;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_OBJC_BRIDGING_HEADER = "HealthyHome/HealthyHome-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -738,13 +736,13 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 35GDVZ2Q5K;
 				INFOPLIST_FILE = HealthyHome/Info.plist;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) CYL_DEMO_FLATDESIGN_DELEGATE";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.HealthyHome.Carthage;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_OBJC_BRIDGING_HEADER = "HealthyHome/HealthyHome-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};

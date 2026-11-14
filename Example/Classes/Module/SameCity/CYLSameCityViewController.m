@@ -11,7 +11,9 @@
 #import <CYLTabBarController/UITableViewCell+CYLBadgeExtention.h>
 #import <CYLTabBarController/UIViewController+CYLSettingsSection.h>
 #import "CYLDetailsViewController.h"
-#import <MJRefresh/MJRefresh.h>
+#import <CYLTableViewPlaceHolder/CYLTableViewPlaceHolder.h>
+#import "CYLDemoLocalization.h"
+#import "CYLTabBarControllerDemo-Swift.h"
 
 @implementation CYLSameCityViewController
 
@@ -25,29 +27,32 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     [UITableViewCell cyl_setUpAutomaticRowHeightForTableView:self.tableView];
-    NSLog(CYLLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), self);
+    NSLog(CYLDemoLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), self);
 
-    self.view.backgroundColor = UIColor.systemBackgroundColor; // [EN] Dark Mode. [CN] 适配深色模式。
+    self.view.backgroundColor = UIColor.systemGroupedBackgroundColor; // [EN] The grouped background, so the rounded sections stand out. [CN] 分组背景色，使圆角分组清晰可见。
     
     __weak __typeof(self) weakSelf = self;
-    self.tableView.mj_header = [MJRefreshNormalHeader headerWithRefreshingBlock:^{
+    self.tableView.cyl_header = [CYLRefreshNormalHeader headerWithRefreshingBlock:^{
         //Call this Block When enter the refresh status automatically
         NSTimeInterval delaySeconds = 1;
         dispatch_time_t when = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delaySeconds * NSEC_PER_SEC));
         dispatch_after(when, dispatch_get_main_queue(), ^{
-            [weakSelf.tableView.mj_header endRefreshing];
+            [weakSelf.tableView.cyl_header endRefreshing];
         });
     }];
 //    [self.view layoutIfNeeded];
 
+    // [EN] Pull to refresh, empty / no-network placeholders and the offline red bar (CYLTableViewPlaceHolder).
+    // [CN] 下拉刷新、无数据 / 无网络占位图与断网红条（CYLTableViewPlaceHolder）。
+    [CYLDemoPlaceholder installOnScrollView:self.tableView viewController:self animation:CYLDemoPlaceholderAnimationPag refresh:nil];
 }
 
 - (void)refresh {
-    [self.tableView.mj_header beginRefreshing];
+    [self.tableView.cyl_header beginRefreshing];
     NSTimeInterval delaySeconds = 1;
     dispatch_time_t when = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delaySeconds * NSEC_PER_SEC));
     dispatch_after(when, dispatch_get_main_queue(), ^{
-        [self.tableView.mj_header endRefreshing];
+        [self.tableView.cyl_header endRefreshing];
     });
 }
 #pragma mark - Methods
@@ -57,7 +62,7 @@
     // [EN] The badge sample is the title, the page the subtitle; both wrap.
     // [CN] 角标样例为主标题，页面为副标题；均可换行。
     cell.textLabel.text = [UITableViewCell cyl_badgeTitleForRow:indexPath.row];
-    cell.detailTextLabel.text = [NSString stringWithFormat:CYLLocalizedString(@"%@ CYLTabBarController on iOS %@"), self.title, @([[[UIDevice currentDevice] systemVersion] floatValue])];
+    cell.detailTextLabel.text = [NSString stringWithFormat:CYLDemoLocalizedString(@"%@ CYLTabBarController on iOS %@"), self.title, @([[[UIDevice currentDevice] systemVersion] floatValue])];
     [cell cyl_wrapsTextLabels];
 }
 
@@ -84,7 +89,7 @@
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
-    return section < [self cyl_demoSectionCount] ? [self cyl_demoTitleForSection:section] : CYLLocalizedString(@"角标");
+    return section < [self cyl_demoSectionCount] ? [self cyl_demoTitleForSection:section] : CYLDemoLocalizedString(@"角标");
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {

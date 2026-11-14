@@ -16,6 +16,11 @@
 #import "UIView+CYLTabBarControllerExtention.h"
 #import "UIImage+CYLTabBarControllerExtention.h"
 #import "UIControl+CYLTabBarItemAnimation.h"
+#if __has_include("CYLUtils/UIView+CYLHitTestOutsideBounds.h")
+#import "CYLUtils/UIView+CYLHitTestOutsideBounds.h"
+#else
+#import "UIView+CYLHitTestOutsideBounds.h"
+#endif
 
 static void *const CYLTabBarContext = (void*)&CYLTabBarContext;
 static void *const CYLTabBarAlpha = (void*)&CYLTabBarAlpha;
@@ -39,6 +44,13 @@ static void *const CYLTabBarItemBadgeValueContext = (void*)&CYLTabBarItemBadgeVa
 /// [EN] Key of the `hidden` value a view inserted by the library had before More editing hid it.
 /// [CN] 「More」编辑隐藏本库插入的视图之前，该视图原来的 `hidden` 值的 key。
 static const void *const CYLHiddenBeforeCustomizingKey = &CYLHiddenBeforeCustomizingKey;
+/// [EN] An item's full title, and the title it shows, while it is cut because the titles overflow the platter.
+/// [CN] 标题因超出 platter 而被截断时，item 的完整标题及其显示的标题。
+static const void *const CYLFullTitleKey = &CYLFullTitleKey;
+static const void *const CYLShownTitleKey = &CYLShownTitleKey;
+/// [EN] The platter width when titles were last cut. [CN] 上次截断标题时的 platter 宽度。
+static const void *const CYLCutPlatterWidthKey = &CYLCutPlatterWidthKey;
+static NSString *CYLTitleFittingWidth(NSString *title, CGFloat width, UIFont *font);
 
 // [EN] FIX: issue #152 / #535 — implemented in CYLTabBarController+CYLInteraction.m.
 // [CN] FIX: issue #152 / #535 — 实现位于 CYLTabBarController+CYLInteraction.m。
@@ -471,6 +483,10 @@ static NSDictionary<NSAttributedStringKey, id> *CYLTitleAttributesWithColor(NSDi
     // [CN] UIKit 在本次布局中（晚于控制器的 `-viewDidLayoutSubviews`）生成 `items`：此时执行
     //      `-performWhenTabBarItemsReady:` / `-reloadBadgesWithBlock:` 的 block。
     [self.tabBarController cyl_runPendingReloadBadgesBlocksIfReady];
+    // [EN] Classic style: badges of tab buttons UIKit replaced follow to the new buttons. [CN] 经典样式：角标跟随到 UIKit 替换后的新按钮。
+    for (UITabBarItem *item in self.items) {
+        [item cyl_moveBadgeToCurrentTabButtonIfNeeded];
+    }
     // The tab titles may have moved: lay the plus button out again so its title follows them
     // (`+alignsTitleWithTabBarItemTitles`).
     [[CYLPlusButton plusButtonForOwner:self] cyl_setNeedsTitleAlignment];
@@ -556,10 +572,49 @@ static NSDictionary<NSAttributedStringKey, id> *CYLTitleAttributesWithColor(NSDi
     self.cyl_isCustomizingItems = YES;
     [self cyl_setInsertedViewsHiddenForCustomizing:YES];
     [super beginCustomizingItems:items];
+    [self cyl_setContainerRespondsOutsideBoundsForCustomizing:YES];
+    [self cyl_waitForCustomizingEndWithPolls:0 sawCustomizing:NO];
 }
 
 - (BOOL)endCustomizingAnimated:(BOOL)animated {
     BOOL changed = [super endCustomizingAnimated:animated];
+    [self cyl_didEndCustomizing];
+    return changed;
+}
+
+/*!
+ * [EN] FIX: after More editing → Done, Home's icon was missing. UIKit ends the editing without calling
+ *      `-endCustomizingAnimated:` (checked with a log: `-beginCustomizingItems:` is called, the end method never is), so
+ *      the marked views stayed hidden, and the container kept answering outside its bounds. The end is found by asking
+ *      `isCustomizing` every 0.1 s after editing began; it also stops once `-endCustomizingAnimated:` ran.
+ * [CN] FIX：「More」编辑 → Done 之后 Home 的图标不见了。UIKit 结束编辑时不会调用 `-endCustomizingAnimated:`（用日志确认：
+ *      `-beginCustomizingItems:` 会被调用，结束方法从不被调用），所以被标记的视图一直隐藏，容器也一直在范围之外响应点击。编辑开始后每 0.1 秒
+ *      询问一次 `isCustomizing` 来发现结束；`-endCustomizingAnimated:` 被调用时同样会结束。
+ */
+- (void)cyl_waitForCustomizingEndWithPolls:(NSUInteger)polls sawCustomizing:(BOOL)sawCustomizing {
+    __weak __typeof(self) weakSelf = self;
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        __strong __typeof(weakSelf) self = weakSelf;
+        if (!self || !self.cyl_isCustomizingItems) {
+            return;
+        }
+        BOOL isCustomizing = self.isCustomizing;
+        // [EN] Never seen as customizing within 3 s (no editing screen): end as well, so nothing stays hidden.
+        // [CN] 3 秒内始终没有处于编辑状态（没有出现编辑界面）：同样结束，避免视图一直隐藏。
+        if (!isCustomizing && (sawCustomizing || polls >= 30)) {
+            [self cyl_didEndCustomizing];
+            return;
+        }
+        [self cyl_waitForCustomizingEndWithPolls:polls + 1 sawCustomizing:(sawCustomizing || isCustomizing)];
+    });
+}
+
+/// [EN] Editing ended: gives back the container's hit test, the hidden views and the layout. [CN] 编辑结束：恢复容器的点击判定、被隐藏的视图与布局。
+- (void)cyl_didEndCustomizing {
+    if (!self.cyl_isCustomizingItems) {
+        return;
+    }
+    [self cyl_setContainerRespondsOutsideBoundsForCustomizing:NO];
     self.cyl_isCustomizingItems = NO;
     [self cyl_setInsertedViewsHiddenForCustomizing:NO];
     [self setNeedsLayout];
@@ -568,7 +623,25 @@ static NSDictionary<NSAttributedStringKey, id> *CYLTitleAttributesWithColor(NSDi
     dispatch_async(dispatch_get_main_queue(), ^{
         [weakSelf setNeedsLayout];
     });
-    return changed;
+}
+
+/*!
+ * [EN] FIX: More editing could not be closed: its "Done" (and every place above the bar) got no tap. UIKit puts the
+ *      editing view (`UITabBarCustomizeView`) next to this tab bar in `_UITabBarContainerView`, whose superview
+ *      (`_UITabBarContainerWrapperView`) is only as tall as the bar, so hit testing never reached it and the tap went to
+ *      the More page's "Edit" below (seen with lldb; the system `UITabBarController` puts it in its full-screen view).
+ *      While editing, that container answers outside its superview's bounds (`-cyl_setRespondsOutsideSuperviewBounds:`);
+ *      afterwards it no longer does, so it never takes the page's touches.
+ * [CN] FIX：「More」编辑无法关闭：其 "Done"（以及 TabBar 上方的任何位置）收不到点击。UIKit 把编辑视图（`UITabBarCustomizeView`）放在本 TabBar
+ *      旁边、`_UITabBarContainerView` 之中，而它的父视图（`_UITabBarContainerWrapperView`）只有 TabBar 那么高，所以点击判定到达不了，点击落到了
+ *      下方 More 页面的 "Edit" 上（用 lldb 确认；系统的 `UITabBarController` 把它放在全屏视图中）。编辑期间，该容器在父视图范围之外也响应点击
+ *      （`-cyl_setRespondsOutsideSuperviewBounds:`）；编辑结束后取消，不会拦截页面的触摸。
+ */
+- (void)cyl_setContainerRespondsOutsideBoundsForCustomizing:(BOOL)responds {
+    UIView *container = self.superview;
+    if ([NSStringFromClass([container class]) containsString:@"TabBarContainer"]) {
+        [container cyl_setRespondsOutsideSuperviewBounds:responds];
+    }
 }
 
 /// [EN] Hides (YES) or restores (NO) the plus button and every inserted view inside this tab bar, in one pass.
@@ -726,6 +799,237 @@ static NSDictionary<NSAttributedStringKey, id> *CYLTitleAttributesWithColor(NSDi
     }];
 }
 
+/*!
+ * [EN] FIX: titles too long for the platter overlapped. The plus button follows its slot (`-plusButtonIndex`), so a
+ *      long title is normally left whole; but when the tab buttons together are wider than the platter, UIKit lets them
+ *      overlap and the titles run into each other. Only then, and only the longest titles, are cut with "…": after
+ *      UIKit's layout the overlap of the buttons is measured, and the longest titles lose that width, the longest first,
+ *      so the others keep their full text. Checked again on each layout pass until nothing overlaps. The full title
+ *      stays the item's accessibility label, and comes back, to be measured again, when the platter grows (rotation) or
+ *      the app sets a new title. Only for the horizontal Liquid Glass bar with a plus button
+ *      (`-cyl_shouldCutOverflowingTabTitles`); elsewhere cut titles get their full text back.
+ * [CN] FIX：超出 platter 的长标题互相重叠。PlusButton 跟随它的 slot（`-plusButtonIndex`），所以长标题通常保持完整；但 Tab 按钮总宽度
+ *      超过 platter 时，UIKit 让按钮重叠，标题文字互相覆盖。只有这时，并且只截断最长的标题（以「…」结尾）：在 UIKit 布局之后测量按钮的
+ *      重叠宽度，由最长的标题依次让出这段宽度，其他标题保持完整。每次布局都再检查一次，直到没有重叠。完整标题作为 item 的无障碍标签，
+ *      platter 变宽时（如旋转）或 App 设置新标题时恢复完整标题并重新测量。只用于有 PlusButton 的横向液态玻璃 TabBar
+ *      （`-cyl_shouldCutOverflowingTabTitles`）；其他情况下被截断的标题恢复完整文字。
+ */
+- (void)cyl_cutOverflowingTabTitlesIfNeeded {
+    NSArray<UITabBarItem *> *items = self.items;
+    if (items.count == 0) {
+        return;
+    }
+    if (![self cyl_shouldCutOverflowingTabTitles]) {
+        [self cyl_restoreCutTabTitles];
+        return;
+    }
+    UIView *platterView = self.cyl_contentView;
+    CGFloat platterWidth = CGRectGetWidth(platterView.bounds);
+    if (platterWidth <= 0) {
+        return;
+    }
+    if ([self cyl_hasCutTabTitles]) {
+        CGFloat cutPlatterWidth = [objc_getAssociatedObject(self, CYLCutPlatterWidthKey) doubleValue];
+        if (platterWidth > cutPlatterWidth + 0.5 || [self cyl_hasTabTitleSetByAppSinceCut]) {
+            [self cyl_restoreCutTabTitles];
+            [self cyl_setNeedsLayoutOnNextRunLoop];
+            return;
+        }
+        // [EN] VoiceOver reads the full title of a cut item. [CN] VoiceOver 读出被截断 item 的完整标题。
+        for (UITabBarItem *item in items) {
+            NSString *fullTitle = objc_getAssociatedObject(item, CYLFullTitleKey);
+            if (fullTitle && ![item.accessibilityLabel isEqualToString:fullTitle]) {
+                item.accessibilityLabel = fullTitle;
+            }
+        }
+    }
+    [platterView layoutIfNeeded];
+    NSArray<UIControl *> *tabButtons = [self cyl_tabBarSubviews];
+    if (tabButtons.count != items.count) {
+        return;
+    }
+    CGFloat excess = [self cyl_overflowOfTabButtons:tabButtons inPlatterWidth:platterWidth];
+    if (excess <= 0.5) {
+        return;
+    }
+    // [EN] The width each title shows now, in its own label's font. [CN] 每个标题当前显示的宽度，使用其标签的字体。
+    NSMutableArray<NSNumber *> *widths = [NSMutableArray arrayWithCapacity:items.count];
+    for (NSUInteger index = 0; index < items.count; index++) {
+        UILabel *label = tabButtons[index].cyl_tabLabel;
+        NSString *title = items[index].title;
+        CGFloat width = (label.font && title.length > 0) ? ceil([title sizeWithAttributes:@{ NSFontAttributeName : label.font }].width) : 0;
+        [widths addObject:@(width)];
+    }
+    CGFloat cap = CYLTitleWidthCapRemovingWidth(widths, excess + 1);
+    BOOL didCut = NO;
+    for (NSUInteger index = 0; index < items.count; index++) {
+        if (widths[index].doubleValue <= cap) {
+            continue;
+        }
+        UITabBarItem *item = items[index];
+        UIFont *font = tabButtons[index].cyl_tabLabel.font;
+        NSString *fullTitle = objc_getAssociatedObject(item, CYLFullTitleKey) ?: item.title;
+        NSString *fittingTitle = CYLTitleFittingWidth(fullTitle, cap, font);
+        if ([fittingTitle isEqualToString:item.title]) {
+            continue;
+        }
+        didCut = YES;
+        objc_setAssociatedObject(item, CYLFullTitleKey, fullTitle, OBJC_ASSOCIATION_COPY_NONATOMIC);
+        objc_setAssociatedObject(item, CYLShownTitleKey, fittingTitle, OBJC_ASSOCIATION_COPY_NONATOMIC);
+        item.accessibilityLabel = fullTitle;
+        item.title = fittingTitle;
+    }
+    if (didCut) {
+        objc_setAssociatedObject(self, CYLCutPlatterWidthKey, @(platterWidth), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+        [self cyl_setNeedsLayoutOnNextRunLoop];
+    }
+}
+
+/*!
+ * [EN] How much title width is missing: UIKit's tab buttons always overlap a little (about 20 pt on iOS 26.1), so their
+ *      frames do not show it; when the titles overflow, UIKit squeezes the title labels instead. So: each label's
+ *      missing width (its text against its width), plus labels closer than `CYLMinimumTabTitleGap` (UIKit's own gap is about
+ *      5 pt) or running past the platter. 0 when every title fits or nothing is laid out.
+ * [CN] 缺少多少标题宽度：UIKit 的 Tab 按钮本来就会略微重叠（iOS 26.1 上约 20 pt），按钮 frame 看不出溢出；标题溢出时 UIKit 改为压缩标题
+ *      标签。因此取：每个标签缺少的宽度（文字宽度减标签宽度），加上间距小于 `CYLMinimumTabTitleGap`（UIKit 自身的间距约 5 pt）或超出 platter 的部分。所有标题都放得下
+ *      或尚未布局时为 0。
+ */
+- (CGFloat)cyl_overflowOfTabButtons:(NSArray<UIControl *> *)tabButtons inPlatterWidth:(CGFloat)platterWidth {
+    static const CGFloat CYLMinimumTabTitleGap = 2;
+    UIView *platterView = self.cyl_contentView;
+    NSMutableArray<NSValue *> *labelFrames = [NSMutableArray array];
+    CGFloat excess = 0;
+    for (UIControl *tabButton in tabButtons) {
+        if (CGRectGetWidth(tabButton.frame) <= 0) {
+            return 0;
+        }
+        UILabel *label = tabButton.cyl_tabLabel;
+        if (label.text.length == 0 || label.hidden || label.alpha <= 0.01) {
+            continue;
+        }
+        CGFloat textWidth = [label sizeThatFits:CGSizeMake(CGFLOAT_MAX, CGFLOAT_MAX)].width;
+        excess += MAX(0, textWidth - CGRectGetWidth(label.bounds));
+        [labelFrames addObject:[NSValue valueWithCGRect:[label convertRect:label.bounds toView:platterView]]];
+    }
+    [labelFrames sortUsingComparator:^NSComparisonResult(NSValue *first, NSValue *second) {
+        return [@(CGRectGetMinX(first.CGRectValue)) compare:@(CGRectGetMinX(second.CGRectValue))];
+    }];
+    for (NSUInteger index = 0; index < labelFrames.count; index++) {
+        CGRect frame = labelFrames[index].CGRectValue;
+        if (index > 0) {
+            CGFloat gap = CGRectGetMinX(frame) - CGRectGetMaxX(labelFrames[index - 1].CGRectValue);
+            excess += MAX(0, CYLMinimumTabTitleGap - gap);
+        }
+        excess += MAX(0, -CGRectGetMinX(frame)) + MAX(0, CGRectGetMaxX(frame) - platterWidth);
+    }
+    return excess;
+}
+
+/// [EN] The only case titles are cut for: iOS 26 and later, Liquid Glass active, not the FlatDesign style, a plus button in
+///      this tab bar, and the horizontal bar (not the iOS 27.1 vertical bar, which shows no titles).
+/// [CN] 只在这种情况下截断标题：iOS 26 及以上、液态玻璃生效、非扁平样式、本 TabBar 有 PlusButton，且为横向栏（iOS 27.1 竖向栏不显示标题）。
+- (BOOL)cyl_shouldCutOverflowingTabTitles {
+    if (@available(iOS 26.0, *)) {
+        // [EN] Checked one by one below. [CN] 以下逐项检查。
+    } else {
+        return NO;
+    }
+    if (![CYLConstants isLiquidGlassActive] || CYLTabBarStyleTypeFlatDesign == self.tabBarController.tabBarStyleType ||
+        !self.hasPlusButton) {
+        return NO;
+    }
+    return ![self cyl_showsVerticalBar];
+}
+
+/// [EN] YES while a title is cut. [CN] 有标题被截断时为 YES。
+- (BOOL)cyl_hasCutTabTitles {
+    for (UITabBarItem *item in self.items) {
+        if (objc_getAssociatedObject(item, CYLFullTitleKey)) {
+            return YES;
+        }
+    }
+    return NO;
+}
+
+/// [EN] YES when the app set the title of a cut item since it was cut. [CN] 被截断的 item 在截断之后由 App 设置了标题时为 YES。
+- (BOOL)cyl_hasTabTitleSetByAppSinceCut {
+    for (UITabBarItem *item in self.items) {
+        NSString *shownTitle = objc_getAssociatedObject(item, CYLShownTitleKey);
+        if (shownTitle && ![item.title isEqualToString:shownTitle]) {
+            return YES;
+        }
+    }
+    return NO;
+}
+
+/// [EN] Gives every cut item its full title back, unless the app set another one. [CN] 把每个被截断的 item 恢复为完整标题，App 已设置其他标题时除外。
+- (void)cyl_restoreCutTabTitles {
+    for (UITabBarItem *item in self.items) {
+        NSString *fullTitle = objc_getAssociatedObject(item, CYLFullTitleKey);
+        NSString *shownTitle = objc_getAssociatedObject(item, CYLShownTitleKey);
+        if (!fullTitle) {
+            continue;
+        }
+        objc_setAssociatedObject(item, CYLFullTitleKey, nil, OBJC_ASSOCIATION_COPY_NONATOMIC);
+        objc_setAssociatedObject(item, CYLShownTitleKey, nil, OBJC_ASSOCIATION_COPY_NONATOMIC);
+        item.accessibilityLabel = nil;
+        if ([item.title isEqualToString:shownTitle]) {
+            item.title = fullTitle;
+        }
+    }
+}
+
+/// [EN] Lays the bar out again on the next run loop, once UIKit has applied changed titles. [CN] 在下一个 run loop（UIKit 应用修改后的标题之后）再次布局 TabBar。
+- (void)cyl_setNeedsLayoutOnNextRunLoop {
+    __weak __typeof(self) weakSelf = self;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [weakSelf setNeedsLayout];
+    });
+}
+
+/*!
+ * [EN] The widest title width that frees `width` when every wider title is cut to it, taking from the longest titles
+ *      first (`widths` holds every title's width).
+ * [CN] 把所有更宽的标题截断到该宽度后能让出 `width` 的最大标题宽度，先从最长的标题中让出（`widths` 为各标题的宽度）。
+ */
+static CGFloat CYLTitleWidthCapRemovingWidth(NSArray<NSNumber *> *widths, CGFloat width) {
+    NSArray<NSNumber *> *sorted = [widths sortedArrayUsingComparator:^NSComparisonResult(NSNumber *first, NSNumber *second) {
+        return [second compare:first];
+    }];
+    CGFloat sum = 0;
+    for (NSUInteger count = 1; count <= sorted.count; count++) {
+        sum += sorted[count - 1].doubleValue;
+        CGFloat next = (count < sorted.count) ? sorted[count].doubleValue : 0;
+        // [EN] Cutting the `count` longest titles to `cap` frees `sum - count * cap`. [CN] 把最长的 `count` 个标题截断到 `cap` 可让出 `sum - count * cap`。
+        CGFloat cap = (sum - width) / count;
+        if (cap >= next) {
+            return MAX(0, floor(cap));
+        }
+    }
+    return 0;
+}
+
+/// [EN] `title`, or its longest start followed by "…", that fits in `width`. [CN] 能放进 `width` 的 `title`，或其后接「…」的最长前缀。
+static NSString *CYLTitleFittingWidth(NSString *title, CGFloat width, UIFont *font) {
+    NSDictionary<NSAttributedStringKey, id> *attributes = @{ NSFontAttributeName : font };
+    if (ceil([title sizeWithAttributes:attributes].width) <= width) {
+        return title;
+    }
+    static NSString *const ellipsis = @"\u2026";
+    NSString *fitting = ellipsis;
+    // [EN] Cut at whole characters (emoji, CJK), longest start first. [CN] 按完整字符截断（emoji、中日韩文字），从最长前缀开始尝试。
+    NSUInteger end = title.length;
+    while (end > 0) {
+        end = [title rangeOfComposedCharacterSequenceAtIndex:end - 1].location;
+        NSString *candidate = [[[title substringToIndex:end] stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceCharacterSet] stringByAppendingString:ellipsis];
+        if (ceil([candidate sizeWithAttributes:attributes].width) <= width) {
+            fitting = candidate;
+            break;
+        }
+    }
+    return fitting;
+}
+
 - (void)cyl_layoutTabBarSubviews {
     self.tabBarButtonArray = [self cyl_originalTabBarButtons];
     
@@ -761,6 +1065,7 @@ static NSDictionary<NSAttributedStringKey, id> *CYLTitleAttributesWithColor(NSDi
             }
         }
     }
+    [self cyl_cutOverflowingTabTitlesIfNeeded];
     if (!self.plusButtonActive) {
         [self cyl_layoutTabButtonsWithItemEdgeInsetsIfNeeded];
         if (self.didLayoutSubViewsBlock) {
@@ -1226,12 +1531,20 @@ UISearchTab 会从 TabBar 分离出来单独显示。
             systemDefaultY = platterCenter.y;
         }
         
+        // FIX: long titles next to the plus button (PlusButton-Slot.md, "Long titles").
+        // [EN] Horizontally on the center of its slot, the tab button it covers: UIKit makes a tab with a long title
+        //      wider, which moves the slots after it, so the platter's center is no longer the slot's. Titles keep their
+        //      full text. The platter's center only while the slot is not laid out.
+        // [CN] 水平方向居中于它的 slot（它覆盖的 Tab 按钮）：UIKit 会把长标题的 Tab 变宽，其后的 slot 随之移动，platter 中心不再是
+        //      slot 的中心。标题保持完整文字。slot 尚未布局时才使用 platter 中心。
+        CGFloat centerX = platterCenter.x;
+        UIView *slot = [self cyl_liquidGlassPlusButtonSlotAtIndex:plusButtonIndex];
+        if (slot) {
+            centerX = [slot.superview convertPoint:slot.center toView:self].x;
+        }
         // [CN] 计算最终中心
         // [EN] Compute the final center
-        CGPoint finalCenter = CGPointMake(
-                                          platterCenter.x ,
-                                          systemDefaultY
-                                          );
+        CGPoint finalCenter = CGPointMake(centerX, systemDefaultY);
         // Issue #636: with the title in the tab item, the image above its title, on the title's vertical center line.
         // 标题由 TabBarItem 显示时：图片位于标题上方，与标题竖向中心线对齐。
         finalCenter = [[CYLPlusButton plusButtonForOwner:self] cyl_alignedCenterForCenter:finalCenter];
@@ -1240,12 +1553,19 @@ UISearchTab 会从 TabBar 分离出来单独显示。
         // [CN] 禁止隐式动画
         // [EN] Disable implicit animations
         // ===============================
-        [CATransaction begin];
-        [CATransaction setDisableActions:YES];
-        
-        self.plusButton.center = finalCenter;
-        
-        [CATransaction commit];
+        if (!CGPointEqualToPoint(self.plusButton.center, finalCenter)) {
+            [CATransaction begin];
+            [CATransaction setDisableActions:YES];
+            self.plusButton.center = finalCenter;
+            [CATransaction commit];
+            // [EN] UIKit may resize the tab buttons after this pass (a title changed): check again on the next run loop;
+            //      nothing happens once the position is unchanged.
+            // [CN] UIKit 可能在本次布局之后才改变 Tab 按钮的宽度（标题改变）：下一个 run loop 再校正一次；位置不变时不会再次触发。
+            __weak typeof(self) weakSelf = self;
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [weakSelf setNeedsLayout];
+            });
+        }
     }
     [[CYLPlusButton plusButtonForOwner:self] cyl_setTabBarChildViewControllerIndex:plusButtonIndex];
 
@@ -1388,6 +1708,25 @@ UISearchTab 会从 TabBar 分离出来单独显示。
     CGFloat platterWidth = CGRectGetWidth([platterView convertRect:platterView.bounds toView:self]);
     CGFloat tabBarWidth = CGRectGetWidth(self.bounds);
     return platterWidth > 0 && tabBarWidth > 0 && platterWidth < tabBarWidth * 0.5;
+}
+
+/*!
+ * [EN] The tab button the plus button covers on the horizontal Liquid Glass bar (its slot), laid out in the platter; nil
+ *      before it is laid out.
+ * [CN] 横向液态玻璃 TabBar 上 PlusButton 覆盖的 Tab 按钮（它的 slot），已在 platter 中布局；尚未布局时返回 nil。
+ */
+- (UIView *)cyl_liquidGlassPlusButtonSlotAtIndex:(NSUInteger)index {
+    UIView *platterView = self.cyl_contentView;
+    [platterView layoutIfNeeded];
+    NSArray<UIControl *> *tabButtons = [self cyl_tabBarSubviews];
+    if (index == NSNotFound || index >= tabButtons.count) {
+        return nil;
+    }
+    UIView *slot = tabButtons[index];
+    if (CGRectGetWidth(slot.bounds) <= 0 || !slot.superview || ![slot isDescendantOfView:platterView]) {
+        return nil;
+    }
+    return slot;
 }
 
 /*!
@@ -1858,6 +2197,15 @@ UISearchTab 会从 TabBar 分离出来单独显示。
         // (no `tabBarController:didSelectControl:` callback). Look the tab button up under the touch instead.
         // 竖向栏中 Tab 按钮不在本 TabBar 内，上面的 hitTest 为 nil，导致选中状态下再次点击不回调 didSelectControl，这里按触摸点查找 Tab 按钮。
         hitView = [self cyl_verticalBarTabButtonAtWindowPoint:[gestureRecognizer locationInView:nil]];
+    }
+    // [EN] FIX: issue #202 — on Liquid Glass a subview of the plus button that takes touches (e.g. an X button) got
+    //      none: the hit test above returns it, but UIKit's selection gesture still began, selected the stand-in tab
+    //      under the plus button and cancelled the subview's touch. Such a subview keeps the touch for itself.
+    // [CN] 液态玻璃下，PlusButton 中自己接收触摸的子视图（例如 X 按钮）收不到触摸：上面的 hitTest 已返回它，但 UIKit 的选中手势仍会开始，
+    //      选中 PlusButton 下方的替身 Tab 并取消该子视图的触摸。这样的子视图自己保留这次触摸。
+    UIView *plusButtonView = self.plusButton;
+    if (plusButtonView && hitView && hitView != plusButtonView && [hitView isDescendantOfView:plusButtonView]) {
+        return NO;
     }
     SEL actin = @selector(tabChangedToControl:);
     CYLTabBarController *tabBarController = [self tabBarController];

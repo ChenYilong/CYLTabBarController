@@ -7,6 +7,35 @@ description: "How to build, test and check CYLTabBarController and its demos, ru
 
 Say plainly what could not be verified. Never call something fixed from a build alone if it is a visual change.
 
+## Before every build of a project that depends on CYLTabBarController
+
+Find the latest commit again, every time: `scripts/latest-cyl-commit.sh` prints the newest commit on any branch by commit
+timestamp (`<sha> <date> <branch>`). A project not named CYLTabBarController must depend on exactly that commit
+(`pod 'CYLTabBarController', :git => '…', :commit => '<sha>'`, then `pod install`); a project named CYLTabBarController uses
+the relative path to the folder with the podspec (`:path => '../'` from a demo). Name the commit in the report. AGENTS.md,
+"Depending on CYLTabBarController".
+
+## Commit message author line
+
+Every commit message carries the line `By  @ChenYilong <luohanchenyilong@163.com>` (exactly as written, two spaces after
+`By`) in its body, after the description and before trailers such as `Claude-Session:`. Check it before every push
+(`git log -1 --format=%B`); amend a commit that lacks it. AGENTS.md, "Commit messages".
+
+## Where a check runs: GitHub CI or locally
+
+GitHub CI/CD for iOS runs on **macOS 26** by default: always read `.github/workflows/ios.yml` on master first to confirm it
+(`runs-on: ${{ vars.MACOS_RUNNER || 'macos-26' }}`; the `MACOS_RUNNER` variable can change it). Running **locally** (not
+through GitHub CI/CD, directly on this Mac) ignores that limit: the default local system is **macOS 27** with **Xcode 27**
+and its simulators. Name the environment (runner, or local macOS and Xcode versions) in every report. AGENTS.md,
+"CI/CD and where tests run".
+
+Before every local build, check the first line of `.github/workflows/ios.yml`, the local environment comment
+(`# local-run-environment: macOS …, Xcode …`): run `scripts/local-run-environment.sh`, which adds it when missing, leaves it
+when the versions are unchanged and rewrites it when macOS or Xcode differs (Xcode of `/Applications/Xcode.app`).
+
+- **Screenshots (added 2026-11-12)**: every screenshot, from CI/CD and from local builds, is saved in the repository with the related document in `docs/` (create the document when none fits; images in `docs/assets/`) and committed to git. Use clear original screenshots: never scaled down or recompressed; a crop that keeps the original resolution is allowed. When the result looks as expected, also update `README.md` with the latest screenshots, in the related section (create it when there is none). Every screenshot, in the document and in the README, is labeled with: the platform (iOS, Android, Flutter, React Native, HarmonyOS, WeChat Mini Program); the environment: operating system version, simulator or emulator (device model and OS version), and the SDK version of that platform (iOS SDK / Xcode, Android SDK / API level, Flutter SDK, React Native, HarmonyOS SDK, WeChat Mini Program base library); this repository's version or commit (with its link); and the time it was taken.
+- **Screenshot moments and layout (added 2026-11-12)**: take and commit screenshots at key moments: when a TODO or Linux note can be removed, when a pull request can be merged, or when the result is judged as expected with no bug and no open issue. The README shows cropped key details, a full screen only when it is needed; several details go into one stitched image. Stitching order of preference: a vertical stack (one column, top to bottom), easiest to read on a phone; then two columns with several rows; last, a single horizontal row, at most three images in a row. (Corrected by the maintainer on 2026-11-12: the original wording said both "prefer a horizontal arrangement" and "a horizontal row is the worst", which contradict each other; the rule is to prefer a vertical stack.)
+
 ## Commands
 
 ```sh
@@ -16,8 +45,11 @@ scripts/ci-build-example.sh <demo folder>                   # one demo, as CI bu
 scripts/plus-child-theme-test.sh "iPhone 17 Pro Max"        # plus child + theme, on a simulator
 scripts/scroll-hide-self-test.sh                            # scroll hiding, on a simulator
 python3 scripts/update-docs-navigation.py --check
+python3 scripts/check-localization-macros.py                    # localization acceptance: a core macro and an example macro, each reading its own bundle
+python3 scripts/check-public-api-comments.py                    # public API comments are /*! ... */ blocks, not stacked //
 python3 scripts/sync-agent-skills.py --check
 scripts/publish-android.sh staging                          # Android library: Maven bundle, checked (local | staging | central | github)
+(cd Example-Android && LC_ALL=C.UTF-8 gradle testDebugUnitTest :tabpages:test lintDebug assembleRelease)   # Android, as .github/workflows/android.yml runs it
 # React Native component (CrossPlatform/react-native-cyltabbar): yarn; yarn tsc --noEmit; in example/ios: LANG=en_US.UTF-8 pod install,
 # then xcodebuild; in example/android: JAVA_HOME=<JDK 17> ./gradlew :app:assembleDebug
 # Flutter component (CrossPlatform/flutter_cyltabbar): flutter analyze; flutter test; in example: flutter build ios --simulator
@@ -25,7 +57,20 @@ scripts/publish-android.sh staging                          # Android library: M
 # Library: CYLTabBarHostViewTests (scripts/unit-tests.sh), CYLTabBarHostViewTest (Android, Robolectric)
 ```
 
+Localization acceptance (AGENTS.md, "Localization (i18n / l10n) file structure"): a project must have at least two different
+macros that read the localized files of two different layers, and a project is accepted only when both exist and are used:
+the **core** macro (iOS: `CYLLocalizedString`, reading `CYLTabBarController.bundle`) and the **example** macro (iOS:
+`CYLDemoLocalizedString`, in Swift `cylDemoLocalizedString`, reading `Example-Shared/CYLDemo.bundle`). Other platforms use another package form, name and folder
+name, but still one macro or helper per layer. `scripts/check-localization-macros.py` checks the iOS side and every example
+Xcode project that compiles a file calling the example macro (it must also compile `CYLDemoLocalization.m` or `.swift` and
+ship `CYLDemo.bundle`); after adding a localized text or a demo project, run it, then build that demo.
+
 The `CYLTabBarController` scheme has no test action: use `scripts/unit-tests.sh`. Static analysis: `xcodebuild analyze` must report no warnings.
+
+Screenshots of the ObjC demo without driving the UI (it shows a splash ad for about 10 s first, so wait about 18 s):
+`xcrun simctl launch <udid> CYL.CYLTabBarController -CYLDemoGalleryScene 8.1` opens gallery scene 8.1 (section.row, as the
+list numbers it; docs/Tab-Bar-Gallery.md), and `-CYLDemoManifestTheme light|dark|christmas` builds the tab bar from the
+configuration manifest. Taps with axe are often swallowed under load: prefer these launch arguments.
 
 ## Common failures
 
@@ -74,3 +119,12 @@ The `CYLTabBarController` scheme has no test action: use `scripts/unit-tests.sh`
   run the one-time `scripts/free-ram.sh --install` (a sudoers rule that allows only `/usr/sbin/purge`). Never type,
   store or ask for a password to work around that; continue without the purge and mention the hint.
 - It quits no app or simulator, and does nothing outside macOS.
+
+### CYLTableViewPlaceHolder in every example
+
+Every example, existing and new, integrates CYLTableViewPlaceHolder with CocoaPods at its latest commit on any branch
+(`CYL_REPO_URL=https://github.com/ChenYilong/CYLTableViewPlaceHolder.git scripts/latest-cyl-commit.sh --sha`, then
+`:git => …, :commit => '<sha>'`, plus the `LottieSwift` subspec). Every iOS example scroll view has pull to refresh
+(`cyl_header`), an empty-data and a no-network placeholder (animated icons preferred) and a red bar at the top while
+offline. MJRefresh is not used (`mj_` → `cyl_`, `MJRefresh…` → `CYLRefresh…`). Library-caused build errors go into
+`docs/CYLTableViewPlaceHolder-Integration-Issues.md`. AGENTS.md, "Depending on CYLTableViewPlaceHolder".

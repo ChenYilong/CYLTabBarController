@@ -23,7 +23,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface UIControl (CYLTabBarItemAnimationPlayer)
 
-/// [EN] The player of this tab button's animation, nil without one. [CN] 本 Tab 按钮动画的播放器；没有动画时为 nil。
+/*!
+ * [EN] The player of this tab button's animation, nil without one. [CN] 本 Tab 按钮动画的播放器；没有动画时为 nil。
+ */
 @property (nonatomic, readonly, nullable) id<CYLTabBarItemAnimationPlayer> cyl_tabBarItemAnimationPlayer;
 
 @end

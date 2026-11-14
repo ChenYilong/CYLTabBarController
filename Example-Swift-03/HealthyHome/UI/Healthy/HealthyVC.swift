@@ -7,12 +7,13 @@
 //
 
 import UIKit
+import CYLTabBarController
 
 class HealthyVC: ViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.navigationItem.title = CYLLocalizedString("健康")
+        self.navigationItem.title = cylDemoLocalizedString("健康")
         self.view.backgroundColor = .blue
 
     }

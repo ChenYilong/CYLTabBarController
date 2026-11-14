@@ -18,6 +18,8 @@ Then run:
 python3 scripts/update-docs-navigation.py
 python3 scripts/sync-agent-skills.py --check
 python3 scripts/android-api-map.py --check   # after a public header changes 公开头文件变化后
+python3 scripts/android-library-strings.py --check   # after a .lproj changes .lproj 变化后
+python3 scripts/sync-example-shared.py --check     # after Example-Shared or a .lproj changes Example-Shared 或 .lproj 变化后
 ```
 
 ## 1. Documentation is part of every new feature
@@ -68,6 +70,38 @@ two places**:
   - No absolute paths, no `../` paths for attachments, no other attachment folders. Use lowercase, hyphenated file
     names that name the feature, e.g. `assets/login-required-tabs-alert.png`.
 - Diagrams are welcome: Mermaid blocks in the Markdown, and optionally an SVG copy in `assets/`.
+
+### Comments on public API
+
+Every comment on public API, one line or several, is a documentation block written on its own lines above the
+declaration (Objective-C: `/*!`, ` * text`, ` */`), never `/*! text */` on one line and never a trailing `/**< */`,
+`/*!< */`, `///<` or `//`. One format per public file. Forms: Objective-C headers `/*! … */`; Swift `/** … */`; Kotlin,
+Java, TypeScript, JavaScript `/** … */`; Python a docstring on its own lines; Go `/* */`, C# `/** */` with XML tags, Rust
+`/** */`; a language without a block form uses its only doc form. The official documentation rules of each language are
+the reference and win where they name one form (Dart `///`; Go `//`, C# and Rust `///`). Check with
+`python3 scripts/check-public-api-comments.py` (`--fix` rewrites). AGENTS.md, "Comments on public API".
+
+### Commit message author line
+
+Every commit message carries the line `By  @ChenYilong <luohanchenyilong@163.com>` (exactly as written, two spaces after
+`By`) in its body, after the description and before trailers such as `Claude-Session:`. Check it before every push
+(`git log -1 --format=%B`); amend a commit that lacks it. AGENTS.md, "Commit messages".
+
+### Swift migration of the core layer
+
+- **Swift for the iOS core layer (added 2026-11-12)**: the core layer (`Core`, `CYLUtils`, `CYLBadgeView` subspecs) is being translated from Objective-C to Swift, bottom-up, keeping every Objective-C name (`@objc(name)`); third-party adapters and the examples stay unless a change is needed. Follow [docs/Swift-Coding-Style.md](docs/Swift-Coding-Style.md); record each step and the score of `python3 scripts/swift-migration-score.py` in [docs/Swift-Migration.md](docs/Swift-Migration.md) and in the commit body; continue until the score is 100 (no Objective-C left; macro-only headers count as compatible). **Examples bend, the core does not (added 2026-11-13)**: when the migration breaks an example's build, fix the example first; examples have the lowest priority and their code may change freely. Never keep a workaround, overload, kept name or shim in the core only because an example uses it; the Swift coding style decides. The public API rule and kept Objective-C selectors still apply, for apps. Details: [docs/Swift-Coding-Style.md](../../../docs/Swift-Coding-Style.md).
+
+### Upstream projects used for translation
+
+- **Upstream projects used for translation (added 2026-11-12)**: when a document of this project links to another project's GitHub repository that is the source of a translation or port (for example the projects ported to Kotlin in the Android folder), do not translate only its default branch. (1) Pull requests: visit the upstream's open pull requests and bring them in. If the translation has not started, merge the open pull requests into the source first; if it is already done, translate each open pull request's change and merge it into our port. (2) Issues: list the upstream's open issues in a table in the related document in `docs/` (create one when none fits): column 1 the issue link, column 2 its description, column 3 the fix status (`TODO` by default). Find each issue's counterpart in our code and try to fix it. (3) Score: 100 means every listed issue is resolved; give a score after each fix and continue until 100. (4) Order: for a translation not started yet, merge the open pull requests, fix issues until the score reaches 60, translate, then fix the remaining issues up to 100; for a finished translation, translate and merge the open pull requests, then fix the issues on the translated code up to 100. The same rule applies to every platform.
+
+### Record every task before starting it
+
+- **Record every task in `docs/` before starting it (added 2026-11-12)**: before any task, find the most relevant existing document in `docs/` (create one only when none fits) and add a `TODO` entry with the task's full context, the user's requirements, and the user's prompt quoted verbatim. Then start the work. When the task is finished, change that entry to `DONE` with the result and its evidence (commits, tests, screenshots). Purpose: if the work is interrupted, the next session can find the context again.
+
+### Pull request for every new branch
+
+- **Every new branch gets a pull request, automatically (added 2026-11-12)**: after creating a branch and pushing its first commit, open a pull request right away, without asking. Target branch: the branch it was created from (preferred); otherwise `main` or `master`.
 
 ### Stale notes before every commit
 

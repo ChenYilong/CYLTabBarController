@@ -165,12 +165,47 @@ def symbols_of(path):
     return symbols
 
 
-def inventory():
+SNAPSHOT_PATH = os.path.join(ROOT, 'scripts', 'ios-public-api.json')
+
+
+def header_inventory():
     rows = []
     for path in public_headers():
         for kind, owner, name in symbols_of(path):
             key = '%s %s' % (owner, name) if owner and kind in ('method', 'property') else name
             rows.append({'header': path, 'kind': kind, 'owner': owner, 'name': name, 'key': key})
+    return rows
+
+
+def inventory():
+    """[EN] Every public symbol: the frozen list of scripts/ios-public-api.json (the Objective-C headers before the Swift
+    migration, whose declarations move into Swift files and the generated header; the Public API rule keeps all of them),
+    plus the symbols declared in the headers since, each after the last symbol of its header.
+    [CN] 全部公开符号：scripts/ios-public-api.json 中冻结的清单（Swift 迁移前的 Objective-C 头文件；其声明会移入 Swift 文件与生成的头文件，
+    公开 API 规则要求全部保留），加上之后在头文件中新增的符号，各自排在其头文件的最后一个符号之后。"""
+    current = header_inventory()
+    if not os.path.exists(SNAPSHOT_PATH):
+        return current
+    with open(SNAPSHOT_PATH, encoding='utf-8') as handle:
+        rows = [dict(row) for row in json.load(handle)['symbols']]
+    known = {row['key'] for row in rows}
+    # [EN] A category renamed later (e.g. to keep a macro from expanding its name) declares the same members: match a
+    #      member by its class and name, and drop a renamed category whose members are all known.
+    # [CN] 之后改名的分类（例如避免其名称被宏展开）声明相同的成员：成员按类名与名称匹配；成员都已知的改名分类不再列出。
+    def member(row):
+        return (row['owner'].split('(')[0], row['name']) if row['kind'] in ('method', 'property') else None
+    members = {member(row) for row in rows} - {None}
+    new_owners = {}
+    for row in current:
+        if row['key'] not in known and row['kind'] in ('method', 'property'):
+            new_owners.setdefault(row['owner'], []).append(member(row) in members)
+    renamed = {owner for owner, flags in new_owners.items() if all(flags)}
+    for row in current:
+        if row['key'] in known or member(row) in members or (row['kind'] == 'category' and row['owner'] in renamed):
+            continue
+        known.add(row['key'])
+        last = max((i for i, other in enumerate(rows) if other['header'] == row['header']), default=len(rows) - 1)
+        rows.insert(last + 1, row)
     return rows
 
 
