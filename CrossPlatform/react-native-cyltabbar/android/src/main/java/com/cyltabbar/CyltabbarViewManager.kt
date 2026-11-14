@@ -93,14 +93,14 @@ class CyltabbarViewManager : SimpleViewManager<CyltabbarView>(),
   }
 
   /** [EN] The playback speed of every tab icon animation; 0 or less: the library's default. [CN] 所有 Tab 图标动画的播放速度；0 或更小表示库的默认值。 */
-  @ReactProp(name = "animationSpeed", defaultFloat = 0f)
-  override fun setAnimationSpeed(view: CyltabbarView?, value: Float) {
+  @ReactProp(name = "playbackSpeed", defaultFloat = 0f)
+  override fun setPlaybackSpeed(view: CyltabbarView?, value: Float) {
     view?.animationSpeed = value
   }
 
   /** [EN] Whether the tab icon animations repeat until this is false. [CN] Tab 图标动画是否重复播放直到设为 false。 */
-  @ReactProp(name = "animationLoops")
-  override fun setAnimationLoops(view: CyltabbarView?, value: Boolean) {
+  @ReactProp(name = "playbackLoops")
+  override fun setPlaybackLoops(view: CyltabbarView?, value: Boolean) {
     view?.animationLoops = value
   }
 

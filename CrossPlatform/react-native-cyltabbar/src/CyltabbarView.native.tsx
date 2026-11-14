@@ -230,16 +230,17 @@ export type CYLTabBarProps = ViewProps & {
   onMemoryWarning?: (report: string) => void;
   /**
    * The playback speed of every tab icon animation (`tabBarItemAnimationSpeed`), e.g. 0.25 to 3; undefined or 0 or less:
-   * the library's default. Applies to the animations already playing.
+   * the library's default. Applies to the animations already playing (`animationSpeed` is the speed in the
+   * configuration: it is read when the tab bar is built).
    */
-  animationSpeed?: number;
+  playbackSpeed?: number;
   /**
    * Whether the tab icon animations repeat until this is false (`tabBarItemAnimationLoops`); applies to the animations
    * already playing.
    */
-  animationLoops?: boolean;
+  playbackLoops?: boolean;
   /**
-   * Each increase plays every tab icon animation again from progress 0, with `animationSpeed` and `animationLoops`
+   * Each increase plays every tab icon animation again from progress 0, with `playbackSpeed` and `playbackLoops`
    * ("Play all", `-[CYLTabBarController cyl_playAllTabBarItemAnimations]`).
    */
   playAllRequest?: number;
@@ -405,8 +406,8 @@ export function CYLTabBar(props: CYLTabBarProps) {
     language,
     tabBarHidden,
     memoryWarningRequest,
-    animationSpeed,
-    animationLoops,
+    playbackSpeed,
+    playbackLoops,
     playAllRequest,
     onMemoryWarning,
     titlePositionAdjustment,
@@ -442,8 +443,8 @@ export function CYLTabBar(props: CYLTabBarProps) {
       language={language ?? ''}
       tabBarHidden={tabBarHidden ?? false}
       memoryWarningRequest={memoryWarningRequest ?? 0}
-      animationSpeed={animationSpeed ?? 0}
-      animationLoops={animationLoops ?? false}
+      playbackSpeed={playbackSpeed ?? 0}
+      playbackLoops={playbackLoops ?? false}
       playAllRequest={playAllRequest ?? 0}
       titlePositionAdjustment={titlePositionAdjustment ?? []}
       onMemoryWarning={(event) => onMemoryWarning?.(event.nativeEvent.report)}

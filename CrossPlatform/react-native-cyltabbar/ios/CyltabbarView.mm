@@ -86,8 +86,8 @@ static id CYLRNJSONObject(NSString *JSON);
   }
   _memoryWarningRequest = newViewProps.memoryWarningRequest;
   // [EN] The tab icon animations: the policy first, then a new request plays them all. [CN] Tab 图标动画：先设置策略，新的请求再让它们全部播放。
-  _hostView.animationSpeed = newViewProps.animationSpeed;
-  _hostView.animationLoops = newViewProps.animationLoops;
+  _hostView.animationSpeed = newViewProps.playbackSpeed;
+  _hostView.animationLoops = newViewProps.playbackLoops;
   if (newViewProps.playAllRequest > _playAllRequest) {
     [_hostView playAllAnimations];
   }

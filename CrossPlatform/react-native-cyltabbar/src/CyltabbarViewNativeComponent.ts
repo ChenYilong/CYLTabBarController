@@ -84,11 +84,11 @@ export interface NativeProps extends ViewProps {
   /**
    * The playback speed of every tab icon animation; 0 (or less): the library's default.
    */
-  animationSpeed?: CodegenTypes.WithDefault<CodegenTypes.Float, 0>;
+  playbackSpeed?: CodegenTypes.WithDefault<CodegenTypes.Float, 0>;
   /**
    * Whether the tab icon animations repeat until this is false.
    */
-  animationLoops?: boolean;
+  playbackLoops?: boolean;
   /**
    * Each increase plays every tab icon animation again from progress 0 ("Play all").
    */
