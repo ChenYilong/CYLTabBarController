@@ -121,7 +121,8 @@ function cylMain() {
       json.usingComponents[tag] = components[tag]
     })
     const text = `${JSON.stringify(json, null, 2)}\n`
-    if (fs.readFileSync(target, 'utf8') !== text) {
+    // [EN] A Windows checkout (core.autocrlf) has CRLF line ends: not a change. [CN] Windows 检出（core.autocrlf）为 CRLF 行尾，不算变化。
+    if (fs.readFileSync(target, 'utf8').replace(/\r\n/g, '\n') !== text) {
       pageFiles[target] = text
     }
   })

@@ -64,6 +64,24 @@ const { CYL_ANIMATIONS, cylChosenAnimation } = require('./cyl_animation_choice')
  */
 const CYL_DEMO_LIST_LANGUAGES = ['zh-Hans', 'zh-Hant'];
 
+function cylRunPython(execFileSync, args) {
+  // [EN] macOS / Linux have python3; Windows often has only `python` or the `py` launcher, and its `python3` may be
+  //      the Microsoft Store stub, which fails. UTF-8 output keeps the Chinese strings intact on Windows consoles.
+  // [CN] macOS / Linux 有 python3；Windows 往往只有 `python` 或 `py` 启动器，其 `python3` 可能是会失败的应用商店占位程序。
+  //      强制 UTF-8 输出，避免 Windows 控制台编码损坏中文。
+  const candidates = [['python3', []], ['python', []], ['py', ['-3']]];
+  const env = Object.assign({}, process.env, { PYTHONIOENCODING: 'utf-8', PYTHONUTF8: '1' });
+  let lastError;
+  for (const [command, prefix] of candidates) {
+    try {
+      return execFileSync(command, prefix.concat(args), { encoding: 'utf8', env, stdio: ['ignore', 'pipe', 'pipe'] });
+    } catch (error) {
+      lastError = error;
+    }
+  }
+  throw new Error(`Python 3 is required to read scripts/sync-example-shared.py (tried python3, python, py -3): ${lastError && lastError.message}`);
+}
+
 /**
  * [EN] demo_list.js: the sections and badge samples of demo-list.json, and {language: {English: translation}} for
  *      its titles and subtitles, from strings_source() of scripts/sync-example-shared.py (one translator for every
@@ -79,8 +97,8 @@ function cylDemoListSource() {
     + 'module = importlib.util.module_from_spec(spec)\n'
     + 'spec.loader.exec_module(module)\n'
     + 'sys.stdout.write(module.strings_source())\n';
-  const all = JSON.parse(execFileSync('python3', ['-c', script,
-    path.join(CYL_REPOSITORY_ROOT, 'scripts', 'sync-example-shared.py')], { encoding: 'utf8' }));
+  const all = JSON.parse(cylRunPython(execFileSync, ['-c', script,
+    path.join(CYL_REPOSITORY_ROOT, 'scripts', 'sync-example-shared.py')]));
   const texts = new Set();
   const walk = (node) => {
     if (Array.isArray(node)) {
@@ -213,6 +231,20 @@ function cylGeneratedFiles() {
  * [EN] Writes the files, or with --check reports the ones that differ and exits 1.
  * [CN] 写入文件；带 --check 时报告不一致的文件并以 1 退出。
  */
+function cylSameContent(current, expected) {
+  // [EN] Text that differs only by CRLF (a Windows checkout with core.autocrlf) is the same; binary files (with NUL
+  //      bytes, e.g. images) must match byte for byte.
+  // [CN] 仅 CRLF 不同的文本（Windows 上 core.autocrlf 检出）视为相同；二进制文件（含 NUL 字节，如图片）须逐字节一致。
+  const buffer = Buffer.isBuffer(expected) ? expected : Buffer.from(expected);
+  if (current.equals(buffer)) {
+    return true;
+  }
+  if (current.includes(0) || buffer.includes(0)) {
+    return false;
+  }
+  return current.toString('utf8').replace(/\r\n/g, '\n') === buffer.toString('utf8').replace(/\r\n/g, '\n');
+}
+
 function cylMain() {
   const check = process.argv.includes('--check');
   const files = cylGeneratedFiles();
@@ -220,7 +252,7 @@ function cylMain() {
   Object.keys(files).sort().forEach((relativePath) => {
     const target = path.join(CYL_TARGET, relativePath);
     const current = fs.existsSync(target) ? fs.readFileSync(target) : null;
-    if (current && current.equals(files[relativePath])) {
+    if (current && cylSameContent(current, files[relativePath])) {
       return;
     }
     stale.push(relativePath);
