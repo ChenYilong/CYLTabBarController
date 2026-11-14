@@ -228,6 +228,30 @@ class CYLTabBarHostViewTest {
     }
 
     @Test
+    fun theTabIconPlaybackPolicyIsAppliedAtBuildAndLiveAndPlayAllReachesTheController() = withActivity { activity ->
+        val host = hostView(activity)
+        val configuration = mapOf(CYLConstants.CYLTabBarControllerTabBarItemsAttributes to items("A", "B"))
+        // [EN] Set before the tab bar exists: the tab bar is built with it. [CN] 在 TabBar 创建之前设置：TabBar 以它创建。
+        host.animationSpeed = 2f
+        host.animationLoops = true
+        host.configuration = configuration
+        val controller = waitForController(host)
+        assertEquals(2f, controller.tabBarItemAnimationSpeed, 0.001f)
+        assertTrue(controller.tabBarItemAnimationLoops)
+        // [EN] Live: the same tab bar, the new policy. [CN] 实时：同一个 TabBar，新的策略。
+        host.animationSpeed = 0.5f
+        host.animationLoops = false
+        assertSame(controller, host.tabBarController)
+        assertEquals(0.5f, controller.tabBarItemAnimationSpeed, 0.001f)
+        assertFalse(controller.tabBarItemAnimationLoops)
+        // [EN] 0 or less keeps the speed in use (the library's default is not forced back). [CN] 0 或更小保持当前速度（不强制恢复库的默认值）。
+        host.animationSpeed = 0f
+        assertEquals(0.5f, controller.tabBarItemAnimationSpeed, 0.001f)
+        host.playAllAnimations()
+        assertSame(controller, host.tabBarController)
+    }
+
+    @Test
     fun invalidJSONChangesNothing() = withActivity { activity ->
         val host = CYLTabBarHostView(activity)
         assertFalse(host.setConfigurationJSON("[1, 2]"))

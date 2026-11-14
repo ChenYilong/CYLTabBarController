@@ -12,6 +12,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { CYLTabBar, type CYLTabBarBadge, type CYLTabBarItem, type CYLTabBarPlusButton } from 'react-native-cyltabbar';
 import { SKINS, THEME_ICONS, type CYLSkin } from './CYLSkins';
 import { CYLDemoList, type CYLDemoRow } from './demo/CYLDemoList';
+import { CYLPlaybackControls } from './demo/CYLPlaybackControls';
 import { CYL_PICKER_LANGUAGES, CYLDemoLanguage, CYLFlaggedLanguageName, CYLIsRightToLeft, CYLLanguageName, CYLSetDemoLanguage, t, tDevice } from './demo/CYLLocalization';
 
 /** A required image's URL, for the keys the component passes as they are. 被原样传递的键使用 require 图片的 URL。 */
@@ -473,6 +474,12 @@ function CYLMainTabBar({
   // -[UIViewController cyl_simulateMemoryWarningAndShowResult]: each tap asks the tab bar for one simulated memory warning.
   // 每次点击请求 TabBar 模拟一次内存警告。
   const [memoryWarningRequest, setMemoryWarningRequest] = useState(0);
+  // The playback controls of the tab icon animations (Play all, speed, loop): one policy, applied live. The Objective-C
+  // example's first tab imitates its home table, so they are on the other tabs. 播放控件：一个实时生效的策略，在其他 Tab 上
+  // （Objective-C 示例的第一个 Tab 模仿其首页表格）。
+  const [playAllRequest, setPlayAllRequest] = useState(0);
+  const [playbackSpeed, setPlaybackSpeed] = useState(1);
+  const [playbackLoops, setPlaybackLoops] = useState(false);
   // CYLSwitchTitlePositionAdjustment(): the title row cycles the vertical offset of every title through 0, -4 and 4 at
   // runtime (`setTitlePositionAdjustment:`); undefined is the configuration's -3.5. 标题行在运行时依次切换所有标题的垂直偏移：
   // 0、-4、4；undefined 为配置中的 -3.5。
@@ -547,6 +554,19 @@ function CYLMainTabBar({
           switches={{ login: loggedIn === true }}
           currentSkin={skinPicker.followsSystem ? '' : skin.name}
           badgeSubtitle={badgeSubtitle(pageTitle)}
+          header={
+            selectedIndex === 0 ? undefined : (
+              <CYLPlaybackControls
+                colors={colors}
+                tint={skin.tint ?? colors.tint}
+                speed={playbackSpeed}
+                loops={playbackLoops}
+                onPlayAll={() => setPlayAllRequest((request) => request + 1)}
+                onSpeedChange={setPlaybackSpeed}
+                onLoopsChange={setPlaybackLoops}
+              />
+            )
+          }
           onRow={(row: CYLDemoRow) => {
             if (row.skin) return skinPicker.choose(row.skin.name);
             if (row.id === 'skin') return setSkinMenuVisible(true);
@@ -591,6 +611,9 @@ function CYLMainTabBar({
         language={language}
         tabBarHidden={tabBarHidden}
         memoryWarningRequest={memoryWarningRequest}
+        playbackSpeed={playbackSpeed}
+        playbackLoops={playbackLoops}
+        playAllRequest={playAllRequest}
         titlePositionAdjustment={titleOffset === undefined ? undefined : [0, titleOffset]}
         onMemoryWarning={(report) => Alert.alert(t('Memory warning'), report, [{ text: t('OK') }])}
         // -[MainTabBarController cyl_demo_presentLoginForViewController:completion:]: "Messages" and "Me" need login; the

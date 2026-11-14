@@ -60,11 +60,12 @@ class CYLPlaybackControls extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 6),
-          DecoratedBox(
-            decoration: BoxDecoration(
-              color: colors.card,
-              borderRadius: BorderRadius.circular(10),
-            ),
+          // A Material, not a DecoratedBox: the ink of the buttons and the switch paints over its color.
+          // 用 Material 而不是 DecoratedBox：按钮与开关的水波纹绘制在其颜色之上。
+          Material(
+            color: colors.card,
+            borderRadius: BorderRadius.circular(10),
+            clipBehavior: Clip.antiAlias,
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
               child: Column(
@@ -73,26 +74,41 @@ class CYLPlaybackControls extends StatelessWidget {
                     alignment: AlignmentDirectional.centerStart,
                     child: TextButton(
                       onPressed: onPlayAll,
-                      child: Text(t('Play all'), style: TextStyle(fontSize: 17, color: tint)),
+                      child: Text(
+                        t('Play all'),
+                        style: TextStyle(fontSize: 17, color: tint),
+                      ),
                     ),
                   ),
                   Row(
                     children: [
                       ExcludeSemantics(
-                        child: Text(t('Speed'), style: TextStyle(fontSize: 17, color: colors.label)),
+                        child: Text(
+                          t('Speed'),
+                          style: TextStyle(fontSize: 17, color: colors.label),
+                        ),
                       ),
                       Expanded(
-                        child: Semantics(
-                          label: t('Speed'),
-                          child: Slider(
-                            value: speed.clamp(cylPlaybackMinimumSpeed, cylPlaybackMaximumSpeed),
-                            min: cylPlaybackMinimumSpeed,
-                            max: cylPlaybackMaximumSpeed,
-                            divisions: cylPlaybackSteps,
-                            activeColor: tint,
-                            onChanged: onSpeedChanged,
-                            semanticFormatterCallback: (value) =>
-                                t('{speed} times', {'speed': cylSpeedText(value)}),
+                        // One node for a screen reader: the label "Speed", the value "1.5 times" and the slider actions.
+                        // 读屏软件看到的是一个节点：标签「倍速」、值「1.5 倍」与滑块操作。
+                        child: MergeSemantics(
+                          child: Semantics(
+                            label: t('Speed'),
+                            child: Slider(
+                              value: speed.clamp(
+                                cylPlaybackMinimumSpeed,
+                                cylPlaybackMaximumSpeed,
+                              ),
+                              min: cylPlaybackMinimumSpeed,
+                              max: cylPlaybackMaximumSpeed,
+                              divisions: cylPlaybackSteps,
+                              activeColor: tint,
+                              onChanged: onSpeedChanged,
+                              semanticFormatterCallback: (value) => t(
+                                '{speed} times',
+                                {'speed': cylSpeedText(value)},
+                              ),
+                            ),
                           ),
                         ),
                       ),
@@ -102,18 +118,26 @@ class CYLPlaybackControls extends StatelessWidget {
                           child: Text(
                             '$speedText×',
                             textAlign: TextAlign.end,
-                            style: TextStyle(fontSize: 17, color: colors.secondaryLabel),
+                            style: TextStyle(
+                              fontSize: 17,
+                              color: colors.secondaryLabel,
+                            ),
                           ),
                         ),
                       ),
                     ],
                   ),
-                  SwitchListTile.adaptive(
-                    contentPadding: EdgeInsets.zero,
-                    title: Text(t('Loop'), style: TextStyle(fontSize: 17, color: colors.label)),
-                    value: loops,
-                    activeThumbColor: tint,
-                    onChanged: onLoopsChanged,
+                  MergeSemantics(
+                    child: SwitchListTile.adaptive(
+                      contentPadding: EdgeInsets.zero,
+                      title: Text(
+                        t('Loop'),
+                        style: TextStyle(fontSize: 17, color: colors.label),
+                      ),
+                      value: loops,
+                      activeThumbColor: tint,
+                      onChanged: onLoopsChanged,
+                    ),
                   ),
                 ],
               ),
