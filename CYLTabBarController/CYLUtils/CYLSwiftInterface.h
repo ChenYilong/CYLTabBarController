@@ -27,6 +27,16 @@
 #elif __has_include("CYLBadgeProtocol.h")
 #import "CYLBadgeProtocol.h"
 #endif
+/*!
+ * [EN] The animation subspec's protocols (`CYLTabBarItemAnimationPlayableView`, `CYLTabBarItemAnimationViewProviding`), which
+ *      Swift classes of the Lottie, Rive and PAG subspecs adopt: without them the generated interface fails in a framework build.
+ * [CN] Lottie、Rive、PAG 子库的 Swift 类遵守的动画协议：缺少它们时，framework 编译中生成的接口会失败。
+ */
+#if __has_include(<CYLTabBarController/CYLTabBarItemAnimationPlayableView.h>)
+#import <CYLTabBarController/CYLTabBarItemAnimationPlayableView.h>
+#elif __has_include("CYLTabBarItemAnimationPlayableView.h")
+#import "CYLTabBarItemAnimationPlayableView.h"
+#endif
 #if defined(SWIFT_PACKAGE)
 @import CYLTabBarControllerSwift;
 #elif __has_include(<CYLTabBarController/CYLTabBarController-Swift.h>)
