@@ -130,13 +130,13 @@ public func cylTabBarItemAnimationDefaultStyleSourceEntryPoint() -> CYLTabBarIte
 }
 
 @_cdecl("CYLTabBarItemAnimationRegisterDarkStyle")
-public func cylTabBarItemAnimationRegisterDarkStyleEntryPoint(_ url: NSURL?, _ darkURL: NSURL?, _ darkColors: NSDictionary?) {
+public func cylTabBarItemAnimationRegisterDarkStyleEntryPoint(_ url: NSURL, _ darkURL: NSURL?, _ darkColors: NSDictionary?) {
     CYLTabBarItemAnimationStyleRegistry.shared.registerDarkURL(darkURL as URL?, for: url as URL?)
     CYLTabBarItemAnimationStyleRegistry.shared.registerDarkColors(darkColors, for: url as URL?)
 }
 
 @_cdecl("CYLTabBarItemAnimationRegisterColors")
-public func cylTabBarItemAnimationRegisterColorsEntryPoint(_ url: NSURL?, _ colors: NSDictionary?) {
+public func cylTabBarItemAnimationRegisterColorsEntryPoint(_ url: NSURL, _ colors: NSDictionary?) {
     CYLTabBarItemAnimationStyleRegistry.shared.registerColors(colors, for: url as URL?)
 }
 

@@ -14,138 +14,16 @@
 #import "CYLTabBarController.h"
 #endif
 
-/*!
+/*
  * FIX: issue #442
- * [EN] The dark versions and dark colors registered for light animation URLs (`absoluteString`), kept in one instance
- *      instead of global dictionaries. It is Core's `CYLTabBarItemAnimationStyleSource`; the `CYLConstants` class methods
- *      below forward to it. Main thread only, like the tab bar that uses it.
- * [CN] 为浅色动画 URL（`absoluteString`）注册的深色版本与深色颜色，保存在一个实例中，而不是全局字典。它就是 Core 的
- *      `CYLTabBarItemAnimationStyleSource`；下面 `CYLConstants` 的类方法都转发给它。与使用它的 Tab 栏一样只在主线程使用。
+ * [EN] The style registry (dark URLs and colors of tab icon animations) is Swift
+ *      (`Swift/CYLTabBarItemAnimationStyleRegistry.swift`, docs/Swift-Migration.md, step 45); the deprecated Lottie class
+ *      methods below forward to it through these private C functions.
+ * [CN] 风格注册表（Tab 图标动画的深色 URL 与颜色）已迁移到 Swift（`Swift/CYLTabBarItemAnimationStyleRegistry.swift`，
+ *      docs/Swift-Migration.md，第 45 步）；下面已弃用的 Lottie 类方法通过这些私有 C 函数转发给它。
  */
-@interface CYLTabBarItemAnimationStyleRegistry : NSObject <CYLTabBarItemAnimationStyleSource>
-- (void)registerDarkURL:(NSURL *)darkURL forURL:(NSURL *)URL;
-- (void)registerDarkColors:(NSDictionary<NSString *, UIColor *> *)darkColors forURL:(NSURL *)URL;
-/// [EN] FIX: issue #216 — the colors of every appearance (`CYLTabBarAnimationColors`). [CN] 所有外观下的颜色（`CYLTabBarAnimationColors`）。
-- (void)registerColors:(NSDictionary<NSString *, UIColor *> *)colors forURL:(NSURL *)URL;
-@end
-
-@implementation CYLTabBarItemAnimationStyleRegistry {
-    NSMutableDictionary<NSString *, NSURL *> *_darkURLs;
-    NSMutableDictionary<NSString *, NSDictionary<NSString *, UIColor *> *> *_darkColors;
-    NSMutableDictionary<NSString *, NSDictionary<NSString *, UIColor *> *> *_colors;
-}
-
-- (instancetype)init {
-    if (self = [super init]) {
-        _darkURLs = [NSMutableDictionary dictionary];
-        _darkColors = [NSMutableDictionary dictionary];
-        _colors = [NSMutableDictionary dictionary];
-    }
-    return self;
-}
-
-static NSString *CYLTabBarItemAnimationStyleKey(NSURL *URL) {
-    return [URL isKindOfClass:[NSURL class]] ? URL.absoluteString : nil;
-}
-
-- (void)registerDarkURL:(NSURL *)darkURL forURL:(NSURL *)URL {
-    NSString *key = CYLTabBarItemAnimationStyleKey(URL);
-    if (key.length == 0) {
-        return;
-    }
-    // Only a real URL counts; anything else clears it. 只接受 NSURL，其他值视为清除。
-    _darkURLs[key] = [darkURL isKindOfClass:[NSURL class]] ? darkURL : nil;
-}
-
-/// [EN] Only keypath (non-empty NSString) -> UIColor pairs count; nil without any. [CN] 只保留「非空 NSString keypath -> UIColor」；没有时为 nil。
-static NSDictionary<NSString *, UIColor *> *_Nullable CYLTabBarItemAnimationValidColors(NSDictionary<NSString *, UIColor *> *colors) {
-    NSMutableDictionary<NSString *, UIColor *> *validColors = [NSMutableDictionary dictionary];
-    if ([colors isKindOfClass:[NSDictionary class]]) {
-        [colors enumerateKeysAndObjectsUsingBlock:^(id keypath, id color, BOOL *stop) {
-            (void)stop;
-            if ([keypath isKindOfClass:[NSString class]] && [(NSString *)keypath length] > 0 && [color isKindOfClass:[UIColor class]]) {
-                validColors[keypath] = color;
-            }
-        }];
-    }
-    return validColors.count > 0 ? [validColors copy] : nil;
-}
-
-- (void)registerDarkColors:(NSDictionary<NSString *, UIColor *> *)darkColors forURL:(NSURL *)URL {
-    NSString *key = CYLTabBarItemAnimationStyleKey(URL);
-    if (key.length == 0) {
-        return;
-    }
-    _darkColors[key] = CYLTabBarItemAnimationValidColors(darkColors);
-}
-
-- (void)registerColors:(NSDictionary<NSString *, UIColor *> *)colors forURL:(NSURL *)URL {
-    NSString *key = CYLTabBarItemAnimationStyleKey(URL);
-    if (key.length == 0) {
-        return;
-    }
-    _colors[key] = CYLTabBarItemAnimationValidColors(colors);
-}
-
-#pragma mark - CYLTabBarItemAnimationStyleSource
-
-- (BOOL)hasStyleVariants {
-    return _darkURLs.count > 0 || _darkColors.count > 0 || _colors.count > 0;
-}
-
-- (BOOL)hasStyleVariantForURL:(NSURL *)URL {
-    NSString *key = CYLTabBarItemAnimationStyleKey(URL);
-    return key.length > 0 && (_darkURLs[key] != nil || _darkColors[key].count > 0 || _colors[key].count > 0);
-}
-
-- (NSURL *)URL:(NSURL *)URL forTraitCollection:(UITraitCollection *)traitCollection {
-    if (!URL) {
-        return nil;
-    }
-    if (@available(iOS 13.0, *)) {
-        NSString *key = CYLTabBarItemAnimationStyleKey(URL);
-        if (traitCollection.userInterfaceStyle == UIUserInterfaceStyleDark && key.length > 0) {
-            return _darkURLs[key] ?: URL;
-        }
-    }
-    return URL;
-}
-
-- (NSDictionary<NSString *, UIColor *> *)darkColorsForURL:(NSURL *)URL {
-    NSString *key = CYLTabBarItemAnimationStyleKey(URL);
-    return key.length > 0 ? _darkColors[key] : nil;
-}
-
-- (NSDictionary<NSString *, UIColor *> *)colorsForURL:(NSURL *)URL {
-    NSString *key = CYLTabBarItemAnimationStyleKey(URL);
-    return key.length > 0 ? _colors[key] : nil;
-}
-
-@end
-
-/// [EN] Core's style source: the one style registry. [CN] Core 的风格来源：唯一的风格注册表。
-static CYLTabBarItemAnimationStyleRegistry *CYLTabBarItemAnimationSharedStyleRegistry(void) {
-    static CYLTabBarItemAnimationStyleRegistry *registry;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        registry = [[CYLTabBarItemAnimationStyleRegistry alloc] init];
-    });
-    return registry;
-}
-
-id<CYLTabBarItemAnimationStyleSource> CYLTabBarItemAnimationDefaultStyleSource(void) {
-    return CYLTabBarItemAnimationSharedStyleRegistry();
-}
-
-void CYLTabBarItemAnimationRegisterDarkStyle(NSURL *URL, NSURL *darkURL, NSDictionary<NSString *, UIColor *> *darkColors) {
-    CYLTabBarItemAnimationStyleRegistry *registry = CYLTabBarItemAnimationSharedStyleRegistry();
-    [registry registerDarkURL:darkURL forURL:URL];
-    [registry registerDarkColors:darkColors forURL:URL];
-}
-
-void CYLTabBarItemAnimationRegisterColors(NSURL *URL, NSDictionary<NSString *, UIColor *> *colors) {
-    [CYLTabBarItemAnimationSharedStyleRegistry() registerColors:colors forURL:URL];
-}
+FOUNDATION_EXTERN void CYLTabBarItemAnimationRegisterDarkURL(NSURL *_Nullable URL, NSURL *_Nullable darkURL);
+FOUNDATION_EXTERN void CYLTabBarItemAnimationRegisterDarkColors(NSURL *_Nullable URL, NSDictionary *_Nullable darkColors);
 
 @implementation CYLConstants
 
@@ -268,27 +146,27 @@ CGFloat CYLTabBarItemImagePlaceholderHeight = 22.0f;
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-implementations"
 + (void)cyl_registerDarkLottieURL:(NSURL *)darkLottieURL forLottieURL:(NSURL *)lottieURL {
-    [CYLTabBarItemAnimationSharedStyleRegistry() registerDarkURL:darkLottieURL forURL:lottieURL];
+    CYLTabBarItemAnimationRegisterDarkURL(lottieURL, darkLottieURL);
 }
 
 + (NSURL *)cyl_lottieURL:(NSURL *)lottieURL forTraitCollection:(UITraitCollection *)traitCollection {
-    return [CYLTabBarItemAnimationSharedStyleRegistry() URL:lottieURL forTraitCollection:traitCollection];
+    return [CYLTabBarItemAnimationDefaultStyleSource() URL:lottieURL forTraitCollection:traitCollection];
 }
 
 + (void)cyl_registerLottieDarkColors:(NSDictionary<NSString *, UIColor *> *)darkColors forLottieURL:(NSURL *)lottieURL {
-    [CYLTabBarItemAnimationSharedStyleRegistry() registerDarkColors:darkColors forURL:lottieURL];
+    CYLTabBarItemAnimationRegisterDarkColors(lottieURL, darkColors);
 }
 
 + (BOOL)cyl_hasDarkLottieForLottieURL:(NSURL *)lottieURL {
-    return [CYLTabBarItemAnimationSharedStyleRegistry() hasStyleVariantForURL:lottieURL];
+    return [CYLTabBarItemAnimationDefaultStyleSource() hasStyleVariantForURL:lottieURL];
 }
 
 + (NSDictionary<NSString *, UIColor *> *)cyl_lottieDarkColorsForLottieURL:(NSURL *)lottieURL {
-    return [CYLTabBarItemAnimationSharedStyleRegistry() darkColorsForURL:lottieURL];
+    return [CYLTabBarItemAnimationDefaultStyleSource() darkColorsForURL:lottieURL];
 }
 
 + (BOOL)cyl_hasDarkLottieURLs {
-    return [CYLTabBarItemAnimationSharedStyleRegistry() hasStyleVariants];
+    return [CYLTabBarItemAnimationDefaultStyleSource() hasStyleVariants];
 }
 
 #pragma clang diagnostic pop

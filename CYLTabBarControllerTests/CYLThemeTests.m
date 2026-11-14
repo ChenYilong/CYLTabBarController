@@ -774,7 +774,7 @@ FOUNDATION_EXTERN void CYLTabBarItemAnimationRegisterColors(NSURL *URL, NSDictio
     NSString *filePath = nil;
     NSURL *boundURL = CYLTabBarItemAnimationURLFromAttributes(@{ CYLTabBarAnimationURL : URL, CYLTabBarAnimationColors : @{ @"**.Fill 1.Color" : themeColor, @"" : UIColor.blackColor, @"bad" : @1 } }, &filePath);
     XCTAssertEqualObjects(boundURL, URL);
-    id<CYLThemeTestStyleSource> styleSource = CYLTabBarItemAnimationDefaultStyleSource();
+    id<CYLThemeTestStyleSource> styleSource = (id<CYLThemeTestStyleSource>)CYLTabBarItemAnimationDefaultStyleSource();
     XCTAssertTrue([styleSource respondsToSelector:@selector(colorsForURL:)]);
     NSDictionary<NSString *, UIColor *> *colors = [styleSource colorsForURL:URL];
     XCTAssertEqualObjects(colors.allKeys, @[ @"**.Fill 1.Color" ], @"only keypath -> UIColor pairs are kept");
