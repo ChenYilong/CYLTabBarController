@@ -39,7 +39,7 @@ NS_ASSUME_NONNULL_BEGIN
  * [EN] Core's style source, over the registrations of the `…DarkURL` / `…DarkFilePath` / `…DarkColors` keys.
  * [CN] Core 的风格来源，基于 `…DarkURL` / `…DarkFilePath` / `…DarkColors` 等 key 的注册信息。
  */
-FOUNDATION_EXTERN id<CYLTabBarItemAnimationStyleSource> CYLTabBarItemAnimationDefaultStyleSource(void);
+FOUNDATION_EXTERN id<CYLTabBarItemAnimationStyleSource> CYLTabBarItemAnimationDefaultStyleSource(void) CYL_NOEXCEPT;
 
 /*!
  * [EN] Core's host. [CN] Core 提供的宿主实现。

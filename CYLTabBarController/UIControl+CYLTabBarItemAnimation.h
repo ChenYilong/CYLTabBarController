@@ -65,10 +65,10 @@ NS_ASSUME_NONNULL_BEGIN
  *      (`CYLTabBarAnimationColors`, theme colors allowed) in Core's style registry; nil clears them.
  * [CN] 由 Core 实现（Swift/CYLTabBarItemAnimationStyleRegistry.swift）：在 Core 的风格注册表中注册动画 `URL` 在所有外观下的颜色（`CYLTabBarAnimationColors`，可以是主题颜色）；nil 清除。
  */
-FOUNDATION_EXTERN void CYLTabBarItemAnimationRegisterColors(NSURL *URL, NSDictionary<NSString *, UIColor *> * _Nullable colors);
+FOUNDATION_EXTERN void CYLTabBarItemAnimationRegisterColors(NSURL *URL, NSDictionary * _Nullable colors) CYL_NOEXCEPT;
 
 FOUNDATION_EXTERN void CYLTabBarItemAnimationRegisterDarkStyle(NSURL *URL, NSURL * _Nullable darkURL,
-                                                                NSDictionary<NSString *, UIColor *> * _Nullable darkColors);
+                                                                NSDictionary * _Nullable darkColors) CYL_NOEXCEPT;
 
 /*!
  * [EN] Implemented by Core, for CYLTabBarController.m: the animation file of a tab item (`…URL`, else `…FilePath`, with
@@ -77,7 +77,7 @@ FOUNDATION_EXTERN void CYLTabBarItemAnimationRegisterDarkStyle(NSURL *URL, NSURL
  *      绑定到其 key 选择的动画库，并注册其深色模式版本（#442）。
  */
 FOUNDATION_EXTERN NSURL * _Nullable CYLTabBarItemAnimationURLFromAttributes(NSDictionary * _Nullable attributes,
-                                                                            NSString * _Nullable __autoreleasing * _Nullable filePath);
+                                                                            NSString * _Nullable __autoreleasing * _Nullable filePath) CYL_NOEXCEPT;
 
 /*!
  * [EN] Implemented by Core, for the subspec: moves the layout tracking of `view` (#653) to `newView`, e.g. a Lottie view
