@@ -274,6 +274,7 @@ docs/
 │   ├── react-native-pag-android-bar.png
 │   ├── react-native-pag-ios-bar.png
 │   ├── react-native-pag-menu.png
+│   ├── react-native-playback-controls-android-api35-3357382.png
 │   ├── react-native-rive-android-bar.png
 │   ├── react-native-rive-chat.png
 │   ├── react-native-rive-ios-bar.png
