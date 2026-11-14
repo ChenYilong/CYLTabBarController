@@ -310,9 +310,9 @@ FOUNDATION_EXTERN NSString *const CYLTabBarLottieLoopsWhenUnselected CYL_LOTTIE_
  *      Lottie 文件中的颜色是固定的，lottie-ios 也不支持主题，因此深色版本即改为深色配色的动画副本。使用 Lottie 4.x 时，也可以只用一份文件
  *      适配深色模式，见 `CYLTabBarLottieDarkColors`。
  */
-FOUNDATION_EXTERN NSArray<NSDictionary *> *CYLTabBarItemsAttributesAddingLottieFiles(NSArray<NSDictionary *> *attributes,
-                                                                                    NSArray<NSString *> *lottieFileNames,
-                                                                                    NSBundle * _Nullable bundle) CYL_LOTTIE_REQUIRED;
+FOUNDATION_EXTERN NSArray *CYLTabBarItemsAttributesAddingLottieFiles(NSArray *attributes,
+                                                                     NSArray *lottieFileNames,
+                                                                                    NSBundle * _Nullable bundle) CYL_NOEXCEPT CYL_LOTTIE_REQUIRED;
 
 /*!
  * FIX: issue #604 — generic animation keys, for every animation library.
@@ -385,7 +385,7 @@ typedef NSString *CYLTabBarAnimationOption NS_TYPED_EXTENSIBLE_ENUM;
  *      仍是不同的 Tab 动画（也是其深色模式版本的 key）。`fileURL` 为 nil 时返回 nil。示例见上。
  */
 FOUNDATION_EXTERN NSURL * _Nullable CYLTabBarAnimationURLWithOptions(NSURL * _Nullable fileURL,
-                                                                     NSDictionary<CYLTabBarAnimationOption, NSString *> * _Nullable options);
+                                                                     NSDictionary * _Nullable options) CYL_NOEXCEPT;
 
 /*!
  * FIX: issue #477 — only some tabs animated, with any animation library.
@@ -410,7 +410,7 @@ FOUNDATION_EXTERN NSURL * _Nullable CYLTabBarAnimationURLWithOptions(NSURL * _Nu
  */
 FOUNDATION_EXTERN NSDictionary *CYLTabBarItemAttributesAddingAnimationFile(NSDictionary *attributes,
                                                                           NSString *fileName,
-                                                                          NSBundle * _Nullable bundle);
+                                                                          NSBundle * _Nullable bundle) CYL_NOEXCEPT;
 
 /*!
  * [EN] The same for every tab, by position: an empty name or `NSNull` leaves that tab static (#477).
@@ -418,9 +418,9 @@ FOUNDATION_EXTERN NSDictionary *CYLTabBarItemAttributesAddingAnimationFile(NSDic
  *          CYLTabBarItemsAttributesAddingAnimationFiles(attributes, @[@"tab_home.json", @"", @"tab_mine.pag"], nil);
  * [CN] 按位置为每个 Tab 执行上面的操作：名称为空字符串或 `NSNull` 的 Tab 保持静态（#477）。示例见上。
  */
-FOUNDATION_EXTERN NSArray<NSDictionary *> *CYLTabBarItemsAttributesAddingAnimationFiles(NSArray<NSDictionary *> *attributes,
-                                                                                    NSArray *fileNames,
-                                                                                    NSBundle * _Nullable bundle);
+FOUNDATION_EXTERN NSArray *CYLTabBarItemsAttributesAddingAnimationFiles(NSArray *attributes,
+                                                                        NSArray *fileNames,
+                                                                                    NSBundle * _Nullable bundle) CYL_NOEXCEPT;
 #ifndef __swift__
 #define CYLTabBarItemImageInsets @"CYLTabBarItemImageInsets"
 #endif
@@ -3332,4 +3332,16 @@ NS_ASSUME_NONNULL_END
 // [EN] FIX: issue #535 — tap animations, long press and swipe to switch tabs; they extend the class declared above.
 // [CN] FIX: issue #535 — 点击动画、长按与滑动切换 Tab；它们扩展上面声明的类，因此放在文件末尾导入。
 #import "CYLTabBarController+CYLInteraction.h"
+
+/*!
+ * `noexcept` in C++: the declarations of CYLTabBarController-Swift.h (functions implemented in Swift with @_cdecl) carry
+ * it, and Objective-C++ files that import both headers fail to compile when the two declarations differ.
+ */
+#ifndef CYL_NOEXCEPT
+#if defined(__cplusplus)
+#define CYL_NOEXCEPT noexcept
+#else
+#define CYL_NOEXCEPT
+#endif
+#endif
 

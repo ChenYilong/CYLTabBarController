@@ -17,6 +17,18 @@
 #import <UIKit/UIKit.h>
 
 /*!
+ * `noexcept` in C++: the declarations of CYLTabBarController-Swift.h (functions implemented in Swift with @_cdecl) carry
+ * it, and Objective-C++ files that import both headers fail to compile when the two declarations differ.
+ */
+#ifndef CYL_NOEXCEPT
+#if defined(__cplusplus)
+#define CYL_NOEXCEPT noexcept
+#else
+#define CYL_NOEXCEPT
+#endif
+#endif
+
+/*!
  * Marks a function that returns translated text, for the static analyzer's localizability checker.
  */
 #ifndef CYL_RETURNS_LOCALIZED_STRING
@@ -59,7 +71,7 @@ NS_ASSUME_NONNULL_BEGIN
  *      没有时使用英文。因此本库不会显示 App 本身不支持的语言；声明了 `CFBundleLocalizations` 的 App 会跟随设备语言。
  *      可用 `CYLSetLocalizationLanguage()` 指定。线程安全。
  */
-FOUNDATION_EXTERN NSString *CYLLocalizedString(NSString * _Nullable key) CYL_RETURNS_LOCALIZED_STRING NS_FORMAT_ARGUMENT(1);
+FOUNDATION_EXTERN NSString *CYLLocalizedString(NSString * _Nullable key) CYL_NOEXCEPT CYL_RETURNS_LOCALIZED_STRING NS_FORMAT_ARGUMENT(1);
 
 /*!
  * [EN] The library's resource bundle, `CYLTabBarController.bundle` (CYLUtils, no extra import). It holds the `*.lproj` string
@@ -68,7 +80,7 @@ FOUNDATION_EXTERN NSString *CYLLocalizedString(NSString * _Nullable key) CYL_RET
  * [CN] 本库的资源包 `CYLTabBarController.bundle`（属于 CYLUtils，无需额外导入）。其中存放各语言的 `*.lproj` 字符串表；图片等资源也可以
  *      放进同一个 bundle，并从中读取，例如上面的 `UIImage` 示例。
  */
-FOUNDATION_EXTERN NSBundle *CYLResourceBundle(void);
+FOUNDATION_EXTERN NSBundle *CYLResourceBundle(void) CYL_NOEXCEPT;
 
 /*!
  * [EN] Overrides the language of `CYLLocalizedString()`, e.g. @"ja" or @"zh-Hant", for an in-app language setting; nil
@@ -82,7 +94,7 @@ FOUNDATION_EXTERN NSBundle *CYLResourceBundle(void);
  * [CN] VoiceOver：同时把 App 的 `accessibilityLanguage` 设为该语言，即使与设备语言不同，VoiceOver 也会用对应语言的语音朗读。
  *      会发送 `CYLLocalizationLanguageDidChangeNotification`。
  */
-FOUNDATION_EXTERN void CYLSetLocalizationLanguage(NSString * _Nullable language);
+FOUNDATION_EXTERN void CYLSetLocalizationLanguage(NSString * _Nullable language) CYL_NOEXCEPT;
 
 /*!
  * [EN] Posted on the main queue by `CYLSetLocalizationLanguage()`. `-[UIWindow cyl_setRootViewControllerProvider:]`
@@ -98,13 +110,13 @@ FOUNDATION_EXTERN void CYLSetLocalizationLanguage(NSString * _Nullable language)
  * [CN] 同 `CYLLocalizedString()`，但使用 `language`（匹配最接近的译文）；传 nil 表示设备语言（`[NSLocale preferredLanguages]`），
  *      与 App 当前语言无关。用于切换到看不懂的语言后用户仍需读懂的提示，例如语言设置的副标题。
  */
-FOUNDATION_EXTERN NSString *CYLLocalizedStringForLanguage(NSString * _Nullable key, NSString * _Nullable language) CYL_RETURNS_LOCALIZED_STRING NS_FORMAT_ARGUMENT(1);
+FOUNDATION_EXTERN NSString *CYLLocalizedStringForLanguage(NSString * _Nullable key, NSString * _Nullable language) CYL_NOEXCEPT CYL_RETURNS_LOCALIZED_STRING NS_FORMAT_ARGUMENT(1);
 
 /*!
  * [EN] The language `CYLLocalizedString()` currently uses, e.g. @"zh-Hans".
  * [CN] `CYLLocalizedString()` 当前使用的语言，例如 @"zh-Hans"。
  */
-FOUNDATION_EXTERN NSString *CYLLocalizationLanguage(void);
+FOUNDATION_EXTERN NSString *CYLLocalizationLanguage(void) CYL_NOEXCEPT;
 
 #endif
 
