@@ -352,6 +352,7 @@ Analyst.ai [App Store Link](https://itunes.apple.com/us/app/analyst-ai/id1345754
 | [在 Swift 项目中使用 CYLTabBarController](docs/Swift-Guide.md) | [Using CYLTabBarController in Swift](docs/Swift-Guide.md) |
 | [iOS 核心层迁移到 Swift](docs/Swift-Migration.md) | [Migrating the iOS core layer to Swift](docs/Swift-Migration.md) |
 | [在 SwiftUI 项目中集成 CYLTabBarController](docs/SwiftUI-Integration.md) | [Integrating CYLTabBarController in a SwiftUI app](docs/SwiftUI-Integration.md) |
+| [TODO 总览与清理进度](docs/TODO-Sweep.md) | [TODO sweep: every open TODO and its status](docs/TODO-Sweep.md) |
 | [Tab 的无障碍与 UI 测试](docs/Tab-Accessibility.md) | [Tab Accessibility and UI Tests](docs/Tab-Accessibility.md) |
 | [TabBar 图库](docs/Tab-Bar-Gallery.md) | [Tab Bar Gallery](docs/Tab-Bar-Gallery.md) |
 | [Tab 图标动画共用子库：CYLTabBarItemAnimation（面向协议，可扩展任意动画库）](docs/Tab-Bar-Item-Animation.md) | [The shared tab icon animation subspec: CYLTabBarItemAnimation (protocol-oriented, open to any library)](docs/Tab-Bar-Item-Animation.md) |
