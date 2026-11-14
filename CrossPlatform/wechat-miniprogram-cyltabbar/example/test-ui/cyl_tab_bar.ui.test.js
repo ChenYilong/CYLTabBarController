@@ -70,6 +70,18 @@ async function cylTap(key) {
 }
 
 /**
+ * [EN] Whether the bar's icons are animation components (Lottie, PAG, Rive: a canvas each); GIF icons are not.
+ * [CN] TabBar 的图标是否为动画组件（Lottie、PAG、Rive：各有一个画布）；GIF 图标不是。
+ */
+function cylHasAnimationViews() {
+  return miniProgram.evaluate(() => {
+    const pages = getCurrentPages();
+    const bar = pages[pages.length - 1].getTabBar().selectComponent('#cyl-tab-bar');
+    return bar.selectAllComponents('.cyl-tab-item').some((item) => Boolean(item.selectComponent('#cyl-item-animation')));
+  });
+}
+
+/**
  * [EN] The vertical extent of every title on the bar, the plus button's included. [CN] TabBar 上每个标题（含 PlusButton 的）的纵向范围。
  */
 function cylTitleRects() {
@@ -166,7 +178,8 @@ test('the playback controls reach the bar: speed, loop, Play all', async () => {
         // [EN] DevTools: one layer, the image of the canvas, also while playing. [CN] 开发者工具：只有一个图层（画布的图片），播放时也一样。
         snapshots: bar.selectAllComponents('.cyl-tab-item').map((item) => {
           const view = item.selectComponent('#cyl-item-animation');
-          return Boolean(view.data.cylCovered && view.data.cylSnapshot);
+          // [EN] GIF icons are <image>s: no canvas, so no second layer. [CN] GIF 图标是 <image>：没有画布，因此不会有第二个图层。
+          return view ? Boolean(view.data.cylCovered && view.data.cylSnapshot) : true;
         }),
       }), 300);
     }, 0);
@@ -204,7 +217,11 @@ function cylDifference(before, after, rect, windowWidth, windowTop) {
   return pixelmatch(crop(first), crop(second), null, width, height, { threshold: 0.1 }) / (width * height);
 }
 
-test('the animated icons stay in the bar during and after a page scroll (WeChat DevTools)', async () => {
+test('the animated icons stay in the bar during and after a page scroll (WeChat DevTools)', async (t) => {
+  if (!(await cylHasAnimationViews())) {
+    t.skip('the icons are <image>s (GIF): no canvas');
+    return;
+  }
   await miniProgram.switchTab('/pages/me/index');
   await cylSleep(CYL_SETTLE_MS * 4);
   const layout = await miniProgram.evaluate(() => new Promise((resolve) => {
@@ -278,7 +295,11 @@ function cylIconLayers() {
   });
 }
 
-test('looping icons stay one layer and keep playing during a page scroll (WeChat DevTools)', async () => {
+test('looping icons stay one layer and keep playing during a page scroll (WeChat DevTools)', async (t) => {
+  if (!(await cylHasAnimationViews())) {
+    t.skip('the icons are <image>s (GIF): no canvas');
+    return;
+  }
   await miniProgram.switchTab('/pages/me/index');
   await cylSleep(CYL_SETTLE_MS * 2);
   await miniProgram.evaluate(() => {
@@ -335,5 +356,77 @@ test('hiddenIdentifiers leaves a tab out of every bar, and tabBarHidden hides on
     assert.ok(await cylBarHeight(false) >= 49, 'the bar is back');
   } finally {
     await cylSetState({ hiddenIdentifiers: [] });
+  }
+});
+
+test('the Home feed scrolls under the bar with one layer of icons (flat style, dark skin; the report of 2026-11-14)', async (t) => {
+  if (!(await cylHasAnimationViews())) {
+    // [EN] A GIF icon is an <image> that animates by itself: two frames of it differ whatever the bar does, and there is
+    //      no canvas to leave behind. [CN] GIF 图标是自己会动的 <image>：无论 TabBar 如何，两帧本身就不同，也没有会被留下的画布。
+    t.skip('the icons are <image>s (GIF): no canvas, and they animate by themselves');
+    return;
+  }
+  // [EN] The user's case: the feed page (pages/home), the flat item style, the dark skin; the whole bar and the strip under
+  //      it (the safe area) must look the same during the scroll as at rest, where the page stops at the same position.
+  // [CN] 用户的场景：信息流页面（pages/home）、扁平 Item 样式、深色皮肤；滚动期间整个 TabBar 及其下方的条带（安全区）
+  //      必须与页面在同一位置静止时一样。
+  try {
+    await miniProgram.switchTab('/pages/home/index');
+    await cylSetState({ itemStyle: 'flat', themeIdentifier: 'dark' });
+    const layout = await miniProgram.evaluate(() => new Promise((resolve) => {
+      const pages = getCurrentPages();
+      const bar = pages[pages.length - 1].getTabBar().selectComponent('#cyl-tab-bar');
+      bar.createSelectorQuery().select('.cyl-tab-bar').boundingClientRect()
+        .selectAll('.cyl-tab-item >>> .cyl-item-icon-box').boundingClientRect()
+        .exec((result) => {
+          const info = wx.getWindowInfo();
+          resolve({
+            windowWidth: info.windowWidth,
+            windowTop: info.screenHeight - info.windowHeight,
+            windowHeight: info.windowHeight,
+            barTop: result[0].top,
+            icons: (result[1] || []).map((rect) => ({ left: rect.left, top: rect.top, width: rect.width, height: rect.height })),
+          });
+        });
+    }));
+    // [EN] The whole bar and its strip (under 0.6%: thin icon strokes change little of it; a fake ghost layer made 1.1%, real runs 0.2%) and every icon box (under 2%).
+    // [CN] 整个 TabBar 及其下方条带（低于 0.6%：细线条图标只占其很小一部分；模拟的第二图层为 1.1%，真实运行为 0.2%）与每个图标区域（低于 2%）。
+    const area = { left: 0, top: layout.barTop, width: layout.windowWidth, height: layout.windowHeight - layout.barTop };
+    assert.ok(layout.icons.length >= 4, 'icon boxes');
+    const cylCompare = (first, second, label) => {
+      const bar = cylDifference(first, second, area, layout.windowWidth, layout.windowTop);
+      assert.ok(bar < 0.006, `the bar differs ${label}: ${(bar * 100).toFixed(2)}% of its pixels`);
+      layout.icons.forEach((rect, index) => {
+        const icon = cylDifference(first, second, rect, layout.windowWidth, layout.windowTop);
+        assert.ok(icon < 0.02, `icon ${index} differs ${label}: ${(icon * 100).toFixed(1)}% of its pixels`);
+      });
+    };
+    // [EN] Jumps first (wx.pageScrollTo without a duration): the case where DevTools left the canvases of the icons behind. The
+    //      dark bar is opaque, so it looks the same at every scroll position.
+    // [CN] 先做跳转（不带 duration 的 wx.pageScrollTo）：开发者工具把图标画布留在原处的情形。深色 TabBar 不透明，
+    //      因此在任何滚动位置看起来都一样。
+    await cylSleep(1500);
+    const baseline = await miniProgram.screenshot();
+    for (const jump of [300, 1380, 700]) {
+      await miniProgram.pageScrollTo(jump);
+      await cylSleep(900);
+      cylCompare(baseline, await miniProgram.screenshot(), `from its look at the top after a jump to ${jump}`);
+    }
+    await miniProgram.pageScrollTo(0);
+    await cylSleep(900);
+    for (const target of [1500, 0]) {
+      await miniProgram.evaluate((top) => { wx.pageScrollTo({ scrollTop: top, duration: 3000 }); }, target);
+      const frames = [];
+      for (let index = 0; index < 5; index += 1) {
+        await cylSleep(450);
+        frames.push(await miniProgram.screenshot());
+      }
+      await cylSleep(2200);
+      const rest = await miniProgram.screenshot();
+      frames.forEach((frame, index) => cylCompare(frame, rest, `from its resting look in frame ${index} of the scroll to ${target}`));
+    }
+  } finally {
+    await miniProgram.pageScrollTo(0);
+    await cylSetState({ itemStyle: '', themeIdentifier: '' });
   }
 });

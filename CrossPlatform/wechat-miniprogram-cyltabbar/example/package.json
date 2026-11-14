@@ -13,7 +13,8 @@
     "install-components": "node scripts/cyl_install_components.js",
     "sync": "node scripts/cyl_sync_shared.js",
     "check": "node scripts/cyl_setup.js --check",
-    "test-ui": "node --test --test-timeout=180000 test-ui/*.test.js"
+    "test-ui": "node --test --test-timeout=180000 test-ui/*.test.js",
+    "test-ui-all": "node scripts/cyl_test_ui_all.js"
   },
   "devDependencies": {
     "miniprogram-automator": "0.13.0",

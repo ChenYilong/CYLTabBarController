@@ -58,5 +58,5 @@ jobs:
         run: npm install --no-package-lock
       - name: Set up the example (components and shared files)
         run: npm run setup
-      - name: UI tests
-        run: npm run test-ui
+      - name: UI tests (Lottie, PAG, Rive and GIF in turn)
+        run: npm run test-ui-all
