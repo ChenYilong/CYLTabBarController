@@ -25,6 +25,13 @@ Page({
     ],
   },
   cyl_itemTap(event) {
-    wx.showToast({ title: `itemtap ${event.detail.index}`, icon: 'none' });
+    // [EN] Tapping a tile toggles its selected state, as a tab would. [CN] 点击格子切换其选中状态，与 Tab 相同。
+    const index = event.detail.index;
+    const tile = this.data.tiles[index];
+    if (!tile || tile.props.enabled === false) {
+      return;
+    }
+    this.setData({ [`tiles[${index}].props.selected`]: !tile.props.selected });
+    wx.showToast({ title: `itemtap ${index}`, icon: 'none' });
   },
 });

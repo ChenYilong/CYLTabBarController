@@ -64,6 +64,6 @@
 
   <text class="cyl-section-title" aria-role="heading">{{texts['Events']}}</text>
   <view class="cyl-section">
-    <view wx:for="{{events}}" wx:key="index" class="cyl-row" aria-label="{{item}}"><text class="cyl-row-value" aria-hidden="true">{{item}}</text></view>
+    <view wx:for="{{events}}" wx:key="index" class="cyl-row" hover-class="cyl-row-pressed" bindtap="cyl_copyEvent" data-value="{{item}}" aria-role="button" aria-label="{{item}}"><text class="cyl-row-value" aria-hidden="true">{{item}}</text></view>
   </view>
 </view>

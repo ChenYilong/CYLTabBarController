@@ -81,3 +81,6 @@ page {
   content: "✓";
   color: #007aff;
 }
+
+/* [EN] Pressed rows. [CN] 按下的行。 */
+.cyl-row-pressed { background-color: rgba(0, 0, 0, 0.05); }

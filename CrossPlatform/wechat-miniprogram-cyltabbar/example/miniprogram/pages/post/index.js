@@ -33,6 +33,10 @@ Component({
       wx.setClipboardData({ data: `https://github.com/ChenYilong/CYLTabBarController#post-${this.data.post.id}` });
     },
 
+    // [EN] Tapping a comment starts a reply to its author. [CN] 点击评论开始回复其作者。
+    cyl_reply(event) {
+      this.setData({ draft: `@${event.currentTarget.dataset.author} ` });
+    },
     cyl_draft(event) {
       this.setData({ draft: event.detail.value });
     },

@@ -69,6 +69,10 @@ Page({
   cyl_recolor(event) {
     this.setData({ colors: event.detail.value ? { '**': '#FF3B30' } : null });
   },
+  // [EN] Tapping an event row copies it. [CN] 点击事件行复制该事件。
+  cyl_copyEvent(event) {
+    wx.setClipboardData({ data: String(event.currentTarget.dataset.value) });
+  },
   cyl_event(event) {
     const message = event.detail && event.detail.message ? `: ${event.detail.message}` : '';
     const events = [`${event.type}${message}`].concat(this.data.events).slice(0, 4);

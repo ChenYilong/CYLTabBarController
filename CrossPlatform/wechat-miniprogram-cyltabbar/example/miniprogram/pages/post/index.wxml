@@ -17,7 +17,7 @@
 
   <text class="cyl-section-title" aria-role="heading">{{texts['Comments']}} ({{comments.length}})</text>
   <view class="cyl-section">
-    <view wx:for="{{comments}}" wx:key="id" class="cyl-row" aria-label="{{item.author}}: {{item.text}}"><text aria-hidden="true"><text class="cyl-post-author">{{item.author}}</text>  {{item.text}}</text></view>
+    <view wx:for="{{comments}}" wx:key="id" class="cyl-row" hover-class="cyl-row-pressed" bindtap="cyl_reply" data-author="{{item.author}}" aria-role="button" aria-label="{{item.author}}: {{item.text}}"><text aria-hidden="true"><text class="cyl-post-author">{{item.author}}</text>  {{item.text}}</text></view>
     <view class="cyl-row">
       <input id="cyl-post-input" class="cyl-post-input" value="{{draft}}" placeholder="{{texts['Write a comment']}}" confirm-type="send" bindinput="cyl_draft" bindconfirm="cyl_send" aria-label="{{texts['Write a comment']}}" />
       <view class="cyl-post-send" bindtap="cyl_send" aria-role="button" aria-label="{{texts['Send']}}"><text aria-hidden="true">{{texts['Send']}}</text></view>
