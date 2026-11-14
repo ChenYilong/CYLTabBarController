@@ -424,7 +424,8 @@ docs/
 │   ├── wechat-miniprogram-christmas-glass.png
 │   ├── wechat-miniprogram-flat-login.png
 │   ├── wechat-miniprogram-home.png
-│   └── wechat-miniprogram-scroll-icons-devtools-sdk3.17.6-88dd149.png
+│   ├── wechat-miniprogram-scroll-icons-devtools-sdk3.17.6-88dd149.png
+│   └── wechat-miniprogram-scroll-icons-still-images-devtools-sdk3.17.6-a157c97.png
 ├── commit-readiness-2026-11-09.md
 └── instructions.md
 ```
