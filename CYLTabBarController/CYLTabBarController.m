@@ -1281,6 +1281,28 @@ static const void *const CYLPlusButtonGlassLayoutRetryPendingKey = &CYLPlusButto
     [self cyl_tabBarThemeDidChangeByManager:manager theme:theme];
 }
 
+#if defined(__IPHONE_26_0) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_26_0
+/*!
+ * Issue #13
+ * [EN] Apple's `tabBarMinimizeBehavior` is the same switch as `cyl_tabBarMinimizeBehavior`. The overrides stay here, in Objective-C, for
+ *      the reason above; the work is in CYLTabBarController+CYLTabBarMinimize.swift.
+ * [CN] Apple 的 `tabBarMinimizeBehavior` 与 `cyl_tabBarMinimizeBehavior` 是同一个开关。重写保留在这里（Objective-C），原因同上；实际工作在
+ *      CYLTabBarController+CYLTabBarMinimize.swift。
+ */
+- (void)setTabBarMinimizeBehavior:(UITabBarMinimizeBehavior)tabBarMinimizeBehavior {
+    if (@available(iOS 26.0, *)) {
+        [self cyl_setSystemTabBarMinimizeBehaviorFromApp:tabBarMinimizeBehavior];
+    }
+}
+
+- (UITabBarMinimizeBehavior)tabBarMinimizeBehavior {
+    if (@available(iOS 26.0, *)) {
+        return [self cyl_systemTabBarMinimizeBehaviorForApp];
+    }
+    return 0;
+}
+#endif
+
 - (void)viewDidLayoutSubviews {
     [super viewDidLayoutSubviews];
     // [EN] Lottie views are added during layout: start the looping ones (`CYLTabBarLottieLoopsWhenUnselected`).

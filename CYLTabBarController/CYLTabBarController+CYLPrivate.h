@@ -34,6 +34,12 @@ NS_ASSUME_NONNULL_BEGIN
 ///      scroll to top). nil when there is none or the view is not loaded.
 /// [CN] `viewController` 中控制 TabBar 的滚动视图，与 UIKit 的选择方式一致（CYLReselect 的滚动到顶部也使用）。没有或视图未加载时为 nil。
 - (nullable UIScrollView *)cyl_tabBarMinimizeScrollViewForViewController:(nullable UIViewController *)viewController;
+#if defined(__IPHONE_26_0) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_26_0
+/// [EN] The app's `tabBarMinimizeBehavior` (iOS 26+), stored as `cyl_tabBarMinimizeBehavior` (CYLTabBarController+CYLTabBarMinimize.swift).
+/// [CN] App 的 `tabBarMinimizeBehavior`（iOS 26+），保存为 `cyl_tabBarMinimizeBehavior`（CYLTabBarController+CYLTabBarMinimize.swift）。
+- (void)cyl_setSystemTabBarMinimizeBehaviorFromApp:(UITabBarMinimizeBehavior)behavior API_AVAILABLE(ios(26.0));
+- (UITabBarMinimizeBehavior)cyl_systemTabBarMinimizeBehaviorForApp API_AVAILABLE(ios(26.0));
+#endif
 @end
 
 /// [EN] Implemented in `CYLPlusButton.m`. [CN] 在 `CYLPlusButton.m` 中实现。
