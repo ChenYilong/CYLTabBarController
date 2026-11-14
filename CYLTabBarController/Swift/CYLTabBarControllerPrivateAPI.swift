@@ -22,6 +22,8 @@ import UIKit
     @objc(cyl_themeRemoveTabBarItemAttributeKeys:atIndex:) func cylThemeRemoveTabBarItemAttributeKeys(_ keys: [String], atIndex index: UInt)
     @objc(cyl_isPlusSlotViewController:) func cylIsPlusSlotViewController(_ viewController: UIViewController) -> Bool
     @objc(cyl_tabButtonsOfViewController:) func cylTabButtons(of viewController: UIViewController) -> [UIControl]
+    @objc(cyl_contextPlusButton) func cylContextPlusButton() -> CYLPlusButton?
+    @objc(cyl_contextPlusChildViewController) func cylContextPlusChildViewController() -> UIViewController?
 }
 
 /**
