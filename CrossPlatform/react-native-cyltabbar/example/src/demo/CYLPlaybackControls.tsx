@@ -1,7 +1,7 @@
 // The playback controls AGENTS.md asks of every example that shows tab icon animations ("Animated icon examples: Play all,
 // speed slider, loop switch"). AGENTS.md 要求每个展示 Tab 图标动画的示例提供的播放控件（「全部播放」、倍速滑块、循环开关）。
-import { useRef, useState } from 'react';
-import { PanResponder, Pressable, StyleSheet, Switch, Text, View, type AccessibilityActionEvent, type LayoutChangeEvent } from 'react-native';
+import { useRef, type ComponentRef } from 'react';
+import { PanResponder, Pressable, StyleSheet, Switch, Text, View, type AccessibilityActionEvent } from 'react-native';
 import type { CYLDemoColors } from './CYLDemoList';
 import { t } from './CYLLocalization';
 
@@ -39,20 +39,23 @@ type Props = Readonly<{
  * 读作「全部播放」，滑块读作「倍速，1.5 倍」（上下滑动调整），开关读作「循环播放，开」。
  */
 export function CYLPlaybackControls({ colors, tint, speed, loops, onPlayAll, onSpeedChange, onLoopsChange }: Props) {
-  const [width, setWidth] = useState(1);
-  const state = useRef({ width: 1, speed, onSpeedChange });
-  state.current = { width, speed, onSpeedChange };
+  const slider = useRef<ComponentRef<typeof View>>(null);
+  // The slider's left edge and width in the window, measured at layout: the touch position is the screen position, which
+  // stays right while the finger is outside the slider. 滑块在窗口中的左边缘与宽度（布局时测量）：触摸位置取屏幕位置，手指移出滑块时仍然正确。
+  const frame = useRef({ left: 0, width: 1 });
+  const state = useRef({ speed, onSpeedChange });
+  state.current = { speed, onSpeedChange };
   const fraction = (speed - CYL_MINIMUM_SPEED) / (CYL_MAXIMUM_SPEED - CYL_MINIMUM_SPEED);
-  const speedFromTouch = (x: number) => {
-    const ratio = Math.min(1, Math.max(0, x / state.current.width));
+  const speedFromTouch = (pageX: number) => {
+    const ratio = Math.min(1, Math.max(0, (pageX - frame.current.left) / frame.current.width));
     return clampedStep(CYL_MINIMUM_SPEED + ratio * (CYL_MAXIMUM_SPEED - CYL_MINIMUM_SPEED));
   };
   const responder = useRef(
     PanResponder.create({
       onStartShouldSetPanResponder: () => true,
       onMoveShouldSetPanResponder: () => true,
-      onPanResponderGrant: (event) => state.current.onSpeedChange(speedFromTouch(event.nativeEvent.locationX)),
-      onPanResponderMove: (event) => state.current.onSpeedChange(speedFromTouch(event.nativeEvent.locationX)),
+      onPanResponderGrant: (event) => state.current.onSpeedChange(speedFromTouch(event.nativeEvent.pageX)),
+      onPanResponderMove: (event) => state.current.onSpeedChange(speedFromTouch(event.nativeEvent.pageX)),
     }),
   ).current;
   const onAccessibilityAction = (event: AccessibilityActionEvent) => {
@@ -72,7 +75,12 @@ export function CYLPlaybackControls({ colors, tint, speed, loops, onPlayAll, onS
           <Text style={[styles.text, { color: colors.label }]} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">{t('Speed')}</Text>
           <View
             style={styles.slider}
-            onLayout={(event: LayoutChangeEvent) => setWidth(Math.max(1, event.nativeEvent.layout.width))}
+            ref={slider}
+            onLayout={() => {
+              slider.current?.measureInWindow((left, _top, measuredWidth) => {
+                frame.current = { left, width: Math.max(1, measuredWidth) };
+              });
+            }}
             accessible
             accessibilityRole="adjustable"
             accessibilityLabel={t('Speed')}
@@ -81,9 +89,10 @@ export function CYLPlaybackControls({ colors, tint, speed, loops, onPlayAll, onS
             onAccessibilityAction={onAccessibilityAction}
             {...responder.panHandlers}
           >
-            <View style={[styles.track, { backgroundColor: colors.separator }]} />
-            <View style={[styles.track, styles.filled, { backgroundColor: tint, width: `${fraction * 100}%` }]} />
-            <View style={[styles.thumb, { left: `${fraction * 100}%`, borderColor: colors.separator }]} />
+            {/* The track and the thumb take no touches: the slider itself is the touch target. 轨道与滑块不接收触摸：触摸目标是滑块本身。 */}
+            <View pointerEvents="none" style={[styles.track, { backgroundColor: colors.separator }]} />
+            <View pointerEvents="none" style={[styles.track, styles.filled, { backgroundColor: tint, width: `${fraction * 100}%` }]} />
+            <View pointerEvents="none" style={[styles.thumb, { left: `${fraction * 100}%`, borderColor: colors.separator }]} />
           </View>
           <Text style={[styles.value, { color: colors.secondaryLabel }]} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">{`${speedText}×`}</Text>
         </View>
