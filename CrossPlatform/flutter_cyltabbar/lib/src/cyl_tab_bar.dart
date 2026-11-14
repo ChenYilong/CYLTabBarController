@@ -226,8 +226,8 @@ class CYLTabBar extends StatefulWidget {
     this.language,
     this.tabBarHidden = false,
     this.memoryWarningRequest = 0,
-    this.animationSpeed,
-    this.animationLoops = false,
+    this.playbackSpeed,
+    this.playbackLoops = false,
     this.playAllRequest = 0,
     this.onMemoryWarning,
     this.titlePositionAdjustment,
@@ -316,15 +316,16 @@ class CYLTabBar extends StatefulWidget {
   /// `CYLTabBarControllerKeepsLoadedTabBarItemIdentifiers`).
   final int memoryWarningRequest;
 
-  /// The playback speed of every tab icon animation (`tabBarItemAnimationSpeed`), e.g. 0.25 to 3; null or 0 or less: the
-  /// library's default. Applies to the animations already playing.
-  final double? animationSpeed;
+  /// The playback speed of every tab icon animation, changed live (`tabBarItemAnimationSpeed`), e.g. 0.25 to 3; null or 0
+  /// or less: the library's default. Applies to the animations already playing. ([animationSpeed] is the speed in the
+  /// configuration: it is read when the tab bar is built, so changing it rebuilds the tab bar.)
+  final double? playbackSpeed;
 
-  /// Whether the tab icon animations repeat until this is false (`tabBarItemAnimationLoops`); applies to the animations
-  /// already playing.
-  final bool animationLoops;
+  /// Whether the tab icon animations repeat until this is false, changed live (`tabBarItemAnimationLoops`); applies to
+  /// the animations already playing.
+  final bool playbackLoops;
 
-  /// Each increase plays every tab icon animation again from progress 0, with [animationSpeed] and [animationLoops]
+  /// Each increase plays every tab icon animation again from progress 0, with [playbackSpeed] and [playbackLoops]
   /// ("Play all", `-[CYLTabBarController cyl_playAllTabBarItemAnimations]`).
   final int playAllRequest;
   final ValueChanged<String>? onMemoryWarning;
@@ -384,8 +385,8 @@ class _CYLTabBarState extends State<CYLTabBar> {
         'loggedIn': widget.loggedIn,
         'language': widget.language,
         'tabBarHidden': widget.tabBarHidden,
-        'animationSpeed': widget.animationSpeed,
-        'animationLoops': widget.animationLoops,
+        'playbackSpeed': widget.playbackSpeed,
+        'playbackLoops': widget.playbackLoops,
         'titlePositionAdjustment': _titleOffset(widget),
       };
 
@@ -436,11 +437,11 @@ class _CYLTabBarState extends State<CYLTabBar> {
         if (report != null) widget.onMemoryWarning?.call(report);
       });
     }
-    if (widget.animationSpeed != oldWidget.animationSpeed) {
-      channel?.invokeMethod<void>('setAnimationSpeed', widget.animationSpeed);
+    if (widget.playbackSpeed != oldWidget.playbackSpeed) {
+      channel?.invokeMethod<void>('setPlaybackSpeed', widget.playbackSpeed);
     }
-    if (widget.animationLoops != oldWidget.animationLoops) {
-      channel?.invokeMethod<void>('setAnimationLoops', widget.animationLoops);
+    if (widget.playbackLoops != oldWidget.playbackLoops) {
+      channel?.invokeMethod<void>('setPlaybackLoops', widget.playbackLoops);
     }
     if (widget.playAllRequest > oldWidget.playAllRequest) {
       channel?.invokeMethod<void>('playAllAnimations');

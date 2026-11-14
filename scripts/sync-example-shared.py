@@ -35,6 +35,9 @@ RN_ICONS = os.path.join(TARGETS[0], 'icons.ts')
 #      每种语言一张表，英文 -> 译文。文字与表中的英文值匹配；{name} 与数字匹配 %@ / %1$@；"N. 标题 (API)" 保留 N 与 API。
 #      Objective-C 示例中不翻译的文字（异常用例、API 名称）保持英文。
 BUNDLE = os.path.join(ROOT, 'CYLTabBarController', 'Resources', 'CYLTabBarController.bundle')
+# [EN] The texts only the examples show (Play all, Speed, Loop...) are in the example layer's bundle; the library's tables win.
+# [CN] 只有示例显示的文字（全部播放、速度、循环等）在示例层的 bundle 中；库的字符串表优先。
+DEMO_BUNDLE = os.path.join(ROOT, 'Example-Shared', 'CYLDemo.bundle')
 STRINGS = 'strings.json'
 
 STRINGS_PAIR = re.compile(r'^"((?:[^"\\]|\\.)*)"\s*=\s*"((?:[^"\\]|\\.)*)";', re.M)
@@ -48,7 +51,12 @@ def strings_table(language):
     """[EN] One .strings file of the library as a dictionary. [CN] 库的一个 .strings 文件，转为字典。"""
     path = os.path.join(BUNDLE, language + LPROJ, 'CYLTabBarController.strings')
     unescape = lambda text: text.replace('\\"', '"').replace('\\n', '\n').replace('\\\\', '\\')
-    return {unescape(key): unescape(value) for key, value in STRINGS_PAIR.findall(open(path, encoding='utf-8').read())}
+    table = {unescape(key): unescape(value) for key, value in STRINGS_PAIR.findall(open(path, encoding='utf-8').read())}
+    demo_path = os.path.join(DEMO_BUNDLE, language + LPROJ, 'CYLDemo.strings')
+    if os.path.exists(demo_path):
+        for key, value in STRINGS_PAIR.findall(open(demo_path, encoding='utf-8').read()):
+            table.setdefault(unescape(key), unescape(value))
+    return table
 
 
 def example_texts():

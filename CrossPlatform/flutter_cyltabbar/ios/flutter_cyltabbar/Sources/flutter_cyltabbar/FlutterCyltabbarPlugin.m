@@ -85,8 +85,8 @@ static UIImage *CYLFlutterAssetImage(NSString *asset, NSObject<FlutterPluginRegi
         // [EN] Before the configuration, so it is built once, in this language. [CN] 在配置之前，使 TabBar 以该语言只创建一次。
         [self applyLanguage:arguments[@"language"]];
         _hostView.tabBarHidden = [arguments[@"tabBarHidden"] isKindOfClass:[NSNumber class]] && [arguments[@"tabBarHidden"] boolValue];
-        _hostView.animationSpeed = [arguments[@"animationSpeed"] isKindOfClass:[NSNumber class]] ? [arguments[@"animationSpeed"] doubleValue] : 0;
-        _hostView.animationLoops = [arguments[@"animationLoops"] isKindOfClass:[NSNumber class]] && [arguments[@"animationLoops"] boolValue];
+        _hostView.animationSpeed = [arguments[@"playbackSpeed"] isKindOfClass:[NSNumber class]] ? [arguments[@"playbackSpeed"] doubleValue] : 0;
+        _hostView.animationLoops = [arguments[@"playbackLoops"] isKindOfClass:[NSNumber class]] && [arguments[@"playbackLoops"] boolValue];
         [self applyTitlePositionAdjustment:arguments[@"titlePositionAdjustment"]];
         id selectedIndex = arguments[@"selectedIndex"];
         _hostView.selectedIndex = [selectedIndex isKindOfClass:[NSNumber class]] ? [selectedIndex integerValue] : -1;
@@ -170,9 +170,9 @@ static UIImage *CYLFlutterAssetImage(NSString *asset, NSObject<FlutterPluginRegi
     } else if ([call.method isEqualToString:@"simulateMemoryWarning"]) {
         result([_hostView simulateMemoryWarning]);
         return;
-    } else if ([call.method isEqualToString:@"setAnimationSpeed"]) {
+    } else if ([call.method isEqualToString:@"setPlaybackSpeed"]) {
         _hostView.animationSpeed = [arguments isKindOfClass:[NSNumber class]] ? [arguments doubleValue] : 0;
-    } else if ([call.method isEqualToString:@"setAnimationLoops"]) {
+    } else if ([call.method isEqualToString:@"setPlaybackLoops"]) {
         _hostView.animationLoops = [arguments isKindOfClass:[NSNumber class]] && [arguments boolValue];
     } else if ([call.method isEqualToString:@"playAllAnimations"]) {
         [_hostView playAllAnimations];

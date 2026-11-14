@@ -16,6 +16,7 @@ import 'package:flutter_cyltabbar/flutter_cyltabbar.dart';
 import 'demo/cyl_badge_view.dart';
 import 'demo/cyl_demo_list.dart';
 import 'demo/cyl_localization.dart';
+import 'demo/cyl_playback_controls.dart';
 import 'cyl_skins.dart';
 
 Future<void> main() async {
@@ -463,6 +464,12 @@ class _ExamplePageState extends State<CYLExamplePage> {
   // -[UIViewController cyl_simulateMemoryWarningAndShowResult]: each tap asks the tab bar for one simulated memory warning.
   // 每次点击请求 TabBar 模拟一次内存警告。
   int _memoryWarningRequest = 0;
+  // The playback controls of the tab icon animations (Play all, speed, loop): one policy, applied live. The Objective-C
+  // example's first tab imitates its home table, so they are on the other tabs. 播放控件：一个实时生效的策略，在其他 Tab 上
+  // （Objective-C 示例的第一个 Tab 模仿其首页表格）。
+  int _playAllRequest = 0;
+  double _animationSpeed = 1;
+  bool _animationLoops = false;
   // CYLSwitchTitlePositionAdjustment(): the title row cycles the vertical offset of every title through 0, -4 and 4 at
   // runtime (`setTitlePositionAdjustment:`); null is the configuration's -3.5. 标题行在运行时依次切换所有标题的垂直偏移：
   // 0、-4、4；null 为配置中的 -3.5。
@@ -767,6 +774,20 @@ class _ExamplePageState extends State<CYLExamplePage> {
               ),
             // Every tab shows the demo list (item 51); the plus button's page shows its title.
             // 每个 Tab 都显示演示列表（第 51 项）；PlusButton 的页面显示其标题。
+            if (!_plusPageSelected && _selectedIndex != 0)
+              CYLPlaybackControls(
+                colors: CYLDemoColors(dark),
+                tint: skin.tint != null
+                    ? hexColor(skin.tint!)
+                    : (dark ? const Color(0xFF0A84FF) : const Color(0xFF007AFF)),
+                speed: _animationSpeed,
+                loops: _animationLoops,
+                onPlayAll: () => setState(() => _playAllRequest++),
+                onSpeedChanged: (value) => setState(
+                  () => _animationSpeed = (value / 0.05).round() * 0.05,
+                ),
+                onLoopsChanged: (value) => setState(() => _animationLoops = value),
+              ),
             Expanded(
               child: _plusPageSelected
                   ? Center(
@@ -879,6 +900,9 @@ class _ExamplePageState extends State<CYLExamplePage> {
         language: widget.language,
         tabBarHidden: _tabBarHidden,
         memoryWarningRequest: _memoryWarningRequest,
+        playbackSpeed: _animationSpeed,
+        playbackLoops: _animationLoops,
+        playAllRequest: _playAllRequest,
         titlePositionAdjustment: _titleOffset == null ? null : Offset(0, _titleOffset!),
         onMemoryWarning: (report) => showDialog<void>(
           context: context,

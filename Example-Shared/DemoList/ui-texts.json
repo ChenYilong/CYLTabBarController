@@ -12,6 +12,7 @@
     "New content", "{count} new messages", "{page} CYLTabBarController on iOS {version}",
     "Default", "Grapefruit", "Grass", "Pink Rose", "Dark", "Network icons",
     "Spring Festival", "Christmas", "Halloween", "Valentine's Day", "Mid-Autumn", "Easter", "New Year", "Summer",
-    "Birthday", "Space", "Ocean"
+    "Birthday", "Space", "Ocean",
+    "Playback", "Play all", "Speed", "Loop", "{speed} times"
   ]
 }
