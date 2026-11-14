@@ -18,6 +18,11 @@ Component({
     },
   },
   methods: {
+    // [EN] A parameter row: copies its value. [CN] 参数行：复制其值。
+    cyl_copyValue(event) {
+      wx.setClipboardData({ data: String(event.currentTarget.dataset.value) });
+    },
+
     cyl_copyLink() {
       wx.setClipboardData({
         data: this.data.url,

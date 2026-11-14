@@ -4,11 +4,11 @@
   </view>
   <text class="cyl-section-title" aria-role="heading">{{texts['Page parameters']}}</text>
   <view class="cyl-section">
-    <view class="cyl-row" aria-label="{{texts['Page identifier']}}, web">
+    <view class="cyl-row cyl-row-action" bindtap="cyl_copyValue" data-value="web" aria-role="button" aria-label="{{texts['Page identifier']}}, web">
       <text aria-hidden="true">{{texts['Page identifier']}}</text>
       <text class="cyl-row-value" aria-hidden="true">web</text>
     </view>
-    <view class="cyl-row" aria-label="url, {{url}}">
+    <view class="cyl-row cyl-row-action" bindtap="cyl_copyValue" data-value="{{url}}" aria-role="button" aria-label="url, {{url}}">
       <text aria-hidden="true">url</text>
       <text class="cyl-row-value" aria-hidden="true">{{url}}</text>
     </view>

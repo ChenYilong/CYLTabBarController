@@ -1,0 +1,12 @@
+.cyl-post-header { display: flex; align-items: center; padding: 12px 16px; }
+.cyl-post-avatar { font-size: 32px; margin-right: 10px; }
+.cyl-post-meta { display: flex; flex-direction: column; }
+.cyl-post-author { font-weight: 600; }
+.cyl-post-time { font-size: 12px; color: #8e8e93; }
+.cyl-post-body { flex-direction: column; align-items: flex-start; line-height: 1.5; }
+.cyl-post-title { font-size: 18px; font-weight: 600; margin-bottom: 6px; }
+.cyl-post-actions { display: flex; border-top: 1rpx solid rgba(127, 127, 127, 0.2); }
+.cyl-post-action { flex: 1; text-align: center; padding: 12px 0; }
+.cyl-post-liked { color: #ff2d55; }
+.cyl-post-input { flex: 1; }
+.cyl-post-send { color: #007aff; padding-left: 12px; }

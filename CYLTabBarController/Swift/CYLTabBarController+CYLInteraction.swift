@@ -598,7 +598,7 @@ extension CYLTabBarController {
      */
     func cylReportLongPress(on control: UIControl) {
         cylInteraction.didLongPressControlBlock?(self, control)
-        delegate?.tabBarController?(self, didLongPress: control)
+        (delegate.map { $0 as AnyObject } as? CYLTabBarControllerDelegate)?.tabBarController?(self, didLongPress: control)
         guard cylHasTabBarItemGestureReceiver() else { return }
         // [EN] The pressed control may be an interactive subview of the plus button (#202): the LongPress belongs to the tab button
         //      or plus button it is in.

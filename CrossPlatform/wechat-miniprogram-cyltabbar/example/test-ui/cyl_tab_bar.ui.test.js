@@ -430,3 +430,86 @@ test('the Home feed scrolls under the bar with one layer of icons (flat style, d
     await cylSetState({ itemStyle: '', themeIdentifier: '' });
   }
 });
+
+/**
+ * [EN] The current page: the page object, its route and its data. [CN] 当前页面：页面对象、路由与数据。
+ */
+async function cylCurrentPage() {
+  const page = await miniProgram.currentPage();
+  return { page, route: page.path, data: await page.data() };
+}
+
+/**
+ * [EN] Taps the element `selector` of the current page and waits. [CN] 点击当前页面的 `selector` 元素并等待。
+ */
+async function cylTapElement(selector, wait = CYL_SETTLE_MS) {
+  const { page } = await cylCurrentPage();
+  const element = await page.$(selector);
+  assert.ok(element, `no element ${selector}`);
+  await element.tap();
+  await cylSleep(wait);
+}
+
+test('the cells of the example act on tap (the request of 2026-11-15)', async () => {
+  await miniProgram.reLaunch('/pages/home/index');
+  await cylSleep(CYL_SETTLE_MS * 2);
+  const barTitles = () => miniProgram.evaluate(() => {
+    const pages = getCurrentPages();
+    return pages[pages.length - 1].getTabBar().selectComponent('#cyl-tab-bar').data.cylSlots
+      .map((slot) => (slot.item ? slot.item.title : slot.title));
+  });
+  const state = () => miniProgram.evaluate(() => getApp().globalData.cylTabBarState);
+
+  // [EN] A direct action: the title of the first tab changes, then comes back. [CN] 直接行为：第一个 Tab 的标题改变后恢复。
+  await cylTapElement('.cyl-home-row[data-id="changeTabTitle"]');
+  assert.equal((await barTitles())[0], 'Changed');
+  await cylTapElement('.cyl-home-row[data-id="changeTabTitle"]');
+  assert.notEqual((await barTitles())[0], 'Changed');
+
+  // [EN] Show / hide the bar. [CN] 显示 / 隐藏 TabBar。
+  await cylTapElement('.cyl-home-row[data-id="flatShowHide"]');
+  assert.equal((await state()).tabBarHidden, true);
+  await cylTapElement('.cyl-home-row[data-id="flatShowHide"]');
+  assert.equal((await state()).tabBarHidden, false);
+
+  // [EN] The first badge row puts its badge on Discover, a second tap removes it. [CN] 第一个角标行把角标放到「发现」上，再点一次移除。
+  await cylTapElement('.cyl-home-row[data-index="0"]');
+  assert.equal((await state()).badges.discover, '3');
+  await cylTapElement('.cyl-home-row[data-index="0"]');
+  assert.equal((await state()).badges.discover, '');
+
+  // [EN] Configuration-file rows open the demo page with the core's result. [CN] 配置文件行打开演示页，显示核心层的结果。
+  await cylTapElement('.cyl-home-row[data-id="configurationA13"]', CYL_SETTLE_MS * 2);
+  let current = await cylCurrentPage();
+  assert.equal(current.route, 'pages/demo/index');
+  assert.match(current.data.result, /JSON/);
+  await miniProgram.navigateBack();
+  await cylSleep(CYL_SETTLE_MS);
+  await cylTapElement('.cyl-home-row[data-id="configurationB12"]', CYL_SETTLE_MS * 2);
+  current = await cylCurrentPage();
+  assert.match(current.data.result, /3 /);
+  assert.ok(await current.page.$('#cyl-demo-tab-bar'), 'the demo page draws a live bar');
+  await miniProgram.navigateBack();
+  await cylSleep(CYL_SETTLE_MS);
+
+  // [EN] Gallery feed: a post opens its page; like it and comment. [CN] 画廊信息流：帖子打开详情页；点赞与评论。
+  await miniProgram.navigateTo('/pages/glass/index');
+  await cylSleep(CYL_SETTLE_MS * 2);
+  await miniProgram.evaluate(() => {
+    const pages = getCurrentPages();
+    pages[pages.length - 1].cyl_showPanel('feed');
+  });
+  await cylSleep(CYL_SETTLE_MS * 2);
+  await cylTapElement('.cyl-glass-post', CYL_SETTLE_MS * 2);
+  current = await cylCurrentPage();
+  assert.equal(current.route, 'pages/post/index');
+  const likes = current.data.likes;
+  await cylTapElement('#cyl-post-like');
+  assert.equal((await current.page.data()).likes, likes + 1);
+  await current.page.setData({ draft: 'Nice' });
+  await cylTapElement('.cyl-post-send');
+  const comments = (await current.page.data()).comments;
+  assert.equal(comments[comments.length - 1].text, 'Nice');
+  await miniProgram.reLaunch('/pages/home/index');
+  await cylSleep(CYL_SETTLE_MS);
+});

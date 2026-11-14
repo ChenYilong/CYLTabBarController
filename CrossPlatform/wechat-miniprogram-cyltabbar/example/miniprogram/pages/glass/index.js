@@ -17,18 +17,7 @@ const cylDemoStrings = require('../../utils/cyl_demo_strings');
 const cylSymbols = require('../../shared/symbols');
 const { CYLTabBarItemStyle } = require('cyl-tabbar-miniprogram/cyl-tab-bar/cyl_tab_bar_item_style');
 
-/**
- * [EN] Reads a JSON file of the code package (a mini program cannot require .json files).
- * [CN] 读取代码包内的 JSON 文件（小程序不能 require .json 文件）。
- */
-function cylReadJSON(path) {
-  try {
-    return JSON.parse(wx.getFileSystemManager().readFileSync(path, 'utf8'));
-  } catch (error) {
-    console.error(`cyl glass gallery: reading ${path} failed: ${error.message || error.errMsg}`);
-    return {};
-  }
-}
+const { cylReadJSON } = require('../../utils/cyl_read_json');
 
 const CYL_PANELS = [
   { identifier: 'checkin', title: 'Check-in', symbol: 'house' },

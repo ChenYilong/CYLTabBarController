@@ -1,0 +1,26 @@
+<!-- [EN] A feed post of the Liquid Glass gallery: the whole text, like, comments. [CN] 液态玻璃画廊的动态帖子：全文、点赞、评论。 -->
+<view class="cyl-page">
+  <view class="cyl-section">
+    <view class="cyl-post-header" aria-label="{{post.author}}, {{post.time}}, {{post.tag}}">
+      <text class="cyl-post-avatar" aria-hidden="true">{{post.avatar}}</text>
+      <view class="cyl-post-meta" aria-hidden="true"><text class="cyl-post-author">{{post.author}}</text><text class="cyl-post-time">{{post.time}} · {{post.tag}}</text></view>
+    </view>
+    <view class="cyl-row cyl-post-body" aria-label="{{post.title}}. {{post.preview}}">
+      <text class="cyl-post-title" aria-hidden="true">{{post.title}}</text>
+      <text aria-hidden="true">{{post.preview}}</text>
+    </view>
+    <view class="cyl-post-actions">
+      <view id="cyl-post-like" class="cyl-post-action {{liked ? 'cyl-post-liked' : ''}}" bindtap="cyl_like" aria-role="button" aria-selected="{{liked}}" aria-label="{{texts['Like']}}, {{likes}}"><text aria-hidden="true">{{liked ? '♥' : '♡'}} {{likes}}</text></view>
+      <view class="cyl-post-action" bindtap="cyl_share" aria-role="button" aria-label="{{texts['Copy link']}}"><text aria-hidden="true">🔗 {{texts['Copy link']}}</text></view>
+    </view>
+  </view>
+
+  <text class="cyl-section-title" aria-role="heading">{{texts['Comments']}} ({{comments.length}})</text>
+  <view class="cyl-section">
+    <view wx:for="{{comments}}" wx:key="id" class="cyl-row" aria-label="{{item.author}}: {{item.text}}"><text aria-hidden="true"><text class="cyl-post-author">{{item.author}}</text>  {{item.text}}</text></view>
+    <view class="cyl-row">
+      <input id="cyl-post-input" class="cyl-post-input" value="{{draft}}" placeholder="{{texts['Write a comment']}}" confirm-type="send" bindinput="cyl_draft" bindconfirm="cyl_send" aria-label="{{texts['Write a comment']}}" />
+      <view class="cyl-post-send" bindtap="cyl_send" aria-role="button" aria-label="{{texts['Send']}}"><text aria-hidden="true">{{texts['Send']}}</text></view>
+    </view>
+  </view>
+</view>
