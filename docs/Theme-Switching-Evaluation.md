@@ -193,7 +193,7 @@
 | 接缝：面向接口 / Seam: interfaces | 55 | 92 | 三个可选协议方法（service 两个、播放器一个、风格来源一个）把主题接到动画 / four optional protocol methods (two on the service, one on the player, one on the style source) join theming to animation |
 | 接缝：依赖反转 / Seam: dependency inversion | 60 | 88 | `traitCollectionDidChange:` 仍直接调用两个单例 / `traitCollectionDidChange:` still calls the two singletons |
 | 接缝：健壮性 / Seam: robustness | 70 | 90 | 无动画库时打印 `🔴[CYL #216]` 日志 / `🔴[CYL #216]` logged without a library |
-| 接缝：解耦 / Seam: decoupling | 75 | 92 | 主题侧在 `CYLTabBarController+CYLTheme.m`，动画侧在引擎；`cyl_updateLoopingLottieViews` 属于 Core 的 Lottie 循环播放，不属于主题，留在原处 / theme side in `CYLTabBarController+CYLTheme.m`, animation side in the engine; `cyl_updateLoopingLottieViews` is Core's Lottie looping, not theming, and stays |
+| 接缝：解耦 / Seam: decoupling | 75 | 92 | 主题侧在 `CYLTabBarController+CYLTheme.swift`，动画侧在引擎；`cyl_updateLoopingLottieViews` 属于 Core 的 Lottie 循环播放，不属于主题，留在原处 / theme side in `CYLTabBarController+CYLTheme.swift`, animation side in the engine; `cyl_updateLoopingLottieViews` is Core's Lottie looping, not theming, and stays |
 | 测试 / Tests | 90 | 94 | `CYLThemeAnimationTests`（3 个）：颜色注册、原地替换文件、注入管理器；没有带真实动画视图的测试 / `CYLThemeAnimationTests` (3): color registration, in-place file swap, injected manager; no test with a real animation view |
 | **与动画组件的集成 / Integration with animation** | **72** | **93** | |
 

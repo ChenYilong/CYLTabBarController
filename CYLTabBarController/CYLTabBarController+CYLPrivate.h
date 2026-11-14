@@ -61,6 +61,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)cyl_applyConfigurationThemes:(NSDictionary<NSString *, id> *)normalizedConfiguration;
 /// [EN] Once, when first shown: the theme chosen at launch. [CN] 首次显示时执行一次：应用启动时选择的主题。
 - (void)cyl_applyLaunchTabBarThemeIfNeeded;
+/// [EN] The tab bar's part of the theme callback, implemented in Swift (CYLTabBarController+CYLTheme.swift). [CN] 主题回调中 TabBar 的部分，由 Swift 实现（CYLTabBarController+CYLTheme.swift）。
+- (void)cyl_tabBarThemeDidChangeByManager:(nullable CYLThemeManager *)manager theme:(nullable NSObject *)theme;
 /// [EN] Implemented in the main implementation (tabBar.standardAppearance). [CN] 实现于主 implementation（tabBar.standardAppearance）。
 - (void)cyl_syncTabBarAppearances;
 /// [EN] The icon view providers by view controller (theme icons use them). [CN] 按子控制器保存的图标视图 provider（主题图标会使用）。

@@ -1268,6 +1268,19 @@ static const void *const CYLPlusButtonGlassLayoutRetryPendingKey = &CYLPlusButto
     }
 }
 
+/*!
+ * FIX: issue #216
+ * [EN] The theme callback of every view controller. The override stays here, in Objective-C: a public Swift override of it would put an
+ *      extension of this class into the generated Swift header, before the class. The work is `-cyl_tabBarThemeDidChangeByManager:theme:`
+ *      (CYLTabBarController+CYLTheme.swift).
+ * [CN] 每个控制器的主题回调。重写保留在这里（Objective-C）：public 的 Swift 重写会让生成的 Swift 头文件在该类之前出现它的 extension。实际工作在
+ *      `-cyl_tabBarThemeDidChangeByManager:theme:`（CYLTabBarController+CYLTheme.swift）。
+ */
+- (void)cyl_themeDidChangeByManager:(CYLThemeManager *)manager identifier:(nullable __kindof NSObject<NSCopying> *)identifier theme:(nullable __kindof NSObject *)theme {
+    [super cyl_themeDidChangeByManager:manager identifier:identifier theme:theme];
+    [self cyl_tabBarThemeDidChangeByManager:manager theme:theme];
+}
+
 - (void)viewDidLayoutSubviews {
     [super viewDidLayoutSubviews];
     // [EN] Lottie views are added during layout: start the looping ones (`CYLTabBarLottieLoopsWhenUnselected`).
