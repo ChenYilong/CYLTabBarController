@@ -7,7 +7,9 @@
     "pages/me/index",
     "pages/lottie/index",
     "pages/item/index",
-    "pages/glass/index"
+    "pages/glass/index",
+    "pages/demo/index",
+    "pages/post/index"
   ],
   "window": {
     "navigationBarTitleText": "CYLTabBarController",

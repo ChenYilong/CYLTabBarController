@@ -61,6 +61,7 @@ Component({
           return;
         }
         tabBar.cyl_setThemeIdentifier(state.themeIdentifier);
+        tabBar.cyl_setTabBarHidden(Boolean(state.tabBarHidden));
         Object.keys(state.badges).forEach((identifier) => {
           const value = state.badges[identifier];
           if (value === '' || value === null || value === undefined) {
@@ -116,15 +117,25 @@ Component({
       }
     },
 
+    // [EN] The Home row "Tab tap sound and haptics": a short vibration on every tab tap. [CN] 首页「Tab 点击音效与振动」行：每次点击 Tab 短振动。
+    cyl_tapFeedback() {
+      if (getApp().globalData.cylTabBarState.tapFeedback) {
+        wx.vibrateShort({ type: 'light' });
+      }
+    },
+
     cyl_onSelect(event) {
+      this.cyl_tapFeedback();
       wx.switchTab({ url: `/${cylPagePath(event.detail.pageIdentifier)}` });
     },
 
     cyl_onReselect() {
+      this.cyl_tapFeedback();
       wx.pageScrollTo({ scrollTop: 0, duration: 200 });
     },
 
     cyl_onPlusTap() {
+      this.cyl_tapFeedback();
       wx.showToast({ title: t('Post'), icon: 'none' });
     },
 

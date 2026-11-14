@@ -118,3 +118,4 @@
 .cyl-glass-items { display: flex; justify-content: space-around; }
 .cyl-glass-item-cell { width: 90px; height: 60px; }
 .cyl-glass-item { display: block; width: 100%; height: 100%; }
+.cyl-glass-pressed { opacity: 0.8; transform: scale(0.98); }

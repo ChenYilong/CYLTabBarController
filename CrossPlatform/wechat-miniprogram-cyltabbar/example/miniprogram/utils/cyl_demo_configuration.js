@@ -181,13 +181,20 @@ function cylDemoConfiguration(overrides) {
   if (options.cylDemoBoldTitles) {
     styledItems = items.map((attributes) => Object.assign({}, attributes, { CYLTabBarItemSelectedTitleFont: 'bold:11' }));
   }
+  // [EN] Per-tab attributes the Home rows change at run time (titles, icons, offsets, colors), by identifier.
+  // [CN] 首页各行在运行时修改的单个 Tab 属性（标题、图标、偏移、颜色），按标识符。
+  const itemAttributes = options.cylDemoItemAttributes || {};
+  const changedItems = styledItems.map((attributes) => Object.assign({}, attributes,
+    itemAttributes['*'], itemAttributes[attributes.CYLTabBarItemIdentifier]));
   const configurationOverrides = Object.assign({}, options);
   delete configurationOverrides.cylDemoLottie;
   delete configurationOverrides.cylDemoIcons;
   delete configurationOverrides.cylDemoBoldTitles;
+  delete configurationOverrides.cylDemoItemAttributes;
+  delete configurationOverrides.cylDemoPlusAttributes;
   return Object.assign({}, cylSharedConfiguration, {
-    CYLTabBarControllerTabBarItemsAttributes: styledItems,
-    CYLTabBarControllerPlusButton: CYL_DEMO_PLUS_BUTTON,
+    CYLTabBarControllerTabBarItemsAttributes: changedItems,
+    CYLTabBarControllerPlusButton: Object.assign({}, CYL_DEMO_PLUS_BUTTON, options.cylDemoPlusAttributes),
     CYLTabBarControllerThemes: Object.assign({}, cylSharedConfiguration.CYLTabBarControllerThemes, {
       dark: Object.assign({}, cylSharedConfiguration.CYLTabBarControllerThemes.dark, CYL_DEMO_DARK_ICON_COLORS),
       christmas: CYL_DEMO_CHRISTMAS_THEME,

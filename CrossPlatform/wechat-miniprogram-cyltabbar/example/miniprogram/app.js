@@ -21,6 +21,11 @@ App({
       animationLoop: false,
       // [EN] Tabs left out of every bar (cyl-tab-bar hiddenIdentifiers), e.g. by user role. [CN] 所有 TabBar 都不显示的 Tab（cyl-tab-bar 的 hiddenIdentifiers），例如按用户角色。
       hiddenIdentifiers: [],
+      // [EN] Home rows: every bar hidden, the bar hidden while the page scrolls down, haptics on taps.
+      // [CN] 首页各行：隐藏所有 TabBar、页面向下滚动时隐藏 TabBar、点击时振动。
+      tabBarHidden: false,
+      hidesOnScroll: false,
+      tapFeedback: false,
     },
   },
 

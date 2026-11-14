@@ -24,6 +24,7 @@ import UIKit
     @objc(cyl_tabButtonsOfViewController:) func cylTabButtons(of viewController: UIViewController) -> [UIControl]
     @objc(cyl_contextPlusButton) func cylContextPlusButton() -> CYLPlusButton?
     @objc(cyl_contextPlusChildViewController) func cylContextPlusChildViewController() -> UIViewController?
+    @objc(cyl_reportedControlForControl:) func cylReportedControl(for control: UIControl?) -> UIControl?
 }
 
 /**
@@ -42,6 +43,7 @@ import UIKit
     @objc(cyl_drawsTitleOverBackgroundImage) func cylDrawsTitleOverBackgroundImage() -> Bool
     @objc(cyl_removeImage) func cylRemoveImage()
     @objc(cyl_setBackgroundImageDidChangeHandler:) func cylSetBackgroundImageDidChangeHandler(_ handler: @escaping () -> Void)
+    @objc(cyl_setLiquidGlassLensMaskSuspended:) func cylSetLiquidGlassLensMaskSuspended(_ suspended: Bool)
 }
 
 extension CYLTabBarController {

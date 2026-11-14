@@ -63,13 +63,6 @@ extension CYLTabBarController {
         }
     }
 
-    private func cylPrivateBool(_ name: String) -> Bool {
-        let selector = NSSelectorFromString(name)
-        guard responds(to: selector), let implementation = method(for: selector) else { return false }
-        typealias Function = @convention(c) (AnyObject, Selector) -> Bool
-        return unsafeBitCast(implementation, to: Function.self)(self, selector)
-    }
-
     private var cyl_gestureSettings: CYLTabBarItemGestureSettings {
         if let settings = objc_getAssociatedObject(self, CYLTabBarItemGestureKeys.settings) as? CYLTabBarItemGestureSettings {
             return settings
@@ -255,7 +248,7 @@ extension CYLTabBarController {
         //      knows whether the press was a tap, a long press or a drag. The plus child view controller is still counted here.
         // [CN] 液态玻璃：Tab 的点击在系统手势结束时计数（`-cyl_recognizeLiquidGlassTapOnControl:…`），那里知道这次是点击、长按还是拖动。PlusButton
         //      子控制器仍在这里计数。
-        if !control.cyl_isPlusButton() && cylPrivateBool("cyl_liquidGlassTakesTabTaps") { return }
+        if !control.cyl_isPlusButton() && cylLiquidGlassTakesTabTaps() { return }
         let state = gestureState
         let isFirstTapFromHere = !state.receivesTabTapsBeforeSelection
         state.receivesTabTapsBeforeSelection = true
@@ -335,6 +328,6 @@ extension CYLTabBarController {
         // [EN] Remember what is selected before the first tap. [CN] 记录第一次点击之前选中的控制器。
         _ = gestureState
         // [EN] The long press recognizer is shared with issue #535 (`CYLTabBarController+CYLInteraction.m`). [CN] 长按手势与 issue #535 共用。
-        cylPrivateVoid("cyl_installInteractionGestureRecognizersIfNeeded", nil)
+        cylInstallInteractionGestureRecognizersIfNeeded()
     }
 }

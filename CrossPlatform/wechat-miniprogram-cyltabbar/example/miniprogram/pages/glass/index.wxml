@@ -38,12 +38,12 @@
         </view>
       </view>
       <view class="cyl-glass-stats">
-        <view class="cyl-glass-card cyl-glass-stat" aria-label="{{texts['This week']}}, {{checkin.stats.week}}"><text class="cyl-glass-stat-number" aria-hidden="true">{{checkin.stats.week}}</text><text class="cyl-glass-stat-label" aria-hidden="true">{{texts['This week']}}</text></view>
-        <view class="cyl-glass-card cyl-glass-stat" aria-label="{{texts['Total']}}, {{checkin.stats.total}}"><text class="cyl-glass-stat-number" aria-hidden="true">{{checkin.stats.total}}</text><text class="cyl-glass-stat-label" aria-hidden="true">{{texts['Total']}}</text></view>
-        <view class="cyl-glass-card cyl-glass-stat" aria-label="{{texts['Streak']}}, {{checkin.stats.streak}}"><text class="cyl-glass-stat-number" aria-hidden="true">{{checkin.stats.streak}}</text><text class="cyl-glass-stat-label" aria-hidden="true">{{texts['Streak']}}</text></view>
+        <view class="cyl-glass-card cyl-glass-stat" bindtap="cyl_showStat" data-key="week" aria-role="button" aria-label="{{texts['This week']}}, {{checkin.stats.week}}"><text class="cyl-glass-stat-number" aria-hidden="true">{{checkin.stats.week}}</text><text class="cyl-glass-stat-label" aria-hidden="true">{{texts['This week']}}</text></view>
+        <view class="cyl-glass-card cyl-glass-stat" bindtap="cyl_showStat" data-key="total" aria-role="button" aria-label="{{texts['Total']}}, {{checkin.stats.total}}"><text class="cyl-glass-stat-number" aria-hidden="true">{{checkin.stats.total}}</text><text class="cyl-glass-stat-label" aria-hidden="true">{{texts['Total']}}</text></view>
+        <view class="cyl-glass-card cyl-glass-stat" bindtap="cyl_showStat" data-key="streak" aria-role="button" aria-label="{{texts['Streak']}}, {{checkin.stats.streak}}"><text class="cyl-glass-stat-number" aria-hidden="true">{{checkin.stats.streak}}</text><text class="cyl-glass-stat-label" aria-hidden="true">{{texts['Streak']}}</text></view>
       </view>
       <view class="cyl-glass-card cyl-glass-week">
-        <view wx:for="{{checkin.week}}" wx:key="day" class="cyl-glass-day" aria-label="{{item.day}}, {{item.done ? texts['Done'] : texts['Rest']}}">
+        <view wx:for="{{checkin.week}}" wx:key="day" class="cyl-glass-day" bindtap="cyl_toggleDay" data-index="{{index}}" aria-role="button" aria-label="{{item.day}}, {{item.done ? texts['Done'] : texts['Rest']}}">
           <view class="cyl-glass-day-dot {{item.done ? 'cyl-glass-day-done' : ''}}" aria-hidden="true"></view>
           <text class="cyl-glass-day-name" aria-hidden="true">{{item.day}}</text>
         </view>
@@ -56,7 +56,7 @@
         <view wx:for="{{tags}}" wx:key="*this" class="cyl-glass-pill {{tag === item ? 'cyl-glass-pill-selected' : ''}}" bindtap="cyl_selectTag" data-tag="{{item}}" aria-role="button" aria-selected="{{tag === item}}" aria-label="{{item}}"><text aria-hidden="true">{{item}}</text></view>
       </scroll-view>
       <view wx:if="{{!posts.length}}" class="cyl-glass-card cyl-glass-empty" aria-label="{{texts['No posts']}}"><text aria-hidden="true">📝 {{texts['No posts']}}</text></view>
-      <view wx:for="{{posts}}" wx:key="id" class="cyl-glass-card cyl-glass-post cyl-glass-slide-up" style="animation-delay: {{index * 60}}ms;" aria-label="{{item.title}}, {{item.author}}, {{item.time}}, {{item.likes}} {{texts['likes']}}">
+      <view wx:for="{{posts}}" wx:key="id" class="cyl-glass-card cyl-glass-post cyl-glass-slide-up" style="animation-delay: {{index * 60}}ms;" hover-class="cyl-glass-pressed" bindtap="cyl_openPost" data-id="{{item.id}}" aria-role="button" aria-label="{{item.title}}, {{item.author}}, {{item.time}}, {{item.likes}} {{texts['likes']}}">
         <view class="cyl-glass-post-header" aria-hidden="true">
           <text class="cyl-glass-avatar">{{item.avatar}}</text>
           <view class="cyl-glass-post-meta"><text class="cyl-glass-post-author">{{item.author}}</text><text class="cyl-glass-post-time">{{item.time}}</text></view>
@@ -95,8 +95,8 @@
       </view>
       <text class="cyl-glass-section-title" aria-role="heading">{{texts['Item styles']}}</text>
       <view class="cyl-glass-card cyl-glass-items">
-        <view class="cyl-glass-item-cell" aria-label="flat"><cyl-tab-bar-item class="cyl-glass-item" title="flat" image="/shared/skins/2.1.0/light/discover@3x.png" selected-image="/shared/skins/2.1.0/light/discover_selected@3x.png" selected="{{true}}" item-style="flat" /></view>
-        <view class="cyl-glass-item-cell" aria-label="liquidGlass"><cyl-tab-bar-item class="cyl-glass-item" title="liquidGlass" image="/shared/skins/2.1.0/light/discover@3x.png" selected-image="/shared/skins/2.1.0/light/discover_selected@3x.png" selected="{{true}}" item-style="liquidGlass" /></view>
+        <view class="cyl-glass-item-cell" bindtap="cyl_setItemStyle" data-style="flat" aria-role="button" aria-selected="{{itemStyle === 'flat'}}" aria-label="flat"><cyl-tab-bar-item class="cyl-glass-item" title="flat" image="/shared/skins/2.1.0/light/discover@3x.png" selected-image="/shared/skins/2.1.0/light/discover_selected@3x.png" selected="{{true}}" item-style="flat" /></view>
+        <view class="cyl-glass-item-cell" bindtap="cyl_setItemStyle" data-style="liquidGlass" aria-role="button" aria-selected="{{itemStyle === 'liquidGlass'}}" aria-label="liquidGlass"><cyl-tab-bar-item class="cyl-glass-item" title="liquidGlass" image="/shared/skins/2.1.0/light/discover@3x.png" selected-image="/shared/skins/2.1.0/light/discover_selected@3x.png" selected="{{true}}" item-style="liquidGlass" /></view>
       </view>
     </view>
   </scroll-view>

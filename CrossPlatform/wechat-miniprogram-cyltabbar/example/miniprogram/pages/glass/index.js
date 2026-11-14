@@ -170,6 +170,30 @@ Page({
     });
   },
 
+  // [EN] A feed post: its page (pages/post). [CN] 动态帖子：打开其详情页（pages/post）。
+  cyl_openPost(event) {
+    wx.navigateTo({ url: `/pages/post/index?id=${event.currentTarget.dataset.id}` });
+  },
+
+  // [EN] A stat card: what it counts. [CN] 统计卡片：显示其统计内容。
+  cyl_showStat(event) {
+    const key = event.currentTarget.dataset.key;
+    const done = this.data.checkin.week.filter((day) => day.done).length;
+    const texts = { week: `${t('This week')}: ${done} / 7`, total: `${t('Total')}: ${this.data.checkin.stats.total}`, streak: `${t('Streak')}: ${this.data.checkin.stats.streak}` };
+    wx.showToast({ title: texts[key], icon: 'none' });
+  },
+
+  // [EN] A day of the week: done or rest; the weekly stat follows. [CN] 一周中的某天：完成或休息；本周统计随之变化。
+  cyl_toggleDay(event) {
+    const index = event.currentTarget.dataset.index;
+    const week = this.data.checkin.week.map((day, position) => (position === index ? Object.assign({}, day, { done: !day.done }) : day));
+    this.setData({ 'checkin.week': week, 'checkin.stats.week': week.filter((day) => day.done).length });
+  },
+
+  cyl_setItemStyle(event) {
+    this.setData({ itemStyle: event.currentTarget.dataset.style });
+  },
+
   cyl_toggleItemStyle() {
     this.setData({
       itemStyle: this.data.itemStyle === CYLTabBarItemStyle.liquidGlass ? CYLTabBarItemStyle.flat : CYLTabBarItemStyle.liquidGlass,
