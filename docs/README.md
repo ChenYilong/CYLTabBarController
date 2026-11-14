@@ -426,6 +426,7 @@ docs/
 │   ├── wechat-miniprogram-api-50-milestone-regular.png
 │   ├── wechat-miniprogram-api-50-milestone-skeuomorphic.png
 │   ├── wechat-miniprogram-badges.png
+│   ├── wechat-miniprogram-cell-taps-devtools-sdk3.17.6-e00babf.png
 │   ├── wechat-miniprogram-christmas-glass.png
 │   ├── wechat-miniprogram-flat-login.png
 │   ├── wechat-miniprogram-home.png
