@@ -30,7 +30,11 @@ for (const name of names) {
     process.exit(2);
   }
   console.log(`\n=== UI tests with ${name} icons ===`);
-  const setup = cylRun('node', ['scripts/cyl_setup.js', `--animation=${name}`]);
+  let setup = cylRun('node', ['scripts/cyl_setup.js', `--animation=${name}`]);
+  if (setup === 0) {
+    // [EN] The code package of this library must fit the 2 MB WeChat allows. [CN] 该库的代码包必须不超过微信允许的 2 MB。
+    setup = cylRun('node', ['scripts/cyl_check_package_size.js', '--check']);
+  }
   // [EN] `cli auto` makes DevTools load the files just installed, and opens the automation port the tests connect to.
   // [CN] `cli auto` 让开发者工具加载刚安装的文件，并打开测试所连接的自动化端口。
   const reload = setup === 0 ? cylRun(CYL_CLI, ['auto', '--project', CYL_ROOT, '--auto-port', CYL_PORT]) : setup;
