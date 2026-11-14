@@ -17,7 +17,7 @@
       </view>
     </view>
     <view wx:if="{{section.badges}}" class="cyl-section">
-      <view wx:for="{{section.badges}}" wx:for-item="badge" wx:key="key" class="cyl-home-row" aria-label="{{badge.title}}, {{badge.text || '•'}}">
+      <view wx:for="{{section.badges}}" wx:for-item="badge" wx:key="key" class="cyl-home-row" hover-class="cyl-home-row-pressed" bindtap="cyl_onBadge" data-index="{{badge.key}}" aria-role="button" aria-label="{{badge.title}}, {{badge.text || '•'}}">
         <text class="cyl-home-title cyl-home-badge-title" aria-hidden="true">{{badge.title}}</text>
         <view class="cyl-home-badge-host" aria-hidden="true">
           <view class="cyl-home-badge cyl-home-badge-{{badge.position}} {{badge.dot ? 'cyl-home-badge-dot' : ''}} {{badge.animation ? 'cyl-home-badge-' + badge.animation : ''}}" style="{{badge.style}}">{{badge.dot ? '' : badge.text}}</view>

@@ -13,6 +13,7 @@ const cylTabPage = require('../../utils/cyl_tab_page');
 const { cylLanguage } = require('../../utils/cyl_demo_localization');
 const { cylDemoConfiguration } = require('../../utils/cyl_demo_configuration');
 const cylDemoList = require('../../shared/demo_list');
+const { cylHomeAction } = require('../../utils/cyl_home_actions');
 
 // [EN] The tap animations the mini program has, in the order the row cycles through them. [CN] 小程序支持的点击动画，按本行切换的顺序。
 const CYL_TAP_ANIMATIONS = ['none', 'bounce', 'rotation', 'scale'];
@@ -209,7 +210,60 @@ Component({
       if (actions[id]) {
         actions[id]();
       } else {
-        wx.showToast({ title: this.t('Only in the iOS example'), icon: 'none' });
+        cylHomeAction(id)(this.cyl_actionContext(id));
+      }
+    },
+
+    /**
+     * [EN] What the actions of utils/cyl_home_actions.js may use.
+     * [CN] utils/cyl_home_actions.js 中各行为可以使用的接口。
+     */
+    cyl_actionContext(id) {
+      const app = getApp();
+      const row = this.data.sections.reduce((found, section) => found
+        || (section.rows || []).find((candidate) => candidate.id === id), null) || { title: id, subtitle: '' };
+      return {
+        state: () => app.globalData.cylTabBarState,
+        overrides: () => app.globalData.cylTabBarState.overrides || {},
+        configuration: () => cylDemoConfiguration(app.globalData.cylTabBarState.overrides),
+        update: (change) => this.cyl_update(change),
+        override: (change) => this.cyl_override(change),
+        tabBar: () => this.cyl_tabBar(),
+        toast: (title) => wx.showToast({ title, icon: 'none' }),
+        open: (caseId) => wx.navigateTo({
+          url: `/pages/demo/index?id=${encodeURIComponent(caseId)}&title=${encodeURIComponent(row.title)}&subtitle=${encodeURIComponent(row.subtitle || '')}`,
+        }),
+      };
+    },
+
+    /**
+     * [EN] A badge row: shows its sample badge on the Discover tab (tap again to remove it).
+     * [CN] 角标行：在「发现」Tab 上显示该示例角标（再次点击移除）。
+     */
+    cyl_onBadge(event) {
+      const sample = cylDemoList.badgeSamples[event.currentTarget.dataset.index];
+      const badges = Object.assign({}, getApp().globalData.cylTabBarState.badges);
+      const value = sample.value ? this.cyl_badgeText(sample) : '•';
+      badges.discover = badges.discover === value ? '' : value;
+      this.cyl_update({ badges });
+      wx.showToast({ title: badges.discover ? `${this.t('Discover')}: ${value}` : this.t('Remove badges'), icon: 'none' });
+    },
+
+    /**
+     * [EN] The Home row "Minimize / hide the TabBar on scroll": down hides the bar, up shows it.
+     * [CN] 首页「滚动时隐藏 TabBar」行：向下滚动隐藏，向上显示。
+     */
+    onPageScroll(event) {
+      const state = getApp().globalData.cylTabBarState;
+      const top = event.scrollTop;
+      const last = this.cylLastScrollTop || 0;
+      this.cylLastScrollTop = top;
+      if (!state.hidesOnScroll || Math.abs(top - last) < 8) {
+        return;
+      }
+      const hidden = top > last && top > 60;
+      if (hidden !== Boolean(state.tabBarHidden)) {
+        this.cyl_update({ tabBarHidden: hidden });
       }
     },
 
