@@ -7,7 +7,6 @@
 
 #import <UIKit/UIKit.h>
 
-NS_ASSUME_NONNULL_BEGIN
 
 /*!
  * [EN] The string constants of this header are macros for Objective-C and Swift constants for Swift
@@ -38,43 +37,13 @@ NS_ASSUME_NONNULL_BEGIN
  *      （`+[CYLTabBarController loadTabBarControllerWithConfigurationURL:completion:]`）。生成的 TabBarController 全屏展示，每个页面显示其来源文件，
  *      并带有关闭按钮。
  */
-@interface UIViewController (CYLConfigurationDemo)
 
 /*!
- * [EN] The sample configuration files in the library's resource bundle, sorted by name. [CN] 本库资源包中的示例配置文件，按名称排序。
+ * [EN] `UIViewController (CYLConfigurationDemo)` and `UIViewController (CYLConfigurationEdgeCases)` are implemented in Swift
+ *      (`Swift/UIViewController+CYLConfigurationDemo.swift`, every selector kept) and declared by the generated Swift interface
+ *      (`CYLSwiftInterface.h`), imported below (docs/Swift-Migration.md, step 31).
+ * [CN] `UIViewController (CYLConfigurationDemo)` 与 `UIViewController (CYLConfigurationEdgeCases)` 在 Swift 中实现
+ *      （`Swift/UIViewController+CYLConfigurationDemo.swift`，所有 selector 不变），由下面导入的 Swift 生成接口（`CYLSwiftInterface.h`）声明
+ *      （docs/Swift-Migration.md，第 31 步）。
  */
-+ (NSArray<NSString *> *)cyl_sampleConfigurationFilePaths;
-
-/*!
- * [EN] The cell of the demo row. [CN] 演示行的 cell。
- */
-- (UITableViewCell *)cyl_configurationDemoCellForTableView:(UITableView *)tableView;
-
-/*!
- * [EN] Shows the choice of files (and the URL), then presents the tab bar controller created from it.
- * [CN] 显示文件（及 URL）选择，然后展示由其生成的 TabBarController。
- */
-- (void)cyl_presentConfigurationDemo;
-
-@end
-
-@interface UIViewController (CYLConfigurationEdgeCases)
-
-/*!
- * [EN] The "simulated failures" rows: each one feeds a broken, hostile or unusual configuration (a file, data, a URL, a
- *      background thread...) to the real API and shows what happens: an error, or a tab bar controller created safely
- *      (open it with "View"). Each row is named after its case in docs/Configuration-File.md ("Edge cases and score").
- * [CN] “模拟意外情况”的若干行：每行把损坏、恶意或特殊的配置（文件、数据、URL、后台线程等）交给真实的 API，并显示结果：错误，或安全创建的
- *      TabBarController（点击“查看”打开）。每行以 docs/Configuration-File.md（“边界情况与评分”）中对应情况的编号命名。
- */
-- (NSInteger)cyl_configurationEdgeCaseRowCount;
-/*!
- * [EN] The localized title of the section. [CN] 该分组的本地化标题。
- */
-+ (NSString *)cyl_configurationEdgeCaseSectionTitle;
-- (UITableViewCell *)cyl_configurationEdgeCaseCellForTableView:(UITableView *)tableView row:(NSInteger)row;
-- (void)cyl_runConfigurationEdgeCaseAtRow:(NSInteger)row;
-
-@end
-
-NS_ASSUME_NONNULL_END
+#import "CYLSwiftInterface.h"
