@@ -53,6 +53,7 @@
 		31DEB73852588F8C55C5F983 /* CYLSwiftInterface.h in Headers */ = {isa = PBXBuildFile; fileRef = 9D9BF13BE18CD84E0B255B2D /* CYLSwiftInterface.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3491203CB996FE9713798B45 /* CYLThemeManager.h in Headers */ = {isa = PBXBuildFile; fileRef = FEAE77FC4A017D57E648057E /* CYLThemeManager.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		38EDE574C7DF0542DFB03DE0 /* CYLRiveTabBarItemAnimator.h in Headers */ = {isa = PBXBuildFile; fileRef = 6BA1748DE6F62127B09636D1 /* CYLRiveTabBarItemAnimator.h */; };
+		3A6886DE5DA1CB74EEDEAF8F /* CYLTabBarController+CYLConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB6BD0FD57B804E4F015A608 /* CYLTabBarController+CYLConfiguration.swift */; };
 		3AA9A8C1CFFED294DB877EAF /* CYLGalleryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A93305C6DEB3D45BD52B623 /* CYLGalleryViewController.swift */; };
 		3B770A55BFB0F5C54FB470F9 /* UIView+CYLTabBarControllerExtention.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9C988DED462DAAC2ABC7811 /* UIView+CYLTabBarControllerExtention.swift */; };
 		3E5F7488174426E3E897E98D /* CYLFlatDesignTabBarButton.h in Headers */ = {isa = PBXBuildFile; fileRef = 46818C00AA5DC8A0452B9DCA /* CYLFlatDesignTabBarButton.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -560,6 +561,7 @@
 		E39F55A213575AA1887779F6 /* CYLTabBarItemAnimator.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CYLTabBarItemAnimator.h; sourceTree = "<group>"; };
 		E3BF1CFC1E8C4A9BEFBBD0CD /* UIImage+CYLUtils.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "UIImage+CYLUtils.swift"; sourceTree = "<group>"; };
 		EB2FC614BF198DF7F9A1E7D0 /* CYLTabBarController+CYLTabBarItemGesture.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "CYLTabBarController+CYLTabBarItemGesture.swift"; sourceTree = "<group>"; };
+		EB6BD0FD57B804E4F015A608 /* CYLTabBarController+CYLConfiguration.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "CYLTabBarController+CYLConfiguration.swift"; sourceTree = "<group>"; };
 		ECD54DD212D88AFAA6C50623 /* CYLRiveTabBarItemAnimator.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = CYLRiveTabBarItemAnimator.m; sourceTree = "<group>"; };
 		ED052EF3AA1764D2AF02D016 /* CYLGalleryModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CYLGalleryModel.swift; path = Example/Classes/Gallery/CYLGalleryModel.swift; sourceTree = SOURCE_ROOT; };
 		ED11D4C15C040CE2FF02C084 /* UIImage+CYLTheme.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "UIImage+CYLTheme.h"; sourceTree = "<group>"; };
@@ -787,6 +789,7 @@
 				516D49CCD43D97EDA829A6E9 /* CYLTabBar+CYLTabBarControllerExtention.swift */,
 				28437B67FAED7CC857EA2B10 /* CYLTabBarController+CYLInteraction.swift */,
 				FF128D8055C6E884727ED5E9 /* CYLTabBarController+CYLTabBarMinimize.swift */,
+				EB6BD0FD57B804E4F015A608 /* CYLTabBarController+CYLConfiguration.swift */,
 			);
 			name = Swift;
 			path = Swift;
@@ -1709,6 +1712,7 @@
 				56437D27CF2472E4733680DA /* CYLTabBar+CYLTabBarControllerExtention.swift in Sources */,
 				94E113902D925FF63269743B /* CYLTabBarController+CYLInteraction.swift in Sources */,
 				7A11077D8D7DB2293F16D3FE /* CYLTabBarController+CYLTabBarMinimize.swift in Sources */,
+				3A6886DE5DA1CB74EEDEAF8F /* CYLTabBarController+CYLConfiguration.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

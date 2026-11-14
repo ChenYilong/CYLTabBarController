@@ -178,4 +178,18 @@ FOUNDATION_EXTERN BOOL CYLControlIsSelectionLocked(UIControl *_Nullable control)
 FOUNDATION_EXTERN void CYLControlSetSelectionLocked(UIControl *_Nullable control, BOOL locked);
 FOUNDATION_EXTERN BOOL CYLControlReportsTaps(UIControl *_Nullable control);
 
+/// [EN] Implemented in Swift (Swift/CYLTabBarController+CYLConfiguration.swift, step 44), for CYLTabBarController+CYLConfiguration.m.
+/// [CN] 由 Swift 实现（Swift/CYLTabBarController+CYLConfiguration.swift，第 44 步），供 CYLTabBarController+CYLConfiguration.m 使用。
+@interface CYLTabBarController (CYLConfigurationPrivate)
++ (nullable UIColor *)cyl_configurationColorValue:(nullable id)value;
++ (nullable UIFont *)cyl_configurationFontValue:(nullable id)value;
++ (nullable id)cyl_configurationImageValue:(nullable id)value;
++ (nullable NSString *)cyl_configurationStringValue:(nullable id)value;
++ (NSDictionary<NSString *, id> *)cyl_normalizedItemAttributes:(NSDictionary *)attributes;
++ (void)cyl_logInvalidConfigurationValue:(nullable id)value forKey:(NSString *)key;
++ (nullable NSError *)cyl_configurationPagesErrorForTabBarController:(nullable UITabBarController *)tabBarController;
++ (NSError *)cyl_configurationMainThreadError;
++ (nullable NSString *)cyl_pathOfConfigurationRoute:(nullable id)route error:(NSError *_Nullable *_Nullable)error;
+@end
+
 NS_ASSUME_NONNULL_END
