@@ -163,12 +163,15 @@ test('the playback controls reach the bar: speed, loop, Play all', async () => {
       setTimeout(() => resolve({
         speed: bar.data.animationSpeed,
         loop: bar.data.animationLoop,
-        // [EN] Playing icons show their canvas, not the still image. [CN] 播放中的图标显示画布，而不是静态图片。
-        snapshots: bar.selectAllComponents('.cyl-tab-item').map((item) => Boolean(item.selectComponent('#cyl-item-animation').data.cylSnapshotShown)),
+        // [EN] DevTools: one layer, the image of the canvas, also while playing. [CN] 开发者工具：只有一个图层（画布的图片），播放时也一样。
+        snapshots: bar.selectAllComponents('.cyl-tab-item').map((item) => {
+          const view = item.selectComponent('#cyl-item-animation');
+          return Boolean(view.data.cylCovered && view.data.cylSnapshot);
+        }),
       }), 300);
     }, 0);
   }));
-  assert.deepEqual(result, { speed: 2, loop: true, snapshots: [false, false, false, false] });
+  assert.deepEqual(result, { speed: 2, loop: true, snapshots: [true, true, true, true] });
   const reset = await miniProgram.evaluate(() => {
     const pages = getCurrentPages();
     const bar = pages[pages.length - 1].getTabBar().selectComponent('#cyl-tab-bar');
@@ -208,22 +211,27 @@ test('the animated icons stay in the bar during and after a page scroll (WeChat 
     const pages = getCurrentPages();
     const bar = pages[pages.length - 1].getTabBar().selectComponent('#cyl-tab-bar');
     bar.createSelectorQuery().selectAll('.cyl-tab-item >>> .cyl-item-icon-box').boundingClientRect()
+      .select('.cyl-tab-bar').boundingClientRect()
       .exec((result) => resolve({
         windowWidth: wx.getWindowInfo().windowWidth,
         windowTop: wx.getWindowInfo().screenHeight - wx.getWindowInfo().windowHeight,
         icons: (result[0] || []).map((rect) => ({ left: rect.left, top: rect.top, width: rect.width, height: rect.height })),
+        // [EN] The whole bar: a second layer of icons anywhere in it changes it. [CN] 整个 TabBar：其中任何位置出现第二层图标都会改变它。
+        bar: result[1] && { left: result[1].left, top: result[1].top, width: result[1].width, height: result[1].height },
       }));
   }));
   assert.ok(layout.icons.length >= 4, 'icon boxes');
+  assert.ok(layout.bar, 'the bar');
+  const areas = layout.icons.map((rect, index) => ({ name: `icon ${index}`, rect })).concat([{ name: 'the bar', rect: layout.bar }]);
   const snapshots = await miniProgram.evaluate(() => {
     const pages = getCurrentPages();
     const bar = pages[pages.length - 1].getTabBar().selectComponent('#cyl-tab-bar');
     return bar.selectAllComponents('.cyl-tab-item').map((item) => {
       const view = item.selectComponent('#cyl-item-animation');
-      return Boolean(view && view.data.cylSnapshotShown);
+      return Boolean(view && view.data.cylCovered && view.data.cylSnapshot);
     });
   });
-  assert.deepEqual(snapshots, [true, true, true, true], 'idle icons show their still image');
+  assert.deepEqual(snapshots, [true, true, true, true], 'each icon is one image layer');
   const before = await miniProgram.screenshot();
   for (const top of [300, 1380]) {
     await miniProgram.pageScrollTo(top);
@@ -232,22 +240,22 @@ test('the animated icons stay in the bar during and after a page scroll (WeChat 
     if (process.env.CYL_UI_SCREENSHOTS) {
       require('node:fs').writeFileSync(path.join(process.env.CYL_UI_SCREENSHOTS, `cyl-scroll-${top}.png`), Buffer.from(after, 'base64'));
     }
-    layout.icons.forEach((rect, index) => {
+    areas.forEach(({ name, rect }) => {
       const difference = cylDifference(before, after, rect, layout.windowWidth, layout.windowTop);
-      assert.ok(difference < 0.02, `icon ${index} after a scroll to ${top}: ${(difference * 100).toFixed(1)}% of its pixels changed`);
+      assert.ok(difference < 0.02, `${name} after a scroll to ${top}: ${(difference * 100).toFixed(1)}% of its pixels changed`);
     });
   }
-  // [EN] During an animated scroll too: idle icons are still images in DevTools (cyl-lottie CYL_USES_SNAPSHOTS).
-  // [CN] 动画滚动期间也一样：开发者工具中空闲的图标是静态图片（cyl-lottie 的 CYL_USES_SNAPSHOTS）。
+  // [EN] During an animated scroll too: in DevTools each icon is one image layer (CYL_USES_SNAPSHOTS).
+  // [CN] 动画滚动期间也一样：开发者工具中每个图标只有一个图片图层（CYL_USES_SNAPSHOTS）。
   await miniProgram.evaluate(() => { wx.pageScrollTo({ scrollTop: 0, duration: 3000 }); });
   await cylSleep(1200);
   const during = await miniProgram.screenshot();
   if (process.env.CYL_UI_SCREENSHOTS) {
     require('node:fs').writeFileSync(path.join(process.env.CYL_UI_SCREENSHOTS, 'cyl-scroll-during.png'), Buffer.from(during, 'base64'));
   }
-  layout.icons.forEach((rect, index) => {
+  areas.forEach(({ name, rect }) => {
     const difference = cylDifference(before, during, rect, layout.windowWidth, layout.windowTop);
-    assert.ok(difference < 0.02, `icon ${index} during a scroll: ${(difference * 100).toFixed(1)}% of its pixels changed`);
+    assert.ok(difference < 0.02, `${name} during a scroll: ${(difference * 100).toFixed(1)}% of its pixels changed`);
   });
   await cylSleep(2000);
   await miniProgram.pageScrollTo(0);
@@ -256,53 +264,43 @@ test('the animated icons stay in the bar during and after a page scroll (WeChat 
 });
 
 /**
- * [EN] Whether each animated icon of the current page's bar shows its still image (DevTools).
- * [CN] 当前页面 TabBar 的每个动画图标是否显示静态图片（开发者工具）。
+ * [EN] For each animated icon of the current page's bar: whether it is one image layer, and that image (DevTools).
+ * [CN] 当前页面 TabBar 的每个动画图标：是否只有一个图片图层，以及该图片（开发者工具）。
  */
-function cylSnapshotsShown() {
+function cylIconLayers() {
   return miniProgram.evaluate(() => {
     const pages = getCurrentPages();
     const bar = pages[pages.length - 1].getTabBar().selectComponent('#cyl-tab-bar');
-    return bar.selectAllComponents('.cyl-tab-item').map((item) => Boolean(item.selectComponent('#cyl-item-animation').data.cylSnapshotShown));
+    return bar.selectAllComponents('.cyl-tab-item').map((item) => {
+      const view = item.selectComponent('#cyl-item-animation');
+      return { oneLayer: Boolean(view.data.cylCovered && view.data.cylSnapshot), image: view.data.cylSnapshot };
+    });
   });
 }
 
-test('looping icons hold still during a page scroll and play again after it (WeChat DevTools)', async () => {
+test('looping icons stay one layer and keep playing during a page scroll (WeChat DevTools)', async () => {
   await miniProgram.switchTab('/pages/me/index');
   await cylSleep(CYL_SETTLE_MS * 2);
-  const layout = await miniProgram.evaluate(() => new Promise((resolve) => {
+  await miniProgram.evaluate(() => {
     const pages = getCurrentPages();
     const bar = pages[pages.length - 1].getTabBar().selectComponent('#cyl-tab-bar');
     bar.cyl_setAnimationLoop(true);
     bar.cyl_playAll();
-    bar.createSelectorQuery().selectAll('.cyl-tab-item >>> .cyl-item-icon-box').boundingClientRect()
-      .exec((result) => resolve({
-        windowWidth: wx.getWindowInfo().windowWidth,
-        windowTop: wx.getWindowInfo().screenHeight - wx.getWindowInfo().windowHeight,
-        icons: (result[0] || []).map((rect) => ({ left: rect.left, top: rect.top, width: rect.width, height: rect.height })),
-      }));
-  }));
+  });
   try {
-    await cylSleep(500);
-    assert.deepEqual(await cylSnapshotsShown(), [false, false, false, false], 'looping icons play on their canvas');
     await miniProgram.evaluate(() => { wx.pageScrollTo({ scrollTop: 1380, duration: 3000 }); });
     await cylSleep(800);
-    const first = await miniProgram.screenshot();
-    const shown = await cylSnapshotsShown();
-    await cylSleep(600);
-    const second = await miniProgram.screenshot();
-    assert.deepEqual(shown, [true, true, true, true], 'still images while the page scrolls');
-    layout.icons.forEach((rect, index) => {
-      const difference = cylDifference(first, second, rect, layout.windowWidth, layout.windowTop);
-      assert.ok(difference < 0.02, `icon ${index} moved during the scroll: ${(difference * 100).toFixed(1)}% of its pixels changed`);
-    });
-    await cylSleep(2200);
-    assert.deepEqual(await cylSnapshotsShown(), [false, false, false, false], 'the canvases come back after the scroll');
+    const first = await cylIconLayers();
+    await cylSleep(300);
+    const second = await cylIconLayers();
+    assert.deepEqual(first.map((icon) => icon.oneLayer), [true, true, true, true], 'one image layer per icon while scrolling');
+    assert.ok(first.some((icon, index) => icon.image !== second[index].image), 'the images follow the animation while scrolling');
   } finally {
     await miniProgram.evaluate(() => {
       const pages = getCurrentPages();
       pages[pages.length - 1].getTabBar().selectComponent('#cyl-tab-bar').cyl_setAnimationLoop(false);
     });
+    await cylSleep(2500);
     await miniProgram.pageScrollTo(0);
     await miniProgram.switchTab('/pages/home/index');
     await cylSleep(CYL_SETTLE_MS * 2);

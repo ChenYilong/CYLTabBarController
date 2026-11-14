@@ -5,12 +5,12 @@
  *      loads the animation from `path` (a network URL or a package file) or `animationData`, recolors it with
  *      `colors`, and destroys it when the component is removed. Events: `ready`, `complete`, `loopcomplete`, `error`.
  *      Methods: cyl_play, cyl_pause, cyl_stop, cyl_playFromStart, cyl_goToAndStop, cyl_goToAndPlay,
- *      cyl_playSegments, cyl_setSpeed, cyl_refreshLayout, cyl_animation.
+ *      cyl_playSegments, cyl_setSpeed, cyl_animation.
  * [CN] cyl-lottie：本包 lottie 库（CYLTabBarController 维护的 lottie-miniprogram 分支）的组件，方式与 Lottie.WMC 相同：
  *      在 WXML 中写 <cyl-lottie path="…" />，组件自己创建 <canvas type="2d">，按屏幕像素比设置尺寸（真机上清晰，
  *      上游 issue #12、#23、#26），从 `path`（网络地址或包内文件）或 `animationData` 加载动画，用 `colors` 换色，
  *      组件移除时销毁动画。事件：`ready`、`complete`、`loopcomplete`、`error`。方法：cyl_play、cyl_pause、cyl_stop、
- *      cyl_playFromStart、cyl_goToAndStop、cyl_goToAndPlay、cyl_playSegments、cyl_setSpeed、cyl_refreshLayout、cyl_animation。
+ *      cyl_playFromStart、cyl_goToAndStop、cyl_goToAndPlay、cyl_playSegments、cyl_setSpeed、cyl_animation。
  */
 const lottie = require('../index.js')
 const {cylApplyLottieColors} = require('./cyl_lottie_colors')
@@ -36,13 +36,16 @@ function cylIsDevTools() {
 
 /**
  * [EN] WeChat DevTools does not keep a <canvas type="2d"> inside a fixed bar (the custom tab bar) in place while the
- *      page scrolls: it moves with the gesture until the component renders again. There, an animation that is not
- *      playing shows a still image of its frame instead (an <image> stays in place); the canvas comes back while it
- *      plays. Phones are not changed.
- * [CN] 微信开发者工具在页面滚动时不会让固定栏（自定义 TabBar）中的 <canvas type="2d"> 保持原位：它随手势移动，直到组件
- *      再次渲染。因此在开发者工具中，未播放的动画改为显示当前帧的静态图片（<image> 保持原位）；播放时恢复画布。真机不变。
+ *      page scrolls: it moves with the gesture, and next to an image of it, shows as a second layer. There, the
+ *      animation is shown as one <image> of its canvas, updated on every drawn frame (at most every
+ *      CYL_SNAPSHOT_INTERVAL_MS while it plays); the canvas only draws, off screen, and is never shown. Phones are not
+ *      changed: they show the canvas.
+ * [CN] 微信开发者工具在页面滚动时不会让固定栏（自定义 TabBar）中的 <canvas type="2d"> 保持原位：它随手势移动，与其图片
+ *      并存时成为第二个图层。因此在开发者工具中，动画只以一个 <image> 显示其画布内容，每画一帧就更新（播放时最多每
+ *      CYL_SNAPSHOT_INTERVAL_MS 一次）；画布只负责绘制，位于屏幕外，从不显示。真机不变：显示画布。
  */
 const CYL_USES_SNAPSHOTS = cylIsDevTools()
+const CYL_SNAPSHOT_INTERVAL_MS = 33
 
 function cylPixelRatio() {
   try {
@@ -96,7 +99,7 @@ Component({
   data: {
     cylCanvasId: '',
     cylSnapshot: '',
-    cylSnapshotShown: false,
+    cylCovered: CYL_USES_SNAPSHOTS,
   },
 
   observers: {
@@ -152,36 +155,37 @@ Component({
     },
 
     /**
-     * [EN] WeChat DevTools only (CYL_USES_SNAPSHOTS): once the animation is not playing, shows a still image of the
-     *      canvas instead of the canvas; while it plays, shows the canvas, except while the page scrolls (a playing
-     *      icon then shows its frame of the moment). Runs after every playback change.
-     * [CN] 仅微信开发者工具（CYL_USES_SNAPSHOTS）：动画未播放时以画布的静态图片代替画布；播放时显示画布，页面滚动期间
-     *      除外（此时播放中的图标显示当时的帧）。每次播放状态变化后运行。
+     * [EN] WeChat DevTools only (CYL_USES_SNAPSHOTS): puts the canvas's current frame into the <image> that shows the
+     *      animation, on the next turn (after lottie has drawn). Runs after every playback change.
+     * [CN] 仅微信开发者工具（CYL_USES_SNAPSHOTS）：在下一轮（lottie 画好之后）把画布的当前帧放入显示动画的 <image>。
+     *      每次播放状态变化后运行。
      */
     cyl_syncSnapshot() {
       if (!CYL_USES_SNAPSHOTS) {
         return
       }
       clearTimeout(this.cylSnapshotTimer)
-      // [EN] On the next turn, after lottie has drawn the frame. [CN] 在下一轮执行，此时 lottie 已画好该帧。
-      this.cylSnapshotTimer = setTimeout(() => {
-        const animation = this.cylAnimation
-        const playing = Boolean(animation && !animation.isPaused)
-        if (this.cylScrolling && this.data.cylSnapshotShown) {
-          return
+      this.cylSnapshotTimer = setTimeout(() => this.cyl_captureSnapshot(), 0)
+    },
+
+    /**
+     * [EN] Reads the canvas into the <image> (WeChat DevTools only).
+     * [CN] 把画布内容读入 <image>（仅微信开发者工具）。
+     */
+    cyl_captureSnapshot() {
+      const canvas = this.cylCanvas
+      if (!CYL_USES_SNAPSHOTS || !canvas || typeof canvas.toDataURL !== 'function') {
+        return
+      }
+      this.cylSnapshotAt = Date.now()
+      try {
+        const snapshot = canvas.toDataURL('image/png')
+        if (snapshot !== this.data.cylSnapshot) {
+          this.setData({cylSnapshot: snapshot})
         }
-        if ((playing && !this.cylScrolling) || !animation || !this.cylCanvas || typeof this.cylCanvas.toDataURL !== 'function') {
-          if (this.data.cylSnapshotShown) {
-            this.setData({cylSnapshotShown: false})
-          }
-          return
-        }
-        try {
-          this.setData({cylSnapshot: this.cylCanvas.toDataURL('image/png'), cylSnapshotShown: true})
-        } catch (error) {
-          this.setData({cylSnapshotShown: false})
-        }
-      }, 0)
+      } catch (error) {
+        // [EN] Keep the last frame. [CN] 保留上一帧。
+      }
     },
 
     /**
@@ -266,6 +270,12 @@ Component({
             duration: this.cylAnimation.getDuration(false),
           })
         })
+        animation.addEventListener('enterFrame', () => {
+          // [EN] Every drawn frame while it plays, at most every CYL_SNAPSHOT_INTERVAL_MS. [CN] 播放时每画一帧，最多每 CYL_SNAPSHOT_INTERVAL_MS 一次。
+          if (CYL_USES_SNAPSHOTS && Date.now() - (this.cylSnapshotAt || 0) >= CYL_SNAPSHOT_INTERVAL_MS) {
+            this.cyl_captureSnapshot()
+          }
+        })
         animation.addEventListener('complete', () => {
           this.cyl_syncSnapshot()
           this.triggerEvent('complete', {})
@@ -320,28 +330,6 @@ Component({
         this.cylAnimation.stop()
         this.cyl_rest()
       }
-    },
-
-    /**
-     * [EN] Renders the component again, without touching the animation, so the canvas goes back to where the page
-     *      puts it. WeChat DevTools leaves a <canvas type="2d"> of a fixed bar (the custom tab bar) where it was after a
-     *      page scroll, over the page content, until the component renders again. `scrolling` (optional, true while the
-     *      page scrolls, false after) shows a still image in DevTools meanwhile, also for a playing icon.
-     * [CN] 重新渲染组件（不改动画），使画布回到页面布局的位置。微信开发者工具在页面滚动后会把固定栏（自定义 TabBar）中的
-     *      <canvas type="2d"> 留在原处、盖在页面内容上，直到组件再次渲染。`scrolling`（可选，页面滚动期间为 true，之后为
-     *      false）使开发者工具在此期间显示静态图片，播放中的图标也一样。
-     */
-    cyl_refreshLayout(scrolling) {
-      if (CYL_USES_SNAPSHOTS && typeof scrolling === 'boolean') {
-        // [EN] DevTools: a still image while the page scrolls, also for a playing (looping) icon; the canvas comes back
-        //      after the scroll. [CN] 开发者工具：页面滚动期间显示静态图片，播放中（循环）的图标也一样；滚动结束后恢复画布。
-        const changed = this.cylScrolling !== scrolling
-        this.cylScrolling = scrolling
-        if (changed) {
-          this.cyl_syncSnapshot()
-        }
-      }
-      this.setData({cylLayoutVersion: (this.data.cylLayoutVersion || 0) + 1})
     },
 
     /**

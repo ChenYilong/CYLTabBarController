@@ -544,22 +544,6 @@ Component({
       });
     },
 
-    /**
-     * [EN] Puts the canvases of the animated icons back inside the bar. WeChat DevTools leaves them where they were
-     *      during a page scroll, so they move with the gesture; cyl_scroll_behavior.js calls this while the page scrolls
-     *      (`scrolling` true) and once after (false).
-     * [CN] 让动画图标的画布回到 TabBar 内。微信开发者工具在页面滚动时会把它们留在原处，使其随手势移动；
-     *      cyl_scroll_behavior.js 在页面滚动期间调用本方法。
-     */
-    cyl_refreshAnimationLayout(scrolling) {
-      (this.data.cylSlots || []).forEach((slot) => {
-        const item = slot.item ? this.selectComponent(`#cyl-item-${slot.key}`) : null;
-        if (item && typeof item.cyl_refreshAnimationLayout === 'function') {
-          item.cyl_refreshAnimationLayout(scrolling);
-        }
-      });
-    },
-
     /** [EN] Sets `animationSpeed` at run time. [CN] 在运行时设置 `animationSpeed`。 */
     cyl_setAnimationSpeed(speed) {
       if (Number(speed) > 0) {

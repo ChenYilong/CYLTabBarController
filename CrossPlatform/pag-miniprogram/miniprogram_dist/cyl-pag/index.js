@@ -52,14 +52,16 @@ function cylIsDevTools() {
 }
 
 /**
- * [EN] WeChat DevTools moves a canvas of a fixed bar with the page while it scrolls (see cyl-lottie). There, a PAG
- *      animation that is not playing, or any while the page scrolls, shows a still image of its frame instead. Its
- *      WebGL context is created with preserveDrawingBuffer so the frame can be read. Phones are not changed.
- * [CN] 微信开发者工具在页面滚动时会让固定栏中的画布随页面移动（见 cyl-lottie）。因此在开发者工具中，未播放的 PAG 动画，
- *      以及页面滚动期间的所有 PAG 动画，改为显示当前帧的静态图片；其 WebGL 上下文以 preserveDrawingBuffer 创建，
- *      以便读取该帧。真机不变。
+ * [EN] WeChat DevTools moves a canvas of a fixed bar with the page while it scrolls (see cyl-lottie). There, the PAG
+ *      animation is shown as one <image> of its canvas, updated on every flushed frame (at most every
+ *      CYL_SNAPSHOT_INTERVAL_MS while it plays); the canvas only draws, off screen. Its WebGL context is created with
+ *      preserveDrawingBuffer so the frame can be read. Phones are not changed: they show the canvas.
+ * [CN] 微信开发者工具在页面滚动时会让固定栏中的画布随页面移动（见 cyl-lottie）。因此在开发者工具中，PAG 动画只以一个
+ *      <image> 显示其画布内容，每次 flush 后更新（播放时最多每 CYL_SNAPSHOT_INTERVAL_MS 一次）；画布只在屏幕外绘制。
+ *      其 WebGL 上下文以 preserveDrawingBuffer 创建，以便读取该帧。真机不变：显示画布。
  */
 const CYL_USES_SNAPSHOTS = cylIsDevTools()
+const CYL_SNAPSHOT_INTERVAL_MS = 33
 
 function cylPixelRatio() {
   try {
@@ -114,7 +116,7 @@ Component({
     wasmPath: { type: String, value: CYL_DEFAULT_WASM },
   },
 
-  data: { cylCanvasId: '', cylSnapshot: '', cylSnapshotShown: false },
+  data: { cylCanvasId: '', cylSnapshot: '', cylCovered: CYL_USES_SNAPSHOTS },
 
   observers: {
     'path, fit': function () {
@@ -241,6 +243,11 @@ Component({
         this.cyl_applySpeed()
         view.setScaleMode(CYL_SCALE_MODES[this.data.fit] || CYL_SCALE_MODES.contain)
         view.setRepeatCount(this.data.loop ? 0 : 1)
+        view.addListener('onAnimationFlushed', () => {
+          if (CYL_USES_SNAPSHOTS && Date.now() - (this.cylSnapshotAt || 0) >= CYL_SNAPSHOT_INTERVAL_MS) {
+            this.cyl_captureSnapshot()
+          }
+        })
         view.addListener('onAnimationEnd', () => {
           this.cyl_syncSnapshot()
           this.triggerEvent('complete', {})
@@ -293,10 +300,10 @@ Component({
     },
 
     /**
-     * [EN] WeChat DevTools only (CYL_USES_SNAPSHOTS): a still image of the canvas while the animation is not playing or
-     *      the page scrolls; the canvas otherwise. Runs after every playback change.
-     * [CN] 仅微信开发者工具（CYL_USES_SNAPSHOTS）：动画未播放或页面滚动时显示画布的静态图片；否则显示画布。每次播放
-     *      状态变化后运行。
+     * [EN] WeChat DevTools only (CYL_USES_SNAPSHOTS): puts the current frame into the <image> that shows the animation,
+     *      after libpag has drawn it (flush is asynchronous). Runs after every playback change.
+     * [CN] 仅微信开发者工具（CYL_USES_SNAPSHOTS）：在 libpag 画好之后（flush 是异步的）把当前帧放入显示动画的 <image>。
+     *      每次播放状态变化后运行。
      */
     cyl_syncSnapshot() {
       if (!CYL_USES_SNAPSHOTS) {
@@ -305,24 +312,32 @@ Component({
       clearTimeout(this.cylSnapshotTimer)
       this.cylSnapshotTimer = setTimeout(() => {
         const view = this.cylView
-        const playing = Boolean(view && view.isPlaying)
-        if (this.cylScrolling && this.data.cylSnapshotShown) {
+        if (!view) {
           return
         }
-        if ((playing && !this.cylScrolling) || !view || !this.cylCanvas || typeof this.cylCanvas.toDataURL !== 'function') {
-          if (this.data.cylSnapshotShown) {
-            this.setData({ cylSnapshotShown: false })
+        Promise.resolve(view.isPlaying ? null : view.flush()).then(() => {
+          if (view === this.cylView) {
+            this.cyl_captureSnapshot()
           }
-          return
-        }
-        // [EN] After libpag has drawn the frame (flush is asynchronous). [CN] 在 libpag 画好该帧之后（flush 是异步的）。
-        Promise.resolve(playing ? null : view.flush()).then(() => {
-          if (view !== this.cylView) {
-            return
-          }
-          this.setData({ cylSnapshot: this.cylCanvas.toDataURL('image/png'), cylSnapshotShown: true })
-        }).catch(() => this.setData({ cylSnapshotShown: false }))
+        }).catch(() => {})
       }, 0)
+    },
+
+    /** [EN] Reads the canvas into the <image> (WeChat DevTools only). [CN] 把画布内容读入 <image>（仅微信开发者工具）。 */
+    cyl_captureSnapshot() {
+      const canvas = this.cylCanvas
+      if (!CYL_USES_SNAPSHOTS || !canvas || typeof canvas.toDataURL !== 'function') {
+        return
+      }
+      this.cylSnapshotAt = Date.now()
+      try {
+        const snapshot = canvas.toDataURL('image/png')
+        if (snapshot !== this.data.cylSnapshot) {
+          this.setData({ cylSnapshot: snapshot })
+        }
+      } catch (error) {
+        // [EN] Keep the last frame. [CN] 保留上一帧。
+      }
     },
 
     /** [EN] Shows the resting frame without playing. [CN] 不播放，显示静止帧。 */
@@ -353,24 +368,6 @@ Component({
         this.cylView.pause()
         this.cyl_rest()
       }
-    },
-
-    /**
-     * [EN] Renders the component again, so the canvas goes back to where the page puts it (WeChat DevTools leaves the
-     *      canvas of a fixed bar where it was after a page scroll; see cyl-lottie). `scrolling` (optional, true while
-     *      the page scrolls, false after) shows a still image in DevTools meanwhile.
-     * [CN] 重新渲染组件，使画布回到页面布局的位置（微信开发者工具在页面滚动后会把固定栏中的画布留在原处；见 cyl-lottie）。
-     *      `scrolling`（可选，页面滚动期间为 true，之后为 false）使开发者工具在此期间显示静态图片。
-     */
-    cyl_refreshLayout(scrolling) {
-      if (CYL_USES_SNAPSHOTS && typeof scrolling === 'boolean') {
-        const changed = this.cylScrolling !== scrolling
-        this.cylScrolling = scrolling
-        if (changed) {
-          this.cyl_syncSnapshot()
-        }
-      }
-      this.setData({cylLayoutVersion: (this.data.cylLayoutVersion || 0) + 1})
     },
 
     /** [EN] Plays from the beginning (a tab that becomes selected). [CN] 从头播放（Tab 被选中时）。 */

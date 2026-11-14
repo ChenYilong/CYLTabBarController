@@ -41,14 +41,14 @@ function cylIsDevTools() {
 }
 
 /**
- * [EN] WeChat DevTools moves a canvas of a fixed bar with the page while it scrolls (see cyl-lottie). There, a Rive
- *      icon shows a still image of its frame while the page scrolls. Rive state machines draw every frame and have
- *      no idle state to detect, so unlike cyl-lottie and cyl-pag only during the scroll. Phones are not changed.
- * [CN] 微信开发者工具在页面滚动时会让固定栏中的画布随页面移动（见 cyl-lottie）。因此在开发者工具中，页面滚动期间 Rive
- *      图标显示当前帧的静态图片。Rive 状态机每帧都绘制，没有可检测的空闲状态，因此与 cyl-lottie、cyl-pag 不同，仅在
- *      滚动期间显示。真机不变。
+ * [EN] WeChat DevTools moves a canvas of a fixed bar with the page while it scrolls (see cyl-lottie). There, the Rive
+ *      animation is shown as one <image> of its canvas, updated from the render loop at most every
+ *      CYL_SNAPSHOT_INTERVAL_MS; the canvas only draws, off screen. Phones are not changed: they show the canvas.
+ * [CN] 微信开发者工具在页面滚动时会让固定栏中的画布随页面移动（见 cyl-lottie）。因此在开发者工具中，Rive 动画只以一个
+ *      <image> 显示其画布内容，由渲染循环最多每 CYL_SNAPSHOT_INTERVAL_MS 更新一次；画布只在屏幕外绘制。真机不变：显示画布。
  */
 const CYL_USES_SNAPSHOTS = cylIsDevTools()
+const CYL_SNAPSHOT_INTERVAL_MS = 33
 
 /**
  * [EN] The Rive runtime, loaded once for every cyl-rive: WXWebAssembly instantiates the Brotli WebAssembly of the
@@ -137,7 +137,7 @@ Component({
     wasmPath: { type: String, value: CYL_DEFAULT_WASM },
   },
 
-  data: { cylCanvasId: '', cylSnapshot: '', cylSnapshotShown: false },
+  data: { cylCanvasId: '', cylSnapshot: '', cylCovered: CYL_USES_SNAPSHOTS },
 
   observers: {
     'path, artboard, stateMachine, colors, fit': function () {
@@ -359,7 +359,27 @@ Component({
       artboard.draw(renderer)
       renderer.restore()
       rive.resolveAnimationFrame()
+      if (CYL_USES_SNAPSHOTS && Date.now() - (this.cylSnapshotAt || 0) >= CYL_SNAPSHOT_INTERVAL_MS) {
+        this.cyl_captureSnapshot()
+      }
       this.cyl_scheduleFrame()
+    },
+
+    /** [EN] Reads the canvas into the <image> (WeChat DevTools only). [CN] 把画布内容读入 <image>（仅微信开发者工具）。 */
+    cyl_captureSnapshot() {
+      const canvas = this.cylState && this.cylState.canvas
+      if (!canvas || typeof canvas.toDataURL !== 'function') {
+        return
+      }
+      this.cylSnapshotAt = Date.now()
+      try {
+        const snapshot = canvas.toDataURL('image/png')
+        if (snapshot !== this.data.cylSnapshot) {
+          this.setData({ cylSnapshot: snapshot })
+        }
+      } catch (error) {
+        // [EN] Keep the last frame. [CN] 保留上一帧。
+      }
     },
 
     /**
@@ -467,30 +487,6 @@ Component({
       if (input) {
         input.asBool().value = false
       }
-    },
-
-    /**
-     * [EN] Renders the component again, so the canvas goes back to where the page puts it (WeChat DevTools leaves the
-     *      canvas of a fixed bar where it was after a page scroll; see cyl-lottie). `scrolling` (optional, true while
-     *      the page scrolls, false after) shows a still image in DevTools meanwhile.
-     * [CN] 重新渲染组件，使画布回到页面布局的位置（微信开发者工具在页面滚动后会把固定栏中的画布留在原处；见 cyl-lottie）。
-     *      `scrolling`（可选，页面滚动期间为 true，之后为 false）使开发者工具在此期间显示静态图片。
-     */
-    cyl_refreshLayout(scrolling) {
-      if (CYL_USES_SNAPSHOTS && typeof scrolling === 'boolean' && this.cylScrolling !== scrolling) {
-        this.cylScrolling = scrolling
-        const canvas = this.cylState && this.cylState.canvas
-        if (scrolling && canvas && typeof canvas.toDataURL === 'function') {
-          try {
-            this.setData({ cylSnapshot: canvas.toDataURL('image/png'), cylSnapshotShown: true })
-          } catch (error) {
-            this.setData({ cylSnapshotShown: false })
-          }
-        } else if (this.data.cylSnapshotShown) {
-          this.setData({ cylSnapshotShown: false })
-        }
-      }
-      this.setData({cylLayoutVersion: (this.data.cylLayoutVersion || 0) + 1})
     },
 
     /** [EN] {rive, file, artboard, instance} or null. [CN] 返回 {rive, file, artboard, instance}，没有时为 null。 */
