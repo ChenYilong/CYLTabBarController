@@ -294,6 +294,26 @@ open class CYLTabBarController(val activity: FragmentActivity) {
             for (button in tabBar.tabBarButtonArray) if (button.cyl_isTabBarItemAnimationReady()) button.cyl_setTabBarItemAnimationSpeed(value)
         }
     /**
+     * [EN] `tabBarItemAnimationLoops`: every tab animation repeats until this is false (off by default: they play
+     *      once); applies to the animations already playing.
+     * [CN] 所有 Tab 动画重复播放直到设为 false（默认关闭：只播放一次）；对正在播放的动画同样生效。
+     */
+    var tabBarItemAnimationLoops: Boolean = false
+        set(value) {
+            field = value
+            for (button in tabBar.tabBarButtonArray) if (button.cyl_isTabBarItemAnimationReady()) button.cyl_setTabBarItemAnimationLoops(value)
+        }
+
+    /**
+     * [EN] `-cyl_playAllTabBarItemAnimations`: applies the speed and the loop setting, then plays every tab icon
+     *      animation from progress 0 ("Play all").
+     * [CN] 应用速度与循环设置，然后让所有 Tab 图标动画从进度 0 开始播放（「全部播放」）。
+     */
+    fun cyl_playAllTabBarItemAnimations() {
+        tabBar.cyl_setAllTabBarItemAnimationsSpeed(tabBarItemAnimationSpeed, tabBarItemAnimationLoops)
+        tabBar.cyl_restartAllTabBarItemAnimations()
+    }
+    /**
      * [EN] `noNeedUIDesignCompatibility`: false means FlatDesign (`tabBarStyleType`), true Liquid Glass; prefer `tabBarStyleType`. [CN] false 表示扁平样式（`tabBarStyleType`），true 表示液态玻璃；建议直接设置 `tabBarStyleType`。
      */
     var noNeedUIDesignCompatibility: Boolean
@@ -362,6 +382,7 @@ open class CYLTabBarController(val activity: FragmentActivity) {
             button.item.cyl_tabBarItemAnimationURL = url
             button.item.cyl_tabBarItemAnimationSizeValue = size
             button.cyl_addTabBarItemAnimationWithURL(url, size, tabBarItemAnimationViewContentMode(), tabBarItemAnimationSpeed)
+            if (tabBarItemAnimationLoops) button.cyl_setTabBarItemAnimationLoops(true)
         }
         cyl_playSelectedTabBarItemAnimation(defaultSelected = true)
     }

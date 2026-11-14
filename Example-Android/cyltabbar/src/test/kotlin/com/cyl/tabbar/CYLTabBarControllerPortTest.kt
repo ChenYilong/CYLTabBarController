@@ -178,6 +178,7 @@ class CYLTabBarControllerPortTest {
         override fun showLastFrame() { events += "last" }
         override fun stop() { events += "stop" }
         override var animationSpeed: Float = 1f
+        override var loops: Boolean = false
         var colors: Map<String, Int>? = null
         override fun applyColors(colors: Map<String, Int>?, configuration: Configuration) { this.colors = colors }
     }
@@ -248,6 +249,43 @@ class CYLTabBarControllerPortTest {
             assertTrue(CYLConstants.isTabBarItemAnimationEnabledWithURLs(null, tabs))
         } finally {
             CYLTabBarItemAnimatorRegistry.unregisterAnimatorWithIdentifier("TestAnimated")
+        }
+    }
+
+    @Test
+    fun playAllSpeedAndLoopCombineIntoOnePlaybackPolicy() = withActivity { activity ->
+        val animator = TestAnimator("TestPlayback", "anim")
+        CYLTabBarItemAnimatorRegistry.registerAnimator(animator)
+        try {
+            val tabs = listOf(
+                mapOf(CYLConstants.CYLTabBarItemTitle to "Home", CYLConstants.CYLTabBarAnimationFilePath to "home.anim"),
+                mapOf(CYLConstants.CYLTabBarItemTitle to "Me", CYLConstants.CYLTabBarAnimationFilePath to "me.anim"),
+                mapOf(CYLConstants.CYLTabBarItemTitle to "Static"),
+            )
+            val controller = controllerIn(activity, listOf(Page(), Page(), Page()), tabs)
+            val buttons = controller.tabBar.tabBarButtonArray
+            val players = buttons.take(2).map { it.cyl_tabBarItemAnimationPlayer as TestPlayer }
+            assertFalse("off by default: animations play once", controller.tabBarItemAnimationLoops)
+            assertTrue(players.none { it.loops })
+
+            controller.tabBarItemAnimationLoops = true
+            assertTrue("the loop switch reaches the animations already added", players.all { it.loops })
+            controller.tabBarItemAnimationSpeed = 2.5f
+            players.forEach { it.events.clear() }
+            controller.cyl_playAllTabBarItemAnimations()
+            players.forEach {
+                assertEquals("Play all restarts every icon, selected or not", listOf("play"), it.events)
+                assertEquals(2.5f, it.animationSpeed, 0.01f)
+                assertTrue(it.loops)
+            }
+            controller.tabBarItemAnimationLoops = false
+            assertTrue(players.none { it.loops })
+            // [EN] A tab without an animation is left alone. [CN] 没有动画的 Tab 不受影响。
+            buttons[2].cyl_setTabBarItemAnimationLoops(true)
+            buttons[2].cyl_restartTabBarItemAnimation()
+            assertNull(buttons[2].cyl_tabBarItemAnimationPlayer)
+        } finally {
+            CYLTabBarItemAnimatorRegistry.unregisterAnimatorWithIdentifier("TestPlayback")
         }
     }
 

@@ -113,6 +113,14 @@ interface CYLTabBarItemAnimationPlayer {
         get() = 1f
         set(@Suppress("UNUSED_PARAMETER") value) { /* [EN] Optional. [CN] 可选。 */ }
     /**
+     * [EN] Whether the animation repeats until this is turned off (iOS `loops`); false: it plays once. Applies to the
+     *      animation already playing. Libraries without a loop ignore it.
+     * [CN] 动画是否重复播放直到关闭（iOS 的 `loops`）；false 时只播放一次。对正在播放的动画同样生效。没有循环的动画库忽略它。
+     */
+    var loops: Boolean
+        get() = false
+        set(@Suppress("UNUSED_PARAMETER") value) { /* [EN] Optional. [CN] 可选。 */ }
+    /**
      * [EN] Applies `darkColors` (keypath → color, #442) where `configuration` is dark, removes them otherwise. [CN] 深色模式下应用 `darkColors`，否则移除。
      */
     fun applyDarkColors(darkColors: Map<String, Int>, configuration: Configuration) { /* [EN] Optional. [CN] 可选。 */ }
@@ -669,6 +677,10 @@ object CYLLottieTabBarItemAnimator : CYLTabBarItemAnimator {
         override var animationSpeed: Float
             get() = animationView?.let { CYLReflection.call(it, "getSpeed") as? Float } ?: 1f
             set(value) { animationView?.let { CYLReflection.call(it, "setSpeed", value) } }
+        // [EN] LottieDrawable.INFINITE is -1; 0 plays once. [CN] LottieDrawable.INFINITE 为 -1；0 表示播放一次。
+        override var loops: Boolean
+            get() = animationView?.let { CYLReflection.call(it, "getRepeatCount") as? Int } == -1
+            set(value) { animationView?.let { CYLReflection.call(it, "setRepeatCount", if (value) -1 else 0) } }
 
         /**
          * [EN] Colors by keypath ("Layer.Group.Fill 1.Color" or with "**"), through `addValueCallback(KeyPath, LottieProperty.COLOR, …)`. [CN] 按 keypath 设置颜色，通过 `addValueCallback`。
@@ -731,7 +743,10 @@ object CYLPAGTabBarItemAnimator : CYLTabBarItemAnimator {
         if (CYLReflection.type(VIEW_CLASS)?.isInstance(view) == true) PAGPlayer(view) else null
 
     private class PAGPlayer(view: View) : CYLTabBarItemAnimationBasePlayer(view) {
-        override fun play() { animationView?.let { CYLReflection.call(it, "setRepeatCount", 1); CYLReflection.call(it, "setProgress", 0.0); CYLReflection.call(it, "play") } }
+        // [EN] PAGView.setRepeatCount: 0 repeats without end, 1 plays once. [CN] PAGView.setRepeatCount：0 为无限重复，1 为播放一次。
+        override var loops: Boolean = false
+            set(value) { field = value; animationView?.let { CYLReflection.call(it, "setRepeatCount", if (value) 0 else 1) } }
+        override fun play() { animationView?.let { CYLReflection.call(it, "setRepeatCount", if (loops) 0 else 1); CYLReflection.call(it, "setProgress", 0.0); CYLReflection.call(it, "play") } }
         override fun showLastFrame() { animationView?.let { CYLReflection.call(it, "stop"); CYLReflection.call(it, "setProgress", 1.0); CYLReflection.call(it, "flush") } }
         override fun stop() { animationView?.let { CYLReflection.call(it, "stop"); CYLReflection.call(it, "setProgress", 0.0); CYLReflection.call(it, "flush") } }
         override var progress: Float

@@ -61,6 +61,7 @@ private class CYLTabAnimationState(
     var view: View?,
     var loadedURL: String?,
     var playing: Boolean = false,
+    var loops: Boolean = false,
 )
 
 private val animationStates = WeakHashMap<View, CYLTabAnimationState>()
@@ -84,6 +85,7 @@ private fun View.cyl_insertAnimationView(state: CYLTabAnimationState) {
     state.loadedURL = url
     val player = CYLTabBarItemAnimationFactory.playerForView(view)
     if (state.speed > 0 && state.speed.isFinite()) player?.animationSpeed = state.speed
+    if (state.loops) player?.loops = true
     player?.applyColors(CYLTabBarItemAnimationStyleSource.colorsForStyle(state.url, resources.configuration), resources.configuration)
     // [EN] The animation replaces the icon. [CN] 动画取代图标。
     when (this) {
@@ -128,6 +130,28 @@ fun View.cyl_setTabBarItemAnimationSpeed(speed: Float) {
     val state = animationStates[this] ?: return
     state.speed = speed
     cyl_tabBarItemAnimationPlayer?.animationSpeed = if (speed > 0 && speed.isFinite()) speed else 1f
+}
+
+/**
+ * [EN] `-cyl_setTabBarItemAnimationLoops:`: the animation repeats until this is false; applies to the animation already
+ *      playing and to the next plays.
+ * [CN] 动画重复播放直到设为 false；对正在播放的动画与之后的播放都生效。
+ */
+fun View.cyl_setTabBarItemAnimationLoops(loops: Boolean) {
+    val state = animationStates[this] ?: return
+    state.loops = loops
+    cyl_tabBarItemAnimationPlayer?.loops = loops
+}
+
+/**
+ * [EN] `-cyl_restartTabBarItemAnimation`: plays the animation again from progress 0, whatever its position ("Play all").
+ * [CN] 无论当前位置，从进度 0 重新播放动画（「全部播放」）。
+ */
+fun View.cyl_restartTabBarItemAnimation() {
+    val state = animationStates[this] ?: return
+    val player = cyl_tabBarItemAnimationPlayer ?: return
+    state.playing = true
+    player.play()
 }
 
 /**
@@ -246,6 +270,25 @@ fun CYLTabBar.cyl_animationLottieImageWithSelectedControl(selectedControl: View?
 fun CYLTabBar.cyl_stopAnimationOfAllLottieView() {
     for (button in tabBarButtonArray) button.cyl_stopTabBarItemAnimation()
     plusButton?.cyl_stopTabBarItemAnimation()
+}
+
+/**
+ * [EN] `-cyl_restartAllTabBarItemAnimations`: every tab icon animation plays again from progress 0. [CN] 所有 Tab 图标动画从进度 0 重新播放。
+ */
+fun CYLTabBar.cyl_restartAllTabBarItemAnimations() {
+    for (button in tabBarButtonArray) button.cyl_restartTabBarItemAnimation()
+}
+
+/**
+ * [EN] `-cyl_setAllTabBarItemAnimationsSpeed:loops:`: one playback policy for every tab icon animation, applied live.
+ * [CN] 所有 Tab 图标动画使用同一个播放策略，实时生效。
+ */
+fun CYLTabBar.cyl_setAllTabBarItemAnimationsSpeed(speed: Float, loops: Boolean) {
+    for (button in tabBarButtonArray) {
+        if (!button.cyl_isTabBarItemAnimationReady()) continue
+        button.cyl_setTabBarItemAnimationSpeed(speed)
+        button.cyl_setTabBarItemAnimationLoops(loops)
+    }
 }
 
 // MARK: - Attributes 属性
