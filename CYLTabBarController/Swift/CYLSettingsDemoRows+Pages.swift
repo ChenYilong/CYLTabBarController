@@ -467,13 +467,13 @@ final class CYLLateImageDemoTabBarController: CYLTabBarController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         // [EN] A badge, shown before the picture changes: it must end on the picture. [CN] 在图片变化之前显示角标：最终应位于图片上。
-        CYLPlusButton(forOwner: self)?.cyl_showBadgeValue("1", animationType: .none)
+        (CYLPlusButton(forOwner: self) as UIView?)?.cyl_showBadgeValue("1", animationType: .none)
     }
 
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         if isMovingFromParent || isBeingDismissed {
-            CYLPlusButton.removePlusButton(forTabBarContext: CYLSettingsDemo.lateImageContext)
+            CYLPlusButton.remove(forTabBarContext: CYLSettingsDemo.lateImageContext)
         }
     }
 }

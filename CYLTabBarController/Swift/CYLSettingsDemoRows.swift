@@ -471,7 +471,7 @@ final class CYLLoginStateSwitch: UISwitch {
         super.init(frame: frame)
         addTarget(self, action: #selector(valueDidChange), for: .valueChanged)
         NotificationCenter.default.addObserver(self, selector: #selector(loginStateDidChange),
-                                               name: NSNotification.Name(CYLTabBarLoginStateDidChangeNotification), object: nil)
+                                               name: .CYLTabBarLoginStateDidChange, object: nil)
     }
 
     required init?(coder: NSCoder) {

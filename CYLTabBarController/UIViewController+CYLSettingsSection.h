@@ -7,8 +7,6 @@
 
 #import <UIKit/UIKit.h>
 
-NS_ASSUME_NONNULL_BEGIN
-
 /*!
  * [EN] Section index of the settings rows at the top of a list: row 0 is the language setting
  *      (`-cyl_languageCellForTableView:`), row 1 the memory warning check (`-cyl_memoryWarningCellForTableView:`),
@@ -48,124 +46,17 @@ NS_ASSUME_NONNULL_BEGIN
  *      （`-cyl_configurationEdgeCaseCellForTableView:row:`），之后是原地更新 Tab 的若干行
  *      （`-cyl_tabBarItemUpdateCellForTableView:row:`）：标题、图标、网络图标、所有网络图标、所有本地图标、GIF 图标、所有标题、替换相邻 Tab 的页面。
  */
-FOUNDATION_EXTERN const NSInteger CYLSettingsSection;
+#define CYLSettingsSection 0
 
 /*!
- * [EN] The settings rows by function, for a list that shows them in groups (one table section per group, like Settings):
- *      the ObjC demo and the Swift demo (`Example-Shared/CYLSettingsDemoTableViewController.swift`) use the same groups.
- * [CN] 按功能划分的设置行，供分组显示的列表使用（每组一个 section，类似系统设置）：ObjC Demo 与 Swift Demo
- *      （`Example-Shared/CYLSettingsDemoTableViewController.swift`）使用相同的分组。
+ * [EN] `CYLSettingsGroup` and `UIViewController (CYLSettingsSection)` are implemented in Swift
+ *      (`Swift/UIViewController+CYLSettingsSection.swift` and the `Swift/CYLSettingsDemoRows*.swift` rows, every name and
+ *      selector kept) and declared by the generated Swift interface (`CYLSwiftInterface.h`), imported below. The scroll
+ *      hiding simulations are in `Swift/UIViewController+CYLScrollHideSimulation.swift`. `CYLSettingsSection` is a macro (it
+ *      was an extern constant), with the same name and value (docs/Swift-Migration.md, steps 32 and 33).
+ * [CN] `CYLSettingsGroup` 与 `UIViewController (CYLSettingsSection)` 在 Swift 中实现（`Swift/UIViewController+CYLSettingsSection.swift`
+ *      以及 `Swift/CYLSettingsDemoRows*.swift` 中的各行，所有名称与 selector 不变），由下面导入的 Swift 生成接口（`CYLSwiftInterface.h`）声明。
+ *      滚动隐藏模拟位于 `Swift/UIViewController+CYLScrollHideSimulation.swift`。`CYLSettingsSection` 改为宏（原为 extern 常量），名称与值不变
+ *      （docs/Swift-Migration.md，第 32、33 步）。
  */
-typedef NS_ENUM(NSInteger, CYLSettingsGroup) {
-    /*!
-     * [EN] Language, memory warning, and rows a newer version adds. [CN] 语言、内存警告，以及新版本新增的行。
-     */
-    CYLSettingsGroupGeneral,
-    /*!
-     * [EN] Title offset, standardAppearance, scroll minimize. [CN] 标题偏移、standardAppearance、滚动缩小。
-     */
-    CYLSettingsGroupTabBarAppearance,
-    /*!
-     * [EN] In-place tab item updates (#601). [CN] 原地更新 Tab（#601）。
-     */
-    CYLSettingsGroupTabBarItemUpdate,
-    /*!
-     * [EN] Replace pages (#481), selectedIndex (#515), login (#19). [CN] 替换页面、selectedIndex、登录。
-     */
-    CYLSettingsGroupPagesSelectionLogin,
-    /*!
-     * [EN] The plus button's touchable area (#91), an image set later. [CN] PlusButton 可点击区域（#91）、之后才加载的图片。
-     */
-    CYLSettingsGroupPlusButton,
-    /*!
-     * [EN] Tap animation, sound, long press, swipe (#535, #118). [CN] 点击动画、声音、长按、滑动。
-     */
-    CYLSettingsGroupTabInteractions,
-    /*!
-     * [EN] No base class, CYLUtils helpers (#535). [CN] 无需继承基类、CYLUtils 工具方法。
-     */
-    CYLSettingsGroupHelpers,
-    /*!
-     * [EN] A tab bar controller from a configuration file, and the simulated failures. [CN] 由配置文件创建 TabBarController，以及模拟意外情况。
-     */
-    CYLSettingsGroupConfiguration,
-};
-
-/*!
- * [EN] The settings section in three calls, so a list adds it with one line in each data source and delegate method:
- *
- *          numberOfSections                  → your sections + 1
- *          numberOfRows      (CYLSettingsSection) → [self cyl_settingsRowCount]
- *          cellForRow        (CYLSettingsSection) → [self cyl_settingsCellForTableView:tableView atIndexPath:indexPath]
- *          didSelectRow      (CYLSettingsSection) → [self cyl_didSelectSettingsRowAtIndexPath:indexPath inTableView:tableView]
- * [CN] 用三个调用提供设置分组，列表在每个数据源 / 代理方法中各加一行即可（见上）。
- */
-@interface UIViewController (CYLSettingsSection)
-
-/*!
- * [EN] Number of rows in the settings section.
- * [CN] 设置分组的行数。
- */
-- (NSInteger)cyl_settingsRowCount;
-
-/*!
- * [EN] The cell for `indexPath.row` of the settings section.
- * [CN] 设置分组第 `indexPath.row` 行的 cell。
- */
-- (UITableViewCell *)cyl_settingsCellForTableView:(UITableView *)tableView atIndexPath:(NSIndexPath *)indexPath;
-
-/*!
- * [EN] Deselects the row and runs it: the language picker, the memory warning check, the next title offset, the next
- *      appearance theme, the login state, the skin picker or the tab item update.
- * [CN] 取消选中并执行该行：语言选择、内存警告检查、切换到下一个标题偏移、下一个 appearance 主题、登录状态、换肤选择器或更新 Tab。
- */
-- (void)cyl_didSelectSettingsRowAtIndexPath:(NSIndexPath *)indexPath inTableView:(UITableView *)tableView;
-
-#pragma mark - Groups
-
-/*!
- * [EN] The groups that have rows, in display order (`CYLSettingsGroup` values).
- * [CN] 有行的分组，按显示顺序排列（`CYLSettingsGroup` 的值）。
- */
-- (NSArray<NSNumber *> *)cyl_settingsGroups NS_SWIFT_NAME(cyl_settingsGroups());
-
-/*!
- * [EN] The localized title of `group`.
- * [CN] `group` 的本地化标题。
- */
-- (NSString *)cyl_titleForSettingsGroup:(CYLSettingsGroup)group NS_SWIFT_NAME(cyl_title(for:));
-
-/*!
- * [EN] The settings rows of `group`, in display order. Every settings row is in exactly one group; a row this version does
- *      not place goes to `CYLSettingsGroupGeneral`.
- * [CN] `group` 中的设置行，按显示顺序排列。每个设置行只属于一个分组；本版本未归类的行放入 `CYLSettingsGroupGeneral`。
- */
-- (NSArray<NSNumber *> *)cyl_settingsRowsInGroup:(CYLSettingsGroup)group NS_SWIFT_NAME(cyl_settingsRows(in:));
-
-/*!
- * [EN] The cell of settings row `row`, for any section of any table view (a grouped list).
- * [CN] 设置行 `row` 的 cell，可用于任意列表的任意 section（分组列表）。
- */
-- (UITableViewCell *)cyl_settingsCellForTableView:(UITableView *)tableView row:(NSInteger)row NS_SWIFT_NAME(cyl_settingsCell(for:row:));
-
-/*!
- * [EN] Runs settings row `row`, without touching a table view: a grouped list deselects and reloads its own rows after it
- *      (e.g. a checkmark or the current value changed).
- * [CN] 执行设置行 `row`，不操作列表：分组列表在其后自行取消选中并刷新（例如勾号或当前值已变化）。
- */
-- (void)cyl_didSelectSettingsRow:(NSInteger)row NS_SWIFT_NAME(cyl_didSelectSettingsRow(_:));
-
-@end
-
-/*!
- * [EN] `UIViewController (CYLScrollHideSimulation)` (issue #13: the scroll hiding simulations and their self-test) is
- *      implemented in Swift (`Swift/UIViewController+CYLScrollHideSimulation.swift`, every selector kept) and declared by the
- *      generated Swift interface (`CYLSwiftInterface.h`), imported at the end of this header (docs/Swift-Migration.md, step 32).
- * [CN] `UIViewController (CYLScrollHideSimulation)`（issue #13：滚动隐藏模拟及其自测）在 Swift 中实现
- *      （`Swift/UIViewController+CYLScrollHideSimulation.swift`，所有 selector 不变），由本头文件末尾导入的 Swift 生成接口
- *      （`CYLSwiftInterface.h`）声明（docs/Swift-Migration.md，第 32 步）。
- */
-
-NS_ASSUME_NONNULL_END
-
 #import "CYLSwiftInterface.h"
