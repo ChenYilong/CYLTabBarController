@@ -6,8 +6,8 @@
 //  Copyright © 2026 https://github.com/ChenYilong . All rights reserved.
 //
 
-// CYL-SWIFT-MIGRATION: objc-required — [EN] Swift cannot catch Objective-C exceptions, and these two methods exist to
-//      catch the one `-removeObserver:forKeyPath:` raises for an observer that is not registered. Everything else of this
+// CYL-SWIFT-MIGRATION: objc-required — [EN] Swift cannot catch Objective-C exceptions, and these two methods and `CYLCatchException()` exist to
+//      catch one, e.g. the one `-removeObserver:forKeyPath:` raises for an observer that is not registered. Everything else of this
 //      category is Swift (`Swift/NSObject+CYLTabBarControllerExtention.swift`, docs/Swift-Migration.md).
 //      [CN] Swift 无法捕获 Objective-C 异常，而这两个方法正是为了捕获 `-removeObserver:forKeyPath:` 在观察者未注册时抛出的异常。
 //      该类别的其他部分均为 Swift（`Swift/NSObject+CYLTabBarControllerExtention.swift`，docs/Swift-Migration.md）。
@@ -37,3 +37,12 @@
 }
 
 @end
+
+NSException *_Nullable CYLCatchException(NS_NOESCAPE void (^block)(void)) {
+    @try {
+        block();
+    } @catch (NSException *exception) {
+        return exception;
+    }
+    return nil;
+}

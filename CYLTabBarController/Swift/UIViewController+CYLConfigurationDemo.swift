@@ -430,7 +430,6 @@ enum CYLConfigurationEdgeCases {
         case .unregistered: return "unregistered"
         case .excluded: return "excluded"
         case .providerFailed: return "provider failed"
-        @unknown default: return "unknown"
         }
     }
 

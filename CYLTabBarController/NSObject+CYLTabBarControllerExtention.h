@@ -40,6 +40,14 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+/*!
+ * [EN] Runs `block` and returns the Objective-C exception it raises, or nil. For the library's Swift code, which cannot
+ *      catch Objective-C exceptions (e.g. around a page provider written by the app). Internal.
+ * [CN] 执行 `block` 并返回它抛出的 Objective-C 异常，没有则为 nil。供本库的 Swift 代码使用（Swift 无法捕获 Objective-C 异常，例如调用
+ *      App 编写的页面提供者时）。内部使用。
+ */
+FOUNDATION_EXTERN NSException *_Nullable CYLCatchException(NS_NOESCAPE void (^block)(void));
+
 NS_ASSUME_NONNULL_END
 
 #import "CYLSwiftInterface.h"
