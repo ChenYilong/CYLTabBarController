@@ -187,3 +187,8 @@
 }
 
 /* [EN] The selected tab's lens is drawn by cyl-tab-bar-item (CYLTabBarItemStyle liquidGlass). [CN] 选中 Tab 的透镜由 cyl-tab-bar-item 绘制（CYLTabBarItemStyle liquidGlass）。 */
+
+/* [EN] tabBarHidden (iOS -setTabBarHidden:). [CN] tabBarHidden（iOS -setTabBarHidden:）。 */
+.cyl-tab-bar-hidden {
+  display: none;
+}

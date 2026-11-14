@@ -4,12 +4,12 @@
  *      and renders the tabs, a raised plus button, badges, skins and the style types. Use it inside the mini program's
  *      `custom-tab-bar` (app.json: "tabBar": {"custom": true}). Events: `select`, `reselect`, `plustap`,
  *      `loginrequired`; methods: `cyl_selectIdentifier`, `cyl_showBadgeValue`, `cyl_showBadgeDot`, `cyl_removeBadge`,
- *      `cyl_setThemeIdentifier`.
+ *      `cyl_setThemeIdentifier`, `cyl_setHiddenIdentifiers`, `cyl_setTabBarHidden`.
  * [CN] cyl-tab-bar：微信小程序版 CYLTabBarController。自定义 TabBar 组件，接收 CYLTabBarController 配置（与 iOS、Android
  *      库相同的键，见 docs/Configuration-File.md），渲染 Tab、凸起的 PlusButton、角标、皮肤与样式。在小程序的
  *      `custom-tab-bar` 中使用（app.json："tabBar": {"custom": true}）。事件：`select`、`reselect`、`plustap`、
  *      `loginrequired`；方法：`cyl_selectIdentifier`、`cyl_showBadgeValue`、`cyl_showBadgeDot`、`cyl_removeBadge`、
- *      `cyl_setThemeIdentifier`。
+ *      `cyl_setThemeIdentifier`、`cyl_setHiddenIdentifiers`、`cyl_setTabBarHidden`。
  */
 const { cylReadConfiguration } = require('./cyl_configuration');
 const { cylTabBarItemStyle, cylTabBarItemStyleForStyleType, cylGlassLensStyle } = require('./cyl_tab_bar_item_style');
@@ -163,6 +163,19 @@ Component({
      * [CN] 与 CYLTabBarItemMinimumAppVersion 比较的 App 版本；'' 表示不检查。
      */
     appVersion: { type: String, value: '' },
+    /**
+     * [EN] Identifiers (CYLTabBarItemIdentifier, or the plus button's) left out of the bar, e.g. tabs the user's role
+     *      may not see. Their pages stay in app.json; the bar only stops showing them. A hidden selected tab selects the
+     *      first shown one.
+     * [CN] 不在 TabBar 中显示的标识（CYLTabBarItemIdentifier 或 PlusButton 的标识），例如用户角色无权看到的 Tab。其页面仍在
+     *      app.json 中，只是 TabBar 不再显示。隐藏选中的 Tab 时选中第一个显示的 Tab。
+     */
+    hiddenIdentifiers: { type: Array, value: [] },
+    /**
+     * [EN] Hides the whole bar (iOS -setTabBarHidden:); each tab page has its own bar, so it hides it on that page only.
+     * [CN] 隐藏整个 TabBar（iOS -setTabBarHidden:）；每个 Tab 页面有自己的 TabBar，因此只在该页面隐藏。
+     */
+    tabBarHidden: { type: Boolean, value: false },
   },
 
   data: {
@@ -179,7 +192,7 @@ Component({
   },
 
   observers: {
-    'configuration, strings, symbolsByTheme, imageBasePath, animationBasePath, selectedIdentifier, appVersion, itemStyle, glassLensStyle': function () {
+    'configuration, strings, symbolsByTheme, imageBasePath, animationBasePath, selectedIdentifier, appVersion, itemStyle, glassLensStyle, hiddenIdentifiers': function () {
       this.cyl_render();
     },
   },
@@ -224,8 +237,22 @@ Component({
         animationBasePath: this.data.animationBasePath,
         themeIdentifier: this.cylRequestedTheme,
       });
+      const hidden = this.data.hiddenIdentifiers || [];
+      if (hidden.length > 0) {
+        if (model.plusButton) {
+          // [EN] The plus button's place counts the tabs before it; hidden ones no longer take a place.
+          // [CN] PlusButton 的位置按其前面的 Tab 计算；隐藏的 Tab 不再占位。
+          const hiddenBefore = model.items.slice(0, model.plusButton.index).filter((item) => hidden.includes(item.identifier)).length;
+          model.plusButton = hidden.includes(model.plusButton.identifier)
+            ? null : Object.assign({}, model.plusButton, { index: model.plusButton.index - hiddenBefore });
+        }
+        model.items = model.items.filter((item) => !hidden.includes(item.identifier));
+      }
       this.cylModel = model;
-      const selected = this.data.selectedIdentifier || (model.items[0] ? model.items[0].identifier : '');
+      const requested = this.data.selectedIdentifier;
+      const shown = model.items.some((item) => item.identifier === requested)
+        || (model.plusButton && model.plusButton.identifier === requested);
+      const selected = shown ? requested : (model.items[0] ? model.items[0].identifier : '');
       const slots = model.items.map((item) => this.cyl_slot(item, selected));
       if (model.plusButton) {
         slots.splice(model.plusButton.index, 0, this.cyl_plusSlot(model.plusButton, selected,
@@ -542,6 +569,22 @@ Component({
           item.cyl_playAnimation(0);
         }
       });
+    },
+
+    /**
+     * [EN] Sets `hiddenIdentifiers` at run time: the tabs (or the plus button) to leave out of the bar.
+     * [CN] 在运行时设置 `hiddenIdentifiers`：不在 TabBar 中显示的 Tab（或 PlusButton）。
+     */
+    cyl_setHiddenIdentifiers(identifiers) {
+      this.setData({ hiddenIdentifiers: Array.isArray(identifiers) ? identifiers.slice() : [] });
+    },
+
+    /**
+     * [EN] Hides or shows the whole bar at run time (iOS -setTabBarHidden:).
+     * [CN] 在运行时隐藏或显示整个 TabBar（iOS -setTabBarHidden:）。
+     */
+    cyl_setTabBarHidden(hidden) {
+      this.setData({ tabBarHidden: Boolean(hidden) });
     },
 
     /** [EN] Sets `animationSpeed` at run time. [CN] 在运行时设置 `animationSpeed`。 */

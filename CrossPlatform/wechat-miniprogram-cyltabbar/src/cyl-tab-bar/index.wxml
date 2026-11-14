@@ -1,5 +1,5 @@
 <!-- [EN] The tab bar: a tab list with one tab per item and the raised plus button. [CN] TabBar：每项一个 Tab 的列表，以及凸起的 PlusButton。 -->
-<view class="cyl-tab-bar cyl-style-{{cylStyleType}} {{cylIsDark ? 'cyl-dark' : ''}}" style="{{cylBarStyle}}" aria-role="tablist">
+<view class="cyl-tab-bar cyl-style-{{cylStyleType}} {{cylIsDark ? 'cyl-dark' : ''}} {{tabBarHidden ? 'cyl-tab-bar-hidden' : ''}}" style="{{cylBarStyle}}" aria-role="tablist" aria-hidden="{{tabBarHidden}}">
   <view
     wx:for="{{cylSlots}}"
     wx:key="key"
