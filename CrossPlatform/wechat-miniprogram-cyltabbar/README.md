@@ -61,7 +61,7 @@ Properties: `itemStyle` (CYLTabBarItemStyle `flat` / `liquidGlass`), `glassLensS
 `loggedIn`, `appVersion`. Events: `select`, `reselect`, `plustap`, `loginrequired` (detail: `index`, `identifier`,
 `pageIdentifier`, `pageParameters`, `context`, `isPlusButton`). Methods: `cyl_selectIdentifier`, `cyl_showBadgeValue`,
 `cyl_showBadgeDot`, `cyl_removeBadge`, `cyl_setThemeIdentifier`, `cyl_themeIdentifiers`, `cyl_playLottie`,
-`cyl_selectAdjacent`, `cyl_setItemStyle`, `cyl_setGlassLensStyle`, `cyl_playAll`, `cyl_setAnimationSpeed`, `cyl_setAnimationLoop`. Page behavior for swiping between tabs: `cyl-tabbar-miniprogram/cyl-tab-bar/cyl_swipe_behavior`.
+`cyl_selectAdjacent`, `cyl_setItemStyle`, `cyl_setGlassLensStyle`, `cyl_playAll`, `cyl_setAnimationSpeed`, `cyl_setAnimationLoop`, `cyl_setHiddenIdentifiers` (property `hiddenIdentifiers`: tabs or the plus button left out of the bar, e.g. by user role), `cyl_setTabBarHidden` (property `tabBarHidden`: hides the bar of one page). Page behavior for swiping between tabs: `cyl-tabbar-miniprogram/cyl-tab-bar/cyl_swipe_behavior`.
 
 ## Layout
 

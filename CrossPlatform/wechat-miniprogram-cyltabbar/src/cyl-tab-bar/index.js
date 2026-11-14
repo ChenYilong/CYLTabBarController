@@ -170,7 +170,11 @@ Component({
      * [CN] 不在 TabBar 中显示的标识（CYLTabBarItemIdentifier 或 PlusButton 的标识），例如用户角色无权看到的 Tab。其页面仍在
      *      app.json 中，只是 TabBar 不再显示。隐藏选中的 Tab 时选中第一个显示的 Tab。
      */
-    hiddenIdentifiers: { type: Array, value: [] },
+    // [EN] `type: null`: an array made in another JavaScript context (a test driver, a worker) is not an Array for
+    //      WeChat: `type: Array` turns it into [], and here it arrives as an object ({0: 'a'}), which cyl_render reads too.
+    // [CN] `type: null`：其他 JavaScript 上下文（测试驱动、worker）创建的数组在微信看来不是 Array：`type: Array` 会把它
+    //      变成 []，在这里则以对象（{0: 'a'}）到达，cyl_render 同样能读取。
+    hiddenIdentifiers: { type: null, value: [] },
     /**
      * [EN] Hides the whole bar (iOS -setTabBarHidden:); each tab page has its own bar, so it hides it on that page only.
      * [CN] 隐藏整个 TabBar（iOS -setTabBarHidden:）；每个 Tab 页面有自己的 TabBar，因此只在该页面隐藏。
@@ -237,7 +241,9 @@ Component({
         animationBasePath: this.data.animationBasePath,
         themeIdentifier: this.cylRequestedTheme,
       });
-      const hidden = this.data.hiddenIdentifiers || [];
+      const hiddenValue = this.data.hiddenIdentifiers;
+      const hidden = (Array.isArray(hiddenValue) ? hiddenValue
+        : (hiddenValue && typeof hiddenValue === 'object' ? Object.keys(hiddenValue).map((key) => hiddenValue[key]) : [])).map(String);
       if (hidden.length > 0) {
         if (model.plusButton) {
           // [EN] The plus button's place counts the tabs before it; hidden ones no longer take a place.
