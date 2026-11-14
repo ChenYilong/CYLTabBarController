@@ -446,6 +446,15 @@ Component({
       }
     },
 
+    /**
+     * [EN] Renders the component again, so the canvas goes back to where the page puts it (WeChat DevTools leaves the
+     *      canvas of a fixed bar where it was after a page scroll; see cyl-lottie).
+     * [CN] 重新渲染组件，使画布回到页面布局的位置（微信开发者工具在页面滚动后会把固定栏中的画布留在原处；见 cyl-lottie）。
+     */
+    cyl_refreshLayout() {
+      this.setData({cylLayoutVersion: (this.data.cylLayoutVersion || 0) + 1})
+    },
+
     /** [EN] {rive, file, artboard, instance} or null. [CN] 返回 {rive, file, artboard, instance}，没有时为 null。 */
     cyl_animation() {
       const state = this.cylState

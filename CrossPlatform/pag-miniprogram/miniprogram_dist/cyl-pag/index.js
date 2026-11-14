@@ -282,6 +282,15 @@ Component({
       }
     },
 
+    /**
+     * [EN] Renders the component again, so the canvas goes back to where the page puts it (WeChat DevTools leaves the
+     *      canvas of a fixed bar where it was after a page scroll; see cyl-lottie).
+     * [CN] 重新渲染组件，使画布回到页面布局的位置（微信开发者工具在页面滚动后会把固定栏中的画布留在原处；见 cyl-lottie）。
+     */
+    cyl_refreshLayout() {
+      this.setData({cylLayoutVersion: (this.data.cylLayoutVersion || 0) + 1})
+    },
+
     /** [EN] Plays from the beginning (a tab that becomes selected). [CN] 从头播放（Tab 被选中时）。 */
     cyl_playFromStart(offset) {
       // [EN] `offset` (seconds) continues a playback another tab bar started: each tab page has its own tab bar.

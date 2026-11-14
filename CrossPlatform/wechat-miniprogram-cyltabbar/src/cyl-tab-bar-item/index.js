@@ -220,6 +220,17 @@ Component({
       }
     },
 
+    /**
+     * [EN] Puts the animation's canvas back where the page lays it out (cyl_refreshLayout of the animation component).
+     * [CN] 让动画画布回到页面布局的位置（动画组件的 cyl_refreshLayout）。
+     */
+    cyl_refreshAnimationLayout() {
+      const view = this.cyl_animationView();
+      if (view && typeof view.cyl_refreshLayout === 'function') {
+        view.cyl_refreshLayout();
+      }
+    },
+
     /** [EN] Stops the animation on its resting frame. [CN] 停止动画并显示静止帧。 */
     cyl_stopAnimation() {
       const view = this.cyl_animationView();

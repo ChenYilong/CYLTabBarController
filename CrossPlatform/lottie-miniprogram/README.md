@@ -28,7 +28,7 @@ table: [docs/WeChat-Mini-Program.md](../../docs/WeChat-Mini-Program.md#enlottie-
 Properties: `path`, `animationData`, `loop`, `autoplay`, `speed`, `colors` (keypath -> color), `fit` (contain, cover,
 fill), `restingFrame` (first, last), `label`. Events: `ready`, `complete`, `loopcomplete`, `error`. Methods:
 `cyl_play`, `cyl_pause`, `cyl_stop`, `cyl_playFromStart`, `cyl_goToAndStop`, `cyl_goToAndPlay`, `cyl_playSegments`,
-`cyl_setSpeed`, `cyl_animation`. The canvas is sized for the pixel ratio, so animations stay sharp on devices
+`cyl_setSpeed`, `cyl_refreshLayout`, `cyl_animation`. The canvas is sized for the pixel ratio, so animations stay sharp on devices
 (issues #12, #23, #26).
 
 Build: `npm install && npm run build` (writes `miniprogram_dist`, committed); test: `npm test`.

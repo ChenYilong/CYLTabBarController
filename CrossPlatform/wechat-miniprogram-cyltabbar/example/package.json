@@ -16,6 +16,8 @@
     "test-ui": "node --test --test-timeout=180000 test-ui/*.test.js"
   },
   "devDependencies": {
-    "miniprogram-automator": "0.13.0"
+    "miniprogram-automator": "0.13.0",
+    "pixelmatch": "4.0.2",
+    "pngjs": "3.4.0"
   }
 }

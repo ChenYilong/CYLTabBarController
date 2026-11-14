@@ -1,11 +1,11 @@
 /**
  * [EN] UI tests of the example in WeChat DevTools, through miniprogram-automator. They drive the real simulator: the
  *      custom tab bar of the current page, its slots, tab switching, the item style and the glass lens look, the plus
- *      button title line and the playback controls. Run: `npm run test-ui` (DevTools installed, logged in, with
+ *      button title line, the playback controls and the animated icons after a page scroll. Run: `npm run test-ui` (DevTools installed, logged in, with
  *      "Settings > Security > Service port" on). CYL_DEVTOOLS_CLI overrides the DevTools command line tool;
  *      CYL_AUTOMATOR_WS connects to a DevTools already started with `cli auto --auto-port <port>`.
  * [CN] 通过 miniprogram-automator 在微信开发者工具中运行的示例 UI 测试。驱动真实模拟器：当前页面的自定义 TabBar、
- *      其各个位置、切换 Tab、Item 样式与玻璃镜片外观、PlusButton 标题行以及播放控件。运行：`npm run test-ui`（已安装并
+ *      其各个位置、切换 Tab、Item 样式与玻璃镜片外观、PlusButton 标题行、播放控件以及页面滚动后的动画图标。运行：`npm run test-ui`（已安装并
  *      登录开发者工具，且开启「设置 > 安全 > 服务端口」）。CYL_DEVTOOLS_CLI 指定开发者工具命令行；CYL_AUTOMATOR_WS
  *      连接已用 `cli auto --auto-port <端口>` 启动的开发者工具。
  */
@@ -13,6 +13,8 @@ const { test, before, after } = require('node:test');
 const assert = require('node:assert/strict');
 const path = require('node:path');
 const automator = require('miniprogram-automator');
+const { PNG } = require('pngjs');
+const pixelmatch = require('pixelmatch');
 
 const CYL_PROJECT = path.resolve(__dirname, '..');
 const CYL_CLI = process.env.CYL_DEVTOOLS_CLI || '/Applications/wechatwebdevtools.app/Contents/MacOS/cli';
@@ -170,4 +172,70 @@ test('the playback controls reach the bar: speed, loop, Play all', async () => {
     return { speed: bar.data.animationSpeed, loop: bar.data.animationLoop };
   });
   assert.deepEqual(reset, { speed: 1, loop: false });
+});
+
+/**
+ * [EN] The share of different pixels between two screenshots (base64 PNG) inside `rect` (in window points). A
+ *      screenshot is the whole screen: the window starts `windowTop` points down, below the status and navigation bars.
+ * [CN] 两张截图（base64 PNG）在 `rect`（窗口点坐标）内不同像素的比例。截图是整个屏幕：窗口从 `windowTop` 点处开始，
+ *      位于状态栏与导航栏之下。
+ */
+function cylDifference(before, after, rect, windowWidth, windowTop) {
+  const first = PNG.sync.read(Buffer.from(before, 'base64'));
+  const second = PNG.sync.read(Buffer.from(after, 'base64'));
+  const scale = first.width / windowWidth;
+  const x = Math.round(rect.left * scale);
+  const y = Math.round((rect.top + windowTop) * scale);
+  const width = Math.round(rect.width * scale);
+  const height = Math.round(rect.height * scale);
+  const crop = (png) => {
+    const out = new PNG({ width, height });
+    PNG.bitblt(png, out, x, y, width, height, 0, 0);
+    return out.data;
+  };
+  return pixelmatch(crop(first), crop(second), null, width, height, { threshold: 0.1 }) / (width * height);
+}
+
+test('the animated icons stay in the bar after a page scroll (WeChat DevTools, cyl_scroll_behavior)', async (t) => {
+  await miniProgram.switchTab('/pages/me/index');
+  await cylSleep(CYL_SETTLE_MS * 4);
+  const layout = await miniProgram.evaluate(() => new Promise((resolve) => {
+    const pages = getCurrentPages();
+    const bar = pages[pages.length - 1].getTabBar().selectComponent('#cyl-tab-bar');
+    bar.createSelectorQuery().selectAll('.cyl-tab-item >>> .cyl-item-icon-box').boundingClientRect()
+      .exec((result) => resolve({
+        windowWidth: wx.getWindowInfo().windowWidth,
+        windowTop: wx.getWindowInfo().screenHeight - wx.getWindowInfo().windowHeight,
+        icons: (result[0] || []).map((rect) => ({ left: rect.left, top: rect.top, width: rect.width, height: rect.height })),
+      }));
+  }));
+  assert.ok(layout.icons.length >= 4, 'icon boxes');
+  const before = await miniProgram.screenshot();
+  for (const top of [300, 1380]) {
+    await miniProgram.pageScrollTo(top);
+    await cylSleep(CYL_SETTLE_MS * 1.5);
+    const after = await miniProgram.screenshot();
+    if (process.env.CYL_UI_SCREENSHOTS) {
+      require('node:fs').writeFileSync(path.join(process.env.CYL_UI_SCREENSHOTS, `cyl-scroll-${top}.png`), Buffer.from(after, 'base64'));
+    }
+    layout.icons.forEach((rect, index) => {
+      const difference = cylDifference(before, after, rect, layout.windowWidth, layout.windowTop);
+      assert.ok(difference < 0.02, `icon ${index} after a scroll to ${top}: ${(difference * 100).toFixed(1)}% of its pixels changed`);
+    });
+  }
+  // [EN] During an animated scroll the icons still lag behind (TODO in docs/WeChat-Mini-Program.md): measured and
+  //      reported, not asserted, until that is fixed.
+  // [CN] 动画滚动期间图标仍会落后（docs/WeChat-Mini-Program.md 中的 TODO）：在修复前只测量并报告，不作断言。
+  await miniProgram.evaluate(() => { wx.pageScrollTo({ scrollTop: 0, duration: 3000 }); });
+  await cylSleep(1200);
+  const during = await miniProgram.screenshot();
+  if (process.env.CYL_UI_SCREENSHOTS) {
+    require('node:fs').writeFileSync(path.join(process.env.CYL_UI_SCREENSHOTS, 'cyl-scroll-during.png'), Buffer.from(during, 'base64'));
+  }
+  const drift = layout.icons.map((rect) => cylDifference(before, during, rect, layout.windowWidth, layout.windowTop));
+  t.diagnostic(`changed pixels of the icons during a scroll (TODO): ${drift.map((value) => `${(value * 100).toFixed(1)}%`).join(', ')}`);
+  await cylSleep(2000);
+  await miniProgram.pageScrollTo(0);
+  await miniProgram.switchTab('/pages/home/index');
+  await cylSleep(CYL_SETTLE_MS);
 });

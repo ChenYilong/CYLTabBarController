@@ -5,12 +5,12 @@
  *      loads the animation from `path` (a network URL or a package file) or `animationData`, recolors it with
  *      `colors`, and destroys it when the component is removed. Events: `ready`, `complete`, `loopcomplete`, `error`.
  *      Methods: cyl_play, cyl_pause, cyl_stop, cyl_playFromStart, cyl_goToAndStop, cyl_goToAndPlay,
- *      cyl_playSegments, cyl_setSpeed, cyl_animation.
+ *      cyl_playSegments, cyl_setSpeed, cyl_refreshLayout, cyl_animation.
  * [CN] cyl-lottie：本包 lottie 库（CYLTabBarController 维护的 lottie-miniprogram 分支）的组件，方式与 Lottie.WMC 相同：
  *      在 WXML 中写 <cyl-lottie path="…" />，组件自己创建 <canvas type="2d">，按屏幕像素比设置尺寸（真机上清晰，
  *      上游 issue #12、#23、#26），从 `path`（网络地址或包内文件）或 `animationData` 加载动画，用 `colors` 换色，
  *      组件移除时销毁动画。事件：`ready`、`complete`、`loopcomplete`、`error`。方法：cyl_play、cyl_pause、cyl_stop、
- *      cyl_playFromStart、cyl_goToAndStop、cyl_goToAndPlay、cyl_playSegments、cyl_setSpeed、cyl_animation。
+ *      cyl_playFromStart、cyl_goToAndStop、cyl_goToAndPlay、cyl_playSegments、cyl_setSpeed、cyl_refreshLayout、cyl_animation。
  */
 const lottie = require('../index.js')
 const {cylApplyLottieColors} = require('./cyl_lottie_colors')
@@ -252,6 +252,17 @@ Component({
         this.cylAnimation.stop()
         this.cyl_rest()
       }
+    },
+
+    /**
+     * [EN] Renders the component again, without touching the animation, so the canvas goes back to where the page
+     *      puts it. WeChat DevTools leaves a <canvas type="2d"> of a fixed bar (the custom tab bar) where it was after a
+     *      page scroll, over the page content, until the component renders again.
+     * [CN] 重新渲染组件（不改动画），使画布回到页面布局的位置。微信开发者工具在页面滚动后会把固定栏（自定义 TabBar）中的
+     *      <canvas type="2d"> 留在原处、盖在页面内容上，直到组件再次渲染。
+     */
+    cyl_refreshLayout() {
+      this.setData({cylLayoutVersion: (this.data.cylLayoutVersion || 0) + 1})
     },
 
     /**
