@@ -181,6 +181,7 @@ docs/
 │   ├── android-liquid-glass-surface-100.png
 │   ├── android-liquid-glass-surface-slider.png
 │   ├── android-more-than-five-tabs-report.png
+│   ├── android-playback-controls-pag-example-api35-b57c844.png
 │   ├── animated-icons-demo-controls-request-android.jpg
 │   ├── carthage-example-ios.png
 │   ├── configuration-demo-json-zh-hans.png

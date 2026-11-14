@@ -586,7 +586,7 @@ open class CYLTabBarPageRegistry: NSObject, CYLTabBarPageProviding {
             CYLTabBarPageValues.log("🔴 CYLTabBarController: the tab is skipped: \(skippedTab). Register the ID with CYLTabBarPageRegistry or adopt CYLTabBarPage.")
         }
         for tab in tabs {
-            guard let attributes = tab as? [String: Any] else {
+            guard let tabDictionary = tab as? NSDictionary, let attributes = tabDictionary as? [String: Any] else {
                 skip(.invalidTab, nil, nil, "not a dictionary: \(tab)")
                 continue
             }
@@ -638,7 +638,9 @@ open class CYLTabBarPageRegistry: NSObject, CYLTabBarPageProviding {
                 content.navigationItem.title = title
             }
             pages.append(page)
-            keptTabs?.add(attributes)
+            // [EN] The same dictionary object, not a Swift copy: the caller matches the kept tabs with its own by identity.
+            // [CN] 放入同一个字典对象，而不是 Swift 副本：调用方按对象标识把保留的 Tab 与自己的 Tab 对应起来。
+            keptTabs?.add(tabDictionary)
         }
         return pages
     }
