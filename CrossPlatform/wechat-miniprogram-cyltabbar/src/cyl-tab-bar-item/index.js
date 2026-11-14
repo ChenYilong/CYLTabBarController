@@ -221,13 +221,14 @@ Component({
     },
 
     /**
-     * [EN] Puts the animation's canvas back where the page lays it out (cyl_refreshLayout of the animation component).
-     * [CN] 让动画画布回到页面布局的位置（动画组件的 cyl_refreshLayout）。
+     * [EN] Puts the animation's canvas back where the page lays it out (cyl_refreshLayout of the animation component);
+     *      `scrolling`: true while the page scrolls, false after.
+     * [CN] 让动画画布回到页面布局的位置（动画组件的 cyl_refreshLayout）；`scrolling`：页面滚动期间为 true，之后为 false。
      */
-    cyl_refreshAnimationLayout() {
+    cyl_refreshAnimationLayout(scrolling) {
       const view = this.cyl_animationView();
       if (view && typeof view.cyl_refreshLayout === 'function') {
-        view.cyl_refreshLayout();
+        view.cyl_refreshLayout(scrolling);
       }
     },
 

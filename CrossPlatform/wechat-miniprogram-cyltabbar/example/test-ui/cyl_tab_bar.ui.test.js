@@ -254,3 +254,57 @@ test('the animated icons stay in the bar during and after a page scroll (WeChat 
   await miniProgram.switchTab('/pages/home/index');
   await cylSleep(CYL_SETTLE_MS);
 });
+
+/**
+ * [EN] Whether each animated icon of the current page's bar shows its still image (DevTools).
+ * [CN] 当前页面 TabBar 的每个动画图标是否显示静态图片（开发者工具）。
+ */
+function cylSnapshotsShown() {
+  return miniProgram.evaluate(() => {
+    const pages = getCurrentPages();
+    const bar = pages[pages.length - 1].getTabBar().selectComponent('#cyl-tab-bar');
+    return bar.selectAllComponents('.cyl-tab-item').map((item) => Boolean(item.selectComponent('#cyl-item-animation').data.cylSnapshotShown));
+  });
+}
+
+test('looping icons hold still during a page scroll and play again after it (WeChat DevTools)', async () => {
+  await miniProgram.switchTab('/pages/me/index');
+  await cylSleep(CYL_SETTLE_MS * 2);
+  const layout = await miniProgram.evaluate(() => new Promise((resolve) => {
+    const pages = getCurrentPages();
+    const bar = pages[pages.length - 1].getTabBar().selectComponent('#cyl-tab-bar');
+    bar.cyl_setAnimationLoop(true);
+    bar.cyl_playAll();
+    bar.createSelectorQuery().selectAll('.cyl-tab-item >>> .cyl-item-icon-box').boundingClientRect()
+      .exec((result) => resolve({
+        windowWidth: wx.getWindowInfo().windowWidth,
+        windowTop: wx.getWindowInfo().screenHeight - wx.getWindowInfo().windowHeight,
+        icons: (result[0] || []).map((rect) => ({ left: rect.left, top: rect.top, width: rect.width, height: rect.height })),
+      }));
+  }));
+  try {
+    await cylSleep(500);
+    assert.deepEqual(await cylSnapshotsShown(), [false, false, false, false], 'looping icons play on their canvas');
+    await miniProgram.evaluate(() => { wx.pageScrollTo({ scrollTop: 1380, duration: 3000 }); });
+    await cylSleep(800);
+    const first = await miniProgram.screenshot();
+    const shown = await cylSnapshotsShown();
+    await cylSleep(600);
+    const second = await miniProgram.screenshot();
+    assert.deepEqual(shown, [true, true, true, true], 'still images while the page scrolls');
+    layout.icons.forEach((rect, index) => {
+      const difference = cylDifference(first, second, rect, layout.windowWidth, layout.windowTop);
+      assert.ok(difference < 0.02, `icon ${index} moved during the scroll: ${(difference * 100).toFixed(1)}% of its pixels changed`);
+    });
+    await cylSleep(2200);
+    assert.deepEqual(await cylSnapshotsShown(), [false, false, false, false], 'the canvases come back after the scroll');
+  } finally {
+    await miniProgram.evaluate(() => {
+      const pages = getCurrentPages();
+      pages[pages.length - 1].getTabBar().selectComponent('#cyl-tab-bar').cyl_setAnimationLoop(false);
+    });
+    await miniProgram.pageScrollTo(0);
+    await miniProgram.switchTab('/pages/home/index');
+    await cylSleep(CYL_SETTLE_MS * 2);
+  }
+});

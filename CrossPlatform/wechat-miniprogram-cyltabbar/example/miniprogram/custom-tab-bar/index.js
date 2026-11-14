@@ -108,10 +108,10 @@ Component({
      * [EN] A page scrolls (cyl_scroll_behavior.js, WeChat DevTools only): the animated icons go back into the bar.
      * [CN] 页面滚动（cyl_scroll_behavior.js，仅微信开发者工具）：动画图标回到 TabBar 内。
      */
-    cyl_refreshAnimationLayout() {
+    cyl_refreshAnimationLayout(scrolling) {
       const tabBar = this.selectComponent('#cyl-tab-bar');
       if (tabBar) {
-        tabBar.cyl_refreshAnimationLayout();
+        tabBar.cyl_refreshAnimationLayout(scrolling);
       }
     },
 

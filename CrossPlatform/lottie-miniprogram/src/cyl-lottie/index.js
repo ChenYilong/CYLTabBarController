@@ -153,9 +153,10 @@ Component({
 
     /**
      * [EN] WeChat DevTools only (CYL_USES_SNAPSHOTS): once the animation is not playing, shows a still image of the
-     *      canvas instead of the canvas; while it plays, shows the canvas. Runs after every playback change.
-     * [CN] 仅微信开发者工具（CYL_USES_SNAPSHOTS）：动画未播放时以画布的静态图片代替画布；播放时显示画布。每次播放状态
-     *      变化后运行。
+     *      canvas instead of the canvas; while it plays, shows the canvas, except while the page scrolls (a playing
+     *      icon then shows its frame of the moment). Runs after every playback change.
+     * [CN] 仅微信开发者工具（CYL_USES_SNAPSHOTS）：动画未播放时以画布的静态图片代替画布；播放时显示画布，页面滚动期间
+     *      除外（此时播放中的图标显示当时的帧）。每次播放状态变化后运行。
      */
     cyl_syncSnapshot() {
       if (!CYL_USES_SNAPSHOTS) {
@@ -166,7 +167,10 @@ Component({
       this.cylSnapshotTimer = setTimeout(() => {
         const animation = this.cylAnimation
         const playing = Boolean(animation && !animation.isPaused)
-        if (playing || !animation || !this.cylCanvas || typeof this.cylCanvas.toDataURL !== 'function') {
+        if (this.cylScrolling && this.data.cylSnapshotShown) {
+          return
+        }
+        if ((playing && !this.cylScrolling) || !animation || !this.cylCanvas || typeof this.cylCanvas.toDataURL !== 'function') {
           if (this.data.cylSnapshotShown) {
             this.setData({cylSnapshotShown: false})
           }
@@ -321,11 +325,22 @@ Component({
     /**
      * [EN] Renders the component again, without touching the animation, so the canvas goes back to where the page
      *      puts it. WeChat DevTools leaves a <canvas type="2d"> of a fixed bar (the custom tab bar) where it was after a
-     *      page scroll, over the page content, until the component renders again.
+     *      page scroll, over the page content, until the component renders again. `scrolling` (optional, true while the
+     *      page scrolls, false after) shows a still image in DevTools meanwhile, also for a playing icon.
      * [CN] 重新渲染组件（不改动画），使画布回到页面布局的位置。微信开发者工具在页面滚动后会把固定栏（自定义 TabBar）中的
-     *      <canvas type="2d"> 留在原处、盖在页面内容上，直到组件再次渲染。
+     *      <canvas type="2d"> 留在原处、盖在页面内容上，直到组件再次渲染。`scrolling`（可选，页面滚动期间为 true，之后为
+     *      false）使开发者工具在此期间显示静态图片，播放中的图标也一样。
      */
-    cyl_refreshLayout() {
+    cyl_refreshLayout(scrolling) {
+      if (CYL_USES_SNAPSHOTS && typeof scrolling === 'boolean') {
+        // [EN] DevTools: a still image while the page scrolls, also for a playing (looping) icon; the canvas comes back
+        //      after the scroll. [CN] 开发者工具：页面滚动期间显示静态图片，播放中（循环）的图标也一样；滚动结束后恢复画布。
+        const changed = this.cylScrolling !== scrolling
+        this.cylScrolling = scrolling
+        if (changed) {
+          this.cyl_syncSnapshot()
+        }
+      }
       this.setData({cylLayoutVersion: (this.data.cylLayoutVersion || 0) + 1})
     },
 
