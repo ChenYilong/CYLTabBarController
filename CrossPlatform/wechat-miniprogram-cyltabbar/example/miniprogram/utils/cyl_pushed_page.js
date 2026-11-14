@@ -11,6 +11,7 @@
  */
 const { t } = require('./cyl_demo_localization');
 const { cylDemoConfiguration } = require('./cyl_demo_configuration');
+const cylSymbols = require('../shared/symbols');
 
 const CYL_PUSHED_COLORS = { orange: '#FF9500', red: '#FF3B30' };
 // [EN] "The other plus button" (CYLPlusButtonSubclass alternatePlusButtonClassForOwner:). [CN] 「另一个 PlusButton」。
@@ -22,18 +23,20 @@ function cylRandomColor() {
 
 function cylPushedPage() {
   return {
-    data: { color: CYL_PUSHED_COLORS.orange, note: '', bar: '', toMe: false, configuration: null, closeColor: '#FF3B30', texts: {} },
+    data: { color: CYL_PUSHED_COLORS.orange, note: '', bar: '', toMe: false, configuration: null, closeColor: '#FF3B30', texts: {}, symbolsByTheme: cylSymbols, statusBarHeight: 20 },
     onLoad(options) {
       const bar = options.bar || '';
       let configuration = null;
       if (bar) {
         configuration = cylDemoConfiguration(Object.assign({}, getApp().globalData.cylTabBarState.overrides,
-          bar === 'other' ? { cylDemoPlusAttributes: CYL_OTHER_PLUS } : {}));
+          { cylDemoIcons: 'images' }, bar === 'other' ? { cylDemoPlusAttributes: CYL_OTHER_PLUS } : {}));
       }
       this.setData({
         color: CYL_PUSHED_COLORS[options.color] || CYL_PUSHED_COLORS.orange,
         note: options.note ? t(decodeURIComponent(options.note)) : '',
         bar,
+        // [EN] The custom navigation area starts below the status bar. [CN] 自定义导航区域从状态栏下方开始。
+        statusBarHeight: wx.getWindowInfo ? wx.getWindowInfo().statusBarHeight : wx.getSystemInfoSync().statusBarHeight,
         toMe: options.toMe === '1',
         configuration,
         texts: { Back: t('Back'), close: t('Close button of the plus button') },
