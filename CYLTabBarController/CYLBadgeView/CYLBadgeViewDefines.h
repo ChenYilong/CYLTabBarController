@@ -51,7 +51,10 @@ NS_ASSUME_NONNULL_BEGIN
  *      `CYLBadgeAnimationKeyForType(animationType)` 作为 key 添加。由本库角标（`-[UIView cyl_beginAnimation]`）与 iOS 26+ 上
  *      bar button item 的系统角标共用；仅供 CYLBadgeView 内部使用，不是公开 API。
  */
+/* [EN] Declared by the generated Swift header too (C++ sees that one: `noexcept`). [CN] 生成的 Swift 头文件也声明了它（C++ 使用那一份：`noexcept`）。 */
+#if !defined(__cplusplus) || !__has_include(<CYLTabBarController/CYLTabBarController-Swift.h>)
 FOUNDATION_EXTERN CAAnimation *_Nullable CYLBadgeAnimationForType(CYLBadgeAnimationType animationType, CGSize badgeSize);
+#endif
 
 NS_ASSUME_NONNULL_END
 

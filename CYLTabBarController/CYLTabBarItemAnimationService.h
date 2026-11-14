@@ -30,14 +30,23 @@ FOUNDATION_EXTERN id<CYLTabBarItemAnimationStyleSource> CYLTabBarItemAnimationDe
 /*!
  * [EN] Core's host. [CN] Core 提供的宿主实现。
  */
+/* [EN] Declared by the generated Swift header too (C++ sees that one: `noexcept`). [CN] 生成的 Swift 头文件也声明了它（C++ 使用那一份：`noexcept`）。 */
+#if !defined(__cplusplus) || !__has_include(<CYLTabBarController/CYLTabBarController-Swift.h>)
 FOUNDATION_EXTERN id<CYLTabBarItemAnimationHost> CYLTabBarItemAnimationDefaultHost(void);
+#endif
 
+/* [EN] Declared by the generated Swift header too (C++ sees that one: `noexcept`). [CN] 生成的 Swift 头文件也声明了它（C++ 使用那一份：`noexcept`）。 */
+#if !defined(__cplusplus) || !__has_include(<CYLTabBarController/CYLTabBarController-Swift.h>)
 FOUNDATION_EXTERN void CYLTabBarItemAnimationSetService(id<CYLTabBarItemAnimationService> _Nullable service);
+#endif
 
 /*!
  * [EN] The service, or nil without an animation library. [CN] 动画服务；没有动画库时为 nil。
  */
+/* [EN] Declared by the generated Swift header too (C++ sees that one: `noexcept`). [CN] 生成的 Swift 头文件也声明了它（C++ 使用那一份：`noexcept`）。 */
+#if !defined(__cplusplus) || !__has_include(<CYLTabBarController/CYLTabBarController-Swift.h>)
 FOUNDATION_EXTERN id<CYLTabBarItemAnimationService> _Nullable CYLTabBarItemAnimationGetService(void);
+#endif
 
 /*!
  * [EN] YES when an animation library is in the build. [CN] 构建中包含动画库时返回 YES。
@@ -53,6 +62,9 @@ static inline BOOL CYLTabBarItemAnimationIsAvailable(void) {
  * [CN] Tab 属性中某个通用动画 key（`CYLTabBarAnimationURL`…）的值：先取通用 key，再取 Tab 的 key 所选择的那一个动画库的 key（例如
  *      `CYLTabBarRiveURL`），不会取其他动画库的 key。Core 只通过它读取 Tab 属性，因此新增动画库时无需修改 Core。
  */
+/* [EN] Declared by the generated Swift header too (C++ sees that one: `noexcept`). [CN] 生成的 Swift 头文件也声明了它（C++ 使用那一份：`noexcept`）。 */
+#if !defined(__cplusplus) || !__has_include(<CYLTabBarController/CYLTabBarController-Swift.h>)
 FOUNDATION_EXTERN id _Nullable CYLTabBarItemAttributesAnimationValue(NSDictionary * _Nullable attributes, NSString *genericKey);
+#endif
 
 NS_ASSUME_NONNULL_END

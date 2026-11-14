@@ -310,9 +310,12 @@ FOUNDATION_EXTERN NSString *const CYLTabBarLottieLoopsWhenUnselected CYL_LOTTIE_
  *      Lottie 文件中的颜色是固定的，lottie-ios 也不支持主题，因此深色版本即改为深色配色的动画副本。使用 Lottie 4.x 时，也可以只用一份文件
  *      适配深色模式，见 `CYLTabBarLottieDarkColors`。
  */
+/* [EN] Declared by the generated Swift header too (C++ sees that one: `noexcept`). [CN] 生成的 Swift 头文件也声明了它（C++ 使用那一份：`noexcept`）。 */
+#if !defined(__cplusplus) || !__has_include(<CYLTabBarController/CYLTabBarController-Swift.h>)
 FOUNDATION_EXTERN NSArray<NSDictionary *> *CYLTabBarItemsAttributesAddingLottieFiles(NSArray<NSDictionary *> *attributes,
                                                                                     NSArray<NSString *> *lottieFileNames,
                                                                                     NSBundle * _Nullable bundle) CYL_LOTTIE_REQUIRED;
+#endif
 
 /*!
  * FIX: issue #604 — generic animation keys, for every animation library.
@@ -384,8 +387,11 @@ typedef NSString *CYLTabBarAnimationOption NS_TYPED_EXTENSIBLE_ENUM;
  *      `CYLTabBarAnimationDarkURL`。由文件对应的动画库读取选项，例如 Tab 播放 Rive 文件中的哪个画板，因此多个 Tab 可以使用同一个文件。每个 URL
  *      仍是不同的 Tab 动画（也是其深色模式版本的 key）。`fileURL` 为 nil 时返回 nil。示例见上。
  */
+/* [EN] Declared by the generated Swift header too (C++ sees that one: `noexcept`). [CN] 生成的 Swift 头文件也声明了它（C++ 使用那一份：`noexcept`）。 */
+#if !defined(__cplusplus) || !__has_include(<CYLTabBarController/CYLTabBarController-Swift.h>)
 FOUNDATION_EXTERN NSURL * _Nullable CYLTabBarAnimationURLWithOptions(NSURL * _Nullable fileURL,
                                                                      NSDictionary<CYLTabBarAnimationOption, NSString *> * _Nullable options);
+#endif
 
 /*!
  * FIX: issue #477 — only some tabs animated, with any animation library.
@@ -408,9 +414,12 @@ FOUNDATION_EXTERN NSURL * _Nullable CYLTabBarAnimationURLWithOptions(NSURL * _Nu
  *      表示 main bundle。文件不存在或没有动画库时 `attributes` 保持不变。同一个 TabBar 中可以混用有动画与无动画的 Tab，以及不同动画库的 Tab，
  *      所有样式均支持。示例见上。
  */
+/* [EN] Declared by the generated Swift header too (C++ sees that one: `noexcept`). [CN] 生成的 Swift 头文件也声明了它（C++ 使用那一份：`noexcept`）。 */
+#if !defined(__cplusplus) || !__has_include(<CYLTabBarController/CYLTabBarController-Swift.h>)
 FOUNDATION_EXTERN NSDictionary *CYLTabBarItemAttributesAddingAnimationFile(NSDictionary *attributes,
                                                                           NSString *fileName,
                                                                           NSBundle * _Nullable bundle);
+#endif
 
 /*!
  * [EN] The same for every tab, by position: an empty name or `NSNull` leaves that tab static (#477).
@@ -418,9 +427,12 @@ FOUNDATION_EXTERN NSDictionary *CYLTabBarItemAttributesAddingAnimationFile(NSDic
  *          CYLTabBarItemsAttributesAddingAnimationFiles(attributes, @[@"tab_home.json", @"", @"tab_mine.pag"], nil);
  * [CN] 按位置为每个 Tab 执行上面的操作：名称为空字符串或 `NSNull` 的 Tab 保持静态（#477）。示例见上。
  */
+/* [EN] Declared by the generated Swift header too (C++ sees that one: `noexcept`). [CN] 生成的 Swift 头文件也声明了它（C++ 使用那一份：`noexcept`）。 */
+#if !defined(__cplusplus) || !__has_include(<CYLTabBarController/CYLTabBarController-Swift.h>)
 FOUNDATION_EXTERN NSArray<NSDictionary *> *CYLTabBarItemsAttributesAddingAnimationFiles(NSArray<NSDictionary *> *attributes,
                                                                                     NSArray *fileNames,
                                                                                     NSBundle * _Nullable bundle);
+#endif
 #ifndef __swift__
 #define CYLTabBarItemImageInsets @"CYLTabBarItemImageInsets"
 #endif

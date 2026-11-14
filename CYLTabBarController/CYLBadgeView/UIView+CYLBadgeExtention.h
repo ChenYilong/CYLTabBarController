@@ -26,7 +26,10 @@ NS_ASSUME_NONNULL_BEGIN
  * [CN] 角标值对应的 VoiceOver 朗读内容：@""（红点）→“有新内容”，数字 →“3 条新消息”，@"new" / @"NEW" → 其译文，其他文字原样；
  *      nil 或小于等于 0 的数字返回 nil。使用 App 当前语言。
  */
+/* [EN] Declared by the generated Swift header too (C++ sees that one: `noexcept`). [CN] 生成的 Swift 头文件也声明了它（C++ 使用那一份：`noexcept`）。 */
+#if !defined(__cplusplus) || !__has_include(<CYLTabBarController/CYLTabBarController-Swift.h>)
 FOUNDATION_EXTERN NSString * _Nullable CYLBadgeAccessibilityDescription(NSString * _Nullable value);
+#endif
 
 /*!
  * [EN] `UIView (CYLBadgeExtention)` (`CYLBadgeProtocol` and the members below it) is implemented in Swift
