@@ -4,6 +4,19 @@
     <text class="cyl-header-subtitle">{{texts['Four tabs and a plus button, as in the iOS example: the shared configuration limits Message to iOS and Android (CYLTabBarItemPlatforms), so this example adds the mini program.']}}</text>
   </view>
 
+  <!-- [EN] Visibility: tabs hidden by role (hiddenIdentifiers) and this page's bar (tabBarHidden). [CN] 可见性：按角色隐藏的 Tab（hiddenIdentifiers）与本页面的 TabBar（tabBarHidden）。 -->
+  <text class="cyl-section-title" aria-role="heading">{{texts['Visibility']}}</text>
+  <view class="cyl-section">
+    <view class="cyl-row">
+      <text aria-hidden="true">{{texts['Hide Discover (as for a user role)']}}</text>
+      <switch id="cyl-hide-discover" checked="{{discoverHidden}}" bindchange="cyl_hideDiscover" aria-label="{{texts['Hide Discover (as for a user role)']}}, {{discoverHidden ? texts['on'] : texts['off']}}" />
+    </view>
+    <view class="cyl-row">
+      <text aria-hidden="true">{{texts['Hide the tab bar of this page']}}</text>
+      <switch id="cyl-hide-tab-bar" checked="{{tabBarHidden}}" bindchange="cyl_hideTabBar" aria-label="{{texts['Hide the tab bar of this page']}}, {{tabBarHidden ? texts['on'] : texts['off']}}" />
+    </view>
+  </view>
+
   <text class="cyl-section-title" aria-role="heading">{{texts['Liquid Glass']}}</text>
   <view class="cyl-section">
     <view wx:for="{{galleryRows}}" wx:key="panel" class="cyl-row cyl-row-action" bindtap="cyl_openGallery" data-panel="{{item.panel}}" aria-role="button" aria-label="{{texts[item.title]}}"><text aria-hidden="true">{{texts[item.title]}}</text></view>

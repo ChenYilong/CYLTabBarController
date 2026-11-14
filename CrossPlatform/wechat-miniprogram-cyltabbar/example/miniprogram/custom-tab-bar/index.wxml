@@ -9,6 +9,7 @@
   glass-lens-style="{{glassLensStyle}}"
   animation-speed="{{animationSpeed}}"
   animation-loop="{{animationLoop}}"
+  hidden-identifiers="{{hiddenIdentifiers}}"
   strings="{{strings}}"
   symbols-by-theme="{{symbolsByTheme}}"
   animation-base-path="/shared/lottie"

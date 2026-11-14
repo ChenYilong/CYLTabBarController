@@ -306,3 +306,34 @@ test('looping icons stay one layer and keep playing during a page scroll (WeChat
     await cylSleep(CYL_SETTLE_MS * 2);
   }
 });
+
+test('hiddenIdentifiers leaves a tab out of every bar, and tabBarHidden hides one page\'s bar', async () => {
+  try {
+    await cylSetState({ hiddenIdentifiers: ['discover'] });
+    let bar = await cylTabBar();
+    assert.deepEqual(bar.slots.filter((slot) => !slot.isPlusButton).map((slot) => slot.key), ['home', 'message', 'me']);
+    assert.equal(bar.slots.filter((slot) => slot.isPlusButton).length, 1, 'the plus button stays');
+    assert.deepEqual(bar.slots.filter((slot) => slot.selected).map((slot) => slot.key), ['home']);
+    // [EN] A hidden selected tab falls back to the first shown one. [CN] 被隐藏的选中 Tab 回退到第一个显示的 Tab。
+    await cylSetState({ hiddenIdentifiers: ['home'] });
+    bar = await cylTabBar();
+    assert.deepEqual(bar.slots.filter((slot) => slot.selected).map((slot) => slot.key), ['message']);
+    await cylSetState({ hiddenIdentifiers: [] });
+    bar = await cylTabBar();
+    assert.deepEqual(bar.slots.filter((slot) => !slot.isPlusButton).map((slot) => slot.key), ['home', 'message', 'discover', 'me']);
+
+    const cylBarHeight = (hidden) => miniProgram.evaluate((value) => new Promise((resolve) => {
+      const pages = getCurrentPages();
+      const tabBar = pages[pages.length - 1].getTabBar();
+      tabBar.cyl_setTabBarHidden(value);
+      setTimeout(() => {
+        tabBar.selectComponent('#cyl-tab-bar').createSelectorQuery().select('.cyl-tab-bar').boundingClientRect()
+          .exec((result) => resolve(result[0] ? result[0].height : -1));
+      }, 300);
+    }), hidden);
+    assert.equal(await cylBarHeight(true), 0, 'the hidden bar takes no space');
+    assert.ok(await cylBarHeight(false) >= 49, 'the bar is back');
+  } finally {
+    await cylSetState({ hiddenIdentifiers: [] });
+  }
+});

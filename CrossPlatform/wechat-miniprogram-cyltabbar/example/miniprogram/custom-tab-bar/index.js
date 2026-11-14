@@ -54,6 +54,7 @@ Component({
         glassLensStyle: state.glassLensStyle || 'regular',
         animationSpeed: state.animationSpeed || 1,
         animationLoop: Boolean(state.animationLoop),
+        hiddenIdentifiers: state.hiddenIdentifiers || [],
       }, () => {
         const tabBar = this.selectComponent('#cyl-tab-bar');
         if (!tabBar) {
@@ -102,6 +103,17 @@ Component({
     cyl_swipe(step) {
       const tabBar = this.selectComponent('#cyl-tab-bar');
       return tabBar ? tabBar.cyl_selectAdjacent(step) : false;
+    },
+
+    /**
+     * [EN] Hides or shows this page's bar (cyl-tab-bar cyl_setTabBarHidden, iOS -setTabBarHidden:).
+     * [CN] 隐藏或显示本页面的 TabBar（cyl-tab-bar 的 cyl_setTabBarHidden，iOS -setTabBarHidden:）。
+     */
+    cyl_setTabBarHidden(hidden) {
+      const tabBar = this.selectComponent('#cyl-tab-bar');
+      if (tabBar) {
+        tabBar.cyl_setTabBarHidden(hidden);
+      }
     },
 
     cyl_onSelect(event) {

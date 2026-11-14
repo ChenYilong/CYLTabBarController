@@ -19,6 +19,8 @@ App({
       // [EN] Playback controls of the tab icon animations (docs/Tab-Icon-Animation-Quick-Start.md). [CN] Tab 图标动画的播放控件。
       animationSpeed: 1,
       animationLoop: false,
+      // [EN] Tabs left out of every bar (cyl-tab-bar hiddenIdentifiers), e.g. by user role. [CN] 所有 TabBar 都不显示的 Tab（cyl-tab-bar 的 hiddenIdentifiers），例如按用户角色。
+      hiddenIdentifiers: [],
     },
   },
 
