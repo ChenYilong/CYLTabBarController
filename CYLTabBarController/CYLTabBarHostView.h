@@ -196,6 +196,24 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)resetLoggedIn;
 /*!
+ * [EN] The playback speed of every tab icon animation (`tabBarItemAnimationSpeed`); 0 or less: the library's default.
+ *      Applies to the animations already playing.
+ * [CN] 所有 Tab 图标动画的播放速度（`tabBarItemAnimationSpeed`）；0 或更小表示库的默认值。对正在播放的动画同样生效。
+ */
+@property (nonatomic, assign) CGFloat animationSpeed;
+/*!
+ * [EN] Whether the tab icon animations repeat until this is turned off (`tabBarItemAnimationLoops`); applies to the
+ *      animations already playing.
+ * [CN] Tab 图标动画是否重复播放直到关闭（`tabBarItemAnimationLoops`）；对正在播放的动画同样生效。
+ */
+@property (nonatomic, assign) BOOL animationLoops;
+/*!
+ * [EN] "Play all": every tab icon animation plays again from progress 0, with the speed and loop settings above
+ *      (`-cyl_playAllTabBarItemAnimations`).
+ * [CN] 「全部播放」：每个 Tab 图标动画按上面的速度与循环设置从进度 0 重新播放（`-cyl_playAllTabBarItemAnimations`）。
+ */
+- (void)playAllAnimations;
+/*!
  * [EN] The language of the library's own texts and of the layout direction: a language code such as @"ar" or
  *      @"zh-Hans", or nil for the device language. Calls `CYLSetLocalizationLanguage()` (it applies to the whole library),
  *      lays the tab bar out right to left for a right-to-left language, and builds the tab bar again, as

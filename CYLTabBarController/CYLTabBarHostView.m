@@ -325,6 +325,10 @@ static UIImage *CYLTabBarHostOriginalImage(UIImage *image) {
         _loggedIn = tabBarController.cyl_loggedIn;
     }
     !self.loginStateDidChange ?: self.loginStateDidChange(_loggedIn);
+    if (_animationSpeed > 0) {
+        tabBarController.tabBarItemAnimationSpeed = _animationSpeed;
+    }
+    tabBarController.tabBarItemAnimationLoops = _animationLoops;
     // [EN] The app shows the login screen: the tab is not selected now (see `didRequestLogin`).
     // [CN] 由 App 展示登录界面：此时不选中该 Tab（见 `didRequestLogin`）。
     tabBarController.cyl_loginHandler = ^(CYLTabBarController *controller, UIViewController *viewController, CYLTabBarLoginCompletion completion) {
@@ -481,6 +485,22 @@ static BOOL CYLTabBarHostRectsContainPoint(NSArray<NSValue *> *rects, CGPoint po
 - (void)resetLoggedIn {
     _loggedInSet = NO;
     _loggedIn = NO;
+}
+
+- (void)setAnimationSpeed:(CGFloat)animationSpeed {
+    _animationSpeed = animationSpeed;
+    if (animationSpeed > 0 && isfinite(animationSpeed)) {
+        _tabBarController.tabBarItemAnimationSpeed = animationSpeed;
+    }
+}
+
+- (void)setAnimationLoops:(BOOL)animationLoops {
+    _animationLoops = animationLoops;
+    _tabBarController.tabBarItemAnimationLoops = animationLoops;
+}
+
+- (void)playAllAnimations {
+    [_tabBarController cyl_playAllTabBarItemAnimations];
 }
 
 - (void)setLoggedIn:(BOOL)loggedIn {

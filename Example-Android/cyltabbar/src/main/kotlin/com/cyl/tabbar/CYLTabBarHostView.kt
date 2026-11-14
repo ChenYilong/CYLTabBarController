@@ -212,6 +212,34 @@ open class CYLTabBarHostView @JvmOverloads constructor(context: Context, attrs: 
         }
     var didRequestLogin: ((index: Int, identifier: String, title: String) -> Unit)? = null
     /**
+     * [EN] The playback speed of every tab icon animation (`tabBarItemAnimationSpeed`); 0 or less: the library's default.
+     *      Applies to the animations already playing.
+     * [CN] 所有 Tab 图标动画的播放速度（`tabBarItemAnimationSpeed`）；0 或更小表示库的默认值。对正在播放的动画同样生效。
+     */
+    var animationSpeed: Float = 0f
+        set(value) {
+            field = value
+            if (value > 0 && value.isFinite()) tabBarController?.tabBarItemAnimationSpeed = value
+        }
+    /**
+     * [EN] Whether the tab icon animations repeat until this is turned off (`tabBarItemAnimationLoops`); applies to the
+     *      animations already playing.
+     * [CN] Tab 图标动画是否重复播放直到关闭（`tabBarItemAnimationLoops`）；对正在播放的动画同样生效。
+     */
+    var animationLoops: Boolean = false
+        set(value) {
+            field = value
+            tabBarController?.tabBarItemAnimationLoops = value
+        }
+    /**
+     * [EN] "Play all": every tab icon animation plays again from progress 0, with the speed and loop settings above
+     *      (`cyl_playAllTabBarItemAnimations`).
+     * [CN] 「全部播放」：每个 Tab 图标动画按上面的速度与循环设置从进度 0 重新播放（`cyl_playAllTabBarItemAnimations`）。
+     */
+    fun playAllAnimations() {
+        tabBarController?.cyl_playAllTabBarItemAnimations()
+    }
+    /**
      * [EN] The login state the tab bar uses, reported once it is built: until the app sets [loggedIn], the state the library
      *      cached (`cyl_loggedIn`, kept across launches), so the app can start from it.
      * [CN] TabBar 使用的登录状态，在 TabBar 创建后报告：App 设置 [loggedIn] 之前为库缓存的状态（`cyl_loggedIn`，重启后保留），App 可以从它开始。
@@ -482,6 +510,8 @@ open class CYLTabBarHostView @JvmOverloads constructor(context: Context, attrs: 
             loggedInSet = false
         }
         loginStateDidChange?.invoke(loggedIn)
+        if (animationSpeed > 0 && animationSpeed.isFinite()) controller.tabBarItemAnimationSpeed = animationSpeed
+        controller.tabBarItemAnimationLoops = animationLoops
         // [EN] The app shows the login screen: the tab is not selected now (see [didRequestLogin]). [CN] 由 App 展示登录界面：此时不选中该 Tab。
         if (tabBarHidden) controller.setTabBarHidden(true, false)
         titlePositionAdjustment?.let { controller.titlePositionAdjustment = it }
