@@ -14,14 +14,20 @@ const { spawnSync } = require('node:child_process');
 const path = require('node:path');
 
 const CYL_ROOT = path.resolve(__dirname, '..');
-const CYL_CLI = process.env.CYL_DEVTOOLS_CLI || '/Applications/wechatwebdevtools.app/Contents/MacOS/cli';
+const CYL_CLI = require('./cyl_devtools_cli').cylDevtoolsCli();
 const CYL_PORT = process.env.CYL_AUTO_PORT || '9420';
 const CYL_ALL = ['lottie', 'pag', 'rive', 'gif'];
 const names = process.argv.slice(2).length > 0 ? process.argv.slice(2) : CYL_ALL;
 const results = [];
 
 function cylRun(command, args, env) {
-  return spawnSync(command, args, { cwd: CYL_ROOT, stdio: 'inherit', env: Object.assign({}, process.env, env) }).status;
+  // [EN] Windows runs a .bat / .cmd only through a shell (Node 18.20+), so quote its arguments.
+  // [CN] Windows 只能通过 shell 运行 .bat / .cmd（Node 18.20+），因此给参数加引号。
+  const shell = process.platform === 'win32' && /\.(bat|cmd)$/i.test(command);
+  const quote = (text) => (shell ? `"${text}"` : text);
+  return spawnSync(quote(command), args.map(quote), {
+    cwd: CYL_ROOT, stdio: 'inherit', shell, env: Object.assign({}, process.env, env),
+  }).status;
 }
 
 for (const name of names) {
@@ -39,7 +45,8 @@ for (const name of names) {
   // [CN] `cli auto` 让开发者工具加载刚安装的文件，并打开测试所连接的自动化端口。
   const reload = setup === 0 ? cylRun(CYL_CLI, ['auto', '--project', CYL_ROOT, '--auto-port', CYL_PORT]) : setup;
   if (reload === 0) {
-    spawnSync('sleep', ['12']);
+    // [EN] No `sleep` command on Windows. [CN] Windows 没有 `sleep` 命令。
+    Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 12000);
   }
   const tests = reload === 0
     ? cylRun('node', ['--test', '--test-timeout=180000', 'test-ui/cyl_tab_bar.ui.test.js'], { CYL_AUTOMATOR_WS: `ws://127.0.0.1:${CYL_PORT}` })

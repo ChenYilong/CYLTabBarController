@@ -17,7 +17,7 @@ const { PNG } = require('pngjs');
 const pixelmatch = require('pixelmatch');
 
 const CYL_PROJECT = path.resolve(__dirname, '..');
-const CYL_CLI = process.env.CYL_DEVTOOLS_CLI || '/Applications/wechatwebdevtools.app/Contents/MacOS/cli';
+const CYL_CLI = require('../scripts/cyl_devtools_cli').cylDevtoolsCli();
 // [EN] State changes reach the pages on the next turn of the app's event loop. [CN] 状态变化在 App 事件循环的下一轮到达页面。
 const CYL_SETTLE_MS = 800;
 

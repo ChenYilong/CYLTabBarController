@@ -1851,6 +1851,12 @@ CYLTabBar(items: items, styleType: 'liquidGlass', selectedIndex: index, badgeVal
 
 ![WeChat Mini Program Liquid Glass: regular lens, skeuomorphic lens, plus title aligned on the default bar and on Liquid Glass](assets/wechat-miniprogram-liquid-glass.png)
 
+| 中文 | English |
+|:---|:---|
+| **微信小程序：Feed 点击与 iOS 一致**：Message、Discover、Me 的 Feed 与 iOS 示例一样响应点击。下图（微信小程序，Windows 11 开发者工具，模拟器 iPhone 12/13 Pro，基础库 3.17.6，基于 [ef5afc3](https://github.com/ChenYilong/CYLTabBarController/commit/ef5afc3)，2026-11-15）从上到下：Message 第 1 行推入新上下文的 TabBar，其 PlusButton 带可点击的 X（#202）；Discover 详情页（橙色，关闭返回手势）；Me 的 Feed，Me 为选中状态。见[微信小程序文档](docs/WeChat-Mini-Program.md)。 | **WeChat Mini Program: feed taps as on iOS**: the feeds of Message, Discover and Me act on tap as in the iOS example. Below (WeChat Mini Program, DevTools on Windows 11, simulator iPhone 12/13 Pro, base library 3.17.6, on top of [ef5afc3](https://github.com/ChenYilong/CYLTabBarController/commit/ef5afc3), 2026-11-15), top to bottom: Message row 1 pushes a tab bar of a new context whose plus button has a tappable X (#202); the Discover details page (orange, pop gesture off); the Me feed with Me selected. See [WeChat Mini Program](docs/WeChat-Mini-Program.md). |
+
+![WeChat Mini Program, DevTools on Windows 11, base library 3.17.6: Message pushes a tab bar whose plus button has a tappable X, the Discover details page, the Me feed](assets/wechat-miniprogram-feed-taps.png)
+
 ### [CN]在 Swift 项目中使用 CYLTabBarController
 ### [EN]Using CYLTabBarController in a Swift project
 
