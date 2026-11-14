@@ -25,11 +25,13 @@ NS_ASSUME_NONNULL_BEGIN
 /*!
  * [EN] The protocols `CYLTabBarItemAnimationStyleSource`, `CYLTabBarItemAnimationHost` and `CYLTabBarItemAnimationService`
  *      are implemented in Swift (`Swift/CYLTabBarItemAnimationService.swift`, every selector kept) and declared by the
- *      generated Swift interface (`CYLSwiftInterface.h`). The functions below stay here: they are defined in Objective-C
- *      (`CYLConstants.m`, `UIControl+CYLTabBarItemAnimation.m`) (docs/Swift-Migration.md).
+ *      generated Swift interface (`CYLSwiftInterface.h`). The functions below are declared here for
+ *      Objective-C callers and defined in Swift with `@_cdecl` (`Swift/UIControl+CYLTabBarItemAnimation.swift`,
+ *      `Swift/CYLTabBarItemAnimationStyleRegistry.swift`) (docs/Swift-Migration.md).
  * [CN] `CYLTabBarItemAnimationStyleSource`、`CYLTabBarItemAnimationHost` 与 `CYLTabBarItemAnimationService` 协议在 Swift 中实现
  *      （`Swift/CYLTabBarItemAnimationService.swift`，所有 selector 不变），由 Swift 生成接口（`CYLSwiftInterface.h`）声明。下面的函数
- *      保留在这里：它们在 Objective-C 中定义（`CYLConstants.m`、`UIControl+CYLTabBarItemAnimation.m`）（docs/Swift-Migration.md）。
+ *      在这里为 Objective-C 调用方声明，并以 `@_cdecl` 在 Swift 中定义（`Swift/UIControl+CYLTabBarItemAnimation.swift`、
+ *      `Swift/CYLTabBarItemAnimationStyleRegistry.swift`）（docs/Swift-Migration.md）。
  */
 
 /*!
