@@ -45,6 +45,13 @@ class CyltabbarView(private val reactContext: ThemedReactContext) : CYLTabBarHos
       field = value
     }
 
+  /** [EN] The last "Play all" request handled; a higher one plays every tab icon animation again. [CN] 最近处理的「全部播放」请求；更大的值让所有 Tab 图标动画重新播放。 */
+  var playAllRequest = 0
+    set(value) {
+      if (value > field) playAllAnimations()
+      field = value
+    }
+
   fun applyConfigurationJSON(json: String?) {
     if (json == configurationJSON) return
     configurationJSON = json

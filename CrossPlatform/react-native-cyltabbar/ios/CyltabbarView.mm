@@ -18,6 +18,7 @@ static id CYLRNJSONObject(NSString *JSON);
   NSString *_plusButtonBadgeStyleJSON;
   /// [EN] The last memory warning request handled. [CN] 最近处理的内存警告请求。
   int _memoryWarningRequest;
+  int _playAllRequest;
 }
 
 + (ComponentDescriptorProvider)componentDescriptorProvider
@@ -84,6 +85,13 @@ static id CYLRNJSONObject(NSString *JSON);
     }
   }
   _memoryWarningRequest = newViewProps.memoryWarningRequest;
+  // [EN] The tab icon animations: the policy first, then a new request plays them all. [CN] Tab 图标动画：先设置策略，新的请求再让它们全部播放。
+  _hostView.animationSpeed = newViewProps.animationSpeed;
+  _hostView.animationLoops = newViewProps.animationLoops;
+  if (newViewProps.playAllRequest > _playAllRequest) {
+    [_hostView playAllAnimations];
+  }
+  _playAllRequest = newViewProps.playAllRequest;
   // [EN] After the selection: logging out may move it away from a tab that needs login. [CN] 在选中之后：退出登录可能使选中离开需要登录的 Tab。
   // [EN] -1: not set, the host uses the cached state. [CN] -1：未设置，宿主使用缓存的状态。
   if (newViewProps.loginState >= 0) {
@@ -147,6 +155,9 @@ static id CYLRNJSONObject(NSString *JSON)
   _hostView.tabBarHidden = NO;
   _hostView.titlePositionAdjustment = nil;
   _memoryWarningRequest = 0;
+  _playAllRequest = 0;
+  _hostView.animationSpeed = 0;
+  _hostView.animationLoops = NO;
   _badgeStylesJSON = nil;
   _plusButtonBadgeStyleJSON = nil;
   _hostView.selectedIndex = -1;

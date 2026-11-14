@@ -226,6 +226,9 @@ class CYLTabBar extends StatefulWidget {
     this.language,
     this.tabBarHidden = false,
     this.memoryWarningRequest = 0,
+    this.animationSpeed,
+    this.animationLoops = false,
+    this.playAllRequest = 0,
     this.onMemoryWarning,
     this.titlePositionAdjustment,
   });
@@ -312,6 +315,18 @@ class CYLTabBar extends StatefulWidget {
   /// configuration decides what is unloaded (`CYLTabBarControllerUnloadsUnselectedViewsOnMemoryWarning`,
   /// `CYLTabBarControllerKeepsLoadedTabBarItemIdentifiers`).
   final int memoryWarningRequest;
+
+  /// The playback speed of every tab icon animation (`tabBarItemAnimationSpeed`), e.g. 0.25 to 3; null or 0 or less: the
+  /// library's default. Applies to the animations already playing.
+  final double? animationSpeed;
+
+  /// Whether the tab icon animations repeat until this is false (`tabBarItemAnimationLoops`); applies to the animations
+  /// already playing.
+  final bool animationLoops;
+
+  /// Each increase plays every tab icon animation again from progress 0, with [animationSpeed] and [animationLoops]
+  /// ("Play all", `-[CYLTabBarController cyl_playAllTabBarItemAnimations]`).
+  final int playAllRequest;
   final ValueChanged<String>? onMemoryWarning;
 
   /// The title offset of every tab (dx horizontal, dy vertical), set at runtime
@@ -369,6 +384,8 @@ class _CYLTabBarState extends State<CYLTabBar> {
         'loggedIn': widget.loggedIn,
         'language': widget.language,
         'tabBarHidden': widget.tabBarHidden,
+        'animationSpeed': widget.animationSpeed,
+        'animationLoops': widget.animationLoops,
         'titlePositionAdjustment': _titleOffset(widget),
       };
 
@@ -418,6 +435,15 @@ class _CYLTabBarState extends State<CYLTabBar> {
       channel?.invokeMethod<String>('simulateMemoryWarning').then((report) {
         if (report != null) widget.onMemoryWarning?.call(report);
       });
+    }
+    if (widget.animationSpeed != oldWidget.animationSpeed) {
+      channel?.invokeMethod<void>('setAnimationSpeed', widget.animationSpeed);
+    }
+    if (widget.animationLoops != oldWidget.animationLoops) {
+      channel?.invokeMethod<void>('setAnimationLoops', widget.animationLoops);
+    }
+    if (widget.playAllRequest > oldWidget.playAllRequest) {
+      channel?.invokeMethod<void>('playAllAnimations');
     }
     if (widget.titlePositionAdjustment != oldWidget.titlePositionAdjustment) {
       channel?.invokeMethod<void>('setTitlePositionAdjustment', _titleOffset(widget));

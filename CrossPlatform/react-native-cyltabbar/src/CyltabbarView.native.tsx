@@ -229,6 +229,21 @@ export type CYLTabBarProps = ViewProps & {
   memoryWarningRequest?: number;
   onMemoryWarning?: (report: string) => void;
   /**
+   * The playback speed of every tab icon animation (`tabBarItemAnimationSpeed`), e.g. 0.25 to 3; undefined or 0 or less:
+   * the library's default. Applies to the animations already playing.
+   */
+  animationSpeed?: number;
+  /**
+   * Whether the tab icon animations repeat until this is false (`tabBarItemAnimationLoops`); applies to the animations
+   * already playing.
+   */
+  animationLoops?: boolean;
+  /**
+   * Each increase plays every tab icon animation again from progress 0, with `animationSpeed` and `animationLoops`
+   * ("Play all", `-[CYLTabBarController cyl_playAllTabBarItemAnimations]`).
+   */
+  playAllRequest?: number;
+  /**
    * The title offset of every tab, [horizontal, vertical], set at runtime (`-[CYLTabBarController setTitlePositionAdjustment:]`)
    * without building the tab bar again; it wins over `CYLTabBarControllerTitlePositionAdjustment` of the configuration. A
    * plus button that aligns its title follows. Undefined keeps the configuration's.
@@ -390,6 +405,9 @@ export function CYLTabBar(props: CYLTabBarProps) {
     language,
     tabBarHidden,
     memoryWarningRequest,
+    animationSpeed,
+    animationLoops,
+    playAllRequest,
     onMemoryWarning,
     titlePositionAdjustment,
     selectedIndex,
@@ -424,6 +442,9 @@ export function CYLTabBar(props: CYLTabBarProps) {
       language={language ?? ''}
       tabBarHidden={tabBarHidden ?? false}
       memoryWarningRequest={memoryWarningRequest ?? 0}
+      animationSpeed={animationSpeed ?? 0}
+      animationLoops={animationLoops ?? false}
+      playAllRequest={playAllRequest ?? 0}
       titlePositionAdjustment={titlePositionAdjustment ?? []}
       onMemoryWarning={(event) => onMemoryWarning?.(event.nativeEvent.report)}
       onLoginStateChange={(event) => onLoginStateChange?.(event.nativeEvent.loggedIn)}

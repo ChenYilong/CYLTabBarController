@@ -82,6 +82,18 @@ export interface NativeProps extends ViewProps {
    */
   memoryWarningRequest?: CodegenTypes.WithDefault<CodegenTypes.Int32, 0>;
   /**
+   * The playback speed of every tab icon animation; 0 (or less): the library's default.
+   */
+  animationSpeed?: CodegenTypes.WithDefault<CodegenTypes.Float, 0>;
+  /**
+   * Whether the tab icon animations repeat until this is false.
+   */
+  animationLoops?: boolean;
+  /**
+   * Each increase plays every tab icon animation again from progress 0 ("Play all").
+   */
+  playAllRequest?: CodegenTypes.WithDefault<CodegenTypes.Int32, 0>;
+  /**
    * The title offset of every tab, [horizontal, vertical], set at runtime; empty keeps the configuration's.
    */
   titlePositionAdjustment?: ReadonlyArray<CodegenTypes.Double>;
