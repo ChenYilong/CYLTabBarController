@@ -96,7 +96,7 @@ extension MainTabBarController {
                                                            ["home_normal", "fishpond_normal", "message_normal", "account_normal"],
                                                            ["home_highlight", "fishpond_highlight", "message_highlight", "account_highlight"],
                                                            [2: "message_normal_night"])
-        let lottieAttributes = CYLTabBarItemsAttributesAddingLottieFiles(attributes, ["green_lottie_tab_home", "green_lottie_tab_discover", "green_lottie_tab_news", "green_lottie_tab_mine"], nil)
+        let lottieAttributes = CYLTabBarItemsAttributesAddingLottieFiles(attributes, ["green_lottie_tab_home", "green_lottie_tab_discover", "green_lottie_tab_news", "green_lottie_tab_mine"], nil) as? [[AnyHashable: Any]] ?? []
         // #442 (Lottie 4.x): one file per tab follows Dark Mode, its colors set with Lottie's value providers.
         // 每个 Tab 一份 Lottie 文件适配深色模式，颜色通过 Lottie 的 value provider 设置。
         return zip(lottieAttributes, lottieDarkColors()).map { item, darkColors in

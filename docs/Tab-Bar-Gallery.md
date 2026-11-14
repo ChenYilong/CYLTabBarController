@@ -9,7 +9,7 @@
 | 绑定的代码类 `CYLTabBarController`：[`CYLTabBarController/CYLTabBarController.h`](../CYLTabBarController/CYLTabBarController.h) | Bound to the class `CYLTabBarController`: [`CYLTabBarController/CYLTabBarController.h`](../CYLTabBarController/CYLTabBarController.h) |
 | 绑定的代码类 `CYLTabBar`：[`CYLTabBarController/CYLTabBar.h`](../CYLTabBarController/CYLTabBar.h) | Bound to the class `CYLTabBar`: [`CYLTabBarController/CYLTabBar.h`](../CYLTabBarController/CYLTabBar.h) |
 | 绑定的代码类 `CYLPlusButton`：[`CYLTabBarController/CYLPlusButton.h`](../CYLTabBarController/CYLPlusButton.h) | Bound to the class `CYLPlusButton`: [`CYLTabBarController/CYLPlusButton.h`](../CYLTabBarController/CYLPlusButton.h) |
-| 绑定的代码类 `CYLTabButtonPressAnimation`：[`CYLTabBarController/CYLTabButtonAnimation.h`](../CYLTabBarController/CYLTabButtonAnimation.h) | Bound to the class `CYLTabButtonPressAnimation`: [`CYLTabBarController/CYLTabButtonAnimation.h`](../CYLTabBarController/CYLTabButtonAnimation.h) |
+| 绑定的代码类 `CYLTabButtonPressAnimation`：[`CYLTabBarController/Swift/CYLTabButtonAnimation.swift`](../CYLTabBarController/Swift/CYLTabButtonAnimation.swift) | Bound to the class `CYLTabButtonPressAnimation`: [`CYLTabBarController/Swift/CYLTabButtonAnimation.swift`](../CYLTabBarController/Swift/CYLTabButtonAnimation.swift) |
 
 <!-- binding:end -->
 

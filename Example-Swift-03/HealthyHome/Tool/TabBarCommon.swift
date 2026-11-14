@@ -134,7 +134,7 @@ class TabBarCommon: NSObject {
         // [EN] Only with Lottie: in a build without it the Lottie keys warn (`CYL_LOTTIE_REQUIRED`) and would be ignored.
         // [CN] 仅在引入 Lottie 时：没有 Lottie 的构建中 Lottie key 会给出警告（`CYL_LOTTIE_REQUIRED`），且不起作用。
         #elseif canImport(Lottie)
-        let lottieAttributes = CYLTabBarItemsAttributesAddingLottieFiles(tabBarItemsAttributes, ["green_lottie_tab_home", "green_lottie_tab_discover", "green_lottie_tab_news", "green_lottie_tab_mine"], nil)
+        let lottieAttributes = CYLTabBarItemsAttributesAddingLottieFiles(tabBarItemsAttributes, ["green_lottie_tab_home", "green_lottie_tab_discover", "green_lottie_tab_news", "green_lottie_tab_mine"], nil) as? [[AnyHashable: Any]] ?? []
         let darkColors = ["Icon_Shop", "Icon_Discovery", "Icon_Knowledge", "Icon_Mine"].map { layer -> [String: UIColor] in
             // Gray outline of the unselected icon → light gray, pale fill of the selected one → dark green.
             // 未选中的灰色描边 → 浅灰，选中的浅色填充 → 深绿。
