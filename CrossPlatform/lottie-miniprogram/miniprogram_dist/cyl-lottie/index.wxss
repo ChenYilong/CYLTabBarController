@@ -5,8 +5,27 @@
   height: 100px;
 }
 
+.cyl-lottie-box {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
 .cyl-lottie-canvas {
   display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* [EN] WeChat DevTools: hidden under the still image, still drawn. [CN] 微信开发者工具：被静态图片覆盖时隐藏，仍会绘制。 */
+.cyl-lottie-canvas-covered {
+  visibility: hidden;
+}
+
+.cyl-lottie-snapshot {
+  position: absolute;
+  left: 0;
+  top: 0;
   width: 100%;
   height: 100%;
 }

@@ -21,6 +21,29 @@ const CYL_FIT = {
   fill: 'none',
 }
 
+/**
+ * [EN] Whether the mini program runs in WeChat DevTools.
+ * [CN] 小程序是否运行在微信开发者工具中。
+ */
+function cylIsDevTools() {
+  try {
+    const info = typeof wx.getDeviceInfo === 'function' ? wx.getDeviceInfo() : wx.getSystemInfoSync()
+    return info.platform === 'devtools'
+  } catch (error) {
+    return false
+  }
+}
+
+/**
+ * [EN] WeChat DevTools does not keep a <canvas type="2d"> inside a fixed bar (the custom tab bar) in place while the
+ *      page scrolls: it moves with the gesture until the component renders again. There, an animation that is not
+ *      playing shows a still image of its frame instead (an <image> stays in place); the canvas comes back while it
+ *      plays. Phones are not changed.
+ * [CN] 微信开发者工具在页面滚动时不会让固定栏（自定义 TabBar）中的 <canvas type="2d"> 保持原位：它随手势移动，直到组件
+ *      再次渲染。因此在开发者工具中，未播放的动画改为显示当前帧的静态图片（<image> 保持原位）；播放时恢复画布。真机不变。
+ */
+const CYL_USES_SNAPSHOTS = cylIsDevTools()
+
 function cylPixelRatio() {
   try {
     return (typeof wx.getWindowInfo === 'function' ? wx.getWindowInfo() : wx.getSystemInfoSync()).pixelRatio || 2
@@ -72,6 +95,8 @@ Component({
 
   data: {
     cylCanvasId: '',
+    cylSnapshot: '',
+    cylSnapshotShown: false,
   },
 
   observers: {
@@ -96,6 +121,7 @@ Component({
       } else if (animation.isPaused) {
         this.cyl_rest()
       }
+      this.cyl_syncSnapshot()
     },
   },
 
@@ -112,6 +138,7 @@ Component({
     },
     detached() {
       this.cylReady = false
+      clearTimeout(this.cylSnapshotTimer)
       this.cyl_destroy()
     },
   },
@@ -122,6 +149,35 @@ Component({
         this.cylAnimation.destroy()
         this.cylAnimation = null
       }
+    },
+
+    /**
+     * [EN] WeChat DevTools only (CYL_USES_SNAPSHOTS): once the animation is not playing, shows a still image of the
+     *      canvas instead of the canvas; while it plays, shows the canvas. Runs after every playback change.
+     * [CN] 仅微信开发者工具（CYL_USES_SNAPSHOTS）：动画未播放时以画布的静态图片代替画布；播放时显示画布。每次播放状态
+     *      变化后运行。
+     */
+    cyl_syncSnapshot() {
+      if (!CYL_USES_SNAPSHOTS) {
+        return
+      }
+      clearTimeout(this.cylSnapshotTimer)
+      // [EN] On the next turn, after lottie has drawn the frame. [CN] 在下一轮执行，此时 lottie 已画好该帧。
+      this.cylSnapshotTimer = setTimeout(() => {
+        const animation = this.cylAnimation
+        const playing = Boolean(animation && !animation.isPaused)
+        if (playing || !animation || !this.cylCanvas || typeof this.cylCanvas.toDataURL !== 'function') {
+          if (this.data.cylSnapshotShown) {
+            this.setData({cylSnapshotShown: false})
+          }
+          return
+        }
+        try {
+          this.setData({cylSnapshot: this.cylCanvas.toDataURL('image/png'), cylSnapshotShown: true})
+        } catch (error) {
+          this.setData({cylSnapshotShown: false})
+        }
+      }, 0)
     },
 
     /**
@@ -152,6 +208,7 @@ Component({
           canvas.width = Math.max(1, Math.round(info.width * ratio))
           canvas.height = Math.max(1, Math.round(info.height * ratio))
           const context = canvas.getContext('2d')
+          this.cylCanvas = canvas
           this.cyl_start(canvas, context, token)
         })
     },
@@ -199,12 +256,16 @@ Component({
           } else if (autoplay) {
             this.cylAnimation.play()
           }
+          this.cyl_syncSnapshot()
           this.triggerEvent('ready', {
             totalFrames: this.cylAnimation.totalFrames,
             duration: this.cylAnimation.getDuration(false),
           })
         })
-        animation.addEventListener('complete', () => this.triggerEvent('complete', {}))
+        animation.addEventListener('complete', () => {
+          this.cyl_syncSnapshot()
+          this.triggerEvent('complete', {})
+        })
         animation.addEventListener('loopComplete', () => this.triggerEvent('loopcomplete', {}))
         animation.addEventListener('error', (event) => {
           const native = event && (event.nativeError || event)
@@ -229,17 +290,20 @@ Component({
       }
       const frame = this.data.restingFrame === 'last' ? Math.max(0, animation.totalFrames - 1) : 0
       animation.goToAndStop(frame, true)
+      this.cyl_syncSnapshot()
     },
 
     cyl_play() {
       if (this.cylAnimation) {
         this.cylAnimation.play()
+        this.cyl_syncSnapshot()
       }
     },
 
     cyl_pause() {
       if (this.cylAnimation) {
         this.cylAnimation.pause()
+        this.cyl_syncSnapshot()
       }
     },
 
@@ -287,26 +351,30 @@ Component({
       const frame = Math.floor(seconds * (animation.frameRate || 30) * speed)
       if (frame >= animation.totalFrames - 1) {
         animation.goToAndStop(Math.max(0, animation.totalFrames - 1), true)
-        return
+      } else {
+        animation.goToAndPlay(frame, true)
       }
-      animation.goToAndPlay(frame, true)
+      this.cyl_syncSnapshot()
     },
 
     cyl_goToAndStop(value, isFrame) {
       if (this.cylAnimation) {
         this.cylAnimation.goToAndStop(value, isFrame)
+        this.cyl_syncSnapshot()
       }
     },
 
     cyl_goToAndPlay(value, isFrame) {
       if (this.cylAnimation) {
         this.cylAnimation.goToAndPlay(value, isFrame)
+        this.cyl_syncSnapshot()
       }
     },
 
     cyl_playSegments(segments, forceFlag) {
       if (this.cylAnimation) {
         this.cylAnimation.playSegments(segments, forceFlag)
+        this.cyl_syncSnapshot()
       }
     },
 

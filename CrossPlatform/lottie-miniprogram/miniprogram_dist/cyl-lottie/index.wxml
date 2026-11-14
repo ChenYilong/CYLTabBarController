@@ -1,9 +1,18 @@
-<!-- [EN] One canvas per animation, labeled for accessibility when `label` is set. [CN] 每个动画一个画布；设置 `label` 时带无障碍标签。 -->
-<canvas
-  type="2d"
-  id="{{cylCanvasId}}"
-  class="cyl-lottie-canvas"
-  aria-role="img"
-  aria-label="{{label}}"
-  aria-hidden="{{!label}}"
-></canvas>
+<!-- [EN] One canvas per animation, labeled for accessibility when `label` is set. In WeChat DevTools a still image of the frame covers it while the animation is not playing (see CYL_USES_SNAPSHOTS in index.js). [CN] 每个动画一个画布；设置 `label` 时带无障碍标签。在微信开发者工具中，动画未播放时由当前帧的静态图片覆盖（见 index.js 中的 CYL_USES_SNAPSHOTS）。 -->
+<view class="cyl-lottie-box">
+  <canvas
+    type="2d"
+    id="{{cylCanvasId}}"
+    class="cyl-lottie-canvas {{cylSnapshotShown ? 'cyl-lottie-canvas-covered' : ''}}"
+    aria-role="img"
+    aria-label="{{label}}"
+    aria-hidden="{{!label}}"
+  ></canvas>
+  <image
+    wx:if="{{cylSnapshotShown}}"
+    class="cyl-lottie-snapshot"
+    src="{{cylSnapshot}}"
+    mode="scaleToFill"
+    aria-hidden="true"
+  />
+</view>
