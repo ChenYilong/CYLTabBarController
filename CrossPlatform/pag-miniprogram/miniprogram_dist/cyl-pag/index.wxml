@@ -1,2 +1,5 @@
-<!-- [EN] One WebGL canvas per PAG animation. [CN] 每个 PAG 动画一个 WebGL 画布。 -->
-<canvas type="webgl" id="{{cylCanvasId}}" class="cyl-pag-canvas" aria-role="img" aria-label="{{label}}" aria-hidden="{{!label}}"></canvas>
+<!-- [EN] One WebGL canvas per PAG animation. In WeChat DevTools a still image of the frame covers it while the animation is not playing or the page scrolls (CYL_USES_SNAPSHOTS in index.js). [CN] 每个 PAG 动画一个 WebGL 画布。在微信开发者工具中，动画未播放或页面滚动时由当前帧的静态图片覆盖（见 index.js 中的 CYL_USES_SNAPSHOTS）。 -->
+<view class="cyl-pag-box">
+  <canvas type="webgl" id="{{cylCanvasId}}" class="cyl-pag-canvas {{cylSnapshotShown ? 'cyl-pag-canvas-covered' : ''}}" aria-role="img" aria-label="{{label}}" aria-hidden="{{!label}}"></canvas>
+  <image wx:if="{{cylSnapshotShown}}" class="cyl-pag-snapshot" src="{{cylSnapshot}}" mode="scaleToFill" aria-hidden="true" />
+</view>

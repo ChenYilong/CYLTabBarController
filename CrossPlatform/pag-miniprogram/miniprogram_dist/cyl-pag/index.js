@@ -38,6 +38,29 @@ function cylLoadPAG(wasmPath) {
   return cylModule
 }
 
+/**
+ * [EN] Whether the mini program runs in WeChat DevTools.
+ * [CN] 小程序是否运行在微信开发者工具中。
+ */
+function cylIsDevTools() {
+  try {
+    const info = typeof wx.getDeviceInfo === 'function' ? wx.getDeviceInfo() : wx.getSystemInfoSync()
+    return info.platform === 'devtools'
+  } catch (error) {
+    return false
+  }
+}
+
+/**
+ * [EN] WeChat DevTools moves a canvas of a fixed bar with the page while it scrolls (see cyl-lottie). There, a PAG
+ *      animation that is not playing, or any while the page scrolls, shows a still image of its frame instead. Its
+ *      WebGL context is created with preserveDrawingBuffer so the frame can be read. Phones are not changed.
+ * [CN] 微信开发者工具在页面滚动时会让固定栏中的画布随页面移动（见 cyl-lottie）。因此在开发者工具中，未播放的 PAG 动画，
+ *      以及页面滚动期间的所有 PAG 动画，改为显示当前帧的静态图片；其 WebGL 上下文以 preserveDrawingBuffer 创建，
+ *      以便读取该帧。真机不变。
+ */
+const CYL_USES_SNAPSHOTS = cylIsDevTools()
+
 function cylPixelRatio() {
   try {
     return (typeof wx.getWindowInfo === 'function' ? wx.getWindowInfo() : wx.getSystemInfoSync()).pixelRatio || 2
@@ -91,7 +114,7 @@ Component({
     wasmPath: { type: String, value: CYL_DEFAULT_WASM },
   },
 
-  data: { cylCanvasId: '' },
+  data: { cylCanvasId: '', cylSnapshot: '', cylSnapshotShown: false },
 
   observers: {
     'path, fit': function () {
@@ -113,6 +136,7 @@ Component({
       } else if (!view.isPlaying) {
         this.cyl_rest()
       }
+      this.cyl_syncSnapshot()
     },
   },
 
@@ -129,6 +153,7 @@ Component({
     },
     detached() {
       this.cylReady = false
+      clearTimeout(this.cylSnapshotTimer)
       this.cyl_destroy()
     },
   },
@@ -171,6 +196,14 @@ Component({
           const ratio = cylPixelRatio()
           canvas.width = Math.max(1, Math.round(info.width * ratio))
           canvas.height = Math.max(1, Math.round(info.height * ratio))
+          if (CYL_USES_SNAPSHOTS) {
+            // [EN] libpag reuses this context (RenderCanvas asks for webgl with alpha, no depth, stencil or
+            //      antialias); preserveDrawingBuffer keeps the frame readable for the still image.
+            // [CN] libpag 会复用该上下文（RenderCanvas 请求带 alpha、无 depth、stencil 与 antialias 的 webgl）；
+            //      preserveDrawingBuffer 使该帧可读取，用于静态图片。
+            canvas.getContext('webgl', { alpha: true, depth: false, stencil: false, antialias: false, preserveDrawingBuffer: true })
+          }
+          this.cylCanvas = canvas
           cylReadPAG(this.data.path, (error, data) => {
             if (token !== this.cylLoadToken || !this.cylReady) {
               return
@@ -208,12 +241,16 @@ Component({
         this.cyl_applySpeed()
         view.setScaleMode(CYL_SCALE_MODES[this.data.fit] || CYL_SCALE_MODES.contain)
         view.setRepeatCount(this.data.loop ? 0 : 1)
-        view.addListener('onAnimationEnd', () => this.triggerEvent('complete', {}))
+        view.addListener('onAnimationEnd', () => {
+          this.cyl_syncSnapshot()
+          this.triggerEvent('complete', {})
+        })
         view.addListener('onAnimationRepeat', () => this.triggerEvent('loopcomplete', {}))
         this.cyl_rest()
         if (this.data.autoplay) {
           view.play()
         }
+        this.cyl_syncSnapshot()
         this.triggerEvent('ready', { duration: this.cyl_duration() })
         if (this.cylPendingPlay) {
           const pending = this.cylPendingPlay
@@ -255,23 +292,59 @@ Component({
       return this.cylView ? (Number(this.cylView.duration()) || 0) / 1000000 : 0
     },
 
+    /**
+     * [EN] WeChat DevTools only (CYL_USES_SNAPSHOTS): a still image of the canvas while the animation is not playing or
+     *      the page scrolls; the canvas otherwise. Runs after every playback change.
+     * [CN] 仅微信开发者工具（CYL_USES_SNAPSHOTS）：动画未播放或页面滚动时显示画布的静态图片；否则显示画布。每次播放
+     *      状态变化后运行。
+     */
+    cyl_syncSnapshot() {
+      if (!CYL_USES_SNAPSHOTS) {
+        return
+      }
+      clearTimeout(this.cylSnapshotTimer)
+      this.cylSnapshotTimer = setTimeout(() => {
+        const view = this.cylView
+        const playing = Boolean(view && view.isPlaying)
+        if (this.cylScrolling && this.data.cylSnapshotShown) {
+          return
+        }
+        if ((playing && !this.cylScrolling) || !view || !this.cylCanvas || typeof this.cylCanvas.toDataURL !== 'function') {
+          if (this.data.cylSnapshotShown) {
+            this.setData({ cylSnapshotShown: false })
+          }
+          return
+        }
+        // [EN] After libpag has drawn the frame (flush is asynchronous). [CN] 在 libpag 画好该帧之后（flush 是异步的）。
+        Promise.resolve(playing ? null : view.flush()).then(() => {
+          if (view !== this.cylView) {
+            return
+          }
+          this.setData({ cylSnapshot: this.cylCanvas.toDataURL('image/png'), cylSnapshotShown: true })
+        }).catch(() => this.setData({ cylSnapshotShown: false }))
+      }, 0)
+    },
+
     /** [EN] Shows the resting frame without playing. [CN] 不播放，显示静止帧。 */
     cyl_rest() {
       if (this.cylView) {
         this.cylView.setProgress(this.data.restingFrame === 'last' ? 1 : 0)
         this.cylView.flush()
+        this.cyl_syncSnapshot()
       }
     },
 
     cyl_play() {
       if (this.cylView) {
         this.cylView.play()
+        this.cyl_syncSnapshot()
       }
     },
 
     cyl_pause() {
       if (this.cylView) {
         this.cylView.pause()
+        this.cyl_syncSnapshot()
       }
     },
 
@@ -284,10 +357,19 @@ Component({
 
     /**
      * [EN] Renders the component again, so the canvas goes back to where the page puts it (WeChat DevTools leaves the
-     *      canvas of a fixed bar where it was after a page scroll; see cyl-lottie).
+     *      canvas of a fixed bar where it was after a page scroll; see cyl-lottie). `scrolling` (optional, true while
+     *      the page scrolls, false after) shows a still image in DevTools meanwhile.
      * [CN] 重新渲染组件，使画布回到页面布局的位置（微信开发者工具在页面滚动后会把固定栏中的画布留在原处；见 cyl-lottie）。
+     *      `scrolling`（可选，页面滚动期间为 true，之后为 false）使开发者工具在此期间显示静态图片。
      */
-    cyl_refreshLayout() {
+    cyl_refreshLayout(scrolling) {
+      if (CYL_USES_SNAPSHOTS && typeof scrolling === 'boolean') {
+        const changed = this.cylScrolling !== scrolling
+        this.cylScrolling = scrolling
+        if (changed) {
+          this.cyl_syncSnapshot()
+        }
+      }
       this.setData({cylLayoutVersion: (this.data.cylLayoutVersion || 0) + 1})
     },
 
@@ -313,6 +395,7 @@ Component({
       } else {
         view.flush()
       }
+      this.cyl_syncSnapshot()
     },
 
     /** [EN] Moves to a progress between 0 and 1. [CN] 跳到 0 到 1 之间的进度。 */
@@ -320,6 +403,7 @@ Component({
       if (this.cylView) {
         this.cylView.setProgress(Math.min(1, Math.max(0, Number(progress) || 0)))
         this.cylView.flush()
+        this.cyl_syncSnapshot()
       }
     },
 

@@ -4,8 +4,30 @@
   height: 100px;
 }
 
+.cyl-pag-box {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
 .cyl-pag-canvas {
   display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* [EN] WeChat DevTools: off screen while the still image shows, still drawn (see cyl-lottie). [CN] 微信开发者工具：显示静态图片时移出屏幕，仍会绘制（见 cyl-lottie）。 */
+.cyl-pag-canvas-covered {
+  position: absolute;
+  left: -10000px;
+  top: 0;
+  visibility: hidden;
+}
+
+.cyl-pag-snapshot {
+  position: absolute;
+  left: 0;
+  top: 0;
   width: 100%;
   height: 100%;
 }
