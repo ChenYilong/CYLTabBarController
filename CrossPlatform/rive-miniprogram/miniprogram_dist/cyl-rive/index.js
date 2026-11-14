@@ -28,6 +28,29 @@ const CYL_DEFAULT_WASM = '/cyl-rive-miniprogram/rive.wasm.br'
 let cylRuntime = null
 
 /**
+ * [EN] Whether the mini program runs in WeChat DevTools.
+ * [CN] 小程序是否运行在微信开发者工具中。
+ */
+function cylIsDevTools() {
+  try {
+    const info = typeof wx.getDeviceInfo === 'function' ? wx.getDeviceInfo() : wx.getSystemInfoSync()
+    return info.platform === 'devtools'
+  } catch (error) {
+    return false
+  }
+}
+
+/**
+ * [EN] WeChat DevTools moves a canvas of a fixed bar with the page while it scrolls (see cyl-lottie). There, a Rive
+ *      icon shows a still image of its frame while the page scrolls. Rive state machines draw every frame and have
+ *      no idle state to detect, so unlike cyl-lottie and cyl-pag only during the scroll. Phones are not changed.
+ * [CN] 微信开发者工具在页面滚动时会让固定栏中的画布随页面移动（见 cyl-lottie）。因此在开发者工具中，页面滚动期间 Rive
+ *      图标显示当前帧的静态图片。Rive 状态机每帧都绘制，没有可检测的空闲状态，因此与 cyl-lottie、cyl-pag 不同，仅在
+ *      滚动期间显示。真机不变。
+ */
+const CYL_USES_SNAPSHOTS = cylIsDevTools()
+
+/**
  * [EN] The Rive runtime, loaded once for every cyl-rive: WXWebAssembly instantiates the Brotli WebAssembly of the
  *      package (Emscripten's instantiateWasm hook).
  * [CN] Rive 运行时，所有 cyl-rive 只加载一次：WXWebAssembly 实例化包内的 Brotli WebAssembly（Emscripten 的
@@ -114,7 +137,7 @@ Component({
     wasmPath: { type: String, value: CYL_DEFAULT_WASM },
   },
 
-  data: { cylCanvasId: '' },
+  data: { cylCanvasId: '', cylSnapshot: '', cylSnapshotShown: false },
 
   observers: {
     'path, artboard, stateMachine, colors, fit': function () {
@@ -448,10 +471,25 @@ Component({
 
     /**
      * [EN] Renders the component again, so the canvas goes back to where the page puts it (WeChat DevTools leaves the
-     *      canvas of a fixed bar where it was after a page scroll; see cyl-lottie).
+     *      canvas of a fixed bar where it was after a page scroll; see cyl-lottie). `scrolling` (optional, true while
+     *      the page scrolls, false after) shows a still image in DevTools meanwhile.
      * [CN] 重新渲染组件，使画布回到页面布局的位置（微信开发者工具在页面滚动后会把固定栏中的画布留在原处；见 cyl-lottie）。
+     *      `scrolling`（可选，页面滚动期间为 true，之后为 false）使开发者工具在此期间显示静态图片。
      */
-    cyl_refreshLayout() {
+    cyl_refreshLayout(scrolling) {
+      if (CYL_USES_SNAPSHOTS && typeof scrolling === 'boolean' && this.cylScrolling !== scrolling) {
+        this.cylScrolling = scrolling
+        const canvas = this.cylState && this.cylState.canvas
+        if (scrolling && canvas && typeof canvas.toDataURL === 'function') {
+          try {
+            this.setData({ cylSnapshot: canvas.toDataURL('image/png'), cylSnapshotShown: true })
+          } catch (error) {
+            this.setData({ cylSnapshotShown: false })
+          }
+        } else if (this.data.cylSnapshotShown) {
+          this.setData({ cylSnapshotShown: false })
+        }
+      }
       this.setData({cylLayoutVersion: (this.data.cylLayoutVersion || 0) + 1})
     },
 
