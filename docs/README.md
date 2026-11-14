@@ -61,6 +61,7 @@
 | [在 Swift 项目中使用 CYLTabBarController](Swift-Guide.md) | [Using CYLTabBarController in Swift](Swift-Guide.md) |
 | [iOS 核心层迁移到 Swift](Swift-Migration.md) | [Migrating the iOS core layer to Swift](Swift-Migration.md) |
 | [在 SwiftUI 项目中集成 CYLTabBarController](SwiftUI-Integration.md) | [Integrating CYLTabBarController in a SwiftUI app](SwiftUI-Integration.md) |
+| [TODO 总览与清理进度](TODO-Sweep.md) | [TODO sweep: every open TODO and its status](TODO-Sweep.md) |
 | [Tab 的无障碍与 UI 测试](Tab-Accessibility.md) | [Tab Accessibility and UI Tests](Tab-Accessibility.md) |
 | [TabBar 图库](Tab-Bar-Gallery.md) | [Tab Bar Gallery](Tab-Bar-Gallery.md) |
 | [Tab 图标动画共用子库：CYLTabBarItemAnimation（面向协议，可扩展任意动画库）](Tab-Bar-Item-Animation.md) | [The shared tab icon animation subspec: CYLTabBarItemAnimation (protocol-oriented, open to any library)](Tab-Bar-Item-Animation.md) |
@@ -151,6 +152,7 @@ docs/
 ├── Swift-Guide.md
 ├── Swift-Migration.md
 ├── SwiftUI-Integration.md
+├── TODO-Sweep.md
 ├── Tab-Accessibility.md
 ├── Tab-Bar-Gallery.md
 ├── Tab-Bar-Item-Animation.md
