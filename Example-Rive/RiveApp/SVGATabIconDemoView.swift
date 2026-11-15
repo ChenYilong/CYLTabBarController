@@ -23,6 +23,8 @@ final class SVGATabIconDemoView: UIView {
     private static let animationSize = CGSize(width: 72, height: 72)
     private var animationViews: [UIView] = []
     private var isOn = false
+    /// [EN] The Bell tab's Rive URL while its icon is the SVGA file, put back on the next tap. [CN] Bell Tab 图标为 SVGA 文件时保存的 Rive URL，再次点击时恢复。
+    private var savedRiveURL: URL?
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -58,7 +60,16 @@ final class SVGATabIconDemoView: UIView {
         button.accessibilityHint = "SVGA"
         button.addTarget(self, action: #selector(toggle), for: .touchUpInside)
 
-        let stack = UIStackView(arrangedSubviews: [icons, button])
+        // [EN] The same SVGA file as the real icon of this tab (Bell), in place, in every style (issue #415).
+        // [CN] 同一个 SVGA 文件作为本 Tab（Bell）真正的图标，原地替换，适用于所有样式（issue #415）。
+        let tabIconButton = UIButton(type: .system)
+        tabIconButton.setTitle(cylDemoLocalizedString("Tab 图标：SVGA / Rive"), for: .normal)
+        tabIconButton.titleLabel?.font = .preferredFont(forTextStyle: .headline)
+        tabIconButton.titleLabel?.adjustsFontForContentSizeCategory = true
+        tabIconButton.accessibilityIdentifier = "SVGATabIconSwitch"
+        tabIconButton.addTarget(self, action: #selector(toggleTabIcon), for: .touchUpInside)
+
+        let stack = UIStackView(arrangedSubviews: [icons, button, tabIconButton])
         stack.translatesAutoresizingMaskIntoConstraints = false
         stack.axis = .vertical
         stack.alignment = .center
@@ -86,5 +97,41 @@ final class SVGATabIconDemoView: UIView {
                 player?.stop()
             }
         }
+    }
+
+    /**
+     * [EN] Swaps the Bell tab's icon between heartbeat.svga and its Rive artboard with `-updateTabBarItemForViewController:attributes:`.
+     *      The generic `CYLTabBarAnimationURL` wins over the library keys (`CYLTabBarRiveURL`) already in the tab's
+     *      attributes, and the file extension picks the SVGA animator; a new app would simply give `CYLTabBarSVGAURL`.
+     * [CN] 通过 `-updateTabBarItemForViewController:attributes:` 在 heartbeat.svga 与 Rive 画板之间切换 Bell Tab 的图标。通用的
+     *      `CYLTabBarAnimationURL` 优先于 Tab 属性中已有的动画库 key（`CYLTabBarRiveURL`），文件扩展名选择 SVGA animator；新 App 直接使用
+     *      `CYLTabBarSVGAURL` 即可。
+     */
+    @objc private func toggleTabIcon() {
+        var responder: UIResponder? = self
+        while let next = responder?.next, !(next is UIViewController) {
+            responder = next
+        }
+        guard let viewController = responder?.next as? UIViewController,
+              // [EN] UIKit's own property: `cyl_tabBarController` finds only system styles, not FlatDesign.
+              // [CN] 使用 UIKit 自带的属性：`cyl_tabBarController` 只查找系统样式，不包括扁平样式。
+              let tabBarController = viewController.tabBarController as? CYLTabBarController,
+              let index = tabBarController.viewControllers?.firstIndex(where: { $0 === viewController || $0.children.first === viewController }) else {
+            return
+        }
+        let url: URL?
+        if let savedRiveURL {
+            url = savedRiveURL
+            self.savedRiveURL = nil
+        } else {
+            let attributes = tabBarController.tabBarItemAttributes(at: UInt(index))
+            savedRiveURL = (attributes?[CYLTabBarAnimationURL] ?? attributes?[CYLTabBarRiveURL]) as? URL
+            url = Bundle.main.url(forResource: "heartbeat", withExtension: "svga")
+        }
+        guard let url else { return }
+        tabBarController.updateTabBarItem(for: viewController, attributes: [
+            CYLTabBarAnimationURL: url,
+            CYLTabBarAnimationSize: NSValue(cgSize: CGSize(width: 32, height: 32)),
+        ])
     }
 }

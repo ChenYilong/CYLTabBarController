@@ -299,6 +299,9 @@ docs/
 │   ├── svga-example-rive-bell.png
 │   ├── svga-example-rive-last-frame.png
 │   ├── svga-example-rive-playing.png
+│   ├── svga-tab-icon-classic.png
+│   ├── svga-tab-icon-flatdesign.png
+│   ├── svga-tab-icon-liquid-glass.png
 │   ├── swift-migration-badges-ios.png
 │   ├── swift-migration-localization-ios.png
 │   ├── swift-migration-step48-flatdesign-popped.png
