@@ -848,6 +848,8 @@ struct Index {
       ForEach([this.tabBarKey], (key: number) => {
       CYLTabBarController({
         tabBarStyleType: this.styleType,
+        // [EN] A skin's bar color tints the FlatDesign and Liquid Glass bars too. [CN] 皮肤的 TabBar 颜色也用于扁平样式与液态玻璃。
+        barTintColor: this.theme.bar,
         tabBarItemsAttributes: this.tabs,
         plusButton: this.plus,
         selectedIndex: $selectedIndex,

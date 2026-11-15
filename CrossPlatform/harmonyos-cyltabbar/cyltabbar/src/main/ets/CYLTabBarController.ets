@@ -835,6 +835,10 @@ export struct CYLTabBarController {
         }
         .width('100%')
         .padding(this.tabBarStyleType === CYLTabBarStyleType.LiquidGlass ? { left: 16, right: 16, bottom: 8 } : 0)
+        // [EN] The bar color continues under the gesture bar (classic and FlatDesign); clear around the Liquid Glass capsule.
+        // [CN] 经典与扁平样式的 TabBar 颜色延伸到手势条下方；液态玻璃胶囊四周透明。
+        .backgroundColor(this.tabBarStyleType === CYLTabBarStyleType.LiquidGlass ? Color.Transparent
+          : (this.tabBarStyleType === CYLTabBarStyleType.FlatDesign ? (this.barTintColor ?? '#F9F9F9') : this.tabBarBackgroundColor))
         .expandSafeArea(this.tabBarStyleType === CYLTabBarStyleType.LiquidGlass ? [] : [SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM])
         .transition(TransitionEffect.move(TransitionEdge.BOTTOM)
           .animation({ duration: this.tabBarHiddenAnimated ? 250 : 0 }))
