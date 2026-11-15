@@ -4,7 +4,8 @@ import {
   CYLTabBarController, CYLTabBarItemAttributes, CYLPlusButton, CYLPlusButtonPageIndex, CYLBadge, CYLBadgeView,
   CYLBadgeAppearance, CYLBadgeAnimationType, CYLOffset, CYLEdgeInsets, cyl_simulateMemoryWarning, cyl_badgeTitleForRow,
   cyl_badgeStyleCount, cyl_applyBadgeSample, CYLTabButtonTapAnimationType, CYLImpactFeedbackStyle,
-  CYLTabBarMinimizeBehavior, cyl_reportScroll, cyl_pushViewController, CYLThemeManager, CYLThemeManagerCenter
+  CYLTabBarMinimizeBehavior, cyl_reportScroll, cyl_pushViewController, CYLThemeManager, CYLThemeManagerCenter,
+  cyl_tabBarItemIdentifiers, cyl_indexOfTabBarItemWithIdentifier, cyl_selectTabBarItemWithIdentifier
 } from 'cyltabbar';
 import { DemoTheme, DEMO_THEMES, demoRegisterThemes } from '../demo/DemoThemes';
 import {
@@ -596,6 +597,58 @@ struct Index {
     ];
   }
 
+  /** [EN] No base class, and helpers (items 39-42, issue #535). [CN] 无需基类与辅助方法（第 39-42 项）。 */
+  private helperRows(page: string): DemoRow[] {
+    const index = this.pageIndex(page);
+    return [
+      {
+        id: 'hide-navigation-bar', title: 'Hide the navigation bar without a base class (issue #535)',
+        subtitle: 'Pushes a page that hides the navigation bar while shown, with no base class',
+        action: () => this.push('pages/TextPage', { title: 'The navigation bar is hidden while this page is shown', color: '#FFCC00', hidesNavigationBar: true } as DemoPushParams),
+      },
+      {
+        id: 'outside-superview', title: 'Touches outside the super view (issue #535)',
+        subtitle: 'The plus button sticks out of the bar; its part above the bar responds (shown in red)',
+        action: () => {
+          const copy: CYLPlusButton = {
+            image: this.plus.image, selectedImage: this.plus.selectedImage, title: this.plus.title, index: this.plus.index,
+            centerYOffset: this.plus.centerYOffset, imageSize: this.plus.imageSize, alignsTitle: this.plus.alignsTitle,
+            identifier: this.plus.identifier, selectable: this.plus.selectable,
+            showsTouchableArea: this.plus.showsTouchableArea !== true, touchableAreaScale: this.plus.touchableAreaScale,
+          };
+          this.plus = copy;
+        },
+      },
+      {
+        id: 'bundle-image', title: 'Load an image from the bundle (issue #535)',
+        subtitle: 'The image of this page\'s tab from the app\'s rawfile (the resource bundle of iOS); tap again to restore',
+        action: () => {
+          const on = this.flip(`bundle-${page}`);
+          this.updateTab(index, (item: CYLTabBarItemAttributes) => {
+            item.image = on ? $rawfile('Skins/1.0.0/space/rocket@3x.png') : CYL_TABS[index].image;
+            item.selectedImage = on ? $rawfile('Skins/1.0.0/space/rocket@3x.png') : CYL_TABS[index].selectedImage;
+            item.lottieFilePath = on ? undefined : CYL_TABS[index].lottieFilePath;
+          });
+        },
+      },
+      {
+        id: 'helpers', title: 'Helpers: find tab buttons and weak references (issue #535)',
+        subtitle: 'cyl_tabBarItemIdentifiers, cyl_indexOfTabBarItemWithIdentifier, cyl_selectTabBarItemWithIdentifier, WeakRef',
+        action: () => {
+          const identifiers = cyl_tabBarItemIdentifiers(this.tabs);
+          const lines = identifiers.map((identifier: string) =>
+            `${identifier}: tab and page at index ${cyl_indexOfTabBarItemWithIdentifier(this.tabs, identifier)}`);
+          const weak = new WeakRef<Object>(this.tabs);
+          this.getUIContext().getPromptAction().showDialog({
+            title: 'CYLUtils',
+            message: `${lines.join('\n')}\n\nWeak reference: ${weak.deref() !== undefined}\nselected: ${identifiers[this.selectedIndex] ?? 'plus'}\n\nOK selects "message".`,
+            buttons: [{ text: 'OK', color: '#007AFF' }],
+          }).then(() => cyl_selectTabBarItemWithIdentifier(DEMO_MESSAGE)).catch(() => {});
+        },
+      },
+    ];
+  }
+
   private sections(page: string): DemoSection[] {
     return [
       { title: 'General', rows: this.generalRows() },
@@ -611,6 +664,7 @@ struct Index {
         return row;
       }) },
       { title: 'Tab interactions', rows: this.interactionRows() },
+      { title: 'No base class, and helpers', rows: this.helperRows(page) },
       { title: 'Configuration file', rows: this.configurationRows() },
       { title: 'Jump and compare', rows: this.jumpRows() },
       { title: 'Badges', rows: page === DEMO_MESSAGE ? this.messageRows().concat(this.badgeRows(page)) : this.badgeRows(page) },

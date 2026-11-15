@@ -64,6 +64,31 @@ export function cyl_popSelectTabBarChildViewControllerForTabBarItemIdentifier(id
 }
 
 /**
+ * [EN] -cyl_selectTabBarItemWithIdentifier:: selects the tab with this identifier in the tab bar controller on screen.
+ * [CN] 在当前 TabBarController 中选中该 identifier 的 Tab。
+ */
+export function cyl_selectTabBarItemWithIdentifier(identifier: string): void {
+  AppStorage.setOrCreate<string>(CYLSelectRequestStorageKey, `id:${identifier}#${Date.now()}`);
+}
+
+/**
+ * [EN] -cyl_tabBarItemIdentifiers: the identifiers of the tabs, in order (the index when a tab has none).
+ * [CN] 各 Tab 的 identifier，按顺序（没有时为索引）。
+ */
+export function cyl_tabBarItemIdentifiers(items: CYLTabBarItemAttributes[]): string[] {
+  return items.map((item: CYLTabBarItemAttributes, index: number) => item.identifier ?? `${index}`);
+}
+
+/**
+ * [EN] -cyl_indexOfTabBarItemWithIdentifier: (cyl_controlWithTabBarItemIdentifier, cyl_viewControllerWithTabBarItemIdentifier
+ *      find the button and page at this index); -1 when none.
+ * [CN] 该 identifier 的 Tab 索引（按钮与页面都在此索引）；没有时为 -1。
+ */
+export function cyl_indexOfTabBarItemWithIdentifier(items: CYLTabBarItemAttributes[], identifier: string): number {
+  return cyl_tabBarItemIdentifiers(items).indexOf(identifier);
+}
+
+/**
  * [EN] -cyl_pushViewController:animated:: pushes a page (router url) above the tab bar, which it covers (the tab bar
  *      stays with its page, as hidesBottomBarWhenPushed).
  * [CN] 在 TabBar 之上 push 页面（router url），页面覆盖 TabBar（相当于 hidesBottomBarWhenPushed）。

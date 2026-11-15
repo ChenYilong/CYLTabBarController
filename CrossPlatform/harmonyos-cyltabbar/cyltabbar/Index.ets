@@ -11,7 +11,8 @@ export {
   CYLTabBarController, CYLPlusButtonPageIndex, CYLEdgeInsets, CYLTabButtonTapAnimationType, CYLImpactFeedbackStyle, CYLColorModeStorageKey, cyl_updateColorMode,
   CYLTabBarMinimizeBehavior, CYLScrollStorageKey, cyl_reportScroll, CYLSelectRequestStorageKey,
   cyl_popSelectTabBarChildViewControllerAtIndex, cyl_popSelectTabBarChildViewControllerForTabBarItemIdentifier,
-  cyl_pushViewController, cyl_pushOrPopToViewController, cyl_simulateMemoryWarning, CYLMemoryWarningStorageKey
+  cyl_pushViewController, cyl_pushOrPopToViewController, cyl_selectTabBarItemWithIdentifier, cyl_tabBarItemIdentifiers,
+  cyl_indexOfTabBarItemWithIdentifier, cyl_simulateMemoryWarning, CYLMemoryWarningStorageKey
 } from './src/main/ets/CYLTabBarController';
 export { CYLBadgeSample, cyl_badgeTitleForRow, cyl_badgeStyleCount, cyl_applyBadgeSample } from './src/main/ets/CYLBadgeSamples';
 export { CYLLottieIcon } from './src/main/ets/CYLLottieIcon';
