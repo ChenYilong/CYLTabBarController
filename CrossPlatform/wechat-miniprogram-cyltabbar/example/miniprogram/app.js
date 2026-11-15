@@ -88,6 +88,38 @@ App({
       wx.onThemeChange((result) => this.cyl_updateTabBarState({ systemTheme: result.theme === 'dark' ? 'dark' : 'light' }));
     }
     this.cyl_decorateTabBar();
+    // [EN] CYLTabBarControllerUnloadsUnselectedViewsOnMemoryWarning: a real memory warning unloads too.
+    // [CN] 真实的内存警告同样卸载未选中的 Tab。
+    if (typeof wx.onMemoryWarning === 'function') {
+      wx.onMemoryWarning(() => this.cyl_simulateMemoryWarning());
+    }
+  },
+
+  /**
+   * [EN] UIViewController+CYLMemoryWarning (docs/ObjC-Example-Parity item 12): unloads the views of the unselected tab
+   *      pages, except Home (-shouldUnloadViewOfViewController: returns NO for it), and returns one line per tab,
+   *      "<title>: <status>", as CYLSimulateMemoryWarningReport. `tabs`: [{title, route, selected}] in bar order.
+   * [CN] UIViewController+CYLMemoryWarning（第 12 项）：卸载未选中 Tab 页面的视图，首页除外（-shouldUnloadViewOfViewController:
+   *      对它返回 NO），并按 CYLSimulateMemoryWarningReport 每个 Tab 返回一行「<标题>: <状态>」。`tabs`：按 TabBar 顺序的
+   *      [{title, route, selected}]。
+   */
+  cyl_simulateMemoryWarning(tabs, translate) {
+    const t = translate || ((text) => text);
+    const loaded = this.cylLoadedTabPages || {};
+    const pages = tabs || Object.keys(loaded).map((route) => ({ title: route, route, selected: false }));
+    return pages.map((tab) => {
+      let status;
+      if (tab.selected) {
+        status = t('kept: selected');
+      } else if (tab.route === 'pages/home/index') {
+        status = t('kept: shouldUnload returned NO');
+      } else if (loaded[tab.route] && !loaded[tab.route].data.cylUnloaded) {
+        status = loaded[tab.route].cyl_unloadView() ? t('unloaded') : t('not loaded');
+      } else {
+        status = t('not loaded');
+      }
+      return `${tab.title}: ${status}`;
+    }).join('\n');
   },
 
   /**

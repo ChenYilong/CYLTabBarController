@@ -97,10 +97,25 @@ function cylSetAttributes(context, valuesByIdentifier) {
  *      tabBar()、toast(text)、open(id)。
  */
 const CYL_HOME_ACTIONS = {
+  // [EN] Item 12: unloads the unselected tabs, then the alert "Memory warning" with the report. [CN] 第 12 项：卸载未选中的 Tab，然后弹出「内存警告」与报告。
   memoryWarning: (context) => {
-    // [EN] What the core does on a memory warning: drop the decoded icon images; the bar draws them again. [CN] 核心层收到内存警告时的行为：丢弃已解码的图标；TabBar 重新绘制。
-    context.update({ overrides: Object.assign({}, context.overrides()) });
-    context.toast(t('Memory warning: icon caches released and drawn again'));
+    const bar = context.tabBar();
+    const items = (context.configuration().CYLTabBarControllerTabBarItemsAttributes || [])
+      .concat([context.configuration().CYLTabBarControllerPlusButton]).filter(Boolean);
+    const tabs = (bar ? bar.data.cylSlots : []).map((slot) => {
+      const item = items.find((candidate) => candidate.CYLTabBarItemIdentifier === slot.key) || {};
+      return {
+        title: (slot.item ? slot.item.title : slot.title) || slot.key,
+        route: `pages/${item.CYLTabBarItemPageIdentifier || item.CYLTabBarItemIdentifier || slot.key}/index`,
+        selected: Boolean(slot.selected),
+      };
+    });
+    wx.showModal({
+      title: t('Memory warning'),
+      content: getApp().cyl_simulateMemoryWarning(tabs, t),
+      showCancel: false,
+      confirmText: t('OK'),
+    });
   },
   // [EN] Item 13: 0 → -4 → 4 on every tab; a value not in the list goes to the first. [CN] 第 13 项：所有 Tab 依次为 0 → -4 → 4；不在列表中的值回到第一个。
   titleOffset: (context) => {

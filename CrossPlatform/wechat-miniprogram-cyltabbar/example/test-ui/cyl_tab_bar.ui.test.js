@@ -995,3 +995,37 @@ test('the tap animation and the tap sound and haptics rows cycle as the Objectiv
   await miniProgram.reLaunch('/pages/home/index');
   await cylSleep(CYL_SETTLE_MS);
 });
+
+test('a memory warning unloads the unselected tabs except Home and reports each tab (docs/ObjC-Example-Parity item 12)', async () => {
+  await cylSetState({ loggedIn: true });
+  for (const page of ['/pages/message/index', '/pages/me/index', '/pages/home/index']) {
+    await miniProgram.switchTab(page);
+    await cylSleep(CYL_SETTLE_MS);
+  }
+  // [EN] The row's report, from the tabs of Home's bar. [CN] 本行的报告，取自首页 TabBar 的各 Tab。
+  const report = await miniProgram.evaluate(() => {
+    const pages = getCurrentPages();
+    const bar = pages[pages.length - 1].getTabBar().selectComponent('#cyl-tab-bar');
+    const routes = { home: 'home', city: 'web', plus: 'publish', message: 'message', CYLMineViewController: 'me' };
+    const tabs = bar.data.cylSlots.map((slot) => ({
+      title: slot.key,
+      route: `pages/${routes[slot.key]}/index`,
+      selected: Boolean(slot.selected),
+    }));
+    return getApp().cyl_simulateMemoryWarning(tabs).split('\n');
+  });
+  assert.equal(report[0], 'home: kept: selected');
+  // [EN] Nearby and Post were loaded or not, depending on the tests before. [CN] 同城与发布是否已加载取决于之前的测试。
+  assert.match(report[1], /^city: (not loaded|unloaded)$/);
+  assert.match(report[2], /^plus: (not loaded|unloaded)$/);
+  assert.deepEqual(report.slice(3), ['message: unloaded', 'CYLMineViewController: unloaded']);
+  const unloaded = await miniProgram.evaluate(() => getApp().cylLoadedTabPages['pages/me/index'].data.cylUnloaded);
+  assert.equal(unloaded, true, 'the view of Me is gone');
+  await miniProgram.switchTab('/pages/me/index');
+  await cylSleep(CYL_SETTLE_MS);
+  const current = await cylCurrentPage();
+  assert.equal(current.data.cylUnloaded, false, 'built again when it shows');
+  assert.ok(await current.page.$('.cyl-page'), 'the page has its view again');
+  await miniProgram.switchTab('/pages/home/index');
+  await cylSleep(CYL_SETTLE_MS);
+});
