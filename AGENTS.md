@@ -210,6 +210,10 @@ Every new feature and user-visible change ships with bilingual documentation in 
   stale code). Confirm a new symbol is in the app (`strings <app>/<binary> | grep <symbol>`) when in doubt.
 - **Simulator**: run `scripts/free-ram.sh` before every simulator use. Details and common failures: the `cyl-verify` skill.
 
+## HarmonyOS port
+
+HarmonyOS (HarmonyOS 6.0.1, API 21, DevEco Studio 6.0, ArkTS / ArkUI, code in `CrossPlatform/harmonyos-cyltabbar`) principles: the public API matches the iOS library; the example (entry) is a one-to-one replica of the iOS Objective-C Example; the internal implementation is ported from the Android Kotlin sources (`Example-Android/cyltabbar`). Progress and score: [docs/HarmonyOS-Parity.md](docs/HarmonyOS-Parity.md); remove one TODO per feature done, until the score is 100. Build from an ASCII path without spaces (hvigor refuses others), e.g. a copy at `C:cyl-hm`.
+
 ## Depending on CYLTabBarController
 
 A project always integrates CYLTabBarController through CocoaPods. The version it depends on is always the **latest commit

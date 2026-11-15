@@ -66,6 +66,7 @@ def document():
            '<!-- 由 scripts/harmonyos-parity.py 生成；请勿手动编辑。 -->', '',
            '| 中文 | English |', '|:---|:---|',
            '| 鸿蒙系统版本：%s | HarmonyOS version: %s |' % (HARMONY_VERSION, HARMONY_VERSION),
+           '| 原则：API 对标 iOS 端；example 对标 iOS 端 Objective-C Example，一比一复刻；内部实现对标 Android 端 Kotlin 源码（`Example-Android/cyltabbar`）迁移到鸿蒙。 | Principles: the API matches iOS; the example is a one-to-one replica of the iOS Objective-C Example; the internals are ported from the Android Kotlin sources (`Example-Android/cyltabbar`). |',
            '| 表 1：iOS 库的全部公开 API；表 2：iOS Objective-C Example 的全部演示（[ObjC-Example-Parity](ObjC-Example-Parity/README.md)）。第二列为鸿蒙对应实现，默认 TODO；每完成一个功能，在 `scripts/harmonyos-api-map.json`（API）或 `scripts/harmonyos-parity.json`（演示）写入实现并运行 `python3 scripts/harmonyos-parity.py`，移除一个 TODO。 | Table 1: every public API of the iOS library; table 2: every demo of the iOS Objective-C Example ([ObjC-Example-Parity](ObjC-Example-Parity/README.md)). The second column is the HarmonyOS implementation, TODO by default; for each feature done, write it into `scripts/harmonyos-api-map.json` (APIs) or `scripts/harmonyos-parity.json` (demos) and run `python3 scripts/harmonyos-parity.py`, removing one TODO. |',
            '| **完成率（两表合并）：%d / 100**：API %d / %d，演示 %d / %d；没有 TODO 即 100。 | **Score (both tables): %d / 100**: APIs %d / %d, demos %d / %d; no TODO left is 100. |'
            % (score, done_a, len(apis), done_d, len(demo_rows), score, done_a, len(apis), done_d, len(demo_rows)), '',
