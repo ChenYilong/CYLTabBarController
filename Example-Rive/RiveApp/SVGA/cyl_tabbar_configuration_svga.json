@@ -7,7 +7,7 @@
       "CYLTabBarItemSelectedImage": "system:message",
       "CYLTabBarItemIdentifier": "chat",
       "CYLTabBarItemPageIdentifier": "svga-chat",
-      "CYLTabBarSVGAFilePath": "TwitterHeart.svga",
+      "CYLTabBarSVGAFilePath": "tab_chat.svga",
       "CYLTabBarSVGASize": "{32, 32}"
     },
     {
@@ -16,7 +16,7 @@
       "CYLTabBarItemSelectedImage": "system:magnifyingglass",
       "CYLTabBarItemIdentifier": "search",
       "CYLTabBarItemPageIdentifier": "svga-search",
-      "CYLTabBarSVGAFilePath": "PinJump.svga",
+      "CYLTabBarSVGAFilePath": "tab_search.svga",
       "CYLTabBarSVGASize": "{32, 32}"
     },
     {
@@ -25,7 +25,7 @@
       "CYLTabBarItemSelectedImage": "system:bell",
       "CYLTabBarItemIdentifier": "bell",
       "CYLTabBarItemPageIdentifier": "svga-bell",
-      "CYLTabBarSVGAFilePath": "alarm.svga",
+      "CYLTabBarSVGAFilePath": "tab_list.svga",
       "CYLTabBarSVGASize": "{32, 32}"
     },
     {
@@ -34,7 +34,7 @@
       "CYLTabBarItemSelectedImage": "system:person",
       "CYLTabBarItemIdentifier": "user",
       "CYLTabBarItemPageIdentifier": "svga-user",
-      "CYLTabBarSVGAFilePath": "heartbeat.svga",
+      "CYLTabBarSVGAFilePath": "tab_profile.svga",
       "CYLTabBarSVGASize": "{32, 32}"
     }
   ],

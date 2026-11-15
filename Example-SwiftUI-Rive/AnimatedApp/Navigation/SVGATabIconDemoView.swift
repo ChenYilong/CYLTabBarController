@@ -29,8 +29,8 @@ final class SVGATabIconDemoView: UIView {
 
     override init(frame: CGRect) {
         super.init(frame: frame)
-        // [EN] HamburgerArrow is the SVGA twin of the Rive menu button above. [CN] HamburgerArrow 是上方 Rive 菜单按钮的 SVGA 对应版本。
-        let containers = ["HamburgerArrow", "heartbeat", "Rocket"].map { name -> UIView in
+        // [EN] tab_home is the SVGA twin of the Rive menu button above. [CN] tab_home 是上方 Rive 菜单按钮的 SVGA 对应版本。
+        let containers = ["tab_home", "tab_profile", "tab_activity"].map { name -> UIView in
             // [EN] Starts at its final size, as in the Rive demo (the animation view follows it through autoresizing).
             // [CN] 与 Rive 演示相同，初始即为最终大小（动画视图通过 autoresizing 跟随它）。
             let container = UIView(frame: CGRect(origin: .zero, size: Self.animationSize))
@@ -119,10 +119,10 @@ final class SVGATabIconDemoView: UIView {
     }
 
     /**
-     * [EN] Swaps the Bell tab's icon between heartbeat.svga and its Rive artboard with `-updateTabBarItemForViewController:attributes:`.
+     * [EN] Swaps the Bell tab's icon between tab_profile.svga and its Rive artboard with `-updateTabBarItemForViewController:attributes:`.
      *      The generic `CYLTabBarAnimationURL` wins over the library keys (`CYLTabBarRiveURL`) already in the tab's
      *      attributes, and the file extension picks the SVGA animator; a new app would simply give `CYLTabBarSVGAURL`.
-     * [CN] 通过 `-updateTabBarItemForViewController:attributes:` 在 heartbeat.svga 与 Rive 画板之间切换 Bell Tab 的图标。通用的
+     * [CN] 通过 `-updateTabBarItemForViewController:attributes:` 在 tab_profile.svga 与 Rive 画板之间切换 Bell Tab 的图标。通用的
      *      `CYLTabBarAnimationURL` 优先于 Tab 属性中已有的动画库 key（`CYLTabBarRiveURL`），文件扩展名选择 SVGA animator；新 App 直接使用
      *      `CYLTabBarSVGAURL` 即可。
      */
@@ -145,7 +145,7 @@ final class SVGATabIconDemoView: UIView {
         } else {
             let attributes = tabBarController.tabBarItemAttributes(at: UInt(index))
             savedRiveURL = (attributes?[CYLTabBarAnimationURL] ?? attributes?[CYLTabBarRiveURL]) as? URL
-            url = Bundle.main.url(forResource: "heartbeat", withExtension: "svga")
+            url = Bundle.main.url(forResource: "tab_profile", withExtension: "svga")
         }
         guard let url else { return }
         tabBarController.updateTabBarItem(for: viewController, attributes: [

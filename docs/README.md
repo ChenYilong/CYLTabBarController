@@ -310,6 +310,7 @@ docs/
 │   ├── svga-tab-icons-keys-ios26.png
 │   ├── svga-tab-icons-swiftui-configuration-ios26.png
 │   ├── svga-tab-icons-swiftui-keys-ios26.png
+│   ├── svga-tab-icons-web-assets-ios26.png
 │   ├── swift-migration-badges-ios.png
 │   ├── swift-migration-localization-ios.png
 │   ├── swift-migration-step48-flatdesign-popped.png

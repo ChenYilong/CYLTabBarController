@@ -63,11 +63,11 @@ extension Tab {
     /** [EN] The SVGA file of each tab, in place of its Rive artboard. [CN] 每个 Tab 的 SVGA 文件，代替其 Rive 画板。 */
     var svgaFileName: String {
         switch self {
-        case .chat: return "TwitterHeart"
-        case .search: return "PinJump"
-        case .timer: return "Rocket"
-        case .bell: return "alarm"
-        case .user: return "heartbeat"
+        case .chat: return "tab_chat"
+        case .search: return "tab_search"
+        case .timer: return "tab_activity"
+        case .bell: return "tab_list"
+        case .user: return "tab_profile"
         }
     }
 
