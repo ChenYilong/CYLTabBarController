@@ -123,7 +123,30 @@ before(async () => {
   await miniProgram.reLaunch('/pages/home/index');
   await cylSleep(CYL_SETTLE_MS * 2);
   await cylSetState({ loggedIn: true, itemStyle: '', glassLensStyle: 'regular' });
+  // [EN] The launch badges animate forever and the cover hides Home: the tests compare icons, so they go first; test 12
+  //      checks them. [CN] 启动角标一直播放动画，封面遮住首页：测试比较图标，因此先移除；第 12 项测试检查它们。
+  await cylClearDecoration();
 });
+
+/**
+ * [EN] Removes the launch badges and the cover (app.js cyl_decorateTabBar) from every bar.
+ * [CN] 从所有 TabBar 移除启动角标与封面（app.js cyl_decorateTabBar）。
+ */
+async function cylClearDecoration() {
+  await miniProgram.evaluate(() => new Promise((resolve) => {
+    // [EN] After the launch timer (1.5 s), so it does not put them back. [CN] 在启动计时器（1.5 秒）之后，避免其重新添加。
+    setTimeout(() => {
+      clearTimeout(getApp().cylDecorateTimer);
+      getApp().cyl_updateTabBarState({
+        badges: { home: '', city: '', message: '', CYLMineViewController: '', plus: '' },
+        badgeAttributes: {},
+        covers: { home: null },
+      });
+      resolve();
+    }, 0);
+  }));
+  await cylSleep(CYL_SETTLE_MS);
+}
 
 after(async () => {
   if (!miniProgram) {
@@ -141,7 +164,7 @@ after(async () => {
 test('the bar has the four tabs and the plus button, Home selected', async () => {
   const bar = await cylTabBar();
   assert.equal(bar.route, 'pages/home/index');
-  assert.deepEqual(bar.slots.filter((slot) => !slot.isPlusButton).map((slot) => slot.key), ['home', 'message', 'discover', 'me']);
+  assert.deepEqual(bar.slots.filter((slot) => !slot.isPlusButton).map((slot) => slot.key), ['home', 'city', 'message', 'CYLMineViewController']);
   assert.equal(bar.slots.filter((slot) => slot.isPlusButton).length, 1);
   assert.deepEqual(bar.slots.filter((slot) => slot.selected).map((slot) => slot.key), ['home']);
 });
@@ -348,18 +371,18 @@ test('looping icons stay one layer and keep playing during a page scroll (WeChat
 
 test('hiddenIdentifiers leaves a tab out of every bar, and tabBarHidden hides one page\'s bar', async () => {
   try {
-    await cylSetState({ hiddenIdentifiers: ['discover'] });
+    await cylSetState({ hiddenIdentifiers: ['city'] });
     let bar = await cylTabBar();
-    assert.deepEqual(bar.slots.filter((slot) => !slot.isPlusButton).map((slot) => slot.key), ['home', 'message', 'me']);
+    assert.deepEqual(bar.slots.filter((slot) => !slot.isPlusButton).map((slot) => slot.key), ['home', 'message', 'CYLMineViewController']);
     assert.equal(bar.slots.filter((slot) => slot.isPlusButton).length, 1, 'the plus button stays');
     assert.deepEqual(bar.slots.filter((slot) => slot.selected).map((slot) => slot.key), ['home']);
     // [EN] A hidden selected tab falls back to the first shown one. [CN] 被隐藏的选中 Tab 回退到第一个显示的 Tab。
     await cylSetState({ hiddenIdentifiers: ['home'] });
     bar = await cylTabBar();
-    assert.deepEqual(bar.slots.filter((slot) => slot.selected).map((slot) => slot.key), ['message']);
+    assert.deepEqual(bar.slots.filter((slot) => slot.selected).map((slot) => slot.key), ['city']);
     await cylSetState({ hiddenIdentifiers: [] });
     bar = await cylTabBar();
-    assert.deepEqual(bar.slots.filter((slot) => !slot.isPlusButton).map((slot) => slot.key), ['home', 'message', 'discover', 'me']);
+    assert.deepEqual(bar.slots.filter((slot) => !slot.isPlusButton).map((slot) => slot.key), ['home', 'city', 'message', 'CYLMineViewController']);
 
     const cylBarHeight = (hidden) => miniProgram.evaluate((value) => new Promise((resolve) => {
       const pages = getCurrentPages();
@@ -577,6 +600,65 @@ test('the feeds of Message, Discover and Me act as on iOS (the request of 2026-1
   assert.equal((await miniProgram.evaluate(() => getApp().globalData.cylTabBarState)).badges.me, '5');
   assert.equal((await cylCurrentPage()).route, 'pages/pushed/locked');
   await miniProgram.evaluate(() => getApp().cyl_updateTabBarState({ badges: {} }));
+  await miniProgram.reLaunch('/pages/home/index');
+  await cylSleep(CYL_SETTLE_MS);
+});
+
+test('the tabs and the launch sequence match the Objective-C example (docs/ObjC-Example-Parity items 1-6, 29, 55)', async () => {
+  await miniProgram.reLaunch('/pages/home/index');
+  await cylSleep(CYL_SETTLE_MS);
+  await cylSetState({ itemStyle: '', loggedIn: true });
+  // [EN] -[MainTabBarController cyl_demo_decorateTabBarController:] runs 1.5 s after launch; run it again here.
+  // [CN] 启动 1.5 秒后执行；这里再执行一次。
+  await miniProgram.evaluate(() => { getApp().cyl_decorateTabBar(); });
+  await cylSleep(1500 + CYL_SETTLE_MS * 2);
+  const bar = () => miniProgram.evaluate(() => {
+    const pages = getCurrentPages();
+    const tabBar = pages[pages.length - 1].getTabBar().selectComponent('#cyl-tab-bar');
+    return {
+      styleType: tabBar.data.cylStyleType,
+      slots: tabBar.data.cylSlots.map((slot) => ({
+        key: slot.key,
+        selected: Boolean(slot.selected),
+        title: slot.item ? slot.item.title : slot.title,
+        badge: slot.isPlusButton ? (slot.badge && slot.badge.text) : (slot.showsDot ? '•' : slot.badge),
+        badgeItem: slot.badgeItem || null,
+        plusBadgeClass: slot.isPlusButton && slot.badge ? slot.badge.className : '',
+        cover: Boolean(slot.cover),
+      })),
+    };
+  });
+  let state = await bar();
+  assert.equal(state.styleType, 'liquidGlass', 'starts on Liquid Glass');
+  const byKey = (key) => state.slots.find((slot) => slot.key === key);
+  assert.deepEqual(state.slots.map((slot) => slot.key), ['home', 'city', 'plus', 'message', 'CYLMineViewController']);
+  assert.deepEqual(state.slots.map((slot) => slot.title), ['Refresh', 'Nearby', 'Post', 'Messages', 'Me']);
+  assert.equal(byKey('home').badge, '•');
+  assert.equal(byKey('home').badgeItem.animation, 'breathe');
+  assert.equal(byKey('home').badgeItem.size, '{11, 11}');
+  assert.equal(byKey('home').cover, true, 'the cover over Home');
+  assert.equal(byKey('city').badge, '8');
+  assert.deepEqual([byKey('city').badgeItem.color, byKey('city').badgeItem.animation], ['#AF52DE', 'scale']);
+  assert.deepEqual([byKey('message').badge, byKey('message').badgeItem.animation], ['99+', 'bounce']);
+  assert.deepEqual([byKey('CYLMineViewController').badge, byKey('CYLMineViewController').badgeItem.positionAdjustment],
+    ['NEW', '{-1, 3}']);
+  assert.deepEqual([byKey('plus').badge, byKey('plus').plusBadgeClass], ['1', 'cyl-badge-bounce']);
+
+  // [EN] Item 55: on Liquid Glass a tap that selects a tab turns its badge into a dot of the same color.
+  // [CN] 第 55 项：液态玻璃下选中 Tab 的点击把其角标变为同色红点。
+  await cylTap('city');
+  state = await bar();
+  assert.equal(byKey('city').selected, true);
+  assert.deepEqual([byKey('city').badge, byKey('city').badgeItem.color], ['•', '#AF52DE']);
+
+  // [EN] Item 29: Messages and Me need login; the tab stays unselected until the alert logs in.
+  // [CN] 第 29 项：消息与我的需要登录；在弹窗登录之前该 Tab 不会被选中。
+  await cylSetState({ loggedIn: false });
+  await cylTap('message');
+  state = await bar();
+  assert.equal(byKey('message').selected, false, 'Messages needs login');
+  await cylSetState({ loggedIn: true });
+  await cylClearDecoration();
   await miniProgram.reLaunch('/pages/home/index');
   await cylSleep(CYL_SETTLE_MS);
 });

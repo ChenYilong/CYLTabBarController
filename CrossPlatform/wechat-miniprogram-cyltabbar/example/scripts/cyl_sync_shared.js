@@ -168,6 +168,10 @@ function cylFindAsset(assets, key, theme, state) {
  * [EN] Every generated file: relative path -> Buffer.
  * [CN] 所有生成的文件：相对路径 -> Buffer。
  */
+const CYL_OBJC_TAB_BAR_IMAGES = ['home_normal', 'home_highlight', 'fishpond_normal', 'fishpond_highlight', 'message_normal',
+  'message_highlight', 'message_normal_night', 'account_normal', 'account_highlight', 'post_normal', 'post_highlight',
+  'home_select_cover'];
+
 function cylGeneratedFiles() {
   const files = {};
   const configuration = JSON.parse(fs.readFileSync(path.join(CYL_SOURCE, 'cyl_tabbar_configuration.json'), 'utf8'));
@@ -208,6 +212,16 @@ function cylGeneratedFiles() {
   symbolsByTheme.default = symbolsByTheme[CYL_DEFAULT_THEME];
   files['demo_list.js'] = Buffer.from(cylDemoListSource());
   files['symbols.js'] = Buffer.from(`${CYL_GENERATED_NOTE}module.exports = ${JSON.stringify(symbolsByTheme, null, 2)};\n`);
+
+  // [EN] The Objective-C example's tab bar images (Example/Images.xcassets/TabBarIcon, @3x), which the example's tab bar
+  //      uses as +[MainTabBarController tabBarItemsAttributesForTabBar] does (docs/ObjC-Example-Parity).
+  // [CN] Objective-C 示例的 TabBar 图片（Example/Images.xcassets/TabBarIcon，@3x），示例 TabBar 与
+  //      +[MainTabBarController tabBarItemsAttributesForTabBar] 一样使用它们（docs/ObjC-Example-Parity）。
+  const tabBarIcons = path.join(CYL_REPOSITORY_ROOT, 'Example', 'Images.xcassets', 'TabBarIcon');
+  CYL_OBJC_TAB_BAR_IMAGES.forEach((name) => {
+    const folder = name === 'home_select_cover' ? '' : name.split('_')[0];
+    files[path.join('objc', `${name}.png`)] = fs.readFileSync(path.join(tabBarIcons, folder, `${name}.imageset`, `${name}@3x.png`));
+  });
 
   const choice = cylChosenAnimation(process.argv, false);
   const animation = CYL_ANIMATIONS[choice];

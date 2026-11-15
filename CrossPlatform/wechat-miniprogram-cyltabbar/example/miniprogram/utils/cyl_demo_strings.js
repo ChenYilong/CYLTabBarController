@@ -169,7 +169,12 @@ module.exports = {
     "Events": "Events",
     "Four tabs and a plus button, as in the iOS example: the shared configuration limits Message to iOS and Android (CYLTabBarItemPlatforms), so this example adds the mini program.": "Four tabs and a plus button, as in the iOS example: the shared configuration limits Message to iOS and Android (CYLTabBarItemPlatforms), so this example adds the mini program.",
     "cyl-tab-bar-item playground": "cyl-tab-bar-item playground",
-    "Run the PAG download first": "Run the PAG download first"
+    "Run the PAG download first": "Run the PAG download first",
+    "Nearby": "Nearby",
+    "Messages": "Messages",
+    "Refresh": "Refresh",
+    "Login required": "Login required",
+    "Log in to view “{title}”": "Log in to view “{title}”"
   },
   "zh-Hans": {
     "Close button of the plus button": "PlusButton 的关闭按钮",
@@ -336,7 +341,12 @@ module.exports = {
     "Events": "事件",
     "Four tabs and a plus button, as in the iOS example: the shared configuration limits Message to iOS and Android (CYLTabBarItemPlatforms), so this example adds the mini program.": "与 iOS 示例一样显示四个 Tab 与 PlusButton：共用配置把 Message 限定为 iOS 与 Android（CYLTabBarItemPlatforms），因此本示例加上了小程序平台。",
     "cyl-tab-bar-item playground": "cyl-tab-bar-item 演示",
-    "Run the PAG download first": "请先下载 PAG 文件"
+    "Run the PAG download first": "请先下载 PAG 文件",
+    "Nearby": "同城",
+    "Messages": "消息",
+    "Refresh": "刷新",
+    "Login required": "需要登录",
+    "Log in to view “{title}”": "「{title}」需要登录后才能查看"
   },
   "zh-Hant": {
     "Close button of the plus button": "PlusButton 的關閉按鈕",
@@ -503,6 +513,11 @@ module.exports = {
     "Events": "事件",
     "Four tabs and a plus button, as in the iOS example: the shared configuration limits Message to iOS and Android (CYLTabBarItemPlatforms), so this example adds the mini program.": "與 iOS 示例一樣顯示四個 Tab 與 PlusButton：共用設定把 Message 限定為 iOS 與 Android（CYLTabBarItemPlatforms），因此本示例加上了小程式平台。",
     "cyl-tab-bar-item playground": "cyl-tab-bar-item 演示",
-    "Run the PAG download first": "請先下載 PAG 檔案"
+    "Run the PAG download first": "請先下載 PAG 檔案",
+    "Nearby": "同城",
+    "Messages": "訊息",
+    "Refresh": "重新整理",
+    "Login required": "需要登入",
+    "Log in to view “{title}”": "「{title}」需要登入後才能查看"
   }
 };

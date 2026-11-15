@@ -34,16 +34,89 @@ function cylAvailableAnimationFiles() {
   });
 }
 
+/**
+ * [EN] The Objective-C example's tabs (+[MainTabBarController tabBarItemsAttributesForTabBar], docs/ObjC-Example-Parity
+ *      item 1): Home (selected title "Refresh"), Nearby, Messages and Me, with its images (Example/Images.xcassets,
+ *      copied to shared/objc by scripts/cyl_sync_shared.js), drawn as templates in the title colors as on iOS. Me has no
+ *      identifier in Objective-C, so the class name is used (#408). Nearby and Me open the example's existing pages.
+ * [CN] Objective-C 示例的 Tab（+[MainTabBarController tabBarItemsAttributesForTabBar]，docs/ObjC-Example-Parity 第 1 项）：
+ *      首页（选中标题「Refresh」）、同城、消息、我的，使用其图片（Example/Images.xcassets，由 scripts/cyl_sync_shared.js
+ *      复制到 shared/objc），与 iOS 一样按模板以标题颜色绘制。Objective-C 中「我的」没有 identifier，因此使用类名（#408）。
+ *      同城与我的打开示例已有的页面。
+ */
+const CYL_DEMO_OBJC_IMAGE = (name) => `/shared/objc/${name}.png`;
+const CYL_DEMO_OBJC_ITEM = {
+  CYLTabBarItemImageURLSize: '{22, 22}',
+  CYLTabBarItemIconRenderingMode: 'template',
+  CYLTabBarItemTitleFont: 10,
+};
+const CYL_DEMO_OBJC_ITEMS = [
+  Object.assign({}, CYL_DEMO_OBJC_ITEM, {
+    CYLTabBarItemTitle: 'Home',
+    CYLTabBarItemSelectedTitle: 'Refresh',
+    CYLTabBarItemIdentifier: 'home',
+    CYLTabBarItemImage: CYL_DEMO_OBJC_IMAGE('home_normal'),
+    CYLTabBarItemSelectedImage: CYL_DEMO_OBJC_IMAGE('home_highlight'),
+  }),
+  Object.assign({}, CYL_DEMO_OBJC_ITEM, {
+    CYLTabBarItemTitle: 'Nearby',
+    CYLTabBarItemIdentifier: 'city',
+    CYLTabBarItemPageIdentifier: 'web',
+    CYLTabBarItemImage: CYL_DEMO_OBJC_IMAGE('fishpond_normal'),
+    CYLTabBarItemSelectedImage: CYL_DEMO_OBJC_IMAGE('fishpond_highlight'),
+  }),
+  Object.assign({}, CYL_DEMO_OBJC_ITEM, {
+    CYLTabBarItemTitle: 'Messages',
+    CYLTabBarItemIdentifier: 'message',
+    CYLTabBarItemImage: CYL_DEMO_OBJC_IMAGE('message_normal'),
+    CYLTabBarItemSelectedImage: CYL_DEMO_OBJC_IMAGE('message_highlight'),
+  }),
+  Object.assign({}, CYL_DEMO_OBJC_ITEM, {
+    CYLTabBarItemTitle: 'Me',
+    CYLTabBarItemIdentifier: 'CYLMineViewController',
+    CYLTabBarItemPageIdentifier: 'me',
+    CYLTabBarItemImage: CYL_DEMO_OBJC_IMAGE('account_normal'),
+    CYLTabBarItemSelectedImage: CYL_DEMO_OBJC_IMAGE('account_highlight'),
+  }),
+];
+
+/**
+ * [EN] The Objective-C example's plus button (CYLPlusButtonSubclass, items 3 and 4): "Post" with its images at index 2,
+ *      55 x 80 with a 55 x 55 image, its center 14 pt above the bar's middle (+constantOfPlusButtonCenterYOffsetForTabBarHeight:
+ *      returns -14), the title on the tab titles' line, a 9.5 pt title that is green when selected, and its own page.
+ * [CN] Objective-C 示例的 PlusButton（CYLPlusButtonSubclass，第 3、4 项）：位于第 2 位、带图片的「Post」，55 x 80，图片
+ *      55 x 55，中心在 TabBar 中线上方 14 pt（+constantOfPlusButtonCenterYOffsetForTabBarHeight: 返回 -14），标题与 Tab 标题
+ *      同一行，标题 9.5 pt、选中时为绿色，并有自己的页面。
+ */
 const CYL_DEMO_PLUS_BUTTON = {
   CYLTabBarItemTitle: 'Post',
-  CYLTabBarItemImage: 'system:plus.circle',
-  CYLTabBarItemSelectedImage: 'system:plus.circle.fill',
-  CYLTabBarItemIdentifier: 'publish',
+  CYLTabBarItemImage: CYL_DEMO_OBJC_IMAGE('post_normal'),
+  CYLTabBarItemSelectedImage: CYL_DEMO_OBJC_IMAGE('post_highlight'),
+  CYLTabBarItemIdentifier: 'plus',
   CYLTabBarItemPageIdentifier: 'publish',
-  CYLPlusButtonCenterYMultiplier: 0.3,
-  CYLPlusButtonImageSize: '{56, 56}',
+  CYLTabBarItemSelectedTitleColor: '#34C759',
+  CYLTabBarItemTitleFont: 9.5,
+  CYLPlusButtonIndexInTabBar: 2,
+  CYLPlusButtonSize: '{55, 80}',
+  CYLPlusButtonImageSize: '{55, 55}',
+  CYLPlusButtonCenterYMultiplier: 0.5,
+  CYLPlusButtonCenterYOffset: -14,
+  CYLPlusButtonAlignsTitle: true,
   CYLPlusButtonKeepsTitleVisible: true,
   CYLPlusButtonShowsSelection: true,
+};
+
+/**
+ * [EN] The Objective-C example's tab bar appearance (+demoStandardAppearanceWithTitlePositionAdjustment:): titles and
+ *      icons red, green when selected, in light and dark mode.
+ * [CN] Objective-C 示例的 TabBar 外观（+demoStandardAppearanceWithTitlePositionAdjustment:）：标题与图标为红色，选中时为
+ *      绿色，浅色与深色模式相同。
+ */
+const CYL_DEMO_OBJC_COLORS = {
+  CYLTabBarItemTitleColor: '#FF0000',
+  CYLTabBarItemIconColor: '#FF0000',
+  CYLTabBarItemSelectedTitleColor: '#34C759',
+  CYLTabBarItemSelectedIconColor: '#34C759',
 };
 
 /**
@@ -74,10 +147,16 @@ const CYL_DEMO_CHRISTMAS_THEME = {
  */
 const CYL_DEMO_LOTTIE = {
   home: 'green_lottie_tab_home',
+  city: 'green_lottie_tab_discover',
   message: 'green_lottie_tab_news',
-  discover: 'green_lottie_tab_discover',
-  me: 'green_lottie_tab_mine',
+  CYLMineViewController: 'green_lottie_tab_mine',
 };
+
+/**
+ * [EN] As the Objective-C example (CYLTabBarAnimationColors of the Nearby tab): its Lottie icon's gray outline.
+ * [CN] 与 Objective-C 示例相同（同城 Tab 的 CYLTabBarAnimationColors）：其 Lottie 图标的灰色轮廓。
+ */
+const CYL_DEMO_LOTTIE_COLORS = { city: { 'Icon_Discovery_Normal.**.Color': '#7F7F7F' } };
 
 /**
  * [EN] Four tabs and the plus button, as the iOS example: the shared configuration limits Message to iOS and Android
@@ -95,7 +174,7 @@ function cylDemoPlatforms(items) {
  * [EN] PAG tab icons (CYLTabBarPAGFilePath) as in the iOS PAG example (Example-PAG): one vector PAG file per tab.
  * [CN] 与 iOS PAG 示例（Example-PAG）相同的 PAG Tab 图标（CYLTabBarPAGFilePath）：每个 Tab 一个矢量 PAG 文件。
  */
-const CYL_DEMO_PAG = { home: 'tab_home', message: 'tab_moments', discover: 'tab_health', me: 'tab_me' };
+const CYL_DEMO_PAG = { home: 'tab_home', message: 'tab_moments', city: 'tab_health', CYLMineViewController: 'tab_me' };
 
 function cylDemoPAGItems(items, files) {
   return items.map((attributes) => {
@@ -114,7 +193,7 @@ function cylDemoPAGItems(items, files) {
  * [CN] 与 iOS Rive 示例相同的 Rive Tab 图标（CYLTabBarRiveFilePath）：每个 Tab 使用 icons.riv 的一个画板、其
  *      "<画板>_Interactivity" 状态机与 "active" 输入，32 x 32。
  */
-const CYL_DEMO_RIVE = { home: 'CHAT', discover: 'SEARCH', message: 'BELL', me: 'USER' };
+const CYL_DEMO_RIVE = { home: 'CHAT', city: 'SEARCH', message: 'BELL', CYLMineViewController: 'USER' };
 
 function cylDemoRiveItems(items, files) {
   return items.map((attributes) => {
@@ -129,11 +208,12 @@ function cylDemoRiveItems(items, files) {
 function cylDemoLottieItems(items) {
   return items.map((attributes) => {
     const name = CYL_DEMO_LOTTIE[attributes.CYLTabBarItemIdentifier];
+    const colors = CYL_DEMO_LOTTIE_COLORS[attributes.CYLTabBarItemIdentifier];
     return name ? Object.assign({}, attributes, {
       CYLTabBarLottieURL: `${name}.json`,
       CYLTabBarLottieDarkURL: `${name}_dark.json`,
       CYLTabBarLottieSize: '{30, 30}',
-    }) : attributes;
+    }, colors ? { CYLTabBarAnimationColors: colors } : {}) : attributes;
   });
 }
 
@@ -149,7 +229,7 @@ function cylDemoGIFItems(items, files) {
   const keys = {
     home: { CYLTabBarGIFFilePath: file('tab_rocket'), CYLTabBarGIFSize: '{30, 30}' },
     message: { CYLTabBarAnimationFilePath: file('tab_star'), CYLTabBarGIFSize: '{30, 30}' },
-    discover: { CYLTabBarItemImage: file('tab_fire'), CYLTabBarItemSelectedImage: file('tab_fire') },
+    city: { CYLTabBarItemImage: file('tab_fire'), CYLTabBarItemSelectedImage: file('tab_fire') },
   };
   return items.map((attributes) => {
     const extra = keys[attributes.CYLTabBarItemIdentifier];
@@ -164,7 +244,7 @@ function cylDemoGIFItems(items, files) {
  */
 function cylDemoConfiguration(overrides) {
   const options = overrides || {};
-  const sharedItems = cylDemoPlatforms(cylSharedConfiguration.CYLTabBarControllerTabBarItemsAttributes);
+  const sharedItems = CYL_DEMO_OBJC_ITEMS;
   // [EN] "images" or the installed animation (the default). [CN] "images" 或已安装的动画（默认）。
   const icons = options.cylDemoIcons === 'images' || options.cylDemoLottie === false ? 'images' : cylInstalledAnimation();
   const files = icons === 'images' ? [] : cylAvailableAnimationFiles();
@@ -195,11 +275,20 @@ function cylDemoConfiguration(overrides) {
   return Object.assign({}, cylSharedConfiguration, {
     CYLTabBarControllerTabBarItemsAttributes: changedItems,
     CYLTabBarControllerPlusButton: Object.assign({}, CYL_DEMO_PLUS_BUTTON, options.cylDemoPlusAttributes),
+    // [EN] The Objective-C example starts on Liquid Glass (CYLMainRootViewController). [CN] Objective-C 示例以液态玻璃启动。
+    CYLTabBarControllerStyleType: 'liquidGlass',
+    // [EN] The Objective-C example's title offset (0, -3.5), which the aligned plus button follows. [CN] Objective-C 示例的标题偏移。
+    CYLTabBarControllerTitlePositionAdjustment: '{0, -3.5}',
     CYLTabBarControllerThemes: Object.assign({}, cylSharedConfiguration.CYLTabBarControllerThemes, {
-      dark: Object.assign({}, cylSharedConfiguration.CYLTabBarControllerThemes.dark, CYL_DEMO_DARK_ICON_COLORS),
+      light: Object.assign({}, cylSharedConfiguration.CYLTabBarControllerThemes.light, CYL_DEMO_OBJC_COLORS),
+      dark: Object.assign({}, cylSharedConfiguration.CYLTabBarControllerThemes.dark, CYL_DEMO_DARK_ICON_COLORS,
+        CYL_DEMO_OBJC_COLORS),
       christmas: CYL_DEMO_CHRISTMAS_THEME,
     }),
-    CYLTabBarControllerTabButtonTapAnimation: 'bounce',
+    // [EN] -[MainTabBarController tabBarController:didSelectControl:] scales the tapped icon. [CN] 点击的图标播放缩放动画。
+    CYLTabBarControllerTabButtonTapAnimation: 'scale',
+    // [EN] -[MainTabBarController setUpLoginRequiredTabs] (issue #19). [CN] 需要登录的 Tab（issue #19）。
+    CYLTabBarControllerLoginRequiredTabBarItemIdentifiers: ['message', 'CYLMineViewController'],
   }, configurationOverrides);
 }
 

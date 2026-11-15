@@ -7,9 +7,9 @@
 
   <text class="cyl-section-title" aria-role="heading">{{texts['Badges']}}</text>
   <view class="cyl-section">
-    <view class="cyl-row cyl-row-action" bindtap="cyl_badge" data-identifier="discover" data-value="3" aria-role="button" aria-label="{{texts['Number on Discover']}}"><text aria-hidden="true">{{texts['Number on Discover']}}</text></view>
-    <view class="cyl-row cyl-row-action" bindtap="cyl_badge" data-identifier="discover" data-value="120" aria-role="button" aria-label="{{texts['99+ on Discover']}}"><text aria-hidden="true">{{texts['99+ on Discover']}}</text></view>
-    <view class="cyl-row cyl-row-action" bindtap="cyl_badge" data-identifier="me" data-value="•" aria-role="button" aria-label="{{texts['Dot on Me']}}"><text aria-hidden="true">{{texts['Dot on Me']}}</text></view>
+    <view class="cyl-row cyl-row-action" bindtap="cyl_badge" data-identifier="city" data-value="3" aria-role="button" aria-label="{{texts['Number on Discover']}}"><text aria-hidden="true">{{texts['Number on Discover']}}</text></view>
+    <view class="cyl-row cyl-row-action" bindtap="cyl_badge" data-identifier="city" data-value="120" aria-role="button" aria-label="{{texts['99+ on Discover']}}"><text aria-hidden="true">{{texts['99+ on Discover']}}</text></view>
+    <view class="cyl-row cyl-row-action" bindtap="cyl_badge" data-identifier="CYLMineViewController" data-value="•" aria-role="button" aria-label="{{texts['Dot on Me']}}"><text aria-hidden="true">{{texts['Dot on Me']}}</text></view>
     <view class="cyl-row cyl-row-action" bindtap="cyl_badge" data-value="clear" aria-role="button" aria-label="{{texts['Remove badges']}}"><text aria-hidden="true">{{texts['Remove badges']}}</text></view>
   </view>
 

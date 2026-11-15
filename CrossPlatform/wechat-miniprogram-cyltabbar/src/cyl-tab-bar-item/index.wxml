@@ -45,8 +45,8 @@
       <image class="cyl-item-image cyl-item-tinted" src="{{m.image}}" style="filter: drop-shadow({{m.iconTint}} 200px 0);" mode="aspectFit" />
     </view>
     <image wx:elif="{{m.image}}" class="cyl-item-image" src="{{m.image}}" mode="aspectFit" />
-    <text wx:if="{{m.showsBadge && !m.badgeIsDot}}" class="cyl-item-badge" style="{{m.badgeStyle}}">{{m.badgeText}}</text>
-    <view wx:if="{{m.showsBadge && m.badgeIsDot}}" class="cyl-item-badge-dot" style="{{m.badgeStyle}}"></view>
+    <text wx:if="{{m.showsBadge && !m.badgeIsDot}}" class="cyl-item-badge {{m.badgeClass}}" style="{{m.badgeStyle}}">{{m.badgeText}}</text>
+    <view wx:if="{{m.showsBadge && m.badgeIsDot}}" class="cyl-item-badge-dot {{m.badgeClass}}" style="{{m.badgeStyle}}"></view>
   </view>
   <text wx:if="{{m.title}}" class="cyl-item-title" style="{{m.titleStyle}}">{{m.title}}</text>
 </view>

@@ -17,7 +17,11 @@
       <cyl-glass-lens wx:if="{{item.showsSelection && cylStyleType === 'liquidGlass'}}" class="cyl-plus-selection" is-dark="{{cylIsDark}}" lens-style="{{cylGlassLensStyle}}" aria-hidden="true" />
       <view class="cyl-plus-button {{cylAnimatingIdentifier === item.key ? 'cyl-animate-' + cylTapAnimation : ''}}" style="{{item.buttonStyle}} {{cylAnimationStyle}}">
         <image wx:if="{{item.backgroundImage}}" class="cyl-plus-background" src="{{item.backgroundImage}}" mode="aspectFit" aria-hidden="true" />
-        <image wx:if="{{item.image}}" class="cyl-plus-image" src="{{item.image}}" style="{{item.imageStyle}}" mode="aspectFit" aria-hidden="true" />
+        <view class="cyl-plus-image-box">
+          <image wx:if="{{item.image}}" class="cyl-plus-image" src="{{item.image}}" style="{{item.imageStyle}}" mode="aspectFit" aria-hidden="true" />
+          <text wx:if="{{item.badge && !item.badge.isDot}}" class="cyl-plus-badge {{item.badge.className}}" style="{{item.badge.style}}" aria-hidden="true">{{item.badge.text}}</text>
+          <view wx:if="{{item.badge && item.badge.isDot}}" class="cyl-plus-badge-dot {{item.badge.className}}" style="{{item.badge.style}}" aria-hidden="true"></view>
+        </view>
         <text wx:if="{{item.title}}" class="cyl-title" style="{{item.titleStyle}}" aria-hidden="true">{{item.title}}</text>
       </view>
     </block>
@@ -27,7 +31,7 @@
         generic:cyl-lottie-view="cyl-lottie-view"
         generic:cyl-pag-view="cyl-pag-view"
         generic:cyl-rive-view="cyl-rive-view"
-        class="cyl-tab-item"
+        class="cyl-tab-item {{item.cover ? 'cyl-tab-covered' : ''}}"
         index="{{item.item.index}}"
         title="{{item.item.title}}"
         image="{{item.item.image}}"
@@ -46,6 +50,10 @@
         selected-background-color="{{item.item.selectedBackgroundColor}}"
         title-text-attributes="{{item.item.titleTextAttributes}}"
         badge-value="{{item.showsDot ? '•' : item.badge}}"
+        badge-color="{{item.badgeItem.color}}"
+        badge-size="{{item.badgeItem.size}}"
+        badge-position-adjustment="{{item.badgeItem.positionAdjustment}}"
+        badge-animation="{{item.badgeItem.animation}}"
         animation-class="{{cylAnimatingIdentifier === item.key ? 'cyl-animate-' + cylTapAnimation : ''}}"
         animation-duration="{{cylAnimationDuration}}"
         item-style="{{cylItemStyle}}"
@@ -54,6 +62,8 @@
         animation-loop="{{animationLoop}}"
         is-dark="{{cylIsDark}}"
       />
+      <!-- [EN] cyl_setCoverImage: a decoration over the tab; VoiceOver / TalkBack read the tab, not the cover. [CN] 覆盖在 Tab 上的装饰；读屏朗读 Tab 本身，而不是封面。 -->
+      <image wx:if="{{item.cover}}" class="cyl-tab-cover" src="{{item.cover.image}}" style="{{item.cover.style}}" mode="aspectFit" aria-hidden="true" />
     </block>
   </view>
 </view>

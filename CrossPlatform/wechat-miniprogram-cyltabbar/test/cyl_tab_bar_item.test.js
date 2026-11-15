@@ -28,7 +28,13 @@ test('badges: value, dot, color, size, content inset, position, text attributes'
   assert.equal(model.showsBadge, true);
   assert.equal(model.badgeText, '8');
   assert.match(model.badgeStyle, /padding: 2px 8px 2px 8px;/);
-  assert.match(model.badgeStyle, /translate\(4px, -2px\)/);
+  // [EN] Moved by margins, so the badge animations can use transform. [CN] 用外边距移动，角标动画可以使用 transform。
+  assert.match(model.badgeStyle, /margin-left: 4px; margin-top: -2px;/);
+  assert.doesNotMatch(model.badgeStyle, /transform/);
+  assert.equal(model.badgeClass, '');
+  assert.equal(cylItemModel({ badgeValue: '8', badgeAnimation: 'bounce' }).badgeClass, 'cyl-badge-bounce');
+  assert.equal(cylItemModel({ badgeValue: '•', badgeAnimation: 'breathe' }).badgeClass, 'cyl-badge-breathe');
+  assert.equal(cylItemModel({ badgeValue: '8', badgeAnimation: 'unknown' }).badgeClass, '');
   assert.match(model.badgeStyle, /background-color: #34C759;/);
   assert.match(model.badgeStyle, /color: #FFFF00;font-size: 9px/);
   assert.equal(cylItemModel({ badgeValue: '•' }).badgeIsDot, true);

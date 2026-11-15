@@ -115,9 +115,12 @@ function cylItemModel(p) {
     showsBadge,
     badgeIsDot: badgeValue === '•' || (badgeValue === '' && Boolean(badgeSize)),
     badgeText: badgeValue === '•' ? '' : badgeValue,
+    badgeClass: /^(breathe|scale|shake|bounce|scaleOnce)$/.test(String(p.badgeAnimation || ''))
+      ? `cyl-badge-${p.badgeAnimation}` : '',
     badgeStyle: `padding: ${badgeInset.top}px ${badgeInset.right}px ${badgeInset.bottom}px ${badgeInset.left}px;`
+      // [EN] Moved by margins: the badge animations use transform. [CN] 用外边距移动：角标动画使用 transform。
       + (badgeOffset.horizontal || badgeOffset.vertical
-        ? ` transform: translate(${badgeOffset.horizontal}px, ${badgeOffset.vertical}px);` : '')
+        ? ` margin-left: ${badgeOffset.horizontal}px; margin-top: ${badgeOffset.vertical}px;` : '')
       + (badgeSize ? ` width: ${badgeSize.width}px; height: ${badgeSize.height}px; min-width: 0; padding: 0;` : '')
       + (reader.cylColor(appearance.badgeBackgroundColor || p.badgeColor)
         ? ` background-color: ${reader.cylColor(appearance.badgeBackgroundColor || p.badgeColor)};` : '')

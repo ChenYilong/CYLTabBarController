@@ -14,7 +14,7 @@ const { CYLTabBarItemStyle, cylTabBarItemStyle } = require('../cyl-tab-bar/cyl_t
 
 const CYL_PROPERTIES = ['title', 'image', 'selectedImage', 'index', 'titlePositionAdjustment', 'imagePositionAdjustment',
   'imageInsets', 'lottieFilePath', 'lottieURL', 'lottieSizeValue', 'enabled', 'selected', 'badgeValue', 'badgeColor',
-  'badgeSize', 'badgeContentInset', 'badgePositionAdjustment', 'layoutCentered', 'backgroundColor',
+  'badgeSize', 'badgeContentInset', 'badgePositionAdjustment', 'badgeAnimation', 'layoutCentered', 'backgroundColor',
   'selectedBackgroundColor', 'titleTextAttributes', 'badgeTextAttributes', 'standardAppearance', 'animationPath',
   'animationSize', 'imageSize', 'iconTint', 'selectedIconTint', 'label', 'animationColors', 'loopsWhenUnselected',
   'animationClass', 'animationDuration', 'itemStyle', 'glassLensStyle', 'isDark', 'animationSpeed', 'animationLoop'];
@@ -55,6 +55,12 @@ Component({
     badgeContentInset: { type: null, value: null },
     /** [EN] `badgePositionAdjustment`. [CN] 角标偏移。 */
     badgePositionAdjustment: { type: null, value: null },
+    /**
+     * [EN] The badge animation, as CYLBadgeAnimationType: "breathe", "scale", "shake", "bounce" (repeating) or
+     *      "scaleOnce"; "" none.
+     * [CN] 角标动画，对应 CYLBadgeAnimationType："breathe"、"scale"、"shake"、"bounce"（重复）或 "scaleOnce"；"" 为无。
+     */
+    badgeAnimation: { type: String, value: '' },
     /** [EN] `layoutCentered`: centers the title without an image, or the image without a title. [CN] 无图片时标题居中，或无标题时图片居中。 */
     layoutCentered: { type: Boolean, value: false },
     /** [EN] `backgroundColor`. [CN] 背景色。 */

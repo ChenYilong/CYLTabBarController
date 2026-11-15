@@ -204,6 +204,8 @@ Component({
   lifetimes: {
     attached() {
       this.cylBadges = {};
+      this.cylBadgeAttributes = {};
+      this.cylCovers = {};
       this.cylSystemTheme = cylSystemTheme();
       this.cylRequestedTheme = '';
       this.cylThemeListener = (result) => {
@@ -392,8 +394,60 @@ Component({
         itemStyle: '',
         badge: isDot ? '' : badge,
         showsDot: isDot,
+        badgeItem: this.cyl_badgeItem(item.identifier, isDot),
+        cover: this.cylCovers[item.identifier] ? this.cyl_cover(this.cylCovers[item.identifier]) : null,
         accessibilityLabel: badge && !isDot ? `${item.accessibilityLabel}, ${badge}` : item.accessibilityLabel,
         accessibilityIdentifier: item.accessibilityIdentifier,
+      };
+    },
+
+    /**
+     * [EN] The badge attributes of cyl_showBadgeValue for cyl-tab-bar-item: `color`, `animation` (CYLBadgeAnimationType
+     *      name), `radius` (of a dot) and `centerOffset` ([x, y], from the default place).
+     * [CN] cyl_showBadgeValue 的角标属性，供 cyl-tab-bar-item 使用：`color`、`animation`（CYLBadgeAnimationType 名称）、
+     *      `radius`（小红点半径）与 `centerOffset`（[x, y]，相对默认位置）。
+     */
+    cyl_badgeItem(identifier, isDot) {
+      const attributes = this.cylBadgeAttributes[identifier] || {};
+      const offset = Array.isArray(attributes.centerOffset) ? attributes.centerOffset : null;
+      const radius = Number(attributes.radius);
+      return {
+        color: attributes.color || '',
+        animation: attributes.animation || '',
+        size: isDot && radius > 0 ? `{${radius * 2}, ${radius * 2}}` : null,
+        positionAdjustment: offset ? `{${Number(offset[0]) || 0}, ${Number(offset[1]) || 0}}` : null,
+      };
+    },
+
+    /** [EN] Render data of a cover (cyl_setCoverImage). [CN] 封面（cyl_setCoverImage）的渲染数据。 */
+    cyl_cover(cover) {
+      const match = /\{\s*([\d.]+)\s*,\s*([\d.]+)\s*\}/.exec(cover.size);
+      const width = match ? Number(match[1]) : 37;
+      const height = match ? Number(match[2]) : 37;
+      return { image: cover.image, style: `width: ${width}px; height: ${height}px; margin: ${-height / 2}px 0 0 ${-width / 2}px;` };
+    },
+
+    /**
+     * [EN] Render data of the plus button's badge (cyl_showBadgeValue with the plus button's identifier), at the top
+     *      right of its image, as the tabs' badges.
+     * [CN] PlusButton 角标（使用 PlusButton 标识调用 cyl_showBadgeValue）的渲染数据，位于其图片右上角，与 Tab 的角标相同。
+     */
+    cyl_plusBadge(identifier) {
+      const text = cylBadgeText(this.cylBadges[identifier]);
+      if (!text) {
+        return null;
+      }
+      const isDot = text === '•';
+      const badge = this.cyl_badgeItem(identifier, isDot);
+      const offset = /\{\s*(-?[\d.]+)\s*,\s*(-?[\d.]+)\s*\}/.exec(badge.positionAdjustment || '');
+      const size = /\{\s*([\d.]+)\s*,/.exec(badge.size || '');
+      return {
+        text: isDot ? '' : text,
+        isDot,
+        className: badge.animation ? `cyl-badge-${badge.animation}` : '',
+        style: (badge.color ? `background-color: ${badge.color};` : '')
+          + (offset ? ` margin-left: ${offset[1]}px; margin-top: ${offset[2]}px;` : '')
+          + (size ? ` width: ${size[1]}px; height: ${size[1]}px; border-radius: ${Number(size[1]) / 2}px;` : ''),
       };
     },
 
@@ -431,6 +485,7 @@ Component({
         buttonStyle: `top: ${top}px; height: ${height}px;${plus.width ? ` width: ${plus.width}px;` : ''}`,
         imageStyle: `width: ${imageWidth}px; height: ${imageHeight}px;`,
         titleStyle: `${color ? `color: ${color};` : ''}${(selected ? plus.selectedTitleFontStyle : plus.titleFontStyle) || ''}`,
+        badge: this.cyl_plusBadge(plus.identifier || 'cyl-plus-button'),
         accessibilityLabel: plus.accessibilityLabel,
         accessibilityIdentifier: plus.accessibilityIdentifier,
       };
@@ -453,6 +508,8 @@ Component({
       const detail = {
         index,
         identifier: item.identifier,
+        // [EN] The localized title, e.g. for the login alert ("Log in to view “Me”"). [CN] 本地化后的标题，例如用于登录提示。
+        title: item.title,
         pageIdentifier: item.pageIdentifier,
         pageParameters: item.pageParameters,
         context: model.context,
@@ -527,8 +584,39 @@ Component({
      * [EN] Shows a badge with a number or a text on the tab with this identifier; "" or null removes it.
      * [CN] 在该标识的 Tab 上显示数字或文字角标；"" 或 null 移除角标。
      */
-    cyl_showBadgeValue(identifier, value) {
+    cyl_showBadgeValue(identifier, value, attributes) {
       this.cylBadges[identifier] = value;
+      // [EN] As iOS, attributes set before cyl_showBadgeValue stay until the badge is removed: pass them to change them.
+      // [CN] 与 iOS 一样，在 cyl_showBadgeValue 之前设置的属性一直保留到角标被移除：传入属性以修改。
+      if (attributes) {
+        this.cylBadgeAttributes[identifier] = Object.assign({}, attributes);
+      }
+      this.cyl_render();
+    },
+
+    /**
+     * [EN] The badge value of the tab or plus button with this identifier ("•" for a dot), or '' when it has none,
+     *      as -cyl_isShowBadge / -cyl_badgeValue.
+     * [CN] 该标识的 Tab 或 PlusButton 的角标值（小红点为 "•"），没有角标时为 ''，对应 -cyl_isShowBadge / -cyl_badgeValue。
+     */
+    cyl_badgeValue(identifier) {
+      const value = this.cylBadges[identifier];
+      return value === undefined || value === null ? '' : String(value);
+    },
+
+    /**
+     * [EN] Covers the tab with this identifier with an image (-cyl_coverVisiableTabImageViewOrTabButton:, the cover of
+     *      the iOS example's first tab): the image, at `size` ("{w, h}", default 37 x 37), centered on the tab, which
+     *      it hides; it stays in any selected state. '' or null removes it.
+     * [CN] 用图片覆盖该标识的 Tab（-cyl_coverVisiableTabImageViewOrTabButton:，iOS 示例第一个 Tab 的封面）：图片按 `size`
+     *      （"{w, h}"，默认 37 x 37）居中显示在 Tab 上并遮住该 Tab；在任何选中状态下都保持。'' 或 null 移除封面。
+     */
+    cyl_setCoverImage(identifier, image, size) {
+      if (image) {
+        this.cylCovers[identifier] = { image, size: size || '{37, 37}' };
+      } else {
+        delete this.cylCovers[identifier];
+      }
       this.cyl_render();
     },
 
@@ -546,6 +634,7 @@ Component({
      */
     cyl_removeBadge(identifier) {
       delete this.cylBadges[identifier];
+      delete this.cylBadgeAttributes[identifier];
       this.cyl_render();
     },
 

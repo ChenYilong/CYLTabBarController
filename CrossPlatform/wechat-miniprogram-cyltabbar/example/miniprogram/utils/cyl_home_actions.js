@@ -11,15 +11,15 @@ const { t } = require('./cyl_demo_localization');
 const CYL_NETWORK_ICON = (name) => `https://raw.githubusercontent.com/ChenYilong/CYLTabBarController/master/CYLTabBarController/Resources/CYLTabBarController.bundle/cyl_theme_${name}@3x.png`;
 const CYL_NETWORK_ICONS = { home: 'balloon', message: 'bell', discover: 'beach_with_umbrella', me: 'alarm_clock' };
 const CYL_LOCAL_ICON = (identifier, selected) => `/shared/skins/2.1.0/light/${identifier}${selected ? '_selected' : ''}@3x.png`;
-const CYL_TABS = ['home', 'message', 'discover', 'me'];
+const CYL_TABS = ['home', 'city', 'message', 'CYLMineViewController'];
 
 // [EN] Title offsets the row cycles through. [CN] 本行依次切换的标题偏移。
 const CYL_TITLE_OFFSETS = ['{0, -2}', '{0, -6}', '{0, 2}'];
 const CYL_BACKGROUNDS = ['', '#FFF3E0', '#E8F5E9', '#E3F2FD'];
 const CYL_TITLE_SETS = [
   {},
-  { home: 'Feed', message: 'Inbox', discover: 'Explore', me: 'Profile' },
-  { home: '首页', message: '消息', discover: '发现', me: '我的' },
+  { home: 'Feed', city: 'Explore', message: 'Inbox', CYLMineViewController: 'Profile' },
+  { home: '首页', city: '同城', message: '消息', CYLMineViewController: '我的' },
 ];
 
 /**
@@ -97,6 +97,15 @@ const CYL_HOME_ACTIONS = {
   },
   changeTabTitle: (context) => {
     const on = cylToggleAttribute(context, 'home', 'CYLTabBarItemTitle', 'Changed');
+    // [EN] The selected title too: a selected Home shows "Refresh". [CN] 选中标题也一起修改：选中的首页显示「Refresh」。
+    const all = Object.assign({}, context.overrides().cylDemoItemAttributes);
+    const home = Object.assign({}, all.home);
+    if (on) {
+      home.CYLTabBarItemSelectedTitle = 'Changed';
+    } else {
+      delete home.CYLTabBarItemSelectedTitle;
+    }
+    context.override({ cylDemoItemAttributes: Object.assign(all, { home }) });
     context.toast(t(on ? 'First tab title: Changed' : 'First tab title restored'));
   },
   allTitles: (context) => {
@@ -105,13 +114,13 @@ const CYL_HOME_ACTIONS = {
     const titles = CYL_TITLE_SETS[next];
     const values = {};
     CYL_TABS.forEach((identifier) => {
-      values[identifier] = { CYLTabBarItemTitle: titles[identifier] || null };
+      values[identifier] = { CYLTabBarItemTitle: titles[identifier] || null, CYLTabBarItemSelectedTitle: titles[identifier] || null };
     });
     cylSetAttributes(context, values);
     context.override({ cylDemoTitleSet: next });
   },
   switchTabIcon: (context) => {
-    const on = cylToggleAttribute(context, 'discover', 'CYLTabBarItemImage', CYL_NETWORK_ICON('bell'));
+    const on = cylToggleAttribute(context, 'city', 'CYLTabBarItemImage', CYL_NETWORK_ICON('bell'));
     cylSetAttributes(context, { discover: { CYLTabBarItemSelectedImage: on ? CYL_NETWORK_ICON('bell') : null } });
     context.override({ cylDemoIcons: 'images' });
   },
@@ -141,8 +150,8 @@ const CYL_HOME_ACTIONS = {
   replaceNeighbors: (context) => {
     // [EN] Discover and Me swap their places by hiding one and showing the other (one bar, other tabs). [CN] 通过隐藏一个、显示另一个，替换相邻的 Tab。
     const hidden = context.state().hiddenIdentifiers || [];
-    context.update({ hiddenIdentifiers: hidden.includes('discover') ? [] : ['discover'] });
-    context.toast(t(hidden.includes('discover') ? 'Discover is back' : 'Discover replaced: its neighbors moved in'));
+    context.update({ hiddenIdentifiers: hidden.includes('city') ? [] : ['city'] });
+    context.toast(t(hidden.includes('city') ? 'Discover is back' : 'Discover replaced: its neighbors moved in'));
   },
   touchableArea: (context) => {
     const on = !context.overrides().cylDemoPlusAttributes;
