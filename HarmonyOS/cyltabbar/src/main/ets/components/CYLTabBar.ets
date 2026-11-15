@@ -194,7 +194,10 @@ export struct CYLTabBar {
         } else {
           this.tabButton(this.items[slot.tabIndex], slot.tabIndex)
         }
-      }, (slot: CYLTabBarSlot) => `${slot.key}-${slot.tabIndex}-${this.selectedIndex}-${this.items[slot.tabIndex]?.badgeValue ?? ''}`)
+        // [EN] The key is the tab only: a selection or a badge updates the tab in place, so its SVGA icon keeps its view and
+        //      plays (a key with the selection would rebuild every tab).
+        // [CN] key 只包含 Tab 本身：选中或角标变化时原地更新 Tab，其 SVGA 图标保留视图并播放（key 若包含选中状态会重建所有 Tab）。
+      }, (slot: CYLTabBarSlot) => `${slot.key}-${slot.tabIndex}`)
     }
     .width('100%')
     .height(56)

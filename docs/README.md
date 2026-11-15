@@ -221,6 +221,8 @@ docs/
 │   ├── gif-classic.png
 │   ├── gif-flat-design.png
 │   ├── gif-liquid-glass.png
+│   ├── harmonyos-tab-bar-svga-launch.png
+│   ├── harmonyos-tab-bar-svga-messages-tap.png
 │   ├── image-only-tabs-gallery-3-3-ios17.png
 │   ├── image-only-tabs-ios.png
 │   ├── inset-grouped-sections-demo-ios.png
