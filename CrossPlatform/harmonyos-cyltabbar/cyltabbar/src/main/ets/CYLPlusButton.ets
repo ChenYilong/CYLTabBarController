@@ -7,7 +7,9 @@
  */
 export interface CYLPlusButton {
   /** [EN] The image (CYLPlusButtonBackgroundImage / -setImage:). [CN] 图片。 */
-  image: ResourceStr;
+  image?: ResourceStr;
+  /** [EN] CYLPlusButtonBackgroundImage / -setBackgroundImage:: drawn behind the image. [CN] 图片下方的背景图。 */
+  backgroundImage?: ResourceStr;
   /** [EN] The image while selected or pressed. [CN] 选中或按下时的图片。 */
   selectedImage?: ResourceStr;
   /** [EN] The title (-setTitle:forState:). [CN] 标题。 */

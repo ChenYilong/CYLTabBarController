@@ -19,11 +19,45 @@ const SQUARE_PLUS: CYLPlusButton = {
   identifier: 'SquarePlus',
 };
 
+interface AnotherTabBarParams {
+  mode?: string;
+}
+
+const X_COLORS: string[] = ['#FF3B30', '#34C759', '#007AFF', '#AF52DE', '#FF9500'];
+
 @Entry
 @Component
 struct AnotherTabBar {
   @State selectedIndex: number = 0;
   @State taps: number = 0;
+  /**
+   * [EN] '' square plus (item 47); 'same' the Example's plus button (item 52); 'close' the square plus with a tappable X
+   *      (issue #202); 'late-*' the plus button image set 2 s later (item 31).
+   * [CN] '' 方形加号；'same' 示例的加号；'close' 带可点击 X 的方形加号（issue #202）；'late-*' 2 秒后设置图片（第 31 项）。
+   */
+  @State mode: string = '';
+  @State plus: CYLPlusButton = SQUARE_PLUS;
+  @State xColor: string = '#FF3B30';
+
+  aboutToAppear(): void {
+    const params = this.getUIContext().getRouter().getParams() as AnotherTabBarParams;
+    this.mode = params?.mode ?? '';
+    if (this.mode === 'same') {
+      this.plus = { image: $r('app.media.post_normal'), selectedImage: $r('app.media.post_highlight'), title: $r('app.string.tab_post'), centerYOffset: -14, imageSize: 52, alignsTitle: true, identifier: 'plus' };
+    } else if (this.mode.startsWith('late')) {
+      this.plus = this.mode === 'late-load' || this.mode === 'late-background' ? { imageSize: 40, identifier: 'late' }
+        : { image: $r('app.media.square_plus'), imageSize: 40, identifier: 'late' };
+      setTimeout(() => {
+        if (this.mode === 'late-load' || this.mode === 'late-replace') {
+          this.plus = { image: $r('app.media.post_normal'), imageSize: 40, identifier: 'late' };
+        } else if (this.mode === 'late-remove') {
+          this.plus = { imageSize: 40, identifier: 'late' };
+        } else {
+          this.plus = { backgroundImage: $r('app.media.square_plus'), imageSize: 40, identifier: 'late' };
+        }
+      }, 2000);
+    }
+  }
 
   @Builder
   page(index: number, identifier: string) {
@@ -58,9 +92,10 @@ struct AnotherTabBar {
       .backgroundColor('#F8F8F8')
       .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP])
 
+      Stack({ alignContent: Alignment.Bottom }) {
       CYLTabBarController({
         tabBarItemsAttributes: ANOTHER_TABS,
-        plusButton: SQUARE_PLUS,
+        plusButton: this.plus,
         selectedIndex: $selectedIndex,
         tintColor: '#FF9500',
         plusButtonAction: () => {
@@ -70,6 +105,22 @@ struct AnotherTabBar {
           this.page(index, identifier)
         },
       })
+
+      if (this.mode === 'close') {
+        // [EN] Issue #202: a subview of the plus button that takes its own taps. [CN] 加号按钮上自己响应点击的子视图。
+        Text('✕')
+          .fontSize(12)
+          .fontColor(Color.White)
+          .textAlign(TextAlign.Center)
+          .width(20)
+          .height(20)
+          .borderRadius(10)
+          .backgroundColor(this.xColor)
+          .margin({ bottom: 36, left: 44 })
+          .id('cyl-plus-close')
+          .onClick(() => this.xColor = X_COLORS[Math.floor(Math.random() * X_COLORS.length)])
+      }
+      }
       .layoutWeight(1)
     }
     .width('100%')

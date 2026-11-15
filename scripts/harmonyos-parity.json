@@ -38,6 +38,11 @@
     "37": "Previous / next tab rows (`selectedIndex` wraps around; library `cylSelectNeighbor`) (built; emulator check pending / 已编译，模拟器验证待做)",
     "38": "`CYLTabBarController.slideTransitionDuration` (350 ms): the new page slides in from the side of its tab (built; emulator check pending / 已编译，模拟器验证待做)",
     "54": "`cyl_updateColorMode` (EntryAbility onCreate / onConfigurationUpdate) + `darkImage` / `darkSelectedImage` / `lottieDarkFilePath` (green_lottie_tab_*_dark.json) + dark color resources for pages and the bar (built; emulator check pending / 已编译，模拟器验证待做)",
-    "55": "`CYLTabBarController.didSelectControl(index, previous)`: a newly selected badged tab turns its badge into a dot of the same color; a re-tap changes nothing (built; emulator check pending / 已编译，模拟器验证待做)"
+    "55": "`CYLTabBarController.didSelectControl(index, previous)`: a newly selected badged tab turns its badge into a dot of the same color; a re-tap changes nothing (built; emulator check pending / 已编译，模拟器验证待做)",
+    "16": "`CYLTabBarController.tabBarMinimizeBehavior` / `hidesTabBarOnScroll` + `cyl_reportScroll` (List onDidScroll): Automatic / Never / OnScrollDown / OnScrollUp (built; emulator check pending / 已编译，模拟器验证待做)",
+    "31": "`entry/pages/AnotherTabBar.ets` late-*: the plus image loads, is replaced or removed, or `CYLPlusButton.backgroundImage` loads after 2 s; the slot keeps its layout (built; emulator check pending / 已编译，模拟器验证待做)",
+    "33": "`tapAnimationType` (6 animations) + `tapSoundEnabled` / `tapSoundPath` (SoundPool, cyl_tap_click.wav / cyl_tap_tock.wav) + `hapticFeedbackEnabled` / `hapticFeedbackStyle` (built; emulator check pending / 已编译，模拟器验证待做)",
+    "48": "`entry/pages/PopPushDemo.ets`: `cyl_popSelectTabBarChildViewControllerAtIndex`, `...ForTabBarItemIdentifier`, `cyl_pushViewController`, `cyl_pushOrPopToViewController` (built; emulator check pending / 已编译，模拟器验证待做)",
+    "52": "Messages rows: `AnotherTabBar` mode same (the Example plus button) and close (a tappable X over the plus button changes color, issue #202) (built; emulator check pending / 已编译，模拟器验证待做)"
   }
 }

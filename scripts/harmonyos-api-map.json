@@ -134,5 +134,16 @@
   "CYLTabBarSlideTransitionAnimator duration": "`CYLTabBarController.slideTransitionDuration` (ms; iOS 0.35 s) (built; emulator check pending / 已编译，模拟器验证待做)",
   "CYLTabBarItemDarkImage": "`CYLTabBarItemAttributes.darkImage` / `darkSelectedImage` (AppStorage `cyl_colorMode`) (built; emulator check pending / 已编译，模拟器验证待做)",
   "CYLTabBarLottieDarkURL": "`CYLTabBarItemAttributes.lottieDarkFilePath` (rawfile; reloads on a color mode change) (built; emulator check pending / 已编译，模拟器验证待做)",
-  "CYLTabBarControllerDelegate -tabBarController:didSelectControl:": "`CYLTabBarController.didSelectControl(index, previous)` (built; emulator check pending / 已编译，模拟器验证待做)"
+  "CYLTabBarControllerDelegate -tabBarController:didSelectControl:": "`CYLTabBarController.didSelectControl(index, previous)` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarMinimizeBehavior": "`CYLTabBarMinimizeBehavior` (Automatic, Never, OnScrollDown, OnScrollUp) (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarController(CYLTabBarMinimize) cyl_tabBarMinimizeBehavior": "`CYLTabBarController.tabBarMinimizeBehavior` (@Prop) + `cyl_reportScroll(delta)` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarController(CYLTabBarMinimize) cyl_hidesTabBarOnScroll": "`CYLTabBarController.hidesTabBarOnScroll` (@Prop) (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarController(CYLInteraction) cyl_tabButtonTapSoundEnabled": "`CYLTabBarController.tapSoundEnabled` (SoundPool) (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarController(CYLInteraction) cyl_tabButtonTapSoundURL": "`CYLTabBarController.tapSoundPath` (rawfile) (built; emulator check pending / 已编译，模拟器验证待做)",
+  "UIViewController(CYLTabBarControllerExtention) -cyl_popSelectTabBarChildViewControllerAtIndex:": "`cyl_popSelectTabBarChildViewControllerAtIndex(index)` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "UIViewController(CYLTabBarControllerExtention) -cyl_popSelectTabBarChildViewControllerAtIndex:completion:": "`cyl_popSelectTabBarChildViewControllerAtIndex(index, completion)` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "UIViewController(CYLTabBarControllerExtention) -cyl_popSelectTabBarChildViewControllerForTabBarItemIdentifier:": "`cyl_popSelectTabBarChildViewControllerForTabBarItemIdentifier(identifier)` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "UIViewController(CYLTabBarControllerExtention) -cyl_pushOrPopToViewController:animated:callback:": "`cyl_pushOrPopToViewController(url, params, callback)` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "UIViewController(CYLTabBarControllerExtention) -cyl_pushViewController:animated:": "`cyl_pushViewController(url, params)` (router) (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLPushOrPopCallback": "`(popped: boolean) => void` of `cyl_pushOrPopToViewController` (built; emulator check pending / 已编译，模拟器验证待做)"
 }

@@ -3,7 +3,8 @@ import { i18n } from '@kit.LocalizationKit';
 import {
   CYLTabBarController, CYLTabBarItemAttributes, CYLPlusButton, CYLPlusButtonPageIndex, CYLBadge, CYLBadgeView,
   CYLBadgeAppearance, CYLBadgeAnimationType, CYLOffset, CYLEdgeInsets, cyl_simulateMemoryWarning, cyl_badgeTitleForRow,
-  cyl_badgeStyleCount, cyl_applyBadgeSample, CYLTabButtonTapAnimationType, CYLImpactFeedbackStyle
+  cyl_badgeStyleCount, cyl_applyBadgeSample, CYLTabButtonTapAnimationType, CYLImpactFeedbackStyle,
+  CYLTabBarMinimizeBehavior, cyl_reportScroll, cyl_pushViewController
 } from 'cyltabbar';
 import {
   DemoRow, DemoSection, DEMO_APPEARANCES, DEMO_TITLE_OFFSETS, DEMO_HOME, DEMO_CITY, DEMO_MESSAGE, DEMO_ME,
@@ -43,6 +44,7 @@ const CYL_PLUS: CYLPlusButton = {
 
 /** [EN] The icon size of a badge row (CYLBadgeRowHeight leaves room for the badge). [CN] 角标行的图标尺寸。 */
 interface DemoPushParams {
+  mode?: string;
   title?: string;
   color?: string;
   hidesNavigationBar?: boolean;
@@ -84,6 +86,7 @@ struct Index {
   @State doubleTapIndex: number = 1;
   @State swipeEnabled: boolean = false;
   @State slideTransition: boolean = false;
+  @State minimizeBehavior: CYLTabBarMinimizeBehavior = CYLTabBarMinimizeBehavior.Never;
   private badges: CYLBadge[] = CYL_TABS.map(() => new CYLBadge());
   private plusButtonBadge: CYLBadge = new CYLBadge();
   /** [EN] The badge of each badge row, per page. [CN] 每个页面每个角标行的角标。 */
@@ -208,6 +211,12 @@ struct Index {
         },
       },
       {
+        id: 'minimize', title: 'Shrink / hide the tab bar on scroll (issue #13)',
+        subtitle: `cyl_tabBarMinimizeBehavior = ${['Automatic', 'Never', 'OnScrollDown', 'OnScrollUp'][this.minimizeBehavior]}; tap to choose, then scroll this list`,
+        action: () => this.choose('cyl_tabBarMinimizeBehavior', ['Automatic', 'Never', 'OnScrollDown', 'OnScrollUp'],
+          this.minimizeBehavior, (index: number) => this.minimizeBehavior = index as CYLTabBarMinimizeBehavior),
+      },
+      {
         id: 'tab-bar-height', title: 'Change the tab bar height', subtitle: `tabBarHeight = ${this.tabBarHeight}`,
         action: () => this.tabBarHeight = this.tabBarHeight === 49 ? 69 : 49,
       },
@@ -265,6 +274,11 @@ struct Index {
         id: 'another-tab-bar', title: 'Push to another CYLTabBarController (another PlusButton)',
         subtitle: 'A tab bar controller of another context, with a square plus button',
         action: () => this.push('pages/AnotherTabBar', {} as DemoPushParams),
+      },
+      {
+        id: 'pop-push', title: 'cyl_pop / cyl_push methods',
+        subtitle: 'cyl_pushViewController, cyl_popSelectTabBarChildViewControllerAtIndex, cyl_pushOrPopToViewController',
+        action: () => cyl_pushViewController('pages/PopPushDemo'),
       },
     ];
   }
@@ -438,10 +452,18 @@ struct Index {
     ];
   }
 
-  /** [EN] PlusButton (item 30). [CN] PlusButton（第 30 项）。 */
+  /** [EN] PlusButton (items 30, 31). [CN] PlusButton（第 30、31 项）。 */
   private plusButtonRows(): DemoRow[] {
     const scale = this.plus.touchableAreaScale ?? 1;
+    const cases = ['Image loads after 2 s', 'Image replaced after 2 s', 'Image removed after 2 s', 'Background image loads after 2 s'];
+    const modes = ['late-load', 'late-replace', 'late-remove', 'late-background'];
     return [
+      {
+        id: 'late-image', title: 'PlusButton image set later',
+        subtitle: 'Pushes a tab bar controller whose plus button image changes 2 s later; the layout must not move',
+        action: () => this.choose('PlusButton image set later', cases, -1,
+          (index: number) => this.push('pages/AnotherTabBar', { mode: modes[index] } as DemoPushParams)),
+      },
       {
         id: 'touchable-area', title: 'PlusButton touchable area (issue #91)',
         subtitle: `Shows the touchable area in translucent red: ${this.plus.showsTouchableArea === true}; scale ${scale}x; tap to cycle 1x, 1.5x, 2x, off`,
@@ -463,7 +485,8 @@ struct Index {
   /** [EN] Tab interactions (items 33-37). [CN] Tab 交互（第 33-37 项）。 */
   private interactionRows(): DemoRow[] {
     const tapNames = ['None', 'Scale', 'Zoom in', 'Bounce', 'Rotation', 'Flip'];
-    const feedbackNames = ['Off', 'Light haptic', 'Medium haptic', 'Heavy haptic'];
+    const feedbackNames = ['Off', 'Default tap sound', 'Custom sound file (cyl_tabButtonTapSoundURL)', 'Light haptic',
+      'Medium haptic', 'Heavy haptic', 'Tap sound + haptic'];
     const longPress = [300, 500, 1000];
     const doubleTap = [200, 300, 500];
     return [
@@ -511,6 +534,21 @@ struct Index {
     ];
   }
 
+  /** [EN] Messages: push tab bar controllers (item 52, issue #202). [CN] 消息页：push TabBarController（第 52 项，issue #202）。 */
+  private messageRows(): DemoRow[] {
+    return [
+      {
+        id: 'same-context', title: 'Push a TabBarController of the same context (the same PlusButton class)',
+        action: () => this.push('pages/AnotherTabBar', { mode: 'same' } as DemoPushParams),
+      },
+      {
+        id: 'new-context', title: 'Push a TabBarController of a new context (PlusButton with a tappable X, issue #202)',
+        subtitle: 'Tap the X at the top right of the PlusButton: the X changes color at random and the PlusButton does not respond',
+        action: () => this.push('pages/AnotherTabBar', { mode: 'close' } as DemoPushParams),
+      },
+    ];
+  }
+
   private sections(page: string): DemoSection[] {
     return [
       { title: 'General', rows: this.generalRows() },
@@ -521,7 +559,7 @@ struct Index {
       { title: 'Tab interactions', rows: this.interactionRows() },
       { title: 'Configuration file', rows: this.configurationRows() },
       { title: 'Jump and compare', rows: this.jumpRows() },
-      { title: 'Badges', rows: this.badgeRows(page) },
+      { title: 'Badges', rows: page === DEMO_MESSAGE ? this.messageRows().concat(this.badgeRows(page)) : this.badgeRows(page) },
     ];
   }
 
@@ -627,6 +665,7 @@ struct Index {
         .layoutWeight(1)
         .width('100%')
         .backgroundColor($r('app.color.cyl_grouped_background'))
+        .onDidScroll((offset: number) => cyl_reportScroll(offset))
         .id(`cyl-page-${identifier}`)
       } else {
         Column()
@@ -649,8 +688,11 @@ struct Index {
         badges: this.badges,
         loggedIn: this.loggedIn,
         tapAnimationType: this.tapAnimation,
-        hapticFeedbackEnabled: this.feedbackStep > 0,
-        hapticFeedbackStyle: Math.max(0, this.feedbackStep - 1) as CYLImpactFeedbackStyle,
+        hapticFeedbackEnabled: this.feedbackStep >= 3,
+        hapticFeedbackStyle: (this.feedbackStep >= 3 && this.feedbackStep <= 5 ? this.feedbackStep - 3 : 1) as CYLImpactFeedbackStyle,
+        tapSoundEnabled: this.feedbackStep === 1 || this.feedbackStep === 2 || this.feedbackStep === 6,
+        tapSoundPath: this.feedbackStep === 2 ? 'cyl_tap_tock.wav' : 'cyl_tap_click.wav',
+        tabBarMinimizeBehavior: this.minimizeBehavior,
         longPressDuration: [300, 500, 1000][this.longPressIndex],
         doubleTapInterval: [200, 300, 500][this.doubleTapIndex],
         swipeToSwitchTabEnabled: this.swipeEnabled,

@@ -4,6 +4,107 @@ import { CYLPlusButton } from './CYLPlusButton';
 import { CYLBadge, CYLBadgeView } from './CYLBadge';
 import { CYLLottieIcon } from './CYLLottieIcon';
 import { vibrator } from '@kit.SensorServiceKit';
+import { media } from '@kit.MediaKit';
+import { audio } from '@kit.AudioKit';
+import { router } from '@kit.ArkUI';
+
+/**
+ * [EN] CYLTabBarMinimizeBehavior (issue #13): how the tab bar reacts when the current page scrolls.
+ * [CN] 页面滚动时 TabBar 的反应（issue #13）。
+ */
+export enum CYLTabBarMinimizeBehavior {
+  Automatic = 0,
+  Never,
+  OnScrollDown,
+  OnScrollUp,
+}
+
+/** [EN] AppStorage key of the latest scroll delta (cyl_reportScroll). [CN] 最近一次滚动距离的 AppStorage 键。 */
+export const CYLScrollStorageKey: string = 'cyl_scrollDelta';
+
+/**
+ * [EN] Reports a scroll of the current page (List / Scroll onDidScroll offset, vp; > 0 down) to the tab bar
+ *      controller, which hides or shows the bar by tabBarMinimizeBehavior (cyl_hidesTabBarOnScroll).
+ * [CN] 向 TabBarController 报告当前页面的滚动（List / Scroll 的 onDidScroll 偏移，vp；> 0 向下），控制器按 tabBarMinimizeBehavior 隐藏或显示 TabBar。
+ */
+export function cyl_reportScroll(delta: number): void {
+  // [EN] A counter in the fraction keeps equal deltas distinct. [CN] 用小数部分的计数区分相同的偏移。
+  cylScrollCounter = (cylScrollCounter + 1) % 1000;
+  AppStorage.setOrCreate<number>(CYLScrollStorageKey, Math.round(delta) + (delta >= 0 ? 1 : -1) * cylScrollCounter / 10000);
+}
+
+let cylScrollCounter: number = 0;
+
+/** [EN] AppStorage key of the tab a pushed page asks to select (cyl_popSelectTabBarChildViewController...). [CN] 被 push 的页面请求选中的 Tab。 */
+export const CYLSelectRequestStorageKey: string = 'cyl_selectRequest';
+
+/**
+ * [EN] -cyl_popSelectTabBarChildViewControllerAtIndex:completion:: pops the pushed pages (router.clear + back to the
+ *      page of the tab bar controller) and selects the tab at `index`.
+ * [CN] 退出被 push 的页面（返回 TabBarController 所在页面）并选中第 index 个 Tab。
+ */
+export function cyl_popSelectTabBarChildViewControllerAtIndex(index: number, completion?: () => void): void {
+  AppStorage.setOrCreate<string>(CYLSelectRequestStorageKey, `${index}#${Date.now()}`);
+  router.back({ url: AppStorage.get<string>('cyl_tabBarPageUrl') ?? 'pages/Index' });
+  if (completion !== undefined) {
+    setTimeout(completion, 0);
+  }
+}
+
+/**
+ * [EN] -cyl_popSelectTabBarChildViewControllerForTabBarItemIdentifier:: the same, by tab identifier.
+ * [CN] 同上，按 Tab identifier。
+ */
+export function cyl_popSelectTabBarChildViewControllerForTabBarItemIdentifier(identifier: string, completion?: () => void): void {
+  AppStorage.setOrCreate<string>(CYLSelectRequestStorageKey, `id:${identifier}#${Date.now()}`);
+  router.back({ url: AppStorage.get<string>('cyl_tabBarPageUrl') ?? 'pages/Index' });
+  if (completion !== undefined) {
+    setTimeout(completion, 0);
+  }
+}
+
+/**
+ * [EN] -cyl_pushViewController:animated:: pushes a page (router url) above the tab bar, which it covers (the tab bar
+ *      stays with its page, as hidesBottomBarWhenPushed).
+ * [CN] 在 TabBar 之上 push 页面（router url），页面覆盖 TabBar（相当于 hidesBottomBarWhenPushed）。
+ */
+export function cyl_pushViewController(url: string, params?: Object): void {
+  router.pushUrl({ url: url, params: params });
+}
+
+/**
+ * [EN] -cyl_pushOrPopToViewController:animated:callback:: goes back to `url` when it is already in the stack, otherwise
+ *      pushes it; callback(true) when it popped.
+ * [CN] 若 url 已在栈中则返回到它，否则 push；返回时 callback(true)。
+ */
+export function cyl_pushOrPopToViewController(url: string, params?: Object, callback?: (popped: boolean) => void): void {
+  const index = router.getStateByUrl(url);
+  if (index.length > 0) {
+    router.back({ url: url, params: params });
+    callback?.(true);
+  } else {
+    router.pushUrl({ url: url, params: params });
+    callback?.(false);
+  }
+}
+
+let cylTapPlayer: media.SoundPool | undefined = undefined;
+let cylTapSound: number = -1;
+
+/**
+ * [EN] Plays the tap sound (cyl_tabButtonTapSoundEnabled; cyl_tabButtonTapSoundURL: a rawfile path, the library's
+ *      click by default). The file must be in the app's rawfile.
+ * [CN] 播放点击音效（rawfile 路径，默认使用库的点击音）。文件需在应用的 rawfile 中。
+ */
+async function cylPlayTapSound(context: Context, path: string): Promise<void> {
+  if (cylTapPlayer === undefined) {
+    cylTapPlayer = await media.createSoundPool(2, { usage: audio.StreamUsage.STREAM_USAGE_GAME, rendererFlags: 1 });
+    const fd = context.resourceManager.getRawFdSync(path);
+    cylTapSound = await cylTapPlayer.load(fd.fd, fd.offset, fd.length);
+    await new Promise<void>((resolve: () => void) => setTimeout(resolve, 150));
+  }
+  await cylTapPlayer.play(cylTapSound, { loop: 0, rate: audio.AudioRendererRate.RENDER_RATE_NORMAL, leftVolume: 0.6, rightVolume: 0.6, priority: 0 });
+}
 
 /**
  * [EN] CYLTabButtonTapAnimationType: the built-in tap animations of a tab button (cyl_tabButtonTapAnimationType).
@@ -193,6 +294,17 @@ export struct CYLTabBarController {
    * [CN] 每次点击后调用，附点击前的选中索引（再次点击时 previous === index）。
    */
   didSelectControl?: (index: number, previous: number) => void;
+  /** [EN] cyl_tabBarMinimizeBehavior (issue #13). [CN] 滚动时 TabBar 的反应。 */
+  @Prop tabBarMinimizeBehavior: CYLTabBarMinimizeBehavior = CYLTabBarMinimizeBehavior.Never;
+  /** [EN] cyl_hidesTabBarOnScroll: OnScrollDown when on (Automatic means OnScrollDown here). [CN] 开启时等同 OnScrollDown。 */
+  @Prop hidesTabBarOnScroll: boolean = false;
+  @State private scrollHidden: boolean = false;
+  @StorageProp('cyl_scrollDelta') @Watch('cylOnScroll') private scrollDelta: number = 0;
+  @StorageProp('cyl_selectRequest') @Watch('cylOnSelectRequest') private selectRequest: string = '';
+  /** [EN] cyl_tabButtonTapSoundEnabled. [CN] 点击时播放音效。 */
+  @Prop tapSoundEnabled: boolean = false;
+  /** [EN] cyl_tabButtonTapSoundURL: a rawfile path. [CN] 音效的 rawfile 路径。 */
+  @Prop tapSoundPath: string = 'cyl_tap_click.wav';
   shouldSelect?: (index: number, identifier: string) => boolean;
   didSelect?: (index: number, identifier: string) => void;
   plusButtonAction?: () => void;
@@ -215,6 +327,42 @@ export struct CYLTabBarController {
    * [EN] -setSelectedIndex: through the delegate: shouldSelect may refuse; didSelect follows.
    * [CN] 经过代理设置选中索引：shouldSelect 可拒绝；随后调用 didSelect。
    */
+  cylOnScroll(): void {
+    let behavior = this.tabBarMinimizeBehavior;
+    if (this.hidesTabBarOnScroll && (behavior === CYLTabBarMinimizeBehavior.Never || behavior === CYLTabBarMinimizeBehavior.Automatic)) {
+      behavior = CYLTabBarMinimizeBehavior.OnScrollDown;
+    }
+    if (behavior === CYLTabBarMinimizeBehavior.Never || behavior === CYLTabBarMinimizeBehavior.Automatic) {
+      this.scrollHidden = false;
+      return;
+    }
+    const delta = this.scrollDelta;
+    if (Math.abs(delta) < 2) {
+      return;
+    }
+    const down = delta > 0;
+    this.scrollHidden = behavior === CYLTabBarMinimizeBehavior.OnScrollDown ? down : !down;
+  }
+
+  cylOnSelectRequest(): void {
+    const request = this.selectRequest.split('#')[0];
+    if (request.length === 0) {
+      return;
+    }
+    if (request.startsWith('id:')) {
+      const identifier = request.substring(3);
+      const index = this.tabBarItemsAttributes.findIndex((item: CYLTabBarItemAttributes) => item.identifier === identifier);
+      if (index >= 0) {
+        this.cylSelect(index);
+      }
+    } else {
+      const index = Number.parseInt(request, 10);
+      if (index >= 0 && index < this.tabBarItemsAttributes.length) {
+        this.cylSelect(index);
+      }
+    }
+  }
+
   cylOnMemoryWarning(): void {
     let unloaded: number[] = [];
     if (this.unloadsUnselectedViewsOnMemoryWarning) {
@@ -228,6 +376,9 @@ export struct CYLTabBarController {
 
   /** [EN] The tap animation and the haptic of a tab button. [CN] Tab 按钮的点击动画与触感。 */
   cylTapFeedback(index: number): void {
+    if (this.tapSoundEnabled) {
+      cylPlayTapSound(this.getUIContext().getHostContext() as Context, this.tapSoundPath).catch(() => {});
+    }
     if (this.hapticFeedbackEnabled) {
       const effects = ['haptic.clock.timer', 'haptic.effect.soft', 'haptic.effect.hard'];
       try {
@@ -485,6 +636,13 @@ export struct CYLTabBarController {
   cylPlus() {
     Column() {
       Stack() {
+        if (this.plusButton?.backgroundImage !== undefined) {
+          Image(this.plusButton.backgroundImage)
+            .width(this.plusButton?.imageSize ?? 54)
+            .height(this.plusButton?.imageSize ?? 54)
+            .objectFit(ImageFit.Contain)
+        }
+        // [EN] Item 31: no image yet keeps the layout (the slot stays). [CN] 第 31 项：尚无图片时布局不变。
         Image(this.plusPressed || this.selectedIndex === CYLPlusButtonPageIndex
           ? (this.plusButton?.selectedImage ?? this.plusButton?.image) : this.plusButton?.image)
           .width(this.plusButton?.imageSize ?? 54)
@@ -562,7 +720,7 @@ export struct CYLTabBarController {
           }
         }), GestureMask.Normal)
 
-      if (!this.tabBarHidden) {
+      if (!this.tabBarHidden && !this.scrollHidden) {
         Row() {
           ForEach(this.cylSlots(), (slot: CYLSlot) => {
             if (slot.tabIndex >= 0) {
