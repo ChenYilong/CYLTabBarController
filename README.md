@@ -1857,6 +1857,12 @@ CYLTabBar(items: items, styleType: 'liquidGlass', selectedIndex: index, badgeVal
 
 ![WeChat Mini Program, DevTools on Windows 11, base library 3.17.6: Message pushes a tab bar whose plus button has a tappable X, the Discover details page, the Me feed](assets/wechat-miniprogram-feed-taps.png)
 
+| 中文 | English |
+|:---|:---|
+| **微信小程序：与 Objective-C 示例相同的 Tab 与启动效果**：首页 / Refresh、同城、发布、消息、我的，ObjC 的图片与红 / 绿标题，液态玻璃；启动 1.5 秒后显示角标（紫色 8、99+、NEW、PlusButton 1）与首页的「淘」封面；选中 Tab 的点击把角标变为同色红点；消息与我的需要登录。下图（微信小程序，Windows 11 开发者工具，模拟器 iPhone 12/13 Pro，基础库 3.17.6，基于 [4e2e327](https://github.com/ChenYilong/CYLTabBarController/commit/4e2e327)，2026-11-15）从上到下：启动后；点击同城；未登录时点击消息。进度见 [ObjC 示例复刻](docs/ObjC-Example-Parity/README.md)。 | **WeChat Mini Program: the Objective-C example’s tabs and launch**: Home / Refresh, Nearby, Post, Messages, Me, the ObjC images and red / green titles, Liquid Glass; 1.5 s after launch the badges (purple 8, 99+, NEW, plus button 1) and the cover over Home; a tap that selects a tab turns its badge into a dot of its color; Messages and Me need login. Below (WeChat Mini Program, DevTools on Windows 11, simulator iPhone 12/13 Pro, base library 3.17.6, on top of [4e2e327](https://github.com/ChenYilong/CYLTabBarController/commit/4e2e327), 2026-11-15), top to bottom: after launch; Nearby tapped; Messages tapped while logged out. Progress: [ObjC example parity](docs/ObjC-Example-Parity/README.md). |
+
+![WeChat Mini Program, DevTools on Windows 11, base library 3.17.6: the Objective-C tabs with the launch badges and the cover, Nearby selected with a purple dot, the login alert for Messages](assets/wechat-miniprogram-objc-launch.png)
+
 ### [CN]在 Swift 项目中使用 CYLTabBarController
 ### [EN]Using CYLTabBarController in a Swift project
 
