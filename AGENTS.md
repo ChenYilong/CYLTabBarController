@@ -11,6 +11,9 @@ When code, `docs/` and `README.md` disagree, code wins, then `docs/`. Fix the wr
 
 `.agents/skills` holds the skills; `.claude/skills` only points there.
 
+TODO: please install following docs 开发者工具 Skills
+ https://developers.weixin.qq.com/miniprogram/dev/devtools/Skills.html
+ 
 - **Project skills, `cyl-*`, maintained here. Use them:**
 
 | Skill | Use it when |
