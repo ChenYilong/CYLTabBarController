@@ -21,6 +21,11 @@ Every commit message carries the line `By  @ChenYilong <luohanchenyilong@163.com
 `By`) in its body, after the description and before trailers such as `Claude-Session:`. Check it before every push
 (`git log -1 --format=%B`); amend a commit that lacks it. AGENTS.md, "Commit messages".
 
+## Commit message style: `git cz`, English only
+
+Every commit uses the `git cz` (Commitizen) style and is written entirely in English: no Chinese (and no other non-English text) anywhere in the subject, the body or the trailers. A user's prompt in another language is quoted in the task's document in `docs/`, never in the commit message.
+Before pushing: `git log -1 --format=%B | python3 -c "import re,sys; sys.exit(1 if re.search('[\u4e00-\u9fff]', sys.stdin.read()) else 0)"` prints nothing. AGENTS.md, "Git and pull requests".
+
 ## Where a check runs: GitHub CI or locally
 
 GitHub CI/CD for iOS runs on **macOS 26** by default: always read `.github/workflows/ios.yml` on master first to confirm it
