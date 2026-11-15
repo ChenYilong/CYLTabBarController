@@ -826,7 +826,9 @@ export struct CYLTabBarController {
         .border({ width: { top: 0.5 }, color: { top: this.tabBarShadowColor } })
         .attributeModifier(cyl_tabBarStyleModifier(this.tabBarStyleType, this.barTintColor, this.tabBarHeight))
         .padding({ left: this.itemEdgeInsets.left, right: this.itemEdgeInsets.right })
-        .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM])
+        // [EN] The classic and FlatDesign bars reach under the gesture bar; the floating Liquid Glass capsule stays above it.
+        // [CN] 经典与扁平样式延伸到手势条下方；悬浮的液态玻璃胶囊保持在其上方。
+        .expandSafeArea(this.tabBarStyleType === CYLTabBarStyleType.LiquidGlass ? [] : [SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM])
         .transition(TransitionEffect.move(TransitionEdge.BOTTOM)
           .animation({ duration: this.tabBarHiddenAnimated ? 250 : 0 }))
         .id('cyl-tab-bar')
