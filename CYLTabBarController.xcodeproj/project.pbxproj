@@ -204,6 +204,7 @@
 		B3E259203FB4D1EF82D8AE22 /* CYLUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F7BF9225483BC626951173C /* CYLUtils.swift */; };
 		B4CE10EFE7C662116218598F /* UIView+CYLHitTestOutsideBounds.h in Headers */ = {isa = PBXBuildFile; fileRef = 934598AD21CBB8B71C2AFEB8 /* UIView+CYLHitTestOutsideBounds.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		B6120A1F9D9B4348CF57D47D /* NSObject+CYLTabBarControllerExtention.m in Sources */ = {isa = PBXBuildFile; fileRef = 3FA92D126331EDA2BD1B0D68 /* NSObject+CYLTabBarControllerExtention.m */; };
+		B86D6F4FFDDE546C196DF203 /* CYLFlatDesignTabBar+CYLImplementation.swift in Sources */ = {isa = PBXBuildFile; fileRef = E77788D00EDE2FD031C00EF4 /* CYLFlatDesignTabBar+CYLImplementation.swift */; };
 		BB6CC09AA0154F56A950AF65 /* CYLDemoLocalization.m in Sources */ = {isa = PBXBuildFile; fileRef = 33E91BC228994983BD78F8C3 /* CYLDemoLocalization.m */; };
 		BBD2AFAEB8BFBB17475415D4 /* CYLPAGTabBarItemAnimator.m in Sources */ = {isa = PBXBuildFile; fileRef = 3983802FD43DC646F15A6B21 /* CYLPAGTabBarItemAnimator.m */; };
 		BC9D57D7EE707105A5DB73E9 /* CYLRiveTabBarItemAnimator.m in Sources */ = {isa = PBXBuildFile; fileRef = ECD54DD212D88AFAA6C50623 /* CYLRiveTabBarItemAnimator.m */; };
@@ -564,6 +565,7 @@
 		E2745BEF0A35D75AC1EE1802 /* NSObject+CYLTabBarControllerExtention.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "NSObject+CYLTabBarControllerExtention.h"; sourceTree = "<group>"; };
 		E39F55A213575AA1887779F6 /* CYLTabBarItemAnimator.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CYLTabBarItemAnimator.h; sourceTree = "<group>"; };
 		E3BF1CFC1E8C4A9BEFBBD0CD /* UIImage+CYLUtils.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "UIImage+CYLUtils.swift"; sourceTree = "<group>"; };
+		E77788D00EDE2FD031C00EF4 /* CYLFlatDesignTabBar+CYLImplementation.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "CYLFlatDesignTabBar+CYLImplementation.swift"; sourceTree = "<group>"; };
 		EB2FC614BF198DF7F9A1E7D0 /* CYLTabBarController+CYLTabBarItemGesture.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "CYLTabBarController+CYLTabBarItemGesture.swift"; sourceTree = "<group>"; };
 		EB6BD0FD57B804E4F015A608 /* CYLTabBarController+CYLConfiguration.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "CYLTabBarController+CYLConfiguration.swift"; sourceTree = "<group>"; };
 		ECD54DD212D88AFAA6C50623 /* CYLRiveTabBarItemAnimator.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = CYLRiveTabBarItemAnimator.m; sourceTree = "<group>"; };
@@ -1183,6 +1185,7 @@
 				D23DC72D9536BC98F84A08B3 /* UINavigationController+CYLFlatDesignTabBarPrivate.swift */,
 				A68F5E8606BC86D5CA3E2791 /* CYLFlatDesignTabBarItem.swift */,
 				323F8AB156FCDC8C7E0BFCB8 /* CYLFlatDesignTabBarButton.swift */,
+				E77788D00EDE2FD031C00EF4 /* CYLFlatDesignTabBar+CYLImplementation.swift */,
 			);
 			name = Swift;
 			path = Swift;
@@ -1717,6 +1720,7 @@
 				049C7757AE261F393B23A6BB /* CYLTabBarItemAnimationPlayableView.swift in Sources */,
 				363A7D6EE7B8D16925B2C6CC /* CYLFlatDesignTabBarItem.swift in Sources */,
 				F2958163E3C92D835247B0E3 /* CYLFlatDesignTabBarButton.swift in Sources */,
+				B86D6F4FFDDE546C196DF203 /* CYLFlatDesignTabBar+CYLImplementation.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1802,8 +1806,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
-				"OTHER_SWIFT_FLAGS[sdk=iphoneos26*]" = "$(inherited) -Xfrontend -alias-module-names-in-module-interface";
-				"OTHER_SWIFT_FLAGS[sdk=iphonesimulator26*]" = "$(inherited) -Xfrontend -alias-module-names-in-module-interface";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_WEAK = NO;
 				CODE_SIGNING_ALLOWED = NO;
@@ -1819,6 +1821,8 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				MARKETING_VERSION = 1.99.55;
+				"OTHER_SWIFT_FLAGS[sdk=iphoneos26*]" = "$(inherited) -Xfrontend -alias-module-names-in-module-interface";
+				"OTHER_SWIFT_FLAGS[sdk=iphonesimulator26*]" = "$(inherited) -Xfrontend -alias-module-names-in-module-interface";
 				PRODUCT_BUNDLE_IDENTIFIER = org.cocoapods.CYLTabBarController;
 				PRODUCT_NAME = CYLTabBarController;
 				SDKROOT = iphoneos;
@@ -1867,8 +1871,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
-				"OTHER_SWIFT_FLAGS[sdk=iphoneos26*]" = "$(inherited) -Xfrontend -alias-module-names-in-module-interface";
-				"OTHER_SWIFT_FLAGS[sdk=iphonesimulator26*]" = "$(inherited) -Xfrontend -alias-module-names-in-module-interface";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_WEAK = NO;
 				CODE_SIGNING_ALLOWED = NO;
@@ -1884,6 +1886,8 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				MARKETING_VERSION = 1.99.55;
+				"OTHER_SWIFT_FLAGS[sdk=iphoneos26*]" = "$(inherited) -Xfrontend -alias-module-names-in-module-interface";
+				"OTHER_SWIFT_FLAGS[sdk=iphonesimulator26*]" = "$(inherited) -Xfrontend -alias-module-names-in-module-interface";
 				PRODUCT_BUNDLE_IDENTIFIER = org.cocoapods.CYLTabBarController;
 				PRODUCT_NAME = CYLTabBarController;
 				SDKROOT = iphoneos;

@@ -307,6 +307,7 @@ docs/
 │   ├── swift-migration-step48-flatdesign-popped.png
 │   ├── swift-migration-step48-flatdesign-pushed.png
 │   ├── swift-migration-step49-flatdesign.png
+│   ├── swift-migration-step50-flatdesign.png
 │   ├── swiftui-integration-ios.png
 │   ├── swiftui-plus-title-blur-ios.png
 │   ├── tab-accessibility-labels-after-title-change.png
