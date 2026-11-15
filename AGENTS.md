@@ -94,6 +94,21 @@ Every new feature and user-visible change ships with bilingual documentation in 
     missing label as a bug and fix it.
   - The convention: every component and every text of this project supports accessibility. A change that adds a control
     or a text without it is not done.
+- **Accessibility and localization in all code, HarmonyOS included (2026-11-16).** All code of this project supports
+  accessibility (screen readers such as VoiceOver, TalkBack and the HarmonyOS screen reader; visual aids such as large
+  text, bold text, high contrast and color inversion) and internationalization / localization through localization
+  files, including the HarmonyOS NEXT (ArkTS / ArkUI) code. Where support is missing, add it first, then continue.
+  - HarmonyOS: every control has `accessibilityText` (localized), `accessibilityDescription` when a hint helps,
+    `accessibilityGroup(true)` for a control made of several views, `accessibilityLevel('no')` for decorations, a
+    stable `id` (`key`) for tests and the selected state in its text; all texts come from string resources
+    (`$r('app.string.…')`, `resources/<locale>/element/string.json`) copied from CYLTabBarController's localization
+    files (`CYLTabBarController/Resources/CYLTabBarController.bundle/*.lproj`), keeping only the strings the HarmonyOS
+    code uses. Skill: `cyl-harmonyos`.
+  - Automated UI tests use these features first to locate controls: accessibility identifiers (`id` / `key`,
+    `accessibilityIdentifier`, `testID`), accessibility labels / texts and localized strings (HarmonyOS UiTest `ON.id()` /
+    `ON.text()`, XCUITest queries, `axe describe-ui`, `uiautomator`, Flutter `find.bySemanticsLabel`, React Native
+    `getByLabelText`), to tap, to drive complex flows and consecutive steps. Coordinates are the last resort; a control
+    that cannot be found that way is a bug to fix.
 - **Naming: keep the project's prefixes.** Every class, protocol, type and function of this project starts with `CYL`,
   and every category method and category property starts with `cyl_`. A file you create or bring in (copied from
   another project, a sample, a snippet) follows the same rules:

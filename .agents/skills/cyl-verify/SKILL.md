@@ -159,3 +159,11 @@ Before any HarmonyOS work (building, installing or running a HAP, taking emulato
    the image download asks for it, with hardware virtualization available on the Mac.
 4. **Signing is not needed on the emulator**: it installs the unsigned `entry-default-unsigned.hap`
    (`hdc install -r`). Do not ask the owner for a signing setup for emulator runs.
+
+## Locating controls in UI tests
+
+All code of this project supports accessibility and localization, including the HarmonyOS code. UI tests and simulator /
+emulator checks locate controls through accessibility identifiers, accessibility labels / texts and localized strings
+first (XCUITest, `axe describe-ui`, `uiautomator`, HarmonyOS UiTest `ON.id()` / `ON.text()`, Flutter
+`find.bySemanticsLabel`, React Native `getByLabelText`), for taps, complex flows and consecutive steps. Coordinates are
+the last resort; a control that cannot be found that way is a bug: add the label first. HarmonyOS details: `cyl-harmonyos`.
