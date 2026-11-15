@@ -135,6 +135,10 @@ export default function App() {
 |:---|:---|
 | 组件只绘制 TabBar：在它上方绘制当前 Tab 的页面，在 `onTabSelect` 中切换。组件的高度由原生 TabBar 决定（含底部安全区），不需要设置。 | The component draws only the bar: draw the current tab's page above it and switch it in `onTabSelect`. Its height comes from the native tab bar (the bottom safe area included); do not set one. |
 
+| 中文 | English |
+|:---|:---|
+| **SVGA Tab 图标**：已支持；App 需加入 SVGA 播放器（iOS `pod 'CYLTabBarController/SVGA'`，Android SVGAPlayer-Android），步骤见 [在 App 中使用 SVGA 图标](Cross-Platform-Components.md#cn在-app-中使用-svga-图标react-nativeflutter)。 | **SVGA tab icons**: supported; the app adds the SVGA player (iOS `pod 'CYLTabBarController/SVGA'`, Android SVGAPlayer-Android), steps in [SVGA tab icons in your app](Cross-Platform-Components.md#ensvga-tab-icons-in-your-app-react-native-flutter). |
+
 ## [CN]属性与事件
 ## [EN]Props and events
 
