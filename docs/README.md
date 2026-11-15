@@ -448,9 +448,17 @@ docs/
 │   ├── wechat-miniprogram-badges.png
 │   ├── wechat-miniprogram-cell-taps-devtools-sdk3.17.6-e00babf.png
 │   ├── wechat-miniprogram-christmas-glass.png
+│   ├── wechat-miniprogram-feed-taps-ios-parity-devtools-sdk3.17.6-ef5afc3-windows.png
 │   ├── wechat-miniprogram-feeds-ios-taps-devtools-sdk3.17.6-3dd395b.png
 │   ├── wechat-miniprogram-flat-login.png
 │   ├── wechat-miniprogram-home.png
+│   ├── wechat-miniprogram-objc-parity-batch1-launch-devtools-sdk3.17.6-4e2e327.png
+│   ├── wechat-miniprogram-objc-parity-batch2-skins-devtools-sdk3.17.6-b850f51.png
+│   ├── wechat-miniprogram-objc-parity-batch3a-home-rows-devtools-sdk3.17.6-a9b1278.png
+│   ├── wechat-miniprogram-objc-parity-batch3b1-arrows-touch-replaced-devtools-sdk3.17.6-5d86b75.png
+│   ├── wechat-miniprogram-objc-parity-batch3b2-tap-animations-devtools-sdk3.17.6-418d901.png
+│   ├── wechat-miniprogram-objc-parity-item11-languages-devtools-sdk3.17.6-c681422.png
+│   ├── wechat-miniprogram-objc-parity-item12-memory-warning-devtools-sdk3.17.6-5bbadb8.png
 │   ├── wechat-miniprogram-one-icon-layer-lottie-pag-rive-devtools-sdk3.17.6-e612393.png
 │   ├── wechat-miniprogram-rive-home-feed-one-layer-devtools-sdk3.17.6-e264ea2.png
 │   ├── wechat-miniprogram-scroll-icons-devtools-sdk3.17.6-88dd149.png
