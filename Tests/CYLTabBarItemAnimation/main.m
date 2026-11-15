@@ -30,7 +30,7 @@ static NSString *const CYLTabBarRiveSize = @"CYLTabBarRiveSize";
 static NSString *const CYLTabBarRiveDarkURL = @"CYLTabBarRiveDarkURL";
 typedef NSString *CYLTabBarAnimationOption;
 
-// [EN] The Core functions under test, extracted by run.sh. [CN] 被测试的 Core 函数，由 run.sh 提取。
+// [EN] Core helpers (Swift in the library), from CYLCoreStandIns.m. [CN] Core 辅助函数（库中为 Swift），来自 CYLCoreStandIns.m。
 id CYLTabBarItemAttributesAnimationValue(NSDictionary *attributes, NSString *genericKey);
 NSURL *CYLTabBarAnimationURLWithOptions(NSURL *fileURL, NSDictionary<CYLTabBarAnimationOption, NSString *> *options);
 
@@ -161,7 +161,7 @@ id<CYLTabBarItemAnimationHost> CYLTabBarItemAnimationDefaultHost(void) {
     return [[CYLTestHost alloc] init];
 }
 
-/// [EN] Core's style registry (CYLConstants.m), extracted by run.sh. [CN] Core 的风格注册表（CYLConstants.m），由 run.sh 提取。
+/// [EN] Core's style registry, from CYLCoreStandIns.m. [CN] Core 的风格注册表，来自 CYLCoreStandIns.m。
 @interface CYLTabBarItemAnimationStyleRegistry : NSObject <CYLTabBarItemAnimationStyleSource>
 - (void)registerDarkURL:(NSURL *)darkURL forURL:(NSURL *)URL;
 - (void)registerDarkColors:(NSDictionary<NSString *, UIColor *> *)darkColors forURL:(NSURL *)URL;

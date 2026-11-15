@@ -1802,6 +1802,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
+				"OTHER_SWIFT_FLAGS[sdk=iphoneos26*]" = "$(inherited) -Xfrontend -alias-module-names-in-module-interface";
+				"OTHER_SWIFT_FLAGS[sdk=iphonesimulator26*]" = "$(inherited) -Xfrontend -alias-module-names-in-module-interface";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_WEAK = NO;
 				CODE_SIGNING_ALLOWED = NO;
@@ -1865,6 +1867,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
+				"OTHER_SWIFT_FLAGS[sdk=iphoneos26*]" = "$(inherited) -Xfrontend -alias-module-names-in-module-interface";
+				"OTHER_SWIFT_FLAGS[sdk=iphonesimulator26*]" = "$(inherited) -Xfrontend -alias-module-names-in-module-interface";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_WEAK = NO;
 				CODE_SIGNING_ALLOWED = NO;

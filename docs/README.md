@@ -439,6 +439,7 @@ docs/
 │   ├── wechat-miniprogram-badges.png
 │   ├── wechat-miniprogram-cell-taps-devtools-sdk3.17.6-e00babf.png
 │   ├── wechat-miniprogram-christmas-glass.png
+│   ├── wechat-miniprogram-feeds-ios-taps-devtools-sdk3.17.6-3dd395b.png
 │   ├── wechat-miniprogram-flat-login.png
 │   ├── wechat-miniprogram-home.png
 │   ├── wechat-miniprogram-one-icon-layer-lottie-pag-rive-devtools-sdk3.17.6-e612393.png
