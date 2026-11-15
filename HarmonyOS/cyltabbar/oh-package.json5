@@ -1,0 +1,11 @@
+{
+  "name": "cyltabbar",
+  "version": "1.100.0",
+  "description": "CYLTabBarController for HarmonyOS NEXT: a tab bar with a plus button and badges, accessible and localized.",
+  "main": "Index.ets",
+  "author": "ChenYilong",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {},
+  "dynamicDependencies": {}
+}

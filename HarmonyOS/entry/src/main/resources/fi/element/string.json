@@ -1,0 +1,28 @@
+{
+  "string": [
+    {
+      "name": "cyl_demo_home",
+      "value": "Koti"
+    },
+    {
+      "name": "cyl_demo_nearby",
+      "value": "Lähellä"
+    },
+    {
+      "name": "cyl_demo_messages",
+      "value": "Viestit"
+    },
+    {
+      "name": "cyl_demo_me",
+      "value": "Minä"
+    },
+    {
+      "name": "cyl_demo_post",
+      "value": "Julkaise"
+    },
+    {
+      "name": "cyl_demo_page",
+      "value": "Sivu %s"
+    }
+  ]
+}

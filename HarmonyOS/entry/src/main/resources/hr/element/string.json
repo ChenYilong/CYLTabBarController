@@ -1,0 +1,28 @@
+{
+  "string": [
+    {
+      "name": "cyl_demo_home",
+      "value": "Početna"
+    },
+    {
+      "name": "cyl_demo_nearby",
+      "value": "U blizini"
+    },
+    {
+      "name": "cyl_demo_messages",
+      "value": "Poruke"
+    },
+    {
+      "name": "cyl_demo_me",
+      "value": "Ja"
+    },
+    {
+      "name": "cyl_demo_post",
+      "value": "Objavi"
+    },
+    {
+      "name": "cyl_demo_page",
+      "value": "Stranica %s"
+    }
+  ]
+}

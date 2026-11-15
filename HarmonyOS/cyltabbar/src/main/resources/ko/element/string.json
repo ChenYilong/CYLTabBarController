@@ -1,0 +1,32 @@
+{
+  "string": [
+    {
+      "name": "cyl_badge_new_content",
+      "value": "새 콘텐츠 있음"
+    },
+    {
+      "name": "cyl_badge_new_messages",
+      "value": "새 메시지 %s개"
+    },
+    {
+      "name": "cyl_plus_button",
+      "value": "플러스 버튼"
+    },
+    {
+      "name": "cyl_list_separator",
+      "value": ", "
+    },
+    {
+      "name": "cyl_badge_text_NEW",
+      "value": "새 글"
+    },
+    {
+      "name": "cyl_badge_text_New",
+      "value": "새 항목"
+    },
+    {
+      "name": "cyl_badge_text_new",
+      "value": "새 글"
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "string": [
+    {
+      "name": "cyl_badge_new_content",
+      "value": "Nový obsah"
+    },
+    {
+      "name": "cyl_badge_new_messages",
+      "value": "Nové správy: %s"
+    },
+    {
+      "name": "cyl_plus_button",
+      "value": "Tlačidlo plus"
+    },
+    {
+      "name": "cyl_list_separator",
+      "value": ", "
+    },
+    {
+      "name": "cyl_badge_text_NEW",
+      "value": "NOVÉ"
+    },
+    {
+      "name": "cyl_badge_text_New",
+      "value": "Nové"
+    },
+    {
+      "name": "cyl_badge_text_new",
+      "value": "nové"
+    }
+  ]
+}

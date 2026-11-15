@@ -1,0 +1,28 @@
+{
+  "string": [
+    {
+      "name": "cyl_demo_home",
+      "value": "Главная"
+    },
+    {
+      "name": "cyl_demo_nearby",
+      "value": "Рядом"
+    },
+    {
+      "name": "cyl_demo_messages",
+      "value": "Сообщения"
+    },
+    {
+      "name": "cyl_demo_me",
+      "value": "Я"
+    },
+    {
+      "name": "cyl_demo_post",
+      "value": "Опубликовать"
+    },
+    {
+      "name": "cyl_demo_page",
+      "value": "Страница %s"
+    }
+  ]
+}

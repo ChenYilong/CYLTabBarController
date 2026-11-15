@@ -1,0 +1,28 @@
+{
+  "string": [
+    {
+      "name": "cyl_demo_home",
+      "value": "Ana sayfa"
+    },
+    {
+      "name": "cyl_demo_nearby",
+      "value": "Yakında"
+    },
+    {
+      "name": "cyl_demo_messages",
+      "value": "Mesajlar"
+    },
+    {
+      "name": "cyl_demo_me",
+      "value": "Ben"
+    },
+    {
+      "name": "cyl_demo_post",
+      "value": "Paylaş"
+    },
+    {
+      "name": "cyl_demo_page",
+      "value": "Sayfa %s"
+    }
+  ]
+}

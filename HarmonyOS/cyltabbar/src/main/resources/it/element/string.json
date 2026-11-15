@@ -1,0 +1,32 @@
+{
+  "string": [
+    {
+      "name": "cyl_badge_new_content",
+      "value": "Nuovi contenuti"
+    },
+    {
+      "name": "cyl_badge_new_messages",
+      "value": "%s nuovi messaggi"
+    },
+    {
+      "name": "cyl_plus_button",
+      "value": "Pulsante più"
+    },
+    {
+      "name": "cyl_list_separator",
+      "value": ", "
+    },
+    {
+      "name": "cyl_badge_text_NEW",
+      "value": "NUOVO"
+    },
+    {
+      "name": "cyl_badge_text_New",
+      "value": "Nuovo"
+    },
+    {
+      "name": "cyl_badge_text_new",
+      "value": "nuovo"
+    }
+  ]
+}

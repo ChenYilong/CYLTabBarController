@@ -1,4 +1,13 @@
 {
+ "+indexOfPlusButtonInTabBar": {
+  "status": "done",
+  "harmonyos": "CYLPlusButton.index"
+ },
+ "+plusButton": {
+  "status": "partial",
+  "harmonyos": "CYLTabBarController({ plusButton })",
+  "note": "a CYLPlusButton object instead of a subclass"
+ },
  "CAAnimation(CYLBadgeExtention)": {
   "status": "n/a",
   "note": "Core Animation; HarmonyOS plays the badge animations with ArkUI animation APIs (animateTo, keyframes)"
@@ -343,6 +352,11 @@
   "status": "n/a",
   "note": "the iOS bundle localization; HarmonyOS uses string resources ($r('app.string.…'))"
  },
+ "CYLPlusButton": {
+  "status": "partial",
+  "harmonyos": "CYLPlusButton",
+  "note": "image, title, index, accessibility label and tap; no subclassing or raised layout yet"
+ },
  "CYLPlusButton(CYLPlusButtonDeprecated) +multiplerInCenterY": {
   "status": "n/a",
   "note": "deprecated on iOS"
@@ -363,6 +377,26 @@
   "status": "n/a",
   "note": "the iOS demo settings list, not library behavior"
  },
+ "CYLTabBar": {
+  "status": "partial",
+  "harmonyos": "CYLTabBar",
+  "note": "a tab bar with tabs, badges and a plus button; no styles, animations, themes or configuration files yet"
+ },
+ "CYLTabBar plusButton": {
+  "status": "partial",
+  "harmonyos": "CYLTabBar.plusButton",
+  "note": "image, title, index, accessibility label and tap; no raised layout or selection yet"
+ },
+ "CYLTabBarController": {
+  "status": "partial",
+  "harmonyos": "CYLTabBarController",
+  "note": "a tab bar with tabs, badges and a plus button; no styles, animations, themes or configuration files yet"
+ },
+ "CYLTabBarController +tabBarControllerWithViewControllers:tabBarItemsAttributes:": {
+  "status": "partial",
+  "harmonyos": "CYLTabBarController({ items, pageBuilder })",
+  "note": "pages from pageBuilder(index), kept when another tab is selected"
+ },
  "CYLTabBarController -appDelegate": {
   "status": "n/a",
   "note": "UIKit internals, the app delegate and the window; HarmonyOS uses UIAbility and WindowStage"
@@ -370,6 +404,11 @@
  "CYLTabBarController -changeItem:toItem:": {
   "status": "n/a",
   "note": "UIKit internals, the app delegate and the window; HarmonyOS uses UIAbility and WindowStage"
+ },
+ "CYLTabBarController -initWithViewControllers:tabBarItemsAttributes:": {
+  "status": "partial",
+  "harmonyos": "CYLTabBarController({ items, pageBuilder })",
+  "note": "pages from pageBuilder(index), kept when another tab is selected"
  },
  "CYLTabBarController -rootWindow": {
   "status": "n/a",
@@ -391,13 +430,47 @@
   "status": "n/a",
   "note": "the iPhone Duo vertical bar of iOS 27.1"
  },
+ "CYLTabBarController tabBarItemsAttributes": {
+  "status": "partial",
+  "harmonyos": "CYLTabBarController.items",
+  "note": "title, image, selected image, identifier, accessibility label and badge"
+ },
  "CYLTabBarController(CYLOpaqueTabBarSafeArea) cyl_fixesOpaqueTabBarSafeAreaInsets": {
   "status": "n/a",
   "note": "a workaround for a UIKit safe-area bug of opaque tab bars"
  },
+ "CYLTabBarController(CYLSelectedIndexIgnoringPlusButton) cyl_selectedIndexIgnoringPlusButton": {
+  "status": "done",
+  "harmonyos": "CYLTabBarController.selectedIndex",
+  "note": "counts the tabs only; the plus button is not a tab"
+ },
  "CYLTabBarController(CYLTabBarControllerDeprecated) -hideTabBadgeBackgroundSeparator": {
   "status": "n/a",
   "note": "UIKit internals, the app delegate and the window; HarmonyOS uses UIAbility and WindowStage"
+ },
+ "CYLTabBarHostView selectedIndex": {
+  "status": "done",
+  "harmonyos": "CYLTabBarController.selectedIndex (@Link)"
+ },
+ "CYLTabBarItemAccessibilityLabel": {
+  "status": "done",
+  "harmonyos": "CYLTabBarItem.accessibilityLabel"
+ },
+ "CYLTabBarItemIdentifier": {
+  "status": "done",
+  "harmonyos": "CYLTabBarItem.identifier (UI test id CYLTabBarItem_<identifier>)"
+ },
+ "CYLTabBarItemImage": {
+  "status": "done",
+  "harmonyos": "CYLTabBarItem.image"
+ },
+ "CYLTabBarItemSelectedImage": {
+  "status": "done",
+  "harmonyos": "CYLTabBarItem.selectedImage"
+ },
+ "CYLTabBarItemTitle": {
+  "status": "done",
+  "harmonyos": "CYLTabBarItem.title (ResourceStr, localized)"
  },
  "CYLTabBarItemUpdateRow": {
   "status": "n/a",
@@ -971,6 +1044,11 @@
   "status": "n/a",
   "note": "CYLUtils: UIKit helpers (frames, images, runtime) with no ArkUI counterpart"
  },
+ "UIView(CYLBadgeExtention) -cyl_showBadgeValue:": {
+  "status": "partial",
+  "harmonyos": "CYLTabBarItem.badgeValue",
+  "note": "tab items only; the screen reader reads it with the tab"
+ },
  "UIView(CYLHitTestOutsideBounds)": {
   "status": "n/a",
   "note": "CYLUtils: UIKit helpers (frames, images, runtime) with no ArkUI counterpart"
@@ -1342,6 +1420,16 @@
  "UIViewController(CYLSettingsSection) -cyl_titleForSettingsGroup:": {
   "status": "n/a",
   "note": "the iOS demo settings list, not library behavior"
+ },
+ "UIViewController(CYLTabBarControllerExtention) -cyl_clearBadge": {
+  "status": "partial",
+  "harmonyos": "CYLTabBarItem.badgeValue = undefined",
+  "note": "set on the page's tab item"
+ },
+ "UIViewController(CYLTabBarControllerExtention) -cyl_showBadge": {
+  "status": "partial",
+  "harmonyos": "CYLTabBarItem.badgeValue = ''",
+  "note": "set on the page's tab item"
  },
  "UIViewController(CYLTabBarControllerExtention) cyl_tabBarItem": {
   "status": "n/a",

@@ -1,0 +1,32 @@
+{
+  "string": [
+    {
+      "name": "cyl_badge_new_content",
+      "value": "有新內容"
+    },
+    {
+      "name": "cyl_badge_new_messages",
+      "value": "%s 則新訊息"
+    },
+    {
+      "name": "cyl_plus_button",
+      "value": "加號按鈕"
+    },
+    {
+      "name": "cyl_list_separator",
+      "value": "、"
+    },
+    {
+      "name": "cyl_badge_text_NEW",
+      "value": "新"
+    },
+    {
+      "name": "cyl_badge_text_New",
+      "value": "新"
+    },
+    {
+      "name": "cyl_badge_text_new",
+      "value": "新"
+    }
+  ]
+}

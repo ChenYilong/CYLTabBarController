@@ -1,0 +1,32 @@
+{
+  "string": [
+    {
+      "name": "cyl_badge_new_content",
+      "value": "محتوى جديد"
+    },
+    {
+      "name": "cyl_badge_new_messages",
+      "value": "رسائل جديدة: %s"
+    },
+    {
+      "name": "cyl_plus_button",
+      "value": "زر الإضافة"
+    },
+    {
+      "name": "cyl_list_separator",
+      "value": "، "
+    },
+    {
+      "name": "cyl_badge_text_NEW",
+      "value": "جديد"
+    },
+    {
+      "name": "cyl_badge_text_New",
+      "value": "جديد"
+    },
+    {
+      "name": "cyl_badge_text_new",
+      "value": "جديد"
+    }
+  ]
+}

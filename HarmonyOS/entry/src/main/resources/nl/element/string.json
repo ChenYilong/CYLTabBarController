@@ -1,0 +1,28 @@
+{
+  "string": [
+    {
+      "name": "cyl_demo_home",
+      "value": "Home"
+    },
+    {
+      "name": "cyl_demo_nearby",
+      "value": "In de buurt"
+    },
+    {
+      "name": "cyl_demo_messages",
+      "value": "Berichten"
+    },
+    {
+      "name": "cyl_demo_me",
+      "value": "Ik"
+    },
+    {
+      "name": "cyl_demo_post",
+      "value": "Plaatsen"
+    },
+    {
+      "name": "cyl_demo_page",
+      "value": "Pagina %s"
+    }
+  ]
+}

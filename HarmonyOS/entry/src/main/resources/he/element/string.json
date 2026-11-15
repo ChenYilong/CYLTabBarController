@@ -1,0 +1,28 @@
+{
+  "string": [
+    {
+      "name": "cyl_demo_home",
+      "value": "בית"
+    },
+    {
+      "name": "cyl_demo_nearby",
+      "value": "בקרבת מקום"
+    },
+    {
+      "name": "cyl_demo_messages",
+      "value": "הודעות"
+    },
+    {
+      "name": "cyl_demo_me",
+      "value": "אני"
+    },
+    {
+      "name": "cyl_demo_post",
+      "value": "פרסום"
+    },
+    {
+      "name": "cyl_demo_page",
+      "value": "עמוד %s"
+    }
+  ]
+}

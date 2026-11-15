@@ -1,0 +1,32 @@
+{
+  "string": [
+    {
+      "name": "cyl_badge_new_content",
+      "value": "Νέο περιεχόμενο"
+    },
+    {
+      "name": "cyl_badge_new_messages",
+      "value": "%s νέα μηνύματα"
+    },
+    {
+      "name": "cyl_plus_button",
+      "value": "Κουμπί συν"
+    },
+    {
+      "name": "cyl_list_separator",
+      "value": ", "
+    },
+    {
+      "name": "cyl_badge_text_NEW",
+      "value": "ΝΕΟ"
+    },
+    {
+      "name": "cyl_badge_text_New",
+      "value": "Νέο"
+    },
+    {
+      "name": "cyl_badge_text_new",
+      "value": "νέο"
+    }
+  ]
+}

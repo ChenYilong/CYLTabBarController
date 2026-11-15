@@ -1,0 +1,32 @@
+{
+  "string": [
+    {
+      "name": "cyl_badge_new_content",
+      "value": "Új tartalom"
+    },
+    {
+      "name": "cyl_badge_new_messages",
+      "value": "%s új üzenet"
+    },
+    {
+      "name": "cyl_plus_button",
+      "value": "Plusz gomb"
+    },
+    {
+      "name": "cyl_list_separator",
+      "value": ", "
+    },
+    {
+      "name": "cyl_badge_text_NEW",
+      "value": "ÚJ"
+    },
+    {
+      "name": "cyl_badge_text_New",
+      "value": "Új"
+    },
+    {
+      "name": "cyl_badge_text_new",
+      "value": "új"
+    }
+  ]
+}

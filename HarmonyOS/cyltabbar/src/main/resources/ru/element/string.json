@@ -1,0 +1,32 @@
+{
+  "string": [
+    {
+      "name": "cyl_badge_new_content",
+      "value": "Новое содержимое"
+    },
+    {
+      "name": "cyl_badge_new_messages",
+      "value": "Новых сообщений: %s"
+    },
+    {
+      "name": "cyl_plus_button",
+      "value": "Кнопка «плюс»"
+    },
+    {
+      "name": "cyl_list_separator",
+      "value": ", "
+    },
+    {
+      "name": "cyl_badge_text_NEW",
+      "value": "НОВОЕ"
+    },
+    {
+      "name": "cyl_badge_text_New",
+      "value": "Новое"
+    },
+    {
+      "name": "cyl_badge_text_new",
+      "value": "новое"
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "apiType": "stageMode",
+  "buildOption": {},
+  "targets": [
+    { "name": "default" },
+    { "name": "ohosTest" }
+  ]
+}

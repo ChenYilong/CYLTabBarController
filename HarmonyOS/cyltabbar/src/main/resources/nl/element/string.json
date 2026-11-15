@@ -1,0 +1,32 @@
+{
+  "string": [
+    {
+      "name": "cyl_badge_new_content",
+      "value": "Nieuwe inhoud"
+    },
+    {
+      "name": "cyl_badge_new_messages",
+      "value": "%s nieuwe berichten"
+    },
+    {
+      "name": "cyl_plus_button",
+      "value": "Plusknop"
+    },
+    {
+      "name": "cyl_list_separator",
+      "value": ", "
+    },
+    {
+      "name": "cyl_badge_text_NEW",
+      "value": "NIEUW"
+    },
+    {
+      "name": "cyl_badge_text_New",
+      "value": "Nieuw"
+    },
+    {
+      "name": "cyl_badge_text_new",
+      "value": "nieuw"
+    }
+  ]
+}
