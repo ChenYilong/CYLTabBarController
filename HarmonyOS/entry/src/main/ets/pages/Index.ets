@@ -13,6 +13,13 @@ function cylDemoItems(): CYLTabBarItem[] {
   messages.badgeValue = '3';
   const me = new CYLTabBarItem('me', $r('app.string.cyl_demo_me'), $r('sys.symbol.person'));
   me.badgeValue = '';
+  // [EN] FIX: issue #415: SVGA tab icons (resources/rawfile/svga, copied from Example-SwiftUI-Rive by scripts/sync-svga.py);
+  //      the symbols show if a file cannot load. [CN] SVGA Tab 图标（resources/rawfile/svga，由 scripts/sync-svga.py 从
+  //      Example-SwiftUI-Rive 复制）；文件无法加载时显示符号图标。
+  home.svgaFilePath = 'svga/tab_home.svga';
+  nearby.svgaFilePath = 'svga/tab_search.svga';
+  messages.svgaFilePath = 'svga/tab_chat.svga';
+  me.svgaFilePath = 'svga/tab_profile.svga';
   return [home, nearby, messages, me];
 }
 

@@ -24,6 +24,23 @@ export class CYLTabBarItem {
    * [CN] 屏幕阅读器代替标题朗读的内容，对应 iOS 的 `CYLTabBarItemAccessibilityLabel`。
    */
   accessibilityLabel?: ResourceStr;
+  /**
+   * [EN] FIX: issue #415. An SVGA 2.x icon in the app's rawfile folder ("svga/tab_home.svga"), iOS `CYLTabBarSVGAFilePath`:
+   *      it plays once when the tab is selected and shows its first frame otherwise. `image` shows if it cannot load.
+   * [CN] FIX: issue #415。App rawfile 目录中的 SVGA 2.x 图标（"svga/tab_home.svga"），对应 iOS `CYLTabBarSVGAFilePath`：Tab 选中时
+   *      播放一次，否则显示第一帧。无法加载时显示 `image`。
+   */
+  svgaFilePath?: string;
+  /**
+   * [EN] An SVGA icon at an http(s) URL, iOS `CYLTabBarSVGAURL` (ohos.permission.INTERNET, declared by this module); wins over
+   *      `svgaFilePath`.
+   * [CN] http(s) 地址上的 SVGA 图标，对应 iOS `CYLTabBarSVGAURL`（ohos.permission.INTERNET，由本模块声明）；优先于 `svgaFilePath`。
+   */
+  svgaURL?: string;
+  /**
+   * [EN] The side of the SVGA icon in vp, iOS `CYLTabBarSVGASize`. [CN] SVGA 图标的边长（vp），对应 iOS `CYLTabBarSVGASize`。
+   */
+  svgaSize: number = 26;
 
   constructor(identifier: string, title: ResourceStr, image?: ResourceStr, selectedImage?: ResourceStr) {
     this.identifier = identifier;

@@ -1,4 +1,5 @@
 import { CYLPlusButton, CYLTabBarAppearance, CYLTabBarItem } from './CYLTabBarItem';
+import { CYLSVGAView } from '../svga/CYLSVGAView';
 import {
   cylBadgeAccessibilityDescription, cylJoinAccessibilityParts, cylPlusButtonDefaultAccessibilityLabel, cylResolveText
 } from './CYLTabBarAccessibility';
@@ -34,6 +35,17 @@ export struct CYLTabBar {
   };
   onPlusButtonTap: () => void = () => {
   };
+  /**
+   * [EN] The identifiers of the tabs whose SVGA icon failed to load: they show their image. [CN] SVGA 图标加载失败的 Tab 标识：它们显示图片。
+   */
+  @State private svgaFailures: string[] = [];
+
+  private svgaPath(item: CYLTabBarItem): string | undefined {
+    if (this.svgaFailures.includes(item.identifier)) {
+      return undefined;
+    }
+    return item.svgaURL ?? item.svgaFilePath;
+  }
 
   private slots(): CYLTabBarSlot[] {
     const slots: CYLTabBarSlot[] = this.items.map((item: CYLTabBarItem, index: number) => {
@@ -94,7 +106,16 @@ export struct CYLTabBar {
   tabButton(item: CYLTabBarItem, index: number) {
     Column({ space: 2 }) {
       Stack({ alignContent: Alignment.TopEnd }) {
-        if (item.image !== undefined) {
+        if (this.svgaPath(item) !== undefined) {
+          CYLSVGAView({
+            path: this.svgaPath(item),
+            selected: index === this.selectedIndex,
+            iconSize: item.svgaSize,
+            onLoadError: (_message: string) => {
+              this.svgaFailures = this.svgaFailures.concat([item.identifier]);
+            }
+          })
+        } else if (item.image !== undefined) {
           Image(index === this.selectedIndex ? (item.selectedImage ?? item.image) : item.image)
             .width(24)
             .height(24)
@@ -106,7 +127,7 @@ export struct CYLTabBar {
         }
       }
       .width(36)
-      .height(26)
+      .height(Math.max(26, item.svgaSize))
 
       Text(item.title)
         .fontSize(10)
