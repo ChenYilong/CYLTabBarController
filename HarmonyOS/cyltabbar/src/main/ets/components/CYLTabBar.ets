@@ -115,6 +115,11 @@ export struct CYLTabBar {
               this.svgaFailures = this.svgaFailures.concat([item.identifier]);
             }
           })
+        } else if (item.symbol !== undefined) {
+          SymbolGlyph(index === this.selectedIndex ? (item.selectedSymbol ?? item.symbol) : item.symbol)
+            .fontSize(24)
+            .fontColor([index === this.selectedIndex ? this.appearance.tintColor : this.appearance.unselectedItemTintColor])
+            .accessibilityLevel('no')
         } else if (item.image !== undefined) {
           Image(index === this.selectedIndex ? (item.selectedImage ?? item.image) : item.image)
             .width(24)
@@ -151,7 +156,12 @@ export struct CYLTabBar {
   @Builder
   plusButtonView(plus: CYLPlusButton) {
     Column({ space: 2 }) {
-      if (plus.image !== undefined) {
+      if (plus.symbol !== undefined) {
+        SymbolGlyph(plus.symbol)
+          .fontSize(40)
+          .fontColor([this.appearance.plusButtonColor])
+          .accessibilityLevel('no')
+      } else if (plus.image !== undefined) {
         Image(plus.image)
           .width(44)
           .height(44)
