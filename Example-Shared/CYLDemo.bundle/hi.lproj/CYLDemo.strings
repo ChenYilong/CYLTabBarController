@@ -115,3 +115,7 @@
 "Speed" = "गति";
 "Loop" = "लूप";
 "%@ times" = "%@ गुना";
+/* [EN] Example-Rive, the tab icon source (issue #415). [CN] Example-Rive 的 Tab 图标来源（issue #415）。 */
+"Tab 图标来源：%@" = "टैब आइकन का स्रोत: %@";
+"SVGA（初始化 Key）" = "SVGA (प्रारंभिक कुंजियाँ)";
+"SVGA（配置文件）" = "SVGA (कॉन्फ़िगरेशन फ़ाइल)";

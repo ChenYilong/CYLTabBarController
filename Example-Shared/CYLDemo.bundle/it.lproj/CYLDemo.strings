@@ -115,3 +115,7 @@
 "Speed" = "Velocità";
 "Loop" = "Ripeti";
 "%@ times" = "%@ volte";
+/* [EN] Example-Rive, the tab icon source (issue #415). [CN] Example-Rive 的 Tab 图标来源（issue #415）。 */
+"Tab 图标来源：%@" = "Origine delle icone delle schede: %@";
+"SVGA（初始化 Key）" = "SVGA (chiavi di inizializzazione)";
+"SVGA（配置文件）" = "SVGA (file di configurazione)";

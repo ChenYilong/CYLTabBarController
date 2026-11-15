@@ -115,3 +115,7 @@
 "Speed" = "速度";
 "Loop" = "ループ";
 "%@ times" = "%@倍";
+/* [EN] Example-Rive, the tab icon source (issue #415). [CN] Example-Rive 的 Tab 图标来源（issue #415）。 */
+"Tab 图标来源：%@" = "タブアイコンの取得元: %@";
+"SVGA（初始化 Key）" = "SVGA（初期化キー）";
+"SVGA（配置文件）" = "SVGA（設定ファイル）";

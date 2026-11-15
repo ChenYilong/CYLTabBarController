@@ -20,7 +20,7 @@ import CYLTabBarController
  */
 final class SVGATabIconDemoView: UIView {
 
-    private static let animationSize = CGSize(width: 72, height: 72)
+    private static let animationSize = CGSize(width: 64, height: 64)
     private var animationViews: [UIView] = []
     private var isOn = false
     /// [EN] The Bell tab's Rive URL while its icon is the SVGA file, put back on the next tap. [CN] Bell Tab 图标为 SVGA 文件时保存的 Rive URL，再次点击时恢复。
@@ -28,7 +28,8 @@ final class SVGATabIconDemoView: UIView {
 
     override init(frame: CGRect) {
         super.init(frame: frame)
-        let containers = ["heartbeat", "Rocket"].map { name -> UIView in
+        // [EN] HamburgerArrow is the SVGA twin of the Rive menu button above. [CN] HamburgerArrow 是上方 Rive 菜单按钮的 SVGA 对应版本。
+        let containers = ["HamburgerArrow", "heartbeat", "Rocket"].map { name -> UIView in
             // [EN] Starts at its final size, as in the Rive demo (the animation view follows it through autoresizing).
             // [CN] 与 Rive 演示相同，初始即为最终大小（动画视图通过 autoresizing 跟随它）。
             let container = UIView(frame: CGRect(origin: .zero, size: Self.animationSize))
@@ -51,7 +52,7 @@ final class SVGATabIconDemoView: UIView {
         }
         let icons = UIStackView(arrangedSubviews: containers)
         icons.axis = .horizontal
-        icons.spacing = 32
+        icons.spacing = 24
 
         let button = UIButton(type: .system)
         button.setTitle(cylDemoLocalizedString("播放 / 停止"), for: .normal)
@@ -69,7 +70,19 @@ final class SVGATabIconDemoView: UIView {
         tabIconButton.accessibilityIdentifier = "SVGATabIconSwitch"
         tabIconButton.addTarget(self, action: #selector(toggleTabIcon), for: .touchUpInside)
 
-        let stack = UIStackView(arrangedSubviews: [icons, button, tabIconButton])
+        // [EN] Issue #415: every tab icon from Rive, from the SVGA initialization keys or from an SVGA configuration file
+        //      (SVGATabIcons.swift); rebuilds the tab bar.
+        // [CN] Issue #415：所有 Tab 图标来自 Rive、SVGA 初始化 key 或 SVGA 配置文件（SVGATabIcons.swift）；切换时重建 TabBar。
+        let sourceButton = UIButton(type: .system)
+        sourceButton.setTitle(CYLDemoTabIconSource.switchTitle, for: .normal)
+        sourceButton.titleLabel?.font = .preferredFont(forTextStyle: .headline)
+        sourceButton.titleLabel?.adjustsFontForContentSizeCategory = true
+        sourceButton.titleLabel?.numberOfLines = 0
+        sourceButton.titleLabel?.textAlignment = .center
+        sourceButton.accessibilityIdentifier = "SVGATabIconSourceSwitch"
+        sourceButton.addTarget(self, action: #selector(switchTabIconSource), for: .touchUpInside)
+
+        let stack = UIStackView(arrangedSubviews: [icons, button, tabIconButton, sourceButton])
         stack.translatesAutoresizingMaskIntoConstraints = false
         stack.axis = .vertical
         stack.alignment = .center
@@ -85,6 +98,11 @@ final class SVGATabIconDemoView: UIView {
     @available(*, unavailable)
     required init?(coder _: NSCoder) {
         fatalError("init(coder:) is not supported")
+    }
+
+    @objc private func switchTabIconSource() {
+        CYLDemoTabIconSource.current = CYLDemoTabIconSource.current.next
+        CYLDemoTabBarStyle.rebuildRootViewController?()
     }
 
     @objc private func toggle() {

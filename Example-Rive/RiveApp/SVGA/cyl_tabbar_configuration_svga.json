@@ -1,0 +1,49 @@
+{
+  "CYLTabBarControllerContext": "CYLSVGAConfigurationDemo",
+  "CYLTabBarControllerTabBarItemsAttributes": [
+    {
+      "CYLTabBarItemTitle": "Chat",
+      "CYLTabBarItemImage": "system:message",
+      "CYLTabBarItemSelectedImage": "system:message",
+      "CYLTabBarItemIdentifier": "chat",
+      "CYLTabBarItemPageIdentifier": "svga-chat",
+      "CYLTabBarSVGAFilePath": "TwitterHeart.svga",
+      "CYLTabBarSVGASize": "{32, 32}"
+    },
+    {
+      "CYLTabBarItemTitle": "Search",
+      "CYLTabBarItemImage": "system:magnifyingglass",
+      "CYLTabBarItemSelectedImage": "system:magnifyingglass",
+      "CYLTabBarItemIdentifier": "search",
+      "CYLTabBarItemPageIdentifier": "svga-search",
+      "CYLTabBarSVGAFilePath": "PinJump.svga",
+      "CYLTabBarSVGASize": "{32, 32}"
+    },
+    {
+      "CYLTabBarItemTitle": "Bell",
+      "CYLTabBarItemImage": "system:bell",
+      "CYLTabBarItemSelectedImage": "system:bell",
+      "CYLTabBarItemIdentifier": "bell",
+      "CYLTabBarItemPageIdentifier": "svga-bell",
+      "CYLTabBarSVGAFilePath": "alarm.svga",
+      "CYLTabBarSVGASize": "{32, 32}"
+    },
+    {
+      "CYLTabBarItemTitle": "User",
+      "CYLTabBarItemImage": "system:person",
+      "CYLTabBarItemSelectedImage": "system:person",
+      "CYLTabBarItemIdentifier": "user",
+      "CYLTabBarItemPageIdentifier": "svga-user",
+      "CYLTabBarSVGAFilePath": "heartbeat.svga",
+      "CYLTabBarSVGASize": "{32, 32}"
+    }
+  ],
+  "CYLTabBarControllerPlusButton": {
+    "CYLTabBarItemTitle": "Start",
+    "CYLTabBarItemImage": "system:plus.circle.fill",
+    "CYLTabBarItemIdentifier": "plus",
+    "CYLTabBarItemPageIdentifier": "svga-start",
+    "CYLPlusButtonIndexInTabBar": 2,
+    "CYLPlusButtonImageSize": "{44, 44}"
+  }
+}

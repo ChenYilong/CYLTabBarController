@@ -50,6 +50,12 @@
 		F2EA4C27D59FFEFFD097501A /* confetti.riv in Resources */ = {isa = PBXBuildFile; fileRef = C78A77277F5BF044CE896CCF /* confetti.riv */; };
 		F432E9BCEE4F345D5C02A425 /* shapes.riv in Resources */ = {isa = PBXBuildFile; fileRef = 8EEB743298095836BF9377D6 /* shapes.riv */; };
 		F6B77B5916BCCA956213941A /* Course.swift in Sources */ = {isa = PBXBuildFile; fileRef = 699EFCFF1B05220558FC4D31 /* Course.swift */; };
+		7EE90F0CF099741C625B69FA /* alarm.svga in Resources */ = {isa = PBXBuildFile; fileRef = CC85256786FCAD9604575290 /* alarm.svga */; };
+		0986309E1B479B4CD2B8E6AE /* TwitterHeart.svga in Resources */ = {isa = PBXBuildFile; fileRef = 383B8EF253785738125A9AFD /* TwitterHeart.svga */; };
+		275FFB48F62878FE218A71E0 /* PinJump.svga in Resources */ = {isa = PBXBuildFile; fileRef = E0A3CDDBF8DC3697610606B5 /* PinJump.svga */; };
+		3F828B277AF61828EB67FFA4 /* HamburgerArrow.svga in Resources */ = {isa = PBXBuildFile; fileRef = 393E61969AA8F3BD62B45DB6 /* HamburgerArrow.svga */; };
+		7B9D3A1982299A1C30A8AFC8 /* cyl_tabbar_configuration_svga.json in Resources */ = {isa = PBXBuildFile; fileRef = 978169DC051CE462E5BA871D /* cyl_tabbar_configuration_svga.json */; };
+		C9F57F8F75CEF11CA290FA5E /* SVGATabIcons.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2CA8A7CB0D29489FB6E0420 /* SVGATabIcons.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -100,6 +106,12 @@
 		E8DF93C34F3E7B872BF47F0F /* check.riv */ = {isa = PBXFileReference; includeInIndex = 1; path = check.riv; sourceTree = "<group>"; };
 		ECDB16DD646E7F3ACB02BBD5 /* CYLDemoLocalization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CYLDemoLocalization.swift; path = "../Example-Shared/CYLDemoLocalization.swift"; sourceTree = SOURCE_ROOT; };
 		FF928D71D024B7F90696E769 /* Assets.xcassets */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		CC85256786FCAD9604575290 /* alarm.svga */ = {isa = PBXFileReference; includeInIndex = 1; name = alarm.svga; path = "SVGA/alarm.svga"; sourceTree = "<group>"; };
+		383B8EF253785738125A9AFD /* TwitterHeart.svga */ = {isa = PBXFileReference; includeInIndex = 1; name = TwitterHeart.svga; path = "SVGA/TwitterHeart.svga"; sourceTree = "<group>"; };
+		E0A3CDDBF8DC3697610606B5 /* PinJump.svga */ = {isa = PBXFileReference; includeInIndex = 1; name = PinJump.svga; path = "SVGA/PinJump.svga"; sourceTree = "<group>"; };
+		393E61969AA8F3BD62B45DB6 /* HamburgerArrow.svga */ = {isa = PBXFileReference; includeInIndex = 1; name = HamburgerArrow.svga; path = "SVGA/HamburgerArrow.svga"; sourceTree = "<group>"; };
+		978169DC051CE462E5BA871D /* cyl_tabbar_configuration_svga.json */ = {isa = PBXFileReference; includeInIndex = 1; name = "cyl_tabbar_configuration_svga.json"; path = "SVGA/cyl_tabbar_configuration_svga.json"; sourceTree = "<group>"; };
+		F2CA8A7CB0D29489FB6E0420 /* SVGATabIcons.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SVGATabIcons.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -237,6 +249,12 @@
 				2A1A22910B89D5219F01A0D4 /* SVGATabIconDemoView.swift */,
 				0EB2E0AF97F87F8846E6C211 /* heartbeat.svga */,
 				2F6E2E7F0E846E62A03D4491 /* Rocket.svga */,
+				CC85256786FCAD9604575290 /* alarm.svga */,
+				383B8EF253785738125A9AFD /* TwitterHeart.svga */,
+				E0A3CDDBF8DC3697610606B5 /* PinJump.svga */,
+				393E61969AA8F3BD62B45DB6 /* HamburgerArrow.svga */,
+				978169DC051CE462E5BA871D /* cyl_tabbar_configuration_svga.json */,
+				F2CA8A7CB0D29489FB6E0420 /* SVGATabIcons.swift */,
 			);
 			name = RiveApp;
 			path = RiveApp;
@@ -362,6 +380,11 @@
 				F432E9BCEE4F345D5C02A425 /* shapes.riv in Resources */,
 				7E34E63FA0714A3431376B0B /* heartbeat.svga in Resources */,
 				53EDE8FBAB9F2924ABDDBCE4 /* Rocket.svga in Resources */,
+				7EE90F0CF099741C625B69FA /* alarm.svga in Resources */,
+				0986309E1B479B4CD2B8E6AE /* TwitterHeart.svga in Resources */,
+				275FFB48F62878FE218A71E0 /* PinJump.svga in Resources */,
+				3F828B277AF61828EB67FFA4 /* HamburgerArrow.svga in Resources */,
+				7B9D3A1982299A1C30A8AFC8 /* cyl_tabbar_configuration_svga.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -468,6 +491,7 @@
 				8270F4983C7222D1B11969F9 /* CYLDemoTabBarStyle.swift in Sources */,
 				A1C0FFEE5A1D0F00D0000003 /* CYLPlusButtonBadgeDemo.swift in Sources */,
 				6F041C42C20CAC318EA621F8 /* SVGATabIconDemoView.swift in Sources */,
+				C9F57F8F75CEF11CA290FA5E /* SVGATabIcons.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
