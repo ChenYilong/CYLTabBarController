@@ -210,6 +210,12 @@ jobs:
     needs: changes
     runs-on: ${{ vars.MACOS_RUNNER || 'macos-26' }}
     timeout-minutes: 60
+    # [EN] The SwiftPM demos still run, but may fail: SwiftPM cannot build the library while its core is part Swift, part
+    #      Objective-C (one target cannot mix them, and two targets would import each other). The maintainer accepted
+    #      SwiftPM being red until the core is all Swift (docs/Swift-Migration.md); remove `spm` then.
+    # [CN] SwiftPM Demo 仍会运行，但允许失败：核心层同时包含 Swift 与 Objective-C 时 SwiftPM 无法构建本库（一个 target 不能混用，两个
+    #      target 会互相导入）。维护者已接受核心全部迁移到 Swift 之前 SwiftPM 为红色（docs/Swift-Migration.md）；届时删除 `spm`。
+    continue-on-error: ${{ matrix.spm == true }}
     strategy:
       fail-fast: false
       matrix:
@@ -225,6 +231,13 @@ jobs:
           - Example-network-download
           - Example-Swift-Gallery
           - Example-GIF
+        include:
+          - demo: Example-Swift-SwiftManager
+            spm: true
+          - demo: Example-Swift-SwiftManager-FlatDesign
+            spm: true
+          - demo: Example-Swift-Gallery
+            spm: true
     steps:
       - uses: actions/checkout@v4
       - name: CocoaPods

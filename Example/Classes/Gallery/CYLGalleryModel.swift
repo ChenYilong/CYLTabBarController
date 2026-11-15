@@ -267,7 +267,7 @@ final class CYLGalleryHighlightAnimation: NSObject, CYLTabButtonAnimation {
  * [EN] Press animation plus a full turn on reselect (the newer protocol hooks). [CN] 按下动画，加上重复点击时旋转一周（新增的协议方法）。
  */
 final class CYLGalleryPressAndReselectAnimation: CYLTabButtonPressAnimation {
-    override func cylPlayReselectAnimation(withTabButton _: UIControl, iconView: UIView, titleLabel _: UILabel?) {
+    @objc func cylPlayReselectAnimation(withTabButton _: UIControl, iconView: UIView, titleLabel _: UILabel?) {
         CYLGallery.playKeyframes(on: iconView, keyPath: "transform.rotation.z", values: [0, Double.pi, 2 * Double.pi], duration: 0.5)
     }
 }

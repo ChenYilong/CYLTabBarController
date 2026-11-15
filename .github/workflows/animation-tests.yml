@@ -8,7 +8,7 @@ on:
     paths:
       - "CYLTabBarController/CYLTabBarItemAnimation/**"
       - "CYLTabBarController/CYLTabBarItemAnimationService.h"
-      - "CYLTabBarController/UIControl+CYLTabBarItemAnimation.m"
+      - "CYLTabBarController/Swift/UIControl+CYLTabBarItemAnimation.swift"
       - "CYLTabBarController/CYLTabBarController.m"
       - "CYLTabBarController/CYLConstants.m"
       - "Tests/CYLTabBarItemAnimation/**"
@@ -18,7 +18,7 @@ on:
     paths:
       - "CYLTabBarController/CYLTabBarItemAnimation/**"
       - "CYLTabBarController/CYLTabBarItemAnimationService.h"
-      - "CYLTabBarController/UIControl+CYLTabBarItemAnimation.m"
+      - "CYLTabBarController/Swift/UIControl+CYLTabBarItemAnimation.swift"
       - "CYLTabBarController/CYLTabBarController.m"
       - "CYLTabBarController/CYLConstants.m"
       - "Tests/CYLTabBarItemAnimation/**"

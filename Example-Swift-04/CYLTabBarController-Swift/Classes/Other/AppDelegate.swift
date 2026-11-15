@@ -44,7 +44,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // [EN] Only with Lottie: in a build without it the Lottie keys warn (`CYL_LOTTIE_REQUIRED`) and would be ignored.
         // [CN] 仅在引入 Lottie 时：没有 Lottie 的构建中 Lottie key 会给出警告（`CYL_LOTTIE_REQUIRED`），且不起作用。
         #if canImport(Lottie)
-        let lottieTabBarItemsAttributes = CYLTabBarItemsAttributesAddingLottieFiles(tabBarItemsAttributes, ["green_lottie_tab_home", "green_lottie_tab_discover", "green_lottie_tab_news", "green_lottie_tab_mine"], nil)
+        let lottieTabBarItemsAttributes = CYLTabBarItemsAttributesAddingLottieFiles(tabBarItemsAttributes, ["green_lottie_tab_home", "green_lottie_tab_discover", "green_lottie_tab_news", "green_lottie_tab_mine"], nil) as? [[AnyHashable: Any]] ?? []
         #else
         let lottieTabBarItemsAttributes = tabBarItemsAttributes
         #endif

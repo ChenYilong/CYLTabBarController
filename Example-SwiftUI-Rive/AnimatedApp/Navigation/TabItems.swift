@@ -64,7 +64,7 @@ enum Tab: String, CaseIterable {
             .riveArtboard: rive.artboard,
             .riveStateMachine: rive.stateMachine,
             .riveInput: "active",
-        ]) else {
+        ] as [CYLTabBarAnimationOption: String]) else {
             return [:]
         }
         return [CYLTabBarRiveURL: url, CYLTabBarRiveSize: NSValue(cgSize: CGSize(width: 32, height: 32))]

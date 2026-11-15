@@ -48,7 +48,7 @@
 ```sh
 # PAG (.pag files are downloaded by pod install / 动画文件由 pod install 下载)
 cd Example-PAG && pod install && open HealthyHome.xcworkspace
-# Rive
+# Rive, then SVGA (issue #415) on the Bell tab / Bell Tab 中 Rive 之后是 SVGA
 cd Example-Rive && pod install && open RiveApp.xcworkspace
 # Lottie 4.x
 cd Example-Swift && pod install && open *.xcworkspace
@@ -62,6 +62,7 @@ cd Example-Swift && pod install && open *.xcworkspace
 | PAG | [Example-PAG](../Example-PAG) | `PAG` | [TabBarCommon.swift](../Example-Swift-03/HealthyHome/Tool/TabBarCommon.swift) (`#if CYL_DEMO_PAG`) |
 | Rive（UIKit） | [Example-Rive](../Example-Rive) | `Rive` | [TabItems.swift](../Example-SwiftUI-Rive/AnimatedApp/Navigation/TabItems.swift) |
 | Rive（SwiftUI） | [Example-SwiftUI-Rive](../Example-SwiftUI-Rive) | `Rive` | 同上 / The same file |
+| SVGA（#415） | [Example-Rive](../Example-Rive)（Bell Tab，Rive 演示之后 / Bell tab, after the Rive demo） | `SVGA` | [SVGATabIconDemoView.swift](../Example-Rive/RiveApp/SVGATabIconDemoView.swift) |
 | GIF | [Example-GIF](../Example-GIF) | `GIF` | [AppDelegate.swift](../Example-GIF/GIFApp/Classes/Other/AppDelegate.swift) |
 | PAG、Rive（React Native） | [react-native-cyltabbar](../CrossPlatform/react-native-cyltabbar) `example-pag`、`example-rive` | `PAG` / `Rive` 子库 + `CYLTabBarHostView` / subspec + `CYLTabBarHostView` | [example-rive/src/App.tsx](../CrossPlatform/react-native-cyltabbar/example-rive/src/App.tsx) |
 | PAG、Rive（Flutter） | [flutter_cyltabbar](../CrossPlatform/flutter_cyltabbar) `example_pag`、`example_rive` | 同上 / The same | [example_rive/lib/main.dart](../CrossPlatform/flutter_cyltabbar/example_rive/lib/main.dart) |
@@ -76,6 +77,7 @@ cd Example-Swift && pod install && open *.xcworkspace
 | Lottie 2.5 | `CYLTabBarController/Lottie` | `.json` | 12.0 | - | 同上 / The same |
 | PAG | `CYLTabBarController/PAG`、`PAGEnterprise` | `.pag` | 12.0 | 只有 CocoaPods / CocoaPods only | [PAG](https://pag.io)（AE 导出 / exported from After Effects） |
 | Rive | `CYLTabBarController/Rive` | `.riv` | 14.0 | 只有 CocoaPods / CocoaPods only | [Rive](https://rive.app) |
+| SVGA（#415） | `CYLTabBarController/SVGA` | `.svga` | 12.0 | 只有 CocoaPods；Protobuf 固定在 3.21 / CocoaPods only; Protobuf pinned to 3.21 | [SVGA](https://svga.dev)，[SVGA-Animation](SVGA-Animation.md) |
 | GIF | `CYLTabBarController/GIF` | `.gif` | 12.0 | SPM、Carthage（通用 key / generic keys） | 任意 GIF，见 [GIF-Animation.md](GIF-Animation.md) / Any GIF, see [GIF-Animation.md](GIF-Animation.md) |
 
 | 中文 | English |

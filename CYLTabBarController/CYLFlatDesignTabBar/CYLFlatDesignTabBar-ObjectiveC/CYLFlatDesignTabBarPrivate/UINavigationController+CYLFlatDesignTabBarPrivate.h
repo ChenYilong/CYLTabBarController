@@ -10,6 +10,13 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+/*!
+ * [EN] The implementation is Swift (`Swift/UINavigationController+CYLFlatDesignTabBarPrivate.swift`, docs/Swift-Migration.md,
+ *      step 48); the selectors below are unchanged. The delegate's methods are called by selector, so an implementer does
+ *      not need to declare this protocol.
+ * [CN] 实现位于 Swift（`Swift/UINavigationController+CYLFlatDesignTabBarPrivate.swift`，docs/Swift-Migration.md，第 48 步）；下面的
+ *      selector 保持不变。代理方法按 selector 调用，实现方无需声明遵守本协议。
+ */
 @protocol UINavigationControllerExtensionDelegate <NSObject>
 
 @required

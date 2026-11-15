@@ -18,6 +18,10 @@ NS_ASSUME_NONNULL_BEGIN
  *      (docs/Swift-Migration.md).
  * [CN] `UIView (CYLTabBarItemAnimation)` 与服务函数在 Swift 中实现（`Swift/UIControl+CYLTabBarItemAnimation.swift`），由末尾导入的
  *      Swift 生成接口声明（docs/Swift-Migration.md）。
+ * [EN] `CYLTabBar (CYLTabBarItemAnimation)` below is implemented in Swift too (`Swift/CYLTabBar+CYLImplementation.swift`,
+ *      step 51); it stays declared here, because the generated interface does not declare internal methods.
+ * [CN] 下面的 `CYLTabBar (CYLTabBarItemAnimation)` 同样在 Swift 中实现（`Swift/CYLTabBar+CYLImplementation.swift`，第 51 步）；
+ *      声明仍保留在这里，因为生成接口不声明 internal 方法。
  */
 
 

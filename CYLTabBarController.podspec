@@ -194,6 +194,20 @@ Pod::Spec.new do |s|
     rive.ios.deployment_target = '14.0'
   end
 
+  # FIX: issue #415 — SVGA tab icons (SVGAPlayer), integrated like Rive: the keys, the animator and its playable view.
+  # SVGA Tab 图标（SVGAPlayer），接入方式与 Rive 相同：key、animator 及其可播放视图。
+  s.subspec 'SVGA' do |svga|
+    svga.dependency 'CYLTabBarController/Core'
+    svga.dependency 'CYLTabBarController/CYLTabBarItemAnimation'
+    svga.source_files = 'CYLTabBarController/CYLTabBarItemAnimation/SVGA/*.{h,m}'
+    svga.public_header_files = 'CYLTabBarController/CYLTabBarItemAnimation/SVGA/*.h'
+    svga.dependency 'SVGAPlayer', '~> 2.5'
+    # SVGAPlayer 2.5.7's generated protobuf files (pbobjc) need the runtime of Protobuf 3.21: 3.22+ removed what they call
+    # (OSAtomicCompareAndSwapPtrBarrier), so they no longer build. SVGAPlayer 2.5.7 生成的 protobuf 文件需要 Protobuf 3.21 的运行时：
+    # 3.22 起移除了其调用的 OSAtomicCompareAndSwapPtrBarrier，无法编译。
+    svga.dependency 'Protobuf', '~> 3.21.0'
+  end
+
   # FIX: issue #605 — GIF tab icons that play once when selected, like Lottie, PAG and Rive. A GIF given as an image
   # (`CYLTabBarItemImage`, `CYLTabBarItemImageURL`) loops and needs no subspec. No third-party library: ImageIO decodes it.
   # 选中时播放一次的 GIF Tab 图标，用法与 Lottie、PAG、Rive 相同。作为图片传入（`CYLTabBarItemImage`、`CYLTabBarItemImageURL`）的 GIF 循环播放，

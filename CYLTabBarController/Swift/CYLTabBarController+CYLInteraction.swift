@@ -622,8 +622,21 @@ extension CYLTabBarController {
      *      `-cyl_liquidGlassTabBarGestureRecognizerDidUpdate:`, not through the library's own long press recognizer.
      * [CN] 液态玻璃下、且 `CYLTabBar` 已拿到系统手势时为 YES：此时 Tab 按钮的触摸经由 `-cyl_liquidGlassTabBarGestureRecognizerDidUpdate:`。
      */
+    /**
+     * [EN] `tabBar` when it really is a `CYLTabBar`; nil otherwise (FlatDesign).
+     * [CN] `tabBar` 确实是 `CYLTabBar` 时返回它；否则（扁平样式）返回 nil。
+     */
+    private var cylCheckedTabBar: CYLTabBar? {
+        let systemTabBar: UITabBar = tabBar
+        return systemTabBar as? CYLTabBar
+    }
+
     func cylLiquidGlassReceivesTabTouches() -> Bool {
-        guard CYLConstants.isLiquidGlassActive(), let tabBar = tabBar as CYLTabBar? else { return false }
+        // [EN] FIX: a FlatDesign controller's `tabBar` is not a `CYLTabBar` (the Objective-C property type is not checked):
+        //      a real cast, or reading its recognizers crashed on the first touch in FlatDesign on iOS 26.
+        // [CN] FIX：扁平样式控制器的 `tabBar` 不是 `CYLTabBar`（Objective-C 属性类型不做检查）：必须做真正的类型转换，否则在 iOS 26 扁平样式下
+        //      首次触摸时读取其手势会崩溃。
+        guard CYLConstants.isLiquidGlassActive(), let tabBar = cylCheckedTabBar else { return false }
         return (tabBar.liquidGlassContinuousGestureRecognizer as UIGestureRecognizer?) != nil ||
             (tabBar.liquidGlassLongGestureRecognizer as UIGestureRecognizer?) != nil
     }
@@ -647,7 +660,7 @@ extension CYLTabBarController {
      *      范围内取水平方向中心最近的按钮。跳过占位按钮；选中图层中的副本与 PlusButton 下方的 Tab 按 `-tabBarController:didSelectControl:` 的方式上报。
      */
     private func cylLiquidGlassTabControl(atWindowPoint windowPoint: CGPoint) -> UIControl? {
-        guard let tabBar = tabBar as CYLTabBar?, tabBar.window != nil, !tabBar.isHidden else { return nil }
+        guard let tabBar = cylCheckedTabBar, tabBar.window != nil, !tabBar.isHidden else { return nil }
         var control = unsafeBitCast(tabBar as AnyObject, to: CYLTabBarVerticalBarPrivateAPI.self).cylVerticalBarTabButton(atWindowPoint: windowPoint)
         if control == nil {
             var closestControl: UIControl?

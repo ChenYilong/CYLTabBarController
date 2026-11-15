@@ -170,7 +170,18 @@ public func cylTabBarItemAnimationURLFromAttributesEntryPoint(_ attributes: NSDi
     let path = cylTabBarItemAttributesAnimationValueEntryPoint(attributes, CYLTabBarAnimationFilePath as NSString) as? String
     filePath?.pointee = path as NSString?
     let animationURL = (urlValue as? URL) ?? CYLTabBarItemAnimationAttributes.fileURL(path)
-    if let animationURL {
+    // [EN] FIX: issue #415 — a file given with a generic key (`CYLTabBarAnimationURL`, `CYLTabBarAnimationFilePath`)
+    //      whose extension a registered library claims is matched by that extension, not bound to the library of the
+    //      other keys still in the tab's attributes (e.g. an SVGA file set in place over a Rive tab). A file given with a
+    //      library's own key, or with no known extension (a remote URL), is still bound to the library its keys choose.
+    // [CN] 通过通用 key（`CYLTabBarAnimationURL`、`CYLTabBarAnimationFilePath`）传入、且扩展名被某个已注册动画库认领的文件，按扩展名匹配，
+    //      不再绑定到 Tab 属性中其他 key 所属的动画库（例如在 Rive Tab 上原地设置 SVGA 文件）。通过动画库自己的 key 传入、或没有已知扩展名
+    //      （远程 URL）的文件，仍绑定到其 key 选择的动画库。
+    let genericKey = (urlValue as? URL) != nil ? CYLTabBarAnimationURL : CYLTabBarAnimationFilePath
+    let extensions = CYLTabBarItemAnimationCore.service?.animationFileExtensions?() ?? []
+    let matchedByExtension = attributes?[genericKey] != nil
+        && animationURL.map { extensions.contains($0.pathExtension.lowercased()) } == true
+    if let animationURL, !matchedByExtension {
         CYLTabBarItemAnimationCore.service?.bindAnimationURL(animationURL, toAttributes: attributes as? [AnyHashable: Any] ?? [:])
     }
     CYLTabBarItemAnimationAttributes.registerDarkAnimation(animationURL, attributes: attributes)

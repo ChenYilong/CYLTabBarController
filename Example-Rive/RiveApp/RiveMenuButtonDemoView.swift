@@ -35,7 +35,7 @@ final class RiveMenuButtonDemoView: UIView {
             .riveStateMachine: "State Machine",
             .riveInput: "isOpen",
             .riveActiveDuration: "0",
-        ]), let animationView = CYLTabBarItemAnimationFactory.animationView(url: url, size: Self.animationSize, contentMode: .scaleAspectFit) {
+        ] as [CYLTabBarAnimationOption: String]), let animationView = CYLTabBarItemAnimationFactory.animationView(url: url, size: Self.animationSize, contentMode: .scaleAspectFit) {
             animationView.frame = container.bounds
             animationView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
             container.addSubview(animationView)
