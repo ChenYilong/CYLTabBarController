@@ -27,6 +27,15 @@ export interface CYLTabBarItemAttributes {
   lottieSize?: number;
   /** [EN] CYLTabBarItemTitlePositionAdjustment (vp). [CN] 标题位置偏移（vp）。 */
   titlePositionAdjustment?: CYLTitleOffset;
+  /**
+   * [EN] CYLTabBarItemImageURL / CYLTabBarItemSelectedImageURL: icons from the network (http/https; the app needs
+   *      ohos.permission.INTERNET), shown instead of image / selectedImage (-setTabBarItemIconWithURL:selectedURL:size:atIndex:).
+   * [CN] 网络图标（http/https；应用需 ohos.permission.INTERNET），代替 image / selectedImage 显示。
+   */
+  imageURL?: string;
+  selectedImageURL?: string;
+  /** [EN] CYLTabBarGIFFilePath: a GIF (rawfile path or URL) shown as the tab's icon. [CN] 作为 Tab 图标显示的 GIF（rawfile 路径或 URL）。 */
+  gifFilePath?: string;
   /** [EN] CYLTabBarItemTitleColor: this tab's title color while not selected. [CN] 未选中时此 Tab 的标题颜色。 */
   titleColor?: ResourceColor;
   /** [EN] CYLTabBarItemSelectedTitleColor. [CN] 选中时此 Tab 的标题颜色。 */

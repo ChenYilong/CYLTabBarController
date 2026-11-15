@@ -6,7 +6,7 @@ export {
   CYLTabBarItemIdentifier, CYLTitleOffset, CYLTabBarItemTitleColor, CYLTabBarItemSelectedTitleColor,
   CYLTabBarItemBackgroundColor, CYLTabBarItemSelectedBackgroundColor
 } from './src/main/ets/CYLTabBarItem';
-export { CYLPlusButton } from './src/main/ets/CYLPlusButton';
+export { CYLPlusButton, CYLPlusButtonInsets } from './src/main/ets/CYLPlusButton';
 export {
   CYLTabBarController, CYLPlusButtonPageIndex, CYLEdgeInsets, cyl_simulateMemoryWarning, CYLMemoryWarningStorageKey
 } from './src/main/ets/CYLTabBarController';

@@ -108,6 +108,18 @@ export struct CYLTabBarController {
   @Prop tabCoverImages: (ResourceStr | undefined)[] = [];
   @State private replayTokens: number[] = [];
   imageSize: number = 26;
+  /**
+   * [EN] -[CYLTabBarController cyl_loginRequiredTabBarItemIdentifiers] (issue #19): tabs that need a login. While
+   *      loggedIn is false, selecting one calls presentLogin instead; it is selected when the completion gets true.
+   * [CN] 需要登录的 Tab（issue #19）。未登录时选中它们会调用 presentLogin；completion 传 true 后才选中。
+   */
+  @Prop loginRequiredTabBarItemIdentifiers: string[] = [];
+  /** [EN] cyl_loggedIn. [CN] 是否已登录。 */
+  @Prop loggedIn: boolean = true;
+  /** [EN] cyl_presentLoginBlock: shows the login UI, then calls completion(true) when logged in. [CN] 显示登录界面，登录后调用 completion(true)。 */
+  presentLogin?: (index: number, identifier: string, completion: (loggedIn: boolean) => void) => void;
+  /** [EN] cyl_loggedIn setter / CYLTabBarLoginStateDidChangeNotification: the login completed. [CN] 登录状态变化。 */
+  loginStateDidChange?: (loggedIn: boolean) => void;
   shouldSelect?: (index: number, identifier: string) => boolean;
   didSelect?: (index: number, identifier: string) => void;
   plusButtonAction?: () => void;
@@ -146,6 +158,23 @@ export struct CYLTabBarController {
     if (this.shouldSelect !== undefined && !this.shouldSelect(index, identifier)) {
       return;
     }
+    if (!this.loggedIn && this.loginRequiredTabBarItemIdentifiers.indexOf(identifier) >= 0) {
+      if (this.presentLogin !== undefined) {
+        this.presentLogin(index, identifier, (loggedIn: boolean) => {
+          if (loggedIn) {
+            if (this.loginStateDidChange !== undefined) {
+              this.loginStateDidChange(true);
+            }
+            this.cylDoSelect(index, identifier);
+          }
+        });
+      }
+      return;
+    }
+    this.cylDoSelect(index, identifier);
+  }
+
+  private cylDoSelect(index: number, identifier: string): void {
     if (index === this.selectedIndex && index >= 0) {
       // [EN] A re-tap replays the Lottie icon (#433). [CN] 再次点击重播 Lottie 图标（#433）。
       const tokens = this.replayTokens.slice();
@@ -159,6 +188,19 @@ export struct CYLTabBarController {
     if (this.didSelect !== undefined) {
       this.didSelect(index, identifier);
     }
+  }
+
+  /** [EN] The icon of a tab: GIF, then URL, then the images. [CN] Tab 图标：GIF 优先，其次网络图片，最后本地图片。 */
+  cylIcon(index: number): ResourceStr | undefined {
+    const item = this.tabBarItemsAttributes[index];
+    if (item.gifFilePath !== undefined) {
+      return item.gifFilePath.startsWith('http') ? item.gifFilePath : $rawfile(item.gifFilePath);
+    }
+    const selected = this.selectedIndex === index;
+    if (item.imageURL !== undefined) {
+      return selected ? (item.selectedImageURL ?? item.imageURL) : item.imageURL;
+    }
+    return selected ? (item.selectedImage ?? item.image) : item.image;
   }
 
   cylIdentifier(index: number): string {
@@ -196,7 +238,9 @@ export struct CYLTabBarController {
           .id(`cyl-cover-${this.cylIdentifier(index)}`)
       } else {
       Stack() {
-        if (this.tabBarItemsAttributes[index].lottieFilePath !== undefined) {
+        if (this.tabBarItemsAttributes[index].lottieFilePath !== undefined
+          && this.tabBarItemsAttributes[index].gifFilePath === undefined
+          && this.tabBarItemsAttributes[index].imageURL === undefined) {
           CYLLottieIcon({
             path: this.tabBarItemsAttributes[index].lottieFilePath,
             iconSize: this.tabBarItemsAttributes[index].lottieSize ?? this.imageSize,
@@ -205,9 +249,7 @@ export struct CYLTabBarController {
             replayToken: this.replayTokens[index] ?? 0,
           })
         } else {
-        Image(this.selectedIndex === index
-          ? (this.tabBarItemsAttributes[index].selectedImage ?? this.tabBarItemsAttributes[index].image)
-          : this.tabBarItemsAttributes[index].image)
+        Image(this.cylIcon(index))
           .width(this.imageSize)
           .height(this.imageSize)
           .objectFit(ImageFit.Contain)
@@ -242,6 +284,28 @@ export struct CYLTabBarController {
       : (this.tabBarItemsAttributes[index].backgroundColor ?? Color.Transparent))
     .id(`cyl-tab-${this.cylIdentifier(index)}`)
     .onClick(() => this.cylSelect(index))
+  }
+
+  /**
+   * [EN] Issue #91: the touchable area, scaled around the center by touchableAreaScale, then grown by touchableAreaOutsets.
+   * [CN] Issue #91：可点击区域，先按 touchableAreaScale 绕中心缩放，再按 touchableAreaOutsets 扩大。
+   */
+  cylPlusResponseRegion(): Rectangle {
+    const scale = Math.max(0.1, this.plusButton?.touchableAreaScale ?? 1);
+    const extra = (scale - 1) / 2;
+    return {
+      x: `${-extra * 100}%`, y: `${-extra * 100}%`, width: `${scale * 100}%`, height: `${scale * 100}%`,
+    };
+  }
+
+  @Builder
+  cylTouchableArea() {
+    Column()
+      .width(`${Math.max(0.1, this.plusButton?.touchableAreaScale ?? 1) * 100}%`)
+      .height(`${Math.max(0.1, this.plusButton?.touchableAreaScale ?? 1) * 100}%`)
+      .backgroundColor(this.plusButton?.touchableAreaColor ?? '#4DFF0000')
+      .hitTestBehavior(HitTestMode.Transparent)
+      .id('cyl-plus-touchable-area')
   }
 
   cylPlusAlignsTitle(): boolean {
@@ -279,6 +343,8 @@ export struct CYLTabBarController {
     .layoutWeight(1)
     .height('100%')
     .justifyContent(FlexAlign.Center)
+    .responseRegion(this.cylPlusResponseRegion())
+    .overlay(this.plusButton?.showsTouchableArea ? this.cylTouchableArea : undefined)
     .id('cyl-plus-button')
     .onTouch((event: TouchEvent) => {
       if (event.type === TouchType.Down) {

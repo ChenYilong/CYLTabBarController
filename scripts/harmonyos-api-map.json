@@ -102,5 +102,19 @@
   "CYLTabBarHostView -simulateMemoryWarning": "`cyl_simulateMemoryWarning()` (built; emulator check pending / 已编译，模拟器验证待做)",
   "CYLSimulateMemoryWarningReport()": "`CYLTabBarController.onMemoryWarning(unloaded, loaded)` (built; emulator check pending / 已编译，模拟器验证待做)",
   "UITableViewCell(CYLBadgeExtention) +cyl_badgeTitleForRow:": "`cyl_badgeTitleForRow(row)` (built; emulator check pending / 已编译，模拟器验证待做)",
-  "UITableViewCell(CYLBadgeExtention) +cyl_badgeStyleCount": "`cyl_badgeStyleCount()` (built; emulator check pending / 已编译，模拟器验证待做)"
+  "UITableViewCell(CYLBadgeExtention) +cyl_badgeStyleCount": "`cyl_badgeStyleCount()` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarController -updateTabBarItemAtIndex:attributes:": "a new `tabBarItemsAttributes` array (@Prop) with the changed item (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarController -updateTabBarItemsWithAttributes:": "a new `tabBarItemsAttributes` array (@Prop) (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarController -setTabBarItemIconWithURL:selectedURL:size:atIndex:": "`CYLTabBarItemAttributes.imageURL` / `selectedImageURL` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarController -setTabBarItemIcon:selectedIcon:size:atIndex:": "`CYLTabBarItemAttributes.image` / `selectedImage` in a new array (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarItemImageURL": "`CYLTabBarItemAttributes.imageURL` / `selectedImageURL` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarGIFFilePath": "`CYLTabBarItemAttributes.gifFilePath` (rawfile path or URL) (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarController(CYLLogin) cyl_loggedIn": "`CYLTabBarController.loggedIn` (@Prop) (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarController(CYLLogin) cyl_loginRequiredTabBarItemIdentifiers": "`CYLTabBarController.loginRequiredTabBarItemIdentifiers` (@Prop) (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarHostView loggedIn": "`CYLTabBarController.loggedIn` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarLoginStateDidChangeNotification": "`CYLTabBarController.loginStateDidChange(loggedIn)` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarController(CYLSelectedIndexIgnoringPlusButton) cyl_selectedIndexIgnoringPlusButton": "`CYLTabBarController.selectedIndex` (tab indexes only; the plus page is `CYLPlusButtonPageIndex`) (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLPlusButton touchableAreaScale": "`CYLPlusButton.touchableAreaScale` (`responseRegion`) (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLPlusButton showsTouchableArea": "`CYLPlusButton.showsTouchableArea` (overlay) (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLPlusButton touchableAreaColor": "`CYLPlusButton.touchableAreaColor` (built; emulator check pending / 已编译，模拟器验证待做)"
 }

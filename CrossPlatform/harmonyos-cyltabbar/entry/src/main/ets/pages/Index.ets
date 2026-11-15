@@ -70,6 +70,13 @@ struct Index {
   @State languageIndex: number = 0;
   /** [EN] Item 53: "Home (n)" after a Home badge row is tapped; -1 none. [CN] 第 53 项：点击首页角标行后的「首页(n)」；-1 表示无。 */
   @State homeTitleRow: number = -1;
+  @State plus: CYLPlusButton = CYL_PLUS;
+  /** [EN] Item 27: tabs whose page was replaced (issue #481). [CN] 第 27 项：页面被替换的 Tab（issue #481）。 */
+  @State replacedTabs: number[] = [];
+  /** [EN] Item 29: login state (issue #19); "Me" needs a login. [CN] 第 29 项：登录状态；「我的」需要登录。 */
+  @State loggedIn: boolean = true;
+  /** [EN] Toggled update rows, by id. [CN] 已切换的更新行。 */
+  @State toggled: string[] = [];
   private badges: CYLBadge[] = CYL_TABS.map(() => new CYLBadge());
   private plusButtonBadge: CYLBadge = new CYLBadge();
   /** [EN] The badge of each badge row, per page. [CN] 每个页面每个角标行的角标。 */
@@ -293,10 +300,166 @@ struct Index {
     }
   }
 
+  private isOn(id: string): boolean {
+    return this.toggled.indexOf(id) >= 0;
+  }
+
+  /** [EN] Flips a toggle row; returns its new state. [CN] 切换一行；返回新状态。 */
+  private flip(id: string): boolean {
+    const on = !this.isOn(id);
+    this.toggled = on ? this.toggled.concat([id]) : this.toggled.filter((t: string) => t !== id);
+    return on;
+  }
+
+  /** [EN] -updateTabBarItemAtIndex:attributes: with a change applied to a copy. [CN] 对副本应用修改后更新 Tab。 */
+  private updateTab(index: number, change: (item: CYLTabBarItemAttributes) => void): void {
+    const tabs = this.tabs.slice();
+    const copy: CYLTabBarItemAttributes = {
+      title: tabs[index].title, selectedTitle: tabs[index].selectedTitle, image: tabs[index].image,
+      selectedImage: tabs[index].selectedImage, identifier: tabs[index].identifier, darkImage: tabs[index].darkImage,
+      lottieFilePath: tabs[index].lottieFilePath, lottieSize: tabs[index].lottieSize,
+      titlePositionAdjustment: tabs[index].titlePositionAdjustment, backgroundColor: tabs[index].backgroundColor,
+      selectedBackgroundColor: tabs[index].selectedBackgroundColor, imageURL: tabs[index].imageURL,
+      selectedImageURL: tabs[index].selectedImageURL, gifFilePath: tabs[index].gifFilePath,
+    };
+    change(copy);
+    tabs[index] = copy;
+    this.tabs = tabs;
+  }
+
+  private pageIndex(page: string): number {
+    return Math.max(0, CYL_TABS.findIndex((item: CYLTabBarItemAttributes) => item.identifier === page));
+  }
+
+  /** [EN] Update tabs in place (items 21-26). [CN] 原地更新 Tab（第 21-26 项）。 */
+  private tabItemUpdateRows(page: string): DemoRow[] {
+    const index = this.pageIndex(page);
+    const icons: string[][] = [
+      ['https://cdn-icons-png.flaticon.com/512/3132/3132732.png', 'https://cdn-icons-png.flaticon.com/512/3132/3132779.png'],
+      ['https://cdn-icons-png.flaticon.com/512/1077/1077035.png', 'https://cdn-icons-png.flaticon.com/512/1077/1077063.png'],
+    ];
+    const local: Resource[] = [$r('app.media.img_tab_home_0'), $r('app.media.img_tab_message_0'), $r('app.media.app_icon')];
+    const localSelected: Resource[] = [$r('app.media.img_tab_home_1'), $r('app.media.img_tab_message_1'), $r('app.media.app_icon')];
+    return [
+      {
+        id: 'title', title: 'Change the tab title', subtitle: 'Changes the title of this page\'s tab in place; tap again to restore',
+        action: () => {
+          const on = this.flip(`title-${page}`);
+          this.updateTab(index, (item: CYLTabBarItemAttributes) => item.title = on ? 'Courses' : CYL_TABS[index].title);
+        },
+      },
+      {
+        id: 'network-icon', title: 'Download a network icon', subtitle: 'Loads the icon of this page\'s tab from a URL (CYLTabBarItemImageURL); tap again to restore',
+        action: () => {
+          const on = this.flip(`network-${page}`);
+          this.updateTab(index, (item: CYLTabBarItemAttributes) => {
+            item.imageURL = on ? icons[0][0] : undefined;
+            item.selectedImageURL = on ? icons[0][1] : undefined;
+          });
+        },
+      },
+      {
+        id: 'all-network-icons', title: 'Download every network icon', subtitle: 'Updates the icons of every tab from URLs; tap again to restore',
+        action: () => {
+          const on = this.flip('all-network');
+          this.tabs.forEach((tab: CYLTabBarItemAttributes, i: number) => this.updateTab(i, (item: CYLTabBarItemAttributes) => {
+            item.imageURL = on ? icons[i % 2][0] : undefined;
+            item.selectedImageURL = on ? icons[i % 2][1] : undefined;
+          }));
+        },
+      },
+      {
+        id: 'all-local-icons', title: 'Use local icons for every tab', subtitle: 'Updates every tab icon from local images; tap again to restore',
+        action: () => {
+          const on = this.flip('all-local');
+          this.tabs.forEach((tab: CYLTabBarItemAttributes, i: number) => this.updateTab(i, (item: CYLTabBarItemAttributes) => {
+            item.image = on ? local[i % 3] : CYL_TABS[i].image;
+            item.selectedImage = on ? localSelected[i % 3] : CYL_TABS[i].selectedImage;
+            item.lottieFilePath = on ? undefined : CYL_TABS[i].lottieFilePath;
+          }));
+        },
+      },
+      {
+        id: 'gif', title: 'GIF icon', subtitle: 'This page\'s tab shows a GIF (CYLTabBarGIFFilePath); tap again to restore',
+        action: () => {
+          const on = this.flip(`gif-${page}`);
+          this.updateTab(index, (item: CYLTabBarItemAttributes) => item.gifFilePath = on ? 'gif/cyl_tab_sample_animated.gif' : undefined);
+        },
+      },
+      {
+        id: 'all-titles', title: 'Change every title', subtitle: 'Updates the titles of every tab at once (-updateTabBarItemsWithAttributes:); tap again to restore',
+        action: () => {
+          const on = this.flip('all-titles');
+          this.tabs.forEach((tab: CYLTabBarItemAttributes, i: number) => this.updateTab(i, (item: CYLTabBarItemAttributes) => {
+            item.title = on ? `Tab ${i + 1}` : CYL_TABS[i].title;
+          }));
+        },
+      },
+    ];
+  }
+
+  /** [EN] Tab pages, selection and login (items 27-29). [CN] Tab 页面、选中与登录（第 27-29 项）。 */
+  private pageRows(page: string): DemoRow[] {
+    const index = this.pageIndex(page);
+    return [
+      {
+        id: 'replace', title: 'Replace the pages of the neighboring tabs',
+        subtitle: 'Replaces the tabs on both sides of this tab with other pages (issue #481); tap again to restore',
+        action: () => {
+          const sides = [index - 1, index + 1].filter((side: number) => side >= 0 && side < CYL_TABS.length);
+          const on = this.flip(`replace-${page}`);
+          this.replacedTabs = on ? sides : [];
+          sides.forEach((side: number) => this.updateTab(side, (item: CYLTabBarItemAttributes) => {
+            item.title = on ? `Replaced ${side + 1}` : CYL_TABS[side].title;
+          }));
+        },
+      },
+      {
+        id: 'selected-index', title: 'selectedIndex and PlusButton (issue #515)',
+        subtitle: `selectedIndex = ${this.selectedIndex} (the plus button's page is ${CYLPlusButtonPageIndex}, never a tab index); tap for the next tab`,
+        action: () => this.selectedIndex = this.selectedIndex < 0 ? 0 : (this.selectedIndex + 1) % CYL_TABS.length,
+      },
+      {
+        id: 'login', title: 'Login state', subtitle: `Logged in: ${this.loggedIn}. The "Me" tab needs a login (issue #19); tap to toggle`,
+        action: () => {
+          this.loggedIn = !this.loggedIn;
+          if (!this.loggedIn && this.selectedIndex === 3) {
+            this.selectedIndex = 0;
+          }
+        },
+      },
+    ];
+  }
+
+  /** [EN] PlusButton (item 30). [CN] PlusButton（第 30 项）。 */
+  private plusButtonRows(): DemoRow[] {
+    const scale = this.plus.touchableAreaScale ?? 1;
+    return [
+      {
+        id: 'touchable-area', title: 'PlusButton touchable area (issue #91)',
+        subtitle: `Shows the touchable area in translucent red: ${this.plus.showsTouchableArea === true}; scale ${scale}x; tap to cycle 1x, 1.5x, 2x, off`,
+        action: () => {
+          const shows = this.plus.showsTouchableArea === true;
+          const next = !shows ? 1 : (scale >= 2 ? 0 : scale + 0.5);
+          const copy: CYLPlusButton = {
+            image: CYL_PLUS.image, selectedImage: CYL_PLUS.selectedImage, title: CYL_PLUS.title, index: CYL_PLUS.index,
+            centerYOffset: CYL_PLUS.centerYOffset, imageSize: CYL_PLUS.imageSize, alignsTitle: CYL_PLUS.alignsTitle,
+            identifier: CYL_PLUS.identifier, selectable: CYL_PLUS.selectable,
+            showsTouchableArea: next > 0, touchableAreaScale: next > 0 ? next : 1,
+          };
+          this.plus = copy;
+        },
+      },
+    ];
+  }
+
   private sections(page: string): DemoSection[] {
     return [
       { title: 'General', rows: this.generalRows() },
       { title: 'Tab bar appearance', rows: this.appearanceRows() },
+      { title: 'Update tabs in place', rows: this.tabItemUpdateRows(page) },
+      { title: 'Tab pages, selection and login', rows: this.pageRows(page) },
+      { title: 'PlusButton', rows: this.plusButtonRows() },
       { title: 'Configuration file', rows: this.configurationRows() },
       { title: 'Jump and compare', rows: this.jumpRows() },
       { title: 'Badges', rows: this.badgeRows(page) },
@@ -379,7 +542,17 @@ struct Index {
       .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP])
       .id(`cyl-nav-title-${identifier}`)
 
-      if (index !== CYLPlusButtonPageIndex) {
+      if (this.replacedTabs.indexOf(index) >= 0) {
+        Column() {
+          Text(`Replacement page ${index + 1}`)
+            .fontSize(20)
+            .id(`cyl-replacement-page-${index}`)
+        }
+        .layoutWeight(1)
+        .width('100%')
+        .justifyContent(FlexAlign.Center)
+        .backgroundColor('#E6E6FA')
+      } else if (index !== CYLPlusButtonPageIndex) {
         List() {
           ForEach(this.sections(identifier), (section: DemoSection) => {
             ListItemGroup({ header: this.cylSectionHeader(section.title) }) {
@@ -412,9 +585,23 @@ struct Index {
     Column() {
       CYLTabBarController({
         tabBarItemsAttributes: this.tabs,
-        plusButton: CYL_PLUS,
+        plusButton: this.plus,
         selectedIndex: $selectedIndex,
         badges: this.badges,
+        loggedIn: this.loggedIn,
+        loginRequiredTabBarItemIdentifiers: [DEMO_ME],
+        presentLogin: (index: number, identifier: string, completion: (loggedIn: boolean) => void) => {
+          this.getUIContext().getPromptAction().showDialog({
+            title: 'Log in', message: `"${identifier}" needs a login (issue #19)`,
+            buttons: [{ text: 'Cancel', color: '#8A8A8E' }, { text: 'Log in', color: '#007AFF' }],
+          }).then((result: promptAction.ShowDialogSuccessResponse) => {
+            const ok = result.index === 1;
+            if (ok) {
+              this.loggedIn = true;
+            }
+            completion(ok);
+          }).catch(() => completion(false));
+        },
         tabCoverImages: this.covers,
         plusButtonBadge: this.plusButtonBadge,
         tabBarHidden: this.tabBarHidden,

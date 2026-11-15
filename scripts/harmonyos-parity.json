@@ -21,6 +21,16 @@
     "50": "`CYLBadgeSamples` / `cyl_applyBadgeSample`: 35 badge samples, one per row, on every tab (built; emulator check pending / 已编译，模拟器验证待做)",
     "51": "`entry/pages/Index.ets` `sections()`: every tab shows the same demo sections and its badge rows (built; emulator check pending / 已编译，模拟器验证待做)",
     "53": "`entry/pages/Index.ets` Home badge row: title becomes 首页(n), pushes the orange `pages/TextPage` (built; emulator check pending / 已编译，模拟器验证待做)",
-    "56": "`CYLTabBarController.tabBarHidden` + `tabBarHiddenAnimated` (slide transition), comes back after 2 s (built; emulator check pending / 已编译，模拟器验证待做)"
+    "56": "`CYLTabBarController.tabBarHidden` + `tabBarHiddenAnimated` (slide transition), comes back after 2 s (built; emulator check pending / 已编译，模拟器验证待做)",
+    "21": "Update row: this tab's `CYLTabBarItemAttributes.title` -> Courses via a new `tabBarItemsAttributes` array (@Prop) (built; emulator check pending / 已编译，模拟器验证待做)",
+    "22": "`CYLTabBarItemAttributes.imageURL` / `selectedImageURL` for this tab (ohos.permission.INTERNET) (built; emulator check pending / 已编译，模拟器验证待做)",
+    "23": "`imageURL` / `selectedImageURL` on every tab (built; emulator check pending / 已编译，模拟器验证待做)",
+    "24": "Every tab's `image` / `selectedImage` from local media (img_tab_*, app_icon) (built; emulator check pending / 已编译，模拟器验证待做)",
+    "25": "`CYLTabBarItemAttributes.gifFilePath` (rawfile gif/cyl_tab_sample_animated.gif) (built; emulator check pending / 已编译，模拟器验证待做)",
+    "26": "Every tab title -> Tab n in one `tabBarItemsAttributes` update (built; emulator check pending / 已编译，模拟器验证待做)",
+    "27": "Neighboring tabs show Replacement page n with titles Replaced n (issue #481) (built; emulator check pending / 已编译，模拟器验证待做)",
+    "28": "`selectedIndex` (tab indexes only; the plus page is `CYLPlusButtonPageIndex`): the row selects the next tab (issue #515) (built; emulator check pending / 已编译，模拟器验证待做)",
+    "29": "`loginRequiredTabBarItemIdentifiers` [Me] + `loggedIn` + `presentLogin` dialog (issue #19) (built; emulator check pending / 已编译，模拟器验证待做)",
+    "30": "`CYLPlusButton.showsTouchableArea` + `touchableAreaScale` (`responseRegion`, red overlay), cycles 1x / 1.5x / 2x / off (issue #91) (built; emulator check pending / 已编译，模拟器验证待做)"
   }
 }
