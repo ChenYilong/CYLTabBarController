@@ -26,6 +26,8 @@ export const CYL_LOCALIZATION_KEYS: Map<string, string> = new Map<string, string
   ["Custom maximum (9)", "cyl_l10n_a45350c25311"],
   ["Double tap to open", "cyl_l10n_bf0576472e31"],
   ["Fade in once", "cyl_l10n_7e0a1ad9a767"],
+  ["FlatDesign", "cyl_l10n_153407d52fed"],
+  ["FlatDesign扁平设计样式", "cyl_l10n_5cfed317a99d"],
   ["Flip ×2", "cyl_l10n_026b984bb8d8"],
   ["GIF 动图图标", "cyl_l10n_c5d4cd682981"],
   ["Left to right once", "cyl_l10n_d52d30723b2f"],

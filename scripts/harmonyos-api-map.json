@@ -342,5 +342,8 @@
   "UIView(CYLLocalization)": "TODO: N/A on HarmonyOS: UIKit views relocalize their texts by hand; ArkUI re-renders $r(...) and CYLLocalizedString texts on a language change.",
   "UIView(CYLLocalization) -cyl_localizeTexts": "TODO: N/A on HarmonyOS: UIKit views relocalize their texts by hand; ArkUI re-renders $r(...) and CYLLocalizedString texts on a language change.",
   "UIWindow(CYLLocalization)": "TODO: N/A on HarmonyOS: UIWindow root view controller rebuild after a language change; ArkUI pages re-render without rebuilding the window.",
-  "UIWindow(CYLLocalization) -cyl_setRootViewControllerProvider:": "TODO: N/A on HarmonyOS: UIWindow root view controller rebuild after a language change; ArkUI pages re-render without rebuilding the window."
+  "UIWindow(CYLLocalization) -cyl_setRootViewControllerProvider:": "TODO: N/A on HarmonyOS: UIWindow root view controller rebuild after a language change; ArkUI pages re-render without rebuilding the window.",
+  "CYLTabBarStyleType": "`CYLTabBarStyleType` (Default, System, FlatDesign, LiquidGlass) + `CYLTabBarController.tabBarStyleType` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLFlatDesignTabBar barTintColor": "`CYLTabBarController.barTintColor` (over the FlatDesign blur) (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLFlatDesignTabBar tintColor": "`CYLTabBarController.tintColor`; FlatDesign default `CYLFlatDesignTintColor` #007AFF (built; emulator check pending / 已编译，模拟器验证待做)"
 }
