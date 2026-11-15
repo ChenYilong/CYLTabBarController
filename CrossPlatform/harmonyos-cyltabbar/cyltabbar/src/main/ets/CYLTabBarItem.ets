@@ -27,6 +27,14 @@ export interface CYLTabBarItemAttributes {
   lottieSize?: number;
   /** [EN] CYLTabBarItemTitlePositionAdjustment (vp). [CN] 标题位置偏移（vp）。 */
   titlePositionAdjustment?: CYLTitleOffset;
+  /** [EN] CYLTabBarItemTitleColor: this tab's title color while not selected. [CN] 未选中时此 Tab 的标题颜色。 */
+  titleColor?: ResourceColor;
+  /** [EN] CYLTabBarItemSelectedTitleColor. [CN] 选中时此 Tab 的标题颜色。 */
+  selectedTitleColor?: ResourceColor;
+  /** [EN] CYLTabBarItemBackgroundColor: the tab's background while not selected. [CN] 未选中时此 Tab 的背景色。 */
+  backgroundColor?: ResourceColor;
+  /** [EN] CYLTabBarItemSelectedBackgroundColor: the tab's background while selected. [CN] 选中时此 Tab 的背景色。 */
+  selectedBackgroundColor?: ResourceColor;
 }
 
 /** [EN] UIOffset (CYLOffset). [CN] 偏移。 */
@@ -41,3 +49,7 @@ export const CYLTabBarItemSelectedTitle: string = 'selectedTitle';
 export const CYLTabBarItemImage: string = 'image';
 export const CYLTabBarItemSelectedImage: string = 'selectedImage';
 export const CYLTabBarItemIdentifier: string = 'identifier';
+export const CYLTabBarItemTitleColor: string = 'titleColor';
+export const CYLTabBarItemSelectedTitleColor: string = 'selectedTitleColor';
+export const CYLTabBarItemBackgroundColor: string = 'backgroundColor';
+export const CYLTabBarItemSelectedBackgroundColor: string = 'selectedBackgroundColor';

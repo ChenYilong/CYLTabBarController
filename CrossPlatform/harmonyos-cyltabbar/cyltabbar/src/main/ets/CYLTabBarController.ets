@@ -4,6 +4,30 @@ import { CYLBadge, CYLBadgeView } from './CYLBadge';
 import { CYLLottieIcon } from './CYLLottieIcon';
 
 /**
+ * [EN] UIEdgeInsets (vp). [CN] 边距（vp）。
+ */
+export interface CYLEdgeInsets {
+  top: number;
+  left: number;
+  bottom: number;
+  right: number;
+}
+
+/** [EN] The AppStorage key bumped by cyl_simulateMemoryWarning. [CN] cyl_simulateMemoryWarning 递增的 AppStorage 键。 */
+export const CYLMemoryWarningStorageKey: string = 'cyl_memoryWarning';
+
+/**
+ * [EN] +[CYLTabBarController cyl_simulateMemoryWarning]: sends a memory warning to every CYLTabBarController (also for
+ *      real warnings: call it from UIAbility.onMemoryLevel). Each controller with unloadsUnselectedViewsOnMemoryWarning
+ *      unloads the pages of its unselected tabs (#426) and reports them to onMemoryWarning.
+ * [CN] 向所有 CYLTabBarController 发送内存警告（系统内存警告时可在 UIAbility.onMemoryLevel 中调用）。开启 unloadsUnselectedViewsOnMemoryWarning
+ *      的控制器卸载未选中 Tab 的页面（#426），并通过 onMemoryWarning 报告。
+ */
+export function cyl_simulateMemoryWarning(): void {
+  AppStorage.setOrCreate<number>(CYLMemoryWarningStorageKey, (AppStorage.get<number>(CYLMemoryWarningStorageKey) ?? 0) + 1);
+}
+
+/**
  * [EN] One place of the bar: a tab (tabIndex >= 0) or the plus button (tabIndex -1).
  * [CN] TabBar 中的一个位置：Tab（tabIndex >= 0）或加号按钮（tabIndex 为 -1）。
  */
@@ -35,7 +59,8 @@ export const CYLPlusButtonPageIndex: number = -1;
  */
 @Component
 export struct CYLTabBarController {
-  tabBarItemsAttributes: CYLTabBarItemAttributes[] = [];
+  /** [EN] CYLTabBarControllerTabBarItemsAttributes; a new array updates the tabs (-updateTabBarItemAtIndex:attributes:). [CN] 新数组即更新 Tab。 */
+  @Prop tabBarItemsAttributes: CYLTabBarItemAttributes[] = [];
   plusButton?: CYLPlusButton;
   @Link selectedIndex: number;
   /** [EN] The badge of each tab (-[UIView cyl_showBadgeValue:] on its tab button); created when unset. [CN] 每个 Tab 的角标；未设置时自动创建。 */
@@ -43,13 +68,36 @@ export struct CYLTabBarController {
   /** [EN] The plus button's badge. [CN] 加号按钮的角标。 */
   @State plusButtonBadge: CYLBadge = new CYLBadge();
   @Prop tabBarHidden: boolean = false;
-  tintColor: ResourceColor = '#FF8000';
-  unselectedColor: ResourceColor = '#808080';
+  /** [EN] -setTabBarHidden:animated:: whether hiding and showing slide (true) or jump. [CN] 隐藏与显示是否带滑动动画。 */
+  @Prop tabBarHiddenAnimated: boolean = true;
+  /** [EN] cyl_tabBarItemSelectedTitleColor / CYLTabBarItemSelectedTitleColor. [CN] 选中标题颜色。 */
+  @Prop tintColor: ResourceColor = '#FF8000';
+  /** [EN] cyl_tabBarItemTitleColor / CYLTabBarItemTitleColor. [CN] 未选中标题颜色。 */
+  @Prop unselectedColor: ResourceColor = '#808080';
   plusButtonTitleSelectedColor?: ResourceColor;
-  tabBarBackgroundColor: ResourceColor = '#F8F8F8';
-  tabBarHeight: number = 49;
+  /** [EN] cyl_tabBarBackgroundColor / CYLTabBarBackgroundColor. [CN] TabBar 背景色。 */
+  @Prop tabBarBackgroundColor: ResourceColor = '#F8F8F8';
+  /** [EN] cyl_tabBarShadowColor / CYLTabBarShadowColor: the line on top of the bar; transparent hides it. [CN] TabBar 顶部分割线颜色；透明即隐藏。 */
+  @Prop tabBarShadowColor: ResourceColor = '#1F000000';
+  /** [EN] tabBarHeight / CYLTabBarHeight (vp). [CN] TabBar 高度（vp）。 */
+  @Prop tabBarHeight: number = 49;
+  /**
+   * [EN] -[CYLTabBar cyl_itemEdgeInsets]: space kept free at the two ends of the bar; the tabs and the plus button share
+   *      the rest (centered items).
+   * [CN] TabBar 两端留空；Tab 与加号按钮平分其余宽度（居中排列）。
+   */
+  @Prop itemEdgeInsets: CYLEdgeInsets = { top: 0, left: 0, bottom: 0, right: 0 };
   /** [EN] CYLTabBarControllerTitlePositionAdjustment (vp); an item's own adjustment wins. [CN] 全部标题的位置偏移；Tab 自己的偏移优先。 */
-  titlePositionAdjustment: CYLTitleOffset = { horizontal: 0, vertical: 0 };
+  @Prop titlePositionAdjustment: CYLTitleOffset = { horizontal: 0, vertical: 0 };
+  /** [EN] unloadsUnselectedViewsOnMemoryWarning (#426). [CN] 内存警告时卸载未选中 Tab 的页面（#426）。 */
+  @Prop unloadsUnselectedViewsOnMemoryWarning: boolean = false;
+  /**
+   * [EN] -didReceiveMemoryWarning: called after each memory warning with the tabs whose pages were unloaded and the
+   *      ones still loaded (CYLSimulateMemoryWarningReport).
+   * [CN] 每次内存警告后调用，参数为被卸载页面的 Tab 与仍保留的 Tab。
+   */
+  onMemoryWarning?: (unloaded: number[], loaded: number[]) => void;
+  @StorageProp('cyl_memoryWarning') @Watch('cylOnMemoryWarning') private memoryWarning: number = 0;
   /** [EN] CYLTabBarControllerTabBarItemAnimationSpeed (Lottie). [CN] Lottie 动画速度。 */
   tabBarItemAnimationSpeed: number = 1;
   /**
@@ -82,6 +130,17 @@ export struct CYLTabBarController {
    * [EN] -setSelectedIndex: through the delegate: shouldSelect may refuse; didSelect follows.
    * [CN] 经过代理设置选中索引：shouldSelect 可拒绝；随后调用 didSelect。
    */
+  cylOnMemoryWarning(): void {
+    let unloaded: number[] = [];
+    if (this.unloadsUnselectedViewsOnMemoryWarning) {
+      unloaded = this.loaded.filter((index: number) => index !== this.selectedIndex);
+      this.loaded = [this.selectedIndex];
+    }
+    if (this.onMemoryWarning !== undefined) {
+      this.onMemoryWarning(unloaded, this.loaded.slice());
+    }
+  }
+
   cylSelect(index: number): void {
     const identifier = this.cylIdentifier(index);
     if (this.shouldSelect !== undefined && !this.shouldSelect(index, identifier)) {
@@ -165,7 +224,9 @@ export struct CYLTabBarController {
           : this.tabBarItemsAttributes[index].title)
           .fontSize(10)
           .margin({ top: 3 })
-          .fontColor(this.selectedIndex === index ? this.tintColor : this.unselectedColor)
+          .fontColor(this.selectedIndex === index
+            ? (this.tabBarItemsAttributes[index].selectedTitleColor ?? this.tintColor)
+            : (this.tabBarItemsAttributes[index].titleColor ?? this.unselectedColor))
           .offset({
             x: (this.tabBarItemsAttributes[index].titlePositionAdjustment ?? this.titlePositionAdjustment).horizontal,
             y: (this.tabBarItemsAttributes[index].titlePositionAdjustment ?? this.titlePositionAdjustment).vertical,
@@ -176,6 +237,9 @@ export struct CYLTabBarController {
     .layoutWeight(1)
     .height('100%')
     .justifyContent(FlexAlign.Center)
+    .backgroundColor(this.selectedIndex === index
+      ? (this.tabBarItemsAttributes[index].selectedBackgroundColor ?? Color.Transparent)
+      : (this.tabBarItemsAttributes[index].backgroundColor ?? Color.Transparent))
     .id(`cyl-tab-${this.cylIdentifier(index)}`)
     .onClick(() => this.cylSelect(index))
   }
@@ -263,9 +327,11 @@ export struct CYLTabBarController {
         .width('100%')
         .height(this.tabBarHeight)
         .backgroundColor(this.tabBarBackgroundColor)
-        .border({ width: { top: 0.5 }, color: { top: '#1F000000' } })
-        .padding({ bottom: 0 })
+        .border({ width: { top: 0.5 }, color: { top: this.tabBarShadowColor } })
+        .padding({ left: this.itemEdgeInsets.left, right: this.itemEdgeInsets.right })
         .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM])
+        .transition(TransitionEffect.move(TransitionEdge.BOTTOM)
+          .animation({ duration: this.tabBarHiddenAnimated ? 250 : 0 }))
         .id('cyl-tab-bar')
       }
     }

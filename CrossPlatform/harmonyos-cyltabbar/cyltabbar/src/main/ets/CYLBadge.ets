@@ -135,6 +135,21 @@ export class CYLBadge {
   cornerRadius?: number;
   borderColor?: ResourceColor;
   borderWidth?: number;
+  /**
+   * [EN] How many times the animation plays: undefined uses the type's default (forever for Scale / Shake / Bounce /
+   *      Breathe, once for the *Once types), -1 forever, n > 0 n times (cyl_shakeAnimationRepeatTimes,
+   *      cyl_bounceAnimationRepeatTimes, CAAnimation+CYLBadgeExtention repeatCount).
+   * [CN] 动画播放次数：undefined 用类型默认值（Scale/Shake/Bounce/Breathe 永久，*Once 一次），-1 永久，n > 0 播放 n 次。
+   */
+  repeatCount?: number;
+  /**
+   * [EN] An animation of CAAnimation+CYLBadgeExtention that no CYLBadgeAnimationType matches: 'rotation' (a full turn
+   *      every 2 s, cyl_rotationAnimationWithDuration: around z) or 'flip' (half a turn around y). Wins over animationType.
+   * [CN] 没有对应 CYLBadgeAnimationType 的 CAAnimation+CYLBadgeExtention 动画：'rotation'（每 2 秒绕 z 轴一圈）或 'flip'（绕 y 轴半圈）。优先于 animationType。
+   */
+  customAnimation?: string;
+  /** [EN] cyl_badgeRespectsReduceMotion: no animation while the system reduces motion. [CN] 系统减少动态效果时不播放动画。 */
+  respectsReduceMotion: boolean = false;
   /** [EN] Localized "new" / "NEW" (CYLLocalization). [CN] 本地化的 "new" / "NEW"。 */
   newText: string = 'new';
   newUppercaseText: string = 'NEW';
@@ -240,6 +255,8 @@ export struct CYLBadgeView {
   @State private translateY: number = 0;
   @State private opacityValue: number = 1;
   @State private rotateX: number = 0;
+  @State private rotateY: number = 0;
+  @State private rotateZ: number = 0;
   private playedGeneration: number = -1;
 
   private appearance(): CYLBadgeAppearance {
@@ -256,7 +273,21 @@ export struct CYLBadgeView {
     this.translateY = 0;
     this.opacityValue = 1;
     this.rotateX = 0;
-    const forever = -1;
+    this.rotateY = 0;
+    this.rotateZ = 0;
+    const repeats = this.badge.repeatCount;
+    // [EN] Alternate play counts each direction as one iteration. [CN] 往返播放时每个方向计一次。
+    const forever = repeats !== undefined && repeats > 0 ? repeats * 2 : -1;
+    const once = repeats === undefined ? 1 : (repeats > 0 ? repeats : -1);
+    if (this.badge.customAnimation === 'rotation') {
+      animateTo({ duration: 2000, iterations: once === 1 && repeats === undefined ? -1 : once, curve: Curve.Linear },
+        () => { this.rotateZ = 360; });
+      return;
+    }
+    if (this.badge.customAnimation === 'flip') {
+      animateTo({ duration: 1000, iterations: repeats ?? 2 }, () => { this.rotateY = 180; });
+      return;
+    }
     switch (this.badge.animationType) {
       case CYLBadgeAnimationType.Scale:
         this.scaleValue = 1.4;
@@ -274,23 +305,23 @@ export struct CYLBadgeView {
         break;
       case CYLBadgeAnimationType.LeftRightOnce:
         this.translateX = -10;
-        animateTo({ duration: 400 }, () => { this.translateX = 0; });
+        animateTo({ duration: 400, iterations: once }, () => { this.translateX = 0; });
         break;
       case CYLBadgeAnimationType.RightLeftOnce:
         this.translateX = 10;
-        animateTo({ duration: 400 }, () => { this.translateX = 0; });
+        animateTo({ duration: 400, iterations: once }, () => { this.translateX = 0; });
         break;
       case CYLBadgeAnimationType.FadeInOnce:
         this.opacityValue = 0;
-        animateTo({ duration: 400 }, () => { this.opacityValue = 1; });
+        animateTo({ duration: 400, iterations: once }, () => { this.opacityValue = 1; });
         break;
       case CYLBadgeAnimationType.RollingOnce:
         this.rotateX = 90;
-        animateTo({ duration: 400 }, () => { this.rotateX = 0; });
+        animateTo({ duration: 400, iterations: once }, () => { this.rotateX = 0; });
         break;
       case CYLBadgeAnimationType.ScaleOnce:
         this.scaleValue = 0;
-        animateTo({ duration: 300, curve: curves.springMotion() }, () => { this.scaleValue = 1; });
+        animateTo({ duration: 300, iterations: once, curve: curves.springMotion() }, () => { this.scaleValue = 1; });
         break;
       default:
         break;
@@ -329,6 +360,8 @@ export struct CYLBadgeView {
       .translate({ x: this.translateX, y: this.translateY })
       .opacity(this.opacityValue)
       .rotate({ x: 1, y: 0, z: 0, angle: this.rotateX })
+      .rotate({ x: 0, y: this.rotateY !== 0 ? 1 : 0, z: this.rotateZ !== 0 ? 1 : 0,
+        angle: this.rotateY !== 0 ? this.rotateY : this.rotateZ })
       .onAppear(() => this.cylPlay())
       .onAttach(() => this.cylPlay())
       .id('cyl-badge')

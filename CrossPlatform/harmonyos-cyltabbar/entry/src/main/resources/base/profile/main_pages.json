@@ -1,6 +1,9 @@
 {
   "src": [
     "pages/Index",
-    "pages/ConfigurationDemo"
+    "pages/ConfigurationDemo",
+    "pages/TextPage",
+    "pages/SystemTabs",
+    "pages/AnotherTabBar"
   ]
 }
