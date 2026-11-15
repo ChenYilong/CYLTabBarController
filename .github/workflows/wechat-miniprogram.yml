@@ -55,7 +55,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install
-        run: npm install --no-package-lock
+        run: npm ci --ignore-scripts
       - name: Set up the example (components and shared files)
         run: npm run setup
       - name: UI tests (Lottie, PAG, Rive and GIF in turn)

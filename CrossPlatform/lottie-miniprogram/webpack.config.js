@@ -25,8 +25,13 @@ module.exports = {
         loader: 'string-replace-loader',
         options: {
           multiple: [{
-            search: `'__LOTTIE_CANVAS__'`,
+            search: '/* __LOTTIE_CANVAS__ */',
             replace: fs.readFileSync('./node_modules/lottie-web/build/player/lottie_light_canvas.js', {encoding: 'utf8'}),
+          }, {
+            // [EN] The UMD header uses `globalThis` first; in a mini program the result must go to `window` (`this`).
+            // [CN] UMD 头部优先使用 `globalThis`；在小程序中结果必须写到 `window`（`this`）。
+            search: "typeof globalThis !== 'undefined' ? globalThis : global || self",
+            replace: 'global || self',
           }, {
             search: '__[STANDALONE]__',
             replace: '',

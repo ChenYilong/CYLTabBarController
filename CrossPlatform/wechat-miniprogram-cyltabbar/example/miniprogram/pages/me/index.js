@@ -44,7 +44,7 @@ Component({
   },
   lifetimes: {
     attached() {
-      const themes = Object.keys(cylDemoConfiguration().CYLTabBarControllerThemes || {}).sort();
+      const themes = Object.keys(cylDemoConfiguration().CYLTabBarControllerThemes || {}).sort((a, b) => String(a).localeCompare(String(b)));
       this.setData({
         feedRows: cylFeedRows(),
         skins: [''].concat(themes),

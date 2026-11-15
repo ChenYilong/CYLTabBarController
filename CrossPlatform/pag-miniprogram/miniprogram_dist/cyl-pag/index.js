@@ -214,7 +214,10 @@ Component({
               this.triggerEvent('error', { message: error.message })
               return
             }
-            this.cyl_start(data, canvas, token)
+            // [EN] A failure to start is reported like a failure to load. [CN] 启动失败与加载失败一样上报。
+            this.cyl_start(data, canvas, token).catch((startError) => {
+              this.triggerEvent('error', { message: startError && startError.message })
+            })
           })
         })
     },

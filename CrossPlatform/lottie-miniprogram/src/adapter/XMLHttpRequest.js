@@ -85,7 +85,9 @@ export default class XMLHttpRequest {
     if (this.readyState !== XMLHttpRequest.OPENED) {
       throw new Error("Failed to execute 'send' on 'XMLHttpRequest': The object's state must be OPENED.")
     } else {
-      wx.request({
+      // [EN] Kept so abort() can cancel the request (it read a task that was never stored).
+      // [CN] 保存请求任务，abort() 才能取消请求（此前读取的任务从未被保存）。
+      _requestTask.set(this, wx.request({
         data,
         url: _url.get(this),
         method: _method.get(this),
@@ -131,7 +133,7 @@ export default class XMLHttpRequest {
           }
           _triggerEvent.call(this, 'loadend')
         }
-      })
+      }))
     }
   }
 

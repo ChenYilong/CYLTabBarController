@@ -43,7 +43,7 @@ def comment_of(path, name):
         start = before.rfind('/*')
         block = before[start:]
         english = re.search(r'\[EN\]([\s\S]*?)(?=\[CN\]|\*/)', block)
-        body = english.group(1) if english else re.sub(r'^/\*!?|\*/$', '', block)
+        body = english.group(1) if english else re.sub(r'(^/\*!?)|(\*/$)', '', block)
         body = ' '.join(l.strip().lstrip('*').strip() for l in body.split('\n'))
         return ' '.join(body.split()).replace('|', '\\|')
     return ''
