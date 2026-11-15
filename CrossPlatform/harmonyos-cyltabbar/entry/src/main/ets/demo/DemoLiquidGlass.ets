@@ -11,12 +11,11 @@ export struct DemoLiquidGlassButton {
 
   build() {
     Text(CYLLocalizedString('LiquidGlass'))
-      .fontSize(15)
+      .fontSize(13)
       .fontColor('#007AFF')
       .padding({ left: 8, right: 8, top: 3, bottom: 3 })
       .borderRadius(12)
       .backgroundColor('#1F007AFF')
-      .position({ left: 120 })
       .accessibilityText(CYLLocalizedString('LiquidGlass'))
       .accessibilityDescription(CYLLocalizedString('Liquid Glass液态玻璃'))
       .id('cyl-nav-liquid-glass')

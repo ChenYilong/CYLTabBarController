@@ -761,8 +761,12 @@ struct Index {
             .fontWeight(FontWeight.Medium)
         }
         if (index === 0) {
-          DemoFlatDesignButton({ onTap: () => this.showFlatDesignTabBar() })
-          DemoLiquidGlassButton({ onTap: () => this.showLiquidGlassTabBar() })
+          // [EN] The left bar buttons, side by side (never over the centred title). [CN] 左侧导航按钮并排，不压住居中的标题。
+          Row({ space: 8 }) {
+            DemoFlatDesignButton({ onTap: () => this.showFlatDesignTabBar() })
+            DemoLiquidGlassButton({ onTap: () => this.showLiquidGlassTabBar() })
+          }
+          .position({ left: 12 })
         }
         if (index !== CYLPlusButtonPageIndex) {
           Text(CYLLocalizedString('换肤'))
@@ -777,7 +781,6 @@ struct Index {
       .width('100%')
       .justifyContent(FlexAlign.Center)
       .backgroundColor($r('app.color.cyl_bar_background'))
-      .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP])
       .id(`cyl-nav-title-${identifier}`)
 
       if (this.replacedTabs.indexOf(index) >= 0) {

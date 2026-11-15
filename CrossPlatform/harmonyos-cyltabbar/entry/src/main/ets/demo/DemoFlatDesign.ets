@@ -22,7 +22,7 @@ export struct DemoFlatDesignButton {
   build() {
     Row({ space: 4 }) {
       Text(CYLLocalizedString('FlatDesign'))
-        .fontSize(15)
+        .fontSize(13)
         .fontColor('#007AFF')
       Circle()
         .width(8)
@@ -37,7 +37,6 @@ export struct DemoFlatDesignButton {
           });
         })
     }
-    .position({ left: 16 })
     .accessibilityGroup(true)
     .accessibilityText(CYLLocalizedString('FlatDesign'))
     .accessibilityDescription(CYLLocalizedString('FlatDesign扁平设计样式'))

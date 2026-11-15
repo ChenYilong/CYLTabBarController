@@ -42,7 +42,6 @@ struct TextPage {
         .width('100%')
         .padding({ left: 12 })
         .backgroundColor('#F8F8F8')
-        .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP])
       }
       Column() {
         Text(this.params.title)

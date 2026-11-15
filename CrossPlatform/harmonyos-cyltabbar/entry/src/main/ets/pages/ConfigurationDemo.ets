@@ -62,7 +62,6 @@ struct ConfigurationDemo {
         .width('100%')
         .textAlign(TextAlign.Center)
         .backgroundColor('#F8F8F8')
-        .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP])
       Text(`${this.file}\nidentifier: ${identifier}\npage: ${this.result?.items[index]?.pageIdentifier ?? '-'}`)
         .fontSize(13)
         .fontColor('#666666')

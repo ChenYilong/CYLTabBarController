@@ -90,7 +90,6 @@ struct AnotherTabBar {
       .width('100%')
       .padding({ left: 12 })
       .backgroundColor('#F8F8F8')
-      .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP])
 
       Stack({ alignContent: Alignment.Bottom }) {
       CYLTabBarController({

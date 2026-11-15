@@ -51,7 +51,6 @@ struct PopPushDemo {
       .width('100%')
       .padding({ left: 12 })
       .backgroundColor('#F8F8F8')
-      .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP])
 
       Column() {
         this.row('select-index', 'cyl_popSelectTabBarChildViewControllerAtIndex: 1 (Nearby)',
