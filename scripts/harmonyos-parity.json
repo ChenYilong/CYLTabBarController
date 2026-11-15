@@ -51,6 +51,7 @@
     "40": "Helper row: toggles `CYLPlusButton.showsTouchableArea`; the part of the plus button above the bar responds (ArkUI hit testing reaches children drawn outside the parent) (built; emulator check pending / 已编译，模拟器验证待做)",
     "41": "Helper row: the tab image from rawfile (`$rawfile`, the resource bundle of iOS) (built; emulator check pending / 已编译，模拟器验证待做)",
     "42": "Helper row: `cyl_tabBarItemIdentifiers`, `cyl_indexOfTabBarItemWithIdentifier`, `cyl_selectTabBarItemWithIdentifier`, `WeakRef` (built; emulator check pending / 已编译，模拟器验证待做)",
-    "7": "Home navigation bar \"Flat Design\" (`DemoFlatDesignButton`, breathing dot in a random color) → `showFlatDesignTabBar()`: a new tab bar (new key) with `tabBarStyleType` FlatDesign (`CYLFlatDesignTabBarModifier`: `BlurStyle.COMPONENT_THICK` + #BFF9F9F9, top line, blue / gray tints), Home selected, the launch badges again after 1.5 s (built; emulator check pending / 已编译，模拟器验证待做)"
+    "7": "Home navigation bar \"Flat Design\" (`DemoFlatDesignButton`, breathing dot in a random color) → `showFlatDesignTabBar()`: a new tab bar (new key) with `tabBarStyleType` FlatDesign (`CYLFlatDesignTabBarModifier`: `BlurStyle.COMPONENT_THICK` + #BFF9F9F9, top line, blue / gray tints), Home selected, the launch badges again after 1.5 s (built; emulator check pending / 已编译，模拟器验证待做)",
+    "8": "Home nav bar LiquidGlass (`entry/demo/DemoLiquidGlass.ets`): rebuilds the tab bar with `tabBarStyleType` LiquidGlass: `CYLLiquidGlassTabBarModifier` (floating translucent capsule, thin blur, rim, shadow), selected capsule `CYLLiquidGlassSelectionColor`, tint `CYLLiquidGlassTintColor` (built; emulator check pending / 已编译，模拟器验证待做)"
   }
 }

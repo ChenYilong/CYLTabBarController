@@ -31,6 +31,8 @@ export const CYL_LOCALIZATION_KEYS: Map<string, string> = new Map<string, string
   ["Flip ×2", "cyl_l10n_026b984bb8d8"],
   ["GIF 动图图标", "cyl_l10n_c5d4cd682981"],
   ["Left to right once", "cyl_l10n_d52d30723b2f"],
+  ["Liquid Glass液态玻璃", "cyl_l10n_f201a4158727"],
+  ["LiquidGlass", "cyl_l10n_af3acf6eb4a9"],
   ["Long press a tab or the plus button", "cyl_l10n_2e8e48a2ebfd"],
   ["Margin", "cyl_l10n_983696096694"],
   ["NEW", "cyl_l10n_24d459a81449"],

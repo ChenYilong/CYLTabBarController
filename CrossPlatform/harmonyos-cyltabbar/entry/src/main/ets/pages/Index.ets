@@ -10,7 +10,8 @@ import {
 import { CYLLocalizedString, cyl_localizationKey, cyl_badgeAccessibilityText } from 'cyltabbar';
 import { DemoTheme, DEMO_THEMES, demoRegisterThemes } from '../demo/DemoThemes';
 import { DemoFlatDesignButton } from '../demo/DemoFlatDesign';
-import { CYLTabBarStyleType, CYLFlatDesignTintColor, CYLFlatDesignUnselectedColor } from 'cyltabbar';
+import { DemoLiquidGlassButton } from '../demo/DemoLiquidGlass';
+import { CYLTabBarStyleType, CYLFlatDesignTintColor, CYLFlatDesignUnselectedColor, CYLLiquidGlassTintColor, CYLLiquidGlassSelectionColor } from 'cyltabbar';
 import {
   DemoRow, DemoSection, DEMO_APPEARANCES, DEMO_TITLE_OFFSETS, DEMO_HOME, DEMO_CITY, DEMO_MESSAGE, DEMO_ME,
   DEMO_LANGUAGES, DEMO_LANGUAGE_NAMES
@@ -305,7 +306,8 @@ struct Index {
 
   /** [EN] -updateTabBarItemAtIndex:attributes: for the background rows and the capsule theme. [CN] 更新各 Tab 的背景属性。 */
   private applyItemBackgrounds(): void {
-    const capsule = DEMO_APPEARANCES[this.appearanceIndex].capsule;
+    const capsule = DEMO_APPEARANCES[this.appearanceIndex].capsule
+      ?? (this.styleType === CYLTabBarStyleType.LiquidGlass ? CYLLiquidGlassSelectionColor : undefined);
     this.tabs = this.tabs.map((item: CYLTabBarItemAttributes) => {
       const copy: CYLTabBarItemAttributes = {
         title: item.title, selectedTitle: item.selectedTitle, image: item.image, selectedImage: item.selectedImage,
@@ -760,6 +762,7 @@ struct Index {
         }
         if (index === 0) {
           DemoFlatDesignButton({ onTap: () => this.showFlatDesignTabBar() })
+          DemoLiquidGlassButton({ onTap: () => this.showLiquidGlassTabBar() })
         }
         if (index !== CYLPlusButtonPageIndex) {
           Text(CYLLocalizedString('换肤'))
@@ -821,6 +824,13 @@ struct Index {
    * [EN] Item 7: replaces the tab bar with a new FlatDesign one (a new key), Home selected, the launch badges again.
    * [CN] 第 7 项：用新的扁平样式 TabBar（新 key）替换当前 TabBar，选中首页，再次显示启动角标。
    */
+  showLiquidGlassTabBar(): void {
+    // [EN] Item 8: a new Liquid Glass tab bar, built like the FlatDesign one (item 7). [CN] 第 8 项：重新创建液态玻璃 TabBar。
+    this.showFlatDesignTabBar();
+    this.styleType = CYLTabBarStyleType.LiquidGlass;
+    this.applyItemBackgrounds();
+  }
+
   showFlatDesignTabBar(): void {
     this.styleType = CYLTabBarStyleType.FlatDesign;
     this.selectedIndex = 0;
@@ -881,7 +891,7 @@ struct Index {
         tabBarBackgroundColor: this.theme.bar ?? (this.appearanceIndex === 0 ? $r('app.color.cyl_bar_background') : DEMO_APPEARANCES[this.appearanceIndex].background),
         tabBarShadowColor: DEMO_APPEARANCES[this.appearanceIndex].shadow,
         unselectedColor: this.theme.normal ?? (this.styleType === CYLTabBarStyleType.FlatDesign ? CYLFlatDesignUnselectedColor : DEMO_APPEARANCES[this.appearanceIndex].normal),
-        tintColor: this.theme.tint ?? (this.styleType === CYLTabBarStyleType.FlatDesign ? CYLFlatDesignTintColor : (this.appearanceIndex === 0 ? '#FF8000' : DEMO_APPEARANCES[this.appearanceIndex].selected)),
+        tintColor: this.theme.tint ?? (this.styleType === CYLTabBarStyleType.FlatDesign ? CYLFlatDesignTintColor : this.styleType === CYLTabBarStyleType.LiquidGlass ? CYLLiquidGlassTintColor : (this.appearanceIndex === 0 ? '#FF8000' : DEMO_APPEARANCES[this.appearanceIndex].selected)),
         unloadsUnselectedViewsOnMemoryWarning: this.unloads,
         onMemoryWarning: (unloaded: number[], loaded: number[]) => this.memoryWarningReport(unloaded, loaded),
         didSelect: (index: number) => {

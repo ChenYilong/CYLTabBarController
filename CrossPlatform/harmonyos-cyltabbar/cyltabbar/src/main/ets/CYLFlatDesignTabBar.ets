@@ -24,7 +24,7 @@ export enum CYLTabBarStyleType {
    */
   FlatDesign = 2,
   /**
-   * [EN] `CYLTabBarStyleTypeLiquidGlass`: Liquid Glass; drawn as the classic tab bar until demo 8 lands. [CN] 液态玻璃；在第 8 项完成前按经典 TabBar 绘制。
+   * [EN] `CYLTabBarStyleTypeLiquidGlass`: Liquid Glass, a floating translucent capsule (CYLLiquidGlassTabBarModifier). [CN] 液态玻璃：悬浮的半透明胶囊。
    */
   LiquidGlass = 3
 }
@@ -57,6 +57,43 @@ export class CYLFlatDesignTabBarModifier implements AttributeModifier<RowAttribu
 }
 
 /**
+ * [EN] Liquid Glass's selected tint (iOS 26 tab bar: `systemBlueColor`). [CN] 液态玻璃的选中色。
+ */
+export const CYLLiquidGlassTintColor: ResourceColor = '#007AFF';
+
+/**
+ * [EN] The capsule behind the selected tab of Liquid Glass (`cyl_liquidGlassSelectionColor`). [CN] 液态玻璃选中 Tab 后的胶囊。
+ */
+export const CYLLiquidGlassSelectionColor: ResourceColor = '#1F007AFF';
+
+/**
+ * [EN] The bar of Liquid Glass (iOS 26 `UITabBar`, Android `CYLLiquidGlass`): a capsule floating above the bottom edge,
+ *      inset from the sides, a thin blur of the pages behind it under a translucent tint (`barTintColor`, white by
+ *      default; `cyl_liquidGlassSurfaceOpacity`), a light rim and a soft shadow.
+ * [CN] 液态玻璃 TabBar：悬浮在底边上方、两侧内缩的胶囊，后面页面的轻度模糊上叠加半透明着色（默认白色），浅色描边与柔和阴影。
+ */
+export class CYLLiquidGlassTabBarModifier implements AttributeModifier<RowAttribute> {
+  barTintColor: ResourceColor | undefined;
+  height: number;
+
+  constructor(barTintColor: ResourceColor | undefined, height: number) {
+    this.barTintColor = barTintColor;
+    this.height = height;
+  }
+
+  applyNormalAttribute(instance: RowAttribute): void {
+    instance.backgroundBlurStyle(BlurStyle.Thin);
+    instance.backgroundColor(this.barTintColor ?? '#66FFFFFF');
+    instance.width('92%');
+    instance.borderRadius(this.height / 2);
+    instance.margin({ bottom: 8 });
+    instance.border({ width: 0.5, color: '#80FFFFFF' });
+    instance.shadow({ radius: 16, color: '#26000000', offsetY: 4 });
+    instance.clip(false);
+  }
+}
+
+/**
  * [EN] Leaves the classic bar as it is. [CN] 保持经典 TabBar 不变。
  */
 export class CYLDefaultTabBarModifier implements AttributeModifier<RowAttribute> {
@@ -69,6 +106,10 @@ export class CYLDefaultTabBarModifier implements AttributeModifier<RowAttribute>
  * [EN] The modifier of the bar for `style`; `barTintColor` is the app's bar color, undefined for the style's own.
  * [CN] `style` 对应的 TabBar modifier；`barTintColor` 为 App 设置的 TabBar 颜色，未设置时使用样式自己的颜色。
  */
-export function cyl_tabBarStyleModifier(style: CYLTabBarStyleType, barTintColor?: ResourceColor): AttributeModifier<RowAttribute> {
+export function cyl_tabBarStyleModifier(style: CYLTabBarStyleType, barTintColor?: ResourceColor,
+  height: number = 49): AttributeModifier<RowAttribute> {
+  if (style === CYLTabBarStyleType.LiquidGlass) {
+    return new CYLLiquidGlassTabBarModifier(barTintColor, height);
+  }
   return style === CYLTabBarStyleType.FlatDesign ? new CYLFlatDesignTabBarModifier(barTintColor) : new CYLDefaultTabBarModifier();
 }

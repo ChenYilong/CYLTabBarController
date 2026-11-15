@@ -345,5 +345,8 @@
   "UIWindow(CYLLocalization) -cyl_setRootViewControllerProvider:": "TODO: N/A on HarmonyOS: UIWindow root view controller rebuild after a language change; ArkUI pages re-render without rebuilding the window.",
   "CYLTabBarStyleType": "`CYLTabBarStyleType` (Default, System, FlatDesign, LiquidGlass) + `CYLTabBarController.tabBarStyleType` (built; emulator check pending / 已编译，模拟器验证待做)",
   "CYLFlatDesignTabBar barTintColor": "`CYLTabBarController.barTintColor` (over the FlatDesign blur) (built; emulator check pending / 已编译，模拟器验证待做)",
-  "CYLFlatDesignTabBar tintColor": "`CYLTabBarController.tintColor`; FlatDesign default `CYLFlatDesignTintColor` #007AFF (built; emulator check pending / 已编译，模拟器验证待做)"
+  "CYLFlatDesignTabBar tintColor": "`CYLTabBarController.tintColor`; FlatDesign default `CYLFlatDesignTintColor` #007AFF (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLConstants +isLiquidGlassActive": "`tabBarStyleType === CYLTabBarStyleType.LiquidGlass` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLUtils +isLiquidGlassActive": "`tabBarStyleType === CYLTabBarStyleType.LiquidGlass` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLConstants +isUsedLiquidGlass": "`tabBarStyleType === CYLTabBarStyleType.LiquidGlass` (built; emulator check pending / 已编译，模拟器验证待做)"
 }

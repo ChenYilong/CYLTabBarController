@@ -824,7 +824,7 @@ export struct CYLTabBarController {
         .height(this.tabBarHeight)
         .backgroundColor(this.tabBarBackgroundColor)
         .border({ width: { top: 0.5 }, color: { top: this.tabBarShadowColor } })
-        .attributeModifier(cyl_tabBarStyleModifier(this.tabBarStyleType, this.barTintColor))
+        .attributeModifier(cyl_tabBarStyleModifier(this.tabBarStyleType, this.barTintColor, this.tabBarHeight))
         .padding({ left: this.itemEdgeInsets.left, right: this.itemEdgeInsets.right })
         .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM])
         .transition(TransitionEffect.move(TransitionEdge.BOTTOM)
