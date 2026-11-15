@@ -34,7 +34,7 @@ Component({
   },
   pageLifetimes: {
     show() {
-      this.setData({ discoverHidden: (getApp().globalData.cylTabBarState.hiddenIdentifiers || []).includes('discover') });
+      this.setData({ discoverHidden: (getApp().globalData.cylTabBarState.hiddenIdentifiers || []).includes('city') });
     },
   },
   methods: {
@@ -44,9 +44,9 @@ Component({
      */
     cyl_hideDiscover(event) {
       const hidden = Boolean(event.detail.value);
-      const others = (getApp().globalData.cylTabBarState.hiddenIdentifiers || []).filter((identifier) => identifier !== 'discover');
+      const others = (getApp().globalData.cylTabBarState.hiddenIdentifiers || []).filter((identifier) => identifier !== 'city');
       this.setData({ discoverHidden: hidden });
-      getApp().cyl_updateTabBarState({ hiddenIdentifiers: hidden ? others.concat('discover') : others });
+      getApp().cyl_updateTabBarState({ hiddenIdentifiers: hidden ? others.concat('city') : others });
     },
 
     /**

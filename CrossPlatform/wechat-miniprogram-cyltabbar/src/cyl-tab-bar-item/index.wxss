@@ -1,4 +1,5 @@
 @import "../cyl-tab-bar/cyl_tap_animations.wxss";
+@import "../cyl-tab-bar/cyl_badge_animations.wxss";
 
 /* [EN] The icon above the title, centered in the item. [CN] 图标在标题上方，在 Item 中居中。 */
 :host {

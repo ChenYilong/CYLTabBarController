@@ -107,3 +107,181 @@
     background-color: #3a3a3c;
   }
 }
+
+/* [EN] CYLHomeViewController's navigation bar, drawn by the page (navigationStyle custom): Liquid Glass bar buttons, the
+        capsule's room kept free on the right. [CN] CYLHomeViewController 的导航栏，由页面绘制（navigationStyle custom）：
+        液态玻璃导航栏按钮，右侧留出胶囊按钮的位置。 */
+.cyl-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  box-sizing: content-box;
+  padding-left: 8px;
+  background-color: rgba(242, 242, 247, 0.92);
+}
+
+.cyl-nav-space {
+  flex: 1;
+}
+
+.cyl-large-title {
+  display: block;
+  margin: 0 4px 8px;
+  font-size: 34px;
+  font-weight: 700;
+  line-height: 41px;
+}
+
+.cyl-nav-button {
+  position: relative;
+  flex-shrink: 0;
+  height: 30px;
+  margin-right: 6px;
+  padding: 0 11px;
+  border-radius: 15px;
+  background-color: rgba(120, 120, 128, 0.16);
+  font-size: 14px;
+  line-height: 30px;
+  white-space: nowrap;
+}
+
+.cyl-nav-button-pressed {
+  background-color: rgba(120, 120, 128, 0.32);
+}
+
+/* [EN] -cyl_showBadgeValue:@"" animationType:… backgroundColor:cyl_randomColor on a bar button. [CN] 导航栏按钮上的随机颜色红点。 */
+.cyl-nav-dot {
+  position: absolute;
+  top: -1px;
+  right: -1px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.cyl-nav-dot-breathe { animation: cyl-badge-breathe 1.6s ease-in-out infinite; }
+.cyl-nav-dot-shake { animation: cyl-badge-shake 0.6s ease-in-out infinite; }
+
+/* [EN] The skin menu (-cyl_themeMenuWithCompletion:), opened under the Skin button. [CN] 换肤菜单，在换肤按钮下方打开。 */
+.cyl-menu-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 20;
+}
+
+.cyl-menu {
+  position: absolute;
+  right: 12px;
+  width: 260px;
+  border-radius: 14px;
+  background-color: rgba(250, 250, 252, 0.98);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.22);
+  overflow: hidden;
+}
+
+.cyl-menu-header {
+  display: block;
+  padding: 10px 16px 6px;
+  font-size: 13px;
+  color: #8e8e93;
+}
+
+.cyl-menu-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  height: 44px;
+  padding: 0 12px;
+  border-top: 1rpx solid rgba(0, 0, 0, 0.1);
+}
+
+.cyl-menu-separator {
+  height: 8px;
+  background-color: rgba(0, 0, 0, 0.06);
+}
+
+.cyl-menu-check {
+  width: 20px;
+  font-size: 15px;
+}
+
+.cyl-menu-title {
+  flex: 1;
+  margin-left: 10px;
+  font-size: 16px;
+}
+
+/* [EN] A skin's first icon or a swatch of its tint (CYLDemoThemes.listIcon). [CN] 皮肤的第一个图标或 tint 色块。 */
+.cyl-skin-icon {
+  flex-shrink: 0;
+  width: 25px;
+  height: 25px;
+}
+
+.cyl-skin-swatch {
+  flex-shrink: 0;
+  width: 21px;
+  height: 21px;
+  margin: 2px;
+  border-radius: 50%;
+  color: #ffffff;
+  font-size: 13px;
+  line-height: 21px;
+  text-align: center;
+}
+
+.cyl-home-row .cyl-skin-icon,
+.cyl-home-row .cyl-skin-swatch {
+  margin-right: 14px;
+}
+
+.cyl-home-check {
+  margin-left: 8px;
+  font-size: 17px;
+  color: #007aff;
+}
+
+@media (prefers-color-scheme: dark) {
+  .cyl-nav {
+    background-color: rgba(0, 0, 0, 0.88);
+  }
+  .cyl-menu {
+    background-color: rgba(44, 44, 46, 0.98);
+  }
+  .cyl-menu-row {
+    border-top-color: rgba(255, 255, 255, 0.12);
+  }
+}
+
+/* [EN] A row the tab bar style does not support (secondaryLabelColor). [CN] 当前 TabBar 样式不支持的行。 */
+.cyl-home-dimmed {
+  color: #8e8e93;
+}
+
+/* [EN] The touchable area slider (item 30) and the previous / next arrows (item 37). [CN] 点击范围滑块（第 30 项）与上一个 / 下一个箭头（第 37 项）。 */
+.cyl-home-slider {
+  margin: 8px 0 0;
+}
+
+.cyl-home-arrows {
+  display: flex;
+  flex-direction: row;
+  margin-left: 8px;
+}
+
+.cyl-home-arrow {
+  width: 42px;
+  height: 44px;
+  font-size: 22px;
+  line-height: 44px;
+  text-align: center;
+  color: #007aff;
+}

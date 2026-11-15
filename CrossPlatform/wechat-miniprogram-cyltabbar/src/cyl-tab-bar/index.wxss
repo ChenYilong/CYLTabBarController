@@ -1,4 +1,5 @@
 @import "./cyl_tap_animations.wxss";
+@import "./cyl_badge_animations.wxss";
 
 /* [EN] Classic bar (default, system): a 50 pt bar with a hairline on top, above the home indicator. [CN] 经典 TabBar（default、system）：50 pt 高、顶部一条细线，位于 Home 指示条之上。 */
 .cyl-tab-bar {
@@ -191,4 +192,62 @@
 /* [EN] tabBarHidden (iOS -setTabBarHidden:). [CN] tabBarHidden（iOS -setTabBarHidden:）。 */
 .cyl-tab-bar-hidden {
   display: none;
+}
+
+/*
+ * [EN] cyl_setCoverImage: the cover sits centered on the tab and hides it (the tab still takes the taps).
+ * [CN] cyl_setCoverImage：封面居中位于 Tab 上并遮住它（点击仍由 Tab 处理）。
+ */
+.cyl-tab-cover {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  pointer-events: none;
+}
+
+.cyl-tab-covered {
+  opacity: 0;
+}
+
+/*
+ * [EN] The plus button's badge (cyl_showBadgeValue with its identifier): at the top right of its image, drawn as the
+ *      tabs' badges (cyl-tab-bar-item .cyl-item-badge / .cyl-item-badge-dot).
+ * [CN] PlusButton 的角标（使用其标识调用 cyl_showBadgeValue）：位于其图片右上角，样式与 Tab 的角标相同。
+ */
+.cyl-plus-image-box {
+  position: relative;
+  display: flex;
+}
+
+.cyl-plus-badge {
+  position: absolute;
+  top: -4px;
+  left: calc(100% - 12px);
+  min-width: 18px;
+  height: 18px;
+  box-sizing: border-box;
+  padding: 1px 6px;
+  border-radius: 9px;
+  background-color: #ff3b30;
+  color: #ffffff;
+  font-size: 11px;
+  line-height: 16px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.cyl-plus-badge-dot {
+  position: absolute;
+  top: 0;
+  left: calc(100% - 6px);
+  width: 9px;
+  height: 9px;
+  border-radius: 5px;
+  background-color: #ff3b30;
+}
+
+/* [EN] The plus button's touchable area (CYLPlusButtonShowsTouchableArea / CYLPlusButtonTouchableAreaScale, issue #91). [CN] PlusButton 的可点击区域（issue #91）。 */
+.cyl-plus-hit {
+  position: absolute;
+  border-radius: 8px;
 }

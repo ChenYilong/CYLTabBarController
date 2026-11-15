@@ -1,5 +1,9 @@
+<!-- [EN] Arabic: the page right to left. [CN] 阿拉伯语：页面从右到左。 -->
+<page-meta page-style="{{cylRTL ? 'direction: rtl;' : ''}}"></page-meta>
 <import src="/templates/cyl_feed.wxml" />
-<view class="cyl-page" bindtouchstart="cyl_onSwipeStart" bindtouchend="cyl_onSwipeEnd">
+<!-- [EN] A replaced tab's plain page (Home row "Replace neighboring tabs", issue #481). [CN] 被替换 Tab 的空白页面（issue #481）。 -->
+<view wx:if="{{replaced}}" id="cyl-replaced-page" class="cyl-replaced-page" style="background-color: {{replaced.color}};" aria-label="{{replaced.title}}"></view>
+<view wx:if="{{!cylUnloaded}}" class="cyl-page" bindtouchstart="cyl_onSwipeStart" bindtouchend="cyl_onSwipeEnd">
   <view class="cyl-header">
     <text class="cyl-header-title" aria-role="heading">{{texts['Discover']}}</text>
   </view>

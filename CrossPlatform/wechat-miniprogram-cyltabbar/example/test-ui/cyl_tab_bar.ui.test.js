@@ -17,13 +17,31 @@ const { PNG } = require('pngjs');
 const pixelmatch = require('pixelmatch');
 
 const CYL_PROJECT = path.resolve(__dirname, '..');
-const CYL_CLI = process.env.CYL_DEVTOOLS_CLI || '/Applications/wechatwebdevtools.app/Contents/MacOS/cli';
+const CYL_CLI = require('../scripts/cyl_devtools_cli').cylDevtoolsCli();
 // [EN] State changes reach the pages on the next turn of the app's event loop. [CN] 状态变化在 App 事件循环的下一轮到达页面。
 const CYL_SETTLE_MS = 800;
 
 let miniProgram;
 
 const cylSleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+/**
+ * [EN] A screenshot of the simulator (base64 PNG). On a slow machine (seen on Windows) DevTools sometimes answers
+ *      "timeout waiting for automator response" to one screenshot; try again up to twice.
+ * [CN] 模拟器截图（base64 PNG）。在较慢的机器上（Windows 上出现过），开发者工具偶尔对某次截图返回
+ *      "timeout waiting for automator response"；最多再试两次。
+ */
+async function cylCapture() {
+  for (let attempt = 1; ; attempt += 1) {
+    try {
+      return await miniProgram.screenshot();
+    } catch (error) {
+      if (attempt >= 3 || !/timeout waiting for automator response/.test(String(error && error.message))) {
+        throw error;
+      }
+    }
+  }
+}
 
 /**
  * [EN] The render data of the current page's tab bar. [CN] 当前页面 TabBar 的渲染数据。
@@ -105,7 +123,33 @@ before(async () => {
   await miniProgram.reLaunch('/pages/home/index');
   await cylSleep(CYL_SETTLE_MS * 2);
   await cylSetState({ loggedIn: true, itemStyle: '', glassLensStyle: 'regular' });
+  // [EN] The launch badges animate forever and the cover hides Home: the tests compare icons, so they go first; test 12
+  //      checks them. [CN] 启动角标一直播放动画，封面遮住首页：测试比较图标，因此先移除；第 12 项测试检查它们。
+  await cylClearDecoration();
 });
+
+/**
+ * [EN] Removes the launch badges and the cover (app.js cyl_decorateTabBar) from every bar.
+ * [CN] 从所有 TabBar 移除启动角标与封面（app.js cyl_decorateTabBar）。
+ */
+async function cylClearDecoration() {
+  await miniProgram.evaluate(() => new Promise((resolve) => {
+    // [EN] After the launch timer (1.5 s), so it does not put them back. [CN] 在启动计时器（1.5 秒）之后，避免其重新添加。
+    setTimeout(() => {
+      clearTimeout(getApp().cylDecorateTimer);
+      // [EN] The skin is kept across launches: back to Default. [CN] 皮肤在重新启动后保留：恢复默认。
+      getApp().cyl_setSkin('Default');
+      clearTimeout(getApp().cylCoverTimer);
+      getApp().cyl_updateTabBarState({
+        badges: { home: '', city: '', message: '', CYLMineViewController: '', plus: '' },
+        badgeAttributes: {},
+        covers: { home: null },
+      });
+      resolve();
+    }, 0);
+  }));
+  await cylSleep(CYL_SETTLE_MS);
+}
 
 after(async () => {
   if (!miniProgram) {
@@ -123,7 +167,7 @@ after(async () => {
 test('the bar has the four tabs and the plus button, Home selected', async () => {
   const bar = await cylTabBar();
   assert.equal(bar.route, 'pages/home/index');
-  assert.deepEqual(bar.slots.filter((slot) => !slot.isPlusButton).map((slot) => slot.key), ['home', 'message', 'discover', 'me']);
+  assert.deepEqual(bar.slots.filter((slot) => !slot.isPlusButton).map((slot) => slot.key), ['home', 'city', 'message', 'CYLMineViewController']);
   assert.equal(bar.slots.filter((slot) => slot.isPlusButton).length, 1);
   assert.deepEqual(bar.slots.filter((slot) => slot.selected).map((slot) => slot.key), ['home']);
 });
@@ -231,7 +275,11 @@ test('the animated icons stay in the bar during and after a page scroll (WeChat 
       .select('.cyl-tab-bar').boundingClientRect()
       .exec((result) => resolve({
         windowWidth: wx.getWindowInfo().windowWidth,
-        windowTop: wx.getWindowInfo().screenHeight - wx.getWindowInfo().windowHeight,
+        // [EN] Me has the system navigation bar. After a page with a custom one (Home), DevTools reports the window as the
+        //      whole screen, so the window starts below the status bar and the 44 pt navigation bar. [CN] Me 使用系统导航栏。打开过自定义导航栏的页面（首页）
+        //      之后，开发者工具把窗口报告为整个屏幕，因此窗口从状态栏与 44pt 导航栏下方开始。
+        windowTop: wx.getWindowInfo().screenHeight - wx.getWindowInfo().windowHeight
+          || (wx.getWindowInfo().statusBarHeight + 44),
         icons: (result[0] || []).map((rect) => ({ left: rect.left, top: rect.top, width: rect.width, height: rect.height })),
         // [EN] The whole bar: a second layer of icons anywhere in it changes it. [CN] 整个 TabBar：其中任何位置出现第二层图标都会改变它。
         bar: result[1] && { left: result[1].left, top: result[1].top, width: result[1].width, height: result[1].height },
@@ -249,11 +297,17 @@ test('the animated icons stay in the bar during and after a page scroll (WeChat 
     });
   });
   assert.deepEqual(snapshots, [true, true, true, true], 'each icon is one image layer');
-  const before = await miniProgram.screenshot();
+  // [EN] From the top: the Me page keeps its scroll position, and the page shows through the glass rim. [CN] 从顶部开始：Me 页面会保留滚动位置，且页面内容会透过玻璃边缘显示。
+  await miniProgram.pageScrollTo(0);
+  await cylSleep(CYL_SETTLE_MS * 1.5);
+  const before = await cylCapture();
+  if (process.env.CYL_UI_SCREENSHOTS) {
+    require('node:fs').writeFileSync(path.join(process.env.CYL_UI_SCREENSHOTS, 'cyl-scroll-before.png'), Buffer.from(before, 'base64'));
+  }
   for (const top of [300, 1380]) {
     await miniProgram.pageScrollTo(top);
     await cylSleep(CYL_SETTLE_MS * 1.5);
-    const after = await miniProgram.screenshot();
+    const after = await cylCapture();
     if (process.env.CYL_UI_SCREENSHOTS) {
       require('node:fs').writeFileSync(path.join(process.env.CYL_UI_SCREENSHOTS, `cyl-scroll-${top}.png`), Buffer.from(after, 'base64'));
     }
@@ -266,7 +320,7 @@ test('the animated icons stay in the bar during and after a page scroll (WeChat 
   // [CN] 动画滚动期间也一样：开发者工具中每个图标只有一个图片图层（CYL_USES_SNAPSHOTS）。
   await miniProgram.evaluate(() => { wx.pageScrollTo({ scrollTop: 0, duration: 3000 }); });
   await cylSleep(1200);
-  const during = await miniProgram.screenshot();
+  const during = await cylCapture();
   if (process.env.CYL_UI_SCREENSHOTS) {
     require('node:fs').writeFileSync(path.join(process.env.CYL_UI_SCREENSHOTS, 'cyl-scroll-during.png'), Buffer.from(during, 'base64'));
   }
@@ -330,18 +384,18 @@ test('looping icons stay one layer and keep playing during a page scroll (WeChat
 
 test('hiddenIdentifiers leaves a tab out of every bar, and tabBarHidden hides one page\'s bar', async () => {
   try {
-    await cylSetState({ hiddenIdentifiers: ['discover'] });
+    await cylSetState({ hiddenIdentifiers: ['city'] });
     let bar = await cylTabBar();
-    assert.deepEqual(bar.slots.filter((slot) => !slot.isPlusButton).map((slot) => slot.key), ['home', 'message', 'me']);
+    assert.deepEqual(bar.slots.filter((slot) => !slot.isPlusButton).map((slot) => slot.key), ['home', 'message', 'CYLMineViewController']);
     assert.equal(bar.slots.filter((slot) => slot.isPlusButton).length, 1, 'the plus button stays');
     assert.deepEqual(bar.slots.filter((slot) => slot.selected).map((slot) => slot.key), ['home']);
     // [EN] A hidden selected tab falls back to the first shown one. [CN] 被隐藏的选中 Tab 回退到第一个显示的 Tab。
     await cylSetState({ hiddenIdentifiers: ['home'] });
     bar = await cylTabBar();
-    assert.deepEqual(bar.slots.filter((slot) => slot.selected).map((slot) => slot.key), ['message']);
+    assert.deepEqual(bar.slots.filter((slot) => slot.selected).map((slot) => slot.key), ['city']);
     await cylSetState({ hiddenIdentifiers: [] });
     bar = await cylTabBar();
-    assert.deepEqual(bar.slots.filter((slot) => !slot.isPlusButton).map((slot) => slot.key), ['home', 'message', 'discover', 'me']);
+    assert.deepEqual(bar.slots.filter((slot) => !slot.isPlusButton).map((slot) => slot.key), ['home', 'city', 'message', 'CYLMineViewController']);
 
     const cylBarHeight = (hidden) => miniProgram.evaluate((value) => new Promise((resolve) => {
       const pages = getCurrentPages();
@@ -406,11 +460,11 @@ test('the Home feed scrolls under the bar with one layer of icons (flat style, d
     // [CN] 先做跳转（不带 duration 的 wx.pageScrollTo）：开发者工具把图标画布留在原处的情形。深色 TabBar 不透明，
     //      因此在任何滚动位置看起来都一样。
     await cylSleep(1500);
-    const baseline = await miniProgram.screenshot();
+    const baseline = await cylCapture();
     for (const jump of [300, 1380, 700]) {
       await miniProgram.pageScrollTo(jump);
       await cylSleep(900);
-      cylCompare(baseline, await miniProgram.screenshot(), `from its look at the top after a jump to ${jump}`);
+      cylCompare(baseline, await cylCapture(), `from its look at the top after a jump to ${jump}`);
     }
     await miniProgram.pageScrollTo(0);
     await cylSleep(900);
@@ -419,10 +473,10 @@ test('the Home feed scrolls under the bar with one layer of icons (flat style, d
       const frames = [];
       for (let index = 0; index < 5; index += 1) {
         await cylSleep(450);
-        frames.push(await miniProgram.screenshot());
+        frames.push(await cylCapture());
       }
       await cylSleep(2200);
-      const rest = await miniProgram.screenshot();
+      const rest = await cylCapture();
       frames.forEach((frame, index) => cylCompare(frame, rest, `from its resting look in frame ${index} of the scroll to ${target}`));
     }
   } finally {
@@ -435,18 +489,40 @@ test('the Home feed scrolls under the bar with one layer of icons (flat style, d
  * [EN] The current page: the page object, its route and its data. [CN] 当前页面：页面对象、路由与数据。
  */
 async function cylCurrentPage() {
-  const page = await miniProgram.currentPage();
-  return { page, route: page.path, data: await page.data() };
+  // [EN] Once more on "page node not found" (a page just shown or rendered again). [CN] 遇到「page node not found」时再试一次（页面刚显示或重新渲染）。
+  try {
+    const page = await miniProgram.currentPage();
+    return { page, route: page.path, data: await page.data() };
+  } catch (error) {
+    if (!/page node not found/.test(String(error && error.message))) {
+      throw error;
+    }
+    await cylSleep(CYL_SETTLE_MS);
+    const page = await miniProgram.currentPage();
+    return { page, route: page.path, data: await page.data() };
+  }
 }
 
 /**
  * [EN] Taps the element `selector` of the current page and waits. [CN] 点击当前页面的 `selector` 元素并等待。
  */
 async function cylTapElement(selector, wait = CYL_SETTLE_MS) {
-  const { page } = await cylCurrentPage();
-  const element = await page.$(selector);
-  assert.ok(element, `no element ${selector}`);
-  await element.tap();
+  // [EN] Once more when DevTools answers "page node not found" (the page was just rendered again, e.g. after a new tab
+  //      bar). [CN] 开发者工具返回「page node not found」时（页面刚重新渲染，例如新的 TabBar 之后）再试一次。
+  for (let attempt = 0; ; attempt += 1) {
+    try {
+      const { page } = await cylCurrentPage();
+      const element = await page.$(selector);
+      assert.ok(element, `no element ${selector}`);
+      await element.tap();
+      break;
+    } catch (error) {
+      if (attempt > 0 || !/page node not found/.test(String(error && error.message))) {
+        throw error;
+      }
+      await cylSleep(CYL_SETTLE_MS);
+    }
+  }
   await cylSleep(wait);
 }
 
@@ -461,10 +537,11 @@ test('the cells of the example act on tap (the request of 2026-11-15)', async ()
   const state = () => miniProgram.evaluate(() => getApp().globalData.cylTabBarState);
 
   // [EN] A direct action: the title of the first tab changes, then comes back. [CN] 直接行为：第一个 Tab 的标题改变后恢复。
+  // [EN] "Purchased courses", as UIViewController+CYLTabBarItemUpdate.swift. [CN] 「已购课程」，与 iOS 相同。
   await cylTapElement('.cyl-home-row[data-id="changeTabTitle"]');
-  assert.equal((await barTitles())[0], 'Changed');
+  assert.match((await barTitles())[0], /Purchased courses|已购课程|已購課程/);
   await cylTapElement('.cyl-home-row[data-id="changeTabTitle"]');
-  assert.notEqual((await barTitles())[0], 'Changed');
+  assert.doesNotMatch((await barTitles())[0], /Purchased courses|已购课程|已購課程/);
 
   // [EN] Show / hide the bar. [CN] 显示 / 隐藏 TabBar。
   await cylTapElement('.cyl-home-row[data-id="flatShowHide"]');
@@ -561,4 +638,420 @@ test('the feeds of Message, Discover and Me act as on iOS (the request of 2026-1
   await miniProgram.evaluate(() => getApp().cyl_updateTabBarState({ badges: {} }));
   await miniProgram.reLaunch('/pages/home/index');
   await cylSleep(CYL_SETTLE_MS);
+});
+
+test('the tabs and the launch sequence match the Objective-C example (docs/ObjC-Example-Parity items 1-6, 29, 55)', async () => {
+  await miniProgram.reLaunch('/pages/home/index');
+  await cylSleep(CYL_SETTLE_MS);
+  await cylSetState({ itemStyle: '', loggedIn: true });
+  // [EN] -[MainTabBarController cyl_demo_decorateTabBarController:] runs 1.5 s after launch; run it again here.
+  // [CN] 启动 1.5 秒后执行；这里再执行一次。
+  await miniProgram.evaluate(() => { getApp().cyl_decorateTabBar(); });
+  await cylSleep(1500 + CYL_SETTLE_MS * 2);
+  const bar = () => miniProgram.evaluate(() => {
+    const pages = getCurrentPages();
+    const tabBar = pages[pages.length - 1].getTabBar().selectComponent('#cyl-tab-bar');
+    return {
+      styleType: tabBar.data.cylStyleType,
+      slots: tabBar.data.cylSlots.map((slot) => ({
+        key: slot.key,
+        selected: Boolean(slot.selected),
+        title: slot.item ? slot.item.title : slot.title,
+        badge: slot.isPlusButton ? (slot.badge && slot.badge.text) : (slot.showsDot ? '•' : slot.badge),
+        badgeItem: slot.badgeItem || null,
+        plusBadgeClass: slot.isPlusButton && slot.badge ? slot.badge.className : '',
+        cover: Boolean(slot.cover),
+      })),
+    };
+  });
+  let state = await bar();
+  assert.equal(state.styleType, 'liquidGlass', 'starts on Liquid Glass');
+  const byKey = (key) => state.slots.find((slot) => slot.key === key);
+  assert.deepEqual(state.slots.map((slot) => slot.key), ['home', 'city', 'plus', 'message', 'CYLMineViewController']);
+  assert.deepEqual(state.slots.map((slot) => slot.title), ['Refresh', 'Nearby', 'Post', 'Messages', 'Me']);
+  assert.equal(byKey('home').badge, '•');
+  assert.equal(byKey('home').badgeItem.animation, 'breathe');
+  assert.equal(byKey('home').badgeItem.size, '{11, 11}');
+  assert.equal(byKey('home').cover, true, 'the cover over Home');
+  assert.equal(byKey('city').badge, '8');
+  assert.deepEqual([byKey('city').badgeItem.color, byKey('city').badgeItem.animation], ['#AF52DE', 'scale']);
+  assert.deepEqual([byKey('message').badge, byKey('message').badgeItem.animation], ['99+', 'bounce']);
+  assert.deepEqual([byKey('CYLMineViewController').badge, byKey('CYLMineViewController').badgeItem.positionAdjustment],
+    ['NEW', '{-1, 3}']);
+  assert.deepEqual([byKey('plus').badge, byKey('plus').plusBadgeClass], ['1', 'cyl-badge-bounce']);
+
+  // [EN] Item 55: on Liquid Glass a tap that selects a tab turns its badge into a dot of the same color.
+  // [CN] 第 55 项：液态玻璃下选中 Tab 的点击把其角标变为同色红点。
+  await cylTap('city');
+  state = await bar();
+  assert.equal(byKey('city').selected, true);
+  assert.deepEqual([byKey('city').badge, byKey('city').badgeItem.color], ['•', '#AF52DE']);
+
+  // [EN] Item 29: Messages and Me need login; the tab stays unselected until the alert logs in.
+  // [CN] 第 29 项：消息与我的需要登录；在弹窗登录之前该 Tab 不会被选中。
+  await cylSetState({ loggedIn: false });
+  await cylTap('message');
+  state = await bar();
+  assert.equal(byKey('message').selected, false, 'Messages needs login');
+  await cylSetState({ loggedIn: true });
+  await cylClearDecoration();
+  await miniProgram.reLaunch('/pages/home/index');
+  await cylSleep(CYL_SETTLE_MS);
+});
+
+test('the Home navigation bar and the skins match the Objective-C example (docs/ObjC-Example-Parity items 7, 8, 9, 15, 32)', async () => {
+  await miniProgram.reLaunch('/pages/home/index');
+  await cylSleep(CYL_SETTLE_MS * 2);
+  const bar = () => miniProgram.evaluate(() => {
+    const pages = getCurrentPages();
+    const tabBar = pages[pages.length - 1].getTabBar().selectComponent('#cyl-tab-bar');
+    return {
+      styleType: tabBar.data.cylStyleType,
+      items: tabBar.data.cylSlots.map((slot) => (slot.item ? { title: slot.item.title, image: slot.item.image, selectedImage: slot.item.selectedImage }
+        : { title: slot.title, image: slot.image })),
+    };
+  });
+
+  // [EN] Item 9: the Skin button opens the menu: 17 skins, the check on Default, then "Follow the system Dark Mode".
+  // [CN] 第 9 项：换肤按钮打开菜单：17 个皮肤，勾号在默认上，然后是「跟随系统深色模式」。
+  await cylTapElement('#cyl-nav-skin');
+  let { data } = await cylCurrentPage();
+  assert.equal(data.skinMenu.length, 18);
+  assert.deepEqual(data.skinMenu.filter((row) => row.checked).map((row) => row.id), ['Default']);
+  assert.equal(data.skinMenu[17].id, 'system');
+  await cylTapElement('.cyl-menu-row[data-id="Christmas"]');
+  ({ data } = await cylCurrentPage());
+  assert.equal(data.skinMenu, null, 'a choice closes the menu');
+  let state = await bar();
+  // [EN] The holiday icons in turn (unselected faded), the last one on the plus button. [CN] 依次使用节日图标（未选中为半透明），最后一个用于 PlusButton。
+  assert.match(state.items[1].image, /theme\/christmas\/wrapped_gift_faded\.png$/);
+  assert.match(state.items[0].selectedImage, /theme\/christmas\/christmas_tree\.png$/);
+  assert.match(state.items[2].image, /theme\/christmas\/star\.png$/);
+
+  // [EN] Items 15 and 32: the skin row names the skin; the list has 17 rows with the check on the current one.
+  // [CN] 第 15、32 项：换肤行显示当前皮肤；列表有 17 行，勾号在当前皮肤上。
+  const skins = data.sections.find((section) => section.id === 'skins');
+  assert.equal(skins.rows.length, 17);
+  assert.deepEqual(skins.rows.filter((row) => row.accessory === 'check').map((row) => row.id), ['skin:Christmas']);
+  const skinRow = data.sections.reduce((found, section) => found || (section.rows || []).find((row) => row.id === 'skin'), null);
+  assert.match(skinRow.subtitle, /Christmas|圣诞节|聖誕節/);
+
+  // [EN] The network skin: "★ " before the titles, icons from the network. [CN] 网络皮肤：标题前加「★ 」，图标来自网络。
+  await miniProgram.evaluate(() => { getApp().cyl_setSkin('Network icons'); });
+  await cylSleep(CYL_SETTLE_MS);
+  state = await bar();
+  assert.ok(state.items[1].title.startsWith('★ '), state.items[1].title);
+  assert.match(state.items[1].image, /^https:\/\/cdn-icons-png\.flaticon\.com\//);
+
+  // [EN] Item 7: Flat Design builds a new FlatDesign bar, its launch badges again; the skin stays.
+  // [CN] 第 7 项：Flat Design 创建新的扁平样式 TabBar，再次出现启动角标；皮肤保持不变。
+  await cylTapElement('#cyl-nav-flat', 1500 + CYL_SETTLE_MS * 2);
+  state = await bar();
+  assert.equal(state.styleType, 'flatDesign');
+  assert.ok(state.items[1].title.startsWith('★ '), 'the skin stays');
+  let app = await miniProgram.evaluate(() => getApp().globalData.cylTabBarState);
+  assert.equal(app.badges.city, '8', 'the launch badges again');
+  ({ data } = await cylCurrentPage());
+  assert.ok(!/Liquid/.test(data.navigationTitle), 'no " (Liquid)" in FlatDesign');
+
+  // [EN] Item 8: Liquid Glass builds a new Liquid Glass bar. [CN] 第 8 项：Liquid Glass 重新创建液态玻璃 TabBar。
+  await cylTapElement('#cyl-nav-liquid', CYL_SETTLE_MS * 2);
+  state = await bar();
+  assert.equal(state.styleType, 'liquidGlass');
+  ({ data } = await cylCurrentPage());
+  assert.match(data.navigationTitle, /\(Liquid\)$/);
+
+  // [EN] Following the system: Dark in Dark Mode. [CN] 跟随系统：深色模式下为 Dark。
+  await miniProgram.evaluate(() => { getApp().cyl_updateTabBarState({ systemTheme: 'dark' }); getApp().cyl_setSkinFollowsSystem(true); });
+  await cylSleep(CYL_SETTLE_MS);
+  ({ data } = await cylCurrentPage());
+  assert.deepEqual(data.sections.find((section) => section.id === 'skins').rows.filter((row) => row.accessory === 'check').map((row) => row.id), ['skin:Dark']);
+  await miniProgram.evaluate(() => { getApp().cyl_setSkinFollowsSystem(false); getApp().cyl_updateTabBarState({ systemTheme: 'light' }); });
+  app = await miniProgram.evaluate(() => getApp().globalData.cylTabBarState);
+  assert.equal(app.skinFollowsSystem, false);
+  await cylClearDecoration();
+  await miniProgram.reLaunch('/pages/home/index');
+  await cylSleep(CYL_SETTLE_MS);
+});
+
+test('the Home rows act with the Objective-C values (docs/ObjC-Example-Parity items 13, 14, 16, 19, 21-26, 28)', async () => {
+  await miniProgram.reLaunch('/pages/home/index');
+  await cylSleep(CYL_SETTLE_MS * 2);
+  // [EN] A new tab bar: the rows start from the configuration's values. [CN] 新的 TabBar：各行从配置中的值开始。
+  await miniProgram.evaluate(() => { getApp().cyl_rebuildTabBar('liquidGlass'); });
+  await cylClearDecoration();
+  const tap = (id, wait) => cylTapElement(`.cyl-home-row[data-id="${id}"]`, wait);
+  const row = async (id) => {
+    const { data } = await cylCurrentPage();
+    return data.sections.reduce((found, section) => found || (section.rows || []).find((candidate) => candidate.id === id), null);
+  };
+  const bar = () => miniProgram.evaluate(() => {
+    const pages = getCurrentPages();
+    const tabBar = pages[pages.length - 1].getTabBar().selectComponent('#cyl-tab-bar');
+    return {
+      style: tabBar.data.cylBarStyle,
+      slots: tabBar.data.cylSlots.map((slot) => ({
+        key: slot.key,
+        selected: Boolean(slot.selected),
+        title: slot.item ? slot.item.title : slot.title,
+        image: slot.item ? slot.item.image : slot.image,
+      })),
+    };
+  });
+
+  // [EN] Item 13: (0, -3.5) at launch, then 0, -4, 4. [CN] 第 13 项：启动时 (0, -3.5)，然后为 0、-4、4。
+  assert.match((await row('titleOffset')).subtitle, /\(0, -3\.5\)/);
+  for (const value of ['(0, 0)', '(0, -4)', '(0, 4)', '(0, 0)']) {
+    await tap('titleOffset');
+    assert.ok((await row('titleOffset')).subtitle.includes(value), value);
+  }
+
+  // [EN] Item 14: Original → Dark (#141414 bar) → Centered capsule → Green line (green top line) → Original.
+  // [CN] 第 14 项：原始 → 深色（#141414）→ 居中胶囊 → 绿色描边（绿色顶部线）→ 原始。
+  await tap('standardAppearance');
+  assert.match((await bar()).style, /#141414/);
+  await tap('standardAppearance');
+  await tap('standardAppearance');
+  assert.match((await bar()).style, /border-top-color: #34C759/);
+  await tap('standardAppearance');
+  assert.doesNotMatch((await bar()).style, /#141414|#34C759/);
+
+  // [EN] Item 16: the four behaviors, by their code names. [CN] 第 16 项：四种行为，显示代码名。
+  for (const name of ['OnScrollDown', 'OnScrollUp', 'Never', 'Automatic']) {
+    await tap('scrollBehavior');
+    assert.ok((await row('scrollBehavior')).subtitle.includes(name), name);
+  }
+
+  // [EN] Items 21-26: checkmarks while on, the slot rules, a second tap restores. [CN] 第 21–26 项：开启时带勾号，图标位置规则，再点恢复。
+  await tap('downloadNetworkIcon');
+  assert.equal((await row('downloadNetworkIcon')).accessory, 'check');
+  assert.match((await bar()).slots[0].image, /3132\/31327(32|79)\.png$/);
+  await tap('gifIcon');
+  assert.equal((await row('downloadNetworkIcon')).accessory, 'none', 'one icon slot');
+  assert.match((await bar()).slots[0].image, /cyl_tab_sample_animated\.gif$/);
+  await tap('allNetworkIcons');
+  assert.equal((await row('gifIcon')).accessory, 'none', 'all icons clear the single icon');
+  assert.match((await bar()).slots[1].image, /2099\/2099085\.png$/);
+  await tap('allLocalIcons');
+  assert.equal((await row('allNetworkIcons')).accessory, 'none', 'network and local exclude each other');
+  assert.match((await bar()).slots[0].image, /img_tab_home_[01]\.png$/);
+  await tap('allLocalIcons');
+  await tap('allTitles');
+  assert.ok((await bar()).slots.filter((slot) => slot.key !== 'home').every((slot) => slot.title.startsWith('★ ')));
+  await tap('allTitles');
+  assert.ok((await bar()).slots.every((slot) => !slot.title.startsWith('★ ')));
+
+  // [EN] Item 19: outside FlatDesign the row is dimmed and an alert explains it. [CN] 第 19 项：非扁平样式下该行变灰并弹窗说明。
+  assert.equal((await row('flatBackground')).dimmed, true);
+
+  // [EN] Item 28: the next tab without the plus button, wrapping after the last. [CN] 第 28 项：不含 PlusButton 的下一个 Tab，最后一个之后回到第一个。
+  await cylSetState({ loggedIn: true });
+  for (const key of ['city', 'message', 'CYLMineViewController']) {
+    await miniProgram.switchTab('/pages/home/index');
+    await cylSleep(CYL_SETTLE_MS);
+    await miniProgram.evaluate((next) => {
+      const pages = getCurrentPages();
+      const tabs = ['home', 'city', 'message', 'CYLMineViewController'];
+      // [EN] The custom tab bar passes the selection to cyl-tab-bar. [CN] 自定义 TabBar 把选中状态传给 cyl-tab-bar。
+      pages[pages.length - 1].getTabBar().setData({ selectedIdentifier: tabs[tabs.indexOf(next) - 1] });
+    }, key);
+    await cylSleep(CYL_SETTLE_MS);
+    await tap('selectedIndex', CYL_SETTLE_MS * 2);
+    assert.equal((await cylCurrentPage()).route, { city: 'pages/web/index', message: 'pages/message/index', CYLMineViewController: 'pages/me/index' }[key]);
+  }
+  await miniProgram.switchTab('/pages/home/index');
+  await cylSleep(CYL_SETTLE_MS);
+  await miniProgram.evaluate(() => {
+    const pages = getCurrentPages();
+    pages[pages.length - 1].getTabBar().setData({ selectedIdentifier: 'CYLMineViewController' });
+  });
+  await cylSleep(CYL_SETTLE_MS);
+  await tap('selectedIndex');
+  assert.equal((await bar()).slots.find((slot) => slot.selected).key, 'home', 'wraps to the first tab');
+  await miniProgram.evaluate(() => { getApp().cyl_rebuildTabBar('liquidGlass'); });
+  await cylClearDecoration();
+  await miniProgram.reLaunch('/pages/home/index');
+  await cylSleep(CYL_SETTLE_MS);
+});
+
+test('the arrows, the touchable area, the replaced tab and the gesture timings (docs/ObjC-Example-Parity items 27, 30, 35, 37)', async () => {
+  await miniProgram.reLaunch('/pages/home/index');
+  await cylSleep(CYL_SETTLE_MS * 2);
+  await miniProgram.evaluate(() => { getApp().cyl_rebuildTabBar('liquidGlass'); });
+  await cylClearDecoration();
+  const row = async (id) => {
+    const { data } = await cylCurrentPage();
+    return data.sections.reduce((found, section) => found || (section.rows || []).find((candidate) => candidate.id === id), null);
+  };
+  const plus = () => miniProgram.evaluate(() => {
+    const pages = getCurrentPages();
+    const tabBar = pages[pages.length - 1].getTabBar().selectComponent('#cyl-tab-bar');
+    return tabBar.data.cylSlots.find((slot) => slot.isPlusButton).hitStyle;
+  });
+
+  // [EN] Item 37: no tab before Home (NO, no wrapping); the next one is Nearby (YES). [CN] 第 37 项：首页之前没有 Tab（NO，不循环）；下一个是同城（YES）。
+  await cylTapElement('#cyl-arrow-previous');
+  assert.match((await row('adjacentTab')).subtitle, /NO$/);
+  assert.equal((await cylCurrentPage()).route, 'pages/home/index');
+
+  // [EN] Item 30: the switch shows the area in red, the slider multiplies it. [CN] 第 30 项：开关以红色显示区域，滑块按倍数扩大。
+  await miniProgram.evaluate(() => { getCurrentPages().pop().cyl_touchableArea({ shows: true, scale: 2 }); });
+  await cylSleep(CYL_SETTLE_MS);
+  assert.match(await plus(), /width: 200%.*background-color: rgba\(255, 59, 48/);
+  assert.match((await row('touchableArea')).subtitle, /2\.0x$/);
+  await miniProgram.evaluate(() => { getCurrentPages().pop().cyl_touchableArea({ shows: false, scale: 1 }); });
+  await cylSleep(CYL_SETTLE_MS);
+  assert.equal(await plus(), '');
+
+  // [EN] Item 35: (0.5, 0.35) → (1, 0.6) → (0.25, 0.25) → (0.5, 0.35). [CN] 第 35 项：依次切换。
+  for (const [longPress, doubleTap] of [['1', '0.6'], ['0.25', '0.25'], ['0.5', '0.35']]) {
+    await cylTapElement('.cyl-home-row[data-id="longPressDuration"]');
+    const subtitle = (await row('longPressDuration')).subtitle;
+    assert.ok(subtitle.includes(`cyl_tabBarItemLongPressDuration: ${longPress} s`) && subtitle.endsWith(`${doubleTap} s`), subtitle);
+  }
+
+  // [EN] Item 27: Nearby (right of Home) becomes "Replaced page B" with a pink page; tap again to restore.
+  // [CN] 第 27 项：同城（首页右侧）变为「替换页 B」并显示粉色页面；再点恢复。
+  await cylTapElement('.cyl-home-row[data-id="replaceNeighbors"]');
+  assert.equal((await row('replaceNeighbors')).accessory, 'check');
+  await cylTapElement('#cyl-arrow-next', CYL_SETTLE_MS * 2);
+  let current = await cylCurrentPage();
+  assert.equal(current.route, 'pages/web/index');
+  assert.match(current.data.replaced.title, /Replaced page B|替换页 B|替換頁 B/);
+  await miniProgram.switchTab('/pages/home/index');
+  await cylSleep(CYL_SETTLE_MS);
+  assert.match((await row('adjacentTab')).subtitle, /YES$/);
+  await cylTapElement('.cyl-home-row[data-id="replaceNeighbors"]');
+  current = await cylCurrentPage();
+  assert.equal((await row('replaceNeighbors')).accessory, 'none');
+  await miniProgram.evaluate(() => { getApp().cyl_rebuildTabBar('liquidGlass'); });
+  await cylClearDecoration();
+  await miniProgram.reLaunch('/pages/home/index');
+  await cylSleep(CYL_SETTLE_MS);
+});
+
+test('the tap animation and the tap sound and haptics rows cycle as the Objective-C example (docs/ObjC-Example-Parity item 33)', async () => {
+  await miniProgram.reLaunch('/pages/home/index');
+  await cylSleep(CYL_SETTLE_MS * 2);
+  await miniProgram.evaluate(() => { getApp().cyl_rebuildTabBar('liquidGlass'); });
+  await cylClearDecoration();
+  const model = () => miniProgram.evaluate(() => {
+    const pages = getCurrentPages();
+    const tabBar = pages[pages.length - 1].getTabBar().selectComponent('#cyl-tab-bar');
+    const m = tabBar.cylModel;
+    return {
+      animation: m.tapAnimation,
+      duration: m.animationDuration,
+      fireworks: m.playsFireworks,
+      star: Boolean(m.fireworksImage),
+      direction: m.flipDirection,
+      homeAnimation: m.items[0].tapAnimation,
+      sound: m.tapSoundURL,
+      haptic: m.tapHapticStyle,
+      playing: tabBar.data.cylAnimatingIdentifier,
+      particles: tabBar.data.cylFireworks ? tabBar.data.cylFireworks.particles.length : 0,
+    };
+  });
+  const expected = [
+    ['scale', 500], ['zoomIn', 500], ['bounce', 500], ['bounceWithFireworks', 500], ['rotation', 500], ['flip', 500],
+    ['fume', 500], ['none', 500], ['frames', 500], ['scale', 1200], ['zoomIn', 1200], ['bounceWithFireworks', 500], ['flip', 500],
+  ];
+  for (let step = 1; step <= 13; step += 1) {
+    await cylTapElement('.cyl-home-row[data-id="tapAnimation"]', 450);
+    const current = await model();
+    assert.deepEqual([current.animation, current.duration], expected[step - 1], `step ${step}`);
+    if (step === 4) {
+      assert.equal(current.playing, 'home', 'played once on the selected tab');
+      // [EN] Played again once the new configuration is in the bar. [CN] 新配置进入 TabBar 后再播放一次。
+      await miniProgram.evaluate(() => {
+        const pages = getCurrentPages();
+        pages[pages.length - 1].getTabBar().selectComponent('#cyl-tab-bar').cyl_playSelectedTapAnimation();
+      });
+      await cylSleep(200);
+      assert.equal((await model()).particles, 10, 'fireworks');
+    }
+    if (step === 8) {
+      assert.equal(current.homeAnimation, 'rotation', 'this tab only');
+    }
+    if (step === 12) {
+      assert.equal(current.star, true);
+    }
+    if (step === 13) {
+      assert.equal(current.direction, 5);
+    }
+  }
+  await cylTapElement('.cyl-home-row[data-id="tapAnimation"]', 450);
+  assert.equal((await model()).homeAnimation, '', 'back to None');
+
+  const sounds = [['/shared/sounds/cyl_tap_click.wav', ''], ['/shared/sounds/cyl_tap_tock.wav', ''], ['', 'light'], ['', 'medium'],
+    ['', 'heavy'], ['/shared/sounds/cyl_tap_click.wav', 'medium'], ['', '']];
+  for (const [sound, haptic] of sounds) {
+    await cylTapElement('.cyl-home-row[data-id="tapSound"]', 450);
+    const current = await model();
+    assert.deepEqual([current.sound, current.haptic], [sound, haptic]);
+  }
+  await miniProgram.evaluate(() => { getApp().cyl_rebuildTabBar('liquidGlass'); });
+  await cylClearDecoration();
+  await miniProgram.reLaunch('/pages/home/index');
+  await cylSleep(CYL_SETTLE_MS);
+});
+
+test('a memory warning unloads the unselected tabs except Home and reports each tab (docs/ObjC-Example-Parity item 12)', async () => {
+  await cylSetState({ loggedIn: true });
+  for (const page of ['/pages/message/index', '/pages/me/index', '/pages/home/index']) {
+    await miniProgram.switchTab(page);
+    await cylSleep(CYL_SETTLE_MS);
+  }
+  // [EN] The row's report, from the tabs of Home's bar. [CN] 本行的报告，取自首页 TabBar 的各 Tab。
+  const report = await miniProgram.evaluate(() => {
+    const pages = getCurrentPages();
+    const bar = pages[pages.length - 1].getTabBar().selectComponent('#cyl-tab-bar');
+    const routes = { home: 'home', city: 'web', plus: 'publish', message: 'message', CYLMineViewController: 'me' };
+    const tabs = bar.data.cylSlots.map((slot) => ({
+      title: slot.key,
+      route: `pages/${routes[slot.key]}/index`,
+      selected: Boolean(slot.selected),
+    }));
+    return getApp().cyl_simulateMemoryWarning(tabs).split('\n');
+  });
+  assert.equal(report[0], 'home: kept: selected');
+  // [EN] Nearby and Post were loaded or not, depending on the tests before. [CN] 同城与发布是否已加载取决于之前的测试。
+  assert.match(report[1], /^city: (not loaded|unloaded)$/);
+  assert.match(report[2], /^plus: (not loaded|unloaded)$/);
+  assert.deepEqual(report.slice(3), ['message: unloaded', 'CYLMineViewController: unloaded']);
+  const unloaded = await miniProgram.evaluate(() => getApp().cylLoadedTabPages['pages/me/index'].data.cylUnloaded);
+  assert.equal(unloaded, true, 'the view of Me is gone');
+  await miniProgram.switchTab('/pages/me/index');
+  await cylSleep(CYL_SETTLE_MS);
+  const current = await cylCurrentPage();
+  assert.equal(current.data.cylUnloaded, false, 'built again when it shows');
+  assert.ok(await current.page.$('.cyl-page'), 'the page has its view again');
+  await miniProgram.switchTab('/pages/home/index');
+  await cylSleep(CYL_SETTLE_MS);
+});
+
+test('the language row: five languages and Follow system, Arabic right to left (docs/ObjC-Example-Parity item 11)', async () => {
+  await miniProgram.switchTab('/pages/home/index');
+  await cylSleep(CYL_SETTLE_MS);
+  const choose = async (language) => {
+    await miniProgram.evaluate((code) => { getCurrentPages().pop().cyl_setLanguage(code); }, language);
+    await cylSleep(CYL_SETTLE_MS * 3);
+    const { data } = await cylCurrentPage();
+    const bar = await miniProgram.evaluate(() => getCurrentPages().pop().getTabBar().data.rtl);
+    return { title: data.sections[0].rows[0].title, offset: data.sections[1].rows[0].title, rtl: data.cylRTL, bar };
+  };
+  let current = await choose('ar');
+  assert.equal(current.title, '🌐 اللغة：🇸🇦 العربية');
+  assert.equal(current.offset, 'إزاحة العنوان (titlePositionAdjustment)');
+  assert.deepEqual([current.rtl, current.bar], [true, true], 'right to left, the bar too');
+  current = await choose('es');
+  assert.equal(current.title, '🌐 Idioma：🇪🇸 Español');
+  assert.deepEqual([current.rtl, current.bar], [false, false]);
+  current = await choose('hi');
+  assert.match(current.title, /🇮🇳 हिन्दी$/);
+  current = await choose('zh-Hans');
+  assert.equal(current.title, '🌐 语言：🇨🇳 简体中文');
+  current = await choose(null);
+  assert.match(current.title, /^🌐 /, 'follows WeChat again');
+  await cylClearDecoration();
 });

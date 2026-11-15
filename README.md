@@ -1853,6 +1853,36 @@ CYLTabBar(items: items, styleType: 'liquidGlass', selectedIndex: index, badgeVal
 
 ![WeChat Mini Program Liquid Glass: regular lens, skeuomorphic lens, plus title aligned on the default bar and on Liquid Glass](assets/wechat-miniprogram-liquid-glass.png)
 
+| 中文 | English |
+|:---|:---|
+| **微信小程序：Feed 点击与 iOS 一致**：Message、Discover、Me 的 Feed 与 iOS 示例一样响应点击。下图（微信小程序，Windows 11 开发者工具，模拟器 iPhone 12/13 Pro，基础库 3.17.6，基于 [ef5afc3](https://github.com/ChenYilong/CYLTabBarController/commit/ef5afc3)，2026-11-15）从上到下：Message 第 1 行推入新上下文的 TabBar，其 PlusButton 带可点击的 X（#202）；Discover 详情页（橙色，关闭返回手势）；Me 的 Feed，Me 为选中状态。见[微信小程序文档](docs/WeChat-Mini-Program.md)。 | **WeChat Mini Program: feed taps as on iOS**: the feeds of Message, Discover and Me act on tap as in the iOS example. Below (WeChat Mini Program, DevTools on Windows 11, simulator iPhone 12/13 Pro, base library 3.17.6, on top of [ef5afc3](https://github.com/ChenYilong/CYLTabBarController/commit/ef5afc3), 2026-11-15), top to bottom: Message row 1 pushes a tab bar of a new context whose plus button has a tappable X (#202); the Discover details page (orange, pop gesture off); the Me feed with Me selected. See [WeChat Mini Program](docs/WeChat-Mini-Program.md). |
+
+![WeChat Mini Program, DevTools on Windows 11, base library 3.17.6: Message pushes a tab bar whose plus button has a tappable X, the Discover details page, the Me feed](assets/wechat-miniprogram-feed-taps.png)
+
+| 中文 | English |
+|:---|:---|
+| **微信小程序：与 Objective-C 示例相同的 Tab 与启动效果**：首页 / Refresh、同城、发布、消息、我的，ObjC 的图片与红 / 绿标题，液态玻璃；启动 1.5 秒后显示角标（紫色 8、99+、NEW、PlusButton 1）与首页的「淘」封面；选中 Tab 的点击把角标变为同色红点；消息与我的需要登录。下图（微信小程序，Windows 11 开发者工具，模拟器 iPhone 12/13 Pro，基础库 3.17.6，基于 [4e2e327](https://github.com/ChenYilong/CYLTabBarController/commit/4e2e327)，2026-11-15）从上到下：启动后；点击同城；未登录时点击消息。进度见 [ObjC 示例复刻](docs/ObjC-Example-Parity/README.md)。 | **WeChat Mini Program: the Objective-C example’s tabs and launch**: Home / Refresh, Nearby, Post, Messages, Me, the ObjC images and red / green titles, Liquid Glass; 1.5 s after launch the badges (purple 8, 99+, NEW, plus button 1) and the cover over Home; a tap that selects a tab turns its badge into a dot of its color; Messages and Me need login. Below (WeChat Mini Program, DevTools on Windows 11, simulator iPhone 12/13 Pro, base library 3.17.6, on top of [4e2e327](https://github.com/ChenYilong/CYLTabBarController/commit/4e2e327), 2026-11-15), top to bottom: after launch; Nearby tapped; Messages tapped while logged out. Progress: [ObjC example parity](docs/ObjC-Example-Parity/README.md). |
+
+![WeChat Mini Program, DevTools on Windows 11, base library 3.17.6: the Objective-C tabs with the launch badges and the cover, Nearby selected with a purple dot, the login alert for Messages](assets/wechat-miniprogram-objc-launch.png)
+
+| 中文 | English |
+|:---|:---|
+| **微信小程序：首页导航栏与 17 个皮肤**：与 Objective-C 示例相同，首页导航栏左侧「Flat Design」（呼吸红点）、右侧「换肤」与「Liquid Glass」（抖动红点）；前后两者用对应样式的新 TabBar 替换当前 TabBar，「换肤」打开 17 个皮肤与「跟随系统深色模式」的菜单（节日图标、网络图标、配色）。下图（微信小程序，Windows 11 开发者工具，模拟器 iPhone 12/13 Pro，基础库 3.17.6，基于 [b850f51](https://github.com/ChenYilong/CYLTabBarController/commit/b850f51)，2026-11-15）从左到右：启动后；换肤菜单；圣诞节皮肤；网络皮肤下的扁平样式。进度见 [ObjC 示例复刻](docs/ObjC-Example-Parity/README.md)。 | **WeChat Mini Program: the Home navigation bar and the 17 skins**: as the Objective-C example, "Flat Design" (a breathing dot) on the left of the Home navigation bar, "Skin" and "Liquid Glass" (a shaking dot) on the right; the first and last replace the bar with a new one in that style, "Skin" opens the menu of the 17 skins and "Follow the system Dark Mode" (holiday icons, network icons, colors). Below (WeChat Mini Program, DevTools on Windows 11, simulator iPhone 12/13 Pro, base library 3.17.6, on top of [b850f51](https://github.com/ChenYilong/CYLTabBarController/commit/b850f51), 2026-11-15), left to right: after launch; the skin menu; Christmas; FlatDesign in the network skin. Progress: [ObjC example parity](docs/ObjC-Example-Parity/README.md). |
+
+![WeChat Mini Program, DevTools on Windows 11, base library 3.17.6: the Home navigation bar with Flat Design, Skin and Liquid Glass, the skin menu, the Christmas skin, the network skin on a FlatDesign bar](assets/wechat-miniprogram-objc-skins.png)
+
+| 中文 | English |
+|:---|:---|
+| **微信小程序：首页各行与 Objective-C 示例取值一致**：标题偏移 0 / -4 / 4、四种 standardAppearance、四种滚动行为、扁平样式 Item 背景色、原地更新 Tab（「已购课程」、网络 / 本地 / GIF 图标、「★ 」标题，带勾号，再点恢复）、selectedIndex 循环。下图（微信小程序，Windows 11 开发者工具，模拟器 iPhone 12/13 Pro，基础库 3.17.6，基于 [a9b1278](https://github.com/ChenYilong/CYLTabBarController/commit/a9b1278)，2026-11-15）从左到右：深色外观 + 本地图标；居中胶囊 + 网络图标 +「★ 」标题；扁平样式 + 绿色描边 + Item 背景色。进度见 [ObjC 示例复刻](docs/ObjC-Example-Parity/README.md)。 | **WeChat Mini Program: the Home rows with the Objective-C values**: title offset 0 / -4 / 4, the four standardAppearance themes, the four scroll behaviors, the FlatDesign item background, tabs updated in place ("Purchased courses", network / local / GIF icons, "★ " titles, with checkmarks, tap again to restore), selectedIndex wrapping. Below (WeChat Mini Program, DevTools on Windows 11, simulator iPhone 12/13 Pro, base library 3.17.6, on top of [a9b1278](https://github.com/ChenYilong/CYLTabBarController/commit/a9b1278), 2026-11-15), left to right: Dark + local icons; Centered capsule + network icons + "★ " titles; FlatDesign + Green line + item background. Progress: [ObjC example parity](docs/ObjC-Example-Parity/README.md). |
+
+![WeChat Mini Program, DevTools on Windows 11, base library 3.17.6: the Dark appearance with local icons, the centered capsule with network icons and star titles, FlatDesign with the green line and item backgrounds](assets/wechat-miniprogram-objc-home-rows.png)
+
+| 中文 | English |
+|:---|:---|
+| **微信小程序：上一个 / 下一个箭头、PlusButton 点击范围、替换相邻 Tab、长按与双击时长**：与 Objective-C 示例相同，◀︎ ▶︎ 调用 `cyl_switchToAdjacentTab`（不循环，显示 YES / NO）；开关以红色显示 PlusButton 的可点击区域，滑块按 1–3 倍扩大；同城变为「替换页 B」；长按时长与双击间隔三档切换。下图（微信小程序，Windows 11 开发者工具，模拟器 iPhone 12/13 Pro，基础库 3.17.6，基于 [5d86b75](https://github.com/ChenYilong/CYLTabBarController/commit/5d86b75)，2026-11-15）左：1.8 倍可点击区域与「替换页 B」Tab；右：▶︎ 进入替换页 B。进度见 [ObjC 示例复刻](docs/ObjC-Example-Parity/README.md)。 | **WeChat Mini Program: previous / next arrows, the plus button's touchable area, replaced neighboring tabs, long press and double tap timings**: as the Objective-C example, ◀︎ ▶︎ call `cyl_switchToAdjacentTab` (no wrapping, YES / NO shown); a switch shows the plus button's touchable area in red and a slider multiplies it 1–3; Nearby becomes "Replaced page B"; the long press and double tap timings cycle through three presets. Below (WeChat Mini Program, DevTools on Windows 11, simulator iPhone 12/13 Pro, base library 3.17.6, on top of [5d86b75](https://github.com/ChenYilong/CYLTabBarController/commit/5d86b75), 2026-11-15), left: the 1.8x touchable area and the "Replaced page B" tab; right: ▶︎ opened Replaced page B. Progress: [ObjC example parity](docs/ObjC-Example-Parity/README.md). |
+
+![WeChat Mini Program, DevTools on Windows 11, base library 3.17.6: the plus button's touchable area in red and the Replaced page B tab, then the pink Replaced page B](assets/wechat-miniprogram-objc-arrows-touch-replaced.png)
+
 ### [CN]在 Swift 项目中使用 CYLTabBarController
 ### [EN]Using CYLTabBarController in a Swift project
 

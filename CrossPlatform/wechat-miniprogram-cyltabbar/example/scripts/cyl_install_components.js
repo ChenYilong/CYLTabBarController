@@ -121,7 +121,8 @@ function cylMain() {
       json.usingComponents[tag] = components[tag]
     })
     const text = `${JSON.stringify(json, null, 2)}\n`
-    if (fs.readFileSync(target, 'utf8') !== text) {
+    // [EN] A Windows checkout (core.autocrlf) has CRLF line ends: not a change. [CN] Windows 检出（core.autocrlf）为 CRLF 行尾，不算变化。
+    if (fs.readFileSync(target, 'utf8').replace(/\r\n/g, '\n') !== text) {
       pageFiles[target] = text
     }
   })
@@ -153,7 +154,12 @@ function cylMain() {
   })
   unusedAssetFolders.forEach((folder) => fs.rmSync(folder, {recursive: true, force: true}))
   cylRemoveEmptyFolders(CYL_TARGET)
-  Object.entries(pageFiles).forEach(([target, text]) => fs.writeFileSync(target, text))
+  // [EN] Keep the line ends of the checkout (CRLF on Windows with core.autocrlf), so git sees no change of line ends.
+  // [CN] 保留检出的行尾（Windows 上 core.autocrlf 为 CRLF），使 git 不会看到行尾变化。
+  Object.entries(pageFiles).forEach(([target, text]) => {
+    const crlf = fs.readFileSync(target, 'utf8').includes('\r\n')
+    fs.writeFileSync(target, crlf ? text.replace(/\n/g, '\r\n') : text)
+  })
   console.log(`Animation: ${choice}. Installed ${Object.keys(packages).join(', ')} into miniprogram/miniprogram_npm (${changed.length} file(s) updated, ${stale.length} removed).`)
 }
 

@@ -1,4 +1,6 @@
 <!-- [EN] The mini program's custom tab bar: the cyl-tab-bar component of the cyl-tabbar-miniprogram package (miniprogram_npm) with the example's configuration. [CN] 小程序的自定义 TabBar：cyl-tabbar-miniprogram 包（miniprogram_npm）中的 cyl-tab-bar 组件，带有示例配置。 -->
+<!-- [EN] Arabic: the tabs right to left (the bar mirrored). [CN] 阿拉伯语：Tab 从右到左（TabBar 镜像）。 -->
+<view style="{{rtl ? 'direction: rtl;' : ''}}">
 <cyl-tab-bar
   id="cyl-tab-bar"
   generic:cyl-lottie-view="cyl-lottie"
@@ -19,4 +21,6 @@
   bind:reselect="cyl_onReselect"
   bind:plustap="cyl_onPlusTap"
   bind:loginrequired="cyl_onLoginRequired"
+  bind:longpress="cyl_onLongPress"
 />
+</view>

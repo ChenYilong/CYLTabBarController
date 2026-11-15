@@ -165,7 +165,7 @@ Component({
       this.cyl_override({ cylDemoBoldTitles: event.detail.value });
     },
     cyl_loginRequired(event) {
-      this.cyl_override({ CYLTabBarControllerLoginRequiredTabBarItemIdentifiers: event.detail.value ? ['me'] : [] });
+      this.cyl_override({ CYLTabBarControllerLoginRequiredTabBarItemIdentifiers: event.detail.value ? ['CYLMineViewController'] : [] });
       this.cyl_update({ loggedIn: !event.detail.value });
     },
   },

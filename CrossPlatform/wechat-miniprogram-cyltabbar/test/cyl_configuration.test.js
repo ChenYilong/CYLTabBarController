@@ -100,7 +100,8 @@ test('appearance keys: insets, title offsets, colors, style type, tap animation,
   assert.equal(model.items[0].selectedBackgroundColor, '#FF000080');
   assert.equal(model.styleType, 'liquidGlass');
   assert.equal(model.tapAnimation, 'rotation');
-  assert.equal(model.animationDuration, 200);
+  // [EN] CYLTabButtonAnimation.duration 0.5 s at speed 2. [CN] 速度 2 时为 0.5 秒的一半。
+  assert.equal(model.animationDuration, 250);
   const invalid = reader.cylReadConfiguration({ CYLTabBarControllerStyleType: 'glass', CYLTabBarControllerTabButtonTapAnimation: 'spin' }, {});
   assert.equal(invalid.styleType, 'default');
   assert.equal(invalid.tapAnimation, 'none');
@@ -212,4 +213,40 @@ test('title fonts, image URL size, icon rendering mode and colors (#787), plus b
   assert.deepEqual([original.iconTint, original.titleFontStyle, original.imageSize],
     ['', 'font-size: 12px; line-height: 14px; font-weight: 700;', { width: 24, height: 24 }]);
   assert.equal(model.plusButton.showsSelection, true);
+});
+
+test('skin keys of UITabBarAppearance: shadow color, badge background color, badge offset', () => {
+  const model = reader.cylReadConfiguration({
+    CYLTabBarControllerTabBarItemsAttributes: [{ CYLTabBarItemTitle: 'Home', CYLTabBarItemIdentifier: 'home' }],
+    CYLTabBarControllerThemes: { green: { CYLTabBarShadowColor: '#34C759', CYLTabBarItemBadgeBackgroundColor: '#FF9500', CYLTabBarItemBadgePositionAdjustment: '{2, -2}' } },
+  }, {});
+  assert.equal(model.shadowColor, '#34C759');
+  assert.equal(model.badgeBackgroundColor, '#FF9500');
+  assert.equal(model.badgePositionAdjustment, '{2, -2}');
+  const plain = reader.cylReadConfiguration({ CYLTabBarControllerTabBarItemsAttributes: [{ CYLTabBarItemTitle: 'Home' }] }, {});
+  assert.deepEqual([plain.shadowColor, plain.badgeBackgroundColor, plain.badgePositionAdjustment], ['', '', '']);
+});
+
+test('tap animation keys: duration, per-tab animation, frames, fireworks, flip direction, sound and haptics', () => {
+  const model = reader.cylReadConfiguration({
+    CYLTabBarControllerTabBarItemsAttributes: [
+      { CYLTabBarItemTitle: 'Home', CYLTabBarItemIdentifier: 'home', CYLTabBarItemTabButtonTapAnimation: 'rotation' },
+      { CYLTabBarItemTitle: 'Me', CYLTabBarItemIdentifier: 'me', CYLTabBarItemTabButtonTapAnimation: 'spin' },
+    ],
+    CYLTabBarControllerTabButtonTapAnimation: 'frames',
+    CYLTabBarControllerTabButtonTapAnimationDuration: 1.2,
+    CYLTabBarControllerTabButtonFireworksImage: '/star.png',
+    CYLTabBarControllerTabButtonFlipDirection: 5,
+    CYLTabBarControllerTabButtonTapSoundURL: '/click.wav',
+    CYLTabBarControllerTabButtonTapHapticStyle: 'heavy',
+  }, {});
+  assert.equal(model.tapAnimation, 'frames');
+  assert.equal(model.animationDuration, 1200);
+  assert.deepEqual(model.items.map((item) => item.tapAnimation), ['rotation', '']);
+  assert.equal(model.playsFireworks, true, 'frames play fireworks');
+  assert.equal(model.fireworksImage, '/star.png');
+  assert.equal(model.flipDirection, 5);
+  assert.deepEqual([model.tapSoundURL, model.tapHapticStyle], ['/click.wav', 'heavy']);
+  const plain = reader.cylReadConfiguration({ CYLTabBarControllerTabBarItemsAttributes: [{ CYLTabBarItemTitle: 'Home' }], CYLTabBarControllerTabButtonTapHapticStyle: 'loud' }, {});
+  assert.deepEqual([plain.animationDuration, plain.playsFireworks, plain.flipDirection, plain.tapHapticStyle], [500, false, 1, '']);
 });

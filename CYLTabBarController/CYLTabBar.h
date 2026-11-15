@@ -37,7 +37,6 @@
 
 #import <UIKit/UIKit.h>
 #import "CYLPlusButton.h"
-#import "NSObject+CYLTabBarControllerExtention.h"
 
 NS_ASSUME_NONNULL_BEGIN
 @class CYLTabBar;
@@ -222,3 +221,12 @@ typedef void(^CYLTabBarDidLayoutSubViewsBlock)(CYLTabBar *tabBar);
 @end
 
 NS_ASSUME_NONNULL_END
+
+/*!
+ * [EN] Imported after `CYLTabBar` is declared: it reaches the generated Swift interface, which imports the umbrella header
+ *      and with it `CYLTabBar+CYLTabBarControllerExtention.h`, a category that needs the class (framework builds failed with
+ *      "cannot define category for undefined class 'CYLTabBar'" when this import came first).
+ * [CN] 在声明 `CYLTabBar` 之后导入：它会导入生成的 Swift 接口，后者导入总头文件及 `CYLTabBar+CYLTabBarControllerExtention.h`，
+ *      该类别需要先有这个类（放在前面时 framework 编译报 "cannot define category for undefined class 'CYLTabBar'"）。
+ */
+#import "NSObject+CYLTabBarControllerExtention.h"
