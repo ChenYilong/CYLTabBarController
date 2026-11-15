@@ -23,3 +23,6 @@ export {
 export {
   CYLTabBarConfiguration, CYLConfiguredTabBarItem, CYLConfiguredPlusButton, CYLTabBarConfigurationResult, CYLTabBarImageResolver
 } from './src/main/ets/CYLTabBarConfiguration';
+export {
+  CYLThemeManager, CYLThemeManagerCenter, CYLThemeManagerNameDefault, CYLThemeDidChangeListener
+} from './src/main/ets/CYLThemeManager';

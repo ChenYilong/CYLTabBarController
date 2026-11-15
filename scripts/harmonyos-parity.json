@@ -43,6 +43,9 @@
     "31": "`entry/pages/AnotherTabBar.ets` late-*: the plus image loads, is replaced or removed, or `CYLPlusButton.backgroundImage` loads after 2 s; the slot keeps its layout (built; emulator check pending / 已编译，模拟器验证待做)",
     "33": "`tapAnimationType` (6 animations) + `tapSoundEnabled` / `tapSoundPath` (SoundPool, cyl_tap_click.wav / cyl_tap_tock.wav) + `hapticFeedbackEnabled` / `hapticFeedbackStyle` (built; emulator check pending / 已编译，模拟器验证待做)",
     "48": "`entry/pages/PopPushDemo.ets`: `cyl_popSelectTabBarChildViewControllerAtIndex`, `...ForTabBarItemIdentifier`, `cyl_pushViewController`, `cyl_pushOrPopToViewController` (built; emulator check pending / 已编译，模拟器验证待做)",
-    "52": "Messages rows: `AnotherTabBar` mode same (the Example plus button) and close (a tappable X over the plus button changes color, issue #202) (built; emulator check pending / 已编译，模拟器验证待做)"
+    "52": "Messages rows: `AnotherTabBar` mode same (the Example plus button) and close (a tappable X over the plus button changes color, issue #202) (built; emulator check pending / 已编译，模拟器验证待做)",
+    "9": "Navigation bar 换肤 on every tab: `showTextPickerDialog` of the 17 skins -> `CYLThemeManagerCenter.defaultThemeManager.currentThemeIdentifier` (built; emulator check pending / 已编译，模拟器验证待做)",
+    "15": "Skin row (issue #216): current skin, tap to choose (`CYLThemeManager`) (built; emulator check pending / 已编译，模拟器验证待做)",
+    "32": "Skins section: 17 skins of DemoThemes.kt (colors, holiday icons from rawfile Skins/1.0.0, network skin with ★ titles and URL icons, plus button icon), ✓ on the current one (built; emulator check pending / 已编译，模拟器验证待做)"
   }
 }

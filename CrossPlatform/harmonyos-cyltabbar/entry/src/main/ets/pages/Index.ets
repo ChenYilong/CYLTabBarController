@@ -4,8 +4,9 @@ import {
   CYLTabBarController, CYLTabBarItemAttributes, CYLPlusButton, CYLPlusButtonPageIndex, CYLBadge, CYLBadgeView,
   CYLBadgeAppearance, CYLBadgeAnimationType, CYLOffset, CYLEdgeInsets, cyl_simulateMemoryWarning, cyl_badgeTitleForRow,
   cyl_badgeStyleCount, cyl_applyBadgeSample, CYLTabButtonTapAnimationType, CYLImpactFeedbackStyle,
-  CYLTabBarMinimizeBehavior, cyl_reportScroll, cyl_pushViewController
+  CYLTabBarMinimizeBehavior, cyl_reportScroll, cyl_pushViewController, CYLThemeManager, CYLThemeManagerCenter
 } from 'cyltabbar';
+import { DemoTheme, DEMO_THEMES, demoRegisterThemes } from '../demo/DemoThemes';
 import {
   DemoRow, DemoSection, DEMO_APPEARANCES, DEMO_TITLE_OFFSETS, DEMO_HOME, DEMO_CITY, DEMO_MESSAGE, DEMO_ME,
   DEMO_LANGUAGES, DEMO_LANGUAGE_NAMES
@@ -87,12 +88,54 @@ struct Index {
   @State swipeEnabled: boolean = false;
   @State slideTransition: boolean = false;
   @State minimizeBehavior: CYLTabBarMinimizeBehavior = CYLTabBarMinimizeBehavior.Never;
+  /** [EN] Items 9, 15, 32: the current skin (CYLThemeManager). [CN] 第 9、15、32 项：当前皮肤。 */
+  @State theme: DemoTheme = DEMO_THEMES[0];
   private badges: CYLBadge[] = CYL_TABS.map(() => new CYLBadge());
   private plusButtonBadge: CYLBadge = new CYLBadge();
   /** [EN] The badge of each badge row, per page. [CN] 每个页面每个角标行的角标。 */
   private rowBadges: Map<string, CYLBadge[]> = new Map();
 
+  /** [EN] CYLThemeDidChangeNotification: applies the skin to the tabs, the colors and the plus button. [CN] 应用皮肤。 */
+  private themeListener = (manager: CYLThemeManager, identifier: string | undefined, theme: Object | undefined): void => {
+    const skin = (theme as DemoTheme) ?? DEMO_THEMES[0];
+    this.theme = skin;
+    this.tabs.forEach((tab: CYLTabBarItemAttributes, i: number) => this.updateTab(i, (item: CYLTabBarItemAttributes) => {
+      const icon = skin.icons.length > 0 ? $rawfile(skin.iconPath(skin.icons[i % skin.icons.length])) : undefined;
+      item.image = icon ?? CYL_TABS[i].image;
+      item.selectedImage = icon ?? CYL_TABS[i].selectedImage;
+      item.lottieFilePath = icon !== undefined || skin.iconURLs.length > 0 ? undefined : CYL_TABS[i].lottieFilePath;
+      item.imageURL = skin.iconURLs.length > 0 ? skin.iconURLs[i % skin.iconURLs.length][0] : undefined;
+      item.selectedImageURL = skin.iconURLs.length > 0 ? skin.iconURLs[i % skin.iconURLs.length][1] : undefined;
+      item.title = skin.titlePrefix !== undefined ? `${skin.titlePrefix} ${['Home', 'Nearby', 'Messages', 'Me'][i]}` : CYL_TABS[i].title;
+    }));
+    const plusIcon: ResourceStr | undefined = skin.icons.length > 0 ? $rawfile(skin.iconPath(skin.icons[skin.icons.length - 1])) : skin.plusURL;
+    const copy: CYLPlusButton = {
+      image: plusIcon ?? CYL_PLUS.image, selectedImage: plusIcon ?? CYL_PLUS.selectedImage, title: CYL_PLUS.title,
+      index: CYL_PLUS.index, centerYOffset: CYL_PLUS.centerYOffset, imageSize: CYL_PLUS.imageSize,
+      alignsTitle: CYL_PLUS.alignsTitle, identifier: CYL_PLUS.identifier, selectable: CYL_PLUS.selectable,
+    };
+    this.plus = copy;
+  };
+
+  /** [EN] Item 9: the navigation bar "Skin" picker. [CN] 第 9 项：导航栏「换肤」选择器。 */
+  private showSkinPicker(): void {
+    const names = DEMO_THEMES.map((theme: DemoTheme) => theme.name);
+    this.getUIContext().showTextPickerDialog({
+      range: names,
+      selected: Math.max(0, names.indexOf(this.theme.name)),
+      onAccept: (value: TextPickerResult) => {
+        CYLThemeManagerCenter.defaultThemeManager.currentThemeIdentifier = names[value.index as number];
+      },
+    });
+  }
+
+  aboutToDisappear(): void {
+    CYLThemeManagerCenter.defaultThemeManager.removeListener(this.themeListener);
+  }
+
   aboutToAppear(): void {
+    demoRegisterThemes();
+    CYLThemeManagerCenter.defaultThemeManager.addListener(this.themeListener);
     // [EN] SceneDelegate.m -setUpBadgeAppearance (#425). [CN] 全局角标偏移。
     CYLBadgeAppearance.globalAppearance.centerOffset = { horizontal: -5, vertical: 3 };
     // [EN] cyl_demo_showPlusButtonBadge: 1 at launch. [CN] 启动时加号角标为 1。
@@ -209,6 +252,10 @@ struct Index {
             setTimeout(() => this.tabBarHidden = false, 2000);
           }
         },
+      },
+      {
+        id: 'skin', title: 'Skin (CYLThemeManager, issue #216)', subtitle: `Current: ${this.theme.name}; tap to choose`,
+        action: () => this.showSkinPicker(),
       },
       {
         id: 'minimize', title: 'Shrink / hide the tab bar on scroll (issue #13)',
@@ -556,6 +603,13 @@ struct Index {
       { title: 'Update tabs in place', rows: this.tabItemUpdateRows(page) },
       { title: 'Tab pages, selection and login', rows: this.pageRows(page) },
       { title: 'PlusButton', rows: this.plusButtonRows() },
+      { title: `Skins: holiday and color themes (${DEMO_THEMES.length})`, rows: DEMO_THEMES.map((theme: DemoTheme) => {
+        const row: DemoRow = {
+          id: `theme-${theme.name}`, title: (theme.name === this.theme.name ? '✓ ' : '') + theme.name,
+          action: () => CYLThemeManagerCenter.defaultThemeManager.currentThemeIdentifier = theme.name,
+        };
+        return row;
+      }) },
       { title: 'Tab interactions', rows: this.interactionRows() },
       { title: 'Configuration file', rows: this.configurationRows() },
       { title: 'Jump and compare', rows: this.jumpRows() },
@@ -630,6 +684,14 @@ struct Index {
           Text(`(${this.homeTitleRow})`)
             .fontSize(17)
             .fontWeight(FontWeight.Medium)
+        }
+        if (index !== CYLPlusButtonPageIndex) {
+          Text('换肤')
+            .fontSize(15)
+            .fontColor('#007AFF')
+            .position({ right: 16 })
+            .id(`cyl-nav-skin-${identifier}`)
+            .onClick(() => this.showSkinPicker())
         }
       }
       .height(44)
@@ -725,10 +787,10 @@ struct Index {
         tabBarHeight: this.tabBarHeight,
         titlePositionAdjustment: this.titleOffset,
         itemEdgeInsets: this.itemEdgeInsets,
-        tabBarBackgroundColor: this.appearanceIndex === 0 ? $r('app.color.cyl_bar_background') : DEMO_APPEARANCES[this.appearanceIndex].background,
+        tabBarBackgroundColor: this.theme.bar ?? (this.appearanceIndex === 0 ? $r('app.color.cyl_bar_background') : DEMO_APPEARANCES[this.appearanceIndex].background),
         tabBarShadowColor: DEMO_APPEARANCES[this.appearanceIndex].shadow,
-        unselectedColor: DEMO_APPEARANCES[this.appearanceIndex].normal,
-        tintColor: this.appearanceIndex === 0 ? '#FF8000' : DEMO_APPEARANCES[this.appearanceIndex].selected,
+        unselectedColor: this.theme.normal ?? DEMO_APPEARANCES[this.appearanceIndex].normal,
+        tintColor: this.theme.tint ?? (this.appearanceIndex === 0 ? '#FF8000' : DEMO_APPEARANCES[this.appearanceIndex].selected),
         unloadsUnselectedViewsOnMemoryWarning: this.unloads,
         onMemoryWarning: (unloaded: number[], loaded: number[]) => this.memoryWarningReport(unloaded, loaded),
         didSelect: (index: number) => {
