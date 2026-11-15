@@ -137,6 +137,9 @@ async function cylClearDecoration() {
     // [EN] After the launch timer (1.5 s), so it does not put them back. [CN] 在启动计时器（1.5 秒）之后，避免其重新添加。
     setTimeout(() => {
       clearTimeout(getApp().cylDecorateTimer);
+      // [EN] The skin is kept across launches: back to Default. [CN] 皮肤在重新启动后保留：恢复默认。
+      getApp().cyl_setSkin('Default');
+      clearTimeout(getApp().cylCoverTimer);
       getApp().cyl_updateTabBarState({
         badges: { home: '', city: '', message: '', CYLMineViewController: '', plus: '' },
         badgeAttributes: {},
@@ -272,7 +275,11 @@ test('the animated icons stay in the bar during and after a page scroll (WeChat 
       .select('.cyl-tab-bar').boundingClientRect()
       .exec((result) => resolve({
         windowWidth: wx.getWindowInfo().windowWidth,
-        windowTop: wx.getWindowInfo().screenHeight - wx.getWindowInfo().windowHeight,
+        // [EN] Me has the system navigation bar. After a page with a custom one (Home), DevTools reports the window as the
+        //      whole screen, so the window starts below the status bar and the 44 pt navigation bar. [CN] Me 使用系统导航栏。打开过自定义导航栏的页面（首页）
+        //      之后，开发者工具把窗口报告为整个屏幕，因此窗口从状态栏与 44pt 导航栏下方开始。
+        windowTop: wx.getWindowInfo().screenHeight - wx.getWindowInfo().windowHeight
+          || (wx.getWindowInfo().statusBarHeight + 44),
         icons: (result[0] || []).map((rect) => ({ left: rect.left, top: rect.top, width: rect.width, height: rect.height })),
         // [EN] The whole bar: a second layer of icons anywhere in it changes it. [CN] 整个 TabBar：其中任何位置出现第二层图标都会改变它。
         bar: result[1] && { left: result[1].left, top: result[1].top, width: result[1].width, height: result[1].height },
@@ -290,7 +297,13 @@ test('the animated icons stay in the bar during and after a page scroll (WeChat 
     });
   });
   assert.deepEqual(snapshots, [true, true, true, true], 'each icon is one image layer');
+  // [EN] From the top: the Me page keeps its scroll position, and the page shows through the glass rim. [CN] 从顶部开始：Me 页面会保留滚动位置，且页面内容会透过玻璃边缘显示。
+  await miniProgram.pageScrollTo(0);
+  await cylSleep(CYL_SETTLE_MS * 1.5);
   const before = await cylCapture();
+  if (process.env.CYL_UI_SCREENSHOTS) {
+    require('node:fs').writeFileSync(path.join(process.env.CYL_UI_SCREENSHOTS, 'cyl-scroll-before.png'), Buffer.from(before, 'base64'));
+  }
   for (const top of [300, 1380]) {
     await miniProgram.pageScrollTo(top);
     await cylSleep(CYL_SETTLE_MS * 1.5);
@@ -658,6 +671,81 @@ test('the tabs and the launch sequence match the Objective-C example (docs/ObjC-
   state = await bar();
   assert.equal(byKey('message').selected, false, 'Messages needs login');
   await cylSetState({ loggedIn: true });
+  await cylClearDecoration();
+  await miniProgram.reLaunch('/pages/home/index');
+  await cylSleep(CYL_SETTLE_MS);
+});
+
+test('the Home navigation bar and the skins match the Objective-C example (docs/ObjC-Example-Parity items 7, 8, 9, 15, 32)', async () => {
+  await miniProgram.reLaunch('/pages/home/index');
+  await cylSleep(CYL_SETTLE_MS * 2);
+  const bar = () => miniProgram.evaluate(() => {
+    const pages = getCurrentPages();
+    const tabBar = pages[pages.length - 1].getTabBar().selectComponent('#cyl-tab-bar');
+    return {
+      styleType: tabBar.data.cylStyleType,
+      items: tabBar.data.cylSlots.map((slot) => (slot.item ? { title: slot.item.title, image: slot.item.image, selectedImage: slot.item.selectedImage }
+        : { title: slot.title, image: slot.image })),
+    };
+  });
+
+  // [EN] Item 9: the Skin button opens the menu: 17 skins, the check on Default, then "Follow the system Dark Mode".
+  // [CN] 第 9 项：换肤按钮打开菜单：17 个皮肤，勾号在默认上，然后是「跟随系统深色模式」。
+  await cylTapElement('#cyl-nav-skin');
+  let { data } = await cylCurrentPage();
+  assert.equal(data.skinMenu.length, 18);
+  assert.deepEqual(data.skinMenu.filter((row) => row.checked).map((row) => row.id), ['Default']);
+  assert.equal(data.skinMenu[17].id, 'system');
+  await cylTapElement('.cyl-menu-row[data-id="Christmas"]');
+  ({ data } = await cylCurrentPage());
+  assert.equal(data.skinMenu, null, 'a choice closes the menu');
+  let state = await bar();
+  // [EN] The holiday icons in turn (unselected faded), the last one on the plus button. [CN] 依次使用节日图标（未选中为半透明），最后一个用于 PlusButton。
+  assert.match(state.items[1].image, /theme\/christmas\/wrapped_gift_faded\.png$/);
+  assert.match(state.items[0].selectedImage, /theme\/christmas\/christmas_tree\.png$/);
+  assert.match(state.items[2].image, /theme\/christmas\/star\.png$/);
+
+  // [EN] Items 15 and 32: the skin row names the skin; the list has 17 rows with the check on the current one.
+  // [CN] 第 15、32 项：换肤行显示当前皮肤；列表有 17 行，勾号在当前皮肤上。
+  const skins = data.sections.find((section) => section.id === 'skins');
+  assert.equal(skins.rows.length, 17);
+  assert.deepEqual(skins.rows.filter((row) => row.accessory === 'check').map((row) => row.id), ['skin:Christmas']);
+  const skinRow = data.sections.reduce((found, section) => found || (section.rows || []).find((row) => row.id === 'skin'), null);
+  assert.match(skinRow.subtitle, /Christmas|圣诞节|聖誕節/);
+
+  // [EN] The network skin: "★ " before the titles, icons from the network. [CN] 网络皮肤：标题前加「★ 」，图标来自网络。
+  await miniProgram.evaluate(() => { getApp().cyl_setSkin('Network icons'); });
+  await cylSleep(CYL_SETTLE_MS);
+  state = await bar();
+  assert.ok(state.items[1].title.startsWith('★ '), state.items[1].title);
+  assert.match(state.items[1].image, /^https:\/\/cdn-icons-png\.flaticon\.com\//);
+
+  // [EN] Item 7: Flat Design builds a new FlatDesign bar, its launch badges again; the skin stays.
+  // [CN] 第 7 项：Flat Design 创建新的扁平样式 TabBar，再次出现启动角标；皮肤保持不变。
+  await cylTapElement('#cyl-nav-flat', 1500 + CYL_SETTLE_MS * 2);
+  state = await bar();
+  assert.equal(state.styleType, 'flatDesign');
+  assert.ok(state.items[1].title.startsWith('★ '), 'the skin stays');
+  let app = await miniProgram.evaluate(() => getApp().globalData.cylTabBarState);
+  assert.equal(app.badges.city, '8', 'the launch badges again');
+  ({ data } = await cylCurrentPage());
+  assert.ok(!/Liquid/.test(data.navigationTitle), 'no " (Liquid)" in FlatDesign');
+
+  // [EN] Item 8: Liquid Glass builds a new Liquid Glass bar. [CN] 第 8 项：Liquid Glass 重新创建液态玻璃 TabBar。
+  await cylTapElement('#cyl-nav-liquid', CYL_SETTLE_MS * 2);
+  state = await bar();
+  assert.equal(state.styleType, 'liquidGlass');
+  ({ data } = await cylCurrentPage());
+  assert.match(data.navigationTitle, /\(Liquid\)$/);
+
+  // [EN] Following the system: Dark in Dark Mode. [CN] 跟随系统：深色模式下为 Dark。
+  await miniProgram.evaluate(() => { getApp().cyl_updateTabBarState({ systemTheme: 'dark' }); getApp().cyl_setSkinFollowsSystem(true); });
+  await cylSleep(CYL_SETTLE_MS);
+  ({ data } = await cylCurrentPage());
+  assert.deepEqual(data.sections.find((section) => section.id === 'skins').rows.filter((row) => row.accessory === 'check').map((row) => row.id), ['skin:Dark']);
+  await miniProgram.evaluate(() => { getApp().cyl_setSkinFollowsSystem(false); getApp().cyl_updateTabBarState({ systemTheme: 'light' }); });
+  app = await miniProgram.evaluate(() => getApp().globalData.cylTabBarState);
+  assert.equal(app.skinFollowsSystem, false);
   await cylClearDecoration();
   await miniProgram.reLaunch('/pages/home/index');
   await cylSleep(CYL_SETTLE_MS);

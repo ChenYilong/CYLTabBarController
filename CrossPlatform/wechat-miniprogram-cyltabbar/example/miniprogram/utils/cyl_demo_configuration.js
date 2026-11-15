@@ -8,6 +8,8 @@
  */
 const cylSharedConfiguration = require('../shared/configuration');
 const cylAnimations = require('../shared/animations');
+const { cylSkinnedConfiguration, cylSkinReplacesIcons } = require('./cyl_demo_skins');
+const { t } = require('./cyl_demo_localization');
 
 /**
  * [EN] The example installs one animation package (`npm run setup -- --animation=lottie|pag|rive|gif`, see
@@ -239,14 +241,16 @@ function cylDemoGIFItems(items, files) {
 
 /**
  * [EN] The configuration with the example's overrides (style type, tap animation, login-required tabs), which the Me
- *      page changes at run time.
- * [CN] 带有示例覆盖项（样式、点击动画、需要登录的 Tab）的配置，Me 页面会在运行时修改这些覆盖项。
+ *      page changes at run time, in `skin` (utils/cyl_demo_skins.js; none: the example's own colors and icons).
+ * [CN] 带有示例覆盖项（样式、点击动画、需要登录的 Tab）的配置，Me 页面会在运行时修改这些覆盖项；使用 `skin`
+ *      （utils/cyl_demo_skins.js；未提供时为示例自己的颜色与图标）。
  */
-function cylDemoConfiguration(overrides) {
+function cylDemoConfiguration(overrides, skin) {
   const options = overrides || {};
   const sharedItems = CYL_DEMO_OBJC_ITEMS;
-  // [EN] "images" or the installed animation (the default). [CN] "images" 或已安装的动画（默认）。
-  const icons = options.cylDemoIcons === 'images' || options.cylDemoLottie === false ? 'images' : cylInstalledAnimation();
+  // [EN] "images" or the installed animation (the default); a skin's icons replace the animations. [CN] "images" 或已安装的动画（默认）；皮肤图标替换动画。
+  const icons = options.cylDemoIcons === 'images' || options.cylDemoLottie === false || cylSkinReplacesIcons(skin)
+    ? 'images' : cylInstalledAnimation();
   const files = icons === 'images' ? [] : cylAvailableAnimationFiles();
   const builders = {
     lottie: cylDemoLottieItems,
@@ -272,7 +276,7 @@ function cylDemoConfiguration(overrides) {
   delete configurationOverrides.cylDemoBoldTitles;
   delete configurationOverrides.cylDemoItemAttributes;
   delete configurationOverrides.cylDemoPlusAttributes;
-  return Object.assign({}, cylSharedConfiguration, {
+  return cylSkinnedConfiguration(Object.assign({}, cylSharedConfiguration, {
     CYLTabBarControllerTabBarItemsAttributes: changedItems,
     CYLTabBarControllerPlusButton: Object.assign({}, CYL_DEMO_PLUS_BUTTON, options.cylDemoPlusAttributes),
     // [EN] The Objective-C example starts on Liquid Glass (CYLMainRootViewController). [CN] Objective-C 示例以液态玻璃启动。
@@ -289,7 +293,7 @@ function cylDemoConfiguration(overrides) {
     CYLTabBarControllerTabButtonTapAnimation: 'scale',
     // [EN] -[MainTabBarController setUpLoginRequiredTabs] (issue #19). [CN] 需要登录的 Tab（issue #19）。
     CYLTabBarControllerLoginRequiredTabBarItemIdentifiers: ['message', 'CYLMineViewController'],
-  }, configurationOverrides);
+  }, configurationOverrides), skin, t);
 }
 
 module.exports = { cylDemoConfiguration, cylInstalledAnimation, cylAvailableAnimationFiles };

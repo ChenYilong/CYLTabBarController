@@ -7,6 +7,7 @@
  *      使选中状态跟随页面。
  */
 const { cylDemoConfiguration } = require('../utils/cyl_demo_configuration');
+const { cylEffectiveSkin } = require('../utils/cyl_demo_skins');
 const { t, cylConfigurationTable } = require('../utils/cyl_demo_localization');
 const cylSymbolsByTheme = require('../shared/symbols');
 
@@ -25,6 +26,7 @@ Component({
     symbolsByTheme: cylSymbolsByTheme,
     selectedIdentifier: '',
     loggedIn: false,
+    animationSpeed: 1,
   },
 
   lifetimes: {
@@ -53,8 +55,9 @@ Component({
      * [CN] 把 App 的 TabBar 状态应用到本实例。
      */
     cyl_apply(state) {
+      const skin = cylEffectiveSkin(state);
       this.setData({
-        configuration: cylDemoConfiguration(state.overrides),
+        configuration: cylDemoConfiguration(state.overrides, skin),
         loggedIn: state.loggedIn,
         itemStyle: state.itemStyle || '',
         glassLensStyle: state.glassLensStyle || 'regular',
@@ -66,9 +69,10 @@ Component({
         if (!tabBar) {
           return;
         }
-        tabBar.cyl_setThemeIdentifier(state.themeIdentifier);
+        // [EN] A skin with colors is a skin of the configuration (utils/cyl_demo_skins.js). [CN] 带颜色的皮肤是配置中的一个皮肤。
+        tabBar.cyl_setThemeIdentifier(skin.tint ? '' : state.themeIdentifier);
         tabBar.cyl_setTabBarHidden(Boolean(state.tabBarHidden));
-        const attributes = state.badgeAttributes || {};
+        const attributes = this.cyl_badgeAttributesInSkin(state.badgeAttributes || {}, state.badges, skin);
         Object.keys(state.badges).forEach((identifier) => {
           const value = state.badges[identifier];
           if (value === '' || value === null || value === undefined) {
@@ -83,6 +87,30 @@ Component({
           tabBar.cyl_setCoverImage(identifier, cover && cover.image, cover && cover.size);
         });
       });
+    },
+
+    /**
+     * [EN] FlatDesign: a skin's tint colors the badges without a color of their own (`badgeBackgroundColor` of the skin's
+     *      appearance); Liquid Glass keeps them red.
+     * [CN] 扁平样式：皮肤的 tint 为没有自定颜色的角标着色（皮肤外观的 `badgeBackgroundColor`）；液态玻璃下仍为红色。
+     */
+    cyl_badgeAttributesInSkin(attributes, badges, skin) {
+      if (!skin.tint || this.cyl_isLiquidGlass()) {
+        return attributes;
+      }
+      const tinted = Object.assign({}, attributes);
+      // [EN] The plus button's badge is the button's own, not a tab item's: it stays red. [CN] PlusButton 的角标属于按钮本身，不属于 Tab Item：保持红色。
+      Object.keys(badges).filter((identifier) => identifier !== 'plus').forEach((identifier) => {
+        if (!(tinted[identifier] || {}).color) {
+          tinted[identifier] = Object.assign({}, tinted[identifier], { color: skin.tint });
+        }
+      });
+      return tinted;
+    },
+
+    cyl_isLiquidGlass() {
+      return this.data.itemStyle === 'liquidGlass'
+        || (!this.data.itemStyle && this.data.configuration.CYLTabBarControllerStyleType === 'liquidGlass');
     },
 
     /**
@@ -162,7 +190,7 @@ Component({
       const attributes = Object.assign({}, state.badgeAttributes);
       const current = attributes[identifier] || {};
       const hasBadge = badges[identifier] !== undefined && badges[identifier] !== '';
-      if (this.data.itemStyle === 'flat' || (!this.data.itemStyle && this.data.configuration.CYLTabBarControllerStyleType !== 'liquidGlass')) {
+      if (!this.cyl_isLiquidGlass()) {
         badges[identifier] = hasBadge ? '' : '•';
         attributes[identifier] = hasBadge ? {} : { animation: 'scaleOnce' };
       } else {
@@ -179,8 +207,7 @@ Component({
      *      Objective-C 示例不计数，这里也一样。
      */
     cyl_countPlusTap() {
-      const liquidGlass = this.data.itemStyle === 'liquidGlass'
-        || (!this.data.itemStyle && this.data.configuration.CYLTabBarControllerStyleType === 'liquidGlass');
+      const liquidGlass = this.cyl_isLiquidGlass();
       const app = getApp();
       const state = app.globalData.cylTabBarState;
       if (liquidGlass || state.badges.plus === undefined || state.badges.plus === '') {

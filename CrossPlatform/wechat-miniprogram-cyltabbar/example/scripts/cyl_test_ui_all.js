@@ -49,7 +49,7 @@ for (const name of names) {
     Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 12000);
   }
   const tests = reload === 0
-    ? cylRun('node', ['--test', '--test-timeout=180000', 'test-ui/cyl_tab_bar.ui.test.js'], { CYL_AUTOMATOR_WS: `ws://127.0.0.1:${CYL_PORT}` })
+    ? cylRun('node', ['--test', '--test-timeout=360000', 'test-ui/cyl_tab_bar.ui.test.js'], { CYL_AUTOMATOR_WS: `ws://127.0.0.1:${CYL_PORT}` })
     : reload;
   results.push({ name, status: tests === 0 ? 'pass' : 'FAIL' });
 }

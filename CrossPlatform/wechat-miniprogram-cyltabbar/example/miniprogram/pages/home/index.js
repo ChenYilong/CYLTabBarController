@@ -14,6 +14,27 @@ const { cylLanguage } = require('../../utils/cyl_demo_localization');
 const { cylDemoConfiguration } = require('../../utils/cyl_demo_configuration');
 const cylDemoList = require('../../shared/demo_list');
 const { cylHomeAction } = require('../../utils/cyl_home_actions');
+const { CYL_DEMO_SKINS, cylEffectiveSkin, cylSkinSummary, cylSkinPreview } = require('../../utils/cyl_demo_skins');
+
+// [EN] UIColor.cyl_randomColor. [CN] 随机颜色。
+const cylRandomColor = () => `#${Math.floor(Math.random() * 0xffffff).toString(16).padStart(6, '0')}`;
+
+/**
+ * [EN] The navigation bar's frame: below the status bar, as tall as the capsule plus its margins, the capsule's room
+ *      kept free on the right; the menu's height leaves the tab bar free.
+ * [CN] 导航栏的位置：位于状态栏下方，高度为胶囊按钮加上下边距，右侧留出胶囊按钮的位置；菜单高度不遮住 TabBar。
+ */
+function cylNavigationFrame() {
+  try {
+    const window = typeof wx.getWindowInfo === 'function' ? wx.getWindowInfo() : wx.getSystemInfoSync();
+    const capsule = wx.getMenuButtonBoundingClientRect();
+    const top = window.statusBarHeight || 20;
+    const height = capsule.height + (capsule.top - top) * 2;
+    return { top, height, right: window.windowWidth - capsule.left + 8, menuHeight: window.windowHeight - top - height - 150 };
+  } catch (error) {
+    return { top: 20, height: 44, right: 100, menuHeight: 400 };
+  }
+}
 
 // [EN] The tap animations the mini program has, in the order the row cycles through them. [CN] 小程序支持的点击动画，按本行切换的顺序。
 const CYL_TAP_ANIMATIONS = ['none', 'bounce', 'rotation', 'scale'];
@@ -40,9 +61,12 @@ function cylFill(text, values) {
 
 Component({
   behaviors: [cylTabPage],
-  data: { sections: [] },
+  data: { sections: [], nav: { top: 20, height: 44, right: 100, menuHeight: 400, dots: [] }, navigationTitle: '', skinMenu: null },
   lifetimes: {
     attached() {
+      // [EN] -[CYLHomeViewController viewDidLoad]: dots in random colors on "Flat Design" and "Liquid Glass".
+      // [CN] 「Flat Design」与「Liquid Glass」按钮上的随机颜色红点。
+      this.setData({ nav: Object.assign(cylNavigationFrame(), { dots: [cylRandomColor(), cylRandomColor()] }) });
       this.cylUnsubscribe = getApp().cyl_subscribe(() => this.cyl_render());
     },
     detached() {
@@ -72,7 +96,8 @@ Component({
       const tabIndex = slots.filter((slot) => !slot.isPlusButton).findIndex((slot) => slot.selected);
       return {
         titleOffset: `(${String(offset).replace(/[{}\s]/g, '').split(',').join(', ')})`,
-        skin: state.themeIdentifier || configuration.CYLTabBarControllerThemeIdentifier || 'default',
+        // [EN] cyl_themeSettingsCell: the skin, " · Follow the system Dark Mode" when it does. [CN] 当前皮肤；跟随系统时加上「 · 跟随系统深色模式」。
+        skin: this.t(cylEffectiveSkin(state).name) + (state.skinFollowsSystem ? ` · ${this.t('Follow the system Dark Mode')}` : ''),
         login: this.t(state.loggedIn ? 'Logged in' : 'Logged out'),
         loginTabs: loginTabs.join(', ') || '—',
         tapAnimation: configuration.CYLTabBarControllerTabButtonTapAnimation || 'none',
@@ -89,13 +114,20 @@ Component({
 
     cyl_render() {
       const state = getApp().globalData.cylTabBarState;
-      const configuration = cylDemoConfiguration(state.overrides);
+      const skin = cylEffectiveSkin(state);
+      const configuration = cylDemoConfiguration(state.overrides, skin);
       const values = this.cyl_values(state, configuration);
-      const skins = Object.keys(configuration.CYLTabBarControllerThemes || {}).sort();
-      const currentSkin = values.skin;
       const sections = cylDemoList.sections.map((section) => {
+        // [EN] Issue #216: every skin, one row each (cyl_themeListCell): name, what it changes, icon or swatch, a check on the current one.
+        // [CN] Issue #216：所有皮肤，每行一个（cyl_themeListCell）：名字、修改的内容、图标或色块，当前皮肤带勾号。
         const rows = section.skins
-          ? skins.map((skin) => ({ id: `skin:${skin}`, title: skin, subtitle: '', accessory: 'none', selected: skin === currentSkin }))
+          ? CYL_DEMO_SKINS.map((candidate) => ({
+            id: `skin:${candidate.name}`,
+            title: this.t(candidate.name),
+            subtitle: this.t(cylSkinSummary(candidate)),
+            preview: cylSkinPreview(candidate),
+            accessory: candidate.name === skin.name ? 'check' : 'none',
+          }))
           : section.rows.map((row) => ({
             id: row.id,
             title: cylFill(cylListText(row.title), values),
@@ -104,7 +136,7 @@ Component({
             checked: this.cyl_isOn(row.id, state),
           }));
         const title = section.skins
-          ? cylListText(section.title).replace(/\d+/, String(skins.length)) : cylListText(section.title);
+          ? this.t('Skins: holidays and colors (%@)').replace('%@', String(CYL_DEMO_SKINS.length)) : cylListText(section.title);
         return { id: section.id, title, rows };
       });
       // [EN] The badge rows of CYLHomeViewController, after the demo sections. [CN] CYLHomeViewController 的角标行，在演示 section 之后。
@@ -121,7 +153,58 @@ Component({
           position: sample.position || 'topRight',
         })),
       });
-      this.setData({ sections });
+      // [EN] MainTabBarController: the first page's title gets " (Liquid)" on Liquid Glass; a badge row sets "Home (N)".
+      // [CN] MainTabBarController：液态玻璃下第一个页面的标题加上「 (Liquid)」；角标行设为「首页(N)」。
+      const liquidGlass = state.itemStyle ? state.itemStyle === 'liquidGlass' : configuration.CYLTabBarControllerStyleType === 'liquidGlass';
+      const navigationTitle = this.cylBadgeTitle || (liquidGlass ? `${this.t('Home')} (Liquid)` : this.t('Home'));
+      this.setData({ sections, navigationTitle, skinMenu: this.data.skinMenu ? this.cyl_skinMenuRows(state) : null });
+    },
+
+    // [EN] -[CYLHomeViewController flatDesignTabBar:]. [CN] 用新的扁平样式 TabBar 替换当前 TabBar。
+    cyl_onFlatDesign() {
+      this.cylBadgeTitle = '';
+      getApp().cyl_rebuildTabBar('flatDesign');
+    },
+
+    // [EN] -[CYLHomeViewController refreshTabBar:]. [CN] 重新创建液态玻璃 TabBar。
+    cyl_onLiquidGlass() {
+      this.cylBadgeTitle = '';
+      getApp().cyl_rebuildTabBar('liquidGlass');
+    },
+
+    // [EN] -[CYLHomeViewController showThemePicker:]. [CN] 打开换肤菜单。
+    cyl_onSkinButton() {
+      this.setData({ skinMenu: this.cyl_skinMenuRows(getApp().globalData.cylTabBarState) });
+    },
+
+    cyl_closeSkinMenu() {
+      this.setData({ skinMenu: null });
+    },
+
+    /**
+     * [EN] The menu rows (cyl_themeMenuElements): every skin with its icon or swatch, a check on the current one (none
+     *      while following the system), then "Follow the system Dark Mode".
+     * [CN] 菜单行（cyl_themeMenuElements）：每个皮肤及其图标或色块，当前皮肤带勾号（跟随系统时不带），然后是「跟随系统深色模式」。
+     */
+    cyl_skinMenuRows(state) {
+      const current = cylEffectiveSkin(state).name;
+      return CYL_DEMO_SKINS.map((skin) => ({
+        id: skin.name,
+        title: this.t(skin.name),
+        preview: cylSkinPreview(skin),
+        checked: !state.skinFollowsSystem && skin.name === current,
+      })).concat([{ id: 'system', title: this.t('Follow the system Dark Mode'), preview: { swatch: '#8E8E93', glyph: '◐' }, checked: Boolean(state.skinFollowsSystem) }]);
+    },
+
+    cyl_onSkinMenuRow(event) {
+      const id = event.currentTarget.dataset.id;
+      const app = getApp();
+      this.setData({ skinMenu: null });
+      if (id === 'system') {
+        app.cyl_setSkinFollowsSystem(!app.globalData.cylTabBarState.skinFollowsSystem);
+      } else {
+        app.cyl_setSkin(id);
+      }
     },
 
     // [EN] Switch rows that the mini program has. [CN] 小程序支持的开关行。
@@ -181,18 +264,15 @@ Component({
     cyl_onRow(event) {
       const id = event.currentTarget.dataset.id;
       const state = getApp().globalData.cylTabBarState;
-      const configuration = cylDemoConfiguration(state.overrides);
+      const configuration = cylDemoConfiguration(state.overrides, cylEffectiveSkin(state));
       if (id.startsWith('skin:')) {
-        this.cyl_update({ themeIdentifier: id.slice('skin:'.length) });
+        getApp().cyl_setSkin(id.slice('skin:'.length));
         return;
       }
       const actions = {
         language: () => wx.showToast({ title: this.t('Follows the language of WeChat'), icon: 'none' }),
-        skin: () => {
-          const skins = Object.keys(configuration.CYLTabBarControllerThemes || {}).sort();
-          const current = state.themeIdentifier || configuration.CYLTabBarControllerThemeIdentifier;
-          this.cyl_update({ themeIdentifier: skins[(skins.indexOf(current) + 1) % skins.length] });
-        },
+        // [EN] cyl_presentThemePickerFromView:completion: (issue #216). [CN] 打开换肤菜单（issue #216）。
+        skin: () => this.cyl_onSkinButton(),
         tapAnimation: () => {
           const current = CYL_TAP_ANIMATIONS.indexOf(configuration.CYLTabBarControllerTabButtonTapAnimation);
           this.cyl_override({ CYLTabBarControllerTabButtonTapAnimation: CYL_TAP_ANIMATIONS[(current + 1) % CYL_TAP_ANIMATIONS.length] });
@@ -225,7 +305,7 @@ Component({
       return {
         state: () => app.globalData.cylTabBarState,
         overrides: () => app.globalData.cylTabBarState.overrides || {},
-        configuration: () => cylDemoConfiguration(app.globalData.cylTabBarState.overrides),
+        configuration: () => cylDemoConfiguration(app.globalData.cylTabBarState.overrides, cylEffectiveSkin(app.globalData.cylTabBarState)),
         update: (change) => this.cyl_update(change),
         override: (change) => this.cyl_override(change),
         tabBar: () => this.cyl_tabBar(),
@@ -244,7 +324,8 @@ Component({
     // [CN] CYLHomeViewController：导航标题变为「首页(N)」，然后 push 一个无导航栏的橙色页面。
     cyl_onBadge(event) {
       const index = Number(event.currentTarget.dataset.index);
-      wx.setNavigationBarTitle({ title: this.t('Home (%@)').replace('%@', index) });
+      this.cylBadgeTitle = this.t('Home (%@)').replace('%@', index);
+      this.setData({ navigationTitle: this.cylBadgeTitle });
       wx.navigateTo({ url: `/pages/pushed/index?color=orange&note=${encodeURIComponent('Pushed by Home: the navigation bar is hidden')}` });
     },
 

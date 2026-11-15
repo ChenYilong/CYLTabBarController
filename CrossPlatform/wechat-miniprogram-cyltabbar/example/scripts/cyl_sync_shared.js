@@ -168,6 +168,73 @@ function cylFindAsset(assets, key, theme, state) {
  * [EN] Every generated file: relative path -> Buffer.
  * [CN] 所有生成的文件：相对路径 -> Buffer。
  */
+/**
+ * [EN] A palette PNG (color type 3) drawn at `alpha`: every palette entry's transparency (the tRNS chunk, added when
+ *      missing) times `alpha`. Only the chunks change, so it needs no image library.
+ * [CN] 以 `alpha` 绘制的调色板 PNG（颜色类型 3）：每个调色板项的透明度（tRNS 块，缺失时添加）乘以 `alpha`。只修改块，
+ *      因此不需要图片库。
+ */
+function cylFadedPalettePNG(image, alpha) {
+  if (image[25] !== 3) {
+    throw new Error('cylFadedPalettePNG: not a palette PNG');
+  }
+  const crcTable = Array.from({ length: 256 }, (unused, n) => {
+    let c = n;
+    for (let k = 0; k < 8; k += 1) {
+      c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1;
+    }
+    return c >>> 0;
+  });
+  const crc = (buffer) => {
+    let c = 0xffffffff;
+    for (const byte of buffer) {
+      c = crcTable[(c ^ byte) & 0xff] ^ (c >>> 8);
+    }
+    return (c ^ 0xffffffff) >>> 0;
+  };
+  const chunk = (type, data) => {
+    const body = Buffer.concat([Buffer.from(type, 'ascii'), data]);
+    const length = Buffer.alloc(4);
+    length.writeUInt32BE(data.length);
+    const sum = Buffer.alloc(4);
+    sum.writeUInt32BE(crc(body));
+    return Buffer.concat([length, body, sum]);
+  };
+  const parts = [image.subarray(0, 8)];
+  let entries = 0;
+  let transparency = null;
+  const chunks = [];
+  for (let offset = 8; offset < image.length;) {
+    const length = image.readUInt32BE(offset);
+    const type = image.toString('ascii', offset + 4, offset + 8);
+    const data = image.subarray(offset + 8, offset + 8 + length);
+    chunks.push({ type, data });
+    if (type === 'PLTE') {
+      entries = length / 3;
+    } else if (type === 'tRNS') {
+      transparency = data;
+    }
+    offset += 12 + length;
+  }
+  const faded = Buffer.alloc(entries);
+  for (let index = 0; index < entries; index += 1) {
+    const original = transparency && index < transparency.length ? transparency[index] : 255;
+    faded[index] = Math.round(original * alpha);
+  }
+  chunks.forEach(({ type, data }) => {
+    if (type === 'tRNS') {
+      return;
+    }
+    if (type === 'IDAT' && !parts.some((part) => part.cylTransparency)) {
+      const transparencyChunk = chunk('tRNS', faded);
+      transparencyChunk.cylTransparency = true;
+      parts.push(transparencyChunk);
+    }
+    parts.push(chunk(type, data));
+  });
+  return Buffer.concat(parts);
+}
+
 const CYL_OBJC_TAB_BAR_IMAGES = ['home_normal', 'home_highlight', 'fishpond_normal', 'fishpond_highlight', 'message_normal',
   'message_highlight', 'message_normal_night', 'account_normal', 'account_highlight', 'post_normal', 'post_highlight',
   'home_select_cover'];
@@ -222,6 +289,22 @@ function cylGeneratedFiles() {
     const folder = name === 'home_select_cover' ? '' : name.split('_')[0];
     files[path.join('objc', `${name}.png`)] = fs.readFileSync(path.join(tabBarIcons, folder, `${name}.imageset`, `${name}@3x.png`));
   });
+
+  // [EN] The holiday skins' icons (Example-Shared/Configurations/Skins/1.0.0, read by UIViewController+CYLThemeSettings),
+  //      each with a copy at 45% opacity: the unselected look (`faded(_:)`), docs/ObjC-Example-Parity items 9 and 32.
+  // [CN] 节日皮肤的图标（Example-Shared/Configurations/Skins/1.0.0，由 UIViewController+CYLThemeSettings 读取），每个另有
+  //      45% 不透明度的副本：未选中样式（`faded(_:)`），docs/ObjC-Example-Parity 第 9、32 项。
+  const themeIcons = path.join(CYL_SOURCE, 'Skins', '1.0.0');
+  fs.readdirSync(themeIcons).filter((folder) => fs.statSync(path.join(themeIcons, folder)).isDirectory()).sort()
+    .forEach((folder) => {
+      fs.readdirSync(path.join(themeIcons, folder)).filter((name) => name.endsWith('@3x.png')).sort().forEach((name) => {
+        const image = fs.readFileSync(path.join(themeIcons, folder, name));
+        const base = name.replace('@3x.png', '');
+        files[path.join('theme', folder, `${base}.png`)] = image;
+        files[path.join('theme', folder, `${base}_faded.png`)] = cylFadedPalettePNG(image, 0.45);
+      });
+    });
+  files[path.join('theme', 'cyl_theme_icons_LICENSE.txt')] = fs.readFileSync(path.join(CYL_SOURCE, 'Skins', 'cyl_theme_icons_LICENSE.txt'));
 
   const choice = cylChosenAnimation(process.argv, false);
   const animation = CYL_ANIMATIONS[choice];

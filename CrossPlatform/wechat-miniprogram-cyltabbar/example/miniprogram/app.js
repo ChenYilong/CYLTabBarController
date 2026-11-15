@@ -6,6 +6,27 @@
  *      登录）保存在这里，每个实例通过 cyl_subscribe() 跟随它。
  */
 const CYL_LOGGED_IN_KEY = 'cyl_loggedIn';
+// [EN] As CYLDemoThemes (UserDefaults "CYLDemoThemeIdentifier", "CYLDemoThemeFollowsSystem"), the skin stays across launches.
+// [CN] 与 CYLDemoThemes 相同（UserDefaults「CYLDemoThemeIdentifier」「CYLDemoThemeFollowsSystem」），皮肤在重新启动后保留。
+const CYL_SKIN_KEY = 'cyl_skin';
+const CYL_SKIN_FOLLOWS_SYSTEM_KEY = 'cyl_skinFollowsSystem';
+
+function cylRead(key, fallback) {
+  try {
+    const value = wx.getStorageSync(key);
+    return value === '' || value === undefined ? fallback : value;
+  } catch (error) {
+    return fallback;
+  }
+}
+
+function cylWrite(key, value) {
+  try {
+    wx.setStorageSync(key, value);
+  } catch (error) {
+    // [EN] Storage full or unavailable: the value lasts until the app quits. [CN] 存储已满或不可用：保留到 App 退出。
+  }
+}
 
 App({
   globalData: {
@@ -16,6 +37,11 @@ App({
       // [EN] cyl_setCoverImage by identifier: {image, size}. [CN] 按标识的封面。
       covers: {},
       themeIdentifier: '',
+      // [EN] The skin of the skin picker (utils/cyl_demo_skins.js), following the system Dark Mode or not, and the
+      //      system theme it follows. [CN] 换肤菜单的皮肤（utils/cyl_demo_skins.js）、是否跟随系统深色模式及所跟随的系统主题。
+      skin: 'Default',
+      skinFollowsSystem: false,
+      systemTheme: 'light',
       overrides: {},
       loggedIn: false,
       // [EN] CYLTabBarItemStyle of the core ('' follows the style type). [CN] 核心层的 CYLTabBarItemStyle（'' 跟随样式）。
@@ -47,12 +73,80 @@ App({
     }
     // [EN] As `cyl_loggedIn` of the Objective-C example, the login (issue #19) stays across launches.
     // [CN] 与 Objective-C 示例的 `cyl_loggedIn` 相同，登录状态（issue #19）在重新启动后保留。
+    const state = this.globalData.cylTabBarState;
+    state.loggedIn = Boolean(cylRead(CYL_LOGGED_IN_KEY, false));
+    state.skin = String(cylRead(CYL_SKIN_KEY, 'Default'));
+    state.skinFollowsSystem = Boolean(cylRead(CYL_SKIN_FOLLOWS_SYSTEM_KEY, false));
     try {
-      this.globalData.cylTabBarState.loggedIn = Boolean(wx.getStorageSync(CYL_LOGGED_IN_KEY));
+      const info = typeof wx.getAppBaseInfo === 'function' ? wx.getAppBaseInfo() : wx.getSystemInfoSync();
+      state.systemTheme = info.theme === 'dark' ? 'dark' : 'light';
     } catch (error) {
-      this.globalData.cylTabBarState.loggedIn = false;
+      state.systemTheme = 'light';
+    }
+    if (typeof wx.onThemeChange === 'function') {
+      wx.onThemeChange((result) => this.cyl_updateTabBarState({ systemTheme: result.theme === 'dark' ? 'dark' : 'light' }));
     }
     this.cyl_decorateTabBar();
+  },
+
+  /**
+   * [EN] -[CYLMainRootViewController createFlatDesignTabBar] / -createNewTabBarWithContext: (docs/ObjC-Example-Parity
+   *      items 7, 8): the navigation bar buttons replace the tab bar with a new one in `styleType` ("flatDesign" or
+   *      "liquidGlass"): its own state again (no badges, the first tab, the configuration's values), then the launch
+   *      badges 1.5 s later. The skin and the login belong to the app and stay.
+   * [CN] -[CYLMainRootViewController createFlatDesignTabBar] / -createNewTabBarWithContext:（第 7、8 项）：导航栏按钮用
+   *      `styleType`（"flatDesign" 或 "liquidGlass"）的新 TabBar 替换当前 TabBar：恢复其自身状态（无角标、第一个 Tab、
+   *      配置中的值），1.5 秒后再次显示启动角标。皮肤与登录状态属于整个 App，保持不变。
+   */
+  cyl_rebuildTabBar(styleType) {
+    clearTimeout(this.cylCoverTimer);
+    this.cyl_updateTabBarState({
+      badges: {},
+      badgeAttributes: {},
+      covers: { home: null },
+      overrides: { CYLTabBarControllerStyleType: styleType },
+      itemStyle: '',
+      hiddenIdentifiers: [],
+      tabBarHidden: false,
+      hidesOnScroll: false,
+      tapFeedback: false,
+    });
+    wx.switchTab({ url: '/pages/home/index' });
+    this.cyl_decorateTabBar();
+  },
+
+  /**
+   * [EN] CYLDemoThemes.apply: a skin picked by hand stops following the system. As the Objective-C example, the cover
+   *      goes on again after the new icons (1.5 s; 4 s for the network skin, whose icons download).
+   * [CN] CYLDemoThemes.apply：手动选择皮肤后不再跟随系统。与 Objective-C 示例相同，封面在新图标之后重新加上
+   *      （1.5 秒；网络皮肤需要下载图标，为 4 秒）。
+   */
+  cyl_setSkin(name) {
+    cylWrite(CYL_SKIN_KEY, name);
+    cylWrite(CYL_SKIN_FOLLOWS_SYSTEM_KEY, false);
+    this.cyl_updateTabBarState({ skin: name, skinFollowsSystem: false });
+    this.cyl_coverAgain(name === 'Network icons' ? 4000 : 1500);
+  },
+
+  /**
+   * [EN] CYLDemoThemes.setFollowsSystem. [CN] 跟随系统深色模式。
+   */
+  cyl_setSkinFollowsSystem(followsSystem) {
+    cylWrite(CYL_SKIN_FOLLOWS_SYSTEM_KEY, Boolean(followsSystem));
+    this.cyl_updateTabBarState({ skinFollowsSystem: Boolean(followsSystem) });
+    this.cyl_coverAgain(1500);
+  },
+
+  cyl_coverAgain(delay) {
+    const covers = this.globalData.cylTabBarState.covers || {};
+    if (!covers.home) {
+      return;
+    }
+    this.cyl_updateTabBarState({ covers: Object.assign({}, covers, { home: null }) });
+    clearTimeout(this.cylCoverTimer);
+    this.cylCoverTimer = setTimeout(() => {
+      this.cyl_updateTabBarState({ covers: Object.assign({}, this.globalData.cylTabBarState.covers, { home: covers.home }) });
+    }, delay);
   },
 
   /**
@@ -88,11 +182,7 @@ App({
    */
   cyl_updateTabBarState(change) {
     if ('loggedIn' in change && change.loggedIn !== this.globalData.cylTabBarState.loggedIn) {
-      try {
-        wx.setStorageSync(CYL_LOGGED_IN_KEY, Boolean(change.loggedIn));
-      } catch (error) {
-        // [EN] Storage full or unavailable: the login lasts until the app quits. [CN] 存储已满或不可用：登录状态保留到 App 退出。
-      }
+      cylWrite(CYL_LOGGED_IN_KEY, Boolean(change.loggedIn));
     }
     this.globalData.cylTabBarState = Object.assign({}, this.globalData.cylTabBarState, change);
     this.cylListeners.forEach((listener) => listener(this.globalData.cylTabBarState));

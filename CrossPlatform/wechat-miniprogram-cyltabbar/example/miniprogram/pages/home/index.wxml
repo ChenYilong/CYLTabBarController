@@ -1,5 +1,39 @@
 <!-- [EN] The Objective-C example's home table (CYLHomeViewController): demo sections, the gallery, badge rows. [CN] Objective-C 示例的首页表格（CYLHomeViewController）：演示 section、图库、角标行。 -->
-<view class="cyl-page" bindtouchstart="cyl_onSwipeStart" bindtouchend="cyl_onSwipeEnd">
+<!-- [EN] CYLHomeViewController's navigation bar: "Flat Design" on the left (a breathing dot), "Skin" and "Liquid Glass" (a shaking dot) on the right, both dots in random colors. [CN] 首页导航栏：左侧「Flat Design」（呼吸红点），右侧「换肤」与「Liquid Glass」（抖动红点），红点为随机颜色。 -->
+<view class="cyl-nav" style="padding-top: {{nav.top}}px; height: {{nav.height}}px; padding-right: {{nav.right}}px;">
+  <view id="cyl-nav-flat" class="cyl-nav-button" hover-class="cyl-nav-button-pressed" bindtap="cyl_onFlatDesign" aria-role="button" aria-label="{{texts['Flat Design']}}">
+    <text>{{texts['Flat Design']}}</text>
+    <view class="cyl-nav-dot cyl-nav-dot-breathe" style="background-color: {{nav.dots[0]}};" aria-hidden="true"></view>
+  </view>
+  <view class="cyl-nav-space"></view>
+  <view id="cyl-nav-skin" class="cyl-nav-button" hover-class="cyl-nav-button-pressed" bindtap="cyl_onSkinButton" aria-role="button" aria-label="{{texts['Skin']}}">
+    <text>{{texts['Skin']}}</text>
+  </view>
+  <view id="cyl-nav-liquid" class="cyl-nav-button" hover-class="cyl-nav-button-pressed" bindtap="cyl_onLiquidGlass" aria-role="button" aria-label="{{texts['Liquid Glass']}}">
+    <text>{{texts['Liquid Glass']}}</text>
+    <view class="cyl-nav-dot cyl-nav-dot-shake" style="background-color: {{nav.dots[1]}};" aria-hidden="true"></view>
+  </view>
+</view>
+<!-- [EN] The skin menu: the skins, a check on the current one, then "Follow the system Dark Mode". [CN] 换肤菜单：各皮肤（当前皮肤带勾号），然后是「跟随系统深色模式」。 -->
+<view wx:if="{{skinMenu}}" class="cyl-menu-backdrop" bindtap="cyl_closeSkinMenu" catchtouchmove="cyl_noop">
+  <view class="cyl-menu" style="top: {{nav.top + nav.height + 4}}px;" catchtap="cyl_noop">
+    <text class="cyl-menu-header">{{texts['Choose a theme']}}</text>
+    <scroll-view scroll-y style="max-height: {{nav.menuHeight}}px;">
+      <view wx:for="{{skinMenu}}" wx:for-item="row" wx:key="id">
+        <view wx:if="{{row.id === 'system'}}" class="cyl-menu-separator"></view>
+        <view class="cyl-menu-row" hover-class="cyl-home-row-pressed" catchtap="cyl_onSkinMenuRow" data-id="{{row.id}}" aria-role="button" aria-label="{{row.title}}" aria-selected="{{row.checked}}">
+          <text class="cyl-menu-check" aria-hidden="true">{{row.checked ? '✓' : ''}}</text>
+          <image wx:if="{{row.preview.icon}}" class="cyl-skin-icon" src="{{row.preview.icon}}" aria-hidden="true" />
+          <view wx:else class="cyl-skin-swatch" style="background-color: {{row.preview.swatch}};" aria-hidden="true">{{row.preview.glyph}}</view>
+          <text class="cyl-menu-title" aria-hidden="true">{{row.title}}</text>
+        </view>
+      </view>
+    </scroll-view>
+  </view>
+</view>
+<view class="cyl-page" style="padding-top: {{nav.top + nav.height + 8}}px;" bindtouchstart="cyl_onSwipeStart" bindtouchend="cyl_onSwipeEnd">
+  <!-- [EN] The navigation title, as a large title: the capsule leaves no room for it between the buttons. [CN] 导航标题以大标题显示：胶囊按钮使按钮之间没有放标题的空间。 -->
+  <text id="cyl-navigation-title" class="cyl-large-title" aria-role="heading">{{navigationTitle}}</text>
   <view class="cyl-header">
     <text class="cyl-header-title">{{texts['CYLTabBarController for WeChat Mini Program']}}</text>
     <text class="cyl-header-subtitle">{{texts['The tab bar below is the cyl-tab-bar component, configured with Example-Shared/Configurations/cyl_tabbar_configuration.json and a raised plus button.']}}</text>
@@ -8,12 +42,15 @@
     <text class="cyl-section-title" aria-role="heading">{{section.title}}</text>
     <view wx:if="{{section.rows}}" class="cyl-section">
       <view wx:for="{{section.rows}}" wx:for-item="row" wx:key="id" class="cyl-home-row {{row.selected ? 'cyl-row-selected' : ''}}" hover-class="cyl-home-row-pressed" bindtap="cyl_onRow" data-id="{{row.id}}" aria-role="button" aria-label="{{row.title}}, {{row.subtitle}}">
+        <image wx:if="{{row.preview.icon}}" class="cyl-skin-icon" src="{{row.preview.icon}}" aria-hidden="true" />
+        <view wx:elif="{{row.preview.swatch}}" class="cyl-skin-swatch" style="background-color: {{row.preview.swatch}};" aria-hidden="true">{{row.preview.glyph}}</view>
         <view class="cyl-home-texts" aria-hidden="true">
           <text class="cyl-home-title">{{row.title}}</text>
           <text wx:if="{{row.subtitle}}" class="cyl-home-subtitle">{{row.subtitle}}</text>
         </view>
         <switch wx:if="{{row.accessory === 'switch'}}" checked="{{row.checked}}" catchchange="cyl_onSwitch" catchtap="cyl_noop" data-id="{{row.id}}" aria-label="{{row.title}}" />
         <text wx:elif="{{row.accessory === 'chevron'}}" class="cyl-home-chevron" aria-hidden="true">›</text>
+        <text wx:elif="{{row.accessory === 'check'}}" class="cyl-home-check" aria-hidden="true">✓</text>
       </view>
     </view>
     <view wx:if="{{section.badges}}" class="cyl-section">
