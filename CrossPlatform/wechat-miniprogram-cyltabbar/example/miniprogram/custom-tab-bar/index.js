@@ -69,8 +69,10 @@ Component({
         if (!tabBar) {
           return;
         }
-        // [EN] A skin with colors is a skin of the configuration (utils/cyl_demo_skins.js). [CN] 带颜色的皮肤是配置中的一个皮肤。
-        tabBar.cyl_setThemeIdentifier(skin.tint ? '' : state.themeIdentifier);
+        // [EN] A skin with colors and a standardAppearance theme are skins the configuration selects (utils/cyl_demo_skins.js,
+        //      utils/cyl_demo_updates.js). [CN] 带颜色的皮肤与 standardAppearance 主题都是配置所选的皮肤。
+        const configured = String(this.data.configuration.CYLTabBarControllerThemeIdentifier || '').includes(':');
+        tabBar.cyl_setThemeIdentifier(configured ? '' : state.themeIdentifier);
         tabBar.cyl_setTabBarHidden(Boolean(state.tabBarHidden));
         const attributes = this.cyl_badgeAttributesInSkin(state.badgeAttributes || {}, state.badges, skin);
         Object.keys(state.badges).forEach((identifier) => {

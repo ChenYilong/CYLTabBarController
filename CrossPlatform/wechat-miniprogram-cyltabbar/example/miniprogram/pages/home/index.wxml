@@ -45,7 +45,7 @@
         <image wx:if="{{row.preview.icon}}" class="cyl-skin-icon" src="{{row.preview.icon}}" aria-hidden="true" />
         <view wx:elif="{{row.preview.swatch}}" class="cyl-skin-swatch" style="background-color: {{row.preview.swatch}};" aria-hidden="true">{{row.preview.glyph}}</view>
         <view class="cyl-home-texts" aria-hidden="true">
-          <text class="cyl-home-title">{{row.title}}</text>
+          <text class="cyl-home-title {{row.dimmed ? 'cyl-home-dimmed' : ''}}">{{row.title}}</text>
           <text wx:if="{{row.subtitle}}" class="cyl-home-subtitle">{{row.subtitle}}</text>
         </view>
         <switch wx:if="{{row.accessory === 'switch'}}" checked="{{row.checked}}" catchchange="cyl_onSwitch" catchtap="cyl_noop" data-id="{{row.id}}" aria-label="{{row.title}}" />

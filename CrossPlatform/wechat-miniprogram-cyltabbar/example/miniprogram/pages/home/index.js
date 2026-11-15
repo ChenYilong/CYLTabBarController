@@ -87,7 +87,8 @@ Component({
      */
     cyl_values(state, configuration) {
       const items = configuration.CYLTabBarControllerTabBarItemsAttributes || [];
-      const offset = (items[0] && items[0].CYLTabBarItemTitlePositionAdjustment) || '{0, -2}';
+      // [EN] Item 13: the bar's titlePositionAdjustment, "(%g, %g)". [CN] 第 13 项：TabBar 的 titlePositionAdjustment，「(%g, %g)」。
+      const offset = /\{\s*(-?[\d.]+)\s*,\s*(-?[\d.]+)\s*\}/.exec(String(configuration.CYLTabBarControllerTitlePositionAdjustment || '{0, 0}'));
       const loginTabs = items.filter((item) => (configuration.CYLTabBarControllerLoginRequiredTabBarItemIdentifiers || [])
         .includes(item.CYLTabBarItemIdentifier)).map((item) => this.t(item.CYLTabBarItemTitle));
       const bar = this.cyl_tabBar();
@@ -95,7 +96,11 @@ Component({
       const selectedIndex = slots.findIndex((slot) => slot.selected);
       const tabIndex = slots.filter((slot) => !slot.isPlusButton).findIndex((slot) => slot.selected);
       return {
-        titleOffset: `(${String(offset).replace(/[{}\s]/g, '').split(',').join(', ')})`,
+        titleOffset: offset ? `(${Number(offset[1])}, ${Number(offset[2])})` : '(0, 0)',
+        // [EN] Item 14: the standardAppearance theme's name. [CN] 第 14 项：standardAppearance 主题名。
+        appearance: this.t((state.overrides || {}).cylDemoAppearance || 'Original'),
+        // [EN] Item 16: the code name, not translated, as iOS. [CN] 第 16 项：代码名，与 iOS 一样不翻译。
+        scrollBehavior: state.scrollBehavior || 'Automatic',
         // [EN] cyl_themeSettingsCell: the skin, " · Follow the system Dark Mode" when it does. [CN] 当前皮肤；跟随系统时加上「 · 跟随系统深色模式」。
         skin: this.t(cylEffectiveSkin(state).name) + (state.skinFollowsSystem ? ` · ${this.t('Follow the system Dark Mode')}` : ''),
         login: this.t(state.loggedIn ? 'Logged in' : 'Logged out'),
@@ -128,13 +133,7 @@ Component({
             preview: cylSkinPreview(candidate),
             accessory: candidate.name === skin.name ? 'check' : 'none',
           }))
-          : section.rows.map((row) => ({
-            id: row.id,
-            title: cylFill(cylListText(row.title), values),
-            subtitle: cylFill(cylListText(row.subtitle), values),
-            accessory: row.accessory,
-            checked: this.cyl_isOn(row.id, state),
-          }));
+          : section.rows.map((row) => this.cyl_row(row, values, state, configuration));
         const title = section.skins
           ? this.t('Skins: holidays and colors (%@)').replace('%@', String(CYL_DEMO_SKINS.length)) : cylListText(section.title);
         return { id: section.id, title, rows };
@@ -207,6 +206,36 @@ Component({
       }
     },
 
+    /**
+     * [EN] A demo row: its texts with the current values, a checkmark on the update rows that are on
+     *      (UIViewController+CYLTabBarItemUpdate.swift), and the FlatDesign-only rows dimmed with their note outside
+     *      FlatDesign (CYLFlatDesignTableViewController).
+     * [CN] 演示行：带当前值的文字；已开启的更新行带勾号（UIViewController+CYLTabBarItemUpdate.swift）；非扁平样式下，
+     *      仅扁平样式支持的行变灰并显示说明（CYLFlatDesignTableViewController）。
+     */
+    cyl_row(row, values, state, configuration) {
+      const updates = (state.overrides || {}).cylDemoUpdates || {};
+      const on = {
+        changeTabTitle: updates.changeTabTitle,
+        switchTabIcon: updates.homeIcon === 'custom',
+        downloadNetworkIcon: updates.homeIcon === 'network',
+        gifIcon: updates.homeIcon === 'gif',
+        allNetworkIcons: updates.allIcons === 'network',
+        allLocalIcons: updates.allIcons === 'local',
+        allTitles: updates.allTitles,
+      };
+      const flatOnly = row.id === 'flatBackground';
+      const unsupported = flatOnly && configuration.CYLTabBarControllerStyleType !== 'flatDesign';
+      return {
+        id: row.id,
+        title: cylFill(cylListText(row.title), values),
+        subtitle: flatOnly && !unsupported ? '' : cylFill(cylListText(row.subtitle), values),
+        accessory: row.id in on ? (on[row.id] ? 'check' : 'none') : row.accessory,
+        checked: this.cyl_isOn(row.id, state),
+        dimmed: unsupported,
+      };
+    },
+
     // [EN] Switch rows that the mini program has. [CN] 小程序支持的开关行。
     cyl_isOn(id, state) {
       if (id === 'login') {
@@ -277,11 +306,17 @@ Component({
           const current = CYL_TAP_ANIMATIONS.indexOf(configuration.CYLTabBarControllerTabButtonTapAnimation);
           this.cyl_override({ CYLTabBarControllerTabButtonTapAnimation: CYL_TAP_ANIMATIONS[(current + 1) % CYL_TAP_ANIMATIONS.length] });
         },
+        // [EN] Item 28: cyl_selectedIndexIgnoringPlusButton = (current + 1) % count: the next tab without the plus
+        //      button, back to the first after the last. [CN] 第 28 项：选中不含 PlusButton 的下一个 Tab，最后一个之后回到第一个。
         selectedIndex: () => {
           const bar = this.cyl_tabBar();
-          if (bar) {
-            bar.cyl_selectAdjacent(1);
+          if (!bar) {
+            return;
           }
+          const tabs = bar.data.cylSlots.filter((slot) => !slot.isPlusButton);
+          const current = tabs.findIndex((slot) => slot.selected);
+          const next = tabs[current < 0 ? 0 : (current + 1) % tabs.length];
+          bar.cyl_onTap({ currentTarget: { dataset: { key: next.key } } });
         },
         gallery: () => wx.navigateTo({ url: '/pages/glass/index' }),
         login: () => this.cyl_update({ loggedIn: !state.loggedIn }),
@@ -338,10 +373,16 @@ Component({
       const top = event.scrollTop;
       const last = this.cylLastScrollTop || 0;
       this.cylLastScrollTop = top;
-      if (!state.hidesOnScroll || Math.abs(top - last) < 8) {
+      // [EN] Item 16: OnScrollDown hides on a scroll down and shows on a scroll up, OnScrollUp the other way; Automatic
+      //      and Never leave the bar (on iOS Liquid Glass the system minimizes the bar instead of hiding it).
+      // [CN] 第 16 项：OnScrollDown 向下滚动隐藏、向上显示，OnScrollUp 相反；Automatic 与 Never 不改变 TabBar（iOS 液态
+      //      玻璃下由系统缩小 TabBar 而不是隐藏）。
+      const behavior = state.scrollBehavior || 'Automatic';
+      if ((behavior !== 'OnScrollDown' && behavior !== 'OnScrollUp') || Math.abs(top - last) < 8) {
         return;
       }
-      const hidden = top > last && top > 60;
+      const down = top > last && top > 60;
+      const hidden = behavior === 'OnScrollDown' ? down : !down && top > 60;
       if (hidden !== Boolean(state.tabBarHidden)) {
         this.cyl_update({ tabBarHidden: hidden });
       }

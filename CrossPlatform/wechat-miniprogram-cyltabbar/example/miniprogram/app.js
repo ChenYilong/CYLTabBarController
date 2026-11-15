@@ -56,7 +56,8 @@ App({
       // [EN] Home rows: every bar hidden, the bar hidden while the page scrolls down, haptics on taps.
       // [CN] 首页各行：隐藏所有 TabBar、页面向下滚动时隐藏 TabBar、点击时振动。
       tabBarHidden: false,
-      hidesOnScroll: false,
+      // [EN] CYLTabBarMinimizeBehavior of the Home row (Automatic, OnScrollDown, OnScrollUp, Never). [CN] 首页行的滚动行为。
+      scrollBehavior: 'Automatic',
       tapFeedback: false,
     },
   },
@@ -108,7 +109,7 @@ App({
       itemStyle: '',
       hiddenIdentifiers: [],
       tabBarHidden: false,
-      hidesOnScroll: false,
+      scrollBehavior: 'Automatic',
       tapFeedback: false,
     });
     wx.switchTab({ url: '/pages/home/index' });

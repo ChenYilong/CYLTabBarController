@@ -515,10 +515,11 @@ test('the cells of the example act on tap (the request of 2026-11-15)', async ()
   const state = () => miniProgram.evaluate(() => getApp().globalData.cylTabBarState);
 
   // [EN] A direct action: the title of the first tab changes, then comes back. [CN] 直接行为：第一个 Tab 的标题改变后恢复。
+  // [EN] "Purchased courses", as UIViewController+CYLTabBarItemUpdate.swift. [CN] 「已购课程」，与 iOS 相同。
   await cylTapElement('.cyl-home-row[data-id="changeTabTitle"]');
-  assert.equal((await barTitles())[0], 'Changed');
+  assert.match((await barTitles())[0], /Purchased courses|已购课程|已購課程/);
   await cylTapElement('.cyl-home-row[data-id="changeTabTitle"]');
-  assert.notEqual((await barTitles())[0], 'Changed');
+  assert.doesNotMatch((await barTitles())[0], /Purchased courses|已购课程|已購課程/);
 
   // [EN] Show / hide the bar. [CN] 显示 / 隐藏 TabBar。
   await cylTapElement('.cyl-home-row[data-id="flatShowHide"]');
@@ -746,6 +747,106 @@ test('the Home navigation bar and the skins match the Objective-C example (docs/
   await miniProgram.evaluate(() => { getApp().cyl_setSkinFollowsSystem(false); getApp().cyl_updateTabBarState({ systemTheme: 'light' }); });
   app = await miniProgram.evaluate(() => getApp().globalData.cylTabBarState);
   assert.equal(app.skinFollowsSystem, false);
+  await cylClearDecoration();
+  await miniProgram.reLaunch('/pages/home/index');
+  await cylSleep(CYL_SETTLE_MS);
+});
+
+test('the Home rows act with the Objective-C values (docs/ObjC-Example-Parity items 13, 14, 16, 19, 21-26, 28)', async () => {
+  await miniProgram.reLaunch('/pages/home/index');
+  await cylSleep(CYL_SETTLE_MS * 2);
+  // [EN] A new tab bar: the rows start from the configuration's values. [CN] 新的 TabBar：各行从配置中的值开始。
+  await miniProgram.evaluate(() => { getApp().cyl_rebuildTabBar('liquidGlass'); });
+  await cylClearDecoration();
+  const tap = (id, wait) => cylTapElement(`.cyl-home-row[data-id="${id}"]`, wait);
+  const row = async (id) => {
+    const { data } = await cylCurrentPage();
+    return data.sections.reduce((found, section) => found || (section.rows || []).find((candidate) => candidate.id === id), null);
+  };
+  const bar = () => miniProgram.evaluate(() => {
+    const pages = getCurrentPages();
+    const tabBar = pages[pages.length - 1].getTabBar().selectComponent('#cyl-tab-bar');
+    return {
+      style: tabBar.data.cylBarStyle,
+      slots: tabBar.data.cylSlots.map((slot) => ({
+        key: slot.key,
+        selected: Boolean(slot.selected),
+        title: slot.item ? slot.item.title : slot.title,
+        image: slot.item ? slot.item.image : slot.image,
+      })),
+    };
+  });
+
+  // [EN] Item 13: (0, -3.5) at launch, then 0, -4, 4. [CN] 第 13 项：启动时 (0, -3.5)，然后为 0、-4、4。
+  assert.match((await row('titleOffset')).subtitle, /\(0, -3\.5\)/);
+  for (const value of ['(0, 0)', '(0, -4)', '(0, 4)', '(0, 0)']) {
+    await tap('titleOffset');
+    assert.ok((await row('titleOffset')).subtitle.includes(value), value);
+  }
+
+  // [EN] Item 14: Original → Dark (#141414 bar) → Centered capsule → Green line (green top line) → Original.
+  // [CN] 第 14 项：原始 → 深色（#141414）→ 居中胶囊 → 绿色描边（绿色顶部线）→ 原始。
+  await tap('standardAppearance');
+  assert.match((await bar()).style, /#141414/);
+  await tap('standardAppearance');
+  await tap('standardAppearance');
+  assert.match((await bar()).style, /border-top-color: #34C759/);
+  await tap('standardAppearance');
+  assert.doesNotMatch((await bar()).style, /#141414|#34C759/);
+
+  // [EN] Item 16: the four behaviors, by their code names. [CN] 第 16 项：四种行为，显示代码名。
+  for (const name of ['OnScrollDown', 'OnScrollUp', 'Never', 'Automatic']) {
+    await tap('scrollBehavior');
+    assert.ok((await row('scrollBehavior')).subtitle.includes(name), name);
+  }
+
+  // [EN] Items 21-26: checkmarks while on, the slot rules, a second tap restores. [CN] 第 21–26 项：开启时带勾号，图标位置规则，再点恢复。
+  await tap('downloadNetworkIcon');
+  assert.equal((await row('downloadNetworkIcon')).accessory, 'check');
+  assert.match((await bar()).slots[0].image, /3132\/31327(32|79)\.png$/);
+  await tap('gifIcon');
+  assert.equal((await row('downloadNetworkIcon')).accessory, 'none', 'one icon slot');
+  assert.match((await bar()).slots[0].image, /cyl_tab_sample_animated\.gif$/);
+  await tap('allNetworkIcons');
+  assert.equal((await row('gifIcon')).accessory, 'none', 'all icons clear the single icon');
+  assert.match((await bar()).slots[1].image, /2099\/2099085\.png$/);
+  await tap('allLocalIcons');
+  assert.equal((await row('allNetworkIcons')).accessory, 'none', 'network and local exclude each other');
+  assert.match((await bar()).slots[0].image, /img_tab_home_[01]\.png$/);
+  await tap('allLocalIcons');
+  await tap('allTitles');
+  assert.ok((await bar()).slots.filter((slot) => slot.key !== 'home').every((slot) => slot.title.startsWith('★ ')));
+  await tap('allTitles');
+  assert.ok((await bar()).slots.every((slot) => !slot.title.startsWith('★ ')));
+
+  // [EN] Item 19: outside FlatDesign the row is dimmed and an alert explains it. [CN] 第 19 项：非扁平样式下该行变灰并弹窗说明。
+  assert.equal((await row('flatBackground')).dimmed, true);
+
+  // [EN] Item 28: the next tab without the plus button, wrapping after the last. [CN] 第 28 项：不含 PlusButton 的下一个 Tab，最后一个之后回到第一个。
+  await cylSetState({ loggedIn: true });
+  for (const key of ['city', 'message', 'CYLMineViewController']) {
+    await miniProgram.switchTab('/pages/home/index');
+    await cylSleep(CYL_SETTLE_MS);
+    await miniProgram.evaluate((next) => {
+      const pages = getCurrentPages();
+      const tabs = ['home', 'city', 'message', 'CYLMineViewController'];
+      // [EN] The custom tab bar passes the selection to cyl-tab-bar. [CN] 自定义 TabBar 把选中状态传给 cyl-tab-bar。
+      pages[pages.length - 1].getTabBar().setData({ selectedIdentifier: tabs[tabs.indexOf(next) - 1] });
+    }, key);
+    await cylSleep(CYL_SETTLE_MS);
+    await tap('selectedIndex', CYL_SETTLE_MS * 2);
+    assert.equal((await cylCurrentPage()).route, { city: 'pages/web/index', message: 'pages/message/index', CYLMineViewController: 'pages/me/index' }[key]);
+  }
+  await miniProgram.switchTab('/pages/home/index');
+  await cylSleep(CYL_SETTLE_MS);
+  await miniProgram.evaluate(() => {
+    const pages = getCurrentPages();
+    pages[pages.length - 1].getTabBar().setData({ selectedIdentifier: 'CYLMineViewController' });
+  });
+  await cylSleep(CYL_SETTLE_MS);
+  await tap('selectedIndex');
+  assert.equal((await bar()).slots.find((slot) => slot.selected).key, 'home', 'wraps to the first tab');
+  await miniProgram.evaluate(() => { getApp().cyl_rebuildTabBar('liquidGlass'); });
   await cylClearDecoration();
   await miniProgram.reLaunch('/pages/home/index');
   await cylSleep(CYL_SETTLE_MS);

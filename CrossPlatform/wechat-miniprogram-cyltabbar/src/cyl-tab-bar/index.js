@@ -288,7 +288,8 @@ Component({
           ? this.cylRequestedGlassLensStyle : this.data.glassLensStyle),
         cylStyleType: styleType,
         cylIsDark: model.isDark,
-        cylBarStyle: model.backgroundColor ? `background-color: ${model.backgroundColor};` : '',
+        cylBarStyle: (model.backgroundColor ? `background-color: ${model.backgroundColor};` : '')
+          + (model.shadowColor ? `border-top-color: ${model.shadowColor};` : ''),
         cylThemeIdentifier: model.themeIdentifier,
         cylTapAnimation: model.tapAnimation,
         cylAnimationStyle: `animation-duration: ${model.animationDuration}ms;`,
@@ -411,11 +412,13 @@ Component({
       const attributes = this.cylBadgeAttributes[identifier] || {};
       const offset = Array.isArray(attributes.centerOffset) ? attributes.centerOffset : null;
       const radius = Number(attributes.radius);
+      const model = this.cylModel || {};
+      // [EN] The skin's badge color and offset apply to badges without their own (UITabBarAppearance). [CN] 皮肤的角标颜色与偏移用于没有自定值的角标。
       return {
-        color: attributes.color || '',
+        color: attributes.color || model.badgeBackgroundColor || '',
         animation: attributes.animation || '',
         size: isDot && radius > 0 ? `{${radius * 2}, ${radius * 2}}` : null,
-        positionAdjustment: offset ? `{${Number(offset[0]) || 0}, ${Number(offset[1]) || 0}}` : null,
+        positionAdjustment: offset ? `{${Number(offset[0]) || 0}, ${Number(offset[1]) || 0}}` : (model.badgePositionAdjustment || null),
       };
     },
 

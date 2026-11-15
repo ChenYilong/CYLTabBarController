@@ -260,3 +260,8 @@
     border-top-color: rgba(255, 255, 255, 0.12);
   }
 }
+
+/* [EN] A row the tab bar style does not support (secondaryLabelColor). [CN] 当前 TabBar 样式不支持的行。 */
+.cyl-home-dimmed {
+  color: #8e8e93;
+}

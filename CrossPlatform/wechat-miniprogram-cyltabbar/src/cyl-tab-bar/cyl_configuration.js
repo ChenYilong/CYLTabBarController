@@ -38,6 +38,10 @@ const CYL_THEME_KEYS = [
   'CYLTabBarItemSelectedBackgroundColor',
   'CYLTabBarItemIconColor',
   'CYLTabBarItemSelectedIconColor',
+  // [EN] UITabBarAppearance shadowColor: the line on top of the bar. [CN] UITabBarAppearance 的 shadowColor：TabBar 顶部的线。
+  'CYLTabBarShadowColor',
+  // [EN] UITabBarItemStateAppearance badgeBackgroundColor: badges without a color of their own. [CN] 没有自定颜色的角标的背景色。
+  'CYLTabBarItemBadgeBackgroundColor',
 ];
 
 const CYL_COLOR_PATTERN = /^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/;
@@ -643,6 +647,10 @@ function cylReadConfiguration(configuration, environment) {
     themeIdentifier,
     themeIdentifiers: Object.keys(themes).sort(),
     backgroundColor: themeValues.CYLTabBarBackgroundColor,
+    shadowColor: themeValues.CYLTabBarShadowColor,
+    badgeBackgroundColor: themeValues.CYLTabBarItemBadgeBackgroundColor,
+    // [EN] UITabBarItemStateAppearance badgePositionAdjustment, "{x, y}". [CN] 角标偏移，"{x, y}"。
+    badgePositionAdjustment: typeof theme.CYLTabBarItemBadgePositionAdjustment === 'string' ? theme.CYLTabBarItemBadgePositionAdjustment : '',
   };
 }
 

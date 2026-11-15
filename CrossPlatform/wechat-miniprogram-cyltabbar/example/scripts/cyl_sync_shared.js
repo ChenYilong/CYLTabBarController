@@ -306,6 +306,17 @@ function cylGeneratedFiles() {
     });
   files[path.join('theme', 'cyl_theme_icons_LICENSE.txt')] = fs.readFileSync(path.join(CYL_SOURCE, 'Skins', 'cyl_theme_icons_LICENSE.txt'));
 
+  // [EN] The Home rows "Change all local icons" and "GIF icon" (UIViewController+CYLTabBarItemUpdate.swift): the example's
+  //      img_tab_home / img_tab_message images and the library's animated GIF (docs/ObjC-Example-Parity items 24, 25).
+  // [CN] 首页「批量使用本地图标」与「GIF 动图图标」行（UIViewController+CYLTabBarItemUpdate.swift）：示例的 img_tab_home /
+  //      img_tab_message 图片与库的 GIF 动图（docs/ObjC-Example-Parity 第 24、25 项）。
+  const lottieResources = path.join(CYL_REPOSITORY_ROOT, 'Example', 'Classes', 'Other', 'LottieResources');
+  ['img_tab_home_0', 'img_tab_home_1', 'img_tab_message_0', 'img_tab_message_1'].forEach((name) => {
+    files[path.join('objc', `${name}.png`)] = fs.readFileSync(path.join(lottieResources, `${name}.png`));
+  });
+  files[path.join('objc', 'cyl_tab_sample_animated.gif')] = fs.readFileSync(path.join(CYL_REPOSITORY_ROOT, 'CYLTabBarController',
+    'Resources', 'CYLTabBarController.bundle', 'cyl_tab_sample_animated.gif'));
+
   const choice = cylChosenAnimation(process.argv, false);
   const animation = CYL_ANIMATIONS[choice];
   const animationFolder = path.resolve(CYL_COMPONENT_ROOT, animation.folder);

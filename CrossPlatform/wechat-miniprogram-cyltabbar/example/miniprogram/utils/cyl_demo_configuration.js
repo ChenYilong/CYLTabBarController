@@ -10,6 +10,7 @@ const cylSharedConfiguration = require('../shared/configuration');
 const cylAnimations = require('../shared/animations');
 const { cylSkinnedConfiguration, cylSkinReplacesIcons } = require('./cyl_demo_skins');
 const { t } = require('./cyl_demo_localization');
+const { cylApplyUpdates } = require('./cyl_demo_updates');
 
 /**
  * [EN] The example installs one animation package (`npm run setup -- --animation=lottie|pag|rive|gif`, see
@@ -276,7 +277,11 @@ function cylDemoConfiguration(overrides, skin) {
   delete configurationOverrides.cylDemoBoldTitles;
   delete configurationOverrides.cylDemoItemAttributes;
   delete configurationOverrides.cylDemoPlusAttributes;
-  return cylSkinnedConfiguration(Object.assign({}, cylSharedConfiguration, {
+  delete configurationOverrides.cylDemoUpdates;
+  delete configurationOverrides.cylDemoAppearance;
+  // [EN] The Home rows that change the tabs in place, last: they act on what is shown (utils/cyl_demo_updates.js).
+  // [CN] 原地修改 Tab 的首页各行最后应用：它们作用于当前显示的内容（utils/cyl_demo_updates.js）。
+  return cylApplyUpdates(cylSkinnedConfiguration(Object.assign({}, cylSharedConfiguration, {
     CYLTabBarControllerTabBarItemsAttributes: changedItems,
     CYLTabBarControllerPlusButton: Object.assign({}, CYL_DEMO_PLUS_BUTTON, options.cylDemoPlusAttributes),
     // [EN] The Objective-C example starts on Liquid Glass (CYLMainRootViewController). [CN] Objective-C 示例以液态玻璃启动。
@@ -293,7 +298,7 @@ function cylDemoConfiguration(overrides, skin) {
     CYLTabBarControllerTabButtonTapAnimation: 'scale',
     // [EN] -[MainTabBarController setUpLoginRequiredTabs] (issue #19). [CN] 需要登录的 Tab（issue #19）。
     CYLTabBarControllerLoginRequiredTabBarItemIdentifiers: ['message', 'CYLMineViewController'],
-  }, configurationOverrides), skin, t);
+  }, configurationOverrides), skin, t), options.cylDemoUpdates, options.cylDemoAppearance, t);
 }
 
 module.exports = { cylDemoConfiguration, cylInstalledAnimation, cylAvailableAnimationFiles };

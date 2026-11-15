@@ -213,3 +213,15 @@ test('title fonts, image URL size, icon rendering mode and colors (#787), plus b
     ['', 'font-size: 12px; line-height: 14px; font-weight: 700;', { width: 24, height: 24 }]);
   assert.equal(model.plusButton.showsSelection, true);
 });
+
+test('skin keys of UITabBarAppearance: shadow color, badge background color, badge offset', () => {
+  const model = reader.cylReadConfiguration({
+    CYLTabBarControllerTabBarItemsAttributes: [{ CYLTabBarItemTitle: 'Home', CYLTabBarItemIdentifier: 'home' }],
+    CYLTabBarControllerThemes: { green: { CYLTabBarShadowColor: '#34C759', CYLTabBarItemBadgeBackgroundColor: '#FF9500', CYLTabBarItemBadgePositionAdjustment: '{2, -2}' } },
+  }, {});
+  assert.equal(model.shadowColor, '#34C759');
+  assert.equal(model.badgeBackgroundColor, '#FF9500');
+  assert.equal(model.badgePositionAdjustment, '{2, -2}');
+  const plain = reader.cylReadConfiguration({ CYLTabBarControllerTabBarItemsAttributes: [{ CYLTabBarItemTitle: 'Home' }] }, {});
+  assert.deepEqual([plain.shadowColor, plain.badgeBackgroundColor, plain.badgePositionAdjustment], ['', '', '']);
+});
