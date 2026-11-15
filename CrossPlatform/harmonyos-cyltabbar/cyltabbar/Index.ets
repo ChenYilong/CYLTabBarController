@@ -8,7 +8,7 @@ export {
 } from './src/main/ets/CYLTabBarItem';
 export { CYLPlusButton, CYLPlusButtonInsets } from './src/main/ets/CYLPlusButton';
 export {
-  CYLTabBarController, CYLPlusButtonPageIndex, CYLEdgeInsets, cyl_simulateMemoryWarning, CYLMemoryWarningStorageKey
+  CYLTabBarController, CYLPlusButtonPageIndex, CYLEdgeInsets, CYLTabButtonTapAnimationType, CYLImpactFeedbackStyle, cyl_simulateMemoryWarning, CYLMemoryWarningStorageKey
 } from './src/main/ets/CYLTabBarController';
 export { CYLBadgeSample, cyl_badgeTitleForRow, cyl_badgeStyleCount, cyl_applyBadgeSample } from './src/main/ets/CYLBadgeSamples';
 export { CYLLottieIcon } from './src/main/ets/CYLLottieIcon';

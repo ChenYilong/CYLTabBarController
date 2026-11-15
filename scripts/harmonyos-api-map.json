@@ -116,5 +116,18 @@
   "CYLTabBarController(CYLSelectedIndexIgnoringPlusButton) cyl_selectedIndexIgnoringPlusButton": "`CYLTabBarController.selectedIndex` (tab indexes only; the plus page is `CYLPlusButtonPageIndex`) (built; emulator check pending / 已编译，模拟器验证待做)",
   "CYLPlusButton touchableAreaScale": "`CYLPlusButton.touchableAreaScale` (`responseRegion`) (built; emulator check pending / 已编译，模拟器验证待做)",
   "CYLPlusButton showsTouchableArea": "`CYLPlusButton.showsTouchableArea` (overlay) (built; emulator check pending / 已编译，模拟器验证待做)",
-  "CYLPlusButton touchableAreaColor": "`CYLPlusButton.touchableAreaColor` (built; emulator check pending / 已编译，模拟器验证待做)"
+  "CYLPlusButton touchableAreaColor": "`CYLPlusButton.touchableAreaColor` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabButtonTapAnimationType": "`CYLTabButtonTapAnimationType` (None, Scale, ZoomIn, Bounce, Rotation, Flip) (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarController(CYLInteraction) cyl_tabButtonTapAnimationType": "`CYLTabBarController.tapAnimationType` (@Prop) (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarController(CYLInteraction) cyl_tabButtonHapticFeedbackEnabled": "`CYLTabBarController.hapticFeedbackEnabled` (vibrator preset; ohos.permission.VIBRATE) (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarController(CYLInteraction) cyl_tabButtonHapticFeedbackStyle": "`CYLTabBarController.hapticFeedbackStyle` (`CYLImpactFeedbackStyle`) (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarControllerDidLongPressControlBlock": "`(index, identifier) => void` of `CYLTabBarController.didLongPress` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarController(CYLInteraction) cyl_didLongPressControlBlock": "`CYLTabBarController.didLongPress` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarControllerDelegate -tabBarController:didLongPressControl:": "`CYLTabBarController.didLongPress` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarHostView didLongPressTab": "`CYLTabBarController.didLongPress` (index; plus button `CYLPlusButtonPageIndex`) (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarController(CYLInteraction) cyl_tabButtonLongPressMinimumDuration": "`CYLTabBarController.longPressDuration` (ms) (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarController(CYLTabBarItemGesture) cyl_tabBarItemLongPressDuration": "`CYLTabBarController.longPressDuration` (ms) (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarController(CYLTabBarItemGesture) cyl_tabBarItemDoubleTapInterval": "`CYLTabBarController.doubleTapInterval` (ms) (built; emulator check pending / 已编译，模拟器验证待做)",
+  "UITabBarItem(CYLTabBarControllerExtention) cyl_doubleTapBlock": "`CYLTabBarController.didDoubleTap` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarController(CYLInteraction) cyl_swipeToSwitchTabEnabled": "`CYLTabBarController.swipeToSwitchTabEnabled` (@Prop) (built; emulator check pending / 已编译，模拟器验证待做)"
 }

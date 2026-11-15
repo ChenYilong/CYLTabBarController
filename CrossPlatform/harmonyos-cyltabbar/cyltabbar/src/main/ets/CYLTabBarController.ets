@@ -1,7 +1,29 @@
+import { curves } from '@kit.ArkUI';
 import { CYLTabBarItemAttributes, CYLTitleOffset } from './CYLTabBarItem';
 import { CYLPlusButton } from './CYLPlusButton';
 import { CYLBadge, CYLBadgeView } from './CYLBadge';
 import { CYLLottieIcon } from './CYLLottieIcon';
+import { vibrator } from '@kit.SensorServiceKit';
+
+/**
+ * [EN] CYLTabButtonTapAnimationType: the built-in tap animations of a tab button (cyl_tabButtonTapAnimationType).
+ * [CN] Tab 按钮的内置点击动画。
+ */
+export enum CYLTabButtonTapAnimationType {
+  None = 0,
+  Scale,
+  ZoomIn,
+  Bounce,
+  Rotation,
+  Flip,
+}
+
+/** [EN] CYLImpactFeedbackStyle (cyl_tabButtonHapticFeedbackStyle). [CN] 触感强度。 */
+export enum CYLImpactFeedbackStyle {
+  Light = 0,
+  Medium,
+  Heavy,
+}
 
 /**
  * [EN] UIEdgeInsets (vp). [CN] 边距（vp）。
@@ -120,6 +142,32 @@ export struct CYLTabBarController {
   presentLogin?: (index: number, identifier: string, completion: (loggedIn: boolean) => void) => void;
   /** [EN] cyl_loggedIn setter / CYLTabBarLoginStateDidChangeNotification: the login completed. [CN] 登录状态变化。 */
   loginStateDidChange?: (loggedIn: boolean) => void;
+  /** [EN] cyl_tabButtonTapAnimationType: played on the tapped tab's icon. [CN] 点击 Tab 时图标播放的动画。 */
+  @Prop tapAnimationType: CYLTabButtonTapAnimationType = CYLTabButtonTapAnimationType.None;
+  /** [EN] cyl_tabButtonHapticFeedbackEnabled (needs ohos.permission.VIBRATE). [CN] 点击时触感反馈（需 ohos.permission.VIBRATE）。 */
+  @Prop hapticFeedbackEnabled: boolean = false;
+  /** [EN] cyl_tabButtonHapticFeedbackStyle. [CN] 触感强度。 */
+  @Prop hapticFeedbackStyle: CYLImpactFeedbackStyle = CYLImpactFeedbackStyle.Medium;
+  /**
+   * [EN] cyl_didLongPressControlBlock / -tabBarController:didLongPressControl: (issue #535): a long press on a tab (its
+   *      index) or on the plus button (CYLPlusButtonPageIndex).
+   * [CN] 长按 Tab（其索引）或加号按钮（CYLPlusButtonPageIndex）。
+   */
+  didLongPress?: (index: number, identifier: string) => void;
+  /** [EN] cyl_tabBarItemLongPressDuration (ms), 500 by default. [CN] 长按时长（毫秒），默认 500。 */
+  @Prop longPressDuration: number = 500;
+  /** [EN] cyl_doubleTapBlock (issue #152): a second tap on a tab within doubleTapInterval. [CN] 在间隔内再次点击同一 Tab。 */
+  didDoubleTap?: (index: number, identifier: string) => void;
+  /** [EN] cyl_tabBarItemDoubleTapInterval (ms), 300 by default. [CN] 双击间隔（毫秒），默认 300。 */
+  @Prop doubleTapInterval: number = 300;
+  /** [EN] cyl_swipeToSwitchTabEnabled: swipe the page left / right for the next / previous tab. [CN] 左右滑动页面切换到下一个 / 上一个 Tab。 */
+  @Prop swipeToSwitchTabEnabled: boolean = false;
+  @State private tapScale: number[] = [];
+  @State private tapAngle: number[] = [];
+  @State private tapFlip: number[] = [];
+  @State private tapOffset: number[] = [];
+  private lastTapIndex: number = -2;
+  private lastTapTime: number = 0;
   shouldSelect?: (index: number, identifier: string) => boolean;
   didSelect?: (index: number, identifier: string) => void;
   plusButtonAction?: () => void;
@@ -151,6 +199,75 @@ export struct CYLTabBarController {
     if (this.onMemoryWarning !== undefined) {
       this.onMemoryWarning(unloaded, this.loaded.slice());
     }
+  }
+
+  /** [EN] The tap animation and the haptic of a tab button. [CN] Tab 按钮的点击动画与触感。 */
+  cylTapFeedback(index: number): void {
+    if (this.hapticFeedbackEnabled) {
+      const effects = ['haptic.clock.timer', 'haptic.effect.soft', 'haptic.effect.hard'];
+      try {
+        vibrator.startVibration({ type: 'preset', effectId: effects[this.hapticFeedbackStyle], count: 1 },
+          { id: 0, usage: 'touch' }).catch(() => {});
+      } catch (e) {
+        // [EN] No vibrator or no permission. [CN] 没有振动器或没有权限。
+      }
+    }
+    if (index < 0 || this.tapAnimationType === CYLTabButtonTapAnimationType.None) {
+      return;
+    }
+    const set = (values: number[], value: number): number[] => {
+      const copy = values.slice();
+      copy[index] = value;
+      return copy;
+    };
+    switch (this.tapAnimationType) {
+      case CYLTabButtonTapAnimationType.Scale:
+        this.tapScale = set(this.tapScale, 0.6);
+        animateTo({ duration: 300, curve: Curve.EaseOut }, () => { this.tapScale = set(this.tapScale, 1); });
+        break;
+      case CYLTabButtonTapAnimationType.ZoomIn:
+        this.tapScale = set(this.tapScale, 1.4);
+        animateTo({ duration: 300, curve: Curve.EaseOut }, () => { this.tapScale = set(this.tapScale, 1); });
+        break;
+      case CYLTabButtonTapAnimationType.Bounce:
+        this.tapOffset = set(this.tapOffset, -10);
+        animateTo({ duration: 400, curve: curves.springMotion(0.4, 0.4) }, () => { this.tapOffset = set(this.tapOffset, 0); });
+        break;
+      case CYLTabButtonTapAnimationType.Rotation:
+        this.tapAngle = set(this.tapAngle, 0);
+        animateTo({ duration: 400 }, () => { this.tapAngle = set(this.tapAngle, 360); });
+        break;
+      case CYLTabButtonTapAnimationType.Flip:
+        this.tapFlip = set(this.tapFlip, 0);
+        animateTo({ duration: 400 }, () => { this.tapFlip = set(this.tapFlip, 180); });
+        break;
+      default:
+        break;
+    }
+  }
+
+  /** [EN] A tap on a tab button: double tap, feedback, then selection. [CN] 点击 Tab：双击检测、反馈，然后选中。 */
+  cylTap(index: number): void {
+    const now = Date.now();
+    if (index === this.lastTapIndex && now - this.lastTapTime <= this.doubleTapInterval && this.didDoubleTap !== undefined) {
+      this.lastTapIndex = -2;
+      this.didDoubleTap(index, this.cylIdentifier(index));
+    } else {
+      this.lastTapIndex = index;
+      this.lastTapTime = now;
+    }
+    this.cylTapFeedback(index);
+    this.cylSelect(index);
+  }
+
+  /** [EN] -cyl_selectNextTab / -cyl_selectPreviousTab (step 1 / -1), wrapping around. [CN] 选中下一个 / 上一个 Tab（循环）。 */
+  cylSelectNeighbor(step: number): void {
+    const count = this.tabBarItemsAttributes.length;
+    if (count === 0) {
+      return;
+    }
+    const from = this.selectedIndex < 0 ? 0 : this.selectedIndex;
+    this.cylSelect((from + step + count) % count);
   }
 
   cylSelect(index: number): void {
@@ -253,6 +370,10 @@ export struct CYLTabBarController {
           .width(this.imageSize)
           .height(this.imageSize)
           .objectFit(ImageFit.Contain)
+          .scale({ x: this.tapScale[index] ?? 1, y: this.tapScale[index] ?? 1 })
+          .rotate({ z: 1, angle: this.tapAngle[index] ?? 0 })
+          .rotate({ y: 1, angle: this.tapFlip[index] ?? 0 })
+          .translate({ y: this.tapOffset[index] ?? 0 })
         }
         CYLBadgeView({ badge: this.badges[index], anchorWidth: this.imageSize })
       }
@@ -283,7 +404,13 @@ export struct CYLTabBarController {
       ? (this.tabBarItemsAttributes[index].selectedBackgroundColor ?? Color.Transparent)
       : (this.tabBarItemsAttributes[index].backgroundColor ?? Color.Transparent))
     .id(`cyl-tab-${this.cylIdentifier(index)}`)
-    .onClick(() => this.cylSelect(index))
+    .gesture(GestureGroup(GestureMode.Exclusive,
+      LongPressGesture({ duration: this.longPressDuration }).onAction(() => {
+        if (this.didLongPress !== undefined) {
+          this.didLongPress(index, this.cylIdentifier(index));
+        }
+      }),
+      TapGesture().onAction(() => this.cylTap(index))))
   }
 
   /**
@@ -353,7 +480,13 @@ export struct CYLTabBarController {
         this.plusPressed = false;
       }
     })
+    .gesture(LongPressGesture({ duration: this.longPressDuration }).onAction(() => {
+      if (this.didLongPress !== undefined) {
+        this.didLongPress(CYLPlusButtonPageIndex, this.cylIdentifier(CYLPlusButtonPageIndex));
+      }
+    }))
     .onClick(() => {
+      this.cylTapFeedback(CYLPlusButtonPageIndex);
       if (this.plusButton?.selectable) {
         this.cylSelect(CYLPlusButtonPageIndex);
       }
@@ -379,6 +512,12 @@ export struct CYLTabBarController {
       }
       .layoutWeight(1)
       .width('100%')
+      .gesture(PanGesture({ direction: PanDirection.Horizontal, distance: 40 })
+        .onActionEnd((event: GestureEvent) => {
+          if (this.swipeToSwitchTabEnabled && Math.abs(event.offsetX) > 60) {
+            this.cylSelectNeighbor(event.offsetX < 0 ? 1 : -1);
+          }
+        }), GestureMask.Normal)
 
       if (!this.tabBarHidden) {
         Row() {

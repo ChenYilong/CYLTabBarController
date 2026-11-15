@@ -3,7 +3,7 @@ import { i18n } from '@kit.LocalizationKit';
 import {
   CYLTabBarController, CYLTabBarItemAttributes, CYLPlusButton, CYLPlusButtonPageIndex, CYLBadge, CYLBadgeView,
   CYLBadgeAppearance, CYLBadgeAnimationType, CYLOffset, CYLEdgeInsets, cyl_simulateMemoryWarning, cyl_badgeTitleForRow,
-  cyl_badgeStyleCount, cyl_applyBadgeSample
+  cyl_badgeStyleCount, cyl_applyBadgeSample, CYLTabButtonTapAnimationType, CYLImpactFeedbackStyle
 } from 'cyltabbar';
 import {
   DemoRow, DemoSection, DEMO_APPEARANCES, DEMO_TITLE_OFFSETS, DEMO_HOME, DEMO_CITY, DEMO_MESSAGE, DEMO_ME,
@@ -77,6 +77,12 @@ struct Index {
   @State loggedIn: boolean = true;
   /** [EN] Toggled update rows, by id. [CN] 已切换的更新行。 */
   @State toggled: string[] = [];
+  /** [EN] Items 33-37: tab interactions (#535). [CN] 第 33-37 项：Tab 交互（#535）。 */
+  @State tapAnimation: CYLTabButtonTapAnimationType = CYLTabButtonTapAnimationType.None;
+  @State feedbackStep: number = 0;
+  @State longPressIndex: number = 1;
+  @State doubleTapIndex: number = 1;
+  @State swipeEnabled: boolean = false;
   private badges: CYLBadge[] = CYL_TABS.map(() => new CYLBadge());
   private plusButtonBadge: CYLBadge = new CYLBadge();
   /** [EN] The badge of each badge row, per page. [CN] 每个页面每个角标行的角标。 */
@@ -453,6 +459,52 @@ struct Index {
     ];
   }
 
+  /** [EN] Tab interactions (items 33-37). [CN] Tab 交互（第 33-37 项）。 */
+  private interactionRows(): DemoRow[] {
+    const tapNames = ['None', 'Scale', 'Zoom in', 'Bounce', 'Rotation', 'Flip'];
+    const feedbackNames = ['Off', 'Light haptic', 'Medium haptic', 'Heavy haptic'];
+    const longPress = [300, 500, 1000];
+    const doubleTap = [200, 300, 500];
+    return [
+      {
+        id: 'tap-animation', title: 'Tap animation (cyl_tabButtonTapAnimationType)',
+        subtitle: `Current: ${tapNames[this.tapAnimation]}; tap for the next one, then tap a tab`,
+        action: () => this.tapAnimation = (this.tapAnimation + 1) % tapNames.length,
+      },
+      {
+        id: 'feedback', title: 'Tap sound and haptics (cyl_tabButtonHapticFeedbackEnabled / Style)',
+        subtitle: `Current: ${feedbackNames[this.feedbackStep]}; tap for the next one`,
+        action: () => this.feedbackStep = (this.feedbackStep + 1) % feedbackNames.length,
+      },
+      {
+        id: 'long-press', title: 'Long press on tabs (issue #535)',
+        subtitle: 'Long press any tab or the plus button: a toast names it (cyl_didLongPressControlBlock)',
+        action: () => this.toast('Long press a tab or the plus button'),
+      },
+      {
+        id: 'gesture-timings', title: 'Long press duration and double tap interval (issue #535 / #152)',
+        subtitle: `cyl_tabBarItemLongPressDuration = ${longPress[this.longPressIndex]} ms, cyl_tabBarItemDoubleTapInterval = ${doubleTap[this.doubleTapIndex]} ms; tap to cycle; double tap a tab to see it`,
+        action: () => {
+          this.longPressIndex = (this.longPressIndex + 1) % longPress.length;
+          this.doubleTapIndex = (this.doubleTapIndex + 1) % doubleTap.length;
+        },
+      },
+      {
+        id: 'swipe', title: 'Swipe to switch tabs (cyl_swipeToSwitchTabEnabled, issue #535)',
+        subtitle: `On: ${this.swipeEnabled}; swipe the page left / right`,
+        action: () => this.swipeEnabled = !this.swipeEnabled,
+      },
+      {
+        id: 'previous-tab', title: 'Previous tab (cyl_selectPreviousTab, issue #535)',
+        action: () => this.selectedIndex = ((this.selectedIndex < 0 ? 0 : this.selectedIndex) + CYL_TABS.length - 1) % CYL_TABS.length,
+      },
+      {
+        id: 'next-tab', title: 'Next tab (cyl_selectNextTab, issue #535)',
+        action: () => this.selectedIndex = ((this.selectedIndex < 0 ? 0 : this.selectedIndex) + 1) % CYL_TABS.length,
+      },
+    ];
+  }
+
   private sections(page: string): DemoSection[] {
     return [
       { title: 'General', rows: this.generalRows() },
@@ -460,6 +512,7 @@ struct Index {
       { title: 'Update tabs in place', rows: this.tabItemUpdateRows(page) },
       { title: 'Tab pages, selection and login', rows: this.pageRows(page) },
       { title: 'PlusButton', rows: this.plusButtonRows() },
+      { title: 'Tab interactions', rows: this.interactionRows() },
       { title: 'Configuration file', rows: this.configurationRows() },
       { title: 'Jump and compare', rows: this.jumpRows() },
       { title: 'Badges', rows: this.badgeRows(page) },
@@ -589,6 +642,14 @@ struct Index {
         selectedIndex: $selectedIndex,
         badges: this.badges,
         loggedIn: this.loggedIn,
+        tapAnimationType: this.tapAnimation,
+        hapticFeedbackEnabled: this.feedbackStep > 0,
+        hapticFeedbackStyle: Math.max(0, this.feedbackStep - 1) as CYLImpactFeedbackStyle,
+        longPressDuration: [300, 500, 1000][this.longPressIndex],
+        doubleTapInterval: [200, 300, 500][this.doubleTapIndex],
+        swipeToSwitchTabEnabled: this.swipeEnabled,
+        didLongPress: (index: number, identifier: string) => this.toast(`Long press: ${identifier} (${index})`),
+        didDoubleTap: (index: number, identifier: string) => this.toast(`Double tap: ${identifier} (${index})`),
         loginRequiredTabBarItemIdentifiers: [DEMO_ME],
         presentLogin: (index: number, identifier: string, completion: (loggedIn: boolean) => void) => {
           this.getUIContext().getPromptAction().showDialog({

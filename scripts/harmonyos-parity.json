@@ -31,6 +31,10 @@
     "27": "Neighboring tabs show Replacement page n with titles Replaced n (issue #481) (built; emulator check pending / 已编译，模拟器验证待做)",
     "28": "`selectedIndex` (tab indexes only; the plus page is `CYLPlusButtonPageIndex`): the row selects the next tab (issue #515) (built; emulator check pending / 已编译，模拟器验证待做)",
     "29": "`loginRequiredTabBarItemIdentifiers` [Me] + `loggedIn` + `presentLogin` dialog (issue #19) (built; emulator check pending / 已编译，模拟器验证待做)",
-    "30": "`CYLPlusButton.showsTouchableArea` + `touchableAreaScale` (`responseRegion`, red overlay), cycles 1x / 1.5x / 2x / off (issue #91) (built; emulator check pending / 已编译，模拟器验证待做)"
+    "30": "`CYLPlusButton.showsTouchableArea` + `touchableAreaScale` (`responseRegion`, red overlay), cycles 1x / 1.5x / 2x / off (issue #91) (built; emulator check pending / 已编译，模拟器验证待做)",
+    "34": "`CYLTabBarController.didLongPress` (LongPressGesture on tabs and the plus button): a toast names the item (issue #535) (built; emulator check pending / 已编译，模拟器验证待做)",
+    "35": "`longPressDuration` 300 / 500 / 1000 ms and `doubleTapInterval` 200 / 300 / 500 ms + `didDoubleTap` toast (issue #535 / #152) (built; emulator check pending / 已编译，模拟器验证待做)",
+    "36": "`swipeToSwitchTabEnabled` (PanGesture on the page area -> next / previous tab) (built; emulator check pending / 已编译，模拟器验证待做)",
+    "37": "Previous / next tab rows (`selectedIndex` wraps around; library `cylSelectNeighbor`) (built; emulator check pending / 已编译，模拟器验证待做)"
   }
 }
