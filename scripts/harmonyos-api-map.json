@@ -1,1 +1,1426 @@
-{}
+{
+ "CAAnimation(CYLBadgeExtention)": {
+  "status": "n/a",
+  "note": "Core Animation; HarmonyOS plays the badge animations with ArkUI animation APIs (animateTo, keyframes)"
+ },
+ "CAAnimation(CYLBadgeExtention) +cyl_badge_once_fadeIn_AnimationRepeatTimes:durTimes:": {
+  "status": "n/a",
+  "note": "Core Animation; HarmonyOS plays the badge animations with ArkUI animation APIs (animateTo, keyframes)"
+ },
+ "CAAnimation(CYLBadgeExtention) +cyl_badge_once_fadeIn_AnimationRepeatTimes:duration:": {
+  "status": "n/a",
+  "note": "Core Animation; HarmonyOS plays the badge animations with ArkUI animation APIs (animateTo, keyframes)"
+ },
+ "CAAnimation(CYLBadgeExtention) +cyl_badge_once_leftRight_AnimationMoveDistance:repeatTimes:durTimes:": {
+  "status": "n/a",
+  "note": "Core Animation; HarmonyOS plays the badge animations with ArkUI animation APIs (animateTo, keyframes)"
+ },
+ "CAAnimation(CYLBadgeExtention) +cyl_badge_once_leftRight_AnimationMoveDistance:repeatTimes:duration:": {
+  "status": "n/a",
+  "note": "Core Animation; HarmonyOS plays the badge animations with ArkUI animation APIs (animateTo, keyframes)"
+ },
+ "CAAnimation(CYLBadgeExtention) +cyl_badge_once_rightLeft_AnimationMoveDistance:repeatTimes:durTimes:": {
+  "status": "n/a",
+  "note": "Core Animation; HarmonyOS plays the badge animations with ArkUI animation APIs (animateTo, keyframes)"
+ },
+ "CAAnimation(CYLBadgeExtention) +cyl_badge_once_rightLeft_AnimationMoveDistance:repeatTimes:duration:": {
+  "status": "n/a",
+  "note": "Core Animation; HarmonyOS plays the badge animations with ArkUI animation APIs (animateTo, keyframes)"
+ },
+ "CAAnimation(CYLBadgeExtention) +cyl_badge_once_rolling_AnimationRepeatTimes:durTimes:": {
+  "status": "n/a",
+  "note": "Core Animation; HarmonyOS plays the badge animations with ArkUI animation APIs (animateTo, keyframes)"
+ },
+ "CAAnimation(CYLBadgeExtention) +cyl_badge_once_rolling_AnimationRepeatTimes:duration:": {
+  "status": "n/a",
+  "note": "Core Animation; HarmonyOS plays the badge animations with ArkUI animation APIs (animateTo, keyframes)"
+ },
+ "CAAnimation(CYLBadgeExtention) +cyl_badge_once_scale_AnimationRepeatTimes:durTimes:": {
+  "status": "n/a",
+  "note": "Core Animation; HarmonyOS plays the badge animations with ArkUI animation APIs (animateTo, keyframes)"
+ },
+ "CAAnimation(CYLBadgeExtention) +cyl_badge_once_scale_AnimationRepeatTimes:duration:": {
+  "status": "n/a",
+  "note": "Core Animation; HarmonyOS plays the badge animations with ArkUI animation APIs (animateTo, keyframes)"
+ },
+ "CAAnimation(CYLBadgeExtention) +cyl_bounceAnimationRepeatTimes:duration:forObj:": {
+  "status": "n/a",
+  "note": "Core Animation; HarmonyOS plays the badge animations with ArkUI animation APIs (animateTo, keyframes)"
+ },
+ "CAAnimation(CYLBadgeExtention) +cyl_bounceAnimationRepeatTimes:duration:offset:": {
+  "status": "n/a",
+  "note": "Core Animation; HarmonyOS plays the badge animations with ArkUI animation APIs (animateTo, keyframes)"
+ },
+ "CAAnimation(CYLBadgeExtention) +cyl_bounce_AnimationRepeatTimes:durTimes:forObj:": {
+  "status": "n/a",
+  "note": "Core Animation; HarmonyOS plays the badge animations with ArkUI animation APIs (animateTo, keyframes)"
+ },
+ "CAAnimation(CYLBadgeExtention) +cyl_opacityForeverAnimationWithDuration:": {
+  "status": "n/a",
+  "note": "Core Animation; HarmonyOS plays the badge animations with ArkUI animation APIs (animateTo, keyframes)"
+ },
+ "CAAnimation(CYLBadgeExtention) +cyl_opacityForever_Animation:": {
+  "status": "n/a",
+  "note": "Core Animation; HarmonyOS plays the badge animations with ArkUI animation APIs (animateTo, keyframes)"
+ },
+ "CAAnimation(CYLBadgeExtention) +cyl_opacityTimesAnimationRepeatTimes:duration:": {
+  "status": "n/a",
+  "note": "Core Animation; HarmonyOS plays the badge animations with ArkUI animation APIs (animateTo, keyframes)"
+ },
+ "CAAnimation(CYLBadgeExtention) +cyl_opacityTimes_Animation:durTimes:": {
+  "status": "n/a",
+  "note": "Core Animation; HarmonyOS plays the badge animations with ArkUI animation APIs (animateTo, keyframes)"
+ },
+ "CAAnimation(CYLBadgeExtention) +cyl_rotation:degree:direction:repeatCount:": {
+  "status": "n/a",
+  "note": "Core Animation; HarmonyOS plays the badge animations with ArkUI animation APIs (animateTo, keyframes)"
+ },
+ "CAAnimation(CYLBadgeExtention) +cyl_rotationAnimationWithDuration:degree:direction:repeatCount:": {
+  "status": "n/a",
+  "note": "Core Animation; HarmonyOS plays the badge animations with ArkUI animation APIs (animateTo, keyframes)"
+ },
+ "CAAnimation(CYLBadgeExtention) +cyl_scaleAnimationFromScale:toScale:duration:repeatTimes:": {
+  "status": "n/a",
+  "note": "Core Animation; HarmonyOS plays the badge animations with ArkUI animation APIs (animateTo, keyframes)"
+ },
+ "CAAnimation(CYLBadgeExtention) +cyl_scaleFrom:toScale:durTimes:rep:": {
+  "status": "n/a",
+  "note": "Core Animation; HarmonyOS plays the badge animations with ArkUI animation APIs (animateTo, keyframes)"
+ },
+ "CAAnimation(CYLBadgeExtention) +cyl_shakeAnimationRepeatTimes:duration:forObj:": {
+  "status": "n/a",
+  "note": "Core Animation; HarmonyOS plays the badge animations with ArkUI animation APIs (animateTo, keyframes)"
+ },
+ "CAAnimation(CYLBadgeExtention) +cyl_shakeAnimationRepeatTimes:duration:offset:": {
+  "status": "n/a",
+  "note": "Core Animation; HarmonyOS plays the badge animations with ArkUI animation APIs (animateTo, keyframes)"
+ },
+ "CAAnimation(CYLBadgeExtention) +cyl_shake_AnimationRepeatTimes:durTimes:forObj:": {
+  "status": "n/a",
+  "note": "Core Animation; HarmonyOS plays the badge animations with ArkUI animation APIs (animateTo, keyframes)"
+ },
+ "CAAnimation(CYLBadgeExtention) +cyl_springAnimationForDuration:": {
+  "status": "n/a",
+  "note": "Core Animation; HarmonyOS plays the badge animations with ArkUI animation APIs (animateTo, keyframes)"
+ },
+ "CYLAxis": {
+  "status": "n/a",
+  "note": "Core Animation; HarmonyOS plays the badge animations with ArkUI animation APIs (animateTo, keyframes)"
+ },
+ "CYLBadgeProtocol -cyl_performSelector:": {
+  "status": "n/a",
+  "note": "the Objective-C runtime; ArkTS has no method swizzling or associated objects"
+ },
+ "CYLBadgeProtocol -cyl_performSelector:withObject:": {
+  "status": "n/a",
+  "note": "the Objective-C runtime; ArkTS has no method swizzling or associated objects"
+ },
+ "CYLBadgeProtocol -cyl_performSelector:withObject:withObject:": {
+  "status": "n/a",
+  "note": "the Objective-C runtime; ArkTS has no method swizzling or associated objects"
+ },
+ "CYLCatchException()": {
+  "status": "n/a",
+  "note": "catches an Objective-C exception for Swift callers; ArkTS has try / catch"
+ },
+ "CYLConstants +UIBasisHeightScale": {
+  "status": "n/a",
+  "note": "UIKit scale factors and the iOS Lottie URL registries; ArkUI uses vp / fp units"
+ },
+ "CYLConstants +UIBasisWidthScale": {
+  "status": "n/a",
+  "note": "UIKit scale factors and the iOS Lottie URL registries; ArkUI uses vp / fp units"
+ },
+ "CYLConstants +cyl_getURLFromString:": {
+  "status": "n/a",
+  "note": "UIKit scale factors and the iOS Lottie URL registries; ArkUI uses vp / fp units"
+ },
+ "CYLFlatDesignTabBar -addItemWithTitle:tabBarItemImage:tabBarItemSelectedImage:index:titlePositionAdjustment:imageInsets:lottieFilePath:lottieSizeValue:": {
+  "status": "n/a",
+  "note": "FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component"
+ },
+ "CYLFlatDesignTabBar 0": {
+  "status": "n/a",
+  "note": "FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component"
+ },
+ "CYLFlatDesignTabBar delegate": {
+  "status": "n/a",
+  "note": "FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component"
+ },
+ "CYLFlatDesignTabBar selectedItem": {
+  "status": "n/a",
+  "note": "FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component"
+ },
+ "CYLFlatDesignTabBarButton -initWithTabBarItem:": {
+  "status": "n/a",
+  "note": "FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component"
+ },
+ "CYLFlatDesignTabBarDelegate": {
+  "status": "n/a",
+  "note": "FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component"
+ },
+ "CYLFlatDesignTabBarDelegate -tabBar:didSelectItem:": {
+  "status": "n/a",
+  "note": "FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component"
+ },
+ "CYLFlatDesignTabBarHideTabBar": {
+  "status": "n/a",
+  "note": "FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component"
+ },
+ "CYLFlatDesignTabBarItem -badgeTextAttributesForState:": {
+  "status": "n/a",
+  "note": "FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component"
+ },
+ "CYLFlatDesignTabBarItem -initWithTitle:image:": {
+  "status": "n/a",
+  "note": "FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component"
+ },
+ "CYLFlatDesignTabBarItem -initWithTitle:image:selectedImage:": {
+  "status": "n/a",
+  "note": "FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component"
+ },
+ "CYLFlatDesignTabBarItem -initWithTitle:image:selectedImage:index:titlePositionAdjustment:imagePositionAdjustment:imageInsets:lottieFilePath:lottieSizeValue:": {
+  "status": "n/a",
+  "note": "FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component"
+ },
+ "CYLFlatDesignTabBarItem -setBadgeTextAttributes:forState:": {
+  "status": "n/a",
+  "note": "FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component"
+ },
+ "CYLFlatDesignTabBarItem -setTitleTextAttributes:forState:": {
+  "status": "n/a",
+  "note": "FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component"
+ },
+ "CYLFlatDesignTabBarItem -titleTextAttributesForState:": {
+  "status": "n/a",
+  "note": "FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component"
+ },
+ "CYLFlatDesignTabBarItem 0": {
+  "status": "n/a",
+  "note": "FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component"
+ },
+ "CYLFlatDesignTabBarItem badgeContentInset": {
+  "status": "n/a",
+  "note": "FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component"
+ },
+ "CYLFlatDesignTabBarItem badgePositionAdjustment": {
+  "status": "n/a",
+  "note": "FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component"
+ },
+ "CYLFlatDesignTabBarItem badgeSize": {
+  "status": "n/a",
+  "note": "FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component"
+ },
+ "CYLFlatDesignTabBarItem childViewController": {
+  "status": "n/a",
+  "note": "FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component"
+ },
+ "CYLFlatDesignTabBarItem cylflatdesign_tabBarController": {
+  "status": "n/a",
+  "note": "FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component"
+ },
+ "CYLFlatDesignTabBarItem index": {
+  "status": "n/a",
+  "note": "FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component"
+ },
+ "CYLFlatDesignTabBarItem lottieFilePath": {
+  "status": "n/a",
+  "note": "FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component"
+ },
+ "CYLFlatDesignTabBarItemDidChange": {
+  "status": "n/a",
+  "note": "FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component"
+ },
+ "CYLFlatDesignUITabBarControllerDelegate": {
+  "status": "n/a",
+  "note": "FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component"
+ },
+ "CYLFlatDesignUITabBarControllerDelegate -tabBarController:didHideTabBar:": {
+  "status": "n/a",
+  "note": "FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component"
+ },
+ "CYLFlatDesignUITabBarControllerDelegate -tabBarController:didShowTabBar:": {
+  "status": "n/a",
+  "note": "FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component"
+ },
+ "CYLFlatDesignUITabBarControllerDelegate -tabBarController:willHideTabBar:": {
+  "status": "n/a",
+  "note": "FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component"
+ },
+ "CYLFlatDesignUITabBarControllerDelegate -tabBarController:willShowTabBar:": {
+  "status": "n/a",
+  "note": "FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component"
+ },
+ "CYLImageCache": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "CYLImageCache +sharedImageCache": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "CYLImageCache -clearDiskOnCompletion:": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "CYLImageCache -clearMemory": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "CYLImageCache -deleteOldFilesWithCompletion:": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "CYLImageCache -imageFromCacheForURL:": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "CYLImageCache -removeImageForURL:": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "CYLImageCache -totalDiskSize": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "CYLImageCache diskCacheExpireType": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "CYLImageCache diskCachePath": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "CYLImageCache downloadTimeout": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "CYLImageCache maxDiskAge": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "CYLImageCache maxDiskSize": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "CYLImageCache maxMemoryCost": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "CYLImageCache maxMemoryCount": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "CYLImageCache shouldCacheImagesInMemory": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "CYLImageCache shouldCacheImagesOnDisk": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "CYLImageCacheExpireType": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "CYLImageLoadOptions": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "CYLLocalizationLanguageDidChangeNotification": {
+  "status": "n/a",
+  "note": "CYLUtils: UIKit helpers (frames, images, runtime) with no ArkUI counterpart"
+ },
+ "CYLLocalizedString()": {
+  "status": "n/a",
+  "note": "CYLUtils: UIKit helpers (frames, images, runtime) with no ArkUI counterpart"
+ },
+ "CYLLocalizedStringForLanguage()": {
+  "status": "n/a",
+  "note": "CYLUtils: UIKit helpers (frames, images, runtime) with no ArkUI counterpart"
+ },
+ "CYLLocalizedTabBarItemsAttributes()": {
+  "status": "n/a",
+  "note": "the iOS bundle localization; HarmonyOS uses string resources ($r('app.string.…'))"
+ },
+ "CYLPlusButton(CYLPlusButtonDeprecated) +multiplerInCenterY": {
+  "status": "n/a",
+  "note": "deprecated on iOS"
+ },
+ "CYLResourceBundle()": {
+  "status": "n/a",
+  "note": "CYLUtils: UIKit helpers (frames, images, runtime) with no ArkUI counterpart"
+ },
+ "CYLSampleConfigurationURLString": {
+  "status": "n/a",
+  "note": "the iOS demo settings list, not library behavior"
+ },
+ "CYLSettingsGroup": {
+  "status": "n/a",
+  "note": "the iOS demo settings list, not library behavior"
+ },
+ "CYLSettingsSection": {
+  "status": "n/a",
+  "note": "the iOS demo settings list, not library behavior"
+ },
+ "CYLTabBarController -appDelegate": {
+  "status": "n/a",
+  "note": "UIKit internals, the app delegate and the window; HarmonyOS uses UIAbility and WindowStage"
+ },
+ "CYLTabBarController -changeItem:toItem:": {
+  "status": "n/a",
+  "note": "UIKit internals, the app delegate and the window; HarmonyOS uses UIAbility and WindowStage"
+ },
+ "CYLTabBarController -rootWindow": {
+  "status": "n/a",
+  "note": "UIKit internals, the app delegate and the window; HarmonyOS uses UIAbility and WindowStage"
+ },
+ "CYLTabBarController -tabChangedToControl:": {
+  "status": "n/a",
+  "note": "UIKit internals, the app delegate and the window; HarmonyOS uses UIAbility and WindowStage"
+ },
+ "CYLTabBarController -updateSelectionStatusIfNeededForTabBarController:shouldSelectViewController:": {
+  "status": "n/a",
+  "note": "UIKit internals, the app delegate and the window; HarmonyOS uses UIAbility and WindowStage"
+ },
+ "CYLTabBarController -updateSelectionStatusIfNeededForTabBarController:shouldSelectViewController:shouldSelect:": {
+  "status": "n/a",
+  "note": "UIKit internals, the app delegate and the window; HarmonyOS uses UIAbility and WindowStage"
+ },
+ "CYLTabBarController allowsVerticalBar": {
+  "status": "n/a",
+  "note": "the iPhone Duo vertical bar of iOS 27.1"
+ },
+ "CYLTabBarController(CYLOpaqueTabBarSafeArea) cyl_fixesOpaqueTabBarSafeAreaInsets": {
+  "status": "n/a",
+  "note": "a workaround for a UIKit safe-area bug of opaque tab bars"
+ },
+ "CYLTabBarController(CYLTabBarControllerDeprecated) -hideTabBadgeBackgroundSeparator": {
+  "status": "n/a",
+  "note": "UIKit internals, the app delegate and the window; HarmonyOS uses UIAbility and WindowStage"
+ },
+ "CYLTabBarItemUpdateRow": {
+  "status": "n/a",
+  "note": "the iOS demo settings list, not library behavior"
+ },
+ "CYLThemeManager 0": {
+  "status": "n/a",
+  "note": "a parsing artifact of a block property, not an API"
+ },
+ "CYLUtils": {
+  "status": "n/a",
+  "note": "CYLUtils: UIKit helpers (frames, images, runtime) with no ArkUI counterpart"
+ },
+ "NSObject(CYLTabBarControllerExtention)": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "NSObject(CYLTabBarControllerExtention) +cyl_currentNavigationController": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "NSObject(CYLTabBarControllerExtention) +cyl_dismissAll:": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "NSObject(CYLTabBarControllerExtention) +cyl_topmostViewController": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "NSObject(CYLTabBarControllerExtention) -cyl_forceUpdateInterfaceOrientation:": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "NSObject(CYLTabBarControllerExtention) -cyl_isContinuousGestureRecognizer": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "NSObject(CYLTabBarControllerExtention) -cyl_isLongGestureRecognizer": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "NSObject(CYLTabBarControllerExtention) -cyl_isPlusViewControllerAdded:": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "NSObject(CYLTabBarControllerExtention) -cyl_ivarList": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "NSObject(CYLTabBarControllerExtention) -cyl_removeObserver:forKeyPath:": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "NSObject(CYLTabBarControllerExtention) -cyl_removeObserver:forKeyPath:context:": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "NSObject(CYLTabBarControllerExtention) -cyl_sharedAppDelegate": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "NSObject(CYLTabBarControllerExtention) cyl_context": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "NSObject(CYLTabBarControllerExtention) cyl_isForceLandscape": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "NSObject(CYLTabBarControllerReferenceExtension) -cyl_tabBarControllerForStyleType:": {
+  "status": "n/a",
+  "note": "the FlatDesign style-type lookup; FlatDesign is iOS only"
+ },
+ "NSObject(CYLTabBarControllerReferenceExtension) cylflatdesign_tabBarController": {
+  "status": "n/a",
+  "note": "FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component"
+ },
+ "NSObject(CYLUtils)": {
+  "status": "n/a",
+  "note": "CYLUtils: UIKit helpers (frames, images, runtime) with no ArkUI counterpart"
+ },
+ "NSObject(CYLUtils) -cyl_setValue:forKey:": {
+  "status": "n/a",
+  "note": "CYLUtils: UIKit helpers (frames, images, runtime) with no ArkUI counterpart"
+ },
+ "NSObject(CYLUtils) -cyl_setWeakAssociatedObject:forKey:": {
+  "status": "n/a",
+  "note": "CYLUtils: UIKit helpers (frames, images, runtime) with no ArkUI counterpart"
+ },
+ "NSObject(CYLUtils) -cyl_valueForKey:": {
+  "status": "n/a",
+  "note": "CYLUtils: UIKit helpers (frames, images, runtime) with no ArkUI counterpart"
+ },
+ "NSObject(CYLUtils) -cyl_weakAssociatedObjectForKey:": {
+  "status": "n/a",
+  "note": "CYLUtils: UIKit helpers (frames, images, runtime) with no ArkUI counterpart"
+ },
+ "NSObject(CYLUtils) cyl_isPlaceholder": {
+  "status": "n/a",
+  "note": "CYLUtils: UIKit helpers (frames, images, runtime) with no ArkUI counterpart"
+ },
+ "UIBarItem(CYLUtils)": {
+  "status": "n/a",
+  "note": "CYLUtils: UIKit helpers (frames, images, runtime) with no ArkUI counterpart"
+ },
+ "UIBarItem(CYLUtils) -cyl_view": {
+  "status": "n/a",
+  "note": "CYLUtils: UIKit helpers (frames, images, runtime) with no ArkUI counterpart"
+ },
+ "UIColor(CYLTabBarControllerDeprecated)": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIColor(CYLTabBarControllerDeprecated) cyl_systemBrownColor": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIColor(CYLTabBarControllerExtention)": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIColor(CYLTabBarControllerExtention) +cyl_colorWithLightColor:darkColor:": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIColor(CYLTabBarControllerExtention) cyl_darkTextColor": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIColor(CYLTabBarControllerExtention) cyl_labelColor": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIColor(CYLTabBarControllerExtention) cyl_lightTextColor": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIColor(CYLTabBarControllerExtention) cyl_linkColor": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIColor(CYLTabBarControllerExtention) cyl_opaqueSeparatorColor": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIColor(CYLTabBarControllerExtention) cyl_placeholderTextColor": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIColor(CYLTabBarControllerExtention) cyl_quaternaryLabelColor": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIColor(CYLTabBarControllerExtention) cyl_quaternarySystemFillColor": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIColor(CYLTabBarControllerExtention) cyl_randomColor": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIColor(CYLTabBarControllerExtention) cyl_secondaryLabelColor": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIColor(CYLTabBarControllerExtention) cyl_secondarySystemBackgroundColor": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIColor(CYLTabBarControllerExtention) cyl_secondarySystemFillColor": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIColor(CYLTabBarControllerExtention) cyl_secondarySystemGroupedBackgroundColor": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIColor(CYLTabBarControllerExtention) cyl_separatorColor": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIColor(CYLTabBarControllerExtention) cyl_systemBackgroundColor": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIColor(CYLTabBarControllerExtention) cyl_systemBlueColor": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIColor(CYLTabBarControllerExtention) cyl_systemFillColor": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIColor(CYLTabBarControllerExtention) cyl_systemGray2Color": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIColor(CYLTabBarControllerExtention) cyl_systemGray3Color": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIColor(CYLTabBarControllerExtention) cyl_systemGray4Color": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIColor(CYLTabBarControllerExtention) cyl_systemGray5Color": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIColor(CYLTabBarControllerExtention) cyl_systemGray6Color": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIColor(CYLTabBarControllerExtention) cyl_systemGrayColor": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIColor(CYLTabBarControllerExtention) cyl_systemGreenColor": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIColor(CYLTabBarControllerExtention) cyl_systemGroupedBackgroundColor": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIColor(CYLTabBarControllerExtention) cyl_systemIndigoColor": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIColor(CYLTabBarControllerExtention) cyl_systemOrangeColor": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIColor(CYLTabBarControllerExtention) cyl_systemPinkColor": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIColor(CYLTabBarControllerExtention) cyl_systemPurpleColor": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIColor(CYLTabBarControllerExtention) cyl_systemRedColor": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIColor(CYLTabBarControllerExtention) cyl_systemTealColor": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIColor(CYLTabBarControllerExtention) cyl_systemYellowColor": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIColor(CYLTabBarControllerExtention) cyl_tertiaryLabelColor": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIColor(CYLTabBarControllerExtention) cyl_tertiarySystemBackgroundColor": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIColor(CYLTabBarControllerExtention) cyl_tertiarySystemFillColor": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIColor(CYLTabBarControllerExtention) cyl_tertiarySystemGroupedBackgroundColor": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIControl(CYLTabBarControllerExtention)": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIControl(CYLTabBarControllerExtention) -cyl_coverSeclectContentTabImageViewOrTabButton:newView:offset:show:delayIfNeededForSeconds:completion:": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIControl(CYLTabBarControllerExtention) -cyl_coverTabImageViewOrTabButton:newView:offset:show:delayIfNeededForSeconds:completion:": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIControl(CYLTabBarControllerExtention) -cyl_coverVisiableTabImageViewOrTabButton:contentNewView:seclectContentNewView:offset:show:delayIfNeededForSeconds:completion:": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIControl(CYLTabBarControllerExtention) -cyl_coverVisiableTabImageViewOrTabButton:newView:offset:show:delayIfNeededForSeconds:completion:": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIControl(CYLTabBarControllerExtention) -cyl_hideControl": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIControl(CYLTabBarControllerExtention) -cyl_isChildViewControllerPlusButton": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIControl(CYLTabBarControllerExtention) -cyl_isPlusControl": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIControl(CYLTabBarControllerExtention) -cyl_isSelected": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIControl(CYLTabBarControllerExtention) -cyl_platterNormalControl": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIControl(CYLTabBarControllerExtention) -cyl_platterSelectedControl": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIControl(CYLTabBarControllerExtention) -cyl_replaceTabButtonWithNewView:offset:show:completion:": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIControl(CYLTabBarControllerExtention) -cyl_replaceTabButtonWithNewView:show:": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIControl(CYLTabBarControllerExtention) -cyl_replaceTabImageViewWithNewView:offset:show:completion:": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIControl(CYLTabBarControllerExtention) -cyl_replaceTabImageViewWithNewView:show:": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIControl(CYLTabBarControllerExtention) cyl_shouldNotSelect": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIControl(CYLTabBarControllerExtention) cyl_tabBarChildViewControllerIndex": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIControl(CYLTabBarControllerExtention) cyl_tabBarItemDisplayName": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIControl(CYLTabBarControllerExtention) cyl_tabBarItemIdentifier": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIControl(CYLTabBarControllerExtention) cyl_tabBarItemVisibleIndex": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIControl(CYLTabBarControllerExtention) cyl_userInteractionDisabled": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIImage(CYLTabBarControllerExtention)": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIImage(CYLTabBarControllerExtention) +cyl_GIFFrameDelayWithProperties:": {
+  "status": "n/a",
+  "note": "reads ImageIO frame properties; ArkUI's Image plays GIF files itself"
+ },
+ "UIImage(CYLTabBarControllerExtention) +cyl_assetImageName:userInterfaceStyle:": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIImage(CYLTabBarControllerExtention) +cyl_getImageFromImageInfo:": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIImage(CYLTabBarControllerExtention) +cyl_imageNamed:": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIImage(CYLTabBarControllerExtention) +cyl_imageWithColor:size:": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIImage(CYLTabBarControllerExtention) +cyl_imageWithColor:size:cornerRadius:": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIImage(CYLTabBarControllerExtention) +cyl_imageWithImageInfo:darkImageInfo:": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIImage(CYLTabBarControllerExtention) +cyl_imageWithLightImage:darkImage:": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIImage(CYLTabBarControllerExtention) +cyl_lightOrDarkModeImageWithLightImage:darkImage:": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIImage(CYLTabBarControllerExtention) +cyl_lightOrDarkModeImageWithOwner:lightImage:darkImage:": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIImage(CYLTabBarControllerExtention) +cyl_lightOrDarkModeImageWithOwner:lightImageName:darkImageName:": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIImage(CYLTabBarControllerExtention) +cyl_loadImageWithURL:completion:": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIImage(CYLTabBarControllerExtention) +cyl_loadImageWithURL:options:completion:": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIImage(CYLTabBarControllerExtention) +cyl_tabItemPlaceholderImage": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIImage(CYLTabBarControllerExtention) cyl_darkImageNameSuffix": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UINavigationController(CYLFlatDesignTabBarPrivate)": {
+  "status": "n/a",
+  "note": "FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component"
+ },
+ "UINavigationController(CYLFlatDesignTabBarPrivate) +cyl_navigationBarActionHook": {
+  "status": "n/a",
+  "note": "FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component"
+ },
+ "UINavigationController(CYLFlatDesignTabBarPrivate) cylflatdesign_customPopGestureRecognizer": {
+  "status": "n/a",
+  "note": "FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component"
+ },
+ "UINavigationControllerExtensionDelegate": {
+  "status": "n/a",
+  "note": "FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component"
+ },
+ "UINavigationControllerExtensionDelegate -cylflatdesign_navigationController:didBeginTransitionFrom:to:operation:": {
+  "status": "n/a",
+  "note": "FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component"
+ },
+ "UINavigationControllerExtensionDelegate -cylflatdesign_navigationController:didEndTransitionFrom:to:operation:cancelled:": {
+  "status": "n/a",
+  "note": "FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component"
+ },
+ "UINavigationControllerExtensionDelegate -cylflatdesign_navigationController:didUpdateInteractiveFrom:to:percentComplete:": {
+  "status": "n/a",
+  "note": "FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component"
+ },
+ "UINavigationControllerExtensionDelegate -cylflatdesign_navigationController:didUpdateInteractiveFrom:to:popGestureRecognizer:": {
+  "status": "n/a",
+  "note": "FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component"
+ },
+ "UINavigationControllerExtensionDelegate -cylflatdesign_navigationController:navigationBarDidChangeHeight:": {
+  "status": "n/a",
+  "note": "FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component"
+ },
+ "UINavigationControllerExtensionDelegate -cylflatdesign_navigationController:willEndTransitionFrom:to:operation:cancelled:": {
+  "status": "n/a",
+  "note": "FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component"
+ },
+ "UITabBar(CYLTabBarControllerExtention)": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UITabBar(CYLTabBarControllerExtention) -cyl_boundsSize": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UITabBar(CYLTabBarControllerExtention) -cyl_boundsWidthOffset": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UITabBar(CYLTabBarControllerExtention) -cyl_contentView": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UITabBar(CYLTabBarControllerExtention) -cyl_fullHeight": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UITabBar(CYLTabBarControllerExtention) -cyl_platterContentViewWithIndex:": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UITabBar(CYLTabBarControllerExtention) -cyl_platterContentViews": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UITabBar(CYLTabBarControllerExtention) -cyl_platterDestOutView": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UITabBar(CYLTabBarControllerExtention) -cyl_platterPortalViewWithIndex:": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UITabBar(CYLTabBarControllerExtention) -cyl_platterPortalViews": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UITabBar(CYLTabBarControllerExtention) -cyl_platterSelectedContentView": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UITabBar(CYLTabBarControllerExtention) -cyl_platterSelectedContentViewWithIndex:": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UITabBar(CYLTabBarControllerExtention) -cyl_platterSelectedContentViewWithoutPlusButttonWithIndex:": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UITabBar(CYLTabBarControllerExtention) -cyl_platterSelectedContentViews": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UITabBar(CYLTabBarControllerExtention) -cyl_platterSelectedContentViewsWithoutPlusButton": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UITabBar(CYLTabBarControllerExtention) -cyl_platterViewWithIndex:": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UITabBar(CYLTabBarControllerExtention) -cyl_platterViews": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UITabBar(CYLTabBarControllerExtention) -cyl_platterVisualProviderFloatingSelectedContentView": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UITabBar(CYLTabBarControllerExtention) -cyl_tabBarSubviews": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UITabBar(CYLTabBarControllerExtention) cyl_platterContentView": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UITabBar(CYLTabBarControllerExtention) cyl_platterView": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UITabBar(CYLTabBarControllerExtention) cyl_platterViewSize": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UITabBar(CYLTabBarControllerExtention) cyl_platterViewWidth": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UITabBar(CYLTabBarControllerExtention) cyl_portalLayer": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UITabBar(CYLTabBarControllerExtention) cyl_portalView": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UITabBarAppearance(CYLTabBarControllerExtention)": {
+  "status": "n/a",
+  "note": "UITabBarAppearance; the ArkUI tab bar takes its colors and images as component properties"
+ },
+ "UITabBarAppearance(CYLTabBarControllerExtention) -cyl_applyItemAppearanceWithBlock:": {
+  "status": "n/a",
+  "note": "UITabBarAppearance; the ArkUI tab bar takes its colors and images as component properties"
+ },
+ "UITabBarItem(CYLUtils)": {
+  "status": "n/a",
+  "note": "CYLUtils: UIKit helpers (frames, images, runtime) with no ArkUI counterpart"
+ },
+ "UITabBarItem(CYLUtils) cyl_tabButton": {
+  "status": "n/a",
+  "note": "CYLUtils: UIKit helpers (frames, images, runtime) with no ArkUI counterpart"
+ },
+ "UIView(CYLHitTestOutsideBounds)": {
+  "status": "n/a",
+  "note": "CYLUtils: UIKit helpers (frames, images, runtime) with no ArkUI counterpart"
+ },
+ "UIView(CYLHitTestOutsideBounds) cyl_respondsOutsideSuperviewBounds": {
+  "status": "n/a",
+  "note": "CYLUtils: UIKit helpers (frames, images, runtime) with no ArkUI counterpart"
+ },
+ "UIView(CYLLocalization)": {
+  "status": "n/a",
+  "note": "the iOS bundle localization; HarmonyOS uses string resources ($r('app.string.…'))"
+ },
+ "UIView(CYLLocalization) -cyl_localizeTexts": {
+  "status": "n/a",
+  "note": "the iOS bundle localization; HarmonyOS uses string resources ($r('app.string.…'))"
+ },
+ "UIView(CYLTabBarControllerExtention)": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIView(CYLTabBarControllerExtention) +cyl_insertedTabControlViews": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIView(CYLTabBarControllerExtention) -cyl_allSubviews": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIView(CYLTabBarControllerExtention) -cyl_bringSubviewToFront:": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIView(CYLTabBarControllerExtention) -cyl_bringSubviewToTop:": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIView(CYLTabBarControllerExtention) -cyl_imageView": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIView(CYLTabBarControllerExtention) -cyl_imageViewInTabBarButton": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIView(CYLTabBarControllerExtention) -cyl_isButtonLabel": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIView(CYLTabBarControllerExtention) -cyl_isPlusButton": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIView(CYLTabBarControllerExtention) -cyl_isTabBackgroundView": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIView(CYLTabBarControllerExtention) -cyl_isTabBadgeView": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIView(CYLTabBarControllerExtention) -cyl_isTabButton": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIView(CYLTabBarControllerExtention) -cyl_isTabImageView": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIView(CYLTabBarControllerExtention) -cyl_isTabLabel": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIView(CYLTabBarControllerExtention) -cyl_markAsInsertedForTabControl:": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIView(CYLTabBarControllerExtention) -cyl_swappableImageViewViewInTabBarButton": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIView(CYLTabBarControllerExtention) -cyl_tabBackgroundView": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIView(CYLTabBarControllerExtention) -cyl_tabBadgeView": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIView(CYLTabBarControllerExtention) -cyl_tabEffectView": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIView(CYLTabBarControllerExtention) -cyl_tabImageView": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIView(CYLTabBarControllerExtention) -cyl_tabLabel": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIView(CYLTabBarControllerExtention) -cyl_tabShadowImageView": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIView(CYLTabBarControllerExtention) -cyl_takeSnapshot": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIView(CYLTabBarControllerExtention) -cyl_takeSnapshotWithoutViews:": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIView(CYLTabBarControllerExtention) cyl_insertedForTabControl": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIView(CYLTabBarControllerExtention) cyl_tabBarItemIconView": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIView(CYLTabBarControllerExtention) cyl_tabButtonCoverView": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIView(CYLTabBarControllerExtentionDeprecated)": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIView(CYLTabBarControllerExtentionDeprecated) +cyl_tabBadgePointViewWithClolor:radius:": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIView(CYLTabBarControllerExtentionDeprecated) -cyl_tabBadgeBackgroundSeparator": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIView(CYLTabBarControllerExtentionDeprecated) -cyl_tabBadgeBackgroundView": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIView(CYLTabBarMetrics)": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIView(CYLTabBarMetrics) -cyl_plusButtonIndex": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIView(CYLTabBarMetrics) -cyl_plusButtonWidth": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIView(CYLTabBarMetrics) cyl_tabBarItemWidth": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIView(CYLTabBarMetrics) cyl_tabbarItemsCount": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIView(CYLUtils)": {
+  "status": "n/a",
+  "note": "CYLUtils: UIKit helpers (frames, images, runtime) with no ArkUI counterpart"
+ },
+ "UIView(CYLUtils) -cyl_addScaleBounceAnimationWithCompletion:": {
+  "status": "n/a",
+  "note": "CYLUtils: UIKit helpers (frames, images, runtime) with no ArkUI counterpart"
+ },
+ "UIView(CYLUtils) -cyl_canNotResponseEvent": {
+  "status": "n/a",
+  "note": "CYLUtils: UIKit helpers (frames, images, runtime) with no ArkUI counterpart"
+ },
+ "UIView(CYLUtils) -cyl_isInvisiable": {
+  "status": "n/a",
+  "note": "CYLUtils: UIKit helpers (frames, images, runtime) with no ArkUI counterpart"
+ },
+ "UIView(CYLUtils) -cyl_nearestControlBelowView:": {
+  "status": "n/a",
+  "note": "CYLUtils: UIKit helpers (frames, images, runtime) with no ArkUI counterpart"
+ },
+ "UIView(CYLUtils) -cyl_setHidden:": {
+  "status": "n/a",
+  "note": "CYLUtils: UIKit helpers (frames, images, runtime) with no ArkUI counterpart"
+ },
+ "UIViewController(CYLConfigurationDemo)": {
+  "status": "n/a",
+  "note": "the iOS demo settings list, not library behavior"
+ },
+ "UIViewController(CYLConfigurationDemo) +cyl_sampleConfigurationFilePaths": {
+  "status": "n/a",
+  "note": "the iOS demo settings list, not library behavior"
+ },
+ "UIViewController(CYLConfigurationDemo) -cyl_configurationDemoCellForTableView:": {
+  "status": "n/a",
+  "note": "the iOS demo settings list, not library behavior"
+ },
+ "UIViewController(CYLConfigurationDemo) -cyl_presentConfigurationDemo": {
+  "status": "n/a",
+  "note": "the iOS demo settings list, not library behavior"
+ },
+ "UIViewController(CYLConfigurationEdgeCases)": {
+  "status": "n/a",
+  "note": "the iOS demo settings list, not library behavior"
+ },
+ "UIViewController(CYLConfigurationEdgeCases) +cyl_configurationEdgeCaseSectionTitle": {
+  "status": "n/a",
+  "note": "the iOS demo settings list, not library behavior"
+ },
+ "UIViewController(CYLConfigurationEdgeCases) -cyl_configurationEdgeCaseCellForTableView:row:": {
+  "status": "n/a",
+  "note": "the iOS demo settings list, not library behavior"
+ },
+ "UIViewController(CYLConfigurationEdgeCases) -cyl_configurationEdgeCaseRowCount": {
+  "status": "n/a",
+  "note": "the iOS demo settings list, not library behavior"
+ },
+ "UIViewController(CYLConfigurationEdgeCases) -cyl_runConfigurationEdgeCaseAtRow:": {
+  "status": "n/a",
+  "note": "the iOS demo settings list, not library behavior"
+ },
+ "UIViewController(CYLLocalization)": {
+  "status": "n/a",
+  "note": "the iOS bundle localization; HarmonyOS uses string resources ($r('app.string.…'))"
+ },
+ "UIViewController(CYLLocalization) +cyl_pickerLanguages": {
+  "status": "n/a",
+  "note": "the iOS bundle localization; HarmonyOS uses string resources ($r('app.string.…'))"
+ },
+ "UIViewController(CYLLocalization) -cyl_languageCellForTableView:": {
+  "status": "n/a",
+  "note": "the iOS bundle localization; HarmonyOS uses string resources ($r('app.string.…'))"
+ },
+ "UIViewController(CYLLocalization) -cyl_presentLanguagePicker": {
+  "status": "n/a",
+  "note": "the iOS bundle localization; HarmonyOS uses string resources ($r('app.string.…'))"
+ },
+ "UIViewController(CYLNavigationControllerExtention)": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIViewController(CYLNavigationControllerExtention) -cyl_deallocNavigationSetting": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIViewController(CYLNavigationControllerExtention) -cyl_disableInteractivePopGestureRecognizer": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIViewController(CYLNavigationControllerExtention) -cyl_enableInteractivePopGestureRecognizer": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIViewController(CYLNavigationControllerExtention) -cyl_hideNavigationBarSeparatorIfNeeded": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIViewController(CYLNavigationControllerExtention) -cyl_resetInteractivePopGestureRecognizer": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIViewController(CYLNavigationControllerExtention) -cyl_setNavigationBarHiddenIfNeeded:": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIViewController(CYLNavigationControllerExtention) -cyl_setNavigationBarVisibleIfNeeded:": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIViewController(CYLNavigationControllerExtention) -cyl_shouldNavigationBarVisible": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIViewController(CYLNavigationControllerExtention) -cyl_viewDidAppearNavigationSetting:": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIViewController(CYLNavigationControllerExtention) -cyl_viewDidDisappearNavigationSetting:": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIViewController(CYLNavigationControllerExtention) -cyl_viewWillAppearNavigationSetting:": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIViewController(CYLNavigationControllerExtention) -cyl_viewWillDisappearNavigationSetting:": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIViewController(CYLNavigationControllerExtention) cyl_automaticNavigationSettingEnabled": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIViewController(CYLNavigationControllerExtention) cyl_disablePopGestureRecognizer": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIViewController(CYLNavigationControllerExtention) cyl_hideNavigationBarSeparator": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIViewController(CYLNavigationControllerExtention) cyl_hidesAncestorNavigationBars": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIViewController(CYLNavigationControllerExtention) cyl_hidesBottomBarWhenPushed": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIViewController(CYLNavigationControllerExtention) cyl_navigationBarHidden": {
+  "status": "n/a",
+  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
+ },
+ "UIViewController(CYLScrollHideSimulation)": {
+  "status": "n/a",
+  "note": "the iOS demo settings list, not library behavior"
+ },
+ "UIViewController(CYLScrollHideSimulation) -cyl_didSelectScrollHideSimulationRow:": {
+  "status": "n/a",
+  "note": "the iOS demo settings list, not library behavior"
+ },
+ "UIViewController(CYLScrollHideSimulation) -cyl_presentScrollHideSimulationMenu": {
+  "status": "n/a",
+  "note": "the iOS demo settings list, not library behavior"
+ },
+ "UIViewController(CYLScrollHideSimulation) -cyl_runScrollHideSelfTest": {
+  "status": "n/a",
+  "note": "the iOS demo settings list, not library behavior"
+ },
+ "UIViewController(CYLScrollHideSimulation) -cyl_scrollHideSimulationCellForTableView:row:": {
+  "status": "n/a",
+  "note": "the iOS demo settings list, not library behavior"
+ },
+ "UIViewController(CYLScrollHideSimulation) -cyl_scrollHideSimulationRowCount": {
+  "status": "n/a",
+  "note": "the iOS demo settings list, not library behavior"
+ },
+ "UIViewController(CYLSettingsSection)": {
+  "status": "n/a",
+  "note": "the iOS demo settings list, not library behavior"
+ },
+ "UIViewController(CYLSettingsSection) -cyl_didSelectSettingsRow:": {
+  "status": "n/a",
+  "note": "the iOS demo settings list, not library behavior"
+ },
+ "UIViewController(CYLSettingsSection) -cyl_didSelectSettingsRowAtIndexPath:inTableView:": {
+  "status": "n/a",
+  "note": "the iOS demo settings list, not library behavior"
+ },
+ "UIViewController(CYLSettingsSection) -cyl_settingsCellForTableView:atIndexPath:": {
+  "status": "n/a",
+  "note": "the iOS demo settings list, not library behavior"
+ },
+ "UIViewController(CYLSettingsSection) -cyl_settingsCellForTableView:row:": {
+  "status": "n/a",
+  "note": "the iOS demo settings list, not library behavior"
+ },
+ "UIViewController(CYLSettingsSection) -cyl_settingsGroups": {
+  "status": "n/a",
+  "note": "the iOS demo settings list, not library behavior"
+ },
+ "UIViewController(CYLSettingsSection) -cyl_settingsRowCount": {
+  "status": "n/a",
+  "note": "the iOS demo settings list, not library behavior"
+ },
+ "UIViewController(CYLSettingsSection) -cyl_settingsRowsInGroup:": {
+  "status": "n/a",
+  "note": "the iOS demo settings list, not library behavior"
+ },
+ "UIViewController(CYLSettingsSection) -cyl_titleForSettingsGroup:": {
+  "status": "n/a",
+  "note": "the iOS demo settings list, not library behavior"
+ },
+ "UIViewController(CYLTabBarControllerExtention) cyl_tabBarItem": {
+  "status": "n/a",
+  "note": "FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component"
+ },
+ "UIViewController(CYLTabBarControllerExtention) cylflatdesign_tabBarController": {
+  "status": "n/a",
+  "note": "FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component"
+ },
+ "UIViewController(CYLTabBarControllerExtentionDeprecated) cyl_tabBarSpacingInViewCoordinator": {
+  "status": "n/a",
+  "note": "a UIKit layout value"
+ },
+ "UIViewController(CYLTabBarItemUpdate)": {
+  "status": "n/a",
+  "note": "the iOS demo settings list, not library behavior"
+ },
+ "UIViewController(CYLTabBarItemUpdate) -cyl_didSelectTabBarItemUpdateRow:": {
+  "status": "n/a",
+  "note": "the iOS demo settings list, not library behavior"
+ },
+ "UIViewController(CYLTabBarItemUpdate) -cyl_tabBarItemUpdateCellForTableView:row:": {
+  "status": "n/a",
+  "note": "the iOS demo settings list, not library behavior"
+ },
+ "UIViewController(CYLTabBarItemUpdate) -cyl_tabBarItemUpdateRowCount": {
+  "status": "n/a",
+  "note": "the iOS demo settings list, not library behavior"
+ },
+ "UIViewController(CYLThemeSettings)": {
+  "status": "n/a",
+  "note": "the iOS demo settings list, not library behavior"
+ },
+ "UIViewController(CYLThemeSettings) +cyl_setUpThemeSettings": {
+  "status": "n/a",
+  "note": "the iOS demo settings list, not library behavior"
+ },
+ "UIViewController(CYLThemeSettings) -cyl_didSelectThemeListRow:": {
+  "status": "n/a",
+  "note": "the iOS demo settings list, not library behavior"
+ },
+ "UIViewController(CYLThemeSettings) -cyl_presentThemePickerFromView:completion:": {
+  "status": "n/a",
+  "note": "the iOS demo settings list, not library behavior"
+ },
+ "UIViewController(CYLThemeSettings) -cyl_themeListCellForTableView:row:": {
+  "status": "n/a",
+  "note": "the iOS demo settings list, not library behavior"
+ },
+ "UIViewController(CYLThemeSettings) -cyl_themeListRowCount": {
+  "status": "n/a",
+  "note": "the iOS demo settings list, not library behavior"
+ },
+ "UIViewController(CYLThemeSettings) -cyl_themeListSectionTitle": {
+  "status": "n/a",
+  "note": "the iOS demo settings list, not library behavior"
+ },
+ "UIViewController(CYLThemeSettings) -cyl_themeMenuWithCompletion:": {
+  "status": "n/a",
+  "note": "the iOS demo settings list, not library behavior"
+ },
+ "UIViewController(CYLThemeSettings) -cyl_themeSettingsCellForTableView:": {
+  "status": "n/a",
+  "note": "the iOS demo settings list, not library behavior"
+ },
+ "UIViewController(CYLUtils)": {
+  "status": "n/a",
+  "note": "CYLUtils: UIKit helpers (frames, images, runtime) with no ArkUI counterpart"
+ },
+ "UIViewController(CYLUtils) -cyl_getViewControllerInsteadOfNavigationController": {
+  "status": "n/a",
+  "note": "CYLUtils: UIKit helpers (frames, images, runtime) with no ArkUI counterpart"
+ },
+ "UIWindow(CYLLocalization)": {
+  "status": "n/a",
+  "note": "the iOS bundle localization; HarmonyOS uses string resources ($r('app.string.…'))"
+ },
+ "UIWindow(CYLLocalization) -cyl_setRootViewControllerProvider:": {
+  "status": "n/a",
+  "note": "the iOS bundle localization; HarmonyOS uses string resources ($r('app.string.…'))"
+ }
+}
