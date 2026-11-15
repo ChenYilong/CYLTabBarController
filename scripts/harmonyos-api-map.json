@@ -675,5 +675,7 @@
   "CYLFlatDesignTabBarButton -actualBadgeSuperView": "TODO: N/A on HarmonyOS: ArkUI is declarative: the tab bar is built from state (tabBarItemsAttributes, selectedIndex, badges), so there is no button or label object to hold or add to.",
   "CYLFlatDesignTabBarItem tabBarButton": "TODO: N/A on HarmonyOS: ArkUI is declarative: the tab bar is built from state (tabBarItemsAttributes, selectedIndex, badges), so there is no button or label object to hold or add to.",
   "CYLFlatDesignTabBarItem -actualBadgeSuperView": "TODO: N/A on HarmonyOS: ArkUI is declarative: the tab bar is built from state (tabBarItemsAttributes, selectedIndex, badges), so there is no button or label object to hold or add to.",
-  "CYLFlatDesignTabBar backgroundImage": "TODO: partial: `CYLFlatDesignTabBarModifier(barTintColor, backgroundImage)` draws it tiled in place of the blur; the controller property is not wired yet (CYLTabBarController.ets is being changed by the SVGA work)."
+  "CYLFlatDesignTabBar backgroundImage": "TODO: partial: `CYLFlatDesignTabBarModifier(barTintColor, backgroundImage)` draws it tiled in place of the blur; the controller property is not wired yet (CYLTabBarController.ets is being changed by the SVGA work).",
+  "CYLFlatDesignTabBar context": "TODO: N/A on HarmonyOS: the plus button is passed to each CYLTabBarController (`plusButton`), so there is no global plus-button registry keyed by a context.",
+  "CYLFlatDesignTabBar respectsVerticalStatusBarSafeArea": "TODO: N/A on HarmonyOS: HarmonyOS has no vertical status bar column beside the app (the iOS 84 pt side column); the status bar is always at the top."
 }
