@@ -180,6 +180,10 @@ export struct CYLTabBarController {
     .onClick(() => this.cylSelect(index))
   }
 
+  cylPlusAlignsTitle(): boolean {
+    return this.plusButton?.title !== undefined && this.plusButton?.alignsTitle !== false;
+  }
+
   @Builder
   cylPlus() {
     Column() {
@@ -191,7 +195,12 @@ export struct CYLTabBarController {
           .objectFit(ImageFit.Contain)
         CYLBadgeView({ badge: this.plusButtonBadge, anchorWidth: this.plusButton?.imageSize ?? 54 })
       }
-      .offset({ y: this.plusButton?.centerYOffset ?? 0 })
+      // [EN] As CYLPlusButton.kt: with an aligned title the image sits right above the title (item 4); otherwise it is
+      //      centred and moved by centerYOffset. [CN] 与 CYLPlusButton.kt 相同：标题对齐时图片紧贴标题上方（第 4 项）；否则居中并按 centerYOffset 移动。
+      .position(this.cylPlusAlignsTitle()
+        ? { x: 0, y: this.tabBarHeight - 17 - (this.plusButton?.imageSize ?? 54) } : undefined)
+      .width(this.cylPlusAlignsTitle() ? '100%' : undefined)
+      .offset({ y: this.cylPlusAlignsTitle() ? 0 : (this.plusButton?.centerYOffset ?? 0) })
 
       if (this.plusButton?.title !== undefined) {
         Text(this.plusButton.title)
