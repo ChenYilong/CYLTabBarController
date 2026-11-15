@@ -245,6 +245,16 @@ function cylSameContent(current, expected) {
   return current.toString('utf8').replace(/\r\n/g, '\n') === buffer.toString('utf8').replace(/\r\n/g, '\n');
 }
 
+function cylKeepLineEnds(current, expected) {
+  // [EN] A text file that had CRLF line ends (a Windows checkout) keeps them, so git sees no change of line ends.
+  // [CN] 原为 CRLF 行尾的文本文件（Windows 检出）保留 CRLF，使 git 不会看到行尾变化。
+  const buffer = Buffer.isBuffer(expected) ? expected : Buffer.from(expected);
+  if (!current || current.includes(0) || buffer.includes(0) || !current.includes('\r\n')) {
+    return buffer;
+  }
+  return Buffer.from(buffer.toString('utf8').replace(/\r?\n/g, '\r\n'), 'utf8');
+}
+
 function cylMain() {
   const check = process.argv.includes('--check');
   const files = cylGeneratedFiles();
@@ -258,7 +268,7 @@ function cylMain() {
     stale.push(relativePath);
     if (!check) {
       fs.mkdirSync(path.dirname(target), { recursive: true });
-      fs.writeFileSync(target, files[relativePath]);
+      fs.writeFileSync(target, cylKeepLineEnds(current, files[relativePath]));
     }
   });
   // [EN] Icons of the animation packages not chosen are removed. [CN] 删除未选择的动画包的图标。

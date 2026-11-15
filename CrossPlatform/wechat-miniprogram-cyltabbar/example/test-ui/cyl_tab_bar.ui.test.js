@@ -26,6 +26,24 @@ let miniProgram;
 const cylSleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 /**
+ * [EN] A screenshot of the simulator (base64 PNG). On a slow machine (seen on Windows) DevTools sometimes answers
+ *      "timeout waiting for automator response" to one screenshot; try again up to twice.
+ * [CN] 模拟器截图（base64 PNG）。在较慢的机器上（Windows 上出现过），开发者工具偶尔对某次截图返回
+ *      "timeout waiting for automator response"；最多再试两次。
+ */
+async function cylCapture() {
+  for (let attempt = 1; ; attempt += 1) {
+    try {
+      return await miniProgram.screenshot();
+    } catch (error) {
+      if (attempt >= 3 || !/timeout waiting for automator response/.test(String(error && error.message))) {
+        throw error;
+      }
+    }
+  }
+}
+
+/**
  * [EN] The render data of the current page's tab bar. [CN] 当前页面 TabBar 的渲染数据。
  */
 function cylTabBar() {
@@ -249,11 +267,11 @@ test('the animated icons stay in the bar during and after a page scroll (WeChat 
     });
   });
   assert.deepEqual(snapshots, [true, true, true, true], 'each icon is one image layer');
-  const before = await miniProgram.screenshot();
+  const before = await cylCapture();
   for (const top of [300, 1380]) {
     await miniProgram.pageScrollTo(top);
     await cylSleep(CYL_SETTLE_MS * 1.5);
-    const after = await miniProgram.screenshot();
+    const after = await cylCapture();
     if (process.env.CYL_UI_SCREENSHOTS) {
       require('node:fs').writeFileSync(path.join(process.env.CYL_UI_SCREENSHOTS, `cyl-scroll-${top}.png`), Buffer.from(after, 'base64'));
     }
@@ -266,7 +284,7 @@ test('the animated icons stay in the bar during and after a page scroll (WeChat 
   // [CN] 动画滚动期间也一样：开发者工具中每个图标只有一个图片图层（CYL_USES_SNAPSHOTS）。
   await miniProgram.evaluate(() => { wx.pageScrollTo({ scrollTop: 0, duration: 3000 }); });
   await cylSleep(1200);
-  const during = await miniProgram.screenshot();
+  const during = await cylCapture();
   if (process.env.CYL_UI_SCREENSHOTS) {
     require('node:fs').writeFileSync(path.join(process.env.CYL_UI_SCREENSHOTS, 'cyl-scroll-during.png'), Buffer.from(during, 'base64'));
   }
@@ -406,11 +424,11 @@ test('the Home feed scrolls under the bar with one layer of icons (flat style, d
     // [CN] 先做跳转（不带 duration 的 wx.pageScrollTo）：开发者工具把图标画布留在原处的情形。深色 TabBar 不透明，
     //      因此在任何滚动位置看起来都一样。
     await cylSleep(1500);
-    const baseline = await miniProgram.screenshot();
+    const baseline = await cylCapture();
     for (const jump of [300, 1380, 700]) {
       await miniProgram.pageScrollTo(jump);
       await cylSleep(900);
-      cylCompare(baseline, await miniProgram.screenshot(), `from its look at the top after a jump to ${jump}`);
+      cylCompare(baseline, await cylCapture(), `from its look at the top after a jump to ${jump}`);
     }
     await miniProgram.pageScrollTo(0);
     await cylSleep(900);
@@ -419,10 +437,10 @@ test('the Home feed scrolls under the bar with one layer of icons (flat style, d
       const frames = [];
       for (let index = 0; index < 5; index += 1) {
         await cylSleep(450);
-        frames.push(await miniProgram.screenshot());
+        frames.push(await cylCapture());
       }
       await cylSleep(2200);
-      const rest = await miniProgram.screenshot();
+      const rest = await cylCapture();
       frames.forEach((frame, index) => cylCompare(frame, rest, `from its resting look in frame ${index} of the scroll to ${target}`));
     }
   } finally {
