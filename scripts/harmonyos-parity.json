@@ -7,6 +7,20 @@
     "5": "`plusButtonBadgeValue` 1 at launch, +1 per tap in `plusButtonAction` (toast) (built; emulator check pending / 已编译，模拟器验证待做)",
     "6": "`CYLBadge` per tab after 1.5 s: Home dot (random color, radius 5.5, breathe), Nearby 8 (purple, scale), Messages 99+ (bounce), Me NEW (offset -1, 3, breathe); global offset (-5, 3); tapping a badged tab clears it (built; emulator check pending / 已编译，模拟器验证待做)",
     "10": "`CYLPlusButton.selectable`: the plus page is blank with the navigation title 发布 (built; emulator check pending / 已编译，模拟器验证待做)",
-    "43": "Home rows → `pages/ConfigurationDemo`: `CYLTabBarConfiguration` reads Example-Shared cyl_tabbar_configuration.json / .json5 / .jsonc (rawfile), themes, title offsets, platform filter (Message is ios,android only), errors shown; JSON5 converter checked in Node against the shared files (built; emulator check pending / 已编译，模拟器验证待做)"
+    "43": "Home rows → `pages/ConfigurationDemo`: `CYLTabBarConfiguration` reads Example-Shared cyl_tabbar_configuration.json / .json5 / .jsonc (rawfile), themes, title offsets, platform filter (Message is ios,android only), errors shown; JSON5 converter checked in Node against the shared files (built; emulator check pending / 已编译，模拟器验证待做)",
+    "11": "`entry/pages/Index.ets` Language row: `i18n.System.setAppPreferredLanguage` (follow the system / English / 简体中文), resources reload (built; emulator check pending / 已编译，模拟器验证待做)",
+    "12": "`cyl_simulateMemoryWarning()` + `CYLTabBarController.unloadsUnselectedViewsOnMemoryWarning` / `onMemoryWarning`: unselected pages unloaded, a dialog lists each tab (built; emulator check pending / 已编译，模拟器验证待做)",
+    "13": "`CYLTabBarController.titlePositionAdjustment` (@Prop): the row cycles the vertical offset 0 / -4 / 4 (built; emulator check pending / 已编译，模拟器验证待做)",
+    "14": "`tabBarBackgroundColor` / `tabBarShadowColor` / `unselectedColor` / `tintColor` (@Prop): System default, Dark, Centered capsule (`selectedBackgroundColor`), Green line (built; emulator check pending / 已编译，模拟器验证待做)",
+    "17": "`CYLTabBarController.tabBarHeight` (@Prop): 49 <-> 69 vp (built; emulator check pending / 已编译，模拟器验证待做)",
+    "18": "`CYLTabBarController.itemEdgeInsets` (cyl_itemEdgeInsets): centered / not centered rows (built; emulator check pending / 已编译，模拟器验证待做)",
+    "19": "`CYLTabBarItemAttributes.backgroundColor` / `selectedBackgroundColor` (CYLTabBarItemBackgroundColor / CYLTabBarItemSelectedBackgroundColor) (built; emulator check pending / 已编译，模拟器验证待做)",
+    "45": "`entry/pages/SystemTabs.ets`: ArkUI `Tabs` (system tab bar) with the same four tabs and a badge on Messages (built; emulator check pending / 已编译，模拟器验证待做)",
+    "46": "`entry/pages/SystemTabs.ets` withPlus: a floating plus button stands in (the system bar has none) (built; emulator check pending / 已编译，模拟器验证待做)",
+    "47": "`entry/pages/AnotherTabBar.ets`: another CYLTabBarController with a square orange plus button (built; emulator check pending / 已编译，模拟器验证待做)",
+    "50": "`CYLBadgeSamples` / `cyl_applyBadgeSample`: 35 badge samples, one per row, on every tab (built; emulator check pending / 已编译，模拟器验证待做)",
+    "51": "`entry/pages/Index.ets` `sections()`: every tab shows the same demo sections and its badge rows (built; emulator check pending / 已编译，模拟器验证待做)",
+    "53": "`entry/pages/Index.ets` Home badge row: title becomes 首页(n), pushes the orange `pages/TextPage` (built; emulator check pending / 已编译，模拟器验证待做)",
+    "56": "`CYLTabBarController.tabBarHidden` + `tabBarHiddenAnimated` (slide transition), comes back after 2 s (built; emulator check pending / 已编译，模拟器验证待做)"
   }
 }
