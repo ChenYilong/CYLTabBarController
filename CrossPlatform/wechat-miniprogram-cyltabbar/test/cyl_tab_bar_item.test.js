@@ -19,7 +19,7 @@ test('lottieFilePath, lottieURL, lottieSizeValue and the animation type', () => 
   assert.equal(model.animationType, 'lottie');
   assert.equal(model.iconBoxStyle, 'width: 36px; height: 30px;');
   assert.equal(cylItemModel({ lottieURL: 'https://x/a.json', lottieFilePath: '/b.json' }).animationPath, 'https://x/a.json');
-  assert.deepEqual(['a.json', 'a.pag', 'a.riv', 'a.png'].map(cylAnimationType), ['lottie', 'pag', 'rive', '']);
+  assert.deepEqual(['a.json', 'a.pag', 'a.riv', 'a.svga', 'a.svga.bin', 'a.png'].map(cylAnimationType), ['lottie', 'pag', 'rive', 'svga', 'svga', '']);
 });
 
 test('badges: value, dot, color, size, content inset, position, text attributes', () => {

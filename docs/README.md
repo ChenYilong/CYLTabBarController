@@ -310,6 +310,7 @@ docs/
 │   ├── svga-example-rive-bell.png
 │   ├── svga-example-rive-last-frame.png
 │   ├── svga-example-rive-playing.png
+│   ├── svga-miniprogram-renderer-frames.png
 │   ├── svga-tab-icon-classic.png
 │   ├── svga-tab-icon-flatdesign.png
 │   ├── svga-tab-icon-liquid-glass.png

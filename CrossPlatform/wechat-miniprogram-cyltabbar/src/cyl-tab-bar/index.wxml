@@ -36,6 +36,7 @@
         generic:cyl-lottie-view="cyl-lottie-view"
         generic:cyl-pag-view="cyl-pag-view"
         generic:cyl-rive-view="cyl-rive-view"
+        generic:cyl-svga-view="cyl-svga-view"
         class="cyl-tab-item {{item.cover ? 'cyl-tab-covered' : ''}}"
         index="{{item.item.index}}"
         title="{{item.item.title}}"

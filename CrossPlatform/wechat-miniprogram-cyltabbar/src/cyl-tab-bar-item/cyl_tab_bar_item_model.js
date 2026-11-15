@@ -7,17 +7,19 @@
  */
 const reader = require('../cyl-tab-bar/cyl_configuration');
 
-// [EN] A mini program code package leaves out .pag and .riv files, so package copies are named *.pag.bin / *.riv.bin.
-// [CN] 小程序代码包不包含 .pag 与 .riv 文件，因此包内副本命名为 *.pag.bin / *.riv.bin。
+// [EN] A mini program code package leaves out .pag, .riv and .svga files, so package copies are named *.pag.bin /
+//      *.riv.bin / *.svga.bin.
+// [CN] 小程序代码包不包含 .pag、.riv 与 .svga 文件，因此包内副本命名为 *.pag.bin / *.riv.bin / *.svga.bin。
 const CYL_ANIMATION_TYPES = [
   ['lottie', /\.json(\?|#|$)/i],
   ['pag', /\.pag(\.bin)?(\?|#|$)/i],
   ['rive', /\.riv(\.bin)?(\?|#|$)/i],
+  ['svga', /\.svga(\.bin)?(\?|#|$)/i],
 ];
 
 /**
- * [EN] The animation library a file needs, by its type (.json Lottie, .pag PAG, .riv Rive); '' otherwise.
- * [CN] 按文件类型判断需要的动画库（.json 为 Lottie、.pag 为 PAG、.riv 为 Rive）；否则返回 ''。
+ * [EN] The animation library a file needs, by its type (.json Lottie, .pag PAG, .riv Rive, .svga SVGA); '' otherwise.
+ * [CN] 按文件类型判断需要的动画库（.json 为 Lottie、.pag 为 PAG、.riv 为 Rive、.svga 为 SVGA）；否则返回 ''。
  */
 function cylAnimationType(path) {
   const value = String(path || '').trim();

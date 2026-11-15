@@ -1,15 +1,15 @@
 /**
- * [EN] cyl-animation-placeholder: the default of the abstract nodes `cyl-lottie-view`, `cyl-pag-view` and `cyl-rive-view`
+ * [EN] cyl-animation-placeholder: the default of the abstract nodes `cyl-lottie-view`, `cyl-pag-view`, `cyl-rive-view` and `cyl-svga-view`
  *      of cyl-tab-bar-item (and cyl-tab-bar, which forwards them). cyl-tabbar-miniprogram depends on no animation
  *      library: an app installs the packages it wants (cyl-lottie-miniprogram, cyl-pag-miniprogram,
- *      cyl-rive-miniprogram) and names their components, e.g. `generic:cyl-lottie-view="cyl-lottie"`. A tab whose
+ *      cyl-rive-miniprogram, cyl-svga-miniprogram) and names their components, e.g. `generic:cyl-lottie-view="cyl-lottie"`. A tab whose
  *      library is not installed shows this empty view, which emits `error` once so the app can fall back to images.
- *      It has the methods of cyl-lottie, cyl-pag and cyl-rive, which do nothing.
+ *      It has the methods of cyl-lottie, cyl-pag, cyl-rive and cyl-svga, which do nothing.
  * [CN] cyl-animation-placeholder：cyl-tab-bar-item（以及转发它们的 cyl-tab-bar）的抽象节点 `cyl-lottie-view`、
- *      `cyl-pag-view`、`cyl-rive-view` 的默认实现。cyl-tabbar-miniprogram 不依赖任何动画库：应用安装需要的包
- *      （cyl-lottie-miniprogram、cyl-pag-miniprogram、cyl-rive-miniprogram）并指定其组件，例如
+ *      `cyl-pag-view`、`cyl-rive-view`、`cyl-svga-view` 的默认实现。cyl-tabbar-miniprogram 不依赖任何动画库：应用安装需要的包
+ *      （cyl-lottie-miniprogram、cyl-pag-miniprogram、cyl-rive-miniprogram、cyl-svga-miniprogram）并指定其组件，例如
  *      `generic:cyl-lottie-view="cyl-lottie"`。动画库未安装的 Tab 显示这个空视图，它发出一次 `error`，以便应用改用图片。
- *      它具有 cyl-lottie、cyl-pag、cyl-rive 的方法，但不做任何事。
+ *      它具有 cyl-lottie、cyl-pag、cyl-rive、cyl-svga 的方法，但不做任何事。
  */
 const cylNothing = function () {}
 

@@ -53,7 +53,7 @@ const CYL_SYMBOL_ASSETS = {
  *      the package's "download" command; missing files are skipped and the example falls back to images.
  * [CN] 示例的 Tab 图标来自它唯一的动画包（scripts/cyl_animation_choice.js）：该包在 package.json 的
  *      "cylExampleResources" 中列出它们（目录、本仓库中的来源目录、文件），只复制这个包的图标，到 shared/<目录>。
- *      小程序代码包不包含 .pag 与 .riv 文件，因此这些副本以 .bin 结尾。本仓库不分发 PAG 文件：由包的 "download"
+ *      小程序代码包不包含 .pag、.riv 与 .svga 文件，因此这些副本以 .bin 结尾。本仓库不分发 PAG 文件：由包的 "download"
  *      命令下载；缺少的文件会被跳过，示例改用图片。
  */
 const { CYL_ANIMATIONS, cylChosenAnimation } = require('./cyl_animation_choice');
@@ -117,7 +117,7 @@ function cylDemoListSource() {
   const strings = {};
   CYL_DEMO_LIST_LANGUAGES.forEach((language) => {
     strings[language] = {};
-    Object.keys(all[language] || {}).sort().filter((text) => texts.has(text)).forEach((text) => {
+    Object.keys(all[language] || {}).sort((a, b) => String(a).localeCompare(String(b))).filter((text) => texts.has(text)).forEach((text) => {
       strings[language][text] = all[language][text];
     });
   });
@@ -209,7 +209,7 @@ function cylMoreStrings() {
   CYL_MORE_LANGUAGES.forEach((language) => {
     const translated = read(language);
     const table = {};
-    Array.from(texts).sort().forEach((text) => {
+    Array.from(texts).sort((a, b) => String(a).localeCompare(String(b))).forEach((text) => {
       const names = text.match(/\{\w+\}/g) || [];
       const key = keyByText[text.replace(/\{\w+\}/g, '%@')];
       if (!key || translated[key] === undefined) {
@@ -350,7 +350,7 @@ function cylGeneratedFiles() {
     files[path.join(skinFolder, asset.path)] = fs.readFileSync(path.join(skinSource, asset.path));
   });
 
-  const themes = Array.from(new Set(assets.map((asset) => asset.theme))).sort();
+  const themes = Array.from(new Set(assets.map((asset) => asset.theme))).sort((a, b) => String(a).localeCompare(String(b)));
   const symbolsByTheme = {};
   themes.forEach((theme) => {
     const symbols = {};
@@ -417,7 +417,7 @@ function cylGeneratedFiles() {
   const animationFolder = path.resolve(CYL_COMPONENT_ROOT, animation.folder);
   const resources = JSON.parse(fs.readFileSync(path.join(animationFolder, 'package.json'), 'utf8')).cylExampleResources;
   const resourceSource = path.join(CYL_REPOSITORY_ROOT, resources.source);
-  const packageName = (name) => (/\.(pag|riv)$/.test(name) ? `${name}.bin` : name);
+  const packageName = (name) => (/\.(pag|riv|svga)$/.test(name) ? `${name}.bin` : name);
   const icons = [];
   resources.files.filter((name) => fs.existsSync(path.join(resourceSource, name))).forEach((name) => {
     files[path.join(resources.folder, packageName(name))] = fs.readFileSync(path.join(resourceSource, name));
@@ -462,7 +462,7 @@ function cylMain() {
   const check = process.argv.includes('--check');
   const files = cylGeneratedFiles();
   const stale = [];
-  Object.keys(files).sort().forEach((relativePath) => {
+  Object.keys(files).sort((a, b) => String(a).localeCompare(String(b))).forEach((relativePath) => {
     const target = path.join(CYL_TARGET, relativePath);
     const current = fs.existsSync(target) ? fs.readFileSync(target) : null;
     if (current && cylSameContent(current, files[relativePath])) {
