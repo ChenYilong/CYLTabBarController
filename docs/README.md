@@ -304,6 +304,7 @@ docs/
 │   ├── rive-classic.png
 │   ├── rive-flat-design.png
 │   ├── rive-liquid-glass.png
+│   ├── rive-tab-taps-and-menu-button-android.png
 │   ├── svga-example-rive-bell.png
 │   ├── svga-example-rive-last-frame.png
 │   ├── svga-example-rive-playing.png
