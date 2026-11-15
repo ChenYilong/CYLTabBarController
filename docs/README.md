@@ -305,6 +305,7 @@ docs/
 │   ├── svga-tab-icon-classic.png
 │   ├── svga-tab-icon-flatdesign.png
 │   ├── svga-tab-icon-liquid-glass.png
+│   ├── svga-tab-icons-android-api35.png
 │   ├── svga-tab-icons-configuration-ios26.png
 │   ├── svga-tab-icons-configuration-plus-ios26.png
 │   ├── svga-tab-icons-keys-ios26.png

@@ -70,6 +70,8 @@ object CYLSVGATabBarItemAnimator : CYLTabBarItemAnimator {
         val completion = Proxy.newProxyInstance(completionType.classLoader, arrayOf(completionType)) { proxy, method, args ->
             when (method.name) {
                 "onComplete" -> { CYLReflection.call(view, "setVideoItem", args?.firstOrNull()); state.parsed(view) }
+                // [EN] A file SVGAPlayer cannot read: the tab keeps an empty icon, as on iOS; the log names it. [CN] SVGAPlayer 无法读取的文件：与 iOS 相同，Tab 图标为空；日志中注明文件。
+                "onError" -> android.util.Log.w("CYLSVGA", "cannot parse " + file.name)
                 "hashCode" -> System.identityHashCode(proxy)
                 "equals" -> proxy === args?.firstOrNull()
                 "toString" -> "CYLSVGAParseCompletion"
