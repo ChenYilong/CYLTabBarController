@@ -108,8 +108,8 @@ static CYLTestRiveView *CYLLastRiveView;
 
 #pragma mark - What Core provides (fakes)
 
-/// [EN] Core's service slot, as in UIControl+CYLTabBarItemAnimation.m; the real engine fills it in +load.
-/// [CN] Core 的服务槽位，与 UIControl+CYLTabBarItemAnimation.m 相同；真正的引擎在 +load 中填入。
+/// [EN] Core's service slot, as in Swift/UIControl+CYLTabBarItemAnimation.swift; the real engine fills it in +load.
+/// [CN] Core 的服务槽位，与 Swift/UIControl+CYLTabBarItemAnimation.swift 相同；真正的引擎在 +load 中填入。
 static id<CYLTabBarItemAnimationService> CYLTestCurrentService;
 void CYLTabBarItemAnimationSetService(id<CYLTabBarItemAnimationService> service) {
     CYLTestCurrentService = service;
