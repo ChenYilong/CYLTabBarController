@@ -46,6 +46,7 @@
 | [React Native 接入](React-Native-Component.md) | [React Native integration](React-Native-Component.md) | 运行示例、添加依赖、pod install、属性与事件、常见问题。 / Running the example, the dependency, pod install, props and events, troubleshooting. |
 | [Flutter 接入](Flutter-Component.md) | [Flutter integration](Flutter-Component.md) | 运行示例、`FlutterFragmentActivity`、Swift Package Manager 或 CocoaPods、字段、常见问题。 / Running the example, `FlutterFragmentActivity`, Swift Package Manager or CocoaPods, fields, troubleshooting. |
 | [微信小程序版](WeChat-Mini-Program.md) | [WeChat Mini Program](WeChat-Mini-Program.md) | `cyl-tab-bar` 组件（纯小程序实现，读取相同的配置键）、示例、评分与待办。 / The `cyl-tab-bar` component (pure mini program code reading the same configuration keys), the example, the score and the TODO list. |
+| [鸿蒙版（开发中）](HarmonyOS-Parity.md) | [HarmonyOS (in progress)](HarmonyOS-Parity.md) | 鸿蒙系统版本（HarmonyOS 6.0.1，API 21）、iOS 公开 API 表与 iOS Example 演示表（第二列为鸿蒙实现，默认 TODO），两表合并实时打分。 / The HarmonyOS version (HarmonyOS 6.0.1, API 21), the table of iOS public APIs and the table of iOS Example demos (second column: the HarmonyOS implementation, TODO by default), scored together live. |
 
 ## [CN]动效图标示例
 ## [EN]Animated-icon demos
