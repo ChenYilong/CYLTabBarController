@@ -811,6 +811,10 @@ export struct CYLTabBarController {
         }), GestureMask.Normal)
 
       if (!this.tabBarHidden && !this.scrollHidden) {
+        // [EN] A container that insets the floating Liquid Glass capsule (16 vp at the sides, 8 vp above the gesture bar);
+        //      the classic and FlatDesign bars fill it and reach under the gesture bar.
+        // [CN] 容器：为悬浮的液态玻璃胶囊留出边距（两侧 16 vp，距手势条 8 vp）；经典与扁平样式铺满并延伸到手势条下方。
+        Column() {
         Row() {
           ForEach(this.cylSlots(), (slot: CYLSlot) => {
             if (slot.tabIndex >= 0) {
@@ -826,12 +830,15 @@ export struct CYLTabBarController {
         .border({ width: { top: 0.5 }, color: { top: this.tabBarShadowColor } })
         .attributeModifier(cyl_tabBarStyleModifier(this.tabBarStyleType, this.barTintColor, this.tabBarHeight))
         .padding({ left: this.itemEdgeInsets.left, right: this.itemEdgeInsets.right })
-        // [EN] The classic and FlatDesign bars reach under the gesture bar; the floating Liquid Glass capsule stays above it.
-        // [CN] 经典与扁平样式延伸到手势条下方；悬浮的液态玻璃胶囊保持在其上方。
+        .expandSafeArea(this.tabBarStyleType === CYLTabBarStyleType.LiquidGlass ? [] : [SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM])
+        .id('cyl-tab-bar')
+        }
+        .width('100%')
+        .padding(this.tabBarStyleType === CYLTabBarStyleType.LiquidGlass ? { left: 16, right: 16, bottom: 8 } : 0)
         .expandSafeArea(this.tabBarStyleType === CYLTabBarStyleType.LiquidGlass ? [] : [SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM])
         .transition(TransitionEffect.move(TransitionEdge.BOTTOM)
           .animation({ duration: this.tabBarHiddenAnimated ? 250 : 0 }))
-        .id('cyl-tab-bar')
+        .id('cyl-tab-bar-container')
       }
     }
     .width('100%')

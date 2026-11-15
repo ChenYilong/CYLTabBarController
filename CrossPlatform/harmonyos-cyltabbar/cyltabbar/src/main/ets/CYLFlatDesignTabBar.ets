@@ -84,11 +84,9 @@ export class CYLLiquidGlassTabBarModifier implements AttributeModifier<RowAttrib
   applyNormalAttribute(instance: RowAttribute): void {
     instance.backgroundBlurStyle(BlurStyle.Thin);
     instance.backgroundColor(this.barTintColor ?? '#66FFFFFF');
-    // [EN] Inset 16 vp on both sides and 8 vp above the system gesture bar (the controller keeps a Liquid Glass bar inside
-    //      the safe area). [CN] 两侧各内缩 16 vp，距系统手势条 8 vp（控制器让液态玻璃 TabBar 保持在安全区内）。
-    instance.width('calc(100% - 32vp)');
+    // [EN] The insets (16 vp at the sides, 8 vp above the gesture bar) come from the controller's bar container.
+    // [CN] 边距（两侧 16 vp，距手势条 8 vp）由控制器的 TabBar 容器提供。
     instance.borderRadius(this.height / 2);
-    instance.margin({ left: 16, right: 16, bottom: 8 });
     instance.border({ width: 0.5, color: '#80FFFFFF' });
     instance.shadow({ radius: 16, color: '#26000000', offsetY: 4 });
     instance.clip(false);
