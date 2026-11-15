@@ -1,1 +1,21 @@
-{}
+{
+  "CYLTabBarItemTitle": "`CYLTabBarItemAttributes.title` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarItemSelectedTitle": "`CYLTabBarItemAttributes.selectedTitle` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarItemImage": "`CYLTabBarItemAttributes.image` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarItemSelectedImage": "`CYLTabBarItemAttributes.selectedImage` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarItemIdentifier": "`CYLTabBarItemAttributes.identifier` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarControllerTabBarItemsAttributes": "`CYLTabBarController.tabBarItemsAttributes` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarControllerPlusButton": "`CYLTabBarController.plusButton (CYLPlusButton)` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarControllerPlusButtonAction": "`CYLTabBarController.plusButtonAction` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLPlusButtonIndexInTabBar": "`CYLPlusButton.index` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "+indexOfPlusButtonInTabBar": "`CYLPlusButton.index` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLPlusButtonCenterYOffset": "`CYLPlusButton.centerYOffset` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "+constantOfPlusButtonCenterYOffsetForTabBarHeight:": "`CYLPlusButton.centerYOffset` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLPlusButtonAlignsTitle": "`CYLPlusButton.alignsTitle` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLPlusButtonShowsSelection": "`CYLPlusButton.selectable` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "+plusChildViewController": "`CYLPlusButton.selectable + CYLTabBarController.pageBuilder(CYLPlusButtonPageIndex)` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLPlusButtonImageSize": "`CYLPlusButton.imageSize` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLPlusButtonBackgroundImage": "`CYLPlusButton.image / selectedImage` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarController tabBarHeight": "`CYLTabBarController.tabBarHeight` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarController -setTabBarHidden:animated:": "`CYLTabBarController.tabBarHidden` (built; emulator check pending / 已编译，模拟器验证待做)"
+}
