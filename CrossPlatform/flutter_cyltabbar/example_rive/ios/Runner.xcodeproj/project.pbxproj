@@ -7,6 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		DED2CCF8F94EB42653958154 /* tab_chat.svga in Resources */ = {isa = PBXBuildFile; fileRef = B824E6D690586A5FEF9E43F7 /* tab_chat.svga */; };
+		19CF369F46E15C195E7523D2 /* tab_search.svga in Resources */ = {isa = PBXBuildFile; fileRef = 02D8F4C93E27A63598C5C4F8 /* tab_search.svga */; };
+		5BB8DC1801CB5332DBBCEDB1 /* tab_activity.svga in Resources */ = {isa = PBXBuildFile; fileRef = A01A2688C60DBD6C9A9CD0E4 /* tab_activity.svga */; };
+		3CD40DAA78225FC6DE9B9EE1 /* tab_list.svga in Resources */ = {isa = PBXBuildFile; fileRef = 43ADE1384AA1D73DB2990181 /* tab_list.svga */; };
+		76677859208FDA3F6226FBEE /* tab_profile.svga in Resources */ = {isa = PBXBuildFile; fileRef = 818E1F01EE7ED2C7ABAC1FE0 /* tab_profile.svga */; };
+		70022564884E5ABFE237798C /* tab_home.svga in Resources */ = {isa = PBXBuildFile; fileRef = BF818E8290D5D3A167DE88B0 /* tab_home.svga */; };
+		D6F4454ED598CFA79D4FCE70 /* svga in Resources */ = {isa = PBXBuildFile; fileRef = 7EF067CF021C0FFD57202183 /* svga */; };
 		1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */ = {isa = PBXBuildFile; fileRef = 1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */; };
 		2BD518951E0742D88C3553B4 /* confetti.riv in Resources */ = {isa = PBXBuildFile; fileRef = 7456F84437114CAAA4800A01 /* confetti.riv */; };
 		331C808B294A63AB00263BE5 /* RunnerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 331C807B294A618700263BE5 /* RunnerTests.swift */; };
@@ -49,6 +56,13 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		B824E6D690586A5FEF9E43F7 /* tab_chat.svga */ = {isa = PBXFileReference; lastKnownFileType = file; name = tab_chat.svga; path = "../../../../Example-SwiftUI-Rive/AnimatedApp/SVGAAssets/tab_chat.svga"; sourceTree = SOURCE_ROOT; };
+		02D8F4C93E27A63598C5C4F8 /* tab_search.svga */ = {isa = PBXFileReference; lastKnownFileType = file; name = tab_search.svga; path = "../../../../Example-SwiftUI-Rive/AnimatedApp/SVGAAssets/tab_search.svga"; sourceTree = SOURCE_ROOT; };
+		A01A2688C60DBD6C9A9CD0E4 /* tab_activity.svga */ = {isa = PBXFileReference; lastKnownFileType = file; name = tab_activity.svga; path = "../../../../Example-SwiftUI-Rive/AnimatedApp/SVGAAssets/tab_activity.svga"; sourceTree = SOURCE_ROOT; };
+		43ADE1384AA1D73DB2990181 /* tab_list.svga */ = {isa = PBXFileReference; lastKnownFileType = file; name = tab_list.svga; path = "../../../../Example-SwiftUI-Rive/AnimatedApp/SVGAAssets/tab_list.svga"; sourceTree = SOURCE_ROOT; };
+		818E1F01EE7ED2C7ABAC1FE0 /* tab_profile.svga */ = {isa = PBXFileReference; lastKnownFileType = file; name = tab_profile.svga; path = "../../../../Example-SwiftUI-Rive/AnimatedApp/SVGAAssets/tab_profile.svga"; sourceTree = SOURCE_ROOT; };
+		BF818E8290D5D3A167DE88B0 /* tab_home.svga */ = {isa = PBXFileReference; lastKnownFileType = file; name = tab_home.svga; path = "../../../../Example-SwiftUI-Rive/AnimatedApp/SVGAAssets/tab_home.svga"; sourceTree = SOURCE_ROOT; };
+		7EF067CF021C0FFD57202183 /* svga */ = {isa = PBXFileReference; lastKnownFileType = folder; name = svga; path = "../configurations/svga"; sourceTree = SOURCE_ROOT; };
 		06A83D295A68665CBEDCC2F3 /* Pods-Runner.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.debug.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.debug.xcconfig"; sourceTree = "<group>"; };
 		1498D2321E8E86230040F4C2 /* GeneratedPluginRegistrant.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GeneratedPluginRegistrant.h; sourceTree = "<group>"; };
 		1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GeneratedPluginRegistrant.m; sourceTree = "<group>"; };
@@ -142,6 +156,13 @@
 				DA0234B048AE4C53BB619873 /* shapes.riv */,
 				E999A38F86BE4E8E9BABA8AD /* menu_button.riv */,
 				EE2AE6B9F82343438DE1C52A /* icons.riv */,
+				B824E6D690586A5FEF9E43F7 /* tab_chat.svga */,
+				02D8F4C93E27A63598C5C4F8 /* tab_search.svga */,
+				A01A2688C60DBD6C9A9CD0E4 /* tab_activity.svga */,
+				43ADE1384AA1D73DB2990181 /* tab_list.svga */,
+				818E1F01EE7ED2C7ABAC1FE0 /* tab_profile.svga */,
+				BF818E8290D5D3A167DE88B0 /* tab_home.svga */,
+				7EF067CF021C0FFD57202183 /* svga */,
 				9740EEB11CF90186004384FC /* Flutter */,
 				97C146F01CF9000F007C117D /* Runner */,
 				97C146EF1CF9000F007C117D /* Products */,
@@ -291,6 +312,13 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DED2CCF8F94EB42653958154 /* tab_chat.svga in Resources */,
+				19CF369F46E15C195E7523D2 /* tab_search.svga in Resources */,
+				5BB8DC1801CB5332DBBCEDB1 /* tab_activity.svga in Resources */,
+				3CD40DAA78225FC6DE9B9EE1 /* tab_list.svga in Resources */,
+				76677859208FDA3F6226FBEE /* tab_profile.svga in Resources */,
+				70022564884E5ABFE237798C /* tab_home.svga in Resources */,
+				D6F4454ED598CFA79D4FCE70 /* svga in Resources */,
 				2BD518951E0742D88C3553B4 /* confetti.riv in Resources */,
 				497F018B919244CA880D6AC2 /* check.riv in Resources */,
 				E05997B9C0E0470CA55996E9 /* button.riv in Resources */,

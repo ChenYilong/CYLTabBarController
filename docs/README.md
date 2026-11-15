@@ -213,6 +213,7 @@ docs/
 │   ├── flutter-rive-android-bar.png
 │   ├── flutter-rive-ios-bar.png
 │   ├── flutter-search-plus-title-missing-when-selected-ios.png
+│   ├── flutter-svga-tab-icons-ios26.png
 │   ├── flutter-viewpager2-fix-android-bar.png
 │   ├── gif-classic.png
 │   ├── gif-flat-design.png

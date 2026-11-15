@@ -15,7 +15,7 @@ String animationURLWithOptions(String file, [Map<String, Object> options = const
 }
 
 /// An animation played by CYLTabBarController's own engine (the one of the tab icons), whatever its library: Rive,
-/// Lottie, PAG or GIF, when the app has that library (iOS subspec or Swift package, Android dependency).
+/// Lottie, PAG, GIF or SVGA, when the app has that library (iOS subspec or Swift package, Android dependency).
 ///
 /// [file] is a file name in the app (the iOS main bundle, the Android assets), a path or a URL.
 class CYLAnimationView extends StatefulWidget {

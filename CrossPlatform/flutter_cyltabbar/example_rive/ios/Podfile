@@ -35,6 +35,12 @@ target 'Runner' do
   # [EN] This repository's CYLTabBarController with its Rive subspec (RiveRuntime), as Example-Rive.
   # [CN] 本仓库的 CYLTabBarController 及其 Rive 子库（RiveRuntime），与 Example-Rive 相同。
   pod 'CYLTabBarController/Rive', :path => '../../../..'
+  # FIX: issue #415 — SVGA tab icons (SVGAPlayer), one for one with the Rive ones, as Example-Rive. Static linking: the
+  # Swift library imports these Objective-C pods, so they need module maps.
+  # SVGA Tab 图标（SVGAPlayer），与 Rive 图标一一对应，与 Example-Rive 相同。静态链接：Swift 库导入这两个 Objective-C pod，因此需要 module map。
+  pod 'CYLTabBarController/SVGA', :path => '../../../..'
+  pod 'SVGAPlayer', :modular_headers => true
+  pod 'Protobuf', :modular_headers => true
   flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
   target 'RunnerTests' do
     inherit! :search_paths

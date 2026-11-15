@@ -1,6 +1,18 @@
 #import "FlutterCyltabbarPlugin.h"
 
 #import <CYLTabBarController/CYLTabBarController.h>
+// [EN] CYLTabBarHostView is in Swift since step 36 of the migration; the umbrella header does not import the generated Swift
+//      header (docs/Swift-Migration.md). CocoaPods: the framework or the static library's "Swift Compatibility Header";
+//      Swift Package Manager: the module.
+// [CN] 自迁移第 36 步起 CYLTabBarHostView 为 Swift；伞头文件不导入生成的 Swift 头文件。CocoaPods：framework 或静态库的
+//      "Swift Compatibility Header"；Swift Package Manager：模块。
+#if __has_include(<CYLTabBarController/CYLTabBarController-Swift.h>)
+#import <CYLTabBarController/CYLTabBarController-Swift.h>
+#elif __has_include("CYLTabBarController-Swift.h")
+#import "CYLTabBarController-Swift.h"
+#else
+@import CYLTabBarController;
+#endif
 #if __has_include(<CYLTabBarController/CYLTabBarItemAnimationFactory.h>)
 #import <CYLTabBarController/CYLTabBarItemAnimationFactory.h>
 #define CYL_FLUTTER_ANIMATION_AVAILABLE 1

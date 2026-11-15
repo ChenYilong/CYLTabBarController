@@ -2,6 +2,8 @@ allprojects {
     repositories {
         google()
         mavenCentral()
+        // [EN] Issue #415: SVGAPlayer-Android is only on JitPack. [CN] Issue #415：SVGAPlayer-Android 只在 JitPack 上。
+        maven("https://jitpack.io") { content { includeGroup("com.github.yyued") } }
     }
 }
 
