@@ -9,6 +9,8 @@ import {
 } from 'cyltabbar';
 import { CYLLocalizedString, cyl_localizationKey, cyl_badgeAccessibilityText } from 'cyltabbar';
 import { DemoTheme, DEMO_THEMES, demoRegisterThemes } from '../demo/DemoThemes';
+import { DemoFlatDesignButton } from '../demo/DemoFlatDesign';
+import { CYLTabBarStyleType, CYLFlatDesignTintColor, CYLFlatDesignUnselectedColor } from 'cyltabbar';
 import {
   DemoRow, DemoSection, DEMO_APPEARANCES, DEMO_TITLE_OFFSETS, DEMO_HOME, DEMO_CITY, DEMO_MESSAGE, DEMO_ME,
   DEMO_LANGUAGES, DEMO_LANGUAGE_NAMES
@@ -92,6 +94,9 @@ struct Index {
   @State minimizeBehavior: CYLTabBarMinimizeBehavior = CYLTabBarMinimizeBehavior.Never;
   /** [EN] Items 9, 15, 32: the current skin (CYLThemeManager). [CN] 第 9、15、32 项：当前皮肤。 */
   @State theme: DemoTheme = DEMO_THEMES[0];
+  /** [EN] Item 7: the tab bar style and the key of the tab bar on screen (a new key builds a new one). [CN] 第 7 项：TabBar 样式与当前 TabBar 的 key（新 key 会新建 TabBar）。 */
+  @State styleType: CYLTabBarStyleType = CYLTabBarStyleType.Default;
+  @State tabBarKey: number = 0;
   private badges: CYLBadge[] = CYL_TABS.map(() => new CYLBadge());
   private plusButtonBadge: CYLBadge = new CYLBadge();
   /** [EN] The badge of each badge row, per page. [CN] 每个页面每个角标行的角标。 */
@@ -157,6 +162,13 @@ struct Index {
     // [EN] Item 6 (MainTabBarController.m, after 1.5 s so the animations are easy to see): Home a dot (random color,
     //      radius 5.5, breathe), Nearby 8 (purple, scale), Messages 100 -> 99+ (bounce), Me NEW (offset (-1, 3), breathe).
     // [CN] 第 6 项（1.5 秒后，便于看清动画）：首页红点、同城 8、消息 99+、我的 NEW。
+    this.showLaunchBadges();
+  }
+
+  /**
+   * [EN] Item 6 after 1.5 s; again for each new tab bar (item 7). [CN] 1.5 秒后显示第 6 项的角标；每个新 TabBar 再次显示（第 7 项）。
+   */
+  showLaunchBadges(): void {
     setTimeout(() => {
       const home = this.badges[0];
       home.backgroundColor = CYL_RANDOM_COLORS[Math.floor(Math.random() * CYL_RANDOM_COLORS.length)];
@@ -746,6 +758,9 @@ struct Index {
             .fontSize(17)
             .fontWeight(FontWeight.Medium)
         }
+        if (index === 0) {
+          DemoFlatDesignButton({ onTap: () => this.showFlatDesignTabBar() })
+        }
         if (index !== CYLPlusButtonPageIndex) {
           Text(CYLLocalizedString('换肤'))
             .fontSize(15)
@@ -802,9 +817,24 @@ struct Index {
     .backgroundColor(Color.White)
   }
 
+  /**
+   * [EN] Item 7: replaces the tab bar with a new FlatDesign one (a new key), Home selected, the launch badges again.
+   * [CN] 第 7 项：用新的扁平样式 TabBar（新 key）替换当前 TabBar，选中首页，再次显示启动角标。
+   */
+  showFlatDesignTabBar(): void {
+    this.styleType = CYLTabBarStyleType.FlatDesign;
+    this.selectedIndex = 0;
+    this.covers = [];
+    this.badges.forEach((badge: CYLBadge) => badge.cyl_clearBadge());
+    this.tabBarKey += 1;
+    this.showLaunchBadges();
+  }
+
   build() {
     Column() {
+      ForEach([this.tabBarKey], (key: number) => {
       CYLTabBarController({
+        tabBarStyleType: this.styleType,
         tabBarItemsAttributes: this.tabs,
         plusButton: this.plus,
         selectedIndex: $selectedIndex,
@@ -850,8 +880,8 @@ struct Index {
         itemEdgeInsets: this.itemEdgeInsets,
         tabBarBackgroundColor: this.theme.bar ?? (this.appearanceIndex === 0 ? $r('app.color.cyl_bar_background') : DEMO_APPEARANCES[this.appearanceIndex].background),
         tabBarShadowColor: DEMO_APPEARANCES[this.appearanceIndex].shadow,
-        unselectedColor: this.theme.normal ?? DEMO_APPEARANCES[this.appearanceIndex].normal,
-        tintColor: this.theme.tint ?? (this.appearanceIndex === 0 ? '#FF8000' : DEMO_APPEARANCES[this.appearanceIndex].selected),
+        unselectedColor: this.theme.normal ?? (this.styleType === CYLTabBarStyleType.FlatDesign ? CYLFlatDesignUnselectedColor : DEMO_APPEARANCES[this.appearanceIndex].normal),
+        tintColor: this.theme.tint ?? (this.styleType === CYLTabBarStyleType.FlatDesign ? CYLFlatDesignTintColor : (this.appearanceIndex === 0 ? '#FF8000' : DEMO_APPEARANCES[this.appearanceIndex].selected)),
         unloadsUnselectedViewsOnMemoryWarning: this.unloads,
         onMemoryWarning: (unloaded: number[], loaded: number[]) => this.memoryWarningReport(unloaded, loaded),
         didSelect: (index: number) => {
@@ -869,6 +899,7 @@ struct Index {
           this.cylPage(index, identifier)
         },
       })
+      }, (key: number) => `cyl-tab-bar-${key}`)
     }
     .width('100%')
     .height('100%')

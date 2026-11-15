@@ -1,3 +1,4 @@
+import { CYLTabBarStyleType, cyl_tabBarStyleModifier } from './CYLFlatDesignTabBar';
 import { curves } from '@kit.ArkUI';
 import { CYLTabBarItemAttributes, CYLTitleOffset } from './CYLTabBarItem';
 import { CYLPlusButton } from './CYLPlusButton';
@@ -261,6 +262,16 @@ export struct CYLTabBarController {
   @Prop tabBarShadowColor: ResourceColor = '#1F000000';
   /** [EN] tabBarHeight / CYLTabBarHeight (vp). [CN] TabBar 高度（vp）。 */
   @Prop tabBarHeight: number = 49;
+  /**
+   * [EN] `tabBarStyleType` (iOS CYLConstants.h): Default, System, FlatDesign or LiquidGlass (demo 7: FlatDesign).
+   * [CN] TabBar 样式（iOS CYLConstants.h）：默认、系统、扁平或液态玻璃（第 7 项：扁平样式）。
+   */
+  @Prop tabBarStyleType: CYLTabBarStyleType = CYLTabBarStyleType.Default;
+  /**
+   * [EN] `-[CYLFlatDesignTabBar barTintColor]`: the FlatDesign bar's tint over its blur; undefined (default) for none.
+   * [CN] 扁平样式 TabBar 模糊之上的着色；undefined（默认）表示不着色。
+   */
+  @Prop barTintColor: ResourceColor | undefined = undefined;
   /**
    * [EN] -[CYLTabBar cyl_itemEdgeInsets]: space kept free at the two ends of the bar; the tabs and the plus button share
    *      the rest (centered items).
@@ -813,6 +824,7 @@ export struct CYLTabBarController {
         .height(this.tabBarHeight)
         .backgroundColor(this.tabBarBackgroundColor)
         .border({ width: { top: 0.5 }, color: { top: this.tabBarShadowColor } })
+        .attributeModifier(cyl_tabBarStyleModifier(this.tabBarStyleType, this.barTintColor))
         .padding({ left: this.itemEdgeInsets.left, right: this.itemEdgeInsets.right })
         .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM])
         .transition(TransitionEffect.move(TransitionEdge.BOTTOM)

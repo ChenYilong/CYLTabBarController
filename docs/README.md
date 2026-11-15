@@ -37,6 +37,7 @@
 | [Flutter 接入：flutter_cyltabbar](Flutter-Component.md) | [Flutter integration: flutter_cyltabbar](Flutter-Component.md) |
 | [GIF Tab 图标：循环的图片，或点击播放一次的动画](GIF-Animation.md) | [GIF tab icons: a looping image, or an animation that plays once when tapped](GIF-Animation.md) |
 | [鸿蒙 API 对照表](HarmonyOS-API-Map.md) | [The HarmonyOS API map](HarmonyOS-API-Map.md) |
+| [鸿蒙端对齐](HarmonyOS-Parity.md) | [HarmonyOS parity](HarmonyOS-Parity.md) |
 | [纯图标 Tab 的自动居中](Image-Only-Tabs.md) | [Automatic centering of image-only tabs](Image-Only-Tabs.md) |
 | [液态玻璃的健壮性改进](Liquid-Glass-Robustness.md) | [Liquid Glass Robustness](Liquid-Glass-Robustness.md) |
 | [需要登录的 Tab](Login-Required-Tabs.md) | [Tabs That Need Login](Login-Required-Tabs.md) |
@@ -126,6 +127,7 @@ docs/
 ├── Flutter-Component.md
 ├── GIF-Animation.md
 ├── HarmonyOS-API-Map.md
+├── HarmonyOS-Parity.md
 ├── Image-Only-Tabs.md
 ├── Liquid-Glass-Robustness.md
 ├── Login-Required-Tabs.md
@@ -445,9 +447,17 @@ docs/
 │   ├── wechat-miniprogram-badges.png
 │   ├── wechat-miniprogram-cell-taps-devtools-sdk3.17.6-e00babf.png
 │   ├── wechat-miniprogram-christmas-glass.png
+│   ├── wechat-miniprogram-feed-taps-ios-parity-devtools-sdk3.17.6-ef5afc3-windows.png
 │   ├── wechat-miniprogram-feeds-ios-taps-devtools-sdk3.17.6-3dd395b.png
 │   ├── wechat-miniprogram-flat-login.png
 │   ├── wechat-miniprogram-home.png
+│   ├── wechat-miniprogram-objc-parity-batch1-launch-devtools-sdk3.17.6-4e2e327.png
+│   ├── wechat-miniprogram-objc-parity-batch2-skins-devtools-sdk3.17.6-b850f51.png
+│   ├── wechat-miniprogram-objc-parity-batch3a-home-rows-devtools-sdk3.17.6-a9b1278.png
+│   ├── wechat-miniprogram-objc-parity-batch3b1-arrows-touch-replaced-devtools-sdk3.17.6-5d86b75.png
+│   ├── wechat-miniprogram-objc-parity-batch3b2-tap-animations-devtools-sdk3.17.6-418d901.png
+│   ├── wechat-miniprogram-objc-parity-item11-languages-devtools-sdk3.17.6-c681422.png
+│   ├── wechat-miniprogram-objc-parity-item12-memory-warning-devtools-sdk3.17.6-5bbadb8.png
 │   ├── wechat-miniprogram-one-icon-layer-lottie-pag-rive-devtools-sdk3.17.6-e612393.png
 │   ├── wechat-miniprogram-rive-home-feed-one-layer-devtools-sdk3.17.6-e264ea2.png
 │   ├── wechat-miniprogram-scroll-icons-devtools-sdk3.17.6-88dd149.png

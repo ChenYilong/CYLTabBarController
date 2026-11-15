@@ -32,3 +32,7 @@ export {
   CYLSetLocalizationLanguage, cyl_addLocalizationLanguageListener, cyl_removeLocalizationLanguageListener, cyl_pickerLanguages
 } from './src/main/ets/CYLLocalization';
 export { cyl_badgeAccessibilityText } from './src/main/ets/CYLTabBarController';
+export {
+  CYLTabBarStyleType, CYLFlatDesignTintColor, CYLFlatDesignUnselectedColor, CYLFlatDesignTabBarModifier, CYLDefaultTabBarModifier,
+  cyl_tabBarStyleModifier
+} from './src/main/ets/CYLFlatDesignTabBar';
