@@ -302,12 +302,21 @@ extension UIView {
 
     /**
      * [EN] The `view` of a `UIBarButtonItem` or `UITabBarItem` (lazily created by UIKit once the item is shown); used by
-     *      `CYLTabBar`, which declares it.
-     * [CN] `UIBarButtonItem` 或 `UITabBarItem` 的 `view`（UIKit 在 item 显示后才创建）；由声明它的 `CYLTabBar` 使用。
+     *      `CYLTabBar`, which declares it. For a `UITabBar`, its content view (`UITabBar.cylContentView()`): the
+     *      Objective-C category of `UITabBar` overrode this selector, which Swift does not allow in an extension
+     *      (Xcode 26: "conflicts with method 'cyl_contentView()' from superclass 'UIView'"), so the one selector
+     *      dispatches here.
+     * [CN] `UIBarButtonItem` 或 `UITabBarItem` 的 `view`（UIKit 在 item 显示后才创建）；由声明它的 `CYLTabBar` 使用。对于
+     *      `UITabBar`，返回其内容视图（`UITabBar.cylContentView()`）：`UITabBar` 的 Objective-C 分类曾覆盖此 selector，
+     *      Swift 不允许在扩展中这样做（Xcode 26：“conflicts with method 'cyl_contentView()' from superclass 'UIView'”），
+     *      因此由这一个 selector 在此分派。
      */
     @objc(cyl_contentView)
     func cyl_contentView() -> UIView? {
-        responds(to: NSSelectorFromString("view")) ? cyl_value(forKey: "view") as? UIView : nil
+        if let tabBar = self as? UITabBar {
+            return tabBar.cylContentView()
+        }
+        return responds(to: NSSelectorFromString("view")) ? cyl_value(forKey: "view") as? UIView : nil
     }
 
     // MARK: Adding views
