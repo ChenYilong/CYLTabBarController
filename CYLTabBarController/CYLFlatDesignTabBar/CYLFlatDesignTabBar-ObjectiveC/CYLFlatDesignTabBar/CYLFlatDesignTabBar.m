@@ -23,6 +23,10 @@
 #import "UINavigationController+CYLFlatDesignTabBarPrivate.h"
 #import "_CYLFlatDesignTabBarParallaxOverlayView.h"
 
+// [EN] Declared in CYLFlatDesignTabBarItem.h; the item is Swift now (step 49), so the C constant is defined here.
+// [CN] 在 CYLFlatDesignTabBarItem.h 中声明；item 已是 Swift（第 49 步），因此 C 常量定义在这里。
+NSString *const CYLFlatDesignTabBarItemDidChange = @"CYLFlatDesignTabBarItemDidChange";
+
 @interface CYLFlatDesignTabBar ()
 
 // _UIBackground
@@ -42,8 +46,8 @@
 
 @end
 
-// Implemented in CYLFlatDesignTabBarButton.m: refreshes the button from its item and the bar's appearance.
-// 在 CYLFlatDesignTabBarButton.m 中实现：根据 item 与 TabBar 的 appearance 刷新按钮。
+// Implemented in Swift/CYLFlatDesignTabBarButton.swift: refreshes the button from its item and the bar's appearance.
+// 在 Swift/CYLFlatDesignTabBarButton.swift 中实现：根据 item 与 TabBar 的 appearance 刷新按钮。
 @interface CYLFlatDesignTabBarButton (CYLFlatDesignAppearance)
 - (void)_updateTabBarButton;
 @end
