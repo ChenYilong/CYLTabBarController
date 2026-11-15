@@ -1,0 +1,40 @@
+{
+  "string": [
+    {
+      "name": "tab_home",
+      "value": "Trang chủ"
+    },
+    {
+      "name": "tab_nearby",
+      "value": "Gần đây"
+    },
+    {
+      "name": "tab_messages",
+      "value": "Tin nhắn"
+    },
+    {
+      "name": "tab_me",
+      "value": "Tôi"
+    },
+    {
+      "name": "tab_post",
+      "value": "Đăng"
+    },
+    {
+      "name": "tab_refresh",
+      "value": "Làm mới"
+    },
+    {
+      "name": "module_desc",
+      "value": "CYLTabBarController example"
+    },
+    {
+      "name": "ability_desc",
+      "value": "CYLTabBarController example"
+    },
+    {
+      "name": "app_name",
+      "value": "CYLTabBar"
+    }
+  ]
+}

@@ -1,3 +1,5 @@
+import { cyl_localizationKey } from 'cyltabbar';
+
 /**
  * [EN] The rows of the example's tab pages, as DemoCatalog.kt of the Android port: every tab shows the same demo
  *      sections (iOS CYLTabBarDemoSection, CYLSettingsSection), then its own badge rows (item 51).
@@ -34,10 +36,10 @@ export interface DemoAppearance {
 }
 
 export const DEMO_APPEARANCES: DemoAppearance[] = [
-  { name: 'System default', background: '#F8F8F8', shadow: '#33000000', normal: '#808080', selected: '#FF8000' },
-  { name: 'Dark', background: '#141414', shadow: '#00000000', normal: '#C0C0C0', selected: '#FFFFFF' },
-  { name: 'Centered capsule', background: '#F8F8F8', shadow: '#1F000000', normal: '#808080', selected: '#FF2D55', capsule: '#33FF2D55' },
-  { name: 'Green line', background: '#FFFFFF', shadow: '#34C759', normal: '#808080', selected: '#34C759' },
+  { name: cyl_localizationKey('原始'), background: '#F8F8F8', shadow: '#33000000', normal: '#808080', selected: '#FF8000' },
+  { name: cyl_localizationKey('深色'), background: '#141414', shadow: '#00000000', normal: '#C0C0C0', selected: '#FFFFFF' },
+  { name: cyl_localizationKey('居中胶囊'), background: '#F8F8F8', shadow: '#1F000000', normal: '#808080', selected: '#FF2D55', capsule: '#33FF2D55' },
+  { name: cyl_localizationKey('绿色描边'), background: '#FFFFFF', shadow: '#34C759', normal: '#808080', selected: '#34C759' },
 ];
 
 /** [EN] Title offsets the title offset row cycles through (vp). [CN] 标题偏移行循环使用的偏移（vp）。 */
@@ -51,4 +53,4 @@ export const DEMO_ME: string = 'CYLMineViewController';
 
 /** [EN] The language row's choices: '' follows the system. [CN] 语言行的选项：'' 跟随系统。 */
 export const DEMO_LANGUAGES: string[] = ['', 'en-Latn-US', 'zh-Hans-CN'];
-export const DEMO_LANGUAGE_NAMES: string[] = ['Follow the system', 'English', '简体中文'];
+export const DEMO_LANGUAGE_NAMES: string[] = [cyl_localizationKey('跟随系统'), 'English', '简体中文'];

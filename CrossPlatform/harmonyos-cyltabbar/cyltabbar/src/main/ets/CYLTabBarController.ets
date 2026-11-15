@@ -3,10 +3,30 @@ import { CYLTabBarItemAttributes, CYLTitleOffset } from './CYLTabBarItem';
 import { CYLPlusButton } from './CYLPlusButton';
 import { CYLBadge, CYLBadgeView } from './CYLBadge';
 import { CYLLottieIcon } from './CYLLottieIcon';
+import { CYLLocalizedString, cyl_textOf } from './CYLLocalization';
+
 import { vibrator } from '@kit.SensorServiceKit';
 import { media } from '@kit.MediaKit';
 import { audio } from '@kit.AudioKit';
 import { router } from '@kit.ArkUI';
+
+/**
+ * [EN] What a screen reader says for a badge (read as part of its host, e.g. "Messages, 99+ new messages"); '' none.
+ * [CN] 屏幕阅读器读出的角标内容（作为宿主的一部分读出）；无角标时为 ''。
+ */
+export function cyl_badgeAccessibilityText(badge: CYLBadge | undefined): string {
+  if (badge === undefined || !badge.cyl_isShowBadge()) {
+    return '';
+  }
+  const text = badge.cyl_displayText();
+  if (text === null) {
+    return CYLLocalizedString('有新内容');
+  }
+  if (/^\d+\+?$/.test(text)) {
+    return CYLLocalizedString('%@ 条新消息', text);
+  }
+  return CYLLocalizedString('Badge: %@', text);
+}
 
 /**
  * [EN] CYLTabBarMinimizeBehavior (issue #13): how the tab bar reacts when the current page scrolls.
@@ -537,6 +557,32 @@ export struct CYLTabBarController {
     return selected ? (item.selectedImage ?? item.image) : item.image;
   }
 
+  /**
+   * [EN] The accessibility label of a tab: its title (the shown one) and its badge, e.g. "Messages, 99+ new messages".
+   * [CN] Tab 的无障碍标签：标题与角标。
+   */
+  cylAccessibilityLabel(index: number): string {
+    const item = this.tabBarItemsAttributes[index];
+    const title = cyl_textOf(this.selectedIndex === index ? (item.selectedTitle ?? item.title) : item.title);
+    const label = title.length > 0 ? title : (item.identifier ?? `${index + 1}`);
+    const badge = cyl_badgeAccessibilityText(this.badges[index]);
+    return badge.length > 0 ? CYLLocalizedString('%@, %@', label, badge) : label;
+  }
+
+  /** [EN] The accessibility description: role, position and the selected state. [CN] 无障碍描述：角色、位置与选中状态。 */
+  cylAccessibilityDescription(index: number): string {
+    const position = CYLLocalizedString('Tab, %1$@ of %2$@', index + 1, this.tabBarItemsAttributes.length);
+    return this.selectedIndex === index ? CYLLocalizedString('%@, %@', position, CYLLocalizedString('选中')) : position;
+  }
+
+  /** [EN] The plus button's label: its title or "Plus button", and its badge. [CN] 加号按钮的标签。 */
+  cylPlusAccessibilityLabel(): string {
+    const title = cyl_textOf(this.plusButton?.title);
+    const label = title.length > 0 ? title : CYLLocalizedString('加号按钮');
+    const badge = cyl_badgeAccessibilityText(this.plusButtonBadge);
+    return badge.length > 0 ? CYLLocalizedString('%@, %@', label, badge) : label;
+  }
+
   cylIdentifier(index: number): string {
     if (index === CYLPlusButtonPageIndex) {
       return this.plusButton?.identifier ?? 'plus';
@@ -621,6 +667,10 @@ export struct CYLTabBarController {
     .backgroundColor(this.selectedIndex === index
       ? (this.tabBarItemsAttributes[index].selectedBackgroundColor ?? Color.Transparent)
       : (this.tabBarItemsAttributes[index].backgroundColor ?? Color.Transparent))
+    // [EN] One accessibility element per tab: icon, cover, Lottie and badge are read through it. [CN] 每个 Tab 一个无障碍元素。
+    .accessibilityGroup(true)
+    .accessibilityText(this.cylAccessibilityLabel(index))
+    .accessibilityDescription(this.cylAccessibilityDescription(index))
     .id(`cyl-tab-${this.cylIdentifier(index)}`)
     .gesture(GestureGroup(GestureMode.Exclusive,
       LongPressGesture({ duration: this.longPressDuration }).onAction(() => {
@@ -650,6 +700,7 @@ export struct CYLTabBarController {
       .height(`${Math.max(0.1, this.plusButton?.touchableAreaScale ?? 1) * 100}%`)
       .backgroundColor(this.plusButton?.touchableAreaColor ?? '#4DFF0000')
       .hitTestBehavior(HitTestMode.Transparent)
+      .accessibilityLevel('no')
       .id('cyl-plus-touchable-area')
   }
 
@@ -695,6 +746,9 @@ export struct CYLTabBarController {
     .layoutWeight(1)
     .height('100%')
     .justifyContent(FlexAlign.Center)
+    .accessibilityGroup(true)
+    .accessibilityText(this.cylPlusAccessibilityLabel())
+    .accessibilityDescription(this.selectedIndex === CYLPlusButtonPageIndex ? CYLLocalizedString('选中') : CYLLocalizedString('Double tap to open'))
     .responseRegion(this.cylPlusResponseRegion())
     .overlay(this.plusButton?.showsTouchableArea ? this.cylTouchableArea : undefined)
     .id('cyl-plus-button')

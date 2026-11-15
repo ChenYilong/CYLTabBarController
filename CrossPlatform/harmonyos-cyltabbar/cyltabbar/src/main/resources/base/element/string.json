@@ -1,8 +1,680 @@
 {
   "string": [
     {
-      "name": "cyl_library",
-      "value": "CYLTabBarController"
+      "name": "cyl_l10n_aaf9b7d7382d",
+      "value": "%@ new messages"
+    },
+    {
+      "name": "cyl_l10n_81a05b6c1cf9",
+      "value": "%@, %@"
+    },
+    {
+      "name": "cyl_l10n_0b0ae9062c5a",
+      "value": "A tab bar controller of another context, with a square plus button"
+    },
+    {
+      "name": "cyl_l10n_aa3e67bda3c0",
+      "value": "ArkUI Tabs, the HarmonyOS system tab bar, with the same tabs"
+    },
+    {
+      "name": "cyl_l10n_8665e238c516",
+      "value": "Badge: %@"
+    },
+    {
+      "name": "cyl_l10n_6b2186414c82",
+      "value": "Blink ×3"
+    },
+    {
+      "name": "cyl_l10n_070554647306",
+      "value": "Border"
+    },
+    {
+      "name": "cyl_l10n_43d3e34b15fb",
+      "value": "Border following Dark Mode"
+    },
+    {
+      "name": "cyl_l10n_b67554192c50",
+      "value": "Bottom left"
+    },
+    {
+      "name": "cyl_l10n_5968e3c37145",
+      "value": "Bottom right"
+    },
+    {
+      "name": "cyl_l10n_5d60263416c2",
+      "value": "Bounce (forever)"
+    },
+    {
+      "name": "cyl_l10n_f3ce1baf4805",
+      "value": "Bounce ×3 (cyl_bounceAnimationRepeatTimes)"
+    },
+    {
+      "name": "cyl_l10n_0875a57843a1",
+      "value": "Breathe (forever)"
+    },
+    {
+      "name": "cyl_l10n_8795570ddeef",
+      "value": "CYLTabBarItemBackgroundColor / CYLTabBarItemSelectedBackgroundColor"
+    },
+    {
+      "name": "cyl_l10n_132201f60522",
+      "value": "CYLUtils weak associated objects and finding a button (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_fa3d06c1b1e9",
+      "value": "CYLFlatDesignTabBarItem: not centered (system style)"
+    },
+    {
+      "name": "cyl_l10n_5e74163d3804",
+      "value": "CYLFlatDesignTabBarItem: centered"
+    },
+    {
+      "name": "cyl_l10n_158b3b19e868",
+      "value": "Corner radius"
+    },
+    {
+      "name": "cyl_l10n_4d242c36821c",
+      "value": "Custom colors"
+    },
+    {
+      "name": "cyl_l10n_4685555ab484",
+      "value": "Custom font"
+    },
+    {
+      "name": "cyl_l10n_a45350c25311",
+      "value": "Custom maximum (9)"
+    },
+    {
+      "name": "cyl_l10n_bf0576472e31",
+      "value": "Double tap to open"
+    },
+    {
+      "name": "cyl_l10n_7e0a1ad9a767",
+      "value": "Fade in once"
+    },
+    {
+      "name": "cyl_l10n_026b984bb8d8",
+      "value": "Flip ×2"
+    },
+    {
+      "name": "cyl_l10n_c5d4cd682981",
+      "value": "GIF icon"
+    },
+    {
+      "name": "cyl_l10n_d52d30723b2f",
+      "value": "Left to right once"
+    },
+    {
+      "name": "cyl_l10n_2e8e48a2ebfd",
+      "value": "Long press a tab or the plus button"
+    },
+    {
+      "name": "cyl_l10n_983696096694",
+      "value": "Margin"
+    },
+    {
+      "name": "cyl_l10n_24d459a81449",
+      "value": "NEW"
+    },
+    {
+      "name": "cyl_l10n_03c2e7e41ffc",
+      "value": "New"
+    },
+    {
+      "name": "cyl_l10n_1e8f217bdf71",
+      "value": "Next tab (cyl_selectNextTab, issue #535)"
+    },
+    {
+      "name": "cyl_l10n_b2ee912b91d6",
+      "value": "Number"
+    },
+    {
+      "name": "cyl_l10n_ab7fa33c83b1",
+      "value": "Number above maximum"
+    },
+    {
+      "name": "cyl_l10n_e0aa021e21dd",
+      "value": "OK"
+    },
+    {
+      "name": "cyl_l10n_287e78fd65af",
+      "value": "Other text"
+    },
+    {
+      "name": "cyl_l10n_41b77539cc64",
+      "value": "PlusButton image loaded later"
+    },
+    {
+      "name": "cyl_l10n_72a245189eaf",
+      "value": "PlusButton touchable area (issue #91)"
+    },
+    {
+      "name": "cyl_l10n_9a1d72fdd764",
+      "value": "Previous tab (cyl_selectPreviousTab, issue #535)"
+    },
+    {
+      "name": "cyl_l10n_4b0282f4f1c6",
+      "value": "Push to a system UITabBarController (another plus button)"
+    },
+    {
+      "name": "cyl_l10n_e5416d3ed3c0",
+      "value": "Push to another CYLTabBarController (another PlusButton)"
+    },
+    {
+      "name": "cyl_l10n_8c96672c9bc5",
+      "value": "Push a TabBarController with the same context (same plus button class)"
+    },
+    {
+      "name": "cyl_l10n_6166b27ea14b",
+      "value": "Push a TabBarController with a new context (PlusButton with a tappable X subview, issue #202)"
+    },
+    {
+      "name": "cyl_l10n_a63e8b745e73",
+      "value": "Pushes a page that hides the navigation bar while shown, with no base class"
+    },
+    {
+      "name": "cyl_l10n_79fe28f3a3ac",
+      "value": "Pushes a tab bar controller whose plus button image changes 2 s later; the layout must not move"
+    },
+    {
+      "name": "cyl_l10n_c27618b1aa9d",
+      "value": "Red dot"
+    },
+    {
+      "name": "cyl_l10n_255c00a63f9d",
+      "value": "Red dot radius"
+    },
+    {
+      "name": "cyl_l10n_7aac5e07b16d",
+      "value": "Right to left once"
+    },
+    {
+      "name": "cyl_l10n_f0c792c049bc",
+      "value": "Rolling once"
+    },
+    {
+      "name": "cyl_l10n_401ea21c7a44",
+      "value": "Rotation (forever)"
+    },
+    {
+      "name": "cyl_l10n_b5fcd68edd9f",
+      "value": "Scale (forever)"
+    },
+    {
+      "name": "cyl_l10n_544d03258eaf",
+      "value": "Scale once"
+    },
+    {
+      "name": "cyl_l10n_dbd4f5e49888",
+      "value": "Scale ×3"
+    },
+    {
+      "name": "cyl_l10n_9ae56cc36e81",
+      "value": "Shake (forever)"
+    },
+    {
+      "name": "cyl_l10n_e0a90124b72f",
+      "value": "Shake ×3 (cyl_shakeAnimationRepeatTimes)"
+    },
+    {
+      "name": "cyl_l10n_b10d33d5ad4d",
+      "value": "Shake, stops with Reduce Motion"
+    },
+    {
+      "name": "cyl_l10n_6cbe015b00fb",
+      "value": "Show / hide CYLFlatDesignTabBar"
+    },
+    {
+      "name": "cyl_l10n_3cb58e0d546d",
+      "value": "Spring (forever)"
+    },
+    {
+      "name": "cyl_l10n_0a00b2238071",
+      "value": "Spring once"
+    },
+    {
+      "name": "cyl_l10n_fee4a478923f",
+      "value": "Tab interactions"
+    },
+    {
+      "name": "cyl_l10n_98559580dcc7",
+      "value": "Tab tap animation (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_db89836d6e21",
+      "value": "Tab tap sound and haptics (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_2f6e866d5219",
+      "value": "Tab pages, selection and login"
+    },
+    {
+      "name": "cyl_l10n_6d067090c833",
+      "value": "Tab, %1$@ of %2$@"
+    },
+    {
+      "name": "cyl_l10n_75ccb7ef4864",
+      "value": "Tab bar appearance"
+    },
+    {
+      "name": "cyl_l10n_2e6d648945c0",
+      "value": "The plus button sticks out of the bar; its part above the bar responds (shown in red)"
+    },
+    {
+      "name": "cyl_l10n_f43b06c12ee1",
+      "value": "The system bar has no plus button: a floating button stands in"
+    },
+    {
+      "name": "cyl_l10n_a4d0d101d6a3",
+      "value": "Top left"
+    },
+    {
+      "name": "cyl_l10n_2306a585ae00",
+      "value": "cyl_itemEdgeInsets: 15% of a tab width free at each end"
+    },
+    {
+      "name": "cyl_l10n_fd15e88376df",
+      "value": "cyl_pop / cyl_push method demo"
+    },
+    {
+      "name": "cyl_l10n_1ec113617309",
+      "value": "cyl_pushViewController, cyl_popSelectTabBarChildViewControllerAtIndex, cyl_pushOrPopToViewController"
+    },
+    {
+      "name": "cyl_l10n_ee5b6ac6461b",
+      "value": "selectedIndex and the PlusButton (issue #515)"
+    },
+    {
+      "name": "cyl_l10n_2de6d572f86b",
+      "value": "standardAppearance theme (shared by Liquid Glass and FlatDesign)"
+    },
+    {
+      "name": "cyl_l10n_2a0608059131",
+      "value": "Updates the titles of all tabs at once; tap again to restore"
+    },
+    {
+      "name": "cyl_l10n_57196013d558",
+      "value": "Halloween"
+    },
+    {
+      "name": "cyl_l10n_0a58c230c3d9",
+      "value": "Downloads and updates the icons of all tabs; tap again to restore the initial icons"
+    },
+    {
+      "name": "cyl_l10n_5e347d8ccb68",
+      "value": "Download network icon"
+    },
+    {
+      "name": "cyl_l10n_2e0e84a0dcfb",
+      "value": "Hide the navigation bar without a base class (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_e1642a46b804",
+      "value": "Mid-Autumn"
+    },
+    {
+      "name": "cyl_l10n_0c2817d10627",
+      "value": "Medium haptic"
+    },
+    {
+      "name": "cyl_l10n_0f60774903e0",
+      "value": "Load images from a bundle (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_0e1b02648a11",
+      "value": "Zoom in"
+    },
+    {
+      "name": "cyl_l10n_cc03f47a389c",
+      "value": "Downloads this page's tab icon from the network (cached); tap again to restore"
+    },
+    {
+      "name": "cyl_l10n_24fb8692947a",
+      "value": "kept"
+    },
+    {
+      "name": "cyl_l10n_b15d91274e9f",
+      "value": "Close"
+    },
+    {
+      "name": "cyl_l10n_70922c50ef07",
+      "value": "Memory warning"
+    },
+    {
+      "name": "cyl_l10n_cbed6b29761b",
+      "value": "Plus button"
+    },
+    {
+      "name": "cyl_l10n_18684d72945b",
+      "value": "Load the image"
+    },
+    {
+      "name": "cyl_l10n_b981b7b359a7",
+      "value": "Load a background image"
+    },
+    {
+      "name": "cyl_l10n_7136049eb4c7",
+      "value": "Unloads unselected tabs; they load again when selected"
+    },
+    {
+      "name": "cyl_l10n_c7626d7d6194",
+      "value": "Changes this page's tab title in place; tap again to restore"
+    },
+    {
+      "name": "cyl_l10n_15fb093f6fff",
+      "value": "Update tabs in place"
+    },
+    {
+      "name": "cyl_l10n_c1ecedab11bc",
+      "value": "Original"
+    },
+    {
+      "name": "cyl_l10n_625fb26b4b33",
+      "value": "Cancel"
+    },
+    {
+      "name": "cyl_l10n_d25efeb790bb",
+      "value": "Nearby"
+    },
+    {
+      "name": "cyl_l10n_7941d8987ff2",
+      "value": "Compare with the system UITabBar"
+    },
+    {
+      "name": "cyl_l10n_d0d78acf1941",
+      "value": "Christmas"
+    },
+    {
+      "name": "cyl_l10n_aa91e8ceec70",
+      "value": "Easter"
+    },
+    {
+      "name": "cyl_l10n_3df20a295b39",
+      "value": "Summer"
+    },
+    {
+      "name": "cyl_l10n_0ef6dae7e80c",
+      "value": "Space"
+    },
+    {
+      "name": "cyl_l10n_bccc798b577a",
+      "value": "Centered capsule"
+    },
+    {
+      "name": "cyl_l10n_7c87af044929",
+      "value": "Swipe to switch tabs (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_7a2261654d24",
+      "value": "unloaded"
+    },
+    {
+      "name": "cyl_l10n_091885db07e4",
+      "value": "Bounce"
+    },
+    {
+      "name": "cyl_l10n_758903c327de",
+      "value": "Shows an animated GIF as this page's tab icon; tap again to restore"
+    },
+    {
+      "name": "cyl_l10n_c4328f75476f",
+      "value": "Valentine's Day"
+    },
+    {
+      "name": "cyl_l10n_07b181184280",
+      "value": "Me"
+    },
+    {
+      "name": "cyl_l10n_a01539048bb0",
+      "value": "Turn the switch on, then long-press any tab or the PlusButton to see its identifier."
+    },
+    {
+      "name": "cyl_l10n_633c2ee4dcc7",
+      "value": "Change all network icons"
+    },
+    {
+      "name": "cyl_l10n_f75fe6720861",
+      "value": "Change all local icons"
+    },
+    {
+      "name": "cyl_l10n_7fb5208a54d5",
+      "value": "Change all titles"
+    },
+    {
+      "name": "cyl_l10n_2f728e190695",
+      "value": "Shows other pages in the tabs on both sides of this tab (issue #481); tap again to restore"
+    },
+    {
+      "name": "cyl_l10n_0be5a194844c",
+      "value": "Skin"
+    },
+    {
+      "name": "cyl_l10n_61a9cd33b1ff",
+      "value": "Skin (theme, issue #216)"
+    },
+    {
+      "name": "cyl_l10n_09d0fdddca66",
+      "value": "Skins: holidays and colors (%@)"
+    },
+    {
+      "name": "cyl_l10n_a0ffdf359138",
+      "value": "Change CYLFlatDesignTabBar height"
+    },
+    {
+      "name": "cyl_l10n_01e3254a92ba",
+      "value": "Scale up and down"
+    },
+    {
+      "name": "cyl_l10n_d46d5bb15db1",
+      "value": "New Year"
+    },
+    {
+      "name": "cyl_l10n_79b5a6564585",
+      "value": "Rotate"
+    },
+    {
+      "name": "cyl_l10n_d81bb206a889",
+      "value": "None"
+    },
+    {
+      "name": "cyl_l10n_14f433db2189",
+      "value": "No base class, and helpers"
+    },
+    {
+      "name": "cyl_l10n_d2339bb4edaa",
+      "value": "Spring Festival"
+    },
+    {
+      "name": "cyl_l10n_5f1de850fb46",
+      "value": "Change tab title"
+    },
+    {
+      "name": "cyl_l10n_9d0d66f312b5",
+      "value": "Replace with a larger image"
+    },
+    {
+      "name": "cyl_l10n_b051a19ace76",
+      "value": "Replace neighboring tabs"
+    },
+    {
+      "name": "cyl_l10n_a131e4f178aa",
+      "value": "New content"
+    },
+    {
+      "name": "cyl_l10n_467b3e031441",
+      "value": "not loaded"
+    },
+    {
+      "name": "cyl_l10n_2c8d9e877a54",
+      "value": "Title offset (titlePositionAdjustment)"
+    },
+    {
+      "name": "cyl_l10n_0787cd518387",
+      "value": "Simulate memory warning"
+    },
+    {
+      "name": "cyl_l10n_6a00c1ae99fa",
+      "value": "Ocean"
+    },
+    {
+      "name": "cyl_l10n_ff692f04ace0",
+      "value": "Messages"
+    },
+    {
+      "name": "cyl_l10n_41e8e8b9935c",
+      "value": "Dark"
+    },
+    {
+      "name": "cyl_l10n_8dfe6bcdd6ec",
+      "value": "Slide transition (CYLTabBarSlideTransitionAnimator)"
+    },
+    {
+      "name": "cyl_l10n_9f44bafc75c6",
+      "value": "Minimize / hide the TabBar on scroll (issue #13)"
+    },
+    {
+      "name": "cyl_l10n_678abebe6aac",
+      "value": "Tap the X at the PlusButton's top right: the X changes to a random color, the PlusButton does not react"
+    },
+    {
+      "name": "cyl_l10n_7375af54db2a",
+      "value": "Tap to switch the tap animation of the tabs and the PlusButton. Now: %@"
+    },
+    {
+      "name": "cyl_l10n_5378f31b520c",
+      "value": "Tap to switch tabBar.standardAppearance, current: %@"
+    },
+    {
+      "name": "cyl_l10n_4a986e4da535",
+      "value": "Tap to switch the vertical offset of all tab titles, current: %@"
+    },
+    {
+      "name": "cyl_l10n_3d0d9d3d7cc2",
+      "value": "Tap to change the language"
+    },
+    {
+      "name": "cyl_l10n_f4e41dda1094",
+      "value": "Tap to switch, then tap any tab or the PlusButton to hear it. Haptics vibrate on a real device only. Now: %@"
+    },
+    {
+      "name": "cyl_l10n_15855ab96e87",
+      "value": "Click + haptic"
+    },
+    {
+      "name": "cyl_l10n_cff8a9cded04",
+      "value": "Tap to pick a theme: the TabBar background, icons and text colors change in place, in every TabBar style. Now: %@"
+    },
+    {
+      "name": "cyl_l10n_1c00c4fd1cea",
+      "value": "Pink Rose"
+    },
+    {
+      "name": "cyl_l10n_8483ed132b2c",
+      "value": "Birthday"
+    },
+    {
+      "name": "cyl_l10n_feef14745f21",
+      "value": "Updates the icons of all tabs with local images (name, file path, UIImage, file URL); tap again to restore"
+    },
+    {
+      "name": "cyl_l10n_402d19e50fff",
+      "value": "Log in"
+    },
+    {
+      "name": "cyl_l10n_833152116634",
+      "value": "Remove the image"
+    },
+    {
+      "name": "cyl_l10n_a0676a7d84a9",
+      "value": "Green line"
+    },
+    {
+      "name": "cyl_l10n_16068b2ff3fd",
+      "value": "Network icons"
+    },
+    {
+      "name": "cyl_l10n_69ca6555a602",
+      "value": "Flip"
+    },
+    {
+      "name": "cyl_l10n_4bd51044149f",
+      "value": "Custom sound file (cyl_tabButtonTapSoundURL)"
+    },
+    {
+      "name": "cyl_l10n_beabcd498b94",
+      "value": "Grapefruit"
+    },
+    {
+      "name": "cyl_l10n_b8c467fce096",
+      "value": "Badges"
+    },
+    {
+      "name": "cyl_l10n_200e65177369",
+      "value": "Set CYLFlatDesignTabBarItem background color"
+    },
+    {
+      "name": "cyl_l10n_295bb704f520",
+      "value": "Language"
+    },
+    {
+      "name": "cyl_l10n_d673e0eb5c1c",
+      "value": "Respond outside the superview (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_71bbc726ace5",
+      "value": "Follow system"
+    },
+    {
+      "name": "cyl_l10n_d0914cf6acd2",
+      "value": "Navigation and comparisons"
+    },
+    {
+      "name": "cyl_l10n_110abc875180",
+      "value": "Light haptic"
+    },
+    {
+      "name": "cyl_l10n_fad7c8a21fe3",
+      "value": "Selected"
+    },
+    {
+      "name": "cyl_l10n_aa05fd09a619",
+      "value": "General"
+    },
+    {
+      "name": "cyl_l10n_15c64aa0b404",
+      "value": "Configuration file"
+    },
+    {
+      "name": "cyl_l10n_45158907e07f",
+      "value": "Heavy haptic"
+    },
+    {
+      "name": "cyl_l10n_d6982fecc6a4",
+      "value": "Long press on tabs (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_aefae51d3c25",
+      "value": "Long-pressed \"%@\""
+    },
+    {
+      "name": "cyl_l10n_abad1baa5479",
+      "value": "Long press duration and double tap interval (issue #535 / #152)"
+    },
+    {
+      "name": "cyl_l10n_b146fc1a1531",
+      "value": "Grass"
+    },
+    {
+      "name": "cyl_l10n_db1c89e0f6e6",
+      "value": "Home"
+    },
+    {
+      "name": "cyl_l10n_18c63459a2c0",
+      "value": "Default"
+    },
+    {
+      "name": "cyl_l10n_be354ee4263a",
+      "value": "Default click"
     }
   ]
 }

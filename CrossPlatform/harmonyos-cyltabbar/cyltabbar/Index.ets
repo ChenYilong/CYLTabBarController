@@ -27,3 +27,8 @@ export {
 export {
   CYLThemeManager, CYLThemeManagerCenter, CYLThemeManagerNameDefault, CYLThemeDidChangeListener
 } from './src/main/ets/CYLThemeManager';
+export {
+  CYLLocalizedString, cyl_localizationKey, cyl_setLocalizationContext, cyl_textOf, CYLLocalizationLanguage,
+  CYLSetLocalizationLanguage, cyl_addLocalizationLanguageListener, cyl_removeLocalizationLanguageListener, cyl_pickerLanguages
+} from './src/main/ets/CYLLocalization';
+export { cyl_badgeAccessibilityText } from './src/main/ets/CYLTabBarController';

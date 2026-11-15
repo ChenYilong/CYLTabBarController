@@ -1,0 +1,680 @@
+{
+  "string": [
+    {
+      "name": "cyl_l10n_aaf9b7d7382d",
+      "value": "%@ uutta viestiä"
+    },
+    {
+      "name": "cyl_l10n_81a05b6c1cf9",
+      "value": "%@, %@"
+    },
+    {
+      "name": "cyl_l10n_0b0ae9062c5a",
+      "value": "A tab bar controller of another context, with a square plus button"
+    },
+    {
+      "name": "cyl_l10n_aa3e67bda3c0",
+      "value": "ArkUI Tabs, the HarmonyOS system tab bar, with the same tabs"
+    },
+    {
+      "name": "cyl_l10n_8665e238c516",
+      "value": "Badge: %@"
+    },
+    {
+      "name": "cyl_l10n_6b2186414c82",
+      "value": "Vilkku ×3"
+    },
+    {
+      "name": "cyl_l10n_070554647306",
+      "value": "Reunus"
+    },
+    {
+      "name": "cyl_l10n_43d3e34b15fb",
+      "value": "Tummaa tilaa seuraava reunus"
+    },
+    {
+      "name": "cyl_l10n_b67554192c50",
+      "value": "Vasen alakulma"
+    },
+    {
+      "name": "cyl_l10n_5968e3c37145",
+      "value": "Oikea alakulma"
+    },
+    {
+      "name": "cyl_l10n_5d60263416c2",
+      "value": "Pomppu (jatkuva)"
+    },
+    {
+      "name": "cyl_l10n_f3ce1baf4805",
+      "value": "Pomppu ×3 (cyl_bounceAnimationRepeatTimes)"
+    },
+    {
+      "name": "cyl_l10n_0875a57843a1",
+      "value": "Hengitys (jatkuva)"
+    },
+    {
+      "name": "cyl_l10n_8795570ddeef",
+      "value": "CYLTabBarItemBackgroundColor / CYLTabBarItemSelectedBackgroundColor"
+    },
+    {
+      "name": "cyl_l10n_132201f60522",
+      "value": "CYLUtils: heikot liitetyt oliot ja painikkeen etsiminen (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_fa3d06c1b1e9",
+      "value": "CYLFlatDesignTabBarItem: ei keskitetty (järjestelmätyyli)"
+    },
+    {
+      "name": "cyl_l10n_5e74163d3804",
+      "value": "CYLFlatDesignTabBarItem: keskitetty"
+    },
+    {
+      "name": "cyl_l10n_158b3b19e868",
+      "value": "Kulman säde"
+    },
+    {
+      "name": "cyl_l10n_4d242c36821c",
+      "value": "Omat värit"
+    },
+    {
+      "name": "cyl_l10n_4685555ab484",
+      "value": "Oma fontti"
+    },
+    {
+      "name": "cyl_l10n_a45350c25311",
+      "value": "Oma enimmäismäärä (9)"
+    },
+    {
+      "name": "cyl_l10n_bf0576472e31",
+      "value": "Double tap to open"
+    },
+    {
+      "name": "cyl_l10n_7e0a1ad9a767",
+      "value": "Häivytys sisään kerran"
+    },
+    {
+      "name": "cyl_l10n_026b984bb8d8",
+      "value": "Käännä ×2"
+    },
+    {
+      "name": "cyl_l10n_c5d4cd682981",
+      "value": "GIF-kuvake"
+    },
+    {
+      "name": "cyl_l10n_d52d30723b2f",
+      "value": "Vasemmalta oikealle kerran"
+    },
+    {
+      "name": "cyl_l10n_2e8e48a2ebfd",
+      "value": "Long press a tab or the plus button"
+    },
+    {
+      "name": "cyl_l10n_983696096694",
+      "value": "Marginaali"
+    },
+    {
+      "name": "cyl_l10n_24d459a81449",
+      "value": "UUSI"
+    },
+    {
+      "name": "cyl_l10n_03c2e7e41ffc",
+      "value": "Uusi"
+    },
+    {
+      "name": "cyl_l10n_1e8f217bdf71",
+      "value": "Next tab (cyl_selectNextTab, issue #535)"
+    },
+    {
+      "name": "cyl_l10n_b2ee912b91d6",
+      "value": "Numero"
+    },
+    {
+      "name": "cyl_l10n_ab7fa33c83b1",
+      "value": "Numero yli enimmäismäärän"
+    },
+    {
+      "name": "cyl_l10n_e0aa021e21dd",
+      "value": "OK"
+    },
+    {
+      "name": "cyl_l10n_287e78fd65af",
+      "value": "Muu teksti"
+    },
+    {
+      "name": "cyl_l10n_41b77539cc64",
+      "value": "PlusButton-kuva ladataan myöhemmin"
+    },
+    {
+      "name": "cyl_l10n_72a245189eaf",
+      "value": "PlusButtonin kosketusalue (issue #91)"
+    },
+    {
+      "name": "cyl_l10n_9a1d72fdd764",
+      "value": "Previous tab (cyl_selectPreviousTab, issue #535)"
+    },
+    {
+      "name": "cyl_l10n_4b0282f4f1c6",
+      "value": "Push järjestelmän UITabBarControlleriin (toinen plus-painike)"
+    },
+    {
+      "name": "cyl_l10n_e5416d3ed3c0",
+      "value": "Push to another CYLTabBarController (another PlusButton)"
+    },
+    {
+      "name": "cyl_l10n_8c96672c9bc5",
+      "value": "Push TabBarController, jolla sama context (sama plus-painikeluokka)"
+    },
+    {
+      "name": "cyl_l10n_6166b27ea14b",
+      "value": "Näytä TabBarController uudella kontekstilla (PlusButton, jossa napautettava X-alinäkymä, issue #202)"
+    },
+    {
+      "name": "cyl_l10n_a63e8b745e73",
+      "value": "Pushes a page that hides the navigation bar while shown, with no base class"
+    },
+    {
+      "name": "cyl_l10n_79fe28f3a3ac",
+      "value": "Pushes a tab bar controller whose plus button image changes 2 s later; the layout must not move"
+    },
+    {
+      "name": "cyl_l10n_c27618b1aa9d",
+      "value": "Punainen piste"
+    },
+    {
+      "name": "cyl_l10n_255c00a63f9d",
+      "value": "Punaisen pisteen säde"
+    },
+    {
+      "name": "cyl_l10n_7aac5e07b16d",
+      "value": "Oikealta vasemmalle kerran"
+    },
+    {
+      "name": "cyl_l10n_f0c792c049bc",
+      "value": "Vieritys kerran"
+    },
+    {
+      "name": "cyl_l10n_401ea21c7a44",
+      "value": "Kierto (jatkuva)"
+    },
+    {
+      "name": "cyl_l10n_b5fcd68edd9f",
+      "value": "Skaalaus (jatkuva)"
+    },
+    {
+      "name": "cyl_l10n_544d03258eaf",
+      "value": "Skaalaus kerran"
+    },
+    {
+      "name": "cyl_l10n_dbd4f5e49888",
+      "value": "Skaalaus ×3"
+    },
+    {
+      "name": "cyl_l10n_9ae56cc36e81",
+      "value": "Ravistus (jatkuva)"
+    },
+    {
+      "name": "cyl_l10n_e0a90124b72f",
+      "value": "Ravistus ×3 (cyl_shakeAnimationRepeatTimes)"
+    },
+    {
+      "name": "cyl_l10n_b10d33d5ad4d",
+      "value": "Ravistus, pysähtyy Vähennä liikettä -asetuksella"
+    },
+    {
+      "name": "cyl_l10n_6cbe015b00fb",
+      "value": "Näytä / piilota CYLFlatDesignTabBar"
+    },
+    {
+      "name": "cyl_l10n_3cb58e0d546d",
+      "value": "Jousi (jatkuva)"
+    },
+    {
+      "name": "cyl_l10n_0a00b2238071",
+      "value": "Jousi kerran"
+    },
+    {
+      "name": "cyl_l10n_fee4a478923f",
+      "value": "Välilehtien vuorovaikutus"
+    },
+    {
+      "name": "cyl_l10n_98559580dcc7",
+      "value": "Välilehtien napautusanimaatio (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_db89836d6e21",
+      "value": "Välilehden napautusääni ja haptiikka (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_2f6e866d5219",
+      "value": "Välilehtisivut, valinta ja kirjautuminen"
+    },
+    {
+      "name": "cyl_l10n_6d067090c833",
+      "value": "Tab, %1$@ of %2$@"
+    },
+    {
+      "name": "cyl_l10n_75ccb7ef4864",
+      "value": "Välilehtipalkin ulkoasu"
+    },
+    {
+      "name": "cyl_l10n_2e6d648945c0",
+      "value": "The plus button sticks out of the bar; its part above the bar responds (shown in red)"
+    },
+    {
+      "name": "cyl_l10n_f43b06c12ee1",
+      "value": "The system bar has no plus button: a floating button stands in"
+    },
+    {
+      "name": "cyl_l10n_a4d0d101d6a3",
+      "value": "Vasen yläkulma"
+    },
+    {
+      "name": "cyl_l10n_2306a585ae00",
+      "value": "cyl_itemEdgeInsets: 15% of a tab width free at each end"
+    },
+    {
+      "name": "cyl_l10n_fd15e88376df",
+      "value": "cyl_pop / cyl_push -metodien demo"
+    },
+    {
+      "name": "cyl_l10n_1ec113617309",
+      "value": "cyl_pushViewController, cyl_popSelectTabBarChildViewControllerAtIndex, cyl_pushOrPopToViewController"
+    },
+    {
+      "name": "cyl_l10n_ee5b6ac6461b",
+      "value": "selectedIndex ja PlusButton (issue #515)"
+    },
+    {
+      "name": "cyl_l10n_2de6d572f86b",
+      "value": "standardAppearance-teema (yhteinen Liquid Glassille ja FlatDesignille)"
+    },
+    {
+      "name": "cyl_l10n_2a0608059131",
+      "value": "Päivittää kaikkien välilehtien otsikot kerralla; palauta napauttamalla uudelleen"
+    },
+    {
+      "name": "cyl_l10n_57196013d558",
+      "value": "Halloween"
+    },
+    {
+      "name": "cyl_l10n_0a58c230c3d9",
+      "value": "Lataa ja päivittää kaikkien välilehtien kuvakkeet; palauta napauttamalla uudelleen"
+    },
+    {
+      "name": "cyl_l10n_5e347d8ccb68",
+      "value": "Lataa kuvake verkosta"
+    },
+    {
+      "name": "cyl_l10n_2e0e84a0dcfb",
+      "value": "Piilota navigointipalkki ilman kantaluokkaa (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_e1642a46b804",
+      "value": "Keskisyksyn juhla"
+    },
+    {
+      "name": "cyl_l10n_0c2817d10627",
+      "value": "Keskivahva haptinen palaute"
+    },
+    {
+      "name": "cyl_l10n_0f60774903e0",
+      "value": "Lataa kuvia bundlesta (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_0e1b02648a11",
+      "value": "Lähennä"
+    },
+    {
+      "name": "cyl_l10n_cc03f47a389c",
+      "value": "Lataa välilehden kuvakkeen verkosta (välimuistiin); palauta napauttamalla uudelleen"
+    },
+    {
+      "name": "cyl_l10n_24fb8692947a",
+      "value": "säilytetty"
+    },
+    {
+      "name": "cyl_l10n_b15d91274e9f",
+      "value": "Sulje"
+    },
+    {
+      "name": "cyl_l10n_70922c50ef07",
+      "value": "Muistivaroitus"
+    },
+    {
+      "name": "cyl_l10n_cbed6b29761b",
+      "value": "Plus-painike"
+    },
+    {
+      "name": "cyl_l10n_18684d72945b",
+      "value": "Lataa kuva"
+    },
+    {
+      "name": "cyl_l10n_b981b7b359a7",
+      "value": "Lataa taustakuva"
+    },
+    {
+      "name": "cyl_l10n_7136049eb4c7",
+      "value": "Vapauttaa valitsemattomat välilehdet; ne ladataan uudelleen valittaessa"
+    },
+    {
+      "name": "cyl_l10n_c7626d7d6194",
+      "value": "Muuttaa tämän sivun välilehden otsikon paikallaan; palauta napauttamalla uudelleen"
+    },
+    {
+      "name": "cyl_l10n_15fb093f6fff",
+      "value": "Päivitä välilehdet paikallaan"
+    },
+    {
+      "name": "cyl_l10n_c1ecedab11bc",
+      "value": "Alkuperäinen"
+    },
+    {
+      "name": "cyl_l10n_625fb26b4b33",
+      "value": "Kumoa"
+    },
+    {
+      "name": "cyl_l10n_d25efeb790bb",
+      "value": "Lähellä"
+    },
+    {
+      "name": "cyl_l10n_7941d8987ff2",
+      "value": "Vertaa järjestelmän UITabBariin"
+    },
+    {
+      "name": "cyl_l10n_d0d78acf1941",
+      "value": "Joulu"
+    },
+    {
+      "name": "cyl_l10n_aa91e8ceec70",
+      "value": "Pääsiäinen"
+    },
+    {
+      "name": "cyl_l10n_3df20a295b39",
+      "value": "Kesä"
+    },
+    {
+      "name": "cyl_l10n_0ef6dae7e80c",
+      "value": "Avaruus"
+    },
+    {
+      "name": "cyl_l10n_bccc798b577a",
+      "value": "Keskitetty kapseli"
+    },
+    {
+      "name": "cyl_l10n_7c87af044929",
+      "value": "Vaihda välilehteä pyyhkäisemällä (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_7a2261654d24",
+      "value": "vapautettu"
+    },
+    {
+      "name": "cyl_l10n_091885db07e4",
+      "value": "Pomppu"
+    },
+    {
+      "name": "cyl_l10n_758903c327de",
+      "value": "Näyttää animoidun GIF-kuvan välilehden kuvakkeena; palauta napauttamalla uudelleen"
+    },
+    {
+      "name": "cyl_l10n_c4328f75476f",
+      "value": "Ystävänpäivä"
+    },
+    {
+      "name": "cyl_l10n_07b181184280",
+      "value": "Minä"
+    },
+    {
+      "name": "cyl_l10n_a01539048bb0",
+      "value": "Ota kytkin käyttöön ja paina pitkään välilehteä tai PlusButtonia nähdäksesi sen tunnisteen."
+    },
+    {
+      "name": "cyl_l10n_633c2ee4dcc7",
+      "value": "Vaihda kaikki verkkokuvakkeet"
+    },
+    {
+      "name": "cyl_l10n_f75fe6720861",
+      "value": "Vaihda kaikki paikalliset kuvakkeet"
+    },
+    {
+      "name": "cyl_l10n_7fb5208a54d5",
+      "value": "Muuta kaikki otsikot"
+    },
+    {
+      "name": "cyl_l10n_2f728e190695",
+      "value": "Näyttää muita sivuja tämän välilehden molemmin puolin (issue #481); palauta napauttamalla uudelleen"
+    },
+    {
+      "name": "cyl_l10n_0be5a194844c",
+      "value": "Ulkoasu"
+    },
+    {
+      "name": "cyl_l10n_61a9cd33b1ff",
+      "value": "Ulkoasu (teema, issue #216)"
+    },
+    {
+      "name": "cyl_l10n_09d0fdddca66",
+      "value": "Ulkoasut: juhlapyhät ja värit (%@)"
+    },
+    {
+      "name": "cyl_l10n_a0ffdf359138",
+      "value": "Muuta CYLFlatDesignTabBarin korkeutta"
+    },
+    {
+      "name": "cyl_l10n_01e3254a92ba",
+      "value": "Suurenna ja pienennä"
+    },
+    {
+      "name": "cyl_l10n_d46d5bb15db1",
+      "value": "Uusivuosi"
+    },
+    {
+      "name": "cyl_l10n_79b5a6564585",
+      "value": "Kierrä"
+    },
+    {
+      "name": "cyl_l10n_d81bb206a889",
+      "value": "Ei mitään"
+    },
+    {
+      "name": "cyl_l10n_14f433db2189",
+      "value": "Ilman perusluokkaa, ja apuvälineet"
+    },
+    {
+      "name": "cyl_l10n_d2339bb4edaa",
+      "value": "Kevätjuhla"
+    },
+    {
+      "name": "cyl_l10n_5f1de850fb46",
+      "value": "Muuta välilehden otsikkoa"
+    },
+    {
+      "name": "cyl_l10n_9d0d66f312b5",
+      "value": "Korvaa suuremmalla kuvalla"
+    },
+    {
+      "name": "cyl_l10n_b051a19ace76",
+      "value": "Korvaa viereiset välilehdet"
+    },
+    {
+      "name": "cyl_l10n_a131e4f178aa",
+      "value": "Uutta sisältöä"
+    },
+    {
+      "name": "cyl_l10n_467b3e031441",
+      "value": "ei ladattu"
+    },
+    {
+      "name": "cyl_l10n_2c8d9e877a54",
+      "value": "Otsikon siirtymä (titlePositionAdjustment)"
+    },
+    {
+      "name": "cyl_l10n_0787cd518387",
+      "value": "Simuloi muistivaroitus"
+    },
+    {
+      "name": "cyl_l10n_6a00c1ae99fa",
+      "value": "Valtameri"
+    },
+    {
+      "name": "cyl_l10n_ff692f04ace0",
+      "value": "Viestit"
+    },
+    {
+      "name": "cyl_l10n_41e8e8b9935c",
+      "value": "Tumma"
+    },
+    {
+      "name": "cyl_l10n_8dfe6bcdd6ec",
+      "value": "Liukuva siirtymä (CYLTabBarSlideTransitionAnimator)"
+    },
+    {
+      "name": "cyl_l10n_9f44bafc75c6",
+      "value": "Pienennä / piilota TabBar vieritettäessä (issue #13)"
+    },
+    {
+      "name": "cyl_l10n_678abebe6aac",
+      "value": "Napauta PlusButtonin oikean yläkulman X:ää: X vaihtaa satunnaiseen väriin, eikä PlusButton reagoi"
+    },
+    {
+      "name": "cyl_l10n_7375af54db2a",
+      "value": "Napauta vaihtaaksesi välilehtien ja PlusButtonin napautusanimaation. Nyt: %@"
+    },
+    {
+      "name": "cyl_l10n_5378f31b520c",
+      "value": "Napauta vaihtaaksesi tabBar.standardAppearance, nykyinen: %@"
+    },
+    {
+      "name": "cyl_l10n_4a986e4da535",
+      "value": "Napauta vaihtaaksesi kaikkien välilehtien otsikoiden pystysiirtymää, nykyinen: %@"
+    },
+    {
+      "name": "cyl_l10n_3d0d9d3d7cc2",
+      "value": "Vaihda kieli napauttamalla"
+    },
+    {
+      "name": "cyl_l10n_f4e41dda1094",
+      "value": "Vaihda napauttamalla ja napauta sitten mitä tahansa välilehteä tai PlusButtonia kuullaksesi sen. Haptiikka värisee vain oikeassa laitteessa. Nyt: %@"
+    },
+    {
+      "name": "cyl_l10n_15855ab96e87",
+      "value": "Napsautus + haptiikka"
+    },
+    {
+      "name": "cyl_l10n_cff8a9cded04",
+      "value": "Valitse teema napauttamalla: TabBarin tausta, kuvakkeet ja tekstien värit vaihtuvat paikallaan kaikissa TabBar-tyyleissä. Nyt: %@"
+    },
+    {
+      "name": "cyl_l10n_1c00c4fd1cea",
+      "value": "Vaaleanpunainen ruusu"
+    },
+    {
+      "name": "cyl_l10n_8483ed132b2c",
+      "value": "Syntymäpäivä"
+    },
+    {
+      "name": "cyl_l10n_feef14745f21",
+      "value": "Päivittää kaikkien välilehtien kuvakkeet paikallisilla kuvilla (nimi, polku, UIImage, tiedosto-URL); palauta napauttamalla uudelleen"
+    },
+    {
+      "name": "cyl_l10n_402d19e50fff",
+      "value": "Kirjaudu"
+    },
+    {
+      "name": "cyl_l10n_833152116634",
+      "value": "Poista kuva"
+    },
+    {
+      "name": "cyl_l10n_a0676a7d84a9",
+      "value": "Vihreä viiva"
+    },
+    {
+      "name": "cyl_l10n_16068b2ff3fd",
+      "value": "Verkkokuvakkeet"
+    },
+    {
+      "name": "cyl_l10n_69ca6555a602",
+      "value": "Käännä"
+    },
+    {
+      "name": "cyl_l10n_4bd51044149f",
+      "value": "Oma äänitiedosto (cyl_tabButtonTapSoundURL)"
+    },
+    {
+      "name": "cyl_l10n_beabcd498b94",
+      "value": "Greippi"
+    },
+    {
+      "name": "cyl_l10n_b8c467fce096",
+      "value": "Merkit"
+    },
+    {
+      "name": "cyl_l10n_200e65177369",
+      "value": "Aseta CYLFlatDesignTabBarItemin taustaväri"
+    },
+    {
+      "name": "cyl_l10n_295bb704f520",
+      "value": "Kieli"
+    },
+    {
+      "name": "cyl_l10n_d673e0eb5c1c",
+      "value": "Reagoi ylänäkymän ulkopuolella (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_71bbc726ace5",
+      "value": "Seuraa järjestelmää"
+    },
+    {
+      "name": "cyl_l10n_d0914cf6acd2",
+      "value": "Navigointi ja vertailut"
+    },
+    {
+      "name": "cyl_l10n_110abc875180",
+      "value": "Kevyt haptinen palaute"
+    },
+    {
+      "name": "cyl_l10n_fad7c8a21fe3",
+      "value": "Valittu"
+    },
+    {
+      "name": "cyl_l10n_aa05fd09a619",
+      "value": "Yleiset"
+    },
+    {
+      "name": "cyl_l10n_15c64aa0b404",
+      "value": "Määritystiedosto"
+    },
+    {
+      "name": "cyl_l10n_45158907e07f",
+      "value": "Voimakas haptinen palaute"
+    },
+    {
+      "name": "cyl_l10n_d6982fecc6a4",
+      "value": "Välilehtien pitkä painallus (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_aefae51d3c25",
+      "value": "Painettiin pitkään kohdetta ”%@”"
+    },
+    {
+      "name": "cyl_l10n_abad1baa5479",
+      "value": "Pitkän painalluksen kesto ja kaksoisnapautuksen väli (issue #535 / #152)"
+    },
+    {
+      "name": "cyl_l10n_b146fc1a1531",
+      "value": "Ruoho"
+    },
+    {
+      "name": "cyl_l10n_db1c89e0f6e6",
+      "value": "Koti"
+    },
+    {
+      "name": "cyl_l10n_18c63459a2c0",
+      "value": "Oletus"
+    },
+    {
+      "name": "cyl_l10n_be354ee4263a",
+      "value": "Oletusnapsautus"
+    }
+  ]
+}

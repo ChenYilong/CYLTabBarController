@@ -1,0 +1,40 @@
+{
+  "en": {
+    "Previous tab (cyl_selectPreviousTab, issue #535)": "Previous tab (cyl_selectPreviousTab, issue #535)",
+    "Next tab (cyl_selectNextTab, issue #535)": "Next tab (cyl_selectNextTab, issue #535)",
+    "Push to another CYLTabBarController (another PlusButton)": "Push to another CYLTabBarController (another PlusButton)",
+    "A tab bar controller of another context, with a square plus button": "A tab bar controller of another context, with a square plus button",
+    "ArkUI Tabs, the HarmonyOS system tab bar, with the same tabs": "ArkUI Tabs, the HarmonyOS system tab bar, with the same tabs",
+    "The system bar has no plus button: a floating button stands in": "The system bar has no plus button: a floating button stands in",
+    "Long press a tab or the plus button": "Long press a tab or the plus button",
+    "Pushes a tab bar controller whose plus button image changes 2 s later; the layout must not move": "Pushes a tab bar controller whose plus button image changes 2 s later; the layout must not move",
+    "cyl_pushViewController, cyl_popSelectTabBarChildViewControllerAtIndex, cyl_pushOrPopToViewController": "cyl_pushViewController, cyl_popSelectTabBarChildViewControllerAtIndex, cyl_pushOrPopToViewController",
+    "Pushes a page that hides the navigation bar while shown, with no base class": "Pushes a page that hides the navigation bar while shown, with no base class",
+    "The plus button sticks out of the bar; its part above the bar responds (shown in red)": "The plus button sticks out of the bar; its part above the bar responds (shown in red)",
+    "cyl_itemEdgeInsets: 15% of a tab width free at each end": "cyl_itemEdgeInsets: 15% of a tab width free at each end",
+    "CYLTabBarItemBackgroundColor / CYLTabBarItemSelectedBackgroundColor": "CYLTabBarItemBackgroundColor / CYLTabBarItemSelectedBackgroundColor",
+    "Tab, %1$@ of %2$@": "Tab, %1$@ of %2$@",
+    "%@, %@": "%@, %@",
+    "Double tap to open": "Double tap to open",
+    "Badge: %@": "Badge: %@"
+  },
+  "zh-Hans": {
+    "Previous tab (cyl_selectPreviousTab, issue #535)": "上一个 Tab（cyl_selectPreviousTab，issue #535）",
+    "Next tab (cyl_selectNextTab, issue #535)": "下一个 Tab（cyl_selectNextTab，issue #535）",
+    "Push to another CYLTabBarController (another PlusButton)": "Push 另一个 CYLTabBarController（另一个 PlusButton）",
+    "A tab bar controller of another context, with a square plus button": "另一个 context 的 TabBarController，使用方形加号按钮",
+    "ArkUI Tabs, the HarmonyOS system tab bar, with the same tabs": "ArkUI Tabs，即鸿蒙系统 TabBar，使用同样的 Tab",
+    "The system bar has no plus button: a floating button stands in": "系统 TabBar 没有加号按钮：用悬浮按钮代替",
+    "Long press a tab or the plus button": "长按任意 Tab 或加号按钮",
+    "Pushes a tab bar controller whose plus button image changes 2 s later; the layout must not move": "Push 一个 TabBarController，其加号按钮图片 2 秒后改变；布局不应移动",
+    "cyl_pushViewController, cyl_popSelectTabBarChildViewControllerAtIndex, cyl_pushOrPopToViewController": "cyl_pushViewController、cyl_popSelectTabBarChildViewControllerAtIndex、cyl_pushOrPopToViewController",
+    "Pushes a page that hides the navigation bar while shown, with no base class": "Push 一个显示期间隐藏导航栏的页面，无需基类",
+    "The plus button sticks out of the bar; its part above the bar responds (shown in red)": "加号按钮超出 TabBar；超出部分也能响应（红色显示）",
+    "cyl_itemEdgeInsets: 15% of a tab width free at each end": "cyl_itemEdgeInsets：两端各留出 Tab 宽度的 15%",
+    "CYLTabBarItemBackgroundColor / CYLTabBarItemSelectedBackgroundColor": "CYLTabBarItemBackgroundColor / CYLTabBarItemSelectedBackgroundColor",
+    "Tab, %1$@ of %2$@": "标签，第 %1$@ 个，共 %2$@ 个",
+    "%@, %@": "%@，%@",
+    "Double tap to open": "点按两次打开",
+    "Badge: %@": "角标：%@"
+  }
+}

@@ -7,6 +7,7 @@ import {
   CYLTabBarMinimizeBehavior, cyl_reportScroll, cyl_pushViewController, CYLThemeManager, CYLThemeManagerCenter,
   cyl_tabBarItemIdentifiers, cyl_indexOfTabBarItemWithIdentifier, cyl_selectTabBarItemWithIdentifier
 } from 'cyltabbar';
+import { CYLLocalizedString, cyl_localizationKey, cyl_badgeAccessibilityText } from 'cyltabbar';
 import { DemoTheme, DEMO_THEMES, demoRegisterThemes } from '../demo/DemoThemes';
 import {
   DemoRow, DemoSection, DEMO_APPEARANCES, DEMO_TITLE_OFFSETS, DEMO_HOME, DEMO_CITY, DEMO_MESSAGE, DEMO_ME,
@@ -196,16 +197,16 @@ struct Index {
   private generalRows(): DemoRow[] {
     return [
       {
-        id: 'language', title: 'Language', subtitle: `Current: ${DEMO_LANGUAGE_NAMES[this.languageIndex]}`,
-        action: () => this.choose('Language', DEMO_LANGUAGE_NAMES, this.languageIndex, (index: number) => {
+        id: 'language', title: CYLLocalizedString('语言'), subtitle: CYLLocalizedString('点击切换语言'),
+        action: () => this.choose(CYLLocalizedString('语言'), DEMO_LANGUAGE_NAMES, this.languageIndex, (index: number) => {
           // [EN] setAppPreferredLanguage reloads the app's resources ($r) in the chosen language. [CN] 以所选语言重新加载应用资源。
           i18n.System.setAppPreferredLanguage(DEMO_LANGUAGES[index] === '' ? 'default' : DEMO_LANGUAGES[index]);
           this.languageIndex = index;
         }),
       },
       {
-        id: 'memory-warning', title: 'Simulate a memory warning',
-        subtitle: 'Unloads the pages of unselected tabs when unloadsUnselectedViewsOnMemoryWarning is on (#426), then lists each tab',
+        id: 'memory-warning', title: CYLLocalizedString('模拟内存警告'),
+        subtitle: CYLLocalizedString('卸载未选中的 Tab，切换时重新加载'),
         action: () => {
           this.unloads = true;
           // [EN] Let the @Prop reach the controller first. [CN] 先让 @Prop 传到控制器。
@@ -217,35 +218,35 @@ struct Index {
 
   /** [EN] CYLSimulateMemoryWarningReport: one line per tab. [CN] 每个 Tab 一行。 */
   private memoryWarningReport(unloaded: number[], loaded: number[]): void {
-    const names = ['Home', 'Nearby', 'Messages', 'Me'];
+    const names = [CYLLocalizedString('首页'), CYLLocalizedString('同城'), CYLLocalizedString('消息'), CYLLocalizedString('我的')];
     const lines = names.map((name: string, index: number) => {
-      const state = loaded.indexOf(index) >= 0 ? 'loaded' : (unloaded.indexOf(index) >= 0 ? 'unloaded now' : 'not loaded');
-      return `${index}. ${name}: ${state}${index === this.selectedIndex ? ' (selected)' : ''}`;
+      const state = loaded.indexOf(index) >= 0 ? CYLLocalizedString('保留') : (unloaded.indexOf(index) >= 0 ? CYLLocalizedString('已卸载') : CYLLocalizedString('未加载'));
+      return `${index}. ${name}: ${state}${index === this.selectedIndex ? ' · ' + CYLLocalizedString('选中') : ''}`;
     });
-    this.getUIContext().getPromptAction().showDialog({ title: 'Memory warning', message: lines.join('\n'), buttons: [{ text: 'OK', color: '#007AFF' }] });
+    this.getUIContext().getPromptAction().showDialog({ title: CYLLocalizedString('内存警告'), message: lines.join('\n'), buttons: [{ text: CYLLocalizedString('OK'), color: '#007AFF' }] });
   }
 
   /** [EN] Tab bar appearance and the FlatDesign rows (items 13, 14, 56, 17, 18, 19). [CN] TabBar 外观与扁平样式行。 */
   private appearanceRows(): DemoRow[] {
     return [
       {
-        id: 'title-offset', title: 'Title offset (titlePositionAdjustment)',
-        subtitle: `Tap to cycle the vertical offset of every tab title, current: (${this.titleOffset.horizontal}, ${this.titleOffset.vertical})`,
+        id: 'title-offset', title: CYLLocalizedString('标题偏移（titlePositionAdjustment）'),
+        subtitle: CYLLocalizedString('点击切换所有 Tab 标题的垂直偏移，当前：%@', `(${this.titleOffset.horizontal}, ${this.titleOffset.vertical})`),
         action: () => {
           const next = DEMO_TITLE_OFFSETS[(DEMO_TITLE_OFFSETS.indexOf(this.titleOffset.vertical) + 1) % DEMO_TITLE_OFFSETS.length];
           this.titleOffset = { horizontal: 0, vertical: next };
         },
       },
       {
-        id: 'appearance', title: 'standardAppearance theme (shared by Liquid Glass and FlatDesign)',
-        subtitle: `Current: ${DEMO_APPEARANCES[this.appearanceIndex].name}; tap for the next one`,
+        id: 'appearance', title: CYLLocalizedString('standardAppearance 主题（液态玻璃与扁平样式共用）'),
+        subtitle: CYLLocalizedString('点击切换 tabBar.standardAppearance，当前：%@', CYLLocalizedString(DEMO_APPEARANCES[this.appearanceIndex].name)),
         action: () => {
           this.appearanceIndex = (this.appearanceIndex + 1) % DEMO_APPEARANCES.length;
           this.applyItemBackgrounds();
         },
       },
       {
-        id: 'tab-bar-hidden', title: 'Show / hide the tab bar (setTabBarHidden:animated:)',
+        id: 'tab-bar-hidden', title: CYLLocalizedString('Show / hide CYLFlatDesignTabBar'),
         subtitle: `tabBarHidden = ${this.tabBarHidden}; hidden, it comes back after 2 s`,
         action: () => {
           this.tabBarHidden = !this.tabBarHidden;
@@ -255,33 +256,33 @@ struct Index {
         },
       },
       {
-        id: 'skin', title: 'Skin (CYLThemeManager, issue #216)', subtitle: `Current: ${this.theme.name}; tap to choose`,
+        id: 'skin', title: CYLLocalizedString('换肤（主题，issue #216）'), subtitle: CYLLocalizedString('点击选择主题：TabBar 的背景、图标与文字颜色原地切换，所有 TabBar 样式均适用。当前：%@', CYLLocalizedString(this.theme.titleKey)),
         action: () => this.showSkinPicker(),
       },
       {
-        id: 'minimize', title: 'Shrink / hide the tab bar on scroll (issue #13)',
+        id: 'minimize', title: CYLLocalizedString('滚动时缩小 / 隐藏 TabBar（issue #13）'),
         subtitle: `cyl_tabBarMinimizeBehavior = ${['Automatic', 'Never', 'OnScrollDown', 'OnScrollUp'][this.minimizeBehavior]}; tap to choose, then scroll this list`,
         action: () => this.choose('cyl_tabBarMinimizeBehavior', ['Automatic', 'Never', 'OnScrollDown', 'OnScrollUp'],
           this.minimizeBehavior, (index: number) => this.minimizeBehavior = index as CYLTabBarMinimizeBehavior),
       },
       {
-        id: 'tab-bar-height', title: 'Change the tab bar height', subtitle: `tabBarHeight = ${this.tabBarHeight}`,
+        id: 'tab-bar-height', title: CYLLocalizedString('改变 CYLFlatDesignTabBar 高度'), subtitle: `tabBarHeight = ${this.tabBarHeight}`,
         action: () => this.tabBarHeight = this.tabBarHeight === 49 ? 69 : 49,
       },
       {
-        id: 'items-not-centered', title: 'Tab items not centered (system layout)',
+        id: 'items-not-centered', title: CYLLocalizedString('Change CYLFlatDesignTabBarItem 不居中显示（系统效果）'),
         action: () => this.itemEdgeInsets = { top: 0, left: 0, bottom: 0, right: 0 },
       },
       {
-        id: 'items-centered', title: 'Tab items centered', subtitle: 'cyl_itemEdgeInsets: 15% of a tab width free at each end',
+        id: 'items-centered', title: CYLLocalizedString('Change CYLFlatDesignTabBarItem 居中显示'), subtitle: CYLLocalizedString('cyl_itemEdgeInsets: 15% of a tab width free at each end'),
         action: () => {
           const inset = this.getUIContext().px2vp(display_width()) / 5 * 0.15;
           this.itemEdgeInsets = { top: 0, left: inset, bottom: 0, right: inset };
         },
       },
       {
-        id: 'item-background', title: 'Set the tab item background color',
-        subtitle: 'CYLTabBarItemBackgroundColor / CYLTabBarItemSelectedBackgroundColor',
+        id: 'item-background', title: CYLLocalizedString('设置 CYLFlatDesignTabBarItem 背景色'),
+        subtitle: CYLLocalizedString('CYLTabBarItemBackgroundColor / CYLTabBarItemSelectedBackgroundColor'),
         action: () => {
           this.itemBackgrounds = !this.itemBackgrounds;
           this.applyItemBackgrounds();
@@ -309,23 +310,23 @@ struct Index {
   private jumpRows(): DemoRow[] {
     return [
       {
-        id: 'system-tab-bar', title: 'Compare with the system tab bar',
-        subtitle: 'ArkUI Tabs, the HarmonyOS system tab bar, with the same tabs',
+        id: 'system-tab-bar', title: CYLLocalizedString('和系统 UITabBar 比较'),
+        subtitle: CYLLocalizedString('ArkUI Tabs, the HarmonyOS system tab bar, with the same tabs'),
         action: () => this.push('pages/SystemTabs', {} as DemoPushParams),
       },
       {
-        id: 'system-tab-bar-plus', title: 'Push to the system tab bar (another PlusButton)',
-        subtitle: 'The system bar has no plus button: a floating button stands in',
+        id: 'system-tab-bar-plus', title: CYLLocalizedString('Push To 系统 UITabBarController（另一个 PlusButton）'),
+        subtitle: CYLLocalizedString('The system bar has no plus button: a floating button stands in'),
         action: () => this.push('pages/SystemTabs', { withPlus: true } as DemoPushParams),
       },
       {
-        id: 'another-tab-bar', title: 'Push to another CYLTabBarController (another PlusButton)',
-        subtitle: 'A tab bar controller of another context, with a square plus button',
+        id: 'another-tab-bar', title: CYLLocalizedString('Push to another CYLTabBarController (another PlusButton)'),
+        subtitle: CYLLocalizedString('A tab bar controller of another context, with a square plus button'),
         action: () => this.push('pages/AnotherTabBar', {} as DemoPushParams),
       },
       {
-        id: 'pop-push', title: 'cyl_pop / cyl_push methods',
-        subtitle: 'cyl_pushViewController, cyl_popSelectTabBarChildViewControllerAtIndex, cyl_pushOrPopToViewController',
+        id: 'pop-push', title: CYLLocalizedString('cyl_pop / cyl_push 系列方法演示'),
+        subtitle: CYLLocalizedString('cyl_pushViewController, cyl_popSelectTabBarChildViewControllerAtIndex, cyl_pushOrPopToViewController'),
         action: () => cyl_pushViewController('pages/PopPushDemo'),
       },
     ];
@@ -411,14 +412,14 @@ struct Index {
     const localSelected: Resource[] = [$r('app.media.img_tab_home_1'), $r('app.media.img_tab_message_1'), $r('app.media.app_icon')];
     return [
       {
-        id: 'title', title: 'Change the tab title', subtitle: 'Changes the title of this page\'s tab in place; tap again to restore',
+        id: 'title', title: CYLLocalizedString('更换 Tab 标题'), subtitle: CYLLocalizedString('原地更换当前页 Tab 的标题，再点恢复'),
         action: () => {
           const on = this.flip(`title-${page}`);
           this.updateTab(index, (item: CYLTabBarItemAttributes) => item.title = on ? 'Courses' : CYL_TABS[index].title);
         },
       },
       {
-        id: 'network-icon', title: 'Download a network icon', subtitle: 'Loads the icon of this page\'s tab from a URL (CYLTabBarItemImageURL); tap again to restore',
+        id: 'network-icon', title: CYLLocalizedString('下载网络图标'), subtitle: CYLLocalizedString('从网络下载当前页 Tab 的图标（带缓存），再点恢复'),
         action: () => {
           const on = this.flip(`network-${page}`);
           this.updateTab(index, (item: CYLTabBarItemAttributes) => {
@@ -428,7 +429,7 @@ struct Index {
         },
       },
       {
-        id: 'all-network-icons', title: 'Download every network icon', subtitle: 'Updates the icons of every tab from URLs; tap again to restore',
+        id: 'all-network-icons', title: CYLLocalizedString('批量下载网络图标'), subtitle: CYLLocalizedString('下载并更新所有 Tab 的图标，再点恢复'),
         action: () => {
           const on = this.flip('all-network');
           this.tabs.forEach((tab: CYLTabBarItemAttributes, i: number) => this.updateTab(i, (item: CYLTabBarItemAttributes) => {
@@ -438,7 +439,7 @@ struct Index {
         },
       },
       {
-        id: 'all-local-icons', title: 'Use local icons for every tab', subtitle: 'Updates every tab icon from local images; tap again to restore',
+        id: 'all-local-icons', title: CYLLocalizedString('批量使用本地图标'), subtitle: CYLLocalizedString('用本地图片（图片名、文件路径、UIImage、文件 URL）更新所有 Tab 的图标，再点恢复'),
         action: () => {
           const on = this.flip('all-local');
           this.tabs.forEach((tab: CYLTabBarItemAttributes, i: number) => this.updateTab(i, (item: CYLTabBarItemAttributes) => {
@@ -449,14 +450,14 @@ struct Index {
         },
       },
       {
-        id: 'gif', title: 'GIF icon', subtitle: 'This page\'s tab shows a GIF (CYLTabBarGIFFilePath); tap again to restore',
+        id: 'gif', title: CYLLocalizedString('GIF 动图图标'), subtitle: CYLLocalizedString('当前页 Tab 显示 GIF 动图，再点恢复'),
         action: () => {
           const on = this.flip(`gif-${page}`);
           this.updateTab(index, (item: CYLTabBarItemAttributes) => item.gifFilePath = on ? 'gif/cyl_tab_sample_animated.gif' : undefined);
         },
       },
       {
-        id: 'all-titles', title: 'Change every title', subtitle: 'Updates the titles of every tab at once (-updateTabBarItemsWithAttributes:); tap again to restore',
+        id: 'all-titles', title: CYLLocalizedString('批量更换标题'), subtitle: CYLLocalizedString('一次更新所有 Tab 的标题，再点恢复'),
         action: () => {
           const on = this.flip('all-titles');
           this.tabs.forEach((tab: CYLTabBarItemAttributes, i: number) => this.updateTab(i, (item: CYLTabBarItemAttributes) => {
@@ -472,8 +473,8 @@ struct Index {
     const index = this.pageIndex(page);
     return [
       {
-        id: 'replace', title: 'Replace the pages of the neighboring tabs',
-        subtitle: 'Replaces the tabs on both sides of this tab with other pages (issue #481); tap again to restore',
+        id: 'replace', title: CYLLocalizedString('替换相邻 Tab 的页面'),
+        subtitle: CYLLocalizedString('把当前 Tab 两侧的 Tab 换成其他页面（issue #481），再点恢复'),
         action: () => {
           const sides = [index - 1, index + 1].filter((side: number) => side >= 0 && side < CYL_TABS.length);
           const on = this.flip(`replace-${page}`);
@@ -484,7 +485,7 @@ struct Index {
         },
       },
       {
-        id: 'selected-index', title: 'selectedIndex and PlusButton (issue #515)',
+        id: 'selected-index', title: CYLLocalizedString('selectedIndex 与 PlusButton（issue #515）'),
         subtitle: `selectedIndex = ${this.selectedIndex} (the plus button's page is ${CYLPlusButtonPageIndex}, never a tab index); tap for the next tab`,
         action: () => this.selectedIndex = this.selectedIndex < 0 ? 0 : (this.selectedIndex + 1) % CYL_TABS.length,
       },
@@ -503,17 +504,17 @@ struct Index {
   /** [EN] PlusButton (items 30, 31). [CN] PlusButton（第 30、31 项）。 */
   private plusButtonRows(): DemoRow[] {
     const scale = this.plus.touchableAreaScale ?? 1;
-    const cases = ['Image loads after 2 s', 'Image replaced after 2 s', 'Image removed after 2 s', 'Background image loads after 2 s'];
+    const cases = [CYLLocalizedString('加载图片'), CYLLocalizedString('替换为更大的图片'), CYLLocalizedString('移除图片'), CYLLocalizedString('加载背景图片')];
     const modes = ['late-load', 'late-replace', 'late-remove', 'late-background'];
     return [
       {
-        id: 'late-image', title: 'PlusButton image set later',
-        subtitle: 'Pushes a tab bar controller whose plus button image changes 2 s later; the layout must not move',
-        action: () => this.choose('PlusButton image set later', cases, -1,
+        id: 'late-image', title: CYLLocalizedString('PlusButton 图片之后才加载'),
+        subtitle: CYLLocalizedString('Pushes a tab bar controller whose plus button image changes 2 s later; the layout must not move'),
+        action: () => this.choose(CYLLocalizedString('PlusButton 图片之后才加载'), cases, -1,
           (index: number) => this.push('pages/AnotherTabBar', { mode: modes[index] } as DemoPushParams)),
       },
       {
-        id: 'touchable-area', title: 'PlusButton touchable area (issue #91)',
+        id: 'touchable-area', title: CYLLocalizedString('PlusButton 点击范围（issue #91）'),
         subtitle: `Shows the touchable area in translucent red: ${this.plus.showsTouchableArea === true}; scale ${scale}x; tap to cycle 1x, 1.5x, 2x, off`,
         action: () => {
           const shows = this.plus.showsTouchableArea === true;
@@ -532,29 +533,29 @@ struct Index {
 
   /** [EN] Tab interactions (items 33-37). [CN] Tab 交互（第 33-37 项）。 */
   private interactionRows(): DemoRow[] {
-    const tapNames = ['None', 'Scale', 'Zoom in', 'Bounce', 'Rotation', 'Flip'];
-    const feedbackNames = ['Off', 'Default tap sound', 'Custom sound file (cyl_tabButtonTapSoundURL)', 'Light haptic',
-      'Medium haptic', 'Heavy haptic', 'Tap sound + haptic'];
+    const tapNames = [CYLLocalizedString('无'), CYLLocalizedString('放大再缩小'), CYLLocalizedString('从小放大'), CYLLocalizedString('弹性'), CYLLocalizedString('旋转'), CYLLocalizedString('翻转')];
+    const feedbackNames = [CYLLocalizedString('关闭'), CYLLocalizedString('默认点击声'), CYLLocalizedString('自定义音频文件（cyl_tabButtonTapSoundURL）'), CYLLocalizedString('轻触感反馈'),
+      CYLLocalizedString('中等触感反馈'), CYLLocalizedString('重触感反馈'), CYLLocalizedString('点击声 + 触感反馈')];
     const longPress = [300, 500, 1000];
     const doubleTap = [200, 300, 500];
     return [
       {
-        id: 'tap-animation', title: 'Tap animation (cyl_tabButtonTapAnimationType)',
-        subtitle: `Current: ${tapNames[this.tapAnimation]}; tap for the next one, then tap a tab`,
+        id: 'tap-animation', title: CYLLocalizedString('Tab 点击动画（issue #535）'),
+        subtitle: CYLLocalizedString('点击切换 Tab 与 PlusButton 的点击动画，当前：%@', tapNames[this.tapAnimation]),
         action: () => this.tapAnimation = (this.tapAnimation + 1) % tapNames.length,
       },
       {
-        id: 'feedback', title: 'Tap sound and haptics (cyl_tabButtonHapticFeedbackEnabled / Style)',
-        subtitle: `Current: ${feedbackNames[this.feedbackStep]}; tap for the next one`,
+        id: 'feedback', title: CYLLocalizedString('Tab 点击声音与触感反馈（issue #535）'),
+        subtitle: CYLLocalizedString('点击切换，然后点击任意 Tab 或 PlusButton 试听。触感反馈只在真机上振动。当前：%@', feedbackNames[this.feedbackStep]),
         action: () => this.feedbackStep = (this.feedbackStep + 1) % feedbackNames.length,
       },
       {
-        id: 'long-press', title: 'Long press on tabs (issue #535)',
-        subtitle: 'Long press any tab or the plus button: a toast names it (cyl_didLongPressControlBlock)',
-        action: () => this.toast('Long press a tab or the plus button'),
+        id: 'long-press', title: CYLLocalizedString('长按 Tab（issue #535）'),
+        subtitle: CYLLocalizedString('打开开关后长按任意 Tab 或 PlusButton，会弹出该按钮的标识。'),
+        action: () => this.toast(CYLLocalizedString('Long press a tab or the plus button')),
       },
       {
-        id: 'gesture-timings', title: 'Long press duration and double tap interval (issue #535 / #152)',
+        id: 'gesture-timings', title: CYLLocalizedString('长按时长与双击间隔（issue #535 / #152）'),
         subtitle: `cyl_tabBarItemLongPressDuration = ${longPress[this.longPressIndex]} ms, cyl_tabBarItemDoubleTapInterval = ${doubleTap[this.doubleTapIndex]} ms; tap to cycle; double tap a tab to see it`,
         action: () => {
           this.longPressIndex = (this.longPressIndex + 1) % longPress.length;
@@ -562,21 +563,21 @@ struct Index {
         },
       },
       {
-        id: 'swipe', title: 'Swipe to switch tabs (cyl_swipeToSwitchTabEnabled, issue #535)',
+        id: 'swipe', title: CYLLocalizedString('左右滑动切换 Tab（issue #535）'),
         subtitle: `On: ${this.swipeEnabled}; swipe the page left / right`,
         action: () => this.swipeEnabled = !this.swipeEnabled,
       },
       {
-        id: 'slide-transition', title: 'Slide transition (CYLTabBarSlideTransitionAnimator)',
+        id: 'slide-transition', title: CYLLocalizedString('滑动转场（CYLTabBarSlideTransitionAnimator）'),
         subtitle: `On: ${this.slideTransition}; the new page slides in from the side of its tab`,
         action: () => this.slideTransition = !this.slideTransition,
       },
       {
-        id: 'previous-tab', title: 'Previous tab (cyl_selectPreviousTab, issue #535)',
+        id: 'previous-tab', title: CYLLocalizedString('Previous tab (cyl_selectPreviousTab, issue #535)'),
         action: () => this.selectedIndex = ((this.selectedIndex < 0 ? 0 : this.selectedIndex) + CYL_TABS.length - 1) % CYL_TABS.length,
       },
       {
-        id: 'next-tab', title: 'Next tab (cyl_selectNextTab, issue #535)',
+        id: 'next-tab', title: CYLLocalizedString('Next tab (cyl_selectNextTab, issue #535)'),
         action: () => this.selectedIndex = ((this.selectedIndex < 0 ? 0 : this.selectedIndex) + 1) % CYL_TABS.length,
       },
     ];
@@ -586,12 +587,12 @@ struct Index {
   private messageRows(): DemoRow[] {
     return [
       {
-        id: 'same-context', title: 'Push a TabBarController of the same context (the same PlusButton class)',
+        id: 'same-context', title: CYLLocalizedString('Push 同一个 context 的 TabBarController（同一个 PlusButton 类）'),
         action: () => this.push('pages/AnotherTabBar', { mode: 'same' } as DemoPushParams),
       },
       {
-        id: 'new-context', title: 'Push a TabBarController of a new context (PlusButton with a tappable X, issue #202)',
-        subtitle: 'Tap the X at the top right of the PlusButton: the X changes color at random and the PlusButton does not respond',
+        id: 'new-context', title: CYLLocalizedString('Push 新 context 的 TabBarController（PlusButton 带可点击的 X 子按钮，issue #202）'),
+        subtitle: CYLLocalizedString('点击 PlusButton 右上角的 X：X 随机改变颜色，PlusButton 不响应'),
         action: () => this.push('pages/AnotherTabBar', { mode: 'close' } as DemoPushParams),
       },
     ];
@@ -602,13 +603,13 @@ struct Index {
     const index = this.pageIndex(page);
     return [
       {
-        id: 'hide-navigation-bar', title: 'Hide the navigation bar without a base class (issue #535)',
-        subtitle: 'Pushes a page that hides the navigation bar while shown, with no base class',
+        id: 'hide-navigation-bar', title: CYLLocalizedString('不继承基类隐藏导航栏（issue #535）'),
+        subtitle: CYLLocalizedString('Pushes a page that hides the navigation bar while shown, with no base class'),
         action: () => this.push('pages/TextPage', { title: 'The navigation bar is hidden while this page is shown', color: '#FFCC00', hidesNavigationBar: true } as DemoPushParams),
       },
       {
-        id: 'outside-superview', title: 'Touches outside the super view (issue #535)',
-        subtitle: 'The plus button sticks out of the bar; its part above the bar responds (shown in red)',
+        id: 'outside-superview', title: CYLLocalizedString('超出父视图响应点击（issue #535）'),
+        subtitle: CYLLocalizedString('The plus button sticks out of the bar; its part above the bar responds (shown in red)'),
         action: () => {
           const copy: CYLPlusButton = {
             image: this.plus.image, selectedImage: this.plus.selectedImage, title: this.plus.title, index: this.plus.index,
@@ -620,7 +621,7 @@ struct Index {
         },
       },
       {
-        id: 'bundle-image', title: 'Load an image from the bundle (issue #535)',
+        id: 'bundle-image', title: CYLLocalizedString('从 bundle 加载图片（issue #535）'),
         subtitle: 'The image of this page\'s tab from the app\'s rawfile (the resource bundle of iOS); tap again to restore',
         action: () => {
           const on = this.flip(`bundle-${page}`);
@@ -632,7 +633,7 @@ struct Index {
         },
       },
       {
-        id: 'helpers', title: 'Helpers: find tab buttons and weak references (issue #535)',
+        id: 'helpers', title: CYLLocalizedString('CYLUtils 弱引用关联对象与查找按钮（issue #535）'),
         subtitle: 'cyl_tabBarItemIdentifiers, cyl_indexOfTabBarItemWithIdentifier, cyl_selectTabBarItemWithIdentifier, WeakRef',
         action: () => {
           const identifiers = cyl_tabBarItemIdentifiers(this.tabs);
@@ -642,7 +643,7 @@ struct Index {
           this.getUIContext().getPromptAction().showDialog({
             title: 'CYLUtils',
             message: `${lines.join('\n')}\n\nWeak reference: ${weak.deref() !== undefined}\nselected: ${identifiers[this.selectedIndex] ?? 'plus'}\n\nOK selects "message".`,
-            buttons: [{ text: 'OK', color: '#007AFF' }],
+            buttons: [{ text: CYLLocalizedString('OK'), color: '#007AFF' }],
           }).then(() => cyl_selectTabBarItemWithIdentifier(DEMO_MESSAGE)).catch(() => {});
         },
       },
@@ -651,23 +652,23 @@ struct Index {
 
   private sections(page: string): DemoSection[] {
     return [
-      { title: 'General', rows: this.generalRows() },
-      { title: 'Tab bar appearance', rows: this.appearanceRows() },
-      { title: 'Update tabs in place', rows: this.tabItemUpdateRows(page) },
-      { title: 'Tab pages, selection and login', rows: this.pageRows(page) },
+      { title: CYLLocalizedString('通用'), rows: this.generalRows() },
+      { title: CYLLocalizedString('TabBar 外观'), rows: this.appearanceRows() },
+      { title: CYLLocalizedString('原地更新 Tab'), rows: this.tabItemUpdateRows(page) },
+      { title: CYLLocalizedString('Tab 页面、选中与登录'), rows: this.pageRows(page) },
       { title: 'PlusButton', rows: this.plusButtonRows() },
-      { title: `Skins: holiday and color themes (${DEMO_THEMES.length})`, rows: DEMO_THEMES.map((theme: DemoTheme) => {
+      { title: CYLLocalizedString('换肤：节日与配色主题（%@ 种）', DEMO_THEMES.length), rows: DEMO_THEMES.map((theme: DemoTheme) => {
         const row: DemoRow = {
-          id: `theme-${theme.name}`, title: (theme.name === this.theme.name ? '✓ ' : '') + theme.name,
+          id: `theme-${theme.name}`, title: (theme.name === this.theme.name ? '✓ ' : '') + CYLLocalizedString(theme.titleKey),
           action: () => CYLThemeManagerCenter.defaultThemeManager.currentThemeIdentifier = theme.name,
         };
         return row;
       }) },
-      { title: 'Tab interactions', rows: this.interactionRows() },
-      { title: 'No base class, and helpers', rows: this.helperRows(page) },
-      { title: 'Configuration file', rows: this.configurationRows() },
-      { title: 'Jump and compare', rows: this.jumpRows() },
-      { title: 'Badges', rows: page === DEMO_MESSAGE ? this.messageRows().concat(this.badgeRows(page)) : this.badgeRows(page) },
+      { title: CYLLocalizedString('Tab 交互'), rows: this.interactionRows() },
+      { title: CYLLocalizedString('无需继承基类与工具方法'), rows: this.helperRows(page) },
+      { title: CYLLocalizedString('配置文件'), rows: this.configurationRows() },
+      { title: CYLLocalizedString('跳转与对比'), rows: this.jumpRows() },
+      { title: CYLLocalizedString('角标'), rows: page === DEMO_MESSAGE ? this.messageRows().concat(this.badgeRows(page)) : this.badgeRows(page) },
     ];
   }
 
@@ -707,6 +708,12 @@ struct Index {
     .constraintSize({ minHeight: row.badgeRow !== undefined ? 60 : 48 })
     .padding({ left: 16, right: 16, top: 8, bottom: 8 })
     .backgroundColor($r('app.color.cyl_row_background'))
+    // [EN] A row is one accessibility element: title as the label, subtitle and badge as the description.
+    // [CN] 每行一个无障碍元素：标题为标签，副标题与角标为描述。
+    .accessibilityGroup(true)
+    .accessibilityText(row.title)
+    .accessibilityDescription([row.subtitle ?? '', row.badgeRow !== undefined
+      ? cyl_badgeAccessibilityText((this.rowBadges.get(page) ?? [])[row.badgeRow]) : ''].filter((t: string) => t.length > 0).join(', '))
     .id(`cyl-row-${page}-${row.id}`)
     .onClick(() => row.action())
   }
@@ -740,7 +747,7 @@ struct Index {
             .fontWeight(FontWeight.Medium)
         }
         if (index !== CYLPlusButtonPageIndex) {
-          Text('换肤')
+          Text(CYLLocalizedString('换肤'))
             .fontSize(15)
             .fontColor('#007AFF')
             .position({ right: 16 })
@@ -820,13 +827,13 @@ struct Index {
             this.badges[index].cyl_showBadgeValue('', CYLBadgeAnimationType.None);
           }
         },
-        didLongPress: (index: number, identifier: string) => this.toast(`Long press: ${identifier} (${index})`),
+        didLongPress: (index: number, identifier: string) => this.toast(CYLLocalizedString('长按了「%@」', identifier)),
         didDoubleTap: (index: number, identifier: string) => this.toast(`Double tap: ${identifier} (${index})`),
         loginRequiredTabBarItemIdentifiers: [DEMO_ME],
         presentLogin: (index: number, identifier: string, completion: (loggedIn: boolean) => void) => {
           this.getUIContext().getPromptAction().showDialog({
-            title: 'Log in', message: `"${identifier}" needs a login (issue #19)`,
-            buttons: [{ text: 'Cancel', color: '#8A8A8E' }, { text: 'Log in', color: '#007AFF' }],
+            title: CYLLocalizedString('登录'), message: `"${identifier}" needs a login (issue #19)`,
+            buttons: [{ text: CYLLocalizedString('取消'), color: '#8A8A8E' }, { text: CYLLocalizedString('登录'), color: '#007AFF' }],
           }).then((result: promptAction.ShowDialogSuccessResponse) => {
             const ok = result.index === 1;
             if (ok) {

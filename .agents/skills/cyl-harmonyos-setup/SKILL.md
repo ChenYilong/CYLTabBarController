@@ -91,3 +91,8 @@ and DevEco Studio can deploy the entry module to it directly.
 
 Build `CrossPlatform/harmonyos-cyltabbar` from an ASCII path without spaces (hvigor refuses others), for example a copy
 at `C:\cyl-hm`. Progress and score: [docs/HarmonyOS-Parity.md](../../../docs/HarmonyOS-Parity.md).
+
+## 8. Accessibility and localization
+
+Every HarmonyOS control and text supports accessibility and localization: see the `cyl-harmonyos-a11y-l10n` skill.
+UI tests locate controls through accessibility text / description and ids first.

@@ -1,4 +1,25 @@
-import { CYLThemeManagerCenter } from 'cyltabbar';
+import { CYLThemeManagerCenter, cyl_localizationKey } from 'cyltabbar';
+
+/** [EN] Skin name -> iOS localization key. [CN] 皮肤名 -> iOS 本地化 key。 */
+const DEMO_THEME_KEYS: Map<string, string> = new Map<string, string>([
+  ["Default", cyl_localizationKey('默认')],
+  ["Grapefruit", cyl_localizationKey('西柚')],
+  ["Grass", cyl_localizationKey('青草')],
+  ["Pink Rose", cyl_localizationKey('玫瑰粉')],
+  ["Dark", cyl_localizationKey('深色')],
+  ["Spring Festival", cyl_localizationKey('春节')],
+  ["Christmas", cyl_localizationKey('圣诞节')],
+  ["Halloween", cyl_localizationKey('万圣节')],
+  ["Valentine's Day", cyl_localizationKey('情人节')],
+  ["Mid-Autumn", cyl_localizationKey('中秋节')],
+  ["Easter", cyl_localizationKey('复活节')],
+  ["New Year", cyl_localizationKey('新年')],
+  ["Summer", cyl_localizationKey('夏日')],
+  ["Birthday", cyl_localizationKey('生日')],
+  ["Space", cyl_localizationKey('太空')],
+  ["Ocean", cyl_localizationKey('海洋')],
+  ["Network", cyl_localizationKey('网络图标')],
+]);
 
 /**
  * [EN] One skin of the iOS demo's theme list (issue #216, CYLDemoTheme; DemoThemes.kt): a tint, a bar color, an
@@ -10,6 +31,8 @@ import { CYLThemeManagerCenter } from 'cyltabbar';
  */
 export class DemoTheme {
   name: string;
+  /** [EN] The localization key of the name (the iOS key). [CN] 名称的本地化 key。 */
+  titleKey: string;
   tint?: string;
   bar?: string;
   normal?: string;
@@ -21,6 +44,7 @@ export class DemoTheme {
   constructor(name: string, tint?: string, bar?: string, normal?: string, icons: string[] = [], titlePrefix?: string,
     iconURLs: string[][] = [], plusURL?: string) {
     this.name = name;
+    this.titleKey = DEMO_THEME_KEYS.get(name) ?? name;
     this.tint = tint;
     this.bar = bar;
     this.normal = normal;

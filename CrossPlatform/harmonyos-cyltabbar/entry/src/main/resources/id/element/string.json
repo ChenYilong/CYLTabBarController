@@ -1,0 +1,40 @@
+{
+  "string": [
+    {
+      "name": "tab_home",
+      "value": "Beranda"
+    },
+    {
+      "name": "tab_nearby",
+      "value": "Terdekat"
+    },
+    {
+      "name": "tab_messages",
+      "value": "Pesan"
+    },
+    {
+      "name": "tab_me",
+      "value": "Saya"
+    },
+    {
+      "name": "tab_post",
+      "value": "Posting"
+    },
+    {
+      "name": "tab_refresh",
+      "value": "Segarkan"
+    },
+    {
+      "name": "module_desc",
+      "value": "CYLTabBarController example"
+    },
+    {
+      "name": "ability_desc",
+      "value": "CYLTabBarController example"
+    },
+    {
+      "name": "app_name",
+      "value": "CYLTabBar"
+    }
+  ]
+}

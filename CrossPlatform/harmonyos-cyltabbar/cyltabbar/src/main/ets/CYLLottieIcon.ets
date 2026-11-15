@@ -76,5 +76,8 @@ export struct CYLLottieIcon {
       .width(this.iconSize)
       .height(this.iconSize)
       .onReady(() => this.cylLoad())
+      // [EN] The canvas never takes the tab's taps (the Rive view of the Android port did). [CN] 画布不拦截 Tab 的点击。
+      .hitTestBehavior(HitTestMode.Transparent)
+      .accessibilityLevel('no')
   }
 }

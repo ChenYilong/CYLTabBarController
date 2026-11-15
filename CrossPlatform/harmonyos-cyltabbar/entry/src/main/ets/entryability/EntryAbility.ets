@@ -1,7 +1,7 @@
 import { AbilityConstant, UIAbility, Want } from '@kit.AbilityKit';
 import { window } from '@kit.ArkUI';
 import { Configuration } from '@kit.AbilityKit';
-import { cyl_updateColorMode, cyl_simulateMemoryWarning } from 'cyltabbar';
+import { cyl_updateColorMode, cyl_simulateMemoryWarning, cyl_setLocalizationContext } from 'cyltabbar';
 
 /**
  * [EN] The example's ability: one window showing pages/Index (the tab bar controller of the Objective-C Example).
@@ -10,6 +10,7 @@ import { cyl_updateColorMode, cyl_simulateMemoryWarning } from 'cyltabbar';
 export default class EntryAbility extends UIAbility {
   onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): void {
     cyl_updateColorMode(this.context.config.colorMode);
+    cyl_setLocalizationContext(this.context);
   }
 
   /** [EN] Item 54: follow the system's dark / light mode. [CN] 第 54 项：跟随系统深色 / 浅色模式。 */

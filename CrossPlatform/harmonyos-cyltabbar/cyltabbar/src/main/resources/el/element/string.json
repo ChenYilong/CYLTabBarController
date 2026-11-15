@@ -1,0 +1,680 @@
+{
+  "string": [
+    {
+      "name": "cyl_l10n_aaf9b7d7382d",
+      "value": "%@ νέα μηνύματα"
+    },
+    {
+      "name": "cyl_l10n_81a05b6c1cf9",
+      "value": "%@, %@"
+    },
+    {
+      "name": "cyl_l10n_0b0ae9062c5a",
+      "value": "A tab bar controller of another context, with a square plus button"
+    },
+    {
+      "name": "cyl_l10n_aa3e67bda3c0",
+      "value": "ArkUI Tabs, the HarmonyOS system tab bar, with the same tabs"
+    },
+    {
+      "name": "cyl_l10n_8665e238c516",
+      "value": "Badge: %@"
+    },
+    {
+      "name": "cyl_l10n_6b2186414c82",
+      "value": "Αναβόσβημα ×3"
+    },
+    {
+      "name": "cyl_l10n_070554647306",
+      "value": "Περίγραμμα"
+    },
+    {
+      "name": "cyl_l10n_43d3e34b15fb",
+      "value": "Περίγραμμα που ακολουθεί τη σκοτεινή λειτουργία"
+    },
+    {
+      "name": "cyl_l10n_b67554192c50",
+      "value": "Κάτω αριστερά"
+    },
+    {
+      "name": "cyl_l10n_5968e3c37145",
+      "value": "Κάτω δεξιά"
+    },
+    {
+      "name": "cyl_l10n_5d60263416c2",
+      "value": "Αναπήδηση (συνεχώς)"
+    },
+    {
+      "name": "cyl_l10n_f3ce1baf4805",
+      "value": "Αναπήδηση ×3 (cyl_bounceAnimationRepeatTimes)"
+    },
+    {
+      "name": "cyl_l10n_0875a57843a1",
+      "value": "Ανάσα (συνεχώς)"
+    },
+    {
+      "name": "cyl_l10n_8795570ddeef",
+      "value": "CYLTabBarItemBackgroundColor / CYLTabBarItemSelectedBackgroundColor"
+    },
+    {
+      "name": "cyl_l10n_132201f60522",
+      "value": "CYLUtils: ασθενή συσχετισμένα αντικείμενα και εύρεση κουμπιού (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_fa3d06c1b1e9",
+      "value": "CYLFlatDesignTabBarItem: όχι στο κέντρο (στυλ συστήματος)"
+    },
+    {
+      "name": "cyl_l10n_5e74163d3804",
+      "value": "CYLFlatDesignTabBarItem: στο κέντρο"
+    },
+    {
+      "name": "cyl_l10n_158b3b19e868",
+      "value": "Ακτίνα γωνίας"
+    },
+    {
+      "name": "cyl_l10n_4d242c36821c",
+      "value": "Προσαρμοσμένα χρώματα"
+    },
+    {
+      "name": "cyl_l10n_4685555ab484",
+      "value": "Προσαρμοσμένη γραμματοσειρά"
+    },
+    {
+      "name": "cyl_l10n_a45350c25311",
+      "value": "Προσαρμοσμένο μέγιστο (9)"
+    },
+    {
+      "name": "cyl_l10n_bf0576472e31",
+      "value": "Double tap to open"
+    },
+    {
+      "name": "cyl_l10n_7e0a1ad9a767",
+      "value": "Εμφάνιση μία φορά"
+    },
+    {
+      "name": "cyl_l10n_026b984bb8d8",
+      "value": "Αναστροφή ×2"
+    },
+    {
+      "name": "cyl_l10n_c5d4cd682981",
+      "value": "Εικονίδιο GIF"
+    },
+    {
+      "name": "cyl_l10n_d52d30723b2f",
+      "value": "Αριστερά προς δεξιά μία φορά"
+    },
+    {
+      "name": "cyl_l10n_2e8e48a2ebfd",
+      "value": "Long press a tab or the plus button"
+    },
+    {
+      "name": "cyl_l10n_983696096694",
+      "value": "Περιθώριο"
+    },
+    {
+      "name": "cyl_l10n_24d459a81449",
+      "value": "ΝΕΟ"
+    },
+    {
+      "name": "cyl_l10n_03c2e7e41ffc",
+      "value": "Νέο"
+    },
+    {
+      "name": "cyl_l10n_1e8f217bdf71",
+      "value": "Next tab (cyl_selectNextTab, issue #535)"
+    },
+    {
+      "name": "cyl_l10n_b2ee912b91d6",
+      "value": "Αριθμός"
+    },
+    {
+      "name": "cyl_l10n_ab7fa33c83b1",
+      "value": "Αριθμός πάνω από το μέγιστο"
+    },
+    {
+      "name": "cyl_l10n_e0aa021e21dd",
+      "value": "OK"
+    },
+    {
+      "name": "cyl_l10n_287e78fd65af",
+      "value": "Άλλο κείμενο"
+    },
+    {
+      "name": "cyl_l10n_41b77539cc64",
+      "value": "Εικόνα PlusButton που φορτώνεται αργότερα"
+    },
+    {
+      "name": "cyl_l10n_72a245189eaf",
+      "value": "Περιοχή αφής του PlusButton (issue #91)"
+    },
+    {
+      "name": "cyl_l10n_9a1d72fdd764",
+      "value": "Previous tab (cyl_selectPreviousTab, issue #535)"
+    },
+    {
+      "name": "cyl_l10n_4b0282f4f1c6",
+      "value": "Push σε UITabBarController συστήματος (άλλο κουμπί συν)"
+    },
+    {
+      "name": "cyl_l10n_e5416d3ed3c0",
+      "value": "Push to another CYLTabBarController (another PlusButton)"
+    },
+    {
+      "name": "cyl_l10n_8c96672c9bc5",
+      "value": "Push TabBarController με το ίδιο context (ίδια κλάση κουμπιού συν)"
+    },
+    {
+      "name": "cyl_l10n_6166b27ea14b",
+      "value": "Ώθηση TabBarController με νέο πλαίσιο (PlusButton με υποπροβολή X που πατιέται, issue #202)"
+    },
+    {
+      "name": "cyl_l10n_a63e8b745e73",
+      "value": "Pushes a page that hides the navigation bar while shown, with no base class"
+    },
+    {
+      "name": "cyl_l10n_79fe28f3a3ac",
+      "value": "Pushes a tab bar controller whose plus button image changes 2 s later; the layout must not move"
+    },
+    {
+      "name": "cyl_l10n_c27618b1aa9d",
+      "value": "Κόκκινη τελεία"
+    },
+    {
+      "name": "cyl_l10n_255c00a63f9d",
+      "value": "Ακτίνα κόκκινης τελείας"
+    },
+    {
+      "name": "cyl_l10n_7aac5e07b16d",
+      "value": "Δεξιά προς αριστερά μία φορά"
+    },
+    {
+      "name": "cyl_l10n_f0c792c049bc",
+      "value": "Κύλιση μία φορά"
+    },
+    {
+      "name": "cyl_l10n_401ea21c7a44",
+      "value": "Περιστροφή (συνεχώς)"
+    },
+    {
+      "name": "cyl_l10n_b5fcd68edd9f",
+      "value": "Κλιμάκωση (συνεχώς)"
+    },
+    {
+      "name": "cyl_l10n_544d03258eaf",
+      "value": "Κλιμάκωση μία φορά"
+    },
+    {
+      "name": "cyl_l10n_dbd4f5e49888",
+      "value": "Κλιμάκωση ×3"
+    },
+    {
+      "name": "cyl_l10n_9ae56cc36e81",
+      "value": "Κούνημα (συνεχώς)"
+    },
+    {
+      "name": "cyl_l10n_e0a90124b72f",
+      "value": "Κούνημα ×3 (cyl_shakeAnimationRepeatTimes)"
+    },
+    {
+      "name": "cyl_l10n_b10d33d5ad4d",
+      "value": "Κούνημα, σταματά με Μείωση κίνησης"
+    },
+    {
+      "name": "cyl_l10n_6cbe015b00fb",
+      "value": "Εμφάνιση / απόκρυψη CYLFlatDesignTabBar"
+    },
+    {
+      "name": "cyl_l10n_3cb58e0d546d",
+      "value": "Ελατήριο (συνεχώς)"
+    },
+    {
+      "name": "cyl_l10n_0a00b2238071",
+      "value": "Ελατήριο μία φορά"
+    },
+    {
+      "name": "cyl_l10n_fee4a478923f",
+      "value": "Αλληλεπιδράσεις καρτελών"
+    },
+    {
+      "name": "cyl_l10n_98559580dcc7",
+      "value": "Κίνηση πατήματος καρτελών (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_db89836d6e21",
+      "value": "Ήχος και απτική στο πάτημα καρτέλας (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_2f6e866d5219",
+      "value": "Σελίδες, επιλογή και σύνδεση"
+    },
+    {
+      "name": "cyl_l10n_6d067090c833",
+      "value": "Tab, %1$@ of %2$@"
+    },
+    {
+      "name": "cyl_l10n_75ccb7ef4864",
+      "value": "Εμφάνιση γραμμής καρτελών"
+    },
+    {
+      "name": "cyl_l10n_2e6d648945c0",
+      "value": "The plus button sticks out of the bar; its part above the bar responds (shown in red)"
+    },
+    {
+      "name": "cyl_l10n_f43b06c12ee1",
+      "value": "The system bar has no plus button: a floating button stands in"
+    },
+    {
+      "name": "cyl_l10n_a4d0d101d6a3",
+      "value": "Πάνω αριστερά"
+    },
+    {
+      "name": "cyl_l10n_2306a585ae00",
+      "value": "cyl_itemEdgeInsets: 15% of a tab width free at each end"
+    },
+    {
+      "name": "cyl_l10n_fd15e88376df",
+      "value": "Επίδειξη μεθόδων cyl_pop / cyl_push"
+    },
+    {
+      "name": "cyl_l10n_1ec113617309",
+      "value": "cyl_pushViewController, cyl_popSelectTabBarChildViewControllerAtIndex, cyl_pushOrPopToViewController"
+    },
+    {
+      "name": "cyl_l10n_ee5b6ac6461b",
+      "value": "selectedIndex και PlusButton (issue #515)"
+    },
+    {
+      "name": "cyl_l10n_2de6d572f86b",
+      "value": "Θέμα standardAppearance (κοινό για Liquid Glass και FlatDesign)"
+    },
+    {
+      "name": "cyl_l10n_2a0608059131",
+      "value": "Ενημερώνει τους τίτλους όλων των καρτελών μαζί· πατήστε ξανά για επαναφορά"
+    },
+    {
+      "name": "cyl_l10n_57196013d558",
+      "value": "Halloween"
+    },
+    {
+      "name": "cyl_l10n_0a58c230c3d9",
+      "value": "Λήψη και ενημέρωση των εικονιδίων όλων των καρτελών· πατήστε ξανά για επαναφορά"
+    },
+    {
+      "name": "cyl_l10n_5e347d8ccb68",
+      "value": "Λήψη εικονιδίου από το δίκτυο"
+    },
+    {
+      "name": "cyl_l10n_2e0e84a0dcfb",
+      "value": "Απόκρυψη γραμμής πλοήγησης χωρίς βασική κλάση (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_e1642a46b804",
+      "value": "Γιορτή του μέσου του φθινοπώρου"
+    },
+    {
+      "name": "cyl_l10n_0c2817d10627",
+      "value": "Μεσαία απτική ανάδραση"
+    },
+    {
+      "name": "cyl_l10n_0f60774903e0",
+      "value": "Φόρτωση εικόνων από bundle (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_0e1b02648a11",
+      "value": "Μεγέθυνση"
+    },
+    {
+      "name": "cyl_l10n_cc03f47a389c",
+      "value": "Κατεβάζει το εικονίδιο της καρτέλας από το δίκτυο (με κρυφή μνήμη)· πατήστε ξανά για επαναφορά"
+    },
+    {
+      "name": "cyl_l10n_24fb8692947a",
+      "value": "διατηρήθηκε"
+    },
+    {
+      "name": "cyl_l10n_b15d91274e9f",
+      "value": "Κλείσιμο"
+    },
+    {
+      "name": "cyl_l10n_70922c50ef07",
+      "value": "Προειδοποίηση μνήμης"
+    },
+    {
+      "name": "cyl_l10n_cbed6b29761b",
+      "value": "Κουμπί συν"
+    },
+    {
+      "name": "cyl_l10n_18684d72945b",
+      "value": "Φόρτωση εικόνας"
+    },
+    {
+      "name": "cyl_l10n_b981b7b359a7",
+      "value": "Φόρτωση εικόνας φόντου"
+    },
+    {
+      "name": "cyl_l10n_7136049eb4c7",
+      "value": "Αποφορτώνει τις μη επιλεγμένες καρτέλες· φορτώνονται ξανά όταν επιλεγούν"
+    },
+    {
+      "name": "cyl_l10n_c7626d7d6194",
+      "value": "Αλλάζει επιτόπου τον τίτλο της καρτέλας αυτής της σελίδας· πατήστε ξανά για επαναφορά"
+    },
+    {
+      "name": "cyl_l10n_15fb093f6fff",
+      "value": "Ενημέρωση καρτελών επί τόπου"
+    },
+    {
+      "name": "cyl_l10n_c1ecedab11bc",
+      "value": "Αρχικό"
+    },
+    {
+      "name": "cyl_l10n_625fb26b4b33",
+      "value": "Ακύρωση"
+    },
+    {
+      "name": "cyl_l10n_d25efeb790bb",
+      "value": "Κοντά"
+    },
+    {
+      "name": "cyl_l10n_7941d8987ff2",
+      "value": "Σύγκριση με το UITabBar του συστήματος"
+    },
+    {
+      "name": "cyl_l10n_d0d78acf1941",
+      "value": "Χριστούγεννα"
+    },
+    {
+      "name": "cyl_l10n_aa91e8ceec70",
+      "value": "Πάσχα"
+    },
+    {
+      "name": "cyl_l10n_3df20a295b39",
+      "value": "Καλοκαίρι"
+    },
+    {
+      "name": "cyl_l10n_0ef6dae7e80c",
+      "value": "Διάστημα"
+    },
+    {
+      "name": "cyl_l10n_bccc798b577a",
+      "value": "Κάψουλα στο κέντρο"
+    },
+    {
+      "name": "cyl_l10n_7c87af044929",
+      "value": "Σάρωση για αλλαγή καρτέλας (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_7a2261654d24",
+      "value": "αποφορτώθηκε"
+    },
+    {
+      "name": "cyl_l10n_091885db07e4",
+      "value": "Αναπήδηση"
+    },
+    {
+      "name": "cyl_l10n_758903c327de",
+      "value": "Δείχνει ένα κινούμενο GIF ως εικονίδιο καρτέλας· πατήστε ξανά για επαναφορά"
+    },
+    {
+      "name": "cyl_l10n_c4328f75476f",
+      "value": "Ημέρα του Αγίου Βαλεντίνου"
+    },
+    {
+      "name": "cyl_l10n_07b181184280",
+      "value": "Εγώ"
+    },
+    {
+      "name": "cyl_l10n_a01539048bb0",
+      "value": "Ενεργοποιήστε τον διακόπτη και πατήστε παρατεταμένα μια καρτέλα ή το PlusButton για να δείτε το αναγνωριστικό του."
+    },
+    {
+      "name": "cyl_l10n_633c2ee4dcc7",
+      "value": "Αλλαγή όλων των εικονιδίων δικτύου"
+    },
+    {
+      "name": "cyl_l10n_f75fe6720861",
+      "value": "Αλλαγή όλων των τοπικών εικονιδίων"
+    },
+    {
+      "name": "cyl_l10n_7fb5208a54d5",
+      "value": "Αλλαγή όλων των τίτλων"
+    },
+    {
+      "name": "cyl_l10n_2f728e190695",
+      "value": "Εμφανίζει άλλες σελίδες στις καρτέλες και στις δύο πλευρές (issue #481)· πατήστε ξανά για επαναφορά"
+    },
+    {
+      "name": "cyl_l10n_0be5a194844c",
+      "value": "Εμφάνιση"
+    },
+    {
+      "name": "cyl_l10n_61a9cd33b1ff",
+      "value": "Εμφάνιση (θέμα, issue #216)"
+    },
+    {
+      "name": "cyl_l10n_09d0fdddca66",
+      "value": "Εμφανίσεις: γιορτές και χρώματα (%@)"
+    },
+    {
+      "name": "cyl_l10n_a0ffdf359138",
+      "value": "Αλλαγή ύψους CYLFlatDesignTabBar"
+    },
+    {
+      "name": "cyl_l10n_01e3254a92ba",
+      "value": "Μεγέθυνση και σμίκρυνση"
+    },
+    {
+      "name": "cyl_l10n_d46d5bb15db1",
+      "value": "Πρωτοχρονιά"
+    },
+    {
+      "name": "cyl_l10n_79b5a6564585",
+      "value": "Περιστροφή"
+    },
+    {
+      "name": "cyl_l10n_d81bb206a889",
+      "value": "Κανένα"
+    },
+    {
+      "name": "cyl_l10n_14f433db2189",
+      "value": "Χωρίς βασική κλάση, και βοηθήματα"
+    },
+    {
+      "name": "cyl_l10n_d2339bb4edaa",
+      "value": "Γιορτή της Άνοιξης"
+    },
+    {
+      "name": "cyl_l10n_5f1de850fb46",
+      "value": "Αλλαγή τίτλου καρτέλας"
+    },
+    {
+      "name": "cyl_l10n_9d0d66f312b5",
+      "value": "Αντικατάσταση με μεγαλύτερη εικόνα"
+    },
+    {
+      "name": "cyl_l10n_b051a19ace76",
+      "value": "Αντικατάσταση γειτονικών καρτελών"
+    },
+    {
+      "name": "cyl_l10n_a131e4f178aa",
+      "value": "Νέο περιεχόμενο"
+    },
+    {
+      "name": "cyl_l10n_467b3e031441",
+      "value": "δεν φορτώθηκε"
+    },
+    {
+      "name": "cyl_l10n_2c8d9e877a54",
+      "value": "Μετατόπιση τίτλου (titlePositionAdjustment)"
+    },
+    {
+      "name": "cyl_l10n_0787cd518387",
+      "value": "Προσομοίωση προειδοποίησης μνήμης"
+    },
+    {
+      "name": "cyl_l10n_6a00c1ae99fa",
+      "value": "Ωκεανός"
+    },
+    {
+      "name": "cyl_l10n_ff692f04ace0",
+      "value": "Μηνύματα"
+    },
+    {
+      "name": "cyl_l10n_41e8e8b9935c",
+      "value": "Σκούρο"
+    },
+    {
+      "name": "cyl_l10n_8dfe6bcdd6ec",
+      "value": "Μετάβαση ολίσθησης (CYLTabBarSlideTransitionAnimator)"
+    },
+    {
+      "name": "cyl_l10n_9f44bafc75c6",
+      "value": "Σμίκρυνση / απόκρυψη TabBar κατά την κύλιση (issue #13)"
+    },
+    {
+      "name": "cyl_l10n_678abebe6aac",
+      "value": "Πατήστε το X πάνω δεξιά στο PlusButton: το X αλλάζει σε τυχαίο χρώμα και το PlusButton δεν αντιδρά"
+    },
+    {
+      "name": "cyl_l10n_7375af54db2a",
+      "value": "Πατήστε για αλλαγή της κίνησης πατήματος των καρτελών και του PlusButton. Τώρα: %@"
+    },
+    {
+      "name": "cyl_l10n_5378f31b520c",
+      "value": "Πατήστε για εναλλαγή του tabBar.standardAppearance, τρέχον: %@"
+    },
+    {
+      "name": "cyl_l10n_4a986e4da535",
+      "value": "Πατήστε για εναλλαγή της κατακόρυφης μετατόπισης των τίτλων όλων των καρτελών, τρέχουσα: %@"
+    },
+    {
+      "name": "cyl_l10n_3d0d9d3d7cc2",
+      "value": "Πατήστε για αλλαγή γλώσσας"
+    },
+    {
+      "name": "cyl_l10n_f4e41dda1094",
+      "value": "Πατήστε για εναλλαγή και μετά πατήστε οποιαδήποτε καρτέλα ή το PlusButton για να το ακούσετε. Η απτική δονείται μόνο σε πραγματική συσκευή. Τώρα: %@"
+    },
+    {
+      "name": "cyl_l10n_15855ab96e87",
+      "value": "Κλικ + απτική"
+    },
+    {
+      "name": "cyl_l10n_cff8a9cded04",
+      "value": "Πατήστε για να επιλέξετε θέμα: το φόντο, τα εικονίδια και τα χρώματα κειμένου της TabBar αλλάζουν επιτόπου, σε κάθε στυλ TabBar. Τώρα: %@"
+    },
+    {
+      "name": "cyl_l10n_1c00c4fd1cea",
+      "value": "Ροζ τριαντάφυλλο"
+    },
+    {
+      "name": "cyl_l10n_8483ed132b2c",
+      "value": "Γενέθλια"
+    },
+    {
+      "name": "cyl_l10n_feef14745f21",
+      "value": "Ενημερώνει τα εικονίδια όλων των καρτελών με τοπικές εικόνες (όνομα, διαδρομή, UIImage, URL αρχείου)· πατήστε ξανά για επαναφορά"
+    },
+    {
+      "name": "cyl_l10n_402d19e50fff",
+      "value": "Σύνδεση"
+    },
+    {
+      "name": "cyl_l10n_833152116634",
+      "value": "Αφαίρεση εικόνας"
+    },
+    {
+      "name": "cyl_l10n_a0676a7d84a9",
+      "value": "Πράσινη γραμμή"
+    },
+    {
+      "name": "cyl_l10n_16068b2ff3fd",
+      "value": "Εικονίδια από το δίκτυο"
+    },
+    {
+      "name": "cyl_l10n_69ca6555a602",
+      "value": "Αναστροφή"
+    },
+    {
+      "name": "cyl_l10n_4bd51044149f",
+      "value": "Δικό σας αρχείο ήχου (cyl_tabButtonTapSoundURL)"
+    },
+    {
+      "name": "cyl_l10n_beabcd498b94",
+      "value": "Γκρέιπφρουτ"
+    },
+    {
+      "name": "cyl_l10n_b8c467fce096",
+      "value": "Σήματα"
+    },
+    {
+      "name": "cyl_l10n_200e65177369",
+      "value": "Ορισμός χρώματος φόντου CYLFlatDesignTabBarItem"
+    },
+    {
+      "name": "cyl_l10n_295bb704f520",
+      "value": "Γλώσσα"
+    },
+    {
+      "name": "cyl_l10n_d673e0eb5c1c",
+      "value": "Απόκριση εκτός της γονικής προβολής (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_71bbc726ace5",
+      "value": "Όπως το σύστημα"
+    },
+    {
+      "name": "cyl_l10n_d0914cf6acd2",
+      "value": "Πλοήγηση και συγκρίσεις"
+    },
+    {
+      "name": "cyl_l10n_110abc875180",
+      "value": "Ελαφριά απτική ανάδραση"
+    },
+    {
+      "name": "cyl_l10n_fad7c8a21fe3",
+      "value": "Επιλεγμένο"
+    },
+    {
+      "name": "cyl_l10n_aa05fd09a619",
+      "value": "Γενικά"
+    },
+    {
+      "name": "cyl_l10n_15c64aa0b404",
+      "value": "Αρχείο ρυθμίσεων"
+    },
+    {
+      "name": "cyl_l10n_45158907e07f",
+      "value": "Έντονη απτική ανάδραση"
+    },
+    {
+      "name": "cyl_l10n_d6982fecc6a4",
+      "value": "Παρατεταμένο πάτημα καρτελών (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_aefae51d3c25",
+      "value": "Παρατεταμένο πάτημα στο «%@»"
+    },
+    {
+      "name": "cyl_l10n_abad1baa5479",
+      "value": "Διάρκεια παρατεταμένου πατήματος και διάστημα διπλού πατήματος (issue #535 / #152)"
+    },
+    {
+      "name": "cyl_l10n_b146fc1a1531",
+      "value": "Γρασίδι"
+    },
+    {
+      "name": "cyl_l10n_db1c89e0f6e6",
+      "value": "Αρχική"
+    },
+    {
+      "name": "cyl_l10n_18c63459a2c0",
+      "value": "Προεπιλογή"
+    },
+    {
+      "name": "cyl_l10n_be354ee4263a",
+      "value": "Προεπιλεγμένο κλικ"
+    }
+  ]
+}

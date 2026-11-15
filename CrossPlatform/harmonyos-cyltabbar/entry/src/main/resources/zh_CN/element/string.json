@@ -21,6 +21,10 @@
       "value": "发布"
     },
     {
+      "name": "tab_refresh",
+      "value": "刷新"
+    },
+    {
       "name": "module_desc",
       "value": "CYLTabBarController example"
     },
@@ -31,10 +35,6 @@
     {
       "name": "app_name",
       "value": "CYLTabBar"
-    },
-    {
-      "name": "tab_refresh",
-      "value": "刷新"
     }
   ]
 }

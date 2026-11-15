@@ -362,6 +362,8 @@ export struct CYLBadgeView {
       .rotate({ x: 1, y: 0, z: 0, angle: this.rotateX })
       .rotate({ x: 0, y: this.rotateY !== 0 ? 1 : 0, z: this.rotateZ !== 0 ? 1 : 0,
         angle: this.rotateY !== 0 ? this.rotateY : this.rotateZ })
+      // [EN] Read as part of its host (cyl_badgeAccessibilityText), not on its own. [CN] 作为宿主的一部分读出，不单独读出。
+      .accessibilityLevel('no')
       .onAppear(() => this.cylPlay())
       .onAttach(() => this.cylPlay())
       .id('cyl-badge')
