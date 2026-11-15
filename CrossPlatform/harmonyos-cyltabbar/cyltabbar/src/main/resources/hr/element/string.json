@@ -1,0 +1,696 @@
+{
+  "string": [
+    {
+      "name": "cyl_l10n_aaf9b7d7382d",
+      "value": "Nove poruke: %@"
+    },
+    {
+      "name": "cyl_l10n_81a05b6c1cf9",
+      "value": "%@, %@"
+    },
+    {
+      "name": "cyl_l10n_0b0ae9062c5a",
+      "value": "A tab bar controller of another context, with a square plus button"
+    },
+    {
+      "name": "cyl_l10n_aa3e67bda3c0",
+      "value": "ArkUI Tabs, the HarmonyOS system tab bar, with the same tabs"
+    },
+    {
+      "name": "cyl_l10n_8665e238c516",
+      "value": "Badge: %@"
+    },
+    {
+      "name": "cyl_l10n_6b2186414c82",
+      "value": "Treptanje ×3"
+    },
+    {
+      "name": "cyl_l10n_070554647306",
+      "value": "Obrub"
+    },
+    {
+      "name": "cyl_l10n_43d3e34b15fb",
+      "value": "Obrub koji prati tamni način"
+    },
+    {
+      "name": "cyl_l10n_b67554192c50",
+      "value": "Dolje lijevo"
+    },
+    {
+      "name": "cyl_l10n_5968e3c37145",
+      "value": "Dolje desno"
+    },
+    {
+      "name": "cyl_l10n_5d60263416c2",
+      "value": "Odskakivanje (stalno)"
+    },
+    {
+      "name": "cyl_l10n_f3ce1baf4805",
+      "value": "Odskakivanje ×3 (cyl_bounceAnimationRepeatTimes)"
+    },
+    {
+      "name": "cyl_l10n_0875a57843a1",
+      "value": "Disanje (stalno)"
+    },
+    {
+      "name": "cyl_l10n_8795570ddeef",
+      "value": "CYLTabBarItemBackgroundColor / CYLTabBarItemSelectedBackgroundColor"
+    },
+    {
+      "name": "cyl_l10n_132201f60522",
+      "value": "CYLUtils: slabi pridruženi objekti i pronalaženje gumba (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_fa3d06c1b1e9",
+      "value": "CYLFlatDesignTabBarItem: nije centrirano (stil sustava)"
+    },
+    {
+      "name": "cyl_l10n_5e74163d3804",
+      "value": "CYLFlatDesignTabBarItem: centrirano"
+    },
+    {
+      "name": "cyl_l10n_158b3b19e868",
+      "value": "Radijus kuta"
+    },
+    {
+      "name": "cyl_l10n_4d242c36821c",
+      "value": "Prilagođene boje"
+    },
+    {
+      "name": "cyl_l10n_4685555ab484",
+      "value": "Prilagođeni font"
+    },
+    {
+      "name": "cyl_l10n_a45350c25311",
+      "value": "Prilagođeni maksimum (9)"
+    },
+    {
+      "name": "cyl_l10n_bf0576472e31",
+      "value": "Double tap to open"
+    },
+    {
+      "name": "cyl_l10n_7e0a1ad9a767",
+      "value": "Jednom postupno pojavljivanje"
+    },
+    {
+      "name": "cyl_l10n_153407d52fed",
+      "value": "Flat Design"
+    },
+    {
+      "name": "cyl_l10n_5cfed317a99d",
+      "value": "Stil Flat Design"
+    },
+    {
+      "name": "cyl_l10n_026b984bb8d8",
+      "value": "Okretanje ×2"
+    },
+    {
+      "name": "cyl_l10n_c5d4cd682981",
+      "value": "GIF ikona"
+    },
+    {
+      "name": "cyl_l10n_d52d30723b2f",
+      "value": "Jednom slijeva nadesno"
+    },
+    {
+      "name": "cyl_l10n_f201a4158727",
+      "value": "Liquid Glass"
+    },
+    {
+      "name": "cyl_l10n_af3acf6eb4a9",
+      "value": "Liquid Glass"
+    },
+    {
+      "name": "cyl_l10n_2e8e48a2ebfd",
+      "value": "Long press a tab or the plus button"
+    },
+    {
+      "name": "cyl_l10n_983696096694",
+      "value": "Margina"
+    },
+    {
+      "name": "cyl_l10n_24d459a81449",
+      "value": "NOVO"
+    },
+    {
+      "name": "cyl_l10n_03c2e7e41ffc",
+      "value": "Novo"
+    },
+    {
+      "name": "cyl_l10n_1e8f217bdf71",
+      "value": "Next tab (cyl_selectNextTab, issue #535)"
+    },
+    {
+      "name": "cyl_l10n_b2ee912b91d6",
+      "value": "Broj"
+    },
+    {
+      "name": "cyl_l10n_ab7fa33c83b1",
+      "value": "Broj iznad maksimuma"
+    },
+    {
+      "name": "cyl_l10n_e0aa021e21dd",
+      "value": "U redu"
+    },
+    {
+      "name": "cyl_l10n_287e78fd65af",
+      "value": "Drugi tekst"
+    },
+    {
+      "name": "cyl_l10n_41b77539cc64",
+      "value": "Slika PlusButtona učitana kasnije"
+    },
+    {
+      "name": "cyl_l10n_72a245189eaf",
+      "value": "Područje dodira PlusButtona (issue #91)"
+    },
+    {
+      "name": "cyl_l10n_9a1d72fdd764",
+      "value": "Previous tab (cyl_selectPreviousTab, issue #535)"
+    },
+    {
+      "name": "cyl_l10n_4b0282f4f1c6",
+      "value": "Push u sustavni UITabBarController (druga tipka plus)"
+    },
+    {
+      "name": "cyl_l10n_e5416d3ed3c0",
+      "value": "Push to another CYLTabBarController (another PlusButton)"
+    },
+    {
+      "name": "cyl_l10n_8c96672c9bc5",
+      "value": "Push TabBarControllera s istim contextom (ista klasa tipke plus)"
+    },
+    {
+      "name": "cyl_l10n_6166b27ea14b",
+      "value": "Prikaži TabBarController s novim kontekstom (PlusButton s X podprikazom koji se može dodirnuti, issue #202)"
+    },
+    {
+      "name": "cyl_l10n_a63e8b745e73",
+      "value": "Pushes a page that hides the navigation bar while shown, with no base class"
+    },
+    {
+      "name": "cyl_l10n_79fe28f3a3ac",
+      "value": "Pushes a tab bar controller whose plus button image changes 2 s later; the layout must not move"
+    },
+    {
+      "name": "cyl_l10n_c27618b1aa9d",
+      "value": "Crvena točka"
+    },
+    {
+      "name": "cyl_l10n_255c00a63f9d",
+      "value": "Radijus crvene točke"
+    },
+    {
+      "name": "cyl_l10n_7aac5e07b16d",
+      "value": "Jednom zdesna nalijevo"
+    },
+    {
+      "name": "cyl_l10n_f0c792c049bc",
+      "value": "Jednom pomicanje"
+    },
+    {
+      "name": "cyl_l10n_401ea21c7a44",
+      "value": "Rotacija (stalno)"
+    },
+    {
+      "name": "cyl_l10n_b5fcd68edd9f",
+      "value": "Skaliranje (stalno)"
+    },
+    {
+      "name": "cyl_l10n_544d03258eaf",
+      "value": "Jednom skaliranje"
+    },
+    {
+      "name": "cyl_l10n_dbd4f5e49888",
+      "value": "Skaliranje ×3"
+    },
+    {
+      "name": "cyl_l10n_9ae56cc36e81",
+      "value": "Tresenje (stalno)"
+    },
+    {
+      "name": "cyl_l10n_e0a90124b72f",
+      "value": "Tresenje ×3 (cyl_shakeAnimationRepeatTimes)"
+    },
+    {
+      "name": "cyl_l10n_b10d33d5ad4d",
+      "value": "Tresenje, zaustavlja se uz Smanjenje pokreta"
+    },
+    {
+      "name": "cyl_l10n_6cbe015b00fb",
+      "value": "Prikaži / sakrij CYLFlatDesignTabBar"
+    },
+    {
+      "name": "cyl_l10n_3cb58e0d546d",
+      "value": "Opruga (stalno)"
+    },
+    {
+      "name": "cyl_l10n_0a00b2238071",
+      "value": "Jednom opruga"
+    },
+    {
+      "name": "cyl_l10n_fee4a478923f",
+      "value": "Interakcije kartica"
+    },
+    {
+      "name": "cyl_l10n_98559580dcc7",
+      "value": "Animacija dodira kartica (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_db89836d6e21",
+      "value": "Zvuk i haptika dodira kartice (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_2f6e866d5219",
+      "value": "Stranice, odabir i prijava"
+    },
+    {
+      "name": "cyl_l10n_6d067090c833",
+      "value": "Tab, %1$@ of %2$@"
+    },
+    {
+      "name": "cyl_l10n_75ccb7ef4864",
+      "value": "Izgled trake kartica"
+    },
+    {
+      "name": "cyl_l10n_2e6d648945c0",
+      "value": "The plus button sticks out of the bar; its part above the bar responds (shown in red)"
+    },
+    {
+      "name": "cyl_l10n_f43b06c12ee1",
+      "value": "The system bar has no plus button: a floating button stands in"
+    },
+    {
+      "name": "cyl_l10n_a4d0d101d6a3",
+      "value": "Gore lijevo"
+    },
+    {
+      "name": "cyl_l10n_2306a585ae00",
+      "value": "cyl_itemEdgeInsets: 15% of a tab width free at each end"
+    },
+    {
+      "name": "cyl_l10n_fd15e88376df",
+      "value": "Demo metoda cyl_pop / cyl_push"
+    },
+    {
+      "name": "cyl_l10n_1ec113617309",
+      "value": "cyl_pushViewController, cyl_popSelectTabBarChildViewControllerAtIndex, cyl_pushOrPopToViewController"
+    },
+    {
+      "name": "cyl_l10n_ee5b6ac6461b",
+      "value": "selectedIndex i PlusButton (issue #515)"
+    },
+    {
+      "name": "cyl_l10n_2de6d572f86b",
+      "value": "Tema standardAppearance (zajednička za Liquid Glass i FlatDesign)"
+    },
+    {
+      "name": "cyl_l10n_2a0608059131",
+      "value": "Ažurira naslove svih kartica odjednom; dodirnite ponovno za vraćanje"
+    },
+    {
+      "name": "cyl_l10n_57196013d558",
+      "value": "Noć vještica"
+    },
+    {
+      "name": "cyl_l10n_0a58c230c3d9",
+      "value": "Preuzima i ažurira ikone svih kartica; dodirnite ponovno za vraćanje"
+    },
+    {
+      "name": "cyl_l10n_5e347d8ccb68",
+      "value": "Preuzmi ikonu s mreže"
+    },
+    {
+      "name": "cyl_l10n_2e0e84a0dcfb",
+      "value": "Sakrij navigacijsku traku bez osnovne klase (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_e1642a46b804",
+      "value": "Festival sredine jeseni"
+    },
+    {
+      "name": "cyl_l10n_0c2817d10627",
+      "value": "Srednja haptička povratna informacija"
+    },
+    {
+      "name": "cyl_l10n_0f60774903e0",
+      "value": "Učitaj slike iz bundlea (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_0e1b02648a11",
+      "value": "Približi"
+    },
+    {
+      "name": "cyl_l10n_cc03f47a389c",
+      "value": "Preuzima ikonu kartice s mreže (u predmemoriji); dodirnite ponovno za vraćanje"
+    },
+    {
+      "name": "cyl_l10n_24fb8692947a",
+      "value": "zadržano"
+    },
+    {
+      "name": "cyl_l10n_b15d91274e9f",
+      "value": "Zatvori"
+    },
+    {
+      "name": "cyl_l10n_70922c50ef07",
+      "value": "Upozorenje o memoriji"
+    },
+    {
+      "name": "cyl_l10n_cbed6b29761b",
+      "value": "Tipka plus"
+    },
+    {
+      "name": "cyl_l10n_18684d72945b",
+      "value": "Učitaj sliku"
+    },
+    {
+      "name": "cyl_l10n_b981b7b359a7",
+      "value": "Učitaj pozadinsku sliku"
+    },
+    {
+      "name": "cyl_l10n_7136049eb4c7",
+      "value": "Oslobađa neodabrane kartice; ponovno se učitavaju kad se odaberu"
+    },
+    {
+      "name": "cyl_l10n_c7626d7d6194",
+      "value": "Mijenja naslov kartice ove stranice na mjestu; dodirnite ponovno za vraćanje"
+    },
+    {
+      "name": "cyl_l10n_15fb093f6fff",
+      "value": "Ažuriranje kartica na mjestu"
+    },
+    {
+      "name": "cyl_l10n_c1ecedab11bc",
+      "value": "Izvorno"
+    },
+    {
+      "name": "cyl_l10n_625fb26b4b33",
+      "value": "Odustani"
+    },
+    {
+      "name": "cyl_l10n_d25efeb790bb",
+      "value": "U blizini"
+    },
+    {
+      "name": "cyl_l10n_7941d8987ff2",
+      "value": "Usporedi sa sustavnim UITabBarom"
+    },
+    {
+      "name": "cyl_l10n_d0d78acf1941",
+      "value": "Božić"
+    },
+    {
+      "name": "cyl_l10n_aa91e8ceec70",
+      "value": "Uskrs"
+    },
+    {
+      "name": "cyl_l10n_3df20a295b39",
+      "value": "Ljeto"
+    },
+    {
+      "name": "cyl_l10n_0ef6dae7e80c",
+      "value": "Svemir"
+    },
+    {
+      "name": "cyl_l10n_bccc798b577a",
+      "value": "Centrirana kapsula"
+    },
+    {
+      "name": "cyl_l10n_7c87af044929",
+      "value": "Prebacivanje kartica povlačenjem (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_7a2261654d24",
+      "value": "oslobođeno"
+    },
+    {
+      "name": "cyl_l10n_091885db07e4",
+      "value": "Odskok"
+    },
+    {
+      "name": "cyl_l10n_758903c327de",
+      "value": "Prikazuje animirani GIF kao ikonu kartice; dodirnite ponovno za vraćanje"
+    },
+    {
+      "name": "cyl_l10n_c4328f75476f",
+      "value": "Valentinovo"
+    },
+    {
+      "name": "cyl_l10n_07b181184280",
+      "value": "Ja"
+    },
+    {
+      "name": "cyl_l10n_a01539048bb0",
+      "value": "Uključite prekidač pa dugo pritisnite bilo koju karticu ili PlusButton da biste vidjeli njegov identifikator."
+    },
+    {
+      "name": "cyl_l10n_633c2ee4dcc7",
+      "value": "Promijeni sve mrežne ikone"
+    },
+    {
+      "name": "cyl_l10n_f75fe6720861",
+      "value": "Promijeni sve lokalne ikone"
+    },
+    {
+      "name": "cyl_l10n_7fb5208a54d5",
+      "value": "Promijeni sve naslove"
+    },
+    {
+      "name": "cyl_l10n_2f728e190695",
+      "value": "Prikazuje druge stranice u karticama s obje strane (issue #481); dodirnite ponovno za vraćanje"
+    },
+    {
+      "name": "cyl_l10n_0be5a194844c",
+      "value": "Izgled"
+    },
+    {
+      "name": "cyl_l10n_61a9cd33b1ff",
+      "value": "Izgled (tema, issue #216)"
+    },
+    {
+      "name": "cyl_l10n_09d0fdddca66",
+      "value": "Izgledi: blagdani i boje (%@)"
+    },
+    {
+      "name": "cyl_l10n_a0ffdf359138",
+      "value": "Promijeni visinu CYLFlatDesignTabBara"
+    },
+    {
+      "name": "cyl_l10n_01e3254a92ba",
+      "value": "Povećaj pa smanji"
+    },
+    {
+      "name": "cyl_l10n_d46d5bb15db1",
+      "value": "Nova godina"
+    },
+    {
+      "name": "cyl_l10n_79b5a6564585",
+      "value": "Okreni"
+    },
+    {
+      "name": "cyl_l10n_d81bb206a889",
+      "value": "Nijedna"
+    },
+    {
+      "name": "cyl_l10n_14f433db2189",
+      "value": "Bez osnovne klase, i pomagala"
+    },
+    {
+      "name": "cyl_l10n_d2339bb4edaa",
+      "value": "Proljetni festival"
+    },
+    {
+      "name": "cyl_l10n_5f1de850fb46",
+      "value": "Promijeni naslov kartice"
+    },
+    {
+      "name": "cyl_l10n_9d0d66f312b5",
+      "value": "Zamijeni većom slikom"
+    },
+    {
+      "name": "cyl_l10n_b051a19ace76",
+      "value": "Zamijeni susjedne kartice"
+    },
+    {
+      "name": "cyl_l10n_a131e4f178aa",
+      "value": "Novi sadržaj"
+    },
+    {
+      "name": "cyl_l10n_467b3e031441",
+      "value": "nije učitano"
+    },
+    {
+      "name": "cyl_l10n_2c8d9e877a54",
+      "value": "Pomak naslova (titlePositionAdjustment)"
+    },
+    {
+      "name": "cyl_l10n_0787cd518387",
+      "value": "Simuliraj upozorenje o memoriji"
+    },
+    {
+      "name": "cyl_l10n_6a00c1ae99fa",
+      "value": "Ocean"
+    },
+    {
+      "name": "cyl_l10n_ff692f04ace0",
+      "value": "Poruke"
+    },
+    {
+      "name": "cyl_l10n_41e8e8b9935c",
+      "value": "Tamno"
+    },
+    {
+      "name": "cyl_l10n_8dfe6bcdd6ec",
+      "value": "Klizni prijelaz (CYLTabBarSlideTransitionAnimator)"
+    },
+    {
+      "name": "cyl_l10n_9f44bafc75c6",
+      "value": "Smanji / sakrij TabBar pri pomicanju (issue #13)"
+    },
+    {
+      "name": "cyl_l10n_678abebe6aac",
+      "value": "Dodirnite X gore desno na PlusButtonu: X mijenja boju u nasumičnu, a PlusButton ne reagira"
+    },
+    {
+      "name": "cyl_l10n_7375af54db2a",
+      "value": "Dodirnite za promjenu animacije dodira kartica i PlusButtona. Sada: %@"
+    },
+    {
+      "name": "cyl_l10n_5378f31b520c",
+      "value": "Dodirnite za promjenu tabBar.standardAppearance, trenutačno: %@"
+    },
+    {
+      "name": "cyl_l10n_4a986e4da535",
+      "value": "Dodirnite za promjenu okomitog pomaka naslova svih kartica, trenutačno: %@"
+    },
+    {
+      "name": "cyl_l10n_3d0d9d3d7cc2",
+      "value": "Dodirnite za promjenu jezika"
+    },
+    {
+      "name": "cyl_l10n_f4e41dda1094",
+      "value": "Dodirnite za promjenu, zatim dodirnite bilo koju karticu ili PlusButton da biste čuli. Haptika vibrira samo na stvarnom uređaju. Sada: %@"
+    },
+    {
+      "name": "cyl_l10n_15855ab96e87",
+      "value": "Klik + haptika"
+    },
+    {
+      "name": "cyl_l10n_cff8a9cded04",
+      "value": "Dodirnite za odabir teme: pozadina, ikone i boje teksta TabBara mijenjaju se na mjestu, u svim stilovima TabBara. Trenutačno: %@"
+    },
+    {
+      "name": "cyl_l10n_1c00c4fd1cea",
+      "value": "Ružičasta ruža"
+    },
+    {
+      "name": "cyl_l10n_8483ed132b2c",
+      "value": "Rođendan"
+    },
+    {
+      "name": "cyl_l10n_feef14745f21",
+      "value": "Ažurira ikone svih kartica lokalnim slikama (naziv, putanja, UIImage, URL datoteke); dodirnite ponovno za vraćanje"
+    },
+    {
+      "name": "cyl_l10n_402d19e50fff",
+      "value": "Prijava"
+    },
+    {
+      "name": "cyl_l10n_833152116634",
+      "value": "Ukloni sliku"
+    },
+    {
+      "name": "cyl_l10n_a0676a7d84a9",
+      "value": "Zelena linija"
+    },
+    {
+      "name": "cyl_l10n_16068b2ff3fd",
+      "value": "Ikone s mreže"
+    },
+    {
+      "name": "cyl_l10n_69ca6555a602",
+      "value": "Preokreni"
+    },
+    {
+      "name": "cyl_l10n_4bd51044149f",
+      "value": "Vlastita zvučna datoteka (cyl_tabButtonTapSoundURL)"
+    },
+    {
+      "name": "cyl_l10n_beabcd498b94",
+      "value": "Grejp"
+    },
+    {
+      "name": "cyl_l10n_b8c467fce096",
+      "value": "Značke"
+    },
+    {
+      "name": "cyl_l10n_200e65177369",
+      "value": "Postavi boju pozadine CYLFlatDesignTabBarItema"
+    },
+    {
+      "name": "cyl_l10n_295bb704f520",
+      "value": "Jezik"
+    },
+    {
+      "name": "cyl_l10n_d673e0eb5c1c",
+      "value": "Reagiraj izvan nadređenog prikaza (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_71bbc726ace5",
+      "value": "Prati sustav"
+    },
+    {
+      "name": "cyl_l10n_d0914cf6acd2",
+      "value": "Navigacija i usporedbe"
+    },
+    {
+      "name": "cyl_l10n_110abc875180",
+      "value": "Lagana haptika"
+    },
+    {
+      "name": "cyl_l10n_fad7c8a21fe3",
+      "value": "Odabrano"
+    },
+    {
+      "name": "cyl_l10n_aa05fd09a619",
+      "value": "Općenito"
+    },
+    {
+      "name": "cyl_l10n_15c64aa0b404",
+      "value": "Konfiguracijska datoteka"
+    },
+    {
+      "name": "cyl_l10n_45158907e07f",
+      "value": "Jaka haptika"
+    },
+    {
+      "name": "cyl_l10n_d6982fecc6a4",
+      "value": "Dugi pritisak na kartice (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_aefae51d3c25",
+      "value": "Dugo pritisnuto „%@”"
+    },
+    {
+      "name": "cyl_l10n_abad1baa5479",
+      "value": "Trajanje dugog pritiska i razmak dvostrukog dodira (issue #535 / #152)"
+    },
+    {
+      "name": "cyl_l10n_b146fc1a1531",
+      "value": "Trava"
+    },
+    {
+      "name": "cyl_l10n_db1c89e0f6e6",
+      "value": "Početna"
+    },
+    {
+      "name": "cyl_l10n_18c63459a2c0",
+      "value": "Zadano"
+    },
+    {
+      "name": "cyl_l10n_be354ee4263a",
+      "value": "Zadani klik"
+    }
+  ]
+}

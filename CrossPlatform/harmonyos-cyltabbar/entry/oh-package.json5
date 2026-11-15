@@ -1,0 +1,11 @@
+{
+  "name": "entry",
+  "version": "1.0.0",
+  "description": "The example of cyltabbar: the Objective-C Example of CYLTabBarController on HarmonyOS.",
+  "main": "",
+  "author": "ChenYilong",
+  "license": "MIT",
+  "dependencies": {
+    "cyltabbar": "file:../cyltabbar"
+  }
+}

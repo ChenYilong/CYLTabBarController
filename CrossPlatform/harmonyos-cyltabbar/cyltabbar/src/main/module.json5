@@ -1,0 +1,10 @@
+{
+  "module": {
+    "name": "cyltabbar",
+    "type": "har",
+    "deviceTypes": [
+      "phone",
+      "tablet"
+    ]
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "src": [
+    "pages/Index",
+    "pages/ConfigurationDemo",
+    "pages/TextPage",
+    "pages/SystemTabs",
+    "pages/AnotherTabBar",
+    "pages/PopPushDemo"
+  ]
+}

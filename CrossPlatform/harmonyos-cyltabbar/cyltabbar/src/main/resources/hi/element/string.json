@@ -1,0 +1,696 @@
+{
+  "string": [
+    {
+      "name": "cyl_l10n_aaf9b7d7382d",
+      "value": "%@ नए संदेश"
+    },
+    {
+      "name": "cyl_l10n_81a05b6c1cf9",
+      "value": "%@, %@"
+    },
+    {
+      "name": "cyl_l10n_0b0ae9062c5a",
+      "value": "A tab bar controller of another context, with a square plus button"
+    },
+    {
+      "name": "cyl_l10n_aa3e67bda3c0",
+      "value": "ArkUI Tabs, the HarmonyOS system tab bar, with the same tabs"
+    },
+    {
+      "name": "cyl_l10n_8665e238c516",
+      "value": "Badge: %@"
+    },
+    {
+      "name": "cyl_l10n_6b2186414c82",
+      "value": "3 बार झपकना"
+    },
+    {
+      "name": "cyl_l10n_070554647306",
+      "value": "बॉर्डर"
+    },
+    {
+      "name": "cyl_l10n_43d3e34b15fb",
+      "value": "डार्क मोड के अनुसार बॉर्डर"
+    },
+    {
+      "name": "cyl_l10n_b67554192c50",
+      "value": "नीचे बाएँ"
+    },
+    {
+      "name": "cyl_l10n_5968e3c37145",
+      "value": "नीचे दाएँ"
+    },
+    {
+      "name": "cyl_l10n_5d60263416c2",
+      "value": "उछाल (लगातार)"
+    },
+    {
+      "name": "cyl_l10n_f3ce1baf4805",
+      "value": "3 बार उछाल (cyl_bounceAnimationRepeatTimes)"
+    },
+    {
+      "name": "cyl_l10n_0875a57843a1",
+      "value": "साँस (लगातार)"
+    },
+    {
+      "name": "cyl_l10n_8795570ddeef",
+      "value": "CYLTabBarItemBackgroundColor / CYLTabBarItemSelectedBackgroundColor"
+    },
+    {
+      "name": "cyl_l10n_132201f60522",
+      "value": "CYLUtils कमज़ोर संबद्ध ऑब्जेक्ट और बटन ढूँढना (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_fa3d06c1b1e9",
+      "value": "CYLFlatDesignTabBarItem: बीच में नहीं (सिस्टम शैली)"
+    },
+    {
+      "name": "cyl_l10n_5e74163d3804",
+      "value": "CYLFlatDesignTabBarItem: बीच में"
+    },
+    {
+      "name": "cyl_l10n_158b3b19e868",
+      "value": "कोने की त्रिज्या"
+    },
+    {
+      "name": "cyl_l10n_4d242c36821c",
+      "value": "कस्टम रंग"
+    },
+    {
+      "name": "cyl_l10n_4685555ab484",
+      "value": "कस्टम फ़ॉन्ट"
+    },
+    {
+      "name": "cyl_l10n_a45350c25311",
+      "value": "कस्टम अधिकतम (9)"
+    },
+    {
+      "name": "cyl_l10n_bf0576472e31",
+      "value": "Double tap to open"
+    },
+    {
+      "name": "cyl_l10n_7e0a1ad9a767",
+      "value": "एक बार धीरे से दिखना"
+    },
+    {
+      "name": "cyl_l10n_153407d52fed",
+      "value": "फ़्लैट"
+    },
+    {
+      "name": "cyl_l10n_5cfed317a99d",
+      "value": "फ़्लैट शैली"
+    },
+    {
+      "name": "cyl_l10n_026b984bb8d8",
+      "value": "2 बार पलटना"
+    },
+    {
+      "name": "cyl_l10n_c5d4cd682981",
+      "value": "GIF आइकन"
+    },
+    {
+      "name": "cyl_l10n_d52d30723b2f",
+      "value": "एक बार बाएँ से दाएँ"
+    },
+    {
+      "name": "cyl_l10n_f201a4158727",
+      "value": "लिक्विड ग्लास"
+    },
+    {
+      "name": "cyl_l10n_af3acf6eb4a9",
+      "value": "लिक्विड ग्लास"
+    },
+    {
+      "name": "cyl_l10n_2e8e48a2ebfd",
+      "value": "Long press a tab or the plus button"
+    },
+    {
+      "name": "cyl_l10n_983696096694",
+      "value": "मार्जिन"
+    },
+    {
+      "name": "cyl_l10n_24d459a81449",
+      "value": "नया"
+    },
+    {
+      "name": "cyl_l10n_03c2e7e41ffc",
+      "value": "नया"
+    },
+    {
+      "name": "cyl_l10n_1e8f217bdf71",
+      "value": "Next tab (cyl_selectNextTab, issue #535)"
+    },
+    {
+      "name": "cyl_l10n_b2ee912b91d6",
+      "value": "संख्या"
+    },
+    {
+      "name": "cyl_l10n_ab7fa33c83b1",
+      "value": "अधिकतम से अधिक संख्या"
+    },
+    {
+      "name": "cyl_l10n_e0aa021e21dd",
+      "value": "ठीक है"
+    },
+    {
+      "name": "cyl_l10n_287e78fd65af",
+      "value": "अन्य टेक्स्ट"
+    },
+    {
+      "name": "cyl_l10n_41b77539cc64",
+      "value": "PlusButton छवि बाद में लोड"
+    },
+    {
+      "name": "cyl_l10n_72a245189eaf",
+      "value": "PlusButton टच क्षेत्र (issue #91)"
+    },
+    {
+      "name": "cyl_l10n_9a1d72fdd764",
+      "value": "Previous tab (cyl_selectPreviousTab, issue #535)"
+    },
+    {
+      "name": "cyl_l10n_4b0282f4f1c6",
+      "value": "सिस्टम UITabBarController पर push (दूसरा प्लस बटन)"
+    },
+    {
+      "name": "cyl_l10n_e5416d3ed3c0",
+      "value": "Push to another CYLTabBarController (another PlusButton)"
+    },
+    {
+      "name": "cyl_l10n_8c96672c9bc5",
+      "value": "उसी context वाला TabBarController push करें (वही प्लस बटन क्लास)"
+    },
+    {
+      "name": "cyl_l10n_6166b27ea14b",
+      "value": "नए संदर्भ वाला TabBarController पुश करें (टैप करने योग्य X सबव्यू वाला PlusButton, issue #202)"
+    },
+    {
+      "name": "cyl_l10n_a63e8b745e73",
+      "value": "Pushes a page that hides the navigation bar while shown, with no base class"
+    },
+    {
+      "name": "cyl_l10n_79fe28f3a3ac",
+      "value": "Pushes a tab bar controller whose plus button image changes 2 s later; the layout must not move"
+    },
+    {
+      "name": "cyl_l10n_c27618b1aa9d",
+      "value": "लाल बिंदु"
+    },
+    {
+      "name": "cyl_l10n_255c00a63f9d",
+      "value": "लाल बिंदु की त्रिज्या"
+    },
+    {
+      "name": "cyl_l10n_7aac5e07b16d",
+      "value": "एक बार दाएँ से बाएँ"
+    },
+    {
+      "name": "cyl_l10n_f0c792c049bc",
+      "value": "एक बार रोल"
+    },
+    {
+      "name": "cyl_l10n_401ea21c7a44",
+      "value": "घुमाव (लगातार)"
+    },
+    {
+      "name": "cyl_l10n_b5fcd68edd9f",
+      "value": "आकार बदलना (लगातार)"
+    },
+    {
+      "name": "cyl_l10n_544d03258eaf",
+      "value": "एक बार आकार बदलना"
+    },
+    {
+      "name": "cyl_l10n_dbd4f5e49888",
+      "value": "3 बार आकार बदलना"
+    },
+    {
+      "name": "cyl_l10n_9ae56cc36e81",
+      "value": "हिलना (लगातार)"
+    },
+    {
+      "name": "cyl_l10n_e0a90124b72f",
+      "value": "3 बार हिलना (cyl_shakeAnimationRepeatTimes)"
+    },
+    {
+      "name": "cyl_l10n_b10d33d5ad4d",
+      "value": "हिलना, “गति कम करें” से रुकता है"
+    },
+    {
+      "name": "cyl_l10n_6cbe015b00fb",
+      "value": "CYLFlatDesignTabBar दिखाएँ / छिपाएँ"
+    },
+    {
+      "name": "cyl_l10n_3cb58e0d546d",
+      "value": "स्प्रिंग (लगातार)"
+    },
+    {
+      "name": "cyl_l10n_0a00b2238071",
+      "value": "एक बार स्प्रिंग"
+    },
+    {
+      "name": "cyl_l10n_fee4a478923f",
+      "value": "टैब इंटरैक्शन"
+    },
+    {
+      "name": "cyl_l10n_98559580dcc7",
+      "value": "टैब टैप एनिमेशन (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_db89836d6e21",
+      "value": "टैब टैप ध्वनि और हैप्टिक (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_2f6e866d5219",
+      "value": "टैब पेज, चयन और लॉगिन"
+    },
+    {
+      "name": "cyl_l10n_6d067090c833",
+      "value": "Tab, %1$@ of %2$@"
+    },
+    {
+      "name": "cyl_l10n_75ccb7ef4864",
+      "value": "टैब बार का रूप"
+    },
+    {
+      "name": "cyl_l10n_2e6d648945c0",
+      "value": "The plus button sticks out of the bar; its part above the bar responds (shown in red)"
+    },
+    {
+      "name": "cyl_l10n_f43b06c12ee1",
+      "value": "The system bar has no plus button: a floating button stands in"
+    },
+    {
+      "name": "cyl_l10n_a4d0d101d6a3",
+      "value": "ऊपर बाएँ"
+    },
+    {
+      "name": "cyl_l10n_2306a585ae00",
+      "value": "cyl_itemEdgeInsets: 15% of a tab width free at each end"
+    },
+    {
+      "name": "cyl_l10n_fd15e88376df",
+      "value": "cyl_pop / cyl_push मेथड डेमो"
+    },
+    {
+      "name": "cyl_l10n_1ec113617309",
+      "value": "cyl_pushViewController, cyl_popSelectTabBarChildViewControllerAtIndex, cyl_pushOrPopToViewController"
+    },
+    {
+      "name": "cyl_l10n_ee5b6ac6461b",
+      "value": "selectedIndex और PlusButton (issue #515)"
+    },
+    {
+      "name": "cyl_l10n_2de6d572f86b",
+      "value": "standardAppearance थीम (Liquid Glass और FlatDesign दोनों के लिए)"
+    },
+    {
+      "name": "cyl_l10n_2a0608059131",
+      "value": "सभी टैब के शीर्षक एक साथ अपडेट करता है; वापस लाने के लिए फिर टैप करें"
+    },
+    {
+      "name": "cyl_l10n_57196013d558",
+      "value": "हैलोवीन"
+    },
+    {
+      "name": "cyl_l10n_0a58c230c3d9",
+      "value": "सभी टैब के आइकन डाउनलोड करके अपडेट करता है; पुनर्स्थापित करने के लिए फिर से टैप करें"
+    },
+    {
+      "name": "cyl_l10n_5e347d8ccb68",
+      "value": "नेटवर्क से आइकन डाउनलोड करें"
+    },
+    {
+      "name": "cyl_l10n_2e0e84a0dcfb",
+      "value": "बेस क्लास के बिना नेविगेशन बार छिपाएँ (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_e1642a46b804",
+      "value": "मध्य-शरद उत्सव"
+    },
+    {
+      "name": "cyl_l10n_0c2817d10627",
+      "value": "मध्यम हैप्टिक"
+    },
+    {
+      "name": "cyl_l10n_0f60774903e0",
+      "value": "bundle से इमेज लोड करें (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_0e1b02648a11",
+      "value": "ज़ूम इन"
+    },
+    {
+      "name": "cyl_l10n_cc03f47a389c",
+      "value": "टैब आइकन नेटवर्क से डाउनलोड करता है (कैश के साथ); वापस लाने के लिए फिर टैप करें"
+    },
+    {
+      "name": "cyl_l10n_24fb8692947a",
+      "value": "रखा गया"
+    },
+    {
+      "name": "cyl_l10n_b15d91274e9f",
+      "value": "बंद करें"
+    },
+    {
+      "name": "cyl_l10n_70922c50ef07",
+      "value": "मेमोरी चेतावनी"
+    },
+    {
+      "name": "cyl_l10n_cbed6b29761b",
+      "value": "प्लस बटन"
+    },
+    {
+      "name": "cyl_l10n_18684d72945b",
+      "value": "छवि लोड करें"
+    },
+    {
+      "name": "cyl_l10n_b981b7b359a7",
+      "value": "पृष्ठभूमि छवि लोड करें"
+    },
+    {
+      "name": "cyl_l10n_7136049eb4c7",
+      "value": "न चुने गए टैब अनलोड करता है; चुनने पर फिर से लोड होते हैं"
+    },
+    {
+      "name": "cyl_l10n_c7626d7d6194",
+      "value": "इस पेज के टैब का शीर्षक वहीं बदलता है; वापस लाने के लिए फिर टैप करें"
+    },
+    {
+      "name": "cyl_l10n_15fb093f6fff",
+      "value": "टैब को उसी जगह अपडेट करें"
+    },
+    {
+      "name": "cyl_l10n_c1ecedab11bc",
+      "value": "मूल"
+    },
+    {
+      "name": "cyl_l10n_625fb26b4b33",
+      "value": "रद्द करें"
+    },
+    {
+      "name": "cyl_l10n_d25efeb790bb",
+      "value": "आस-पास"
+    },
+    {
+      "name": "cyl_l10n_7941d8987ff2",
+      "value": "सिस्टम UITabBar से तुलना करें"
+    },
+    {
+      "name": "cyl_l10n_d0d78acf1941",
+      "value": "क्रिसमस"
+    },
+    {
+      "name": "cyl_l10n_aa91e8ceec70",
+      "value": "ईस्टर"
+    },
+    {
+      "name": "cyl_l10n_3df20a295b39",
+      "value": "गर्मी"
+    },
+    {
+      "name": "cyl_l10n_0ef6dae7e80c",
+      "value": "अंतरिक्ष"
+    },
+    {
+      "name": "cyl_l10n_bccc798b577a",
+      "value": "बीच में कैप्सूल"
+    },
+    {
+      "name": "cyl_l10n_7c87af044929",
+      "value": "स्वाइप से टैब बदलें (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_7a2261654d24",
+      "value": "अनलोड किया गया"
+    },
+    {
+      "name": "cyl_l10n_091885db07e4",
+      "value": "उछाल"
+    },
+    {
+      "name": "cyl_l10n_758903c327de",
+      "value": "टैब आइकन के रूप में एनिमेटेड GIF दिखाता है; वापस लाने के लिए फिर टैप करें"
+    },
+    {
+      "name": "cyl_l10n_c4328f75476f",
+      "value": "वैलेंटाइन डे"
+    },
+    {
+      "name": "cyl_l10n_07b181184280",
+      "value": "मैं"
+    },
+    {
+      "name": "cyl_l10n_a01539048bb0",
+      "value": "स्विच चालू करें, फिर किसी टैब या PlusButton को देर तक दबाकर उसका पहचानकर्ता देखें।"
+    },
+    {
+      "name": "cyl_l10n_633c2ee4dcc7",
+      "value": "सभी नेटवर्क आइकन बदलें"
+    },
+    {
+      "name": "cyl_l10n_f75fe6720861",
+      "value": "सभी स्थानीय आइकन बदलें"
+    },
+    {
+      "name": "cyl_l10n_7fb5208a54d5",
+      "value": "सभी शीर्षक बदलें"
+    },
+    {
+      "name": "cyl_l10n_2f728e190695",
+      "value": "इस टैब के दोनों ओर के टैब में दूसरे पेज दिखाता है (issue #481); पुनर्स्थापित करने के लिए फिर से टैप करें"
+    },
+    {
+      "name": "cyl_l10n_0be5a194844c",
+      "value": "स्किन"
+    },
+    {
+      "name": "cyl_l10n_61a9cd33b1ff",
+      "value": "स्किन (थीम, issue #216)"
+    },
+    {
+      "name": "cyl_l10n_09d0fdddca66",
+      "value": "स्किन: त्योहार और रंग (%@)"
+    },
+    {
+      "name": "cyl_l10n_a0ffdf359138",
+      "value": "CYLFlatDesignTabBar की ऊँचाई बदलें"
+    },
+    {
+      "name": "cyl_l10n_01e3254a92ba",
+      "value": "बड़ा करें और छोटा करें"
+    },
+    {
+      "name": "cyl_l10n_d46d5bb15db1",
+      "value": "नया साल"
+    },
+    {
+      "name": "cyl_l10n_79b5a6564585",
+      "value": "घुमाएँ"
+    },
+    {
+      "name": "cyl_l10n_d81bb206a889",
+      "value": "कोई नहीं"
+    },
+    {
+      "name": "cyl_l10n_14f433db2189",
+      "value": "बेस क्लास के बिना, और सहायक"
+    },
+    {
+      "name": "cyl_l10n_d2339bb4edaa",
+      "value": "वसंत उत्सव"
+    },
+    {
+      "name": "cyl_l10n_5f1de850fb46",
+      "value": "टैब का शीर्षक बदलें"
+    },
+    {
+      "name": "cyl_l10n_9d0d66f312b5",
+      "value": "बड़ी छवि से बदलें"
+    },
+    {
+      "name": "cyl_l10n_b051a19ace76",
+      "value": "पास के टैब बदलें"
+    },
+    {
+      "name": "cyl_l10n_a131e4f178aa",
+      "value": "नई सामग्री"
+    },
+    {
+      "name": "cyl_l10n_467b3e031441",
+      "value": "लोड नहीं हुआ"
+    },
+    {
+      "name": "cyl_l10n_2c8d9e877a54",
+      "value": "शीर्षक ऑफ़सेट (titlePositionAdjustment)"
+    },
+    {
+      "name": "cyl_l10n_0787cd518387",
+      "value": "मेमोरी चेतावनी का अनुकरण करें"
+    },
+    {
+      "name": "cyl_l10n_6a00c1ae99fa",
+      "value": "महासागर"
+    },
+    {
+      "name": "cyl_l10n_ff692f04ace0",
+      "value": "संदेश"
+    },
+    {
+      "name": "cyl_l10n_41e8e8b9935c",
+      "value": "गहरा"
+    },
+    {
+      "name": "cyl_l10n_8dfe6bcdd6ec",
+      "value": "स्लाइड ट्रांज़िशन (CYLTabBarSlideTransitionAnimator)"
+    },
+    {
+      "name": "cyl_l10n_9f44bafc75c6",
+      "value": "स्क्रॉल पर TabBar छोटा / छिपाएँ (issue #13)"
+    },
+    {
+      "name": "cyl_l10n_678abebe6aac",
+      "value": "PlusButton के ऊपर दाईं ओर X पर टैप करें: X का रंग बेतरतीब बदलता है, PlusButton प्रतिक्रिया नहीं देता"
+    },
+    {
+      "name": "cyl_l10n_7375af54db2a",
+      "value": "टैब और PlusButton का टैप एनिमेशन बदलने के लिए टैप करें। अभी: %@"
+    },
+    {
+      "name": "cyl_l10n_5378f31b520c",
+      "value": "tabBar.standardAppearance बदलने के लिए टैप करें, वर्तमान: %@"
+    },
+    {
+      "name": "cyl_l10n_4a986e4da535",
+      "value": "सभी टैब शीर्षकों का लंबवत ऑफ़सेट बदलने के लिए टैप करें, वर्तमान: %@"
+    },
+    {
+      "name": "cyl_l10n_3d0d9d3d7cc2",
+      "value": "भाषा बदलने के लिए टैप करें"
+    },
+    {
+      "name": "cyl_l10n_f4e41dda1094",
+      "value": "बदलने के लिए टैप करें, फिर सुनने के लिए कोई भी टैब या PlusButton टैप करें। हैप्टिक केवल असली डिवाइस पर कंपन करता है। अभी: %@"
+    },
+    {
+      "name": "cyl_l10n_15855ab96e87",
+      "value": "क्लिक + हैप्टिक"
+    },
+    {
+      "name": "cyl_l10n_cff8a9cded04",
+      "value": "थीम चुनने के लिए टैप करें: TabBar का बैकग्राउंड, आइकन और टेक्स्ट रंग वहीं बदल जाते हैं, हर TabBar शैली में। वर्तमान: %@"
+    },
+    {
+      "name": "cyl_l10n_1c00c4fd1cea",
+      "value": "गुलाबी गुलाब"
+    },
+    {
+      "name": "cyl_l10n_8483ed132b2c",
+      "value": "जन्मदिन"
+    },
+    {
+      "name": "cyl_l10n_feef14745f21",
+      "value": "सभी टैब के आइकन स्थानीय छवियों (नाम, फ़ाइल पथ, UIImage, फ़ाइल URL) से अपडेट करता है; पुनर्स्थापित करने के लिए फिर से टैप करें"
+    },
+    {
+      "name": "cyl_l10n_402d19e50fff",
+      "value": "लॉग इन"
+    },
+    {
+      "name": "cyl_l10n_833152116634",
+      "value": "छवि हटाएँ"
+    },
+    {
+      "name": "cyl_l10n_a0676a7d84a9",
+      "value": "हरी रेखा"
+    },
+    {
+      "name": "cyl_l10n_16068b2ff3fd",
+      "value": "नेटवर्क आइकन"
+    },
+    {
+      "name": "cyl_l10n_69ca6555a602",
+      "value": "पलटें"
+    },
+    {
+      "name": "cyl_l10n_4bd51044149f",
+      "value": "अपनी ध्वनि फ़ाइल (cyl_tabButtonTapSoundURL)"
+    },
+    {
+      "name": "cyl_l10n_beabcd498b94",
+      "value": "चकोतरा"
+    },
+    {
+      "name": "cyl_l10n_b8c467fce096",
+      "value": "बैज"
+    },
+    {
+      "name": "cyl_l10n_200e65177369",
+      "value": "CYLFlatDesignTabBarItem का बैकग्राउंड रंग सेट करें"
+    },
+    {
+      "name": "cyl_l10n_295bb704f520",
+      "value": "भाषा"
+    },
+    {
+      "name": "cyl_l10n_d673e0eb5c1c",
+      "value": "पैरेंट व्यू के बाहर प्रतिक्रिया (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_71bbc726ace5",
+      "value": "सिस्टम के अनुसार"
+    },
+    {
+      "name": "cyl_l10n_d0914cf6acd2",
+      "value": "नेविगेशन और तुलना"
+    },
+    {
+      "name": "cyl_l10n_110abc875180",
+      "value": "हल्का हैप्टिक"
+    },
+    {
+      "name": "cyl_l10n_fad7c8a21fe3",
+      "value": "चुना गया"
+    },
+    {
+      "name": "cyl_l10n_aa05fd09a619",
+      "value": "सामान्य"
+    },
+    {
+      "name": "cyl_l10n_15c64aa0b404",
+      "value": "कॉन्फ़िगरेशन फ़ाइल"
+    },
+    {
+      "name": "cyl_l10n_45158907e07f",
+      "value": "तेज़ हैप्टिक"
+    },
+    {
+      "name": "cyl_l10n_d6982fecc6a4",
+      "value": "टैब को देर तक दबाएँ (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_aefae51d3c25",
+      "value": "\"%@\" को देर तक दबाया"
+    },
+    {
+      "name": "cyl_l10n_abad1baa5479",
+      "value": "लंबे दबाव की अवधि और डबल टैप अंतराल (issue #535 / #152)"
+    },
+    {
+      "name": "cyl_l10n_b146fc1a1531",
+      "value": "घास"
+    },
+    {
+      "name": "cyl_l10n_db1c89e0f6e6",
+      "value": "होम"
+    },
+    {
+      "name": "cyl_l10n_18c63459a2c0",
+      "value": "डिफ़ॉल्ट"
+    },
+    {
+      "name": "cyl_l10n_be354ee4263a",
+      "value": "डिफ़ॉल्ट क्लिक"
+    }
+  ]
+}

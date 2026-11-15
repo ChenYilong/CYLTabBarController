@@ -1,0 +1,40 @@
+{
+  "string": [
+    {
+      "name": "tab_home",
+      "value": "홈"
+    },
+    {
+      "name": "tab_nearby",
+      "value": "근처"
+    },
+    {
+      "name": "tab_messages",
+      "value": "메시지"
+    },
+    {
+      "name": "tab_me",
+      "value": "내 정보"
+    },
+    {
+      "name": "tab_post",
+      "value": "게시"
+    },
+    {
+      "name": "tab_refresh",
+      "value": "새로고침"
+    },
+    {
+      "name": "module_desc",
+      "value": "CYLTabBarController example"
+    },
+    {
+      "name": "ability_desc",
+      "value": "CYLTabBarController example"
+    },
+    {
+      "name": "app_name",
+      "value": "CYLTabBar"
+    }
+  ]
+}

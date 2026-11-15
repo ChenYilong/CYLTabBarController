@@ -60,6 +60,7 @@
 | A4 TODO：配置清单的下载与回调尚未提供给 JavaScript / Dart（[Configuration-Manifest](Configuration-Manifest.md#entodo)）。 | A4 TODO: manifest downloads and callbacks are not given to JavaScript / Dart yet ([Configuration-Manifest](Configuration-Manifest.md#entodo)). |
 | A5 TODO：移植到 Kotlin 的上游项目的 PR 与 issue（[Android-Library](Android-Library.md)，211 行）。需要网络访问上游仓库。 | A5 TODO: upstream pull requests and issues of the projects ported to Kotlin ([Android-Library](Android-Library.md), line 211). Needs network access to the upstream repositories. |
 | A6 TODO：Android 超过 5 个 Tab 时不显示 More（[Android-Library](Android-Library.md)，213 行）。需要 Android 模拟器验证。 | A6 TODO: no "More" on Android with more than five tabs ([Android-Library](Android-Library.md), line 213). Needs an Android emulator to verify. |
+| A7 TODO（2026-11-16）：SVGA 进入 Core，Example 层一比一复刻 Rive 的全部演示（Example-Rive、Example-SwiftUI-Rive、占位图动画），0 / 100（[SVGA-Animation](SVGA-Animation.md#cn任务记录)）。 | A7 TODO (2026-11-16): SVGA in Core, and every Rive demo (Example-Rive, Example-SwiftUI-Rive, the placeholder animation) copied one to one for SVGA in the Example layer, 0 / 100 ([SVGA-Animation](SVGA-Animation.md#entask-log)). |
 
 ### [CN]B. 需要在 iOS 模拟器上运行（Mac 负载过高时无法进行）
 ### [EN]B. Needs a run on an iOS simulator (not possible while the Mac is overloaded)

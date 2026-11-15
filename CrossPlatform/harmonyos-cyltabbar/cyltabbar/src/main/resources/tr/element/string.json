@@ -1,0 +1,696 @@
+{
+  "string": [
+    {
+      "name": "cyl_l10n_aaf9b7d7382d",
+      "value": "%@ yeni mesaj"
+    },
+    {
+      "name": "cyl_l10n_81a05b6c1cf9",
+      "value": "%@, %@"
+    },
+    {
+      "name": "cyl_l10n_0b0ae9062c5a",
+      "value": "A tab bar controller of another context, with a square plus button"
+    },
+    {
+      "name": "cyl_l10n_aa3e67bda3c0",
+      "value": "ArkUI Tabs, the HarmonyOS system tab bar, with the same tabs"
+    },
+    {
+      "name": "cyl_l10n_8665e238c516",
+      "value": "Badge: %@"
+    },
+    {
+      "name": "cyl_l10n_6b2186414c82",
+      "value": "Yanıp sönme ×3"
+    },
+    {
+      "name": "cyl_l10n_070554647306",
+      "value": "Kenarlık"
+    },
+    {
+      "name": "cyl_l10n_43d3e34b15fb",
+      "value": "Karanlık Mod'a uyan kenarlık"
+    },
+    {
+      "name": "cyl_l10n_b67554192c50",
+      "value": "Sol alt"
+    },
+    {
+      "name": "cyl_l10n_5968e3c37145",
+      "value": "Sağ alt"
+    },
+    {
+      "name": "cyl_l10n_5d60263416c2",
+      "value": "Zıplama (sürekli)"
+    },
+    {
+      "name": "cyl_l10n_f3ce1baf4805",
+      "value": "Zıplama ×3 (cyl_bounceAnimationRepeatTimes)"
+    },
+    {
+      "name": "cyl_l10n_0875a57843a1",
+      "value": "Nefes (sürekli)"
+    },
+    {
+      "name": "cyl_l10n_8795570ddeef",
+      "value": "CYLTabBarItemBackgroundColor / CYLTabBarItemSelectedBackgroundColor"
+    },
+    {
+      "name": "cyl_l10n_132201f60522",
+      "value": "CYLUtils zayıf ilişkili nesneler ve düğme bulma (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_fa3d06c1b1e9",
+      "value": "CYLFlatDesignTabBarItem ortalanmamış (sistem stili)"
+    },
+    {
+      "name": "cyl_l10n_5e74163d3804",
+      "value": "CYLFlatDesignTabBarItem ortalanmış"
+    },
+    {
+      "name": "cyl_l10n_158b3b19e868",
+      "value": "Köşe yarıçapı"
+    },
+    {
+      "name": "cyl_l10n_4d242c36821c",
+      "value": "Özel renkler"
+    },
+    {
+      "name": "cyl_l10n_4685555ab484",
+      "value": "Özel yazı tipi"
+    },
+    {
+      "name": "cyl_l10n_a45350c25311",
+      "value": "Özel üst sınır (9)"
+    },
+    {
+      "name": "cyl_l10n_bf0576472e31",
+      "value": "Double tap to open"
+    },
+    {
+      "name": "cyl_l10n_7e0a1ad9a767",
+      "value": "Bir kez belirme"
+    },
+    {
+      "name": "cyl_l10n_153407d52fed",
+      "value": "Düz tasarım"
+    },
+    {
+      "name": "cyl_l10n_5cfed317a99d",
+      "value": "Düz tasarım stili"
+    },
+    {
+      "name": "cyl_l10n_026b984bb8d8",
+      "value": "Çevirme ×2"
+    },
+    {
+      "name": "cyl_l10n_c5d4cd682981",
+      "value": "GIF simgesi"
+    },
+    {
+      "name": "cyl_l10n_d52d30723b2f",
+      "value": "Bir kez soldan sağa"
+    },
+    {
+      "name": "cyl_l10n_f201a4158727",
+      "value": "Liquid Glass"
+    },
+    {
+      "name": "cyl_l10n_af3acf6eb4a9",
+      "value": "Liquid Glass"
+    },
+    {
+      "name": "cyl_l10n_2e8e48a2ebfd",
+      "value": "Long press a tab or the plus button"
+    },
+    {
+      "name": "cyl_l10n_983696096694",
+      "value": "Kenar boşluğu"
+    },
+    {
+      "name": "cyl_l10n_24d459a81449",
+      "value": "YENİ"
+    },
+    {
+      "name": "cyl_l10n_03c2e7e41ffc",
+      "value": "Yeni"
+    },
+    {
+      "name": "cyl_l10n_1e8f217bdf71",
+      "value": "Next tab (cyl_selectNextTab, issue #535)"
+    },
+    {
+      "name": "cyl_l10n_b2ee912b91d6",
+      "value": "Sayı"
+    },
+    {
+      "name": "cyl_l10n_ab7fa33c83b1",
+      "value": "Üst sınırı aşan sayı"
+    },
+    {
+      "name": "cyl_l10n_e0aa021e21dd",
+      "value": "Tamam"
+    },
+    {
+      "name": "cyl_l10n_287e78fd65af",
+      "value": "Diğer metin"
+    },
+    {
+      "name": "cyl_l10n_41b77539cc64",
+      "value": "PlusButton görseli sonradan yüklenir"
+    },
+    {
+      "name": "cyl_l10n_72a245189eaf",
+      "value": "PlusButton dokunma alanı (issue #91)"
+    },
+    {
+      "name": "cyl_l10n_9a1d72fdd764",
+      "value": "Previous tab (cyl_selectPreviousTab, issue #535)"
+    },
+    {
+      "name": "cyl_l10n_4b0282f4f1c6",
+      "value": "Sistem UITabBarController'ına push (başka artı düğmesi)"
+    },
+    {
+      "name": "cyl_l10n_e5416d3ed3c0",
+      "value": "Push to another CYLTabBarController (another PlusButton)"
+    },
+    {
+      "name": "cyl_l10n_8c96672c9bc5",
+      "value": "Aynı context'e sahip TabBarController'ı push et (aynı artı düğmesi sınıfı)"
+    },
+    {
+      "name": "cyl_l10n_6166b27ea14b",
+      "value": "Yeni bağlamlı bir TabBarController göster (dokunulabilir X alt görünümlü PlusButton, issue #202)"
+    },
+    {
+      "name": "cyl_l10n_a63e8b745e73",
+      "value": "Pushes a page that hides the navigation bar while shown, with no base class"
+    },
+    {
+      "name": "cyl_l10n_79fe28f3a3ac",
+      "value": "Pushes a tab bar controller whose plus button image changes 2 s later; the layout must not move"
+    },
+    {
+      "name": "cyl_l10n_c27618b1aa9d",
+      "value": "Kırmızı nokta"
+    },
+    {
+      "name": "cyl_l10n_255c00a63f9d",
+      "value": "Kırmızı nokta yarıçapı"
+    },
+    {
+      "name": "cyl_l10n_7aac5e07b16d",
+      "value": "Bir kez sağdan sola"
+    },
+    {
+      "name": "cyl_l10n_f0c792c049bc",
+      "value": "Bir kez yuvarlanma"
+    },
+    {
+      "name": "cyl_l10n_401ea21c7a44",
+      "value": "Dönme (sürekli)"
+    },
+    {
+      "name": "cyl_l10n_b5fcd68edd9f",
+      "value": "Ölçekleme (sürekli)"
+    },
+    {
+      "name": "cyl_l10n_544d03258eaf",
+      "value": "Bir kez ölçekleme"
+    },
+    {
+      "name": "cyl_l10n_dbd4f5e49888",
+      "value": "Ölçekleme ×3"
+    },
+    {
+      "name": "cyl_l10n_9ae56cc36e81",
+      "value": "Sallanma (sürekli)"
+    },
+    {
+      "name": "cyl_l10n_e0a90124b72f",
+      "value": "Sallanma ×3 (cyl_shakeAnimationRepeatTimes)"
+    },
+    {
+      "name": "cyl_l10n_b10d33d5ad4d",
+      "value": "Sallanma, Hareketi Azalt ile durur"
+    },
+    {
+      "name": "cyl_l10n_6cbe015b00fb",
+      "value": "CYLFlatDesignTabBar'ı göster / gizle"
+    },
+    {
+      "name": "cyl_l10n_3cb58e0d546d",
+      "value": "Yay (sürekli)"
+    },
+    {
+      "name": "cyl_l10n_0a00b2238071",
+      "value": "Bir kez yay"
+    },
+    {
+      "name": "cyl_l10n_fee4a478923f",
+      "value": "Sekme etkileşimleri"
+    },
+    {
+      "name": "cyl_l10n_98559580dcc7",
+      "value": "Sekme dokunma animasyonu (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_db89836d6e21",
+      "value": "Sekme dokunma sesi ve dokunsal geri bildirim (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_2f6e866d5219",
+      "value": "Sekme sayfaları, seçim ve giriş"
+    },
+    {
+      "name": "cyl_l10n_6d067090c833",
+      "value": "Tab, %1$@ of %2$@"
+    },
+    {
+      "name": "cyl_l10n_75ccb7ef4864",
+      "value": "Sekme çubuğu görünümü"
+    },
+    {
+      "name": "cyl_l10n_2e6d648945c0",
+      "value": "The plus button sticks out of the bar; its part above the bar responds (shown in red)"
+    },
+    {
+      "name": "cyl_l10n_f43b06c12ee1",
+      "value": "The system bar has no plus button: a floating button stands in"
+    },
+    {
+      "name": "cyl_l10n_a4d0d101d6a3",
+      "value": "Sol üst"
+    },
+    {
+      "name": "cyl_l10n_2306a585ae00",
+      "value": "cyl_itemEdgeInsets: 15% of a tab width free at each end"
+    },
+    {
+      "name": "cyl_l10n_fd15e88376df",
+      "value": "cyl_pop / cyl_push yöntemleri demosu"
+    },
+    {
+      "name": "cyl_l10n_1ec113617309",
+      "value": "cyl_pushViewController, cyl_popSelectTabBarChildViewControllerAtIndex, cyl_pushOrPopToViewController"
+    },
+    {
+      "name": "cyl_l10n_ee5b6ac6461b",
+      "value": "selectedIndex ve PlusButton (issue #515)"
+    },
+    {
+      "name": "cyl_l10n_2de6d572f86b",
+      "value": "standardAppearance teması (Liquid Glass ve FlatDesign için ortak)"
+    },
+    {
+      "name": "cyl_l10n_2a0608059131",
+      "value": "Tüm sekmelerin başlıklarını birlikte günceller; geri almak için yeniden dokunun"
+    },
+    {
+      "name": "cyl_l10n_57196013d558",
+      "value": "Cadılar Bayramı"
+    },
+    {
+      "name": "cyl_l10n_0a58c230c3d9",
+      "value": "Tüm sekmelerin simgelerini indirir ve günceller; geri yüklemek için tekrar dokunun"
+    },
+    {
+      "name": "cyl_l10n_5e347d8ccb68",
+      "value": "Ağdan simge indir"
+    },
+    {
+      "name": "cyl_l10n_2e0e84a0dcfb",
+      "value": "Temel sınıf olmadan gezinme çubuğunu gizle (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_e1642a46b804",
+      "value": "Sonbahar Ortası Festivali"
+    },
+    {
+      "name": "cyl_l10n_0c2817d10627",
+      "value": "Orta dokunsal geri bildirim"
+    },
+    {
+      "name": "cyl_l10n_0f60774903e0",
+      "value": "Bundle'dan görüntü yükle (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_0e1b02648a11",
+      "value": "Yakınlaştır"
+    },
+    {
+      "name": "cyl_l10n_cc03f47a389c",
+      "value": "Sekme simgesini ağdan indirir (önbellekli); geri almak için yeniden dokunun"
+    },
+    {
+      "name": "cyl_l10n_24fb8692947a",
+      "value": "tutuldu"
+    },
+    {
+      "name": "cyl_l10n_b15d91274e9f",
+      "value": "Kapat"
+    },
+    {
+      "name": "cyl_l10n_70922c50ef07",
+      "value": "Bellek uyarısı"
+    },
+    {
+      "name": "cyl_l10n_cbed6b29761b",
+      "value": "Artı düğmesi"
+    },
+    {
+      "name": "cyl_l10n_18684d72945b",
+      "value": "Görseli yükle"
+    },
+    {
+      "name": "cyl_l10n_b981b7b359a7",
+      "value": "Arka plan görseli yükle"
+    },
+    {
+      "name": "cyl_l10n_7136049eb4c7",
+      "value": "Seçili olmayan sekmeleri boşaltır; seçilince yeniden yüklenir"
+    },
+    {
+      "name": "cyl_l10n_c7626d7d6194",
+      "value": "Bu sayfanın sekme başlığını yerinde değiştirir; geri almak için yeniden dokunun"
+    },
+    {
+      "name": "cyl_l10n_15fb093f6fff",
+      "value": "Sekmeleri yerinde güncelle"
+    },
+    {
+      "name": "cyl_l10n_c1ecedab11bc",
+      "value": "Orijinal"
+    },
+    {
+      "name": "cyl_l10n_625fb26b4b33",
+      "value": "İptal"
+    },
+    {
+      "name": "cyl_l10n_d25efeb790bb",
+      "value": "Yakında"
+    },
+    {
+      "name": "cyl_l10n_7941d8987ff2",
+      "value": "Sistem UITabBar'ı ile karşılaştır"
+    },
+    {
+      "name": "cyl_l10n_d0d78acf1941",
+      "value": "Noel"
+    },
+    {
+      "name": "cyl_l10n_aa91e8ceec70",
+      "value": "Paskalya"
+    },
+    {
+      "name": "cyl_l10n_3df20a295b39",
+      "value": "Yaz"
+    },
+    {
+      "name": "cyl_l10n_0ef6dae7e80c",
+      "value": "Uzay"
+    },
+    {
+      "name": "cyl_l10n_bccc798b577a",
+      "value": "Ortalanmış kapsül"
+    },
+    {
+      "name": "cyl_l10n_7c87af044929",
+      "value": "Kaydırarak sekme değiştir (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_7a2261654d24",
+      "value": "boşaltıldı"
+    },
+    {
+      "name": "cyl_l10n_091885db07e4",
+      "value": "Zıplama"
+    },
+    {
+      "name": "cyl_l10n_758903c327de",
+      "value": "Sekme simgesi olarak hareketli GIF gösterir; geri almak için yeniden dokunun"
+    },
+    {
+      "name": "cyl_l10n_c4328f75476f",
+      "value": "Sevgililer Günü"
+    },
+    {
+      "name": "cyl_l10n_07b181184280",
+      "value": "Ben"
+    },
+    {
+      "name": "cyl_l10n_a01539048bb0",
+      "value": "Anahtarı açın, ardından tanımlayıcısını görmek için herhangi bir sekmeye veya PlusButton'a uzun basın."
+    },
+    {
+      "name": "cyl_l10n_633c2ee4dcc7",
+      "value": "Tüm ağ simgelerini değiştir"
+    },
+    {
+      "name": "cyl_l10n_f75fe6720861",
+      "value": "Tüm yerel simgeleri değiştir"
+    },
+    {
+      "name": "cyl_l10n_7fb5208a54d5",
+      "value": "Tüm başlıkları değiştir"
+    },
+    {
+      "name": "cyl_l10n_2f728e190695",
+      "value": "Bu sekmenin iki yanındaki sekmelerde başka sayfalar gösterir (issue #481); geri yüklemek için tekrar dokunun"
+    },
+    {
+      "name": "cyl_l10n_0be5a194844c",
+      "value": "Görünüm"
+    },
+    {
+      "name": "cyl_l10n_61a9cd33b1ff",
+      "value": "Görünüm (tema, issue #216)"
+    },
+    {
+      "name": "cyl_l10n_09d0fdddca66",
+      "value": "Görünümler: bayramlar ve renkler (%@)"
+    },
+    {
+      "name": "cyl_l10n_a0ffdf359138",
+      "value": "CYLFlatDesignTabBar yüksekliğini değiştir"
+    },
+    {
+      "name": "cyl_l10n_01e3254a92ba",
+      "value": "Büyüt ve küçült"
+    },
+    {
+      "name": "cyl_l10n_d46d5bb15db1",
+      "value": "Yılbaşı"
+    },
+    {
+      "name": "cyl_l10n_79b5a6564585",
+      "value": "Döndür"
+    },
+    {
+      "name": "cyl_l10n_d81bb206a889",
+      "value": "Yok"
+    },
+    {
+      "name": "cyl_l10n_14f433db2189",
+      "value": "Temel sınıfsız ve yardımcılar"
+    },
+    {
+      "name": "cyl_l10n_d2339bb4edaa",
+      "value": "Bahar Bayramı"
+    },
+    {
+      "name": "cyl_l10n_5f1de850fb46",
+      "value": "Sekme başlığını değiştir"
+    },
+    {
+      "name": "cyl_l10n_9d0d66f312b5",
+      "value": "Daha büyük bir görselle değiştir"
+    },
+    {
+      "name": "cyl_l10n_b051a19ace76",
+      "value": "Komşu sekmeleri değiştir"
+    },
+    {
+      "name": "cyl_l10n_a131e4f178aa",
+      "value": "Yeni içerik"
+    },
+    {
+      "name": "cyl_l10n_467b3e031441",
+      "value": "yüklenmedi"
+    },
+    {
+      "name": "cyl_l10n_2c8d9e877a54",
+      "value": "Başlık kaydırması (titlePositionAdjustment)"
+    },
+    {
+      "name": "cyl_l10n_0787cd518387",
+      "value": "Bellek uyarısını taklit et"
+    },
+    {
+      "name": "cyl_l10n_6a00c1ae99fa",
+      "value": "Okyanus"
+    },
+    {
+      "name": "cyl_l10n_ff692f04ace0",
+      "value": "Mesajlar"
+    },
+    {
+      "name": "cyl_l10n_41e8e8b9935c",
+      "value": "Koyu"
+    },
+    {
+      "name": "cyl_l10n_8dfe6bcdd6ec",
+      "value": "Kaydırmalı geçiş (CYLTabBarSlideTransitionAnimator)"
+    },
+    {
+      "name": "cyl_l10n_9f44bafc75c6",
+      "value": "Kaydırırken TabBar'ı küçült / gizle (issue #13)"
+    },
+    {
+      "name": "cyl_l10n_678abebe6aac",
+      "value": "PlusButton'ın sağ üstündeki X'e dokunun: X rastgele bir renge döner, PlusButton tepki vermez"
+    },
+    {
+      "name": "cyl_l10n_7375af54db2a",
+      "value": "Sekmelerin ve PlusButton'ın dokunma animasyonunu değiştirmek için dokunun. Şu an: %@"
+    },
+    {
+      "name": "cyl_l10n_5378f31b520c",
+      "value": "tabBar.standardAppearance'ı değiştirmek için dokunun, geçerli: %@"
+    },
+    {
+      "name": "cyl_l10n_4a986e4da535",
+      "value": "Tüm sekme başlıklarının dikey kaydırmasını değiştirmek için dokunun, geçerli: %@"
+    },
+    {
+      "name": "cyl_l10n_3d0d9d3d7cc2",
+      "value": "Dili değiştirmek için dokunun"
+    },
+    {
+      "name": "cyl_l10n_f4e41dda1094",
+      "value": "Değiştirmek için dokunun, ardından duymak için herhangi bir sekmeye veya PlusButton'a dokunun. Dokunsal titreşim yalnızca gerçek cihazda olur. Şu an: %@"
+    },
+    {
+      "name": "cyl_l10n_15855ab96e87",
+      "value": "Tık + dokunsal"
+    },
+    {
+      "name": "cyl_l10n_cff8a9cded04",
+      "value": "Tema seçmek için dokunun: TabBar arka planı, simgeleri ve metin renkleri her TabBar stilinde yerinde değişir. Şu an: %@"
+    },
+    {
+      "name": "cyl_l10n_1c00c4fd1cea",
+      "value": "Pembe Gül"
+    },
+    {
+      "name": "cyl_l10n_8483ed132b2c",
+      "value": "Doğum Günü"
+    },
+    {
+      "name": "cyl_l10n_feef14745f21",
+      "value": "Tüm sekmelerin simgelerini yerel görsellerle (ad, dosya yolu, UIImage, dosya URL'si) günceller; geri yüklemek için tekrar dokunun"
+    },
+    {
+      "name": "cyl_l10n_402d19e50fff",
+      "value": "Giriş yap"
+    },
+    {
+      "name": "cyl_l10n_833152116634",
+      "value": "Görseli kaldır"
+    },
+    {
+      "name": "cyl_l10n_a0676a7d84a9",
+      "value": "Yeşil çizgi"
+    },
+    {
+      "name": "cyl_l10n_16068b2ff3fd",
+      "value": "Ağ simgeleri"
+    },
+    {
+      "name": "cyl_l10n_69ca6555a602",
+      "value": "Çevir"
+    },
+    {
+      "name": "cyl_l10n_4bd51044149f",
+      "value": "Özel ses dosyası (cyl_tabButtonTapSoundURL)"
+    },
+    {
+      "name": "cyl_l10n_beabcd498b94",
+      "value": "Greyfurt"
+    },
+    {
+      "name": "cyl_l10n_b8c467fce096",
+      "value": "Rozetler"
+    },
+    {
+      "name": "cyl_l10n_200e65177369",
+      "value": "CYLFlatDesignTabBarItem arka plan rengini ayarla"
+    },
+    {
+      "name": "cyl_l10n_295bb704f520",
+      "value": "Dil"
+    },
+    {
+      "name": "cyl_l10n_d673e0eb5c1c",
+      "value": "Üst görünümün dışında yanıt ver (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_71bbc726ace5",
+      "value": "Sistemi izle"
+    },
+    {
+      "name": "cyl_l10n_d0914cf6acd2",
+      "value": "Gezinme ve karşılaştırmalar"
+    },
+    {
+      "name": "cyl_l10n_110abc875180",
+      "value": "Hafif dokunsal geri bildirim"
+    },
+    {
+      "name": "cyl_l10n_fad7c8a21fe3",
+      "value": "Seçili"
+    },
+    {
+      "name": "cyl_l10n_aa05fd09a619",
+      "value": "Genel"
+    },
+    {
+      "name": "cyl_l10n_15c64aa0b404",
+      "value": "Yapılandırma dosyası"
+    },
+    {
+      "name": "cyl_l10n_45158907e07f",
+      "value": "Güçlü dokunsal geri bildirim"
+    },
+    {
+      "name": "cyl_l10n_d6982fecc6a4",
+      "value": "Sekmelere uzun basma (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_aefae51d3c25",
+      "value": "\"%@\" uzun basıldı"
+    },
+    {
+      "name": "cyl_l10n_abad1baa5479",
+      "value": "Uzun basma süresi ve çift dokunma aralığı (issue #535 / #152)"
+    },
+    {
+      "name": "cyl_l10n_b146fc1a1531",
+      "value": "Çimen"
+    },
+    {
+      "name": "cyl_l10n_db1c89e0f6e6",
+      "value": "Ana sayfa"
+    },
+    {
+      "name": "cyl_l10n_18c63459a2c0",
+      "value": "Varsayılan"
+    },
+    {
+      "name": "cyl_l10n_be354ee4263a",
+      "value": "Varsayılan tık"
+    }
+  ]
+}

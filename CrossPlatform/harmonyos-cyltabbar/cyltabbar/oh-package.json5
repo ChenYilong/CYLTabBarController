@@ -1,0 +1,11 @@
+{
+  "name": "cyltabbar",
+  "version": "1.0.0",
+  "description": "CYLTabBarController for HarmonyOS NEXT (ArkTS / ArkUI): a tab bar with a plus button, badges and the configuration keys of the iOS library.",
+  "main": "Index.ets",
+  "author": "ChenYilong",
+  "license": "MIT",
+  "dependencies": {
+    "@ohos/lottie": "^2.0.38"
+  }
+}

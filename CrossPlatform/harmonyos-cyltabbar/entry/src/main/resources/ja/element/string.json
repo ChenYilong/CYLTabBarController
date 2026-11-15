@@ -1,0 +1,40 @@
+{
+  "string": [
+    {
+      "name": "tab_home",
+      "value": "ホーム"
+    },
+    {
+      "name": "tab_nearby",
+      "value": "近く"
+    },
+    {
+      "name": "tab_messages",
+      "value": "メッセージ"
+    },
+    {
+      "name": "tab_me",
+      "value": "マイページ"
+    },
+    {
+      "name": "tab_post",
+      "value": "投稿"
+    },
+    {
+      "name": "tab_refresh",
+      "value": "更新"
+    },
+    {
+      "name": "module_desc",
+      "value": "CYLTabBarController example"
+    },
+    {
+      "name": "ability_desc",
+      "value": "CYLTabBarController example"
+    },
+    {
+      "name": "app_name",
+      "value": "CYLTabBar"
+    }
+  ]
+}

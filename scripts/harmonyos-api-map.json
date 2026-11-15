@@ -1,1531 +1,654 @@
 {
- "+indexOfPlusButtonInTabBar": {
-  "status": "done",
-  "harmonyos": "CYLPlusButton.index"
- },
- "+plusButton": {
-  "status": "partial",
-  "harmonyos": "CYLTabBarController({ plusButton })",
-  "note": "a CYLPlusButton object instead of a subclass"
- },
- "CAAnimation(CYLBadgeExtention)": {
-  "status": "n/a",
-  "note": "Core Animation; HarmonyOS plays the badge animations with ArkUI animation APIs (animateTo, keyframes)"
- },
- "CAAnimation(CYLBadgeExtention) +cyl_badge_once_fadeIn_AnimationRepeatTimes:durTimes:": {
-  "status": "n/a",
-  "note": "Core Animation; HarmonyOS plays the badge animations with ArkUI animation APIs (animateTo, keyframes)"
- },
- "CAAnimation(CYLBadgeExtention) +cyl_badge_once_fadeIn_AnimationRepeatTimes:duration:": {
-  "status": "n/a",
-  "note": "Core Animation; HarmonyOS plays the badge animations with ArkUI animation APIs (animateTo, keyframes)"
- },
- "CAAnimation(CYLBadgeExtention) +cyl_badge_once_leftRight_AnimationMoveDistance:repeatTimes:durTimes:": {
-  "status": "n/a",
-  "note": "Core Animation; HarmonyOS plays the badge animations with ArkUI animation APIs (animateTo, keyframes)"
- },
- "CAAnimation(CYLBadgeExtention) +cyl_badge_once_leftRight_AnimationMoveDistance:repeatTimes:duration:": {
-  "status": "n/a",
-  "note": "Core Animation; HarmonyOS plays the badge animations with ArkUI animation APIs (animateTo, keyframes)"
- },
- "CAAnimation(CYLBadgeExtention) +cyl_badge_once_rightLeft_AnimationMoveDistance:repeatTimes:durTimes:": {
-  "status": "n/a",
-  "note": "Core Animation; HarmonyOS plays the badge animations with ArkUI animation APIs (animateTo, keyframes)"
- },
- "CAAnimation(CYLBadgeExtention) +cyl_badge_once_rightLeft_AnimationMoveDistance:repeatTimes:duration:": {
-  "status": "n/a",
-  "note": "Core Animation; HarmonyOS plays the badge animations with ArkUI animation APIs (animateTo, keyframes)"
- },
- "CAAnimation(CYLBadgeExtention) +cyl_badge_once_rolling_AnimationRepeatTimes:durTimes:": {
-  "status": "n/a",
-  "note": "Core Animation; HarmonyOS plays the badge animations with ArkUI animation APIs (animateTo, keyframes)"
- },
- "CAAnimation(CYLBadgeExtention) +cyl_badge_once_rolling_AnimationRepeatTimes:duration:": {
-  "status": "n/a",
-  "note": "Core Animation; HarmonyOS plays the badge animations with ArkUI animation APIs (animateTo, keyframes)"
- },
- "CAAnimation(CYLBadgeExtention) +cyl_badge_once_scale_AnimationRepeatTimes:durTimes:": {
-  "status": "n/a",
-  "note": "Core Animation; HarmonyOS plays the badge animations with ArkUI animation APIs (animateTo, keyframes)"
- },
- "CAAnimation(CYLBadgeExtention) +cyl_badge_once_scale_AnimationRepeatTimes:duration:": {
-  "status": "n/a",
-  "note": "Core Animation; HarmonyOS plays the badge animations with ArkUI animation APIs (animateTo, keyframes)"
- },
- "CAAnimation(CYLBadgeExtention) +cyl_bounceAnimationRepeatTimes:duration:forObj:": {
-  "status": "n/a",
-  "note": "Core Animation; HarmonyOS plays the badge animations with ArkUI animation APIs (animateTo, keyframes)"
- },
- "CAAnimation(CYLBadgeExtention) +cyl_bounceAnimationRepeatTimes:duration:offset:": {
-  "status": "n/a",
-  "note": "Core Animation; HarmonyOS plays the badge animations with ArkUI animation APIs (animateTo, keyframes)"
- },
- "CAAnimation(CYLBadgeExtention) +cyl_bounce_AnimationRepeatTimes:durTimes:forObj:": {
-  "status": "n/a",
-  "note": "Core Animation; HarmonyOS plays the badge animations with ArkUI animation APIs (animateTo, keyframes)"
- },
- "CAAnimation(CYLBadgeExtention) +cyl_opacityForeverAnimationWithDuration:": {
-  "status": "n/a",
-  "note": "Core Animation; HarmonyOS plays the badge animations with ArkUI animation APIs (animateTo, keyframes)"
- },
- "CAAnimation(CYLBadgeExtention) +cyl_opacityForever_Animation:": {
-  "status": "n/a",
-  "note": "Core Animation; HarmonyOS plays the badge animations with ArkUI animation APIs (animateTo, keyframes)"
- },
- "CAAnimation(CYLBadgeExtention) +cyl_opacityTimesAnimationRepeatTimes:duration:": {
-  "status": "n/a",
-  "note": "Core Animation; HarmonyOS plays the badge animations with ArkUI animation APIs (animateTo, keyframes)"
- },
- "CAAnimation(CYLBadgeExtention) +cyl_opacityTimes_Animation:durTimes:": {
-  "status": "n/a",
-  "note": "Core Animation; HarmonyOS plays the badge animations with ArkUI animation APIs (animateTo, keyframes)"
- },
- "CAAnimation(CYLBadgeExtention) +cyl_rotation:degree:direction:repeatCount:": {
-  "status": "n/a",
-  "note": "Core Animation; HarmonyOS plays the badge animations with ArkUI animation APIs (animateTo, keyframes)"
- },
- "CAAnimation(CYLBadgeExtention) +cyl_rotationAnimationWithDuration:degree:direction:repeatCount:": {
-  "status": "n/a",
-  "note": "Core Animation; HarmonyOS plays the badge animations with ArkUI animation APIs (animateTo, keyframes)"
- },
- "CAAnimation(CYLBadgeExtention) +cyl_scaleAnimationFromScale:toScale:duration:repeatTimes:": {
-  "status": "n/a",
-  "note": "Core Animation; HarmonyOS plays the badge animations with ArkUI animation APIs (animateTo, keyframes)"
- },
- "CAAnimation(CYLBadgeExtention) +cyl_scaleFrom:toScale:durTimes:rep:": {
-  "status": "n/a",
-  "note": "Core Animation; HarmonyOS plays the badge animations with ArkUI animation APIs (animateTo, keyframes)"
- },
- "CAAnimation(CYLBadgeExtention) +cyl_shakeAnimationRepeatTimes:duration:forObj:": {
-  "status": "n/a",
-  "note": "Core Animation; HarmonyOS plays the badge animations with ArkUI animation APIs (animateTo, keyframes)"
- },
- "CAAnimation(CYLBadgeExtention) +cyl_shakeAnimationRepeatTimes:duration:offset:": {
-  "status": "n/a",
-  "note": "Core Animation; HarmonyOS plays the badge animations with ArkUI animation APIs (animateTo, keyframes)"
- },
- "CAAnimation(CYLBadgeExtention) +cyl_shake_AnimationRepeatTimes:durTimes:forObj:": {
-  "status": "n/a",
-  "note": "Core Animation; HarmonyOS plays the badge animations with ArkUI animation APIs (animateTo, keyframes)"
- },
- "CAAnimation(CYLBadgeExtention) +cyl_springAnimationForDuration:": {
-  "status": "n/a",
-  "note": "Core Animation; HarmonyOS plays the badge animations with ArkUI animation APIs (animateTo, keyframes)"
- },
- "CYLAxis": {
-  "status": "n/a",
-  "note": "Core Animation; HarmonyOS plays the badge animations with ArkUI animation APIs (animateTo, keyframes)"
- },
- "CYLBadgeProtocol -cyl_performSelector:": {
-  "status": "n/a",
-  "note": "the Objective-C runtime; ArkTS has no method swizzling or associated objects"
- },
- "CYLBadgeProtocol -cyl_performSelector:withObject:": {
-  "status": "n/a",
-  "note": "the Objective-C runtime; ArkTS has no method swizzling or associated objects"
- },
- "CYLBadgeProtocol -cyl_performSelector:withObject:withObject:": {
-  "status": "n/a",
-  "note": "the Objective-C runtime; ArkTS has no method swizzling or associated objects"
- },
- "CYLCatchException()": {
-  "status": "n/a",
-  "note": "catches an Objective-C exception for Swift callers; ArkTS has try / catch"
- },
- "CYLConstants +UIBasisHeightScale": {
-  "status": "n/a",
-  "note": "UIKit scale factors and the iOS Lottie URL registries; ArkUI uses vp / fp units"
- },
- "CYLConstants +UIBasisWidthScale": {
-  "status": "n/a",
-  "note": "UIKit scale factors and the iOS Lottie URL registries; ArkUI uses vp / fp units"
- },
- "CYLConstants +cyl_getURLFromString:": {
-  "status": "n/a",
-  "note": "UIKit scale factors and the iOS Lottie URL registries; ArkUI uses vp / fp units"
- },
- "CYLFlatDesignTabBar -addItemWithTitle:tabBarItemImage:tabBarItemSelectedImage:index:titlePositionAdjustment:imageInsets:lottieFilePath:lottieSizeValue:": {
-  "status": "n/a",
-  "note": "FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component"
- },
- "CYLFlatDesignTabBar 0": {
-  "status": "n/a",
-  "note": "FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component"
- },
- "CYLFlatDesignTabBar delegate": {
-  "status": "n/a",
-  "note": "FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component"
- },
- "CYLFlatDesignTabBar selectedItem": {
-  "status": "n/a",
-  "note": "FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component"
- },
- "CYLFlatDesignTabBarButton -initWithTabBarItem:": {
-  "status": "n/a",
-  "note": "FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component"
- },
- "CYLFlatDesignTabBarDelegate": {
-  "status": "n/a",
-  "note": "FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component"
- },
- "CYLFlatDesignTabBarDelegate -tabBar:didSelectItem:": {
-  "status": "n/a",
-  "note": "FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component"
- },
- "CYLFlatDesignTabBarHideTabBar": {
-  "status": "n/a",
-  "note": "FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component"
- },
- "CYLFlatDesignTabBarItem -badgeTextAttributesForState:": {
-  "status": "n/a",
-  "note": "FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component"
- },
- "CYLFlatDesignTabBarItem -initWithTitle:image:": {
-  "status": "n/a",
-  "note": "FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component"
- },
- "CYLFlatDesignTabBarItem -initWithTitle:image:selectedImage:": {
-  "status": "n/a",
-  "note": "FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component"
- },
- "CYLFlatDesignTabBarItem -initWithTitle:image:selectedImage:index:titlePositionAdjustment:imagePositionAdjustment:imageInsets:lottieFilePath:lottieSizeValue:": {
-  "status": "n/a",
-  "note": "FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component"
- },
- "CYLFlatDesignTabBarItem -setBadgeTextAttributes:forState:": {
-  "status": "n/a",
-  "note": "FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component"
- },
- "CYLFlatDesignTabBarItem -setTitleTextAttributes:forState:": {
-  "status": "n/a",
-  "note": "FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component"
- },
- "CYLFlatDesignTabBarItem -titleTextAttributesForState:": {
-  "status": "n/a",
-  "note": "FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component"
- },
- "CYLFlatDesignTabBarItem 0": {
-  "status": "n/a",
-  "note": "FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component"
- },
- "CYLFlatDesignTabBarItem badgeContentInset": {
-  "status": "n/a",
-  "note": "FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component"
- },
- "CYLFlatDesignTabBarItem badgePositionAdjustment": {
-  "status": "n/a",
-  "note": "FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component"
- },
- "CYLFlatDesignTabBarItem badgeSize": {
-  "status": "n/a",
-  "note": "FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component"
- },
- "CYLFlatDesignTabBarItem childViewController": {
-  "status": "n/a",
-  "note": "FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component"
- },
- "CYLFlatDesignTabBarItem cylflatdesign_tabBarController": {
-  "status": "n/a",
-  "note": "FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component"
- },
- "CYLFlatDesignTabBarItem index": {
-  "status": "n/a",
-  "note": "FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component"
- },
- "CYLFlatDesignTabBarItem lottieFilePath": {
-  "status": "n/a",
-  "note": "FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component"
- },
- "CYLFlatDesignTabBarItemDidChange": {
-  "status": "n/a",
-  "note": "FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component"
- },
- "CYLFlatDesignUITabBarControllerDelegate": {
-  "status": "n/a",
-  "note": "FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component"
- },
- "CYLFlatDesignUITabBarControllerDelegate -tabBarController:didHideTabBar:": {
-  "status": "n/a",
-  "note": "FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component"
- },
- "CYLFlatDesignUITabBarControllerDelegate -tabBarController:didShowTabBar:": {
-  "status": "n/a",
-  "note": "FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component"
- },
- "CYLFlatDesignUITabBarControllerDelegate -tabBarController:willHideTabBar:": {
-  "status": "n/a",
-  "note": "FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component"
- },
- "CYLFlatDesignUITabBarControllerDelegate -tabBarController:willShowTabBar:": {
-  "status": "n/a",
-  "note": "FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component"
- },
- "CYLImageCache": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "CYLImageCache +sharedImageCache": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "CYLImageCache -clearDiskOnCompletion:": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "CYLImageCache -clearMemory": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "CYLImageCache -deleteOldFilesWithCompletion:": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "CYLImageCache -imageFromCacheForURL:": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "CYLImageCache -removeImageForURL:": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "CYLImageCache -totalDiskSize": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "CYLImageCache diskCacheExpireType": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "CYLImageCache diskCachePath": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "CYLImageCache downloadTimeout": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "CYLImageCache maxDiskAge": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "CYLImageCache maxDiskSize": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "CYLImageCache maxMemoryCost": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "CYLImageCache maxMemoryCount": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "CYLImageCache shouldCacheImagesInMemory": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "CYLImageCache shouldCacheImagesOnDisk": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "CYLImageCacheExpireType": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "CYLImageLoadOptions": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "CYLLocalizationLanguageDidChangeNotification": {
-  "status": "n/a",
-  "note": "CYLUtils: UIKit helpers (frames, images, runtime) with no ArkUI counterpart"
- },
- "CYLLocalizedString()": {
-  "status": "n/a",
-  "note": "CYLUtils: UIKit helpers (frames, images, runtime) with no ArkUI counterpart"
- },
- "CYLLocalizedStringForLanguage()": {
-  "status": "n/a",
-  "note": "CYLUtils: UIKit helpers (frames, images, runtime) with no ArkUI counterpart"
- },
- "CYLLocalizedTabBarItemsAttributes()": {
-  "status": "n/a",
-  "note": "the iOS bundle localization; HarmonyOS uses string resources ($r('app.string.…'))"
- },
- "CYLPlusButton": {
-  "status": "partial",
-  "harmonyos": "CYLPlusButton",
-  "note": "image, title, index, accessibility label and tap; no subclassing or raised layout yet"
- },
- "CYLPlusButton(CYLPlusButtonDeprecated) +multiplerInCenterY": {
-  "status": "n/a",
-  "note": "deprecated on iOS"
- },
- "CYLResourceBundle()": {
-  "status": "n/a",
-  "note": "CYLUtils: UIKit helpers (frames, images, runtime) with no ArkUI counterpart"
- },
- "CYLSVGATabBarItemAnimator": {
-  "status": "partial",
-  "harmonyos": "CYLSVGAView",
-  "note": "plays once when its tab is selected, first frame otherwise; an ArkTS SVGA 2.x player (bitmaps, shapes, alpha, transforms, clip paths); no masks, audio or dark variants yet"
- },
- "CYLSampleConfigurationURLString": {
-  "status": "n/a",
-  "note": "the iOS demo settings list, not library behavior"
- },
- "CYLSettingsGroup": {
-  "status": "n/a",
-  "note": "the iOS demo settings list, not library behavior"
- },
- "CYLSettingsSection": {
-  "status": "n/a",
-  "note": "the iOS demo settings list, not library behavior"
- },
- "CYLTabBar": {
-  "status": "partial",
-  "harmonyos": "CYLTabBar",
-  "note": "a tab bar with tabs, badges and a plus button; no styles, animations, themes or configuration files yet"
- },
- "CYLTabBar plusButton": {
-  "status": "partial",
-  "harmonyos": "CYLTabBar.plusButton",
-  "note": "image, title, index, accessibility label and tap; no raised layout or selection yet"
- },
- "CYLTabBarController": {
-  "status": "partial",
-  "harmonyos": "CYLTabBarController",
-  "note": "a tab bar with tabs, badges and a plus button; no styles, animations, themes or configuration files yet"
- },
- "CYLTabBarController +tabBarControllerWithViewControllers:tabBarItemsAttributes:": {
-  "status": "partial",
-  "harmonyos": "CYLTabBarController({ items, pageBuilder })",
-  "note": "pages from pageBuilder(index), kept when another tab is selected"
- },
- "CYLTabBarController -appDelegate": {
-  "status": "n/a",
-  "note": "UIKit internals, the app delegate and the window; HarmonyOS uses UIAbility and WindowStage"
- },
- "CYLTabBarController -changeItem:toItem:": {
-  "status": "n/a",
-  "note": "UIKit internals, the app delegate and the window; HarmonyOS uses UIAbility and WindowStage"
- },
- "CYLTabBarController -initWithViewControllers:tabBarItemsAttributes:": {
-  "status": "partial",
-  "harmonyos": "CYLTabBarController({ items, pageBuilder })",
-  "note": "pages from pageBuilder(index), kept when another tab is selected"
- },
- "CYLTabBarController -rootWindow": {
-  "status": "n/a",
-  "note": "UIKit internals, the app delegate and the window; HarmonyOS uses UIAbility and WindowStage"
- },
- "CYLTabBarController -tabChangedToControl:": {
-  "status": "n/a",
-  "note": "UIKit internals, the app delegate and the window; HarmonyOS uses UIAbility and WindowStage"
- },
- "CYLTabBarController -updateSelectionStatusIfNeededForTabBarController:shouldSelectViewController:": {
-  "status": "n/a",
-  "note": "UIKit internals, the app delegate and the window; HarmonyOS uses UIAbility and WindowStage"
- },
- "CYLTabBarController -updateSelectionStatusIfNeededForTabBarController:shouldSelectViewController:shouldSelect:": {
-  "status": "n/a",
-  "note": "UIKit internals, the app delegate and the window; HarmonyOS uses UIAbility and WindowStage"
- },
- "CYLTabBarController allowsVerticalBar": {
-  "status": "n/a",
-  "note": "the iPhone Duo vertical bar of iOS 27.1"
- },
- "CYLTabBarController tabBarItemsAttributes": {
-  "status": "partial",
-  "harmonyos": "CYLTabBarController.items",
-  "note": "title, image, selected image, identifier, accessibility label and badge"
- },
- "CYLTabBarController(CYLOpaqueTabBarSafeArea) cyl_fixesOpaqueTabBarSafeAreaInsets": {
-  "status": "n/a",
-  "note": "a workaround for a UIKit safe-area bug of opaque tab bars"
- },
- "CYLTabBarController(CYLSelectedIndexIgnoringPlusButton) cyl_selectedIndexIgnoringPlusButton": {
-  "status": "done",
-  "harmonyos": "CYLTabBarController.selectedIndex",
-  "note": "counts the tabs only; the plus button is not a tab"
- },
- "CYLTabBarController(CYLTabBarControllerDeprecated) -hideTabBadgeBackgroundSeparator": {
-  "status": "n/a",
-  "note": "UIKit internals, the app delegate and the window; HarmonyOS uses UIAbility and WindowStage"
- },
- "CYLTabBarHostView selectedIndex": {
-  "status": "done",
-  "harmonyos": "CYLTabBarController.selectedIndex (@Link)"
- },
- "CYLTabBarItemAccessibilityLabel": {
-  "status": "done",
-  "harmonyos": "CYLTabBarItem.accessibilityLabel"
- },
- "CYLTabBarItemIdentifier": {
-  "status": "done",
-  "harmonyos": "CYLTabBarItem.identifier (UI test id CYLTabBarItem_<identifier>)"
- },
- "CYLTabBarItemImage": {
-  "status": "done",
-  "harmonyos": "CYLTabBarItem.image"
- },
- "CYLTabBarItemSelectedImage": {
-  "status": "done",
-  "harmonyos": "CYLTabBarItem.selectedImage"
- },
- "CYLTabBarItemTitle": {
-  "status": "done",
-  "harmonyos": "CYLTabBarItem.title (ResourceStr, localized)"
- },
- "CYLTabBarItemUpdateRow": {
-  "status": "n/a",
-  "note": "the iOS demo settings list, not library behavior"
- },
- "CYLTabBarSVGAFilePath": {
-  "status": "done",
-  "harmonyos": "CYLTabBarItem.svgaFilePath (rawfile path)"
- },
- "CYLTabBarSVGASize": {
-  "status": "done",
-  "harmonyos": "CYLTabBarItem.svgaSize"
- },
- "CYLTabBarSVGAURL": {
-  "status": "done",
-  "harmonyos": "CYLTabBarItem.svgaURL"
- },
- "CYLThemeManager 0": {
-  "status": "n/a",
-  "note": "a parsing artifact of a block property, not an API"
- },
- "CYLUtils": {
-  "status": "n/a",
-  "note": "CYLUtils: UIKit helpers (frames, images, runtime) with no ArkUI counterpart"
- },
- "NSObject(CYLTabBarControllerExtention)": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "NSObject(CYLTabBarControllerExtention) +cyl_currentNavigationController": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "NSObject(CYLTabBarControllerExtention) +cyl_dismissAll:": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "NSObject(CYLTabBarControllerExtention) +cyl_topmostViewController": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "NSObject(CYLTabBarControllerExtention) -cyl_forceUpdateInterfaceOrientation:": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "NSObject(CYLTabBarControllerExtention) -cyl_isContinuousGestureRecognizer": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "NSObject(CYLTabBarControllerExtention) -cyl_isLongGestureRecognizer": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "NSObject(CYLTabBarControllerExtention) -cyl_isPlusViewControllerAdded:": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "NSObject(CYLTabBarControllerExtention) -cyl_ivarList": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "NSObject(CYLTabBarControllerExtention) -cyl_removeObserver:forKeyPath:": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "NSObject(CYLTabBarControllerExtention) -cyl_removeObserver:forKeyPath:context:": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "NSObject(CYLTabBarControllerExtention) -cyl_sharedAppDelegate": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "NSObject(CYLTabBarControllerExtention) cyl_context": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "NSObject(CYLTabBarControllerExtention) cyl_isForceLandscape": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "NSObject(CYLTabBarControllerReferenceExtension) -cyl_tabBarControllerForStyleType:": {
-  "status": "n/a",
-  "note": "the FlatDesign style-type lookup; FlatDesign is iOS only"
- },
- "NSObject(CYLTabBarControllerReferenceExtension) cylflatdesign_tabBarController": {
-  "status": "n/a",
-  "note": "FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component"
- },
- "NSObject(CYLUtils)": {
-  "status": "n/a",
-  "note": "CYLUtils: UIKit helpers (frames, images, runtime) with no ArkUI counterpart"
- },
- "NSObject(CYLUtils) -cyl_setValue:forKey:": {
-  "status": "n/a",
-  "note": "CYLUtils: UIKit helpers (frames, images, runtime) with no ArkUI counterpart"
- },
- "NSObject(CYLUtils) -cyl_setWeakAssociatedObject:forKey:": {
-  "status": "n/a",
-  "note": "CYLUtils: UIKit helpers (frames, images, runtime) with no ArkUI counterpart"
- },
- "NSObject(CYLUtils) -cyl_valueForKey:": {
-  "status": "n/a",
-  "note": "CYLUtils: UIKit helpers (frames, images, runtime) with no ArkUI counterpart"
- },
- "NSObject(CYLUtils) -cyl_weakAssociatedObjectForKey:": {
-  "status": "n/a",
-  "note": "CYLUtils: UIKit helpers (frames, images, runtime) with no ArkUI counterpart"
- },
- "NSObject(CYLUtils) cyl_isPlaceholder": {
-  "status": "n/a",
-  "note": "CYLUtils: UIKit helpers (frames, images, runtime) with no ArkUI counterpart"
- },
- "UIBarItem(CYLUtils)": {
-  "status": "n/a",
-  "note": "CYLUtils: UIKit helpers (frames, images, runtime) with no ArkUI counterpart"
- },
- "UIBarItem(CYLUtils) -cyl_view": {
-  "status": "n/a",
-  "note": "CYLUtils: UIKit helpers (frames, images, runtime) with no ArkUI counterpart"
- },
- "UIColor(CYLTabBarControllerDeprecated)": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIColor(CYLTabBarControllerDeprecated) cyl_systemBrownColor": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIColor(CYLTabBarControllerExtention)": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIColor(CYLTabBarControllerExtention) +cyl_colorWithLightColor:darkColor:": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIColor(CYLTabBarControllerExtention) cyl_darkTextColor": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIColor(CYLTabBarControllerExtention) cyl_labelColor": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIColor(CYLTabBarControllerExtention) cyl_lightTextColor": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIColor(CYLTabBarControllerExtention) cyl_linkColor": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIColor(CYLTabBarControllerExtention) cyl_opaqueSeparatorColor": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIColor(CYLTabBarControllerExtention) cyl_placeholderTextColor": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIColor(CYLTabBarControllerExtention) cyl_quaternaryLabelColor": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIColor(CYLTabBarControllerExtention) cyl_quaternarySystemFillColor": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIColor(CYLTabBarControllerExtention) cyl_randomColor": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIColor(CYLTabBarControllerExtention) cyl_secondaryLabelColor": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIColor(CYLTabBarControllerExtention) cyl_secondarySystemBackgroundColor": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIColor(CYLTabBarControllerExtention) cyl_secondarySystemFillColor": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIColor(CYLTabBarControllerExtention) cyl_secondarySystemGroupedBackgroundColor": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIColor(CYLTabBarControllerExtention) cyl_separatorColor": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIColor(CYLTabBarControllerExtention) cyl_systemBackgroundColor": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIColor(CYLTabBarControllerExtention) cyl_systemBlueColor": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIColor(CYLTabBarControllerExtention) cyl_systemFillColor": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIColor(CYLTabBarControllerExtention) cyl_systemGray2Color": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIColor(CYLTabBarControllerExtention) cyl_systemGray3Color": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIColor(CYLTabBarControllerExtention) cyl_systemGray4Color": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIColor(CYLTabBarControllerExtention) cyl_systemGray5Color": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIColor(CYLTabBarControllerExtention) cyl_systemGray6Color": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIColor(CYLTabBarControllerExtention) cyl_systemGrayColor": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIColor(CYLTabBarControllerExtention) cyl_systemGreenColor": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIColor(CYLTabBarControllerExtention) cyl_systemGroupedBackgroundColor": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIColor(CYLTabBarControllerExtention) cyl_systemIndigoColor": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIColor(CYLTabBarControllerExtention) cyl_systemOrangeColor": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIColor(CYLTabBarControllerExtention) cyl_systemPinkColor": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIColor(CYLTabBarControllerExtention) cyl_systemPurpleColor": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIColor(CYLTabBarControllerExtention) cyl_systemRedColor": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIColor(CYLTabBarControllerExtention) cyl_systemTealColor": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIColor(CYLTabBarControllerExtention) cyl_systemYellowColor": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIColor(CYLTabBarControllerExtention) cyl_tertiaryLabelColor": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIColor(CYLTabBarControllerExtention) cyl_tertiarySystemBackgroundColor": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIColor(CYLTabBarControllerExtention) cyl_tertiarySystemFillColor": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIColor(CYLTabBarControllerExtention) cyl_tertiarySystemGroupedBackgroundColor": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIControl(CYLTabBarControllerExtention)": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIControl(CYLTabBarControllerExtention) -cyl_coverSeclectContentTabImageViewOrTabButton:newView:offset:show:delayIfNeededForSeconds:completion:": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIControl(CYLTabBarControllerExtention) -cyl_coverTabImageViewOrTabButton:newView:offset:show:delayIfNeededForSeconds:completion:": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIControl(CYLTabBarControllerExtention) -cyl_coverVisiableTabImageViewOrTabButton:contentNewView:seclectContentNewView:offset:show:delayIfNeededForSeconds:completion:": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIControl(CYLTabBarControllerExtention) -cyl_coverVisiableTabImageViewOrTabButton:newView:offset:show:delayIfNeededForSeconds:completion:": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIControl(CYLTabBarControllerExtention) -cyl_hideControl": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIControl(CYLTabBarControllerExtention) -cyl_isChildViewControllerPlusButton": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIControl(CYLTabBarControllerExtention) -cyl_isPlusControl": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIControl(CYLTabBarControllerExtention) -cyl_isSelected": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIControl(CYLTabBarControllerExtention) -cyl_platterNormalControl": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIControl(CYLTabBarControllerExtention) -cyl_platterSelectedControl": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIControl(CYLTabBarControllerExtention) -cyl_replaceTabButtonWithNewView:offset:show:completion:": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIControl(CYLTabBarControllerExtention) -cyl_replaceTabButtonWithNewView:show:": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIControl(CYLTabBarControllerExtention) -cyl_replaceTabImageViewWithNewView:offset:show:completion:": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIControl(CYLTabBarControllerExtention) -cyl_replaceTabImageViewWithNewView:show:": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIControl(CYLTabBarControllerExtention) cyl_shouldNotSelect": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIControl(CYLTabBarControllerExtention) cyl_tabBarChildViewControllerIndex": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIControl(CYLTabBarControllerExtention) cyl_tabBarItemDisplayName": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIControl(CYLTabBarControllerExtention) cyl_tabBarItemIdentifier": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIControl(CYLTabBarControllerExtention) cyl_tabBarItemVisibleIndex": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIControl(CYLTabBarControllerExtention) cyl_userInteractionDisabled": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIImage(CYLTabBarControllerExtention)": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIImage(CYLTabBarControllerExtention) +cyl_GIFFrameDelayWithProperties:": {
-  "status": "n/a",
-  "note": "reads ImageIO frame properties; ArkUI's Image plays GIF files itself"
- },
- "UIImage(CYLTabBarControllerExtention) +cyl_assetImageName:userInterfaceStyle:": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIImage(CYLTabBarControllerExtention) +cyl_getImageFromImageInfo:": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIImage(CYLTabBarControllerExtention) +cyl_imageNamed:": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIImage(CYLTabBarControllerExtention) +cyl_imageWithColor:size:": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIImage(CYLTabBarControllerExtention) +cyl_imageWithColor:size:cornerRadius:": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIImage(CYLTabBarControllerExtention) +cyl_imageWithImageInfo:darkImageInfo:": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIImage(CYLTabBarControllerExtention) +cyl_imageWithLightImage:darkImage:": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIImage(CYLTabBarControllerExtention) +cyl_lightOrDarkModeImageWithLightImage:darkImage:": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIImage(CYLTabBarControllerExtention) +cyl_lightOrDarkModeImageWithOwner:lightImage:darkImage:": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIImage(CYLTabBarControllerExtention) +cyl_lightOrDarkModeImageWithOwner:lightImageName:darkImageName:": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIImage(CYLTabBarControllerExtention) +cyl_loadImageWithURL:completion:": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIImage(CYLTabBarControllerExtention) +cyl_loadImageWithURL:options:completion:": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIImage(CYLTabBarControllerExtention) +cyl_tabItemPlaceholderImage": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIImage(CYLTabBarControllerExtention) cyl_darkImageNameSuffix": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UINavigationController(CYLFlatDesignTabBarPrivate)": {
-  "status": "n/a",
-  "note": "FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component"
- },
- "UINavigationController(CYLFlatDesignTabBarPrivate) +cyl_navigationBarActionHook": {
-  "status": "n/a",
-  "note": "FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component"
- },
- "UINavigationController(CYLFlatDesignTabBarPrivate) cylflatdesign_customPopGestureRecognizer": {
-  "status": "n/a",
-  "note": "FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component"
- },
- "UINavigationControllerExtensionDelegate": {
-  "status": "n/a",
-  "note": "FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component"
- },
- "UINavigationControllerExtensionDelegate -cylflatdesign_navigationController:didBeginTransitionFrom:to:operation:": {
-  "status": "n/a",
-  "note": "FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component"
- },
- "UINavigationControllerExtensionDelegate -cylflatdesign_navigationController:didEndTransitionFrom:to:operation:cancelled:": {
-  "status": "n/a",
-  "note": "FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component"
- },
- "UINavigationControllerExtensionDelegate -cylflatdesign_navigationController:didUpdateInteractiveFrom:to:percentComplete:": {
-  "status": "n/a",
-  "note": "FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component"
- },
- "UINavigationControllerExtensionDelegate -cylflatdesign_navigationController:didUpdateInteractiveFrom:to:popGestureRecognizer:": {
-  "status": "n/a",
-  "note": "FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component"
- },
- "UINavigationControllerExtensionDelegate -cylflatdesign_navigationController:navigationBarDidChangeHeight:": {
-  "status": "n/a",
-  "note": "FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component"
- },
- "UINavigationControllerExtensionDelegate -cylflatdesign_navigationController:willEndTransitionFrom:to:operation:cancelled:": {
-  "status": "n/a",
-  "note": "FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component"
- },
- "UITabBar(CYLTabBarControllerExtention)": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UITabBar(CYLTabBarControllerExtention) -cyl_boundsSize": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UITabBar(CYLTabBarControllerExtention) -cyl_boundsWidthOffset": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UITabBar(CYLTabBarControllerExtention) -cyl_contentView": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UITabBar(CYLTabBarControllerExtention) -cyl_fullHeight": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UITabBar(CYLTabBarControllerExtention) -cyl_platterContentViewWithIndex:": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UITabBar(CYLTabBarControllerExtention) -cyl_platterContentViews": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UITabBar(CYLTabBarControllerExtention) -cyl_platterDestOutView": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UITabBar(CYLTabBarControllerExtention) -cyl_platterPortalViewWithIndex:": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UITabBar(CYLTabBarControllerExtention) -cyl_platterPortalViews": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UITabBar(CYLTabBarControllerExtention) -cyl_platterSelectedContentView": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UITabBar(CYLTabBarControllerExtention) -cyl_platterSelectedContentViewWithIndex:": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UITabBar(CYLTabBarControllerExtention) -cyl_platterSelectedContentViewWithoutPlusButttonWithIndex:": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UITabBar(CYLTabBarControllerExtention) -cyl_platterSelectedContentViews": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UITabBar(CYLTabBarControllerExtention) -cyl_platterSelectedContentViewsWithoutPlusButton": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UITabBar(CYLTabBarControllerExtention) -cyl_platterViewWithIndex:": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UITabBar(CYLTabBarControllerExtention) -cyl_platterViews": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UITabBar(CYLTabBarControllerExtention) -cyl_platterVisualProviderFloatingSelectedContentView": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UITabBar(CYLTabBarControllerExtention) -cyl_tabBarSubviews": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UITabBar(CYLTabBarControllerExtention) cyl_platterContentView": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UITabBar(CYLTabBarControllerExtention) cyl_platterView": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UITabBar(CYLTabBarControllerExtention) cyl_platterViewSize": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UITabBar(CYLTabBarControllerExtention) cyl_platterViewWidth": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UITabBar(CYLTabBarControllerExtention) cyl_portalLayer": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UITabBar(CYLTabBarControllerExtention) cyl_portalView": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UITabBarAppearance(CYLTabBarControllerExtention)": {
-  "status": "n/a",
-  "note": "UITabBarAppearance; the ArkUI tab bar takes its colors and images as component properties"
- },
- "UITabBarAppearance(CYLTabBarControllerExtention) -cyl_applyItemAppearanceWithBlock:": {
-  "status": "n/a",
-  "note": "UITabBarAppearance; the ArkUI tab bar takes its colors and images as component properties"
- },
- "UITabBarItem(CYLUtils)": {
-  "status": "n/a",
-  "note": "CYLUtils: UIKit helpers (frames, images, runtime) with no ArkUI counterpart"
- },
- "UITabBarItem(CYLUtils) cyl_tabButton": {
-  "status": "n/a",
-  "note": "CYLUtils: UIKit helpers (frames, images, runtime) with no ArkUI counterpart"
- },
- "UIView(CYLBadgeExtention) -cyl_showBadgeValue:": {
-  "status": "partial",
-  "harmonyos": "CYLTabBarItem.badgeValue",
-  "note": "tab items only; the screen reader reads it with the tab"
- },
- "UIView(CYLHitTestOutsideBounds)": {
-  "status": "n/a",
-  "note": "CYLUtils: UIKit helpers (frames, images, runtime) with no ArkUI counterpart"
- },
- "UIView(CYLHitTestOutsideBounds) cyl_respondsOutsideSuperviewBounds": {
-  "status": "n/a",
-  "note": "CYLUtils: UIKit helpers (frames, images, runtime) with no ArkUI counterpart"
- },
- "UIView(CYLLocalization)": {
-  "status": "n/a",
-  "note": "the iOS bundle localization; HarmonyOS uses string resources ($r('app.string.…'))"
- },
- "UIView(CYLLocalization) -cyl_localizeTexts": {
-  "status": "n/a",
-  "note": "the iOS bundle localization; HarmonyOS uses string resources ($r('app.string.…'))"
- },
- "UIView(CYLTabBarControllerExtention)": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIView(CYLTabBarControllerExtention) +cyl_insertedTabControlViews": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIView(CYLTabBarControllerExtention) -cyl_allSubviews": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIView(CYLTabBarControllerExtention) -cyl_bringSubviewToFront:": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIView(CYLTabBarControllerExtention) -cyl_bringSubviewToTop:": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIView(CYLTabBarControllerExtention) -cyl_imageView": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIView(CYLTabBarControllerExtention) -cyl_imageViewInTabBarButton": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIView(CYLTabBarControllerExtention) -cyl_isButtonLabel": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIView(CYLTabBarControllerExtention) -cyl_isPlusButton": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIView(CYLTabBarControllerExtention) -cyl_isTabBackgroundView": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIView(CYLTabBarControllerExtention) -cyl_isTabBadgeView": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIView(CYLTabBarControllerExtention) -cyl_isTabButton": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIView(CYLTabBarControllerExtention) -cyl_isTabImageView": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIView(CYLTabBarControllerExtention) -cyl_isTabLabel": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIView(CYLTabBarControllerExtention) -cyl_markAsInsertedForTabControl:": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIView(CYLTabBarControllerExtention) -cyl_swappableImageViewViewInTabBarButton": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIView(CYLTabBarControllerExtention) -cyl_tabBackgroundView": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIView(CYLTabBarControllerExtention) -cyl_tabBadgeView": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIView(CYLTabBarControllerExtention) -cyl_tabEffectView": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIView(CYLTabBarControllerExtention) -cyl_tabImageView": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIView(CYLTabBarControllerExtention) -cyl_tabLabel": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIView(CYLTabBarControllerExtention) -cyl_tabShadowImageView": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIView(CYLTabBarControllerExtention) -cyl_takeSnapshot": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIView(CYLTabBarControllerExtention) -cyl_takeSnapshotWithoutViews:": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIView(CYLTabBarControllerExtention) cyl_insertedForTabControl": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIView(CYLTabBarControllerExtention) cyl_tabBarItemIconView": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIView(CYLTabBarControllerExtention) cyl_tabButtonCoverView": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIView(CYLTabBarControllerExtentionDeprecated)": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIView(CYLTabBarControllerExtentionDeprecated) +cyl_tabBadgePointViewWithClolor:radius:": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIView(CYLTabBarControllerExtentionDeprecated) -cyl_tabBadgeBackgroundSeparator": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIView(CYLTabBarControllerExtentionDeprecated) -cyl_tabBadgeBackgroundView": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIView(CYLTabBarMetrics)": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIView(CYLTabBarMetrics) -cyl_plusButtonIndex": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIView(CYLTabBarMetrics) -cyl_plusButtonWidth": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIView(CYLTabBarMetrics) cyl_tabBarItemWidth": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIView(CYLTabBarMetrics) cyl_tabbarItemsCount": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIView(CYLUtils)": {
-  "status": "n/a",
-  "note": "CYLUtils: UIKit helpers (frames, images, runtime) with no ArkUI counterpart"
- },
- "UIView(CYLUtils) -cyl_addScaleBounceAnimationWithCompletion:": {
-  "status": "n/a",
-  "note": "CYLUtils: UIKit helpers (frames, images, runtime) with no ArkUI counterpart"
- },
- "UIView(CYLUtils) -cyl_canNotResponseEvent": {
-  "status": "n/a",
-  "note": "CYLUtils: UIKit helpers (frames, images, runtime) with no ArkUI counterpart"
- },
- "UIView(CYLUtils) -cyl_isInvisiable": {
-  "status": "n/a",
-  "note": "CYLUtils: UIKit helpers (frames, images, runtime) with no ArkUI counterpart"
- },
- "UIView(CYLUtils) -cyl_nearestControlBelowView:": {
-  "status": "n/a",
-  "note": "CYLUtils: UIKit helpers (frames, images, runtime) with no ArkUI counterpart"
- },
- "UIView(CYLUtils) -cyl_setHidden:": {
-  "status": "n/a",
-  "note": "CYLUtils: UIKit helpers (frames, images, runtime) with no ArkUI counterpart"
- },
- "UIViewController(CYLConfigurationDemo)": {
-  "status": "n/a",
-  "note": "the iOS demo settings list, not library behavior"
- },
- "UIViewController(CYLConfigurationDemo) +cyl_sampleConfigurationFilePaths": {
-  "status": "n/a",
-  "note": "the iOS demo settings list, not library behavior"
- },
- "UIViewController(CYLConfigurationDemo) -cyl_configurationDemoCellForTableView:": {
-  "status": "n/a",
-  "note": "the iOS demo settings list, not library behavior"
- },
- "UIViewController(CYLConfigurationDemo) -cyl_presentConfigurationDemo": {
-  "status": "n/a",
-  "note": "the iOS demo settings list, not library behavior"
- },
- "UIViewController(CYLConfigurationEdgeCases)": {
-  "status": "n/a",
-  "note": "the iOS demo settings list, not library behavior"
- },
- "UIViewController(CYLConfigurationEdgeCases) +cyl_configurationEdgeCaseSectionTitle": {
-  "status": "n/a",
-  "note": "the iOS demo settings list, not library behavior"
- },
- "UIViewController(CYLConfigurationEdgeCases) -cyl_configurationEdgeCaseCellForTableView:row:": {
-  "status": "n/a",
-  "note": "the iOS demo settings list, not library behavior"
- },
- "UIViewController(CYLConfigurationEdgeCases) -cyl_configurationEdgeCaseRowCount": {
-  "status": "n/a",
-  "note": "the iOS demo settings list, not library behavior"
- },
- "UIViewController(CYLConfigurationEdgeCases) -cyl_runConfigurationEdgeCaseAtRow:": {
-  "status": "n/a",
-  "note": "the iOS demo settings list, not library behavior"
- },
- "UIViewController(CYLLocalization)": {
-  "status": "n/a",
-  "note": "the iOS bundle localization; HarmonyOS uses string resources ($r('app.string.…'))"
- },
- "UIViewController(CYLLocalization) +cyl_pickerLanguages": {
-  "status": "n/a",
-  "note": "the iOS bundle localization; HarmonyOS uses string resources ($r('app.string.…'))"
- },
- "UIViewController(CYLLocalization) -cyl_languageCellForTableView:": {
-  "status": "n/a",
-  "note": "the iOS bundle localization; HarmonyOS uses string resources ($r('app.string.…'))"
- },
- "UIViewController(CYLLocalization) -cyl_presentLanguagePicker": {
-  "status": "n/a",
-  "note": "the iOS bundle localization; HarmonyOS uses string resources ($r('app.string.…'))"
- },
- "UIViewController(CYLNavigationControllerExtention)": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIViewController(CYLNavigationControllerExtention) -cyl_deallocNavigationSetting": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIViewController(CYLNavigationControllerExtention) -cyl_disableInteractivePopGestureRecognizer": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIViewController(CYLNavigationControllerExtention) -cyl_enableInteractivePopGestureRecognizer": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIViewController(CYLNavigationControllerExtention) -cyl_hideNavigationBarSeparatorIfNeeded": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIViewController(CYLNavigationControllerExtention) -cyl_resetInteractivePopGestureRecognizer": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIViewController(CYLNavigationControllerExtention) -cyl_setNavigationBarHiddenIfNeeded:": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIViewController(CYLNavigationControllerExtention) -cyl_setNavigationBarVisibleIfNeeded:": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIViewController(CYLNavigationControllerExtention) -cyl_shouldNavigationBarVisible": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIViewController(CYLNavigationControllerExtention) -cyl_viewDidAppearNavigationSetting:": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIViewController(CYLNavigationControllerExtention) -cyl_viewDidDisappearNavigationSetting:": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIViewController(CYLNavigationControllerExtention) -cyl_viewWillAppearNavigationSetting:": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIViewController(CYLNavigationControllerExtention) -cyl_viewWillDisappearNavigationSetting:": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIViewController(CYLNavigationControllerExtention) cyl_automaticNavigationSettingEnabled": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIViewController(CYLNavigationControllerExtention) cyl_disablePopGestureRecognizer": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIViewController(CYLNavigationControllerExtention) cyl_hideNavigationBarSeparator": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIViewController(CYLNavigationControllerExtention) cyl_hidesAncestorNavigationBars": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIViewController(CYLNavigationControllerExtention) cyl_hidesBottomBarWhenPushed": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIViewController(CYLNavigationControllerExtention) cyl_navigationBarHidden": {
-  "status": "n/a",
-  "note": "UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router"
- },
- "UIViewController(CYLScrollHideSimulation)": {
-  "status": "n/a",
-  "note": "the iOS demo settings list, not library behavior"
- },
- "UIViewController(CYLScrollHideSimulation) -cyl_didSelectScrollHideSimulationRow:": {
-  "status": "n/a",
-  "note": "the iOS demo settings list, not library behavior"
- },
- "UIViewController(CYLScrollHideSimulation) -cyl_presentScrollHideSimulationMenu": {
-  "status": "n/a",
-  "note": "the iOS demo settings list, not library behavior"
- },
- "UIViewController(CYLScrollHideSimulation) -cyl_runScrollHideSelfTest": {
-  "status": "n/a",
-  "note": "the iOS demo settings list, not library behavior"
- },
- "UIViewController(CYLScrollHideSimulation) -cyl_scrollHideSimulationCellForTableView:row:": {
-  "status": "n/a",
-  "note": "the iOS demo settings list, not library behavior"
- },
- "UIViewController(CYLScrollHideSimulation) -cyl_scrollHideSimulationRowCount": {
-  "status": "n/a",
-  "note": "the iOS demo settings list, not library behavior"
- },
- "UIViewController(CYLSettingsSection)": {
-  "status": "n/a",
-  "note": "the iOS demo settings list, not library behavior"
- },
- "UIViewController(CYLSettingsSection) -cyl_didSelectSettingsRow:": {
-  "status": "n/a",
-  "note": "the iOS demo settings list, not library behavior"
- },
- "UIViewController(CYLSettingsSection) -cyl_didSelectSettingsRowAtIndexPath:inTableView:": {
-  "status": "n/a",
-  "note": "the iOS demo settings list, not library behavior"
- },
- "UIViewController(CYLSettingsSection) -cyl_settingsCellForTableView:atIndexPath:": {
-  "status": "n/a",
-  "note": "the iOS demo settings list, not library behavior"
- },
- "UIViewController(CYLSettingsSection) -cyl_settingsCellForTableView:row:": {
-  "status": "n/a",
-  "note": "the iOS demo settings list, not library behavior"
- },
- "UIViewController(CYLSettingsSection) -cyl_settingsGroups": {
-  "status": "n/a",
-  "note": "the iOS demo settings list, not library behavior"
- },
- "UIViewController(CYLSettingsSection) -cyl_settingsRowCount": {
-  "status": "n/a",
-  "note": "the iOS demo settings list, not library behavior"
- },
- "UIViewController(CYLSettingsSection) -cyl_settingsRowsInGroup:": {
-  "status": "n/a",
-  "note": "the iOS demo settings list, not library behavior"
- },
- "UIViewController(CYLSettingsSection) -cyl_titleForSettingsGroup:": {
-  "status": "n/a",
-  "note": "the iOS demo settings list, not library behavior"
- },
- "UIViewController(CYLTabBarControllerExtention) -cyl_clearBadge": {
-  "status": "partial",
-  "harmonyos": "CYLTabBarItem.badgeValue = undefined",
-  "note": "set on the page's tab item"
- },
- "UIViewController(CYLTabBarControllerExtention) -cyl_showBadge": {
-  "status": "partial",
-  "harmonyos": "CYLTabBarItem.badgeValue = ''",
-  "note": "set on the page's tab item"
- },
- "UIViewController(CYLTabBarControllerExtention) cyl_tabBarItem": {
-  "status": "n/a",
-  "note": "FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component"
- },
- "UIViewController(CYLTabBarControllerExtention) cylflatdesign_tabBarController": {
-  "status": "n/a",
-  "note": "FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component"
- },
- "UIViewController(CYLTabBarControllerExtentionDeprecated) cyl_tabBarSpacingInViewCoordinator": {
-  "status": "n/a",
-  "note": "a UIKit layout value"
- },
- "UIViewController(CYLTabBarItemUpdate)": {
-  "status": "n/a",
-  "note": "the iOS demo settings list, not library behavior"
- },
- "UIViewController(CYLTabBarItemUpdate) -cyl_didSelectTabBarItemUpdateRow:": {
-  "status": "n/a",
-  "note": "the iOS demo settings list, not library behavior"
- },
- "UIViewController(CYLTabBarItemUpdate) -cyl_tabBarItemUpdateCellForTableView:row:": {
-  "status": "n/a",
-  "note": "the iOS demo settings list, not library behavior"
- },
- "UIViewController(CYLTabBarItemUpdate) -cyl_tabBarItemUpdateRowCount": {
-  "status": "n/a",
-  "note": "the iOS demo settings list, not library behavior"
- },
- "UIViewController(CYLThemeSettings)": {
-  "status": "n/a",
-  "note": "the iOS demo settings list, not library behavior"
- },
- "UIViewController(CYLThemeSettings) +cyl_setUpThemeSettings": {
-  "status": "n/a",
-  "note": "the iOS demo settings list, not library behavior"
- },
- "UIViewController(CYLThemeSettings) -cyl_didSelectThemeListRow:": {
-  "status": "n/a",
-  "note": "the iOS demo settings list, not library behavior"
- },
- "UIViewController(CYLThemeSettings) -cyl_presentThemePickerFromView:completion:": {
-  "status": "n/a",
-  "note": "the iOS demo settings list, not library behavior"
- },
- "UIViewController(CYLThemeSettings) -cyl_themeListCellForTableView:row:": {
-  "status": "n/a",
-  "note": "the iOS demo settings list, not library behavior"
- },
- "UIViewController(CYLThemeSettings) -cyl_themeListRowCount": {
-  "status": "n/a",
-  "note": "the iOS demo settings list, not library behavior"
- },
- "UIViewController(CYLThemeSettings) -cyl_themeListSectionTitle": {
-  "status": "n/a",
-  "note": "the iOS demo settings list, not library behavior"
- },
- "UIViewController(CYLThemeSettings) -cyl_themeMenuWithCompletion:": {
-  "status": "n/a",
-  "note": "the iOS demo settings list, not library behavior"
- },
- "UIViewController(CYLThemeSettings) -cyl_themeSettingsCellForTableView:": {
-  "status": "n/a",
-  "note": "the iOS demo settings list, not library behavior"
- },
- "UIViewController(CYLUtils)": {
-  "status": "n/a",
-  "note": "CYLUtils: UIKit helpers (frames, images, runtime) with no ArkUI counterpart"
- },
- "UIViewController(CYLUtils) -cyl_getViewControllerInsteadOfNavigationController": {
-  "status": "n/a",
-  "note": "CYLUtils: UIKit helpers (frames, images, runtime) with no ArkUI counterpart"
- },
- "UIWindow(CYLLocalization)": {
-  "status": "n/a",
-  "note": "the iOS bundle localization; HarmonyOS uses string resources ($r('app.string.…'))"
- },
- "UIWindow(CYLLocalization) -cyl_setRootViewControllerProvider:": {
-  "status": "n/a",
-  "note": "the iOS bundle localization; HarmonyOS uses string resources ($r('app.string.…'))"
- }
+  "CYLTabBarItemTitle": "`CYLTabBarItemAttributes.title` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarItemSelectedTitle": "`CYLTabBarItemAttributes.selectedTitle` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarItemImage": "`CYLTabBarItemAttributes.image` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarItemSelectedImage": "`CYLTabBarItemAttributes.selectedImage` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarItemIdentifier": "`CYLTabBarItemAttributes.identifier` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarControllerTabBarItemsAttributes": "`CYLTabBarController.tabBarItemsAttributes` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarControllerPlusButton": "`CYLTabBarController.plusButton (CYLPlusButton)` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarControllerPlusButtonAction": "`CYLTabBarController.plusButtonAction` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLPlusButtonIndexInTabBar": "`CYLPlusButton.index` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "+indexOfPlusButtonInTabBar": "`CYLPlusButton.index` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLPlusButtonCenterYOffset": "`CYLPlusButton.centerYOffset` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "+constantOfPlusButtonCenterYOffsetForTabBarHeight:": "`CYLPlusButton.centerYOffset` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLPlusButtonAlignsTitle": "`CYLPlusButton.alignsTitle` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLPlusButtonShowsSelection": "`CYLPlusButton.selectable` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "+plusChildViewController": "`CYLPlusButton.selectable + CYLTabBarController.pageBuilder(CYLPlusButtonPageIndex)` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLPlusButtonImageSize": "`CYLPlusButton.imageSize` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLPlusButtonBackgroundImage": "`CYLPlusButton.backgroundImage`; from a configuration: `CYLTabBarConfiguration.plusButtonWithConfiguration` (image or background image required) (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarController tabBarHeight": "`CYLTabBarController.tabBarHeight` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarController -setTabBarHidden:animated:": "`CYLTabBarController.tabBarHidden` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLBadgeAppearance": "`CYLBadgeAppearance` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLBadgeAppearance globalAppearance": "`CYLBadgeAppearance.globalAppearance` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLBadgeAppearance backgroundColor": "`CYLBadgeAppearance.backgroundColor` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLBadgeAppearance textColor": "`CYLBadgeAppearance.textColor` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLBadgeAppearance centerOffset": "`CYLBadgeAppearance.centerOffset` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLBadgeAppearance radius": "`CYLBadgeAppearance.radius` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLBadgeAppearance margin": "`CYLBadgeAppearance.margin` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLBadgeAppearance maximumBadgeNumber": "`CYLBadgeAppearance.maximumBadgeNumber` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLBadgeAppearance cornerRadius": "`CYLBadgeAppearance.cornerRadius` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLBadgeAppearance borderColor": "`CYLBadgeAppearance.borderColor` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLBadgeAppearance borderWidth": "`CYLBadgeAppearance.borderWidth` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLBadgeAppearance font": "`CYLBadgeAppearance.fontSize` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLBadgeAppearance -reset": "`CYLBadgeAppearance.reset()` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLBadgeAnimationType": "`CYLBadgeAnimationType` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLBadgeProtocol": "`CYLBadge` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLBadgeProtocol cyl_badgeFont": "`CYLBadge.fontSize` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLBadgeProtocol cyl_badgeBackgroundColor": "`CYLBadge.backgroundColor` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLBadgeProtocol cyl_badgeTextColor": "`CYLBadge.textColor` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLBadgeProtocol cyl_badgeCenterOffset": "`CYLBadge.centerOffset` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLBadgeProtocol cyl_badgeAnimationType": "`CYLBadge.animationType` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLBadgeProtocol cyl_badgeMaximumBadgeNumber": "`CYLBadge.maximumBadgeNumber` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLBadgeProtocol cyl_badgeRadius": "`CYLBadge.radius` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLBadgeProtocol cyl_badgeMargin": "`CYLBadge.margin` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLBadgeProtocol cyl_badgeCornerRadius": "`CYLBadge.cornerRadius` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "UIView(CYLBadgeExtention) cyl_badgeBorderColor": "`CYLBadge.borderColor` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "UIView(CYLBadgeExtention) cyl_badgeBorderWidth": "`CYLBadge.borderWidth` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLBadgeProtocol -cyl_isShowBadge": "`CYLBadge.cyl_isShowBadge()` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLBadgeProtocol -cyl_showBadge": "`CYLBadge.cyl_showBadge()` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLBadgeProtocol -cyl_clearBadge": "`CYLBadge.cyl_clearBadge()` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLBadgeProtocol -cyl_resumeBadge": "`CYLBadge.cyl_resumeBadge()` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLBadgeProtocol -cyl_isPauseBadge": "`CYLBadge.cyl_isPauseBadge()` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLBadgeProtocol -cyl_showBadgeValue:animationType:": "`CYLBadge.cyl_showBadgeValue(value, animationType)` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "UIView(CYLBadgeExtention) -cyl_isShowBadge": "`CYLBadge.cyl_isShowBadge()` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "UIView(CYLBadgeExtention) -cyl_showBadge": "`CYLBadge.cyl_showBadge()` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "UIView(CYLBadgeExtention) -cyl_clearBadge": "`CYLBadge.cyl_clearBadge()` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "UIView(CYLBadgeExtention) -cyl_resumeBadge": "`CYLBadge.cyl_resumeBadge()` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "UIView(CYLBadgeExtention) -cyl_isPauseBadge": "`CYLBadge.cyl_isPauseBadge()` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "UIView(CYLBadgeExtention) -cyl_showBadgeValue:animationType:": "`CYLBadge.cyl_showBadgeValue(value, animationType)` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "UIView(CYLBadgeExtention) -cyl_showBadgeValue:": "`CYLBadge.cyl_showBadgeValue(value)` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "UIView(CYLBadgeExtention)": "`CYLBadge + CYLBadgeView` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "UIView(CYLBadgeExtention) cyl_badge": "`CYLBadgeView` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "UIView(CYLBadgeExtention) -cyl_resetBadgeAppearance": "`CYLBadge.cyl_resetBadgeAppearance()` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarLottieFilePath": "`CYLTabBarItemAttributes.lottieFilePath (CYLLottieIcon, @ohos/lottie)` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarLottieSize": "`CYLTabBarItemAttributes.lottieSize` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarControllerTabBarItemAnimationSpeed": "`CYLTabBarController.tabBarItemAnimationSpeed` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "UIControl(CYLTabBarControllerExtention) -cyl_coverVisiableTabImageViewOrTabButton:newView:offset:show:delayIfNeededForSeconds:completion:": "`CYLTabBarController.tabCoverImages` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "UIControl(CYLTabBarControllerExtention) -cyl_coverVisiableTabImageViewOrTabButton:contentNewView:seclectContentNewView:offset:show:delayIfNeededForSeconds:completion:": "`CYLTabBarController.tabCoverImages` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarConfigurationFormat": "`CYLTabBarConfigurationFormat` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarConfigurationErrorDomain": "`CYLTabBarConfigurationErrorDomain` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarConfigurationErrorCode": "`CYLTabBarConfigurationErrorCode` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarConfigurationMaximumLength": "`CYLTabBarConfigurationMaximumLength` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarConfigurationMaximumDepth": "`CYLTabBarConfigurationMaximumDepth` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarConfigurationParser": "`CYLTabBarConfigurationParser` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarConfigurationParser +formatForPathExtension:": "`CYLTabBarConfigurationParser.formatForPathExtension()` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarConfigurationParser +formatForMIMEType:": "`CYLTabBarConfigurationParser.formatForMIMEType()` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarConfigurationParser +dictionaryWithData:format:error:": "`CYLTabBarConfigurationParser.configurationWithString(text, format)` — JSON, JSON5 / JSONC so far (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarConfigurationParser +dictionaryWithContentsOfFile:error:": "`CYLTabBarConfiguration.configurationWithRawFile(context, path)` — JSON, JSON5 / JSONC so far (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarItemTitlePositionAdjustment": "`CYLTabBarItemAttributes.titlePositionAdjustment` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarControllerTitlePositionAdjustment": "`CYLTabBarController.titlePositionAdjustment` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarControllerContext": "`CYLTabBarConfigurationResult.context` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarController +tabBarControllerWithConfiguration:": "`CYLTabBarConfiguration.resultWithConfiguration() + CYLTabBarController` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarController -initWithConfiguration:": "`CYLTabBarConfiguration.resultWithConfiguration() + CYLTabBarController` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarController titlePositionAdjustment": "`CYLTabBarController.titlePositionAdjustment` (@Prop) (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarHostView titlePositionAdjustment": "`CYLTabBarController.titlePositionAdjustment` (@Prop) (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarController tabBarHidden": "`CYLTabBarController.tabBarHidden` (@Prop, animated by `tabBarHiddenAnimated`) (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarHostView tabBarHidden": "`CYLTabBarController.tabBarHidden` (@Prop) (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarController(CYLTabBarItemStyle) cyl_tabBarBackgroundColor": "`CYLTabBarController.tabBarBackgroundColor` (@Prop) (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarController(CYLTabBarItemStyle) cyl_tabBarShadowColor": "`CYLTabBarController.tabBarShadowColor` (@Prop) (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarController(CYLTabBarItemStyle) cyl_tabBarItemTitleColor": "`CYLTabBarController.unselectedColor` (@Prop) (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarController(CYLTabBarItemStyle) cyl_tabBarItemSelectedTitleColor": "`CYLTabBarController.tintColor` (@Prop) (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarBackgroundColor": "`CYLTabBarController.tabBarBackgroundColor` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarShadowColor": "`CYLTabBarController.tabBarShadowColor` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarItemTitleColor": "`CYLTabBarItemAttributes.titleColor` / `CYLTabBarItemTitleColor` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarItemSelectedTitleColor": "`CYLTabBarItemAttributes.selectedTitleColor` / `CYLTabBarItemSelectedTitleColor` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarItemBackgroundColor": "`CYLTabBarItemAttributes.backgroundColor` / `CYLTabBarItemBackgroundColor` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarItemSelectedBackgroundColor": "`CYLTabBarItemAttributes.selectedBackgroundColor` / `CYLTabBarItemSelectedBackgroundColor` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarHeight": "`CYLTabBarController.tabBarHeight` (@Prop) (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBar cyl_itemEdgeInsets": "`CYLTabBarController.itemEdgeInsets` (`CYLEdgeInsets`) (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarController unloadsUnselectedViewsOnMemoryWarning": "`CYLTabBarController.unloadsUnselectedViewsOnMemoryWarning` (@Prop) (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarControllerUnloadsUnselectedViewsOnMemoryWarning": "`CYLTabBarController.unloadsUnselectedViewsOnMemoryWarning` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarController(CYLActiveTabBarController) +cyl_simulateMemoryWarning": "`cyl_simulateMemoryWarning()` (AppStorage `cyl_memoryWarning`) (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarHostView -simulateMemoryWarning": "`cyl_simulateMemoryWarning()` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLSimulateMemoryWarningReport()": "`CYLTabBarController.onMemoryWarning(unloaded, loaded)` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "UITableViewCell(CYLBadgeExtention) +cyl_badgeTitleForRow:": "`cyl_badgeTitleForRow(row)` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "UITableViewCell(CYLBadgeExtention) +cyl_badgeStyleCount": "`cyl_badgeStyleCount()` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarController -updateTabBarItemAtIndex:attributes:": "a new `tabBarItemsAttributes` array (@Prop) with the changed item (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarController -updateTabBarItemsWithAttributes:": "a new `tabBarItemsAttributes` array (@Prop) (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarController -setTabBarItemIconWithURL:selectedURL:size:atIndex:": "`CYLTabBarItemAttributes.imageURL` / `selectedImageURL` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarController -setTabBarItemIcon:selectedIcon:size:atIndex:": "`CYLTabBarItemAttributes.image` / `selectedImage` in a new array (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarItemImageURL": "`CYLTabBarItemAttributes.imageURL` / `selectedImageURL` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarGIFFilePath": "`CYLTabBarItemAttributes.gifFilePath` (rawfile path or URL) (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarController(CYLLogin) cyl_loggedIn": "`CYLTabBarController.loggedIn` (@Prop) (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarController(CYLLogin) cyl_loginRequiredTabBarItemIdentifiers": "`CYLTabBarController.loginRequiredTabBarItemIdentifiers` (@Prop) (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarHostView loggedIn": "`CYLTabBarController.loggedIn` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarLoginStateDidChangeNotification": "`CYLTabBarController.loginStateDidChange(loggedIn)` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarController(CYLSelectedIndexIgnoringPlusButton) cyl_selectedIndexIgnoringPlusButton": "`CYLTabBarController.selectedIndex` (tab indexes only; the plus page is `CYLPlusButtonPageIndex`) (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLPlusButton touchableAreaScale": "`CYLPlusButton.touchableAreaScale` (`responseRegion`) (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLPlusButton showsTouchableArea": "`CYLPlusButton.showsTouchableArea` (overlay) (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLPlusButton touchableAreaColor": "`CYLPlusButton.touchableAreaColor` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabButtonTapAnimationType": "`CYLTabButtonTapAnimationType` (None, Scale, ZoomIn, Bounce, Rotation, Flip) (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarController(CYLInteraction) cyl_tabButtonTapAnimationType": "`CYLTabBarController.tapAnimationType` (@Prop) (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarController(CYLInteraction) cyl_tabButtonHapticFeedbackEnabled": "`CYLTabBarController.hapticFeedbackEnabled` (vibrator preset; ohos.permission.VIBRATE) (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarController(CYLInteraction) cyl_tabButtonHapticFeedbackStyle": "`CYLTabBarController.hapticFeedbackStyle` (`CYLImpactFeedbackStyle`) (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarControllerDidLongPressControlBlock": "`(index, identifier) => void` of `CYLTabBarController.didLongPress` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarController(CYLInteraction) cyl_didLongPressControlBlock": "`CYLTabBarController.didLongPress` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarControllerDelegate -tabBarController:didLongPressControl:": "`CYLTabBarController.didLongPress` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarHostView didLongPressTab": "`CYLTabBarController.didLongPress` (index; plus button `CYLPlusButtonPageIndex`) (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarController(CYLInteraction) cyl_tabButtonLongPressMinimumDuration": "`CYLTabBarController.longPressDuration` (ms) (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarController(CYLTabBarItemGesture) cyl_tabBarItemLongPressDuration": "`CYLTabBarController.longPressDuration` (ms) (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarController(CYLTabBarItemGesture) cyl_tabBarItemDoubleTapInterval": "`CYLTabBarController.doubleTapInterval` (ms) (built; emulator check pending / 已编译，模拟器验证待做)",
+  "UITabBarItem(CYLTabBarControllerExtention) cyl_doubleTapBlock": "`CYLTabBarController.didDoubleTap` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarController(CYLInteraction) cyl_swipeToSwitchTabEnabled": "`CYLTabBarController.swipeToSwitchTabEnabled` (@Prop) (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarSlideTransitionAnimator": "`CYLTabBarController.slideTransitionDuration` (page translate animation) (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarSlideTransitionAnimator duration": "`CYLTabBarController.slideTransitionDuration` (ms; iOS 0.35 s) (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarItemDarkImage": "`CYLTabBarItemAttributes.darkImage` / `darkSelectedImage` (AppStorage `cyl_colorMode`) (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarLottieDarkURL": "`CYLTabBarItemAttributes.lottieDarkFilePath` (rawfile; reloads on a color mode change) (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarControllerDelegate -tabBarController:didSelectControl:": "`CYLTabBarController.didSelectControl(index, previous)` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarMinimizeBehavior": "`CYLTabBarMinimizeBehavior` (Automatic, Never, OnScrollDown, OnScrollUp) (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarController(CYLTabBarMinimize) cyl_tabBarMinimizeBehavior": "`CYLTabBarController.tabBarMinimizeBehavior` (@Prop) + `cyl_reportScroll(delta)` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarController(CYLTabBarMinimize) cyl_hidesTabBarOnScroll": "`CYLTabBarController.hidesTabBarOnScroll` (@Prop) (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarController(CYLInteraction) cyl_tabButtonTapSoundEnabled": "`CYLTabBarController.tapSoundEnabled` (SoundPool) (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarController(CYLInteraction) cyl_tabButtonTapSoundURL": "`CYLTabBarController.tapSoundPath` (rawfile) (built; emulator check pending / 已编译，模拟器验证待做)",
+  "UIViewController(CYLTabBarControllerExtention) -cyl_popSelectTabBarChildViewControllerAtIndex:": "`cyl_popSelectTabBarChildViewControllerAtIndex(index)` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "UIViewController(CYLTabBarControllerExtention) -cyl_popSelectTabBarChildViewControllerAtIndex:completion:": "`cyl_popSelectTabBarChildViewControllerAtIndex(index, completion)` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "UIViewController(CYLTabBarControllerExtention) -cyl_popSelectTabBarChildViewControllerForTabBarItemIdentifier:": "`cyl_popSelectTabBarChildViewControllerForTabBarItemIdentifier(identifier)` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "UIViewController(CYLTabBarControllerExtention) -cyl_pushOrPopToViewController:animated:callback:": "`cyl_pushOrPopToViewController(url, params, callback)` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "UIViewController(CYLTabBarControllerExtention) -cyl_pushViewController:animated:": "`cyl_pushViewController(url, params)` (router) (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLPushOrPopCallback": "`(popped: boolean) => void` of `cyl_pushOrPopToViewController` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLThemeManager": "`cyltabbar/CYLThemeManager.ets` CYLThemeManager (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLThemeManager -init": "`cyltabbar/CYLThemeManager.ets` -init (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLThemeManager +new": "`cyltabbar/CYLThemeManager.ets` +new (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLThemeManager name": "`cyltabbar/CYLThemeManager.ets` name (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLThemeManager identifierForTrait": "`cyltabbar/CYLThemeManager.ets` identifierForTrait (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLThemeManager themeIdentifiers": "`cyltabbar/CYLThemeManager.ets` themeIdentifiers (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLThemeManager themes": "`cyltabbar/CYLThemeManager.ets` themes (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLThemeManager currentThemeIdentifier": "`cyltabbar/CYLThemeManager.ets` currentThemeIdentifier (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLThemeManager currentTheme": "`cyltabbar/CYLThemeManager.ets` currentTheme (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLThemeManager persistsCurrentThemeIdentifier": "`cyltabbar/CYLThemeManager.ets` persistsCurrentThemeIdentifier (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLThemeManager themeGenerator": "`cyltabbar/CYLThemeManager.ets` themeGenerator (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLThemeManager themeIdentifierGenerator": "`cyltabbar/CYLThemeManager.ets` themeIdentifierGenerator (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLThemeManager -addThemeIdentifier:theme:": "`cyltabbar/CYLThemeManager.ets` -addThemeIdentifier:theme: (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLThemeManager -removeThemeIdentifier:": "`cyltabbar/CYLThemeManager.ets` -removeThemeIdentifier: (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLThemeManager -removeTheme:": "`cyltabbar/CYLThemeManager.ets` -removeTheme: (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLThemeManager -themeForIdentifier:": "`cyltabbar/CYLThemeManager.ets` -themeForIdentifier: (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLThemeManager -identifierForTheme:": "`cyltabbar/CYLThemeManager.ets` -identifierForTheme: (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLThemeManager -updateThemeForTraitCollection:": "`cyltabbar/CYLThemeManager.ets` -updateThemeForTraitCollection: (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLThemeDidChangeNotification": "`cyltabbar/CYLThemeManager.ets` CYLThemeDidChangeNotification (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLThemeManagerNameDefault": "`cyltabbar/CYLThemeManager.ets` CYLThemeManagerNameDefault (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLThemeManagerCenter": "`cyltabbar/CYLThemeManager.ets` CYLThemeManagerCenter (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLThemeManagerCenter defaultThemeManager": "`cyltabbar/CYLThemeManager.ets` defaultThemeManager (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLThemeManagerCenter themeManagers": "`cyltabbar/CYLThemeManager.ets` themeManagers (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLThemeManagerCenter +themeManagerWithName:": "`cyltabbar/CYLThemeManager.ets` +themeManagerWithName: (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLThemeManagerCenter +updateThemesForTraitCollection:": "`cyltabbar/CYLThemeManager.ets` +updateThemesForTraitCollection: (built; emulator check pending / 已编译，模拟器验证待做)",
+  "UINavigationControllerExtensionDelegate": "TODO: N/A on HarmonyOS: A UINavigationController delegate extension; HarmonyOS navigation is router / Navigation, which the tab bar does not wrap.",
+  "UINavigationControllerExtensionDelegate -cylflatdesign_navigationController:navigationBarDidChangeHeight:": "TODO: N/A on HarmonyOS: A UINavigationController delegate extension; HarmonyOS navigation is router / Navigation, which the tab bar does not wrap.",
+  "UINavigationControllerExtensionDelegate -cylflatdesign_navigationController:didBeginTransitionFrom:to:operation:": "TODO: N/A on HarmonyOS: A UINavigationController delegate extension; HarmonyOS navigation is router / Navigation, which the tab bar does not wrap.",
+  "UINavigationControllerExtensionDelegate -cylflatdesign_navigationController:didUpdateInteractiveFrom:to:percentComplete:": "TODO: N/A on HarmonyOS: A UINavigationController delegate extension; HarmonyOS navigation is router / Navigation, which the tab bar does not wrap.",
+  "UINavigationControllerExtensionDelegate -cylflatdesign_navigationController:didUpdateInteractiveFrom:to:popGestureRecognizer:": "TODO: N/A on HarmonyOS: A UINavigationController delegate extension; HarmonyOS navigation is router / Navigation, which the tab bar does not wrap.",
+  "UINavigationControllerExtensionDelegate -cylflatdesign_navigationController:willEndTransitionFrom:to:operation:cancelled:": "TODO: N/A on HarmonyOS: A UINavigationController delegate extension; HarmonyOS navigation is router / Navigation, which the tab bar does not wrap.",
+  "UINavigationControllerExtensionDelegate -cylflatdesign_navigationController:didEndTransitionFrom:to:operation:cancelled:": "TODO: N/A on HarmonyOS: A UINavigationController delegate extension; HarmonyOS navigation is router / Navigation, which the tab bar does not wrap.",
+  "UINavigationController(CYLFlatDesignTabBarPrivate)": "TODO: N/A on HarmonyOS: iOS internal API (a private category of the Objective-C implementation); the HarmonyOS internals are ported from the Android Kotlin sources and have no public counterpart.",
+  "UINavigationController(CYLFlatDesignTabBarPrivate) cylflatdesign_customPopGestureRecognizer": "TODO: N/A on HarmonyOS: iOS internal API (a private category of the Objective-C implementation); the HarmonyOS internals are ported from the Android Kotlin sources and have no public counterpart.",
+  "UINavigationController(CYLFlatDesignTabBarPrivate) +cyl_navigationBarActionHook": "TODO: N/A on HarmonyOS: iOS internal API (a private category of the Objective-C implementation); the HarmonyOS internals are ported from the Android Kotlin sources and have no public counterpart.",
+  "+multiplierOfTabBarHeight:": "TODO: N/A on HarmonyOS: Deprecated iOS API (its comment starts with \"Deprecated\"); the HarmonyOS port starts with the current API only.",
+  "CYLPlusButton(CYLPlusButtonDeprecated)": "TODO: N/A on HarmonyOS: Deprecated iOS API kept for source compatibility; the HarmonyOS port starts with the current API only.",
+  "CYLPlusButton(CYLPlusButtonDeprecated) +registerSubclass": "TODO: N/A on HarmonyOS: Deprecated iOS API kept for source compatibility; the HarmonyOS port starts with the current API only.",
+  "CYLPlusButton(CYLPlusButtonDeprecated) +multiplerInCenterY": "TODO: N/A on HarmonyOS: Deprecated iOS API kept for source compatibility; the HarmonyOS port starts with the current API only.",
+  "NSObject(CYLTabBarControllerReferenceExtension)": "TODO: N/A on HarmonyOS: Objective-C associated references to the tab bar controller; on HarmonyOS pages get the controller state from their parent (@Prop / @Link / AppStorage).",
+  "NSObject(CYLTabBarControllerReferenceExtension) cyl_tabBarController": "TODO: N/A on HarmonyOS: Objective-C associated references to the tab bar controller; on HarmonyOS pages get the controller state from their parent (@Prop / @Link / AppStorage).",
+  "NSObject(CYLTabBarControllerReferenceExtension) -cyl_tabBarControllerForStyleType:": "TODO: N/A on HarmonyOS: Objective-C associated references to the tab bar controller; on HarmonyOS pages get the controller state from their parent (@Prop / @Link / AppStorage).",
+  "NSObject(CYLTabBarControllerReferenceExtension) -cyl_owningTabBarController": "TODO: N/A on HarmonyOS: Objective-C associated references to the tab bar controller; on HarmonyOS pages get the controller state from their parent (@Prop / @Link / AppStorage).",
+  "NSObject(CYLTabBarControllerReferenceExtension) cylflatdesign_tabBarController": "TODO: N/A on HarmonyOS: Objective-C associated references to the tab bar controller; on HarmonyOS pages get the controller state from their parent (@Prop / @Link / AppStorage).",
+  "CYLTabBarController(CYLTabBarControllerDeprecated)": "TODO: N/A on HarmonyOS: Deprecated iOS API kept for source compatibility; the HarmonyOS port starts with the current API only.",
+  "CYLTabBarController(CYLTabBarControllerDeprecated) -hideTabBadgeBackgroundSeparator": "TODO: N/A on HarmonyOS: Deprecated iOS API kept for source compatibility; the HarmonyOS port starts with the current API only.",
+  "CALayer(CYLTheme)": "TODO: N/A on HarmonyOS: CALayer theme colors; ArkUI has no layer objects. Equivalent: component attributes bound to @State (CYLThemeManager listeners).",
+  "CALayer(CYLTheme) -cyl_setThemeColor:forKey:": "TODO: N/A on HarmonyOS: CALayer theme colors; ArkUI has no layer objects. Equivalent: component attributes bound to @State (CYLThemeManager listeners).",
+  "CALayer(CYLTheme) -cyl_themeColorForKey:": "TODO: N/A on HarmonyOS: CALayer theme colors; ArkUI has no layer objects. Equivalent: component attributes bound to @State (CYLThemeManager listeners).",
+  "CALayer(CYLTheme) -cyl_updateThemeColors": "TODO: N/A on HarmonyOS: CALayer theme colors; ArkUI has no layer objects. Equivalent: component attributes bound to @State (CYLThemeManager listeners).",
+  "CALayer(CYLTheme) cyl_themeBackgroundColor": "TODO: N/A on HarmonyOS: CALayer theme colors; ArkUI has no layer objects. Equivalent: component attributes bound to @State (CYLThemeManager listeners).",
+  "CALayer(CYLTheme) cyl_themeBorderColor": "TODO: N/A on HarmonyOS: CALayer theme colors; ArkUI has no layer objects. Equivalent: component attributes bound to @State (CYLThemeManager listeners).",
+  "CALayer(CYLTheme) cyl_themeShadowColor": "TODO: N/A on HarmonyOS: CALayer theme colors; ArkUI has no layer objects. Equivalent: component attributes bound to @State (CYLThemeManager listeners).",
+  "UIVisualEffect(CYLTheme)": "TODO: N/A on HarmonyOS: UIVisualEffect (blur) theme values; ArkUI blur is a component attribute (backgroundBlurStyle) set from @State.",
+  "UIVisualEffect(CYLTheme) +cyl_effectWithThemeProvider:": "TODO: N/A on HarmonyOS: UIVisualEffect (blur) theme values; ArkUI blur is a component attribute (backgroundBlurStyle) set from @State.",
+  "UIVisualEffect(CYLTheme) +cyl_effectWithThemeManagerName:provider:": "TODO: N/A on HarmonyOS: UIVisualEffect (blur) theme values; ArkUI blur is a component attribute (backgroundBlurStyle) set from @State.",
+  "UIVisualEffect(CYLTheme) cyl_isThemeEffect": "TODO: N/A on HarmonyOS: UIVisualEffect (blur) theme values; ArkUI blur is a component attribute (backgroundBlurStyle) set from @State.",
+  "UIVisualEffect(CYLTheme) cyl_rawEffect": "TODO: N/A on HarmonyOS: UIVisualEffect (blur) theme values; ArkUI blur is a component attribute (backgroundBlurStyle) set from @State.",
+  "NSObject(CYLUtils)": "TODO: N/A on HarmonyOS: Objective-C runtime helpers (weak associated objects, method swizzling); ArkTS has no categories or swizzling. Equivalent: fields on the owning class, WeakRef.",
+  "NSObject(CYLUtils) -cyl_valueForKey:": "TODO: N/A on HarmonyOS: Objective-C runtime helpers (weak associated objects, method swizzling); ArkTS has no categories or swizzling. Equivalent: fields on the owning class, WeakRef.",
+  "NSObject(CYLUtils) -cyl_setValue:forKey:": "TODO: N/A on HarmonyOS: Objective-C runtime helpers (weak associated objects, method swizzling); ArkTS has no categories or swizzling. Equivalent: fields on the owning class, WeakRef.",
+  "NSObject(CYLUtils) cyl_isPlaceholder": "TODO: N/A on HarmonyOS: Objective-C runtime helpers (weak associated objects, method swizzling); ArkTS has no categories or swizzling. Equivalent: fields on the owning class, WeakRef.",
+  "NSObject(CYLUtils) -cyl_setWeakAssociatedObject:forKey:": "TODO: N/A on HarmonyOS: Objective-C runtime helpers (weak associated objects, method swizzling); ArkTS has no categories or swizzling. Equivalent: fields on the owning class, WeakRef.",
+  "NSObject(CYLUtils) -cyl_weakAssociatedObjectForKey:": "TODO: N/A on HarmonyOS: Objective-C runtime helpers (weak associated objects, method swizzling); ArkTS has no categories or swizzling. Equivalent: fields on the owning class, WeakRef.",
+  "NSObject(CYLTabBarControllerExtention)": "TODO: N/A on HarmonyOS: Objective-C runtime helpers (associated objects, KVO, swizzling) on NSObject; ArkTS has no runtime categories. Equivalent: plain fields / @State on the HarmonyOS objects.",
+  "NSObject(CYLTabBarControllerExtention) cyl_context": "TODO: N/A on HarmonyOS: Objective-C runtime helpers (associated objects, KVO, swizzling) on NSObject; ArkTS has no runtime categories. Equivalent: plain fields / @State on the HarmonyOS objects.",
+  "NSObject(CYLTabBarControllerExtention) cyl_isForceLandscape": "TODO: N/A on HarmonyOS: Objective-C runtime helpers (associated objects, KVO, swizzling) on NSObject; ArkTS has no runtime categories. Equivalent: plain fields / @State on the HarmonyOS objects.",
+  "NSObject(CYLTabBarControllerExtention) -cyl_forceUpdateInterfaceOrientation:": "TODO: N/A on HarmonyOS: Objective-C runtime helpers (associated objects, KVO, swizzling) on NSObject; ArkTS has no runtime categories. Equivalent: plain fields / @State on the HarmonyOS objects.",
+  "NSObject(CYLTabBarControllerExtention) -cyl_sharedAppDelegate": "TODO: N/A on HarmonyOS: Objective-C runtime helpers (associated objects, KVO, swizzling) on NSObject; ArkTS has no runtime categories. Equivalent: plain fields / @State on the HarmonyOS objects.",
+  "NSObject(CYLTabBarControllerExtention) +cyl_topmostViewController": "TODO: N/A on HarmonyOS: Objective-C runtime helpers (associated objects, KVO, swizzling) on NSObject; ArkTS has no runtime categories. Equivalent: plain fields / @State on the HarmonyOS objects.",
+  "NSObject(CYLTabBarControllerExtention) +cyl_currentNavigationController": "TODO: N/A on HarmonyOS: Objective-C runtime helpers (associated objects, KVO, swizzling) on NSObject; ArkTS has no runtime categories. Equivalent: plain fields / @State on the HarmonyOS objects.",
+  "NSObject(CYLTabBarControllerExtention) +cyl_dismissAll:": "TODO: N/A on HarmonyOS: Objective-C runtime helpers (associated objects, KVO, swizzling) on NSObject; ArkTS has no runtime categories. Equivalent: plain fields / @State on the HarmonyOS objects.",
+  "NSObject(CYLTabBarControllerExtention) -cyl_ivarList": "TODO: N/A on HarmonyOS: Objective-C runtime helpers (associated objects, KVO, swizzling) on NSObject; ArkTS has no runtime categories. Equivalent: plain fields / @State on the HarmonyOS objects.",
+  "NSObject(CYLTabBarControllerExtention) -cyl_isContinuousGestureRecognizer": "TODO: N/A on HarmonyOS: Objective-C runtime helpers (associated objects, KVO, swizzling) on NSObject; ArkTS has no runtime categories. Equivalent: plain fields / @State on the HarmonyOS objects.",
+  "NSObject(CYLTabBarControllerExtention) -cyl_isLongGestureRecognizer": "TODO: N/A on HarmonyOS: Objective-C runtime helpers (associated objects, KVO, swizzling) on NSObject; ArkTS has no runtime categories. Equivalent: plain fields / @State on the HarmonyOS objects.",
+  "NSObject(CYLTabBarControllerExtention) -cyl_isPlusViewControllerAdded:": "TODO: N/A on HarmonyOS: Objective-C runtime helpers (associated objects, KVO, swizzling) on NSObject; ArkTS has no runtime categories. Equivalent: plain fields / @State on the HarmonyOS objects.",
+  "NSObject(CYLTabBarControllerExtention) -cyl_removeObserver:forKeyPath:": "TODO: N/A on HarmonyOS: Objective-C runtime helpers (associated objects, KVO, swizzling) on NSObject; ArkTS has no runtime categories. Equivalent: plain fields / @State on the HarmonyOS objects.",
+  "NSObject(CYLTabBarControllerExtention) -cyl_removeObserver:forKeyPath:context:": "TODO: N/A on HarmonyOS: Objective-C runtime helpers (associated objects, KVO, swizzling) on NSObject; ArkTS has no runtime categories. Equivalent: plain fields / @State on the HarmonyOS objects.",
+  "UIColor(CYLTabBarControllerDeprecated)": "TODO: N/A on HarmonyOS: Deprecated iOS API kept for source compatibility; the HarmonyOS port starts with the current API only.",
+  "UIColor(CYLTabBarControllerDeprecated) cyl_systemBrownColor": "TODO: N/A on HarmonyOS: Deprecated iOS API kept for source compatibility; the HarmonyOS port starts with the current API only.",
+  "UIControl(CYLTabBarControllerExtention) cyl_shouldNotSelect": "TODO: N/A on HarmonyOS: Deprecated iOS API (its comment starts with \"Deprecated\"); the HarmonyOS port starts with the current API only.",
+  "UIControl(CYLTabBarControllerExtention) cyl_userInteractionDisabled": "TODO: N/A on HarmonyOS: Deprecated iOS API (its comment starts with \"Deprecated\"); the HarmonyOS port starts with the current API only.",
+  "UIControl(CYLTabBarControllerExtentionDeprecated)": "TODO: N/A on HarmonyOS: Deprecated iOS API kept for source compatibility; the HarmonyOS port starts with the current API only.",
+  "UIControl(CYLTabBarControllerExtentionDeprecated) cyl_tabBadgePointView": "TODO: N/A on HarmonyOS: Deprecated iOS API kept for source compatibility; the HarmonyOS port starts with the current API only.",
+  "UIControl(CYLTabBarControllerExtentionDeprecated) cyl_tabBadgePointViewOffset": "TODO: N/A on HarmonyOS: Deprecated iOS API kept for source compatibility; the HarmonyOS port starts with the current API only.",
+  "UIControl(CYLTabBarControllerExtentionDeprecated) -cyl_showTabBadgePoint": "TODO: N/A on HarmonyOS: Deprecated iOS API kept for source compatibility; the HarmonyOS port starts with the current API only.",
+  "UIControl(CYLTabBarControllerExtentionDeprecated) -cyl_removeTabBadgePoint": "TODO: N/A on HarmonyOS: Deprecated iOS API kept for source compatibility; the HarmonyOS port starts with the current API only.",
+  "UIControl(CYLTabBarControllerExtentionDeprecated) -cyl_isShowTabBadgePoint": "TODO: N/A on HarmonyOS: Deprecated iOS API kept for source compatibility; the HarmonyOS port starts with the current API only.",
+  "CYLImageCache": "TODO: N/A on HarmonyOS: The iOS cache of downloaded tab icons; ArkUI Image caches network images itself (memory and disk). Equivalent: Image(url).",
+  "CYLImageCache +sharedImageCache": "TODO: N/A on HarmonyOS: The iOS cache of downloaded tab icons; ArkUI Image caches network images itself (memory and disk). Equivalent: Image(url).",
+  "CYLImageCache shouldCacheImagesInMemory": "TODO: N/A on HarmonyOS: The iOS cache of downloaded tab icons; ArkUI Image caches network images itself (memory and disk). Equivalent: Image(url).",
+  "CYLImageCache shouldCacheImagesOnDisk": "TODO: N/A on HarmonyOS: The iOS cache of downloaded tab icons; ArkUI Image caches network images itself (memory and disk). Equivalent: Image(url).",
+  "CYLImageCache maxMemoryCount": "TODO: N/A on HarmonyOS: The iOS cache of downloaded tab icons; ArkUI Image caches network images itself (memory and disk). Equivalent: Image(url).",
+  "CYLImageCache maxMemoryCost": "TODO: N/A on HarmonyOS: The iOS cache of downloaded tab icons; ArkUI Image caches network images itself (memory and disk). Equivalent: Image(url).",
+  "CYLImageCache maxDiskAge": "TODO: N/A on HarmonyOS: The iOS cache of downloaded tab icons; ArkUI Image caches network images itself (memory and disk). Equivalent: Image(url).",
+  "CYLImageCache diskCacheExpireType": "TODO: N/A on HarmonyOS: The iOS cache of downloaded tab icons; ArkUI Image caches network images itself (memory and disk). Equivalent: Image(url).",
+  "CYLImageCache maxDiskSize": "TODO: N/A on HarmonyOS: The iOS cache of downloaded tab icons; ArkUI Image caches network images itself (memory and disk). Equivalent: Image(url).",
+  "CYLImageCache diskCachePath": "TODO: N/A on HarmonyOS: The iOS cache of downloaded tab icons; ArkUI Image caches network images itself (memory and disk). Equivalent: Image(url).",
+  "CYLImageCache downloadTimeout": "TODO: N/A on HarmonyOS: The iOS cache of downloaded tab icons; ArkUI Image caches network images itself (memory and disk). Equivalent: Image(url).",
+  "CYLImageCache -imageFromCacheForURL:": "TODO: N/A on HarmonyOS: The iOS cache of downloaded tab icons; ArkUI Image caches network images itself (memory and disk). Equivalent: Image(url).",
+  "CYLImageCache -removeImageForURL:": "TODO: N/A on HarmonyOS: The iOS cache of downloaded tab icons; ArkUI Image caches network images itself (memory and disk). Equivalent: Image(url).",
+  "CYLImageCache -clearMemory": "TODO: N/A on HarmonyOS: The iOS cache of downloaded tab icons; ArkUI Image caches network images itself (memory and disk). Equivalent: Image(url).",
+  "CYLImageCache -clearDiskOnCompletion:": "TODO: N/A on HarmonyOS: The iOS cache of downloaded tab icons; ArkUI Image caches network images itself (memory and disk). Equivalent: Image(url).",
+  "CYLImageCache -deleteOldFilesWithCompletion:": "TODO: N/A on HarmonyOS: The iOS cache of downloaded tab icons; ArkUI Image caches network images itself (memory and disk). Equivalent: Image(url).",
+  "CYLImageCache -totalDiskSize": "TODO: N/A on HarmonyOS: The iOS cache of downloaded tab icons; ArkUI Image caches network images itself (memory and disk). Equivalent: Image(url).",
+  "UIView(CYLTabBarControllerExtentionDeprecated)": "TODO: N/A on HarmonyOS: Deprecated iOS API kept for source compatibility; the HarmonyOS port starts with the current API only.",
+  "UIView(CYLTabBarControllerExtentionDeprecated) -cyl_tabBadgeBackgroundView": "TODO: N/A on HarmonyOS: Deprecated iOS API kept for source compatibility; the HarmonyOS port starts with the current API only.",
+  "UIView(CYLTabBarControllerExtentionDeprecated) -cyl_tabBadgeBackgroundSeparator": "TODO: N/A on HarmonyOS: Deprecated iOS API kept for source compatibility; the HarmonyOS port starts with the current API only.",
+  "UIView(CYLTabBarControllerExtentionDeprecated) +cyl_tabBadgePointViewWithClolor:radius:": "TODO: N/A on HarmonyOS: Deprecated iOS API kept for source compatibility; the HarmonyOS port starts with the current API only.",
+  "UIViewController(CYLTabBarControllerExtentionDeprecated)": "TODO: N/A on HarmonyOS: Deprecated iOS API kept for source compatibility; the HarmonyOS port starts with the current API only.",
+  "UIViewController(CYLTabBarControllerExtentionDeprecated) -cyl_showTabBadgePoint": "TODO: N/A on HarmonyOS: Deprecated iOS API kept for source compatibility; the HarmonyOS port starts with the current API only.",
+  "UIViewController(CYLTabBarControllerExtentionDeprecated) -cyl_removeTabBadgePoint": "TODO: N/A on HarmonyOS: Deprecated iOS API kept for source compatibility; the HarmonyOS port starts with the current API only.",
+  "UIViewController(CYLTabBarControllerExtentionDeprecated) -cyl_isShowTabBadgePoint": "TODO: N/A on HarmonyOS: Deprecated iOS API kept for source compatibility; the HarmonyOS port starts with the current API only.",
+  "UIViewController(CYLTabBarControllerExtentionDeprecated) cyl_tabBadgePointView": "TODO: N/A on HarmonyOS: Deprecated iOS API kept for source compatibility; the HarmonyOS port starts with the current API only.",
+  "UIViewController(CYLTabBarControllerExtentionDeprecated) cyl_tabBadgePointViewOffset": "TODO: N/A on HarmonyOS: Deprecated iOS API kept for source compatibility; the HarmonyOS port starts with the current API only.",
+  "UIViewController(CYLTabBarControllerExtentionDeprecated) cyl_tabBarSpacingInViewCoordinator": "TODO: N/A on HarmonyOS: Deprecated iOS API kept for source compatibility; the HarmonyOS port starts with the current API only.",
+  "CYLTabBarController(CYLTabBarMinimizePrivate)": "TODO: N/A on HarmonyOS: iOS internal API (a private category of the Objective-C implementation); the HarmonyOS internals are ported from the Android Kotlin sources and have no public counterpart.",
+  "CYLTabBarController(CYLTabBarMinimizePrivate) -cyl_updateTabBarMinimizeTracking": "TODO: N/A on HarmonyOS: iOS internal API (a private category of the Objective-C implementation); the HarmonyOS internals are ported from the Android Kotlin sources and have no public counterpart.",
+  "CYLTabBarController(CYLTabBarMinimizePrivate) -cyl_expandSystemMinimizedTabBar": "TODO: N/A on HarmonyOS: iOS internal API (a private category of the Objective-C implementation); the HarmonyOS internals are ported from the Android Kotlin sources and have no public counterpart.",
+  "CYLTabBarController(CYLTabBarMinimizePrivate) -cyl_releaseSystemMinimizeHoldIfNeeded": "TODO: N/A on HarmonyOS: iOS internal API (a private category of the Objective-C implementation); the HarmonyOS internals are ported from the Android Kotlin sources and have no public counterpart.",
+  "CYLTabBarController(CYLTabBarMinimizePrivate) -cyl_tabBarMinimizeLifecycleEvent": "TODO: N/A on HarmonyOS: iOS internal API (a private category of the Objective-C implementation); the HarmonyOS internals are ported from the Android Kotlin sources and have no public counterpart.",
+  "CYLTabBarController(CYLTabBarMinimizePrivate) -cyl_tabBarMinimizeDidReceiveTabBarHiddenRequest:": "TODO: N/A on HarmonyOS: iOS internal API (a private category of the Objective-C implementation); the HarmonyOS internals are ported from the Android Kotlin sources and have no public counterpart.",
+  "CYLTabBarController(CYLTabBarMinimizePrivate) -cyl_tabBarMinimizeScrollViewForViewController:": "TODO: N/A on HarmonyOS: iOS internal API (a private category of the Objective-C implementation); the HarmonyOS internals are ported from the Android Kotlin sources and have no public counterpart.",
+  "CYLTabBarController(CYLTabBarMinimizePrivate) -cyl_setSystemTabBarMinimizeBehaviorFromApp:": "TODO: N/A on HarmonyOS: iOS internal API (a private category of the Objective-C implementation); the HarmonyOS internals are ported from the Android Kotlin sources and have no public counterpart.",
+  "CYLTabBarController(CYLTabBarMinimizePrivate) -cyl_systemTabBarMinimizeBehaviorForApp": "TODO: N/A on HarmonyOS: iOS internal API (a private category of the Objective-C implementation); the HarmonyOS internals are ported from the Android Kotlin sources and have no public counterpart.",
+  "CYLPlusButton(CYLLiquidGlassPrivate)": "TODO: N/A on HarmonyOS: iOS internal API (a private category of the Objective-C implementation); the HarmonyOS internals are ported from the Android Kotlin sources and have no public counterpart.",
+  "CYLPlusButton(CYLLiquidGlassPrivate) -cyl_updateSelectedContentViewImage": "TODO: N/A on HarmonyOS: iOS internal API (a private category of the Objective-C implementation); the HarmonyOS internals are ported from the Android Kotlin sources and have no public counterpart.",
+  "CYLPlusButton(CYLLiquidGlassPrivate) -cyl_moveSelectedContentViewWithPlusButton": "TODO: N/A on HarmonyOS: iOS internal API (a private category of the Objective-C implementation); the HarmonyOS internals are ported from the Android Kotlin sources and have no public counterpart.",
+  "CYLPlusButton(CYLLiquidGlassPrivate) -cyl_placeSelectedContentView": "TODO: N/A on HarmonyOS: iOS internal API (a private category of the Objective-C implementation); the HarmonyOS internals are ported from the Android Kotlin sources and have no public counterpart.",
+  "CYLPlusButton(CYLLiquidGlassPrivate) -cyl_drawsTitleOverBackgroundImage": "TODO: N/A on HarmonyOS: iOS internal API (a private category of the Objective-C implementation); the HarmonyOS internals are ported from the Android Kotlin sources and have no public counterpart.",
+  "CYLPlusButton(CYLLiquidGlassPrivate) -cyl_setBackgroundImageDidChangeHandler:": "TODO: N/A on HarmonyOS: iOS internal API (a private category of the Objective-C implementation); the HarmonyOS internals are ported from the Android Kotlin sources and have no public counterpart.",
+  "CYLPlusButton(CYLLiquidGlassPrivate) -cyl_removeImage": "TODO: N/A on HarmonyOS: iOS internal API (a private category of the Objective-C implementation); the HarmonyOS internals are ported from the Android Kotlin sources and have no public counterpart.",
+  "CYLPlusButton(CYLLiquidGlassPrivate) -cyl_setLiquidGlassLensMaskSuspended:": "TODO: N/A on HarmonyOS: iOS internal API (a private category of the Objective-C implementation); the HarmonyOS internals are ported from the Android Kotlin sources and have no public counterpart.",
+  "CYLTabBarController(CYLThemePrivate)": "TODO: N/A on HarmonyOS: iOS internal API (a private category of the Objective-C implementation); the HarmonyOS internals are ported from the Android Kotlin sources and have no public counterpart.",
+  "CYLTabBarController(CYLThemePrivate) -cyl_applyConfigurationThemes:": "TODO: N/A on HarmonyOS: iOS internal API (a private category of the Objective-C implementation); the HarmonyOS internals are ported from the Android Kotlin sources and have no public counterpart.",
+  "CYLTabBarController(CYLThemePrivate) -cyl_applyLaunchTabBarThemeIfNeeded": "TODO: N/A on HarmonyOS: iOS internal API (a private category of the Objective-C implementation); the HarmonyOS internals are ported from the Android Kotlin sources and have no public counterpart.",
+  "CYLTabBarController(CYLThemePrivate) -cyl_tabBarThemeDidChangeByManager:theme:": "TODO: N/A on HarmonyOS: iOS internal API (a private category of the Objective-C implementation); the HarmonyOS internals are ported from the Android Kotlin sources and have no public counterpart.",
+  "CYLTabBarController(CYLThemePrivate) -cyl_syncTabBarAppearances": "TODO: N/A on HarmonyOS: iOS internal API (a private category of the Objective-C implementation); the HarmonyOS internals are ported from the Android Kotlin sources and have no public counterpart.",
+  "CYLTabBarController(CYLThemePrivate) -cyl_tabBarItemIconViewProviders": "TODO: N/A on HarmonyOS: iOS internal API (a private category of the Objective-C implementation); the HarmonyOS internals are ported from the Android Kotlin sources and have no public counterpart.",
+  "CYLTabBarController(CYLThemePrivate) -cyl_themeRemoveTabBarItemAttributeKeys:atIndex:": "TODO: N/A on HarmonyOS: iOS internal API (a private category of the Objective-C implementation); the HarmonyOS internals are ported from the Android Kotlin sources and have no public counterpart.",
+  "CYLTabBarController(CYLThemePrivate) -cyl_rearmViewDidLayoutSubviewsBlockInvokeOnce": "TODO: N/A on HarmonyOS: iOS internal API (a private category of the Objective-C implementation); the HarmonyOS internals are ported from the Android Kotlin sources and have no public counterpart.",
+  "CYLTabBarController(CYLThemePrivate) +cyl_loadTabBarItemIcon:completion:": "TODO: N/A on HarmonyOS: iOS internal API (a private category of the Objective-C implementation); the HarmonyOS internals are ported from the Android Kotlin sources and have no public counterpart.",
+  "CYLTabBarController(CYLTabBarToolkitPrivate)": "TODO: N/A on HarmonyOS: iOS internal API (a private category of the Objective-C implementation); the HarmonyOS internals are ported from the Android Kotlin sources and have no public counterpart.",
+  "CYLTabBarController(CYLTabBarToolkitPrivate) -cyl_applyTabBarItemStyles": "TODO: N/A on HarmonyOS: iOS internal API (a private category of the Objective-C implementation); the HarmonyOS internals are ported from the Android Kotlin sources and have no public counterpart.",
+  "CYLTabBarController(CYLTabBarToolkitPrivate) -cyl_fixOpaqueTabBarSafeAreaInsetsIfNeeded": "TODO: N/A on HarmonyOS: iOS internal API (a private category of the Objective-C implementation); the HarmonyOS internals are ported from the Android Kotlin sources and have no public counterpart.",
+  "CYLTabBarController(CYLReselectPrivate)": "TODO: N/A on HarmonyOS: iOS internal API (a private category of the Objective-C implementation); the HarmonyOS internals are ported from the Android Kotlin sources and have no public counterpart.",
+  "CYLTabBarController(CYLReselectPrivate) -cyl_viewControllerForTabControl:": "TODO: N/A on HarmonyOS: iOS internal API (a private category of the Objective-C implementation); the HarmonyOS internals are ported from the Android Kotlin sources and have no public counterpart.",
+  "CYLTabBarController(CYLReselectPrivate) -cyl_performReselectBehaviorForViewController:": "TODO: N/A on HarmonyOS: iOS internal API (a private category of the Objective-C implementation); the HarmonyOS internals are ported from the Android Kotlin sources and have no public counterpart.",
+  "CYLTabBarController(CYLTabBarItemColorsPrivate)": "TODO: N/A on HarmonyOS: iOS internal API (a private category of the Objective-C implementation); the HarmonyOS internals are ported from the Android Kotlin sources and have no public counterpart.",
+  "CYLTabBarController(CYLTabBarItemColorsPrivate) -cyl_updateSelectedBackgroundColorsOfTabButtons": "TODO: N/A on HarmonyOS: iOS internal API (a private category of the Objective-C implementation); the HarmonyOS internals are ported from the Android Kotlin sources and have no public counterpart.",
+  "CYLTabBarController(CYLTabBarItemColorsPrivate) -cyl_setNeedsUpdateSelectedBackgroundColors": "TODO: N/A on HarmonyOS: iOS internal API (a private category of the Objective-C implementation); the HarmonyOS internals are ported from the Android Kotlin sources and have no public counterpart.",
+  "CYLTabBarController(CYLTabBarItemColorsPrivate) -cyl_updateLoopingLottieViews": "TODO: N/A on HarmonyOS: iOS internal API (a private category of the Objective-C implementation); the HarmonyOS internals are ported from the Android Kotlin sources and have no public counterpart.",
+  "CYLTabBarController(CYLTabBarItemColorsPrivate) -cyl_updateBadgesOfSelectedTab": "TODO: N/A on HarmonyOS: iOS internal API (a private category of the Objective-C implementation); the HarmonyOS internals are ported from the Android Kotlin sources and have no public counterpart.",
+  "CYLTabBarController(CYLTabBarItemColorsPrivate) -cyl_syncTabBarItemAccessibility": "TODO: N/A on HarmonyOS: iOS internal API (a private category of the Objective-C implementation); the HarmonyOS internals are ported from the Android Kotlin sources and have no public counterpart.",
+  "CYLTabBarController(CYLTabBarItemColorsPrivate) -cyl_syncFlatDesignTabBarItemColors": "TODO: N/A on HarmonyOS: iOS internal API (a private category of the Objective-C implementation); the HarmonyOS internals are ported from the Android Kotlin sources and have no public counterpart.",
+  "CYLTabBarController(CYLContextPlusButtonPrivate)": "TODO: N/A on HarmonyOS: iOS internal API (a private category of the Objective-C implementation); the HarmonyOS internals are ported from the Android Kotlin sources and have no public counterpart.",
+  "CYLTabBarController(CYLContextPlusButtonPrivate) -cyl_contextPlusButton": "TODO: N/A on HarmonyOS: iOS internal API (a private category of the Objective-C implementation); the HarmonyOS internals are ported from the Android Kotlin sources and have no public counterpart.",
+  "CYLTabBarController(CYLContextPlusButtonPrivate) -cyl_contextPlusChildViewController": "TODO: N/A on HarmonyOS: iOS internal API (a private category of the Objective-C implementation); the HarmonyOS internals are ported from the Android Kotlin sources and have no public counterpart.",
+  "CYLTabBarController(CYLContextPlusButtonPrivate) -cyl_isPlusSlotViewController:": "TODO: N/A on HarmonyOS: iOS internal API (a private category of the Objective-C implementation); the HarmonyOS internals are ported from the Android Kotlin sources and have no public counterpart.",
+  "CYLTabBarController(CYLContextPlusButtonPrivate) -cyl_tabButtonsOfViewController:": "TODO: N/A on HarmonyOS: iOS internal API (a private category of the Objective-C implementation); the HarmonyOS internals are ported from the Android Kotlin sources and have no public counterpart.",
+  "CYLTabBarController(CYLActiveTabBarControllerPrivate)": "TODO: N/A on HarmonyOS: iOS internal API (a private category of the Objective-C implementation); the HarmonyOS internals are ported from the Android Kotlin sources and have no public counterpart.",
+  "CYLTabBarController(CYLActiveTabBarControllerPrivate) +cyl_registerTabBarController:": "TODO: N/A on HarmonyOS: iOS internal API (a private category of the Objective-C implementation); the HarmonyOS internals are ported from the Android Kotlin sources and have no public counterpart.",
+  "CYLTabBarController(CYLActiveTabBarControllerPrivate) +cyl_markTabBarControllerActive:": "TODO: N/A on HarmonyOS: iOS internal API (a private category of the Objective-C implementation); the HarmonyOS internals are ported from the Android Kotlin sources and have no public counterpart.",
+  "CYLTabBarController(CYLActiveTabBarControllerPrivate) +cyl_tabBarControllerForContext:matching:": "TODO: N/A on HarmonyOS: iOS internal API (a private category of the Objective-C implementation); the HarmonyOS internals are ported from the Android Kotlin sources and have no public counterpart.",
+  "CYLTabBarController(CYLTabBarItemGesturePrivate)": "TODO: N/A on HarmonyOS: iOS internal API (a private category of the Objective-C implementation); the HarmonyOS internals are ported from the Android Kotlin sources and have no public counterpart.",
+  "CYLTabBarController(CYLTabBarItemGesturePrivate) -cyl_recognizeTabBarItemGestureForReportedControl:": "TODO: N/A on HarmonyOS: iOS internal API (a private category of the Objective-C implementation); the HarmonyOS internals are ported from the Android Kotlin sources and have no public counterpart.",
+  "CYLTabBarController(CYLTabBarItemGesturePrivate) -cyl_installTabBarItemLongPressIfNeeded": "TODO: N/A on HarmonyOS: iOS internal API (a private category of the Objective-C implementation); the HarmonyOS internals are ported from the Android Kotlin sources and have no public counterpart.",
+  "CYLTabBarController(CYLTabBarItemGesturePrivate) -cyl_isTabBarItemGestureControl:viewController:": "TODO: N/A on HarmonyOS: iOS internal API (a private category of the Objective-C implementation); the HarmonyOS internals are ported from the Android Kotlin sources and have no public counterpart.",
+  "CYLTabBarController(CYLTabBarItemGesturePrivate) -cyl_reportTabBarItemGesture:control:viewController:": "TODO: N/A on HarmonyOS: iOS internal API (a private category of the Objective-C implementation); the HarmonyOS internals are ported from the Android Kotlin sources and have no public counterpart.",
+  "CYLTabBarController(CYLTabBarItemGesturePrivate) -cyl_recognizeTapOnControl:viewController:isReselect:": "TODO: N/A on HarmonyOS: iOS internal API (a private category of the Objective-C implementation); the HarmonyOS internals are ported from the Android Kotlin sources and have no public counterpart.",
+  "CYLTabBarController(CYLTabBarItemGesturePrivate) -cyl_recognizeTabBarItemTapWillSelectViewController:": "TODO: N/A on HarmonyOS: iOS internal API (a private category of the Objective-C implementation); the HarmonyOS internals are ported from the Android Kotlin sources and have no public counterpart.",
+  "CYLTabBarController(CYLTabBarItemGesturePrivate) -cyl_recognizeTabBarItemTapOnControl:viewController:isReselect:": "TODO: N/A on HarmonyOS: iOS internal API (a private category of the Objective-C implementation); the HarmonyOS internals are ported from the Android Kotlin sources and have no public counterpart.",
+  "CYLTabBarController(CYLConfigurationPrivate)": "TODO: N/A on HarmonyOS: iOS internal API (a private category of the Objective-C implementation); the HarmonyOS internals are ported from the Android Kotlin sources and have no public counterpart.",
+  "CYLTabBarController(CYLConfigurationPrivate) +cyl_configurationColorValue:": "TODO: N/A on HarmonyOS: iOS internal API (a private category of the Objective-C implementation); the HarmonyOS internals are ported from the Android Kotlin sources and have no public counterpart.",
+  "CYLTabBarController(CYLConfigurationPrivate) +cyl_configurationFontValue:": "TODO: N/A on HarmonyOS: iOS internal API (a private category of the Objective-C implementation); the HarmonyOS internals are ported from the Android Kotlin sources and have no public counterpart.",
+  "CYLTabBarController(CYLConfigurationPrivate) +cyl_configurationImageValue:": "TODO: N/A on HarmonyOS: iOS internal API (a private category of the Objective-C implementation); the HarmonyOS internals are ported from the Android Kotlin sources and have no public counterpart.",
+  "CYLTabBarController(CYLConfigurationPrivate) +cyl_configurationStringValue:": "TODO: N/A on HarmonyOS: iOS internal API (a private category of the Objective-C implementation); the HarmonyOS internals are ported from the Android Kotlin sources and have no public counterpart.",
+  "CYLTabBarController(CYLConfigurationPrivate) +cyl_normalizedItemAttributes:": "TODO: N/A on HarmonyOS: iOS internal API (a private category of the Objective-C implementation); the HarmonyOS internals are ported from the Android Kotlin sources and have no public counterpart.",
+  "CYLTabBarController(CYLConfigurationPrivate) +cyl_logInvalidConfigurationValue:forKey:": "TODO: N/A on HarmonyOS: iOS internal API (a private category of the Objective-C implementation); the HarmonyOS internals are ported from the Android Kotlin sources and have no public counterpart.",
+  "CYLTabBarController(CYLConfigurationPrivate) +cyl_configurationPagesErrorForTabBarController:": "TODO: N/A on HarmonyOS: iOS internal API (a private category of the Objective-C implementation); the HarmonyOS internals are ported from the Android Kotlin sources and have no public counterpart.",
+  "CYLTabBarController(CYLConfigurationPrivate) +cyl_configurationMainThreadError": "TODO: N/A on HarmonyOS: iOS internal API (a private category of the Objective-C implementation); the HarmonyOS internals are ported from the Android Kotlin sources and have no public counterpart.",
+  "CYLTabBarController(CYLConfigurationPrivate) +cyl_pathOfConfigurationRoute:error:": "TODO: N/A on HarmonyOS: iOS internal API (a private category of the Objective-C implementation); the HarmonyOS internals are ported from the Android Kotlin sources and have no public counterpart.",
+  "CYLTabBarController(CYLTabBarItemIdentifier) cyl_tabBarItemIdentifiers": "`cyl_tabBarItemIdentifiers(items)` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarController(CYLTabBarItemIdentifier) -cyl_indexOfTabBarItemIdentifier:": "`cyl_indexOfTabBarItemWithIdentifier(items, identifier)` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarController(CYLTabBarItemIdentifier) -cyl_selectTabBarItemWithIdentifier:": "`cyl_selectTabBarItemWithIdentifier(identifier)` (AppStorage `cyl_selectRequest`) (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarController(CYLTabBarItemIdentifier) -cyl_controlWithTabBarItemIdentifier:": "`cyl_indexOfTabBarItemWithIdentifier` + the tab button id `cyl-tab-<identifier>` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarController(CYLTabBarItemIdentifier) -cyl_viewControllerWithTabBarItemIdentifier:": "`cyl_indexOfTabBarItemWithIdentifier` + `pageBuilder(index, identifier)` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLLocalizedString()": "`CYLLocalizedString(key, ...args)` (string resources generated from the iOS bundle by scripts/harmonyos-l10n.py) (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLSetLocalizationLanguage()": "`CYLSetLocalizationLanguage(language)` (i18n.System.setAppPreferredLanguage) (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLLocalizationLanguage()": "`CYLLocalizationLanguage()` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLLocalizationLanguageDidChangeNotification": "`cyl_addLocalizationLanguageListener(listener)` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "UIViewController(CYLLocalization) +cyl_pickerLanguages": "`cyl_pickerLanguages()` (the 33 languages of the iOS bundle) (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLResourceBundle()": "TODO: N/A on HarmonyOS: iOS resource bundle lookup; HarmonyOS module resources are merged into the app and read with the context resourceManager (cyl_setLocalizationContext).",
+  "UIView(CYLLocalization)": "TODO: N/A on HarmonyOS: UIKit views relocalize their texts by hand; ArkUI re-renders $r(...) and CYLLocalizedString texts on a language change.",
+  "UIView(CYLLocalization) -cyl_localizeTexts": "TODO: N/A on HarmonyOS: UIKit views relocalize their texts by hand; ArkUI re-renders $r(...) and CYLLocalizedString texts on a language change.",
+  "UIWindow(CYLLocalization)": "TODO: N/A on HarmonyOS: UIWindow root view controller rebuild after a language change; ArkUI pages re-render without rebuilding the window.",
+  "UIWindow(CYLLocalization) -cyl_setRootViewControllerProvider:": "TODO: N/A on HarmonyOS: UIWindow root view controller rebuild after a language change; ArkUI pages re-render without rebuilding the window.",
+  "CYLTabBarStyleType": "`CYLTabBarStyleType` (Default, System, FlatDesign, LiquidGlass) + `CYLTabBarController.tabBarStyleType` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLFlatDesignTabBar barTintColor": "`CYLTabBarController.barTintColor` (over the FlatDesign blur) (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLFlatDesignTabBar tintColor": "`CYLTabBarController.tintColor`; FlatDesign default `CYLFlatDesignTintColor` #007AFF (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLConstants +isLiquidGlassActive": "`tabBarStyleType === CYLTabBarStyleType.LiquidGlass` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLUtils +isLiquidGlassActive": "`tabBarStyleType === CYLTabBarStyleType.LiquidGlass` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLConstants +isUsedLiquidGlass": "`tabBarStyleType === CYLTabBarStyleType.LiquidGlass` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "+plusButton": "TODO: partial in the HarmonyOS/ project: `CYLTabBarController({ plusButton })`; a CYLPlusButton object instead of a subclass",
+  "CAAnimation(CYLBadgeExtention)": "TODO: N/A on HarmonyOS: Core Animation; HarmonyOS plays the badge animations with ArkUI animation APIs (animateTo, keyframes)",
+  "CAAnimation(CYLBadgeExtention) +cyl_badge_once_fadeIn_AnimationRepeatTimes:durTimes:": "TODO: N/A on HarmonyOS: Core Animation; HarmonyOS plays the badge animations with ArkUI animation APIs (animateTo, keyframes)",
+  "CAAnimation(CYLBadgeExtention) +cyl_badge_once_fadeIn_AnimationRepeatTimes:duration:": "TODO: N/A on HarmonyOS: Core Animation; HarmonyOS plays the badge animations with ArkUI animation APIs (animateTo, keyframes)",
+  "CAAnimation(CYLBadgeExtention) +cyl_badge_once_leftRight_AnimationMoveDistance:repeatTimes:durTimes:": "TODO: N/A on HarmonyOS: Core Animation; HarmonyOS plays the badge animations with ArkUI animation APIs (animateTo, keyframes)",
+  "CAAnimation(CYLBadgeExtention) +cyl_badge_once_leftRight_AnimationMoveDistance:repeatTimes:duration:": "TODO: N/A on HarmonyOS: Core Animation; HarmonyOS plays the badge animations with ArkUI animation APIs (animateTo, keyframes)",
+  "CAAnimation(CYLBadgeExtention) +cyl_badge_once_rightLeft_AnimationMoveDistance:repeatTimes:durTimes:": "TODO: N/A on HarmonyOS: Core Animation; HarmonyOS plays the badge animations with ArkUI animation APIs (animateTo, keyframes)",
+  "CAAnimation(CYLBadgeExtention) +cyl_badge_once_rightLeft_AnimationMoveDistance:repeatTimes:duration:": "TODO: N/A on HarmonyOS: Core Animation; HarmonyOS plays the badge animations with ArkUI animation APIs (animateTo, keyframes)",
+  "CAAnimation(CYLBadgeExtention) +cyl_badge_once_rolling_AnimationRepeatTimes:durTimes:": "TODO: N/A on HarmonyOS: Core Animation; HarmonyOS plays the badge animations with ArkUI animation APIs (animateTo, keyframes)",
+  "CAAnimation(CYLBadgeExtention) +cyl_badge_once_rolling_AnimationRepeatTimes:duration:": "TODO: N/A on HarmonyOS: Core Animation; HarmonyOS plays the badge animations with ArkUI animation APIs (animateTo, keyframes)",
+  "CAAnimation(CYLBadgeExtention) +cyl_badge_once_scale_AnimationRepeatTimes:durTimes:": "TODO: N/A on HarmonyOS: Core Animation; HarmonyOS plays the badge animations with ArkUI animation APIs (animateTo, keyframes)",
+  "CAAnimation(CYLBadgeExtention) +cyl_badge_once_scale_AnimationRepeatTimes:duration:": "TODO: N/A on HarmonyOS: Core Animation; HarmonyOS plays the badge animations with ArkUI animation APIs (animateTo, keyframes)",
+  "CAAnimation(CYLBadgeExtention) +cyl_bounceAnimationRepeatTimes:duration:forObj:": "TODO: N/A on HarmonyOS: Core Animation; HarmonyOS plays the badge animations with ArkUI animation APIs (animateTo, keyframes)",
+  "CAAnimation(CYLBadgeExtention) +cyl_bounceAnimationRepeatTimes:duration:offset:": "TODO: N/A on HarmonyOS: Core Animation; HarmonyOS plays the badge animations with ArkUI animation APIs (animateTo, keyframes)",
+  "CAAnimation(CYLBadgeExtention) +cyl_bounce_AnimationRepeatTimes:durTimes:forObj:": "TODO: N/A on HarmonyOS: Core Animation; HarmonyOS plays the badge animations with ArkUI animation APIs (animateTo, keyframes)",
+  "CAAnimation(CYLBadgeExtention) +cyl_opacityForeverAnimationWithDuration:": "TODO: N/A on HarmonyOS: Core Animation; HarmonyOS plays the badge animations with ArkUI animation APIs (animateTo, keyframes)",
+  "CAAnimation(CYLBadgeExtention) +cyl_opacityForever_Animation:": "TODO: N/A on HarmonyOS: Core Animation; HarmonyOS plays the badge animations with ArkUI animation APIs (animateTo, keyframes)",
+  "CAAnimation(CYLBadgeExtention) +cyl_opacityTimesAnimationRepeatTimes:duration:": "TODO: N/A on HarmonyOS: Core Animation; HarmonyOS plays the badge animations with ArkUI animation APIs (animateTo, keyframes)",
+  "CAAnimation(CYLBadgeExtention) +cyl_opacityTimes_Animation:durTimes:": "TODO: N/A on HarmonyOS: Core Animation; HarmonyOS plays the badge animations with ArkUI animation APIs (animateTo, keyframes)",
+  "CAAnimation(CYLBadgeExtention) +cyl_rotation:degree:direction:repeatCount:": "TODO: N/A on HarmonyOS: Core Animation; HarmonyOS plays the badge animations with ArkUI animation APIs (animateTo, keyframes)",
+  "CAAnimation(CYLBadgeExtention) +cyl_rotationAnimationWithDuration:degree:direction:repeatCount:": "TODO: N/A on HarmonyOS: Core Animation; HarmonyOS plays the badge animations with ArkUI animation APIs (animateTo, keyframes)",
+  "CAAnimation(CYLBadgeExtention) +cyl_scaleAnimationFromScale:toScale:duration:repeatTimes:": "TODO: N/A on HarmonyOS: Core Animation; HarmonyOS plays the badge animations with ArkUI animation APIs (animateTo, keyframes)",
+  "CAAnimation(CYLBadgeExtention) +cyl_scaleFrom:toScale:durTimes:rep:": "TODO: N/A on HarmonyOS: Core Animation; HarmonyOS plays the badge animations with ArkUI animation APIs (animateTo, keyframes)",
+  "CAAnimation(CYLBadgeExtention) +cyl_shakeAnimationRepeatTimes:duration:forObj:": "TODO: N/A on HarmonyOS: Core Animation; HarmonyOS plays the badge animations with ArkUI animation APIs (animateTo, keyframes)",
+  "CAAnimation(CYLBadgeExtention) +cyl_shakeAnimationRepeatTimes:duration:offset:": "TODO: N/A on HarmonyOS: Core Animation; HarmonyOS plays the badge animations with ArkUI animation APIs (animateTo, keyframes)",
+  "CAAnimation(CYLBadgeExtention) +cyl_shake_AnimationRepeatTimes:durTimes:forObj:": "TODO: N/A on HarmonyOS: Core Animation; HarmonyOS plays the badge animations with ArkUI animation APIs (animateTo, keyframes)",
+  "CAAnimation(CYLBadgeExtention) +cyl_springAnimationForDuration:": "TODO: N/A on HarmonyOS: Core Animation; HarmonyOS plays the badge animations with ArkUI animation APIs (animateTo, keyframes)",
+  "CYLAxis": "TODO: N/A on HarmonyOS: Core Animation; HarmonyOS plays the badge animations with ArkUI animation APIs (animateTo, keyframes)",
+  "CYLBadgeProtocol -cyl_performSelector:": "TODO: N/A on HarmonyOS: the Objective-C runtime; ArkTS has no method swizzling or associated objects",
+  "CYLBadgeProtocol -cyl_performSelector:withObject:": "TODO: N/A on HarmonyOS: the Objective-C runtime; ArkTS has no method swizzling or associated objects",
+  "CYLBadgeProtocol -cyl_performSelector:withObject:withObject:": "TODO: N/A on HarmonyOS: the Objective-C runtime; ArkTS has no method swizzling or associated objects",
+  "CYLCatchException()": "TODO: N/A on HarmonyOS: catches an Objective-C exception for Swift callers; ArkTS has try / catch",
+  "CYLConstants +UIBasisHeightScale": "TODO: N/A on HarmonyOS: UIKit scale factors and the iOS Lottie URL registries; ArkUI uses vp / fp units",
+  "CYLConstants +UIBasisWidthScale": "TODO: N/A on HarmonyOS: UIKit scale factors and the iOS Lottie URL registries; ArkUI uses vp / fp units",
+  "CYLConstants +cyl_getURLFromString:": "TODO: N/A on HarmonyOS: UIKit scale factors and the iOS Lottie URL registries; ArkUI uses vp / fp units",
+  "CYLFlatDesignTabBar -addItemWithTitle:tabBarItemImage:tabBarItemSelectedImage:index:titlePositionAdjustment:imageInsets:lottieFilePath:lottieSizeValue:": "TODO: N/A on HarmonyOS: FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component",
+  "CYLFlatDesignTabBar 0": "TODO: N/A on HarmonyOS: FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component",
+  "CYLFlatDesignTabBar delegate": "TODO: N/A on HarmonyOS: FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component",
+  "CYLFlatDesignTabBar selectedItem": "TODO: N/A on HarmonyOS: FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component",
+  "CYLFlatDesignTabBarButton -initWithTabBarItem:": "TODO: N/A on HarmonyOS: FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component",
+  "CYLFlatDesignTabBarDelegate": "TODO: N/A on HarmonyOS: FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component",
+  "CYLFlatDesignTabBarDelegate -tabBar:didSelectItem:": "TODO: N/A on HarmonyOS: FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component",
+  "CYLFlatDesignTabBarHideTabBar": "TODO: N/A on HarmonyOS: FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component",
+  "CYLFlatDesignTabBarItem -badgeTextAttributesForState:": "TODO: N/A on HarmonyOS: FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component",
+  "CYLFlatDesignTabBarItem -initWithTitle:image:": "TODO: N/A on HarmonyOS: FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component",
+  "CYLFlatDesignTabBarItem -initWithTitle:image:selectedImage:": "TODO: N/A on HarmonyOS: FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component",
+  "CYLFlatDesignTabBarItem -initWithTitle:image:selectedImage:index:titlePositionAdjustment:imagePositionAdjustment:imageInsets:lottieFilePath:lottieSizeValue:": "TODO: N/A on HarmonyOS: FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component",
+  "CYLFlatDesignTabBarItem -setBadgeTextAttributes:forState:": "TODO: N/A on HarmonyOS: FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component",
+  "CYLFlatDesignTabBarItem -setTitleTextAttributes:forState:": "TODO: N/A on HarmonyOS: FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component",
+  "CYLFlatDesignTabBarItem -titleTextAttributesForState:": "TODO: N/A on HarmonyOS: FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component",
+  "CYLFlatDesignTabBarItem 0": "TODO: N/A on HarmonyOS: FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component",
+  "CYLFlatDesignTabBarItem badgeContentInset": "TODO: N/A on HarmonyOS: FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component",
+  "CYLFlatDesignTabBarItem badgePositionAdjustment": "TODO: N/A on HarmonyOS: FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component",
+  "CYLFlatDesignTabBarItem badgeSize": "TODO: N/A on HarmonyOS: FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component",
+  "CYLFlatDesignTabBarItem childViewController": "TODO: N/A on HarmonyOS: FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component",
+  "CYLFlatDesignTabBarItem cylflatdesign_tabBarController": "TODO: N/A on HarmonyOS: FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component",
+  "CYLFlatDesignTabBarItem index": "TODO: N/A on HarmonyOS: FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component",
+  "CYLFlatDesignTabBarItem lottieFilePath": "TODO: N/A on HarmonyOS: FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component",
+  "CYLFlatDesignTabBarItemDidChange": "TODO: N/A on HarmonyOS: FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component",
+  "CYLFlatDesignUITabBarControllerDelegate": "TODO: N/A on HarmonyOS: FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component",
+  "CYLFlatDesignUITabBarControllerDelegate -tabBarController:didHideTabBar:": "TODO: N/A on HarmonyOS: FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component",
+  "CYLFlatDesignUITabBarControllerDelegate -tabBarController:didShowTabBar:": "TODO: N/A on HarmonyOS: FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component",
+  "CYLFlatDesignUITabBarControllerDelegate -tabBarController:willHideTabBar:": "TODO: N/A on HarmonyOS: FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component",
+  "CYLFlatDesignUITabBarControllerDelegate -tabBarController:willShowTabBar:": "TODO: N/A on HarmonyOS: FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component",
+  "CYLImageCacheExpireType": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "CYLImageLoadOptions": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "CYLLocalizedStringForLanguage()": "TODO: N/A on HarmonyOS: CYLUtils: UIKit helpers (frames, images, runtime) with no ArkUI counterpart",
+  "CYLLocalizedTabBarItemsAttributes()": "TODO: N/A on HarmonyOS: the iOS bundle localization; HarmonyOS uses string resources ($r('app.string.…'))",
+  "CYLPlusButton": "TODO: partial in the HarmonyOS/ project: `CYLPlusButton`; image, title, index, accessibility label and tap; no subclassing or raised layout yet",
+  "CYLSVGATabBarItemAnimator": "TODO: partial in the HarmonyOS/ project: `CYLSVGAView`; plays once when its tab is selected, first frame otherwise; an ArkTS SVGA 2.x player (bitmaps, shapes, alpha, transforms, clip paths); no masks, audio or dark variants yet",
+  "CYLSampleConfigurationURLString": "TODO: N/A on HarmonyOS: the iOS demo settings list, not library behavior",
+  "CYLSettingsGroup": "TODO: N/A on HarmonyOS: the iOS demo settings list, not library behavior",
+  "CYLSettingsSection": "TODO: N/A on HarmonyOS: the iOS demo settings list, not library behavior",
+  "CYLTabBar": "TODO: partial in the HarmonyOS/ project: `CYLTabBar`; a tab bar with tabs, badges and a plus button; no styles, animations, themes or configuration files yet",
+  "CYLTabBar plusButton": "TODO: partial in the HarmonyOS/ project: `CYLTabBar.plusButton`; image, title, index, accessibility label and tap; no raised layout or selection yet",
+  "CYLTabBarController": "TODO: partial in the HarmonyOS/ project: `CYLTabBarController`; a tab bar with tabs, badges and a plus button; no styles, animations, themes or configuration files yet",
+  "CYLTabBarController +tabBarControllerWithViewControllers:tabBarItemsAttributes:": "TODO: partial in the HarmonyOS/ project: `CYLTabBarController({ items, pageBuilder })`; pages from pageBuilder(index), kept when another tab is selected",
+  "CYLTabBarController -appDelegate": "TODO: N/A on HarmonyOS: UIKit internals, the app delegate and the window; HarmonyOS uses UIAbility and WindowStage",
+  "CYLTabBarController -changeItem:toItem:": "TODO: N/A on HarmonyOS: UIKit internals, the app delegate and the window; HarmonyOS uses UIAbility and WindowStage",
+  "CYLTabBarController -initWithViewControllers:tabBarItemsAttributes:": "TODO: partial in the HarmonyOS/ project: `CYLTabBarController({ items, pageBuilder })`; pages from pageBuilder(index), kept when another tab is selected",
+  "CYLTabBarController -rootWindow": "TODO: N/A on HarmonyOS: UIKit internals, the app delegate and the window; HarmonyOS uses UIAbility and WindowStage",
+  "CYLTabBarController -tabChangedToControl:": "TODO: N/A on HarmonyOS: UIKit internals, the app delegate and the window; HarmonyOS uses UIAbility and WindowStage",
+  "CYLTabBarController -updateSelectionStatusIfNeededForTabBarController:shouldSelectViewController:": "TODO: N/A on HarmonyOS: UIKit internals, the app delegate and the window; HarmonyOS uses UIAbility and WindowStage",
+  "CYLTabBarController -updateSelectionStatusIfNeededForTabBarController:shouldSelectViewController:shouldSelect:": "TODO: N/A on HarmonyOS: UIKit internals, the app delegate and the window; HarmonyOS uses UIAbility and WindowStage",
+  "CYLTabBarController allowsVerticalBar": "TODO: N/A on HarmonyOS: the iPhone Duo vertical bar of iOS 27.1",
+  "CYLTabBarController tabBarItemsAttributes": "TODO: partial in the HarmonyOS/ project: `CYLTabBarController.items`; title, image, selected image, identifier, accessibility label and badge",
+  "CYLTabBarController(CYLOpaqueTabBarSafeArea) cyl_fixesOpaqueTabBarSafeAreaInsets": "TODO: N/A on HarmonyOS: a workaround for a UIKit safe-area bug of opaque tab bars",
+  "CYLTabBarHostView selectedIndex": "`CYLTabBarController.selectedIndex (@Link)` in the HarmonyOS/ project (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarItemAccessibilityLabel": "`CYLTabBarItem.accessibilityLabel` in the HarmonyOS/ project (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarItemUpdateRow": "TODO: N/A on HarmonyOS: the iOS demo settings list, not library behavior",
+  "CYLTabBarSVGAFilePath": "`CYLTabBarItem.svgaFilePath (rawfile path)` in the HarmonyOS/ project (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarSVGASize": "`CYLTabBarItem.svgaSize` in the HarmonyOS/ project (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarSVGAURL": "`CYLTabBarItem.svgaURL` in the HarmonyOS/ project (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLThemeManager 0": "TODO: N/A on HarmonyOS: a parsing artifact of a block property, not an API",
+  "CYLUtils": "TODO: N/A on HarmonyOS: CYLUtils: UIKit helpers (frames, images, runtime) with no ArkUI counterpart",
+  "UIBarItem(CYLUtils)": "TODO: N/A on HarmonyOS: CYLUtils: UIKit helpers (frames, images, runtime) with no ArkUI counterpart",
+  "UIBarItem(CYLUtils) -cyl_view": "TODO: N/A on HarmonyOS: CYLUtils: UIKit helpers (frames, images, runtime) with no ArkUI counterpart",
+  "UIColor(CYLTabBarControllerExtention)": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIColor(CYLTabBarControllerExtention) +cyl_colorWithLightColor:darkColor:": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIColor(CYLTabBarControllerExtention) cyl_darkTextColor": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIColor(CYLTabBarControllerExtention) cyl_labelColor": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIColor(CYLTabBarControllerExtention) cyl_lightTextColor": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIColor(CYLTabBarControllerExtention) cyl_linkColor": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIColor(CYLTabBarControllerExtention) cyl_opaqueSeparatorColor": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIColor(CYLTabBarControllerExtention) cyl_placeholderTextColor": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIColor(CYLTabBarControllerExtention) cyl_quaternaryLabelColor": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIColor(CYLTabBarControllerExtention) cyl_quaternarySystemFillColor": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIColor(CYLTabBarControllerExtention) cyl_randomColor": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIColor(CYLTabBarControllerExtention) cyl_secondaryLabelColor": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIColor(CYLTabBarControllerExtention) cyl_secondarySystemBackgroundColor": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIColor(CYLTabBarControllerExtention) cyl_secondarySystemFillColor": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIColor(CYLTabBarControllerExtention) cyl_secondarySystemGroupedBackgroundColor": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIColor(CYLTabBarControllerExtention) cyl_separatorColor": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIColor(CYLTabBarControllerExtention) cyl_systemBackgroundColor": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIColor(CYLTabBarControllerExtention) cyl_systemBlueColor": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIColor(CYLTabBarControllerExtention) cyl_systemFillColor": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIColor(CYLTabBarControllerExtention) cyl_systemGray2Color": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIColor(CYLTabBarControllerExtention) cyl_systemGray3Color": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIColor(CYLTabBarControllerExtention) cyl_systemGray4Color": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIColor(CYLTabBarControllerExtention) cyl_systemGray5Color": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIColor(CYLTabBarControllerExtention) cyl_systemGray6Color": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIColor(CYLTabBarControllerExtention) cyl_systemGrayColor": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIColor(CYLTabBarControllerExtention) cyl_systemGreenColor": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIColor(CYLTabBarControllerExtention) cyl_systemGroupedBackgroundColor": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIColor(CYLTabBarControllerExtention) cyl_systemIndigoColor": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIColor(CYLTabBarControllerExtention) cyl_systemOrangeColor": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIColor(CYLTabBarControllerExtention) cyl_systemPinkColor": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIColor(CYLTabBarControllerExtention) cyl_systemPurpleColor": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIColor(CYLTabBarControllerExtention) cyl_systemRedColor": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIColor(CYLTabBarControllerExtention) cyl_systemTealColor": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIColor(CYLTabBarControllerExtention) cyl_systemYellowColor": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIColor(CYLTabBarControllerExtention) cyl_tertiaryLabelColor": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIColor(CYLTabBarControllerExtention) cyl_tertiarySystemBackgroundColor": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIColor(CYLTabBarControllerExtention) cyl_tertiarySystemFillColor": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIColor(CYLTabBarControllerExtention) cyl_tertiarySystemGroupedBackgroundColor": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIControl(CYLTabBarControllerExtention)": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIControl(CYLTabBarControllerExtention) -cyl_coverSeclectContentTabImageViewOrTabButton:newView:offset:show:delayIfNeededForSeconds:completion:": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIControl(CYLTabBarControllerExtention) -cyl_coverTabImageViewOrTabButton:newView:offset:show:delayIfNeededForSeconds:completion:": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIControl(CYLTabBarControllerExtention) -cyl_hideControl": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIControl(CYLTabBarControllerExtention) -cyl_isChildViewControllerPlusButton": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIControl(CYLTabBarControllerExtention) -cyl_isPlusControl": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIControl(CYLTabBarControllerExtention) -cyl_isSelected": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIControl(CYLTabBarControllerExtention) -cyl_platterNormalControl": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIControl(CYLTabBarControllerExtention) -cyl_platterSelectedControl": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIControl(CYLTabBarControllerExtention) -cyl_replaceTabButtonWithNewView:offset:show:completion:": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIControl(CYLTabBarControllerExtention) -cyl_replaceTabButtonWithNewView:show:": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIControl(CYLTabBarControllerExtention) -cyl_replaceTabImageViewWithNewView:offset:show:completion:": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIControl(CYLTabBarControllerExtention) -cyl_replaceTabImageViewWithNewView:show:": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIControl(CYLTabBarControllerExtention) cyl_tabBarChildViewControllerIndex": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIControl(CYLTabBarControllerExtention) cyl_tabBarItemDisplayName": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIControl(CYLTabBarControllerExtention) cyl_tabBarItemIdentifier": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIControl(CYLTabBarControllerExtention) cyl_tabBarItemVisibleIndex": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIImage(CYLTabBarControllerExtention)": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIImage(CYLTabBarControllerExtention) +cyl_GIFFrameDelayWithProperties:": "TODO: N/A on HarmonyOS: reads ImageIO frame properties; ArkUI's Image plays GIF files itself",
+  "UIImage(CYLTabBarControllerExtention) +cyl_assetImageName:userInterfaceStyle:": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIImage(CYLTabBarControllerExtention) +cyl_getImageFromImageInfo:": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIImage(CYLTabBarControllerExtention) +cyl_imageNamed:": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIImage(CYLTabBarControllerExtention) +cyl_imageWithColor:size:": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIImage(CYLTabBarControllerExtention) +cyl_imageWithColor:size:cornerRadius:": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIImage(CYLTabBarControllerExtention) +cyl_imageWithImageInfo:darkImageInfo:": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIImage(CYLTabBarControllerExtention) +cyl_imageWithLightImage:darkImage:": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIImage(CYLTabBarControllerExtention) +cyl_lightOrDarkModeImageWithLightImage:darkImage:": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIImage(CYLTabBarControllerExtention) +cyl_lightOrDarkModeImageWithOwner:lightImage:darkImage:": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIImage(CYLTabBarControllerExtention) +cyl_lightOrDarkModeImageWithOwner:lightImageName:darkImageName:": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIImage(CYLTabBarControllerExtention) +cyl_loadImageWithURL:completion:": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIImage(CYLTabBarControllerExtention) +cyl_loadImageWithURL:options:completion:": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIImage(CYLTabBarControllerExtention) +cyl_tabItemPlaceholderImage": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIImage(CYLTabBarControllerExtention) cyl_darkImageNameSuffix": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UITabBar(CYLTabBarControllerExtention)": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UITabBar(CYLTabBarControllerExtention) -cyl_boundsSize": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UITabBar(CYLTabBarControllerExtention) -cyl_boundsWidthOffset": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UITabBar(CYLTabBarControllerExtention) -cyl_contentView": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UITabBar(CYLTabBarControllerExtention) -cyl_fullHeight": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UITabBar(CYLTabBarControllerExtention) -cyl_platterContentViewWithIndex:": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UITabBar(CYLTabBarControllerExtention) -cyl_platterContentViews": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UITabBar(CYLTabBarControllerExtention) -cyl_platterDestOutView": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UITabBar(CYLTabBarControllerExtention) -cyl_platterPortalViewWithIndex:": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UITabBar(CYLTabBarControllerExtention) -cyl_platterPortalViews": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UITabBar(CYLTabBarControllerExtention) -cyl_platterSelectedContentView": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UITabBar(CYLTabBarControllerExtention) -cyl_platterSelectedContentViewWithIndex:": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UITabBar(CYLTabBarControllerExtention) -cyl_platterSelectedContentViewWithoutPlusButttonWithIndex:": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UITabBar(CYLTabBarControllerExtention) -cyl_platterSelectedContentViews": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UITabBar(CYLTabBarControllerExtention) -cyl_platterSelectedContentViewsWithoutPlusButton": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UITabBar(CYLTabBarControllerExtention) -cyl_platterViewWithIndex:": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UITabBar(CYLTabBarControllerExtention) -cyl_platterViews": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UITabBar(CYLTabBarControllerExtention) -cyl_platterVisualProviderFloatingSelectedContentView": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UITabBar(CYLTabBarControllerExtention) -cyl_tabBarSubviews": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UITabBar(CYLTabBarControllerExtention) cyl_platterContentView": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UITabBar(CYLTabBarControllerExtention) cyl_platterView": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UITabBar(CYLTabBarControllerExtention) cyl_platterViewSize": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UITabBar(CYLTabBarControllerExtention) cyl_platterViewWidth": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UITabBar(CYLTabBarControllerExtention) cyl_portalLayer": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UITabBar(CYLTabBarControllerExtention) cyl_portalView": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UITabBarAppearance(CYLTabBarControllerExtention)": "TODO: N/A on HarmonyOS: UITabBarAppearance; the ArkUI tab bar takes its colors and images as component properties",
+  "UITabBarAppearance(CYLTabBarControllerExtention) -cyl_applyItemAppearanceWithBlock:": "TODO: N/A on HarmonyOS: UITabBarAppearance; the ArkUI tab bar takes its colors and images as component properties",
+  "UITabBarItem(CYLUtils)": "TODO: N/A on HarmonyOS: CYLUtils: UIKit helpers (frames, images, runtime) with no ArkUI counterpart",
+  "UITabBarItem(CYLUtils) cyl_tabButton": "TODO: N/A on HarmonyOS: CYLUtils: UIKit helpers (frames, images, runtime) with no ArkUI counterpart",
+  "UIView(CYLHitTestOutsideBounds)": "TODO: N/A on HarmonyOS: CYLUtils: UIKit helpers (frames, images, runtime) with no ArkUI counterpart",
+  "UIView(CYLHitTestOutsideBounds) cyl_respondsOutsideSuperviewBounds": "TODO: N/A on HarmonyOS: CYLUtils: UIKit helpers (frames, images, runtime) with no ArkUI counterpart",
+  "UIView(CYLTabBarControllerExtention)": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIView(CYLTabBarControllerExtention) +cyl_insertedTabControlViews": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIView(CYLTabBarControllerExtention) -cyl_allSubviews": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIView(CYLTabBarControllerExtention) -cyl_bringSubviewToFront:": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIView(CYLTabBarControllerExtention) -cyl_bringSubviewToTop:": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIView(CYLTabBarControllerExtention) -cyl_imageView": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIView(CYLTabBarControllerExtention) -cyl_imageViewInTabBarButton": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIView(CYLTabBarControllerExtention) -cyl_isButtonLabel": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIView(CYLTabBarControllerExtention) -cyl_isPlusButton": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIView(CYLTabBarControllerExtention) -cyl_isTabBackgroundView": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIView(CYLTabBarControllerExtention) -cyl_isTabBadgeView": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIView(CYLTabBarControllerExtention) -cyl_isTabButton": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIView(CYLTabBarControllerExtention) -cyl_isTabImageView": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIView(CYLTabBarControllerExtention) -cyl_isTabLabel": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIView(CYLTabBarControllerExtention) -cyl_markAsInsertedForTabControl:": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIView(CYLTabBarControllerExtention) -cyl_swappableImageViewViewInTabBarButton": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIView(CYLTabBarControllerExtention) -cyl_tabBackgroundView": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIView(CYLTabBarControllerExtention) -cyl_tabBadgeView": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIView(CYLTabBarControllerExtention) -cyl_tabEffectView": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIView(CYLTabBarControllerExtention) -cyl_tabImageView": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIView(CYLTabBarControllerExtention) -cyl_tabLabel": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIView(CYLTabBarControllerExtention) -cyl_tabShadowImageView": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIView(CYLTabBarControllerExtention) -cyl_takeSnapshot": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIView(CYLTabBarControllerExtention) -cyl_takeSnapshotWithoutViews:": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIView(CYLTabBarControllerExtention) cyl_insertedForTabControl": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIView(CYLTabBarControllerExtention) cyl_tabBarItemIconView": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIView(CYLTabBarControllerExtention) cyl_tabButtonCoverView": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIView(CYLTabBarMetrics)": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIView(CYLTabBarMetrics) -cyl_plusButtonIndex": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIView(CYLTabBarMetrics) -cyl_plusButtonWidth": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIView(CYLTabBarMetrics) cyl_tabBarItemWidth": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIView(CYLTabBarMetrics) cyl_tabbarItemsCount": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIView(CYLUtils)": "TODO: N/A on HarmonyOS: CYLUtils: UIKit helpers (frames, images, runtime) with no ArkUI counterpart",
+  "UIView(CYLUtils) -cyl_addScaleBounceAnimationWithCompletion:": "TODO: N/A on HarmonyOS: CYLUtils: UIKit helpers (frames, images, runtime) with no ArkUI counterpart",
+  "UIView(CYLUtils) -cyl_canNotResponseEvent": "TODO: N/A on HarmonyOS: CYLUtils: UIKit helpers (frames, images, runtime) with no ArkUI counterpart",
+  "UIView(CYLUtils) -cyl_isInvisiable": "TODO: N/A on HarmonyOS: CYLUtils: UIKit helpers (frames, images, runtime) with no ArkUI counterpart",
+  "UIView(CYLUtils) -cyl_nearestControlBelowView:": "TODO: N/A on HarmonyOS: CYLUtils: UIKit helpers (frames, images, runtime) with no ArkUI counterpart",
+  "UIView(CYLUtils) -cyl_setHidden:": "TODO: N/A on HarmonyOS: CYLUtils: UIKit helpers (frames, images, runtime) with no ArkUI counterpart",
+  "UIViewController(CYLConfigurationDemo)": "TODO: N/A on HarmonyOS: the iOS demo settings list, not library behavior",
+  "UIViewController(CYLConfigurationDemo) +cyl_sampleConfigurationFilePaths": "TODO: N/A on HarmonyOS: the iOS demo settings list, not library behavior",
+  "UIViewController(CYLConfigurationDemo) -cyl_configurationDemoCellForTableView:": "TODO: N/A on HarmonyOS: the iOS demo settings list, not library behavior",
+  "UIViewController(CYLConfigurationDemo) -cyl_presentConfigurationDemo": "TODO: N/A on HarmonyOS: the iOS demo settings list, not library behavior",
+  "UIViewController(CYLConfigurationEdgeCases)": "TODO: N/A on HarmonyOS: the iOS demo settings list, not library behavior",
+  "UIViewController(CYLConfigurationEdgeCases) +cyl_configurationEdgeCaseSectionTitle": "TODO: N/A on HarmonyOS: the iOS demo settings list, not library behavior",
+  "UIViewController(CYLConfigurationEdgeCases) -cyl_configurationEdgeCaseCellForTableView:row:": "TODO: N/A on HarmonyOS: the iOS demo settings list, not library behavior",
+  "UIViewController(CYLConfigurationEdgeCases) -cyl_configurationEdgeCaseRowCount": "TODO: N/A on HarmonyOS: the iOS demo settings list, not library behavior",
+  "UIViewController(CYLConfigurationEdgeCases) -cyl_runConfigurationEdgeCaseAtRow:": "TODO: N/A on HarmonyOS: the iOS demo settings list, not library behavior",
+  "UIViewController(CYLLocalization)": "TODO: N/A on HarmonyOS: the iOS bundle localization; HarmonyOS uses string resources ($r('app.string.…'))",
+  "UIViewController(CYLLocalization) -cyl_languageCellForTableView:": "TODO: N/A on HarmonyOS: the iOS bundle localization; HarmonyOS uses string resources ($r('app.string.…'))",
+  "UIViewController(CYLLocalization) -cyl_presentLanguagePicker": "TODO: N/A on HarmonyOS: the iOS bundle localization; HarmonyOS uses string resources ($r('app.string.…'))",
+  "UIViewController(CYLNavigationControllerExtention)": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIViewController(CYLNavigationControllerExtention) -cyl_deallocNavigationSetting": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIViewController(CYLNavigationControllerExtention) -cyl_disableInteractivePopGestureRecognizer": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIViewController(CYLNavigationControllerExtention) -cyl_enableInteractivePopGestureRecognizer": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIViewController(CYLNavigationControllerExtention) -cyl_hideNavigationBarSeparatorIfNeeded": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIViewController(CYLNavigationControllerExtention) -cyl_resetInteractivePopGestureRecognizer": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIViewController(CYLNavigationControllerExtention) -cyl_setNavigationBarHiddenIfNeeded:": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIViewController(CYLNavigationControllerExtention) -cyl_setNavigationBarVisibleIfNeeded:": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIViewController(CYLNavigationControllerExtention) -cyl_shouldNavigationBarVisible": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIViewController(CYLNavigationControllerExtention) -cyl_viewDidAppearNavigationSetting:": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIViewController(CYLNavigationControllerExtention) -cyl_viewDidDisappearNavigationSetting:": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIViewController(CYLNavigationControllerExtention) -cyl_viewWillAppearNavigationSetting:": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIViewController(CYLNavigationControllerExtention) -cyl_viewWillDisappearNavigationSetting:": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIViewController(CYLNavigationControllerExtention) cyl_automaticNavigationSettingEnabled": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIViewController(CYLNavigationControllerExtention) cyl_disablePopGestureRecognizer": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIViewController(CYLNavigationControllerExtention) cyl_hideNavigationBarSeparator": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIViewController(CYLNavigationControllerExtention) cyl_hidesAncestorNavigationBars": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIViewController(CYLNavigationControllerExtention) cyl_hidesBottomBarWhenPushed": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIViewController(CYLNavigationControllerExtention) cyl_navigationBarHidden": "TODO: N/A on HarmonyOS: UIKit view, control, color, image and navigation helpers; ArkUI has its own components, modifiers and router",
+  "UIViewController(CYLScrollHideSimulation)": "TODO: N/A on HarmonyOS: the iOS demo settings list, not library behavior",
+  "UIViewController(CYLScrollHideSimulation) -cyl_didSelectScrollHideSimulationRow:": "TODO: N/A on HarmonyOS: the iOS demo settings list, not library behavior",
+  "UIViewController(CYLScrollHideSimulation) -cyl_presentScrollHideSimulationMenu": "TODO: N/A on HarmonyOS: the iOS demo settings list, not library behavior",
+  "UIViewController(CYLScrollHideSimulation) -cyl_runScrollHideSelfTest": "TODO: N/A on HarmonyOS: the iOS demo settings list, not library behavior",
+  "UIViewController(CYLScrollHideSimulation) -cyl_scrollHideSimulationCellForTableView:row:": "TODO: N/A on HarmonyOS: the iOS demo settings list, not library behavior",
+  "UIViewController(CYLScrollHideSimulation) -cyl_scrollHideSimulationRowCount": "TODO: N/A on HarmonyOS: the iOS demo settings list, not library behavior",
+  "UIViewController(CYLSettingsSection)": "TODO: N/A on HarmonyOS: the iOS demo settings list, not library behavior",
+  "UIViewController(CYLSettingsSection) -cyl_didSelectSettingsRow:": "TODO: N/A on HarmonyOS: the iOS demo settings list, not library behavior",
+  "UIViewController(CYLSettingsSection) -cyl_didSelectSettingsRowAtIndexPath:inTableView:": "TODO: N/A on HarmonyOS: the iOS demo settings list, not library behavior",
+  "UIViewController(CYLSettingsSection) -cyl_settingsCellForTableView:atIndexPath:": "TODO: N/A on HarmonyOS: the iOS demo settings list, not library behavior",
+  "UIViewController(CYLSettingsSection) -cyl_settingsCellForTableView:row:": "TODO: N/A on HarmonyOS: the iOS demo settings list, not library behavior",
+  "UIViewController(CYLSettingsSection) -cyl_settingsGroups": "TODO: N/A on HarmonyOS: the iOS demo settings list, not library behavior",
+  "UIViewController(CYLSettingsSection) -cyl_settingsRowCount": "TODO: N/A on HarmonyOS: the iOS demo settings list, not library behavior",
+  "UIViewController(CYLSettingsSection) -cyl_settingsRowsInGroup:": "TODO: N/A on HarmonyOS: the iOS demo settings list, not library behavior",
+  "UIViewController(CYLSettingsSection) -cyl_titleForSettingsGroup:": "TODO: N/A on HarmonyOS: the iOS demo settings list, not library behavior",
+  "UIViewController(CYLTabBarControllerExtention) -cyl_clearBadge": "TODO: partial in the HarmonyOS/ project: `CYLTabBarItem.badgeValue = undefined`; set on the page's tab item",
+  "UIViewController(CYLTabBarControllerExtention) -cyl_showBadge": "TODO: partial in the HarmonyOS/ project: `CYLTabBarItem.badgeValue = ''`; set on the page's tab item",
+  "UIViewController(CYLTabBarControllerExtention) cyl_tabBarItem": "TODO: N/A on HarmonyOS: FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component",
+  "UIViewController(CYLTabBarControllerExtention) cylflatdesign_tabBarController": "TODO: N/A on HarmonyOS: FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component",
+  "UIViewController(CYLTabBarItemUpdate)": "TODO: N/A on HarmonyOS: the iOS demo settings list, not library behavior",
+  "UIViewController(CYLTabBarItemUpdate) -cyl_didSelectTabBarItemUpdateRow:": "TODO: N/A on HarmonyOS: the iOS demo settings list, not library behavior",
+  "UIViewController(CYLTabBarItemUpdate) -cyl_tabBarItemUpdateCellForTableView:row:": "TODO: N/A on HarmonyOS: the iOS demo settings list, not library behavior",
+  "UIViewController(CYLTabBarItemUpdate) -cyl_tabBarItemUpdateRowCount": "TODO: N/A on HarmonyOS: the iOS demo settings list, not library behavior",
+  "UIViewController(CYLThemeSettings)": "TODO: N/A on HarmonyOS: the iOS demo settings list, not library behavior",
+  "UIViewController(CYLThemeSettings) +cyl_setUpThemeSettings": "TODO: N/A on HarmonyOS: the iOS demo settings list, not library behavior",
+  "UIViewController(CYLThemeSettings) -cyl_didSelectThemeListRow:": "TODO: N/A on HarmonyOS: the iOS demo settings list, not library behavior",
+  "UIViewController(CYLThemeSettings) -cyl_presentThemePickerFromView:completion:": "TODO: N/A on HarmonyOS: the iOS demo settings list, not library behavior",
+  "UIViewController(CYLThemeSettings) -cyl_themeListCellForTableView:row:": "TODO: N/A on HarmonyOS: the iOS demo settings list, not library behavior",
+  "UIViewController(CYLThemeSettings) -cyl_themeListRowCount": "TODO: N/A on HarmonyOS: the iOS demo settings list, not library behavior",
+  "UIViewController(CYLThemeSettings) -cyl_themeListSectionTitle": "TODO: N/A on HarmonyOS: the iOS demo settings list, not library behavior",
+  "UIViewController(CYLThemeSettings) -cyl_themeMenuWithCompletion:": "TODO: N/A on HarmonyOS: the iOS demo settings list, not library behavior",
+  "UIViewController(CYLThemeSettings) -cyl_themeSettingsCellForTableView:": "TODO: N/A on HarmonyOS: the iOS demo settings list, not library behavior",
+  "UIViewController(CYLUtils)": "TODO: N/A on HarmonyOS: CYLUtils: UIKit helpers (frames, images, runtime) with no ArkUI counterpart",
+  "UIViewController(CYLUtils) -cyl_getViewControllerInsteadOfNavigationController": "TODO: N/A on HarmonyOS: CYLUtils: UIKit helpers (frames, images, runtime) with no ArkUI counterpart"
 }

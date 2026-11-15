@@ -1,0 +1,24 @@
+{
+  "color": [
+    {
+      "name": "start_window_background",
+      "value": "#FFFFFF"
+    },
+    {
+      "name": "cyl_grouped_background",
+      "value": "#F2F2F7"
+    },
+    {
+      "name": "cyl_row_background",
+      "value": "#FFFFFF"
+    },
+    {
+      "name": "cyl_label",
+      "value": "#000000"
+    },
+    {
+      "name": "cyl_bar_background",
+      "value": "#F8F8F8"
+    }
+  ]
+}

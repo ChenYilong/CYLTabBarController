@@ -1,0 +1,696 @@
+{
+  "string": [
+    {
+      "name": "cyl_l10n_aaf9b7d7382d",
+      "value": "%@ novas mensagens"
+    },
+    {
+      "name": "cyl_l10n_81a05b6c1cf9",
+      "value": "%@, %@"
+    },
+    {
+      "name": "cyl_l10n_0b0ae9062c5a",
+      "value": "A tab bar controller of another context, with a square plus button"
+    },
+    {
+      "name": "cyl_l10n_aa3e67bda3c0",
+      "value": "ArkUI Tabs, the HarmonyOS system tab bar, with the same tabs"
+    },
+    {
+      "name": "cyl_l10n_8665e238c516",
+      "value": "Badge: %@"
+    },
+    {
+      "name": "cyl_l10n_6b2186414c82",
+      "value": "Piscar ×3"
+    },
+    {
+      "name": "cyl_l10n_070554647306",
+      "value": "Borda"
+    },
+    {
+      "name": "cyl_l10n_43d3e34b15fb",
+      "value": "Borda que segue o Modo Escuro"
+    },
+    {
+      "name": "cyl_l10n_b67554192c50",
+      "value": "Inferior esquerdo"
+    },
+    {
+      "name": "cyl_l10n_5968e3c37145",
+      "value": "Inferior direito"
+    },
+    {
+      "name": "cyl_l10n_5d60263416c2",
+      "value": "Quicar (contínuo)"
+    },
+    {
+      "name": "cyl_l10n_f3ce1baf4805",
+      "value": "Quicar ×3 (cyl_bounceAnimationRepeatTimes)"
+    },
+    {
+      "name": "cyl_l10n_0875a57843a1",
+      "value": "Respirar (contínuo)"
+    },
+    {
+      "name": "cyl_l10n_8795570ddeef",
+      "value": "CYLTabBarItemBackgroundColor / CYLTabBarItemSelectedBackgroundColor"
+    },
+    {
+      "name": "cyl_l10n_132201f60522",
+      "value": "CYLUtils: objetos associados fracos e busca do botão (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_fa3d06c1b1e9",
+      "value": "CYLFlatDesignTabBarItem não centralizado (estilo do sistema)"
+    },
+    {
+      "name": "cyl_l10n_5e74163d3804",
+      "value": "CYLFlatDesignTabBarItem centralizado"
+    },
+    {
+      "name": "cyl_l10n_158b3b19e868",
+      "value": "Raio do canto"
+    },
+    {
+      "name": "cyl_l10n_4d242c36821c",
+      "value": "Cores personalizadas"
+    },
+    {
+      "name": "cyl_l10n_4685555ab484",
+      "value": "Fonte personalizada"
+    },
+    {
+      "name": "cyl_l10n_a45350c25311",
+      "value": "Máximo personalizado (9)"
+    },
+    {
+      "name": "cyl_l10n_bf0576472e31",
+      "value": "Double tap to open"
+    },
+    {
+      "name": "cyl_l10n_7e0a1ad9a767",
+      "value": "Surgir gradualmente uma vez"
+    },
+    {
+      "name": "cyl_l10n_153407d52fed",
+      "value": "Design plano"
+    },
+    {
+      "name": "cyl_l10n_5cfed317a99d",
+      "value": "Estilo Design plano"
+    },
+    {
+      "name": "cyl_l10n_026b984bb8d8",
+      "value": "Virar ×2"
+    },
+    {
+      "name": "cyl_l10n_c5d4cd682981",
+      "value": "Ícone GIF"
+    },
+    {
+      "name": "cyl_l10n_d52d30723b2f",
+      "value": "Da esquerda para a direita uma vez"
+    },
+    {
+      "name": "cyl_l10n_f201a4158727",
+      "value": "Liquid Glass"
+    },
+    {
+      "name": "cyl_l10n_af3acf6eb4a9",
+      "value": "Liquid Glass"
+    },
+    {
+      "name": "cyl_l10n_2e8e48a2ebfd",
+      "value": "Long press a tab or the plus button"
+    },
+    {
+      "name": "cyl_l10n_983696096694",
+      "value": "Margem"
+    },
+    {
+      "name": "cyl_l10n_24d459a81449",
+      "value": "NOVO"
+    },
+    {
+      "name": "cyl_l10n_03c2e7e41ffc",
+      "value": "Novo"
+    },
+    {
+      "name": "cyl_l10n_1e8f217bdf71",
+      "value": "Next tab (cyl_selectNextTab, issue #535)"
+    },
+    {
+      "name": "cyl_l10n_b2ee912b91d6",
+      "value": "Número"
+    },
+    {
+      "name": "cyl_l10n_ab7fa33c83b1",
+      "value": "Número acima do máximo"
+    },
+    {
+      "name": "cyl_l10n_e0aa021e21dd",
+      "value": "OK"
+    },
+    {
+      "name": "cyl_l10n_287e78fd65af",
+      "value": "Outro texto"
+    },
+    {
+      "name": "cyl_l10n_41b77539cc64",
+      "value": "Imagem do PlusButton carregada depois"
+    },
+    {
+      "name": "cyl_l10n_72a245189eaf",
+      "value": "Área de toque do PlusButton (issue #91)"
+    },
+    {
+      "name": "cyl_l10n_9a1d72fdd764",
+      "value": "Previous tab (cyl_selectPreviousTab, issue #535)"
+    },
+    {
+      "name": "cyl_l10n_4b0282f4f1c6",
+      "value": "Push para um UITabBarController do sistema (outro botão mais)"
+    },
+    {
+      "name": "cyl_l10n_e5416d3ed3c0",
+      "value": "Push to another CYLTabBarController (another PlusButton)"
+    },
+    {
+      "name": "cyl_l10n_8c96672c9bc5",
+      "value": "Push de um TabBarController com o mesmo context (mesma classe de botão mais)"
+    },
+    {
+      "name": "cyl_l10n_6166b27ea14b",
+      "value": "Exibir um TabBarController com um novo contexto (PlusButton com uma subvisualização X tocável, issue #202)"
+    },
+    {
+      "name": "cyl_l10n_a63e8b745e73",
+      "value": "Pushes a page that hides the navigation bar while shown, with no base class"
+    },
+    {
+      "name": "cyl_l10n_79fe28f3a3ac",
+      "value": "Pushes a tab bar controller whose plus button image changes 2 s later; the layout must not move"
+    },
+    {
+      "name": "cyl_l10n_c27618b1aa9d",
+      "value": "Ponto vermelho"
+    },
+    {
+      "name": "cyl_l10n_255c00a63f9d",
+      "value": "Raio do ponto vermelho"
+    },
+    {
+      "name": "cyl_l10n_7aac5e07b16d",
+      "value": "Da direita para a esquerda uma vez"
+    },
+    {
+      "name": "cyl_l10n_f0c792c049bc",
+      "value": "Rolar uma vez"
+    },
+    {
+      "name": "cyl_l10n_401ea21c7a44",
+      "value": "Rotação (contínua)"
+    },
+    {
+      "name": "cyl_l10n_b5fcd68edd9f",
+      "value": "Escala (contínua)"
+    },
+    {
+      "name": "cyl_l10n_544d03258eaf",
+      "value": "Escala uma vez"
+    },
+    {
+      "name": "cyl_l10n_dbd4f5e49888",
+      "value": "Escala ×3"
+    },
+    {
+      "name": "cyl_l10n_9ae56cc36e81",
+      "value": "Tremer (contínuo)"
+    },
+    {
+      "name": "cyl_l10n_e0a90124b72f",
+      "value": "Tremer ×3 (cyl_shakeAnimationRepeatTimes)"
+    },
+    {
+      "name": "cyl_l10n_b10d33d5ad4d",
+      "value": "Tremer, para com “Reduzir Movimento”"
+    },
+    {
+      "name": "cyl_l10n_6cbe015b00fb",
+      "value": "Mostrar / ocultar CYLFlatDesignTabBar"
+    },
+    {
+      "name": "cyl_l10n_3cb58e0d546d",
+      "value": "Mola (contínua)"
+    },
+    {
+      "name": "cyl_l10n_0a00b2238071",
+      "value": "Mola uma vez"
+    },
+    {
+      "name": "cyl_l10n_fee4a478923f",
+      "value": "Interações das abas"
+    },
+    {
+      "name": "cyl_l10n_98559580dcc7",
+      "value": "Animação ao tocar nas abas (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_db89836d6e21",
+      "value": "Som e resposta tátil ao tocar abas (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_2f6e866d5219",
+      "value": "Páginas, seleção e login"
+    },
+    {
+      "name": "cyl_l10n_6d067090c833",
+      "value": "Tab, %1$@ of %2$@"
+    },
+    {
+      "name": "cyl_l10n_75ccb7ef4864",
+      "value": "Aparência da barra"
+    },
+    {
+      "name": "cyl_l10n_2e6d648945c0",
+      "value": "The plus button sticks out of the bar; its part above the bar responds (shown in red)"
+    },
+    {
+      "name": "cyl_l10n_f43b06c12ee1",
+      "value": "The system bar has no plus button: a floating button stands in"
+    },
+    {
+      "name": "cyl_l10n_a4d0d101d6a3",
+      "value": "Superior esquerdo"
+    },
+    {
+      "name": "cyl_l10n_2306a585ae00",
+      "value": "cyl_itemEdgeInsets: 15% of a tab width free at each end"
+    },
+    {
+      "name": "cyl_l10n_fd15e88376df",
+      "value": "Demonstração dos métodos cyl_pop / cyl_push"
+    },
+    {
+      "name": "cyl_l10n_1ec113617309",
+      "value": "cyl_pushViewController, cyl_popSelectTabBarChildViewControllerAtIndex, cyl_pushOrPopToViewController"
+    },
+    {
+      "name": "cyl_l10n_ee5b6ac6461b",
+      "value": "selectedIndex e o PlusButton (issue #515)"
+    },
+    {
+      "name": "cyl_l10n_2de6d572f86b",
+      "value": "Tema de standardAppearance (compartilhado por Liquid Glass e FlatDesign)"
+    },
+    {
+      "name": "cyl_l10n_2a0608059131",
+      "value": "Atualiza os títulos de todas as abas de uma vez; toque de novo para restaurar"
+    },
+    {
+      "name": "cyl_l10n_57196013d558",
+      "value": "Halloween"
+    },
+    {
+      "name": "cyl_l10n_0a58c230c3d9",
+      "value": "Baixa e atualiza os ícones de todas as abas; toque novamente para restaurar"
+    },
+    {
+      "name": "cyl_l10n_5e347d8ccb68",
+      "value": "Baixar ícone da rede"
+    },
+    {
+      "name": "cyl_l10n_2e0e84a0dcfb",
+      "value": "Ocultar a barra de navegação sem classe base (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_e1642a46b804",
+      "value": "Festival do Meio do Outono"
+    },
+    {
+      "name": "cyl_l10n_0c2817d10627",
+      "value": "Resposta tátil média"
+    },
+    {
+      "name": "cyl_l10n_0f60774903e0",
+      "value": "Carregar imagens de um bundle (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_0e1b02648a11",
+      "value": "Aproximar"
+    },
+    {
+      "name": "cyl_l10n_cc03f47a389c",
+      "value": "Baixa o ícone da aba da rede (com cache); toque de novo para restaurar"
+    },
+    {
+      "name": "cyl_l10n_24fb8692947a",
+      "value": "mantida"
+    },
+    {
+      "name": "cyl_l10n_b15d91274e9f",
+      "value": "Fechar"
+    },
+    {
+      "name": "cyl_l10n_70922c50ef07",
+      "value": "Aviso de memória"
+    },
+    {
+      "name": "cyl_l10n_cbed6b29761b",
+      "value": "Botão mais"
+    },
+    {
+      "name": "cyl_l10n_18684d72945b",
+      "value": "Carregar a imagem"
+    },
+    {
+      "name": "cyl_l10n_b981b7b359a7",
+      "value": "Carregar uma imagem de fundo"
+    },
+    {
+      "name": "cyl_l10n_7136049eb4c7",
+      "value": "Descarrega as abas não selecionadas; recarregam ao selecionar"
+    },
+    {
+      "name": "cyl_l10n_c7626d7d6194",
+      "value": "Muda no lugar o título da aba desta página; toque de novo para restaurar"
+    },
+    {
+      "name": "cyl_l10n_15fb093f6fff",
+      "value": "Atualizar abas no lugar"
+    },
+    {
+      "name": "cyl_l10n_c1ecedab11bc",
+      "value": "Original"
+    },
+    {
+      "name": "cyl_l10n_625fb26b4b33",
+      "value": "Cancelar"
+    },
+    {
+      "name": "cyl_l10n_d25efeb790bb",
+      "value": "Por perto"
+    },
+    {
+      "name": "cyl_l10n_7941d8987ff2",
+      "value": "Comparar com a UITabBar do sistema"
+    },
+    {
+      "name": "cyl_l10n_d0d78acf1941",
+      "value": "Natal"
+    },
+    {
+      "name": "cyl_l10n_aa91e8ceec70",
+      "value": "Páscoa"
+    },
+    {
+      "name": "cyl_l10n_3df20a295b39",
+      "value": "Verão"
+    },
+    {
+      "name": "cyl_l10n_0ef6dae7e80c",
+      "value": "Espaço"
+    },
+    {
+      "name": "cyl_l10n_bccc798b577a",
+      "value": "Cápsula centralizada"
+    },
+    {
+      "name": "cyl_l10n_7c87af044929",
+      "value": "Deslizar para trocar de aba (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_7a2261654d24",
+      "value": "descarregada"
+    },
+    {
+      "name": "cyl_l10n_091885db07e4",
+      "value": "Quique"
+    },
+    {
+      "name": "cyl_l10n_758903c327de",
+      "value": "Mostra um GIF animado como ícone da aba; toque de novo para restaurar"
+    },
+    {
+      "name": "cyl_l10n_c4328f75476f",
+      "value": "Dia dos Namorados"
+    },
+    {
+      "name": "cyl_l10n_07b181184280",
+      "value": "Eu"
+    },
+    {
+      "name": "cyl_l10n_a01539048bb0",
+      "value": "Ative a chave e toque e segure qualquer aba ou o PlusButton para ver o identificador."
+    },
+    {
+      "name": "cyl_l10n_633c2ee4dcc7",
+      "value": "Alterar todos os ícones de rede"
+    },
+    {
+      "name": "cyl_l10n_f75fe6720861",
+      "value": "Alterar todos os ícones locais"
+    },
+    {
+      "name": "cyl_l10n_7fb5208a54d5",
+      "value": "Mudar todos os títulos"
+    },
+    {
+      "name": "cyl_l10n_2f728e190695",
+      "value": "Mostra outras páginas nas abas dos dois lados desta (issue #481); toque novamente para restaurar"
+    },
+    {
+      "name": "cyl_l10n_0be5a194844c",
+      "value": "Tema visual"
+    },
+    {
+      "name": "cyl_l10n_61a9cd33b1ff",
+      "value": "Tema visual (tema, issue #216)"
+    },
+    {
+      "name": "cyl_l10n_09d0fdddca66",
+      "value": "Temas visuais: festas e cores (%@)"
+    },
+    {
+      "name": "cyl_l10n_a0ffdf359138",
+      "value": "Alterar a altura da CYLFlatDesignTabBar"
+    },
+    {
+      "name": "cyl_l10n_01e3254a92ba",
+      "value": "Ampliar e reduzir"
+    },
+    {
+      "name": "cyl_l10n_d46d5bb15db1",
+      "value": "Ano-Novo"
+    },
+    {
+      "name": "cyl_l10n_79b5a6564585",
+      "value": "Girar"
+    },
+    {
+      "name": "cyl_l10n_d81bb206a889",
+      "value": "Nenhuma"
+    },
+    {
+      "name": "cyl_l10n_14f433db2189",
+      "value": "Sem classe base e utilitários"
+    },
+    {
+      "name": "cyl_l10n_d2339bb4edaa",
+      "value": "Festival da Primavera"
+    },
+    {
+      "name": "cyl_l10n_5f1de850fb46",
+      "value": "Mudar título da aba"
+    },
+    {
+      "name": "cyl_l10n_9d0d66f312b5",
+      "value": "Substituir por uma imagem maior"
+    },
+    {
+      "name": "cyl_l10n_b051a19ace76",
+      "value": "Substituir abas vizinhas"
+    },
+    {
+      "name": "cyl_l10n_a131e4f178aa",
+      "value": "Conteúdo novo"
+    },
+    {
+      "name": "cyl_l10n_467b3e031441",
+      "value": "não carregada"
+    },
+    {
+      "name": "cyl_l10n_2c8d9e877a54",
+      "value": "Deslocamento do título (titlePositionAdjustment)"
+    },
+    {
+      "name": "cyl_l10n_0787cd518387",
+      "value": "Simular aviso de memória"
+    },
+    {
+      "name": "cyl_l10n_6a00c1ae99fa",
+      "value": "Oceano"
+    },
+    {
+      "name": "cyl_l10n_ff692f04ace0",
+      "value": "Mensagens"
+    },
+    {
+      "name": "cyl_l10n_41e8e8b9935c",
+      "value": "Escuro"
+    },
+    {
+      "name": "cyl_l10n_8dfe6bcdd6ec",
+      "value": "Transição deslizante (CYLTabBarSlideTransitionAnimator)"
+    },
+    {
+      "name": "cyl_l10n_9f44bafc75c6",
+      "value": "Minimizar / ocultar a TabBar ao rolar (issue #13)"
+    },
+    {
+      "name": "cyl_l10n_678abebe6aac",
+      "value": "Toque no X no canto superior direito do PlusButton: o X muda para uma cor aleatória e o PlusButton não reage"
+    },
+    {
+      "name": "cyl_l10n_7375af54db2a",
+      "value": "Toque para trocar a animação ao tocar nas abas e no PlusButton. Agora: %@"
+    },
+    {
+      "name": "cyl_l10n_5378f31b520c",
+      "value": "Toque para alternar tabBar.standardAppearance, atual: %@"
+    },
+    {
+      "name": "cyl_l10n_4a986e4da535",
+      "value": "Toque para alternar o deslocamento vertical dos títulos de todas as abas, atual: %@"
+    },
+    {
+      "name": "cyl_l10n_3d0d9d3d7cc2",
+      "value": "Toque para mudar o idioma"
+    },
+    {
+      "name": "cyl_l10n_f4e41dda1094",
+      "value": "Toque para trocar e depois toque em qualquer aba ou no PlusButton para ouvir. A resposta tátil só vibra em um aparelho real. Atual: %@"
+    },
+    {
+      "name": "cyl_l10n_15855ab96e87",
+      "value": "Clique + tátil"
+    },
+    {
+      "name": "cyl_l10n_cff8a9cded04",
+      "value": "Toque para escolher um tema: o fundo, os ícones e as cores do texto da TabBar mudam no lugar, em todos os estilos de TabBar. Atual: %@"
+    },
+    {
+      "name": "cyl_l10n_1c00c4fd1cea",
+      "value": "Rosa"
+    },
+    {
+      "name": "cyl_l10n_8483ed132b2c",
+      "value": "Aniversário"
+    },
+    {
+      "name": "cyl_l10n_feef14745f21",
+      "value": "Atualiza os ícones de todas as abas com imagens locais (nome, caminho, UIImage, URL de arquivo); toque novamente para restaurar"
+    },
+    {
+      "name": "cyl_l10n_402d19e50fff",
+      "value": "Entrar"
+    },
+    {
+      "name": "cyl_l10n_833152116634",
+      "value": "Remover a imagem"
+    },
+    {
+      "name": "cyl_l10n_a0676a7d84a9",
+      "value": "Linha verde"
+    },
+    {
+      "name": "cyl_l10n_16068b2ff3fd",
+      "value": "Ícones da rede"
+    },
+    {
+      "name": "cyl_l10n_69ca6555a602",
+      "value": "Virar"
+    },
+    {
+      "name": "cyl_l10n_4bd51044149f",
+      "value": "Arquivo de som próprio (cyl_tabButtonTapSoundURL)"
+    },
+    {
+      "name": "cyl_l10n_beabcd498b94",
+      "value": "Toranja"
+    },
+    {
+      "name": "cyl_l10n_b8c467fce096",
+      "value": "Selos"
+    },
+    {
+      "name": "cyl_l10n_200e65177369",
+      "value": "Definir a cor de fundo do CYLFlatDesignTabBarItem"
+    },
+    {
+      "name": "cyl_l10n_295bb704f520",
+      "value": "Idioma"
+    },
+    {
+      "name": "cyl_l10n_d673e0eb5c1c",
+      "value": "Responder fora da supervisualização (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_71bbc726ace5",
+      "value": "Seguir o sistema"
+    },
+    {
+      "name": "cyl_l10n_d0914cf6acd2",
+      "value": "Navegação e comparações"
+    },
+    {
+      "name": "cyl_l10n_110abc875180",
+      "value": "Resposta tátil leve"
+    },
+    {
+      "name": "cyl_l10n_fad7c8a21fe3",
+      "value": "Selecionado"
+    },
+    {
+      "name": "cyl_l10n_aa05fd09a619",
+      "value": "Geral"
+    },
+    {
+      "name": "cyl_l10n_15c64aa0b404",
+      "value": "Arquivo de configuração"
+    },
+    {
+      "name": "cyl_l10n_45158907e07f",
+      "value": "Resposta tátil forte"
+    },
+    {
+      "name": "cyl_l10n_d6982fecc6a4",
+      "value": "Toque longo nas abas (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_aefae51d3c25",
+      "value": "Toque longo em \"%@\""
+    },
+    {
+      "name": "cyl_l10n_abad1baa5479",
+      "value": "Duração do toque longo e intervalo do toque duplo (issue #535 / #152)"
+    },
+    {
+      "name": "cyl_l10n_b146fc1a1531",
+      "value": "Grama"
+    },
+    {
+      "name": "cyl_l10n_db1c89e0f6e6",
+      "value": "Início"
+    },
+    {
+      "name": "cyl_l10n_18c63459a2c0",
+      "value": "Padrão"
+    },
+    {
+      "name": "cyl_l10n_be354ee4263a",
+      "value": "Clique padrão"
+    }
+  ]
+}

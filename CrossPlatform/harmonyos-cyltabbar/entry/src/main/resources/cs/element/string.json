@@ -1,0 +1,40 @@
+{
+  "string": [
+    {
+      "name": "tab_home",
+      "value": "Domů"
+    },
+    {
+      "name": "tab_nearby",
+      "value": "Poblíž"
+    },
+    {
+      "name": "tab_messages",
+      "value": "Zprávy"
+    },
+    {
+      "name": "tab_me",
+      "value": "Já"
+    },
+    {
+      "name": "tab_post",
+      "value": "Zveřejnit"
+    },
+    {
+      "name": "tab_refresh",
+      "value": "Obnovit"
+    },
+    {
+      "name": "module_desc",
+      "value": "CYLTabBarController example"
+    },
+    {
+      "name": "ability_desc",
+      "value": "CYLTabBarController example"
+    },
+    {
+      "name": "app_name",
+      "value": "CYLTabBar"
+    }
+  ]
+}

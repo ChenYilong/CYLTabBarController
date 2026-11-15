@@ -1,0 +1,696 @@
+{
+  "string": [
+    {
+      "name": "cyl_l10n_aaf9b7d7382d",
+      "value": "%@ 則新訊息"
+    },
+    {
+      "name": "cyl_l10n_81a05b6c1cf9",
+      "value": "%@, %@"
+    },
+    {
+      "name": "cyl_l10n_0b0ae9062c5a",
+      "value": "A tab bar controller of another context, with a square plus button"
+    },
+    {
+      "name": "cyl_l10n_aa3e67bda3c0",
+      "value": "ArkUI Tabs, the HarmonyOS system tab bar, with the same tabs"
+    },
+    {
+      "name": "cyl_l10n_8665e238c516",
+      "value": "Badge: %@"
+    },
+    {
+      "name": "cyl_l10n_6b2186414c82",
+      "value": "閃爍 ×3"
+    },
+    {
+      "name": "cyl_l10n_070554647306",
+      "value": "邊框"
+    },
+    {
+      "name": "cyl_l10n_43d3e34b15fb",
+      "value": "跟隨深色模式的邊框"
+    },
+    {
+      "name": "cyl_l10n_b67554192c50",
+      "value": "左下角"
+    },
+    {
+      "name": "cyl_l10n_5968e3c37145",
+      "value": "右下角"
+    },
+    {
+      "name": "cyl_l10n_5d60263416c2",
+      "value": "彈跳（持續）"
+    },
+    {
+      "name": "cyl_l10n_f3ce1baf4805",
+      "value": "彈跳 ×3（cyl_bounceAnimationRepeatTimes）"
+    },
+    {
+      "name": "cyl_l10n_0875a57843a1",
+      "value": "呼吸（持續）"
+    },
+    {
+      "name": "cyl_l10n_8795570ddeef",
+      "value": "CYLTabBarItemBackgroundColor / CYLTabBarItemSelectedBackgroundColor"
+    },
+    {
+      "name": "cyl_l10n_132201f60522",
+      "value": "CYLUtils 弱引用關聯物件與尋找按鈕（issue #535）"
+    },
+    {
+      "name": "cyl_l10n_fa3d06c1b1e9",
+      "value": "CYLFlatDesignTabBarItem 不置中顯示（系統效果）"
+    },
+    {
+      "name": "cyl_l10n_5e74163d3804",
+      "value": "CYLFlatDesignTabBarItem 置中顯示"
+    },
+    {
+      "name": "cyl_l10n_158b3b19e868",
+      "value": "圓角"
+    },
+    {
+      "name": "cyl_l10n_4d242c36821c",
+      "value": "自訂顏色"
+    },
+    {
+      "name": "cyl_l10n_4685555ab484",
+      "value": "自訂字體"
+    },
+    {
+      "name": "cyl_l10n_a45350c25311",
+      "value": "自訂最大值（9）"
+    },
+    {
+      "name": "cyl_l10n_bf0576472e31",
+      "value": "Double tap to open"
+    },
+    {
+      "name": "cyl_l10n_7e0a1ad9a767",
+      "value": "淡入一次"
+    },
+    {
+      "name": "cyl_l10n_153407d52fed",
+      "value": "扁平樣式"
+    },
+    {
+      "name": "cyl_l10n_5cfed317a99d",
+      "value": "扁平設計樣式"
+    },
+    {
+      "name": "cyl_l10n_026b984bb8d8",
+      "value": "翻轉 ×2"
+    },
+    {
+      "name": "cyl_l10n_c5d4cd682981",
+      "value": "GIF 動圖圖示"
+    },
+    {
+      "name": "cyl_l10n_d52d30723b2f",
+      "value": "從左到右一次"
+    },
+    {
+      "name": "cyl_l10n_f201a4158727",
+      "value": "液態玻璃"
+    },
+    {
+      "name": "cyl_l10n_af3acf6eb4a9",
+      "value": "液態玻璃"
+    },
+    {
+      "name": "cyl_l10n_2e8e48a2ebfd",
+      "value": "Long press a tab or the plus button"
+    },
+    {
+      "name": "cyl_l10n_983696096694",
+      "value": "邊距"
+    },
+    {
+      "name": "cyl_l10n_24d459a81449",
+      "value": "新"
+    },
+    {
+      "name": "cyl_l10n_03c2e7e41ffc",
+      "value": "新"
+    },
+    {
+      "name": "cyl_l10n_1e8f217bdf71",
+      "value": "Next tab (cyl_selectNextTab, issue #535)"
+    },
+    {
+      "name": "cyl_l10n_b2ee912b91d6",
+      "value": "數字"
+    },
+    {
+      "name": "cyl_l10n_ab7fa33c83b1",
+      "value": "超過最大值的數字"
+    },
+    {
+      "name": "cyl_l10n_e0aa021e21dd",
+      "value": "好"
+    },
+    {
+      "name": "cyl_l10n_287e78fd65af",
+      "value": "其他文字"
+    },
+    {
+      "name": "cyl_l10n_41b77539cc64",
+      "value": "PlusButton 圖片之後才載入"
+    },
+    {
+      "name": "cyl_l10n_72a245189eaf",
+      "value": "PlusButton 點擊範圍（issue #91）"
+    },
+    {
+      "name": "cyl_l10n_9a1d72fdd764",
+      "value": "Previous tab (cyl_selectPreviousTab, issue #535)"
+    },
+    {
+      "name": "cyl_l10n_4b0282f4f1c6",
+      "value": "推入到系統 UITabBarController（另一個加號按鈕）"
+    },
+    {
+      "name": "cyl_l10n_e5416d3ed3c0",
+      "value": "Push to another CYLTabBarController (another PlusButton)"
+    },
+    {
+      "name": "cyl_l10n_8c96672c9bc5",
+      "value": "推入同一個上下文的 TabBarController（同一個加號按鈕類別）"
+    },
+    {
+      "name": "cyl_l10n_6166b27ea14b",
+      "value": "推入新上下文的 TabBarController（加號按鈕帶可點擊的 X 子按鈕，issue #202）"
+    },
+    {
+      "name": "cyl_l10n_a63e8b745e73",
+      "value": "Pushes a page that hides the navigation bar while shown, with no base class"
+    },
+    {
+      "name": "cyl_l10n_79fe28f3a3ac",
+      "value": "Pushes a tab bar controller whose plus button image changes 2 s later; the layout must not move"
+    },
+    {
+      "name": "cyl_l10n_c27618b1aa9d",
+      "value": "紅點"
+    },
+    {
+      "name": "cyl_l10n_255c00a63f9d",
+      "value": "紅點半徑"
+    },
+    {
+      "name": "cyl_l10n_7aac5e07b16d",
+      "value": "從右到左一次"
+    },
+    {
+      "name": "cyl_l10n_f0c792c049bc",
+      "value": "滾動一次"
+    },
+    {
+      "name": "cyl_l10n_401ea21c7a44",
+      "value": "旋轉（持續）"
+    },
+    {
+      "name": "cyl_l10n_b5fcd68edd9f",
+      "value": "縮放（持續）"
+    },
+    {
+      "name": "cyl_l10n_544d03258eaf",
+      "value": "縮放一次"
+    },
+    {
+      "name": "cyl_l10n_dbd4f5e49888",
+      "value": "縮放 ×3"
+    },
+    {
+      "name": "cyl_l10n_9ae56cc36e81",
+      "value": "抖動（持續）"
+    },
+    {
+      "name": "cyl_l10n_e0a90124b72f",
+      "value": "抖動 ×3（cyl_shakeAnimationRepeatTimes）"
+    },
+    {
+      "name": "cyl_l10n_b10d33d5ad4d",
+      "value": "抖動，開啟「減少動態效果」時停止"
+    },
+    {
+      "name": "cyl_l10n_6cbe015b00fb",
+      "value": "顯示 / 隱藏 CYLFlatDesignTabBar"
+    },
+    {
+      "name": "cyl_l10n_3cb58e0d546d",
+      "value": "彈簧（持續）"
+    },
+    {
+      "name": "cyl_l10n_0a00b2238071",
+      "value": "彈簧一次"
+    },
+    {
+      "name": "cyl_l10n_fee4a478923f",
+      "value": "Tab 互動"
+    },
+    {
+      "name": "cyl_l10n_98559580dcc7",
+      "value": "Tab 點擊動畫（issue #535）"
+    },
+    {
+      "name": "cyl_l10n_db89836d6e21",
+      "value": "Tab 點擊聲音與觸覺回饋（issue #535）"
+    },
+    {
+      "name": "cyl_l10n_2f6e866d5219",
+      "value": "Tab 頁面、選取與登入"
+    },
+    {
+      "name": "cyl_l10n_6d067090c833",
+      "value": "Tab, %1$@ of %2$@"
+    },
+    {
+      "name": "cyl_l10n_75ccb7ef4864",
+      "value": "TabBar 外觀"
+    },
+    {
+      "name": "cyl_l10n_2e6d648945c0",
+      "value": "The plus button sticks out of the bar; its part above the bar responds (shown in red)"
+    },
+    {
+      "name": "cyl_l10n_f43b06c12ee1",
+      "value": "The system bar has no plus button: a floating button stands in"
+    },
+    {
+      "name": "cyl_l10n_a4d0d101d6a3",
+      "value": "左上角"
+    },
+    {
+      "name": "cyl_l10n_2306a585ae00",
+      "value": "cyl_itemEdgeInsets: 15% of a tab width free at each end"
+    },
+    {
+      "name": "cyl_l10n_fd15e88376df",
+      "value": "cyl_pop / cyl_push 系列方法示範"
+    },
+    {
+      "name": "cyl_l10n_1ec113617309",
+      "value": "cyl_pushViewController, cyl_popSelectTabBarChildViewControllerAtIndex, cyl_pushOrPopToViewController"
+    },
+    {
+      "name": "cyl_l10n_ee5b6ac6461b",
+      "value": "selectedIndex 與加號按鈕（issue #515）"
+    },
+    {
+      "name": "cyl_l10n_2de6d572f86b",
+      "value": "standardAppearance 主題（液態玻璃與扁平樣式共用）"
+    },
+    {
+      "name": "cyl_l10n_2a0608059131",
+      "value": "一次更新所有 Tab 的標題，再點一次還原"
+    },
+    {
+      "name": "cyl_l10n_57196013d558",
+      "value": "萬聖節"
+    },
+    {
+      "name": "cyl_l10n_0a58c230c3d9",
+      "value": "下載並更新所有 Tab 的圖示，再點恢復"
+    },
+    {
+      "name": "cyl_l10n_5e347d8ccb68",
+      "value": "下載網路圖示"
+    },
+    {
+      "name": "cyl_l10n_2e0e84a0dcfb",
+      "value": "不繼承基類隱藏導覽列（issue #535）"
+    },
+    {
+      "name": "cyl_l10n_e1642a46b804",
+      "value": "中秋節"
+    },
+    {
+      "name": "cyl_l10n_0c2817d10627",
+      "value": "中等觸覺回饋"
+    },
+    {
+      "name": "cyl_l10n_0f60774903e0",
+      "value": "從 bundle 載入圖片（issue #535）"
+    },
+    {
+      "name": "cyl_l10n_0e1b02648a11",
+      "value": "從小放大"
+    },
+    {
+      "name": "cyl_l10n_cc03f47a389c",
+      "value": "從網路下載目前頁面 Tab 的圖示（有快取），再點一次還原"
+    },
+    {
+      "name": "cyl_l10n_24fb8692947a",
+      "value": "保留"
+    },
+    {
+      "name": "cyl_l10n_b15d91274e9f",
+      "value": "關閉"
+    },
+    {
+      "name": "cyl_l10n_70922c50ef07",
+      "value": "記憶體警告"
+    },
+    {
+      "name": "cyl_l10n_cbed6b29761b",
+      "value": "加號按鈕"
+    },
+    {
+      "name": "cyl_l10n_18684d72945b",
+      "value": "載入圖片"
+    },
+    {
+      "name": "cyl_l10n_b981b7b359a7",
+      "value": "載入背景圖片"
+    },
+    {
+      "name": "cyl_l10n_7136049eb4c7",
+      "value": "卸載未選取的標籤頁，切換時重新載入"
+    },
+    {
+      "name": "cyl_l10n_c7626d7d6194",
+      "value": "原地更換目前頁面 Tab 的標題，再點一次還原"
+    },
+    {
+      "name": "cyl_l10n_15fb093f6fff",
+      "value": "原地更新 Tab"
+    },
+    {
+      "name": "cyl_l10n_c1ecedab11bc",
+      "value": "原始"
+    },
+    {
+      "name": "cyl_l10n_625fb26b4b33",
+      "value": "取消"
+    },
+    {
+      "name": "cyl_l10n_d25efeb790bb",
+      "value": "同城"
+    },
+    {
+      "name": "cyl_l10n_7941d8987ff2",
+      "value": "和系統 UITabBar 比較"
+    },
+    {
+      "name": "cyl_l10n_d0d78acf1941",
+      "value": "聖誕節"
+    },
+    {
+      "name": "cyl_l10n_aa91e8ceec70",
+      "value": "復活節"
+    },
+    {
+      "name": "cyl_l10n_3df20a295b39",
+      "value": "夏日"
+    },
+    {
+      "name": "cyl_l10n_0ef6dae7e80c",
+      "value": "太空"
+    },
+    {
+      "name": "cyl_l10n_bccc798b577a",
+      "value": "置中膠囊"
+    },
+    {
+      "name": "cyl_l10n_7c87af044929",
+      "value": "左右滑動切換 Tab（issue #535）"
+    },
+    {
+      "name": "cyl_l10n_7a2261654d24",
+      "value": "已卸載"
+    },
+    {
+      "name": "cyl_l10n_091885db07e4",
+      "value": "彈性"
+    },
+    {
+      "name": "cyl_l10n_758903c327de",
+      "value": "目前頁面 Tab 顯示 GIF 動圖，再點一次還原"
+    },
+    {
+      "name": "cyl_l10n_c4328f75476f",
+      "value": "情人節"
+    },
+    {
+      "name": "cyl_l10n_07b181184280",
+      "value": "我的"
+    },
+    {
+      "name": "cyl_l10n_a01539048bb0",
+      "value": "打開開關後長按任意 Tab 或加號按鈕，會顯示該按鈕的識別碼。"
+    },
+    {
+      "name": "cyl_l10n_633c2ee4dcc7",
+      "value": "批次下載網路圖示"
+    },
+    {
+      "name": "cyl_l10n_f75fe6720861",
+      "value": "批次使用本機圖示"
+    },
+    {
+      "name": "cyl_l10n_7fb5208a54d5",
+      "value": "批次更換標題"
+    },
+    {
+      "name": "cyl_l10n_2f728e190695",
+      "value": "把目前 Tab 兩側的 Tab 換成其他頁面（issue #481），再點恢復"
+    },
+    {
+      "name": "cyl_l10n_0be5a194844c",
+      "value": "換膚"
+    },
+    {
+      "name": "cyl_l10n_61a9cd33b1ff",
+      "value": "換膚（主題，issue #216）"
+    },
+    {
+      "name": "cyl_l10n_09d0fdddca66",
+      "value": "換膚：節日與配色主題（%@ 種）"
+    },
+    {
+      "name": "cyl_l10n_a0ffdf359138",
+      "value": "改變 CYLFlatDesignTabBar 高度"
+    },
+    {
+      "name": "cyl_l10n_01e3254a92ba",
+      "value": "放大再縮小"
+    },
+    {
+      "name": "cyl_l10n_d46d5bb15db1",
+      "value": "新年"
+    },
+    {
+      "name": "cyl_l10n_79b5a6564585",
+      "value": "旋轉"
+    },
+    {
+      "name": "cyl_l10n_d81bb206a889",
+      "value": "無"
+    },
+    {
+      "name": "cyl_l10n_14f433db2189",
+      "value": "無需繼承基類與工具方法"
+    },
+    {
+      "name": "cyl_l10n_d2339bb4edaa",
+      "value": "春節"
+    },
+    {
+      "name": "cyl_l10n_5f1de850fb46",
+      "value": "更換 Tab 標題"
+    },
+    {
+      "name": "cyl_l10n_9d0d66f312b5",
+      "value": "替換為更大的圖片"
+    },
+    {
+      "name": "cyl_l10n_b051a19ace76",
+      "value": "替換相鄰 Tab 的頁面"
+    },
+    {
+      "name": "cyl_l10n_a131e4f178aa",
+      "value": "有新內容"
+    },
+    {
+      "name": "cyl_l10n_467b3e031441",
+      "value": "未載入"
+    },
+    {
+      "name": "cyl_l10n_2c8d9e877a54",
+      "value": "標題偏移（titlePositionAdjustment）"
+    },
+    {
+      "name": "cyl_l10n_0787cd518387",
+      "value": "模擬記憶體警告"
+    },
+    {
+      "name": "cyl_l10n_6a00c1ae99fa",
+      "value": "海洋"
+    },
+    {
+      "name": "cyl_l10n_ff692f04ace0",
+      "value": "訊息"
+    },
+    {
+      "name": "cyl_l10n_41e8e8b9935c",
+      "value": "深色"
+    },
+    {
+      "name": "cyl_l10n_8dfe6bcdd6ec",
+      "value": "滑動轉場（CYLTabBarSlideTransitionAnimator）"
+    },
+    {
+      "name": "cyl_l10n_9f44bafc75c6",
+      "value": "捲動時縮小 / 隱藏 TabBar（issue #13）"
+    },
+    {
+      "name": "cyl_l10n_678abebe6aac",
+      "value": "點擊加號按鈕右上角的 X：X 隨機改變顏色，加號按鈕不回應"
+    },
+    {
+      "name": "cyl_l10n_7375af54db2a",
+      "value": "點擊切換 Tab 與加號按鈕的點擊動畫，目前：%@"
+    },
+    {
+      "name": "cyl_l10n_5378f31b520c",
+      "value": "點按切換 tabBar.standardAppearance，目前：%@"
+    },
+    {
+      "name": "cyl_l10n_4a986e4da535",
+      "value": "點按切換所有 Tab 標題的垂直偏移，目前：%@"
+    },
+    {
+      "name": "cyl_l10n_3d0d9d3d7cc2",
+      "value": "點擊切換語言"
+    },
+    {
+      "name": "cyl_l10n_f4e41dda1094",
+      "value": "點擊切換，然後點擊任意 Tab 或 PlusButton 試聽。觸覺回饋只在實機上振動。目前：%@"
+    },
+    {
+      "name": "cyl_l10n_15855ab96e87",
+      "value": "點擊聲 + 觸覺回饋"
+    },
+    {
+      "name": "cyl_l10n_cff8a9cded04",
+      "value": "點擊選擇主題：TabBar 的背景、圖示與文字顏色原地切換，所有 TabBar 樣式均適用。目前：%@"
+    },
+    {
+      "name": "cyl_l10n_1c00c4fd1cea",
+      "value": "玫瑰粉"
+    },
+    {
+      "name": "cyl_l10n_8483ed132b2c",
+      "value": "生日"
+    },
+    {
+      "name": "cyl_l10n_feef14745f21",
+      "value": "用本機圖片（圖片名稱、檔案路徑、UIImage、檔案 URL）更新所有 Tab 的圖示，再點恢復"
+    },
+    {
+      "name": "cyl_l10n_402d19e50fff",
+      "value": "登入"
+    },
+    {
+      "name": "cyl_l10n_833152116634",
+      "value": "移除圖片"
+    },
+    {
+      "name": "cyl_l10n_a0676a7d84a9",
+      "value": "綠色描邊"
+    },
+    {
+      "name": "cyl_l10n_16068b2ff3fd",
+      "value": "網路圖示"
+    },
+    {
+      "name": "cyl_l10n_69ca6555a602",
+      "value": "翻轉"
+    },
+    {
+      "name": "cyl_l10n_4bd51044149f",
+      "value": "自訂音訊檔案（cyl_tabButtonTapSoundURL）"
+    },
+    {
+      "name": "cyl_l10n_beabcd498b94",
+      "value": "西柚"
+    },
+    {
+      "name": "cyl_l10n_b8c467fce096",
+      "value": "徽章"
+    },
+    {
+      "name": "cyl_l10n_200e65177369",
+      "value": "設定 CYLFlatDesignTabBarItem 背景色"
+    },
+    {
+      "name": "cyl_l10n_295bb704f520",
+      "value": "語言"
+    },
+    {
+      "name": "cyl_l10n_d673e0eb5c1c",
+      "value": "超出父視圖回應點擊（issue #535）"
+    },
+    {
+      "name": "cyl_l10n_71bbc726ace5",
+      "value": "跟隨系統"
+    },
+    {
+      "name": "cyl_l10n_d0914cf6acd2",
+      "value": "跳轉與對比"
+    },
+    {
+      "name": "cyl_l10n_110abc875180",
+      "value": "輕觸覺回饋"
+    },
+    {
+      "name": "cyl_l10n_fad7c8a21fe3",
+      "value": "選取"
+    },
+    {
+      "name": "cyl_l10n_aa05fd09a619",
+      "value": "一般"
+    },
+    {
+      "name": "cyl_l10n_15c64aa0b404",
+      "value": "設定檔"
+    },
+    {
+      "name": "cyl_l10n_45158907e07f",
+      "value": "重觸覺回饋"
+    },
+    {
+      "name": "cyl_l10n_d6982fecc6a4",
+      "value": "長按 Tab（issue #535）"
+    },
+    {
+      "name": "cyl_l10n_aefae51d3c25",
+      "value": "長按了「%@」"
+    },
+    {
+      "name": "cyl_l10n_abad1baa5479",
+      "value": "長按時長與雙擊間隔（issue #535 / #152）"
+    },
+    {
+      "name": "cyl_l10n_b146fc1a1531",
+      "value": "青草"
+    },
+    {
+      "name": "cyl_l10n_db1c89e0f6e6",
+      "value": "首頁"
+    },
+    {
+      "name": "cyl_l10n_18c63459a2c0",
+      "value": "預設"
+    },
+    {
+      "name": "cyl_l10n_be354ee4263a",
+      "value": "預設點擊聲"
+    }
+  ]
+}

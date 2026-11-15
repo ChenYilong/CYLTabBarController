@@ -1,0 +1,40 @@
+{
+  "string": [
+    {
+      "name": "tab_home",
+      "value": "Home"
+    },
+    {
+      "name": "tab_nearby",
+      "value": "In de buurt"
+    },
+    {
+      "name": "tab_messages",
+      "value": "Berichten"
+    },
+    {
+      "name": "tab_me",
+      "value": "Ik"
+    },
+    {
+      "name": "tab_post",
+      "value": "Plaatsen"
+    },
+    {
+      "name": "tab_refresh",
+      "value": "Vernieuwen"
+    },
+    {
+      "name": "module_desc",
+      "value": "CYLTabBarController example"
+    },
+    {
+      "name": "ability_desc",
+      "value": "CYLTabBarController example"
+    },
+    {
+      "name": "app_name",
+      "value": "CYLTabBar"
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "string": [
+    {
+      "name": "tab_home",
+      "value": "Головна"
+    },
+    {
+      "name": "tab_nearby",
+      "value": "Поруч"
+    },
+    {
+      "name": "tab_messages",
+      "value": "Повідомлення"
+    },
+    {
+      "name": "tab_me",
+      "value": "Я"
+    },
+    {
+      "name": "tab_post",
+      "value": "Опублікувати"
+    },
+    {
+      "name": "tab_refresh",
+      "value": "Оновити"
+    },
+    {
+      "name": "module_desc",
+      "value": "CYLTabBarController example"
+    },
+    {
+      "name": "ability_desc",
+      "value": "CYLTabBarController example"
+    },
+    {
+      "name": "app_name",
+      "value": "CYLTabBar"
+    }
+  ]
+}

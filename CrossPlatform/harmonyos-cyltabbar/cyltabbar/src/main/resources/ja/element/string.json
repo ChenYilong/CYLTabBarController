@@ -1,0 +1,696 @@
+{
+  "string": [
+    {
+      "name": "cyl_l10n_aaf9b7d7382d",
+      "value": "新着メッセージ %@ 件"
+    },
+    {
+      "name": "cyl_l10n_81a05b6c1cf9",
+      "value": "%@, %@"
+    },
+    {
+      "name": "cyl_l10n_0b0ae9062c5a",
+      "value": "A tab bar controller of another context, with a square plus button"
+    },
+    {
+      "name": "cyl_l10n_aa3e67bda3c0",
+      "value": "ArkUI Tabs, the HarmonyOS system tab bar, with the same tabs"
+    },
+    {
+      "name": "cyl_l10n_8665e238c516",
+      "value": "Badge: %@"
+    },
+    {
+      "name": "cyl_l10n_6b2186414c82",
+      "value": "点滅 ×3"
+    },
+    {
+      "name": "cyl_l10n_070554647306",
+      "value": "枠線"
+    },
+    {
+      "name": "cyl_l10n_43d3e34b15fb",
+      "value": "ダークモード対応の枠線"
+    },
+    {
+      "name": "cyl_l10n_b67554192c50",
+      "value": "左下"
+    },
+    {
+      "name": "cyl_l10n_5968e3c37145",
+      "value": "右下"
+    },
+    {
+      "name": "cyl_l10n_5d60263416c2",
+      "value": "バウンド（継続）"
+    },
+    {
+      "name": "cyl_l10n_f3ce1baf4805",
+      "value": "バウンド ×3（cyl_bounceAnimationRepeatTimes）"
+    },
+    {
+      "name": "cyl_l10n_0875a57843a1",
+      "value": "呼吸（継続）"
+    },
+    {
+      "name": "cyl_l10n_8795570ddeef",
+      "value": "CYLTabBarItemBackgroundColor / CYLTabBarItemSelectedBackgroundColor"
+    },
+    {
+      "name": "cyl_l10n_132201f60522",
+      "value": "CYLUtils の弱参照関連オブジェクトとボタン検索（issue #535）"
+    },
+    {
+      "name": "cyl_l10n_fa3d06c1b1e9",
+      "value": "CYLFlatDesignTabBarItem を中央揃えにしない（システム標準）"
+    },
+    {
+      "name": "cyl_l10n_5e74163d3804",
+      "value": "CYLFlatDesignTabBarItem を中央揃えにする"
+    },
+    {
+      "name": "cyl_l10n_158b3b19e868",
+      "value": "角丸"
+    },
+    {
+      "name": "cyl_l10n_4d242c36821c",
+      "value": "カスタムカラー"
+    },
+    {
+      "name": "cyl_l10n_4685555ab484",
+      "value": "カスタムフォント"
+    },
+    {
+      "name": "cyl_l10n_a45350c25311",
+      "value": "最大値を指定（9）"
+    },
+    {
+      "name": "cyl_l10n_bf0576472e31",
+      "value": "Double tap to open"
+    },
+    {
+      "name": "cyl_l10n_7e0a1ad9a767",
+      "value": "フェードイン（1回）"
+    },
+    {
+      "name": "cyl_l10n_153407d52fed",
+      "value": "フラット"
+    },
+    {
+      "name": "cyl_l10n_5cfed317a99d",
+      "value": "フラットデザイン"
+    },
+    {
+      "name": "cyl_l10n_026b984bb8d8",
+      "value": "フリップ ×2"
+    },
+    {
+      "name": "cyl_l10n_c5d4cd682981",
+      "value": "GIF アイコン"
+    },
+    {
+      "name": "cyl_l10n_d52d30723b2f",
+      "value": "左から右へ（1回）"
+    },
+    {
+      "name": "cyl_l10n_f201a4158727",
+      "value": "リキッドグラス"
+    },
+    {
+      "name": "cyl_l10n_af3acf6eb4a9",
+      "value": "リキッドグラス"
+    },
+    {
+      "name": "cyl_l10n_2e8e48a2ebfd",
+      "value": "Long press a tab or the plus button"
+    },
+    {
+      "name": "cyl_l10n_983696096694",
+      "value": "余白"
+    },
+    {
+      "name": "cyl_l10n_24d459a81449",
+      "value": "新着"
+    },
+    {
+      "name": "cyl_l10n_03c2e7e41ffc",
+      "value": "新着"
+    },
+    {
+      "name": "cyl_l10n_1e8f217bdf71",
+      "value": "Next tab (cyl_selectNextTab, issue #535)"
+    },
+    {
+      "name": "cyl_l10n_b2ee912b91d6",
+      "value": "数字"
+    },
+    {
+      "name": "cyl_l10n_ab7fa33c83b1",
+      "value": "最大値を超える数字"
+    },
+    {
+      "name": "cyl_l10n_e0aa021e21dd",
+      "value": "OK"
+    },
+    {
+      "name": "cyl_l10n_287e78fd65af",
+      "value": "その他のテキスト"
+    },
+    {
+      "name": "cyl_l10n_41b77539cc64",
+      "value": "PlusButton の画像を後から読み込む"
+    },
+    {
+      "name": "cyl_l10n_72a245189eaf",
+      "value": "PlusButton のタップ範囲（issue #91）"
+    },
+    {
+      "name": "cyl_l10n_9a1d72fdd764",
+      "value": "Previous tab (cyl_selectPreviousTab, issue #535)"
+    },
+    {
+      "name": "cyl_l10n_4b0282f4f1c6",
+      "value": "システムの UITabBarController へプッシュ（別のプラスボタン）"
+    },
+    {
+      "name": "cyl_l10n_e5416d3ed3c0",
+      "value": "Push to another CYLTabBarController (another PlusButton)"
+    },
+    {
+      "name": "cyl_l10n_8c96672c9bc5",
+      "value": "同じコンテキストの TabBarController をプッシュ（同じプラスボタンのクラス）"
+    },
+    {
+      "name": "cyl_l10n_6166b27ea14b",
+      "value": "新しいコンテキストの TabBarController をプッシュ（タップできる X サブビュー付きプラスボタン、issue #202）"
+    },
+    {
+      "name": "cyl_l10n_a63e8b745e73",
+      "value": "Pushes a page that hides the navigation bar while shown, with no base class"
+    },
+    {
+      "name": "cyl_l10n_79fe28f3a3ac",
+      "value": "Pushes a tab bar controller whose plus button image changes 2 s later; the layout must not move"
+    },
+    {
+      "name": "cyl_l10n_c27618b1aa9d",
+      "value": "赤い点"
+    },
+    {
+      "name": "cyl_l10n_255c00a63f9d",
+      "value": "赤い点の半径"
+    },
+    {
+      "name": "cyl_l10n_7aac5e07b16d",
+      "value": "右から左へ（1回）"
+    },
+    {
+      "name": "cyl_l10n_f0c792c049bc",
+      "value": "回転して表示（1回）"
+    },
+    {
+      "name": "cyl_l10n_401ea21c7a44",
+      "value": "回転（継続）"
+    },
+    {
+      "name": "cyl_l10n_b5fcd68edd9f",
+      "value": "拡大縮小（継続）"
+    },
+    {
+      "name": "cyl_l10n_544d03258eaf",
+      "value": "拡大縮小（1回）"
+    },
+    {
+      "name": "cyl_l10n_dbd4f5e49888",
+      "value": "拡大縮小 ×3"
+    },
+    {
+      "name": "cyl_l10n_9ae56cc36e81",
+      "value": "揺れ（継続）"
+    },
+    {
+      "name": "cyl_l10n_e0a90124b72f",
+      "value": "揺れ ×3（cyl_shakeAnimationRepeatTimes）"
+    },
+    {
+      "name": "cyl_l10n_b10d33d5ad4d",
+      "value": "揺れ（「視差効果を減らす」で停止）"
+    },
+    {
+      "name": "cyl_l10n_6cbe015b00fb",
+      "value": "CYLFlatDesignTabBar の表示 / 非表示"
+    },
+    {
+      "name": "cyl_l10n_3cb58e0d546d",
+      "value": "スプリング（継続）"
+    },
+    {
+      "name": "cyl_l10n_0a00b2238071",
+      "value": "スプリング（1回）"
+    },
+    {
+      "name": "cyl_l10n_fee4a478923f",
+      "value": "タブの操作"
+    },
+    {
+      "name": "cyl_l10n_98559580dcc7",
+      "value": "タブのタップアニメーション（issue #535）"
+    },
+    {
+      "name": "cyl_l10n_db89836d6e21",
+      "value": "タブのタップ音と触覚フィードバック（issue #535）"
+    },
+    {
+      "name": "cyl_l10n_2f6e866d5219",
+      "value": "タブのページ・選択・ログイン"
+    },
+    {
+      "name": "cyl_l10n_6d067090c833",
+      "value": "Tab, %1$@ of %2$@"
+    },
+    {
+      "name": "cyl_l10n_75ccb7ef4864",
+      "value": "タブバーの外観"
+    },
+    {
+      "name": "cyl_l10n_2e6d648945c0",
+      "value": "The plus button sticks out of the bar; its part above the bar responds (shown in red)"
+    },
+    {
+      "name": "cyl_l10n_f43b06c12ee1",
+      "value": "The system bar has no plus button: a floating button stands in"
+    },
+    {
+      "name": "cyl_l10n_a4d0d101d6a3",
+      "value": "左上"
+    },
+    {
+      "name": "cyl_l10n_2306a585ae00",
+      "value": "cyl_itemEdgeInsets: 15% of a tab width free at each end"
+    },
+    {
+      "name": "cyl_l10n_fd15e88376df",
+      "value": "cyl_pop / cyl_push メソッドのデモ"
+    },
+    {
+      "name": "cyl_l10n_1ec113617309",
+      "value": "cyl_pushViewController, cyl_popSelectTabBarChildViewControllerAtIndex, cyl_pushOrPopToViewController"
+    },
+    {
+      "name": "cyl_l10n_ee5b6ac6461b",
+      "value": "selectedIndex とプラスボタン（issue #515）"
+    },
+    {
+      "name": "cyl_l10n_2de6d572f86b",
+      "value": "standardAppearance テーマ（Liquid Glass と FlatDesign で共通）"
+    },
+    {
+      "name": "cyl_l10n_2a0608059131",
+      "value": "すべてのタブのタイトルを一度に更新。もう一度タップで元に戻す"
+    },
+    {
+      "name": "cyl_l10n_57196013d558",
+      "value": "ハロウィン"
+    },
+    {
+      "name": "cyl_l10n_0a58c230c3d9",
+      "value": "すべてのタブのアイコンをダウンロードして更新。もう一度タップで元に戻す"
+    },
+    {
+      "name": "cyl_l10n_5e347d8ccb68",
+      "value": "ネットワークからアイコンを取得"
+    },
+    {
+      "name": "cyl_l10n_2e0e84a0dcfb",
+      "value": "基底クラスなしでナビゲーションバーを隠す（issue #535）"
+    },
+    {
+      "name": "cyl_l10n_e1642a46b804",
+      "value": "中秋節"
+    },
+    {
+      "name": "cyl_l10n_0c2817d10627",
+      "value": "中程度の触覚フィードバック"
+    },
+    {
+      "name": "cyl_l10n_0f60774903e0",
+      "value": "bundle から画像を読み込む（issue #535）"
+    },
+    {
+      "name": "cyl_l10n_0e1b02648a11",
+      "value": "ズームイン"
+    },
+    {
+      "name": "cyl_l10n_cc03f47a389c",
+      "value": "このページのタブのアイコンをネットワークから取得（キャッシュあり）。もう一度タップで元に戻す"
+    },
+    {
+      "name": "cyl_l10n_24fb8692947a",
+      "value": "保持"
+    },
+    {
+      "name": "cyl_l10n_b15d91274e9f",
+      "value": "閉じる"
+    },
+    {
+      "name": "cyl_l10n_70922c50ef07",
+      "value": "メモリ警告"
+    },
+    {
+      "name": "cyl_l10n_cbed6b29761b",
+      "value": "プラスボタン"
+    },
+    {
+      "name": "cyl_l10n_18684d72945b",
+      "value": "画像を読み込む"
+    },
+    {
+      "name": "cyl_l10n_b981b7b359a7",
+      "value": "背景画像を読み込む"
+    },
+    {
+      "name": "cyl_l10n_7136049eb4c7",
+      "value": "選択されていないタブを解放し、選択時に再読み込み"
+    },
+    {
+      "name": "cyl_l10n_c7626d7d6194",
+      "value": "このページのタブのタイトルをその場で変更。もう一度タップで元に戻す"
+    },
+    {
+      "name": "cyl_l10n_15fb093f6fff",
+      "value": "タブをその場で更新"
+    },
+    {
+      "name": "cyl_l10n_c1ecedab11bc",
+      "value": "オリジナル"
+    },
+    {
+      "name": "cyl_l10n_625fb26b4b33",
+      "value": "キャンセル"
+    },
+    {
+      "name": "cyl_l10n_d25efeb790bb",
+      "value": "近く"
+    },
+    {
+      "name": "cyl_l10n_7941d8987ff2",
+      "value": "システムの UITabBar と比較"
+    },
+    {
+      "name": "cyl_l10n_d0d78acf1941",
+      "value": "クリスマス"
+    },
+    {
+      "name": "cyl_l10n_aa91e8ceec70",
+      "value": "イースター"
+    },
+    {
+      "name": "cyl_l10n_3df20a295b39",
+      "value": "夏"
+    },
+    {
+      "name": "cyl_l10n_0ef6dae7e80c",
+      "value": "宇宙"
+    },
+    {
+      "name": "cyl_l10n_bccc798b577a",
+      "value": "中央のカプセル"
+    },
+    {
+      "name": "cyl_l10n_7c87af044929",
+      "value": "スワイプでタブを切り替え（issue #535）"
+    },
+    {
+      "name": "cyl_l10n_7a2261654d24",
+      "value": "解放済み"
+    },
+    {
+      "name": "cyl_l10n_091885db07e4",
+      "value": "バウンス"
+    },
+    {
+      "name": "cyl_l10n_758903c327de",
+      "value": "このページのタブに GIF アニメを表示。もう一度タップで元に戻す"
+    },
+    {
+      "name": "cyl_l10n_c4328f75476f",
+      "value": "バレンタインデー"
+    },
+    {
+      "name": "cyl_l10n_07b181184280",
+      "value": "マイページ"
+    },
+    {
+      "name": "cyl_l10n_a01539048bb0",
+      "value": "スイッチをオンにしてタブまたはプラスボタンを長押しすると、その識別子が表示されます。"
+    },
+    {
+      "name": "cyl_l10n_633c2ee4dcc7",
+      "value": "すべてのアイコンをネットワークから取得"
+    },
+    {
+      "name": "cyl_l10n_f75fe6720861",
+      "value": "すべてのアイコンをローカル画像に変更"
+    },
+    {
+      "name": "cyl_l10n_7fb5208a54d5",
+      "value": "すべてのタイトルを変更"
+    },
+    {
+      "name": "cyl_l10n_2f728e190695",
+      "value": "このタブの両側のタブを別のページに置き換え（issue #481）。もう一度タップで元に戻す"
+    },
+    {
+      "name": "cyl_l10n_0be5a194844c",
+      "value": "スキン"
+    },
+    {
+      "name": "cyl_l10n_61a9cd33b1ff",
+      "value": "スキン（テーマ、issue #216）"
+    },
+    {
+      "name": "cyl_l10n_09d0fdddca66",
+      "value": "スキン：祝日と配色（%@ 種類）"
+    },
+    {
+      "name": "cyl_l10n_a0ffdf359138",
+      "value": "CYLFlatDesignTabBar の高さを変更"
+    },
+    {
+      "name": "cyl_l10n_01e3254a92ba",
+      "value": "拡大して縮小"
+    },
+    {
+      "name": "cyl_l10n_d46d5bb15db1",
+      "value": "お正月"
+    },
+    {
+      "name": "cyl_l10n_79b5a6564585",
+      "value": "回転"
+    },
+    {
+      "name": "cyl_l10n_d81bb206a889",
+      "value": "なし"
+    },
+    {
+      "name": "cyl_l10n_14f433db2189",
+      "value": "基底クラス不要とユーティリティ"
+    },
+    {
+      "name": "cyl_l10n_d2339bb4edaa",
+      "value": "春節"
+    },
+    {
+      "name": "cyl_l10n_5f1de850fb46",
+      "value": "タブのタイトルを変更"
+    },
+    {
+      "name": "cyl_l10n_9d0d66f312b5",
+      "value": "より大きな画像に置き換える"
+    },
+    {
+      "name": "cyl_l10n_b051a19ace76",
+      "value": "隣のタブのページを置き換え"
+    },
+    {
+      "name": "cyl_l10n_a131e4f178aa",
+      "value": "新しいコンテンツがあります"
+    },
+    {
+      "name": "cyl_l10n_467b3e031441",
+      "value": "未読み込み"
+    },
+    {
+      "name": "cyl_l10n_2c8d9e877a54",
+      "value": "タイトルのオフセット（titlePositionAdjustment）"
+    },
+    {
+      "name": "cyl_l10n_0787cd518387",
+      "value": "メモリ警告をシミュレート"
+    },
+    {
+      "name": "cyl_l10n_6a00c1ae99fa",
+      "value": "海"
+    },
+    {
+      "name": "cyl_l10n_ff692f04ace0",
+      "value": "メッセージ"
+    },
+    {
+      "name": "cyl_l10n_41e8e8b9935c",
+      "value": "ダーク"
+    },
+    {
+      "name": "cyl_l10n_8dfe6bcdd6ec",
+      "value": "スライド遷移（CYLTabBarSlideTransitionAnimator）"
+    },
+    {
+      "name": "cyl_l10n_9f44bafc75c6",
+      "value": "スクロール時に TabBar を縮小 / 非表示（issue #13）"
+    },
+    {
+      "name": "cyl_l10n_678abebe6aac",
+      "value": "プラスボタン右上の X をタップ：X がランダムな色に変わり、プラスボタンは反応しません"
+    },
+    {
+      "name": "cyl_l10n_7375af54db2a",
+      "value": "タップしてタブとプラスボタンのタップアニメーションを切り替えます。現在：%@"
+    },
+    {
+      "name": "cyl_l10n_5378f31b520c",
+      "value": "タップして tabBar.standardAppearance を切り替え、現在：%@"
+    },
+    {
+      "name": "cyl_l10n_4a986e4da535",
+      "value": "タップしてすべてのタブタイトルの垂直オフセットを切り替え、現在：%@"
+    },
+    {
+      "name": "cyl_l10n_3d0d9d3d7cc2",
+      "value": "タップして言語を変更"
+    },
+    {
+      "name": "cyl_l10n_f4e41dda1094",
+      "value": "タップで切り替え、任意のタブまたは PlusButton をタップして確認します。触覚フィードバックは実機でのみ振動します。現在：%@"
+    },
+    {
+      "name": "cyl_l10n_15855ab96e87",
+      "value": "クリック音 + 触覚フィードバック"
+    },
+    {
+      "name": "cyl_l10n_cff8a9cded04",
+      "value": "タップしてテーマを選択：TabBar の背景・アイコン・文字色がその場で切り替わります（すべての TabBar スタイルに対応）。現在：%@"
+    },
+    {
+      "name": "cyl_l10n_1c00c4fd1cea",
+      "value": "ピンクローズ"
+    },
+    {
+      "name": "cyl_l10n_8483ed132b2c",
+      "value": "誕生日"
+    },
+    {
+      "name": "cyl_l10n_feef14745f21",
+      "value": "ローカル画像（画像名、ファイルパス、UIImage、ファイル URL）ですべてのタブのアイコンを更新。もう一度タップで元に戻す"
+    },
+    {
+      "name": "cyl_l10n_402d19e50fff",
+      "value": "ログイン"
+    },
+    {
+      "name": "cyl_l10n_833152116634",
+      "value": "画像を削除"
+    },
+    {
+      "name": "cyl_l10n_a0676a7d84a9",
+      "value": "緑のライン"
+    },
+    {
+      "name": "cyl_l10n_16068b2ff3fd",
+      "value": "ネットワークアイコン"
+    },
+    {
+      "name": "cyl_l10n_69ca6555a602",
+      "value": "フリップ"
+    },
+    {
+      "name": "cyl_l10n_4bd51044149f",
+      "value": "カスタムサウンドファイル（cyl_tabButtonTapSoundURL）"
+    },
+    {
+      "name": "cyl_l10n_beabcd498b94",
+      "value": "グレープフルーツ"
+    },
+    {
+      "name": "cyl_l10n_b8c467fce096",
+      "value": "バッジ"
+    },
+    {
+      "name": "cyl_l10n_200e65177369",
+      "value": "CYLFlatDesignTabBarItem の背景色を設定"
+    },
+    {
+      "name": "cyl_l10n_295bb704f520",
+      "value": "言語"
+    },
+    {
+      "name": "cyl_l10n_d673e0eb5c1c",
+      "value": "スーパービュー外でのタップに反応（issue #535）"
+    },
+    {
+      "name": "cyl_l10n_71bbc726ace5",
+      "value": "システムに従う"
+    },
+    {
+      "name": "cyl_l10n_d0914cf6acd2",
+      "value": "画面遷移と比較"
+    },
+    {
+      "name": "cyl_l10n_110abc875180",
+      "value": "軽い触覚フィードバック"
+    },
+    {
+      "name": "cyl_l10n_fad7c8a21fe3",
+      "value": "選択中"
+    },
+    {
+      "name": "cyl_l10n_aa05fd09a619",
+      "value": "一般"
+    },
+    {
+      "name": "cyl_l10n_15c64aa0b404",
+      "value": "設定ファイル"
+    },
+    {
+      "name": "cyl_l10n_45158907e07f",
+      "value": "強い触覚フィードバック"
+    },
+    {
+      "name": "cyl_l10n_d6982fecc6a4",
+      "value": "タブの長押し（issue #535）"
+    },
+    {
+      "name": "cyl_l10n_aefae51d3c25",
+      "value": "「%@」を長押ししました"
+    },
+    {
+      "name": "cyl_l10n_abad1baa5479",
+      "value": "長押し時間とダブルタップ間隔（issue #535 / #152）"
+    },
+    {
+      "name": "cyl_l10n_b146fc1a1531",
+      "value": "グラス"
+    },
+    {
+      "name": "cyl_l10n_db1c89e0f6e6",
+      "value": "ホーム"
+    },
+    {
+      "name": "cyl_l10n_18c63459a2c0",
+      "value": "デフォルト"
+    },
+    {
+      "name": "cyl_l10n_be354ee4263a",
+      "value": "標準のクリック音"
+    }
+  ]
+}

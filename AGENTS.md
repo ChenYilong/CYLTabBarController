@@ -11,6 +11,9 @@ When code, `docs/` and `README.md` disagree, code wins, then `docs/`. Fix the wr
 
 `.agents/skills` holds the skills; `.claude/skills` only points there.
 
+TODO: please install following docs 开发者工具 Skills
+ https://developers.weixin.qq.com/miniprogram/dev/devtools/Skills.html
+ 
 - **Project skills, `cyl-*`, maintained here. Use them:**
 
 | Skill | Use it when |
@@ -23,6 +26,8 @@ When code, `docs/` and `README.md` disagree, code wins, then `docs/`. Fix the wr
 | `cyl-api-map` | Finding the API and document for a feature |
 | `cyl-docs` | Adding a feature, editing `README.md` or `docs/` |
 | `cyl-verify` | Building, testing, running the simulator, reading common failures |
+| `cyl-harmonyos-setup` | Preparing Windows and DevEco Studio for HarmonyOS; prerequisites for installing the local emulator |
+| `cyl-harmonyos-a11y-l10n` | HarmonyOS accessibility, localization (strings from the iOS bundle) and accessibility-first UI tests |
 
 - **Third-party skills** are listed in `.agents/skills.json`, pinned in `.agents/skills.lock.json`, and vendored by `python3 scripts/sync-agent-skills.py`. Do not edit them by hand: change the manifest and sync. See [docs/Agent-Skills.md](docs/Agent-Skills.md) for what is there and why. Their advice is generic: where one conflicts with a rule here, this file and the `cyl-*` skills win. For example, they target modern Swift, while this library is Objective-C with a Swift 5 API.
 
@@ -88,6 +93,9 @@ Every new feature and user-visible change ships with bilingual documentation in 
     `accessibilityValue`. Flutter: `Semantics` (or the widgets' `semanticLabel`), `ExcludeSemantics` for decorations.
     Android: `contentDescription`, `importantForAccessibility`, `stateDescription`. iOS: `accessibilityLabel`,
     `accessibilityTraits`, `accessibilityValue`, `accessibilityElementsHidden`.
+    HarmonyOS (ArkUI, API 12): `accessibilityGroup(true)` + `accessibilityText` + `accessibilityDescription` on each
+    control, `accessibilityLevel('no')` for decorations; the selected state and role go into the description text
+    (`accessibilitySelected` is API 13 and `accessibilityRole` API 18, above the port's compatibleSdkVersion).
   - Automated tests and simulator / emulator checks drive the UI through accessibility first: find elements by their
     accessibility label or identifier (XCUITest queries, `axe describe-ui`, `uiautomator`, Flutter `find.bySemanticsLabel`,
     React Native `getByLabelText`), and fall back to coordinates only when no element can be found, then file the
@@ -224,6 +232,41 @@ Every new feature and user-visible change ships with bilingual documentation in 
   library only, so a reused build tests an old binary and its result means nothing (2026-11-09: two experiments ran
   stale code). Confirm a new symbol is in the app (`strings <app>/<binary> | grep <symbol>`) when in doubt.
 - **Simulator**: run `scripts/free-ram.sh` before every simulator use. Details and common failures: the `cyl-verify` skill.
+
+## HarmonyOS port
+
+HarmonyOS (HarmonyOS 6.0.1, API 21, DevEco Studio 6.0, ArkTS / ArkUI, code in `CrossPlatform/harmonyos-cyltabbar`) principles: the public API matches the iOS library; the example (entry) is a one-to-one replica of the iOS Objective-C Example; the internal implementation is ported from the Android Kotlin sources (`Example-Android/cyltabbar`). Progress and score: [docs/HarmonyOS-Parity.md](docs/HarmonyOS-Parity.md); remove one TODO per feature done, until the score is 100. Build from an ASCII path without spaces (hvigor refuses others), e.g. a copy at `C:cyl-hm`.
+
+**DevEco Studio setup and emulator prerequisites** (full steps: the `cyl-harmonyos-setup` skill):
+- Windows features `Microsoft-Hyper-V-All`, `Microsoft-Hyper-V-Hypervisor`, `VirtualMachinePlatform` and
+  `HypervisorPlatform` are enabled, and **Windows itself has been restarted** (restarting DevEco Studio is not enough).
+- **The region must be China.** In `%APPDATA%\Huawei\DevEcoStudio6.0\options\country.region.xml`, change any other
+  region (for example `NZ`) to China, and make sure the region file says `<countryregion name="CN"/>`. Edit it only
+  while DevEco Studio is closed (it can write the old value back on exit), then confirm `request region:CN` in
+  `%LOCALAPPDATA%\Huawei\DevEcoStudio6.0\log\idea.log` after the restart.
+- Sign in with a Huawei developer account; an account that is not Chinese Mainland and not real-name verified may
+  still be refused the emulator image. Fallback: a real HarmonyOS device through `hdc`.
+
+**HarmonyOS accessibility, localization and UI tests** (full steps: the `cyl-harmonyos-a11y-l10n` skill):
+- **All code of this project supports accessibility (screen readers such as ScreenReader / TalkBack-style blind
+  assistance and other visual assistance) and internationalization / localization, and so does the HarmonyOS code.**
+  If you find a control, a text or a page that does not, add the support first, then continue with your task.
+- Accessibility: every tab, the plus button, every list row and every button is one accessibility element with a
+  meaningful `accessibilityText` (badges are read as part of their host, e.g. "Messages, 99+ new messages") and an
+  `accessibilityDescription` (role, position, selected state, subtitle); decorations (badge views, Lottie canvases,
+  covers, overlays) use `accessibilityLevel('no')` or sit inside an `accessibilityGroup`.
+- Localization: every user-visible text goes through `CYLLocalizedString('<key>')` (or is marked with
+  `cyl_localizationKey('<key>')`). The key is the original text, the same key as iOS (`CYLLocalizedString(@"<original
+  Chinese text>")`), so the translations are copied from the iOS bundle
+  (`CYLTabBarController/Resources/CYLTabBarController.bundle/<lang>.lproj/CYLTabBarController.strings`); only the keys
+  the HarmonyOS code uses are copied. Texts only the port has go into `scripts/harmonyos-l10n.json`. Run
+  `python3 scripts/harmonyos-l10n.py` after changing texts (`--check` fails when the resources are stale); never edit
+  the generated `string.json` files or `CYLLocalizationTable.ets` by hand.
+- Automated UI tests drive the UI through these features first: locate controls by their accessibility text or
+  description (and the `id` given to every control, e.g. `cyl-tab-<identifier>`, `cyl-row-<page>-<id>`), then trigger
+  taps, long presses, swipes and multi-step flows on them (wechatide-style automation, `hdc shell uitest`, ArkUI
+  `on.text()` / `on.id()` / `on.description()` matchers). Fall back to coordinates only when no element can be found,
+  and treat that as a missing accessibility label to fix.
 
 ## Depending on CYLTabBarController
 
