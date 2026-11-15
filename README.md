@@ -1875,6 +1875,12 @@ CYLTabBar(items: items, styleType: 'liquidGlass', selectedIndex: index, badgeVal
 
 ![WeChat Mini Program, DevTools on Windows 11, base library 3.17.6: the Dark appearance with local icons, the centered capsule with network icons and star titles, FlatDesign with the green line and item backgrounds](assets/wechat-miniprogram-objc-home-rows.png)
 
+| 中文 | English |
+|:---|:---|
+| **微信小程序：上一个 / 下一个箭头、PlusButton 点击范围、替换相邻 Tab、长按与双击时长**：与 Objective-C 示例相同，◀︎ ▶︎ 调用 `cyl_switchToAdjacentTab`（不循环，显示 YES / NO）；开关以红色显示 PlusButton 的可点击区域，滑块按 1–3 倍扩大；同城变为「替换页 B」；长按时长与双击间隔三档切换。下图（微信小程序，Windows 11 开发者工具，模拟器 iPhone 12/13 Pro，基础库 3.17.6，基于 [5d86b75](https://github.com/ChenYilong/CYLTabBarController/commit/5d86b75)，2026-11-15）左：1.8 倍可点击区域与「替换页 B」Tab；右：▶︎ 进入替换页 B。进度见 [ObjC 示例复刻](docs/ObjC-Example-Parity/README.md)。 | **WeChat Mini Program: previous / next arrows, the plus button's touchable area, replaced neighboring tabs, long press and double tap timings**: as the Objective-C example, ◀︎ ▶︎ call `cyl_switchToAdjacentTab` (no wrapping, YES / NO shown); a switch shows the plus button's touchable area in red and a slider multiplies it 1–3; Nearby becomes "Replaced page B"; the long press and double tap timings cycle through three presets. Below (WeChat Mini Program, DevTools on Windows 11, simulator iPhone 12/13 Pro, base library 3.17.6, on top of [5d86b75](https://github.com/ChenYilong/CYLTabBarController/commit/5d86b75), 2026-11-15), left: the 1.8x touchable area and the "Replaced page B" tab; right: ▶︎ opened Replaced page B. Progress: [ObjC example parity](docs/ObjC-Example-Parity/README.md). |
+
+![WeChat Mini Program, DevTools on Windows 11, base library 3.17.6: the plus button's touchable area in red and the Replaced page B tab, then the pink Replaced page B](assets/wechat-miniprogram-objc-arrows-touch-replaced.png)
+
 ### [CN]在 Swift 项目中使用 CYLTabBarController
 ### [EN]Using CYLTabBarController in a Swift project
 
