@@ -1,6 +1,7 @@
 import { util } from '@kit.ArkTS';
 import { CYLTabBarItemAttributes } from './CYLTabBarItem';
 import { CYLOffset } from './CYLBadge';
+import { CYLPlusButton } from './CYLPlusButton';
 import {
   CYLTabBarConfigurationParser, CYLTabBarConfigurationFormat, CYLTabBarConfigurationError, CYLTabBarConfigurationErrorCode
 } from './CYLTabBarConfigurationParser';
@@ -11,6 +12,16 @@ import {
  * [CN] 从配置读取的 Tab：属性以及要显示的页面。
  */
 export interface CYLConfiguredTabBarItem extends CYLTabBarItemAttributes {
+  pageIdentifier?: string;
+  pageParameters?: Record<string, Object>;
+}
+
+/**
+ * [EN] The plus button read from a configuration (CYLTabBarControllerPlusButton), with the page it selects
+ *      (CYLTabBarItemPageIdentifier: the button is selectable and selects that page, as a tab's page).
+ * [CN] 从配置读取的 PlusButton（CYLTabBarControllerPlusButton），以及它选中的页面（CYLTabBarItemPageIdentifier）。
+ */
+export interface CYLConfiguredPlusButton extends CYLPlusButton {
   pageIdentifier?: string;
   pageParameters?: Record<string, Object>;
 }
@@ -28,6 +39,7 @@ export interface CYLTabBarConfigurationResult {
   unselectedColor?: string;
   backgroundColor?: string;
   themeIdentifier?: string;
+  plusButton?: CYLConfiguredPlusButton;
 }
 
 /**
@@ -117,6 +129,52 @@ export class CYLTabBarConfiguration {
     return numbers.length === count ? numbers : undefined;
   }
 
+  /**
+   * [EN] The plus button of CYLTabBarControllerPlusButton: CYLTabBarItemImage (required), CYLTabBarItemSelectedImage,
+   *      CYLTabBarItemTitle, CYLPlusButtonIndexInTabBar, CYLPlusButtonCenterYOffset, CYLPlusButtonImageSize
+   *      ("{55, 55}" or a number), CYLPlusButtonAlignsTitle, CYLTabBarItemIdentifier, CYLTabBarItemPageIdentifier and
+   *      CYLTabBarItemPageParameters; undefined without an image or outside this platform (CYLTabBarItemPlatforms).
+   * [CN] 解析 CYLTabBarControllerPlusButton：CYLTabBarItemImage（必需）及其余键；没有图片或不适用于本平台时为 undefined。
+   */
+  static plusButtonWithConfiguration(configuration: Record<string, Object>): CYLConfiguredPlusButton | undefined {
+    const raw = configuration['CYLTabBarControllerPlusButton'];
+    if (raw === null || raw === undefined || typeof raw !== 'object' || Array.isArray(raw)) {
+      return undefined;
+    }
+    const button = raw as Record<string, Object>;
+    const platforms = button['CYLTabBarItemPlatforms'];
+    if (typeof platforms === 'string' &&
+      platforms.split(',').map((p: string) => p.trim().toLowerCase()).indexOf(CYLTabBarConfiguration.platform) < 0) {
+      return undefined;
+    }
+    const imageName = button['CYLTabBarItemImage'];
+    const image = typeof imageName === 'string' ? CYLTabBarConfiguration.imageResolver(imageName) : undefined;
+    if (image === undefined) {
+      return undefined;
+    }
+    const selectedName = button['CYLTabBarItemSelectedImage'];
+    const index = Number(button['CYLPlusButtonIndexInTabBar']);
+    const offset = Number(button['CYLPlusButtonCenterYOffset']);
+    const sizeValue = button['CYLPlusButtonImageSize'];
+    const size = typeof sizeValue === 'number' ? [sizeValue, sizeValue]
+      : CYLTabBarConfiguration.numbers(sizeValue, 2, ['width', 'height']);
+    const pageIdentifier = typeof button['CYLTabBarItemPageIdentifier'] === 'string'
+      ? button['CYLTabBarItemPageIdentifier'] as string : undefined;
+    return {
+      image: image,
+      selectedImage: typeof selectedName === 'string' ? CYLTabBarConfiguration.imageResolver(selectedName) : undefined,
+      title: typeof button['CYLTabBarItemTitle'] === 'string' ? button['CYLTabBarItemTitle'] as string : undefined,
+      index: button['CYLPlusButtonIndexInTabBar'] !== undefined && Number.isInteger(index) ? index : undefined,
+      centerYOffset: button['CYLPlusButtonCenterYOffset'] !== undefined && Number.isFinite(offset) ? offset : undefined,
+      imageSize: size !== undefined ? Math.min(size[0], size[1]) : undefined,
+      alignsTitle: CYLTabBarConfiguration.boolValue(button['CYLPlusButtonAlignsTitle']),
+      identifier: typeof button['CYLTabBarItemIdentifier'] === 'string' ? button['CYLTabBarItemIdentifier'] as string : undefined,
+      selectable: pageIdentifier !== undefined,
+      pageIdentifier: pageIdentifier,
+      pageParameters: button['CYLTabBarItemPageParameters'] as Record<string, Object> | undefined,
+    };
+  }
+
   /** [EN] "1.2.3" <= "1.10" compare. [CN] 版本比较。 */
   static compareVersions(a: string, b: string): number {
     const x = a.split('.').map((p: string) => Number(p) || 0);
@@ -196,6 +254,7 @@ export class CYLTabBarConfiguration {
       unselectedColor: pick('CYLTabBarItemTitleColor'),
       backgroundColor: pick('CYLTabBarBackgroundColor'),
       themeIdentifier: typeof themeIdentifier === 'string' ? themeIdentifier : undefined,
+      plusButton: CYLTabBarConfiguration.plusButtonWithConfiguration(configuration),
     };
   }
 }
