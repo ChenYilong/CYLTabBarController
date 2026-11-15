@@ -101,6 +101,27 @@ enum CYLDemoPlaceholderAnimation: Int {
 final class CYLDemoPlaceholder: NSObject {
 
     /**
+     * [EN] `animation`, or Lottie instead of PAG on a simulator older than iOS 26. libpag draws with OpenGL ES, and on the
+     *      iOS 17.5 simulator (macOS 27.3 host, Xcode 27.2) the simulator's OpenGL shader compiler crashed as soon as a
+     *      page with PAG placeholders opened (`EXC_BAD_ACCESS` in `cvmsServerElementBuild`, queue
+     *      `com.apple.opengl.cvmDoWork`, 2026-11-16): the Objective-C demo's Nearby tab closed the app. The iOS 26.3
+     *      simulator and devices are not affected; iOS 18 to 25 simulators were not available to test, so they fall back
+     *      too. docs/PAG-Animation.md, "Known issues".
+     * [CN] 返回 `animation`；在低于 iOS 26 的模拟器上用 Lottie 代替 PAG。libpag 使用 OpenGL ES 绘制，在 iOS 17.5 模拟器上（macOS 27.3 主机、
+     *      Xcode 27.2），打开带 PAG 占位图的页面时模拟器的 OpenGL 着色器编译器立即崩溃（`cvmsServerElementBuild` 中的 `EXC_BAD_ACCESS`，
+     *      队列 `com.apple.opengl.cvmDoWork`，2026-11-16）：Objective-C 示例的「同城」Tab 会使 App 退出。iOS 26.3 模拟器与真机不受影响；
+     *      没有 iOS 18 到 25 的模拟器可供测试，因此同样回退。见 docs/PAG-Animation.md「已知问题」。
+     */
+    static func supportedAnimation(for animation: CYLDemoPlaceholderAnimation) -> CYLDemoPlaceholderAnimation {
+        #if targetEnvironment(simulator)
+        if animation == .pag, ProcessInfo.processInfo.operatingSystemVersion.majorVersion < 26 {
+            return .lottie
+        }
+        #endif
+        return animation
+    }
+
+    /**
      * [EN] Installs refresh, placeholders and the offline bar on `scrollView`, shown by `viewController`, with the
      *      animations of `animation`. `refresh` loads the data and calls its completion; without it, a refresh reloads the
      *      list after a short delay. A header the list already has is replaced by an animation header with its block.
@@ -111,6 +132,7 @@ final class CYLDemoPlaceholder: NSObject {
     static func install(on scrollView: UIScrollView, in viewController: UIViewController,
                         animation: CYLDemoPlaceholderAnimation = .lottie,
                         refresh: ((@escaping () -> Void) -> Void)? = nil) {
+        let animation = supportedAnimation(for: animation)
         CYLPlaceholderNetworkMonitor.shared.startMonitoring()
         installPlaceholder(on: scrollView, animation: animation)
         // [EN] Launch argument `-CYLDemoHoldRefresh YES` (screenshots, UI tests): every list starts refreshing and stays
@@ -202,6 +224,7 @@ final class CYLDemoPlaceholder: NSObject {
      */
     @objc(placeholderViewWithAnimation:)
     static func placeholderView(animation: CYLDemoPlaceholderAnimation) -> UIView {
+        let animation = supportedAnimation(for: animation)
         if CYLPlaceholderNetworkMonitor.shared.networkStatus == .notReachable {
             return CYLPlaceholderView(style: .noInternet, message: .noInternet)
         }

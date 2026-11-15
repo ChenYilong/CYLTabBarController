@@ -236,6 +236,9 @@ docs/
 │   ├── pag-classic.png
 │   ├── pag-flat-design.png
 │   ├── pag-liquid-glass.png
+│   ├── pag-nearby-ios17-simulator-crash.png
+│   ├── pag-nearby-ios17-simulator-fixed.png
+│   ├── pag-nearby-ios26-simulator.png
 │   ├── per-tab-animation-pag-ios.png
 │   ├── plus-button-first-display-fixed-ios.png
 │   ├── plus-button-first-display-glitch-ios.jpg
