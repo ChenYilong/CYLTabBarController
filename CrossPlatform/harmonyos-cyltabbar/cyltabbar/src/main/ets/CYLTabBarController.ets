@@ -1,5 +1,6 @@
 import { CYLTabBarItemAttributes } from './CYLTabBarItem';
 import { CYLPlusButton } from './CYLPlusButton';
+import { CYLBadge, CYLBadgeView } from './CYLBadge';
 
 /**
  * [EN] One place of the bar: a tab (tabIndex >= 0) or the plus button (tabIndex -1).
@@ -36,8 +37,10 @@ export struct CYLTabBarController {
   tabBarItemsAttributes: CYLTabBarItemAttributes[] = [];
   plusButton?: CYLPlusButton;
   @Link selectedIndex: number;
-  @Prop badgeValues: string[] = [];
-  @Prop plusButtonBadgeValue: string = '';
+  /** [EN] The badge of each tab (-[UIView cyl_showBadgeValue:] on its tab button); created when unset. [CN] 每个 Tab 的角标；未设置时自动创建。 */
+  @State badges: CYLBadge[] = [];
+  /** [EN] The plus button's badge. [CN] 加号按钮的角标。 */
+  @State plusButtonBadge: CYLBadge = new CYLBadge();
   @Prop tabBarHidden: boolean = false;
   tintColor: ResourceColor = '#FF8000';
   unselectedColor: ResourceColor = '#808080';
@@ -58,6 +61,9 @@ export struct CYLTabBarController {
 
   aboutToAppear(): void {
     this.loaded = [this.selectedIndex];
+    while (this.badges.length < this.tabBarItemsAttributes.length) {
+      this.badges.push(new CYLBadge());
+    }
   }
 
   /**
@@ -104,23 +110,6 @@ export struct CYLTabBarController {
   }
 
   @Builder
-  cylBadge(value: string) {
-    if (value.length > 0) {
-      Text(value === '•' ? '' : value)
-        .fontSize(11)
-        .fontColor(Color.White)
-        .backgroundColor('#FF3B30')
-        .borderRadius(9)
-        .constraintSize({ minWidth: value === '•' ? 8 : 18 })
-        .height(value === '•' ? 8 : 18)
-        .padding({ left: value === '•' ? 0 : 5, right: value === '•' ? 0 : 5 })
-        .textAlign(TextAlign.Center)
-        .position({ x: '55%', y: value === '•' ? 2 : -2 })
-        .id(`cyl-badge-${value}`)
-    }
-  }
-
-  @Builder
   cylTab(index: number) {
     Column() {
       Stack() {
@@ -130,9 +119,11 @@ export struct CYLTabBarController {
           .width(this.imageSize)
           .height(this.imageSize)
           .objectFit(ImageFit.Contain)
+        CYLBadgeView({ badge: this.badges[index], anchorWidth: this.imageSize })
       }
-      .width('100%')
+      .width(this.imageSize)
       .height(this.imageSize)
+      .alignContent(Alignment.TopStart)
 
       if (this.tabBarItemsAttributes[index].title !== undefined) {
         Text(this.selectedIndex === index
@@ -142,7 +133,6 @@ export struct CYLTabBarController {
           .margin({ top: 3 })
           .fontColor(this.selectedIndex === index ? this.tintColor : this.unselectedColor)
       }
-      this.cylBadge(this.badgeValues[index] ?? '')
     }
     .layoutWeight(1)
     .height('100%')
@@ -160,7 +150,7 @@ export struct CYLTabBarController {
           .width(this.plusButton?.imageSize ?? 54)
           .height(this.plusButton?.imageSize ?? 54)
           .objectFit(ImageFit.Contain)
-        this.cylBadge(this.plusButtonBadgeValue)
+        CYLBadgeView({ badge: this.plusButtonBadge, anchorWidth: this.plusButton?.imageSize ?? 54 })
       }
       .offset({ y: this.plusButton?.centerYOffset ?? 0 })
 
