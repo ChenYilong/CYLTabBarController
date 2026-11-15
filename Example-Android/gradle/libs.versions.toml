@@ -12,6 +12,7 @@ junit = "4.13.2"
 lottie = "6.6.2"
 libpag = "4.5.98"
 rive = "10.3.0"
+svgaplayer = "2.6.1"
 androidx-test-core = "1.6.1"
 viewpager2 = "1.0.0"
 
@@ -25,6 +26,7 @@ junit = { module = "junit:junit", version.ref = "junit" }
 lottie = { module = "com.airbnb.android:lottie", version.ref = "lottie" }
 libpag = { module = "com.tencent.tav:libpag", version.ref = "libpag" }
 rive = { module = "app.rive:rive-android", version.ref = "rive" }
+svgaplayer = { module = "com.github.yyued:SVGAPlayer-Android", version.ref = "svgaplayer" }
 androidx-test-core = { module = "androidx.test:core", version.ref = "androidx-test-core" }
 androidx-viewpager2 = { module = "androidx.viewpager2:viewpager2", version.ref = "viewpager2" }
 

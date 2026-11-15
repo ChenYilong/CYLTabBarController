@@ -91,6 +91,14 @@ public final class CYLConstants {
     public static final String CYLTabBarGIFDarkURL = "CYLTabBarGIFDarkURL";
     public static final String CYLTabBarGIFDarkFilePath = "CYLTabBarGIFDarkFilePath";
     /**
+     * [EN] SVGA keys (#415, CYLSVGATabBarItemAnimator.h): an SVGA file plays once when its tab is selected (SVGAPlayer-Android). [CN] SVGA 键（#415）：选中 Tab 时播放一次（SVGAPlayer-Android）。
+     */
+    public static final String CYLTabBarSVGAURL = "CYLTabBarSVGAURL";
+    public static final String CYLTabBarSVGAFilePath = "CYLTabBarSVGAFilePath";
+    public static final String CYLTabBarSVGASize = "CYLTabBarSVGASize";
+    public static final String CYLTabBarSVGADarkURL = "CYLTabBarSVGADarkURL";
+    public static final String CYLTabBarSVGADarkFilePath = "CYLTabBarSVGADarkFilePath";
+    /**
      * [EN] Rive options of `CYLTabBarAnimationURLWithOptions()` (CYLRiveTabBarItemAnimator.h); every value is a string. [CN] `CYLTabBarAnimationURLWithOptions()` 的 Rive 选项；值都是字符串。
      */
     public static final String CYLTabBarAnimationOptionRiveArtboard = "artboard";

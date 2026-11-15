@@ -387,6 +387,15 @@ class BellPage : TitledPage("Bell") {
                 textSize = 17f; setTypeface(typeface, Typeface.BOLD); setTextColor(Color.rgb(0, 122, 255)); setPadding(0, context.dp(12f), 0, 0)
                 setOnClickListener { isOn = !isOn; if (isOn) menuButton.play() else menuButton.stop() }
             })
+            // [EN] Issue #415: switches the tab icons between Rive, SVGA keys and the SVGA configuration file, and rebuilds the tab bar. [CN] Issue #415：在 Rive、SVGA key 与 SVGA 配置文件之间切换 Tab 图标，并重建 TabBar。
+            val activity = requireActivity() as? com.cyl.tabbar.demo.DemoTabBarActivity
+            val source = activity?.let { CYLDemoTabIconSource.current(it) } ?: CYLDemoTabIconSource.Rive
+            addView(context.text("Tab icons: " + source.title).apply {
+                textSize = 15f; setTextColor(Color.rgb(0, 122, 255)); setPadding(0, context.dp(12f), 0, 0)
+                contentDescription = "Tab icons: " + source.title + ". Double tap to use " + source.next.title
+                tag = "tab-icon-source"
+                setOnClickListener { CYLDemoTabIconSource.save(context, source.next); activity?.showTabBarController() }
+            })
         }
         if (savedInstanceState == null) childFragmentManager.beginTransaction().add(list.id, DemoListFragment.newInstance(DemoCatalog.SETTINGS)).commit()
         return LinearLayout(context).apply {
