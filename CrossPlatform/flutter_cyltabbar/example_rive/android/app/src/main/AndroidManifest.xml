@@ -5,7 +5,7 @@
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
         android:allowBackup="false"
-        tools:replace="android:allowBackup"
+        tools:replace="android:allowBackup,android:label"
         android:usesCleartextTraffic="false">
         <activity
             android:name=".MainActivity"
