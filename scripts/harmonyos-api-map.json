@@ -64,5 +64,20 @@
   "CYLTabBarLottieSize": "`CYLTabBarItemAttributes.lottieSize` (built; emulator check pending / 已编译，模拟器验证待做)",
   "CYLTabBarControllerTabBarItemAnimationSpeed": "`CYLTabBarController.tabBarItemAnimationSpeed` (built; emulator check pending / 已编译，模拟器验证待做)",
   "UIControl(CYLTabBarControllerExtention) -cyl_coverVisiableTabImageViewOrTabButton:newView:offset:show:delayIfNeededForSeconds:completion:": "`CYLTabBarController.tabCoverImages` (built; emulator check pending / 已编译，模拟器验证待做)",
-  "UIControl(CYLTabBarControllerExtention) -cyl_coverVisiableTabImageViewOrTabButton:contentNewView:seclectContentNewView:offset:show:delayIfNeededForSeconds:completion:": "`CYLTabBarController.tabCoverImages` (built; emulator check pending / 已编译，模拟器验证待做)"
+  "UIControl(CYLTabBarControllerExtention) -cyl_coverVisiableTabImageViewOrTabButton:contentNewView:seclectContentNewView:offset:show:delayIfNeededForSeconds:completion:": "`CYLTabBarController.tabCoverImages` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarConfigurationFormat": "`CYLTabBarConfigurationFormat` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarConfigurationErrorDomain": "`CYLTabBarConfigurationErrorDomain` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarConfigurationErrorCode": "`CYLTabBarConfigurationErrorCode` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarConfigurationMaximumLength": "`CYLTabBarConfigurationMaximumLength` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarConfigurationMaximumDepth": "`CYLTabBarConfigurationMaximumDepth` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarConfigurationParser": "`CYLTabBarConfigurationParser` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarConfigurationParser +formatForPathExtension:": "`CYLTabBarConfigurationParser.formatForPathExtension()` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarConfigurationParser +formatForMIMEType:": "`CYLTabBarConfigurationParser.formatForMIMEType()` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarConfigurationParser +dictionaryWithData:format:error:": "`CYLTabBarConfigurationParser.configurationWithString(text, format)` — JSON, JSON5 / JSONC so far (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarConfigurationParser +dictionaryWithContentsOfFile:error:": "`CYLTabBarConfiguration.configurationWithRawFile(context, path)` — JSON, JSON5 / JSONC so far (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarItemTitlePositionAdjustment": "`CYLTabBarItemAttributes.titlePositionAdjustment` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarControllerTitlePositionAdjustment": "`CYLTabBarController.titlePositionAdjustment` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarControllerContext": "`CYLTabBarConfigurationResult.context` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarController +tabBarControllerWithConfiguration:": "`CYLTabBarConfiguration.resultWithConfiguration() + CYLTabBarController` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarController -initWithConfiguration:": "`CYLTabBarConfiguration.resultWithConfiguration() + CYLTabBarController` (built; emulator check pending / 已编译，模拟器验证待做)"
 }

@@ -1,4 +1,4 @@
-import { promptAction } from '@kit.ArkUI';
+import { promptAction, router } from '@kit.ArkUI';
 import {
   CYLTabBarController, CYLTabBarItemAttributes, CYLPlusButton, CYLPlusButtonPageIndex, CYLBadge, CYLBadgeAppearance,
   CYLBadgeAnimationType
@@ -91,7 +91,23 @@ struct Index {
         .backgroundColor('#F8F8F8')
         .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP])
         .id(`cyl-nav-title-${identifier}`)
-      Column()
+      Column() {
+        if (identifier === 'home') {
+          // [EN] Home rows (more follow, docs/HarmonyOS-Parity.md). Item 43: create from a configuration file.
+          // [CN] 首页行（后续补齐）。第 43 项：由配置文件创建。
+          ForEach(['json', 'json5', 'jsonc'], (format: string) => {
+            Text(`由配置文件创建 TabBarController (.${format}) / Create from a configuration file`)
+              .fontSize(15)
+              .width('100%')
+              .padding(14)
+              .border({ width: { bottom: 0.5 }, color: { bottom: '#E5E5E5' } })
+              .id(`cyl-row-configuration-${format}`)
+              .onClick(() => {
+                router.pushUrl({ url: 'pages/ConfigurationDemo', params: { file: `configurations/cyl_tabbar_configuration.${format}` } });
+              })
+          }, (format: string) => format)
+        }
+      }
         .layoutWeight(1)
         .width('100%')
         .id(`cyl-page-${identifier}`)

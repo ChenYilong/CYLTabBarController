@@ -1,4 +1,4 @@
-import { CYLTabBarItemAttributes } from './CYLTabBarItem';
+import { CYLTabBarItemAttributes, CYLTitleOffset } from './CYLTabBarItem';
 import { CYLPlusButton } from './CYLPlusButton';
 import { CYLBadge, CYLBadgeView } from './CYLBadge';
 import { CYLLottieIcon } from './CYLLottieIcon';
@@ -48,6 +48,8 @@ export struct CYLTabBarController {
   plusButtonTitleSelectedColor?: ResourceColor;
   tabBarBackgroundColor: ResourceColor = '#F8F8F8';
   tabBarHeight: number = 49;
+  /** [EN] CYLTabBarControllerTitlePositionAdjustment (vp); an item's own adjustment wins. [CN] 全部标题的位置偏移；Tab 自己的偏移优先。 */
+  titlePositionAdjustment: CYLTitleOffset = { horizontal: 0, vertical: 0 };
   /** [EN] CYLTabBarControllerTabBarItemAnimationSpeed (Lottie). [CN] Lottie 动画速度。 */
   tabBarItemAnimationSpeed: number = 1;
   /**
@@ -164,6 +166,10 @@ export struct CYLTabBarController {
           .fontSize(10)
           .margin({ top: 3 })
           .fontColor(this.selectedIndex === index ? this.tintColor : this.unselectedColor)
+          .offset({
+            x: (this.tabBarItemsAttributes[index].titlePositionAdjustment ?? this.titlePositionAdjustment).horizontal,
+            y: (this.tabBarItemsAttributes[index].titlePositionAdjustment ?? this.titlePositionAdjustment).vertical,
+          })
       }
       }
     }

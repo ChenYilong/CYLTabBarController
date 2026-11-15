@@ -1,3 +1,5 @@
+import { CYLOffset } from './CYLBadge';
+
 /**
  * [EN] The attributes of one tab, the CYLTabBarItem* keys of the iOS library (CYLTabBarController.h) as typed fields:
  *      CYLTabBarItemTitle -> title, CYLTabBarItemSelectedTitle -> selectedTitle, CYLTabBarItemImage -> image,
@@ -23,7 +25,12 @@ export interface CYLTabBarItemAttributes {
   lottieFilePath?: string;
   /** [EN] CYLTabBarLottieSize (vp); the image size when unset. [CN] Lottie 尺寸（vp）；未设置时用图片尺寸。 */
   lottieSize?: number;
+  /** [EN] CYLTabBarItemTitlePositionAdjustment (vp). [CN] 标题位置偏移（vp）。 */
+  titlePositionAdjustment?: CYLTitleOffset;
 }
+
+/** [EN] UIOffset (CYLOffset). [CN] 偏移。 */
+export type CYLTitleOffset = CYLOffset;
 
 /**
  * [EN] The keys of the iOS library, for code that keeps the attributes as dictionaries (CYLTabBarItem* constants).
