@@ -324,6 +324,14 @@ function cylDemoConfiguration(overrides, skin) {
   delete configurationOverrides.cylDemoItemAttributes;
   delete configurationOverrides.cylDemoPlusAttributes;
   delete configurationOverrides.cylDemoTouchableArea;
+  delete configurationOverrides.cylDemoTapStep;
+  delete configurationOverrides.cylDemoSoundStep;
+  // [EN] An override set to undefined leaves the default. [CN] 设为 undefined 的覆盖项保留默认值。
+  Object.keys(configurationOverrides).forEach((key) => {
+    if (configurationOverrides[key] === undefined) {
+      delete configurationOverrides[key];
+    }
+  });
   delete configurationOverrides.cylDemoReplaced;
   delete configurationOverrides.cylDemoUpdates;
   delete configurationOverrides.cylDemoAppearance;

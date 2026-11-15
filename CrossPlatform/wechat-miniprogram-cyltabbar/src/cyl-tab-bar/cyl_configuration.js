@@ -24,7 +24,7 @@ const CYL_STYLE_TYPES = ['default', 'system', 'flatDesign', 'liquidGlass'];
  * [EN] Tap animations of `CYLTabBarControllerTabButtonTapAnimation`.
  * [CN] `CYLTabBarControllerTabButtonTapAnimation` 的点击动画。
  */
-const CYL_TAP_ANIMATIONS = ['none', 'scale', 'zoomIn', 'bounce', 'bounceWithFireworks', 'rotation', 'flip', 'fume'];
+const CYL_TAP_ANIMATIONS = ['none', 'scale', 'zoomIn', 'bounce', 'bounceWithFireworks', 'rotation', 'flip', 'fume', 'frames'];
 
 /**
  * [EN] Theme value keys the component applies to the whole bar.
@@ -198,7 +198,7 @@ function cylImagePath(route, environment) {
   if (value.startsWith('system:')) {
     return (environment.symbols || {})[value.slice('system:'.length)] || '';
   }
-  if (/^https?:\/\//.test(value) || value.startsWith('/')) {
+  if (/^(https?:\/\/|data:)/.test(value) || value.startsWith('/')) {
     return value;
   }
   const base = environment.imageBasePath || '';
@@ -637,7 +637,10 @@ function cylReadConfiguration(configuration, environment) {
   const attributesList = cylArray(source.CYLTabBarControllerTabBarItemsAttributes) || [];
   const items = attributesList
     .filter((attributes) => attributes && typeof attributes === 'object' && cylIsItemEligible(attributes, env))
-    .map((attributes) => cylItem(attributes, themedEnvironment, theme, defaults));
+    .map((attributes) => Object.assign(cylItem(attributes, themedEnvironment, theme, defaults), {
+      // [EN] viewController.cyl_tabButtonAnimation: this tab's own tap animation. [CN] 本 Tab 自己的点击动画。
+      tapAnimation: CYL_TAP_ANIMATIONS.includes(attributes.CYLTabBarItemTabButtonTapAnimation) ? attributes.CYLTabBarItemTabButtonTapAnimation : '',
+    }));
   const styleValue = source.CYLTabBarControllerStyleType;
   const styleType = typeof styleValue === 'number' ? CYL_STYLE_TYPES[styleValue] : styleValue;
   const tapAnimation = source.CYLTabBarControllerTabButtonTapAnimation;
@@ -652,7 +655,21 @@ function cylReadConfiguration(configuration, environment) {
     plusButton: cylPlusButton(source, themedEnvironment, theme, defaults, items.length),
     styleType: CYL_STYLE_TYPES.includes(styleType) ? styleType : 'default',
     tapAnimation: CYL_TAP_ANIMATIONS.includes(tapAnimation) ? tapAnimation : 'none',
-    animationDuration: Math.round(400 / (Number.isFinite(speed) && speed > 0 ? speed : 1)),
+    // [EN] CYLTabButtonAnimation.duration: 0.5 s by default (CYLTabBarControllerTabButtonTapAnimationDuration).
+    // [CN] CYLTabButtonAnimation.duration：默认 0.5 秒（CYLTabBarControllerTabButtonTapAnimationDuration）。
+    animationDuration: Math.round(cylPositive(source.CYLTabBarControllerTabButtonTapAnimationDuration, 0.5) * 1000
+      / (Number.isFinite(speed) && speed > 0 ? speed : 1)),
+    // [EN] Fireworks after the animation (playsFireworks; on for bounceWithFireworks and frames), optionally an image
+    //      (fireworksImage), and the flip direction (1 left, 2 right, 3 top, 4 bottom, 5 curl up, 6 curl down).
+    // [CN] 动画后的烟花（playsFireworks；bounceWithFireworks 与 frames 默认开启），可选图片（fireworksImage），以及翻转方向
+    //      （1 左、2 右、3 上、4 下、5 向上卷页、6 向下卷页）。
+    playsFireworks: cylBool(source.CYLTabBarControllerTabButtonPlaysFireworks, tapAnimation === 'bounceWithFireworks' || tapAnimation === 'frames'),
+    fireworksImage: cylImagePath(source.CYLTabBarControllerTabButtonFireworksImage, env),
+    flipDirection: Math.min(6, Math.max(1, parseInt(source.CYLTabBarControllerTabButtonFlipDirection, 10) || 1)),
+    // [EN] cyl_tabButtonTapSoundURL and the haptic style (light, medium, heavy) of a tab tap (issue #535).
+    // [CN] Tab 点击的声音文件（cyl_tabButtonTapSoundURL）与触感风格（light、medium、heavy）（issue #535）。
+    tapSoundURL: cylImagePath(source.CYLTabBarControllerTabButtonTapSoundURL, env),
+    tapHapticStyle: ['light', 'medium', 'heavy'].includes(source.CYLTabBarControllerTabButtonTapHapticStyle) ? source.CYLTabBarControllerTabButtonTapHapticStyle : '',
     swipeToSwitchTab: cylBool(source.CYLTabBarControllerSwipeToSwitchTab, false),
     // [EN] cyl_tabBarItemLongPressDuration (0.5 s) and cyl_tabBarItemDoubleTapInterval (0.35 s), issue #535 / #152.
     // [CN] 长按时长（0.5 秒）与双击间隔（0.35 秒），issue #535 / #152。

@@ -292,6 +292,7 @@ Component({
           + (model.shadowColor ? `border-top-color: ${model.shadowColor};` : ''),
         cylThemeIdentifier: model.themeIdentifier,
         cylTapAnimation: model.tapAnimation,
+        cylFlipDirection: model.flipDirection,
         cylAnimationStyle: `animation-duration: ${model.animationDuration}ms;`,
         cylAnimationDuration: model.animationDuration,
       }, () => this.cyl_syncLottie(selected));
@@ -588,6 +589,7 @@ Component({
         return;
       }
       this.cyl_playTapAnimation(key);
+      this.cyl_playTabButtonTapFeedback();
       if (isPlusButton && !plus.hasPage) {
         this.triggerEvent('plustap', detail);
         return;
@@ -608,14 +610,84 @@ Component({
      * [CN] 在被点击的项上播放 CYLTabBarControllerTabButtonTapAnimation。
      */
     cyl_playTapAnimation(key) {
-      if (this.data.cylTapAnimation === 'none') {
+      const model = this.cylModel;
+      if (!model) {
+        return;
+      }
+      const item = model.items.find((candidate) => candidate.identifier === key);
+      // [EN] A tab's own animation wins (viewController.cyl_tabButtonAnimation). [CN] Tab 自己的动画优先。
+      const name = (item && item.tapAnimation) || model.tapAnimation;
+      if (!name || name === 'none') {
         return;
       }
       clearTimeout(this.cylAnimationTimer);
-      this.setData({ cylAnimatingIdentifier: '' }, () => {
-        this.setData({ cylAnimatingIdentifier: key });
-        this.cylAnimationTimer = setTimeout(() => this.setData({ cylAnimatingIdentifier: '' }), 1000);
+      const fireworks = model.playsFireworks && (!item || !item.tapAnimation) ? this.cyl_fireworks(key) : null;
+      this.setData({ cylAnimatingIdentifier: '', cylFireworks: null }, () => {
+        this.setData({ cylAnimatingIdentifier: key, cylAnimatingName: name, cylFireworks: fireworks });
+        this.cylAnimationTimer = setTimeout(() => this.setData({ cylAnimatingIdentifier: '', cylFireworks: null }),
+          model.animationDuration + (fireworks ? 900 : 100));
       });
+    },
+
+    /**
+     * [EN] Plays the tap animation once on the selected tab (the Home row plays a new animation this way).
+     * [CN] 在选中的 Tab 上播放一次点击动画（首页行以此展示新的动画）。
+     */
+    cyl_playSelectedTapAnimation() {
+      const model = this.cylModel;
+      const key = this.data.selectedIdentifier || (model && model.items[0] ? model.items[0].identifier : '');
+      this.cyl_playTapAnimation(key);
+    },
+
+    /**
+     * [EN] The fireworks of CYLTabButtonAnimation (playsFireworks): 10 particles in the icon's selected color (or the
+     *      fireworks image) that gather on the icon after the animation, then burst out.
+     * [CN] CYLTabButtonAnimation 的烟花（playsFireworks）：10 个使用图标选中颜色（或烟花图片）的粒子，动画后聚到图标上，然后散开。
+     */
+    cyl_fireworks(key) {
+      const model = this.cylModel;
+      const plus = model.plusButton;
+      const item = plus && key === (plus.identifier || 'cyl-plus-button') ? plus : model.items.find((candidate) => candidate.identifier === key);
+      const color = (item && (item.selectedIconTint || item.selectedTitleColor)) || '#FF9500';
+      const delay = model.animationDuration;
+      return {
+        key,
+        image: model.fireworksImage,
+        particles: Array.from({ length: 10 }, (unused, index) => {
+          const angle = (index / 10) * Math.PI * 2;
+          const dx = Math.round(Math.cos(angle) * 26);
+          const dy = Math.round(Math.sin(angle) * 26);
+          return { index, style: `--cyl-dx: ${dx}px; --cyl-dy: ${dy}px; animation-delay: ${delay}ms;${model.fireworksImage ? '' : ` background-color: ${color};`}` };
+        }),
+      };
+    },
+
+    /**
+     * [EN] cyl_playTabButtonTapFeedback: the tap sound (CYLTabBarControllerTabButtonTapSoundURL) and the haptic
+     *      (CYLTabBarControllerTabButtonTapHapticStyle; a phone vibrates, DevTools does not).
+     * [CN] cyl_playTabButtonTapFeedback：点击声音（CYLTabBarControllerTabButtonTapSoundURL）与触感
+     *      （CYLTabBarControllerTabButtonTapHapticStyle；真机振动，开发者工具不振动）。
+     */
+    cyl_playTabButtonTapFeedback() {
+      const model = this.cylModel;
+      if (!model) {
+        return;
+      }
+      if (model.tapHapticStyle && typeof wx.vibrateShort === 'function') {
+        wx.vibrateShort({ type: model.tapHapticStyle });
+      }
+      if (model.tapSoundURL && typeof wx.createInnerAudioContext === 'function') {
+        if (!this.cylTapSound || this.cylTapSoundURL !== model.tapSoundURL) {
+          if (this.cylTapSound) {
+            this.cylTapSound.destroy();
+          }
+          this.cylTapSound = wx.createInnerAudioContext();
+          this.cylTapSound.src = model.tapSoundURL;
+          this.cylTapSoundURL = model.tapSoundURL;
+        }
+        this.cylTapSound.stop();
+        this.cylTapSound.play();
+      }
     },
 
     /**

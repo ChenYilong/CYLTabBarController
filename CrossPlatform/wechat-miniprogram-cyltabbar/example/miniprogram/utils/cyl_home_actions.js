@@ -8,6 +8,38 @@
 const { t } = require('./cyl_demo_localization');
 const { CYL_APPEARANCES } = require('./cyl_demo_updates');
 
+/**
+ * [EN] Item 33: the 14 steps of the tap animation row (CYLSettingsDemoRows.swift) as configuration keys.
+ * [CN] 第 33 项：点击动画行的 14 步（CYLSettingsDemoRows.swift），以配置键表示。
+ */
+const CYL_STAR = `data:image/svg+xml;utf8,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.6 7L12 17.3 5.8 20.9l1.6-7L2 9.2l7.1-.6z" fill="#FFCC00"/></svg>')}`;
+const CYL_TAP_STEPS = [
+  { name: 'None', animation: 'none' },
+  { name: 'Scale up and down', animation: 'scale' },
+  { name: 'Zoom in', animation: 'zoomIn' },
+  { name: 'Bounce', animation: 'bounce' },
+  { name: 'Bounce + fireworks', animation: 'bounceWithFireworks' },
+  { name: 'Rotate', animation: 'rotation' },
+  { name: 'Flip', animation: 'flip' },
+  { name: 'Fume', animation: 'fume' },
+  { name: 'Rotate (this tab only: viewController.cyl_tabButtonAnimation)', animation: 'none', thisTab: 'rotation' },
+  { name: 'Frames + fireworks (all tabs: cyl_defaultTabButtonAnimation)', animation: 'frames' },
+  { name: 'Slow scale up and down (CYLTabButtonScaleAnimation.duration = 1.2)', animation: 'scale', duration: 1.2 },
+  { name: 'Slow zoom in (CYLTabButtonZoomInAnimation.duration = 1.2)', animation: 'zoomIn', duration: 1.2 },
+  { name: 'Bounce + star fireworks (CYLTabButtonBounceAnimation.fireworksImage)', animation: 'bounceWithFireworks', fireworksImage: CYL_STAR },
+  { name: 'Curl up, no deselect animation (CYLTabButtonFlipAnimation.direction = 5)', animation: 'flip', direction: 5 },
+];
+// [EN] Item 33: the 7 steps of the tap sound and haptics row. [CN] 第 33 项：点击声音与触感行的 7 步。
+const CYL_SOUND_STEPS = [
+  { name: 'None' },
+  { name: 'Default click', sound: '/shared/sounds/cyl_tap_click.wav' },
+  { name: 'Custom sound file (cyl_tabButtonTapSoundURL)', sound: '/shared/sounds/cyl_tap_tock.wav' },
+  { name: 'Light haptic', haptic: 'light' },
+  { name: 'Medium haptic', haptic: 'medium' },
+  { name: 'Heavy haptic', haptic: 'heavy' },
+  { name: 'Click + haptic', sound: '/shared/sounds/cyl_tap_click.wav', haptic: 'medium' },
+];
+
 // [EN] Item 13: the vertical title offsets the row cycles through (CYLSettingsDemoRows.swift). [CN] 第 13 项：本行依次切换的标题垂直偏移。
 const CYL_TITLE_OFFSETS = [0, -4, 4];
 // [EN] Item 16: CYLTabBarMinimizeBehavior, in the row's order. [CN] 第 16 项：CYLTabBarMinimizeBehavior，按本行顺序。
@@ -155,13 +187,51 @@ const CYL_HOME_ACTIONS = {
     setTimeout(() => context.override({ cylDemoPlusAttributes: undefined }), 1500);
     context.toast(t('The plus image arrives in 1.5 s'));
   },
-  tapSound: (context) => {
-    const on = !context.state().tapFeedback;
-    context.update({ tapFeedback: on });
-    if (on) {
-      wx.vibrateShort({ type: 'light' });
+  // [EN] Item 33: the next of the 14 animations, played once on the selected tab. [CN] 第 33 项：切换到下一个动画，并在选中 Tab 上播放一次。
+  tapAnimation: (context) => {
+    const step = ((context.overrides().cylDemoTapStep || 0) + 1) % CYL_TAP_STEPS.length;
+    const entry = CYL_TAP_STEPS[step];
+    const bar = context.tabBar();
+    const selected = bar ? (bar.data.cylSlots.find((slot) => slot.selected) || {}).key : '';
+    const attributes = Object.assign({}, context.overrides().cylDemoItemAttributes);
+    Object.keys(attributes).forEach((identifier) => {
+      const changed = Object.assign({}, attributes[identifier]);
+      delete changed.CYLTabBarItemTabButtonTapAnimation;
+      attributes[identifier] = changed;
+    });
+    if (entry.thisTab && selected) {
+      attributes[selected] = Object.assign({}, attributes[selected], { CYLTabBarItemTabButtonTapAnimation: entry.thisTab });
     }
-    context.toast(t(on ? 'Haptics on every tab tap' : 'Haptics off'));
+    context.override({
+      cylDemoTapStep: step,
+      cylDemoItemAttributes: attributes,
+      CYLTabBarControllerTabButtonTapAnimation: step === 0 ? undefined : entry.animation,
+      CYLTabBarControllerTabButtonTapAnimationDuration: entry.duration,
+      CYLTabBarControllerTabButtonFireworksImage: entry.fireworksImage,
+      CYLTabBarControllerTabButtonFlipDirection: entry.direction,
+    });
+    setTimeout(() => {
+      const current = context.tabBar();
+      if (current) {
+        current.cyl_playSelectedTapAnimation();
+      }
+    }, 300);
+  },
+  // [EN] Item 33: the next of the 7 sound and haptic steps, played once at once. [CN] 第 33 项：切换到下一步，并立即播放一次。
+  tapSound: (context) => {
+    const step = ((context.overrides().cylDemoSoundStep || 0) + 1) % CYL_SOUND_STEPS.length;
+    const entry = CYL_SOUND_STEPS[step];
+    context.override({
+      cylDemoSoundStep: step,
+      CYLTabBarControllerTabButtonTapSoundURL: entry.sound,
+      CYLTabBarControllerTabButtonTapHapticStyle: entry.haptic,
+    });
+    setTimeout(() => {
+      const bar = context.tabBar();
+      if (bar) {
+        bar.cyl_playTabButtonTapFeedback();
+      }
+    }, 300);
   },
   // [EN] Item 37: the row does nothing; its arrows call cyl_switchToAdjacentTab (pages/home cyl_onArrow). [CN] 第 37 项：点击该行无效果；由箭头调用（pages/home 的 cyl_onArrow）。
   adjacentTab: () => {},
@@ -175,4 +245,4 @@ function cylHomeAction(id) {
   return CYL_HOME_ACTIONS[id] || ((context) => context.open(id));
 }
 
-module.exports = { cylHomeAction, CYL_HOME_ACTIONS };
+module.exports = { cylHomeAction, CYL_HOME_ACTIONS, CYL_TAP_STEPS, CYL_SOUND_STEPS };

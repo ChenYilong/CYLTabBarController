@@ -169,6 +169,35 @@ function cylFindAsset(assets, key, theme, state) {
  * [CN] 所有生成的文件：相对路径 -> Buffer。
  */
 /**
+ * [EN] A click as a mono 16-bit 22.05 kHz WAV: a sine of `frequency` Hz that decays over `seconds`.
+ * [CN] 单声道 16 位 22.05 kHz WAV 格式的点击声：`frequency` Hz 的正弦波，在 `seconds` 秒内衰减。
+ */
+function cylClickWAV(frequency, seconds) {
+  const rate = 22050;
+  const count = Math.round(rate * seconds);
+  const data = Buffer.alloc(count * 2);
+  for (let index = 0; index < count; index += 1) {
+    const time = index / rate;
+    const envelope = Math.exp(-time / (seconds / 5));
+    data.writeInt16LE(Math.round(Math.sin(2 * Math.PI * frequency * time) * envelope * 0.6 * 32767), index * 2);
+  }
+  const header = Buffer.alloc(44);
+  header.write('RIFF', 0, 'ascii');
+  header.writeUInt32LE(36 + data.length, 4);
+  header.write('WAVEfmt ', 8, 'ascii');
+  header.writeUInt32LE(16, 16);
+  header.writeUInt16LE(1, 20);
+  header.writeUInt16LE(1, 22);
+  header.writeUInt32LE(rate, 24);
+  header.writeUInt32LE(rate * 2, 28);
+  header.writeUInt16LE(2, 32);
+  header.writeUInt16LE(16, 34);
+  header.write('data', 36, 'ascii');
+  header.writeUInt32LE(data.length, 40);
+  return Buffer.concat([header, data]);
+}
+
+/**
  * [EN] A palette PNG (color type 3) drawn at `alpha`: every palette entry's transparency (the tRNS chunk, added when
  *      missing) times `alpha`. Only the chunks change, so it needs no image library.
  * [CN] 以 `alpha` 绘制的调色板 PNG（颜色类型 3）：每个调色板项的透明度（tRNS 块，缺失时添加）乘以 `alpha`。只修改块，
@@ -314,6 +343,12 @@ function cylGeneratedFiles() {
   ['img_tab_home_0', 'img_tab_home_1', 'img_tab_message_0', 'img_tab_message_1'].forEach((name) => {
     files[path.join('objc', `${name}.png`)] = fs.readFileSync(path.join(lottieResources, `${name}.png`));
   });
+  // [EN] The tap sounds of the Home row "Tab tap sound and haptics" (item 33): a short click (the default click) and a
+  //      lower tock (the custom sound file, as /System/Library/Audio/UISounds/Tock.caf), made here as 16-bit WAV.
+  // [CN] 首页「Tab 点击声音与触感反馈」行（第 33 项）的点击声：短促的 click（默认点击声）与较低的 tock（自定义音频文件，对应
+  //      /System/Library/Audio/UISounds/Tock.caf），在此生成 16 位 WAV。
+  files[path.join('sounds', 'cyl_tap_click.wav')] = cylClickWAV(1800, 0.025);
+  files[path.join('sounds', 'cyl_tap_tock.wav')] = cylClickWAV(650, 0.045);
   files[path.join('objc', 'cyl_tab_sample_animated.gif')] = fs.readFileSync(path.join(CYL_REPOSITORY_ROOT, 'CYLTabBarController',
     'Resources', 'CYLTabBarController.bundle', 'cyl_tab_sample_animated.gif'));
 

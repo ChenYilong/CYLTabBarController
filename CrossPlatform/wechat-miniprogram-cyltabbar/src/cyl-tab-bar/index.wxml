@@ -19,7 +19,7 @@
     <block wx:if="{{item.isPlusButton}}">
       <!-- [EN] As iOS (CYLPlusButtonShowsSelection): the selection under the plus button exists on Liquid Glass only; it is the same cyl-glass-lens as a selected tab's. [CN] 与 iOS 一致（CYLPlusButtonShowsSelection）：PlusButton 下方的选中效果只在液态玻璃下出现。 -->
       <cyl-glass-lens wx:if="{{item.showsSelection && cylStyleType === 'liquidGlass'}}" class="cyl-plus-selection" is-dark="{{cylIsDark}}" lens-style="{{cylGlassLensStyle}}" aria-hidden="true" />
-      <view class="cyl-plus-button {{cylAnimatingIdentifier === item.key ? 'cyl-animate-' + cylTapAnimation : ''}}" style="{{item.buttonStyle}} {{cylAnimationStyle}}">
+      <view class="cyl-plus-button {{cylAnimatingIdentifier === item.key ? 'cyl-animate-' + cylAnimatingName + ' cyl-flip-' + cylFlipDirection : ''}}" style="{{item.buttonStyle}} {{cylAnimationStyle}}">
         <view wx:if="{{item.hitStyle}}" class="cyl-plus-hit" style="{{item.hitStyle}}" aria-hidden="true"></view>
         <image wx:if="{{item.backgroundImage}}" class="cyl-plus-background" src="{{item.backgroundImage}}" mode="aspectFit" aria-hidden="true" />
         <view class="cyl-plus-image-box">
@@ -59,7 +59,7 @@
         badge-size="{{item.badgeItem.size}}"
         badge-position-adjustment="{{item.badgeItem.positionAdjustment}}"
         badge-animation="{{item.badgeItem.animation}}"
-        animation-class="{{cylAnimatingIdentifier === item.key ? 'cyl-animate-' + cylTapAnimation : ''}}"
+        animation-class="{{cylAnimatingIdentifier === item.key ? 'cyl-animate-' + cylAnimatingName + ' cyl-flip-' + cylFlipDirection : ''}}"
         animation-duration="{{cylAnimationDuration}}"
         item-style="{{cylItemStyle}}"
         glass-lens-style="{{cylGlassLensStyle}}"
@@ -67,6 +67,14 @@
         animation-loop="{{animationLoop}}"
         is-dark="{{cylIsDark}}"
       />
+      <!-- [EN] The frames animation (CYLTabButtonFrameAnimation) and the fireworks over the icon (decoration). [CN] 逐帧动画与图标上的烟花（装饰）。 -->
+      <view wx:if="{{cylAnimatingIdentifier === item.key && cylAnimatingName === 'frames'}}" class="cyl-frames" style="{{cylAnimationStyle}}" aria-hidden="true"></view>
+      <view wx:if="{{cylFireworks && cylFireworks.key === item.key}}" class="cyl-fireworks" aria-hidden="true">
+        <block wx:for="{{cylFireworks.particles}}" wx:for-item="particle" wx:key="index">
+          <image wx:if="{{cylFireworks.image}}" class="cyl-firework cyl-firework-image" src="{{cylFireworks.image}}" style="{{particle.style}}" mode="aspectFit" />
+          <view wx:else class="cyl-firework" style="{{particle.style}}"></view>
+        </block>
+      </view>
       <!-- [EN] cyl_setCoverImage: a decoration over the tab; VoiceOver / TalkBack read the tab, not the cover. [CN] 覆盖在 Tab 上的装饰；读屏朗读 Tab 本身，而不是封面。 -->
       <image wx:if="{{item.cover}}" class="cyl-tab-cover" src="{{item.cover.image}}" style="{{item.cover.style}}" mode="aspectFit" aria-hidden="true" />
     </block>

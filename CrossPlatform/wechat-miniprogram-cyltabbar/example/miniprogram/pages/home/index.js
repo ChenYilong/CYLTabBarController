@@ -13,7 +13,7 @@ const cylTabPage = require('../../utils/cyl_tab_page');
 const { cylLanguage } = require('../../utils/cyl_demo_localization');
 const { cylDemoConfiguration } = require('../../utils/cyl_demo_configuration');
 const cylDemoList = require('../../shared/demo_list');
-const { cylHomeAction } = require('../../utils/cyl_home_actions');
+const { cylHomeAction, CYL_TAP_STEPS, CYL_SOUND_STEPS } = require('../../utils/cyl_home_actions');
 const { CYL_DEMO_SKINS, cylEffectiveSkin, cylSkinSummary, cylSkinPreview } = require('../../utils/cyl_demo_skins');
 
 // [EN] UIColor.cyl_randomColor. [CN] 随机颜色。
@@ -35,9 +35,6 @@ function cylNavigationFrame() {
     return { top: 20, height: 44, right: 100, menuHeight: 400 };
   }
 }
-
-// [EN] The tap animations the mini program has, in the order the row cycles through them. [CN] 小程序支持的点击动画，按本行切换的顺序。
-const CYL_TAP_ANIMATIONS = ['none', 'bounce', 'rotation', 'scale'];
 
 // [EN] Badge animations drawn in CSS (index.wxss); the others show a still badge. [CN] 用 CSS 绘制的角标动画（index.wxss）；其他为静止角标。
 const CYL_BADGE_ANIMATIONS = ['scale', 'shake', 'bounce', 'breathe', 'rotation'];
@@ -110,7 +107,9 @@ Component({
         skin: this.t(cylEffectiveSkin(state).name) + (state.skinFollowsSystem ? ` · ${this.t('Follow the system Dark Mode')}` : ''),
         login: this.t(state.loggedIn ? 'Logged in' : 'Logged out'),
         loginTabs: loginTabs.join(', ') || '—',
-        tapAnimation: configuration.CYLTabBarControllerTabButtonTapAnimation || 'none',
+        // [EN] Item 33: the names of the current steps. [CN] 第 33 项：当前步骤的名字。
+        tapAnimation: this.t(CYL_TAP_STEPS[(state.overrides || {}).cylDemoTapStep || 0].name),
+        tapSound: this.t(CYL_SOUND_STEPS[(state.overrides || {}).cylDemoSoundStep || 0].name),
         indexWithoutPlus: tabIndex < 0 ? '-' : tabIndex,
         selectedIndex: selectedIndex < 0 ? '-' : selectedIndex,
         selectedTitle: selectedIndex < 0 ? '-' : (slots[selectedIndex].item ? slots[selectedIndex].item.title : slots[selectedIndex].title) || '-',
@@ -316,10 +315,6 @@ Component({
         language: () => wx.showToast({ title: this.t('Follows the language of WeChat'), icon: 'none' }),
         // [EN] cyl_presentThemePickerFromView:completion: (issue #216). [CN] 打开换肤菜单（issue #216）。
         skin: () => this.cyl_onSkinButton(),
-        tapAnimation: () => {
-          const current = CYL_TAP_ANIMATIONS.indexOf(configuration.CYLTabBarControllerTabButtonTapAnimation);
-          this.cyl_override({ CYLTabBarControllerTabButtonTapAnimation: CYL_TAP_ANIMATIONS[(current + 1) % CYL_TAP_ANIMATIONS.length] });
-        },
         // [EN] Item 28: cyl_selectedIndexIgnoringPlusButton = (current + 1) % count: the next tab without the plus
         //      button, back to the first after the last. [CN] 第 28 项：选中不含 PlusButton 的下一个 Tab，最后一个之后回到第一个。
         selectedIndex: () => {

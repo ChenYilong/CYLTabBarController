@@ -489,18 +489,40 @@ test('the Home feed scrolls under the bar with one layer of icons (flat style, d
  * [EN] The current page: the page object, its route and its data. [CN] 当前页面：页面对象、路由与数据。
  */
 async function cylCurrentPage() {
-  const page = await miniProgram.currentPage();
-  return { page, route: page.path, data: await page.data() };
+  // [EN] Once more on "page node not found" (a page just shown or rendered again). [CN] 遇到「page node not found」时再试一次（页面刚显示或重新渲染）。
+  try {
+    const page = await miniProgram.currentPage();
+    return { page, route: page.path, data: await page.data() };
+  } catch (error) {
+    if (!/page node not found/.test(String(error && error.message))) {
+      throw error;
+    }
+    await cylSleep(CYL_SETTLE_MS);
+    const page = await miniProgram.currentPage();
+    return { page, route: page.path, data: await page.data() };
+  }
 }
 
 /**
  * [EN] Taps the element `selector` of the current page and waits. [CN] 点击当前页面的 `selector` 元素并等待。
  */
 async function cylTapElement(selector, wait = CYL_SETTLE_MS) {
-  const { page } = await cylCurrentPage();
-  const element = await page.$(selector);
-  assert.ok(element, `no element ${selector}`);
-  await element.tap();
+  // [EN] Once more when DevTools answers "page node not found" (the page was just rendered again, e.g. after a new tab
+  //      bar). [CN] 开发者工具返回「page node not found」时（页面刚重新渲染，例如新的 TabBar 之后）再试一次。
+  for (let attempt = 0; ; attempt += 1) {
+    try {
+      const { page } = await cylCurrentPage();
+      const element = await page.$(selector);
+      assert.ok(element, `no element ${selector}`);
+      await element.tap();
+      break;
+    } catch (error) {
+      if (attempt > 0 || !/page node not found/.test(String(error && error.message))) {
+        throw error;
+      }
+      await cylSleep(CYL_SETTLE_MS);
+    }
+  }
   await cylSleep(wait);
 }
 
@@ -902,6 +924,72 @@ test('the arrows, the touchable area, the replaced tab and the gesture timings (
   await cylTapElement('.cyl-home-row[data-id="replaceNeighbors"]');
   current = await cylCurrentPage();
   assert.equal((await row('replaceNeighbors')).accessory, 'none');
+  await miniProgram.evaluate(() => { getApp().cyl_rebuildTabBar('liquidGlass'); });
+  await cylClearDecoration();
+  await miniProgram.reLaunch('/pages/home/index');
+  await cylSleep(CYL_SETTLE_MS);
+});
+
+test('the tap animation and the tap sound and haptics rows cycle as the Objective-C example (docs/ObjC-Example-Parity item 33)', async () => {
+  await miniProgram.reLaunch('/pages/home/index');
+  await cylSleep(CYL_SETTLE_MS * 2);
+  await miniProgram.evaluate(() => { getApp().cyl_rebuildTabBar('liquidGlass'); });
+  await cylClearDecoration();
+  const model = () => miniProgram.evaluate(() => {
+    const pages = getCurrentPages();
+    const tabBar = pages[pages.length - 1].getTabBar().selectComponent('#cyl-tab-bar');
+    const m = tabBar.cylModel;
+    return {
+      animation: m.tapAnimation,
+      duration: m.animationDuration,
+      fireworks: m.playsFireworks,
+      star: Boolean(m.fireworksImage),
+      direction: m.flipDirection,
+      homeAnimation: m.items[0].tapAnimation,
+      sound: m.tapSoundURL,
+      haptic: m.tapHapticStyle,
+      playing: tabBar.data.cylAnimatingIdentifier,
+      particles: tabBar.data.cylFireworks ? tabBar.data.cylFireworks.particles.length : 0,
+    };
+  });
+  const expected = [
+    ['scale', 500], ['zoomIn', 500], ['bounce', 500], ['bounceWithFireworks', 500], ['rotation', 500], ['flip', 500],
+    ['fume', 500], ['none', 500], ['frames', 500], ['scale', 1200], ['zoomIn', 1200], ['bounceWithFireworks', 500], ['flip', 500],
+  ];
+  for (let step = 1; step <= 13; step += 1) {
+    await cylTapElement('.cyl-home-row[data-id="tapAnimation"]', 450);
+    const current = await model();
+    assert.deepEqual([current.animation, current.duration], expected[step - 1], `step ${step}`);
+    if (step === 4) {
+      assert.equal(current.playing, 'home', 'played once on the selected tab');
+      // [EN] Played again once the new configuration is in the bar. [CN] 新配置进入 TabBar 后再播放一次。
+      await miniProgram.evaluate(() => {
+        const pages = getCurrentPages();
+        pages[pages.length - 1].getTabBar().selectComponent('#cyl-tab-bar').cyl_playSelectedTapAnimation();
+      });
+      await cylSleep(200);
+      assert.equal((await model()).particles, 10, 'fireworks');
+    }
+    if (step === 8) {
+      assert.equal(current.homeAnimation, 'rotation', 'this tab only');
+    }
+    if (step === 12) {
+      assert.equal(current.star, true);
+    }
+    if (step === 13) {
+      assert.equal(current.direction, 5);
+    }
+  }
+  await cylTapElement('.cyl-home-row[data-id="tapAnimation"]', 450);
+  assert.equal((await model()).homeAnimation, '', 'back to None');
+
+  const sounds = [['/shared/sounds/cyl_tap_click.wav', ''], ['/shared/sounds/cyl_tap_tock.wav', ''], ['', 'light'], ['', 'medium'],
+    ['', 'heavy'], ['/shared/sounds/cyl_tap_click.wav', 'medium'], ['', '']];
+  for (const [sound, haptic] of sounds) {
+    await cylTapElement('.cyl-home-row[data-id="tapSound"]', 450);
+    const current = await model();
+    assert.deepEqual([current.sound, current.haptic], [sound, haptic]);
+  }
   await miniProgram.evaluate(() => { getApp().cyl_rebuildTabBar('liquidGlass'); });
   await cylClearDecoration();
   await miniProgram.reLaunch('/pages/home/index');
