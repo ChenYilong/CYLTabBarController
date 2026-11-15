@@ -56,6 +56,7 @@
 | [React Native 接入：react-native-cyltabbar](React-Native-Component.md) | [React Native integration: react-native-cyltabbar](React-Native-Component.md) |
 | [资源路由](Resource-Routes.md) | [Resource routes](Resource-Routes.md) |
 | [Rive 动画 Tab 图标（与 Lottie、PAG 用法相同）](Rive-Animation.md) | [Rive animated tab icons (used like Lottie and PAG)](Rive-Animation.md) |
+| [SVGA 动画 Tab 图标（与 Rive、PAG、Lottie 用法相同）](SVGA-Animation.md) | [SVGA animated tab icons (used like Rive, PAG and Lottie)](SVGA-Animation.md) |
 | [selectedIndex 与 PlusButton：选中的文字与图片一致](SelectedIndex-PlusButton.md) | [selectedIndex and the PlusButton: the selected title and image match](SelectedIndex-PlusButton.md) |
 | [Swift 编码规范](Swift-Coding-Style.md) | [Swift coding style](Swift-Coding-Style.md) |
 | [在 Swift 项目中使用 CYLTabBarController](Swift-Guide.md) | [Using CYLTabBarController in Swift](Swift-Guide.md) |
@@ -147,6 +148,7 @@ docs/
 ├── React-Native-Component.md
 ├── Resource-Routes.md
 ├── Rive-Animation.md
+├── SVGA-Animation.md
 ├── SelectedIndex-PlusButton.md
 ├── Swift-Coding-Style.md
 ├── Swift-Guide.md
@@ -294,8 +296,13 @@ docs/
 │   ├── rive-classic.png
 │   ├── rive-flat-design.png
 │   ├── rive-liquid-glass.png
+│   ├── svga-example-rive-bell.png
+│   ├── svga-example-rive-last-frame.png
+│   ├── svga-example-rive-playing.png
 │   ├── swift-migration-badges-ios.png
 │   ├── swift-migration-localization-ios.png
+│   ├── swift-migration-step48-flatdesign-popped.png
+│   ├── swift-migration-step48-flatdesign-pushed.png
 │   ├── swiftui-integration-ios.png
 │   ├── swiftui-plus-title-blur-ios.png
 │   ├── tab-accessibility-labels-after-title-change.png

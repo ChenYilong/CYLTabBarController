@@ -77,6 +77,7 @@ Read the document for the feature before using its API. The public API is in the
 | Animation subspec, adding a library | [Tab-Bar-Item-Animation](../../../docs/Tab-Bar-Item-Animation.md) |
 | PAG | [PAG-Animation](../../../docs/PAG-Animation.md) |
 | Rive | [Rive-Animation](../../../docs/Rive-Animation.md) |
+| SVGA (issue #415): `pod 'CYLTabBarController/SVGA'`, `CYLTabBarSVGAURL` keys, Protobuf pinned to 3.21, demo in Example-Rive after the Rive demo | [SVGA-Animation](../../../docs/SVGA-Animation.md) |
 | GIF: looping image or play once | [GIF-Animation](../../../docs/GIF-Animation.md) |
 | Mixing animated and static tabs | [Per-Tab-Animation](../../../docs/Per-Tab-Animation.md) |
 | Themes | [Theme-Switching](../../../docs/Theme-Switching.md) |

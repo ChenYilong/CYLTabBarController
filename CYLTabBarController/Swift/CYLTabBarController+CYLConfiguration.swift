@@ -57,6 +57,9 @@ enum CYLConfigurationValues {
     static let riveDarkColors = "CYLTabBarRiveDarkColors"
     static let gifURL = "CYLTabBarGIFURL", gifFilePath = "CYLTabBarGIFFilePath", gifSize = "CYLTabBarGIFSize"
     static let gifDarkURL = "CYLTabBarGIFDarkURL", gifDarkFilePath = "CYLTabBarGIFDarkFilePath"
+    // FIX: issue #415 — SVGA. [CN] SVGA。
+    static let svgaURL = "CYLTabBarSVGAURL", svgaFilePath = "CYLTabBarSVGAFilePath", svgaSize = "CYLTabBarSVGASize"
+    static let svgaDarkURL = "CYLTabBarSVGADarkURL", svgaDarkFilePath = "CYLTabBarSVGADarkFilePath"
     static let lottieURL = "CYLTabBarLottieURL", lottieFilePath = "CYLTabBarLottieFilePath", lottieSize = "CYLTabBarLottieSize"
     static let lottieDarkURL = "CYLTabBarLottieDarkURL", lottieDarkFilePath = "CYLTabBarLottieDarkFilePath"
     static let lottieDarkColors = "CYLTabBarLottieDarkColors"
@@ -437,6 +440,7 @@ enum CYLConfigurationValues {
             (CYLTabBarAnimationURL, CYLTabBarAnimationFilePath), (CYLTabBarAnimationDarkURL, CYLTabBarAnimationDarkFilePath),
             (lottieURL, lottieFilePath), (lottieDarkURL, lottieDarkFilePath), (pagURL, pagFilePath), (pagDarkURL, pagDarkFilePath),
             (riveURL, riveFilePath), (riveDarkURL, riveDarkFilePath), (gifURL, gifFilePath), (gifDarkURL, gifDarkFilePath),
+            (svgaURL, svgaFilePath), (svgaDarkURL, svgaDarkFilePath),
         ]
         for (urlKey, pathKey) in pairs {
             var url = item[urlKey] as? URL
@@ -572,6 +576,7 @@ enum CYLConfigurationValues {
         CYLTabBarAnimationDarkFilePath, CYLTabBarAnimationDarkColors, CYLTabBarAnimationColors, CYLTabBarAnimationOptions,
         lottieLoopsWhenUnselected, pagURL, pagFilePath, pagSize, pagDarkURL, pagDarkFilePath, riveURL, riveFilePath, riveSize,
         riveDarkURL, riveDarkFilePath, riveDarkColors, gifURL, gifFilePath, gifSize, gifDarkURL, gifDarkFilePath,
+        svgaURL, svgaFilePath, svgaSize, svgaDarkURL, svgaDarkFilePath,
     ]
 
     /** [EN] Case-insensitive edit distance (at most 64 characters); DEBUG hints only. [CN] 不区分大小写的编辑距离（最多 64 个字符），仅用于 DEBUG 提示。 */
@@ -810,14 +815,14 @@ enum CYLConfigurationValues {
                 item[key] = offsetValue(value, key: key)
             }
         }
-        for key in [CYLTabBarItemImageURLSize, lottieSize, CYLTabBarAnimationSize, pagSize, riveSize, gifSize] {
+        for key in [CYLTabBarItemImageURLSize, lottieSize, CYLTabBarAnimationSize, pagSize, riveSize, gifSize, svgaSize] {
             if let value = item[key] {
                 item[key] = sizeValue(value, key: key)
             }
         }
         // [EN] Animation URLs: a local file must exist and be readable (B17). [CN] 动画 URL：本地文件必须存在且可读（B17）。
         for key in [CYLTabBarItemImageURL, CYLTabBarItemSelectedImageURL, lottieURL, lottieDarkURL, CYLTabBarAnimationURL,
-                    CYLTabBarAnimationDarkURL, pagURL, pagDarkURL, riveURL, riveDarkURL, gifURL, gifDarkURL] {
+                    CYLTabBarAnimationDarkURL, pagURL, pagDarkURL, riveURL, riveDarkURL, gifURL, gifDarkURL, svgaURL, svgaDarkURL] {
             guard let value = item[key] else { continue }
             let isImage = key == CYLTabBarItemImageURL || key == CYLTabBarItemSelectedImageURL
             var checked: Any? = isImage ? imageURLValue(value) : urlValue(value)
@@ -830,7 +835,7 @@ enum CYLConfigurationValues {
             item[key] = checked
         }
         for key in [lottieFilePath, lottieDarkFilePath, CYLTabBarAnimationFilePath, CYLTabBarAnimationDarkFilePath, pagFilePath,
-                    pagDarkFilePath, riveFilePath, riveDarkFilePath, gifFilePath, gifDarkFilePath] {
+                    pagDarkFilePath, riveFilePath, riveDarkFilePath, gifFilePath, gifDarkFilePath, svgaFilePath, svgaDarkFilePath] {
             guard let value = item[key] else { continue }
             var path = (value as? String).map { mainBundlePath($0) }
             if !fileExists(path) || !isReadableAnimationFile(path ?? "") {

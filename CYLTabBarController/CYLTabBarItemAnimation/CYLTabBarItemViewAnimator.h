@@ -12,6 +12,8 @@
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/GIF-Animation.md
 //   - Rive animated tab icons (used like Lottie and PAG) / Rive 动画 Tab 图标（与 Lottie、PAG 用法相同）
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Rive-Animation.md
+//   - SVGA animated tab icons (used like Rive, PAG and Lottie) / SVGA 动画 Tab 图标（与 Rive、PAG、Lottie 用法相同）
+//     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/SVGA-Animation.md
 //   - The shared tab icon animation subspec: CYLTabBarItemAnimation (protocol-oriented, open to any library) / Tab 图标动画共用子库：CYLTabBarItemAnimation（面向协议，可扩展任意动画库）
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Tab-Bar-Item-Animation.md
 // docs-binding:end

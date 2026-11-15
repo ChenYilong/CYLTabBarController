@@ -25,8 +25,11 @@ extension Tab {
         case .timer:
             rootViewController = UIHostingController(rootView: OnboardingView(show: .constant(true)))
         case .bell:
-            // [EN] The shared test list, with a Rive animation in plain UIKit above it. [CN] 共用的测试列表，上方是纯 UIKit 中的 Rive 动画。
-            return settingsViewController(headerView: RiveMenuButtonDemoView())
+            // [EN] The shared test list, with a Rive animation in plain UIKit above it, then the SVGA demo (issue #415).
+            // [CN] 共用的测试列表，上方是纯 UIKit 中的 Rive 动画，其后是 SVGA 演示（issue #415）。
+            let demos = UIStackView(arrangedSubviews: [RiveMenuButtonDemoView(), SVGATabIconDemoView()])
+            demos.axis = .vertical
+            return settingsViewController(headerView: demos)
         case .user:
             rootViewController = UIHostingController(rootView: SignInView(show: .constant(true)))
         }
