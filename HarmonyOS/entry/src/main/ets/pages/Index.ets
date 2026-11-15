@@ -7,11 +7,17 @@ import { CYLPlusButton, CYLTabBarController, CYLTabBarItem, cylLocalizedString, 
  *      本地化文件复制来的字符串资源。
  */
 function cylDemoItems(): CYLTabBarItem[] {
-  const home = new CYLTabBarItem('home', $r('app.string.cyl_demo_home'), $r('sys.symbol.house'), $r('sys.symbol.house_fill'));
-  const nearby = new CYLTabBarItem('nearby', $r('app.string.cyl_demo_nearby'), $r('sys.symbol.map'));
-  const messages = new CYLTabBarItem('messages', $r('app.string.cyl_demo_messages'), $r('sys.symbol.message'), $r('sys.symbol.message_fill'));
+  const home = new CYLTabBarItem('home', $r('app.string.cyl_demo_home'));
+  home.symbol = $r('sys.symbol.house');
+  home.selectedSymbol = $r('sys.symbol.house_fill');
+  const nearby = new CYLTabBarItem('nearby', $r('app.string.cyl_demo_nearby'));
+  nearby.symbol = $r('sys.symbol.map');
+  const messages = new CYLTabBarItem('messages', $r('app.string.cyl_demo_messages'));
+  messages.symbol = $r('sys.symbol.message');
+  messages.selectedSymbol = $r('sys.symbol.message_fill');
   messages.badgeValue = '3';
-  const me = new CYLTabBarItem('me', $r('app.string.cyl_demo_me'), $r('sys.symbol.person'));
+  const me = new CYLTabBarItem('me', $r('app.string.cyl_demo_me'));
+  me.symbol = $r('sys.symbol.person');
   me.badgeValue = '';
   // [EN] FIX: issue #415: SVGA tab icons (resources/rawfile/svga, copied from Example-SwiftUI-Rive by scripts/sync-svga.py);
   //      the symbols show if a file cannot load. [CN] SVGA Tab 图标（resources/rawfile/svga，由 scripts/sync-svga.py 从
@@ -26,7 +32,7 @@ function cylDemoItems(): CYLTabBarItem[] {
 function cylDemoPlusButton(): CYLPlusButton {
   const plus = new CYLPlusButton();
   plus.identifier = 'CYLPlusButton';
-  plus.image = $r('sys.symbol.plus_circle_fill');
+  plus.symbol = $r('sys.symbol.plus_circle_fill');
   plus.title = $r('app.string.cyl_demo_post');
   return plus;
 }

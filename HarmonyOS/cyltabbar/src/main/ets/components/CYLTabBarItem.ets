@@ -15,6 +15,13 @@ export class CYLTabBarItem {
   image?: ResourceStr;
   selectedImage?: ResourceStr;
   /**
+   * [EN] A system symbol (`$r('sys.symbol.house')`), drawn with SymbolGlyph in the tint colors; ArkUI's Image cannot draw
+   *      symbols. Wins over `image`.
+   * [CN] 系统符号（`$r('sys.symbol.house')`），用 SymbolGlyph 以着色颜色绘制；ArkUI 的 Image 无法绘制符号。优先于 `image`。
+   */
+  symbol?: Resource;
+  selectedSymbol?: Resource;
+  /**
    * [EN] The badge: undefined for none, "" for a red dot, a number ("3", "99+") or a text ("NEW").
    * [CN] 角标：undefined 表示无，"" 表示红点，数字（"3"、"99+"）或文本（"NEW"）。
    */
@@ -59,6 +66,10 @@ export class CYLTabBarItem {
 export class CYLPlusButton {
   identifier: string = 'CYLPlusButton';
   image?: ResourceStr;
+  /**
+   * [EN] A system symbol drawn with SymbolGlyph in `plusButtonColor`; wins over `image`. [CN] 用 SymbolGlyph 以 `plusButtonColor` 绘制的系统符号；优先于 `image`。
+   */
+  symbol?: Resource;
   title?: ResourceStr;
   /**
    * [EN] Its place among the tabs; by default the middle. [CN] 在 Tab 之间的位置；默认居中。
