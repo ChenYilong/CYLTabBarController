@@ -1863,6 +1863,12 @@ CYLTabBar(items: items, styleType: 'liquidGlass', selectedIndex: index, badgeVal
 
 ![WeChat Mini Program, DevTools on Windows 11, base library 3.17.6: the Objective-C tabs with the launch badges and the cover, Nearby selected with a purple dot, the login alert for Messages](assets/wechat-miniprogram-objc-launch.png)
 
+| 中文 | English |
+|:---|:---|
+| **微信小程序：首页导航栏与 17 个皮肤**：与 Objective-C 示例相同，首页导航栏左侧「Flat Design」（呼吸红点）、右侧「换肤」与「Liquid Glass」（抖动红点）；前后两者用对应样式的新 TabBar 替换当前 TabBar，「换肤」打开 17 个皮肤与「跟随系统深色模式」的菜单（节日图标、网络图标、配色）。下图（微信小程序，Windows 11 开发者工具，模拟器 iPhone 12/13 Pro，基础库 3.17.6，基于 [b850f51](https://github.com/ChenYilong/CYLTabBarController/commit/b850f51)，2026-11-15）从左到右：启动后；换肤菜单；圣诞节皮肤；网络皮肤下的扁平样式。进度见 [ObjC 示例复刻](docs/ObjC-Example-Parity/README.md)。 | **WeChat Mini Program: the Home navigation bar and the 17 skins**: as the Objective-C example, "Flat Design" (a breathing dot) on the left of the Home navigation bar, "Skin" and "Liquid Glass" (a shaking dot) on the right; the first and last replace the bar with a new one in that style, "Skin" opens the menu of the 17 skins and "Follow the system Dark Mode" (holiday icons, network icons, colors). Below (WeChat Mini Program, DevTools on Windows 11, simulator iPhone 12/13 Pro, base library 3.17.6, on top of [b850f51](https://github.com/ChenYilong/CYLTabBarController/commit/b850f51), 2026-11-15), left to right: after launch; the skin menu; Christmas; FlatDesign in the network skin. Progress: [ObjC example parity](docs/ObjC-Example-Parity/README.md). |
+
+![WeChat Mini Program, DevTools on Windows 11, base library 3.17.6: the Home navigation bar with Flat Design, Skin and Liquid Glass, the skin menu, the Christmas skin, the network skin on a FlatDesign bar](assets/wechat-miniprogram-objc-skins.png)
+
 ### [CN]在 Swift 项目中使用 CYLTabBarController
 ### [EN]Using CYLTabBarController in a Swift project
 
