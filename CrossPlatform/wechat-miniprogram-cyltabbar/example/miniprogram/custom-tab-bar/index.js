@@ -219,6 +219,16 @@ Component({
       app.cyl_updateTabBarState({ badges: Object.assign({}, state.badges, { plus: String(count) }) });
     },
 
+    /**
+     * [EN] The Home switch "Long press on tabs" (issue #535): a long press shows the identifier of the tab or plus button.
+     * [CN] 首页「长按 Tab」开关（issue #535）：长按显示 Tab 或 PlusButton 的标识。
+     */
+    cyl_onLongPress(event) {
+      if (getApp().globalData.cylTabBarState.longPressEnabled && event.detail) {
+        wx.showToast({ title: String(event.detail.identifier), icon: 'none' });
+      }
+    },
+
     cyl_onReselect() {
       this.cyl_tapFeedback();
       wx.pageScrollTo({ scrollTop: 0, duration: 200 });

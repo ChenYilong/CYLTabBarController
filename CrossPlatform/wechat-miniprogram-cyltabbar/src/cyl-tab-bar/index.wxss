@@ -245,3 +245,9 @@
   border-radius: 5px;
   background-color: #ff3b30;
 }
+
+/* [EN] The plus button's touchable area (CYLPlusButtonShowsTouchableArea / CYLPlusButtonTouchableAreaScale, issue #91). [CN] PlusButton 的可点击区域（issue #91）。 */
+.cyl-plus-hit {
+  position: absolute;
+  border-radius: 8px;
+}

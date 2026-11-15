@@ -241,6 +241,52 @@ function cylDemoGIFItems(items, files) {
 }
 
 /**
+ * [EN] The Home row "Replace neighboring tabs" (issue #481, replaceViewControllerAtIndex:withViewController:attributes:):
+ *      a replaced tab is "Replaced page A" (left, a.circle) or "Replaced page B" (right, b.circle) and shows its plain
+ *      page (pages/web for Nearby, see cylReplacedPage). `replaced`: {identifier: "A" | "B"}.
+ * [CN] 首页「替换相邻 Tab 的页面」行（issue #481）：被替换的 Tab 为「替换页 A」（左侧，a.circle）或「替换页 B」（右侧，
+ *      b.circle），并显示其空白页面（同城为 pages/web，见 cylReplacedPage）。`replaced`：{标识: "A" | "B"}。
+ */
+function cylLetterIcon(letter, filled) {
+  const circle = filled ? '<circle cx="12" cy="12" r="11" fill="#000"/>' : '<circle cx="12" cy="12" r="10" fill="none" stroke="#000" stroke-width="1.8"/>';
+  const text = `<text x="12" y="16.5" font-family="-apple-system, Helvetica, Arial" font-size="13" font-weight="600" text-anchor="middle" fill="${filled ? '#fff' : '#000'}">${letter.toLowerCase()}</text>`;
+  return `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">${circle}${text}</svg>`)}`;
+}
+
+function cylReplacedItems(items, replaced) {
+  if (!replaced) {
+    return items;
+  }
+  return items.map((attributes) => {
+    const letter = replaced[attributes.CYLTabBarItemIdentifier];
+    if (!letter) {
+      return attributes;
+    }
+    const title = t('Replaced page %@').replace('%@', letter);
+    const changed = Object.assign({}, attributes, {
+      CYLTabBarItemTitle: title,
+      CYLTabBarItemSelectedTitle: title,
+      CYLTabBarItemImage: cylLetterIcon(letter, false),
+      CYLTabBarItemSelectedImage: cylLetterIcon(letter, true),
+      CYLTabBarItemImageURLSize: '{22, 22}',
+      CYLTabBarItemIconRenderingMode: 'template',
+    });
+    ['CYLTabBarLottieURL', 'CYLTabBarLottieDarkURL', 'CYLTabBarLottieSize', 'CYLTabBarAnimationColors', 'CYLTabBarPAGFilePath',
+      'CYLTabBarRiveFilePath', 'CYLTabBarGIFFilePath', 'CYLTabBarAnimationFilePath'].forEach((key) => delete changed[key]);
+    return changed;
+  });
+}
+
+/**
+ * [EN] The plain page of a replaced tab: its title and background color (systemTeal for A, systemPink for B), or null.
+ * [CN] 被替换 Tab 的空白页面：标题与背景色（A 为 systemTeal，B 为 systemPink），否则为 null。
+ */
+function cylReplacedPage(overrides, identifier) {
+  const letter = ((overrides || {}).cylDemoReplaced || {})[identifier];
+  return letter ? { title: t('Replaced page %@').replace('%@', letter), color: letter === 'A' ? '#30B0C7' : '#FF2D55' } : null;
+}
+
+/**
  * [EN] The configuration with the example's overrides (style type, tap animation, login-required tabs), which the Me
  *      page changes at run time, in `skin` (utils/cyl_demo_skins.js; none: the example's own colors and icons).
  * [CN] 带有示例覆盖项（样式、点击动画、需要登录的 Tab）的配置，Me 页面会在运行时修改这些覆盖项；使用 `skin`
@@ -269,21 +315,28 @@ function cylDemoConfiguration(overrides, skin) {
   // [EN] Per-tab attributes the Home rows change at run time (titles, icons, offsets, colors), by identifier.
   // [CN] 首页各行在运行时修改的单个 Tab 属性（标题、图标、偏移、颜色），按标识符。
   const itemAttributes = options.cylDemoItemAttributes || {};
-  const changedItems = styledItems.map((attributes) => Object.assign({}, attributes,
-    itemAttributes['*'], itemAttributes[attributes.CYLTabBarItemIdentifier]));
+  const changedItems = cylReplacedItems(styledItems.map((attributes) => Object.assign({}, attributes,
+    itemAttributes['*'], itemAttributes[attributes.CYLTabBarItemIdentifier])), options.cylDemoReplaced);
   const configurationOverrides = Object.assign({}, options);
   delete configurationOverrides.cylDemoLottie;
   delete configurationOverrides.cylDemoIcons;
   delete configurationOverrides.cylDemoBoldTitles;
   delete configurationOverrides.cylDemoItemAttributes;
   delete configurationOverrides.cylDemoPlusAttributes;
+  delete configurationOverrides.cylDemoTouchableArea;
+  delete configurationOverrides.cylDemoReplaced;
   delete configurationOverrides.cylDemoUpdates;
   delete configurationOverrides.cylDemoAppearance;
   // [EN] The Home rows that change the tabs in place, last: they act on what is shown (utils/cyl_demo_updates.js).
   // [CN] 原地修改 Tab 的首页各行最后应用：它们作用于当前显示的内容（utils/cyl_demo_updates.js）。
   return cylApplyUpdates(cylSkinnedConfiguration(Object.assign({}, cylSharedConfiguration, {
     CYLTabBarControllerTabBarItemsAttributes: changedItems,
-    CYLTabBarControllerPlusButton: Object.assign({}, CYL_DEMO_PLUS_BUTTON, options.cylDemoPlusAttributes),
+    // [EN] The Home row "PlusButton touchable area" (issue #91): showsTouchableArea and touchableAreaScale.
+    // [CN] 首页「PlusButton 点击范围」行（issue #91）：showsTouchableArea 与 touchableAreaScale。
+    CYLTabBarControllerPlusButton: Object.assign({}, CYL_DEMO_PLUS_BUTTON, options.cylDemoPlusAttributes, options.cylDemoTouchableArea ? {
+      CYLPlusButtonShowsTouchableArea: Boolean(options.cylDemoTouchableArea.shows),
+      CYLPlusButtonTouchableAreaScale: options.cylDemoTouchableArea.scale || 1,
+    } : {}),
     // [EN] The Objective-C example starts on Liquid Glass (CYLMainRootViewController). [CN] Objective-C 示例以液态玻璃启动。
     CYLTabBarControllerStyleType: 'liquidGlass',
     // [EN] The Objective-C example's title offset (0, -3.5), which the aligned plus button follows. [CN] Objective-C 示例的标题偏移。
@@ -301,4 +354,4 @@ function cylDemoConfiguration(overrides, skin) {
   }, configurationOverrides), skin, t), options.cylDemoUpdates, options.cylDemoAppearance, t);
 }
 
-module.exports = { cylDemoConfiguration, cylInstalledAnimation, cylAvailableAnimationFiles };
+module.exports = { cylDemoConfiguration, cylInstalledAnimation, cylAvailableAnimationFiles, cylReplacedPage };

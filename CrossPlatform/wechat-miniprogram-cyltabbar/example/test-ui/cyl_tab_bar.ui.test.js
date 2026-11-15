@@ -851,3 +851,59 @@ test('the Home rows act with the Objective-C values (docs/ObjC-Example-Parity it
   await miniProgram.reLaunch('/pages/home/index');
   await cylSleep(CYL_SETTLE_MS);
 });
+
+test('the arrows, the touchable area, the replaced tab and the gesture timings (docs/ObjC-Example-Parity items 27, 30, 35, 37)', async () => {
+  await miniProgram.reLaunch('/pages/home/index');
+  await cylSleep(CYL_SETTLE_MS * 2);
+  await miniProgram.evaluate(() => { getApp().cyl_rebuildTabBar('liquidGlass'); });
+  await cylClearDecoration();
+  const row = async (id) => {
+    const { data } = await cylCurrentPage();
+    return data.sections.reduce((found, section) => found || (section.rows || []).find((candidate) => candidate.id === id), null);
+  };
+  const plus = () => miniProgram.evaluate(() => {
+    const pages = getCurrentPages();
+    const tabBar = pages[pages.length - 1].getTabBar().selectComponent('#cyl-tab-bar');
+    return tabBar.data.cylSlots.find((slot) => slot.isPlusButton).hitStyle;
+  });
+
+  // [EN] Item 37: no tab before Home (NO, no wrapping); the next one is Nearby (YES). [CN] 第 37 项：首页之前没有 Tab（NO，不循环）；下一个是同城（YES）。
+  await cylTapElement('#cyl-arrow-previous');
+  assert.match((await row('adjacentTab')).subtitle, /NO$/);
+  assert.equal((await cylCurrentPage()).route, 'pages/home/index');
+
+  // [EN] Item 30: the switch shows the area in red, the slider multiplies it. [CN] 第 30 项：开关以红色显示区域，滑块按倍数扩大。
+  await miniProgram.evaluate(() => { getCurrentPages().pop().cyl_touchableArea({ shows: true, scale: 2 }); });
+  await cylSleep(CYL_SETTLE_MS);
+  assert.match(await plus(), /width: 200%.*background-color: rgba\(255, 59, 48/);
+  assert.match((await row('touchableArea')).subtitle, /2\.0x$/);
+  await miniProgram.evaluate(() => { getCurrentPages().pop().cyl_touchableArea({ shows: false, scale: 1 }); });
+  await cylSleep(CYL_SETTLE_MS);
+  assert.equal(await plus(), '');
+
+  // [EN] Item 35: (0.5, 0.35) → (1, 0.6) → (0.25, 0.25) → (0.5, 0.35). [CN] 第 35 项：依次切换。
+  for (const [longPress, doubleTap] of [['1', '0.6'], ['0.25', '0.25'], ['0.5', '0.35']]) {
+    await cylTapElement('.cyl-home-row[data-id="longPressDuration"]');
+    const subtitle = (await row('longPressDuration')).subtitle;
+    assert.ok(subtitle.includes(`cyl_tabBarItemLongPressDuration: ${longPress} s`) && subtitle.endsWith(`${doubleTap} s`), subtitle);
+  }
+
+  // [EN] Item 27: Nearby (right of Home) becomes "Replaced page B" with a pink page; tap again to restore.
+  // [CN] 第 27 项：同城（首页右侧）变为「替换页 B」并显示粉色页面；再点恢复。
+  await cylTapElement('.cyl-home-row[data-id="replaceNeighbors"]');
+  assert.equal((await row('replaceNeighbors')).accessory, 'check');
+  await cylTapElement('#cyl-arrow-next', CYL_SETTLE_MS * 2);
+  let current = await cylCurrentPage();
+  assert.equal(current.route, 'pages/web/index');
+  assert.match(current.data.replaced.title, /Replaced page B|替换页 B|替換頁 B/);
+  await miniProgram.switchTab('/pages/home/index');
+  await cylSleep(CYL_SETTLE_MS);
+  assert.match((await row('adjacentTab')).subtitle, /YES$/);
+  await cylTapElement('.cyl-home-row[data-id="replaceNeighbors"]');
+  current = await cylCurrentPage();
+  assert.equal((await row('replaceNeighbors')).accessory, 'none');
+  await miniProgram.evaluate(() => { getApp().cyl_rebuildTabBar('liquidGlass'); });
+  await cylClearDecoration();
+  await miniProgram.reLaunch('/pages/home/index');
+  await cylSleep(CYL_SETTLE_MS);
+});

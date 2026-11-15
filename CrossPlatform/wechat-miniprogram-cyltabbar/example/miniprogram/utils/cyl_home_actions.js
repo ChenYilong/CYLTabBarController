@@ -117,17 +117,39 @@ const CYL_HOME_ACTIONS = {
     const on = !cylUpdates(context).allTitles;
     cylSetUpdates(context, on ? { allTitles: true } : { allTitles: false, changeTabTitle: false });
   },
+  // [EN] Item 27: the nearest real tab on each side of this page's tab (Home: only Nearby, on the right) becomes "Replaced
+  //      page A" / "B"; tap again to restore; the example's decorations come back afterwards.
+  // [CN] 第 27 项：当前页 Tab 两侧最近的真实 Tab（首页：只有右侧的同城）变为「替换页 A」/「B」；再点恢复；之后重新加上示例的装饰。
   replaceNeighbors: (context) => {
-    // [EN] Discover and Me swap their places by hiding one and showing the other (one bar, other tabs). [CN] 通过隐藏一个、显示另一个，替换相邻的 Tab。
-    const hidden = context.state().hiddenIdentifiers || [];
-    context.update({ hiddenIdentifiers: hidden.includes('city') ? [] : ['city'] });
-    context.toast(t(hidden.includes('city') ? 'Discover is back' : 'Discover replaced: its neighbors moved in'));
+    const replaced = context.overrides().cylDemoReplaced;
+    if (replaced) {
+      context.override({ cylDemoReplaced: undefined });
+    } else {
+      const tabs = (context.configuration().CYLTabBarControllerTabBarItemsAttributes || []).map((item) => item.CYLTabBarItemIdentifier);
+      const index = tabs.indexOf('home');
+      const next = {};
+      if (index > 0) {
+        next[tabs[index - 1]] = 'A';
+      }
+      if (index >= 0 && index < tabs.length - 1) {
+        next[tabs[index + 1]] = 'B';
+      }
+      context.override({ cylDemoReplaced: next });
+    }
+    getApp().cyl_decorateTabBar();
   },
-  touchableArea: (context) => {
-    const on = !context.overrides().cylDemoPlusAttributes;
-    context.override({ cylDemoPlusAttributes: on ? { CYLPlusButtonSize: '{84, 84}' } : undefined });
-    context.toast(t(on ? 'Plus button: larger touchable area' : 'Plus button: default touchable area'));
+  // [EN] Item 30: the row itself does nothing; its switch and slider act (pages/home). [CN] 第 30 项：点击该行无效果；由开关与滑块操作（pages/home）。
+  touchableArea: () => {},
+  // [EN] Item 35: (0.5 s / 0.35 s) → (1.0 / 0.6) → (0.25 / 0.25). [CN] 第 35 项：依次切换长按时长与双击间隔。
+  longPressDuration: (context) => {
+    const presets = [[0.5, 0.35], [1, 0.6], [0.25, 0.25]];
+    const current = context.configuration().CYLTabBarControllerTabBarItemLongPressDuration || 0.5;
+    const index = presets.findIndex(([value]) => Math.abs(value - current) < 0.001);
+    const [longPress, doubleTap] = presets[((index < 0 ? 0 : index) + 1) % presets.length];
+    context.override({ CYLTabBarControllerTabBarItemLongPressDuration: longPress, CYLTabBarControllerTabBarItemDoubleTapInterval: doubleTap });
   },
+  // [EN] The long press switch: a long press on a tab or the plus button shows its identifier. [CN] 长按开关：长按 Tab 或 PlusButton 显示其标识。
+  longPress: (context) => context.update({ longPressEnabled: !context.state().longPressEnabled }),
   imageLater: (context) => {
     context.override({ cylDemoPlusAttributes: { CYLTabBarItemImage: '', CYLTabBarItemSelectedImage: '' } });
     setTimeout(() => context.override({ cylDemoPlusAttributes: undefined }), 1500);
@@ -141,12 +163,8 @@ const CYL_HOME_ACTIONS = {
     }
     context.toast(t(on ? 'Haptics on every tab tap' : 'Haptics off'));
   },
-  adjacentTab: (context) => {
-    const bar = context.tabBar();
-    if (bar) {
-      bar.cyl_selectAdjacent(1);
-    }
-  },
+  // [EN] Item 37: the row does nothing; its arrows call cyl_switchToAdjacentTab (pages/home cyl_onArrow). [CN] 第 37 项：点击该行无效果；由箭头调用（pages/home 的 cyl_onArrow）。
+  adjacentTab: () => {},
 };
 
 /**

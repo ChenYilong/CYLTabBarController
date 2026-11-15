@@ -101,6 +101,11 @@ Component({
         appearance: this.t((state.overrides || {}).cylDemoAppearance || 'Original'),
         // [EN] Item 16: the code name, not translated, as iOS. [CN] 第 16 项：代码名，与 iOS 一样不翻译。
         scrollBehavior: state.scrollBehavior || 'Automatic',
+        // [EN] Items 30, 35, 37. [CN] 第 30、35、37 项。
+        touchScale: Number(((state.overrides || {}).cylDemoTouchableArea || {}).scale || 1).toFixed(1),
+        longPress: String(configuration.CYLTabBarControllerTabBarItemLongPressDuration || 0.5),
+        doubleTap: String(configuration.CYLTabBarControllerTabBarItemDoubleTapInterval || 0.35),
+        adjacent: state.adjacentResult || '-',
         // [EN] cyl_themeSettingsCell: the skin, " · Follow the system Dark Mode" when it does. [CN] 当前皮肤；跟随系统时加上「 · 跟随系统深色模式」。
         skin: this.t(cylEffectiveSkin(state).name) + (state.skinFollowsSystem ? ` · ${this.t('Follow the system Dark Mode')}` : ''),
         login: this.t(state.loggedIn ? 'Logged in' : 'Logged out'),
@@ -223,6 +228,7 @@ Component({
         allNetworkIcons: updates.allIcons === 'network',
         allLocalIcons: updates.allIcons === 'local',
         allTitles: updates.allTitles,
+        replaceNeighbors: Boolean((state.overrides || {}).cylDemoReplaced),
       };
       const flatOnly = row.id === 'flatBackground';
       const unsupported = flatOnly && configuration.CYLTabBarControllerStyleType !== 'flatDesign';
@@ -233,6 +239,8 @@ Component({
         accessory: row.id in on ? (on[row.id] ? 'check' : 'none') : row.accessory,
         checked: this.cyl_isOn(row.id, state),
         dimmed: unsupported,
+        // [EN] Item 30: the slider of touchableAreaScale (1 to 3). [CN] 第 30 项：touchableAreaScale 滑块（1 到 3）。
+        slider: row.id === 'touchableArea' ? Number(values.touchScale) : null,
       };
     },
 
@@ -243,6 +251,12 @@ Component({
       }
       if (id === 'swipe') {
         return Boolean((state.overrides || {}).CYLTabBarControllerSwipeToSwitchTab);
+      }
+      if (id === 'touchableArea') {
+        return Boolean(((state.overrides || {}).cylDemoTouchableArea || {}).shows);
+      }
+      if (id === 'longPress') {
+        return Boolean(state.longPressEnabled);
       }
       return false;
     },
@@ -388,11 +402,38 @@ Component({
       }
     },
 
+    /**
+     * [EN] Item 37: the ◀︎ / ▶︎ arrows call cyl_switchToAdjacentTab(-1 / 1); the row shows the result (YES / NO).
+     * [CN] 第 37 项：◀︎ / ▶︎ 箭头调用 cyl_switchToAdjacentTab(-1 / 1)；该行显示结果（YES / NO）。
+     */
+    cyl_onArrow(event) {
+      const bar = this.cyl_tabBar();
+      const result = bar ? bar.cyl_switchToAdjacentTab(Number(event.currentTarget.dataset.step)) : false;
+      this.cyl_update({ adjacentResult: result ? 'YES' : 'NO' });
+    },
+
+    /**
+     * [EN] Item 30: the switch shows the touchable area, the slider multiplies it (steps of 0.1).
+     * [CN] 第 30 项：开关显示可点击区域，滑块按倍数扩大（步长 0.1）。
+     */
+    cyl_touchableArea(change) {
+      const current = (getApp().globalData.cylTabBarState.overrides || {}).cylDemoTouchableArea || { shows: false, scale: 1 };
+      this.cyl_override({ cylDemoTouchableArea: Object.assign({}, current, change) });
+    },
+
+    cyl_onTouchSlider(event) {
+      this.cyl_touchableArea({ scale: Math.round(Number(event.detail.value) * 10) / 10 });
+    },
+
     // [EN] A tap on a switch stays on the switch (its change event acts). [CN] 点击开关不传给所在行（由其 change 事件处理）。
     cyl_noop() {},
 
     // [EN] A switch was flipped: the same as tapping its row. [CN] 拨动开关：与点击该行相同。
     cyl_onSwitch(event) {
+      if (event.currentTarget.dataset.id === 'touchableArea') {
+        this.cyl_touchableArea({ shows: Boolean(event.detail.value) });
+        return;
+      }
       this.cyl_onRow(event);
     },
   },

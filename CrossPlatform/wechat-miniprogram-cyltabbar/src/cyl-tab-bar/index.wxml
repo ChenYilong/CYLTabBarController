@@ -8,6 +8,10 @@
     data-key="{{item.key}}"
     id="{{item.accessibilityIdentifier}}"
     bindtap="cyl_onTap"
+    bindtouchstart="cyl_onTouchStart"
+    bindtouchend="cyl_onTouchEnd"
+    bindtouchcancel="cyl_onTouchEnd"
+    bindtouchmove="cyl_onTouchEnd"
     aria-role="{{item.isPlusButton ? 'button' : 'tab'}}"
     aria-label="{{item.accessibilityLabel}}"
     aria-selected="{{item.selected}}"
@@ -16,6 +20,7 @@
       <!-- [EN] As iOS (CYLPlusButtonShowsSelection): the selection under the plus button exists on Liquid Glass only; it is the same cyl-glass-lens as a selected tab's. [CN] 与 iOS 一致（CYLPlusButtonShowsSelection）：PlusButton 下方的选中效果只在液态玻璃下出现。 -->
       <cyl-glass-lens wx:if="{{item.showsSelection && cylStyleType === 'liquidGlass'}}" class="cyl-plus-selection" is-dark="{{cylIsDark}}" lens-style="{{cylGlassLensStyle}}" aria-hidden="true" />
       <view class="cyl-plus-button {{cylAnimatingIdentifier === item.key ? 'cyl-animate-' + cylTapAnimation : ''}}" style="{{item.buttonStyle}} {{cylAnimationStyle}}">
+        <view wx:if="{{item.hitStyle}}" class="cyl-plus-hit" style="{{item.hitStyle}}" aria-hidden="true"></view>
         <image wx:if="{{item.backgroundImage}}" class="cyl-plus-background" src="{{item.backgroundImage}}" mode="aspectFit" aria-hidden="true" />
         <view class="cyl-plus-image-box">
           <image wx:if="{{item.image}}" class="cyl-plus-image" src="{{item.image}}" style="{{item.imageStyle}}" mode="aspectFit" aria-hidden="true" />

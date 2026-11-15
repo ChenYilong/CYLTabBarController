@@ -265,3 +265,23 @@
 .cyl-home-dimmed {
   color: #8e8e93;
 }
+
+/* [EN] The touchable area slider (item 30) and the previous / next arrows (item 37). [CN] 点击范围滑块（第 30 项）与上一个 / 下一个箭头（第 37 项）。 */
+.cyl-home-slider {
+  margin: 8px 0 0;
+}
+
+.cyl-home-arrows {
+  display: flex;
+  flex-direction: row;
+  margin-left: 8px;
+}
+
+.cyl-home-arrow {
+  width: 42px;
+  height: 44px;
+  font-size: 22px;
+  line-height: 44px;
+  text-align: center;
+  color: #007aff;
+}

@@ -5,21 +5,40 @@
  *      网页，因此本页显示链接并可复制。
  */
 const cylTabPage = require('../../utils/cyl_tab_page');
-const { cylDemoConfiguration } = require('../../utils/cyl_demo_configuration');
+const { cylDemoConfiguration, cylReplacedPage } = require('../../utils/cyl_demo_configuration');
 const { cylFeedRows } = require('../../utils/cyl_feed_rows');
 
 Component({
   behaviors: [cylTabPage],
-  data: { url: '', feedRows: [] },
+  data: { url: '', feedRows: [], replaced: null },
   lifetimes: {
     attached() {
       const item = cylDemoConfiguration().CYLTabBarControllerTabBarItemsAttributes
         .find((attributes) => attributes.CYLTabBarItemPageIdentifier === 'web');
       this.setData({ feedRows: cylFeedRows() });
       this.setData({ url: item && item.CYLTabBarItemPageParameters ? item.CYLTabBarItemPageParameters.url : '' });
+      this.cylUnsubscribe = getApp().cyl_subscribe(() => this.cyl_showReplaced());
+      this.cyl_showReplaced();
+    },
+    detached() {
+      if (this.cylUnsubscribe) {
+        this.cylUnsubscribe();
+      }
     },
   },
   methods: {
+    /**
+     * [EN] The Home row "Replace neighboring tabs": this tab shows a plain page with its title and color.
+     * [CN] 首页「替换相邻 Tab 的页面」行：本 Tab 显示带标题与颜色的空白页面。
+     */
+    cyl_showReplaced() {
+      const replaced = cylReplacedPage(getApp().globalData.cylTabBarState.overrides, 'city');
+      if (JSON.stringify(replaced) !== JSON.stringify(this.data.replaced)) {
+        this.setData({ replaced });
+      }
+      wx.setNavigationBarTitle({ title: replaced ? replaced.title : 'CYLTabBarController' });
+    },
+
     // [EN] A parameter row: copies its value. [CN] 参数行：复制其值。
     cyl_copyValue(event) {
       wx.setClipboardData({ data: String(event.currentTarget.dataset.value) });

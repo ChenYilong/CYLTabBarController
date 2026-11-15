@@ -593,7 +593,19 @@ function cylPlusButton(configuration, environment, theme, defaults, tabCount) {
     alignsTitle: cylBool(attributes.CYLPlusButtonAlignsTitle, Boolean(item.title) && !attributes.CYLPlusButtonBackgroundImage),
     keepsTitleVisible: cylBool(attributes.CYLPlusButtonKeepsTitleVisible, true),
     showsSelection: cylBool(attributes.CYLPlusButtonShowsSelection, false),
+    // [EN] CYLPlusButton showsTouchableArea / touchableAreaScale (issue #91): the touchable area in translucent red, and
+    //      the area multiplied (1 to 3). [CN] 以半透明红色显示可点击区域，并按倍数扩大（1 到 3）（issue #91）。
+    showsTouchableArea: cylBool(attributes.CYLPlusButtonShowsTouchableArea, false),
+    touchableAreaScale: Math.min(3, Math.max(1, Number(attributes.CYLPlusButtonTouchableAreaScale) || 1)),
   });
+}
+
+/**
+ * [EN] A positive number of seconds, or `fallback`. [CN] 正的秒数，否则为 `fallback`。
+ */
+function cylPositive(value, fallback) {
+  const number = Number(value);
+  return Number.isFinite(number) && number > 0 ? number : fallback;
 }
 
 /**
@@ -642,6 +654,10 @@ function cylReadConfiguration(configuration, environment) {
     tapAnimation: CYL_TAP_ANIMATIONS.includes(tapAnimation) ? tapAnimation : 'none',
     animationDuration: Math.round(400 / (Number.isFinite(speed) && speed > 0 ? speed : 1)),
     swipeToSwitchTab: cylBool(source.CYLTabBarControllerSwipeToSwitchTab, false),
+    // [EN] cyl_tabBarItemLongPressDuration (0.5 s) and cyl_tabBarItemDoubleTapInterval (0.35 s), issue #535 / #152.
+    // [CN] 长按时长（0.5 秒）与双击间隔（0.35 秒），issue #535 / #152。
+    longPressDuration: cylPositive(source.CYLTabBarControllerTabBarItemLongPressDuration, 0.5),
+    doubleTapInterval: cylPositive(source.CYLTabBarControllerTabBarItemDoubleTapInterval, 0.35),
     loginRequiredIdentifiers: cylStringList(source.CYLTabBarControllerLoginRequiredTabBarItemIdentifiers),
     isDark,
     themeIdentifier,

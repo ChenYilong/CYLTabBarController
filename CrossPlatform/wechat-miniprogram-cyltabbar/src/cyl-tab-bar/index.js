@@ -486,6 +486,11 @@ Component({
         image: selected ? plus.selectedImage : plus.image,
         backgroundImage: plus.backgroundImage,
         buttonStyle: `top: ${top}px; height: ${height}px;${plus.width ? ` width: ${plus.width}px;` : ''}`,
+        // [EN] The touchable area around the button, multiplied by touchableAreaScale, red when shown (issue #91).
+        // [CN] 按钮周围的可点击区域，按 touchableAreaScale 放大，显示时为红色（issue #91）。
+        hitStyle: plus.touchableAreaScale > 1 || plus.showsTouchableArea
+          ? `width: ${plus.touchableAreaScale * 100}%; height: ${plus.touchableAreaScale * 100}%; left: ${(1 - plus.touchableAreaScale) * 50}%; top: ${(1 - plus.touchableAreaScale) * 50}%;${plus.showsTouchableArea ? ' background-color: rgba(255, 59, 48, 0.35);' : ''}`
+          : '',
         imageStyle: `width: ${imageWidth}px; height: ${imageHeight}px;`,
         titleStyle: `${color ? `color: ${color};` : ''}${(selected ? plus.selectedTitleFontStyle : plus.titleFontStyle) || ''}`,
         badge: this.cyl_plusBadge(plus.identifier || 'cyl-plus-button'),
@@ -498,8 +503,68 @@ Component({
      * [EN] A tap on a tab or the plus button: checks login, plays the tap animation and emits the event.
      * [CN] 点击 Tab 或 PlusButton：检查登录、播放点击动画并发出事件。
      */
+    /**
+     * [EN] Long press and double tap (issue #535 / #152): a touch held for cyl_tabBarItemLongPressDuration emits
+     *      `longpress` instead of the tap; two taps within cyl_tabBarItemDoubleTapInterval emit `doubletap` after the
+     *      second tap.
+     * [CN] 长按与双击（issue #535 / #152）：按住达到长按时长时发出 `longpress`，代替点击；双击间隔内的两次点击在第二次
+     *      点击后发出 `doubletap`。
+     */
+    cyl_onTouchStart(event) {
+      const key = event.currentTarget.dataset.key;
+      const model = this.cylModel;
+      clearTimeout(this.cylLongPressTimer);
+      this.cylLongPressed = false;
+      if (!model) {
+        return;
+      }
+      this.cylLongPressTimer = setTimeout(() => {
+        this.cylLongPressed = true;
+        this.triggerEvent('longpress', this.cyl_detail(key));
+      }, model.longPressDuration * 1000);
+    },
+
+    cyl_onTouchEnd() {
+      clearTimeout(this.cylLongPressTimer);
+    },
+
+    /**
+     * [EN] The event detail of the tab or plus button `key`. [CN] Tab 或 PlusButton `key` 的事件详情。
+     */
+    cyl_detail(key) {
+      const model = this.cylModel;
+      const plus = model.plusButton;
+      const isPlusButton = Boolean(plus) && key === (plus.identifier || 'cyl-plus-button');
+      const item = isPlusButton ? plus : model.items.find((candidate) => candidate.identifier === key);
+      return item ? {
+        index: this.data.cylSlots.findIndex((slot) => slot.key === key),
+        identifier: item.identifier,
+        title: item.title,
+        pageIdentifier: item.pageIdentifier,
+        pageParameters: item.pageParameters,
+        context: model.context,
+        isPlusButton,
+      } : null;
+    },
+
     cyl_onTap(event) {
       const key = event.currentTarget.dataset.key;
+      if (this.cylLongPressed && event.type === 'tap') {
+        // [EN] The touch was a long press. [CN] 本次触摸是长按。
+        this.cylLongPressed = false;
+        return;
+      }
+      if (event.type === 'tap' && this.cylModel) {
+        const now = Date.now();
+        const last = this.cylLastTap || {};
+        if (last.key === key && now - last.time <= this.cylModel.doubleTapInterval * 1000) {
+          this.cylLastTap = null;
+          const doubleTapDetail = this.cyl_detail(key);
+          setTimeout(() => this.triggerEvent('doubletap', doubleTapDetail), 0);
+        } else {
+          this.cylLastTap = { key, time: now };
+        }
+      }
       const model = this.cylModel;
       const plus = model.plusButton;
       const isPlusButton = Boolean(plus) && key === (plus.identifier || 'cyl-plus-button');
@@ -560,6 +625,32 @@ Component({
      * [CN] CYLTabBarControllerSwipeToSwitchTab：选中与当前 Tab 相邻的 Tab（1 为下一个，-1 为上一个），跳过 PlusButton，
      *      像点击一样发出 `select`；该键关闭或已到两端时不做任何事。页面在水平滑动时调用（cyl_swipe_behavior.js）。
      */
+    /**
+     * [EN] cyl_switchToAdjacentTabWithStep: (issue #535): selects the next (1) or previous (-1) tab, the plus button
+     *      included when it has a page, like a tap: a tab that needs login starts the login (`loginrequired`) and
+     *      returns false; at either end it returns false (no wrapping). Swipe or not.
+     * [CN] cyl_switchToAdjacentTabWithStep:（issue #535）：像点击一样选中下一个（1）或上一个（-1）Tab；PlusButton 有页面时
+     *      也算在内；需要登录的 Tab 开始登录（`loginrequired`）并返回 false；到两端时返回 false（不循环）。与是否开启滑动无关。
+     */
+    cyl_switchToAdjacentTab(step) {
+      const model = this.cylModel;
+      if (!model) {
+        return false;
+      }
+      const plus = model.plusButton;
+      const slots = this.data.cylSlots.filter((slot) => !slot.isPlusButton || (plus && plus.hasPage));
+      const current = this.data.selectedIdentifier || (model.items[0] ? model.items[0].identifier : '');
+      const index = slots.findIndex((slot) => slot.key === current);
+      const next = slots[index + (step > 0 ? 1 : -1)];
+      if (index < 0 || !next) {
+        return false;
+      }
+      const item = next.isPlusButton ? plus : model.items.find((candidate) => candidate.identifier === next.key);
+      const needsLogin = item && model.loginRequiredIdentifiers.includes(item.identifier) && !this.data.loggedIn;
+      this.cyl_onTap({ currentTarget: { dataset: { key: next.key } } });
+      return !needsLogin;
+    },
+
     cyl_selectAdjacent(step) {
       const model = this.cylModel;
       if (!model || !model.swipeToSwitchTab) {
