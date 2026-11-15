@@ -14,5 +14,5 @@ export {
   CYLTabBarConfigurationErrorDomain, CYLTabBarConfigurationMaximumLength, CYLTabBarConfigurationMaximumDepth
 } from './src/main/ets/CYLTabBarConfigurationParser';
 export {
-  CYLTabBarConfiguration, CYLConfiguredTabBarItem, CYLTabBarConfigurationResult, CYLTabBarImageResolver
+  CYLTabBarConfiguration, CYLConfiguredTabBarItem, CYLConfiguredPlusButton, CYLTabBarConfigurationResult, CYLTabBarImageResolver
 } from './src/main/ets/CYLTabBarConfiguration';
