@@ -128,3 +128,42 @@ Every example, existing and new, integrates CYLTableViewPlaceHolder with CocoaPo
 (`cyl_header`), an empty-data and a no-network placeholder (animated icons preferred) and a red bar at the top while
 offline. MJRefresh is not used (`mj_` → `cyl_`, `MJRefresh…` → `CYLRefresh…`). Library-caused build errors go into
 `docs/CYLTableViewPlaceHolder-Integration-Issues.md`. AGENTS.md, "Depending on CYLTableViewPlaceHolder".
+
+## HarmonyOS: IDE preparation and emulator prerequisites (added 2026-11-16)
+
+Before any HarmonyOS work (building, installing or running a HAP, taking emulator screenshots), check these:
+
+1. **DevEco Studio is installed**: `/Applications/DevEco-Studio.app` (DevEco Studio 6.0). The SDK is the bundled one:
+   `DEVECO_SDK_HOME=/Applications/DevEco-Studio.app/Contents/sdk`; `hdc` is at
+   `sdk/default/openharmony/toolchains/hdc`; build with the bundled node running
+   `tools/hvigor/bin/hvigorw.js assembleHap --no-daemon`.
+2. **The region is China.** The emulator (Device Manager, emulator images) is only offered when DevEco Studio's region
+   is China. The region file is
+   `~/Library/Application Support/Huawei/DevEcoStudio6.0/options/country.region.xml` (the folder follows the DevEco
+   version). It must say `<countryregion name="CN"/>`, not another region such as `NZ`:
+
+   ```xml
+   <application>
+       <component name="CountryRegionSetting">
+           <countryregion name="CN"/>
+       </component>
+   </application>
+   ```
+
+   Check it with `grep countryregion "$HOME/Library/Application Support/Huawei/DevEcoStudio"*/options/country.region.xml`.
+   If it is not `CN`: quit DevEco Studio first (it writes its settings back on exit), keep a copy of the file, change
+   the value to `CN`, start DevEco Studio again and check the file once more.
+3. **An emulator image is installed and the emulator starts**: the Mate 70 Pro image under `~/.Huawei/Emulator/deployed`
+   (`Emulator -hvd "Mate 70 Pro" -path ~/.Huawei/Emulator/deployed -imageRoot ~/Library/Huawei/Sdk`, from
+   `/Applications/DevEco-Studio.app/Contents/tools/emulator/`), signed in to a Huawei account in DevEco Studio when
+   the image download asks for it, with hardware virtualization available on the Mac.
+4. **Signing is not needed on the emulator**: it installs the unsigned `entry-default-unsigned.hap`
+   (`hdc install -r`). Do not ask the owner for a signing setup for emulator runs.
+
+## Locating controls in UI tests
+
+All code of this project supports accessibility and localization, including the HarmonyOS code. UI tests and simulator /
+emulator checks locate controls through accessibility identifiers, accessibility labels / texts and localized strings
+first (XCUITest, `axe describe-ui`, `uiautomator`, HarmonyOS UiTest `ON.id()` / `ON.text()`, Flutter
+`find.bySemanticsLabel`, React Native `getByLabelText`), for taps, complex flows and consecutive steps. Coordinates are
+the last resort; a control that cannot be found that way is a bug: add the label first. HarmonyOS details: `cyl-harmonyos`.

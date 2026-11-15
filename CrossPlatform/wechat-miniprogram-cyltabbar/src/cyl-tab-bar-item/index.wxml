@@ -41,6 +41,16 @@
       speed="{{animationSpeed}}"
       autoplay="{{!m.selected && loopsWhenUnselected}}"
     />
+    <cyl-svga-view
+      wx:elif="{{m.animationType === 'svga'}}"
+      id="cyl-item-animation"
+      class="cyl-item-animation"
+      path="{{m.animationPath}}"
+      loop="{{animationLoop || (!m.selected && loopsWhenUnselected)}}"
+      speed="{{animationSpeed}}"
+      autoplay="{{!m.selected && loopsWhenUnselected}}"
+      resting-frame="{{m.selected ? 'last' : 'first'}}"
+    />
     <view wx:elif="{{m.image && m.iconTint}}" class="cyl-item-tint">
       <image class="cyl-item-image cyl-item-tinted" src="{{m.image}}" style="filter: drop-shadow({{m.iconTint}} 200px 0);" mode="aspectFit" />
     </view>

@@ -182,6 +182,13 @@ test('Lottie, PAG, Rive, generic animation and GIF keys', () => {
   assert.equal(fragment.path.split('#')[0], '/shared/rive/icons.riv.bin');
   assert.match(fragment.path, /artboard=BELL/);
   assert.match(fragment.path, /stateMachine=BELL_Interactivity/);
+  // [EN] FIX: issue #415: SVGA icons, by their own keys or the generic keys with a .svga file. [CN] SVGA 图标：自己的键，或文件为 .svga 的通用键。
+  const svga = reader.cylSVGA({ CYLTabBarSVGAFilePath: '/shared/svga/tab_home.svga.bin', CYLTabBarSVGADarkURL: 'https://x/d.svga',
+    CYLTabBarSVGASize: '{32, 32}' }, env);
+  assert.deepEqual([svga.library, svga.path, svga.darkPath, svga.width], ['svga', '/shared/svga/tab_home.svga.bin', 'https://x/d.svga', 32]);
+  assert.equal(reader.cylSVGA({ CYLTabBarAnimationURL: 'https://x/a.svga' }, env).path, 'https://x/a.svga');
+  assert.equal(reader.cylSVGA({ CYLTabBarAnimationURL: 'https://x/a.riv' }, env), null);
+  assert.equal(reader.cylRive({ CYLTabBarAnimationURL: 'https://x/a.svga' }, env), null);
   assert.equal(reader.cylGIF({ CYLTabBarGIFFilePath: 'a.gif', CYLTabBarGIFDarkFilePath: 'b.gif' }, env, true), '/shared/lottie/b.gif');
   assert.equal(reader.cylGIF({ CYLTabBarAnimationURL: 'https://x/a.gif' }, env, false), 'https://x/a.gif');
 });

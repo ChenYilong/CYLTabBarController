@@ -6,6 +6,7 @@
   generic:cyl-lottie-view="cyl-lottie"
   generic:cyl-pag-view="cyl-pag"
   generic:cyl-rive-view="cyl-rive"
+  generic:cyl-svga-view="cyl-svga"
   configuration="{{configuration}}"
   item-style="{{itemStyle}}"
   glass-lens-style="{{glassLensStyle}}"

@@ -14,11 +14,15 @@ const OffscreenCanvas = CYLOffscreenCanvas
 //      factory result lands on `window.lottie` (the light canvas build has no `eval`, issues #2, #51, #56).
 // [CN] lottie-web 的 UMD 包装在 `module` 存在时写入 `module.exports`；这里对它隐藏，使工厂函数的结果写到
 //      `window.lottie`（light canvas 版本不含 `eval`，issue #2、#51、#56）。
+//      The build also makes its UMD header ignore `globalThis` (webpack.config.js), so the result lands on `window`
+//      without binding that special name here (SonarCloud S2137).
+// [CN] 构建时还会让其 UMD 头部忽略 `globalThis`（webpack.config.js），结果仍写到 `window`，而无需在这里绑定这个特殊名称
+//      （SonarCloud S2137）。
 // eslint-disable-next-line no-unused-vars
-const lottieWeb = (function (module, exports, define, globalThis, self) {
-  ;'__LOTTIE_CANVAS__'
+const lottieWeb = (function (module, exports, define, self) {
+  /* __LOTTIE_CANVAS__ */
   return window.lottie
-}).call(window, undefined, undefined, undefined, undefined, window)
+}).call(window, undefined, undefined, undefined, window)
 
 /**
  * [EN] Whether a path is a network URL.

@@ -458,14 +458,14 @@ extension CYLTabBarController {
      */
     private func applyThemePlusButtonAttributes(_ attributes: [String: Any]?, generation: Int) {
         guard let plusButton = CYLPlusButton(forOwner: self) else { return }
-        plusButton.cylPrivate.cylSetBackgroundImageDidChangeHandler { [weak self] in
+        plusButton.cylSetBackgroundImageDidChangeHandler { [weak self] in
             self?.plusButtonBackgroundImageDidChange()
         }
         var themeParts: [String: Any] = [:]
         themeParts[CYLThemeKeys.plusPartTitle] = attributes?[CYLTabBarItemTitle]
         // [EN] A button whose picture is its background keeps it: an icon of a theme would sit beside the title, over the picture.
         // [CN] 以背景图为图片的按钮保持原样：主题图标会盖在图片上、挤在标题旁边。
-        let takesThemeImages = !plusButton.cylPrivate.cylDrawsTitleOverBackgroundImage()
+        let takesThemeImages = !plusButton.cylDrawsTitleOverBackgroundImage()
         if takesThemeImages {
             themeParts[CYLThemeKeys.plusPartImage] = attributes?[CYLTabBarItemImageURL] ?? attributes?[CYLTabBarItemImage]
             themeParts[CYLThemeKeys.plusPartSelectedImage] = attributes?[CYLTabBarItemSelectedImageURL] ?? attributes?[CYLTabBarItemSelectedImage]
@@ -490,7 +490,7 @@ extension CYLTabBarController {
                 guard let self, let plusButton, self.isCurrentThemeGeneration(generation) else { return }
                 // [EN] A background image arrived while the icon was loading: the button takes no theme image any more.
                 // [CN] 图标加载期间背景图片已到：按钮不再接受主题图片。
-                if plusButton.cylPrivate.cylDrawsTitleOverBackgroundImage() { return }
+                if plusButton.cylDrawsTitleOverBackgroundImage() { return }
                 guard let image else {
                     self.restoreThemePlusButtonPart(part)
                     return
@@ -539,7 +539,7 @@ extension CYLTabBarController {
                 plusButton.cyl_updateTitle(nil, image: original, selectedImage: nil)
             } else {
                 // [EN] It had no image of its own. [CN] 它原本没有图片。
-                plusButton.cylPrivate.cylRemoveImage()
+                plusButton.cylRemoveImage()
             }
         } else {
             // [EN] No selected image of its own: the normal one, as a button without a selected image shows.

@@ -58,7 +58,12 @@ extension UITabBar {
         objc_setAssociatedObject(self, CYLKey("cyl_platterViewSize"), size, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
     }
 
-    @objc(cyl_contentView)
+    /**
+     * [EN] The tab bar's content view: its platter view, else the tab bar. Objective-C reaches it through
+     *      `-[UIView cyl_contentView]`, which dispatches here for a tab bar (one selector, see that method).
+     * [CN] TabBar 的内容视图：其 platter 视图，否则为 TabBar 本身。Objective-C 通过 `-[UIView cyl_contentView]` 访问，
+     *      该方法对 TabBar 分派到这里（同一个 selector，见该方法）。
+     */
     func cylContentView() -> UIView {
         cylPlatterView() ?? self
     }

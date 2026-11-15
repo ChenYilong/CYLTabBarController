@@ -4,6 +4,8 @@
     <item name="cyl_tab_bar_item_animation_player" type="id" />
     <item name="cyl_tab_bar_item_view_animator" type="id" />
     <item name="cyl_tab_bar_item_animation_view" type="id" />
+    <!-- [EN] The parse state of an SVGA tab icon. [CN] SVGA Tab 图标的解析状态。 -->
+    <item name="cyl_svga_state" type="id" />
     <!-- [EN] Theme values (adapted from QMUI skin). [CN] 主题值（改编自 QMUI 换肤）。 -->
     <item name="cyl_theme_value" type="id" />
     <item name="cyl_theme_value_applied" type="id" />

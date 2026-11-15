@@ -1,0 +1,28 @@
+{
+  "string": [
+    {
+      "name": "cyl_demo_home",
+      "value": "होम"
+    },
+    {
+      "name": "cyl_demo_nearby",
+      "value": "आस-पास"
+    },
+    {
+      "name": "cyl_demo_messages",
+      "value": "संदेश"
+    },
+    {
+      "name": "cyl_demo_me",
+      "value": "मैं"
+    },
+    {
+      "name": "cyl_demo_post",
+      "value": "पोस्ट"
+    },
+    {
+      "name": "cyl_demo_page",
+      "value": "पेज %s"
+    }
+  ]
+}

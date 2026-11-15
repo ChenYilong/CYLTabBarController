@@ -418,7 +418,10 @@ extension UIViewController {
         case .guidedAccess:
             center.post(name: UIAccessibility.guidedAccessStatusDidChangeNotification, object: nil)
         case .sameTabAgain:
-            tabBarController.selectedIndex = tabBarController.selectedIndex
+            // [EN] Selecting the tab that is already selected, as a second tap on it does.
+            // [CN] 再次选中已选中的 Tab，与再点一次相同。
+            let selectedIndex = tabBarController.selectedIndex
+            tabBarController.selectedIndex = selectedIndex
         case .turnOnAgain:
             tabBarController.cyl_hidesTabBarOnScroll = true
         case .appShowsTabBar:

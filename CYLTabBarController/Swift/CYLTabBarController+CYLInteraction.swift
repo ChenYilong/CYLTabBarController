@@ -705,7 +705,7 @@ extension CYLTabBarController {
             // [CN] 放大镜被按住或拖动期间关闭 PlusButton 的放大镜遮罩（它曾把 PlusButton 切成两半）。
             let lensIsMoving = gestureRecognizer.state == .began || gestureRecognizer.state == .changed
             if hasPlusButton(), let plusButton = cylPrivate.cylContextPlusButton() {
-                plusButton.cylPrivate.cylSetLiquidGlassLensMaskSuspended(lensIsMoving)
+                plusButton.cylSetLiquidGlassLensMaskSuspended(lensIsMoving)
             }
         }
         let handlesLongPress = cylHandlesTabButtonLongPress()

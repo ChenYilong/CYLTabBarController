@@ -147,6 +147,10 @@ class _HomePageState extends State<HomePage> {
 |:---|:---|
 | 组件只绘制 TabBar，页面由 Flutter 绘制（如上面的 `IndexedStack`）。高度由原生 TabBar 决定：底部安全区，加上 PlusButton 与角标高出 TabBar 的部分（Flutter 会裁剪平台视图）。图片放在 `pubspec.yaml` 的 `assets:` 中，可以有 `2.0x/`、`3.0x/` 版本。 | The widget draws only the bar; Flutter draws the pages (the `IndexedStack` above). Its height comes from the native tab bar: the bottom safe area, plus what the plus button and the badges rise above the bar (Flutter clips platform views). Put the images in `assets:` of `pubspec.yaml`, with `2.0x/` and `3.0x/` variants if you like. |
 
+| 中文 | English |
+|:---|:---|
+| **SVGA Tab 图标**：已支持；App 需加入 SVGA 播放器（iOS `pod 'CYLTabBarController/SVGA'`，Android SVGAPlayer-Android），步骤见 [在 App 中使用 SVGA 图标](Cross-Platform-Components.md#cn在-app-中使用-svga-图标react-nativeflutter)。 | **SVGA tab icons**: supported; the app adds the SVGA player (iOS `pod 'CYLTabBarController/SVGA'`, Android SVGAPlayer-Android), steps in [SVGA tab icons in your app](Cross-Platform-Components.md#ensvga-tab-icons-in-your-app-react-native-flutter). |
+
 ## [CN]字段
 ## [EN]Fields
 

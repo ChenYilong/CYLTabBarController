@@ -1,0 +1,28 @@
+{
+  "string": [
+    {
+      "name": "cyl_demo_home",
+      "value": "ホーム"
+    },
+    {
+      "name": "cyl_demo_nearby",
+      "value": "近く"
+    },
+    {
+      "name": "cyl_demo_messages",
+      "value": "メッセージ"
+    },
+    {
+      "name": "cyl_demo_me",
+      "value": "マイページ"
+    },
+    {
+      "name": "cyl_demo_post",
+      "value": "投稿"
+    },
+    {
+      "name": "cyl_demo_page",
+      "value": "ページ %s"
+    }
+  ]
+}

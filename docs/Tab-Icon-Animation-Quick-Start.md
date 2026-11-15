@@ -62,7 +62,7 @@ cd Example-Swift && pod install && open *.xcworkspace
 | PAG | [Example-PAG](../Example-PAG) | `PAG` | [TabBarCommon.swift](../Example-Swift-03/HealthyHome/Tool/TabBarCommon.swift) (`#if CYL_DEMO_PAG`) |
 | Rive（UIKit） | [Example-Rive](../Example-Rive) | `Rive` | [TabItems.swift](../Example-SwiftUI-Rive/AnimatedApp/Navigation/TabItems.swift) |
 | Rive（SwiftUI） | [Example-SwiftUI-Rive](../Example-SwiftUI-Rive) | `Rive` | 同上 / The same file |
-| SVGA（#415） | [Example-Rive](../Example-Rive)（Bell Tab，Rive 演示之后 / Bell tab, after the Rive demo） | `SVGA` | [SVGATabIconDemoView.swift](../Example-Rive/RiveApp/SVGATabIconDemoView.swift) |
+| SVGA（#415） | [Example-Rive](../Example-Rive)、[Example-SwiftUI-Rive](../Example-SwiftUI-Rive)（Bell Tab / the Bell tab） | `SVGA` | [SVGATabIcons.swift](../Example-SwiftUI-Rive/AnimatedApp/Navigation/SVGATabIcons.swift)、[SVGATabIconDemoView.swift](../Example-SwiftUI-Rive/AnimatedApp/Navigation/SVGATabIconDemoView.swift) |
 | GIF | [Example-GIF](../Example-GIF) | `GIF` | [AppDelegate.swift](../Example-GIF/GIFApp/Classes/Other/AppDelegate.swift) |
 | PAG、Rive（React Native） | [react-native-cyltabbar](../CrossPlatform/react-native-cyltabbar) `example-pag`、`example-rive` | `PAG` / `Rive` 子库 + `CYLTabBarHostView` / subspec + `CYLTabBarHostView` | [example-rive/src/App.tsx](../CrossPlatform/react-native-cyltabbar/example-rive/src/App.tsx) |
 | PAG、Rive（Flutter） | [flutter_cyltabbar](../CrossPlatform/flutter_cyltabbar) `example_pag`、`example_rive` | 同上 / The same | [example_rive/lib/main.dart](../CrossPlatform/flutter_cyltabbar/example_rive/lib/main.dart) |

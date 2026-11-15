@@ -99,6 +99,21 @@ Every new feature and user-visible change ships with bilingual documentation in 
     missing label as a bug and fix it.
   - The convention: every component and every text of this project supports accessibility. A change that adds a control
     or a text without it is not done.
+- **Accessibility and localization in all code, HarmonyOS included (2026-11-16).** All code of this project supports
+  accessibility (screen readers such as VoiceOver, TalkBack and the HarmonyOS screen reader; visual aids such as large
+  text, bold text, high contrast and color inversion) and internationalization / localization through localization
+  files, including the HarmonyOS NEXT (ArkTS / ArkUI) code. Where support is missing, add it first, then continue.
+  - HarmonyOS: every control has `accessibilityText` (localized), `accessibilityDescription` when a hint helps,
+    `accessibilityGroup(true)` for a control made of several views, `accessibilityLevel('no')` for decorations, a
+    stable `id` (`key`) for tests and the selected state in its text; all texts come from string resources
+    (`$r('app.string.…')`, `resources/<locale>/element/string.json`) copied from CYLTabBarController's localization
+    files (`CYLTabBarController/Resources/CYLTabBarController.bundle/*.lproj`), keeping only the strings the HarmonyOS
+    code uses. Skill: `cyl-harmonyos`.
+  - Automated UI tests use these features first to locate controls: accessibility identifiers (`id` / `key`,
+    `accessibilityIdentifier`, `testID`), accessibility labels / texts and localized strings (HarmonyOS UiTest `ON.id()` /
+    `ON.text()`, XCUITest queries, `axe describe-ui`, `uiautomator`, Flutter `find.bySemanticsLabel`, React Native
+    `getByLabelText`), to tap, to drive complex flows and consecutive steps. Coordinates are the last resort; a control
+    that cannot be found that way is a bug to fix.
 - **Naming: keep the project's prefixes.** Every class, protocol, type and function of this project starts with `CYL`,
   and every category method and category property starts with `cyl_`. A file you create or bring in (copied from
   another project, a sample, a snippet) follows the same rules:
@@ -435,7 +450,7 @@ The root `Podfile` is the reference: it already has the top lines and the hook.
 - Branch from the latest `master` for each issue or feature.
 - **Swift for the iOS core layer (added 2026-11-12)**: the core layer (`Core`, `CYLUtils`, `CYLBadgeView` subspecs) is being translated from Objective-C to Swift, bottom-up, keeping every Objective-C name (`@objc(name)`); third-party adapters and the examples stay unless a change is needed. Follow [docs/Swift-Coding-Style.md](docs/Swift-Coding-Style.md); record each step and the score of `python3 scripts/swift-migration-score.py` in [docs/Swift-Migration.md](docs/Swift-Migration.md) and in the commit body; continue until the score is 100 (no Objective-C left; macro-only headers count as compatible). **Examples bend, the core does not (added 2026-11-13)**: when the migration breaks an example's build, fix the example first; examples have the lowest priority and their code may change freely. Never keep a workaround, overload, kept name or shim in the core only because an example uses it; the Swift coding style decides. The public API rule and kept Objective-C selectors still apply, for apps. Details: [docs/Swift-Coding-Style.md](docs/Swift-Coding-Style.md).
 - **Upstream projects used for translation (added 2026-11-12)**: when a document of this project links to another project's GitHub repository that is the source of a translation or port (for example the projects ported to Kotlin in the Android folder), do not translate only its default branch. (1) Pull requests: visit the upstream's open pull requests and bring them in. If the translation has not started, merge the open pull requests into the source first; if it is already done, translate each open pull request's change and merge it into our port. (2) Issues: list the upstream's open issues in a table in the related document in `docs/` (create one when none fits): column 1 the issue link, column 2 its description, column 3 the fix status (`TODO` by default). Find each issue's counterpart in our code and try to fix it. (3) Score: 100 means every listed issue is resolved; give a score after each fix and continue until 100. (4) Order: for a translation not started yet, merge the open pull requests, fix issues until the score reaches 60, translate, then fix the remaining issues up to 100; for a finished translation, translate and merge the open pull requests, then fix the issues on the translated code up to 100. The same rule applies to every platform.
-- **`-[CYLPlusButton cyl_updateLiquidGlassMask]` is a known source of plus button bugs (added 2026-11-12)**: implement it only with great care. When any plus button bug shows up (missing, cut, offset, flickering), first disable this method (its first line returns, through `CYL_PLUS_BUTTON_LENS_MASK_ENABLED` set to 0) and test again, to rule it out before looking anywhere else. Known failure: on iOS 26 and later, Liquid Glass (not FlatDesign), with a plus button that has a plus child view controller, select the plus button, then drag the Liquid Glass lens to another item: the plus button is cut in two. The maintainer removed an earlier implementation because of this. Keep an implementation only after complete testing shows that dragging the lens never cuts the plus button (the drag UI tests in `Example-SwiftUI/HealthyHomeUITests`, recorded on video, raised and flat plus buttons), and that the plus button is never missing or offset on first display or when the plus tab is selected in code. **Same risk, to verify (added 2026-11-13, TODO)**: PR #793 keeps the Liquid Glass lens on the plus page when the plus button's title is drawn by its tab item (`-[CYLTabBarController cyl_plusButtonTitleIsDrawnByItsTabItem]`, switch `CYL_PLUS_BUTTON_TITLE_KEEPS_LENS_ENABLED`). The maintainer considers it as dangerous as the mask: verify it the same way, and on any plus button bug after selection turn both off first.
+- **`-[CYLPlusButton cyl_updateLiquidGlassMask]` is a known source of plus button bugs (added 2026-11-12)**: implement it only with great care. When any plus button bug shows up (missing, cut, offset, flickering), first disable this method (since step 52 of the Swift migration it is Swift and does nothing unless the Swift compilation condition `CYL_PLUS_BUTTON_LENS_MASK_ENABLED` is set; before, an Objective-C macro of that name set to 0 made its first line return) and test again, to rule it out before looking anywhere else. Known failure: on iOS 26 and later, Liquid Glass (not FlatDesign), with a plus button that has a plus child view controller, select the plus button, then drag the Liquid Glass lens to another item: the plus button is cut in two. The maintainer removed an earlier implementation because of this. Keep an implementation only after complete testing shows that dragging the lens never cuts the plus button (the drag UI tests in `Example-SwiftUI/HealthyHomeUITests`, recorded on video, raised and flat plus buttons), and that the plus button is never missing or offset on first display or when the plus tab is selected in code. **Same risk, to verify (added 2026-11-13, TODO)**: PR #793 keeps the Liquid Glass lens on the plus page when the plus button's title is drawn by its tab item (`-[CYLTabBarController cyl_plusButtonTitleIsDrawnByItsTabItem]`, switch `CYL_PLUS_BUTTON_TITLE_KEEPS_LENS_ENABLED`). The maintainer considers it as dangerous as the mask: verify it the same way, and on any plus button bug after selection turn both off first.
 - **Record every task in `docs/` before starting it (added 2026-11-12)**: before any task, find the most relevant existing document in `docs/` (create one only when none fits) and add a `TODO` entry with the task's full context, the user's requirements, and the user's prompt quoted verbatim. Then start the work. When the task is finished, change that entry to `DONE` with the result and its evidence (commits, tests, screenshots). Purpose: if the work is interrupted, the next session can find the context again.
 - **Every new branch gets a pull request, automatically (added 2026-11-12)**: after creating a branch and pushing its first commit, open a pull request right away, without asking. Target branch: the branch it was created from (preferred); otherwise `main` or `master`.
 - **Every commit message carries the author line** `By  @ChenYilong <luohanchenyilong@163.com>` (exactly as written,
@@ -484,3 +499,34 @@ python3 scripts/update-docs-navigation.py
 python3 scripts/sync-agent-skills.py --check
 scripts/publish-android.sh staging        # Android library: build and check the Maven bundle (local | staging | central | github)
 ```
+
+## HarmonyOS: IDE preparation and emulator prerequisites (added 2026-11-16)
+
+Before any HarmonyOS work (building, installing or running a HAP, taking emulator screenshots), check these:
+
+1. **DevEco Studio is installed**: `/Applications/DevEco-Studio.app` (DevEco Studio 6.0). The SDK is the bundled one:
+   `DEVECO_SDK_HOME=/Applications/DevEco-Studio.app/Contents/sdk`; `hdc` is at
+   `sdk/default/openharmony/toolchains/hdc`; build with the bundled node running
+   `tools/hvigor/bin/hvigorw.js assembleHap --no-daemon`.
+2. **The region is China.** The emulator (Device Manager, emulator images) is only offered when DevEco Studio's region
+   is China. The region file is
+   `~/Library/Application Support/Huawei/DevEcoStudio6.0/options/country.region.xml` (the folder follows the DevEco
+   version). It must say `<countryregion name="CN"/>`, not another region such as `NZ`:
+
+   ```xml
+   <application>
+       <component name="CountryRegionSetting">
+           <countryregion name="CN"/>
+       </component>
+   </application>
+   ```
+
+   Check it with `grep countryregion "$HOME/Library/Application Support/Huawei/DevEcoStudio"*/options/country.region.xml`.
+   If it is not `CN`: quit DevEco Studio first (it writes its settings back on exit), keep a copy of the file, change
+   the value to `CN`, start DevEco Studio again and check the file once more.
+3. **An emulator image is installed and the emulator starts**: the Mate 70 Pro image under `~/.Huawei/Emulator/deployed`
+   (`Emulator -hvd "Mate 70 Pro" -path ~/.Huawei/Emulator/deployed -imageRoot ~/Library/Huawei/Sdk`, from
+   `/Applications/DevEco-Studio.app/Contents/tools/emulator/`), signed in to a Huawei account in DevEco Studio when
+   the image download asks for it, with hardware virtualization available on the Mac.
+4. **Signing is not needed on the emulator**: it installs the unsigned `entry-default-unsigned.hap`
+   (`hdc install -r`). Do not ask the owner for a signing setup for emulator runs.

@@ -25,11 +25,12 @@ import UIKit
     @objc(cyl_contextPlusButton) func cylContextPlusButton() -> CYLPlusButton?
     @objc(cyl_contextPlusChildViewController) func cylContextPlusChildViewController() -> UIViewController?
     @objc(cyl_reportedControlForControl:) func cylReportedControl(for control: UIControl?) -> UIControl?
+    /// FIX: issue #594 — implemented in CYLTabBarController.m (`CYLTabBarController (CYLPlusButtonSelection)`).
+    @objc(cyl_plusButtonControlIfSelectingPlusChildViewController:) func cylPlusButtonControlIfSelectingPlusChildViewController(_ viewController: UIViewController) -> UIControl?
+    /// FIX: issue #610 — implemented in CYLTabBarController.m, only with FlatDesign (`CYL_FLATDESIGN_AVAILABLE`).
+    @objc(cyl_flatDesignReportDidSelectControl:) optional func cylFlatDesignReportDidSelectControl(_ control: UIControl)
 }
 
-/**
- * [EN] The methods only `CYLPlusButton.m` declares, as for the tab bar controller above. [CN] 只在 `CYLPlusButton.m` 中声明的方法，与上面的 TabBarController 相同。
- */
 /**
  * [EN] The class methods of `CYLTabBarController` that only the private header declares. A class method is an instance method of the
  *      class object, so it is declared as an instance method here and called on `CYLTabBarController.self`.
@@ -37,13 +38,6 @@ import UIKit
  */
 @objc protocol CYLTabBarControllerPrivateClassAPI {
     @objc(cyl_loadTabBarItemIcon:completion:) func cylLoadTabBarItemIcon(_ icon: Any?, completion: @escaping (UIImage?) -> Void)
-}
-
-@objc protocol CYLPlusButtonPrivateAPI {
-    @objc(cyl_drawsTitleOverBackgroundImage) func cylDrawsTitleOverBackgroundImage() -> Bool
-    @objc(cyl_removeImage) func cylRemoveImage()
-    @objc(cyl_setBackgroundImageDidChangeHandler:) func cylSetBackgroundImageDidChangeHandler(_ handler: @escaping () -> Void)
-    @objc(cyl_setLiquidGlassLensMaskSuspended:) func cylSetLiquidGlassLensMaskSuspended(_ suspended: Bool)
 }
 
 extension CYLTabBarController {
@@ -57,12 +51,5 @@ extension CYLTabBarController {
     /// [EN] The private class methods. [CN] 私有类方法。
     static var cylPrivateClass: CYLTabBarControllerPrivateClassAPI {
         unsafeBitCast(CYLTabBarController.self as AnyObject, to: CYLTabBarControllerPrivateClassAPI.self)
-    }
-}
-
-extension CYLPlusButton {
-    /// [EN] The private methods of this plus button. [CN] 本 PlusButton 的私有方法。
-    var cylPrivate: CYLPlusButtonPrivateAPI {
-        unsafeBitCast(self as AnyObject, to: CYLPlusButtonPrivateAPI.self)
     }
 }

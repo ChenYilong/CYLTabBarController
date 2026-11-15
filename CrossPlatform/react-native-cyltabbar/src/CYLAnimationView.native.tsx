@@ -31,7 +31,7 @@ export function animationURLWithOptions(file: string, options: CYLAnimationOptio
 
 export type CYLAnimationViewProps = ViewProps & {
   /**
-   * A file name in the app (iOS main bundle, Android assets), a path or a URL: `.riv`, `.json` (Lottie), `.pag`, `.gif`.
+   * A file name in the app (iOS main bundle, Android assets), a path or a URL: `.riv`, `.json` (Lottie), `.pag`, `.gif`, `.svga`.
    */
   file: string;
   options?: CYLAnimationOptions;
@@ -40,7 +40,7 @@ export type CYLAnimationViewProps = ViewProps & {
 
 /**
  * An animation played by CYLTabBarController's own engine (the one of the tab icons), whatever its library: Rive, Lottie,
- * PAG or GIF, when the app has that library (iOS subspec, Android dependency). 由 CYLTabBarController 自己的引擎（Tab 图标所用）播放的动画。
+ * PAG, GIF or SVGA, when the app has that library (iOS subspec, Android dependency). 由 CYLTabBarController 自己的引擎（Tab 图标所用）播放的动画。
  */
 export function CYLAnimationView({ file, options, playing, ...rest }: CYLAnimationViewProps) {
   return <NativeAnimationView {...rest} source={animationURLWithOptions(file, options)} playing={playing ?? false} />;

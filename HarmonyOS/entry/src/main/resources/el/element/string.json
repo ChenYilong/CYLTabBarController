@@ -1,0 +1,28 @@
+{
+  "string": [
+    {
+      "name": "cyl_demo_home",
+      "value": "Αρχική"
+    },
+    {
+      "name": "cyl_demo_nearby",
+      "value": "Κοντά"
+    },
+    {
+      "name": "cyl_demo_messages",
+      "value": "Μηνύματα"
+    },
+    {
+      "name": "cyl_demo_me",
+      "value": "Εγώ"
+    },
+    {
+      "name": "cyl_demo_post",
+      "value": "Δημοσίευση"
+    },
+    {
+      "name": "cyl_demo_page",
+      "value": "Σελίδα %s"
+    }
+  ]
+}

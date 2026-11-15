@@ -1,0 +1,28 @@
+{
+  "string": [
+    {
+      "name": "cyl_demo_home",
+      "value": "Hjem"
+    },
+    {
+      "name": "cyl_demo_nearby",
+      "value": "I nærheten"
+    },
+    {
+      "name": "cyl_demo_messages",
+      "value": "Meldinger"
+    },
+    {
+      "name": "cyl_demo_me",
+      "value": "Meg"
+    },
+    {
+      "name": "cyl_demo_post",
+      "value": "Publiser"
+    },
+    {
+      "name": "cyl_demo_page",
+      "value": "Side %s"
+    }
+  ]
+}

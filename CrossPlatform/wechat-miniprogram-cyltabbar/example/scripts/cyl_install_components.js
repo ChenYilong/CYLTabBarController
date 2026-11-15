@@ -21,8 +21,8 @@ const { CYL_ANIMATIONS, CYL_EXAMPLE, cylChosenAnimation, cylAnimationComponents 
 const CYL_TARGET = path.join(CYL_EXAMPLE, 'miniprogram', 'miniprogram_npm')
 
 /**
- * [EN] The pages whose usingComponents name animation components (cyl-lottie, cyl-pag, cyl-rive).
- * [CN] usingComponents 中包含动画组件（cyl-lottie、cyl-pag、cyl-rive）的页面。
+ * [EN] The pages whose usingComponents name animation components (cyl-lottie, cyl-pag, cyl-rive, cyl-svga).
+ * [CN] usingComponents 中包含动画组件（cyl-lottie、cyl-pag、cyl-rive、cyl-svga）的页面。
  */
 const CYL_COMPONENT_PAGES = ['custom-tab-bar/index.json', 'pages/lottie/index.json']
 

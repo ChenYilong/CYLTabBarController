@@ -192,3 +192,9 @@ NSDictionary *home = @{
 | Example-Rive 的 PlusButton（上：首页；下：选中 PlusButton 后，显示引导页）：紫色图片按原图绘制，标题 "Start" 与其他 Tab 标题在同一条线上，放大镜中的副本与按钮对齐；启动 5 次均无崩溃。 | Example-Rive's plus button (top: home; bottom: the plus button selected, showing the onboarding page): the purple image is drawn as is, the title "Start" sits on the other tab titles' line, and the copy in the lens lines up with the button; no crash in 5 launches. |
 
 ![](assets/rive-animation-plus-button.png)
+
+| 中文 | English |
+|:---|:---|
+| Android：点按 Rive 图标不切换 Tab（2026-11-16 修复）：rive-android 的 `RiveAnimationView` 为状态机的指针事件消费触摸，Tab 按钮收不到点按，Example-Android 的 example-rive 在 Rive 模式下点 Tab 无反应（SVGA 模式正常）。修复：`CYLRiveTabBarItemAnimationView.dispatchTouchEvent` 返回 false，触摸交给 Tab 按钮；图标对无障碍隐藏，由 Tab 按钮朗读。验证：emulator-5554（Android 15，API 35）Rive 模式点 Bell 切到 Bell 页，Bell 页的 Rive 菜单按钮正常显示；`:cyltabbar:testDebugUnitTest` 通过。React Native 的 Bell 页菜单按钮此前空白是主机负载所致，负载下降后正常显示（右图，未改 RN 代码）。 | Android: tapping a Rive icon did not switch tabs (fixed 2026-11-16): rive-android's `RiveAnimationView` consumes touches for its state machines' pointer events, so the tab button never got the tap; Example-Android's example-rive ignored tab taps in Rive mode (SVGA mode worked). Fix: `CYLRiveTabBarItemAnimationView.dispatchTouchEvent` returns false and leaves the touch to the tab button; the icon is hidden from accessibility, the tab button reads. Checked: on emulator-5554 (Android 15, API 35) in Rive mode a tap on Bell shows the Bell page, whose Rive menu button shows; `:cyltabbar:testDebugUnitTest` passes. The React Native Bell page's blank menu button earlier was the host load: once it dropped, it shows (right, no RN code changed). |
+
+![Android Rive tab tap fixed; RN Bell menu button](assets/rive-tab-taps-and-menu-button-android.png)

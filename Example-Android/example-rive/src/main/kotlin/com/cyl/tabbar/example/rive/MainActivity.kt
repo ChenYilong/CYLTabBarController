@@ -83,20 +83,30 @@ class MainActivity : DemoTabBarActivity() {
     }
 
     override fun makeTabBarController(style: CYLEnums.CYLTabBarStyleType): CYLTabBarController {
+        val source = CYLDemoTabIconSource.current(this)
+        // [EN] Issue #415: the same tab bar with SVGA icons from a configuration file (SVGATabIcons.kt). [CN] Issue #415：同一个 TabBar，SVGA 图标来自配置文件（SVGATabIcons.kt）。
+        if (source == CYLDemoTabIconSource.SVGAConfigurationFile) {
+            CYLDemoSVGAConfiguration.makeTabBarController(this)?.let { return it.apply { tabBarStyleType = style; applyCourseAppearance() } }
+        }
         CYLPlusButton.registerPlusButton(StartPlusButton)
         val tabs = CourseTab.entries.filter { it != CourseTab.Timer }
-        return CYLTabBarController(this, tabs.map { it.page() }, tabs.map { it.attributes(this) }, style, StartPlusButton.CONTEXT).apply {
-            // [EN] `applyCourseTabBarAppearance()`: dark, translucent, white tints. [CN] 深色、半透明、白色强调色。
-            cyl_tabBarBackgroundColor = Color.argb(204, 0x17, 0x20, 0x3A)
-            cyl_tabBarItemTitleColor = Color.argb(153, 255, 255, 255)
-            cyl_tabBarItemImageColor = Color.argb(153, 255, 255, 255)
-            setTintColor(Color.WHITE)
-        }
+        // [EN] Issue #415: SVGA icons given with the SVGA initialization keys, one for one with the Rive ones. [CN] Issue #415：用 SVGA 初始化 key 提供的 SVGA 图标，与 Rive 图标一一对应。
+        val attributes = tabs.map { tab -> if (source == CYLDemoTabIconSource.SVGAKeys) tab.attributes(this).filterKeys { !it.startsWith("CYLTabBarRive") } + tab.svgaAttributes else tab.attributes(this) }
+        return CYLTabBarController(this, tabs.map { it.page() }, attributes, style, StartPlusButton.CONTEXT).apply { applyCourseAppearance() }
+    }
+
+    /** [EN] `applyCourseTabBarAppearance()`: dark, translucent, white tints. [CN] 深色、半透明、白色强调色。 */
+    private fun CYLTabBarController.applyCourseAppearance() {
+        cyl_tabBarBackgroundColor = Color.argb(204, 0x17, 0x20, 0x3A)
+        cyl_tabBarItemTitleColor = Color.argb(153, 255, 255, 255)
+        cyl_tabBarItemImageColor = Color.argb(153, 255, 255, 255)
+        setTintColor(Color.WHITE)
     }
 
     /** [EN] #216: the Grapefruit skin swaps the icons of "Chat" and "User". [CN] #216：西柚皮肤互换 "Chat" 与 "User" 的图标。 */
     private fun applySkinAnimations() {
         val controller = tabBarController ?: return
+        if (CYLDemoTabIconSource.current(this) != CYLDemoTabIconSource.Rive) return
         val swaps = CYLThemeManager.defaultManager.currentThemeIdentifier == "Grapefruit"
         controller.updateTabBarItemAtIndex(0, (if (swaps) CourseTab.User else CourseTab.Chat).animationAttributes)
         controller.updateTabBarItemAtIndex(controller.viewControllers.lastIndex, (if (swaps) CourseTab.Chat else CourseTab.User).animationAttributes)

@@ -1,6 +1,14 @@
 #import "CyltabbarView.h"
 
 #import <CYLTabBarController/CYLTabBarController.h>
+// [EN] The classes translated to Swift (CYLTabBarHostView, step 36; the animation factory): the umbrella header does not
+//      import the generated Swift header (docs/Swift-Migration.md).
+// [CN] 已翻译为 Swift 的类（CYLTabBarHostView，第 36 步；动画工厂）：伞头文件不导入生成的 Swift 头文件（docs/Swift-Migration.md）。
+#if __has_include(<CYLTabBarController/CYLTabBarController-Swift.h>)
+#import <CYLTabBarController/CYLTabBarController-Swift.h>
+#else
+#import "CYLTabBarController-Swift.h"
+#endif
 
 #import <react/renderer/components/CyltabbarViewSpec/ComponentDescriptors.h>
 #import <react/renderer/components/CyltabbarViewSpec/EventEmitters.h>

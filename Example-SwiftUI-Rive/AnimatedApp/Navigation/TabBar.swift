@@ -21,14 +21,42 @@ import CYLTabBarController
  */
 struct TabBar: UIViewControllerRepresentable {
 
+    /**
+     * [EN] Issue #415: the source of the icons (SVGATabIcons.swift). ContentView recreates the tab bar when it changes.
+     * [CN] Issue #415：图标来源（SVGATabIcons.swift）。来源改变时 ContentView 重新创建 TabBar。
+     */
+    var iconSource = CYLDemoTabIconSource.current
+
     func makeUIViewController(context _: Context) -> CYLTabBarController {
-        let viewControllers = Tab.allCases.map { tab -> UIViewController in
-            tab == .bell ? tab.settingsViewController() : UIHostingController(rootView: tab.content)
+        if iconSource == .svgaConfigurationFile, let tabBarController = Self.makeSVGAConfigurationTabBarController() {
+            return tabBarController
         }
-        let tabBarController = CourseTabBarController(viewControllers: viewControllers,
-                                                      tabBarItemsAttributes: Tab.allCases.map(\.attributes))
+        // [EN] Issue #415: SVGA icons given with the SVGA initialization keys, one for one with the Rive ones.
+        // [CN] Issue #415：用 SVGA 初始化 key 提供的 SVGA 图标，与 Rive 图标一一对应。
+        let usesSVGA = iconSource == .svgaKeys
+        let tabBarController = CourseTabBarController(viewControllers: Tab.allCases.map(\.pageViewController),
+                                                      tabBarItemsAttributes: Tab.allCases.map { usesSVGA ? $0.svgaAttributes : $0.attributes })
         tabBarController.applyCourseTabBarAppearance()
         return tabBarController
+    }
+
+    /**
+     * [EN] The tab bar of cyl_tabbar_configuration_svga.json: tabs and SVGA icons from the file (`CYLTabBarSVGAFilePath`),
+     *      pages from the page registry. nil (and the Rive tab bar) when the file cannot be read.
+     * [CN] cyl_tabbar_configuration_svga.json 中的 TabBar：Tab 与 SVGA 图标来自该文件（`CYLTabBarSVGAFilePath`），页面来自页面注册表。
+     *      无法读取文件时返回 nil（并使用 Rive 的 TabBar）。
+     */
+    private static func makeSVGAConfigurationTabBarController() -> CYLTabBarController? {
+        guard let path = Bundle.main.path(forResource: "cyl_tabbar_configuration_svga", ofType: "json") else { return nil }
+        CYLDemoSVGAConfigurationPages.registerIfNeeded { $0.pageViewController }
+        do {
+            let tabBarController = try CourseTabBarController(configurationFile: path)
+            tabBarController.applyCourseTabBarAppearance()
+            return tabBarController
+        } catch {
+            NSLog("%@", error.localizedDescription)
+            return nil
+        }
     }
 
     func updateUIViewController(_: CYLTabBarController, context _: Context) {
@@ -38,6 +66,14 @@ struct TabBar: UIViewControllerRepresentable {
 }
 
 extension Tab {
+    /**
+     * [EN] The page of the tab: the course's screens, and on Bell the shared test list with the SVGA demo above it (issue #415).
+     * [CN] 该 Tab 的页面：课程页面；Bell 为共用的测试列表，上方是 SVGA 演示（issue #415）。
+     */
+    var pageViewController: UIViewController {
+        self == .bell ? settingsViewController(headerView: SVGATabIconDemoView()) : UIHostingController(rootView: content)
+    }
+
     @ViewBuilder
     var content: some View {
         if self == .chat {

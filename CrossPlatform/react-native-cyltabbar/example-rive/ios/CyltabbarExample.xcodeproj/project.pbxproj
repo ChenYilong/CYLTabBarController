@@ -7,6 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		76DFAF956F6B4EB6B0F9290F /* tab_chat.svga in Resources */ = {isa = PBXBuildFile; fileRef = 5C9E3E71719C2AD9B9B4652F /* tab_chat.svga */; };
+		9E83A50342A3C1CB59710F3A /* tab_search.svga in Resources */ = {isa = PBXBuildFile; fileRef = 391D90876FBD0B06DC34F764 /* tab_search.svga */; };
+		DA018439B506FE89B705593B /* tab_activity.svga in Resources */ = {isa = PBXBuildFile; fileRef = 19E028627758C15D4D6F3E1C /* tab_activity.svga */; };
+		E93609A7C8B6A5DAFE920977 /* tab_list.svga in Resources */ = {isa = PBXBuildFile; fileRef = D8C45E6EC22F31F5DE0302B8 /* tab_list.svga */; };
+		12ECA1F8AF8A82ECFD7447AC /* tab_profile.svga in Resources */ = {isa = PBXBuildFile; fileRef = C93E3AC9606624B280DD22D2 /* tab_profile.svga */; };
+		D84C9CE05B2276AC91D1BBFA /* tab_home.svga in Resources */ = {isa = PBXBuildFile; fileRef = 735D4DAE0416298B1623E20E /* tab_home.svga */; };
+		0F32264E7ACDAC014BB08384 /* svga in Resources */ = {isa = PBXBuildFile; fileRef = A2DEEDE5F74CC088715E7EB8 /* svga */; };
 		091FFD36242740ED8D5349A3 /* Inter-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 4CB1784706444803A5CCF29C /* Inter-SemiBold.ttf */; };
 		0AC45C5AA8BB4D54BB7CD92E /* menu_button.riv in Resources */ = {isa = PBXBuildFile; fileRef = 870A1328DB234BEDA6A64FB0 /* menu_button.riv */; };
 		0C80B921A6F3F58F76C31292 /* libPods-CyltabbarExample.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5DCACB8F33CDC322A6C60F78 /* libPods-CyltabbarExample.a */; };
@@ -26,6 +33,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		5C9E3E71719C2AD9B9B4652F /* tab_chat.svga */ = {isa = PBXFileReference; lastKnownFileType = file; name = tab_chat.svga; path = "../../../../Example-SwiftUI-Rive/AnimatedApp/SVGAAssets/tab_chat.svga"; sourceTree = SOURCE_ROOT; };
+		391D90876FBD0B06DC34F764 /* tab_search.svga */ = {isa = PBXFileReference; lastKnownFileType = file; name = tab_search.svga; path = "../../../../Example-SwiftUI-Rive/AnimatedApp/SVGAAssets/tab_search.svga"; sourceTree = SOURCE_ROOT; };
+		19E028627758C15D4D6F3E1C /* tab_activity.svga */ = {isa = PBXFileReference; lastKnownFileType = file; name = tab_activity.svga; path = "../../../../Example-SwiftUI-Rive/AnimatedApp/SVGAAssets/tab_activity.svga"; sourceTree = SOURCE_ROOT; };
+		D8C45E6EC22F31F5DE0302B8 /* tab_list.svga */ = {isa = PBXFileReference; lastKnownFileType = file; name = tab_list.svga; path = "../../../../Example-SwiftUI-Rive/AnimatedApp/SVGAAssets/tab_list.svga"; sourceTree = SOURCE_ROOT; };
+		C93E3AC9606624B280DD22D2 /* tab_profile.svga */ = {isa = PBXFileReference; lastKnownFileType = file; name = tab_profile.svga; path = "../../../../Example-SwiftUI-Rive/AnimatedApp/SVGAAssets/tab_profile.svga"; sourceTree = SOURCE_ROOT; };
+		735D4DAE0416298B1623E20E /* tab_home.svga */ = {isa = PBXFileReference; lastKnownFileType = file; name = tab_home.svga; path = "../../../../Example-SwiftUI-Rive/AnimatedApp/SVGAAssets/tab_home.svga"; sourceTree = SOURCE_ROOT; };
+		A2DEEDE5F74CC088715E7EB8 /* svga */ = {isa = PBXFileReference; lastKnownFileType = folder; name = svga; path = "../configurations/svga"; sourceTree = SOURCE_ROOT; };
 		13B07F961A680F5B00A75B9A /* CyltabbarExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CyltabbarExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = CyltabbarExample/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = CyltabbarExample/Info.plist; sourceTree = "<group>"; };
@@ -103,6 +117,13 @@
 				824A37227822460EBBB05705 /* shapes.riv */,
 				870A1328DB234BEDA6A64FB0 /* menu_button.riv */,
 				633C5047B761428292C0A127 /* icons.riv */,
+				5C9E3E71719C2AD9B9B4652F /* tab_chat.svga */,
+				391D90876FBD0B06DC34F764 /* tab_search.svga */,
+				19E028627758C15D4D6F3E1C /* tab_activity.svga */,
+				D8C45E6EC22F31F5DE0302B8 /* tab_list.svga */,
+				C93E3AC9606624B280DD22D2 /* tab_profile.svga */,
+				735D4DAE0416298B1623E20E /* tab_home.svga */,
+				A2DEEDE5F74CC088715E7EB8 /* svga */,
 				13B07FAE1A68108700A75B9A /* CyltabbarExample */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				83CBBA001A601CBA00E9B192 /* Products */,
@@ -191,6 +212,13 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				76DFAF956F6B4EB6B0F9290F /* tab_chat.svga in Resources */,
+				9E83A50342A3C1CB59710F3A /* tab_search.svga in Resources */,
+				DA018439B506FE89B705593B /* tab_activity.svga in Resources */,
+				E93609A7C8B6A5DAFE920977 /* tab_list.svga in Resources */,
+				12ECA1F8AF8A82ECFD7447AC /* tab_profile.svga in Resources */,
+				D84C9CE05B2276AC91D1BBFA /* tab_home.svga in Resources */,
+				0F32264E7ACDAC014BB08384 /* svga in Resources */,
 				091FFD36242740ED8D5349A3 /* Inter-SemiBold.ttf in Resources */,
 				8E7F05B39AB54ED7B9D4076A /* Inter-Regular.ttf in Resources */,
 				5F71C48B95D34678A88DD1E2 /* Poppins-Bold.ttf in Resources */,

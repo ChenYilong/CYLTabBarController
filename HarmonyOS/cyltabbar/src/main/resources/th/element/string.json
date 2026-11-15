@@ -1,0 +1,32 @@
+{
+  "string": [
+    {
+      "name": "cyl_badge_new_content",
+      "value": "มีเนื้อหาใหม่"
+    },
+    {
+      "name": "cyl_badge_new_messages",
+      "value": "ข้อความใหม่ %s ข้อความ"
+    },
+    {
+      "name": "cyl_plus_button",
+      "value": "ปุ่มบวก"
+    },
+    {
+      "name": "cyl_list_separator",
+      "value": ", "
+    },
+    {
+      "name": "cyl_badge_text_NEW",
+      "value": "ใหม่"
+    },
+    {
+      "name": "cyl_badge_text_New",
+      "value": "ใหม่"
+    },
+    {
+      "name": "cyl_badge_text_new",
+      "value": "ใหม่"
+    }
+  ]
+}

@@ -115,3 +115,7 @@
 "Speed" = "Kelajuan";
 "Loop" = "Gelung";
 "%@ times" = "%@ kali";
+/* [EN] Example-Rive, the tab icon source (issue #415). [CN] Example-Rive 的 Tab 图标来源（issue #415）。 */
+"Tab 图标来源：%@" = "Sumber ikon tab: %@";
+"SVGA（初始化 Key）" = "SVGA (kunci permulaan)";
+"SVGA（配置文件）" = "SVGA (fail konfigurasi)";

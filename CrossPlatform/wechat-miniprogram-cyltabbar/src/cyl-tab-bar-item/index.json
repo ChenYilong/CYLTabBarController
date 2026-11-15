@@ -12,6 +12,9 @@
     },
     "cyl-rive-view": {
       "default": "../cyl-animation-placeholder/index"
+    },
+    "cyl-svga-view": {
+      "default": "../cyl-animation-placeholder/index"
     }
   }
 }

@@ -1,0 +1,29 @@
+{
+  "name": "cyl-svga-miniprogram",
+  "version": "0.1.0",
+  "description": "SVGA animations for WeChat Mini Program: the cyl-svga component, an SVGA 2.x player written for the mini program 2D canvas (inflate by fflate 0.8.2, MIT)",
+  "license": "MIT",
+  "author": "ChenYilong <luohanchenyilong@163.com>",
+  "homepage": "https://github.com/ChenYilong/CYLTabBarController/tree/master/CrossPlatform/svga-miniprogram",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ChenYilong/CYLTabBarController.git",
+    "directory": "CrossPlatform/svga-miniprogram"
+  },
+  "keywords": ["miniprogram", "svga", "CYLTabBarController"],
+  "miniprogram": "miniprogram_dist",
+  "main": "miniprogram_dist/svga/cyl_svga_movie.js",
+  "cylExampleResources": {
+    "folder": "svga",
+    "source": "Example-SwiftUI-Rive/AnimatedApp/SVGAAssets",
+    "files": ["tab_home.svga", "tab_search.svga", "tab_chat.svga", "tab_profile.svga"]
+  },
+  "files": ["miniprogram_dist", "README.md", "LICENSE", "NOTICE"],
+  "scripts": {
+    "build": "node scripts/cyl_build.js",
+    "test": "node --test test/*.test.js"
+  },
+  "devDependencies": {
+    "fflate": "0.8.2"
+  }
+}

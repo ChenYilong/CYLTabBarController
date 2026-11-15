@@ -251,7 +251,7 @@ function cylThemes(value) {
  *      没有皮肤时返回 ''。
  */
 function cylActiveThemeIdentifier(configuration, themes, isDark, requested) {
-  const identifiers = Object.keys(themes).sort();
+  const identifiers = Object.keys(themes).sort((a, b) => String(a).localeCompare(String(b)));
   if (identifiers.length === 0) {
     return '';
   }
@@ -346,6 +346,18 @@ function cylPAG(attributes, environment) {
  */
 function cylRive(attributes, environment) {
   return cylAnimationIcon(attributes, environment, 'Rive', /\.riv(\.bin)?(\?|#|$)/i)
+}
+
+/**
+ * [EN] FIX: issue #415. The SVGA icon of a tab, or null: CYLTabBarSVGAURL / CYLTabBarSVGAFilePath (and their Dark
+ *      variants), CYLTabBarSVGASize, then the generic animation keys when the file is a .svga (a package copy ends in
+ *      .svga.bin). Played by cyl-svga-miniprogram through the `cyl-svga-view` generic.
+ * [CN] FIX: issue #415。Tab 的 SVGA 图标，没有时返回 null：先读 CYLTabBarSVGAURL / CYLTabBarSVGAFilePath（及其 Dark 版本）、
+ *      CYLTabBarSVGASize，再读文件为 .svga 的通用动画键（包内副本以 .svga.bin 结尾）。由 cyl-svga-miniprogram 通过泛型
+ *      `cyl-svga-view` 播放。
+ */
+function cylSVGA(attributes, environment) {
+  return cylAnimationIcon(attributes, environment, 'SVGA', /\.svga(\.bin)?(\?|#|$)/i)
 }
 
 /**
@@ -514,7 +526,8 @@ function cylItem(attributes, environment, theme, defaults) {
     accessibilityLabel: String(attributes.CYLTabBarItemAccessibilityLabel || '') || title || identifier,
     accessibilityHint: String(attributes.CYLTabBarItemAccessibilityHint || ''),
     accessibilityIdentifier: String(attributes.CYLTabBarItemAccessibilityIdentifier || '') || identifier,
-    lottie: cylLottie(attributes, environment) || cylPAG(attributes, environment) || cylRive(attributes, environment),
+    lottie: cylLottie(attributes, environment) || cylPAG(attributes, environment) || cylRive(attributes, environment)
+      || cylSVGA(attributes, environment),
     gif: cylGIF(attributes, environment, Boolean(environment.isDark)),
     titleFontStyle: cylFont(attributes.CYLTabBarItemTitleFont),
     selectedTitleFontStyle: cylFont(attributes.CYLTabBarItemSelectedTitleFont) || cylFont(attributes.CYLTabBarItemTitleFont),
@@ -678,7 +691,7 @@ function cylReadConfiguration(configuration, environment) {
     loginRequiredIdentifiers: cylStringList(source.CYLTabBarControllerLoginRequiredTabBarItemIdentifiers),
     isDark,
     themeIdentifier,
-    themeIdentifiers: Object.keys(themes).sort(),
+    themeIdentifiers: Object.keys(themes).sort((a, b) => String(a).localeCompare(String(b))),
     backgroundColor: themeValues.CYLTabBarBackgroundColor,
     shadowColor: themeValues.CYLTabBarShadowColor,
     badgeBackgroundColor: themeValues.CYLTabBarItemBadgeBackgroundColor,
@@ -694,6 +707,7 @@ module.exports = {
   cylAnimationFragment,
   cylPAG,
   cylRive,
+  cylSVGA,
   cylFont,
   cylRenderingMode,
   cylLottie,

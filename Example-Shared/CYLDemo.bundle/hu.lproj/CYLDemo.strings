@@ -115,3 +115,7 @@
 "Speed" = "Sebesség";
 "Loop" = "Ismétlés";
 "%@ times" = "%@-szoros";
+/* [EN] Example-Rive, the tab icon source (issue #415). [CN] Example-Rive 的 Tab 图标来源（issue #415）。 */
+"Tab 图标来源：%@" = "A lapikonok forrása: %@";
+"SVGA（初始化 Key）" = "SVGA (inicializálási kulcsok)";
+"SVGA（配置文件）" = "SVGA (konfigurációs fájl)";

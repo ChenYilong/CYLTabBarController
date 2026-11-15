@@ -22,6 +22,7 @@ const CYL_ANIMATIONS = {
   lottie: { name: 'cyl-lottie-miniprogram', folder: '../../lottie-miniprogram', tag: 'cyl-lottie', component: 'cyl-lottie/index' },
   pag: { name: 'cyl-pag-miniprogram', folder: '../../pag-miniprogram', tag: 'cyl-pag', component: 'cyl-pag/index' },
   rive: { name: 'cyl-rive-miniprogram', folder: '../../rive-miniprogram', tag: 'cyl-rive', component: 'cyl-rive/index' },
+  svga: { name: 'cyl-svga-miniprogram', folder: '../../svga-miniprogram', tag: 'cyl-svga', component: 'cyl-svga/index' },
   gif: { name: 'cyl-gif-miniprogram', folder: '../../gif-miniprogram', tag: null, component: null },
 }
 

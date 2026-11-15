@@ -96,6 +96,16 @@
 #else
 #import "CYLUtils.h"
 #endif
+// [CN] 动画视图协议（Swift 迁移后为公开头文件）：框架的伞头文件需要包含它，否则 Xcode 警告 "umbrella header ... does not
+//      include header"；CocoaPods 不带动画子模块时没有该文件。
+// [EN] The animation view protocols (a public header since the Swift migration): the framework's umbrella header must
+//      include it, or Xcode warns "umbrella header ... does not include header"; CocoaPods without the animation
+//      subspec has no such file.
+#if __has_include("CYLTabBarItemAnimation/CYLTabBarItemAnimationPlayableView.h")
+#import "CYLTabBarItemAnimation/CYLTabBarItemAnimationPlayableView.h"
+#elif __has_include("CYLTabBarItemAnimationPlayableView.h")
+#import "CYLTabBarItemAnimationPlayableView.h"
+#endif
 #import "CYLPlusButton.h"
 #import "UIViewController+CYLTabBarControllerExtention.h"
 #import "UIViewController+CYLNavigationControllerExtention.h"

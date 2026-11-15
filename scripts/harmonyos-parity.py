@@ -66,7 +66,7 @@ CRITERIA = [
     ('3. 不适用：以 `N/A on HarmonyOS:` 开头，写明原因与鸿蒙上的等价做法（例如 Objective-C 运行时、UIKit 私有视图层级、已废弃 API）。只用于在 ArkUI 中没有意义的 API，不能用来跳过难做的功能。',
      '3. Not applicable: starts with `N/A on HarmonyOS:` and gives the reason and the HarmonyOS equivalent (e.g. the Objective-C runtime, UIKit private view hierarchy, deprecated APIs). Only for APIs that have no meaning in ArkUI, never to skip a hard feature.'),
     ('4. 待审不适用：以 `TODO: N/A on HarmonyOS:` 开头并写明原因，表示提议标为不适用、尚待审核；仍按 TODO 计，不计入完成率。审核通过后去掉 `TODO: ` 前缀。',
-     '4. Proposed not applicable: starts with `TODO: N/A on HarmonyOS:` and a reason; proposed, not yet reviewed; still counts as TODO, not toward the score. Drop the `TODO: ` prefix once reviewed.'),
+     '4. Proposed not applicable: starts with `TODO: N/A on HarmonyOS:` and a reason; proposed, not yet reviewed; still counts as TODO, not toward the score. Drop the `TODO: ` prefix once reviewed. Any other `TODO: <note>` (e.g. `TODO: partial in the HarmonyOS/ project: …`) also counts as TODO.'),
     ('最终满分：完成率 100，且所有「已编译」行在模拟器上验证后改为「已验证」（验证率 100）。',
      'Final full score: score 100, and every "built" row is checked on the emulator and changed to "verified" (verified rate 100).'),
 ]
@@ -84,6 +84,8 @@ def status_of(value):
     """[EN] built / verified / na, or None when the row has no valid status. [CN] 行状态；无效时为 None。"""
     if value.startswith(STATUS_PROPOSED_NA):
         return 'proposed'
+    if value.startswith('TODO:'):
+        return 'todo-note'
     if value.startswith(STATUS_NA):
         return 'na'
     if STATUS_VERIFIED in value:

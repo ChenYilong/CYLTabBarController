@@ -1,0 +1,28 @@
+{
+  "string": [
+    {
+      "name": "cyl_demo_home",
+      "value": "Start"
+    },
+    {
+      "name": "cyl_demo_nearby",
+      "value": "W pobliżu"
+    },
+    {
+      "name": "cyl_demo_messages",
+      "value": "Wiadomości"
+    },
+    {
+      "name": "cyl_demo_me",
+      "value": "Ja"
+    },
+    {
+      "name": "cyl_demo_post",
+      "value": "Opublikuj"
+    },
+    {
+      "name": "cyl_demo_page",
+      "value": "Strona %s"
+    }
+  ]
+}

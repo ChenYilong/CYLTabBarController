@@ -2,6 +2,8 @@
 # [CN] 示例自身 Android 依赖的版本（Gradle 默认读取此文件）。
 [versions]
 rive-android = "10.3.0"
+svgaplayer = "2.6.1"
 
 [libraries]
 rive-android = { module = "app.rive:rive-android", version.ref = "rive-android" }
+svgaplayer = { module = "com.github.yyued:SVGAPlayer-Android", version.ref = "svgaplayer" }

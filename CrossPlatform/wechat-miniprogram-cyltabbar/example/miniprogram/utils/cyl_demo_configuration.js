@@ -13,9 +13,9 @@ const { t } = require('./cyl_demo_localization');
 const { cylApplyUpdates } = require('./cyl_demo_updates');
 
 /**
- * [EN] The example installs one animation package (`npm run setup -- --animation=lottie|pag|rive|gif`, see
+ * [EN] The example installs one animation package (`npm run setup -- --animation=lottie|pag|rive|svga|gif`, see
  *      scripts/cyl_animation_choice.js); shared/animations.js names it and lists its icons.
- * [CN] 示例只安装一个动画包（`npm run setup -- --animation=lottie|pag|rive|gif`，见 scripts/cyl_animation_choice.js）；
+ * [CN] 示例只安装一个动画包（`npm run setup -- --animation=lottie|pag|rive|svga|gif`，见 scripts/cyl_animation_choice.js）；
  *      shared/animations.js 给出它的名称并列出其图标。
  */
 function cylInstalledAnimation() {
@@ -208,6 +208,25 @@ function cylDemoRiveItems(items, files) {
   });
 }
 
+/**
+ * [EN] FIX: issue #415. SVGA tab icons (CYLTabBarSVGAFilePath) as in the iOS Rive examples' SVGA source: the tab icons of
+ *      Example-SwiftUI-Rive/AnimatedApp/SVGAAssets (package copies *.svga.bin), 30 x 30.
+ * [CN] FIX: issue #415。与 iOS Rive 示例的 SVGA 来源相同的 SVGA Tab 图标（CYLTabBarSVGAFilePath）：
+ *      Example-SwiftUI-Rive/AnimatedApp/SVGAAssets 中的 Tab 图标（包内副本 *.svga.bin），30 x 30。
+ */
+const CYL_DEMO_SVGA = { home: 'tab_home', city: 'tab_search', message: 'tab_chat', CYLMineViewController: 'tab_profile' };
+
+function cylDemoSVGAItems(items, files) {
+  return items.map((attributes) => {
+    const name = CYL_DEMO_SVGA[attributes.CYLTabBarItemIdentifier];
+    const file = name && files.find((path) => path.endsWith(`/${name}.svga.bin`));
+    return file ? Object.assign({}, attributes, {
+      CYLTabBarSVGAFilePath: file,
+      CYLTabBarSVGASize: '{30, 30}',
+    }) : attributes;
+  });
+}
+
 function cylDemoLottieItems(items) {
   return items.map((attributes) => {
     const name = CYL_DEMO_LOTTIE[attributes.CYLTabBarItemIdentifier];
@@ -303,6 +322,7 @@ function cylDemoConfiguration(overrides, skin) {
     lottie: cylDemoLottieItems,
     pag: cylDemoPAGItems,
     rive: cylDemoRiveItems,
+    svga: cylDemoSVGAItems,
     gif: cylDemoGIFItems,
   };
   // [EN] Lottie icons are named by tab; the others need their files. [CN] Lottie 图标按 Tab 命名；其他需要文件。

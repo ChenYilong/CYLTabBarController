@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- [EN] SVGAPlayer-Android sets allowBackup="true" in its manifest; this app keeps false. [CN] SVGAPlayer-Android 的 manifest 设置了 allowBackup="true"；本 App 保持 false。 -->
     <application
+        tools:replace="android:allowBackup"
         android:allowBackup="false"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"

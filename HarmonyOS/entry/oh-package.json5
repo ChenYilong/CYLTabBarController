@@ -1,0 +1,9 @@
+{
+  "name": "entry",
+  "version": "1.0.0",
+  "description": "The demo of CYLTabBarController for HarmonyOS NEXT.",
+  "main": "",
+  "author": "ChenYilong",
+  "license": "MIT",
+  "dependencies": { "cyltabbar": "file:../cyltabbar" }
+}

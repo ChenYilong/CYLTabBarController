@@ -15,7 +15,7 @@ Steps for app developers: [Tab-Icon-Animation-Quick-Start](../../../docs/Tab-Ico
 | Lottie 2.5 | `Lottie` | same | same | Objective-C | `Example-Swift-02` |
 | PAG | `PAG`, `PAGEnterprise` | `CYLTabBarPAGURL` / `CYLTabBarPAGFilePath` | `CYLTabBarPAGSize` | [PAG-Animation](../../../docs/PAG-Animation.md) | `Example-PAG` |
 | Rive | `Rive` | `CYLTabBarRiveURL` / `CYLTabBarRiveFilePath` | `CYLTabBarRiveSize` | iOS 14, CocoaPods only; options such as `CYLTabBarAnimationOptionRiveArtboard` on the URL | `Example-Rive`, `Example-SwiftUI-Rive` |
-| SVGA | `SVGA` | `CYLTabBarSVGAURL` / `CYLTabBarSVGAFilePath` | `CYLTabBarSVGASize` | SVGAPlayer 2.5 with Protobuf pinned to 3.21 (`pod update Protobuf` in a project that has a newer one); plays once, keeps the last frame (issue #415, [SVGA-Animation](../../../docs/SVGA-Animation.md)) | `Example-Rive` (Bell tab, after the Rive demo) |
+| SVGA | `SVGA` | `CYLTabBarSVGAURL` / `CYLTabBarSVGAFilePath` | `CYLTabBarSVGASize` | SVGAPlayer 2.5 with Protobuf pinned to 3.21 (`pod update Protobuf` in a project that has a newer one); plays once, keeps the last frame (issue #415, [SVGA-Animation](../../../docs/SVGA-Animation.md)) | `Example-Rive` (Bell tab, after the Rive demo); Android: `Example-Android/example-rive` with `com.github.yyued:SVGAPlayer-Android:2.6.1` from JitPack, found by reflection (`CYLSVGATabBarItemAnimator.kt`); its manifest needs `tools:replace="android:allowBackup"` |
 
 | GIF | `GIF` (no third-party dependency) | `CYLTabBarGIFURL` / `CYLTabBarGIFFilePath` (local files) | `CYLTabBarGIFSize` | [GIF-Animation](../../../docs/GIF-Animation.md) | `Example-GIF` |
 - `pod 'CYLTabBarController'` alone has **no** animation code. Without a subspec the tabs show their images.

@@ -274,6 +274,7 @@ open class CYLTabBarItemAnimatorRegistry : CYLTabBarItemAnimatorRegistering {
                 CYLLottieTabBarItemAnimator.takeIf { it.isAvailable }?.let { registerAnimator(it) }
                 CYLPAGTabBarItemAnimator.takeIf { it.isAvailable }?.let { registerAnimator(it) }
                 if (CYLRiveTabBarItemAnimator.isAvailable) registerAnimator(CYLRiveTabBarItemAnimator.animator)
+                CYLSVGATabBarItemAnimator.takeIf { it.isAvailable }?.let { registerAnimator(it) }
                 // [EN] GIF needs no library: the platform decodes it, as ImageIO does on iOS. [CN] GIF 不需要额外的库：由系统解码，如同 iOS 的 ImageIO。
                 registerAnimator(CYLGIFTabBarItemAnimator.animator)
             }
@@ -802,7 +803,18 @@ class CYLRiveTabBarItemAnimationView private constructor(context: Context, priva
 
     init {
         addView(rive, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
+        // [EN] A tab icon is not a control: TalkBack reads the tab button. [CN] Tab 图标不是控件：TalkBack 读取 Tab 按钮。
+        importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS
     }
+
+    /**
+     * [EN] Leaves every touch to the tab button: rive-android's `RiveAnimationView` consumes touches for its state
+     *      machines' pointer events, so a tap on a Rive icon never selected its tab (the tab bar of Example-Rive on
+     *      Android ignored taps on the icons). iOS tab icons do not take touches either.
+     * [CN] 把所有触摸交给 Tab 按钮：rive-android 的 `RiveAnimationView` 为状态机的指针事件消费触摸，导致点按 Rive 图标不会选中 Tab
+     *      （Android 上 Example-Rive 的 TabBar 点按图标无反应）。iOS 的 Tab 图标同样不接收触摸。
+     */
+    override fun dispatchTouchEvent(event: android.view.MotionEvent?): Boolean = false
 
     private fun setActive(active: Boolean) {
         val machine = stateMachine ?: return

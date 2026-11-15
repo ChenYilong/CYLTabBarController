@@ -1,0 +1,10 @@
+{
+  "module": {
+    "name": "cyltabbar",
+    "type": "har",
+    "deviceTypes": ["phone", "tablet", "2in1"],
+    "requestPermissions": [
+      { "name": "ohos.permission.INTERNET" }
+    ]
+  }
+}
