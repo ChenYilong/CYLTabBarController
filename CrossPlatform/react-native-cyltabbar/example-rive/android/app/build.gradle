@@ -102,6 +102,12 @@ android {
             assets.srcDir("${cylRepository}/Example-SwiftUI-Rive/AnimatedApp/RiveAssets")
             assets.srcDir("${cylRepository}/Example-SwiftUI-Rive/AnimatedApp/Assets.xcassets")
             assets.srcDir("${cylRepository}/Example-SwiftUI-Rive/AnimatedApp/Fonts")
+            // [EN] Issue #415: the SVGA tab icons of Example-SwiftUI-Rive (not a copy) and this demo's SVGA configuration
+            //      file (assets/svga/cyl_tabbar_configuration_svga.json, route "bundle:svga?name=cyl_tabbar_configuration_svga").
+            // [CN] Issue #415：Example-SwiftUI-Rive 的 SVGA Tab 图标（不是副本）与本 Demo 的 SVGA 配置文件
+            //      （assets/svga/cyl_tabbar_configuration_svga.json，路由 "bundle:svga?name=cyl_tabbar_configuration_svga"）。
+            assets.srcDir("${cylRepository}/Example-SwiftUI-Rive/AnimatedApp/SVGAAssets")
+            assets.srcDir("configurations")
             assets.srcDir(cylFontsDir)
             java.srcDir(cylDemoAssetsDir)
         }
@@ -138,6 +144,9 @@ android {
 dependencies {
     // [EN] The library plays Rive through rive-android, found by reflection. [CN] 库通过反射找到 rive-android 播放 Rive。
     implementation "app.rive:rive-android:10.3.0"
+    // [EN] Issue #415: the library plays SVGA through SVGAPlayer-Android (JitPack), found by reflection.
+    // [CN] Issue #415：库通过反射找到 SVGAPlayer-Android（JitPack）播放 SVGA。
+    implementation "com.github.yyued:SVGAPlayer-Android:2.6.1"
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
 
