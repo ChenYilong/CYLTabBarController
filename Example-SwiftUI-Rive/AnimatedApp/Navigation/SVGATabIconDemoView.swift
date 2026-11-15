@@ -1,6 +1,6 @@
 //
 //  SVGATabIconDemoView.swift
-//  RiveApp
+//  AnimatedApp
 //
 //  Copyright © 2026 https://github.com/ChenYilong . All rights reserved.
 //
@@ -10,13 +10,14 @@ import CYLTabBarController
 
 /**
  * FIX: issue #415
- * [EN] SVGA animations in plain UIKit, shown after the Rive demo (`RiveMenuButtonDemoView`): the SVGA subspec
+ * [EN] SVGA animations in plain UIKit, on the Bell page of Example-SwiftUI-Rive and, after the Rive demo
+ *      (`RiveMenuButtonDemoView`), of Example-Rive: the SVGA subspec
  *      (`pod 'CYLTabBarController/SVGA'`) registers a view provider for ".svga" files, so `CYLTabBarItemAnimationFactory`
  *      makes their views exactly as it does for Rive, and the player plays (once, keeping the last frame) and stops them. The
- *      same files work as tab icons with `CYLTabBarSVGAURL` (docs/SVGA-Animation.md). Samples: SVGAPlayer-iOS (Apache 2.0).
- * [CN] 纯 UIKit 中的 SVGA 动画，显示在 Rive 演示（`RiveMenuButtonDemoView`）之后：SVGA 子库（`pod 'CYLTabBarController/SVGA'`）为 ".svga" 文件
+ *      same files work as tab icons with `CYLTabBarSVGAURL` (docs/SVGA-Animation.md). Samples: SVGAAssets/NOTICE.md (Apache 2.0).
+ * [CN] 纯 UIKit 中的 SVGA 动画，显示在 Example-SwiftUI-Rive 的 Bell 页面，以及 Example-Rive 的 Bell 页面 Rive 演示（`RiveMenuButtonDemoView`）之后：SVGA 子库（`pod 'CYLTabBarController/SVGA'`）为 ".svga" 文件
  *      注册了视图 provider，因此 `CYLTabBarItemAnimationFactory` 创建其视图的方式与 Rive 完全相同，播放器负责播放（一次，停在最后一帧）与停止。
- *      同样的文件通过 `CYLTabBarSVGAURL` 即可作为 Tab 图标（docs/SVGA-Animation.md）。示例文件来自 SVGAPlayer-iOS（Apache 2.0）。
+ *      同样的文件通过 `CYLTabBarSVGAURL` 即可作为 Tab 图标（docs/SVGA-Animation.md）。示例文件见 SVGAAssets/NOTICE.md（Apache 2.0）。
  */
 final class SVGATabIconDemoView: UIView {
 
@@ -102,7 +103,7 @@ final class SVGATabIconDemoView: UIView {
 
     @objc private func switchTabIconSource() {
         CYLDemoTabIconSource.current = CYLDemoTabIconSource.current.next
-        CYLDemoTabBarStyle.rebuildRootViewController?()
+        CYLDemoTabIconSource.rebuildTabBar?()
     }
 
     @objc private func toggle() {

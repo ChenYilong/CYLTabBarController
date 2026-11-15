@@ -40,9 +40,9 @@
   ],
   "CYLTabBarControllerPlusButton": {
     "CYLTabBarItemTitle": "Start",
-    "CYLTabBarItemImage": "system:plus.circle.fill",
+    "CYLTabBarItemImage": "svga_plus_button",
     "CYLTabBarItemIdentifier": "plus",
-    "CYLTabBarItemPageIdentifier": "svga-start",
+    "CYLTabBarItemPageIdentifier": "svga-timer",
     "CYLPlusButtonIndexInTabBar": 2,
     "CYLPlusButtonImageSize": "{44, 44}"
   }

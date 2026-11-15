@@ -23,6 +23,9 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         CYLDemoTabBarStyle.rebuildRootViewController = { [weak window] in
             window?.rootViewController = Self.makeTabBarController()
         }
+        // [EN] The tab icon source switch of the Bell page (SVGATabIcons.swift) rebuilds it the same way.
+        // [CN] Bell 页面的 Tab 图标来源切换（SVGATabIcons.swift）以同样方式重建。
+        CYLDemoTabIconSource.rebuildTabBar = CYLDemoTabBarStyle.rebuildRootViewController
         window.makeKeyAndVisible()
         self.window = window
     }
@@ -52,14 +55,22 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     }
 
     /**
-     * [EN] The tab bar of SVGA/cyl_tabbar_configuration_svga.json: tabs, plus button and SVGA icons from the file
+     * [EN] The tab bar of RiveApp/SVGA/cyl_tabbar_configuration_svga.json: tabs, plus button and SVGA icons from the file
      *      (`CYLTabBarSVGAFilePath`), pages from the page registry. nil (and the Rive tab bar) when the file cannot be read.
-     * [CN] SVGA/cyl_tabbar_configuration_svga.json 中的 TabBar：Tab、PlusButton 与 SVGA 图标来自该文件（`CYLTabBarSVGAFilePath`），页面来自页面注册表。
+     * [CN] RiveApp/SVGA/cyl_tabbar_configuration_svga.json 中的 TabBar：Tab、PlusButton 与 SVGA 图标来自该文件（`CYLTabBarSVGAFilePath`），页面来自页面注册表。
      *      无法读取文件时返回 nil（并使用 Rive 的 TabBar）。
      */
     private static func makeSVGAConfigurationTabBarController() -> CYLTabBarController? {
         guard let path = Bundle.main.path(forResource: "cyl_tabbar_configuration_svga", ofType: "json") else { return nil }
-        CYLDemoSVGAConfigurationPages.registerIfNeeded()
+        // [EN] The plus button "Start" shows the Timer tab's page (svga-timer), as in the Rive tab bar.
+        // [CN] PlusButton「Start」显示 Timer Tab 的页面（svga-timer），与 Rive TabBar 相同。
+        CYLDemoSVGAConfigurationPages.registerIfNeeded { tab in
+            let viewController = tab.viewController
+            if tab == .timer {
+                viewController.children.first?.title = "Start"
+            }
+            return viewController
+        }
         do {
             let tabBarController = try RiveTabBarController(configurationFile: path)
             tabBarController.applyCourseTabBarAppearance()

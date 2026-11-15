@@ -306,7 +306,10 @@ docs/
 │   ├── svga-tab-icon-flatdesign.png
 │   ├── svga-tab-icon-liquid-glass.png
 │   ├── svga-tab-icons-configuration-ios26.png
+│   ├── svga-tab-icons-configuration-plus-ios26.png
 │   ├── svga-tab-icons-keys-ios26.png
+│   ├── svga-tab-icons-swiftui-configuration-ios26.png
+│   ├── svga-tab-icons-swiftui-keys-ios26.png
 │   ├── swift-migration-badges-ios.png
 │   ├── swift-migration-localization-ios.png
 │   ├── swift-migration-step48-flatdesign-popped.png

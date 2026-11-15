@@ -1,6 +1,6 @@
 //
 //  SVGATabIcons.swift
-//  RiveApp
+//  AnimatedApp
 //
 //  Copyright © 2026 https://github.com/ChenYilong . All rights reserved.
 //
@@ -10,15 +10,16 @@ import CYLTabBarController
 
 /**
  * FIX: issue #415
- * [EN] Where Example-Rive's tab icons come from, one for one with the Rive tab icons (TabItems.swift): the course's Rive
- *      artboards (`CYLTabBarRiveURL`), SVGA files given with the SVGA initialization keys in code (`CYLTabBarSVGAURL`,
- *      `CYLTabBarSVGASize`), or SVGA files given in a configuration file (`CYLTabBarSVGAFilePath`, SVGA/cyl_tabbar_configuration_svga.json,
- *      `+tabBarControllerWithConfigurationFile:error:`). Chosen on the Bell page and kept across launches; changing it rebuilds
- *      the tab bar. The SVGA files: SVGAPlayer-iOS, SVGAPlayer-Android and SVGAPlayer-Web samples (Apache 2.0, SVGA/NOTICE.md).
- * [CN] Example-Rive 的 Tab 图标来源，与 Rive Tab 图标（TabItems.swift）一一对应：课程的 Rive 画板（`CYLTabBarRiveURL`）、在代码中用 SVGA 初始化 key
- *      （`CYLTabBarSVGAURL`、`CYLTabBarSVGASize`）提供的 SVGA 文件，或在配置文件中（`CYLTabBarSVGAFilePath`，SVGA/cyl_tabbar_configuration_svga.json，
- *      `+tabBarControllerWithConfigurationFile:error:`）提供的 SVGA 文件。在 Bell 页面选择，重启后保持；切换时重建 TabBar。SVGA 文件来自 SVGAPlayer-iOS、
- *      SVGAPlayer-Android 与 SVGAPlayer-Web 的示例（Apache 2.0，见 SVGA/NOTICE.md）。
+ * [EN] Where the tab icons of Example-SwiftUI-Rive and Example-Rive come from, one for one with the Rive tab icons (TabItems.swift,
+ *      shared the same way): the course's Rive artboards (`CYLTabBarRiveURL`), SVGA files given with the SVGA initialization
+ *      keys in code (`CYLTabBarSVGAURL`, `CYLTabBarSVGASize`), or SVGA files given in each app's configuration file
+ *      (`CYLTabBarSVGAFilePath`, cyl_tabbar_configuration_svga.json, `+tabBarControllerWithConfigurationFile:error:`). Chosen
+ *      on the Bell page and kept across launches; changing it rebuilds the tab bar (`rebuildTabBar`). The SVGA files:
+ *      SVGAPlayer-iOS, SVGAPlayer-Android and SVGAPlayer-Web samples (Apache 2.0, SVGAAssets/NOTICE.md).
+ * [CN] Example-SwiftUI-Rive 与 Example-Rive 的 Tab 图标来源，与 Rive Tab 图标（TabItems.swift，同样共用）一一对应：课程的 Rive 画板（`CYLTabBarRiveURL`）、
+ *      在代码中用 SVGA 初始化 key（`CYLTabBarSVGAURL`、`CYLTabBarSVGASize`）提供的 SVGA 文件，或在各 App 的配置文件中（`CYLTabBarSVGAFilePath`，
+ *      cyl_tabbar_configuration_svga.json，`+tabBarControllerWithConfigurationFile:error:`）提供的 SVGA 文件。在 Bell 页面选择，重启后保持；切换时重建
+ *      TabBar（`rebuildTabBar`）。SVGA 文件来自 SVGAPlayer-iOS、SVGAPlayer-Android 与 SVGAPlayer-Web 的示例（Apache 2.0，见 SVGAAssets/NOTICE.md）。
  */
 enum CYLDemoTabIconSource: Int, CaseIterable {
     case rive
@@ -26,6 +27,9 @@ enum CYLDemoTabIconSource: Int, CaseIterable {
     case svgaConfigurationFile
 
     private static let defaultsKey = "CYLDemoTabIconSource"
+
+    /** [EN] Set by each app: rebuilds its tab bar with the current source. [CN] 由各 App 设置：用当前来源重建 TabBar。 */
+    static var rebuildTabBar: (() -> Void)?
 
     /**
      * [EN] The source in use; the launch argument `-CYLDemoTabIconSource 0|1|2` (screenshots, UI tests) also sets it.
@@ -80,30 +84,25 @@ extension Tab {
         return attributes
     }
 
-    /** [EN] The page identifier of the tab in the SVGA configuration file. [CN] 该 Tab 在 SVGA 配置文件中的页面标识。 */
+    /** [EN] The page identifier of the tab in the SVGA configuration files. [CN] 该 Tab 在 SVGA 配置文件中的页面标识。 */
     var svgaPageIdentifier: String {
-        self == .timer ? "svga-start" : "svga-\(rawValue)"
+        "svga-\(rawValue)"
     }
 }
 
 /**
- * [EN] Registers the pages the SVGA configuration file names (`CYLTabBarItemPageIdentifier`): the same pages as the Rive tabs.
- * [CN] 注册 SVGA 配置文件引用的页面（`CYLTabBarItemPageIdentifier`）：与 Rive Tab 的页面相同。
+ * [EN] Registers the pages the SVGA configuration files name (`CYLTabBarItemPageIdentifier`): each app passes the pages of
+ *      its Rive tabs.
+ * [CN] 注册 SVGA 配置文件引用的页面（`CYLTabBarItemPageIdentifier`）：各 App 传入其 Rive Tab 的页面。
  */
 enum CYLDemoSVGAConfigurationPages {
     private static var isRegistered = false
 
-    static func registerIfNeeded() {
+    static func registerIfNeeded(page: @escaping (Tab) -> UIViewController) {
         guard !isRegistered else { return }
         isRegistered = true
         for tab in Tab.allCases {
-            CYLTabBarPageRegistry.shared.register(factory: { _ in
-                let viewController = tab.viewController
-                if tab == .timer {
-                    viewController.children.first?.title = "Start"
-                }
-                return viewController
-            }, forPageIdentifier: tab.svgaPageIdentifier)
+            CYLTabBarPageRegistry.shared.register(factory: { _ in page(tab) }, forPageIdentifier: tab.svgaPageIdentifier)
         }
     }
 }
