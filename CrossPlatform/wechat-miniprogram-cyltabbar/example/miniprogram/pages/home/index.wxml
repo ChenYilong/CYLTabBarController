@@ -1,3 +1,5 @@
+<!-- [EN] Arabic: the page right to left. [CN] 阿拉伯语：页面从右到左。 -->
+<page-meta page-style="{{cylRTL ? 'direction: rtl;' : ''}}"></page-meta>
 <!-- [EN] The Objective-C example's home table (CYLHomeViewController): demo sections, the gallery, badge rows. [CN] Objective-C 示例的首页表格（CYLHomeViewController）：演示 section、图库、角标行。 -->
 <!-- [EN] CYLHomeViewController's navigation bar: "Flat Design" on the left (a breathing dot), "Skin" and "Liquid Glass" (a shaking dot) on the right, both dots in random colors. [CN] 首页导航栏：左侧「Flat Design」（呼吸红点），右侧「换肤」与「Liquid Glass」（抖动红点），红点为随机颜色。 -->
 <view class="cyl-nav" style="padding-top: {{nav.top}}px; height: {{nav.height}}px; padding-right: {{nav.right}}px;">

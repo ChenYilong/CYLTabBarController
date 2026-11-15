@@ -1029,3 +1029,29 @@ test('a memory warning unloads the unselected tabs except Home and reports each 
   await miniProgram.switchTab('/pages/home/index');
   await cylSleep(CYL_SETTLE_MS);
 });
+
+test('the language row: five languages and Follow system, Arabic right to left (docs/ObjC-Example-Parity item 11)', async () => {
+  await miniProgram.switchTab('/pages/home/index');
+  await cylSleep(CYL_SETTLE_MS);
+  const choose = async (language) => {
+    await miniProgram.evaluate((code) => { getCurrentPages().pop().cyl_setLanguage(code); }, language);
+    await cylSleep(CYL_SETTLE_MS * 3);
+    const { data } = await cylCurrentPage();
+    const bar = await miniProgram.evaluate(() => getCurrentPages().pop().getTabBar().data.rtl);
+    return { title: data.sections[0].rows[0].title, offset: data.sections[1].rows[0].title, rtl: data.cylRTL, bar };
+  };
+  let current = await choose('ar');
+  assert.equal(current.title, '🌐 اللغة：🇸🇦 العربية');
+  assert.equal(current.offset, 'إزاحة العنوان (titlePositionAdjustment)');
+  assert.deepEqual([current.rtl, current.bar], [true, true], 'right to left, the bar too');
+  current = await choose('es');
+  assert.equal(current.title, '🌐 Idioma：🇪🇸 Español');
+  assert.deepEqual([current.rtl, current.bar], [false, false]);
+  current = await choose('hi');
+  assert.match(current.title, /🇮🇳 हिन्दी$/);
+  current = await choose('zh-Hans');
+  assert.equal(current.title, '🌐 语言：🇨🇳 简体中文');
+  current = await choose(null);
+  assert.match(current.title, /^🌐 /, 'follows WeChat again');
+  await cylClearDecoration();
+});

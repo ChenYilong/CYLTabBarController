@@ -4,7 +4,7 @@
  * [CN] Tab 页面的 behavior：让自定义 TabBar 的选中状态跟随页面，为页面提供文字（WXML 中为 `texts[key]`，JS 中为 t(key)），
  *      并支持滑动切换 Tab。
  */
-const { t } = require('./cyl_demo_localization');
+const { t, cylIsRightToLeft } = require('./cyl_demo_localization');
 const cylDemoStrings = require('./cyl_demo_strings');
 const cylSwipeBehavior = require('cyl-tabbar-miniprogram/cyl-tab-bar/cyl_swipe_behavior');
 
@@ -14,6 +14,8 @@ module.exports = Behavior({
     texts: {},
     // [EN] The view was unloaded on a memory warning; it is built again when the page shows. [CN] 视图因内存警告被卸载；页面显示时重新创建。
     cylUnloaded: false,
+    // [EN] Right to left (Arabic): <page-meta> flips the page. [CN] 从右到左（阿拉伯语）：<page-meta> 翻转页面。
+    cylRTL: false,
   },
   lifetimes: {
     detached() {
@@ -31,7 +33,7 @@ module.exports = Behavior({
       Object.keys(cylDemoStrings.en).forEach((key) => {
         texts[key] = t(key);
       });
-      this.setData({ texts });
+      this.setData({ texts, cylRTL: cylIsRightToLeft() });
     },
   },
   pageLifetimes: {

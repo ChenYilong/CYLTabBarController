@@ -5,7 +5,7 @@
  *      与 `-cyl_showBadgeForRow:`），来自共用演示列表。
  */
 const cylDemoList = require('../shared/demo_list');
-const { cylLanguage } = require('./cyl_demo_localization');
+const { cylLanguage, cylMoreTable } = require('./cyl_demo_localization');
 
 /**
  * [EN] A badge text as the core shows it: numbers above the maximum read "99+".
@@ -18,7 +18,8 @@ function cylBadgeText(sample) {
 }
 
 function cylListText(text) {
-  const table = cylDemoList.strings[cylLanguage(cylDemoList.strings)] || {};
+  // [EN] The demo list's own tables (zh-Hans, zh-Hant), else the library's (hi, es, ar). [CN] 演示列表自己的表（zh-Hans、zh-Hant），否则为库的表（hi、es、ar）。
+  const table = cylDemoList.strings[cylLanguage(cylDemoList.strings)] || cylMoreTable();
   return table[text] || text || '';
 }
 

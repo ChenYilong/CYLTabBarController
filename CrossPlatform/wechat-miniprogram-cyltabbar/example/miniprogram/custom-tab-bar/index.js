@@ -8,7 +8,7 @@
  */
 const { cylDemoConfiguration } = require('../utils/cyl_demo_configuration');
 const { cylEffectiveSkin } = require('../utils/cyl_demo_skins');
-const { t, cylConfigurationTable } = require('../utils/cyl_demo_localization');
+const { t, cylConfigurationTable, cylIsRightToLeft } = require('../utils/cyl_demo_localization');
 const cylSymbolsByTheme = require('../shared/symbols');
 
 /**
@@ -38,7 +38,7 @@ Component({
       ['Home', 'Refresh', 'Nearby', 'Messages', 'Me', 'Post'].forEach((title) => {
         titles[title] = t(title);
       });
-      this.setData({ strings: Object.assign({}, cylConfigurationTable(), titles) });
+      this.setData({ strings: Object.assign({}, cylConfigurationTable(), titles), rtl: cylIsRightToLeft() });
       this.cyl_apply(app.globalData.cylTabBarState);
       this.cylUnsubscribe = app.cyl_subscribe((state) => this.cyl_apply(state));
     },

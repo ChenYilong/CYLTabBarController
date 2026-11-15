@@ -169,6 +169,65 @@ function cylFindAsset(assets, key, theme, state) {
  * [CN] 所有生成的文件：相对路径 -> Buffer。
  */
 /**
+ * [EN] The languages of the Objective-C example's language picker that the example has no table of (CYLLocalization.swift:
+ *      en, zh-Hans, hi, es, ar), for the example's texts (miniprogram/utils/cyl_demo_strings.js) and the demo list: each
+ *      English text is looked up in the library's English table, and the same key gives the text in the other language.
+ *      "{name}" parts are "%@" in the library (in order). A text the library does not have stays English.
+ * [CN] Objective-C 示例语言选择器中示例尚无字符串表的语言（CYLLocalization.swift：en、zh-Hans、hi、es、ar），用于示例文字
+ *      （miniprogram/utils/cyl_demo_strings.js）与演示列表：每个英文文字在库的英文表中查找，用同一个键取得另一种语言的文字。
+ *      「{name}」部分在库中为「%@」（按顺序）。库中没有的文字保持英文。
+ */
+const CYL_MORE_LANGUAGES = ['hi', 'es', 'ar'];
+
+function cylMoreStrings() {
+  const bundle = path.join(CYL_REPOSITORY_ROOT, 'CYLTabBarController', 'Resources', 'CYLTabBarController.bundle');
+  const read = (language) => cylReadStrings(path.join(bundle, `${language}.lproj`, 'CYLTabBarController.strings'));
+  const english = read('en');
+  const keyByText = {};
+  Object.keys(english).forEach((key) => {
+    const text = english[key].replace(/%(\d+\$)?@/g, '%@');
+    if (!(text in keyByText)) {
+      keyByText[text] = key;
+    }
+  });
+  const texts = new Set(Object.keys(require(path.join(CYL_COMPONENT_ROOT, 'miniprogram', 'utils', 'cyl_demo_strings.js')).en));
+  const demoList = JSON.parse(fs.readFileSync(path.join(CYL_REPOSITORY_ROOT, 'Example-Shared', 'DemoList', 'demo-list.json'), 'utf8'));
+  const collect = (value) => {
+    if (Array.isArray(value)) {
+      value.forEach(collect);
+    } else if (value && typeof value === 'object') {
+      ['title', 'subtitle'].forEach((field) => {
+        if (typeof value[field] === 'string' && value[field]) {
+          texts.add(value[field]);
+        }
+      });
+      Object.keys(value).filter((key) => key !== 'strings').forEach((key) => collect(value[key]));
+    }
+  };
+  collect(demoList);
+  const tables = {};
+  CYL_MORE_LANGUAGES.forEach((language) => {
+    const translated = read(language);
+    const table = {};
+    Array.from(texts).sort().forEach((text) => {
+      const names = text.match(/\{\w+\}/g) || [];
+      const key = keyByText[text.replace(/\{\w+\}/g, '%@')];
+      if (!key || translated[key] === undefined) {
+        return;
+      }
+      let index = 0;
+      table[text] = translated[key].replace(/%(\d+)\$@|%@/g, (match, position) => {
+        const name = position ? names[Number(position) - 1] : names[index];
+        index += 1;
+        return name || match;
+      });
+    });
+    tables[language] = table;
+  });
+  return tables;
+}
+
+/**
  * [EN] A click as a mono 16-bit 22.05 kHz WAV: a sine of `frequency` Hz that decays over `seconds`.
  * [CN] 单声道 16 位 22.05 kHz WAV 格式的点击声：`frequency` Hz 的正弦波，在 `seconds` 秒内衰减。
  */
@@ -307,6 +366,7 @@ function cylGeneratedFiles() {
   });
   symbolsByTheme.default = symbolsByTheme[CYL_DEFAULT_THEME];
   files['demo_list.js'] = Buffer.from(cylDemoListSource());
+  files['strings_more.js'] = Buffer.from(`${CYL_GENERATED_NOTE}module.exports = ${JSON.stringify(cylMoreStrings(), null, 2)};\n`);
   files['symbols.js'] = Buffer.from(`${CYL_GENERATED_NOTE}module.exports = ${JSON.stringify(symbolsByTheme, null, 2)};\n`);
 
   // [EN] The Objective-C example's tab bar images (Example/Images.xcassets/TabBarIcon, @3x), which the example's tab bar

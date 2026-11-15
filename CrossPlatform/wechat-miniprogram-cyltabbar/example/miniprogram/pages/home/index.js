@@ -10,7 +10,19 @@
  *      行会修改 App 的 TabBar 状态；其他行提示仅 iOS 示例提供。
  */
 const cylTabPage = require('../../utils/cyl_tab_page');
-const { cylLanguage } = require('../../utils/cyl_demo_localization');
+const { cylLanguage, cylMoreTable, cylSetLanguage, cylChosen, cylSystemLanguage } = require('../../utils/cyl_demo_localization');
+
+/**
+ * [EN] The languages of the Objective-C picker (CYLLocalization.swift), each with its flag and its own name.
+ * [CN] Objective-C 语言选择器中的语言（CYLLocalization.swift），各带国旗与自身语言中的名字。
+ */
+const CYL_LANGUAGES = [['en', '🇺🇸', 'English'], ['zh-Hans', '🇨🇳', '简体中文'], ['hi', '🇮🇳', 'हिन्दी'], ['es', '🇪🇸', 'Español'], ['ar', '🇸🇦', 'العربية']];
+
+function cylFlaggedName(language) {
+  const entry = CYL_LANGUAGES.find(([code]) => code === language)
+    || CYL_LANGUAGES.find(([code]) => code === language.split('-')[0]);
+  return entry ? `${entry[1]} ${entry[2]}` : `🌐 ${language}`;
+}
 const { cylDemoConfiguration } = require('../../utils/cyl_demo_configuration');
 const cylDemoList = require('../../shared/demo_list');
 const { cylHomeAction, CYL_TAP_STEPS, CYL_SOUND_STEPS } = require('../../utils/cyl_home_actions');
@@ -44,7 +56,8 @@ const CYL_BADGE_ANIMATIONS = ['scale', 'shake', 'bounce', 'breathe', 'rotation']
  * [CN] 演示列表文字的当前语言版本（示例支持的语言；否则为英文）。
  */
 function cylListText(text) {
-  const table = cylDemoList.strings[cylLanguage(cylDemoList.strings)] || {};
+  // [EN] The demo list's own tables (zh-Hans, zh-Hant), else the library's (hi, es, ar). [CN] 演示列表自己的表（zh-Hans、zh-Hant），否则为库的表（hi、es、ar）。
+  const table = cylDemoList.strings[cylLanguage(cylDemoList.strings)] || cylMoreTable();
   return table[text] || text;
 }
 
@@ -231,6 +244,17 @@ Component({
       };
       const flatOnly = row.id === 'flatBackground';
       const unsupported = flatOnly && configuration.CYLTabBarControllerStyleType !== 'flatDesign';
+      // [EN] Item 11: "🌐 Language：<flag> <name>"; the subtitle stays in WeChat's language (CYLLocalizedStringForLanguage nil).
+      // [CN] 第 11 项：「🌐 语言：<国旗> <名字>」；副标题保持微信语言（CYLLocalizedStringForLanguage nil）。
+      if (row.id === 'language') {
+        return {
+          id: row.id,
+          title: `🌐 ${this.t('Language')}：${cylFlaggedName(cylChosen() || cylSystemLanguage())}`,
+          subtitle: this.cyl_systemText('Tap to change the language'),
+          accessory: row.accessory,
+          checked: false,
+        };
+      }
       return {
         id: row.id,
         title: cylFill(cylListText(row.title), values),
@@ -241,6 +265,41 @@ Component({
         // [EN] Item 30: the slider of touchableAreaScale (1 to 3). [CN] 第 30 项：touchableAreaScale 滑块（1 到 3）。
         slider: row.id === 'touchableArea' ? Number(values.touchScale) : null,
       };
+    },
+
+    /**
+     * [EN] A text in WeChat's language, whatever language is chosen. [CN] 无论选择了哪种语言，都使用微信语言的文字。
+     */
+    cyl_systemText(key) {
+      const chosen = cylChosen();
+      cylSetLanguage(null);
+      const text = this.t(key);
+      cylSetLanguage(chosen);
+      return text;
+    },
+
+    /**
+     * [EN] Item 11 (CYLLocalization.swift): the five languages and "Follow system"; a choice builds every page again in
+     *      it (wx.reLaunch, as -[UIWindow cyl_setRootViewControllerProvider:]); Arabic lays the pages and the bar out
+     *      right to left.
+     * [CN] 第 11 项（CYLLocalization.swift）：五种语言与「跟随系统」；选择后用该语言重新创建所有页面（wx.reLaunch，对应
+     *      -[UIWindow cyl_setRootViewControllerProvider:]）；阿拉伯语从右到左布局页面与 TabBar。
+     */
+    cyl_chooseLanguage() {
+      wx.showActionSheet({
+        alertText: this.t('Language'),
+        itemList: CYL_LANGUAGES.map(([code]) => cylFlaggedName(code)).concat([this.t('Follow system')]),
+        success: (result) => {
+          const entry = CYL_LANGUAGES[result.tapIndex];
+          this.cyl_setLanguage(entry ? entry[0] : null);
+        },
+      });
+    },
+
+    cyl_setLanguage(language) {
+      cylSetLanguage(language);
+      getApp().globalData.cylLanguage = language;
+      wx.reLaunch({ url: '/pages/home/index' });
     },
 
     // [EN] Switch rows that the mini program has. [CN] 小程序支持的开关行。
@@ -312,7 +371,7 @@ Component({
         return;
       }
       const actions = {
-        language: () => wx.showToast({ title: this.t('Follows the language of WeChat'), icon: 'none' }),
+        language: () => this.cyl_chooseLanguage(),
         // [EN] cyl_presentThemePickerFromView:completion: (issue #216). [CN] 打开换肤菜单（issue #216）。
         skin: () => this.cyl_onSkinButton(),
         // [EN] Item 28: cyl_selectedIndexIgnoringPlusButton = (current + 1) % count: the next tab without the plus

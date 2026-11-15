@@ -1,3 +1,5 @@
+<!-- [EN] Arabic: the page right to left. [CN] 阿拉伯语：页面从右到左。 -->
+<page-meta page-style="{{cylRTL ? 'direction: rtl;' : ''}}"></page-meta>
 <view wx:if="{{!cylUnloaded}}" class="cyl-page" bindtouchstart="cyl_onSwipeStart" bindtouchend="cyl_onSwipeEnd">
   <view class="cyl-header">
     <text class="cyl-header-title" aria-role="heading">{{texts['Post']}}</text>
