@@ -23,6 +23,7 @@ When code, `docs/` and `README.md` disagree, code wins, then `docs/`. Fix the wr
 | `cyl-api-map` | Finding the API and document for a feature |
 | `cyl-docs` | Adding a feature, editing `README.md` or `docs/` |
 | `cyl-verify` | Building, testing, running the simulator, reading common failures |
+| `cyl-harmonyos-setup` | Preparing Windows and DevEco Studio for HarmonyOS; prerequisites for installing the local emulator |
 
 - **Third-party skills** are listed in `.agents/skills.json`, pinned in `.agents/skills.lock.json`, and vendored by `python3 scripts/sync-agent-skills.py`. Do not edit them by hand: change the manifest and sync. See [docs/Agent-Skills.md](docs/Agent-Skills.md) for what is there and why. Their advice is generic: where one conflicts with a rule here, this file and the `cyl-*` skills win. For example, they target modern Swift, while this library is Objective-C with a Swift 5 API.
 
@@ -213,6 +214,16 @@ Every new feature and user-visible change ships with bilingual documentation in 
 ## HarmonyOS port
 
 HarmonyOS (HarmonyOS 6.0.1, API 21, DevEco Studio 6.0, ArkTS / ArkUI, code in `CrossPlatform/harmonyos-cyltabbar`) principles: the public API matches the iOS library; the example (entry) is a one-to-one replica of the iOS Objective-C Example; the internal implementation is ported from the Android Kotlin sources (`Example-Android/cyltabbar`). Progress and score: [docs/HarmonyOS-Parity.md](docs/HarmonyOS-Parity.md); remove one TODO per feature done, until the score is 100. Build from an ASCII path without spaces (hvigor refuses others), e.g. a copy at `C:cyl-hm`.
+
+**DevEco Studio setup and emulator prerequisites** (full steps: the `cyl-harmonyos-setup` skill):
+- Windows features `Microsoft-Hyper-V-All`, `Microsoft-Hyper-V-Hypervisor`, `VirtualMachinePlatform` and
+  `HypervisorPlatform` are enabled, and **Windows itself has been restarted** (restarting DevEco Studio is not enough).
+- **The region must be China.** In `%APPDATA%\Huawei\DevEcoStudio6.0\options\country.region.xml`, change any other
+  region (for example `NZ`) to China, and make sure the region file says `<countryregion name="CN"/>`. Edit it only
+  while DevEco Studio is closed (it can write the old value back on exit), then confirm `request region:CN` in
+  `%LOCALAPPDATA%\Huawei\DevEcoStudio6.0\log\idea.log` after the restart.
+- Sign in with a Huawei developer account; an account that is not Chinese Mainland and not real-name verified may
+  still be refused the emulator image. Fallback: a real HarmonyOS device through `hdc`.
 
 ## Depending on CYLTabBarController
 
