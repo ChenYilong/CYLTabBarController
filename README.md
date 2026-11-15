@@ -1869,6 +1869,12 @@ CYLTabBar(items: items, styleType: 'liquidGlass', selectedIndex: index, badgeVal
 
 ![WeChat Mini Program, DevTools on Windows 11, base library 3.17.6: the Home navigation bar with Flat Design, Skin and Liquid Glass, the skin menu, the Christmas skin, the network skin on a FlatDesign bar](assets/wechat-miniprogram-objc-skins.png)
 
+| 中文 | English |
+|:---|:---|
+| **微信小程序：首页各行与 Objective-C 示例取值一致**：标题偏移 0 / -4 / 4、四种 standardAppearance、四种滚动行为、扁平样式 Item 背景色、原地更新 Tab（「已购课程」、网络 / 本地 / GIF 图标、「★ 」标题，带勾号，再点恢复）、selectedIndex 循环。下图（微信小程序，Windows 11 开发者工具，模拟器 iPhone 12/13 Pro，基础库 3.17.6，基于 [a9b1278](https://github.com/ChenYilong/CYLTabBarController/commit/a9b1278)，2026-11-15）从左到右：深色外观 + 本地图标；居中胶囊 + 网络图标 +「★ 」标题；扁平样式 + 绿色描边 + Item 背景色。进度见 [ObjC 示例复刻](docs/ObjC-Example-Parity/README.md)。 | **WeChat Mini Program: the Home rows with the Objective-C values**: title offset 0 / -4 / 4, the four standardAppearance themes, the four scroll behaviors, the FlatDesign item background, tabs updated in place ("Purchased courses", network / local / GIF icons, "★ " titles, with checkmarks, tap again to restore), selectedIndex wrapping. Below (WeChat Mini Program, DevTools on Windows 11, simulator iPhone 12/13 Pro, base library 3.17.6, on top of [a9b1278](https://github.com/ChenYilong/CYLTabBarController/commit/a9b1278), 2026-11-15), left to right: Dark + local icons; Centered capsule + network icons + "★ " titles; FlatDesign + Green line + item background. Progress: [ObjC example parity](docs/ObjC-Example-Parity/README.md). |
+
+![WeChat Mini Program, DevTools on Windows 11, base library 3.17.6: the Dark appearance with local icons, the centered capsule with network icons and star titles, FlatDesign with the green line and item backgrounds](assets/wechat-miniprogram-objc-home-rows.png)
+
 ### [CN]在 Swift 项目中使用 CYLTabBarController
 ### [EN]Using CYLTabBarController in a Swift project
 
