@@ -59,5 +59,10 @@
   "UIView(CYLBadgeExtention) -cyl_showBadgeValue:": "`CYLBadge.cyl_showBadgeValue(value)` (built; emulator check pending / 已编译，模拟器验证待做)",
   "UIView(CYLBadgeExtention)": "`CYLBadge + CYLBadgeView` (built; emulator check pending / 已编译，模拟器验证待做)",
   "UIView(CYLBadgeExtention) cyl_badge": "`CYLBadgeView` (built; emulator check pending / 已编译，模拟器验证待做)",
-  "UIView(CYLBadgeExtention) -cyl_resetBadgeAppearance": "`CYLBadge.cyl_resetBadgeAppearance()` (built; emulator check pending / 已编译，模拟器验证待做)"
+  "UIView(CYLBadgeExtention) -cyl_resetBadgeAppearance": "`CYLBadge.cyl_resetBadgeAppearance()` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarLottieFilePath": "`CYLTabBarItemAttributes.lottieFilePath (CYLLottieIcon, @ohos/lottie)` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarLottieSize": "`CYLTabBarItemAttributes.lottieSize` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarControllerTabBarItemAnimationSpeed": "`CYLTabBarController.tabBarItemAnimationSpeed` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "UIControl(CYLTabBarControllerExtention) -cyl_coverVisiableTabImageViewOrTabButton:newView:offset:show:delayIfNeededForSeconds:completion:": "`CYLTabBarController.tabCoverImages` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "UIControl(CYLTabBarControllerExtention) -cyl_coverVisiableTabImageViewOrTabButton:contentNewView:seclectContentNewView:offset:show:delayIfNeededForSeconds:completion:": "`CYLTabBarController.tabCoverImages` (built; emulator check pending / 已编译，模拟器验证待做)"
 }

@@ -1,8 +1,10 @@
 {
   "demos": {
     "1": "`CYLTabBarController` + `entry/pages/Index.ets` CYL_TABS: 首页 / 同城 / 消息 / 我的 with images and identifiers (built; emulator check pending / 已编译，模拟器验证待做)",
+    "2": "`CYLTabBarItemAttributes.lottieFilePath` (green_lottie_tab_*.json, all four tabs as the ObjC Example; plays on select and on a re-tap) + `tabCoverImages` home_select_cover after 1.5 s, Home badge cleared; Home selected title 刷新 (built; emulator check pending / 已编译，模拟器验证待做)",
     "3": "`CYLPlusButton` 发布 / Post: index 2, identifier plus, title aligned, selected title green (`plusButtonTitleSelectedColor`) (built; emulator check pending / 已编译，模拟器验证待做)",
     "5": "`plusButtonBadgeValue` 1 at launch, +1 per tap in `plusButtonAction` (toast) (built; emulator check pending / 已编译，模拟器验证待做)",
-    "6": "`CYLBadge` per tab after 1.5 s: Home dot (random color, radius 5.5, breathe), Nearby 8 (purple, scale), Messages 99+ (bounce), Me NEW (offset -1, 3, breathe); global offset (-5, 3); tapping a badged tab clears it (built; emulator check pending / 已编译，模拟器验证待做)"
+    "6": "`CYLBadge` per tab after 1.5 s: Home dot (random color, radius 5.5, breathe), Nearby 8 (purple, scale), Messages 99+ (bounce), Me NEW (offset -1, 3, breathe); global offset (-5, 3); tapping a badged tab clears it (built; emulator check pending / 已编译，模拟器验证待做)",
+    "10": "`CYLPlusButton.selectable`: the plus page is blank with the navigation title 发布 (built; emulator check pending / 已编译，模拟器验证待做)"
   }
 }

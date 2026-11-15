@@ -5,5 +5,7 @@
   "main": "Index.ets",
   "author": "ChenYilong",
   "license": "MIT",
-  "dependencies": {}
+  "dependencies": {
+    "@ohos/lottie": "^2.0.38"
+  }
 }

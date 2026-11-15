@@ -9,10 +9,10 @@ import {
  * [CN] Objective-C Example（MainTabBarController）的 Tab：首页、同城、消息、我的，带 identifier。
  */
 const CYL_TABS: CYLTabBarItemAttributes[] = [
-  { title: $r('app.string.tab_home'), image: $r('app.media.home_normal'), selectedImage: $r('app.media.home_highlight'), identifier: 'home' },
-  { title: $r('app.string.tab_nearby'), image: $r('app.media.fishpond_normal'), selectedImage: $r('app.media.fishpond_highlight'), identifier: 'nearby' },
-  { title: $r('app.string.tab_messages'), image: $r('app.media.message_normal'), selectedImage: $r('app.media.message_highlight'), identifier: 'message' },
-  { title: $r('app.string.tab_me'), image: $r('app.media.account_normal'), selectedImage: $r('app.media.account_highlight'), identifier: 'me' },
+  { title: $r('app.string.tab_home'), selectedTitle: $r('app.string.tab_refresh'), image: $r('app.media.home_normal'), selectedImage: $r('app.media.home_highlight'), identifier: 'home', lottieFilePath: 'lottie/green_lottie_tab_home.json' },
+  { title: $r('app.string.tab_nearby'), image: $r('app.media.fishpond_normal'), selectedImage: $r('app.media.fishpond_highlight'), identifier: 'city', lottieFilePath: 'lottie/green_lottie_tab_discover.json' },
+  { title: $r('app.string.tab_messages'), image: $r('app.media.message_normal'), darkImage: $r('app.media.message_normal_night'), selectedImage: $r('app.media.message_highlight'), identifier: 'message', lottieFilePath: 'lottie/green_lottie_tab_news.json' },
+  { title: $r('app.string.tab_me'), image: $r('app.media.account_normal'), selectedImage: $r('app.media.account_highlight'), identifier: 'CYLMineViewController', lottieFilePath: 'lottie/green_lottie_tab_mine.json' },
 ];
 
 /**
@@ -40,6 +40,8 @@ const CYL_PLUS: CYLPlusButton = {
 struct Index {
   @State selectedIndex: number = 0;
   @State plusBadge: number = 1;
+  // [EN] Item 2: the Taobao-style cover on Home after 1.5 s (setSelectedCoverShow:). [CN] 第 2 项：1.5 秒后首页的仿淘宝封面。
+  @State covers: (ResourceStr | undefined)[] = [];
   private badges: CYLBadge[] = CYL_TABS.map(() => new CYLBadge());
   private plusButtonBadge: CYLBadge = new CYLBadge();
 
@@ -61,20 +63,37 @@ struct Index {
       this.badges[2].cyl_showBadgeValue('100', CYLBadgeAnimationType.Bounce);
       this.badges[3].centerOffset = { horizontal: -1, vertical: 3 };
       this.badges[3].cyl_showBadgeValue('NEW', CYLBadgeAnimationType.Breathe);
+      // [EN] The cover replaces the Home button, so its badge is cleared (MainTabBarController.m). [CN] 封面替换首页按钮，因此清除其角标。
+      this.covers = [$r('app.media.home_select_cover')];
+      this.badges[0].cyl_clearBadge();
     }, 1500);
   }
 
+  /**
+   * [EN] A tab's page: a navigation bar with the tab's title (the view controllers of the Objective-C Example are in
+   *      navigation controllers). Item 10: the plus button's page (+plusChildViewController) is blank, titled "发布".
+   * [CN] Tab 页面：带 Tab 标题的导航栏（Objective-C Example 的视图控制器都在导航控制器中）。第 10 项：加号按钮的页面为空白，标题为「发布」。
+   */
+  /**
+   * [EN] A tab's page: a navigation bar with the tab's title (the view controllers of the Objective-C Example are in
+   *      navigation controllers). Item 10: the plus button's page (+plusChildViewController) is blank, titled "发布".
+   * [CN] Tab 页面：带 Tab 标题的导航栏（Objective-C Example 的视图控制器都在导航控制器中）。第 10 项：加号按钮的页面为空白，标题为「发布」。
+   */
   @Builder
   cylPage(index: number, identifier: string) {
     Column() {
       Text(index === CYLPlusButtonPageIndex ? $r('app.string.tab_post') : CYL_TABS[index].title)
         .fontSize(17)
         .fontWeight(FontWeight.Medium)
-        .margin({ top: 12 })
-      Text(identifier)
-        .fontSize(13)
-        .fontColor('#888888')
-        .margin({ top: 8 })
+        .height(44)
+        .width('100%')
+        .textAlign(TextAlign.Center)
+        .backgroundColor('#F8F8F8')
+        .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP])
+        .id(`cyl-nav-title-${identifier}`)
+      Column()
+        .layoutWeight(1)
+        .width('100%')
         .id(`cyl-page-${identifier}`)
     }
     .width('100%')
@@ -89,6 +108,7 @@ struct Index {
         plusButton: CYL_PLUS,
         selectedIndex: $selectedIndex,
         badges: this.badges,
+        tabCoverImages: this.covers,
         plusButtonBadge: this.plusButtonBadge,
         didSelect: (index: number) => {
           // [EN] Tapping a tab with a badge clears it (MainTabBarController.m). [CN] 点击带角标的 Tab 清除角标。

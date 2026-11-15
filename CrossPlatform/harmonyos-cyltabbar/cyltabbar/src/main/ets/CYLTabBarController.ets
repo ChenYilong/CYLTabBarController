@@ -1,6 +1,7 @@
 import { CYLTabBarItemAttributes } from './CYLTabBarItem';
 import { CYLPlusButton } from './CYLPlusButton';
 import { CYLBadge, CYLBadgeView } from './CYLBadge';
+import { CYLLottieIcon } from './CYLLottieIcon';
 
 /**
  * [EN] One place of the bar: a tab (tabIndex >= 0) or the plus button (tabIndex -1).
@@ -47,6 +48,15 @@ export struct CYLTabBarController {
   plusButtonTitleSelectedColor?: ResourceColor;
   tabBarBackgroundColor: ResourceColor = '#F8F8F8';
   tabBarHeight: number = 49;
+  /** [EN] CYLTabBarControllerTabBarItemAnimationSpeed (Lottie). [CN] Lottie 动画速度。 */
+  tabBarItemAnimationSpeed: number = 1;
+  /**
+   * [EN] -cyl_coverVisiableTabImageViewOrTabButton:...: an image covering a whole tab button (index -> image), as the
+   *      Example's Taobao-style Home cover; undefined: none.
+   * [CN] 覆盖整个 Tab 按钮的图片（索引 -> 图片），如示例中仿淘宝的首页封面；undefined 表示无。
+   */
+  @Prop tabCoverImages: (ResourceStr | undefined)[] = [];
+  @State private replayTokens: number[] = [];
   imageSize: number = 26;
   shouldSelect?: (index: number, identifier: string) => boolean;
   didSelect?: (index: number, identifier: string) => void;
@@ -74,6 +84,12 @@ export struct CYLTabBarController {
     const identifier = this.cylIdentifier(index);
     if (this.shouldSelect !== undefined && !this.shouldSelect(index, identifier)) {
       return;
+    }
+    if (index === this.selectedIndex && index >= 0) {
+      // [EN] A re-tap replays the Lottie icon (#433). [CN] 再次点击重播 Lottie 图标（#433）。
+      const tokens = this.replayTokens.slice();
+      tokens[index] = (tokens[index] ?? 0) + 1;
+      this.replayTokens = tokens;
     }
     if (this.loaded.indexOf(index) < 0) {
       this.loaded = this.loaded.concat([index]);
@@ -112,13 +128,29 @@ export struct CYLTabBarController {
   @Builder
   cylTab(index: number) {
     Column() {
+      if (this.tabCoverImages[index] !== undefined) {
+        Image(this.tabCoverImages[index])
+          .height(this.tabBarHeight - 4)
+          .objectFit(ImageFit.Contain)
+          .id(`cyl-cover-${this.cylIdentifier(index)}`)
+      } else {
       Stack() {
+        if (this.tabBarItemsAttributes[index].lottieFilePath !== undefined) {
+          CYLLottieIcon({
+            path: this.tabBarItemsAttributes[index].lottieFilePath,
+            iconSize: this.tabBarItemsAttributes[index].lottieSize ?? this.imageSize,
+            speed: this.tabBarItemAnimationSpeed,
+            selected: this.selectedIndex === index,
+            replayToken: this.replayTokens[index] ?? 0,
+          })
+        } else {
         Image(this.selectedIndex === index
           ? (this.tabBarItemsAttributes[index].selectedImage ?? this.tabBarItemsAttributes[index].image)
           : this.tabBarItemsAttributes[index].image)
           .width(this.imageSize)
           .height(this.imageSize)
           .objectFit(ImageFit.Contain)
+        }
         CYLBadgeView({ badge: this.badges[index], anchorWidth: this.imageSize })
       }
       .width(this.imageSize)
@@ -132,6 +164,7 @@ export struct CYLTabBarController {
           .fontSize(10)
           .margin({ top: 3 })
           .fontColor(this.selectedIndex === index ? this.tintColor : this.unselectedColor)
+      }
       }
     }
     .layoutWeight(1)

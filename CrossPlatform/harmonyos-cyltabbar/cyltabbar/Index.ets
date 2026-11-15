@@ -7,4 +7,5 @@ export {
 } from './src/main/ets/CYLTabBarItem';
 export { CYLPlusButton } from './src/main/ets/CYLPlusButton';
 export { CYLTabBarController, CYLPlusButtonPageIndex } from './src/main/ets/CYLTabBarController';
+export { CYLLottieIcon } from './src/main/ets/CYLLottieIcon';
 export { CYLBadge, CYLBadgeView, CYLBadgeAppearance, CYLBadgeAnimationType, CYLOffset } from './src/main/ets/CYLBadge';

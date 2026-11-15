@@ -31,6 +31,10 @@
     {
       "name": "app_name",
       "value": "CYLTabBar"
+    },
+    {
+      "name": "tab_refresh",
+      "value": "刷新"
     }
   ]
 }
