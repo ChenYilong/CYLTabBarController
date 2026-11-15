@@ -15,10 +15,10 @@ import {
  * [CN] Objective-C Example（MainTabBarController）的 Tab：首页、同城、消息、我的，带 identifier。
  */
 const CYL_TABS: CYLTabBarItemAttributes[] = [
-  { title: $r('app.string.tab_home'), selectedTitle: $r('app.string.tab_refresh'), image: $r('app.media.home_normal'), selectedImage: $r('app.media.home_highlight'), identifier: DEMO_HOME, lottieFilePath: 'lottie/green_lottie_tab_home.json' },
-  { title: $r('app.string.tab_nearby'), image: $r('app.media.fishpond_normal'), selectedImage: $r('app.media.fishpond_highlight'), identifier: DEMO_CITY, lottieFilePath: 'lottie/green_lottie_tab_discover.json' },
-  { title: $r('app.string.tab_messages'), image: $r('app.media.message_normal'), darkImage: $r('app.media.message_normal_night'), selectedImage: $r('app.media.message_highlight'), identifier: DEMO_MESSAGE, lottieFilePath: 'lottie/green_lottie_tab_news.json' },
-  { title: $r('app.string.tab_me'), image: $r('app.media.account_normal'), selectedImage: $r('app.media.account_highlight'), identifier: DEMO_ME, lottieFilePath: 'lottie/green_lottie_tab_mine.json' },
+  { title: $r('app.string.tab_home'), selectedTitle: $r('app.string.tab_refresh'), image: $r('app.media.home_normal'), selectedImage: $r('app.media.home_highlight'), identifier: DEMO_HOME, lottieFilePath: 'lottie/green_lottie_tab_home.json', lottieDarkFilePath: 'lottie/green_lottie_tab_home_dark.json' },
+  { title: $r('app.string.tab_nearby'), image: $r('app.media.fishpond_normal'), selectedImage: $r('app.media.fishpond_highlight'), identifier: DEMO_CITY, lottieFilePath: 'lottie/green_lottie_tab_discover.json', lottieDarkFilePath: 'lottie/green_lottie_tab_discover_dark.json' },
+  { title: $r('app.string.tab_messages'), image: $r('app.media.message_normal'), darkImage: $r('app.media.message_normal_night'), selectedImage: $r('app.media.message_highlight'), identifier: DEMO_MESSAGE, lottieFilePath: 'lottie/green_lottie_tab_news.json', lottieDarkFilePath: 'lottie/green_lottie_tab_news_dark.json' },
+  { title: $r('app.string.tab_me'), image: $r('app.media.account_normal'), selectedImage: $r('app.media.account_highlight'), identifier: DEMO_ME, lottieFilePath: 'lottie/green_lottie_tab_mine.json', lottieDarkFilePath: 'lottie/green_lottie_tab_mine_dark.json' },
 ];
 
 const CYL_RANDOM_COLORS: string[] = ['#FF3B30', '#FF9500', '#34C759', '#007AFF', '#AF52DE', '#FF2D55'];
@@ -83,6 +83,7 @@ struct Index {
   @State longPressIndex: number = 1;
   @State doubleTapIndex: number = 1;
   @State swipeEnabled: boolean = false;
+  @State slideTransition: boolean = false;
   private badges: CYLBadge[] = CYL_TABS.map(() => new CYLBadge());
   private plusButtonBadge: CYLBadge = new CYLBadge();
   /** [EN] The badge of each badge row, per page. [CN] 每个页面每个角标行的角标。 */
@@ -238,7 +239,7 @@ struct Index {
     this.tabs = this.tabs.map((item: CYLTabBarItemAttributes) => {
       const copy: CYLTabBarItemAttributes = {
         title: item.title, selectedTitle: item.selectedTitle, image: item.image, selectedImage: item.selectedImage,
-        identifier: item.identifier, darkImage: item.darkImage, lottieFilePath: item.lottieFilePath,
+        identifier: item.identifier, darkImage: item.darkImage, lottieFilePath: item.lottieFilePath, lottieDarkFilePath: item.lottieDarkFilePath,
         lottieSize: item.lottieSize, titlePositionAdjustment: item.titlePositionAdjustment,
         backgroundColor: this.itemBackgrounds ? '#FFF0C8' : undefined,
         selectedBackgroundColor: this.itemBackgrounds ? '#FFCC00' : capsule,
@@ -323,7 +324,7 @@ struct Index {
     const copy: CYLTabBarItemAttributes = {
       title: tabs[index].title, selectedTitle: tabs[index].selectedTitle, image: tabs[index].image,
       selectedImage: tabs[index].selectedImage, identifier: tabs[index].identifier, darkImage: tabs[index].darkImage,
-      lottieFilePath: tabs[index].lottieFilePath, lottieSize: tabs[index].lottieSize,
+      lottieFilePath: tabs[index].lottieFilePath, lottieDarkFilePath: tabs[index].lottieDarkFilePath, lottieSize: tabs[index].lottieSize,
       titlePositionAdjustment: tabs[index].titlePositionAdjustment, backgroundColor: tabs[index].backgroundColor,
       selectedBackgroundColor: tabs[index].selectedBackgroundColor, imageURL: tabs[index].imageURL,
       selectedImageURL: tabs[index].selectedImageURL, gifFilePath: tabs[index].gifFilePath,
@@ -495,6 +496,11 @@ struct Index {
         action: () => this.swipeEnabled = !this.swipeEnabled,
       },
       {
+        id: 'slide-transition', title: 'Slide transition (CYLTabBarSlideTransitionAnimator)',
+        subtitle: `On: ${this.slideTransition}; the new page slides in from the side of its tab`,
+        action: () => this.slideTransition = !this.slideTransition,
+      },
+      {
         id: 'previous-tab', title: 'Previous tab (cyl_selectPreviousTab, issue #535)',
         action: () => this.selectedIndex = ((this.selectedIndex < 0 ? 0 : this.selectedIndex) + CYL_TABS.length - 1) % CYL_TABS.length,
       },
@@ -540,7 +546,7 @@ struct Index {
       Column() {
         Text(row.title)
           .fontSize(15)
-          .fontColor('#000000')
+          .fontColor($r('app.color.cyl_label'))
         if (row.subtitle !== undefined) {
           Text(row.subtitle)
             .fontSize(12)
@@ -554,7 +560,7 @@ struct Index {
     .width('100%')
     .constraintSize({ minHeight: row.badgeRow !== undefined ? 60 : 48 })
     .padding({ left: 16, right: 16, top: 8, bottom: 8 })
-    .backgroundColor(Color.White)
+    .backgroundColor($r('app.color.cyl_row_background'))
     .id(`cyl-row-${page}-${row.id}`)
     .onClick(() => row.action())
   }
@@ -566,7 +572,7 @@ struct Index {
       .fontColor('#6D6D72')
       .width('100%')
       .padding({ left: 16, top: 16, bottom: 6 })
-      .backgroundColor('#F2F2F7')
+      .backgroundColor($r('app.color.cyl_grouped_background'))
   }
 
   /**
@@ -591,7 +597,7 @@ struct Index {
       .height(44)
       .width('100%')
       .justifyContent(FlexAlign.Center)
-      .backgroundColor('#F8F8F8')
+      .backgroundColor($r('app.color.cyl_bar_background'))
       .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP])
       .id(`cyl-nav-title-${identifier}`)
 
@@ -620,7 +626,7 @@ struct Index {
         }
         .layoutWeight(1)
         .width('100%')
-        .backgroundColor('#F2F2F7')
+        .backgroundColor($r('app.color.cyl_grouped_background'))
         .id(`cyl-page-${identifier}`)
       } else {
         Column()
@@ -648,6 +654,14 @@ struct Index {
         longPressDuration: [300, 500, 1000][this.longPressIndex],
         doubleTapInterval: [200, 300, 500][this.doubleTapIndex],
         swipeToSwitchTabEnabled: this.swipeEnabled,
+        slideTransitionDuration: this.slideTransition ? 350 : 0,
+        didSelectControl: (index: number, previous: number) => {
+          // [EN] Item 55: a tap on a newly selected tab turns its badge into a dot of the same color; a re-tap of the
+          //      selected tab changes nothing. [CN] 第 55 项：点击新选中的 Tab 时把角标变为同色红点；再次点击已选中的 Tab 不变。
+          if (index >= 0 && index !== previous && this.badges[index].cyl_isShowBadge() && this.badges[index].value !== '') {
+            this.badges[index].cyl_showBadgeValue('', CYLBadgeAnimationType.None);
+          }
+        },
         didLongPress: (index: number, identifier: string) => this.toast(`Long press: ${identifier} (${index})`),
         didDoubleTap: (index: number, identifier: string) => this.toast(`Double tap: ${identifier} (${index})`),
         loginRequiredTabBarItemIdentifiers: [DEMO_ME],
@@ -669,7 +683,7 @@ struct Index {
         tabBarHeight: this.tabBarHeight,
         titlePositionAdjustment: this.titleOffset,
         itemEdgeInsets: this.itemEdgeInsets,
-        tabBarBackgroundColor: DEMO_APPEARANCES[this.appearanceIndex].background,
+        tabBarBackgroundColor: this.appearanceIndex === 0 ? $r('app.color.cyl_bar_background') : DEMO_APPEARANCES[this.appearanceIndex].background,
         tabBarShadowColor: DEMO_APPEARANCES[this.appearanceIndex].shadow,
         unselectedColor: DEMO_APPEARANCES[this.appearanceIndex].normal,
         tintColor: this.appearanceIndex === 0 ? '#FF8000' : DEMO_APPEARANCES[this.appearanceIndex].selected,
@@ -677,9 +691,7 @@ struct Index {
         onMemoryWarning: (unloaded: number[], loaded: number[]) => this.memoryWarningReport(unloaded, loaded),
         didSelect: (index: number) => {
           // [EN] Tapping a tab with a badge clears it (MainTabBarController.m). [CN] 点击带角标的 Tab 清除角标。
-          if (index >= 0 && this.badges[index].cyl_isShowBadge()) {
-            this.badges[index].cyl_clearBadge();
-          }
+          // [EN] Badges now change in didSelectControl (item 55). [CN] 角标改为在 didSelectControl 中更新（第 55 项）。
         },
         plusButtonTitleSelectedColor: '#32CD32',
         plusButtonAction: () => {

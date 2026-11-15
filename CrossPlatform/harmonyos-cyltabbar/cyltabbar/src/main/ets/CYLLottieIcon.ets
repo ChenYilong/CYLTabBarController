@@ -12,7 +12,7 @@ let cylLottieCount: number = 0;
  */
 @Component
 export struct CYLLottieIcon {
-  path: string = '';
+  @Prop @Watch('cylReload') path: string = '';
   iconSize: number = 26;
   speed: number = 1;
   @Prop @Watch('cylUpdate') selected: boolean = false;
@@ -43,6 +43,15 @@ export struct CYLLottieIcon {
     });
     this.lottieItem.setSpeed(this.speed);
     this.lottieItem.addEventListener('DOMLoaded', () => this.cylUpdate());
+  }
+
+  /** [EN] A new path (e.g. the dark file after a color mode change) reloads the animation. [CN] 新路径（如切换深色模式后）重新加载动画。 */
+  cylReload(): void {
+    if (this.lottieItem !== undefined) {
+      this.lottieItem.destroy(this.name);
+      this.lottieItem = undefined;
+      this.cylLoad();
+    }
   }
 
   cylUpdate(): void {

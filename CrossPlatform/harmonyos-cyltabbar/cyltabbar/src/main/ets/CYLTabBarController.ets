@@ -18,6 +18,18 @@ export enum CYLTabButtonTapAnimationType {
   Flip,
 }
 
+/**
+ * [EN] The AppStorage key of the system color mode ('dark' / 'light'); set it from UIAbility.onCreate and
+ *      onConfigurationUpdate with cyl_updateColorMode (Dark Mode images, CYLTabBarItemDarkImage).
+ * [CN] 系统颜色模式的 AppStorage 键（'dark' / 'light'）；在 UIAbility.onCreate 与 onConfigurationUpdate 中用 cyl_updateColorMode 设置。
+ */
+export const CYLColorModeStorageKey: string = 'cyl_colorMode';
+
+/** [EN] Records the color mode (ConfigurationConstant.ColorMode: 0 dark, 1 light). [CN] 记录颜色模式（0 深色，1 浅色）。 */
+export function cyl_updateColorMode(colorMode: number | undefined): void {
+  AppStorage.setOrCreate<string>(CYLColorModeStorageKey, colorMode === 0 ? 'dark' : 'light');
+}
+
 /** [EN] CYLImpactFeedbackStyle (cyl_tabButtonHapticFeedbackStyle). [CN] 触感强度。 */
 export enum CYLImpactFeedbackStyle {
   Light = 0,
@@ -168,6 +180,19 @@ export struct CYLTabBarController {
   @State private tapOffset: number[] = [];
   private lastTapIndex: number = -2;
   private lastTapTime: number = 0;
+  /**
+   * [EN] CYLTabBarSlideTransitionAnimator: the new page slides in from the side of its tab (duration ms; 0 off).
+   * [CN] 新页面从其 Tab 所在一侧滑入（时长毫秒；0 关闭）。
+   */
+  @Prop slideTransitionDuration: number = 0;
+  @State private slideOffset: number = 0;
+  @StorageProp('cyl_colorMode') private colorMode: string = 'light';
+  /**
+   * [EN] -tabBarController:didSelectControl:: every reported tap, with the index selected before it (a re-tap has
+   *      previous === index).
+   * [CN] 每次点击后调用，附点击前的选中索引（再次点击时 previous === index）。
+   */
+  didSelectControl?: (index: number, previous: number) => void;
   shouldSelect?: (index: number, identifier: string) => boolean;
   didSelect?: (index: number, identifier: string) => void;
   plusButtonAction?: () => void;
@@ -257,7 +282,11 @@ export struct CYLTabBarController {
       this.lastTapTime = now;
     }
     this.cylTapFeedback(index);
+    const previous = this.selectedIndex;
     this.cylSelect(index);
+    if (this.didSelectControl !== undefined) {
+      this.didSelectControl(index, previous);
+    }
   }
 
   /** [EN] -cyl_selectNextTab / -cyl_selectPreviousTab (step 1 / -1), wrapping around. [CN] 选中下一个 / 上一个 Tab（循环）。 */
@@ -292,6 +321,10 @@ export struct CYLTabBarController {
   }
 
   private cylDoSelect(index: number, identifier: string): void {
+    if (this.slideTransitionDuration > 0 && index !== this.selectedIndex && index >= 0 && this.selectedIndex >= 0) {
+      this.slideOffset = index > this.selectedIndex ? 100 : -100;
+      animateTo({ duration: this.slideTransitionDuration, curve: Curve.EaseOut }, () => { this.slideOffset = 0; });
+    }
     if (index === this.selectedIndex && index >= 0) {
       // [EN] A re-tap replays the Lottie icon (#433). [CN] 再次点击重播 Lottie 图标（#433）。
       const tokens = this.replayTokens.slice();
@@ -316,6 +349,14 @@ export struct CYLTabBarController {
     const selected = this.selectedIndex === index;
     if (item.imageURL !== undefined) {
       return selected ? (item.selectedImageURL ?? item.imageURL) : item.imageURL;
+    }
+    if (this.colorMode === 'dark') {
+      if (selected && item.darkSelectedImage !== undefined) {
+        return item.darkSelectedImage;
+      }
+      if (!selected && item.darkImage !== undefined) {
+        return item.darkImage;
+      }
     }
     return selected ? (item.selectedImage ?? item.image) : item.image;
   }
@@ -359,7 +400,8 @@ export struct CYLTabBarController {
           && this.tabBarItemsAttributes[index].gifFilePath === undefined
           && this.tabBarItemsAttributes[index].imageURL === undefined) {
           CYLLottieIcon({
-            path: this.tabBarItemsAttributes[index].lottieFilePath,
+            path: this.colorMode === 'dark' && this.tabBarItemsAttributes[index].lottieDarkFilePath !== undefined
+              ? this.tabBarItemsAttributes[index].lottieDarkFilePath : this.tabBarItemsAttributes[index].lottieFilePath,
             iconSize: this.tabBarItemsAttributes[index].lottieSize ?? this.imageSize,
             speed: this.tabBarItemAnimationSpeed,
             selected: this.selectedIndex === index,
@@ -506,6 +548,7 @@ export struct CYLTabBarController {
             }
             .width('100%')
             .height('100%')
+            .translate({ x: this.selectedIndex === index ? `${this.slideOffset}%` : 0 })
             .visibility(this.selectedIndex === index ? Visibility.Visible : Visibility.Hidden)
           }
         }, (index: number) => `page-${index}`)

@@ -21,8 +21,12 @@ export interface CYLTabBarItemAttributes {
   identifier?: string;
   /** [EN] CYLTabBarItemDarkImage: the image in dark mode. [CN] 深色模式图片。 */
   darkImage?: ResourceStr;
+  /** [EN] CYLTabBarItemDarkSelectedImage: the selected image in dark mode. [CN] 深色模式选中图片。 */
+  darkSelectedImage?: ResourceStr;
   /** [EN] CYLTabBarLottieFilePath: a rawfile path of a Lottie JSON (shown instead of the images). [CN] Lottie JSON 的 rawfile 路径（代替图片显示）。 */
   lottieFilePath?: string;
+  /** [EN] CYLTabBarLottieDarkFilePath: the Lottie JSON in dark mode. [CN] 深色模式的 Lottie JSON。 */
+  lottieDarkFilePath?: string;
   /** [EN] CYLTabBarLottieSize (vp); the image size when unset. [CN] Lottie 尺寸（vp）；未设置时用图片尺寸。 */
   lottieSize?: number;
   /** [EN] CYLTabBarItemTitlePositionAdjustment (vp). [CN] 标题位置偏移（vp）。 */

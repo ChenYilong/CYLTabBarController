@@ -129,5 +129,10 @@
   "CYLTabBarController(CYLTabBarItemGesture) cyl_tabBarItemLongPressDuration": "`CYLTabBarController.longPressDuration` (ms) (built; emulator check pending / 已编译，模拟器验证待做)",
   "CYLTabBarController(CYLTabBarItemGesture) cyl_tabBarItemDoubleTapInterval": "`CYLTabBarController.doubleTapInterval` (ms) (built; emulator check pending / 已编译，模拟器验证待做)",
   "UITabBarItem(CYLTabBarControllerExtention) cyl_doubleTapBlock": "`CYLTabBarController.didDoubleTap` (built; emulator check pending / 已编译，模拟器验证待做)",
-  "CYLTabBarController(CYLInteraction) cyl_swipeToSwitchTabEnabled": "`CYLTabBarController.swipeToSwitchTabEnabled` (@Prop) (built; emulator check pending / 已编译，模拟器验证待做)"
+  "CYLTabBarController(CYLInteraction) cyl_swipeToSwitchTabEnabled": "`CYLTabBarController.swipeToSwitchTabEnabled` (@Prop) (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarSlideTransitionAnimator": "`CYLTabBarController.slideTransitionDuration` (page translate animation) (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarSlideTransitionAnimator duration": "`CYLTabBarController.slideTransitionDuration` (ms; iOS 0.35 s) (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarItemDarkImage": "`CYLTabBarItemAttributes.darkImage` / `darkSelectedImage` (AppStorage `cyl_colorMode`) (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarLottieDarkURL": "`CYLTabBarItemAttributes.lottieDarkFilePath` (rawfile; reloads on a color mode change) (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarControllerDelegate -tabBarController:didSelectControl:": "`CYLTabBarController.didSelectControl(index, previous)` (built; emulator check pending / 已编译，模拟器验证待做)"
 }

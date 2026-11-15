@@ -35,6 +35,9 @@
     "34": "`CYLTabBarController.didLongPress` (LongPressGesture on tabs and the plus button): a toast names the item (issue #535) (built; emulator check pending / 已编译，模拟器验证待做)",
     "35": "`longPressDuration` 300 / 500 / 1000 ms and `doubleTapInterval` 200 / 300 / 500 ms + `didDoubleTap` toast (issue #535 / #152) (built; emulator check pending / 已编译，模拟器验证待做)",
     "36": "`swipeToSwitchTabEnabled` (PanGesture on the page area -> next / previous tab) (built; emulator check pending / 已编译，模拟器验证待做)",
-    "37": "Previous / next tab rows (`selectedIndex` wraps around; library `cylSelectNeighbor`) (built; emulator check pending / 已编译，模拟器验证待做)"
+    "37": "Previous / next tab rows (`selectedIndex` wraps around; library `cylSelectNeighbor`) (built; emulator check pending / 已编译，模拟器验证待做)",
+    "38": "`CYLTabBarController.slideTransitionDuration` (350 ms): the new page slides in from the side of its tab (built; emulator check pending / 已编译，模拟器验证待做)",
+    "54": "`cyl_updateColorMode` (EntryAbility onCreate / onConfigurationUpdate) + `darkImage` / `darkSelectedImage` / `lottieDarkFilePath` (green_lottie_tab_*_dark.json) + dark color resources for pages and the bar (built; emulator check pending / 已编译，模拟器验证待做)",
+    "55": "`CYLTabBarController.didSelectControl(index, previous)`: a newly selected badged tab turns its badge into a dot of the same color; a re-tap changes nothing (built; emulator check pending / 已编译，模拟器验证待做)"
   }
 }
