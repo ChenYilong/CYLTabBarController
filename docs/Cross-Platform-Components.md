@@ -230,3 +230,9 @@ bar.setConfigurationJSON(assets.open("tabbar.json").bufferedReader().readText())
 ![HarmonyOS Home, Mate 70 Pro emulator, API 21](assets/harmonyos-home-mate70pro-api21.jpeg)
 
 ![HarmonyOS FlatDesign then Liquid Glass taps](assets/harmonyos-flatdesign-liquidglass-taps-mate70pro.png)
+
+| 中文 | English |
+|:---|:---|
+| 复查（2026-11-16 12:45，提交 `6befe36`，同一模拟器）：液态玻璃胶囊已位于手势条上方，标题可见 ✅；但左右两侧仍没有 16 vp 间距，胶囊几乎占满屏宽（TODO）。经典与扁平样式的 TabBar 背景与页面颜色接近，无法从截图判断是否延伸到手势条下方（待用深色主题复查）。从左到右：经典、扁平样式、液态玻璃。 | Re-check (2026-11-16 12:45, commit `6befe36`, same emulator): the Liquid Glass capsule now sits above the gesture bar with its titles visible ✅; but there is still no 16 vp gap on the left and right, the capsule spans almost the full width (TODO). The classic and FlatDesign bars are too close in color to the page to tell from the picture whether they reach under the gesture bar (to re-check with a dark skin). Left to right: classic, FlatDesign, Liquid Glass. |
+
+![HarmonyOS styles re-check at 6befe36](assets/harmonyos-styles-recheck-6befe36.png)
