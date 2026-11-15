@@ -23,6 +23,8 @@ async function cylReadSVGA(context: Context, path: string): Promise<Uint8Array> 
         throw new Error(`CYLSVGA: loading ${path} failed with HTTP status ${response.responseCode}`);
       }
       return new Uint8Array(response.result as ArrayBuffer);
+    } catch (error) {
+      throw new Error(`CYLSVGA: loading ${path} failed: ${(error as Error).message}`);
     } finally {
       request.destroy();
     }

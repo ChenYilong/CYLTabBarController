@@ -365,6 +365,11 @@
   "status": "n/a",
   "note": "CYLUtils: UIKit helpers (frames, images, runtime) with no ArkUI counterpart"
  },
+ "CYLSVGATabBarItemAnimator": {
+  "status": "partial",
+  "harmonyos": "CYLSVGAView",
+  "note": "plays once when its tab is selected, first frame otherwise; an ArkTS SVGA 2.x player (bitmaps, shapes, alpha, transforms, clip paths); no masks, audio or dark variants yet"
+ },
  "CYLSampleConfigurationURLString": {
   "status": "n/a",
   "note": "the iOS demo settings list, not library behavior"
@@ -475,6 +480,18 @@
  "CYLTabBarItemUpdateRow": {
   "status": "n/a",
   "note": "the iOS demo settings list, not library behavior"
+ },
+ "CYLTabBarSVGAFilePath": {
+  "status": "done",
+  "harmonyos": "CYLTabBarItem.svgaFilePath (rawfile path)"
+ },
+ "CYLTabBarSVGASize": {
+  "status": "done",
+  "harmonyos": "CYLTabBarItem.svgaSize"
+ },
+ "CYLTabBarSVGAURL": {
+  "status": "done",
+  "harmonyos": "CYLTabBarItem.svgaURL"
  },
  "CYLThemeManager 0": {
   "status": "n/a",
