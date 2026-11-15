@@ -302,6 +302,7 @@ docs/
 │   ├── rive-animation-swiftui-test-list.png
 │   ├── rive-animation-tab-icons.png
 │   ├── rive-animation-test-list.png
+│   ├── rive-bell-page-centered-android.png
 │   ├── rive-classic.png
 │   ├── rive-flat-design.png
 │   ├── rive-liquid-glass.png
