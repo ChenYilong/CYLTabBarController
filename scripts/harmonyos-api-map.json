@@ -15,7 +15,7 @@
   "CYLPlusButtonShowsSelection": "`CYLPlusButton.selectable` (built; emulator check pending / 已编译，模拟器验证待做)",
   "+plusChildViewController": "`CYLPlusButton.selectable + CYLTabBarController.pageBuilder(CYLPlusButtonPageIndex)` (built; emulator check pending / 已编译，模拟器验证待做)",
   "CYLPlusButtonImageSize": "`CYLPlusButton.imageSize` (built; emulator check pending / 已编译，模拟器验证待做)",
-  "CYLPlusButtonBackgroundImage": "`CYLPlusButton.image / selectedImage` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLPlusButtonBackgroundImage": "`CYLPlusButton.backgroundImage`; from a configuration: `CYLTabBarConfiguration.plusButtonWithConfiguration` (image or background image required) (built; emulator check pending / 已编译，模拟器验证待做)",
   "CYLTabBarController tabBarHeight": "`CYLTabBarController.tabBarHeight` (built; emulator check pending / 已编译，模拟器验证待做)",
   "CYLTabBarController -setTabBarHidden:animated:": "`CYLTabBarController.tabBarHidden` (built; emulator check pending / 已编译，模拟器验证待做)",
   "CYLBadgeAppearance": "`CYLBadgeAppearance` (built; emulator check pending / 已编译，模拟器验证待做)",

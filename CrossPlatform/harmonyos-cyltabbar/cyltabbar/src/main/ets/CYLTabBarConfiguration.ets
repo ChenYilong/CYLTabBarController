@@ -130,11 +130,11 @@ export class CYLTabBarConfiguration {
   }
 
   /**
-   * [EN] The plus button of CYLTabBarControllerPlusButton: CYLTabBarItemImage (required), CYLTabBarItemSelectedImage,
+   * [EN] The plus button of CYLTabBarControllerPlusButton: CYLTabBarItemImage or CYLPlusButtonBackgroundImage (one is required), CYLTabBarItemSelectedImage,
    *      CYLTabBarItemTitle, CYLPlusButtonIndexInTabBar, CYLPlusButtonCenterYOffset, CYLPlusButtonImageSize
    *      ("{55, 55}" or a number), CYLPlusButtonAlignsTitle, CYLTabBarItemIdentifier, CYLTabBarItemPageIdentifier and
-   *      CYLTabBarItemPageParameters; undefined without an image or outside this platform (CYLTabBarItemPlatforms).
-   * [CN] 解析 CYLTabBarControllerPlusButton：CYLTabBarItemImage（必需）及其余键；没有图片或不适用于本平台时为 undefined。
+   *      CYLTabBarItemPageParameters; undefined without either image or outside this platform (CYLTabBarItemPlatforms).
+   * [CN] 解析 CYLTabBarControllerPlusButton：CYLTabBarItemImage 或 CYLPlusButtonBackgroundImage（至少一个）及其余键；两者都没有或不适用于本平台时为 undefined。
    */
   static plusButtonWithConfiguration(configuration: Record<string, Object>): CYLConfiguredPlusButton | undefined {
     const raw = configuration['CYLTabBarControllerPlusButton'];
@@ -149,7 +149,10 @@ export class CYLTabBarConfiguration {
     }
     const imageName = button['CYLTabBarItemImage'];
     const image = typeof imageName === 'string' ? CYLTabBarConfiguration.imageResolver(imageName) : undefined;
-    if (image === undefined) {
+    const backgroundName = button['CYLPlusButtonBackgroundImage'];
+    const backgroundImage = typeof backgroundName === 'string' ? CYLTabBarConfiguration.imageResolver(backgroundName) : undefined;
+    // [EN] An image or a background image is needed (CYLPlusButton.image is optional). [CN] 需要图片或背景图。
+    if (image === undefined && backgroundImage === undefined) {
       return undefined;
     }
     const selectedName = button['CYLTabBarItemSelectedImage'];
@@ -162,6 +165,7 @@ export class CYLTabBarConfiguration {
       ? button['CYLTabBarItemPageIdentifier'] as string : undefined;
     return {
       image: image,
+      backgroundImage: backgroundImage,
       selectedImage: typeof selectedName === 'string' ? CYLTabBarConfiguration.imageResolver(selectedName) : undefined,
       title: typeof button['CYLTabBarItemTitle'] === 'string' ? button['CYLTabBarItemTitle'] as string : undefined,
       index: button['CYLPlusButtonIndexInTabBar'] !== undefined && Number.isInteger(index) ? index : undefined,
