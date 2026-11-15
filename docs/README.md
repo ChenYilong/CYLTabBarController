@@ -286,6 +286,7 @@ docs/
 │   ├── react-native-rive-search.png
 │   ├── react-native-rive-start.png
 │   ├── react-native-rive-user.png
+│   ├── react-native-svga-tab-icons-android.png
 │   ├── react-native-svga-tab-icons-configuration-ios26.png
 │   ├── react-native-svga-tab-icons-keys-ios26.png
 │   ├── readme-english-before-reading.png

@@ -107,7 +107,7 @@ android {
             // [CN] Issue #415：Example-SwiftUI-Rive 的 SVGA Tab 图标（不是副本）与本 Demo 的 SVGA 配置文件
             //      （assets/svga/cyl_tabbar_configuration_svga.json，路由 "bundle:svga?name=cyl_tabbar_configuration_svga"）。
             assets.srcDir("${cylRepository}/Example-SwiftUI-Rive/AnimatedApp/SVGAAssets")
-            assets.srcDir("configurations")
+            assets.srcDir("../../configurations")
             assets.srcDir(cylFontsDir)
             java.srcDir(cylDemoAssetsDir)
         }
