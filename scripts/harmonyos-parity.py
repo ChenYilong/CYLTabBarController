@@ -65,13 +65,25 @@ CRITERIA = [
      '2. Verified: `<HarmonyOS API / file>` + `(verified on emulator: <device> HarmonyOS <version>, <date> / 已在模拟器验证)`. Requires: run on the emulator or a real device and behaving as in the iOS Example; a visible change has a screenshot (`docs/assets/`).'),
     ('3. 不适用：以 `N/A on HarmonyOS:` 开头，写明原因与鸿蒙上的等价做法（例如 Objective-C 运行时、UIKit 私有视图层级、已废弃 API）。只用于在 ArkUI 中没有意义的 API，不能用来跳过难做的功能。',
      '3. Not applicable: starts with `N/A on HarmonyOS:` and gives the reason and the HarmonyOS equivalent (e.g. the Objective-C runtime, UIKit private view hierarchy, deprecated APIs). Only for APIs that have no meaning in ArkUI, never to skip a hard feature.'),
+    ('4. 待审不适用：以 `TODO: N/A on HarmonyOS:` 开头并写明原因，表示提议标为不适用、尚待审核；仍按 TODO 计，不计入完成率。审核通过后去掉 `TODO: ` 前缀。',
+     '4. Proposed not applicable: starts with `TODO: N/A on HarmonyOS:` and a reason; proposed, not yet reviewed; still counts as TODO, not toward the score. Drop the `TODO: ` prefix once reviewed.'),
     ('最终满分：完成率 100，且所有「已编译」行在模拟器上验证后改为「已验证」（验证率 100）。',
      'Final full score: score 100, and every "built" row is checked on the emulator and changed to "verified" (verified rate 100).'),
 ]
 
 
+STATUS_PROPOSED_NA = 'TODO: N/A on HarmonyOS:'
+
+
+def is_done(value):
+    """[EN] Counts toward the score: a value that does not start with TODO. [CN] 计入完成率：不以 TODO 开头的值。"""
+    return bool(value) and not value.startswith('TODO')
+
+
 def status_of(value):
     """[EN] built / verified / na, or None when the row has no valid status. [CN] 行状态；无效时为 None。"""
+    if value.startswith(STATUS_PROPOSED_NA):
+        return 'proposed'
     if value.startswith(STATUS_NA):
         return 'na'
     if STATUS_VERIFIED in value:
@@ -93,8 +105,8 @@ def document():
     api_done = api_map.load_map()
     demo_rows = demos()
     demo_done = load(DEMO_MAP_PATH).get('demos', {})
-    done_a = sum(1 for r in apis if api_done.get(r['key']))
-    done_d = sum(1 for n, _ in demo_rows if demo_done.get(n))
+    done_a = sum(1 for r in apis if is_done(api_done.get(r['key'])))
+    done_d = sum(1 for n, _ in demo_rows if is_done(demo_done.get(n)))
     total = len(apis) + len(demo_rows)
     score = int(100 * (done_a + done_d) / total) if total else 0
     values = [api_done.get(r['key']) for r in apis] + [demo_done.get(n) for n, _ in demo_rows]
