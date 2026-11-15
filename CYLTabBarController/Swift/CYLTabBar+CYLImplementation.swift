@@ -34,17 +34,6 @@ import UIKit
 }
 
 /**
- * [EN] Private methods of `CYLPlusButton` (CYLPlusButton.m) the layout uses; see `cyl_appliesCenterYOffsetWithoutTitle` in CYLPlusButton.h.
- * [CN] 布局用到的 `CYLPlusButton` 私有方法（CYLPlusButton.m）；见 CYLPlusButton.h 中的 `cyl_appliesCenterYOffsetWithoutTitle`。
- */
-@objc private protocol CYLPlusButtonTabBarLayoutAPI {
-    @objc(cyl_isCenteredWithoutTitle) func isCenteredWithoutTitle() -> Bool
-    @objc(cyl_alignedCenterForCenter:) func alignedCenter(forCenter center: CGPoint) -> CGPoint
-    /// [EN] Declared in CYLPlusButton.h (`CYLPlusButtonSubclassing`), implemented by `CYLPlusButton`. [CN] 在 CYLPlusButton.h 中声明，由 `CYLPlusButton` 实现。
-    @objc(isLayoutCentered) func isLayoutCentered() -> Bool
-}
-
-/**
  * [EN] The optional class method of `CYLPlusButtonSubclassing` the tab bar asks the plus button's class for.
  * [CN] TabBar 向 PlusButton 的类询问的 `CYLPlusButtonSubclassing` 可选类方法。
  */
@@ -181,10 +170,6 @@ extension CYLTabBar {
 
     private func cylControllerPrivateAPI(_ controller: CYLTabBarController) -> CYLTabBarOwnerPrivateAPI {
         unsafeBitCast(controller as AnyObject, to: CYLTabBarOwnerPrivateAPI.self)
-    }
-
-    private func cylPlusButtonLayoutAPI(_ plusButton: CYLPlusButton) -> CYLPlusButtonTabBarLayoutAPI {
-        unsafeBitCast(plusButton as AnyObject, to: CYLPlusButtonTabBarLayoutAPI.self)
     }
 
     /// [EN] The plus button registered for this tab bar's owner (`+[CYLPlusButton plusButtonForOwner:]`). [CN] 为本 TabBar 所属者注册的 PlusButton。
@@ -372,7 +357,7 @@ extension CYLTabBar {
 
     @objc(cyl_tabBarIsPlusButtonLayoutCentered)
     func cylTabBarIsPlusButtonLayoutCentered() -> Bool {
-        cylTabBarPlusButton().map { cylPlusButtonLayoutAPI($0).isLayoutCentered() } ?? false
+        cylTabBarPlusButton().map { $0.cylIsLayoutCentered() } ?? false
     }
 
     /// [EN] The owner (its `delegate`) first; the `-cyl_tabBarController` fallback walk only when it has none.
@@ -1166,7 +1151,7 @@ extension CYLTabBar {
         // A plus button without a title replaces the whole tab item: centered on the platter (the tab items' center),
         // not on the tab bar (`cyl_appliesCenterYOffsetWithoutTitle` in CYLPlusButton.h).
         // 没有标题的 PlusButton 替换整个 TabBarItem：居中于 platter（即 Tab 的中心），而不是 TabBar 的中心。
-        if let registeredPlusButton, cylPlusButtonLayoutAPI(registeredPlusButton).isCenteredWithoutTitle() {
+        if let registeredPlusButton, registeredPlusButton.cylIsCenteredWithoutTitle() {
             systemDefaultY = platterCenter.y
         }
         // FIX: long titles next to the plus button (PlusButton-Slot.md, "Long titles").
@@ -1185,7 +1170,7 @@ extension CYLTabBar {
         // Issue #636: with the title in the tab item, the image above its title, on the title's vertical center line.
         // 标题由 TabBarItem 显示时：图片位于标题上方，与标题竖向中心线对齐。
         if let registeredPlusButton {
-            finalCenter = cylPlusButtonLayoutAPI(registeredPlusButton).alignedCenter(forCenter: finalCenter)
+            finalCenter = registeredPlusButton.cylAlignedCenter(forCenter: finalCenter)
         }
         // [CN] 禁止隐式动画
         // [EN] Disable implicit animations

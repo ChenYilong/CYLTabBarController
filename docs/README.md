@@ -316,6 +316,10 @@ docs/
 │   ├── swift-migration-step51-liquid-glass-bell.png
 │   ├── swift-migration-step51-liquid-glass-launch.png
 │   ├── swift-migration-step51-liquid-glass-plus.png
+│   ├── swift-migration-step52-classic-me.png
+│   ├── swift-migration-step52-classic-plus.png
+│   ├── swift-migration-step52-liquid-glass-bell.png
+│   ├── swift-migration-step52-liquid-glass-plus.png
 │   ├── swiftui-integration-ios.png
 │   ├── swiftui-plus-title-blur-ios.png
 │   ├── tab-accessibility-labels-after-title-change.png
