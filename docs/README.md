@@ -289,6 +289,7 @@ docs/
 │   ├── react-native-svga-tab-icons-android.png
 │   ├── react-native-svga-tab-icons-configuration-ios26.png
 │   ├── react-native-svga-tab-icons-keys-ios26.png
+│   ├── react-native-svga-tab-taps-android.png
 │   ├── readme-english-before-reading.png
 │   ├── readme-english-bilingual-contents.png
 │   ├── readme-english-header-badges.png
