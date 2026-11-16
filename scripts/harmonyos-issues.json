@@ -304,5 +304,14 @@
     "evidence": "harmonyos-emulator-pages-b7fdf26.png, harmonyos-system-tab-bar-plus-before-after.png (top panel)",
     "cause": "The nav titles of the pushed pages have no line limit",
     "fix": "Nav titles of SystemTabs, AnotherTabBar, TextPage, PopPushDemo and ConfigurationFailures: maxLines(1), minFontSize(12) / maxFontSize(17), ellipsis"
+  },
+  {
+    "id": 35,
+    "status": "TODO need 模拟器截图验证",
+    "scope": "CrossPlatform/harmonyos-cyltabbar (cyltabbar)",
+    "title": "The tab bar moves up with the keyboard (it sits right above the keyboard while typing); it must stay fixed at the bottom, as on iOS",
+    "evidence": "harmonyos-keyboard-moves-tab-bar-cylsearch.png cols. 2-3 (CYLSearchViewController HarmonyOS example on cyltabbar 3ddb96c, Mate 70 Pro emulator API 21, 2026-11-16 10:12; reported by the maintainer)",
+    "cause": "The app resizes its page for the keyboard (KeyboardAvoidMode.RESIZE); the tab bar is the last child of the controller's column, so it is laid out at the new, higher bottom",
+    "fix": "CYLTabBarController follows the window's keyboardHeightChange; while the keyboard is up and the avoid mode is not OFFSET, the tab bar container is Visibility.None (out of the layout), so it stays behind the keyboard and the content fills up to the keyboard; it comes back unmoved when the keyboard closes. OFFSET mode already keeps the bar in place"
   }
 ]

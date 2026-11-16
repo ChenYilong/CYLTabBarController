@@ -1,5 +1,5 @@
 import { CYLTabBarStyleType, cyl_tabBarStyleModifier } from './CYLFlatDesignTabBar';
-import { curves } from '@kit.ArkUI';
+import { curves, window, KeyboardAvoidMode } from '@kit.ArkUI';
 import { CYLTabBarItemAttributes, CYLTitleOffset } from './CYLTabBarItem';
 import { CYLPlusButton } from './CYLPlusButton';
 import { CYLBadge, CYLBadgeView } from './CYLBadge';
@@ -403,6 +403,22 @@ export struct CYLTabBarController {
   @BuilderParam pageBuilder: (index: number, identifier: string) => void = this.cylEmptyPage;
   @State private loaded: number[] = [];
   @State private plusPressed: boolean = false;
+  /**
+   * [EN] Issue list #31: the keyboard is up and the page is resized for it (KeyboardAvoidMode other than OFFSET). The tab bar then
+   *      leaves the layout instead of riding up on top of the keyboard: like iOS, it stays where it is, behind the keyboard.
+   * [CN] 问题清单 #31：键盘弹出且页面为键盘缩小（避让模式不是 OFFSET）。此时 TabBar 退出布局，不随键盘上移：与 iOS 相同，留在原处被键盘遮住。
+   */
+  @State private keyboardCoversTabBar: boolean = false;
+  private cylKeyboardWindow: window.Window | undefined = undefined;
+  private cylKeyboardListener: (height: number) => void = (height: number) => {
+    let mode = KeyboardAvoidMode.OFFSET;
+    try {
+      mode = this.getUIContext().getKeyboardAvoidMode();
+    } catch (error) {
+      mode = KeyboardAvoidMode.OFFSET;
+    }
+    this.keyboardCoversTabBar = height > 0 && mode !== KeyboardAvoidMode.OFFSET;
+  };
 
   @Builder
   cylEmptyPage(index: number, identifier: string) {
@@ -413,6 +429,32 @@ export struct CYLTabBarController {
     while (this.badges.length < this.tabBarItemsAttributes.length) {
       this.badges.push(new CYLBadge());
     }
+    this.cylObserveKeyboard();
+  }
+
+  aboutToDisappear(): void {
+    try {
+      this.cylKeyboardWindow?.off('keyboardHeightChange', this.cylKeyboardListener);
+    } catch (error) {
+      // [EN] The window is already gone. [CN] 窗口已销毁。
+    }
+    this.cylKeyboardWindow = undefined;
+  }
+
+  /**
+   * [EN] Follows the keyboard height of the window (issue list #31). [CN] 监听窗口的键盘高度（问题清单 #31）。
+   */
+  private cylObserveKeyboard(): void {
+    const context = this.getUIContext().getHostContext();
+    if (context === undefined) {
+      return;
+    }
+    window.getLastWindow(context).then((found: window.Window) => {
+      this.cylKeyboardWindow = found;
+      found.on('keyboardHeightChange', this.cylKeyboardListener);
+    }).catch(() => {
+      // [EN] No window (e.g. the previewer): the bar keeps its normal layout. [CN] 没有窗口（如预览器）：TabBar 保持普通布局。
+    });
   }
 
   /**
@@ -1002,6 +1044,9 @@ export struct CYLTabBarController {
         .backgroundColor(this.tabBarStyleType === CYLTabBarStyleType.LiquidGlass ? Color.Transparent
           : (this.tabBarStyleType === CYLTabBarStyleType.FlatDesign ? (this.barTintColor ?? '#F9F9F9') : this.tabBarBackgroundColor))
         .expandSafeArea(this.tabBarStyleType === CYLTabBarStyleType.LiquidGlass ? [] : [SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM])
+        // [EN] Issue list #31: out of the layout while a resizing keyboard is up, so it never moves above the keyboard.
+        // [CN] 问题清单 #31：缩小页面的键盘弹出时退出布局，因此不会移到键盘上方。
+        .visibility(this.keyboardCoversTabBar ? Visibility.None : Visibility.Visible)
         .transition(TransitionEffect.move(TransitionEdge.BOTTOM)
           .animation({ duration: this.tabBarHiddenAnimated ? 250 : 0 }))
         .id('cyl-tab-bar-container')
