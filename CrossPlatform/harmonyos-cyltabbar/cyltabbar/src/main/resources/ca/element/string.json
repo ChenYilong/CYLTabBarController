@@ -2,11 +2,11 @@
   "string": [
     {
       "name": "cyl_l10n_bffed61338ea",
-      "value": "%@ CYLTabBarController on HarmonyOS"
+      "value": "%@ CYLTabBarController a HarmonyOS"
     },
     {
       "name": "cyl_l10n_9ecf653a3fc6",
-      "value": "%@ · another context · plus taps: %@"
+      "value": "%@ · un altre context · tocs al més: %@"
     },
     {
       "name": "cyl_l10n_aaf9b7d7382d",
@@ -18,23 +18,23 @@
     },
     {
       "name": "cyl_l10n_0b0ae9062c5a",
-      "value": "A tab bar controller of another context, with a square plus button"
+      "value": "Un controlador de barra de pestanyes d’un altre context, amb un botó més quadrat"
     },
     {
       "name": "cyl_l10n_427131e7add2",
-      "value": "Another plus button"
+      "value": "Un altre botó més"
     },
     {
       "name": "cyl_l10n_aa3e67bda3c0",
-      "value": "ArkUI Tabs, the HarmonyOS system tab bar, with the same tabs"
+      "value": "ArkUI Tabs, la barra de pestanyes del sistema HarmonyOS, amb les mateixes pestanyes"
     },
     {
       "name": "cyl_l10n_0557fa923dce",
-      "value": "Back"
+      "value": "Enrere"
     },
     {
       "name": "cyl_l10n_8665e238c516",
-      "value": "Badge: %@"
+      "value": "Insígnia: %@"
     },
     {
       "name": "cyl_l10n_6b2186414c82",
@@ -74,7 +74,7 @@
     },
     {
       "name": "cyl_l10n_d7c01888e55e",
-      "value": "CYLTabBarSVGAFilePath: plays once when selected, first frame otherwise"
+      "value": "CYLTabBarSVGAFilePath: es reprodueix un cop en seleccionar-la; si no, primer fotograma"
     },
     {
       "name": "cyl_l10n_132201f60522",
@@ -110,7 +110,7 @@
     },
     {
       "name": "cyl_l10n_b9c74f4cd786",
-      "value": "Dimmed"
+      "value": "Atenuat"
     },
     {
       "name": "cyl_l10n_abfc3a65538a",
@@ -118,7 +118,7 @@
     },
     {
       "name": "cyl_l10n_bf0576472e31",
-      "value": "Double tap to open"
+      "value": "Toca dues vegades per obrir"
     },
     {
       "name": "cyl_l10n_7e0a1ad9a767",
@@ -158,7 +158,7 @@
     },
     {
       "name": "cyl_l10n_2e8e48a2ebfd",
-      "value": "Long press a tab or the plus button"
+      "value": "Mantén premuda una pestanya o el botó més"
     },
     {
       "name": "cyl_l10n_983696096694",
@@ -182,7 +182,7 @@
     },
     {
       "name": "cyl_l10n_1e8f217bdf71",
-      "value": "Next tab (cyl_selectNextTab, issue #535)"
+      "value": "Pestanya següent (cyl_selectNextTab, issue #535)"
     },
     {
       "name": "cyl_l10n_b2ee912b91d6",
@@ -198,11 +198,11 @@
     },
     {
       "name": "cyl_l10n_8a7b0e9c294e",
-      "value": "On: %@; swipe the page left / right"
+      "value": "Activat: %@; llisca la pàgina a l’esquerra / dreta"
     },
     {
       "name": "cyl_l10n_06eb0a05de97",
-      "value": "On: %@; the new page slides in from the side of its tab"
+      "value": "Activat: %@; la pàgina nova entra pel costat de la seva pestanya"
     },
     {
       "name": "cyl_l10n_287e78fd65af",
@@ -222,7 +222,7 @@
     },
     {
       "name": "cyl_l10n_9a1d72fdd764",
-      "value": "Previous tab (cyl_selectPreviousTab, issue #535)"
+      "value": "Pestanya anterior (cyl_selectPreviousTab, issue #535)"
     },
     {
       "name": "cyl_l10n_4b0282f4f1c6",
@@ -230,7 +230,7 @@
     },
     {
       "name": "cyl_l10n_e5416d3ed3c0",
-      "value": "Push to another CYLTabBarController (another PlusButton)"
+      "value": "Obre un altre CYLTabBarController (un altre PlusButton)"
     },
     {
       "name": "cyl_l10n_8c96672c9bc5",
@@ -242,11 +242,11 @@
     },
     {
       "name": "cyl_l10n_a63e8b745e73",
-      "value": "Pushes a page that hides the navigation bar while shown, with no base class"
+      "value": "Obre una pàgina que amaga la barra de navegació, sense classe base"
     },
     {
       "name": "cyl_l10n_79fe28f3a3ac",
-      "value": "Pushes a tab bar controller whose plus button image changes 2 s later; the layout must not move"
+      "value": "Obre un controlador la imatge del botó més del qual canvia 2 s després; el disseny no s’ha de moure"
     },
     {
       "name": "cyl_l10n_c27618b1aa9d",
@@ -270,7 +270,7 @@
     },
     {
       "name": "cyl_l10n_bd001817e373",
-      "value": "SVGA tab icons (configuration file)"
+      "value": "Icones de pestanya SVGA (fitxer de configuració)"
     },
     {
       "name": "cyl_l10n_b5fcd68edd9f",
@@ -302,7 +302,7 @@
     },
     {
       "name": "cyl_l10n_561582c1e7cc",
-      "value": "Shows the touchable area in translucent red: %@; scale %@x; tap to cycle 1x, 1.5x, 2x, off"
+      "value": "Mostra l’àrea tàctil en vermell translúcid: %@; escala %@x; toca per a 1x, 1,5x, 2x, desactivat"
     },
     {
       "name": "cyl_l10n_3cb58e0d546d",
@@ -330,7 +330,7 @@
     },
     {
       "name": "cyl_l10n_6d067090c833",
-      "value": "Tab, %1$@ of %2$@"
+      "value": "Pestanya, %1$@ de %2$@"
     },
     {
       "name": "cyl_l10n_456887f9731c",
@@ -342,15 +342,15 @@
     },
     {
       "name": "cyl_l10n_2e6d648945c0",
-      "value": "The plus button sticks out of the bar; its part above the bar responds (shown in red)"
+      "value": "El botó més sobresurt de la barra; la part de sobre també respon (en vermell)"
     },
     {
       "name": "cyl_l10n_f43b06c12ee1",
-      "value": "The system bar has no plus button: a floating button stands in"
+      "value": "La barra del sistema no té botó més: el substitueix un botó flotant"
     },
     {
       "name": "cyl_l10n_9b6633b75bf2",
-      "value": "The “Me” tab needs a login (issue #19); tap to toggle"
+      "value": "La pestanya «Jo» requereix iniciar sessió (issue #19); toca per alternar"
     },
     {
       "name": "cyl_l10n_a4d0d101d6a3",
@@ -358,11 +358,11 @@
     },
     {
       "name": "cyl_l10n_2306a585ae00",
-      "value": "cyl_itemEdgeInsets: 15% of a tab width free at each end"
+      "value": "cyl_itemEdgeInsets: 15 % de l’amplada d’una pestanya lliure a cada extrem"
     },
     {
       "name": "cyl_l10n_6360bbdfb8ff",
-      "value": "cyl_itemEdgeInsets: zero, the tabs fill the bar"
+      "value": "cyl_itemEdgeInsets: zero, les pestanyes omplen la barra"
     },
     {
       "name": "cyl_l10n_fd15e88376df",
@@ -378,7 +378,7 @@
     },
     {
       "name": "cyl_l10n_59884403daf6",
-      "value": "cyl_pushOrPopToViewController: pages/Index (already in the stack: pops)"
+      "value": "cyl_pushOrPopToViewController: pages/Index (ja a la pila: torna enrere)"
     },
     {
       "name": "cyl_l10n_1ec113617309",
@@ -386,19 +386,19 @@
     },
     {
       "name": "cyl_l10n_9fb845377ee4",
-      "value": "cyl_pushViewController: a green page"
+      "value": "cyl_pushViewController: una pàgina verda"
     },
     {
       "name": "cyl_l10n_ff5772993aee",
-      "value": "cyl_tabBarItemLongPressDuration = %@ ms, cyl_tabBarItemDoubleTapInterval = %@ ms; tap to cycle; double tap a tab to see it"
+      "value": "cyl_tabBarItemLongPressDuration = %@ ms, cyl_tabBarItemDoubleTapInterval = %@ ms; toca per canviar; toca dues vegades una pestanya per veure-ho"
     },
     {
       "name": "cyl_l10n_f69c71bc581e",
-      "value": "cyl_tabBarMinimizeBehavior = %@; tap to choose, then scroll this list"
+      "value": "cyl_tabBarMinimizeBehavior = %@; toca per triar i desplaça aquesta llista"
     },
     {
       "name": "cyl_l10n_f3f4ecf4a4a6",
-      "value": "selectedIndex = %@ (the plus button's page is %@, never a tab index); tap for the next tab"
+      "value": "selectedIndex = %@ (la pàgina del botó més és %@, mai un índex de pestanya); toca per a la pestanya següent"
     },
     {
       "name": "cyl_l10n_ee5b6ac6461b",
@@ -410,7 +410,7 @@
     },
     {
       "name": "cyl_l10n_c4376b477be8",
-      "value": "tabBarHidden = %@; hidden, it comes back after 2 s"
+      "value": "tabBarHidden = %@; amagada, torna al cap de 2 s"
     },
     {
       "name": "cyl_l10n_2a0608059131",
