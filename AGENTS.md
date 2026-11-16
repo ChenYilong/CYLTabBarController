@@ -54,6 +54,15 @@ Every new feature and user-visible change ships with bilingual documentation in 
 
 ## Code rules
 
+- **Fix bugs in the core, not in the example (added 2026-11-17)**: when you fix an issue or a bug, change the core code
+  first so that the whole class of problem is avoided for every app, not only the example. The core is the code
+  published to a package manager: CocoaPods (the podspec's sources), Swift Package Manager, Maven / Gradle
+  (`Example-Android/cyltabbar`), npm (`CrossPlatform/react-native-cyltabbar` outside `example*`), pub.dev
+  (`CrossPlatform/flutter_cyltabbar` outside `example*`), ohpm (`CrossPlatform/harmonyos-cyltabbar/cyltabbar`) and the
+  WeChat Mini Program component (outside `example`). Fixing only the example layer is the worst option. If the bug
+  cannot be fixed in the core, stop and ask the owner first, giving the reason; only after the owner agrees, fix it in
+  the example and record in `docs/Example-Layer-Fixes.md` why the core could not fix it (the issue, the reason, the
+  example change, and what would let the core fix it later).
 - **No warnings**: fix every build and static-analyzer warning you meet, including old ones in code you did not change.
 - **Public API**: never remove or change an existing public API; add new API instead. Prefer implementing an existing
   protocol method over adding a new category method; file-private C functions and private headers are fine.
@@ -205,7 +214,6 @@ Every new feature and user-visible change ships with bilingual documentation in 
   `cyl_addBadgeHelperTable`) is created by the example itself with `.insetGrouped`. Keep this when porting a demo.
 - **Examples**: they import only `#import <CYLTabBarController/CYLTabBarController.h>` (Swift: `import CYLTabBarController`),
   and their Podfiles must not need changes.
-- **Fix bugs in the core first, not in the examples (added 2026-11-17)**: when an issue or a bug comes up, fix it first in the core code, so the same kind of problem goes away for every app, instead of working around it in the example layer. The core is the code published to a package registry: CocoaPods (and Swift Package Manager), Maven / Gradle (the Android library), npm (the React Native component), pub.dev (the Flutter component), ohpm (the HarmonyOS `cyltabbar` module) and the WeChat Mini Program component. A fix in the example layer is the worst option. If a bug cannot be fixed in the core, stop and ask the maintainer first, and say why. When the maintainer agrees to an example-layer fix, explain in the related document in `docs/` why the core could not solve it and why the example does.
 - **Verify** before pushing: `pod lib lint CYLTabBarController.podspec --quick`, plus a build or static check of the
   changed code. Say plainly what could not be verified.
 

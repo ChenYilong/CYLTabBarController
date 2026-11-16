@@ -32,6 +32,7 @@
 | [React Native 与 Flutter 组件](Cross-Platform-Components.md) | [React Native and Flutter components](Cross-Platform-Components.md) |
 | [自定义 TabBar 功能清单](Custom-Tab-Bar-Features.md) | [Custom Tab Bar Feature Checklist](Custom-Tab-Bar-Features.md) |
 | [Demo 测试列表：设置分组与纯 Swift 版本](Demo-Test-List.md) | [The demo test list: settings groups and a pure Swift version](Demo-Test-List.md) |
+| [示例层修复](Example-Layer-Fixes.md) | [Example-layer fixes](Example-Layer-Fixes.md) |
 | [CYLTabBarController 常见问题](FAQ.md) | [CYLTabBarController FAQ](FAQ.md) |
 | [FlatDesign × UITabBarAppearance](FlatDesign-StandardAppearance.md) | [FlatDesign × UITabBarAppearance](FlatDesign-StandardAppearance.md) |
 | [Flutter 接入：flutter_cyltabbar](Flutter-Component.md) | [Flutter integration: flutter_cyltabbar](Flutter-Component.md) |
@@ -126,6 +127,7 @@ docs/
 ├── Cross-Platform-Components.md
 ├── Custom-Tab-Bar-Features.md
 ├── Demo-Test-List.md
+├── Example-Layer-Fixes.md
 ├── FAQ.md
 ├── FlatDesign-StandardAppearance.md
 ├── Flutter-Component.md

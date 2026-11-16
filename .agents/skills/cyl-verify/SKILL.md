@@ -30,10 +30,6 @@ Before pushing: `git log -1 --format=%B | python3 -c "import re,sys; sys.exit(1 
 
 **Commit and push at the end of every turn (added 2026-11-16)**: when a question-and-answer turn ends and the current branch is not `master` or `main`, commit and push the work of that turn, without asking. This is always safe: the code stays on a branch and is never pushed to `master` or `main`, so pushing carries no risk to worry about. The open pull request rule still applies to every such commit (check for an open pull request first, open one if missing). On `master` or `main`, ask first. AGENTS.md, "Git and pull requests".
 
-## Fix bugs in the core first
-
-**Fix bugs in the core first, not in the examples (added 2026-11-17)**: when an issue or a bug comes up, fix it first in the core code, so the same kind of problem goes away for every app, instead of working around it in the example layer. The core is the code published to a package registry: CocoaPods (and Swift Package Manager), Maven / Gradle (the Android library), npm (the React Native component), pub.dev (the Flutter component), ohpm (the HarmonyOS `cyltabbar` module) and the WeChat Mini Program component. A fix in the example layer is the worst option. If a bug cannot be fixed in the core, stop and ask the maintainer first, and say why. When the maintainer agrees to an example-layer fix, explain in the related document in `docs/` why the core could not solve it and why the example does. AGENTS.md, "Code rules".
-
 ## Where a check runs: GitHub CI or locally
 
 GitHub CI/CD for iOS runs on **macOS 26** by default: always read `.github/workflows/ios.yml` on master first to confirm it
@@ -207,3 +203,10 @@ the last resort; a control that cannot be found that way is a bug: add the label
     each branch.
   - Push only to branches that have an open pull request; do not recreate a branch that was deleted after its pull
     request was closed or merged.
+
+## Fix in the core first (added 2026-11-17)
+
+Change the core code (the code published to CocoaPods, Swift Package Manager, Maven / Gradle, npm, pub.dev, ohpm or
+the WeChat Mini Program component) so that the whole class of bug is avoided; a fix only in the example layer is the
+worst option. If the core cannot fix it, ask the owner first and explain why; after the owner agrees, fix it in the
+example and record the reason in `docs/Example-Layer-Fixes.md` (see AGENTS.md, "Code rules").
