@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		EB6DE3E5F466459DA5D4772C /* green_lottie_tab_mine_dark.json in Resources */ = {isa = PBXBuildFile; fileRef = 17BE476FA978496A8324E63D /* green_lottie_tab_mine_dark.json */; };
 		945C22889D1A4725BC79DA54 /* green_lottie_tab_mine.json in Resources */ = {isa = PBXBuildFile; fileRef = DE7A286DC067478B849B91FF /* green_lottie_tab_mine.json */; };
+		14454ABF5DCE4BF7BD195CCA /* icons.riv in Resources */ = {isa = PBXBuildFile; fileRef = 3FF52A4B814A4B70AB8E9F30 /* icons.riv */; };
 		D98767A89ADE486B98B04E8D /* green_lottie_tab_news_dark.json in Resources */ = {isa = PBXBuildFile; fileRef = 1338B07BC7454727B0E7E40B /* green_lottie_tab_news_dark.json */; };
 		3025FD4F02F54357AC181B17 /* green_lottie_tab_news.json in Resources */ = {isa = PBXBuildFile; fileRef = 7930957FF92847C480DA6B48 /* green_lottie_tab_news.json */; };
 		16A760621D7D4D83BB61EB10 /* green_lottie_tab_discover_dark.json in Resources */ = {isa = PBXBuildFile; fileRef = 1CC8FDAA520C49DDB15A48D5 /* green_lottie_tab_discover_dark.json */; };
@@ -51,6 +52,7 @@
 /* Begin PBXFileReference section */
 		17BE476FA978496A8324E63D /* green_lottie_tab_mine_dark.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = "green_lottie_tab_mine_dark.json"; path = "../../../../Example/Classes/Other/LottieResources/green_lottie_tab_mine_dark.json"; sourceTree = SOURCE_ROOT; };
 		DE7A286DC067478B849B91FF /* green_lottie_tab_mine.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = "green_lottie_tab_mine.json"; path = "../../../../Example/Classes/Other/LottieResources/green_lottie_tab_mine.json"; sourceTree = SOURCE_ROOT; };
+		3FF52A4B814A4B70AB8E9F30 /* icons.riv */ = {isa = PBXFileReference; lastKnownFileType = file; name = icons.riv; path = "../../../../Example-SwiftUI-Rive/AnimatedApp/RiveAssets/icons.riv"; sourceTree = SOURCE_ROOT; };
 		1338B07BC7454727B0E7E40B /* green_lottie_tab_news_dark.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = "green_lottie_tab_news_dark.json"; path = "../../../../Example/Classes/Other/LottieResources/green_lottie_tab_news_dark.json"; sourceTree = SOURCE_ROOT; };
 		7930957FF92847C480DA6B48 /* green_lottie_tab_news.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = "green_lottie_tab_news.json"; path = "../../../../Example/Classes/Other/LottieResources/green_lottie_tab_news.json"; sourceTree = SOURCE_ROOT; };
 		1CC8FDAA520C49DDB15A48D5 /* green_lottie_tab_discover_dark.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = "green_lottie_tab_discover_dark.json"; path = "../../../../Example/Classes/Other/LottieResources/green_lottie_tab_discover_dark.json"; sourceTree = SOURCE_ROOT; };
@@ -123,6 +125,7 @@
 			children = (
 				17BE476FA978496A8324E63D /* green_lottie_tab_mine_dark.json */,
 				DE7A286DC067478B849B91FF /* green_lottie_tab_mine.json */,
+				3FF52A4B814A4B70AB8E9F30 /* icons.riv */,
 				1338B07BC7454727B0E7E40B /* green_lottie_tab_news_dark.json */,
 				7930957FF92847C480DA6B48 /* green_lottie_tab_news.json */,
 				1CC8FDAA520C49DDB15A48D5 /* green_lottie_tab_discover_dark.json */,
@@ -260,6 +263,7 @@
 			files = (
 				EB6DE3E5F466459DA5D4772C /* green_lottie_tab_mine_dark.json in Resources */,
 				945C22889D1A4725BC79DA54 /* green_lottie_tab_mine.json in Resources */,
+				14454ABF5DCE4BF7BD195CCA /* icons.riv in Resources */,
 				D98767A89ADE486B98B04E8D /* green_lottie_tab_news_dark.json in Resources */,
 				3025FD4F02F54357AC181B17 /* green_lottie_tab_news.json in Resources */,
 				16A760621D7D4D83BB61EB10 /* green_lottie_tab_discover_dark.json in Resources */,

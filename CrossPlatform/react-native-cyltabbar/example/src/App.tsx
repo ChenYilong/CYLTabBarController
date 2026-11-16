@@ -24,6 +24,24 @@ const lottie = (name: string) => ({
   CYLTabBarLottieDarkFilePath: `green_lottie_tab_${name}_dark.json`,
 });
 
+/** The icons.riv artboard of each tab (Example-SwiftUI-Rive TabItems.swift). 每个 Tab 在 icons.riv 中的画板。 */
+const RIVE_ARTBOARDS = ['TIMER', 'SEARCH', 'CHAT', 'USER'];
+
+/** A tab's Rive keys: the state machine input "active" plays on select, as example-rive. Tab 的 Rive key，选中时播放 "active"。 */
+const rive = (artboard: string) => ({
+  CYLTabBarRiveFilePath: 'icons.riv',
+  CYLTabBarAnimationOptions: { artboard, stateMachine: `${artboard}_Interactivity`, input: 'active' },
+  CYLTabBarRiveSize: '{28, 28}',
+});
+
+/** The item with Rive keys instead of the Lottie ones (and their colors). 用 Rive key 替换 Lottie key（及其颜色）。 */
+function withRiveIcon(item: CYLTabBarItem, index: number): CYLTabBarItem {
+  const kept = Object.fromEntries(
+    Object.entries(item).filter(([key]) => !key.startsWith('CYLTabBarLottie') && key !== 'CYLTabBarAnimationColors'),
+  ) as CYLTabBarItem;
+  return { ...kept, ...rive(RIVE_ARTBOARDS[index % RIVE_ARTBOARDS.length]!) };
+}
+
 // +[MainTabBarController tabBarItemsAttributesForTabBar]
 const ITEMS: CYLTabBarItem[] = [
   {
@@ -193,7 +211,7 @@ function CYLLanguageMenu({ visible, colors, onChoose, onClose }: Readonly<{ visi
 type CYLSkinPicker = { skin: CYLSkin; followsSystem: boolean; choose: (name: string) => void; toggleFollowsSystem: () => void };
 
 /** The tabs in a skin: holiday or network icons instead of the Lottie ones. 皮肤中的 Tab：用节日或网络图标替换 Lottie 图标。 */
-function skinnedItems(skin: CYLSkin): CYLTabBarItem[] {
+function skinnedItems(skin: CYLSkin, riveIcons = false): CYLTabBarItem[] {
   return ITEMS.map((item, index) => {
     // The titles in the current language, as CYLLocalizedTabBarItemsAttributes(). 当前语言中的标题。
     const title = t(item.title as string);
@@ -214,7 +232,8 @@ function skinnedItems(skin: CYLSkin): CYLTabBarItem[] {
         CYLTabBarItemImageURLSize: [24, 24],
       };
     }
-    return { ...item, title, CYLTabBarItemSelectedTitle: selectedTitle };
+    const lottieItem = { ...item, title, CYLTabBarItemSelectedTitle: selectedTitle };
+    return riveIcons ? withRiveIcon(lottieItem, index) : lottieItem;
   });
 }
 
@@ -480,6 +499,8 @@ function CYLMainTabBar({
   const [playAllRequest, setPlayAllRequest] = useState(0);
   const [playbackSpeed, setPlaybackSpeed] = useState(1);
   const [playbackLoops, setPlaybackLoops] = useState(false);
+  // The "Rive tab icons" switch: icons.riv instead of the Lottie icons. Rive / Lottie 图标切换。
+  const [riveIcons, setRiveIcons] = useState(false);
   // CYLSwitchTitlePositionAdjustment(): the title row cycles the vertical offset of every title through 0, -4 and 4 at
   // runtime (`setTitlePositionAdjustment:`); undefined is the configuration's -3.5. 标题行在运行时依次切换所有标题的垂直偏移：
   // 0、-4、4；undefined 为配置中的 -3.5。
@@ -564,6 +585,8 @@ function CYLMainTabBar({
                 onPlayAll={() => setPlayAllRequest((request) => request + 1)}
                 onSpeedChange={setPlaybackSpeed}
                 onLoopsChange={setPlaybackLoops}
+                riveIcons={riveIcons}
+                onRiveIconsChange={setRiveIcons}
               />
             )
           }
@@ -590,7 +613,7 @@ function CYLMainTabBar({
       </View>
       <CYLTabBar
         style={styles.tabBar}
-        items={skinnedItems(skin)}
+        items={skinnedItems(skin, riveIcons)}
         styleType={styleType}
         // -addScaleAnimationOnView:repeatCount: on every tap. 每次点击播放一次缩放动画。
         tapAnimation="scale"

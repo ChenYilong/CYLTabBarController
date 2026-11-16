@@ -40,6 +40,35 @@ Map<String, Object?> _lottie(String name) => {
   'CYLTabBarLottieDarkFilePath': 'green_lottie_tab_${name}_dark.json',
 };
 
+/// Whether the tabs show Rive icons (icons.riv of Example-SwiftUI-Rive) instead of the Lottie ones (the "Rive tab
+/// icons" switch of the playback controls). Tab 是否显示 Rive 图标（Example-SwiftUI-Rive 的 icons.riv）而不是 Lottie 图标。
+bool cylRiveTabIcons = false;
+
+/// The icons.riv artboard of each tab, as Example-Rive (TabItems.swift): Home TIMER, Nearby SEARCH, Messages CHAT, Me USER.
+/// 每个 Tab 在 icons.riv 中的画板，与 Example-Rive（TabItems.swift）相同。
+const _riveArtboards = ['TIMER', 'SEARCH', 'CHAT', 'USER'];
+
+/// A tab's Rive keys (CYLTabBarRiveFilePath, CYLTabBarAnimationOptions, CYLTabBarRiveSize): icons.riv has no view model,
+/// so its state machine input "active" plays on select, as in example_rive. Tab 的 Rive key：选中时播放状态机输入 "active"。
+Map<String, Object?> _rive(String artboard) => {
+  'CYLTabBarRiveFilePath': 'icons.riv',
+  'CYLTabBarAnimationOptions': {'artboard': artboard, 'stateMachine': '${artboard}_Interactivity', 'input': 'active'},
+  'CYLTabBarRiveSize': '{28, 28}',
+};
+
+/// The item with Rive keys instead of the Lottie ones (and their colors). 用 Rive key 替换 Lottie key（及其颜色）。
+CYLTabBarItem _withRiveIcon(int index, CYLTabBarItem item) => CYLTabBarItem(
+  title: item.title,
+  identifier: item.identifier,
+  image: item.image,
+  selectedImage: item.selectedImage,
+  attributes: {
+    for (final entry in item.attributes.entries)
+      if (!entry.key.startsWith('CYLTabBarLottie') && entry.key != 'CYLTabBarAnimationColors') entry.key: entry.value,
+    ..._rive(_riveArtboards[index % _riveArtboards.length]),
+  },
+);
+
 // +[MainTabBarController tabBarItemsAttributesForTabBar]
 final _items = [
   CYLTabBarItem(
@@ -186,7 +215,7 @@ CYLTabBarItem _skinnedItem(CYLSkin skin, int index, CYLTabBarItem item) {
       },
     );
   }
-  return item;
+  return cylRiveTabIcons ? _withRiveIcon(index, item) : item;
 }
 
 /// The plus button in a skin (`cyl_plusButtonAttributesForTabBarController:`). 皮肤中的 PlusButton。
@@ -326,6 +355,10 @@ class _ExampleAppState extends State<CYLExampleApp> {
       onLoggedInChange: (loggedIn) => setState(() => _loggedIn = loggedIn),
       language: _language,
       onLanguageChange: (language) => setState(() => _language = language),
+      onRiveIconsChanged: (on) => setState(() {
+        cylRiveTabIcons = on;
+        _generation++;
+      }),
     );
   }
 }
@@ -439,6 +472,7 @@ class CYLExamplePage extends StatefulWidget {
     required this.onLoggedInChange,
     required this.language,
     required this.onLanguageChange,
+    required this.onRiveIconsChanged,
   });
 
   final String styleType;
@@ -449,6 +483,9 @@ class CYLExamplePage extends StatefulWidget {
   final VoidCallback onToggleFollowsSystem;
   final bool? loggedIn;
   final ValueChanged<bool> onLoggedInChange;
+
+  /// The "Rive tab icons" switch: rebuilds the tab bar with Rive or Lottie icons. 切换 Rive / Lottie 图标并重建 TabBar。
+  final ValueChanged<bool> onRiveIconsChanged;
   final String? language;
   final ValueChanged<String?> onLanguageChange;
 
@@ -787,6 +824,8 @@ class _ExamplePageState extends State<CYLExamplePage> {
                   () => _animationSpeed = (value / 0.05).round() * 0.05,
                 ),
                 onLoopsChanged: (value) => setState(() => _animationLoops = value),
+                riveIcons: cylRiveTabIcons,
+                onRiveIconsChanged: widget.onRiveIconsChanged,
               ),
             Expanded(
               child: _plusPageSelected

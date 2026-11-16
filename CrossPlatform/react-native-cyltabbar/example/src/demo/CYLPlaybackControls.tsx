@@ -28,6 +28,9 @@ type Props = Readonly<{
   onPlayAll: () => void;
   onSpeedChange: (speed: number) => void;
   onLoopsChange: (loops: boolean) => void;
+  /** Whether the tabs show icons.riv's Rive icons instead of the Lottie ones; undefined hides the switch. Tab 是否显示 Rive 图标；未定义时不显示开关。 */
+  riveIcons?: boolean;
+  onRiveIconsChange?: (riveIcons: boolean) => void;
 }>;
 
 /**
@@ -38,7 +41,7 @@ type Props = Readonly<{
  * 为 TabBar 的 Tab 图标动画提供「全部播放」、倍速滑块与循环开关，三者组合成一个实时生效的播放策略。TalkBack 与 VoiceOver 把按钮
  * 读作「全部播放」，滑块读作「倍速，1.5 倍」（上下滑动调整），开关读作「循环播放，开」。
  */
-export function CYLPlaybackControls({ colors, tint, speed, loops, onPlayAll, onSpeedChange, onLoopsChange }: Props) {
+export function CYLPlaybackControls({ colors, tint, speed, loops, onPlayAll, onSpeedChange, onLoopsChange, riveIcons, onRiveIconsChange }: Props) {
   const slider = useRef<ComponentRef<typeof View>>(null);
   // The slider's left edge and width in the window, measured at layout: the touch position is the screen position, which
   // stays right while the finger is outside the slider. 滑块在窗口中的左边缘与宽度（布局时测量）：触摸位置取屏幕位置，手指移出滑块时仍然正确。
@@ -106,6 +109,19 @@ export function CYLPlaybackControls({ colors, tint, speed, loops, onPlayAll, onS
             accessibilityState={{ checked: loops }}
           />
         </View>
+        {riveIcons === undefined ? null : (
+          <View style={styles.row}>
+            <Text style={[styles.text, { color: colors.label }]} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">{t('Rive tab icons')}</Text>
+            <Switch
+              testID="cyl-rive-tab-icons"
+              value={riveIcons}
+              onValueChange={onRiveIconsChange}
+              trackColor={{ true: tint }}
+              accessibilityLabel={t('Rive tab icons')}
+              accessibilityState={{ checked: riveIcons }}
+            />
+          </View>
+        )}
       </View>
     </View>
   );

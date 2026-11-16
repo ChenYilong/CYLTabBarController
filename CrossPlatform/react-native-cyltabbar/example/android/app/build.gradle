@@ -85,6 +85,8 @@ android {
     sourceSets {
         main {
             assets.srcDir("${cylRepository}/Example/Classes/Other/LottieResources")
+            // [EN] icons.riv of Example-SwiftUI-Rive, for the Rive tab icons (not a copy). [CN] Rive Tab 图标所用的 icons.riv（不是副本）。
+            assets.srcDir("${cylRepository}/Example-SwiftUI-Rive/AnimatedApp/RiveAssets")
         }
     }
     defaultConfig {
