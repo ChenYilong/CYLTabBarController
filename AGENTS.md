@@ -417,6 +417,7 @@ The root `Podfile` is the reference: it already has the top lines and the hook.
 
 - **On any branch other than `master` or `main`, commit and push as soon as the work is written, without asking
   for confirmation.** On `master` or `main`, ask first.
+- **Commit and push at the end of every turn (added 2026-11-16)**: when a question-and-answer turn ends and the current branch is not `master` or `main`, commit and push the work of that turn, without asking. This is always safe: the code stays on a branch and is never pushed to `master` or `main`, so pushing carries no risk to worry about. The open pull request rule still applies to every such commit (check for an open pull request first, open one if missing). On `master` or `main`, ask first.
 
 - **Never commit `._*` files.** macOS writes these AppleDouble metadata files next to every file on an external volume
   (e.g. `._.claude`, `._.git`, `._.github`, `._.gitignore`, `._.pullapprove.yml`, `._ChatKit`). `.gitignore` excludes
