@@ -418,7 +418,7 @@
   "CYLLocalizedStringForLanguage()": "TODO: N/A on HarmonyOS: CYLUtils: UIKit helpers (frames, images, runtime) with no ArkUI counterpart",
   "CYLLocalizedTabBarItemsAttributes()": "TODO: N/A on HarmonyOS: the iOS bundle localization; HarmonyOS uses string resources ($r('app.string.…'))",
   "CYLPlusButton": "`CYLPlusButton` (interface) (built; emulator check pending / 已编译，模拟器验证待做)",
-  "CYLSVGATabBarItemAnimator": "`CYLSVGAView` (svga/CYLSVGAView.ets) (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLSVGATabBarItemAnimator": "`CYLSVGAView` (svga/CYLSVGAView.ets) (verified on emulator: Mate 70 Pro HarmonyOS 6.0.1 API 21, 2026-11-16 / 已在模拟器验证)",
   "CYLSampleConfigurationURLString": "TODO: N/A on HarmonyOS: the iOS demo settings list, not library behavior",
   "CYLSettingsGroup": "TODO: N/A on HarmonyOS: the iOS demo settings list, not library behavior",
   "CYLSettingsSection": "TODO: N/A on HarmonyOS: the iOS demo settings list, not library behavior",
@@ -439,9 +439,9 @@
   "CYLTabBarHostView selectedIndex": "`CYLTabBarController.selectedIndex` (@Link) (built; emulator check pending / 已编译，模拟器验证待做)",
   "CYLTabBarItemAccessibilityLabel": "TODO: the tab reads its title and badge; no per-tab accessibility label attribute yet",
   "CYLTabBarItemUpdateRow": "TODO: N/A on HarmonyOS: the iOS demo settings list, not library behavior",
-  "CYLTabBarSVGAFilePath": "`CYLTabBarItemAttributes.svgaFilePath` (rawfile path; configuration key CYLTabBarSVGAFilePath) (built; emulator check pending / 已编译，模拟器验证待做)",
-  "CYLTabBarSVGASize": "`CYLTabBarItemAttributes.svgaSize` (built; emulator check pending / 已编译，模拟器验证待做)",
-  "CYLTabBarSVGAURL": "`CYLTabBarItemAttributes.svgaURL` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarSVGAFilePath": "`CYLTabBarItemAttributes.svgaFilePath` (rawfile path; configuration key CYLTabBarSVGAFilePath) (verified on emulator: Mate 70 Pro HarmonyOS 6.0.1 API 21, 2026-11-16 / 已在模拟器验证)",
+  "CYLTabBarSVGASize": "`CYLTabBarItemAttributes.svgaSize` (verified on emulator: Mate 70 Pro HarmonyOS 6.0.1 API 21, 2026-11-16 / 已在模拟器验证)",
+  "CYLTabBarSVGAURL": "`CYLTabBarItemAttributes.svgaURL` (verified on emulator: Mate 70 Pro HarmonyOS 6.0.1 API 21, 2026-11-16 / 已在模拟器验证)",
   "CYLThemeManager 0": "TODO: N/A on HarmonyOS: a parsing artifact of a block property, not an API",
   "CYLUtils": "TODO: N/A on HarmonyOS: CYLUtils: UIKit helpers (frames, images, runtime) with no ArkUI counterpart",
   "UIBarItem(CYLUtils)": "TODO: N/A on HarmonyOS: CYLUtils: UIKit helpers (frames, images, runtime) with no ArkUI counterpart",
@@ -678,6 +678,6 @@
   "CYLFlatDesignTabBar backgroundImage": "TODO: partial: `CYLFlatDesignTabBarModifier(barTintColor, backgroundImage)` draws it tiled in place of the blur; the controller property is not wired yet (CYLTabBarController.ets is being changed by the SVGA work).",
   "CYLFlatDesignTabBar context": "TODO: N/A on HarmonyOS: the plus button is passed to each CYLTabBarController (`plusButton`), so there is no global plus-button registry keyed by a context.",
   "CYLFlatDesignTabBar respectsVerticalStatusBarSafeArea": "TODO: N/A on HarmonyOS: HarmonyOS has no vertical status bar column beside the app (the iOS 84 pt side column); the status bar is always at the top.",
-  "CYLTabBarSVGADarkFilePath": "`CYLTabBarItemAttributes.svgaDarkFilePath` (built; emulator check pending / 已编译，模拟器验证待做)",
-  "CYLTabBarSVGADarkURL": "`CYLTabBarItemAttributes.svgaDarkURL` (built; emulator check pending / 已编译，模拟器验证待做)"
+  "CYLTabBarSVGADarkFilePath": "`CYLTabBarItemAttributes.svgaDarkFilePath` (verified on emulator: Mate 70 Pro HarmonyOS 6.0.1 API 21, 2026-11-16 / 已在模拟器验证)",
+  "CYLTabBarSVGADarkURL": "`CYLTabBarItemAttributes.svgaDarkURL` (verified on emulator: Mate 70 Pro HarmonyOS 6.0.1 API 21, 2026-11-16 / 已在模拟器验证)"
 }

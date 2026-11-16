@@ -91,7 +91,7 @@
   },
   {
     "id": 11,
-    "status": "TODO need 模拟器截图验证",
+    "status": "DONE (harmonyos-port-svga-demo-taps.png, b840da3, emulator 127.0.0.1:5557)",
     "scope": "CrossPlatform/harmonyos-cyltabbar (cyltabbar)",
     "title": "SVGA (and Lottie) icons larger than imageSize sit about 5 vp right of and below their titles",
     "evidence": "harmonyos-tab-bar-svga-launch.png, harmonyos-tab-bar-svga-messages-tap.png (reported by the CYLTableViewPlaceHolder session)",
@@ -115,5 +115,14 @@
     "evidence": "Code review (reported by the CYLTableViewPlaceHolder session)",
     "cause": "Template string in Index.ets cylPage",
     "fix": "CYLLocalizedString('替换页 %@') (the iOS key)"
+  },
+  {
+    "id": 14,
+    "status": "TODO need 模拟器截图验证",
+    "scope": "CrossPlatform/harmonyos-cyltabbar (cyltabbar)",
+    "title": "The first tap on a tab right after pushing the configuration demo page does nothing; the next tap works",
+    "evidence": "Emulator check of the SVGA demo (CYLTabBarController-folder session, b840da3, 127.0.0.1:5557)",
+    "cause": "Likely the tab's exclusive gesture group (LongPressGesture before TapGesture): during or right after the push transition the first tap is not recognised by the group",
+    "fix": "Tabs take taps through onClick and the long press as a parallelGesture (a long press marks its tab so the following click is ignored)"
   }
 ]
