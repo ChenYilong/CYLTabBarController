@@ -65,4 +65,7 @@ flutter {
 dependencies {
     // [EN] The Lottie tab icons (the library plays them when lottie-android is present). [CN] Lottie Tab 图标（引入 lottie-android 时库会播放）。
     implementation(libs.lottie)
+    // [EN] Rive tab icons: the library plays Rive through rive-android, found by reflection (as example_rive).
+    // [CN] Rive Tab 图标：库通过反射找到 rive-android 播放 Rive（与 example_rive 相同）。
+    implementation(libs.rive.android)
 }

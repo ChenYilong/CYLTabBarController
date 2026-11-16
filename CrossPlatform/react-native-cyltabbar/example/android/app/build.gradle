@@ -121,6 +121,9 @@ dependencies {
     implementation("com.facebook.react:react-android")
     // The Lottie tab icons (the library plays them when lottie-android is present). Lottie Tab 图标（引入 lottie-android 时库会播放）。
     implementation("com.airbnb.android:lottie:6.6.2")
+    // [EN] Rive tab icons: the library plays Rive through rive-android, found by reflection (as example-rive).
+    // [CN] Rive Tab 图标：库通过反射找到 rive-android 播放 Rive（与 example-rive 相同）。
+    implementation("app.rive:rive-android:10.3.0")
 
     if (hermesEnabled.toBoolean()) {
         implementation("com.facebook.react:hermes-android")
