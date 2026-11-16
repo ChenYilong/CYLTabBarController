@@ -110,6 +110,10 @@ struct Index {
   @State minimizeBehavior: CYLTabBarMinimizeBehavior = CYLTabBarMinimizeBehavior.Never;
   /** [EN] Items 9, 15, 32: the current skin (CYLThemeManager). [CN] 第 9、15、32 项：当前皮肤。 */
   @State theme: DemoTheme = DEMO_THEMES[0];
+  /** [EN] Issue #42: the widths (vp) of the navigation row, its left buttons and 换肤, to centre the title. [CN] 问题 #42：导航行、左侧按钮与「换肤」的宽度，用于标题居中。 */
+  @State cylNavWidth: number = 0;
+  @State cylNavLeftWidth: number = 0;
+  @State cylNavRightWidth: number = 0;
   /** [EN] Item 20: whether scrolling left the bar shown, and the result of each simulation. [CN] 第 20 项：滚动后 TabBar 是否显示，以及每个模拟的结果。 */
   @State scrollBarVisible: boolean = true;
   @State scrollResults: Map<number, string> = new Map();
@@ -971,6 +975,22 @@ struct Index {
    *      button's page (+plusChildViewController) is blank, titled "发布".
    * [CN] Tab 页面：带 Tab 标题的导航栏与演示列表（第 51 项：每个 Tab 相同，不留空）。第 10 项：加号按钮的页面为空白，标题为「发布」。
    */
+  /**
+   * [EN] Issue #42: as iOS, the title is centred on the bar when the space between equal margins is wide enough (48 vp);
+   *      otherwise (long translations) it takes the space between the left buttons and 换肤.
+   * [CN] 问题 #42：与 iOS 相同，左右等宽留白后剩余空间足够（48 vp）时标题在导航栏居中；否则（较长的译文）占据左侧按钮与「换肤」之间的空间。
+   */
+  private cylNavTitlePadding(index: number): Padding {
+    const left = index === 0 ? this.cylNavLeftWidth : 0;
+    const right = index === CYLPlusButtonPageIndex ? 0 : this.cylNavRightWidth;
+    const centred = this.cylNavWidth - 2 * Math.max(left, right) >= 48;
+    const padding: Padding = {
+      left: 8 + (centred ? Math.max(0, right - left) : 0),
+      right: 8 + (centred ? Math.max(0, left - right) : 0),
+    };
+    return padding;
+  }
+
   @Builder
   cylPage(index: number, identifier: string) {
     Column() {
@@ -988,6 +1008,7 @@ struct Index {
           .alignItems(VerticalAlign.Center)
           .margin({ left: 12 })
           .flexShrink(0)
+          .onAreaChange((oldArea: Area, newArea: Area) => this.cylNavLeftWidth = Number(newArea.width) + 12)
         }
         Text() {
           Span(index === CYLPlusButtonPageIndex ? $r('app.string.tab_post') : CYL_TABS[index].title)
@@ -1003,7 +1024,7 @@ struct Index {
           .textOverflow({ overflow: TextOverflow.Ellipsis })
           .textAlign(TextAlign.Center)
           .layoutWeight(1)
-          .padding({ left: 8, right: 8 })
+          .padding(this.cylNavTitlePadding(index))
         if (index !== CYLPlusButtonPageIndex) {
           Text(CYLLocalizedString('换肤'))
             .fontSize(15)
@@ -1012,6 +1033,7 @@ struct Index {
             .textAlign(TextAlign.Center)
             .margin({ right: 16 })
             .flexShrink(0)
+            .onAreaChange((oldArea: Area, newArea: Area) => this.cylNavRightWidth = Number(newArea.width) + 16)
             .id(`cyl-nav-skin-${identifier}`)
             .onClick(() => this.showSkinPicker())
         }
@@ -1019,6 +1041,7 @@ struct Index {
       .height(44)
       .width('100%')
       .alignItems(VerticalAlign.Center)
+      .onAreaChange((oldArea: Area, newArea: Area) => this.cylNavWidth = Number(newArea.width))
       .backgroundColor($r('app.color.cyl_bar_background'))
       .id(`cyl-nav-title-${identifier}`)
 
