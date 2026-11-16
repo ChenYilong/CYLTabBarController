@@ -327,7 +327,7 @@ Analyst.ai [App Store Link](https://itunes.apple.com/us/app/analyst-ai/id1345754
 
 | 中文 | English |
 |:---|:---|
-| 四步搭建主流 App 结构。代码取自 Swift 示例（`Example-Swift-04`、`Example-Rive`）。Objective-C 写法、全部参数与更多自定义见 [使用指南](docs/Usage-Guide.md)。 | Four steps build a mainstream app structure. The code comes from the Swift demos (`Example-Swift-04`, `Example-Rive`). For Objective-C, every parameter and more customization, see the [usage guide](docs/Usage-Guide.md). |
+| 四步搭建主流 App 结构。代码取自 Swift 示例（`Example-Swift-04`、`Example-Rive`）。全部参数、PlusButton 协议与更多自定义见 [使用指南](docs/Usage-Guide.md)（同样为 Swift）。 | Four steps build a mainstream app structure. The code comes from the Swift demos (`Example-Swift-04`, `Example-Rive`). For every parameter, the plus button protocol and more customization, see the [usage guide](docs/Usage-Guide.md) (Swift too). |
 
 ### [CN]第一步：导入
 ### [EN]Step 1: Install
