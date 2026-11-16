@@ -347,7 +347,10 @@ export struct CYLBadgeView {
     } catch (e) {
       // [EN] Estimate when measuring is not available. [CN] 无法测量时估算。
     }
-    return Math.max(height, Math.ceil(textWidth) + margin);
+    // [EN] The border is drawn inside the width, so it is added on both sides or a bordered badge clips its text.
+    // [CN] 描边绘制在宽度之内，因此两侧都要加上，否则带描边的角标会裁切文字。
+    const border = this.badge.borderWidth ?? this.appearance().borderWidth;
+    return Math.max(height, Math.ceil(textWidth) + margin + border * 2);
   }
 
   build() {
