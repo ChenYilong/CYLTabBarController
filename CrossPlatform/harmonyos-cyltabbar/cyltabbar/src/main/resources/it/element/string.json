@@ -337,6 +337,10 @@
       "value": "Scheda: %@"
     },
     {
+      "name": "cyl_l10n_ab5745daa734",
+      "value": "Galleria delle tab bar"
+    },
+    {
       "name": "cyl_l10n_75ccb7ef4864",
       "value": "Aspetto della barra"
     },
@@ -449,6 +453,10 @@
       "value": "Zoom avanti"
     },
     {
+      "name": "cyl_l10n_83c39abd16cd",
+      "value": "Scegli dall’album"
+    },
+    {
       "name": "cyl_l10n_cc03f47a389c",
       "value": "Scarica l’icona della scheda dalla rete (con cache); tocca di nuovo per ripristinare"
     },
@@ -495,6 +503,10 @@
     {
       "name": "cyl_l10n_c1ecedab11bc",
       "value": "Originale"
+    },
+    {
+      "name": "cyl_l10n_83611abd5f80",
+      "value": "Pubblica"
     },
     {
       "name": "cyl_l10n_625fb26b4b33",
@@ -565,6 +577,10 @@
       "value": "Manuale: tocca per attivare il nascondi allo scorrimento, scorri verso il basso per nascondere la TabBar, poi fai ciò che dice il titolo. Atteso: la TabBar torna subito."
     },
     {
+      "name": "cyl_l10n_89246468f7fd",
+      "value": "Apri la galleria delle tab bar"
+    },
+    {
       "name": "cyl_l10n_a01539048bb0",
       "value": "Attiva l'interruttore, poi tieni premuta una scheda o il PlusButton per vederne l'identificatore."
     },
@@ -583,6 +599,10 @@
     {
       "name": "cyl_l10n_2f728e190695",
       "value": "Mostra altre pagine nelle schede ai due lati (issue #481); tocca di nuovo per ripristinare"
+    },
+    {
+      "name": "cyl_l10n_bed9ec1e8448",
+      "value": "Scatta una foto"
     },
     {
       "name": "cyl_l10n_0be5a194844c",
@@ -659,6 +679,10 @@
     {
       "name": "cyl_l10n_0787cd518387",
       "value": "Simula avviso di memoria"
+    },
+    {
+      "name": "cyl_l10n_d76904d0e7ee",
+      "value": "Ogni scena è una tab bar creata con l’API pubblica: stili, animazioni, avvisi, Lottie e le nuove API delle tab"
     },
     {
       "name": "cyl_l10n_6a00c1ae99fa",

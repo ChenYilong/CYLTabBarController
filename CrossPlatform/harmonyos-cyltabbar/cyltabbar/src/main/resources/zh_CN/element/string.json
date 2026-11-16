@@ -337,6 +337,10 @@
       "value": "Tab：%@"
     },
     {
+      "name": "cyl_l10n_ab5745daa734",
+      "value": "TabBar 场景展示"
+    },
+    {
       "name": "cyl_l10n_75ccb7ef4864",
       "value": "TabBar 外观"
     },
@@ -449,6 +453,10 @@
       "value": "从小放大"
     },
     {
+      "name": "cyl_l10n_83c39abd16cd",
+      "value": "从相册选择"
+    },
+    {
       "name": "cyl_l10n_cc03f47a389c",
       "value": "从网络下载当前页 Tab 的图标（带缓存），再点恢复"
     },
@@ -495,6 +503,10 @@
     {
       "name": "cyl_l10n_c1ecedab11bc",
       "value": "原始"
+    },
+    {
+      "name": "cyl_l10n_83611abd5f80",
+      "value": "发布"
     },
     {
       "name": "cyl_l10n_625fb26b4b33",
@@ -565,6 +577,10 @@
       "value": "手动操作：点击开启滚动隐藏，向下滚动隐藏 TabBar 后按标题操作。预期：TabBar 立即恢复显示。"
     },
     {
+      "name": "cyl_l10n_89246468f7fd",
+      "value": "打开 TabBar 场景展示"
+    },
+    {
       "name": "cyl_l10n_a01539048bb0",
       "value": "打开开关后长按任意 Tab 或加号按钮，会弹出该按钮的标识。"
     },
@@ -583,6 +599,10 @@
     {
       "name": "cyl_l10n_2f728e190695",
       "value": "把当前 Tab 两侧的 Tab 换成其他页面（issue #481），再点恢复"
+    },
+    {
+      "name": "cyl_l10n_bed9ec1e8448",
+      "value": "拍照"
     },
     {
       "name": "cyl_l10n_0be5a194844c",
@@ -659,6 +679,10 @@
     {
       "name": "cyl_l10n_0787cd518387",
       "value": "模拟内存警告"
+    },
+    {
+      "name": "cyl_l10n_d76904d0e7ee",
+      "value": "每个场景都是用公开 API 构建的 TabBar：样式、动画、提醒、Lottie 以及较新的 Tab API"
     },
     {
       "name": "cyl_l10n_6a00c1ae99fa",

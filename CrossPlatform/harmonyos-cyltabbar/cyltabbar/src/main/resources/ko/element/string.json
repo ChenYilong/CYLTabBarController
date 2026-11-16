@@ -337,6 +337,10 @@
       "value": "탭: %@"
     },
     {
+      "name": "cyl_l10n_ab5745daa734",
+      "value": "TabBar 갤러리"
+    },
+    {
       "name": "cyl_l10n_75ccb7ef4864",
       "value": "탭 바 모양"
     },
@@ -449,6 +453,10 @@
       "value": "확대"
     },
     {
+      "name": "cyl_l10n_83c39abd16cd",
+      "value": "앨범에서 선택"
+    },
+    {
       "name": "cyl_l10n_cc03f47a389c",
       "value": "이 페이지 탭의 아이콘을 네트워크에서 다운로드(캐시됨). 다시 탭하면 복원"
     },
@@ -495,6 +503,10 @@
     {
       "name": "cyl_l10n_c1ecedab11bc",
       "value": "원본"
+    },
+    {
+      "name": "cyl_l10n_83611abd5f80",
+      "value": "게시"
     },
     {
       "name": "cyl_l10n_625fb26b4b33",
@@ -565,6 +577,10 @@
       "value": "수동: 탭하여 스크롤 시 숨기기를 켜고, 아래로 스크롤해 TabBar를 숨긴 뒤 제목대로 조작하세요. 예상: TabBar가 즉시 다시 표시됩니다."
     },
     {
+      "name": "cyl_l10n_89246468f7fd",
+      "value": "TabBar 갤러리 열기"
+    },
+    {
       "name": "cyl_l10n_a01539048bb0",
       "value": "스위치를 켠 후 탭이나 플러스 버튼을 길게 누르면 해당 식별자가 표시됩니다."
     },
@@ -583,6 +599,10 @@
     {
       "name": "cyl_l10n_2f728e190695",
       "value": "이 탭 양쪽의 탭을 다른 페이지로 바꿉니다(issue #481). 다시 탭하면 원래대로 돌아갑니다"
+    },
+    {
+      "name": "cyl_l10n_bed9ec1e8448",
+      "value": "사진 찍기"
     },
     {
       "name": "cyl_l10n_0be5a194844c",
@@ -659,6 +679,10 @@
     {
       "name": "cyl_l10n_0787cd518387",
       "value": "메모리 경고 시뮬레이션"
+    },
+    {
+      "name": "cyl_l10n_d76904d0e7ee",
+      "value": "모든 장면은 공개 API로 만든 TabBar입니다: 스타일, 애니메이션, 알림, Lottie, 새로운 Tab API"
     },
     {
       "name": "cyl_l10n_6a00c1ae99fa",

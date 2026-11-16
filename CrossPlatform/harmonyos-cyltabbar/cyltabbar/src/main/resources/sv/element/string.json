@@ -337,6 +337,10 @@
       "value": "Flik: %@"
     },
     {
+      "name": "cyl_l10n_ab5745daa734",
+      "value": "Flikfältsgalleri"
+    },
+    {
       "name": "cyl_l10n_75ccb7ef4864",
       "value": "Flikfältets utseende"
     },
@@ -449,6 +453,10 @@
       "value": "Zooma in"
     },
     {
+      "name": "cyl_l10n_83c39abd16cd",
+      "value": "Välj från album"
+    },
+    {
       "name": "cyl_l10n_cc03f47a389c",
       "value": "Hämtar fliksymbolen från nätet (cachad); tryck igen för att återställa"
     },
@@ -495,6 +503,10 @@
     {
       "name": "cyl_l10n_c1ecedab11bc",
       "value": "Original"
+    },
+    {
+      "name": "cyl_l10n_83611abd5f80",
+      "value": "Publicera"
     },
     {
       "name": "cyl_l10n_625fb26b4b33",
@@ -565,6 +577,10 @@
       "value": "Manuellt: tryck för att slå på dölj vid rullning, rulla nedåt för att dölja TabBar och gör sedan det titeln säger. Förväntat: TabBar kommer tillbaka direkt."
     },
     {
+      "name": "cyl_l10n_89246468f7fd",
+      "value": "Öppna flikfältsgalleriet"
+    },
+    {
       "name": "cyl_l10n_a01539048bb0",
       "value": "Slå på reglaget och håll ned en flik eller PlusButton för att se dess identifierare."
     },
@@ -583,6 +599,10 @@
     {
       "name": "cyl_l10n_2f728e190695",
       "value": "Visar andra sidor i flikarna på båda sidor om denna flik (issue #481); tryck igen för att återställa"
+    },
+    {
+      "name": "cyl_l10n_bed9ec1e8448",
+      "value": "Ta en bild"
     },
     {
       "name": "cyl_l10n_0be5a194844c",
@@ -659,6 +679,10 @@
     {
       "name": "cyl_l10n_0787cd518387",
       "value": "Simulera minnesvarning"
+    },
+    {
+      "name": "cyl_l10n_d76904d0e7ee",
+      "value": "Varje scen är ett flikfält byggt med det publika API:t: stilar, animationer, påminnelser, Lottie och de nyare flik-API:erna"
     },
     {
       "name": "cyl_l10n_6a00c1ae99fa",

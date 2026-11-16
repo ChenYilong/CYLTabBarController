@@ -337,6 +337,10 @@
       "value": "Tab：%@"
     },
     {
+      "name": "cyl_l10n_ab5745daa734",
+      "value": "TabBar 場景展示"
+    },
+    {
       "name": "cyl_l10n_75ccb7ef4864",
       "value": "TabBar 外觀"
     },
@@ -449,6 +453,10 @@
       "value": "從小放大"
     },
     {
+      "name": "cyl_l10n_83c39abd16cd",
+      "value": "從相簿選擇"
+    },
+    {
       "name": "cyl_l10n_cc03f47a389c",
       "value": "從網路下載目前頁面 Tab 的圖示（有快取），再點一次還原"
     },
@@ -495,6 +503,10 @@
     {
       "name": "cyl_l10n_c1ecedab11bc",
       "value": "原始"
+    },
+    {
+      "name": "cyl_l10n_83611abd5f80",
+      "value": "發佈"
     },
     {
       "name": "cyl_l10n_625fb26b4b33",
@@ -565,6 +577,10 @@
       "value": "手動操作：點擊開啟捲動隱藏，向下捲動隱藏 TabBar 後依標題操作。預期：TabBar 立即恢復顯示。"
     },
     {
+      "name": "cyl_l10n_89246468f7fd",
+      "value": "打開 TabBar 場景展示"
+    },
+    {
       "name": "cyl_l10n_a01539048bb0",
       "value": "打開開關後長按任意 Tab 或加號按鈕，會顯示該按鈕的識別碼。"
     },
@@ -583,6 +599,10 @@
     {
       "name": "cyl_l10n_2f728e190695",
       "value": "把目前 Tab 兩側的 Tab 換成其他頁面（issue #481），再點恢復"
+    },
+    {
+      "name": "cyl_l10n_bed9ec1e8448",
+      "value": "拍照"
     },
     {
       "name": "cyl_l10n_0be5a194844c",
@@ -659,6 +679,10 @@
     {
       "name": "cyl_l10n_0787cd518387",
       "value": "模擬記憶體警告"
+    },
+    {
+      "name": "cyl_l10n_d76904d0e7ee",
+      "value": "每個場景都是用公開 API 建立的 TabBar：樣式、動畫、提醒、Lottie 以及較新的 Tab API"
     },
     {
       "name": "cyl_l10n_6a00c1ae99fa",

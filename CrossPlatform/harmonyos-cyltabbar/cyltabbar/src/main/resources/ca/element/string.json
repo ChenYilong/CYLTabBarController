@@ -337,6 +337,10 @@
       "value": "Pestanya: %@"
     },
     {
+      "name": "cyl_l10n_ab5745daa734",
+      "value": "Galeria de barres de pestanyes"
+    },
+    {
       "name": "cyl_l10n_75ccb7ef4864",
       "value": "Aparença de la barra"
     },
@@ -449,6 +453,10 @@
       "value": "Apropa"
     },
     {
+      "name": "cyl_l10n_83c39abd16cd",
+      "value": "Tria de l’àlbum"
+    },
+    {
       "name": "cyl_l10n_cc03f47a389c",
       "value": "Baixa la icona de la pestanya de la xarxa (en memòria cau); toca de nou per restaurar"
     },
@@ -495,6 +503,10 @@
     {
       "name": "cyl_l10n_c1ecedab11bc",
       "value": "Original"
+    },
+    {
+      "name": "cyl_l10n_83611abd5f80",
+      "value": "Publica"
     },
     {
       "name": "cyl_l10n_625fb26b4b33",
@@ -565,6 +577,10 @@
       "value": "Manual: toca per activar l'amagat en desplaçar, desplaça't cap avall per amagar la TabBar i fes el que diu el títol. Esperat: la TabBar torna de seguida."
     },
     {
+      "name": "cyl_l10n_89246468f7fd",
+      "value": "Obre la galeria de barres de pestanyes"
+    },
+    {
       "name": "cyl_l10n_a01539048bb0",
       "value": "Activa l'interruptor i mantén premuda qualsevol pestanya o el PlusButton per veure'n l'identificador."
     },
@@ -583,6 +599,10 @@
     {
       "name": "cyl_l10n_2f728e190695",
       "value": "Mostra altres pàgines a les pestanyes de tots dos costats (issue #481); toca de nou per restaurar"
+    },
+    {
+      "name": "cyl_l10n_bed9ec1e8448",
+      "value": "Fes una foto"
     },
     {
       "name": "cyl_l10n_0be5a194844c",
@@ -659,6 +679,10 @@
     {
       "name": "cyl_l10n_0787cd518387",
       "value": "Simula un avís de memòria"
+    },
+    {
+      "name": "cyl_l10n_d76904d0e7ee",
+      "value": "Cada escena és una barra de pestanyes feta amb l’API pública: estils, animacions, avisos, Lottie i les API de pestanyes més noves"
     },
     {
       "name": "cyl_l10n_6a00c1ae99fa",

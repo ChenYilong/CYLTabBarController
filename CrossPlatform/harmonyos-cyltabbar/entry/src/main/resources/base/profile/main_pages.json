@@ -6,6 +6,8 @@
     "pages/SystemTabs",
     "pages/AnotherTabBar",
     "pages/PopPushDemo",
-    "pages/ConfigurationFailures"
+    "pages/ConfigurationFailures",
+    "pages/Gallery",
+    "pages/GalleryScene"
   ]
 }
