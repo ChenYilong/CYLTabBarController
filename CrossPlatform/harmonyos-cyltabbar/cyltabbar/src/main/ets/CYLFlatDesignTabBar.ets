@@ -1,3 +1,6 @@
+import { CYLTabBarItemAttributes, CYLTitleOffset } from './CYLTabBarItem';
+import { CYLPlusButton } from './CYLPlusButton';
+
 /**
  * [EN] The tab bar styles (iOS `CYLTabBarStyleType`, CYLConstants.h) and the FlatDesign look (iOS `CYLFlatDesignTabBar`,
  *      Android `CYLFlatDesignTabBarStyle`): a strong blur of the pages behind the bar under a near-opaque system background
@@ -45,14 +48,31 @@ export const CYLFlatDesignUnselectedColor: ResourceColor = '#8E8E93';
  */
 export class CYLFlatDesignTabBarModifier implements AttributeModifier<RowAttribute> {
   barTintColor: ResourceColor | undefined;
+  backgroundImage: ResourceStr | undefined;
 
-  constructor(barTintColor: ResourceColor | undefined) {
+  constructor(barTintColor: ResourceColor | undefined, backgroundImage?: ResourceStr) {
     this.barTintColor = barTintColor;
+    this.backgroundImage = backgroundImage;
   }
 
   applyNormalAttribute(instance: RowAttribute): void {
+    // [EN] `backgroundImage` replaces the blur and is tiled to fit (iOS). [CN] `backgroundImage` 代替模糊并平铺（与 iOS 相同）。
+    if (this.backgroundImage !== undefined) {
+      instance.backgroundImage(this.backgroundImage, ImageRepeat.XY);
+      instance.backgroundColor(this.barTintColor ?? Color.Transparent);
+      return;
+    }
+    // [EN] A tint (a skin's bar color) is drawn as is: the light `COMPONENT_THICK` material would wash a dark tint out and
+    //      leave the bar a different color from the strip under the gesture bar. Without one, the blur and the
+    //      near-opaque system background (`UIBlurEffectStyleProminent`).
+    // [CN] 有着色（皮肤的 TabBar 颜色）时直接绘制：浅色的 `COMPONENT_THICK` 材质会冲淡深色着色，使 TabBar 与手势条下方区域颜色不一致。
+    //      没有着色时使用模糊与接近不透明的系统背景（`UIBlurEffectStyleProminent`）。
+    if (this.barTintColor !== undefined) {
+      instance.backgroundColor(this.barTintColor);
+      return;
+    }
     instance.backgroundBlurStyle(BlurStyle.COMPONENT_THICK);
-    instance.backgroundColor(this.barTintColor ?? '#BFF9F9F9');
+    instance.backgroundColor('#BFF9F9F9');
   }
 }
 
@@ -84,9 +104,9 @@ export class CYLLiquidGlassTabBarModifier implements AttributeModifier<RowAttrib
   applyNormalAttribute(instance: RowAttribute): void {
     instance.backgroundBlurStyle(BlurStyle.Thin);
     instance.backgroundColor(this.barTintColor ?? '#66FFFFFF');
-    instance.width('92%');
+    // [EN] The insets (16 vp at the sides, 8 vp above the gesture bar) come from the controller's bar container.
+    // [CN] 边距（两侧 16 vp，距手势条 8 vp）由控制器的 TabBar 容器提供。
     instance.borderRadius(this.height / 2);
-    instance.margin({ bottom: 8 });
     instance.border({ width: 0.5, color: '#80FFFFFF' });
     instance.shadow({ radius: 16, color: '#26000000', offsetY: 4 });
     instance.clip(false);
@@ -112,4 +132,48 @@ export function cyl_tabBarStyleModifier(style: CYLTabBarStyleType, barTintColor?
     return new CYLLiquidGlassTabBarModifier(barTintColor, height);
   }
   return style === CYLTabBarStyleType.FlatDesign ? new CYLFlatDesignTabBarModifier(barTintColor) : new CYLDefaultTabBarModifier();
+}
+
+/**
+ * [EN] `CYLFlatDesignTabBarItem`: on HarmonyOS a tab item is its attributes, the same type for every style (Android
+ *      `typealias CYLFlatDesignTabBarItem = CYLTabBarItem`). [CN] 鸿蒙上 Tab item 即其属性，各样式共用同一类型（与 Android 的 typealias 相同）。
+ */
+export type CYLFlatDesignTabBarItem = CYLTabBarItemAttributes;
+
+/**
+ * [EN] `-[CYLFlatDesignTabBarItem initWithTitle:image:]` and `-initWithTitle:image:selectedImage:`: the attributes of a
+ *      tab with a title and images; `selectedImage` defaults to `image`.
+ * [CN] 带标题与图片的 Tab 属性；`selectedImage` 默认为 `image`。
+ */
+export function cyl_flatDesignTabBarItem(title: ResourceStr | undefined, image: ResourceStr | undefined,
+  selectedImage?: ResourceStr): CYLFlatDesignTabBarItem {
+  const item: CYLFlatDesignTabBarItem = { title: title, image: image, selectedImage: selectedImage ?? image };
+  return item;
+}
+
+/**
+ * [EN] `-initWithTitle:image:selectedImage:index:titlePositionAdjustment:imagePositionAdjustment:…`: as above, with the
+ *      title offset; the index is the item's position in `tabBarItemsAttributes`.
+ * [CN] 同上并带标题偏移；index 即该 item 在 `tabBarItemsAttributes` 中的位置。
+ */
+export function cyl_flatDesignTabBarItemWithOffset(title: ResourceStr | undefined, image: ResourceStr | undefined,
+  selectedImage: ResourceStr | undefined, titlePositionAdjustment: CYLTitleOffset): CYLFlatDesignTabBarItem {
+  const item: CYLFlatDesignTabBarItem = cyl_flatDesignTabBarItem(title, image, selectedImage);
+  item.titlePositionAdjustment = titlePositionAdjustment;
+  return item;
+}
+
+/**
+ * [EN] `-[CYLFlatDesignTabBar hasPlusButton]`: whether the tab bar shows a plus button. [CN] TabBar 是否显示加号按钮。
+ */
+export function cyl_flatDesignHasPlusButton(plusButton: CYLPlusButton | undefined): boolean {
+  return plusButton !== undefined;
+}
+
+/**
+ * [EN] `-[CYLFlatDesignTabBar hasPlusChildViewController]`: whether the plus button selects a page of its own
+ *      (`CYLPlusButton.selectable`). [CN] 加号按钮是否选中自己的页面（`CYLPlusButton.selectable`）。
+ */
+export function cyl_flatDesignHasPlusChildViewController(plusButton: CYLPlusButton | undefined): boolean {
+  return plusButton?.selectable === true;
 }

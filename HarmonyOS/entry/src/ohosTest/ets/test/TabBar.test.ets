@@ -15,16 +15,16 @@ export default function tabBarTest() {
       await delegator.startAbility(want);
       const driver = Driver.create();
       await driver.delayMs(1500);
-      const messages = await driver.findComponent(ON.id('CYLTabBarItem_messages'));
-      expect(messages !== null).assertTrue();
-      await messages.click();
-      await driver.delayMs(500);
-      expect(await messages.isSelected()).assertTrue();
-      await driver.assertComponentExist(ON.id('CYLDemoPage_messages'));
-      const me = await driver.findComponent(ON.id('CYLTabBarItem_me'));
-      await me.click();
-      await driver.delayMs(500);
-      expect(await me.isSelected()).assertTrue();
+      // [EN] Each tab is found again after a tap: the UI may have changed. [CN] 每次点击后重新查找 Tab：界面可能已变化。
+      for (const identifier of ['messages', 'me', 'nearby', 'home']) {
+        const tab = await driver.findComponent(ON.id(`CYLTabBarItem_${identifier}`));
+        expect(tab !== null).assertTrue();
+        await tab.click();
+        await driver.delayMs(800);
+        const selected = await driver.findComponent(ON.id(`CYLTabBarItem_${identifier}`));
+        expect(await selected.isSelected()).assertTrue();
+        await driver.assertComponentExist(ON.id(`CYLDemoPage_${identifier}`));
+      }
       await driver.assertComponentExist(ON.id('CYLPlusButton'));
     });
   });
