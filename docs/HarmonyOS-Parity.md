@@ -39,7 +39,7 @@
 | 鸿蒙系统版本：HarmonyOS 6.0.1 (API 21, SDK 6.0.1.112 Release), DevEco Studio 6.0 (DS-243.24978.46.36.601251), ArkTS / ArkUI, Stage model | HarmonyOS version: HarmonyOS 6.0.1 (API 21, SDK 6.0.1.112 Release), DevEco Studio 6.0 (DS-243.24978.46.36.601251), ArkTS / ArkUI, Stage model |
 | 原则：API 对标 iOS 端；example 对标 iOS 端 Objective-C Example，一比一复刻；内部实现对标 Android 端 Kotlin 源码（`Example-Android/cyltabbar`）迁移到鸿蒙。 | Principles: the API matches iOS; the example is a one-to-one replica of the iOS Objective-C Example; the internals are ported from the Android Kotlin sources (`Example-Android/cyltabbar`). |
 | 表 1：iOS 库的全部公开 API；表 2：iOS Objective-C Example 的全部演示（[ObjC-Example-Parity](ObjC-Example-Parity/README.md)）。第二列为鸿蒙对应实现，默认 TODO；每完成一个功能，在 `scripts/harmonyos-api-map.json`（API）或 `scripts/harmonyos-parity.json`（演示）写入实现并运行 `python3 scripts/harmonyos-parity.py`，移除一个 TODO。 | Table 1: every public API of the iOS library; table 2: every demo of the iOS Objective-C Example ([ObjC-Example-Parity](ObjC-Example-Parity/README.md)). The second column is the HarmonyOS implementation, TODO by default; for each feature done, write it into `scripts/harmonyos-api-map.json` (APIs) or `scripts/harmonyos-parity.json` (demos) and run `python3 scripts/harmonyos-parity.py`, removing one TODO. |
-| **完成率（两表合并）：16 / 100**：API 193 / 1418，演示 53 / 56；没有 TODO 即 100。 | **Score (both tables): 16 / 100**: APIs 193 / 1418, demos 53 / 56; no TODO left is 100. |
+| **完成率（两表合并）：18 / 100**：API 217 / 1418，演示 53 / 56；没有 TODO 即 100。 | **Score (both tables): 18 / 100**: APIs 217 / 1418, demos 53 / 56; no TODO left is 100. |
 | **验证率：0 / 100**：已验证或不适用 0 / 1474。 | **Verified rate: 0 / 100**: verified or not applicable 0 / 1474. |
 | **满分标准（100 分）**：表 1 与表 2 没有 TODO，且每行第二列只能是以下三种状态之一；`--check` 拒绝不带状态的行。 | **Full-score criteria (100)**: no TODO in tables 1 and 2, and every row second column has one of the three statuses below; `--check` rejects a row without one. |
 | 1. 已编译：`<鸿蒙 API / 文件>` + `(built; emulator check pending / 已编译，模拟器验证待做)`。条件：实现在 `cyltabbar`（库）或 `entry`（演示）中，`scripts/harmonyos-build.sh` 构建成功（`BUILD SUCCESSFUL`），演示可从 entry 的界面进入。计入完成率。 | 1. Built: `<HarmonyOS API / file>` + `(built; emulator check pending / 已编译，模拟器验证待做)`. Requires: implemented in `cyltabbar` (library) or `entry` (demo), `scripts/harmonyos-build.sh` succeeds (`BUILD SUCCESSFUL`), and a demo can be reached from the entry UI. Counts toward the score. |
@@ -282,37 +282,37 @@
 
 | iOS 公开 API / iOS public API | 鸿蒙对应实现 / HarmonyOS implementation | 接口注释 / Comment |
 |:---|:---|:---|
-| `CYLFlatDesignTabBarDelegate` | TODO: N/A on HarmonyOS: FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component | — |
-| `CYLFlatDesignTabBarDelegate -tabBar:didSelectItem:` | TODO: N/A on HarmonyOS: FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component | — |
-| `CYLFlatDesignTabBar` | TODO | Called when the user taps an item (not when selection changes in code). |
-| `CYLFlatDesignTabBar delegate` | TODO: N/A on HarmonyOS: FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component | — |
-| `CYLFlatDesignTabBar items` | TODO | — |
-| `CYLFlatDesignTabBar tabBarItems` | TODO | tabBarItems is same as items， 作用是兼容CYLTabBar，实际效果以items为准。 |
-| `CYLFlatDesignTabBar -addItemWithTitle:tabBarItemImage:tabBarItemSelectedImage:index:titlePositionAdjustment:imageInsets:lottieFilePath:lottieSizeValue:` | TODO: N/A on HarmonyOS: FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component | — |
-| `CYLFlatDesignTabBar selectedItem` | TODO: N/A on HarmonyOS: FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component | — |
-| `CYLFlatDesignTabBar selectedIndex` | TODO | — |
-| `CYLFlatDesignTabBar tabBarButtons` | TODO | — |
+| `CYLFlatDesignTabBarDelegate` | `CYLTabBarController.didSelect` / `didSelectControl` callbacks (built; emulator check pending / 已编译，模拟器验证待做) | — |
+| `CYLFlatDesignTabBarDelegate -tabBar:didSelectItem:` | `CYLTabBarController.didSelect(index, identifier)` (built; emulator check pending / 已编译，模拟器验证待做) | — |
+| `CYLFlatDesignTabBar` | `CYLTabBarController` with `tabBarStyleType: CYLTabBarStyleType.FlatDesign` (`CYLFlatDesignTabBarModifier`) (built; emulator check pending / 已编译，模拟器验证待做) | Called when the user taps an item (not when selection changes in code). |
+| `CYLFlatDesignTabBar delegate` | `CYLTabBarController.didSelect` / `didSelectControl` callbacks (built; emulator check pending / 已编译，模拟器验证待做) | — |
+| `CYLFlatDesignTabBar items` | `CYLTabBarController.tabBarItemsAttributes` (`CYLFlatDesignTabBarItem[]`) (built; emulator check pending / 已编译，模拟器验证待做) | — |
+| `CYLFlatDesignTabBar tabBarItems` | `CYLTabBarController.tabBarItemsAttributes` (same as items) (built; emulator check pending / 已编译，模拟器验证待做) | tabBarItems is same as items， 作用是兼容CYLTabBar，实际效果以items为准。 |
+| `CYLFlatDesignTabBar -addItemWithTitle:tabBarItemImage:tabBarItemSelectedImage:index:titlePositionAdjustment:imageInsets:lottieFilePath:lottieSizeValue:` | TODO: N/A on HarmonyOS: ArkUI is declarative: the tab bar is built from state (tabBarItemsAttributes, selectedIndex, badges), so there is no button or label object to hold or add to. | — |
+| `CYLFlatDesignTabBar selectedItem` | `tabBarItemsAttributes[selectedIndex]` (built; emulator check pending / 已编译，模拟器验证待做) | — |
+| `CYLFlatDesignTabBar selectedIndex` | `CYLTabBarController.selectedIndex` (@Link) (built; emulator check pending / 已编译，模拟器验证待做) | — |
+| `CYLFlatDesignTabBar tabBarButtons` | TODO: N/A on HarmonyOS: ArkUI is declarative: the tab bar is built from state (tabBarItemsAttributes, selectedIndex, badges), so there is no button or label object to hold or add to. | — |
 | `CYLFlatDesignTabBar 0` | TODO: N/A on HarmonyOS: FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component | The `UITabBarAppearance` of the flat design tab bar, like `-[UITabBar standardAppearance]`: one appearance object styles the system tab bar (Liquid Glass and the classic style) and this tab bar alike. Nil (the default) keeps the flat design look and the properties below. `CYLTabBarController` assigns `tabBarController.tabBar.standardAppearance` here when the app has set one, so setting the system tab bar's appearance is enough; assigning this property directly also works. When the selected item has its own `-[CYLFlatDesignTabBarItem standardAppearance]`, the whole bar uses that one while it is selected, as `UITabBar` does. Mapping (UITabBarAppearance → flat design tab bar): backgroundEffect → the background blur (nil: no blur) backgroundColor → the background color backgroundImage → the background image backgroundImageContentMode → the background image's content mode shadowImage → the top shadow line (its own height; tinted by shadowColor if template) shadowColor → a hairline at the top when there is no shadowImage (nil/clear: none) selectionIndicatorImage → drawn behind the selected item selectionIndicatorTintColor → tints the selection indicator image stackedItemPositioning → .centered lays the items out centered; .fill / .automatic fill the width stackedItemWidth → the item width when centered (0: equal share of the width) stackedItemSpacing → the spacing between items when centered stackedLayoutAppearance.normal / .selected / .disabled (UITabBarItemStateAppearance): titleTextAttributes → title font, color and other attributes (they override the item's own) titlePositionAdjustment → the title offset when the item has none (`CYLTabBarController.titlePositionAdjustment` wins, as on the system tab bar) iconColor → the icon tint color (template images) badgeBackgroundColor → the badge background color badgeTextAttributes → the badge font and text color badgePositionAdjustment → the badge center offset Not mapped: inline/compact inline layouts (the flat design bar is always stacked), scroll edge appearances, `badgeTitlePositionAdjustment` and the focused state. Badge values a state does not customize (equal to a new `UITabBarAppearance`) leave the badge's own settings and `CYLBadgeAppearance` in place. |
 | `CYLFlatDesignTabBar tintColor` | `CYLTabBarController.tintColor`; FlatDesign default `CYLFlatDesignTintColor` #007AFF (built; emulator check pending / 已编译，模拟器验证待做) | — |
 | `CYLFlatDesignTabBar barTintColor` | `CYLTabBarController.barTintColor` (over the FlatDesign blur) (built; emulator check pending / 已编译，模拟器验证待做) | default is nil |
-| `CYLFlatDesignTabBar backgroundImage` | TODO | The background image will be tiled to fit, even if it was not created via the UIImage resizableImage methods. |
+| `CYLFlatDesignTabBar backgroundImage` | TODO: partial: `CYLFlatDesignTabBarModifier(barTintColor, backgroundImage)` draws it tiled in place of the blur; the controller property is not wired yet (CYLTabBarController.ets is being changed by the SVGA work). | The background image will be tiled to fit, even if it was not created via the UIImage resizableImage methods. |
 | `CYLFlatDesignTabBar shadowImage` | TODO | Default is nil. When non-nil, a custom shadow image to show instead of the default shadow image. For a custom shadow to be shown, a custom background image must also be set with -setBackgroundImage: (if the default background image is used, the default shadow image will be used). |
 | `CYLFlatDesignTabBar useLayoutSafeAreaInsets` | TODO | Whether the buttons stay clear of the left/right safe area (e.g. a landscape notch). The background always spans the full width. The one-sided inset of a vertical status bar (the folded iPhone Duo's right-hand status column) is controlled separately by `respectsVerticalStatusBarSafeArea` (ignored by default). |
-| `CYLFlatDesignTabBar respectsVerticalStatusBarSafeArea` | TODO | Default is NO. Whether the buttons also stay clear of the inset that a vertical status bar adds on one side, e.g. the 84 pt column on the right of the folded iPhone Duo held upright (iOS 27.1 SDK), where the status bar (Wi-Fi, battery) moves to the trailing edge. NO: that one-sided inset is ignored, so the buttons span the full width and stay centered on screen; the last button can sit partly under the status column. YES: the buttons stay inside the safe area, so the row is shifted left by that column. A vertical status bar is told apart by its inset being on one side only; a landscape notch insets both sides and is still handled by `useLayoutSafeAreaInsets`. Has no effect when `useLayoutSafeAreaInsets` is NO. Only matters while the vertical bar is shown. This property does not switch the vertical bar on or off; that is `CYLTabBarController.allowsVerticalBar` (or a screen's own `preferredVerticalBarBehavior`). With the vertical bar off the status bar is horizontal, there is no one-sided inset, and both values give the same layout. |
-| `CYLFlatDesignTabBar context` | TODO | This can be left unset; the default is CYLTabBarController. If set, please implement the `+[CYLPlusButton tabBarContext]` method in CYLPlusButton and ensure consistency. If neither is implemented, the default is CYLTabBarController for both. |
-| `CYLFlatDesignTabBar -hasPlusButton` | TODO | — |
-| `CYLFlatDesignTabBar -hasPlusChildViewController` | TODO | — |
+| `CYLFlatDesignTabBar respectsVerticalStatusBarSafeArea` | TODO: N/A on HarmonyOS: HarmonyOS has no vertical status bar column beside the app (the iOS 84 pt side column); the status bar is always at the top. | Default is NO. Whether the buttons also stay clear of the inset that a vertical status bar adds on one side, e.g. the 84 pt column on the right of the folded iPhone Duo held upright (iOS 27.1 SDK), where the status bar (Wi-Fi, battery) moves to the trailing edge. NO: that one-sided inset is ignored, so the buttons span the full width and stay centered on screen; the last button can sit partly under the status column. YES: the buttons stay inside the safe area, so the row is shifted left by that column. A vertical status bar is told apart by its inset being on one side only; a landscape notch insets both sides and is still handled by `useLayoutSafeAreaInsets`. Has no effect when `useLayoutSafeAreaInsets` is NO. Only matters while the vertical bar is shown. This property does not switch the vertical bar on or off; that is `CYLTabBarController.allowsVerticalBar` (or a screen's own `preferredVerticalBarBehavior`). With the vertical bar off the status bar is horizontal, there is no one-sided inset, and both values give the same layout. |
+| `CYLFlatDesignTabBar context` | TODO: N/A on HarmonyOS: the plus button is passed to each CYLTabBarController (`plusButton`), so there is no global plus-button registry keyed by a context. | This can be left unset; the default is CYLTabBarController. If set, please implement the `+[CYLPlusButton tabBarContext]` method in CYLPlusButton and ensure consistency. If neither is implemented, the default is CYLTabBarController for both. |
+| `CYLFlatDesignTabBar -hasPlusButton` | `cyl_flatDesignHasPlusButton(plusButton)` (built; emulator check pending / 已编译，模拟器验证待做) | — |
+| `CYLFlatDesignTabBar -hasPlusChildViewController` | `cyl_flatDesignHasPlusChildViewController(plusButton)` (`CYLPlusButton.selectable`) (built; emulator check pending / 已编译，模拟器验证待做) | — |
 
 ### `CYLFlatDesignTabBar/CYLFlatDesignTabBar-ObjectiveC/CYLFlatDesignTabBar/CYLFlatDesignTabBarButton.h`
 
 | iOS 公开 API / iOS public API | 鸿蒙对应实现 / HarmonyOS implementation | 接口注释 / Comment |
 |:---|:---|:---|
-| `CYLFlatDesignTabBarButton` | TODO | — |
-| `CYLFlatDesignTabBarButton -initWithTabBarItem:` | TODO: N/A on HarmonyOS: FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component | — |
-| `CYLFlatDesignTabBarButton tabBarItem` | TODO | Creates a flat-design tab bar button for `tabBarItem` and links the item back to this button. |
-| `CYLFlatDesignTabBarButton imageView` | TODO | — |
-| `CYLFlatDesignTabBarButton titleLabel` | TODO | — |
-| `CYLFlatDesignTabBarButton -actualBadgeSuperView` | TODO | — |
+| `CYLFlatDesignTabBarButton` | TODO: N/A on HarmonyOS: ArkUI is declarative: the tab bar is built from state (tabBarItemsAttributes, selectedIndex, badges), so there is no button or label object to hold or add to. | — |
+| `CYLFlatDesignTabBarButton -initWithTabBarItem:` | TODO: N/A on HarmonyOS: ArkUI is declarative: the tab bar is built from state (tabBarItemsAttributes, selectedIndex, badges), so there is no button or label object to hold or add to. | — |
+| `CYLFlatDesignTabBarButton tabBarItem` | TODO: N/A on HarmonyOS: ArkUI is declarative: the tab bar is built from state (tabBarItemsAttributes, selectedIndex, badges), so there is no button or label object to hold or add to. | Creates a flat-design tab bar button for `tabBarItem` and links the item back to this button. |
+| `CYLFlatDesignTabBarButton imageView` | TODO: N/A on HarmonyOS: ArkUI is declarative: the tab bar is built from state (tabBarItemsAttributes, selectedIndex, badges), so there is no button or label object to hold or add to. | — |
+| `CYLFlatDesignTabBarButton titleLabel` | TODO: N/A on HarmonyOS: ArkUI is declarative: the tab bar is built from state (tabBarItemsAttributes, selectedIndex, badges), so there is no button or label object to hold or add to. | — |
+| `CYLFlatDesignTabBarButton -actualBadgeSuperView` | TODO: N/A on HarmonyOS: ArkUI is declarative: the tab bar is built from state (tabBarItemsAttributes, selectedIndex, badges), so there is no button or label object to hold or add to. | — |
 
 ### `CYLFlatDesignTabBar/CYLFlatDesignTabBar-ObjectiveC/CYLFlatDesignTabBar/CYLFlatDesignTabBarHideTabBar.h`
 
@@ -324,22 +324,22 @@
 
 | iOS 公开 API / iOS public API | 鸿蒙对应实现 / HarmonyOS implementation | 接口注释 / Comment |
 |:---|:---|:---|
-| `CYLFlatDesignTabBarItemDidChange` | TODO: N/A on HarmonyOS: FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component | Posted with the item as its object whenever a shown value of a `CYLFlatDesignTabBarItem` changes. |
-| `CYLFlatDesignTabBarItem` | TODO | Posted with the item as its object whenever a shown value of a `CYLFlatDesignTabBarItem` changes. |
-| `CYLFlatDesignTabBarItem -initWithTitle:image:` | TODO: N/A on HarmonyOS: FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component | — |
-| `CYLFlatDesignTabBarItem -initWithTitle:image:selectedImage:` | TODO: N/A on HarmonyOS: FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component | — |
+| `CYLFlatDesignTabBarItemDidChange` | TODO: N/A on HarmonyOS: ArkUI state is reactive: changing an item's attributes redraws its tab, so no change notification is needed. | Posted with the item as its object whenever a shown value of a `CYLFlatDesignTabBarItem` changes. |
+| `CYLFlatDesignTabBarItem` | `CYLFlatDesignTabBarItem` (type alias of `CYLTabBarItemAttributes`) (built; emulator check pending / 已编译，模拟器验证待做) | Posted with the item as its object whenever a shown value of a `CYLFlatDesignTabBarItem` changes. |
+| `CYLFlatDesignTabBarItem -initWithTitle:image:` | `cyl_flatDesignTabBarItem(title, image)` (built; emulator check pending / 已编译，模拟器验证待做) | — |
+| `CYLFlatDesignTabBarItem -initWithTitle:image:selectedImage:` | `cyl_flatDesignTabBarItem(title, image, selectedImage)` (built; emulator check pending / 已编译，模拟器验证待做) | — |
 | `CYLFlatDesignTabBarItem -initWithTitle:image:selectedImage:index:titlePositionAdjustment:imagePositionAdjustment:imageInsets:lottieFilePath:lottieSizeValue:` | TODO: N/A on HarmonyOS: FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component | — |
-| `CYLFlatDesignTabBarItem tabBarButton` | TODO | — |
+| `CYLFlatDesignTabBarItem tabBarButton` | TODO: N/A on HarmonyOS: ArkUI is declarative: the tab bar is built from state (tabBarItemsAttributes, selectedIndex, badges), so there is no button or label object to hold or add to. | — |
 | `CYLFlatDesignTabBarItem enabled` | TODO | default is YES |
-| `CYLFlatDesignTabBarItem index` | TODO: N/A on HarmonyOS: FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component | — |
-| `CYLFlatDesignTabBarItem title` | TODO | Creates a flat-design tab bar item with a title and image. |
-| `CYLFlatDesignTabBarItem image` | TODO | — |
-| `CYLFlatDesignTabBarItem selectedImage` | TODO | — |
-| `CYLFlatDesignTabBarItem childViewController` | TODO: N/A on HarmonyOS: FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component | ⚠️ PATCH(aifirx): This used to be strong, which together with the associated object (RETAIN) of UIViewController.cyl_tabBarItem formed the retain cycle <ViewController> → <CYLFlatDesignTabBarItem> → <childViewController>, so tab child controllers were never released after being popped. Changed to weak. |
-| `CYLFlatDesignTabBarItem badgeValue` | TODO | default is nil; the badge is hidden when badgeValue is nil and badgeSize is CGSizeZero |
-| `CYLFlatDesignTabBarItem badgeColor` | TODO | — |
-| `CYLFlatDesignTabBarItem cylflatdesign_tabBarController` | TODO: N/A on HarmonyOS: FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component | — |
-| `CYLFlatDesignTabBarItem titlePositionAdjustment` | TODO | — |
+| `CYLFlatDesignTabBarItem index` | the item's position in `tabBarItemsAttributes` (built; emulator check pending / 已编译，模拟器验证待做) | — |
+| `CYLFlatDesignTabBarItem title` | `CYLFlatDesignTabBarItem.title` (built; emulator check pending / 已编译，模拟器验证待做) | Creates a flat-design tab bar item with a title and image. |
+| `CYLFlatDesignTabBarItem image` | `CYLFlatDesignTabBarItem.image` (built; emulator check pending / 已编译，模拟器验证待做) | — |
+| `CYLFlatDesignTabBarItem selectedImage` | `CYLFlatDesignTabBarItem.selectedImage` (built; emulator check pending / 已编译，模拟器验证待做) | — |
+| `CYLFlatDesignTabBarItem childViewController` | TODO: N/A on HarmonyOS: there are no view controllers; pages come from `pageBuilder(index, identifier)`. | ⚠️ PATCH(aifirx): This used to be strong, which together with the associated object (RETAIN) of UIViewController.cyl_tabBarItem formed the retain cycle <ViewController> → <CYLFlatDesignTabBarItem> → <childViewController>, so tab child controllers were never released after being popped. Changed to weak. |
+| `CYLFlatDesignTabBarItem badgeValue` | `CYLTabBarController.badges[index].cyl_showBadgeValue(value)` (`CYLBadge`) (built; emulator check pending / 已编译，模拟器验证待做) | default is nil; the badge is hidden when badgeValue is nil and badgeSize is CGSizeZero |
+| `CYLFlatDesignTabBarItem badgeColor` | `CYLTabBarController.badges[index].backgroundColor` (`CYLBadge`) (built; emulator check pending / 已编译，模拟器验证待做) | — |
+| `CYLFlatDesignTabBarItem cylflatdesign_tabBarController` | TODO: N/A on HarmonyOS: an item is a plain attributes object with no back reference; the controller owns the items. | — |
+| `CYLFlatDesignTabBarItem titlePositionAdjustment` | `CYLFlatDesignTabBarItem.titlePositionAdjustment` (built; emulator check pending / 已编译，模拟器验证待做) | — |
 | `CYLFlatDesignTabBarItem 0` | TODO: N/A on HarmonyOS: FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component | Like `-[UITabBarItem standardAppearance]`: while this item is selected, the whole flat design tab bar uses this appearance instead of `-[CYLFlatDesignTabBar standardAppearance]`. `CYLTabBarController` assigns the child view controller's `tabBarItem.standardAppearance` here when the app has set one. See `-[CYLFlatDesignTabBar standardAppearance]` for what is mapped. |
 | `CYLFlatDesignTabBarItem -setTitleTextAttributes:forState:` | TODO: N/A on HarmonyOS: FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component | — |
 | `CYLFlatDesignTabBarItem -titleTextAttributesForState:` | TODO: N/A on HarmonyOS: FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component | — |
@@ -350,13 +350,13 @@
 | `CYLFlatDesignTabBarItem badgePositionAdjustment` | TODO: N/A on HarmonyOS: FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component | — |
 | `CYLFlatDesignTabBarItem imagePositionAdjustment` | TODO | — |
 | `CYLFlatDesignTabBarItem layoutCentered` | TODO | Whether the title is centered when there is no image, or the image is centered when there is no title. Defaults to NO |
-| `CYLFlatDesignTabBarItem backgroundColor` | TODO | — |
-| `CYLFlatDesignTabBarItem selectedBackgroundColor` | TODO | — |
+| `CYLFlatDesignTabBarItem backgroundColor` | `CYLFlatDesignTabBarItem.backgroundColor` (built; emulator check pending / 已编译，模拟器验证待做) | — |
+| `CYLFlatDesignTabBarItem selectedBackgroundColor` | `CYLFlatDesignTabBarItem.selectedBackgroundColor` (built; emulator check pending / 已编译，模拟器验证待做) | — |
 | `CYLFlatDesignTabBarItem imageInsets` | TODO | — |
 | `CYLFlatDesignTabBarItem lottieURL` | TODO | — |
-| `CYLFlatDesignTabBarItem lottieFilePath` | TODO: N/A on HarmonyOS: FlatDesign is the iOS-only KVC tab bar; the HarmonyOS tab bar is one ArkUI component | — |
-| `CYLFlatDesignTabBarItem lottieSizeValue` | TODO | — |
-| `CYLFlatDesignTabBarItem -actualBadgeSuperView` | TODO | — |
+| `CYLFlatDesignTabBarItem lottieFilePath` | `CYLFlatDesignTabBarItem.lottieFilePath` (built; emulator check pending / 已编译，模拟器验证待做) | — |
+| `CYLFlatDesignTabBarItem lottieSizeValue` | `CYLFlatDesignTabBarItem.lottieSize` (built; emulator check pending / 已编译，模拟器验证待做) | — |
+| `CYLFlatDesignTabBarItem -actualBadgeSuperView` | TODO: N/A on HarmonyOS: ArkUI is declarative: the tab bar is built from state (tabBarItemsAttributes, selectedIndex, badges), so there is no button or label object to hold or add to. | — |
 
 ### `CYLFlatDesignTabBar/CYLFlatDesignTabBar-ObjectiveC/CYLFlatDesignTabBarPrivate/UINavigationController+CYLFlatDesignTabBarPrivate.h`
 
