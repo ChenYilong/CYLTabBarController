@@ -370,20 +370,20 @@
   },
   {
     "id": 42,
-    "status": "TODO",
+    "status": "DONE (harmonyos-verify-nav-title-mate70pro-api21.png: 首页 centred; Spanish moves aside, no overlap)",
     "scope": "CrossPlatform/harmonyos-cyltabbar (entry)",
     "title": "Home: the title is centred between the left buttons and 换肤, not on the screen",
     "evidence": "harmonyos-verify-l10n-mate70pro-api21.png (side effect of #41)",
     "cause": "iOS centres the title when it fits and only then moves it aside",
-    "fix": "Centre the title when it fits, else use the space between the buttons"
+    "fix": "The title gets extra padding on the narrow side so it is centred on the bar when equal margins leave at least 48 vp; otherwise it uses the space between the buttons and 换肤"
   },
   {
     "id": 43,
-    "status": "TODO",
+    "status": "DONE (matches iOS: not a bug)",
     "scope": "CrossPlatform/harmonyos-cyltabbar (entry)",
     "title": "Scroll simulation rows: \"Self-test: run every automatic simulation…\" and the kind labels (Restore, Keep, N/A, Manual, Self-test) are English in the Chinese UI",
     "evidence": "Emulator check 2026-11-16 (Home, scroll simulation section)",
-    "cause": "Literal strings in DemoScrollHide.ets and the Self-test toast in Index.ets",
-    "fix": "CYLLocalizedString + 33 languages"
+    "cause": "The simulation titles and kind labels are English on iOS too: the iOS core (CYLTabBarController/Swift/UIViewController+CYLScrollHideSimulation.swift) and Android (Example-Android/demokit DemoScrollHide.kt) use the same strings",
+    "fix": "No change, kept as on iOS and Android"
   }
 ]
