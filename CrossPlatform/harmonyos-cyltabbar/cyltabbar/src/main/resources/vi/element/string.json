@@ -113,6 +113,10 @@
       "value": "Giá trị tối đa tùy chỉnh (9)"
     },
     {
+      "name": "cyl_l10n_3924c958175e",
+      "value": "Chế độ tối"
+    },
+    {
       "name": "cyl_l10n_b9c74f4cd786",
       "value": "Làm mờ"
     },
@@ -151,6 +155,14 @@
     {
       "name": "cyl_l10n_d52d30723b2f",
       "value": "Trái sang phải một lần"
+    },
+    {
+      "name": "cyl_l10n_1aae3277f8d3",
+      "value": "Liquid Glass (tham chiếu)"
+    },
+    {
+      "name": "cyl_l10n_32f643a9aa26",
+      "value": "Liquid Glass: hiệu ứng trong suốt của dự án tham chiếu"
     },
     {
       "name": "cyl_l10n_f201a4158727",
@@ -305,6 +317,10 @@
       "value": "Phóng to thu nhỏ ×3"
     },
     {
+      "name": "cyl_l10n_13348442cc6a",
+      "value": "Tìm kiếm"
+    },
+    {
       "name": "cyl_l10n_9ae56cc36e81",
       "value": "Rung (liên tục)"
     },
@@ -419,6 +435,10 @@
     {
       "name": "cyl_l10n_f69c71bc581e",
       "value": "cyl_tabBarMinimizeBehavior = %@; nhấn để chọn, rồi cuộn danh sách này"
+    },
+    {
+      "name": "cyl_l10n_4abddd944c2e",
+      "value": "harmonyos-liquid-glass-tabbar: viên nang tab, quả cầu tìm kiếm và thanh nhạc trên nội dung nhiều màu; cuộn để thu nhỏ"
     },
     {
       "name": "cyl_l10n_f3f4ecf4a4a6",

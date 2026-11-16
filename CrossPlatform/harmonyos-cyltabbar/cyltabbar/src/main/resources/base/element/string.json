@@ -113,6 +113,10 @@
       "value": "Custom maximum (9)"
     },
     {
+      "name": "cyl_l10n_3924c958175e",
+      "value": "Dark mode"
+    },
+    {
       "name": "cyl_l10n_b9c74f4cd786",
       "value": "Dimmed"
     },
@@ -151,6 +155,14 @@
     {
       "name": "cyl_l10n_d52d30723b2f",
       "value": "Left to right once"
+    },
+    {
+      "name": "cyl_l10n_1aae3277f8d3",
+      "value": "Liquid Glass (reference)"
+    },
+    {
+      "name": "cyl_l10n_32f643a9aa26",
+      "value": "Liquid Glass: the see-through effect of the reference"
     },
     {
       "name": "cyl_l10n_f201a4158727",
@@ -305,6 +317,10 @@
       "value": "Scale ×3"
     },
     {
+      "name": "cyl_l10n_13348442cc6a",
+      "value": "Search"
+    },
+    {
       "name": "cyl_l10n_9ae56cc36e81",
       "value": "Shake (forever)"
     },
@@ -419,6 +435,10 @@
     {
       "name": "cyl_l10n_f69c71bc581e",
       "value": "cyl_tabBarMinimizeBehavior = %@; tap to choose, then scroll this list"
+    },
+    {
+      "name": "cyl_l10n_4abddd944c2e",
+      "value": "harmonyos-liquid-glass-tabbar: tab capsule, search ball and music bar over colorful content; scroll to minimize"
     },
     {
       "name": "cyl_l10n_f3f4ecf4a4a6",

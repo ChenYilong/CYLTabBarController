@@ -113,6 +113,10 @@
       "value": "Maksimum tersuai (9)"
     },
     {
+      "name": "cyl_l10n_3924c958175e",
+      "value": "Mod gelap"
+    },
+    {
       "name": "cyl_l10n_b9c74f4cd786",
       "value": "Dimalapkan"
     },
@@ -151,6 +155,14 @@
     {
       "name": "cyl_l10n_d52d30723b2f",
       "value": "Kiri ke kanan sekali"
+    },
+    {
+      "name": "cyl_l10n_1aae3277f8d3",
+      "value": "Liquid Glass (rujukan)"
+    },
+    {
+      "name": "cyl_l10n_32f643a9aa26",
+      "value": "Liquid Glass: kesan lut sinar projek rujukan"
     },
     {
       "name": "cyl_l10n_f201a4158727",
@@ -305,6 +317,10 @@
       "value": "Skala ×3"
     },
     {
+      "name": "cyl_l10n_13348442cc6a",
+      "value": "Cari"
+    },
+    {
       "name": "cyl_l10n_9ae56cc36e81",
       "value": "Goncang (berterusan)"
     },
@@ -419,6 +435,10 @@
     {
       "name": "cyl_l10n_f69c71bc581e",
       "value": "cyl_tabBarMinimizeBehavior = %@; ketik untuk memilih, kemudian tatal senarai ini"
+    },
+    {
+      "name": "cyl_l10n_4abddd944c2e",
+      "value": "harmonyos-liquid-glass-tabbar: kapsul tab, bola carian dan bar muzik di atas kandungan berwarna; tatal untuk mengecilkan"
     },
     {
       "name": "cyl_l10n_f3f4ecf4a4a6",

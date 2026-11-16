@@ -113,6 +113,10 @@
       "value": "Свой максимум (9)"
     },
     {
+      "name": "cyl_l10n_3924c958175e",
+      "value": "Тёмный режим"
+    },
+    {
       "name": "cyl_l10n_b9c74f4cd786",
       "value": "Приглушено"
     },
@@ -151,6 +155,14 @@
     {
       "name": "cyl_l10n_d52d30723b2f",
       "value": "Слева направо один раз"
+    },
+    {
+      "name": "cyl_l10n_1aae3277f8d3",
+      "value": "Liquid Glass (образец)"
+    },
+    {
+      "name": "cyl_l10n_32f643a9aa26",
+      "value": "Liquid Glass: эффект прозрачности образца"
     },
     {
       "name": "cyl_l10n_f201a4158727",
@@ -305,6 +317,10 @@
       "value": "Масштаб ×3"
     },
     {
+      "name": "cyl_l10n_13348442cc6a",
+      "value": "Поиск"
+    },
+    {
       "name": "cyl_l10n_9ae56cc36e81",
       "value": "Тряска (постоянно)"
     },
@@ -419,6 +435,10 @@
     {
       "name": "cyl_l10n_f69c71bc581e",
       "value": "cyl_tabBarMinimizeBehavior = %@; нажмите, чтобы выбрать, затем прокрутите список"
+    },
+    {
+      "name": "cyl_l10n_4abddd944c2e",
+      "value": "harmonyos-liquid-glass-tabbar: капсула вкладок, шар поиска и музыкальная панель поверх яркого контента; прокрутите, чтобы свернуть"
     },
     {
       "name": "cyl_l10n_f3f4ecf4a4a6",

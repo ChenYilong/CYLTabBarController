@@ -8,6 +8,7 @@
     "pages/PopPushDemo",
     "pages/ConfigurationFailures",
     "pages/Gallery",
-    "pages/GalleryScene"
+    "pages/GalleryScene",
+    "pages/LiquidGlassDock"
   ]
 }

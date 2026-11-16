@@ -12,7 +12,7 @@ import { DemoScrollKind, DemoScrollSimulation, DEMO_SCROLL_SIMULATIONS, demoScro
 import { cyl_restoreTabBar, CYLSetLocalizationLanguage, CYLLocalizationLanguage } from 'cyltabbar';
 import { DemoFlatDesignButton } from '../demo/DemoFlatDesign';
 import { DemoLiquidGlassButton } from '../demo/DemoLiquidGlass';
-import { CYLTabBarStyleType, CYLFlatDesignTintColor, CYLFlatDesignUnselectedColor, CYLLiquidGlassTintColor } from 'cyltabbar';
+import { CYLTabBarStyleType, CYLFlatDesignTintColor, CYLFlatDesignUnselectedColor, CYLLiquidGlassTintColor, CYLLiquidGlassSelectionColor } from 'cyltabbar';
 import {
   DemoRow, DemoSection, DEMO_APPEARANCES, DEMO_TITLE_OFFSETS, DEMO_HOME, DEMO_CITY, DEMO_MESSAGE, DEMO_ME,
   DEMO_LANGUAGES, DEMO_LANGUAGE_NAMES
@@ -163,55 +163,6 @@ struct Index {
         CYLThemeManagerCenter.defaultThemeManager.currentThemeIdentifier = names[value.index as number];
       },
     });
-  }
-
-  /** [EN] A skin color made translucent for the glass ('#RRGGBB' -> 70 % alpha). [CN] 把皮肤颜色变成半透明，用于玻璃。 */
-  private demoGlassTint(color: ResourceColor | undefined): ResourceColor | undefined {
-    if (typeof color === 'string' && /^#[0-9A-Fa-f]{6}$/.test(color as string)) {
-      return `#B3${(color as string).substring(1)}`;
-    }
-    return color;
-  }
-
-  @State demoPlaying: boolean = true;
-
-  /**
-   * [EN] The Liquid Glass accessory of the demo: cover, title, play / pause and next, as the reference's mini music bar.
-   * [CN] 示例的液态玻璃附属条：封面、标题、播放 / 暂停与下一首，与参考工程的迷你音乐条相同。
-   */
-  @Builder
-  demoMiniPlayer() {
-    Row({ space: 8 }) {
-      Image($r('app.media.home_select_cover'))
-        .width(26)
-        .height(26)
-        .borderRadius(5)
-      Column({ space: 1 }) {
-        Text(CYLLocalizedString('LiquidGlass'))
-          .fontSize(12)
-          .fontWeight(FontWeight.Medium)
-          .maxLines(1)
-        Text('CYLTabBarController')
-          .fontSize(10)
-          .opacity(0.7)
-          .maxLines(1)
-          .textOverflow({ overflow: TextOverflow.Ellipsis })
-      }
-      .layoutWeight(1)
-      .alignItems(HorizontalAlign.Start)
-      SymbolGlyph(this.demoPlaying ? $r('sys.symbol.pause') : $r('sys.symbol.play_fill'))
-        .fontSize(20)
-        .accessibilityText(this.demoPlaying ? CYLLocalizedString('Pause') : CYLLocalizedString('Play'))
-        .onClick(() => {
-          this.demoPlaying = !this.demoPlaying;
-        })
-      SymbolGlyph($r('sys.symbol.forward_end_fill'))
-        .fontSize(20)
-        .accessibilityText(CYLLocalizedString('Next track'))
-    }
-    .width('100%')
-    .height('100%')
-    .padding({ left: 8, right: 14 })
   }
 
   aboutToDisappear(): void {
@@ -392,9 +343,8 @@ struct Index {
 
   /** [EN] -updateTabBarItemAtIndex:attributes: for the background rows and the capsule theme. [CN] 更新各 Tab 的背景属性。 */
   private applyItemBackgrounds(): void {
-    // [EN] Liquid Glass draws its own lens behind the selected tab (CYLLiquidGlass.ets), so no default capsule color here.
-    // [CN] 液态玻璃自己在选中 Tab 后绘制镜片（CYLLiquidGlass.ets），因此这里不再设置默认胶囊色。
-    const capsule = DEMO_APPEARANCES[this.appearanceIndex].capsule;
+    const capsule = DEMO_APPEARANCES[this.appearanceIndex].capsule
+      ?? (this.styleType === CYLTabBarStyleType.LiquidGlass ? CYLLiquidGlassSelectionColor : undefined);
     this.tabs = this.tabs.map((item: CYLTabBarItemAttributes) => {
       const copy: CYLTabBarItemAttributes = {
         title: item.title, selectedTitle: item.selectedTitle, image: item.image, selectedImage: item.selectedImage,
@@ -955,6 +905,15 @@ struct Index {
       { title: CYLLocalizedString('配置文件'), rows: this.configurationRows() },
       { title: CYLLocalizedString('跳转与对比'), rows: this.jumpRows() },
       // [EN] Item 49: the gallery, on Home only (as iOS and Android). [CN] 第 49 项：场景展示，仅在首页（与 iOS、Android 相同）。
+      // [EN] Example only, on the second tab (new demo rows never go on the first): the see-through glass of the HarmonyOS
+      //      reference harmonyos-liquid-glass-tabbar, on its own pushed page; the library's Liquid Glass keeps the iOS style.
+      // [CN] 仅示例，位于第二个 Tab（新示例行不放在第一个 Tab）：鸿蒙参考工程 harmonyos-liquid-glass-tabbar 的透视玻璃，在单独推入的页面中；
+      //      库的液态玻璃保持 iOS 样式。
+      ...(page === DEMO_CITY ? [{ title: CYLLocalizedString('LiquidGlass'), rows: [{
+        id: 'liquid-glass-dock', title: CYLLocalizedString('Liquid Glass: the see-through effect of the reference'),
+        subtitle: CYLLocalizedString('harmonyos-liquid-glass-tabbar: tab capsule, search ball and music bar over colorful content; scroll to minimize'),
+        action: () => this.push('pages/LiquidGlassDock', {} as DemoPushParams),
+      } as DemoRow] } as DemoSection] : []),
       ...(page === DEMO_HOME ? [{ title: CYLLocalizedString('TabBar 场景展示'), rows: [{
         id: 'gallery', title: CYLLocalizedString('打开 TabBar 场景展示'),
         subtitle: CYLLocalizedString('每个场景都是用公开 API 构建的 TabBar：样式、动画、提醒、Lottie 以及较新的 Tab API'),
@@ -1168,7 +1127,7 @@ struct Index {
       CYLTabBarController({
         tabBarStyleType: this.styleType,
         // [EN] A skin's bar color tints the FlatDesign and Liquid Glass bars too. [CN] 皮肤的 TabBar 颜色也用于扁平样式与液态玻璃。
-        barTintColor: this.styleType === CYLTabBarStyleType.LiquidGlass ? this.demoGlassTint(this.theme.bar) : this.theme.bar,
+        barTintColor: this.theme.bar,
         tabBarItemsAttributes: this.tabs,
         plusButton: this.plus,
         selectedIndex: $selectedIndex,
@@ -1232,11 +1191,6 @@ struct Index {
         },
         pageBuilder: (index: number, identifier: string) => {
           this.cylPage(index, identifier)
-        },
-        // [EN] Liquid Glass: a mini player as the bottom accessory, as the reference's music bar. [CN] 液态玻璃：迷你播放条作为底部附属条，与参考工程的音乐条相同。
-        liquidGlassAccessoryShown: this.styleType === CYLTabBarStyleType.LiquidGlass,
-        liquidGlassAccessory: () => {
-          this.demoMiniPlayer()
         },
       })
       }, (key: number) => `cyl-tab-bar-${key}`)

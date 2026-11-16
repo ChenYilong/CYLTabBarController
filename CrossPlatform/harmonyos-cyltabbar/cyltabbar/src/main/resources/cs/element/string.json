@@ -113,6 +113,10 @@
       "value": "Vlastní maximum (9)"
     },
     {
+      "name": "cyl_l10n_3924c958175e",
+      "value": "Tmavý režim"
+    },
+    {
       "name": "cyl_l10n_b9c74f4cd786",
       "value": "Ztlumené"
     },
@@ -151,6 +155,14 @@
     {
       "name": "cyl_l10n_d52d30723b2f",
       "value": "Jednou zleva doprava"
+    },
+    {
+      "name": "cyl_l10n_1aae3277f8d3",
+      "value": "Liquid Glass (vzor)"
+    },
+    {
+      "name": "cyl_l10n_32f643a9aa26",
+      "value": "Liquid Glass: efekt průhlednosti vzoru"
     },
     {
       "name": "cyl_l10n_f201a4158727",
@@ -305,6 +317,10 @@
       "value": "Zvětšení ×3"
     },
     {
+      "name": "cyl_l10n_13348442cc6a",
+      "value": "Hledat"
+    },
+    {
       "name": "cyl_l10n_9ae56cc36e81",
       "value": "Třesení (nekonečně)"
     },
@@ -419,6 +435,10 @@
     {
       "name": "cyl_l10n_f69c71bc581e",
       "value": "cyl_tabBarMinimizeBehavior = %@; klepnutím vyberte a pak posuňte tento seznam"
+    },
+    {
+      "name": "cyl_l10n_4abddd944c2e",
+      "value": "harmonyos-liquid-glass-tabbar: kapsle karet, vyhledávací koule a hudební lišta nad barevným obsahem; posunutím minimalizujete"
     },
     {
       "name": "cyl_l10n_f3f4ecf4a4a6",

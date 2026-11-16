@@ -113,6 +113,10 @@
       "value": "ค่าสูงสุดกำหนดเอง (9)"
     },
     {
+      "name": "cyl_l10n_3924c958175e",
+      "value": "โหมดมืด"
+    },
+    {
       "name": "cyl_l10n_b9c74f4cd786",
       "value": "จาง"
     },
@@ -151,6 +155,14 @@
     {
       "name": "cyl_l10n_d52d30723b2f",
       "value": "ซ้ายไปขวา 1 ครั้ง"
+    },
+    {
+      "name": "cyl_l10n_1aae3277f8d3",
+      "value": "Liquid Glass (ต้นแบบ)"
+    },
+    {
+      "name": "cyl_l10n_32f643a9aa26",
+      "value": "Liquid Glass: เอฟเฟกต์โปร่งใสของต้นแบบ"
     },
     {
       "name": "cyl_l10n_f201a4158727",
@@ -305,6 +317,10 @@
       "value": "ย่อขยาย ×3"
     },
     {
+      "name": "cyl_l10n_13348442cc6a",
+      "value": "ค้นหา"
+    },
+    {
       "name": "cyl_l10n_9ae56cc36e81",
       "value": "สั่น (ต่อเนื่อง)"
     },
@@ -419,6 +435,10 @@
     {
       "name": "cyl_l10n_f69c71bc581e",
       "value": "cyl_tabBarMinimizeBehavior = %@; แตะเพื่อเลือก แล้วเลื่อนรายการนี้"
+    },
+    {
+      "name": "cyl_l10n_4abddd944c2e",
+      "value": "harmonyos-liquid-glass-tabbar: แคปซูลแท็บ ลูกบอลค้นหา และแถบเพลงเหนือเนื้อหาสีสันสดใส เลื่อนเพื่อย่อ"
     },
     {
       "name": "cyl_l10n_f3f4ecf4a4a6",

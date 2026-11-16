@@ -84,10 +84,9 @@ export class CYLFlatDesignTabBarModifier implements AttributeModifier<RowAttribu
 }
 
 /**
- * [EN] Liquid Glass's selected tint: `#FF375F`, as the HarmonyOS reference harmonyos-liquid-glass-tabbar (CYLLiquidGlass.ets).
- * [CN] 液态玻璃的选中色：`#FF375F`，与鸿蒙参考工程 harmonyos-liquid-glass-tabbar 相同（CYLLiquidGlass.ets）。
+ * [EN] Liquid Glass's selected tint (iOS 26 tab bar: `systemBlueColor`). [CN] 液态玻璃的选中色。
  */
-export const CYLLiquidGlassTintColor: ResourceColor = '#FF375F';
+export const CYLLiquidGlassTintColor: ResourceColor = '#007AFF';
 
 /**
  * [EN] The capsule behind the selected tab of Liquid Glass (`cyl_liquidGlassSelectionColor`). [CN] 液态玻璃选中 Tab 后的胶囊。

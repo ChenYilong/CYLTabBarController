@@ -113,6 +113,10 @@
       "value": "사용자 지정 최댓값(9)"
     },
     {
+      "name": "cyl_l10n_3924c958175e",
+      "value": "다크 모드"
+    },
+    {
       "name": "cyl_l10n_b9c74f4cd786",
       "value": "흐리게 표시됨"
     },
@@ -151,6 +155,14 @@
     {
       "name": "cyl_l10n_d52d30723b2f",
       "value": "왼쪽에서 오른쪽으로 1회"
+    },
+    {
+      "name": "cyl_l10n_1aae3277f8d3",
+      "value": "Liquid Glass (참고)"
+    },
+    {
+      "name": "cyl_l10n_32f643a9aa26",
+      "value": "Liquid Glass: 참고 프로젝트의 투명 효과"
     },
     {
       "name": "cyl_l10n_f201a4158727",
@@ -305,6 +317,10 @@
       "value": "크기 변화 ×3"
     },
     {
+      "name": "cyl_l10n_13348442cc6a",
+      "value": "검색"
+    },
+    {
       "name": "cyl_l10n_9ae56cc36e81",
       "value": "흔들기(계속)"
     },
@@ -419,6 +435,10 @@
     {
       "name": "cyl_l10n_f69c71bc581e",
       "value": "cyl_tabBarMinimizeBehavior = %@; 탭하여 선택한 뒤 이 목록을 스크롤"
+    },
+    {
+      "name": "cyl_l10n_4abddd944c2e",
+      "value": "harmonyos-liquid-glass-tabbar: 다채로운 콘텐츠 위의 탭 캡슐, 검색 볼, 음악 바. 스크롤하면 축소"
     },
     {
       "name": "cyl_l10n_f3f4ecf4a4a6",
