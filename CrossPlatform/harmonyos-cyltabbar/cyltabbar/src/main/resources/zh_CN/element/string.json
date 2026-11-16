@@ -334,7 +334,7 @@
     },
     {
       "name": "cyl_l10n_6360bbdfb8ff",
-      "value": "cyl_itemEdgeInsets: zero, the tabs fill the bar"
+      "value": "cyl_itemEdgeInsets：为零，Tab 铺满 TabBar"
     },
     {
       "name": "cyl_l10n_fd15e88376df",

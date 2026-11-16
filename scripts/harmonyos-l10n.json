@@ -35,7 +35,10 @@
     "On: %@; swipe the page left / right": "On: %@; swipe the page left / right",
     "On: %@; the new page slides in from the side of its tab": "On: %@; the new page slides in from the side of its tab",
     "The “Me” tab needs a login (issue #19); tap to toggle": "The “Me” tab needs a login (issue #19); tap to toggle",
-    "Dimmed": "Dimmed"
+    "Dimmed": "Dimmed",
+    "Login state": "Login state",
+    "Logged in: %@. The \"Me\" tab needs a login (issue #19); tap to toggle": "Logged in: %@. The \"Me\" tab needs a login (issue #19); tap to toggle",
+    "cyl_itemEdgeInsets: zero, the tabs fill the bar": "cyl_itemEdgeInsets: zero, the tabs fill the bar"
   },
   "zh-Hans": {
     "Previous tab (cyl_selectPreviousTab, issue #535)": "上一个 Tab（cyl_selectPreviousTab，issue #535）",
@@ -73,6 +76,9 @@
     "On: %@; swipe the page left / right": "开启：%@；在页面上左右滑动",
     "On: %@; the new page slides in from the side of its tab": "开启：%@；新页面从其 Tab 所在一侧滑入",
     "The “Me” tab needs a login (issue #19); tap to toggle": "「我的」需要登录（issue #19）；点击切换",
-    "Dimmed": "不可用"
+    "Dimmed": "不可用",
+    "Login state": "登录状态",
+    "Logged in: %@. The \"Me\" tab needs a login (issue #19); tap to toggle": "已登录：%@。「我的」Tab 需要登录（issue #19）；点击切换",
+    "cyl_itemEdgeInsets: zero, the tabs fill the bar": "cyl_itemEdgeInsets：为零，Tab 铺满 TabBar"
   }
 }

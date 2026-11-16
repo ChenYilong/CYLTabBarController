@@ -115,5 +115,41 @@
     "evidence": "Code review (reported by the CYLTableViewPlaceHolder session)",
     "cause": "Template string in Index.ets cylPage",
     "fix": "CYLLocalizedString('替换页 %@') (the iOS key)"
+  },
+  {
+    "id": 14,
+    "status": "TODO need 模拟器截图验证",
+    "scope": "CrossPlatform/harmonyos-cyltabbar (entry)",
+    "title": "The demo list has no bottom inset: the last row stays under the tab bar and the raised plus button",
+    "evidence": "every Home screenshot",
+    "cause": "The list scrolls under the overlaid bar without an end offset",
+    "fix": "contentEndOffset(CYL_LIST_END_INSET), 120 vp (PR #803)"
+  },
+  {
+    "id": 15,
+    "status": "TODO need 模拟器截图验证",
+    "scope": "CrossPlatform/harmonyos-cyltabbar (entry)",
+    "title": "A skin's plus image (wave, meteor) overflows above the bar over the list",
+    "evidence": "harmonyos-styles-ocean-skin-b7995d0.png col. 2, harmonyos-styles-space-skin-981db1e.png col. 2",
+    "cause": "A tab-style icon without the round button background, drawn at the 52 vp button size",
+    "fix": "Drawn at 40 vp (CYL_SKIN_PLUS_IMAGE_SIZE) (PR #803)"
+  },
+  {
+    "id": 16,
+    "status": "TODO need 模拟器截图验证",
+    "scope": "CrossPlatform/harmonyos-cyltabbar (entry)",
+    "title": "The row \"CYLFlatDesignTabBarItem 不居中显示（系统效果）\" has no subtitle while its neighbors have one",
+    "evidence": "every Home screenshot",
+    "cause": "No subtitle given",
+    "fix": "Localized subtitle \"cyl_itemEdgeInsets: zero, the tabs fill the bar\" (PR #803)"
+  },
+  {
+    "id": 17,
+    "status": "TODO",
+    "scope": "CrossPlatform/harmonyos-cyltabbar (entry)",
+    "title": "Ocean skin: the skin row's subtitle says \"当前：默认\" while the Ocean icons are on the bar",
+    "evidence": "harmonyos-styles-ocean-skin-b7995d0.png col. 1",
+    "cause": "Not found in code: the subtitle reads this.theme, set in the same listener as the icons; possibly the stale state of issue 7",
+    "fix": "Needs a reproduction on the emulator after issue 7's fix"
   }
 ]

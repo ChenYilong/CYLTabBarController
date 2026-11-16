@@ -17,7 +17,7 @@
 |:---|:---|
 | 来源：模拟器截图（docs/assets/harmonyos-*.png / .jpeg，Mate 70 Pro 模拟器，HarmonyOS 6.0.1 API 21）。每发现一个问题新增一行，包括本仓库其他目录与其他仓库的问题。 | Source: emulator screenshots (docs/assets/harmonyos-*.png / .jpeg, Mate 70 Pro emulator, HarmonyOS 6.0.1 API 21). One row per issue found, including issues in other folders of this repository and in other repositories. |
 | 状态：`TODO` 未修复；`TODO need 模拟器截图验证` 已修复、待模拟器截图验证；`DONE (<截图>)` 已验证。 | Status: `TODO` not fixed; `TODO need 模拟器截图验证` fixed, waiting for an emulator screenshot; `DONE (<screenshot>)` checked. |
-| **打分：100 / 100**（13 / 13 个问题不再是 TODO；已截图验证 0）。没有 `TODO` 行即满分。 | **Score: 100 / 100** (13 of 13 issues no longer TODO; 0 checked with a screenshot). No `TODO` row left is the full score. |
+| **打分：94 / 100**（16 / 17 个问题不再是 TODO；已截图验证 0）。没有 `TODO` 行即满分。 | **Score: 94 / 100** (16 of 17 issues no longer TODO; 0 checked with a screenshot). No `TODO` row left is the full score. |
 
 | # | 状态 / Status | 范围 / Scope | 问题 / Issue | 证据 / Evidence | 原因 / Cause | 修复 / Fix |
 |:---|:---|:---|:---|:---|:---|:---|
@@ -34,6 +34,10 @@
 | 11 | TODO need 模拟器截图验证 | CrossPlatform/harmonyos-cyltabbar (cyltabbar) | SVGA (and Lottie) icons larger than imageSize sit about 5 vp right of and below their titles | harmonyos-tab-bar-svga-launch.png, harmonyos-tab-bar-svga-messages-tap.png (reported by the CYLTableViewPlaceHolder session) | The icon Stack had a fixed imageSize with alignContent TopStart, so a bigger icon spilled right and down; the title line and the badge anchor used imageSize | The icon Stack takes the real icon size (no fixed size, centred in the tab); the title line and the badge anchorWidth use cylIconHeight (Lottie / SVGA / image size) |
 | 12 | TODO need 模拟器截图验证 | CrossPlatform/harmonyos-cyltabbar (cyltabbar) | Ocean skin, classic style: a white strip under the tab bar (the bar color does not reach under the gesture bar) | harmonyos-styles-ocean-skin-b7995d0.png (left) | The bar container (added for the Liquid Glass insets) had no background | 981db1e: the container takes the bar background (classic / FlatDesign), transparent for Liquid Glass; the Space screenshot of 981db1e shows it fixed, Ocean needs a new screenshot |
 | 13 | TODO need 模拟器截图验证 | CrossPlatform/harmonyos-cyltabbar (entry) | "Replacement page N" (issue #481 demo) is English only | Code review (reported by the CYLTableViewPlaceHolder session) | Template string in Index.ets cylPage | CYLLocalizedString('替换页 %@') (the iOS key) |
+| 14 | TODO need 模拟器截图验证 | CrossPlatform/harmonyos-cyltabbar (entry) | The demo list has no bottom inset: the last row stays under the tab bar and the raised plus button | every Home screenshot | The list scrolls under the overlaid bar without an end offset | contentEndOffset(CYL_LIST_END_INSET), 120 vp (PR #803) |
+| 15 | TODO need 模拟器截图验证 | CrossPlatform/harmonyos-cyltabbar (entry) | A skin's plus image (wave, meteor) overflows above the bar over the list | harmonyos-styles-ocean-skin-b7995d0.png col. 2, harmonyos-styles-space-skin-981db1e.png col. 2 | A tab-style icon without the round button background, drawn at the 52 vp button size | Drawn at 40 vp (CYL_SKIN_PLUS_IMAGE_SIZE) (PR #803) |
+| 16 | TODO need 模拟器截图验证 | CrossPlatform/harmonyos-cyltabbar (entry) | The row "CYLFlatDesignTabBarItem 不居中显示（系统效果）" has no subtitle while its neighbors have one | every Home screenshot | No subtitle given | Localized subtitle "cyl_itemEdgeInsets: zero, the tabs fill the bar" (PR #803) |
+| 17 | TODO | CrossPlatform/harmonyos-cyltabbar (entry) | Ocean skin: the skin row's subtitle says "当前：默认" while the Ocean icons are on the bar | harmonyos-styles-ocean-skin-b7995d0.png col. 1 | Not found in code: the subtitle reads this.theme, set in the same listener as the icons; possibly the stale state of issue 7 | Needs a reproduction on the emulator after issue 7's fix |
 
 ## 目录 / Contents
 
