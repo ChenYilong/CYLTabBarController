@@ -189,6 +189,10 @@
       "value": "Tab seterusnya (cyl_selectNextTab, issue #535)"
     },
     {
+      "name": "cyl_l10n_3826b8552c94",
+      "value": "Lagu seterusnya"
+    },
+    {
       "name": "cyl_l10n_b2ee912b91d6",
       "value": "Nombor"
     },
@@ -215,6 +219,14 @@
     {
       "name": "cyl_l10n_84432607fd87",
       "value": "Halaman: %@"
+    },
+    {
+      "name": "cyl_l10n_105b296a83f9",
+      "value": "Jeda"
+    },
+    {
+      "name": "cyl_l10n_de3c731be563",
+      "value": "Main"
     },
     {
       "name": "cyl_l10n_41b77539cc64",

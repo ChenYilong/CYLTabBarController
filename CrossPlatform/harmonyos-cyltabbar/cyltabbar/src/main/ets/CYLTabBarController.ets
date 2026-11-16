@@ -396,12 +396,32 @@ export struct CYLTabBarController {
   /** [EN] The gesture bar's height (vp), so the capsule floats 24 vp above the screen's bottom. [CN] 手势条高度（vp），使胶囊距屏幕底部 24 vp。 */
   @State private glassGestureBarHeight: number = 0;
   /**
+   * [EN] Liquid Glass: draw a glass lens behind the selected tab (iOS 26). Off by default: the reference marks the selected tab
+   *      with its tint only.
+   * [CN] 液态玻璃：在选中 Tab 后绘制玻璃镜片（iOS 26）。默认关闭：参考工程只用着色表示选中。
+   */
+  @Prop liquidGlassLensEnabled: boolean = false;
+  /**
+   * [EN] Liquid Glass bottom accessory (iOS 26 `tabViewBottomAccessory`, the reference's mini music bar): a glass bar above the
+   *      tabs, between the two balls when minimized. Shown when liquidGlassAccessoryShown is true.
+   * [CN] 液态玻璃底部附属条（iOS 26 `tabViewBottomAccessory`，参考工程的迷你音乐条）：位于 Tab 上方的玻璃条，缩小后位于两颗球之间。
+   *      liquidGlassAccessoryShown 为 true 时显示。
+   */
+  @BuilderParam liquidGlassAccessory: () => void = this.cylNoAccessory;
+  @Prop liquidGlassAccessoryShown: boolean = false;
+  /**
    * [EN] The Liquid Glass lens (iOS 26): its position in slots (fractional while it slides or follows a finger), its stretch
    *      along the motion (jelly), and how much it is lifted (pressed or dragged). Separate layers: no tab node is rebuilt.
    * [CN] 液态玻璃的镜片（iOS 26）：以槽位计的位置（滑动或跟随手指时为小数）、沿运动方向的拉伸（果冻效果）与抬起程度（按压或拖动）。
    *      独立图层：不重建任何 Tab 节点。
    */
   @State private glassLensPosition: number = -1;
+  /** [EN] Where the finger is on the capsule (vp), for the point light. [CN] 手指在胶囊上的位置（vp），用于点光源。 */
+  @State private glassTouchX: number = 0;
+  /** [EN] A finger is on the pages: only finger-driven scrolling minimizes the glass (reference). [CN] 手指在页面上：只有手指驱动的滚动才会缩小玻璃（参考工程）。 */
+  private glassFingerOnPage: boolean = false;
+  private glassScrollAccum: number = 0;
+  private glassSwitchedThisGesture: boolean = false;
   @State private glassLensStretch: number = 1;
   @State private glassLensLift: number = 0;
   private glassDragging: boolean = false;
@@ -456,6 +476,10 @@ export struct CYLTabBarController {
   cylEmptyPage(index: number, identifier: string) {
   }
 
+  @Builder
+  cylNoAccessory() {
+  }
+
   aboutToAppear(): void {
     this.loaded = [this.selectedIndex];
     while (this.badges.length < this.tabBarItemsAttributes.length) {
@@ -502,6 +526,10 @@ export struct CYLTabBarController {
    * [CN] 经过代理设置选中索引：shouldSelect 可拒绝；随后调用 didSelect。
    */
   cylOnScroll(): void {
+    if (this.tabBarStyleType === CYLTabBarStyleType.LiquidGlass && this.cylGlassMinimizes()) {
+      this.cylGlassOnScroll(this.scrollDelta);
+      return;
+    }
     let behavior = this.tabBarMinimizeBehavior;
     if (this.hidesTabBarOnScroll && (behavior === CYLTabBarMinimizeBehavior.Never || behavior === CYLTabBarMinimizeBehavior.Automatic)) {
       behavior = CYLTabBarMinimizeBehavior.OnScrollDown;
@@ -555,7 +583,7 @@ export struct CYLTabBarController {
 
   /** [EN] The slot position of the selected tab or plus button. [CN] 选中 Tab 或加号按钮的槽位序号。 */
   private cylGlassSelectedSlot(): number {
-    return Math.max(0, this.cylSlots().findIndex((slot: CYLSlot) => slot.tabIndex === this.selectedIndex));
+    return Math.max(0, this.cylCapsuleSlots().findIndex((slot: CYLSlot) => slot.tabIndex === this.selectedIndex));
   }
 
   /**
@@ -599,8 +627,8 @@ export struct CYLTabBarController {
 
   /** [EN] The slot under a finger at x (vp, inside the capsule). [CN] 胶囊内 x 处（vp）手指下的槽位。 */
   private cylGlassSlotAt(x: number): number {
-    const position = (x - this.itemEdgeInsets.left) / this.cylGlassSlotWidth() - 0.5;
-    return Math.max(0, Math.min(this.cylSlots().length - 1, position));
+    const position = (x - this.cylGlassSlotsInset()) / this.cylGlassSlotWidth() - 0.5;
+    return Math.max(0, Math.min(this.cylCapsuleSlots().length - 1, position));
   }
 
   /** [EN] The lens follows the finger, lifted, then snaps to the slot it ends on and selects it (iOS 26 drag). [CN] 镜片抬起并跟随手指，松手后吸附到所在槽位并选中（iOS 26 拖动）。 */
@@ -618,7 +646,7 @@ export struct CYLTabBarController {
     }
     this.glassDragging = false;
     this.glassTouchActive = false;
-    const slot = this.cylSlots()[Math.round(this.glassLensPosition)];
+    const slot = this.cylCapsuleSlots()[Math.round(this.glassLensPosition)];
     this.cylGlassLift(false);
     if (slot !== undefined && slot.tabIndex >= 0 && slot.tabIndex !== this.selectedIndex) {
       this.cylTap(slot.tabIndex);
@@ -648,14 +676,14 @@ export struct CYLTabBarController {
           y: (2 - this.glassLensStretch) * (1 + 0.18 * this.glassLensLift),
         })
         .position({
-          x: this.itemEdgeInsets.left + Math.max(0, this.glassLensPosition) * this.cylGlassSlotWidth() + 3,
+          x: this.cylGlassSlotsInset() + Math.max(0, this.glassLensPosition) * this.cylGlassSlotWidth() + 3,
           y: 4,
         })
     }
     .width('100%')
     .height('100%')
     .position({ x: 0, y: 0 })
-    .opacity(this.glassCollapsed || this.glassLensPosition < 0 ? 0 : 1)
+    .opacity(!this.liquidGlassLensEnabled || this.glassCollapsed || this.glassLensPosition < 0 ? 0 : 1)
     .hitTestBehavior(HitTestMode.None)
   }
 
@@ -674,10 +702,100 @@ export struct CYLTabBarController {
         direction: GradientDirection.Bottom,
         colors: [['#73FFFFFF', 0], ['#14FFFFFF', 0.35], ['#00FFFFFF', 0.6], ['#1FFFFFFF', 1]],
       })
-      // [EN] The glass rim, under the tabs. [CN] 玻璃亮边，位于 Tab 之下。
-      .border({ width: 1, color: '#80FFFFFF' })
+      // [EN] The glass rim, under the tabs: bright outside, a faint dark line inside, so the capsule reads as convex.
+      // [CN] 玻璃亮边，位于 Tab 之下：外侧明亮、内侧一条淡淡的暗线，使胶囊呈凸起状。
+      .border({ width: 1, color: '#99FFFFFF' })
+      .outline({ width: 0.5, color: '#1F000000', radius: this.cylGlassRowHeight() / 2 })
       .position({ x: 0, y: 0 })
       .hitTestBehavior(HitTestMode.None)
+    // [EN] The point light: a soft spot that appears where the finger touches and follows it (reference lightEffect).
+    // [CN] 点光源：在手指触摸处出现并跟随手指的柔和光斑（参考工程的 lightEffect）。
+    Stack()
+      .width('100%')
+      .height('100%')
+      .borderRadius(this.cylGlassRowHeight() / 2)
+      .radialGradient({
+        center: [this.glassTouchX, this.cylGlassRowHeight() * 0.35],
+        radius: this.cylGlassRowHeight() * 1.6,
+        colors: [['#59FFFFFF', 0], ['#1AFFFFFF', 0.45], ['#00FFFFFF', 1]],
+      })
+      .opacity(this.glassLensLift)
+      .position({ x: 0, y: 0 })
+      .hitTestBehavior(HitTestMode.None)
+  }
+
+  /** [EN] A tap on the plus button (in the bar, or the Liquid Glass ball). [CN] 点按加号按钮（TabBar 中或液态玻璃的球）。 */
+  cylPlusTapped(): void {
+    this.cylTapFeedback(CYLPlusButtonPageIndex);
+    if (this.plusButton?.selectable) {
+      this.cylSelect(CYLPlusButtonPageIndex);
+    }
+    if (this.plusButtonAction !== undefined) {
+      this.plusButtonAction();
+    }
+  }
+
+  /**
+   * [EN] Liquid Glass: the plus button as its own glass ball at the right end (the reference's search ball, iOS 26's search
+   *      role): 56 vp expanded, 42 vp minimized; a tap on the minimized ball only expands the bar.
+   * [CN] 液态玻璃：加号按钮是右端独立的玻璃球（参考工程的搜索球、iOS 26 的搜索角色）：展开 56 vp，缩小 42 vp；缩小时点按球只展开 TabBar。
+   */
+  @Builder
+  cylGlassPlusBall() {
+    Row() {
+      Stack() {
+        Image(this.plusPressed || this.selectedIndex === CYLPlusButtonPageIndex
+          ? (this.plusButton?.selectedImage ?? this.plusButton?.image) : this.plusButton?.image)
+          .width(this.cylGlassRowHeight() * 0.62)
+          .height(this.cylGlassRowHeight() * 0.62)
+          .objectFit(ImageFit.Contain)
+        CYLBadgeView({ badge: this.plusButtonBadge, anchorWidth: this.cylGlassRowHeight() * 0.62 })
+      }
+      .width(this.cylGlassRowHeight() * 0.62)
+      .height(this.cylGlassRowHeight() * 0.62)
+    }
+    .width(this.cylGlassRowHeight())
+    .height(this.cylGlassRowHeight())
+    .justifyContent(FlexAlign.Center)
+    .attributeModifier(new CYLLiquidGlassCapsuleModifier(this.barTintColor, this.cylGlassRowHeight(), 3, this.colorMode === 'dark'))
+    .border({ width: 1, color: '#80FFFFFF', radius: this.cylGlassRowHeight() / 2 })
+    .position({ x: this.cylGlassBallX(), y: this.cylGlassRowY() })
+    .accessibilityGroup(true)
+    .accessibilityText(this.cylPlusAccessibilityLabel())
+    .accessibilityDescription(this.selectedIndex === CYLPlusButtonPageIndex ? CYLLocalizedString('选中') : CYLLocalizedString('Double tap to open'))
+    .id('cyl-plus-button')
+    .onTouch((event: TouchEvent) => {
+      if (event.type === TouchType.Down) {
+        this.plusPressed = true;
+      } else if (event.type === TouchType.Up || event.type === TouchType.Cancel) {
+        this.plusPressed = false;
+      }
+    })
+    .onClick(() => {
+      if (this.cylGlassMinimized()) {
+        this.cylSetGlassCollapsed(false);
+        return;
+      }
+      this.cylPlusTapped();
+    })
+  }
+
+  /**
+   * [EN] Liquid Glass: the app's bottom accessory in a glass bar (the reference's mini music bar): full width above the tab row,
+   *      between the two balls when minimized.
+   * [CN] 液态玻璃：放在玻璃条中的 App 底部附属内容（参考工程的迷你音乐条）：展开时在 Tab 行上方铺满，缩小后位于两颗球之间。
+   */
+  @Builder
+  cylGlassAccessoryBar() {
+    Row() {
+      this.liquidGlassAccessory()
+    }
+    .width(this.cylGlassAccessoryWidth())
+    .height(this.cylGlassAccessoryHeight())
+    .attributeModifier(new CYLLiquidGlassCapsuleModifier(this.barTintColor, this.cylGlassAccessoryHeight(), 3, this.colorMode === 'dark'))
+    .border({ width: 1, color: '#80FFFFFF', radius: this.cylGlassAccessoryHeight() / 2 })
+    .position({ x: this.cylGlassAccessoryX(), y: this.cylGlassAccessoryY() })
+    .id('cyl-liquid-glass-accessory')
   }
 
   /** [EN] Liquid Glass, minimized into a ball. [CN] 液态玻璃，已缩小成球。 */
@@ -691,10 +809,144 @@ export struct CYLTabBarController {
       : Math.max(this.tabBarHeight, CYLLiquidGlassTokens.ROW_HEIGHT_EXPANDED);
   }
 
-  /** [EN] The width of one slot of the expanded capsule; slots keep it while the capsule narrows. [CN] 展开态胶囊中一个槽位的宽度；胶囊收窄时槽位保持此宽度。 */
+  /** [EN] The slots in the capsule: Liquid Glass shows the plus button as its own ball, not in the capsule. [CN] 胶囊中的槽位：液态玻璃把加号按钮显示为独立的球，不在胶囊里。 */
+  cylCapsuleSlots(): CYLSlot[] {
+    const slots = this.cylSlots();
+    return this.tabBarStyleType === CYLTabBarStyleType.LiquidGlass ? slots.filter((slot: CYLSlot) => slot.tabIndex >= 0) : slots;
+  }
+
+  /** [EN] Liquid Glass with a plus button: the ball at the right end. [CN] 有加号按钮的液态玻璃：右端的球。 */
+  private cylGlassHasBall(): boolean {
+    return this.plusButton !== undefined;
+  }
+
+  /** [EN] The expanded capsule's width: the screen minus the side margins and the ball's reserve (reference TAB_RIGHT_RESERVE). [CN] 展开态胶囊宽度。 */
+  private cylGlassCapsuleExpandedWidth(): number {
+    return Math.max(0, this.glassWidth - 2 * CYLLiquidGlassTokens.BAR_SIDE_MARGIN
+      - (this.cylGlassHasBall() ? CYLLiquidGlassTokens.TAB_RIGHT_RESERVE - CYLLiquidGlassTokens.BAR_SIDE_MARGIN : 0));
+  }
+
+  /** [EN] One slot: 62 vp as the reference when it fits, else an equal share; slots keep it while the capsule narrows. [CN] 一个槽位：放得下时为参考工程的 62 vp，否则均分；胶囊收窄时保持不变。 */
   private cylGlassSlotWidth(): number {
-    const capsule = this.glassWidth - 2 * CYLLiquidGlassTokens.BAR_SIDE_MARGIN - this.itemEdgeInsets.left - this.itemEdgeInsets.right;
-    return Math.max(1, capsule / Math.max(1, this.cylSlots().length));
+    const inner = this.cylGlassCapsuleExpandedWidth() - this.itemEdgeInsets.left - this.itemEdgeInsets.right;
+    return Math.max(1, Math.min(CYLLiquidGlassTokens.TAB_SLOT_WIDTH, inner / Math.max(1, this.cylCapsuleSlots().length)));
+  }
+
+  /** [EN] Space before the first slot: the slots are centered in the capsule. [CN] 第一个槽位之前的空白：槽位在胶囊中居中。 */
+  private cylGlassSlotsInset(): number {
+    const inner = this.cylGlassCapsuleExpandedWidth() - this.itemEdgeInsets.left - this.itemEdgeInsets.right;
+    return this.itemEdgeInsets.left + Math.max(0, (inner - this.cylCapsuleSlots().length * this.cylGlassSlotWidth()) / 2);
+  }
+
+  /** [EN] Minimized: the tabs row moves so its center sits on the ball's center. [CN] 缩小后 Tab 行平移，使其中心落在球心。 */
+  private cylGlassItemsShift(): number {
+    return this.glassCollapsed ? CYLLiquidGlassTokens.ROW_HEIGHT_COLLAPSED / 2 - this.cylGlassCapsuleExpandedWidth() / 2 : 0;
+  }
+
+  /** [EN] The bottom margin inside the safe area, so the bar floats 24 vp above the screen's bottom. [CN] 安全区内的底边距，使 TabBar 距屏幕底部 24 vp。 */
+  private cylGlassBottom(): number {
+    return Math.max(4, CYLLiquidGlassTokens.BAR_BOTTOM_MARGIN - this.glassGestureBarHeight);
+  }
+
+  /** [EN] The container's constant height: the morph never changes the component box (reference). [CN] 容器的固定高度：形变不改变组件盒（参考工程）。 */
+  private cylGlassBoxHeight(): number {
+    return this.cylGlassBottom() + Math.max(this.tabBarHeight, CYLLiquidGlassTokens.ROW_HEIGHT_EXPANDED)
+      + (this.liquidGlassAccessoryShown ? CYLLiquidGlassTokens.ACCESSORY_GAP + CYLLiquidGlassTokens.ACCESSORY_HEIGHT : 0);
+  }
+
+  /** [EN] The top of the tab row in the container. [CN] Tab 行在容器中的顶部位置。 */
+  private cylGlassRowY(): number {
+    return this.cylGlassBoxHeight() - this.cylGlassBottom() - this.cylGlassRowHeight();
+  }
+
+  /** [EN] The capsule's frame: expanded from the leading margin; minimized, a ball 22 vp from the edge. [CN] 胶囊位置：展开时从起始边距开始；缩小后是距边 22 vp 的球。 */
+  private cylGlassCapsuleX(): number {
+    return this.glassCollapsed ? CYLLiquidGlassTokens.COLLAPSED_EDGE_MARGIN : CYLLiquidGlassTokens.BAR_SIDE_MARGIN;
+  }
+
+  private cylGlassCapsuleWidth(): number {
+    return this.glassCollapsed ? CYLLiquidGlassTokens.ROW_HEIGHT_COLLAPSED : this.cylGlassCapsuleExpandedWidth();
+  }
+
+  /** [EN] The plus ball's frame. [CN] 加号球的位置。 */
+  private cylGlassBallX(): number {
+    const margin = this.glassCollapsed ? CYLLiquidGlassTokens.COLLAPSED_EDGE_MARGIN : CYLLiquidGlassTokens.BAR_SIDE_MARGIN;
+    return this.glassWidth - margin - this.cylGlassRowHeight();
+  }
+
+  /** [EN] The accessory's frame: above the row expanded, between the balls minimized. [CN] 附属条位置：展开时在 Tab 行上方，缩小后在两颗球之间。 */
+  private cylGlassAccessoryX(): number {
+    return this.glassCollapsed
+      ? CYLLiquidGlassTokens.COLLAPSED_EDGE_MARGIN + CYLLiquidGlassTokens.ROW_HEIGHT_COLLAPSED + CYLLiquidGlassTokens.COLLAPSED_GAP
+      : CYLLiquidGlassTokens.BAR_SIDE_MARGIN;
+  }
+
+  private cylGlassAccessoryY(): number {
+    return this.glassCollapsed ? this.cylGlassRowY()
+      : this.cylGlassRowY() - CYLLiquidGlassTokens.ACCESSORY_GAP - CYLLiquidGlassTokens.ACCESSORY_HEIGHT;
+  }
+
+  private cylGlassAccessoryWidth(): number {
+    if (!this.glassCollapsed) {
+      return this.glassWidth - 2 * CYLLiquidGlassTokens.BAR_SIDE_MARGIN;
+    }
+    const right = this.cylGlassHasBall()
+      ? CYLLiquidGlassTokens.COLLAPSED_GAP + CYLLiquidGlassTokens.ROW_HEIGHT_COLLAPSED + CYLLiquidGlassTokens.COLLAPSED_EDGE_MARGIN
+      : CYLLiquidGlassTokens.COLLAPSED_EDGE_MARGIN;
+    return Math.max(0, this.glassWidth - this.cylGlassAccessoryX() - right);
+  }
+
+  private cylGlassAccessoryHeight(): number {
+    return this.glassCollapsed ? CYLLiquidGlassTokens.ROW_HEIGHT_COLLAPSED : CYLLiquidGlassTokens.ACCESSORY_HEIGHT;
+  }
+
+  /** [EN] Liquid Glass minimizes on scroll unless the app chose Never... see cylGlassMinimizes. [CN] 见 cylGlassMinimizes。 */
+  private cylGlassMinimizes(): boolean {
+    return this.tabBarMinimizeBehavior !== CYLTabBarMinimizeBehavior.Never || this.hidesTabBarOnScroll || this.liquidGlassAccessoryShown;
+  }
+
+  /**
+   * [EN] The reference's scroll rule: only while a finger is on the pages; scrolling down 8 vp in total minimizes, any frame
+   *      scrolling up expands at once (asymmetric on purpose); one switch per gesture.
+   * [CN] 参考工程的滚动规则：只在手指按在页面上时生效；向下累计滚动 8 vp 缩小，任何一帧向上立即展开（刻意不对称）；一次手势只切换一次。
+   */
+  private cylGlassOnScroll(delta: number): void {
+    if (!this.glassFingerOnPage || this.glassSwitchedThisGesture || Math.abs(delta) < 0.01) {
+      return;
+    }
+    if (this.glassCollapsed) {
+      if (delta < 0) {
+        this.cylSetGlassCollapsed(false);
+        this.glassSwitchedThisGesture = true;
+      }
+      return;
+    }
+    if (delta < 0) {
+      this.glassScrollAccum = 0;
+      return;
+    }
+    this.glassScrollAccum += delta;
+    if (this.glassScrollAccum >= CYLLiquidGlassTokens.MIN_SCROLL) {
+      this.cylSetGlassCollapsed(true);
+      this.glassSwitchedThisGesture = true;
+    }
+  }
+
+  /** [EN] A finger down on / up from the pages. [CN] 手指按下 / 离开页面。 */
+  private cylGlassPageTouch(down: boolean): void {
+    this.glassFingerOnPage = down;
+    if (!down) {
+      this.glassScrollAccum = 0;
+      this.glassSwitchedThisGesture = false;
+    }
+  }
+
+  /** [EN] The unselected title color of Liquid Glass follows dark and light (reference font_primary). [CN] 液态玻璃未选中标题颜色随深浅色变化。 */
+  cylUnselectedTitleColor(): ResourceColor {
+    if (this.tabBarStyleType !== CYLTabBarStyleType.LiquidGlass) {
+      return this.unselectedColor;
+    }
+    return this.colorMode === 'dark' ? '#F2F2F7' : '#1C1C1E';
   }
 
   /**
@@ -705,7 +957,7 @@ export struct CYLTabBarController {
     if (!this.cylGlassMinimized() || slotTabIndex !== this.selectedIndex) {
       return { x: 0, y: 0 };
     }
-    const slots = this.cylSlots();
+    const slots = this.cylCapsuleSlots();
     const position = slots.findIndex((slot: CYLSlot) => slot.tabIndex === slotTabIndex);
     return {
       x: (slots.length / 2 - position - 0.5) * this.cylGlassSlotWidth(),
@@ -1098,13 +1350,14 @@ export struct CYLTabBarController {
         Text(this.selectedIndex === index
           ? (this.tabBarItemsAttributes[index].selectedTitle ?? this.tabBarItemsAttributes[index].title)
           : this.tabBarItemsAttributes[index].title)
-          .fontSize(10)
-          .margin({ top: 3 })
+          // [EN] Liquid Glass: 11 vp labels, 2 vp under the icon (reference). [CN] 液态玻璃：11 vp 标题，距图标 2 vp（参考工程）。
+          .fontSize(this.tabBarStyleType === CYLTabBarStyleType.LiquidGlass ? 11 : 10)
+          .margin({ top: this.tabBarStyleType === CYLTabBarStyleType.LiquidGlass ? 2 : 3 })
           // [EN] Liquid Glass minimized: the title fades out with the morph. [CN] 液态玻璃缩小时标题随形变淡出。
           .opacity(this.cylGlassMinimized() ? 0 : 1)
           .fontColor(this.selectedIndex === index
             ? (this.tabBarItemsAttributes[index].selectedTitleColor ?? this.tintColor)
-            : (this.tabBarItemsAttributes[index].titleColor ?? this.unselectedColor))
+            : (this.tabBarItemsAttributes[index].titleColor ?? this.cylUnselectedTitleColor()))
           .offset({
             x: (this.tabBarItemsAttributes[index].titlePositionAdjustment ?? this.titlePositionAdjustment).horizontal,
             y: (this.tabBarItemsAttributes[index].titlePositionAdjustment ?? this.titlePositionAdjustment).vertical,
@@ -1118,6 +1371,9 @@ export struct CYLTabBarController {
     .constraintSize(this.tabBarStyleType === CYLTabBarStyleType.LiquidGlass && this.glassWidth > 0
       ? { minWidth: this.cylGlassSlotWidth(), maxWidth: this.cylGlassSlotWidth() } : {})
     .translate(this.cylGlassSlotTranslate(index))
+    // [EN] Minimized: the selected icon shrinks to half the ball (reference). [CN] 缩小后选中图标缩到球径一半（参考工程）。
+    .scale(this.cylGlassMinimized() && index === this.selectedIndex
+      ? { x: CYLLiquidGlassTokens.COLLAPSED_ICON_SCALE, y: CYLLiquidGlassTokens.COLLAPSED_ICON_SCALE } : { x: 1, y: 1 })
     .visibility(this.cylGlassSlotVisible(index) ? Visibility.Visible : Visibility.Hidden)
     .height('100%')
     .justifyContent(FlexAlign.Start)
@@ -1242,15 +1498,7 @@ export struct CYLTabBarController {
         this.didLongPress(CYLPlusButtonPageIndex, this.cylIdentifier(CYLPlusButtonPageIndex));
       }
     }))
-    .onClick(() => {
-      this.cylTapFeedback(CYLPlusButtonPageIndex);
-      if (this.plusButton?.selectable) {
-        this.cylSelect(CYLPlusButtonPageIndex);
-      }
-      if (this.plusButtonAction !== undefined) {
-        this.plusButtonAction();
-      }
-    })
+    .onClick(() => this.cylPlusTapped())
   }
 
   /**
@@ -1283,6 +1531,15 @@ export struct CYLTabBarController {
       }
       .layoutWeight(1)
       .width('100%')
+      // [EN] Liquid Glass: only finger-driven scrolling minimizes the bar (fling frames after the finger lifts do not).
+      // [CN] 液态玻璃：只有手指驱动的滚动会缩小 TabBar（抬手后的惯性帧不算）。
+      .onTouch((event: TouchEvent) => {
+        if (event.type === TouchType.Down) {
+          this.cylGlassPageTouch(true);
+        } else if (event.type === TouchType.Up || event.type === TouchType.Cancel) {
+          this.cylGlassPageTouch(false);
+        }
+      })
       .gesture(PanGesture({ direction: PanDirection.Horizontal, distance: 40 })
         .onActionEnd((event: GestureEvent) => {
           if (this.swipeToSwitchTabEnabled && Math.abs(event.offsetX) > 60) {
@@ -1306,17 +1563,32 @@ export struct CYLTabBarController {
             this.cylGlassSheen()
             this.cylGlassLens()
           }
-          ForEach(this.cylSlots(), (slot: CYLSlot) => {
-            if (slot.tabIndex >= 0) {
-              this.cylTab(slot.tabIndex)
-            } else {
-              this.cylPlus()
-            }
-          }, (slot: CYLSlot) => slot.key)
+          // [EN] The tabs in their own row. Liquid Glass gives it the expanded width at a fixed place and shifts it when the
+          //      capsule narrows, so the selected tab lands on the ball's center (an overflowing row would start at the left).
+          // [CN] Tab 位于独立的 Row 中。液态玻璃让它保持展开时的宽度与固定位置，胶囊收窄时整体平移，使选中 Tab 落在球心（溢出的 Row 会从左侧开始排列）。
+          Row() {
+            ForEach(this.cylCapsuleSlots(), (slot: CYLSlot) => {
+              if (slot.tabIndex >= 0) {
+                this.cylTab(slot.tabIndex)
+              } else {
+                this.cylPlus()
+              }
+            }, (slot: CYLSlot) => slot.key)
+          }
+          .width(this.tabBarStyleType === CYLTabBarStyleType.LiquidGlass ? this.cylGlassCapsuleExpandedWidth() : '100%')
+          .height('100%')
+          .padding(this.tabBarStyleType === CYLTabBarStyleType.LiquidGlass
+            ? { left: this.itemEdgeInsets.left, right: this.itemEdgeInsets.right } : 0)
+          .justifyContent(this.tabBarStyleType === CYLTabBarStyleType.LiquidGlass ? FlexAlign.Center : FlexAlign.Start)
+          .position(this.tabBarStyleType === CYLTabBarStyleType.LiquidGlass ? { x: this.cylGlassItemsShift(), y: 0 } : undefined)
+          .id('cyl-tab-items')
         }
         // [EN] Liquid Glass: the capsule narrows into a ball when minimized; its slots keep their width and stay centered on it.
         // [CN] 液态玻璃：缩小时胶囊收窄成球；槽位保持宽度并以胶囊为中心。
-        .width(this.cylGlassMinimized() ? CYLLiquidGlassTokens.ROW_HEIGHT_COLLAPSED : '100%')
+        .width(this.tabBarStyleType === CYLTabBarStyleType.LiquidGlass ? this.cylGlassCapsuleWidth() : '100%')
+        // [EN] Liquid Glass: the capsule is placed absolutely in a container of constant height (reference geometry).
+        // [CN] 液态玻璃：胶囊在固定高度的容器中绝对定位（参考工程的几何）。
+        .position(this.tabBarStyleType === CYLTabBarStyleType.LiquidGlass ? { x: this.cylGlassCapsuleX(), y: this.cylGlassRowY() } : undefined)
         .height(this.tabBarStyleType === CYLTabBarStyleType.LiquidGlass ? this.cylGlassRowHeight() : this.tabBarHeight)
         .justifyContent(this.tabBarStyleType === CYLTabBarStyleType.LiquidGlass ? FlexAlign.Center : FlexAlign.Start)
         // [EN] Classic / FlatDesign: the container paints the bar color once, so a translucent theme color (e.g. #17203ACC)
@@ -1337,6 +1609,9 @@ export struct CYLTabBarController {
         .onTouch((event: TouchEvent) => {
           if (this.tabBarStyleType !== CYLTabBarStyleType.LiquidGlass || this.glassCollapsed) {
             return;
+          }
+          if (event.touches.length > 0) {
+            this.glassTouchX = event.touches[0].x;
           }
           if (event.type === TouchType.Down) {
             this.glassTouchActive = true;
@@ -1362,22 +1637,26 @@ export struct CYLTabBarController {
         // [EN] Liquid Glass: the glass capsule of CYLLiquidGlass.ets (blur, tint barTintColor or a light glass, shadow, rim).
         // [CN] 液态玻璃：CYLLiquidGlass.ets 的玻璃胶囊（模糊、barTintColor 或浅色玻璃着色、阴影、描边）。
         .attributeModifier(this.tabBarStyleType === CYLTabBarStyleType.LiquidGlass
-          ? new CYLLiquidGlassCapsuleModifier(this.barTintColor, this.cylGlassRowHeight())
+          ? new CYLLiquidGlassCapsuleModifier(this.barTintColor, this.cylGlassRowHeight(), 3, this.colorMode === 'dark')
           : cyl_tabBarStyleModifier(this.tabBarStyleType, this.barTintColor, this.tabBarHeight, this.barBackgroundImage))
-        .padding({ left: this.itemEdgeInsets.left, right: this.itemEdgeInsets.right })
+        .padding(this.tabBarStyleType === CYLTabBarStyleType.LiquidGlass ? 0 : { left: this.itemEdgeInsets.left, right: this.itemEdgeInsets.right })
         .expandSafeArea(this.tabBarStyleType === CYLTabBarStyleType.LiquidGlass ? [] : [SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM])
         .id('cyl-tab-bar')
+        if (this.tabBarStyleType === CYLTabBarStyleType.LiquidGlass) {
+          if (this.liquidGlassAccessoryShown) {
+            this.cylGlassAccessoryBar()
+          }
+          if (this.cylGlassHasBall()) {
+            this.cylGlassPlusBall()
+          }
+        }
         }
         .width('100%')
         // [EN] Liquid Glass (reference geometry): 11 vp at the sides, 24 vp above the screen's bottom (gesture bar included);
         //      minimized, the ball sits 22 vp from the leading edge.
         // [CN] 液态玻璃（参考工程的几何）：两侧 11 vp，距屏幕底部 24 vp（含手势条）；缩小后球距起始边 22 vp。
-        .padding(this.tabBarStyleType === CYLTabBarStyleType.LiquidGlass ? {
-          left: this.glassCollapsed ? CYLLiquidGlassTokens.COLLAPSED_EDGE_MARGIN : CYLLiquidGlassTokens.BAR_SIDE_MARGIN,
-          right: CYLLiquidGlassTokens.BAR_SIDE_MARGIN,
-          bottom: Math.max(4, CYLLiquidGlassTokens.BAR_BOTTOM_MARGIN - this.glassGestureBarHeight),
-        } : 0)
-        .alignItems(this.cylGlassMinimized() ? HorizontalAlign.Start : HorizontalAlign.Center)
+        .padding(0)
+        .height(this.tabBarStyleType === CYLTabBarStyleType.LiquidGlass ? this.cylGlassBoxHeight() : 'auto')
         .attributeModifier(new CYLLiquidGlassContainerModifier(this.tabBarStyleType === CYLTabBarStyleType.LiquidGlass))
         // [EN] The bar color continues under the gesture bar (classic and FlatDesign); clear around the Liquid Glass capsule.
         // [CN] 经典与扁平样式的 TabBar 颜色延伸到手势条下方；液态玻璃胶囊四周透明。

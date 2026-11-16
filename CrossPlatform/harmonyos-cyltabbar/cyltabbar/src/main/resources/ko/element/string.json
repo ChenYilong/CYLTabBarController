@@ -189,6 +189,10 @@
       "value": "다음 탭 (cyl_selectNextTab, issue #535)"
     },
     {
+      "name": "cyl_l10n_3826b8552c94",
+      "value": "다음 곡"
+    },
+    {
       "name": "cyl_l10n_b2ee912b91d6",
       "value": "숫자"
     },
@@ -215,6 +219,14 @@
     {
       "name": "cyl_l10n_84432607fd87",
       "value": "페이지: %@"
+    },
+    {
+      "name": "cyl_l10n_105b296a83f9",
+      "value": "일시정지"
+    },
+    {
+      "name": "cyl_l10n_de3c731be563",
+      "value": "재생"
     },
     {
       "name": "cyl_l10n_41b77539cc64",

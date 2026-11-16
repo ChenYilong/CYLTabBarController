@@ -54,6 +54,35 @@ export class CYLLiquidGlassTokens {
    * [EN] The duration of the minimize / expand morph (ms). [CN] 缩小 / 展开形变的时长（毫秒）。
    */
   static readonly MORPH_DURATION: number = 300;
+  /**
+   * [EN] One tab slot in the capsule (reference TAB_SLOT_WIDTH). [CN] 胶囊中一个 Tab 槽位的宽度。
+   */
+  static readonly TAB_SLOT_WIDTH: number = 62;
+  /**
+   * [EN] What the capsule leaves at its right for the ball: ball 56 + the ball's margin + a 7 vp gap minus the margin (reference).
+   * [CN] 胶囊右侧为球让出的宽度（参考工程）。
+   */
+  static readonly TAB_RIGHT_RESERVE: number = 63;
+  /**
+   * [EN] Minimized: the gap between the balls and the accessory. [CN] 缩小后球与附属条之间的缝隙。
+   */
+  static readonly COLLAPSED_GAP: number = 5;
+  /**
+   * [EN] The expanded accessory bar's height. [CN] 展开态附属条高度。
+   */
+  static readonly ACCESSORY_HEIGHT: number = 44;
+  /**
+   * [EN] The gap between the expanded accessory and the tab row (its bottom 92 vp above the screen's bottom). [CN] 展开态附属条与 Tab 行之间的缝隙。
+   */
+  static readonly ACCESSORY_GAP: number = 12;
+  /**
+   * [EN] Scrolling down this far in one gesture minimizes the bar (reference MIN_BAR_SCROLL). [CN] 一次手势向下滚动这么多即缩小。
+   */
+  static readonly MIN_SCROLL: number = 8;
+  /**
+   * [EN] The selected tab's scale inside the minimized ball: icon 24 vp to 21 vp (half the ball). [CN] 缩小球内选中 Tab 的缩放：图标 24 vp 缩到 21 vp。
+   */
+  static readonly COLLAPSED_ICON_SCALE: number = 21 / 24;
 }
 
 /**
@@ -88,17 +117,22 @@ export class CYLLiquidGlassCapsuleModifier implements AttributeModifier<RowAttri
   height: number;
   strength: number;
 
-  constructor(barTintColor: ResourceColor | undefined, height: number, strength: number = 3) {
+  dark: boolean;
+
+  constructor(barTintColor: ResourceColor | undefined, height: number, strength: number = 3, dark: boolean = false) {
     this.barTintColor = barTintColor;
     this.height = height;
     this.strength = strength;
+    this.dark = dark;
   }
 
   applyNormalAttribute(instance: RowAttribute): void {
     // [EN] Vibrant glass: blur with boosted saturation and brightness (what makes iOS glass look liquid rather than frosted).
     // [CN] 鲜亮的玻璃：模糊并提高饱和度与亮度（这让 iOS 玻璃看起来像液体而不是磨砂）。
-    instance.backgroundEffect({ radius: 30 + 10 * (5 - this.strength), saturation: 1.8, brightness: 1.08 });
-    instance.backgroundColor(this.barTintColor ?? '#26FFFFFF');
+    // [EN] Dark glass over a dark app, light glass over a light one (reference: material ADAPTIVE).
+    // [CN] 深色 App 上为深色玻璃，浅色 App 上为浅色玻璃（参考工程：材质 ADAPTIVE）。
+    instance.backgroundEffect({ radius: 30 + 10 * (5 - this.strength), saturation: 1.8, brightness: this.dark ? 0.85 : 1.08 });
+    instance.backgroundColor(this.barTintColor ?? (this.dark ? '#33000000' : '#26FFFFFF'));
     instance.borderRadius(this.height / 2);
     instance.shadow({ radius: 20, color: '#22000000', offsetY: 6 });
     // [EN] Never clip: the raised plus button and the badges rise above the capsule, as on iOS (the glass effect follows the

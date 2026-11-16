@@ -189,6 +189,10 @@
       "value": "Volgend tabblad (cyl_selectNextTab, issue #535)"
     },
     {
+      "name": "cyl_l10n_3826b8552c94",
+      "value": "Volgende nummer"
+    },
+    {
       "name": "cyl_l10n_b2ee912b91d6",
       "value": "Getal"
     },
@@ -215,6 +219,14 @@
     {
       "name": "cyl_l10n_84432607fd87",
       "value": "Pagina: %@"
+    },
+    {
+      "name": "cyl_l10n_105b296a83f9",
+      "value": "Pauzeren"
+    },
+    {
+      "name": "cyl_l10n_de3c731be563",
+      "value": "Afspelen"
     },
     {
       "name": "cyl_l10n_41b77539cc64",

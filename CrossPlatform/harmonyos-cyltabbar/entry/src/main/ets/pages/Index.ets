@@ -165,6 +165,55 @@ struct Index {
     });
   }
 
+  /** [EN] A skin color made translucent for the glass ('#RRGGBB' -> 70 % alpha). [CN] 把皮肤颜色变成半透明，用于玻璃。 */
+  private demoGlassTint(color: ResourceColor | undefined): ResourceColor | undefined {
+    if (typeof color === 'string' && /^#[0-9A-Fa-f]{6}$/.test(color as string)) {
+      return `#B3${(color as string).substring(1)}`;
+    }
+    return color;
+  }
+
+  @State demoPlaying: boolean = true;
+
+  /**
+   * [EN] The Liquid Glass accessory of the demo: cover, title, play / pause and next, as the reference's mini music bar.
+   * [CN] 示例的液态玻璃附属条：封面、标题、播放 / 暂停与下一首，与参考工程的迷你音乐条相同。
+   */
+  @Builder
+  demoMiniPlayer() {
+    Row({ space: 8 }) {
+      Image($r('app.media.home_select_cover'))
+        .width(26)
+        .height(26)
+        .borderRadius(5)
+      Column({ space: 1 }) {
+        Text(CYLLocalizedString('LiquidGlass'))
+          .fontSize(12)
+          .fontWeight(FontWeight.Medium)
+          .maxLines(1)
+        Text('CYLTabBarController')
+          .fontSize(10)
+          .opacity(0.7)
+          .maxLines(1)
+          .textOverflow({ overflow: TextOverflow.Ellipsis })
+      }
+      .layoutWeight(1)
+      .alignItems(HorizontalAlign.Start)
+      SymbolGlyph(this.demoPlaying ? $r('sys.symbol.pause') : $r('sys.symbol.play_fill'))
+        .fontSize(20)
+        .accessibilityText(this.demoPlaying ? CYLLocalizedString('Pause') : CYLLocalizedString('Play'))
+        .onClick(() => {
+          this.demoPlaying = !this.demoPlaying;
+        })
+      SymbolGlyph($r('sys.symbol.forward_end_fill'))
+        .fontSize(20)
+        .accessibilityText(CYLLocalizedString('Next track'))
+    }
+    .width('100%')
+    .height('100%')
+    .padding({ left: 8, right: 14 })
+  }
+
   aboutToDisappear(): void {
     CYLThemeManagerCenter.defaultThemeManager.removeListener(this.themeListener);
   }
@@ -1119,7 +1168,7 @@ struct Index {
       CYLTabBarController({
         tabBarStyleType: this.styleType,
         // [EN] A skin's bar color tints the FlatDesign and Liquid Glass bars too. [CN] 皮肤的 TabBar 颜色也用于扁平样式与液态玻璃。
-        barTintColor: this.theme.bar,
+        barTintColor: this.styleType === CYLTabBarStyleType.LiquidGlass ? this.demoGlassTint(this.theme.bar) : this.theme.bar,
         tabBarItemsAttributes: this.tabs,
         plusButton: this.plus,
         selectedIndex: $selectedIndex,
@@ -1183,6 +1232,11 @@ struct Index {
         },
         pageBuilder: (index: number, identifier: string) => {
           this.cylPage(index, identifier)
+        },
+        // [EN] Liquid Glass: a mini player as the bottom accessory, as the reference's music bar. [CN] 液态玻璃：迷你播放条作为底部附属条，与参考工程的音乐条相同。
+        liquidGlassAccessoryShown: this.styleType === CYLTabBarStyleType.LiquidGlass,
+        liquidGlassAccessory: () => {
+          this.demoMiniPlayer()
         },
       })
       }, (key: number) => `cyl-tab-bar-${key}`)

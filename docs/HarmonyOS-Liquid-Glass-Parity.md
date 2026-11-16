@@ -32,7 +32,7 @@
 
 | 中文 | English |
 |:---|:---|
-| **40 / 100**（2026-11-17，本项目提交 `4d0de6b`）。光学 10 / 40，结构与布局 10 / 25，收起与展开 13 / 25，兼容与健壮性 7 / 10。 | **40 / 100** (2026-11-17, this project at `4d0de6b`). Optics 10 / 40, structure and layout 10 / 25, collapse and expand 13 / 25, compatibility and robustness 7 / 10. |
+| **70 / 100**（2026-11-17，按参考工程重构后）。光学 16 / 40，结构与布局 23 / 25，收起与展开 24 / 25，兼容与健壮性 7 / 10。起点为 40 / 100（`4d0de6b`）。剩下的 30 分中，约 24 分（第 1、2、5、6、18 行）依赖 API 24+ 的系统材质。 | **70 / 100** (2026-11-17, after the rebuild on the reference). Optics 16 / 40, structure and layout 23 / 25, collapse and expand 24 / 25, compatibility and robustness 7 / 10. Started at 40 / 100 (`4d0de6b`). Of the 30 points left, about 24 (rows 1, 2, 5, 6 and 18) depend on the API 24+ system material. |
 | 最大差距是材质：参考工程使用 HDS 系统材质（`HdsTabs` 的 `barFloatingStyle.systemMaterialEffect`，`hdsMaterial.MaterialType.ADAPTIVE` + `MaterialLevel.EXQUISITE`；API 26 的 `uiMaterial.ImmersiveMaterial`），这些 API 需要 SDK 6.1.1（API 24）及以上。本机 DevEco Studio 的 SDK 与模拟器是 6.0.1（API 21），其中的 `HdsTabs` 没有 `barFloatingStyle`、`systemMaterial` 与 `hdsMaterial`，`materialFilter` 也是 API 23 起才有。因此在 API 21 上光学部分最多约 20 / 40；要到 100 必须先安装 SDK 6.1.1+ 与 API 24+ 的模拟器镜像（需要维护者在 DevEco Studio 中下载）。 | The largest gap is the material: the reference uses HDS system material (`HdsTabs` `barFloatingStyle.systemMaterialEffect`, `hdsMaterial.MaterialType.ADAPTIVE` + `MaterialLevel.EXQUISITE`; `uiMaterial.ImmersiveMaterial` on API 26), which needs SDK 6.1.1 (API 24) or later. This Mac's DevEco Studio SDK and emulator are 6.0.1 (API 21): its `HdsTabs` has no `barFloatingStyle`, `systemMaterial` or `hdsMaterial`, and `materialFilter` starts at API 23. So on API 21 the optics can reach about 20 / 40 at most; reaching 100 needs SDK 6.1.1+ and an API 24+ emulator image first (the maintainer downloads them in DevEco Studio). |
 
 上：参考工程（真机，深色内容）；下：本项目（Mate 70 Pro 模拟器，HarmonyOS 6.0.1，API 21，`4d0de6b`，2026-11-16，浅色内容）。/ Top: the reference (device, dark content); bottom: this project (Mate 70 Pro emulator, HarmonyOS 6.0.1, API 21, `4d0de6b`, 2026-11-16, light content).
@@ -45,23 +45,27 @@
 |:---|:---|:---|:---|:---|:---|:---|
 | 1 | 系统材质 / System material | 10 | HDS system material on each capsule (`hdsMaterial` ADAPTIVE, level EXQUISITE), real glass rendered by the system | `backgroundEffect` blur imitation (radius, saturation 1.8, brightness 1.08) | 0 | TODO (needs SDK 6.1.1 / API 24+) |
 | 2 | 边缘折射 / Edge refraction | 8 | Content behind is bent and magnified near the capsule edges (lens look), streaks along the long edges | Uniform blur, no bending | 0 | TODO (system material; no API 21 equivalent found) |
-| 3 | 模糊强度与色彩 / Blur strength and color | 6 | Strong soft blur, colors kept vivid; dark glass over dark content, light over light | Blur 40 to 50 vp with saturation 1.8 and a fixed white tint `#26FFFFFF` | 3 | TODO |
-| 4 | 立体描边 / Convex rim | 5 | Thin bright rim with an inner shadow, the capsule reads as a convex glass body | Flat 1 vp white rim and a top-to-bottom gradient | 2 | TODO |
-| 5 | 点光源 / Point light | 5 | Material point light (`lightEffect`) that follows the touch | Static specular band, no light following the finger | 1 | TODO |
+| 3 | 模糊强度与色彩 / Blur strength and color | 6 | Strong soft blur, colors kept vivid; dark glass over dark content, light over light | Blur 40 to 50 vp, saturation 1.8; light glass `#26FFFFFF` in a light app, dark glass `#33000000` (brightness 0.85) in a dark app | 4 | TODO (material adapts to content; ours to the app's mode) |
+| 4 | 立体描边 / Convex rim | 5 | Thin bright rim with an inner shadow, the capsule reads as a convex glass body | Bright outer rim `#99FFFFFF` plus a faint dark inner line (`outline` 0.5 vp `#1F000000`), drawn under the tabs | 4 | TODO |
+| 5 | 点光源 / Point light | 5 | Material point light (`lightEffect`) that follows the touch | A soft radial light spot appears where the finger touches and follows it | 3 | TODO (system lightEffect needs API 24+) |
 | 6 | 按压形变 / Press deformation | 3 | Material press deformation (`interactive: true`), elastic | Spring lift and 2 % swell of the capsule and the lens | 2 | TODO |
-| 7 | 材质阴影 / Material shadow | 3 | `applyShadow: true` | `shadow` radius 20, `#22000000`, offset 6 | 2 | TODO |
-| 8 | 三个独立胶囊 / Three separate capsules | 8 | Tab capsule (4 tabs), search ball at the right end, mini music bar above the tab row, each its own glass | One capsule with the plus button inside it; no ball, no accessory bar | 2 | TODO |
-| 9 | 几何尺寸 / Geometry | 5 | Bottom 24, sides 11, row 56 (42 collapsed), slot 62, icon 24, label 11 vp, gap 2, ball 56 / 42, capsule leaves 63 vp for the ball | Bottom 24, sides 11, row 56 / 42 match; slot = capsule / slot count, label 10 vp, no right reserve | 3 | TODO |
-| 10 | 选中样式 / Selected style | 4 | Tint only (`#FF375F` icon and label), no pill behind the tab | Glass lens pill behind the selected tab plus blue tint | 1 | TODO (remove the lens or make it optional) |
+| 7 | 材质阴影 / Material shadow | 3 | `applyShadow: true` | `shadow` radius 20, `#22000000`, offset 6 on every glass shape | 3 | DONE |
+| 8 | 三个独立胶囊 / Three separate capsules | 8 | Tab capsule (4 tabs), search ball at the right end, mini music bar above the tab row, each its own glass | Tab capsule, plus button as its own glass ball at the right end, optional accessory glass bar (`liquidGlassAccessory`) above the tabs | 8 | DONE |
+| 9 | 几何尺寸 / Geometry | 5 | Bottom 24, sides 11, row 56 (42 collapsed), slot 62, icon 24, label 11 vp, gap 2, ball 56 / 42, capsule leaves 63 vp for the ball | Bottom 24, sides 11, row 56 / 42, slot 62, right reserve 63, ball 56 / 42, gap 5, accessory 44 vp ending 92 vp above the bottom; label 11 vp, 2 vp under the icon | 5 | DONE |
+| 10 | 选中样式 / Selected style | 4 | Tint only (`#FF375F` icon and label), no pill behind the tab | Tint only (`CYLLiquidGlassTintColor` `#FF375F`); the lens is off by default (`liquidGlassLensEnabled`) | 4 | DONE |
 | 11 | 自绘内容 / Self-drawn content | 3 | Content drawn by the app over the material, `hitTestBehavior(Transparent)` so the material still gets touches | Content drawn by the controller over the glass | 3 | DONE |
-| 12 | 深浅色自适应 / Dark and light | 5 | Material ADAPTIVE; text `#F2F2F7` dark / `#1C1C1E` light | Fixed white glass and light-mode colors | 1 | TODO |
-| 13 | 滚动触发 / Scroll trigger | 6 | Finger on screen only; up 8 vp accumulated collapses, any down frame expands; one switch per gesture; works by default | Only with `tabBarMinimizeBehavior`; symmetric `abs(delta) >= 2`; no finger check | 2 | TODO |
-| 14 | 收起后的布局 / Collapsed layout | 6 | One row: tab ball (22 vp from the edge), music bar in the middle, search ball at the right, gaps 5 vp | Only the tab ball | 2 | TODO |
-| 15 | 收起形变细节 / Morph details | 6 | Selected icon slides to the ball center and scales to half the ball, label fades, other tabs vanish at once (outside the animation) | Slide, fade and instant hide; no icon scale | 4 | TODO |
-| 16 | 单一驱动 / Single driver | 4 | One `@State` and one `animateTo` (300 ms EaseInOut); component box height constant, no flicker | One `animateTo` (300 ms EaseInOut); the capsule height changes with the morph | 3 | TODO |
-| 17 | 收起态点击 / Taps when collapsed | 3 | Tap the tab ball or the search ball: expand first, no action | Tab ball expands; no search ball | 2 | TODO |
+| 12 | 深浅色自适应 / Dark and light | 5 | Material ADAPTIVE; text `#F2F2F7` dark / `#1C1C1E` light | Glass tint and unselected titles follow dark and light (`#F2F2F7` / `#1C1C1E`) | 3 | TODO (dark mode not checked on the emulator) |
+| 13 | 滚动触发 / Scroll trigger | 6 | Finger on screen only; up 8 vp accumulated collapses, any down frame expands; one switch per gesture; works by default | Finger on the pages only; down 8 vp in total minimizes, any frame up expands; one switch per gesture; on whenever an accessory is shown or a minimize behavior is set | 5 | TODO (not on by default without an accessory) |
+| 14 | 收起后的布局 / Collapsed layout | 6 | One row: tab ball (22 vp from the edge), music bar in the middle, search ball at the right, gaps 5 vp | One row: tab ball 22 vp from the edge, accessory in the middle, plus ball at the right, gaps 5 vp | 6 | DONE |
+| 15 | 收起形变细节 / Morph details | 6 | Selected icon slides to the ball center and scales to half the ball, label fades, other tabs vanish at once (outside the animation) | Selected tab slides to the ball center and scales 24 to 21 vp, titles fade, other tabs vanish at once | 6 | DONE |
+| 16 | 单一驱动 / Single driver | 4 | One `@State` and one `animateTo` (300 ms EaseInOut); component box height constant, no flicker | One `animateTo` (300 ms EaseInOut); constant container height, every shape placed absolutely | 4 | DONE |
+| 17 | 收起态点击 / Taps when collapsed | 3 | Tap the tab ball or the search ball: expand first, no action | Tab ball and plus ball: the first tap expands only | 3 | DONE |
 | 18 | 材质兼容层 / Material compatibility | 5 | `MaterialCompat`: `apiAvailable` + `isImmersiveMaterialSupported`, cached, never at module level, blur fallback by strength | Blur fallback only (`CYLLiquidGlassMaterial.blurFallback`), no runtime probe | 2 | TODO |
 | 19 | 无黑纱 / No dark veil | 5 | All three HdsTabs plates turned off (bar color, `barBackgroundStyle`, `barBackgroundBlurStyle(NONE)`) | No HdsTabs, no plate under the capsule | 5 | DONE |
+
+收起与展开（上：展开；中：手指上滑后缩小成一行三段；下：点按球后展开），Mate 70 Pro 模拟器，HarmonyOS 6.0.1，API 21，2026-11-17。/ Expanded, minimized after a finger scroll (one row, three shapes), and expanded again after a tap on the ball; Mate 70 Pro emulator, HarmonyOS 6.0.1, API 21, 2026-11-17.
+
+![展开与收起 / Expanded and minimized](assets/harmonyos-liquid-glass-expand-collapse.png)
 
 ## 达到满分的路径 / Path to 100
 
@@ -76,4 +80,5 @@
 
 | 中文 | English |
 |:---|:---|
+| 本条按用户要求使用英文（见右列）。 | IN PROGRESS (2026-11-17, fix to 100): user prompt, verbatim: "修复到100分" English: fix Liquid Glass up to 100. Done on API 21: rows 3, 4, 5, 7 to 10, 12 to 17 (70 / 100). Blocked: rows 1, 2, 5, 6 and 18 need the HDS system material, SDK 6.1.1 (API 24) or later, which must be downloaded in DevEco Studio with the maintainer's Huawei account; this Mac has SDK 6.0.1 (API 21) only. |
 | 本条按用户要求使用英文（见右列）。 | DONE (2026-11-17, scoring table): user prompt, verbatim: "我想要和下面这个项目一模一样的效果，我之前在对话中强调过你参考这个项目，https://github.com/DUDUXXR2/harmonyos-liquid-glass-tabbar 现在代码的液态玻璃效果完全需要重构。根据这个项目创建一个打分表格，对比我们的项目与他的项目之间液态玻璃的差距，满分100分，模糊差距。" English: the user wants exactly the reference's effect; the Liquid Glass code needs a full rebuild; create a scoring table comparing our Liquid Glass with the reference, out of 100, including the blur gap. Result: this document, 40 / 100. |

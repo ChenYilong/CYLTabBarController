@@ -189,6 +189,10 @@
       "value": "下一個 Tab（cyl_selectNextTab，issue #535）"
     },
     {
+      "name": "cyl_l10n_3826b8552c94",
+      "value": "下一首"
+    },
+    {
       "name": "cyl_l10n_b2ee912b91d6",
       "value": "數字"
     },
@@ -215,6 +219,14 @@
     {
       "name": "cyl_l10n_84432607fd87",
       "value": "頁面：%@"
+    },
+    {
+      "name": "cyl_l10n_105b296a83f9",
+      "value": "暫停"
+    },
+    {
+      "name": "cyl_l10n_de3c731be563",
+      "value": "播放"
     },
     {
       "name": "cyl_l10n_41b77539cc64",
