@@ -672,7 +672,8 @@ struct Index {
       },
       {
         id: 'bundle-image', title: CYLLocalizedString('从 bundle 加载图片（issue #535）'),
-        subtitle: CYLLocalizedString('The image of this page’s tab from the app’s rawfile (the resource bundle of iOS); tap again to restore'),
+        // [EN] Issue list row 31: localized. [CN] 问题清单第 31 行：已本地化。
+        subtitle: CYLLocalizedString('The image of this page\'s tab from the app\'s rawfile (the resource bundle of iOS); tap again to restore'),
         action: () => {
           const on = this.flip(`bundle-${page}`);
           this.updateTab(index, (item: CYLTabBarItemAttributes) => {

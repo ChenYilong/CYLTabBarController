@@ -88,7 +88,7 @@ export const CYL_LOCALIZATION_KEYS: Map<string, string> = new Map<string, string
   ["Tab, %1$@ of %2$@", "cyl_l10n_6d067090c833"],
   ["Tab: %@", "cyl_l10n_456887f9731c"],
   ["TabBar 外观", "cyl_l10n_75ccb7ef4864"],
-  ["The image of this page’s tab from the app’s rawfile (the resource bundle of iOS); tap again to restore", "cyl_l10n_46e28086d56d"],
+  ["The image of this page\'s tab from the app\'s rawfile (the resource bundle of iOS); tap again to restore", "cyl_l10n_7c4aecba91c3"],
   ["The plus button sticks out of the bar; its part above the bar responds (shown in red)", "cyl_l10n_2e6d648945c0"],
   ["The “Me” tab needs a login (issue #19); tap to toggle", "cyl_l10n_9b6633b75bf2"],
   ["Top left", "cyl_l10n_a4d0d101d6a3"],

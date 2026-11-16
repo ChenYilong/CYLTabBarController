@@ -341,8 +341,8 @@
       "value": "TabBar 外观"
     },
     {
-      "name": "cyl_l10n_46e28086d56d",
-      "value": "当前页 Tab 的图片取自应用的 rawfile（相当于 iOS 的资源包）；再点恢复"
+      "name": "cyl_l10n_7c4aecba91c3",
+      "value": "本页面 Tab 的图片来自应用的 rawfile（即 iOS 的资源 bundle）；再次点击恢复"
     },
     {
       "name": "cyl_l10n_2e6d648945c0",
