@@ -4,7 +4,7 @@
 export {
   CYLTabBarItemAttributes, CYLTabBarItemTitle, CYLTabBarItemSelectedTitle, CYLTabBarItemImage, CYLTabBarItemSelectedImage,
   CYLTabBarItemIdentifier, CYLTitleOffset, CYLTabBarItemTitleColor, CYLTabBarItemSelectedTitleColor,
-  CYLTabBarItemBackgroundColor, CYLTabBarItemSelectedBackgroundColor
+  CYLTabBarItemBackgroundColor, CYLTabBarItemSelectedBackgroundColor, CYLTabBarItemImageInsets
 } from './src/main/ets/CYLTabBarItem';
 export { CYLPlusButton, CYLPlusButtonInsets } from './src/main/ets/CYLPlusButton';
 export {

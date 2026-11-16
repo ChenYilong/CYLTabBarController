@@ -18,7 +18,8 @@
     "Double tap to open": "Double tap to open",
     "Badge: %@": "Badge: %@",
     "SVGA Tab 图标（配置文件）": "SVGA tab icons (configuration file)",
-    "CYLTabBarSVGAFilePath：选中时播放一次，未选中时显示第一帧": "CYLTabBarSVGAFilePath: plays once when selected, first frame otherwise"
+    "CYLTabBarSVGAFilePath：选中时播放一次，未选中时显示第一帧": "CYLTabBarSVGAFilePath: plays once when selected, first frame otherwise",
+    "Dimmed": "Dimmed"
   },
   "zh-Hans": {
     "Previous tab (cyl_selectPreviousTab, issue #535)": "上一个 Tab（cyl_selectPreviousTab，issue #535）",
@@ -39,6 +40,7 @@
     "Double tap to open": "点按两次打开",
     "Badge: %@": "角标：%@",
     "SVGA Tab 图标（配置文件）": "SVGA Tab 图标（配置文件）",
-    "CYLTabBarSVGAFilePath：选中时播放一次，未选中时显示第一帧": "CYLTabBarSVGAFilePath：选中时播放一次，未选中时显示第一帧"
+    "CYLTabBarSVGAFilePath：选中时播放一次，未选中时显示第一帧": "CYLTabBarSVGAFilePath：选中时播放一次，未选中时显示第一帧",
+    "Dimmed": "不可用"
   }
 }

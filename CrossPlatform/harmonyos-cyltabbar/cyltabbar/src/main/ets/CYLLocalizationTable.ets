@@ -25,6 +25,7 @@ export const CYL_LOCALIZATION_KEYS: Map<string, string> = new Map<string, string
   ["Custom colors", "cyl_l10n_4d242c36821c"],
   ["Custom font", "cyl_l10n_4685555ab484"],
   ["Custom maximum (9)", "cyl_l10n_a45350c25311"],
+  ["Dimmed", "cyl_l10n_b9c74f4cd786"],
   ["Double tap to open", "cyl_l10n_bf0576472e31"],
   ["Fade in once", "cyl_l10n_7e0a1ad9a767"],
   ["FlatDesign", "cyl_l10n_153407d52fed"],
