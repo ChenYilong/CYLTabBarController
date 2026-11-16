@@ -6,7 +6,7 @@ export {
   CYLTabBarItemIdentifier, CYLTitleOffset, CYLTabBarItemTitleColor, CYLTabBarItemSelectedTitleColor,
   CYLTabBarItemBackgroundColor, CYLTabBarItemSelectedBackgroundColor, CYLTabBarItemImageInsets
 } from './src/main/ets/CYLTabBarItem';
-export { CYLPlusButton, CYLPlusButtonInsets, cyl_plusButtonOverhang } from './src/main/ets/CYLPlusButton';
+export { CYLPlusButton, CYLPlusButtonInsets, cyl_plusButtonOverhang, cyl_liquidGlassContentDy } from './src/main/ets/CYLPlusButton';
 export {
   CYLTabBarController, CYLPlusButtonPageIndex, CYLEdgeInsets, CYLTabButtonTapAnimationType, CYLImpactFeedbackStyle, CYLColorModeStorageKey, cyl_updateColorMode,
   CYLTabBarMinimizeBehavior, CYLScrollStorageKey, cyl_reportScroll, cyl_restoreTabBar, CYLRestoreTabBarStorageKey, CYLSelectRequestStorageKey,
