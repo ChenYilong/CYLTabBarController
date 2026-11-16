@@ -605,6 +605,10 @@
       "value": "not loaded"
     },
     {
+      "name": "cyl_l10n_809de913ec0a",
+      "value": "Identifier: %@"
+    },
+    {
       "name": "cyl_l10n_2c8d9e877a54",
       "value": "Title offset (titlePositionAdjustment)"
     },
@@ -763,6 +767,10 @@
     {
       "name": "cyl_l10n_b146fc1a1531",
       "value": "Grass"
+    },
+    {
+      "name": "cyl_l10n_e56fc5fce033",
+      "value": "Page identifier: %@"
     },
     {
       "name": "cyl_l10n_db1c89e0f6e6",
