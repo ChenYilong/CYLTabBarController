@@ -242,7 +242,8 @@ export const CYLPlusButtonPageIndex: number = -1;
 export struct CYLTabBarController {
   /** [EN] CYLTabBarControllerTabBarItemsAttributes; a new array updates the tabs (-updateTabBarItemAtIndex:attributes:). [CN] 新数组即更新 Tab。 */
   @Prop tabBarItemsAttributes: CYLTabBarItemAttributes[] = [];
-  plusButton?: CYLPlusButton;
+  /** [EN] CYLTabBarControllerPlusButton; a new object updates the plus button in place (issue list #7). [CN] 新对象即原地更新加号按钮。 */
+  @Prop plusButton: CYLPlusButton | undefined = undefined;
   @Link selectedIndex: number;
   /** [EN] The badge of each tab (-[UIView cyl_showBadgeValue:] on its tab button); created when unset. [CN] 每个 Tab 的角标；未设置时自动创建。 */
   @State badges: CYLBadge[] = [];
@@ -594,6 +595,13 @@ export struct CYLTabBarController {
     return badge.length > 0 ? CYLLocalizedString('%@, %@', label, badge) : label;
   }
 
+  /** [EN] The height of a tab's icon (a Lottie size or the image size). [CN] Tab 图标高度。 */
+  cylIconHeight(index: number): number {
+    const item = this.tabBarItemsAttributes[index];
+    const lottie = item.lottieFilePath !== undefined && item.gifFilePath === undefined && item.imageURL === undefined;
+    return lottie ? (item.lottieSize ?? this.imageSize) : this.imageSize;
+  }
+
   cylIdentifier(index: number): string {
     if (index === CYLPlusButtonPageIndex) {
       return this.plusButton?.identifier ?? 'plus';
@@ -625,6 +633,7 @@ export struct CYLTabBarController {
       if (this.tabCoverImages[index] !== undefined) {
         Image(this.tabCoverImages[index])
           .height(this.tabBarHeight - 4)
+          .margin({ top: 2 })
           .objectFit(ImageFit.Contain)
           .id(`cyl-cover-${this.cylIdentifier(index)}`)
       } else {
@@ -652,9 +661,11 @@ export struct CYLTabBarController {
         }
         CYLBadgeView({ badge: this.badges[index], anchorWidth: this.imageSize })
       }
-      .width(this.imageSize)
-      .height(this.imageSize)
+      // [EN] No fixed width: the badge is measured with the free width, so text badges grow with their text (issue list
+      //      #1). The icon sits right above the title, whose top is at tabBarHeight - 17 like the plus title (#2).
+      // [CN] 不固定宽度：角标按剩余宽度测量，文字角标随文字变宽（问题 #1）。图标紧贴标题上方，标题顶部与加号标题同在 tabBarHeight - 17（#2）。
       .alignContent(Alignment.TopStart)
+      .margin({ top: Math.max(0, this.tabBarHeight - 17 - 3 - this.cylIconHeight(index)) })
 
       if (this.tabBarItemsAttributes[index].title !== undefined) {
         Text(this.selectedIndex === index
@@ -674,7 +685,9 @@ export struct CYLTabBarController {
     }
     .layoutWeight(1)
     .height('100%')
-    .justifyContent(FlexAlign.Center)
+    .justifyContent(FlexAlign.Start)
+    // [EN] Liquid Glass: the selection is a capsule inside the rounded bar (issue list #6). [CN] 液态玻璃：选中背景为圆角胶囊（问题 #6）。
+    .borderRadius(this.tabBarStyleType === CYLTabBarStyleType.LiquidGlass ? this.tabBarHeight / 2 : 0)
     .backgroundColor(this.selectedIndex === index
       ? (this.tabBarItemsAttributes[index].selectedBackgroundColor ?? Color.Transparent)
       : (this.tabBarItemsAttributes[index].backgroundColor ?? Color.Transparent))

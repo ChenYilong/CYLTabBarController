@@ -699,8 +699,7 @@ struct Index {
             .borderRadius(6)
           CYLBadgeView({ badge: (this.rowBadges.get(page) ?? [])[row.badgeRow], anchorWidth: CYL_BADGE_ICON })
         }
-        .width(CYL_BADGE_ICON)
-        .height(CYL_BADGE_ICON)
+        // [EN] No fixed size: text badges are measured with the free width (issue list #1). [CN] 不固定尺寸（问题 #1）。
         .alignContent(Alignment.TopStart)
         .margin({ right: 16 })
       }

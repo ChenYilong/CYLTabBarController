@@ -342,6 +342,9 @@ export struct CYLBadgeView {
             .fontWeight(FontWeight.Bold)
             .fontColor(this.badge.textColor ?? this.appearance().textColor)
             .textAlign(TextAlign.Center)
+            // [EN] One line: the badge grows with its text (iOS sizeToFit, Android wrap_content), never wraps (issue list #1).
+            // [CN] 单行：角标随文字变宽，不换行（问题 #1）。
+            .maxLines(1)
             .padding({ left: (this.badge.margin ?? this.appearance().margin) / 2, right: (this.badge.margin ?? this.appearance().margin) / 2 })
             .height((this.badge.fontSize ?? this.appearance().fontSize) * 1.2 + (this.badge.margin ?? this.appearance().margin))
             .constraintSize({ minWidth: (this.badge.fontSize ?? this.appearance().fontSize) * 1.2 + (this.badge.margin ?? this.appearance().margin) })
