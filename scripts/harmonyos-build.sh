@@ -1,10 +1,16 @@
 #!/usr/bin/env bash
 # Copy CrossPlatform/harmonyos-cyltabbar to an ASCII path without spaces (hvigor refuses others) and build the HAP.
-# Usage: scripts/harmonyos-build.sh [build dir, default /c/cyl-hm]. Exit code 0 only when the build succeeds.
+# Usage: scripts/harmonyos-build.sh [build dir, default /c/cyl-hm on Windows, ~/cyl-hm on macOS]. Exit code 0 only when the build succeeds.
 set -uo pipefail
 SRC="$(cd "$(dirname "$0")/../CrossPlatform/harmonyos-cyltabbar" && pwd)"
-DST="${1:-/c/cyl-hm}"
-DEVECO="${DEVECO_HOME:-/c/Program Files/Huawei/DevEco Studio}"
+# [EN] Windows (Git Bash) and macOS defaults; override with the first argument and DEVECO_HOME.
+if [ "$(uname)" = "Darwin" ]; then
+  DST="${1:-$HOME/cyl-hm}"
+  DEVECO="${DEVECO_HOME:-/Applications/DevEco-Studio.app/Contents}"
+else
+  DST="${1:-/c/cyl-hm}"
+  DEVECO="${DEVECO_HOME:-/c/Program Files/Huawei/DevEco Studio}"
+fi
 mkdir -p "$DST"
 for d in AppScope cyltabbar entry hvigor; do
   rm -rf "$DST/$d/src"

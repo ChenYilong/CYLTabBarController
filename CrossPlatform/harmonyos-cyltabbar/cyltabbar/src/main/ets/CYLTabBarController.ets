@@ -1071,7 +1071,10 @@ export struct CYLTabBarController {
         }
         .width('100%')
         .height(this.tabBarHeight)
-        .backgroundColor(this.tabBarBackgroundColor)
+        // [EN] Classic / FlatDesign: the container paints the bar color once, so a translucent theme color (e.g. #17203ACC)
+        //      is the same above and under the gesture bar (painted twice, the row looked darker than the strip).
+        // [CN] 经典 / 扁平样式：由容器统一绘制 TabBar 颜色，半透明主题色在手势条上下一致（绘制两次时 TabBar 比下方条带更深）。
+        .backgroundColor(this.tabBarStyleType === CYLTabBarStyleType.LiquidGlass ? this.tabBarBackgroundColor : Color.Transparent)
         .border({ width: { top: this.shadowImage !== undefined ? 0 : 0.5 }, color: { top: this.tabBarShadowColor } })
         .overlay(this.shadowImage !== undefined ? this.cylShadowImage : undefined, { align: Alignment.Top })
         .attributeModifier(cyl_tabBarStyleModifier(this.tabBarStyleType, this.barTintColor, this.tabBarHeight, this.barBackgroundImage))
