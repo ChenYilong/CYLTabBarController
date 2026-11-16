@@ -27,6 +27,7 @@
 | [新功能的文档规则](#新功能的文档规则--documentation-rules-for-new-features) | [Documentation rules for new features](#新功能的文档规则--documentation-rules-for-new-features) |
 | [附件目录](#附件目录--attachment-layout) | [Attachment layout](#附件目录--attachment-layout) |
 | [截图](#截图--screenshots) | [Screenshots](#截图--screenshots) |
+| [任务记录](#cn任务记录) | [Task log](#entask-log) |
 
 <!-- navigation:end -->
 
@@ -89,3 +90,11 @@ flowchart LR
 ![README: bilingual contents](assets/readme-english-bilingual-contents.png)
 
 ![docs/README.md: documentation index and folder layout](assets/docs-navigation-index.png)
+
+## [CN]任务记录
+## [EN]Task log
+
+| 中文 | English |
+|:---|:---|
+| TODO（2026-11-16，README 重写）：用户提示词：「更新readme 合并明显重复的内容，以及重复的图片引用。更新过时的描述。将QA移动到docs独立的文档，并使用链接引用。遵循文档规范。使readme更加可读。不必要的内容使用docs独立文档 用链接引用。更新代码，objc换用使用Swift 并结合example更新，并指出example各个demo用处」。要求：合并重复内容与重复图片；更新过时描述；常见问题移到 docs 并用链接引用；遵循文档规范；README 更易读，非必要内容移到 docs 用链接引用；代码示例由 Objective-C 改为 Swift，结合 Example 更新；列出每个 Example 演示的用途。上下文：README 2223 行，11 个 Objective-C 代码块、0 个 Swift 代码块，9 张图片重复引用，README 常见问题与 docs/FAQ.md 话题大多不重叠。 | TODO (2026-11-16, README rewrite): user prompt, verbatim: "更新readme 合并明显重复的内容，以及重复的图片引用。更新过时的描述。将QA移动到docs独立的文档，并使用链接引用。遵循文档规范。使readme更加可读。不必要的内容使用docs独立文档 用链接引用。更新代码，objc换用使用Swift 并结合example更新，并指出example各个demo用处" (EN: "Update the README: merge obviously duplicated content and duplicated image references; update outdated descriptions; move the Q&A to a separate document in docs and link to it; follow the documentation rules; make the README more readable; move unnecessary content to separate docs and link to them; update the code from Objective-C to Swift, based on the examples, and state what each example demo is for."). Context: the README has 2223 lines, 11 Objective-C code blocks and no Swift one, 9 images referenced twice; most of its FAQ topics are not in docs/FAQ.md. |
+
