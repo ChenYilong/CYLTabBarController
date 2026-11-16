@@ -49,19 +49,6 @@ const CYL_SKIN_PLUS_IMAGE_SIZE: number = 40;
  *      and a page of its own (+plusChildViewController).
  * [CN] Objective-C Example 的 CYLPlusButtonSubclass：位于第 2 位的「发布」，上移 14 vp，标题与 Tab 标题对齐，选中时为绿色，带自己的页面。
  */
-/**
- * [EN] The space under the last row of a demo list (vp): the tab bar (49), the raised plus button above it and the
- *      gesture bar, so no row stays hidden behind them (HarmonyOS screenshot issue 5).
- * [CN] 演示列表最后一行下方的空间（vp）：TabBar（49）、其上方凸起的 PlusButton 与手势条，使任何一行都不会被挡住（鸿蒙截图问题 5）。
- */
-const CYL_LIST_END_INSET: number = 120;
-
-/**
- * [EN] The size of a skin's plus image (vp), smaller than the default 52 vp button (HarmonyOS screenshot issue 10).
- * [CN] 皮肤加号图片的尺寸（vp），小于默认 52 vp 的按钮（鸿蒙截图问题 10）。
- */
-const CYL_SKIN_PLUS_IMAGE_SIZE: number = 40;
-
 const CYL_PLUS: CYLPlusButton = {
   image: $r('app.media.post_normal'),
   selectedImage: $r('app.media.post_highlight'),
