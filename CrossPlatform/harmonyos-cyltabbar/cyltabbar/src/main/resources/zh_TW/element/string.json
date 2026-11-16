@@ -2,7 +2,7 @@
   "string": [
     {
       "name": "cyl_l10n_bffed61338ea",
-      "value": "%@ CYLTabBarController on HarmonyOS"
+      "value": "%@ · 鴻蒙上的 CYLTabBarController"
     },
     {
       "name": "cyl_l10n_aaf9b7d7382d",
@@ -10,19 +10,19 @@
     },
     {
       "name": "cyl_l10n_81a05b6c1cf9",
-      "value": "%@, %@"
+      "value": "%@，%@"
     },
     {
       "name": "cyl_l10n_0b0ae9062c5a",
-      "value": "A tab bar controller of another context, with a square plus button"
+      "value": "另一個 context 的 TabBarController，使用方形加號按鈕"
     },
     {
       "name": "cyl_l10n_aa3e67bda3c0",
-      "value": "ArkUI Tabs, the HarmonyOS system tab bar, with the same tabs"
+      "value": "ArkUI Tabs，即鴻蒙系統 TabBar，使用同樣的 Tab"
     },
     {
       "name": "cyl_l10n_8665e238c516",
-      "value": "Badge: %@"
+      "value": "標記：%@"
     },
     {
       "name": "cyl_l10n_6b2186414c82",
@@ -90,7 +90,7 @@
     },
     {
       "name": "cyl_l10n_bf0576472e31",
-      "value": "Double tap to open"
+      "value": "點兩下以開啟"
     },
     {
       "name": "cyl_l10n_7e0a1ad9a767",
@@ -126,15 +126,15 @@
     },
     {
       "name": "cyl_l10n_0b320b0a775c",
-      "value": "Logged in: %@. The \"Me\" tab needs a login (issue #19); tap to toggle"
+      "value": "已登入：%@。「我的」Tab 需要登入（issue #19）；點擊切換"
     },
     {
       "name": "cyl_l10n_66ba80032520",
-      "value": "Login state"
+      "value": "登入狀態"
     },
     {
       "name": "cyl_l10n_2e8e48a2ebfd",
-      "value": "Long press a tab or the plus button"
+      "value": "長按任意 Tab 或加號按鈕"
     },
     {
       "name": "cyl_l10n_983696096694",
@@ -150,7 +150,7 @@
     },
     {
       "name": "cyl_l10n_1e8f217bdf71",
-      "value": "Next tab (cyl_selectNextTab, issue #535)"
+      "value": "下一個 Tab（cyl_selectNextTab，issue #535）"
     },
     {
       "name": "cyl_l10n_b2ee912b91d6",
@@ -166,11 +166,11 @@
     },
     {
       "name": "cyl_l10n_8a7b0e9c294e",
-      "value": "On: %@; swipe the page left / right"
+      "value": "開啟：%@；左右滑動頁面"
     },
     {
       "name": "cyl_l10n_06eb0a05de97",
-      "value": "On: %@; the new page slides in from the side of its tab"
+      "value": "開啟：%@；新頁面從其 Tab 所在一側滑入"
     },
     {
       "name": "cyl_l10n_287e78fd65af",
@@ -186,7 +186,7 @@
     },
     {
       "name": "cyl_l10n_9a1d72fdd764",
-      "value": "Previous tab (cyl_selectPreviousTab, issue #535)"
+      "value": "上一個 Tab（cyl_selectPreviousTab，issue #535）"
     },
     {
       "name": "cyl_l10n_4b0282f4f1c6",
@@ -194,7 +194,7 @@
     },
     {
       "name": "cyl_l10n_e5416d3ed3c0",
-      "value": "Push to another CYLTabBarController (another PlusButton)"
+      "value": "Push 另一個 CYLTabBarController（另一個 PlusButton）"
     },
     {
       "name": "cyl_l10n_8c96672c9bc5",
@@ -206,11 +206,11 @@
     },
     {
       "name": "cyl_l10n_a63e8b745e73",
-      "value": "Pushes a page that hides the navigation bar while shown, with no base class"
+      "value": "Push 一個顯示期間隱藏導覽列的頁面，無需基底類別"
     },
     {
       "name": "cyl_l10n_79fe28f3a3ac",
-      "value": "Pushes a tab bar controller whose plus button image changes 2 s later; the layout must not move"
+      "value": "Push 一個 TabBarController，其加號按鈕圖片 2 秒後改變；版面不應移動"
     },
     {
       "name": "cyl_l10n_c27618b1aa9d",
@@ -262,7 +262,7 @@
     },
     {
       "name": "cyl_l10n_561582c1e7cc",
-      "value": "Shows the touchable area in translucent red: %@; scale %@x; tap to cycle 1x, 1.5x, 2x, off"
+      "value": "以半透明紅色顯示點擊範圍：%@；縮放 %@x；點擊依次切換 1x、1.5x、2x、關閉"
     },
     {
       "name": "cyl_l10n_3cb58e0d546d",
@@ -290,7 +290,7 @@
     },
     {
       "name": "cyl_l10n_6d067090c833",
-      "value": "Tab, %1$@ of %2$@"
+      "value": "標籤，第 %1$@ 個，共 %2$@ 個"
     },
     {
       "name": "cyl_l10n_75ccb7ef4864",
@@ -298,11 +298,11 @@
     },
     {
       "name": "cyl_l10n_2e6d648945c0",
-      "value": "The plus button sticks out of the bar; its part above the bar responds (shown in red)"
+      "value": "加號按鈕超出 TabBar；超出部分也能回應（紅色顯示）"
     },
     {
       "name": "cyl_l10n_f43b06c12ee1",
-      "value": "The system bar has no plus button: a floating button stands in"
+      "value": "系統 TabBar 沒有加號按鈕：用懸浮按鈕代替"
     },
     {
       "name": "cyl_l10n_a4d0d101d6a3",
@@ -310,11 +310,11 @@
     },
     {
       "name": "cyl_l10n_2306a585ae00",
-      "value": "cyl_itemEdgeInsets: 15% of a tab width free at each end"
+      "value": "cyl_itemEdgeInsets：兩端各留出 Tab 寬度的 15%"
     },
     {
       "name": "cyl_l10n_6360bbdfb8ff",
-      "value": "cyl_itemEdgeInsets: zero, the tabs fill the bar"
+      "value": "cyl_itemEdgeInsets：為零，Tab 鋪滿 TabBar"
     },
     {
       "name": "cyl_l10n_fd15e88376df",
@@ -322,19 +322,19 @@
     },
     {
       "name": "cyl_l10n_1ec113617309",
-      "value": "cyl_pushViewController, cyl_popSelectTabBarChildViewControllerAtIndex, cyl_pushOrPopToViewController"
+      "value": "cyl_pushViewController、cyl_popSelectTabBarChildViewControllerAtIndex、cyl_pushOrPopToViewController"
     },
     {
       "name": "cyl_l10n_ff5772993aee",
-      "value": "cyl_tabBarItemLongPressDuration = %@ ms, cyl_tabBarItemDoubleTapInterval = %@ ms; tap to cycle; double tap a tab to see it"
+      "value": "cyl_tabBarItemLongPressDuration = %@ ms，cyl_tabBarItemDoubleTapInterval = %@ ms；點擊依次切換；雙擊 Tab 查看效果"
     },
     {
       "name": "cyl_l10n_f69c71bc581e",
-      "value": "cyl_tabBarMinimizeBehavior = %@; tap to choose, then scroll this list"
+      "value": "cyl_tabBarMinimizeBehavior = %@；點擊選擇，然後捲動此列表"
     },
     {
       "name": "cyl_l10n_f3f4ecf4a4a6",
-      "value": "selectedIndex = %@ (the plus button's page is %@, never a tab index); tap for the next tab"
+      "value": "selectedIndex = %@（PlusButton 的頁面為 %@，不是 Tab 序號）；點擊切換到下一個 Tab"
     },
     {
       "name": "cyl_l10n_ee5b6ac6461b",
@@ -346,7 +346,7 @@
     },
     {
       "name": "cyl_l10n_c4376b477be8",
-      "value": "tabBarHidden = %@; hidden, it comes back after 2 s"
+      "value": "tabBarHidden = %@；隱藏後 2 秒恢復顯示"
     },
     {
       "name": "cyl_l10n_2a0608059131",
