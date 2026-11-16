@@ -6,7 +6,7 @@
     },
     {
       "name": "cyl_l10n_9ecf653a3fc6",
-      "value": "%@ · บริบทอื่น · จำนวนแตะปุ่มบวก: %@"
+      "value": "%@ · บริบทอื่น · จำนวนการแตะปุ่มบวก: %@"
     },
     {
       "name": "cyl_l10n_aaf9b7d7382d",
@@ -26,7 +26,7 @@
     },
     {
       "name": "cyl_l10n_aa3e67bda3c0",
-      "value": "ArkUI Tabs แถบแท็บของระบบ HarmonyOS ที่มีแท็บเดียวกัน"
+      "value": "ArkUI Tabs แถบแท็บระบบของ HarmonyOS ที่มีแท็บเดียวกัน"
     },
     {
       "name": "cyl_l10n_0557fa923dce",
@@ -74,7 +74,7 @@
     },
     {
       "name": "cyl_l10n_d7c01888e55e",
-      "value": "CYLTabBarSVGAFilePath: เล่นหนึ่งครั้งเมื่อเลือก มิฉะนั้นแสดงเฟรมแรก"
+      "value": "CYLTabBarSVGAFilePath: เล่นหนึ่งครั้งเมื่อเลือก ไม่เช่นนั้นแสดงเฟรมแรก"
     },
     {
       "name": "cyl_l10n_132201f60522",
@@ -87,6 +87,10 @@
     {
       "name": "cyl_l10n_5e74163d3804",
       "value": "CYLFlatDesignTabBarItem จัดกึ่งกลาง"
+    },
+    {
+      "name": "cyl_l10n_f6da70b584ae",
+      "value": "ไฟล์การตั้งค่า: %@"
     },
     {
       "name": "cyl_l10n_158b3b19e868",
@@ -106,7 +110,11 @@
     },
     {
       "name": "cyl_l10n_b9c74f4cd786",
-      "value": "หรี่"
+      "value": "จาง"
+    },
+    {
+      "name": "cyl_l10n_abfc3a65538a",
+      "value": "ค้นพบ"
     },
     {
       "name": "cyl_l10n_bf0576472e31",
@@ -133,8 +141,8 @@
       "value": "ไอคอน GIF"
     },
     {
-      "name": "cyl_l10n_62c204295948",
-      "value": "ตัวระบุ: %@"
+      "name": "cyl_l10n_8cf04a973413",
+      "value": "หน้าแรก"
     },
     {
       "name": "cyl_l10n_d52d30723b2f",
@@ -155,6 +163,14 @@
     {
       "name": "cyl_l10n_983696096694",
       "value": "ระยะขอบ"
+    },
+    {
+      "name": "cyl_l10n_318b2739ddc2",
+      "value": "ฉัน"
+    },
+    {
+      "name": "cyl_l10n_4c2a8fe7eaf2",
+      "value": "ข้อความ"
     },
     {
       "name": "cyl_l10n_24d459a81449",
@@ -193,8 +209,8 @@
       "value": "ข้อความอื่น"
     },
     {
-      "name": "cyl_l10n_2c7326127f1f",
-      "value": "ตัวระบุหน้า: %@"
+      "name": "cyl_l10n_84432607fd87",
+      "value": "หน้า: %@"
     },
     {
       "name": "cyl_l10n_41b77539cc64",
@@ -214,7 +230,7 @@
     },
     {
       "name": "cyl_l10n_e5416d3ed3c0",
-      "value": "เปิด CYLTabBarController อื่น (PlusButton อื่น)"
+      "value": "ไปยัง CYLTabBarController อื่น (PlusButton อื่น)"
     },
     {
       "name": "cyl_l10n_8c96672c9bc5",
@@ -317,12 +333,16 @@
       "value": "แท็บ %1$@ จาก %2$@"
     },
     {
+      "name": "cyl_l10n_456887f9731c",
+      "value": "แท็บ: %@"
+    },
+    {
       "name": "cyl_l10n_75ccb7ef4864",
       "value": "รูปลักษณ์แถบแท็บ"
     },
     {
       "name": "cyl_l10n_2e6d648945c0",
-      "value": "ปุ่มบวกยื่นเหนือแถบ ส่วนที่อยู่เหนือแถบก็ตอบสนอง (แสดงเป็นสีแดง)"
+      "value": "ปุ่มบวกยื่นออกจากแถบ ส่วนที่อยู่เหนือแถบก็ตอบสนองด้วย (แสดงเป็นสีแดง)"
     },
     {
       "name": "cyl_l10n_f43b06c12ee1",
@@ -338,7 +358,7 @@
     },
     {
       "name": "cyl_l10n_2306a585ae00",
-      "value": "cyl_itemEdgeInsets: เว้นว่าง 15% ของความกว้างแท็บที่แต่ละด้าน"
+      "value": "cyl_itemEdgeInsets: เว้นว่าง 15% ของความกว้างแท็บที่ปลายแต่ละด้าน"
     },
     {
       "name": "cyl_l10n_6360bbdfb8ff",
@@ -370,7 +390,7 @@
     },
     {
       "name": "cyl_l10n_ff5772993aee",
-      "value": "cyl_tabBarItemLongPressDuration = %@ มิลลิวินาที, cyl_tabBarItemDoubleTapInterval = %@ มิลลิวินาที; แตะเพื่อเปลี่ยน; แตะแท็บสองครั้งเพื่อดู"
+      "value": "cyl_tabBarItemLongPressDuration = %@ ms, cyl_tabBarItemDoubleTapInterval = %@ ms; แตะเพื่อสลับ; แตะแท็บสองครั้งเพื่อดู"
     },
     {
       "name": "cyl_l10n_f69c71bc581e",
@@ -390,7 +410,7 @@
     },
     {
       "name": "cyl_l10n_c4376b477be8",
-      "value": "tabBarHidden = %@; เมื่อซ่อน จะกลับมาหลัง 2 วินาที"
+      "value": "tabBarHidden = %@; เมื่อซ่อนจะกลับมาหลัง 2 วินาที"
     },
     {
       "name": "cyl_l10n_2a0608059131",

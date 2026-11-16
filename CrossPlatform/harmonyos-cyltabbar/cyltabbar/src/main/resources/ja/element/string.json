@@ -2,11 +2,11 @@
   "string": [
     {
       "name": "cyl_l10n_bffed61338ea",
-      "value": "HarmonyOS 版 %@ CYLTabBarController"
+      "value": "HarmonyOS 上の %@ CYLTabBarController"
     },
     {
       "name": "cyl_l10n_9ecf653a3fc6",
-      "value": "%@ · 別のコンテキスト · プラスのタップ数：%@"
+      "value": "%@ · 別のコンテキスト · プラスのタップ：%@"
     },
     {
       "name": "cyl_l10n_aaf9b7d7382d",
@@ -18,7 +18,7 @@
     },
     {
       "name": "cyl_l10n_0b0ae9062c5a",
-      "value": "別のコンテキストのタブバーコントローラー（四角いプラスボタン付き）"
+      "value": "別のコンテキストのタブバーコントローラ（四角いプラスボタン）"
     },
     {
       "name": "cyl_l10n_427131e7add2",
@@ -26,7 +26,7 @@
     },
     {
       "name": "cyl_l10n_aa3e67bda3c0",
-      "value": "ArkUI Tabs：HarmonyOS のシステムタブバー（同じタブ）"
+      "value": "ArkUI Tabs（HarmonyOS のシステムタブバー）、同じタブで"
     },
     {
       "name": "cyl_l10n_0557fa923dce",
@@ -74,7 +74,7 @@
     },
     {
       "name": "cyl_l10n_d7c01888e55e",
-      "value": "CYLTabBarSVGAFilePath：選択時に 1 回再生、それ以外は最初のフレーム"
+      "value": "CYLTabBarSVGAFilePath：選択時に 1 回再生、未選択時は最初のフレーム"
     },
     {
       "name": "cyl_l10n_132201f60522",
@@ -87,6 +87,10 @@
     {
       "name": "cyl_l10n_5e74163d3804",
       "value": "CYLFlatDesignTabBarItem を中央揃えにする"
+    },
+    {
+      "name": "cyl_l10n_f6da70b584ae",
+      "value": "設定ファイル：%@"
     },
     {
       "name": "cyl_l10n_158b3b19e868",
@@ -109,8 +113,12 @@
       "value": "淡色表示"
     },
     {
+      "name": "cyl_l10n_abfc3a65538a",
+      "value": "発見"
+    },
+    {
       "name": "cyl_l10n_bf0576472e31",
-      "value": "ダブルタップで開く"
+      "value": "ダブルタップして開く"
     },
     {
       "name": "cyl_l10n_7e0a1ad9a767",
@@ -133,8 +141,8 @@
       "value": "GIF アイコン"
     },
     {
-      "name": "cyl_l10n_62c204295948",
-      "value": "識別子：%@"
+      "name": "cyl_l10n_8cf04a973413",
+      "value": "ホーム"
     },
     {
       "name": "cyl_l10n_d52d30723b2f",
@@ -155,6 +163,14 @@
     {
       "name": "cyl_l10n_983696096694",
       "value": "余白"
+    },
+    {
+      "name": "cyl_l10n_318b2739ddc2",
+      "value": "マイページ"
+    },
+    {
+      "name": "cyl_l10n_4c2a8fe7eaf2",
+      "value": "メッセージ"
     },
     {
       "name": "cyl_l10n_24d459a81449",
@@ -182,19 +198,19 @@
     },
     {
       "name": "cyl_l10n_8a7b0e9c294e",
-      "value": "オン：%@；ページを左右にスワイプ"
+      "value": "オン：%@。ページを左右にスワイプ"
     },
     {
       "name": "cyl_l10n_06eb0a05de97",
-      "value": "オン：%@；新しいページがタブの側からスライドして入ります"
+      "value": "オン：%@。新しいページがタブの側からスライドイン"
     },
     {
       "name": "cyl_l10n_287e78fd65af",
       "value": "その他のテキスト"
     },
     {
-      "name": "cyl_l10n_2c7326127f1f",
-      "value": "ページ識別子：%@"
+      "name": "cyl_l10n_84432607fd87",
+      "value": "ページ：%@"
     },
     {
       "name": "cyl_l10n_41b77539cc64",
@@ -214,7 +230,7 @@
     },
     {
       "name": "cyl_l10n_e5416d3ed3c0",
-      "value": "別の CYLTabBarController を開く（別の PlusButton）"
+      "value": "別の CYLTabBarController へ（別の PlusButton）"
     },
     {
       "name": "cyl_l10n_8c96672c9bc5",
@@ -226,11 +242,11 @@
     },
     {
       "name": "cyl_l10n_a63e8b745e73",
-      "value": "表示中はナビゲーションバーを隠すページを開きます（基底クラス不要）"
+      "value": "表示中はナビゲーションバーを隠すページを開く（基底クラス不要）"
     },
     {
       "name": "cyl_l10n_79fe28f3a3ac",
-      "value": "2 秒後にプラスボタンの画像が変わるタブバーコントローラーを開きます。レイアウトは動いてはいけません"
+      "value": "2 秒後にプラスボタンの画像が変わるタブバーコントローラを開く。レイアウトは動いてはいけない"
     },
     {
       "name": "cyl_l10n_c27618b1aa9d",
@@ -286,7 +302,7 @@
     },
     {
       "name": "cyl_l10n_561582c1e7cc",
-      "value": "タップ可能な領域を半透明の赤で表示：%@；倍率 %@x；タップで 1x、1.5x、2x、オフを切り替え"
+      "value": "タップ領域を半透明の赤で表示：%@。倍率 %@x。タップで 1x、1.5x、2x、オフを切り替え"
     },
     {
       "name": "cyl_l10n_3cb58e0d546d",
@@ -314,7 +330,11 @@
     },
     {
       "name": "cyl_l10n_6d067090c833",
-      "value": "タブ、%1$@/%2$@"
+      "value": "タブ、%2$@ 個中 %1$@ 個目"
+    },
+    {
+      "name": "cyl_l10n_456887f9731c",
+      "value": "タブ：%@"
     },
     {
       "name": "cyl_l10n_75ccb7ef4864",
@@ -322,15 +342,15 @@
     },
     {
       "name": "cyl_l10n_2e6d648945c0",
-      "value": "プラスボタンがバーからはみ出し、バーより上の部分も反応します（赤で表示）"
+      "value": "プラスボタンがバーからはみ出し、その上の部分も反応する（赤で表示）"
     },
     {
       "name": "cyl_l10n_f43b06c12ee1",
-      "value": "システムのバーにはプラスボタンがないため、フローティングボタンで代用します"
+      "value": "システムバーにはプラスボタンがないため、フローティングボタンで代用"
     },
     {
       "name": "cyl_l10n_9b6633b75bf2",
-      "value": "「マイ」タブはログインが必要です（issue #19）；タップで切り替え"
+      "value": "「マイ」タブはログインが必要（issue #19）。タップで切り替え"
     },
     {
       "name": "cyl_l10n_a4d0d101d6a3",
@@ -342,7 +362,7 @@
     },
     {
       "name": "cyl_l10n_6360bbdfb8ff",
-      "value": "cyl_itemEdgeInsets：0、タブがバー全体を埋めます"
+      "value": "cyl_itemEdgeInsets：ゼロ、タブがバー全体に広がる"
     },
     {
       "name": "cyl_l10n_fd15e88376df",
@@ -370,15 +390,15 @@
     },
     {
       "name": "cyl_l10n_ff5772993aee",
-      "value": "cyl_tabBarItemLongPressDuration = %@ ms、cyl_tabBarItemDoubleTapInterval = %@ ms；タップで切り替え；タブをダブルタップして確認"
+      "value": "cyl_tabBarItemLongPressDuration = %@ ms、cyl_tabBarItemDoubleTapInterval = %@ ms。タップで切り替え。タブをダブルタップして確認"
     },
     {
       "name": "cyl_l10n_f69c71bc581e",
-      "value": "cyl_tabBarMinimizeBehavior = %@；タップして選び、このリストをスクロール"
+      "value": "cyl_tabBarMinimizeBehavior = %@。タップして選び、このリストをスクロール"
     },
     {
       "name": "cyl_l10n_f3f4ecf4a4a6",
-      "value": "selectedIndex = %@（プラスボタンのページは %@ で、タブのインデックスにはなりません）；タップで次のタブへ"
+      "value": "selectedIndex = %@（プラスボタンのページは %@、タブのインデックスではない）。タップで次のタブ"
     },
     {
       "name": "cyl_l10n_ee5b6ac6461b",
@@ -390,7 +410,7 @@
     },
     {
       "name": "cyl_l10n_c4376b477be8",
-      "value": "tabBarHidden = %@；非表示にすると 2 秒後に戻ります"
+      "value": "tabBarHidden = %@。非表示にすると 2 秒後に戻る"
     },
     {
       "name": "cyl_l10n_2a0608059131",

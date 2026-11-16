@@ -18,7 +18,7 @@
     },
     {
       "name": "cyl_l10n_0b0ae9062c5a",
-      "value": "다른 컨텍스트의 탭 바 컨트롤러, 사각형 플러스 버튼 포함"
+      "value": "다른 컨텍스트의 탭 바 컨트롤러, 사각형 플러스 버튼"
     },
     {
       "name": "cyl_l10n_427131e7add2",
@@ -26,7 +26,7 @@
     },
     {
       "name": "cyl_l10n_aa3e67bda3c0",
-      "value": "ArkUI Tabs, HarmonyOS 시스템 탭 바, 같은 탭 사용"
+      "value": "ArkUI Tabs, HarmonyOS 시스템 탭 바, 같은 탭으로"
     },
     {
       "name": "cyl_l10n_0557fa923dce",
@@ -74,7 +74,7 @@
     },
     {
       "name": "cyl_l10n_d7c01888e55e",
-      "value": "CYLTabBarSVGAFilePath: 선택 시 한 번 재생, 그 외에는 첫 프레임"
+      "value": "CYLTabBarSVGAFilePath: 선택하면 한 번 재생, 아니면 첫 프레임"
     },
     {
       "name": "cyl_l10n_132201f60522",
@@ -87,6 +87,10 @@
     {
       "name": "cyl_l10n_5e74163d3804",
       "value": "CYLFlatDesignTabBarItem 가운데 정렬"
+    },
+    {
+      "name": "cyl_l10n_f6da70b584ae",
+      "value": "설정 파일: %@"
     },
     {
       "name": "cyl_l10n_158b3b19e868",
@@ -106,7 +110,11 @@
     },
     {
       "name": "cyl_l10n_b9c74f4cd786",
-      "value": "흐리게"
+      "value": "흐리게 표시됨"
+    },
+    {
+      "name": "cyl_l10n_abfc3a65538a",
+      "value": "발견"
     },
     {
       "name": "cyl_l10n_bf0576472e31",
@@ -133,8 +141,8 @@
       "value": "GIF 아이콘"
     },
     {
-      "name": "cyl_l10n_62c204295948",
-      "value": "식별자: %@"
+      "name": "cyl_l10n_8cf04a973413",
+      "value": "홈"
     },
     {
       "name": "cyl_l10n_d52d30723b2f",
@@ -150,11 +158,19 @@
     },
     {
       "name": "cyl_l10n_2e8e48a2ebfd",
-      "value": "탭 또는 플러스 버튼 길게 누르기"
+      "value": "탭이나 플러스 버튼을 길게 누르기"
     },
     {
       "name": "cyl_l10n_983696096694",
       "value": "여백"
+    },
+    {
+      "name": "cyl_l10n_318b2739ddc2",
+      "value": "내 정보"
+    },
+    {
+      "name": "cyl_l10n_4c2a8fe7eaf2",
+      "value": "메시지"
     },
     {
       "name": "cyl_l10n_24d459a81449",
@@ -186,15 +202,15 @@
     },
     {
       "name": "cyl_l10n_06eb0a05de97",
-      "value": "켬: %@; 새 페이지가 해당 탭 쪽에서 밀려 들어옵니다"
+      "value": "켬: %@; 새 페이지가 해당 탭 쪽에서 밀려 들어옴"
     },
     {
       "name": "cyl_l10n_287e78fd65af",
       "value": "기타 텍스트"
     },
     {
-      "name": "cyl_l10n_2c7326127f1f",
-      "value": "페이지 식별자: %@"
+      "name": "cyl_l10n_84432607fd87",
+      "value": "페이지: %@"
     },
     {
       "name": "cyl_l10n_41b77539cc64",
@@ -214,7 +230,7 @@
     },
     {
       "name": "cyl_l10n_e5416d3ed3c0",
-      "value": "다른 CYLTabBarController 열기 (다른 PlusButton)"
+      "value": "다른 CYLTabBarController로 이동 (다른 PlusButton)"
     },
     {
       "name": "cyl_l10n_8c96672c9bc5",
@@ -226,11 +242,11 @@
     },
     {
       "name": "cyl_l10n_a63e8b745e73",
-      "value": "표시되는 동안 내비게이션 바를 숨기는 페이지를 엽니다(기본 클래스 없음)"
+      "value": "표시되는 동안 내비게이션 바를 숨기는 페이지를 엽니다 (기본 클래스 없음)"
     },
     {
       "name": "cyl_l10n_79fe28f3a3ac",
-      "value": "2초 후 플러스 버튼 이미지가 바뀌는 탭 바 컨트롤러를 엽니다. 레이아웃이 움직이면 안 됩니다"
+      "value": "2초 뒤 플러스 버튼 이미지가 바뀌는 탭 바 컨트롤러를 엽니다. 레이아웃이 움직이면 안 됩니다"
     },
     {
       "name": "cyl_l10n_c27618b1aa9d",
@@ -254,7 +270,7 @@
     },
     {
       "name": "cyl_l10n_bd001817e373",
-      "value": "SVGA 탭 아이콘 (설정 파일)"
+      "value": "SVGA 탭 아이콘 (구성 파일)"
     },
     {
       "name": "cyl_l10n_b5fcd68edd9f",
@@ -286,7 +302,7 @@
     },
     {
       "name": "cyl_l10n_561582c1e7cc",
-      "value": "터치 가능 영역을 반투명 빨간색으로 표시: %@; 배율 %@x; 탭하여 1x, 1.5x, 2x, 끔 순환"
+      "value": "터치 영역을 반투명 빨간색으로 표시: %@; 배율 %@x; 탭하여 1x, 1.5x, 2x, 끔 전환"
     },
     {
       "name": "cyl_l10n_3cb58e0d546d",
@@ -317,16 +333,20 @@
       "value": "탭, %2$@개 중 %1$@번째"
     },
     {
+      "name": "cyl_l10n_456887f9731c",
+      "value": "탭: %@"
+    },
+    {
       "name": "cyl_l10n_75ccb7ef4864",
       "value": "탭 바 모양"
     },
     {
       "name": "cyl_l10n_2e6d648945c0",
-      "value": "플러스 버튼이 바 위로 튀어나오며, 바 위쪽 부분도 반응합니다(빨간색 표시)"
+      "value": "플러스 버튼이 바 위로 튀어나오며, 위쪽 부분도 반응합니다 (빨간색 표시)"
     },
     {
       "name": "cyl_l10n_f43b06c12ee1",
-      "value": "시스템 바에는 플러스 버튼이 없어 플로팅 버튼으로 대신합니다"
+      "value": "시스템 바에는 플러스 버튼이 없어 떠 있는 버튼으로 대신함"
     },
     {
       "name": "cyl_l10n_9b6633b75bf2",
@@ -342,7 +362,7 @@
     },
     {
       "name": "cyl_l10n_6360bbdfb8ff",
-      "value": "cyl_itemEdgeInsets: 0, 탭이 바를 채웁니다"
+      "value": "cyl_itemEdgeInsets: 0, 탭이 바를 가득 채움"
     },
     {
       "name": "cyl_l10n_fd15e88376df",
@@ -358,7 +378,7 @@
     },
     {
       "name": "cyl_l10n_59884403daf6",
-      "value": "cyl_pushOrPopToViewController: pages/Index (이미 스택에 있음: 돌아감)"
+      "value": "cyl_pushOrPopToViewController: pages/Index (이미 스택에 있어 돌아감)"
     },
     {
       "name": "cyl_l10n_1ec113617309",
@@ -370,15 +390,15 @@
     },
     {
       "name": "cyl_l10n_ff5772993aee",
-      "value": "cyl_tabBarItemLongPressDuration = %@ ms, cyl_tabBarItemDoubleTapInterval = %@ ms; 탭하여 변경; 탭을 두 번 탭하여 확인"
+      "value": "cyl_tabBarItemLongPressDuration = %@ ms, cyl_tabBarItemDoubleTapInterval = %@ ms; 탭하여 전환; 탭을 두 번 탭해 확인"
     },
     {
       "name": "cyl_l10n_f69c71bc581e",
-      "value": "cyl_tabBarMinimizeBehavior = %@; 탭하여 선택한 뒤 이 목록을 스크롤하세요"
+      "value": "cyl_tabBarMinimizeBehavior = %@; 탭하여 선택한 뒤 이 목록을 스크롤"
     },
     {
       "name": "cyl_l10n_f3f4ecf4a4a6",
-      "value": "selectedIndex = %@ (플러스 버튼의 페이지는 %@이며 탭 인덱스가 아님); 탭하면 다음 탭"
+      "value": "selectedIndex = %@ (플러스 버튼의 페이지는 %@, 탭 인덱스가 아님); 탭하면 다음 탭"
     },
     {
       "name": "cyl_l10n_ee5b6ac6461b",
@@ -390,7 +410,7 @@
     },
     {
       "name": "cyl_l10n_c4376b477be8",
-      "value": "tabBarHidden = %@; 숨기면 2초 후 다시 나타납니다"
+      "value": "tabBarHidden = %@; 숨기면 2초 뒤 돌아옴"
     },
     {
       "name": "cyl_l10n_2a0608059131",

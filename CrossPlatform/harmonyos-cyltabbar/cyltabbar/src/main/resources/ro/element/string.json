@@ -18,7 +18,7 @@
     },
     {
       "name": "cyl_l10n_0b0ae9062c5a",
-      "value": "Un controler de bară de file din alt context, cu un buton plus pătrat"
+      "value": "Un controler de bară de file din alt context, cu buton plus pătrat"
     },
     {
       "name": "cyl_l10n_427131e7add2",
@@ -89,6 +89,10 @@
       "value": "CYLFlatDesignTabBarItem: centrat"
     },
     {
+      "name": "cyl_l10n_f6da70b584ae",
+      "value": "Fișier de configurare: %@"
+    },
+    {
       "name": "cyl_l10n_158b3b19e868",
       "value": "Rază colț"
     },
@@ -109,8 +113,12 @@
       "value": "Estompat"
     },
     {
+      "name": "cyl_l10n_abfc3a65538a",
+      "value": "Descoperă"
+    },
+    {
       "name": "cyl_l10n_bf0576472e31",
-      "value": "Atinge de două ori pentru a deschide"
+      "value": "Atingeți de două ori pentru a deschide"
     },
     {
       "name": "cyl_l10n_7e0a1ad9a767",
@@ -133,8 +141,8 @@
       "value": "Pictogramă GIF"
     },
     {
-      "name": "cyl_l10n_62c204295948",
-      "value": "Identificator: %@"
+      "name": "cyl_l10n_8cf04a973413",
+      "value": "Acasă"
     },
     {
       "name": "cyl_l10n_d52d30723b2f",
@@ -150,11 +158,19 @@
     },
     {
       "name": "cyl_l10n_2e8e48a2ebfd",
-      "value": "Apasă lung o filă sau butonul plus"
+      "value": "Apăsați lung o filă sau butonul plus"
     },
     {
       "name": "cyl_l10n_983696096694",
       "value": "Margine"
+    },
+    {
+      "name": "cyl_l10n_318b2739ddc2",
+      "value": "Eu"
+    },
+    {
+      "name": "cyl_l10n_4c2a8fe7eaf2",
+      "value": "Mesaje"
     },
     {
       "name": "cyl_l10n_24d459a81449",
@@ -182,7 +198,7 @@
     },
     {
       "name": "cyl_l10n_8a7b0e9c294e",
-      "value": "Activat: %@; glisează pagina la stânga / dreapta"
+      "value": "Activat: %@; glisați pagina la stânga / dreapta"
     },
     {
       "name": "cyl_l10n_06eb0a05de97",
@@ -193,8 +209,8 @@
       "value": "Alt text"
     },
     {
-      "name": "cyl_l10n_2c7326127f1f",
-      "value": "Identificator de pagină: %@"
+      "name": "cyl_l10n_84432607fd87",
+      "value": "Pagină: %@"
     },
     {
       "name": "cyl_l10n_41b77539cc64",
@@ -226,7 +242,7 @@
     },
     {
       "name": "cyl_l10n_a63e8b745e73",
-      "value": "Deschide o pagină care ascunde bara de navigare cât este afișată, fără clasă de bază"
+      "value": "Deschide o pagină care ascunde bara de navigare, fără clasă de bază"
     },
     {
       "name": "cyl_l10n_79fe28f3a3ac",
@@ -286,7 +302,7 @@
     },
     {
       "name": "cyl_l10n_561582c1e7cc",
-      "value": "Arată zona atingibilă cu roșu translucid: %@; scară %@x; atinge pentru 1x, 1,5x, 2x, oprit"
+      "value": "Afișează zona de atingere în roșu translucid: %@; scară %@x; atingeți pentru 1x, 1,5x, 2x, oprit"
     },
     {
       "name": "cyl_l10n_3cb58e0d546d",
@@ -317,20 +333,24 @@
       "value": "Filă, %1$@ din %2$@"
     },
     {
+      "name": "cyl_l10n_456887f9731c",
+      "value": "Filă: %@"
+    },
+    {
       "name": "cyl_l10n_75ccb7ef4864",
       "value": "Aspectul barei de file"
     },
     {
       "name": "cyl_l10n_2e6d648945c0",
-      "value": "Butonul plus iese deasupra barei; partea de deasupra barei răspunde (afișată cu roșu)"
+      "value": "Butonul plus iese din bară; și partea de deasupra răspunde (în roșu)"
     },
     {
       "name": "cyl_l10n_f43b06c12ee1",
-      "value": "Bara de sistem nu are buton plus: îl înlocuiește un buton plutitor"
+      "value": "Bara de sistem nu are buton plus: un buton plutitor îl înlocuiește"
     },
     {
       "name": "cyl_l10n_9b6633b75bf2",
-      "value": "Fila „Eu” necesită autentificare (issue #19); atinge pentru a comuta"
+      "value": "Fila „Eu” necesită autentificare (issue #19); atingeți pentru a comuta"
     },
     {
       "name": "cyl_l10n_a4d0d101d6a3",
@@ -370,15 +390,15 @@
     },
     {
       "name": "cyl_l10n_ff5772993aee",
-      "value": "cyl_tabBarItemLongPressDuration = %@ ms, cyl_tabBarItemDoubleTapInterval = %@ ms; atinge pentru a schimba; atinge de două ori o filă pentru a vedea"
+      "value": "cyl_tabBarItemLongPressDuration = %@ ms, cyl_tabBarItemDoubleTapInterval = %@ ms; atingeți pentru a schimba; atingeți de două ori o filă pentru a vedea"
     },
     {
       "name": "cyl_l10n_f69c71bc581e",
-      "value": "cyl_tabBarMinimizeBehavior = %@; atinge pentru a alege, apoi derulează această listă"
+      "value": "cyl_tabBarMinimizeBehavior = %@; atingeți pentru a alege, apoi derulați lista"
     },
     {
       "name": "cyl_l10n_f3f4ecf4a4a6",
-      "value": "selectedIndex = %@ (pagina butonului plus este %@, niciodată un index de filă); atinge pentru fila următoare"
+      "value": "selectedIndex = %@ (pagina butonului plus este %@, niciodată un index de filă); atingeți pentru fila următoare"
     },
     {
       "name": "cyl_l10n_ee5b6ac6461b",

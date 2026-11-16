@@ -6,7 +6,7 @@
     },
     {
       "name": "cyl_l10n_9ecf653a3fc6",
-      "value": "%@ · ngữ cảnh khác · số lần chạm nút cộng: %@"
+      "value": "%@ · ngữ cảnh khác · số lần nhấn nút cộng: %@"
     },
     {
       "name": "cyl_l10n_aaf9b7d7382d",
@@ -89,6 +89,10 @@
       "value": "CYLFlatDesignTabBarItem căn giữa"
     },
     {
+      "name": "cyl_l10n_f6da70b584ae",
+      "value": "Tệp cấu hình: %@"
+    },
+    {
       "name": "cyl_l10n_158b3b19e868",
       "value": "Bo góc"
     },
@@ -109,8 +113,12 @@
       "value": "Làm mờ"
     },
     {
+      "name": "cyl_l10n_abfc3a65538a",
+      "value": "Khám phá"
+    },
+    {
       "name": "cyl_l10n_bf0576472e31",
-      "value": "Chạm hai lần để mở"
+      "value": "Nhấn đúp để mở"
     },
     {
       "name": "cyl_l10n_7e0a1ad9a767",
@@ -133,8 +141,8 @@
       "value": "Biểu tượng GIF"
     },
     {
-      "name": "cyl_l10n_62c204295948",
-      "value": "Mã định danh: %@"
+      "name": "cyl_l10n_8cf04a973413",
+      "value": "Trang chủ"
     },
     {
       "name": "cyl_l10n_d52d30723b2f",
@@ -155,6 +163,14 @@
     {
       "name": "cyl_l10n_983696096694",
       "value": "Lề"
+    },
+    {
+      "name": "cyl_l10n_318b2739ddc2",
+      "value": "Tôi"
+    },
+    {
+      "name": "cyl_l10n_4c2a8fe7eaf2",
+      "value": "Tin nhắn"
     },
     {
       "name": "cyl_l10n_24d459a81449",
@@ -193,8 +209,8 @@
       "value": "Văn bản khác"
     },
     {
-      "name": "cyl_l10n_2c7326127f1f",
-      "value": "Mã định danh trang: %@"
+      "name": "cyl_l10n_84432607fd87",
+      "value": "Trang: %@"
     },
     {
       "name": "cyl_l10n_41b77539cc64",
@@ -214,7 +230,7 @@
     },
     {
       "name": "cyl_l10n_e5416d3ed3c0",
-      "value": "Mở một CYLTabBarController khác (PlusButton khác)"
+      "value": "Chuyển sang CYLTabBarController khác (PlusButton khác)"
     },
     {
       "name": "cyl_l10n_8c96672c9bc5",
@@ -226,7 +242,7 @@
     },
     {
       "name": "cyl_l10n_a63e8b745e73",
-      "value": "Mở trang ẩn thanh điều hướng khi đang hiển thị, không cần lớp cơ sở"
+      "value": "Mở trang ẩn thanh điều hướng khi hiển thị, không cần lớp cơ sở"
     },
     {
       "name": "cyl_l10n_79fe28f3a3ac",
@@ -286,7 +302,7 @@
     },
     {
       "name": "cyl_l10n_561582c1e7cc",
-      "value": "Hiển thị vùng chạm màu đỏ trong mờ: %@; tỷ lệ %@x; chạm để chuyển 1x, 1,5x, 2x, tắt"
+      "value": "Hiển thị vùng chạm màu đỏ trong suốt: %@; tỉ lệ %@x; nhấn để đổi 1x, 1,5x, 2x, tắt"
     },
     {
       "name": "cyl_l10n_3cb58e0d546d",
@@ -317,12 +333,16 @@
       "value": "Tab, %1$@ trên %2$@"
     },
     {
+      "name": "cyl_l10n_456887f9731c",
+      "value": "Tab: %@"
+    },
+    {
       "name": "cyl_l10n_75ccb7ef4864",
       "value": "Giao diện thanh tab"
     },
     {
       "name": "cyl_l10n_2e6d648945c0",
-      "value": "Nút cộng nhô lên trên thanh; phần phía trên thanh vẫn phản hồi (hiển thị màu đỏ)"
+      "value": "Nút cộng nhô ra khỏi thanh; phần phía trên cũng phản hồi (hiển thị màu đỏ)"
     },
     {
       "name": "cyl_l10n_f43b06c12ee1",
@@ -330,7 +350,7 @@
     },
     {
       "name": "cyl_l10n_9b6633b75bf2",
-      "value": "Tab “Tôi” cần đăng nhập (issue #19); chạm để bật/tắt"
+      "value": "Tab “Tôi” cần đăng nhập (issue #19); nhấn để chuyển"
     },
     {
       "name": "cyl_l10n_a4d0d101d6a3",
@@ -338,7 +358,7 @@
     },
     {
       "name": "cyl_l10n_2306a585ae00",
-      "value": "cyl_itemEdgeInsets: chừa trống 15% chiều rộng tab ở mỗi đầu"
+      "value": "cyl_itemEdgeInsets: chừa 15% chiều rộng tab ở mỗi đầu"
     },
     {
       "name": "cyl_l10n_6360bbdfb8ff",
@@ -358,7 +378,7 @@
     },
     {
       "name": "cyl_l10n_59884403daf6",
-      "value": "cyl_pushOrPopToViewController: pages/Index (đã có trong ngăn xếp: quay lại)"
+      "value": "cyl_pushOrPopToViewController: pages/Index (đã ở trong ngăn xếp: quay lại)"
     },
     {
       "name": "cyl_l10n_1ec113617309",
@@ -370,15 +390,15 @@
     },
     {
       "name": "cyl_l10n_ff5772993aee",
-      "value": "cyl_tabBarItemLongPressDuration = %@ ms, cyl_tabBarItemDoubleTapInterval = %@ ms; chạm để đổi; chạm hai lần vào một tab để xem"
+      "value": "cyl_tabBarItemLongPressDuration = %@ ms, cyl_tabBarItemDoubleTapInterval = %@ ms; nhấn để đổi; nhấn đúp một tab để xem"
     },
     {
       "name": "cyl_l10n_f69c71bc581e",
-      "value": "cyl_tabBarMinimizeBehavior = %@; chạm để chọn, rồi cuộn danh sách này"
+      "value": "cyl_tabBarMinimizeBehavior = %@; nhấn để chọn, rồi cuộn danh sách này"
     },
     {
       "name": "cyl_l10n_f3f4ecf4a4a6",
-      "value": "selectedIndex = %@ (trang của nút cộng là %@, không bao giờ là chỉ số tab); chạm để sang tab tiếp theo"
+      "value": "selectedIndex = %@ (trang của nút cộng là %@, không bao giờ là chỉ số tab); nhấn để sang tab tiếp theo"
     },
     {
       "name": "cyl_l10n_ee5b6ac6461b",
@@ -390,7 +410,7 @@
     },
     {
       "name": "cyl_l10n_c4376b477be8",
-      "value": "tabBarHidden = %@; khi ẩn, sẽ hiện lại sau 2 giây"
+      "value": "tabBarHidden = %@; khi ẩn, quay lại sau 2 giây"
     },
     {
       "name": "cyl_l10n_2a0608059131",

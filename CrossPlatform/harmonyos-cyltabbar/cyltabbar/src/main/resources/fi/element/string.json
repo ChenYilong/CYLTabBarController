@@ -2,11 +2,11 @@
   "string": [
     {
       "name": "cyl_l10n_bffed61338ea",
-      "value": "%@ CYLTabBarController HarmonyOSissa"
+      "value": "%@ CYLTabBarController HarmonyOS:ssä"
     },
     {
       "name": "cyl_l10n_9ecf653a3fc6",
-      "value": "%@ · toinen konteksti · plus-napautukset: %@"
+      "value": "%@ · toinen konteksti · plusnapautukset: %@"
     },
     {
       "name": "cyl_l10n_aaf9b7d7382d",
@@ -18,15 +18,15 @@
     },
     {
       "name": "cyl_l10n_0b0ae9062c5a",
-      "value": "Toisen kontekstin välilehtipalkin ohjain, jossa on neliön muotoinen plus-painike"
+      "value": "Toisen kontekstin välilehtipalkin ohjain neliönmuotoisella pluspainikkeella"
     },
     {
       "name": "cyl_l10n_427131e7add2",
-      "value": "Toinen plus-painike"
+      "value": "Toinen pluspainike"
     },
     {
       "name": "cyl_l10n_aa3e67bda3c0",
-      "value": "ArkUI Tabs, HarmonyOSin järjestelmän välilehtipalkki, samoilla välilehdillä"
+      "value": "ArkUI Tabs, HarmonyOS:n järjestelmän välilehtipalkki, samoilla välilehdillä"
     },
     {
       "name": "cyl_l10n_0557fa923dce",
@@ -74,7 +74,7 @@
     },
     {
       "name": "cyl_l10n_d7c01888e55e",
-      "value": "CYLTabBarSVGAFilePath: toistetaan kerran valittaessa, muuten ensimmäinen kuva"
+      "value": "CYLTabBarSVGAFilePath: toistuu kerran valittaessa, muuten ensimmäinen kuva"
     },
     {
       "name": "cyl_l10n_132201f60522",
@@ -87,6 +87,10 @@
     {
       "name": "cyl_l10n_5e74163d3804",
       "value": "CYLFlatDesignTabBarItem: keskitetty"
+    },
+    {
+      "name": "cyl_l10n_f6da70b584ae",
+      "value": "Asetustiedosto: %@"
     },
     {
       "name": "cyl_l10n_158b3b19e868",
@@ -109,8 +113,12 @@
       "value": "Himmennetty"
     },
     {
+      "name": "cyl_l10n_abfc3a65538a",
+      "value": "Tutustu"
+    },
+    {
       "name": "cyl_l10n_bf0576472e31",
-      "value": "Avaa kaksoisnapautuksella"
+      "value": "Avaa kaksoisnapauttamalla"
     },
     {
       "name": "cyl_l10n_7e0a1ad9a767",
@@ -133,8 +141,8 @@
       "value": "GIF-kuvake"
     },
     {
-      "name": "cyl_l10n_62c204295948",
-      "value": "Tunniste: %@"
+      "name": "cyl_l10n_8cf04a973413",
+      "value": "Koti"
     },
     {
       "name": "cyl_l10n_d52d30723b2f",
@@ -150,11 +158,19 @@
     },
     {
       "name": "cyl_l10n_2e8e48a2ebfd",
-      "value": "Paina pitkään välilehteä tai plus-painiketta"
+      "value": "Paina pitkään välilehteä tai pluspainiketta"
     },
     {
       "name": "cyl_l10n_983696096694",
       "value": "Marginaali"
+    },
+    {
+      "name": "cyl_l10n_318b2739ddc2",
+      "value": "Minä"
+    },
+    {
+      "name": "cyl_l10n_4c2a8fe7eaf2",
+      "value": "Viestit"
     },
     {
       "name": "cyl_l10n_24d459a81449",
@@ -193,8 +209,8 @@
       "value": "Muu teksti"
     },
     {
-      "name": "cyl_l10n_2c7326127f1f",
-      "value": "Sivun tunniste: %@"
+      "name": "cyl_l10n_84432607fd87",
+      "value": "Sivu: %@"
     },
     {
       "name": "cyl_l10n_41b77539cc64",
@@ -214,7 +230,7 @@
     },
     {
       "name": "cyl_l10n_e5416d3ed3c0",
-      "value": "Avaa toinen CYLTabBarController (toinen PlusButton)"
+      "value": "Siirry toiseen CYLTabBarControlleriin (toinen PlusButton)"
     },
     {
       "name": "cyl_l10n_8c96672c9bc5",
@@ -226,11 +242,11 @@
     },
     {
       "name": "cyl_l10n_a63e8b745e73",
-      "value": "Avaa sivun, joka piilottaa navigointipalkin näkyessään, ilman kantaluokkaa"
+      "value": "Avaa sivun, joka piilottaa navigointipalkin, ilman kantaluokkaa"
     },
     {
       "name": "cyl_l10n_79fe28f3a3ac",
-      "value": "Avaa ohjaimen, jonka plus-painikkeen kuva vaihtuu 2 s kuluttua; asettelu ei saa siirtyä"
+      "value": "Avaa ohjaimen, jonka pluspainikkeen kuva vaihtuu 2 s myöhemmin; asettelu ei saa liikkua"
     },
     {
       "name": "cyl_l10n_c27618b1aa9d",
@@ -254,7 +270,7 @@
     },
     {
       "name": "cyl_l10n_bd001817e373",
-      "value": "SVGA-välilehtikuvakkeet (asetustiedosto)"
+      "value": "SVGA-välilehtikuvakkeet (määritystiedosto)"
     },
     {
       "name": "cyl_l10n_b5fcd68edd9f",
@@ -286,7 +302,7 @@
     },
     {
       "name": "cyl_l10n_561582c1e7cc",
-      "value": "Näyttää kosketusalueen läpikuultavana punaisena: %@; mittakaava %@x; napauta: 1x, 1,5x, 2x, pois"
+      "value": "Näyttää kosketusalueen läpikuultavan punaisena: %@; mittakaava %@x; napauta: 1x, 1,5x, 2x, pois"
     },
     {
       "name": "cyl_l10n_3cb58e0d546d",
@@ -314,7 +330,11 @@
     },
     {
       "name": "cyl_l10n_6d067090c833",
-      "value": "Välilehti, %1$@ / %2$@"
+      "value": "Välilehti, %1$@/%2$@"
+    },
+    {
+      "name": "cyl_l10n_456887f9731c",
+      "value": "Välilehti: %@"
     },
     {
       "name": "cyl_l10n_75ccb7ef4864",
@@ -322,15 +342,15 @@
     },
     {
       "name": "cyl_l10n_2e6d648945c0",
-      "value": "Plus-painike ulottuu palkin yläpuolelle; palkin yläpuolinen osa reagoi (näytetään punaisena)"
+      "value": "Pluspainike ulottuu palkin yläpuolelle; myös yläosa reagoi (näytetään punaisena)"
     },
     {
       "name": "cyl_l10n_f43b06c12ee1",
-      "value": "Järjestelmäpalkissa ei ole plus-painiketta: kelluva painike korvaa sen"
+      "value": "Järjestelmäpalkissa ei ole pluspainiketta: kelluva painike korvaa sen"
     },
     {
       "name": "cyl_l10n_9b6633b75bf2",
-      "value": "Välilehti ”Minä” vaatii kirjautumisen (issue #19); vaihda napauttamalla"
+      "value": "”Minä”-välilehti vaatii kirjautumisen (issue #19); vaihda napauttamalla"
     },
     {
       "name": "cyl_l10n_a4d0d101d6a3",
@@ -374,11 +394,11 @@
     },
     {
       "name": "cyl_l10n_f69c71bc581e",
-      "value": "cyl_tabBarMinimizeBehavior = %@; valitse napauttamalla ja vieritä sitten tätä luetteloa"
+      "value": "cyl_tabBarMinimizeBehavior = %@; valitse napauttamalla ja vieritä sitten luetteloa"
     },
     {
       "name": "cyl_l10n_f3f4ecf4a4a6",
-      "value": "selectedIndex = %@ (plus-painikkeen sivu on %@, ei koskaan välilehden indeksi); napauta seuraavaa välilehteä varten"
+      "value": "selectedIndex = %@ (pluspainikkeen sivu on %@, ei koskaan välilehden indeksi); napauta seuraavaan välilehteen"
     },
     {
       "name": "cyl_l10n_ee5b6ac6461b",
@@ -390,7 +410,7 @@
     },
     {
       "name": "cyl_l10n_c4376b477be8",
-      "value": "tabBarHidden = %@; piilotettuna se palaa 2 s kuluttua"
+      "value": "tabBarHidden = %@; piilotettu, palaa 2 s kuluttua"
     },
     {
       "name": "cyl_l10n_2a0608059131",

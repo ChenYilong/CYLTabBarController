@@ -26,7 +26,7 @@
     },
     {
       "name": "cyl_l10n_aa3e67bda3c0",
-      "value": "ArkUI Tabs, sistemska traka kartica HarmonyOS-a, s istim karticama"
+      "value": "ArkUI Tabs, sustavna traka kartica HarmonyOS-a, s istim karticama"
     },
     {
       "name": "cyl_l10n_0557fa923dce",
@@ -89,6 +89,10 @@
       "value": "CYLFlatDesignTabBarItem: centrirano"
     },
     {
+      "name": "cyl_l10n_f6da70b584ae",
+      "value": "Konfiguracijska datoteka: %@"
+    },
+    {
       "name": "cyl_l10n_158b3b19e868",
       "value": "Radijus kuta"
     },
@@ -107,6 +111,10 @@
     {
       "name": "cyl_l10n_b9c74f4cd786",
       "value": "Zatamnjeno"
+    },
+    {
+      "name": "cyl_l10n_abfc3a65538a",
+      "value": "Otkrij"
     },
     {
       "name": "cyl_l10n_bf0576472e31",
@@ -133,8 +141,8 @@
       "value": "GIF ikona"
     },
     {
-      "name": "cyl_l10n_62c204295948",
-      "value": "Identifikator: %@"
+      "name": "cyl_l10n_8cf04a973413",
+      "value": "Početna"
     },
     {
       "name": "cyl_l10n_d52d30723b2f",
@@ -155,6 +163,14 @@
     {
       "name": "cyl_l10n_983696096694",
       "value": "Margina"
+    },
+    {
+      "name": "cyl_l10n_318b2739ddc2",
+      "value": "Ja"
+    },
+    {
+      "name": "cyl_l10n_4c2a8fe7eaf2",
+      "value": "Poruke"
     },
     {
       "name": "cyl_l10n_24d459a81449",
@@ -182,19 +198,19 @@
     },
     {
       "name": "cyl_l10n_8a7b0e9c294e",
-      "value": "Uključeno: %@; povucite stranicu lijevo / desno"
+      "value": "Uklj.: %@; povucite stranicu lijevo / desno"
     },
     {
       "name": "cyl_l10n_06eb0a05de97",
-      "value": "Uključeno: %@; nova stranica ulazi sa strane svoje kartice"
+      "value": "Uklj.: %@; nova stranica klizi sa strane svoje kartice"
     },
     {
       "name": "cyl_l10n_287e78fd65af",
       "value": "Drugi tekst"
     },
     {
-      "name": "cyl_l10n_2c7326127f1f",
-      "value": "Identifikator stranice: %@"
+      "name": "cyl_l10n_84432607fd87",
+      "value": "Stranica: %@"
     },
     {
       "name": "cyl_l10n_41b77539cc64",
@@ -214,7 +230,7 @@
     },
     {
       "name": "cyl_l10n_e5416d3ed3c0",
-      "value": "Otvori drugi CYLTabBarController (drugi PlusButton)"
+      "value": "Idi na drugi CYLTabBarController (drugi PlusButton)"
     },
     {
       "name": "cyl_l10n_8c96672c9bc5",
@@ -226,7 +242,7 @@
     },
     {
       "name": "cyl_l10n_a63e8b745e73",
-      "value": "Otvara stranicu koja skriva traku za navigaciju dok je prikazana, bez osnovne klase"
+      "value": "Otvara stranicu koja skriva navigacijsku traku, bez osnovne klase"
     },
     {
       "name": "cyl_l10n_79fe28f3a3ac",
@@ -286,7 +302,7 @@
     },
     {
       "name": "cyl_l10n_561582c1e7cc",
-      "value": "Prikazuje područje dodira prozirno crveno: %@; mjerilo %@x; dodirnite za 1x, 1,5x, 2x, isključeno"
+      "value": "Prikazuje područje dodira prozirno crveno: %@; mjerilo %@x; dodirnite za 1x, 1,5x, 2x, isklj."
     },
     {
       "name": "cyl_l10n_3cb58e0d546d",
@@ -317,16 +333,20 @@
       "value": "Kartica, %1$@ od %2$@"
     },
     {
+      "name": "cyl_l10n_456887f9731c",
+      "value": "Kartica: %@"
+    },
+    {
       "name": "cyl_l10n_75ccb7ef4864",
       "value": "Izgled trake kartica"
     },
     {
       "name": "cyl_l10n_2e6d648945c0",
-      "value": "Gumb plus strši iznad trake; njegov dio iznad trake reagira (prikazan crveno)"
+      "value": "Gumb plus viri iznad trake; i dio iznad reagira (prikazano crveno)"
     },
     {
       "name": "cyl_l10n_f43b06c12ee1",
-      "value": "Sistemska traka nema gumb plus: zamjenjuje ga plutajući gumb"
+      "value": "Sustavna traka nema gumb plus: zamjenjuje ga plutajući gumb"
     },
     {
       "name": "cyl_l10n_9b6633b75bf2",
@@ -358,7 +378,7 @@
     },
     {
       "name": "cyl_l10n_59884403daf6",
-      "value": "cyl_pushOrPopToViewController: pages/Index (već u stogu: povratak)"
+      "value": "cyl_pushOrPopToViewController: pages/Index (već na stogu: vraća se)"
     },
     {
       "name": "cyl_l10n_1ec113617309",
@@ -370,11 +390,11 @@
     },
     {
       "name": "cyl_l10n_ff5772993aee",
-      "value": "cyl_tabBarItemLongPressDuration = %@ ms, cyl_tabBarItemDoubleTapInterval = %@ ms; dodirnite za promjenu; dvaput dodirnite karticu da to vidite"
+      "value": "cyl_tabBarItemLongPressDuration = %@ ms, cyl_tabBarItemDoubleTapInterval = %@ ms; dodirnite za promjenu; dvaput dodirnite karticu da vidite"
     },
     {
       "name": "cyl_l10n_f69c71bc581e",
-      "value": "cyl_tabBarMinimizeBehavior = %@; dodirnite za odabir, zatim pomičite ovaj popis"
+      "value": "cyl_tabBarMinimizeBehavior = %@; dodirnite za odabir, zatim pomaknite ovaj popis"
     },
     {
       "name": "cyl_l10n_f3f4ecf4a4a6",
@@ -390,7 +410,7 @@
     },
     {
       "name": "cyl_l10n_c4376b477be8",
-      "value": "tabBarHidden = %@; skrivena se vraća nakon 2 s"
+      "value": "tabBarHidden = %@; skrivena, vraća se nakon 2 s"
     },
     {
       "name": "cyl_l10n_2a0608059131",

@@ -74,7 +74,7 @@
     },
     {
       "name": "cyl_l10n_d7c01888e55e",
-      "value": "CYLTabBarSVGAFilePath: přehraje se jednou při výběru, jinak první snímek"
+      "value": "CYLTabBarSVGAFilePath: při výběru se přehraje jednou, jinak první snímek"
     },
     {
       "name": "cyl_l10n_132201f60522",
@@ -87,6 +87,10 @@
     {
       "name": "cyl_l10n_5e74163d3804",
       "value": "CYLFlatDesignTabBarItem: centrováno"
+    },
+    {
+      "name": "cyl_l10n_f6da70b584ae",
+      "value": "Konfigurační soubor: %@"
     },
     {
       "name": "cyl_l10n_158b3b19e868",
@@ -106,11 +110,15 @@
     },
     {
       "name": "cyl_l10n_b9c74f4cd786",
-      "value": "Ztlumeno"
+      "value": "Ztlumené"
+    },
+    {
+      "name": "cyl_l10n_abfc3a65538a",
+      "value": "Objevit"
     },
     {
       "name": "cyl_l10n_bf0576472e31",
-      "value": "Dvojitým klepnutím otevřete"
+      "value": "Otevřete dvojitým klepnutím"
     },
     {
       "name": "cyl_l10n_7e0a1ad9a767",
@@ -133,8 +141,8 @@
       "value": "Ikona GIF"
     },
     {
-      "name": "cyl_l10n_62c204295948",
-      "value": "Identifikátor: %@"
+      "name": "cyl_l10n_8cf04a973413",
+      "value": "Domů"
     },
     {
       "name": "cyl_l10n_d52d30723b2f",
@@ -150,11 +158,19 @@
     },
     {
       "name": "cyl_l10n_2e8e48a2ebfd",
-      "value": "Dlouze stiskněte kartu nebo tlačítko plus"
+      "value": "Podržte kartu nebo tlačítko plus"
     },
     {
       "name": "cyl_l10n_983696096694",
       "value": "Okraj textu"
+    },
+    {
+      "name": "cyl_l10n_318b2739ddc2",
+      "value": "Já"
+    },
+    {
+      "name": "cyl_l10n_4c2a8fe7eaf2",
+      "value": "Zprávy"
     },
     {
       "name": "cyl_l10n_24d459a81449",
@@ -182,19 +198,19 @@
     },
     {
       "name": "cyl_l10n_8a7b0e9c294e",
-      "value": "Zapnuto: %@; přejeďte stránkou doleva / doprava"
+      "value": "Zap.: %@; přejeďte stránkou doleva / doprava"
     },
     {
       "name": "cyl_l10n_06eb0a05de97",
-      "value": "Zapnuto: %@; nová stránka vjede ze strany své karty"
+      "value": "Zap.: %@; nová stránka vjede ze strany své karty"
     },
     {
       "name": "cyl_l10n_287e78fd65af",
       "value": "Jiný text"
     },
     {
-      "name": "cyl_l10n_2c7326127f1f",
-      "value": "Identifikátor stránky: %@"
+      "name": "cyl_l10n_84432607fd87",
+      "value": "Stránka: %@"
     },
     {
       "name": "cyl_l10n_41b77539cc64",
@@ -214,7 +230,7 @@
     },
     {
       "name": "cyl_l10n_e5416d3ed3c0",
-      "value": "Otevřít jiný CYLTabBarController (jiné PlusButton)"
+      "value": "Přejít na jiný CYLTabBarController (jiné PlusButton)"
     },
     {
       "name": "cyl_l10n_8c96672c9bc5",
@@ -226,7 +242,7 @@
     },
     {
       "name": "cyl_l10n_a63e8b745e73",
-      "value": "Otevře stránku, která při zobrazení skryje navigační panel, bez základní třídy"
+      "value": "Otevře stránku, která skryje navigační panel, bez základní třídy"
     },
     {
       "name": "cyl_l10n_79fe28f3a3ac",
@@ -286,7 +302,7 @@
     },
     {
       "name": "cyl_l10n_561582c1e7cc",
-      "value": "Zobrazí dotykovou oblast průsvitně červeně: %@; měřítko %@x; klepnutím 1x, 1,5x, 2x, vypnuto"
+      "value": "Zobrazuje dotykovou oblast poloprůhledně červeně: %@; měřítko %@x; klepnutím 1x, 1,5x, 2x, vyp."
     },
     {
       "name": "cyl_l10n_3cb58e0d546d",
@@ -317,12 +333,16 @@
       "value": "Karta, %1$@ z %2$@"
     },
     {
+      "name": "cyl_l10n_456887f9731c",
+      "value": "Karta: %@"
+    },
+    {
       "name": "cyl_l10n_75ccb7ef4864",
       "value": "Vzhled panelu karet"
     },
     {
       "name": "cyl_l10n_2e6d648945c0",
-      "value": "Tlačítko plus vyčnívá nad panel; jeho část nad panelem reaguje (zobrazena červeně)"
+      "value": "Tlačítko plus přesahuje panel; i část nad ním reaguje (zobrazeno červeně)"
     },
     {
       "name": "cyl_l10n_f43b06c12ee1",
@@ -338,11 +358,11 @@
     },
     {
       "name": "cyl_l10n_2306a585ae00",
-      "value": "cyl_itemEdgeInsets: na každém konci 15 % šířky karty volné"
+      "value": "cyl_itemEdgeInsets: na každém konci volných 15 % šířky karty"
     },
     {
       "name": "cyl_l10n_6360bbdfb8ff",
-      "value": "cyl_itemEdgeInsets: nula, karty vyplní panel"
+      "value": "cyl_itemEdgeInsets: nula, karty vyplňují panel"
     },
     {
       "name": "cyl_l10n_fd15e88376df",
@@ -358,7 +378,7 @@
     },
     {
       "name": "cyl_l10n_59884403daf6",
-      "value": "cyl_pushOrPopToViewController: pages/Index (už je v zásobníku: návrat)"
+      "value": "cyl_pushOrPopToViewController: pages/Index (už je v zásobníku: vrátí se)"
     },
     {
       "name": "cyl_l10n_1ec113617309",
@@ -378,7 +398,7 @@
     },
     {
       "name": "cyl_l10n_f3f4ecf4a4a6",
-      "value": "selectedIndex = %@ (stránka tlačítka plus je %@, nikdy index karty); klepnutím přejdete na další kartu"
+      "value": "selectedIndex = %@ (stránka tlačítka plus je %@, nikdy index karty); klepnutím na další kartu"
     },
     {
       "name": "cyl_l10n_ee5b6ac6461b",
@@ -390,7 +410,7 @@
     },
     {
       "name": "cyl_l10n_c4376b477be8",
-      "value": "tabBarHidden = %@; skrytý se vrátí po 2 s"
+      "value": "tabBarHidden = %@; skrytý, vrátí se po 2 s"
     },
     {
       "name": "cyl_l10n_2a0608059131",

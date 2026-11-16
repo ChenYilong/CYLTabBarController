@@ -18,11 +18,11 @@
     },
     {
       "name": "cyl_l10n_0b0ae9062c5a",
-      "value": "Een tabbalkcontroller uit een andere context, met een vierkante plusknop"
+      "value": "Een tabbalkcontroller van een andere context, met een vierkante plusknop"
     },
     {
       "name": "cyl_l10n_427131e7add2",
-      "value": "Een andere plusknop"
+      "value": "Andere plusknop"
     },
     {
       "name": "cyl_l10n_aa3e67bda3c0",
@@ -74,7 +74,7 @@
     },
     {
       "name": "cyl_l10n_d7c01888e55e",
-      "value": "CYLTabBarSVGAFilePath: speelt één keer af bij selectie, anders het eerste beeld"
+      "value": "CYLTabBarSVGAFilePath: speelt één keer bij selectie, anders het eerste beeld"
     },
     {
       "name": "cyl_l10n_132201f60522",
@@ -87,6 +87,10 @@
     {
       "name": "cyl_l10n_5e74163d3804",
       "value": "CYLFlatDesignTabBarItem: gecentreerd"
+    },
+    {
+      "name": "cyl_l10n_f6da70b584ae",
+      "value": "Configuratiebestand: %@"
     },
     {
       "name": "cyl_l10n_158b3b19e868",
@@ -107,6 +111,10 @@
     {
       "name": "cyl_l10n_b9c74f4cd786",
       "value": "Gedimd"
+    },
+    {
+      "name": "cyl_l10n_abfc3a65538a",
+      "value": "Ontdekken"
     },
     {
       "name": "cyl_l10n_bf0576472e31",
@@ -133,8 +141,8 @@
       "value": "GIF-symbool"
     },
     {
-      "name": "cyl_l10n_62c204295948",
-      "value": "Identificatie: %@"
+      "name": "cyl_l10n_8cf04a973413",
+      "value": "Home"
     },
     {
       "name": "cyl_l10n_d52d30723b2f",
@@ -150,11 +158,19 @@
     },
     {
       "name": "cyl_l10n_2e8e48a2ebfd",
-      "value": "Houd een tabblad of de plusknop lang ingedrukt"
+      "value": "Houd een tabblad of de plusknop ingedrukt"
     },
     {
       "name": "cyl_l10n_983696096694",
       "value": "Marge"
+    },
+    {
+      "name": "cyl_l10n_318b2739ddc2",
+      "value": "Ik"
+    },
+    {
+      "name": "cyl_l10n_4c2a8fe7eaf2",
+      "value": "Berichten"
     },
     {
       "name": "cyl_l10n_24d459a81449",
@@ -186,15 +202,15 @@
     },
     {
       "name": "cyl_l10n_06eb0a05de97",
-      "value": "Aan: %@; de nieuwe pagina schuift in vanaf de kant van haar tabblad"
+      "value": "Aan: %@; de nieuwe pagina schuift in vanaf de kant van zijn tabblad"
     },
     {
       "name": "cyl_l10n_287e78fd65af",
       "value": "Andere tekst"
     },
     {
-      "name": "cyl_l10n_2c7326127f1f",
-      "value": "Pagina-identificatie: %@"
+      "name": "cyl_l10n_84432607fd87",
+      "value": "Pagina: %@"
     },
     {
       "name": "cyl_l10n_41b77539cc64",
@@ -226,7 +242,7 @@
     },
     {
       "name": "cyl_l10n_a63e8b745e73",
-      "value": "Opent een pagina die de navigatiebalk verbergt zolang ze zichtbaar is, zonder basisklasse"
+      "value": "Opent een pagina die de navigatiebalk verbergt, zonder basisklasse"
     },
     {
       "name": "cyl_l10n_79fe28f3a3ac",
@@ -254,7 +270,7 @@
     },
     {
       "name": "cyl_l10n_bd001817e373",
-      "value": "SVGA-tabpictogrammen (configuratiebestand)"
+      "value": "SVGA-tabsymbolen (configuratiebestand)"
     },
     {
       "name": "cyl_l10n_b5fcd68edd9f",
@@ -286,7 +302,7 @@
     },
     {
       "name": "cyl_l10n_561582c1e7cc",
-      "value": "Toont het aanraakgebied in doorschijnend rood: %@; schaal %@x; tik voor 1x, 1,5x, 2x, uit"
+      "value": "Toont het tikgebied in doorschijnend rood: %@; schaal %@x; tik voor 1x, 1,5x, 2x, uit"
     },
     {
       "name": "cyl_l10n_3cb58e0d546d",
@@ -317,12 +333,16 @@
       "value": "Tabblad, %1$@ van %2$@"
     },
     {
+      "name": "cyl_l10n_456887f9731c",
+      "value": "Tabblad: %@"
+    },
+    {
       "name": "cyl_l10n_75ccb7ef4864",
       "value": "Uiterlijk van de tabbalk"
     },
     {
       "name": "cyl_l10n_2e6d648945c0",
-      "value": "De plusknop steekt boven de balk uit; het deel boven de balk reageert (rood weergegeven)"
+      "value": "De plusknop steekt boven de balk uit; ook dat deel reageert (rood weergegeven)"
     },
     {
       "name": "cyl_l10n_f43b06c12ee1",
@@ -358,7 +378,7 @@
     },
     {
       "name": "cyl_l10n_59884403daf6",
-      "value": "cyl_pushOrPopToViewController: pages/Index (al in de stapel: gaat terug)"
+      "value": "cyl_pushOrPopToViewController: pages/Index (al in de stapel: terug)"
     },
     {
       "name": "cyl_l10n_1ec113617309",
@@ -374,7 +394,7 @@
     },
     {
       "name": "cyl_l10n_f69c71bc581e",
-      "value": "cyl_tabBarMinimizeBehavior = %@; tik om te kiezen en scrol dan door deze lijst"
+      "value": "cyl_tabBarMinimizeBehavior = %@; tik om te kiezen en scrol dan deze lijst"
     },
     {
       "name": "cyl_l10n_f3f4ecf4a4a6",
@@ -390,7 +410,7 @@
     },
     {
       "name": "cyl_l10n_c4376b477be8",
-      "value": "tabBarHidden = %@; verborgen komt hij na 2 s terug"
+      "value": "tabBarHidden = %@; verborgen, komt na 2 s terug"
     },
     {
       "name": "cyl_l10n_2a0608059131",

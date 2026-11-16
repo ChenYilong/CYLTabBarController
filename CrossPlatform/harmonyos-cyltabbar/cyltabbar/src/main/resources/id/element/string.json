@@ -74,7 +74,7 @@
     },
     {
       "name": "cyl_l10n_d7c01888e55e",
-      "value": "CYLTabBarSVGAFilePath: diputar sekali saat dipilih, selain itu bingkai pertama"
+      "value": "CYLTabBarSVGAFilePath: diputar sekali saat dipilih, jika tidak bingkai pertama"
     },
     {
       "name": "cyl_l10n_132201f60522",
@@ -87,6 +87,10 @@
     {
       "name": "cyl_l10n_5e74163d3804",
       "value": "CYLFlatDesignTabBarItem di tengah"
+    },
+    {
+      "name": "cyl_l10n_f6da70b584ae",
+      "value": "File konfigurasi: %@"
     },
     {
       "name": "cyl_l10n_158b3b19e868",
@@ -107,6 +111,10 @@
     {
       "name": "cyl_l10n_b9c74f4cd786",
       "value": "Diredupkan"
+    },
+    {
+      "name": "cyl_l10n_abfc3a65538a",
+      "value": "Jelajahi"
     },
     {
       "name": "cyl_l10n_bf0576472e31",
@@ -133,8 +141,8 @@
       "value": "Ikon GIF"
     },
     {
-      "name": "cyl_l10n_62c204295948",
-      "value": "Pengenal: %@"
+      "name": "cyl_l10n_8cf04a973413",
+      "value": "Beranda"
     },
     {
       "name": "cyl_l10n_d52d30723b2f",
@@ -150,11 +158,19 @@
     },
     {
       "name": "cyl_l10n_2e8e48a2ebfd",
-      "value": "Tekan lama sebuah tab atau tombol plus"
+      "value": "Tekan lama tab atau tombol plus"
     },
     {
       "name": "cyl_l10n_983696096694",
       "value": "Margin"
+    },
+    {
+      "name": "cyl_l10n_318b2739ddc2",
+      "value": "Saya"
+    },
+    {
+      "name": "cyl_l10n_4c2a8fe7eaf2",
+      "value": "Pesan"
     },
     {
       "name": "cyl_l10n_24d459a81449",
@@ -186,15 +202,15 @@
     },
     {
       "name": "cyl_l10n_06eb0a05de97",
-      "value": "Aktif: %@; halaman baru masuk dari sisi tabnya"
+      "value": "Aktif: %@; halaman baru meluncur dari sisi tabnya"
     },
     {
       "name": "cyl_l10n_287e78fd65af",
       "value": "Teks lain"
     },
     {
-      "name": "cyl_l10n_2c7326127f1f",
-      "value": "Pengenal halaman: %@"
+      "name": "cyl_l10n_84432607fd87",
+      "value": "Halaman: %@"
     },
     {
       "name": "cyl_l10n_41b77539cc64",
@@ -226,7 +242,7 @@
     },
     {
       "name": "cyl_l10n_a63e8b745e73",
-      "value": "Membuka halaman yang menyembunyikan bilah navigasi saat ditampilkan, tanpa kelas dasar"
+      "value": "Membuka halaman yang menyembunyikan bilah navigasi, tanpa kelas dasar"
     },
     {
       "name": "cyl_l10n_79fe28f3a3ac",
@@ -286,7 +302,7 @@
     },
     {
       "name": "cyl_l10n_561582c1e7cc",
-      "value": "Menampilkan area sentuh dengan merah transparan: %@; skala %@x; ketuk untuk 1x, 1,5x, 2x, mati"
+      "value": "Menampilkan area sentuh merah transparan: %@; skala %@x; ketuk untuk 1x, 1,5x, 2x, mati"
     },
     {
       "name": "cyl_l10n_3cb58e0d546d",
@@ -317,12 +333,16 @@
       "value": "Tab, %1$@ dari %2$@"
     },
     {
+      "name": "cyl_l10n_456887f9731c",
+      "value": "Tab: %@"
+    },
+    {
       "name": "cyl_l10n_75ccb7ef4864",
       "value": "Tampilan tab bar"
     },
     {
       "name": "cyl_l10n_2e6d648945c0",
-      "value": "Tombol plus menonjol di atas bilah; bagian di atas bilah merespons (ditampilkan merah)"
+      "value": "Tombol plus menonjol dari bilah; bagian di atasnya juga merespons (ditampilkan merah)"
     },
     {
       "name": "cyl_l10n_f43b06c12ee1",
@@ -330,7 +350,7 @@
     },
     {
       "name": "cyl_l10n_9b6633b75bf2",
-      "value": "Tab “Saya” memerlukan login (issue #19); ketuk untuk beralih"
+      "value": "Tab “Saya” perlu masuk (issue #19); ketuk untuk mengganti"
     },
     {
       "name": "cyl_l10n_a4d0d101d6a3",
@@ -342,7 +362,7 @@
     },
     {
       "name": "cyl_l10n_6360bbdfb8ff",
-      "value": "cyl_itemEdgeInsets: nol, tab mengisi bilah"
+      "value": "cyl_itemEdgeInsets: nol, tab memenuhi bilah"
     },
     {
       "name": "cyl_l10n_fd15e88376df",
@@ -370,7 +390,7 @@
     },
     {
       "name": "cyl_l10n_ff5772993aee",
-      "value": "cyl_tabBarItemLongPressDuration = %@ md, cyl_tabBarItemDoubleTapInterval = %@ md; ketuk untuk berganti; ketuk dua kali sebuah tab untuk melihatnya"
+      "value": "cyl_tabBarItemLongPressDuration = %@ ms, cyl_tabBarItemDoubleTapInterval = %@ ms; ketuk untuk mengganti; ketuk dua kali sebuah tab untuk melihat"
     },
     {
       "name": "cyl_l10n_f69c71bc581e",

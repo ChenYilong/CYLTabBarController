@@ -18,15 +18,15 @@
     },
     {
       "name": "cyl_l10n_0b0ae9062c5a",
-      "value": "Ein Tab-Bar-Controller eines anderen Kontexts, mit einem quadratischen Plus-Button"
+      "value": "Ein Tab-Bar-Controller eines anderen Kontexts mit quadratischem Plus-Button"
     },
     {
       "name": "cyl_l10n_427131e7add2",
-      "value": "Ein anderer Plus-Button"
+      "value": "Anderer Plus-Button"
     },
     {
       "name": "cyl_l10n_aa3e67bda3c0",
-      "value": "ArkUI Tabs, die System-Tab-Bar von HarmonyOS, mit denselben Tabs"
+      "value": "ArkUI Tabs, die HarmonyOS-System-Tab-Bar, mit denselben Tabs"
     },
     {
       "name": "cyl_l10n_0557fa923dce",
@@ -74,7 +74,7 @@
     },
     {
       "name": "cyl_l10n_d7c01888e55e",
-      "value": "CYLTabBarSVGAFilePath: wird bei Auswahl einmal abgespielt, sonst erstes Bild"
+      "value": "CYLTabBarSVGAFilePath: spielt beim Auswählen einmal ab, sonst das erste Bild"
     },
     {
       "name": "cyl_l10n_132201f60522",
@@ -87,6 +87,10 @@
     {
       "name": "cyl_l10n_5e74163d3804",
       "value": "CYLFlatDesignTabBarItem zentriert"
+    },
+    {
+      "name": "cyl_l10n_f6da70b584ae",
+      "value": "Konfigurationsdatei: %@"
     },
     {
       "name": "cyl_l10n_158b3b19e868",
@@ -106,11 +110,15 @@
     },
     {
       "name": "cyl_l10n_b9c74f4cd786",
-      "value": "Abgedunkelt"
+      "value": "Gedimmt"
+    },
+    {
+      "name": "cyl_l10n_abfc3a65538a",
+      "value": "Entdecken"
     },
     {
       "name": "cyl_l10n_bf0576472e31",
-      "value": "Zum Öffnen doppelt tippen"
+      "value": "Zum Öffnen doppeltippen"
     },
     {
       "name": "cyl_l10n_7e0a1ad9a767",
@@ -133,8 +141,8 @@
       "value": "GIF-Symbol"
     },
     {
-      "name": "cyl_l10n_62c204295948",
-      "value": "Kennung: %@"
+      "name": "cyl_l10n_8cf04a973413",
+      "value": "Start"
     },
     {
       "name": "cyl_l10n_d52d30723b2f",
@@ -150,11 +158,19 @@
     },
     {
       "name": "cyl_l10n_2e8e48a2ebfd",
-      "value": "Lange auf einen Tab oder den Plus-Button drücken"
+      "value": "Einen Tab oder den Plus-Button lange drücken"
     },
     {
       "name": "cyl_l10n_983696096694",
       "value": "Abstand"
+    },
+    {
+      "name": "cyl_l10n_318b2739ddc2",
+      "value": "Ich"
+    },
+    {
+      "name": "cyl_l10n_4c2a8fe7eaf2",
+      "value": "Nachrichten"
     },
     {
       "name": "cyl_l10n_24d459a81449",
@@ -182,19 +198,19 @@
     },
     {
       "name": "cyl_l10n_8a7b0e9c294e",
-      "value": "An: %@; die Seite nach links / rechts wischen"
+      "value": "Ein: %@; die Seite nach links / rechts wischen"
     },
     {
       "name": "cyl_l10n_06eb0a05de97",
-      "value": "An: %@; die neue Seite gleitet von der Seite ihres Tabs herein"
+      "value": "Ein: %@; die neue Seite gleitet von der Seite ihres Tabs herein"
     },
     {
       "name": "cyl_l10n_287e78fd65af",
       "value": "Anderer Text"
     },
     {
-      "name": "cyl_l10n_2c7326127f1f",
-      "value": "Seitenkennung: %@"
+      "name": "cyl_l10n_84432607fd87",
+      "value": "Seite: %@"
     },
     {
       "name": "cyl_l10n_41b77539cc64",
@@ -226,7 +242,7 @@
     },
     {
       "name": "cyl_l10n_a63e8b745e73",
-      "value": "Öffnet eine Seite, die die Navigationsleiste während der Anzeige ausblendet, ohne Basisklasse"
+      "value": "Öffnet eine Seite, die die Navigationsleiste ausblendet, ohne Basisklasse"
     },
     {
       "name": "cyl_l10n_79fe28f3a3ac",
@@ -286,7 +302,7 @@
     },
     {
       "name": "cyl_l10n_561582c1e7cc",
-      "value": "Zeigt den berührbaren Bereich halbtransparent rot: %@; Skalierung %@x; tippen für 1x, 1,5x, 2x, aus"
+      "value": "Zeigt den Tippbereich halbtransparent rot: %@; Skalierung %@x; tippen für 1x, 1,5x, 2x, aus"
     },
     {
       "name": "cyl_l10n_3cb58e0d546d",
@@ -317,20 +333,24 @@
       "value": "Tab, %1$@ von %2$@"
     },
     {
+      "name": "cyl_l10n_456887f9731c",
+      "value": "Tab: %@"
+    },
+    {
       "name": "cyl_l10n_75ccb7ef4864",
       "value": "Aussehen der Tab-Bar"
     },
     {
       "name": "cyl_l10n_2e6d648945c0",
-      "value": "Der Plus-Button ragt über die Leiste hinaus; sein Teil oberhalb der Leiste reagiert (rot dargestellt)"
+      "value": "Der Plus-Button ragt aus der Leiste; auch der Teil darüber reagiert (rot dargestellt)"
     },
     {
       "name": "cyl_l10n_f43b06c12ee1",
-      "value": "Die System-Leiste hat keinen Plus-Button: ein schwebender Button ersetzt ihn"
+      "value": "Die System-Tab-Bar hat keinen Plus-Button: ein schwebender Button ersetzt ihn"
     },
     {
       "name": "cyl_l10n_9b6633b75bf2",
-      "value": "Der Tab „Ich“ erfordert eine Anmeldung (issue #19); zum Umschalten tippen"
+      "value": "Der Tab „Ich“ erfordert eine Anmeldung (issue #19); tippen zum Umschalten"
     },
     {
       "name": "cyl_l10n_a4d0d101d6a3",
@@ -358,7 +378,7 @@
     },
     {
       "name": "cyl_l10n_59884403daf6",
-      "value": "cyl_pushOrPopToViewController: pages/Index (bereits im Stapel: wird zurückgekehrt)"
+      "value": "cyl_pushOrPopToViewController: pages/Index (bereits im Stapel: zurück)"
     },
     {
       "name": "cyl_l10n_1ec113617309",
@@ -370,7 +390,7 @@
     },
     {
       "name": "cyl_l10n_ff5772993aee",
-      "value": "cyl_tabBarItemLongPressDuration = %@ ms, cyl_tabBarItemDoubleTapInterval = %@ ms; tippen zum Wechseln; zum Ansehen doppelt auf einen Tab tippen"
+      "value": "cyl_tabBarItemLongPressDuration = %@ ms, cyl_tabBarItemDoubleTapInterval = %@ ms; tippen zum Wechseln; einen Tab doppeltippen, um es zu sehen"
     },
     {
       "name": "cyl_l10n_f69c71bc581e",
@@ -390,7 +410,7 @@
     },
     {
       "name": "cyl_l10n_c4376b477be8",
-      "value": "tabBarHidden = %@; ausgeblendet kehrt sie nach 2 s zurück"
+      "value": "tabBarHidden = %@; ausgeblendet, kehrt nach 2 s zurück"
     },
     {
       "name": "cyl_l10n_2a0608059131",

@@ -380,7 +380,12 @@ export struct CYLBadgeView {
               color: this.badge.borderColor ?? this.appearance().borderColor ?? Color.Transparent })
         }
       }
-      .markAnchor({ x: '50%', y: '50%' })
+      // [EN] A red dot is centred on the icon's corner; a number or text badge puts its left cap there and grows to the
+      //      right (iOS / Android keep the badge's left part at the corner), so "99+" or "NEW" does not cover the icon.
+      // [CN] 红点以图标角为中心；数字或文字角标的左端圆心位于该处并向右延伸（与 iOS / Android 一致），"99+"、"NEW" 不盖住图标。
+      .markAnchor({ x: this.badge.cyl_displayText() === null ? '50%'
+        : ((this.badge.fontSize ?? this.appearance().fontSize) * 1.2 + (this.badge.margin ?? this.appearance().margin)) / 2,
+        y: '50%' })
       .position({ x: this.anchorWidth + 2 + (this.badge.centerOffset ?? this.appearance().centerOffset).horizontal,
         y: (this.badge.centerOffset ?? this.appearance().centerOffset).vertical })
       .visibility(this.badge.paused ? Visibility.Hidden : Visibility.Visible)

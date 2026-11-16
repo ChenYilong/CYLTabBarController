@@ -18,15 +18,15 @@
     },
     {
       "name": "cyl_l10n_0b0ae9062c5a",
-      "value": "En fanelinjekontroller fra en annen kontekst, med en firkantet plussknapp"
+      "value": "En fanelinjekontroller i en annen kontekst med en firkantet plussknapp"
     },
     {
       "name": "cyl_l10n_427131e7add2",
-      "value": "En annen plussknapp"
+      "value": "Annen plussknapp"
     },
     {
       "name": "cyl_l10n_aa3e67bda3c0",
-      "value": "ArkUI Tabs, HarmonyOS sin systemfanelinje, med de samme fanene"
+      "value": "ArkUI Tabs, HarmonyOS’ systemfanelinje, med de samme fanene"
     },
     {
       "name": "cyl_l10n_0557fa923dce",
@@ -74,7 +74,7 @@
     },
     {
       "name": "cyl_l10n_d7c01888e55e",
-      "value": "CYLTabBarSVGAFilePath: spilles én gang når den velges, ellers første bilde"
+      "value": "CYLTabBarSVGAFilePath: spilles én gang ved valg, ellers første bilde"
     },
     {
       "name": "cyl_l10n_132201f60522",
@@ -87,6 +87,10 @@
     {
       "name": "cyl_l10n_5e74163d3804",
       "value": "CYLFlatDesignTabBarItem: sentrert"
+    },
+    {
+      "name": "cyl_l10n_f6da70b584ae",
+      "value": "Konfigurasjonsfil: %@"
     },
     {
       "name": "cyl_l10n_158b3b19e868",
@@ -106,7 +110,11 @@
     },
     {
       "name": "cyl_l10n_b9c74f4cd786",
-      "value": "Dempet"
+      "value": "Nedtonet"
+    },
+    {
+      "name": "cyl_l10n_abfc3a65538a",
+      "value": "Oppdag"
     },
     {
       "name": "cyl_l10n_bf0576472e31",
@@ -133,8 +141,8 @@
       "value": "GIF-symbol"
     },
     {
-      "name": "cyl_l10n_62c204295948",
-      "value": "Identifikator: %@"
+      "name": "cyl_l10n_8cf04a973413",
+      "value": "Hjem"
     },
     {
       "name": "cyl_l10n_d52d30723b2f",
@@ -155,6 +163,14 @@
     {
       "name": "cyl_l10n_983696096694",
       "value": "Marg"
+    },
+    {
+      "name": "cyl_l10n_318b2739ddc2",
+      "value": "Meg"
+    },
+    {
+      "name": "cyl_l10n_4c2a8fe7eaf2",
+      "value": "Meldinger"
     },
     {
       "name": "cyl_l10n_24d459a81449",
@@ -186,15 +202,15 @@
     },
     {
       "name": "cyl_l10n_06eb0a05de97",
-      "value": "På: %@; den nye siden glir inn fra siden til fanen sin"
+      "value": "På: %@; den nye siden glir inn fra sin fanes side"
     },
     {
       "name": "cyl_l10n_287e78fd65af",
       "value": "Annen tekst"
     },
     {
-      "name": "cyl_l10n_2c7326127f1f",
-      "value": "Sideidentifikator: %@"
+      "name": "cyl_l10n_84432607fd87",
+      "value": "Side: %@"
     },
     {
       "name": "cyl_l10n_41b77539cc64",
@@ -214,7 +230,7 @@
     },
     {
       "name": "cyl_l10n_e5416d3ed3c0",
-      "value": "Åpne en annen CYLTabBarController (annen PlusButton)"
+      "value": "Gå til en annen CYLTabBarController (annen PlusButton)"
     },
     {
       "name": "cyl_l10n_8c96672c9bc5",
@@ -226,11 +242,11 @@
     },
     {
       "name": "cyl_l10n_a63e8b745e73",
-      "value": "Åpner en side som skjuler navigasjonslinjen mens den vises, uten basisklasse"
+      "value": "Åpner en side som skjuler navigasjonslinjen, uten basisklasse"
     },
     {
       "name": "cyl_l10n_79fe28f3a3ac",
-      "value": "Åpner en fanelinjekontroller der plussknappbildet endres etter 2 s; oppsettet må ikke flytte seg"
+      "value": "Åpner en kontroller der plussknappbildet endres etter 2 s; oppsettet skal ikke flytte seg"
     },
     {
       "name": "cyl_l10n_c27618b1aa9d",
@@ -286,7 +302,7 @@
     },
     {
       "name": "cyl_l10n_561582c1e7cc",
-      "value": "Viser det trykkbare området i gjennomsiktig rødt: %@; skala %@x; trykk for 1x, 1,5x, 2x, av"
+      "value": "Viser trykkområdet i gjennomsiktig rødt: %@; skala %@x; trykk for 1x, 1,5x, 2x, av"
     },
     {
       "name": "cyl_l10n_3cb58e0d546d",
@@ -317,12 +333,16 @@
       "value": "Fane, %1$@ av %2$@"
     },
     {
+      "name": "cyl_l10n_456887f9731c",
+      "value": "Fane: %@"
+    },
+    {
       "name": "cyl_l10n_75ccb7ef4864",
       "value": "Fanelinjens utseende"
     },
     {
       "name": "cyl_l10n_2e6d648945c0",
-      "value": "Plussknappen stikker opp over linjen; delen over linjen reagerer (vist i rødt)"
+      "value": "Plussknappen stikker opp over linjen; også delen over reagerer (vist i rødt)"
     },
     {
       "name": "cyl_l10n_f43b06c12ee1",
@@ -338,7 +358,7 @@
     },
     {
       "name": "cyl_l10n_2306a585ae00",
-      "value": "cyl_itemEdgeInsets: 15 % av en fanes bredde fritt i hver ende"
+      "value": "cyl_itemEdgeInsets: 15 % av en fanebredde ledig i hver ende"
     },
     {
       "name": "cyl_l10n_6360bbdfb8ff",
@@ -390,7 +410,7 @@
     },
     {
       "name": "cyl_l10n_c4376b477be8",
-      "value": "tabBarHidden = %@; skjult kommer den tilbake etter 2 s"
+      "value": "tabBarHidden = %@; skjult, kommer tilbake etter 2 s"
     },
     {
       "name": "cyl_l10n_2a0608059131",

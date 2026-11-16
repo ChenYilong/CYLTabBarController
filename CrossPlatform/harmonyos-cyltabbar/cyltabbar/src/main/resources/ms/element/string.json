@@ -89,6 +89,10 @@
       "value": "CYLFlatDesignTabBarItem: berpusat"
     },
     {
+      "name": "cyl_l10n_f6da70b584ae",
+      "value": "Fail konfigurasi: %@"
+    },
+    {
       "name": "cyl_l10n_158b3b19e868",
       "value": "Jejari sudut"
     },
@@ -107,6 +111,10 @@
     {
       "name": "cyl_l10n_b9c74f4cd786",
       "value": "Dimalapkan"
+    },
+    {
+      "name": "cyl_l10n_abfc3a65538a",
+      "value": "Teroka"
     },
     {
       "name": "cyl_l10n_bf0576472e31",
@@ -133,8 +141,8 @@
       "value": "Ikon GIF"
     },
     {
-      "name": "cyl_l10n_62c204295948",
-      "value": "Pengecam: %@"
+      "name": "cyl_l10n_8cf04a973413",
+      "value": "Utama"
     },
     {
       "name": "cyl_l10n_d52d30723b2f",
@@ -155,6 +163,14 @@
     {
       "name": "cyl_l10n_983696096694",
       "value": "Jidar"
+    },
+    {
+      "name": "cyl_l10n_318b2739ddc2",
+      "value": "Saya"
+    },
+    {
+      "name": "cyl_l10n_4c2a8fe7eaf2",
+      "value": "Mesej"
     },
     {
       "name": "cyl_l10n_24d459a81449",
@@ -186,15 +202,15 @@
     },
     {
       "name": "cyl_l10n_06eb0a05de97",
-      "value": "Hidup: %@; halaman baharu masuk dari sisi tabnya"
+      "value": "Hidup: %@; halaman baharu meluncur dari sisi tabnya"
     },
     {
       "name": "cyl_l10n_287e78fd65af",
       "value": "Teks lain"
     },
     {
-      "name": "cyl_l10n_2c7326127f1f",
-      "value": "Pengecam halaman: %@"
+      "name": "cyl_l10n_84432607fd87",
+      "value": "Halaman: %@"
     },
     {
       "name": "cyl_l10n_41b77539cc64",
@@ -214,7 +230,7 @@
     },
     {
       "name": "cyl_l10n_e5416d3ed3c0",
-      "value": "Buka CYLTabBarController lain (PlusButton lain)"
+      "value": "Pergi ke CYLTabBarController lain (PlusButton lain)"
     },
     {
       "name": "cyl_l10n_8c96672c9bc5",
@@ -226,7 +242,7 @@
     },
     {
       "name": "cyl_l10n_a63e8b745e73",
-      "value": "Membuka halaman yang menyembunyikan bar navigasi semasa dipaparkan, tanpa kelas asas"
+      "value": "Membuka halaman yang menyembunyikan bar navigasi, tanpa kelas asas"
     },
     {
       "name": "cyl_l10n_79fe28f3a3ac",
@@ -286,7 +302,7 @@
     },
     {
       "name": "cyl_l10n_561582c1e7cc",
-      "value": "Menunjukkan kawasan sentuh dalam merah lut sinar: %@; skala %@x; ketik untuk 1x, 1.5x, 2x, mati"
+      "value": "Menunjukkan kawasan sentuh merah lut sinar: %@; skala %@x; ketik untuk 1x, 1.5x, 2x, mati"
     },
     {
       "name": "cyl_l10n_3cb58e0d546d",
@@ -317,12 +333,16 @@
       "value": "Tab, %1$@ daripada %2$@"
     },
     {
+      "name": "cyl_l10n_456887f9731c",
+      "value": "Tab: %@"
+    },
+    {
       "name": "cyl_l10n_75ccb7ef4864",
       "value": "Rupa bar tab"
     },
     {
       "name": "cyl_l10n_2e6d648945c0",
-      "value": "Butang tambah menonjol di atas bar; bahagian di atas bar bertindak balas (ditunjukkan merah)"
+      "value": "Butang tambah terkeluar dari bar; bahagian di atasnya juga bertindak balas (ditunjukkan merah)"
     },
     {
       "name": "cyl_l10n_f43b06c12ee1",
@@ -330,7 +350,7 @@
     },
     {
       "name": "cyl_l10n_9b6633b75bf2",
-      "value": "Tab “Saya” memerlukan log masuk (issue #19); ketik untuk togol"
+      "value": "Tab “Saya” memerlukan log masuk (issue #19); ketik untuk menukar"
     },
     {
       "name": "cyl_l10n_a4d0d101d6a3",
@@ -370,7 +390,7 @@
     },
     {
       "name": "cyl_l10n_ff5772993aee",
-      "value": "cyl_tabBarItemLongPressDuration = %@ ms, cyl_tabBarItemDoubleTapInterval = %@ ms; ketik untuk bertukar; ketik dua kali tab untuk melihatnya"
+      "value": "cyl_tabBarItemLongPressDuration = %@ ms, cyl_tabBarItemDoubleTapInterval = %@ ms; ketik untuk menukar; ketik dua kali sesuatu tab untuk melihat"
     },
     {
       "name": "cyl_l10n_f69c71bc581e",
@@ -390,7 +410,7 @@
     },
     {
       "name": "cyl_l10n_c4376b477be8",
-      "value": "tabBarHidden = %@; apabila disembunyikan, ia kembali selepas 2 s"
+      "value": "tabBarHidden = %@; apabila disembunyikan, kembali selepas 2 s"
     },
     {
       "name": "cyl_l10n_2a0608059131",

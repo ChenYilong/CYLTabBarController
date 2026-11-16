@@ -22,7 +22,7 @@
     },
     {
       "name": "cyl_l10n_427131e7add2",
-      "value": "Başka bir artı düğmesi"
+      "value": "Başka artı düğmesi"
     },
     {
       "name": "cyl_l10n_aa3e67bda3c0",
@@ -89,6 +89,10 @@
       "value": "CYLFlatDesignTabBarItem ortalanmış"
     },
     {
+      "name": "cyl_l10n_f6da70b584ae",
+      "value": "Yapılandırma dosyası: %@"
+    },
+    {
       "name": "cyl_l10n_158b3b19e868",
       "value": "Köşe yarıçapı"
     },
@@ -107,6 +111,10 @@
     {
       "name": "cyl_l10n_b9c74f4cd786",
       "value": "Soluk"
+    },
+    {
+      "name": "cyl_l10n_abfc3a65538a",
+      "value": "Keşfet"
     },
     {
       "name": "cyl_l10n_bf0576472e31",
@@ -133,8 +141,8 @@
       "value": "GIF simgesi"
     },
     {
-      "name": "cyl_l10n_62c204295948",
-      "value": "Tanımlayıcı: %@"
+      "name": "cyl_l10n_8cf04a973413",
+      "value": "Ana sayfa"
     },
     {
       "name": "cyl_l10n_d52d30723b2f",
@@ -155,6 +163,14 @@
     {
       "name": "cyl_l10n_983696096694",
       "value": "Kenar boşluğu"
+    },
+    {
+      "name": "cyl_l10n_318b2739ddc2",
+      "value": "Ben"
+    },
+    {
+      "name": "cyl_l10n_4c2a8fe7eaf2",
+      "value": "Mesajlar"
     },
     {
       "name": "cyl_l10n_24d459a81449",
@@ -193,8 +209,8 @@
       "value": "Diğer metin"
     },
     {
-      "name": "cyl_l10n_2c7326127f1f",
-      "value": "Sayfa tanımlayıcısı: %@"
+      "name": "cyl_l10n_84432607fd87",
+      "value": "Sayfa: %@"
     },
     {
       "name": "cyl_l10n_41b77539cc64",
@@ -214,7 +230,7 @@
     },
     {
       "name": "cyl_l10n_e5416d3ed3c0",
-      "value": "Başka bir CYLTabBarController aç (başka PlusButton)"
+      "value": "Başka bir CYLTabBarController'a geç (başka PlusButton)"
     },
     {
       "name": "cyl_l10n_8c96672c9bc5",
@@ -226,11 +242,11 @@
     },
     {
       "name": "cyl_l10n_a63e8b745e73",
-      "value": "Gösterildiği sürece gezinme çubuğunu gizleyen bir sayfa açar, temel sınıf olmadan"
+      "value": "Gösterilirken gezinme çubuğunu gizleyen bir sayfa açar, temel sınıf olmadan"
     },
     {
       "name": "cyl_l10n_79fe28f3a3ac",
-      "value": "Artı düğmesi görseli 2 sn sonra değişen bir denetleyici açar; düzen kaymamalıdır"
+      "value": "Artı düğmesi resmi 2 sn sonra değişen bir denetleyici açar; düzen kaymamalıdır"
     },
     {
       "name": "cyl_l10n_c27618b1aa9d",
@@ -286,7 +302,7 @@
     },
     {
       "name": "cyl_l10n_561582c1e7cc",
-      "value": "Dokunulabilir alanı yarı saydam kırmızıyla gösterir: %@; ölçek %@x; 1x, 1,5x, 2x, kapalı için dokunun"
+      "value": "Dokunma alanını yarı saydam kırmızı gösterir: %@; ölçek %@x; 1x, 1,5x, 2x, kapalı için dokunun"
     },
     {
       "name": "cyl_l10n_3cb58e0d546d",
@@ -317,20 +333,24 @@
       "value": "Sekme, %1$@ / %2$@"
     },
     {
+      "name": "cyl_l10n_456887f9731c",
+      "value": "Sekme: %@"
+    },
+    {
       "name": "cyl_l10n_75ccb7ef4864",
       "value": "Sekme çubuğu görünümü"
     },
     {
       "name": "cyl_l10n_2e6d648945c0",
-      "value": "Artı düğmesi çubuğun üstüne taşar; çubuğun üstündeki kısmı da yanıt verir (kırmızı gösterilir)"
+      "value": "Artı düğmesi çubuğun dışına taşar; üstteki kısmı da yanıt verir (kırmızı gösterilir)"
     },
     {
       "name": "cyl_l10n_f43b06c12ee1",
-      "value": "Sistem çubuğunda artı düğmesi yok: yerine yüzen bir düğme konur"
+      "value": "Sistem çubuğunda artı düğmesi yok: yerine yüzen bir düğme kullanılır"
     },
     {
       "name": "cyl_l10n_9b6633b75bf2",
-      "value": "“Ben” sekmesi giriş gerektirir (issue #19); değiştirmek için dokunun"
+      "value": "“Ben” sekmesi oturum açmayı gerektirir (issue #19); değiştirmek için dokunun"
     },
     {
       "name": "cyl_l10n_a4d0d101d6a3",
@@ -378,7 +398,7 @@
     },
     {
       "name": "cyl_l10n_f3f4ecf4a4a6",
-      "value": "selectedIndex = %@ (artı düğmesinin sayfası %@, asla bir sekme dizini değil); sonraki sekme için dokunun"
+      "value": "selectedIndex = %@ (artı düğmesinin sayfası %@, asla sekme dizini değil); sonraki sekme için dokunun"
     },
     {
       "name": "cyl_l10n_ee5b6ac6461b",
@@ -390,7 +410,7 @@
     },
     {
       "name": "cyl_l10n_c4376b477be8",
-      "value": "tabBarHidden = %@; gizlendiğinde 2 sn sonra geri gelir"
+      "value": "tabBarHidden = %@; gizlenince 2 sn sonra geri gelir"
     },
     {
       "name": "cyl_l10n_2a0608059131",
