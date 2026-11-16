@@ -89,6 +89,10 @@
       "value": "CYLFlatDesignTabBarItem: wyśrodkowany"
     },
     {
+      "name": "cyl_l10n_f6da70b584ae",
+      "value": "Configuration file: %@"
+    },
+    {
       "name": "cyl_l10n_158b3b19e868",
       "value": "Promień narożnika"
     },
@@ -107,6 +111,10 @@
     {
       "name": "cyl_l10n_b9c74f4cd786",
       "value": "Dimmed"
+    },
+    {
+      "name": "cyl_l10n_abfc3a65538a",
+      "value": "Discover"
     },
     {
       "name": "cyl_l10n_bf0576472e31",
@@ -133,6 +141,10 @@
       "value": "Ikona GIF"
     },
     {
+      "name": "cyl_l10n_8cf04a973413",
+      "value": "Home"
+    },
+    {
       "name": "cyl_l10n_d52d30723b2f",
       "value": "Jednorazowo od lewej do prawej"
     },
@@ -151,6 +163,14 @@
     {
       "name": "cyl_l10n_983696096694",
       "value": "Margines"
+    },
+    {
+      "name": "cyl_l10n_318b2739ddc2",
+      "value": "Me"
+    },
+    {
+      "name": "cyl_l10n_4c2a8fe7eaf2",
+      "value": "Message"
     },
     {
       "name": "cyl_l10n_24d459a81449",
@@ -187,6 +207,10 @@
     {
       "name": "cyl_l10n_287e78fd65af",
       "value": "Inny tekst"
+    },
+    {
+      "name": "cyl_l10n_84432607fd87",
+      "value": "Page: %@"
     },
     {
       "name": "cyl_l10n_41b77539cc64",
@@ -307,6 +331,10 @@
     {
       "name": "cyl_l10n_6d067090c833",
       "value": "Tab, %1$@ of %2$@"
+    },
+    {
+      "name": "cyl_l10n_456887f9731c",
+      "value": "Tab: %@"
     },
     {
       "name": "cyl_l10n_75ccb7ef4864",

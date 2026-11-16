@@ -1,4 +1,4 @@
-import { CYLLocalizedString } from 'cyltabbar';
+import { CYLLocalizedString, cyl_localizationKey } from 'cyltabbar';
 import { router } from '@kit.ArkUI';
 import {
   CYLTabBarController, CYLTabBarConfiguration, CYLTabBarConfigurationResult, CYLTabBarConfigurationError
@@ -18,6 +18,15 @@ const CYL_SYSTEM_IMAGES: Record<string, Resource> = {
   'system:person': $r('app.media.account_normal'),
   'system:person.fill': $r('app.media.account_highlight'),
 };
+
+/**
+ * [EN] The English titles of the shared configuration files (Example-Shared/Configurations), as localization keys: the
+ *      tabs show them in the device language like every other text of the demo.
+ * [CN] 共享配置文件中的英文标题，作为本地化 key：Tab 与演示中的其他文字一样按设备语言显示。
+ */
+const CYL_CONFIGURATION_TITLES: string[] = [
+  cyl_localizationKey('Home'), cyl_localizationKey('Discover'), cyl_localizationKey('Message'), cyl_localizationKey('Me'),
+];
 
 interface CYLConfigurationRoute {
   file: string;
@@ -46,7 +55,13 @@ struct ConfigurationDemo {
     CYLTabBarConfiguration.imageResolver = (name: string) => CYL_SYSTEM_IMAGES[name] ?? $r('app.media.home_normal');
     try {
       const configuration = CYLTabBarConfiguration.configurationWithRawFile(getContext(this), this.file);
-      this.result = CYLTabBarConfiguration.resultWithConfiguration(configuration, '1.0.0', false);
+      const result = CYLTabBarConfiguration.resultWithConfiguration(configuration, '1.0.0', false);
+      result.items.forEach((item) => {
+        if (typeof item.title === 'string' && CYL_CONFIGURATION_TITLES.indexOf(item.title) >= 0) {
+          item.title = CYLLocalizedString(item.title);
+        }
+      });
+      this.result = result;
     } catch (error) {
       const failure = error as CYLTabBarConfigurationError;
       this.errorText = `${failure.domain ?? ''} ${failure.code ?? ''}: ${failure.message}`;
@@ -63,7 +78,11 @@ struct ConfigurationDemo {
         .width('100%')
         .textAlign(TextAlign.Center)
         .backgroundColor('#F8F8F8')
-      Text(`${this.file}\nidentifier: ${identifier}\npage: ${this.result?.items[index]?.pageIdentifier ?? '-'}`)
+      // [EN] What this page is, in the device language; the page identifier only when the item has one.
+      // [CN] 说明本页内容（设备语言）；只有设置了页面标识时才显示。
+      Text(CYLLocalizedString('Configuration file: %@', this.file) + '\n' + CYLLocalizedString('Tab: %@', identifier)
+        + (this.result?.items[index]?.pageIdentifier !== undefined
+          ? '\n' + CYLLocalizedString('Page: %@', this.result?.items[index]?.pageIdentifier ?? '') : ''))
         .fontSize(13)
         .fontColor('#666666')
         .margin(16)
@@ -80,7 +99,9 @@ struct ConfigurationDemo {
         CYLTabBarController({
           tabBarItemsAttributes: this.result.items,
           selectedIndex: $selectedIndex,
-          tintColor: this.result.tintColor ?? '#007AFF',
+          // [EN] Without a tint in the file: the demo's orange (its Home screen, the SVGA icons), not system blue.
+          // [CN] 文件未设置强调色时：使用演示的橙色（与首页、SVGA 图标一致），而不是系统蓝。
+          tintColor: this.result.tintColor ?? '#FF8000',
           tabBarBackgroundColor: this.result.backgroundColor ?? '#F8F8F8',
           titlePositionAdjustment: this.result.titlePositionAdjustment,
           pageBuilder: (index: number, identifier: string) => {
