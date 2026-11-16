@@ -17,4 +17,8 @@
     <string name="cyl_memory_warning_kept_selected">zadržano: odabrano</string>
     <string name="cyl_memory_warning_kept_should_unload">zadržano: shouldUnload je vratio NO</string>
     <string name="cyl_memory_warning_kept">zadržano</string>
+    <string name="cyl_scroll_self_test">Samotest</string>
+    <string name="cyl_scroll_title_manual">Ručno: %1$s</string>
+    <string name="cyl_scroll_title_real">Stvarno: %1$s</string>
+    <string name="cyl_scroll_title_self_test">Samotest: pokreni sve automatske simulacije, prijavi PASS / FAIL</string>
 </resources>

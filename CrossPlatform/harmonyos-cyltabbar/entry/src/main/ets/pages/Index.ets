@@ -8,7 +8,7 @@ import {
 } from 'cyltabbar';
 import { CYLLocalizedString, cyl_localizationKey, cyl_badgeAccessibilityText } from 'cyltabbar';
 import { DemoTheme, DEMO_THEMES, demoRegisterThemes } from '../demo/DemoThemes';
-import { DemoScrollKind, DemoScrollSimulation, DEMO_SCROLL_SIMULATIONS, demoScrollKindName } from '../demo/DemoScrollHide';
+import { DemoScrollKind, DemoScrollSimulation, DEMO_SCROLL_SIMULATIONS, demoScrollKindName, demoScrollTitle } from '../demo/DemoScrollHide';
 import { cyl_restoreTabBar, CYLSetLocalizationLanguage, CYLLocalizationLanguage } from 'cyltabbar';
 import { DemoFlatDesignButton } from '../demo/DemoFlatDesign';
 import { DemoLiquidGlassButton } from '../demo/DemoLiquidGlass';
@@ -681,9 +681,9 @@ struct Index {
     switch (sim.action) {
       case 'dialog':
         if (quiet) {
-          ui.getPromptAction().showToast({ message: sim.title });
+          ui.getPromptAction().showToast({ message: demoScrollTitle(sim) });
         } else {
-          ui.getPromptAction().showDialog({ title: sim.title, buttons: [{ text: CYLLocalizedString('OK'), color: '#007AFF' }] }).catch(() => {});
+          ui.getPromptAction().showDialog({ title: demoScrollTitle(sim), buttons: [{ text: CYLLocalizedString('OK'), color: '#007AFF' }] }).catch(() => {});
         }
         // [EN] Presenting is an interruption: the app restores the bar. [CN] 弹出视为意外情况：App 恢复 TabBar。
         cyl_restoreTabBar();
@@ -691,14 +691,14 @@ struct Index {
         break;
       case 'actionMenu':
         if (!quiet) {
-          ui.getPromptAction().showActionMenu({ title: sim.title, buttons: [{ text: CYLLocalizedString('OK'), color: '#007AFF' }] }).catch(() => {});
+          ui.getPromptAction().showActionMenu({ title: demoScrollTitle(sim), buttons: [{ text: CYLLocalizedString('OK'), color: '#007AFF' }] }).catch(() => {});
         }
         cyl_restoreTabBar();
         done();
         break;
       case 'push':
       case 'pushHidden':
-        ui.getRouter().pushUrl({ url: 'pages/TextPage', params: { title: sim.title, color: '#5AC8FA', hidesNavigationBar: sim.action === 'pushHidden' } as DemoPushParams });
+        ui.getRouter().pushUrl({ url: 'pages/TextPage', params: { title: demoScrollTitle(sim), color: '#5AC8FA', hidesNavigationBar: sim.action === 'pushHidden' } as DemoPushParams });
         setTimeout(() => {
           ui.getRouter().back();
           setTimeout(done, 700);
@@ -764,7 +764,7 @@ struct Index {
   private demoRunScrollSimulation(index: number, quiet: boolean, done?: () => void): void {
     const sim = DEMO_SCROLL_SIMULATIONS[index];
     if (sim.kind === DemoScrollKind.NotApplicable || sim.kind === DemoScrollKind.Manual) {
-      this.toast(sim.kind === DemoScrollKind.Manual ? CYLLocalizedString('手动操作：点击开启滚动隐藏，向下滚动隐藏 TabBar 后按标题操作。预期：TabBar 立即恢复显示。') : `${sim.title}: N/A on HarmonyOS`);
+      this.toast(sim.kind === DemoScrollKind.Manual ? CYLLocalizedString('手动操作：点击开启滚动隐藏，向下滚动隐藏 TabBar 后按标题操作。预期：TabBar 立即恢复显示。') : `${demoScrollTitle(sim)}: N/A on HarmonyOS`);
       done?.();
       return;
     }
@@ -790,7 +790,7 @@ struct Index {
     const next = (k: number): void => {
       if (k >= automatic.length) {
         const fails = automatic.filter((i: number) => (this.scrollResults.get(i) ?? '').startsWith('FAIL')).length;
-        this.toast(`Self-test: ${automatic.length - fails} PASS, ${fails} FAIL`);
+        this.toast(`${CYLLocalizedString('自测')}: ${automatic.length - fails} PASS, ${fails} FAIL`);
         return;
       }
       this.demoRunScrollSimulation(automatic[k], true, () => setTimeout(() => next(k + 1), DEMO_SCROLL_SIMULATIONS[automatic[k]].action === 'hideApp' ? 4300 : 300));
@@ -806,7 +806,7 @@ struct Index {
         return;
       }
       rows.push({
-        id: `scroll-sim-${index + 1}`, title: `${index + 1}. ${sim.title}`,
+        id: `scroll-sim-${index + 1}`, title: `${index + 1}. ${demoScrollTitle(sim)}`,
         subtitle: `${demoScrollKindName(sim.kind)}${this.scrollResults.has(index) ? ' · ' + this.scrollResults.get(index) : ''}`,
         action: () => sim.kind === DemoScrollKind.SelfTest ? this.demoRunScrollSelfTest() : this.demoRunScrollSimulation(index, false),
       });

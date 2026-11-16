@@ -477,6 +477,10 @@
       "value": "Sembunyikan bar navigasi tanpa kelas asas (issue #535)"
     },
     {
+      "name": "cyl_l10n_321ff794aab8",
+      "value": "T/B"
+    },
+    {
       "name": "cyl_l10n_e1642a46b804",
       "value": "Pesta Pertengahan Musim Luruh"
     },
@@ -503,6 +507,10 @@
     {
       "name": "cyl_l10n_e05f97c5159d",
       "value": "Cipta TabBarController daripada fail konfigurasi"
+    },
+    {
+      "name": "cyl_l10n_5f0c0bf32dc1",
+      "value": "Kekalkan"
     },
     {
       "name": "cyl_l10n_24fb8692947a",
@@ -577,6 +585,10 @@
       "value": "Angkasa Lepas"
     },
     {
+      "name": "cyl_l10n_2f383291bcf8",
+      "value": "Sebenar: %@"
+    },
+    {
       "name": "cyl_l10n_bccc798b577a",
       "value": "Kapsul di tengah"
     },
@@ -605,6 +617,10 @@
       "value": "Memaparkan GIF animasi sebagai ikon tab; ketik lagi untuk memulihkan"
     },
     {
+      "name": "cyl_l10n_c7db6d4f1a42",
+      "value": "Pulihkan"
+    },
+    {
       "name": "cyl_l10n_c4328f75476f",
       "value": "Hari Valentine"
     },
@@ -613,8 +629,16 @@
       "value": "Saya"
     },
     {
+      "name": "cyl_l10n_2a3e7f5c382c",
+      "value": "Manual"
+    },
+    {
       "name": "cyl_l10n_97a6bedeb7fd",
       "value": "Manual: ketik untuk menghidupkan sembunyi semasa menatal, tatal ke bawah untuk menyembunyikan TabBar, kemudian lakukan seperti tajuk. Dijangka: TabBar kembali serta-merta."
+    },
+    {
+      "name": "cyl_l10n_f68e7e217ad1",
+      "value": "Manual: %@"
     },
     {
       "name": "cyl_l10n_89246468f7fd",
@@ -815,6 +839,14 @@
     {
       "name": "cyl_l10n_4bd51044149f",
       "value": "Fail bunyi sendiri (cyl_tabButtonTapSoundURL)"
+    },
+    {
+      "name": "cyl_l10n_9d1c8a70d4da",
+      "value": "Ujian kendiri"
+    },
+    {
+      "name": "cyl_l10n_11858aeb1656",
+      "value": "Ujian kendiri: jalankan semua simulasi automatik, laporkan PASS / FAIL"
     },
     {
       "name": "cyl_l10n_beabcd498b94",

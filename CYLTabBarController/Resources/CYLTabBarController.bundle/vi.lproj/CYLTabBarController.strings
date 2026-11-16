@@ -368,3 +368,12 @@
 "网络图标、标题与配色" = "Biểu tượng từ mạng, tiêu đề và màu sắc";
 /* The settings group of the configuration file rows (docs/Configuration-File.md). */
 "配置文件" = "Tệp cấu hình";
+/* Scroll hiding simulations (issue #13): kind labels and title prefixes; API names stay English. */
+"恢复" = "Khôi phục";
+"保持" = "Giữ nguyên";
+"不适用" = "Không áp dụng";
+"手动" = "Thủ công";
+"自测" = "Tự kiểm tra";
+"手动：%@" = "Thủ công: %@";
+"实测：%@" = "Thực tế: %@";
+"自测：依次运行所有自动模拟，报告 PASS / FAIL" = "Tự kiểm tra: chạy mọi mô phỏng tự động, báo cáo PASS / FAIL";

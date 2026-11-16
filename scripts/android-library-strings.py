@@ -33,6 +33,11 @@ STRINGS = {
     'cyl_memory_warning_kept_selected': '保留：当前选中',
     'cyl_memory_warning_kept_should_unload': '保留：shouldUnload 返回 NO',
     'cyl_memory_warning_kept': '保留',
+    # [EN] Scroll hiding simulations (issue #13), used by the demo kit. [CN] 滚动隐藏模拟（问题 #13），供示例使用。
+    'cyl_scroll_self_test': '自测',
+    'cyl_scroll_title_manual': '手动：%@',
+    'cyl_scroll_title_real': '实测：%@',
+    'cyl_scroll_title_self_test': '自测：依次运行所有自动模拟，报告 PASS / FAIL',
 }
 PAIR = re.compile(r'^"((?:[^"\\]|\\.)*)"\s*=\s*"((?:[^"\\]|\\.)*)";', re.M)
 

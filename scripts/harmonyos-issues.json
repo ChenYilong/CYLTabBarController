@@ -379,12 +379,12 @@
   },
   {
     "id": 43,
-    "status": "DONE (matches iOS: not a bug)",
+    "status": "TODO need 模拟器截图验证",
     "scope": "CrossPlatform/harmonyos-cyltabbar (entry)",
     "title": "Scroll simulation rows: \"Self-test: run every automatic simulation…\" and the kind labels (Restore, Keep, N/A, Manual, Self-test) are English in the Chinese UI",
     "evidence": "Emulator check 2026-11-16 (Home, scroll simulation section)",
-    "cause": "The simulation titles and kind labels are English on iOS too: the iOS core (CYLTabBarController/Swift/UIViewController+CYLScrollHideSimulation.swift) and Android (Example-Android/demokit DemoScrollHide.kt) use the same strings",
-    "fix": "No change, kept as on iOS and Android"
+    "cause": "The kind labels, the Manual / Real prefixes and the self-test title were English on all three platforms",
+    "fix": "Localized on iOS, Android and HarmonyOS from 8 new keys in CYLTabBarController.bundle (33 languages); the API or event a title names stays English"
   },
   {
     "id": 44,

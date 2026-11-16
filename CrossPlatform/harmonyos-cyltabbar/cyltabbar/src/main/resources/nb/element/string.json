@@ -477,6 +477,10 @@
       "value": "Skjul navigasjonslinjen uten basisklasse (issue #535)"
     },
     {
+      "name": "cyl_l10n_321ff794aab8",
+      "value": "I/A"
+    },
+    {
       "name": "cyl_l10n_e1642a46b804",
       "value": "Midthøstfestivalen"
     },
@@ -503,6 +507,10 @@
     {
       "name": "cyl_l10n_e05f97c5159d",
       "value": "Opprett en TabBarController fra en konfigurasjonsfil"
+    },
+    {
+      "name": "cyl_l10n_5f0c0bf32dc1",
+      "value": "Behold"
     },
     {
       "name": "cyl_l10n_24fb8692947a",
@@ -577,6 +585,10 @@
       "value": "Verdensrommet"
     },
     {
+      "name": "cyl_l10n_2f383291bcf8",
+      "value": "Ekte: %@"
+    },
+    {
       "name": "cyl_l10n_bccc798b577a",
       "value": "Sentrert kapsel"
     },
@@ -605,6 +617,10 @@
       "value": "Viser en animert GIF som fanesymbol; trykk igjen for å gjenopprette"
     },
     {
+      "name": "cyl_l10n_c7db6d4f1a42",
+      "value": "Gjenopprett"
+    },
+    {
       "name": "cyl_l10n_c4328f75476f",
       "value": "Valentinsdagen"
     },
@@ -613,8 +629,16 @@
       "value": "Meg"
     },
     {
+      "name": "cyl_l10n_2a3e7f5c382c",
+      "value": "Manuell"
+    },
+    {
       "name": "cyl_l10n_97a6bedeb7fd",
       "value": "Manuelt: trykk for å slå på skjul ved rulling, rull ned for å skjule TabBar, og gjør så det tittelen sier. Forventet: TabBar kommer straks tilbake."
+    },
+    {
+      "name": "cyl_l10n_f68e7e217ad1",
+      "value": "Manuell: %@"
     },
     {
       "name": "cyl_l10n_89246468f7fd",
@@ -815,6 +839,14 @@
     {
       "name": "cyl_l10n_4bd51044149f",
       "value": "Egen lydfil (cyl_tabButtonTapSoundURL)"
+    },
+    {
+      "name": "cyl_l10n_9d1c8a70d4da",
+      "value": "Selvtest"
+    },
+    {
+      "name": "cyl_l10n_11858aeb1656",
+      "value": "Selvtest: kjør alle automatiske simuleringer, rapporter PASS / FAIL"
     },
     {
       "name": "cyl_l10n_beabcd498b94",

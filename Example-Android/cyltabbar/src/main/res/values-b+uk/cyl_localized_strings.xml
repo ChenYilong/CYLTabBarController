@@ -17,4 +17,8 @@
     <string name="cyl_memory_warning_kept_selected">залишено: вибрано</string>
     <string name="cyl_memory_warning_kept_should_unload">залишено: shouldUnload повернув NO</string>
     <string name="cyl_memory_warning_kept">залишено</string>
+    <string name="cyl_scroll_self_test">Самоперевірка</string>
+    <string name="cyl_scroll_title_manual">Вручну: %1$s</string>
+    <string name="cyl_scroll_title_real">Реально: %1$s</string>
+    <string name="cyl_scroll_title_self_test">Самоперевірка: запустити всі автоматичні симуляції, повідомити PASS / FAIL</string>
 </resources>

@@ -368,3 +368,12 @@
 "网络图标、标题与配色" = "Pictograme din rețea, titluri și culori";
 /* The settings group of the configuration file rows (docs/Configuration-File.md). */
 "配置文件" = "Fișier de configurare";
+/* Scroll hiding simulations (issue #13): kind labels and title prefixes; API names stay English. */
+"恢复" = "Restabilire";
+"保持" = "Păstrare";
+"不适用" = "N/A";
+"手动" = "Manual";
+"自测" = "Autotest";
+"手动：%@" = "Manual: %@";
+"实测：%@" = "Real: %@";
+"自测：依次运行所有自动模拟，报告 PASS / FAIL" = "Autotest: rulează toate simulările automate, raportează PASS / FAIL";

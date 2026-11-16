@@ -477,6 +477,10 @@
       "value": "Dölj navigeringsfältet utan basklass (issue #535)"
     },
     {
+      "name": "cyl_l10n_321ff794aab8",
+      "value": "Ej tillämpligt"
+    },
+    {
       "name": "cyl_l10n_e1642a46b804",
       "value": "Midhöstfestivalen"
     },
@@ -503,6 +507,10 @@
     {
       "name": "cyl_l10n_e05f97c5159d",
       "value": "Skapa en TabBarController från en konfigurationsfil"
+    },
+    {
+      "name": "cyl_l10n_5f0c0bf32dc1",
+      "value": "Behåll"
     },
     {
       "name": "cyl_l10n_24fb8692947a",
@@ -577,6 +585,10 @@
       "value": "Rymden"
     },
     {
+      "name": "cyl_l10n_2f383291bcf8",
+      "value": "Verklig: %@"
+    },
+    {
       "name": "cyl_l10n_bccc798b577a",
       "value": "Centrerad kapsel"
     },
@@ -605,6 +617,10 @@
       "value": "Visar en animerad GIF som fliksymbol; tryck igen för att återställa"
     },
     {
+      "name": "cyl_l10n_c7db6d4f1a42",
+      "value": "Återställ"
+    },
+    {
       "name": "cyl_l10n_c4328f75476f",
       "value": "Alla hjärtans dag"
     },
@@ -613,8 +629,16 @@
       "value": "Jag"
     },
     {
+      "name": "cyl_l10n_2a3e7f5c382c",
+      "value": "Manuell"
+    },
+    {
       "name": "cyl_l10n_97a6bedeb7fd",
       "value": "Manuellt: tryck för att slå på dölj vid rullning, rulla nedåt för att dölja TabBar och gör sedan det titeln säger. Förväntat: TabBar kommer tillbaka direkt."
+    },
+    {
+      "name": "cyl_l10n_f68e7e217ad1",
+      "value": "Manuell: %@"
     },
     {
       "name": "cyl_l10n_89246468f7fd",
@@ -815,6 +839,14 @@
     {
       "name": "cyl_l10n_4bd51044149f",
       "value": "Egen ljudfil (cyl_tabButtonTapSoundURL)"
+    },
+    {
+      "name": "cyl_l10n_9d1c8a70d4da",
+      "value": "Självtest"
+    },
+    {
+      "name": "cyl_l10n_11858aeb1656",
+      "value": "Självtest: kör alla automatiska simuleringar, rapportera PASS / FAIL"
     },
     {
       "name": "cyl_l10n_beabcd498b94",

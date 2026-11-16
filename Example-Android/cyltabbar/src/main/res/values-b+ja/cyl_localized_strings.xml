@@ -17,4 +17,8 @@
     <string name="cyl_memory_warning_kept_selected">保持：選択中</string>
     <string name="cyl_memory_warning_kept_should_unload">保持：shouldUnload が NO を返した</string>
     <string name="cyl_memory_warning_kept">保持</string>
+    <string name="cyl_scroll_self_test">セルフテスト</string>
+    <string name="cyl_scroll_title_manual">手動：%1$s</string>
+    <string name="cyl_scroll_title_real">実機：%1$s</string>
+    <string name="cyl_scroll_title_self_test">セルフテスト：すべての自動シミュレーションを実行し、PASS / FAIL を報告</string>
 </resources>

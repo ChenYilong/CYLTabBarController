@@ -477,6 +477,10 @@
       "value": "Ascunderea barei de navigare fără clasă de bază (issue #535)"
     },
     {
+      "name": "cyl_l10n_321ff794aab8",
+      "value": "N/A"
+    },
+    {
       "name": "cyl_l10n_e1642a46b804",
       "value": "Festivalul de mijloc al toamnei"
     },
@@ -503,6 +507,10 @@
     {
       "name": "cyl_l10n_e05f97c5159d",
       "value": "Creează un TabBarController dintr-un fișier de configurare"
+    },
+    {
+      "name": "cyl_l10n_5f0c0bf32dc1",
+      "value": "Păstrare"
     },
     {
       "name": "cyl_l10n_24fb8692947a",
@@ -577,6 +585,10 @@
       "value": "Spațiu"
     },
     {
+      "name": "cyl_l10n_2f383291bcf8",
+      "value": "Real: %@"
+    },
+    {
       "name": "cyl_l10n_bccc798b577a",
       "value": "Capsulă centrată"
     },
@@ -605,6 +617,10 @@
       "value": "Afișează un GIF animat ca pictogramă a filei; atinge din nou pentru a restabili"
     },
     {
+      "name": "cyl_l10n_c7db6d4f1a42",
+      "value": "Restabilire"
+    },
+    {
       "name": "cyl_l10n_c4328f75476f",
       "value": "Ziua Îndrăgostiților"
     },
@@ -613,8 +629,16 @@
       "value": "Eu"
     },
     {
+      "name": "cyl_l10n_2a3e7f5c382c",
+      "value": "Manual"
+    },
+    {
       "name": "cyl_l10n_97a6bedeb7fd",
       "value": "Manual: atingeți pentru a activa ascunderea la derulare, derulați în jos pentru a ascunde TabBar, apoi faceți ce spune titlul. Așteptat: TabBar revine imediat."
+    },
+    {
+      "name": "cyl_l10n_f68e7e217ad1",
+      "value": "Manual: %@"
     },
     {
       "name": "cyl_l10n_89246468f7fd",
@@ -815,6 +839,14 @@
     {
       "name": "cyl_l10n_4bd51044149f",
       "value": "Fișier de sunet propriu (cyl_tabButtonTapSoundURL)"
+    },
+    {
+      "name": "cyl_l10n_9d1c8a70d4da",
+      "value": "Autotest"
+    },
+    {
+      "name": "cyl_l10n_11858aeb1656",
+      "value": "Autotest: rulează toate simulările automate, raportează PASS / FAIL"
     },
     {
       "name": "cyl_l10n_beabcd498b94",

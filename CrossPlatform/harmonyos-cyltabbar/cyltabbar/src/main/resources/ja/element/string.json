@@ -477,6 +477,10 @@
       "value": "基底クラスなしでナビゲーションバーを隠す（issue #535）"
     },
     {
+      "name": "cyl_l10n_321ff794aab8",
+      "value": "該当なし"
+    },
+    {
       "name": "cyl_l10n_e1642a46b804",
       "value": "中秋節"
     },
@@ -503,6 +507,10 @@
     {
       "name": "cyl_l10n_e05f97c5159d",
       "value": "設定ファイルから TabBarController を作成"
+    },
+    {
+      "name": "cyl_l10n_5f0c0bf32dc1",
+      "value": "維持"
     },
     {
       "name": "cyl_l10n_24fb8692947a",
@@ -577,6 +585,10 @@
       "value": "宇宙"
     },
     {
+      "name": "cyl_l10n_2f383291bcf8",
+      "value": "実機：%@"
+    },
+    {
       "name": "cyl_l10n_bccc798b577a",
       "value": "中央のカプセル"
     },
@@ -605,6 +617,10 @@
       "value": "このページのタブに GIF アニメを表示。もう一度タップで元に戻す"
     },
     {
+      "name": "cyl_l10n_c7db6d4f1a42",
+      "value": "復元"
+    },
+    {
       "name": "cyl_l10n_c4328f75476f",
       "value": "バレンタインデー"
     },
@@ -613,8 +629,16 @@
       "value": "マイページ"
     },
     {
+      "name": "cyl_l10n_2a3e7f5c382c",
+      "value": "手動"
+    },
+    {
       "name": "cyl_l10n_97a6bedeb7fd",
       "value": "手動：タップでスクロール時の非表示をオンにし、下へスクロールして TabBar を隠してから、タイトルの操作を行います。期待：TabBar がすぐに再表示されます。"
+    },
+    {
+      "name": "cyl_l10n_f68e7e217ad1",
+      "value": "手動：%@"
     },
     {
       "name": "cyl_l10n_89246468f7fd",
@@ -815,6 +839,14 @@
     {
       "name": "cyl_l10n_4bd51044149f",
       "value": "カスタムサウンドファイル（cyl_tabButtonTapSoundURL）"
+    },
+    {
+      "name": "cyl_l10n_9d1c8a70d4da",
+      "value": "セルフテスト"
+    },
+    {
+      "name": "cyl_l10n_11858aeb1656",
+      "value": "セルフテスト：すべての自動シミュレーションを実行し、PASS / FAIL を報告"
     },
     {
       "name": "cyl_l10n_beabcd498b94",

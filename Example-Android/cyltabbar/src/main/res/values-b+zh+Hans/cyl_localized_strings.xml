@@ -17,4 +17,8 @@
     <string name="cyl_memory_warning_kept_selected">保留：当前选中</string>
     <string name="cyl_memory_warning_kept_should_unload">保留：shouldUnload 返回 NO</string>
     <string name="cyl_memory_warning_kept">保留</string>
+    <string name="cyl_scroll_self_test">自测</string>
+    <string name="cyl_scroll_title_manual">手动：%1$s</string>
+    <string name="cyl_scroll_title_real">实测：%1$s</string>
+    <string name="cyl_scroll_title_self_test">自测：依次运行所有自动模拟，报告 PASS / FAIL</string>
 </resources>

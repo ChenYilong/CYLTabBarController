@@ -368,3 +368,12 @@
 "网络图标、标题与配色" = "ネットワークアイコン、タイトルと配色";
 /* The settings group of the configuration file rows (docs/Configuration-File.md). */
 "配置文件" = "設定ファイル";
+/* Scroll hiding simulations (issue #13): kind labels and title prefixes; API names stay English. */
+"恢复" = "復元";
+"保持" = "維持";
+"不适用" = "該当なし";
+"手动" = "手動";
+"自测" = "セルフテスト";
+"手动：%@" = "手動：%@";
+"实测：%@" = "実機：%@";
+"自测：依次运行所有自动模拟，报告 PASS / FAIL" = "セルフテスト：すべての自動シミュレーションを実行し、PASS / FAIL を報告";

@@ -17,4 +17,8 @@
     <string name="cyl_memory_warning_kept_selected">คงไว้: ถูกเลือก</string>
     <string name="cyl_memory_warning_kept_should_unload">คงไว้: shouldUnload คืนค่า NO</string>
     <string name="cyl_memory_warning_kept">คงไว้</string>
+    <string name="cyl_scroll_self_test">ทดสอบตัวเอง</string>
+    <string name="cyl_scroll_title_manual">ด้วยตนเอง: %1$s</string>
+    <string name="cyl_scroll_title_real">จริง: %1$s</string>
+    <string name="cyl_scroll_title_self_test">ทดสอบตัวเอง: เรียกใช้การจำลองอัตโนมัติทั้งหมด รายงาน PASS / FAIL</string>
 </resources>

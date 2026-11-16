@@ -17,4 +17,8 @@
     <string name="cyl_memory_warning_kept_selected">रखा गया: चुना हुआ</string>
     <string name="cyl_memory_warning_kept_should_unload">रखा गया: shouldUnload ने NO लौटाया</string>
     <string name="cyl_memory_warning_kept">रखा गया</string>
+    <string name="cyl_scroll_self_test">स्व-परीक्षण</string>
+    <string name="cyl_scroll_title_manual">मैन्युअल: %1$s</string>
+    <string name="cyl_scroll_title_real">वास्तविक: %1$s</string>
+    <string name="cyl_scroll_title_self_test">स्व-परीक्षण: सभी स्वचालित सिमुलेशन चलाएँ, PASS / FAIL रिपोर्ट करें</string>
 </resources>

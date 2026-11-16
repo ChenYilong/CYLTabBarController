@@ -17,4 +17,8 @@
     <string name="cyl_memory_warning_kept_selected">giữ lại: đang chọn</string>
     <string name="cyl_memory_warning_kept_should_unload">giữ lại: shouldUnload trả về NO</string>
     <string name="cyl_memory_warning_kept">giữ lại</string>
+    <string name="cyl_scroll_self_test">Tự kiểm tra</string>
+    <string name="cyl_scroll_title_manual">Thủ công: %1$s</string>
+    <string name="cyl_scroll_title_real">Thực tế: %1$s</string>
+    <string name="cyl_scroll_title_self_test">Tự kiểm tra: chạy mọi mô phỏng tự động, báo cáo PASS / FAIL</string>
 </resources>

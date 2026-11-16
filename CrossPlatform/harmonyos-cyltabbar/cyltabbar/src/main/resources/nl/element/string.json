@@ -477,6 +477,10 @@
       "value": "Navigatiebalk verbergen zonder basisklasse (issue #535)"
     },
     {
+      "name": "cyl_l10n_321ff794aab8",
+      "value": "N.v.t."
+    },
+    {
       "name": "cyl_l10n_e1642a46b804",
       "value": "Midherfstfestival"
     },
@@ -503,6 +507,10 @@
     {
       "name": "cyl_l10n_e05f97c5159d",
       "value": "TabBarController maken van een configuratiebestand"
+    },
+    {
+      "name": "cyl_l10n_5f0c0bf32dc1",
+      "value": "Behouden"
     },
     {
       "name": "cyl_l10n_24fb8692947a",
@@ -577,6 +585,10 @@
       "value": "Ruimte"
     },
     {
+      "name": "cyl_l10n_2f383291bcf8",
+      "value": "Echt: %@"
+    },
+    {
       "name": "cyl_l10n_bccc798b577a",
       "value": "Gecentreerde capsule"
     },
@@ -605,6 +617,10 @@
       "value": "Toont een geanimeerde GIF als tabsymbool; tik opnieuw om te herstellen"
     },
     {
+      "name": "cyl_l10n_c7db6d4f1a42",
+      "value": "Herstellen"
+    },
+    {
       "name": "cyl_l10n_c4328f75476f",
       "value": "Valentijnsdag"
     },
@@ -613,8 +629,16 @@
       "value": "Ik"
     },
     {
+      "name": "cyl_l10n_2a3e7f5c382c",
+      "value": "Handmatig"
+    },
+    {
       "name": "cyl_l10n_97a6bedeb7fd",
       "value": "Handmatig: tik om verbergen bij scrollen aan te zetten, scrol omlaag om de TabBar te verbergen en doe dan wat de titel zegt. Verwacht: de TabBar komt meteen terug."
+    },
+    {
+      "name": "cyl_l10n_f68e7e217ad1",
+      "value": "Handmatig: %@"
     },
     {
       "name": "cyl_l10n_89246468f7fd",
@@ -815,6 +839,14 @@
     {
       "name": "cyl_l10n_4bd51044149f",
       "value": "Eigen geluidsbestand (cyl_tabButtonTapSoundURL)"
+    },
+    {
+      "name": "cyl_l10n_9d1c8a70d4da",
+      "value": "Zelftest"
+    },
+    {
+      "name": "cyl_l10n_11858aeb1656",
+      "value": "Zelftest: alle automatische simulaties uitvoeren, PASS / FAIL melden"
     },
     {
       "name": "cyl_l10n_beabcd498b94",

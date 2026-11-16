@@ -477,6 +477,10 @@
       "value": "Ocultar a barra de navegação sem classe base (issue #535)"
     },
     {
+      "name": "cyl_l10n_321ff794aab8",
+      "value": "N/A"
+    },
+    {
       "name": "cyl_l10n_e1642a46b804",
       "value": "Festival do Meio do Outono"
     },
@@ -503,6 +507,10 @@
     {
       "name": "cyl_l10n_e05f97c5159d",
       "value": "Criar um TabBarController a partir de um arquivo de configuração"
+    },
+    {
+      "name": "cyl_l10n_5f0c0bf32dc1",
+      "value": "Manter"
     },
     {
       "name": "cyl_l10n_24fb8692947a",
@@ -577,6 +585,10 @@
       "value": "Espaço"
     },
     {
+      "name": "cyl_l10n_2f383291bcf8",
+      "value": "Real: %@"
+    },
+    {
       "name": "cyl_l10n_bccc798b577a",
       "value": "Cápsula centralizada"
     },
@@ -605,6 +617,10 @@
       "value": "Mostra um GIF animado como ícone da aba; toque de novo para restaurar"
     },
     {
+      "name": "cyl_l10n_c7db6d4f1a42",
+      "value": "Restaurar"
+    },
+    {
       "name": "cyl_l10n_c4328f75476f",
       "value": "Dia dos Namorados"
     },
@@ -613,8 +629,16 @@
       "value": "Eu"
     },
     {
+      "name": "cyl_l10n_2a3e7f5c382c",
+      "value": "Manual"
+    },
+    {
       "name": "cyl_l10n_97a6bedeb7fd",
       "value": "Manual: toque para ativar o ocultar ao rolar, role para baixo para ocultar a TabBar e faça o que o título diz. Esperado: a TabBar volta na hora."
+    },
+    {
+      "name": "cyl_l10n_f68e7e217ad1",
+      "value": "Manual: %@"
     },
     {
       "name": "cyl_l10n_89246468f7fd",
@@ -815,6 +839,14 @@
     {
       "name": "cyl_l10n_4bd51044149f",
       "value": "Arquivo de som próprio (cyl_tabButtonTapSoundURL)"
+    },
+    {
+      "name": "cyl_l10n_9d1c8a70d4da",
+      "value": "Autoteste"
+    },
+    {
+      "name": "cyl_l10n_11858aeb1656",
+      "value": "Autoteste: executar todas as simulações automáticas e relatar PASS / FAIL"
     },
     {
       "name": "cyl_l10n_beabcd498b94",

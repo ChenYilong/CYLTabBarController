@@ -368,3 +368,12 @@
 "网络图标、标题与配色" = "Ikon dari jaringan, judul, dan warna";
 /* The settings group of the configuration file rows (docs/Configuration-File.md). */
 "配置文件" = "Berkas konfigurasi";
+/* Scroll hiding simulations (issue #13): kind labels and title prefixes; API names stay English. */
+"恢复" = "Pulihkan";
+"保持" = "Pertahankan";
+"不适用" = "T/A";
+"手动" = "Manual";
+"自测" = "Uji mandiri";
+"手动：%@" = "Manual: %@";
+"实测：%@" = "Nyata: %@";
+"自测：依次运行所有自动模拟，报告 PASS / FAIL" = "Uji mandiri: jalankan semua simulasi otomatis, laporkan PASS / FAIL";

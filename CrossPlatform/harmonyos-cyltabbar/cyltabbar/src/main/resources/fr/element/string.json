@@ -477,6 +477,10 @@
       "value": "Masquer la barre de navigation sans classe de base (issue #535)"
     },
     {
+      "name": "cyl_l10n_321ff794aab8",
+      "value": "N/A"
+    },
+    {
       "name": "cyl_l10n_e1642a46b804",
       "value": "Fête de la mi-automne"
     },
@@ -503,6 +507,10 @@
     {
       "name": "cyl_l10n_e05f97c5159d",
       "value": "Créer un TabBarController à partir d’un fichier de configuration"
+    },
+    {
+      "name": "cyl_l10n_5f0c0bf32dc1",
+      "value": "Conserver"
     },
     {
       "name": "cyl_l10n_24fb8692947a",
@@ -577,6 +585,10 @@
       "value": "Espace"
     },
     {
+      "name": "cyl_l10n_2f383291bcf8",
+      "value": "Réel : %@"
+    },
+    {
       "name": "cyl_l10n_bccc798b577a",
       "value": "Capsule centrée"
     },
@@ -605,6 +617,10 @@
       "value": "Affiche un GIF animé comme icône de l’onglet ; touchez à nouveau pour rétablir"
     },
     {
+      "name": "cyl_l10n_c7db6d4f1a42",
+      "value": "Rétablir"
+    },
+    {
       "name": "cyl_l10n_c4328f75476f",
       "value": "Saint-Valentin"
     },
@@ -613,8 +629,16 @@
       "value": "Moi"
     },
     {
+      "name": "cyl_l10n_2a3e7f5c382c",
+      "value": "Manuel"
+    },
+    {
       "name": "cyl_l10n_97a6bedeb7fd",
       "value": "Manuel : touchez pour activer le masquage au défilement, faites défiler vers le bas pour masquer la TabBar, puis faites ce qu'indique le titre. Attendu : la TabBar revient aussitôt."
+    },
+    {
+      "name": "cyl_l10n_f68e7e217ad1",
+      "value": "Manuel : %@"
     },
     {
       "name": "cyl_l10n_89246468f7fd",
@@ -815,6 +839,14 @@
     {
       "name": "cyl_l10n_4bd51044149f",
       "value": "Fichier son personnalisé (cyl_tabButtonTapSoundURL)"
+    },
+    {
+      "name": "cyl_l10n_9d1c8a70d4da",
+      "value": "Autotest"
+    },
+    {
+      "name": "cyl_l10n_11858aeb1656",
+      "value": "Autotest : exécuter toutes les simulations automatiques, signaler PASS / FAIL"
     },
     {
       "name": "cyl_l10n_beabcd498b94",

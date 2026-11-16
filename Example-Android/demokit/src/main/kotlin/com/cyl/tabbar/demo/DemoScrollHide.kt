@@ -18,7 +18,10 @@ import android.widget.PopupMenu
 import android.widget.PopupWindow
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import android.content.Context
+import com.cyl.tabbar.CYLLocalization
 import com.cyl.tabbar.CYLTabBarController
+import com.cyl.tabbar.R as CYLR
 import com.cyl.tabbar.cyl_handleNavigationBackActionWithAnimated
 import com.cyl.tabbar.cyl_pushViewController
 import com.cyl.tabbar.cyl_tabBarController
@@ -177,14 +180,30 @@ object DemoScrollHide {
         }
     }
 
+    /**
+     * [EN] The title as shown: the "Manual:" / "Real:" prefix and the self-test title are localized, the API or event
+     *      stays English, as on iOS and HarmonyOS.
+     * [CN] 显示的标题：「手动：」「实测：」前缀与自测标题已本地化，API 或事件保持英文，与 iOS、鸿蒙相同。
+     */
+    private fun title(context: Context?, simulation: Simulation): String {
+        context ?: return simulation.title
+        val text = simulation.title
+        return when {
+            simulation.kind == Kind.SelfTest -> CYLLocalization.string(context, CYLR.string.cyl_scroll_title_self_test)
+            text.startsWith("Manual: ") -> CYLLocalization.string(context, CYLR.string.cyl_scroll_title_manual, text.removePrefix("Manual: "))
+            text.startsWith("Real: ") -> CYLLocalization.string(context, CYLR.string.cyl_scroll_title_real, text.removePrefix("Real: "))
+            else -> text
+        }
+    }
+
     fun section(page: DemoListFragment): DemoSection {
         val rows = ArrayList<DemoRow>()
         rows += DemoRow("Scroll hiding: simulated interruptions (issue #13)", { "Choose one from a list; the same simulations as the rows below" }) {
-            choose("Simulated interruptions", simulations.map { it.title }) { index -> run(this, index) }
+            choose("Simulated interruptions", simulations.map { title(page.context, it) }) { index -> run(this, index) }
         }
         rows += DemoRow(if (expanded) "Collapse the simulations" else "Expand all ${simulations.size} simulations") { expanded = !expanded }
         if (expanded) simulations.forEachIndexed { index, simulation ->
-            rows += DemoRow(simulation.title, { results[index] ?: hint(simulation) }) { run(this, index) }
+            rows += DemoRow(title(page.context, simulation), { results[index] ?: hint(simulation) }) { run(this, index) }
         }
         return DemoSection("Scroll hiding: simulated interruptions (issue #13)", rows)
     }
@@ -201,7 +220,7 @@ object DemoScrollHide {
         val controller = page.tabBarController ?: return
         val simulation = simulations[index]
         when (simulation.kind) {
-            Kind.NotApplicable -> page.showMessage(simulation.title, hint(simulation))
+            Kind.NotApplicable -> page.showMessage(title(page.context, simulation), hint(simulation))
             Kind.Manual -> { controller.cyl_hidesTabBarOnScroll = true; simulation.fire(page, controller) { } }
             Kind.SelfTest -> selfTest(page, controller)
             else -> runOne(page, controller, index) { result -> results[index] = result; if (page.isAdded) page.reload() }
@@ -239,13 +258,13 @@ object DemoScrollHide {
         val report = ArrayList<String>()
         fun next(position: Int) {
             if (position >= automatic.size || !page.isAdded) {
-                if (page.isAdded) page.showMessage("Self-test", "${report.count { it.startsWith("PASS") }} / ${report.size} PASS\n\n" + report.joinToString("\n"))
+                if (page.isAdded) page.showMessage(CYLLocalization.string(page.requireContext(), CYLR.string.cyl_scroll_self_test), "${report.count { it.startsWith("PASS") }} / ${report.size} PASS\n\n" + report.joinToString("\n"))
                 return
             }
             val index = automatic[position]
             runOne(page, controller, index) { result ->
                 results[index] = result
-                report += "$result · ${simulations[index].title}"
+                report += "$result · ${title(page.context, simulations[index])}"
                 later(600) { next(position + 1) }
             }
         }
