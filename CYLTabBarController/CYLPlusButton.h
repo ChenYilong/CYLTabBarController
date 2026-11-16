@@ -41,6 +41,8 @@
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/TabBar-Minimize-On-Scroll.md
 //   - Update Tabs in Place: Titles, Icons, Network Icons and Pages / 原地更新 Tab：标题、图标、网络图标与替换页面
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Update-Tab-Bar-Items-In-Place.md
+//   - CYLTabBarController usage guide / CYLTabBarController 使用指南
+//     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Usage-Guide.md
 // docs-binding:end
 
 #import "CYLConstants.h"
