@@ -61,7 +61,7 @@ def public_headers():
     headers = []
     for folder, _, files in os.walk(HEADERS_ROOT):
         for name in files:
-            path = os.path.relpath(os.path.join(folder, name), ROOT)
+            path = os.path.relpath(os.path.join(folder, name), ROOT).replace(os.sep, '/')  # [EN] '/' on every OS, as PRIVATE. [CN] 各系统统一用 '/'。
             if name.endswith('.h') and path not in PRIVATE and not name.startswith('_'):
                 headers.append(path)
     return sorted(headers)

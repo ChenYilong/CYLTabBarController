@@ -36,6 +36,18 @@ export {
 } from './src/main/ets/CYLLocalization';
 export { cyl_badgeAccessibilityText } from './src/main/ets/CYLTabBarController';
 export {
-  CYLTabBarStyleType, CYLFlatDesignTintColor, CYLLiquidGlassTintColor, CYLLiquidGlassSelectionColor, CYLLiquidGlassTabBarModifier, CYLFlatDesignUnselectedColor, CYLFlatDesignTabBarModifier, CYLDefaultTabBarModifier,
-  cyl_tabBarStyleModifier
+  CYLTabBarStyleType,
+  CYLFlatDesignTintColor,
+  CYLLiquidGlassTintColor,
+  CYLLiquidGlassSelectionColor,
+  CYLLiquidGlassTabBarModifier,
+  CYLFlatDesignUnselectedColor,
+  CYLFlatDesignTabBarModifier,
+  CYLDefaultTabBarModifier,
+  cyl_tabBarStyleModifier,
+  CYLFlatDesignTabBarItem,
+  cyl_flatDesignTabBarItem,
+  cyl_flatDesignTabBarItemWithOffset,
+  cyl_flatDesignHasPlusButton,
+  cyl_flatDesignHasPlusChildViewController
 } from './src/main/ets/CYLFlatDesignTabBar';
