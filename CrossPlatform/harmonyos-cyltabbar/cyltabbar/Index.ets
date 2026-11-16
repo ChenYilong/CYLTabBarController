@@ -68,3 +68,7 @@ export {
   cyl_setTabBarItemImagePlaceholderSize
 } from './src/main/ets/CYLConstants';
 export { CYLThemeColor, CYLThemeColorProvider } from './src/main/ets/CYLThemeColor';
+export {
+  CYLTabBarManifest, CYLTabBarManifestLoader, CYLTabBarManifestLoaderDelegate, CYLTabBarManifestCompletion, CYLTabBarManifestSource,
+  CYLTabBarManifestError, CYLTabBarManifestErrorCode
+} from './src/main/ets/CYLTabBarManifest';
