@@ -66,6 +66,15 @@ android {
         // [CN] 这里编译的是库的源码而不是它的模块：必须一并带上库的 R8 规则（反射查找的类，如 libpag 的 PAGView），否则开启混淆的发布版会删除它们，
         //      Tab 只显示图片。
         if (cylUseLocalSources) consumerProguardFiles("$cylAndroidRoot/cyltabbar/consumer-rules.pro")
+        // [EN] The library's CYLBadge reads BuildConfig.CYL_BADGE_ANIMATION_DISABLED, the badge debugging build option
+        //      (docs/Badge-Debugging.md): `-PcylBadgeAnimationDisabled=true` turns badge animations off.
+        // [CN] 库的 CYLBadge 读取角标调试编译选项 BuildConfig.CYL_BADGE_ANIMATION_DISABLED（docs/Badge-Debugging.md）。
+        if (cylUseLocalSources) buildConfigField("boolean", "CYL_BADGE_ANIMATION_DISABLED",
+            (project.findProperty("cylBadgeAnimationDisabled")?.toString() == "true").toString())
+    }
+
+    buildFeatures {
+        buildConfig = cylUseLocalSources
     }
 }
 
