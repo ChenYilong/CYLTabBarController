@@ -73,10 +73,10 @@
   },
   {
     "id": 9,
-    "status": "TODO need 模拟器截图验证",
+    "status": "DONE (no longer applies: HarmonyOS/ was merged into the port and deleted in PR #800)",
     "scope": "HarmonyOS/ (separate project in this repository)",
     "title": "Plus button title 发布 sits about 12 vp below the other tab titles",
-    "evidence": "harmonyos-tab-bar-svga-launch.png, harmonyos-tab-bar-svga-messages-tap.png",
+    "evidence": "The deleted HarmonyOS/ demo (its screenshots were removed in 2e1aaec)",
     "cause": "plusButtonView centres a 44 vp image + title, tabButton centres a 26 vp icon stack + title: the larger image pushes the plus title down",
     "fix": "HarmonyOS/ was merged into the official port and deleted (PR #800); the port places tab and plus titles on one line (#2)"
   },
@@ -94,7 +94,7 @@
     "status": "DONE (harmonyos-port-svga-demo-taps.png, b840da3, emulator 127.0.0.1:5557)",
     "scope": "CrossPlatform/harmonyos-cyltabbar (cyltabbar)",
     "title": "SVGA (and Lottie) icons larger than imageSize sit about 5 vp right of and below their titles",
-    "evidence": "harmonyos-tab-bar-svga-launch.png, harmonyos-tab-bar-svga-messages-tap.png (reported by the CYLTableViewPlaceHolder session)",
+    "evidence": "The deleted HarmonyOS/ demo showed icons 19-29 px right of their titles (screenshots removed in 2e1aaec); the port: harmonyos-port-svga-demo-taps.png (b840da3, centred, -2 to +1.5 px)",
     "cause": "The icon Stack had a fixed imageSize with alignContent TopStart, so a bigger icon spilled right and down; the title line and the badge anchor used imageSize",
     "fix": "The icon Stack takes the real icon size (no fixed size, centred in the tab); the title line and the badge anchorWidth use cylIconHeight (Lottie / SVGA / image size)"
   },
