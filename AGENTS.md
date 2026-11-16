@@ -235,6 +235,8 @@ Every new feature and user-visible change ships with bilingual documentation in 
 
 ## HarmonyOS port
 
+**CYLTabBarController ships a HarmonyOS component and a HarmonyOS example (added 2026-11-16, required).** The repository must always contain (1) the HarmonyOS tab bar component, the library module `CrossPlatform/harmonyos-cyltabbar/cyltabbar` (ArkTS / ArkUI, the HarmonyOS version of the tab bar), and (2) the HarmonyOS example, the `entry` module next to it, which shows that component's features as a showcase. Never delete, move out or leave them behind when merging or closing branches and pull requests; a branch or pull request that carries HarmonyOS work keeps both modules buildable (`hvigorw assembleHap`), and both reach `master` with the pull request that merges the cross-platform work.
+
 HarmonyOS (HarmonyOS 6.0.1, API 21, DevEco Studio 6.0, ArkTS / ArkUI, code in `CrossPlatform/harmonyos-cyltabbar`) principles: the public API matches the iOS library; the example (entry) is a one-to-one replica of the iOS Objective-C Example; the internal implementation is ported from the Android Kotlin sources (`Example-Android/cyltabbar`). Progress and score: [docs/HarmonyOS-Parity.md](docs/HarmonyOS-Parity.md); remove one TODO per feature done, until the score is 100. Build from an ASCII path without spaces (hvigor refuses others), e.g. a copy at `C:cyl-hm`.
 
 **DevEco Studio setup and emulator prerequisites** (full steps: the `cyl-harmonyos-setup` skill):
