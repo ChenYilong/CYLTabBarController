@@ -15,9 +15,11 @@ check (every row DONE) happens when the screenshots are taken again.
 [CN] 鸿蒙端在模拟器截图中发现的问题清单。每个问题一行；状态：TODO（未修复）、TODO need 模拟器截图验证（已在无模拟器条件下修复，待截图验证）、
 DONE（已在模拟器或真机验证）。完成率 = 100 × 状态不是 "TODO" 的行 / 全部行；没有 "TODO" 行即满分。
 """
+import importlib.util
 import json
 import os
 import sys
+import tempfile
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA = os.path.join(ROOT, 'scripts', 'harmonyos-issues.json')
@@ -49,10 +51,31 @@ def document(rows):
     return '\n'.join(out) + '\n', score
 
 
+def with_navigation(text):
+    """
+    [EN] The document as scripts/update-docs-navigation.py leaves it (contents block and class binding block), so the two
+         generators agree and its --check in CI passes after this script runs.
+    [CN] 套用 scripts/update-docs-navigation.py 的目录块与类绑定块后的文档，使两个生成器结果一致，CI 中它的 --check 能通过。
+    """
+    spec = importlib.util.spec_from_file_location('cyl_docs_navigation', os.path.join(ROOT, 'scripts', 'update-docs-navigation.py'))
+    navigation = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(navigation)
+    with tempfile.NamedTemporaryFile('w', suffix='.md', delete=False, encoding='utf-8', newline='\n') as handle:
+        handle.write(text)
+    try:
+        _, updated = navigation.update_page(handle.name)
+    finally:
+        os.remove(handle.name)
+    lines = updated.split('\n')
+    lines = navigation.apply_binding_block(lines, navigation.binding_rows([], {}, os.path.basename(DOC)))
+    return '\n'.join(lines)
+
+
 def main():
     rows = json.load(open(DATA, encoding='utf-8'))
     bad = [r['id'] for r in rows if not valid(r['status'])]
     text, score = document(rows)
+    text = with_navigation(text)
     if '--check' in sys.argv:
         current = open(DOC, encoding='utf-8').read() if os.path.exists(DOC) else ''
         if bad:
