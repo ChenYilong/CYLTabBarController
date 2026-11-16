@@ -453,6 +453,10 @@
       "value": "Downloads this page's tab icon from the network (cached); tap again to restore"
     },
     {
+      "name": "cyl_l10n_e05f97c5159d",
+      "value": "Create a TabBarController from a configuration file"
+    },
+    {
       "name": "cyl_l10n_24fb8692947a",
       "value": "kept"
     },
@@ -531,6 +535,10 @@
     {
       "name": "cyl_l10n_7a2261654d24",
       "value": "unloaded"
+    },
+    {
+      "name": "cyl_l10n_f79d05d929aa",
+      "value": "TabBarController created safely: %@ tabs"
     },
     {
       "name": "cyl_l10n_091885db07e4",
@@ -771,6 +779,10 @@
     {
       "name": "cyl_l10n_15c64aa0b404",
       "value": "Configuration file"
+    },
+    {
+      "name": "cyl_l10n_d505958a042b",
+      "value": "Configuration: simulated failures"
     },
     {
       "name": "cyl_l10n_45158907e07f",

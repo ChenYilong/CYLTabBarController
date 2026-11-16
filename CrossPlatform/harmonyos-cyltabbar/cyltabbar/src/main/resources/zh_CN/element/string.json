@@ -453,6 +453,10 @@
       "value": "从网络下载当前页 Tab 的图标（带缓存），再点恢复"
     },
     {
+      "name": "cyl_l10n_e05f97c5159d",
+      "value": "从配置文件创建 TabBarController"
+    },
+    {
       "name": "cyl_l10n_24fb8692947a",
       "value": "保留"
     },
@@ -531,6 +535,10 @@
     {
       "name": "cyl_l10n_7a2261654d24",
       "value": "已卸载"
+    },
+    {
+      "name": "cyl_l10n_f79d05d929aa",
+      "value": "已安全创建 TabBarController：%@ 个 Tab"
     },
     {
       "name": "cyl_l10n_091885db07e4",
@@ -771,6 +779,10 @@
     {
       "name": "cyl_l10n_15c64aa0b404",
       "value": "配置文件"
+    },
+    {
+      "name": "cyl_l10n_d505958a042b",
+      "value": "配置文件：模拟意外情况"
     },
     {
       "name": "cyl_l10n_45158907e07f",

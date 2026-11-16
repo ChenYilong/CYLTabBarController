@@ -369,7 +369,7 @@ struct Index {
   private configurationRows(): DemoRow[] {
     return ['json', 'json5', 'jsonc'].map((format: string) => {
       const row: DemoRow = {
-        id: `configuration-${format}`, title: `由配置文件创建 TabBarController (.${format}) / Create from a configuration file`,
+        id: `configuration-${format}`, title: `${CYLLocalizedString('从配置文件创建 TabBarController')} (.${format})`,
         action: () => this.push('pages/ConfigurationDemo', { file: `configurations/cyl_tabbar_configuration.${format}` } as DemoPushParams),
       };
       return row;
@@ -379,6 +379,11 @@ struct Index {
       id: 'configuration-svga', title: CYLLocalizedString('SVGA Tab 图标（配置文件）'),
       subtitle: CYLLocalizedString('CYLTabBarSVGAFilePath：选中时播放一次，未选中时显示第一帧'),
       action: () => this.push('pages/ConfigurationDemo', { file: 'configurations/cyl_tabbar_configuration_svga.json' } as DemoPushParams),
+    } as DemoRow, {
+      // [EN] Item 44: broken and unusual files (A2–E1); each shows a typed error or the tab bar created safely.
+      // [CN] 第 44 项：损坏与异常的文件（A2–E1）；每个显示错误或安全创建的 TabBar。
+      id: 'configuration-failures', title: CYLLocalizedString('配置文件：模拟意外情况'),
+      action: () => this.push('pages/ConfigurationFailures', {} as DemoPushParams),
     } as DemoRow]);
   }
 

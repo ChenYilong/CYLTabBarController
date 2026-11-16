@@ -453,6 +453,10 @@
       "value": "Descarcă pictograma filei din rețea (în cache); atinge din nou pentru a restabili"
     },
     {
+      "name": "cyl_l10n_e05f97c5159d",
+      "value": "Creează un TabBarController dintr-un fișier de configurare"
+    },
+    {
       "name": "cyl_l10n_24fb8692947a",
       "value": "păstrată"
     },
@@ -531,6 +535,10 @@
     {
       "name": "cyl_l10n_7a2261654d24",
       "value": "descărcată"
+    },
+    {
+      "name": "cyl_l10n_f79d05d929aa",
+      "value": "TabBarController creat în siguranță: %@ file"
     },
     {
       "name": "cyl_l10n_091885db07e4",
@@ -771,6 +779,10 @@
     {
       "name": "cyl_l10n_15c64aa0b404",
       "value": "Fișier de configurare"
+    },
+    {
+      "name": "cyl_l10n_d505958a042b",
+      "value": "Configurare: defecțiuni simulate"
     },
     {
       "name": "cyl_l10n_45158907e07f",

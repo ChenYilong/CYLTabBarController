@@ -5,6 +5,7 @@
     "pages/TextPage",
     "pages/SystemTabs",
     "pages/AnotherTabBar",
-    "pages/PopPushDemo"
+    "pages/PopPushDemo",
+    "pages/ConfigurationFailures"
   ]
 }
