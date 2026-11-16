@@ -26,6 +26,10 @@ Every commit message carries the line `By  @ChenYilong <luohanchenyilong@163.com
 Every commit uses the `git cz` (Commitizen) style and is written entirely in English: no Chinese (and no other non-English text) anywhere in the subject, the body or the trailers. A user's prompt in another language is quoted in the task's document in `docs/`, never in the commit message.
 Before pushing: `git log -1 --format=%B | python3 -c "import re,sys; sys.exit(1 if re.search('[\u4e00-\u9fff]', sys.stdin.read()) else 0)"` prints nothing. AGENTS.md, "Git and pull requests".
 
+## Commit and push at the end of every turn
+
+**Commit and push at the end of every turn (added 2026-11-16)**: when a question-and-answer turn ends and the current branch is not `master` or `main`, commit and push the work of that turn, without asking. This is always safe: the code stays on a branch and is never pushed to `master` or `main`, so pushing carries no risk to worry about. The open pull request rule still applies to every such commit (check for an open pull request first, open one if missing). On `master` or `main`, ask first. AGENTS.md, "Git and pull requests".
+
 ## Where a check runs: GitHub CI or locally
 
 GitHub CI/CD for iOS runs on **macOS 26** by default: always read `.github/workflows/ios.yml` on master first to confirm it
@@ -182,3 +186,20 @@ emulator checks locate controls through accessibility identifiers, accessibility
 first (XCUITest, `axe describe-ui`, `uiautomator`, HarmonyOS UiTest `ON.id()` / `ON.text()`, Flutter
 `find.bySemanticsLabel`, React Native `getByLabelText`), for taps, complex flows and consecutive steps. Coordinates are
 the last resort; a control that cannot be found that way is a bug: add the label first. HarmonyOS details: `cyl-harmonyos-a11y-l10n`.
+
+## Pull requests for every branch
+
+- **Every branch with commits has an open pull request (added 2026-11-16).** After creating a branch, any commit on it
+  must be in a pull request. Never create a branch and keep committing to it without one: commits on a branch with no
+  pull request are ignored, because nothing ever merges them.
+  - **Before every commit**, check that the current branch has an open pull request
+    (`gh pr list --state open --head <branch>`). If it has none (never opened, closed or merged), open a new one right
+    after pushing (`gh pr create --base <target> --head <branch>`).
+  - **Target branch**: the branch of the pull request that was active (open) before this one was created; only when
+    there is none, `master` (or `main`).
+  - **More than two open pull requests: ask first.** When the repository already has more than two open pull requests,
+    do not open another one on your own: ask the owner whether to create a new branch and pull request or to keep
+    committing on the current branch. More than two open branches make merging hard and leave no sensible target for
+    each branch.
+  - Push only to branches that have an open pull request; do not recreate a branch that was deleted after its pull
+    request was closed or merged.

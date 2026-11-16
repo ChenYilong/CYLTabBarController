@@ -417,6 +417,7 @@ The root `Podfile` is the reference: it already has the top lines and the hook.
 
 - **On any branch other than `master` or `main`, commit and push as soon as the work is written, without asking
   for confirmation.** On `master` or `main`, ask first.
+- **Commit and push at the end of every turn (added 2026-11-16)**: when a question-and-answer turn ends and the current branch is not `master` or `main`, commit and push the work of that turn, without asking. This is always safe: the code stays on a branch and is never pushed to `master` or `main`, so pushing carries no risk to worry about. The open pull request rule still applies to every such commit (check for an open pull request first, open one if missing). On `master` or `main`, ask first.
 
 - **Never commit `._*` files.** macOS writes these AppleDouble metadata files next to every file on an external volume
   (e.g. `._.claude`, `._.git`, `._.github`, `._.gitignore`, `._.pullapprove.yml`, `._ChatKit`). `.gitignore` excludes
@@ -493,6 +494,20 @@ The root `Podfile` is the reference: it already has the top lines and the hook.
   On someone else's branch, merge `master` in instead of rebasing.
 - After opening the PR, comment on the issue (in the issue's language) with the changes, the commit link, and an
   invitation to try the latest version.
+- **Every branch with commits has an open pull request (added 2026-11-16).** After creating a branch, any commit on it
+  must be in a pull request. Never create a branch and keep committing to it without one: commits on a branch with no
+  pull request are ignored, because nothing ever merges them.
+  - **Before every commit**, check that the current branch has an open pull request
+    (`gh pr list --state open --head <branch>`). If it has none (never opened, closed or merged), open a new one right
+    after pushing (`gh pr create --base <target> --head <branch>`).
+  - **Target branch**: the branch of the pull request that was active (open) before this one was created; only when
+    there is none, `master` (or `main`).
+  - **More than two open pull requests: ask first.** When the repository already has more than two open pull requests,
+    do not open another one on your own: ask the owner whether to create a new branch and pull request or to keep
+    committing on the current branch. More than two open branches make merging hard and leave no sensible target for
+    each branch.
+  - Push only to branches that have an open pull request; do not recreate a branch that was deleted after its pull
+    request was closed or merged.
 
 ## Commands
 
