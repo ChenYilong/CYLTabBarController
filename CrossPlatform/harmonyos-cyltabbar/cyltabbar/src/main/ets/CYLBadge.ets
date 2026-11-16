@@ -268,13 +268,20 @@ export struct CYLBadgeView {
       return;
     }
     this.playedGeneration = this.badge.generation;
-    this.scaleValue = 1;
-    this.translateX = 0;
-    this.translateY = 0;
-    this.opacityValue = 1;
-    this.rotateX = 0;
-    this.rotateY = 0;
-    this.rotateZ = 0;
+    // [EN] Reset inside a zero-length animation: it also stops a running infinite animation (e.g. Bounce on "100"). A plain
+    //      assignment left that animation driving the transform, so the new badge (the dot after the tab was selected) was
+    //      drawn about 13 vp below its place.
+    // [CN] 在零时长动画中重置：同时停止正在运行的无限动画（如 "100" 的 Bounce）。直接赋值时那个动画仍在驱动变换，新的角标（选中 Tab
+    //      后的红点）被画在原位下方约 13 vp 处。
+    this.getUIContext().animateTo({ duration: 0 }, () => {
+      this.scaleValue = 1;
+      this.translateX = 0;
+      this.translateY = 0;
+      this.opacityValue = 1;
+      this.rotateX = 0;
+      this.rotateY = 0;
+      this.rotateZ = 0;
+    });
     const repeats = this.badge.repeatCount;
     // [EN] Alternate play counts each direction as one iteration. [CN] 往返播放时每个方向计一次。
     const forever = repeats !== undefined && repeats > 0 ? repeats * 2 : -1;

@@ -430,5 +430,14 @@
     "evidence": "Maintainer report 2026-11-17; layout dump: plus badge center 36 px (Liquid Glass) / 51 px (classic) left of the image's right edge",
     "cause": "The plus badge was placed from the left of the plus slot (the image's Stack was the slot's width), not from the image, so it moved with the slot width",
     "fix": "The plus image and its badge are in a box of the image's size, so the badge center is at the image's top-right corner plus cyl_badgeCenterOffset, as iOS (also fixes the classic style). Tab badges already use iOS's formula (host width + 2 + offset); what is left (up to 3.7 pt on 同城) comes from the icons' own padding inside the 26 vp Lottie box"
+  },
+  {
+    "id": 49,
+    "status": "DONE (harmonyos-liquid-glass-message-badge-before-after.png: left before, the dot about 13 vp below the icon's corner; right after, at the icon's top-right corner, 1.5 s and 3 s after selecting 消息; Mate 70 Pro emulator, HarmonyOS 6.0.1, API 21, 127.0.0.1:5559, 2026-11-17)",
+    "scope": "CrossPlatform/harmonyos-cyltabbar (cyltabbar)",
+    "title": "Liquid Glass: after selecting 消息, its badge (the dot) is drawn at the lower right of the icon instead of the top-right corner",
+    "evidence": "Maintainer report 2026-11-17; the layout dump had the dot in place while the screen showed it 45 px (13 vp) lower: a render-time transform",
+    "cause": "The badge was \"100\" with the Bounce animation, an infinite animateTo on translateY; selecting the tab turns it into a dot without animation, and cylPlay() reset translateY by plain assignment, which does not stop a running infinite animation in ArkUI, so it kept driving the dot's transform",
+    "fix": "cylPlay() resets scale, translate, opacity and rotation inside animateTo({ duration: 0 }), which stops running animations before the new badge plays its own (all styles)"
   }
 ]

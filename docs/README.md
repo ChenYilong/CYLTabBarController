@@ -239,6 +239,7 @@ docs/
 │   ├── harmonyos-liquid-glass-dock-example.png
 │   ├── harmonyos-liquid-glass-ios-vs-harmonyos.png
 │   ├── harmonyos-liquid-glass-lens.png
+│   ├── harmonyos-liquid-glass-message-badge-before-after.png
 │   ├── harmonyos-liquid-glass-plus-raised.png
 │   ├── harmonyos-liquid-glass-reference-vs-ours.png
 │   ├── harmonyos-port-svga-demo-page.png
