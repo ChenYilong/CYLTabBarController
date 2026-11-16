@@ -228,6 +228,7 @@ docs/
 │   ├── harmonyos-flatdesign-liquidglass-taps-mate70pro.png
 │   ├── harmonyos-flatdesign-tint-fixed.png
 │   ├── harmonyos-home-mate70pro-api21.jpeg
+│   ├── harmonyos-keyboard-moves-tab-bar-cylsearch.png
 │   ├── harmonyos-port-svga-demo-page.png
 │   ├── harmonyos-port-svga-demo-row.png
 │   ├── harmonyos-port-svga-demo-taps.png
