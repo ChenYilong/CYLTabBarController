@@ -348,6 +348,8 @@ export struct CYLTabBarController {
   @State private tapFlip: number[] = [];
   @State private tapOffset: number[] = [];
   private lastTapIndex: number = -2;
+  /** [EN] The tab whose long press just fired: its click is not a tap. [CN] 刚触发长按的 Tab：其 click 不算点击。 */
+  private cylLongPressedIndex: number = -2;
   private lastTapTime: number = 0;
   /**
    * [EN] CYLTabBarSlideTransitionAnimator: the new page slides in from the side of its tab (duration ms; 0 off).
@@ -762,13 +764,21 @@ export struct CYLTabBarController {
     .accessibilityText(this.cylAccessibilityLabel(index))
     .accessibilityDescription(this.cylAccessibilityDescription(index))
     .id(`cyl-tab-${this.cylIdentifier(index)}`)
-    .gesture(GestureGroup(GestureMode.Exclusive,
-      LongPressGesture({ duration: this.longPressDuration }).onAction(() => {
-        if (this.didLongPress !== undefined) {
-          this.didLongPress(index, this.cylIdentifier(index));
-        }
-      }),
-      TapGesture().onAction(() => this.cylTap(index))))
+    // [EN] Taps through onClick, the long press in parallel: an exclusive long-press + tap group could drop the first tap
+    //      right after a page push (issue list #14). [CN] 点击走 onClick，长按为并行手势：长按 + 点击的互斥组合可能丢失 push 后的第一次点击（问题 #14）。
+    .onClick(() => {
+      if (this.cylLongPressedIndex === index) {
+        this.cylLongPressedIndex = -2;
+        return;
+      }
+      this.cylTap(index);
+    })
+    .parallelGesture(LongPressGesture({ duration: this.longPressDuration }).onAction(() => {
+      this.cylLongPressedIndex = index;
+      if (this.didLongPress !== undefined) {
+        this.didLongPress(index, this.cylIdentifier(index));
+      }
+    }))
   }
 
   /**
