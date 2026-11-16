@@ -331,7 +331,6 @@ Analyst.ai [App Store Link](https://itunes.apple.com/us/app/analyst-ai/id1345754
 | [鸿蒙 API 对照表](docs/HarmonyOS-API-Map.md) | [The HarmonyOS API map](docs/HarmonyOS-API-Map.md) |
 | [鸿蒙端问题清单](docs/HarmonyOS-Issues.md) | [HarmonyOS issues](docs/HarmonyOS-Issues.md) |
 | [鸿蒙端对齐](docs/HarmonyOS-Parity.md) | [HarmonyOS parity](docs/HarmonyOS-Parity.md) |
-| [鸿蒙截图问题清单](docs/HarmonyOS-Screenshot-Issues.md) | [HarmonyOS screenshot issues](docs/HarmonyOS-Screenshot-Issues.md) |
 | [纯图标 Tab 的自动居中](docs/Image-Only-Tabs.md) | [Automatic centering of image-only tabs](docs/Image-Only-Tabs.md) |
 | [液态玻璃的健壮性改进](docs/Liquid-Glass-Robustness.md) | [Liquid Glass Robustness](docs/Liquid-Glass-Robustness.md) |
 | [需要登录的 Tab](docs/Login-Required-Tabs.md) | [Tabs That Need Login](docs/Login-Required-Tabs.md) |
