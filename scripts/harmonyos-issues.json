@@ -174,10 +174,10 @@
     "id": 20,
     "status": "TODO need 模拟器截图验证",
     "scope": "CrossPlatform/harmonyos-cyltabbar (cyltabbar, entry)",
-    "title": "The 41 HarmonyOS-only strings stay English in the 30 other languages (de 29 copies of English, fr / es 29, ar / ko / ja 27; report of the CYLSearchViewController session)",
+    "title": "The HarmonyOS-only strings stay English in the 30 other languages (de 29 copies of English, fr / es 29, ar / ko / ja 27; report of the CYLSearchViewController session)",
     "evidence": "string.json of every language except zh_CN / zh_TW",
     "cause": "scripts/harmonyos-l10n.json had only en, zh-Hans and zh-Hant",
-    "fix": "Translations for all 33 languages added to scripts/harmonyos-l10n.json and resources regenerated; only API names, Liquid Glass and loanwords (Badge, OK) stay as in English"
+    "fix": "All 46 HarmonyOS-only keys translated in all 33 languages in scripts/harmonyos-l10n.json (merged with 3344398), resources regenerated; only API names, Liquid Glass and loanwords (Badge, OK) stay as in English"
   },
   {
     "id": 21,
@@ -186,7 +186,7 @@
     "title": "SVGA configuration demo: tab titles and the page title are English (Home, Discover, Message, Me) in the Chinese UI",
     "evidence": "harmonyos-port-svga-demo-page.png",
     "cause": "configurationWithRawFile ignored CYLTabBarControllerLocalization, and the SVGA file had none",
-    "fix": "configurationWithRawFile localizes CYLTabBarItemTitle / CYLTabBarItemSelectedTitle from <path>/<language>.lproj/<table>.strings next to the file, as iOS; the tables of Example-Shared/Configurations/Localization are copied to rawfile/configurations/Localization and the SVGA file declares them"
+    "fix": "Two layers: the demo page shows the file's English titles as localization keys (3eb7381; Home / Discover / Message / Me copied from Example-Shared/Configurations/Localization for 33 languages), and the library's configurationWithRawFile now also applies CYLTabBarControllerLocalization of a file, as iOS (6bd5b02)"
   },
   {
     "id": 22,
@@ -195,7 +195,7 @@
     "title": "Configuration demo page: the labels \"identifier:\" and \"page:\" are English, and \"page: -\" shows no page",
     "evidence": "harmonyos-port-svga-demo-page.png",
     "cause": "Literal English labels in ConfigurationDemo.ets; the SVGA file had no CYLTabBarItemPageIdentifier",
-    "fix": "Labels go through CYLLocalizedString (Identifier: %@, Page identifier: %@, 33 languages); each SVGA tab has a page identifier svga-<identifier>"
+    "fix": "The page says which file, tab and page it is, through CYLLocalizedString (Configuration file / Tab / Page: %@, 33 languages; 3eb7381 + translations); each SVGA tab has a page identifier svga-<identifier>"
   },
   {
     "id": 23,
