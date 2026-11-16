@@ -248,6 +248,7 @@ docs/
 │   ├── harmonyos-verify-liquid-glass-eba8c44.png
 │   ├── harmonyos-verify-pushed-page-eba8c44.jpeg
 │   ├── harmonyos-verify-replacement-page-eba8c44.jpeg
+│   ├── harmonyos-verify-rive-mate70pro-api21.png
 │   ├── harmonyos-verify-skin-row-picker.jpeg
 │   ├── harmonyos-verify-skins-eba8c44.png
 │   ├── image-only-tabs-gallery-3-3-ios17.png
