@@ -233,6 +233,7 @@ docs/
 │   ├── harmonyos-styles-ocean-skin-b7995d0.png
 │   ├── harmonyos-styles-recheck-6befe36.png
 │   ├── harmonyos-styles-space-skin-981db1e.png
+│   ├── harmonyos-system-tab-bar-plus-before-after.png
 │   ├── image-only-tabs-gallery-3-3-ios17.png
 │   ├── image-only-tabs-ios.png
 │   ├── inset-grouped-sections-demo-ios.png

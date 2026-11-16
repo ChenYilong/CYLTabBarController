@@ -280,11 +280,20 @@
   },
   {
     "id": 32,
-    "status": "TODO",
+    "status": "DONE (harmonyos-system-tab-bar-plus-before-after.png, emulator 127.0.0.1:5559, 2026-11-16 11:01)",
     "scope": "CrossPlatform/harmonyos-cyltabbar (entry)",
     "title": "The system tab bar page (推入到系统 UITabBarController) shows its page body \"Home\" in English in the Chinese UI",
     "evidence": "harmonyos-emulator-pages-b7fdf26.png, 4th screen",
     "cause": "Text not passed through CYLLocalizedString",
-    "fix": "Localize it (scripts/harmonyos-l10n.json)"
+    "fix": "The page shows the selected tab's localized title (or the localized plus button name after a tap)"
+  },
+  {
+    "id": 33,
+    "status": "DONE (harmonyos-system-tab-bar-plus-before-after.png, emulator 127.0.0.1:5559, 2026-11-16 11:01)",
+    "scope": "CrossPlatform/harmonyos-cyltabbar (entry)",
+    "title": "System tab bar page with another plus button: the plus button floats 80 vp above the bar, over the page, instead of sitting in the bar",
+    "evidence": "User screenshot of 2026-11-16 10:48 (the same as harmonyos-emulator-pages-b7fdf26.png, 4th screen)",
+    "cause": "SystemTabs.ets drew the stand-in button with margin({ bottom: 80 })",
+    "fix": "The button sits in the bar's middle slot (between Nearby and Messages) and bulges over the bar's top edge (CYL_SYSTEM_PLUS_BOTTOM = 18); it has an accessibility text"
   }
 ]

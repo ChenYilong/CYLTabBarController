@@ -6,6 +6,15 @@ import { CYLLocalizedString } from 'cyltabbar';
  * [CN] 第 45、46 项：系统 TabBar（ArkUI `Tabs` 底部 TabBar，即鸿蒙上的 UITabBar），同样四个 Tab，消息带角标；`withPlus` 加上另一个
  *      PlusButton：系统 TabBar 没有加号按钮，因此用悬浮按钮代替（与 Android 端的 FloatingActionButton 相同）。
  */
+/**
+ * [EN] The plus button's bottom margin (vp) in the Stack that ends above the gesture bar: its center sits about 14 vp
+ *      above the tab icons' center line, so the button bulges over the bar's top edge (measured on the Mate-class
+ *      emulator, 2026-11-16: 48 left it 40 vp above the icons).
+ * [CN] 加号按钮在 Stack（底边位于手势条之上）中的下边距（vp）：其中心比 Tab 图标中心线高约 14 vp，使按钮凸出 TabBar 上沿
+ *      （2026-11-16 在模拟器上测量：48 时比图标高 40 vp）。
+ */
+const CYL_SYSTEM_PLUS_BOTTOM: number = 18;
+
 interface SystemTabsParams {
   withPlus?: boolean;
 }
@@ -20,7 +29,11 @@ interface SystemTab {
 @Component
 struct SystemTabs {
   @State current: number = 0;
-  @State label: string = 'Home';
+  /**
+   * [EN] What the page shows: the selected tab's title (localized, issue list row 32), or the plus button's name after a tap.
+   * [CN] 页面显示的内容：选中 Tab 的标题（已本地化，问题清单第 32 行），点按加号按钮后为其名称。
+   */
+  @State plusTapped: boolean = false;
   @State withPlus: boolean = false;
   private tabs: SystemTab[] = [
     { title: $r('app.string.tab_home'), image: $r('app.media.home_normal'), selectedImage: $r('app.media.home_highlight') },
@@ -74,7 +87,7 @@ struct SystemTabs {
         Tabs({ barPosition: BarPosition.End, index: this.current }) {
           ForEach(this.tabs, (tab: SystemTab, index: number) => {
             TabContent() {
-              Text(this.label)
+              Text(this.plusTapped ? CYLLocalizedString('Another plus button') : this.tabs[this.current].title)
                 .fontSize(18)
                 .id('cyl-system-tabs-label')
             }
@@ -83,7 +96,7 @@ struct SystemTabs {
         }
         .onChange((index: number) => {
           this.current = index;
-          this.label = ['Home', 'Nearby', 'Messages', 'Me'][index];
+          this.plusTapped = false;
         })
 
         if (this.withPlus) {
@@ -95,10 +108,18 @@ struct SystemTabs {
           .width(52)
           .height(52)
           .backgroundColor('#FF9500')
-          .margin({ bottom: 80 })
+          // [EN] FIX (screenshot of 2026-11-16): the plus button sits in the bar's middle slot (with four equal tabs the
+          //      gap between Nearby and Messages is the bar's center) and bulges above the bar, as the raised plus button
+          //      of the examples (AGENTS.md); it used to float 80 vp up, over the page. CYL_SYSTEM_PLUS_BOTTOM puts its
+          //      center about 14 vp above the tab icons.
+          // [CN] 修复（2026-11-16 截图）：加号按钮位于 TabBar 中间（四个等宽 Tab 时，同城与消息之间即为中心），并凸出 TabBar 上沿，
+          //      与示例的凸起加号按钮相同（AGENTS.md）；此前悬浮在 80 vp 高处、压在页面上。CYL_SYSTEM_PLUS_BOTTOM 使其中心比 Tab 图标
+          //      高约 14 vp。
+          .margin({ bottom: CYL_SYSTEM_PLUS_BOTTOM })
+          .accessibilityText(CYLLocalizedString('Another plus button'))
           .id('cyl-system-plus')
           .onClick(() => {
-            this.label = 'PlusButton';
+            this.plusTapped = true;
           })
         }
       }
