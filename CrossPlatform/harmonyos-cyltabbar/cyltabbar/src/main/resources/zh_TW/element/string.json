@@ -605,6 +605,10 @@
       "value": "未載入"
     },
     {
+      "name": "cyl_l10n_809de913ec0a",
+      "value": "標識：%@"
+    },
+    {
       "name": "cyl_l10n_2c8d9e877a54",
       "value": "標題偏移（titlePositionAdjustment）"
     },
@@ -763,6 +767,10 @@
     {
       "name": "cyl_l10n_b146fc1a1531",
       "value": "青草"
+    },
+    {
+      "name": "cyl_l10n_e56fc5fce033",
+      "value": "頁面標識：%@"
     },
     {
       "name": "cyl_l10n_db1c89e0f6e6",

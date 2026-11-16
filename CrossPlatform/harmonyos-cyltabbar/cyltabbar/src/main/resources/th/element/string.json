@@ -2,11 +2,11 @@
   "string": [
     {
       "name": "cyl_l10n_bffed61338ea",
-      "value": "%@ CYLTabBarController on HarmonyOS"
+      "value": "%@ CYLTabBarController บน HarmonyOS"
     },
     {
       "name": "cyl_l10n_9ecf653a3fc6",
-      "value": "%@ · another context · plus taps: %@"
+      "value": "%@ · บริบทอื่น · จำนวนการแตะปุ่มบวก: %@"
     },
     {
       "name": "cyl_l10n_aaf9b7d7382d",
@@ -18,23 +18,23 @@
     },
     {
       "name": "cyl_l10n_0b0ae9062c5a",
-      "value": "A tab bar controller of another context, with a square plus button"
+      "value": "ตัวควบคุมแถบแท็บจากบริบทอื่น พร้อมปุ่มบวกสี่เหลี่ยม"
     },
     {
       "name": "cyl_l10n_427131e7add2",
-      "value": "Another plus button"
+      "value": "ปุ่มบวกอื่น"
     },
     {
       "name": "cyl_l10n_aa3e67bda3c0",
-      "value": "ArkUI Tabs, the HarmonyOS system tab bar, with the same tabs"
+      "value": "ArkUI Tabs แถบแท็บระบบของ HarmonyOS ที่มีแท็บเดียวกัน"
     },
     {
       "name": "cyl_l10n_0557fa923dce",
-      "value": "Back"
+      "value": "กลับ"
     },
     {
       "name": "cyl_l10n_8665e238c516",
-      "value": "Badge: %@"
+      "value": "ป้าย: %@"
     },
     {
       "name": "cyl_l10n_6b2186414c82",
@@ -74,7 +74,7 @@
     },
     {
       "name": "cyl_l10n_d7c01888e55e",
-      "value": "CYLTabBarSVGAFilePath: plays once when selected, first frame otherwise"
+      "value": "CYLTabBarSVGAFilePath: เล่นหนึ่งครั้งเมื่อเลือก ไม่เช่นนั้นแสดงเฟรมแรก"
     },
     {
       "name": "cyl_l10n_132201f60522",
@@ -106,11 +106,11 @@
     },
     {
       "name": "cyl_l10n_b9c74f4cd786",
-      "value": "Dimmed"
+      "value": "จาง"
     },
     {
       "name": "cyl_l10n_bf0576472e31",
-      "value": "Double tap to open"
+      "value": "แตะสองครั้งเพื่อเปิด"
     },
     {
       "name": "cyl_l10n_7e0a1ad9a767",
@@ -146,7 +146,7 @@
     },
     {
       "name": "cyl_l10n_2e8e48a2ebfd",
-      "value": "Long press a tab or the plus button"
+      "value": "กดค้างที่แท็บหรือปุ่มบวก"
     },
     {
       "name": "cyl_l10n_983696096694",
@@ -162,7 +162,7 @@
     },
     {
       "name": "cyl_l10n_1e8f217bdf71",
-      "value": "Next tab (cyl_selectNextTab, issue #535)"
+      "value": "แท็บถัดไป (cyl_selectNextTab, issue #535)"
     },
     {
       "name": "cyl_l10n_b2ee912b91d6",
@@ -178,11 +178,11 @@
     },
     {
       "name": "cyl_l10n_8a7b0e9c294e",
-      "value": "On: %@; swipe the page left / right"
+      "value": "เปิด: %@; ปัดหน้าไปทางซ้าย / ขวา"
     },
     {
       "name": "cyl_l10n_06eb0a05de97",
-      "value": "On: %@; the new page slides in from the side of its tab"
+      "value": "เปิด: %@; หน้าใหม่เลื่อนเข้ามาจากด้านของแท็บ"
     },
     {
       "name": "cyl_l10n_287e78fd65af",
@@ -198,7 +198,7 @@
     },
     {
       "name": "cyl_l10n_9a1d72fdd764",
-      "value": "Previous tab (cyl_selectPreviousTab, issue #535)"
+      "value": "แท็บก่อนหน้า (cyl_selectPreviousTab, issue #535)"
     },
     {
       "name": "cyl_l10n_4b0282f4f1c6",
@@ -206,7 +206,7 @@
     },
     {
       "name": "cyl_l10n_e5416d3ed3c0",
-      "value": "Push to another CYLTabBarController (another PlusButton)"
+      "value": "ไปยัง CYLTabBarController อื่น (PlusButton อื่น)"
     },
     {
       "name": "cyl_l10n_8c96672c9bc5",
@@ -218,11 +218,11 @@
     },
     {
       "name": "cyl_l10n_a63e8b745e73",
-      "value": "Pushes a page that hides the navigation bar while shown, with no base class"
+      "value": "เปิดหน้าที่ซ่อนแถบนำทางขณะแสดง โดยไม่ต้องมีคลาสฐาน"
     },
     {
       "name": "cyl_l10n_79fe28f3a3ac",
-      "value": "Pushes a tab bar controller whose plus button image changes 2 s later; the layout must not move"
+      "value": "เปิดตัวควบคุมที่รูปปุ่มบวกเปลี่ยนหลัง 2 วินาที เลย์เอาต์ต้องไม่ขยับ"
     },
     {
       "name": "cyl_l10n_c27618b1aa9d",
@@ -246,7 +246,7 @@
     },
     {
       "name": "cyl_l10n_bd001817e373",
-      "value": "SVGA tab icons (configuration file)"
+      "value": "ไอคอนแท็บ SVGA (ไฟล์การตั้งค่า)"
     },
     {
       "name": "cyl_l10n_b5fcd68edd9f",
@@ -278,7 +278,7 @@
     },
     {
       "name": "cyl_l10n_561582c1e7cc",
-      "value": "Shows the touchable area in translucent red: %@; scale %@x; tap to cycle 1x, 1.5x, 2x, off"
+      "value": "แสดงพื้นที่แตะเป็นสีแดงโปร่งแสง: %@; สเกล %@x; แตะเพื่อสลับ 1x, 1.5x, 2x, ปิด"
     },
     {
       "name": "cyl_l10n_3cb58e0d546d",
@@ -306,7 +306,7 @@
     },
     {
       "name": "cyl_l10n_6d067090c833",
-      "value": "Tab, %1$@ of %2$@"
+      "value": "แท็บ %1$@ จาก %2$@"
     },
     {
       "name": "cyl_l10n_75ccb7ef4864",
@@ -314,15 +314,15 @@
     },
     {
       "name": "cyl_l10n_2e6d648945c0",
-      "value": "The plus button sticks out of the bar; its part above the bar responds (shown in red)"
+      "value": "ปุ่มบวกยื่นออกจากแถบ ส่วนที่อยู่เหนือแถบก็ตอบสนองด้วย (แสดงเป็นสีแดง)"
     },
     {
       "name": "cyl_l10n_f43b06c12ee1",
-      "value": "The system bar has no plus button: a floating button stands in"
+      "value": "แถบระบบไม่มีปุ่มบวก จึงใช้ปุ่มลอยแทน"
     },
     {
       "name": "cyl_l10n_9b6633b75bf2",
-      "value": "The “Me” tab needs a login (issue #19); tap to toggle"
+      "value": "แท็บ “ฉัน” ต้องเข้าสู่ระบบ (issue #19); แตะเพื่อสลับ"
     },
     {
       "name": "cyl_l10n_a4d0d101d6a3",
@@ -330,11 +330,11 @@
     },
     {
       "name": "cyl_l10n_2306a585ae00",
-      "value": "cyl_itemEdgeInsets: 15% of a tab width free at each end"
+      "value": "cyl_itemEdgeInsets: เว้นว่าง 15% ของความกว้างแท็บที่ปลายแต่ละด้าน"
     },
     {
       "name": "cyl_l10n_6360bbdfb8ff",
-      "value": "cyl_itemEdgeInsets: zero, the tabs fill the bar"
+      "value": "cyl_itemEdgeInsets: ศูนย์ แท็บเต็มแถบ"
     },
     {
       "name": "cyl_l10n_fd15e88376df",
@@ -350,7 +350,7 @@
     },
     {
       "name": "cyl_l10n_59884403daf6",
-      "value": "cyl_pushOrPopToViewController: pages/Index (already in the stack: pops)"
+      "value": "cyl_pushOrPopToViewController: pages/Index (อยู่ในสแต็กแล้ว: ย้อนกลับ)"
     },
     {
       "name": "cyl_l10n_1ec113617309",
@@ -358,19 +358,19 @@
     },
     {
       "name": "cyl_l10n_9fb845377ee4",
-      "value": "cyl_pushViewController: a green page"
+      "value": "cyl_pushViewController: หน้าสีเขียว"
     },
     {
       "name": "cyl_l10n_ff5772993aee",
-      "value": "cyl_tabBarItemLongPressDuration = %@ ms, cyl_tabBarItemDoubleTapInterval = %@ ms; tap to cycle; double tap a tab to see it"
+      "value": "cyl_tabBarItemLongPressDuration = %@ ms, cyl_tabBarItemDoubleTapInterval = %@ ms; แตะเพื่อสลับ; แตะแท็บสองครั้งเพื่อดู"
     },
     {
       "name": "cyl_l10n_f69c71bc581e",
-      "value": "cyl_tabBarMinimizeBehavior = %@; tap to choose, then scroll this list"
+      "value": "cyl_tabBarMinimizeBehavior = %@; แตะเพื่อเลือก แล้วเลื่อนรายการนี้"
     },
     {
       "name": "cyl_l10n_f3f4ecf4a4a6",
-      "value": "selectedIndex = %@ (the plus button's page is %@, never a tab index); tap for the next tab"
+      "value": "selectedIndex = %@ (หน้าของปุ่มบวกคือ %@ ไม่ใช่ดัชนีแท็บ); แตะเพื่อไปแท็บถัดไป"
     },
     {
       "name": "cyl_l10n_ee5b6ac6461b",
@@ -382,7 +382,7 @@
     },
     {
       "name": "cyl_l10n_c4376b477be8",
-      "value": "tabBarHidden = %@; hidden, it comes back after 2 s"
+      "value": "tabBarHidden = %@; เมื่อซ่อนจะกลับมาหลัง 2 วินาที"
     },
     {
       "name": "cyl_l10n_2a0608059131",
@@ -605,6 +605,10 @@
       "value": "ยังไม่โหลด"
     },
     {
+      "name": "cyl_l10n_809de913ec0a",
+      "value": "Identifier: %@"
+    },
+    {
       "name": "cyl_l10n_2c8d9e877a54",
       "value": "ระยะเลื่อนชื่อ (titlePositionAdjustment)"
     },
@@ -763,6 +767,10 @@
     {
       "name": "cyl_l10n_b146fc1a1531",
       "value": "หญ้า"
+    },
+    {
+      "name": "cyl_l10n_e56fc5fce033",
+      "value": "Page identifier: %@"
     },
     {
       "name": "cyl_l10n_db1c89e0f6e6",
