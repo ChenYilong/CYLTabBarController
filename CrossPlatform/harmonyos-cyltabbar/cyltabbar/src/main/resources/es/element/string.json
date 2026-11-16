@@ -1,6 +1,14 @@
 {
   "string": [
     {
+      "name": "cyl_l10n_bffed61338ea",
+      "value": "%@ CYLTabBarController en HarmonyOS"
+    },
+    {
+      "name": "cyl_l10n_9ecf653a3fc6",
+      "value": "%@ · otro contexto · toques del más: %@"
+    },
+    {
       "name": "cyl_l10n_aaf9b7d7382d",
       "value": "%@ mensajes nuevos"
     },
@@ -10,15 +18,23 @@
     },
     {
       "name": "cyl_l10n_0b0ae9062c5a",
-      "value": "A tab bar controller of another context, with a square plus button"
+      "value": "Un controlador de barra de pestañas de otro contexto, con un botón más cuadrado"
+    },
+    {
+      "name": "cyl_l10n_427131e7add2",
+      "value": "Otro botón más"
     },
     {
       "name": "cyl_l10n_aa3e67bda3c0",
-      "value": "ArkUI Tabs, the HarmonyOS system tab bar, with the same tabs"
+      "value": "ArkUI Tabs, la barra de pestañas del sistema de HarmonyOS, con las mismas pestañas"
+    },
+    {
+      "name": "cyl_l10n_0557fa923dce",
+      "value": "Atrás"
     },
     {
       "name": "cyl_l10n_8665e238c516",
-      "value": "Badge: %@"
+      "value": "Insignia: %@"
     },
     {
       "name": "cyl_l10n_6b2186414c82",
@@ -58,7 +74,7 @@
     },
     {
       "name": "cyl_l10n_d7c01888e55e",
-      "value": "CYLTabBarSVGAFilePath: plays once when selected, first frame otherwise"
+      "value": "CYLTabBarSVGAFilePath: se reproduce una vez al seleccionar; si no, primer fotograma"
     },
     {
       "name": "cyl_l10n_132201f60522",
@@ -71,6 +87,10 @@
     {
       "name": "cyl_l10n_5e74163d3804",
       "value": "CYLFlatDesignTabBarItem centrado"
+    },
+    {
+      "name": "cyl_l10n_f6da70b584ae",
+      "value": "Archivo de configuración: %@"
     },
     {
       "name": "cyl_l10n_158b3b19e868",
@@ -89,8 +109,16 @@
       "value": "Máximo personalizado (9)"
     },
     {
+      "name": "cyl_l10n_b9c74f4cd786",
+      "value": "Atenuado"
+    },
+    {
+      "name": "cyl_l10n_abfc3a65538a",
+      "value": "Descubrir"
+    },
+    {
       "name": "cyl_l10n_bf0576472e31",
-      "value": "Double tap to open"
+      "value": "Toca dos veces para abrir"
     },
     {
       "name": "cyl_l10n_7e0a1ad9a767",
@@ -113,6 +141,10 @@
       "value": "Icono GIF"
     },
     {
+      "name": "cyl_l10n_8cf04a973413",
+      "value": "Inicio"
+    },
+    {
       "name": "cyl_l10n_d52d30723b2f",
       "value": "De izquierda a derecha una vez"
     },
@@ -126,11 +158,19 @@
     },
     {
       "name": "cyl_l10n_2e8e48a2ebfd",
-      "value": "Long press a tab or the plus button"
+      "value": "Mantén pulsada una pestaña o el botón más"
     },
     {
       "name": "cyl_l10n_983696096694",
       "value": "Margen"
+    },
+    {
+      "name": "cyl_l10n_318b2739ddc2",
+      "value": "Yo"
+    },
+    {
+      "name": "cyl_l10n_4c2a8fe7eaf2",
+      "value": "Mensajes"
     },
     {
       "name": "cyl_l10n_24d459a81449",
@@ -142,7 +182,7 @@
     },
     {
       "name": "cyl_l10n_1e8f217bdf71",
-      "value": "Next tab (cyl_selectNextTab, issue #535)"
+      "value": "Pestaña siguiente (cyl_selectNextTab, issue #535)"
     },
     {
       "name": "cyl_l10n_b2ee912b91d6",
@@ -157,8 +197,20 @@
       "value": "Aceptar"
     },
     {
+      "name": "cyl_l10n_8a7b0e9c294e",
+      "value": "Activado: %@; desliza la página a izquierda / derecha"
+    },
+    {
+      "name": "cyl_l10n_06eb0a05de97",
+      "value": "Activado: %@; la nueva página entra desde el lado de su pestaña"
+    },
+    {
       "name": "cyl_l10n_287e78fd65af",
       "value": "Otro texto"
+    },
+    {
+      "name": "cyl_l10n_84432607fd87",
+      "value": "Página: %@"
     },
     {
       "name": "cyl_l10n_41b77539cc64",
@@ -170,7 +222,7 @@
     },
     {
       "name": "cyl_l10n_9a1d72fdd764",
-      "value": "Previous tab (cyl_selectPreviousTab, issue #535)"
+      "value": "Pestaña anterior (cyl_selectPreviousTab, issue #535)"
     },
     {
       "name": "cyl_l10n_4b0282f4f1c6",
@@ -178,7 +230,7 @@
     },
     {
       "name": "cyl_l10n_e5416d3ed3c0",
-      "value": "Push to another CYLTabBarController (another PlusButton)"
+      "value": "Abrir otro CYLTabBarController (otro PlusButton)"
     },
     {
       "name": "cyl_l10n_8c96672c9bc5",
@@ -190,11 +242,11 @@
     },
     {
       "name": "cyl_l10n_a63e8b745e73",
-      "value": "Pushes a page that hides the navigation bar while shown, with no base class"
+      "value": "Abre una página que oculta la barra de navegación, sin clase base"
     },
     {
       "name": "cyl_l10n_79fe28f3a3ac",
-      "value": "Pushes a tab bar controller whose plus button image changes 2 s later; the layout must not move"
+      "value": "Abre un controlador cuya imagen del botón más cambia 2 s después; el diseño no debe moverse"
     },
     {
       "name": "cyl_l10n_c27618b1aa9d",
@@ -218,7 +270,7 @@
     },
     {
       "name": "cyl_l10n_bd001817e373",
-      "value": "SVGA tab icons (configuration file)"
+      "value": "Iconos de pestaña SVGA (archivo de configuración)"
     },
     {
       "name": "cyl_l10n_b5fcd68edd9f",
@@ -249,6 +301,10 @@
       "value": "Mostrar / ocultar CYLFlatDesignTabBar"
     },
     {
+      "name": "cyl_l10n_561582c1e7cc",
+      "value": "Muestra el área táctil en rojo translúcido: %@; escala %@x; toca para 1x, 1,5x, 2x, desactivado"
+    },
+    {
       "name": "cyl_l10n_3cb58e0d546d",
       "value": "Resorte (continuo)"
     },
@@ -274,7 +330,11 @@
     },
     {
       "name": "cyl_l10n_6d067090c833",
-      "value": "Tab, %1$@ of %2$@"
+      "value": "Pestaña, %1$@ de %2$@"
+    },
+    {
+      "name": "cyl_l10n_456887f9731c",
+      "value": "Pestaña: %@"
     },
     {
       "name": "cyl_l10n_75ccb7ef4864",
@@ -282,11 +342,15 @@
     },
     {
       "name": "cyl_l10n_2e6d648945c0",
-      "value": "The plus button sticks out of the bar; its part above the bar responds (shown in red)"
+      "value": "El botón más sobresale de la barra; su parte superior también responde (en rojo)"
     },
     {
       "name": "cyl_l10n_f43b06c12ee1",
-      "value": "The system bar has no plus button: a floating button stands in"
+      "value": "La barra del sistema no tiene botón más: lo sustituye un botón flotante"
+    },
+    {
+      "name": "cyl_l10n_9b6633b75bf2",
+      "value": "La pestaña «Yo» requiere iniciar sesión (issue #19); toca para alternar"
     },
     {
       "name": "cyl_l10n_a4d0d101d6a3",
@@ -294,15 +358,47 @@
     },
     {
       "name": "cyl_l10n_2306a585ae00",
-      "value": "cyl_itemEdgeInsets: 15% of a tab width free at each end"
+      "value": "cyl_itemEdgeInsets: 15 % del ancho de una pestaña libre en cada extremo"
+    },
+    {
+      "name": "cyl_l10n_6360bbdfb8ff",
+      "value": "cyl_itemEdgeInsets: cero, las pestañas llenan la barra"
     },
     {
       "name": "cyl_l10n_fd15e88376df",
       "value": "Demostración de los métodos cyl_pop / cyl_push"
     },
     {
+      "name": "cyl_l10n_ca3dcd2d62be",
+      "value": "cyl_popSelectTabBarChildViewControllerAtIndex: 1 (%@)"
+    },
+    {
+      "name": "cyl_l10n_3b06a9582640",
+      "value": "cyl_popSelectTabBarChildViewControllerForTabBarItemIdentifier: message"
+    },
+    {
+      "name": "cyl_l10n_59884403daf6",
+      "value": "cyl_pushOrPopToViewController: pages/Index (ya en la pila: vuelve)"
+    },
+    {
       "name": "cyl_l10n_1ec113617309",
       "value": "cyl_pushViewController, cyl_popSelectTabBarChildViewControllerAtIndex, cyl_pushOrPopToViewController"
+    },
+    {
+      "name": "cyl_l10n_9fb845377ee4",
+      "value": "cyl_pushViewController: una página verde"
+    },
+    {
+      "name": "cyl_l10n_ff5772993aee",
+      "value": "cyl_tabBarItemLongPressDuration = %@ ms, cyl_tabBarItemDoubleTapInterval = %@ ms; toca para cambiar; toca dos veces una pestaña para verlo"
+    },
+    {
+      "name": "cyl_l10n_f69c71bc581e",
+      "value": "cyl_tabBarMinimizeBehavior = %@; toca para elegir y desplaza esta lista"
+    },
+    {
+      "name": "cyl_l10n_f3f4ecf4a4a6",
+      "value": "selectedIndex = %@ (la página del botón más es %@, nunca un índice de pestaña); toca para la siguiente pestaña"
     },
     {
       "name": "cyl_l10n_ee5b6ac6461b",
@@ -311,6 +407,10 @@
     {
       "name": "cyl_l10n_2de6d572f86b",
       "value": "Tema de standardAppearance (compartido por Liquid Glass y FlatDesign)"
+    },
+    {
+      "name": "cyl_l10n_c4376b477be8",
+      "value": "tabBarHidden = %@; oculta, vuelve tras 2 s"
     },
     {
       "name": "cyl_l10n_2a0608059131",
@@ -519,6 +619,10 @@
     {
       "name": "cyl_l10n_b051a19ace76",
       "value": "Reemplazar pestañas vecinas"
+    },
+    {
+      "name": "cyl_l10n_3e730a3320e9",
+      "value": "Página de reemplazo %@"
     },
     {
       "name": "cyl_l10n_a131e4f178aa",

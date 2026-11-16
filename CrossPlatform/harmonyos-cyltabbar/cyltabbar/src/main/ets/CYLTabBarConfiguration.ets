@@ -1,4 +1,6 @@
 import { util } from '@kit.ArkTS';
+import { i18n } from '@kit.LocalizationKit';
+import { CYLLocalizationLanguage } from './CYLLocalization';
 import { CYLTabBarItemAttributes } from './CYLTabBarItem';
 import { CYLOffset } from './CYLBadge';
 import { CYLPlusButton } from './CYLPlusButton';
@@ -68,10 +70,100 @@ export class CYLTabBarConfiguration {
     }
     const extension = path.substring(path.lastIndexOf('.') + 1);
     const text = util.TextDecoder.create('utf-8').decodeToString(bytes);
-    return CYLTabBarConfigurationParser.configurationWithString(text, CYLTabBarConfigurationParser.formatForPathExtension(extension));
+    const configuration = CYLTabBarConfigurationParser.configurationWithString(text, CYLTabBarConfigurationParser.formatForPathExtension(extension));
+    CYLTabBarConfiguration.localizeTitles(context, path, configuration);
+    return configuration;
   }
 
-  /** [EN] "{h, v}", [h, v] or {horizontal, vertical}. [CN] 偏移值。 */
+  /**
+   * [EN] CYLTabBarControllerLocalization ({ CYLTabBarLocalizationTableName, CYLTabBarLocalizationPath }), as iOS: the tab and
+   *      plus button titles of the file are keys of `<path>/<language>.lproj/<table>.strings` next to the file (rawfile), in the
+   *      app's language, else the system's, else English; a title without a translation stays as written.
+   * [CN] CYLTabBarControllerLocalization（{ CYLTabBarLocalizationTableName, CYLTabBarLocalizationPath }），与 iOS 相同：文件中 Tab 与
+   *      PlusButton 的标题是文件旁 `<path>/<language>.lproj/<table>.strings`（rawfile）中的键，语言取应用语言、其次系统语言、最后英文；没有译文的标题保持原样。
+   */
+  static localizeTitles(context: Context, path: string, configuration: Record<string, Object>): void {
+    const localization = configuration['CYLTabBarControllerLocalization'] as Record<string, Object> | undefined;
+    const table = CYLTabBarConfiguration.stringValue(localization?.['CYLTabBarLocalizationTableName']);
+    if (localization === undefined || table === undefined) {
+      return;
+    }
+    const folder = CYLTabBarConfiguration.stringValue(localization['CYLTabBarLocalizationPath']) ?? '';
+    const base = path.lastIndexOf('/') >= 0 ? path.substring(0, path.lastIndexOf('/') + 1) : '';
+    const strings = CYLTabBarConfiguration.stringsTable(context, `${base}${folder.length > 0 ? folder + '/' : ''}`, table);
+    if (strings.size === 0) {
+      return;
+    }
+    const translate = (attributes: Record<string, Object>): void => {
+      ['CYLTabBarItemTitle', 'CYLTabBarItemSelectedTitle'].forEach((key: string) => {
+        const value = attributes[key];
+        if (typeof value === 'string' && strings.has(value as string)) {
+          attributes[key] = strings.get(value as string) as string;
+        }
+      });
+    };
+    const items = configuration['CYLTabBarControllerTabBarItemsAttributes'];
+    if (Array.isArray(items)) {
+      (items as Object[]).forEach((item: Object) => translate(item as Record<string, Object>));
+    }
+    const plus = configuration['CYLTabBarControllerPlusButton'];
+    if (plus !== undefined && typeof plus === 'object') {
+      translate(plus as Record<string, Object>);
+    }
+  }
+
+  /**
+   * [EN] The strings table `<folder><language>.lproj/<table>.strings` for the first language that has one; empty when none.
+   * [CN] 第一个存在的 `<folder><language>.lproj/<table>.strings` 字符串表；都没有时为空。
+   */
+  private static stringsTable(context: Context, folder: string, table: string): Map<string, string> {
+    const strings = new Map<string, string>();
+    for (const language of CYLTabBarConfiguration.lprojCandidates()) {
+      let bytes: Uint8Array;
+      try {
+        bytes = context.resourceManager.getRawFileContentSync(`${folder}${language}.lproj/${table}.strings`);
+      } catch (error) {
+        continue;
+      }
+      const text = util.TextDecoder.create('utf-8').decodeToString(bytes);
+      const pattern = /^\s*"((?:[^"\\]|\\.)*)"\s*=\s*"((?:[^"\\]|\\.)*)"\s*;/gm;
+      let match = pattern.exec(text);
+      while (match !== null) {
+        strings.set(match[1].replace(/\\"/g, '"'), match[2].replace(/\\"/g, '"'));
+        match = pattern.exec(text);
+      }
+      return strings;
+    }
+    return strings;
+  }
+
+  /**
+   * [EN] The .lproj names to try for the app's (else the system's) language, as iOS names them: "zh-Hans", "zh-Hant", "pt-BR",
+   *      the language code, then "en".
+   * [CN] 按 iOS 的命名，为应用语言（其次系统语言）依次尝试的 .lproj 名称："zh-Hans"、"zh-Hant"、"pt-BR"、语言代码，最后 "en"。
+   */
+  private static lprojCandidates(): string[] {
+    let tag = CYLLocalizationLanguage();
+    if (tag.length === 0) {
+      try {
+        tag = i18n.System.getSystemLanguage();
+      } catch (error) {
+        tag = 'en';
+      }
+    }
+    const parts = tag.split('-');
+    const language = parts[0];
+    const candidates: string[] = [];
+    if (language === 'zh') {
+      const traditional = parts.includes('Hant') || parts.includes('TW') || parts.includes('HK') || parts.includes('MO');
+      candidates.push(traditional ? 'zh-Hant' : 'zh-Hans');
+    } else if (parts.length > 1) {
+      candidates.push(`${language}-${parts[parts.length - 1]}`);
+    }
+    candidates.push(language, 'en');
+    return candidates;
+  }
+
   /** [EN] A non-empty string, or undefined. [CN] 非空字符串，否则为 undefined。 */
   static stringValue(value: Object | undefined): string | undefined {
     return typeof value === 'string' && value.length > 0 ? value as string : undefined;
@@ -95,6 +187,7 @@ export class CYLTabBarConfiguration {
     return undefined;
   }
 
+  /** [EN] "{h, v}", [h, v] or {horizontal, vertical}. [CN] 偏移值。 */
   static offsetValue(value: Object | undefined): CYLOffset | undefined {
     const numbers = CYLTabBarConfiguration.numbers(value, 2, ['horizontal', 'vertical']);
     return numbers === undefined ? undefined : { horizontal: numbers[0], vertical: numbers[1] };

@@ -328,6 +328,31 @@ export struct CYLBadgeView {
     }
   }
 
+  /**
+   * [EN] The width of a text badge, as Android CYLBadge.onMeasure and iOS -cyl_adjustLabelWidth: the measured text width
+   *      plus the margin, at least the badge height (a circle for one digit). Never fixed, so "NEW" stays on one line.
+   * [CN] 文字角标宽度：测量的文字宽度加边距，至少为角标高度（一位数字为圆形）。不写死，"NEW" 保持单行。
+   */
+  cylTextBadgeWidth(): number {
+    const fontSize = this.badge.fontSize ?? this.appearance().fontSize;
+    const margin = this.badge.margin ?? this.appearance().margin;
+    const height = fontSize * 1.2 + margin;
+    const text = this.badge.cyl_displayText() ?? '';
+    let textWidth = text.length * fontSize * 0.62;
+    try {
+      const px = this.getUIContext().getMeasureUtils().measureText({
+        textContent: text, fontSize: fontSize, fontWeight: FontWeight.Bold,
+      });
+      textWidth = this.getUIContext().px2vp(px);
+    } catch (e) {
+      // [EN] Estimate when measuring is not available. [CN] 无法测量时估算。
+    }
+    // [EN] The border is drawn inside the width, so it is added on both sides or a bordered badge clips its text.
+    // [CN] 描边绘制在宽度之内，因此两侧都要加上，否则带描边的角标会裁切文字。
+    const border = this.badge.borderWidth ?? this.appearance().borderWidth;
+    return Math.max(height, Math.ceil(textWidth) + margin + border * 2);
+  }
+
   build() {
     if (this.badge.value !== null) {
       Stack() {
@@ -342,9 +367,12 @@ export struct CYLBadgeView {
             .fontWeight(FontWeight.Bold)
             .fontColor(this.badge.textColor ?? this.appearance().textColor)
             .textAlign(TextAlign.Center)
+            // [EN] One line: the badge grows with its text (iOS sizeToFit, Android wrap_content), never wraps (issue list #1).
+            // [CN] 单行：角标随文字变宽，不换行（问题 #1）。
+            .maxLines(1)
             .padding({ left: (this.badge.margin ?? this.appearance().margin) / 2, right: (this.badge.margin ?? this.appearance().margin) / 2 })
             .height((this.badge.fontSize ?? this.appearance().fontSize) * 1.2 + (this.badge.margin ?? this.appearance().margin))
-            .constraintSize({ minWidth: (this.badge.fontSize ?? this.appearance().fontSize) * 1.2 + (this.badge.margin ?? this.appearance().margin) })
+            .width(this.cylTextBadgeWidth())
             .backgroundColor(this.badge.backgroundColor ?? this.appearance().backgroundColor)
             .borderRadius((this.badge.cornerRadius ?? this.appearance().cornerRadius) > 0
               ? (this.badge.cornerRadius ?? this.appearance().cornerRadius) : 100)
@@ -352,7 +380,12 @@ export struct CYLBadgeView {
               color: this.badge.borderColor ?? this.appearance().borderColor ?? Color.Transparent })
         }
       }
-      .markAnchor({ x: '50%', y: '50%' })
+      // [EN] A red dot is centred on the icon's corner; a number or text badge puts its left cap there and grows to the
+      //      right (iOS / Android keep the badge's left part at the corner), so "99+" or "NEW" does not cover the icon.
+      // [CN] 红点以图标角为中心；数字或文字角标的左端圆心位于该处并向右延伸（与 iOS / Android 一致），"99+"、"NEW" 不盖住图标。
+      .markAnchor({ x: this.badge.cyl_displayText() === null ? '50%'
+        : ((this.badge.fontSize ?? this.appearance().fontSize) * 1.2 + (this.badge.margin ?? this.appearance().margin)) / 2,
+        y: '50%' })
       .position({ x: this.anchorWidth + 2 + (this.badge.centerOffset ?? this.appearance().centerOffset).horizontal,
         y: (this.badge.centerOffset ?? this.appearance().centerOffset).vertical })
       .visibility(this.badge.paused ? Visibility.Hidden : Visibility.Visible)

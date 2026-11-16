@@ -1,3 +1,4 @@
+import { CYLLocalizedString } from 'cyltabbar';
 import { CYLTabBarController, CYLTabBarItemAttributes, CYLPlusButton } from 'cyltabbar';
 
 /**
@@ -62,7 +63,7 @@ struct AnotherTabBar {
   @Builder
   page(index: number, identifier: string) {
     Column() {
-      Text(`${identifier} · another context · plus taps: ${this.taps}`)
+      Text(CYLLocalizedString('%@ · another context · plus taps: %@', identifier, this.taps))
         .fontSize(16)
         .id(`cyl-another-page-${identifier}`)
     }
@@ -74,12 +75,12 @@ struct AnotherTabBar {
   build() {
     Column() {
       Row() {
-        Text('‹ Back')
+        Text('‹ ' + CYLLocalizedString('Back'))
           .fontSize(16)
           .fontColor('#007AFF')
           .id('cyl-back')
           .onClick(() => this.getUIContext().getRouter().back())
-        Text('Another plus button')
+        Text(CYLLocalizedString('Another plus button'))
           .fontSize(17)
           .fontWeight(FontWeight.Medium)
           .layoutWeight(1)

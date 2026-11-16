@@ -1,24 +1,40 @@
 {
   "string": [
     {
+      "name": "cyl_l10n_bffed61338ea",
+      "value": "%@ CYLTabBarController على HarmonyOS"
+    },
+    {
+      "name": "cyl_l10n_9ecf653a3fc6",
+      "value": "%@ · سياق آخر · نقرات الزائد: %@"
+    },
+    {
       "name": "cyl_l10n_aaf9b7d7382d",
       "value": "رسائل جديدة: %@"
     },
     {
       "name": "cyl_l10n_81a05b6c1cf9",
-      "value": "%@, %@"
+      "value": "%@، %@"
     },
     {
       "name": "cyl_l10n_0b0ae9062c5a",
-      "value": "A tab bar controller of another context, with a square plus button"
+      "value": "وحدة تحكم شريط علامات تبويب من سياق آخر، بزر زائد مربع"
+    },
+    {
+      "name": "cyl_l10n_427131e7add2",
+      "value": "زر زائد آخر"
     },
     {
       "name": "cyl_l10n_aa3e67bda3c0",
-      "value": "ArkUI Tabs, the HarmonyOS system tab bar, with the same tabs"
+      "value": "ArkUI Tabs، شريط علامات التبويب في نظام HarmonyOS، بالعلامات نفسها"
+    },
+    {
+      "name": "cyl_l10n_0557fa923dce",
+      "value": "رجوع"
     },
     {
       "name": "cyl_l10n_8665e238c516",
-      "value": "Badge: %@"
+      "value": "شارة: %@"
     },
     {
       "name": "cyl_l10n_6b2186414c82",
@@ -58,7 +74,7 @@
     },
     {
       "name": "cyl_l10n_d7c01888e55e",
-      "value": "CYLTabBarSVGAFilePath: plays once when selected, first frame otherwise"
+      "value": "CYLTabBarSVGAFilePath: يُشغَّل مرة عند التحديد، وإلا يعرض الإطار الأول"
     },
     {
       "name": "cyl_l10n_132201f60522",
@@ -71,6 +87,10 @@
     {
       "name": "cyl_l10n_5e74163d3804",
       "value": "CYLFlatDesignTabBarItem في المنتصف"
+    },
+    {
+      "name": "cyl_l10n_f6da70b584ae",
+      "value": "ملف الإعدادات: %@"
     },
     {
       "name": "cyl_l10n_158b3b19e868",
@@ -89,8 +109,16 @@
       "value": "حد أقصى مخصص (9)"
     },
     {
+      "name": "cyl_l10n_b9c74f4cd786",
+      "value": "باهت"
+    },
+    {
+      "name": "cyl_l10n_abfc3a65538a",
+      "value": "اكتشف"
+    },
+    {
       "name": "cyl_l10n_bf0576472e31",
-      "value": "Double tap to open"
+      "value": "انقر مرتين للفتح"
     },
     {
       "name": "cyl_l10n_7e0a1ad9a767",
@@ -113,6 +141,10 @@
       "value": "أيقونة GIF"
     },
     {
+      "name": "cyl_l10n_8cf04a973413",
+      "value": "الرئيسية"
+    },
+    {
       "name": "cyl_l10n_d52d30723b2f",
       "value": "من اليسار إلى اليمين مرة واحدة"
     },
@@ -126,11 +158,19 @@
     },
     {
       "name": "cyl_l10n_2e8e48a2ebfd",
-      "value": "Long press a tab or the plus button"
+      "value": "اضغط مطولًا على علامة تبويب أو على زر الزائد"
     },
     {
       "name": "cyl_l10n_983696096694",
       "value": "الهامش"
+    },
+    {
+      "name": "cyl_l10n_318b2739ddc2",
+      "value": "أنا"
+    },
+    {
+      "name": "cyl_l10n_4c2a8fe7eaf2",
+      "value": "الرسائل"
     },
     {
       "name": "cyl_l10n_24d459a81449",
@@ -142,7 +182,7 @@
     },
     {
       "name": "cyl_l10n_1e8f217bdf71",
-      "value": "Next tab (cyl_selectNextTab, issue #535)"
+      "value": "علامة التبويب التالية (cyl_selectNextTab، issue #535)"
     },
     {
       "name": "cyl_l10n_b2ee912b91d6",
@@ -157,8 +197,20 @@
       "value": "حسنًا"
     },
     {
+      "name": "cyl_l10n_8a7b0e9c294e",
+      "value": "تشغيل: %@؛ اسحب الصفحة يمينًا / يسارًا"
+    },
+    {
+      "name": "cyl_l10n_06eb0a05de97",
+      "value": "تشغيل: %@؛ تنزلق الصفحة الجديدة من جهة علامة تبويبها"
+    },
+    {
       "name": "cyl_l10n_287e78fd65af",
       "value": "نص آخر"
+    },
+    {
+      "name": "cyl_l10n_84432607fd87",
+      "value": "الصفحة: %@"
     },
     {
       "name": "cyl_l10n_41b77539cc64",
@@ -170,7 +222,7 @@
     },
     {
       "name": "cyl_l10n_9a1d72fdd764",
-      "value": "Previous tab (cyl_selectPreviousTab, issue #535)"
+      "value": "علامة التبويب السابقة (cyl_selectPreviousTab، issue #535)"
     },
     {
       "name": "cyl_l10n_4b0282f4f1c6",
@@ -178,7 +230,7 @@
     },
     {
       "name": "cyl_l10n_e5416d3ed3c0",
-      "value": "Push to another CYLTabBarController (another PlusButton)"
+      "value": "الانتقال إلى CYLTabBarController آخر (PlusButton آخر)"
     },
     {
       "name": "cyl_l10n_8c96672c9bc5",
@@ -190,11 +242,11 @@
     },
     {
       "name": "cyl_l10n_a63e8b745e73",
-      "value": "Pushes a page that hides the navigation bar while shown, with no base class"
+      "value": "يفتح صفحة تخفي شريط التنقل، دون فئة أساسية"
     },
     {
       "name": "cyl_l10n_79fe28f3a3ac",
-      "value": "Pushes a tab bar controller whose plus button image changes 2 s later; the layout must not move"
+      "value": "يفتح وحدة تحكم تتغير صورة زر الزائد فيها بعد ثانيتين؛ يجب ألا يتحرك التخطيط"
     },
     {
       "name": "cyl_l10n_c27618b1aa9d",
@@ -218,7 +270,7 @@
     },
     {
       "name": "cyl_l10n_bd001817e373",
-      "value": "SVGA tab icons (configuration file)"
+      "value": "أيقونات علامات تبويب SVGA (ملف إعدادات)"
     },
     {
       "name": "cyl_l10n_b5fcd68edd9f",
@@ -249,6 +301,10 @@
       "value": "إظهار / إخفاء CYLFlatDesignTabBar"
     },
     {
+      "name": "cyl_l10n_561582c1e7cc",
+      "value": "يعرض منطقة اللمس باللون الأحمر الشفاف: %@؛ المقياس %@x؛ انقر للتبديل بين 1x و1.5x و2x وإيقاف"
+    },
+    {
       "name": "cyl_l10n_3cb58e0d546d",
       "value": "نابض (مستمر)"
     },
@@ -274,7 +330,11 @@
     },
     {
       "name": "cyl_l10n_6d067090c833",
-      "value": "Tab, %1$@ of %2$@"
+      "value": "علامة تبويب، %1$@ من %2$@"
+    },
+    {
+      "name": "cyl_l10n_456887f9731c",
+      "value": "علامة التبويب: %@"
     },
     {
       "name": "cyl_l10n_75ccb7ef4864",
@@ -282,11 +342,15 @@
     },
     {
       "name": "cyl_l10n_2e6d648945c0",
-      "value": "The plus button sticks out of the bar; its part above the bar responds (shown in red)"
+      "value": "يبرز زر الزائد فوق الشريط؛ والجزء العلوي منه يستجيب أيضًا (باللون الأحمر)"
     },
     {
       "name": "cyl_l10n_f43b06c12ee1",
-      "value": "The system bar has no plus button: a floating button stands in"
+      "value": "لا يحتوي شريط النظام على زر زائد: يحل محله زر عائم"
+    },
+    {
+      "name": "cyl_l10n_9b6633b75bf2",
+      "value": "علامة التبويب «أنا» تتطلب تسجيل الدخول (issue #19)؛ انقر للتبديل"
     },
     {
       "name": "cyl_l10n_a4d0d101d6a3",
@@ -294,15 +358,47 @@
     },
     {
       "name": "cyl_l10n_2306a585ae00",
-      "value": "cyl_itemEdgeInsets: 15% of a tab width free at each end"
+      "value": "cyl_itemEdgeInsets: ‏15% من عرض علامة التبويب فارغة عند كل طرف"
+    },
+    {
+      "name": "cyl_l10n_6360bbdfb8ff",
+      "value": "cyl_itemEdgeInsets: صفر، تملأ علامات التبويب الشريط"
     },
     {
       "name": "cyl_l10n_fd15e88376df",
       "value": "عرض توضيحي لطرق cyl_pop / cyl_push"
     },
     {
+      "name": "cyl_l10n_ca3dcd2d62be",
+      "value": "cyl_popSelectTabBarChildViewControllerAtIndex: 1 (%@)"
+    },
+    {
+      "name": "cyl_l10n_3b06a9582640",
+      "value": "cyl_popSelectTabBarChildViewControllerForTabBarItemIdentifier: message"
+    },
+    {
+      "name": "cyl_l10n_59884403daf6",
+      "value": "cyl_pushOrPopToViewController: pages/Index (موجودة في المكدس: رجوع)"
+    },
+    {
       "name": "cyl_l10n_1ec113617309",
       "value": "cyl_pushViewController, cyl_popSelectTabBarChildViewControllerAtIndex, cyl_pushOrPopToViewController"
+    },
+    {
+      "name": "cyl_l10n_9fb845377ee4",
+      "value": "cyl_pushViewController: صفحة خضراء"
+    },
+    {
+      "name": "cyl_l10n_ff5772993aee",
+      "value": "cyl_tabBarItemLongPressDuration = %@ ms، cyl_tabBarItemDoubleTapInterval = %@ ms؛ انقر للتبديل؛ انقر مرتين على علامة تبويب لرؤيته"
+    },
+    {
+      "name": "cyl_l10n_f69c71bc581e",
+      "value": "cyl_tabBarMinimizeBehavior = %@؛ انقر للاختيار ثم مرّر هذه القائمة"
+    },
+    {
+      "name": "cyl_l10n_f3f4ecf4a4a6",
+      "value": "selectedIndex = %@ (صفحة زر الزائد هي %@، وليست فهرس علامة تبويب)؛ انقر للانتقال إلى العلامة التالية"
     },
     {
       "name": "cyl_l10n_ee5b6ac6461b",
@@ -311,6 +407,10 @@
     {
       "name": "cyl_l10n_2de6d572f86b",
       "value": "سمة standardAppearance (مشتركة بين Liquid Glass والتصميم المسطح)"
+    },
+    {
+      "name": "cyl_l10n_c4376b477be8",
+      "value": "tabBarHidden = %@؛ عند إخفائه يعود بعد ثانيتين"
     },
     {
       "name": "cyl_l10n_2a0608059131",
@@ -519,6 +619,10 @@
     {
       "name": "cyl_l10n_b051a19ace76",
       "value": "استبدال علامات التبويب المجاورة"
+    },
+    {
+      "name": "cyl_l10n_3e730a3320e9",
+      "value": "صفحة بديلة %@"
     },
     {
       "name": "cyl_l10n_a131e4f178aa",

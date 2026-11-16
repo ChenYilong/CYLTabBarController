@@ -243,7 +243,8 @@ export const CYLPlusButtonPageIndex: number = -1;
 export struct CYLTabBarController {
   /** [EN] CYLTabBarControllerTabBarItemsAttributes; a new array updates the tabs (-updateTabBarItemAtIndex:attributes:). [CN] 新数组即更新 Tab。 */
   @Prop tabBarItemsAttributes: CYLTabBarItemAttributes[] = [];
-  plusButton?: CYLPlusButton;
+  /** [EN] CYLTabBarControllerPlusButton; a new object updates the plus button in place (issue list #7). [CN] 新对象即原地更新加号按钮。 */
+  @Prop plusButton: CYLPlusButton | undefined = undefined;
   @Link selectedIndex: number;
   /** [EN] The badge of each tab (-[UIView cyl_showBadgeValue:] on its tab button); created when unset. [CN] 每个 Tab 的角标；未设置时自动创建。 */
   @State badges: CYLBadge[] = [];
@@ -273,6 +274,16 @@ export struct CYLTabBarController {
    * [CN] 扁平样式 TabBar 模糊之上的着色；undefined（默认）表示不着色。
    */
   @Prop barTintColor: ResourceColor | undefined = undefined;
+  /**
+   * [EN] `-[CYLFlatDesignTabBar backgroundImage]`: a FlatDesign bar's image, tiled, in place of its blur; undefined for none.
+   * [CN] 扁平样式 TabBar 的背景图（平铺），代替模糊；undefined 表示无。
+   */
+  @Prop barBackgroundImage: ResourceStr | undefined = undefined;
+  /**
+   * [EN] `-[CYLFlatDesignTabBar shadowImage]`: an image drawn as the bar's top line instead of the 0.5 vp shadow color.
+   * [CN] 作为 TabBar 顶部线条绘制的图片，代替 0.5 vp 的阴影色。
+   */
+  @Prop shadowImage: ResourceStr | undefined = undefined;
   /**
    * [EN] -[CYLTabBar cyl_itemEdgeInsets]: space kept free at the two ends of the bar; the tabs and the plus button share
    *      the rest (centered items).
@@ -337,6 +348,8 @@ export struct CYLTabBarController {
   @State private tapFlip: number[] = [];
   @State private tapOffset: number[] = [];
   private lastTapIndex: number = -2;
+  /** [EN] The tab whose long press just fired: its click is not a tap. [CN] 刚触发长按的 Tab：其 click 不算点击。 */
+  private cylLongPressedIndex: number = -2;
   private lastTapTime: number = 0;
   /**
    * [EN] CYLTabBarSlideTransitionAnimator: the new page slides in from the side of its tab (duration ms; 0 off).
@@ -584,7 +597,20 @@ export struct CYLTabBarController {
   /** [EN] The accessibility description: role, position and the selected state. [CN] 无障碍描述：角色、位置与选中状态。 */
   cylAccessibilityDescription(index: number): string {
     const position = CYLLocalizedString('Tab, %1$@ of %2$@', index + 1, this.tabBarItemsAttributes.length);
-    return this.selectedIndex === index ? CYLLocalizedString('%@, %@', position, CYLLocalizedString('选中')) : position;
+    const state = this.selectedIndex === index ? CYLLocalizedString('%@, %@', position, CYLLocalizedString('选中')) : position;
+    // [EN] A disabled tab says so (`CYLFlatDesignTabBarItem.enabled`). [CN] 不可用的 Tab 会读出「不可用」。
+    return this.tabBarItemsAttributes[index].enabled === false ? CYLLocalizedString('%@, %@', state, CYLLocalizedString('Dimmed')) : state;
+  }
+
+  /**
+   * [EN] `layoutCentered` with a title and no image: the icon square is left out, so the title sits in the middle.
+   * [CN] `layoutCentered` 且有标题无图片时省略图标方框，使标题居中。
+   */
+  cylHidesIcon(index: number): boolean {
+    const item = this.tabBarItemsAttributes[index];
+    return item.layoutCentered === true && item.title !== undefined && item.image === undefined
+      && item.lottieFilePath === undefined && item.imageURL === undefined && item.gifFilePath === undefined
+      && this.cylSVGAPath(index) === undefined;
   }
 
   /** [EN] The plus button's label: its title or "Plus button", and its badge. [CN] 加号按钮的标签。 */
@@ -593,6 +619,17 @@ export struct CYLTabBarController {
     const label = title.length > 0 ? title : CYLLocalizedString('加号按钮');
     const badge = cyl_badgeAccessibilityText(this.plusButtonBadge);
     return badge.length > 0 ? CYLLocalizedString('%@, %@', label, badge) : label;
+  }
+
+  /** [EN] The height of a tab's icon (a Lottie size or the image size). [CN] Tab 图标高度。 */
+  cylIconHeight(index: number): number {
+    const item = this.tabBarItemsAttributes[index];
+    const lottie = item.lottieFilePath !== undefined && item.gifFilePath === undefined && item.imageURL === undefined;
+    if (lottie) {
+      return item.lottieSize ?? this.imageSize;
+    }
+    // [EN] SVGA icons have their own size (issue list #11). [CN] SVGA 图标有自己的尺寸（问题 #11）。
+    return this.cylSVGAPath(index) !== undefined ? (item.svgaSize ?? this.imageSize) : this.imageSize;
   }
 
   cylIdentifier(index: number): string {
@@ -646,6 +683,7 @@ export struct CYLTabBarController {
       if (this.tabCoverImages[index] !== undefined) {
         Image(this.tabCoverImages[index])
           .height(this.tabBarHeight - 4)
+          .margin({ top: 2 })
           .objectFit(ImageFit.Contain)
           .id(`cyl-cover-${this.cylIdentifier(index)}`)
       } else {
@@ -680,12 +718,20 @@ export struct CYLTabBarController {
           .rotate({ z: 1, angle: this.tapAngle[index] ?? 0 })
           .rotate({ y: 1, angle: this.tapFlip[index] ?? 0 })
           .translate({ y: this.tapOffset[index] ?? 0 })
+          .padding(this.tabBarItemsAttributes[index].imageInsets ?? 0)
         }
-        CYLBadgeView({ badge: this.badges[index], anchorWidth: this.imageSize })
+        CYLBadgeView({ badge: this.badges[index], anchorWidth: this.cylIconHeight(index) })
       }
-      .width(this.imageSize)
-      .height(this.imageSize)
+      // [EN] No fixed width: the badge is measured with the free width, so text badges grow with their text (issue list
+      //      #1). The icon sits right above the title, whose top is at tabBarHeight - 17 like the plus title (#2).
+      // [CN] 不固定宽度：角标按剩余宽度测量，文字角标随文字变宽（问题 #1）。图标紧贴标题上方，标题顶部与加号标题同在 tabBarHeight - 17（#2）。
       .alignContent(Alignment.TopStart)
+      .margin({ top: Math.max(0, this.tabBarHeight - 17 - 3 - this.cylIconHeight(index)) })
+      .offset({
+        x: this.tabBarItemsAttributes[index].imagePositionAdjustment?.horizontal ?? 0,
+        y: this.tabBarItemsAttributes[index].imagePositionAdjustment?.vertical ?? 0,
+      })
+      .visibility(this.cylHidesIcon(index) ? Visibility.None : Visibility.Visible)
 
       if (this.tabBarItemsAttributes[index].title !== undefined) {
         Text(this.selectedIndex === index
@@ -705,7 +751,11 @@ export struct CYLTabBarController {
     }
     .layoutWeight(1)
     .height('100%')
-    .justifyContent(FlexAlign.Center)
+    .justifyContent(FlexAlign.Start)
+    // [EN] Liquid Glass: the selection is a capsule inside the rounded bar (issue list #6). [CN] 液态玻璃：选中背景为圆角胶囊（问题 #6）。
+    .borderRadius(this.tabBarStyleType === CYLTabBarStyleType.LiquidGlass ? this.tabBarHeight / 2 : 0)
+    .opacity(this.tabBarItemsAttributes[index].enabled === false ? 0.4 : 1)
+    .enabled(this.tabBarItemsAttributes[index].enabled !== false)
     .backgroundColor(this.selectedIndex === index
       ? (this.tabBarItemsAttributes[index].selectedBackgroundColor ?? Color.Transparent)
       : (this.tabBarItemsAttributes[index].backgroundColor ?? Color.Transparent))
@@ -714,13 +764,21 @@ export struct CYLTabBarController {
     .accessibilityText(this.cylAccessibilityLabel(index))
     .accessibilityDescription(this.cylAccessibilityDescription(index))
     .id(`cyl-tab-${this.cylIdentifier(index)}`)
-    .gesture(GestureGroup(GestureMode.Exclusive,
-      LongPressGesture({ duration: this.longPressDuration }).onAction(() => {
-        if (this.didLongPress !== undefined) {
-          this.didLongPress(index, this.cylIdentifier(index));
-        }
-      }),
-      TapGesture().onAction(() => this.cylTap(index))))
+    // [EN] Taps through onClick, the long press in parallel: an exclusive long-press + tap group could drop the first tap
+    //      right after a page push (issue list #14). [CN] 点击走 onClick，长按为并行手势：长按 + 点击的互斥组合可能丢失 push 后的第一次点击（问题 #14）。
+    .onClick(() => {
+      if (this.cylLongPressedIndex === index) {
+        this.cylLongPressedIndex = -2;
+        return;
+      }
+      this.cylTap(index);
+    })
+    .parallelGesture(LongPressGesture({ duration: this.longPressDuration }).onAction(() => {
+      this.cylLongPressedIndex = index;
+      if (this.didLongPress !== undefined) {
+        this.didLongPress(index, this.cylIdentifier(index));
+      }
+    }))
   }
 
   /**
@@ -817,6 +875,19 @@ export struct CYLTabBarController {
     })
   }
 
+  /**
+   * [EN] `shadowImage` as the bar's top line, stretched to the width. [CN] 作为 TabBar 顶部线条的 `shadowImage`，横向拉伸。
+   */
+  @Builder
+  cylShadowImage() {
+    Image(this.shadowImage)
+      .width('100%')
+      .height(1)
+      .objectFit(ImageFit.Fill)
+      .accessibilityLevel('no')
+      .hitTestBehavior(HitTestMode.Transparent)
+  }
+
   build() {
     Column() {
       Stack() {
@@ -858,8 +929,9 @@ export struct CYLTabBarController {
         .width('100%')
         .height(this.tabBarHeight)
         .backgroundColor(this.tabBarBackgroundColor)
-        .border({ width: { top: 0.5 }, color: { top: this.tabBarShadowColor } })
-        .attributeModifier(cyl_tabBarStyleModifier(this.tabBarStyleType, this.barTintColor, this.tabBarHeight))
+        .border({ width: { top: this.shadowImage !== undefined ? 0 : 0.5 }, color: { top: this.tabBarShadowColor } })
+        .overlay(this.shadowImage !== undefined ? this.cylShadowImage : undefined, { align: Alignment.Top })
+        .attributeModifier(cyl_tabBarStyleModifier(this.tabBarStyleType, this.barTintColor, this.tabBarHeight, this.barBackgroundImage))
         .padding({ left: this.itemEdgeInsets.left, right: this.itemEdgeInsets.right })
         .expandSafeArea(this.tabBarStyleType === CYLTabBarStyleType.LiquidGlass ? [] : [SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM])
         .id('cyl-tab-bar')

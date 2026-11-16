@@ -78,7 +78,7 @@ def document(items, mapping):
     for r in items:
         if r['header'] != header:
             header = r['header']
-            out += ['', '### `%s`' % os.path.relpath(header, 'CYLTabBarController'), '',
+            out += ['', '### `%s`' % os.path.relpath(header, 'CYLTabBarController').replace(os.sep, '/'), '',
                     '| iOS 公开 API / iOS public API | 接口注释 / Comment | 鸿蒙对应接口 / HarmonyOS API |', '|:---|:---|:---|']
         api = ('%s %s' % (r['owner'], r['name'])) if r['owner'] and r['kind'] in ('method', 'property') else r['name']
         out.append('| `%s` | %s | %s |' % (api.replace('|', '\\|'), r['comment'] or '—', mapping.get(r['key']) or 'TODO'))

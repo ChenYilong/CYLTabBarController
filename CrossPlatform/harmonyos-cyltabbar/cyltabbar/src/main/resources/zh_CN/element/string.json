@@ -1,6 +1,14 @@
 {
   "string": [
     {
+      "name": "cyl_l10n_bffed61338ea",
+      "value": "%@ CYLTabBarController（HarmonyOS）"
+    },
+    {
+      "name": "cyl_l10n_9ecf653a3fc6",
+      "value": "%@ · 另一个 context · 加号点击 %@ 次"
+    },
+    {
       "name": "cyl_l10n_aaf9b7d7382d",
       "value": "%@ 条新消息"
     },
@@ -13,8 +21,16 @@
       "value": "另一个 context 的 TabBarController，使用方形加号按钮"
     },
     {
+      "name": "cyl_l10n_427131e7add2",
+      "value": "另一个加号按钮"
+    },
+    {
       "name": "cyl_l10n_aa3e67bda3c0",
       "value": "ArkUI Tabs，即鸿蒙系统 TabBar，使用同样的 Tab"
+    },
+    {
+      "name": "cyl_l10n_0557fa923dce",
+      "value": "返回"
     },
     {
       "name": "cyl_l10n_8665e238c516",
@@ -73,6 +89,10 @@
       "value": "CYLFlatDesignTabBarItem 居中显示"
     },
     {
+      "name": "cyl_l10n_f6da70b584ae",
+      "value": "配置文件：%@"
+    },
+    {
       "name": "cyl_l10n_158b3b19e868",
       "value": "圆角"
     },
@@ -87,6 +107,14 @@
     {
       "name": "cyl_l10n_a45350c25311",
       "value": "自定义最大值（9）"
+    },
+    {
+      "name": "cyl_l10n_b9c74f4cd786",
+      "value": "不可用"
+    },
+    {
+      "name": "cyl_l10n_abfc3a65538a",
+      "value": "发现"
     },
     {
       "name": "cyl_l10n_bf0576472e31",
@@ -113,6 +141,10 @@
       "value": "GIF 动图图标"
     },
     {
+      "name": "cyl_l10n_8cf04a973413",
+      "value": "首页"
+    },
+    {
       "name": "cyl_l10n_d52d30723b2f",
       "value": "从左到右一次"
     },
@@ -131,6 +163,14 @@
     {
       "name": "cyl_l10n_983696096694",
       "value": "边距"
+    },
+    {
+      "name": "cyl_l10n_318b2739ddc2",
+      "value": "我的"
+    },
+    {
+      "name": "cyl_l10n_4c2a8fe7eaf2",
+      "value": "消息"
     },
     {
       "name": "cyl_l10n_24d459a81449",
@@ -157,8 +197,20 @@
       "value": "好"
     },
     {
+      "name": "cyl_l10n_8a7b0e9c294e",
+      "value": "开启：%@；在页面上左右滑动"
+    },
+    {
+      "name": "cyl_l10n_06eb0a05de97",
+      "value": "开启：%@；新页面从其 Tab 所在一侧滑入"
+    },
+    {
       "name": "cyl_l10n_287e78fd65af",
       "value": "其他文字"
+    },
+    {
+      "name": "cyl_l10n_84432607fd87",
+      "value": "页面：%@"
     },
     {
       "name": "cyl_l10n_41b77539cc64",
@@ -249,6 +301,10 @@
       "value": "显示 / 隐藏 CYLFlatDesignTabBar"
     },
     {
+      "name": "cyl_l10n_561582c1e7cc",
+      "value": "半透明红色显示可点击区域：%@；倍数 %@；点击循环 1x、1.5x、2x、关闭"
+    },
+    {
       "name": "cyl_l10n_3cb58e0d546d",
       "value": "弹簧（持续）"
     },
@@ -277,6 +333,10 @@
       "value": "标签，第 %1$@ 个，共 %2$@ 个"
     },
     {
+      "name": "cyl_l10n_456887f9731c",
+      "value": "Tab：%@"
+    },
+    {
       "name": "cyl_l10n_75ccb7ef4864",
       "value": "TabBar 外观"
     },
@@ -289,6 +349,10 @@
       "value": "系统 TabBar 没有加号按钮：用悬浮按钮代替"
     },
     {
+      "name": "cyl_l10n_9b6633b75bf2",
+      "value": "「我的」需要登录（issue #19）；点击切换"
+    },
+    {
       "name": "cyl_l10n_a4d0d101d6a3",
       "value": "左上角"
     },
@@ -297,12 +361,44 @@
       "value": "cyl_itemEdgeInsets：两端各留出 Tab 宽度的 15%"
     },
     {
+      "name": "cyl_l10n_6360bbdfb8ff",
+      "value": "cyl_itemEdgeInsets：为零，Tab 铺满 TabBar"
+    },
+    {
       "name": "cyl_l10n_fd15e88376df",
       "value": "cyl_pop / cyl_push 系列方法演示"
     },
     {
+      "name": "cyl_l10n_ca3dcd2d62be",
+      "value": "cyl_popSelectTabBarChildViewControllerAtIndex：1（%@）"
+    },
+    {
+      "name": "cyl_l10n_3b06a9582640",
+      "value": "cyl_popSelectTabBarChildViewControllerForTabBarItemIdentifier：message（消息）"
+    },
+    {
+      "name": "cyl_l10n_59884403daf6",
+      "value": "cyl_pushOrPopToViewController：pages/Index（已在栈中：返回）"
+    },
+    {
       "name": "cyl_l10n_1ec113617309",
       "value": "cyl_pushViewController、cyl_popSelectTabBarChildViewControllerAtIndex、cyl_pushOrPopToViewController"
+    },
+    {
+      "name": "cyl_l10n_9fb845377ee4",
+      "value": "cyl_pushViewController：一个绿色页面"
+    },
+    {
+      "name": "cyl_l10n_ff5772993aee",
+      "value": "cyl_tabBarItemLongPressDuration = %@ 毫秒，cyl_tabBarItemDoubleTapInterval = %@ 毫秒；点击切换；双击任意 Tab 查看效果"
+    },
+    {
+      "name": "cyl_l10n_f69c71bc581e",
+      "value": "cyl_tabBarMinimizeBehavior = %@；点击选择，然后滚动本列表"
+    },
+    {
+      "name": "cyl_l10n_f3f4ecf4a4a6",
+      "value": "selectedIndex = %@（加号按钮的页面为 %@，不占 Tab 下标）；点击切换到下一个 Tab"
     },
     {
       "name": "cyl_l10n_ee5b6ac6461b",
@@ -311,6 +407,10 @@
     {
       "name": "cyl_l10n_2de6d572f86b",
       "value": "standardAppearance 主题（液态玻璃与扁平样式共用）"
+    },
+    {
+      "name": "cyl_l10n_c4376b477be8",
+      "value": "tabBarHidden = %@；隐藏后 2 秒自动恢复"
     },
     {
       "name": "cyl_l10n_2a0608059131",
@@ -519,6 +619,10 @@
     {
       "name": "cyl_l10n_b051a19ace76",
       "value": "替换相邻 Tab 的页面"
+    },
+    {
+      "name": "cyl_l10n_3e730a3320e9",
+      "value": "替换页 %@"
     },
     {
       "name": "cyl_l10n_a131e4f178aa",

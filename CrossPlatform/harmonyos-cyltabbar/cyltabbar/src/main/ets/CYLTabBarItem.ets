@@ -64,6 +64,24 @@ export interface CYLTabBarItemAttributes {
   backgroundColor?: ResourceColor;
   /** [EN] CYLTabBarItemSelectedBackgroundColor: the tab's background while selected. [CN] 选中时此 Tab 的背景色。 */
   selectedBackgroundColor?: ResourceColor;
+  /**
+   * [EN] `CYLFlatDesignTabBarItem.enabled`: false dims the tab and ignores its taps; true (default) when unset.
+   * [CN] false 时 Tab 变暗且不响应点击；未设置时为 true。
+   */
+  enabled?: boolean;
+  /**
+   * [EN] `CYLFlatDesignTabBarItem.imagePositionAdjustment`: moves the icon. [CN] 移动图标。
+   */
+  imagePositionAdjustment?: CYLOffset;
+  /**
+   * [EN] `CYLFlatDesignTabBarItem.imageInsets`: insets of the icon inside its square, in vp. [CN] 图标在其方框内的内边距（vp）。
+   */
+  imageInsets?: CYLTabBarItemImageInsets;
+  /**
+   * [EN] `CYLFlatDesignTabBarItem.layoutCentered`: centers a lone title (no image) or a lone image (no title) in the tab.
+   * [CN] 只有标题（无图片）或只有图片（无标题）时在 Tab 中居中。
+   */
+  layoutCentered?: boolean;
 }
 
 /** [EN] UIOffset (CYLOffset). [CN] 偏移。 */
@@ -82,3 +100,13 @@ export const CYLTabBarItemTitleColor: string = 'titleColor';
 export const CYLTabBarItemSelectedTitleColor: string = 'selectedTitleColor';
 export const CYLTabBarItemBackgroundColor: string = 'backgroundColor';
 export const CYLTabBarItemSelectedBackgroundColor: string = 'selectedBackgroundColor';
+
+/**
+ * [EN] The icon insets of a tab (`UIEdgeInsets`), in vp. [CN] Tab 图标的内边距（`UIEdgeInsets`，vp）。
+ */
+export interface CYLTabBarItemImageInsets {
+  top: number;
+  left: number;
+  bottom: number;
+  right: number;
+}
