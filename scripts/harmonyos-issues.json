@@ -403,5 +403,14 @@
     "evidence": "Maintainer report 2026-11-16; harmonyos-liquid-glass-lens.png (plus and 8 cut at the capsule's top edge)",
     "cause": "The capsule clipped its children (clip(true)), its highlight was drawn over the tabs, and ArkUI paints the row's border over its children",
     "fix": "No clipping (unselected slots are hidden, not clipped, when minimized; the glass effect follows the radius by itself); the highlight and the rim are a layer under the tabs (cylGlassSheen), the row has no border"
+  },
+  {
+    "id": 46,
+    "status": "DONE (harmonyos-liquid-glass-ios-vs-harmonyos.png: top iOS 26 (Objective-C example, iPhone 17 Pro, ios-playback-controls-message-tab-iphone17pro-ios26.1-dc04439.png), bottom HarmonyOS (Mate 70 Pro emulator, HarmonyOS 6.0.1, API 21, 127.0.0.1:5559, 2026-11-17): same floating capsule, lens, raised plus button with an aligned title, label-colored unselected titles)",
+    "scope": "CrossPlatform/harmonyos-cyltabbar (cyltabbar, entry)",
+    "title": "The HarmonyOS Liquid Glass must be a one-to-one copy of the iOS style (the reference project's look belongs to the example only)",
+    "evidence": "Maintainer request 2026-11-17",
+    "cause": "The library had taken the reference project's layout (b004370), then was reset to an opaque capsule below the pages (b5f9ea5); neither was the iOS look",
+    "fix": "Library Liquid Glass measured on iOS 26: floating capsule 21 vp from the sides and the bottom, 61 vp high; near-white (light) or dark grey (dark) glass with a soft shadow and a light rim; a neutral borderless lens 8 vp wider than its slot that slides, stretches, lifts and follows a drag; the raised plus button in its slot, never cut; minimize into a ball; new CYLLiquidGlassUnselectedColor (sys.color.font_primary) used by the demo, as iOS uses the label color; the demo no longer paints its own pill"
   }
 ]

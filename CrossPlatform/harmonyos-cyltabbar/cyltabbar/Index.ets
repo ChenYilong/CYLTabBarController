@@ -38,7 +38,7 @@ export { cyl_badgeAccessibilityText } from './src/main/ets/CYLTabBarController';
 export {
   CYLTabBarStyleType,
   CYLFlatDesignTintColor,
-  CYLLiquidGlassTintColor,
+  CYLLiquidGlassTintColor, CYLLiquidGlassUnselectedColor,
   CYLLiquidGlassSelectionColor,
   CYLLiquidGlassTabBarModifier,
   CYLFlatDesignUnselectedColor,

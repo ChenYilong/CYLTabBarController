@@ -89,6 +89,12 @@ export class CYLFlatDesignTabBarModifier implements AttributeModifier<RowAttribu
 export const CYLLiquidGlassTintColor: ResourceColor = '#007AFF';
 
 /**
+ * [EN] Liquid Glass's unselected tint: the system label color, dark in a light app and light in a dark one (iOS 26 tab bar).
+ * [CN] 液态玻璃的未选中色：系统文字颜色，浅色 App 中为深色、深色 App 中为浅色（iOS 26 TabBar）。
+ */
+export const CYLLiquidGlassUnselectedColor: ResourceColor = $r('sys.color.font_primary');
+
+/**
  * [EN] The capsule behind the selected tab of Liquid Glass (`cyl_liquidGlassSelectionColor`). [CN] 液态玻璃选中 Tab 后的胶囊。
  */
 export const CYLLiquidGlassSelectionColor: ResourceColor = '#1F007AFF';
