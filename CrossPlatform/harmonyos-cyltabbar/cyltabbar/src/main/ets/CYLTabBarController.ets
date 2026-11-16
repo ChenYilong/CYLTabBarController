@@ -682,6 +682,20 @@ export struct CYLTabBarController {
       .hitTestBehavior(HitTestMode.None)
   }
 
+  /**
+   * [EN] Liquid Glass: how far the tab content moves down so it is centered in the capsule, as on iOS. The content is laid out
+   *      for tabBarHeight from the top; the capsule is taller (61 vp), so tabs and the plus button move by the same amount and
+   *      stay aligned with each other. 0 for the other styles.
+   * [CN] 液态玻璃：Tab 内容下移的距离，使其在胶囊中垂直居中（与 iOS 相同）。内容按 tabBarHeight 从顶部排列，而胶囊更高（61 vp），
+   *      因此 Tab 与加号按钮移动相同距离，彼此保持对齐。其他样式为 0。
+   */
+  private cylGlassContentDy(): number {
+    if (this.tabBarStyleType !== CYLTabBarStyleType.LiquidGlass || this.glassCollapsed) {
+      return 0;
+    }
+    return Math.max(0, (this.cylGlassRowHeight() - this.tabBarHeight) / 2);
+  }
+
   /** [EN] Liquid Glass, minimized into a ball. [CN] 液态玻璃，已缩小成球。 */
   private cylGlassMinimized(): boolean {
     return this.tabBarStyleType === CYLTabBarStyleType.LiquidGlass && this.glassCollapsed;
@@ -1115,6 +1129,7 @@ export struct CYLTabBarController {
       }
     }
     .layoutWeight(1)
+    .padding({ top: this.cylGlassContentDy() })
     // [EN] Liquid Glass: each slot keeps the expanded width while the capsule narrows into a ball (CYLLiquidGlass.ets).
     // [CN] 液态玻璃：胶囊收窄成球时，每个槽位保持展开时的宽度（CYLLiquidGlass.ets）。
     .constraintSize(this.tabBarStyleType === CYLTabBarStyleType.LiquidGlass && this.glassWidth > 0
@@ -1205,7 +1220,7 @@ export struct CYLTabBarController {
       // [EN] As CYLPlusButton.kt: with an aligned title the image sits right above the title (item 4); otherwise it is
       //      centred and moved by centerYOffset. [CN] 与 CYLPlusButton.kt 相同：标题对齐时图片紧贴标题上方（第 4 项）；否则居中并按 centerYOffset 移动。
       .position(this.cylPlusAlignsTitle()
-        ? { x: 0, y: this.tabBarHeight - 17 - (this.plusButton?.imageSize ?? 54) } : undefined)
+        ? { x: 0, y: this.cylGlassContentDy() + this.tabBarHeight - 17 - (this.plusButton?.imageSize ?? 54) } : undefined)
       .width(this.cylPlusAlignsTitle() ? '100%' : undefined)
       .offset({ y: this.cylPlusAlignsTitle() ? 0 : (this.plusButton?.centerYOffset ?? 0) })
 
@@ -1214,7 +1229,7 @@ export struct CYLTabBarController {
           .fontSize(10)
           .fontColor(this.selectedIndex === CYLPlusButtonPageIndex
             ? (this.plusButtonTitleSelectedColor ?? this.tintColor) : this.unselectedColor)
-          .position(this.plusButton?.alignsTitle === false ? undefined : { x: 0, y: this.tabBarHeight - 17 })
+          .position(this.plusButton?.alignsTitle === false ? undefined : { x: 0, y: this.cylGlassContentDy() + this.tabBarHeight - 17 })
           .width('100%')
           .textAlign(TextAlign.Center)
       }

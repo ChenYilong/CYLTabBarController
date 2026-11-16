@@ -412,5 +412,14 @@
     "evidence": "Maintainer request 2026-11-17",
     "cause": "The library had taken the reference project's layout (b004370), then was reset to an opaque capsule below the pages (b5f9ea5); neither was the iOS look",
     "fix": "Library Liquid Glass measured on iOS 26: floating capsule 21 vp from the sides and the bottom, 61 vp high; near-white (light) or dark grey (dark) glass with a soft shadow and a light rim; a neutral borderless lens 8 vp wider than its slot that slides, stretches, lifts and follows a drag; the raised plus button in its slot, never cut; minimize into a ball; new CYLLiquidGlassUnselectedColor (sys.color.font_primary) used by the demo, as iOS uses the label color; the demo no longer paints its own pill"
+  },
+  {
+    "id": 47,
+    "status": "DONE (harmonyos-liquid-glass-ios-vs-harmonyos.png, layout dump: capsule 2507-2721 px (center 2614); icons and titles 2538-2680 (center 2609), plus title 2640 vs tab titles 2639, cover and lens centered at 2614; Mate 70 Pro emulator, HarmonyOS 6.0.1, API 21, 127.0.0.1:5559, 2026-11-17)",
+    "scope": "CrossPlatform/harmonyos-cyltabbar (cyltabbar)",
+    "title": "Liquid Glass: the tab icons and titles are not aligned with the capsule and the lens: they sit about 7 vp high",
+    "evidence": "Maintainer report 2026-11-17; layout dump: content center 2588 px vs capsule and lens center 2614 px",
+    "cause": "The tabs lay out for tabBarHeight (49 vp) from the top, while the Liquid Glass capsule is 61 vp high (iOS)",
+    "fix": "cylGlassContentDy(): tabs get a top padding of (capsule height - tabBarHeight) / 2 and the plus button's image and title positions move by the same amount, so the content is centered in the capsule and stays aligned with the plus title (as iOS)"
   }
 ]
