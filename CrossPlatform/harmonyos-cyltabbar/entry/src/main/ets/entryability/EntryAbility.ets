@@ -1,7 +1,7 @@
 import { AbilityConstant, UIAbility, Want } from '@kit.AbilityKit';
 import { window } from '@kit.ArkUI';
 import { Configuration } from '@kit.AbilityKit';
-import { cyl_updateColorMode, cyl_simulateMemoryWarning, cyl_setLocalizationContext } from 'cyltabbar';
+import { cyl_updateColorMode, cyl_simulateMemoryWarning, cyl_setLocalizationContext, CYLSetLocalizationLanguage } from 'cyltabbar';
 
 /**
  * [EN] The example's ability: one window showing pages/Index (the tab bar controller of the Objective-C Example).
@@ -11,6 +11,21 @@ export default class EntryAbility extends UIAbility {
   onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): void {
     cyl_updateColorMode(this.context.config.colorMode);
     cyl_setLocalizationContext(this.context);
+    this.cylApplyLaunchLanguage(want);
+  }
+
+  /**
+   * [EN] Launch parameter CYLDemoLanguage (a language tag such as zh-Hant, de, ar; '' follows the system), for automated UI tests
+   *      and screenshots, like the iOS demos' launch arguments: `aa start -b com.cyl.tabbar.harmony -a EntryAbility
+   *      --ps CYLDemoLanguage zh-Hant`. It sets the app's language through CYLSetLocalizationLanguage before the page loads.
+   * [CN] 启动参数 CYLDemoLanguage（语言标签，如 zh-Hant、de、ar；'' 跟随系统），用于自动化 UI 测试与截图，与 iOS 示例的启动参数相同。在页面加载前
+   *      通过 CYLSetLocalizationLanguage 设置应用语言。
+   */
+  private cylApplyLaunchLanguage(want: Want): void {
+    const language = want.parameters?.['CYLDemoLanguage'];
+    if (typeof language === 'string') {
+      CYLSetLocalizationLanguage(language as string);
+    }
   }
 
   /** [EN] Item 54: follow the system's dark / light mode. [CN] 第 54 项：跟随系统深色 / 浅色模式。 */

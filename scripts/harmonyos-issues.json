@@ -307,7 +307,7 @@
   },
   {
     "id": 35,
-    "status": "TODO need 模拟器截图验证",
+    "status": "DONE (harmonyos-verify-keyboard-fixed-tab-bar.jpeg: CYLSearchViewController HarmonyOS example (KeyboardAvoidMode.RESIZE) built with cyltabbar 696efb5; with the keyboard up the tab bar stays behind it and the results fill up to the keyboard; after 取消 the bar is back at y 2563 px, unmoved; Mate 70 Pro emulator, HarmonyOS 6.0.1 (API 21), 127.0.0.1:5557, 2026-11-16)",
     "scope": "CrossPlatform/harmonyos-cyltabbar (cyltabbar)",
     "title": "The tab bar moves up with the keyboard (it sits right above the keyboard while typing); it must stay fixed at the bottom, as on iOS",
     "evidence": "harmonyos-keyboard-moves-tab-bar-cylsearch.png cols. 2-3 (CYLSearchViewController HarmonyOS example on cyltabbar 3ddb96c, Mate 70 Pro emulator API 21, 2026-11-16 10:12; reported by the maintainer)",
@@ -352,7 +352,7 @@
   },
   {
     "id": 40,
-    "status": "TODO need 模拟器截图验证",
+    "status": "DONE (harmonyos-verify-language-picker.jpeg: 🇺🇸 English, 🇨🇳 简体中文, 🇮🇳 हिन्दी, 🇪🇸 Español, 🇸🇦 العربية, 跟随系统, 取消, and the row 🌐 语言：🇨🇳 简体中文; Spanish and Arabic in harmonyos-verify-spanish.jpeg, harmonyos-verify-arabic.jpeg; Mate 70 Pro emulator, HarmonyOS 6.0.1 (API 21), 127.0.0.1:5557, 2026-11-16)",
     "scope": "CrossPlatform/harmonyos-cyltabbar (entry)",
     "title": "The language picker offers only 跟随系统 / English / 简体中文, and the language row does not show the current language, unlike iOS",
     "evidence": "Emulator check 2026-11-16",

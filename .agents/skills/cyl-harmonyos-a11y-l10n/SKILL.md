@@ -68,3 +68,7 @@ state changes (selected, on / off) are in the description; texts are localized (
 
 Tools: `hdc shell uitest` / `@ohos.UiTest` (`ON.text()`, `ON.id()`, `ON.description()`), DevEco Studio's UI
 inspector; on Windows build with `scripts/harmonyos-build.sh`.
+
+## Choosing the language in UI tests (added 2026-11-16)
+
+The example accepts the launch parameter `CYLDemoLanguage` (a language tag such as `zh-Hant`, `de`, `ar`; empty follows the system), like the iOS demos' launch arguments. It calls `CYLSetLocalizationLanguage` before the page loads, so a test can check any of the 33 languages without changing the shared emulator's system language: `hdc shell aa start -b com.cyl.tabbar.harmony -a EntryAbility --ps CYLDemoLanguage zh-Hant`. The in-app language picker mirrors iOS (English, 简体中文, हिन्दी, Español, العربية, 跟随系统).
