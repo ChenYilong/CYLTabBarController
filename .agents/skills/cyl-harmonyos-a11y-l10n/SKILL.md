@@ -72,3 +72,10 @@ inspector; on Windows build with `scripts/harmonyos-build.sh`.
 ## Choosing the language in UI tests (added 2026-11-16)
 
 The example accepts the launch parameter `CYLDemoLanguage` (a language tag such as `zh-Hant`, `de`, `ar`; empty follows the system), like the iOS demos' launch arguments. It calls `CYLSetLocalizationLanguage` before the page loads, so a test can check any of the 33 languages without changing the shared emulator's system language: `hdc shell aa start -b com.cyl.tabbar.harmony -a EntryAbility --ps CYLDemoLanguage zh-Hant`. The in-app language picker mirrors iOS (English, 简体中文, हिन्दी, Español, العربية, 跟随系统).
+
+## Fix in the core first (added 2026-11-17)
+
+Change the core code (the code published to CocoaPods, Swift Package Manager, Maven / Gradle, npm, pub.dev, ohpm or
+the WeChat Mini Program component) so that the whole class of bug is avoided; a fix only in the example layer is the
+worst option. If the core cannot fix it, ask the owner first and explain why; after the owner agrees, fix it in the
+example and record the reason in `docs/Example-Layer-Fixes.md` (see AGENTS.md, "Code rules").

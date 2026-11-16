@@ -203,3 +203,10 @@ the last resort; a control that cannot be found that way is a bug: add the label
     each branch.
   - Push only to branches that have an open pull request; do not recreate a branch that was deleted after its pull
     request was closed or merged.
+
+## Fix in the core first (added 2026-11-17)
+
+Change the core code (the code published to CocoaPods, Swift Package Manager, Maven / Gradle, npm, pub.dev, ohpm or
+the WeChat Mini Program component) so that the whole class of bug is avoided; a fix only in the example layer is the
+worst option. If the core cannot fix it, ask the owner first and explain why; after the owner agrees, fix it in the
+example and record the reason in `docs/Example-Layer-Fixes.md` (see AGENTS.md, "Code rules").

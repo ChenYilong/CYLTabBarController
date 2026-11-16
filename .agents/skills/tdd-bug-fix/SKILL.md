@@ -261,3 +261,10 @@ This test will catch any future regression of this bug.
 - `testing/tdd-feature/` — for new features (not bug fixes)
 - `testing/characterization-test-generator/` — for capturing existing behavior first
 - `generators/test-generator/` — for general test generation
+
+## Fix in the core first (added 2026-11-17)
+
+Change the core code (the code published to CocoaPods, Swift Package Manager, Maven / Gradle, npm, pub.dev, ohpm or
+the WeChat Mini Program component) so that the whole class of bug is avoided; a fix only in the example layer is the
+worst option. If the core cannot fix it, ask the owner first and explain why; after the owner agrees, fix it in the
+example and record the reason in `docs/Example-Layer-Fixes.md` (see AGENTS.md, "Code rules").
