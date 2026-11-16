@@ -1,3 +1,4 @@
+import { CYLLocalizedString } from 'cyltabbar';
 /**
  * [EN] Items 45 and 46: the system tab bar (ArkUI `Tabs` with a bottom `TabBar`, the HarmonyOS counterpart of UITabBar)
  *      with the same four tabs, a badge on Messages; `withPlus` adds another plus button: the system bar has none, so a
@@ -52,12 +53,12 @@ struct SystemTabs {
   build() {
     Column() {
       Row() {
-        Text('‹ Back')
+        Text('‹ ' + CYLLocalizedString('Back'))
           .fontSize(16)
           .fontColor('#007AFF')
           .id('cyl-back')
           .onClick(() => this.getUIContext().getRouter().back())
-        Text(this.withPlus ? 'System tab bar' : 'Tabs (system tab bar)')
+        Text(this.withPlus ? CYLLocalizedString('Push To 系统 UITabBarController（另一个 PlusButton）') : CYLLocalizedString('和系统 UITabBar 比较'))
           .fontSize(17)
           .fontWeight(FontWeight.Medium)
           .layoutWeight(1)

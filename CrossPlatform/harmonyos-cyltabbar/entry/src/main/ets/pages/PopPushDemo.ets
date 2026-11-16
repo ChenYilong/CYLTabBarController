@@ -1,3 +1,4 @@
+import { CYLLocalizedString } from 'cyltabbar';
 import {
   cyl_popSelectTabBarChildViewControllerAtIndex, cyl_popSelectTabBarChildViewControllerForTabBarItemIdentifier,
   cyl_pushViewController, cyl_pushOrPopToViewController
@@ -35,12 +36,12 @@ struct PopPushDemo {
   build() {
     Column() {
       Row() {
-        Text('‹ Back')
+        Text('‹ ' + CYLLocalizedString('Back'))
           .fontSize(16)
           .fontColor('#007AFF')
           .id('cyl-back')
           .onClick(() => this.getUIContext().getRouter().back())
-        Text('cyl_pop / cyl_push')
+        Text(CYLLocalizedString('cyl_pop / cyl_push 系列方法演示'))
           .fontSize(17)
           .fontWeight(FontWeight.Medium)
           .layoutWeight(1)
@@ -53,13 +54,13 @@ struct PopPushDemo {
       .backgroundColor('#F8F8F8')
 
       Column() {
-        this.row('select-index', 'cyl_popSelectTabBarChildViewControllerAtIndex: 1 (Nearby)',
+        this.row('select-index', CYLLocalizedString('cyl_popSelectTabBarChildViewControllerAtIndex: 1 (%@)', CYLLocalizedString('同城')),
           () => cyl_popSelectTabBarChildViewControllerAtIndex(1))
-        this.row('select-identifier', 'cyl_popSelectTabBarChildViewControllerForTabBarItemIdentifier: message',
+        this.row('select-identifier', CYLLocalizedString('cyl_popSelectTabBarChildViewControllerForTabBarItemIdentifier: message'),
           () => cyl_popSelectTabBarChildViewControllerForTabBarItemIdentifier('message'))
-        this.row('push', 'cyl_pushViewController: a green page',
+        this.row('push', CYLLocalizedString('cyl_pushViewController: a green page'),
           () => cyl_pushViewController('pages/TextPage', GREEN_PAGE))
-        this.row('push-or-pop', 'cyl_pushOrPopToViewController: pages/Index (already in the stack: pops)',
+        this.row('push-or-pop', CYLLocalizedString('cyl_pushOrPopToViewController: pages/Index (already in the stack: pops)'),
           () => cyl_pushOrPopToViewController('pages/Index', undefined, (popped: boolean) => this.result = `popped: ${popped}`))
         Text(this.result)
           .fontSize(13)

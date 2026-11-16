@@ -328,6 +328,28 @@ export struct CYLBadgeView {
     }
   }
 
+  /**
+   * [EN] The width of a text badge, as Android CYLBadge.onMeasure and iOS -cyl_adjustLabelWidth: the measured text width
+   *      plus the margin, at least the badge height (a circle for one digit). Never fixed, so "NEW" stays on one line.
+   * [CN] 文字角标宽度：测量的文字宽度加边距，至少为角标高度（一位数字为圆形）。不写死，"NEW" 保持单行。
+   */
+  cylTextBadgeWidth(): number {
+    const fontSize = this.badge.fontSize ?? this.appearance().fontSize;
+    const margin = this.badge.margin ?? this.appearance().margin;
+    const height = fontSize * 1.2 + margin;
+    const text = this.badge.cyl_displayText() ?? '';
+    let textWidth = text.length * fontSize * 0.62;
+    try {
+      const px = this.getUIContext().getMeasureUtils().measureText({
+        textContent: text, fontSize: fontSize, fontWeight: FontWeight.Bold,
+      });
+      textWidth = this.getUIContext().px2vp(px);
+    } catch (e) {
+      // [EN] Estimate when measuring is not available. [CN] 无法测量时估算。
+    }
+    return Math.max(height, Math.ceil(textWidth) + margin);
+  }
+
   build() {
     if (this.badge.value !== null) {
       Stack() {
@@ -347,7 +369,7 @@ export struct CYLBadgeView {
             .maxLines(1)
             .padding({ left: (this.badge.margin ?? this.appearance().margin) / 2, right: (this.badge.margin ?? this.appearance().margin) / 2 })
             .height((this.badge.fontSize ?? this.appearance().fontSize) * 1.2 + (this.badge.margin ?? this.appearance().margin))
-            .constraintSize({ minWidth: (this.badge.fontSize ?? this.appearance().fontSize) * 1.2 + (this.badge.margin ?? this.appearance().margin) })
+            .width(this.cylTextBadgeWidth())
             .backgroundColor(this.badge.backgroundColor ?? this.appearance().backgroundColor)
             .borderRadius((this.badge.cornerRadius ?? this.appearance().cornerRadius) > 0
               ? (this.badge.cornerRadius ?? this.appearance().cornerRadius) : 100)

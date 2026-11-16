@@ -260,7 +260,7 @@ struct Index {
       },
       {
         id: 'tab-bar-hidden', title: CYLLocalizedString('Show / hide CYLFlatDesignTabBar'),
-        subtitle: `tabBarHidden = ${this.tabBarHidden}; hidden, it comes back after 2 s`,
+        subtitle: CYLLocalizedString('tabBarHidden = %@; hidden, it comes back after 2 s', `${this.tabBarHidden}`),
         action: () => {
           this.tabBarHidden = !this.tabBarHidden;
           if (this.tabBarHidden) {
@@ -274,7 +274,7 @@ struct Index {
       },
       {
         id: 'minimize', title: CYLLocalizedString('滚动时缩小 / 隐藏 TabBar（issue #13）'),
-        subtitle: `cyl_tabBarMinimizeBehavior = ${['Automatic', 'Never', 'OnScrollDown', 'OnScrollUp'][this.minimizeBehavior]}; tap to choose, then scroll this list`,
+        subtitle: CYLLocalizedString('cyl_tabBarMinimizeBehavior = %@; tap to choose, then scroll this list', ['Automatic', 'Never', 'OnScrollDown', 'OnScrollUp'][this.minimizeBehavior]),
         action: () => this.choose('cyl_tabBarMinimizeBehavior', ['Automatic', 'Never', 'OnScrollDown', 'OnScrollUp'],
           this.minimizeBehavior, (index: number) => this.minimizeBehavior = index as CYLTabBarMinimizeBehavior),
       },
@@ -369,7 +369,7 @@ struct Index {
     return badges.map((badge: CYLBadge, row: number) => {
       const item: DemoRow = {
         id: `badge-${row}`, title: cyl_badgeTitleForRow(row), badgeRow: row,
-        subtitle: `${page} CYLTabBarController on HarmonyOS`,
+        subtitle: CYLLocalizedString('%@ CYLTabBarController on HarmonyOS', page),
         action: () => this.badgeRowTapped(page, row),
       };
       return item;
@@ -506,11 +506,11 @@ struct Index {
       },
       {
         id: 'selected-index', title: CYLLocalizedString('selectedIndex 与 PlusButton（issue #515）'),
-        subtitle: `selectedIndex = ${this.selectedIndex} (the plus button's page is ${CYLPlusButtonPageIndex}, never a tab index); tap for the next tab`,
+        subtitle: CYLLocalizedString('selectedIndex = %@ (the plus button\'s page is %@, never a tab index); tap for the next tab', this.selectedIndex, CYLPlusButtonPageIndex),
         action: () => this.selectedIndex = this.selectedIndex < 0 ? 0 : (this.selectedIndex + 1) % CYL_TABS.length,
       },
       {
-        id: 'login', title: 'Login state', subtitle: `Logged in: ${this.loggedIn}. The "Me" tab needs a login (issue #19); tap to toggle`,
+        id: 'login', title: CYLLocalizedString(this.loggedIn ? '登录状态：已登录' : '登录状态：未登录'), subtitle: CYLLocalizedString('The “Me” tab needs a login (issue #19); tap to toggle'),
         action: () => {
           this.loggedIn = !this.loggedIn;
           if (!this.loggedIn && this.selectedIndex === 3) {
@@ -535,7 +535,7 @@ struct Index {
       },
       {
         id: 'touchable-area', title: CYLLocalizedString('PlusButton 点击范围（issue #91）'),
-        subtitle: `Shows the touchable area in translucent red: ${this.plus.showsTouchableArea === true}; scale ${scale}x; tap to cycle 1x, 1.5x, 2x, off`,
+        subtitle: CYLLocalizedString('Shows the touchable area in translucent red: %@; scale %@x; tap to cycle 1x, 1.5x, 2x, off', `${this.plus.showsTouchableArea === true}`, scale),
         action: () => {
           const shows = this.plus.showsTouchableArea === true;
           const next = !shows ? 1 : (scale >= 2 ? 0 : scale + 0.5);
@@ -576,7 +576,7 @@ struct Index {
       },
       {
         id: 'gesture-timings', title: CYLLocalizedString('长按时长与双击间隔（issue #535 / #152）'),
-        subtitle: `cyl_tabBarItemLongPressDuration = ${longPress[this.longPressIndex]} ms, cyl_tabBarItemDoubleTapInterval = ${doubleTap[this.doubleTapIndex]} ms; tap to cycle; double tap a tab to see it`,
+        subtitle: CYLLocalizedString('cyl_tabBarItemLongPressDuration = %@ ms, cyl_tabBarItemDoubleTapInterval = %@ ms; tap to cycle; double tap a tab to see it', longPress[this.longPressIndex], doubleTap[this.doubleTapIndex]),
         action: () => {
           this.longPressIndex = (this.longPressIndex + 1) % longPress.length;
           this.doubleTapIndex = (this.doubleTapIndex + 1) % doubleTap.length;
@@ -584,12 +584,12 @@ struct Index {
       },
       {
         id: 'swipe', title: CYLLocalizedString('左右滑动切换 Tab（issue #535）'),
-        subtitle: `On: ${this.swipeEnabled}; swipe the page left / right`,
+        subtitle: CYLLocalizedString('On: %@; swipe the page left / right', `${this.swipeEnabled}`),
         action: () => this.swipeEnabled = !this.swipeEnabled,
       },
       {
         id: 'slide-transition', title: CYLLocalizedString('滑动转场（CYLTabBarSlideTransitionAnimator）'),
-        subtitle: `On: ${this.slideTransition}; the new page slides in from the side of its tab`,
+        subtitle: CYLLocalizedString('On: %@; the new page slides in from the side of its tab', `${this.slideTransition}`),
         action: () => this.slideTransition = !this.slideTransition,
       },
       {
@@ -771,13 +771,18 @@ struct Index {
             DemoFlatDesignButton({ onTap: () => this.showFlatDesignTabBar() })
             DemoLiquidGlassButton({ onTap: () => this.showLiquidGlassTabBar() })
           }
-          .position({ left: 12 })
+          // [EN] As tall as the bar, content centred: on the title's centre line (issue list #3). [CN] 与导航栏等高并垂直居中（问题 #3）。
+          .height(44)
+          .alignItems(VerticalAlign.Center)
+          .position({ left: 12, top: 0 })
         }
         if (index !== CYLPlusButtonPageIndex) {
           Text(CYLLocalizedString('换肤'))
             .fontSize(15)
             .fontColor('#007AFF')
-            .position({ right: 16 })
+            .height(44)
+            .textAlign(TextAlign.Center)
+            .position({ right: 16, top: 0 })
             .id(`cyl-nav-skin-${identifier}`)
             .onClick(() => this.showSkinPicker())
         }
@@ -790,7 +795,7 @@ struct Index {
 
       if (this.replacedTabs.indexOf(index) >= 0) {
         Column() {
-          Text(`Replacement page ${index + 1}`)
+          Text(CYLLocalizedString('替换页 %@', index + 1))
             .fontSize(20)
             .id(`cyl-replacement-page-${index}`)
         }

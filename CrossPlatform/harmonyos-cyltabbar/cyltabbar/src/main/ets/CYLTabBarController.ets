@@ -600,7 +600,11 @@ export struct CYLTabBarController {
   cylIconHeight(index: number): number {
     const item = this.tabBarItemsAttributes[index];
     const lottie = item.lottieFilePath !== undefined && item.gifFilePath === undefined && item.imageURL === undefined;
-    return lottie ? (item.lottieSize ?? this.imageSize) : this.imageSize;
+    if (lottie) {
+      return item.lottieSize ?? this.imageSize;
+    }
+    // [EN] SVGA icons have their own size (issue list #11). [CN] SVGA 图标有自己的尺寸（问题 #11）。
+    return this.cylSVGAPath(index) !== undefined ? (item.svgaSize ?? this.imageSize) : this.imageSize;
   }
 
   cylIdentifier(index: number): string {
@@ -690,7 +694,7 @@ export struct CYLTabBarController {
           .rotate({ y: 1, angle: this.tapFlip[index] ?? 0 })
           .translate({ y: this.tapOffset[index] ?? 0 })
         }
-        CYLBadgeView({ badge: this.badges[index], anchorWidth: this.imageSize })
+        CYLBadgeView({ badge: this.badges[index], anchorWidth: this.cylIconHeight(index) })
       }
       // [EN] No fixed width: the badge is measured with the free width, so text badges grow with their text (issue list
       //      #1). The icon sits right above the title, whose top is at tabBarHeight - 17 like the plus title (#2).

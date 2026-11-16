@@ -6,7 +6,7 @@
     "title": "Badge text wraps: \"NEW\" on Me shows as \"NE\" / \"W\" on two lines; text badges do not grow with their text",
     "evidence": "harmonyos-home-mate70pro-api21.jpeg, harmonyos-styles-*-*.png (Me tab, all styles)",
     "cause": "CYLBadgeView is a child of the icon Stack, which has a fixed width (imageSize, 26 vp); the badge Text is measured inside that width, so long text wraps. iOS (sizeToFit + margin) and Android (wrap_content) size the badge to its label",
-    "fix": "Host stacks no longer fix their width (tab icon, plus button, demo rows), so the badge is measured with the free width; the badge Text is one line (maxLines 1, no wrap) and its width is the text width + margin, at least its height"
+    "fix": "Host stacks no longer fix their width (tab icon, plus button, demo rows), so the badge is measured with the free width; the badge Text is one line (maxLines 1, no wrap) and its width is the text width + margin, at least its height; the badge width is explicit, as Android CYLBadge.onMeasure / iOS -cyl_adjustLabelWidth: max(height, measured text width (MeasureUtils.measureText, bold) + margin)"
   },
   {
     "id": 2,
@@ -19,7 +19,7 @@
   },
   {
     "id": 3,
-    "status": "TODO",
+    "status": "TODO need 模拟器截图验证",
     "scope": "CrossPlatform/harmonyos-cyltabbar (entry)",
     "title": "Navigation bar: the left buttons (扁平样式, 液态玻璃) and 换肤 sit at the top while the title 首页 is centred: not on one centre line",
     "evidence": "harmonyos-home-mate70pro-api21.jpeg, harmonyos-styles-*-981db1e / b7995d0 (top bar)",
@@ -28,7 +28,7 @@
   },
   {
     "id": 4,
-    "status": "TODO",
+    "status": "TODO need 模拟器截图验证",
     "scope": "CrossPlatform/harmonyos-cyltabbar (entry)",
     "title": "Status bar area is white above the gray navigation bar",
     "evidence": "harmonyos-styles-space-skin-981db1e.png (top)",
@@ -37,7 +37,7 @@
   },
   {
     "id": 5,
-    "status": "TODO",
+    "status": "TODO need 模拟器截图验证",
     "scope": "CrossPlatform/harmonyos-cyltabbar (entry)",
     "title": "Untranslated English subtitles in the Chinese UI (tabBarHidden = false; hidden, it comes back after 2 s / cyl_tabBarMinimizeBehavior = Never; tap to choose, then scroll this list)",
     "evidence": "harmonyos-home-mate70pro-api21.jpeg",
@@ -73,20 +73,47 @@
   },
   {
     "id": 9,
-    "status": "TODO",
+    "status": "TODO need 模拟器截图验证",
     "scope": "HarmonyOS/ (separate project in this repository)",
     "title": "Plus button title 发布 sits about 12 vp below the other tab titles",
     "evidence": "harmonyos-tab-bar-svga-launch.png, harmonyos-tab-bar-svga-messages-tap.png",
     "cause": "plusButtonView centres a 44 vp image + title, tabButton centres a 26 vp icon stack + title: the larger image pushes the plus title down",
-    "fix": "The plus image sits in a stack as tall as a tab icon and grows upward, so the plus title is on the tab titles' line"
+    "fix": "HarmonyOS/ was merged into the official port and deleted (PR #800); the port places tab and plus titles on one line (#2)"
   },
   {
     "id": 10,
-    "status": "TODO",
+    "status": "TODO need 模拟器截图验证",
     "scope": "CrossPlatform/harmonyos-cyltabbar (entry)",
     "title": "Pushed pages are not localized: ‹ Back, page titles (System tab bar, Another plus button, cyl_pop / cyl_push) and row texts stay English",
     "evidence": "Code review while checking the screenshots (pages/TextPage, SystemTabs, AnotherTabBar, PopPushDemo)",
     "cause": "Literal strings in the pushed pages",
     "fix": "Texts go through CYLLocalizedString (iOS keys where they exist: 返回 / Back, cyl_pop / cyl_push 系列方法演示, Push To 系统 UITabBarController ...); resources regenerated"
+  },
+  {
+    "id": 11,
+    "status": "TODO need 模拟器截图验证",
+    "scope": "CrossPlatform/harmonyos-cyltabbar (cyltabbar)",
+    "title": "SVGA (and Lottie) icons larger than imageSize sit about 5 vp right of and below their titles",
+    "evidence": "harmonyos-tab-bar-svga-launch.png, harmonyos-tab-bar-svga-messages-tap.png (reported by the CYLTableViewPlaceHolder session)",
+    "cause": "The icon Stack had a fixed imageSize with alignContent TopStart, so a bigger icon spilled right and down; the title line and the badge anchor used imageSize",
+    "fix": "The icon Stack takes the real icon size (no fixed size, centred in the tab); the title line and the badge anchorWidth use cylIconHeight (Lottie / SVGA / image size)"
+  },
+  {
+    "id": 12,
+    "status": "TODO need 模拟器截图验证",
+    "scope": "CrossPlatform/harmonyos-cyltabbar (cyltabbar)",
+    "title": "Ocean skin, classic style: a white strip under the tab bar (the bar color does not reach under the gesture bar)",
+    "evidence": "harmonyos-styles-ocean-skin-b7995d0.png (left)",
+    "cause": "The bar container (added for the Liquid Glass insets) had no background",
+    "fix": "981db1e: the container takes the bar background (classic / FlatDesign), transparent for Liquid Glass; the Space screenshot of 981db1e shows it fixed, Ocean needs a new screenshot"
+  },
+  {
+    "id": 13,
+    "status": "TODO need 模拟器截图验证",
+    "scope": "CrossPlatform/harmonyos-cyltabbar (entry)",
+    "title": "\"Replacement page N\" (issue #481 demo) is English only",
+    "evidence": "Code review (reported by the CYLTableViewPlaceHolder session)",
+    "cause": "Template string in Index.ets cylPage",
+    "fix": "CYLLocalizedString('替换页 %@') (the iOS key)"
   }
 ]

@@ -1,6 +1,14 @@
 {
   "string": [
     {
+      "name": "cyl_l10n_bffed61338ea",
+      "value": "%@ CYLTabBarController on HarmonyOS"
+    },
+    {
+      "name": "cyl_l10n_9ecf653a3fc6",
+      "value": "%@ · another context · plus taps: %@"
+    },
+    {
       "name": "cyl_l10n_aaf9b7d7382d",
       "value": "%@ nye meldinger"
     },
@@ -13,8 +21,16 @@
       "value": "A tab bar controller of another context, with a square plus button"
     },
     {
+      "name": "cyl_l10n_427131e7add2",
+      "value": "Another plus button"
+    },
+    {
       "name": "cyl_l10n_aa3e67bda3c0",
       "value": "ArkUI Tabs, the HarmonyOS system tab bar, with the same tabs"
+    },
+    {
+      "name": "cyl_l10n_0557fa923dce",
+      "value": "Back"
     },
     {
       "name": "cyl_l10n_8665e238c516",
@@ -157,6 +173,14 @@
       "value": "OK"
     },
     {
+      "name": "cyl_l10n_8a7b0e9c294e",
+      "value": "On: %@; swipe the page left / right"
+    },
+    {
+      "name": "cyl_l10n_06eb0a05de97",
+      "value": "On: %@; the new page slides in from the side of its tab"
+    },
+    {
       "name": "cyl_l10n_287e78fd65af",
       "value": "Annen tekst"
     },
@@ -249,6 +273,10 @@
       "value": "Vis / skjul CYLFlatDesignTabBar"
     },
     {
+      "name": "cyl_l10n_561582c1e7cc",
+      "value": "Shows the touchable area in translucent red: %@; scale %@x; tap to cycle 1x, 1.5x, 2x, off"
+    },
+    {
       "name": "cyl_l10n_3cb58e0d546d",
       "value": "Fjær (uendelig)"
     },
@@ -289,6 +317,10 @@
       "value": "The system bar has no plus button: a floating button stands in"
     },
     {
+      "name": "cyl_l10n_9b6633b75bf2",
+      "value": "The “Me” tab needs a login (issue #19); tap to toggle"
+    },
+    {
       "name": "cyl_l10n_a4d0d101d6a3",
       "value": "Oppe til venstre"
     },
@@ -301,8 +333,36 @@
       "value": "Demo av cyl_pop / cyl_push-metoder"
     },
     {
+      "name": "cyl_l10n_ca3dcd2d62be",
+      "value": "cyl_popSelectTabBarChildViewControllerAtIndex: 1 (%@)"
+    },
+    {
+      "name": "cyl_l10n_3b06a9582640",
+      "value": "cyl_popSelectTabBarChildViewControllerForTabBarItemIdentifier: message"
+    },
+    {
+      "name": "cyl_l10n_59884403daf6",
+      "value": "cyl_pushOrPopToViewController: pages/Index (already in the stack: pops)"
+    },
+    {
       "name": "cyl_l10n_1ec113617309",
       "value": "cyl_pushViewController, cyl_popSelectTabBarChildViewControllerAtIndex, cyl_pushOrPopToViewController"
+    },
+    {
+      "name": "cyl_l10n_9fb845377ee4",
+      "value": "cyl_pushViewController: a green page"
+    },
+    {
+      "name": "cyl_l10n_ff5772993aee",
+      "value": "cyl_tabBarItemLongPressDuration = %@ ms, cyl_tabBarItemDoubleTapInterval = %@ ms; tap to cycle; double tap a tab to see it"
+    },
+    {
+      "name": "cyl_l10n_f69c71bc581e",
+      "value": "cyl_tabBarMinimizeBehavior = %@; tap to choose, then scroll this list"
+    },
+    {
+      "name": "cyl_l10n_f3f4ecf4a4a6",
+      "value": "selectedIndex = %@ (the plus button's page is %@, never a tab index); tap for the next tab"
     },
     {
       "name": "cyl_l10n_ee5b6ac6461b",
@@ -311,6 +371,10 @@
     {
       "name": "cyl_l10n_2de6d572f86b",
       "value": "standardAppearance-tema (felles for Liquid Glass og FlatDesign)"
+    },
+    {
+      "name": "cyl_l10n_c4376b477be8",
+      "value": "tabBarHidden = %@; hidden, it comes back after 2 s"
     },
     {
       "name": "cyl_l10n_2a0608059131",
@@ -519,6 +583,10 @@
     {
       "name": "cyl_l10n_b051a19ace76",
       "value": "Erstatt nabofaner"
+    },
+    {
+      "name": "cyl_l10n_3e730a3320e9",
+      "value": "Erstatningsside %@"
     },
     {
       "name": "cyl_l10n_a131e4f178aa",

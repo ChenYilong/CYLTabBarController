@@ -1,3 +1,4 @@
+import { CYLLocalizedString } from 'cyltabbar';
 import { router } from '@kit.ArkUI';
 import {
   CYLTabBarController, CYLTabBarConfiguration, CYLTabBarConfigurationResult, CYLTabBarConfigurationError
@@ -67,7 +68,7 @@ struct ConfigurationDemo {
         .fontColor('#666666')
         .margin(16)
         .id(`cyl-config-page-${identifier}`)
-      Button('Back').onClick(() => router.back())
+      Button(CYLLocalizedString('Back')).onClick(() => router.back())
     }
     .width('100%')
     .height('100%')
@@ -88,7 +89,7 @@ struct ConfigurationDemo {
         })
       } else {
         Text(this.errorText).fontColor(Color.Red).margin(16).id('cyl-config-error')
-        Button('Back').onClick(() => router.back())
+        Button(CYLLocalizedString('Back')).onClick(() => router.back())
       }
     }
     .width('100%')

@@ -18,7 +18,23 @@
     "Double tap to open": "Double tap to open",
     "Badge: %@": "Badge: %@",
     "SVGA Tab 图标（配置文件）": "SVGA tab icons (configuration file)",
-    "CYLTabBarSVGAFilePath：选中时播放一次，未选中时显示第一帧": "CYLTabBarSVGAFilePath: plays once when selected, first frame otherwise"
+    "CYLTabBarSVGAFilePath：选中时播放一次，未选中时显示第一帧": "CYLTabBarSVGAFilePath: plays once when selected, first frame otherwise",
+    "Back": "Back",
+    "Another plus button": "Another plus button",
+    "%@ · another context · plus taps: %@": "%@ · another context · plus taps: %@",
+    "cyl_popSelectTabBarChildViewControllerAtIndex: 1 (%@)": "cyl_popSelectTabBarChildViewControllerAtIndex: 1 (%@)",
+    "cyl_popSelectTabBarChildViewControllerForTabBarItemIdentifier: message": "cyl_popSelectTabBarChildViewControllerForTabBarItemIdentifier: message",
+    "cyl_pushViewController: a green page": "cyl_pushViewController: a green page",
+    "cyl_pushOrPopToViewController: pages/Index (already in the stack: pops)": "cyl_pushOrPopToViewController: pages/Index (already in the stack: pops)",
+    "tabBarHidden = %@; hidden, it comes back after 2 s": "tabBarHidden = %@; hidden, it comes back after 2 s",
+    "cyl_tabBarMinimizeBehavior = %@; tap to choose, then scroll this list": "cyl_tabBarMinimizeBehavior = %@; tap to choose, then scroll this list",
+    "%@ CYLTabBarController on HarmonyOS": "%@ CYLTabBarController on HarmonyOS",
+    "selectedIndex = %@ (the plus button's page is %@, never a tab index); tap for the next tab": "selectedIndex = %@ (the plus button's page is %@, never a tab index); tap for the next tab",
+    "Shows the touchable area in translucent red: %@; scale %@x; tap to cycle 1x, 1.5x, 2x, off": "Shows the touchable area in translucent red: %@; scale %@x; tap to cycle 1x, 1.5x, 2x, off",
+    "cyl_tabBarItemLongPressDuration = %@ ms, cyl_tabBarItemDoubleTapInterval = %@ ms; tap to cycle; double tap a tab to see it": "cyl_tabBarItemLongPressDuration = %@ ms, cyl_tabBarItemDoubleTapInterval = %@ ms; tap to cycle; double tap a tab to see it",
+    "On: %@; swipe the page left / right": "On: %@; swipe the page left / right",
+    "On: %@; the new page slides in from the side of its tab": "On: %@; the new page slides in from the side of its tab",
+    "The “Me” tab needs a login (issue #19); tap to toggle": "The “Me” tab needs a login (issue #19); tap to toggle"
   },
   "zh-Hans": {
     "Previous tab (cyl_selectPreviousTab, issue #535)": "上一个 Tab（cyl_selectPreviousTab，issue #535）",
@@ -39,6 +55,22 @@
     "Double tap to open": "点按两次打开",
     "Badge: %@": "角标：%@",
     "SVGA Tab 图标（配置文件）": "SVGA Tab 图标（配置文件）",
-    "CYLTabBarSVGAFilePath：选中时播放一次，未选中时显示第一帧": "CYLTabBarSVGAFilePath：选中时播放一次，未选中时显示第一帧"
+    "CYLTabBarSVGAFilePath：选中时播放一次，未选中时显示第一帧": "CYLTabBarSVGAFilePath：选中时播放一次，未选中时显示第一帧",
+    "Back": "返回",
+    "Another plus button": "另一个加号按钮",
+    "%@ · another context · plus taps: %@": "%@ · 另一个 context · 加号点击 %@ 次",
+    "cyl_popSelectTabBarChildViewControllerAtIndex: 1 (%@)": "cyl_popSelectTabBarChildViewControllerAtIndex：1（%@）",
+    "cyl_popSelectTabBarChildViewControllerForTabBarItemIdentifier: message": "cyl_popSelectTabBarChildViewControllerForTabBarItemIdentifier：message（消息）",
+    "cyl_pushViewController: a green page": "cyl_pushViewController：一个绿色页面",
+    "cyl_pushOrPopToViewController: pages/Index (already in the stack: pops)": "cyl_pushOrPopToViewController：pages/Index（已在栈中：返回）",
+    "tabBarHidden = %@; hidden, it comes back after 2 s": "tabBarHidden = %@；隐藏后 2 秒自动恢复",
+    "cyl_tabBarMinimizeBehavior = %@; tap to choose, then scroll this list": "cyl_tabBarMinimizeBehavior = %@；点击选择，然后滚动本列表",
+    "%@ CYLTabBarController on HarmonyOS": "%@ CYLTabBarController（HarmonyOS）",
+    "selectedIndex = %@ (the plus button's page is %@, never a tab index); tap for the next tab": "selectedIndex = %@（加号按钮的页面为 %@，不占 Tab 下标）；点击切换到下一个 Tab",
+    "Shows the touchable area in translucent red: %@; scale %@x; tap to cycle 1x, 1.5x, 2x, off": "半透明红色显示可点击区域：%@；倍数 %@；点击循环 1x、1.5x、2x、关闭",
+    "cyl_tabBarItemLongPressDuration = %@ ms, cyl_tabBarItemDoubleTapInterval = %@ ms; tap to cycle; double tap a tab to see it": "cyl_tabBarItemLongPressDuration = %@ 毫秒，cyl_tabBarItemDoubleTapInterval = %@ 毫秒；点击切换；双击任意 Tab 查看效果",
+    "On: %@; swipe the page left / right": "开启：%@；在页面上左右滑动",
+    "On: %@; the new page slides in from the side of its tab": "开启：%@；新页面从其 Tab 所在一侧滑入",
+    "The “Me” tab needs a login (issue #19); tap to toggle": "「我的」需要登录（issue #19）；点击切换"
   }
 }
