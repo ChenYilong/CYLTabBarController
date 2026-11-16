@@ -417,8 +417,16 @@ export struct CYLTabBarController {
     } catch (error) {
       mode = KeyboardAvoidMode.OFFSET;
     }
+    // [EN] As iOS (restoreTabBar(for:) on UIKeyboardWillShowNotification): the keyboard coming up is an interruption that
+    //      shows a scroll-hidden bar again; its going away is not.
+    // [CN] 与 iOS 相同（UIKeyboardWillShowNotification）：键盘弹出是一次打断，会重新显示被滚动隐藏的 TabBar；键盘收起不算打断。
+    if (height > 0 && !this.cylKeyboardShown && this.scrollHidden) {
+      this.cylRestoreFromScroll();
+    }
+    this.cylKeyboardShown = height > 0;
     this.keyboardCoversTabBar = height > 0 && mode !== KeyboardAvoidMode.OFFSET;
   };
+  private cylKeyboardShown: boolean = false;
 
   @Builder
   cylEmptyPage(index: number, identifier: string) {

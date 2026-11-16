@@ -273,10 +273,10 @@
     "id": 31,
     "status": "DONE (harmonyos-bundle-image-row-localized.png, emulator 127.0.0.1:5559, 2026-11-16 11:13)",
     "scope": "CrossPlatform/harmonyos-cyltabbar (entry)",
-    "title": "The row \"从 bundle 加载图片（issue #535）\" has an English subtitle in the Chinese UI (\"The image of this page's tab from the app's rawfile ...\")",
+    "title": "The tab bar moves up with the keyboard (it sits right above the keyboard while typing); it must stay fixed at the bottom, in sync with iOS",
     "evidence": "harmonyos-emulator-pages-b7fdf26.png (taken on 5559 at 10:37, Home list)",
     "cause": "Text not passed through CYLLocalizedString",
-    "fix": "The subtitle goes through CYLLocalizedString; translated into the 33 languages of the port (scripts/harmonyos-l10n.json)"
+    "fix": "Synced with iOS, where UIKit never moves the tab bar for the keyboard (it stays at the bottom, covered) and CYLTabBarController+CYLTabBarMinimize.swift treats UIKeyboardWillShowNotification as an interruption that shows a scroll-hidden bar again. HarmonyOS: the controller follows the window's keyboardHeightChange; while the keyboard is up and the avoid mode is not OFFSET, the tab bar container is Visibility.None (out of the layout), so it stays behind the keyboard and the content fills up to the keyboard; it comes back unmoved when the keyboard closes (OFFSET mode already keeps it in place). The keyboard coming up also restores a scroll-hidden bar (cylRestoreFromScroll), as iOS; its going away does not"
   },
   {
     "id": 32,
