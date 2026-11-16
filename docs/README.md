@@ -268,6 +268,7 @@ docs/
 │   ├── harmonyos-verify-pushed-page-eba8c44.jpeg
 │   ├── harmonyos-verify-replacement-page-eba8c44.jpeg
 │   ├── harmonyos-verify-rive-mate70pro-api21.png
+│   ├── harmonyos-verify-scroll-sim-labels-mate70pro-api21.jpeg
 │   ├── harmonyos-verify-skin-row-picker.jpeg
 │   ├── harmonyos-verify-skins-eba8c44.png
 │   ├── harmonyos-verify-spanish.jpeg

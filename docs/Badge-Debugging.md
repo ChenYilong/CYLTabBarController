@@ -19,6 +19,7 @@
 | 中文 | English |
 |:---|:---|
 | [规则](#cn规则) | [Rule](#enrule) |
+| [默认值](#cn默认值) | [Default value](#endefault-value) |
 | [各平台的编译选项](#cn各平台的编译选项) | [The build option on each platform](#enthe-build-option-on-each-platform) |
 | [验证](#cn验证) | [Verification](#enverification) |
 
@@ -30,6 +31,13 @@
 | 中文 | English |
 |:---|:---|
 | 本节按用户要求使用英文（见右列）。 | While checking badge positions (coordinates, offsets, alignment with the icon), build with `CYL_BADGE_ANIMATION_DISABLED` on. An animated badge (Bounce, Shake, Scale, Breathe, the one-shot types) is drawn away from its laid-out place, so a screenshot taken during the animation gives wrong coordinates (2026-11-17: the HarmonyOS 消息 (Messages) badge looked 13 vp too low because a Bounce animation was still running). With the option on, the badge is drawn exactly where the layout puts it. Turn it off before committing; never commit or ship it on. After the positions are right, check once more with animations on. Label screenshots taken with it: "badge animations off (CYL_BADGE_ANIMATION_DISABLED)". |
+
+## [CN]默认值
+## [EN]Default value
+
+| 中文 | English |
+|:---|:---|
+| 本节按用户要求使用英文（见右列）。 | **Badge animation build controls default to NO (added 2026-11-17)**: every build control that turns badge animations off, including but not limited to the iOS Swift compilation condition `CYL_BADGE_ANIMATION_DISABLED`, the Android Gradle property `-PcylBadgeAnimationDisabled` (`BuildConfig.CYL_BADGE_ANIMATION_DISABLED`, also in the React Native and Flutter Android builds), the HarmonyOS `buildProfileFields` entry `CYL_BADGE_ANIMATION_DISABLED` in `cyltabbar/build-profile.json5`, the WeChat Mini Program constant `CYL_BADGE_ANIMATION_DISABLED` in `src/cyl-tab-bar/cyl_debug.js`, and any badge animation switch added later, defaults to NO (not set, `false`): badges animate as the app asks. Set one to YES (`true`) only while debugging badges: badge coordinates, offsets and alignment with the icon or other views. Set it on locally only; never commit, merge, release or publish it as YES (no Podfile, Xcode project, `gradle.properties`, CI setting or package with it on), and set it back to NO when the debugging is done, then check once more with animations on. Checked 2026-11-17: no Podfile, Xcode project, `.xcconfig`, `Package.swift`, podspec or `gradle.properties` in the repository sets the iOS or Android control; the HarmonyOS entry and the Mini Program constant are `false`, and a Mini Program unit test fails if its constant is committed as `true`. |
 
 ## [CN]各平台的编译选项
 ## [EN]The build option on each platform
