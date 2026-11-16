@@ -304,8 +304,17 @@ export struct CYLBadgeView {
     }
     switch (this.badge.animationType) {
       case CYLBadgeAnimationType.Scale:
-        this.scaleValue = 1.4;
-        animateTo({ duration: 1000, iterations: forever, playMode: PlayMode.Alternate }, () => { this.scaleValue = 0.6; });
+        // [EN] Starts from the resting size (1), grows to 1.4, then breathes 1.4 <-> 0.6 (iOS's scale animation). Setting
+        //      1.4 first left the badge stuck large when the animation was cut off (the Liquid Glass bar re-lays its
+        //      items out as its capsule moves): a cut-off animation now ends near 1. [CN] 从 1 开始放大到 1.4 再往返缩放；
+        //      之前先设为 1.4，动画被打断时角标停在放大状态（液态玻璃）。
+        animateTo({
+          duration: 500, curve: Curve.EaseOut, onFinish: () => {
+            if (this.badge.animationType === CYLBadgeAnimationType.Scale) {
+              animateTo({ duration: 1000, iterations: forever, playMode: PlayMode.Alternate }, () => { this.scaleValue = 0.6; });
+            }
+          }
+        }, () => { this.scaleValue = 1.4; });
         break;
       case CYLBadgeAnimationType.Shake:
         // [EN] As iOS (cyl_shakeAnimationRepeatTimes, translation.x): 0, -w/4, 0, +w/4, 0 in 1 s, around the badge's place.
