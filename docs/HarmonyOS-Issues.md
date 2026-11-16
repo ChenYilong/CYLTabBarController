@@ -17,7 +17,7 @@
 |:---|:---|
 | 来源：模拟器截图（docs/assets/harmonyos-*.png / .jpeg，Mate 70 Pro 模拟器，HarmonyOS 6.0.1 API 21）。每发现一个问题新增一行，包括本仓库其他目录与其他仓库的问题。 | Source: emulator screenshots (docs/assets/harmonyos-*.png / .jpeg, Mate 70 Pro emulator, HarmonyOS 6.0.1 API 21). One row per issue found, including issues in other folders of this repository and in other repositories. |
 | 状态：`TODO` 未修复；`TODO need 模拟器截图验证` 已修复、待模拟器截图验证；`DONE (<截图>)` 已验证。 | Status: `TODO` not fixed; `TODO need 模拟器截图验证` fixed, waiting for an emulator screenshot; `DONE (<screenshot>)` checked. |
-| **打分：100 / 100**（30 / 30 个问题不再是 TODO；已截图验证 3）。没有 `TODO` 行即满分。 | **Score: 100 / 100** (30 of 30 issues no longer TODO; 3 checked with a screenshot). No `TODO` row left is the full score. |
+| **打分：93 / 100**（30 / 32 个问题不再是 TODO；已截图验证 3）。没有 `TODO` 行即满分。 | **Score: 93 / 100** (30 of 32 issues no longer TODO; 3 checked with a screenshot). No `TODO` row left is the full score. |
 
 | # | 状态 / Status | 范围 / Scope | 问题 / Issue | 证据 / Evidence | 原因 / Cause | 修复 / Fix |
 |:---|:---|:---|:---|:---|:---|:---|
@@ -51,6 +51,8 @@
 | 28 | TODO need 模拟器截图验证 | ChenYilong/CollectionViewClassifyMenu (harmony port; other repository, tracker docs/harmony-verification.md) | Dark mode, animations page: empty rows; the speed and loop labels are invisible | harmonyos-push-*.jpeg on feat/harmony 98df838 (report of session chenyilong-de): animations-tab | Empty rows: tags clamped to width 0 before the list knew its width; invisible labels: 7 Texts without a color | 849c2d8 (feat/harmony), with a host regression test |
 | 29 | TODO need 模拟器截图验证 | ChenYilong/CollectionViewClassifyMenu (harmony port; other repository, tracker docs/harmony-verification.md) | Crash in libohos_rive.so on the animations page | harmonyos-push-*.jpeg on feat/harmony 98df838 (report of session chenyilong-de): animations-tab | Crash when a Rive view is disposed (bug in the ohos_rive library, still there) | 95bebc1 (feat/harmony): avoided by pooling Rive views (BuilderNode / NodeContainer) and never disposing them |
 | 30 | DONE (by design, B1: tab titles stay 10 fp and shrink toward 8 fp, then ellipsize, only when a long title such as 场景一：评价筛选 would not fit; harmonyos-push-*.jpeg) | ChenYilong/CollectionViewClassifyMenu (harmony port; other repository, tracker docs/harmony-verification.md) | Bottom tab bar titles are small (8 fp) after the B1 fix | harmonyos-push-*.jpeg on feat/harmony 98df838 (report of session chenyilong-de) | Intended shrink-to-fit for long titles | No change (owner's decision) |
+| 31 | TODO | CrossPlatform/harmonyos-cyltabbar (entry) | The row "从 bundle 加载图片（issue #535）" has an English subtitle in the Chinese UI ("The image of this page's tab from the app's rawfile ...") | harmonyos-emulator-pages-b7fdf26.png (taken on 5559 at 10:37, Home list) | Text not passed through CYLLocalizedString | Localize it (scripts/harmonyos-l10n.json) |
+| 32 | TODO | CrossPlatform/harmonyos-cyltabbar (entry) | The system tab bar page (推入到系统 UITabBarController) shows its page body "Home" in English in the Chinese UI | harmonyos-emulator-pages-b7fdf26.png, 4th screen | Text not passed through CYLLocalizedString | Localize it (scripts/harmonyos-l10n.json) |
 
 ## 目录 / Contents
 

@@ -268,5 +268,23 @@
     "evidence": "harmonyos-push-*.jpeg on feat/harmony 98df838 (report of session chenyilong-de)",
     "cause": "Intended shrink-to-fit for long titles",
     "fix": "No change (owner's decision)"
+  },
+  {
+    "id": 31,
+    "status": "TODO",
+    "scope": "CrossPlatform/harmonyos-cyltabbar (entry)",
+    "title": "The row \"从 bundle 加载图片（issue #535）\" has an English subtitle in the Chinese UI (\"The image of this page's tab from the app's rawfile ...\")",
+    "evidence": "harmonyos-emulator-pages-b7fdf26.png (taken on 5559 at 10:37, Home list)",
+    "cause": "Text not passed through CYLLocalizedString",
+    "fix": "Localize it (scripts/harmonyos-l10n.json)"
+  },
+  {
+    "id": 32,
+    "status": "TODO",
+    "scope": "CrossPlatform/harmonyos-cyltabbar (entry)",
+    "title": "The system tab bar page (推入到系统 UITabBarController) shows its page body \"Home\" in English in the Chinese UI",
+    "evidence": "harmonyos-emulator-pages-b7fdf26.png, 4th screen",
+    "cause": "Text not passed through CYLLocalizedString",
+    "fix": "Localize it (scripts/harmonyos-l10n.json)"
   }
 ]
