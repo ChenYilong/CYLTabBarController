@@ -105,6 +105,10 @@
       "value": "自定义最大值（9）"
     },
     {
+      "name": "cyl_l10n_b9c74f4cd786",
+      "value": "不可用"
+    },
+    {
       "name": "cyl_l10n_bf0576472e31",
       "value": "点按两次打开"
     },
@@ -327,6 +331,10 @@
     {
       "name": "cyl_l10n_2306a585ae00",
       "value": "cyl_itemEdgeInsets：两端各留出 Tab 宽度的 15%"
+    },
+    {
+      "name": "cyl_l10n_6360bbdfb8ff",
+      "value": "cyl_itemEdgeInsets: zero, the tabs fill the bar"
     },
     {
       "name": "cyl_l10n_fd15e88376df",

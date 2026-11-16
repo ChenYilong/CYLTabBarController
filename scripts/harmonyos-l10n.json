@@ -34,7 +34,8 @@
     "cyl_tabBarItemLongPressDuration = %@ ms, cyl_tabBarItemDoubleTapInterval = %@ ms; tap to cycle; double tap a tab to see it": "cyl_tabBarItemLongPressDuration = %@ ms, cyl_tabBarItemDoubleTapInterval = %@ ms; tap to cycle; double tap a tab to see it",
     "On: %@; swipe the page left / right": "On: %@; swipe the page left / right",
     "On: %@; the new page slides in from the side of its tab": "On: %@; the new page slides in from the side of its tab",
-    "The “Me” tab needs a login (issue #19); tap to toggle": "The “Me” tab needs a login (issue #19); tap to toggle"
+    "The “Me” tab needs a login (issue #19); tap to toggle": "The “Me” tab needs a login (issue #19); tap to toggle",
+    "Dimmed": "Dimmed"
   },
   "zh-Hans": {
     "Previous tab (cyl_selectPreviousTab, issue #535)": "上一个 Tab（cyl_selectPreviousTab，issue #535）",
@@ -71,6 +72,7 @@
     "cyl_tabBarItemLongPressDuration = %@ ms, cyl_tabBarItemDoubleTapInterval = %@ ms; tap to cycle; double tap a tab to see it": "cyl_tabBarItemLongPressDuration = %@ 毫秒，cyl_tabBarItemDoubleTapInterval = %@ 毫秒；点击切换；双击任意 Tab 查看效果",
     "On: %@; swipe the page left / right": "开启：%@；在页面上左右滑动",
     "On: %@; the new page slides in from the side of its tab": "开启：%@；新页面从其 Tab 所在一侧滑入",
-    "The “Me” tab needs a login (issue #19); tap to toggle": "「我的」需要登录（issue #19）；点击切换"
+    "The “Me” tab needs a login (issue #19); tap to toggle": "「我的」需要登录（issue #19）；点击切换",
+    "Dimmed": "不可用"
   }
 }

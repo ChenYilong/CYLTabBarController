@@ -36,6 +36,19 @@ const CYL_RANDOM_COLORS: string[] = ['#FF3B30', '#FF9500', '#34C759', '#007AFF',
  *      and a page of its own (+plusChildViewController).
  * [CN] Objective-C Example 的 CYLPlusButtonSubclass：位于第 2 位的「发布」，上移 14 vp，标题与 Tab 标题对齐，选中时为绿色，带自己的页面。
  */
+/**
+ * [EN] The space under the last row of a demo list (vp): the tab bar (49), the raised plus button above it and the
+ *      gesture bar, so no row stays hidden behind them (HarmonyOS screenshot issue 5).
+ * [CN] 演示列表最后一行下方的空间（vp）：TabBar（49）、其上方凸起的 PlusButton 与手势条，使任何一行都不会被挡住（鸿蒙截图问题 5）。
+ */
+const CYL_LIST_END_INSET: number = 120;
+
+/**
+ * [EN] The size of a skin's plus image (vp), smaller than the default 52 vp button (HarmonyOS screenshot issue 10).
+ * [CN] 皮肤加号图片的尺寸（vp），小于默认 52 vp 的按钮（鸿蒙截图问题 10）。
+ */
+const CYL_SKIN_PLUS_IMAGE_SIZE: number = 40;
+
 const CYL_PLUS: CYLPlusButton = {
   image: $r('app.media.post_normal'),
   selectedImage: $r('app.media.post_highlight'),
@@ -119,7 +132,11 @@ struct Index {
     const plusIcon: ResourceStr | undefined = skin.icons.length > 0 ? $rawfile(skin.iconPath(skin.icons[skin.icons.length - 1])) : skin.plusURL;
     const copy: CYLPlusButton = {
       image: plusIcon ?? CYL_PLUS.image, selectedImage: plusIcon ?? CYL_PLUS.selectedImage, title: CYL_PLUS.title,
-      index: CYL_PLUS.index, centerYOffset: CYL_PLUS.centerYOffset, imageSize: CYL_PLUS.imageSize,
+      // [EN] FIX (HarmonyOS screenshot issue 10): a skin's plus image is a tab-style icon without the button's round
+      //      background, so it is drawn smaller than the 52 vp button and no longer spreads over the list above the bar.
+      // [CN] 修复（鸿蒙截图问题 10）：皮肤的加号图片是 Tab 风格的图标，没有按钮的圆形背景，因此画得比 52 vp 的按钮小，不再铺到 TabBar 上方的列表上。
+      index: CYL_PLUS.index, centerYOffset: CYL_PLUS.centerYOffset,
+      imageSize: plusIcon !== undefined ? CYL_SKIN_PLUS_IMAGE_SIZE : CYL_PLUS.imageSize,
       alignsTitle: CYL_PLUS.alignsTitle, identifier: CYL_PLUS.identifier, selectable: CYL_PLUS.selectable,
     };
     this.plus = copy;
@@ -284,6 +301,8 @@ struct Index {
       },
       {
         id: 'items-not-centered', title: CYLLocalizedString('Change CYLFlatDesignTabBarItem 不居中显示（系统效果）'),
+        // [EN] FIX (HarmonyOS screenshot issue 15): a subtitle like its neighbors. [CN] 修复（鸿蒙截图问题 15）：与相邻行一样带副标题。
+        subtitle: CYLLocalizedString('cyl_itemEdgeInsets: zero, the tabs fill the bar'),
         action: () => this.itemEdgeInsets = { top: 0, left: 0, bottom: 0, right: 0 },
       },
       {
@@ -818,6 +837,10 @@ struct Index {
         }
         .layoutWeight(1)
         .width('100%')
+        // [EN] FIX (HarmonyOS screenshot issue 5): the last rows scroll above the tab bar, the raised plus button and the
+        //      gesture bar instead of staying under them. [CN] 修复（鸿蒙截图问题 5）：最后几行可以滚动到 TabBar、凸起的 PlusButton
+        //      与手势条之上，而不是被它们挡住。
+        .contentEndOffset(CYL_LIST_END_INSET)
         .backgroundColor($r('app.color.cyl_grouped_background'))
         .onDidScroll((offset: number) => cyl_reportScroll(offset))
         .id(`cyl-page-${identifier}`)

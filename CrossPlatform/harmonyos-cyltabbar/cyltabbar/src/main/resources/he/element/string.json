@@ -105,6 +105,10 @@
       "value": "מקסימום מותאם (9)"
     },
     {
+      "name": "cyl_l10n_b9c74f4cd786",
+      "value": "Dimmed"
+    },
+    {
       "name": "cyl_l10n_bf0576472e31",
       "value": "Double tap to open"
     },
@@ -327,6 +331,10 @@
     {
       "name": "cyl_l10n_2306a585ae00",
       "value": "cyl_itemEdgeInsets: 15% of a tab width free at each end"
+    },
+    {
+      "name": "cyl_l10n_6360bbdfb8ff",
+      "value": "cyl_itemEdgeInsets: zero, the tabs fill the bar"
     },
     {
       "name": "cyl_l10n_fd15e88376df",
