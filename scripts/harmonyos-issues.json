@@ -325,11 +325,11 @@
   },
   {
     "id": 37,
-    "status": "TODO",
+    "status": "TODO need 模拟器截图验证",
     "scope": "CrossPlatform/harmonyos-cyltabbar (cyltabbar, entry)",
     "title": "The emulator went down while the Rive demo (row \"Rive Tab 图标（配置文件）\") was opened and its Messages tab tapped, with the Canvas renderer already on the emulator",
     "evidence": "2026-11-16 ~17:47, emulator CYL TabBar Test (127.0.0.1:5559), HAP of df8664f: hdc lost the target, kernel.log shows a fresh boot at ~17:48 and hdc did not reconnect for 3+ minutes; no screenshot of the Rive page",
-    "cause": "Not known: a third @ohos/rive crash path (not the GPU renderer, cylRiveRendererType() returns Canvas on the emulator) or an unrelated emulator hang",
-    "fix": "Reproduce once with a screenshot right after the page opens and the hilog of the crash; if Rive is the cause, find what is disposed or created there"
+    "cause": "Most likely the host, not Rive: after a restart the same emulator dropped twice more before reaching the Rive page (while scrolling Home and before the first Home screenshot, a page with Lottie and no Rive); no jscrash or cppcrash of com.cyl.tabbar.harmony, only sceneboard sysfreeze logs; the Mac ran 3 HarmonyOS emulators and an Android one at about 130% CPU each. Earlier the same build showed the Rive page and 3 tab switches without a crash",
+    "fix": "Retest the Rive demo on a less loaded host (one HarmonyOS emulator running)"
   }
 ]
