@@ -237,6 +237,11 @@ docs/
 │   ├── harmonyos-styles-recheck-6befe36.png
 │   ├── harmonyos-styles-space-skin-981db1e.png
 │   ├── harmonyos-system-tab-bar-plus-before-after.png
+│   ├── harmonyos-verify-home-mate70pro-api21.png
+│   ├── harmonyos-verify-l10n-mate70pro-api21.png
+│   ├── harmonyos-verify-liquidglass-mate70pro-api21.png
+│   ├── harmonyos-verify-pages-mate70pro-api21.png
+│   ├── harmonyos-verify-skins-mate70pro-api21.png
 │   ├── image-only-tabs-gallery-3-3-ios17.png
 │   ├── image-only-tabs-ios.png
 │   ├── inset-grouped-sections-demo-ios.png

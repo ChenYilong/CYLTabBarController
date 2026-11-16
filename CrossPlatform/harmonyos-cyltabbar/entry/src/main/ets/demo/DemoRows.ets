@@ -52,5 +52,5 @@ export const DEMO_MESSAGE: string = 'message';
 export const DEMO_ME: string = 'CYLMineViewController';
 
 /** [EN] The language row's choices: '' follows the system. [CN] 语言行的选项：'' 跟随系统。 */
-export const DEMO_LANGUAGES: string[] = ['', 'en-Latn-US', 'zh-Hans-CN'];
-export const DEMO_LANGUAGE_NAMES: string[] = [cyl_localizationKey('跟随系统'), 'English', '简体中文'];
+export const DEMO_LANGUAGES: string[] = ['', 'en-Latn-US', 'zh-Hans-CN', 'zh-Hant-TW', 'de-Latn-DE', 'ja-Jpan-JP'];
+export const DEMO_LANGUAGE_NAMES: string[] = [cyl_localizationKey('跟随系统'), 'English', '简体中文', '繁體中文', 'Deutsch', '日本語'];

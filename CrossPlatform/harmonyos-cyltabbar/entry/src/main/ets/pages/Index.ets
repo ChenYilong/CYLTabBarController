@@ -542,7 +542,7 @@ struct Index {
           const on = this.flip(`replace-${page}`);
           this.replacedTabs = on ? sides : [];
           sides.forEach((side: number) => this.updateTab(side, (item: CYLTabBarItemAttributes) => {
-            item.title = on ? `Replaced ${side + 1}` : CYL_TABS[side].title;
+            item.title = on ? CYLLocalizedString('替换页 %@', side + 1) : CYL_TABS[side].title;
           }));
         },
       },
@@ -967,17 +967,11 @@ struct Index {
   @Builder
   cylPage(index: number, identifier: string) {
     Column() {
+      // [EN] Left buttons, the title and 换肤 in one row: the title takes the space between them, so a long translation
+      //      (German "Flaches Design", "Liquid Glass") never draws over the buttons; it shrinks, then ends with an ellipsis.
+      // [CN] 左侧按钮、标题与「换肤」排在一行：标题占据两者之间的空间，较长的译文不再压住按钮；先缩小字号，再以省略号结尾。
       Row() {
-        Text(index === CYLPlusButtonPageIndex ? $r('app.string.tab_post') : CYL_TABS[index].title)
-          .fontSize(17)
-          .fontWeight(FontWeight.Medium)
-        if (index === 0 && this.homeTitleRow >= 0) {
-          Text(`(${this.homeTitleRow})`)
-            .fontSize(17)
-            .fontWeight(FontWeight.Medium)
-        }
         if (index === 0) {
-          // [EN] The left bar buttons, side by side (never over the centred title). [CN] 左侧导航按钮并排，不压住居中的标题。
           Row({ space: 8 }) {
             DemoFlatDesignButton({ onTap: () => this.showFlatDesignTabBar() })
             DemoLiquidGlassButton({ onTap: () => this.showLiquidGlassTabBar() })
@@ -985,22 +979,39 @@ struct Index {
           // [EN] As tall as the bar, content centred: on the title's centre line (issue list #3). [CN] 与导航栏等高并垂直居中（问题 #3）。
           .height(44)
           .alignItems(VerticalAlign.Center)
-          .position({ left: 12, top: 0 })
+          .margin({ left: 12 })
+          .flexShrink(0)
         }
+        Text() {
+          Span(index === CYLPlusButtonPageIndex ? $r('app.string.tab_post') : CYL_TABS[index].title)
+          if (index === 0 && this.homeTitleRow >= 0) {
+            Span(`(${this.homeTitleRow})`)
+          }
+        }
+          .fontSize(17)
+          .minFontSize(12)
+          .maxFontSize(17)
+          .fontWeight(FontWeight.Medium)
+          .maxLines(1)
+          .textOverflow({ overflow: TextOverflow.Ellipsis })
+          .textAlign(TextAlign.Center)
+          .layoutWeight(1)
+          .padding({ left: 8, right: 8 })
         if (index !== CYLPlusButtonPageIndex) {
           Text(CYLLocalizedString('换肤'))
             .fontSize(15)
             .fontColor('#007AFF')
             .height(44)
             .textAlign(TextAlign.Center)
-            .position({ right: 16, top: 0 })
+            .margin({ right: 16 })
+            .flexShrink(0)
             .id(`cyl-nav-skin-${identifier}`)
             .onClick(() => this.showSkinPicker())
         }
       }
       .height(44)
       .width('100%')
-      .justifyContent(FlexAlign.Center)
+      .alignItems(VerticalAlign.Center)
       .backgroundColor($r('app.color.cyl_bar_background'))
       .id(`cyl-nav-title-${identifier}`)
 
@@ -1025,7 +1036,9 @@ struct Index {
               }, (row: DemoRow) => `${row.id}-${row.title}-${row.subtitle ?? ''}`)
             }
             .divider({ strokeWidth: 0.5, color: '#E5E5E5', startMargin: 16 })
-          }, (section: DemoSection) => section.title)
+          // [EN] The key holds the rows too: with the title alone ForEach kept the old group, and a changed subtitle (换肤's
+          //      "current: …") stayed stale. [CN] key 同时包含各行：只用标题时 ForEach 保留旧的分组，变化的副标题（换肤的「当前：…」）不更新。
+          }, (section: DemoSection) => `${section.title}|${section.rows.map((row: DemoRow) => `${row.id}-${row.title}-${row.subtitle ?? ''}`).join('|')}`)
         }
         .layoutWeight(1)
         .width('100%')

@@ -1,7 +1,7 @@
 [
   {
     "id": 1,
-    "status": "TODO need 模拟器截图验证",
+    "status": "DONE (harmonyos-verify-home-mate70pro-api21.png)",
     "scope": "CrossPlatform/harmonyos-cyltabbar (cyltabbar)",
     "title": "Badge text wraps: \"NEW\" on Me shows as \"NE\" / \"W\" on two lines; text badges do not grow with their text",
     "evidence": "harmonyos-home-mate70pro-api21.jpeg, harmonyos-styles-*-*.png (Me tab, all styles)",
@@ -10,7 +10,7 @@
   },
   {
     "id": 2,
-    "status": "TODO need 模拟器截图验证",
+    "status": "DONE (harmonyos-verify-home-mate70pro-api21.png)",
     "scope": "CrossPlatform/harmonyos-cyltabbar (cyltabbar)",
     "title": "Icon and title centre lines differ between the tabs and the plus button: the plus title 发布 sits a few px off the line of the tab titles",
     "evidence": "harmonyos-home-mate70pro-api21.jpeg (title row: 同城 / 消息 / 我的 vs 发布)",
@@ -19,7 +19,7 @@
   },
   {
     "id": 3,
-    "status": "TODO need 模拟器截图验证",
+    "status": "DONE (harmonyos-verify-home-mate70pro-api21.png)",
     "scope": "CrossPlatform/harmonyos-cyltabbar (entry)",
     "title": "Navigation bar: the left buttons (扁平样式, 液态玻璃) and 换肤 sit at the top while the title 首页 is centred: not on one centre line",
     "evidence": "harmonyos-home-mate70pro-api21.jpeg, harmonyos-styles-*-981db1e / b7995d0 (top bar)",
@@ -28,7 +28,7 @@
   },
   {
     "id": 4,
-    "status": "TODO need 模拟器截图验证",
+    "status": "DONE (harmonyos-verify-home-mate70pro-api21.png)",
     "scope": "CrossPlatform/harmonyos-cyltabbar (entry)",
     "title": "Status bar area is white above the gray navigation bar",
     "evidence": "harmonyos-styles-space-skin-981db1e.png (top)",
@@ -37,7 +37,7 @@
   },
   {
     "id": 5,
-    "status": "TODO need 模拟器截图验证",
+    "status": "DONE (harmonyos-verify-home-mate70pro-api21.png)",
     "scope": "CrossPlatform/harmonyos-cyltabbar (entry)",
     "title": "Untranslated English subtitles in the Chinese UI (tabBarHidden = false; hidden, it comes back after 2 s / cyl_tabBarMinimizeBehavior = Never; tap to choose, then scroll this list)",
     "evidence": "harmonyos-home-mate70pro-api21.jpeg",
@@ -46,7 +46,7 @@
   },
   {
     "id": 6,
-    "status": "TODO need 模拟器截图验证",
+    "status": "DONE (harmonyos-verify-liquidglass-mate70pro-api21.png)",
     "scope": "CrossPlatform/harmonyos-cyltabbar (cyltabbar)",
     "title": "Liquid Glass: the selected tab's capsule has square corners that stick out of the rounded bar (left end, behind the Home cover)",
     "evidence": "harmonyos-styles-space-skin-981db1e.png, harmonyos-flatdesign-liquidglass-taps-mate70pro.png (right column)",
@@ -55,7 +55,7 @@
   },
   {
     "id": 7,
-    "status": "TODO need 模拟器截图验证",
+    "status": "DONE (harmonyos-verify-skins-mate70pro-api21.png)",
     "scope": "CrossPlatform/harmonyos-cyltabbar (cyltabbar)",
     "title": "The plus button does not follow updates: with a skin the classic bar keeps the default + image (FlatDesign / Liquid Glass show the skin icon only because they rebuild the bar)",
     "evidence": "harmonyos-styles-space-skin-981db1e.png (left: + image; middle and right: comet)",
@@ -64,7 +64,7 @@
   },
   {
     "id": 8,
-    "status": "TODO need 模拟器截图验证",
+    "status": "DONE (harmonyos-verify-skins-mate70pro-api21.png)",
     "scope": "CrossPlatform/harmonyos-cyltabbar (cyltabbar)",
     "title": "FlatDesign with a skin is two-tone: the bar row stays light gray-purple, the strip under the gesture bar is the skin color",
     "evidence": "harmonyos-styles-space-skin-981db1e.png (middle)",
@@ -82,7 +82,7 @@
   },
   {
     "id": 10,
-    "status": "TODO need 模拟器截图验证",
+    "status": "DONE (harmonyos-verify-pages-mate70pro-api21.png)",
     "scope": "CrossPlatform/harmonyos-cyltabbar (entry)",
     "title": "Pushed pages are not localized: ‹ Back, page titles (System tab bar, Another plus button, cyl_pop / cyl_push) and row texts stay English",
     "evidence": "Code review while checking the screenshots (pages/TextPage, SystemTabs, AnotherTabBar, PopPushDemo)",
@@ -100,7 +100,7 @@
   },
   {
     "id": 12,
-    "status": "TODO need 模拟器截图验证",
+    "status": "DONE (harmonyos-verify-skins-mate70pro-api21.png)",
     "scope": "CrossPlatform/harmonyos-cyltabbar (cyltabbar)",
     "title": "Ocean skin, classic style: a white strip under the tab bar (the bar color does not reach under the gesture bar)",
     "evidence": "harmonyos-styles-ocean-skin-b7995d0.png (left)",
@@ -109,16 +109,16 @@
   },
   {
     "id": 13,
-    "status": "TODO need 模拟器截图验证",
+    "status": "DONE (harmonyos-verify-l10n-mate70pro-api21.png)",
     "scope": "CrossPlatform/harmonyos-cyltabbar (entry)",
     "title": "\"Replacement page N\" (issue #481 demo) is English only",
     "evidence": "Code review (reported by the CYLTableViewPlaceHolder session)",
     "cause": "Template string in Index.ets cylPage",
-    "fix": "CYLLocalizedString('替换页 %@') (the iOS key)"
+    "fix": "CYLLocalizedString('替换页 %@') (the iOS key); 2026-11-16: the replaced tab's own title (Replaced N) also uses 替换页 %@"
   },
   {
     "id": 14,
-    "status": "TODO need 模拟器截图验证",
+    "status": "DONE (harmonyos-verify-pages-mate70pro-api21.png)",
     "scope": "CrossPlatform/harmonyos-cyltabbar (cyltabbar)",
     "title": "The first tap on a tab right after pushing the configuration demo page does nothing; the next tap works",
     "evidence": "Emulator check of the SVGA demo (CYLTabBarController-folder session, b840da3, 127.0.0.1:5557)",
@@ -127,7 +127,7 @@
   },
   {
     "id": 15,
-    "status": "TODO need 模拟器截图验证",
+    "status": "DONE (harmonyos-verify-home-mate70pro-api21.png)",
     "scope": "CrossPlatform/harmonyos-cyltabbar (entry)",
     "title": "The last demo rows stay hidden behind the tab bar, the raised plus button and the gesture bar",
     "evidence": "harmonyos-home-mate70pro-api21.jpeg (bottom rows under the bar; reported in PR #803)",
@@ -136,7 +136,7 @@
   },
   {
     "id": 16,
-    "status": "TODO need 模拟器截图验证",
+    "status": "DONE (harmonyos-verify-skins-mate70pro-api21.png)",
     "scope": "CrossPlatform/harmonyos-cyltabbar (entry)",
     "title": "A skin's plus image is drawn at the 52 vp button size and spreads over the list above the bar",
     "evidence": "harmonyos-styles-space-skin-981db1e.png (comet over the list; reported in PR #803)",
@@ -145,7 +145,7 @@
   },
   {
     "id": 17,
-    "status": "TODO need 模拟器截图验证",
+    "status": "DONE (harmonyos-verify-home-mate70pro-api21.png)",
     "scope": "CrossPlatform/harmonyos-cyltabbar (entry)",
     "title": "The row CYLFlatDesignTabBarItem 不居中显示（系统效果） has no subtitle, unlike its neighbours",
     "evidence": "harmonyos-home-mate70pro-api21.jpeg (reported in PR #803)",
@@ -154,7 +154,7 @@
   },
   {
     "id": 18,
-    "status": "TODO need 模拟器截图验证",
+    "status": "DONE (harmonyos-verify-l10n-mate70pro-api21.png)",
     "scope": "CrossPlatform/harmonyos-cyltabbar (l10n)",
     "title": "Traditional Chinese shows English for every HarmonyOS-only string",
     "evidence": "scripts/harmonyos-l10n.json had no zh-Hant table (reported in PR #804)",
@@ -172,7 +172,7 @@
   },
   {
     "id": 20,
-    "status": "TODO need 模拟器截图验证",
+    "status": "DONE (harmonyos-verify-l10n-mate70pro-api21.png)",
     "scope": "CrossPlatform/harmonyos-cyltabbar (cyltabbar, entry)",
     "title": "The HarmonyOS-only strings stay English in the 30 other languages (de 29 copies of English, fr / es 29, ar / ko / ja 27; report of the CYLSearchViewController session)",
     "evidence": "string.json of every language except zh_CN / zh_TW",
@@ -181,7 +181,7 @@
   },
   {
     "id": 21,
-    "status": "TODO need 模拟器截图验证",
+    "status": "DONE (harmonyos-verify-pages-mate70pro-api21.png)",
     "scope": "CrossPlatform/harmonyos-cyltabbar (cyltabbar, entry)",
     "title": "SVGA configuration demo: tab titles and the page title are English (Home, Discover, Message, Me) in the Chinese UI",
     "evidence": "harmonyos-port-svga-demo-page.png",
@@ -190,7 +190,7 @@
   },
   {
     "id": 22,
-    "status": "TODO need 模拟器截图验证",
+    "status": "DONE (harmonyos-verify-pages-mate70pro-api21.png)",
     "scope": "CrossPlatform/harmonyos-cyltabbar (entry)",
     "title": "Configuration demo page: the labels \"identifier:\" and \"page:\" are English, and \"page: -\" shows no page",
     "evidence": "harmonyos-port-svga-demo-page.png",
@@ -199,16 +199,16 @@
   },
   {
     "id": 23,
-    "status": "TODO need 模拟器截图验证",
+    "status": "DONE (harmonyos-verify-liquidglass-mate70pro-api21.png)",
     "scope": "CrossPlatform/harmonyos-cyltabbar (cyltabbar)",
     "title": "Liquid Glass: the \"8\" badge on 同城 is drawn about twice its size and covers the icon",
     "evidence": "harmonyos-flatdesign-liquidglass-taps-mate70pro.png col. 3",
-    "cause": "Probably captured during the Scale animation (spring curve overshoots past 1) replayed when the style switches; not seen in the other columns",
+    "cause": "Probably captured during the Scale animation (spring curve overshoots past 1) replayed when the style switches; not seen in the other columns. Checked 2026-11-16: it is the demo's CYLBadgeAnimationTypeScale on the 同城 badge (1.4 ↔ 0.6, as iOS MainTabBarController.m and WZLBadge), not a bug",
     "fix": "No code change; take the screenshot 1 s after switching the style and check the badge is 2 × radius"
   },
   {
     "id": 24,
-    "status": "TODO need 模拟器截图验证",
+    "status": "DONE (harmonyos-verify-liquidglass-mate70pro-api21.png)",
     "scope": "CrossPlatform/harmonyos-cyltabbar (cyltabbar)",
     "title": "Liquid Glass: right after the switch the bar sits low, behind the gesture bar, with titles cut off",
     "evidence": "harmonyos-flatdesign-liquidglass-taps-mate70pro.png col. 2",
@@ -217,7 +217,7 @@
   },
   {
     "id": 25,
-    "status": "TODO need 模拟器截图验证",
+    "status": "DONE (harmonyos-verify-home-mate70pro-api21.png)",
     "scope": "CrossPlatform/harmonyos-cyltabbar (cyltabbar)",
     "title": "Wide badges (99+, NEW) are anchored by their left end at the icon corner and grow only to the right, unlike iOS and Android",
     "evidence": "Code review of 3eb7381 / aaddad4 (PR #806, \"wide badges grow right\") against Example-Android CYLBadge.kt cyl_badgeOrigin (anchorRight + 2 dp - width / 2) and the iOS placement (center 2 pt right of the host's right edge)",
@@ -298,7 +298,7 @@
   },
   {
     "id": 34,
-    "status": "TODO need 模拟器截图验证",
+    "status": "DONE (harmonyos-verify-pages-mate70pro-api21.png)",
     "scope": "CrossPlatform/harmonyos-cyltabbar (entry)",
     "title": "Pushed pages: a long navigation title (推入到系统 UITabBarController（另一个加号按钮）) wraps onto two lines and crowds the bar",
     "evidence": "harmonyos-emulator-pages-b7fdf26.png, harmonyos-system-tab-bar-plus-before-after.png (top panel)",
@@ -331,5 +331,41 @@
     "evidence": "2026-11-16 ~17:47, emulator CYL TabBar Test (127.0.0.1:5559), HAP of df8664f: hdc lost the target, kernel.log shows a fresh boot at ~17:48 and hdc did not reconnect for 3+ minutes; no screenshot of the Rive page",
     "cause": "Most likely the host, not Rive: after a restart the same emulator dropped twice more before reaching the Rive page (while scrolling Home and before the first Home screenshot, a page with Lottie and no Rive); no jscrash or cppcrash of com.cyl.tabbar.harmony, only sceneboard sysfreeze logs; the Mac ran 3 HarmonyOS emulators and an Android one at about 130% CPU each. Earlier the same build showed the Rive page and 3 tab switches without a crash",
     "fix": "Retest the Rive demo on a less loaded host (one HarmonyOS emulator running)"
+  },
+  {
+    "id": 38,
+    "status": "DONE (harmonyos-verify-skins-mate70pro-api21.png)",
+    "scope": "CrossPlatform/harmonyos-cyltabbar (entry)",
+    "title": "The skin row kept saying \"当前：默认\" after another skin was picked",
+    "evidence": "Emulator check 2026-11-16 (Ocean picked, row still said 默认)",
+    "cause": "The section ForEach key was the title only, so ArkUI kept the old group with its old rows",
+    "fix": "The section key holds every row id, title and subtitle"
+  },
+  {
+    "id": 39,
+    "status": "DONE (harmonyos-verify-l10n-mate70pro-api21.png)",
+    "scope": "CrossPlatform/harmonyos-cyltabbar (entry)",
+    "title": "German: the navigation title \"Start\" was drawn over the \"Liquid Glass\" button",
+    "evidence": "Emulator check 2026-11-16 (Deutsch)",
+    "cause": "The left buttons and 换肤 were positioned absolutely over a centred title",
+    "fix": "One row: buttons, title (layoutWeight, shrinks to 12 fp, then ellipsis), 换肤; the language row also offers 繁體中文, Deutsch and 日本語"
+  },
+  {
+    "id": 40,
+    "status": "TODO",
+    "scope": "CrossPlatform/harmonyos-cyltabbar (entry)",
+    "title": "Home: the title is centred between the left buttons and 换肤, not on the screen",
+    "evidence": "harmonyos-verify-l10n-mate70pro-api21.png (side effect of #39)",
+    "cause": "iOS centres the title when it fits and only then moves it aside",
+    "fix": "Centre the title when it fits, else use the space between the buttons"
+  },
+  {
+    "id": 41,
+    "status": "TODO",
+    "scope": "CrossPlatform/harmonyos-cyltabbar (entry)",
+    "title": "Scroll simulation rows: \"Self-test: run every automatic simulation…\" and the kind labels (Restore, Keep, N/A, Manual, Self-test) are English in the Chinese UI",
+    "evidence": "Emulator check 2026-11-16 (Home, scroll simulation section)",
+    "cause": "Literal strings in DemoScrollHide.ets and the Self-test toast in Index.ets",
+    "fix": "CYLLocalizedString + 33 languages"
   }
 ]
