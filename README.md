@@ -155,6 +155,7 @@ Analyst.ai [App Store Link](https://itunes.apple.com/us/app/analyst-ai/id1345754
 | [Android 版 CYLTabBarController](docs/Android-Library.md) | [CYLTabBarController for Android](docs/Android-Library.md) |
 | [Android 液态玻璃](docs/Android-Liquid-Glass.md) | [Android Liquid Glass](docs/Android-Liquid-Glass.md) |
 | [Android 库与 QMUI_Android、XUI 的 Tab 对比](docs/Android-QMUI-Comparison.md) | [The Android library compared with QMUI_Android's and XUI's tabs](docs/Android-QMUI-Comparison.md) |
+| [角标调试](docs/Badge-Debugging.md) | [Badge debugging](docs/Badge-Debugging.md) |
 | [中英文双语文档](docs/Bilingual-Documentation.md) | [Bilingual Documentation](docs/Bilingual-Documentation.md) |
 | [CYLTableViewPlaceHolder 集成问题](docs/CYLTableViewPlaceHolder-Integration-Issues.md) | [CYLTableViewPlaceHolder Integration Issues](docs/CYLTableViewPlaceHolder-Integration-Issues.md) |
 | [CYLUtils 通用工具：超出父视图响应点击、点击动画与图片加载](docs/CYLUtils-Helpers.md) | [CYLUtils helpers: responding outside the superview, a tap animation, and image loading](docs/CYLUtils-Helpers.md) |
@@ -167,12 +168,14 @@ Analyst.ai [App Store Link](https://itunes.apple.com/us/app/analyst-ai/id1345754
 | [React Native 与 Flutter 组件](docs/Cross-Platform-Components.md) | [React Native and Flutter components](docs/Cross-Platform-Components.md) |
 | [自定义 TabBar 功能清单](docs/Custom-Tab-Bar-Features.md) | [Custom Tab Bar Feature Checklist](docs/Custom-Tab-Bar-Features.md) |
 | [Demo 测试列表：设置分组与纯 Swift 版本](docs/Demo-Test-List.md) | [The demo test list: settings groups and a pure Swift version](docs/Demo-Test-List.md) |
+| [示例层修复](docs/Example-Layer-Fixes.md) | [Example-layer fixes](docs/Example-Layer-Fixes.md) |
 | [CYLTabBarController 常见问题](docs/FAQ.md) | [CYLTabBarController FAQ](docs/FAQ.md) |
 | [FlatDesign × UITabBarAppearance](docs/FlatDesign-StandardAppearance.md) | [FlatDesign × UITabBarAppearance](docs/FlatDesign-StandardAppearance.md) |
 | [Flutter 接入：flutter_cyltabbar](docs/Flutter-Component.md) | [Flutter integration: flutter_cyltabbar](docs/Flutter-Component.md) |
 | [GIF Tab 图标：循环的图片，或点击播放一次的动画](docs/GIF-Animation.md) | [GIF tab icons: a looping image, or an animation that plays once when tapped](docs/GIF-Animation.md) |
 | [鸿蒙 API 对照表](docs/HarmonyOS-API-Map.md) | [The HarmonyOS API map](docs/HarmonyOS-API-Map.md) |
 | [鸿蒙端问题清单](docs/HarmonyOS-Issues.md) | [HarmonyOS issues](docs/HarmonyOS-Issues.md) |
+| [鸿蒙液态玻璃对标](docs/HarmonyOS-Liquid-Glass-Parity.md) | [HarmonyOS Liquid Glass parity](docs/HarmonyOS-Liquid-Glass-Parity.md) |
 | [鸿蒙端对齐](docs/HarmonyOS-Parity.md) | [HarmonyOS parity](docs/HarmonyOS-Parity.md) |
 | [纯图标 Tab 的自动居中](docs/Image-Only-Tabs.md) | [Automatic centering of image-only tabs](docs/Image-Only-Tabs.md) |
 | [液态玻璃的健壮性改进](docs/Liquid-Glass-Robustness.md) | [Liquid Glass Robustness](docs/Liquid-Glass-Robustness.md) |

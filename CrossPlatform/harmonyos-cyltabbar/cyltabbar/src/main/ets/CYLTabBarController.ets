@@ -2,7 +2,7 @@ import { CYLTabBarStyleType, cyl_tabBarStyleModifier } from './CYLFlatDesignTabB
 import { CYLLiquidGlassTokens, CYLLiquidGlassCapsuleModifier, CYLLiquidGlassContainerModifier } from './CYLLiquidGlass';
 import { curves, window, KeyboardAvoidMode } from '@kit.ArkUI';
 import { CYLTabBarItemAttributes, CYLTitleOffset } from './CYLTabBarItem';
-import { CYLPlusButton } from './CYLPlusButton';
+import { CYLPlusButton, cyl_liquidGlassContentDy } from './CYLPlusButton';
 import { CYLBadge, CYLBadgeView } from './CYLBadge';
 import { CYLLottieIcon } from './CYLLottieIcon';
 import { CYLSVGAView } from './svga/CYLSVGAView';
@@ -693,7 +693,7 @@ export struct CYLTabBarController {
     if (this.tabBarStyleType !== CYLTabBarStyleType.LiquidGlass || this.glassCollapsed) {
       return 0;
     }
-    return Math.max(0, (this.cylGlassRowHeight() - this.tabBarHeight) / 2);
+    return cyl_liquidGlassContentDy(this.tabBarHeight);
   }
 
   /** [EN] Liquid Glass, minimized into a ball. [CN] 液态玻璃，已缩小成球。 */

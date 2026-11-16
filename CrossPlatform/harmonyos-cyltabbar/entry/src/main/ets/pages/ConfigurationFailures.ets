@@ -112,6 +112,12 @@ struct ConfigurationFailures {
         Text(CYLLocalizedString('配置文件：模拟意外情况'))
           .fontSize(17)
           .fontWeight(FontWeight.Medium)
+
+          // One line, ending with an ellipsis (UINavigationBar): long titles wrapped to two lines.
+
+          .maxLines(1)
+
+          .textOverflow({ overflow: TextOverflow.Ellipsis })
           .layoutWeight(1)
           // [EN] One line: long titles shrink to 12 fp, then end with an ellipsis (issue list #26). [CN] 单行：长标题缩小到 12 fp，再以省略号结尾（问题 #26）。
           .maxLines(1)

@@ -169,6 +169,49 @@ struct Index {
     CYLThemeManagerCenter.defaultThemeManager.removeListener(this.themeListener);
   }
 
+  /** [EN] Launch options from EntryAbility ("style|theme|screen"). [CN] 来自 EntryAbility 的启动参数。 */
+  @StorageProp('cylLaunchOptions') @Watch('cylLaunchOptionsChanged') cylLaunchOptions: string = '';
+
+  cylLaunchOptionsChanged(): void {
+    if (this.cylLaunchOptions === '') {
+      return;
+    }
+    const parts = this.cylLaunchOptions.split('|');
+    const style = parts.length > 0 ? parts[0] : '';
+    const theme = parts.length > 1 ? parts[1] : '';
+    const screen = parts.length > 2 ? parts[2] : '';
+    AppStorage.setOrCreate('cylLaunchOptions', '');
+    // [EN] After the first layout and the launch badges, as a tap would come. [CN] 首次布局与启动角标之后，如同用户点击。
+    setTimeout(() => this.cylApplyLaunchOptions(style, theme, screen), 800);
+  }
+
+  /** [EN] cylStyle, cylTheme and cylScreen (see EntryAbility). [CN] 应用 cylStyle、cylTheme 与 cylScreen。 */
+  private cylApplyLaunchOptions(style: string, theme: string, screen: string): void {
+    if (style === 'flat') {
+      this.showFlatDesignTabBar();
+    } else if (style === 'glass') {
+      this.showLiquidGlassTabBar();
+    }
+    if (theme !== '') {
+      const match = DEMO_THEMES.find((t: DemoTheme) => t.name === theme || CYLLocalizedString(t.titleKey) === theme ||
+        t.titleKey === theme);
+      if (match !== undefined) {
+        CYLThemeManagerCenter.defaultThemeManager.currentThemeIdentifier = match.name;
+      }
+    }
+    if (screen !== '') {
+      for (const page of [DEMO_HOME, DEMO_CITY, DEMO_MESSAGE, DEMO_ME]) {
+        for (const section of this.sections(page)) {
+          const row = section.rows.find((r: DemoRow) => r.id === screen);
+          if (row !== undefined) {
+            row.action();
+            return;
+          }
+        }
+      }
+    }
+  }
+
   aboutToAppear(): void {
     demoRegisterThemes();
     CYLThemeManagerCenter.defaultThemeManager.addListener(this.themeListener);
@@ -194,6 +237,7 @@ struct Index {
     //      radius 5.5, breathe), Nearby 8 (purple, scale), Messages 100 -> 99+ (bounce), Me NEW (offset (-1, 3), breathe).
     // [CN] 第 6 项（1.5 秒后，便于看清动画）：首页红点、同城 8、消息 99+、我的 NEW。
     this.showLaunchBadges();
+    this.cylLaunchOptionsChanged();
   }
 
   /**
