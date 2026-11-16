@@ -63,3 +63,7 @@ export {
   CYLTabBarPageRegistry, CYLTabBarPageRequest, CYLTabBarPage, CYLTabBarAsyncPageFactory, CYLTabBarPageResolver, CYLTabBarPageSource,
   CYLTabBarPageSkipReason, CYLTabBarSkippedTab, CYLTabBarResolvedPage, CYLTabBarPagesResult, CYLTabBarPageProviding
 } from './src/main/ets/CYLTabBarPageRegistry';
+export {
+  CYLConstants, CYLSize, CYLTabBarItemImagePlaceholderWidth, CYLTabBarItemImagePlaceholderHeight,
+  cyl_setTabBarItemImagePlaceholderSize
+} from './src/main/ets/CYLConstants';

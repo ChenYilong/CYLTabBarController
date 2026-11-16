@@ -18,6 +18,8 @@ Read the document for the feature before using its API. The public API is in the
 | Gallery of scenes, one per API | [Tab-Bar-Gallery](../../../docs/Tab-Bar-Gallery.md) |
 | The demo settings list | [Demo-Test-List](../../../docs/Demo-Test-List.md) |
 | FAQ | [FAQ](../../../docs/FAQ.md) |
+| Usage guide (installation details, Objective-C setup, plus button protocol, appearance, badges, Dark Mode, localization, orientation, nested tab bars, Storyboard; moved from the README) | [Usage guide](../../../docs/Usage-Guide.md) |
+| Highlights of earlier versions (1.99.x: iOS 27, iPhone Duo, runtime plus button) | [Version highlights](../../../docs/Version-Highlights.md) |
 | Plus button rules | [PlusButton](../../../docs/PlusButton.md) |
 | Plus button: slot, counts; on Liquid Glass it follows its slot's center; titles are cut (longest first) only when they overflow the platter | [PlusButton-Slot](../../../docs/PlusButton-Slot.md) |
 | Swift migration of the iOS core layer: plan, order, score (`scripts/swift-migration-score.py`), progress | [Swift-Migration](../../../docs/Swift-Migration.md) |
@@ -69,7 +71,7 @@ Read the document for the feature before using its API. The public API is in the
 | Reselect: pop or scroll to top | [Tab-Reselect](../../../docs/Tab-Reselect.md) |
 | A tab runs an action | [Tab-Custom-Action](../../../docs/Tab-Custom-Action.md) |
 | Login-required tabs (also the config key, Android persistence, `CYLTabBarHostView` / React Native / Flutter `loggedIn`, `onLoginRequest`, `onLoginStateChange`) | [Login-Required-Tabs](../../../docs/Login-Required-Tabs.md) |
-| Localization and language switch (`CYLLocalizedString`, `CYLSetLocalizationLanguage`, `-cyl_presentLanguagePicker`, right to left; Android `CYLLocalization.language`; `CYLTabBarHostView` / React Native / Flutter `language`) | [README, Localization](../../../README.md#cn多语言本地化) |
+| Localization and language switch (`CYLLocalizedString`, `CYLSetLocalizationLanguage`, `-cyl_presentLanguagePicker`, right to left; Android `CYLLocalization.language`; `CYLTabBarHostView` / React Native / Flutter `language`) | [README, Localization](../../../docs/Usage-Guide.md#cn多语言本地化) |
 | Example-level texts (not library API): `CYLDemoLocalizedString` (Objective-C macro; the Swift function is `cylDemoLocalizedString`) reading `Example-Shared/CYLDemo.bundle`; the library's own texts use `CYLLocalizedString`; a project needs both layers, checked by `scripts/check-localization-macros.py` | [AGENTS.md, Localization file structure](../../../AGENTS.md) |
 | Hide or minimize on scroll | [TabBar-Minimize-On-Scroll](../../../docs/TabBar-Minimize-On-Scroll.md) |
 | Push from anywhere | [Push-From-Anywhere](../../../docs/Push-From-Anywhere.md) |
@@ -79,7 +81,7 @@ Read the document for the feature before using its API. The public API is in the
 | Animation subspec, adding a library | [Tab-Bar-Item-Animation](../../../docs/Tab-Bar-Item-Animation.md) |
 | PAG | [PAG-Animation](../../../docs/PAG-Animation.md) |
 | Rive | [Rive-Animation](../../../docs/Rive-Animation.md) |
-| SVGA (issue #415): `pod 'CYLTabBarController/SVGA'`, `CYLTabBarSVGAURL` keys, Protobuf pinned to 3.21, demo in Example-Rive after the Rive demo | [SVGA-Animation](../../../docs/SVGA-Animation.md) |
+| SVGA (issue #415): `pod 'CYLTabBarController/SVGA'`, `CYLTabBarSVGAURL` keys, player SVGAPlayerLite (maintained SVGAPlayer fork, Protobuf 3.27), demo in Example-Rive after the Rive demo | [SVGA-Animation](../../../docs/SVGA-Animation.md) |
 | GIF: looping image or play once | [GIF-Animation](../../../docs/GIF-Animation.md) |
 | Mixing animated and static tabs | [Per-Tab-Animation](../../../docs/Per-Tab-Animation.md) |
 | Themes | [Theme-Switching](../../../docs/Theme-Switching.md) |

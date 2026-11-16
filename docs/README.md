@@ -86,6 +86,8 @@
 | [换肤实现评估：与 QMUI 的差距、架构符合度与改进建议](Theme-Switching-QMUI-Evaluation.md) | [Theme switching evaluation: the gap to QMUI, fit with the original design, and what to improve](Theme-Switching-QMUI-Evaluation.md) |
 | [换肤（主题切换）](Theme-Switching.md) | [Theme switching (skins)](Theme-Switching.md) |
 | [原地更新 Tab：标题、图标、网络图标与替换页面](Update-Tab-Bar-Items-In-Place.md) | [Update Tabs in Place: Titles, Icons, Network Icons and Pages](Update-Tab-Bar-Items-In-Place.md) |
+| [CYLTabBarController 使用指南](Usage-Guide.md) | [CYLTabBarController usage guide](Usage-Guide.md) |
+| [CYLTabBarController 历史版本亮点](Version-Highlights.md) | [CYLTabBarController highlights of earlier versions](Version-Highlights.md) |
 | [微信小程序版 CYLTabBarController](WeChat-Mini-Program.md) | [CYLTabBarController for WeChat Mini Program](WeChat-Mini-Program.md) |
 | [提交前准备规则](commit-readiness-2026-11-09.md) | [Commit Readiness Rules](commit-readiness-2026-11-09.md) |
 | [文档文件夹说明](instructions.md) | [Documentation Folder Instructions](instructions.md) |
@@ -180,6 +182,8 @@ docs/
 ├── Theme-Switching-QMUI-Evaluation.md
 ├── Theme-Switching.md
 ├── Update-Tab-Bar-Items-In-Place.md
+├── Usage-Guide.md
+├── Version-Highlights.md
 ├── WeChat-Mini-Program.md
 ├── assets/
 │   ├── android-liquid-glass-surface-000.png
@@ -237,11 +241,15 @@ docs/
 │   ├── harmonyos-styles-recheck-6befe36.png
 │   ├── harmonyos-styles-space-skin-981db1e.png
 │   ├── harmonyos-system-tab-bar-plus-before-after.png
-│   ├── harmonyos-verify-home-mate70pro-api21.png
+│   ├── harmonyos-verify-configuration-svga-eba8c44.jpeg
+│   ├── harmonyos-verify-home-eba8c44.jpeg
+│   ├── harmonyos-verify-home-end-eba8c44.jpeg
 │   ├── harmonyos-verify-l10n-mate70pro-api21.png
-│   ├── harmonyos-verify-liquidglass-mate70pro-api21.png
-│   ├── harmonyos-verify-pages-mate70pro-api21.png
-│   ├── harmonyos-verify-skins-mate70pro-api21.png
+│   ├── harmonyos-verify-liquid-glass-eba8c44.png
+│   ├── harmonyos-verify-pushed-page-eba8c44.jpeg
+│   ├── harmonyos-verify-replacement-page-eba8c44.jpeg
+│   ├── harmonyos-verify-skin-row-picker.jpeg
+│   ├── harmonyos-verify-skins-eba8c44.png
 │   ├── image-only-tabs-gallery-3-3-ios17.png
 │   ├── image-only-tabs-ios.png
 │   ├── inset-grouped-sections-demo-ios.png
@@ -341,6 +349,7 @@ docs/
 │   ├── svga-tab-icons-configuration-ios26.png
 │   ├── svga-tab-icons-configuration-plus-ios26.png
 │   ├── svga-tab-icons-keys-ios26.png
+│   ├── svga-tab-icons-svgaplayerlite-ios27.png
 │   ├── svga-tab-icons-swiftui-configuration-ios26.png
 │   ├── svga-tab-icons-swiftui-keys-ios26.png
 │   ├── svga-tab-icons-web-assets-ios26.png

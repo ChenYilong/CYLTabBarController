@@ -1,5 +1,4 @@
 import { promptAction, display } from '@kit.ArkUI';
-import { i18n } from '@kit.LocalizationKit';
 import {
   CYLTabBarController, CYLTabBarItemAttributes, CYLPlusButton, CYLPlusButtonPageIndex, CYLBadge, CYLBadgeView,
   CYLBadgeAppearance, CYLBadgeAnimationType, CYLOffset, CYLEdgeInsets, cyl_simulateMemoryWarning, cyl_badgeTitleForRow,
@@ -10,7 +9,7 @@ import {
 import { CYLLocalizedString, cyl_localizationKey, cyl_badgeAccessibilityText } from 'cyltabbar';
 import { DemoTheme, DEMO_THEMES, demoRegisterThemes } from '../demo/DemoThemes';
 import { DemoScrollKind, DemoScrollSimulation, DEMO_SCROLL_SIMULATIONS, demoScrollKindName } from '../demo/DemoScrollHide';
-import { cyl_restoreTabBar } from 'cyltabbar';
+import { cyl_restoreTabBar, CYLSetLocalizationLanguage, CYLLocalizationLanguage } from 'cyltabbar';
 import { DemoFlatDesignButton } from '../demo/DemoFlatDesign';
 import { DemoLiquidGlassButton } from '../demo/DemoLiquidGlass';
 import { CYLTabBarStyleType, CYLFlatDesignTintColor, CYLFlatDesignUnselectedColor, CYLLiquidGlassTintColor, CYLLiquidGlassSelectionColor } from 'cyltabbar';
@@ -153,7 +152,8 @@ struct Index {
   private showSkinPicker(): void {
     const names = DEMO_THEMES.map((theme: DemoTheme) => theme.name);
     this.getUIContext().showTextPickerDialog({
-      range: names,
+      // [EN] Localized names, as the skin rows (iOS shows the theme's localized title). [CN] 显示本地化名称，与换肤行相同。
+      range: DEMO_THEMES.map((theme: DemoTheme) => CYLLocalizedString(theme.titleKey)),
       selected: Math.max(0, names.indexOf(this.theme.name)),
       onAccept: (value: TextPickerResult) => {
         CYLThemeManagerCenter.defaultThemeManager.currentThemeIdentifier = names[value.index as number];
@@ -172,8 +172,10 @@ struct Index {
     CYLBadgeAppearance.globalAppearance.centerOffset = { horizontal: -5, vertical: 3 };
     // [EN] cyl_demo_showPlusButtonBadge: 1 at launch. [CN] 启动时加号角标为 1。
     this.plusButtonBadge.cyl_showBadgeValue('1');
-    const current = i18n.System.getAppPreferredLanguage();
-    this.languageIndex = Math.max(0, DEMO_LANGUAGES.indexOf(current));
+    const current = CYLLocalizationLanguage();
+    // [EN] A language outside the picker (set elsewhere) shows as "Follow system". [CN] 不在选项中的语言显示为「跟随系统」。
+    const known = DEMO_LANGUAGES.indexOf(current);
+    this.languageIndex = known >= 0 ? known : DEMO_LANGUAGES.length - 1;
     for (const page of [DEMO_HOME, DEMO_CITY, DEMO_MESSAGE, DEMO_ME]) {
       const count = Math.max(page === DEMO_HOME || page === DEMO_ME ? 30 : 15, cyl_badgeStyleCount());
       const badges: CYLBadge[] = [];
@@ -234,10 +236,15 @@ struct Index {
   private generalRows(): DemoRow[] {
     return [
       {
-        id: 'language', title: CYLLocalizedString('语言'), subtitle: CYLLocalizedString('点击切换语言'),
-        action: () => this.choose(CYLLocalizedString('语言'), DEMO_LANGUAGE_NAMES, this.languageIndex, (index: number) => {
-          // [EN] setAppPreferredLanguage reloads the app's resources ($r) in the chosen language. [CN] 以所选语言重新加载应用资源。
-          i18n.System.setAppPreferredLanguage(DEMO_LANGUAGES[index] === '' ? 'default' : DEMO_LANGUAGES[index]);
+        // [EN] As iOS -cyl_languageCellForTableView: the title shows the current language ("🌐 Language: 🇨🇳 简体中文").
+        // [CN] 与 iOS 相同：标题显示当前语言（「🌐 语言：🇨🇳 简体中文」）。
+        id: 'language', title: `🌐 ${CYLLocalizedString('语言')}：${CYLLocalizedString(DEMO_LANGUAGE_NAMES[this.languageIndex])}`,
+        subtitle: CYLLocalizedString('点击切换语言'),
+        action: () => this.choose(CYLLocalizedString('语言'), DEMO_LANGUAGE_NAMES.map((name: string) => CYLLocalizedString(name)),
+          this.languageIndex, (index: number) => {
+          // [EN] CYLSetLocalizationLanguage reloads the app's resources ($r) in the chosen language and tells the listeners, as iOS.
+          // [CN] CYLSetLocalizationLanguage 以所选语言重新加载应用资源并通知监听者，与 iOS 相同。
+          CYLSetLocalizationLanguage(DEMO_LANGUAGES[index]);
           this.languageIndex = index;
         }),
       },
@@ -1036,8 +1043,9 @@ struct Index {
               }, (row: DemoRow) => `${row.id}-${row.title}-${row.subtitle ?? ''}`)
             }
             .divider({ strokeWidth: 0.5, color: '#E5E5E5', startMargin: 16 })
-          // [EN] The key holds the rows too: with the title alone ForEach kept the old group, and a changed subtitle (换肤's
-          //      "current: …") stayed stale. [CN] key 同时包含各行：只用标题时 ForEach 保留旧的分组，变化的副标题（换肤的「当前：…」）不更新。
+          // [EN] Issue list: the key includes the rows' keys, so a section whose subtitles change (e.g. "当前：海洋" after a skin)
+          //      is rebuilt; with the title alone ArkUI kept the old rows.
+          // [CN] 问题清单：key 包含各行的 key，副标题变化的分组（如换肤后的「当前：海洋」）会重建；只用标题时 ArkUI 保留旧行。
           }, (section: DemoSection) => `${section.title}|${section.rows.map((row: DemoRow) => `${row.id}-${row.title}-${row.subtitle ?? ''}`).join('|')}`)
         }
         .layoutWeight(1)

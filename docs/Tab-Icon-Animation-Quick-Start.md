@@ -77,7 +77,7 @@ cd Example-Swift && pod install && open *.xcworkspace
 | Lottie 2.5 | `CYLTabBarController/Lottie` | `.json` | 12.0 | - | 同上 / The same |
 | PAG | `CYLTabBarController/PAG`、`PAGEnterprise` | `.pag` | 12.0 | 只有 CocoaPods / CocoaPods only | [PAG](https://pag.io)（AE 导出 / exported from After Effects） |
 | Rive | `CYLTabBarController/Rive` | `.riv` | 14.0 | 只有 CocoaPods / CocoaPods only | [Rive](https://rive.app) |
-| SVGA（#415） | `CYLTabBarController/SVGA` | `.svga` | 12.0 | 只有 CocoaPods；Protobuf 固定在 3.21 / CocoaPods only; Protobuf pinned to 3.21 | [SVGA](https://svga.dev)，[SVGA-Animation](SVGA-Animation.md) |
+| SVGA（#415） | `CYLTabBarController/SVGA` | `.svga` | 12.0 | 只有 CocoaPods；播放器 SVGAPlayerLite（维护分支，Protobuf 3.27） / CocoaPods only; player SVGAPlayerLite (maintained fork, Protobuf 3.27) | [SVGA](https://svga.dev)，[SVGA-Animation](SVGA-Animation.md) |
 | GIF | `CYLTabBarController/GIF` | `.gif` | 12.0 | SPM、Carthage（通用 key / generic keys） | 任意 GIF，见 [GIF-Animation.md](GIF-Animation.md) / Any GIF, see [GIF-Animation.md](GIF-Animation.md) |
 
 | 中文 | English |

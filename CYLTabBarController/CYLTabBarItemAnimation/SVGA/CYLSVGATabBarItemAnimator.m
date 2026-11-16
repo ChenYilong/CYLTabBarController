@@ -19,7 +19,11 @@
 // [EN] FIX: issue #415 — only with SVGAPlayer (`CYL_SVGA_AVAILABLE`, the SVGA subspec); without it this file is empty.
 // [CN] 仅在引入 SVGAPlayer 时编译（`CYL_SVGA_AVAILABLE`，SVGA 子库）；未引入时本文件为空。
 #if CYL_SVGA_AVAILABLE
-#if __has_include(<SVGAPlayer/SVGA.h>)
+// [EN] SVGAPlayerLite (the SVGA subspec's maintained fork) first; the original SVGAPlayer pod works too.
+// [CN] 优先使用 SVGAPlayerLite（SVGA 子库依赖的维护分支）；原版 SVGAPlayer pod 同样可用。
+#if __has_include(<SVGAPlayerLite/SVGA.h>)
+#import <SVGAPlayerLite/SVGA.h>
+#elif __has_include(<SVGAPlayer/SVGA.h>)
 #import <SVGAPlayer/SVGA.h>
 #else
 #import "SVGA.h"

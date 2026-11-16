@@ -201,11 +201,12 @@ Pod::Spec.new do |s|
     svga.dependency 'CYLTabBarController/CYLTabBarItemAnimation'
     svga.source_files = 'CYLTabBarController/CYLTabBarItemAnimation/SVGA/*.{h,m}'
     svga.public_header_files = 'CYLTabBarController/CYLTabBarItemAnimation/SVGA/*.h'
-    svga.dependency 'SVGAPlayer', '~> 2.5'
-    # SVGAPlayer 2.5.7's generated protobuf files (pbobjc) need the runtime of Protobuf 3.21: 3.22+ removed what they call
-    # (OSAtomicCompareAndSwapPtrBarrier), so they no longer build. SVGAPlayer 2.5.7 生成的 protobuf 文件需要 Protobuf 3.21 的运行时：
-    # 3.22 起移除了其调用的 OSAtomicCompareAndSwapPtrBarrier，无法编译。
-    svga.dependency 'Protobuf', '~> 3.21.0'
+    # SVGAPlayerLite: a maintained fork of SVGAPlayer (svga/SVGAPlayer-iOS is archived; its last release, 2.5.7, is from
+    # 2021), with the same classes (SVGAPlayer, SVGAParser) and protobuf files generated for Protobuf 3.27, so the old pin to
+    # Protobuf 3.21 is gone. Apache-2.0. https://github.com/jfyGiveMeFive/SVGAPlayer-Lite
+    # SVGAPlayerLite：SVGAPlayer 的维护分支（svga/SVGAPlayer-iOS 已归档，最后版本 2.5.7 发布于 2021 年），类名相同（SVGAPlayer、SVGAParser），
+    # protobuf 文件为 Protobuf 3.27 重新生成，因此不再需要固定 Protobuf 3.21。Apache-2.0。
+    svga.dependency 'SVGAPlayerLite', '~> 1.0', '>= 1.0.8'
   end
 
   # FIX: issue #605 — GIF tab icons that play once when selected, like Lottie, PAG and Rive. A GIF given as an image
