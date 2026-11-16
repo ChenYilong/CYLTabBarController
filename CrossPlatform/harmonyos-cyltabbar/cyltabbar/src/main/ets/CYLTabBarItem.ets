@@ -56,6 +56,21 @@ export interface CYLTabBarItemAttributes {
   svgaDarkURL?: string;
   /** [EN] CYLTabBarSVGASize (vp); the image size when unset. [CN] SVGA 尺寸（vp）；未设置时用图片尺寸。 */
   svgaSize?: number;
+  /**
+   * [EN] CYLTabBarRiveFilePath: a rawfile path of a .riv file, with Rive options in its query
+   *      (`CYLTabBarAnimationURLWithOptions`), e.g. "rive/icons.riv?artboard=CHAT&stateMachine=CHAT_Interactivity&input=active".
+   *      Shown instead of the image and played when the tab is selected (`CYLRiveIcon`); the image when it cannot load.
+   * [CN] .riv 文件的 rawfile 路径，Rive 选项放在查询参数中。代替图片显示，Tab 选中时播放（`CYLRiveIcon`）；无法加载时显示图片。
+   */
+  riveFilePath?: string;
+  /**
+   * [EN] CYLTabBarRiveDarkFilePath: the .riv file in dark mode. [CN] 深色模式的 .riv 文件。
+   */
+  riveDarkFilePath?: string;
+  /**
+   * [EN] CYLTabBarRiveSize (vp); the image size when unset. [CN] Rive 尺寸（vp）；未设置时用图片尺寸。
+   */
+  riveSize?: number;
   /** [EN] CYLTabBarItemTitleColor: this tab's title color while not selected. [CN] 未选中时此 Tab 的标题颜色。 */
   titleColor?: ResourceColor;
   /** [EN] CYLTabBarItemSelectedTitleColor. [CN] 选中时此 Tab 的标题颜色。 */

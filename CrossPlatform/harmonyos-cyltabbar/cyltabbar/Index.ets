@@ -52,3 +52,10 @@ export {
   cyl_flatDesignHasPlusChildViewController
 } from './src/main/ets/CYLFlatDesignTabBar';
 export { CYLColor } from './src/main/ets/CYLColor';
+export {
+  CYLRiveIcon, CYLTabBarRiveURL, CYLTabBarRiveFilePath, CYLTabBarRiveSize, CYLTabBarRiveDarkURL, CYLTabBarRiveDarkFilePath,
+  CYLTabBarAnimationOptionRiveArtboard, CYLTabBarAnimationOptionRiveStateMachine, CYLTabBarAnimationOptionRiveActiveProperty,
+  CYLTabBarAnimationOptionRiveActiveDuration, CYLTabBarAnimationOptionRiveTriggerProperty, CYLTabBarAnimationOptionRiveInput,
+  CYLTabBarAnimationOptionRiveTriggerInput, CYLTabBarAnimationOptionRiveAnimation, CYLTabBarAnimationOptionRiveLegacyRuntime,
+  CYLTabBarAnimationURLWithOptions, cylRiveFileAndOptions, cylRiveRendererType, cylEnsureRiveInitialized
+} from './src/main/ets/CYLRiveTabBarItemAnimator';

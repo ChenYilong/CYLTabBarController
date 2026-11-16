@@ -825,5 +825,21 @@
   "CYLTabBarHostView loginStateDidChange": "`CYLTabBarController.loginStateDidChange(loggedIn)` (built; emulator check pending / 已编译，模拟器验证待做)",
   "CYLTabBarHostView language": "`CYLSetLocalizationLanguage(language)` (built; emulator check pending / 已编译，模拟器验证待做)",
   "CYLTabBarHostView didTapPlusButton": "`CYLTabBarController.plusButtonAction` (built; emulator check pending / 已编译，模拟器验证待做)",
-  "CYLTabBarHostView tabBarController": "the `CYLTabBarController` component itself (built; emulator check pending / 已编译，模拟器验证待做)"
+  "CYLTabBarHostView tabBarController": "the `CYLTabBarController` component itself (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLRiveTabBarItemAnimator": "`CYLRiveIcon` (CYLRiveTabBarItemAnimator.ets; @ohos/rive 1.0.4, Canvas renderer on the emulator) (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLRiveTabBarItemAnimator animator": "TODO: N/A on HarmonyOS: there is no animator registry; `cylTab` picks `CYLRiveIcon` when a tab has `riveFilePath`.",
+  "CYLTabBarRiveURL": "`CYLTabBarRiveURL` → `CYLTabBarItemAttributes.riveFilePath` (rawfile path with options; http(s) URLs not yet) (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarRiveFilePath": "`CYLTabBarRiveFilePath` → `CYLTabBarItemAttributes.riveFilePath` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarRiveSize": "`CYLTabBarRiveSize` → `CYLTabBarItemAttributes.riveSize` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarRiveDarkURL": "`CYLTabBarRiveDarkURL` → `CYLTabBarItemAttributes.riveDarkFilePath` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarRiveDarkFilePath": "`CYLTabBarRiveDarkFilePath` → `CYLTabBarItemAttributes.riveDarkFilePath` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarAnimationOptionRiveArtboard": "`CYLTabBarAnimationOptionRiveArtboard` (\"artboard\") (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarAnimationOptionRiveStateMachine": "`CYLTabBarAnimationOptionRiveStateMachine` (\"stateMachine\") (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarAnimationOptionRiveActiveProperty": "`CYLTabBarAnimationOptionRiveActiveProperty` (\"active\", view model boolean) (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarAnimationOptionRiveActiveDuration": "`CYLTabBarAnimationOptionRiveActiveDuration` (\"duration\", default 1 s; 0 keeps it) (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarAnimationOptionRiveTriggerProperty": "`CYLTabBarAnimationOptionRiveTriggerProperty` (\"trigger\") (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarAnimationOptionRiveInput": "`CYLTabBarAnimationOptionRiveInput` (\"input\", state machine boolean) (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarAnimationOptionRiveTriggerInput": "`CYLTabBarAnimationOptionRiveTriggerInput` (\"triggerInput\") (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarAnimationOptionRiveAnimation": "`CYLTabBarAnimationOptionRiveAnimation` (\"animation\", linear) (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarAnimationOptionRiveLegacyRuntime": "`CYLTabBarAnimationOptionRiveLegacyRuntime` (\"legacy\") (built; emulator check pending / 已编译，模拟器验证待做)"
 }

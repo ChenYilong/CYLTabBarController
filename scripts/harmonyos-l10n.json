@@ -46,7 +46,9 @@
     "Page: %@": "Page: %@",
     "Configuration file: %@": "Configuration file: %@",
     "Tab: %@": "Tab: %@",
-    "The image of this page's tab from the app's rawfile (the resource bundle of iOS); tap again to restore": "The image of this page's tab from the app's rawfile (the resource bundle of iOS); tap again to restore"
+    "The image of this page's tab from the app's rawfile (the resource bundle of iOS); tap again to restore": "The image of this page's tab from the app's rawfile (the resource bundle of iOS); tap again to restore",
+    "Rive Tab 图标（配置文件）": "Rive tab icons (configuration file)",
+    "CYLTabBarRiveURL：选中时驱动状态机输入 active，未选中时恢复": "CYLTabBarRiveURL: selecting a tab sets its state machine input active; deselecting resets it"
   },
   "zh-Hans": {
     "Previous tab (cyl_selectPreviousTab, issue #535)": "上一个 Tab（cyl_selectPreviousTab，issue #535）",
@@ -95,7 +97,9 @@
     "Page: %@": "页面：%@",
     "Configuration file: %@": "配置文件：%@",
     "Tab: %@": "Tab：%@",
-    "The image of this page's tab from the app's rawfile (the resource bundle of iOS); tap again to restore": "本页面 Tab 的图片来自应用的 rawfile（即 iOS 的资源 bundle）；再次点击恢复"
+    "The image of this page's tab from the app's rawfile (the resource bundle of iOS); tap again to restore": "本页面 Tab 的图片来自应用的 rawfile（即 iOS 的资源 bundle）；再次点击恢复",
+    "Rive Tab 图标（配置文件）": "Rive Tab 图标（配置文件）",
+    "CYLTabBarRiveURL：选中时驱动状态机输入 active，未选中时恢复": "CYLTabBarRiveURL：选中时驱动状态机输入 active，未选中时恢复"
   },
   "zh-Hant": {
     "Previous tab (cyl_selectPreviousTab, issue #535)": "上一個 Tab（cyl_selectPreviousTab，issue #535）",
@@ -144,7 +148,9 @@
     "Page: %@": "頁面：%@",
     "Configuration file: %@": "設定檔：%@",
     "Tab: %@": "Tab：%@",
-    "The image of this page's tab from the app's rawfile (the resource bundle of iOS); tap again to restore": "本頁面 Tab 的圖片來自 App 的 rawfile（即 iOS 的資源 bundle）；再次點擊復原"
+    "The image of this page's tab from the app's rawfile (the resource bundle of iOS); tap again to restore": "本頁面 Tab 的圖片來自 App 的 rawfile（即 iOS 的資源 bundle）；再次點擊復原",
+    "Rive Tab 图标（配置文件）": "Rive Tab 圖示（設定檔）",
+    "CYLTabBarRiveURL：选中时驱动状态机输入 active，未选中时恢复": "CYLTabBarRiveURL：選中時驅動狀態機輸入 active，未選中時恢復"
   },
   "de": {
     "Previous tab (cyl_selectPreviousTab, issue #535)": "Vorheriger Tab (cyl_selectPreviousTab, issue #535)",

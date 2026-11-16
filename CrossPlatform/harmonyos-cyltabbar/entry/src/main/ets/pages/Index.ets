@@ -392,6 +392,12 @@ struct Index {
       subtitle: CYLLocalizedString('CYLTabBarSVGAFilePath：选中时播放一次，未选中时显示第一帧'),
       action: () => this.push('pages/ConfigurationDemo', { file: 'configurations/cyl_tabbar_configuration_svga.json' } as DemoPushParams),
     } as DemoRow, {
+      // [EN] Rive tab icons from a configuration file (CYLTabBarRiveURL with artboard, stateMachine and input options), as
+      //      the iOS and Android Rive demos (the course's icons.riv). [CN] 来自配置文件的 Rive Tab 图标，与 iOS、Android 的 Rive 演示相同。
+      id: 'configuration-rive', title: CYLLocalizedString('Rive Tab 图标（配置文件）'),
+      subtitle: CYLLocalizedString('CYLTabBarRiveURL：选中时驱动状态机输入 active，未选中时恢复'),
+      action: () => this.push('pages/ConfigurationDemo', { file: 'configurations/cyl_tabbar_configuration_rive.json' } as DemoPushParams),
+    } as DemoRow, {
       // [EN] Item 44: broken and unusual files (A2–E1); each shows a typed error or the tab bar created safely.
       // [CN] 第 44 项：损坏与异常的文件（A2–E1）；每个显示错误或安全创建的 TabBar。
       id: 'configuration-failures', title: CYLLocalizedString('配置文件：模拟意外情况'),

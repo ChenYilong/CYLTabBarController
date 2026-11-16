@@ -73,6 +73,10 @@
       "value": "CYLTabBarItemBackgroundColor / CYLTabBarItemSelectedBackgroundColor"
     },
     {
+      "name": "cyl_l10n_687f0fbab628",
+      "value": "CYLTabBarRiveURL: selecting a tab sets its state machine input active; deselecting resets it"
+    },
+    {
       "name": "cyl_l10n_d7c01888e55e",
       "value": "CYLTabBarSVGAFilePath: plays once when selected, first frame otherwise"
     },
@@ -259,6 +263,10 @@
     {
       "name": "cyl_l10n_7aac5e07b16d",
       "value": "Right to left once"
+    },
+    {
+      "name": "cyl_l10n_e7d74cf8c9a3",
+      "value": "Rive tab icons (configuration file)"
     },
     {
       "name": "cyl_l10n_f0c792c049bc",

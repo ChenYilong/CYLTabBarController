@@ -6,6 +6,7 @@
   "author": "ChenYilong",
   "license": "MIT",
   "dependencies": {
-    "@ohos/lottie": "^2.0.38"
+    "@ohos/lottie": "^2.0.38",
+    "@ohos/rive": "1.0.4"
   }
 }

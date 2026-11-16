@@ -5,6 +5,7 @@ import { CYLPlusButton } from './CYLPlusButton';
 import { CYLBadge, CYLBadgeView } from './CYLBadge';
 import { CYLLottieIcon } from './CYLLottieIcon';
 import { CYLSVGAView } from './svga/CYLSVGAView';
+import { CYLRiveIcon } from './CYLRiveTabBarItemAnimator';
 import { CYLLocalizedString, cyl_textOf } from './CYLLocalization';
 
 import { vibrator } from '@kit.SensorServiceKit';
@@ -737,6 +738,9 @@ export struct CYLTabBarController {
     if (lottie) {
       return item.lottieSize ?? this.imageSize;
     }
+    if (this.cylRivePath(index) !== undefined) {
+      return item.riveSize ?? this.imageSize;
+    }
     // [EN] SVGA icons have their own size (issue list #11). [CN] SVGA 图标有自己的尺寸（问题 #11）。
     return this.cylSVGAPath(index) !== undefined ? (item.svgaSize ?? this.imageSize) : this.imageSize;
   }
@@ -786,6 +790,26 @@ export struct CYLTabBarController {
     return darkPath ?? item.svgaURL ?? item.svgaFilePath;
   }
 
+  /**
+   * [EN] The tabs whose Rive file failed to load: they show their image. [CN] Rive 文件加载失败的 Tab：它们显示图片。
+   */
+  @State cylRiveFailures: number[] = [];
+
+  /**
+   * [EN] The Rive file of a tab (the dark variant in dark mode), or undefined when it has none, when Lottie, GIF or image
+   *      URL attributes win, or when it failed to load.
+   * [CN] Tab 的 Rive 文件（深色模式取深色版本）；没有、被 Lottie、GIF 或图片 URL 属性覆盖或加载失败时为 undefined。
+   */
+  private cylRivePath(index: number): string | undefined {
+    const item = this.tabBarItemsAttributes[index];
+    if (item.lottieFilePath !== undefined || item.gifFilePath !== undefined || item.imageURL !== undefined
+      || this.cylRiveFailures.includes(index)) {
+      return undefined;
+    }
+    const dark = this.colorMode === 'dark';
+    return (dark ? item.riveDarkFilePath : undefined) ?? item.riveFilePath;
+  }
+
   @Builder
   cylTab(index: number) {
     Column() {
@@ -807,6 +831,16 @@ export struct CYLTabBarController {
             speed: this.tabBarItemAnimationSpeed,
             selected: this.selectedIndex === index,
             replayToken: this.replayTokens[index] ?? 0,
+          })
+        } else if (this.cylRivePath(index) !== undefined) {
+          CYLRiveIcon({
+            path: this.cylRivePath(index),
+            iconSize: this.tabBarItemsAttributes[index].riveSize ?? this.imageSize,
+            selected: this.selectedIndex === index,
+            replayToken: this.replayTokens[index] ?? 0,
+            onLoadError: (_message: string) => {
+              this.cylRiveFailures = this.cylRiveFailures.concat([index]);
+            },
           })
         } else if (this.cylSVGAPath(index) !== undefined) {
           CYLSVGAView({

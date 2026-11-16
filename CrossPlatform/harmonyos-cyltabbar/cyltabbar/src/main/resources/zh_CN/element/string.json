@@ -73,6 +73,10 @@
       "value": "CYLTabBarItemBackgroundColor / CYLTabBarItemSelectedBackgroundColor"
     },
     {
+      "name": "cyl_l10n_687f0fbab628",
+      "value": "CYLTabBarRiveURL：选中时驱动状态机输入 active，未选中时恢复"
+    },
+    {
       "name": "cyl_l10n_d7c01888e55e",
       "value": "CYLTabBarSVGAFilePath：选中时播放一次，未选中时显示第一帧"
     },
@@ -259,6 +263,10 @@
     {
       "name": "cyl_l10n_7aac5e07b16d",
       "value": "从右到左一次"
+    },
+    {
+      "name": "cyl_l10n_e7d74cf8c9a3",
+      "value": "Rive Tab 图标（配置文件）"
     },
     {
       "name": "cyl_l10n_f0c792c049bc",
