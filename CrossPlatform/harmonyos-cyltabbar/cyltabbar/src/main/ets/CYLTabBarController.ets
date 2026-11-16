@@ -4,6 +4,7 @@ import { CYLTabBarItemAttributes, CYLTitleOffset } from './CYLTabBarItem';
 import { CYLPlusButton } from './CYLPlusButton';
 import { CYLBadge, CYLBadgeView } from './CYLBadge';
 import { CYLLottieIcon } from './CYLLottieIcon';
+import { CYLSVGAView } from './svga/CYLSVGAView';
 import { CYLLocalizedString, cyl_textOf } from './CYLLocalization';
 
 import { vibrator } from '@kit.SensorServiceKit';
@@ -619,6 +620,26 @@ export struct CYLTabBarController {
     return pages;
   }
 
+  /**
+   * [EN] FIX: issue #415. The tabs whose SVGA file failed to load: they show their image. [CN] SVGA 文件加载失败的 Tab：它们显示图片。
+   */
+  @State cylSVGAFailures: number[] = [];
+
+  /**
+   * [EN] FIX: issue #415. The SVGA file of a tab (URL first, the dark variant in dark mode), or undefined when it has none,
+   *      when GIF or image URL attributes win (as for Lottie), or when it failed to load.
+   * [CN] FIX: issue #415。Tab 的 SVGA 文件（先取 URL，深色模式取深色版本）；没有、被 GIF 或图片 URL 属性覆盖（与 Lottie 相同）或加载失败时为 undefined。
+   */
+  private cylSVGAPath(index: number): string | undefined {
+    const item = this.tabBarItemsAttributes[index];
+    if (item.gifFilePath !== undefined || item.imageURL !== undefined || this.cylSVGAFailures.includes(index)) {
+      return undefined;
+    }
+    const dark = this.colorMode === 'dark';
+    const darkPath = dark ? (item.svgaDarkURL ?? item.svgaDarkFilePath) : undefined;
+    return darkPath ?? item.svgaURL ?? item.svgaFilePath;
+  }
+
   @Builder
   cylTab(index: number) {
     Column() {
@@ -639,6 +660,16 @@ export struct CYLTabBarController {
             speed: this.tabBarItemAnimationSpeed,
             selected: this.selectedIndex === index,
             replayToken: this.replayTokens[index] ?? 0,
+          })
+        } else if (this.cylSVGAPath(index) !== undefined) {
+          CYLSVGAView({
+            path: this.cylSVGAPath(index),
+            iconSize: this.tabBarItemsAttributes[index].svgaSize ?? this.imageSize,
+            selected: this.selectedIndex === index,
+            replayToken: this.replayTokens[index] ?? 0,
+            onLoadError: (_message: string) => {
+              this.cylSVGAFailures = this.cylSVGAFailures.concat([index]);
+            },
           })
         } else {
         Image(this.cylIcon(index))

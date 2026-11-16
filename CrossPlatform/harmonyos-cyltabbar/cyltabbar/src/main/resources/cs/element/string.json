@@ -57,6 +57,10 @@
       "value": "CYLTabBarItemBackgroundColor / CYLTabBarItemSelectedBackgroundColor"
     },
     {
+      "name": "cyl_l10n_d7c01888e55e",
+      "value": "CYLTabBarSVGAFilePath: plays once when selected, first frame otherwise"
+    },
+    {
       "name": "cyl_l10n_132201f60522",
       "value": "CYLUtils: slabé přidružené objekty a hledání tlačítka (issue #535)"
     },
@@ -211,6 +215,10 @@
     {
       "name": "cyl_l10n_401ea21c7a44",
       "value": "Rotace (nekonečně)"
+    },
+    {
+      "name": "cyl_l10n_bd001817e373",
+      "value": "SVGA tab icons (configuration file)"
     },
     {
       "name": "cyl_l10n_b5fcd68edd9f",

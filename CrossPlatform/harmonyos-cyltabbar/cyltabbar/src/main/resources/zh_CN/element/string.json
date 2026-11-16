@@ -57,6 +57,10 @@
       "value": "CYLTabBarItemBackgroundColor / CYLTabBarItemSelectedBackgroundColor"
     },
     {
+      "name": "cyl_l10n_d7c01888e55e",
+      "value": "CYLTabBarSVGAFilePath：选中时播放一次，未选中时显示第一帧"
+    },
+    {
       "name": "cyl_l10n_132201f60522",
       "value": "CYLUtils 弱引用关联对象与查找按钮（issue #535）"
     },
@@ -211,6 +215,10 @@
     {
       "name": "cyl_l10n_401ea21c7a44",
       "value": "旋转（持续）"
+    },
+    {
+      "name": "cyl_l10n_bd001817e373",
+      "value": "SVGA Tab 图标（配置文件）"
     },
     {
       "name": "cyl_l10n_b5fcd68edd9f",

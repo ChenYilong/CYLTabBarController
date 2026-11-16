@@ -354,7 +354,13 @@ struct Index {
         action: () => this.push('pages/ConfigurationDemo', { file: `configurations/cyl_tabbar_configuration.${format}` } as DemoPushParams),
       };
       return row;
-    });
+    }).concat([{
+      // [EN] FIX: issue #415: SVGA tab icons from a configuration file (CYLTabBarSVGAFilePath, CYLTabBarSVGASize), as the
+      //      iOS, Android, React Native, Flutter and mini program demos. [CN] FIX: issue #415：来自配置文件的 SVGA Tab 图标。
+      id: 'configuration-svga', title: CYLLocalizedString('SVGA Tab 图标（配置文件）'),
+      subtitle: CYLLocalizedString('CYLTabBarSVGAFilePath：选中时播放一次，未选中时显示第一帧'),
+      action: () => this.push('pages/ConfigurationDemo', { file: 'configurations/cyl_tabbar_configuration_svga.json' } as DemoPushParams),
+    } as DemoRow]);
   }
 
   /** [EN] The badge rows of a page (items 50, 53), each with its action as BadgeRows of the Android port. [CN] 页面的角标行。 */
