@@ -529,6 +529,10 @@
       "value": "Ortalanmış kapsül"
     },
     {
+      "name": "cyl_l10n_f613681ddf31",
+      "value": "%@ simülasyonun tümünü göster"
+    },
+    {
       "name": "cyl_l10n_7c87af044929",
       "value": "Kaydırarak sekme değiştir (issue #535)"
     },
@@ -555,6 +559,10 @@
     {
       "name": "cyl_l10n_07b181184280",
       "value": "Ben"
+    },
+    {
+      "name": "cyl_l10n_97a6bedeb7fd",
+      "value": "Elle: kaydırırken gizlemeyi açmak için dokunun, TabBar'ı gizlemek için aşağı kaydırın, sonra başlıktakini yapın. Beklenen: TabBar hemen geri gelir."
     },
     {
       "name": "cyl_l10n_a01539048bb0",
@@ -587,6 +595,10 @@
     {
       "name": "cyl_l10n_09d0fdddca66",
       "value": "Görünümler: bayramlar ve renkler (%@)"
+    },
+    {
+      "name": "cyl_l10n_3de5855e2c7f",
+      "value": "Simülasyon listesini daralt"
     },
     {
       "name": "cyl_l10n_a0ffdf359138",
@@ -667,6 +679,10 @@
     {
       "name": "cyl_l10n_9f44bafc75c6",
       "value": "Kaydırırken TabBar'ı küçült / gizle (issue #13)"
+    },
+    {
+      "name": "cyl_l10n_8625f5f225d7",
+      "value": "Kaydırırken gizle: kesintileri simüle et (issue #13)"
     },
     {
       "name": "cyl_l10n_678abebe6aac",

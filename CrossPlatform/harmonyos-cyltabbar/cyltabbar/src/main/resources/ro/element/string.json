@@ -529,6 +529,10 @@
       "value": "Capsulă centrată"
     },
     {
+      "name": "cyl_l10n_f613681ddf31",
+      "value": "Afișează toate cele %@ simulări"
+    },
+    {
       "name": "cyl_l10n_7c87af044929",
       "value": "Glisare pentru schimbarea filei (issue #535)"
     },
@@ -555,6 +559,10 @@
     {
       "name": "cyl_l10n_07b181184280",
       "value": "Eu"
+    },
+    {
+      "name": "cyl_l10n_97a6bedeb7fd",
+      "value": "Manual: atingeți pentru a activa ascunderea la derulare, derulați în jos pentru a ascunde TabBar, apoi faceți ce spune titlul. Așteptat: TabBar revine imediat."
     },
     {
       "name": "cyl_l10n_a01539048bb0",
@@ -587,6 +595,10 @@
     {
       "name": "cyl_l10n_09d0fdddca66",
       "value": "Aspecte: sărbători și culori (%@)"
+    },
+    {
+      "name": "cyl_l10n_3de5855e2c7f",
+      "value": "Restrânge lista de simulări"
     },
     {
       "name": "cyl_l10n_a0ffdf359138",
@@ -667,6 +679,10 @@
     {
       "name": "cyl_l10n_9f44bafc75c6",
       "value": "Micșorează / ascunde TabBar la derulare (issue #13)"
+    },
+    {
+      "name": "cyl_l10n_8625f5f225d7",
+      "value": "Ascundere la derulare: simularea întreruperilor (issue #13)"
     },
     {
       "name": "cyl_l10n_678abebe6aac",

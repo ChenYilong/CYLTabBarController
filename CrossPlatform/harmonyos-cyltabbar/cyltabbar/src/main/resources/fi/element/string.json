@@ -529,6 +529,10 @@
       "value": "Keskitetty kapseli"
     },
     {
+      "name": "cyl_l10n_f613681ddf31",
+      "value": "Näytä kaikki %@ simulaatiota"
+    },
+    {
       "name": "cyl_l10n_7c87af044929",
       "value": "Vaihda välilehteä pyyhkäisemällä (issue #535)"
     },
@@ -555,6 +559,10 @@
     {
       "name": "cyl_l10n_07b181184280",
       "value": "Minä"
+    },
+    {
+      "name": "cyl_l10n_97a6bedeb7fd",
+      "value": "Manuaalinen: napauta ottaaksesi piilotuksen vieritettäessä käyttöön, vieritä alas piilottaaksesi TabBarin ja tee otsikon mukaan. Odotettu: TabBar palaa heti."
     },
     {
       "name": "cyl_l10n_a01539048bb0",
@@ -587,6 +595,10 @@
     {
       "name": "cyl_l10n_09d0fdddca66",
       "value": "Ulkoasut: juhlapyhät ja värit (%@)"
+    },
+    {
+      "name": "cyl_l10n_3de5855e2c7f",
+      "value": "Tiivistä simulaatioluettelo"
     },
     {
       "name": "cyl_l10n_a0ffdf359138",
@@ -667,6 +679,10 @@
     {
       "name": "cyl_l10n_9f44bafc75c6",
       "value": "Pienennä / piilota TabBar vieritettäessä (issue #13)"
+    },
+    {
+      "name": "cyl_l10n_8625f5f225d7",
+      "value": "Piilota vieritettäessä: simuloi keskeytyksiä (issue #13)"
     },
     {
       "name": "cyl_l10n_678abebe6aac",

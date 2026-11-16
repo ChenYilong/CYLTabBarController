@@ -529,6 +529,10 @@
       "value": "Centered capsule"
     },
     {
+      "name": "cyl_l10n_f613681ddf31",
+      "value": "Show all %@ simulations"
+    },
+    {
       "name": "cyl_l10n_7c87af044929",
       "value": "Swipe to switch tabs (issue #535)"
     },
@@ -555,6 +559,10 @@
     {
       "name": "cyl_l10n_07b181184280",
       "value": "Me"
+    },
+    {
+      "name": "cyl_l10n_97a6bedeb7fd",
+      "value": "Manual: tap to turn scroll hiding on, scroll down to hide the TabBar, then do what the title says. Expected: the TabBar comes back at once."
     },
     {
       "name": "cyl_l10n_a01539048bb0",
@@ -587,6 +595,10 @@
     {
       "name": "cyl_l10n_09d0fdddca66",
       "value": "Skins: holidays and colors (%@)"
+    },
+    {
+      "name": "cyl_l10n_3de5855e2c7f",
+      "value": "Collapse the simulation list"
     },
     {
       "name": "cyl_l10n_a0ffdf359138",
@@ -667,6 +679,10 @@
     {
       "name": "cyl_l10n_9f44bafc75c6",
       "value": "Minimize / hide the TabBar on scroll (issue #13)"
+    },
+    {
+      "name": "cyl_l10n_8625f5f225d7",
+      "value": "Scroll hiding: simulate interruptions (issue #13)"
     },
     {
       "name": "cyl_l10n_678abebe6aac",

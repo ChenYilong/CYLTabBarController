@@ -529,6 +529,10 @@
       "value": "Gecentreerde capsule"
     },
     {
+      "name": "cyl_l10n_f613681ddf31",
+      "value": "Alle %@ simulaties tonen"
+    },
+    {
       "name": "cyl_l10n_7c87af044929",
       "value": "Vegen om van tabblad te wisselen (issue #535)"
     },
@@ -555,6 +559,10 @@
     {
       "name": "cyl_l10n_07b181184280",
       "value": "Ik"
+    },
+    {
+      "name": "cyl_l10n_97a6bedeb7fd",
+      "value": "Handmatig: tik om verbergen bij scrollen aan te zetten, scrol omlaag om de TabBar te verbergen en doe dan wat de titel zegt. Verwacht: de TabBar komt meteen terug."
     },
     {
       "name": "cyl_l10n_a01539048bb0",
@@ -587,6 +595,10 @@
     {
       "name": "cyl_l10n_09d0fdddca66",
       "value": "Skins: feestdagen en kleuren (%@)"
+    },
+    {
+      "name": "cyl_l10n_3de5855e2c7f",
+      "value": "Simulatielijst inklappen"
     },
     {
       "name": "cyl_l10n_a0ffdf359138",
@@ -667,6 +679,10 @@
     {
       "name": "cyl_l10n_9f44bafc75c6",
       "value": "TabBar verkleinen / verbergen bij scrollen (issue #13)"
+    },
+    {
+      "name": "cyl_l10n_8625f5f225d7",
+      "value": "Verbergen bij scrollen: onderbrekingen simuleren (issue #13)"
     },
     {
       "name": "cyl_l10n_678abebe6aac",

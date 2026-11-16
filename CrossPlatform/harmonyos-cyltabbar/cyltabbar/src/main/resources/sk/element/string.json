@@ -529,6 +529,10 @@
       "value": "Kapsula v strede"
     },
     {
+      "name": "cyl_l10n_f613681ddf31",
+      "value": "Zobraziť všetkých %@ simulácií"
+    },
+    {
       "name": "cyl_l10n_7c87af044929",
       "value": "Prepínanie kariet potiahnutím (issue #535)"
     },
@@ -555,6 +559,10 @@
     {
       "name": "cyl_l10n_07b181184280",
       "value": "Ja"
+    },
+    {
+      "name": "cyl_l10n_97a6bedeb7fd",
+      "value": "Ručne: klepnutím zapnite skrývanie pri posúvaní, posuňte nadol, aby sa TabBar skryl, a urobte, čo hovorí názov. Očakávané: TabBar sa hneď vráti."
     },
     {
       "name": "cyl_l10n_a01539048bb0",
@@ -587,6 +595,10 @@
     {
       "name": "cyl_l10n_09d0fdddca66",
       "value": "Vzhľady: sviatky a farby (%@)"
+    },
+    {
+      "name": "cyl_l10n_3de5855e2c7f",
+      "value": "Zbaliť zoznam simulácií"
     },
     {
       "name": "cyl_l10n_a0ffdf359138",
@@ -667,6 +679,10 @@
     {
       "name": "cyl_l10n_9f44bafc75c6",
       "value": "Zmenšiť / skryť TabBar pri posúvaní (issue #13)"
+    },
+    {
+      "name": "cyl_l10n_8625f5f225d7",
+      "value": "Skrytie pri posúvaní: simulácia prerušení (issue #13)"
     },
     {
       "name": "cyl_l10n_678abebe6aac",

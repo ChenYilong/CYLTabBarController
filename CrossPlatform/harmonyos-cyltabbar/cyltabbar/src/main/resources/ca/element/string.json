@@ -529,6 +529,10 @@
       "value": "Càpsula centrada"
     },
     {
+      "name": "cyl_l10n_f613681ddf31",
+      "value": "Mostra les %@ simulacions"
+    },
+    {
       "name": "cyl_l10n_7c87af044929",
       "value": "Llisca per canviar de pestanya (issue #535)"
     },
@@ -555,6 +559,10 @@
     {
       "name": "cyl_l10n_07b181184280",
       "value": "Jo"
+    },
+    {
+      "name": "cyl_l10n_97a6bedeb7fd",
+      "value": "Manual: toca per activar l'amagat en desplaçar, desplaça't cap avall per amagar la TabBar i fes el que diu el títol. Esperat: la TabBar torna de seguida."
     },
     {
       "name": "cyl_l10n_a01539048bb0",
@@ -587,6 +595,10 @@
     {
       "name": "cyl_l10n_09d0fdddca66",
       "value": "Aspectes: festes i colors (%@)"
+    },
+    {
+      "name": "cyl_l10n_3de5855e2c7f",
+      "value": "Amaga la llista de simulacions"
     },
     {
       "name": "cyl_l10n_a0ffdf359138",
@@ -667,6 +679,10 @@
     {
       "name": "cyl_l10n_9f44bafc75c6",
       "value": "Minimitza / amaga la TabBar en desplaçar (issue #13)"
+    },
+    {
+      "name": "cyl_l10n_8625f5f225d7",
+      "value": "Amagar en desplaçar: simular interrupcions (issue #13)"
     },
     {
       "name": "cyl_l10n_678abebe6aac",

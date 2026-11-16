@@ -9,6 +9,8 @@ import {
 } from 'cyltabbar';
 import { CYLLocalizedString, cyl_localizationKey, cyl_badgeAccessibilityText } from 'cyltabbar';
 import { DemoTheme, DEMO_THEMES, demoRegisterThemes } from '../demo/DemoThemes';
+import { DemoScrollKind, DemoScrollSimulation, DEMO_SCROLL_SIMULATIONS, demoScrollKindName } from '../demo/DemoScrollHide';
+import { cyl_restoreTabBar } from 'cyltabbar';
 import { DemoFlatDesignButton } from '../demo/DemoFlatDesign';
 import { DemoLiquidGlassButton } from '../demo/DemoLiquidGlass';
 import { CYLTabBarStyleType, CYLFlatDesignTintColor, CYLFlatDesignUnselectedColor, CYLLiquidGlassTintColor, CYLLiquidGlassSelectionColor } from 'cyltabbar';
@@ -109,6 +111,10 @@ struct Index {
   @State minimizeBehavior: CYLTabBarMinimizeBehavior = CYLTabBarMinimizeBehavior.Never;
   /** [EN] Items 9, 15, 32: the current skin (CYLThemeManager). [CN] 第 9、15、32 项：当前皮肤。 */
   @State theme: DemoTheme = DEMO_THEMES[0];
+  /** [EN] Item 20: whether scrolling left the bar shown, and the result of each simulation. [CN] 第 20 项：滚动后 TabBar 是否显示，以及每个模拟的结果。 */
+  @State scrollBarVisible: boolean = true;
+  @State scrollResults: Map<number, string> = new Map();
+  @State scrollListExpanded: boolean = false;
   /** [EN] Item 7: the tab bar style and the key of the tab bar on screen (a new key builds a new one). [CN] 第 7 项：TabBar 样式与当前 TabBar 的 key（新 key 会新建 TabBar）。 */
   @State styleType: CYLTabBarStyleType = CYLTabBarStyleType.Default;
   @State tabBarKey: number = 0;
@@ -633,6 +639,167 @@ struct Index {
     ];
   }
 
+  /** [EN] The page shown again (a pop, the app back in front) is an interruption (issue #13). [CN] 页面重新显示视为意外情况。 */
+  onPageShow(): void {
+    cyl_restoreTabBar();
+  }
+
+  private demoScrollVisible(): boolean {
+    return this.scrollBarVisible && !this.tabBarHidden;
+  }
+
+  /** [EN] Hides the bar as a scroll down would (OnScrollDown), before a simulation. [CN] 模拟前像向下滚动一样隐藏 TabBar。 */
+  private demoHideByScroll(done: () => void): void {
+    this.minimizeBehavior = CYLTabBarMinimizeBehavior.OnScrollDown;
+    setTimeout(() => {
+      cyl_reportScroll(40);
+      setTimeout(done, 700);
+    }, 700);
+  }
+
+  /** [EN] Runs one simulation's action; `quiet` uses toasts instead of modal dialogs (self-test). [CN] 运行一个模拟的动作。 */
+  private demoRunScrollAction(sim: DemoScrollSimulation, quiet: boolean, done: () => void): void {
+    const ui = this.getUIContext();
+    switch (sim.action) {
+      case 'dialog':
+        if (quiet) {
+          ui.getPromptAction().showToast({ message: sim.title });
+        } else {
+          ui.getPromptAction().showDialog({ title: sim.title, buttons: [{ text: CYLLocalizedString('OK'), color: '#007AFF' }] }).catch(() => {});
+        }
+        // [EN] Presenting is an interruption: the app restores the bar. [CN] 弹出视为意外情况：App 恢复 TabBar。
+        cyl_restoreTabBar();
+        done();
+        break;
+      case 'actionMenu':
+        if (!quiet) {
+          ui.getPromptAction().showActionMenu({ title: sim.title, buttons: [{ text: CYLLocalizedString('OK'), color: '#007AFF' }] }).catch(() => {});
+        }
+        cyl_restoreTabBar();
+        done();
+        break;
+      case 'push':
+      case 'pushHidden':
+        ui.getRouter().pushUrl({ url: 'pages/TextPage', params: { title: sim.title, color: '#5AC8FA', hidesNavigationBar: sim.action === 'pushHidden' } as DemoPushParams });
+        setTimeout(() => {
+          ui.getRouter().back();
+          setTimeout(done, 700);
+        }, 800);
+        break;
+      case 'nextTab': {
+        const from = this.selectedIndex;
+        this.selectedIndex = (from + 1) % CYL_TABS.length;
+        setTimeout(() => {
+          this.selectedIndex = from;
+          done();
+        }, 500);
+        break;
+      }
+      case 'memoryWarning':
+        cyl_simulateMemoryWarning();
+        done();
+        break;
+      case 'scrollUp':
+        cyl_reportScroll(-40);
+        done();
+        break;
+      case 'scrollDown':
+        cyl_reportScroll(40);
+        done();
+        break;
+      case 'hideApp':
+        this.tabBarHidden = true;
+        setTimeout(() => this.tabBarHidden = false, 4000);
+        done();
+        break;
+      case 'toggleHidesOnScroll':
+        this.minimizeBehavior = CYLTabBarMinimizeBehavior.Never;
+        setTimeout(() => {
+          this.minimizeBehavior = CYLTabBarMinimizeBehavior.OnScrollDown;
+          done();
+        }, 300);
+        break;
+      case 'sameTab': {
+        const same = this.selectedIndex;
+        this.selectedIndex = same;
+        done();
+        break;
+      }
+      case 'hidesOnScrollAgain':
+        this.minimizeBehavior = CYLTabBarMinimizeBehavior.OnScrollDown;
+        done();
+        break;
+      case 'showApp':
+        this.tabBarHidden = true;
+        setTimeout(() => {
+          this.tabBarHidden = false;
+          done();
+        }, 300);
+        break;
+      default:
+        done();
+        break;
+    }
+  }
+
+  /** [EN] Runs a simulation 1.5 s after the tap (iOS timing) and records PASS / FAIL. [CN] 点击 1.5 秒后运行模拟并记录结果。 */
+  private demoRunScrollSimulation(index: number, quiet: boolean, done?: () => void): void {
+    const sim = DEMO_SCROLL_SIMULATIONS[index];
+    if (sim.kind === DemoScrollKind.NotApplicable || sim.kind === DemoScrollKind.Manual) {
+      this.toast(sim.kind === DemoScrollKind.Manual ? CYLLocalizedString('手动操作：点击开启滚动隐藏，向下滚动隐藏 TabBar 后按标题操作。预期：TabBar 立即恢复显示。') : `${sim.title}: N/A on HarmonyOS`);
+      done?.();
+      return;
+    }
+    const start = (): void => {
+      this.demoRunScrollAction(sim, quiet, () => {
+        setTimeout(() => {
+          const visible = this.demoScrollVisible();
+          const pass = visible === sim.expectsVisible;
+          const results = new Map<number, string>(this.scrollResults);
+          results.set(index, `${pass ? 'PASS' : 'FAIL'}: ${visible ? 'shown' : 'hidden'}`);
+          this.scrollResults = results;
+          done?.();
+        }, 400);
+      });
+    };
+    setTimeout(() => this.demoHideByScroll(start), quiet ? 0 : 1500);
+  }
+
+  /** [EN] The self-test: every automatic simulation in turn. [CN] 自检：依次运行所有自动模拟。 */
+  private demoRunScrollSelfTest(): void {
+    const automatic = DEMO_SCROLL_SIMULATIONS.map((sim: DemoScrollSimulation, i: number) => i)
+      .filter((i: number) => DEMO_SCROLL_SIMULATIONS[i].kind === DemoScrollKind.Restore || DEMO_SCROLL_SIMULATIONS[i].kind === DemoScrollKind.Keep);
+    const next = (k: number): void => {
+      if (k >= automatic.length) {
+        const fails = automatic.filter((i: number) => (this.scrollResults.get(i) ?? '').startsWith('FAIL')).length;
+        this.toast(`Self-test: ${automatic.length - fails} PASS, ${fails} FAIL`);
+        return;
+      }
+      this.demoRunScrollSimulation(automatic[k], true, () => setTimeout(() => next(k + 1), DEMO_SCROLL_SIMULATIONS[automatic[k]].action === 'hideApp' ? 4300 : 300));
+    };
+    next(0);
+  }
+
+  /** [EN] Item 20 rows. [CN] 第 20 项的行。 */
+  private scrollSimulationRows(): DemoRow[] {
+    const rows: DemoRow[] = [];
+    DEMO_SCROLL_SIMULATIONS.forEach((sim: DemoScrollSimulation, index: number) => {
+      if (!this.scrollListExpanded && index >= 6 && sim.kind !== DemoScrollKind.SelfTest) {
+        return;
+      }
+      rows.push({
+        id: `scroll-sim-${index + 1}`, title: `${index + 1}. ${sim.title}`,
+        subtitle: `${demoScrollKindName(sim.kind)}${this.scrollResults.has(index) ? ' · ' + this.scrollResults.get(index) : ''}`,
+        action: () => sim.kind === DemoScrollKind.SelfTest ? this.demoRunScrollSelfTest() : this.demoRunScrollSimulation(index, false),
+      });
+    });
+    rows.push({
+      id: 'scroll-sim-expand', title: this.scrollListExpanded ? CYLLocalizedString('收起模拟列表') : CYLLocalizedString('展开全部 %@ 个模拟', DEMO_SCROLL_SIMULATIONS.length),
+      action: () => this.scrollListExpanded = !this.scrollListExpanded,
+    });
+    return rows;
+  }
+
   /** [EN] Messages: push tab bar controllers (item 52, issue #202). [CN] 消息页：push TabBarController（第 52 项，issue #202）。 */
   private messageRows(): DemoRow[] {
     return [
@@ -705,6 +872,7 @@ struct Index {
     return [
       { title: CYLLocalizedString('通用'), rows: this.generalRows() },
       { title: CYLLocalizedString('TabBar 外观'), rows: this.appearanceRows() },
+      { title: CYLLocalizedString('滚动隐藏：模拟意外情况（issue #13）'), rows: this.scrollSimulationRows() },
       { title: CYLLocalizedString('原地更新 Tab'), rows: this.tabItemUpdateRows(page) },
       { title: CYLLocalizedString('Tab 页面、选中与登录'), rows: this.pageRows(page) },
       { title: 'PlusButton', rows: this.plusButtonRows() },
@@ -906,6 +1074,7 @@ struct Index {
         tapSoundEnabled: this.feedbackStep === 1 || this.feedbackStep === 2 || this.feedbackStep === 6,
         tapSoundPath: this.feedbackStep === 2 ? 'cyl_tap_tock.wav' : 'cyl_tap_click.wav',
         tabBarMinimizeBehavior: this.minimizeBehavior,
+        tabBarVisibilityDidChange: (visible: boolean) => this.scrollBarVisible = visible,
         longPressDuration: [300, 500, 1000][this.longPressIndex],
         doubleTapInterval: [200, 300, 500][this.doubleTapIndex],
         swipeToSwitchTabEnabled: this.swipeEnabled,

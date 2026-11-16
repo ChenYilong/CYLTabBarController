@@ -529,6 +529,10 @@
       "value": "居中胶囊"
     },
     {
+      "name": "cyl_l10n_f613681ddf31",
+      "value": "展开全部 %@ 个模拟"
+    },
+    {
       "name": "cyl_l10n_7c87af044929",
       "value": "左右滑动切换 Tab（issue #535）"
     },
@@ -555,6 +559,10 @@
     {
       "name": "cyl_l10n_07b181184280",
       "value": "我的"
+    },
+    {
+      "name": "cyl_l10n_97a6bedeb7fd",
+      "value": "手动操作：点击开启滚动隐藏，向下滚动隐藏 TabBar 后按标题操作。预期：TabBar 立即恢复显示。"
     },
     {
       "name": "cyl_l10n_a01539048bb0",
@@ -587,6 +595,10 @@
     {
       "name": "cyl_l10n_09d0fdddca66",
       "value": "换肤：节日与配色主题（%@ 种）"
+    },
+    {
+      "name": "cyl_l10n_3de5855e2c7f",
+      "value": "收起模拟列表"
     },
     {
       "name": "cyl_l10n_a0ffdf359138",
@@ -667,6 +679,10 @@
     {
       "name": "cyl_l10n_9f44bafc75c6",
       "value": "滚动时缩小 / 隐藏 TabBar（issue #13）"
+    },
+    {
+      "name": "cyl_l10n_8625f5f225d7",
+      "value": "滚动隐藏：模拟意外情况（issue #13）"
     },
     {
       "name": "cyl_l10n_678abebe6aac",

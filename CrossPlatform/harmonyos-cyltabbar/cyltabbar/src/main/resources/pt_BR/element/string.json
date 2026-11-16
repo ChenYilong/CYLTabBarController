@@ -529,6 +529,10 @@
       "value": "Cápsula centralizada"
     },
     {
+      "name": "cyl_l10n_f613681ddf31",
+      "value": "Mostrar todas as %@ simulações"
+    },
+    {
       "name": "cyl_l10n_7c87af044929",
       "value": "Deslizar para trocar de aba (issue #535)"
     },
@@ -555,6 +559,10 @@
     {
       "name": "cyl_l10n_07b181184280",
       "value": "Eu"
+    },
+    {
+      "name": "cyl_l10n_97a6bedeb7fd",
+      "value": "Manual: toque para ativar o ocultar ao rolar, role para baixo para ocultar a TabBar e faça o que o título diz. Esperado: a TabBar volta na hora."
     },
     {
       "name": "cyl_l10n_a01539048bb0",
@@ -587,6 +595,10 @@
     {
       "name": "cyl_l10n_09d0fdddca66",
       "value": "Temas visuais: festas e cores (%@)"
+    },
+    {
+      "name": "cyl_l10n_3de5855e2c7f",
+      "value": "Recolher a lista de simulações"
     },
     {
       "name": "cyl_l10n_a0ffdf359138",
@@ -667,6 +679,10 @@
     {
       "name": "cyl_l10n_9f44bafc75c6",
       "value": "Minimizar / ocultar a TabBar ao rolar (issue #13)"
+    },
+    {
+      "name": "cyl_l10n_8625f5f225d7",
+      "value": "Ocultar ao rolar: simular interrupções (issue #13)"
     },
     {
       "name": "cyl_l10n_678abebe6aac",

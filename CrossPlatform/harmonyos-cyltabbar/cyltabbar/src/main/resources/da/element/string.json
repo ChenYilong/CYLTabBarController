@@ -529,6 +529,10 @@
       "value": "Centreret kapsel"
     },
     {
+      "name": "cyl_l10n_f613681ddf31",
+      "value": "Vis alle %@ simuleringer"
+    },
+    {
       "name": "cyl_l10n_7c87af044929",
       "value": "Stryg for at skifte fane (issue #535)"
     },
@@ -555,6 +559,10 @@
     {
       "name": "cyl_l10n_07b181184280",
       "value": "Mig"
+    },
+    {
+      "name": "cyl_l10n_97a6bedeb7fd",
+      "value": "Manuelt: tryk for at slå skjul ved rulning til, rul ned for at skjule TabBar, og gør så det, titlen siger. Forventet: TabBar kommer straks tilbage."
     },
     {
       "name": "cyl_l10n_a01539048bb0",
@@ -587,6 +595,10 @@
     {
       "name": "cyl_l10n_09d0fdddca66",
       "value": "Udseender: højtider og farver (%@)"
+    },
+    {
+      "name": "cyl_l10n_3de5855e2c7f",
+      "value": "Skjul listen over simuleringer"
     },
     {
       "name": "cyl_l10n_a0ffdf359138",
@@ -667,6 +679,10 @@
     {
       "name": "cyl_l10n_9f44bafc75c6",
       "value": "Minimer / skjul TabBar ved rulning (issue #13)"
+    },
+    {
+      "name": "cyl_l10n_8625f5f225d7",
+      "value": "Skjul ved rulning: simuler afbrydelser (issue #13)"
     },
     {
       "name": "cyl_l10n_678abebe6aac",

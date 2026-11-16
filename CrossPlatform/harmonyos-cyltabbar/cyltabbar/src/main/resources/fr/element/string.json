@@ -529,6 +529,10 @@
       "value": "Capsule centrée"
     },
     {
+      "name": "cyl_l10n_f613681ddf31",
+      "value": "Afficher les %@ simulations"
+    },
+    {
       "name": "cyl_l10n_7c87af044929",
       "value": "Balayer pour changer d'onglet (issue #535)"
     },
@@ -555,6 +559,10 @@
     {
       "name": "cyl_l10n_07b181184280",
       "value": "Moi"
+    },
+    {
+      "name": "cyl_l10n_97a6bedeb7fd",
+      "value": "Manuel : touchez pour activer le masquage au défilement, faites défiler vers le bas pour masquer la TabBar, puis faites ce qu'indique le titre. Attendu : la TabBar revient aussitôt."
     },
     {
       "name": "cyl_l10n_a01539048bb0",
@@ -587,6 +595,10 @@
     {
       "name": "cyl_l10n_09d0fdddca66",
       "value": "Habillages : fêtes et couleurs (%@)"
+    },
+    {
+      "name": "cyl_l10n_3de5855e2c7f",
+      "value": "Replier la liste des simulations"
     },
     {
       "name": "cyl_l10n_a0ffdf359138",
@@ -667,6 +679,10 @@
     {
       "name": "cyl_l10n_9f44bafc75c6",
       "value": "Réduire / masquer la TabBar au défilement (issue #13)"
+    },
+    {
+      "name": "cyl_l10n_8625f5f225d7",
+      "value": "Masquer au défilement : simuler des interruptions (issue #13)"
     },
     {
       "name": "cyl_l10n_678abebe6aac",

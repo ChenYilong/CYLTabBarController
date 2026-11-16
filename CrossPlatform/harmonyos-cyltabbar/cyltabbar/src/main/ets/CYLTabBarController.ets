@@ -57,6 +57,20 @@ export function cyl_reportScroll(delta: number): void {
 
 let cylScrollCounter: number = 0;
 
+/** [EN] AppStorage key bumped by cyl_restoreTabBar. [CN] cyl_restoreTabBar 递增的 AppStorage 键。 */
+export const CYLRestoreTabBarStorageKey: string = 'cyl_restoreTabBar';
+
+/**
+ * [EN] Shows a tab bar that scrolling hid, after an interruption (a dialog, a push and pop, the page shown again, the app
+ *      back in the foreground; iOS -cyl_restoreTabBarAfterInterruption, issue #13). Scrolling right after it (a fling's
+ *      inertia) does not hide the bar again; only a new scroll after 600 ms does.
+ * [CN] 意外情况（弹窗、push 后 pop、页面重新显示、App 回到前台）后恢复被滚动隐藏的 TabBar（issue #13）。紧随其后的滚动（惯性）
+ *      不会再次隐藏，600 毫秒后的新滚动才会。
+ */
+export function cyl_restoreTabBar(): void {
+  AppStorage.setOrCreate<number>(CYLRestoreTabBarStorageKey, (AppStorage.get<number>(CYLRestoreTabBarStorageKey) ?? 0) + 1);
+}
+
 /** [EN] AppStorage key of the tab a pushed page asks to select (cyl_popSelectTabBarChildViewController...). [CN] 被 push 的页面请求选中的 Tab。 */
 export const CYLSelectRequestStorageKey: string = 'cyl_selectRequest';
 
@@ -245,12 +259,12 @@ export struct CYLTabBarController {
   @Prop tabBarItemsAttributes: CYLTabBarItemAttributes[] = [];
   /** [EN] CYLTabBarControllerPlusButton; a new object updates the plus button in place (issue list #7). [CN] 新对象即原地更新加号按钮。 */
   @Prop plusButton: CYLPlusButton | undefined = undefined;
-  @Link selectedIndex: number;
+  @Link @Watch('cylOnSelectedIndexChange') selectedIndex: number;
   /** [EN] The badge of each tab (-[UIView cyl_showBadgeValue:] on its tab button); created when unset. [CN] 每个 Tab 的角标；未设置时自动创建。 */
   @State badges: CYLBadge[] = [];
   /** [EN] The plus button's badge. [CN] 加号按钮的角标。 */
   @State plusButtonBadge: CYLBadge = new CYLBadge();
-  @Prop tabBarHidden: boolean = false;
+  @Prop @Watch('cylOnTabBarHiddenChange') tabBarHidden: boolean = false;
   /** [EN] -setTabBarHidden:animated:: whether hiding and showing slide (true) or jump. [CN] 隐藏与显示是否带滑动动画。 */
   @Prop tabBarHiddenAnimated: boolean = true;
   /** [EN] cyl_tabBarItemSelectedTitleColor / CYLTabBarItemSelectedTitleColor. [CN] 选中标题颜色。 */
@@ -365,11 +379,19 @@ export struct CYLTabBarController {
    */
   didSelectControl?: (index: number, previous: number) => void;
   /** [EN] cyl_tabBarMinimizeBehavior (issue #13). [CN] 滚动时 TabBar 的反应。 */
-  @Prop tabBarMinimizeBehavior: CYLTabBarMinimizeBehavior = CYLTabBarMinimizeBehavior.Never;
+  @Prop @Watch('cylRestoreFromScroll') tabBarMinimizeBehavior: CYLTabBarMinimizeBehavior = CYLTabBarMinimizeBehavior.Never;
   /** [EN] cyl_hidesTabBarOnScroll: OnScrollDown when on (Automatic means OnScrollDown here). [CN] 开启时等同 OnScrollDown。 */
-  @Prop hidesTabBarOnScroll: boolean = false;
+  @Prop @Watch('cylRestoreFromScroll') hidesTabBarOnScroll: boolean = false;
   @State private scrollHidden: boolean = false;
   @StorageProp('cyl_scrollDelta') @Watch('cylOnScroll') private scrollDelta: number = 0;
+  @StorageProp('cyl_restoreTabBar') @Watch('cylRestoreFromScroll') private restoreToken: number = 0;
+  /** [EN] Scrolls until this time do not hide the bar (after a restore). [CN] 在此时间前的滚动不会隐藏 TabBar（恢复之后）。 */
+  private cylIgnoreScrollUntil: number = 0;
+  /**
+   * [EN] Called when scrolling hides or shows the bar (true: shown), for apps and tests (iOS
+   *      CYLTabBarMinimizeStateDidChangeNotification). [CN] 滚动隐藏或显示 TabBar 时调用（true 为显示）。
+   */
+  tabBarVisibilityDidChange?: (visible: boolean) => void;
   @StorageProp('cyl_selectRequest') @Watch('cylOnSelectRequest') private selectRequest: string = '';
   /** [EN] cyl_tabButtonTapSoundEnabled. [CN] 点击时播放音效。 */
   @Prop tapSoundEnabled: boolean = false;
@@ -411,7 +433,39 @@ export struct CYLTabBarController {
       return;
     }
     const down = delta > 0;
-    this.scrollHidden = behavior === CYLTabBarMinimizeBehavior.OnScrollDown ? down : !down;
+    const hidden = behavior === CYLTabBarMinimizeBehavior.OnScrollDown ? down : !down;
+    if (hidden && Date.now() < this.cylIgnoreScrollUntil) {
+      return;
+    }
+    this.cylSetScrollHidden(hidden);
+  }
+
+  private cylSetScrollHidden(hidden: boolean): void {
+    if (this.scrollHidden === hidden) {
+      return;
+    }
+    this.scrollHidden = hidden;
+    if (this.tabBarVisibilityDidChange !== undefined) {
+      this.tabBarVisibilityDidChange(!hidden);
+    }
+  }
+
+  /** [EN] A tab change from code is an interruption too (issue #13). [CN] 代码切换 Tab 也视为意外情况。 */
+  cylOnSelectedIndexChange(): void {
+    this.cylRestoreFromScroll();
+  }
+
+  /** [EN] setTabBarHidden(false) shows the bar, also when scrolling had hidden it. [CN] setTabBarHidden(false) 也会恢复被滚动隐藏的 TabBar。 */
+  cylOnTabBarHiddenChange(): void {
+    if (!this.tabBarHidden) {
+      this.cylRestoreFromScroll();
+    }
+  }
+
+  /** [EN] cyl_restoreTabBar and other interruptions: show the bar, ignore the next 600 ms of scrolling. [CN] 恢复 TabBar。 */
+  cylRestoreFromScroll(): void {
+    this.cylIgnoreScrollUntil = Date.now() + 600;
+    this.cylSetScrollHidden(false);
   }
 
   cylOnSelectRequest(): void {
@@ -434,6 +488,7 @@ export struct CYLTabBarController {
   }
 
   cylOnMemoryWarning(): void {
+    this.cylRestoreFromScroll();
     let unloaded: number[] = [];
     if (this.unloadsUnselectedViewsOnMemoryWarning) {
       unloaded = this.loaded.filter((index: number) => index !== this.selectedIndex);
@@ -542,6 +597,10 @@ export struct CYLTabBarController {
   }
 
   private cylDoSelect(index: number, identifier: string): void {
+    // [EN] A tab change is an interruption: the bar comes back (issue #13). [CN] 切换 Tab 视为意外情况：TabBar 恢复。
+    if (index !== this.selectedIndex) {
+      this.cylRestoreFromScroll();
+    }
     if (this.slideTransitionDuration > 0 && index !== this.selectedIndex && index >= 0 && this.selectedIndex >= 0) {
       this.slideOffset = index > this.selectedIndex ? 100 : -100;
       animateTo({ duration: this.slideTransitionDuration, curve: Curve.EaseOut }, () => { this.slideOffset = 0; });

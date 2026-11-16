@@ -529,6 +529,10 @@
       "value": "Kapsul di tengah"
     },
     {
+      "name": "cyl_l10n_f613681ddf31",
+      "value": "Tampilkan semua %@ simulasi"
+    },
+    {
       "name": "cyl_l10n_7c87af044929",
       "value": "Geser untuk berpindah tab (issue #535)"
     },
@@ -555,6 +559,10 @@
     {
       "name": "cyl_l10n_07b181184280",
       "value": "Saya"
+    },
+    {
+      "name": "cyl_l10n_97a6bedeb7fd",
+      "value": "Manual: ketuk untuk menyalakan sembunyikan saat menggulir, gulir ke bawah untuk menyembunyikan TabBar, lalu lakukan sesuai judul. Diharapkan: TabBar langsung kembali."
     },
     {
       "name": "cyl_l10n_a01539048bb0",
@@ -587,6 +595,10 @@
     {
       "name": "cyl_l10n_09d0fdddca66",
       "value": "Skin: hari raya dan warna (%@)"
+    },
+    {
+      "name": "cyl_l10n_3de5855e2c7f",
+      "value": "Ciutkan daftar simulasi"
     },
     {
       "name": "cyl_l10n_a0ffdf359138",
@@ -667,6 +679,10 @@
     {
       "name": "cyl_l10n_9f44bafc75c6",
       "value": "Perkecil / sembunyikan TabBar saat menggulir (issue #13)"
+    },
+    {
+      "name": "cyl_l10n_8625f5f225d7",
+      "value": "Sembunyikan saat menggulir: simulasi gangguan (issue #13)"
     },
     {
       "name": "cyl_l10n_678abebe6aac",

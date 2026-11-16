@@ -529,6 +529,10 @@
       "value": "가운데 캡슐"
     },
     {
+      "name": "cyl_l10n_f613681ddf31",
+      "value": "시뮬레이션 %@개 모두 보기"
+    },
+    {
       "name": "cyl_l10n_7c87af044929",
       "value": "스와이프로 탭 전환 (issue #535)"
     },
@@ -555,6 +559,10 @@
     {
       "name": "cyl_l10n_07b181184280",
       "value": "내 정보"
+    },
+    {
+      "name": "cyl_l10n_97a6bedeb7fd",
+      "value": "수동: 탭하여 스크롤 시 숨기기를 켜고, 아래로 스크롤해 TabBar를 숨긴 뒤 제목대로 조작하세요. 예상: TabBar가 즉시 다시 표시됩니다."
     },
     {
       "name": "cyl_l10n_a01539048bb0",
@@ -587,6 +595,10 @@
     {
       "name": "cyl_l10n_09d0fdddca66",
       "value": "스킨: 기념일과 색상(%@개)"
+    },
+    {
+      "name": "cyl_l10n_3de5855e2c7f",
+      "value": "시뮬레이션 목록 접기"
     },
     {
       "name": "cyl_l10n_a0ffdf359138",
@@ -667,6 +679,10 @@
     {
       "name": "cyl_l10n_9f44bafc75c6",
       "value": "스크롤 시 TabBar 축소 / 숨기기 (issue #13)"
+    },
+    {
+      "name": "cyl_l10n_8625f5f225d7",
+      "value": "스크롤 시 숨기기: 예외 상황 시뮬레이션 (issue #13)"
     },
     {
       "name": "cyl_l10n_678abebe6aac",
