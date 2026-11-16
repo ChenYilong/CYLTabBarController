@@ -341,6 +341,10 @@
       "value": "Välilehtipalkin ulkoasu"
     },
     {
+      "name": "cyl_l10n_7c4aecba91c3",
+      "value": "Tämän sivun välilehden kuva sovelluksen rawfile-kansiosta (iOS:n resurssipaketti); palauta napauttamalla uudelleen"
+    },
+    {
       "name": "cyl_l10n_2e6d648945c0",
       "value": "Pluspainike ulottuu palkin yläpuolelle; myös yläosa reagoi (näytetään punaisena)"
     },

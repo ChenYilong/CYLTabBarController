@@ -341,6 +341,10 @@
       "value": "Giao diện thanh tab"
     },
     {
+      "name": "cyl_l10n_7c4aecba91c3",
+      "value": "Ảnh của tab trang này lấy từ rawfile của ứng dụng (gói tài nguyên trên iOS); nhấn lại để khôi phục"
+    },
+    {
       "name": "cyl_l10n_2e6d648945c0",
       "value": "Nút cộng nhô ra khỏi thanh; phần phía trên cũng phản hồi (hiển thị màu đỏ)"
     },

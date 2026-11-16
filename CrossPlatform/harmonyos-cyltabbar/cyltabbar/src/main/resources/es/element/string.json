@@ -341,6 +341,10 @@
       "value": "Apariencia de la barra"
     },
     {
+      "name": "cyl_l10n_7c4aecba91c3",
+      "value": "La imagen de la pestaña de esta página procede del rawfile de la app (el bundle de recursos de iOS); toca de nuevo para restaurar"
+    },
+    {
       "name": "cyl_l10n_2e6d648945c0",
       "value": "El botón más sobresale de la barra; su parte superior también responde (en rojo)"
     },

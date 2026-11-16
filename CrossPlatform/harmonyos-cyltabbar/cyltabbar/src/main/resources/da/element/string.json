@@ -341,6 +341,10 @@
       "value": "Fanelinjens udseende"
     },
     {
+      "name": "cyl_l10n_7c4aecba91c3",
+      "value": "Billedet til denne sides fane fra appens rawfile (ressourcebundtet i iOS); tryk igen for at gendanne"
+    },
+    {
       "name": "cyl_l10n_2e6d648945c0",
       "value": "Plusknappen stikker op over bjælken; også delen ovenover reagerer (vist med rødt)"
     },

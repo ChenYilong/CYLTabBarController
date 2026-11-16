@@ -341,6 +341,10 @@
       "value": "TabBar 外觀"
     },
     {
+      "name": "cyl_l10n_7c4aecba91c3",
+      "value": "本頁面 Tab 的圖片來自 App 的 rawfile（即 iOS 的資源 bundle）；再次點擊復原"
+    },
+    {
       "name": "cyl_l10n_2e6d648945c0",
       "value": "加號按鈕超出 TabBar；超出部分也能回應（紅色顯示）"
     },
