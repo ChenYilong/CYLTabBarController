@@ -34,6 +34,8 @@ class CYLPlaybackControls extends StatelessWidget {
     required this.onPlayAll,
     required this.onSpeedChanged,
     required this.onLoopsChanged,
+    this.riveIcons,
+    this.onRiveIconsChanged,
   });
 
   final CYLDemoColors colors;
@@ -43,6 +45,11 @@ class CYLPlaybackControls extends StatelessWidget {
   final VoidCallback onPlayAll;
   final ValueChanged<double> onSpeedChanged;
   final ValueChanged<bool> onLoopsChanged;
+
+  /// Whether the tabs show the Rive icons of icons.riv instead of the Lottie ones; null hides the switch.
+  /// Tab 是否显示 icons.riv 的 Rive 图标而不是 Lottie 图标；为 null 时不显示开关。
+  final bool? riveIcons;
+  final ValueChanged<bool>? onRiveIconsChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -139,6 +146,20 @@ class CYLPlaybackControls extends StatelessWidget {
                       onChanged: onLoopsChanged,
                     ),
                   ),
+                  if (riveIcons != null)
+                    MergeSemantics(
+                      child: SwitchListTile.adaptive(
+                        key: const Key('cyl-rive-tab-icons'),
+                        contentPadding: EdgeInsets.zero,
+                        title: Text(
+                          t('Rive tab icons'),
+                          style: TextStyle(fontSize: 17, color: colors.label),
+                        ),
+                        value: riveIcons!,
+                        activeThumbColor: tint,
+                        onChanged: onRiveIconsChanged,
+                      ),
+                    ),
                 ],
               ),
             ),
