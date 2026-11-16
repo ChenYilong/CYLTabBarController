@@ -107,6 +107,7 @@ Before pushing: `git log -1 --format=%B | python3 -c "import re,sys; sys.exit(1 
 ### Pull request for every new branch
 
 - **Every new branch gets a pull request, automatically (added 2026-11-12)**: after creating a branch and pushing its first commit, open a pull request right away, without asking. Target branch: the branch it was created from (preferred); otherwise `main` or `master`.
+- **Every commit on a branch goes through an open pull request (added 2026-11-16)**: once a branch is created, every commit on it must reach a pull request. Never create a branch and keep committing to it without a pull request: the commits of a branch without a pull request are all ignored. Before every commit, check that the branch has an open pull request (`gh pr list --head <branch> --state open`); if it has none, open one right away. Target branch: the pull request that was active before this one was created (its head branch) first; only when there is none, `master`. If more than two pull requests are already open, stop and ask the maintainer whether to create a new branch with its own pull request or to keep committing to the current branch: more than two open pull requests make merging hard and leave no sound choice of target branch for each. AGENTS.md, "Git and pull requests".
 
 ### Stale notes before every commit
 
