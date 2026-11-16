@@ -5,6 +5,10 @@
       "value": "%@ CYLTabBarController on HarmonyOS"
     },
     {
+      "name": "cyl_l10n_9ecf653a3fc6",
+      "value": "%@ · another context · plus taps: %@"
+    },
+    {
       "name": "cyl_l10n_aaf9b7d7382d",
       "value": "%@ nieuwe berichten"
     },
@@ -17,8 +21,16 @@
       "value": "A tab bar controller of another context, with a square plus button"
     },
     {
+      "name": "cyl_l10n_427131e7add2",
+      "value": "Another plus button"
+    },
+    {
       "name": "cyl_l10n_aa3e67bda3c0",
       "value": "ArkUI Tabs, the HarmonyOS system tab bar, with the same tabs"
+    },
+    {
+      "name": "cyl_l10n_0557fa923dce",
+      "value": "Back"
     },
     {
       "name": "cyl_l10n_8665e238c516",
@@ -59,6 +71,10 @@
     {
       "name": "cyl_l10n_8795570ddeef",
       "value": "CYLTabBarItemBackgroundColor / CYLTabBarItemSelectedBackgroundColor"
+    },
+    {
+      "name": "cyl_l10n_d7c01888e55e",
+      "value": "CYLTabBarSVGAFilePath: plays once when selected, first frame otherwise"
     },
     {
       "name": "cyl_l10n_132201f60522",
@@ -123,14 +139,6 @@
     {
       "name": "cyl_l10n_af3acf6eb4a9",
       "value": "Liquid Glass"
-    },
-    {
-      "name": "cyl_l10n_0b320b0a775c",
-      "value": "Logged in: %@. The \"Me\" tab needs a login (issue #19); tap to toggle"
-    },
-    {
-      "name": "cyl_l10n_66ba80032520",
-      "value": "Login state"
     },
     {
       "name": "cyl_l10n_2e8e48a2ebfd",
@@ -233,6 +241,10 @@
       "value": "Rotatie (doorlopend)"
     },
     {
+      "name": "cyl_l10n_bd001817e373",
+      "value": "SVGA tab icons (configuration file)"
+    },
+    {
       "name": "cyl_l10n_b5fcd68edd9f",
       "value": "Schalen (doorlopend)"
     },
@@ -305,6 +317,10 @@
       "value": "The system bar has no plus button: a floating button stands in"
     },
     {
+      "name": "cyl_l10n_9b6633b75bf2",
+      "value": "The “Me” tab needs a login (issue #19); tap to toggle"
+    },
+    {
       "name": "cyl_l10n_a4d0d101d6a3",
       "value": "Linksboven"
     },
@@ -321,8 +337,24 @@
       "value": "Demo van cyl_pop / cyl_push-methoden"
     },
     {
+      "name": "cyl_l10n_ca3dcd2d62be",
+      "value": "cyl_popSelectTabBarChildViewControllerAtIndex: 1 (%@)"
+    },
+    {
+      "name": "cyl_l10n_3b06a9582640",
+      "value": "cyl_popSelectTabBarChildViewControllerForTabBarItemIdentifier: message"
+    },
+    {
+      "name": "cyl_l10n_59884403daf6",
+      "value": "cyl_pushOrPopToViewController: pages/Index (already in the stack: pops)"
+    },
+    {
       "name": "cyl_l10n_1ec113617309",
       "value": "cyl_pushViewController, cyl_popSelectTabBarChildViewControllerAtIndex, cyl_pushOrPopToViewController"
+    },
+    {
+      "name": "cyl_l10n_9fb845377ee4",
+      "value": "cyl_pushViewController: a green page"
     },
     {
       "name": "cyl_l10n_ff5772993aee",
@@ -555,6 +587,10 @@
     {
       "name": "cyl_l10n_b051a19ace76",
       "value": "Naastgelegen tabbladen vervangen"
+    },
+    {
+      "name": "cyl_l10n_3e730a3320e9",
+      "value": "Vervangende pagina %@"
     },
     {
       "name": "cyl_l10n_a131e4f178aa",

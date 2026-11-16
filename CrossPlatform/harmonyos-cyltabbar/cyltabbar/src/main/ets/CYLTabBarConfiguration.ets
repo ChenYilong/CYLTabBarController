@@ -72,6 +72,29 @@ export class CYLTabBarConfiguration {
   }
 
   /** [EN] "{h, v}", [h, v] or {horizontal, vertical}. [CN] 偏移值。 */
+  /** [EN] A non-empty string, or undefined. [CN] 非空字符串，否则为 undefined。 */
+  static stringValue(value: Object | undefined): string | undefined {
+    return typeof value === 'string' && value.length > 0 ? value as string : undefined;
+  }
+
+  /**
+   * [EN] FIX: issue #415. The side of a square size: a number, "{32, 32}" (the width) or [32, 32]; undefined otherwise.
+   * [CN] FIX: issue #415。正方形尺寸的边长：数字、"{32, 32}"（取宽度）或 [32, 32]；否则为 undefined。
+   */
+  static sideValue(value: Object | undefined): number | undefined {
+    if (typeof value === 'number') {
+      return value as number;
+    }
+    if (typeof value === 'string') {
+      const match = (value as string).match(/-?\d+(\.\d+)?/);
+      return match !== null ? parseFloat(match[0]) : undefined;
+    }
+    if (Array.isArray(value) && (value as Object[]).length > 0 && typeof (value as Object[])[0] === 'number') {
+      return (value as number[])[0];
+    }
+    return undefined;
+  }
+
   static offsetValue(value: Object | undefined): CYLOffset | undefined {
     const numbers = CYLTabBarConfiguration.numbers(value, 2, ['horizontal', 'vertical']);
     return numbers === undefined ? undefined : { horizontal: numbers[0], vertical: numbers[1] };
@@ -231,6 +254,11 @@ export class CYLTabBarConfiguration {
           selectedImage: typeof selectedImage === 'string' ? CYLTabBarConfiguration.imageResolver(selectedImage) : undefined,
           identifier: identifier,
           lottieFilePath: typeof item['CYLTabBarLottieFilePath'] === 'string' ? item['CYLTabBarLottieFilePath'] as string : undefined,
+          svgaFilePath: CYLTabBarConfiguration.stringValue(item['CYLTabBarSVGAFilePath']),
+          svgaURL: CYLTabBarConfiguration.stringValue(item['CYLTabBarSVGAURL']),
+          svgaDarkFilePath: CYLTabBarConfiguration.stringValue(item['CYLTabBarSVGADarkFilePath']),
+          svgaDarkURL: CYLTabBarConfiguration.stringValue(item['CYLTabBarSVGADarkURL']),
+          svgaSize: CYLTabBarConfiguration.sideValue(item['CYLTabBarSVGASize']),
           pageIdentifier: typeof item['CYLTabBarItemPageIdentifier'] === 'string' ? item['CYLTabBarItemPageIdentifier'] as string : undefined,
           pageParameters: item['CYLTabBarItemPageParameters'] as Record<string, Object> | undefined,
           titlePositionAdjustment: CYLTabBarConfiguration.offsetValue(item['CYLTabBarItemTitlePositionAdjustment']),

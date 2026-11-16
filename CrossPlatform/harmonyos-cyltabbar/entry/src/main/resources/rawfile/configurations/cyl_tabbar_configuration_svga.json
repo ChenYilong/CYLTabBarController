@@ -1,0 +1,37 @@
+{
+  "CYLTabBarControllerContext": "CYLSVGAConfigurationDemo",
+  "CYLTabBarControllerTabBarItemsAttributes": [
+    {
+      "CYLTabBarItemTitle": "Home",
+      "CYLTabBarItemImage": "system:house",
+      "CYLTabBarItemSelectedImage": "system:house.fill",
+      "CYLTabBarItemIdentifier": "home",
+      "CYLTabBarSVGAFilePath": "svga/tab_home.svga",
+      "CYLTabBarSVGASize": "{30, 30}"
+    },
+    {
+      "CYLTabBarItemTitle": "Discover",
+      "CYLTabBarItemImage": "system:safari",
+      "CYLTabBarItemSelectedImage": "system:safari.fill",
+      "CYLTabBarItemIdentifier": "discover",
+      "CYLTabBarSVGAFilePath": "svga/tab_search.svga",
+      "CYLTabBarSVGASize": "{30, 30}"
+    },
+    {
+      "CYLTabBarItemTitle": "Message",
+      "CYLTabBarItemImage": "system:message",
+      "CYLTabBarItemSelectedImage": "system:message.fill",
+      "CYLTabBarItemIdentifier": "message",
+      "CYLTabBarSVGAFilePath": "svga/tab_chat.svga",
+      "CYLTabBarSVGASize": "{30, 30}"
+    },
+    {
+      "CYLTabBarItemTitle": "Me",
+      "CYLTabBarItemImage": "system:person",
+      "CYLTabBarItemSelectedImage": "system:person.fill",
+      "CYLTabBarItemIdentifier": "me",
+      "CYLTabBarSVGAFilePath": "svga/tab_profile.svga",
+      "CYLTabBarSVGASize": "{30, 30}"
+    }
+  ]
+}

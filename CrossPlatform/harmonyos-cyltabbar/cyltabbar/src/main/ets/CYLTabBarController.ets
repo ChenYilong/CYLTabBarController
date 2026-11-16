@@ -4,6 +4,7 @@ import { CYLTabBarItemAttributes, CYLTitleOffset } from './CYLTabBarItem';
 import { CYLPlusButton } from './CYLPlusButton';
 import { CYLBadge, CYLBadgeView } from './CYLBadge';
 import { CYLLottieIcon } from './CYLLottieIcon';
+import { CYLSVGAView } from './svga/CYLSVGAView';
 import { CYLLocalizedString, cyl_textOf } from './CYLLocalization';
 
 import { vibrator } from '@kit.SensorServiceKit';
@@ -242,7 +243,8 @@ export const CYLPlusButtonPageIndex: number = -1;
 export struct CYLTabBarController {
   /** [EN] CYLTabBarControllerTabBarItemsAttributes; a new array updates the tabs (-updateTabBarItemAtIndex:attributes:). [CN] 新数组即更新 Tab。 */
   @Prop tabBarItemsAttributes: CYLTabBarItemAttributes[] = [];
-  plusButton?: CYLPlusButton;
+  /** [EN] CYLTabBarControllerPlusButton; a new object updates the plus button in place (issue list #7). [CN] 新对象即原地更新加号按钮。 */
+  @Prop plusButton: CYLPlusButton | undefined = undefined;
   @Link selectedIndex: number;
   /** [EN] The badge of each tab (-[UIView cyl_showBadgeValue:] on its tab button); created when unset. [CN] 每个 Tab 的角标；未设置时自动创建。 */
   @State badges: CYLBadge[] = [];
@@ -594,6 +596,17 @@ export struct CYLTabBarController {
     return badge.length > 0 ? CYLLocalizedString('%@, %@', label, badge) : label;
   }
 
+  /** [EN] The height of a tab's icon (a Lottie size or the image size). [CN] Tab 图标高度。 */
+  cylIconHeight(index: number): number {
+    const item = this.tabBarItemsAttributes[index];
+    const lottie = item.lottieFilePath !== undefined && item.gifFilePath === undefined && item.imageURL === undefined;
+    if (lottie) {
+      return item.lottieSize ?? this.imageSize;
+    }
+    // [EN] SVGA icons have their own size (issue list #11). [CN] SVGA 图标有自己的尺寸（问题 #11）。
+    return this.cylSVGAPath(index) !== undefined ? (item.svgaSize ?? this.imageSize) : this.imageSize;
+  }
+
   cylIdentifier(index: number): string {
     if (index === CYLPlusButtonPageIndex) {
       return this.plusButton?.identifier ?? 'plus';
@@ -619,12 +632,33 @@ export struct CYLTabBarController {
     return pages;
   }
 
+  /**
+   * [EN] FIX: issue #415. The tabs whose SVGA file failed to load: they show their image. [CN] SVGA 文件加载失败的 Tab：它们显示图片。
+   */
+  @State cylSVGAFailures: number[] = [];
+
+  /**
+   * [EN] FIX: issue #415. The SVGA file of a tab (URL first, the dark variant in dark mode), or undefined when it has none,
+   *      when GIF or image URL attributes win (as for Lottie), or when it failed to load.
+   * [CN] FIX: issue #415。Tab 的 SVGA 文件（先取 URL，深色模式取深色版本）；没有、被 GIF 或图片 URL 属性覆盖（与 Lottie 相同）或加载失败时为 undefined。
+   */
+  private cylSVGAPath(index: number): string | undefined {
+    const item = this.tabBarItemsAttributes[index];
+    if (item.gifFilePath !== undefined || item.imageURL !== undefined || this.cylSVGAFailures.includes(index)) {
+      return undefined;
+    }
+    const dark = this.colorMode === 'dark';
+    const darkPath = dark ? (item.svgaDarkURL ?? item.svgaDarkFilePath) : undefined;
+    return darkPath ?? item.svgaURL ?? item.svgaFilePath;
+  }
+
   @Builder
   cylTab(index: number) {
     Column() {
       if (this.tabCoverImages[index] !== undefined) {
         Image(this.tabCoverImages[index])
           .height(this.tabBarHeight - 4)
+          .margin({ top: 2 })
           .objectFit(ImageFit.Contain)
           .id(`cyl-cover-${this.cylIdentifier(index)}`)
       } else {
@@ -640,6 +674,16 @@ export struct CYLTabBarController {
             selected: this.selectedIndex === index,
             replayToken: this.replayTokens[index] ?? 0,
           })
+        } else if (this.cylSVGAPath(index) !== undefined) {
+          CYLSVGAView({
+            path: this.cylSVGAPath(index),
+            iconSize: this.tabBarItemsAttributes[index].svgaSize ?? this.imageSize,
+            selected: this.selectedIndex === index,
+            replayToken: this.replayTokens[index] ?? 0,
+            onLoadError: (_message: string) => {
+              this.cylSVGAFailures = this.cylSVGAFailures.concat([index]);
+            },
+          })
         } else {
         Image(this.cylIcon(index))
           .width(this.imageSize)
@@ -650,25 +694,19 @@ export struct CYLTabBarController {
           .rotate({ y: 1, angle: this.tapFlip[index] ?? 0 })
           .translate({ y: this.tapOffset[index] ?? 0 })
         }
-        CYLBadgeView({ badge: this.badges[index], anchorWidth: this.imageSize })
+        CYLBadgeView({ badge: this.badges[index], anchorWidth: this.cylIconHeight(index) })
       }
-      .width(this.imageSize)
-      .height(this.imageSize)
-      // [EN] FIX (HarmonyOS screenshot issue 3): the icon is centered in its frame (a smaller Lottie or SVGA icon too),
-      //      so icon and title share one vertical center line; the badge is positioned absolutely and does not move.
-      // [CN] 修复（鸿蒙截图问题 3）：图标在其框内居中（较小的 Lottie 或 SVGA 图标也一样），使图标与标题位于同一条竖直中心线；
-      //      角标为绝对定位，不受影响。
-      .alignContent(Alignment.Center)
+      // [EN] No fixed width: the badge is measured with the free width, so text badges grow with their text (issue list
+      //      #1). The icon sits right above the title, whose top is at tabBarHeight - 17 like the plus title (#2).
+      // [CN] 不固定宽度：角标按剩余宽度测量，文字角标随文字变宽（问题 #1）。图标紧贴标题上方，标题顶部与加号标题同在 tabBarHeight - 17（#2）。
+      .alignContent(Alignment.TopStart)
+      .margin({ top: Math.max(0, this.tabBarHeight - 17 - 3 - this.cylIconHeight(index)) })
 
       if (this.tabBarItemsAttributes[index].title !== undefined) {
         Text(this.selectedIndex === index
           ? (this.tabBarItemsAttributes[index].selectedTitle ?? this.tabBarItemsAttributes[index].title)
           : this.tabBarItemsAttributes[index].title)
           .fontSize(10)
-          .height(13)
-          .maxLines(1)
-          .width('100%')
-          .textAlign(TextAlign.Center)
           .margin({ top: 3 })
           .fontColor(this.selectedIndex === index
             ? (this.tabBarItemsAttributes[index].selectedTitleColor ?? this.tintColor)
@@ -682,15 +720,12 @@ export struct CYLTabBarController {
     }
     .layoutWeight(1)
     .height('100%')
-    .justifyContent(FlexAlign.Center)
-    .alignItems(HorizontalAlign.Center)
+    .justifyContent(FlexAlign.Start)
+    // [EN] Liquid Glass: the selection is a capsule inside the rounded bar (issue list #6). [CN] 液态玻璃：选中背景为圆角胶囊（问题 #6）。
+    .borderRadius(this.tabBarStyleType === CYLTabBarStyleType.LiquidGlass ? this.tabBarHeight / 2 : 0)
     .backgroundColor(this.selectedIndex === index
       ? (this.tabBarItemsAttributes[index].selectedBackgroundColor ?? Color.Transparent)
       : (this.tabBarItemsAttributes[index].backgroundColor ?? Color.Transparent))
-    // [EN] FIX (HarmonyOS screenshot issue 6): on the Liquid Glass capsule an item's background is a capsule too, so the
-    //      first and last items' backgrounds no longer stick out of the bar's rounded ends.
-    // [CN] 修复（鸿蒙截图问题 6）：在液态玻璃胶囊上，item 背景也是胶囊形，首尾 item 的背景不再超出 TabBar 的圆角两端。
-    .borderRadius(this.tabBarStyleType === CYLTabBarStyleType.LiquidGlass ? this.tabBarHeight / 2 : 0)
     // [EN] One accessibility element per tab: icon, cover, Lottie and badge are read through it. [CN] 每个 Tab 一个无障碍元素。
     .accessibilityGroup(true)
     .accessibilityText(this.cylAccessibilityLabel(index))
@@ -728,17 +763,6 @@ export struct CYLTabBarController {
       .id('cyl-plus-touchable-area')
   }
 
-  /**
-   * [EN] FIX (HarmonyOS screenshot issue 3): the top of a tab's title, the same for the tabs and the plus button. A tab
-   *      centers its icon, a 3 vp gap and its title (about 13 vp for 10 fp text) in the bar; the plus button's aligned
-   *      title used `tabBarHeight - 17` instead and sat lower than the other titles.
-   * [CN] 修复（鸿蒙截图问题 3）：Tab 标题的顶部，Tab 与 PlusButton 相同。Tab 在 TabBar 中居中排列图标、3 vp 间距与标题（10 fp 文字约
-   *      13 vp）；PlusButton 对齐的标题此前使用 `tabBarHeight - 17`，比其他标题低。
-   */
-  cylTitleTop(): number {
-    return (this.tabBarHeight - (this.imageSize + 3 + 13)) / 2 + this.imageSize + 3;
-  }
-
   cylPlusAlignsTitle(): boolean {
     return this.plusButton?.title !== undefined && this.plusButton?.alignsTitle !== false;
   }
@@ -764,18 +788,16 @@ export struct CYLTabBarController {
       // [EN] As CYLPlusButton.kt: with an aligned title the image sits right above the title (item 4); otherwise it is
       //      centred and moved by centerYOffset. [CN] 与 CYLPlusButton.kt 相同：标题对齐时图片紧贴标题上方（第 4 项）；否则居中并按 centerYOffset 移动。
       .position(this.cylPlusAlignsTitle()
-        ? { x: 0, y: this.cylTitleTop() - (this.plusButton?.imageSize ?? 54) } : undefined)
+        ? { x: 0, y: this.tabBarHeight - 17 - (this.plusButton?.imageSize ?? 54) } : undefined)
       .width(this.cylPlusAlignsTitle() ? '100%' : undefined)
       .offset({ y: this.cylPlusAlignsTitle() ? 0 : (this.plusButton?.centerYOffset ?? 0) })
 
       if (this.plusButton?.title !== undefined) {
         Text(this.plusButton.title)
           .fontSize(10)
-          .height(13)
-          .maxLines(1)
           .fontColor(this.selectedIndex === CYLPlusButtonPageIndex
             ? (this.plusButtonTitleSelectedColor ?? this.tintColor) : this.unselectedColor)
-          .position(this.plusButton?.alignsTitle === false ? undefined : { x: 0, y: this.cylTitleTop() })
+          .position(this.plusButton?.alignsTitle === false ? undefined : { x: 0, y: this.tabBarHeight - 17 })
           .width('100%')
           .textAlign(TextAlign.Center)
       }

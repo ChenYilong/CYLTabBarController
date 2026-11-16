@@ -171,4 +171,4 @@ All code of this project supports accessibility and localization, including the 
 emulator checks locate controls through accessibility identifiers, accessibility labels / texts and localized strings
 first (XCUITest, `axe describe-ui`, `uiautomator`, HarmonyOS UiTest `ON.id()` / `ON.text()`, Flutter
 `find.bySemanticsLabel`, React Native `getByLabelText`), for taps, complex flows and consecutive steps. Coordinates are
-the last resort; a control that cannot be found that way is a bug: add the label first. HarmonyOS details: `cyl-harmonyos`.
+the last resort; a control that cannot be found that way is a bug: add the label first. HarmonyOS details: `cyl-harmonyos-a11y-l10n`.

@@ -1,3 +1,4 @@
+import { CYLLocalizedString } from 'cyltabbar';
 /**
  * [EN] A pushed page with a colored background and a title (the CYLBaseViewController, CYLDetailsViewController and
  *      testPush pages the badge rows push; TextPageFragment.kt). `hidesNavigationBar` hides the bar (Discover).
@@ -26,7 +27,7 @@ struct TextPage {
     Column() {
       if (this.params.hidesNavigationBar !== true) {
         Row() {
-          Text('‹ Back')
+          Text('‹ ' + CYLLocalizedString('Back'))
             .fontSize(16)
             .fontColor('#007AFF')
             .id('cyl-back')
@@ -49,7 +50,7 @@ struct TextPage {
           .fontColor(Color.White)
           .id('cyl-text-page-title')
         if (this.params.hidesNavigationBar === true) {
-          Button('Back')
+          Button(CYLLocalizedString('Back'))
             .margin({ top: 24 })
             .id('cyl-back')
             .onClick(() => this.getUIContext().getRouter().back())
