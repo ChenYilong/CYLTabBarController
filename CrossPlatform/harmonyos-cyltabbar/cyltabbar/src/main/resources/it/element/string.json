@@ -477,6 +477,10 @@
       "value": "Nascondere la barra di navigazione senza classe base (issue #535)"
     },
     {
+      "name": "cyl_l10n_321ff794aab8",
+      "value": "N/D"
+    },
+    {
       "name": "cyl_l10n_e1642a46b804",
       "value": "Festa di metà autunno"
     },
@@ -503,6 +507,10 @@
     {
       "name": "cyl_l10n_e05f97c5159d",
       "value": "Crea un TabBarController da un file di configurazione"
+    },
+    {
+      "name": "cyl_l10n_5f0c0bf32dc1",
+      "value": "Mantieni"
     },
     {
       "name": "cyl_l10n_24fb8692947a",
@@ -577,6 +585,10 @@
       "value": "Spazio"
     },
     {
+      "name": "cyl_l10n_2f383291bcf8",
+      "value": "Reale: %@"
+    },
+    {
       "name": "cyl_l10n_bccc798b577a",
       "value": "Capsula centrata"
     },
@@ -605,6 +617,10 @@
       "value": "Mostra una GIF animata come icona della scheda; tocca di nuovo per ripristinare"
     },
     {
+      "name": "cyl_l10n_c7db6d4f1a42",
+      "value": "Ripristina"
+    },
+    {
       "name": "cyl_l10n_c4328f75476f",
       "value": "San Valentino"
     },
@@ -613,8 +629,16 @@
       "value": "Io"
     },
     {
+      "name": "cyl_l10n_2a3e7f5c382c",
+      "value": "Manuale"
+    },
+    {
       "name": "cyl_l10n_97a6bedeb7fd",
       "value": "Manuale: tocca per attivare il nascondi allo scorrimento, scorri verso il basso per nascondere la TabBar, poi fai ciò che dice il titolo. Atteso: la TabBar torna subito."
+    },
+    {
+      "name": "cyl_l10n_f68e7e217ad1",
+      "value": "Manuale: %@"
     },
     {
       "name": "cyl_l10n_89246468f7fd",
@@ -815,6 +839,14 @@
     {
       "name": "cyl_l10n_4bd51044149f",
       "value": "File audio personalizzato (cyl_tabButtonTapSoundURL)"
+    },
+    {
+      "name": "cyl_l10n_9d1c8a70d4da",
+      "value": "Autotest"
+    },
+    {
+      "name": "cyl_l10n_11858aeb1656",
+      "value": "Autotest: esegui tutte le simulazioni automatiche, riporta PASS / FAIL"
     },
     {
       "name": "cyl_l10n_beabcd498b94",

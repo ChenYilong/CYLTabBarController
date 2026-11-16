@@ -368,3 +368,12 @@
 "网络图标、标题与配色" = "Сетевые значки, заголовки и цвета";
 /* The settings group of the configuration file rows (docs/Configuration-File.md). */
 "配置文件" = "Файл конфигурации";
+/* Scroll hiding simulations (issue #13): kind labels and title prefixes; API names stay English. */
+"恢复" = "Восстановить";
+"保持" = "Сохранить";
+"不适用" = "Н/П";
+"手动" = "Вручную";
+"自测" = "Самопроверка";
+"手动：%@" = "Вручную: %@";
+"实测：%@" = "Реально: %@";
+"自测：依次运行所有自动模拟，报告 PASS / FAIL" = "Самопроверка: запустить все автоматические симуляции, сообщить PASS / FAIL";

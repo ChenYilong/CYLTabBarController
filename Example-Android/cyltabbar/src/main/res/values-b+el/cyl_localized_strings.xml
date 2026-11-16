@@ -17,4 +17,8 @@
     <string name="cyl_memory_warning_kept_selected">διατηρήθηκε: επιλεγμένη</string>
     <string name="cyl_memory_warning_kept_should_unload">διατηρήθηκε: το shouldUnload επέστρεψε NO</string>
     <string name="cyl_memory_warning_kept">διατηρήθηκε</string>
+    <string name="cyl_scroll_self_test">Αυτοέλεγχος</string>
+    <string name="cyl_scroll_title_manual">Χειροκίνητα: %1$s</string>
+    <string name="cyl_scroll_title_real">Πραγματικό: %1$s</string>
+    <string name="cyl_scroll_title_self_test">Αυτοέλεγχος: εκτέλεση όλων των αυτόματων προσομοιώσεων, αναφορά PASS / FAIL</string>
 </resources>

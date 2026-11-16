@@ -17,4 +17,8 @@
     <string name="cyl_memory_warning_kept_selected">محفوظ: محدد</string>
     <string name="cyl_memory_warning_kept_should_unload">محفوظ: أعاد shouldUnload القيمة NO</string>
     <string name="cyl_memory_warning_kept">محفوظ</string>
+    <string name="cyl_scroll_self_test">اختبار ذاتي</string>
+    <string name="cyl_scroll_title_manual">يدوي: %1$s</string>
+    <string name="cyl_scroll_title_real">حقيقي: %1$s</string>
+    <string name="cyl_scroll_title_self_test">اختبار ذاتي: تشغيل كل المحاكاة التلقائية والإبلاغ عن PASS / FAIL</string>
 </resources>

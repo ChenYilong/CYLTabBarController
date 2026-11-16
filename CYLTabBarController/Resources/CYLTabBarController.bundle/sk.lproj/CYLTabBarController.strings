@@ -368,3 +368,12 @@
 "网络图标、标题与配色" = "Ikony zo siete, názvy a farby";
 /* The settings group of the configuration file rows (docs/Configuration-File.md). */
 "配置文件" = "Konfiguračný súbor";
+/* Scroll hiding simulations (issue #13): kind labels and title prefixes; API names stay English. */
+"恢复" = "Obnoviť";
+"保持" = "Zachovať";
+"不适用" = "N/A";
+"手动" = "Ručne";
+"自测" = "Autotest";
+"手动：%@" = "Ručne: %@";
+"实测：%@" = "Skutočné: %@";
+"自测：依次运行所有自动模拟，报告 PASS / FAIL" = "Autotest: spustiť všetky automatické simulácie, hlásiť PASS / FAIL";

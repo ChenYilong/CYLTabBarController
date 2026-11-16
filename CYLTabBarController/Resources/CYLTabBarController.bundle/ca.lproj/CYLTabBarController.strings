@@ -368,3 +368,12 @@
 "网络图标、标题与配色" = "Icones de la xarxa, títols i colors";
 /* The settings group of the configuration file rows (docs/Configuration-File.md). */
 "配置文件" = "Fitxer de configuració";
+/* Scroll hiding simulations (issue #13): kind labels and title prefixes; API names stay English. */
+"恢复" = "Restaura";
+"保持" = "Manté";
+"不适用" = "N/A";
+"手动" = "Manual";
+"自测" = "Autoprova";
+"手动：%@" = "Manual: %@";
+"实测：%@" = "Real: %@";
+"自测：依次运行所有自动模拟，报告 PASS / FAIL" = "Autoprova: executa totes les simulacions automàtiques i informa PASS / FAIL";

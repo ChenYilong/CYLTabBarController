@@ -477,6 +477,10 @@
       "value": "Hide the navigation bar without a base class (issue #535)"
     },
     {
+      "name": "cyl_l10n_321ff794aab8",
+      "value": "N/A"
+    },
+    {
       "name": "cyl_l10n_e1642a46b804",
       "value": "Mid-Autumn"
     },
@@ -503,6 +507,10 @@
     {
       "name": "cyl_l10n_e05f97c5159d",
       "value": "Create a TabBarController from a configuration file"
+    },
+    {
+      "name": "cyl_l10n_5f0c0bf32dc1",
+      "value": "Keep"
     },
     {
       "name": "cyl_l10n_24fb8692947a",
@@ -577,6 +585,10 @@
       "value": "Space"
     },
     {
+      "name": "cyl_l10n_2f383291bcf8",
+      "value": "Real: %@"
+    },
+    {
       "name": "cyl_l10n_bccc798b577a",
       "value": "Centered capsule"
     },
@@ -605,6 +617,10 @@
       "value": "Shows an animated GIF as this page's tab icon; tap again to restore"
     },
     {
+      "name": "cyl_l10n_c7db6d4f1a42",
+      "value": "Restore"
+    },
+    {
       "name": "cyl_l10n_c4328f75476f",
       "value": "Valentine's Day"
     },
@@ -613,8 +629,16 @@
       "value": "Me"
     },
     {
+      "name": "cyl_l10n_2a3e7f5c382c",
+      "value": "Manual"
+    },
+    {
       "name": "cyl_l10n_97a6bedeb7fd",
       "value": "Manual: tap to turn scroll hiding on, scroll down to hide the TabBar, then do what the title says. Expected: the TabBar comes back at once."
+    },
+    {
+      "name": "cyl_l10n_f68e7e217ad1",
+      "value": "Manual: %@"
     },
     {
       "name": "cyl_l10n_89246468f7fd",
@@ -815,6 +839,14 @@
     {
       "name": "cyl_l10n_4bd51044149f",
       "value": "Custom sound file (cyl_tabButtonTapSoundURL)"
+    },
+    {
+      "name": "cyl_l10n_9d1c8a70d4da",
+      "value": "Self-test"
+    },
+    {
+      "name": "cyl_l10n_11858aeb1656",
+      "value": "Self-test: run every automatic simulation, report PASS / FAIL"
     },
     {
       "name": "cyl_l10n_beabcd498b94",

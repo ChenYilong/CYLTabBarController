@@ -477,6 +477,10 @@
       "value": "Skrýt navigační panel bez základní třídy (issue #535)"
     },
     {
+      "name": "cyl_l10n_321ff794aab8",
+      "value": "N/A"
+    },
+    {
       "name": "cyl_l10n_e1642a46b804",
       "value": "Svátek středu podzimu"
     },
@@ -503,6 +507,10 @@
     {
       "name": "cyl_l10n_e05f97c5159d",
       "value": "Vytvořit TabBarController z konfiguračního souboru"
+    },
+    {
+      "name": "cyl_l10n_5f0c0bf32dc1",
+      "value": "Zachovat"
     },
     {
       "name": "cyl_l10n_24fb8692947a",
@@ -577,6 +585,10 @@
       "value": "Vesmír"
     },
     {
+      "name": "cyl_l10n_2f383291bcf8",
+      "value": "Skutečné: %@"
+    },
+    {
       "name": "cyl_l10n_bccc798b577a",
       "value": "Kapsle uprostřed"
     },
@@ -605,6 +617,10 @@
       "value": "Zobrazí animovaný GIF jako ikonu panelu; klepnutím znovu obnovíte"
     },
     {
+      "name": "cyl_l10n_c7db6d4f1a42",
+      "value": "Obnovit"
+    },
+    {
       "name": "cyl_l10n_c4328f75476f",
       "value": "Valentýn"
     },
@@ -613,8 +629,16 @@
       "value": "Já"
     },
     {
+      "name": "cyl_l10n_2a3e7f5c382c",
+      "value": "Ručně"
+    },
+    {
       "name": "cyl_l10n_97a6bedeb7fd",
       "value": "Ručně: klepnutím zapněte skrývání při posouvání, posuňte dolů, aby se TabBar skryl, a proveďte, co říká název. Očekávání: TabBar se hned vrátí."
+    },
+    {
+      "name": "cyl_l10n_f68e7e217ad1",
+      "value": "Ručně: %@"
     },
     {
       "name": "cyl_l10n_89246468f7fd",
@@ -815,6 +839,14 @@
     {
       "name": "cyl_l10n_4bd51044149f",
       "value": "Vlastní zvukový soubor (cyl_tabButtonTapSoundURL)"
+    },
+    {
+      "name": "cyl_l10n_9d1c8a70d4da",
+      "value": "Autotest"
+    },
+    {
+      "name": "cyl_l10n_11858aeb1656",
+      "value": "Autotest: spustit všechny automatické simulace, hlásit PASS / FAIL"
     },
     {
       "name": "cyl_l10n_beabcd498b94",

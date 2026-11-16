@@ -477,6 +477,10 @@
       "value": "Ocultar la barra de navegación sin clase base (issue #535)"
     },
     {
+      "name": "cyl_l10n_321ff794aab8",
+      "value": "N/D"
+    },
+    {
       "name": "cyl_l10n_e1642a46b804",
       "value": "Festival del Medio Otoño"
     },
@@ -503,6 +507,10 @@
     {
       "name": "cyl_l10n_e05f97c5159d",
       "value": "Crear un TabBarController a partir de un archivo de configuración"
+    },
+    {
+      "name": "cyl_l10n_5f0c0bf32dc1",
+      "value": "Mantener"
     },
     {
       "name": "cyl_l10n_24fb8692947a",
@@ -577,6 +585,10 @@
       "value": "Espacio"
     },
     {
+      "name": "cyl_l10n_2f383291bcf8",
+      "value": "Real: %@"
+    },
+    {
       "name": "cyl_l10n_bccc798b577a",
       "value": "Cápsula centrada"
     },
@@ -605,6 +617,10 @@
       "value": "Muestra un GIF animado como icono de la pestaña; toca de nuevo para restaurar"
     },
     {
+      "name": "cyl_l10n_c7db6d4f1a42",
+      "value": "Restaurar"
+    },
+    {
       "name": "cyl_l10n_c4328f75476f",
       "value": "San Valentín"
     },
@@ -613,8 +629,16 @@
       "value": "Yo"
     },
     {
+      "name": "cyl_l10n_2a3e7f5c382c",
+      "value": "Manual"
+    },
+    {
       "name": "cyl_l10n_97a6bedeb7fd",
       "value": "Manual: toca para activar el ocultar al desplazar, desplázate hacia abajo para ocultar la TabBar y haz lo que dice el título. Esperado: la TabBar vuelve de inmediato."
+    },
+    {
+      "name": "cyl_l10n_f68e7e217ad1",
+      "value": "Manual: %@"
     },
     {
       "name": "cyl_l10n_89246468f7fd",
@@ -815,6 +839,14 @@
     {
       "name": "cyl_l10n_4bd51044149f",
       "value": "Archivo de sonido propio (cyl_tabButtonTapSoundURL)"
+    },
+    {
+      "name": "cyl_l10n_9d1c8a70d4da",
+      "value": "Autoprueba"
+    },
+    {
+      "name": "cyl_l10n_11858aeb1656",
+      "value": "Autoprueba: ejecutar todas las simulaciones automáticas e informar PASS / FAIL"
     },
     {
       "name": "cyl_l10n_beabcd498b94",

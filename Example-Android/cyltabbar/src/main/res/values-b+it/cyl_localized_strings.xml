@@ -17,4 +17,8 @@
     <string name="cyl_memory_warning_kept_selected">mantenuto: selezionato</string>
     <string name="cyl_memory_warning_kept_should_unload">mantenuto: shouldUnload ha restituito NO</string>
     <string name="cyl_memory_warning_kept">mantenuto</string>
+    <string name="cyl_scroll_self_test">Autotest</string>
+    <string name="cyl_scroll_title_manual">Manuale: %1$s</string>
+    <string name="cyl_scroll_title_real">Reale: %1$s</string>
+    <string name="cyl_scroll_title_self_test">Autotest: esegui tutte le simulazioni automatiche, riporta PASS / FAIL</string>
 </resources>

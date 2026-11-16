@@ -477,6 +477,10 @@
       "value": "Ẩn thanh điều hướng không cần lớp cơ sở (issue #535)"
     },
     {
+      "name": "cyl_l10n_321ff794aab8",
+      "value": "Không áp dụng"
+    },
+    {
       "name": "cyl_l10n_e1642a46b804",
       "value": "Tết Trung thu"
     },
@@ -503,6 +507,10 @@
     {
       "name": "cyl_l10n_e05f97c5159d",
       "value": "Tạo TabBarController từ tệp cấu hình"
+    },
+    {
+      "name": "cyl_l10n_5f0c0bf32dc1",
+      "value": "Giữ nguyên"
     },
     {
       "name": "cyl_l10n_24fb8692947a",
@@ -577,6 +585,10 @@
       "value": "Không gian"
     },
     {
+      "name": "cyl_l10n_2f383291bcf8",
+      "value": "Thực tế: %@"
+    },
+    {
       "name": "cyl_l10n_bccc798b577a",
       "value": "Viên nang ở giữa"
     },
@@ -605,6 +617,10 @@
       "value": "Hiện ảnh GIF động làm biểu tượng tab; chạm lại để khôi phục"
     },
     {
+      "name": "cyl_l10n_c7db6d4f1a42",
+      "value": "Khôi phục"
+    },
+    {
       "name": "cyl_l10n_c4328f75476f",
       "value": "Lễ tình nhân"
     },
@@ -613,8 +629,16 @@
       "value": "Tôi"
     },
     {
+      "name": "cyl_l10n_2a3e7f5c382c",
+      "value": "Thủ công"
+    },
+    {
       "name": "cyl_l10n_97a6bedeb7fd",
       "value": "Thủ công: chạm để bật ẩn khi cuộn, cuộn xuống để ẩn TabBar, rồi làm theo tiêu đề. Mong đợi: TabBar hiện lại ngay."
+    },
+    {
+      "name": "cyl_l10n_f68e7e217ad1",
+      "value": "Thủ công: %@"
     },
     {
       "name": "cyl_l10n_89246468f7fd",
@@ -815,6 +839,14 @@
     {
       "name": "cyl_l10n_4bd51044149f",
       "value": "Tệp âm thanh tùy chỉnh (cyl_tabButtonTapSoundURL)"
+    },
+    {
+      "name": "cyl_l10n_9d1c8a70d4da",
+      "value": "Tự kiểm tra"
+    },
+    {
+      "name": "cyl_l10n_11858aeb1656",
+      "value": "Tự kiểm tra: chạy mọi mô phỏng tự động, báo cáo PASS / FAIL"
     },
     {
       "name": "cyl_l10n_beabcd498b94",

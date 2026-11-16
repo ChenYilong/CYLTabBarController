@@ -17,4 +17,8 @@
     <string name="cyl_memory_warning_kept_selected">dikekalkan: dipilih</string>
     <string name="cyl_memory_warning_kept_should_unload">dikekalkan: shouldUnload mengembalikan NO</string>
     <string name="cyl_memory_warning_kept">dikekalkan</string>
+    <string name="cyl_scroll_self_test">Ujian kendiri</string>
+    <string name="cyl_scroll_title_manual">Manual: %1$s</string>
+    <string name="cyl_scroll_title_real">Sebenar: %1$s</string>
+    <string name="cyl_scroll_title_self_test">Ujian kendiri: jalankan semua simulasi automatik, laporkan PASS / FAIL</string>
 </resources>

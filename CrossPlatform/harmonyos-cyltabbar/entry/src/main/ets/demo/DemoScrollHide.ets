@@ -1,3 +1,5 @@
+import { CYLLocalizedString } from 'cyltabbar';
+
 /**
  * [EN] Item 20: scroll hiding, simulated interruptions (iOS UIViewController+CYLScrollHideSimulation, Android
  *      DemoScrollHide.kt): 39 cases in the iOS / Android order. Each automatic case fires 1.5 s after the tap; scroll down
@@ -74,7 +76,27 @@ export const DEMO_SCROLL_SIMULATIONS: DemoScrollSimulation[] = [
   { title: 'Self-test: run every automatic simulation, report PASS / FAIL', kind: DemoScrollKind.SelfTest, action: '', expectsVisible: true },
 ];
 
-/** [EN] The kind's label. [CN] 类型名。 */
+/** [EN] The kind's label, localized as on iOS and Android. [CN] 类型名，与 iOS、Android 一样本地化。 */
 export function demoScrollKindName(kind: DemoScrollKind): string {
-  return ['Restore', 'Keep', 'N/A', 'Manual', 'Self-test'][kind];
+  return [CYLLocalizedString('恢复'), CYLLocalizedString('保持'), CYLLocalizedString('不适用'), CYLLocalizedString('手动'),
+    CYLLocalizedString('自测')][kind];
+}
+
+/**
+ * [EN] The case's title as shown: the "Manual:" / "Real:" prefix and the self-test title are localized; the API or event
+ *      it names stays English, as on iOS and Android.
+ * [CN] 显示的用例标题：「手动：」「实测：」前缀与自测标题已本地化；所触发的 API 或事件保持英文，与 iOS、Android 相同。
+ */
+export function demoScrollTitle(simulation: DemoScrollSimulation): string {
+  const title = simulation.title;
+  if (simulation.kind === DemoScrollKind.SelfTest) {
+    return CYLLocalizedString('自测：依次运行所有自动模拟，报告 PASS / FAIL');
+  }
+  if (title.startsWith('Manual: ')) {
+    return CYLLocalizedString('手动：%@', title.substring('Manual: '.length));
+  }
+  if (title.startsWith('Real: ')) {
+    return CYLLocalizedString('实测：%@', title.substring('Real: '.length));
+  }
+  return title;
 }

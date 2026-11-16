@@ -17,4 +17,8 @@
     <string name="cyl_memory_warning_kept_selected">נשמר: נבחר</string>
     <string name="cyl_memory_warning_kept_should_unload">נשמר: shouldUnload החזיר NO</string>
     <string name="cyl_memory_warning_kept">נשמר</string>
+    <string name="cyl_scroll_self_test">בדיקה עצמית</string>
+    <string name="cyl_scroll_title_manual">ידני: %1$s</string>
+    <string name="cyl_scroll_title_real">אמיתי: %1$s</string>
+    <string name="cyl_scroll_title_self_test">בדיקה עצמית: הרצת כל ההדמיות האוטומטיות ודיווח PASS / FAIL</string>
 </resources>

@@ -17,4 +17,8 @@
     <string name="cyl_memory_warning_kept_selected">ponechané: vybrané</string>
     <string name="cyl_memory_warning_kept_should_unload">ponechané: shouldUnload vrátilo NO</string>
     <string name="cyl_memory_warning_kept">ponechané</string>
+    <string name="cyl_scroll_self_test">Autotest</string>
+    <string name="cyl_scroll_title_manual">Ručne: %1$s</string>
+    <string name="cyl_scroll_title_real">Skutočné: %1$s</string>
+    <string name="cyl_scroll_title_self_test">Autotest: spustiť všetky automatické simulácie, hlásiť PASS / FAIL</string>
 </resources>

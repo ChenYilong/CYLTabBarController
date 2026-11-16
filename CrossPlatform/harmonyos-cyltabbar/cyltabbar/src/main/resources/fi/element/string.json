@@ -477,6 +477,10 @@
       "value": "Piilota navigointipalkki ilman kantaluokkaa (issue #535)"
     },
     {
+      "name": "cyl_l10n_321ff794aab8",
+      "value": "Ei sovellu"
+    },
+    {
       "name": "cyl_l10n_e1642a46b804",
       "value": "Keskisyksyn juhla"
     },
@@ -503,6 +507,10 @@
     {
       "name": "cyl_l10n_e05f97c5159d",
       "value": "Luo TabBarController määritystiedostosta"
+    },
+    {
+      "name": "cyl_l10n_5f0c0bf32dc1",
+      "value": "Säilytä"
     },
     {
       "name": "cyl_l10n_24fb8692947a",
@@ -577,6 +585,10 @@
       "value": "Avaruus"
     },
     {
+      "name": "cyl_l10n_2f383291bcf8",
+      "value": "Todellinen: %@"
+    },
+    {
       "name": "cyl_l10n_bccc798b577a",
       "value": "Keskitetty kapseli"
     },
@@ -605,6 +617,10 @@
       "value": "Näyttää animoidun GIF-kuvan välilehden kuvakkeena; palauta napauttamalla uudelleen"
     },
     {
+      "name": "cyl_l10n_c7db6d4f1a42",
+      "value": "Palauta"
+    },
+    {
       "name": "cyl_l10n_c4328f75476f",
       "value": "Ystävänpäivä"
     },
@@ -613,8 +629,16 @@
       "value": "Minä"
     },
     {
+      "name": "cyl_l10n_2a3e7f5c382c",
+      "value": "Manuaalinen"
+    },
+    {
       "name": "cyl_l10n_97a6bedeb7fd",
       "value": "Manuaalinen: napauta ottaaksesi piilotuksen vieritettäessä käyttöön, vieritä alas piilottaaksesi TabBarin ja tee otsikon mukaan. Odotettu: TabBar palaa heti."
+    },
+    {
+      "name": "cyl_l10n_f68e7e217ad1",
+      "value": "Manuaalinen: %@"
     },
     {
       "name": "cyl_l10n_89246468f7fd",
@@ -815,6 +839,14 @@
     {
       "name": "cyl_l10n_4bd51044149f",
       "value": "Oma äänitiedosto (cyl_tabButtonTapSoundURL)"
+    },
+    {
+      "name": "cyl_l10n_9d1c8a70d4da",
+      "value": "Itsetesti"
+    },
+    {
+      "name": "cyl_l10n_11858aeb1656",
+      "value": "Itsetesti: suorita kaikki automaattiset simulaatiot, raportoi PASS / FAIL"
     },
     {
       "name": "cyl_l10n_beabcd498b94",

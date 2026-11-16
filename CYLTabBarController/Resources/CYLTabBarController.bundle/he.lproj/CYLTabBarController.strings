@@ -368,3 +368,12 @@
 "网络图标、标题与配色" = "סמלים מהרשת, כותרות וצבעים";
 /* The settings group of the configuration file rows (docs/Configuration-File.md). */
 "配置文件" = "קובץ תצורה";
+/* Scroll hiding simulations (issue #13): kind labels and title prefixes; API names stay English. */
+"恢复" = "שחזור";
+"保持" = "שמירה";
+"不适用" = "לא רלוונטי";
+"手动" = "ידני";
+"自测" = "בדיקה עצמית";
+"手动：%@" = "ידני: %@";
+"实测：%@" = "אמיתי: %@";
+"自测：依次运行所有自动模拟，报告 PASS / FAIL" = "בדיקה עצמית: הרצת כל ההדמיות האוטומטיות ודיווח PASS / FAIL";

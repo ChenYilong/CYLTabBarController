@@ -368,3 +368,12 @@
 "网络图标、标题与配色" = "नेटवर्क आइकन, शीर्षक और रंग";
 /* The settings group of the configuration file rows (docs/Configuration-File.md). */
 "配置文件" = "कॉन्फ़िगरेशन फ़ाइल";
+/* Scroll hiding simulations (issue #13): kind labels and title prefixes; API names stay English. */
+"恢复" = "पुनर्स्थापित करें";
+"保持" = "बनाए रखें";
+"不适用" = "लागू नहीं";
+"手动" = "मैन्युअल";
+"自测" = "स्व-परीक्षण";
+"手动：%@" = "मैन्युअल: %@";
+"实测：%@" = "वास्तविक: %@";
+"自测：依次运行所有自动模拟，报告 PASS / FAIL" = "स्व-परीक्षण: सभी स्वचालित सिमुलेशन चलाएँ, PASS / FAIL रिपोर्ट करें";

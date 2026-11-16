@@ -477,6 +477,10 @@
       "value": "기본 클래스 없이 내비게이션 바 숨기기 (issue #535)"
     },
     {
+      "name": "cyl_l10n_321ff794aab8",
+      "value": "해당 없음"
+    },
+    {
       "name": "cyl_l10n_e1642a46b804",
       "value": "추석"
     },
@@ -503,6 +507,10 @@
     {
       "name": "cyl_l10n_e05f97c5159d",
       "value": "구성 파일로 TabBarController 만들기"
+    },
+    {
+      "name": "cyl_l10n_5f0c0bf32dc1",
+      "value": "유지"
     },
     {
       "name": "cyl_l10n_24fb8692947a",
@@ -577,6 +585,10 @@
       "value": "우주"
     },
     {
+      "name": "cyl_l10n_2f383291bcf8",
+      "value": "실제: %@"
+    },
+    {
       "name": "cyl_l10n_bccc798b577a",
       "value": "가운데 캡슐"
     },
@@ -605,6 +617,10 @@
       "value": "이 페이지 탭에 GIF 애니메이션 표시. 다시 탭하면 복원"
     },
     {
+      "name": "cyl_l10n_c7db6d4f1a42",
+      "value": "복원"
+    },
+    {
       "name": "cyl_l10n_c4328f75476f",
       "value": "밸런타인데이"
     },
@@ -613,8 +629,16 @@
       "value": "내 정보"
     },
     {
+      "name": "cyl_l10n_2a3e7f5c382c",
+      "value": "수동"
+    },
+    {
       "name": "cyl_l10n_97a6bedeb7fd",
       "value": "수동: 탭하여 스크롤 시 숨기기를 켜고, 아래로 스크롤해 TabBar를 숨긴 뒤 제목대로 조작하세요. 예상: TabBar가 즉시 다시 표시됩니다."
+    },
+    {
+      "name": "cyl_l10n_f68e7e217ad1",
+      "value": "수동: %@"
     },
     {
       "name": "cyl_l10n_89246468f7fd",
@@ -815,6 +839,14 @@
     {
       "name": "cyl_l10n_4bd51044149f",
       "value": "사용자 지정 사운드 파일 (cyl_tabButtonTapSoundURL)"
+    },
+    {
+      "name": "cyl_l10n_9d1c8a70d4da",
+      "value": "자체 테스트"
+    },
+    {
+      "name": "cyl_l10n_11858aeb1656",
+      "value": "자체 테스트: 모든 자동 시뮬레이션을 실행하고 PASS / FAIL 보고"
     },
     {
       "name": "cyl_l10n_beabcd498b94",

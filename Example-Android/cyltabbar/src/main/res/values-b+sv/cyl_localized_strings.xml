@@ -17,4 +17,8 @@
     <string name="cyl_memory_warning_kept_selected">behållen: vald</string>
     <string name="cyl_memory_warning_kept_should_unload">behållen: shouldUnload returnerade NO</string>
     <string name="cyl_memory_warning_kept">behållen</string>
+    <string name="cyl_scroll_self_test">Självtest</string>
+    <string name="cyl_scroll_title_manual">Manuell: %1$s</string>
+    <string name="cyl_scroll_title_real">Verklig: %1$s</string>
+    <string name="cyl_scroll_title_self_test">Självtest: kör alla automatiska simuleringar, rapportera PASS / FAIL</string>
 </resources>

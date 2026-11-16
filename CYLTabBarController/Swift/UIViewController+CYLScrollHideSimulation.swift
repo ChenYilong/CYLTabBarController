@@ -95,8 +95,8 @@ enum CYLScrollHideSimulation {
     }
 
     /**
-     * [EN] The row's title (the API or event it triggers, the same in every language, so not translated) and its kind.
-     * [CN] 行标题（触发的 API 或事件，在所有语言中都相同，因此不翻译）及其类型。
+     * [EN] The row's title (the API or event it triggers stays English; the Manual / Real / Self-test words are localized) and its kind.
+     * [CN] 行标题（触发的 API 或事件保持英文；「手动」「实测」「自测」等词已本地化）及其类型。
      */
     static func title(of row: Row) -> (String, Kind) {
         switch row {
@@ -128,17 +128,17 @@ enum CYLScrollHideSimulation {
         case .drawer: return ("tabBarController.view slides away and back (side menu / drawer)", .restore)
         case .safeAreaTop: return ("additionalSafeAreaInsets.top + 20 (in-call / hotspot status bar)", .restore)
         case .sceneDeactivate: return ("UISceneWillDeactivateNotification (this scene)", .restore)
-        case .manualLongPress: return ("Manual: long press a row (context menu, drag, text selection)", .manual)
-        case .manualTapOutside: return ("Manual: tap a navigation bar button (UIMenu, action)", .manual)
-        case .manualKeepDragging: return ("Manual: after a restore, fling on without lifting; only a new drag hides it", .manual)
-        case .realBackground: return ("Real: open Settings (the app really goes to the background; come back)", .restore)
-        case .realSystemAlert: return ("Real system alert: tel:// call prompt (iPhone; tap Cancel)", .restore)
+        case .manualLongPress: return (String(format: CYLLocalizedString("手动：%@"), "long press a row (context menu, drag, text selection)"), .manual)
+        case .manualTapOutside: return (String(format: CYLLocalizedString("手动：%@"), "tap a navigation bar button (UIMenu, action)"), .manual)
+        case .manualKeepDragging: return (String(format: CYLLocalizedString("手动：%@"), "after a restore, fling on without lifting; only a new drag hides it"), .manual)
+        case .realBackground: return (String(format: CYLLocalizedString("实测：%@"), "open Settings (the app really goes to the background; come back)"), .restore)
+        case .realSystemAlert: return (String(format: CYLLocalizedString("实测：%@"), "system alert: tel:// call prompt (iPhone; tap Cancel)"), .restore)
         case .otherAppKeyboard: return ("UIKeyboardWillShow of another app (UIKeyboardIsLocalUserInfoKey = NO)", .keep)
         case .guidedAccess: return ("UIAccessibilityGuidedAccessStatusDidChangeNotification", .restore)
         case .sameTabAgain: return ("selectedIndex = the same tab (no change)", .keep)
         case .turnOnAgain: return ("cyl_hidesTabBarOnScroll = YES again (no change)", .keep)
         case .appShowsTabBar: return ("App: setTabBarHidden:NO", .restore)
-        case .selfTest: return ("Self-test: run every automatic simulation, report PASS / FAIL", .selfTest)
+        case .selfTest: return (CYLLocalizedString("自测：依次运行所有自动模拟，报告 PASS / FAIL"), .selfTest)
         }
     }
 

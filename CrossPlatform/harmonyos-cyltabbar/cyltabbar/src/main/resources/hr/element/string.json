@@ -477,6 +477,10 @@
       "value": "Sakrij navigacijsku traku bez osnovne klase (issue #535)"
     },
     {
+      "name": "cyl_l10n_321ff794aab8",
+      "value": "N/P"
+    },
+    {
       "name": "cyl_l10n_e1642a46b804",
       "value": "Festival sredine jeseni"
     },
@@ -503,6 +507,10 @@
     {
       "name": "cyl_l10n_e05f97c5159d",
       "value": "Stvori TabBarController iz konfiguracijske datoteke"
+    },
+    {
+      "name": "cyl_l10n_5f0c0bf32dc1",
+      "value": "Zadrži"
     },
     {
       "name": "cyl_l10n_24fb8692947a",
@@ -577,6 +585,10 @@
       "value": "Svemir"
     },
     {
+      "name": "cyl_l10n_2f383291bcf8",
+      "value": "Stvarno: %@"
+    },
+    {
       "name": "cyl_l10n_bccc798b577a",
       "value": "Centrirana kapsula"
     },
@@ -605,6 +617,10 @@
       "value": "Prikazuje animirani GIF kao ikonu kartice; dodirnite ponovno za vraćanje"
     },
     {
+      "name": "cyl_l10n_c7db6d4f1a42",
+      "value": "Vrati"
+    },
+    {
       "name": "cyl_l10n_c4328f75476f",
       "value": "Valentinovo"
     },
@@ -613,8 +629,16 @@
       "value": "Ja"
     },
     {
+      "name": "cyl_l10n_2a3e7f5c382c",
+      "value": "Ručno"
+    },
+    {
       "name": "cyl_l10n_97a6bedeb7fd",
       "value": "Ručno: dodirnite za uključivanje skrivanja pri pomicanju, pomaknite se prema dolje da se TabBar sakrije, zatim učinite što kaže naslov. Očekivano: TabBar se odmah vraća."
+    },
+    {
+      "name": "cyl_l10n_f68e7e217ad1",
+      "value": "Ručno: %@"
     },
     {
       "name": "cyl_l10n_89246468f7fd",
@@ -815,6 +839,14 @@
     {
       "name": "cyl_l10n_4bd51044149f",
       "value": "Vlastita zvučna datoteka (cyl_tabButtonTapSoundURL)"
+    },
+    {
+      "name": "cyl_l10n_9d1c8a70d4da",
+      "value": "Samotest"
+    },
+    {
+      "name": "cyl_l10n_11858aeb1656",
+      "value": "Samotest: pokreni sve automatske simulacije, prijavi PASS / FAIL"
     },
     {
       "name": "cyl_l10n_beabcd498b94",
