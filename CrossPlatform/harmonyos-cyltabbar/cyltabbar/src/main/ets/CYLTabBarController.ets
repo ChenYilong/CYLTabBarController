@@ -630,6 +630,38 @@ export struct CYLTabBarController {
    *      when GIF or image URL attributes win (as for Lottie), or when it failed to load.
    * [CN] FIX: issue #415。Tab 的 SVGA 文件（先取 URL，深色模式取深色版本）；没有、被 GIF 或图片 URL 属性覆盖（与 Lottie 相同）或加载失败时为 undefined。
    */
+  /**
+   * [EN] The drawn size of a tab's icon: lottieSize for a Lottie icon, svgaSize for an SVGA icon, else imageSize (the same
+   *      choice as cylTab). [CN] Tab 图标的绘制尺寸：Lottie 图标为 lottieSize，SVGA 图标为 svgaSize，否则为 imageSize（与 cylTab 相同的选择）。
+   */
+  private cylIconSize(index: number): number {
+    const item = this.tabBarItemsAttributes[index];
+    if (item.lottieFilePath !== undefined && item.gifFilePath === undefined && item.imageURL === undefined) {
+      return item.lottieSize ?? this.imageSize;
+    }
+    if (this.cylSVGAPath(index) !== undefined) {
+      return item.svgaSize ?? this.imageSize;
+    }
+    return this.imageSize;
+  }
+
+  /**
+   * [EN] The top of a tab title, as the centred column of cylTab lays it out for an imageSize icon: (tabBarHeight - icon -
+   *      3 - title height) / 2 + icon + 3. The plus button's title uses it so all titles share one baseline (iOS and
+   *      Android align the plus title with the tab titles). [CN] Tab 标题的顶部位置，与 cylTab 居中列对 imageSize 图标的布局相同。
+   *      PlusButton 标题使用它，使所有标题在同一基线（iOS、Android 让 PlusButton 标题与 Tab 标题对齐）。
+   */
+  private cylTabTitleTop(): number {
+    let titleHeight = 13;
+    try {
+      const size = this.getUIContext().getMeasureUtils().measureTextSize({ textContent: 'Ag', fontSize: 10 });
+      titleHeight = this.getUIContext().px2vp(Number(size.height));
+    } catch (error) {
+      // [EN] Keep the estimate. [CN] 保留估算值。
+    }
+    return (this.tabBarHeight - this.imageSize - 3 - titleHeight) / 2 + this.imageSize + 3;
+  }
+
   private cylSVGAPath(index: number): string | undefined {
     const item = this.tabBarItemsAttributes[index];
     if (item.gifFilePath !== undefined || item.imageURL !== undefined || this.cylSVGAFailures.includes(index)) {
@@ -681,10 +713,13 @@ export struct CYLTabBarController {
           .rotate({ y: 1, angle: this.tapFlip[index] ?? 0 })
           .translate({ y: this.tapOffset[index] ?? 0 })
         }
-        CYLBadgeView({ badge: this.badges[index], anchorWidth: this.imageSize })
+        CYLBadgeView({ badge: this.badges[index], anchorWidth: this.cylIconSize(index) })
       }
-      .width(this.imageSize)
-      .height(this.imageSize)
+      // [EN] As large as the drawn icon (an SVGA or Lottie icon may be larger than imageSize), so the icon stays centred
+      //      over its title and the badge sits on its real right edge. [CN] 与实际绘制的图标同大（SVGA、Lottie 图标可能大于
+      //      imageSize），使图标与标题居中对齐，角标位于图标真实的右边缘。
+      .width(this.cylIconSize(index))
+      .height(this.cylIconSize(index))
       .alignContent(Alignment.TopStart)
 
       if (this.tabBarItemsAttributes[index].title !== undefined) {
@@ -771,7 +806,8 @@ export struct CYLTabBarController {
       // [EN] As CYLPlusButton.kt: with an aligned title the image sits right above the title (item 4); otherwise it is
       //      centred and moved by centerYOffset. [CN] 与 CYLPlusButton.kt 相同：标题对齐时图片紧贴标题上方（第 4 项）；否则居中并按 centerYOffset 移动。
       .position(this.cylPlusAlignsTitle()
-        ? { x: 0, y: this.tabBarHeight - 17 - (this.plusButton?.imageSize ?? 54) } : undefined)
+        ? { x: 0, y: this.cylTabTitleTop() + this.titlePositionAdjustment.vertical - (this.plusButton?.imageSize ?? 54) }
+        : undefined)
       .width(this.cylPlusAlignsTitle() ? '100%' : undefined)
       .offset({ y: this.cylPlusAlignsTitle() ? 0 : (this.plusButton?.centerYOffset ?? 0) })
 
@@ -780,7 +816,9 @@ export struct CYLTabBarController {
           .fontSize(10)
           .fontColor(this.selectedIndex === CYLPlusButtonPageIndex
             ? (this.plusButtonTitleSelectedColor ?? this.tintColor) : this.unselectedColor)
-          .position(this.plusButton?.alignsTitle === false ? undefined : { x: 0, y: this.tabBarHeight - 17 })
+          // [EN] The same top as the tab titles, moved by the same titlePositionAdjustment. [CN] 与 Tab 标题顶部相同，并按相同的 titlePositionAdjustment 移动。
+          .position(this.plusButton?.alignsTitle === false ? undefined
+            : { x: this.titlePositionAdjustment.horizontal, y: this.cylTabTitleTop() + this.titlePositionAdjustment.vertical })
           .width('100%')
           .textAlign(TextAlign.Center)
       }

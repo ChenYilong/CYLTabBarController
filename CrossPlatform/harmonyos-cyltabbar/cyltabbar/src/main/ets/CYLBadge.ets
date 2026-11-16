@@ -259,6 +259,30 @@ export struct CYLBadgeView {
   @State private rotateZ: number = 0;
   private playedGeneration: number = -1;
 
+  /**
+   * [EN] The width of a text badge: its text measured with the badge font, plus the margin and the border, and at least
+   *      the height (a round badge for one character). As iOS (`CYLBadgeView` `sizeThatFits`) and Android (the label
+   *      measured), so "NEW" or "99+" stays on one line. Without a UI context it estimates from the character count.
+   * [CN] 文字角标宽度：按角标字体测量文字，加上边距与描边，且不小于高度（单个字符为圆形）。与 iOS、Android 相同，"NEW"、
+   *      "99+" 保持单行。无 UI 上下文时按字符数估算。
+   */
+  private cylTextBadgeWidth(text: string): number {
+    const fontSize = this.badge.fontSize ?? this.appearance().fontSize;
+    const margin = this.badge.margin ?? this.appearance().margin;
+    const border = this.badge.borderWidth ?? this.appearance().borderWidth;
+    const height = fontSize * 1.2 + margin;
+    let textWidth = fontSize * 0.62 * text.length;
+    try {
+      const size = this.getUIContext().getMeasureUtils().measureTextSize({
+        textContent: text, fontSize: fontSize, fontWeight: FontWeight.Bold
+      });
+      textWidth = this.getUIContext().px2vp(Number(size.width));
+    } catch (error) {
+      // [EN] Keep the estimate. [CN] 保留估算值。
+    }
+    return Math.max(height, Math.ceil(textWidth) + margin + border * 2);
+  }
+
   private appearance(): CYLBadgeAppearance {
     return CYLBadgeAppearance.globalAppearance;
   }
@@ -342,6 +366,9 @@ export struct CYLBadgeView {
             .fontWeight(FontWeight.Bold)
             .fontColor(this.badge.textColor ?? this.appearance().textColor)
             .textAlign(TextAlign.Center)
+            // [EN] One line, as wide as its text (not the narrow icon box it sits in). [CN] 单行，宽度随文字（而非所在的窄图标框）。
+            .maxLines(1)
+            .width(this.cylTextBadgeWidth(this.badge.cyl_displayText() ?? ''))
             .padding({ left: (this.badge.margin ?? this.appearance().margin) / 2, right: (this.badge.margin ?? this.appearance().margin) / 2 })
             .height((this.badge.fontSize ?? this.appearance().fontSize) * 1.2 + (this.badge.margin ?? this.appearance().margin))
             .constraintSize({ minWidth: (this.badge.fontSize ?? this.appearance().fontSize) * 1.2 + (this.badge.margin ?? this.appearance().margin) })
