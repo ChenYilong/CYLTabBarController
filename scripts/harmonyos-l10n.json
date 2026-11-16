@@ -38,7 +38,8 @@
     "Dimmed": "Dimmed",
     "Login state": "Login state",
     "Logged in: %@. The \"Me\" tab needs a login (issue #19); tap to toggle": "Logged in: %@. The \"Me\" tab needs a login (issue #19); tap to toggle",
-    "cyl_itemEdgeInsets: zero, the tabs fill the bar": "cyl_itemEdgeInsets: zero, the tabs fill the bar"
+    "cyl_itemEdgeInsets: zero, the tabs fill the bar": "cyl_itemEdgeInsets: zero, the tabs fill the bar",
+    "Dimmed": "Dimmed"
   },
   "zh-Hans": {
     "Previous tab (cyl_selectPreviousTab, issue #535)": "上一个 Tab（cyl_selectPreviousTab，issue #535）",
