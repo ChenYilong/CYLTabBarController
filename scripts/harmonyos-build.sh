@@ -14,7 +14,7 @@ done
 cp "$SRC"/*.json5 "$SRC"/hvigorfile.ts "$DST/"
 export JAVA_HOME="$DEVECO/jbr" DEVECO_SDK_HOME="$DEVECO/sdk"
 export PATH="$DEVECO/jbr/bin:$DEVECO/tools/node:$DEVECO/tools/ohpm/bin:$PATH"
-cd "$DST"
+cd "$DST" || exit 1
 ohpm install --all >/dev/null 2>&1 || ohpm install --all
 LOG="$DST/build.log"
 node "$DEVECO/tools/hvigor/bin/hvigorw.js" --mode module -p product=default assembleHap --no-daemon >"$LOG" 2>&1
