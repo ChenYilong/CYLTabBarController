@@ -421,5 +421,14 @@
     "evidence": "Maintainer report 2026-11-17; layout dump: content center 2588 px vs capsule and lens center 2614 px",
     "cause": "The tabs lay out for tabBarHeight (49 vp) from the top, while the Liquid Glass capsule is 61 vp high (iOS)",
     "fix": "cylGlassContentDy(): tabs get a top padding of (capsule height - tabBarHeight) / 2 and the plus button's image and title positions move by the same amount, so the content is centered in the capsule and stays aligned with the plus title (as iOS)"
+  },
+  {
+    "id": 48,
+    "status": "DONE (harmonyos-liquid-glass-badges-ios-vs-harmonyos.png, top iOS 26, bottom HarmonyOS at the same pt scale; layout dump: the plus badge center is now 10 px (2.9 vp) left of and 11 px (3.1 vp) below the plus image's top-right corner, iOS -3 / +3.7 pt; Mate 70 Pro emulator, HarmonyOS 6.0.1, API 21, 127.0.0.1:5559, 2026-11-17)",
+    "scope": "CrossPlatform/harmonyos-cyltabbar (cyltabbar)",
+    "title": "Liquid Glass badge misplaced: the plus button's badge sits inside the plus image instead of on its top-right corner",
+    "evidence": "Maintainer report 2026-11-17; layout dump: plus badge center 36 px (Liquid Glass) / 51 px (classic) left of the image's right edge",
+    "cause": "The plus badge was placed from the left of the plus slot (the image's Stack was the slot's width), not from the image, so it moved with the slot width",
+    "fix": "The plus image and its badge are in a box of the image's size, so the badge center is at the image's top-right corner plus cyl_badgeCenterOffset, as iOS (also fixes the classic style). Tab badges already use iOS's formula (host width + 2 + offset); what is left (up to 3.7 pt on 同城) comes from the icons' own padding inside the 26 vp Lottie box"
   }
 ]

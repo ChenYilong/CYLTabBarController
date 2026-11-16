@@ -1203,19 +1203,28 @@ export struct CYLTabBarController {
   cylPlus() {
     Column() {
       Stack() {
-        if (this.plusButton?.backgroundImage !== undefined) {
-          Image(this.plusButton.backgroundImage)
+        // [EN] The image and its badge in a box of the image's size: the badge is placed from the image's top-left, as iOS
+        //      places it on the plus button (center at its top-right corner plus cyl_badgeCenterOffset), not from the slot,
+        //      which is wider than the image (the badge was 8 to 15 vp inside the image).
+        // [CN] 图片与角标放在与图片等大的盒子中：角标以图片左上角为原点定位，与 iOS 在加号按钮上的位置相同（中心位于右上角再加
+        //      cyl_badgeCenterOffset），而不是以比图片更宽的槽位为原点（此前角标落在图片内侧 8 到 15 vp）。
+        Stack() {
+          if (this.plusButton?.backgroundImage !== undefined) {
+            Image(this.plusButton.backgroundImage)
+              .width(this.plusButton?.imageSize ?? 54)
+              .height(this.plusButton?.imageSize ?? 54)
+              .objectFit(ImageFit.Contain)
+          }
+          // [EN] Item 31: no image yet keeps the layout (the slot stays). [CN] 第 31 项：尚无图片时布局不变。
+          Image(this.plusPressed || this.selectedIndex === CYLPlusButtonPageIndex
+            ? (this.plusButton?.selectedImage ?? this.plusButton?.image) : this.plusButton?.image)
             .width(this.plusButton?.imageSize ?? 54)
             .height(this.plusButton?.imageSize ?? 54)
             .objectFit(ImageFit.Contain)
+          CYLBadgeView({ badge: this.plusButtonBadge, anchorWidth: this.plusButton?.imageSize ?? 54 })
         }
-        // [EN] Item 31: no image yet keeps the layout (the slot stays). [CN] 第 31 项：尚无图片时布局不变。
-        Image(this.plusPressed || this.selectedIndex === CYLPlusButtonPageIndex
-          ? (this.plusButton?.selectedImage ?? this.plusButton?.image) : this.plusButton?.image)
-          .width(this.plusButton?.imageSize ?? 54)
-          .height(this.plusButton?.imageSize ?? 54)
-          .objectFit(ImageFit.Contain)
-        CYLBadgeView({ badge: this.plusButtonBadge, anchorWidth: this.plusButton?.imageSize ?? 54 })
+        .width(this.plusButton?.imageSize ?? 54)
+        .height(this.plusButton?.imageSize ?? 54)
       }
       // [EN] As CYLPlusButton.kt: with an aligned title the image sits right above the title (item 4); otherwise it is
       //      centred and moved by centerYOffset. [CN] 与 CYLPlusButton.kt 相同：标题对齐时图片紧贴标题上方（第 4 项）；否则居中并按 centerYOffset 移动。
