@@ -226,47 +226,47 @@
   },
   {
     "id": 26,
-    "status": "TODO",
+    "status": "TODO need 模拟器截图验证",
     "scope": "ChenYilong/CollectionViewClassifyMenu (harmony port; other repository, tracker docs/harmony-verification.md)",
     "title": "The review filter 好评(9) does not filter the list when tapped",
     "evidence": "harmonyos-push-*.jpeg on feat/harmony 98df838 (report of session chenyilong-de): reviews-all",
     "cause": "Not investigated here; owned by the winCollectionViewClassifyMenu session",
-    "fix": "Fix in CollectionViewClassifyMenu"
+    "fix": "5dc703b (feat/harmony): tag taps go through a priorityGesture TapGesture on each item; host test ReviewFilterTap; traced in hilog domain CYLTagList"
   },
   {
     "id": 27,
-    "status": "TODO",
+    "status": "TODO need 模拟器截图验证",
     "scope": "ChenYilong/CollectionViewClassifyMenu (harmony port; other repository, tracker docs/harmony-verification.md)",
     "title": "The plus button and the menu-linkage filter button have no accessibility text and do nothing when tapped",
     "evidence": "harmonyos-push-*.jpeg on feat/harmony 98df838 (report of session chenyilong-de): query-menu-linkage",
     "cause": "Missing accessibilityText / onClick",
-    "fix": "Owner fix c6a8a5c, not pushed yet"
+    "fix": "95bebc1 (feat/harmony): accessibility labels and taps for the plus button and the menu-linkage filter button"
   },
   {
     "id": 28,
-    "status": "TODO",
+    "status": "TODO need 模拟器截图验证",
     "scope": "ChenYilong/CollectionViewClassifyMenu (harmony port; other repository, tracker docs/harmony-verification.md)",
     "title": "Dark mode, animations page: empty rows; the speed and loop labels are invisible",
     "evidence": "harmonyos-push-*.jpeg on feat/harmony 98df838 (report of session chenyilong-de): animations-tab",
-    "cause": "Text colors not following the dark color mode",
-    "fix": "Fix in CollectionViewClassifyMenu"
+    "cause": "Empty rows: tags clamped to width 0 before the list knew its width; invisible labels: 7 Texts without a color",
+    "fix": "849c2d8 (feat/harmony), with a host regression test"
   },
   {
     "id": 29,
-    "status": "TODO",
+    "status": "TODO need 模拟器截图验证",
     "scope": "ChenYilong/CollectionViewClassifyMenu (harmony port; other repository, tracker docs/harmony-verification.md)",
     "title": "Crash in libohos_rive.so on the animations page",
     "evidence": "harmonyos-push-*.jpeg on feat/harmony 98df838 (report of session chenyilong-de): animations-tab",
-    "cause": "Rive native library (ohos_rive) crash; not reproduced here",
-    "fix": "Fix in CollectionViewClassifyMenu (Rive player)"
+    "cause": "Crash when a Rive view is disposed (bug in the ohos_rive library, still there)",
+    "fix": "95bebc1 (feat/harmony): avoided by pooling Rive views (BuilderNode / NodeContainer) and never disposing them"
   },
   {
     "id": 30,
-    "status": "TODO",
+    "status": "DONE (by design, B1: tab titles stay 10 fp and shrink toward 8 fp, then ellipsize, only when a long title such as 场景一：评价筛选 would not fit; harmonyos-push-*.jpeg)",
     "scope": "ChenYilong/CollectionViewClassifyMenu (harmony port; other repository, tracker docs/harmony-verification.md)",
     "title": "Bottom tab bar titles are small (8 fp) after the B1 fix",
     "evidence": "harmonyos-push-*.jpeg on feat/harmony 98df838 (report of session chenyilong-de)",
-    "cause": "The app's own tab bar (not cyltabbar) uses 8 fp titles",
-    "fix": "Fix in CollectionViewClassifyMenu; CYLTabBarController uses 10 fp"
+    "cause": "Intended shrink-to-fit for long titles",
+    "fix": "No change (owner's decision)"
   }
 ]
