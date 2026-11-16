@@ -51,3 +51,4 @@ export {
   cyl_flatDesignHasPlusButton,
   cyl_flatDesignHasPlusChildViewController
 } from './src/main/ets/CYLFlatDesignTabBar';
+export { CYLColor } from './src/main/ets/CYLColor';
