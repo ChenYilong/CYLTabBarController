@@ -73,3 +73,11 @@ test('standardAppearance while selected, tint, accessibility label, helpers', ()
   assert.equal(cylTextStyle(null), '');
   assert.deepEqual([cylStateKey(4), cylStateKey('selected'), cylStateKey(0)], ['selected', 'selected', 'normal']);
 });
+
+test('badge debugging switch (cyl_debug.js): off by default, on leaves out the animation class', () => {
+  const { CYL_BADGE_ANIMATION_DISABLED, cylBadgeAnimationClass } = require('../src/cyl-tab-bar/cyl_debug');
+  assert.equal(CYL_BADGE_ANIMATION_DISABLED, false, 'never commit the badge debugging switch on');
+  assert.equal(cylItemModel({ badgeValue: '9', badgeAnimation: 'bounce' }).badgeClass, 'cyl-badge-bounce');
+  assert.equal(cylBadgeAnimationClass('bounce', true), '');
+  assert.equal(cylBadgeAnimationClass('', false), '');
+});

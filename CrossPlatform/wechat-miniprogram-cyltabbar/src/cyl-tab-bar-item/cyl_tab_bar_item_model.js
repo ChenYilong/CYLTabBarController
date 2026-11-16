@@ -6,6 +6,7 @@
  *      （与 iOS 同名）转为模板的样式与节点。纯函数，不调用 wx API，在 Node 中测试（test/cyl_tab_bar_item.test.js）。
  */
 const reader = require('../cyl-tab-bar/cyl_configuration');
+const { cylBadgeAnimationClass } = require('../cyl-tab-bar/cyl_debug');
 
 // [EN] A mini program code package leaves out .pag, .riv and .svga files, so package copies are named *.pag.bin /
 //      *.riv.bin / *.svga.bin.
@@ -118,7 +119,7 @@ function cylItemModel(p) {
     badgeIsDot: badgeValue === '•' || (badgeValue === '' && Boolean(badgeSize)),
     badgeText: badgeValue === '•' ? '' : badgeValue,
     badgeClass: /^(breathe|scale|shake|bounce|scaleOnce)$/.test(String(p.badgeAnimation || ''))
-      ? `cyl-badge-${p.badgeAnimation}` : '',
+      ? cylBadgeAnimationClass(p.badgeAnimation) : '',
     badgeStyle: `padding: ${badgeInset.top}px ${badgeInset.right}px ${badgeInset.bottom}px ${badgeInset.left}px;`
       // [EN] Moved by margins: the badge animations use transform. [CN] 用外边距移动：角标动画使用 transform。
       + (badgeOffset.horizontal || badgeOffset.vertical

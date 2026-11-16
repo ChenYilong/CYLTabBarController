@@ -12,6 +12,7 @@
  *      `cyl_setThemeIdentifier`、`cyl_setHiddenIdentifiers`、`cyl_setTabBarHidden`。
  */
 const { cylReadConfiguration } = require('./cyl_configuration');
+const { cylBadgeAnimationClass } = require('./cyl_debug');
 const { cylTabBarItemStyle, cylTabBarItemStyleForStyleType, cylGlassLensStyle } = require('./cyl_tab_bar_item_style');
 
 /**
@@ -448,7 +449,7 @@ Component({
       return {
         text: isDot ? '' : text,
         isDot,
-        className: badge.animation ? `cyl-badge-${badge.animation}` : '',
+        className: cylBadgeAnimationClass(badge.animation),
         style: (badge.color ? `background-color: ${badge.color};` : '')
           + (offset ? ` margin-left: ${offset[1]}px; margin-top: ${offset[2]}px;` : '')
           + (size ? ` width: ${size[1]}px; height: ${size[1]}px; border-radius: ${Number(size[1]) / 2}px;` : ''),
