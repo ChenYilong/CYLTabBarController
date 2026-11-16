@@ -978,5 +978,14 @@
   "CYLConstants +cyl_hasDarkLottieURLs": "`CYLConstants.cyl_hasDarkLottieURLs(...)` (built; emulator check pending / 已编译，模拟器验证待做)",
   "CYLConstants +cyl_hasDarkLottieForLottieURL:": "`CYLConstants.cyl_hasDarkLottieForLottieURL(...)` (built; emulator check pending / 已编译，模拟器验证待做)",
   "CYLConstants +isLottieEnabledFromlottieURLs:tabBarItemsAttributes:": "`CYLConstants.isLottieEnabledFromlottieURLs(...)` (built; emulator check pending / 已编译，模拟器验证待做)",
-  "CYLConstants +isTabBarItemAnimationEnabledWithURLs:tabBarItemsAttributes:": "`CYLConstants.isTabBarItemAnimationEnabledWithURLs(...)` (built; emulator check pending / 已编译，模拟器验证待做)"
+  "CYLConstants +isTabBarItemAnimationEnabledWithURLs:tabBarItemsAttributes:": "`CYLConstants.isTabBarItemAnimationEnabledWithURLs(...)` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLThemeColorProvider": "`CYLThemeColorProvider` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "UIColor(CYLTheme)": "`CYLThemeColor` (`cyltabbar/CYLThemeColor.ets`; ArkUI has no dynamic color, read `cyl_rawColor`) (built; emulator check pending / 已编译，模拟器验证待做)",
+  "UIColor(CYLTheme) +cyl_colorWithThemeProvider:": "`CYLThemeColor.cyl_colorWithThemeProvider(provider)` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "UIColor(CYLTheme) +cyl_colorWithName:themeProvider:": "`CYLThemeColor.cyl_colorWithName(name, provider)` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "UIColor(CYLTheme) +cyl_colorWithThemeManagerName:provider:": "`CYLThemeColor.cyl_colorWithThemeManagerName(managerName, provider)` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "UIColor(CYLTheme) +cyl_colorWithName:themeManagerName:provider:": "`CYLThemeColor.cyl_colorWithNameAndThemeManagerName(name, managerName, provider)` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "UIColor(CYLTheme) cyl_isThemeColor": "`CYLThemeColor.cyl_isThemeColor` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "UIColor(CYLTheme) cyl_themeColorName": "`CYLThemeColor.cyl_themeColorName` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "UIColor(CYLTheme) cyl_rawColor": "`CYLThemeColor.cyl_rawColor` / `CYLThemeColor.cyl_rawColorOf(color)` (built; emulator check pending / 已编译，模拟器验证待做)"
 }

@@ -67,3 +67,4 @@ export {
   CYLConstants, CYLSize, CYLTabBarItemImagePlaceholderWidth, CYLTabBarItemImagePlaceholderHeight,
   cyl_setTabBarItemImagePlaceholderSize
 } from './src/main/ets/CYLConstants';
+export { CYLThemeColor, CYLThemeColorProvider } from './src/main/ets/CYLThemeColor';
