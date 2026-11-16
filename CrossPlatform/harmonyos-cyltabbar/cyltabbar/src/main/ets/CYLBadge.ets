@@ -301,14 +301,22 @@ export struct CYLBadgeView {
         animateTo({ duration: 1000, iterations: forever, playMode: PlayMode.Alternate }, () => { this.scaleValue = 0.6; });
         break;
       case CYLBadgeAnimationType.Shake:
-        this.translateX = -6;
-        animateTo({ duration: 125, iterations: forever, playMode: PlayMode.Alternate }, () => { this.translateX = 6; });
+        // [EN] As iOS (cyl_shakeAnimationRepeatTimes, translation.x): 0, -w/4, 0, +w/4, 0 in 1 s, around the badge's place.
+        // [CN] 与 iOS 相同（translation.x）：1 秒内 0、-w/4、0、+w/4、0，围绕角标原位。
+        this.cylPlayAround(true, this.cylBadgeWidth() / 4, repeats);
         break;
       case CYLBadgeAnimationType.Bounce:
-        animateTo({ duration: 250, iterations: forever, playMode: PlayMode.Alternate }, () => { this.translateY = -8; });
+        // [EN] As iOS (cyl_bounceAnimationRepeatTimes, translation.y): 0, -h/4, 0, +h/4, 0 in 1 s, around the badge's place.
+        //      It used to go only up, 8 vp every 250 ms, so the badge (e.g. "100" on Messages) sat about 4 vp too high.
+        // [CN] 与 iOS 相同（translation.y）：1 秒内 0、-h/4、0、+h/4、0，围绕角标原位。此前只向上 8 vp、每 250 毫秒一次，
+        //      角标（如「消息」上的 "100"）平均高出约 4 vp。
+        this.cylPlayAround(false, this.cylBadgeHeight() / 4, repeats);
         break;
       case CYLBadgeAnimationType.Breathe:
-        animateTo({ duration: 600, iterations: forever, playMode: PlayMode.Alternate }, () => { this.opacityValue = 0.1; });
+        // [EN] As iOS (cyl_opacityForeverAnimation 1.4 s): opacity 1 to 0.1 and back, 1.4 s each way, linear.
+        // [CN] 与 iOS 相同：透明度 1 到 0.1 再回到 1，每个方向 1.4 秒，线性。
+        animateTo({ duration: 1400, iterations: forever, playMode: PlayMode.Alternate, curve: Curve.Linear },
+          () => { this.opacityValue = 0.1; });
         break;
       case CYLBadgeAnimationType.LeftRightOnce:
         this.translateX = -10;
@@ -333,6 +341,40 @@ export struct CYLBadgeView {
       default:
         break;
     }
+  }
+
+  /** [EN] The badge's height: a dot's diameter, or a text badge's height. [CN] 角标高度：红点直径或文字角标高度。 */
+  private cylBadgeHeight(): number {
+    if (this.badge.cyl_displayText() === null) {
+      return (this.badge.radius ?? this.appearance().radius) * 2;
+    }
+    return (this.badge.fontSize ?? this.appearance().fontSize) * 1.2 + (this.badge.margin ?? this.appearance().margin);
+  }
+
+  /** [EN] The badge's width: a dot's diameter, or a text badge's width. [CN] 角标宽度：红点直径或文字角标宽度。 */
+  private cylBadgeWidth(): number {
+    return this.badge.cyl_displayText() === null ? (this.badge.radius ?? this.appearance().radius) * 2 : this.cylTextBadgeWidth();
+  }
+
+  /**
+   * [EN] iOS translationAnimation: keyframes 0, -offset, 0, +offset, 0 over 1 s (250 ms each), relative to the badge's place;
+   *      forever unless repeatCount is set. [CN] iOS 的 translationAnimation：1 秒内关键帧 0、-offset、0、+offset、0（各 250 毫秒），
+   *      相对角标原位；未设置 repeatCount 时无限循环。
+   */
+  private cylPlayAround(horizontal: boolean, offset: number, repeats: number | undefined): void {
+    const set = (value: number): void => {
+      if (horizontal) {
+        this.translateX = value;
+      } else {
+        this.translateY = value;
+      }
+    };
+    this.getUIContext().keyframeAnimateTo({ iterations: repeats !== undefined && repeats > 0 ? repeats : -1 }, [
+      { duration: 250, curve: Curve.Linear, event: () => set(-offset) },
+      { duration: 250, curve: Curve.Linear, event: () => set(0) },
+      { duration: 250, curve: Curve.Linear, event: () => set(offset) },
+      { duration: 250, curve: Curve.Linear, event: () => set(0) },
+    ]);
   }
 
   /**

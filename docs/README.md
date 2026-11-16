@@ -231,6 +231,7 @@ docs/
 │   ├── gif-classic.png
 │   ├── gif-flat-design.png
 │   ├── gif-liquid-glass.png
+│   ├── harmonyos-badge-bounce-around-place.png
 │   ├── harmonyos-bundle-image-row-localized.png
 │   ├── harmonyos-emulator-pages-b7fdf26.png
 │   ├── harmonyos-flatdesign-liquidglass-taps-mate70pro.png

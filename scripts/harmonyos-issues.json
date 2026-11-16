@@ -439,5 +439,14 @@
     "evidence": "Maintainer report 2026-11-17; the layout dump had the dot in place while the screen showed it 45 px (13 vp) lower: a render-time transform",
     "cause": "The badge was \"100\" with the Bounce animation, an infinite animateTo on translateY; selecting the tab turns it into a dot without animation, and cylPlay() reset translateY by plain assignment, which does not stop a running infinite animation in ArkUI, so it kept driving the dot's transform",
     "fix": "cylPlay() resets scale, translate, opacity and rotation inside animateTo({ duration: 0 }), which stops running animations before the new badge plays its own (all styles)"
+  },
+  {
+    "id": 50,
+    "status": "DONE (harmonyos-badge-bounce-around-place.png: six shots of the 消息 \"99+\" and 我的 \"NEW\" badges; the green line is the badge's resting center; 99+ now moves above and below it; Mate 70 Pro emulator, HarmonyOS 6.0.1, API 21, 127.0.0.1:5559, 2026-11-17)",
+    "scope": "CrossPlatform/harmonyos-cyltabbar (cyltabbar, core)",
+    "title": "Liquid Glass: the 消息 badge (\"100\", Bounce) sits too high: it bounces only upward, faster than iOS",
+    "evidence": "Maintainer report 2026-11-17 (消息 tab badge misplaced); iOS cyl_bounceAnimationRepeatTimes: 0, -h/4, 0, +h/4, 0 in 1 s",
+    "cause": "CYLBadge.ets animated Bounce from 0 to -8 vp and back every 250 ms (Shake ±6 vp every 125 ms, Breathe 600 ms ease), unlike iOS",
+    "fix": "Core fix in CYLBadge.ets (cyltabbar, published to ohpm), not in the example: Bounce and Shake use iOS's keyframes 0, -size/4, 0, +size/4, 0 over 1 s around the badge's place (h for Bounce, w for Shake); Breathe is opacity 1 to 0.1 and back, 1.4 s each way, linear, as iOS"
   }
 ]
