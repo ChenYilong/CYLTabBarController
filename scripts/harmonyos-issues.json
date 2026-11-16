@@ -160,5 +160,59 @@
     "evidence": "scripts/harmonyos-l10n.json had no zh-Hant table (reported in PR #804)",
     "cause": "Only en and zh-Hans were written for keys the iOS bundle does not have",
     "fix": "PR #804: zh-Hant for all HarmonyOS-only keys; resources regenerated"
+  },
+  {
+    "id": 19,
+    "status": "TODO need 模拟器截图验证",
+    "scope": "CrossPlatform/harmonyos-cyltabbar (cyltabbar)",
+    "title": "A bordered text badge (the Border option) clips its text",
+    "evidence": "PR #805 review",
+    "cause": "cylTextBadgeWidth() left out borderWidth, but ArkUI draws the border inside the width",
+    "fix": "PR #805 merged: the width adds the border on both sides"
+  },
+  {
+    "id": 20,
+    "status": "TODO need 模拟器截图验证",
+    "scope": "CrossPlatform/harmonyos-cyltabbar (cyltabbar, entry)",
+    "title": "The 41 HarmonyOS-only strings stay English in the 30 other languages (de 29 copies of English, fr / es 29, ar / ko / ja 27; report of the CYLSearchViewController session)",
+    "evidence": "string.json of every language except zh_CN / zh_TW",
+    "cause": "scripts/harmonyos-l10n.json had only en, zh-Hans and zh-Hant",
+    "fix": "Translations for all 33 languages added to scripts/harmonyos-l10n.json and resources regenerated; only API names, Liquid Glass and loanwords (Badge, OK) stay as in English"
+  },
+  {
+    "id": 21,
+    "status": "TODO need 模拟器截图验证",
+    "scope": "CrossPlatform/harmonyos-cyltabbar (cyltabbar, entry)",
+    "title": "SVGA configuration demo: tab titles and the page title are English (Home, Discover, Message, Me) in the Chinese UI",
+    "evidence": "harmonyos-port-svga-demo-page.png",
+    "cause": "configurationWithRawFile ignored CYLTabBarControllerLocalization, and the SVGA file had none",
+    "fix": "configurationWithRawFile localizes CYLTabBarItemTitle / CYLTabBarItemSelectedTitle from <path>/<language>.lproj/<table>.strings next to the file, as iOS; the tables of Example-Shared/Configurations/Localization are copied to rawfile/configurations/Localization and the SVGA file declares them"
+  },
+  {
+    "id": 22,
+    "status": "TODO need 模拟器截图验证",
+    "scope": "CrossPlatform/harmonyos-cyltabbar (entry)",
+    "title": "Configuration demo page: the labels \"identifier:\" and \"page:\" are English, and \"page: -\" shows no page",
+    "evidence": "harmonyos-port-svga-demo-page.png",
+    "cause": "Literal English labels in ConfigurationDemo.ets; the SVGA file had no CYLTabBarItemPageIdentifier",
+    "fix": "Labels go through CYLLocalizedString (Identifier: %@, Page identifier: %@, 33 languages); each SVGA tab has a page identifier svga-<identifier>"
+  },
+  {
+    "id": 23,
+    "status": "TODO need 模拟器截图验证",
+    "scope": "CrossPlatform/harmonyos-cyltabbar (cyltabbar)",
+    "title": "Liquid Glass: the \"8\" badge on 同城 is drawn about twice its size and covers the icon",
+    "evidence": "harmonyos-flatdesign-liquidglass-taps-mate70pro.png col. 3",
+    "cause": "Probably captured during the Scale animation (spring curve overshoots past 1) replayed when the style switches; not seen in the other columns",
+    "fix": "No code change; take the screenshot 1 s after switching the style and check the badge is 2 × radius"
+  },
+  {
+    "id": 24,
+    "status": "TODO need 模拟器截图验证",
+    "scope": "CrossPlatform/harmonyos-cyltabbar (cyltabbar)",
+    "title": "Liquid Glass: right after the switch the bar sits low, behind the gesture bar, with titles cut off",
+    "evidence": "harmonyos-flatdesign-liquidglass-taps-mate70pro.png col. 2",
+    "cause": "Probably captured during the style switch animation; col. 3 shows the settled bar",
+    "fix": "No code change; take the screenshot 1 s after the switch and check the bar is above the gesture bar"
   }
 ]

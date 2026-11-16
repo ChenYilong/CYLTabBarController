@@ -133,6 +133,10 @@
       "value": "GIF 動圖圖示"
     },
     {
+      "name": "cyl_l10n_62c204295948",
+      "value": "識別碼：%@"
+    },
+    {
       "name": "cyl_l10n_d52d30723b2f",
       "value": "從左到右一次"
     },
@@ -187,6 +191,10 @@
     {
       "name": "cyl_l10n_287e78fd65af",
       "value": "其他文字"
+    },
+    {
+      "name": "cyl_l10n_2c7326127f1f",
+      "value": "頁面識別碼：%@"
     },
     {
       "name": "cyl_l10n_41b77539cc64",

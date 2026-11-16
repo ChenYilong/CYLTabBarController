@@ -133,6 +133,10 @@
       "value": "GIF icon"
     },
     {
+      "name": "cyl_l10n_62c204295948",
+      "value": "Identifier: %@"
+    },
+    {
       "name": "cyl_l10n_d52d30723b2f",
       "value": "Left to right once"
     },
@@ -187,6 +191,10 @@
     {
       "name": "cyl_l10n_287e78fd65af",
       "value": "Other text"
+    },
+    {
+      "name": "cyl_l10n_2c7326127f1f",
+      "value": "Page identifier: %@"
     },
     {
       "name": "cyl_l10n_41b77539cc64",

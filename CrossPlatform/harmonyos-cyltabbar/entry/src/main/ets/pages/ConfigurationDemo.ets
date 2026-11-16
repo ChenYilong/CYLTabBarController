@@ -65,7 +65,7 @@ struct ConfigurationDemo {
         .backgroundColor('#F8F8F8')
       // [EN] Issue list #22: the labels are localized (iOS-style keys); the file path and the identifiers stay as written.
       // [CN] 问题清单 #22：标签已本地化；文件路径与标识保持原样。
-      Text(`${this.file}\n${CYLLocalizedString('标识：%@', identifier)}\n${CYLLocalizedString('页面标识：%@', this.result?.items[index]?.pageIdentifier ?? '-')}`)
+      Text(`${this.file}\n${CYLLocalizedString('Identifier: %@', identifier)}\n${CYLLocalizedString('Page identifier: %@', this.result?.items[index]?.pageIdentifier ?? '-')}`)
         .fontSize(13)
         .fontColor('#666666')
         .margin(16)
