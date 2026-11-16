@@ -232,6 +232,7 @@ docs/
 │   ├── harmonyos-styles-ocean-skin-b7995d0.png
 │   ├── harmonyos-styles-recheck-6befe36.png
 │   ├── harmonyos-styles-space-skin-981db1e.png
+│   ├── harmonyos-svga-icon-title-alignment-before-after.png
 │   ├── harmonyos-tab-bar-svga-launch.png
 │   ├── harmonyos-tab-bar-svga-messages-tap.png
 │   ├── image-only-tabs-gallery-3-3-ios17.png

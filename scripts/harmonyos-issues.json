@@ -91,7 +91,7 @@
   },
   {
     "id": 11,
-    "status": "TODO need 模拟器截图验证",
+    "status": "DONE (harmonyos-port-svga-demo-taps.png, b840da3, emulator 127.0.0.1:5557)",
     "scope": "CrossPlatform/harmonyos-cyltabbar (cyltabbar)",
     "title": "SVGA (and Lottie) icons larger than imageSize sit about 5 vp right of and below their titles",
     "evidence": "harmonyos-tab-bar-svga-launch.png, harmonyos-tab-bar-svga-messages-tap.png (reported by the CYLTableViewPlaceHolder session)",
@@ -119,6 +119,15 @@
   {
     "id": 14,
     "status": "TODO need 模拟器截图验证",
+    "scope": "CrossPlatform/harmonyos-cyltabbar (cyltabbar)",
+    "title": "The first tap on a tab right after pushing the configuration demo page does nothing; the next tap works",
+    "evidence": "Emulator check of the SVGA demo (CYLTabBarController-folder session, b840da3, 127.0.0.1:5557)",
+    "cause": "Likely the tab's exclusive gesture group (LongPressGesture before TapGesture): during or right after the push transition the first tap is not recognised by the group",
+    "fix": "Tabs take taps through onClick and the long press as a parallelGesture (a long press marks its tab so the following click is ignored)"
+  },
+  {
+    "id": 15,
+    "status": "TODO need 模拟器截图验证",
     "scope": "CrossPlatform/harmonyos-cyltabbar (entry)",
     "title": "The demo list has no bottom inset: the last row stays under the tab bar and the raised plus button",
     "evidence": "every Home screenshot",
@@ -126,7 +135,7 @@
     "fix": "contentEndOffset(CYL_LIST_END_INSET), 120 vp (PR #803)"
   },
   {
-    "id": 15,
+    "id": 16,
     "status": "TODO need 模拟器截图验证",
     "scope": "CrossPlatform/harmonyos-cyltabbar (entry)",
     "title": "A skin's plus image (wave, meteor) overflows above the bar over the list",
@@ -135,7 +144,7 @@
     "fix": "Drawn at 40 vp (CYL_SKIN_PLUS_IMAGE_SIZE) (PR #803)"
   },
   {
-    "id": 16,
+    "id": 17,
     "status": "TODO need 模拟器截图验证",
     "scope": "CrossPlatform/harmonyos-cyltabbar (entry)",
     "title": "The row \"CYLFlatDesignTabBarItem 不居中显示（系统效果）\" has no subtitle while its neighbors have one",
@@ -144,7 +153,7 @@
     "fix": "Localized subtitle \"cyl_itemEdgeInsets: zero, the tabs fill the bar\" (PR #803)"
   },
   {
-    "id": 17,
+    "id": 18,
     "status": "TODO",
     "scope": "CrossPlatform/harmonyos-cyltabbar (entry)",
     "title": "Ocean skin: the skin row's subtitle says \"当前：默认\" while the Ocean icons are on the bar",
