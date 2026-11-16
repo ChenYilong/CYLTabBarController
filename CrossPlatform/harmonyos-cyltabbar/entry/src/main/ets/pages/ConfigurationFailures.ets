@@ -112,6 +112,12 @@ struct ConfigurationFailures {
         Text(CYLLocalizedString('配置文件：模拟意外情况'))
           .fontSize(17)
           .fontWeight(FontWeight.Medium)
+
+          // One line, ending with an ellipsis (UINavigationBar): long titles wrapped to two lines.
+
+          .maxLines(1)
+
+          .textOverflow({ overflow: TextOverflow.Ellipsis })
           .layoutWeight(1)
           .textAlign(TextAlign.Center)
           .margin({ right: 52 })

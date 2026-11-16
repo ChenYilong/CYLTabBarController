@@ -74,6 +74,12 @@ struct ConfigurationDemo {
       Text(this.result?.items[index]?.title ?? identifier)
         .fontSize(17)
         .fontWeight(FontWeight.Medium)
+
+        // One line, ending with an ellipsis (UINavigationBar): long titles wrapped to two lines.
+
+        .maxLines(1)
+
+        .textOverflow({ overflow: TextOverflow.Ellipsis })
         .height(44)
         .width('100%')
         .textAlign(TextAlign.Center)
