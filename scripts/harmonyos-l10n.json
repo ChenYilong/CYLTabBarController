@@ -45,7 +45,8 @@
     "Me": "Me",
     "Page: %@": "Page: %@",
     "Configuration file: %@": "Configuration file: %@",
-    "Tab: %@": "Tab: %@"
+    "Tab: %@": "Tab: %@",
+    "The image of this page’s tab from the app’s rawfile (the resource bundle of iOS); tap again to restore": "The image of this page’s tab from the app’s rawfile (the resource bundle of iOS); tap again to restore"
   },
   "zh-Hans": {
     "Previous tab (cyl_selectPreviousTab, issue #535)": "上一个 Tab（cyl_selectPreviousTab，issue #535）",
@@ -93,7 +94,8 @@
     "Me": "我的",
     "Page: %@": "页面：%@",
     "Configuration file: %@": "配置文件：%@",
-    "Tab: %@": "Tab：%@"
+    "Tab: %@": "Tab：%@",
+    "The image of this page’s tab from the app’s rawfile (the resource bundle of iOS); tap again to restore": "当前页 Tab 的图片取自应用的 rawfile（相当于 iOS 的资源包）；再点恢复"
   },
   "zh-Hant": {
     "Previous tab (cyl_selectPreviousTab, issue #535)": "上一個 Tab（cyl_selectPreviousTab，issue #535）",
@@ -141,7 +143,8 @@
     "Me": "我的",
     "Page: %@": "頁面：%@",
     "Configuration file: %@": "設定檔：%@",
-    "Tab: %@": "Tab：%@"
+    "Tab: %@": "Tab：%@",
+    "The image of this page’s tab from the app’s rawfile (the resource bundle of iOS); tap again to restore": "目前頁 Tab 的圖片取自應用的 rawfile（相當於 iOS 的資源包）；再點恢復"
   },
   "de": {
     "Previous tab (cyl_selectPreviousTab, issue #535)": "Vorheriger Tab (cyl_selectPreviousTab, issue #535)",
@@ -189,7 +192,8 @@
     "Home": "Start",
     "Discover": "Entdecken",
     "Message": "Nachrichten",
-    "Me": "Ich"
+    "Me": "Ich",
+    "The image of this page’s tab from the app’s rawfile (the resource bundle of iOS); tap again to restore": "Das Bild des Tabs dieser Seite aus dem rawfile der App (das Ressourcenbündel von iOS); erneut tippen zum Zurücksetzen"
   },
   "fr": {
     "Previous tab (cyl_selectPreviousTab, issue #535)": "Onglet précédent (cyl_selectPreviousTab, issue #535)",
@@ -237,7 +241,8 @@
     "Home": "Accueil",
     "Discover": "Découvrir",
     "Message": "Messages",
-    "Me": "Moi"
+    "Me": "Moi",
+    "The image of this page’s tab from the app’s rawfile (the resource bundle of iOS); tap again to restore": "L’image de l’onglet de cette page depuis le rawfile de l’app (le bundle de ressources d’iOS) ; touchez à nouveau pour rétablir"
   },
   "es": {
     "Previous tab (cyl_selectPreviousTab, issue #535)": "Pestaña anterior (cyl_selectPreviousTab, issue #535)",
@@ -285,7 +290,8 @@
     "Home": "Inicio",
     "Discover": "Descubrir",
     "Message": "Mensajes",
-    "Me": "Yo"
+    "Me": "Yo",
+    "The image of this page’s tab from the app’s rawfile (the resource bundle of iOS); tap again to restore": "La imagen de la pestaña de esta página desde el rawfile de la app (el paquete de recursos de iOS); toca de nuevo para restaurar"
   },
   "it": {
     "Previous tab (cyl_selectPreviousTab, issue #535)": "Scheda precedente (cyl_selectPreviousTab, issue #535)",
@@ -333,7 +339,8 @@
     "Home": "Home",
     "Discover": "Scopri",
     "Message": "Messaggi",
-    "Me": "Io"
+    "Me": "Io",
+    "The image of this page’s tab from the app’s rawfile (the resource bundle of iOS); tap again to restore": "The image of this page’s tab from the app’s rawfile (the resource bundle of iOS); tap again to restore"
   },
   "pt-BR": {
     "Previous tab (cyl_selectPreviousTab, issue #535)": "Aba anterior (cyl_selectPreviousTab, issue #535)",
@@ -381,7 +388,8 @@
     "Home": "Início",
     "Discover": "Descobrir",
     "Message": "Mensagens",
-    "Me": "Eu"
+    "Me": "Eu",
+    "The image of this page’s tab from the app’s rawfile (the resource bundle of iOS); tap again to restore": "The image of this page’s tab from the app’s rawfile (the resource bundle of iOS); tap again to restore"
   },
   "ca": {
     "Previous tab (cyl_selectPreviousTab, issue #535)": "Pestanya anterior (cyl_selectPreviousTab, issue #535)",
@@ -429,7 +437,8 @@
     "Home": "Inici",
     "Discover": "Descobreix",
     "Message": "Missatges",
-    "Me": "Jo"
+    "Me": "Jo",
+    "The image of this page’s tab from the app’s rawfile (the resource bundle of iOS); tap again to restore": "The image of this page’s tab from the app’s rawfile (the resource bundle of iOS); tap again to restore"
   },
   "nl": {
     "Previous tab (cyl_selectPreviousTab, issue #535)": "Vorig tabblad (cyl_selectPreviousTab, issue #535)",
@@ -477,7 +486,8 @@
     "Home": "Home",
     "Discover": "Ontdekken",
     "Message": "Berichten",
-    "Me": "Ik"
+    "Me": "Ik",
+    "The image of this page’s tab from the app’s rawfile (the resource bundle of iOS); tap again to restore": "The image of this page’s tab from the app’s rawfile (the resource bundle of iOS); tap again to restore"
   },
   "da": {
     "Previous tab (cyl_selectPreviousTab, issue #535)": "Forrige fane (cyl_selectPreviousTab, issue #535)",
@@ -525,7 +535,8 @@
     "Home": "Hjem",
     "Discover": "Opdag",
     "Message": "Beskeder",
-    "Me": "Mig"
+    "Me": "Mig",
+    "The image of this page’s tab from the app’s rawfile (the resource bundle of iOS); tap again to restore": "The image of this page’s tab from the app’s rawfile (the resource bundle of iOS); tap again to restore"
   },
   "sv": {
     "Previous tab (cyl_selectPreviousTab, issue #535)": "Föregående flik (cyl_selectPreviousTab, issue #535)",
@@ -573,7 +584,8 @@
     "Home": "Hem",
     "Discover": "Upptäck",
     "Message": "Meddelanden",
-    "Me": "Jag"
+    "Me": "Jag",
+    "The image of this page’s tab from the app’s rawfile (the resource bundle of iOS); tap again to restore": "The image of this page’s tab from the app’s rawfile (the resource bundle of iOS); tap again to restore"
   },
   "nb": {
     "Previous tab (cyl_selectPreviousTab, issue #535)": "Forrige fane (cyl_selectPreviousTab, issue #535)",
@@ -621,7 +633,8 @@
     "Home": "Hjem",
     "Discover": "Oppdag",
     "Message": "Meldinger",
-    "Me": "Meg"
+    "Me": "Meg",
+    "The image of this page’s tab from the app’s rawfile (the resource bundle of iOS); tap again to restore": "The image of this page’s tab from the app’s rawfile (the resource bundle of iOS); tap again to restore"
   },
   "fi": {
     "Previous tab (cyl_selectPreviousTab, issue #535)": "Edellinen välilehti (cyl_selectPreviousTab, issue #535)",
@@ -669,7 +682,8 @@
     "Home": "Koti",
     "Discover": "Tutustu",
     "Message": "Viestit",
-    "Me": "Minä"
+    "Me": "Minä",
+    "The image of this page’s tab from the app’s rawfile (the resource bundle of iOS); tap again to restore": "The image of this page’s tab from the app’s rawfile (the resource bundle of iOS); tap again to restore"
   },
   "pl": {
     "Previous tab (cyl_selectPreviousTab, issue #535)": "Poprzednia karta (cyl_selectPreviousTab, issue #535)",
@@ -717,7 +731,8 @@
     "Home": "Start",
     "Discover": "Odkrywaj",
     "Message": "Wiadomości",
-    "Me": "Ja"
+    "Me": "Ja",
+    "The image of this page’s tab from the app’s rawfile (the resource bundle of iOS); tap again to restore": "The image of this page’s tab from the app’s rawfile (the resource bundle of iOS); tap again to restore"
   },
   "cs": {
     "Previous tab (cyl_selectPreviousTab, issue #535)": "Předchozí karta (cyl_selectPreviousTab, issue #535)",
@@ -765,7 +780,8 @@
     "Home": "Domů",
     "Discover": "Objevit",
     "Message": "Zprávy",
-    "Me": "Já"
+    "Me": "Já",
+    "The image of this page’s tab from the app’s rawfile (the resource bundle of iOS); tap again to restore": "The image of this page’s tab from the app’s rawfile (the resource bundle of iOS); tap again to restore"
   },
   "sk": {
     "Previous tab (cyl_selectPreviousTab, issue #535)": "Predchádzajúca karta (cyl_selectPreviousTab, issue #535)",
@@ -813,7 +829,8 @@
     "Home": "Domov",
     "Discover": "Objaviť",
     "Message": "Správy",
-    "Me": "Ja"
+    "Me": "Ja",
+    "The image of this page’s tab from the app’s rawfile (the resource bundle of iOS); tap again to restore": "The image of this page’s tab from the app’s rawfile (the resource bundle of iOS); tap again to restore"
   },
   "hr": {
     "Previous tab (cyl_selectPreviousTab, issue #535)": "Prethodna kartica (cyl_selectPreviousTab, issue #535)",
@@ -861,7 +878,8 @@
     "Home": "Početna",
     "Discover": "Otkrij",
     "Message": "Poruke",
-    "Me": "Ja"
+    "Me": "Ja",
+    "The image of this page’s tab from the app’s rawfile (the resource bundle of iOS); tap again to restore": "The image of this page’s tab from the app’s rawfile (the resource bundle of iOS); tap again to restore"
   },
   "hu": {
     "Previous tab (cyl_selectPreviousTab, issue #535)": "Előző lap (cyl_selectPreviousTab, issue #535)",
@@ -909,7 +927,8 @@
     "Home": "Kezdőlap",
     "Discover": "Felfedezés",
     "Message": "Üzenetek",
-    "Me": "Én"
+    "Me": "Én",
+    "The image of this page’s tab from the app’s rawfile (the resource bundle of iOS); tap again to restore": "The image of this page’s tab from the app’s rawfile (the resource bundle of iOS); tap again to restore"
   },
   "ro": {
     "Previous tab (cyl_selectPreviousTab, issue #535)": "Fila anterioară (cyl_selectPreviousTab, issue #535)",
@@ -957,7 +976,8 @@
     "Home": "Acasă",
     "Discover": "Descoperă",
     "Message": "Mesaje",
-    "Me": "Eu"
+    "Me": "Eu",
+    "The image of this page’s tab from the app’s rawfile (the resource bundle of iOS); tap again to restore": "The image of this page’s tab from the app’s rawfile (the resource bundle of iOS); tap again to restore"
   },
   "ru": {
     "Previous tab (cyl_selectPreviousTab, issue #535)": "Предыдущая вкладка (cyl_selectPreviousTab, issue #535)",
@@ -1005,7 +1025,8 @@
     "Home": "Главная",
     "Discover": "Обзор",
     "Message": "Сообщения",
-    "Me": "Я"
+    "Me": "Я",
+    "The image of this page’s tab from the app’s rawfile (the resource bundle of iOS); tap again to restore": "The image of this page’s tab from the app’s rawfile (the resource bundle of iOS); tap again to restore"
   },
   "uk": {
     "Previous tab (cyl_selectPreviousTab, issue #535)": "Попередня вкладка (cyl_selectPreviousTab, issue #535)",
@@ -1053,7 +1074,8 @@
     "Home": "Головна",
     "Discover": "Огляд",
     "Message": "Повідомлення",
-    "Me": "Я"
+    "Me": "Я",
+    "The image of this page’s tab from the app’s rawfile (the resource bundle of iOS); tap again to restore": "The image of this page’s tab from the app’s rawfile (the resource bundle of iOS); tap again to restore"
   },
   "el": {
     "Previous tab (cyl_selectPreviousTab, issue #535)": "Προηγούμενη καρτέλα (cyl_selectPreviousTab, issue #535)",
@@ -1101,7 +1123,8 @@
     "Home": "Αρχική",
     "Discover": "Ανακάλυψη",
     "Message": "Μηνύματα",
-    "Me": "Εγώ"
+    "Me": "Εγώ",
+    "The image of this page’s tab from the app’s rawfile (the resource bundle of iOS); tap again to restore": "The image of this page’s tab from the app’s rawfile (the resource bundle of iOS); tap again to restore"
   },
   "ja": {
     "Previous tab (cyl_selectPreviousTab, issue #535)": "前のタブ（cyl_selectPreviousTab、issue #535）",
@@ -1149,7 +1172,8 @@
     "Home": "ホーム",
     "Discover": "発見",
     "Message": "メッセージ",
-    "Me": "マイページ"
+    "Me": "マイページ",
+    "The image of this page’s tab from the app’s rawfile (the resource bundle of iOS); tap again to restore": "このページのタブ画像をアプリの rawfile（iOS のリソースバンドルに相当）から読み込みます。もう一度タップで元に戻します"
   },
   "ko": {
     "Previous tab (cyl_selectPreviousTab, issue #535)": "이전 탭 (cyl_selectPreviousTab, issue #535)",
@@ -1197,7 +1221,8 @@
     "Home": "홈",
     "Discover": "발견",
     "Message": "메시지",
-    "Me": "내 정보"
+    "Me": "내 정보",
+    "The image of this page’s tab from the app’s rawfile (the resource bundle of iOS); tap again to restore": "이 페이지 탭의 이미지를 앱의 rawfile(iOS의 리소스 번들)에서 불러옵니다. 다시 탭하면 복원됩니다"
   },
   "ar": {
     "Previous tab (cyl_selectPreviousTab, issue #535)": "علامة التبويب السابقة (cyl_selectPreviousTab، issue #535)",
@@ -1245,7 +1270,8 @@
     "Home": "الرئيسية",
     "Discover": "اكتشف",
     "Message": "الرسائل",
-    "Me": "أنا"
+    "Me": "أنا",
+    "The image of this page’s tab from the app’s rawfile (the resource bundle of iOS); tap again to restore": "The image of this page’s tab from the app’s rawfile (the resource bundle of iOS); tap again to restore"
   },
   "he": {
     "Previous tab (cyl_selectPreviousTab, issue #535)": "הכרטיסייה הקודמת (cyl_selectPreviousTab, issue #535)",
@@ -1293,7 +1319,8 @@
     "Home": "בית",
     "Discover": "גילוי",
     "Message": "הודעות",
-    "Me": "אני"
+    "Me": "אני",
+    "The image of this page’s tab from the app’s rawfile (the resource bundle of iOS); tap again to restore": "The image of this page’s tab from the app’s rawfile (the resource bundle of iOS); tap again to restore"
   },
   "hi": {
     "Previous tab (cyl_selectPreviousTab, issue #535)": "पिछला टैब (cyl_selectPreviousTab, issue #535)",
@@ -1341,7 +1368,8 @@
     "Home": "होम",
     "Discover": "खोजें",
     "Message": "संदेश",
-    "Me": "मैं"
+    "Me": "मैं",
+    "The image of this page’s tab from the app’s rawfile (the resource bundle of iOS); tap again to restore": "The image of this page’s tab from the app’s rawfile (the resource bundle of iOS); tap again to restore"
   },
   "th": {
     "Previous tab (cyl_selectPreviousTab, issue #535)": "แท็บก่อนหน้า (cyl_selectPreviousTab, issue #535)",
@@ -1389,7 +1417,8 @@
     "Home": "หน้าแรก",
     "Discover": "ค้นพบ",
     "Message": "ข้อความ",
-    "Me": "ฉัน"
+    "Me": "ฉัน",
+    "The image of this page’s tab from the app’s rawfile (the resource bundle of iOS); tap again to restore": "The image of this page’s tab from the app’s rawfile (the resource bundle of iOS); tap again to restore"
   },
   "tr": {
     "Previous tab (cyl_selectPreviousTab, issue #535)": "Önceki sekme (cyl_selectPreviousTab, issue #535)",
@@ -1437,7 +1466,8 @@
     "Home": "Ana sayfa",
     "Discover": "Keşfet",
     "Message": "Mesajlar",
-    "Me": "Ben"
+    "Me": "Ben",
+    "The image of this page’s tab from the app’s rawfile (the resource bundle of iOS); tap again to restore": "The image of this page’s tab from the app’s rawfile (the resource bundle of iOS); tap again to restore"
   },
   "vi": {
     "Previous tab (cyl_selectPreviousTab, issue #535)": "Tab trước (cyl_selectPreviousTab, issue #535)",
@@ -1485,7 +1515,8 @@
     "Home": "Trang chủ",
     "Discover": "Khám phá",
     "Message": "Tin nhắn",
-    "Me": "Tôi"
+    "Me": "Tôi",
+    "The image of this page’s tab from the app’s rawfile (the resource bundle of iOS); tap again to restore": "The image of this page’s tab from the app’s rawfile (the resource bundle of iOS); tap again to restore"
   },
   "id": {
     "Previous tab (cyl_selectPreviousTab, issue #535)": "Tab sebelumnya (cyl_selectPreviousTab, issue #535)",
@@ -1533,7 +1564,8 @@
     "Home": "Beranda",
     "Discover": "Jelajahi",
     "Message": "Pesan",
-    "Me": "Saya"
+    "Me": "Saya",
+    "The image of this page’s tab from the app’s rawfile (the resource bundle of iOS); tap again to restore": "The image of this page’s tab from the app’s rawfile (the resource bundle of iOS); tap again to restore"
   },
   "ms": {
     "Previous tab (cyl_selectPreviousTab, issue #535)": "Tab sebelumnya (cyl_selectPreviousTab, issue #535)",
@@ -1581,6 +1613,7 @@
     "Home": "Utama",
     "Discover": "Teroka",
     "Message": "Mesej",
-    "Me": "Saya"
+    "Me": "Saya",
+    "The image of this page’s tab from the app’s rawfile (the resource bundle of iOS); tap again to restore": "The image of this page’s tab from the app’s rawfile (the resource bundle of iOS); tap again to restore"
   }
 }

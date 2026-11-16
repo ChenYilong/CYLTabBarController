@@ -341,6 +341,10 @@
       "value": "Aparença de la barra"
     },
     {
+      "name": "cyl_l10n_46e28086d56d",
+      "value": "The image of this page’s tab from the app’s rawfile (the resource bundle of iOS); tap again to restore"
+    },
+    {
       "name": "cyl_l10n_2e6d648945c0",
       "value": "El botó més sobresurt de la barra; la part de sobre també respon (en vermell)"
     },

@@ -93,6 +93,11 @@ struct AnotherTabBar {
           .fontSize(17)
           .fontWeight(FontWeight.Medium)
           .layoutWeight(1)
+          // [EN] One line: long titles shrink to 12 fp, then end with an ellipsis (issue list #26). [CN] 单行：长标题缩小到 12 fp，再以省略号结尾（问题 #26）。
+          .maxLines(1)
+          .minFontSize(12)
+          .maxFontSize(17)
+          .textOverflow({ overflow: TextOverflow.Ellipsis })
           .textAlign(TextAlign.Center)
           .margin({ right: 52 })
       }

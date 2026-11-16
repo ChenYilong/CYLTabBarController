@@ -341,6 +341,10 @@
       "value": "टैब बार का रूप"
     },
     {
+      "name": "cyl_l10n_46e28086d56d",
+      "value": "The image of this page’s tab from the app’s rawfile (the resource bundle of iOS); tap again to restore"
+    },
+    {
       "name": "cyl_l10n_2e6d648945c0",
       "value": "प्लस बटन बार से बाहर निकलता है; ऊपर वाला हिस्सा भी प्रतिक्रिया देता है (लाल में)"
     },

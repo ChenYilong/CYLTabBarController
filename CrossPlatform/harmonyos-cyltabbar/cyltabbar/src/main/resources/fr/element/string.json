@@ -341,6 +341,10 @@
       "value": "Apparence de la barre"
     },
     {
+      "name": "cyl_l10n_46e28086d56d",
+      "value": "L’image de l’onglet de cette page depuis le rawfile de l’app (le bundle de ressources d’iOS) ; touchez à nouveau pour rétablir"
+    },
+    {
       "name": "cyl_l10n_2e6d648945c0",
       "value": "Le bouton plus dépasse de la barre ; sa partie au-dessus répond aussi (en rouge)"
     },
