@@ -38,6 +38,7 @@
 | [GIF Tab 图标：循环的图片，或点击播放一次的动画](GIF-Animation.md) | [GIF tab icons: a looping image, or an animation that plays once when tapped](GIF-Animation.md) |
 | [鸿蒙 API 对照表](HarmonyOS-API-Map.md) | [The HarmonyOS API map](HarmonyOS-API-Map.md) |
 | [鸿蒙端问题清单](HarmonyOS-Issues.md) | [HarmonyOS issues](HarmonyOS-Issues.md) |
+| [鸿蒙液态玻璃对标](HarmonyOS-Liquid-Glass-Parity.md) | [HarmonyOS Liquid Glass parity](HarmonyOS-Liquid-Glass-Parity.md) |
 | [鸿蒙端对齐](HarmonyOS-Parity.md) | [HarmonyOS parity](HarmonyOS-Parity.md) |
 | [纯图标 Tab 的自动居中](Image-Only-Tabs.md) | [Automatic centering of image-only tabs](Image-Only-Tabs.md) |
 | [液态玻璃的健壮性改进](Liquid-Glass-Robustness.md) | [Liquid Glass Robustness](Liquid-Glass-Robustness.md) |
@@ -131,6 +132,7 @@ docs/
 ├── GIF-Animation.md
 ├── HarmonyOS-API-Map.md
 ├── HarmonyOS-Issues.md
+├── HarmonyOS-Liquid-Glass-Parity.md
 ├── HarmonyOS-Parity.md
 ├── Image-Only-Tabs.md
 ├── Liquid-Glass-Robustness.md
@@ -235,6 +237,7 @@ docs/
 │   ├── harmonyos-keyboard-moves-tab-bar-cylsearch.png
 │   ├── harmonyos-liquid-glass-lens.png
 │   ├── harmonyos-liquid-glass-plus-raised.png
+│   ├── harmonyos-liquid-glass-reference-vs-ours.png
 │   ├── harmonyos-port-svga-demo-page.png
 │   ├── harmonyos-port-svga-demo-row.png
 │   ├── harmonyos-port-svga-demo-taps.png
