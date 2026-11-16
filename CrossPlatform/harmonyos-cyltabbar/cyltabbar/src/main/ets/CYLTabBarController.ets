@@ -275,6 +275,16 @@ export struct CYLTabBarController {
    */
   @Prop barTintColor: ResourceColor | undefined = undefined;
   /**
+   * [EN] `-[CYLFlatDesignTabBar backgroundImage]`: a FlatDesign bar's image, tiled, in place of its blur; undefined for none.
+   * [CN] 扁平样式 TabBar 的背景图（平铺），代替模糊；undefined 表示无。
+   */
+  @Prop barBackgroundImage: ResourceStr | undefined = undefined;
+  /**
+   * [EN] `-[CYLFlatDesignTabBar shadowImage]`: an image drawn as the bar's top line instead of the 0.5 vp shadow color.
+   * [CN] 作为 TabBar 顶部线条绘制的图片，代替 0.5 vp 的阴影色。
+   */
+  @Prop shadowImage: ResourceStr | undefined = undefined;
+  /**
    * [EN] -[CYLTabBar cyl_itemEdgeInsets]: space kept free at the two ends of the bar; the tabs and the plus button share
    *      the rest (centered items).
    * [CN] TabBar 两端留空；Tab 与加号按钮平分其余宽度（居中排列）。
@@ -587,7 +597,20 @@ export struct CYLTabBarController {
   /** [EN] The accessibility description: role, position and the selected state. [CN] 无障碍描述：角色、位置与选中状态。 */
   cylAccessibilityDescription(index: number): string {
     const position = CYLLocalizedString('Tab, %1$@ of %2$@', index + 1, this.tabBarItemsAttributes.length);
-    return this.selectedIndex === index ? CYLLocalizedString('%@, %@', position, CYLLocalizedString('选中')) : position;
+    const state = this.selectedIndex === index ? CYLLocalizedString('%@, %@', position, CYLLocalizedString('选中')) : position;
+    // [EN] A disabled tab says so (`CYLFlatDesignTabBarItem.enabled`). [CN] 不可用的 Tab 会读出「不可用」。
+    return this.tabBarItemsAttributes[index].enabled === false ? CYLLocalizedString('%@, %@', state, CYLLocalizedString('Dimmed')) : state;
+  }
+
+  /**
+   * [EN] `layoutCentered` with a title and no image: the icon square is left out, so the title sits in the middle.
+   * [CN] `layoutCentered` 且有标题无图片时省略图标方框，使标题居中。
+   */
+  cylHidesIcon(index: number): boolean {
+    const item = this.tabBarItemsAttributes[index];
+    return item.layoutCentered === true && item.title !== undefined && item.image === undefined
+      && item.lottieFilePath === undefined && item.imageURL === undefined && item.gifFilePath === undefined
+      && this.cylSVGAPath(index) === undefined;
   }
 
   /** [EN] The plus button's label: its title or "Plus button", and its badge. [CN] 加号按钮的标签。 */
@@ -695,6 +718,7 @@ export struct CYLTabBarController {
           .rotate({ z: 1, angle: this.tapAngle[index] ?? 0 })
           .rotate({ y: 1, angle: this.tapFlip[index] ?? 0 })
           .translate({ y: this.tapOffset[index] ?? 0 })
+          .padding(this.tabBarItemsAttributes[index].imageInsets ?? 0)
         }
         CYLBadgeView({ badge: this.badges[index], anchorWidth: this.cylIconHeight(index) })
       }
@@ -703,6 +727,11 @@ export struct CYLTabBarController {
       // [CN] 不固定宽度：角标按剩余宽度测量，文字角标随文字变宽（问题 #1）。图标紧贴标题上方，标题顶部与加号标题同在 tabBarHeight - 17（#2）。
       .alignContent(Alignment.TopStart)
       .margin({ top: Math.max(0, this.tabBarHeight - 17 - 3 - this.cylIconHeight(index)) })
+      .offset({
+        x: this.tabBarItemsAttributes[index].imagePositionAdjustment?.horizontal ?? 0,
+        y: this.tabBarItemsAttributes[index].imagePositionAdjustment?.vertical ?? 0,
+      })
+      .visibility(this.cylHidesIcon(index) ? Visibility.None : Visibility.Visible)
 
       if (this.tabBarItemsAttributes[index].title !== undefined) {
         Text(this.selectedIndex === index
@@ -725,6 +754,8 @@ export struct CYLTabBarController {
     .justifyContent(FlexAlign.Start)
     // [EN] Liquid Glass: the selection is a capsule inside the rounded bar (issue list #6). [CN] 液态玻璃：选中背景为圆角胶囊（问题 #6）。
     .borderRadius(this.tabBarStyleType === CYLTabBarStyleType.LiquidGlass ? this.tabBarHeight / 2 : 0)
+    .opacity(this.tabBarItemsAttributes[index].enabled === false ? 0.4 : 1)
+    .enabled(this.tabBarItemsAttributes[index].enabled !== false)
     .backgroundColor(this.selectedIndex === index
       ? (this.tabBarItemsAttributes[index].selectedBackgroundColor ?? Color.Transparent)
       : (this.tabBarItemsAttributes[index].backgroundColor ?? Color.Transparent))
@@ -844,6 +875,19 @@ export struct CYLTabBarController {
     })
   }
 
+  /**
+   * [EN] `shadowImage` as the bar's top line, stretched to the width. [CN] 作为 TabBar 顶部线条的 `shadowImage`，横向拉伸。
+   */
+  @Builder
+  cylShadowImage() {
+    Image(this.shadowImage)
+      .width('100%')
+      .height(1)
+      .objectFit(ImageFit.Fill)
+      .accessibilityLevel('no')
+      .hitTestBehavior(HitTestMode.Transparent)
+  }
+
   build() {
     Column() {
       Stack() {
@@ -885,8 +929,9 @@ export struct CYLTabBarController {
         .width('100%')
         .height(this.tabBarHeight)
         .backgroundColor(this.tabBarBackgroundColor)
-        .border({ width: { top: 0.5 }, color: { top: this.tabBarShadowColor } })
-        .attributeModifier(cyl_tabBarStyleModifier(this.tabBarStyleType, this.barTintColor, this.tabBarHeight))
+        .border({ width: { top: this.shadowImage !== undefined ? 0 : 0.5 }, color: { top: this.tabBarShadowColor } })
+        .overlay(this.shadowImage !== undefined ? this.cylShadowImage : undefined, { align: Alignment.Top })
+        .attributeModifier(cyl_tabBarStyleModifier(this.tabBarStyleType, this.barTintColor, this.tabBarHeight, this.barBackgroundImage))
         .padding({ left: this.itemEdgeInsets.left, right: this.itemEdgeInsets.right })
         .expandSafeArea(this.tabBarStyleType === CYLTabBarStyleType.LiquidGlass ? [] : [SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM])
         .id('cyl-tab-bar')

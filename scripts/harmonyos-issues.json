@@ -6,7 +6,7 @@
     "title": "Badge text wraps: \"NEW\" on Me shows as \"NE\" / \"W\" on two lines; text badges do not grow with their text",
     "evidence": "harmonyos-home-mate70pro-api21.jpeg, harmonyos-styles-*-*.png (Me tab, all styles)",
     "cause": "CYLBadgeView is a child of the icon Stack, which has a fixed width (imageSize, 26 vp); the badge Text is measured inside that width, so long text wraps. iOS (sizeToFit + margin) and Android (wrap_content) size the badge to its label",
-    "fix": "Host stacks no longer fix their width (tab icon, plus button, demo rows), so the badge is measured with the free width; the badge Text is one line (maxLines 1, no wrap) and its width is the text width + margin, at least its height; the badge width is explicit, as Android CYLBadge.onMeasure / iOS -cyl_adjustLabelWidth: max(height, measured text width (MeasureUtils.measureText, bold) + margin)"
+    "fix": "Host stacks no longer fix their width (tab icon, plus button, demo rows), so the badge is measured with the free width; the badge Text is one line (maxLines 1, no wrap) and its width is the text width + margin, at least its height; the badge width is explicit, as Android CYLBadge.onMeasure / iOS -cyl_adjustLabelWidth: max(height, measured text width (MeasureUtils.measureText, bold) + margin); the border width (twice) is added too, as in PR #801"
   },
   {
     "id": 2,
@@ -69,7 +69,7 @@
     "title": "FlatDesign with a skin is two-tone: the bar row stays light gray-purple, the strip under the gesture bar is the skin color",
     "evidence": "harmonyos-styles-space-skin-981db1e.png (middle)",
     "cause": "CYLFlatDesignTabBarModifier draws the light blur material over the skin tint",
-    "fix": "PR #799 (merged): with barTintColor the modifier draws the tint without the light material"
+    "fix": "PR #799: with barTintColor the modifier draws the tint without the light material; PR #804: the tint and image branches also reset backgroundBlurStyle(BlurStyle.NONE), because the modifier is applied again to the same bar and the default look's material stayed"
   },
   {
     "id": 9,
@@ -124,5 +124,41 @@
     "evidence": "Emulator check of the SVGA demo (CYLTabBarController-folder session, b840da3, 127.0.0.1:5557)",
     "cause": "Likely the tab's exclusive gesture group (LongPressGesture before TapGesture): during or right after the push transition the first tap is not recognised by the group",
     "fix": "Tabs take taps through onClick and the long press as a parallelGesture (a long press marks its tab so the following click is ignored)"
+  },
+  {
+    "id": 15,
+    "status": "TODO need 模拟器截图验证",
+    "scope": "CrossPlatform/harmonyos-cyltabbar (entry)",
+    "title": "The last demo rows stay hidden behind the tab bar, the raised plus button and the gesture bar",
+    "evidence": "harmonyos-home-mate70pro-api21.jpeg (bottom rows under the bar; reported in PR #803)",
+    "cause": "The demo List has no end inset for the bar",
+    "fix": "PR #803: List.contentEndOffset(120 vp) so every row can scroll above the bar"
+  },
+  {
+    "id": 16,
+    "status": "TODO need 模拟器截图验证",
+    "scope": "CrossPlatform/harmonyos-cyltabbar (entry)",
+    "title": "A skin's plus image is drawn at the 52 vp button size and spreads over the list above the bar",
+    "evidence": "harmonyos-styles-space-skin-981db1e.png (comet over the list; reported in PR #803)",
+    "cause": "The skin plus copies imageSize 52 from the default round button, but the skin image is a tab-style icon",
+    "fix": "PR #803: a skin's plus image uses 40 vp"
+  },
+  {
+    "id": 17,
+    "status": "TODO need 模拟器截图验证",
+    "scope": "CrossPlatform/harmonyos-cyltabbar (entry)",
+    "title": "The row CYLFlatDesignTabBarItem 不居中显示（系统效果） has no subtitle, unlike its neighbours",
+    "evidence": "harmonyos-home-mate70pro-api21.jpeg (reported in PR #803)",
+    "cause": "Missing subtitle in appearanceRows",
+    "fix": "PR #803: subtitle cyl_itemEdgeInsets: zero, the tabs fill the bar (localized)"
+  },
+  {
+    "id": 18,
+    "status": "TODO need 模拟器截图验证",
+    "scope": "CrossPlatform/harmonyos-cyltabbar (l10n)",
+    "title": "Traditional Chinese shows English for every HarmonyOS-only string",
+    "evidence": "scripts/harmonyos-l10n.json had no zh-Hant table (reported in PR #804)",
+    "cause": "Only en and zh-Hans were written for keys the iOS bundle does not have",
+    "fix": "PR #804: zh-Hant for all HarmonyOS-only keys; resources regenerated"
   }
 ]

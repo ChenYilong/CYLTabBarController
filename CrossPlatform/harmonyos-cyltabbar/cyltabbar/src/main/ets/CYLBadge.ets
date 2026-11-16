@@ -347,7 +347,8 @@ export struct CYLBadgeView {
     } catch (e) {
       // [EN] Estimate when measuring is not available. [CN] 无法测量时估算。
     }
-    return Math.max(height, Math.ceil(textWidth) + margin);
+    const border = this.badge.borderWidth ?? this.appearance().borderWidth;
+    return Math.max(height, Math.ceil(textWidth) + margin + border * 2);
   }
 
   build() {

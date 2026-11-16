@@ -58,6 +58,9 @@ export class CYLFlatDesignTabBarModifier implements AttributeModifier<RowAttribu
   applyNormalAttribute(instance: RowAttribute): void {
     // [EN] `backgroundImage` replaces the blur and is tiled to fit (iOS). [CN] `backgroundImage` 代替模糊并平铺（与 iOS 相同）。
     if (this.backgroundImage !== undefined) {
+      // [EN] Reset the material a previous look left (the modifier is applied again to the same bar).
+      // [CN] 重置之前外观留下的材质（同一个 TabBar 会再次应用 modifier）。
+      instance.backgroundBlurStyle(BlurStyle.NONE);
       instance.backgroundImage(this.backgroundImage, ImageRepeat.XY);
       instance.backgroundColor(this.barTintColor ?? Color.Transparent);
       return;
@@ -68,6 +71,10 @@ export class CYLFlatDesignTabBarModifier implements AttributeModifier<RowAttribu
     // [CN] 有着色（皮肤的 TabBar 颜色）时直接绘制：浅色的 `COMPONENT_THICK` 材质会冲淡深色着色，使 TabBar 与手势条下方区域颜色不一致。
     //      没有着色时使用模糊与接近不透明的系统背景（`UIBlurEffectStyleProminent`）。
     if (this.barTintColor !== undefined) {
+      // [EN] Without this reset the light material of the default look stayed on the bar after a skin was chosen,
+      //      washing its color out to gray above a strip of the real color (two tones, light titles on gray).
+      // [CN] 不重置时，选择皮肤后默认外观的浅色材质仍留在 TabBar 上，把皮肤颜色冲淡成灰色，下方却是真实颜色（两种颜色、浅色标题在灰底上）。
+      instance.backgroundBlurStyle(BlurStyle.NONE);
       instance.backgroundColor(this.barTintColor);
       return;
     }
@@ -127,11 +134,11 @@ export class CYLDefaultTabBarModifier implements AttributeModifier<RowAttribute>
  * [CN] `style` 对应的 TabBar modifier；`barTintColor` 为 App 设置的 TabBar 颜色，未设置时使用样式自己的颜色。
  */
 export function cyl_tabBarStyleModifier(style: CYLTabBarStyleType, barTintColor?: ResourceColor,
-  height: number = 49): AttributeModifier<RowAttribute> {
+  height: number = 49, backgroundImage?: ResourceStr): AttributeModifier<RowAttribute> {
   if (style === CYLTabBarStyleType.LiquidGlass) {
     return new CYLLiquidGlassTabBarModifier(barTintColor, height);
   }
-  return style === CYLTabBarStyleType.FlatDesign ? new CYLFlatDesignTabBarModifier(barTintColor) : new CYLDefaultTabBarModifier();
+  return style === CYLTabBarStyleType.FlatDesign ? new CYLFlatDesignTabBarModifier(barTintColor, backgroundImage) : new CYLDefaultTabBarModifier();
 }
 
 /**
