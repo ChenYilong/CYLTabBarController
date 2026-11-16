@@ -1,5 +1,9 @@
 {
   "CYLTabBarControllerContext": "CYLSVGAConfigurationDemo",
+  "CYLTabBarControllerLocalization": {
+    "CYLTabBarLocalizationTableName": "ConfigurationDemo",
+    "CYLTabBarLocalizationPath": "Localization"
+  },
   "CYLTabBarControllerTabBarItemsAttributes": [
     {
       "CYLTabBarItemTitle": "Home",
@@ -7,7 +11,8 @@
       "CYLTabBarItemSelectedImage": "system:house.fill",
       "CYLTabBarItemIdentifier": "home",
       "CYLTabBarSVGAFilePath": "svga/tab_home.svga",
-      "CYLTabBarSVGASize": "{30, 30}"
+      "CYLTabBarSVGASize": "{30, 30}",
+      "CYLTabBarItemPageIdentifier": "svga-home"
     },
     {
       "CYLTabBarItemTitle": "Discover",
@@ -15,7 +20,8 @@
       "CYLTabBarItemSelectedImage": "system:safari.fill",
       "CYLTabBarItemIdentifier": "discover",
       "CYLTabBarSVGAFilePath": "svga/tab_search.svga",
-      "CYLTabBarSVGASize": "{30, 30}"
+      "CYLTabBarSVGASize": "{30, 30}",
+      "CYLTabBarItemPageIdentifier": "svga-discover"
     },
     {
       "CYLTabBarItemTitle": "Message",
@@ -23,7 +29,8 @@
       "CYLTabBarItemSelectedImage": "system:message.fill",
       "CYLTabBarItemIdentifier": "message",
       "CYLTabBarSVGAFilePath": "svga/tab_chat.svga",
-      "CYLTabBarSVGASize": "{30, 30}"
+      "CYLTabBarSVGASize": "{30, 30}",
+      "CYLTabBarItemPageIdentifier": "svga-message"
     },
     {
       "CYLTabBarItemTitle": "Me",
@@ -31,7 +38,8 @@
       "CYLTabBarItemSelectedImage": "system:person.fill",
       "CYLTabBarItemIdentifier": "me",
       "CYLTabBarSVGAFilePath": "svga/tab_profile.svga",
-      "CYLTabBarSVGASize": "{30, 30}"
+      "CYLTabBarSVGASize": "{30, 30}",
+      "CYLTabBarItemPageIdentifier": "svga-me"
     }
   ]
 }
