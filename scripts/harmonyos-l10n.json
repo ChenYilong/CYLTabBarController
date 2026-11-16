@@ -16,7 +16,9 @@
     "Tab, %1$@ of %2$@": "Tab, %1$@ of %2$@",
     "%@, %@": "%@, %@",
     "Double tap to open": "Double tap to open",
-    "Badge: %@": "Badge: %@"
+    "Badge: %@": "Badge: %@",
+    "SVGA Tab 图标（配置文件）": "SVGA tab icons (configuration file)",
+    "CYLTabBarSVGAFilePath：选中时播放一次，未选中时显示第一帧": "CYLTabBarSVGAFilePath: plays once when selected, first frame otherwise"
   },
   "zh-Hans": {
     "Previous tab (cyl_selectPreviousTab, issue #535)": "上一个 Tab（cyl_selectPreviousTab，issue #535）",
@@ -35,6 +37,8 @@
     "Tab, %1$@ of %2$@": "标签，第 %1$@ 个，共 %2$@ 个",
     "%@, %@": "%@，%@",
     "Double tap to open": "点按两次打开",
-    "Badge: %@": "角标：%@"
+    "Badge: %@": "角标：%@",
+    "SVGA Tab 图标（配置文件）": "SVGA Tab 图标（配置文件）",
+    "CYLTabBarSVGAFilePath：选中时播放一次，未选中时显示第一帧": "CYLTabBarSVGAFilePath：选中时播放一次，未选中时显示第一帧"
   }
 }

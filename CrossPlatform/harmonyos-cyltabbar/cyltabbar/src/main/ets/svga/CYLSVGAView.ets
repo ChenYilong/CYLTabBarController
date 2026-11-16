@@ -4,9 +4,9 @@ import { CYLSVGAMovie, cylLoadSVGAMovie } from './CYLSVGAMovie';
 import { cylDrawSVGAFrame } from './CYLSVGARenderer';
 
 /**
- * [EN] The bytes of an SVGA file: an http(s) URL (ohos.permission.INTERNET, declared by this module), else a rawfile path of the app
+ * [EN] The bytes of an SVGA file: an http(s) URL (the app needs ohos.permission.INTERNET), else a rawfile path of the app
  *      ("svga/tab_home.svga" in resources/rawfile).
- * [CN] SVGA 文件的字节：http(s) 地址（ohos.permission.INTERNET，由本模块声明），否则为 App 的 rawfile 路径（resources/rawfile 中的
+ * [CN] SVGA 文件的字节：http(s) 地址（App 需要 ohos.permission.INTERNET），否则为 App 的 rawfile 路径（resources/rawfile 中的
  *      "svga/tab_home.svga"）。
  */
 async function cylReadSVGA(context: Context, path: string): Promise<Uint8Array> {
@@ -59,17 +59,23 @@ async function cylDecodeBitmaps(movie: CYLSVGAMovie): Promise<Map<string, image.
 }
 
 /**
- * [EN] FIX: issue #415. An SVGA 2.x animation on an ArkUI Canvas, as a tab icon: it plays once when `selected` becomes true
- *      and keeps the last frame; unselected, it shows the first frame (iOS `CYLSVGATabBarItemAnimator`). Decorative for the
- *      screen reader: the tab reads its title.
- * [CN] FIX: issue #415。ArkUI Canvas 上的 SVGA 2.x 动画，用作 Tab 图标：`selected` 变为 true 时播放一次并停在最后一帧；未选中时
- *      显示第一帧（iOS `CYLSVGATabBarItemAnimator`）。对屏幕阅读器是装饰：由 Tab 朗读标题。
+ * [EN] FIX: issue #415. An SVGA 2.x tab icon (CYLTabBarSVGAFilePath / CYLTabBarSVGAURL) on an ArkUI Canvas: it plays once
+ *      from the start each time its tab becomes selected (and on a re-tap, `replayToken`) and keeps the last frame; unselected,
+ *      it shows the first frame (iOS `CYLSVGATabBarItemAnimator`, as CYLLottieIcon). Decorative for the screen reader (the
+ *      tab reads its title), and transparent to taps.
+ * [CN] FIX: issue #415。ArkUI Canvas 上的 SVGA 2.x Tab 图标（CYLTabBarSVGAFilePath / CYLTabBarSVGAURL）：每次 Tab 变为选中（以及再次点击，
+ *      `replayToken`）时从头播放一次并停在最后一帧；未选中时显示第一帧（iOS `CYLSVGATabBarItemAnimator`，与 CYLLottieIcon 相同）。对屏幕阅读器
+ *      是装饰（由 Tab 朗读标题），不拦截点击。
  */
 @Component
 export struct CYLSVGAView {
-  @Prop path: string = '';
+  @Prop @Watch('cylReload') path: string = '';
+  iconSize: number = 26;
   @Prop @Watch('cylSelectedChanged') selected: boolean = false;
-  @Prop iconSize: number = 26;
+  /**
+   * [EN] Each increase plays the animation again while selected (a re-tap), as CYLLottieIcon. [CN] 每次增加时在选中状态下重新播放（再次点击），与 CYLLottieIcon 相同。
+   */
+  @Prop @Watch('cylReplay') replayToken: number = 0;
   /**
    * [EN] The file could not be loaded or decoded, with the reason. [CN] 文件无法加载或解码，附原因。
    */
@@ -88,6 +94,19 @@ export struct CYLSVGAView {
       bitmap.release();
     });
     this.bitmaps.clear();
+  }
+
+  /** [EN] A new path (e.g. the dark file after a color mode change) reloads the animation. [CN] 新路径（如切换深色模式后）重新加载动画。 */
+  cylReload(): void {
+    this.cylStop();
+    this.movie = undefined;
+    this.cylLoad();
+  }
+
+  cylReplay(): void {
+    if (this.selected) {
+      this.cylPlayFromStart();
+    }
   }
 
   cylSelectedChanged(): void {
@@ -109,9 +128,14 @@ export struct CYLSVGAView {
       const movie = await cylLoadSVGAMovie(await cylReadSVGA(context, this.path));
       this.bitmaps = await cylDecodeBitmaps(movie);
       this.movie = movie;
-      // [EN] Selected at launch: rest on the last frame, as after playing. [CN] 启动时已选中：停在最后一帧，与播放后相同。
-      this.frame = this.selected ? movie.frames - 1 : 0;
-      this.cylDraw();
+      // [EN] As CYLLottieIcon: a selected tab plays from the start once loaded, the others rest on the first frame.
+      // [CN] 与 CYLLottieIcon 相同：选中的 Tab 加载后从头播放，其他 Tab 停在第一帧。
+      this.frame = 0;
+      if (this.selected) {
+        this.cylPlayFromStart();
+      } else {
+        this.cylDraw();
+      }
     } catch (error) {
       this.onLoadError(`${(error as Error).message ?? error}`);
     }
@@ -153,6 +177,8 @@ export struct CYLSVGAView {
       .width(this.iconSize)
       .height(this.iconSize)
       .accessibilityLevel('no')
+      // [EN] The canvas never takes the tab's taps, as CYLLottieIcon. [CN] 与 CYLLottieIcon 相同，画布不拦截 Tab 的点击。
+      .hitTestBehavior(HitTestMode.Transparent)
       .onReady(() => {
         this.cylLoad();
       })

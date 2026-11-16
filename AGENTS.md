@@ -111,7 +111,7 @@ Every new feature and user-visible change ships with bilingual documentation in 
     stable `id` (`key`) for tests and the selected state in its text; all texts come from string resources
     (`$r('app.string.…')`, `resources/<locale>/element/string.json`) copied from CYLTabBarController's localization
     files (`CYLTabBarController/Resources/CYLTabBarController.bundle/*.lproj`), keeping only the strings the HarmonyOS
-    code uses. Skill: `cyl-harmonyos`.
+    code uses. Code: `CrossPlatform/harmonyos-cyltabbar`. Skill: `cyl-harmonyos-a11y-l10n`.
   - Automated UI tests use these features first to locate controls: accessibility identifiers (`id` / `key`,
     `accessibilityIdentifier`, `testID`), accessibility labels / texts and localized strings (HarmonyOS UiTest `ON.id()` /
     `ON.text()`, XCUITest queries, `axe describe-ui`, `uiautomator`, Flutter `find.bySemanticsLabel`, React Native

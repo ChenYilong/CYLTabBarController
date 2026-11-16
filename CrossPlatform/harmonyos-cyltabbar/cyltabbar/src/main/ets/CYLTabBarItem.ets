@@ -40,6 +40,22 @@ export interface CYLTabBarItemAttributes {
   selectedImageURL?: string;
   /** [EN] CYLTabBarGIFFilePath: a GIF (rawfile path or URL) shown as the tab's icon. [CN] 作为 Tab 图标显示的 GIF（rawfile 路径或 URL）。 */
   gifFilePath?: string;
+  /**
+   * [EN] FIX: issue #415. CYLTabBarSVGAFilePath: a rawfile path of an SVGA 2.x file (e.g. "svga/tab_home.svga"), shown instead
+   *      of the images: it plays once when the tab is selected and shows its first frame otherwise; the image shows if it
+   *      cannot load (CYLSVGAView).
+   * [CN] FIX: issue #415。CYLTabBarSVGAFilePath：SVGA 2.x 文件的 rawfile 路径（如 "svga/tab_home.svga"），代替图片显示：Tab 选中时播放一次，
+   *      否则显示第一帧；无法加载时显示图片（CYLSVGAView）。
+   */
+  svgaFilePath?: string;
+  /** [EN] CYLTabBarSVGAURL: an SVGA file at an http(s) URL (ohos.permission.INTERNET); wins over svgaFilePath. [CN] http(s) 地址上的 SVGA 文件；优先于 svgaFilePath。 */
+  svgaURL?: string;
+  /** [EN] CYLTabBarSVGADarkFilePath: the SVGA file in dark mode. [CN] 深色模式的 SVGA 文件。 */
+  svgaDarkFilePath?: string;
+  /** [EN] CYLTabBarSVGADarkURL: the SVGA URL in dark mode. [CN] 深色模式的 SVGA 地址。 */
+  svgaDarkURL?: string;
+  /** [EN] CYLTabBarSVGASize (vp); the image size when unset. [CN] SVGA 尺寸（vp）；未设置时用图片尺寸。 */
+  svgaSize?: number;
   /** [EN] CYLTabBarItemTitleColor: this tab's title color while not selected. [CN] 未选中时此 Tab 的标题颜色。 */
   titleColor?: ResourceColor;
   /** [EN] CYLTabBarItemSelectedTitleColor. [CN] 选中时此 Tab 的标题颜色。 */
