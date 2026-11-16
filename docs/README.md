@@ -336,6 +336,7 @@ docs/
 │   ├── svga-tab-icons-configuration-ios26.png
 │   ├── svga-tab-icons-configuration-plus-ios26.png
 │   ├── svga-tab-icons-keys-ios26.png
+│   ├── svga-tab-icons-svgaplayerlite-ios27.png
 │   ├── svga-tab-icons-swiftui-configuration-ios26.png
 │   ├── svga-tab-icons-swiftui-keys-ios26.png
 │   ├── svga-tab-icons-web-assets-ios26.png

@@ -29,7 +29,7 @@ target 'CyltabbarExample' do
   pod 'CYLTabBarController/SVGA', :path => '../../../..'
   # [EN] Static linking: the Swift library imports these Objective-C pods, so they need module maps.
   # [CN] 静态链接：Swift 库导入这两个 Objective-C pod，因此它们需要 module map。
-  pod 'SVGAPlayer', :modular_headers => true
+  pod 'SVGAPlayerLite', :modular_headers => true
   pod 'Protobuf', :modular_headers => true
 
   use_react_native!(

@@ -34,7 +34,7 @@
  *      `CYLTabBarSVGAURL` 会编译失败，而不是被静默忽略。App 自己只用于 SVGA 的代码可用 `#if CYL_SVGA_AVAILABLE` 包住。
  *      CocoaPods：`pod 'CYLTabBarController/SVGA'`。
  */
-#if __has_include(<SVGAPlayer/SVGA.h>) || __has_include("SVGA.h")
+#if __has_include(<SVGAPlayerLite/SVGA.h>) || __has_include(<SVGAPlayer/SVGA.h>) || __has_include("SVGA.h")
 #define CYL_SVGA_AVAILABLE 1
 #else
 #define CYL_SVGA_AVAILABLE 0
