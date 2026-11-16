@@ -379,7 +379,7 @@
   },
   {
     "id": 43,
-    "status": "TODO need 模拟器截图验证",
+    "status": "DONE (harmonyos-verify-scroll-sim-labels-mate70pro-api21.jpeg: 39. 自测：依次运行所有自动模拟… and the kind labels 恢复 / 自测 in Chinese; the case titles 1-38 stay English, as on iOS and Android)",
     "scope": "CrossPlatform/harmonyos-cyltabbar (entry)",
     "title": "Scroll simulation rows: \"Self-test: run every automatic simulation…\" and the kind labels (Restore, Keep, N/A, Manual, Self-test) are English in the Chinese UI",
     "evidence": "Emulator check 2026-11-16 (Home, scroll simulation section)",
