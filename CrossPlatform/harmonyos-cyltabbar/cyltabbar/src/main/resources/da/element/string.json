@@ -337,6 +337,10 @@
       "value": "Fane: %@"
     },
     {
+      "name": "cyl_l10n_ab5745daa734",
+      "value": "Fanelinjegalleri"
+    },
+    {
       "name": "cyl_l10n_75ccb7ef4864",
       "value": "Fanelinjens udseende"
     },
@@ -449,6 +453,10 @@
       "value": "Zoom ind"
     },
     {
+      "name": "cyl_l10n_83c39abd16cd",
+      "value": "Vælg fra album"
+    },
+    {
       "name": "cyl_l10n_cc03f47a389c",
       "value": "Henter fanesymbolet fra netværket (cachet); tryk igen for at gendanne"
     },
@@ -495,6 +503,10 @@
     {
       "name": "cyl_l10n_c1ecedab11bc",
       "value": "Original"
+    },
+    {
+      "name": "cyl_l10n_83611abd5f80",
+      "value": "Opslå"
     },
     {
       "name": "cyl_l10n_625fb26b4b33",
@@ -565,6 +577,10 @@
       "value": "Manuelt: tryk for at slå skjul ved rulning til, rul ned for at skjule TabBar, og gør så det, titlen siger. Forventet: TabBar kommer straks tilbage."
     },
     {
+      "name": "cyl_l10n_89246468f7fd",
+      "value": "Åbn fanelinjegalleriet"
+    },
+    {
       "name": "cyl_l10n_a01539048bb0",
       "value": "Slå kontakten til, og hold en fane eller PlusButton nede for at se dens id."
     },
@@ -583,6 +599,10 @@
     {
       "name": "cyl_l10n_2f728e190695",
       "value": "Viser andre sider i fanerne på begge sider af denne fane (issue #481); tryk igen for at gendanne"
+    },
+    {
+      "name": "cyl_l10n_bed9ec1e8448",
+      "value": "Tag et foto"
     },
     {
       "name": "cyl_l10n_0be5a194844c",
@@ -659,6 +679,10 @@
     {
       "name": "cyl_l10n_0787cd518387",
       "value": "Simuler hukommelsesadvarsel"
+    },
+    {
+      "name": "cyl_l10n_d76904d0e7ee",
+      "value": "Hver scene er en fanelinje bygget med det offentlige API: typografier, animationer, påmindelser, Lottie og de nyere fane-API'er"
     },
     {
       "name": "cyl_l10n_6a00c1ae99fa",

@@ -337,6 +337,10 @@
       "value": "Aba: %@"
     },
     {
+      "name": "cyl_l10n_ab5745daa734",
+      "value": "Galeria de tab bars"
+    },
+    {
       "name": "cyl_l10n_75ccb7ef4864",
       "value": "Aparência da barra"
     },
@@ -449,6 +453,10 @@
       "value": "Aproximar"
     },
     {
+      "name": "cyl_l10n_83c39abd16cd",
+      "value": "Escolher do álbum"
+    },
+    {
       "name": "cyl_l10n_cc03f47a389c",
       "value": "Baixa o ícone da aba da rede (com cache); toque de novo para restaurar"
     },
@@ -495,6 +503,10 @@
     {
       "name": "cyl_l10n_c1ecedab11bc",
       "value": "Original"
+    },
+    {
+      "name": "cyl_l10n_83611abd5f80",
+      "value": "Publicar"
     },
     {
       "name": "cyl_l10n_625fb26b4b33",
@@ -565,6 +577,10 @@
       "value": "Manual: toque para ativar o ocultar ao rolar, role para baixo para ocultar a TabBar e faça o que o título diz. Esperado: a TabBar volta na hora."
     },
     {
+      "name": "cyl_l10n_89246468f7fd",
+      "value": "Abrir a galeria de tab bars"
+    },
+    {
       "name": "cyl_l10n_a01539048bb0",
       "value": "Ative a chave e toque e segure qualquer aba ou o PlusButton para ver o identificador."
     },
@@ -583,6 +599,10 @@
     {
       "name": "cyl_l10n_2f728e190695",
       "value": "Mostra outras páginas nas abas dos dois lados desta (issue #481); toque novamente para restaurar"
+    },
+    {
+      "name": "cyl_l10n_bed9ec1e8448",
+      "value": "Tirar foto"
     },
     {
       "name": "cyl_l10n_0be5a194844c",
@@ -659,6 +679,10 @@
     {
       "name": "cyl_l10n_0787cd518387",
       "value": "Simular aviso de memória"
+    },
+    {
+      "name": "cyl_l10n_d76904d0e7ee",
+      "value": "Cada cena é uma tab bar criada com a API pública: estilos, animações, avisos, Lottie e as novas APIs de abas"
     },
     {
       "name": "cyl_l10n_6a00c1ae99fa",

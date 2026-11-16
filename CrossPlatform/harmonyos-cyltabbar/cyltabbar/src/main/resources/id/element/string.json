@@ -337,6 +337,10 @@
       "value": "Tab: %@"
     },
     {
+      "name": "cyl_l10n_ab5745daa734",
+      "value": "Galeri tab bar"
+    },
+    {
       "name": "cyl_l10n_75ccb7ef4864",
       "value": "Tampilan tab bar"
     },
@@ -449,6 +453,10 @@
       "value": "Perbesar"
     },
     {
+      "name": "cyl_l10n_83c39abd16cd",
+      "value": "Pilih dari album"
+    },
+    {
       "name": "cyl_l10n_cc03f47a389c",
       "value": "Mengunduh ikon tab dari jaringan (dengan cache); ketuk lagi untuk memulihkan"
     },
@@ -495,6 +503,10 @@
     {
       "name": "cyl_l10n_c1ecedab11bc",
       "value": "Asli"
+    },
+    {
+      "name": "cyl_l10n_83611abd5f80",
+      "value": "Posting"
     },
     {
       "name": "cyl_l10n_625fb26b4b33",
@@ -565,6 +577,10 @@
       "value": "Manual: ketuk untuk menyalakan sembunyikan saat menggulir, gulir ke bawah untuk menyembunyikan TabBar, lalu lakukan sesuai judul. Diharapkan: TabBar langsung kembali."
     },
     {
+      "name": "cyl_l10n_89246468f7fd",
+      "value": "Buka galeri tab bar"
+    },
+    {
       "name": "cyl_l10n_a01539048bb0",
       "value": "Nyalakan sakelar, lalu tekan lama tab mana pun atau PlusButton untuk melihat pengenalnya."
     },
@@ -583,6 +599,10 @@
     {
       "name": "cyl_l10n_2f728e190695",
       "value": "Menampilkan halaman lain di tab kedua sisi tab ini (issue #481); ketuk lagi untuk memulihkan"
+    },
+    {
+      "name": "cyl_l10n_bed9ec1e8448",
+      "value": "Ambil foto"
     },
     {
       "name": "cyl_l10n_0be5a194844c",
@@ -659,6 +679,10 @@
     {
       "name": "cyl_l10n_0787cd518387",
       "value": "Simulasikan peringatan memori"
+    },
+    {
+      "name": "cyl_l10n_d76904d0e7ee",
+      "value": "Setiap adegan adalah tab bar yang dibuat dengan API publik: gaya, animasi, pengingat, Lottie, dan API tab terbaru"
     },
     {
       "name": "cyl_l10n_6a00c1ae99fa",

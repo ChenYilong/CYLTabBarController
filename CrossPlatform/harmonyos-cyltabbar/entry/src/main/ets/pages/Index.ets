@@ -887,6 +887,12 @@ struct Index {
       { title: CYLLocalizedString('无需继承基类与工具方法'), rows: this.helperRows(page) },
       { title: CYLLocalizedString('配置文件'), rows: this.configurationRows() },
       { title: CYLLocalizedString('跳转与对比'), rows: this.jumpRows() },
+      // [EN] Item 49: the gallery, on Home only (as iOS and Android). [CN] 第 49 项：场景展示，仅在首页（与 iOS、Android 相同）。
+      ...(page === DEMO_HOME ? [{ title: CYLLocalizedString('TabBar 场景展示'), rows: [{
+        id: 'gallery', title: CYLLocalizedString('打开 TabBar 场景展示'),
+        subtitle: CYLLocalizedString('每个场景都是用公开 API 构建的 TabBar：样式、动画、提醒、Lottie 以及较新的 Tab API'),
+        action: () => this.push('pages/Gallery', {} as DemoPushParams),
+      } as DemoRow] } as DemoSection] : []),
       { title: CYLLocalizedString('角标'), rows: page === DEMO_MESSAGE ? this.messageRows().concat(this.badgeRows(page)) : this.badgeRows(page) },
     ];
   }

@@ -337,6 +337,10 @@
       "value": "Tab: %@"
     },
     {
+      "name": "cyl_l10n_ab5745daa734",
+      "value": "Tab Bar Gallery"
+    },
+    {
       "name": "cyl_l10n_75ccb7ef4864",
       "value": "Tab bar appearance"
     },
@@ -449,6 +453,10 @@
       "value": "Zoom in"
     },
     {
+      "name": "cyl_l10n_83c39abd16cd",
+      "value": "Select from album"
+    },
+    {
       "name": "cyl_l10n_cc03f47a389c",
       "value": "Downloads this page's tab icon from the network (cached); tap again to restore"
     },
@@ -495,6 +503,10 @@
     {
       "name": "cyl_l10n_c1ecedab11bc",
       "value": "Original"
+    },
+    {
+      "name": "cyl_l10n_83611abd5f80",
+      "value": "Post"
     },
     {
       "name": "cyl_l10n_625fb26b4b33",
@@ -565,6 +577,10 @@
       "value": "Manual: tap to turn scroll hiding on, scroll down to hide the TabBar, then do what the title says. Expected: the TabBar comes back at once."
     },
     {
+      "name": "cyl_l10n_89246468f7fd",
+      "value": "Open the tab bar gallery"
+    },
+    {
       "name": "cyl_l10n_a01539048bb0",
       "value": "Turn the switch on, then long-press any tab or the PlusButton to see its identifier."
     },
@@ -583,6 +599,10 @@
     {
       "name": "cyl_l10n_2f728e190695",
       "value": "Shows other pages in the tabs on both sides of this tab (issue #481); tap again to restore"
+    },
+    {
+      "name": "cyl_l10n_bed9ec1e8448",
+      "value": "Take a photo"
     },
     {
       "name": "cyl_l10n_0be5a194844c",
@@ -659,6 +679,10 @@
     {
       "name": "cyl_l10n_0787cd518387",
       "value": "Simulate memory warning"
+    },
+    {
+      "name": "cyl_l10n_d76904d0e7ee",
+      "value": "Every scene is a tab bar built with the public API: styles, animations, reminders, Lottie and the newer tab APIs"
     },
     {
       "name": "cyl_l10n_6a00c1ae99fa",

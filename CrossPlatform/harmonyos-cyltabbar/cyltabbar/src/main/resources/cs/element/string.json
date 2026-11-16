@@ -337,6 +337,10 @@
       "value": "Karta: %@"
     },
     {
+      "name": "cyl_l10n_ab5745daa734",
+      "value": "Galerie panelů karet"
+    },
+    {
       "name": "cyl_l10n_75ccb7ef4864",
       "value": "Vzhled panelu karet"
     },
@@ -449,6 +453,10 @@
       "value": "Přiblížit"
     },
     {
+      "name": "cyl_l10n_83c39abd16cd",
+      "value": "Vybrat z alba"
+    },
+    {
       "name": "cyl_l10n_cc03f47a389c",
       "value": "Stáhne ikonu panelu ze sítě (s mezipamětí); klepnutím znovu obnovíte"
     },
@@ -495,6 +503,10 @@
     {
       "name": "cyl_l10n_c1ecedab11bc",
       "value": "Původní"
+    },
+    {
+      "name": "cyl_l10n_83611abd5f80",
+      "value": "Zveřejnit"
     },
     {
       "name": "cyl_l10n_625fb26b4b33",
@@ -565,6 +577,10 @@
       "value": "Ručně: klepnutím zapněte skrývání při posouvání, posuňte dolů, aby se TabBar skryl, a proveďte, co říká název. Očekávání: TabBar se hned vrátí."
     },
     {
+      "name": "cyl_l10n_89246468f7fd",
+      "value": "Otevřít galerii panelů karet"
+    },
+    {
       "name": "cyl_l10n_a01539048bb0",
       "value": "Zapněte přepínač a dlouhým stisknutím libovolného panelu nebo PlusButton zobrazíte jeho identifikátor."
     },
@@ -583,6 +599,10 @@
     {
       "name": "cyl_l10n_2f728e190695",
       "value": "Zobrazí jiné stránky v kartách po obou stranách této karty (issue #481); dalším klepnutím obnovíte"
+    },
+    {
+      "name": "cyl_l10n_bed9ec1e8448",
+      "value": "Pořídit fotku"
     },
     {
       "name": "cyl_l10n_0be5a194844c",
@@ -659,6 +679,10 @@
     {
       "name": "cyl_l10n_0787cd518387",
       "value": "Simulovat varování o paměti"
+    },
+    {
+      "name": "cyl_l10n_d76904d0e7ee",
+      "value": "Každá scéna je panel karet vytvořený veřejným API: styly, animace, upozornění, Lottie a novější API karet"
     },
     {
       "name": "cyl_l10n_6a00c1ae99fa",
