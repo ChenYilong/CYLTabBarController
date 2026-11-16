@@ -2,7 +2,7 @@
   "string": [
     {
       "name": "cyl_l10n_bffed61338ea",
-      "value": "%@ 鸿蒙上的 CYLTabBarController"
+      "value": "%@ CYLTabBarController（HarmonyOS）"
     },
     {
       "name": "cyl_l10n_9ecf653a3fc6",
@@ -178,7 +178,7 @@
     },
     {
       "name": "cyl_l10n_8a7b0e9c294e",
-      "value": "开启：%@；左右滑动页面"
+      "value": "开启：%@；在页面上左右滑动"
     },
     {
       "name": "cyl_l10n_06eb0a05de97",
@@ -278,7 +278,7 @@
     },
     {
       "name": "cyl_l10n_561582c1e7cc",
-      "value": "以半透明红色显示可点击区域：%@；缩放 %@x；点击依次切换 1x、1.5x、2x、关闭"
+      "value": "半透明红色显示可点击区域：%@；倍数 %@；点击循环 1x、1.5x、2x、关闭"
     },
     {
       "name": "cyl_l10n_3cb58e0d546d",
@@ -362,7 +362,7 @@
     },
     {
       "name": "cyl_l10n_ff5772993aee",
-      "value": "cyl_tabBarItemLongPressDuration = %@ ms，cyl_tabBarItemDoubleTapInterval = %@ ms；点击依次切换；双击一个 Tab 查看效果"
+      "value": "cyl_tabBarItemLongPressDuration = %@ 毫秒，cyl_tabBarItemDoubleTapInterval = %@ 毫秒；点击切换；双击任意 Tab 查看效果"
     },
     {
       "name": "cyl_l10n_f69c71bc581e",
@@ -370,7 +370,7 @@
     },
     {
       "name": "cyl_l10n_f3f4ecf4a4a6",
-      "value": "selectedIndex = %@（PlusButton 的页面为 %@，不是 Tab 下标）；点击切换到下一个 Tab"
+      "value": "selectedIndex = %@（加号按钮的页面为 %@，不占 Tab 下标）；点击切换到下一个 Tab"
     },
     {
       "name": "cyl_l10n_ee5b6ac6461b",
@@ -382,7 +382,7 @@
     },
     {
       "name": "cyl_l10n_c4376b477be8",
-      "value": "tabBarHidden = %@；隐藏后 2 秒恢复"
+      "value": "tabBarHidden = %@；隐藏后 2 秒自动恢复"
     },
     {
       "name": "cyl_l10n_2a0608059131",
