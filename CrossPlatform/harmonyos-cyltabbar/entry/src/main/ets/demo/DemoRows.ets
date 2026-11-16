@@ -51,6 +51,12 @@ export const DEMO_CITY: string = 'city';
 export const DEMO_MESSAGE: string = 'message';
 export const DEMO_ME: string = 'CYLMineViewController';
 
-/** [EN] The language row's choices: '' follows the system. [CN] 语言行的选项：'' 跟随系统。 */
-export const DEMO_LANGUAGES: string[] = ['', 'en-Latn-US', 'zh-Hans-CN'];
-export const DEMO_LANGUAGE_NAMES: string[] = [cyl_localizationKey('跟随系统'), 'English', '简体中文'];
+/**
+ * [EN] The language row's choices, as iOS -cyl_presentLanguagePicker (+cyl_pickerLanguages: en, zh-Hans, hi, es, ar, then
+ *      "Follow system"); '' follows the system. The names are the languages' own names with iOS's flags (CYLLanguageNames).
+ * [CN] 语言行的选项，与 iOS 的 -cyl_presentLanguagePicker 相同（en、zh-Hans、hi、es、ar，最后「跟随系统」）；'' 表示跟随系统。名称为各语言的
+ *      自称，并带有与 iOS 相同的国旗（CYLLanguageNames）。
+ */
+export const DEMO_LANGUAGES: string[] = ['en-Latn-US', 'zh-Hans-CN', 'hi', 'es', 'ar', ''];
+export const DEMO_LANGUAGE_NAMES: string[] = ['🇺🇸 English', '🇨🇳 简体中文', '🇮🇳 हिन्दी', '🇪🇸 Español', '🇸🇦 العربية',
+  cyl_localizationKey('跟随系统')];
