@@ -413,6 +413,8 @@ The root `Podfile` is the reference: it already has the top lines and the hook.
   touch .git/hooks/NO_AUTO_SYNC
   ```
 
+- **`git cz` style commits, English only (added 2026-11-16)**: Every commit is a Commitizen (`git cz`) style commit (`{type}{scope}: {emoji}{subject}`, see the Commitizen rules below), and the whole commit message is written in English: subject, body, TODO notes and trailers. No Chinese characters are allowed anywhere in a commit message. When a commit refers to Chinese text (a user prompt, a document, a string), give its English translation or link the document instead. Check before every push: `git log -1 --format=%B | python3 -c "import re,sys; sys.exit(1 if re.search('[\u4e00-\u9fff]', sys.stdin.read()) else 0)"` must print nothing; reword a commit that fails.
+
 - **On any branch other than `master` or `main`, commit and push as soon as the work is written, without asking
   for confirmation.** On `master` or `main`, ask first.
 
