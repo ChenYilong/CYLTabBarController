@@ -214,5 +214,14 @@
     "evidence": "harmonyos-flatdesign-liquidglass-taps-mate70pro.png col. 2",
     "cause": "Probably captured during the style switch animation; col. 3 shows the settled bar",
     "fix": "No code change; take the screenshot 1 s after the switch and check the bar is above the gesture bar"
+  },
+  {
+    "id": 25,
+    "status": "TODO need 模拟器截图验证",
+    "scope": "CrossPlatform/harmonyos-cyltabbar (cyltabbar)",
+    "title": "Wide badges (99+, NEW) are anchored by their left end at the icon corner and grow only to the right, unlike iOS and Android",
+    "evidence": "Code review of 3eb7381 / aaddad4 (PR #806, \"wide badges grow right\") against Example-Android CYLBadge.kt cyl_badgeOrigin (anchorRight + 2 dp - width / 2) and the iOS placement (center 2 pt right of the host's right edge)",
+    "cause": "markAnchor x was set to half the badge height for text badges, so the badge's left cap sat on the corner",
+    "fix": "markAnchor x 50% for every badge: the centre is 2 vp right of the corner plus centerOffset, so wide badges grow to both sides as on iOS and Android"
   }
 ]

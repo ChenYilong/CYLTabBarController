@@ -380,12 +380,12 @@ export struct CYLBadgeView {
               color: this.badge.borderColor ?? this.appearance().borderColor ?? Color.Transparent })
         }
       }
-      // [EN] A red dot is centred on the icon's corner; a number or text badge puts its left cap there and grows to the
-      //      right (iOS / Android keep the badge's left part at the corner), so "99+" or "NEW" does not cover the icon.
-      // [CN] 红点以图标角为中心；数字或文字角标的左端圆心位于该处并向右延伸（与 iOS / Android 一致），"99+"、"NEW" 不盖住图标。
-      .markAnchor({ x: this.badge.cyl_displayText() === null ? '50%'
-        : ((this.badge.fontSize ?? this.appearance().fontSize) * 1.2 + (this.badge.margin ?? this.appearance().margin)) / 2,
-        y: '50%' })
+      // [EN] Every badge (dot, number, text) is centred 2 vp right of the icon's top-right corner, plus centerOffset, as iOS
+      //      (center 2 pt right of the host's right edge) and Android (cyl_badgeOrigin: anchorRight + 2 dp - width / 2):
+      //      a wide badge grows to both sides of that point (issue list #25).
+      // [CN] 所有角标（红点、数字、文字）的中心都在图标右上角右侧 2 vp 处，再加 centerOffset，与 iOS（宿主右边缘右侧 2 pt）和
+      //      Android（cyl_badgeOrigin：anchorRight + 2 dp - 宽度 / 2）相同：宽角标向两侧延伸（问题 #25）。
+      .markAnchor({ x: '50%', y: '50%' })
       .position({ x: this.anchorWidth + 2 + (this.badge.centerOffset ?? this.appearance().centerOffset).horizontal,
         y: (this.badge.centerOffset ?? this.appearance().centerOffset).vertical })
       .visibility(this.badge.paused ? Visibility.Hidden : Visibility.Visible)
