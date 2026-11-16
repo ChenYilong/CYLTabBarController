@@ -226,7 +226,7 @@
   },
   {
     "id": 26,
-    "status": "TODO need 模拟器截图验证",
+    "status": "DONE (harmonyos-cvcm-issue26-good.jpeg, harmonyos-cvcm-issue26-all.jpeg; emulator Mate 70 Pro (HarmonyOS 6.0.0.112, API 21, x86_64; Rive / PAG .so excluded), 127.0.0.1:5555, 2026-11-17; CollectionViewClassifyMenu feat/harmony 518946b: tapping 好评(9) selects it and shows the 9 good reviews, hilog CYLTagList \"tap gesture 0-1\"; 全部 shows all 10 again)",
     "scope": "ChenYilong/CollectionViewClassifyMenu (harmony port; other repository, tracker docs/harmony-verification.md)",
     "title": "The review filter 好评(9) does not filter the list when tapped",
     "evidence": "harmonyos-push-*.jpeg on feat/harmony 98df838 (report of session chenyilong-de): reviews-all",
@@ -235,7 +235,7 @@
   },
   {
     "id": 27,
-    "status": "TODO need 模拟器截图验证",
+    "status": "DONE (harmonyos-cvcm-issue27-plus.jpeg, harmonyos-cvcm-issue27-filter-open.jpeg; emulator Mate 70 Pro (HarmonyOS 6.0.0.112, API 21, x86_64; Rive / PAG .so excluded), 127.0.0.1:5555, 2026-11-17; CollectionViewClassifyMenu feat/harmony 518946b: tab-plus has accessibility description 按场景分组的筛选演示 and opens 查询筛选; menuLinkageFilter has description 多选筛选 and opens the filter panel)",
     "scope": "ChenYilong/CollectionViewClassifyMenu (harmony port; other repository, tracker docs/harmony-verification.md)",
     "title": "The plus button and the menu-linkage filter button have no accessibility text and do nothing when tapped",
     "evidence": "harmonyos-push-*.jpeg on feat/harmony 98df838 (report of session chenyilong-de): query-menu-linkage",
