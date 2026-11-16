@@ -124,6 +124,7 @@
 "有新内容" = "Nouveau contenu";
 "%@ 条新消息" = "%@ nouveaux messages";
 "加号按钮" = "Bouton plus";
+"更多" = "Plus";
 "模拟内存警告" = "Simuler un avertissement mémoire";
 "卸载未选中的 Tab，切换时重新加载" = "Décharge les onglets non sélectionnés ; rechargés à la sélection";
 "内存警告" = "Avertissement mémoire";

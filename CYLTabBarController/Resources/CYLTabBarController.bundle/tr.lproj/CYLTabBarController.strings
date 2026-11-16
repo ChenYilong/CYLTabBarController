@@ -124,6 +124,7 @@
 "有新内容" = "Yeni içerik";
 "%@ 条新消息" = "%@ yeni mesaj";
 "加号按钮" = "Artı düğmesi";
+"更多" = "Diğer";
 "模拟内存警告" = "Bellek uyarısını taklit et";
 "卸载未选中的 Tab，切换时重新加载" = "Seçili olmayan sekmeleri boşaltır; seçilince yeniden yüklenir";
 "内存警告" = "Bellek uyarısı";

@@ -5,6 +5,7 @@
     <string name="cyl_badge_new_content">תוכן חדש</string>
     <string name="cyl_badge_new_messages">%1$s הודעות חדשות</string>
     <string name="cyl_plus_button">כפתור פלוס</string>
+    <string name="cyl_more">עוד</string>
     <string name="cyl_badge_new_lowercase">חדש</string>
     <string name="cyl_badge_new_uppercase">חדש</string>
     <string name="cyl_memory_warning_title">הדמיית אזהרת זיכרון</string>

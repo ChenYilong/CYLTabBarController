@@ -124,6 +124,7 @@
 "有新内容" = "Nový obsah";
 "%@ 条新消息" = "Nové zprávy: %@";
 "加号按钮" = "Tlačítko plus";
+"更多" = "Další";
 "模拟内存警告" = "Simulovat varování o paměti";
 "卸载未选中的 Tab，切换时重新加载" = "Uvolní nevybrané karty; po výběru se znovu načtou";
 "内存警告" = "Varování o paměti";

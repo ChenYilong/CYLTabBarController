@@ -5,6 +5,7 @@
     <string name="cyl_badge_new_content">มีเนื้อหาใหม่</string>
     <string name="cyl_badge_new_messages">ข้อความใหม่ %1$s ข้อความ</string>
     <string name="cyl_plus_button">ปุ่มบวก</string>
+    <string name="cyl_more">เพิ่มเติม</string>
     <string name="cyl_badge_new_lowercase">ใหม่</string>
     <string name="cyl_badge_new_uppercase">ใหม่</string>
     <string name="cyl_memory_warning_title">จำลองคำเตือนหน่วยความจำ</string>

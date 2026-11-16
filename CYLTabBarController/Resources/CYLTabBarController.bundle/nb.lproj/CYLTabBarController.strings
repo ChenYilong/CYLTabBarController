@@ -124,6 +124,7 @@
 "有新内容" = "Nytt innhold";
 "%@ 条新消息" = "%@ nye meldinger";
 "加号按钮" = "Plussknapp";
+"更多" = "Mer";
 "模拟内存警告" = "Simuler minneadvarsel";
 "卸载未选中的 Tab，切换时重新加载" = "Laster ut faner som ikke er valgt; de lastes på nytt når de velges";
 "内存警告" = "Minneadvarsel";

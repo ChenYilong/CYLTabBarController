@@ -5,6 +5,7 @@
     <string name="cyl_badge_new_content">有新内容</string>
     <string name="cyl_badge_new_messages">%1$s 条新消息</string>
     <string name="cyl_plus_button">加号按钮</string>
+    <string name="cyl_more">更多</string>
     <string name="cyl_badge_new_lowercase">新</string>
     <string name="cyl_badge_new_uppercase">新</string>
     <string name="cyl_memory_warning_title">模拟内存警告</string>

@@ -5,6 +5,7 @@
     <string name="cyl_badge_new_content">Yeni içerik</string>
     <string name="cyl_badge_new_messages">%1$s yeni mesaj</string>
     <string name="cyl_plus_button">Artı düğmesi</string>
+    <string name="cyl_more">Diğer</string>
     <string name="cyl_badge_new_lowercase">yeni</string>
     <string name="cyl_badge_new_uppercase">YENİ</string>
     <string name="cyl_memory_warning_title">Bellek uyarısını taklit et</string>

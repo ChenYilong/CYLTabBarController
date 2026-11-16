@@ -124,6 +124,7 @@
 "有新内容" = "New content";
 "%@ 条新消息" = "%@ new messages";
 "加号按钮" = "Plus button";
+"更多" = "More";
 "模拟内存警告" = "Simulate memory warning";
 "卸载未选中的 Tab，切换时重新加载" = "Unloads unselected tabs; they load again when selected";
 "内存警告" = "Memory warning";

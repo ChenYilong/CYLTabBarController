@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- [EN] The "More" tab icon: three dots, as UIKit's More tab. [CN] 「更多」Tab 图标：三个点，与 UIKit 的 More Tab 一致。 -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="#FF000000"
+        android:pathData="M6,10a2,2 0,1 0,0.01 0zM12,10a2,2 0,1 0,0.01 0zM18,10a2,2 0,1 0,0.01 0z" />
+</vector>

@@ -124,6 +124,7 @@
 "有新内容" = "Új tartalom";
 "%@ 条新消息" = "%@ új üzenet";
 "加号按钮" = "Plusz gomb";
+"更多" = "Továbbiak";
 "模拟内存警告" = "Memóriafigyelmeztetés szimulálása";
 "卸载未选中的 Tab，切换时重新加载" = "Felszabadítja a nem kiválasztott lapokat; kiválasztáskor újratöltődnek";
 "内存警告" = "Memóriafigyelmeztetés";

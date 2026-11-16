@@ -209,6 +209,20 @@ def inventory():
     return rows
 
 
+ANDROID_ONLY_PATH = os.path.join(os.path.dirname(MAP_PATH), 'api-map-android-only.json')
+
+
+def load_android_only():
+    """
+    [EN] Android-only APIs (no iOS twin): a list of {"android", "note"}, listed in their own section, out of the score.
+    [CN] 仅 Android 的 API（iOS 无对应）：{"android", "note"} 列表，单独成节，不计入完成率。
+    """
+    if not os.path.exists(ANDROID_ONLY_PATH):
+        return []
+    with open(ANDROID_ONLY_PATH, encoding='utf-8') as handle:
+        return json.load(handle)
+
+
 def load_map():
     if not os.path.exists(MAP_PATH):
         return {}
@@ -259,6 +273,14 @@ def document(rows, mapping):
             out.append('| %s | %s | %s | %s |' % (ios, '`%s`' % android if android else '—', status, note))
         out.append('')
         del done
+    extensions = load_android_only()
+    if extensions:
+        out += ['## 仅 Android / Android only', '',
+                '| 中文 | English |', '|:---|:---|',
+                '| 这些 API 只在 Android 上存在，iOS 库没有对应 API，不计入完成率。详见 [Android-Library](Android-Library.md) 的「仅 Android 的扩展」。 | These APIs exist on Android only; the iOS library has no counterpart, and they are left out of the score. Details: "Android-only extensions" in [Android-Library](Android-Library.md). |', '',
+                '| Android API | 说明 / Note |', '|:---|:---|']
+        out += ['| `%s` | %s |' % (entry['android'], entry.get('note', '')) for entry in extensions]
+        out.append('')
     return '\n'.join(out)
 
 

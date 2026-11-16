@@ -236,6 +236,10 @@ docs/
 │   ├── gif-liquid-glass.png
 │   ├── harmonyos-badge-bounce-around-place.png
 │   ├── harmonyos-bundle-image-row-localized.png
+│   ├── harmonyos-cvcm-issue26-all.jpeg
+│   ├── harmonyos-cvcm-issue26-good.jpeg
+│   ├── harmonyos-cvcm-issue27-filter-open.jpeg
+│   ├── harmonyos-cvcm-issue27-plus.jpeg
 │   ├── harmonyos-emulator-pages-b7fdf26.png
 │   ├── harmonyos-flatdesign-liquidglass-taps-mate70pro.png
 │   ├── harmonyos-flatdesign-tint-fixed.png

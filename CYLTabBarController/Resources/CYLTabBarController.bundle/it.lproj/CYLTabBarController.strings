@@ -124,6 +124,7 @@
 "有新内容" = "Nuovi contenuti";
 "%@ 条新消息" = "%@ nuovi messaggi";
 "加号按钮" = "Pulsante più";
+"更多" = "Altro";
 "模拟内存警告" = "Simula avviso di memoria";
 "卸载未选中的 Tab，切换时重新加载" = "Scarica i pannelli non selezionati; si ricaricano quando selezionati";
 "内存警告" = "Avviso di memoria";

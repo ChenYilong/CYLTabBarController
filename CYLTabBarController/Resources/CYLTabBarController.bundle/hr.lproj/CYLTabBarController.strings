@@ -124,6 +124,7 @@
 "有新内容" = "Novi sadržaj";
 "%@ 条新消息" = "Nove poruke: %@";
 "加号按钮" = "Tipka plus";
+"更多" = "Više";
 "模拟内存警告" = "Simuliraj upozorenje o memoriji";
 "卸载未选中的 Tab，切换时重新加载" = "Oslobađa neodabrane kartice; ponovno se učitavaju kad se odaberu";
 "内存警告" = "Upozorenje o memoriji";

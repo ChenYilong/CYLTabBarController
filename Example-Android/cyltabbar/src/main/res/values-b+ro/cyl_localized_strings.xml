@@ -5,6 +5,7 @@
     <string name="cyl_badge_new_content">Conținut nou</string>
     <string name="cyl_badge_new_messages">Mesaje noi: %1$s</string>
     <string name="cyl_plus_button">Buton plus</string>
+    <string name="cyl_more">Mai multe</string>
     <string name="cyl_badge_new_lowercase">nou</string>
     <string name="cyl_badge_new_uppercase">NOU</string>
     <string name="cyl_memory_warning_title">Simulează avertisment de memorie</string>

@@ -214,6 +214,7 @@ open class CYLTabBarController(val activity: FragmentActivity) {
         val transaction = fragmentManager.beginTransaction()
         for (page in viewControllers) if (page.isAdded && page.isHidden) transaction.show(page)
         fragmentManager.findFragmentByTag("$fragmentTag-plus")?.takeIf { it.isAdded && !it.isHidden && !tabBar.plusButtonActive }?.let { transaction.hide(it) }
+        cyl_applyMoreList(transaction)
         transaction.commitNowAllowingStateLoss()
         host.cyl_showPage(selectedIndex)
     }
@@ -233,8 +234,9 @@ open class CYLTabBarController(val activity: FragmentActivity) {
             if (!page.isAdded) transaction.add(pagesContainer.id, page, "$fragmentTag-$index")
             // [EN] A tab unloaded by a memory warning creates its view again when selected (#426). [CN] 被内存警告卸载的 Tab 在选中时重新创建视图（#426）。
             if (index == selectedIndex && page.isDetached) transaction.attach(page)
-            if (index == selectedIndex) transaction.show(page) else transaction.hide(page)
+            if (index == selectedIndex && !cyl_isMoreSelected) transaction.show(page) else transaction.hide(page)
         }
+        cyl_applyMoreList(transaction)
         // [EN] The plus button's page (`plusChildViewController`) leaves the screen when a tab is selected; it was added last,
         //      so left shown it would cover the selected tab's page. On iOS it is one of the view controllers and is replaced.
         // [CN] 选中 Tab 时 PlusButton 的页面（`plusChildViewController`）离开屏幕；它最后添加，若仍显示会盖住选中 Tab 的页面。iOS 上它是 viewControllers
@@ -409,6 +411,7 @@ open class CYLTabBarController(val activity: FragmentActivity) {
             val fromPlusPage = tabBar.plusButtonActive
             field = value
             tabBar.plusButtonActive = false
+            cyl_isMoreSelected = false
             showSelectedPage()
             tabBar.refreshSelection()
             cyl_applyNavigationTitleOfSelectedPage()
@@ -521,6 +524,8 @@ open class CYLTabBarController(val activity: FragmentActivity) {
             CYLTabBarPageRegistry.pagesOfTabs(listOf(mapOf(CYLConstants.CYLTabBarItemPageIdentifier to identifier)), cyl_pageRegistry, cyl_pageResolver,
                 cyl_pageLookupOrder, ArrayList(), ArrayList()).firstOrNull()
         }
+        // [EN] Android only: every tab in the bar, no "More". [CN] 仅 Android：所有 Tab 都显示在 TabBar 中，没有「更多」。
+        CYLTabBarConfiguration.boolValue(normalized[CYLConstants.CYLTabBarControllerShowsAllTabs])?.let { cyl_showsAllTabs = it }
         (normalized[CYLConstants.CYLTabBarControllerTabBarItemAnimationSpeed]?.toString()?.toFloatOrNull())?.takeIf { it > 0 && it.isFinite() }?.let { tabBarItemAnimationSpeed = it }
         // [EN] Interactions of the configuration; `CYLTabBarControllerUserInterfaceStyle` is iOS only (Android follows the system).
         // [CN] 配置中的交互；`CYLTabBarControllerUserInterfaceStyle` 仅用于 iOS（Android 跟随系统）。
@@ -800,6 +805,89 @@ open class CYLTabBarController(val activity: FragmentActivity) {
         tabBar.cyl_tabBarButtonWithTabIndex(index)?.let { delegate?.tabBarController_didSelectControl(this, it) }
     }
 
+    // MARK: - More (as UIKit's moreNavigationController) 更多（对应 UIKit 的 moreNavigationController）
+
+    /**
+     * [EN] Android only (no iOS counterpart; UIKit always adds "More" on iOS): true shows every tab in the bar, with no "More"
+     *      tab. Default false, as on iOS: with more than five tabs (a plus button with its own page counts as one, as it is one
+     *      of UIKit's view controllers), the bar shows the first four (three with such a plus button) and "More", whose page
+     *      (`cyl_moreViewController`) lists the others. The scrollable mode (`CYLTabBar.cyl_scrollMode`) also shows every tab.
+     *      Configuration key: `CYLTabBarControllerShowsAllTabs`. See docs/Android-Library.md.
+     * [CN] 仅 Android（iOS 无对应 API；iOS 上 UIKit 总会加入「更多」）：true 时所有 Tab 都显示在 TabBar 中，没有「更多」。默认 false，与 iOS 一致：超过 5 个
+     *      Tab（有自己页面的 PlusButton 算一个，因为它是 UIKit 的一个视图控制器）时，TabBar 显示前四个（有这种 PlusButton 时为三个）与「更多」，其页面
+     *      （`cyl_moreViewController`）列出其余 Tab。滚动模式（`CYLTabBar.cyl_scrollMode`）也会显示所有 Tab。配置键：`CYLTabBarControllerShowsAllTabs`。
+     *      见 docs/Android-Library.md。
+     */
+    var cyl_showsAllTabs: Boolean = false
+        set(value) {
+            if (field == value) return
+            field = value
+            if (value && cyl_isMoreSelected) cyl_isMoreSelected = false
+            tabBar.cyl_updateMoreButton()
+            commitPages()
+        }
+
+    /**
+     * [EN] Whether the page of "More" (its list) shows now (`moreNavigationController` selected). [CN] 当前是否显示「更多」的页面（其列表），即选中了 `moreNavigationController`。
+     */
+    var cyl_isMoreSelected: Boolean = false
+        private set
+
+    private var moreList: CYLTabBarMoreListFragment? = null
+
+    /**
+     * [EN] The page of "More" (UIKit's `moreNavigationController`): the list of the tabs past the ones in the bar. Asked
+     *      through the delegate's `shouldSelect` and reported to `didSelectViewController` when "More" is tapped.
+     * [CN] 「更多」的页面（对应 UIKit 的 `moreNavigationController`）：列出 TabBar 中放不下的 Tab。点击「更多」时通过代理的 `shouldSelect` 询问，并通知
+     *      `didSelectViewController`。
+     */
+    val cyl_moreViewController: Fragment
+        get() = moreList ?: CYLTabBarMoreListFragment().also { it.cyl_tabBarController = this; moreList = it }
+
+    /**
+     * [EN] How many tabs the bar shows before "More", for `tabs` tabs: all of them with `cyl_showsAllTabs`, in the scrollable
+     *      mode, or with five view controllers or fewer; else four, or three when the plus button has its own page.
+     * [CN] 有 `tabs` 个 Tab 时 TabBar 在「更多」之前显示的数量：`cyl_showsAllTabs`、滚动模式或视图控制器不超过 5 个时为全部；否则为四个，PlusButton 有自己的
+     *      页面时为三个。
+     */
+    internal fun cyl_visibleTabCount(tabs: Int, plusHasPage: Boolean): Int {
+        if (cyl_showsAllTabs || tabBar.cyl_scrollMode != CYLTabBarScrollMode.Fixed) return tabs
+        val viewControllerCount = tabs + if (plusHasPage) 1 else 0
+        if (viewControllerCount <= 5) return tabs
+        return if (plusHasPage) 3 else 4
+    }
+
+    /**
+     * [EN] Shows or hides the list of "More" in the pages container. [CN] 在页面容器中显示或隐藏「更多」的列表。
+     */
+    private fun cyl_applyMoreList(transaction: androidx.fragment.app.FragmentTransaction) {
+        val list = moreList
+        if (cyl_isMoreSelected) {
+            val more = cyl_moreViewController
+            if (!more.isAdded) transaction.add(pagesContainer.id, more, "$fragmentTag-more")
+            transaction.show(more)
+        } else if (list != null && list.isAdded && !list.isHidden) {
+            transaction.hide(list)
+        }
+    }
+
+    /**
+     * [EN] A tap on "More": its list, as UIKit's More tab. [CN] 点击「更多」：显示其列表，与 UIKit 的 More Tab 一致。
+     */
+    internal fun cyl_moreButtonTapped(button: CYLTabBarItemButton) {
+        val more = cyl_moreViewController
+        if (delegate?.tabBarController_shouldSelectViewController(this, more) == false) return
+        cyl_isMoreSelected = true
+        tabBar.plusButtonActive = false
+        commitPages()
+        (more as? CYLTabBarMoreListFragment)?.cyl_reloadRows()
+        tabBar.refreshSelection()
+        cyl_playTabButtonAnimationForControl(button)
+        cyl_playTabButtonTapFeedback()
+        delegate?.tabBarController_didSelectViewController(this, more)
+        delegate?.tabBarController_didSelectControl(this, button)
+    }
+
     internal fun cyl_plusButtonTapped(plusButton: CYLPlusButton) {
         val provider = plusButton.provider ?: CYLPlusButton.providerForTabBarContext(context) ?: return
         val child = provider.plusChildViewController()
@@ -807,6 +895,8 @@ open class CYLTabBarController(val activity: FragmentActivity) {
             val transaction = fragmentManager.beginTransaction()
             if (!child.isAdded) transaction.add(pagesContainer.id, child, "$fragmentTag-plus")
             for (page in viewControllers) if (page.isAdded) transaction.hide(page)
+            cyl_isMoreSelected = false
+            cyl_applyMoreList(transaction)
             transaction.show(child).commitNowAllowingStateLoss()
             plusButton.cyl_plusViewControllerEverAdded = true
             tabBar.plusButtonActive = true

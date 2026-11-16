@@ -490,9 +490,15 @@ class CYLTabBar(context: Context) : ViewGroup(context) {
     internal fun cyl_selectedSlot(): Int {
         val plusIndex = plusButtonIndex()
         if (plusButtonActive && plusIndex >= 0) return plusIndex
-        val index = tabBarController?.selectedIndex ?: return -1
-        if (index < 0 || index >= buttons.size) return -1
-        return if (plusIndex in 0..index) index + 1 else index
+        val controller = tabBarController ?: return -1
+        val index = controller.selectedIndex
+        // [EN] The list of "More", or a tab under it, selects the "More" slot. [CN] 「更多」的列表或其下的 Tab 选中「更多」的 slot。
+        val barIndex = when {
+            cyl_moreButton != null && (controller.cyl_isMoreSelected || index >= cyl_visibleTabCount) -> cyl_visibleTabCount
+            index < 0 || index >= buttons.size -> return -1
+            else -> index
+        }
+        return if (plusIndex in 0..barIndex) barIndex + 1 else barIndex
     }
 
     /**
@@ -511,12 +517,71 @@ class CYLTabBar(context: Context) : ViewGroup(context) {
         val plusIndex = plusButtonIndex()
         if (slot == plusIndex) { plusButton?.performClick(); return }
         val index = if (plusIndex in 0 until slot) slot - 1 else slot
-        val button = buttons.getOrNull(index) ?: return
-        if (index == tabBarController?.selectedIndex && !plusButtonActive) { refreshSelection(); return }
-        tabBarController?.cyl_tabButtonTapped(button)
+        val button = slotButtons.getOrNull(index) ?: return
+        val controller = tabBarController ?: return
+        if (button === cyl_moreButton) { controller.cyl_moreButtonTapped(button); return }
+        if (index == controller.selectedIndex && !plusButtonActive && !controller.cyl_isMoreSelected) { refreshSelection(); return }
+        controller.cyl_tabButtonTapped(button)
     }
     @ColorInt var cyl_shadowColor: Int? = 0x33000000
     private val buttons = ArrayList<CYLTabBarItemButton>()
+
+    // MARK: - More (as UIKit's moreNavigationController) 更多（对应 UIKit 的 moreNavigationController）
+
+    /**
+     * [EN] The "More" button, shown in place of the tabs past the fourth when there are more than five (as UIKit does on
+     *      iOS); null when every tab fits (or `CYLTabBarController.cyl_showsAllTabs`). Its page is
+     *      `CYLTabBarController.cyl_moreViewController`. `tabBarButtonArray` still holds a button for every tab.
+     * [CN] 「更多」按钮：超过 5 个 Tab 时代替第四个之后的 Tab 显示（与 iOS 上的 UIKit 一致）；所有 Tab 都放得下（或 `CYLTabBarController.cyl_showsAllTabs`）
+     *      时为 null。其页面为 `CYLTabBarController.cyl_moreViewController`。`tabBarButtonArray` 仍包含每个 Tab 的按钮。
+     */
+    var cyl_moreButton: CYLTabBarItemButton? = null
+        private set
+    /**
+     * [EN] How many tabs the bar shows before "More" (all of them without "More"). [CN] TabBar 在「更多」之前显示的 Tab 数（没有「更多」时为全部）。
+     */
+    var cyl_visibleTabCount: Int = 0
+        private set
+    /**
+     * [EN] The buttons laid out in the bar: the visible tabs, then "More". [CN] TabBar 中布局的按钮：可见的 Tab，然后是「更多」。
+     */
+    private val slotButtons: List<CYLTabBarItemButton> get() = cyl_moreButton?.let { more -> buttons.take(cyl_visibleTabCount) + more } ?: buttons
+
+    /**
+     * [EN] The bar button that stands for tab `index`: its own button, or "More" for a tab under it. [CN] 代表第 `index` 个 Tab 的 TabBar 按钮：其自身按钮，或其所在的「更多」。
+     */
+    private fun barButtonOfTab(index: Int): CYLTabBarItemButton? =
+        if (cyl_moreButton != null && index >= cyl_visibleTabCount) cyl_moreButton else buttons.getOrNull(index)
+
+    /**
+     * [EN] Shows "More" when the controller asks for it (more than five tabs, see `CYLTabBarController.cyl_visibleTabCount`)
+     *      and hides the tabs under it; without it, every tab shows again. Keeps the buttons (and their badges).
+     * [CN] 控制器需要时显示「更多」（超过 5 个 Tab，见 `CYLTabBarController.cyl_visibleTabCount`）并隐藏其下的 Tab；不需要时所有 Tab 重新显示。按钮（及其角标）保持不变。
+     */
+    internal fun cyl_updateMoreButton() {
+        val controller = tabBarController ?: return
+        val plusHasPage = plusButton != null && hasPlusChildViewController()
+        val visible = controller.cyl_visibleTabCount(buttons.size, plusHasPage)
+        cyl_visibleTabCount = visible
+        buttons.forEachIndexed { index, button -> button.visibility = if (index < visible) View.VISIBLE else View.GONE }
+        if (visible < buttons.size) {
+            if (cyl_moreButton == null) {
+                val item = CYLTabBarItem(mapOf(CYLConstants.CYLTabBarItemTitle to CYLLocalization.string(context, R.string.cyl_more))).apply {
+                    image = androidx.core.content.ContextCompat.getDrawable(context, R.drawable.cyl_tab_more)
+                }
+                val more = CYLTabBarItemButton(context, item, -1)
+                more.onTap = { controller.cyl_moreButtonTapped(more) }
+                addView(more)
+                cyl_moreButton = more
+            }
+        } else {
+            cyl_moreButton?.let { removeView(it) }
+            cyl_moreButton = null
+        }
+        refreshSelection()
+        requestLayout()
+        updateGlobals()
+    }
     private val shadow = View(context)
 
     // MARK: - Indicator and scroll mode (Android only, adapted from QMUITabSegment) 指示器与滚动模式（仅 Android，改编自 QMUITabSegment）
@@ -534,7 +599,7 @@ class CYLTabBar(context: Context) : ViewGroup(context) {
      * [EN] Android only: `Fixed` (default) or `Scrollable` (`CYLTabBarScrollMode`). [CN] 仅 Android：`Fixed`（默认）或 `Scrollable`（`CYLTabBarScrollMode`）。
      */
     var cyl_scrollMode: CYLTabBarScrollMode = CYLTabBarScrollMode.Fixed
-        set(value) { field = value; scrollTo(0, 0); requestLayout() }
+        set(value) { field = value; scrollTo(0, 0); cyl_updateMoreButton(); requestLayout() }
     /**
      * [EN] Android only: the room added to each tab's content in the scrollable mode, in dp (default 24). [CN] 仅 Android：滚动模式下每个 Tab 内容之外的空间（dp，默认 24）。
      */
@@ -657,14 +722,14 @@ class CYLTabBar(context: Context) : ViewGroup(context) {
     /**
      * [EN] `-plusButtonIndex`: the slot of the plus button among the tabs, or -1. [CN] PlusButton 在 Tab 中的 slot 下标，没有则为 -1。
      */
-    fun plusButtonIndex(): Int = if (plusButton == null) -1 else CYLPlusButton.indexForTabbarItemsCount(buttons.size, context_)
+    fun plusButtonIndex(): Int = if (plusButton == null) -1 else CYLPlusButton.indexForTabbarItemsCount(slotButtons.size, context_)
 
     /**
      * [EN] `-isPlusButtonLayoutCentered`. [CN] PlusButton 是否居中布局。
      */
     fun isPlusButtonLayoutCentered(): Boolean = plusButton?.isLayoutCentered() ?: false
 
-    private fun slotCount(): Int = buttons.size + (if (plusButton != null) 1 else 0)
+    private fun slotCount(): Int = slotButtons.size + (if (plusButton != null) 1 else 0)
 
     /**
      * [EN] `-cyl_reloadTabButtons`: builds the buttons again from the controller's items. [CN] 根据控制器的 item 重新创建按钮。
@@ -693,9 +758,9 @@ class CYLTabBar(context: Context) : ViewGroup(context) {
             addView(plus)
             plusButton = plus
         }
-        refreshSelection()
-        requestLayout()
-        updateGlobals()
+        cyl_moreButton?.let { removeView(it) }
+        cyl_moreButton = null
+        cyl_updateMoreButton()
     }
 
     /**
@@ -713,7 +778,7 @@ class CYLTabBar(context: Context) : ViewGroup(context) {
      * [EN] The iOS globals `CYLTabbarItemsCount`, `CYLPlusButtonIndex`, `CYLPlusButtonWidth`, `CYLTabBarItemWidth`, `CYLTabBarHeight`: the latest tab bar's values. [CN] iOS 的全局变量：最近布局的 TabBar 的值。
      */
     private fun updateGlobals() {
-        CYLTabbarItemsCount = buttons.size
+        CYLTabbarItemsCount = slotButtons.size
         CYLPlusButtonIndex = plusButtonIndex()
         CYLPlusButtonWidth = plusButton?.let { it.width / resources.displayMetrics.density } ?: 0f
         CYLTabBarItemWidth = tabBarItemWidth
@@ -722,7 +787,10 @@ class CYLTabBar(context: Context) : ViewGroup(context) {
 
     internal fun refreshSelection() {
         val controller = tabBarController ?: return
-        buttons.forEachIndexed { index, button -> button.apply(index == controller.selectedIndex && !plusButtonActive, this) }
+        val moreSelected = controller.cyl_isMoreSelected
+        buttons.forEachIndexed { index, button -> button.apply(index == controller.selectedIndex && !plusButtonActive && !moreSelected, this) }
+        // [EN] "More" is selected while its list or a tab under it shows. [CN] 显示其列表或其下的 Tab 时，「更多」为选中状态。
+        cyl_moreButton?.apply(!plusButtonActive && (moreSelected || controller.selectedIndex >= cyl_visibleTabCount), this)
         plusButton?.let { refreshPlusButtonTitle(it, controller) }
         shadow.setBackgroundColor(cyl_shadowColor ?: Color.TRANSPARENT)
         layoutIndicator(animated = true)
@@ -759,7 +827,11 @@ class CYLTabBar(context: Context) : ViewGroup(context) {
         plus.titleLabel.setTextColor(if (plusButtonActive) selectedColor else normalColor)
     }
 
-    private fun indicatorTarget(): Int = if (plusButtonActive) -1 else tabBarController?.selectedIndex ?: -1
+    private fun indicatorTarget(): Int = when {
+        plusButtonActive -> -1
+        tabBarController?.cyl_isMoreSelected == true -> cyl_visibleTabCount
+        else -> tabBarController?.selectedIndex ?: -1
+    }
 
     /**
      * [EN] `layoutIndicator`: puts the indicator on the selected tab, moving it there when `animated`. [CN] 把指示条放到选中 Tab 上，`animated` 时移动过去。
@@ -767,14 +839,14 @@ class CYLTabBar(context: Context) : ViewGroup(context) {
     private fun layoutIndicator(animated: Boolean) {
         val indicator = cyl_indicator ?: return
         val target = indicatorTarget()
-        val targetButton = buttons.getOrNull(target)
+        val targetButton = barButtonOfTab(target)
         if (targetButton == null || targetButton.width == 0) {
             if (target < 0) indicator.hide()
             indicatorIndex = if (targetButton == null) -1 else indicatorIndex
             invalidate()
             return
         }
-        val previous = buttons.getOrNull(indicatorIndex)
+        val previous = barButtonOfTab(indicatorIndex)
         indicatorAnimator?.cancel()
         if (animated && previous != null && previous !== targetButton && cyl_indicatorAnimationDuration > 0) {
             indicatorAnimator = android.animation.ValueAnimator.ofFloat(0f, 1f).apply {
@@ -817,13 +889,13 @@ class CYLTabBar(context: Context) : ViewGroup(context) {
      *      `CYLTabBarController.cyl_swipesBetweenPages` 会自行调用。
      */
     fun cyl_updateIndicatorPosition(index: Int, offsetPercent: Float) {
-        val from = buttons.getOrNull(index) ?: return
+        val from = barButtonOfTab(index) ?: return
         indicatorAnimator?.cancel()
         if (offsetPercent == 0f) {
             refreshSelection()
             return
         }
-        val to = buttons.getOrNull(if (offsetPercent < 0) index - 1 else index + 1) ?: return
+        val to = barButtonOfTab(if (offsetPercent < 0) index - 1 else index + 1) ?: return
         val fraction = kotlin.math.abs(offsetPercent).coerceAtMost(1f)
         from.cyl_setSelectionFraction(1 - fraction, this)
         to.cyl_setSelectionFraction(fraction, this)
@@ -835,7 +907,7 @@ class CYLTabBar(context: Context) : ViewGroup(context) {
      */
     private fun scrollSelectedTabIntoView() {
         if (maxScrollX <= 0) return
-        val button = buttons.getOrNull(indicatorTarget()) ?: return
+        val button = barButtonOfTab(indicatorTarget()) ?: return
         if (button.width == 0) return
         val target = (button.left + button.width / 2 - width / 2).coerceIn(0, maxScrollX)
         scroller.forceFinished(true)
@@ -911,7 +983,7 @@ class CYLTabBar(context: Context) : ViewGroup(context) {
         contentWidth = slotWidths.sum()
         val plusIndex = plusButtonIndex()
         var slot = 0
-        for ((index, button) in buttons.withIndex()) {
+        for ((index, button) in slotButtons.withIndex()) {
             if (index == plusIndex) slot++
             button.measure(MeasureSpec.makeMeasureSpec(slotWidths.getOrElse(slot) { 0 }, MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(height, MeasureSpec.EXACTLY))
             slot++
@@ -935,7 +1007,7 @@ class CYLTabBar(context: Context) : ViewGroup(context) {
         var button = 0
         val widths = IntArray(slots) { slot ->
             if (slot == plusIndex) maxOf(plusButton?.measuredWidth ?: 0, width / maxOf(slots, 1) / 2)
-            else buttons[button++].cyl_contentWidth() + space
+            else slotButtons[button++].cyl_contentWidth() + space
         }
         return if (widths.sum() <= width) equal else widths
     }
@@ -948,11 +1020,11 @@ class CYLTabBar(context: Context) : ViewGroup(context) {
      */
     private fun cyl_weightedSlotWidths(slots: Int, equal: IntArray): IntArray? {
         val weights = cyl_itemWidthWeights ?: return null
-        if (cyl_scrollMode != CYLTabBarScrollMode.Fixed || buttons.isEmpty()) return null
+        if (cyl_scrollMode != CYLTabBarScrollMode.Fixed || slotButtons.isEmpty()) return null
         val plusIndex = plusButtonIndex()
         val share = equal.firstOrNull() ?: 0
         val available = equal.sum() - (if (plusIndex >= 0) share else 0)
-        val tabWeights = buttons.indices.map { index -> weights.getOrNull(index)?.takeIf { it.isFinite() && it > 0f } ?: 1f }
+        val tabWeights = slotButtons.indices.map { index -> weights.getOrNull(index)?.takeIf { it.isFinite() && it > 0f } ?: 1f }
         val total = tabWeights.sum()
         var button = 0
         return IntArray(slots) { slot -> if (slot == plusIndex) share else (available * tabWeights[button++] / total).toInt() }
@@ -987,7 +1059,7 @@ class CYLTabBar(context: Context) : ViewGroup(context) {
         if (slotWidths.size != slotCount()) slotWidths = computeSlotWidths(cyl_itemsFrame.width())
         val plusIndex = plusButtonIndex()
         var slot = 0
-        for ((index, button) in buttons.withIndex()) {
+        for ((index, button) in slotButtons.withIndex()) {
             if (index == plusIndex) slot++
             val slotStart = slotStart(slot)
             val left = slotStart + (cyl_itemEdgeInsets.left * density).toInt()

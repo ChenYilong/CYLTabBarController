@@ -5,6 +5,7 @@
     <string name="cyl_badge_new_content">Nytt innhold</string>
     <string name="cyl_badge_new_messages">%1$s nye meldinger</string>
     <string name="cyl_plus_button">Plussknapp</string>
+    <string name="cyl_more">Mer</string>
     <string name="cyl_badge_new_lowercase">ny</string>
     <string name="cyl_badge_new_uppercase">NY</string>
     <string name="cyl_memory_warning_title">Simuler minneadvarsel</string>

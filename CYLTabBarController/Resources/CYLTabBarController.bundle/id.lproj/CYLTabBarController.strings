@@ -124,6 +124,7 @@
 "有新内容" = "Konten baru";
 "%@ 条新消息" = "%@ pesan baru";
 "加号按钮" = "Tombol plus";
+"更多" = "Lainnya";
 "模拟内存警告" = "Simulasikan peringatan memori";
 "卸载未选中的 Tab，切换时重新加载" = "Membebaskan tab yang tidak dipilih; dimuat ulang saat dipilih";
 "内存警告" = "Peringatan memori";

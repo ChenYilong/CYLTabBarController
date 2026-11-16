@@ -79,8 +79,10 @@ class CYLQMUIAdaptedFeaturesTest : CYLRobolectricTestCase() {
         val titles = (1..8).map { "A rather long tab title $it" }.toTypedArray()
         val controller = controllerWith(activity, *titles)
         val tabBar = controller.tabBar
-        val fixedWidths = tabBar.tabBarButtonArray.map { it.width }.toSet()
-        assertEquals("equal tabs in the fixed mode", 1, fixedWidths.size)
+        // [EN] Eight tabs in the fixed mode: four tabs and "More", as on iOS. [CN] 固定模式下 8 个 Tab：四个 Tab 与「更多」，与 iOS 一致。
+        val laidOut = tabBar.tabBarButtonArray.take(tabBar.cyl_visibleTabCount) + listOfNotNull(tabBar.cyl_moreButton)
+        assertEquals(5, laidOut.size)
+        assertEquals("equal tabs in the fixed mode", 1, laidOut.map { it.width }.toSet().size)
 
         tabBar.cyl_scrollMode = CYLTabBarScrollMode.Scrollable
         idle()

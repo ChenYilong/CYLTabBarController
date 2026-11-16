@@ -21,6 +21,7 @@ STRINGS = {
     'cyl_badge_new_content': '有新内容',
     'cyl_badge_new_messages': '%@ 条新消息',
     'cyl_plus_button': '加号按钮',
+    'cyl_more': '更多',
     'cyl_badge_new_lowercase': 'new',
     'cyl_badge_new_uppercase': 'NEW',
     'cyl_memory_warning_title': '模拟内存警告',

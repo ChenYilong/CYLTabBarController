@@ -179,6 +179,8 @@ public final class CYLConstants {
     /**
      * [EN] Skins of a configuration (see CYLTabBarConfigurationTheme). [CN] 配置中的皮肤（见 CYLTabBarConfigurationTheme）。
      */
+    // [EN] Android only: every tab in the bar, no "More" (CYLTabBarController.cyl_showsAllTabs). [CN] 仅 Android：所有 Tab 都显示在 TabBar 中，没有「更多」。
+    public static final String CYLTabBarControllerShowsAllTabs = "CYLTabBarControllerShowsAllTabs";
     public static final String CYLTabBarControllerThemes = "CYLTabBarControllerThemes";
     public static final String CYLTabBarControllerThemeIdentifier = "CYLTabBarControllerThemeIdentifier";
     public static final String CYLTabBarControllerDarkThemeIdentifier = "CYLTabBarControllerDarkThemeIdentifier";

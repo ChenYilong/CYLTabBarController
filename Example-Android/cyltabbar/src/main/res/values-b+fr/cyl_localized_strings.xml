@@ -5,6 +5,7 @@
     <string name="cyl_badge_new_content">Nouveau contenu</string>
     <string name="cyl_badge_new_messages">%1$s nouveaux messages</string>
     <string name="cyl_plus_button">Bouton plus</string>
+    <string name="cyl_more">Plus</string>
     <string name="cyl_badge_new_lowercase">nouv.</string>
     <string name="cyl_badge_new_uppercase">NOUV.</string>
     <string name="cyl_memory_warning_title">Simuler un avertissement mémoire</string>

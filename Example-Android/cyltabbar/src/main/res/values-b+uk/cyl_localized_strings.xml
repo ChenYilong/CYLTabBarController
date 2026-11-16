@@ -5,6 +5,7 @@
     <string name="cyl_badge_new_content">Новий вміст</string>
     <string name="cyl_badge_new_messages">Нових повідомлень: %1$s</string>
     <string name="cyl_plus_button">Кнопка «плюс»</string>
+    <string name="cyl_more">Ще</string>
     <string name="cyl_badge_new_lowercase">нове</string>
     <string name="cyl_badge_new_uppercase">НОВЕ</string>
     <string name="cyl_memory_warning_title">Змоделювати нестачу пам’яті</string>

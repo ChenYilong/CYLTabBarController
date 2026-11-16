@@ -5,6 +5,7 @@
     <string name="cyl_badge_new_content">新しいコンテンツがあります</string>
     <string name="cyl_badge_new_messages">新着メッセージ %1$s 件</string>
     <string name="cyl_plus_button">プラスボタン</string>
+    <string name="cyl_more">その他</string>
     <string name="cyl_badge_new_lowercase">新着</string>
     <string name="cyl_badge_new_uppercase">新着</string>
     <string name="cyl_memory_warning_title">メモリ警告をシミュレート</string>
