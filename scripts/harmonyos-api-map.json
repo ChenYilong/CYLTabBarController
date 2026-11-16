@@ -965,5 +965,18 @@
   "CYLTabBarPageRegistry +pagesOfTabs:registry:resolver:lookupOrder:keptTabs:skipped:": "`CYLTabBarPageRegistry.pagesOfTabs(tabs, registry, resolver, lookupOrder)` -> kept / skipped (built; emulator check pending / 已编译，模拟器验证待做)",
   "CYLTabBarPage": "TODO: N/A on HarmonyOS: automatic registration scans the Objective-C runtime for classes that adopt CYLTabBarPage; ArkTS has no runtime class scan, so pages are registered explicitly (registerPageProvider / registerPageFactory).",
   "CYLTabBarPage +cylTabBarPageIdentifier": "TODO: N/A on HarmonyOS: automatic registration scans the Objective-C runtime for classes that adopt CYLTabBarPage; ArkTS has no runtime class scan, so pages are registered explicitly (registerPageProvider / registerPageFactory).",
-  "CYLTabBarPage +cylTabBarPageWithAttributes:": "TODO: N/A on HarmonyOS: automatic registration scans the Objective-C runtime for classes that adopt CYLTabBarPage; ArkTS has no runtime class scan, so pages are registered explicitly (registerPageProvider / registerPageFactory)."
+  "CYLTabBarPage +cylTabBarPageWithAttributes:": "TODO: N/A on HarmonyOS: automatic registration scans the Objective-C runtime for classes that adopt CYLTabBarPage; ArkTS has no runtime class scan, so pages are registered explicitly (registerPageProvider / registerPageFactory).",
+  "CYLTabBarItemImagePlaceholderWidth": "`CYLTabBarItemImagePlaceholderWidth` (22 vp; `cyl_setTabBarItemImagePlaceholderSize`) (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarItemImagePlaceholderHeight": "`CYLTabBarItemImagePlaceholderHeight` (22 vp) (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLConstants": "`CYLConstants` (`cyltabbar/CYLConstants.ets`) (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLConstants +cyl_getTureLottieSizeValue:fromNormalImage:": "`CYLConstants.cyl_getTureLottieSizeValue(...)` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLConstants +cyl_tabBarItemAnimationSizeValue:fromNormalImage:": "`CYLConstants.cyl_tabBarItemAnimationSizeValue(...)` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLConstants +cyl_registerDarkLottieURL:forLottieURL:": "`CYLConstants.cyl_registerDarkLottieURL(...)` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLConstants +cyl_lottieURL:forTraitCollection:": "`CYLConstants.cyl_lottieURL(...)` (dark: boolean instead of a trait collection) (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLConstants +cyl_registerLottieDarkColors:forLottieURL:": "`CYLConstants.cyl_registerLottieDarkColors(...)` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLConstants +cyl_lottieDarkColorsForLottieURL:": "`CYLConstants.cyl_lottieDarkColorsForLottieURL(...)` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLConstants +cyl_hasDarkLottieURLs": "`CYLConstants.cyl_hasDarkLottieURLs(...)` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLConstants +cyl_hasDarkLottieForLottieURL:": "`CYLConstants.cyl_hasDarkLottieForLottieURL(...)` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLConstants +isLottieEnabledFromlottieURLs:tabBarItemsAttributes:": "`CYLConstants.isLottieEnabledFromlottieURLs(...)` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLConstants +isTabBarItemAnimationEnabledWithURLs:tabBarItemsAttributes:": "`CYLConstants.isTabBarItemAnimationEnabledWithURLs(...)` (built; emulator check pending / 已编译，模拟器验证待做)"
 }
