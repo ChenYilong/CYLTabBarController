@@ -95,10 +95,11 @@ export class CYLLiquidGlassCapsuleModifier implements AttributeModifier<RowAttri
   }
 
   applyNormalAttribute(instance: RowAttribute): void {
-    instance.backgroundBlurStyle(CYLLiquidGlassMaterial.blurFallback(this.strength));
-    instance.backgroundColor(this.barTintColor ?? '#33FFFFFF');
+    // [EN] Vibrant glass: blur with boosted saturation and brightness (what makes iOS glass look liquid rather than frosted).
+    // [CN] 鲜亮的玻璃：模糊并提高饱和度与亮度（这让 iOS 玻璃看起来像液体而不是磨砂）。
+    instance.backgroundEffect({ radius: 30 + 10 * (5 - this.strength), saturation: 1.8, brightness: 1.08 });
+    instance.backgroundColor(this.barTintColor ?? '#26FFFFFF');
     instance.borderRadius(this.height / 2);
-    instance.border({ width: 0.5, color: '#99FFFFFF' });
     instance.shadow({ radius: 20, color: '#22000000', offsetY: 6 });
     instance.clip(true);
   }

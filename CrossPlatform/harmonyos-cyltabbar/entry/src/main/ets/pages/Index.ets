@@ -12,7 +12,7 @@ import { DemoScrollKind, DemoScrollSimulation, DEMO_SCROLL_SIMULATIONS, demoScro
 import { cyl_restoreTabBar, CYLSetLocalizationLanguage, CYLLocalizationLanguage } from 'cyltabbar';
 import { DemoFlatDesignButton } from '../demo/DemoFlatDesign';
 import { DemoLiquidGlassButton } from '../demo/DemoLiquidGlass';
-import { CYLTabBarStyleType, CYLFlatDesignTintColor, CYLFlatDesignUnselectedColor, CYLLiquidGlassTintColor, CYLLiquidGlassSelectionColor } from 'cyltabbar';
+import { CYLTabBarStyleType, CYLFlatDesignTintColor, CYLFlatDesignUnselectedColor, CYLLiquidGlassTintColor } from 'cyltabbar';
 import {
   DemoRow, DemoSection, DEMO_APPEARANCES, DEMO_TITLE_OFFSETS, DEMO_HOME, DEMO_CITY, DEMO_MESSAGE, DEMO_ME,
   DEMO_LANGUAGES, DEMO_LANGUAGE_NAMES
@@ -343,8 +343,9 @@ struct Index {
 
   /** [EN] -updateTabBarItemAtIndex:attributes: for the background rows and the capsule theme. [CN] 更新各 Tab 的背景属性。 */
   private applyItemBackgrounds(): void {
-    const capsule = DEMO_APPEARANCES[this.appearanceIndex].capsule
-      ?? (this.styleType === CYLTabBarStyleType.LiquidGlass ? CYLLiquidGlassSelectionColor : undefined);
+    // [EN] Liquid Glass draws its own lens behind the selected tab (CYLLiquidGlass.ets), so no default capsule color here.
+    // [CN] 液态玻璃自己在选中 Tab 后绘制镜片（CYLLiquidGlass.ets），因此这里不再设置默认胶囊色。
+    const capsule = DEMO_APPEARANCES[this.appearanceIndex].capsule;
     this.tabs = this.tabs.map((item: CYLTabBarItemAttributes) => {
       const copy: CYLTabBarItemAttributes = {
         title: item.title, selectedTitle: item.selectedTitle, image: item.image, selectedImage: item.selectedImage,
