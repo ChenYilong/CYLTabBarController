@@ -674,6 +674,8 @@ export struct CYLTabBarController {
         direction: GradientDirection.Bottom,
         colors: [['#73FFFFFF', 0], ['#14FFFFFF', 0.35], ['#00FFFFFF', 0.6], ['#1FFFFFFF', 1]],
       })
+      // [EN] The glass rim, under the tabs. [CN] 玻璃亮边，位于 Tab 之下。
+      .border({ width: 1, color: '#80FFFFFF' })
       .position({ x: 0, y: 0 })
       .hitTestBehavior(HitTestMode.None)
   }
@@ -1297,7 +1299,11 @@ export struct CYLTabBarController {
           // [EN] Liquid Glass: the lens under the tabs and the sheen over them are real children placed absolutely, so they
           //      follow state like any node and leave the tabs' layout and keys alone.
           // [CN] 液态玻璃：Tab 下方的镜片与上方的光泽是绝对定位的真实子节点，随状态更新，且不影响 Tab 的布局与 key。
+          // [EN] Glass light first, then the lens, then the tabs: the raised plus button and the badges are drawn over the
+          //      glass, as on iOS, with no band of light across them.
+          // [CN] 先画玻璃的光，再画镜片，最后画 Tab：凸起的加号按钮与角标画在玻璃之上，与 iOS 相同，不会被光带横穿。
           if (this.tabBarStyleType === CYLTabBarStyleType.LiquidGlass) {
+            this.cylGlassSheen()
             this.cylGlassLens()
           }
           ForEach(this.cylSlots(), (slot: CYLSlot) => {
@@ -1307,9 +1313,6 @@ export struct CYLTabBarController {
               this.cylPlus()
             }
           }, (slot: CYLSlot) => slot.key)
-          if (this.tabBarStyleType === CYLTabBarStyleType.LiquidGlass) {
-            this.cylGlassSheen()
-          }
         }
         // [EN] Liquid Glass: the capsule narrows into a ball when minimized; its slots keep their width and stay centered on it.
         // [CN] 液态玻璃：缩小时胶囊收窄成球；槽位保持宽度并以胶囊为中心。
@@ -1320,10 +1323,12 @@ export struct CYLTabBarController {
         //      is the same above and under the gesture bar (painted twice, the row looked darker than the strip).
         // [CN] 经典 / 扁平样式：由容器统一绘制 TabBar 颜色，半透明主题色在手势条上下一致（绘制两次时 TabBar 比下方条带更深）。
         .backgroundColor(Color.Transparent)
-        // [EN] Liquid Glass: one border, the glass rim; the classic top line would leave the other edges black after a re-render.
-        // [CN] 液态玻璃：只用一种描边，即玻璃的亮边；经典样式的顶部线条会在重新渲染后让其他边变成黑色。
+        // [EN] Liquid Glass: no border on the row (ArkUI paints a border over the children, a line across the raised plus
+        //      button); the glass rim is drawn by cylGlassSheen, under the tabs. The classic top line would also leave the
+        //      other edges black after a re-render.
+        // [CN] 液态玻璃：Row 不设描边（ArkUI 把描边画在子节点之上，会在凸起的加号按钮上留下一条线）；玻璃亮边由 cylGlassSheen 画在 Tab 之下。
         .border(this.tabBarStyleType === CYLTabBarStyleType.LiquidGlass
-          ? { width: 1, color: '#80FFFFFF', radius: this.cylGlassRowHeight() / 2 }
+          ? { width: 0 }
           : { width: { top: this.shadowImage !== undefined ? 0 : 0.5 }, color: { top: this.tabBarShadowColor } })
         .overlay(this.shadowImage !== undefined ? this.cylShadowImage : undefined, { align: Alignment.Top })
         // [EN] Liquid Glass: the lens slides behind the tabs; touching lifts it, dragging moves it (iOS 26).

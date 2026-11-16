@@ -101,7 +101,10 @@ export class CYLLiquidGlassCapsuleModifier implements AttributeModifier<RowAttri
     instance.backgroundColor(this.barTintColor ?? '#26FFFFFF');
     instance.borderRadius(this.height / 2);
     instance.shadow({ radius: 20, color: '#22000000', offsetY: 6 });
-    instance.clip(true);
+    // [EN] Never clip: the raised plus button and the badges rise above the capsule, as on iOS (the glass effect follows the
+    //      corner radius by itself, and unselected slots are hidden, not clipped, when the capsule narrows into a ball).
+    // [CN] 不裁剪：凸起的加号按钮与角标会超出胶囊，与 iOS 相同（玻璃效果自身遵循圆角；胶囊收窄成球时未选中槽位是隐藏而非裁剪）。
+    instance.clip(false);
   }
 }
 

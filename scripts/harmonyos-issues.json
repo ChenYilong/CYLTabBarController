@@ -394,5 +394,14 @@
     "evidence": "Maintainer review 2026-11-16, after 5a1a1db",
     "cause": "Only a blur and a tint; no lens, no motion, no light; the pill was the demo's selectedBackgroundColor",
     "fix": "CYLTabBarController (Liquid Glass): a glass lens (saturated backgroundEffect, bright rim, shadow) behind the selected tab that slides on a spring and stretches like jelly in flight; touching lifts the lens and swells the capsule; dragging moves the lens with the finger and selects the tab it ends on; vibrant capsule (backgroundEffect saturation 1.8), a specular band along the top edge and a glow along the bottom; lens and sheen are real children placed absolutely, so the tab nodes (Lottie, SVGA, Rive) are never rebuilt. The demo no longer sets the blue pill in Liquid Glass"
+  },
+  {
+    "id": 45,
+    "status": "DONE (harmonyos-liquid-glass-plus-raised.png: the raised plus button, its badge 1 and the badges 8 / NEW rise above the capsule whole, with no line across them; Mate 70 Pro emulator, HarmonyOS 6.0.1 (API 21), 127.0.0.1:5559, 2026-11-16)",
+    "scope": "CrossPlatform/harmonyos-cyltabbar (cyltabbar)",
+    "title": "Liquid Glass: the raised plus button (and badges above the bar) are cut by the capsule; expected as iOS, where the plus button rises above the bar",
+    "evidence": "Maintainer report 2026-11-16; harmonyos-liquid-glass-lens.png (plus and 8 cut at the capsule's top edge)",
+    "cause": "The capsule clipped its children (clip(true)), its highlight was drawn over the tabs, and ArkUI paints the row's border over its children",
+    "fix": "No clipping (unselected slots are hidden, not clipped, when minimized; the glass effect follows the radius by itself); the highlight and the rim are a layer under the tabs (cylGlassSheen), the row has no border"
   }
 ]

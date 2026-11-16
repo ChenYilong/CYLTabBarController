@@ -234,6 +234,7 @@ docs/
 │   ├── harmonyos-home-mate70pro-api21.jpeg
 │   ├── harmonyos-keyboard-moves-tab-bar-cylsearch.png
 │   ├── harmonyos-liquid-glass-lens.png
+│   ├── harmonyos-liquid-glass-plus-raised.png
 │   ├── harmonyos-port-svga-demo-page.png
 │   ├── harmonyos-port-svga-demo-row.png
 │   ├── harmonyos-port-svga-demo-taps.png
