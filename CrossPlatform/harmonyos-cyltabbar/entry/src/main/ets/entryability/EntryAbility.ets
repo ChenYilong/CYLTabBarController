@@ -12,6 +12,32 @@ export default class EntryAbility extends UIAbility {
     cyl_updateColorMode(this.context.config.colorMode);
     cyl_setLocalizationContext(this.context);
     this.cylApplyLaunchLanguage(want);
+    this.cylStoreLaunchOptions(want);
+  }
+
+  /** [EN] A relaunch with new launch options while the app runs. [CN] 应用运行时以新的启动参数再次启动。 */
+  onNewWant(want: Want, launchParam: AbilityConstant.LaunchParam): void {
+    this.cylApplyLaunchLanguage(want);
+    this.cylStoreLaunchOptions(want);
+  }
+
+  /**
+   * [EN] Launch options for automated checks and screenshots (pages/Index applies them once it appears):
+   *      cylScreen <row id> runs a demo row as if tapped (e.g. configuration-svga, system-tab-bar-plus, any id of the
+   *      demo lists); cylTheme <skin name or title> picks a skin; cylStyle flat|glass rebuilds the tab bar in that style.
+   *      `aa start -b com.cyl.tabbar.harmony -a EntryAbility --ps cylStyle flat --ps cylTheme 太空 --ps cylScreen skin`.
+   * [CN] 自动化检查与截图用的启动参数（pages/Index 出现后应用）：cylScreen <行 id> 如同点击该演示行；cylTheme <皮肤名或标题> 选择皮肤；
+   *      cylStyle flat|glass 以该样式重建 TabBar。
+   */
+  private cylStoreLaunchOptions(want: Want): void {
+    const text = (key: string): string => {
+      const value = want.parameters?.[key];
+      return typeof value === 'string' ? value as string : '';
+    };
+    const options = [text('cylStyle'), text('cylTheme'), text('cylScreen')];
+    if (options.some((value: string) => value !== '')) {
+      AppStorage.setOrCreate('cylLaunchOptions', options.join('|'));
+    }
   }
 
   /**
@@ -22,7 +48,8 @@ export default class EntryAbility extends UIAbility {
    *      通过 CYLSetLocalizationLanguage 设置应用语言。
    */
   private cylApplyLaunchLanguage(want: Want): void {
-    const language = want.parameters?.['CYLDemoLanguage'];
+    // [EN] cylLanguage is an alias (as ClassifyMenu's example). [CN] cylLanguage 为别名（与 ClassifyMenu 示例一致）。
+    const language = want.parameters?.['CYLDemoLanguage'] ?? want.parameters?.['cylLanguage'];
     if (typeof language === 'string') {
       CYLSetLocalizationLanguage(language as string);
     }
