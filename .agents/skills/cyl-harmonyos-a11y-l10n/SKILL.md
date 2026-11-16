@@ -72,3 +72,7 @@ inspector; on Windows build with `scripts/harmonyos-build.sh`.
 ## Choosing the language in UI tests (added 2026-11-16)
 
 The example accepts the launch parameter `CYLDemoLanguage` (a language tag such as `zh-Hant`, `de`, `ar`; empty follows the system), like the iOS demos' launch arguments. It calls `CYLSetLocalizationLanguage` before the page loads, so a test can check any of the 33 languages without changing the shared emulator's system language: `hdc shell aa start -b com.cyl.tabbar.harmony -a EntryAbility --ps CYLDemoLanguage zh-Hant`. The in-app language picker mirrors iOS (English, 简体中文, हिन्दी, Español, العربية, 跟随系统).
+
+## Fix bugs in the core first (added 2026-11-17)
+
+On HarmonyOS the core is the `cyltabbar` module (published to ohpm); the `entry` module is the example. Fix a bug in `cyltabbar` first; an `entry`-only fix is the worst option and needs the maintainer's agreement, with the reason written in the related document in `docs/`. Full rule: AGENTS.md, "Code rules".

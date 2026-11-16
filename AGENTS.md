@@ -205,6 +205,7 @@ Every new feature and user-visible change ships with bilingual documentation in 
   `cyl_addBadgeHelperTable`) is created by the example itself with `.insetGrouped`. Keep this when porting a demo.
 - **Examples**: they import only `#import <CYLTabBarController/CYLTabBarController.h>` (Swift: `import CYLTabBarController`),
   and their Podfiles must not need changes.
+- **Fix bugs in the core first, not in the examples (added 2026-11-17)**: when an issue or a bug comes up, fix it first in the core code, so the same kind of problem goes away for every app, instead of working around it in the example layer. The core is the code published to a package registry: CocoaPods (and Swift Package Manager), Maven / Gradle (the Android library), npm (the React Native component), pub.dev (the Flutter component), ohpm (the HarmonyOS `cyltabbar` module) and the WeChat Mini Program component. A fix in the example layer is the worst option. If a bug cannot be fixed in the core, stop and ask the maintainer first, and say why. When the maintainer agrees to an example-layer fix, explain in the related document in `docs/` why the core could not solve it and why the example does.
 - **Verify** before pushing: `pod lib lint CYLTabBarController.podspec --quick`, plus a build or static check of the
   changed code. Say plainly what could not be verified.
 
