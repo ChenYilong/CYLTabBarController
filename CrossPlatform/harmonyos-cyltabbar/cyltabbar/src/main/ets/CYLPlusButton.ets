@@ -49,21 +49,24 @@ export interface CYLPlusButtonInsets {
  *      out over the pages, so an app keeps the end of a page clear of the raised button with this value (for example
  *      `List.contentEndOffset(cyl_plusButtonOverhang(plusButton))`, or a bottom padding). Same layout as the plus slot of
  *      CYLTabBarController: with an aligned title the image sits right above the title, whose top is at tabBarHeight - 17;
- *      otherwise the image (and a title under it, 14 vp) is centred in the bar and moved by centerYOffset.
+ *      otherwise the image (and a title under it, 14 vp) is centred in the bar and moved by centerYOffset. In Liquid Glass
+ *      the content moves down by (capsule height 61 - tabBarHeight) / 2 inside the taller capsule: pass that as contentDy
+ *      (the result is then measured from the capsule's top).
  * [CN] 加号按钮高出 TabBar 顶部的距离（vp），未高出时为 0。TabBar 覆盖在页面之上，App 可用此值让页面末尾避开凸起的按钮（例如
  *      `List.contentEndOffset(cyl_plusButtonOverhang(plusButton))` 或底部内边距）。与 CYLTabBarController 中加号槽位的布局相同：
  *      标题对齐时图片紧贴标题上方，标题顶部在 tabBarHeight - 17；否则图片（及其下方 14 vp 的标题）在 TabBar 中居中并按
- *      centerYOffset 移动。
+ *      centerYOffset 移动。液态玻璃中内容在更高的胶囊内下移 (61 - tabBarHeight) / 2：将其作为 contentDy 传入（结果从胶囊顶部量起）。
  */
-export function cyl_plusButtonOverhang(plusButton: CYLPlusButton | undefined, tabBarHeight: number = 49): number {
+export function cyl_plusButtonOverhang(plusButton: CYLPlusButton | undefined, tabBarHeight: number = 49,
+  contentDy: number = 0): number {
   if (plusButton === undefined) {
     return 0;
   }
   const imageSize = plusButton.imageSize ?? 54;
   if (plusButton.title !== undefined && plusButton.alignsTitle !== false) {
-    return Math.max(0, imageSize - (tabBarHeight - 17));
+    return Math.max(0, imageSize - (tabBarHeight - 17) - contentDy);
   }
   const contentHeight = imageSize + (plusButton.title !== undefined ? 14 : 0);
-  const top = (tabBarHeight - contentHeight) / 2 + (plusButton.centerYOffset ?? 0);
+  const top = contentDy + (tabBarHeight - contentHeight) / 2 + (plusButton.centerYOffset ?? 0);
   return Math.max(0, -top);
 }
