@@ -6,7 +6,7 @@
     },
     {
       "name": "cyl_l10n_9ecf653a3fc6",
-      "value": "%@ · another context · plus taps: %@"
+      "value": "%@ · 另一個 context · 加號點擊 %@ 次"
     },
     {
       "name": "cyl_l10n_aaf9b7d7382d",
@@ -22,7 +22,7 @@
     },
     {
       "name": "cyl_l10n_427131e7add2",
-      "value": "Another plus button"
+      "value": "另一個加號按鈕"
     },
     {
       "name": "cyl_l10n_aa3e67bda3c0",
@@ -30,7 +30,7 @@
     },
     {
       "name": "cyl_l10n_0557fa923dce",
-      "value": "Back"
+      "value": "返回"
     },
     {
       "name": "cyl_l10n_8665e238c516",
@@ -74,7 +74,7 @@
     },
     {
       "name": "cyl_l10n_d7c01888e55e",
-      "value": "CYLTabBarSVGAFilePath: plays once when selected, first frame otherwise"
+      "value": "CYLTabBarSVGAFilePath：選取時播放一次，未選取時顯示第一幀"
     },
     {
       "name": "cyl_l10n_132201f60522",
@@ -106,7 +106,7 @@
     },
     {
       "name": "cyl_l10n_b9c74f4cd786",
-      "value": "Dimmed"
+      "value": "無法使用"
     },
     {
       "name": "cyl_l10n_bf0576472e31",
@@ -246,7 +246,7 @@
     },
     {
       "name": "cyl_l10n_bd001817e373",
-      "value": "SVGA tab icons (configuration file)"
+      "value": "SVGA Tab 圖示（設定檔）"
     },
     {
       "name": "cyl_l10n_b5fcd68edd9f",
@@ -322,7 +322,7 @@
     },
     {
       "name": "cyl_l10n_9b6633b75bf2",
-      "value": "The “Me” tab needs a login (issue #19); tap to toggle"
+      "value": "「我的」需要登入（issue #19）；點擊切換"
     },
     {
       "name": "cyl_l10n_a4d0d101d6a3",
@@ -342,15 +342,15 @@
     },
     {
       "name": "cyl_l10n_ca3dcd2d62be",
-      "value": "cyl_popSelectTabBarChildViewControllerAtIndex: 1 (%@)"
+      "value": "cyl_popSelectTabBarChildViewControllerAtIndex：1（%@）"
     },
     {
       "name": "cyl_l10n_3b06a9582640",
-      "value": "cyl_popSelectTabBarChildViewControllerForTabBarItemIdentifier: message"
+      "value": "cyl_popSelectTabBarChildViewControllerForTabBarItemIdentifier：message（訊息）"
     },
     {
       "name": "cyl_l10n_59884403daf6",
-      "value": "cyl_pushOrPopToViewController: pages/Index (already in the stack: pops)"
+      "value": "cyl_pushOrPopToViewController：pages/Index（已在堆疊中：返回）"
     },
     {
       "name": "cyl_l10n_1ec113617309",
@@ -358,7 +358,7 @@
     },
     {
       "name": "cyl_l10n_9fb845377ee4",
-      "value": "cyl_pushViewController: a green page"
+      "value": "cyl_pushViewController：一個綠色頁面"
     },
     {
       "name": "cyl_l10n_ff5772993aee",

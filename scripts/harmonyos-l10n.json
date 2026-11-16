@@ -109,6 +109,17 @@
     "On: %@; the new page slides in from the side of its tab": "開啟：%@；新頁面從其 Tab 所在一側滑入",
     "Login state": "登入狀態",
     "Logged in: %@. The \"Me\" tab needs a login (issue #19); tap to toggle": "已登入：%@。「我的」Tab 需要登入（issue #19）；點擊切換",
-    "cyl_itemEdgeInsets: zero, the tabs fill the bar": "cyl_itemEdgeInsets：為零，Tab 鋪滿 TabBar"
+    "cyl_itemEdgeInsets: zero, the tabs fill the bar": "cyl_itemEdgeInsets：為零，Tab 鋪滿 TabBar",
+    "SVGA Tab 图标（配置文件）": "SVGA Tab 圖示（設定檔）",
+    "CYLTabBarSVGAFilePath：选中时播放一次，未选中时显示第一帧": "CYLTabBarSVGAFilePath：選取時播放一次，未選取時顯示第一幀",
+    "Back": "返回",
+    "Another plus button": "另一個加號按鈕",
+    "%@ · another context · plus taps: %@": "%@ · 另一個 context · 加號點擊 %@ 次",
+    "cyl_popSelectTabBarChildViewControllerAtIndex: 1 (%@)": "cyl_popSelectTabBarChildViewControllerAtIndex：1（%@）",
+    "cyl_popSelectTabBarChildViewControllerForTabBarItemIdentifier: message": "cyl_popSelectTabBarChildViewControllerForTabBarItemIdentifier：message（訊息）",
+    "cyl_pushViewController: a green page": "cyl_pushViewController：一個綠色頁面",
+    "cyl_pushOrPopToViewController: pages/Index (already in the stack: pops)": "cyl_pushOrPopToViewController：pages/Index（已在堆疊中：返回）",
+    "The “Me” tab needs a login (issue #19); tap to toggle": "「我的」需要登入（issue #19）；點擊切換",
+    "Dimmed": "無法使用"
   }
 }
