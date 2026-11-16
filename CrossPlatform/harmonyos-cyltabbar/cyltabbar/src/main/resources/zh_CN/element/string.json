@@ -89,6 +89,10 @@
       "value": "CYLFlatDesignTabBarItem 居中显示"
     },
     {
+      "name": "cyl_l10n_f6da70b584ae",
+      "value": "配置文件：%@"
+    },
+    {
       "name": "cyl_l10n_158b3b19e868",
       "value": "圆角"
     },
@@ -107,6 +111,10 @@
     {
       "name": "cyl_l10n_b9c74f4cd786",
       "value": "不可用"
+    },
+    {
+      "name": "cyl_l10n_abfc3a65538a",
+      "value": "发现"
     },
     {
       "name": "cyl_l10n_bf0576472e31",
@@ -133,6 +141,10 @@
       "value": "GIF 动图图标"
     },
     {
+      "name": "cyl_l10n_8cf04a973413",
+      "value": "首页"
+    },
+    {
       "name": "cyl_l10n_d52d30723b2f",
       "value": "从左到右一次"
     },
@@ -151,6 +163,14 @@
     {
       "name": "cyl_l10n_983696096694",
       "value": "边距"
+    },
+    {
+      "name": "cyl_l10n_318b2739ddc2",
+      "value": "我的"
+    },
+    {
+      "name": "cyl_l10n_4c2a8fe7eaf2",
+      "value": "消息"
     },
     {
       "name": "cyl_l10n_24d459a81449",
@@ -187,6 +207,10 @@
     {
       "name": "cyl_l10n_287e78fd65af",
       "value": "其他文字"
+    },
+    {
+      "name": "cyl_l10n_84432607fd87",
+      "value": "页面：%@"
     },
     {
       "name": "cyl_l10n_41b77539cc64",
@@ -307,6 +331,10 @@
     {
       "name": "cyl_l10n_6d067090c833",
       "value": "标签，第 %1$@ 个，共 %2$@ 个"
+    },
+    {
+      "name": "cyl_l10n_456887f9731c",
+      "value": "Tab：%@"
     },
     {
       "name": "cyl_l10n_75ccb7ef4864",
@@ -605,10 +633,6 @@
       "value": "未加载"
     },
     {
-      "name": "cyl_l10n_809de913ec0a",
-      "value": "标识：%@"
-    },
-    {
       "name": "cyl_l10n_2c8d9e877a54",
       "value": "标题偏移（titlePositionAdjustment）"
     },
@@ -767,10 +791,6 @@
     {
       "name": "cyl_l10n_b146fc1a1531",
       "value": "青草"
-    },
-    {
-      "name": "cyl_l10n_e56fc5fce033",
-      "value": "页面标识：%@"
     },
     {
       "name": "cyl_l10n_db1c89e0f6e6",
