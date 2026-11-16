@@ -60,6 +60,19 @@ interface DemoPushParams {
 
 const CYL_BADGE_ICON: number = 30;
 
+/**
+ * [EN] The space under the last row of a demo list (vp): the tab bar (49), the raised plus button above it and the
+ *      gesture bar, so no row stays hidden behind them (HarmonyOS screenshot issue 5).
+ * [CN] 演示列表最后一行下方的空间（vp）：TabBar（49）、其上方凸起的 PlusButton 与手势条，使任何一行都不会被挡住（鸿蒙截图问题 5）。
+ */
+const CYL_LIST_END_INSET: number = 120;
+
+/**
+ * [EN] The size of a skin's plus image (vp), smaller than the default 52 vp button (HarmonyOS screenshot issue 10).
+ * [CN] 皮肤加号图片的尺寸（vp），小于默认 52 vp 的按钮（鸿蒙截图问题 10）。
+ */
+const CYL_SKIN_PLUS_IMAGE_SIZE: number = 40;
+
 @Entry
 @Component
 struct Index {
@@ -119,7 +132,11 @@ struct Index {
     const plusIcon: ResourceStr | undefined = skin.icons.length > 0 ? $rawfile(skin.iconPath(skin.icons[skin.icons.length - 1])) : skin.plusURL;
     const copy: CYLPlusButton = {
       image: plusIcon ?? CYL_PLUS.image, selectedImage: plusIcon ?? CYL_PLUS.selectedImage, title: CYL_PLUS.title,
-      index: CYL_PLUS.index, centerYOffset: CYL_PLUS.centerYOffset, imageSize: CYL_PLUS.imageSize,
+      // [EN] FIX (HarmonyOS screenshot issue 10): a skin's plus image is a tab-style icon without the button's round
+      //      background, so it is drawn smaller than the 52 vp button and no longer spreads over the list above the bar.
+      // [CN] 修复（鸿蒙截图问题 10）：皮肤的加号图片是 Tab 风格的图标，没有按钮的圆形背景，因此画得比 52 vp 的按钮小，不再铺到 TabBar 上方的列表上。
+      index: CYL_PLUS.index, centerYOffset: CYL_PLUS.centerYOffset,
+      imageSize: plusIcon !== undefined ? CYL_SKIN_PLUS_IMAGE_SIZE : CYL_PLUS.imageSize,
       alignsTitle: CYL_PLUS.alignsTitle, identifier: CYL_PLUS.identifier, selectable: CYL_PLUS.selectable,
     };
     this.plus = copy;
@@ -260,7 +277,7 @@ struct Index {
       },
       {
         id: 'tab-bar-hidden', title: CYLLocalizedString('Show / hide CYLFlatDesignTabBar'),
-        subtitle: `tabBarHidden = ${this.tabBarHidden}; hidden, it comes back after 2 s`,
+        subtitle: CYLLocalizedString('tabBarHidden = %@; hidden, it comes back after 2 s', `${this.tabBarHidden}`),
         action: () => {
           this.tabBarHidden = !this.tabBarHidden;
           if (this.tabBarHidden) {
@@ -274,7 +291,7 @@ struct Index {
       },
       {
         id: 'minimize', title: CYLLocalizedString('滚动时缩小 / 隐藏 TabBar（issue #13）'),
-        subtitle: `cyl_tabBarMinimizeBehavior = ${['Automatic', 'Never', 'OnScrollDown', 'OnScrollUp'][this.minimizeBehavior]}; tap to choose, then scroll this list`,
+        subtitle: CYLLocalizedString('cyl_tabBarMinimizeBehavior = %@; tap to choose, then scroll this list', ['Automatic', 'Never', 'OnScrollDown', 'OnScrollUp'][this.minimizeBehavior]),
         action: () => this.choose('cyl_tabBarMinimizeBehavior', ['Automatic', 'Never', 'OnScrollDown', 'OnScrollUp'],
           this.minimizeBehavior, (index: number) => this.minimizeBehavior = index as CYLTabBarMinimizeBehavior),
       },
@@ -284,6 +301,8 @@ struct Index {
       },
       {
         id: 'items-not-centered', title: CYLLocalizedString('Change CYLFlatDesignTabBarItem 不居中显示（系统效果）'),
+        // [EN] FIX (HarmonyOS screenshot issue 15): a subtitle like its neighbors. [CN] 修复（鸿蒙截图问题 15）：与相邻行一样带副标题。
+        subtitle: CYLLocalizedString('cyl_itemEdgeInsets: zero, the tabs fill the bar'),
         action: () => this.itemEdgeInsets = { top: 0, left: 0, bottom: 0, right: 0 },
       },
       {
@@ -363,7 +382,7 @@ struct Index {
     return badges.map((badge: CYLBadge, row: number) => {
       const item: DemoRow = {
         id: `badge-${row}`, title: cyl_badgeTitleForRow(row), badgeRow: row,
-        subtitle: `${page} CYLTabBarController on HarmonyOS`,
+        subtitle: CYLLocalizedString('%@ CYLTabBarController on HarmonyOS', page),
         action: () => this.badgeRowTapped(page, row),
       };
       return item;
@@ -500,11 +519,11 @@ struct Index {
       },
       {
         id: 'selected-index', title: CYLLocalizedString('selectedIndex 与 PlusButton（issue #515）'),
-        subtitle: `selectedIndex = ${this.selectedIndex} (the plus button's page is ${CYLPlusButtonPageIndex}, never a tab index); tap for the next tab`,
+        subtitle: CYLLocalizedString('selectedIndex = %@ (the plus button\'s page is %@, never a tab index); tap for the next tab', this.selectedIndex, CYLPlusButtonPageIndex),
         action: () => this.selectedIndex = this.selectedIndex < 0 ? 0 : (this.selectedIndex + 1) % CYL_TABS.length,
       },
       {
-        id: 'login', title: 'Login state', subtitle: `Logged in: ${this.loggedIn}. The "Me" tab needs a login (issue #19); tap to toggle`,
+        id: 'login', title: CYLLocalizedString('Login state'), subtitle: CYLLocalizedString('Logged in: %@. The "Me" tab needs a login (issue #19); tap to toggle', `${this.loggedIn}`),
         action: () => {
           this.loggedIn = !this.loggedIn;
           if (!this.loggedIn && this.selectedIndex === 3) {
@@ -529,7 +548,7 @@ struct Index {
       },
       {
         id: 'touchable-area', title: CYLLocalizedString('PlusButton 点击范围（issue #91）'),
-        subtitle: `Shows the touchable area in translucent red: ${this.plus.showsTouchableArea === true}; scale ${scale}x; tap to cycle 1x, 1.5x, 2x, off`,
+        subtitle: CYLLocalizedString('Shows the touchable area in translucent red: %@; scale %@x; tap to cycle 1x, 1.5x, 2x, off', `${this.plus.showsTouchableArea === true}`, scale),
         action: () => {
           const shows = this.plus.showsTouchableArea === true;
           const next = !shows ? 1 : (scale >= 2 ? 0 : scale + 0.5);
@@ -570,7 +589,7 @@ struct Index {
       },
       {
         id: 'gesture-timings', title: CYLLocalizedString('长按时长与双击间隔（issue #535 / #152）'),
-        subtitle: `cyl_tabBarItemLongPressDuration = ${longPress[this.longPressIndex]} ms, cyl_tabBarItemDoubleTapInterval = ${doubleTap[this.doubleTapIndex]} ms; tap to cycle; double tap a tab to see it`,
+        subtitle: CYLLocalizedString('cyl_tabBarItemLongPressDuration = %@ ms, cyl_tabBarItemDoubleTapInterval = %@ ms; tap to cycle; double tap a tab to see it', longPress[this.longPressIndex], doubleTap[this.doubleTapIndex]),
         action: () => {
           this.longPressIndex = (this.longPressIndex + 1) % longPress.length;
           this.doubleTapIndex = (this.doubleTapIndex + 1) % doubleTap.length;
@@ -578,12 +597,12 @@ struct Index {
       },
       {
         id: 'swipe', title: CYLLocalizedString('左右滑动切换 Tab（issue #535）'),
-        subtitle: `On: ${this.swipeEnabled}; swipe the page left / right`,
+        subtitle: CYLLocalizedString('On: %@; swipe the page left / right', `${this.swipeEnabled}`),
         action: () => this.swipeEnabled = !this.swipeEnabled,
       },
       {
         id: 'slide-transition', title: CYLLocalizedString('滑动转场（CYLTabBarSlideTransitionAnimator）'),
-        subtitle: `On: ${this.slideTransition}; the new page slides in from the side of its tab`,
+        subtitle: CYLLocalizedString('On: %@; the new page slides in from the side of its tab', `${this.slideTransition}`),
         action: () => this.slideTransition = !this.slideTransition,
       },
       {
@@ -766,13 +785,20 @@ struct Index {
             DemoFlatDesignButton({ onTap: () => this.showFlatDesignTabBar() })
             DemoLiquidGlassButton({ onTap: () => this.showLiquidGlassTabBar() })
           }
-          .position({ left: 12 })
+          // [EN] FIX (HarmonyOS screenshot issue 4): as tall as the bar and centered in it, on the title's center line
+          //      (a positioned view without a height sat at the top). [CN] 修复（鸿蒙截图问题 4）：与导航栏同高并在其中居中，
+          //      与标题位于同一中心线（未设高度的定位视图此前贴在顶部）。
+          .height(44)
+          .alignItems(VerticalAlign.Center)
+          .position({ left: 12, top: 0 })
         }
         if (index !== CYLPlusButtonPageIndex) {
           Text(CYLLocalizedString('换肤'))
             .fontSize(15)
             .fontColor('#007AFF')
-            .position({ right: 16 })
+            // [EN] FIX (HarmonyOS screenshot issue 4): centered on the bar's center line. [CN] 修复（鸿蒙截图问题 4）：位于导航栏中心线。
+            .height(44)
+            .position({ right: 16, top: 0 })
             .id(`cyl-nav-skin-${identifier}`)
             .onClick(() => this.showSkinPicker())
         }
@@ -808,6 +834,10 @@ struct Index {
         }
         .layoutWeight(1)
         .width('100%')
+        // [EN] FIX (HarmonyOS screenshot issue 5): the last rows scroll above the tab bar, the raised plus button and the
+        //      gesture bar instead of staying under them. [CN] 修复（鸿蒙截图问题 5）：最后几行可以滚动到 TabBar、凸起的 PlusButton
+        //      与手势条之上，而不是被它们挡住。
+        .contentEndOffset(CYL_LIST_END_INSET)
         .backgroundColor($r('app.color.cyl_grouped_background'))
         .onDidScroll((offset: number) => cyl_reportScroll(offset))
         .id(`cyl-page-${identifier}`)

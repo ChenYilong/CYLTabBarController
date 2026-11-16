@@ -38,6 +38,7 @@
 | [GIF Tab 图标：循环的图片，或点击播放一次的动画](GIF-Animation.md) | [GIF tab icons: a looping image, or an animation that plays once when tapped](GIF-Animation.md) |
 | [鸿蒙 API 对照表](HarmonyOS-API-Map.md) | [The HarmonyOS API map](HarmonyOS-API-Map.md) |
 | [鸿蒙端对齐](HarmonyOS-Parity.md) | [HarmonyOS parity](HarmonyOS-Parity.md) |
+| [鸿蒙截图问题清单](HarmonyOS-Screenshot-Issues.md) | [HarmonyOS screenshot issues](HarmonyOS-Screenshot-Issues.md) |
 | [纯图标 Tab 的自动居中](Image-Only-Tabs.md) | [Automatic centering of image-only tabs](Image-Only-Tabs.md) |
 | [液态玻璃的健壮性改进](Liquid-Glass-Robustness.md) | [Liquid Glass Robustness](Liquid-Glass-Robustness.md) |
 | [需要登录的 Tab](Login-Required-Tabs.md) | [Tabs That Need Login](Login-Required-Tabs.md) |
@@ -128,6 +129,7 @@ docs/
 ├── GIF-Animation.md
 ├── HarmonyOS-API-Map.md
 ├── HarmonyOS-Parity.md
+├── HarmonyOS-Screenshot-Issues.md
 ├── Image-Only-Tabs.md
 ├── Liquid-Glass-Robustness.md
 ├── Login-Required-Tabs.md

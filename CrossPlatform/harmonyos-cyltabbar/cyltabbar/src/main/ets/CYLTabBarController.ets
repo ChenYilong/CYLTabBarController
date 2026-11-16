@@ -654,13 +654,21 @@ export struct CYLTabBarController {
       }
       .width(this.imageSize)
       .height(this.imageSize)
-      .alignContent(Alignment.TopStart)
+      // [EN] FIX (HarmonyOS screenshot issue 3): the icon is centered in its frame (a smaller Lottie or SVGA icon too),
+      //      so icon and title share one vertical center line; the badge is positioned absolutely and does not move.
+      // [CN] 修复（鸿蒙截图问题 3）：图标在其框内居中（较小的 Lottie 或 SVGA 图标也一样），使图标与标题位于同一条竖直中心线；
+      //      角标为绝对定位，不受影响。
+      .alignContent(Alignment.Center)
 
       if (this.tabBarItemsAttributes[index].title !== undefined) {
         Text(this.selectedIndex === index
           ? (this.tabBarItemsAttributes[index].selectedTitle ?? this.tabBarItemsAttributes[index].title)
           : this.tabBarItemsAttributes[index].title)
           .fontSize(10)
+          .height(13)
+          .maxLines(1)
+          .width('100%')
+          .textAlign(TextAlign.Center)
           .margin({ top: 3 })
           .fontColor(this.selectedIndex === index
             ? (this.tabBarItemsAttributes[index].selectedTitleColor ?? this.tintColor)
@@ -675,9 +683,14 @@ export struct CYLTabBarController {
     .layoutWeight(1)
     .height('100%')
     .justifyContent(FlexAlign.Center)
+    .alignItems(HorizontalAlign.Center)
     .backgroundColor(this.selectedIndex === index
       ? (this.tabBarItemsAttributes[index].selectedBackgroundColor ?? Color.Transparent)
       : (this.tabBarItemsAttributes[index].backgroundColor ?? Color.Transparent))
+    // [EN] FIX (HarmonyOS screenshot issue 6): on the Liquid Glass capsule an item's background is a capsule too, so the
+    //      first and last items' backgrounds no longer stick out of the bar's rounded ends.
+    // [CN] 修复（鸿蒙截图问题 6）：在液态玻璃胶囊上，item 背景也是胶囊形，首尾 item 的背景不再超出 TabBar 的圆角两端。
+    .borderRadius(this.tabBarStyleType === CYLTabBarStyleType.LiquidGlass ? this.tabBarHeight / 2 : 0)
     // [EN] One accessibility element per tab: icon, cover, Lottie and badge are read through it. [CN] 每个 Tab 一个无障碍元素。
     .accessibilityGroup(true)
     .accessibilityText(this.cylAccessibilityLabel(index))
@@ -715,6 +728,17 @@ export struct CYLTabBarController {
       .id('cyl-plus-touchable-area')
   }
 
+  /**
+   * [EN] FIX (HarmonyOS screenshot issue 3): the top of a tab's title, the same for the tabs and the plus button. A tab
+   *      centers its icon, a 3 vp gap and its title (about 13 vp for 10 fp text) in the bar; the plus button's aligned
+   *      title used `tabBarHeight - 17` instead and sat lower than the other titles.
+   * [CN] 修复（鸿蒙截图问题 3）：Tab 标题的顶部，Tab 与 PlusButton 相同。Tab 在 TabBar 中居中排列图标、3 vp 间距与标题（10 fp 文字约
+   *      13 vp）；PlusButton 对齐的标题此前使用 `tabBarHeight - 17`，比其他标题低。
+   */
+  cylTitleTop(): number {
+    return (this.tabBarHeight - (this.imageSize + 3 + 13)) / 2 + this.imageSize + 3;
+  }
+
   cylPlusAlignsTitle(): boolean {
     return this.plusButton?.title !== undefined && this.plusButton?.alignsTitle !== false;
   }
@@ -740,16 +764,18 @@ export struct CYLTabBarController {
       // [EN] As CYLPlusButton.kt: with an aligned title the image sits right above the title (item 4); otherwise it is
       //      centred and moved by centerYOffset. [CN] 与 CYLPlusButton.kt 相同：标题对齐时图片紧贴标题上方（第 4 项）；否则居中并按 centerYOffset 移动。
       .position(this.cylPlusAlignsTitle()
-        ? { x: 0, y: this.tabBarHeight - 17 - (this.plusButton?.imageSize ?? 54) } : undefined)
+        ? { x: 0, y: this.cylTitleTop() - (this.plusButton?.imageSize ?? 54) } : undefined)
       .width(this.cylPlusAlignsTitle() ? '100%' : undefined)
       .offset({ y: this.cylPlusAlignsTitle() ? 0 : (this.plusButton?.centerYOffset ?? 0) })
 
       if (this.plusButton?.title !== undefined) {
         Text(this.plusButton.title)
           .fontSize(10)
+          .height(13)
+          .maxLines(1)
           .fontColor(this.selectedIndex === CYLPlusButtonPageIndex
             ? (this.plusButtonTitleSelectedColor ?? this.tintColor) : this.unselectedColor)
-          .position(this.plusButton?.alignsTitle === false ? undefined : { x: 0, y: this.tabBarHeight - 17 })
+          .position(this.plusButton?.alignsTitle === false ? undefined : { x: 0, y: this.cylTitleTop() })
           .width('100%')
           .textAlign(TextAlign.Center)
       }

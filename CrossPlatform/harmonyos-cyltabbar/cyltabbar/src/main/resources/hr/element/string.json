@@ -1,6 +1,10 @@
 {
   "string": [
     {
+      "name": "cyl_l10n_bffed61338ea",
+      "value": "%@ CYLTabBarController on HarmonyOS"
+    },
+    {
       "name": "cyl_l10n_aaf9b7d7382d",
       "value": "Nove poruke: %@"
     },
@@ -121,6 +125,14 @@
       "value": "Liquid Glass"
     },
     {
+      "name": "cyl_l10n_0b320b0a775c",
+      "value": "Logged in: %@. The \"Me\" tab needs a login (issue #19); tap to toggle"
+    },
+    {
+      "name": "cyl_l10n_66ba80032520",
+      "value": "Login state"
+    },
+    {
       "name": "cyl_l10n_2e8e48a2ebfd",
       "value": "Long press a tab or the plus button"
     },
@@ -151,6 +163,14 @@
     {
       "name": "cyl_l10n_e0aa021e21dd",
       "value": "U redu"
+    },
+    {
+      "name": "cyl_l10n_8a7b0e9c294e",
+      "value": "On: %@; swipe the page left / right"
+    },
+    {
+      "name": "cyl_l10n_06eb0a05de97",
+      "value": "On: %@; the new page slides in from the side of its tab"
     },
     {
       "name": "cyl_l10n_287e78fd65af",
@@ -241,6 +261,10 @@
       "value": "Prikaži / sakrij CYLFlatDesignTabBar"
     },
     {
+      "name": "cyl_l10n_561582c1e7cc",
+      "value": "Shows the touchable area in translucent red: %@; scale %@x; tap to cycle 1x, 1.5x, 2x, off"
+    },
+    {
       "name": "cyl_l10n_3cb58e0d546d",
       "value": "Opruga (stalno)"
     },
@@ -289,6 +313,10 @@
       "value": "cyl_itemEdgeInsets: 15% of a tab width free at each end"
     },
     {
+      "name": "cyl_l10n_6360bbdfb8ff",
+      "value": "cyl_itemEdgeInsets: zero, the tabs fill the bar"
+    },
+    {
       "name": "cyl_l10n_fd15e88376df",
       "value": "Demo metoda cyl_pop / cyl_push"
     },
@@ -297,12 +325,28 @@
       "value": "cyl_pushViewController, cyl_popSelectTabBarChildViewControllerAtIndex, cyl_pushOrPopToViewController"
     },
     {
+      "name": "cyl_l10n_ff5772993aee",
+      "value": "cyl_tabBarItemLongPressDuration = %@ ms, cyl_tabBarItemDoubleTapInterval = %@ ms; tap to cycle; double tap a tab to see it"
+    },
+    {
+      "name": "cyl_l10n_f69c71bc581e",
+      "value": "cyl_tabBarMinimizeBehavior = %@; tap to choose, then scroll this list"
+    },
+    {
+      "name": "cyl_l10n_f3f4ecf4a4a6",
+      "value": "selectedIndex = %@ (the plus button's page is %@, never a tab index); tap for the next tab"
+    },
+    {
       "name": "cyl_l10n_ee5b6ac6461b",
       "value": "selectedIndex i PlusButton (issue #515)"
     },
     {
       "name": "cyl_l10n_2de6d572f86b",
       "value": "Tema standardAppearance (zajednička za Liquid Glass i FlatDesign)"
+    },
+    {
+      "name": "cyl_l10n_c4376b477be8",
+      "value": "tabBarHidden = %@; hidden, it comes back after 2 s"
     },
     {
       "name": "cyl_l10n_2a0608059131",

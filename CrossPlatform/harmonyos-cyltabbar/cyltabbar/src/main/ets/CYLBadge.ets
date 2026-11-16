@@ -328,6 +328,27 @@ export struct CYLBadgeView {
     }
   }
 
+  /**
+   * [EN] FIX (HarmonyOS screenshot issue 1): the badge's width follows its text, as on iOS (sizeThatFits) and Android
+   *      (measured text): the measured text width plus the margin, never less than a circle. Without it the badge took
+   *      the width of the icon container it sits in, and "NEW" wrapped onto two lines.
+   * [CN] 修复（鸿蒙截图问题 1）：角标宽度跟随文字，与 iOS（sizeThatFits）和 Android（测量文字）相同：测量出的文字宽度加边距，
+   *      且不小于圆形。此前角标取其所在图标容器的宽度，"NEW" 被换成两行。
+   */
+  private cylTextWidth(text: string, fontSize: number, margin: number): number {
+    const minimum = fontSize * 1.2 + margin;
+    let measured = 0;
+    try {
+      const context = this.getUIContext();
+      measured = context.px2vp(context.getMeasureUtils().measureText({ textContent: text, fontSize: fontSize,
+        fontWeight: FontWeight.Bold }));
+    } catch (error) {
+      // [EN] Fallback: about 0.62 em per character. [CN] 兜底：每个字符约 0.62 em。
+      measured = text.length * fontSize * 0.62;
+    }
+    return Math.max(minimum, Math.ceil(measured) + margin);
+  }
+
   build() {
     if (this.badge.value !== null) {
       Stack() {
@@ -342,7 +363,9 @@ export struct CYLBadgeView {
             .fontWeight(FontWeight.Bold)
             .fontColor(this.badge.textColor ?? this.appearance().textColor)
             .textAlign(TextAlign.Center)
-            .padding({ left: (this.badge.margin ?? this.appearance().margin) / 2, right: (this.badge.margin ?? this.appearance().margin) / 2 })
+            .maxLines(1)
+            .width(this.cylTextWidth(this.badge.cyl_displayText() ?? '', this.badge.fontSize ?? this.appearance().fontSize,
+              this.badge.margin ?? this.appearance().margin))
             .height((this.badge.fontSize ?? this.appearance().fontSize) * 1.2 + (this.badge.margin ?? this.appearance().margin))
             .constraintSize({ minWidth: (this.badge.fontSize ?? this.appearance().fontSize) * 1.2 + (this.badge.margin ?? this.appearance().margin) })
             .backgroundColor(this.badge.backgroundColor ?? this.appearance().backgroundColor)

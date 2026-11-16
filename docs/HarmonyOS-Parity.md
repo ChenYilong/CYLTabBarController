@@ -57,6 +57,7 @@
 |:---|:---|
 | [表 1：iOS 公开 API](#表-1ios-公开-api--table-1-ios-public-apis) | [Table 1: iOS public APIs](#表-1ios-公开-api--table-1-ios-public-apis) |
 | [表 2：Example 演示](#表-2example-演示--table-2-example-demos) | [Table 2: Example demos](#表-2example-演示--table-2-example-demos) |
+| [截图问题](#截图问题--screenshot-issues) | [Screenshot issues](#截图问题--screenshot-issues) |
 
 <!-- navigation:end -->
 
@@ -1895,3 +1896,9 @@
 | 54 | `cyl_updateColorMode` (EntryAbility onCreate / onConfigurationUpdate) + `darkImage` / `darkSelectedImage` / `lottieDarkFilePath` (green_lottie_tab_*_dark.json) + dark color resources for pages and the bar (built; emulator check pending / 已编译，模拟器验证待做) | 跟随系统深色 / 浅色模式：页面颜色、TabBar、深色图片（`CYLTabBarItemDarkImage`、Lottie 深色文件）随系统设置切换 / Follows the system's dark / light mode: page colors, the tab bar and the dark images (`CYLTabBarItemDarkImage`, Lottie dark files) switch with the system setting |
 | 55 | `CYLTabBarController.didSelectControl(index, previous)`: a newly selected badged tab turns its badge into a dot of the same color; a re-tap changes nothing (built; emulator check pending / 已编译，模拟器验证待做) | 点击 Tab 后更新角标（`-tabBarController:didSelectControl:`）：液态玻璃下选中 Tab 的点击把其角标变为同色红点；再次点击已选中的 Tab 不变 / A tap updates the tab's badge (`-tabBarController:didSelectControl:`): on Liquid Glass a tap that selects a tab turns its badge into a dot of the same color; tapping the selected tab again changes nothing |
 | 56 | `CYLTabBarController.tabBarHidden` + `tabBarHiddenAnimated` (slide transition), comes back after 2 s (built; emulator check pending / 已编译，模拟器验证待做) | 显示 / 隐藏 TabBar（`-setTabBarHidden:animated:`，所有样式） / Show / hide the tab bar (`-setTabBarHidden:animated:`, every style) |
+
+## 截图问题 / Screenshot issues
+
+| 中文 | English |
+|:---|:---|
+| 2026-11-16 模拟器截图中发现的问题、修复状态与打分：[HarmonyOS-Screenshot-Issues.md](HarmonyOS-Screenshot-Issues.md)。 | Issues found in the emulator screenshots of 2026-11-16, their fix status and score: [HarmonyOS-Screenshot-Issues.md](HarmonyOS-Screenshot-Issues.md). |

@@ -1,6 +1,10 @@
 {
   "string": [
     {
+      "name": "cyl_l10n_bffed61338ea",
+      "value": "%@ 鸿蒙上的 CYLTabBarController"
+    },
+    {
       "name": "cyl_l10n_aaf9b7d7382d",
       "value": "%@ 条新消息"
     },
@@ -121,6 +125,14 @@
       "value": "液态玻璃"
     },
     {
+      "name": "cyl_l10n_0b320b0a775c",
+      "value": "已登录：%@。「我的」Tab 需要登录（issue #19）；点击切换"
+    },
+    {
+      "name": "cyl_l10n_66ba80032520",
+      "value": "登录状态"
+    },
+    {
       "name": "cyl_l10n_2e8e48a2ebfd",
       "value": "长按任意 Tab 或加号按钮"
     },
@@ -151,6 +163,14 @@
     {
       "name": "cyl_l10n_e0aa021e21dd",
       "value": "好"
+    },
+    {
+      "name": "cyl_l10n_8a7b0e9c294e",
+      "value": "开启：%@；左右滑动页面"
+    },
+    {
+      "name": "cyl_l10n_06eb0a05de97",
+      "value": "开启：%@；新页面从其 Tab 所在一侧滑入"
     },
     {
       "name": "cyl_l10n_287e78fd65af",
@@ -241,6 +261,10 @@
       "value": "显示 / 隐藏 CYLFlatDesignTabBar"
     },
     {
+      "name": "cyl_l10n_561582c1e7cc",
+      "value": "以半透明红色显示可点击区域：%@；缩放 %@x；点击依次切换 1x、1.5x、2x、关闭"
+    },
+    {
       "name": "cyl_l10n_3cb58e0d546d",
       "value": "弹簧（持续）"
     },
@@ -289,6 +313,10 @@
       "value": "cyl_itemEdgeInsets：两端各留出 Tab 宽度的 15%"
     },
     {
+      "name": "cyl_l10n_6360bbdfb8ff",
+      "value": "cyl_itemEdgeInsets：为零，Tab 铺满 TabBar"
+    },
+    {
       "name": "cyl_l10n_fd15e88376df",
       "value": "cyl_pop / cyl_push 系列方法演示"
     },
@@ -297,12 +325,28 @@
       "value": "cyl_pushViewController、cyl_popSelectTabBarChildViewControllerAtIndex、cyl_pushOrPopToViewController"
     },
     {
+      "name": "cyl_l10n_ff5772993aee",
+      "value": "cyl_tabBarItemLongPressDuration = %@ ms，cyl_tabBarItemDoubleTapInterval = %@ ms；点击依次切换；双击一个 Tab 查看效果"
+    },
+    {
+      "name": "cyl_l10n_f69c71bc581e",
+      "value": "cyl_tabBarMinimizeBehavior = %@；点击选择，然后滚动本列表"
+    },
+    {
+      "name": "cyl_l10n_f3f4ecf4a4a6",
+      "value": "selectedIndex = %@（PlusButton 的页面为 %@，不是 Tab 下标）；点击切换到下一个 Tab"
+    },
+    {
       "name": "cyl_l10n_ee5b6ac6461b",
       "value": "selectedIndex 与加号按钮（issue #515）"
     },
     {
       "name": "cyl_l10n_2de6d572f86b",
       "value": "standardAppearance 主题（液态玻璃与扁平样式共用）"
+    },
+    {
+      "name": "cyl_l10n_c4376b477be8",
+      "value": "tabBarHidden = %@；隐藏后 2 秒恢复"
     },
     {
       "name": "cyl_l10n_2a0608059131",
