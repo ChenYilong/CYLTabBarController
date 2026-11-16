@@ -40,6 +40,22 @@ export interface CYLTabBarItemAttributes {
   selectedImageURL?: string;
   /** [EN] CYLTabBarGIFFilePath: a GIF (rawfile path or URL) shown as the tab's icon. [CN] 作为 Tab 图标显示的 GIF（rawfile 路径或 URL）。 */
   gifFilePath?: string;
+  /**
+   * [EN] FIX: issue #415. CYLTabBarSVGAFilePath: a rawfile path of an SVGA 2.x file (e.g. "svga/tab_home.svga"), shown instead
+   *      of the images: it plays once when the tab is selected and shows its first frame otherwise; the image shows if it
+   *      cannot load (CYLSVGAView).
+   * [CN] FIX: issue #415。CYLTabBarSVGAFilePath：SVGA 2.x 文件的 rawfile 路径（如 "svga/tab_home.svga"），代替图片显示：Tab 选中时播放一次，
+   *      否则显示第一帧；无法加载时显示图片（CYLSVGAView）。
+   */
+  svgaFilePath?: string;
+  /** [EN] CYLTabBarSVGAURL: an SVGA file at an http(s) URL (ohos.permission.INTERNET); wins over svgaFilePath. [CN] http(s) 地址上的 SVGA 文件；优先于 svgaFilePath。 */
+  svgaURL?: string;
+  /** [EN] CYLTabBarSVGADarkFilePath: the SVGA file in dark mode. [CN] 深色模式的 SVGA 文件。 */
+  svgaDarkFilePath?: string;
+  /** [EN] CYLTabBarSVGADarkURL: the SVGA URL in dark mode. [CN] 深色模式的 SVGA 地址。 */
+  svgaDarkURL?: string;
+  /** [EN] CYLTabBarSVGASize (vp); the image size when unset. [CN] SVGA 尺寸（vp）；未设置时用图片尺寸。 */
+  svgaSize?: number;
   /** [EN] CYLTabBarItemTitleColor: this tab's title color while not selected. [CN] 未选中时此 Tab 的标题颜色。 */
   titleColor?: ResourceColor;
   /** [EN] CYLTabBarItemSelectedTitleColor. [CN] 选中时此 Tab 的标题颜色。 */
@@ -48,6 +64,24 @@ export interface CYLTabBarItemAttributes {
   backgroundColor?: ResourceColor;
   /** [EN] CYLTabBarItemSelectedBackgroundColor: the tab's background while selected. [CN] 选中时此 Tab 的背景色。 */
   selectedBackgroundColor?: ResourceColor;
+  /**
+   * [EN] `CYLFlatDesignTabBarItem.enabled`: false dims the tab and ignores its taps; true (default) when unset.
+   * [CN] false 时 Tab 变暗且不响应点击；未设置时为 true。
+   */
+  enabled?: boolean;
+  /**
+   * [EN] `CYLFlatDesignTabBarItem.imagePositionAdjustment`: moves the icon. [CN] 移动图标。
+   */
+  imagePositionAdjustment?: CYLOffset;
+  /**
+   * [EN] `CYLFlatDesignTabBarItem.imageInsets`: insets of the icon inside its square, in vp. [CN] 图标在其方框内的内边距（vp）。
+   */
+  imageInsets?: CYLTabBarItemImageInsets;
+  /**
+   * [EN] `CYLFlatDesignTabBarItem.layoutCentered`: centers a lone title (no image) or a lone image (no title) in the tab.
+   * [CN] 只有标题（无图片）或只有图片（无标题）时在 Tab 中居中。
+   */
+  layoutCentered?: boolean;
 }
 
 /** [EN] UIOffset (CYLOffset). [CN] 偏移。 */
@@ -66,3 +100,13 @@ export const CYLTabBarItemTitleColor: string = 'titleColor';
 export const CYLTabBarItemSelectedTitleColor: string = 'selectedTitleColor';
 export const CYLTabBarItemBackgroundColor: string = 'backgroundColor';
 export const CYLTabBarItemSelectedBackgroundColor: string = 'selectedBackgroundColor';
+
+/**
+ * [EN] The icon insets of a tab (`UIEdgeInsets`), in vp. [CN] Tab 图标的内边距（`UIEdgeInsets`，vp）。
+ */
+export interface CYLTabBarItemImageInsets {
+  top: number;
+  left: number;
+  bottom: number;
+  right: number;
+}

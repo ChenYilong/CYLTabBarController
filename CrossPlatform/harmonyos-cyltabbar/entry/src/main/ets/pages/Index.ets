@@ -31,6 +31,19 @@ const CYL_TABS: CYLTabBarItemAttributes[] = [
 const CYL_RANDOM_COLORS: string[] = ['#FF3B30', '#FF9500', '#34C759', '#007AFF', '#AF52DE', '#FF2D55'];
 
 /**
+ * [EN] The space under the last row of a demo list (vp): the tab bar (49), the raised plus button above it and the
+ *      gesture bar, so no row stays hidden behind them (HarmonyOS screenshot issue 5).
+ * [CN] 演示列表最后一行下方的空间（vp）：TabBar（49）、其上方凸起的 PlusButton 与手势条，使任何一行都不会被挡住（鸿蒙截图问题 5）。
+ */
+const CYL_LIST_END_INSET: number = 120;
+
+/**
+ * [EN] The size of a skin's plus image (vp), smaller than the default 52 vp button (HarmonyOS screenshot issue 10).
+ * [CN] 皮肤加号图片的尺寸（vp），小于默认 52 vp 的按钮（鸿蒙截图问题 10）。
+ */
+const CYL_SKIN_PLUS_IMAGE_SIZE: number = 40;
+
+/**
  * [EN] CYLPlusButtonSubclass of the Objective-C Example: "Post" at index 2, raised by 14 vp
  *      (+constantOfPlusButtonCenterYOffsetForTabBarHeight: -14), title aligned with the tab titles, green when selected,
  *      and a page of its own (+plusChildViewController).
@@ -59,19 +72,6 @@ interface DemoPushParams {
 }
 
 const CYL_BADGE_ICON: number = 30;
-
-/**
- * [EN] The space under the last row of a demo list (vp): the tab bar (49), the raised plus button above it and the
- *      gesture bar, so no row stays hidden behind them (HarmonyOS screenshot issue 5).
- * [CN] 演示列表最后一行下方的空间（vp）：TabBar（49）、其上方凸起的 PlusButton 与手势条，使任何一行都不会被挡住（鸿蒙截图问题 5）。
- */
-const CYL_LIST_END_INSET: number = 120;
-
-/**
- * [EN] The size of a skin's plus image (vp), smaller than the default 52 vp button (HarmonyOS screenshot issue 10).
- * [CN] 皮肤加号图片的尺寸（vp），小于默认 52 vp 的按钮（鸿蒙截图问题 10）。
- */
-const CYL_SKIN_PLUS_IMAGE_SIZE: number = 40;
 
 @Entry
 @Component
@@ -373,7 +373,13 @@ struct Index {
         action: () => this.push('pages/ConfigurationDemo', { file: `configurations/cyl_tabbar_configuration.${format}` } as DemoPushParams),
       };
       return row;
-    });
+    }).concat([{
+      // [EN] FIX: issue #415: SVGA tab icons from a configuration file (CYLTabBarSVGAFilePath, CYLTabBarSVGASize), as the
+      //      iOS, Android, React Native, Flutter and mini program demos. [CN] FIX: issue #415：来自配置文件的 SVGA Tab 图标。
+      id: 'configuration-svga', title: CYLLocalizedString('SVGA Tab 图标（配置文件）'),
+      subtitle: CYLLocalizedString('CYLTabBarSVGAFilePath：选中时播放一次，未选中时显示第一帧'),
+      action: () => this.push('pages/ConfigurationDemo', { file: 'configurations/cyl_tabbar_configuration_svga.json' } as DemoPushParams),
+    } as DemoRow]);
   }
 
   /** [EN] The badge rows of a page (items 50, 53), each with its action as BadgeRows of the Android port. [CN] 页面的角标行。 */
@@ -523,7 +529,7 @@ struct Index {
         action: () => this.selectedIndex = this.selectedIndex < 0 ? 0 : (this.selectedIndex + 1) % CYL_TABS.length,
       },
       {
-        id: 'login', title: CYLLocalizedString('Login state'), subtitle: CYLLocalizedString('Logged in: %@. The "Me" tab needs a login (issue #19); tap to toggle', `${this.loggedIn}`),
+        id: 'login', title: CYLLocalizedString(this.loggedIn ? '登录状态：已登录' : '登录状态：未登录'), subtitle: CYLLocalizedString('The “Me” tab needs a login (issue #19); tap to toggle'),
         action: () => {
           this.loggedIn = !this.loggedIn;
           if (!this.loggedIn && this.selectedIndex === 3) {
@@ -718,8 +724,7 @@ struct Index {
             .borderRadius(6)
           CYLBadgeView({ badge: (this.rowBadges.get(page) ?? [])[row.badgeRow], anchorWidth: CYL_BADGE_ICON })
         }
-        .width(CYL_BADGE_ICON)
-        .height(CYL_BADGE_ICON)
+        // [EN] No fixed size: text badges are measured with the free width (issue list #1). [CN] 不固定尺寸（问题 #1）。
         .alignContent(Alignment.TopStart)
         .margin({ right: 16 })
       }
@@ -785,9 +790,7 @@ struct Index {
             DemoFlatDesignButton({ onTap: () => this.showFlatDesignTabBar() })
             DemoLiquidGlassButton({ onTap: () => this.showLiquidGlassTabBar() })
           }
-          // [EN] FIX (HarmonyOS screenshot issue 4): as tall as the bar and centered in it, on the title's center line
-          //      (a positioned view without a height sat at the top). [CN] 修复（鸿蒙截图问题 4）：与导航栏同高并在其中居中，
-          //      与标题位于同一中心线（未设高度的定位视图此前贴在顶部）。
+          // [EN] As tall as the bar, content centred: on the title's centre line (issue list #3). [CN] 与导航栏等高并垂直居中（问题 #3）。
           .height(44)
           .alignItems(VerticalAlign.Center)
           .position({ left: 12, top: 0 })
@@ -796,8 +799,8 @@ struct Index {
           Text(CYLLocalizedString('换肤'))
             .fontSize(15)
             .fontColor('#007AFF')
-            // [EN] FIX (HarmonyOS screenshot issue 4): centered on the bar's center line. [CN] 修复（鸿蒙截图问题 4）：位于导航栏中心线。
             .height(44)
+            .textAlign(TextAlign.Center)
             .position({ right: 16, top: 0 })
             .id(`cyl-nav-skin-${identifier}`)
             .onClick(() => this.showSkinPicker())
@@ -811,7 +814,7 @@ struct Index {
 
       if (this.replacedTabs.indexOf(index) >= 0) {
         Column() {
-          Text(`Replacement page ${index + 1}`)
+          Text(CYLLocalizedString('替换页 %@', index + 1))
             .fontSize(20)
             .id(`cyl-replacement-page-${index}`)
         }

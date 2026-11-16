@@ -5,6 +5,10 @@
       "value": "%@ 鸿蒙上的 CYLTabBarController"
     },
     {
+      "name": "cyl_l10n_9ecf653a3fc6",
+      "value": "%@ · 另一个 context · 加号点击 %@ 次"
+    },
+    {
       "name": "cyl_l10n_aaf9b7d7382d",
       "value": "%@ 条新消息"
     },
@@ -17,8 +21,16 @@
       "value": "另一个 context 的 TabBarController，使用方形加号按钮"
     },
     {
+      "name": "cyl_l10n_427131e7add2",
+      "value": "另一个加号按钮"
+    },
+    {
       "name": "cyl_l10n_aa3e67bda3c0",
       "value": "ArkUI Tabs，即鸿蒙系统 TabBar，使用同样的 Tab"
+    },
+    {
+      "name": "cyl_l10n_0557fa923dce",
+      "value": "返回"
     },
     {
       "name": "cyl_l10n_8665e238c516",
@@ -61,6 +73,10 @@
       "value": "CYLTabBarItemBackgroundColor / CYLTabBarItemSelectedBackgroundColor"
     },
     {
+      "name": "cyl_l10n_d7c01888e55e",
+      "value": "CYLTabBarSVGAFilePath：选中时播放一次，未选中时显示第一帧"
+    },
+    {
       "name": "cyl_l10n_132201f60522",
       "value": "CYLUtils 弱引用关联对象与查找按钮（issue #535）"
     },
@@ -87,6 +103,10 @@
     {
       "name": "cyl_l10n_a45350c25311",
       "value": "自定义最大值（9）"
+    },
+    {
+      "name": "cyl_l10n_b9c74f4cd786",
+      "value": "不可用"
     },
     {
       "name": "cyl_l10n_bf0576472e31",
@@ -123,14 +143,6 @@
     {
       "name": "cyl_l10n_af3acf6eb4a9",
       "value": "液态玻璃"
-    },
-    {
-      "name": "cyl_l10n_0b320b0a775c",
-      "value": "已登录：%@。「我的」Tab 需要登录（issue #19）；点击切换"
-    },
-    {
-      "name": "cyl_l10n_66ba80032520",
-      "value": "登录状态"
     },
     {
       "name": "cyl_l10n_2e8e48a2ebfd",
@@ -233,6 +245,10 @@
       "value": "旋转（持续）"
     },
     {
+      "name": "cyl_l10n_bd001817e373",
+      "value": "SVGA Tab 图标（配置文件）"
+    },
+    {
       "name": "cyl_l10n_b5fcd68edd9f",
       "value": "缩放（持续）"
     },
@@ -305,6 +321,10 @@
       "value": "系统 TabBar 没有加号按钮：用悬浮按钮代替"
     },
     {
+      "name": "cyl_l10n_9b6633b75bf2",
+      "value": "「我的」需要登录（issue #19）；点击切换"
+    },
+    {
       "name": "cyl_l10n_a4d0d101d6a3",
       "value": "左上角"
     },
@@ -321,8 +341,24 @@
       "value": "cyl_pop / cyl_push 系列方法演示"
     },
     {
+      "name": "cyl_l10n_ca3dcd2d62be",
+      "value": "cyl_popSelectTabBarChildViewControllerAtIndex：1（%@）"
+    },
+    {
+      "name": "cyl_l10n_3b06a9582640",
+      "value": "cyl_popSelectTabBarChildViewControllerForTabBarItemIdentifier：message（消息）"
+    },
+    {
+      "name": "cyl_l10n_59884403daf6",
+      "value": "cyl_pushOrPopToViewController：pages/Index（已在栈中：返回）"
+    },
+    {
       "name": "cyl_l10n_1ec113617309",
       "value": "cyl_pushViewController、cyl_popSelectTabBarChildViewControllerAtIndex、cyl_pushOrPopToViewController"
+    },
+    {
+      "name": "cyl_l10n_9fb845377ee4",
+      "value": "cyl_pushViewController：一个绿色页面"
     },
     {
       "name": "cyl_l10n_ff5772993aee",
@@ -555,6 +591,10 @@
     {
       "name": "cyl_l10n_b051a19ace76",
       "value": "替换相邻 Tab 的页面"
+    },
+    {
+      "name": "cyl_l10n_3e730a3320e9",
+      "value": "替换页 %@"
     },
     {
       "name": "cyl_l10n_a131e4f178aa",

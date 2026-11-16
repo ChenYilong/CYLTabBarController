@@ -329,24 +329,25 @@ export struct CYLBadgeView {
   }
 
   /**
-   * [EN] FIX (HarmonyOS screenshot issue 1): the badge's width follows its text, as on iOS (sizeThatFits) and Android
-   *      (measured text): the measured text width plus the margin, never less than a circle. Without it the badge took
-   *      the width of the icon container it sits in, and "NEW" wrapped onto two lines.
-   * [CN] 修复（鸿蒙截图问题 1）：角标宽度跟随文字，与 iOS（sizeThatFits）和 Android（测量文字）相同：测量出的文字宽度加边距，
-   *      且不小于圆形。此前角标取其所在图标容器的宽度，"NEW" 被换成两行。
+   * [EN] The width of a text badge, as Android CYLBadge.onMeasure and iOS -cyl_adjustLabelWidth: the measured text width
+   *      plus the margin, at least the badge height (a circle for one digit). Never fixed, so "NEW" stays on one line.
+   * [CN] 文字角标宽度：测量的文字宽度加边距，至少为角标高度（一位数字为圆形）。不写死，"NEW" 保持单行。
    */
-  private cylTextWidth(text: string, fontSize: number, margin: number): number {
-    const minimum = fontSize * 1.2 + margin;
-    let measured = 0;
+  cylTextBadgeWidth(): number {
+    const fontSize = this.badge.fontSize ?? this.appearance().fontSize;
+    const margin = this.badge.margin ?? this.appearance().margin;
+    const height = fontSize * 1.2 + margin;
+    const text = this.badge.cyl_displayText() ?? '';
+    let textWidth = text.length * fontSize * 0.62;
     try {
-      const context = this.getUIContext();
-      measured = context.px2vp(context.getMeasureUtils().measureText({ textContent: text, fontSize: fontSize,
-        fontWeight: FontWeight.Bold }));
-    } catch (error) {
-      // [EN] Fallback: about 0.62 em per character. [CN] 兜底：每个字符约 0.62 em。
-      measured = text.length * fontSize * 0.62;
+      const px = this.getUIContext().getMeasureUtils().measureText({
+        textContent: text, fontSize: fontSize, fontWeight: FontWeight.Bold,
+      });
+      textWidth = this.getUIContext().px2vp(px);
+    } catch (e) {
+      // [EN] Estimate when measuring is not available. [CN] 无法测量时估算。
     }
-    return Math.max(minimum, Math.ceil(measured) + margin);
+    return Math.max(height, Math.ceil(textWidth) + margin);
   }
 
   build() {
@@ -363,11 +364,12 @@ export struct CYLBadgeView {
             .fontWeight(FontWeight.Bold)
             .fontColor(this.badge.textColor ?? this.appearance().textColor)
             .textAlign(TextAlign.Center)
+            // [EN] One line: the badge grows with its text (iOS sizeToFit, Android wrap_content), never wraps (issue list #1).
+            // [CN] 单行：角标随文字变宽，不换行（问题 #1）。
             .maxLines(1)
-            .width(this.cylTextWidth(this.badge.cyl_displayText() ?? '', this.badge.fontSize ?? this.appearance().fontSize,
-              this.badge.margin ?? this.appearance().margin))
+            .padding({ left: (this.badge.margin ?? this.appearance().margin) / 2, right: (this.badge.margin ?? this.appearance().margin) / 2 })
             .height((this.badge.fontSize ?? this.appearance().fontSize) * 1.2 + (this.badge.margin ?? this.appearance().margin))
-            .constraintSize({ minWidth: (this.badge.fontSize ?? this.appearance().fontSize) * 1.2 + (this.badge.margin ?? this.appearance().margin) })
+            .width(this.cylTextBadgeWidth())
             .backgroundColor(this.badge.backgroundColor ?? this.appearance().backgroundColor)
             .borderRadius((this.badge.cornerRadius ?? this.appearance().cornerRadius) > 0
               ? (this.badge.cornerRadius ?? this.appearance().cornerRadius) : 100)

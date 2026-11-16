@@ -134,11 +134,11 @@ export class CYLDefaultTabBarModifier implements AttributeModifier<RowAttribute>
  * [CN] `style` 对应的 TabBar modifier；`barTintColor` 为 App 设置的 TabBar 颜色，未设置时使用样式自己的颜色。
  */
 export function cyl_tabBarStyleModifier(style: CYLTabBarStyleType, barTintColor?: ResourceColor,
-  height: number = 49): AttributeModifier<RowAttribute> {
+  height: number = 49, backgroundImage?: ResourceStr): AttributeModifier<RowAttribute> {
   if (style === CYLTabBarStyleType.LiquidGlass) {
     return new CYLLiquidGlassTabBarModifier(barTintColor, height);
   }
-  return style === CYLTabBarStyleType.FlatDesign ? new CYLFlatDesignTabBarModifier(barTintColor) : new CYLDefaultTabBarModifier();
+  return style === CYLTabBarStyleType.FlatDesign ? new CYLFlatDesignTabBarModifier(barTintColor, backgroundImage) : new CYLDefaultTabBarModifier();
 }
 
 /**

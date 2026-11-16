@@ -4,7 +4,7 @@
 export {
   CYLTabBarItemAttributes, CYLTabBarItemTitle, CYLTabBarItemSelectedTitle, CYLTabBarItemImage, CYLTabBarItemSelectedImage,
   CYLTabBarItemIdentifier, CYLTitleOffset, CYLTabBarItemTitleColor, CYLTabBarItemSelectedTitleColor,
-  CYLTabBarItemBackgroundColor, CYLTabBarItemSelectedBackgroundColor
+  CYLTabBarItemBackgroundColor, CYLTabBarItemSelectedBackgroundColor, CYLTabBarItemImageInsets
 } from './src/main/ets/CYLTabBarItem';
 export { CYLPlusButton, CYLPlusButtonInsets } from './src/main/ets/CYLPlusButton';
 export {
@@ -16,6 +16,9 @@ export {
 } from './src/main/ets/CYLTabBarController';
 export { CYLBadgeSample, cyl_badgeTitleForRow, cyl_badgeStyleCount, cyl_applyBadgeSample } from './src/main/ets/CYLBadgeSamples';
 export { CYLLottieIcon } from './src/main/ets/CYLLottieIcon';
+export { CYLSVGAView } from './src/main/ets/svga/CYLSVGAView';
+export { CYLSVGAMovie, cylLoadSVGAMovie, cylDecodeSVGAMovie } from './src/main/ets/svga/CYLSVGAMovie';
+export { cylDrawSVGAFrame, cylParseSVGAPath } from './src/main/ets/svga/CYLSVGARenderer';
 export { CYLBadge, CYLBadgeView, CYLBadgeAppearance, CYLBadgeAnimationType, CYLOffset } from './src/main/ets/CYLBadge';
 export {
   CYLTabBarConfigurationParser, CYLTabBarConfigurationFormat, CYLTabBarConfigurationErrorCode, CYLTabBarConfigurationError,
