@@ -43,7 +43,15 @@ android {
     //      Tab 只显示图片。
     if (cylUseLocalSources) {
       consumerProguardFiles "${cylAndroidRoot}/cyltabbar/consumer-rules.pro"
+      // [EN] The library's CYLBadge reads BuildConfig.CYL_BADGE_ANIMATION_DISABLED, the badge debugging build option
+      //      (docs/Badge-Debugging.md): `-PcylBadgeAnimationDisabled=true` turns badge animations off.
+      // [CN] 库的 CYLBadge 读取角标调试编译选项 BuildConfig.CYL_BADGE_ANIMATION_DISABLED（docs/Badge-Debugging.md）。
+      buildConfigField "boolean", "CYL_BADGE_ANIMATION_DISABLED", (project.findProperty("cylBadgeAnimationDisabled")?.toString() == "true").toString()
     }
+  }
+
+  buildFeatures {
+    buildConfig cylUseLocalSources
   }
 
   if (cylUseLocalSources) {
