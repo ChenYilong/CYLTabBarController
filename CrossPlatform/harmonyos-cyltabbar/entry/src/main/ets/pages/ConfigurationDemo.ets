@@ -1,4 +1,5 @@
-import { CYLLocalizedString, cyl_localizationKey } from 'cyltabbar';
+import { CYLLocalizedString, cyl_localizationKey, CYLTabBarPageRegistry, CYLTabBarPageRequest, CYLTabBarPage } from 'cyltabbar';
+import { demoRegisterPages } from '../demo/DemoPages';
 import { router } from '@kit.ArkUI';
 import {
   CYLTabBarController, CYLTabBarConfiguration, CYLTabBarConfigurationResult, CYLTabBarConfigurationError
@@ -48,6 +49,7 @@ struct ConfigurationDemo {
   private file: string = 'configurations/cyl_tabbar_configuration.json';
 
   aboutToAppear(): void {
+    demoRegisterPages();
     const params = router.getParams() as CYLConfigurationRoute | undefined;
     if (params?.file) {
       this.file = params.file;
@@ -68,8 +70,31 @@ struct ConfigurationDemo {
     }
   }
 
+  /**
+   * [EN] The registered page of a tab (CYLTabBarItemPageIdentifier, docs/Tab-Page-Registry.md), or undefined.
+   * [CN] Tab 已注册的页面（页面 ID），没有时为 undefined。
+   */
+  private cylRegisteredPage(index: number): CYLTabBarPage | undefined {
+    const pageIdentifier = this.result?.items[index]?.pageIdentifier;
+    return pageIdentifier === undefined ? undefined : CYLTabBarPageRegistry.sharedRegistry.pageProviderForPageIdentifier(pageIdentifier);
+  }
+
+  private cylRequest(index: number): CYLTabBarPageRequest {
+    const item = this.result?.items[index];
+    const attributes: Record<string, Object> = {
+      'CYLTabBarItemIdentifier': item?.identifier ?? `${index}`,
+      'CYLTabBarItemTitle': typeof item?.title === 'string' ? item.title : '',
+      'CYLTabBarItemPageParameters': item?.pageParameters ?? ({} as Record<string, Object>),
+    };
+    return new CYLTabBarPageRequest(item?.pageIdentifier ?? '', attributes);
+  }
+
   @Builder
   cylPage(index: number, identifier: string) {
+    if (this.cylRegisteredPage(index) !== undefined) {
+      // [EN] The page the app registered for this page ID. [CN] App 为此页面 ID 注册的页面。
+      this.cylRegisteredPage(index)!.builder(this.cylRequest(index))
+    } else {
     Column() {
       Text(this.result?.items[index]?.title ?? identifier)
         .fontSize(17)
@@ -91,6 +116,7 @@ struct ConfigurationDemo {
     }
     .width('100%')
     .height('100%')
+    }
   }
 
   build() {

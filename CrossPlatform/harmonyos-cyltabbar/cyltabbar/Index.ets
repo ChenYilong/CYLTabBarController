@@ -59,3 +59,7 @@ export {
   CYLTabBarAnimationOptionRiveTriggerInput, CYLTabBarAnimationOptionRiveAnimation, CYLTabBarAnimationOptionRiveLegacyRuntime,
   CYLTabBarAnimationURLWithOptions, cylRiveFileAndOptions, cylRiveRendererType, cylEnsureRiveInitialized
 } from './src/main/ets/CYLRiveTabBarItemAnimator';
+export {
+  CYLTabBarPageRegistry, CYLTabBarPageRequest, CYLTabBarPage, CYLTabBarAsyncPageFactory, CYLTabBarPageResolver, CYLTabBarPageSource,
+  CYLTabBarPageSkipReason, CYLTabBarSkippedTab, CYLTabBarResolvedPage, CYLTabBarPagesResult, CYLTabBarPageProviding
+} from './src/main/ets/CYLTabBarPageRegistry';
