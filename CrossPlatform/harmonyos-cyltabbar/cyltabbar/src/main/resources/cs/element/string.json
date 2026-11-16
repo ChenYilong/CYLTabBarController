@@ -345,10 +345,6 @@
       "value": "Tlačítko plus přesahuje panel; i část nad ním reaguje (zobrazeno červeně)"
     },
     {
-      "name": "cyl_l10n_f43b06c12ee1",
-      "value": "Systémový panel nemá tlačítko plus: nahrazuje ho plovoucí tlačítko"
-    },
-    {
       "name": "cyl_l10n_9b6633b75bf2",
       "value": "Karta „Já“ vyžaduje přihlášení (issue #19); klepnutím přepnete"
     },

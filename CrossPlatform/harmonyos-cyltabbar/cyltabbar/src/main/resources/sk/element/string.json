@@ -345,10 +345,6 @@
       "value": "Tlačidlo plus presahuje panel; aj časť nad ním reaguje (zobrazené červeno)"
     },
     {
-      "name": "cyl_l10n_f43b06c12ee1",
-      "value": "Systémový panel nemá tlačidlo plus: nahrádza ho plávajúce tlačidlo"
-    },
-    {
       "name": "cyl_l10n_9b6633b75bf2",
       "value": "Karta „Ja“ vyžaduje prihlásenie (issue #19); ťuknutím prepnete"
     },

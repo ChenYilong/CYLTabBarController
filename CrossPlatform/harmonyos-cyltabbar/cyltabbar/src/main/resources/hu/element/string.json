@@ -345,10 +345,6 @@
       "value": "A plusz gomb kilóg a sávból; a fölötte lévő rész is reagál (pirossal jelölve)"
     },
     {
-      "name": "cyl_l10n_f43b06c12ee1",
-      "value": "A rendszersávnak nincs plusz gombja: egy lebegő gomb helyettesíti"
-    },
-    {
       "name": "cyl_l10n_9b6633b75bf2",
       "value": "Az „Én” lap bejelentkezést igényel (issue #19); koppintással vált"
     },

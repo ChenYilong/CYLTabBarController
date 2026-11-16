@@ -345,10 +345,6 @@
       "value": "Der Plus-Button ragt aus der Leiste; auch der Teil darüber reagiert (rot dargestellt)"
     },
     {
-      "name": "cyl_l10n_f43b06c12ee1",
-      "value": "Die System-Tab-Bar hat keinen Plus-Button: ein schwebender Button ersetzt ihn"
-    },
-    {
       "name": "cyl_l10n_9b6633b75bf2",
       "value": "Der Tab „Ich“ erfordert eine Anmeldung (issue #19); tippen zum Umschalten"
     },

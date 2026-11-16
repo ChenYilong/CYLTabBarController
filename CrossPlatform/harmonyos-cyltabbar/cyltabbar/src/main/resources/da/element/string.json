@@ -345,10 +345,6 @@
       "value": "Plusknappen stikker op over bjælken; også delen ovenover reagerer (vist med rødt)"
     },
     {
-      "name": "cyl_l10n_f43b06c12ee1",
-      "value": "Systembjælken har ingen plusknap: en svævende knap træder i stedet"
-    },
-    {
       "name": "cyl_l10n_9b6633b75bf2",
       "value": "Fanen “Mig” kræver login (issue #19); tryk for at skifte"
     },

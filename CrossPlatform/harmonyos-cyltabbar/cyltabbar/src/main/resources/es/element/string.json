@@ -345,10 +345,6 @@
       "value": "El botón más sobresale de la barra; su parte superior también responde (en rojo)"
     },
     {
-      "name": "cyl_l10n_f43b06c12ee1",
-      "value": "La barra del sistema no tiene botón más: lo sustituye un botón flotante"
-    },
-    {
       "name": "cyl_l10n_9b6633b75bf2",
       "value": "La pestaña «Yo» requiere iniciar sesión (issue #19); toca para alternar"
     },

@@ -68,6 +68,7 @@ interface DemoPushParams {
   color?: string;
   hidesNavigationBar?: boolean;
   withPlus?: boolean;
+  style?: string;
   file?: string;
 }
 
@@ -349,8 +350,13 @@ struct Index {
       },
       {
         id: 'system-tab-bar-plus', title: CYLLocalizedString('Push To 系统 UITabBarController（另一个 PlusButton）'),
-        subtitle: CYLLocalizedString('The system bar has no plus button: a floating button stands in'),
-        action: () => this.push('pages/SystemTabs', { withPlus: true } as DemoPushParams),
+        // [EN] As iOS (CYLFlatDesignTableViewController, CYLTabBarDemoRowPushSystemStyle): a CYLTabBarController in the
+        //      system (Liquid Glass) style with the other plus button, drawn by the library. The ArkUI system Tabs bar has
+        //      no plus button, so it is not used here (it stays the comparison page of the row above).
+        // [CN] 与 iOS 相同（CYLFlatDesignTableViewController 的 CYLTabBarDemoRowPushSystemStyle）：系统（液态玻璃）风格的
+        //      CYLTabBarController，使用另一个 PlusButton，由本库绘制。ArkUI 系统 Tabs 不支持加号按钮，因此这里不用它（它仍是上一行的对比页面）。
+        subtitle: CYLLocalizedString('A tab bar controller of another context, with a square plus button'),
+        action: () => this.push('pages/AnotherTabBar', { style: 'liquidGlass' } as DemoPushParams),
       },
       {
         id: 'another-tab-bar', title: CYLLocalizedString('Push to another CYLTabBarController (another PlusButton)'),

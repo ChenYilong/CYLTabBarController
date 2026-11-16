@@ -345,10 +345,6 @@
       "value": "The plus button sticks out of the bar; its part above the bar responds (shown in red)"
     },
     {
-      "name": "cyl_l10n_f43b06c12ee1",
-      "value": "The system bar has no plus button: a floating button stands in"
-    },
-    {
       "name": "cyl_l10n_9b6633b75bf2",
       "value": "The “Me” tab needs a login (issue #19); tap to toggle"
     },

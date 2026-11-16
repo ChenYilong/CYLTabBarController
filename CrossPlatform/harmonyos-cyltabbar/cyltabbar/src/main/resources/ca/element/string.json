@@ -345,10 +345,6 @@
       "value": "El botó més sobresurt de la barra; la part de sobre també respon (en vermell)"
     },
     {
-      "name": "cyl_l10n_f43b06c12ee1",
-      "value": "La barra del sistema no té botó més: el substitueix un botó flotant"
-    },
-    {
       "name": "cyl_l10n_9b6633b75bf2",
       "value": "La pestanya «Jo» requereix iniciar sessió (issue #19); toca per alternar"
     },

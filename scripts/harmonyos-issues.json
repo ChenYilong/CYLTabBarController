@@ -289,11 +289,11 @@
   },
   {
     "id": 33,
-    "status": "DONE (harmonyos-system-tab-bar-plus-before-after.png, emulator 127.0.0.1:5559, 2026-11-16 11:01)",
+    "status": "DONE (harmonyos-system-tab-bar-plus-before-after.png, emulator 127.0.0.1:5559, 2026-11-16 11:08)",
     "scope": "CrossPlatform/harmonyos-cyltabbar (entry)",
     "title": "System tab bar page with another plus button: the plus button floats 80 vp above the bar, over the page, instead of sitting in the bar",
     "evidence": "User screenshot of 2026-11-16 10:48 (the same as harmonyos-emulator-pages-b7fdf26.png, 4th screen)",
-    "cause": "SystemTabs.ets drew the stand-in button with margin({ bottom: 80 })",
-    "fix": "The button sits in the bar's middle slot (between Nearby and Messages) and bulges over the bar's top edge (CYL_SYSTEM_PLUS_BOTTOM = 18); it has an accessibility text"
+    "cause": "The row opened the ArkUI system Tabs page and drew a stand-in button with margin({ bottom: 80 }); the system bar has no plus button, and iOS opens a CYLTabBarController instead",
+    "fix": "As iOS CYLTabBarDemoRowPushSystemStyle: the row opens AnotherTabBar in the Liquid Glass style with the other (square) plus button; the system Tabs page (row \"和系统 UITabBar 比较\") draws no plus button"
   }
 ]

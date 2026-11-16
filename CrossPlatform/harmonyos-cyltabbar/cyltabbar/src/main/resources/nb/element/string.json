@@ -345,10 +345,6 @@
       "value": "Plussknappen stikker opp over linjen; også delen over reagerer (vist i rødt)"
     },
     {
-      "name": "cyl_l10n_f43b06c12ee1",
-      "value": "Systemlinjen har ingen plussknapp: en flytende knapp erstatter den"
-    },
-    {
       "name": "cyl_l10n_9b6633b75bf2",
       "value": "Fanen «Meg» krever innlogging (issue #19); trykk for å bytte"
     },

@@ -345,10 +345,6 @@
       "value": "Plusknappen sticker upp ovanför fältet; även delen ovanför reagerar (visas i rött)"
     },
     {
-      "name": "cyl_l10n_f43b06c12ee1",
-      "value": "Systemfältet har ingen plusknapp: en flytande knapp ersätter den"
-    },
-    {
       "name": "cyl_l10n_9b6633b75bf2",
       "value": "Fliken ”Jag” kräver inloggning (issue #19); tryck för att växla"
     },

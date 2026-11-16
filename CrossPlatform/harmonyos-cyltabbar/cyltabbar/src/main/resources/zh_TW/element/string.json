@@ -345,10 +345,6 @@
       "value": "加號按鈕超出 TabBar；超出部分也能回應（紅色顯示）"
     },
     {
-      "name": "cyl_l10n_f43b06c12ee1",
-      "value": "系統 TabBar 沒有加號按鈕：用懸浮按鈕代替"
-    },
-    {
       "name": "cyl_l10n_9b6633b75bf2",
       "value": "「我的」需要登入（issue #19）；點擊切換"
     },

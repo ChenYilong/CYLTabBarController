@@ -345,10 +345,6 @@
       "value": "Le bouton plus dépasse de la barre ; sa partie au-dessus répond aussi (en rouge)"
     },
     {
-      "name": "cyl_l10n_f43b06c12ee1",
-      "value": "La barre système n’a pas de bouton plus : un bouton flottant le remplace"
-    },
-    {
       "name": "cyl_l10n_9b6633b75bf2",
       "value": "L’onglet « Moi » demande une connexion (issue #19) ; touchez pour basculer"
     },

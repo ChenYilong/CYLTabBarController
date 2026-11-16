@@ -345,10 +345,6 @@
       "value": "Artı düğmesi çubuğun dışına taşar; üstteki kısmı da yanıt verir (kırmızı gösterilir)"
     },
     {
-      "name": "cyl_l10n_f43b06c12ee1",
-      "value": "Sistem çubuğunda artı düğmesi yok: yerine yüzen bir düğme kullanılır"
-    },
-    {
       "name": "cyl_l10n_9b6633b75bf2",
       "value": "“Ben” sekmesi oturum açmayı gerektirir (issue #19); değiştirmek için dokunun"
     },

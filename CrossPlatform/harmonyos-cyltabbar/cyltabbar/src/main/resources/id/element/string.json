@@ -345,10 +345,6 @@
       "value": "Tombol plus menonjol dari bilah; bagian di atasnya juga merespons (ditampilkan merah)"
     },
     {
-      "name": "cyl_l10n_f43b06c12ee1",
-      "value": "Bilah sistem tidak punya tombol plus: tombol mengambang menggantikannya"
-    },
-    {
       "name": "cyl_l10n_9b6633b75bf2",
       "value": "Tab “Saya” perlu masuk (issue #19); ketuk untuk mengganti"
     },

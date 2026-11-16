@@ -1,5 +1,5 @@
 import { CYLLocalizedString } from 'cyltabbar';
-import { CYLTabBarController, CYLTabBarItemAttributes, CYLPlusButton } from 'cyltabbar';
+import { CYLTabBarController, CYLTabBarItemAttributes, CYLPlusButton, CYLTabBarStyleType } from 'cyltabbar';
 
 /**
  * [EN] Item 47 and the Messages badge rows: a pushed CYLTabBarController of another context, with a square orange plus
@@ -22,6 +22,13 @@ const SQUARE_PLUS: CYLPlusButton = {
 
 interface AnotherTabBarParams {
   mode?: string;
+  /**
+   * [EN] 'liquidGlass': the system-style (Liquid Glass) tab bar of the row "Push To 系统 UITabBarController（另一个
+   *      PlusButton）", as iOS (`+newLiquidGlassTabBarControllerWithPlusButtonClass:` with the other plus button class).
+   * [CN] 'liquidGlass'：「Push To 系统 UITabBarController（另一个 PlusButton）」一行的系统风格（液态玻璃）TabBar，与 iOS 相同
+   *      （`+newLiquidGlassTabBarControllerWithPlusButtonClass:`，使用另一个 PlusButton 类）。
+   */
+  style?: string;
 }
 
 const X_COLORS: string[] = ['#FF3B30', '#34C759', '#007AFF', '#AF52DE', '#FF9500'];
@@ -37,12 +44,14 @@ struct AnotherTabBar {
    * [CN] '' 方形加号；'same' 示例的加号；'close' 带可点击 X 的方形加号（issue #202）；'late-*' 2 秒后设置图片（第 31 项）。
    */
   @State mode: string = '';
+  @State styleType: CYLTabBarStyleType = CYLTabBarStyleType.Default;
   @State plus: CYLPlusButton = SQUARE_PLUS;
   @State xColor: string = '#FF3B30';
 
   aboutToAppear(): void {
     const params = this.getUIContext().getRouter().getParams() as AnotherTabBarParams;
     this.mode = params?.mode ?? '';
+    this.styleType = params?.style === 'liquidGlass' ? CYLTabBarStyleType.LiquidGlass : CYLTabBarStyleType.Default;
     if (this.mode === 'same') {
       this.plus = { image: $r('app.media.post_normal'), selectedImage: $r('app.media.post_highlight'), title: $r('app.string.tab_post'), centerYOffset: -14, imageSize: 52, alignsTitle: true, identifier: 'plus' };
     } else if (this.mode.startsWith('late')) {
@@ -94,6 +103,7 @@ struct AnotherTabBar {
 
       Stack({ alignContent: Alignment.Bottom }) {
       CYLTabBarController({
+        tabBarStyleType: this.styleType,
         tabBarItemsAttributes: ANOTHER_TABS,
         plusButton: this.plus,
         selectedIndex: $selectedIndex,

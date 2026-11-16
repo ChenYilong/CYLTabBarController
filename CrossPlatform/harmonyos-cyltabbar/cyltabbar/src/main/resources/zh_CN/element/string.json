@@ -345,10 +345,6 @@
       "value": "加号按钮超出 TabBar；超出部分也能响应（红色显示）"
     },
     {
-      "name": "cyl_l10n_f43b06c12ee1",
-      "value": "系统 TabBar 没有加号按钮：用悬浮按钮代替"
-    },
-    {
       "name": "cyl_l10n_9b6633b75bf2",
       "value": "「我的」需要登录（issue #19）；点击切换"
     },

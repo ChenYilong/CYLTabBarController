@@ -345,10 +345,6 @@
       "value": "Pluspainike ulottuu palkin yläpuolelle; myös yläosa reagoi (näytetään punaisena)"
     },
     {
-      "name": "cyl_l10n_f43b06c12ee1",
-      "value": "Järjestelmäpalkissa ei ole pluspainiketta: kelluva painike korvaa sen"
-    },
-    {
       "name": "cyl_l10n_9b6633b75bf2",
       "value": "”Minä”-välilehti vaatii kirjautumisen (issue #19); vaihda napauttamalla"
     },

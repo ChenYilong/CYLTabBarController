@@ -89,7 +89,6 @@ export const CYL_LOCALIZATION_KEYS: Map<string, string> = new Map<string, string
   ["Tab: %@", "cyl_l10n_456887f9731c"],
   ["TabBar 外观", "cyl_l10n_75ccb7ef4864"],
   ["The plus button sticks out of the bar; its part above the bar responds (shown in red)", "cyl_l10n_2e6d648945c0"],
-  ["The system bar has no plus button: a floating button stands in", "cyl_l10n_f43b06c12ee1"],
   ["The “Me” tab needs a login (issue #19); tap to toggle", "cyl_l10n_9b6633b75bf2"],
   ["Top left", "cyl_l10n_a4d0d101d6a3"],
   ["cyl_itemEdgeInsets: 15% of a tab width free at each end", "cyl_l10n_2306a585ae00"],
