@@ -809,5 +809,21 @@
   "UITabBarItem(CYLBadgeExtention) -cyl_showBadgeValue:animationType:": "`CYLBadge.cyl_showBadgeValue(value, animationType)` (built; emulator check pending / 已编译，模拟器验证待做)",
   "UITabBarItem(CYLBadgeExtention) -cyl_clearBadge": "`CYLBadge.cyl_clearBadge()` (built; emulator check pending / 已编译，模拟器验证待做)",
   "UITabBarItem(CYLBadgeExtention) -cyl_resumeBadge": "`CYLBadge.cyl_resumeBadge()` (built; emulator check pending / 已编译，模拟器验证待做)",
-  "UITabBarItem(CYLBadgeExtention) -cyl_isPauseBadge": "`CYLBadge.cyl_isPauseBadge()` (built; emulator check pending / 已编译，模拟器验证待做)"
+  "UITabBarItem(CYLBadgeExtention) -cyl_isPauseBadge": "`CYLBadge.cyl_isPauseBadge()` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarHostView": "`CYLTabBarController` (an ArkUI component embeds anywhere; no separate host view is needed) (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarHostView configuration": "`CYLTabBarConfiguration.resultWithConfiguration(...)` -> `CYLTabBarController` parameters (Example: pages/ConfigurationDemo) (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarHostView -setConfigurationJSON:": "`CYLTabBarConfigurationParser.configurationWithString(json, CYLTabBarConfigurationFormat.JSON)` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarHostView imageResolver": "`CYLTabBarConfiguration.imageResolver` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarHostView badgeValues": "`CYLTabBarController.badges` (a `CYLBadge` per tab) (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarHostView plusButtonBadgeValue": "`CYLTabBarController.plusButtonBadge` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarHostView badgeAnimationType": "`CYLBadge.animationType` / `cyl_showBadgeValue(value, animationType)` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarHostView badgeAttributes": "`CYLTabBarController.badges` (each `CYLBadge` carries its own style) (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarHostView plusButtonBadgeAttributes": "`CYLTabBarController.plusButtonBadge` (its own style) (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarHostView tabCoverImages": "`CYLTabBarController.tabCoverImages` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarHostView didSelectTab": "`CYLTabBarController.didSelect(index, identifier)` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarHostView didRequestLogin": "`CYLTabBarController.presentLogin(index, identifier, completion)` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarHostView loginStateDidChange": "`CYLTabBarController.loginStateDidChange(loggedIn)` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarHostView language": "`CYLSetLocalizationLanguage(language)` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarHostView didTapPlusButton": "`CYLTabBarController.plusButtonAction` (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLTabBarHostView tabBarController": "the `CYLTabBarController` component itself (built; emulator check pending / 已编译，模拟器验证待做)"
 }
