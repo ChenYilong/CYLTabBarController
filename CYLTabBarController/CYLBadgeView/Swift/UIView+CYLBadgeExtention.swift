@@ -957,6 +957,12 @@ extension UIView {
         if cyl_shouldReduceBadgeMotion() {
             return
         }
+        #if CYL_BADGE_ANIMATION_DISABLED
+        // [EN] Badge debugging build option (docs/Badge-Debugging.md): no badge animation, so a screenshot shows the badge at
+        //      its laid-out place. Never ship a release with it.
+        // [CN] 角标调试编译选项（docs/Badge-Debugging.md）：不播放角标动画，截图中的角标就在布局位置。不要在发布版本中开启。
+        return
+        #endif
         let animationType = cyl_badgeAnimationType
         if let animation = cylBadgeAnimationForTypeEntryPoint(animationType, badge.bounds.size),
            let key = CYLBadgeAnimationKeyForType(animationType) {

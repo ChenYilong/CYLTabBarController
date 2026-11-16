@@ -154,6 +154,10 @@ class CYLBadgeView(context: Context) : View(context), CYLBadgeTextDisplaying {
      */
     fun play(type: CYLEnums.CYLBadgeAnimationType) {
         stopAnimation()
+        // [EN] Badge debugging build option (docs/Badge-Debugging.md): `-PcylBadgeAnimationDisabled=true` turns badge
+        //      animations off, so a screenshot shows the badge at its laid-out place. Never ship a release with it.
+        // [CN] 角标调试编译选项（docs/Badge-Debugging.md）：`-PcylBadgeAnimationDisabled=true` 关闭角标动画，截图中的角标就在布局位置。不要在发布版本中开启。
+        if (BuildConfig.CYL_BADGE_ANIMATION_DISABLED) return
         val forever = ObjectAnimator.INFINITE
         val animator: android.animation.Animator = when (type) {
             CYLEnums.CYLBadgeAnimationType.None -> return
@@ -176,6 +180,7 @@ class CYLBadgeView(context: Context) : View(context), CYLBadgeTextDisplaying {
      */
     internal fun playAnimator(animator: android.animation.Animator) {
         stopAnimation()
+        if (BuildConfig.CYL_BADGE_ANIMATION_DISABLED) return
         running = animator
         animator.start()
     }

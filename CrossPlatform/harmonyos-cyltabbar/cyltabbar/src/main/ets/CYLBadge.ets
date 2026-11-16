@@ -1,3 +1,4 @@
+import BuildProfile from '../../../BuildProfile';
 import { curves } from '@kit.ArkUI';
 
 /**
@@ -282,6 +283,12 @@ export struct CYLBadgeView {
       this.rotateY = 0;
       this.rotateZ = 0;
     });
+    // [EN] Badge debugging build option (docs/Badge-Debugging.md, cyltabbar/build-profile.json5): no badge animation, so a
+    //      screenshot shows the badge at its laid-out place.
+    // [CN] 角标调试编译选项（docs/Badge-Debugging.md，cyltabbar/build-profile.json5）：不播放角标动画，截图中的角标就在布局位置。
+    if (BuildProfile.CYL_BADGE_ANIMATION_DISABLED) {
+      return;
+    }
     const repeats = this.badge.repeatCount;
     // [EN] Alternate play counts each direction as one iteration. [CN] 往返播放时每个方向计一次。
     const forever = repeats !== undefined && repeats > 0 ? repeats * 2 : -1;

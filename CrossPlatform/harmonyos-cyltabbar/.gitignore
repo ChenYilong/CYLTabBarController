@@ -12,3 +12,4 @@
 /.appanalyzer
 **/oh_modules
 **/.preview
+**/BuildProfile.ets
