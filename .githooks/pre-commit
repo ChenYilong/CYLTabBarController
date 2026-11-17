@@ -3,8 +3,14 @@
 #      docs/Screenshot-Guidelines.md (built by scripts/stitch-screenshots.py). Installed by scripts/install-git-hooks.sh.
 # [CN] 阻止提交没有页眉、说明与页脚（由 scripts/stitch-screenshots.py 生成）的 docs/assets 截图。
 root=$(git rev-parse --show-toplevel) || exit 0
-command -v python3 >/dev/null 2>&1 || { echo "pre-commit: python3 not found, screenshot labels not checked" >&2; exit 0; }
-python3 "$root/scripts/check-screenshot-labels.py" --staged || {
+# [EN] The first Python that really runs: on Windows `python3` can be the Microsoft Store stub, which is found but fails.
+# [CN] 第一个真正能运行的 Python：Windows 上 `python3` 可能是微软商店的占位程序，能找到但运行失败。
+python=""
+for candidate in python3 python py; do
+    if "$candidate" -c "import sys" >/dev/null 2>&1; then python=$candidate; break; fi
+done
+[ -n "$python" ] || { echo "pre-commit: no working Python found, screenshot labels not checked" >&2; exit 0; }
+"$python" "$root/scripts/check-screenshot-labels.py" --staged || {
     echo "pre-commit: screenshot without labels. Rebuild it with python3 scripts/stitch-screenshots.py (docs/Screenshot-Guidelines.md)." >&2
     exit 1
 }
