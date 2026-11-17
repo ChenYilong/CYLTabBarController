@@ -216,6 +216,7 @@ docs/
 │   ├── animated-item-miniprogram-b7-engines-overflow.jpg
 │   ├── b10-flatdesign-image-under-gif-after.png
 │   ├── b10-flatdesign-image-under-gif-before.png
+│   ├── b14-language-row-emoji-ios27.2.png
 │   ├── badge-debugging-animations-off-harmonyos.png
 │   ├── carthage-example-ios.png
 │   ├── configuration-demo-json-zh-hans.png
