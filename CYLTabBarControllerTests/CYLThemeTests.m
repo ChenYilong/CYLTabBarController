@@ -754,6 +754,77 @@ FOUNDATION_EXTERN void CYLTabBarItemAnimationRegisterColors(NSURL *URL, NSDictio
     XCTAssertNil([[CYLTabBarItemAnimatorRegistry animatorForURL:URL] animationViewWithURL:URL size:CGSizeMake(24, 24) contentMode:UIViewContentModeScaleAspectFit]);
 }
 
+/// [EN] docs/Animated-Item.md TODO 4, second step: a FlatDesign tab button's component animation is the tab's own:
+///      `animationView` and `animationReady` answer with the tab bar's animation view, and `reloadAnimation` /
+///      `stopAnimation` act on it instead of making a second view.
+/// [CN] docs/Animated-Item.md TODO 4 第二步：扁平样式 Tab 按钮的组件动画就是 Tab 自己的动画：`animationView` 与 `animationReady` 返回 TabBar 的
+///      动画视图，`reloadAnimation` / `stopAnimation` 作用于它，而不是创建第二个视图。
+- (void)testFlatDesignTabButtonsComponentAnimationIsTheTabsAnimation {
+    Class buttonClass = NSClassFromString(@"CYLFlatDesignTabBarButton");
+    if (!buttonClass) {
+        XCTSkip(@"FlatDesign is not compiled into this target");
+    }
+    NSURL *URL = [self gifFileURL];
+    UIImage *icon = CYLTestImage(10, UIColor.grayColor);
+    CYLTabBarController *tabBarController = [CYLTabBarController tabBarControllerWithConfiguration:@{
+        CYLTabBarControllerContext : [NSUUID UUID].UUIDString,
+        CYLTabBarControllerStyleType : @"flatDesign",
+        CYLTabBarControllerTabBarItemsAttributes : @[
+            @{ CYLTabBarItemIdentifier : @"a", CYLTabBarItemTitle : @"A", CYLTabBarItemImage : icon,
+               CYLTabBarAnimationURL : URL, CYLTabBarAnimationSize : [NSValue valueWithCGSize:CGSizeMake(24, 24)] },
+            @{ CYLTabBarItemIdentifier : @"b", CYLTabBarItemTitle : @"B", CYLTabBarItemImage : icon },
+        ],
+        CYLTabBarControllerPageResolver : ^UIViewController *(NSString *pageIdentifier, NSDictionary *attributes) {
+            return [[UIViewController alloc] init];
+        },
+    }];
+    UIWindow *window = [[UIWindow alloc] initWithFrame:CGRectMake(0, 0, 390, 844)];
+    window.rootViewController = tabBarController;
+    window.hidden = NO;
+    [tabBarController.view layoutIfNeeded];
+    [[NSRunLoop mainRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.3]];
+    NSMutableDictionary<NSString *, UIControl *> *buttons = [NSMutableDictionary dictionary];
+    NSMutableArray<UIView *> *queue = [NSMutableArray arrayWithObject:tabBarController.view];
+    while (queue.count > 0) {
+        UIView *view = queue.firstObject;
+        [queue removeObjectAtIndex:0];
+        NSString *title = [view isKindOfClass:buttonClass] ? [view valueForKey:@"title"] : nil;
+        if (title) {
+            buttons[title] = (UIControl *)view;
+        }
+        [queue addObjectsFromArray:view.subviews];
+    }
+    UIControl *animated = buttons[@"A"];
+    XCTAssertNotNil(animated, @"%@", buttons);
+    SEL tabViewSelector = NSSelectorFromString(@"cyl_tabBarItemAnimationView");
+    UIView *(^tabAnimationView)(UIControl *) = ^UIView *(UIControl *button) {
+        return ((UIView *(*)(id, SEL))[button methodForSelector:tabViewSelector])(button, tabViewSelector);
+    };
+    UIView *tabView = tabAnimationView(animated);
+    XCTAssertNotNil(tabView, @"the selected tab has its GIF animation view");
+    XCTAssertEqual([animated valueForKey:@"animationView"], tabView, @"the component's animation view is the tab's");
+    XCTAssertTrue([[animated valueForKey:@"animationReady"] boolValue]);
+    XCTAssertNil([buttons[@"B"] valueForKey:@"animationView"], @"a tab without an animation has none");
+    XCTAssertFalse([[buttons[@"B"] valueForKey:@"animationReady"] boolValue]);
+
+    [animated performSelector:@selector(stopAnimation)];
+    XCTAssertEqual([animated valueForKey:@"animationView"], tabAnimationView(animated), @"stopping keeps one view, the tab's");
+    [animated performSelector:@selector(reloadAnimation)];
+    [tabBarController.view layoutIfNeeded];
+    UIView *reloaded = tabAnimationView(animated);
+    XCTAssertNotNil(reloaded, @"reloading keeps the tab's animation");
+    XCTAssertEqual([animated valueForKey:@"animationView"], reloaded);
+    NSUInteger animationViews = 0;
+    for (UIView *subview in animated.subviews) {
+        if (subview != [animated valueForKey:@"imageView"] && subview != [animated valueForKey:@"titleLabel"] &&
+            [subview isKindOfClass:UIImageView.class] && subview == reloaded) {
+            animationViews++;
+        }
+    }
+    XCTAssertLessThanOrEqual(animationViews, 1u, @"no second animation view from the component");
+    window.hidden = YES;
+}
+
 @end
 
 @interface CYLThemeAnimationTests : XCTestCase

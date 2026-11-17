@@ -415,6 +415,68 @@ open class CYLFlatDesignTabBarButton: CYLAnimatedItemView {
 
     // MARK: - [EN] Tab icon animation [CN] Tab 图标动画
 
+    // [EN] docs/Animated-Item.md TODO 4, second step: the component's animation is the tab's. The tab bar keeps making and
+    //      driving the tab's animation view (late failures, speed, loops, dark colors, themes, the classic tab bar shares
+    //      it), and the component's animation members answer with that view, so callers and the component's own icon logic
+    //      see one animation view; the component never makes or removes a second one.
+    // [CN] docs/Animated-Item.md TODO 4 第二步：组件的动画就是 Tab 的动画。Tab 的动画视图仍由 TabBar 创建与驱动（加载后失败、速度、循环、深色颜色、
+    //      主题，经典 TabBar 也共用），组件的动画成员返回该视图，调用方与组件自己的图标逻辑看到的是同一个动画视图；组件从不创建或移除第二个。
+
+    /**
+     * [EN] The tab's animation view (`-cyl_tabBarItemAnimationView`), nil without one.
+     * [CN] Tab 的动画视图（`-cyl_tabBarItemAnimationView`），没有时为 nil。
+     */
+    open override var animationView: UIView? {
+        cyl_tabBarItemAnimationView()
+    }
+
+    /**
+     * [EN] Whether this tab has an animation view and the tab bar's animations are loaded (`-cyl_isTabBarItemAnimationReady`
+     *      alone is about the whole tab bar, YES also for a tab without an animation).
+     * [CN] 本 Tab 是否有动画视图且 TabBar 的动画已加载（单独的 `-cyl_isTabBarItemAnimationReady` 针对整个 TabBar，没有动画的 Tab 也返回 YES）。
+     */
+    open override var isAnimationReady: Bool {
+        animationView != nil && cyl_isTabBarItemAnimationReady()
+    }
+
+    /**
+     * [EN] Rebuilds the tab's animation view for the current style. [CN] 按当前样式重建 Tab 的动画视图。
+     */
+    open override func reloadAnimation() {
+        cyl_reloadTabBarItemAnimationViewForCurrentStyle()
+    }
+
+    /**
+     * [EN] Plays the tab's animation, as a selection does. [CN] 播放 Tab 的动画，与选中时相同。
+     */
+    open override func playAnimation() {
+        guard CYLTabBarItemAnimationCore.service != nil, let url = tabBarAnimationURL else { return }
+        cyl_addTabBarItemAnimation(with: url, size: tabBarAnimationSize, contentMode: animationContentMode,
+                                   animationSpeed: tabBarAnimationSpeed)
+        cyl_playTabBarItemAnimation(with: url, size: tabBarAnimationSize, defaultSelected: false,
+                                    contentMode: animationContentMode)
+    }
+
+    /**
+     * [EN] Plays the tab's animation again from the start. [CN] 从头再次播放 Tab 的动画。
+     */
+    open override func restartAnimation() {
+        cyl_restartTabBarItemAnimation()
+    }
+
+    /**
+     * [EN] Stops the tab's animation. [CN] 停止 Tab 的动画。
+     */
+    open override func stopAnimation() {
+        cyl_stopTabBarItemAnimation()
+    }
+
+    /// [EN] The item's animation size (`CYLTabBarLottieSize`). [CN] item 的动画尺寸（`CYLTabBarLottieSize`）。
+    private var tabBarAnimationSize: CGSize {
+        tabBarItemStorage?.lottieSizeValue?.cgSizeValue ?? .zero
+    }
+
+
     /// [EN] The animation URL first, as on the system tab bar, then the local path. [CN] 与系统 TabBar 相同，先取动画 URL，再取本地路径。
     private var tabBarAnimationURL: URL? {
         guard let item = tabBarItemStorage else { return nil }
@@ -454,7 +516,7 @@ open class CYLFlatDesignTabBarButton: CYLAnimatedItemView {
     private func initTabBarItemAnimation() {
         // FIX: issue #604 — only with the `CYLTabBarItemAnimation` subspec. 仅在包含 `CYLTabBarItemAnimation` 子库时。
         guard CYLTabBarItemAnimationCore.service != nil, let url = tabBarAnimationURL else { return }
-        let size = tabBarItemStorage?.lottieSizeValue?.cgSizeValue ?? .zero
+        let size = tabBarAnimationSize
         cyl_addTabBarItemAnimation(with: url, size: size, contentMode: animationContentMode, animationSpeed: tabBarAnimationSpeed)
     }
 
@@ -469,7 +531,7 @@ open class CYLFlatDesignTabBarButton: CYLAnimatedItemView {
             }
             return
         }
-        let size = tabBarItemStorage?.lottieSizeValue?.cgSizeValue ?? .zero
+        let size = tabBarAnimationSize
         // [EN] The selected button can get here before `initTabBarItemAnimation()`; add the view with the speed first (#428).
         // [CN] 选中的按钮可能先于 `initTabBarItemAnimation()` 执行到这里；先按速度添加视图（#428）。
         cyl_addTabBarItemAnimation(with: url, size: size, contentMode: animationContentMode, animationSpeed: tabBarAnimationSpeed)
