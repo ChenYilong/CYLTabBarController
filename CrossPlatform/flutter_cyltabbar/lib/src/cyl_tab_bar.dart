@@ -513,6 +513,16 @@ class _CYLTabBarState extends State<CYLTabBar> {
           viewType: _viewType,
           creationParams: _creationParams,
           creationParamsCodec: const StandardMessageCodec(),
+          // [EN] The native tab bar claims its touches at once. Without a recognizer, Flutter holds every touch back
+          //      from a UIKit platform view until its gesture arena settles on touch up; a real finger survives that
+          //      delay, but short automated taps (UI tests, accessibility taps) did not select a tab. The bar has no
+          //      Flutter gestures of its own, and CYLTouchRegions still decides which touches reach it.
+          // [CN] 原生 TabBar 立即接管触摸。没有识别器时，Flutter 会把每个触摸扣留到手势竞技场在抬起时决出结果后才交给 UIKit 平台视图；
+          //      真实手指能经受这个延迟，但短促的自动化点击（UI 测试、无障碍点击）无法选中 Tab。TabBar 自身没有 Flutter 手势，
+          //      哪些触摸能到达它仍由 CYLTouchRegions 决定。
+          gestureRecognizers: <Factory<OneSequenceGestureRecognizer>>{
+            Factory<OneSequenceGestureRecognizer>(EagerGestureRecognizer.new),
+          },
           onPlatformViewCreated: _onPlatformViewCreated,
         );
       case TargetPlatform.android:
