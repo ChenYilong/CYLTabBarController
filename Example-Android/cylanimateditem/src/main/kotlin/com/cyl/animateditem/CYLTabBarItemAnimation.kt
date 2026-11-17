@@ -1,7 +1,7 @@
 // [EN] The method names are the iOS names on purpose (`cyl_…`), see docs/Android-API-Map.md. [CN] 方法名刻意沿用 iOS 名称（`cyl_…`），见 docs/Android-API-Map.md。
 @file:Suppress("FunctionName", "kotlin:S100")
 
-package com.cyl.tabbar
+package com.cyl.animateditem
 
 import androidx.annotation.RestrictTo
 import android.content.Context

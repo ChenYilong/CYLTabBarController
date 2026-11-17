@@ -6,6 +6,9 @@
 //
 
 import UIKit
+#if canImport(CYLAnimatedItem)
+import CYLAnimatedItem
+#endif
 
 /**
  * [EN] Internal (not for apps): the dark mode and color variants of tab item animation files. Translated from Objective-C

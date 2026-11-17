@@ -16,8 +16,16 @@
 // [CN] Tab 按钮使用引擎的部分，属于 Core：只有动画子库带入引擎时才编译。
 #if CYL_ANIMATION_ENGINE_AVAILABLE
 #import <objc/runtime.h>
+#if __has_include(<CYLAnimatedItem/CYLTabBarItemAnimatorRegistry.h>)
+#import <CYLAnimatedItem/CYLTabBarItemAnimatorRegistry.h>
+#else
 #import "CYLTabBarItemAnimatorRegistry.h"
+#endif
+#if __has_include(<CYLAnimatedItem/CYLTabBarItemAnimationFactory.h>)
+#import <CYLAnimatedItem/CYLTabBarItemAnimationFactory.h>
+#else
 #import "CYLTabBarItemAnimationFactory.h"
+#endif
 
 static const void *CYLTabBarItemAnimationSourceURLKey = &CYLTabBarItemAnimationSourceURLKey;
 static const void *CYLTabBarItemAnimationShownURLKey = &CYLTabBarItemAnimationShownURLKey;

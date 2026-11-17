@@ -6,7 +6,13 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "CYLUtilsMacros.h"
+#if __has_include(<CYLAnimatedItem/CYLAnimatedItemMacros.h>)
+#import <CYLAnimatedItem/CYLAnimatedItemMacros.h>
+#elif __has_include("../CYLAnimatedItem/CYLAnimatedItemMacros.h")
+#import "../CYLAnimatedItem/CYLAnimatedItemMacros.h"
+#else
+#import "CYLAnimatedItemMacros.h"
+#endif
 
 /*
  * [EN] The animation keys shared by the tab bar (Core) and the animation engine and its animators (CYLAnimationEngine,

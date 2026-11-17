@@ -1,4 +1,4 @@
-package com.cyl.tabbar;
+package com.cyl.animateditem;
 
 /**
  * [EN] The animation file keys the animation engine reads (`CYLAnimatedItem`). `CYLConstants` keeps the same fields,

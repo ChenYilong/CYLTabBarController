@@ -6,6 +6,9 @@
 //
 
 import UIKit
+#if canImport(CYLAnimatedItem)
+import CYLAnimatedItem
+#endif
 
 /**
  * [EN] The object at `index`, or nil when `array` is nil or `index` is out of range (negative, `NSNotFound` or too large).

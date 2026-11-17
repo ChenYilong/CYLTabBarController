@@ -7,6 +7,9 @@
 //
 
 import UIKit
+#if canImport(CYLAnimatedItem)
+import CYLAnimatedItem
+#endif
 
 // [EN] The button of a FlatDesign tab, translated from Objective-C together with its item (docs/Swift-Migration.md,
 //      step 49). Objective-C names, selectors and Swift names are kept; `-_updateTabBarButton` keeps its selector for

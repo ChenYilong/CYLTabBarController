@@ -14,15 +14,13 @@
 
 #import <UIKit/UIKit.h>
 
-// [EN] `CYL_ANIMATION_ENGINE_AVAILABLE` (CYLUtils, like `CYL_FLATDESIGN_AVAILABLE`): static images only without the engine.
-// [CN] `CYL_ANIMATION_ENGINE_AVAILABLE`（CYLUtils，与 `CYL_FLATDESIGN_AVAILABLE` 相同）：没有引擎时只显示静态图片。
-#if __has_include("../CYLUtils/CYLUtilsMacros.h")
-#import "../CYLUtils/CYLUtilsMacros.h"
-#else
-#import "CYLUtilsMacros.h"
-#endif
+// [EN] `CYL_ANIMATION_ENGINE_AVAILABLE` (`CYLAnimatedItemMacros.h`, like `CYL_FLATDESIGN_AVAILABLE`): static images only without the engine.
+// [CN] `CYL_ANIMATION_ENGINE_AVAILABLE`（`CYLAnimatedItemMacros.h`，与 `CYL_FLATDESIGN_AVAILABLE` 相同）：没有引擎时只显示静态图片。
+#import "CYLAnimatedItemMacros.h"
 #if CYL_ANIMATION_ENGINE_AVAILABLE
-#if __has_include(<CYLTabBarController/CYLTabBarItemAnimationFactory.h>)
+#if __has_include(<CYLAnimatedItem/CYLTabBarItemAnimationFactory.h>)
+#import <CYLAnimatedItem/CYLTabBarItemAnimationFactory.h>
+#elif __has_include(<CYLTabBarController/CYLTabBarItemAnimationFactory.h>)
 #import <CYLTabBarController/CYLTabBarItemAnimationFactory.h>
 #else
 #import "CYLTabBarItemAnimationFactory.h"
@@ -204,7 +202,8 @@ NS_SWIFT_NAME(CYLAnimatedItemViewDelegate)
  *      Subclasses change what they need: the content (`CYLAnimatedItemContent`), the layout
  *      (`-layoutContentInRect:`, `-contentSizeThatFits:`), the appearance per state (`-itemStateDidChange`), the
  *      accessibility text (`-itemAccessibilityLabel`), more gestures (add recognizers), or the animation source
- *      (`animationSource`). It depends on CYLUtils only, never on the tab bar (subspec `CYLTabBarController/CYLAnimatedItem`), and plays
+ *      (`animationSource`). It is the CYLAnimatedItem pod and module (`import CYLAnimatedItem`), which depends on no other pod, not on
+ *      CYLTabBarController, and plays
  *      animations only when the engine is in the build (`CYL_ANIMATION_ENGINE_AVAILABLE`); static images otherwise.
  * [CN] 可继承的动效 icon + title 控件，供 CollectionViewClassifyMenu 与 CYLSearchViewController 的标签、CYLTableViewPlaceHolder 的
  *      占位图以及 CYLTabBarController 的 Tab 按钮共用：
@@ -214,7 +213,7 @@ NS_SWIFT_NAME(CYLAnimatedItemViewDelegate)
  *      - 整个控件的手势，报告给 `delegate`：点击、长按与拖拽（`dragEnabled`）。
  *      子类按需修改：内容（`CYLAnimatedItemContent`）、布局（`-layoutContentInRect:`、`-contentSizeThatFits:`）、各状态的外观
  *      （`-itemStateDidChange`）、无障碍文本（`-itemAccessibilityLabel`）、更多手势（添加手势识别器）或动画来源（`animationSource`）。
- *      只依赖 CYLUtils，从不依赖 TabBar（子库 `CYLTabBarController/CYLAnimatedItem`）；只有引擎参与编译时才播放动画
+ *      属于 CYLAnimatedItem pod 与模块（`import CYLAnimatedItem`），不依赖任何其他 pod，也不依赖 CYLTabBarController；只有引擎参与编译时才播放动画
  *      （`CYL_ANIMATION_ENGINE_AVAILABLE`），否则只显示静态图片。
  */
 @interface CYLAnimatedItemView : UIControl <CYLAnimatedItemContent, CYLAnimatedItemAnimating>

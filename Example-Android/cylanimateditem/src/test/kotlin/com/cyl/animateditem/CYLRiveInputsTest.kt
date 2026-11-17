@@ -1,4 +1,4 @@
-package com.cyl.tabbar
+package com.cyl.animateditem
 
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue

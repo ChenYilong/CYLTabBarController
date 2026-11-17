@@ -1,5 +1,9 @@
 package com.cyl.tabbar;
 
+import com.cyl.animateditem.CYLSize;
+import com.cyl.animateditem.CYLTabBarItemAnimationKeys;
+import com.cyl.animateditem.CYLTabBarItemAnimatorRegistry;
+
 import androidx.annotation.NonNull;
 
 /**

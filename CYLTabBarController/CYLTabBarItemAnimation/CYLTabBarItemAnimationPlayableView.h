@@ -25,8 +25,20 @@ NS_ASSUME_NONNULL_BEGIN
 
 NS_ASSUME_NONNULL_END
 
-#if __has_include("../CYLUtils/CYLSwiftInterface.h")
-#import "../CYLUtils/CYLSwiftInterface.h"
-#else
-#import "CYLSwiftInterface.h"
+// [EN] The Swift protocols, from the module that compiles them: the CYLAnimatedItem pod, Swift Package Manager's Swift target,
+//      or the framework target of CYLTabBarController.xcodeproj. Never CYLTabBarController's CocoaPods module.
+// [CN] Swift 协议，来自编译它们的模块：CYLAnimatedItem pod、Swift Package Manager 的 Swift target，或 CYLTabBarController.xcodeproj
+//      的 framework target。不来自 CYLTabBarController 的 CocoaPods 模块。
+#ifndef __swift__
+#if __has_include(<CYLAnimatedItem/CYLAnimatedItem-Swift.h>)
+#import <CYLAnimatedItem/CYLAnimatedItem-Swift.h>
+#elif __has_include("CYLAnimatedItem-Swift.h")
+#import "CYLAnimatedItem-Swift.h"
+#elif defined(SWIFT_PACKAGE)
+@import CYLTabBarControllerSwift;
+#elif __has_include(<CYLTabBarController/CYLTabBarController-Swift.h>)
+#import <CYLTabBarController/CYLTabBarController-Swift.h>
+#elif __has_include("CYLTabBarController-Swift.h")
+#import "CYLTabBarController-Swift.h"
+#endif
 #endif

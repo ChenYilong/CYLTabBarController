@@ -33,9 +33,17 @@
  * [CN] Lottie、Rive、PAG 子库的 Swift 类遵守的动画协议：缺少它们时，framework 编译中生成的接口会失败。
  */
 #if __has_include(<CYLTabBarController/CYLTabBarItemAnimationPlayableView.h>)
+#if __has_include(<CYLAnimatedItem/CYLTabBarItemAnimationPlayableView.h>)
+#import <CYLAnimatedItem/CYLTabBarItemAnimationPlayableView.h>
+#else
 #import <CYLTabBarController/CYLTabBarItemAnimationPlayableView.h>
+#endif
 #elif __has_include("CYLTabBarItemAnimationPlayableView.h")
+#if __has_include(<CYLAnimatedItem/CYLTabBarItemAnimationPlayableView.h>)
+#import <CYLAnimatedItem/CYLTabBarItemAnimationPlayableView.h>
+#else
 #import "CYLTabBarItemAnimationPlayableView.h"
+#endif
 #endif
 #if defined(SWIFT_PACKAGE)
 @import CYLTabBarControllerSwift;

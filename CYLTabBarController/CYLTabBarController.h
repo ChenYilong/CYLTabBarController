@@ -104,9 +104,17 @@
 //      include it, or Xcode warns "umbrella header ... does not include header"; CocoaPods without the animation
 //      subspec has no such file.
 #if __has_include("CYLTabBarItemAnimation/CYLTabBarItemAnimationPlayableView.h")
+#if __has_include(<CYLAnimatedItem/CYLTabBarItemAnimationPlayableView.h>)
+#import <CYLAnimatedItem/CYLTabBarItemAnimationPlayableView.h>
+#else
 #import "CYLTabBarItemAnimation/CYLTabBarItemAnimationPlayableView.h"
+#endif
 #elif __has_include("CYLTabBarItemAnimationPlayableView.h")
+#if __has_include(<CYLAnimatedItem/CYLTabBarItemAnimationPlayableView.h>)
+#import <CYLAnimatedItem/CYLTabBarItemAnimationPlayableView.h>
+#else
 #import "CYLTabBarItemAnimationPlayableView.h"
+#endif
 #endif
 // [CN] 动效 icon + title 控件（CYLAnimatedItem 子库，有该子库时才有此文件），伞头文件需要包含它。
 // [EN] The animated icon + title control (the CYLAnimatedItem subspec; the file exists only with it), which the umbrella
@@ -114,7 +122,11 @@
 #if __has_include("CYLAnimatedItem/CYLAnimatedItemView.h")
 #import "CYLAnimatedItem/CYLAnimatedItemView.h"
 #elif __has_include("CYLAnimatedItemView.h")
+#if __has_include(<CYLAnimatedItem/CYLAnimatedItemView.h>)
+#import <CYLAnimatedItem/CYLAnimatedItemView.h>
+#else
 #import "CYLAnimatedItemView.h"
+#endif
 #endif
 #import "CYLPlusButton.h"
 #import "UIViewController+CYLTabBarControllerExtention.h"

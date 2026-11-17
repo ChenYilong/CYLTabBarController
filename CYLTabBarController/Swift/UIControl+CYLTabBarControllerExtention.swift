@@ -7,6 +7,9 @@
 //
 
 import UIKit
+#if canImport(CYLAnimatedItem)
+import CYLAnimatedItem
+#endif
 
 /**
  * [EN] `UIControl (CYLTabBarControllerExtention)` and `(CYLTabBarControllerExtentionDeprecated)`: what a tab button or plus

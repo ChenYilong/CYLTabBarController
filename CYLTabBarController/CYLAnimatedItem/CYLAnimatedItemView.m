@@ -6,11 +6,6 @@
 //
 
 #import "CYLAnimatedItemView.h"
-#if __has_include("../CYLUtils/CYLLocalizedString.h")
-#import "../CYLUtils/CYLLocalizedString.h"
-#else
-#import "CYLLocalizedString.h"
-#endif
 
 /*
  * [EN] How often a looping animation whose player has no `loops` checks whether it reached the end.
@@ -156,7 +151,7 @@ static BOOL CYLAnimatedItemLocalFileIsMissing(NSURL *URL) {
     static UIImage *image = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        NSBundle *bundle = CYLResourceBundleNamed(@"CYLAnimatedItem");
+        NSBundle *bundle = CYLAnimatedItemResourceBundle();
         UIImage *found = bundle ? [UIImage imageNamed:@"cyl_animated_item_placeholder" inBundle:bundle compatibleWithTraitCollection:nil] : nil;
         image = [found imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
     });

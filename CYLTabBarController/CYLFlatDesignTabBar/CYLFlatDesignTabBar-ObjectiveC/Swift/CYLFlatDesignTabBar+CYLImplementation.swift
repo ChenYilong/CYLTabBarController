@@ -7,6 +7,9 @@
 //
 
 import UIKit
+#if canImport(CYLAnimatedItem)
+import CYLAnimatedItem
+#endif
 
 // [EN] The implementation of `CYLFlatDesignTabBar`, translated from Objective-C (docs/Swift-Migration.md, step 50). The
 //      class stays declared in Objective-C: `CYLTabBarController.h` adopts `CYLFlatDesignTabBarDelegate`, which its

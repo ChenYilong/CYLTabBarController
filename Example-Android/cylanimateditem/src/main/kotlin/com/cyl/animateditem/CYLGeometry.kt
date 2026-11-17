@@ -1,4 +1,4 @@
-package com.cyl.tabbar
+package com.cyl.animateditem
 
 /**
  * [EN] CGSize. [CN] 尺寸。

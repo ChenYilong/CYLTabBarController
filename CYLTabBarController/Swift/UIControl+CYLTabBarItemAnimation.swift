@@ -6,6 +6,9 @@
 //
 
 import UIKit
+#if canImport(CYLAnimatedItem)
+import CYLAnimatedItem
+#endif
 
 /**
  * [EN] The tab item animation core: the animation library service, the host the tab bar offers it, the attribute helpers

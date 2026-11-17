@@ -36,63 +36,6 @@
 #endif
 
 /*!
- * [EN] 1 when the animation engine (the subspec `CYLAnimationEngine`, brought by every component engine
- *      `CYLAnimatedItemLottieSwift`, `…LottieObjectiveC`, `…PAG`, `…PAGEnterprise`, `…Rive`, `…SVGA`, `…GIF`, and so by the tab
- *      bar's `LottieSwift`, `PAG`… which are Core plus one of them) is part of the build, 0 otherwise. Like
- *      `CYL_FLATDESIGN_AVAILABLE`, the one place that asks; guard engine code with `#if CYL_ANIMATION_ENGINE_AVAILABLE`.
- *      The component engines never depend on Core: `CYLAnimatedItem` plus `CYLAnimatedItemLottieSwift` brings no tab bar.
- *      Core depends on `CYLAnimatedItem` (static images) and on no engine, and holds the tab buttons' side of the engine behind this macro, so a tab bar plays animations as soon as an
- *      animation subspec is added, and `CYLAnimatedItemView` shows static images without one. The first check is the public
- *      header (CocoaPods, apps), the second the target's own headers (the framework target, SwiftPM, the pod's private
- *      headers), which never count a file on disk that the build does not compile.
- * [CN] 引入动画引擎（子库 `CYLAnimationEngine`，每个组件动效引擎 `CYLAnimatedItemLottieSwift`、`…LottieObjectiveC`、`…PAG`、`…PAGEnterprise`、
- *      `…Rive`、`…SVGA`、`…GIF` 都会带入它，因而由 Core 加其中之一组成的 TabBar 子库 `LottieSwift`、`PAG`……也会带入）时为 1，否则为 0。与 `CYL_FLATDESIGN_AVAILABLE` 一样是唯一检查的地方；引擎相关代码统一用
- *      `#if CYL_ANIMATION_ENGINE_AVAILABLE` 包住。组件动效引擎从不依赖 Core：`CYLAnimatedItem` 加 `CYLAnimatedItemLottieSwift` 不会带入 TabBar；Core 依赖 `CYLAnimatedItem`（静态图片），不依赖任何引擎。
- *      Tab 按钮使用引擎的部分位于 Core 中、由本宏包住，因此加入动画子库后 TabBar 即可播放动画；没有动画子库时 `CYLAnimatedItemView`
- *      只显示静态图片。第一个检查针对公开头文件（CocoaPods、App），第二个针对 target 自己的头文件（framework target、SwiftPM、pod 的私有
- *      头文件），不会把磁盘上存在但未参与编译的文件算进来。
- */
-#if __has_include(<CYLTabBarController/CYLTabBarItemAnimationFactory.h>) || __has_include("CYLTabBarItemAnimationFactory.h")
-#define CYL_ANIMATION_ENGINE_AVAILABLE 1
-#else
-#define CYL_ANIMATION_ENGINE_AVAILABLE 0
-#endif
-
-/*!
- * [EN] 1 when a Lottie library is part of the build, 0 otherwise: lottie-ios 2.x for Objective-C
- *      (`CYLTabBarController/LottieObjectiveC`, `<Lottie/Lottie.h>`) or lottie-ios 4.x for Swift
- *      (`CYLTabBarController/LottieSwift`, `CYLFlatDesignTabBar`, SPM; `<Lottie/Lottie-Swift.h>`). The Core subspec
- *      alone has no Lottie, and Lottie code there does nothing. Use it, like `CYL_FLATDESIGN_AVAILABLE`, only after
- *      importing this header.
- * [CN] 工程中引入了 Lottie 库时为 1，否则为 0：Objective-C 版 lottie-ios 2.x（`CYLTabBarController/LottieObjectiveC`，
- *      `<Lottie/Lottie.h>`），或 Swift 版 lottie-ios 4.x（`CYLTabBarController/LottieSwift`、`CYLFlatDesignTabBar`、SPM；
- *      `<Lottie/Lottie-Swift.h>`）。只引入 Core 子库时没有 Lottie，Lottie 相关代码不起作用。与 `CYL_FLATDESIGN_AVAILABLE`
- *      一样，只能在引入本头文件之后使用。
- */
-#if __has_include(<Lottie/Lottie.h>) || __has_include(<Lottie/Lottie-Swift.h>)
-#define CYL_LOTTIE_AVAILABLE 1
-#else
-#define CYL_LOTTIE_AVAILABLE 0
-#endif
-
-/*!
- * [EN] On the Lottie keys (`CYLTabBarLottieURL`…) and `CYLTabBarItemsAttributesAddingLottieFiles`: nothing with Lottie;
- *      without it, a compile warning. Those keys are released API, so they stay defined (code that uses them keeps
- *      building, and the tab shows its image), but using one in a build without Lottie is most likely a forgotten pod.
- *      The PAG and Rive keys go further: they do not exist without their library (`CYL_PAG_AVAILABLE`,
- *      `CYL_RIVE_AVAILABLE`).
- * [CN] 用于 Lottie 的 key（`CYLTabBarLottieURL`……）与 `CYLTabBarItemsAttributesAddingLottieFiles`：引入 Lottie 时无影响；
- *      未引入时给出编译警告。这些 key 是已发布的 API，因此保持定义（使用它们的代码仍能编译，Tab 显示图片），但在没有 Lottie 的
- *      构建中使用它们，多半是忘了引入 pod。PAG 与 Rive 的 key 更进一步：未引入动画库时不存在（`CYL_PAG_AVAILABLE`、
- *      `CYL_RIVE_AVAILABLE`）。
- */
-#if CYL_LOTTIE_AVAILABLE
-#define CYL_LOTTIE_REQUIRED
-#else
-#define CYL_LOTTIE_REQUIRED __attribute__((deprecated("Lottie is not part of this build, so this is ignored and the tab shows its image. Add pod 'CYLTabBarController/Lottie' (or LottieSwift), or wrap the code in #if canImport(Lottie) / #if CYL_LOTTIE_AVAILABLE.")))
-#endif
-
-/*!
  * [EN] Core and CYLUtils have no compile-time switch per animation library (PAG, Rive, …): whether a tab animates is
  *      decided at runtime by the animators registered with `CYLTabBarItemAnimatorRegistry` (the `CYLTabBarItemAnimation`
  *      subspec), so adding a library changes nothing here. Each library's own header defines its switch
@@ -128,6 +71,7 @@ _Pragma("clang diagnostic ignored \"-Wmethod-signatures\"")
 _Pragma("clang diagnostic pop")
 
 
+#ifndef CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS
 #define CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS(Stuff) \
 do { \
 _Pragma("clang diagnostic push") \
@@ -140,6 +84,7 @@ NSLog(CYLLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述�
 } \
 _Pragma("clang diagnostic pop") \
 } while (0);
+#endif
 
 #define CYL_IS_IOS_11  ([[[UIDevice currentDevice] systemVersion] floatValue] >= 11.f) && (@available(iOS 11.0, *))
 #define CYL_IS_IOS_13  ([[[UIDevice currentDevice] systemVersion] floatValue] >= 13.f) && (@available(iOS 13.0, *))
@@ -153,5 +98,17 @@ _Pragma("clang diagnostic pop") \
 #define CYL_SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(v)  ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] != NSOrderedAscending)
 #define CYL_SYSTEM_VERSION_LESS_THAN(v)                 ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] == NSOrderedAscending)
 #define CYL_SYSTEM_VERSION_LESS_THAN_OR_EQUAL_TO(v)     ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] != NSOrderedDescending)
+
+// [EN] CYL_ANIMATION_ENGINE_AVAILABLE, CYL_LOTTIE_AVAILABLE and CYL_LOTTIE_REQUIRED come from the CYLAnimatedItem pod; imported
+//      after this file's own CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS, so the localized one is used here.
+// [CN] CYL_ANIMATION_ENGINE_AVAILABLE、CYL_LOTTIE_AVAILABLE 与 CYL_LOTTIE_REQUIRED 来自 CYLAnimatedItem pod；在本文件自己的
+//      CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS 之后导入，因此这里使用本地化的版本。
+#if __has_include(<CYLAnimatedItem/CYLAnimatedItemMacros.h>)
+#import <CYLAnimatedItem/CYLAnimatedItemMacros.h>
+#elif __has_include("../CYLAnimatedItem/CYLAnimatedItemMacros.h")
+#import "../CYLAnimatedItem/CYLAnimatedItemMacros.h"
+#else
+#import "CYLAnimatedItemMacros.h"
+#endif
 
 #endif /* CYLUtilsMacros_h */

@@ -39,6 +39,9 @@ cd "$(dirname "$0")/.."
 export XCODE_XCCONFIG_FILE="$PWD/scripts/pod-lint.xcconfig"
 
 PODSPEC=CYLTabBarController.podspec
+# [EN] The animated item component, a pod of its own that CYLTabBarController depends on: linted and pushed first, same version.
+# [CN] 动效组件，CYLTabBarController 依赖的独立 pod：先检查、先发布，版本相同。
+COMPONENT_PODSPEC=CYLAnimatedItem.podspec
 CARTFILE=Example-Swift-Carthage/Cartfile
 CARTHAGE_SPEC=CYLTabBarController.json
 CARTHAGE_SPEC_URL='https://raw.githubusercontent.com/ChenYilong/CYLTabBarController/master/CYLTabBarController.json'
@@ -160,6 +163,8 @@ bump_version() {
   release_version
   sed "1,/^[[:space:]]*s\.version[[:space:]]*=/s|^\([[:space:]]*s\.version[[:space:]]*=[[:space:]]*[\"']\)[^\"']*\([\"']\)|\1$1\2|" "$PODSPEC" > "$PODSPEC.tmp"
   mv "$PODSPEC.tmp" "$PODSPEC"
+  sed "1,/^[[:space:]]*s\.version[[:space:]]*=/s|^\([[:space:]]*s\.version[[:space:]]*=[[:space:]]*[\"']\)[^\"']*\([\"']\)|\1$1\2|" "$COMPONENT_PODSPEC" > "$COMPONENT_PODSPEC.tmp"
+  mv "$COMPONENT_PODSPEC.tmp" "$COMPONENT_PODSPEC"
   if [ "$(pod_version)" != "$1" ]; then
     echo "error: could not set s.version in $PODSPEC" >&2
     exit 1
@@ -168,7 +173,7 @@ bump_version() {
 }
 
 case "$1" in
-  push)      shift; pod trunk push "$PODSPEC" --allow-warnings "$@"; update_carthage; update_spm; update_navigation ;;
+  push)      shift; pod trunk push "$COMPONENT_PODSPEC" --allow-warnings "$@"; pod trunk push "$PODSPEC" --allow-warnings "$@"; update_carthage; update_spm; update_navigation ;;
   version)   release_version; echo "$version" ;;
   check-tag) check_tag "${2:?usage: $0 check-tag <tag>}" ;;
   bump)      bump_version "${2:-}"; update_carthage; update_spm; update_navigation ;;
@@ -176,5 +181,7 @@ case "$1" in
   xcframework) build_xcframework ;;
   spm)      update_spm; update_navigation ;;
   versions) update_carthage; update_spm; update_navigation ;;
-  *)        [ "$1" = lib ] && shift; pod lib lint "$PODSPEC" --allow-warnings "$@" ;;
+  *)        [ "$1" = lib ] && shift
+            pod lib lint "$COMPONENT_PODSPEC" --allow-warnings "$@"
+            pod lib lint "$PODSPEC" --allow-warnings --include-podspecs="$COMPONENT_PODSPEC" "$@" ;;
 esac

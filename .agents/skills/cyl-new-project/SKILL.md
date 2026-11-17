@@ -7,7 +7,7 @@ description: "Create a new app or a new demo with CYLTabBarController: choose th
 
 Every new demo in this repository is created with this skill. Source of truth: code, then `docs/`, then `README.md`. If they disagree, fix the wrong one first (usually `README.md`), then this skill.
 
-> Animated tab icons: `pod 'CYLTabBarController/LottieSwift'` (or `PAG`, `Rive`, `SVGA`, `GIF`) brings Core and the engine. Without a tab bar, use `pod 'CYLTabBarController/CYLAnimatedItem'` plus `pod 'CYLTabBarController/CYLAnimatedItemLottieSwift'` (no Core). See docs/Animated-Item.md.
+> Animated tab icons: `pod 'CYLTabBarController/LottieSwift'` (or `PAG`, `Rive`, `SVGA`, `GIF`) brings Core and the engine. A project that uses CYLTabBarController by path or commit also names `pod 'CYLAnimatedItem'` the same way (its own pod, not on the trunk yet). Without a tab bar, use `pod 'CYLAnimatedItem'` and `import CYLAnimatedItem` (older names: `pod 'CYLTabBarController/CYLAnimatedItem'` plus `pod 'CYLTabBarController/CYLAnimatedItemLottieSwift'`, which now only depend on the CYLAnimatedItem pod). See docs/Animated-Item.md.
 
 ## 1. Choose the integration
 

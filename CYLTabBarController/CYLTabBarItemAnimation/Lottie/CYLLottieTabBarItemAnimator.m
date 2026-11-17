@@ -20,10 +20,12 @@
 #import "CYLAnimationKeys.h"
 #endif
 // Shared through CYLUtils (the source tree, or flattened by CocoaPods). 通过 CYLUtils 共用（源码目录，或 CocoaPods 展平后）。
-#if __has_include("../../CYLUtils/CYLUtils.h")
-#import "../../CYLUtils/CYLUtils.h"
+#if __has_include(<CYLAnimatedItem/CYLAnimatedItemMacros.h>)
+#import <CYLAnimatedItem/CYLAnimatedItemMacros.h>
+#elif __has_include("../../CYLAnimatedItem/CYLAnimatedItemMacros.h")
+#import "../../CYLAnimatedItem/CYLAnimatedItemMacros.h"
 #else
-#import "CYLUtils.h"
+#import "CYLAnimatedItemMacros.h"
 #endif
 
 // FIX: issue #604 — only with a Lottie library; without one this file is empty and the class is never used.
@@ -38,7 +40,11 @@
 #else
 #import "CYLTabBarItemAnimationPlayableView.h"
 #endif
-#if __has_include(<CYLTabBarController/CYLTabBarController-Swift.h>)
+#if __has_include(<CYLAnimatedItem/CYLAnimatedItem-Swift.h>)
+#import <CYLAnimatedItem/CYLAnimatedItem-Swift.h>
+#elif __has_include("CYLAnimatedItem-Swift.h")
+#import "CYLAnimatedItem-Swift.h"
+#elif __has_include(<CYLTabBarController/CYLTabBarController-Swift.h>)
 #import <CYLTabBarController/CYLTabBarController-Swift.h>
 #endif
 

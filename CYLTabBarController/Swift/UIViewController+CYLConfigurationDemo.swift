@@ -6,6 +6,9 @@
 //
 
 import UIKit
+#if canImport(CYLAnimatedItem)
+import CYLAnimatedItem
+#endif
 
 /**
  * [EN] The configuration file demo of the settings section: a tab bar controller from a sample file, a resource route, a

@@ -6,6 +6,9 @@
 //
 
 import UIKit
+#if canImport(CYLAnimatedItem)
+import CYLAnimatedItem
+#endif
 
 /**
  * [EN] The same object, or equal ones (nil only matches nil). [CN] 同一对象或相等的对象（nil 只与 nil 匹配）。

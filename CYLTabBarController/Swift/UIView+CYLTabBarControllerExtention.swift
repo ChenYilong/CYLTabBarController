@@ -7,6 +7,9 @@
 //
 
 import UIKit
+#if canImport(CYLAnimatedItem)
+import CYLAnimatedItem
+#endif
 
 /**
  * [EN] `UIView (CYLTabBarControllerExtention)`, `(CYLTabBarControllerExtentionDeprecated)` and `(CYLTabBarMetrics)`: how the

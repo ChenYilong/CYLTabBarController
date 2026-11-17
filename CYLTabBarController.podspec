@@ -20,6 +20,12 @@ Pod::Spec.new do |s|
     # [EN] Swift migration (docs/Swift-Migration.md): translated files live in `Swift/` folders next to the Objective-C ones.
     # [CN] Swift 迁移（docs/Swift-Migration.md）：已翻译的文件放在 Objective-C 文件旁的 `Swift/` 目录中。
     utils.source_files = 'CYLTabBarController/CYLUtils/**/*.{h,m,swift}'
+    # [EN] The animation keys and URL options belong to the CYLAnimatedItem pod (CYLAnimatedItem.podspec), which CYLUtils
+    #      depends on; CYLUtils re-exports it (Swift `@_exported import`, Objective-C headers).
+    # [CN] 动画 key 与 URL 选项属于 CYLAnimatedItem pod（CYLAnimatedItem.podspec），CYLUtils 依赖它并重新导出（Swift `@_exported import`、
+    #      Objective-C 头文件）。
+    utils.exclude_files = 'CYLTabBarController/CYLUtils/CYLAnimationKeys.{h,m}', 'CYLTabBarController/CYLUtils/Swift/CYLAnimationURLOptions.swift'
+    utils.dependency 'CYLAnimatedItem/Core', s.version.to_s
     utils.public_header_files = 'CYLTabBarController/CYLUtils/**/*.h'
     # FIX: issue #216 — theme switching (skins): public headers in `CYLUtils/CYLComponents/CYLTheme/`, implementation in
     # Swift (`CYLUtils/Swift/`); its private helpers are internal Swift. [CN] 换肤（主题切换）：公开头文件位于
@@ -50,15 +56,9 @@ Pod::Spec.new do |s|
   # [CN] CYLAnimationEngine：仅动画引擎（animator 协议、注册表、工厂、播放器、view animator），不含 TabBar，也不依赖 Core。每个动画库
   #      子库（LottieSwift、LottieObjectiveC、PAG、Rive、SVGA、GIF）都依赖它；App 只有在注册自己的 animator 时才需要直接引入。
   s.subspec 'CYLAnimationEngine' do |engine|
+    # [EN] The engine lives in the CYLAnimatedItem pod; kept as a name for compatibility. [CN] 引擎位于 CYLAnimatedItem pod；保留此名称以兼容。
     engine.dependency 'CYLTabBarController/CYLUtils'
-    files = %w[CYLTabBarItemAnimator CYLTabBarItemAnimationPlayer CYLTabBarItemAnimatorRegistry CYLTabBarItemAnimationFactory
-               CYLTabBarItemAnimationPlayableView CYLTabBarItemViewAnimator]
-    # [EN] The playable view protocols are Swift (CYLTabBarItemAnimation/Swift/), so the engine builds without Core.
-    # [CN] 可播放视图协议为 Swift（CYLTabBarItemAnimation/Swift/），因此引擎不依赖 Core 也能编译。
-    engine.source_files = files.map { |name| "CYLTabBarController/CYLTabBarItemAnimation/#{name}.{h,m}" } +
-                          ['CYLTabBarController/CYLTabBarItemAnimation/Swift/*.swift']
-    engine.public_header_files = files.map { |name| "CYLTabBarController/CYLTabBarItemAnimation/#{name}.h" }
-    engine.frameworks = 'UIKit'
+    engine.dependency 'CYLAnimatedItem/Engine', s.version.to_s
   end
 
   # [EN] CYLAnimatedItem: CYLAnimatedItemView, an icon + title control to subclass (an accessory icon with its own tap,
@@ -74,15 +74,9 @@ Pod::Spec.new do |s|
   #      `pod 'CYLTabBarController/LottieSwift'`），它会带入引擎，同一个控件无需修改代码即可播放。不使用动效的 App 不会带入引擎和任何
   #      动画库，以后引擎再多也不会增大其包体积。接入文档：docs/Animated-Item.md。
   s.subspec 'CYLAnimatedItem' do |item|
-    item.dependency 'CYLTabBarController/CYLUtils'
-    item.source_files = 'CYLTabBarController/CYLAnimatedItem/*.{h,m}'
-    item.public_header_files = 'CYLTabBarController/CYLAnimatedItem/*.h'
-    # [EN] The component's resource bundle: the tab-icon-sized placeholder shown when only an animation file is given and it
-    #      cannot play, its LICENSE and POLICY.md. Found with `CYLResourceBundleNamed(@"CYLAnimatedItem")`.
-    # [CN] 组件的资源包：只传入动画文件且无法播放时显示的、适合 Tab 图标尺寸的占位图，及其 LICENSE 与 POLICY.md。通过
-    #      `CYLResourceBundleNamed(@"CYLAnimatedItem")` 查找。
-    item.resources = ['CYLTabBarController/CYLAnimatedItem/Resources/CYLAnimatedItem.bundle']
-    item.frameworks = 'UIKit'
+    # [EN] The component is the CYLAnimatedItem pod (module `CYLAnimatedItem`, no dependency on this pod); kept as a name
+    #      for compatibility. [CN] 组件即 CYLAnimatedItem pod（模块 `CYLAnimatedItem`，不依赖本 pod）；保留此名称以兼容。
+    item.dependency 'CYLAnimatedItem/Core', s.version.to_s
   end
 
   # [EN] The component's animation engines, one per type and the same for every type: CYLAnimatedItem (the component's
@@ -98,11 +92,7 @@ Pod::Spec.new do |s|
   #      在这里加一个 `CYLAnimatedItem<类型>`，再加一个依赖它的 TabBar 子库 `<类型>`。使用平铺名称：CocoaPods 只允许根 spec 设置
   #      `default_subspecs`，CYLAnimatedItem 的子库会被全部带入（libpag 与 libpag-enterprise、iOS 13 / 14 的要求也会在其中冲突）。
   s.subspec 'CYLAnimatedItemLottieObjectiveC' do |lottieobjc|
-    lottieobjc.dependency 'CYLTabBarController/CYLAnimatedItem'
-    lottieobjc.dependency 'CYLTabBarController/CYLAnimationEngine'
-    lottieobjc.source_files = 'CYLTabBarController/CYLTabBarItemAnimation/Lottie/*.{h,m}'
-    lottieobjc.private_header_files = 'CYLTabBarController/CYLTabBarItemAnimation/Lottie/*.h'
-    lottieobjc.dependency 'lottie-ios', '~> 2.5.3'
+    lottieobjc.dependency 'CYLAnimatedItem/LottieObjectiveC', s.version.to_s
   end
 
   s.subspec 'CYLAnimatedItemLottie' do |lottie|
@@ -110,55 +100,29 @@ Pod::Spec.new do |s|
   end
 
   s.subspec 'CYLAnimatedItemLottieSwift' do |lottieswift|
-    lottieswift.dependency 'CYLTabBarController/CYLAnimatedItem'
-    lottieswift.dependency 'CYLTabBarController/CYLAnimationEngine'
-    lottieswift.source_files = 'CYLTabBarController/**/LottieSwift/*.{h,m,Swift}', 'CYLTabBarController/CYLTabBarItemAnimation/Lottie/*.{h,m}'
-    lottieswift.private_header_files = 'CYLTabBarController/CYLTabBarItemAnimation/Lottie/*.h'
-    lottieswift.dependency 'lottie-ios', '>= 4.5.1'
+    lottieswift.dependency 'CYLAnimatedItem/LottieSwift', s.version.to_s
     lottieswift.ios.deployment_target = '13.0'
   end
 
   s.subspec 'CYLAnimatedItemPAG' do |pag|
-    pag.dependency 'CYLTabBarController/CYLAnimatedItem'
-    pag.dependency 'CYLTabBarController/CYLAnimationEngine'
-    pag.source_files = 'CYLTabBarController/CYLTabBarItemAnimation/PAG/*.{h,m}'
-    pag.public_header_files = 'CYLTabBarController/CYLTabBarItemAnimation/PAG/*.h'
-    pag.dependency 'libpag', '>= 4.0'
-    pag.pod_target_xcconfig = { 'GCC_PREPROCESSOR_DEFINITIONS' => '$(inherited) GLES_SILENCE_DEPRECATION=1' }
+    pag.dependency 'CYLAnimatedItem/PAG', s.version.to_s
   end
 
   s.subspec 'CYLAnimatedItemPAGEnterprise' do |pagenterprise|
-    pagenterprise.dependency 'CYLTabBarController/CYLAnimatedItem'
-    pagenterprise.dependency 'CYLTabBarController/CYLAnimationEngine'
-    pagenterprise.source_files = 'CYLTabBarController/CYLTabBarItemAnimation/PAG/*.{h,m}'
-    pagenterprise.public_header_files = 'CYLTabBarController/CYLTabBarItemAnimation/PAG/*.h'
-    pagenterprise.dependency 'libpag-enterprise', '>= 4.0'
-    pagenterprise.compiler_flags = '-fno-modules'
+    pagenterprise.dependency 'CYLAnimatedItem/PAGEnterprise', s.version.to_s
   end
 
   s.subspec 'CYLAnimatedItemRive' do |rive|
-    rive.dependency 'CYLTabBarController/CYLAnimatedItem'
-    rive.dependency 'CYLTabBarController/CYLAnimationEngine'
-    rive.source_files = 'CYLTabBarController/CYLTabBarItemAnimation/Rive/*.{h,m}', 'CYLTabBarController/RiveSwift/*.swift'
-    rive.public_header_files = 'CYLTabBarController/CYLTabBarItemAnimation/Rive/*.h'
-    rive.dependency 'RiveRuntime', '~> 6.29'
+    rive.dependency 'CYLAnimatedItem/Rive', s.version.to_s
     rive.ios.deployment_target = '14.0'
   end
 
   s.subspec 'CYLAnimatedItemSVGA' do |svga|
-    svga.dependency 'CYLTabBarController/CYLAnimatedItem'
-    svga.dependency 'CYLTabBarController/CYLAnimationEngine'
-    svga.source_files = 'CYLTabBarController/CYLTabBarItemAnimation/SVGA/*.{h,m}'
-    svga.public_header_files = 'CYLTabBarController/CYLTabBarItemAnimation/SVGA/*.h'
-    svga.dependency 'SVGAPlayerLite', '~> 1.0', '>= 1.0.8'
+    svga.dependency 'CYLAnimatedItem/SVGA', s.version.to_s
   end
 
   s.subspec 'CYLAnimatedItemGIF' do |gif|
-    gif.dependency 'CYLTabBarController/CYLAnimatedItem'
-    gif.dependency 'CYLTabBarController/CYLAnimationEngine'
-    gif.source_files = 'CYLTabBarController/CYLTabBarItemAnimation/GIF/*.{h,m}'
-    gif.public_header_files = 'CYLTabBarController/CYLTabBarItemAnimation/GIF/*.h'
-    gif.frameworks = 'ImageIO', 'QuartzCore'
+    gif.dependency 'CYLAnimatedItem/GIF', s.version.to_s
   end
 
   s.subspec 'Core' do |core|

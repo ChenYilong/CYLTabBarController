@@ -6,6 +6,9 @@
 //
 
 import UIKit
+#if canImport(CYLAnimatedItem)
+import CYLAnimatedItem
+#endif
 
 // [EN] Configuration dictionaries (`CYLTabBarController (CYLConfiguration)`), translated from Objective-C (docs/Swift-Migration.md,
 //      step 44): value conversion, skins, localization, routes, files and URLs. Every selector of the header is kept.

@@ -23,13 +23,25 @@
 #if __has_include("CYLAnimatedItem/CYLAnimatedItemView.h")
 #import "CYLAnimatedItem/CYLAnimatedItemView.h"
 #else
+#if __has_include(<CYLAnimatedItem/CYLAnimatedItemView.h>)
+#import <CYLAnimatedItem/CYLAnimatedItemView.h>
+#else
 #import "CYLAnimatedItemView.h"
+#endif
 #endif
 #if CYL_ANIMATION_ENGINE_AVAILABLE
 #if __has_include(<CYLTabBarController/CYLTabBarItemAnimatorRegistry.h>)
+#if __has_include(<CYLAnimatedItem/CYLTabBarItemAnimatorRegistry.h>)
+#import <CYLAnimatedItem/CYLTabBarItemAnimatorRegistry.h>
+#else
 #import <CYLTabBarController/CYLTabBarItemAnimatorRegistry.h>
+#endif
+#else
+#if __has_include(<CYLAnimatedItem/CYLTabBarItemAnimatorRegistry.h>)
+#import <CYLAnimatedItem/CYLTabBarItemAnimatorRegistry.h>
 #else
 #import "CYLTabBarItemAnimatorRegistry.h"
+#endif
 #endif
 #endif
 

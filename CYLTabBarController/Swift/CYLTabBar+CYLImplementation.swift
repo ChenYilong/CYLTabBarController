@@ -7,6 +7,9 @@
 //
 
 import UIKit
+#if canImport(CYLAnimatedItem)
+import CYLAnimatedItem
+#endif
 
 // [EN] The implementation of `CYLTabBar`, translated from Objective-C (docs/Swift-Migration.md, step 51). The class stays
 //      declared in Objective-C: `CYLTabBarController.h` and `CYLPlusButton.h` name it, so it moves with them. CYLTabBar.m

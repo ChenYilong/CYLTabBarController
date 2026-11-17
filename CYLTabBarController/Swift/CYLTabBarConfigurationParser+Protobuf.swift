@@ -6,6 +6,9 @@
 //
 
 import Foundation
+#if canImport(CYLAnimatedItem)
+import CYLAnimatedItem
+#endif
 
 /**
  * [EN] Protocol Buffers text format, without a schema: `name: value`, `name { ... }` (or `< ... >`), `name: [a, b]`;

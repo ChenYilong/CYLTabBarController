@@ -8,10 +8,6 @@ import android.os.Looper
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageView
-import com.cyl.tabbar.CYLSize
-import com.cyl.tabbar.CYLTabBarItemAnimationFailure
-import com.cyl.tabbar.CYLTabBarItemAnimationPlayer
-import com.cyl.tabbar.CYLTabBarItemAnimationViewMaking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull

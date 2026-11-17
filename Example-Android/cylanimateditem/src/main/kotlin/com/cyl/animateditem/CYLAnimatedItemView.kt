@@ -15,10 +15,6 @@ import android.widget.Button
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
-import com.cyl.tabbar.CYLSize
-import com.cyl.tabbar.CYLTabBarItemAnimationFailureHandling
-import com.cyl.tabbar.CYLTabBarItemAnimationPlayer
-import com.cyl.tabbar.CYLTabBarItemAnimationViewMaking
 import kotlin.math.abs
 import kotlin.math.ceil
 import kotlin.math.max
@@ -391,7 +387,7 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
     /**
      * [EN] Whether the animation is on screen: made, and not waiting for its file (a download). [CN] 动画是否已显示：已创建且不在等待其文件（下载）。
      */
-    private fun animationShows() = animationView != null && !com.cyl.tabbar.CYLTabBarItemAnimationFailure.isLoading(animationView)
+    private fun animationShows() = animationView != null && !com.cyl.animateditem.CYLTabBarItemAnimationFailure.isLoading(animationView)
 
     /**
      * [EN] Shows the static image, else the placeholder, until the animation shows. A subclass that lays out its own
@@ -597,6 +593,6 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
          */
         @JvmStatic
         fun defaultPlaceholderImage(context: Context): Drawable? =
-            com.cyl.tabbar.CYLAnimatedItemResources.id(context, "cyl_animated_item_placeholder", "drawable").takeIf { it != 0 }?.let { androidx.core.content.ContextCompat.getDrawable(context, it) }
+            com.cyl.animateditem.CYLAnimatedItemResources.id(context, "cyl_animated_item_placeholder", "drawable").takeIf { it != 0 }?.let { androidx.core.content.ContextCompat.getDrawable(context, it) }
     }
 }
