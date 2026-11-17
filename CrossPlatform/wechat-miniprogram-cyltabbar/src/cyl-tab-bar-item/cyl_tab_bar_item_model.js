@@ -108,6 +108,8 @@ function cylItemModel(p) {
     animationPath,
     animationType: cylAnimationType(animationPath),
     iconTint,
+    iconWidth: iconBox.width,
+    iconHeight: iconBox.height,
     centered,
     itemStyle: `${background ? `background-color: ${background};` : ''}${p.enabled === false ? 'opacity: 0.4;' : ''}`,
     iconBoxStyle: `width: ${iconBox.width}px; height: ${iconBox.height}px;`

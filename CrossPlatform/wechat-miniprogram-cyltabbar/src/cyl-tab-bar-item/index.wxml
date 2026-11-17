@@ -10,51 +10,29 @@
   <!-- [EN] Liquid Glass: the lens behind the selected icon and title (decoration). [CN] 液态玻璃：选中图标与标题后的透镜（装饰）。 -->
   <cyl-glass-lens wx:if="{{cylItemStyle === 'liquidGlass' && m.selected}}" class="cyl-item-glass-lens" is-dark="{{isDark}}" lens-style="{{glassLensStyle}}" aria-hidden="true" />
   <view wx:if="{{m.image || m.animationPath}}" class="cyl-item-icon-box" style="{{m.iconBoxStyle}}">
-    <cyl-lottie-view
-      wx:if="{{m.animationType === 'lottie'}}"
-      id="cyl-item-animation"
+    <!-- [EN] The icon is cyl-animated-item (docs/Animated-Item.md): every animation type it knows (Lottie, PAG, Rive,
+         SVGA, GIF), and the static image or the placeholder when the engine is missing or fails.
+         [CN] 图标由 cyl-animated-item 绘制（docs/Animated-Item.md）：支持其所有动画类型（Lottie、PAG、Rive、SVGA、GIF），引擎缺失或失败时显示静态图片或占位图。 -->
+    <cyl-animated-item
+      id="cyl-item-icon"
       class="cyl-item-animation"
-      path="{{m.animationPath}}"
+      bare="{{true}}"
+      accessibility-hidden="{{true}}"
+      image="{{m.image}}"
+      animation-url="{{m.animationPath}}"
+      selected="{{m.selected}}"
+      icon-width="{{m.iconWidth}}"
+      icon-height="{{m.iconHeight}}"
+      icon-tint="{{m.iconTint}}"
       colors="{{animationColors}}"
       loop="{{animationLoop || (!m.selected && loopsWhenUnselected)}}"
       speed="{{animationSpeed}}"
       autoplay="{{!m.selected && loopsWhenUnselected}}"
-      resting-frame="{{m.selected ? 'last' : 'first'}}"
+      generic:cyl-lottie-view="cyl-lottie-view"
+      generic:cyl-pag-view="cyl-pag-view"
+      generic:cyl-rive-view="cyl-rive-view"
+      generic:cyl-svga-view="cyl-svga-view"
     />
-    <cyl-pag-view
-      wx:elif="{{m.animationType === 'pag'}}"
-      id="cyl-item-animation"
-      class="cyl-item-animation"
-      path="{{m.animationPath}}"
-      loop="{{animationLoop || (!m.selected && loopsWhenUnselected)}}"
-      speed="{{animationSpeed}}"
-      autoplay="{{!m.selected && loopsWhenUnselected}}"
-      resting-frame="{{m.selected ? 'last' : 'first'}}"
-    />
-    <cyl-rive-view
-      wx:elif="{{m.animationType === 'rive'}}"
-      id="cyl-item-animation"
-      class="cyl-item-animation"
-      path="{{m.animationPath}}"
-      colors="{{animationColors}}"
-      loop="{{animationLoop || (!m.selected && loopsWhenUnselected)}}"
-      speed="{{animationSpeed}}"
-      autoplay="{{!m.selected && loopsWhenUnselected}}"
-    />
-    <cyl-svga-view
-      wx:elif="{{m.animationType === 'svga'}}"
-      id="cyl-item-animation"
-      class="cyl-item-animation"
-      path="{{m.animationPath}}"
-      loop="{{animationLoop || (!m.selected && loopsWhenUnselected)}}"
-      speed="{{animationSpeed}}"
-      autoplay="{{!m.selected && loopsWhenUnselected}}"
-      resting-frame="{{m.selected ? 'last' : 'first'}}"
-    />
-    <view wx:elif="{{m.image && m.iconTint}}" class="cyl-item-tint">
-      <image class="cyl-item-image cyl-item-tinted" src="{{m.image}}" style="filter: drop-shadow({{m.iconTint}} 200px 0);" mode="aspectFit" />
-    </view>
-    <image wx:elif="{{m.image}}" class="cyl-item-image" src="{{m.image}}" mode="aspectFit" />
     <text wx:if="{{m.showsBadge && !m.badgeIsDot}}" class="cyl-item-badge {{m.badgeClass}}" style="{{m.badgeStyle}}">{{m.badgeText}}</text>
     <view wx:if="{{m.showsBadge && m.badgeIsDot}}" class="cyl-item-badge-dot {{m.badgeClass}}" style="{{m.badgeStyle}}"></view>
   </view>

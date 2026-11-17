@@ -83,6 +83,7 @@ private fun View.cyl_insertAnimationView(state: CYLTabAnimationState) {
     host.addView(view, FrameLayout.LayoutParams(width, height, Gravity.CENTER))
     state.view = view
     state.loadedURL = url
+    (this as? CYLTabBarItemButton)?.cyl_setTabBarItemAnimationView(view)
     val player = CYLTabBarItemAnimationFactory.playerForView(view)
     if (state.speed > 0 && state.speed.isFinite()) player?.animationSpeed = state.speed
     if (state.loops) player?.loops = true
@@ -201,6 +202,7 @@ fun View.cyl_replaceTabBarItemAnimationWithURL(url: String?, size: CYLSize?, con
     if (url.isNullOrBlank()) {
         previous?.view?.let { (this as? ViewGroup)?.removeView(it) }
         animationStates.remove(this)
+        (this as? CYLTabBarItemButton)?.cyl_setTabBarItemAnimationView(null)
         when (this) {
             is CYLTabBarItemButton -> iconView.visibility = View.VISIBLE
             is CYLPlusButton -> imageView.visibility = View.VISIBLE

@@ -209,9 +209,11 @@ Component({
       return owner && typeof owner.cyl_selectAdjacent === 'function' ? owner : null;
     },
 
-    /** [EN] The animation component (cyl-lottie, cyl-pag or cyl-rive), or null. [CN] 动画组件，没有时为 null。 */
+    /**
+     * [EN] The icon component (cyl-animated-item), which plays and stops its engine view. [CN] 图标组件（cyl-animated-item），由它播放与停止引擎视图。
+     */
     cyl_animationView() {
-      return this.selectComponent('#cyl-item-animation');
+      return this.selectComponent('#cyl-item-icon');
     },
 
     /**

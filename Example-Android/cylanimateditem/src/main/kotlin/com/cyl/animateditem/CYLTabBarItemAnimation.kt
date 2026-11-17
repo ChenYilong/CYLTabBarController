@@ -521,7 +521,7 @@ object CYLTabBarItemAnimationFiles {
             isRemote(url) -> null
             assetName(url) != null -> context.assets.open(assetName(url)!!)
             url.startsWith("file:") -> Uri.parse(url).path?.let { File(it).inputStream() }
-            url.startsWith("/") -> File(url).inputStream()
+            File(url).isAbsolute -> File(url).inputStream()
             else -> context.contentResolver.openInputStream(Uri.parse(url))
         }
     } catch (error: java.io.IOException) { null } catch (error: SecurityException) { null }
@@ -530,7 +530,8 @@ object CYLTabBarItemAnimationFiles {
      * [EN] A local file of `url` (copied to the cache when it is an asset, a stream or remote), delivered on the main thread. [CN] `url` 的本地文件（asset、流或远程文件会复制到缓存），在主线程回调。
      */
     fun localFile(context: Context, url: String, completion: (File?) -> Unit) {
-        if (url.startsWith("/") && File(url).exists()) return completion(File(url))
+        // [EN] An absolute path ("/..." on Android; a drive path in JVM tests on Windows). [CN] 绝对路径（Android 上为 "/..."；Windows 上的 JVM 测试中为盘符路径）。
+        if (File(url).isAbsolute && File(url).exists()) return completion(File(url))
         if (url.startsWith("file:") && !url.startsWith(ANDROID_ASSET_PREFIX)) return completion(Uri.parse(url).path?.let { File(it) }?.takeIf { it.exists() })
         val appContext = context.applicationContext
         executor.execute {

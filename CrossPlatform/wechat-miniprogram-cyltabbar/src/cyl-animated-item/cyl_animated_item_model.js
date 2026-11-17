@@ -61,6 +61,8 @@ function cylAnimatedItemModel(p) {
     fallbackImage = placeholder
   }
   const iconSize = Number(p.iconSize) > 0 ? Number(p.iconSize) : 24
+  const iconWidth = Number(p.iconWidth) > 0 ? Number(p.iconWidth) : iconSize
+  const iconHeight = Number(p.iconHeight) > 0 ? Number(p.iconHeight) : iconSize
   const title = p.title || ''
   const label = p.accessibilityLabel || title
   return {
@@ -72,7 +74,9 @@ function cylAnimatedItemModel(p) {
     fallbackImage,
     fallbackHidden: animationShows && !gifShows,
     showsIcon: !!(fallbackImage || usesEngine || gifShows),
-    iconStyle: `width: ${iconSize}px; height: ${iconSize}px;`,
+    iconStyle: `width: ${iconWidth}px; height: ${iconHeight}px;`,
+    // [EN] A tint applies to the static image only; an animation keeps its own colors. [CN] 着色只作用于静态图片。
+    iconTint: p.iconTint || '',
     axisClass: p.axis === 'vertical' ? 'cyl-animated-item-vertical' : 'cyl-animated-item-horizontal',
     accessoryPlacement: ['leading', 'trailing', 'topTrailing'].includes(p.accessoryPlacement) ? p.accessoryPlacement : 'trailing',
     hasAccessory: !!(p.accessoryImage || p.accessoryText),
