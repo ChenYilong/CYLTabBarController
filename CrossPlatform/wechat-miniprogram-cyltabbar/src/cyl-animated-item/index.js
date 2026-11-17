@@ -42,6 +42,9 @@ Component({
     //      autoplay, a tint for the static image, a non-square icon, the embedded layout and hiding it from screen
     //      readers (the host is the accessibility element). [CN] 供用本组件绘制图标的宿主（TabBar Item）使用：Lottie / Rive
     //      颜色（keypath -> 颜色）、自动播放、静态图片着色、非正方形图标、嵌入式布局，以及对读屏隐藏（宿主是无障碍元素）。
+    // [EN] 'lottie', 'pag', 'rive', 'svga' or 'gif' when the file name does not say it ('' reads the extension; "*.svga.bin" is read as SVGA).
+    // [CN] 文件名无法表明类型时指定 'lottie'、'pag'、'rive'、'svga' 或 'gif'（'' 按扩展名读取；"*.svga.bin" 读作 SVGA）。
+    animationType: { type: String, value: '' },
     colors: { type: Object, value: null },
     autoplay: { type: Boolean, value: true },
     iconTint: { type: String, value: '' },
@@ -58,7 +61,7 @@ Component({
   },
 
   observers: {
-    'animationUrl': function () {
+    'animationUrl, animationType': function () {
       this.setData({ animationLoaded: false, animationFailed: false })
       this.cyl_update()
     },
