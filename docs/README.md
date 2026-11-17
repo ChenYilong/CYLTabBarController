@@ -253,6 +253,7 @@ docs/
 │   ├── flat-design-more-icon-fix-ios.png
 │   ├── flatdesign-standard-appearance-ios.png
 │   ├── flatdesign-standard-appearance-mapping.svg
+│   ├── flutter-android-simulated-taps.png
 │   ├── flutter-component-android-bar.png
 │   ├── flutter-component-android.png
 │   ├── flutter-component-ios-bar.png
