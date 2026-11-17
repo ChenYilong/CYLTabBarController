@@ -1166,9 +1166,13 @@ class CYLRiveTabBarItemAnimationView internal constructor(context: Context, priv
          * [EN] A frame later: the state machine sees the reset or the false first. [CN] 一帧之后：状态机先看到重置或 false。
          */
         internal const val NEXT_FRAME_MS = 50L
-        /** [EN] A held input's off time before it goes on again (outside a loop). [CN] 保持的输入重新打开前的关闭时间（循环之外）。 */
+        /**
+         * [EN] A held input's off time before it goes on again (outside a loop). [CN] 保持的输入重新打开前的关闭时间（循环之外）。
+         */
         internal const val INPUT_OFF_MS = 150L
-        /** [EN] Time for the first frame to be drawn before a loaded file pauses. [CN] 加载的文件暂停前绘制第一帧的时间。 */
+        /**
+         * [EN] Time for the first frame to be drawn before a loaded file pauses. [CN] 加载的文件暂停前绘制第一帧的时间。
+         */
         internal const val FIRST_FRAME_MS = 100L
     }
 
