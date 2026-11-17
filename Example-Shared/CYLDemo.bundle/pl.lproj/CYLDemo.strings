@@ -127,3 +127,12 @@
 "静态图片" = "Obraz statyczny";
 "占位图（文件损坏）" = "Symbol zastępczy (uszkodzony plik)";
 "远程 GIF（下载中显示图片）" = "Zdalny GIF (obraz podczas ładowania)";
+
+/* [EN] The interactive item of the animated item demo (TODO 6). [CN] 动效组件 Demo 的可交互项。 */
+"竖排：附加图标，可拖拽" = "Pionowo: dodatkowa ikona, można przeciągać";
+"删除" = "Usuń";
+"点击、点击附加图标或拖拽" = "Stuknij, stuknij dodatkową ikonę lub przeciągnij";
+"点击了组件" = "Stuknięto element";
+"点击了附加图标" = "Stuknięto dodatkową ikonę";
+"拖拽中" = "Przeciąganie";
+"拖拽结束，已弹回" = "Przeciąganie zakończone, wrócił na miejsce";

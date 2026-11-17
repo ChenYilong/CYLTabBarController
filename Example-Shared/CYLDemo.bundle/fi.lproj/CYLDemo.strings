@@ -127,3 +127,12 @@
 "静态图片" = "Staattinen kuva";
 "占位图（文件损坏）" = "Paikkamerkki (vioittunut tiedosto)";
 "远程 GIF（下载中显示图片）" = "Etä-GIF (kuva latauksen aikana)";
+
+/* [EN] The interactive item of the animated item demo (TODO 6). [CN] 动效组件 Demo 的可交互项。 */
+"竖排：附加图标，可拖拽" = "Pystysuora: lisäkuvake, vedettävä";
+"删除" = "Poista";
+"点击、点击附加图标或拖拽" = "Napauta, napauta lisäkuvaketta tai vedä";
+"点击了组件" = "Kohdetta napautettu";
+"点击了附加图标" = "Lisäkuvaketta napautettu";
+"拖拽中" = "Vedetään";
+"拖拽结束，已弹回" = "Veto päättyi, palasi paikalleen";

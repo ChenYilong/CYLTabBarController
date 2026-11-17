@@ -127,3 +127,12 @@
 "静态图片" = "Ảnh tĩnh";
 "占位图（文件损坏）" = "Ảnh giữ chỗ (tệp hỏng)";
 "远程 GIF（下载中显示图片）" = "GIF từ xa (hiện ảnh khi tải)";
+
+/* [EN] The interactive item of the animated item demo (TODO 6). [CN] 动效组件 Demo 的可交互项。 */
+"竖排：附加图标，可拖拽" = "Dọc: biểu tượng phụ, kéo được";
+"删除" = "Xoá";
+"点击、点击附加图标或拖拽" = "Chạm, chạm biểu tượng phụ hoặc kéo";
+"点击了组件" = "Đã chạm mục";
+"点击了附加图标" = "Đã chạm biểu tượng phụ";
+"拖拽中" = "Đang kéo";
+"拖拽结束，已弹回" = "Kéo xong, đã bật về chỗ cũ";

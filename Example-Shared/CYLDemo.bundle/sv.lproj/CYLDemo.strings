@@ -127,3 +127,12 @@
 "静态图片" = "Statisk bild";
 "占位图（文件损坏）" = "Platshållare (skadad fil)";
 "远程 GIF（下载中显示图片）" = "Fjärr-GIF (bild under laddning)";
+
+/* [EN] The interactive item of the animated item demo (TODO 6). [CN] 动效组件 Demo 的可交互项。 */
+"竖排：附加图标，可拖拽" = "Lodrät: extra symbol, dragbar";
+"删除" = "Radera";
+"点击、点击附加图标或拖拽" = "Tryck, tryck på den extra symbolen eller dra";
+"点击了组件" = "Objekt tryckt";
+"点击了附加图标" = "Extra symbol tryckt";
+"拖拽中" = "Drar";
+"拖拽结束，已弹回" = "Dragning klar, studsade tillbaka";

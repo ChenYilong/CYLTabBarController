@@ -127,3 +127,12 @@
 "静态图片" = "Statična slika";
 "占位图（文件损坏）" = "Rezervirano mjesto (oštećena datoteka)";
 "远程 GIF（下载中显示图片）" = "Udaljeni GIF (slika tijekom učitavanja)";
+
+/* [EN] The interactive item of the animated item demo (TODO 6). [CN] 动效组件 Demo 的可交互项。 */
+"竖排：附加图标，可拖拽" = "Okomito: dodatna ikona, može se povući";
+"删除" = "Izbriši";
+"点击、点击附加图标或拖拽" = "Dodirnite, dodirnite dodatnu ikonu ili povucite";
+"点击了组件" = "Stavka dodirnuta";
+"点击了附加图标" = "Dodatna ikona dodirnuta";
+"拖拽中" = "Povlačenje";
+"拖拽结束，已弹回" = "Povlačenje završeno, vraćeno";

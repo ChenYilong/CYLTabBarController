@@ -127,3 +127,12 @@
 "静态图片" = "Statikus kép";
 "占位图（文件损坏）" = "Helyőrző (sérült fájl)";
 "远程 GIF（下载中显示图片）" = "Távoli GIF (kép betöltés közben)";
+
+/* [EN] The interactive item of the animated item demo (TODO 6). [CN] 动效组件 Demo 的可交互项。 */
+"竖排：附加图标，可拖拽" = "Függőleges: kiegészítő ikon, húzható";
+"删除" = "Törlés";
+"点击、点击附加图标或拖拽" = "Koppintson, koppintson a kiegészítő ikonra, vagy húzza";
+"点击了组件" = "Elemre koppintott";
+"点击了附加图标" = "Kiegészítő ikonra koppintott";
+"拖拽中" = "Húzás";
+"拖拽结束，已弹回" = "Húzás vége, visszaugrott";

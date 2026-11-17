@@ -127,3 +127,12 @@
 "静态图片" = "Static image";
 "占位图（文件损坏）" = "Placeholder (broken file)";
 "远程 GIF（下载中显示图片）" = "Remote GIF (image while loading)";
+
+/* [EN] The interactive item of the animated item demo (TODO 6). [CN] 动效组件 Demo 的可交互项。 */
+"竖排：附加图标，可拖拽" = "Vertical: accessory, draggable";
+"删除" = "Delete";
+"点击、点击附加图标或拖拽" = "Tap, tap the accessory, or drag";
+"点击了组件" = "Item tapped";
+"点击了附加图标" = "Accessory tapped";
+"拖拽中" = "Dragging";
+"拖拽结束，已弹回" = "Drag ended, sprang back";

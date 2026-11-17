@@ -127,3 +127,12 @@
 "静态图片" = "Statische afbeelding";
 "占位图（文件损坏）" = "Tijdelijke afbeelding (beschadigd bestand)";
 "远程 GIF（下载中显示图片）" = "Externe GIF (afbeelding tijdens laden)";
+
+/* [EN] The interactive item of the animated item demo (TODO 6). [CN] 动效组件 Demo 的可交互项。 */
+"竖排：附加图标，可拖拽" = "Verticaal: extra pictogram, versleepbaar";
+"删除" = "Verwijder";
+"点击、点击附加图标或拖拽" = "Tik, tik op het extra pictogram of sleep";
+"点击了组件" = "Item getikt";
+"点击了附加图标" = "Extra pictogram getikt";
+"拖拽中" = "Slepen";
+"拖拽结束，已弹回" = "Slepen klaar, teruggesprongen";

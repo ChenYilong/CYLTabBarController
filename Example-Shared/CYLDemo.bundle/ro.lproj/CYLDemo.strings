@@ -127,3 +127,12 @@
 "静态图片" = "Imagine statică";
 "占位图（文件损坏）" = "Substituent (fișier deteriorat)";
 "远程 GIF（下载中显示图片）" = "GIF la distanță (imagine la încărcare)";
+
+/* [EN] The interactive item of the animated item demo (TODO 6). [CN] 动效组件 Demo 的可交互项。 */
+"竖排：附加图标，可拖拽" = "Vertical: pictogramă suplimentară, se poate trage";
+"删除" = "Șterge";
+"点击、点击附加图标或拖拽" = "Atingeți, atingeți pictograma suplimentară sau trageți";
+"点击了组件" = "Element atins";
+"点击了附加图标" = "Pictogramă suplimentară atinsă";
+"拖拽中" = "Se trage";
+"拖拽结束，已弹回" = "Tragere încheiată, a revenit";

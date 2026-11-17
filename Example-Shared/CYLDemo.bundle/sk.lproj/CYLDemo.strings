@@ -127,3 +127,12 @@
 "静态图片" = "Statický obrázok";
 "占位图（文件损坏）" = "Zástupný obrázok (poškodený súbor)";
 "远程 GIF（下载中显示图片）" = "Vzdialený GIF (obrázok pri načítaní)";
+
+/* [EN] The interactive item of the animated item demo (TODO 6). [CN] 动效组件 Demo 的可交互项。 */
+"竖排：附加图标，可拖拽" = "Zvisle: doplnková ikona, dá sa presunúť";
+"删除" = "Vymazať";
+"点击、点击附加图标或拖拽" = "Ťuknite, ťuknite na doplnkovú ikonu alebo potiahnite";
+"点击了组件" = "Ťuknutie na položku";
+"点击了附加图标" = "Ťuknutie na doplnkovú ikonu";
+"拖拽中" = "Ťahanie";
+"拖拽结束，已弹回" = "Ťahanie skončilo, vrátilo sa späť";

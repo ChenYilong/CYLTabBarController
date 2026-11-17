@@ -127,3 +127,12 @@
 "静态图片" = "Sabit görsel";
 "占位图（文件损坏）" = "Yer tutucu (bozuk dosya)";
 "远程 GIF（下载中显示图片）" = "Uzak GIF (yüklenirken görsel)";
+
+/* [EN] The interactive item of the animated item demo (TODO 6). [CN] 动效组件 Demo 的可交互项。 */
+"竖排：附加图标，可拖拽" = "Dikey: ek simge, sürüklenebilir";
+"删除" = "Sil";
+"点击、点击附加图标或拖拽" = "Dokunun, ek simgeye dokunun veya sürükleyin";
+"点击了组件" = "Öğeye dokunuldu";
+"点击了附加图标" = "Ek simgeye dokunuldu";
+"拖拽中" = "Sürükleniyor";
+"拖拽结束，已弹回" = "Sürükleme bitti, geri döndü";

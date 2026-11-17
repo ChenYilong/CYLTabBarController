@@ -11,12 +11,15 @@ import CYLAnimatedItem
 
 /// [EN] The animated item component on its own (docs/Animated-Item.md, TODO 6): four `CYLAnimatedItemView`s, one per
 ///      display state: a GIF that plays, a static image (no animation file), the placeholder (a broken file, no image),
-///      and a remote GIF whose static image shows while it downloads.
+///      a remote GIF whose static image shows while it downloads, and a vertical item with an accessory icon that can be
+///      dragged (it springs back), whose last event shows under it, as the Android demo's last item.
 /// [CN] 单独使用的动效组件（docs/Animated-Item.md，TODO 6）：四个 `CYLAnimatedItemView`，每个对应一种显示状态：播放中的 GIF、
-///      静态图片（没有动效文件）、占位图（文件损坏且没有图片）、远程 GIF（下载期间显示静态图片）。
-class MessageViewController: UIViewController {
+///      静态图片（没有动效文件）、占位图（文件损坏且没有图片）、远程 GIF（下载期间显示静态图片）；以及一个带附加图标、可拖拽（松手弹回）的
+///      竖排组件，其最近的事件显示在下方，与 Android Demo 的最后一项相同。
+class MessageViewController: UIViewController, CYLAnimatedItemViewDelegate {
 
     private let stackView = UIStackView()
+    private let eventLabel = UILabel()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -44,6 +47,57 @@ class MessageViewController: UIViewController {
         addItem(title: "远程 GIF（下载中显示图片）", image: UIImage(systemName: "icloud.and.arrow.down"),
                 animationURL: URL(string: "https://raw.githubusercontent.com/ChenYilong/CYLTabBarController/master/Example-GIF/GIFApp/Resources/tab_rocket.gif"),
                 identifier: "CYLAnimatedItemDemoRemote")
+        addInteractiveItem()
+    }
+
+    private func addInteractiveItem() {
+        let item = CYLAnimatedItemView()
+        item.title = cylDemoLocalizedString("竖排：附加图标，可拖拽")
+        item.image = UIImage(systemName: "star.fill")
+        item.axis = .vertical
+        item.iconSize = CGSize(width: 48, height: 48)
+        let accessory = UIImageView(image: UIImage(systemName: "xmark.circle.fill"))
+        accessory.tintColor = .systemRed
+        accessory.accessibilityLabel = cylDemoLocalizedString("删除")
+        item.accessoryView = accessory
+        item.isDragEnabled = true
+        item.dragMovesView = true
+        item.delegate = self
+        item.accessibilityIdentifier = "CYLAnimatedItemDemoInteractive"
+        stackView.addArrangedSubview(item)
+        item.widthAnchor.constraint(lessThanOrEqualTo: view.widthAnchor, constant: -32).isActive = true
+
+        eventLabel.font = .preferredFont(forTextStyle: .footnote)
+        eventLabel.adjustsFontForContentSizeCategory = true
+        eventLabel.textColor = .secondaryLabel
+        eventLabel.numberOfLines = 0
+        eventLabel.textAlignment = .center
+        eventLabel.accessibilityIdentifier = "CYLAnimatedItemDemoEvent"
+        eventLabel.text = cylDemoLocalizedString("点击、点击附加图标或拖拽")
+        stackView.addArrangedSubview(eventLabel)
+    }
+
+    private func show(event key: String) {
+        eventLabel.text = cylDemoLocalizedString(key)
+        UIAccessibility.post(notification: .announcement, argument: eventLabel.text)
+    }
+
+    // MARK: - CYLAnimatedItemViewDelegate
+
+    func animatedItemViewDidTap(_ itemView: CYLAnimatedItemView) {
+        show(event: "点击了组件")
+    }
+
+    func animatedItemViewDidTapAccessory(_ itemView: CYLAnimatedItemView) {
+        show(event: "点击了附加图标")
+    }
+
+    func animatedItemViewDidBeginDrag(_ itemView: CYLAnimatedItemView) {
+        show(event: "拖拽中")
+    }
+
+    func animatedItemView(_ itemView: CYLAnimatedItemView, didEndDragWithTranslation translation: CGPoint, cancelled: Bool) {
+        show(event: "拖拽结束，已弹回")
     }
 
     private func addItem(title key: String, image: UIImage?, animationURL: URL?, identifier: String) {
