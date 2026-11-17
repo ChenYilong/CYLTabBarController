@@ -64,4 +64,39 @@ class CYLAnimationEnginesTest {
         CYLAnimationEngines.warnMissingEngine(context, null, "home.svga")
         assertTrue(ShadowLog.getLogsForTag("CYLAnimatedItem").isEmpty())
     }
+
+    private class StatusAnimator(override val identifier: String, override val fileExtensions: List<String>, override val priority: CYLTabBarItemAnimatorPriority = CYLTabBarItemAnimatorPriorityDefault) : CYLTabBarItemAnimator {
+        override fun canAnimateFileAtURL(url: String) = CYLTabBarAnimationFileExtension(url) in fileExtensions
+        override fun animationViewWithURL(context: android.content.Context, url: String, size: CYLSize, contentMode: android.widget.ImageView.ScaleType): android.view.View? = null
+        override fun playerForAnimationView(view: android.view.View): CYLTabBarItemAnimationPlayer? = null
+    }
+
+    /**
+     * [EN] Several engines: which are in, which known ones are missing (with the dependency), and the conflicts.
+     * [CN] 多个引擎：哪些已接入、哪些已知引擎缺少（及其依赖）以及冲突。
+     */
+    @Test
+    fun theRegistryReportsEveryEngineTheMissingOnesAndTheConflicts() {
+        val registry = CYLTabBarItemAnimatorRegistry()
+        assertEquals(listOf("Lottie", "PAG", "Rive", "SVGA", "GIF"), registry.missingKnownIdentifiers())
+        registry.registerAnimator(StatusAnimator("PAG", listOf("pag")))
+        registry.registerAnimator(StatusAnimator("Lottie", listOf("json"), CYLTabBarItemAnimatorPriorityFallback))
+        registry.registerAnimator(StatusAnimator("GIF", listOf("gif")))
+        assertEquals(listOf("PAG", "GIF", "Lottie"), registry.registeredIdentifiers())
+        assertTrue(registry.isAnimatorRegisteredWithIdentifier("GIF"))
+        assertFalse(registry.isAnimatorRegisteredWithIdentifier("Rive"))
+        assertEquals(listOf("Rive", "SVGA"), registry.missingKnownIdentifiers())
+        assertTrue(registry.conflictDescriptions().isEmpty())
+        val report = registry.registrationReport()
+        assertTrue(report, report.contains("3 registered"))
+        assertTrue(report, report.contains("✅ PAG"))
+        assertTrue(report, report.contains("app.rive:rive-android"))
+
+        registry.registerAnimator(StatusAnimator("MyGIF", listOf("GIF", "webp")))
+        assertEquals(1, registry.conflictDescriptions().size)
+        assertTrue(registry.conflictDescriptions().first().startsWith("GIF and MyGIF both claim .gif"))
+        registry.registerAnimator(StatusAnimator("MyGIF", listOf("gif"), 10))
+        assertTrue(registry.conflictDescriptions().isEmpty())
+        assertEquals("MyGIF", registry.animatorForURL("/data/a.gif")?.identifier)
+    }
 }

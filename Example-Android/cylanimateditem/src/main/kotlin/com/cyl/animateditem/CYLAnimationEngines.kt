@@ -78,6 +78,22 @@ object CYLAnimationEngines {
     fun isAvailable(type: String?): Boolean = types.firstOrNull { it.name == type }?.isAvailable?.invoke() == true
 
     /**
+     * [EN] The types this component knows, in a fixed order: "Lottie", "PAG", "Rive", "SVGA", "GIF"; each is also its
+     *      animator's identifier in `CYLTabBarItemAnimatorRegistry`. iOS: `CYLAnimationKnownTypes()`.
+     * [CN] 组件已知的类型，顺序固定；每个名称也是其 animator 在注册表中的名称。iOS：`CYLAnimationKnownTypes()`。
+     */
+    @JvmStatic
+    fun knownTypes(): List<String> = types.map { it.name }
+
+    /**
+     * [EN] The Gradle dependency that brings the library of `type` (empty for GIF, decoded by the platform); null when
+     *      unknown. iOS: `CYLAnimationSubspecOfType()`.
+     * [CN] 提供 `type` 动画库的 Gradle 依赖（GIF 由系统解码，为空字符串）；未知类型为 null。iOS：`CYLAnimationSubspecOfType()`。
+     */
+    @JvmStatic
+    fun dependencyOf(type: String?): String? = types.firstOrNull { it.name == type }?.dependency
+
+    /**
      * [EN] In a debuggable app, logs once per type that a file cannot play because its library is missing, with the
      *      dependency to add; the item shows its static image, or the placeholder. Nothing in release builds, for an
      *      unknown type, or when the library is there.

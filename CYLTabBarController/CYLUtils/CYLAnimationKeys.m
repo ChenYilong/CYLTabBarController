@@ -136,6 +136,31 @@ BOOL CYLAnimationTypeIsAvailable(NSString *type) {
 #endif
 }
 
+NSArray<NSString *> *CYLAnimationKnownTypes(void) {
+    return [CYLAnimationTypeTable() valueForKey:@"type"];
+}
+
+/// [EN] The table entry of `type`, or nil. [CN] `type` 在表中的条目；没有时为 nil。
+static NSDictionary<NSString *, id> *CYLAnimationTypeEntry(NSString *type) {
+    if (type.length == 0) {
+        return nil;
+    }
+    for (NSDictionary<NSString *, id> *entry in CYLAnimationTypeTable()) {
+        if ([entry[@"type"] isEqualToString:type]) {
+            return entry;
+        }
+    }
+    return nil;
+}
+
+NSString *CYLAnimationSubspecOfType(NSString *type) {
+    return CYLAnimationTypeEntry(type)[@"pod"];
+}
+
+NSArray<NSString *> *CYLAnimationFileExtensionsOfType(NSString *type) {
+    return CYLAnimationTypeEntry(type)[@"extensions"] ?: @[];
+}
+
 void CYLAnimationWarnMissingEngine(NSDictionary *attributes, NSURL *fileURL) {
 #if defined(DEBUG)
     NSString *type = CYLAnimationTypeOfFile(attributes, fileURL);
@@ -153,12 +178,7 @@ void CYLAnimationWarnMissingEngine(NSDictionary *attributes, NSURL *fileURL) {
         }
         [warned addObject:type];
     }
-    NSString *pod = @"";
-    for (NSDictionary *entry in CYLAnimationTypeTable()) {
-        if ([entry[@"type"] isEqualToString:type]) {
-            pod = entry[@"pod"];
-        }
-    }
+    NSString *pod = CYLAnimationSubspecOfType(type) ?: @"";
     NSLog(@"⚠️ [CYLAnimatedItem] %@ animation (%@) cannot play: the %@ engine is not in this build. Showing the static image, or the placeholder without one. Add pod 'CYLAnimatedItem/%@' (with CYLTabBarController: pod 'CYLTabBarController/%@'). This message is shown in debug builds only.",
           type, fileURL.lastPathComponent ?: @"?", type, pod, pod);
 #endif

@@ -8,10 +8,43 @@
 #import <XCTest/XCTest.h>
 #import <CYLTabBarController/CYLTabBarController.h>
 #import "../CYLTabBarController/CYLAnimatedItem/CYLAnimatedItemView.h"
+#if CYL_ANIMATION_ENGINE_AVAILABLE
+#import "../CYLTabBarController/CYLTabBarItemAnimation/CYLTabBarItemAnimatorRegistry.h"
+#endif
 
 // [EN] Declared in CYLTabBarItemAnimatorRegistry.h (the engine), not in the umbrella header.
 // [CN] 声明于 CYLTabBarItemAnimatorRegistry.h（引擎），不在总头文件中。
 FOUNDATION_EXTERN BOOL CYLTabBarItemAnimationURLMayBeLottie(NSURL *_Nullable URL, BOOL acceptsDotLottie);
+
+#if CYL_ANIMATION_ENGINE_AVAILABLE
+/*
+ * [EN] An animator that only matches by extension, for the registry's engine status. [CN] 只按扩展名匹配的 animator，用于注册表的引擎状态。
+ */
+@interface CYLAnimatedItemStatusAnimator : NSObject <CYLTabBarItemAnimator>
+@property (nonatomic, copy) NSString *identifier;
+@property (nonatomic, copy) NSArray<NSString *> *fileExtensions;
+@property (nonatomic, assign) CYLTabBarItemAnimatorPriority priority;
+@end
+
+@implementation CYLAnimatedItemStatusAnimator
++ (instancetype)animatorWithIdentifier:(NSString *)identifier extensions:(NSArray<NSString *> *)extensions priority:(CYLTabBarItemAnimatorPriority)priority {
+    CYLAnimatedItemStatusAnimator *animator = [[self alloc] init];
+    animator.identifier = identifier;
+    animator.fileExtensions = extensions;
+    animator.priority = priority;
+    return animator;
+}
+- (BOOL)canAnimateFileAtURL:(NSURL *)URL {
+    return [self.fileExtensions containsObject:URL.pathExtension.lowercaseString];
+}
+- (UIView *)animationViewWithURL:(NSURL *)URL size:(CGSize)size contentMode:(UIViewContentMode)contentMode {
+    return nil;
+}
+- (id<CYLTabBarItemAnimationPlayer>)playerForAnimationView:(UIView *)view {
+    return nil;
+}
+@end
+#endif
 
 #if CYL_ANIMATION_ENGINE_AVAILABLE
 /*
@@ -459,5 +492,63 @@ FOUNDATION_EXTERN BOOL CYLTabBarItemAnimationURLMayBeLottie(NSURL *_Nullable URL
     XCTAssertTrue(CYLTabBarItemAnimationURLMayBeLottie(changing, NO));
     [[NSFileManager defaultManager] removeItemAtPath:folder error:NULL];
 }
+
+#pragma mark - Several engines: status, missing engines, conflicts
+
+#if CYL_ANIMATION_ENGINE_AVAILABLE
+/*!
+ * [EN] Several engines in one registry: the integrator sees which are in, which known ones are missing (with the pod to
+ *      add), and the conflicts; a change posts a notification. Uses its own registry, so the shared one is untouched.
+ * [CN] 一个注册表中的多个引擎：接入方可以看到哪些已接入、哪些已知引擎缺少（以及需要加入的 pod）和冲突；变化时发送通知。使用独立的注册表，
+ *      不影响共享注册表。
+ */
+- (void)testTheRegistryReportsEveryEngineAndTheMissingOnes {
+    CYLTabBarItemAnimatorRegistry *registry = [[CYLTabBarItemAnimatorRegistry alloc] init];
+    XCTAssertEqualObjects([registry registeredIdentifiers], @[]);
+    XCTAssertEqualObjects([registry missingKnownIdentifiers], (@[ @"Lottie", @"PAG", @"Rive", @"SVGA", @"GIF" ]));
+
+    XCTestExpectation *changed = [self expectationForNotification:CYLTabBarItemAnimatorRegistryDidChangeNotification object:registry handler:^BOOL(NSNotification *note) {
+        return [note.userInfo[CYLTabBarItemAnimatorRegistryIdentifierKey] isEqualToString:@"PAG"];
+    }];
+    [registry registerAnimator:[CYLAnimatedItemStatusAnimator animatorWithIdentifier:@"PAG" extensions:@[ @"pag" ] priority:CYLTabBarItemAnimatorPriorityDefault]];
+    [self waitForExpectations:@[ changed ] timeout:1];
+    [registry registerAnimator:[CYLAnimatedItemStatusAnimator animatorWithIdentifier:@"Lottie" extensions:@[ @"json", @"lottie" ] priority:CYLTabBarItemAnimatorPriorityFallback]];
+    [registry registerAnimator:[CYLAnimatedItemStatusAnimator animatorWithIdentifier:@"Rive" extensions:@[ @"riv" ] priority:CYLTabBarItemAnimatorPriorityDefault]];
+
+    XCTAssertEqualObjects([registry registeredIdentifiers], (@[ @"PAG", @"Rive", @"Lottie" ]), @"lookup order: priority, then registration");
+    XCTAssertTrue([registry isAnimatorRegisteredWithIdentifier:@"Rive"]);
+    XCTAssertFalse([registry isAnimatorRegisteredWithIdentifier:@"SVGA"]);
+    XCTAssertEqualObjects([registry missingKnownIdentifiers], (@[ @"SVGA", @"GIF" ]));
+    XCTAssertEqualObjects([registry conflictDescriptions], @[]);
+
+    NSString *report = [registry registrationReport];
+    XCTAssertTrue([report containsString:@"3 registered"], @"%@", report);
+    XCTAssertTrue([report containsString:@"✅ Rive"], @"%@", report);
+    XCTAssertTrue([report containsString:@".json .lottie"], @"%@", report);
+    XCTAssertTrue([report containsString:@"pod 'CYLAnimatedItem/SVGA'"], @"%@", report);
+    XCTAssertFalse([report containsString:@"➖ PAG"], @"%@", report);
+
+    [registry unregisterAnimatorWithIdentifier:@"Rive"];
+    XCTAssertEqualObjects([registry missingKnownIdentifiers], (@[ @"Rive", @"SVGA", @"GIF" ]));
+}
+
+/*!
+ * [EN] Two engines of the same priority that claim one extension are a conflict (the +load order decides, and it is not
+ *      fixed); another priority settles it. [CN] 相同优先级的两个引擎声明同一扩展名即为冲突（由不固定的 +load 顺序决定）；不同优先级即可解决。
+ */
+- (void)testTwoEnginesClaimingOneExtensionAtOnePriorityAreAConflict {
+    CYLTabBarItemAnimatorRegistry *registry = [[CYLTabBarItemAnimatorRegistry alloc] init];
+    [registry registerAnimator:[CYLAnimatedItemStatusAnimator animatorWithIdentifier:@"GIF" extensions:@[ @"gif" ] priority:CYLTabBarItemAnimatorPriorityDefault]];
+    [registry registerAnimator:[CYLAnimatedItemStatusAnimator animatorWithIdentifier:@"MyGIF" extensions:@[ @"GIF", @"webp" ] priority:CYLTabBarItemAnimatorPriorityDefault]];
+    NSArray<NSString *> *conflicts = [registry conflictDescriptions];
+    XCTAssertEqual(conflicts.count, 1u);
+    XCTAssertTrue([conflicts.firstObject containsString:@"GIF and MyGIF both claim .gif"], @"%@", conflicts);
+    XCTAssertTrue([[registry registrationReport] containsString:@"⚠️"]);
+
+    [registry registerAnimator:[CYLAnimatedItemStatusAnimator animatorWithIdentifier:@"MyGIF" extensions:@[ @"gif" ] priority:10]];
+    XCTAssertEqualObjects([registry conflictDescriptions], @[]);
+    XCTAssertEqualObjects([[registry animatorForURL:[NSURL fileURLWithPath:@"/tmp/a.gif"]] identifier], @"MyGIF", @"the higher priority wins");
+}
+#endif
 
 @end
