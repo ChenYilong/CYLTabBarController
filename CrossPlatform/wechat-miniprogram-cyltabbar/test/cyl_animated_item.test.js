@@ -201,3 +201,10 @@ test('title color, font size and line count', () => {
   assert.equal(model({ title: 'A', titleLines: 0 }).titleLinesClass, 'cyl-animated-item-title-wrap')
   assert.equal(model({ title: 'A', titleLines: -3 }).titleLinesClass, '')
 })
+
+test('title line height and spacing; spacing follows the axis', () => {
+  const { cylAnimatedItemModel: model } = require('../src/cyl-animated-item/cyl_animated_item_model')
+  assert.equal(model({ title: 'A', titleSpacing: -1 }).titleStyle, '')
+  assert.equal(model({ title: 'A', axis: 'vertical', titleLineHeight: 22, titleSpacing: 12 }).titleStyle, 'line-height: 22px;margin-top: 12px;')
+  assert.equal(model({ title: 'A', axis: 'horizontal', titleSpacing: 0 }).titleStyle, 'margin-left: 0px;')
+})

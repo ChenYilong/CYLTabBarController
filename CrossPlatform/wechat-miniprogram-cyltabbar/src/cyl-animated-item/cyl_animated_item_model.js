@@ -111,7 +111,12 @@ function cylAnimatedItemModel(p) {
   const titleLines = Number.isFinite(Number(p.titleLines)) && Number(p.titleLines) >= 0 ? Math.floor(Number(p.titleLines)) : 1
   const titleStyle = (p.titleColor ? `color: ${p.titleColor};` : '') +
     (Number(p.titleFontSize) > 0 ? `font-size: ${Number(p.titleFontSize)}px;` : '') +
-    (titleLines > 1 ? `-webkit-line-clamp: ${titleLines};` : '')
+    (titleLines > 1 ? `-webkit-line-clamp: ${titleLines};` : '') +
+    (Number(p.titleLineHeight) > 0 ? `line-height: ${Number(p.titleLineHeight)}px;` : '') +
+    // [EN] The gap between the icon and the title (margin-top when vertical, margin-left when horizontal); -1 keeps the
+    //      default (2 px / 4 px). [CN] 图标与标题的间距（纵向为 margin-top，横向为 margin-left）；-1 为默认（2 px / 4 px）。
+    (Number(p.titleSpacing) >= 0 && p.titleSpacing !== null && p.titleSpacing !== undefined && p.titleSpacing !== ''
+      ? `${p.axis === 'vertical' ? 'margin-top' : 'margin-left'}: ${Number(p.titleSpacing)}px;` : '')
   const titleLinesClass = titleLines === 1 ? '' : (titleLines > 1 ? 'cyl-animated-item-title-wrap cyl-animated-item-title-clamp' : 'cyl-animated-item-title-wrap')
   return {
     title,

@@ -61,6 +61,8 @@
 }
 .cyl-animated-item-vertical .cyl-animated-item-title {
   margin-top: 2px;
+  /* [EN] Wrapped lines are centred under the icon. [CN] 换行后的每一行在图标下方居中。 */
+  text-align: center;
 }
 .cyl-animated-item-title {
   font-size: 14px;

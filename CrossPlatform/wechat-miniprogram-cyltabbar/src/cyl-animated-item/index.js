@@ -112,6 +112,17 @@ Component({
      * [CN] 标题行数：1 为单行省略（默认），0 为不限，n > 1 为最多 n 行后省略。
      */
     titleLines: { type: Number, value: 1 },
+    /**
+     * [EN] The title's line height in px; 0 keeps the default.
+     * [CN] 标题行高（px）；0 时为默认值。
+     */
+    titleLineHeight: { type: Number, value: 0 },
+    /**
+     * [EN] The gap between the icon and the title in px (below the icon when vertical, beside it when horizontal); -1
+     *      keeps the default 2 px (vertical) / 4 px (horizontal).
+     * [CN] 图标与标题的间距（px；纵向在图标下方，横向在图标旁）；-1 为默认的 2 px（纵向）/ 4 px（横向）。
+     */
+    titleSpacing: { type: Number, value: -1 },
     iconWidth: { type: Number, value: 0 },
     iconHeight: { type: Number, value: 0 },
     bare: { type: Boolean, value: false },
@@ -148,7 +159,7 @@ Component({
       this.setData({ animationLoaded: false, animationFailed: false, gifPlaying: false, lottieData })
       this.cyl_update()
     },
-    'title, image, selectedImage, placeholderImage, embedded, enabled, axis, iconSize, accessoryImage, accessoryText, accessoryAccessibilityLabel, accessoryPlacement, accessibilityLabel, gifFirstFrame, gifLastFrame, iconWidth, iconHeight, iconTint, titleColor, titleFontSize, titleLines': function () {
+    'title, image, selectedImage, placeholderImage, embedded, enabled, axis, iconSize, accessoryImage, accessoryText, accessoryAccessibilityLabel, accessoryPlacement, accessibilityLabel, gifFirstFrame, gifLastFrame, iconWidth, iconHeight, iconTint, titleColor, titleFontSize, titleLines, titleLineHeight, titleSpacing': function () {
       this.cyl_update()
     },
     'selected, restingProgress': function () {
