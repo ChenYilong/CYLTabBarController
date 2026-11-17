@@ -74,7 +74,10 @@ launch) stays hung until it is restarted. When one does not open at all, restart
    - HarmonyOS: stop the emulator and start it again (DevEco Studio's Device Manager, or its emulator command line),
      then check it with `hdc list targets` (in Git Bash set `MSYS_NO_PATHCONV=1`).
    - iOS: `xcrun simctl shutdown <udid>` then `xcrun simctl boot <udid>`; `xcrun simctl list devices` lists them.
-4. Tell the other sessions when it is back.
+4. After every restart, tell **all active sessions** (list them with `ListAgents`; not only the ones that used the
+   device) that the emulator is available again, naming the device, and ask each to resume any task it paused
+   because the emulator could not start or was hung. For example: "emulator-5556 is restarted and available again;
+   please resume any task you paused because it could not start."
 5. If it hangs again after the restart, look for the cause, for example another process that polls `adb` in a loop
    (on Windows, `Get-CimInstance Win32_Process -Filter "name='adb.exe'"` shows each command line), and report it to
    the user and to that session.

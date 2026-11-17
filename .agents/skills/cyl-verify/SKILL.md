@@ -236,4 +236,5 @@ example and record the reason in `docs/Example-Layer-Fixes.md` (see AGENTS.md, "
 Start every task with the `cyl-task-workflow` skill: check the other sessions, a `TODO` list with the current branch
 at the top, the task and its rubric (100 = full marks, 60 = pass) in `docs/`, work until the score passes, and the
 missing points as `TODO` at the end. A hung or unopenable emulator or simulator: tell the other sessions that use it,
-then restart it from the command line without asking ("Hung emulator" in that skill).
+then restart it from the command line without asking, and afterwards tell all active sessions it is available again
+so that they resume tasks paused because of it ("Hung emulator" in that skill).

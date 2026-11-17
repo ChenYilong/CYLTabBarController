@@ -107,5 +107,6 @@ example and record the reason in `docs/Example-Layer-Fixes.md` (see AGENTS.md, "
 ## Hung emulator (added 2026-11-18)
 
 When the HarmonyOS emulator hangs or does not open, restart it first, without asking the user: tell the other sessions
-that use it, restart it, check `hdc list targets`, and tell them it is back. Details: the `cyl-task-workflow` skill,
+that use it, restart it, check `hdc list targets`, then tell all active sessions it is available again so that they resume tasks paused
+because of it. Details: the `cyl-task-workflow` skill,
 "Hung emulator".
