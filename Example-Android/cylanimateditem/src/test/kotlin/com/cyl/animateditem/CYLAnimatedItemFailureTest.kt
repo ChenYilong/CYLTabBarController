@@ -127,6 +127,25 @@ class CYLAnimatedItemFailureTest {
     }
 
     @Test
+    fun withAStaticImageEveryFailureShowsTheImageNotThePlaceholder() {
+        val activity = activity()
+        val image = ColorDrawable(Color.BLUE)
+        val item = hosted(activity, CYLAnimatedItemView(activity).apply { this.image = image; title = "Home" })
+        val placeholder = CYLAnimatedItemView.defaultPlaceholderImage(activity)
+        item.animationURL = File(activity.cacheDir, "missing.json").absolutePath
+        assertSame("missing file: the static image", image, item.iconView.drawable)
+        item.animationURL = tempFile(activity, "empty2.json", ByteArray(0)).absolutePath
+        assertSame("empty file: the static image", image, item.iconView.drawable)
+        item.animationURL = tempFile(activity, "broken2.gif", "not a gif".toByteArray()).absolutePath
+        idle()
+        assertSame("corrupted file: the static image", image, item.iconView.drawable)
+        item.animationURL = "file:///android_asset/missing.lottie"
+        assertSame("unknown type: the static image", image, item.iconView.drawable)
+        assertFalse(placeholder === item.iconView.drawable)
+        assertEquals(View.VISIBLE, item.iconView.visibility)
+    }
+
+    @Test
     fun aReportForAnOldViewIsIgnored() {
         val activity = activity()
         val source = CountingSource()

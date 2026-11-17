@@ -285,6 +285,20 @@
     XCTAssertEqual(item.imageView.image, image, @"with a static image, the image is the fallback");
 }
 
+- (void)testWithAStaticImageAMissingFileShowsTheImageNotThePlaceholder {
+    CYLAnimatedItemView *item = [[CYLAnimatedItemView alloc] initWithFrame:CGRectMake(0, 0, 200, 44)];
+    item.animationSource = [[CYLAnimatedItemFakeSource alloc] init];
+    UIImage *image = [self icon];
+    item.image = image;
+    item.placeholderImage = [self icon];
+    NSString *missing = [NSTemporaryDirectory() stringByAppendingPathComponent:@"cyl-missing-with-image.fake"];
+    [[NSFileManager defaultManager] removeItemAtPath:missing error:NULL];
+    item.animationURL = [NSURL fileURLWithPath:missing];
+    XCTAssertEqual(item.imageView.image, image, @"the placeholder is only for an item without a static image");
+    item.animationURL = [NSURL URLWithString:@"https://example.com/home.unknown"];
+    XCTAssertEqual(item.imageView.image, image);
+}
+
 - (void)testAFailureOfAnOldAnimationIsIgnored {
     CYLAnimatedItemView *item = [[CYLAnimatedItemView alloc] initWithFrame:CGRectMake(0, 0, 200, 44)];
     item.animationSource = [[CYLAnimatedItemFakeSource alloc] init];
