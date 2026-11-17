@@ -927,7 +927,9 @@ class CYLRiveTabBarItemAnimationView internal constructor(context: Context, priv
     private val stateMachine get() = options[CYLTabBarItemAnimationKeys.CYLTabBarAnimationOptionRiveStateMachine]
     private val booleanInput get() = options[CYLTabBarItemAnimationKeys.CYLTabBarAnimationOptionRiveInput] ?: options[CYLTabBarItemAnimationKeys.CYLTabBarAnimationOptionRiveActiveProperty] ?: "active"
     private val activeDuration get() = options[CYLTabBarItemAnimationKeys.CYLTabBarAnimationOptionRiveActiveDuration]?.toDoubleOrNull() ?: 1.0
-    /** [EN] Plays again after each pass (`cyl_setAnimationViewLoops`). [CN] 每次播放后再次播放（`cyl_setAnimationViewLoops`）。 */
+    /**
+     * [EN] Plays again after each pass (`cyl_setAnimationViewLoops`). [CN] 每次播放后再次播放（`cyl_setAnimationViewLoops`）。
+     */
     private var loops = false
     private val loopRunnable = Runnable { if (loops) cyl_playAnimationView() }
 
@@ -1036,13 +1038,17 @@ class CYLRiveTabBarItemAnimationView internal constructor(context: Context, priv
         if (loops) handler.postDelayed(loopRunnable, (loopSeconds(machine, trigger) * 1000).toLong())
     }
 
-    /** [EN] `cyl_setAnimationViewLoops`. [CN] `cyl_setAnimationViewLoops`。 */
+    /**
+     * [EN] `cyl_setAnimationViewLoops`. [CN] `cyl_setAnimationViewLoops`。
+     */
     override fun cyl_setAnimationViewLoops(loops: Boolean) {
         this.loops = loops
         if (!loops) handler.removeCallbacks(loopRunnable)
     }
 
-    /** [EN] A loop pass: after the input goes back to false (plus a pause), else LOOP_SECONDS. [CN] 一次循环：输入恢复为 false 之后（再停顿一下），否则 LOOP_SECONDS。 */
+    /**
+     * [EN] A loop pass: after the input goes back to false (plus a pause), else LOOP_SECONDS. [CN] 一次循环：输入恢复为 false 之后（再停顿一下），否则 LOOP_SECONDS。
+     */
     private fun loopSeconds(machine: String?, trigger: String?): Double =
         if (machine != null && trigger == null && activeDuration > 0) activeDuration + LOOP_PAUSE_SECONDS else LOOP_SECONDS
 
@@ -1063,11 +1069,17 @@ class CYLRiveTabBarItemAnimationView internal constructor(context: Context, priv
          * [EN] The `tint` option value that follows the tab's title color. [CN] 跟随 Tab 标题颜色的 `tint` 选项值。
          */
         const val TINT_TITLE = "title"
-        /** [EN] Seconds of a loop pass when the file gives none. [CN] 文件未给出时一次循环的秒数。 */
+        /**
+         * [EN] Seconds of a loop pass when the file gives none. [CN] 文件未给出时一次循环的秒数。
+         */
         const val LOOP_SECONDS = 1.5
-        /** [EN] The pause after an input goes back to false, before the next pass. [CN] 输入恢复为 false 后、下一次播放前的停顿。 */
+        /**
+         * [EN] The pause after an input goes back to false, before the next pass. [CN] 输入恢复为 false 后、下一次播放前的停顿。
+         */
         const val LOOP_PAUSE_SECONDS = 0.4
-        /** [EN] A frame later: the state machine sees the reset or the false first. [CN] 一帧之后：状态机先看到重置或 false。 */
+        /**
+         * [EN] A frame later: the state machine sees the reset or the false first. [CN] 一帧之后：状态机先看到重置或 false。
+         */
         internal const val NEXT_FRAME_MS = 50L
     }
 
