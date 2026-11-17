@@ -6,7 +6,7 @@
  */
 const test = require('node:test')
 const assert = require('node:assert/strict')
-const { cylAnimatedItemModel, cylAnimatedItemType, cylAnimatedItemPackage, CYL_ANIMATED_ITEM_PLACEHOLDER } = require('../src/cyl-animated-item/cyl_animated_item_model')
+const { cylAnimatedItemModel, cylAnimatedItemType, cylAnimatedItemPackage, cylAnimatedItemRestingProgress, cylAnimatedItemGifSource, CYL_ANIMATED_ITEM_PLACEHOLDER } = require('../src/cyl-animated-item/cyl_animated_item_model')
 
 test('the animation type from the extension', () => {
   assert.deepEqual(['a.json', 'a.lottie', 'a.pag', 'a.riv', 'a.svga', 'a.gif', 'a.png', 'https://x/a.riv#artboard=HOME', ''].map(cylAnimatedItemType),
@@ -67,4 +67,33 @@ test('layout, accessory and accessibility', () => {
   assert.equal(m.ariaDisabled, true)
   assert.equal(cylAnimatedItemModel({ title: 'Tag', accessibilityLabel: 'Tag, 3 new' }).ariaLabel, 'Tag, 3 new')
   assert.equal(cylAnimatedItemModel({ accessoryPlacement: 'nowhere', accessoryText: 'x' }).accessoryPlacement, 'trailing')
+})
+
+test('Lottie data instead of a file: a Lottie engine, the placeholder until it is ready', () => {
+  const m = cylAnimatedItemModel({ animationData: { v: '5.7', layers: [] } })
+  assert.equal(m.animationType, 'lottie')
+  assert.equal(m.usesEngine, true)
+  assert.equal(m.fallbackImage, CYL_ANIMATED_ITEM_PLACEHOLDER)
+  assert.equal(cylAnimatedItemModel({ animationData: { v: '5.7' }, animationLoaded: true }).fallbackImage, '')
+  assert.equal(cylAnimatedItemModel({ animationData: { v: '5.7' }, animationFailed: true }).usesEngine, false)
+})
+
+test('the resting progress and frame: the last while selected, else restingProgress in 0...1', () => {
+  assert.equal(cylAnimatedItemRestingProgress({}), 0)
+  assert.equal(cylAnimatedItemRestingProgress({ restingProgress: 0.4 }), 0.4)
+  assert.equal(cylAnimatedItemRestingProgress({ restingProgress: 3 }), 1)
+  assert.equal(cylAnimatedItemRestingProgress({ restingProgress: -1 }), 0)
+  assert.equal(cylAnimatedItemRestingProgress({ restingProgress: 0.4, selected: true }), 1)
+  assert.equal(cylAnimatedItemModel({ animationUrl: 'a.json' }).restingFrame, 'first')
+  assert.equal(cylAnimatedItemModel({ animationUrl: 'a.json', selected: true }).restingFrame, 'last')
+})
+
+test('GIF stills: the first frame at rest, the last while selected, the GIF while it plays', () => {
+  const p = { animationUrl: 'star.gif', gifFirstFrame: 'first.png', gifLastFrame: 'last.png' }
+  assert.equal(cylAnimatedItemModel(p).gifPath, 'first.png')
+  assert.equal(cylAnimatedItemModel({ ...p, selected: true }).gifPath, 'last.png')
+  assert.equal(cylAnimatedItemModel({ ...p, restingProgress: 1 }).gifPath, 'last.png')
+  assert.equal(cylAnimatedItemModel({ ...p, gifPlaying: true }).gifPath, 'star.gif')
+  assert.equal(cylAnimatedItemGifSource({ gifLastFrame: 'last.png' }, 'star.gif'), 'last.png', 'a missing still uses the other one')
+  assert.equal(cylAnimatedItemGifSource({}, 'star.gif'), 'star.gif', 'without stills the GIF plays, as before')
 })

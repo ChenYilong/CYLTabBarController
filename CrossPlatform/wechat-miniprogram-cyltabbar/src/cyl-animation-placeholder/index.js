@@ -16,6 +16,8 @@ const cylNothing = function () {}
 Component({
   properties: {
     path: { type: String, value: '' },
+    animationData: { type: Object, value: null },
+    wasmPath: { type: String, value: '' },
     loop: { type: Boolean, value: false },
     autoplay: { type: Boolean, value: true },
     restingFrame: { type: String, value: 'first' },
@@ -26,9 +28,9 @@ Component({
 
   lifetimes: {
     ready() {
-      if (this.data.path) {
+      if (this.data.path || this.data.animationData) {
         this.triggerEvent('error', {
-          message: `cyl-tab-bar: no animation component for '${this.data.path}'; install its package and set the generic (see README).`,
+          message: `cyl-tab-bar: no animation component for '${this.data.path || 'animation data'}'; install its package and set the generic (see README).`,
         })
       }
     },
