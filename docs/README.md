@@ -221,7 +221,7 @@ docs/
 │   ├── animated-item-flutter-rive-switch-before.png
 │   ├── animated-item-harmonyos-lottie-done.png
 │   ├── animated-item-harmonyos-lottie-playing.png
-│   ├── animated-item-harmonyos-spacing-before.jpeg
+│   ├── animated-item-harmonyos-spacing-before.png
 │   ├── animated-item-harmonyos-tabbar.jpeg
 │   ├── animated-item-ios-demo-interactive-ios27.2.png
 │   ├── animated-item-ios-rive-loop-before-after.png
