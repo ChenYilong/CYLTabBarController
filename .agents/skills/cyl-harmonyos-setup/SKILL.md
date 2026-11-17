@@ -103,3 +103,9 @@ Change the core code (the code published to CocoaPods, Swift Package Manager, Ma
 the WeChat Mini Program component) so that the whole class of bug is avoided; a fix only in the example layer is the
 worst option. If the core cannot fix it, ask the owner first and explain why; after the owner agrees, fix it in the
 example and record the reason in `docs/Example-Layer-Fixes.md` (see AGENTS.md, "Code rules").
+
+## Hung emulator (added 2026-11-18)
+
+When the HarmonyOS emulator hangs or does not open, restart it first, without asking the user: tell the other sessions
+that use it, restart it, check `hdc list targets`, and tell them it is back. Details: the `cyl-task-workflow` skill,
+"Hung emulator".

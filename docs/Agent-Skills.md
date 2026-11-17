@@ -41,6 +41,7 @@
 | `cyl-api-map` | 功能与文档的对照表 | Which document holds which feature |
 | `cyl-docs` | 文档规则 | Documentation rules |
 | `cyl-verify` | 构建、测试、模拟器与常见问题 | Build, test, simulator and common failures |
+| `cyl-task-workflow` | 开始任务：先查看其他会话、顶部 TODO 与当前分支、任务文档与评分；模拟器卡死时重启 | Starting a task: other sessions, the TODO header with the branch, the task document and its score; restarting a hung emulator |
 
 | 中文 | English |
 |:---|:---|
@@ -77,3 +78,7 @@
 | 中文 | English |
 |:---|:---|
 | **DONE**（2026-11-16）：每个有提交的分支必须有 open 的 PR 的规则（全英文）写入 `AGENTS.md` “Git and pull requests” 与 skill `cyl-verify`。用户原话：「写入instructions相关文件，skills相关指令，找到commit 的相关章节，没有的话就新建，保证写入成功：全英文写入：创建分支后有任何commit必须提交pr。不允许只新建分支，持续向该分支commit代码，但不创建pr。因为不创建pr会导致该分支上的所有commit代码全部被忽略。 commit前必须检查该分支pr是否处于open状态，如果不处于open状态必须新建pr。target 目标优先设置为 在创建pr前的活跃pr，如果没有才设置为master分支。如果open状态的pr已经超过两个，那么就要慎重，你需要询问我，是否新建分支创建pr还是保持在本分支继续提交。因为超过两个分支会导致代码合并困难，无法合理分配分支的目标分支。」 | **DONE** (2026-11-16): the rule that every branch with commits has an open pull request (English), added to `AGENTS.md` "Git and pull requests" and the `cyl-verify` skill. |
+
+| 中文 | English |
+|:---|:---|
+| **DONE**（2026-11-18，分支 feat/cross-platform-components，评分 100/100）：任务开始规则（先查看其他会话、顶部 TODO 与当前分支、docs 任务与评分标准、不及格不中断、末尾打印缺失分数 TODO）与模拟器卡死重启规则（先通知其他会话，再直接命令行重启，无须询问），全英文写入 `AGENTS.md`（“Git and pull requests”，接在 “Record every task in `docs/`” 之后）、新 skill `cyl-task-workflow`，以及 `cyl-verify`、`cyl-harmonyos-setup`。评分标准：100 = 规则写入 AGENTS.md 与 skill，`sync-agent-skills.py --check` 在 `cyl-*` skill 上无问题（Windows 检出中第三方 skill 的哈希与 `.claude/skills` 符号链接报错，原因是 `core.autocrlf=true` 与 `core.symlinks=false`，与本改动无关），已提交推送；60 = 规则写入 AGENTS.md。用户原话：「找到本项目instructions 相关文件以及skills相关文件，如果没有就新增文件保证写入成功，全英文写入：找到开始任务先标注todo写入文档的相关描述没有就新建该规则，如果有就插入以下规则：开始任务前总是在任务顶部标注TODO 以及当前分支，并找到合适的文档将任务写进docs文档以及验收评分标准什么是满分，什么什么是及格，不达到及格不允许中断任务，一直打分到及格为止。并标注为什么打不到满分，并将缺失的分数以TODO的形式打印在会话结束末端。并更新任务开始时写入的文档。看看 check other sessions first read their task ，第一步看看有没有session在编辑相同分支，如果没有就继续，如果有继续坚持任务是否重复。usually marked as TODO at top of 会话， 遇到 emulator stays hung until it's restarted,  please tell the other sessions first, then restart it. 遇到模拟器打不开的情况优先使用重启策略。无须询问是否重启直接命令行执行重启。」 | **DONE** (2026-11-18, branch feat/cross-platform-components, score 100/100): the task-start rule (check other sessions, a TODO header with the branch, the task and its rubric in `docs/`, no stopping below the pass mark, missing points printed as TODO at the end) and the hung-emulator rule (tell the other sessions, then restart from the command line without asking), in English, added to `AGENTS.md` ("Git and pull requests", after "Record every task in `docs/`"), the new skill `cyl-task-workflow`, and the skills `cyl-verify` and `cyl-harmonyos-setup`. Rubric: 100 = rules in AGENTS.md and the skills, `sync-agent-skills.py --check` reports no problem in the `cyl-*` skills (on this Windows checkout it reports the third-party skills' hashes and the `.claude/skills` symlink, because of `core.autocrlf=true` and `core.symlinks=false`, unrelated to this change), committed and pushed; 60 = rules in AGENTS.md. |

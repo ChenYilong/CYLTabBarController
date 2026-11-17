@@ -230,3 +230,10 @@ Change the core code (the code published to CocoaPods, Swift Package Manager, Ma
 the WeChat Mini Program component) so that the whole class of bug is avoided; a fix only in the example layer is the
 worst option. If the core cannot fix it, ask the owner first and explain why; after the owner agrees, fix it in the
 example and record the reason in `docs/Example-Layer-Fixes.md` (see AGENTS.md, "Code rules").
+
+## Task workflow and hung emulators (added 2026-11-18)
+
+Start every task with the `cyl-task-workflow` skill: check the other sessions, a `TODO` list with the current branch
+at the top, the task and its rubric (100 = full marks, 60 = pass) in `docs/`, work until the score passes, and the
+missing points as `TODO` at the end. A hung or unopenable emulator or simulator: tell the other sessions that use it,
+then restart it from the command line without asking ("Hung emulator" in that skill).
