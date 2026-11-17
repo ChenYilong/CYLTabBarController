@@ -207,6 +207,7 @@ docs/
 │   ├── animated-item-android-demo-page.png
 │   ├── animated-item-android-demo.png
 │   ├── animated-item-android-gif-tabs.png
+│   ├── animated-item-android-tab-badges.png
 │   ├── animated-item-demo-ios26.3-en.png
 │   ├── animated-item-demo-ios26.3-zh-Hans.png
 │   ├── animated-item-demo-ios27-en.png

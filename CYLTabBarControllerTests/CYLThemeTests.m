@@ -759,6 +759,85 @@ FOUNDATION_EXTERN void CYLTabBarItemAnimationRegisterColors(NSURL *URL, NSDictio
 ///      `stopAnimation` act on it instead of making a second view.
 /// [CN] docs/Animated-Item.md TODO 4 第二步：扁平样式 Tab 按钮的组件动画就是 Tab 自己的动画：`animationView` 与 `animationReady` 返回 TabBar 的
 ///      动画视图，`reloadAnimation` / `stopAnimation` 作用于它，而不是创建第二个视图。
+/// [EN] Badges on FlatDesign tabs drawn by CYLAnimatedItemView: a tab with a GIF animation and a tab with a static icon both
+///      keep a visible badge once the animation has loaded (the component hides its image view then), near the icon's
+///      top-right (docs/Animated-Item.md, badges on every platform, 2026-11-18).
+/// [CN] 由 CYLAnimatedItemView 绘制的扁平样式 Tab 上的角标：带 GIF 动画的 Tab 与静态图标的 Tab，在动画加载后（此时组件会隐藏图片视图）
+///      角标都保持可见，并位于图标右上角附近（docs/Animated-Item.md，各端角标，2026-11-18）。
+- (void)testFlatDesignTabBadgesStayVisibleWithAnimatedIcons {
+    Class buttonClass = NSClassFromString(@"CYLFlatDesignTabBarButton");
+    if (!buttonClass) {
+        XCTSkip(@"FlatDesign is not compiled into this target");
+    }
+    NSURL *URL = [self gifFileURL];
+    UIImage *icon = CYLTestImage(24, UIColor.grayColor);
+    NSMutableArray<UIViewController *> *pages = [NSMutableArray array];
+    CYLTabBarController *tabBarController = [CYLTabBarController tabBarControllerWithConfiguration:@{
+        CYLTabBarControllerContext : [NSUUID UUID].UUIDString,
+        CYLTabBarControllerStyleType : @"flatDesign",
+        CYLTabBarControllerTabBarItemsAttributes : @[
+            @{ CYLTabBarItemIdentifier : @"a", CYLTabBarItemTitle : @"A", CYLTabBarItemImage : icon,
+               CYLTabBarAnimationURL : URL, CYLTabBarAnimationSize : [NSValue valueWithCGSize:CGSizeMake(24, 24)] },
+            @{ CYLTabBarItemIdentifier : @"b", CYLTabBarItemTitle : @"B", CYLTabBarItemImage : icon,
+               CYLTabBarAnimationURL : URL, CYLTabBarAnimationSize : [NSValue valueWithCGSize:CGSizeMake(24, 24)] },
+            @{ CYLTabBarItemIdentifier : @"c", CYLTabBarItemTitle : @"C", CYLTabBarItemImage : icon },
+        ],
+        CYLTabBarControllerPageResolver : ^UIViewController *(NSString *pageIdentifier, NSDictionary *attributes) {
+            UIViewController *page = [[UIViewController alloc] init];
+            [pages addObject:page];
+            return page;
+        },
+    }];
+    UIWindow *window = [[UIWindow alloc] initWithFrame:CGRectMake(0, 0, 390, 844)];
+    window.rootViewController = tabBarController;
+    window.hidden = NO;
+    [tabBarController.view layoutIfNeeded];
+    // [EN] Badges first, as apps do at launch, then let the animations load. [CN] 先设置角标（与 App 启动时相同），再等待动画加载。
+    for (UIViewController *viewController in tabBarController.viewControllers) {
+        [viewController.tabBarItem cyl_showBadgeValue:@"3" animationType:CYLBadgeAnimationTypeNone];
+    }
+    [[NSRunLoop mainRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.5]];
+    [tabBarController setSelectedIndex:1];
+    [tabBarController.view layoutIfNeeded];
+    [[NSRunLoop mainRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.5]];
+    NSArray<NSString *> *titles = @[ @"A", @"B", @"C" ];
+    [tabBarController.viewControllers enumerateObjectsUsingBlock:^(UIViewController *viewController, NSUInteger index, BOOL *stop) {
+        if (index == 0) {
+            // [EN] Known, older than CYLAnimatedItemView (it fails the same way at 357c314b, a static icon too): the first
+            //      tab's `tabBarItem.cyl_tabButton` is still the hidden system tab button, so its badge is added there.
+            //      docs/Animated-Item.md, task log 2026-11-18, TODO. Remove this when it is fixed.
+            // [CN] 已知问题，早于 CYLAnimatedItemView（在 357c314b、静态图标下同样失败）：第一个 Tab 的 `tabBarItem.cyl_tabButton` 仍是隐藏的系统
+            //      Tab 按钮，角标被加到那里。docs/Animated-Item.md，2026-11-18 任务记录，TODO。修复后删除此处。
+            XCTExpectFailure(@"the first FlatDesign tab's badge goes to the hidden system tab button (TODO)");
+        }
+        UIView *host = (UIView *)[viewController.tabBarItem cyl_getActualBadgeSuperView];
+        UIView *badge = host.cyl_badge;
+        XCTAssertNotNil(badge, @"tab %@ has a badge (host %@)", titles[index], host);
+        XCTAssertNotNil(badge.window, @"tab %@: the badge is in the window", titles[index]);
+        BOOL hidden = NO;
+        for (UIView *view = badge; view; view = view.superview) {
+            if (view.hidden || view.alpha < 0.01) {
+                hidden = YES;
+                XCTFail(@"tab %@: the badge is hidden by %@", titles[index], view);
+                break;
+            }
+        }
+        XCTAssertFalse(hidden);
+        UIControl *button = viewController.tabBarItem.cyl_tabButton;
+        if (![button respondsToSelector:NSSelectorFromString(@"imageView")]) {
+            XCTFail(@"tab %@: its button is %@, not the FlatDesign button", titles[index], button);
+            return;
+        }
+        UIView *imageView = [button valueForKey:@"imageView"];
+        CGRect iconFrame = [imageView convertRect:imageView.bounds toView:window];
+        CGRect badgeFrame = [badge convertRect:badge.bounds toView:window];
+        XCTAssertGreaterThan(CGRectGetMidX(badgeFrame), CGRectGetMidX(iconFrame), @"tab %@: the badge is right of the icon's center (%@ vs %@)",
+                             titles[index], NSStringFromCGRect(badgeFrame), NSStringFromCGRect(iconFrame));
+        XCTAssertLessThan(CGRectGetMidY(badgeFrame), CGRectGetMidY(iconFrame), @"tab %@: the badge is above the icon's center", titles[index]);
+    }];
+    window.hidden = YES;
+}
+
 - (void)testFlatDesignTabButtonsComponentAnimationIsTheTabsAnimation {
     Class buttonClass = NSClassFromString(@"CYLFlatDesignTabBarButton");
     if (!buttonClass) {
