@@ -103,7 +103,7 @@
 // [EN] The animation view protocols (a public header since the Swift migration): the framework's umbrella header must
 //      include it, or Xcode warns "umbrella header ... does not include header"; CocoaPods without the animation
 //      subspec has no such file.
-#if __has_include("CYLTabBarItemAnimation/CYLTabBarItemAnimationPlayableView.h")
+#if __has_include(<CYLAnimatedItem/CYLTabBarItemAnimationPlayableView.h>) || __has_include("CYLTabBarItemAnimation/CYLTabBarItemAnimationPlayableView.h")
 #if __has_include(<CYLAnimatedItem/CYLTabBarItemAnimationPlayableView.h>)
 #import <CYLAnimatedItem/CYLTabBarItemAnimationPlayableView.h>
 #else

@@ -12,7 +12,7 @@
 // [CN] TabBar 的 PAG 工具函数（声明于 CYLPAGTabBarItemAnimator.h）。它基于 Core 的 `CYLTabBarItemsAttributesAddingAnimationFiles()`，因此属于
 //      Core，只有 PAG 子库（`PAG` 或 `PAGEnterprise`，二者不依赖 Core）参与构建时才编译。PAG 头文件只通过头文件搜索路径查找，不使用相对路径，
 //      因此不会用到磁盘上存在但未参与编译的文件。
-#if __has_include(<CYLTabBarController/CYLPAGTabBarItemAnimator.h>)
+#if __has_include(<CYLAnimatedItem/CYLPAGTabBarItemAnimator.h>) || __has_include(<CYLTabBarController/CYLPAGTabBarItemAnimator.h>)
 #if __has_include(<CYLAnimatedItem/CYLPAGTabBarItemAnimator.h>)
 #import <CYLAnimatedItem/CYLPAGTabBarItemAnimator.h>
 #else
