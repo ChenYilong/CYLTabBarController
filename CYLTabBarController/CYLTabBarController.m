@@ -20,14 +20,14 @@
 // [EN] The animated item component (Core depends on it) gives the placeholder; the engine registry only with an animation
 //      subspec (`CYL_ANIMATION_ENGINE_AVAILABLE`), looked up through the header search paths only.
 // [CN] 动效组件（Core 依赖它）提供占位图；引擎注册表只在引入动画子库时存在（`CYL_ANIMATION_ENGINE_AVAILABLE`），只通过头文件搜索路径查找。
-#if __has_include("CYLAnimatedItem/CYLAnimatedItemView.h")
+#if defined(COCOAPODS) && __has_include(<CYLAnimatedItem/CYLAnimatedItemView.h>)
+#import <CYLAnimatedItem/CYLAnimatedItemView.h>
+#elif __has_include("CYLAnimatedItem/CYLAnimatedItemView.h")
 #import "CYLAnimatedItem/CYLAnimatedItemView.h"
-#else
-#if __has_include(<CYLAnimatedItem/CYLAnimatedItemView.h>)
+#elif __has_include(<CYLAnimatedItem/CYLAnimatedItemView.h>)
 #import <CYLAnimatedItem/CYLAnimatedItemView.h>
 #else
 #import "CYLAnimatedItemView.h"
-#endif
 #endif
 #if CYL_ANIMATION_ENGINE_AVAILABLE
 #if __has_include(<CYLTabBarController/CYLTabBarItemAnimatorRegistry.h>)

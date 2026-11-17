@@ -119,14 +119,22 @@
 // [CN] 动效 icon + title 控件（CYLAnimatedItem 子库，有该子库时才有此文件），伞头文件需要包含它。
 // [EN] The animated icon + title control (the CYLAnimatedItem subspec; the file exists only with it), which the umbrella
 //      header must include.
-#if __has_include("CYLAnimatedItem/CYLAnimatedItemView.h")
-#import "CYLAnimatedItem/CYLAnimatedItemView.h"
-#elif __has_include("CYLAnimatedItemView.h")
-#if __has_include(<CYLAnimatedItem/CYLAnimatedItemView.h>)
+// [CN] CocoaPods 中组件是独立模块 CYLAnimatedItem：必须用尖括号形式导入，引号形式会经 `Pods/Headers/Public` 找到同一个头文件并把
+//      它按文本编进 CYLTabBarController 模块，同时导入两个模块的客户端（如 CollectionViewClassifyMenu 的静态库 App）就无法加载
+//      `CYLAnimatedItemView` 父类。引号形式只用于把组件编进本模块的 framework target 与 SwiftPM。
+// [EN] Under CocoaPods the component is its own module, CYLAnimatedItem: import it in the angle form. The quoted form also
+//      finds the header through `Pods/Headers/Public` and compiles it into the CYLTabBarController module as text, and a
+//      client that imports both modules (CollectionViewClassifyMenu's static-library app) then cannot load the
+//      `CYLAnimatedItemView` superclass. The quoted forms are only for the framework target and SwiftPM, which compile
+//      the component into this module.
+#if defined(COCOAPODS) && __has_include(<CYLAnimatedItem/CYLAnimatedItemView.h>)
 #import <CYLAnimatedItem/CYLAnimatedItemView.h>
-#else
+#elif __has_include("CYLAnimatedItem/CYLAnimatedItemView.h")
+#import "CYLAnimatedItem/CYLAnimatedItemView.h"
+#elif __has_include(<CYLAnimatedItem/CYLAnimatedItemView.h>)
+#import <CYLAnimatedItem/CYLAnimatedItemView.h>
+#elif __has_include("CYLAnimatedItemView.h")
 #import "CYLAnimatedItemView.h"
-#endif
 #endif
 // [CN] 引擎与各类型 animator 的公开头文件（Xcode 工程的 framework target 把它们编进本模块）：伞头文件需要包含它们，否则 Xcode 警告
 //      "umbrella header ... does not include header"。每个 animator 头文件只在其类型开关打开时才有声明，因此没有对应动画库时也能编译。
