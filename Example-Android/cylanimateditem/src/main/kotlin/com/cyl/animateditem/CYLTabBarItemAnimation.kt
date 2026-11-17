@@ -431,6 +431,12 @@ interface CYLTabBarItemAnimationPlayableView {
      * [EN] The tab's tint (see `CYLTabBarItemAnimationPlayer.tintColor`). [CN] Tab 的着色（见 `CYLTabBarItemAnimationPlayer.tintColor`）。
      */
     fun cyl_applyAnimationViewTintColor(color: Int?) { /* [EN] Optional. [CN] 可选。 */ }
+    /**
+     * [EN] Whether the view plays again after each pass until this is turned off (the player's `loops`). For views with no
+     *      progress to restart, such as Rive state machines (docs/Animated-Item.md, the Rive loop).
+     * [CN] 视图是否在每次播放后再次播放，直到关闭（播放器的 `loops`）。用于没有进度可重新开始的视图，例如 Rive 状态机（docs/Animated-Item.md，Rive 循环）。
+     */
+    fun cyl_setAnimationViewLoops(loops: Boolean) { /* [EN] Optional. [CN] 可选。 */ }
 }
 
 /**
@@ -483,6 +489,8 @@ open class CYLTabBarItemViewAnimator(
             override fun play() = playable.cyl_playAnimationView()
             override fun showLastFrame() = playable.cyl_showAnimationViewLastFrame()
             override fun stop() = playable.cyl_stopAnimationView()
+            override var loops: Boolean = false
+                set(value) { field = value; playable.cyl_setAnimationViewLoops(value) }
             override var tintColor: Int? = null
                 set(value) { if (field != value) { field = value; playable.cyl_applyAnimationViewTintColor(value) } }
             override fun applyColors(colors: Map<String, Int>?, configuration: Configuration) {
@@ -912,13 +920,16 @@ object CYLRiveTabBarItemAnimator {
  *      （`CYLTabBarAnimationOptionRiveInput` 或 active 属性）、触发器、线性动画、持续时间。
  */
 @android.annotation.SuppressLint("ViewConstructor") // [EN] Made by its provider around a RiveAnimationView, never inflated. [CN] 由 provider 围绕 RiveAnimationView 创建，不从 XML 加载。
-class CYLRiveTabBarItemAnimationView private constructor(context: Context, private val rive: View, private val options: Map<String, String>) :
+class CYLRiveTabBarItemAnimationView internal constructor(context: Context, private val rive: View, private val options: Map<String, String>) :
     android.widget.FrameLayout(context), CYLTabBarItemAnimationPlayableView {
 
     private val handler = Handler(Looper.getMainLooper())
     private val stateMachine get() = options[CYLTabBarItemAnimationKeys.CYLTabBarAnimationOptionRiveStateMachine]
     private val booleanInput get() = options[CYLTabBarItemAnimationKeys.CYLTabBarAnimationOptionRiveInput] ?: options[CYLTabBarItemAnimationKeys.CYLTabBarAnimationOptionRiveActiveProperty] ?: "active"
     private val activeDuration get() = options[CYLTabBarItemAnimationKeys.CYLTabBarAnimationOptionRiveActiveDuration]?.toDoubleOrNull() ?: 1.0
+    /** [EN] Plays again after each pass (`cyl_setAnimationViewLoops`). [CN] 每次播放后再次播放（`cyl_setAnimationViewLoops`）。 */
+    private var loops = false
+    private val loopRunnable = Runnable { if (loops) cyl_playAnimationView() }
 
     init {
         addView(rive, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
@@ -984,24 +995,56 @@ class CYLRiveTabBarItemAnimationView private constructor(context: Context, priva
      */
     internal fun hasInput(machine: String, input: String): Boolean = CYLRiveInputs.hasInput(rive, machine, input)
 
+    /**
+     * [EN] Plays from the start (docs/Animated-Item.md, the Rive loop): a trigger restarts the state machine, then fires a frame
+     *      later (check.riv stayed on its finished check); a boolean input the state machine has goes false, then true a
+     *      frame later, so every play is a transition (a held input used to play once), and false after the duration; a
+     *      state machine without that input restarts (house.riv); a linear animation restarts. With looping on, it plays
+     *      again after each pass.
+     * [CN] 从头播放（docs/Animated-Item.md，Rive 循环）：trigger 先重新开始状态机，一帧之后再触发（check.riv 停在完成的对勾上）；状态机中存在的布尔输入先设为
+     *      false，一帧之后设为 true，每次播放都是一次状态切换（保持的输入以前只播放一次），经过时长后设为 false；没有该输入的状态机重新开始（house.riv）；
+     *      线性动画重新开始。开启循环时，每次播放后再次播放。
+     */
     override fun cyl_playAnimationView() {
         handler.removeCallbacksAndMessages(null)
         val machine = stateMachine
         val trigger = options[CYLTabBarItemAnimationKeys.CYLTabBarAnimationOptionRiveTriggerInput] ?: options[CYLTabBarItemAnimationKeys.CYLTabBarAnimationOptionRiveTriggerProperty]
         val animation = options[CYLTabBarItemAnimationKeys.CYLTabBarAnimationOptionRiveAnimation]
         val default = CYLReflection.DEFAULT
-        when {
-            machine != null && trigger != null -> { if (hasInput(machine, trigger)) CYLReflection.call(rive, "fireState", machine, trigger) }
-            machine != null -> {
-                setActive(true)
-                if (activeDuration > 0) handler.postDelayed({ setActive(false) }, (activeDuration * 1000).toLong())
-            }
-            // [EN] rive-android `play(animationName, loop, direction, isStateMachine, settleInitialState)`. [CN] rive-android 的 `play(animationName, loop, direction, isStateMachine, settleInitialState)`。
-            animation != null -> CYLReflection.callKotlin(rive, "play", animation, default, default, false, default)
+        val restart = {
             // [EN] `reset()`, then `play(loop, direction, settleInitialState)` with its defaults. [CN] `reset()` 后以默认值调用 `play(loop, direction, settleInitialState)`。
-            else -> { CYLReflection.call(rive, "reset"); CYLReflection.callKotlin(rive, "play", default, default, default) }
+            CYLReflection.call(rive, "reset")
+            CYLReflection.callKotlin(rive, "play", default, default, default)
         }
+        when {
+            machine != null && trigger != null && hasInput(machine, trigger) -> {
+                restart()
+                handler.postDelayed({ CYLReflection.call(rive, "fireState", machine, trigger) }, NEXT_FRAME_MS)
+            }
+            machine != null && trigger == null && hasInput(machine, booleanInput) -> {
+                setActive(false)
+                handler.postDelayed({
+                    setActive(true)
+                    if (activeDuration > 0) handler.postDelayed({ setActive(false) }, (activeDuration * 1000).toLong())
+                }, NEXT_FRAME_MS)
+            }
+            // [EN] rive-android `play(animationName, loop, direction, isStateMachine, settleInitialState)`, from the start.
+            // [CN] rive-android 的 `play(animationName, loop, direction, isStateMachine, settleInitialState)`，从头开始。
+            animation != null -> { CYLReflection.call(rive, "reset"); CYLReflection.callKotlin(rive, "play", animation, default, default, false, default) }
+            else -> restart()
+        }
+        if (loops) handler.postDelayed(loopRunnable, (loopSeconds(machine, trigger) * 1000).toLong())
     }
+
+    /** [EN] `cyl_setAnimationViewLoops`. [CN] `cyl_setAnimationViewLoops`。 */
+    override fun cyl_setAnimationViewLoops(loops: Boolean) {
+        this.loops = loops
+        if (!loops) handler.removeCallbacks(loopRunnable)
+    }
+
+    /** [EN] A loop pass: after the input goes back to false (plus a pause), else LOOP_SECONDS. [CN] 一次循环：输入恢复为 false 之后（再停顿一下），否则 LOOP_SECONDS。 */
+    private fun loopSeconds(machine: String?, trigger: String?): Double =
+        if (machine != null && trigger == null && activeDuration > 0) activeDuration + LOOP_PAUSE_SECONDS else LOOP_SECONDS
 
     override fun cyl_showAnimationViewLastFrame() {
         if (stateMachine != null) setActive(true) else CYLReflection.call(rive, "pause")
@@ -1020,6 +1063,12 @@ class CYLRiveTabBarItemAnimationView private constructor(context: Context, priva
          * [EN] The `tint` option value that follows the tab's title color. [CN] 跟随 Tab 标题颜色的 `tint` 选项值。
          */
         const val TINT_TITLE = "title"
+        /** [EN] Seconds of a loop pass when the file gives none. [CN] 文件未给出时一次循环的秒数。 */
+        const val LOOP_SECONDS = 1.5
+        /** [EN] The pause after an input goes back to false, before the next pass. [CN] 输入恢复为 false 后、下一次播放前的停顿。 */
+        const val LOOP_PAUSE_SECONDS = 0.4
+        /** [EN] A frame later: the state machine sees the reset or the false first. [CN] 一帧之后：状态机先看到重置或 false。 */
+        internal const val NEXT_FRAME_MS = 50L
     }
 
     object Provider : CYLTabBarItemAnimationViewProviding {
