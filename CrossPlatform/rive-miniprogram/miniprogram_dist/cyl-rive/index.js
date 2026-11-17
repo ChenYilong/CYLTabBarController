@@ -18,7 +18,7 @@
  *      cyl_input、cyl_animation。
  */
 const { Rive, CYLRiveEnvironment } = require('../rive/canvas_advanced.js')
-const { cylRiveOptions, cylRiveColor } = require('./cyl_rive_options')
+const { cylRiveOptions, cylRiveColor, cylRivePlayKind, cylRiveLoopDelay } = require('./cyl_rive_options')
 
 // [EN] A mini program cannot read files under miniprogram_npm, so the WebAssembly is copied to the package root
 //      (cylMiniprogramAssets in package.json); set `wasmPath` when it lives elsewhere ('' keeps this default).
@@ -123,8 +123,9 @@ Component({
     /** [EN] View model color path -> "#RRGGBB" (CYLTabBarRiveDarkColors). [CN] view model 颜色路径 -> 颜色。 */
     colors: { type: Object, value: null },
     /**
-     * [EN] Repeats the play: after the input goes back to false, it turns true again until `loop` is off.
-     * [CN] 重复播放：输入恢复为 false 后再次设为 true，直到关闭 `loop`。
+     * [EN] Repeats the play until `loop` is off: after the input goes back to false, or after each pass of a trigger, a
+     *      held input or a state machine (cylRiveLoopDelay); turning it on plays at once.
+     * [CN] 重复播放，直到关闭 `loop`：输入恢复为 false 后，或 trigger、保持的输入、状态机每播放一次后（cylRiveLoopDelay）；打开时立即播放。
      */
     loop: { type: Boolean, value: false },
     autoplay: { type: Boolean, value: true },
@@ -140,6 +141,19 @@ Component({
   data: { cylCanvasId: '', cylSnapshot: '', cylCovered: CYL_USES_SNAPSHOTS },
 
   observers: {
+    loop(loop) {
+      // [EN] On: play now (each pass schedules the next); off: no further pass. [CN] 打开：立即播放（每次播放安排下一次）；关闭：不再安排。
+      const state = this.cylState
+      if (!state) {
+        return
+      }
+      if (loop && !state.loopTimer) {
+        this.cyl_playFromStart()
+      } else if (!loop) {
+        clearTimeout(state.loopTimer)
+        state.loopTimer = null
+      }
+    },
     'path, artboard, stateMachine, colors, fit': function () {
       // [EN] WeChat runs an observer on every set, even with the same value: a host that re-renders (cyl-animated-item
       //      after `ready`) restarted the load dozens of times a second, so the file never played (bugs B8 / B11,
@@ -267,7 +281,8 @@ Component({
         const animation = options.animation ? artboard.animationByName(options.animation) : artboard.animationByIndex(0)
         instance = new rive.LinearAnimationInstance(animation, artboard)
       }
-      const state = { rive, canvas, renderer, file, artboard, instance, isStateMachine, options, playing: true, last: 0 }
+      const state = { rive, canvas, renderer, file, artboard, instance, isStateMachine, options, playing: true, last: 0,
+        machine: isStateMachine ? machine : null, animationSeconds: isStateMachine ? 0 : this.cyl_animationSeconds(instance) }
       state.viewModelInstance = this.cyl_bindViewModel(state)
       this.cylState = state
       this.cyl_scheduleFrame()
@@ -421,18 +436,15 @@ Component({
       state.playing = true
       const { options } = state
       clearTimeout(state.inputTimer)
+      clearTimeout(state.loopTimer)
       const triggerInput = options.triggerInput && this.cyl_input(options.triggerInput)
-      if (triggerInput) {
-        triggerInput.asTrigger().fire()
-        return
-      }
-      if (options.trigger && state.viewModelInstance && state.viewModelInstance.trigger(options.trigger)) {
-        state.viewModelInstance.trigger(options.trigger).trigger()
-        return
-      }
+      const viewModelTrigger = options.trigger && state.viewModelInstance ? state.viewModelInstance.trigger(options.trigger) : null
       const boolInput = options.input && this.cyl_input(options.input)
       const activeName = options.active || (state.viewModelInstance && !boolInput ? 'active' : '')
       const activeProperty = activeName && state.viewModelInstance ? state.viewModelInstance.boolean(activeName) : null
+      const kind = cylRivePlayKind({ hasTriggerInput: !!triggerInput, hasViewModelTrigger: !!viewModelTrigger,
+        hasBoolInput: !!(boolInput || activeProperty) })
+      const speed = this.cyl_speed()
       const setActive = (value) => {
         if (boolInput) {
           boolInput.asBool().value = value
@@ -440,33 +452,71 @@ Component({
           activeProperty.value = value
         }
       }
-      if (boolInput || activeProperty) {
+      if (kind === 'trigger') {
+        triggerInput.asTrigger().fire()
+      } else if (kind === 'viewModelTrigger') {
+        viewModelTrigger.trigger()
+      } else if (kind === 'input') {
+        // [EN] Off first, so a play always changes the value (an input left true, duration 0, played only once).
+        // [CN] 先设为 false，每次播放都会改变取值（保持为 true 的输入、duration 为 0 时只播放一次）。
+        setActive(false)
+        if (state.instance && typeof state.instance.advance === 'function') {
+          state.instance.advance(0)
+        }
         setActive(true)
         if (seconds > 0 && state.instance && typeof state.instance.advance === 'function') {
           // [EN] Catch up with the playback the previous tab bar started. [CN] 追上前一个 TabBar 已开始的播放。
           state.instance.advance(Math.min(seconds, 2))
         }
         if (options.duration > 0) {
-          const speed = this.cyl_speed()
           state.inputTimer = setTimeout(() => {
             setActive(false)
             this.triggerEvent('complete', {})
-            // [EN] Loop: play again after the icon settles, while `loop` is on. [CN] 循环：图标复位后再次播放，直到关闭 `loop`。
-            if (this.data.loop) {
-              state.inputTimer = setTimeout(() => {
-                if (this.data.loop && this.cylState === state) {
-                  this.triggerEvent('loopcomplete', {})
-                  this.cyl_playFromStart()
-                }
-              }, 400 / speed)
-            }
           }, Math.max(0, options.duration - seconds) * 1000 / speed)
         }
-        return
+      } else {
+        this.cyl_restart(state)
       }
-      if (!state.isStateMachine && state.instance) {
+      // [EN] Loop (docs/Animated-Item.md, the Rive loop): every kind plays again after its pass, while `loop` is on.
+      // [CN] 循环（docs/Animated-Item.md，Rive 循环）：每种播放方式在一次播放后再次播放，直到关闭 `loop`。
+      if (this.data.loop) {
+        const delay = cylRiveLoopDelay({ kind, duration: options.duration, animationSeconds: state.animationSeconds, speed })
+        state.loopTimer = setTimeout(() => {
+          if (this.data.loop && this.cylState === state) {
+            this.triggerEvent('loopcomplete', {})
+            this.cyl_playFromStart()
+          }
+        }, Math.max(0, delay - seconds * 1000 / speed))
+      }
+    },
+
+    /**
+     * [EN] Restarts the icon: a state machine gets a new instance (with the view model bound again), an animation goes back
+     *      to its start. A state machine at its end state (or one whose input the options do not name) plays again.
+     * [CN] 重新开始图标：状态机创建新实例（重新绑定 view model），动画回到开头。处于结束状态的状态机（或选项未指定其输入的状态机）也能再次播放。
+     */
+    cyl_restart(state) {
+      if (state.isStateMachine && state.machine) {
+        const previous = state.instance
+        state.instance = new state.rive.StateMachineInstance(state.machine, state.artboard)
+        if (state.viewModelInstance && typeof state.instance.bindViewModelInstance === 'function') {
+          state.instance.bindViewModelInstance(state.viewModelInstance)
+        }
+        if (previous && typeof previous.delete === 'function') {
+          previous.delete()
+        }
+      } else if (state.instance) {
         state.instance.time = 0
       }
+    },
+
+    /** [EN] A linear animation's length in seconds (0 when unknown). [CN] 线性动画的时长（秒，未知时为 0）。 */
+    cyl_animationSeconds(instance) {
+      const animation = instance && instance.animation
+      if (animation && Number(animation.duration) > 0 && Number(animation.fps) > 0) {
+        return Number(animation.duration) / Number(animation.fps)
+      }
+      return instance && Number(instance.duration) > 0 ? Number(instance.duration) : 0
     },
 
     /** [EN] The speed in use (1 when not above 0). [CN] 当前速度（不大于 0 时为 1）。 */
@@ -501,6 +551,8 @@ Component({
         return
       }
       clearTimeout(state.inputTimer)
+      clearTimeout(state.loopTimer)
+      state.loopTimer = null
       const input = state.options.input && this.cyl_input(state.options.input)
       if (input) {
         input.asBool().value = false

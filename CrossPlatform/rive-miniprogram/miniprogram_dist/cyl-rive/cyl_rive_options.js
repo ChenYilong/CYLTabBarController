@@ -59,4 +59,49 @@ function cylRiveColor(hex) {
   return ((alpha << 24) >>> 0) + parseInt(value.slice(0, 6), 16)
 }
 
-module.exports = { cylRiveRoute, cylRiveOptions, cylRiveColor }
+/**
+ * [EN] What one play does (docs/Animated-Item.md, the Rive loop): 'trigger' fires the legacy trigger input, 'viewModelTrigger'
+ *      fires the view model trigger, 'input' turns the boolean input / view model boolean off and then on (so a play always
+ *      makes a transition, also when the value was already true), 'restart' restarts the state machine (a new instance) or
+ *      the animation: a file whose input or trigger is missing, or that has none, still plays again.
+ * [CN] 一次播放做什么（docs/Animated-Item.md，Rive 循环）：'trigger' 触发旧版 trigger 输入，'viewModelTrigger' 触发 view model trigger，
+ *      'input' 先把布尔输入 / view model 布尔属性设为 false 再设为 true（即使原值已是 true，每次播放都会产生状态切换），'restart' 重新开始状态机
+ *      （新实例）或动画：缺少输入或 trigger、或没有输入的文件也能再次播放。
+ */
+function cylRivePlayKind({ hasTriggerInput, hasViewModelTrigger, hasBoolInput }) {
+  if (hasTriggerInput) {
+    return 'trigger'
+  }
+  if (hasViewModelTrigger) {
+    return 'viewModelTrigger'
+  }
+  return hasBoolInput ? 'input' : 'restart'
+}
+
+/** [EN] Seconds of a loop pass when the file gives none (held input, trigger, state machine). [CN] 文件未给出时一次循环的秒数。 */
+const CYL_RIVE_LOOP_SECONDS = 1.5
+/** [EN] The pause after an input goes back to false, before the next pass. [CN] 输入恢复为 false 后、下一次播放前的停顿。 */
+const CYL_RIVE_LOOP_PAUSE_SECONDS = 0.4
+
+/**
+ * [EN] Milliseconds from a play to the next one while looping: after the input goes back to false (`duration` above 0, plus a
+ *      short pause), else after the animation's own length when it is known, else CYL_RIVE_LOOP_SECONDS; divided by the speed.
+ * [CN] 循环时从一次播放到下一次的毫秒数：输入恢复为 false 后（`duration` 大于 0，再加短暂停顿），否则为动画自身时长（已知时），否则为
+ *      CYL_RIVE_LOOP_SECONDS；再除以速度。
+ */
+function cylRiveLoopDelay({ kind, duration, animationSeconds, speed }) {
+  const rate = Number(speed) > 0 ? Number(speed) : 1
+  let seconds
+  if (kind === 'input' && Number(duration) > 0) {
+    seconds = Number(duration) + CYL_RIVE_LOOP_PAUSE_SECONDS
+  } else if (Number(animationSeconds) > 0) {
+    seconds = Number(animationSeconds)
+  } else if (Number(duration) > 0) {
+    seconds = Number(duration) + CYL_RIVE_LOOP_PAUSE_SECONDS
+  } else {
+    seconds = CYL_RIVE_LOOP_SECONDS
+  }
+  return Math.round(seconds * 1000 / rate)
+}
+
+module.exports = { cylRiveRoute, cylRiveOptions, cylRiveColor, cylRivePlayKind, cylRiveLoopDelay, CYL_RIVE_LOOP_SECONDS }
