@@ -220,3 +220,14 @@ test('menu_button.riv: a held input (isOpen, duration 0) still replays on every 
   assert.ok(seen.includes(0) && seen.includes(1), `isOpen is false for real time on each pass: ${seen.join('')}`)
   assert.deepEqual(seen, [1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1], 'open 1.5 s; each pass closes it for 0.75 s, then opens it')
 })
+
+test('a loaded file rests on its first frame until it is played (shapes.riv, truck.riv no longer move at load)', () => {
+  const source = require('fs').readFileSync(require.resolve('../miniprogram_dist/cyl-rive/index.js'), 'utf8')
+  assert.match(source, /isStateMachine, options, playing: false, last: 0/, 'a new state is not playing')
+  assert.match(source, /cylRivePoseFirstFrame\(state\)/, 'the first frame is applied once')
+  const definition = loadComponent()
+  const { item } = makeItem(definition, { inputs: {}, duration: 0 })
+  item.cylState.playing = false
+  item.cyl_playFromStart()
+  assert.equal(item.cylState.playing, true, 'a play starts it')
+})

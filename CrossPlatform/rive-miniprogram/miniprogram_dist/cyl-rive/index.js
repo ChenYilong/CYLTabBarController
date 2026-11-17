@@ -109,6 +109,23 @@ function cylReadBytes(path, callback) {
 
 const CYL_FIT = { contain: 'contain', cover: 'cover', fill: 'fill' }
 
+/**
+ * [EN] Applies the first frame of a file that is not played yet: the state machine's entry state (or the animation's
+ *      time 0) without moving on, so a file at rest shows its first frame.
+ * [CN] 为尚未播放的文件应用第一帧：状态机的入口状态（或动画的 0 时刻），不再向前推进，因此静止的文件显示第一帧。
+ */
+function cylRivePoseFirstFrame(state) {
+  const { instance, isStateMachine, artboard } = state
+  if (!instance) {
+    return
+  }
+  instance.advance(0)
+  if (!isStateMachine) {
+    instance.apply(1)
+  }
+  artboard.advance(0)
+}
+
 Component({
   properties: {
     /** [EN] A .riv file (or a .riv.bin package copy), with optional options in its fragment. [CN] .riv 文件（或包内的 .riv.bin 副本），fragment 中可带选项。 */
@@ -301,9 +318,13 @@ Component({
         const animation = options.animation ? artboard.animationByName(options.animation) : artboard.animationByIndex(0)
         instance = new rive.LinearAnimationInstance(animation, artboard)
       }
-      const state = { rive, canvas, renderer, file, artboard, instance, isStateMachine, options, playing: true, last: 0,
+      // [EN] Rests on its first frame until it is played (docs/Animated-Item.md): a file whose state machine moves by itself
+      //      (shapes.riv, truck.riv) no longer runs from load. A play, a loop pass or cyl_play() starts it.
+      // [CN] 在被播放之前停在第一帧：状态机会自行运动的文件（shapes.riv、truck.riv）不再从加载起就运动。播放、循环或 cyl_play() 才开始。
+      const state = { rive, canvas, renderer, file, artboard, instance, isStateMachine, options, playing: false, last: 0,
         machine: isStateMachine ? machine : null, animationSeconds: isStateMachine ? 0 : this.cyl_animationSeconds(instance) }
       state.viewModelInstance = this.cyl_bindViewModel(state)
+      cylRivePoseFirstFrame(state)
       this.cylState = state
       this.cyl_scheduleFrame()
       this.triggerEvent('ready', {
