@@ -220,6 +220,8 @@ docs/
 │   ├── b10-flatdesign-image-under-gif-after.png
 │   ├── b10-flatdesign-image-under-gif-before.png
 │   ├── b14-language-row-emoji-ios27.2.png
+│   ├── b18-example-gif-static-image-house-after.png
+│   ├── b18-example-gif-static-image-like-placeholder-before.jpg
 │   ├── badge-debugging-animations-off-harmonyos.png
 │   ├── carthage-example-ios.png
 │   ├── carthage-example-two-frameworks-ios27.png
