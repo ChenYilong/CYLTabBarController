@@ -1011,7 +1011,9 @@ class CYLRiveTabBarItemAnimationView private constructor(context: Context, priva
      * [EN] Provides the views of `CYLRiveTabBarItemAnimator`. [CN] 为 `CYLRiveTabBarItemAnimator` 提供视图。
      */
     companion object {
-        /** [EN] The `tint` option value that follows the tab's title color. [CN] 跟随 Tab 标题颜色的 `tint` 选项值。 */
+        /**
+         * [EN] The `tint` option value that follows the tab's title color. [CN] 跟随 Tab 标题颜色的 `tint` 选项值。
+         */
         const val TINT_TITLE = "title"
     }
 
