@@ -258,6 +258,7 @@ docs/
 │   ├── flutter-component-android.png
 │   ├── flutter-component-ios-bar.png
 │   ├── flutter-component-ios.png
+│   ├── flutter-ios-simulated-taps-3ee06877.png
 │   ├── flutter-pag-android-bar.png
 │   ├── flutter-pag-ios-bar.png
 │   ├── flutter-playback-controls-android-api35-93abe96.png
