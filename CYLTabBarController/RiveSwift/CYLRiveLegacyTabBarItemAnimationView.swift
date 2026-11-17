@@ -74,6 +74,11 @@ public final class CYLRiveLegacyTabBarItemAnimationView: UIView, CYLTabBarItemAn
         return true
     }
 
+    /// [EN] The template tint (`CYLTabBarAnimationOptionTint`). [CN] 模板着色（`CYLTabBarAnimationOptionTint`）。
+    private let tintOverlay = CYLRiveTintOverlay()
+    /// [EN] The last title color, kept for a file that loads later. [CN] 最近的标题颜色，供稍后加载的文件使用。
+    private var titleTintColor: UIColor?
+
     private init(configuration: CYLRiveTabBarItemAnimationConfiguration, file: RiveFile) {
         self.configuration = configuration
         let model = RiveModel(riveFile: file)
@@ -99,7 +104,25 @@ public final class CYLRiveLegacyTabBarItemAnimationView: UIView, CYLTabBarItemAn
         riveView.isUserInteractionEnabled = false
         riveView.backgroundColor = .clear
         addSubview(riveView)
+        tintOverlay.apply(configuration.fixedTintColor, in: self)
     }
+
+    /// [EN] `cyl_applyAnimationViewTintColor:`: the tab's title color, drawn when the `tint` option is "title".
+    /// [CN] `cyl_applyAnimationViewTintColor:`：Tab 的标题颜色，`tint` 选项为 "title" 时绘制。
+    public func applyAnimationTintColor(_ color: UIColor?) {
+        guard configuration.tintFollowsTitle else {
+            return
+        }
+        titleTintColor = color
+        tintOverlay.apply(color, in: self)
+    }
+
+    /// [EN] Keeps the tint over the Rive view. [CN] 让着色覆盖 Rive 视图。
+    override public func layoutSubviews() {
+        super.layoutSubviews()
+        tintOverlay.layout(in: self)
+    }
+
 
     /// [EN] Not used from Interface Builder. [CN] 不支持从 Interface Builder 创建。
     public required init?(coder _: NSCoder) {

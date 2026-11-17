@@ -46,6 +46,10 @@ struct CYLRiveTabBarItemAnimationConfiguration {
     /// [EN] A state machine number input set to the next value on each play (house.riv: `Rooms`).
     /// [CN] 每次播放设为下一个值的状态机数字输入（house.riv：`Rooms`）。
     let numberInput: String?
+    /// [EN] `tint` = "title": the tab's title color, as a template image. [CN] `tint` 为 "title"：Tab 的标题颜色，与模板图片相同。
+    let tintFollowsTitle: Bool
+    /// [EN] `tint` = "#RRGGBB(AA)": a fixed color. [CN] `tint` 为 "#RRGGBB(AA)"：固定颜色。
+    let fixedTintColor: UIColor?
     /// [EN] The values the number input steps through; empty: +1. [CN] 数字输入依次使用的值；为空时 +1。
     let numberValues: [Float]
     /// [EN] Played through the legacy runtime even with none of the three above. [CN] 即使没有以上三项，也通过旧版运行时播放。
@@ -80,6 +84,9 @@ struct CYLRiveTabBarItemAnimationConfiguration {
         animationName = options[CYLTabBarAnimationOption.riveAnimation.rawValue]
         forcesLegacyRuntime = options[CYLTabBarAnimationOption.riveLegacyRuntime.rawValue] == "1"
         numberInput = options[CYLTabBarAnimationOption.riveNumberInput.rawValue]
+        let tint = options[CYLTabBarAnimationOption.tint.rawValue]?.trimmingCharacters(in: .whitespaces)
+        tintFollowsTitle = tint == "title"
+        fixedTintColor = tint.flatMap { $0 == "title" ? nil : Self.color(hex: $0) }
         numberValues = (options[CYLTabBarAnimationOption.riveNumberValues.rawValue] ?? "").split(separator: ",")
             .compactMap { Float($0.trimmingCharacters(in: .whitespaces)) }
     }
@@ -95,7 +102,7 @@ struct CYLRiveTabBarItemAnimationConfiguration {
     }
 
     /// [EN] "#RRGGBB" or "#RRGGBBAA" ("#" optional). [CN] "#RRGGBB" 或 "#RRGGBBAA"（"#" 可省略）。
-    private static func color(hex: String) -> UIColor? {
+    static func color(hex: String) -> UIColor? {
         let digits = hex.hasPrefix("#") ? String(hex.dropFirst()) : hex
         guard digits.count == 6 || digits.count == 8, var value = UInt64(digits, radix: 16) else {
             return nil
@@ -199,6 +206,27 @@ public final class CYLRiveTabBarItemAnimationView: UIView, CYLTabBarItemAnimatio
 
     /// [EN] `fileProvider` is injected, so the view does not depend on where files come from.
     /// [CN] `fileProvider` 由外部注入，因此视图不依赖文件的来源。
+    /// [EN] The template tint (`CYLTabBarAnimationOptionTint`). [CN] 模板着色（`CYLTabBarAnimationOptionTint`）。
+    private let tintOverlay = CYLRiveTintOverlay()
+    /// [EN] The last title color, kept for a file that loads later. [CN] 最近的标题颜色，供稍后加载的文件使用。
+    private var titleTintColor: UIColor?
+
+    /// [EN] `cyl_applyAnimationViewTintColor:`: the tab's title color, drawn when the `tint` option is "title".
+    /// [CN] `cyl_applyAnimationViewTintColor:`：Tab 的标题颜色，`tint` 选项为 "title" 时绘制。
+    public func applyAnimationTintColor(_ color: UIColor?) {
+        guard configuration.tintFollowsTitle else {
+            return
+        }
+        titleTintColor = color
+        tintOverlay.apply(color, in: self)
+    }
+
+    /// [EN] Keeps the tint over the Rive view. [CN] 让着色覆盖 Rive 视图。
+    override public func layoutSubviews() {
+        super.layoutSubviews()
+        tintOverlay.layout(in: self)
+    }
+
     init(configuration: CYLRiveTabBarItemAnimationConfiguration, fileProvider: CYLRiveTabBarItemAnimationFileProviding) {
         self.configuration = configuration
         self.fileProvider = fileProvider
@@ -372,6 +400,7 @@ public final class CYLRiveTabBarItemAnimationView: UIView, CYLTabBarItemAnimatio
         addSubview(riveView)
         self.riveView = riveView
         isLoaded = true
+        tintOverlay.apply(configuration.fixedTintColor ?? (configuration.tintFollowsTitle ? titleTintColor : nil), in: self)
         // [EN] Rests on its first frame until it is played (docs/Animated-Item.md): paused once the first frame is drawn.
         // [CN] 在被播放之前停在第一帧：第一帧绘制后暂停。
         Task { @MainActor [weak self, weak riveView] in
@@ -518,3 +547,42 @@ final class CYLRiveTabBarItemAnimationFileCache: CYLRiveTabBarItemAnimationFileP
     }
 }
 #endif
+
+/**
+ * [EN] Draws a Rive view's icon in one color, like a template image (`CYLTabBarAnimationOptionTint`): a layer of that color
+ *      above the Rive view, composited with "sourceAtop", so only the icon's own pixels take the color. Rive draws with
+ *      Metal, so the image itself cannot be tinted. Checked on iOS 27.2 (Example-Rive): the icons keep animating.
+ * [CN] 像模板图片一样用一种颜色绘制 Rive 视图的图标（`CYLTabBarAnimationOptionTint`）：在 Rive 视图之上放一个该颜色的图层，以 "sourceAtop"
+ *      合成，只有图标本身的像素取该颜色。Rive 用 Metal 绘制，无法直接给图像着色。已在 iOS 27.2（Example-Rive）上检查：图标仍会播放。
+ */
+@MainActor
+final class CYLRiveTintOverlay {
+    private var layer: CALayer?
+
+    /// [EN] Draws `color` over `host`'s icon, above its subviews; nil removes the tint. [CN] 在 `host` 的图标上绘制 `color`；nil 移除着色。
+    func apply(_ color: UIColor?, in host: UIView) {
+        guard let color else {
+            layer?.removeFromSuperlayer()
+            layer = nil
+            return
+        }
+        let overlay = layer ?? CALayer()
+        overlay.compositingFilter = "sourceAtop"
+        overlay.backgroundColor = color.resolvedColor(with: host.traitCollection).cgColor
+        overlay.frame = host.bounds
+        host.layer.addSublayer(overlay)
+        layer = overlay
+    }
+
+    /// [EN] Keeps the tint over the whole view, on top. [CN] 让着色覆盖整个视图并位于最上层。
+    func layout(in host: UIView) {
+        guard let overlay = layer else {
+            return
+        }
+        overlay.frame = host.bounds
+        if host.layer.sublayers?.last !== overlay {
+            host.layer.addSublayer(overlay)
+        }
+    }
+}
+

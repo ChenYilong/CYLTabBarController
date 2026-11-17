@@ -43,6 +43,7 @@ CYLTabBarAnimationOption const CYLTabBarAnimationOptionRiveAnimation = @"animati
 CYLTabBarAnimationOption const CYLTabBarAnimationOptionRiveLegacyRuntime = @"legacy";
 CYLTabBarAnimationOption const CYLTabBarAnimationOptionRiveNumberInput = @"numberInput";
 CYLTabBarAnimationOption const CYLTabBarAnimationOptionRiveNumberValues = @"values";
+CYLTabBarAnimationOption const CYLTabBarAnimationOptionTint = @"tint";
 NSString *const CYLTabBarSVGAURL = @"CYLTabBarSVGAURL";
 NSString *const CYLTabBarSVGAFilePath = @"CYLTabBarSVGAFilePath";
 NSString *const CYLTabBarSVGASize = @"CYLTabBarSVGASize";

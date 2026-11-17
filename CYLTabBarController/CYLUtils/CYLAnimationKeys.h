@@ -268,6 +268,14 @@ FOUNDATION_EXTERN CYLTabBarAnimationOption const CYLTabBarAnimationOptionRiveLeg
 FOUNDATION_EXTERN CYLTabBarAnimationOption const CYLTabBarAnimationOptionRiveNumberInput CYL_RIVE_REQUIRED;
 FOUNDATION_EXTERN CYLTabBarAnimationOption const CYLTabBarAnimationOptionRiveNumberValues CYL_RIVE_REQUIRED;
 /*!
+ * [EN] A tab icon tinted like a template image (bug B12; Android's key of the same name): "title" draws the icon in the tab's
+ *      title color, the tab bar's tint when the tab is selected and its unselected tint otherwise, as UIKit draws a template
+ *      static image; "#RRGGBB" or "#RRGGBBAA" draws it in that fixed color. For one-color icons (icons.riv). Rive on iOS.
+ * [CN] 像模板图片一样为 Tab 图标着色（问题 B12；与 Android 同名的 key）："title" 用 Tab 标题的颜色绘制图标：选中时为 TabBar 的 tint，
+ *      未选中时为未选中 tint，与 UIKit 绘制模板静态图片相同；"#RRGGBB" 或 "#RRGGBBAA" 用该固定颜色绘制。用于单色图标（icons.riv）。iOS 上用于 Rive。
+ */
+FOUNDATION_EXTERN CYLTabBarAnimationOption const CYLTabBarAnimationOptionTint;
+/*!
  * [EN] An SVGA file's URL (NSURL), the counterpart of `CYLTabBarLottieURL`; read from `CYLTabBarAnimationURL` too.
  * [CN] SVGA 文件的 URL（NSURL），对应 `CYLTabBarLottieURL`；也可以使用 `CYLTabBarAnimationURL`。
  */

@@ -330,6 +330,7 @@ docs/
 │   ├── ios-gif-image-rest-then-play.png
 │   ├── ios-playback-controls-message-tab-iphone17pro-ios26.1-dc04439.png
 │   ├── ios-rive-rest-then-play-bell.png
+│   ├── ios-rive-tint-template.png
 │   ├── iphone-duo-tab-bar-ios27-2-b356c1e6.png
 │   ├── issue-561-ipad-tab-bars-ios.png
 │   ├── liquid-glass-plus-stand-in-landscape-ios.png

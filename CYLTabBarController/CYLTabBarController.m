@@ -130,6 +130,50 @@ static UIImage *CYLRestingTabBarItemImage(UIImage *image, UITabBarItem *item, BO
 }
 
 /*!
+ * [EN] The color UIKit draws a template tab image in, from the tint the tab bar was set up with: selected, the appearance's
+ *      selected icon color, else `tintColor`; not selected, the appearance's normal icon color, else
+ *      `unselectedItemTintColor`, else UIKit's default (the label color with Liquid Glass, system gray before).
+ * [CN] UIKit 绘制模板 Tab 图片所用的颜色，来自 TabBar 设置的 tint：选中时为外观的选中图标颜色，否则为 `tintColor`；未选中时为外观的普通图标颜色，
+ *      否则为 `unselectedItemTintColor`，再否则为 UIKit 的默认值（液态玻璃下为 label 颜色，之前为系统灰色）。
+ */
+static UIColor *CYLTemplateTintColor(UITabBar *tabBar, BOOL selected) {
+    UITabBarItemStateAppearance *state = selected ? tabBar.standardAppearance.stackedLayoutAppearance.selected
+                                                  : tabBar.standardAppearance.stackedLayoutAppearance.normal;
+    if (state.iconColor) {
+        return state.iconColor;
+    }
+    if (selected) {
+        return tabBar.tintColor ?: UIColor.systemBlueColor;
+    }
+    if (tabBar.unselectedItemTintColor) {
+        return tabBar.unselectedItemTintColor;
+    }
+    return [CYLConstants isLiquidGlassActive] ? UIColor.labelColor : UIColor.systemGrayColor;
+}
+
+/*!
+ * [EN] The optional tint method of `CYLTabBarItemAnimationPlayableView` (declared in the animation subspec, which Core does
+ *      not import), called by selector.
+ * [CN] `CYLTabBarItemAnimationPlayableView` 的可选着色方法（声明在动画子库中，Core 不导入它），通过 selector 调用。
+ */
+@protocol CYLTabBarItemAnimationTintable <NSObject>
+- (void)cyl_applyAnimationViewTintColor:(nullable UIColor *)color;
+@end
+
+/*!
+ * [EN] The animation views of a tab button that take a template tint (`-cyl_applyAnimationViewTintColor:`, the `tint` option).
+ * [CN] Tab 按钮中接受模板着色的动画视图（`-cyl_applyAnimationViewTintColor:`，`tint` 选项）。
+ */
+static void CYLCollectTintableAnimationViews(UIView *view, NSMutableArray<UIView *> *result) {
+    for (UIView *subview in view.subviews) {
+        if ([subview respondsToSelector:@selector(cyl_applyAnimationViewTintColor:)]) {
+            [result addObject:subview];
+        }
+        CYLCollectTintableAnimationViews(subview, result);
+    }
+}
+
+/*!
  * [EN] Plays `image`'s frames on `imageView` from the first one: once, or until stopped when `loops` is YES. The image view
  *      then shows its resting image again.
  * [CN] 在 `imageView` 上从第一帧播放 `image` 的各帧：播放一次，`loops` 为 YES 时一直播放到停止。之后图片视图恢复显示静止的图片。
@@ -1418,6 +1462,9 @@ static const void *const CYLPlusButtonGlassLayoutRetryPendingKey = &CYLPlusButto
     // [EN] Lottie views are added during layout: start the looping ones (`CYLTabBarLottieLoopsWhenUnselected`).
     // [CN] Lottie 视图在布局时添加：启动需要循环播放的视图（`CYLTabBarLottieLoopsWhenUnselected`）。
     [self cyl_updateLoopingLottieViews];
+    // [EN] Animation views added during layout get the tab's template tint (`CYLTabBarAnimationOptionTint`).
+    // [CN] 布局时添加的动画视图获得 Tab 的模板着色。
+    [self cyl_setNeedsApplyTabBarItemAnimationTintColors];
     // [EN] FIX: issue #535 — long press and swipe to switch tabs, once the view exists (every style).
     // [CN] FIX: issue #535 — view 已存在时安装长按与滑动切换手势（所有样式）。
     [self cyl_installInteractionGestureRecognizersIfNeeded];
@@ -5890,6 +5937,38 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
     return controls;
 }
 
+/*!
+ * [EN] Gives every tab's animation view the tab's current title color (`CYLTabBarAnimationOptionTint` "title"): the tab bar's
+ *      tint when selected, its unselected tint otherwise, as UIKit draws a template image. Next run loop, once UIKit has set
+ *      the labels' colors for the new selection or traits.
+ * [CN] 把每个 Tab 当前的标题颜色交给其动画视图（`CYLTabBarAnimationOptionTint` 为 "title"）：选中时为 TabBar 的 tint，否则为未选中 tint，
+ *      与 UIKit 绘制模板图片相同。在下一个 runloop 执行，此时 UIKit 已为新的选中状态或 trait 设置好标签颜色。
+ */
+- (void)cyl_setNeedsApplyTabBarItemAnimationTintColors {
+    __weak __typeof(self) weakSelf = self;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        __strong __typeof(weakSelf) self = weakSelf;
+        if (![self.cyl_tabBar isKindOfClass:[CYLTabBar class]]) {
+            return;
+        }
+        CYLTabBar *tabBar = (CYLTabBar *)self.cyl_tabBar;
+        for (UIControl *control in [self cyl_allTabButtonsForAnimatedImages]) {
+            NSMutableArray<UIView *> *views = [NSMutableArray array];
+            CYLCollectTintableAnimationViews(control, views);
+            if (views.count == 0) {
+                continue;
+            }
+            UITabBarItem *item = [self cyl_tabBarItemForTabButton:control];
+            BOOL selected = (item && item == self.selectedViewController.tabBarItem) ||
+                [tabBar.cyl_platterSelectedContentViews containsObject:control];
+            UIColor *color = CYLTemplateTintColor(tabBar, selected);
+            for (UIView *view in views) {
+                [(id<CYLTabBarItemAnimationTintable>)view cyl_applyAnimationViewTintColor:color];
+            }
+        }
+    });
+}
+
 - (void)didSelectControl:(UIControl *)control {
     [self cyl_setNeedsUpdateTabBarItemIconViews];
     CYL_IF_NOT_FLATDESIGN_BEGIN     //Not CYLTabBarStyleTypeFlatDesign
@@ -5976,6 +6055,7 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
         }
         [self cyl_sendDidSelectControl:reportedControl];
     }
+    [self cyl_setNeedsApplyTabBarItemAnimationTintColors];
     if (shouldSelectViewController) {
         // [EN] A tap plays the tab's animated images (they rest until played). [CN] 点击播放该 Tab 的动图（播放前保持静止）。
         [self cyl_playAnimatedImagesOfTabButton:contentControl];
@@ -6941,6 +7021,7 @@ static BOOL CYLIsImplementedOutsideSystemFrameworks(Class cls, SEL selector) {
 #pragma clang diagnostic ignored "-Wdeprecated-implementations"
 - (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection {
     [super traitCollectionDidChange:previousTraitCollection];
+    [self cyl_setNeedsApplyTabBarItemAnimationTintColors];
     // FIX: issue #216
     // [EN] Themes that follow the system Dark Mode (`respondsSystemStyleAutomatically`): next run loop, once UIKit has
     //      finished passing the new traits down.

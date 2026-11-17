@@ -67,6 +67,15 @@ public protocol CYLTabBarItemAnimationPlayableView: NSObjectProtocol {
      */
     @objc(cyl_setAnimationViewLoops:)
     optional func setAnimationLoops(_ loops: Bool)
+
+    /**
+     * [EN] The tab's current title color, for a view whose `tint` option is "title" (`CYLTabBarAnimationOptionTint`): the
+     *      icon is drawn in it like a template image. Called when the tab is selected or deselected and when the colors change.
+     * [CN] Tab 当前的标题颜色，用于 `tint` 选项为 "title" 的视图（`CYLTabBarAnimationOptionTint`）：图标像模板图片一样用该颜色绘制。在 Tab
+     *      选中或取消选中、颜色变化时调用。
+     */
+    @objc(cyl_applyAnimationViewTintColor:)
+    optional func applyAnimationTintColor(_ color: UIColor?)
 }
 
 /**
