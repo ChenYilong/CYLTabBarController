@@ -920,7 +920,7 @@
 | `UIViewController(CYLTabBarItemTitle)` | TODO | — |
 | `UIViewController(CYLTabBarItemTitle) cyl_tabBarItemTitle` | TODO | Title font of unselected tabs (and of selected ones without `cyl_tabBarItemSelectedTitleFont`). |
 | `UIViewController(CYLTabBarItemTitle) cyl_navigationTitleFollowsTabBarItemTitle` | TODO | YES: `navigationItem.title` is the tab's title, now and after every change. Default NO. |
-| `CYLTabBarController tabBarItemAnimationLoops` | TODO | Whether the tab icon animations repeat until this is set to NO (default NO: each plays once). Settable at any time: the views already added change at once, during playback too. Only for libraries with a loop mode (Lottie, PAG). |
+| `CYLTabBarController tabBarItemAnimationLoops` | Rive DONE (2026-11-18, `@Prop tabBarItemAnimationLoops` → `CYLRiveIcon.loops`, checked on the arm64 emulator, [Animated-Item.md](Animated-Item.md)); Lottie, SVGA TODO | Whether the tab icon animations repeat until this is set to NO (default NO: each plays once). Settable at any time: the views already added change at once, during playback too. Only for libraries with a loop mode (Lottie, PAG). |
 | `CYLTabBarController -cyl_playAllTabBarItemAnimations` | TODO | — |
 
 ### `CYLTabBarHostView.h`

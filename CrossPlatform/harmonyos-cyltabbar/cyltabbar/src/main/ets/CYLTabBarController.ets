@@ -322,6 +322,12 @@ export struct CYLTabBarController {
   /** [EN] CYLTabBarControllerTabBarItemAnimationSpeed (Lottie). [CN] Lottie 动画速度。 */
   tabBarItemAnimationSpeed: number = 1;
   /**
+   * [EN] tabBarItemAnimationLoops: the selected tab's Rive icon plays again after each pass until this is turned off,
+   *      also while playing (docs/Animated-Item.md, the Rive loop); off by default.
+   * [CN] tabBarItemAnimationLoops：选中 Tab 的 Rive 图标每次播放后再次播放，直到关闭，播放中也立即生效；默认关闭。
+   */
+  @Prop tabBarItemAnimationLoops: boolean = false;
+  /**
    * [EN] -cyl_coverVisiableTabImageViewOrTabButton:...: an image covering a whole tab button (index -> image), as the
    *      Example's Taobao-style Home cover; undefined: none.
    * [CN] 覆盖整个 Tab 按钮的图片（索引 -> 图片），如示例中仿淘宝的首页封面；undefined 表示无。
@@ -1263,6 +1269,7 @@ export struct CYLTabBarController {
         iconSize: this.cylTabAnimationSize(index),
         selected: this.selectedIndex === index,
         replayToken: this.replayTokens[index] ?? 0,
+        loops: this.tabBarItemAnimationLoops,
         onLoaded: () => context.onLoaded(),
         onLoadError: (_message: string) => {
           context.onFailed();

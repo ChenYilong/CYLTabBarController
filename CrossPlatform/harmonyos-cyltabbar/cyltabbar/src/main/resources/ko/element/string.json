@@ -293,6 +293,10 @@
       "value": "Rive tab icons (configuration file)"
     },
     {
+      "name": "cyl_l10n_9d01c837b4bc",
+      "value": "Rive 탭 아이콘: house.riv (숫자 입력 Rooms)"
+    },
+    {
       "name": "cyl_l10n_f0c792c049bc",
       "value": "롤링 1회"
     },
@@ -439,6 +443,10 @@
     {
       "name": "cyl_l10n_4abddd944c2e",
       "value": "harmonyos-liquid-glass-tabbar: 다채로운 콘텐츠 위의 탭 캡슐, 검색 볼, 음악 바. 스크롤하면 축소"
+    },
+    {
+      "name": "cyl_l10n_3b4e07b5542e",
+      "value": "numberInput=Rooms: each select or tap again sets Rooms to the next value (3, 4, 5, 6)"
     },
     {
       "name": "cyl_l10n_f3f4ecf4a4a6",
@@ -615,6 +623,10 @@
     {
       "name": "cyl_l10n_758903c327de",
       "value": "이 페이지 탭에 GIF 애니메이션 표시. 다시 탭하면 복원"
+    },
+    {
+      "name": "cyl_l10n_56e6ecf97176",
+      "value": "반복"
     },
     {
       "name": "cyl_l10n_c7db6d4f1a42",

@@ -46,6 +46,11 @@ struct ConfigurationDemo {
   @State selectedIndex: number = 0;
   @State result?: CYLTabBarConfigurationResult = undefined;
   @State errorText: string = '';
+  /**
+   * [EN] The Loop switch of the Rive pages (tabBarItemAnimationLoops): the selected tab's icon plays again after each pass.
+   * [CN] Rive 页面的循环开关（tabBarItemAnimationLoops）：选中 Tab 的图标每次播放后再次播放。
+   */
+  @State loops: boolean = false;
   private file: string = 'configurations/cyl_tabbar_configuration.json';
 
   aboutToAppear(): void {
@@ -127,6 +132,19 @@ struct ConfigurationDemo {
 
   build() {
     Column() {
+      if (this.result !== undefined && this.file.indexOf('_rive') >= 0) {
+        // [EN] The animated icon examples' loop switch (AGENTS.md), applied live. [CN] 动画图标示例的循环开关，立即生效。
+        Row() {
+          Text(CYLLocalizedString('循环播放')).fontSize(15).layoutWeight(1)
+          Toggle({ type: ToggleType.Switch, isOn: this.loops })
+            .onChange((isOn: boolean) => { this.loops = isOn; })
+            .id('cyl-config-rive-loop')
+            .accessibilityText(CYLLocalizedString('循环播放'))
+        }
+        .padding({ left: 16, right: 16 })
+        .height(48)
+        .width('100%')
+      }
       if (this.result !== undefined) {
         CYLTabBarController({
           tabBarItemsAttributes: this.result.items,
@@ -136,10 +154,12 @@ struct ConfigurationDemo {
           tintColor: this.result.tintColor ?? '#FF8000',
           tabBarBackgroundColor: this.result.backgroundColor ?? '#F8F8F8',
           titlePositionAdjustment: this.result.titlePositionAdjustment,
+          tabBarItemAnimationLoops: this.loops,
           pageBuilder: (index: number, identifier: string) => {
             this.cylPage(index, identifier)
           },
         })
+        .layoutWeight(1)
       } else {
         Text(this.errorText).fontColor(Color.Red).margin(16).id('cyl-config-error')
         Button(CYLLocalizedString('Back')).onClick(() => router.back())

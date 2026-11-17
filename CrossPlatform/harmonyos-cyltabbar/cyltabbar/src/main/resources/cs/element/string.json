@@ -293,6 +293,10 @@
       "value": "Rive tab icons (configuration file)"
     },
     {
+      "name": "cyl_l10n_9d01c837b4bc",
+      "value": "Rive tab icon: house.riv (number input Rooms)"
+    },
+    {
       "name": "cyl_l10n_f0c792c049bc",
       "value": "Jednou převinout"
     },
@@ -439,6 +443,10 @@
     {
       "name": "cyl_l10n_4abddd944c2e",
       "value": "harmonyos-liquid-glass-tabbar: kapsle karet, vyhledávací koule a hudební lišta nad barevným obsahem; posunutím minimalizujete"
+    },
+    {
+      "name": "cyl_l10n_3b4e07b5542e",
+      "value": "numberInput=Rooms: each select or tap again sets Rooms to the next value (3, 4, 5, 6)"
     },
     {
       "name": "cyl_l10n_f3f4ecf4a4a6",
@@ -615,6 +623,10 @@
     {
       "name": "cyl_l10n_758903c327de",
       "value": "Zobrazí animovaný GIF jako ikonu panelu; klepnutím znovu obnovíte"
+    },
+    {
+      "name": "cyl_l10n_56e6ecf97176",
+      "value": "Loop"
     },
     {
       "name": "cyl_l10n_c7db6d4f1a42",

@@ -454,6 +454,15 @@ struct Index {
       subtitle: CYLLocalizedString('CYLTabBarRiveURL：选中时驱动状态机输入 active，未选中时恢复'),
       action: () => this.push('pages/ConfigurationDemo', { file: 'configurations/cyl_tabbar_configuration_rive.json' } as DemoPushParams),
     } as DemoRow, {
+      // [EN] house.riv on the Home tab: its state machine moves only when the NUMBER input Rooms changes, so each play sets
+      //      the next of values (numberInput=Rooms&values=3,4,5,6), as iOS, Android and the mini program. The page's Loop
+      //      switch drives tabBarItemAnimationLoops (docs/Animated-Item.md, the Rive loop).
+      // [CN] Home Tab 使用 house.riv：其状态机只在数字输入 Rooms 变化时运动，因此每次播放设为 values 中的下一个值。页面的循环开关
+      //      驱动 tabBarItemAnimationLoops。
+      id: 'configuration-rive-house', title: CYLLocalizedString('Rive Tab 图标：house.riv（数字输入 Rooms）'),
+      subtitle: CYLLocalizedString('numberInput=Rooms：每次选中或再次点击时 Rooms 变为下一个值（3、4、5、6）'),
+      action: () => this.push('pages/ConfigurationDemo', { file: 'configurations/cyl_tabbar_configuration_rive_house.json' } as DemoPushParams),
+    } as DemoRow, {
       // [EN] Item 44: broken and unusual files (A2–E1); each shows a typed error or the tab bar created safely.
       // [CN] 第 44 项：损坏与异常的文件（A2–E1）；每个显示错误或安全创建的 TabBar。
       id: 'configuration-failures', title: CYLLocalizedString('配置文件：模拟意外情况'),

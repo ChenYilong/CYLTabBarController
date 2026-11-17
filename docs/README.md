@@ -287,6 +287,8 @@ docs/
 │   ├── harmonyos-port-svga-demo-page.png
 │   ├── harmonyos-port-svga-demo-row.png
 │   ├── harmonyos-port-svga-demo-taps.png
+│   ├── harmonyos-rive-house-loop-arm64.png
+│   ├── harmonyos-rive-replay-arm64.png
 │   ├── harmonyos-rive-tab-icons-mate70pro-api21.png
 │   ├── harmonyos-styles-ocean-skin-b7995d0.png
 │   ├── harmonyos-styles-recheck-6befe36.png
