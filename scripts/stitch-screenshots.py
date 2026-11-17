@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 """Stitch screenshots into one labeled image, as docs/Screenshot-Guidelines.md requires.
 
-The result has, from top to bottom: a header band (environment and purpose), the cells in a grid (two columns by
-default, one caption band above each cell), and a footer band (result, method). The bands are added around the
+The result has, from top to bottom: a header band (environment and purpose), the cells (one caption band above each),
+and a footer band (result, method). Columns: one column by default; two columns when one column would be taller than
+one phone screen (height above PHONE_SCREEN_RATIO times the width, a 19.5:9 phone shown at phone width). The bands are added around the
 screenshots, never drawn over them, and the screenshots keep their original pixels (no scaling). Only ffmpeg is
 needed (with drawtext); no Python packages.
 
-    python3 scripts/stitch-screenshots.py --out docs/assets/ios-rive-rest.png --columns 1 \\
+    python3 scripts/stitch-screenshots.py --out docs/assets/ios-rive-rest.png \\
         --header "iOS 27.2, iPhone 17 Pro simulator, macOS 27.3, Xcode 27.2, CYLTabBarController dcbfdec6, 2026-11-18. Purpose: Rive tags rest until played" \\
         --footer "Result: 0 changed pixels in all six icons over 11 s (expected: still until played). Method: pixel diff of two screenshots" \\
         "launch, no play=/tmp/a.png" "11 s later, 0 changed pixels=/tmp/b.png"
@@ -24,6 +25,8 @@ import textwrap
 FONT = '/System/Library/Fonts/Supplemental/Arial Bold.ttf'
 TEXT_COLOR = '0xFF3B30'
 BACKGROUND = 'white'
+# [EN] A common phone screen (19.5:9): an image taller than this times its width needs scrolling at phone width.
+PHONE_SCREEN_RATIO = 19.5 / 9
 
 
 def run(args):
@@ -82,7 +85,8 @@ def main():
     parser.add_argument('--out', required=True)
     parser.add_argument('--header', required=True, help='Environment and purpose (English).')
     parser.add_argument('--footer', required=True, help='Result and method (English).')
-    parser.add_argument('--columns', type=int, default=2, help='Cells per row (default 2).')
+    parser.add_argument('--columns', default='auto',
+                        help='Cells per row: "auto" (default: 1, or 2 when one column is taller than a phone screen), or a number.')
     parser.add_argument('--gap', type=int, default=16, help='White space after each cell, in pixels (default 16).')
     parser.add_argument('cells', nargs='+', help='"caption=path" or "path".')
     options = parser.parse_args()
@@ -94,6 +98,13 @@ def main():
         caption, path = cell.split('=', 1) if '=' in cell and not os.path.exists(cell) else ('', cell)
         cells.append((caption, path))
     cell_width = max(size_of(path)[0] for _, path in cells)
+    if options.columns == 'auto':
+        # [EN] One column first; two when the one-column image (cells plus captions, header and footer, roughly) would be
+        #      taller than one phone screen.
+        estimate = sum(size_of(path)[1] + options.gap + int(cell_width * 0.06) for _, path in cells) + int(cell_width * 0.3)
+        options.columns = 2 if len(cells) > 1 and estimate > cell_width * PHONE_SCREEN_RATIO else 1
+    else:
+        options.columns = int(options.columns)
     font_size = max(28, int(cell_width * options.columns * 0.02))
     # [EN] Each cell: its caption band above it, then the screenshot; all cells as wide as the widest, rows as tall as
     #      the tallest cell of the row.
@@ -122,7 +133,10 @@ def main():
     stack([header, grid, footer], options.out, vertical=True)
     width, height = size_of(options.out)
     shutil.rmtree(work, ignore_errors=True)
-    print(f'{options.out}: {width} x {height}' + ('' if height >= width else ' (landscape: try fewer columns)'))
+    note = ''
+    if options.columns == 1 and len(cells) > 1 and height > width * PHONE_SCREEN_RATIO:
+        note = ' (taller than one phone screen: use --columns 2)'
+    print(f'{options.out}: {width} x {height}, {options.columns} column(s){note}')
 
 
 if __name__ == '__main__':

@@ -13,8 +13,9 @@ Read this file before reading or writing files in this repository. It inherits t
 ## Screenshots (added 2026-11-18)
 
 - Original screenshots only (no scaling, no recompression), cropped to the same region and width, from real runs.
-- The stitched image is portrait. Two columns with several rows by default; one column when each cell is wider than
-  tall (a tab bar strip); a matrix stays a grid; a single horizontal row only as the last resort (at most three).
+- One column with several rows (top to bottom) first. Two columns with several rows only when the one-column image
+  would be taller than one screen of a common phone (height above about 2.17 times the width, 19.5:9). A matrix stays a
+  grid; a single horizontal row only as the last resort (at most three). The script picks this by default.
 - Every stitched image has a header band, a caption band above each cell and a footer band, added around the
   screenshots and never overlapping or covering them. English only; white bands, bold red text (`#FF3B30`), about 2 %
   of the image width.

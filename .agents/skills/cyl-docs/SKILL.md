@@ -57,9 +57,9 @@ two places**:
   embed them in the feature's `docs/` file.
 - **Final screenshots** of the finished feature also go into `README.md`.
 - **Screenshot layout** (updated 2026-11-18, [Screenshot-Guidelines](../../../docs/Screenshot-Guidelines.md) wins over this
-  summary): the stitched image is portrait; two columns with several rows by default (a pair to compare side by side in
-  one row); one column, top to bottom, when each cell is wider than tall (a tab bar strip), with the same element lined up
-  vertically; a matrix (e.g. styles × libraries) stays a grid. Crop each screenshot to the same region and width. Every
+  summary): one column with several rows, top to bottom, first, the same element lined up vertically; two columns with
+  several rows only when the one-column image would be taller than one phone screen (height above about 2.17 times the
+  width); a matrix (e.g. styles × libraries) stays a grid. Crop each screenshot to the same region and width. Every
   stitched image has a header band (platform and OS version, simulator / emulator / device, host OS, IDE version, commit,
   branch, date, `Purpose: …`), a caption band above each cell (state and measurement) and a footer band (`Result: …
   Method: …`), English only, added around the screenshots and never over them: `scripts/stitch-screenshots.py`.
