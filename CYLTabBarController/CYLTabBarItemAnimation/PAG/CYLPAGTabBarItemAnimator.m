@@ -6,11 +6,11 @@
 //
 
 #import "CYLPAGTabBarItemAnimator.h"
-// [EN] Core's generic keys and helpers. [CN] Core 的通用 key 与工具函数。
-#if __has_include("../../CYLTabBarController.h")
-#import "../../CYLTabBarController.h"
+// [EN] The generic keys, from CYLUtils: no Core. [CN] 通用 key，来自 CYLUtils：不依赖 Core。
+#if __has_include("../../CYLUtils/CYLAnimationKeys.h")
+#import "../../CYLUtils/CYLAnimationKeys.h"
 #else
-#import "CYLTabBarController.h"
+#import "CYLAnimationKeys.h"
 #endif
 
 // FIX: issue #604 — only with libpag (`CYL_PAG_AVAILABLE`, the PAG subspec); without it this file is empty: no keys,
@@ -26,19 +26,6 @@ NSString *const CYLTabBarPAGFilePath = @"CYLTabBarPAGFilePath";
 NSString *const CYLTabBarPAGSize = @"CYLTabBarPAGSize";
 NSString *const CYLTabBarPAGDarkURL = @"CYLTabBarPAGDarkURL";
 NSString *const CYLTabBarPAGDarkFilePath = @"CYLTabBarPAGDarkFilePath";
-
-NSArray<NSDictionary *> *CYLTabBarItemsAttributesAddingPAGFiles(NSArray<NSDictionary *> *attributes,
-                                                                 NSArray<NSString *> *pagFileNames,
-                                                                 NSBundle *bundle) {
-    // [EN] The generic helper with "<name>.pag": the same files, under the generic keys the PAG keys stand for.
-    // [CN] 使用「名称.pag」调用通用工具函数：文件相同，使用 PAG key 所对应的通用 key。
-    NSMutableArray *fileNames = [NSMutableArray arrayWithCapacity:pagFileNames.count];
-    for (id name in pagFileNames) {
-        BOOL hasName = [name isKindOfClass:[NSString class]] && [(NSString *)name length] > 0;
-        [fileNames addObject:hasName ? [(NSString *)name stringByAppendingPathExtension:@"pag"] : @""];
-    }
-    return CYLTabBarItemsAttributesAddingAnimationFiles(attributes, fileNames, bundle);
-}
 
 // The protocol and the registry of the `CYLTabBarItemAnimation` subspec (the source tree, or flattened by CocoaPods).
 // `CYLTabBarItemAnimation` 子库的协议与注册表（源码目录，或 CocoaPods 展平后）。

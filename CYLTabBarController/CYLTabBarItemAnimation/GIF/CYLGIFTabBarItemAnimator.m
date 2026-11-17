@@ -14,17 +14,31 @@
 #import "CYLTabBarItemAnimatorRegistry.h"
 #import "CYLTabBarItemAnimationPlayableView.h"
 #endif
-// [EN] `CYLTabBarAnimationURL` and the other generic keys. [CN] `CYLTabBarAnimationURL` 等通用 key。
-#if __has_include("../../CYLTabBarController.h")
-#import "../../CYLTabBarController.h"
-#import "../../UIImage+CYLTabBarControllerExtention.h"
+// [EN] `CYLTabBarAnimationURL` and the other generic keys, from CYLUtils: no Core, so the subspec works without the tab bar.
+// [CN] `CYLTabBarAnimationURL` 等通用 key，来自 CYLUtils：不依赖 Core，因此本子库无需 TabBar 也能使用。
+#if __has_include("../../CYLUtils/CYLAnimationKeys.h")
+#import "../../CYLUtils/CYLAnimationKeys.h"
 #else
-#import "CYLTabBarController.h"
-#import "UIImage+CYLTabBarControllerExtention.h"
+#import "CYLAnimationKeys.h"
 #endif
 
 #if CYL_GIF_AVAILABLE
 #import <ImageIO/ImageIO.h>
+
+/*
+ * [EN] The delay of one GIF frame (0.1 s for a delay under 11 ms, as browsers do): the same rule as Core's
+ *      `+[UIImage cyl_GIFFrameDelayWithProperties:]`, here so that this subspec does not need Core.
+ * [CN] 一帧 GIF 的延迟（小于 11 毫秒时为 0.1 秒，与浏览器一致）：与 Core 的 `+[UIImage cyl_GIFFrameDelayWithProperties:]` 规则相同，放在这里
+ *      使本子库不依赖 Core。
+ */
+static NSTimeInterval CYLGIFFrameDelay(NSDictionary *properties) {
+    NSDictionary *gif = properties[(__bridge NSString *)kCGImagePropertyGIFDictionary];
+    NSTimeInterval delay = [gif[(__bridge NSString *)kCGImagePropertyGIFUnclampedDelayTime] doubleValue];
+    if (delay <= 0) {
+        delay = [gif[(__bridge NSString *)kCGImagePropertyGIFDelayTime] doubleValue];
+    }
+    return delay < 0.011 ? 0.1 : delay;
+}
 
 NSString *const CYLTabBarGIFURL = @"CYLTabBarGIFURL";
 NSString *const CYLTabBarGIFFilePath = @"CYLTabBarGIFFilePath";
@@ -66,7 +80,7 @@ static NSString *const CYLGIFPlayAnimationKey = @"CYLGIFTabBarItemPlayAnimation"
         [frames addObject:[UIImage imageWithCGImage:imageRef]];
         CGImageRelease(imageRef);
         NSDictionary *properties = (__bridge_transfer NSDictionary *)CGImageSourceCopyPropertiesAtIndex(source, index, NULL);
-        [frameDelays addObject:@([UIImage cyl_GIFFrameDelayWithProperties:properties])];
+        [frameDelays addObject:@(CYLGIFFrameDelay(properties))];
     }
     CFRelease(source);
     if (frames.count == 0) {

@@ -13,11 +13,11 @@
 #else
 #import "CYLTabBarItemAnimatorRegistry.h"
 #endif
-// Core's keys (`CYLTabBarLottie…`, `CYLTabBarAnimation…`). Core 的 key。
-#if __has_include("../../CYLTabBarController.h")
-#import "../../CYLTabBarController.h"
+// [EN] The keys (`CYLTabBarLottie…`, `CYLTabBarAnimation…`), from CYLUtils: no Core. [CN] key（`CYLTabBarLottie…`、`CYLTabBarAnimation…`），来自 CYLUtils：不依赖 Core。
+#if __has_include("../../CYLUtils/CYLAnimationKeys.h")
+#import "../../CYLUtils/CYLAnimationKeys.h"
 #else
-#import "CYLTabBarController.h"
+#import "CYLAnimationKeys.h"
 #endif
 // Shared through CYLUtils (the source tree, or flattened by CocoaPods). 通过 CYLUtils 共用（源码目录，或 CocoaPods 展平后）。
 #if __has_include("../../CYLUtils/CYLUtils.h")

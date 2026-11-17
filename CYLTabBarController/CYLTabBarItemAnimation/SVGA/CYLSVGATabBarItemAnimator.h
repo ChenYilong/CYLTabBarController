@@ -18,11 +18,11 @@
 #else
 #import "CYLTabBarItemViewAnimator.h"
 #endif
-// [EN] The generic keys (`CYLTabBarAnimationURL`…). [CN] 通用 key（`CYLTabBarAnimationURL` 等）。
-#if __has_include("../../CYLTabBarController.h")
-#import "../../CYLTabBarController.h"
+// [EN] The generic keys (`CYLTabBarAnimationURL`…), from CYLUtils: no Core. [CN] 通用 key（`CYLTabBarAnimationURL` 等），来自 CYLUtils：不依赖 Core。
+#if __has_include("../../CYLUtils/CYLAnimationKeys.h")
+#import "../../CYLUtils/CYLAnimationKeys.h"
 #else
-#import "CYLTabBarController.h"
+#import "CYLAnimationKeys.h"
 #endif
 
 /*!

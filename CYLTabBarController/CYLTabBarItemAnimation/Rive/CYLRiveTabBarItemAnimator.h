@@ -20,11 +20,11 @@
 #else
 #import "CYLTabBarItemViewAnimator.h"
 #endif
-// [EN] `CYLTabBarAnimationOption`. [CN] `CYLTabBarAnimationOption` 类型。
-#if __has_include("../../CYLTabBarController.h")
-#import "../../CYLTabBarController.h"
+// [EN] `CYLTabBarAnimationOption` and the keys, from CYLUtils: no Core. [CN] `CYLTabBarAnimationOption` 与 key，来自 CYLUtils：不依赖 Core。
+#if __has_include("../../CYLUtils/CYLAnimationKeys.h")
+#import "../../CYLUtils/CYLAnimationKeys.h"
 #else
-#import "CYLTabBarController.h"
+#import "CYLAnimationKeys.h"
 #endif
 
 /*!

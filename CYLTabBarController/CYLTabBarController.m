@@ -53,9 +53,6 @@
 //#import "NSObject+CYLTabBarControllerExtention.h"
 #endif
 
-NSString *const CYLTabBarLottieFilePath = @"CYLTabBarLottieFilePath";
-NSString *const CYLTabBarLottieURL = @"CYLTabBarLottieURL";
-NSString *const CYLTabBarLottieSize = @"CYLTabBarLottieSize";
 /// [EN] Defined in CYLPlusButton.m: the plus button page, passed with its attributes. [CN] 定义在 CYLPlusButton.m：随属性传递的 PlusButton 页面。
 FOUNDATION_EXTERN NSString *const CYLConfigurationPlusButtonPageKey;
 /// [EN] Set from `CYLPlusButtonShowsSelection` of a configuration. [CN] 由配置中的 `CYLPlusButtonShowsSelection` 设置。
@@ -65,7 +62,6 @@ static const void *const CYLPlusButtonShowsSelectionKey = &CYLPlusButtonShowsSel
 static NSString *const CYLTabBarItemExcludedKey = @"_CYLTabBarItemExcluded";
 /// [EN] Private: set by the parameter initializers, which keep an empty view controller list (C9). [CN] 私有：由参数初始化方法设置，保持空的子控制器列表（C9）。
 static NSString *const CYLTabBarControllerKeepsEmptyViewControllersKey = @"_CYLTabBarControllerKeepsEmptyViewControllers";
-NSString *const CYLTabBarLottieLoopsWhenUnselected = @"CYLTabBarLottieLoopsWhenUnselected";
 
 #pragma mark - Selected title (FIX: issue #433)
 
@@ -212,9 +208,6 @@ static NSDictionary *CYLTabBarItemIconAttributes(NSDictionary *attributes) {
     }
     return [iconAttributes copy];
 }
-NSString *const CYLTabBarLottieDarkURL = @"CYLTabBarLottieDarkURL";
-NSString *const CYLTabBarLottieDarkFilePath = @"CYLTabBarLottieDarkFilePath";
-NSString *const CYLTabBarLottieDarkColors = @"CYLTabBarLottieDarkColors";
 
 NSUInteger CYLTabbarItemsCount = 0;
 NSUInteger CYLPlusButtonIndex = 0;

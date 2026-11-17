@@ -8,7 +8,8 @@
 import UIKit
 
 // [EN] FIX: issue #415 — the playable view protocols of the `CYLTabBarItemAnimation` subspec, translated from Objective-C
-//      (CYLTabBarItemAnimation/CYLTabBarItemAnimationPlayableView.h; docs/Swift-Migration.md). Their Objective-C names,
+//      (CYLTabBarItemAnimation/CYLTabBarItemAnimationPlayableView.h; docs/Swift-Migration.md). It lives with the engine (subspec
+//      CYLAnimationEngine), not in Core, so the engine builds without Core. Their Objective-C names,
 //      selectors and Swift names are unchanged. Declared in Swift so the Swift views that adopt them (Rive's) no longer make
 //      the generated header import the umbrella header, which broke a CocoaPods build with the Rive subspec.
 // [CN] `CYLTabBarItemAnimation` 子库的可播放视图协议，已从 Objective-C 翻译（CYLTabBarItemAnimation/CYLTabBarItemAnimationPlayableView.h；

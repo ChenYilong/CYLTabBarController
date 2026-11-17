@@ -3,7 +3,7 @@ name: cyl-tab-animation
 description: "Animated tab icons in CYLTabBarController with Lottie, PAG, Rive, GIF or SVGA: subspecs, keys, options, availability guards, and adding a new animation library. Use when adding animated tabs or touching the CYLTabBarItemAnimation subspec."
 ---
 
-> The engine (animator protocols, registry, factory, players) is the Core-free subspec `CYLAnimationEngine` (Android: module `:cylanimateditem`), which `CYLTabBarItemAnimation` and so every animation subspec depend on. `CYLAnimatedItemView` (subspec `CYLAnimatedItem`) shows static images unless the engine is in the build (`CYL_ANIMATION_ENGINE_AVAILABLE`). A new animator registered there plays in tab buttons and in every `CYLAnimatedItemView` subclass of the other repositories. See [docs/Animated-Item.md](../../../docs/Animated-Item.md).
+> The engine (animator protocols, registry, factory, players) is the Core-free subspec `CYLAnimationEngine` (Android: module `:cylanimateditem`), which `CYLTabBarItemAnimation` depends on. Every animation type has a Core-free component subspec `CYLAnimatedItem<Type>` (the view, the engine, the animator); the tab bar subspec `<Type>` depends on it plus Core. A new type: an animator in `CYLTabBarItemAnimation/<Type>/`, a `CYLAnimatedItem<Type>` subspec and a `<Type>` subspec depending on it. `CYLAnimatedItemView` (subspec `CYLAnimatedItem`) shows static images unless the engine is in the build (`CYL_ANIMATION_ENGINE_AVAILABLE`). A new animator registered there plays in tab buttons and in every `CYLAnimatedItemView` subclass of the other repositories. See [docs/Animated-Item.md](../../../docs/Animated-Item.md).
 
 # Animated tab icons
 

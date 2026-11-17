@@ -154,28 +154,6 @@ public func cylTabBarItemsAttributesAddingLottieFilesEntryPoint(_ attributes: NS
                                                  darkFilePathKey: "CYLTabBarLottieDarkFilePath" /* CYLTabBarLottieDarkFilePath, deprecated without Lottie */) as NSArray
 }
 
-@_cdecl("CYLTabBarAnimationURLWithOptions")
-public func cylTabBarAnimationURLWithOptionsEntryPoint(_ fileURL: NSURL?, _ options: NSDictionary?) -> NSURL? {
-    guard let fileURL = fileURL as URL?, var components = URLComponents(url: fileURL, resolvingAgainstBaseURL: true) else {
-        return nil
-    }
-    var allowed = CharacterSet.urlQueryAllowed
-    allowed.remove(charactersIn: "&=+#?")
-    var values: [String: String] = [:]
-    for case let (name as String, value as String) in options ?? [:] where !name.isEmpty && !value.isEmpty {
-        values[name] = value
-    }
-    let items: [String] = values.keys.sorted().compactMap { name in
-        guard let encodedName = name.addingPercentEncoding(withAllowedCharacters: allowed), !encodedName.isEmpty,
-              let encodedValue = values[name]?.addingPercentEncoding(withAllowedCharacters: allowed), !encodedValue.isEmpty else {
-            return nil
-        }
-        return "\(encodedName)=\(encodedValue)"
-    }
-    components.percentEncodedFragment = items.isEmpty ? nil : items.joined(separator: "&")
-    return components.url as NSURL?
-}
-
 @_cdecl("CYLTabBarItemAttributesAddingAnimationFile")
 public func cylTabBarItemAttributesAddingAnimationFileEntryPoint(_ attributes: NSDictionary, _ fileName: NSString,
                                                                  _ bundle: Bundle?) -> NSDictionary {

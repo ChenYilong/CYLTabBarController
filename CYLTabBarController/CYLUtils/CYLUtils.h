@@ -23,6 +23,7 @@
 
 #import <UIKit/UIKit.h>
 #import "CYLUtilsMacros.h"
+#import "CYLAnimationKeys.h"
 #import "CYLLocalizedString.h"
 #import "CYLResourceRoute.h"
 #import "NSObject+CYLUtils.h"

@@ -16,15 +16,17 @@
 
 /*!
  * [EN] 1 when the animation engine (the subspec `CYLTabBarController/CYLAnimationEngine`, pulled in by every animation
- *      library subspec: `LottieSwift`, `LottieObjectiveC`, `PAG`, `Rive`, `SVGA`, `GIF`) is part of the build, 0
- *      otherwise. Like `CYL_FLATDESIGN_AVAILABLE`, this is the one place that asks; guard engine code with
+ *      subspec of the component: `CYLAnimatedItemLottieSwift`, `CYLAnimatedItemLottieObjectiveC`, `CYLAnimatedItemPAG`,
+ *      `CYLAnimatedItemRive`, `CYLAnimatedItemSVGA`, `CYLAnimatedItemGIF`, and by the tab bar's `LottieSwift`, `PAG`… which
+ *      depend on them) is part of the build, 0 otherwise. Like `CYL_FLATDESIGN_AVAILABLE`, this is the one place that asks; guard engine code with
  *      `#if CYL_ANIMATION_ENGINE_AVAILABLE`. Without the engine, `CYLAnimatedItemView` shows static images only:
  *      `animationURL` is kept but plays nothing, and the playback methods do nothing, so an app that never animates
  *      ships no engine and no animation library. Adding an animation subspec turns it on, with no code change.
  *      The first check is the public header (CocoaPods, apps); the second the target's own headers (the framework target,
  *      SwiftPM), which do not include a file on disk that the build does not compile.
- * [CN] 引入动画引擎（子库 `CYLTabBarController/CYLAnimationEngine`，每个动画库子库 `LottieSwift`、`LottieObjectiveC`、`PAG`、
- *      `Rive`、`SVGA`、`GIF` 都会引入它）时为 1，否则为 0。与 `CYL_FLATDESIGN_AVAILABLE` 一样，这是唯一检查的地方；引擎相关代码统一用
+ * [CN] 引入动画引擎（子库 `CYLTabBarController/CYLAnimationEngine`；组件的每个动效子库 `CYLAnimatedItemLottieSwift`、
+ *      `CYLAnimatedItemLottieObjectiveC`、`CYLAnimatedItemPAG`、`CYLAnimatedItemRive`、`CYLAnimatedItemSVGA`、`CYLAnimatedItemGIF`，以及依赖
+ *      它们的 TabBar 子库 `LottieSwift`、`PAG`……都会引入它）时为 1，否则为 0。与 `CYL_FLATDESIGN_AVAILABLE` 一样，这是唯一检查的地方；引擎相关代码统一用
  *      `#if CYL_ANIMATION_ENGINE_AVAILABLE` 做 guard。没有引擎时 `CYLAnimatedItemView` 只显示静态图片：保留 `animationURL` 但不播放，
  *      播放方法不做任何事，因此不使用动效的 App 不会带入引擎和任何动画库，减小包体积。加入动画子库即可开启，无需修改代码。
  *      第一个检查针对公开头文件（CocoaPods、App），第二个针对 target 自己的头文件（framework target、SwiftPM），不会把磁盘上存在但
