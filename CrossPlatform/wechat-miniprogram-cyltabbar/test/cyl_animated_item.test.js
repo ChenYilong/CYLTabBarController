@@ -104,3 +104,25 @@ test('cyl-animated-item: the placeholder is a data URI, not a path the page woul
   assert.match(CYL_ANIMATED_ITEM_PLACEHOLDER, /^data:image\/png;base64,iVBORw0KGgo/)
   assert.equal(cylAnimatedItemModel({ animationUrl: 'unknown.xyz' }).fallbackImage, CYL_ANIMATED_ITEM_PLACEHOLDER)
 })
+
+test('cyl-animated-item: the same file set again keeps the loaded state (the engine view sends no second ready)', () => {
+  let definition = null
+  global.Component = (options) => { definition = options }
+  delete require.cache[require.resolve('../src/cyl-animated-item/index.js')]
+  require('../src/cyl-animated-item/index.js')
+  delete global.Component
+  const observer = definition.observers['animationUrl, animationType']
+  const resets = []
+  const item = {
+    setData(data) { if (data.animationLoaded === false) resets.push(data) },
+    cyl_update() {},
+  }
+  observer.call(item, '/a.json', '')
+  observer.call(item, '/a.json', '')
+  observer.call(item, '/a.json', '')
+  assert.equal(resets.length, 1, 'set again with the same file: no reset')
+  observer.call(item, '/b.json', '')
+  assert.equal(resets.length, 2, 'a new file resets')
+  observer.call(item, '/b.json', 'lottie')
+  assert.equal(resets.length, 3, 'a new type resets')
+})

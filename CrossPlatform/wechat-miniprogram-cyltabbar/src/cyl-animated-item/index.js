@@ -61,7 +61,17 @@ Component({
   },
 
   observers: {
-    'animationUrl, animationType': function () {
+    'animationUrl, animationType': function (animationUrl, animationType) {
+      // [EN] A host re-renders and sets the same file again: keep the loaded / failed state, because the engine view
+      //      (cyl-lottie reloads only when its inputs change) does not load again and sends no new `ready`; resetting
+      //      here left the static image over a playing animation.
+      // [CN] 宿主重新渲染时会再次设置同一个文件：保留已加载 / 失败状态，因为引擎视图（cyl-lottie 只在输入变化时重新加载）
+      //      不会再次加载、也不会再发 `ready`；在这里重置会让静态图片盖住正在播放的动画。
+      const key = `${animationUrl || ''}|${animationType || ''}`
+      if (key === this.cylAnimationKey) {
+        return
+      }
+      this.cylAnimationKey = key
       this.setData({ animationLoaded: false, animationFailed: false })
       this.cyl_update()
     },
