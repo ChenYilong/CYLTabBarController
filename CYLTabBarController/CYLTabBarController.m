@@ -101,7 +101,63 @@ static BOOL CYLTabBarAnimationCanPlay(NSURL *URL) {
 #import <CYLTabBarController/UINavigationController+CYLFlatDesignTabBarPrivate.h>
 #import <CYLTabBarController/_CYLFlatDesignTabBarParallaxOverlayView.h>
 #import <CYLTabBarController/CYLFlatDesignTabBarHideTabBar.h>
+
 #endif
+
+#pragma mark - Animated images rest until played
+
+static const void *CYLTabBarItemAnimatedImageKey = &CYLTabBarItemAnimatedImageKey;
+static const void *CYLTabBarItemAnimatedSelectedImageKey = &CYLTabBarItemAnimatedSelectedImageKey;
+
+/*!
+ * [EN] An animated image given as a tab's image (`CYLTabBarItemImage` with `+[UIImage cyl_animatedImageWithGIFData:]`, a GIF
+ *      `CYLTabBarItemImageURL`) rests on its first frame until the tab is played, like an animation (docs/GIF-Animation.md):
+ *      the item keeps the animated image and shows its first frame. Any other image is returned as it is.
+ * [CN] 作为 Tab 图片传入的动图（`CYLTabBarItemImage` 传 `+[UIImage cyl_animatedImageWithGIFData:]`、GIF 的
+ *      `CYLTabBarItemImageURL`）与动画一样，在 Tab 被播放之前停在第一帧：tabBarItem 保存动图，显示其第一帧。其他图片原样返回。
+ */
+static UIImage *CYLRestingTabBarItemImage(UIImage *image, UITabBarItem *item, BOOL selected) {
+    const void *key = selected ? CYLTabBarItemAnimatedSelectedImageKey : CYLTabBarItemAnimatedImageKey;
+    if (!item) {
+        return image;
+    }
+    if (image.images.count < 2) {
+        objc_setAssociatedObject(item, key, nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+        return image;
+    }
+    objc_setAssociatedObject(item, key, image, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    return [image.images.firstObject imageWithRenderingMode:image.renderingMode];
+}
+
+/*!
+ * [EN] Plays `image`'s frames on `imageView` from the first one: once, or until stopped when `loops` is YES. The image view
+ *      then shows its resting image again.
+ * [CN] 在 `imageView` 上从第一帧播放 `image` 的各帧：播放一次，`loops` 为 YES 时一直播放到停止。之后图片视图恢复显示静止的图片。
+ */
+static void CYLPlayAnimatedImage(UIImageView *imageView, UIImage *image, BOOL loops) {
+    if (!imageView || image.images.count < 2) {
+        return;
+    }
+    [imageView stopAnimating];
+    imageView.animationImages = image.images;
+    imageView.animationDuration = image.duration;
+    imageView.animationRepeatCount = loops ? 0 : 1;
+    [imageView startAnimating];
+}
+
+/*!
+ * [EN] The icon views a tab draws itself (`-setTabBarItemIconViewProvider:atIndex:`, URL icons) that hold animation frames.
+ * [CN] Tab 自己绘制的、带有动画帧的图标视图（`-setTabBarItemIconViewProvider:atIndex:`、URL 图标）。
+ */
+static void CYLCollectAnimatedIconViews(UIView *view, NSMutableArray<UIImageView *> *result) {
+    for (UIView *subview in view.subviews) {
+        if ([subview isKindOfClass:[UIImageView class]] && ((UIImageView *)subview).animationImages.count > 1) {
+            [result addObject:(UIImageView *)subview];
+        }
+        CYLCollectAnimatedIconViews(subview, result);
+    }
+}
+
 
 
 #if __has_include(<CYLTabBarController/CYLTabBarController.h>)
@@ -2588,6 +2644,23 @@ static NSMutableDictionary<NSString *, NSMutableArray<UIViewController *> *> *CY
 - (void)setTabBarItemAnimationLoops:(BOOL)tabBarItemAnimationLoops {
     _tabBarItemAnimationLoops = tabBarItemAnimationLoops;
     [self cyl_applyTabBarItemAnimationPlayback];
+    // [EN] Animated images: off stops them on their resting frame, on plays the selected tab's. [CN] 动图：关闭时停在静止帧，开启时播放选中的 Tab。
+    for (UIControl *control in [self cyl_allTabButtonsForAnimatedImages]) {
+        NSMutableArray<UIImageView *> *iconViews = [NSMutableArray array];
+        CYLCollectAnimatedIconViews(control, iconViews);
+        UIImageView *tabImageView = [control cyl_tabImageView];
+        if (tabImageView.animationImages.count > 1 && ![iconViews containsObject:tabImageView]) {
+            [iconViews addObject:tabImageView];
+        }
+        for (UIImageView *iconView in iconViews) {
+            if (!tabBarItemAnimationLoops) {
+                [iconView stopAnimating];
+            }
+        }
+        if (tabBarItemAnimationLoops && control.selected) {
+            [self cyl_playAnimatedImagesOfTabButton:control];
+        }
+    }
 }
 
 /// [EN] The speed and the loop mode, to the views already added (none before the tab bar is laid out).
@@ -2601,6 +2674,10 @@ static NSMutableDictionary<NSString *, NSMutableArray<UIViewController *> *> *CY
 }
 
 - (void)cyl_playAllTabBarItemAnimations {
+    // [EN] Animated images need no animation subspec. [CN] 动图不需要动画子库。
+    for (UIControl *control in [self cyl_allTabButtonsForAnimatedImages]) {
+        [self cyl_playAnimatedImagesOfTabButton:control];
+    }
     if (!CYLTabBarItemAnimationIsAvailable() || ![self.cyl_tabBar isKindOfClass:[CYLTabBar class]]) {
         return;
     }
@@ -3247,8 +3324,8 @@ static NSString *const CYLTabBarItemPlusSlotPlaceholderKey = @"CYLTabBarItemPlus
     }
     for (UITabBarItem *tabBarItem in tabBarItems) {
         if (title) { tabBarItem.title = title; }
-        if (image) { tabBarItem.image = image; }
-        if (selectedImage) { tabBarItem.selectedImage = selectedImage; }
+        if (image) { tabBarItem.image = CYLRestingTabBarItemImage(image, tabBarItem, NO); }
+        if (selectedImage) { tabBarItem.selectedImage = CYLRestingTabBarItemImage(selectedImage, tabBarItem, YES); }
     }
     if (title) {
         CYLApplyNavigationTitleOfFollowingPage(viewController, title);
@@ -3386,6 +3463,7 @@ static void CYLLoadTabBarItemIcon(id _Nullable icon, void (^completion)(UIImage 
     }
     completion([icon isKindOfClass:[NSString class]] ? [UIImage cyl_imageNamed:icon] : nil);
 }
+
 
 /// [EN] `image` drawn at `size` with its own colors, every frame of an animated one. [CN] 按 `size` 以原图颜色绘制 `image`，动图的每一帧都绘制。
 static UIImage *CYLImageScaledToSize(UIImage *image, CGSize size) {
@@ -3591,7 +3669,16 @@ static UIImage *CYLImageScaledToSize(UIImage *image, CGSize size) {
             UIImage *originalImage = [image imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
             UIImage *originalSelectedImage = [(selectedImage ?: image) imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
             [self setTabBarItemIconViewProvider:^UIView *(BOOL selected) {
-                UIImageView *iconView = [[UIImageView alloc] initWithImage:(selected ? originalSelectedImage : originalImage)];
+                UIImage *iconImage = selected ? originalSelectedImage : originalImage;
+                // [EN] An animated icon rests on its first frame; a tap or Play all plays its frames.
+                // [CN] 动图图标停在第一帧；点击或“全部播放”时播放其各帧。
+                UIImageView *iconView = [[UIImageView alloc] initWithImage:(iconImage.images.count > 1 ?
+                    [iconImage.images.firstObject imageWithRenderingMode:iconImage.renderingMode] : iconImage)];
+                if (iconImage.images.count > 1) {
+                    iconView.animationImages = iconImage.images;
+                    iconView.animationDuration = iconImage.duration;
+                    iconView.animationRepeatCount = 1;
+                }
                 iconView.contentMode = UIViewContentModeScaleAspectFit;
                 CGSize iconSize = CGSizeEqualToSize(size, CGSizeZero) ?
                     CGSizeMake(CYLTabBarItemImagePlaceholderWidth, CYLTabBarItemImagePlaceholderHeight) : size;
@@ -4341,10 +4428,10 @@ static UIImage *CYLImageScaledToSize(UIImage *image, CGSize size) {
     viewController.tabBarItem.title = title;
     [viewController cyl_getViewControllerInsteadOfNavigationController].tabBarItem.title = title;
     UIImage *normalImage = [UIImage cyl_imageNamed:normalImageInfo];
-    viewController.tabBarItem.image = normalImage;
+    viewController.tabBarItem.image = CYLRestingTabBarItemImage(normalImage, viewController.tabBarItem, NO);
     
     UIImage *selectedImage = [UIImage cyl_imageNamed:selectedImageInfo];;
-    viewController.tabBarItem.selectedImage = selectedImage;
+    viewController.tabBarItem.selectedImage = CYLRestingTabBarItemImage(selectedImage, viewController.tabBarItem, YES);
     
     UIEdgeInsets insets = self.imageInsets;
     BOOL shouldCustomizeImageInsets = !(UIEdgeInsetsEqualToEdgeInsets(UIEdgeInsetsZero, imageInsets));
@@ -5760,6 +5847,49 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
     [self cyl_recognizeTabBarItemGestureForReportedControl:control];
 }
 
+
+/*!
+ * [EN] Plays the animated images of a tab button (docs/GIF-Animation.md): the tab item's image shown by UIKit, and the
+ *      tab's own icon views. They rest on their first frame otherwise.
+ * [CN] 播放 Tab 按钮的动图：UIKit 显示的 tabBarItem 图片，以及 Tab 自己的图标视图。其他时候停在第一帧。
+ */
+- (void)cyl_playAnimatedImagesOfTabButton:(UIControl *)control {
+    if (!control || [control cyl_isPlusControl]) {
+        return;
+    }
+    UITabBarItem *item = [self cyl_tabBarItemForTabButton:control];
+    UIImage *animatedImage = nil;
+    if (item) {
+        BOOL selected = (item == self.selectedViewController.tabBarItem);
+        animatedImage = objc_getAssociatedObject(item, selected ? CYLTabBarItemAnimatedSelectedImageKey : CYLTabBarItemAnimatedImageKey)
+            ?: objc_getAssociatedObject(item, CYLTabBarItemAnimatedImageKey);
+    }
+    UIImageView *tabImageView = [control cyl_tabImageView];
+    CYLPlayAnimatedImage(tabImageView, animatedImage, self.tabBarItemAnimationLoops);
+    NSMutableArray<UIImageView *> *iconViews = [NSMutableArray array];
+    CYLCollectAnimatedIconViews(control, iconViews);
+    for (UIImageView *iconView in iconViews) {
+        if (iconView == tabImageView && animatedImage) {
+            continue;
+        }
+        [iconView stopAnimating];
+        iconView.animationRepeatCount = self.tabBarItemAnimationLoops ? 0 : 1;
+        [iconView startAnimating];
+    }
+}
+
+/// [EN] Every tab button, the selected-state layer's too. [CN] 所有 Tab 按钮，包括选中态图层中的。
+- (NSArray<UIControl *> *)cyl_allTabButtonsForAnimatedImages {
+    if (![self.cyl_tabBar isKindOfClass:[CYLTabBar class]]) {
+        return @[];
+    }
+    CYLTabBar *tabBar = (CYLTabBar *)self.cyl_tabBar;
+    NSMutableArray<UIControl *> *controls = [NSMutableArray array];
+    [controls addObjectsFromArray:tabBar.cyl_visibleControls ?: @[]];
+    [controls addObjectsFromArray:tabBar.cyl_platterSelectedContentViews ?: @[]];
+    return controls;
+}
+
 - (void)didSelectControl:(UIControl *)control {
     [self cyl_setNeedsUpdateTabBarItemIconViews];
     CYL_IF_NOT_FLATDESIGN_BEGIN     //Not CYLTabBarStyleTypeFlatDesign
@@ -5845,6 +5975,13 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
             [self cyl_markControlReportedInCurrentRunLoop:reportedControl];
         }
         [self cyl_sendDidSelectControl:reportedControl];
+    }
+    if (shouldSelectViewController) {
+        // [EN] A tap plays the tab's animated images (they rest until played). [CN] 点击播放该 Tab 的动图（播放前保持静止）。
+        [self cyl_playAnimatedImagesOfTabButton:contentControl];
+        if (selectedContentControl && selectedContentControl != contentControl) {
+            [self cyl_playAnimatedImagesOfTabButton:selectedContentControl];
+        }
     }
 } else {/**  CYLTabBarStyleTypeFlatDesign*/}
 }

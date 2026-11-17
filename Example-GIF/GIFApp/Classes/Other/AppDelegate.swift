@@ -49,8 +49,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             items[1] = item
             items[1][CYLTabBarAnimationSize] = size
         }
-        // [EN] Tab 3, a plain image entry: no animation key, so the GIF keeps looping, selected or not.
-        // [CN] 第 3 个 Tab，普通图片入口：没有动画 key，因此 GIF 一直循环，无论是否选中。
+        // [EN] Tab 3, a plain image entry: no animation key; the GIF rests on its first frame and plays once per tap (loops while looping is on).
+        // [CN] 第 3 个 Tab，普通图片入口：没有动画 key；GIF 停在第一帧，每次点击播放一次（开启循环时一直播放）。
         items[2][CYLTabBarItemImageURL] = Bundle.main.url(forResource: "tab_fire", withExtension: "gif")
         items[2][CYLTabBarItemImageURLSize] = size
         // [EN] Tab 4 keeps its static images. [CN] 第 4 个 Tab 保持静态图片。

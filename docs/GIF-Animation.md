@@ -39,9 +39,9 @@
 
 | 设置 / Setting | 子库 / Subspec | 未选中 / Not selected | 选中时 / When selected | 切换到其他 Tab / When another tab is selected |
 |:---|:---|:---|:---|:---|
-| `CYLTabBarItemImage` 传 `+[UIImage cyl_animatedImageWithGIFData:]` | 不需要 / None | 循环 / Loops | 循环 / Loops | 循环 / Loops |
-| `CYLTabBarItemImageURL`（`.gif`） | 不需要 / None | 循环 / Loops | 循环 / Loops | 循环 / Loops |
-| `-setTabBarItemIconWithURL:selectedURL:size:atIndex:` | 不需要 / None | 循环 / Loops | 循环 / Loops | 循环 / Loops |
+| `CYLTabBarItemImage` 传 `+[UIImage cyl_animatedImageWithGIFData:]` | 不需要 / None | 第一帧 / First frame | **点击时播放一次（开启循环时一直播放） / Plays once per tap (repeats while looping is on)** | 第一帧 / First frame |
+| `CYLTabBarItemImageURL`（`.gif`） | 不需要 / None | 第一帧 / First frame | **点击时播放一次（开启循环时一直播放） / Plays once per tap (repeats while looping is on)** | 第一帧 / First frame |
+| `-setTabBarItemIconWithURL:selectedURL:size:atIndex:` | 不需要 / None | 第一帧 / First frame | **点击时播放一次（开启循环时一直播放） / Plays once per tap (repeats while looping is on)** | 第一帧 / First frame |
 | `CYLTabBarGIFURL` / `CYLTabBarGIFFilePath` | `GIF` | 第一帧 / First frame | **播放一次，停在最后一帧 / Plays once, stays on the last frame** | 回到第一帧 / Back to the first frame |
 | `CYLTabBarAnimationURL` / `CYLTabBarAnimationFilePath`（`.gif`） | `GIF` | 同上 / As above | 同上 / As above | 同上 / As above |
 | `CYLTabBarItemAttributesAddingAnimationFile(attributes, @"home.gif", nil)` | `GIF` | 同上 / As above | 同上 / As above | 同上 / As above |

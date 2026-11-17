@@ -177,7 +177,7 @@ NSDictionary *home = @{
 
 | 中文 | English |
 |:---|:---|
-| 通过 `CYLTabBarGIF…`（或通用 key）传入的 GIF 是动画：显示第一帧，选中 Tab 时播放一次并停在最后一帧。作为图片传入（`CYLTabBarItemImage` 传动图，或 `CYLTabBarItemImageURL`）的 GIF 循环播放，不需要子库。GIF 没有颜色图层，深色模式请提供 `CYLTabBarGIFDarkFilePath`。 | A GIF given by `CYLTabBarGIF…` (or the generic keys) is an animation: it shows its first frame, plays once when the tab is selected and stays on its last frame. A GIF given as an image (an animated `CYLTabBarItemImage`, or `CYLTabBarItemImageURL`) loops and needs no subspec. A GIF has no color layers: for Dark Mode, give `CYLTabBarGIFDarkFilePath`. |
+| 通过 `CYLTabBarGIF…`（或通用 key）传入的 GIF 是动画：显示第一帧，选中 Tab 时播放一次并停在最后一帧。作为图片传入（`CYLTabBarItemImage` 传动图，或 `CYLTabBarItemImageURL`）的 GIF 不需要子库，在被播放前停在第一帧，每次点击播放一次（iOS，2026-11-18）。GIF 没有颜色图层，深色模式请提供 `CYLTabBarGIFDarkFilePath`。 | A GIF given by `CYLTabBarGIF…` (or the generic keys) is an animation: it shows its first frame, plays once when the tab is selected and stays on its last frame. A GIF given as an image (an animated `CYLTabBarItemImage`, or `CYLTabBarItemImageURL`) needs no subspec; it rests on its first frame and plays once per tap (iOS, since 2026-11-18). A GIF has no color layers: for Dark Mode, give `CYLTabBarGIFDarkFilePath`. |
 
 ### [CN]通用写法
 ### [EN]The generic form

@@ -218,6 +218,7 @@ docs/
 │   ├── animated-item-flutter-rive-switch-before.png
 │   ├── animated-item-harmonyos-lottie-done.png
 │   ├── animated-item-harmonyos-lottie-playing.png
+│   ├── animated-item-harmonyos-spacing-before.jpeg
 │   ├── animated-item-harmonyos-tabbar.jpeg
 │   ├── animated-item-ios-demo-interactive-ios27.2.png
 │   ├── animated-item-ios-rive-loop-before-after.png
@@ -294,6 +295,7 @@ docs/
 │   ├── harmonyos-port-svga-demo-taps.png
 │   ├── harmonyos-rive-house-loop-arm64.png
 │   ├── harmonyos-rive-replay-arm64.png
+│   ├── harmonyos-rive-rest-then-play-arm64.png
 │   ├── harmonyos-rive-tab-icons-mate70pro-api21.png
 │   ├── harmonyos-styles-ocean-skin-b7995d0.png
 │   ├── harmonyos-styles-recheck-6befe36.png
@@ -322,7 +324,9 @@ docs/
 │   ├── inset-grouped-sections-demo-ios.png
 │   ├── ios-flatdesign-animateditem-tab-ios26-4-a6e88609.png
 │   ├── ios-flatdesign-gif-no-image-under-animation-ios26-4-5ba3a089.png
+│   ├── ios-gif-image-rest-then-play.png
 │   ├── ios-playback-controls-message-tab-iphone17pro-ios26.1-dc04439.png
+│   ├── ios-rive-rest-then-play-bell.png
 │   ├── iphone-duo-tab-bar-ios27-2-b356c1e6.png
 │   ├── issue-561-ipad-tab-bars-ios.png
 │   ├── liquid-glass-plus-stand-in-landscape-ios.png
