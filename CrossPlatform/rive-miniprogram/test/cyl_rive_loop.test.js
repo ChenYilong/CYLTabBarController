@@ -99,9 +99,12 @@ test('loop repeats a trigger, a restart and an input; turning it off stops the n
   const check = { name: 'Check', asTrigger: () => ({ fire: () => { fired += 1 } }) }
   const { item } = makeItem(definition, { inputs: { Check: check }, options: { triggerInput: 'Check' }, duration: 1 })
   item.setLoop(true)
-  assert.equal(fired, 1, 'turning loop on plays at once')
-  t.mock.timers.tick(1400)
-  t.mock.timers.tick(1400)
+  t.mock.timers.tick(50)
+  assert.equal(fired, 1, 'turning loop on plays at once (the trigger fires a frame after the restart)')
+  t.mock.timers.tick(1350)
+  t.mock.timers.tick(50)
+  t.mock.timers.tick(1350)
+  t.mock.timers.tick(50)
   assert.equal(fired, 3, 'a trigger loops (it used to fire once)')
   item.setLoop(false)
   t.mock.timers.tick(5000)
@@ -120,4 +123,17 @@ test('loop repeats a trigger, a restart and an input; turning it off stops the n
   held.item.cyl_playFromStart()
   t.mock.timers.tick(1400)
   assert.deepEqual(active.history, [false, true, false, false, true], 'on, off after the duration, then on again')
+})
+
+test('a trigger restarts its state machine first, then fires (check.riv: the finished check plays again)', (t) => {
+  t.mock.timers.enable({ apis: ['setTimeout'] })
+  const definition = loadComponent()
+  let fired = 0
+  const check = { name: 'Check', asTrigger: () => ({ fire: () => { fired += 1 } }) }
+  const { item, created } = makeItem(definition, { inputs: { Check: check }, options: { triggerInput: 'Check' } })
+  item.cyl_playFromStart()
+  assert.equal(created.length, 2, 'a new state machine instance')
+  assert.equal(fired, 0, 'not yet: a frame later')
+  t.mock.timers.tick(50)
+  assert.equal(fired, 1)
 })

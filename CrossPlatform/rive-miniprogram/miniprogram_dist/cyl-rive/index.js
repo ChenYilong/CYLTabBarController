@@ -271,9 +271,12 @@ Component({
       }
       let instance = null
       let isStateMachine = false
-      const machine = options.stateMachine
+      // [EN] A named animation wins over the state machines (button.riv has both: its "active" animation is what plays).
+      // [CN] 指定的动画优先于状态机（button.riv 两者都有：播放的是其 "active" 动画）。
+      const namedAnimation = options.animation && !options.stateMachine ? artboard.animationByName(options.animation) : null
+      const machine = namedAnimation ? null : (options.stateMachine
         ? artboard.stateMachineByName(options.stateMachine)
-        : (artboard.stateMachineCount() > 0 ? artboard.stateMachineByIndex(0) : null)
+        : (artboard.stateMachineCount() > 0 ? artboard.stateMachineByIndex(0) : null))
       if (machine) {
         instance = new rive.StateMachineInstance(machine, artboard)
         isStateMachine = true
@@ -453,7 +456,16 @@ Component({
         }
       }
       if (kind === 'trigger') {
-        triggerInput.asTrigger().fire()
+        // [EN] A trigger does nothing once its state machine has reached the end (check.riv stayed on its finished check):
+        //      restart it, then fire on the new instance a frame later.
+        // [CN] 状态机到达结束状态后 trigger 不再起作用（check.riv 停在完成的对勾上）：先重新开始，一帧之后在新实例上触发。
+        this.cyl_restart(state)
+        state.inputTimer = setTimeout(() => {
+          const restarted = this.cylState === state && options.triggerInput && this.cyl_input(options.triggerInput)
+          if (restarted) {
+            restarted.asTrigger().fire()
+          }
+        }, 50)
       } else if (kind === 'viewModelTrigger') {
         viewModelTrigger.trigger()
       } else if (kind === 'input') {
