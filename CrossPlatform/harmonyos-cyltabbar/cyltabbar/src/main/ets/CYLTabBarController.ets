@@ -1530,6 +1530,27 @@ export struct CYLTabBarController {
       .hitTestBehavior(HitTestMode.Transparent)
   }
 
+  /**
+   * [EN] The classic / FlatDesign top line (0.5 vp of the shadow color, or `shadowImage`), as the row's first child placed
+   *      at its top: the tabs and the raised plus button are drawn after it, so it never crosses them (HarmonyOS issue
+   *      list #52). As the row's border or overlay, ArkUI painted it over the children.
+   * [CN] 经典 / 扁平样式的顶部线条（0.5 vp 的阴影色，或 `shadowImage`），作为 Row 的第一个子节点放在顶部：Tab 与凸起的加号按钮在其后绘制，
+   *      线条不会横穿它们（鸿蒙问题列表 #52）。作为 Row 的描边或 overlay 时，ArkUI 会把它画在子节点之上。
+   */
+  @Builder
+  cylTopLine() {
+    if (this.shadowImage !== undefined) {
+      this.cylShadowImage()
+    } else {
+      Row()
+        .width('100%')
+        .height(0.5)
+        .backgroundColor(this.tabBarShadowColor)
+        .accessibilityLevel('no')
+        .hitTestBehavior(HitTestMode.Transparent)
+    }
+  }
+
   build() {
     Column() {
       Stack() {
@@ -1569,6 +1590,15 @@ export struct CYLTabBarController {
           if (this.tabBarStyleType === CYLTabBarStyleType.LiquidGlass) {
             this.cylGlassSheen()
             this.cylGlassLens()
+          } else {
+            // [EN] The top line first, under the tabs and the plus button (issue list #52).
+            // [CN] 先画顶部线条，位于 Tab 与加号按钮之下（问题列表 #52）。
+            Stack() {
+              this.cylTopLine()
+            }
+            .width('100%')
+            .position({ x: 0, y: 0 })
+            .hitTestBehavior(HitTestMode.Transparent)
           }
           ForEach(this.cylSlots(), (slot: CYLSlot) => {
             if (slot.tabIndex >= 0) {
@@ -1591,10 +1621,10 @@ export struct CYLTabBarController {
         //      button); the glass rim is drawn by cylGlassSheen, under the tabs. The classic top line would also leave the
         //      other edges black after a re-render.
         // [CN] 液态玻璃：Row 不设描边（ArkUI 把描边画在子节点之上，会在凸起的加号按钮上留下一条线）；玻璃亮边由 cylGlassSheen 画在 Tab 之下。
-        .border(this.tabBarStyleType === CYLTabBarStyleType.LiquidGlass
-          ? { width: 0 }
-          : { width: { top: this.shadowImage !== undefined ? 0 : 0.5 }, color: { top: this.tabBarShadowColor } })
-        .overlay(this.shadowImage !== undefined ? this.cylShadowImage : undefined, { align: Alignment.Top })
+        // [EN] No border and no overlay in any style: both are painted over the children. The classic / FlatDesign top line
+        //      is cylTopLine, the row's first child (issue list #52).
+        // [CN] 任何样式都不用描边与 overlay：两者都画在子节点之上。经典 / 扁平样式的顶部线条是 Row 的第一个子节点 cylTopLine（问题列表 #52）。
+        .border({ width: 0 })
         // [EN] Liquid Glass: the lens slides behind the tabs; touching lifts it, dragging moves it (iOS 26).
         // [CN] 液态玻璃：镜片在 Tab 后滑动；触摸时抬起，拖动时跟随（iOS 26）。
         .scale({ x: 1 + 0.02 * this.glassLensLift, y: 1 + 0.02 * this.glassLensLift })

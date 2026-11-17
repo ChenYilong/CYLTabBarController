@@ -277,6 +277,8 @@ docs/
 │   ├── harmonyos-liquid-glass-message-badge-before-after.png
 │   ├── harmonyos-liquid-glass-plus-raised.png
 │   ├── harmonyos-liquid-glass-reference-vs-ours.png
+│   ├── harmonyos-plus-button-liquid-glass-no-line.png
+│   ├── harmonyos-plus-button-top-line-before-after.png
 │   ├── harmonyos-plus-button-top-line-report.png
 │   ├── harmonyos-port-svga-demo-page.png
 │   ├── harmonyos-port-svga-demo-row.png
