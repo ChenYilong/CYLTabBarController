@@ -11,6 +11,7 @@ target 'CYLTabBarController-Swift' do
   
 #  pod 'CYLTabBarController', '1.99.4'
 #  pod 'CYLTabBarContr oller', :path => '../'
+  pod 'CYLTabBarController', :path => '../'   # the tab bar (Core); animation subspecs no longer bring it
   pod 'CYLTabBarController/Lottie', :path => '../'
   # Third-party code: its warnings are not ours to fix.
   pod 'lottie-ios', :inhibit_warnings => true

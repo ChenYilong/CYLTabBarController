@@ -6,7 +6,20 @@
 //
 
 #import <UIKit/UIKit.h>
+#if __has_include("../CYLUtils/CYLUtilsMacros.h")
+#import "../CYLUtils/CYLUtilsMacros.h"
+#else
+#import "CYLUtilsMacros.h"
+#endif
+
+// [EN] Part of Core; declared only when an animation subspec brings the engine (`CYL_ANIMATION_ENGINE_AVAILABLE`).
+// [CN] 属于 Core；只有动画子库带入引擎时才声明（`CYL_ANIMATION_ENGINE_AVAILABLE`）。
+#if CYL_ANIMATION_ENGINE_AVAILABLE
+#if __has_include(<CYLTabBarController/CYLTabBarItemAnimationPlayer.h>)
+#import <CYLTabBarController/CYLTabBarItemAnimationPlayer.h>
+#else
 #import "CYLTabBarItemAnimationPlayer.h"
+#endif
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -31,3 +44,5 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 NS_ASSUME_NONNULL_END
+
+#endif

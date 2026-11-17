@@ -6,6 +6,15 @@
 //
 
 #import "CYLTabBarItemAnimationEngine.h"
+#if __has_include("../CYLUtils/CYLUtilsMacros.h")
+#import "../CYLUtils/CYLUtilsMacros.h"
+#else
+#import "CYLUtilsMacros.h"
+#endif
+
+// [EN] The tab buttons' side of the engine, part of Core: compiled only when an animation subspec brings the engine.
+// [CN] Tab 按钮使用引擎的部分，属于 Core：只有动画子库带入引擎时才编译。
+#if CYL_ANIMATION_ENGINE_AVAILABLE
 #import <objc/runtime.h>
 #import "CYLTabBarItemAnimatorRegistry.h"
 #import "CYLTabBarItemAnimationFactory.h"
@@ -417,3 +426,5 @@ static const void *CYLTabBarItemAnimationShownURLKey = &CYLTabBarItemAnimationSh
 }
 
 @end
+
+#endif

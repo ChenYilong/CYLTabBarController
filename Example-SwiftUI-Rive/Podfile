@@ -10,6 +10,7 @@ target 'AnimatedApp' do
   # Rive tab icons, the same way as `CYLTabBarController/LottieSwift` and `CYLTabBarController/PAG`; it also brings the
   # RiveRuntime pod, so the app needs no Swift package. Rive Tab 图标，用法与 LottieSwift、PAG 相同；同时引入 RiveRuntime pod，
   # 因此 App 不再需要 Swift Package。
+  pod 'CYLTabBarController', :path => '../'   # the tab bar (Core); animation subspecs no longer bring it
   pod 'CYLTabBarController/Rive', :path => '../'
   # FIX: issue #415 — SVGA tab icons (SVGAPlayer), one for one with the Rive ones, chosen on the Bell page.
   # SVGA Tab 图标（SVGAPlayer），与 Rive 图标一一对应，在 Bell 页面选择。

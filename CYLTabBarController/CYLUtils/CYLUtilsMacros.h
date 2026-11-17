@@ -36,6 +36,28 @@
 #endif
 
 /*!
+ * [EN] 1 when the animation engine (the subspec `CYLAnimationEngine`, brought by every animation subspec: `LottieSwift`,
+ *      `LottieObjectiveC`, `PAG`, `PAGEnterprise`, `Rive`, `SVGA`, `GIF`) is part of the build, 0 otherwise. Like
+ *      `CYL_FLATDESIGN_AVAILABLE`, the one place that asks; guard engine code with `#if CYL_ANIMATION_ENGINE_AVAILABLE`.
+ *      The animation subspecs depend on the engine only, never on Core: `CYLAnimatedItem` plus `LottieSwift` brings no tab
+ *      bar. Core holds the tab buttons' side of the engine behind this macro, so a tab bar plays animations as soon as an
+ *      animation subspec is added, and `CYLAnimatedItemView` shows static images without one. The first check is the public
+ *      header (CocoaPods, apps), the second the target's own headers (the framework target, SwiftPM, the pod's private
+ *      headers), which never count a file on disk that the build does not compile.
+ * [CN] 引入动画引擎（子库 `CYLAnimationEngine`，每个动画子库 `LottieSwift`、`LottieObjectiveC`、`PAG`、`PAGEnterprise`、`Rive`、`SVGA`、
+ *      `GIF` 都会带入它）时为 1，否则为 0。与 `CYL_FLATDESIGN_AVAILABLE` 一样是唯一检查的地方；引擎相关代码统一用
+ *      `#if CYL_ANIMATION_ENGINE_AVAILABLE` 包住。动画子库只依赖引擎，从不依赖 Core：`CYLAnimatedItem` 加 `LottieSwift` 不会带入 TabBar。
+ *      Tab 按钮使用引擎的部分位于 Core 中、由本宏包住，因此加入动画子库后 TabBar 即可播放动画；没有动画子库时 `CYLAnimatedItemView`
+ *      只显示静态图片。第一个检查针对公开头文件（CocoaPods、App），第二个针对 target 自己的头文件（framework target、SwiftPM、pod 的私有
+ *      头文件），不会把磁盘上存在但未参与编译的文件算进来。
+ */
+#if __has_include(<CYLTabBarController/CYLTabBarItemAnimationFactory.h>) || __has_include("CYLTabBarItemAnimationFactory.h")
+#define CYL_ANIMATION_ENGINE_AVAILABLE 1
+#else
+#define CYL_ANIMATION_ENGINE_AVAILABLE 0
+#endif
+
+/*!
  * [EN] 1 when a Lottie library is part of the build, 0 otherwise: lottie-ios 2.x for Objective-C
  *      (`CYLTabBarController/LottieObjectiveC`, `<Lottie/Lottie.h>`) or lottie-ios 4.x for Swift
  *      (`CYLTabBarController/LottieSwift`, `CYLFlatDesignTabBar`, SPM; `<Lottie/Lottie-Swift.h>`). The Core subspec

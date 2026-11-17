@@ -6,6 +6,8 @@
 //
 
 #import "UIControl+CYLTabBarItemAnimationPlayer.h"
+
+#if CYL_ANIMATION_ENGINE_AVAILABLE
 #import "CYLTabBarItemAnimationFactory.h"
 // Core, which this subspec depends on (the source tree, or flattened by CocoaPods). 本子库依赖的 Core（源码目录，或 CocoaPods 展平后）。
 #if __has_include("../UIControl+CYLTabBarItemAnimation.h")
@@ -21,3 +23,5 @@
 }
 
 @end
+
+#endif

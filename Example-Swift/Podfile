@@ -18,6 +18,7 @@ target 'CYLTabBarController-Swift' do
   
 # pod 'CYLTabBarController', :path => '../'
 # pod 'CYLTabBarController/Lottie', :path => '../'
+ pod 'CYLTabBarController', :path => '../'   # the tab bar (Core); animation subspecs no longer bring it
  pod 'CYLTabBarController/LottieSwift', :path => '../'
 
 end
