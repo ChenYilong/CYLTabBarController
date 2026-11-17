@@ -1044,9 +1044,18 @@ class CYLRiveTabBarItemAnimationView internal constructor(context: Context, priv
         handler.removeCallbacksAndMessages(null)
         hasPlayed = true
         if (restingAfterLoad) {
-            // [EN] Resumed where it rests (no settling), then played as usual. [CN] 从静止处恢复（不重新定位），然后照常播放。
+            // [EN] Resumed where it rests (no settling), then played as usual. Only the state machine: an unnamed `play()` also
+            //      starts every linear animation of the artboard, which then overrides the machine (menu_button.riv stuck after
+            //      one play on Android, dcbfdec6).
+            // [CN] 从静止处恢复（不重新定位），然后照常播放。只恢复状态机：不带名字的 `play()` 还会启动画板的所有线性动画，它们会覆盖状态机
+            //      （Android 上 menu_button.riv 播放一次后卡住，dcbfdec6）。
             restingAfterLoad = false
-            CYLReflection.callKotlin(rive, "play", CYLReflection.DEFAULT, CYLReflection.DEFAULT, false)
+            val machineName = stateMachine
+            if (machineName != null) {
+                CYLReflection.callKotlin(rive, "play", machineName, CYLReflection.DEFAULT, CYLReflection.DEFAULT, true, false)
+            } else if (options[CYLTabBarItemAnimationKeys.CYLTabBarAnimationOptionRiveAnimation] == null) {
+                CYLReflection.callKotlin(rive, "play", CYLReflection.DEFAULT, CYLReflection.DEFAULT, false)
+            }
         }
         val machine = stateMachine
         val trigger = options[CYLTabBarItemAnimationKeys.CYLTabBarAnimationOptionRiveTriggerInput] ?: options[CYLTabBarItemAnimationKeys.CYLTabBarAnimationOptionRiveTriggerProperty]

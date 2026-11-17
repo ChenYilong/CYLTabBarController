@@ -129,7 +129,7 @@ class CYLRiveLoopTest {
         idle(CYLRiveTabBarItemAnimationView.FIRST_FRAME_MS + 10)
         assertEquals("paused once its first frame is drawn", listOf("pause"), rive.calls)
         view.cyl_playAnimationView()
-        assertEquals("a play resumes it, then restarts it", listOf("pause", "play", "reset", "play"), rive.calls)
+        assertEquals("a play resumes only its state machine, then restarts it", listOf("pause", "play:State Machine 1", "reset", "play"), rive.calls)
     }
 
     @Test
@@ -140,5 +140,17 @@ class CYLRiveLoopTest {
         view.cyl_playAnimationView()
         idle(CYLRiveTabBarItemAnimationView.FIRST_FRAME_MS + 10)
         assertEquals(listOf("reset", "play"), rive.calls)
+    }
+
+    @Test
+    fun aHeldInputKeepsPlayingAfterItWasResumed() {
+        val rive = FakeRive(context, listOf(Machine("State Machine", listOf("isOpen"))))
+        val view = CYLRiveTabBarItemAnimationView(context, rive, mapOf("stateMachine" to "State Machine", "input" to "isOpen", "duration" to "0"))
+        view.cyl_restUntilPlayed()
+        idle(CYLRiveTabBarItemAnimationView.FIRST_FRAME_MS + 10)
+        view.cyl_playAnimationView(); idle(60)
+        view.cyl_playAnimationView(); idle(60)
+        assertEquals("menu_button.riv: resumed once, then every play toggles isOpen",
+            listOf("pause", "play:State Machine", "isOpen=false", "isOpen=true", "isOpen=false", "isOpen=true"), rive.calls)
     }
 }

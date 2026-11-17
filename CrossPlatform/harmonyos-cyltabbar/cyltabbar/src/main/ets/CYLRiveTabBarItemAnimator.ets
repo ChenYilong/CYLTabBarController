@@ -376,9 +376,14 @@ export struct CYLRiveIcon {
     this.cylCancelLoop();
     this.hasPlayed = true;
     if (this.restingAfterLoad) {
-      // [EN] Resumed where it rests (no settling), then played as usual. [CN] 从静止处恢复（不重新定位），然后照常播放。
+      // [EN] Resumed where it rests (no settling), then played as usual. Only the state machine: an unnamed `play()` also
+      //      starts the artboard's linear animations, which override the machine (Android, menu_button.riv).
+      // [CN] 从静止处恢复（不重新定位），然后照常播放。只恢复状态机：不带名字的 `play()` 还会启动画板的线性动画并覆盖状态机（Android，menu_button.riv）。
       this.restingAfterLoad = false;
-      view.play(undefined, undefined, undefined, undefined, false);
+      const machineName = this.cylOption(CYLTabBarAnimationOptionRiveAnimation) === undefined ? this.cylStateMachine(view) : undefined;
+      if (machineName !== undefined) {
+        view.play(machineName, undefined, undefined, true, false);
+      }
     }
     const animation = this.cylOption(CYLTabBarAnimationOptionRiveAnimation);
     const machine = animation === undefined ? this.cylStateMachine(view) : undefined;
