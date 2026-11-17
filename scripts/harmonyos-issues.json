@@ -448,5 +448,14 @@
     "evidence": "Maintainer report 2026-11-17 (消息 tab badge misplaced); iOS cyl_bounceAnimationRepeatTimes: 0, -h/4, 0, +h/4, 0 in 1 s",
     "cause": "CYLBadge.ets animated Bounce from 0 to -8 vp and back every 250 ms (Shake ±6 vp every 125 ms, Breathe 600 ms ease), unlike iOS",
     "fix": "Core fix in CYLBadge.ets (cyltabbar, published to ohpm), not in the example: Bounce and Shake use iOS's keyframes 0, -size/4, 0, +size/4, 0 over 1 s around the badge's place (h for Bounce, w for Shake); Breathe is opacity 1 to 0.1 and back, 1.4 s each way, linear, as iOS"
+  },
+  {
+    "id": 51,
+    "status": "TODO (recorded 2026-11-17 before the fix; screenshots and fix follow)",
+    "scope": "CrossPlatform/harmonyos-cyltabbar (cylanimateditem, core)",
+    "title": "Tab badges sit at the icon's top-left instead of its top-right since animated tab icons are drawn by CYLAnimatedItemView",
+    "evidence": "Maintainer report 2026-11-17, verbatim: \"鸿蒙系统tabbaritem的badge坐标，预期是右上角现在变左上角了。排查原因\" (English: on HarmonyOS the tab bar item's badge should be at the top-right, it is now at the top-left; find the cause). Started with 760dfba2 (22:18), which draws Lottie, Rive and SVGA tab icons with CYLAnimatedItemView(isBare)",
+    "cause": "CYLAnimatedItemView's root is a Flex without a width, and an ArkUI Flex fills its parent: in the tab item it is as wide as the tab slot, with the icon centred in it, so the tab's icon Stack becomes that wide; the badge is placed at anchorWidth + 2 from the Stack's left edge, which is now left of the centred icon",
+    "fix": "TODO"
   }
 ]
