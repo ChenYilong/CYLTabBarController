@@ -27,5 +27,7 @@ Read this file before reading or writing files in this repository. It inherits t
 - Footer: the result against the expectation and the method (`Result: ... (expected: ...). Method: ...`), plus the
   test or document.
 - Build it with `python3 scripts/stitch-screenshots.py` (ffmpeg only; it marks the PNG). Before committing a screenshot,
-  run `python3 scripts/check-screenshot-labels.py`: it fails on any image added since 2026-11-18 without the marker. Save it in `docs/assets/`, embed it in the
+  run `python3 scripts/check-screenshot-labels.py`: it fails on any image added since 2026-11-18 without the marker.
+  Run `bash scripts/install-git-hooks.sh` once per clone: its pre-commit hook blocks an unlabeled screenshot, and CI
+  checks pull requests. Never bypass it with `--no-verify`. Save it in `docs/assets/`, embed it in the
   related document and repeat the header as its text label.

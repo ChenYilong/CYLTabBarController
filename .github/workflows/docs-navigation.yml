@@ -12,6 +12,8 @@ on:
       - "scripts/sync-agent-skills.py"
       - "scripts/sync-example-shared.py"
       - "scripts/android-library-strings.py"
+      - "scripts/check-screenshot-labels.py"
+      - "scripts/stitch-screenshots.py"
       - "CYLTabBarController/Resources/**"
       - "CrossPlatform/**"
       - ".agents/**"
@@ -27,6 +29,8 @@ on:
       - "scripts/sync-agent-skills.py"
       - "scripts/sync-example-shared.py"
       - "scripts/android-library-strings.py"
+      - "scripts/check-screenshot-labels.py"
+      - "scripts/stitch-screenshots.py"
       - "CYLTabBarController/Resources/**"
       - "CrossPlatform/**"
       - ".agents/**"
@@ -41,6 +45,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
+        with:
+          # [EN] The screenshot check reads which images were added since 2026-11-18. [CN] 截图检查需要读取 2026-11-18 起新增的图片。
+          fetch-depth: 0
       - name: Check the navigation
         run: python3 scripts/update-docs-navigation.py --check
       - name: Check the agent skills
@@ -50,3 +57,7 @@ jobs:
         run: python3 scripts/sync-example-shared.py --check
       - name: Check the Android library strings
         run: python3 scripts/android-library-strings.py --check
+      # [EN] docs/Screenshot-Guidelines.md: every screenshot added since 2026-11-18 has its header, captions and footer.
+      # [CN] 2026-11-18 起新增的每张截图都有页眉、说明与页脚。
+      - name: Check the screenshot labels
+        run: python3 scripts/check-screenshot-labels.py

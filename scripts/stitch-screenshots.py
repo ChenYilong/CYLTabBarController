@@ -127,6 +127,13 @@ def main():
     parser.add_argument('--gap', type=int, default=16, help='White space after each cell, in pixels (default 16).')
     parser.add_argument('cells', nargs='+', help='"caption=path" or "path".')
     options = parser.parse_args()
+    # [EN] The labels the rules require (docs/Screenshot-Guidelines.md); scripts/check-screenshot-labels.py checks them.
+    if 'Purpose:' not in options.header:
+        sys.exit('--header must end with "Purpose: <what the image shows>" (docs/Screenshot-Guidelines.md)')
+    if 'Result:' not in options.footer:
+        sys.exit('--footer must start with "Result: <what it proves> (expected: ...)" (docs/Screenshot-Guidelines.md)')
+    if any(ord(character) > 127 for character in options.header + options.footer + ''.join(options.cells)):
+        sys.exit('labels are English only (ASCII) (docs/Screenshot-Guidelines.md)')
     if not shutil.which('ffmpeg'):
         sys.exit('ffmpeg is required')
     work = tempfile.mkdtemp(prefix='cyl-stitch-')

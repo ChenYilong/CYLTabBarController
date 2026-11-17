@@ -63,6 +63,7 @@ two places**:
   stitched image has a header band (platform and OS version, simulator / emulator / device, host OS, IDE version, commit,
   branch, date, `Purpose: …`), a caption band above each cell (state and measurement) and a footer band (`Result: …
   Method: …`), English only, added around the screenshots and never over them: `scripts/stitch-screenshots.py`.
+  Enforced: the pre-commit hook (`bash scripts/install-git-hooks.sh`) and CI run `scripts/check-screenshot-labels.py`.
   Example: `docs/Android-Liquid-Glass.md` (the dock at three surface opacities).
 - If a change could not be run (no simulator or device), say so in the document instead of adding screenshots, and
   never present a mock-up or a diagram as a screenshot.
