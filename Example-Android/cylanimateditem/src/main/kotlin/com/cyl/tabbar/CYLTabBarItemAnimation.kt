@@ -320,14 +320,14 @@ open class CYLTabBarItemAnimationFactory(val registry: CYLTabBarItemAnimatorRegi
         view.isClickable = false
         view.isFocusable = false
         (view as? ImageView)?.scaleType = contentMode
-        view.setTag(com.cyl.animateditem.R.id.cyl_tab_bar_item_animation_player, animator.playerForAnimationView(view))
+        view.cyl_setTag("cyl_tab_bar_item_animation_player", animator.playerForAnimationView(view))
         return view
     }
 
     override fun playerForView(view: View?): CYLTabBarItemAnimationPlayer? {
         view ?: return null
-        (view.getTag(com.cyl.animateditem.R.id.cyl_tab_bar_item_animation_player) as? CYLTabBarItemAnimationPlayer)?.let { return it }
-        return registry.animators().firstNotNullOfOrNull { it.playerForAnimationView(view) }?.also { view.setTag(com.cyl.animateditem.R.id.cyl_tab_bar_item_animation_player, it) }
+        (view.cyl_getTag("cyl_tab_bar_item_animation_player") as? CYLTabBarItemAnimationPlayer)?.let { return it }
+        return registry.animators().firstNotNullOfOrNull { it.playerForAnimationView(view) }?.also { view.cyl_setTag("cyl_tab_bar_item_animation_player", it) }
     }
 
     override fun isAnimationView(view: View?): Boolean = playerForView(view) != null
@@ -398,9 +398,9 @@ open class CYLTabBarItemViewAnimator(
     override fun playerForAnimationView(view: View): CYLTabBarItemAnimationPlayer? {
         val playable = view as? CYLTabBarItemAnimationPlayableView ?: return null
         // [EN] A playable view made by another view animator is not this one's. [CN] 其他 view animator 创建的可播放视图不属于本 animator。
-        val owner = view.getTag(com.cyl.animateditem.R.id.cyl_tab_bar_item_view_animator) as? String
+        val owner = view.cyl_getTag("cyl_tab_bar_item_view_animator") as? String
         if (owner != null && owner != identifier) return null
-        view.setTag(com.cyl.animateditem.R.id.cyl_tab_bar_item_view_animator, identifier)
+        view.cyl_setTag("cyl_tab_bar_item_view_animator", identifier)
         return object : CYLTabBarItemAnimationBasePlayer(view) {
             private var appliedColors: Map<String, Int>? = null
             override fun play() = playable.cyl_playAnimationView()

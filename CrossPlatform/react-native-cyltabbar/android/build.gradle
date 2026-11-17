@@ -42,7 +42,7 @@ android {
     // [CN] 这里编译的是库的源码而不是它的模块：必须一并带上库的 R8 规则（反射查找的类，如 libpag 的 PAGView），否则开启混淆的发布版会删除它们，
     //      Tab 只显示图片。
     if (cylUseLocalSources) {
-      consumerProguardFiles "${cylAndroidRoot}/cyltabbar/consumer-rules.pro"
+      consumerProguardFiles "${cylAndroidRoot}/cyltabbar/consumer-rules.pro", "${cylAndroidRoot}/cylanimateditem/consumer-rules.pro"
       // [EN] The library's CYLBadge reads BuildConfig.CYL_BADGE_ANIMATION_DISABLED, the badge debugging build option
       //      (docs/Badge-Debugging.md): `-PcylBadgeAnimationDisabled=true` turns badge animations off.
       // [CN] 库的 CYLBadge 读取角标调试编译选项 BuildConfig.CYL_BADGE_ANIMATION_DISABLED（docs/Badge-Debugging.md）。
@@ -60,9 +60,15 @@ android {
         java.srcDirs += [
           "${cylAndroidRoot}/cyltabbar/src/main/java",
           "${cylAndroidRoot}/cyltabbar/src/main/kotlin",
+          // [EN] cyltabbar depends on CYLAnimatedItem (the animated icon + title component and the animation engine, no
+          //      animation library): its sources and resources come along. [CN] cyltabbar 依赖 CYLAnimatedItem（动效 icon + title 组件与动画引擎，
+          //      不含动画库）：一并编译其源码与资源。
+          "${cylAndroidRoot}/cylanimateditem/src/main/java",
+          "${cylAndroidRoot}/cylanimateditem/src/main/kotlin",
           "${cylAndroidRoot}/tabpages/src/main/kotlin",
         ]
-        res.srcDirs += ["${cylAndroidRoot}/cyltabbar/src/main/res"]
+        res.srcDirs += ["${cylAndroidRoot}/cyltabbar/src/main/res", "${cylAndroidRoot}/cylanimateditem/src/main/res"]
+        resources.srcDirs += ["${cylAndroidRoot}/cylanimateditem/src/main/resources"]
       }
     }
   }

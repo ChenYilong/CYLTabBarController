@@ -49,7 +49,7 @@ object CYLTabBarItemAnimationFailure {
      */
     @JvmStatic
     fun markLoading(animationView: View) {
-        animationView.setTag(com.cyl.animateditem.R.id.cyl_tab_bar_item_animation_loading, true)
+        animationView.cyl_setTag("cyl_tab_bar_item_animation_loading", true)
     }
 
     /**
@@ -57,7 +57,7 @@ object CYLTabBarItemAnimationFailure {
      */
     @JvmStatic
     fun isLoading(animationView: View?): Boolean =
-        animationView?.getTag(com.cyl.animateditem.R.id.cyl_tab_bar_item_animation_loading) == true
+        animationView?.cyl_getTag("cyl_tab_bar_item_animation_loading") == true
 
     /**
      * [EN] For animators: `animationView` has its file and shows the animation now. [CN] 供 animator 使用：`animationView` 已拿到文件，现在显示动画。
@@ -65,7 +65,7 @@ object CYLTabBarItemAnimationFailure {
     @JvmStatic
     fun reportLoaded(animationView: View) {
         if (!isLoading(animationView)) return
-        animationView.setTag(com.cyl.animateditem.R.id.cyl_tab_bar_item_animation_loading, null)
+        animationView.cyl_setTag("cyl_tab_bar_item_animation_loading", null)
         animationView.post {
             val host = animationView.parent as? View ?: return@post
             if (host is CYLTabBarItemAnimationFailureHandling) host.cyl_animationViewDidLoad(animationView) else loadedFallbackHandler?.invoke(host)
@@ -88,7 +88,7 @@ object CYLTabBarItemAnimationFailure {
      */
     @JvmStatic
     fun report(animationView: View) {
-        animationView.setTag(com.cyl.animateditem.R.id.cyl_tab_bar_item_animation_loading, null)
+        animationView.cyl_setTag("cyl_tab_bar_item_animation_loading", null)
         val host = animationView.parent as? View ?: return
         if (host is CYLTabBarItemAnimationFailureHandling) host.cyl_animationViewDidFail(animationView) else fallbackHandler?.invoke(host)
     }

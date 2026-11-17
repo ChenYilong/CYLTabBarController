@@ -589,6 +589,6 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
          */
         @JvmStatic
         fun defaultPlaceholderImage(context: Context): Drawable? =
-            androidx.core.content.ContextCompat.getDrawable(context, com.cyl.animateditem.R.drawable.cyl_animated_item_placeholder)
+            com.cyl.tabbar.CYLAnimatedItemResources.id(context, "cyl_animated_item_placeholder", "drawable").takeIf { it != 0 }?.let { androidx.core.content.ContextCompat.getDrawable(context, it) }
     }
 }

@@ -46,7 +46,7 @@ object CYLSVGATabBarItemAnimator : CYLTabBarItemAnimator {
         CYLReflection.call(view, "setClearsAfterDetached", false)
         CYLReflection.enumConstant(FILL_MODE_CLASS, "Forward")?.let { CYLReflection.call(view, "setFillMode", it) }
         val state = SVGAState()
-        view.setTag(com.cyl.animateditem.R.id.cyl_svga_state, state)
+        view.cyl_setTag("cyl_svga_state", state)
         val appContext = context.applicationContext
         // [EN] Until the file is parsed (a download), the host shows its static image or placeholder. [CN] 文件解析完成之前（下载中），宿主显示其静态图片或占位图。
         CYLTabBarItemAnimationFailure.markLoading(view)
@@ -99,7 +99,7 @@ object CYLSVGATabBarItemAnimator : CYLTabBarItemAnimator {
     }
 
     private class SVGAPlayer(view: View) : CYLTabBarItemAnimationBasePlayer(view) {
-        private val state: SVGAState? get() = animationView?.getTag(com.cyl.animateditem.R.id.cyl_svga_state) as? SVGAState
+        private val state: SVGAState? get() = animationView?.cyl_getTag("cyl_svga_state") as? SVGAState
 
         // [EN] SVGAImageView.loops: 0 repeats without end, 1 plays once. [CN] SVGAImageView.loops：0 为无限重复，1 为播放一次。
         override var loops: Boolean = false
