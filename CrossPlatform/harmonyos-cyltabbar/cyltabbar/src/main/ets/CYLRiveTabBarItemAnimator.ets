@@ -153,12 +153,24 @@ export function cylEnsureRiveInitialized(): void {
  *      （或 `trigger`），旧版文件则用状态机 `input` / `triggerInput` 或线性 `animation`；未选中时布尔值恢复为 false。文件无法加载时调用
  *      `onLoadError`，Tab 显示图片。
  */
+/** [EN] Seconds of a loop pass when the file gives none. [CN] 文件未给出时一次循环的秒数。 */
+const CYL_RIVE_LOOP_SECONDS: number = 1.5;
+/** [EN] The pause after a boolean goes back to false, before the next pass. [CN] 布尔值恢复为 false 后、下一次播放前的停顿。 */
+const CYL_RIVE_LOOP_PAUSE_SECONDS: number = 0.4;
+/** [EN] A frame later: the state machine sees the reset or the false first. [CN] 一帧之后：状态机先看到重置或 false。 */
+const CYL_RIVE_NEXT_FRAME_MS: number = 50;
+
 @Component
 export struct CYLRiveIcon {
   @Prop @Watch('cylReload') path: string = '';
   iconSize: number = 26;
   @Prop @Watch('cylUpdate') selected: boolean = false;
   @Prop @Watch('cylReplay') replayToken: number = 0;
+  /**
+   * [EN] Plays again after each pass while the tab is selected (docs/Animated-Item.md, the Rive loop); off by default.
+   * [CN] Tab 选中期间，每次播放后再次播放（docs/Animated-Item.md，Rive 循环）；默认关闭。
+   */
+  @Prop @Watch('cylLoopsChanged') loops: boolean = false;
   onLoadError: (message: string) => void = () => {};
   /** [EN] The file is drawn (CYLAnimatedItemView shows it from here on). [CN] 文件已绘制。 */
   onLoaded: () => void = () => {};
@@ -167,6 +179,7 @@ export struct CYLRiveIcon {
   private options: Record<string, string> = {};
   private loaded: boolean = false;
   private deactivateTimer: number = -1;
+  private loopTimer: number = -1;
 
   aboutToAppear(): void {
     try {
@@ -180,6 +193,7 @@ export struct CYLRiveIcon {
 
   aboutToDisappear(): void {
     this.cylCancelDeactivate();
+    this.cylCancelLoop();
     this.riveView = null;
   }
 
@@ -285,48 +299,120 @@ export struct CYLRiveIcon {
     }
   }
 
+  /**
+   * [EN] Whether the state machine has the input (an unknown answer counts as yes). [CN] 状态机是否有该输入（无法判断时视为有）。
+   */
+  private cylHasInput(view: RiveAnimationView, machine: string, input: string): boolean {
+    try {
+      const found = view.getStateMachines().find((instance) => instance.name === machine);
+      return found === undefined ? true : found.inputNames.includes(input);
+    } catch (e) {
+      return true;
+    }
+  }
+
+  /**
+   * [EN] Plays from the start (docs/Animated-Item.md, the Rive loop): a linear animation restarts; a trigger restarts the state
+   *      machine, then fires a frame later (check.riv stayed on its finished check); a boolean goes false, then true a frame
+   *      later, so every play is a transition (a held one used to play once); a state machine without the input restarts
+   *      (house.riv). With `loops` on, it plays again after each pass.
+   * [CN] 从头播放（docs/Animated-Item.md，Rive 循环）：线性动画重新开始；trigger 先重新开始状态机，一帧之后再触发（check.riv 停在完成的对勾上）；布尔值先设为
+   *      false，一帧之后设为 true，每次播放都是一次状态切换（保持的布尔值以前只播放一次）；没有该输入的状态机重新开始（house.riv）。开启 `loops` 时，
+   *      每次播放后再次播放。
+   */
   private cylPlay(view: RiveAnimationView): void {
     this.cylCancelDeactivate();
+    this.cylCancelLoop();
     const animation = this.cylOption(CYLTabBarAnimationOptionRiveAnimation);
-    if (animation !== undefined) {
-      view.play(animation, Loop.ONESHOT);
-      return;
-    }
-    view.play();
-    const machine = this.cylStateMachine(view);
+    const machine = animation === undefined ? this.cylStateMachine(view) : undefined;
     const triggerInput = this.cylOption(CYLTabBarAnimationOptionRiveTriggerInput);
-    if (triggerInput !== undefined && machine !== undefined) {
-      try {
-        view.fireState(machine, triggerInput);
-      } catch (e) {
-        // [EN] No such trigger. [CN] 没有该 trigger。
-      }
-      return;
-    }
     const trigger = this.cylOption(CYLTabBarAnimationOptionRiveTriggerProperty);
     const instance = this.cylUsesLegacyRuntime() ? null : this.cylViewModel(view);
-    if (trigger !== undefined && instance !== null) {
+    const legacyInput = this.cylOption(CYLTabBarAnimationOptionRiveInput);
+    if (animation !== undefined) {
+      view.reset();
+      view.play(animation, Loop.ONESHOT);
+    } else if (triggerInput !== undefined && machine !== undefined && this.cylHasInput(view, machine, triggerInput)) {
+      view.reset();
+      view.play();
+      this.deactivateTimer = setTimeout(() => {
+        this.deactivateTimer = -1;
+        if (this.riveView === view) {
+          try {
+            view.fireState(machine, triggerInput);
+          } catch (e) {
+            // [EN] No such trigger. [CN] 没有该 trigger。
+          }
+        }
+      }, CYL_RIVE_NEXT_FRAME_MS);
+    } else if (trigger !== undefined && instance !== null) {
+      view.play();
       try {
         instance.getTriggerProperty(trigger).trigger();
       } catch (e) {
         // [EN] No such trigger. [CN] 没有该 trigger。
       }
-      return;
-    }
-    this.cylSetActive(view, true);
-    const duration = this.cylDuration();
-    if (duration > 0) {
+    } else if (instance !== null || (legacyInput !== undefined && machine !== undefined
+      && this.cylHasInput(view, machine, legacyInput))) {
+      view.play();
+      this.cylSetActive(view, false);
+      const duration = this.cylDuration();
       this.deactivateTimer = setTimeout(() => {
         this.deactivateTimer = -1;
-        if (this.riveView === view) {
-          this.cylSetActive(view, false);
+        if (this.riveView !== view) {
+          return;
         }
-      }, duration * 1000);
+        this.cylSetActive(view, true);
+        if (duration > 0) {
+          this.deactivateTimer = setTimeout(() => {
+            this.deactivateTimer = -1;
+            if (this.riveView === view) {
+              this.cylSetActive(view, false);
+            }
+          }, duration * 1000);
+        }
+      }, CYL_RIVE_NEXT_FRAME_MS);
+    } else {
+      view.reset();
+      view.play();
+    }
+    this.cylScheduleLoop(view, trigger !== undefined || triggerInput !== undefined);
+  }
+
+  /** [EN] The next pass while looping. [CN] 循环时的下一次播放。 */
+  private cylScheduleLoop(view: RiveAnimationView, isTrigger: boolean): void {
+    if (!this.loops) {
+      return;
+    }
+    const duration = this.cylDuration();
+    const seconds = !isTrigger && duration > 0 ? duration + CYL_RIVE_LOOP_PAUSE_SECONDS : CYL_RIVE_LOOP_SECONDS;
+    this.loopTimer = setTimeout(() => {
+      this.loopTimer = -1;
+      if (this.loops && this.riveView === view && this.selected) {
+        this.cylPlay(view);
+      }
+    }, seconds * 1000);
+  }
+
+  cylLoopsChanged(): void {
+    const view = this.riveView;
+    if (!this.loops) {
+      this.cylCancelLoop();
+    } else if (view !== null && this.loaded && this.selected && this.loopTimer < 0) {
+      this.cylPlay(view);
+    }
+  }
+
+  private cylCancelLoop(): void {
+    if (this.loopTimer >= 0) {
+      clearTimeout(this.loopTimer);
+      this.loopTimer = -1;
     }
   }
 
   private cylStop(view: RiveAnimationView): void {
     this.cylCancelDeactivate();
+    this.cylCancelLoop();
     if (this.cylOption(CYLTabBarAnimationOptionRiveAnimation) !== undefined) {
       view.stop();
       return;
