@@ -13,10 +13,31 @@
 // docs-binding:end
 
 #import <UIKit/UIKit.h>
-#if __has_include("../CYLTabBarItemAnimation/CYLTabBarItemAnimationFactory.h")
-#import "../CYLTabBarItemAnimation/CYLTabBarItemAnimationFactory.h"
-#else
+
+/*!
+ * [EN] 1 when the animation engine (the subspec `CYLTabBarController/CYLAnimationEngine`, pulled in by every animation
+ *      library subspec: `LottieSwift`, `LottieObjectiveC`, `PAG`, `Rive`, `SVGA`, `GIF`) is part of the build, 0
+ *      otherwise. Like `CYL_FLATDESIGN_AVAILABLE`, this is the one place that asks; guard engine code with
+ *      `#if CYL_ANIMATION_ENGINE_AVAILABLE`. Without the engine, `CYLAnimatedItemView` shows static images only:
+ *      `animationURL` is kept but plays nothing, and the playback methods do nothing, so an app that never animates
+ *      ships no engine and no animation library. Adding an animation subspec turns it on, with no code change.
+ *      The first check is the public header (CocoaPods, apps); the second the target's own headers (the framework target,
+ *      SwiftPM), which do not include a file on disk that the build does not compile.
+ * [CN] 引入动画引擎（子库 `CYLTabBarController/CYLAnimationEngine`，每个动画库子库 `LottieSwift`、`LottieObjectiveC`、`PAG`、
+ *      `Rive`、`SVGA`、`GIF` 都会引入它）时为 1，否则为 0。与 `CYL_FLATDESIGN_AVAILABLE` 一样，这是唯一检查的地方；引擎相关代码统一用
+ *      `#if CYL_ANIMATION_ENGINE_AVAILABLE` 做 guard。没有引擎时 `CYLAnimatedItemView` 只显示静态图片：保留 `animationURL` 但不播放，
+ *      播放方法不做任何事，因此不使用动效的 App 不会带入引擎和任何动画库，减小包体积。加入动画子库即可开启，无需修改代码。
+ *      第一个检查针对公开头文件（CocoaPods、App），第二个针对 target 自己的头文件（framework target、SwiftPM），不会把磁盘上存在但
+ *      未参与编译的文件算进来。
+ */
+#if __has_include(<CYLTabBarController/CYLTabBarItemAnimationFactory.h>)
+#import <CYLTabBarController/CYLTabBarItemAnimationFactory.h>
+#define CYL_ANIMATION_ENGINE_AVAILABLE 1
+#elif __has_include("CYLTabBarItemAnimationFactory.h")
 #import "CYLTabBarItemAnimationFactory.h"
+#define CYL_ANIMATION_ENGINE_AVAILABLE 1
+#else
+#define CYL_ANIMATION_ENGINE_AVAILABLE 0
 #endif
 
 NS_ASSUME_NONNULL_BEGIN
@@ -194,7 +215,8 @@ NS_SWIFT_NAME(CYLAnimatedItemViewDelegate)
  *      Subclasses change what they need: the content (`CYLAnimatedItemContent`), the layout
  *      (`-layoutContentInRect:`, `-contentSizeThatFits:`), the appearance per state (`-itemStateDidChange`), the
  *      accessibility text (`-itemAccessibilityLabel`), more gestures (add recognizers), or the animation source
- *      (`animationSource`). It depends on CYLUtils only, never on the tab bar (subspec `CYLTabBarController/CYLAnimatedItem`).
+ *      (`animationSource`). It depends on CYLUtils only, never on the tab bar (subspec `CYLTabBarController/CYLAnimatedItem`), and plays
+ *      animations only when the engine is in the build (`CYL_ANIMATION_ENGINE_AVAILABLE`); static images otherwise.
  * [CN] 可继承的动效 icon + title 控件，供 CollectionViewClassifyMenu 与 CYLSearchViewController 的标签、CYLTableViewPlaceHolder 的
  *      占位图以及 CYLTabBarController 的 Tab 按钮共用：
  *      - 图标（`imageView`）可播放动画引擎支持的任意文件（`animationURL`），动画就绪前显示静态 `image` / `selectedImage`；
@@ -203,7 +225,8 @@ NS_SWIFT_NAME(CYLAnimatedItemViewDelegate)
  *      - 整个控件的手势，报告给 `delegate`：点击、长按与拖拽（`dragEnabled`）。
  *      子类按需修改：内容（`CYLAnimatedItemContent`）、布局（`-layoutContentInRect:`、`-contentSizeThatFits:`）、各状态的外观
  *      （`-itemStateDidChange`）、无障碍文本（`-itemAccessibilityLabel`）、更多手势（添加手势识别器）或动画来源（`animationSource`）。
- *      只依赖 CYLUtils，从不依赖 TabBar（子库 `CYLTabBarController/CYLAnimatedItem`）。
+ *      只依赖 CYLUtils，从不依赖 TabBar（子库 `CYLTabBarController/CYLAnimatedItem`）；只有引擎参与编译时才播放动画
+ *      （`CYL_ANIMATION_ENGINE_AVAILABLE`），否则只显示静态图片。
  */
 @interface CYLAnimatedItemView : UIControl <CYLAnimatedItemContent, CYLAnimatedItemAnimating>
 
@@ -217,19 +240,24 @@ NS_SWIFT_NAME(CYLAnimatedItemViewDelegate)
  */
 @property (nonatomic, strong, readonly) UILabel *titleLabel;
 /*!
- * [EN] The view playing `animationURL`, while ready. [CN] 正在播放 `animationURL` 的视图（就绪时）。
+ * [EN] The view playing `animationURL`, while ready; always nil without the animation engine.
+ * [CN] 正在播放 `animationURL` 的视图（就绪时）；没有动画引擎时始终为 nil。
  */
 @property (nonatomic, strong, readonly, nullable) UIView *animationView;
+#if CYL_ANIMATION_ENGINE_AVAILABLE
 /*!
- * [EN] The player of `animationView`. [CN] `animationView` 的播放器。
+ * [EN] The player of `animationView`. Only with the animation engine (`CYL_ANIMATION_ENGINE_AVAILABLE`).
+ * [CN] `animationView` 的播放器。仅在有动画引擎时提供（`CYL_ANIMATION_ENGINE_AVAILABLE`）。
  */
 @property (nonatomic, strong, readonly, nullable) id<CYLTabBarItemAnimationPlayer> animationPlayer;
 /*!
  * [EN] Where animation views come from: `+[CYLTabBarItemAnimationFactory sharedFactory]` by default. A library with
- *      its own registry (or a test) sets another factory.
+ *      its own registry (or a test) sets another factory. Only with the animation engine.
  * [CN] 动画视图的来源：默认为 `+[CYLTabBarItemAnimationFactory sharedFactory]`。有自己注册表的库（或测试）可以设置其他工厂。
+ *      仅在有动画引擎时提供。
  */
 @property (nonatomic, strong, null_resettable) id<CYLTabBarItemAnimationViewMaking> animationSource;
+#endif
 /*!
  * [EN] The delegate of taps, long presses, accessory taps and drags. [CN] 点击、长按、附加图标点击与拖拽的代理。
  */

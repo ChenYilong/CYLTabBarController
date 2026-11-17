@@ -44,23 +44,36 @@ Pod::Spec.new do |s|
     badge.frameworks = 'UIKit', 'QuartzCore'
   end
 
-  # [EN] CYLAnimatedItem: the animation engine (animator protocols, registry, factory, players) and CYLAnimatedItemView, an
-  #      animated icon + title control to subclass (an accessory icon with its own tap, tap / long press / drag). No tab bar
-  #      code and no Core: `pod 'CYLTabBarController/CYLAnimatedItem'` is all CollectionViewClassifyMenu,
-  #      CYLTableViewPlaceHolder or CYLSearchViewController need. A new animation type is one animator registered with
-  #      the engine, and every view built on it plays it. Integration guide: docs/Animated-Item.md.
-  # [CN] CYLAnimatedItem：动画引擎（animator 协议、注册表、工厂、播放器）与可继承的动效 icon + title 控件 CYLAnimatedItemView（带自身
-  #      点击的附加图标，点击 / 长按 / 拖拽）。不含 TabBar 代码，也不依赖 Core：CollectionViewClassifyMenu、CYLTableViewPlaceHolder、
-  #      CYLSearchViewController 只需 `pod 'CYLTabBarController/CYLAnimatedItem'`。新增动画类型只需向引擎注册一个 animator，基于它的
-  #      所有视图都能播放。接入文档：docs/Animated-Item.md。
+  # [EN] CYLAnimationEngine: the animation engine alone (animator protocols, registry, factory, players, view animator),
+  #      no tab bar and no Core. Every animation library subspec (LottieSwift, LottieObjectiveC, PAG, Rive, SVGA, GIF)
+  #      depends on it; an app adds it directly only to register an animator of its own.
+  # [CN] CYLAnimationEngine：仅动画引擎（animator 协议、注册表、工厂、播放器、view animator），不含 TabBar，也不依赖 Core。每个动画库
+  #      子库（LottieSwift、LottieObjectiveC、PAG、Rive、SVGA、GIF）都依赖它；App 只有在注册自己的 animator 时才需要直接引入。
+  s.subspec 'CYLAnimationEngine' do |engine|
+    engine.dependency 'CYLTabBarController/CYLUtils'
+    files = %w[CYLTabBarItemAnimator CYLTabBarItemAnimationPlayer CYLTabBarItemAnimatorRegistry CYLTabBarItemAnimationFactory
+               CYLTabBarItemAnimationPlayableView CYLTabBarItemViewAnimator]
+    engine.source_files = files.map { |name| "CYLTabBarController/CYLTabBarItemAnimation/#{name}.{h,m}" }
+    engine.public_header_files = files.map { |name| "CYLTabBarController/CYLTabBarItemAnimation/#{name}.h" }
+    engine.frameworks = 'UIKit'
+  end
+
+  # [EN] CYLAnimatedItem: CYLAnimatedItemView, an icon + title control to subclass (an accessory icon with its own tap,
+  #      tap / long press / drag), as an independent component: `pod 'CYLTabBarController/CYLAnimatedItem'` brings
+  #      CYLUtils and nothing else, no tab bar, no Core, no engine. Like the FlatDesign tab bar item, it is guarded at
+  #      compile time (`CYL_ANIMATION_ENGINE_AVAILABLE`): static images by default; add the animation subspec of each
+  #      file type to play (e.g. `pod 'CYLTabBarController/LottieSwift'`), which brings the engine, and the same view plays
+  #      it with no code change. An app that never animates ships no engine and no animation library, however many engines
+  #      are added later. Integration guide: docs/Animated-Item.md.
+  # [CN] CYLAnimatedItem：可继承的 icon + title 控件 CYLAnimatedItemView（带自身点击的附加图标，点击 / 长按 / 拖拽），作为独立组件：
+  #      `pod 'CYLTabBarController/CYLAnimatedItem'` 只带入 CYLUtils，不含 TabBar、Core 和引擎。与扁平样式 Tab 按钮一样在编译期用 guard
+  #      （`CYL_ANIMATION_ENGINE_AVAILABLE`）隔离：默认只支持静态图片；要播放某种文件，加入对应的动画子库（例如
+  #      `pod 'CYLTabBarController/LottieSwift'`），它会带入引擎，同一个控件无需修改代码即可播放。不使用动效的 App 不会带入引擎和任何
+  #      动画库，以后引擎再多也不会增大其包体积。接入文档：docs/Animated-Item.md。
   s.subspec 'CYLAnimatedItem' do |item|
     item.dependency 'CYLTabBarController/CYLUtils'
-    engine = %w[CYLTabBarItemAnimator CYLTabBarItemAnimationPlayer CYLTabBarItemAnimatorRegistry CYLTabBarItemAnimationFactory
-                CYLTabBarItemAnimationPlayableView CYLTabBarItemViewAnimator]
-    item.source_files = engine.map { |name| "CYLTabBarController/CYLTabBarItemAnimation/#{name}.{h,m}" } +
-                        ['CYLTabBarController/CYLAnimatedItem/*.{h,m}']
-    item.public_header_files = engine.map { |name| "CYLTabBarController/CYLTabBarItemAnimation/#{name}.h" } +
-                               ['CYLTabBarController/CYLAnimatedItem/*.h']
+    item.source_files = 'CYLTabBarController/CYLAnimatedItem/*.{h,m}'
+    item.public_header_files = 'CYLTabBarController/CYLAnimatedItem/*.h'
     item.frameworks = 'UIKit'
   end
 
@@ -73,7 +86,7 @@ Pod::Spec.new do |s|
     'CYLTabBarController/CYLUtils/**/*', # the CYLUtils subspec above
     'CYLTabBarController/CYLBadgeView/**/*', # the CYLBadgeView subspec above
     'CYLTabBarController/CYLTabBarItemAnimation/**/*', # the CYLTabBarItemAnimation subspec below
-    'CYLTabBarController/CYLAnimatedItem/**/*', # the CYLAnimatedItem subspec above
+    'CYLTabBarController/CYLAnimatedItem/**/*', # the CYLAnimatedItem subspec above (the engine files are in CYLTabBarItemAnimation/)
     'CYLTabBarController/**/LottieSwift/*.{h,m,Swift}',
     'CYLTabBarController/RiveSwift/**/*', # the Rive subspec below (Swift bridge)
     'CYLTabBarController/**/CYLFlatDesignTabBar/CYLFlatDesignTabBar-ObjectiveC/**/*.{swift}',
@@ -110,14 +123,14 @@ Pod::Spec.new do |s|
   # 新增动画库只需新增一个目录、一个 animator 类和一个子库，其他代码都无需修改。
   s.subspec 'CYLTabBarItemAnimation' do |animation|
     animation.dependency 'CYLTabBarController/Core'
-    # [EN] The engine itself is in CYLAnimatedItem (no Core); this subspec adds the tab buttons' part.
-    # [CN] 引擎本身位于 CYLAnimatedItem（不依赖 Core）；本子库加入 Tab 按钮相关的部分。
-    animation.dependency 'CYLTabBarController/CYLAnimatedItem'
+    # [EN] The engine itself is the CYLAnimationEngine subspec (no Core); this subspec adds the tab buttons' part.
+    # [CN] 引擎本身是 CYLAnimationEngine 子库（不依赖 Core）；本子库加入 Tab 按钮相关的部分。
+    animation.dependency 'CYLTabBarController/CYLAnimationEngine'
     animation.source_files = 'CYLTabBarController/CYLTabBarItemAnimation/CYLTabBarItemAnimationEngine.{h,m}',
                              'CYLTabBarController/CYLTabBarItemAnimation/UIControl+CYLTabBarItemAnimationPlayer.{h,m}'
     # [EN] Public: the player of a tab button. The protocols, the registry, the factory and the short path for views that play
-    #      themselves (Rive) are public through CYLAnimatedItem.
-    # [CN] 公开：Tab 按钮的播放器。协议、注册表、工厂以及自己播放的视图（Rive）的简便方式通过 CYLAnimatedItem 公开。
+    #      themselves (Rive) are public through CYLAnimationEngine.
+    # [CN] 公开：Tab 按钮的播放器。协议、注册表、工厂以及自己播放的视图（Rive）的简便方式通过 CYLAnimationEngine 公开。
     animation.public_header_files = 'CYLTabBarController/CYLTabBarItemAnimation/UIControl+CYLTabBarItemAnimationPlayer.h'
     animation.private_header_files = 'CYLTabBarController/CYLTabBarItemAnimation/CYLTabBarItemAnimationEngine.h'
     animation.frameworks = 'UIKit'

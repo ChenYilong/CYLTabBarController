@@ -9,6 +9,7 @@
 #import <CYLTabBarController/CYLTabBarController.h>
 #import "../CYLTabBarController/CYLAnimatedItem/CYLAnimatedItemView.h"
 
+#if CYL_ANIMATION_ENGINE_AVAILABLE
 /*
  * [EN] A player that records calls. [CN] 记录调用的播放器。
  */
@@ -64,6 +65,7 @@
     return [self playerForView:view] != nil;
 }
 @end
+#endif
 
 /*
  * [EN] A tag as another repository would write it: a delete accessory, a badge read with the title, a state hook.
@@ -143,6 +145,7 @@
     XCTAssertEqualObjects(item.accessibilityLabel, @"Tag, 3 new");
 }
 
+#if CYL_ANIMATION_ENGINE_AVAILABLE
 - (void)testPlaysAnyAnimationOfTheSource {
     CYLAnimatedItemFakeSource *source = [[CYLAnimatedItemFakeSource alloc] init];
     CYLAnimatedItemView *item = [[CYLAnimatedItemView alloc] initWithFrame:CGRectMake(0, 0, 200, 44)];
@@ -175,6 +178,19 @@
     XCTAssertEqual(item.animationSource, [CYLTabBarItemAnimationFactory sharedFactory]);
 }
 
+#else
+- (void)testWithoutTheEngineOnlyTheStaticImageShows {
+    CYLAnimatedItemView *item = [[CYLAnimatedItemView alloc] initWithFrame:CGRectMake(0, 0, 200, 44)];
+    item.image = [self icon];
+    item.animationURL = [NSURL fileURLWithPath:@"/tmp/home.json"];
+    [item playAnimation];
+    XCTAssertFalse(item.isAnimationReady);
+    XCTAssertNil(item.animationView);
+    XCTAssertFalse(item.imageView.hidden);
+    XCTAssertNotNil(item.animationURL, @"kept for when an animation subspec is added");
+}
+
+#endif
 - (void)testAccessoryIsPlacedAndReachableFromVoiceOver {
     CYLAnimatedItemView *item = [[CYLAnimatedItemView alloc] initWithFrame:CGRectMake(0, 0, 200, 44)];
     item.delegate = self;

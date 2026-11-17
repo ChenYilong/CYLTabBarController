@@ -11,7 +11,9 @@
  * [EN] How often a looping animation whose player has no `loops` checks whether it reached the end.
  * [CN] 播放器没有 `loops` 时，循环动画检查是否播放到末尾的间隔。
  */
+#if CYL_ANIMATION_ENGINE_AVAILABLE
 static const NSTimeInterval CYLAnimatedItemLoopCheckInterval = 0.05;
+#endif
 
 /*
  * [EN] The default animation size, as the tab bar's. [CN] 默认动画尺寸，与 TabBar 一致。
@@ -37,7 +39,9 @@ static const CGFloat CYLAnimatedItemDefaultAnimationSide = 24;
 @synthesize animationSpeed = _animationSpeed;
 @synthesize animationLoops = _animationLoops;
 @synthesize animationRestingProgress = _animationRestingProgress;
+#if CYL_ANIMATION_ENGINE_AVAILABLE
 @synthesize animationSource = _animationSource;
+#endif
 
 #pragma mark - Life cycle 生命周期
 
@@ -329,6 +333,8 @@ static const CGFloat CYLAnimatedItemDefaultAnimationSide = 24;
 
 #pragma mark - Animation 动画
 
+#if CYL_ANIMATION_ENGINE_AVAILABLE
+
 - (id<CYLTabBarItemAnimationViewMaking>)animationSource {
     return _animationSource ?: [CYLTabBarItemAnimationFactory sharedFactory];
 }
@@ -482,6 +488,61 @@ static const CGFloat CYLAnimatedItemDefaultAnimationSide = 24;
     [self.loopTimer invalidate];
     self.loopTimer = nil;
 }
+
+#else
+
+/*
+ * [EN] Without the animation engine: static images only. The properties keep their values, so a subclass behaves the
+ *      same and starts animating as soon as an animation subspec is added; nothing plays meanwhile.
+ * [CN] 没有动画引擎：只显示静态图片。属性仍保存设置的值，子类行为一致，加入动画子库后即开始播放；在此之前不播放任何动画。
+ */
+- (void)setAnimationURL:(NSURL *)animationURL {
+    _animationURL = [animationURL copy];
+}
+
+- (BOOL)isAnimationReady {
+    return NO;
+}
+
+- (void)setAnimationSpeed:(CGFloat)animationSpeed {
+    _animationSpeed = animationSpeed;
+}
+
+- (void)setAnimationLoops:(BOOL)animationLoops {
+    _animationLoops = animationLoops;
+}
+
+- (void)setAnimationRestingProgress:(CGFloat)animationRestingProgress {
+    _animationRestingProgress = MIN(1, MAX(0, animationRestingProgress));
+}
+
+- (void)reloadAnimation {
+    [self cyl_updateIcon];
+    [self cyl_contentDidChange];
+}
+
+- (void)playAnimation {
+    // [EN] No engine: nothing to play. [CN] 没有引擎：没有可播放的内容。
+}
+
+- (void)restartAnimation {
+    // [EN] No engine: nothing to play. [CN] 没有引擎：没有可播放的内容。
+}
+
+- (void)stopAnimation {
+    // [EN] No engine: nothing to stop. [CN] 没有引擎：没有可停止的内容。
+}
+
+- (void)showAnimationLastFrame {
+    // [EN] No engine: nothing to show. [CN] 没有引擎：没有可显示的内容。
+}
+
+- (void)cyl_stopLoopTimer {
+    [self.loopTimer invalidate];
+    self.loopTimer = nil;
+}
+
+#endif
 
 #pragma mark - Gestures 手势
 
