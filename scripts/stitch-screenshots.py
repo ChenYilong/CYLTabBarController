@@ -16,6 +16,7 @@ Each cell is "caption=path" (a cell without "=" has no caption). Text is English
 """
 import argparse
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -24,7 +25,12 @@ import textwrap
 import struct
 import zlib
 
-FONT = '/System/Library/Fonts/Supplemental/Arial Bold.ttf'
+# [EN] A bold font: $CYL_SCREENSHOT_FONT, else the first that exists on macOS, Windows or Linux.
+FONT = next((path for path in [os.environ.get('CYL_SCREENSHOT_FONT', ''),
+                               '/System/Library/Fonts/Supplemental/Arial Bold.ttf',
+                               'C:/Windows/Fonts/arialbd.ttf',
+                               '/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf'] if path and os.path.exists(path)),
+            '/System/Library/Fonts/Supplemental/Arial Bold.ttf')
 TEXT_COLOR = '0xFF3B30'
 BACKGROUND = 'white'
 # [EN] A common phone screen (19.5:9): an image taller than this times its width needs scrolling at phone width.
@@ -54,11 +60,23 @@ def run(args):
         sys.exit('ffmpeg failed: ' + result.stderr[-800:])
 
 
+def filter_path(path):
+    """A path inside an ffmpeg filter argument: forward slashes, the drive colon escaped (Windows)."""
+    return path.replace('\\', '/').replace(':', '\\:')
+
+
 def size_of(path):
-    out = subprocess.run(['ffprobe', '-v', 'error', '-select_streams', 'v:0', '-show_entries', 'stream=width,height',
-                          '-of', 'csv=p=0:s=x', path], capture_output=True, text=True, check=True).stdout.strip()
-    width, height = out.split('x')
-    return int(width), int(height)
+    if shutil.which('ffprobe'):
+        out = subprocess.run(['ffprobe', '-v', 'error', '-select_streams', 'v:0', '-show_entries', 'stream=width,height',
+                              '-of', 'csv=p=0:s=x', path], capture_output=True, text=True, check=True).stdout.strip()
+        width, height = out.split('x')
+        return int(width), int(height)
+    # [EN] Without ffprobe (some Windows builds ship ffmpeg alone): the size from `ffmpeg -i`'s stream line.
+    info = subprocess.run(['ffmpeg', '-hide_banner', '-i', path], capture_output=True, text=True).stderr
+    match = re.search(r'Video:.*?(\d{2,5})x(\d{2,5})', info)
+    if not match:
+        sys.exit(f'cannot read the size of {path}')
+    return int(match.group(1)), int(match.group(2))
 
 
 def band(text, width, font_size, path):
@@ -75,7 +93,7 @@ def band(text, width, font_size, path):
         handle.write('\n'.join(lines))
     run(['ffmpeg', '-v', 'error', '-y', '-f', 'lavfi', '-i', f'color=c={BACKGROUND}:s={width}x{height}:d=1',
          '-frames:v', '1', '-vf',
-         f"drawtext=fontfile='{FONT}':textfile='{text_file}':fontcolor={TEXT_COLOR}:fontsize={font_size}"
+         f"drawtext=fontfile='{filter_path(FONT)}':textfile='{filter_path(text_file)}':fontcolor={TEXT_COLOR}:fontsize={font_size}"
          f':line_spacing={line_height - font_size}:x={margin}:y={margin}', path])
     return path
 
