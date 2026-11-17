@@ -141,4 +141,19 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+/*!
+ * FIX: an unplayable file hid the static image when Lottie was linked
+ * [EN] NO when `URL` is a local file that is not a Lottie animation: missing, unreadable, or not a Lottie document (a JSON
+ *      object with a `layers` array, or, when `acceptsDotLottie` is YES, a `.lottie` zip archive). YES otherwise, also for a
+ *      remote URL, which can only be judged once it is downloaded. The Lottie animator takes every file no other animator
+ *      takes (`CYLTabBarItemAnimatorPriorityFallback`) and asks this first, so a picture or a broken file makes no Lottie
+ *      view and the static image stays (docs/Tab-Bar-Item-Animation.md). The answer is cached by path, size and
+ *      modification date.
+ * [CN] `URL` 是本地文件但不是 Lottie 动画时返回 NO：文件不存在、无法读取，或不是 Lottie 文档（带 `layers` 数组的 JSON 对象，`acceptsDotLottie`
+ *      为 YES 时也包括 `.lottie` zip 压缩包）。其他情况返回 YES，远程 URL 也返回 YES（下载后才能判断）。Lottie animator 接收其他 animator 都不处理的
+ *      文件（`CYLTabBarItemAnimatorPriorityFallback`），会先调用本函数，因此图片或损坏的文件不会创建 Lottie 视图，静态图片保持显示
+ *      （docs/Tab-Bar-Item-Animation.md）。结果按路径、大小与修改时间缓存。
+ */
+FOUNDATION_EXTERN BOOL CYLTabBarItemAnimationURLMayBeLottie(NSURL *_Nullable URL, BOOL acceptsDotLottie);
+
 NS_ASSUME_NONNULL_END
