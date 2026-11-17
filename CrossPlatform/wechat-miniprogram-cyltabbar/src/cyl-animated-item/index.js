@@ -63,10 +63,11 @@ Component({
     gifLastFrame: { type: String, value: '' },
     gifDuration: { type: Number, value: 1000 },
     /**
-     * [EN] Passed to the engine node as `wasm-path` (cyl-rive, cyl-pag load their WebAssembly from it); '' keeps the engine's.
-     * [CN] 作为 `wasm-path` 传给引擎节点（cyl-rive、cyl-pag 从这里加载 WebAssembly）；'' 使用引擎自己的路径。
+     * [EN] Where cyl-rive and cyl-pag load their WebAssembly from (their `wasm-path`); '' keeps the engine's default.
+     * [CN] cyl-rive 与 cyl-pag 加载 WebAssembly 的位置（其 `wasm-path`）；'' 使用引擎的默认路径。
      */
-    wasmPath: { type: String, value: '' },
+    riveWasmPath: { type: String, value: '' },
+    pagWasmPath: { type: String, value: '' },
     accessoryImage: { type: String, value: '' },
     accessoryText: { type: String, value: '' },
     accessoryAccessibilityLabel: { type: String, value: '' },

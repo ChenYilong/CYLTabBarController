@@ -16,7 +16,7 @@
 const { PAGInit } = require('../libpag/libpag.js')
 
 // [EN] A mini program cannot read files under miniprogram_npm, so the WebAssembly is copied to the package root
-//      (cylMiniprogramAssets in package.json); set `wasmPath` when it lives elsewhere.
+//      (cylMiniprogramAssets in package.json); set `wasmPath` when it lives elsewhere ('' keeps this default).
 // [CN] 小程序不能读取 miniprogram_npm 下的文件，因此 WebAssembly 被复制到代码包根目录（package.json 中的
 //      cylMiniprogramAssets）；放在其他位置时设置 `wasmPath`。
 const CYL_DEFAULT_WASM = '/cyl-pag-miniprogram/libpag.wasm.br'
@@ -226,7 +226,7 @@ Component({
       const current = () => token === this.cylLoadToken && this.cylReady
       let file = null
       try {
-        const PAG = await cylLoadPAG(this.data.wasmPath)
+        const PAG = await cylLoadPAG(this.data.wasmPath || CYL_DEFAULT_WASM)
         file = current() ? await PAG.PAGFile.load(data) : null
         if (!file || !current()) {
           if (file) {

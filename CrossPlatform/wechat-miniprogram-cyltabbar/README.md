@@ -73,7 +73,7 @@ Properties: `title`, `image`, `selectedImage`, `placeholderImage`, `animationUrl
 object, each item plays its own copy), `selected`, `enabled`, `axis`, `iconSize`, `loop`, `speed`, `autoplay` (default
 true; false rests until `playAnimation()`), `restingProgress` (0...1, the frame at rest; selected shows the last),
 `gifFirstFrame` / `gifLastFrame` / `gifDuration` (GIF stills at rest and one pass in milliseconds on play; without
-stills a GIF always plays), `wasmPath` (passed to cyl-rive / cyl-pag), `accessoryImage`, `accessoryText`,
+stills a GIF always plays), `riveWasmPath` / `pagWasmPath` (cyl-rive / cyl-pag `wasm-path`; '' keeps their default), `accessoryImage`, `accessoryText`,
 `accessoryAccessibilityLabel`, `accessoryPlacement`, `dragEnabled`, `accessibilityLabel`. Methods (through
 `selectComponent`): `playAnimation()` (from progress 0; a file still loading plays when ready), `restartAnimation()`,
 `stopAnimation()`. Events: `itemtap`, `itemlongpress`, `accessorytap`, `dragstart` / `dragmove` / `dragend`.
