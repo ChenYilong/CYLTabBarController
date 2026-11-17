@@ -511,11 +511,51 @@ python3 scripts/export-tabbar-configurations.py --check               # exit 1 w
 | 本节按用户要求使用英文（见右列）。 | **Remote Config's data model** (what the format must fit): a template of *parameters*, each a key with a default value and optional conditional values. Every value reaches the app as a string, with a value type of String, Number, Boolean or JSON. Parameter keys start with a letter or an underscore and contain only letters, digits and underscores; the key names this library uses (`CYLTabBarControllerStyleType`, `CYLTabBarControllerTabBarItemsAttributes`, …) already fit. There are limits on the number of parameters and the size of values: check the [Remote Config quotas](https://firebase.google.com/docs/remote-config/parameters) before relying on large JSON values. |
 | 本节按用户要求使用英文（见右列）。 | **Format compatibility, the plan**: (1) *Flat mapping*: each top-level key of the configuration is one parameter. A scalar (`CYLTabBarControllerStyleType = "default"`) is a String, Number or Boolean parameter; a nested value (the tab items, the plus button, the themes, the localization block) is a JSON parameter holding exactly the JSON that the `.json` file has under that key. (2) *Whole-file mapping*, as an alternative for small templates: one JSON parameter, `CYLTabBarConfiguration`, holding the whole `.json` file. (3) Both read back into the same dictionary that the file parsers produce today, so `-initWithConfiguration:` and every existing key, skin and edge case keep working. (4) New input formats, detected like the others: the Remote Config template JSON (`{"parameters": {key: {"defaultValue": {"value": …}, "valueType": …}}}`, as exported by the console or the REST API; conditions are evaluated by Firebase, not by the library) and the in-app defaults files (Android `remote_config_defaults.xml`, `<defaultsMap><entry><key/><value/></entry></defaultsMap>`; iOS a defaults `.plist`). (5) A converter script that turns any supported configuration file into a Remote Config template and a defaults file, and back, with round-trip tests against the sample files in `Example-Shared/Configurations/`. |
 | 本节按用户要求使用英文（见右列）。 | **API design, the plan** (the core stays free of Firebase, as the Fix-in-the-core rule asks): the core gains one entry point that takes Remote Config values as a plain string dictionary, e.g. iOS `+[CYLTabBarController configurationWithRemoteConfigValues:error:]` (`NSDictionary<NSString *, NSString *>`, JSON values decoded), Android `CYLTabBarConfiguration.fromRemoteConfigValues(Map<String, String>)`, and the same on the other platforms. A thin optional adapter per platform reads Firebase and calls it: an optional CocoaPods subspec / SPM product (`CYLTabBarController/FirebaseRemoteConfig`), an optional Gradle artifact, and optional dependencies in the Flutter and React Native packages, so an app that does not use Firebase never links it. Fetch policy: show the tab bar from the local file (the defaults) at once, call fetch-and-activate, and apply new values at the next launch by default; an opt-in applies them live (rebuild the tab bar, or switch the skin when only themes changed), using real-time updates where the platform's SDK supports them. Invalid remote values are rejected with the parser's error and the defaults stay, so a bad console edit never breaks the tab bar. |
+| 本节按用户要求使用英文（见右列）。 | **Progress (2026-11-17): the Firebase-free cores of iOS and Android are done; the Firebase adapters, the examples and the screenshots are not.** What exists: (1) The values entry point, on iOS `+[CYLTabBarController configurationWithRemoteConfigValues:error:]` (and `+[CYLTabBarConfigurationParser dictionaryWithRemoteConfigValues:error:]`), on Android `CYLTabBarConfiguration.configurationWithRemoteConfigValues(Map)` (and `CYLTabBarConfigurationParser.dictionaryWithRemoteConfigValues`), the iOS names as everywhere in the Android library rather than the `fromRemoteConfigValues` of the plan. Both take every value as a string, as the Firebase SDKs give it. (2) Both mappings of the plan: one parameter per top-level key, and the whole file in `CYLTabBarConfiguration` (any supported format), whose keys the flat parameters replace. (3) The rules: only parameters whose key starts with `CYL` are read, so a template can hold the app's other parameters; an empty value (a parameter Firebase does not have) is left out; a value that starts with `{` or `[` is decoded as JSON, except the geometry strings of configuration files (`"{0, -2}"`, `"{0, 0, 0, 0}"`), which stay strings; other strings are typed as the `.properties` reader types them (`"true"`, `"12"`); an invalid JSON value, an unreadable whole file, no `CYL` parameter or no tab throws the parser's error (`InvalidSyntax`, `Empty`, `NoTabs`), so the app keeps its defaults. (4) Three new inputs, detected like the other formats by `+configurationWithContentsOfFile:error:`, `-initWithConfigurationFile:error:`, a URL or a route on both platforms: a Remote Config template JSON (`parameters` and `parameterGroups`; a parameter with `useInAppDefault` is left out; conditions are not evaluated), an Android `remote_config_defaults.xml`, and an iOS defaults property list (`CYL` keys holding JSON objects or arrays as strings). Every existing sample file still reads as before. (5) The converter, `scripts/remote-config.py` (Python standard library): a JSON, property list or TOML configuration to a template, a defaults XML or a defaults plist, and back, checked against Remote Config's quotas (3,000 parameters, keys of at most 256 characters made of letters, digits and `_`, 1,000,000 characters of values); `--self-test` round-trips every such sample in `Example-Shared/Configurations/`. See [Configuration scripts](Configuration-Scripts.md). **Verified**: the iOS tests `CYLTabBarHostViewTests` (`testRemoteConfig…`) and the Android tests `CYLRemoteConfigTest` are written for CI (this work was done on Linux, without Xcode or the Android SDK). The Android parser itself, unchanged, was compiled with Kotlin 2.0.21 on the JVM and checked: every case above, the files the converter writes from the sample configuration (template, whole-file template, defaults XML, defaults plist) read back into the same dictionary as the `.json` file, and the 17 sample files still read. The converter's self-test passes (24 round trips). **Not done**: the optional Firebase adapters (a CocoaPods subspec / SPM product and a Gradle artifact), wiring the examples to a Firebase project with a console change, and the screenshots: they need a Firebase project (`GoogleService-Info.plist`, `google-services.json`) and a device or simulator. So no platform is DONE yet and the score stays 0/100 by the rule below; the cores are what the adapters and the Flutter and React Native integrations will call. |
+| 本节按用户要求使用英文（见右列）。 | **Using it today**, without an adapter: fetch with the Firebase SDK, then hand the values to the library; show the tab bar from the local file first, as the fetch policy of the plan says. |
+
+```swift
+// iOS (Swift). The local file is the default; remote values replace it when they are valid.
+let remoteConfig = RemoteConfig.remoteConfig()
+remoteConfig.fetchAndActivate { _, _ in
+    var values: [String: String] = [:]
+    for key in remoteConfig.allKeys(from: .remote) { values[key] = remoteConfig[key].stringValue }
+    if let configuration = try? CYLTabBarController.configuration(withRemoteConfigValues: values) {
+        // Keep it for the next launch (the default policy), or rebuild the tab bar now.
+    } // else: an invalid console edit; the tab bar of the local file stays.
+}
+```
+
+```objc
+// iOS (Objective-C)
+NSMutableDictionary<NSString *, NSString *> *values = [NSMutableDictionary dictionary];
+for (NSString *key in [remoteConfig allKeysFromSource:FIRRemoteConfigSourceRemote]) {
+    values[key] = remoteConfig[key].stringValue;
+}
+NSError *error = nil;
+NSDictionary *configuration = [CYLTabBarController configurationWithRemoteConfigValues:values error:&error];
+```
+
+```kotlin
+// Android (Kotlin)
+remoteConfig.fetchAndActivate().addOnCompleteListener {
+    val values = remoteConfig.all.mapValues { it.value.asString() }
+    val configuration = try {
+        CYLTabBarConfiguration.configurationWithRemoteConfigValues(values)
+    } catch (error: CYLTabBarConfiguration.CYLConfigurationException) {
+        null // an invalid console edit: the tab bar of the local file stays
+    }
+}
+```
+
+| 中文 | English |
+|:---|:---|
+| 本节按用户要求使用英文（见右列）。 | To publish a configuration file as Remote Config parameters, and to make the in-app defaults: `python3 scripts/remote-config.py to-template tabbar.json -o template.json` (then the console's "Publish from a file", or the REST API), `to-defaults-xml` for Android and `to-defaults-plist` for iOS. |
 
 | 平台 / Platform | 接入方式 / Integration | 状态 / Status |
 |:---|:---|:---|
-| 1. iOS | Firebase Apple SDK, `FirebaseRemoteConfig` (SPM or CocoaPods); defaults from the bundled `.plist` (`setDefaults(fromPlist:)`); adapter subspec; ObjC and Swift examples. | TODO |
-| 2. Android | `com.google.firebase:firebase-config` (Firebase BoM); defaults from `res/xml/remote_config_defaults.xml` (`setDefaultsAsync`); optional artifact next to `io.github.chenyilong:cyltabbarcontroller`; the Android examples. | TODO |
+| 1. iOS | Firebase Apple SDK, `FirebaseRemoteConfig` (SPM or CocoaPods); defaults from the bundled `.plist` (`setDefaults(fromPlist:)`); adapter subspec; ObjC and Swift examples. | In progress: core done (values API, template / defaults files, converter, tests); adapter, example and screenshots to do |
+| 2. Android | `com.google.firebase:firebase-config` (Firebase BoM); defaults from `res/xml/remote_config_defaults.xml` (`setDefaultsAsync`); optional artifact next to `io.github.chenyilong:cyltabbarcontroller`; the Android examples. | In progress: core done (values API, template / defaults files, converter, tests); adapter, example and screenshots to do |
 | 3. Flutter | `firebase_remote_config` (FlutterFire), passing the values to the native host view (iOS and Android cores above), so no parsing in Dart. | TODO |
 | 4. React Native | `@react-native-firebase/remote-config` (React Native Firebase), passing the values to the native host view, as Flutter. | TODO |
 | 5. HarmonyOS | Firebase has no HarmonyOS SDK. To decide: fetch the published template through a server the app owns (a Firebase server SDK or the Remote Config REST API, which needs a service account and must never ship in the app), then hand the values or a generated configuration file to the `cyltabbar` core; it already accepts a configuration from a URL. | TODO |

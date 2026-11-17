@@ -331,7 +331,9 @@ public class CYLTabBarConfigurationParser: NSObject {
         let utf8 = Text.utf8Data(from: data ?? Data())
         var firstError: NSError?
         if let dictionary = parse(utf8, format, &firstError) {
-            return dictionary
+            // [EN] A Remote Config template or defaults file reads as the configuration it holds (docs/Configuration-File.md).
+            // [CN] Remote Config 模板或默认值文件读取为其中的配置（docs/Configuration-File.md）。
+            return try CYLRemoteConfigReader.configuration(fromFileDictionary: dictionary)
         }
         let retries = firstError?.code == CYLTabBarConfigurationErrorCode.invalidSyntax.rawValue
             || firstError?.code == CYLTabBarConfigurationErrorCode.notADictionary.rawValue
@@ -345,7 +347,7 @@ public class CYLTabBarConfigurationParser: NSObject {
                     NSLog("🟡 CYLTabBarConfigurationParser: the content is %@, not %@; read as %@.",
                           name(of: detected), name(of: format), name(of: detected))
                     #endif
-                    return dictionary
+                    return try CYLRemoteConfigReader.configuration(fromFileDictionary: dictionary)
                 }
             }
         }
@@ -516,5 +518,268 @@ public class CYLTabBarConfigurationParser: NSObject {
             parseError = Text.syntaxError(formatName, line: 0, error.localizedDescription)
             return nil
         }
+    }
+}
+
+// MARK: - Firebase Remote Config
+
+/**
+ * [EN] Firebase Remote Config, without Firebase (docs/Configuration-File.md, "Firebase Remote Config"). Remote Config hands
+ *      an app a flat map of parameters whose values are strings (String, Number, Boolean or JSON). This reader turns such
+ *      values, a Remote Config template JSON (as the console or the REST API exports it) and an Android defaults file
+ *      (`remote_config_defaults.xml`) into the same dictionary the other formats give, so `-initWithConfiguration:` and
+ *      every key keep working. The mapping:
+ *      - Flat: each top-level key of the configuration is one parameter; a nested value (the tab items, the plus button,
+ *        the themes...) is a JSON parameter holding exactly the JSON the `.json` file has under that key.
+ *      - Whole file: one parameter, `CYLTabBarConfiguration`, holding a whole configuration file (any format); the flat
+ *        parameters, when there are some too, replace its keys.
+ *      Only parameters whose key starts with "CYL" are read, so a template can hold the app's other parameters. Conditions
+ *      are evaluated by Firebase, not here: a template is read by its default values.
+ * [CN] Firebase Remote Config，但不依赖 Firebase（docs/Configuration-File.md，“Firebase Remote Config”）。Remote Config 交给 App 的是
+ *      一组扁平参数，值都是字符串（String、Number、Boolean 或 JSON）。本读取器把这些值、Remote Config 模板 JSON（控制台或 REST API 导出的格式）
+ *      以及 Android 默认值文件（`remote_config_defaults.xml`）转换为与其他格式相同的字典，使 `-initWithConfiguration:` 与所有 key 照常工作。
+ *      映射方式：
+ *      - 扁平映射：配置的每个顶层 key 是一个参数；嵌套的值（Tab 列表、PlusButton、主题等）是一个 JSON 参数，内容与 `.json` 文件中该 key 下的
+ *        JSON 完全相同。
+ *      - 整个文件：一个参数 `CYLTabBarConfiguration`，内容为完整的配置文件（任意格式）；同时有扁平参数时，扁平参数替换其中的 key。
+ *      只读取 key 以 "CYL" 开头的参数，因此模板中可以有 App 的其他参数。条件由 Firebase 计算，不在这里计算：模板按其默认值读取。
+ */
+enum CYLRemoteConfigReader {
+
+    private typealias Text = CYLConfigurationText
+
+    /**
+     * [EN] The parameter that holds a whole configuration file. [CN] 存放完整配置文件的参数。
+     */
+    static let wholeConfigurationKey = "CYLTabBarConfiguration"
+
+    /**
+     * [EN] The prefix of the parameters this library reads. [CN] 本库读取的参数的前缀。
+     */
+    static let parameterPrefix = "CYL"
+
+    /**
+     * [EN] The name used in error messages. [CN] 错误信息中使用的名称。
+     */
+    static let formatName = "Remote Config"
+
+    // MARK: - Values
+
+    /**
+     * [EN] The configuration in Remote Config values (`key` → string, as `RemoteConfig.configValue(forKey:).stringValue`
+     *      gives; numbers and booleans are accepted too). A JSON value that does not parse, or a whole configuration that
+     *      does not read, throws the parser's error, so the caller keeps its defaults. Empty values (a parameter that
+     *      Firebase does not have) are left out.
+     * [CN] Remote Config 值中的配置（`key` → 字符串，即 `RemoteConfig.configValue(forKey:).stringValue` 的结果；也接受数字与布尔值）。
+     *      无法解析的 JSON 值，或无法读取的完整配置，会抛出解析器的错误，调用方因此保留默认值。空值（Firebase 中没有的参数）会被忽略。
+     */
+    static func configuration(fromValues values: [String: Any]) throws -> [String: Any] {
+        var length = 0
+        for value in values.values {
+            length += (value as? String)?.utf8.count ?? 0
+        }
+        if length > Int(CYLTabBarConfigurationMaximumLength) {
+            throw Text.error(.tooLarge, "The Remote Config values are \(length) bytes, more than the "
+                                        + "\(CYLTabBarConfigurationMaximumLength) allowed.")
+        }
+        var configuration: [String: Any] = [:]
+        if let whole = values[wholeConfigurationKey] {
+            if let text = whole as? String, !Text.trimmed(text).isEmpty {
+                do {
+                    configuration = try CYLTabBarConfigurationParser.dictionary(with: Data(text.utf8), format: .unknown)
+                } catch {
+                    let reason = (error as NSError).localizedDescription
+                    throw Text.syntaxError(formatName, line: 0, "the parameter \"\(wholeConfigurationKey)\" is not a "
+                                                                 + "configuration: \(reason)")
+                }
+            } else if let dictionary = whole as? [String: Any] {
+                configuration = dictionary
+            }
+        }
+        for key in values.keys.sorted() where key != wholeConfigurationKey && key.hasPrefix(parameterPrefix) {
+            guard let raw = values[key], let value = try decodedValue(raw, key: key) else {
+                continue
+            }
+            configuration[key] = value
+        }
+        if configuration.isEmpty {
+            throw Text.error(.empty, "Remote Config: no \(parameterPrefix)… parameter (or \"\(wholeConfigurationKey)\") "
+                                     + "with a value.")
+        }
+        return configuration
+    }
+
+    /**
+     * [EN] One parameter's value: a JSON object or array decoded (an error when it does not parse), other strings typed as
+     *      the .properties reader types them ("true" → YES, "12" → 12...), nil for an empty string.
+     * [CN] 单个参数的值：JSON 对象或数组会被解码（无法解析时报错），其他字符串按 .properties 读取器的规则转换类型（"true" → YES、"12" → 12……），
+     *      空字符串返回 nil。
+     */
+    private static func decodedValue(_ raw: Any, key: String) throws -> Any? {
+        guard let string = raw as? String else {
+            // [EN] Already typed (a plist or an XML defaults file). [CN] 已有类型（plist 或 XML 默认值文件）。
+            return raw is NSNull ? nil : raw
+        }
+        let trimmed = Text.trimmed(string)
+        if trimmed.isEmpty {
+            return nil
+        }
+        guard trimmed.hasPrefix("{") || trimmed.hasPrefix("[") else {
+            return Text.typedScalar(trimmed, allowsNull: false)
+        }
+        if Text.bracketDepth(trimmed as NSString) > Text.maximumDepth {
+            throw Text.tooDeepError(formatName)
+        }
+        do {
+            return try JSONSerialization.jsonObject(with: Data(trimmed.utf8), options: [.fragmentsAllowed])
+        } catch {
+            if isGeometryString(trimmed) {
+                // [EN] "{0, -2}", "{0, 0, 0, 0}": an offset, an inset or a size, as in every other format. [CN] 偏移、内边距或尺寸，与其他格式相同。
+                return trimmed
+            }
+            throw Text.syntaxError(formatName, line: 0, "the parameter \"\(key)\" is not valid JSON: "
+                                                         + error.localizedDescription)
+        }
+    }
+
+    /**
+     * [EN] YES for the geometry strings of configuration files ("{0, -2}", "{1.5, 0, 0, 0}"): they start with "{" but are not
+     *      JSON, and stay strings for the value conversion.
+     * [CN] 配置文件中的几何字符串（"{0, -2}"、"{1.5, 0, 0, 0}"）返回 YES：它们以 "{" 开头但不是 JSON，保留为字符串，由值转换处理。
+     */
+    private static func isGeometryString(_ text: String) -> Bool {
+        text.range(of: #"^\{\s*-?[0-9.]+(\s*,\s*-?[0-9.]+)*\s*\}$"#, options: .regularExpression) != nil
+    }
+
+    // MARK: - Files
+
+    /**
+     * [EN] `dictionary` read back as a configuration when it is a Remote Config file: a template JSON
+     *      (`{"parameters": {key: {"defaultValue": {"value": …}}}}`, with `parameterGroups` too) or an Android defaults file
+     *      (`<defaultsMap><entry><key/><value/></entry></defaultsMap>`, read by the XML reader as `entry`). Any other
+     *      dictionary is returned as it is.
+     * [CN] `dictionary` 是 Remote Config 文件时，将其读取为配置：模板 JSON（`{"parameters": {key: {"defaultValue": {"value": …}}}}`，也包括
+     *      `parameterGroups`）或 Android 默认值文件（`<defaultsMap><entry><key/><value/></entry></defaultsMap>`，XML 读取器将其读取为
+     *      `entry`）。其他字典原样返回。
+     */
+    static func configuration(fromFileDictionary dictionary: [String: Any]) throws -> [String: Any] {
+        if let values = templateValues(dictionary) {
+            return try configuration(fromValues: values)
+        }
+        if let values = defaultsMapValues(dictionary) {
+            return try configuration(fromValues: values)
+        }
+        if holdsJSONParameters(dictionary) {
+            // [EN] An iOS defaults property list (`setDefaults(fromPlist:)`): nested values as JSON strings.
+            // [CN] iOS 默认值属性列表（`setDefaults(fromPlist:)`）：嵌套的值为 JSON 字符串。
+            return try configuration(fromValues: dictionary)
+        }
+        return dictionary
+    }
+
+    /**
+     * [EN] YES when a "CYL…" key holds a JSON object or array as a string, as Remote Config stores nested values (an iOS
+     *      defaults property list). A configuration file never stores a nested value as a string; geometry strings
+     *      ("{0, -2}") do not count.
+     * [CN] 某个 "CYL…" key 以字符串形式保存 JSON 对象或数组时返回 YES，这正是 Remote Config 保存嵌套值的方式（iOS 默认值属性列表）。配置文件从不以
+     *      字符串保存嵌套的值；几何字符串（"{0, -2}"）不算在内。
+     */
+    private static func holdsJSONParameters(_ dictionary: [String: Any]) -> Bool {
+        dictionary.contains { key, value in
+            guard key.hasPrefix(parameterPrefix), let text = (value as? String).map(Text.trimmed),
+                  text.hasPrefix("{") || text.hasPrefix("["), !isGeometryString(text) else {
+                return false
+            }
+            return (try? JSONSerialization.jsonObject(with: Data(text.utf8))) != nil
+        }
+    }
+
+    /**
+     * [EN] The default values of a template's parameters, nil when `dictionary` is not a template. A parameter that uses
+     *      the in-app default (`useInAppDefault`) is left out.
+     * [CN] 模板参数的默认值；`dictionary` 不是模板时返回 nil。使用 App 内默认值（`useInAppDefault`）的参数会被忽略。
+     */
+    private static func templateValues(_ dictionary: [String: Any]) -> [String: Any]? {
+        var parameterSets: [[String: Any]] = []
+        if let parameters = dictionary["parameters"] as? [String: Any] {
+            parameterSets.append(parameters)
+        }
+        if let groups = dictionary["parameterGroups"] as? [String: Any] {
+            for group in groups.values {
+                if let parameters = (group as? [String: Any])?["parameters"] as? [String: Any] {
+                    parameterSets.append(parameters)
+                }
+            }
+        }
+        let isTemplate = parameterSets.contains { parameters in
+            parameters.values.contains { ($0 as? [String: Any]).map(isTemplateParameter) ?? false }
+        }
+        guard isTemplate, !dictionary.keys.contains(where: { $0.hasPrefix(parameterPrefix) }) else {
+            return nil
+        }
+        var values: [String: Any] = [:]
+        for parameters in parameterSets {
+            for (key, parameter) in parameters {
+                guard let defaultValue = (parameter as? [String: Any])?["defaultValue"] as? [String: Any],
+                      (defaultValue["useInAppDefault"] as? Bool) != true,
+                      let value = defaultValue["value"] else {
+                    continue
+                }
+                values[key] = value
+            }
+        }
+        return values
+    }
+
+    private static func isTemplateParameter(_ parameter: [String: Any]) -> Bool {
+        parameter["defaultValue"] is [String: Any] || parameter["conditionalValues"] is [String: Any]
+            || parameter["valueType"] is String
+    }
+
+    /**
+     * [EN] The entries of an Android defaults file, nil when `dictionary` is not one. The XML reader gives `entry` as one
+     *      dictionary (a single entry), a list of `{key, value}` dictionaries, or a dictionary already keyed by the keys.
+     * [CN] Android 默认值文件的条目；`dictionary` 不是这种文件时返回 nil。XML 读取器给出的 `entry` 可能是一个字典（只有一个条目）、
+     *      `{key, value}` 字典的列表，或已按 key 组织的字典。
+     */
+    private static func defaultsMapValues(_ dictionary: [String: Any]) -> [String: Any]? {
+        guard dictionary.count == 1, let entry = dictionary["entry"] else {
+            return nil
+        }
+        let entries: [Any]
+        if let list = entry as? [Any] {
+            entries = list
+        } else if let single = entry as? [String: Any], single["key"] != nil {
+            entries = [single]
+        } else if let keyed = entry as? [String: Any] {
+            return keyed
+        } else {
+            return nil
+        }
+        var values: [String: Any] = [:]
+        for item in entries {
+            guard let pair = item as? [String: Any], let key = pair["key"] else {
+                return nil
+            }
+            values["\(key)"] = pair["value"] ?? ""
+        }
+        return values
+    }
+}
+
+extension CYLTabBarConfigurationParser {
+
+    /**
+     * [EN] The configuration in Firebase Remote Config values, without Firebase: pass every value as a string (e.g. for each
+     *      key of `remoteConfig.allKeys(from: .remote)`, `remoteConfig[key].stringValue`). Only "CYL…" parameters are read;
+     *      a nested value is a JSON parameter, and `CYLTabBarConfiguration` may hold a whole configuration file. Throws when
+     *      a value is invalid, so the app keeps its defaults (docs/Configuration-File.md, "Firebase Remote Config").
+     * [CN] Firebase Remote Config 值中的配置，不依赖 Firebase：以字符串传入每个值（例如对 `remoteConfig.allKeys(from: .remote)` 的每个 key，
+     *      传入 `remoteConfig[key].stringValue`）。只读取 "CYL…" 参数；嵌套的值是 JSON 参数，`CYLTabBarConfiguration` 可以存放完整的配置文件。
+     *      值无效时抛出错误，App 因此保留默认值（docs/Configuration-File.md，“Firebase Remote Config”）。
+     */
+    @objc(dictionaryWithRemoteConfigValues:error:)
+    public class func dictionary(withRemoteConfigValues values: [String: Any]) throws -> [String: Any] {
+        try CYLRemoteConfigReader.configuration(fromValues: values)
     }
 }

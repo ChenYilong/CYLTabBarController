@@ -5815,5 +5815,10 @@
  "CYLCatchException()": {
   "status": "n/a",
   "note": "Catches an Objective-C exception for Swift callers (Swift cannot catch NSException); Kotlin has try / catch"
+ },
+ "CYLTabBarController(CYLConfiguration) +configurationWithRemoteConfigValues:error:": {
+  "android": "CYLTabBarController.configurationWithRemoteConfigValues / CYLTabBarConfiguration.configurationWithRemoteConfigValues",
+  "note": "Firebase Remote Config values without Firebase (docs/Configuration-File.md); NoTabs when no tab is left",
+  "status": "done"
  }
 }

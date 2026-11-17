@@ -94,6 +94,34 @@ object CYLTabBarConfiguration {
     }
 
     /**
+     * [EN] `+configurationWithRemoteConfigValues:error:`: a configuration from Firebase Remote Config values, without Firebase
+     *      (docs/Configuration-File.md, "Firebase Remote Config"), e.g.
+     *      `CYLTabBarConfiguration.configurationWithRemoteConfigValues(remoteConfig.all.mapValues { it.value.asString() })`.
+     *      Only "CYL…" parameters are read; a nested value is a JSON parameter; `CYLTabBarConfiguration` may hold a whole
+     *      configuration file. Throws the parser's error for an invalid value, and `NoTabs` when no tab is left, so the app
+     *      keeps the tab bar of its local file (the defaults).
+     * [CN] 根据 Firebase Remote Config 的值生成配置，不依赖 Firebase（docs/Configuration-File.md，“Firebase Remote Config”），例如
+     *      `CYLTabBarConfiguration.configurationWithRemoteConfigValues(remoteConfig.all.mapValues { it.value.asString() })`。只读取 "CYL…" 参数；
+     *      嵌套的值为 JSON 参数；`CYLTabBarConfiguration` 可以存放完整的配置文件。值无效时抛出解析器的错误，没有 Tab 时抛出 `NoTabs`，App 因此保留
+     *      本地文件（默认值）中的 TabBar。
+     */
+    @JvmStatic
+    @Throws(CYLConfigurationException::class)
+    fun configurationWithRemoteConfigValues(values: Map<String, Any?>): Map<String, Any?> {
+        val configuration = try {
+            CYLTabBarConfigurationParser.dictionaryWithRemoteConfigValues(values)
+        } catch (error: CYLTabBarConfigurationException) {
+            throw CYLConfigurationException(CYLTabBarConfigurationError.of(error.code), error.message ?: error.code.name)
+        }
+        val items = configuration[CYLConstants.CYLTabBarControllerTabBarItemsAttributes]
+        if (items !is Map<*, *> && (items as? List<*>)?.any { it is Map<*, *> } != true) {
+            throw CYLConfigurationException(CYLTabBarConfigurationError.NoTabs,
+                "The configuration has no tab: CYLTabBarControllerTabBarItemsAttributes is missing or empty.")
+        }
+        return configuration
+    }
+
+    /**
      * [EN] `+configurationWithRoute:error:`: the configuration file a resource route points to (`CYLResourceRoute`,
      *      docs/Resource-Routes.md), e.g. "bundle:Configurations?name=tabbar" or
      *      "sandbox:Caches/tabbar?name=tabbar&theme=dark&version=2.1&format=json"; `FileNotFound` when it matches no file.

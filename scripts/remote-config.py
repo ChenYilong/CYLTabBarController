@@ -1,0 +1,318 @@
+#!/usr/bin/env python3
+"""Convert tab bar configuration files to and from Firebase Remote Config.
+
+[EN] docs/Configuration-File.md, "Firebase Remote Config". Turns a configuration file (JSON, property list or TOML: the
+     formats Python's standard library reads) into what Remote Config takes, and back:
+     - a Remote Config template JSON (`{"parameters": {...}}`, the shape the console's "Publish from a file" and the REST
+       API use), one parameter per top-level key: a scalar as STRING / NUMBER / BOOLEAN, a nested value as JSON holding
+       exactly the JSON the `.json` file has under that key (`--whole` puts the whole file in one JSON parameter,
+       `CYLTabBarConfiguration`);
+     - an Android defaults file (`res/xml/remote_config_defaults.xml`, for `setDefaultsAsync(R.xml.…)`);
+     - an iOS defaults property list (for `setDefaults(fromPlist:)`).
+     Each output reads back, through the library (`+configurationWithContentsOfFile:error:`, `CYLTabBarConfigurationParser`
+     on Android) or through `to-config` here, into the same dictionary as the input. The checks follow Remote Config's
+     quotas (firebase.google.com/docs/remote-config/parameters): at most 3,000 parameters, keys of at most 256 characters
+     that start with a letter or an underscore and hold only letters, digits and underscores, and at most 1,000,000
+     characters across all values. Python 3 standard library only.
+[CN] docs/Configuration-File.md，“Firebase Remote Config”。把配置文件（JSON、属性列表或 TOML：Python 标准库能读取的格式）转换为 Remote Config
+     使用的文件，也可以转换回来：
+     - Remote Config 模板 JSON（`{"parameters": {...}}`，即控制台“从文件发布”与 REST API 使用的格式），每个顶层 key 一个参数：标量为
+       STRING / NUMBER / BOOLEAN，嵌套的值为 JSON，内容与 `.json` 文件中该 key 下的 JSON 完全相同（`--whole` 把整个文件放进一个 JSON 参数
+       `CYLTabBarConfiguration`）；
+     - Android 默认值文件（`res/xml/remote_config_defaults.xml`，用于 `setDefaultsAsync(R.xml.…)`）；
+     - iOS 默认值属性列表（用于 `setDefaults(fromPlist:)`）。
+     每种输出都可以通过本库（`+configurationWithContentsOfFile:error:`、Android 的 `CYLTabBarConfigurationParser`）或这里的 `to-config`
+     读取回与输入相同的字典。检查遵循 Remote Config 的配额（firebase.google.com/docs/remote-config/parameters）：最多 3,000 个参数，key 最长
+     256 个字符、以字母或下划线开头且只包含字母、数字与下划线，所有值合计最多 1,000,000 个字符。仅使用 Python 3 标准库。
+
+Usage 用法:
+    python3 scripts/remote-config.py to-template Example-Shared/Configurations/cyl_tabbar_configuration.json -o template.json
+    python3 scripts/remote-config.py to-template --whole tabbar.toml -o template.json
+    python3 scripts/remote-config.py to-defaults-xml tabbar.json -o app/src/main/res/xml/remote_config_defaults.xml
+    python3 scripts/remote-config.py to-defaults-plist tabbar.json -o RemoteConfigDefaults.plist
+    python3 scripts/remote-config.py to-config template.json -o tabbar.json     # also a defaults .xml or .plist
+    python3 scripts/remote-config.py --self-test                                # round trips of the sample files
+"""
+
+import argparse
+import json
+import os
+import plistlib
+import re
+import sys
+import tomllib
+import xml.etree.ElementTree as ElementTree
+
+WHOLE_CONFIGURATION_KEY = "CYLTabBarConfiguration"
+PARAMETER_PREFIX = "CYL"
+MAXIMUM_PARAMETERS = 3000
+MAXIMUM_KEY_LENGTH = 256
+MAXIMUM_VALUE_CHARACTERS = 1_000_000
+KEY_PATTERN = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
+# [EN] Geometry strings ("{0, -2}") start with "{" but are not JSON. [CN] 几何字符串（"{0, -2}"）以 "{" 开头但不是 JSON。
+GEOMETRY = re.compile(r"^\{\s*-?[0-9.]+(\s*,\s*-?[0-9.]+)*\s*\}$")
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+SAMPLES = os.path.join(ROOT, "Example-Shared", "Configurations")
+
+
+class ConversionError(Exception):
+    """[EN] A file that cannot be converted, with the reason. [CN] 无法转换的文件及原因。"""
+
+
+# MARK: - Reading configuration files 读取配置文件
+
+def read_configuration(path):
+    """[EN] A configuration file as a dictionary (JSON, property list, TOML). [CN] 将配置文件读取为字典（JSON、属性列表、TOML）。"""
+    extension = os.path.splitext(path)[1].lower()
+    with open(path, "rb") as handle:
+        data = handle.read()
+    try:
+        if extension == ".plist":
+            value = plistlib.loads(data)
+        elif extension == ".toml":
+            value = tomllib.loads(data.decode("utf-8"))
+        elif extension == ".json":
+            value = json.loads(data.decode("utf-8-sig"))
+        else:
+            raise ConversionError(f"{path}: use a .json, .plist or .toml file (other formats: convert them to JSON "
+                                  "first, e.g. with the Example's \"export\" row)")
+    except (ValueError, plistlib.InvalidFileException, tomllib.TOMLDecodeError) as error:
+        raise ConversionError(f"{path}: {error}") from error
+    if not isinstance(value, dict) or not value:
+        raise ConversionError(f"{path}: the top level must be a non-empty dictionary")
+    return value
+
+
+# MARK: - Parameters 参数
+
+def json_text(value):
+    """[EN] Compact JSON, as a Remote Config value. [CN] 紧凑的 JSON，作为 Remote Config 的值。"""
+    return json.dumps(value, ensure_ascii=False, separators=(",", ":"), sort_keys=False)
+
+
+def parameter(value):
+    """[EN] (string value, Remote Config value type) of one configuration value. [CN] 一个配置值对应的（字符串值，Remote Config 值类型）。"""
+    if isinstance(value, bool):
+        return ("true" if value else "false"), "BOOLEAN"
+    if isinstance(value, (int, float)):
+        return json_text(value), "NUMBER"
+    if isinstance(value, str):
+        return value, "STRING"
+    if isinstance(value, (dict, list)):
+        return json_text(value), "JSON"
+    raise ConversionError(f"a {type(value).__name__} value cannot be a Remote Config parameter (dates and data are not "
+                          "configuration values)")
+
+
+def parameters_of(configuration, whole=False):
+    """[EN] The parameters ({key: (value, type)}) of a configuration, checked against Remote Config's quotas.
+    [CN] 配置对应的参数（{key: (值, 类型)}），并按 Remote Config 的配额检查。"""
+    if whole:
+        result = {WHOLE_CONFIGURATION_KEY: (json_text(configuration), "JSON")}
+    else:
+        result = {}
+        for key, value in configuration.items():
+            if not key.startswith(PARAMETER_PREFIX):
+                raise ConversionError(f"\"{key}\" is not read from Remote Config (only {PARAMETER_PREFIX}… keys are); "
+                                      "use --whole to keep it")
+            result[key] = parameter(value)
+    for key in result:
+        if not KEY_PATTERN.match(key) or len(key) > MAXIMUM_KEY_LENGTH:
+            raise ConversionError(f"\"{key}\" is not a valid Remote Config key (a letter or \"_\" first, then letters, "
+                                  f"digits and \"_\", at most {MAXIMUM_KEY_LENGTH} characters); use --whole")
+    if len(result) > MAXIMUM_PARAMETERS:
+        raise ConversionError(f"{len(result)} parameters, more than Remote Config's {MAXIMUM_PARAMETERS}")
+    characters = sum(len(value) for value, _ in result.values())
+    if characters > MAXIMUM_VALUE_CHARACTERS:
+        raise ConversionError(f"{characters} characters of values, more than Remote Config's "
+                              f"{MAXIMUM_VALUE_CHARACTERS} per project")
+    return result
+
+
+# MARK: - Writing 写入
+
+def template_json(configuration, whole=False):
+    """[EN] A Remote Config template (the REST API / console file shape). [CN] Remote Config 模板（REST API / 控制台文件格式）。"""
+    parameters = {key: {"defaultValue": {"value": value}, "valueType": value_type}
+                  for key, (value, value_type) in parameters_of(configuration, whole).items()}
+    return json.dumps({"parameters": parameters}, ensure_ascii=False, indent=2) + "\n"
+
+
+def defaults_xml(configuration, whole=False):
+    """[EN] An Android `remote_config_defaults.xml`. [CN] Android 的 `remote_config_defaults.xml`。"""
+    root = ElementTree.Element("defaultsMap")
+    for key, (value, _) in parameters_of(configuration, whole).items():
+        entry = ElementTree.SubElement(root, "entry")
+        ElementTree.SubElement(entry, "key").text = key
+        ElementTree.SubElement(entry, "value").text = value
+    ElementTree.indent(root, space="    ")
+    return '<?xml version="1.0" encoding="utf-8"?>\n' + ElementTree.tostring(root, encoding="unicode") + "\n"
+
+
+def defaults_plist(configuration, whole=False):
+    """[EN] An iOS defaults property list: JSON parameters as strings, scalars with their type.
+    [CN] iOS 默认值属性列表：JSON 参数为字符串，标量保留类型。"""
+    values = {}
+    for key, (value, value_type) in parameters_of(configuration, whole).items():
+        if value_type == "BOOLEAN":
+            values[key] = value == "true"
+        elif value_type == "NUMBER":
+            values[key] = json.loads(value)
+        else:
+            values[key] = value
+    return plistlib.dumps(values, fmt=plistlib.FMT_XML)
+
+
+# MARK: - Reading Remote Config files back 读取 Remote Config 文件
+
+def decoded(value):
+    """[EN] One value as the library decodes it: JSON objects and arrays parsed, other strings kept. The library also
+    types scalar strings ("true", "12") as the .properties reader does; this script keeps the types the input had.
+    [CN] 按本库的方式解码一个值：解析 JSON 对象与数组，其他字符串保持不变。本库还会像 .properties 读取器一样转换标量字符串（"true"、"12"）的类型；
+    本脚本保留输入中的类型。"""
+    if isinstance(value, str) and value.strip()[:1] in ("{", "["):
+        try:
+            return json.loads(value)
+        except ValueError:
+            if GEOMETRY.match(value.strip()):
+                # [EN] "{0, -2}": an offset, an inset or a size, not JSON. [CN] 偏移、内边距或尺寸，不是 JSON。
+                return value
+            raise
+    return value
+
+
+def configuration_from_values(values, types=None):
+    """[EN] Remote Config values (and their value types) as a configuration, as the library reads them.
+    [CN] 按本库的读取方式，把 Remote Config 的值（及其值类型）转换为配置。"""
+    types = types or {}
+    configuration = {}
+    whole = values.get(WHOLE_CONFIGURATION_KEY)
+    if isinstance(whole, str) and whole.strip():
+        configuration.update(json.loads(whole))
+    for key in sorted(values):
+        value = values[key]
+        if key == WHOLE_CONFIGURATION_KEY or not key.startswith(PARAMETER_PREFIX) or value in ("", None):
+            continue
+        value_type = types.get(key)
+        if value_type == "NUMBER" and isinstance(value, str):
+            value = json.loads(value)
+        elif value_type == "BOOLEAN" and isinstance(value, str):
+            value = value.strip().lower() == "true"
+        configuration[key] = value if value_type == "STRING" else decoded(value)
+    if not configuration:
+        raise ConversionError(f"no {PARAMETER_PREFIX}… parameter (or \"{WHOLE_CONFIGURATION_KEY}\") with a value")
+    return configuration
+
+
+def read_remote_config_file(path):
+    """[EN] A template JSON, a defaults .xml or a defaults .plist as a configuration.
+    [CN] 将模板 JSON、默认值 .xml 或默认值 .plist 读取为配置。"""
+    extension = os.path.splitext(path)[1].lower()
+    with open(path, "rb") as handle:
+        data = handle.read()
+    if extension == ".xml":
+        root = ElementTree.fromstring(data)
+        if root.tag != "defaultsMap":
+            raise ConversionError(f"{path}: not a Remote Config defaults file (<defaultsMap>)")
+        values = {entry.findtext("key", ""): entry.findtext("value", "") for entry in root.iter("entry")}
+        return configuration_from_values(values)
+    if extension == ".plist":
+        return configuration_from_values(plistlib.loads(data))
+    template = json.loads(data.decode("utf-8-sig"))
+    values, types = {}, {}
+    parameter_sets = [template.get("parameters", {})]
+    parameter_sets += [group.get("parameters", {}) for group in template.get("parameterGroups", {}).values()]
+    for parameters in parameter_sets:
+        for key, item in parameters.items():
+            default = item.get("defaultValue", {})
+            if default.get("useInAppDefault") or "value" not in default:
+                continue
+            values[key] = default["value"]
+            types[key] = item.get("valueType")
+    return configuration_from_values(values, types)
+
+
+# MARK: - Self-test 自测
+
+def self_test():
+    """[EN] Every JSON, property list and TOML sample: each output reads back into the input, and the files written are
+    valid (a template is JSON, a defaults file is a <defaultsMap>). [CN] 每个 JSON、属性列表与 TOML 示例文件：每种输出都能读取回输入，且写出的
+    文件有效（模板是 JSON，默认值文件是 <defaultsMap>）。"""
+    import tempfile
+    samples = []
+    for folder, _, files in os.walk(SAMPLES):
+        for name in sorted(files):
+            if os.path.splitext(name)[1].lower() in (".json", ".plist", ".toml"):
+                samples.append(os.path.join(folder, name))
+    failures = checks = 0
+    with tempfile.TemporaryDirectory() as work:
+        for sample in samples:
+            try:
+                configuration = read_configuration(sample)
+            except ConversionError:
+                continue  # [EN] e.g. a manifest or a localization table, not a configuration. [CN] 例如清单或字符串表，不是配置。
+            if not any(key.startswith(PARAMETER_PREFIX) for key in configuration):
+                continue
+            relative = os.path.relpath(sample, ROOT)
+            flat_ok = all(key.startswith(PARAMETER_PREFIX) for key in configuration)
+            for whole in ([False, True] if flat_ok else [True]):
+                writers = (("template.json", lambda c: template_json(c, whole).encode()),
+                           ("defaults.xml", lambda c: defaults_xml(c, whole).encode()),
+                           ("defaults.plist", lambda c: defaults_plist(c, whole)))
+                for suffix, writer in writers:
+                    checks += 1
+                    path = os.path.join(work, ("whole-" if whole else "") + suffix)
+                    try:
+                        with open(path, "wb") as handle:
+                            handle.write(writer(configuration))
+                        back = read_remote_config_file(path)
+                    except (ConversionError, ValueError, ElementTree.ParseError) as error:
+                        failures += 1
+                        print(f"  FAIL {relative} → {suffix}{' (whole)' if whole else ''}: {error}")
+                        continue
+                    if back != configuration:
+                        failures += 1
+                        print(f"  FAIL {relative} → {suffix}{' (whole)' if whole else ''}: reads back differently")
+    print(f"{checks} round trips, {failures} failures, {len(samples)} sample files looked at")
+    return failures == 0 and checks > 0
+
+
+def main(argv=None):
+    parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
+    parser.add_argument("--self-test", action="store_true", help="round trips of the sample files")
+    sub = parser.add_subparsers(dest="command")
+    for name in ("to-template", "to-defaults-xml", "to-defaults-plist", "to-config"):
+        command = sub.add_parser(name)
+        command.add_argument("input")
+        command.add_argument("-o", "--output", help="the file to write (default: standard output)")
+        if name != "to-config":
+            command.add_argument("--whole", action="store_true",
+                                 help=f"one JSON parameter, {WHOLE_CONFIGURATION_KEY}, holding the whole file")
+    arguments = parser.parse_args(argv)
+    if arguments.self_test:
+        return 0 if self_test() else 1
+    if not arguments.command:
+        parser.print_help()
+        return 2
+    try:
+        if arguments.command == "to-config":
+            output = (json.dumps(read_remote_config_file(arguments.input), ensure_ascii=False, indent=2) + "\n").encode()
+        else:
+            configuration = read_configuration(arguments.input)
+            writer = {"to-template": lambda: template_json(configuration, arguments.whole).encode(),
+                      "to-defaults-xml": lambda: defaults_xml(configuration, arguments.whole).encode(),
+                      "to-defaults-plist": lambda: defaults_plist(configuration, arguments.whole)}[arguments.command]
+            output = writer()
+    except (ConversionError, ValueError, OSError, ElementTree.ParseError) as error:
+        print(f"remote-config.py: {error}", file=sys.stderr)
+        return 1
+    if arguments.output:
+        with open(arguments.output, "wb") as handle:
+            handle.write(output)
+    else:
+        sys.stdout.buffer.write(output)
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

@@ -1839,6 +1839,13 @@ open class CYLTabBarController(val activity: FragmentActivity) {
         }
 
         /**
+         * [EN] `+configurationWithRemoteConfigValues:error:`: a configuration from Firebase Remote Config values, without Firebase
+         *      (docs/Configuration-File.md, "Firebase Remote Config"). [CN] 根据 Firebase Remote Config 的值生成配置，不依赖 Firebase。
+         */
+        @JvmStatic @Throws(CYLTabBarConfiguration.CYLConfigurationException::class)
+        fun configurationWithRemoteConfigValues(values: Map<String, Any?>) = CYLTabBarConfiguration.configurationWithRemoteConfigValues(values)
+
+        /**
          * [EN] `+configurationWithRoute:error:` / `+tabBarControllerWithConfigurationRoute:error:` (docs/Resource-Routes.md). [CN] 从资源路由创建。
          */
         @JvmStatic @Throws(CYLTabBarConfiguration.CYLConfigurationException::class)

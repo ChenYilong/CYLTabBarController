@@ -2824,6 +2824,26 @@ typedef void (^CYLTabBarConfigurationCompletion)(NSDictionary<NSString *, id> *_
 + (nullable NSDictionary<NSString *, id> *)configurationWithContentsOfFile:(NSString *)filePath error:(NSError *_Nullable *_Nullable)error;
 
 /*!
+ * [EN] A configuration from Firebase Remote Config values, without linking Firebase: pass each value as a string, e.g.
+ *      for every key of `-[FIRRemoteConfig allKeysFromSource:FIRRemoteConfigSourceRemote]`, its `stringValue`. Only
+ *      parameters whose key starts with "CYL" are read: a scalar key (`CYLTabBarControllerStyleType`) is a String, Number
+ *      or Boolean parameter; a nested value (`CYLTabBarControllerTabBarItemsAttributes`, the plus button, the themes...)
+ *      is a JSON parameter holding exactly the JSON of the `.json` file under that key; `CYLTabBarConfiguration` may hold
+ *      a whole configuration file, whose keys the other parameters replace. Returns nil and sets `error` when a value is
+ *      invalid or no tab is left, so the app keeps the tab bar of its local file (the defaults). A Remote Config template
+ *      JSON and an Android `remote_config_defaults.xml` are also read by `+configurationWithContentsOfFile:error:`.
+ *      See docs/Configuration-File.md, "Firebase Remote Config".
+ * [CN] 根据 Firebase Remote Config 的值生成配置，无需链接 Firebase：以字符串传入每个值，例如对
+ *      `-[FIRRemoteConfig allKeysFromSource:FIRRemoteConfigSourceRemote]` 的每个 key 传入其 `stringValue`。只读取 key 以 "CYL" 开头的参数：
+ *      标量 key（`CYLTabBarControllerStyleType`）是 String、Number 或 Boolean 参数；嵌套的值（`CYLTabBarControllerTabBarItemsAttributes`、
+ *      PlusButton、主题等）是 JSON 参数，内容与 `.json` 文件中该 key 下的 JSON 完全相同；`CYLTabBarConfiguration` 可以存放完整的配置文件，
+ *      其他参数会替换其中的 key。值无效或没有 Tab 时返回 nil 并设置 `error`，App 因此保留本地文件（默认值）中的 TabBar。Remote Config 模板 JSON
+ *      与 Android 的 `remote_config_defaults.xml` 也可以由 `+configurationWithContentsOfFile:error:` 读取。见 docs/Configuration-File.md，
+ *      “Firebase Remote Config”。
+ */
++ (nullable NSDictionary<NSString *, id> *)configurationWithRemoteConfigValues:(NSDictionary<NSString *, id> *)values error:(NSError *_Nullable *_Nullable)error;
+
+/*!
  * [EN] A tab bar controller from a configuration file (see `+configurationWithContentsOfFile:error:`), or nil and `error`.
  *      Main thread only (UIKit): elsewhere it returns nil and `CYLTabBarConfigurationErrorMainThreadRequired`; read the
  *      dictionary in the background with `+configurationWithContentsOfFile:error:` instead.

@@ -39,6 +39,7 @@
 | [边界情况清单与评分：configuration-edge-cases.py](#cn边界情况清单与评分configuration-edge-casespy) | [Edge-case checklist and score: configuration-edge-cases.py](#enedge-case-checklist-and-score-configuration-edge-casespy) |
 | [解析器测试：configuration-tests/run-tests.sh](#cn解析器测试configuration-testsrun-testssh) | [Parser tests: configuration-tests/run-tests.sh](#enparser-tests-configuration-testsrun-testssh) |
 | [注释块检查：check-comment-blocks.py](#cn注释块检查check-comment-blockspy) | [Comment block check: check-comment-blocks.py](#encomment-block-check-check-comment-blockspy) |
+| [Firebase Remote Config 转换：remote-config.py](#cnfirebase-remote-config-转换remote-configpy) | [Firebase Remote Config conversion: remote-config.py](#enfirebase-remote-config-conversion-remote-configpy) |
 | [测试与截图](#cn测试与截图) | [Testing and screenshots](#entesting-and-screenshots) |
 
 <!-- navigation:end -->
@@ -213,6 +214,26 @@ python3 scripts/check-comment-blocks.py path/to/File.h   # given files or folder
 | 中文 | English |
 |:---|:---|
 | 合并冲突时，如果两侧共用 `/*!` 这一行，而解决冲突时把两侧拼接起来，其中一个文档注释会丢失开头，剩下的 ` * [EN] ...` 行就成了头文件中的普通文本：编译错误，但在审查中很难看出。本脚本列出所有注释之外、以 `*` 开头的行，存在时返回 1。本 PR 合并 master 时就发生过一次（`daa4c89`，28 行），已修复，并由此加入这个检查；`run-tests.sh` 会先运行它。 | When both sides of a merge conflict share a `/*!` line and the conflict is resolved by joining the two sides, one documentation comment loses its opener, and its remaining ` * [EN] ...` lines become plain text in the header: a compile error that is hard to see in review. This script lists every line outside a comment that starts with `*`, and exits 1 when there is one. It happened once in this PR when merging master (`daa4c89`, 28 lines); it was fixed, and the check was added for it; `run-tests.sh` runs it first. |
+
+## [CN]Firebase Remote Config 转换：remote-config.py
+## [EN]Firebase Remote Config conversion: remote-config.py
+
+| 中文 | English |
+|:---|:---|
+| 把配置文件（JSON、属性列表或 TOML，即 Python 标准库能读取的格式）转换为 Firebase Remote Config 使用的文件，也可以转换回来：模板 JSON（`{"parameters": {...}}`，用于控制台“从文件发布”或 REST API）、Android 的 `remote_config_defaults.xml` 与 iOS 的默认值属性列表。默认每个顶层 key 一个参数（标量为 STRING / NUMBER / BOOLEAN，嵌套的值为 JSON）；`--whole` 把整个文件放进一个 JSON 参数 `CYLTabBarConfiguration`。这三种文件本库都能直接读取（`+configurationWithContentsOfFile:error:`，Android 的 `CYLTabBarConfigurationParser`），结果与原文件相同。见 [配置文件：Firebase Remote Config](Configuration-File.md#cnfirebase-remote-configtodo)。 | Converts a configuration file (JSON, property list or TOML, the formats Python's standard library reads) into the files Firebase Remote Config uses, and back: a template JSON (`{"parameters": {...}}`, for the console's "Publish from a file" or the REST API), an Android `remote_config_defaults.xml` and an iOS defaults property list. By default each top-level key is one parameter (a scalar as STRING / NUMBER / BOOLEAN, a nested value as JSON); `--whole` puts the whole file in one JSON parameter, `CYLTabBarConfiguration`. The library reads all three files directly (`+configurationWithContentsOfFile:error:`, `CYLTabBarConfigurationParser` on Android), into the same dictionary as the original file. See [Configuration file: Firebase Remote Config](Configuration-File.md#enfirebase-remote-config-todo). |
+
+```sh
+python3 scripts/remote-config.py to-template tabbar.json -o template.json            # one parameter per key 每个 key 一个参数
+python3 scripts/remote-config.py to-template --whole tabbar.toml -o template.json    # one CYLTabBarConfiguration parameter 一个参数
+python3 scripts/remote-config.py to-defaults-xml tabbar.json -o app/src/main/res/xml/remote_config_defaults.xml
+python3 scripts/remote-config.py to-defaults-plist tabbar.json -o RemoteConfigDefaults.plist
+python3 scripts/remote-config.py to-config template.json -o tabbar.json              # back; also a defaults .xml or .plist 转换回来
+python3 scripts/remote-config.py --self-test                                         # round trips of the sample files 示例文件往返测试
+```
+
+| 中文 | English |
+|:---|:---|
+| 检查遵循 Remote Config 的配额：最多 3,000 个参数，key 最长 256 个字符、以字母或下划线开头且只包含字母、数字与下划线，所有值合计最多 1,000,000 个字符；超出时报错并提示使用 `--whole`。不以 `CYL` 开头的 key 本库不会从 Remote Config 读取，同样提示使用 `--whole`。几何字符串（`"{0, -2}"`）保持为字符串，不当作 JSON。`--self-test` 把 `Example-Shared/Configurations/` 中每个 JSON、属性列表与 TOML 配置分别转换为三种文件并读回，结果必须与原文件相同（目前 24 次往返全部通过）。 | The checks follow Remote Config's quotas: at most 3,000 parameters, keys of at most 256 characters that start with a letter or an underscore and hold only letters, digits and underscores, and at most 1,000,000 characters across all values; beyond them it stops and suggests `--whole`. A key that does not start with `CYL` is not read from Remote Config by the library, so it also suggests `--whole`. Geometry strings (`"{0, -2}"`) stay strings, not JSON. `--self-test` converts every JSON, property list and TOML configuration in `Example-Shared/Configurations/` into the three files and reads them back, which must give the original (currently 24 round trips, all passing). |
 
 ## [CN]测试与截图
 ## [EN]Testing and screenshots
