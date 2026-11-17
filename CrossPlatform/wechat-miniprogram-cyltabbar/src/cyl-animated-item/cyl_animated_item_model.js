@@ -79,7 +79,8 @@ function cylAnimatedItemGifSource(p, animationPath) {
 function cylAnimatedItemModel(p) {
   const animationPath = p.animationUrl || ''
   const hasAnimationData = !!p.animationData && typeof p.animationData === 'object'
-  const animationType = hasAnimationData ? 'lottie' : cylAnimatedItemType(animationPath)
+  const namedType = CYL_ANIMATED_ITEM_TYPES.some((item) => item.type === p.animationType) ? p.animationType : ''
+  const animationType = hasAnimationData ? 'lottie' : namedType || cylAnimatedItemType(animationPath)
   const hasSource = !!animationPath || hasAnimationData
   const usesEngine = hasSource && !!animationType && animationType !== 'gif' && !p.animationFailed
   const gifShows = animationType === 'gif' && !p.animationFailed

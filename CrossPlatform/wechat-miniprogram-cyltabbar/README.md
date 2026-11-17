@@ -70,7 +70,7 @@ Properties: `itemStyle` (CYLTabBarItemStyle `flat` / `liquidGlass`), `glassLensS
 (`cyl-lottie-view`, `cyl-pag-view`, `cyl-rive-view`, `cyl-svga-view`) and draws GIF with `<image>`.
 
 Properties: `title`, `image`, `selectedImage`, `placeholderImage`, `animationUrl` or `animationData` (Lottie JSON as an
-object, each item plays its own copy), `selected`, `enabled`, `axis`, `iconSize`, `loop`, `speed`, `autoplay` (default
+object, each item plays its own copy), `animationType` (when the extension does not say it, e.g. `.riv.bin`), `selected`, `enabled`, `axis`, `iconSize`, `loop`, `speed`, `autoplay` (default
 true; false rests until `playAnimation()`), `restingProgress` (0...1, the frame at rest; selected shows the last),
 `gifFirstFrame` / `gifLastFrame` / `gifDuration` (GIF stills at rest and one pass in milliseconds on play; without
 stills a GIF always plays), `riveWasmPath` / `pagWasmPath` (cyl-rive / cyl-pag `wasm-path`; '' keeps their default), `accessoryImage`, `accessoryText`,

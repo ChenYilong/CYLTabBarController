@@ -44,6 +44,13 @@ Component({
      */
     animationData: { type: Object, value: null },
     /**
+     * [EN] The type of `animationUrl` ('lottie', 'pag', 'rive', 'svga', 'gif') when its extension does not say it (a file
+     *      renamed to `.bin` for a code package); '' or an unknown type reads it from the extension.
+     * [CN] 当扩展名无法说明时（为代码包改名为 `.bin` 的文件）`animationUrl` 的类型（'lottie'、'pag'、'rive'、'svga'、'gif'）；
+     *      '' 或未知类型时根据扩展名判断。
+     */
+    animationType: { type: String, value: '' },
+    /**
      * [EN] Plays once when the file is ready (default, as before). false: rests until `playAnimation()`.
      * [CN] 文件就绪后播放一次（默认，与之前相同）。false：静止，直到调用 `playAnimation()`。
      */
@@ -93,7 +100,7 @@ Component({
       this.setData({ animationLoaded: false, animationFailed: false, gifPlaying: false, lottieData })
       this.cyl_update()
     },
-    'title, image, selectedImage, placeholderImage, enabled, axis, iconSize, accessoryImage, accessoryText, accessoryAccessibilityLabel, accessoryPlacement, accessibilityLabel, gifFirstFrame, gifLastFrame': function () {
+    'title, image, selectedImage, placeholderImage, animationType, enabled, axis, iconSize, accessoryImage, accessoryText, accessoryAccessibilityLabel, accessoryPlacement, accessibilityLabel, gifFirstFrame, gifLastFrame': function () {
       this.cyl_update()
     },
     'selected, restingProgress': function () {

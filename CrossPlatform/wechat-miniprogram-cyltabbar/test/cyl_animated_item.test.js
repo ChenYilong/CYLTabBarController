@@ -97,3 +97,10 @@ test('GIF stills: the first frame at rest, the last while selected, the GIF whil
   assert.equal(cylAnimatedItemGifSource({ gifLastFrame: 'last.png' }, 'star.gif'), 'last.png', 'a missing still uses the other one')
   assert.equal(cylAnimatedItemGifSource({}, 'star.gif'), 'star.gif', 'without stills the GIF plays, as before')
 })
+
+test('a named type wins over the extension (files renamed to .bin for a code package)', () => {
+  assert.equal(cylAnimatedItemModel({ animationUrl: '/rive/house.riv.bin', animationType: 'rive' }).animationType, 'rive')
+  assert.equal(cylAnimatedItemModel({ animationUrl: '/pag/0.pag.bin', animationType: 'pag' }).usesEngine, true)
+  assert.equal(cylAnimatedItemModel({ animationUrl: '/pag/0.pag.bin' }).usesEngine, false)
+  assert.equal(cylAnimatedItemModel({ animationUrl: 'a.json', animationType: 'unknown' }).animationType, 'lottie')
+})
