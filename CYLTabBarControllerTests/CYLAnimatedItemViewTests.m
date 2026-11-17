@@ -434,14 +434,32 @@ FOUNDATION_EXTERN BOOL CYLTabBarItemAnimationURLMayBeLottie(NSURL *_Nullable URL
     item.accessoryView = delete;
     [item layoutIfNeeded];
     XCTAssertEqualWithAccuracy(CGRectGetMaxX(delete.frame), 200, 0.5, @"trailing by default");
-    [delete sendActionsForControlEvents:UIControlEventTouchUpInside];
+    [self cyl_sendTouchUpInsideTo:delete];
     XCTAssertEqualObjects(self.events, (@[ @"accessory" ]));
     UIAccessibilityCustomAction *action = item.accessibilityCustomActions.lastObject;
     XCTAssertEqualObjects(action.name, @"Delete");
-    [item sendActionsForControlEvents:UIControlEventTouchUpInside];
+    [self cyl_sendTouchUpInsideTo:item];
     XCTAssertEqualObjects(self.events.lastObject, @"tap");
     item.dragEnabled = YES;
     XCTAssertTrue(item.panGestureRecognizer.enabled);
+}
+
+#pragma mark - Helpers
+
+/*
+ * [EN] Runs the touch-up-inside actions of `control`. These are logic tests without a host app, so there is no
+ *      UIApplication and -sendActionsForControlEvents: delivers nothing; the targets are called directly instead.
+ * [CN] 执行 `control` 的 touch-up-inside 事件。本测试是没有宿主 App 的逻辑测试，没有 UIApplication，
+ *      -sendActionsForControlEvents: 不会派发任何事件，因此直接调用各 target。
+ */
+- (void)cyl_sendTouchUpInsideTo:(UIControl *)control {
+    for (id target in control.allTargets) {
+        for (NSString *name in [control actionsForTarget:target forControlEvent:UIControlEventTouchUpInside]) {
+            SEL action = NSSelectorFromString(name);
+            IMP imp = [target methodForSelector:action];
+            ((void (*)(id, SEL, id))imp)(target, action, control);
+        }
+    }
 }
 
 #pragma mark - CYLAnimatedItemViewDelegate
