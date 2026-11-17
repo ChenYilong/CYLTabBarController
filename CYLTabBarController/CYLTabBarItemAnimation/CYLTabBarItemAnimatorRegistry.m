@@ -241,3 +241,51 @@ static CYLTabBarItemAnimatorPriority CYLTabBarItemAnimatorPriorityOf(id<CYLTabBa
 }
 
 @end
+
+#pragma mark - Lottie documents
+
+/// [EN] The largest local file read to tell whether it is a Lottie document. [CN] 判断是否为 Lottie 文档时读取的最大本地文件。
+static const unsigned long long CYLTabBarItemAnimationLottieMaximumFileSize = 32ull * 1024 * 1024;
+
+BOOL CYLTabBarItemAnimationURLMayBeLottie(NSURL *URL, BOOL acceptsDotLottie) {
+    if (!URL) {
+        return NO;
+    }
+    if (!URL.isFileURL) {
+        // [EN] Remote: judged once downloaded. [CN] 远程文件：下载后才能判断。
+        return YES;
+    }
+    NSString *path = URL.path;
+    NSDictionary<NSFileAttributeKey, id> *attributes = [[NSFileManager defaultManager] attributesOfItemAtPath:path error:NULL];
+    if (!attributes || ![attributes.fileType isEqualToString:NSFileTypeRegular]) {
+        return NO;
+    }
+    unsigned long long size = attributes.fileSize;
+    if (size < 2 || size > CYLTabBarItemAnimationLottieMaximumFileSize) {
+        return NO;
+    }
+    static NSCache<NSString *, NSNumber *> *cache;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        cache = [[NSCache alloc] init];
+        cache.countLimit = 256;
+    });
+    NSString *cacheKey = [NSString stringWithFormat:@"%@|%llu|%f|%d", path, size,
+                          attributes.fileModificationDate.timeIntervalSinceReferenceDate, acceptsDotLottie];
+    NSNumber *cached = [cache objectForKey:cacheKey];
+    if (cached) {
+        return cached.boolValue;
+    }
+    BOOL isLottie = NO;
+    NSData *data = [NSData dataWithContentsOfFile:path options:NSDataReadingMappedIfSafe error:NULL];
+    const unsigned char *bytes = data.bytes;
+    if (data.length >= 2 && bytes[0] == 'P' && bytes[1] == 'K') {
+        // [EN] A zip archive: a dotLottie file, which only Lottie 4 (LottieSwift) plays. [CN] zip 压缩包：dotLottie 文件，只有 Lottie 4（LottieSwift）能播放。
+        isLottie = acceptsDotLottie;
+    } else if (data) {
+        id object = [NSJSONSerialization JSONObjectWithData:data options:0 error:NULL];
+        isLottie = [object isKindOfClass:[NSDictionary class]] && [((NSDictionary *)object)[@"layers"] isKindOfClass:[NSArray class]];
+    }
+    [cache setObject:@(isLottie) forKey:cacheKey];
+    return isLottie;
+}

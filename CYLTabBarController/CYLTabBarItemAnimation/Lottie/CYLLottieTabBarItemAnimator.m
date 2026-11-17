@@ -360,12 +360,30 @@
     };
 }
 
+/// [EN] Lottie 4 (LottieSwift) also plays `.lottie` archives; Lottie 2 does not. [CN] Lottie 4（LottieSwift）也能播放 `.lottie` 压缩包；Lottie 2 不能。
+static BOOL CYLLottieAnimatorAcceptsDotLottie(void) {
+#if __has_include(<Lottie/Lottie-Swift.h>)
+    return YES;
+#else
+    return NO;
+#endif
+}
+
 - (BOOL)canAnimateFileAtURL:(NSURL *)URL {
-    // Every file another animator does not take (they are looked up first). 其他 animator 不处理的文件（它们先被查找）。
-    return URL != nil;
+    // [EN] Every file another animator does not take (they are looked up first), but only a Lottie animation: a picture or
+    //      a broken file is left to the static image (CYLTabBarItemAnimationURLMayBeLottie).
+    // [CN] 其他 animator 不处理的文件（它们先被查找），但只接收 Lottie 动画：图片或损坏的文件交给静态图片（CYLTabBarItemAnimationURLMayBeLottie）。
+    return CYLTabBarItemAnimationURLMayBeLottie(URL, CYLLottieAnimatorAcceptsDotLottie());
 }
 
 - (UIView *)animationViewWithURL:(NSURL *)URL size:(CGSize)size contentMode:(UIViewContentMode)contentMode {
+    // [EN] Also checked here: a tab's Lottie keys bind a URL to this animator without asking -canAnimateFileAtURL:. A file
+    //      that does not load makes no view, so the caller keeps the static image instead of an empty Lottie view over it.
+    // [CN] 这里也要检查：Tab 的 Lottie key 会把 URL 绑定到本 animator，而不调用 -canAnimateFileAtURL:。无法加载的文件不创建视图，调用方因此保留静态
+    //      图片，而不是在其上方放一个空的 Lottie 视图。
+    if (!CYLTabBarItemAnimationURLMayBeLottie(URL, CYLLottieAnimatorAcceptsDotLottie())) {
+        return nil;
+    }
     // The first Lottie library linked makes the view (each behind its own guard). 由先引入的 Lottie 库创建视图（各自使用独立的 guard）。
     UIView *lottieView = nil;
 #if __has_include(<Lottie/Lottie.h>)

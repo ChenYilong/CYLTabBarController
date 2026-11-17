@@ -9,6 +9,10 @@
 #import <CYLTabBarController/CYLTabBarController.h>
 #import "../CYLTabBarController/CYLAnimatedItem/CYLAnimatedItemView.h"
 
+// [EN] Declared in CYLTabBarItemAnimatorRegistry.h (the engine), not in the umbrella header.
+// [CN] 声明于 CYLTabBarItemAnimatorRegistry.h（引擎），不在总头文件中。
+FOUNDATION_EXTERN BOOL CYLTabBarItemAnimationURLMayBeLottie(NSURL *_Nullable URL, BOOL acceptsDotLottie);
+
 #if CYL_ANIMATION_ENGINE_AVAILABLE
 /*
  * [EN] A player that records calls. [CN] 记录调用的播放器。
@@ -415,6 +419,45 @@
 
 - (void)animatedItemViewDidTapAccessory:(CYLAnimatedItemView *)itemView {
     [self.events addObject:@"accessory"];
+}
+
+#pragma mark - A file Lottie cannot play (the Lottie animator takes every other file)
+
+/*!
+ * [EN] The Lottie animator takes every file no other animator takes. A picture or a broken file used to get an empty
+ *      Lottie view that hid the static image (found by CollectionViewClassifyMenu's tests with Lottie linked); it now asks
+ *      CYLTabBarItemAnimationURLMayBeLottie first, which needs no Lottie and is tested here.
+ * [CN] Lottie animator 接收其他 animator 都不处理的文件。图片或损坏的文件以前会得到一个空的 Lottie 视图并遮住静态图片（CollectionViewClassifyMenu
+ *      在链接 Lottie 时的测试发现）；现在它先调用 CYLTabBarItemAnimationURLMayBeLottie，该函数不需要 Lottie，在这里测试。
+ */
+- (void)testOnlyALottieDocumentIsTakenByTheLottieAnimator {
+    NSString *folder = [NSTemporaryDirectory() stringByAppendingPathComponent:[NSUUID UUID].UUIDString];
+    XCTAssertTrue([[NSFileManager defaultManager] createDirectoryAtPath:folder withIntermediateDirectories:YES attributes:nil error:NULL]);
+    NSURL * (^write)(NSString *, NSData *) = ^NSURL *(NSString *name, NSData *data) {
+        NSString *path = [folder stringByAppendingPathComponent:name];
+        XCTAssertTrue([data writeToFile:path atomically:YES]);
+        return [NSURL fileURLWithPath:path];
+    };
+    NSData *lottie = [@"{\"v\": \"5.7.4\", \"fr\": 30, \"ip\": 0, \"op\": 30, \"w\": 24, \"h\": 24, \"layers\": []}" dataUsingEncoding:NSUTF8StringEncoding];
+    XCTAssertTrue(CYLTabBarItemAnimationURLMayBeLottie(write(@"home.json", lottie), NO));
+    XCTAssertTrue(CYLTabBarItemAnimationURLMayBeLottie(write(@"home-without-extension", lottie), NO), @"the content decides, not the name");
+    XCTAssertFalse(CYLTabBarItemAnimationURLMayBeLottie(write(@"home.png", UIImagePNGRepresentation([self icon])), YES), @"a picture");
+    XCTAssertFalse(CYLTabBarItemAnimationURLMayBeLottie(write(@"broken.json", [@"{\"v\": " dataUsingEncoding:NSUTF8StringEncoding]), YES));
+    XCTAssertFalse(CYLTabBarItemAnimationURLMayBeLottie(write(@"other.json", [@"{\"name\": \"home\"}" dataUsingEncoding:NSUTF8StringEncoding]), YES),
+                   @"JSON that is not an animation");
+    XCTAssertFalse(CYLTabBarItemAnimationURLMayBeLottie([NSURL fileURLWithPath:[folder stringByAppendingPathComponent:@"missing.json"]], YES));
+    const unsigned char zip[] = { 'P', 'K', 3, 4, 0, 0, 0, 0 };
+    NSURL *dotLottie = write(@"home.lottie", [NSData dataWithBytes:zip length:sizeof(zip)]);
+    XCTAssertTrue(CYLTabBarItemAnimationURLMayBeLottie(dotLottie, YES), @"a .lottie archive with Lottie 4");
+    XCTAssertFalse(CYLTabBarItemAnimationURLMayBeLottie(dotLottie, NO), @"Lottie 2 cannot play a .lottie archive");
+    XCTAssertTrue(CYLTabBarItemAnimationURLMayBeLottie([NSURL URLWithString:@"https://example.com/home.json"], NO), @"remote: judged once downloaded");
+    XCTAssertFalse(CYLTabBarItemAnimationURLMayBeLottie(nil, YES));
+    // [EN] The cache follows the file: a picture replaced by an animation is taken. [CN] 缓存跟随文件：图片被替换为动画后会被接收。
+    NSURL *changing = write(@"changing.json", [@"{}" dataUsingEncoding:NSUTF8StringEncoding]);
+    XCTAssertFalse(CYLTabBarItemAnimationURLMayBeLottie(changing, NO));
+    write(@"changing.json", lottie);
+    XCTAssertTrue(CYLTabBarItemAnimationURLMayBeLottie(changing, NO));
+    [[NSFileManager defaultManager] removeItemAtPath:folder error:NULL];
 }
 
 @end

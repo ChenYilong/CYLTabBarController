@@ -23,6 +23,13 @@ Pod::Spec.new do |s|
   s.source       = { :git => "https://github.com/ChenYilong/CYLTabBarController.git", :tag => s.version.to_s }
   s.requires_arc = true
   s.static_framework = true
+  # [EN] A module even when the app builds static libraries (no use_frameworks!): Swift code imports it
+  #      (`import CYLAnimatedItem`, e.g. CYLTabBarController's CYLUtils and CollectionViewClassifyMenu's core), and without
+  #      DEFINES_MODULE that import failed unless every Podfile added `:modular_headers => true` for this pod.
+  # [CN] 即使 App 构建静态库（没有 use_frameworks!）也提供 module：Swift 代码会导入它（`import CYLAnimatedItem`，例如 CYLTabBarController 的
+  #      CYLUtils 与 CollectionViewClassifyMenu 的核心），没有 DEFINES_MODULE 时，除非每个 Podfile 都为本 pod 加上 `:modular_headers => true`，
+  #      否则导入会失败。
+  s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES' }
   s.default_subspec = 'Core'
 
   # [EN] The component: the view, its macros, the generic animation keys and URL options, and the resource bundle (the
