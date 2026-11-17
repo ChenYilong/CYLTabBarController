@@ -73,20 +73,6 @@ _Pragma("clang diagnostic ignored \"-Wmethod-signatures\"")
 _Pragma("clang diagnostic pop")
 
 
-#ifndef CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS
-#define CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS(Stuff) \
-do { \
-_Pragma("clang diagnostic push") \
-_Pragma("clang diagnostic ignored \"-Warc-performSelector-leaks\"") \
-@try { \
-Stuff; \
-} @catch (NSException *exception) { \
-NSLog(CYLLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), \
-@(__PRETTY_FUNCTION__), @(__LINE__), exception.reason); \
-} \
-_Pragma("clang diagnostic pop") \
-} while (0);
-#endif
 
 #define CYL_IS_IOS_11  ([[[UIDevice currentDevice] systemVersion] floatValue] >= 11.f) && (@available(iOS 11.0, *))
 #define CYL_IS_IOS_13  ([[[UIDevice currentDevice] systemVersion] floatValue] >= 13.f) && (@available(iOS 13.0, *))
@@ -101,16 +87,34 @@ _Pragma("clang diagnostic pop") \
 #define CYL_SYSTEM_VERSION_LESS_THAN(v)                 ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] == NSOrderedAscending)
 #define CYL_SYSTEM_VERSION_LESS_THAN_OR_EQUAL_TO(v)     ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] != NSOrderedDescending)
 
-// [EN] CYL_ANIMATION_ENGINE_AVAILABLE, CYL_LOTTIE_AVAILABLE and CYL_LOTTIE_REQUIRED come from the CYLAnimatedItem pod; imported
-//      after this file's own CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS, so the localized one is used here.
-// [CN] CYL_ANIMATION_ENGINE_AVAILABLE、CYL_LOTTIE_AVAILABLE 与 CYL_LOTTIE_REQUIRED 来自 CYLAnimatedItem pod；在本文件自己的
-//      CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS 之后导入，因此这里使用本地化的版本。
+// [EN] CYL_ANIMATION_ENGINE_AVAILABLE, CYL_LOTTIE_AVAILABLE, CYL_LOTTIE_REQUIRED and CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS come
+//      from the CYLAnimatedItem pod. Its CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS is the only one: with CocoaPods each pod is a
+//      module, and a second, different definition here made every use an "ambiguous expansion of macro" warning. The
+//      definition below is only a fallback for a build without the component.
+// [CN] CYL_ANIMATION_ENGINE_AVAILABLE、CYL_LOTTIE_AVAILABLE、CYL_LOTTIE_REQUIRED 与 CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS 来自
+//      CYLAnimatedItem pod。后者以组件的定义为唯一定义：使用 CocoaPods 时每个 pod 是一个 module，这里再定义一个不同的版本会让每处使用都产生
+//      "ambiguous expansion of macro" 警告。下面的定义只是没有组件时的后备。
 #if __has_include(<CYLAnimatedItem/CYLAnimatedItemMacros.h>)
 #import <CYLAnimatedItem/CYLAnimatedItemMacros.h>
 #elif __has_include("../CYLAnimatedItem/CYLAnimatedItemMacros.h")
 #import "../CYLAnimatedItem/CYLAnimatedItemMacros.h"
 #else
 #import "CYLAnimatedItemMacros.h"
+#endif
+
+#ifndef CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS
+#define CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS(Stuff) \
+do { \
+_Pragma("clang diagnostic push") \
+_Pragma("clang diagnostic ignored \"-Warc-performSelector-leaks\"") \
+@try { \
+Stuff; \
+} @catch (NSException *exception) { \
+NSLog(CYLLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), \
+@(__PRETTY_FUNCTION__), @(__LINE__), exception.reason); \
+} \
+_Pragma("clang diagnostic pop") \
+} while (0);
 #endif
 
 #endif /* CYLUtilsMacros_h */
