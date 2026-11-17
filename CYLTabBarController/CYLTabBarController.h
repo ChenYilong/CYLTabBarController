@@ -130,13 +130,15 @@
 #endif
 // [CN] 引擎与各类型 animator 的公开头文件（Xcode 工程的 framework target 把它们编进本模块）：伞头文件需要包含它们，否则 Xcode 警告
 //      "umbrella header ... does not include header"。每个 animator 头文件只在其类型开关打开时才有声明，因此没有对应动画库时也能编译。
-//      CYLAnimatedItem 作为独立模块存在时（CocoaPods）不导入，以免同一声明出现在两个模块中。
+//      CocoaPods（定义 `COCOAPODS`）中 CYLAnimatedItem 是独立模块，此时不导入，以免同一声明出现在两个模块中。不能用
+//      `__has_include(<CYLAnimatedItem/…>)` 判断：源码中有同名文件夹 `CYLAnimatedItem/`，framework target 也能找到它。
 // [EN] The public headers of the engine and of each type's animator (the Xcode project's framework target compiles them
 //      into this module): the umbrella header must include them, or Xcode warns "umbrella header ... does not include
 //      header". Each animator header declares something only when its type's switch is on, so this compiles without
-//      the animation libraries. Not imported when CYLAnimatedItem is a module of its own (CocoaPods), so that no
-//      declaration lands in two modules.
-#if !__has_include(<CYLAnimatedItem/CYLAnimatedItemView.h>) && __has_include("CYLTabBarItemAnimation/CYLTabBarItemViewAnimator.h")
+//      the animation libraries. Not imported under CocoaPods (which defines `COCOAPODS`), where CYLAnimatedItem is a
+//      module of its own, so that no declaration lands in two modules. `__has_include(<CYLAnimatedItem/…>)` cannot
+//      tell them apart: the source folder `CYLAnimatedItem/` has that name, so the framework target finds it too.
+#if !defined(COCOAPODS) && __has_include("CYLTabBarItemAnimation/CYLTabBarItemViewAnimator.h")
 #import "CYLTabBarItemAnimation/CYLTabBarItemViewAnimator.h"
 #if __has_include("CYLTabBarItemAnimation/GIF/CYLGIFTabBarItemAnimator.h")
 #import "CYLTabBarItemAnimation/GIF/CYLGIFTabBarItemAnimator.h"
