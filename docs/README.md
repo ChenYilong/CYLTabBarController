@@ -297,6 +297,7 @@ docs/
 │   ├── image-only-tabs-gallery-3-3-ios17.png
 │   ├── image-only-tabs-ios.png
 │   ├── inset-grouped-sections-demo-ios.png
+│   ├── ios-flatdesign-animateditem-tab-ios26-4-a6e88609.png
 │   ├── ios-playback-controls-message-tab-iphone17pro-ios26.1-dc04439.png
 │   ├── issue-561-ipad-tab-bars-ios.png
 │   ├── liquid-glass-plus-stand-in-landscape-ios.png
