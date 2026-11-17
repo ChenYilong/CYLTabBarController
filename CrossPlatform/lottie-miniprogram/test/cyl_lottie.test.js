@@ -309,3 +309,33 @@ test('embedded images load from the canvas node even when context.canvas is anot
   assert.ok(Object.keys(cylFiles).some((file) => file.endsWith('.png')), 'the base64 image was written to a file')
   animation.destroy()
 })
+
+test('cyl-lottie reloads only when path / animationData / colors / fit really change', () => {
+  // [EN] A host re-renders and sets the same values again (cyl-animated-item binds `colors`, an Object, on every render);
+  //      reloading each time destroyed the animation about 30 times a second, so it never played.
+  // [CN] 宿主重新渲染时会再次设置相同的值（cyl-animated-item 每次渲染都绑定 Object 类型的 `colors`）；每次都重新加载会让
+  //      动画每秒被销毁约 30 次，从而永远不会播放。
+  let definition = null
+  global.Component = (options) => { definition = options }
+  delete require.cache[require.resolve('../miniprogram_dist/cyl-lottie/index.js')]
+  require('../miniprogram_dist/cyl-lottie/index.js')
+  const observer = definition.observers['path, animationData, colors, fit']
+  let loads = 0
+  const component = Object.assign({}, definition.methods, {cylReady: true, cyl_load: () => { loads += 1 }})
+  const data = {v: 1}
+  observer.call(component, '/a.json', null, null, 'contain')
+  observer.call(component, '/a.json', null, null, 'contain')
+  observer.call(component, '/a.json', null, null, 'contain')
+  assert.equal(loads, 1, 'the same values again do not reload')
+  observer.call(component, '/a.json', null, {'**': '#ff0000'}, 'contain')
+  observer.call(component, '/a.json', null, {'**': '#ff0000'}, 'contain')
+  assert.equal(loads, 2, 'colors with the same content do not reload')
+  observer.call(component, '/b.json', null, {'**': '#ff0000'}, 'contain')
+  assert.equal(loads, 3, 'a new path reloads')
+  observer.call(component, '', data, null, 'contain')
+  observer.call(component, '', data, null, 'contain')
+  observer.call(component, '', {v: 1}, null, 'contain')
+  assert.equal(loads, 5, 'animationData compares by reference')
+  observer.call(component, '', data, null, 'cover')
+  assert.equal(loads, 6, 'a new fit reloads')
+})
