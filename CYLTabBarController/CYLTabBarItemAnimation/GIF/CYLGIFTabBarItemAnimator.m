@@ -10,9 +10,11 @@
 #if __has_include("../CYLTabBarItemAnimatorRegistry.h")
 #import "../CYLTabBarItemAnimatorRegistry.h"
 #import "../CYLTabBarItemAnimationPlayableView.h"
+#import "../CYLTabBarItemAnimationFactory.h"
 #else
 #import "CYLTabBarItemAnimatorRegistry.h"
 #import "CYLTabBarItemAnimationPlayableView.h"
+#import "CYLTabBarItemAnimationFactory.h"
 #endif
 // [EN] `CYLTabBarAnimationURL` and the other generic keys, from CYLUtils: no Core, so the subspec works without the tab bar.
 // [CN] `CYLTabBarAnimationURL` 等通用 key，来自 CYLUtils：不依赖 Core，因此本子库无需 TabBar 也能使用。
@@ -57,14 +59,12 @@ static NSString *const CYLGIFPlayAnimationKey = @"CYLGIFTabBarItemPlayAnimation"
 
 @implementation CYLGIFTabBarItemAnimationView
 
-+ (nullable UIView<CYLTabBarItemAnimationPlayableView> *)cyl_animationViewWithFileURL:(NSURL *)fileURL
-                                                                             options:(NSDictionary<NSString *, NSString *> *)options
-                                                                         contentMode:(UIViewContentMode)contentMode {
-    CGImageSourceRef source = CGImageSourceCreateWithURL((__bridge CFURLRef)fileURL, NULL);
-    if (!source) {
-        return nil;
-    }
-    size_t count = CGImageSourceGetCount(source);
+/*!
+ * [EN] Decodes every frame of `source` into the view. NO when it has no frame (not a GIF, or a broken one).
+ * [CN] 把 `source` 的每一帧解码到视图中。没有任何帧时（不是 GIF 或已损坏）返回 NO。
+ */
+- (BOOL)cyl_loadFramesFromSource:(CGImageSourceRef)source {
+    size_t count = source ? CGImageSourceGetCount(source) : 0;
     NSMutableArray<UIImage *> *frames = [NSMutableArray arrayWithCapacity:count];
     NSMutableArray<NSNumber *> *frameDelays = [NSMutableArray arrayWithCapacity:count];
     for (size_t index = 0; index < count; index++) {
@@ -77,14 +77,69 @@ static NSString *const CYLGIFPlayAnimationKey = @"CYLGIFTabBarItemPlayAnimation"
         NSDictionary *properties = (__bridge_transfer NSDictionary *)CGImageSourceCopyPropertiesAtIndex(source, index, NULL);
         [frameDelays addObject:@(CYLGIFFrameDelay(properties))];
     }
-    CFRelease(source);
     if (frames.count == 0) {
+        return NO;
+    }
+    self.frames = frames;
+    self.frameDelays = frameDelays;
+    self.image = frames.firstObject;
+    return YES;
+}
+
++ (nullable UIView<CYLTabBarItemAnimationPlayableView> *)cyl_animationViewWithFileURL:(NSURL *)fileURL
+                                                                             options:(NSDictionary<NSString *, NSString *> *)options
+                                                                         contentMode:(UIViewContentMode)contentMode {
+    if (!fileURL.isFileURL && fileURL.scheme.length > 0) {
+        return [self cyl_animationViewDownloadingURL:fileURL contentMode:contentMode];
+    }
+    CGImageSourceRef source = CGImageSourceCreateWithURL((__bridge CFURLRef)fileURL, NULL);
+    if (!source) {
         return nil;
     }
-    CYLGIFTabBarItemAnimationView *view = [[self alloc] initWithImage:frames.firstObject];
-    view.frames = frames;
-    view.frameDelays = frameDelays;
+    CYLGIFTabBarItemAnimationView *view = [[self alloc] initWithImage:nil];
+    BOOL loaded = [view cyl_loadFramesFromSource:source];
+    CFRelease(source);
+    if (!loaded) {
+        return nil;
+    }
     view.contentMode = contentMode;
+    return view;
+}
+
+/*!
+ * [EN] A remote GIF (http, https): an empty view, marked as loading so that the item keeps its static image (or the
+ *      placeholder), filled once the file is downloaded (`CYLTabBarItemAnimationReportLoaded`), or reported as failed
+ *      when the download or the decoding fails (`CYLTabBarItemAnimationReportFailure`), which shows the static image again.
+ *      The download goes through the shared URL session, so its HTTP cache applies.
+ * [CN] 远程 GIF（http、https）：先返回空视图并标记为加载中，使条目继续显示静态图片（或占位图）；下载完成后填充帧
+ *      （`CYLTabBarItemAnimationReportLoaded`）；下载或解码失败时报告失败（`CYLTabBarItemAnimationReportFailure`），重新显示静态图片。
+ *      下载使用共享的 URL session，因此遵循其 HTTP 缓存。
+ */
++ (UIView<CYLTabBarItemAnimationPlayableView> *)cyl_animationViewDownloadingURL:(NSURL *)URL contentMode:(UIViewContentMode)contentMode {
+    CYLGIFTabBarItemAnimationView *view = [[self alloc] initWithImage:nil];
+    view.contentMode = contentMode;
+    CYLTabBarItemAnimationMarkLoading(view);
+    __weak CYLGIFTabBarItemAnimationView *weakView = view;
+    NSURLSessionDataTask *task = [[NSURLSession sharedSession] dataTaskWithURL:URL completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+        NSInteger status = [response isKindOfClass:[NSHTTPURLResponse class]] ? ((NSHTTPURLResponse *)response).statusCode : 200;
+        CGImageSourceRef source = (data.length > 0 && status < 400) ? CGImageSourceCreateWithData((__bridge CFDataRef)data, NULL) : NULL;
+        dispatch_async(dispatch_get_main_queue(), ^{
+            CYLGIFTabBarItemAnimationView *strongView = weakView;
+            BOOL loaded = strongView && source && [strongView cyl_loadFramesFromSource:source];
+            if (source) {
+                CFRelease(source);
+            }
+            if (!strongView) {
+                return;
+            }
+            if (loaded) {
+                CYLTabBarItemAnimationReportLoaded(strongView);
+            } else {
+                CYLTabBarItemAnimationReportFailure(strongView, error);
+            }
+        });
+    }];
+    [task resume];
     return view;
 }
 

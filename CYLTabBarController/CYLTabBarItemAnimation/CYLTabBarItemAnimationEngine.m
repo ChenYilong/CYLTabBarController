@@ -49,8 +49,62 @@ static const void *CYLTabBarItemAnimationShownURLKey = &CYLTabBarItemAnimationSh
         _registry = registry;
         _factory = factory;
         _styleSource = styleSource;
+        // [EN] A tab's animation that fails after its view was shown (a corrupt file found while parsing): UIKit's tab
+        //      buttons do not adopt `CYLTabBarItemAnimationFailureHandling`, so the failure arrives as a notification.
+        // [CN] Tab 的动画在视图显示之后才失败（解析时发现文件损坏）：UIKit 的 Tab 按钮不遵守 `CYLTabBarItemAnimationFailureHandling`，
+        //      因此失败以通知的形式到达。
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(cyl_animationViewDidFail:)
+                                                     name:CYLTabBarItemAnimationDidFailNotification
+                                                   object:nil];
     }
     return self;
+}
+
+- (void)dealloc {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
+/*!
+ * [EN] A tab's animation view failed late: it is removed and the tab shows its image again, or the animated item
+ *      component's placeholder when the tab has none (the same display rule as before the view was made).
+ * [CN] Tab 的动画视图晚些时候失败：移除该视图，Tab 重新显示其图片；没有图片时显示动效组件的占位图（与创建视图之前的显示规则相同）。
+ */
+- (void)cyl_animationViewDidFail:(NSNotification *)notification {
+    UIView *animationView = [notification.object isKindOfClass:[UIView class]] ? notification.object : nil;
+    UIControl *control = nil;
+    for (UIView *view = animationView.superview; view; view = view.superview) {
+        if ([view isKindOfClass:[UIControl class]] && [self animationViewInControl:(UIControl *)view] == animationView) {
+            control = (UIControl *)view;
+            break;
+        }
+    }
+    if (!control) {
+        return;
+    }
+    [animationView removeFromSuperview];
+    SEL imageViewSelector = NSSelectorFromString(@"cyl_swappableImageViewViewInTabBarButton");
+    UIImageView *imageView = nil;
+    if ([control respondsToSelector:imageViewSelector]) {
+        CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS(imageView = [control performSelector:imageViewSelector]);
+    }
+    if (![imageView isKindOfClass:[UIImageView class]]) {
+        return;
+    }
+    imageView.hidden = NO;
+    imageView.alpha = 1;
+    if (!imageView.image) {
+        // [EN] The animated item component's placeholder, looked up at run time so that the engine's stand-alone tests
+        //      (Tests/CYLTabBarItemAnimation, Foundation only) need no view class.
+        // [CN] 动效组件的占位图，在运行时查找，使引擎的独立测试（Tests/CYLTabBarItemAnimation，只链接 Foundation）不需要视图类。
+        Class itemViewClass = NSClassFromString(@"CYLAnimatedItemView");
+        SEL placeholderSelector = NSSelectorFromString(@"defaultPlaceholderImage");
+        if ([itemViewClass respondsToSelector:placeholderSelector]) {
+            id placeholder = nil;
+            CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS(placeholder = [itemViewClass performSelector:placeholderSelector]);
+            imageView.image = [placeholder isKindOfClass:[UIImage class]] ? placeholder : nil;
+        }
+    }
 }
 
 /// [EN] The composition root: the only place that names the default implementations. [CN] 组合根：唯一指定默认实现的地方。

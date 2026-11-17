@@ -49,3 +49,9 @@
 
 @implementation UIControl
 @end
+
+@implementation UIImage
+@end
+
+@implementation UIImageView
+@end

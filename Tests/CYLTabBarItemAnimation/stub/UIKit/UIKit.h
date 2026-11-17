@@ -58,3 +58,11 @@ typedef NS_OPTIONS(NSUInteger, UIViewAutoresizing) {
 
 @interface UIControl : UIView
 @end
+
+// [EN] Used by the engine's late-failure fallback (the tab's image view). [CN] 供引擎的延迟失败回退使用（Tab 的图片视图）。
+@interface UIImage : NSObject
+@end
+
+@interface UIImageView : UIView
+@property (nonatomic, strong) UIImage *image;
+@end

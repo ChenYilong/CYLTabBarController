@@ -69,7 +69,11 @@ static NSURL *CYLTabBarItemAnimationURLOfAnyType(NSDictionary *attributes) {
 
 static BOOL CYLTabBarAnimationCanPlay(NSURL *URL) {
 #if CYL_ANIMATION_ENGINE_AVAILABLE
-    return URL != nil && [CYLTabBarItemAnimatorRegistry animatorForURL:URL] != nil;
+    // [EN] The tab bar plays local files that exist (`-addAnimationWithURL:…` of the engine): a remote URL or a missing file
+    //      shows the tab's image, or the placeholder. [CN] TabBar 只播放存在的本地文件（引擎的 `-addAnimationWithURL:…`）：远程 URL
+    //      或不存在的文件显示 Tab 的图片，没有时显示占位图。
+    BOOL playableFile = URL.isFileURL && URL.path.length > 0 && [[NSFileManager defaultManager] fileExistsAtPath:URL.path];
+    return playableFile && [CYLTabBarItemAnimatorRegistry animatorForURL:URL] != nil;
 #else
     return NO;
 #endif
