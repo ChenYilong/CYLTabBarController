@@ -209,6 +209,8 @@ docs/
 │   ├── animated-item-demo-ios26.3-zh-Hans.png
 │   ├── animated-item-demo-ios27-en.png
 │   ├── animated-item-flatdesign-tabbar-ios27.png
+│   ├── animated-item-miniprogram-b7-engines-fixed.jpg
+│   ├── animated-item-miniprogram-b7-engines-overflow.jpg
 │   ├── badge-debugging-animations-off-harmonyos.png
 │   ├── carthage-example-ios.png
 │   ├── configuration-demo-json-zh-hans.png
