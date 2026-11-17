@@ -45,6 +45,17 @@
 #import "CYLTabBarItemAnimationPlayableView.h"
 #endif
 #endif
+// [EN] The Swift header declares `CYLFlatDesignTabBarButton : CYLAnimatedItemView`; in a framework that compiles the
+//      component into the same module (CYLTabBarController.xcodeproj, Carthage) the superclass must be declared first.
+// [CN] Swift 头文件声明了 `CYLFlatDesignTabBarButton : CYLAnimatedItemView`；在把组件编译进同一模块的 framework 中（CYLTabBarController.xcodeproj、
+//      Carthage），必须先声明父类。
+#if __has_include(<CYLAnimatedItem/CYLAnimatedItemView.h>)
+#import <CYLAnimatedItem/CYLAnimatedItemView.h>
+#elif __has_include(<CYLTabBarController/CYLAnimatedItemView.h>)
+#import <CYLTabBarController/CYLAnimatedItemView.h>
+#elif __has_include("CYLAnimatedItemView.h")
+#import "CYLAnimatedItemView.h"
+#endif
 #if defined(SWIFT_PACKAGE)
 @import CYLTabBarControllerSwift;
 #elif __has_include(<CYLTabBarController/CYLTabBarController-Swift.h>)

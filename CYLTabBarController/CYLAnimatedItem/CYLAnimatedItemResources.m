@@ -19,10 +19,15 @@ NSBundle *CYLAnimatedItemResourceBundle(void) {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         NSMutableArray<NSBundle *> *containers = [NSMutableArray arrayWithObjects:[NSBundle bundleForClass:[CYLAnimatedItemView class]], [NSBundle mainBundle], nil];
-        NSString *packagePath = [[NSBundle mainBundle] pathForResource:@"CYLTabBarController_CYLTabBarControllerSwift" ofType:@"bundle"];
-        NSBundle *package = packagePath ? [NSBundle bundleWithPath:packagePath] : nil;
-        if (package) {
-            [containers addObject:package];
+        // [EN] Swift Package Manager: the resource bundle of the CYLAnimatedItemSwift target (before 2026-11-17 the bundle was in
+        //      CYLTabBarControllerSwift's). [CN] Swift Package Manager：CYLAnimatedItemSwift target 的资源包（2026-11-17 之前在
+        //      CYLTabBarControllerSwift 的资源包中）。
+        for (NSString *packageName in @[@"CYLTabBarController_CYLAnimatedItemSwift", @"CYLTabBarController_CYLTabBarControllerSwift"]) {
+            NSString *packagePath = [[NSBundle mainBundle] pathForResource:packageName ofType:@"bundle"];
+            NSBundle *package = packagePath ? [NSBundle bundleWithPath:packagePath] : nil;
+            if (package) {
+                [containers addObject:package];
+            }
         }
         for (NSBundle *container in containers) {
             NSString *path = [container pathForResource:@"CYLAnimatedItem" ofType:@"bundle"];

@@ -14,7 +14,11 @@ let package = Package(
         .iOS(.v13),
     ],
     products: [
-        .library(name: "CYLTabBarController", targets: ["CYLTabBarController"])
+        .library(name: "CYLTabBarController", targets: ["CYLTabBarController"]),
+        // [EN] The animated item component on its own (CocoaPods `CYLAnimatedItem` pod, docs/Animated-Item.md): the view, its
+        //      placeholder bundle and the animation engine, without the tab bar.
+        // [CN] 单独的动效条目组件（CocoaPods `CYLAnimatedItem` pod，docs/Animated-Item.md）：视图、占位图资源包与动画引擎，不含 TabBar。
+        .library(name: "CYLAnimatedItem", targets: ["CYLAnimatedItem"]),
     ],
     dependencies: [
         // Same requirement as the podspec's `LottieSwift` subspec: 'lottie-ios', '>= 4.5.1' (`removeValueProvider(for:)`).
@@ -22,6 +26,40 @@ let package = Package(
         .package(url: "https://github.com/airbnb/lottie-spm.git", from: "4.5.1"),
     ],
     targets: [
+        // [EN] CYLAnimatedItem, Swift half: the animation URL options and the engine's Swift protocols, plus the component's
+        //      resource bundle. SwiftPM cannot mix Swift and Objective-C in one target, so the component is two targets.
+        // [CN] CYLAnimatedItem 的 Swift 部分：动画 URL 选项与引擎的 Swift 协议，以及组件的资源包。SwiftPM 不能在一个 target 中混用 Swift 与
+        //      Objective-C，因此组件分为两个 target。
+        .target(
+            name: "CYLAnimatedItemSwift",
+            path: "CYLTabBarController",
+            sources: ["CYLUtils/Swift/CYLAnimationURLOptions.swift", "CYLTabBarItemAnimation/Swift"],
+            resources: [.copy("CYLAnimatedItem/Resources/CYLAnimatedItem.bundle")]
+        ),
+        // [EN] CYLAnimatedItem, Objective-C half: CYLAnimatedItemView, the animation keys and the engine (the CocoaPods
+        //      `CYLAnimatedItem/Core` and `CYLAnimatedItem/Engine` subspecs). It never depends on the tab bar.
+        // [CN] CYLAnimatedItem 的 Objective-C 部分：CYLAnimatedItemView、动画 key 与引擎（CocoaPods 的 `CYLAnimatedItem/Core` 与
+        //      `CYLAnimatedItem/Engine` 子库）。它从不依赖 TabBar。
+        .target(
+            name: "CYLAnimatedItem",
+            dependencies: ["CYLAnimatedItemSwift"],
+            path: "CYLTabBarController",
+            exclude: ["CYLAnimatedItem/Resources"],
+            sources: [
+                "CYLAnimatedItem",
+                "CYLUtils/CYLAnimationKeys.m",
+                "CYLTabBarItemAnimation/CYLTabBarItemAnimationPlayer.m",
+                "CYLTabBarItemAnimation/CYLTabBarItemAnimatorRegistry.m",
+                "CYLTabBarItemAnimation/CYLTabBarItemAnimationFactory.m",
+                "CYLTabBarItemAnimation/CYLTabBarItemViewAnimator.m",
+            ],
+            publicHeadersPath: "CYLAnimatedItem/include",
+            cSettings: [
+                .headerSearchPath("CYLAnimatedItem"),
+                .headerSearchPath("CYLUtils"),
+                .headerSearchPath("CYLTabBarItemAnimation"),
+            ]
+        ),
         // Swift bridge that exposes Lottie 4.x to the Objective-C sources (`CYLCompatibleLOTAnimationView`).
         // SPM cannot mix Swift and Objective-C in one target, so it lives in its own target.
         .target(
@@ -37,16 +75,19 @@ let package = Package(
         //      （各 `Swift/` 目录）组成一个更底层的 target，由 Objective-C target 依赖。
         .target(
             name: "CYLTabBarControllerSwift",
+            dependencies: ["CYLAnimatedItem", "CYLAnimatedItemSwift"],
             path: "CYLTabBarController",
-            sources: ["CYLUtils/Swift", "CYLBadgeView/Swift", "Swift", "CYLTabBarItemAnimation/Swift", "CYLFlatDesignTabBar/CYLFlatDesignTabBar-ObjectiveC/Swift"],
+            exclude: ["CYLUtils/Swift/CYLAnimationURLOptions.swift"],
+            sources: ["CYLUtils/Swift", "CYLBadgeView/Swift", "Swift", "CYLFlatDesignTabBar/CYLFlatDesignTabBar-ObjectiveC/Swift"],
             // [EN] The resource bundle belongs to the target that reads it (`CYLResourceBundle()`, now in Swift).
             // [CN] 资源包属于读取它的 target（`CYLResourceBundle()`，现在用 Swift 实现）。
-            resources: [.copy("Resources/CYLTabBarController.bundle"), .copy("CYLAnimatedItem/Resources/CYLAnimatedItem.bundle")]
+            resources: [.copy("Resources/CYLTabBarController.bundle")]
         ),
         .target(
             name: "CYLTabBarController",
             dependencies: [
                 "CYLTabBarControllerSwift",
+                "CYLAnimatedItem",
                 "CYLTabBarControllerLottieSwift",
                 .product(name: "Lottie", package: "lottie-spm"),
             ],
@@ -55,7 +96,11 @@ let package = Package(
             //      this target cannot hold Swift, so it is left out; `CYLTabBarItemAnimation/Rive/` is then empty, like `PAG/`.
             // [CN] `RiveSwift`：CocoaPods `Rive` 子库的 Swift 桥接。这里的 SPM 不提供 RiveRuntime，且本 target 不能包含 Swift，因此排除它；
             //      `CYLTabBarItemAnimation/Rive/` 随之为空，与 `PAG/` 相同。
-            exclude: ["LottieSwift", "RiveSwift", "CYLUtils/Swift", "CYLBadgeView/Swift", "Swift", "CYLTabBarItemAnimation/Swift", "CYLFlatDesignTabBar/CYLFlatDesignTabBar-ObjectiveC/Swift", "Resources/CYLTabBarController.bundle", "CYLAnimatedItem/Resources"],
+            // [EN] The component's sources are the CYLAnimatedItem targets above. [CN] 组件的源码属于上面的 CYLAnimatedItem target。
+            exclude: ["LottieSwift", "RiveSwift", "CYLUtils/Swift", "CYLBadgeView/Swift", "Swift", "CYLTabBarItemAnimation/Swift", "CYLFlatDesignTabBar/CYLFlatDesignTabBar-ObjectiveC/Swift", "Resources/CYLTabBarController.bundle",
+                      "CYLAnimatedItem", "CYLUtils/CYLAnimationKeys.m", "CYLTabBarItemAnimation/CYLTabBarItemAnimationPlayer.m",
+                      "CYLTabBarItemAnimation/CYLTabBarItemAnimatorRegistry.m", "CYLTabBarItemAnimation/CYLTabBarItemAnimationFactory.m",
+                      "CYLTabBarItemAnimation/CYLTabBarItemViewAnimator.m"],
             // `include/` holds the module map plus `CYLTabBarController/*.h` shims, so the
             // CocoaPods-style `<CYLTabBarController/...>` imports and `__has_include` checks
             // (which enable FlatDesign and Lottie code) also resolve under SPM.

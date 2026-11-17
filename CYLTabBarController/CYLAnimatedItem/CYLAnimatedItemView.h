@@ -17,14 +17,14 @@
 // [EN] `CYL_ANIMATION_ENGINE_AVAILABLE` (`CYLAnimatedItemMacros.h`, like `CYL_FLATDESIGN_AVAILABLE`): static images only without the engine.
 // [CN] `CYL_ANIMATION_ENGINE_AVAILABLE`（`CYLAnimatedItemMacros.h`，与 `CYL_FLATDESIGN_AVAILABLE` 相同）：没有引擎时只显示静态图片。
 #import "CYLAnimatedItemMacros.h"
+// [EN] The engine's protocols are declared here and its header is imported after `@end`: in a framework that compiles the
+//      component and the tab bar into one module, the engine header imports the generated Swift header, which declares a
+//      subclass of this view (`CYLFlatDesignTabBarButton`) and so needs this interface first.
+// [CN] 引擎的协议在这里前向声明，引擎头文件在 `@end` 之后导入：在把组件与 TabBar 编译进同一模块的 framework 中，引擎头文件会导入生成的 Swift 头文件，
+//      其中声明了本视图的子类（`CYLFlatDesignTabBarButton`），因此需要先有本接口。
 #if CYL_ANIMATION_ENGINE_AVAILABLE
-#if __has_include(<CYLAnimatedItem/CYLTabBarItemAnimationFactory.h>)
-#import <CYLAnimatedItem/CYLTabBarItemAnimationFactory.h>
-#elif __has_include(<CYLTabBarController/CYLTabBarItemAnimationFactory.h>)
-#import <CYLTabBarController/CYLTabBarItemAnimationFactory.h>
-#else
-#import "CYLTabBarItemAnimationFactory.h"
-#endif
+@protocol CYLTabBarItemAnimationPlayer;
+@protocol CYLTabBarItemAnimationViewMaking;
 #endif
 
 NS_ASSUME_NONNULL_BEGIN
@@ -359,3 +359,13 @@ NS_SWIFT_NAME(CYLAnimatedItemViewDelegate)
 @end
 
 NS_ASSUME_NONNULL_END
+
+#if CYL_ANIMATION_ENGINE_AVAILABLE
+#if __has_include(<CYLAnimatedItem/CYLTabBarItemAnimationFactory.h>)
+#import <CYLAnimatedItem/CYLTabBarItemAnimationFactory.h>
+#elif __has_include(<CYLTabBarController/CYLTabBarItemAnimationFactory.h>)
+#import <CYLTabBarController/CYLTabBarItemAnimationFactory.h>
+#else
+#import "CYLTabBarItemAnimationFactory.h"
+#endif
+#endif

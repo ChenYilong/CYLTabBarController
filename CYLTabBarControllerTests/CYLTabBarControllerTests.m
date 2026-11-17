@@ -524,6 +524,72 @@
     window.hidden = YES;
 }
 
+/// [EN] docs/Animated-Item.md TODO 4: a FlatDesign tab button is the shared component, `CYLAnimatedItemView`. Its image
+///      and title are the component's content (`image`, `title`), shown by the component's `imageView` and `titleLabel`;
+///      the component's long press is off, and selecting a tab updates the content to its selected image.
+/// [CN] docs/Animated-Item.md TODO 4：扁平样式的 Tab 按钮就是共用组件 `CYLAnimatedItemView`。其图片与标题是组件的内容（`image`、`title`），
+///      由组件的 `imageView` 与 `titleLabel` 显示；组件的长按已关闭；选中 Tab 时内容更新为其选中图片。
+- (void)testFlatDesignTabButtonIsTheAnimatedItemComponent {
+    Class buttonClass = NSClassFromString(@"CYLFlatDesignTabBarButton");
+    Class componentClass = NSClassFromString(@"CYLAnimatedItemView");
+    if (!buttonClass || !componentClass) {
+        XCTSkip(@"FlatDesign or the component is not compiled into this target");
+    }
+    XCTAssertTrue([buttonClass isSubclassOfClass:componentClass]);
+    UIImage *(^square)(UIColor *) = ^UIImage *(UIColor *color) {
+        return [[[UIGraphicsImageRenderer alloc] initWithSize:CGSizeMake(8, 8)] imageWithActions:^(UIGraphicsImageRendererContext *context) {
+            [color setFill];
+            [context fillRect:CGRectMake(0, 0, 8, 8)];
+        }];
+    };
+    UIImage *normal = square(UIColor.grayColor);
+    UIImage *selected = square(UIColor.blueColor);
+    CYLTabBarController *tabBarController = [CYLTabBarController tabBarControllerWithConfiguration:@{
+        CYLTabBarControllerContext : [NSUUID UUID].UUIDString,
+        CYLTabBarControllerStyleType : @"flatDesign",
+        CYLTabBarControllerTabBarItemsAttributes : @[
+            @{ CYLTabBarItemIdentifier : @"a", CYLTabBarItemTitle : @"A", CYLTabBarItemImage : normal, CYLTabBarItemSelectedImage : selected },
+            @{ CYLTabBarItemIdentifier : @"b", CYLTabBarItemTitle : @"B", CYLTabBarItemImage : normal, CYLTabBarItemSelectedImage : selected },
+        ],
+        CYLTabBarControllerPageResolver : ^UIViewController *(NSString *pageIdentifier, NSDictionary *attributes) {
+            return [[UIViewController alloc] init];
+        },
+    }];
+    UIWindow *window = [[UIWindow alloc] initWithFrame:CGRectMake(0, 0, 390, 844)];
+    window.rootViewController = tabBarController;
+    window.hidden = NO;
+    [tabBarController.view layoutIfNeeded];
+    NSMutableDictionary<NSString *, UIControl *> *buttons = [NSMutableDictionary dictionary];
+    NSMutableArray<UIView *> *queue = [NSMutableArray arrayWithObject:tabBarController.view];
+    while (queue.count > 0) {
+        UIView *view = queue.firstObject;
+        [queue removeObjectAtIndex:0];
+        if ([view isKindOfClass:buttonClass]) {
+            NSString *title = [view valueForKey:@"title"];
+            if (title) {
+                buttons[title] = (UIControl *)view;
+            }
+        }
+        [queue addObjectsFromArray:view.subviews];
+    }
+    XCTAssertEqual(buttons.count, 2u, @"%@", buttons);
+    for (UIControl *button in buttons.allValues) {
+        UILabel *titleLabel = [button valueForKey:@"titleLabel"];
+        UIImageView *imageView = [button valueForKey:@"imageView"];
+        XCTAssertEqualObjects(titleLabel.text, [button valueForKey:@"title"], @"the component's title label shows the title");
+        XCTAssertEqual(imageView.image, [button valueForKey:@"image"], @"the component's image view shows the image");
+        XCTAssertFalse(((UILongPressGestureRecognizer *)[button valueForKey:@"longPressGestureRecognizer"]).enabled,
+                       @"the tab bar handles its own gestures");
+    }
+    XCTAssertEqual([buttons[@"A"] valueForKey:@"image"], selected, @"the selected tab shows its selected image");
+    XCTAssertEqual([buttons[@"B"] valueForKey:@"image"], normal);
+    tabBarController.selectedIndex = 1;
+    [tabBarController.view layoutIfNeeded];
+    XCTAssertEqual([buttons[@"A"] valueForKey:@"image"], normal);
+    XCTAssertEqual([buttons[@"B"] valueForKey:@"image"], selected);
+    window.hidden = YES;
+}
+
 /// [EN] FIX: the FlatDesign "More" tab had no icon (the 1×1 transparent placeholder). With 8 tabs it now shows a real image
 ///      and the "More" title.
 /// [CN] FIX：扁平样式的「More」Tab 没有图标（1×1 透明占位图）。8 个 Tab 时现在显示真实图片与「More」标题。

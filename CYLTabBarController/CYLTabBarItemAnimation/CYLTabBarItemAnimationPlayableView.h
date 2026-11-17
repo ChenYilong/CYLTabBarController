@@ -36,9 +36,19 @@ NS_ASSUME_NONNULL_END
 #import "CYLAnimatedItem-Swift.h"
 #elif defined(SWIFT_PACKAGE)
 @import CYLTabBarControllerSwift;
-#elif __has_include(<CYLTabBarController/CYLTabBarController-Swift.h>)
+#elif __has_include(<CYLTabBarController/CYLTabBarController-Swift.h>) || __has_include("CYLTabBarController-Swift.h")
+// [EN] A framework with the component and the tab bar in one module: the Swift header declares a subclass of
+//      CYLAnimatedItemView (CYLFlatDesignTabBarButton), so the component's interface comes first.
+// [CN] 组件与 TabBar 在同一模块的 framework：Swift 头文件声明了 CYLAnimatedItemView 的子类（CYLFlatDesignTabBarButton），因此先导入组件的接口。
+#if __has_include(<CYLTabBarController/CYLAnimatedItemView.h>)
+#import <CYLTabBarController/CYLAnimatedItemView.h>
+#elif __has_include("CYLAnimatedItemView.h")
+#import "CYLAnimatedItemView.h"
+#endif
+#if __has_include(<CYLTabBarController/CYLTabBarController-Swift.h>)
 #import <CYLTabBarController/CYLTabBarController-Swift.h>
-#elif __has_include("CYLTabBarController-Swift.h")
+#else
 #import "CYLTabBarController-Swift.h"
+#endif
 #endif
 #endif
