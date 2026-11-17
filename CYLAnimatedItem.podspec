@@ -123,7 +123,11 @@ Pod::Spec.new do |s|
     # [EN] lottie-ios 2.x (iOS 12, like the root spec); LottieSwift needs iOS 13, which a test spec of a 12.0 root cannot resolve.
     # [CN] lottie-ios 2.x（iOS 12，与根 spec 相同）；LottieSwift 需要 iOS 13，12.0 的根 spec 下的 test spec 无法解析。
     test.dependency 'CYLAnimatedItem/LottieObjectiveC'
-    test.source_files = 'CYLAnimatedItemTests/*.{h,m}'
+    # [EN] One Swift file, so the test bundle links the Swift runtime that the component's Swift code needs
+    #      (otherwise Xcode 26 fails with "Undefined symbol: __swift_FORCE_LOAD_$_swiftCompatibility56").
+    # [CN] 一个 Swift 文件，使测试 bundle 链接组件 Swift 代码所需的 Swift 运行时（否则 Xcode 26 报
+    #      "Undefined symbol: __swift_FORCE_LOAD_$_swiftCompatibility56"）。
+    test.source_files = 'CYLAnimatedItemTests/*.{h,m,swift}'
     test.frameworks = 'XCTest', 'UIKit'
   end
 end

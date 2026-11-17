@@ -35,7 +35,9 @@ NS_ASSUME_NONNULL_END
 #elif __has_include("CYLAnimatedItem-Swift.h")
 #import "CYLAnimatedItem-Swift.h"
 #elif defined(SWIFT_PACKAGE)
-@import CYLTabBarControllerSwift;
+// [EN] Swift Package Manager: the protocols are in the component's own Swift target, never in the tab bar's.
+// [CN] Swift Package Manager：协议位于组件自己的 Swift target 中，不在 TabBar 的 target 中。
+@import CYLAnimatedItemSwift;
 #elif __has_include(<CYLTabBarController/CYLTabBarController-Swift.h>) || __has_include("CYLTabBarController-Swift.h")
 // [EN] A framework with the component and the tab bar in one module: the Swift header declares a subclass of
 //      CYLAnimatedItemView (CYLFlatDesignTabBarButton), so the component's interface comes first.
