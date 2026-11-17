@@ -82,6 +82,12 @@ Every new feature and user-visible change ships with bilingual documentation in 
   tab bar, so keep this in the plus button's internals, behind a Liquid Glass guard.
   When the app asks for the title to be aligned (`+alignsTitleWithTabBarItemTitles`), the stand-in and the real plus button line
   up by icon only: take the icon's coordinates and ignore the other subviews.
+- **`CYLAnimatedItemView` does not depend on CYLTabBarController (added 2026-11-17)**: the animated item component
+  (iOS: the `CYLAnimatedItem` pod, `CYLAnimatedItem.podspec`; Android: `:cylanimateditem`, package
+  `com.cyl.animateditem`) never imports, calls or depends on CYLTabBarController's code, subspecs, module or resources
+  (no CYLUtils, no `CYLTabBarController-Swift.h`, no `:cyltabbar`); CYLTabBarController depends on it, never the other
+  way round. Code that is only for tests may depend on CYLTabBarController. Details:
+  [docs/Animated-Item.md](docs/Animated-Item.md#enstructure).
 - **Optional components are isolated with guards**:
   - FlatDesign code in Core: `#if CYL_FLATDESIGN_AVAILABLE` (defined once in `CYLUtils/CYLUtilsMacros.h`), and run only
     for `CYLTabBarStyleTypeFlatDesign`, so Liquid Glass and the classic style are never affected.
