@@ -35,6 +35,31 @@ static const CGFloat CYLAnimatedItemDefaultAnimationSide = 24;
 @property (nonatomic, assign) BOOL playing;
 @end
 
+#if CYL_ANIMATION_ENGINE_AVAILABLE
+// [EN] Told by the engine when the animation file fails after the view was made. [CN] 动画文件在视图创建后失败时由引擎通知。
+@interface CYLAnimatedItemView () <CYLTabBarItemAnimationFailureHandling>
+@end
+
+/*
+ * [EN] Whether `URL` is a local file that is missing, not a regular file, or empty: no animation view is made for it, so
+ *      the static image or the placeholder shows at once. Remote files are checked by the animator, which reports a failed
+ *      download or a corrupted file (`CYLTabBarItemAnimationReportFailure`).
+ * [CN] `URL` 是否为不存在、不是普通文件或为空的本地文件：不为其创建动画视图，立即显示静态图片或占位图。远程文件由 animator 检查，下载失败或文件损坏时报告
+ *      （`CYLTabBarItemAnimationReportFailure`）。
+ */
+static BOOL CYLAnimatedItemLocalFileIsMissing(NSURL *URL) {
+    if (!URL.isFileURL) {
+        return NO;
+    }
+    NSString *path = URL.path;
+    if (path.length == 0) {
+        return YES;
+    }
+    NSDictionary<NSFileAttributeKey, id> *attributes = [[NSFileManager defaultManager] attributesOfItemAtPath:path error:NULL];
+    return !attributes || ![attributes.fileType isEqualToString:NSFileTypeRegular] || attributes.fileSize == 0;
+}
+#endif
+
 @implementation CYLAnimatedItemView
 
 @synthesize title = _title;
@@ -445,7 +470,7 @@ static const CGFloat CYLAnimatedItemDefaultAnimationSide = 24;
     self.animationView = nil;
     self.playing = NO;
     NSURL *URL = self.animationURL;
-    if (URL) {
+    if (URL && !CYLAnimatedItemLocalFileIsMissing(URL)) {
         CGSize size = (self.iconSize.width > 0 && self.iconSize.height > 0)
             ? self.iconSize : CGSizeMake(CYLAnimatedItemDefaultAnimationSide, CYLAnimatedItemDefaultAnimationSide);
         UIView *view = [self.animationSource animationViewWithURL:URL size:size contentMode:UIViewContentModeScaleAspectFit];
@@ -462,6 +487,20 @@ static const CGFloat CYLAnimatedItemDefaultAnimationSide = 24;
             }
         }
     }
+    [self cyl_updateIcon];
+    [self cyl_contentDidChange];
+}
+
+- (void)cylAnimationViewDidFail:(UIView *)animationView error:(NSError *)error {
+    if (animationView != self.animationView) {
+        return;
+    }
+    // [EN] A corrupted file, a parse error or a failed download: drop the animation; the static image or the placeholder shows.
+    // [CN] 文件损坏、解析错误或下载失败：移除动画，显示静态图片或占位图。
+    [self cyl_stopLoopTimer];
+    [animationView removeFromSuperview];
+    self.animationView = nil;
+    self.playing = NO;
     [self cyl_updateIcon];
     [self cyl_contentDidChange];
 }

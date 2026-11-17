@@ -153,7 +153,7 @@
     item.image = [self icon];
     item.animationLoops = YES;
     item.animationSpeed = 2;
-    item.animationURL = [NSURL fileURLWithPath:@"/tmp/home.fake"];
+    item.animationURL = [NSURL URLWithString:@"https://example.com/home.fake"];
     XCTAssertTrue(item.isAnimationReady);
     XCTAssertTrue(item.imageView.hidden);
     CYLAnimatedItemFakePlayer *player = (CYLAnimatedItemFakePlayer *)item.animationPlayer;
@@ -193,7 +193,7 @@
     XCTAssertNoThrow([item playAnimation]);
     XCTAssertNoThrow([item restartAnimation]);
     XCTAssertNoThrow([item stopAnimation]);
-    item.animationURL = [NSURL fileURLWithPath:@"/tmp/home.fake"];
+    item.animationURL = [NSURL URLWithString:@"https://example.com/home.fake"];
     XCTAssertTrue(item.isAnimationReady);
     XCTAssertTrue(item.imageView.hidden, @"the animation wins once it can play");
     item.placeholderImage = [[UIImage alloc] init];
@@ -237,11 +237,65 @@
     item.animationSource = [[CYLAnimatedItemFakeSource alloc] init];
     item.title = @"Home";
     item.image = [self icon];
-    item.animationURL = [NSURL fileURLWithPath:@"/tmp/home.fake"];
+    item.animationURL = [NSURL URLWithString:@"https://example.com/home.fake"];
     [item layoutIfNeeded];
     XCTAssertTrue(item.isAnimationReady);
     XCTAssertTrue(item.imageView.hidden, @"the static image waits under the animation");
     XCTAssertTrue(CGRectEqualToRect(item.animationView.frame, item.imageView.frame), @"the animation takes the icon's place");
+}
+
+- (void)testAMissingLocalFileShowsThePlaceholderWithoutAskingTheEngine {
+    CYLAnimatedItemFakeSource *source = [[CYLAnimatedItemFakeSource alloc] init];
+    UIImage *placeholder = [self icon];
+    CYLAnimatedItemView *item = [[CYLAnimatedItemView alloc] initWithFrame:CGRectMake(0, 0, 200, 44)];
+    item.animationSource = source;
+    item.placeholderImage = placeholder;
+    NSString *missing = [NSTemporaryDirectory() stringByAppendingPathComponent:@"cyl-missing-home.fake"];
+    [[NSFileManager defaultManager] removeItemAtPath:missing error:NULL];
+    item.animationURL = [NSURL fileURLWithPath:missing];
+    XCTAssertEqual(source.players.count, 0u, @"a missing file never reaches the engine");
+    XCTAssertEqual(item.imageView.image, placeholder);
+    NSString *empty = [NSTemporaryDirectory() stringByAppendingPathComponent:@"cyl-empty-home.fake"];
+    [[NSData data] writeToFile:empty atomically:YES];
+    item.animationURL = [NSURL fileURLWithPath:empty];
+    XCTAssertEqual(source.players.count, 0u, @"an empty file is missing too");
+    NSString *full = [NSTemporaryDirectory() stringByAppendingPathComponent:@"cyl-full-home.fake"];
+    [[@"{}" dataUsingEncoding:NSUTF8StringEncoding] writeToFile:full atomically:YES];
+    item.animationURL = [NSURL fileURLWithPath:full];
+    XCTAssertTrue(item.isAnimationReady);
+}
+
+- (void)testAFailureReportedLaterShowsThePlaceholderOrTheImage {
+    CYLAnimatedItemView *item = [[CYLAnimatedItemView alloc] initWithFrame:CGRectMake(0, 0, 200, 44)];
+    item.animationSource = [[CYLAnimatedItemFakeSource alloc] init];
+    UIImage *placeholder = [self icon];
+    item.placeholderImage = placeholder;
+    item.animationURL = [NSURL URLWithString:@"https://example.com/home.fake"];
+    XCTAssertTrue(item.isAnimationReady);
+    CYLTabBarItemAnimationReportFailure(item.animationView, [NSError errorWithDomain:@"CYLTest" code:1 userInfo:nil]);
+    [[NSRunLoop mainRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.05]];
+    XCTAssertFalse(item.isAnimationReady, @"a corrupted file or a failed download drops the animation");
+    XCTAssertEqual(item.imageView.image, placeholder);
+    XCTAssertFalse(item.imageView.hidden);
+    UIImage *image = [self icon];
+    item.image = image;
+    item.animationURL = [NSURL URLWithString:@"https://example.com/other.fake"];
+    CYLTabBarItemAnimationReportFailure(item.animationView, nil);
+    [[NSRunLoop mainRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.05]];
+    XCTAssertEqual(item.imageView.image, image, @"with a static image, the image is the fallback");
+}
+
+- (void)testAFailureOfAnOldAnimationIsIgnored {
+    CYLAnimatedItemView *item = [[CYLAnimatedItemView alloc] initWithFrame:CGRectMake(0, 0, 200, 44)];
+    item.animationSource = [[CYLAnimatedItemFakeSource alloc] init];
+    item.animationURL = [NSURL URLWithString:@"https://example.com/a.fake"];
+    UIView *old = item.animationView;
+    item.animationURL = [NSURL URLWithString:@"https://example.com/b.fake"];
+    [item addSubview:old];
+    CYLTabBarItemAnimationReportFailure(old, nil);
+    [[NSRunLoop mainRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.05]];
+    XCTAssertTrue(item.isAnimationReady, @"the current animation stays");
+    [old removeFromSuperview];
 }
 
 #else

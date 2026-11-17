@@ -401,7 +401,7 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
         animationView = null
         playing = false
         val url = animationURL
-        if (!url.isNullOrBlank()) {
+        if (!url.isNullOrBlank() && !localFileIsMissing(url)) {
             val (w, h) = iconSizeDp?.let { it.width to it.height } ?: (24f to 24f)
             // [EN] No engine, no library or a file it cannot read: no view, the static image stays (an app's own source that
             //      throws is treated the same way). [CN] 没有引擎、没有动画库或文件无法读取：不创建视图，保留静态图片（App 自己的来源抛出异常时同样处理）。
@@ -419,6 +419,26 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
         }
         updateIcon()
         requestLayout()
+    }
+
+    /**
+     * [EN] Whether `url` names a local file (a path, `file://`, an asset) that is missing or empty: no animation view is made
+     *      for it, so the static image or the placeholder shows at once. Remote files are checked by the animator, which
+     *      reports a failed download (`CYLTabBarItemAnimationFailure`).
+     * [CN] `url` 是否指向不存在或为空的本地文件（路径、`file://`、asset）：不为其创建动画视图，立即显示静态图片或占位图。远程文件由 animator 检查，
+     *      下载失败时报告（`CYLTabBarItemAnimationFailure`）。
+     */
+    protected open fun localFileIsMissing(url: String): Boolean {
+        val file = url.substringBefore('#')
+        fun missing(path: String?) = path == null || java.io.File(path).let { !it.isFile || it.length() == 0L }
+        return when {
+            file.startsWith(ANDROID_ASSET_PREFIX) -> try {
+                context.assets.open(file.removePrefix(ANDROID_ASSET_PREFIX)).use { it.read() < 0 }
+            } catch (error: java.io.IOException) { true }
+            file.startsWith("file:") -> missing(android.net.Uri.parse(file).path)
+            file.startsWith("/") -> missing(file)
+            else -> false
+        }
     }
 
     override fun playAnimation() {
@@ -548,6 +568,8 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
     fun titleWidth(text: CharSequence?): Int = if (text.isNullOrEmpty()) 0 else ceil(titleView.paint.measureText(text.toString())).toInt()
 
     companion object {
+        private const val ANDROID_ASSET_PREFIX = "file:///android_asset/"
+
         /**
          * [EN] The library's placeholder, `R.drawable.cyl_animated_item_placeholder` (24 dp, a tab icon's size; the same
          *      drawing as iOS's `CYLAnimatedItem.bundle`). Copyright and policy: `META-INF/cylanimateditem/`.

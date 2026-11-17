@@ -29,7 +29,18 @@ object CYLTabBarItemAnimationFailure {
     var fallbackHandler: ((host: View) -> Unit)? = null
 
     /**
-     * [EN] Reports that `animationView` could not load its file. [CN] 报告 `animationView` 无法加载其文件。
+     * [EN] Reports that `animationView` could not load its file (missing, corrupted, a failed download, a parse error).
+     * [CN] 报告 `animationView` 无法加载其文件（不存在、已损坏、下载失败、解析错误）。
+     */
+    @JvmStatic
+    fun reportLater(animationView: View) {
+        // [EN] After the view is in its host: a failure found while the view is being made (a missing local file) is not lost.
+        // [CN] 在视图加入宿主之后再报告：创建视图期间发现的失败（例如本地文件不存在）不会丢失。
+        animationView.post { report(animationView) }
+    }
+
+    /**
+     * [EN] Reports now. Prefer `reportLater` from an animator, whose view may not have a parent yet. [CN] 立即报告。animator 中优先使用 `reportLater`，因为其视图可能还没有父视图。
      */
     @JvmStatic
     fun report(animationView: View) {

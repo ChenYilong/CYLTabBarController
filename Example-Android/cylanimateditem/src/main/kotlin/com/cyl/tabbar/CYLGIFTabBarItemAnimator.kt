@@ -67,7 +67,22 @@ class CYLGIFTabBarItemAnimationView internal constructor(context: Context, priva
         setLayerType(LAYER_TYPE_SOFTWARE, null)
     }
 
+    private fun isGIF(bytes: ByteArray): Boolean {
+        if (bytes.size < 13) return false
+        val signature = String(bytes, 0, 6, Charsets.US_ASCII)
+        return signature == "GIF87a" || signature == "GIF89a"
+    }
+
     internal fun setData(bytes: ByteArray) {
+        // [EN] Bytes that are not a GIF (a corrupted file, an error page saved as .gif): reported, so the host shows its
+        //      image or placeholder. The signature is checked, not `Movie`, which returns null on some platforms (and in
+        //      JVM tests) even for a valid file.
+        // [CN] 不是 GIF 的数据（文件损坏、保存为 .gif 的错误页面）：报告失败，宿主显示其图片或占位图。检查的是文件签名，而不是 `Movie`：后者在某些平台
+        //      （以及 JVM 测试）中即使文件有效也会返回 null。
+        if (!isGIF(bytes)) {
+            CYLTabBarItemAnimationFailure.reportLater(this)
+            return
+        }
         movie = android.graphics.Movie.decodeByteArray(bytes, 0, bytes.size)
         invalidate()
     }
@@ -125,7 +140,12 @@ class CYLGIFTabBarItemAnimationView internal constructor(context: Context, priva
     object Provider : CYLTabBarItemAnimationViewProviding {
         override fun cyl_animationViewWithFileURL(context: Context, fileURL: String, options: Map<String, String>, contentMode: ImageView.ScaleType): View {
             val view = CYLGIFTabBarItemAnimationView(context, contentMode)
-            CYLTabBarItemAnimationFiles.localFile(context, fileURL) { file -> file?.readBytes()?.let { view.setData(it) } }
+            CYLTabBarItemAnimationFiles.localFile(context, fileURL) { file ->
+                // [EN] A missing file, a failed download or an unreadable one: the host shows its image or placeholder.
+                // [CN] 文件不存在、下载失败或无法读取：宿主显示其图片或占位图。
+                val bytes = try { file?.readBytes() } catch (error: java.io.IOException) { null }
+                if (bytes == null || bytes.isEmpty()) CYLTabBarItemAnimationFailure.reportLater(view) else view.setData(bytes)
+            }
             return view
         }
     }

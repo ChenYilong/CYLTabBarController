@@ -92,3 +92,27 @@ static const void *CYLTabBarItemAnimationPlayerKey = &CYLTabBarItemAnimationPlay
 }
 
 @end
+
+NSNotificationName const CYLTabBarItemAnimationDidFailNotification = @"CYLTabBarItemAnimationDidFailNotification";
+
+void CYLTabBarItemAnimationReportFailure(UIView *animationView, NSError *error) {
+    if (!animationView) {
+        return;
+    }
+    __weak UIView *weakView = animationView;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        UIView *view = weakView;
+        if (!view) {
+            return;
+        }
+        for (UIView *host = view.superview; host; host = host.superview) {
+            if ([host conformsToProtocol:@protocol(CYLTabBarItemAnimationFailureHandling)]) {
+                [(id<CYLTabBarItemAnimationFailureHandling>)host cylAnimationViewDidFail:view error:error];
+                return;
+            }
+        }
+        [[NSNotificationCenter defaultCenter] postNotificationName:CYLTabBarItemAnimationDidFailNotification
+                                                            object:view
+                                                          userInfo:error ? @{ NSUnderlyingErrorKey : error } : nil];
+    });
+}

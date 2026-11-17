@@ -49,7 +49,8 @@ object CYLSVGATabBarItemAnimator : CYLTabBarItemAnimator {
         view.setTag(com.cyl.animateditem.R.id.cyl_svga_state, state)
         val appContext = context.applicationContext
         CYLTabBarItemAnimationFiles.localFile(context, url.substringBefore('#')) { file ->
-            if (file != null) decode(appContext, file, view, state)
+            // [EN] A missing file or a failed download: reported, so the host falls back. [CN] 文件不存在或下载失败：报告失败，宿主回退显示。
+            if (file != null) decode(appContext, file, view, state) else CYLTabBarItemAnimationFailure.reportLater(view)
         }
         return view
     }
@@ -70,8 +71,9 @@ object CYLSVGATabBarItemAnimator : CYLTabBarItemAnimator {
         val completion = Proxy.newProxyInstance(completionType.classLoader, arrayOf(completionType)) { proxy, method, args ->
             when (method.name) {
                 "onComplete" -> { CYLReflection.call(view, "setVideoItem", args?.firstOrNull()); state.parsed(view) }
-                // [EN] A file SVGAPlayer cannot read: the tab keeps an empty icon, as on iOS; the log names it. [CN] SVGAPlayer 无法读取的文件：与 iOS 相同，Tab 图标为空；日志中注明文件。
-                "onError" -> android.util.Log.w("CYLSVGA", "cannot parse " + file.name)
+                // [EN] A file SVGAPlayer cannot read (corrupted): reported, so the host shows its image or placeholder; the log names it.
+                // [CN] SVGAPlayer 无法读取的文件（已损坏）：报告失败，宿主显示其图片或占位图；日志中注明文件。
+                "onError" -> { android.util.Log.w("CYLSVGA", "cannot parse " + file.name); CYLTabBarItemAnimationFailure.reportLater(view) }
                 "hashCode" -> System.identityHashCode(proxy)
                 "equals" -> proxy === args?.firstOrNull()
                 "toString" -> "CYLSVGAParseCompletion"

@@ -253,6 +253,11 @@ public final class CYLRiveTabBarItemAnimationView: UIView, CYLTabBarItemAnimatio
                 #if DEBUG
                 print("[CYLTabBarController] Could not load the Rive tab animation \(configuration.fileURL.lastPathComponent): \(error)")
                 #endif
+                // [EN] A corrupted file or a failed download: the host shows its image or placeholder.
+                // [CN] 文件损坏或下载失败：宿主显示其图片或占位图。
+                if let self {
+                    CYLTabBarItemAnimationReportFailure(self, error as NSError)
+                }
             }
         }
     }

@@ -11,9 +11,11 @@
 #if __has_include("../CYLTabBarItemAnimatorRegistry.h")
 #import "../CYLTabBarItemAnimatorRegistry.h"
 #import "../CYLTabBarItemAnimationPlayableView.h"
+#import "../CYLTabBarItemAnimationFactory.h"
 #else
 #import "CYLTabBarItemAnimatorRegistry.h"
 #import "CYLTabBarItemAnimationPlayableView.h"
+#import "CYLTabBarItemAnimationFactory.h"
 #endif
 
 // [EN] FIX: issue #415 — only with SVGAPlayer (`CYL_SVGA_AVAILABLE`, the SVGA subspec); without it this file is empty.
@@ -75,6 +77,8 @@ typedef NS_ENUM(NSInteger, CYLSVGATabBarItemAnimationState) {
 #if defined(DEBUG) || defined(BETA)
         NSLog(@"🔴 CYLTabBarController SVGA: %@ could not be parsed: %@", fileURL, error.localizedDescription);
 #endif
+        // [EN] A corrupted file or a failed download: the host shows its image or placeholder. [CN] 文件损坏或下载失败：宿主显示其图片或占位图。
+        CYLTabBarItemAnimationReportFailure(weakView, error);
     };
     SVGAParser *parser = [[SVGAParser alloc] init];
     parser.enabledMemoryCache = YES;
