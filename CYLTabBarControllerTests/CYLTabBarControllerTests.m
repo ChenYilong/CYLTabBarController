@@ -529,6 +529,61 @@
 ///      the component's long press is off, and selecting a tab updates the content to its selected image.
 /// [CN] docs/Animated-Item.md TODO 4：扁平样式的 Tab 按钮就是共用组件 `CYLAnimatedItemView`。其图片与标题是组件的内容（`image`、`title`），
 ///      由组件的 `imageView` 与 `titleLabel` 显示；组件的长按已关闭；选中 Tab 时内容更新为其选中图片。
+/// [EN] Bug B13 (docs/Animated-Item.md), found with it: since the FlatDesign tab button became the animated item component, VoiceOver
+///      found no tab button (no "Home"): each one must be an accessibility element labeled with its title, with no
+///      ancestor that hides it from accessibility or is an element itself.
+/// [CN] Bug B13（docs/Animated-Item.md）：扁平样式 Tab 按钮改为动效组件后，VoiceOver 找不到 Tab 按钮（没有"Home"）：每个按钮都必须是
+///      以标题为标签的无障碍元素，且没有隐藏它或自身就是无障碍元素的父视图。
+- (void)testFlatDesignTabButtonsAreAccessibilityElements {
+    Class buttonClass = NSClassFromString(@"CYLFlatDesignTabBarButton");
+    if (!buttonClass) {
+        XCTSkip(@"FlatDesign is not compiled into this target");
+    }
+    UIImage *image = [[[UIGraphicsImageRenderer alloc] initWithSize:CGSizeMake(8, 8)] imageWithActions:^(UIGraphicsImageRendererContext *context) {
+        [UIColor.grayColor setFill];
+        [context fillRect:CGRectMake(0, 0, 8, 8)];
+    }];
+    CYLTabBarController *tabBarController = [CYLTabBarController tabBarControllerWithConfiguration:@{
+        CYLTabBarControllerContext : [NSUUID UUID].UUIDString,
+        CYLTabBarControllerStyleType : @"flatDesign",
+        CYLTabBarControllerTabBarItemsAttributes : @[
+            @{ CYLTabBarItemIdentifier : @"home", CYLTabBarItemTitle : @"Home", CYLTabBarItemImage : image },
+            @{ CYLTabBarItemIdentifier : @"me", CYLTabBarItemTitle : @"Me", CYLTabBarItemImage : image },
+        ],
+        CYLTabBarControllerPageResolver : ^UIViewController *(NSString *pageIdentifier, NSDictionary *attributes) {
+            return [[UIViewController alloc] init];
+        },
+    }];
+    UIWindow *window = [[UIWindow alloc] initWithFrame:CGRectMake(0, 0, 390, 844)];
+    window.rootViewController = tabBarController;
+    window.hidden = NO;
+    [tabBarController.view layoutIfNeeded];
+    NSMutableArray<UIView *> *buttons = [NSMutableArray array];
+    NSMutableArray<UIView *> *queue = [NSMutableArray arrayWithObject:tabBarController.view];
+    while (queue.count > 0) {
+        UIView *view = queue.firstObject;
+        [queue removeObjectAtIndex:0];
+        if ([view isKindOfClass:buttonClass]) {
+            [buttons addObject:view];
+        }
+        [queue addObjectsFromArray:view.subviews];
+    }
+    XCTAssertEqual(buttons.count, 2u);
+    for (UIView *button in buttons) {
+        XCTAssertTrue(button.isAccessibilityElement, @"%@", button);
+        NSArray<NSString *> *titles = @[@"Home", @"Me"];
+        XCTAssertTrue([titles containsObject:button.accessibilityLabel ?: @""], @"label %@", button.accessibilityLabel);
+        XCTAssertFalse(button.accessibilityElementsHidden);
+        XCTAssertFalse(button.hidden);
+        for (UIView *ancestor = button.superview; ancestor; ancestor = ancestor.superview) {
+            XCTAssertFalse(ancestor.accessibilityElementsHidden, @"hidden by %@", ancestor);
+            XCTAssertFalse(ancestor.isAccessibilityElement, @"covered by the element %@ (%@)", ancestor, ancestor.accessibilityLabel);
+            XCTAssertFalse(ancestor.hidden && ancestor != window, @"inside a hidden view %@", ancestor);
+        }
+    }
+    window.hidden = YES;
+}
+
 - (void)testFlatDesignTabButtonIsTheAnimatedItemComponent {
     Class buttonClass = NSClassFromString(@"CYLFlatDesignTabBarButton");
     Class componentClass = NSClassFromString(@"CYLAnimatedItemView");
