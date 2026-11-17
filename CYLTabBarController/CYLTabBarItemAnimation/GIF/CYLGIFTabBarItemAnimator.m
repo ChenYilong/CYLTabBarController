@@ -40,11 +40,6 @@ static NSTimeInterval CYLGIFFrameDelay(NSDictionary *properties) {
     return delay < 0.011 ? 0.1 : delay;
 }
 
-NSString *const CYLTabBarGIFURL = @"CYLTabBarGIFURL";
-NSString *const CYLTabBarGIFFilePath = @"CYLTabBarGIFFilePath";
-NSString *const CYLTabBarGIFSize = @"CYLTabBarGIFSize";
-NSString *const CYLTabBarGIFDarkURL = @"CYLTabBarGIFDarkURL";
-NSString *const CYLTabBarGIFDarkFilePath = @"CYLTabBarGIFDarkFilePath";
 
 static NSString *const CYLGIFPlayAnimationKey = @"CYLGIFTabBarItemPlayAnimation";
 

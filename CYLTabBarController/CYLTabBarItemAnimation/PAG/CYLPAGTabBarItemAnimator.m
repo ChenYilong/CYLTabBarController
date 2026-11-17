@@ -19,13 +19,8 @@
 #if CYL_PAG_AVAILABLE
 #import <libpag/PAGView.h>
 
-// [EN] The PAG keys, declared by the PAG subspec (aliases of the generic keys, see `attributeKeys`).
-// [CN] PAG 的 key，由 PAG 子库声明（通用 key 的别名，见 `attributeKeys`）。
-NSString *const CYLTabBarPAGURL = @"CYLTabBarPAGURL";
-NSString *const CYLTabBarPAGFilePath = @"CYLTabBarPAGFilePath";
-NSString *const CYLTabBarPAGSize = @"CYLTabBarPAGSize";
-NSString *const CYLTabBarPAGDarkURL = @"CYLTabBarPAGDarkURL";
-NSString *const CYLTabBarPAGDarkFilePath = @"CYLTabBarPAGDarkFilePath";
+// [EN] The PAG keys are declared and defined in the component's core (CYLAnimationKeys), so they exist without libpag.
+// [CN] PAG 的 key 在组件核心（CYLAnimationKeys）中声明与定义，没有 libpag 时也存在。
 
 // The protocol and the registry of the `CYLTabBarItemAnimation` subspec (the source tree, or flattened by CocoaPods).
 // `CYLTabBarItemAnimation` 子库的协议与注册表（源码目录，或 CocoaPods 展平后）。

@@ -325,15 +325,9 @@ fun CYLTabBar.cyl_setAllTabBarItemAnimationsSpeed(speed: Float, loops: Boolean) 
 internal fun CYLTabBarItemAttributesAnimationValue(attributes: Map<String, Any?>, genericKey: String): Any? {
     attributes[genericKey]?.let { return it }
     CYLTabBarItemAnimatorRegistry.attributeKeyForGenericKey(genericKey, attributes)?.let { key -> attributes[key]?.let { return it } }
-    val known = mapOf(
-        CYLConstants.CYLTabBarAnimationURL to listOf(CYLConstants.CYLTabBarLottieURL, CYLConstants.CYLTabBarPAGURL, CYLConstants.CYLTabBarRiveURL, CYLConstants.CYLTabBarGIFURL),
-        CYLConstants.CYLTabBarAnimationFilePath to listOf(CYLConstants.CYLTabBarLottieFilePath, CYLConstants.CYLTabBarPAGFilePath, CYLConstants.CYLTabBarRiveFilePath, CYLConstants.CYLTabBarGIFFilePath),
-        CYLConstants.CYLTabBarAnimationSize to listOf(CYLConstants.CYLTabBarLottieSize, CYLConstants.CYLTabBarPAGSize, CYLConstants.CYLTabBarRiveSize, CYLConstants.CYLTabBarGIFSize),
-        CYLConstants.CYLTabBarAnimationDarkURL to listOf(CYLConstants.CYLTabBarLottieDarkURL, CYLConstants.CYLTabBarPAGDarkURL, CYLConstants.CYLTabBarRiveDarkURL, CYLConstants.CYLTabBarGIFDarkURL),
-        CYLConstants.CYLTabBarAnimationDarkFilePath to listOf(CYLConstants.CYLTabBarLottieDarkFilePath, CYLConstants.CYLTabBarPAGDarkFilePath, CYLConstants.CYLTabBarRiveDarkFilePath, CYLConstants.CYLTabBarGIFDarkFilePath),
-        CYLConstants.CYLTabBarAnimationDarkColors to listOf(CYLConstants.CYLTabBarLottieDarkColors, CYLConstants.CYLTabBarRiveDarkColors),
-    )
-    return known[genericKey]?.firstNotNullOfOrNull { attributes[it] }
+    // [EN] Any type's own key, also when its library is not in the app (the tab then shows its image, or the placeholder).
+    // [CN] 任一类型自己的 key，包括其动画库不在 App 中时（此时 Tab 显示图片，没有时显示占位图）。
+    return com.cyl.animateditem.CYLAnimationEngines.attributesValue(attributes, genericKey)
 }
 
 /**

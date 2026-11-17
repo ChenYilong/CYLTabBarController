@@ -308,12 +308,22 @@ class CYLTabBarItemButton(context: Context, val item: CYLTabBarItem, val index: 
         return com.cyl.animateditem.CYLAnimatedItemView.defaultPlaceholderImage(context)?.mutate()
     }
 
+    /**
+     * [EN] Debug builds: a tab whose animation type has no library in the app says which dependency to add (once per type).
+     * [CN] debug 构建：动画类型的动画库不在 App 中的 Tab 提示需要加入的依赖（每种类型一次）。
+     */
+    private fun cyl_warnMissingAnimationEngine() {
+        val url = CYLTabBarItemAnimationURLOfAttributes(item.attributes) ?: return
+        com.cyl.animateditem.CYLAnimationEngines.warnMissingEngine(context, item.attributes, url)
+    }
+
     fun apply(selected: Boolean, tabBar: CYLTabBar) {
         val selectionChanged = isSelected != selected
         isSelected = selected
         if (selectionChanged && cyl_iconViewProvider != null) cyl_applyIconViewProvider()
         titleLabel.text = if (selected) item.cyl_selectedTitle ?: item.title ?: "" else item.title ?: ""
         iconView.setImageDrawable((if (selected) item.selectedImage ?: item.image else item.image)?.mutate() ?: cyl_animationPlaceholder())
+        cyl_warnMissingAnimationEngine()
         val controller = tabBar.tabBarController
         titleLabel.setTextColor(titleColor(selected, tabBar))
         val font = if (selected) item.cyl_selectedTitleFont ?: controller?.cyl_tabBarItemSelectedTitleFont ?: item.cyl_titleFont ?: controller?.cyl_tabBarItemTitleFont

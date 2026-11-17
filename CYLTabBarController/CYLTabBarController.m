@@ -49,6 +49,24 @@
  * [EN] Whether a tab's animation file can play: an engine with an animator for its type. Without the engine nothing can.
  * [CN] Tab 的动画文件能否播放：有引擎且有该类型的 animator。没有引擎时都不能播放。
  */
+/*
+ * [EN] The animation file a tab's attributes give under the generic keys or any type's own keys, whether or not that type's
+ *      engine is in the build (`CYLAnimationAttributesValue()` of the CYLAnimatedItem pod).
+ * [CN] Tab 属性通过通用 key 或任一类型自己的 key 给出的动画文件，与该类型的引擎是否参与构建无关（CYLAnimatedItem pod 的
+ *      `CYLAnimationAttributesValue()`）。
+ */
+static NSURL *CYLTabBarItemAnimationURLOfAnyType(NSDictionary *attributes) {
+    id URL = CYLAnimationAttributesValue(attributes, CYLTabBarAnimationURL);
+    if ([URL isKindOfClass:[NSURL class]]) {
+        return URL;
+    }
+    if ([URL isKindOfClass:[NSString class]] && [(NSString *)URL length] > 0) {
+        return [NSURL URLWithString:URL];
+    }
+    id path = CYLAnimationAttributesValue(attributes, CYLTabBarAnimationFilePath);
+    return [path isKindOfClass:[NSString class]] && [(NSString *)path length] > 0 ? [NSURL fileURLWithPath:path] : nil;
+}
+
 static BOOL CYLTabBarAnimationCanPlay(NSURL *URL) {
 #if CYL_ANIMATION_ENGINE_AVAILABLE
     return URL != nil && [CYLTabBarItemAnimatorRegistry animatorForURL:URL] != nil;
@@ -2029,8 +2047,17 @@ static const void *const CYLPlusButtonGlassLayoutRetryPendingKey = &CYLPlusButto
             // [EN] Only an animation file, which cannot play (no engine, no library): the component's placeholder, sized
             //      for a tab icon, instead of an empty icon. With a static image, that image is the fallback as before.
             // [CN] 只有动画文件且无法播放（没有引擎或动画库）：使用组件的占位图（适合 Tab 图标的尺寸），而不是空图标。有静态图片时仍以该图片兜底。
-            if (!setup.normalImageInfo && !setup.selectedImageInfo && setup.animationURL && !CYLTabBarAnimationCanPlay(setup.animationURL)) {
-                setup.normalImageInfo = CYLAnimatedItemView.defaultPlaceholderImage;
+            // [EN] A type's own key whose engine is not in the build (e.g. `CYLTabBarPAGURL` without the PAG subspec): the
+            //      engine does not know the key, so the file is found here, by the component's table of every type's keys.
+            // [CN] 引擎未参与构建的类型自己的 key（例如没有 PAG 子库时的 `CYLTabBarPAGURL`）：引擎不认识该 key，因此这里通过组件中
+            //      所有类型的 key 表找到文件。
+            NSURL *unplayableURL = setup.animationURL ?: CYLTabBarItemAnimationURLOfAnyType(attributes);
+            if (unplayableURL && !CYLTabBarAnimationCanPlay(unplayableURL)) {
+                // [EN] Debug builds: which pod to add. [CN] debug 构建：提示需要加入的 pod。
+                CYLAnimationWarnMissingEngine(attributes, unplayableURL);
+                if (!setup.normalImageInfo && !setup.selectedImageInfo) {
+                    setup.normalImageInfo = CYLAnimatedItemView.defaultPlaceholderImage;
+                }
             }
             setup.animationSizeValue = CYLTabBarItemAttributesAnimationValue(attributes, CYLTabBarAnimationSize);
             // FIX: issue #408 the tab's identifier. Tab 的标识。
@@ -3040,6 +3067,7 @@ static NSString *const CYLTabBarItemPlusSlotPlaceholderKey = @"CYLTabBarItemPlus
         return;
     }
     if (!CYLTabBarItemAnimationIsAvailable()) {
+        CYLAnimationWarnMissingEngine(newAttributes, CYLTabBarItemAnimationURLOfAnyType(newAttributes));
         NSLog(@"🔴[CYL #216] tab bar item attributes carry an animation key (%@) but no animation library is linked: add pod 'CYLTabBarController/Lottie', 'CYLTabBarController/PAG' or 'CYLTabBarController/Rive'. The key is ignored and the tab keeps its image.", [attributes.allKeys componentsJoinedByString:@", "]);
         return;
     }

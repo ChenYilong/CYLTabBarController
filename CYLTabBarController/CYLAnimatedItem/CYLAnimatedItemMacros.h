@@ -83,6 +83,32 @@
 #endif
 
 /*!
+ * [EN] Marks the keys of one animation type: nothing when that type's engine is in the build; otherwise a compile warning
+ *      (the code still compiles and the item shows its static image, or the placeholder).
+ * [CN] 标记某种动画类型的 key：该类型的引擎参与构建时无影响；否则给出编译警告（代码仍能编译，条目显示静态图片或占位图）。
+ */
+#if CYL_GIF_AVAILABLE
+#define CYL_GIF_REQUIRED
+#else
+#define CYL_GIF_REQUIRED __attribute__((deprecated("GIF is not part of this build, so this key is ignored and the item shows its static image (or the placeholder). Add pod 'CYLAnimatedItem/GIF' (with CYLTabBarController: pod 'CYLTabBarController/GIF'), or wrap the code in #if CYL_GIF_AVAILABLE.")))
+#endif
+#if CYL_PAG_AVAILABLE
+#define CYL_PAG_REQUIRED
+#else
+#define CYL_PAG_REQUIRED __attribute__((deprecated("PAG is not part of this build, so this key is ignored and the item shows its static image (or the placeholder). Add pod 'CYLAnimatedItem/PAG' (with CYLTabBarController: pod 'CYLTabBarController/PAG'), or wrap the code in #if CYL_PAG_AVAILABLE.")))
+#endif
+#if CYL_RIVE_AVAILABLE
+#define CYL_RIVE_REQUIRED
+#else
+#define CYL_RIVE_REQUIRED __attribute__((deprecated("Rive is not part of this build, so this key is ignored and the item shows its static image (or the placeholder). Add pod 'CYLAnimatedItem/Rive' (with CYLTabBarController: pod 'CYLTabBarController/Rive'), or wrap the code in #if CYL_RIVE_AVAILABLE.")))
+#endif
+#if CYL_SVGA_AVAILABLE
+#define CYL_SVGA_REQUIRED
+#else
+#define CYL_SVGA_REQUIRED __attribute__((deprecated("SVGA is not part of this build, so this key is ignored and the item shows its static image (or the placeholder). Add pod 'CYLAnimatedItem/SVGA' (with CYLTabBarController: pod 'CYLTabBarController/SVGA'), or wrap the code in #if CYL_SVGA_AVAILABLE.")))
+#endif
+
+/*!
  * [EN] Runs `Stuff` without the performSelector-leaks warning and logs an exception instead of crashing. CYLTabBarController's
  *      `CYLUtilsMacros.h` defines the same macro with a localized message; the first definition wins.
  * [CN] 执行 `Stuff`，屏蔽 performSelector 泄漏警告，并在发生异常时记录日志而不是崩溃。CYLTabBarController 的 `CYLUtilsMacros.h`

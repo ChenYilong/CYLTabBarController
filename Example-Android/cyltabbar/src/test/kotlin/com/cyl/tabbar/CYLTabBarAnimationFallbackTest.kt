@@ -55,6 +55,33 @@ class CYLTabBarAnimationFallbackTest {
     }
 
     /**
+     * [EN] A type's own key (SVGA) without its library: the tab finds the file, shows the placeholder (no image) or its
+     *      image, keeps the tab bar working, and a debuggable app logs which dependency to add.
+     * [CN] 没有动画库却使用该类型自己的 key（SVGA）：Tab 能找到文件，显示占位图（没有图片时）或图片，TabBar 正常工作，可调试的 App 在日志中提示需要加入的依赖。
+     */
+    @Test
+    fun aTypeKeyWithoutItsLibraryFallsBackAndWarns() = withActivity { activity ->
+        activity.applicationInfo.flags = activity.applicationInfo.flags or android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE
+        org.robolectric.shadows.ShadowLog.clear()
+        val items = listOf(
+            mapOf(CYLConstants.CYLTabBarItemTitle to "SVGA", CYLConstants.CYLTabBarSVGAURL to "file:///android_asset/home.svga"),
+            mapOf(CYLConstants.CYLTabBarItemTitle to "Image", CYLConstants.CYLTabBarItemImage to androidx.core.content.ContextCompat.getDrawable(activity, android.R.drawable.ic_menu_add),
+                CYLConstants.CYLTabBarSVGAURL to "file:///android_asset/home.svga"),
+        )
+        val controller = CYLTabBarController(activity, items.map { Page() }, items)
+        activity.setContentView(controller.view)
+        idle()
+        val (svga, image) = controller.tabBar.tabBarButtonArray
+        assertNull(svga.cyl_tabBarItemAnimationView)
+        assertNotNull("the placeholder", svga.iconView.drawable)
+        assertNotNull("the static image", image.iconView.drawable)
+        image.performClick()
+        idle()
+        assertEquals(1, controller.selectedIndex)
+        assertTrue(org.robolectric.shadows.ShadowLog.getLogsForTag("CYLAnimatedItem").any { it.msg.contains("SVGAPlayer") })
+    }
+
+    /**
      * [EN] TODO 4 of docs/Animated-Item.md: the tab button is the animated item component, keeps its tab look and its
      *      own label, and stays a frame for badges.
      * [CN] docs/Animated-Item.md 的 TODO 4：Tab 按钮即动效组件，保留 Tab 外观与自己的朗读文本，并仍是可承载角标的帧布局。

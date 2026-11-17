@@ -93,12 +93,14 @@ Every new feature and user-visible change ships with bilingual documentation in 
     for `CYLTabBarStyleTypeFlatDesign`, so Liquid Glass and the classic style are never affected.
   - Lottie: separate `__has_include` guards; check keys first; call through `respondsToSelector:` and
     `cyl_performSelector`.
-  - An animation library's own keys exist only with that library. The switches are all defined in the component's core,
+  - Every type's keys always exist (2026-11-17, in the component's core `CYLAnimationKeys.h`): without that type's engine a
+    key still compiles, gets a compile warning (`CYL_PAG_REQUIRED`, `CYL_RIVE_REQUIRED`, `CYL_SVGA_REQUIRED`,
+    `CYL_GIF_REQUIRED`, `CYL_LOTTIE_REQUIRED`) and a debug log at run time (`CYLAnimationWarnMissingEngine()`; Android
+    `CYLAnimationEngines.warnMissingEngine`), and the item shows its static image, or the placeholder. The switches are all defined in the component's core,
     `CYLAnimatedItem/CYLAnimatedItemMacros.h` (2026-11-17): `CYL_ANIMATION_ENGINE_AVAILABLE` (any engine),
     `CYL_LOTTIE_AVAILABLE` (the Lottie library), and `CYL_GIF_AVAILABLE`, `CYL_PAG_AVAILABLE`, `CYL_RIVE_AVAILABLE`,
     `CYL_SVGA_AVAILABLE` (that type's engine subspec, found by its animator header through the header search paths,
-    plus its library). Each animator header imports that file, and its content and the `.m` definitions sit inside its
-    switch. CYLTabBarController's Core and CYLUtils define no library switch. The released Lottie keys stay defined and are marked
+    plus its library). Each animator header imports that file, and the animator itself sits inside its switch. CYLTabBarController's Core and CYLUtils define no library switch. The released Lottie keys stay defined and are marked
     `CYL_LOTTIE_REQUIRED` (a compile warning without Lottie). See docs/Tab-Bar-Item-Animation.md.
 - **Accessibility is required everywhere.** The library code shipped to CocoaPods / SPM and to Gradle / Maven, the
   React Native and Flutter components, and every example fully support accessibility (VoiceOver, TalkBack, Voice

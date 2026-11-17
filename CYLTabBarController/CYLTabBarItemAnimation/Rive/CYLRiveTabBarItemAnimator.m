@@ -33,23 +33,7 @@
 #define CYL_RIVE_SWIFT_VIEWS_AVAILABLE 1
 #endif
 
-NSString *const CYLTabBarRiveURL = @"CYLTabBarRiveURL";
-NSString *const CYLTabBarRiveFilePath = @"CYLTabBarRiveFilePath";
-NSString *const CYLTabBarRiveSize = @"CYLTabBarRiveSize";
-NSString *const CYLTabBarRiveDarkURL = @"CYLTabBarRiveDarkURL";
-NSString *const CYLTabBarRiveDarkFilePath = @"CYLTabBarRiveDarkFilePath";
-NSString *const CYLTabBarRiveDarkColors = @"CYLTabBarRiveDarkColors";
 
-CYLTabBarAnimationOption const CYLTabBarAnimationOptionRiveArtboard = @"artboard";
-CYLTabBarAnimationOption const CYLTabBarAnimationOptionRiveStateMachine = @"stateMachine";
-CYLTabBarAnimationOption const CYLTabBarAnimationOptionRiveActiveProperty = @"active";
-CYLTabBarAnimationOption const CYLTabBarAnimationOptionRiveActiveDuration = @"duration";
-CYLTabBarAnimationOption const CYLTabBarAnimationOptionRiveTriggerProperty = @"trigger";
-CYLTabBarAnimationOption const CYLTabBarAnimationOptionRiveColor = @"color";
-CYLTabBarAnimationOption const CYLTabBarAnimationOptionRiveInput = @"input";
-CYLTabBarAnimationOption const CYLTabBarAnimationOptionRiveTriggerInput = @"triggerInput";
-CYLTabBarAnimationOption const CYLTabBarAnimationOptionRiveAnimation = @"animation";
-CYLTabBarAnimationOption const CYLTabBarAnimationOptionRiveLegacyRuntime = @"legacy";
 
 @implementation CYLRiveTabBarItemAnimator
 

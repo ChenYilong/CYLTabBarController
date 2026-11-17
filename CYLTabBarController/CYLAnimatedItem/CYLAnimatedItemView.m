@@ -6,6 +6,14 @@
 //
 
 #import "CYLAnimatedItemView.h"
+// [EN] The type keys and `CYLAnimationWarnMissingEngine()`, in this pod's Core. [CN] 类型 key 与 `CYLAnimationWarnMissingEngine()`，位于本 pod 的 Core。
+#if __has_include(<CYLAnimatedItem/CYLAnimationKeys.h>)
+#import <CYLAnimatedItem/CYLAnimationKeys.h>
+#elif __has_include("../CYLUtils/CYLAnimationKeys.h")
+#import "../CYLUtils/CYLAnimationKeys.h"
+#else
+#import "CYLAnimationKeys.h"
+#endif
 
 /*
  * [EN] How often a looping animation whose player has no `loops` checks whether it reached the end.
@@ -493,6 +501,9 @@ static BOOL CYLAnimatedItemLocalFileIsMissing(NSURL *URL) {
             if ([player respondsToSelector:@selector(setProgress:)]) {
                 player.progress = self.animationRestingProgress;
             }
+        } else {
+            // [EN] Debug builds: a type whose engine is not in the build says which pod to add. [CN] debug 构建：引擎未参与构建的类型提示需要加入的 pod。
+            CYLAnimationWarnMissingEngine(nil, URL);
         }
     }
     [self cyl_updateIcon];
@@ -618,6 +629,10 @@ static BOOL CYLAnimatedItemLocalFileIsMissing(NSURL *URL) {
 }
 
 - (void)reloadAnimation {
+    // [EN] No engine: debug builds say which pod to add. [CN] 没有引擎：debug 构建提示需要加入的 pod。
+    if (self.animationURL) {
+        CYLAnimationWarnMissingEngine(nil, self.animationURL);
+    }
     [self cyl_updateIcon];
     [self cyl_contentDidChange];
 }

@@ -26,13 +26,16 @@
 #endif
 
 /*!
- * FIX: issue #415
- * [EN] 1 when SVGAPlayer is part of the build, 0 otherwise. Everything below, the SVGA keys included, exists only then:
- *      without SVGAPlayer, using `CYLTabBarSVGAURL` fails to build instead of being silently ignored. Use
- *      `#if CYL_SVGA_AVAILABLE` for SVGA-only code of your own. CocoaPods: `pod 'CYLTabBarController/SVGA'`.
- * [CN] 工程中引入了 SVGAPlayer 时为 1，否则为 0。以下所有内容（包括 SVGA 的 key）只在此时存在：没有 SVGAPlayer 时，使用
- *      `CYLTabBarSVGAURL` 会编译失败，而不是被静默忽略。App 自己只用于 SVGA 的代码可用 `#if CYL_SVGA_AVAILABLE` 包住。
- *      CocoaPods：`pod 'CYLTabBarController/SVGA'`。
+ * [EN] `CYL_SVGA_AVAILABLE` (defined in the component's core, `CYLAnimatedItemMacros.h`) is 1 when this subspec and
+ *      SVGAPlayer are part of the build, 0 otherwise. The animator below exists only then. The SVGA keys
+ *      (`CYLTabBarSVGAURL`…) are declared in the component's core and always exist: without the engine they get a compile
+ *      warning, a debug log at run time, and the tab shows its static image (or the placeholder). Use
+ *      `#if CYL_SVGA_AVAILABLE` for SVGA-only code of your own. CocoaPods: `pod 'CYLAnimatedItem/SVGA'` (tab bar:
+ *      `pod 'CYLTabBarController/SVGA'`).
+ * [CN] `CYL_SVGA_AVAILABLE`（定义在组件核心 `CYLAnimatedItemMacros.h`）在本子库与 SVGAPlayer 都参与构建时为 1，否则为 0。下面的 animator 只在此时
+ *      存在。SVGA 的 key（`CYLTabBarSVGAURL`……）声明在组件核心中，总是存在：没有引擎时会有编译警告与运行时的 debug 日志，Tab 显示静态图片
+ *      （或占位图）。App 自己只用于 SVGA 的代码可用 `#if CYL_SVGA_AVAILABLE` 包住。CocoaPods：`pod 'CYLAnimatedItem/SVGA'`（TabBar：
+ *      `pod 'CYLTabBarController/SVGA'`）。
  */
 #if __has_include(<CYLAnimatedItem/CYLAnimatedItemMacros.h>)
 #import <CYLAnimatedItem/CYLAnimatedItemMacros.h>
@@ -67,35 +70,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-/*!
- * [EN] An SVGA file's URL (NSURL), the counterpart of `CYLTabBarLottieURL`; read from `CYLTabBarAnimationURL` too.
- * [CN] SVGA 文件的 URL（NSURL），对应 `CYLTabBarLottieURL`；也可以使用 `CYLTabBarAnimationURL`。
- */
-FOUNDATION_EXTERN NSString *const CYLTabBarSVGAURL;
 
-/*!
- * [EN] An SVGA file's path (NSString), used when there is no URL.
- * [CN] SVGA 文件的路径（NSString），没有 URL 时使用。
- */
-FOUNDATION_EXTERN NSString *const CYLTabBarSVGAFilePath;
 
-/*!
- * [EN] The size of the animation view (NSValue of CGSize); default: the size of the tab's image.
- * [CN] 动画视图的尺寸（CGSize 的 NSValue）；默认为 Tab 图片的尺寸。
- */
-FOUNDATION_EXTERN NSString *const CYLTabBarSVGASize;
 
-/*!
- * [EN] The SVGA file played in Dark Mode (NSURL).
- * [CN] 深色模式下播放的 SVGA 文件（NSURL）。
- */
-FOUNDATION_EXTERN NSString *const CYLTabBarSVGADarkURL;
 
-/*!
- * [EN] The path of the SVGA file played in Dark Mode (NSString).
- * [CN] 深色模式下播放的 SVGA 文件路径（NSString）。
- */
-FOUNDATION_EXTERN NSString *const CYLTabBarSVGADarkFilePath;
 
 NS_ASSUME_NONNULL_END
 #endif

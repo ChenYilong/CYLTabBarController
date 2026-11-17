@@ -426,7 +426,7 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
                     if (animationSpeed > 0f) player.animationSpeed = animationSpeed
                     player.progress = animationRestingProgress
                 }
-            }
+            } ?: CYLAnimationEngines.warnMissingEngine(context, null, url)
         }
         updateIcon()
         requestLayout()

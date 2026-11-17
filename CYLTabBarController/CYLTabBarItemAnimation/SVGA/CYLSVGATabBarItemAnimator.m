@@ -31,11 +31,6 @@
 #import "SVGA.h"
 #endif
 
-NSString *const CYLTabBarSVGAURL = @"CYLTabBarSVGAURL";
-NSString *const CYLTabBarSVGAFilePath = @"CYLTabBarSVGAFilePath";
-NSString *const CYLTabBarSVGASize = @"CYLTabBarSVGASize";
-NSString *const CYLTabBarSVGADarkURL = @"CYLTabBarSVGADarkURL";
-NSString *const CYLTabBarSVGADarkFilePath = @"CYLTabBarSVGADarkFilePath";
 
 /*!
  * [EN] What the view shows once its file is parsed (parsing is asynchronous): a request made before is kept and applied then.
