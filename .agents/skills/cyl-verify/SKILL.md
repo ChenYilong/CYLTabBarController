@@ -51,6 +51,15 @@ when the versions are unchanged and rewrites it when macOS or Xcode differs (Xco
 - **Screenshots (added 2026-11-12)**: every screenshot, from CI/CD and from local builds, is saved in the repository with the related document in `docs/` (create the document when none fits; images in `docs/assets/`) and committed to git. Use clear original screenshots: never scaled down or recompressed; a crop that keeps the original resolution is allowed. When the result looks as expected, also update `README.md` with the latest screenshots, in the related section (create it when there is none). Every screenshot, in the document and in the README, is labeled with: the platform (iOS, Android, Flutter, React Native, HarmonyOS, WeChat Mini Program); the environment: operating system version, simulator or emulator (device model and OS version), and the SDK version of that platform (iOS SDK / Xcode, Android SDK / API level, Flutter SDK, React Native, HarmonyOS SDK, WeChat Mini Program base library); this repository's version or commit (with its link); and the time it was taken.
 - **Screenshot moments and layout (added 2026-11-12)**: take and commit screenshots at key moments: when a TODO or Linux note can be removed, when a pull request can be merged, or when the result is judged as expected with no bug and no open issue. The README shows cropped key details, a full screen only when it is needed; several details go into one stitched image. Stitching order of preference: a vertical stack (one column, top to bottom), easiest to read on a phone; then two columns with several rows; last, a single horizontal row, at most three images in a row. (Corrected by the maintainer on 2026-11-12: the original wording said both "prefer a horizontal arrangement" and "a horizontal row is the worst", which contradict each other; the rule is to prefer a vertical stack.)
 
+## License in every published package (added 2026-11-17)
+
+Every package published to an outside registry (CocoaPods, Swift Package Manager, Gradle / Maven, npm, pub.dev, ohpm,
+WeChat Mini Program components) contains its `LICENSE` inside its built-in resource folder; when it has none, create one.
+iOS: the `.bundle` holds `LICENSE`; Android: `src/main/resources/META-INF/<module>/LICENSE`; HarmonyOS: the HAR root and
+`resources/rawfile/<module>/`; npm / pub.dev / Mini Program: the package root and the folder copied into the app. Before a
+release or a push that adds a package, run `python3 scripts/sync-package-licenses.py --check`; a new package adds a row to
+that script. Details: [docs/Package-Licenses.md](../../../docs/Package-Licenses.md).
+
 ## Commands
 
 ```sh
@@ -63,6 +72,7 @@ python3 scripts/update-docs-navigation.py --check
 python3 scripts/check-localization-macros.py                    # localization acceptance: a core macro and an example macro, each reading its own bundle
 python3 scripts/check-public-api-comments.py                    # public API comments are /*! ... */ blocks, not stacked //
 python3 scripts/sync-agent-skills.py --check
+python3 scripts/sync-package-licenses.py --check   # every published package carries its LICENSE
 scripts/publish-android.sh staging                          # Android library: Maven bundle, checked (local | staging | central | github)
 (cd Example-Android && LC_ALL=C.UTF-8 gradle testDebugUnitTest :tabpages:test lintDebug assembleRelease)   # Android, as .github/workflows/android.yml runs it
 # React Native component (CrossPlatform/react-native-cyltabbar): yarn; yarn tsc --noEmit; in example/ios: LANG=en_US.UTF-8 pod install,

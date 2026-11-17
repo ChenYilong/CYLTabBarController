@@ -48,6 +48,7 @@
 | [需要登录的 Tab](Login-Required-Tabs.md) | [Tabs That Need Login](Login-Required-Tabs.md) |
 | [macOS CI/CD 调研报告：用 Mac 服务器构建本项目](Mac-CI-CD.md) | [macOS CI/CD research: building this project on Mac servers](Mac-CI-CD.md) |
 | [PAG 动画 Tab 图标（与 Lottie 用法相同）](PAG-Animation.md) | [PAG animated tab icons (used like Lottie)](PAG-Animation.md) |
+| [发布包中的协议文件](Package-Licenses.md) | [License files in published packages](Package-Licenses.md) |
 | [只有部分 Tab 有动画（Lottie 或 PAG）](Per-Tab-Animation.md) | [Only some tabs animated (Lottie or PAG)](Per-Tab-Animation.md) |
 | [PlusButton 子控制器换肤测试](Plus-Child-Theme-Switching-Test.md) | [Plus child theme switching test](Plus-Child-Theme-Switching-Test.md) |
 | [液态玻璃：标题画在背景图上的 PlusButton](PlusButton-Background-Image-Liquid-Glass.md) | [Liquid Glass: a PlusButton with its title on a background image](PlusButton-Background-Image-Liquid-Glass.md) |
@@ -147,6 +148,7 @@ docs/
 ├── ObjC-Example-Parity/
 │   └── README.md
 ├── PAG-Animation.md
+├── Package-Licenses.md
 ├── Per-Tab-Animation.md
 ├── Plus-Child-Theme-Switching-Test.md
 ├── PlusButton-Background-Image-Liquid-Glass.md

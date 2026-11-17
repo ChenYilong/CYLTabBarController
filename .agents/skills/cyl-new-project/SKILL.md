@@ -101,6 +101,13 @@ for example `:path => '../'` in a demo folder.
    Check with `python3 scripts/check-localization-macros.py`. Other platforms: the same two layers in their own package form
    (AGENTS.md, "Localization (i18n / l10n) file structure").
 
+## A new published package or module: its license
+
+A new library, module or package that will be published (a pod, a Gradle module, an npm, pub.dev or ohpm package, a
+Mini Program component) ships its `LICENSE` inside its resource folder (iOS: its `.bundle`; create the folder when there
+is none). Add a row to `scripts/sync-package-licenses.py`, run it, and see [docs/Package-Licenses.md](../../../docs/Package-Licenses.md).
+Demo apps are not published and need nothing.
+
 ## Podfile, app icon, launch screen
 
 Every Xcode project checks its Podfile (top lines `platform :ios, '15.0'`, `ENV['SWIFT_VERSION'] = '5'`, `project '<name>.xcodeproj'`; a `post_install` hook that sets `IPHONEOS_DEPLOYMENT_TARGET` to 15.0 on every pod), and copies the ObjC example's app icon and launch screen when it has none. Full rule and exceptions (one `post_install` only, React Native minimum 15.1): AGENTS.md, "Xcode projects: Podfile, app icon, launch screen".

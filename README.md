@@ -185,6 +185,7 @@ Analyst.ai [App Store Link](https://itunes.apple.com/us/app/analyst-ai/id1345754
 | [需要登录的 Tab](docs/Login-Required-Tabs.md) | [Tabs That Need Login](docs/Login-Required-Tabs.md) |
 | [macOS CI/CD 调研报告：用 Mac 服务器构建本项目](docs/Mac-CI-CD.md) | [macOS CI/CD research: building this project on Mac servers](docs/Mac-CI-CD.md) |
 | [PAG 动画 Tab 图标（与 Lottie 用法相同）](docs/PAG-Animation.md) | [PAG animated tab icons (used like Lottie)](docs/PAG-Animation.md) |
+| [发布包中的协议文件](docs/Package-Licenses.md) | [License files in published packages](docs/Package-Licenses.md) |
 | [只有部分 Tab 有动画（Lottie 或 PAG）](docs/Per-Tab-Animation.md) | [Only some tabs animated (Lottie or PAG)](docs/Per-Tab-Animation.md) |
 | [PlusButton 子控制器换肤测试](docs/Plus-Child-Theme-Switching-Test.md) | [Plus child theme switching test](docs/Plus-Child-Theme-Switching-Test.md) |
 | [液态玻璃：标题画在背景图上的 PlusButton](docs/PlusButton-Background-Image-Liquid-Glass.md) | [Liquid Glass: a PlusButton with its title on a background image](docs/PlusButton-Background-Image-Liquid-Glass.md) |
