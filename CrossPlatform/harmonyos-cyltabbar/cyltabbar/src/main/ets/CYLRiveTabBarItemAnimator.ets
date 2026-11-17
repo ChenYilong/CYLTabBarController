@@ -142,6 +142,8 @@ export struct CYLRiveIcon {
   @Prop @Watch('cylUpdate') selected: boolean = false;
   @Prop @Watch('cylReplay') replayToken: number = 0;
   onLoadError: (message: string) => void = () => {};
+  /** [EN] The file is drawn (CYLAnimatedItemView shows it from here on). [CN] 文件已绘制。 */
+  onLoaded: () => void = () => {};
   private riveView: RiveAnimationView | null = null;
   private bytes: ArrayBuffer | null = null;
   private options: Record<string, string> = {};
@@ -204,6 +206,7 @@ export struct CYLRiveIcon {
         true, true, Fit.CONTAIN, undefined, Loop.AUTO);
       this.loaded = true;
       this.cylUpdate();
+      this.onLoaded();
     } catch (e) {
       this.onLoadError(`${e}`);
     }

@@ -88,6 +88,8 @@ private fun View.cyl_insertAnimationView(state: CYLTabAnimationState) {
     if (state.speed > 0 && state.speed.isFinite()) player?.animationSpeed = state.speed
     if (state.loops) player?.loops = true
     player?.applyColors(CYLTabBarItemAnimationStyleSource.colorsForStyle(state.url, resources.configuration), resources.configuration)
+    // [EN] The tab's current title color, for an animation with the `tint` option "title" (bug B12). [CN] Tab 当前标题颜色，供 `tint` 选项为 "title" 的动画使用（问题 B12）。
+    (this as? CYLTabBarItemButton)?.let { player?.tintColor = it.titleLabel.currentTextColor }
     // [EN] The animation replaces the icon. [CN] 动画取代图标。
     when (this) {
         // [EN] While the file downloads, the tab keeps its image (or the placeholder). [CN] 文件下载期间，Tab 保留其图片（或占位图）。

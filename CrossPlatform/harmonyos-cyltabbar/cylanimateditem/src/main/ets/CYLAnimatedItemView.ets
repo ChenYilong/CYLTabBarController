@@ -64,7 +64,8 @@ const CYL_ANIMATED_ITEM_TYPES: CYLAnimatedItemType[] = [
  * [CN] 根据扩展名得到文件的动画类型（"Lottie"、"PAG"、"Rive"、"SVGA"、"GIF"），未知时为 ''。
  */
 export function cylAnimatedItemTypeOf(url: string): string {
-  let file: string = url.split('#')[0].split('?')[0];
+  // [EN] A trailing ".bin" is skipped ("icons.riv.bin" is Rive), as in the mini program. [CN] 忽略末尾的 ".bin"，与小程序相同。
+  let file: string = url.split('#')[0].split('?')[0].replace(/\.bin$/i, '');
   let dot: number = file.lastIndexOf('.');
   if (dot < 0) {
     return '';
@@ -219,6 +220,12 @@ export struct CYLAnimatedItemView {
   @Prop itemDescription: string = '';
   @Prop selectedDescription: string = '';
   @Prop itemId: string = '';
+  /**
+   * [EN] Embedded in a host that is the touch target and the accessibility element (the tab bar's icon): no padding, no
+   *      minimum height, no gestures and hidden from screen readers. [CN] 嵌入在作为触摸目标与无障碍元素的宿主中（TabBar 的图标）：
+   *      无内边距、无最小高度、无手势，并对读屏隐藏。
+   */
+  @Prop isBare: boolean = false;
   @State animationLoaded: boolean = false;
   @State animationFailed: boolean = false;
   @BuilderParam animationBuilder: (context: CYLAnimatedItemAnimationContext) => void = this.cylNoAnimation;
@@ -395,9 +402,11 @@ export struct CYLAnimatedItemView {
     }) {
       this.cylContent()
     }
-    .padding(4)
+    .padding(this.isBare ? 0 : 4)
     .opacity(this.isItemEnabled ? 1 : 0.5)
-    .constraintSize({ minHeight: 44 })
+    .constraintSize({ minHeight: this.isBare ? 0 : 44 })
+    .hitTestBehavior(this.isBare ? HitTestMode.None : HitTestMode.Default)
+    .accessibilityLevel(this.isBare ? 'no-hide-descendants' : 'auto')
     .accessibilityGroup(true)
     .accessibilityText(this.cylAccessibilityText())
     .accessibilityDescription(this.isItemSelected && this.selectedDescription.length > 0 ?

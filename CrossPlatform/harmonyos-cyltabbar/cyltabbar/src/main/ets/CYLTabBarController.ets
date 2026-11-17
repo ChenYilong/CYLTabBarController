@@ -7,6 +7,7 @@ import { CYLBadge, CYLBadgeView } from './CYLBadge';
 import { CYLLottieIcon } from './CYLLottieIcon';
 import { CYLSVGAView } from './svga/CYLSVGAView';
 import { CYLRiveIcon } from './CYLRiveTabBarItemAnimator';
+import { CYLAnimatedItemView, CYLAnimatedItemAnimationContext, CYLAnimatedItemEngines } from 'cylanimateditem';
 import { CYLLocalizedString, cyl_textOf } from './CYLLocalization';
 import { CYLTabButtonAnimation, CYLTabButtonProperty, CYLTabButtonView, CYLTabButtonViewImpl } from './CYLTabButtonAnimation';
 
@@ -470,6 +471,9 @@ export struct CYLTabBarController {
   }
 
   aboutToAppear(): void {
+    // [EN] cyltabbar plays Lottie (@ohos/lottie), Rive (@ohos/rive) and SVGA (its own player): CYLAnimatedItemView draws them.
+    // [CN] cyltabbar 播放 Lottie、Rive 与 SVGA（自带播放器）：由 CYLAnimatedItemView 绘制。
+    ['Lottie', 'Rive', 'SVGA'].forEach((type: string) => CYLAnimatedItemEngines.register(type));
     this.loaded = [this.selectedIndex];
     while (this.badges.length < this.tabBarItemsAttributes.length) {
       this.badges.push(new CYLBadge());
@@ -1217,6 +1221,68 @@ export struct CYLTabBarController {
     .accessibilityLevel('no-hide-descendants')
   }
 
+  /** [EN] The animation file of a tab (Lottie, Rive or SVGA), or undefined. [CN] Tab 的动画文件（Lottie、Rive 或 SVGA），没有时为 undefined。 */
+  cylTabAnimationPath(index: number): string | undefined {
+    const item = this.tabBarItemsAttributes[index];
+    if (item.lottieFilePath !== undefined && item.gifFilePath === undefined && item.imageURL === undefined) {
+      return this.colorMode === 'dark' && item.lottieDarkFilePath !== undefined ? item.lottieDarkFilePath : item.lottieFilePath;
+    }
+    return this.cylRivePath(index) ?? this.cylSVGAPath(index);
+  }
+
+  cylTabAnimationSize(index: number): number {
+    const item = this.tabBarItemsAttributes[index];
+    if (item.lottieFilePath !== undefined && item.gifFilePath === undefined && item.imageURL === undefined) {
+      return item.lottieSize ?? this.imageSize;
+    }
+    if (this.cylRivePath(index) !== undefined) {
+      return item.riveSize ?? this.imageSize;
+    }
+    return item.svgaSize ?? this.imageSize;
+  }
+
+  /** [EN] The engine view CYLAnimatedItemView shows for a tab. [CN] CYLAnimatedItemView 为 Tab 显示的引擎视图。 */
+  @Builder
+  cylTabEngine(index: number, context: CYLAnimatedItemAnimationContext) {
+    if (this.tabBarItemsAttributes[index].lottieFilePath !== undefined
+      && this.tabBarItemsAttributes[index].gifFilePath === undefined
+      && this.tabBarItemsAttributes[index].imageURL === undefined) {
+      CYLLottieIcon({
+        path: this.cylTabAnimationPath(index),
+        iconSize: this.cylTabAnimationSize(index),
+        speed: this.tabBarItemAnimationSpeed,
+        selected: this.selectedIndex === index,
+        replayToken: this.replayTokens[index] ?? 0,
+        onLoaded: () => context.onLoaded(),
+        onLoadError: (_message: string) => context.onFailed(),
+      })
+    } else if (this.cylRivePath(index) !== undefined) {
+      CYLRiveIcon({
+        path: this.cylRivePath(index),
+        iconSize: this.cylTabAnimationSize(index),
+        selected: this.selectedIndex === index,
+        replayToken: this.replayTokens[index] ?? 0,
+        onLoaded: () => context.onLoaded(),
+        onLoadError: (_message: string) => {
+          context.onFailed();
+          this.cylRiveFailures = this.cylRiveFailures.concat([index]);
+        },
+      })
+    } else if (this.cylSVGAPath(index) !== undefined) {
+      CYLSVGAView({
+        path: this.cylSVGAPath(index),
+        iconSize: this.cylTabAnimationSize(index),
+        selected: this.selectedIndex === index,
+        replayToken: this.replayTokens[index] ?? 0,
+        onLoaded: () => context.onLoaded(),
+        onLoadError: (_message: string) => {
+          context.onFailed();
+          this.cylSVGAFailures = this.cylSVGAFailures.concat([index]);
+        },
+      })
+    }
+  }
+
   @Builder
   cylTab(index: number) {
     Column() {
@@ -1228,35 +1294,18 @@ export struct CYLTabBarController {
           .id(`cyl-cover-${this.cylIdentifier(index)}`)
       } else {
       Stack() {
-        if (this.tabBarItemsAttributes[index].lottieFilePath !== undefined
-          && this.tabBarItemsAttributes[index].gifFilePath === undefined
-          && this.tabBarItemsAttributes[index].imageURL === undefined) {
-          CYLLottieIcon({
-            path: this.colorMode === 'dark' && this.tabBarItemsAttributes[index].lottieDarkFilePath !== undefined
-              ? this.tabBarItemsAttributes[index].lottieDarkFilePath : this.tabBarItemsAttributes[index].lottieFilePath,
-            iconSize: this.tabBarItemsAttributes[index].lottieSize ?? this.imageSize,
-            speed: this.tabBarItemAnimationSpeed,
-            selected: this.selectedIndex === index,
-            replayToken: this.replayTokens[index] ?? 0,
-          })
-        } else if (this.cylRivePath(index) !== undefined) {
-          CYLRiveIcon({
-            path: this.cylRivePath(index),
-            iconSize: this.tabBarItemsAttributes[index].riveSize ?? this.imageSize,
-            selected: this.selectedIndex === index,
-            replayToken: this.replayTokens[index] ?? 0,
-            onLoadError: (_message: string) => {
-              this.cylRiveFailures = this.cylRiveFailures.concat([index]);
-            },
-          })
-        } else if (this.cylSVGAPath(index) !== undefined) {
-          CYLSVGAView({
-            path: this.cylSVGAPath(index),
-            iconSize: this.tabBarItemsAttributes[index].svgaSize ?? this.imageSize,
-            selected: this.selectedIndex === index,
-            replayToken: this.replayTokens[index] ?? 0,
-            onLoadError: (_message: string) => {
-              this.cylSVGAFailures = this.cylSVGAFailures.concat([index]);
+        if (this.cylTabAnimationPath(index) !== undefined) {
+          // [EN] The animated icon is CYLAnimatedItemView (docs/Animated-Item.md, TODO 5): the static image (else the
+          //      placeholder) until the engine view reports it is drawn, and again when it fails.
+          // [CN] 动效图标由 CYLAnimatedItemView 绘制（docs/Animated-Item.md，TODO 5）：引擎视图报告绘制完成之前，以及失败之后，显示静态图片（没有时为占位图）。
+          CYLAnimatedItemView({
+            isBare: true,
+            image: this.cylIcon(index) ?? '',
+            animationUrl: this.cylTabAnimationPath(index),
+            iconSize: this.cylTabAnimationSize(index),
+            isItemSelected: this.selectedIndex === index,
+            animationBuilder: (context: CYLAnimatedItemAnimationContext) => {
+              this.cylTabEngine(index, context)
             },
           })
         } else {
