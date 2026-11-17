@@ -357,6 +357,14 @@
       "value": "Tab 互動"
     },
     {
+      "name": "cyl_l10n_5ea7bf3d8e63",
+      "value": "Tab 圖示動畫循環播放：關"
+    },
+    {
+      "name": "cyl_l10n_918aff638366",
+      "value": "Tab 圖示動畫循環播放：開"
+    },
+    {
       "name": "cyl_l10n_98559580dcc7",
       "value": "Tab 點擊動畫（issue #535）"
     },

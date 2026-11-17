@@ -120,6 +120,11 @@ struct Index {
   @State scrollListExpanded: boolean = false;
   /** [EN] Item 7: the tab bar style and the key of the tab bar on screen (a new key builds a new one). [CN] 第 7 项：TabBar 样式与当前 TabBar 的 key（新 key 会新建 TabBar）。 */
   @State styleType: CYLTabBarStyleType = CYLTabBarStyleType.Default;
+  /**
+   * [EN] The Loop row of the second tab (tabBarItemAnimationLoops): the selected tab's Lottie icon plays again after each pass.
+   * [CN] 第二个 Tab 的循环行（tabBarItemAnimationLoops）：选中 Tab 的 Lottie 图标每次播放后再次播放。
+   */
+  @State animationLoops: boolean = false;
   @State tabBarKey: number = 0;
   private badges: CYLBadge[] = CYL_TABS.map(() => new CYLBadge());
   private plusButtonBadge: CYLBadge = new CYLBadge();
@@ -963,6 +968,13 @@ struct Index {
       //      reference harmonyos-liquid-glass-tabbar, on its own pushed page; the library's Liquid Glass keeps the iOS style.
       // [CN] 仅示例，位于第二个 Tab（新示例行不放在第一个 Tab）：鸿蒙参考工程 harmonyos-liquid-glass-tabbar 的透视玻璃，在单独推入的页面中；
       //      库的液态玻璃保持 iOS 样式。
+      // [EN] The animated icon examples' loop switch (AGENTS.md), on the second tab: tabBarItemAnimationLoops, applied live.
+      // [CN] 动画图标示例的循环开关（AGENTS.md），位于第二个 Tab：tabBarItemAnimationLoops，立即生效。
+      ...(page === DEMO_CITY ? [{ title: CYLLocalizedString('循环播放'), rows: [{
+        id: 'animation-loops', title: CYLLocalizedString('循环播放'),
+        subtitle: this.animationLoops ? CYLLocalizedString('Tab 图标动画循环播放：开') : CYLLocalizedString('Tab 图标动画循环播放：关'),
+        action: () => { this.animationLoops = !this.animationLoops; },
+      } as DemoRow] } as DemoSection] : []),
       ...(page === DEMO_CITY ? [{ title: CYLLocalizedString('LiquidGlass'), rows: [{
         id: 'liquid-glass-dock', title: CYLLocalizedString('Liquid Glass: the see-through effect of the reference'),
         subtitle: CYLLocalizedString('harmonyos-liquid-glass-tabbar: tab capsule, search ball and music bar over colorful content; scroll to minimize'),
@@ -1184,6 +1196,7 @@ struct Index {
         barTintColor: this.theme.bar,
         tabBarItemsAttributes: this.tabs,
         plusButton: this.plus,
+        tabBarItemAnimationLoops: this.animationLoops,
         selectedIndex: $selectedIndex,
         badges: this.badges,
         loggedIn: this.loggedIn,

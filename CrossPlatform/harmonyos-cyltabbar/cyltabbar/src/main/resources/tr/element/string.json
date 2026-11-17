@@ -357,6 +357,14 @@
       "value": "Sekme etkileşimleri"
     },
     {
+      "name": "cyl_l10n_5ea7bf3d8e63",
+      "value": "Tab icon animations loop: off"
+    },
+    {
+      "name": "cyl_l10n_918aff638366",
+      "value": "Tab icon animations loop: on"
+    },
+    {
       "name": "cyl_l10n_98559580dcc7",
       "value": "Sekme dokunma animasyonu (issue #535)"
     },

@@ -357,6 +357,14 @@
       "value": "탭 상호작용"
     },
     {
+      "name": "cyl_l10n_5ea7bf3d8e63",
+      "value": "Tab icon animations loop: off"
+    },
+    {
+      "name": "cyl_l10n_918aff638366",
+      "value": "Tab icon animations loop: on"
+    },
+    {
       "name": "cyl_l10n_98559580dcc7",
       "value": "탭 애니메이션 (issue #535)"
     },

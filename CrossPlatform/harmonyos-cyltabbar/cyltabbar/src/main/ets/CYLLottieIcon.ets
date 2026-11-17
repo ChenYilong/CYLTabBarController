@@ -17,6 +17,11 @@ export struct CYLLottieIcon {
   speed: number = 1;
   @Prop @Watch('cylUpdate') selected: boolean = false;
   @Prop @Watch('cylReplay') replayToken: number = 0;
+  /**
+   * [EN] Plays again from the start after each pass while the tab is selected (tabBarItemAnimationLoops); off by default.
+   * [CN] Tab 选中期间每次播放结束后从头再次播放（tabBarItemAnimationLoops）；默认关闭。
+   */
+  @Prop @Watch('cylLoopsChanged') loops: boolean = false;
   /** [EN] The file is drawn (CYLAnimatedItemView shows it from here on). [CN] 文件已绘制（CYLAnimatedItemView 从此显示它）。 */
   onLoaded: () => void = () => {};
   /** [EN] The file cannot be loaded. [CN] 文件无法加载。 */
@@ -40,7 +45,7 @@ export struct CYLLottieIcon {
     this.lottieItem = lottie.loadAnimation({
       container: this.context,
       renderer: 'canvas',
-      loop: false,
+      loop: this.loops,
       autoplay: false,
       name: this.name,
       path: this.path,
@@ -76,6 +81,18 @@ export struct CYLLottieIcon {
   cylReplay(): void {
     if (this.selected) {
       this.lottieItem?.goToAndPlay(0, true);
+    }
+  }
+
+  /** [EN] Applied to the animation already playing; turning it on replays a finished one. [CN] 对正在播放的动画生效；开启时重新播放已结束的动画。 */
+  cylLoopsChanged(): void {
+    const item = this.lottieItem;
+    if (item === undefined) {
+      return;
+    }
+    item.loop = this.loops;
+    if (this.loops && this.selected && item.isPaused) {
+      item.goToAndPlay(0, true);
     }
   }
 

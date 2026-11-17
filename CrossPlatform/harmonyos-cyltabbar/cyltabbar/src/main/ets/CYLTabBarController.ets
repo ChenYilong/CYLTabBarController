@@ -322,9 +322,9 @@ export struct CYLTabBarController {
   /** [EN] CYLTabBarControllerTabBarItemAnimationSpeed (Lottie). [CN] Lottie 动画速度。 */
   tabBarItemAnimationSpeed: number = 1;
   /**
-   * [EN] tabBarItemAnimationLoops: the selected tab's Rive icon plays again after each pass until this is turned off,
-   *      also while playing (docs/Animated-Item.md, the Rive loop); off by default.
-   * [CN] tabBarItemAnimationLoops：选中 Tab 的 Rive 图标每次播放后再次播放，直到关闭，播放中也立即生效；默认关闭。
+   * [EN] tabBarItemAnimationLoops: the selected tab's Lottie, Rive or SVGA icon plays again after each pass until this
+   *      is turned off, also while playing (docs/Animated-Item.md, the Rive loop); off by default.
+   * [CN] tabBarItemAnimationLoops：选中 Tab 的 Lottie、Rive 或 SVGA 图标每次播放后再次播放，直到关闭，播放中也立即生效；默认关闭。
    */
   @Prop tabBarItemAnimationLoops: boolean = false;
   /**
@@ -1260,6 +1260,7 @@ export struct CYLTabBarController {
         speed: this.tabBarItemAnimationSpeed,
         selected: this.selectedIndex === index,
         replayToken: this.replayTokens[index] ?? 0,
+        loops: this.tabBarItemAnimationLoops,
         onLoaded: () => context.onLoaded(),
         onLoadError: (_message: string) => context.onFailed(),
       })
@@ -1282,6 +1283,7 @@ export struct CYLTabBarController {
         iconSize: this.cylTabAnimationSize(index),
         selected: this.selectedIndex === index,
         replayToken: this.replayTokens[index] ?? 0,
+        loops: this.tabBarItemAnimationLoops,
         onLoaded: () => context.onLoaded(),
         onLoadError: (_message: string) => {
           context.onFailed();

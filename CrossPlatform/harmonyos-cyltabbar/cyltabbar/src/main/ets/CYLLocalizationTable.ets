@@ -92,6 +92,8 @@ export const CYL_LOCALIZATION_KEYS: Map<string, string> = new Map<string, string
   ["Spring (forever)", "cyl_l10n_3cb58e0d546d"],
   ["Spring once", "cyl_l10n_0a00b2238071"],
   ["Tab 交互", "cyl_l10n_fee4a478923f"],
+  ["Tab 图标动画循环播放：关", "cyl_l10n_5ea7bf3d8e63"],
+  ["Tab 图标动画循环播放：开", "cyl_l10n_918aff638366"],
   ["Tab 点击动画（issue #535）", "cyl_l10n_98559580dcc7"],
   ["Tab 点击声音与触感反馈（issue #535）", "cyl_l10n_db89836d6e21"],
   ["Tab 页面、选中与登录", "cyl_l10n_2f6e866d5219"],

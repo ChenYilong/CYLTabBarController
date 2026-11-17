@@ -59,7 +59,9 @@
     "harmonyos-liquid-glass-tabbar: tab capsule, search ball and music bar over colorful content; scroll to minimize": "harmonyos-liquid-glass-tabbar: tab capsule, search ball and music bar over colorful content; scroll to minimize",
     "Rive Tab 图标：house.riv（数字输入 Rooms）": "Rive tab icon: house.riv (number input Rooms)",
     "numberInput=Rooms：每次选中或再次点击时 Rooms 变为下一个值（3、4、5、6）": "numberInput=Rooms: each select or tap again sets Rooms to the next value (3, 4, 5, 6)",
-    "循环播放": "Loop"
+    "循环播放": "Loop",
+    "Tab 图标动画循环播放：开": "Tab icon animations loop: on",
+    "Tab 图标动画循环播放：关": "Tab icon animations loop: off"
   },
   "zh-Hans": {
     "Previous tab (cyl_selectPreviousTab, issue #535)": "上一个 Tab（cyl_selectPreviousTab，issue #535）",
@@ -121,7 +123,9 @@
     "harmonyos-liquid-glass-tabbar: tab capsule, search ball and music bar over colorful content; scroll to minimize": "harmonyos-liquid-glass-tabbar：页签胶囊、搜索球与音乐条悬浮在彩色内容之上；滚动即可缩小",
     "Rive Tab 图标：house.riv（数字输入 Rooms）": "Rive Tab 图标：house.riv（数字输入 Rooms）",
     "numberInput=Rooms：每次选中或再次点击时 Rooms 变为下一个值（3、4、5、6）": "numberInput=Rooms：每次选中或再次点击时 Rooms 变为下一个值（3、4、5、6）",
-    "循环播放": "循环播放"
+    "循环播放": "循环播放",
+    "Tab 图标动画循环播放：开": "Tab 图标动画循环播放：开",
+    "Tab 图标动画循环播放：关": "Tab 图标动画循环播放：关"
   },
   "zh-Hant": {
     "Previous tab (cyl_selectPreviousTab, issue #535)": "上一個 Tab（cyl_selectPreviousTab，issue #535）",
@@ -183,7 +187,9 @@
     "harmonyos-liquid-glass-tabbar: tab capsule, search ball and music bar over colorful content; scroll to minimize": "harmonyos-liquid-glass-tabbar：頁籤膠囊、搜尋球與音樂列懸浮在彩色內容之上；捲動即可縮小",
     "Rive Tab 图标：house.riv（数字输入 Rooms）": "Rive Tab 圖示：house.riv（數字輸入 Rooms）",
     "numberInput=Rooms：每次选中或再次点击时 Rooms 变为下一个值（3、4、5、6）": "numberInput=Rooms：每次選中或再次點擊時 Rooms 變為下一個值（3、4、5、6）",
-    "循环播放": "循環播放"
+    "循环播放": "循環播放",
+    "Tab 图标动画循环播放：开": "Tab 圖示動畫循環播放：開",
+    "Tab 图标动画循环播放：关": "Tab 圖示動畫循環播放：關"
   },
   "de": {
     "Previous tab (cyl_selectPreviousTab, issue #535)": "Vorheriger Tab (cyl_selectPreviousTab, issue #535)",
@@ -1388,7 +1394,9 @@
     "harmonyos-liquid-glass-tabbar: tab capsule, search ball and music bar over colorful content; scroll to minimize": "harmonyos-liquid-glass-tabbar：カラフルなコンテンツ上のタブカプセル、検索ボール、音楽バー。スクロールで縮小",
     "Rive Tab 图标：house.riv（数字输入 Rooms）": "Rive タブアイコン：house.riv（数値入力 Rooms）",
     "numberInput=Rooms：每次选中或再次点击时 Rooms 变为下一个值（3、4、5、6）": "numberInput=Rooms：選択または再タップのたびに Rooms が次の値（3、4、5、6）になります",
-    "循环播放": "ループ"
+    "循环播放": "ループ",
+    "Tab 图标动画循环播放：开": "タブアイコンのアニメーションをループ：オン",
+    "Tab 图标动画循环播放：关": "タブアイコンのアニメーションをループ：オフ"
   },
   "ko": {
     "Previous tab (cyl_selectPreviousTab, issue #535)": "이전 탭 (cyl_selectPreviousTab, issue #535)",

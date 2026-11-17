@@ -221,6 +221,7 @@ docs/
 │   ├── animated-item-ios-rive-loop-per-icon.png
 │   ├── animated-item-miniprogram-b7-engines-fixed.jpg
 │   ├── animated-item-miniprogram-b7-engines-overflow.jpg
+│   ├── animated-item-rn-rive-icons-tinted.png
 │   ├── b10-flatdesign-image-under-gif-after.png
 │   ├── b10-flatdesign-image-under-gif-before.png
 │   ├── b14-language-row-emoji-ios27.2.png
@@ -280,6 +281,7 @@ docs/
 │   ├── harmonyos-liquid-glass-message-badge-before-after.png
 │   ├── harmonyos-liquid-glass-plus-raised.png
 │   ├── harmonyos-liquid-glass-reference-vs-ours.png
+│   ├── harmonyos-lottie-svga-loop-arm64.png
 │   ├── harmonyos-plus-button-liquid-glass-no-line.png
 │   ├── harmonyos-plus-button-top-line-before-after.png
 │   ├── harmonyos-plus-button-top-line-kept.png

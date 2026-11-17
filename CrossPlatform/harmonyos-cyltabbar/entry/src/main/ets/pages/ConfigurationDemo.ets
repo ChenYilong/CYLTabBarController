@@ -132,13 +132,13 @@ struct ConfigurationDemo {
 
   build() {
     Column() {
-      if (this.result !== undefined && this.file.indexOf('_rive') >= 0) {
+      if (this.result !== undefined && (this.file.indexOf('_rive') >= 0 || this.file.indexOf('_svga') >= 0)) {
         // [EN] The animated icon examples' loop switch (AGENTS.md), applied live. [CN] 动画图标示例的循环开关，立即生效。
         Row() {
           Text(CYLLocalizedString('循环播放')).fontSize(15).layoutWeight(1)
           Toggle({ type: ToggleType.Switch, isOn: this.loops })
             .onChange((isOn: boolean) => { this.loops = isOn; })
-            .id('cyl-config-rive-loop')
+            .id('cyl-config-loop')
             .accessibilityText(CYLLocalizedString('循环播放'))
         }
         .padding({ left: 16, right: 16 })
