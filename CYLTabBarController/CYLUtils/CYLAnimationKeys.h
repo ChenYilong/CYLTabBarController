@@ -326,6 +326,29 @@ FOUNDATION_EXTERN NSString * _Nullable CYLAnimationTypeOfFile(NSDictionary * _Nu
 FOUNDATION_EXTERN BOOL CYLAnimationTypeIsAvailable(NSString * _Nullable type);
 
 /*!
+ * [EN] The animation types this library knows, in a fixed order: "Lottie", "PAG", "Rive", "SVGA", "GIF". Each name is also
+ *      the identifier of its animator in `CYLTabBarItemAnimatorRegistry`, so a type missing from the registry is an engine
+ *      missing from the build.
+ * [CN] 本库已知的动画类型，顺序固定："Lottie"、"PAG"、"Rive"、"SVGA"、"GIF"。每个名称也是其 animator 在 `CYLTabBarItemAnimatorRegistry`
+ *      中的名称，因此注册表中缺少的类型就是未参与构建的引擎。
+ */
+FOUNDATION_EXTERN NSArray<NSString *> *CYLAnimationKnownTypes(void);
+
+/*!
+ * [EN] The subspec that brings the engine of `type` (e.g. "LottieSwift" for "Lottie"), to add as
+ *      `pod 'CYLAnimatedItem/<subspec>'` or `pod 'CYLTabBarController/<subspec>'`; nil for an unknown type.
+ * [CN] 提供 `type` 引擎的子库（例如 "Lottie" 对应 "LottieSwift"），以 `pod 'CYLAnimatedItem/<子库>'` 或
+ *      `pod 'CYLTabBarController/<子库>'` 加入；未知类型返回 nil。
+ */
+FOUNDATION_EXTERN NSString * _Nullable CYLAnimationSubspecOfType(NSString * _Nullable type);
+
+/*!
+ * [EN] The file extensions of `type` (e.g. @[@"json", @"lottie"] for "Lottie"); empty for an unknown type.
+ * [CN] `type` 的文件扩展名（例如 "Lottie" 为 @[@"json", @"lottie"]）；未知类型为空数组。
+ */
+FOUNDATION_EXTERN NSArray<NSString *> *CYLAnimationFileExtensionsOfType(NSString * _Nullable type);
+
+/*!
  * [EN] In debug builds (`DEBUG`), logs once per type that a file cannot play because its engine is not in the build, with
  *      the pod to add; the item shows its static image, or the placeholder without one. Does nothing in release builds,
  *      for an unknown type, or when the engine is there (a failure of the file itself is reported by the engine).

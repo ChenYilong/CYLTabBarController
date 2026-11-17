@@ -267,6 +267,58 @@ open class CYLTabBarItemAnimatorRegistry : CYLTabBarItemAnimatorRegistering {
 
     override fun fileExtensions(): List<String> = animators().flatMap { it.fileExtensions }.map { it.lowercase() }.distinct()
 
+    /**
+     * [EN] The identifiers of the registered animators, in lookup order: the engines in this app.
+     * [CN] 已注册 animator 的名称，按查找顺序：即 App 中的引擎。
+     */
+    fun registeredIdentifiers(): List<String> = animators().map { it.identifier }
+
+    /**
+     * [EN] Whether an animator with `identifier` (e.g. "Rive") is registered. [CN] 名称为 `identifier` 的 animator 是否已注册。
+     */
+    fun isAnimatorRegisteredWithIdentifier(identifier: String): Boolean = animatorWithIdentifier(identifier) != null
+
+    /**
+     * [EN] The known engines (`CYLAnimationEngines.knownTypes()`) that are not registered.
+     * [CN] 已知（`CYLAnimationEngines.knownTypes()`）但未注册的引擎。
+     */
+    fun missingKnownIdentifiers(): List<String> = registeredIdentifiers().let { registered -> CYLAnimationEngines.knownTypes().filter { it !in registered } }
+
+    /**
+     * [EN] Two animators of the same priority that claim the same file extension, one sentence each (the one registered
+     *      first plays those files). [CN] 相同优先级且声明了相同文件扩展名的两个 animator，每条一句（先注册的播放这些文件）。
+     */
+    fun conflictDescriptions(): List<String> {
+        val list = animators()
+        val conflicts = mutableListOf<String>()
+        for (i in list.indices) for (j in i + 1 until list.size) {
+            val first = list[i]
+            val second = list[j]
+            if (first.priority != second.priority) continue
+            val shared = first.fileExtensions.map { it.lowercase() }.toSet() intersect second.fileExtensions.map { it.lowercase() }.toSet()
+            if (shared.isEmpty()) continue
+            conflicts += "${first.identifier} and ${second.identifier} both claim .${shared.sorted().joinToString(", .")} at priority ${first.priority}: " +
+                "${first.identifier} plays these files (registered first). Give one of them another priority."
+        }
+        return conflicts
+    }
+
+    /**
+     * [EN] A readable report: each registered engine, each known engine that is missing with its dependency, and the
+     *      conflicts. iOS: `+[CYLTabBarItemAnimatorRegistry registrationReport]`.
+     * [CN] 可读的报告：每个已注册引擎、每个缺少的已知引擎及其依赖，以及冲突。iOS：`+[CYLTabBarItemAnimatorRegistry registrationReport]`。
+     */
+    fun registrationReport(): String = buildList {
+        val list = animators()
+        add("[CYLAnimatedItem] Animation engines: ${list.size} registered, in lookup order.")
+        list.forEach { animator ->
+            val files = animator.fileExtensions.map { it.lowercase() }.distinct().sorted().joinToString(" ") { ".$it" }.ifEmpty { "(none)" }
+            add("  ✅ ${animator.identifier}: ${animator.javaClass.simpleName}, priority ${animator.priority}, files $files")
+        }
+        missingKnownIdentifiers().forEach { add("  ➖ $it: not in this app. To add it: implementation(\"${CYLAnimationEngines.dependencyOf(it)}:<version>\").") }
+        conflictDescriptions().forEach { add("  ⚠️ $it") }
+    }.joinToString("\n")
+
     companion object {
         /**
          * [EN] The instance the animators register into. [CN] animator 注册到的共享实例。
@@ -292,6 +344,18 @@ open class CYLTabBarItemAnimatorRegistry : CYLTabBarItemAnimatorRegistering {
         fun bindURL(url: String, animator: CYLTabBarItemAnimator?) = sharedRegistry.bindURL(url, animator)
         fun attributeKeysForGenericKey(genericKey: String) = sharedRegistry.attributeKeysForGenericKey(genericKey)
         fun fileExtensions() = sharedRegistry.fileExtensions()
+        fun registeredIdentifiers() = sharedRegistry.registeredIdentifiers()
+        fun isAnimatorRegisteredWithIdentifier(identifier: String) = sharedRegistry.isAnimatorRegisteredWithIdentifier(identifier)
+        fun missingKnownIdentifiers() = sharedRegistry.missingKnownIdentifiers()
+        fun conflictDescriptions() = sharedRegistry.conflictDescriptions()
+        fun registrationReport() = sharedRegistry.registrationReport()
+
+        /**
+         * [EN] Logs `registrationReport()` (tag "CYLAnimatedItem"). [CN] 打印 `registrationReport()`（tag 为 "CYLAnimatedItem"）。
+         */
+        fun logRegistrationReport() {
+            android.util.Log.i("CYLAnimatedItem", registrationReport())
+        }
     }
 }
 
