@@ -180,6 +180,7 @@ Analyst.ai [App Store Link](https://itunes.apple.com/us/app/analyst-ai/id1345754
 | [鸿蒙液态玻璃对标](docs/HarmonyOS-Liquid-Glass-Parity.md) | [HarmonyOS Liquid Glass parity](docs/HarmonyOS-Liquid-Glass-Parity.md) |
 | [鸿蒙端对齐](docs/HarmonyOS-Parity.md) | [HarmonyOS parity](docs/HarmonyOS-Parity.md) |
 | [纯图标 Tab 的自动居中](docs/Image-Only-Tabs.md) | [Automatic centering of image-only tabs](docs/Image-Only-Tabs.md) |
+| [发布包中的协议声明](docs/License-Notices.md) | [License notices in published packages](docs/License-Notices.md) |
 | [液态玻璃的健壮性改进](docs/Liquid-Glass-Robustness.md) | [Liquid Glass Robustness](docs/Liquid-Glass-Robustness.md) |
 | [需要登录的 Tab](docs/Login-Required-Tabs.md) | [Tabs That Need Login](docs/Login-Required-Tabs.md) |
 | [macOS CI/CD 调研报告：用 Mac 服务器构建本项目](docs/Mac-CI-CD.md) | [macOS CI/CD research: building this project on Mac servers](docs/Mac-CI-CD.md) |

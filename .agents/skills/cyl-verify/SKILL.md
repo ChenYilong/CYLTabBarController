@@ -36,6 +36,20 @@ Before pushing: `git log -1 --format=%B | python3 -c "import re,sys; sys.exit(1 
 
 **Badge animation build controls default to NO (added 2026-11-17)**: every build control that turns badge animations off, including but not limited to the iOS Swift compilation condition `CYL_BADGE_ANIMATION_DISABLED`, the Android Gradle property `-PcylBadgeAnimationDisabled` (`BuildConfig.CYL_BADGE_ANIMATION_DISABLED`, also in the React Native and Flutter Android builds), the HarmonyOS `buildProfileFields` entry `CYL_BADGE_ANIMATION_DISABLED` in `cyltabbar/build-profile.json5`, the WeChat Mini Program constant `CYL_BADGE_ANIMATION_DISABLED` in `src/cyl-tab-bar/cyl_debug.js`, and any badge animation switch added later, defaults to NO (not set, `false`): badges animate as the app asks. Set one to YES (`true`) only while debugging badges: badge coordinates, offsets and alignment with the icon or other views. Set it on locally only; never commit, merge, release or publish it as YES (no Podfile, Xcode project, `gradle.properties`, CI setting or package with it on), and set it back to NO when the debugging is done, then check once more with animations on. Details: `docs/Badge-Debugging.md`.
 
+## License notice in every published package
+
+Every package published to an outside registry (CocoaPods, Swift Package Manager, Carthage, Maven / Gradle, npm, pub.dev,
+ohpm, the WeChat Mini Program npm package) ships the root `LICENSE` inside the package, on every platform:
+
+- iOS: in the package's resource `.bundle` (`CYLTabBarController.bundle/LICENSE`, `CYLAnimatedItem.bundle/LICENSE`).
+- Android: in the library's Java resources, `src/main/resources/META-INF/<module>/LICENSE` (packed into the AAR).
+- Mini program: in the component folder (`src/LICENSE`) and at the package root.
+- npm, pub.dev, ohpm: at the package root, which the registry publishes.
+- A package without a built-in resource folder gets one, or the license at its root.
+
+Before pushing: `python3 scripts/check-license-notices.py` (exits 1 and names each missing file). A new published package
+gets its license file, a row in `docs/License-Notices.md` and an entry in the script, in the same change.
+
 ## Where a check runs: GitHub CI or locally
 
 GitHub CI/CD for iOS runs on **macOS 26** by default: always read `.github/workflows/ios.yml` on master first to confirm it

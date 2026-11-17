@@ -227,6 +227,16 @@ Every new feature and user-visible change ships with bilingual documentation in 
   `cyl_addBadgeHelperTable`) is created by the example itself with `.insetGrouped`. Keep this when porting a demo.
 - **Examples**: they import only `#import <CYLTabBarController/CYLTabBarController.h>` (Swift: `import CYLTabBarController`),
   and their Podfiles must not need changes.
+- **License notice in every published package (added 2026-11-17)**: all code published to an outside registry
+  (including but not limited to CocoaPods, Swift Package Manager, Carthage, Maven / Gradle, npm, pub.dev, ohpm and the
+  WeChat Mini Program npm package) must ship the license notice (the root `LICENSE`) inside the package. When the
+  package has a built-in resource folder, put the license there: on iOS the package's resource `.bundle` contains the
+  license file (`CYLTabBarController.bundle/LICENSE`, `CYLAnimatedItem.bundle/LICENSE`); on Android the library's Java
+  resources (`src/main/resources/META-INF/<module>/LICENSE`); for the mini program the component folder (`src/LICENSE`).
+  When it has none, create one, or put the license at the package root where the registry publishes it (npm, pub.dev,
+  ohpm). This applies to every platform. A new published package gets its license file, a row in
+  [docs/License-Notices.md](docs/License-Notices.md) and an entry in `scripts/check-license-notices.py` in the same change;
+  run `python3 scripts/check-license-notices.py` before pushing.
 - **Verify** before pushing: `pod lib lint CYLTabBarController.podspec --quick`, plus a build or static check of the
   changed code. Say plainly what could not be verified.
 
@@ -541,6 +551,7 @@ scripts/unit-tests.sh "iPhone 17 Pro Max"
 scripts/ci-build-example.sh <demo folder>
 python3 scripts/update-docs-navigation.py
 python3 scripts/sync-agent-skills.py --check
+python3 scripts/check-license-notices.py
 scripts/publish-android.sh staging        # Android library: build and check the Maven bundle (local | staging | central | github)
 ```
 

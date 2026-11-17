@@ -122,6 +122,13 @@ Every example, existing and new, integrates CYLTableViewPlaceHolder with CocoaPo
 offline. MJRefresh is not used (`mj_` → `cyl_`, `MJRefresh…` → `CYLRefresh…`). Library-caused build errors go into
 `docs/CYLTableViewPlaceHolder-Integration-Issues.md`. AGENTS.md, "Depending on CYLTableViewPlaceHolder".
 
+## A new published package: its license notice
+
+A new library or package published to a registry (a pod, a Maven artifact, an npm, pub.dev or ohpm package) ships the
+root `LICENSE` inside it: in its resource `.bundle` on iOS, in `src/main/resources/META-INF/<module>/` on Android, in the
+component folder for a mini program, otherwise at the package root (create the resource folder when there is none).
+Add it to `docs/License-Notices.md` and `scripts/check-license-notices.py`, and run the script.
+
 ## Plus button in demos
 
 - **A raised plus button (added 2026-11-12)**: when an example demonstrates the plus button, always prefer the raised look: the top of the plus button reaches above the top edge of the tab bar (an image taller than the bar, and/or `+multiplierOfTabBarHeight:` below 0.5 or a negative `+constantOfPlusButtonCenterYOffsetForTabBarHeight:`), in every style (classic, Liquid Glass, FlatDesign). A demo that needs a flat plus button (inside the bar) says so in its title or comment.

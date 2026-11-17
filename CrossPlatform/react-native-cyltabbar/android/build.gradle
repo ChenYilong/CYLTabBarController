@@ -68,7 +68,7 @@ android {
           "${cylAndroidRoot}/tabpages/src/main/kotlin",
         ]
         res.srcDirs += ["${cylAndroidRoot}/cyltabbar/src/main/res", "${cylAndroidRoot}/cylanimateditem/src/main/res"]
-        resources.srcDirs += ["${cylAndroidRoot}/cylanimateditem/src/main/resources"]
+        resources.srcDirs += ["${cylAndroidRoot}/cyltabbar/src/main/resources", "${cylAndroidRoot}/cylanimateditem/src/main/resources"]
       }
     }
   }
