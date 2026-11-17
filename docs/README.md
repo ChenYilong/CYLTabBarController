@@ -323,6 +323,7 @@ docs/
 │   ├── ios-flatdesign-animateditem-tab-ios26-4-a6e88609.png
 │   ├── ios-flatdesign-gif-no-image-under-animation-ios26-4-5ba3a089.png
 │   ├── ios-playback-controls-message-tab-iphone17pro-ios26.1-dc04439.png
+│   ├── iphone-duo-tab-bar-ios27-2-b356c1e6.png
 │   ├── issue-561-ipad-tab-bars-ios.png
 │   ├── liquid-glass-plus-stand-in-landscape-ios.png
 │   ├── liquid-glass-robustness-more-ios.png
