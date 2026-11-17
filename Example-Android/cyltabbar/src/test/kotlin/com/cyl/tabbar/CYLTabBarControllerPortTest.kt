@@ -299,6 +299,8 @@ class CYLTabBarControllerPortTest {
         val view = CYLTabBarItemAnimationFactory.animationViewWithURL(activity, file.absolutePath, CYLSize(30f, 30f), ImageView.ScaleType.FIT_CENTER)
         assertNotNull(view)
         assertTrue(view!!.cyl_isLottieAnimationView())
+        assertEquals("merge paths are on, as on iOS", true,
+            view.javaClass.getMethod("isMergePathsEnabledForKitKatAndAbove").invoke(view))
         val player = CYLTabBarItemAnimationFactory.playerForView(view)!!
         player.animationSpeed = 1.5f
         assertEquals(1.5f, player.animationSpeed, 0.01f)

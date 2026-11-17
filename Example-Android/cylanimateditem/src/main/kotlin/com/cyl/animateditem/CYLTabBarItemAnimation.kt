@@ -712,6 +712,11 @@ object CYLLottieTabBarItemAnimator : CYLTabBarItemAnimator {
 
     override fun animationViewWithURL(context: Context, url: String, size: CYLSize, contentMode: ImageView.ScaleType): View? {
         val view = CYLReflection.newInstance(VIEW_CLASS, context) as? View ?: return null
+        // [EN] Merge paths (common in After Effects exports): lottie-android leaves them off and then draws such a file
+        //      wrongly or not at all, while lottie-ios draws them. On, as on iOS.
+        // [CN] 合并路径（After Effects 导出的文件中很常见）：lottie-android 默认关闭，此时这类文件会画错或完全不画，
+        //      而 lottie-ios 会绘制它们。与 iOS 一致，打开。
+        CYLReflection.call(view, "enableMergePathsForKitKatAndAbove", true)
         val file = url.substringBefore('#')
         setFailureListener(view, file)
         if (CYLTabBarItemAnimationFiles.isRemote(file)) {
