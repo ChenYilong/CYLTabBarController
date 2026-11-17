@@ -120,7 +120,20 @@ fun View.cyl_addTabBarItemAnimationWithURL(url: String?, size: CYLSize?, content
     if (url.isNullOrBlank() || animationStates[this]?.view != null) return
     val state = CYLTabAnimationState(url, size, contentMode, speed, null, null)
     animationStates[this] = state
+    cyl_installAnimationFailureFallback()
     cyl_insertAnimationView(state)
+}
+
+/**
+ * [EN] A tab button whose animation file fails shows its image again, as on iOS (the engine reports through
+ *      `CYLTabBarItemAnimationFailure`, which lives in `:cylanimateditem` and does not know the tab bar).
+ * [CN] 动画文件加载失败的 Tab 按钮重新显示图片，与 iOS 一致（引擎通过 `:cylanimateditem` 中不了解 TabBar 的
+ *      `CYLTabBarItemAnimationFailure` 报告）。
+ */
+private fun cyl_installAnimationFailureFallback() {
+    if (CYLTabBarItemAnimationFailure.fallbackHandler == null) {
+        CYLTabBarItemAnimationFailure.fallbackHandler = { host -> host.cyl_replaceTabBarItemAnimationWithURL(null, null) }
+    }
 }
 
 /**
@@ -184,6 +197,7 @@ fun View.cyl_replaceTabBarItemAnimationWithURL(url: String?, size: CYLSize?, con
     }
     val state = CYLTabAnimationState(url, size, contentMode, previous?.speed ?: 0f, previous?.view, null, previous?.playing ?: false)
     animationStates[this] = state
+    cyl_installAnimationFailureFallback()
     cyl_insertAnimationView(state)
     if (state.playing) cyl_tabBarItemAnimationPlayer?.showLastFrame()
 }

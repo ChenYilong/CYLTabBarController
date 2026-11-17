@@ -4,7 +4,7 @@
 [EN] Every comment on public API, one line or several, is a block in the platform's official documentation form, written
      on its own lines above the declaration (opener, ` * text` lines, closer), and a public file uses one comment format:
        - Objective-C public headers (CYLTabBarController/**/*.h):  /*!  …  */   (HeaderDoc, Xcode Quick Help)
-       - Kotlin / Java (Example-Android/cyltabbar, tabpages):      /**  …  */   (KDoc / Javadoc)
+       - Kotlin / Java (Example-Android/cyltabbar, cylanimateditem, tabpages): /**  …  */   (KDoc / Javadoc)
        - TypeScript / JavaScript (CrossPlatform/react-native-…):    /**  …  */   (TSDoc / JSDoc)
        - Dart (CrossPlatform/flutter_cyltabbar/lib):               ///          (Effective Dart's only doc form; checked only)
      Reported (exit 1), and rewritten with --fix (same text):
@@ -201,7 +201,7 @@ def files():
     for path in glob.glob(os.path.join(ROOT, 'CYLTabBarController', '**', '*.h'), recursive=True):
         if 'Private' not in path:
             found.append((path, 'objc'))
-    for module in ('cyltabbar', 'tabpages'):
+    for module in ('cyltabbar', 'cylanimateditem', 'tabpages'):
         for ext in ('kt', 'java'):
             for path in glob.glob(os.path.join(ROOT, 'Example-Android', module, 'src', 'main', '**', '*.' + ext), recursive=True):
                 found.append((path, 'jvm'))

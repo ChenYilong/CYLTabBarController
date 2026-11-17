@@ -3,6 +3,7 @@
 
 package com.cyl.tabbar
 
+import androidx.annotation.RestrictTo
 import android.content.Context
 import android.content.res.Configuration
 import android.net.Uri
@@ -64,7 +65,8 @@ fun CYLTabBarAnimationURLWithOptions(fileURL: String?, options: Map<CYLTabBarAni
 /**
  * [EN] Splits a tab's animation URL into the file and its options (the reverse of `CYLTabBarAnimationURLWithOptions()`). [CN] 把 Tab 的动画 URL 拆成文件与选项。
  */
-internal fun CYLTabBarAnimationFileAndOptions(url: String): Pair<String, Map<String, String>> {
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+fun CYLTabBarAnimationFileAndOptions(url: String): Pair<String, Map<String, String>> {
     val fragment = url.substringAfter('#', "")
     val options = fragment.split('&').filter { it.contains('=') }.associate { Uri.decode(it.substringBefore('=')) to Uri.decode(it.substringAfter('=')) }
     return url.substringBefore('#') to options
@@ -73,7 +75,8 @@ internal fun CYLTabBarAnimationFileAndOptions(url: String): Pair<String, Map<Str
 /**
  * [EN] The lowercase extension of a URL or path, without options or query. [CN] URL 或路径的小写扩展名（不含选项与查询）。
  */
-internal fun CYLTabBarAnimationFileExtension(url: String): String =
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+fun CYLTabBarAnimationFileExtension(url: String): String =
     url.substringBefore('#').substringBefore('?').substringAfterLast('/').substringAfterLast('.', "").lowercase()
 
 // MARK: - Players 播放器
@@ -317,14 +320,14 @@ open class CYLTabBarItemAnimationFactory(val registry: CYLTabBarItemAnimatorRegi
         view.isClickable = false
         view.isFocusable = false
         (view as? ImageView)?.scaleType = contentMode
-        view.setTag(R.id.cyl_tab_bar_item_animation_player, animator.playerForAnimationView(view))
+        view.setTag(com.cyl.animateditem.R.id.cyl_tab_bar_item_animation_player, animator.playerForAnimationView(view))
         return view
     }
 
     override fun playerForView(view: View?): CYLTabBarItemAnimationPlayer? {
         view ?: return null
-        (view.getTag(R.id.cyl_tab_bar_item_animation_player) as? CYLTabBarItemAnimationPlayer)?.let { return it }
-        return registry.animators().firstNotNullOfOrNull { it.playerForAnimationView(view) }?.also { view.setTag(R.id.cyl_tab_bar_item_animation_player, it) }
+        (view.getTag(com.cyl.animateditem.R.id.cyl_tab_bar_item_animation_player) as? CYLTabBarItemAnimationPlayer)?.let { return it }
+        return registry.animators().firstNotNullOfOrNull { it.playerForAnimationView(view) }?.also { view.setTag(com.cyl.animateditem.R.id.cyl_tab_bar_item_animation_player, it) }
     }
 
     override fun isAnimationView(view: View?): Boolean = playerForView(view) != null
@@ -395,9 +398,9 @@ open class CYLTabBarItemViewAnimator(
     override fun playerForAnimationView(view: View): CYLTabBarItemAnimationPlayer? {
         val playable = view as? CYLTabBarItemAnimationPlayableView ?: return null
         // [EN] A playable view made by another view animator is not this one's. [CN] 其他 view animator 创建的可播放视图不属于本 animator。
-        val owner = view.getTag(R.id.cyl_tab_bar_item_view_animator) as? String
+        val owner = view.getTag(com.cyl.animateditem.R.id.cyl_tab_bar_item_view_animator) as? String
         if (owner != null && owner != identifier) return null
-        view.setTag(R.id.cyl_tab_bar_item_view_animator, identifier)
+        view.setTag(com.cyl.animateditem.R.id.cyl_tab_bar_item_view_animator, identifier)
         return object : CYLTabBarItemAnimationBasePlayer(view) {
             private var appliedColors: Map<String, Int>? = null
             override fun play() = playable.cyl_playAnimationView()
@@ -486,7 +489,8 @@ object CYLTabBarItemAnimationFiles {
 /**
  * [EN] Calls a method by name with arguments adapted to its parameters; null when it cannot. [CN] 按名称调用方法并适配参数；无法调用时返回 null。
  */
-internal object CYLReflection {
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+object CYLReflection {
     fun type(name: String): Class<*>? = try { Class.forName(name) } catch (error: ClassNotFoundException) { null } catch (error: LinkageError) { null }
 
     /**
@@ -616,12 +620,12 @@ object CYLLottieTabBarItemAnimator : CYLTabBarItemAnimator {
     override val priority: CYLTabBarItemAnimatorPriority = CYLTabBarItemAnimatorPriorityFallback
     override val fileExtensions: List<String> = listOf("json", "lottie", "zip")
     override val attributeKeys: Map<String, String> = mapOf(
-        CYLConstants.CYLTabBarAnimationURL to CYLConstants.CYLTabBarLottieURL,
-        CYLConstants.CYLTabBarAnimationFilePath to CYLConstants.CYLTabBarLottieFilePath,
-        CYLConstants.CYLTabBarAnimationSize to CYLConstants.CYLTabBarLottieSize,
-        CYLConstants.CYLTabBarAnimationDarkURL to CYLConstants.CYLTabBarLottieDarkURL,
-        CYLConstants.CYLTabBarAnimationDarkFilePath to CYLConstants.CYLTabBarLottieDarkFilePath,
-        CYLConstants.CYLTabBarAnimationDarkColors to CYLConstants.CYLTabBarLottieDarkColors,
+        CYLTabBarItemAnimationKeys.CYLTabBarAnimationURL to CYLTabBarItemAnimationKeys.CYLTabBarLottieURL,
+        CYLTabBarItemAnimationKeys.CYLTabBarAnimationFilePath to CYLTabBarItemAnimationKeys.CYLTabBarLottieFilePath,
+        CYLTabBarItemAnimationKeys.CYLTabBarAnimationSize to CYLTabBarItemAnimationKeys.CYLTabBarLottieSize,
+        CYLTabBarItemAnimationKeys.CYLTabBarAnimationDarkURL to CYLTabBarItemAnimationKeys.CYLTabBarLottieDarkURL,
+        CYLTabBarItemAnimationKeys.CYLTabBarAnimationDarkFilePath to CYLTabBarItemAnimationKeys.CYLTabBarLottieDarkFilePath,
+        CYLTabBarItemAnimationKeys.CYLTabBarAnimationDarkColors to CYLTabBarItemAnimationKeys.CYLTabBarLottieDarkColors,
     )
 
     override fun canAnimateFileAtURL(url: String): Boolean = url.isNotEmpty()
@@ -651,7 +655,7 @@ object CYLLottieTabBarItemAnimator : CYLTabBarItemAnimator {
             when (method.name) {
                 "onResult" -> {
                     Log.w("CYLTabBarController", "Lottie could not load $file: ${(args?.firstOrNull() as? Throwable)?.message}")
-                    view.post { (view.parent as? View)?.cyl_replaceTabBarItemAnimationWithURL(null, null) }
+                    view.post { CYLTabBarItemAnimationFailure.report(view) }
                     null
                 }
                 "hashCode" -> System.identityHashCode(proxy)
@@ -721,11 +725,11 @@ object CYLPAGTabBarItemAnimator : CYLTabBarItemAnimator {
     override val identifier: String = "PAG"
     override val fileExtensions: List<String> = listOf("pag")
     override val attributeKeys: Map<String, String> = mapOf(
-        CYLConstants.CYLTabBarAnimationURL to CYLConstants.CYLTabBarPAGURL,
-        CYLConstants.CYLTabBarAnimationFilePath to CYLConstants.CYLTabBarPAGFilePath,
-        CYLConstants.CYLTabBarAnimationSize to CYLConstants.CYLTabBarPAGSize,
-        CYLConstants.CYLTabBarAnimationDarkURL to CYLConstants.CYLTabBarPAGDarkURL,
-        CYLConstants.CYLTabBarAnimationDarkFilePath to CYLConstants.CYLTabBarPAGDarkFilePath,
+        CYLTabBarItemAnimationKeys.CYLTabBarAnimationURL to CYLTabBarItemAnimationKeys.CYLTabBarPAGURL,
+        CYLTabBarItemAnimationKeys.CYLTabBarAnimationFilePath to CYLTabBarItemAnimationKeys.CYLTabBarPAGFilePath,
+        CYLTabBarItemAnimationKeys.CYLTabBarAnimationSize to CYLTabBarItemAnimationKeys.CYLTabBarPAGSize,
+        CYLTabBarItemAnimationKeys.CYLTabBarAnimationDarkURL to CYLTabBarItemAnimationKeys.CYLTabBarPAGDarkURL,
+        CYLTabBarItemAnimationKeys.CYLTabBarAnimationDarkFilePath to CYLTabBarItemAnimationKeys.CYLTabBarPAGDarkFilePath,
     )
 
     override fun canAnimateFileAtURL(url: String): Boolean = CYLTabBarAnimationFileExtension(url) == "pag"
@@ -775,12 +779,12 @@ object CYLRiveTabBarItemAnimator {
     @JvmStatic
     val animator: CYLTabBarItemViewAnimator by lazy {
         CYLTabBarItemViewAnimator("Rive", listOf("riv"), mapOf(
-            CYLConstants.CYLTabBarAnimationURL to CYLConstants.CYLTabBarRiveURL,
-            CYLConstants.CYLTabBarAnimationFilePath to CYLConstants.CYLTabBarRiveFilePath,
-            CYLConstants.CYLTabBarAnimationSize to CYLConstants.CYLTabBarRiveSize,
-            CYLConstants.CYLTabBarAnimationDarkURL to CYLConstants.CYLTabBarRiveDarkURL,
-            CYLConstants.CYLTabBarAnimationDarkFilePath to CYLConstants.CYLTabBarRiveDarkFilePath,
-            CYLConstants.CYLTabBarAnimationDarkColors to CYLConstants.CYLTabBarRiveDarkColors,
+            CYLTabBarItemAnimationKeys.CYLTabBarAnimationURL to CYLTabBarItemAnimationKeys.CYLTabBarRiveURL,
+            CYLTabBarItemAnimationKeys.CYLTabBarAnimationFilePath to CYLTabBarItemAnimationKeys.CYLTabBarRiveFilePath,
+            CYLTabBarItemAnimationKeys.CYLTabBarAnimationSize to CYLTabBarItemAnimationKeys.CYLTabBarRiveSize,
+            CYLTabBarItemAnimationKeys.CYLTabBarAnimationDarkURL to CYLTabBarItemAnimationKeys.CYLTabBarRiveDarkURL,
+            CYLTabBarItemAnimationKeys.CYLTabBarAnimationDarkFilePath to CYLTabBarItemAnimationKeys.CYLTabBarRiveDarkFilePath,
+            CYLTabBarItemAnimationKeys.CYLTabBarAnimationDarkColors to CYLTabBarItemAnimationKeys.CYLTabBarRiveDarkColors,
         ), CYLRiveTabBarItemAnimationView.Provider)
     }
 }
@@ -797,9 +801,9 @@ class CYLRiveTabBarItemAnimationView private constructor(context: Context, priva
     android.widget.FrameLayout(context), CYLTabBarItemAnimationPlayableView {
 
     private val handler = Handler(Looper.getMainLooper())
-    private val stateMachine get() = options[CYLConstants.CYLTabBarAnimationOptionRiveStateMachine]
-    private val booleanInput get() = options[CYLConstants.CYLTabBarAnimationOptionRiveInput] ?: options[CYLConstants.CYLTabBarAnimationOptionRiveActiveProperty] ?: "active"
-    private val activeDuration get() = options[CYLConstants.CYLTabBarAnimationOptionRiveActiveDuration]?.toDoubleOrNull() ?: 1.0
+    private val stateMachine get() = options[CYLTabBarItemAnimationKeys.CYLTabBarAnimationOptionRiveStateMachine]
+    private val booleanInput get() = options[CYLTabBarItemAnimationKeys.CYLTabBarAnimationOptionRiveInput] ?: options[CYLTabBarItemAnimationKeys.CYLTabBarAnimationOptionRiveActiveProperty] ?: "active"
+    private val activeDuration get() = options[CYLTabBarItemAnimationKeys.CYLTabBarAnimationOptionRiveActiveDuration]?.toDoubleOrNull() ?: 1.0
 
     init {
         addView(rive, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
@@ -834,8 +838,8 @@ class CYLRiveTabBarItemAnimationView private constructor(context: Context, priva
     override fun cyl_playAnimationView() {
         handler.removeCallbacksAndMessages(null)
         val machine = stateMachine
-        val trigger = options[CYLConstants.CYLTabBarAnimationOptionRiveTriggerInput] ?: options[CYLConstants.CYLTabBarAnimationOptionRiveTriggerProperty]
-        val animation = options[CYLConstants.CYLTabBarAnimationOptionRiveAnimation]
+        val trigger = options[CYLTabBarItemAnimationKeys.CYLTabBarAnimationOptionRiveTriggerInput] ?: options[CYLTabBarItemAnimationKeys.CYLTabBarAnimationOptionRiveTriggerProperty]
+        val animation = options[CYLTabBarItemAnimationKeys.CYLTabBarAnimationOptionRiveAnimation]
         val default = CYLReflection.DEFAULT
         when {
             machine != null && trigger != null -> { if (hasInput(machine, trigger)) CYLReflection.call(rive, "fireState", machine, trigger) }
@@ -901,18 +905,18 @@ class CYLRiveTabBarItemAnimationView private constructor(context: Context, priva
          */
         private fun load(rive: View, bytes: ByteArray, options: Map<String, String>, contentMode: ImageView.ScaleType) {
             val default = CYLReflection.DEFAULT
-            val stateMachine = options[CYLConstants.CYLTabBarAnimationOptionRiveStateMachine]
+            val stateMachine = options[CYLTabBarItemAnimationKeys.CYLTabBarAnimationOptionRiveStateMachine]
             val fit = when (contentMode) {
                 ImageView.ScaleType.FIT_XY -> "FILL"
                 ImageView.ScaleType.CENTER_CROP -> "COVER"
                 else -> "CONTAIN"
             }.let { CYLReflection.enumConstant("app.rive.runtime.kotlin.core.Fit", it) } ?: default
-            val loaded = CYLReflection.callKotlin(rive, "setRiveBytes", bytes, options[CYLConstants.CYLTabBarAnimationOptionRiveArtboard] ?: default,
+            val loaded = CYLReflection.callKotlin(rive, "setRiveBytes", bytes, options[CYLTabBarItemAnimationKeys.CYLTabBarAnimationOptionRiveArtboard] ?: default,
                 default, stateMachine ?: default, stateMachine != null, default, fit, default, default)
             // [EN] An older rive-android without these parameters: the bytes, then the artboard. [CN] 没有这些参数的旧版 rive-android：先设置数据，再设置画板。
             if (loaded == null) {
                 CYLReflection.callWithDefaults(rive, "setRiveBytes", mapOf(ByteArray::class.java to bytes))
-                options[CYLConstants.CYLTabBarAnimationOptionRiveArtboard]?.let { CYLReflection.call(rive, "setArtboardName", it) }
+                options[CYLTabBarItemAnimationKeys.CYLTabBarAnimationOptionRiveArtboard]?.let { CYLReflection.call(rive, "setArtboardName", it) }
             }
         }
     }

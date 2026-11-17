@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- [EN] View tag keys of the animation engine. [CN] 动画引擎使用的视图 tag key。 -->
+<resources>
+    <item name="cyl_tab_bar_item_animation_player" type="id" />
+    <item name="cyl_tab_bar_item_view_animator" type="id" />
+    <!-- [EN] The parse state of an SVGA tab icon. [CN] SVGA Tab 图标的解析状态。 -->
+    <item name="cyl_svga_state" type="id" />
+</resources>

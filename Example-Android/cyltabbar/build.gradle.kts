@@ -48,6 +48,7 @@ android {
 dependencies {
     // The page registry and the configuration rules (pure Kotlin). 页面注册表与配置规则（纯 Kotlin）。
     api(project(":tabpages"))
+    api(project(":cylanimateditem"))
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.fragment.ktx)
     // [EN] Only for `cyl_setupWithViewPager2`: an app that uses it adds ViewPager2 itself. [CN] 仅用于 `cyl_setupWithViewPager2`：使用它的 App 自行添加 ViewPager2。

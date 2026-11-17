@@ -56,60 +56,60 @@ public final class CYLConstants {
 
     // MARK: - Tab animations 动画键 (Lottie, the generic keys, PAG, Rive, options)
 
-    public static final String CYLTabBarLottieFilePath = "CYLTabBarLottieFilePath";
-    public static final String CYLTabBarLottieURL = "CYLTabBarLottieURL";
-    public static final String CYLTabBarLottieSize = "CYLTabBarLottieSize";
-    public static final String CYLTabBarLottieDarkURL = "CYLTabBarLottieDarkURL";
-    public static final String CYLTabBarLottieDarkFilePath = "CYLTabBarLottieDarkFilePath";
-    public static final String CYLTabBarLottieDarkColors = "CYLTabBarLottieDarkColors";
+    public static final String CYLTabBarLottieFilePath = CYLTabBarItemAnimationKeys.CYLTabBarLottieFilePath;
+    public static final String CYLTabBarLottieURL = CYLTabBarItemAnimationKeys.CYLTabBarLottieURL;
+    public static final String CYLTabBarLottieSize = CYLTabBarItemAnimationKeys.CYLTabBarLottieSize;
+    public static final String CYLTabBarLottieDarkURL = CYLTabBarItemAnimationKeys.CYLTabBarLottieDarkURL;
+    public static final String CYLTabBarLottieDarkFilePath = CYLTabBarItemAnimationKeys.CYLTabBarLottieDarkFilePath;
+    public static final String CYLTabBarLottieDarkColors = CYLTabBarItemAnimationKeys.CYLTabBarLottieDarkColors;
     public static final String CYLTabBarLottieLoopsWhenUnselected = "CYLTabBarLottieLoopsWhenUnselected";
-    public static final String CYLTabBarAnimationURL = "CYLTabBarAnimationURL";
-    public static final String CYLTabBarAnimationFilePath = "CYLTabBarAnimationFilePath";
-    public static final String CYLTabBarAnimationSize = "CYLTabBarAnimationSize";
-    public static final String CYLTabBarAnimationDarkURL = "CYLTabBarAnimationDarkURL";
-    public static final String CYLTabBarAnimationDarkFilePath = "CYLTabBarAnimationDarkFilePath";
-    public static final String CYLTabBarAnimationDarkColors = "CYLTabBarAnimationDarkColors";
+    public static final String CYLTabBarAnimationURL = CYLTabBarItemAnimationKeys.CYLTabBarAnimationURL;
+    public static final String CYLTabBarAnimationFilePath = CYLTabBarItemAnimationKeys.CYLTabBarAnimationFilePath;
+    public static final String CYLTabBarAnimationSize = CYLTabBarItemAnimationKeys.CYLTabBarAnimationSize;
+    public static final String CYLTabBarAnimationDarkURL = CYLTabBarItemAnimationKeys.CYLTabBarAnimationDarkURL;
+    public static final String CYLTabBarAnimationDarkFilePath = CYLTabBarItemAnimationKeys.CYLTabBarAnimationDarkFilePath;
+    public static final String CYLTabBarAnimationDarkColors = CYLTabBarItemAnimationKeys.CYLTabBarAnimationDarkColors;
     public static final String CYLTabBarAnimationColors = "CYLTabBarAnimationColors";
     public static final String CYLTabBarAnimationOptions = "CYLTabBarAnimationOptions";
-    public static final String CYLTabBarPAGURL = "CYLTabBarPAGURL";
-    public static final String CYLTabBarPAGFilePath = "CYLTabBarPAGFilePath";
-    public static final String CYLTabBarPAGSize = "CYLTabBarPAGSize";
-    public static final String CYLTabBarPAGDarkURL = "CYLTabBarPAGDarkURL";
-    public static final String CYLTabBarPAGDarkFilePath = "CYLTabBarPAGDarkFilePath";
-    public static final String CYLTabBarRiveURL = "CYLTabBarRiveURL";
-    public static final String CYLTabBarRiveFilePath = "CYLTabBarRiveFilePath";
-    public static final String CYLTabBarRiveSize = "CYLTabBarRiveSize";
-    public static final String CYLTabBarRiveDarkURL = "CYLTabBarRiveDarkURL";
-    public static final String CYLTabBarRiveDarkFilePath = "CYLTabBarRiveDarkFilePath";
-    public static final String CYLTabBarRiveDarkColors = "CYLTabBarRiveDarkColors";
+    public static final String CYLTabBarPAGURL = CYLTabBarItemAnimationKeys.CYLTabBarPAGURL;
+    public static final String CYLTabBarPAGFilePath = CYLTabBarItemAnimationKeys.CYLTabBarPAGFilePath;
+    public static final String CYLTabBarPAGSize = CYLTabBarItemAnimationKeys.CYLTabBarPAGSize;
+    public static final String CYLTabBarPAGDarkURL = CYLTabBarItemAnimationKeys.CYLTabBarPAGDarkURL;
+    public static final String CYLTabBarPAGDarkFilePath = CYLTabBarItemAnimationKeys.CYLTabBarPAGDarkFilePath;
+    public static final String CYLTabBarRiveURL = CYLTabBarItemAnimationKeys.CYLTabBarRiveURL;
+    public static final String CYLTabBarRiveFilePath = CYLTabBarItemAnimationKeys.CYLTabBarRiveFilePath;
+    public static final String CYLTabBarRiveSize = CYLTabBarItemAnimationKeys.CYLTabBarRiveSize;
+    public static final String CYLTabBarRiveDarkURL = CYLTabBarItemAnimationKeys.CYLTabBarRiveDarkURL;
+    public static final String CYLTabBarRiveDarkFilePath = CYLTabBarItemAnimationKeys.CYLTabBarRiveDarkFilePath;
+    public static final String CYLTabBarRiveDarkColors = CYLTabBarItemAnimationKeys.CYLTabBarRiveDarkColors;
     /**
      * [EN] GIF keys (#605, CYLGIFTabBarItemAnimator.h): a GIF plays once when its tab is selected. [CN] GIF 键（#605）：选中 Tab 时播放一次。
      */
-    public static final String CYLTabBarGIFURL = "CYLTabBarGIFURL";
-    public static final String CYLTabBarGIFFilePath = "CYLTabBarGIFFilePath";
-    public static final String CYLTabBarGIFSize = "CYLTabBarGIFSize";
-    public static final String CYLTabBarGIFDarkURL = "CYLTabBarGIFDarkURL";
-    public static final String CYLTabBarGIFDarkFilePath = "CYLTabBarGIFDarkFilePath";
+    public static final String CYLTabBarGIFURL = CYLTabBarItemAnimationKeys.CYLTabBarGIFURL;
+    public static final String CYLTabBarGIFFilePath = CYLTabBarItemAnimationKeys.CYLTabBarGIFFilePath;
+    public static final String CYLTabBarGIFSize = CYLTabBarItemAnimationKeys.CYLTabBarGIFSize;
+    public static final String CYLTabBarGIFDarkURL = CYLTabBarItemAnimationKeys.CYLTabBarGIFDarkURL;
+    public static final String CYLTabBarGIFDarkFilePath = CYLTabBarItemAnimationKeys.CYLTabBarGIFDarkFilePath;
     /**
      * [EN] SVGA keys (#415, CYLSVGATabBarItemAnimator.h): an SVGA file plays once when its tab is selected (SVGAPlayer-Android). [CN] SVGA 键（#415）：选中 Tab 时播放一次（SVGAPlayer-Android）。
      */
-    public static final String CYLTabBarSVGAURL = "CYLTabBarSVGAURL";
-    public static final String CYLTabBarSVGAFilePath = "CYLTabBarSVGAFilePath";
-    public static final String CYLTabBarSVGASize = "CYLTabBarSVGASize";
-    public static final String CYLTabBarSVGADarkURL = "CYLTabBarSVGADarkURL";
-    public static final String CYLTabBarSVGADarkFilePath = "CYLTabBarSVGADarkFilePath";
+    public static final String CYLTabBarSVGAURL = CYLTabBarItemAnimationKeys.CYLTabBarSVGAURL;
+    public static final String CYLTabBarSVGAFilePath = CYLTabBarItemAnimationKeys.CYLTabBarSVGAFilePath;
+    public static final String CYLTabBarSVGASize = CYLTabBarItemAnimationKeys.CYLTabBarSVGASize;
+    public static final String CYLTabBarSVGADarkURL = CYLTabBarItemAnimationKeys.CYLTabBarSVGADarkURL;
+    public static final String CYLTabBarSVGADarkFilePath = CYLTabBarItemAnimationKeys.CYLTabBarSVGADarkFilePath;
     /**
      * [EN] Rive options of `CYLTabBarAnimationURLWithOptions()` (CYLRiveTabBarItemAnimator.h); every value is a string. [CN] `CYLTabBarAnimationURLWithOptions()` 的 Rive 选项；值都是字符串。
      */
-    public static final String CYLTabBarAnimationOptionRiveArtboard = "artboard";
-    public static final String CYLTabBarAnimationOptionRiveStateMachine = "stateMachine";
-    public static final String CYLTabBarAnimationOptionRiveActiveProperty = "active";
-    public static final String CYLTabBarAnimationOptionRiveActiveDuration = "duration";
-    public static final String CYLTabBarAnimationOptionRiveTriggerProperty = "trigger";
+    public static final String CYLTabBarAnimationOptionRiveArtboard = CYLTabBarItemAnimationKeys.CYLTabBarAnimationOptionRiveArtboard;
+    public static final String CYLTabBarAnimationOptionRiveStateMachine = CYLTabBarItemAnimationKeys.CYLTabBarAnimationOptionRiveStateMachine;
+    public static final String CYLTabBarAnimationOptionRiveActiveProperty = CYLTabBarItemAnimationKeys.CYLTabBarAnimationOptionRiveActiveProperty;
+    public static final String CYLTabBarAnimationOptionRiveActiveDuration = CYLTabBarItemAnimationKeys.CYLTabBarAnimationOptionRiveActiveDuration;
+    public static final String CYLTabBarAnimationOptionRiveTriggerProperty = CYLTabBarItemAnimationKeys.CYLTabBarAnimationOptionRiveTriggerProperty;
     public static final String CYLTabBarAnimationOptionRiveColor = "color";
-    public static final String CYLTabBarAnimationOptionRiveInput = "input";
-    public static final String CYLTabBarAnimationOptionRiveTriggerInput = "triggerInput";
-    public static final String CYLTabBarAnimationOptionRiveAnimation = "animation";
+    public static final String CYLTabBarAnimationOptionRiveInput = CYLTabBarItemAnimationKeys.CYLTabBarAnimationOptionRiveInput;
+    public static final String CYLTabBarAnimationOptionRiveTriggerInput = CYLTabBarItemAnimationKeys.CYLTabBarAnimationOptionRiveTriggerInput;
+    public static final String CYLTabBarAnimationOptionRiveAnimation = CYLTabBarItemAnimationKeys.CYLTabBarAnimationOptionRiveAnimation;
     public static final String CYLTabBarAnimationOptionRiveLegacyRuntime = "legacy";
 
     // MARK: - Configuration keys 配置键 (CYLTabBarController (CYLConfiguration))

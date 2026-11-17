@@ -5,14 +5,15 @@
 #        staging  Example-Android/build/staging-deploy and a Maven Central bundle (zip), checked; nothing is uploaded.
 #        central  staging, then uploads the bundle to Maven Central (the Central Portal) and waits for its validation.
 #        github   GitHub Packages (a Maven repository of the GitHub repository).
-#      Artifacts: io.github.chenyilong:cyltabbarcontroller (aar) and io.github.chenyilong:cyltabbarcontroller-pages
+#      Artifacts: io.github.chenyilong:cyltabbarcontroller (aar), io.github.chenyilong:cyltabbarcontroller-animateditem (aar)
+#      and io.github.chenyilong:cyltabbarcontroller-pages
 #      (jar), with sources, javadoc, the POM and the Gradle module metadata. The version follows CYLTabBarController.podspec.
 # [CN] 用 Gradle 把 CYLTabBarController 的 Android 库（Example-Android：`cyltabbar` 及其依赖的 `tabpages` 模块）发布到 Maven 仓库：
 #        local    ~/.m2（Maven Local），在其他工程中试用。默认。
 #        staging  Example-Android/build/staging-deploy 与 Maven Central 上传包（zip），并做检查；不上传。
 #        central  先 staging，再把上传包上传到 Maven Central（Central Portal）并等待校验。
 #        github   GitHub Packages（GitHub 仓库的 Maven 仓库）。
-#      产物：io.github.chenyilong:cyltabbarcontroller（aar）与 io.github.chenyilong:cyltabbarcontroller-pages（jar），带源码、javadoc、
+#      产物：io.github.chenyilong:cyltabbarcontroller（aar）、io.github.chenyilong:cyltabbarcontroller-animateditem（aar）与 io.github.chenyilong:cyltabbarcontroller-pages（jar），带源码、javadoc、
 #      POM 与 Gradle 模块元数据。版本默认与 CYLTabBarController.podspec 一致。
 #
 # Usage 用法:
@@ -74,7 +75,7 @@ export LC_ALL=${LC_ALL:-C.UTF-8}
 GRADLE_ARGS=(-p "$PROJECT" --console=plain)
 [[ -n "$VERSION" ]] && GRADLE_ARGS+=("-PcylVersion=$VERSION")
 [[ -n "$GROUP" ]] && GRADLE_ARGS+=("-PcylGroup=$GROUP")
-MODULES=(:tabpages :cyltabbar)
+MODULES=(:tabpages :cylanimateditem :cyltabbar)
 
 run() {
     echo "+ $*"
@@ -100,7 +101,7 @@ esac
 # 1. [EN] Tests and lint, as CI would. [CN] 与 CI 一样先运行测试与 lint。
 if [[ "$SKIP_TESTS" = 0 ]]; then
     step "Tests and lint 测试与 lint"
-    run "$GRADLE" "${GRADLE_ARGS[@]}" :tabpages:test :cyltabbar:testDebugUnitTest :cyltabbar:lintRelease
+    run "$GRADLE" "${GRADLE_ARGS[@]}" :tabpages:test :cylanimateditem:testDebugUnitTest :cylanimateditem:lintRelease :cyltabbar:testDebugUnitTest :cyltabbar:lintRelease
 fi
 
 # 2. [EN] Credentials before any work that depends on them. [CN] 先检查凭据。
@@ -137,7 +138,7 @@ gradle_tasks publishAllPublicationsToStagingRepository
 # 4. [EN] Check what Maven Central requires, for both artifacts. [CN] 检查 Maven Central 对两个产物的要求。
 step "Checking the bundle 检查上传包"
 problems=0
-for artifact in cyltabbarcontroller cyltabbarcontroller-pages; do
+for artifact in cyltabbarcontroller cyltabbarcontroller-pages cyltabbarcontroller-animateditem; do
     folder="$STAGING/$GROUP_PATH/$artifact/$VERSION"
     main=aar; [[ "$artifact" = cyltabbarcontroller-pages ]] && main=jar
     for file in "$artifact-$VERSION.$main" "$artifact-$VERSION.pom" "$artifact-$VERSION-sources.jar" "$artifact-$VERSION-javadoc.jar"; do

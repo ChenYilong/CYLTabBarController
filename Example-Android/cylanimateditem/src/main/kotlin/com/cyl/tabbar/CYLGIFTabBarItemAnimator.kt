@@ -30,11 +30,11 @@ object CYLGIFTabBarItemAnimator {
     @JvmStatic
     val animator: CYLTabBarItemViewAnimator by lazy {
         CYLTabBarItemViewAnimator("GIF", listOf("gif"), mapOf(
-            CYLConstants.CYLTabBarAnimationURL to CYLConstants.CYLTabBarGIFURL,
-            CYLConstants.CYLTabBarAnimationFilePath to CYLConstants.CYLTabBarGIFFilePath,
-            CYLConstants.CYLTabBarAnimationSize to CYLConstants.CYLTabBarGIFSize,
-            CYLConstants.CYLTabBarAnimationDarkURL to CYLConstants.CYLTabBarGIFDarkURL,
-            CYLConstants.CYLTabBarAnimationDarkFilePath to CYLConstants.CYLTabBarGIFDarkFilePath,
+            CYLTabBarItemAnimationKeys.CYLTabBarAnimationURL to CYLTabBarItemAnimationKeys.CYLTabBarGIFURL,
+            CYLTabBarItemAnimationKeys.CYLTabBarAnimationFilePath to CYLTabBarItemAnimationKeys.CYLTabBarGIFFilePath,
+            CYLTabBarItemAnimationKeys.CYLTabBarAnimationSize to CYLTabBarItemAnimationKeys.CYLTabBarGIFSize,
+            CYLTabBarItemAnimationKeys.CYLTabBarAnimationDarkURL to CYLTabBarItemAnimationKeys.CYLTabBarGIFDarkURL,
+            CYLTabBarItemAnimationKeys.CYLTabBarAnimationDarkFilePath to CYLTabBarItemAnimationKeys.CYLTabBarGIFDarkFilePath,
         ), CYLGIFTabBarItemAnimationView.Provider)
     }
 }

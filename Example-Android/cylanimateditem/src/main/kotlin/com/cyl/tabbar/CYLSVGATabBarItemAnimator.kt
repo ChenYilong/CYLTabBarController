@@ -28,11 +28,11 @@ object CYLSVGATabBarItemAnimator : CYLTabBarItemAnimator {
     override val identifier: String = "SVGA"
     override val fileExtensions: List<String> = listOf("svga")
     override val attributeKeys: Map<String, String> = mapOf(
-        CYLConstants.CYLTabBarAnimationURL to CYLConstants.CYLTabBarSVGAURL,
-        CYLConstants.CYLTabBarAnimationFilePath to CYLConstants.CYLTabBarSVGAFilePath,
-        CYLConstants.CYLTabBarAnimationSize to CYLConstants.CYLTabBarSVGASize,
-        CYLConstants.CYLTabBarAnimationDarkURL to CYLConstants.CYLTabBarSVGADarkURL,
-        CYLConstants.CYLTabBarAnimationDarkFilePath to CYLConstants.CYLTabBarSVGADarkFilePath,
+        CYLTabBarItemAnimationKeys.CYLTabBarAnimationURL to CYLTabBarItemAnimationKeys.CYLTabBarSVGAURL,
+        CYLTabBarItemAnimationKeys.CYLTabBarAnimationFilePath to CYLTabBarItemAnimationKeys.CYLTabBarSVGAFilePath,
+        CYLTabBarItemAnimationKeys.CYLTabBarAnimationSize to CYLTabBarItemAnimationKeys.CYLTabBarSVGASize,
+        CYLTabBarItemAnimationKeys.CYLTabBarAnimationDarkURL to CYLTabBarItemAnimationKeys.CYLTabBarSVGADarkURL,
+        CYLTabBarItemAnimationKeys.CYLTabBarAnimationDarkFilePath to CYLTabBarItemAnimationKeys.CYLTabBarSVGADarkFilePath,
     )
 
     override fun canAnimateFileAtURL(url: String): Boolean = CYLTabBarAnimationFileExtension(url) == "svga"
@@ -46,7 +46,7 @@ object CYLSVGATabBarItemAnimator : CYLTabBarItemAnimator {
         CYLReflection.call(view, "setClearsAfterDetached", false)
         CYLReflection.enumConstant(FILL_MODE_CLASS, "Forward")?.let { CYLReflection.call(view, "setFillMode", it) }
         val state = SVGAState()
-        view.setTag(R.id.cyl_svga_state, state)
+        view.setTag(com.cyl.animateditem.R.id.cyl_svga_state, state)
         val appContext = context.applicationContext
         CYLTabBarItemAnimationFiles.localFile(context, url.substringBefore('#')) { file ->
             if (file != null) decode(appContext, file, view, state)
@@ -95,7 +95,7 @@ object CYLSVGATabBarItemAnimator : CYLTabBarItemAnimator {
     }
 
     private class SVGAPlayer(view: View) : CYLTabBarItemAnimationBasePlayer(view) {
-        private val state: SVGAState? get() = animationView?.getTag(R.id.cyl_svga_state) as? SVGAState
+        private val state: SVGAState? get() = animationView?.getTag(com.cyl.animateditem.R.id.cyl_svga_state) as? SVGAState
 
         // [EN] SVGAImageView.loops: 0 repeats without end, 1 plays once. [CN] SVGAImageView.loops：0 为无限重复，1 为播放一次。
         override var loops: Boolean = false
