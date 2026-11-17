@@ -12,6 +12,7 @@ import android.view.ViewConfiguration
 import android.view.ViewGroup
 import android.view.accessibility.AccessibilityNodeInfo
 import android.widget.Button
+import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
 import com.cyl.tabbar.CYLSize
@@ -50,7 +51,7 @@ import kotlin.math.roundToInt
 open class CYLAnimatedItemView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-) : ViewGroup(context, attrs), CYLAnimatedItemContent, CYLAnimatedItemAnimating, CYLTabBarItemAnimationFailureHandling {
+) : FrameLayout(context, attrs), CYLAnimatedItemContent, CYLAnimatedItemAnimating, CYLTabBarItemAnimationFailureHandling {
 
     /**
      * [EN] The static icon. Hidden from accessibility (the item reads as one element). [CN] 静态图标。对无障碍隐藏（条目作为一个元素朗读）。
@@ -234,7 +235,9 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
         isFocusable = true
         addView(iconView)
         addView(titleView)
-        updateAccessibility()
+        // [EN] Not `updateAccessibility()`: a subclass's `accessibilityText()` would run before its own properties exist.
+        // [CN] 不调用 `updateAccessibility()`：子类的 `accessibilityText()` 会在其属性初始化之前运行。
+        contentDescription = CYLAnimatedItemAccessibilityText(title, null)
     }
 
     // MARK: - Measuring and layout 测量与布局
@@ -390,7 +393,12 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
      */
     private fun animationShows() = animationView != null && !com.cyl.tabbar.CYLTabBarItemAnimationFailure.isLoading(animationView)
 
-    private fun updateIcon() {
+    /**
+     * [EN] Shows the static image, else the placeholder, until the animation shows. A subclass that lays out its own
+     *      icon (the tab bar's button) overrides it.
+     * [CN] 在动画显示之前显示静态图片，没有时显示占位图。自行布局图标的子类（TabBar 的按钮）可以重写。
+     */
+    protected open fun updateIcon() {
         // [EN] The static image given, else the placeholder, until the animation shows (also while it downloads).
         // [CN] 在动画显示之前（包括下载期间）显示传入的静态图片，没有时显示占位图。
         iconView.setImageDrawable((if (isSelected && selectedImage != null) selectedImage else image) ?: placeholderIfNeeded())

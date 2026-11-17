@@ -8,6 +8,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -51,6 +52,38 @@ class CYLTabBarAnimationFallbackTest {
         only.performClick()
         idle()
         assertEquals(0, controller.selectedIndex)
+    }
+
+    /**
+     * [EN] TODO 4 of docs/Animated-Item.md: the tab button is the animated item component, keeps its tab look and its
+     *      own label, and stays a frame for badges.
+     * [CN] docs/Animated-Item.md 的 TODO 4：Tab 按钮即动效组件，保留 Tab 外观与自己的朗读文本，并仍是可承载角标的帧布局。
+     */
+    @Test
+    fun theTabButtonIsTheAnimatedItemComponent() = withActivity { activity ->
+        val items = listOf(
+            mapOf(CYLConstants.CYLTabBarItemTitle to "Home", CYLConstants.CYLTabBarItemImage to androidx.core.content.ContextCompat.getDrawable(activity, android.R.drawable.ic_menu_add)),
+            mapOf(CYLConstants.CYLTabBarItemTitle to "Me", CYLConstants.CYLTabBarItemImage to androidx.core.content.ContextCompat.getDrawable(activity, android.R.drawable.ic_menu_add)),
+        )
+        val controller = CYLTabBarController(activity, items.map { Page() }, items)
+        activity.setContentView(controller.view)
+        idle()
+        val button = controller.tabBar.tabBarButtonArray[1]
+        // [EN] Checked by the compiler: the component, and a frame for badges. [CN] 由编译器检查：即动效组件，并且是可承载角标的帧布局。
+        val component: com.cyl.animateditem.CYLAnimatedItemView = button
+        val frame: android.widget.FrameLayout = button
+        assertSame(component, frame)
+        assertSame(button.titleView, button.titleLabel)
+        assertEquals("Me", button.titleLabel.text.toString())
+        assertEquals(android.util.TypedValue.applyDimension(android.util.TypedValue.COMPLEX_UNIT_SP, 10f, activity.resources.displayMetrics), button.titleLabel.textSize, 0.01f)
+        assertNotNull(button.iconView.drawable)
+        assertTrue(button.iconView.width > 0)
+        button.performClick()
+        idle()
+        assertEquals(1, controller.selectedIndex)
+        assertEquals("Me", button.contentDescription.toString())
+        button.item.isEnabled = false
+        assertEquals("a disabled tab is not dimmed", 1f, button.alpha, 0f)
     }
 
     /**

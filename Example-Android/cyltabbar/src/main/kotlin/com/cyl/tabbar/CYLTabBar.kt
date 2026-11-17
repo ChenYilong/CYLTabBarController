@@ -28,9 +28,8 @@ import kotlin.math.abs
  *      TabBar 的手势（点击、双击、长按、滑动）。
  */
 @android.annotation.SuppressLint("ViewConstructor") // [EN] Made by the tab bar for an item, never inflated. [CN] 由 TabBar 为 item 创建，不从 XML 加载。
-class CYLTabBarItemButton(context: Context, val item: CYLTabBarItem, val index: Int) : FrameLayout(context) {
+class CYLTabBarItemButton(context: Context, val item: CYLTabBarItem, val index: Int) : com.cyl.animateditem.CYLAnimatedItemView(context) {
 
-    val iconView = ImageView(context).apply { scaleType = ImageView.ScaleType.CENTER_INSIDE }
     /**
      * [EN] The view of `setTabBarItemIconViewProvider`, laid out in place of the icon. [CN] `setTabBarItemIconViewProvider` 提供的视图，代替图标布局。
      */
@@ -47,7 +46,10 @@ class CYLTabBarItemButton(context: Context, val item: CYLTabBarItem, val index: 
         iconView.visibility = if (cyl_customIconView == null && !animationShows) View.VISIBLE else View.INVISIBLE
         requestLayout()
     }
-    val titleLabel = TextView(context).apply { gravity = Gravity.CENTER; maxLines = 1; textSize = 10f }
+    /**
+     * [EN] The title, the animated item component's `titleView`. [CN] 标题，即动效组件的 `titleView`。
+     */
+    val titleLabel: TextView get() = titleView
 
     /**
      * [EN] `-[UIControl cyl_coverVisiableTabImageViewOrTabButton:YES ...]`: a view covering the whole tab button (icon,
@@ -111,12 +113,63 @@ class CYLTabBarItemButton(context: Context, val item: CYLTabBarItem, val index: 
     }
 
     init {
-        addView(iconView, LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, Gravity.CENTER_HORIZONTAL))
-        addView(titleLabel, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT, Gravity.BOTTOM))
+        // [EN] The component adds the icon and the title; the tab keeps its own look (10 sp titles, icons not scaled up)
+        //      and layout. [CN] 组件已添加图标与标题；Tab 保留自己的外观（10 sp 标题、图标不放大）与布局。
+        iconView.scaleType = ImageView.ScaleType.CENTER_INSIDE
+        iconView.layoutParams = LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, Gravity.CENTER_HORIZONTAL)
+        titleLabel.layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT, Gravity.BOTTOM)
+        titleLabel.ellipsize = null
+        titleLabel.textSize = 10f
+        // [EN] A disabled tab is not dimmed, as before. [CN] 不可用的 Tab 不变暗，与之前一致。
+        disabledAlpha = 1f
         isClickable = true
         isFocusable = true
         contentDescription = item.accessibilityLabel ?: item.title
         item.cyl_visiableTabButton = this
+    }
+
+    /**
+     * [EN] The tab's icon follows `apply(selected, tabBar)` (images, tint, the placeholder), not the component's
+     *      `image` / `selectedImage`. [CN] Tab 的图标由 `apply(selected, tabBar)` 设置（图片、着色、占位图），而不是组件的 `image` / `selectedImage`。
+     */
+    override fun updateIcon() { /* [EN] See apply. [CN] 见 apply。 */ }
+
+    /**
+     * [EN] The tab's animation view is the tab bar's (`cyl_tabBarItemAnimationView`), not the component's: its load and
+     *      failure go to the tab bar's handlers (the static image, else the placeholder).
+     * [CN] Tab 的动画视图属于 TabBar（`cyl_tabBarItemAnimationView`），而不是组件：其加载与失败交给 TabBar 的处理（静态图片，没有时为占位图）。
+     */
+    override fun cyl_animationViewDidLoad(animationView: View) {
+        if (animationView === this.animationView) super.cyl_animationViewDidLoad(animationView) else CYLTabBarItemAnimationFailure.loadedFallbackHandler?.invoke(this)
+    }
+
+    override fun cyl_animationViewDidFail(animationView: View) {
+        if (animationView === this.animationView) super.cyl_animationViewDidFail(animationView) else CYLTabBarItemAnimationFailure.fallbackHandler?.invoke(this)
+    }
+
+    /**
+     * [EN] The tab's label: its accessibility label, else its title. [CN] Tab 的朗读文本：无障碍标签，否则为标题。
+     */
+    override fun accessibilityText(): CharSequence = item.accessibilityLabel ?: titleLabel.text ?: ""
+
+    /**
+     * [EN] Measured as a frame: every child at its own layout params (the tab lays them out in `onLayout`).
+     * [CN] 按帧布局测量：每个子视图按自己的布局参数测量（Tab 在 `onLayout` 中布局）。
+     */
+    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+        var maxWidth = 0
+        var maxHeight = 0
+        for (index in 0 until childCount) {
+            val child = getChildAt(index)
+            if (child.visibility == View.GONE) continue
+            measureChildWithMargins(child, widthMeasureSpec, 0, heightMeasureSpec, 0)
+            maxWidth = maxOf(maxWidth, child.measuredWidth)
+            maxHeight = maxOf(maxHeight, child.measuredHeight)
+        }
+        setMeasuredDimension(
+            resolveSize(maxOf(maxWidth + paddingLeft + paddingRight, suggestedMinimumWidth), widthMeasureSpec),
+            resolveSize(maxOf(maxHeight + paddingTop + paddingBottom, suggestedMinimumHeight), heightMeasureSpec),
+        )
     }
 
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
