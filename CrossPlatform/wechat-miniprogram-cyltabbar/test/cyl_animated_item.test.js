@@ -148,3 +148,44 @@ test('embedded in a control: hidden from accessibility, no padding class of its 
   assert.match(m.axisClass, /cyl-animated-item-embedded/)
   assert.equal(cylAnimatedItemModel({ animationUrl: 'a.json' }).ariaHidden, false)
 })
+
+test('cyl-animated-item: the same file set again keeps the loaded state (the engine view sends no second ready)', () => {
+  let definition = null
+  global.Component = (options) => { definition = options }
+  delete require.cache[require.resolve('../src/cyl-animated-item/index.js')]
+  require('../src/cyl-animated-item/index.js')
+  delete global.Component
+  const observer = definition.observers['animationUrl, animationData, animationType']
+  const resets = []
+  const item = {
+    data: { animationFailed: false },
+    setData(data) { if (data.animationLoaded === false) resets.push(data) },
+    cyl_update() {},
+  }
+  observer.call(item, '/a.json', null, '')
+  observer.call(item, '/a.json', null, '')
+  observer.call(item, '/a.json', null, '')
+  assert.equal(resets.length, 1, 'set again with the same file: no reset')
+  observer.call(item, '/b.json', null, '')
+  assert.equal(resets.length, 2, 'a new file resets')
+  observer.call(item, '/b.json', null, 'lottie')
+  assert.equal(resets.length, 3, 'a new type resets')
+})
+
+test('cyl-animated-item: the same file after a failure is a retry and resets the state', () => {
+  let definition = null
+  global.Component = (options) => { definition = options }
+  delete require.cache[require.resolve('../src/cyl-animated-item/index.js')]
+  require('../src/cyl-animated-item/index.js')
+  delete global.Component
+  const observer = definition.observers['animationUrl, animationData, animationType']
+  const item = {
+    data: { animationFailed: false },
+    setData(data) { Object.assign(this.data, data) },
+    cyl_update() {},
+  }
+  observer.call(item, 'https://x/a.json', null, '')
+  item.data.animationFailed = true
+  observer.call(item, 'https://x/a.json', null, '')
+  assert.equal(item.data.animationFailed, false, 'a retry clears the failure')
+})

@@ -103,7 +103,16 @@ Component({
   },
 
   observers: {
-    'path, animationData, colors, fit': function () {
+    'path, animationData, colors, fit': function (path, animationData, colors, fit) {
+      // [EN] A host re-renders and sets these again with the same values (cyl-animated-item binds `colors`, an Object, on
+      //      every render): reload only when one really changed, or the animation is destroyed and reloaded on every
+      //      render and never plays (about 30 reloads a second in CYLTableViewPlaceHolder's cyl-placeholder).
+      // [CN] 宿主重新渲染时会以相同的值再次设置这些属性（cyl-animated-item 每次渲染都绑定 Object 类型的 `colors`）：只有真正
+      //      变化时才重新加载，否则每次渲染都会销毁并重新加载动画，动画永远不会播放（CYLTableViewPlaceHolder 的 cyl-placeholder 中
+      //      每秒约 30 次）。
+      if (!this.cyl_loadInputsChanged(path, animationData, colors, fit)) {
+        return
+      }
       if (this.cylReady) {
         this.cyl_load()
       }
@@ -137,6 +146,8 @@ Component({
     },
     ready() {
       this.cylReady = true
+      const {path, animationData, colors, fit} = this.data
+      this.cyl_loadInputsChanged(path, animationData, colors, fit)
       this.cyl_load()
     },
     detached() {
@@ -147,6 +158,33 @@ Component({
   },
 
   methods: {
+    /**
+     * [EN] Whether path / animationData / colors / fit differ from the last values seen; remembers the new ones.
+     *      animationData is compared by reference, colors by content.
+     * [CN] path / animationData / colors / fit 是否与上次不同；记住新的值。animationData 按引用比较，colors 按内容比较。
+     */
+    cyl_loadInputsChanged(path, animationData, colors, fit) {
+      const colorsKey = colors ? JSON.stringify(colors) : ''
+      const last = this.cylLoadInputs
+      // [EN] After a failed load the same inputs load again (a retry once the network is back).
+      // [CN] 加载失败后，相同的输入也会重新加载（例如网络恢复后重试）。
+      if (last && !this.cylLoadFailed && last.path === path && last.animationData === animationData && last.colorsKey === colorsKey &&
+        last.fit === fit) {
+        return false
+      }
+      this.cylLoadInputs = {path, animationData, colorsKey, fit}
+      return true
+    },
+
+    /**
+     * [EN] Reports a failed load (event `error`) and remembers it, so the same inputs may load again.
+     * [CN] 报告加载失败（事件 `error`）并记住，以便相同的输入可以重新加载。
+     */
+    cyl_reportError(detail) {
+      this.cylLoadFailed = true
+      this.triggerEvent('error', detail)
+    },
+
     cyl_destroy() {
       if (this.cylAnimation) {
         this.cylAnimation.destroy()
@@ -194,6 +232,7 @@ Component({
      */
     cyl_load() {
       const token = ++this.cylLoadToken
+      this.cylLoadFailed = false
       const {path, animationData} = this.data
       this.cyl_destroy()
       if (!path && !animationData) {
@@ -208,7 +247,7 @@ Component({
             return
           }
           if (!info || !info.node) {
-            this.triggerEvent('error', {message: 'cyl-lottie: the canvas node is not available.'})
+            this.cyl_reportError({message: 'cyl-lottie: the canvas node is not available.'})
             return
           }
           const canvas = info.node
@@ -222,7 +261,7 @@ Component({
     },
 
     cyl_start(canvas, context, token) {
-      const {path, animationData, colors, loop, autoplay, speed, fit} = this.data
+      const {path, animationData, colors, loop, fit} = this.data
       const settings = {
         loop,
         autoplay: false,
@@ -254,14 +293,18 @@ Component({
           }
           // [EN] A `path` load returns a stand-in; from here on use the animation itself. [CN] `path` 加载返回替身；此后使用动画本身。
           this.cylAnimation = animation.cylAnimation || animation
-          if (speed > 0 && speed !== 1) {
-            this.cylAnimation.setSpeed(speed)
+          // [EN] The values now, not those captured when the load began: a speed / loop / autoplay set while the file
+          //      loaded would be lost. [CN] 使用此刻的值而不是开始加载时的值：加载期间设置的 speed / loop / autoplay 否则会丢失。
+          const {speed: currentSpeed, loop: currentLoop} = this.data
+          this.cylAnimation.setLoop(currentLoop)
+          if (currentSpeed > 0 && currentSpeed !== 1) {
+            this.cylAnimation.setSpeed(currentSpeed)
           }
           this.cyl_rest()
           if (this.cylPendingPlay) {
             const pending = this.cylPendingPlay
             this.cyl_playFromStart(pending.seconds + (Date.now() - pending.requestedAt) / 1000)
-          } else if (autoplay) {
+          } else if (this.data.autoplay) {
             this.cylAnimation.play()
           }
           this.cyl_syncSnapshot()
@@ -283,13 +326,13 @@ Component({
         animation.addEventListener('loopComplete', () => this.triggerEvent('loopcomplete', {}))
         animation.addEventListener('error', (event) => {
           const native = event && (event.nativeError || event)
-          this.triggerEvent('error', {message: (native && native.message) || 'cyl-lottie: rendering failed.'})
+          this.cyl_reportError({message: (native && native.message) || 'cyl-lottie: rendering failed.'})
         })
         animation.addEventListener('data_failed', (error) => {
-          this.triggerEvent('error', {message: (error && error.message) || 'cyl-lottie: loading failed.'})
+          this.cyl_reportError({message: (error && error.message) || 'cyl-lottie: loading failed.'})
         })
       } catch (error) {
-        this.triggerEvent('error', {message: error.message})
+        this.cyl_reportError({message: error.message})
       }
     },
 
@@ -297,8 +340,17 @@ Component({
      * [EN] Shows the resting frame ("first" or "last") without playing.
      * [CN] 不播放，显示静止帧（"first" 或 "last"）。
      */
-    cyl_rest() {
+    /**
+     * [EN] The animation itself: a `path` load first returns a stand-in whose copied `playSpeed` / `totalFrames` go
+     *      stale. [CN] 动画本身：`path` 加载先返回替身，其复制的 `playSpeed` / `totalFrames` 会过时。
+     */
+    cyl_realAnimation() {
       const animation = this.cylAnimation
+      return animation ? (animation.cylAnimation || animation) : null
+    },
+
+    cyl_rest() {
+      const animation = this.cyl_realAnimation()
       if (!animation || !animation.totalFrames) {
         return
       }
@@ -349,7 +401,7 @@ Component({
         return
       }
       this.cylPendingPlay = null
-      const animation = this.cylAnimation
+      const animation = this.cyl_realAnimation()
       const speed = Math.abs(animation.playSpeed || 1)
       const frame = Math.floor(seconds * (animation.frameRate || 30) * speed)
       if (frame >= animation.totalFrames - 1) {

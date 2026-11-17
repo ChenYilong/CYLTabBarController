@@ -112,7 +112,20 @@ Component({
   },
 
   observers: {
-    'animationUrl, animationData, animationType': function (animationUrl, animationData) {
+    'animationUrl, animationData, animationType': function (animationUrl, animationData, animationType) {
+      // [EN] A host re-renders and sets the same file (or the same Lottie data object) again: keep the loaded / failed
+      //      state, because the engine view (cyl-lottie reloads only when its inputs change) does not load again and sends
+      //      no new `ready`; resetting here left the static image over a playing animation.
+      // [CN] 宿主重新渲染时会再次设置同一个文件（或同一个 Lottie 数据对象）：保留已加载 / 失败状态，因为引擎视图（cyl-lottie
+      //      只在输入变化时重新加载）不会再次加载、也不会再发 `ready`；在这里重置会让静态图片盖住正在播放的动画。
+      const key = `${animationUrl || ''}|${animationType || ''}`
+      // [EN] The same file after a failure is a retry (the network is back): reset so the engine view may load it again.
+      // [CN] 失败后再次设置同一个文件即为重试（例如网络恢复）：重置，让引擎视图可以再次加载。
+      if (key === this.cylAnimationKey && animationData === this.cylAnimationData && !this.data.animationFailed) {
+        return
+      }
+      this.cylAnimationKey = key
+      this.cylAnimationData = animationData
       clearTimeout(this.cylGifTimer)
       this.cylPendingPlay = false
       // cyl-lottie keeps the data it gets and changes it while playing: every item gets its own copy.
