@@ -166,12 +166,23 @@ Component({
     cyl_loadInputsChanged(path, animationData, colors, fit) {
       const colorsKey = colors ? JSON.stringify(colors) : ''
       const last = this.cylLoadInputs
-      if (last && last.path === path && last.animationData === animationData && last.colorsKey === colorsKey &&
+      // [EN] After a failed load the same inputs load again (a retry once the network is back).
+      // [CN] 加载失败后，相同的输入也会重新加载（例如网络恢复后重试）。
+      if (last && !this.cylLoadFailed && last.path === path && last.animationData === animationData && last.colorsKey === colorsKey &&
         last.fit === fit) {
         return false
       }
       this.cylLoadInputs = {path, animationData, colorsKey, fit}
       return true
+    },
+
+    /**
+     * [EN] Reports a failed load (event `error`) and remembers it, so the same inputs may load again.
+     * [CN] 报告加载失败（事件 `error`）并记住，以便相同的输入可以重新加载。
+     */
+    cyl_reportError(detail) {
+      this.cylLoadFailed = true
+      this.triggerEvent('error', detail)
     },
 
     cyl_destroy() {
@@ -221,6 +232,7 @@ Component({
      */
     cyl_load() {
       const token = ++this.cylLoadToken
+      this.cylLoadFailed = false
       const {path, animationData} = this.data
       this.cyl_destroy()
       if (!path && !animationData) {
@@ -235,7 +247,7 @@ Component({
             return
           }
           if (!info || !info.node) {
-            this.triggerEvent('error', {message: 'cyl-lottie: the canvas node is not available.'})
+            this.cyl_reportError({message: 'cyl-lottie: the canvas node is not available.'})
             return
           }
           const canvas = info.node
@@ -314,13 +326,13 @@ Component({
         animation.addEventListener('loopComplete', () => this.triggerEvent('loopcomplete', {}))
         animation.addEventListener('error', (event) => {
           const native = event && (event.nativeError || event)
-          this.triggerEvent('error', {message: (native && native.message) || 'cyl-lottie: rendering failed.'})
+          this.cyl_reportError({message: (native && native.message) || 'cyl-lottie: rendering failed.'})
         })
         animation.addEventListener('data_failed', (error) => {
-          this.triggerEvent('error', {message: (error && error.message) || 'cyl-lottie: loading failed.'})
+          this.cyl_reportError({message: (error && error.message) || 'cyl-lottie: loading failed.'})
         })
       } catch (error) {
-        this.triggerEvent('error', {message: error.message})
+        this.cyl_reportError({message: error.message})
       }
     },
 

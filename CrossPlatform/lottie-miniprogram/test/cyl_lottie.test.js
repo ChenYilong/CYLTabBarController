@@ -339,3 +339,23 @@ test('cyl-lottie reloads only when path / animationData / colors / fit really ch
   observer.call(component, '', data, null, 'cover')
   assert.equal(loads, 6, 'a new fit reloads')
 })
+
+test('cyl-lottie loads the same inputs again after a failed load (a retry)', () => {
+  let definition = null
+  global.Component = (options) => { definition = options }
+  delete require.cache[require.resolve('../miniprogram_dist/cyl-lottie/index.js')]
+  require('../miniprogram_dist/cyl-lottie/index.js')
+  const observer = definition.observers['path, animationData, colors, fit']
+  let loads = 0
+  const component = Object.assign({}, definition.methods, {
+    cylReady: true,
+    triggerEvent() {},
+    cyl_load() { loads += 1; this.cylLoadFailed = false },
+  })
+  observer.call(component, 'https://x/a.json', null, null, 'contain')
+  component.cyl_reportError({message: 'request:fail'})
+  observer.call(component, 'https://x/a.json', null, null, 'contain')
+  assert.equal(loads, 2, 'the failed file loads again')
+  observer.call(component, 'https://x/a.json', null, null, 'contain')
+  assert.equal(loads, 2, 'once loaded, the same file does not reload')
+})

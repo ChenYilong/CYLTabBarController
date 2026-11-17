@@ -114,6 +114,7 @@ test('cyl-animated-item: the same file set again keeps the loaded state (the eng
   const observer = definition.observers['animationUrl, animationType']
   const resets = []
   const item = {
+    data: { animationFailed: false },
     setData(data) { if (data.animationLoaded === false) resets.push(data) },
     cyl_update() {},
   }
@@ -125,4 +126,22 @@ test('cyl-animated-item: the same file set again keeps the loaded state (the eng
   assert.equal(resets.length, 2, 'a new file resets')
   observer.call(item, '/b.json', 'lottie')
   assert.equal(resets.length, 3, 'a new type resets')
+})
+
+test('cyl-animated-item: the same file after a failure is a retry and resets the state', () => {
+  let definition = null
+  global.Component = (options) => { definition = options }
+  delete require.cache[require.resolve('../src/cyl-animated-item/index.js')]
+  require('../src/cyl-animated-item/index.js')
+  delete global.Component
+  const observer = definition.observers['animationUrl, animationType']
+  const item = {
+    data: { animationFailed: false },
+    setData(data) { Object.assign(this.data, data) },
+    cyl_update() {},
+  }
+  observer.call(item, 'https://x/a.json', '')
+  item.data.animationFailed = true
+  observer.call(item, 'https://x/a.json', '')
+  assert.equal(item.data.animationFailed, false, 'a retry clears the failure')
 })

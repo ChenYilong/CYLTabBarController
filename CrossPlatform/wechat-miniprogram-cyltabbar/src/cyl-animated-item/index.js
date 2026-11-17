@@ -68,7 +68,9 @@ Component({
       // [CN] 宿主重新渲染时会再次设置同一个文件：保留已加载 / 失败状态，因为引擎视图（cyl-lottie 只在输入变化时重新加载）
       //      不会再次加载、也不会再发 `ready`；在这里重置会让静态图片盖住正在播放的动画。
       const key = `${animationUrl || ''}|${animationType || ''}`
-      if (key === this.cylAnimationKey) {
+      // [EN] The same file after a failure is a retry (the network is back): reset so the engine view may load it again.
+      // [CN] 失败后再次设置同一个文件即为重试（例如网络恢复）：重置，让引擎视图可以再次加载。
+      if (key === this.cylAnimationKey && !this.data.animationFailed) {
         return
       }
       this.cylAnimationKey = key
