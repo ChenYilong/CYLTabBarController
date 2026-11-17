@@ -1,5 +1,8 @@
 import BuildProfile from '../../../BuildProfile';
 
+/** [EN] `maxLines` for a title without a line limit (`titleLines` 0). [CN] 标题不限行数（`titleLines` 为 0）时的 `maxLines`。 */
+const CYL_UNLIMITED_LINES: number = 1000;
+
 /**
  * [EN] Icon beside the title (default) or above it. [CN] 图标在标题旁（默认）或上方。
  */
@@ -208,7 +211,17 @@ export struct CYLAnimatedItemView {
    *      only. [CN] 静态图标的颜色（如 iOS 的模板图着色）：SVG 与符号图作为填充色，位图通过保留透明度的颜色滤镜着色；''（默认）保留原色。
    */
   @Prop iconColor: ResourceColor = '';
+  /**
+   * [EN] The gap in vp between the icon and the title, and between an inline accessory and the rest (iOS `spacing`,
+   *      Android `spacingDp`, the mini program's `titleSpacing`). Bug B21: it was declared but never read.
+   * [CN] 图标与标题之间、行内附件与其余内容之间的间距（vp）（iOS `spacing`、Android `spacingDp`、小程序 `titleSpacing`）。问题 B21：此前声明了却从未使用。
+   */
   @Prop spacing: number = 4;
+  /**
+   * [EN] The most lines of the title: 1 (the default) is one line with an ellipsis, 0 has no limit (as the mini
+   *      program's `titleLines`). [CN] 标题的最大行数：1（默认）为单行加省略号，0 不限（与小程序的 `titleLines` 相同）。
+   */
+  @Prop titleLines: number = 1;
   @Prop titleFontSize: number = 14;
   @Prop titleColor: ResourceColor = '#333333';
   @Prop accessoryImage: ResourceStr = '';
@@ -357,6 +370,11 @@ export struct CYLAnimatedItemView {
       }
       .constraintSize({ minWidth: 44, minHeight: 44 })
       .justifyContent(FlexAlign.Center)
+      // [EN] An inline accessory keeps `spacing` from the icon and title, as on Android (B21). [CN] 行内附件与图标、标题保持 `spacing`，与 Android 相同（B21）。
+      .margin(!this.cylShowsIconOrTitle() ? 0 :
+        this.accessoryPlacement === CYLAnimatedItemAccessoryPlacement.Leading ?
+          (this.axis === CYLAnimatedItemAxis.Vertical ? { bottom: this.spacing } : { right: this.spacing }) :
+          this.accessoryPlacement === CYLAnimatedItemAccessoryPlacement.Trailing ? this.cylLeadingGap(this.spacing) : 0)
       .accessibilityGroup(true)
       .accessibilityText(this.accessoryAccessibilityText.length > 0 ? this.accessoryAccessibilityText : this.accessoryText)
       .id(this.itemId.length > 0 ? `${this.itemId}-accessory` : '')
@@ -374,10 +392,22 @@ export struct CYLAnimatedItemView {
       Text(this.itemTitle)
         .fontSize(this.titleFontSize)
         .fontColor(this.titleColor)
-        .maxLines(1)
-        .textOverflow({ overflow: TextOverflow.Ellipsis })
+        .maxLines(this.titleLines > 0 ? Math.floor(this.titleLines) : CYL_UNLIMITED_LINES)
+        .textOverflow({ overflow: this.titleLines > 0 ? TextOverflow.Ellipsis : TextOverflow.None })
+        .textAlign(this.axis === CYLAnimatedItemAxis.Vertical ? TextAlign.Center : TextAlign.Start)
+        .margin(this.cylShowsIcon() ? this.cylLeadingGap(this.spacing) : 0)
         .accessibilityLevel('no')
     }
+  }
+
+  /** [EN] A gap before a part: above it on the vertical axis, before it on the horizontal one. [CN] 某部分之前的间距：纵向在其上方，横向在其前方。 */
+  private cylLeadingGap(gap: number): Margin {
+    return this.axis === CYLAnimatedItemAxis.Vertical ? { top: gap } : { left: gap };
+  }
+
+  /** [EN] Whether the icon or the title shows (an inline accessory keeps `spacing` from them). [CN] 是否显示图标或标题（行内附件与它们保持 `spacing`）。 */
+  private cylShowsIconOrTitle(): boolean {
+    return this.cylShowsIcon() || this.itemTitle.length > 0;
   }
 
   @Builder
