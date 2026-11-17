@@ -32,6 +32,8 @@ android {
             //      leave out its .lproj folders (`ignoreAssetsPatterns`).
             // [CN] 库的 iOS 资源 bundle（节日皮肤图标、示例 GIF），由 `DemoAssets` 读取；App 排除其中的 .lproj 目录（`ignoreAssetsPatterns`）。
             assets.srcDir("../../CYLTabBarController/Resources/CYLTabBarController.bundle")
+            // [EN] The Lottie files of the Objective-C example, for the CYLAnimatedItemView page (not a copy). [CN] Objective-C 示例的 Lottie 文件，供 CYLAnimatedItemView 页面使用（不是副本）。
+            assets.srcDir("../../Example/Classes/Other/LottieResources")
         }
     }
 }
