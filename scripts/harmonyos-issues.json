@@ -457,5 +457,14 @@
     "evidence": "Maintainer report 2026-11-17, verbatim: \"鸿蒙系统tabbaritem的badge坐标，预期是右上角现在变左上角了。排查原因\" (English: on HarmonyOS the tab bar item's badge should be at the top-right, it is now at the top-left; find the cause). Started with 760dfba2 (22:18), which draws Lottie, Rive and SVGA tab icons with CYLAnimatedItemView(isBare)",
     "cause": "CYLAnimatedItemView's root is a Flex without a width, and an ArkUI Flex fills its parent: in the tab item it is as wide as the tab slot, with the icon centred in it, so the tab's icon Stack becomes that wide; the badge is placed at anchorWidth + 2 from the Stack's left edge, which is now left of the centred icon",
     "fix": "Core fix in CYLAnimatedItemView (cylanimateditem, published to ohpm), not in the tab bar or the example: a bare item that shows only an icon (no title, no accessory) now has the icon's width and height, so a host can place things against the icon's edges; every other item keeps its default size (`undefined`). Measured with uitest dumpLayout: badge center vs icon top-right dx -96 px before, -10 px after, as the plus button"
+  },
+  {
+    "id": 52,
+    "status": "TODO (recorded 2026-11-18 before the fix; maintainer's screenshot harmonyos-plus-button-top-line-report.png)",
+    "scope": "CrossPlatform/harmonyos-cyltabbar (cyltabbar, core)",
+    "title": "The tab bar's top line runs across the raised plus button (classic and FlatDesign)",
+    "evidence": "Maintainer report 2026-11-18, verbatim: \"鸿蒙 液态dock的边框 黑线 遮挡了plus button，请确保plus button总是在顶端。不应该被黑线遮挡\" (English: HarmonyOS, the dock's border, a black line, covers the plus button; make sure the plus button is always on top, never covered by the black line); screenshot: the FlatDesign demo page, a dark line across the raised plus button",
+    "cause": "The 0.5 vp top line is the tab Row's top border (and a custom shadowImage its overlay); ArkUI paints a border and an overlay over the children, so the line crosses the raised plus button. Liquid Glass already has no row border for this reason (its rim is drawn under the tabs)",
+    "fix": "TODO"
   }
 ]

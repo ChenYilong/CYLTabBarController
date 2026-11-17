@@ -212,6 +212,7 @@ docs/
 │   ├── animated-item-demo-ios27-en.png
 │   ├── animated-item-flatdesign-tabbar-ios27.png
 │   ├── animated-item-flutter-rive-icons-faint.png
+│   ├── animated-item-flutter-rive-icons-tinted.png
 │   ├── animated-item-harmonyos-lottie-done.png
 │   ├── animated-item-harmonyos-lottie-playing.png
 │   ├── animated-item-harmonyos-tabbar.jpeg
@@ -276,6 +277,7 @@ docs/
 │   ├── harmonyos-liquid-glass-message-badge-before-after.png
 │   ├── harmonyos-liquid-glass-plus-raised.png
 │   ├── harmonyos-liquid-glass-reference-vs-ours.png
+│   ├── harmonyos-plus-button-top-line-report.png
 │   ├── harmonyos-port-svga-demo-page.png
 │   ├── harmonyos-port-svga-demo-row.png
 │   ├── harmonyos-port-svga-demo-taps.png
