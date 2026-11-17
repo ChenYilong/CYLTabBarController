@@ -82,9 +82,11 @@ public final class CYLRiveLegacyTabBarItemAnimationView: UIView, CYLTabBarItemAn
             viewModel = RiveViewModel(model, animationName: animationName, fit: .contain, alignment: .center,
                                       autoPlay: false, artboardName: configuration.artboardName)
         } else {
-            // [EN] A state machine, running from the start (it waits for its inputs). [CN] 状态机，从一开始就运行（等待输入）。
+            // [EN] A state machine, resting on its first frame until it is played (docs/Animated-Item.md): a file that moves
+            //      by itself (shapes.riv, truck.riv) no longer runs from launch. Every play calls `play()`.
+            // [CN] 状态机，在被播放之前停在第一帧：会自行运动的文件（shapes.riv、truck.riv）不再从启动起就运动。每次播放都会调用 `play()`。
             viewModel = RiveViewModel(model, stateMachineName: configuration.stateMachineName, fit: .contain, alignment: .center,
-                                      autoPlay: true, artboardName: configuration.artboardName)
+                                      autoPlay: false, artboardName: configuration.artboardName)
         }
         super.init(frame: .zero)
         isUserInteractionEnabled = false

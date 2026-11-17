@@ -151,6 +151,10 @@ public final class CYLRiveTabBarItemAnimationView: UIView, CYLTabBarItemAnimatio
     private var viewModelInstance: ViewModelInstance?
     private var isLoaded = false
     private var playsWhenLoaded = false
+    /// [EN] Played at least once: the view is no longer paused on its first frame. [CN] 至少播放过一次：视图不再暂停在第一帧。
+    private var hasPlayed = false
+    /// [EN] Time for the first frame to be drawn before the view pauses. [CN] 视图暂停前绘制第一帧的时间。
+    private static let firstFrameNanoseconds: UInt64 = 100_000_000
     private var deactivateTask: Task<Void, Never>?
     /// [EN] Plays again after each pass (`cyl_setAnimationViewLoops:`). [CN] 每次播放后再次播放（`cyl_setAnimationViewLoops:`）。
     private var loops = false
@@ -235,6 +239,8 @@ public final class CYLRiveTabBarItemAnimationView: UIView, CYLTabBarItemAnimatio
         }
         deactivateTask?.cancel()
         loopTask?.cancel()
+        hasPlayed = true
+        riveView?.isPaused = false
         if let triggerPropertyPath = configuration.triggerPropertyPath {
             instance.fire(trigger: TriggerProperty(path: triggerPropertyPath))
         } else {
@@ -366,6 +372,15 @@ public final class CYLRiveTabBarItemAnimationView: UIView, CYLTabBarItemAnimatio
         addSubview(riveView)
         self.riveView = riveView
         isLoaded = true
+        // [EN] Rests on its first frame until it is played (docs/Animated-Item.md): paused once the first frame is drawn.
+        // [CN] 在被播放之前停在第一帧：第一帧绘制后暂停。
+        Task { @MainActor [weak self, weak riveView] in
+            try? await Task.sleep(nanoseconds: Self.firstFrameNanoseconds)
+            guard let self, let riveView, self.riveView === riveView, !self.hasPlayed else {
+                return
+            }
+            riveView.isPaused = true
+        }
         if let lightColor = configuration.lightColor, let instance = viewModelInstance {
             let path = Self.colorPropertyPath
             let color = Self.riveColor(lightColor)

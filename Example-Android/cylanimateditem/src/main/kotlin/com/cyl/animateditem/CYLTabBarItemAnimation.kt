@@ -934,6 +934,27 @@ class CYLRiveTabBarItemAnimationView internal constructor(context: Context, priv
     private val numberInput get() = options[CYLTabBarItemAnimationKeys.CYLTabBarAnimationOptionRiveNumberInput]
     private val numberValues get() = CYLRiveInputs.numberValues(options[CYLTabBarItemAnimationKeys.CYLTabBarAnimationOptionRiveNumberValues])
     private var lastNumber: Float? = null
+    /**
+     * [EN] Paused on its first frame after load, not played yet (docs/Animated-Item.md): the next play resumes it first.
+     * [CN] 加载后暂停在第一帧、尚未播放：下一次播放先恢复它。
+     */
+    private var restingAfterLoad = false
+    private var hasPlayed = false
+
+    /**
+     * [EN] Rests on the first frame until the first play: a file whose state machine moves by itself (shapes.riv, truck.riv)
+     *      no longer runs from load. The machine is created (autoplay) so its inputs can be read, then paused once drawn.
+     * [CN] 在第一次播放之前停在第一帧：状态机会自行运动的文件（shapes.riv、truck.riv）不再从加载起就运动。状态机先创建（autoplay）以便读取其输入，
+     *      绘制后再暂停。
+     */
+    internal fun cyl_restUntilPlayed() {
+        handler.postDelayed({
+            if (!hasPlayed) {
+                CYLReflection.call(rive, "pause")
+                restingAfterLoad = true
+            }
+        }, FIRST_FRAME_MS)
+    }
     // [EN] A loop pass leaves a file that is still moving on its own alone (shapes.riv, truck.riv); only a play restarts it.
     // [CN] 一次循环不打断仍在自行运动的文件（shapes.riv、truck.riv）；只有播放才会重新开始它。
     private val loopRunnable: Runnable = Runnable {
@@ -1021,6 +1042,12 @@ class CYLRiveTabBarItemAnimationView internal constructor(context: Context, priv
      */
     override fun cyl_playAnimationView() {
         handler.removeCallbacksAndMessages(null)
+        hasPlayed = true
+        if (restingAfterLoad) {
+            // [EN] Resumed where it rests (no settling), then played as usual. [CN] 从静止处恢复（不重新定位），然后照常播放。
+            restingAfterLoad = false
+            CYLReflection.callKotlin(rive, "play", CYLReflection.DEFAULT, CYLReflection.DEFAULT, false)
+        }
         val machine = stateMachine
         val trigger = options[CYLTabBarItemAnimationKeys.CYLTabBarAnimationOptionRiveTriggerInput] ?: options[CYLTabBarItemAnimationKeys.CYLTabBarAnimationOptionRiveTriggerProperty]
         val animation = options[CYLTabBarItemAnimationKeys.CYLTabBarAnimationOptionRiveAnimation]
@@ -1112,6 +1139,8 @@ class CYLRiveTabBarItemAnimationView internal constructor(context: Context, priv
          * [EN] A frame later: the state machine sees the reset or the false first. [CN] 一帧之后：状态机先看到重置或 false。
          */
         internal const val NEXT_FRAME_MS = 50L
+        /** [EN] Time for the first frame to be drawn before a loaded file pauses. [CN] 加载的文件暂停前绘制第一帧的时间。 */
+        internal const val FIRST_FRAME_MS = 100L
     }
 
     object Provider : CYLTabBarItemAnimationViewProviding {
@@ -1144,6 +1173,7 @@ class CYLRiveTabBarItemAnimationView internal constructor(context: Context, priv
                     return@localFile
                 }
                 load(rive, bytes, options, contentMode)
+                view.cyl_restUntilPlayed()
                 CYLTabBarItemAnimationFailure.reportLoaded(view)
             }
             return view

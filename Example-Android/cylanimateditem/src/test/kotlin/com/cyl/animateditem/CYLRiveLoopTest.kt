@@ -32,6 +32,7 @@ class CYLRiveLoopTest {
         val calls = mutableListOf<String>()
         fun getStateMachines() = machines
         fun reset() { calls += "reset" }
+        fun pause() { calls += "pause" }
         // [EN] Default arguments, as rive-android's: the view calls them through Kotlin's `play$default`. [CN] 与 rive-android 一样使用默认参数：视图通过 Kotlin 的 `play$default` 调用。
         fun play(loop: Any? = null, direction: Any? = null, settleInitialState: Boolean = true) { calls += "play" }
         fun play(animationName: String, loop: Any? = null, direction: Any? = null, isStateMachine: Boolean = false, settleInitialState: Boolean = true) { calls += "play:$animationName" }
@@ -118,5 +119,26 @@ class CYLRiveLoopTest {
         rive.playing = false
         idle((CYLRiveTabBarItemAnimationView.LOOP_SECONDS * 1000).toLong() + 60)
         assertEquals(2, rive.calls.count { it == "reset" })
+    }
+
+    @Test
+    fun aLoadedFileRestsUntilItIsPlayed() {
+        val rive = FakeRive(context, listOf(Machine("State Machine 1", emptyList())))
+        val view = CYLRiveTabBarItemAnimationView(context, rive, mapOf("stateMachine" to "State Machine 1"))
+        view.cyl_restUntilPlayed()
+        idle(CYLRiveTabBarItemAnimationView.FIRST_FRAME_MS + 10)
+        assertEquals("paused once its first frame is drawn", listOf("pause"), rive.calls)
+        view.cyl_playAnimationView()
+        assertEquals("a play resumes it, then restarts it", listOf("pause", "play", "reset", "play"), rive.calls)
+    }
+
+    @Test
+    fun aPlayBeforeTheFirstFrameKeepsItRunning() {
+        val rive = FakeRive(context, listOf(Machine("State Machine 1", emptyList())))
+        val view = CYLRiveTabBarItemAnimationView(context, rive, mapOf("stateMachine" to "State Machine 1"))
+        view.cyl_restUntilPlayed()
+        view.cyl_playAnimationView()
+        idle(CYLRiveTabBarItemAnimationView.FIRST_FRAME_MS + 10)
+        assertEquals(listOf("reset", "play"), rive.calls)
     }
 }
