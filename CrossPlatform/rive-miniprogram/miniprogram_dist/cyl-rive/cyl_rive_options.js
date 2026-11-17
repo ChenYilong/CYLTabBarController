@@ -6,8 +6,13 @@
  *      CYLTabBarAnimationURLWithOptions() 写入的 URL fragment（"icons.riv#artboard=CHAT&stateMachine=…&input=active"）
  *      与组件属性，属性优先。纯函数，在 Node 中测试。
  */
-const CYL_OPTION_NAMES = ['artboard', 'stateMachine', 'animation', 'input', 'triggerInput', 'active', 'trigger',
-  'duration', 'color', 'numberInput', 'number', 'values']
+/**
+ * [EN] Every option name cyl-rive reads from the path fragment and its properties; exported as `CYL_RIVE_OPTION_NAMES` so an
+ *      adapter that writes the fragment imports it instead of copying it.
+ * [CN] cyl-rive 从路径 fragment 与属性读取的全部选项名；导出为 `CYL_RIVE_OPTION_NAMES`，写 fragment 的适配器直接导入，不再复制。
+ */
+const CYL_OPTION_NAMES = Object.freeze(['artboard', 'stateMachine', 'animation', 'input', 'triggerInput', 'active', 'trigger',
+  'duration', 'color', 'numberInput', 'number', 'values'])
 
 /**
  * [EN] {path, options}: the file path without its fragment, and the fragment's options.
@@ -130,5 +135,5 @@ function cylRiveLoopDelay({ kind, duration, animationSeconds, speed }) {
   return Math.round(seconds * 1000 / rate)
 }
 
-module.exports = { cylRiveRoute, cylRiveOptions, cylRiveColor, cylRivePlayKind, cylRiveLoopDelay, cylRiveNumberValues,
+module.exports = { CYL_RIVE_OPTION_NAMES: CYL_OPTION_NAMES, cylRiveRoute, cylRiveOptions, cylRiveColor, cylRivePlayKind, cylRiveLoopDelay, cylRiveNumberValues,
   cylRiveNextNumber, CYL_RIVE_LOOP_SECONDS }

@@ -191,3 +191,11 @@ test('a loop pass does not restart a file that is still moving on its own (shape
   t.mock.timers.tick(CYL_RIVE_LOOP_SECONDS * 1000)
   assert.equal(created.length, 3, 'settled: the next pass restarts it')
 })
+
+test('the option names are exported for adapters', () => {
+  const { CYL_RIVE_OPTION_NAMES } = require('../miniprogram_dist/cyl-rive/cyl_rive_options')
+  for (const name of ['numberInput', 'number', 'values', 'input', 'triggerInput', 'animation']) {
+    assert.ok(CYL_RIVE_OPTION_NAMES.includes(name), name)
+  }
+  assert.ok(Object.isFrozen(CYL_RIVE_OPTION_NAMES))
+})
