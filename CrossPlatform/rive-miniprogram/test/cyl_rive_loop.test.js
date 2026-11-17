@@ -65,13 +65,16 @@ function boolInput(name) {
   return input
 }
 
-test('a held input (duration 0) plays again: each play turns it off, then on', () => {
+test('a held input (duration 0) plays again: on; then off, and on a frame later', (t) => {
+  t.mock.timers.enable({ apis: ['setTimeout'] })
   const definition = loadComponent()
   const isOpen = boolInput('isOpen')
   const { item } = makeItem(definition, { inputs: { isOpen }, duration: 0, options: { input: 'isOpen' } })
   item.cyl_playFromStart()
   item.cyl_playFromStart()
-  assert.deepEqual(isOpen.history, [false, true, false, true], 'two plays, two transitions to true')
+  assert.deepEqual(isOpen.history, [true, false], 'off and on are never in the same tick')
+  t.mock.timers.tick(50)
+  assert.deepEqual(isOpen.history, [true, false, true], 'two plays, two transitions to true')
 })
 
 test('a state machine without the named input restarts on every play (house.riv: no "active")', () => {
@@ -123,7 +126,7 @@ test('loop repeats a trigger, a restart and an input; turning it off stops the n
   held.item.data.loop = true
   held.item.cyl_playFromStart()
   t.mock.timers.tick(1400)
-  assert.deepEqual(active.history, [false, true, false, false, true], 'on, off after the duration, then on again')
+  assert.deepEqual(active.history, [true, false, true], 'on, off after the duration, then on again')
 })
 
 test('a trigger restarts its state machine first, then fires (check.riv: the finished check plays again)', (t) => {
@@ -208,7 +211,12 @@ test('menu_button.riv: a held input (isOpen, duration 0) still replays on every 
   item.data.loop = true
   item.cylState.settled = false
   item.cyl_playFromStart()
-  t.mock.timers.tick(CYL_RIVE_LOOP_SECONDS * 1000)
-  t.mock.timers.tick(CYL_RIVE_LOOP_SECONDS * 1000)
-  assert.deepEqual(isOpen.history, [false, true, false, true, false, true], 'the settle check applies to restarts only')
+  // [EN] Sampled as the machine sees it (DevTools read isOpen every 250 ms): open, then closed for half a pass, in turn.
+  const seen = []
+  for (let i = 0; i < 12; i += 1) {
+    seen.push(isOpen.value ? 1 : 0)
+    t.mock.timers.tick(250)
+  }
+  assert.ok(seen.includes(0) && seen.includes(1), `isOpen is false for real time on each pass: ${seen.join('')}`)
+  assert.deepEqual(seen, [1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1], 'open 1.5 s; each pass closes it for 0.75 s, then opens it')
 })

@@ -20,6 +20,11 @@
 const { Rive, CYLRiveEnvironment } = require('../rive/canvas_advanced.js')
 const { cylRiveOptions, cylRiveColor, cylRivePlayKind, cylRiveLoopDelay, cylRiveNumberValues, cylRiveNextNumber } = require('./cyl_rive_options')
 
+/**
+ * [EN] A frame later, for an input switched off then on (as iOS and Android, 50 ms). [CN] 先关后开的输入在一帧之后打开（与 iOS、Android 一致，50 ms）。
+ */
+const CYL_RIVE_NEXT_FRAME_MS = 50
+
 // [EN] A mini program cannot read files under miniprogram_npm, so the WebAssembly is copied to the package root
 //      (cylMiniprogramAssets in package.json); set `wasmPath` when it lives elsewhere ('' keeps this default).
 // [CN] 小程序不能读取 miniprogram_npm 下的文件，因此 WebAssembly 被复制到代码包根目录（package.json 中的
@@ -490,22 +495,40 @@ Component({
         const target = numberInput ? numberInput.asNumber() : numberProperty
         target.value = cylRiveNextNumber(cylRiveNumberValues(options.values), target.value)
       } else if (kind === 'input') {
-        // [EN] Off first, so a play always changes the value (an input left true, duration 0, played only once).
-        // [CN] 先设为 false，每次播放都会改变取值（保持为 true 的输入、duration 为 0 时只播放一次）。
-        setActive(false)
-        if (state.instance && typeof state.instance.advance === 'function') {
-          state.instance.advance(0)
+        // [EN] A play always changes the value. An input already on (held, duration 0) goes off first, and the state
+        //      machine needs real time with frames drawn in the off state: off and on in the same tick (advance(0))
+        //      never ran the close transition, so the mini program's menu_button stayed open (isOpen read true at
+        //      every 250 ms sample in DevTools). On a later frame (50 ms, as iOS and Android), or half a loop pass
+        //      while looping a held input, so it opens and closes in turn.
+        // [CN] 每次播放都会改变取值。已经为 true 的输入（保持、duration 为 0）先设为 false，状态机需要在 false 状态下经过真实时间并绘制帧：
+        //      同一个 tick 内先关后开（advance(0)）不会运行关闭过渡，小程序的 menu_button 一直停在打开状态（DevTools 中每 250 ms 读取
+        //      isOpen 都是 true）。在之后的帧（50 ms，与 iOS、Android 一致）再打开；循环保持的输入时等半个循环周期，使其交替打开与关闭。
+        const turnOn = () => {
+          setActive(true)
+          if (seconds > 0 && state.instance && typeof state.instance.advance === 'function') {
+            // [EN] Catch up with the playback the previous tab bar started. [CN] 追上前一个 TabBar 已开始的播放。
+            state.instance.advance(Math.min(seconds, 2))
+          }
+          if (options.duration > 0) {
+            state.inputTimer = setTimeout(() => {
+              setActive(false)
+              this.triggerEvent('complete', {})
+            }, Math.max(0, options.duration - seconds) * 1000 / speed)
+          }
         }
-        setActive(true)
-        if (seconds > 0 && state.instance && typeof state.instance.advance === 'function') {
-          // [EN] Catch up with the playback the previous tab bar started. [CN] 追上前一个 TabBar 已开始的播放。
-          state.instance.advance(Math.min(seconds, 2))
-        }
-        if (options.duration > 0) {
+        const isOn = boolInput ? boolInput.asBool().value === true : !!(activeProperty && activeProperty.value)
+        if (isOn) {
+          setActive(false)
+          const offMs = this.data.loop && !(options.duration > 0)
+            ? cylRiveLoopDelay({ kind, duration: options.duration, animationSeconds: state.animationSeconds, speed }) / 2
+            : CYL_RIVE_NEXT_FRAME_MS
           state.inputTimer = setTimeout(() => {
-            setActive(false)
-            this.triggerEvent('complete', {})
-          }, Math.max(0, options.duration - seconds) * 1000 / speed)
+            if (this.cylState === state) {
+              turnOn()
+            }
+          }, offMs)
+        } else {
+          turnOn()
         }
       } else {
         this.cyl_restart(state)
