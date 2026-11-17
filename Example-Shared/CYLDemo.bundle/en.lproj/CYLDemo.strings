@@ -120,3 +120,10 @@
 "SVGA（初始化 Key）" = "SVGA (initialization keys)";
 "SVGA（配置文件）" = "SVGA (configuration file)";
 "Rive tab icons" = "Rive tab icons";
+
+/* [EN] The animated item demo (Example-GIF, docs/Animated-Item.md TODO 6). [CN] 动效 icon 组件 Demo。 */
+"动效 icon 组件" = "Animated item";
+"播放中的 GIF" = "GIF playing";
+"静态图片" = "Static image";
+"占位图（文件损坏）" = "Placeholder (broken file)";
+"远程 GIF（下载中显示图片）" = "Remote GIF (image while loading)";

@@ -120,3 +120,10 @@
 "SVGA（初始化 Key）" = "SVGA (inicializálási kulcsok)";
 "SVGA（配置文件）" = "SVGA (konfigurációs fájl)";
 "Rive tab icons" = "Rive tab icons";
+
+/* [EN] The animated item demo (Example-GIF, docs/Animated-Item.md TODO 6). [CN] 动效 icon 组件 Demo。 */
+"动效 icon 组件" = "Animált elem";
+"播放中的 GIF" = "GIF lejátszás";
+"静态图片" = "Statikus kép";
+"占位图（文件损坏）" = "Helyőrző (sérült fájl)";
+"远程 GIF（下载中显示图片）" = "Távoli GIF (kép betöltés közben)";
