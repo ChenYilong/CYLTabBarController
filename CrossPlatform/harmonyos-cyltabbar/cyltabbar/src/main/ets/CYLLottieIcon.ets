@@ -14,7 +14,8 @@ let cylLottieCount: number = 0;
 export struct CYLLottieIcon {
   @Prop @Watch('cylReload') path: string = '';
   iconSize: number = 26;
-  speed: number = 1;
+  /** [EN] Playback speed, applied live (B22). [CN] 播放速度，立即生效（B22）。 */
+  @Prop @Watch('cylSpeedChanged') speed: number = 1;
   @Prop @Watch('cylUpdate') selected: boolean = false;
   @Prop @Watch('cylReplay') replayToken: number = 0;
   /**
@@ -56,6 +57,10 @@ export struct CYLLottieIcon {
       this.onLoaded();
     });
     this.lottieItem.addEventListener('data_failed', () => this.onLoadError(`cannot load ${this.path}`));
+  }
+
+  cylSpeedChanged(): void {
+    this.lottieItem?.setSpeed(this.speed);
   }
 
   /** [EN] A new path (e.g. the dark file after a color mode change) reloads the animation. [CN] 新路径（如切换深色模式后）重新加载动画。 */

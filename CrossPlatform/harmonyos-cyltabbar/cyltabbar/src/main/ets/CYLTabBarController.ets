@@ -1257,10 +1257,10 @@ export struct CYLTabBarController {
       CYLLottieIcon({
         path: this.cylTabAnimationPath(index),
         iconSize: this.cylTabAnimationSize(index),
-        speed: this.tabBarItemAnimationSpeed,
+        speed: context.speed,
         selected: this.selectedIndex === index,
-        replayToken: this.replayTokens[index] ?? 0,
-        loops: this.tabBarItemAnimationLoops,
+        replayToken: context.restartToken,
+        loops: context.loops,
         onLoaded: () => context.onLoaded(),
         onLoadError: (_message: string) => context.onFailed(),
       })
@@ -1269,8 +1269,8 @@ export struct CYLTabBarController {
         path: this.cylRivePath(index),
         iconSize: this.cylTabAnimationSize(index),
         selected: this.selectedIndex === index,
-        replayToken: this.replayTokens[index] ?? 0,
-        loops: this.tabBarItemAnimationLoops,
+        replayToken: context.restartToken,
+        loops: context.loops,
         onLoaded: () => context.onLoaded(),
         onLoadError: (_message: string) => {
           context.onFailed();
@@ -1282,8 +1282,8 @@ export struct CYLTabBarController {
         path: this.cylSVGAPath(index),
         iconSize: this.cylTabAnimationSize(index),
         selected: this.selectedIndex === index,
-        replayToken: this.replayTokens[index] ?? 0,
-        loops: this.tabBarItemAnimationLoops,
+        replayToken: context.restartToken,
+        loops: context.loops,
         onLoaded: () => context.onLoaded(),
         onLoadError: (_message: string) => {
           context.onFailed();
@@ -1314,6 +1314,11 @@ export struct CYLTabBarController {
             animationUrl: this.cylTabAnimationPath(index),
             iconSize: this.cylTabAnimationSize(index),
             isItemSelected: this.selectedIndex === index,
+            // [EN] The playback goes through the component, which hands it to the engine in its context.
+            // [CN] 播放设置经由组件传递，组件通过 context 交给引擎。
+            animationSpeed: this.tabBarItemAnimationSpeed,
+            animationLoops: this.tabBarItemAnimationLoops,
+            animationRestartToken: this.replayTokens[index] ?? 0,
             animationBuilder: (context: CYLAnimatedItemAnimationContext) => {
               this.cylTabEngine(index, context)
             },

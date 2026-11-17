@@ -32,10 +32,38 @@ export class CYLAnimatedItemAnimationContext {
   url: string = '';
   size: number = 24;
   selected: boolean = false;
+  /**
+   * [EN] The playback the engine applies (the item's `animationSpeed`, `animationLoops`, and `restartToken`, which grows
+   *      on every restart: the engine plays from progress 0 when it changes). The item hands a new context to the builder
+   *      whenever one of them changes, so the engine view gets them as props and needs no state of the host.
+   * [CN] 引擎应用的播放设置（条目的 `animationSpeed`、`animationLoops`，以及每次重播都会增长的 `restartToken`：变化时引擎从进度 0 播放）。
+   *      其中任一项变化时条目都会把新的 context 交给 builder，因此引擎视图通过 prop 获得它们，不需要宿主的状态。
+   */
+  speed: number = 1;
+  loops: boolean = false;
+  restartToken: number = 0;
   onLoaded: () => void = () => {
   };
   onFailed: () => void = () => {
   };
+}
+
+/**
+ * [EN] Imperative playback for a `CYLAnimatedItemView` (iOS / Android `restartAnimation`): pass one as `controller`, then
+ *      call `restartAnimation()`, for example from `onItemTap`. The props `animationSpeed`, `animationLoops` and
+ *      `animationRestartToken` do the same declaratively.
+ * [CN] `CYLAnimatedItemView` 的命令式播放控制（iOS / Android 的 `restartAnimation`）：作为 `controller` 传入，然后调用 `restartAnimation()`，
+ *      例如在 `onItemTap` 中。prop `animationSpeed`、`animationLoops` 与 `animationRestartToken` 以声明式实现相同功能。
+ */
+export class CYLAnimatedItemController {
+  /** [EN] Set by the item it is attached to. [CN] 由所关联的条目设置。 */
+  cylRestart: () => void = () => {
+  };
+
+  /** [EN] Plays the animation again from progress 0. [CN] 从进度 0 重新播放动画。 */
+  restartAnimation(): void {
+    this.cylRestart();
+  }
 }
 
 /**
@@ -200,7 +228,23 @@ export struct CYLAnimatedItemView {
   @Prop selectedImage: ResourceStr = '';
   @Prop placeholderImage: ResourceStr = $r('app.media.cyl_animated_item_placeholder');
   @Prop @Watch('cylAnimationDidChange') animationUrl: string = '';
-  @Prop isItemSelected: boolean = false;
+  @Prop @Watch('cylPlaybackDidChange') isItemSelected: boolean = false;
+  /**
+   * [EN] Playback speed of the animation, 1 by default (iOS / Android `animationSpeed`). [CN] 动画播放速度，默认 1（iOS / Android `animationSpeed`）。
+   */
+  @Prop @Watch('cylPlaybackDidChange') animationSpeed: number = 1;
+  /**
+   * [EN] Whether the animation repeats (iOS / Android `animationLoops`). [CN] 动画是否循环（iOS / Android `animationLoops`）。
+   */
+  @Prop @Watch('cylPlaybackDidChange') animationLoops: boolean = false;
+  /**
+   * [EN] Any change plays the animation again from progress 0 (declarative `restartAnimation`); see also `controller`.
+   * [CN] 任何变化都会让动画从进度 0 重新播放（声明式的 `restartAnimation`）；另见 `controller`。
+   */
+  @Prop @Watch('cylPlaybackDidChange') animationRestartToken: number = 0;
+  /** [EN] Optional imperative control (`restartAnimation()`). [CN] 可选的命令式控制（`restartAnimation()`）。 */
+  controller?: CYLAnimatedItemController;
+  @State private cylControllerRestarts: number = 0;
   @Prop isItemEnabled: boolean = true;
   @Prop axis: CYLAnimatedItemAxis = CYLAnimatedItemAxis.Horizontal;
   @Prop iconSize: number = 24;
@@ -248,9 +292,15 @@ export struct CYLAnimatedItemView {
   onItemDragStart?: () => void;
   onItemDragMove?: (dx: number, dy: number) => void;
   onItemDragEnd?: (dx: number, dy: number) => void;
-  private animationContext: CYLAnimatedItemAnimationContext = new CYLAnimatedItemAnimationContext();
+  @State private animationContext: CYLAnimatedItemAnimationContext = new CYLAnimatedItemAnimationContext();
 
   aboutToAppear(): void {
+    if (this.controller) {
+      this.controller.cylRestart = () => {
+        this.cylControllerRestarts += 1;
+        this.cylPlaybackDidChange();
+      };
+    }
     this.cylAnimationDidChange();
   }
 
@@ -265,10 +315,28 @@ export struct CYLAnimatedItemView {
   cylAnimationDidChange(): void {
     this.animationLoaded = false;
     this.animationFailed = false;
+    this.cylUpdateContext();
+    if (this.animationUrl.length > 0 && !CYLAnimatedItemEngines.canPlay(this.animationUrl)) {
+      CYLAnimatedItemEngines.warnMissingEngine(this.animationUrl);
+    }
+  }
+
+  /**
+   * [EN] The selection, speed, loops or a restart changed: the engine gets them in a new context, without reloading the
+   *      file. [CN] 选中、速度、循环或重播发生变化：引擎通过新的 context 获得它们，不重新加载文件。
+   */
+  cylPlaybackDidChange(): void {
+    this.cylUpdateContext();
+  }
+
+  private cylUpdateContext(): void {
     let context: CYLAnimatedItemAnimationContext = new CYLAnimatedItemAnimationContext();
     context.url = this.animationUrl;
     context.size = this.iconSize;
     context.selected = this.isItemSelected;
+    context.speed = this.animationSpeed;
+    context.loops = this.animationLoops;
+    context.restartToken = this.animationRestartToken + this.cylControllerRestarts;
     let url: string = this.animationUrl;
     context.onLoaded = () => {
       if (url === this.animationUrl) {
@@ -281,9 +349,6 @@ export struct CYLAnimatedItemView {
       }
     };
     this.animationContext = context;
-    if (this.animationUrl.length > 0 && !CYLAnimatedItemEngines.canPlay(this.animationUrl)) {
-      CYLAnimatedItemEngines.warnMissingEngine(this.animationUrl);
-    }
   }
 
   /**
@@ -344,7 +409,19 @@ export struct CYLAnimatedItemView {
       }
       if (this.cylMakesAnimation()) {
         Column() {
-          this.animationBuilder(this.animationContext)
+          // [EN] One object literal whose fields read state: ArkUI passes it by reference, so the engine view gets new
+          //      values (selection, speed, loops, restarts) as they change; a context object alone is rendered once.
+          // [CN] 字段读取状态的单个对象字面量：ArkUI 按引用传递，引擎视图随变化获得新值（选中、速度、循环、重播）；单独的 context 对象只渲染一次。
+          this.animationBuilder({
+            url: this.animationUrl,
+            size: this.iconSize,
+            selected: this.isItemSelected,
+            speed: this.animationSpeed,
+            loops: this.animationLoops,
+            restartToken: this.animationRestartToken + this.cylControllerRestarts,
+            onLoaded: this.animationContext.onLoaded,
+            onFailed: this.animationContext.onFailed
+          })
         }
         .width(this.iconSize)
         .height(this.iconSize)
