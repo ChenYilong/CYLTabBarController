@@ -7,7 +7,7 @@ description: "Create a new app or a new demo with CYLTabBarController: choose th
 
 Every new demo in this repository is created with this skill. Source of truth: code, then `docs/`, then `README.md`. If they disagree, fix the wrong one first (usually `README.md`), then this skill.
 
-> Animated tab icons: list the tab bar and the animation subspec, `pod 'CYLTabBarController'` plus `pod 'CYLTabBarController/LottieSwift'` (or `PAG`, `Rive`, `SVGA`, `GIF`). The animation subspecs depend on the engine only, never on Core, so they do not bring the tab bar by themselves (`CYLFlatDesignTabBar` includes Core). See docs/Animated-Item.md.
+> Animated tab icons: `pod 'CYLTabBarController/LottieSwift'` (or `PAG`, `Rive`, `SVGA`, `GIF`) brings Core and the engine. Without a tab bar, use `pod 'CYLTabBarController/CYLAnimatedItem'` plus `pod 'CYLTabBarController/CYLAnimatedItemLottieSwift'` (no Core). See docs/Animated-Item.md.
 
 ## 1. Choose the integration
 
