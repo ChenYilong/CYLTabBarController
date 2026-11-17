@@ -201,6 +201,7 @@ Analyst.ai [App Store Link](https://itunes.apple.com/us/app/analyst-ai/id1345754
 | [资源路由](docs/Resource-Routes.md) | [Resource routes](docs/Resource-Routes.md) |
 | [Rive 动画 Tab 图标（与 Lottie、PAG 用法相同）](docs/Rive-Animation.md) | [Rive animated tab icons (used like Lottie and PAG)](docs/Rive-Animation.md) |
 | [SVGA 动画 Tab 图标（与 Rive、PAG、Lottie 用法相同）](docs/SVGA-Animation.md) | [SVGA animated tab icons (used like Rive, PAG and Lottie)](docs/SVGA-Animation.md) |
+| [截图规范](docs/Screenshot-Guidelines.md) | [Screenshot guidelines](docs/Screenshot-Guidelines.md) |
 | [selectedIndex 与 PlusButton：选中的文字与图片一致](docs/SelectedIndex-PlusButton.md) | [selectedIndex and the PlusButton: the selected title and image match](docs/SelectedIndex-PlusButton.md) |
 | [Swift 编码规范](docs/Swift-Coding-Style.md) | [Swift coding style](docs/Swift-Coding-Style.md) |
 | [在 Swift 项目中使用 CYLTabBarController](docs/Swift-Guide.md) | [Using CYLTabBarController in Swift](docs/Swift-Guide.md) |

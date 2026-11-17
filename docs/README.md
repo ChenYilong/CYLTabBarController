@@ -64,6 +64,7 @@
 | [资源路由](Resource-Routes.md) | [Resource routes](Resource-Routes.md) |
 | [Rive 动画 Tab 图标（与 Lottie、PAG 用法相同）](Rive-Animation.md) | [Rive animated tab icons (used like Lottie and PAG)](Rive-Animation.md) |
 | [SVGA 动画 Tab 图标（与 Rive、PAG、Lottie 用法相同）](SVGA-Animation.md) | [SVGA animated tab icons (used like Rive, PAG and Lottie)](SVGA-Animation.md) |
+| [截图规范](Screenshot-Guidelines.md) | [Screenshot guidelines](Screenshot-Guidelines.md) |
 | [selectedIndex 与 PlusButton：选中的文字与图片一致](SelectedIndex-PlusButton.md) | [selectedIndex and the PlusButton: the selected title and image match](SelectedIndex-PlusButton.md) |
 | [Swift 编码规范](Swift-Coding-Style.md) | [Swift coding style](Swift-Coding-Style.md) |
 | [在 Swift 项目中使用 CYLTabBarController](Swift-Guide.md) | [Using CYLTabBarController in Swift](Swift-Guide.md) |
@@ -165,6 +166,7 @@ docs/
 ├── Resource-Routes.md
 ├── Rive-Animation.md
 ├── SVGA-Animation.md
+├── Screenshot-Guidelines.md
 ├── SelectedIndex-PlusButton.md
 ├── Swift-Coding-Style.md
 ├── Swift-Guide.md
@@ -412,6 +414,7 @@ docs/
 │   ├── rive-flat-design.png
 │   ├── rive-liquid-glass.png
 │   ├── rive-tab-taps-and-menu-button-android.png
+│   ├── screenshot-guidelines-reference-example.png
 │   ├── svga-example-rive-bell.png
 │   ├── svga-example-rive-last-frame.png
 │   ├── svga-example-rive-playing.png
