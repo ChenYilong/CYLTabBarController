@@ -79,6 +79,8 @@ export struct CYLSVGAView {
   /**
    * [EN] The file could not be loaded or decoded, with the reason. [CN] 文件无法加载或解码，附原因。
    */
+  /** [EN] The file is drawn (CYLAnimatedItemView shows it from here on). [CN] 文件已绘制。 */
+  onLoaded: () => void = () => {};
   onLoadError: (message: string) => void = (_message: string) => {
   };
   private settings: RenderingContextSettings = new RenderingContextSettings(true);
@@ -136,6 +138,7 @@ export struct CYLSVGAView {
       } else {
         this.cylDraw();
       }
+      this.onLoaded();
     } catch (error) {
       this.onLoadError(`${(error as Error).message ?? error}`);
     }

@@ -17,6 +17,10 @@ export struct CYLLottieIcon {
   speed: number = 1;
   @Prop @Watch('cylUpdate') selected: boolean = false;
   @Prop @Watch('cylReplay') replayToken: number = 0;
+  /** [EN] The file is drawn (CYLAnimatedItemView shows it from here on). [CN] 文件已绘制（CYLAnimatedItemView 从此显示它）。 */
+  onLoaded: () => void = () => {};
+  /** [EN] The file cannot be loaded. [CN] 文件无法加载。 */
+  onLoadError: (message: string) => void = (_message: string) => {};
   private settings: RenderingContextSettings = new RenderingContextSettings(true);
   private context: CanvasRenderingContext2D = new CanvasRenderingContext2D(this.settings);
   private lottieItem?: AnimationItem;
@@ -42,7 +46,11 @@ export struct CYLLottieIcon {
       path: this.path,
     });
     this.lottieItem.setSpeed(this.speed);
-    this.lottieItem.addEventListener('DOMLoaded', () => this.cylUpdate());
+    this.lottieItem.addEventListener('DOMLoaded', () => {
+      this.cylUpdate();
+      this.onLoaded();
+    });
+    this.lottieItem.addEventListener('data_failed', () => this.onLoadError(`cannot load ${this.path}`));
   }
 
   /** [EN] A new path (e.g. the dark file after a color mode change) reloads the animation. [CN] 新路径（如切换深色模式后）重新加载动画。 */
