@@ -38,11 +38,13 @@
 /*!
  * [EN] Core and CYLUtils have no compile-time switch per animation library (PAG, Rive, …): whether a tab animates is
  *      decided at runtime by the animators registered with `CYLTabBarItemAnimatorRegistry` (the `CYLTabBarItemAnimation`
- *      subspec), so adding a library changes nothing here. Each library's own header defines its switch
- *      (`CYL_PAG_AVAILABLE`, `CYL_RIVE_AVAILABLE`), and its keys exist only when the library does.
+ *      subspec), so adding a library changes nothing here. The switches per type (`CYL_GIF_AVAILABLE`, `CYL_PAG_AVAILABLE`,
+ *      `CYL_RIVE_AVAILABLE`, `CYL_SVGA_AVAILABLE`, `CYL_LOTTIE_AVAILABLE`) are in the component's core,
+ *      `CYLAnimatedItemMacros.h`, imported at the end of this file; a library's keys exist only when the library does.
  * [CN] Core 与 CYLUtils 中没有各动画库（PAG、Rive……）的编译期开关：Tab 是否有动画在运行时由注册到 `CYLTabBarItemAnimatorRegistry`
- *      的 animator 决定（`CYLTabBarItemAnimation` 子库），因此新增动画库时这里无需修改。各动画库在自己的头文件中定义开关
- *      （`CYL_PAG_AVAILABLE`、`CYL_RIVE_AVAILABLE`），其 key 只在引入该动画库时存在。
+ *      的 animator 决定（`CYLTabBarItemAnimation` 子库），因此新增动画库时这里无需修改。各类型的开关
+ *      （`CYL_GIF_AVAILABLE`、`CYL_PAG_AVAILABLE`、`CYL_RIVE_AVAILABLE`、`CYL_SVGA_AVAILABLE`、`CYL_LOTTIE_AVAILABLE`）位于组件核心的
+ *      `CYLAnimatedItemMacros.h`，在本文件末尾导入；动画库的 key 只在引入该动画库时存在。
  */
 
 #define CYL_DEPRECATED(explain) __attribute__((deprecated(explain)))

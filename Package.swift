@@ -76,6 +76,14 @@ let package = Package(
                 // [EN] CYLAnimatedItem (CocoaPods `CYLAnimatedItem` subspec): CYLAnimatedItemView, built on the engine above.
                 // [CN] CYLAnimatedItem（CocoaPods `CYLAnimatedItem` 子库）：基于上述引擎的 CYLAnimatedItemView。
                 .headerSearchPath("CYLAnimatedItem"),
+                // [EN] The animator headers, so that CYLAnimatedItemMacros.h finds them for CYL_GIF_AVAILABLE, CYL_PAG_AVAILABLE,
+                //      CYL_RIVE_AVAILABLE and CYL_SVGA_AVAILABLE (each still needs its library).
+                // [CN] animator 头文件，使 CYLAnimatedItemMacros.h 能为 CYL_GIF_AVAILABLE 等开关找到它们（各自仍需其动画库）。
+                .headerSearchPath("CYLTabBarItemAnimation/GIF"),
+                .headerSearchPath("CYLTabBarItemAnimation/Lottie"),
+                .headerSearchPath("CYLTabBarItemAnimation/PAG"),
+                .headerSearchPath("CYLTabBarItemAnimation/Rive"),
+                .headerSearchPath("CYLTabBarItemAnimation/SVGA"),
                 // FIX: issue #216 — theme switching (skins), in CYLUtils/CYLComponents/CYLTheme.
                 .headerSearchPath("CYLUtils/CYLComponents/CYLTheme"),
                 .headerSearchPath("CYLFlatDesignTabBar/CYLFlatDesignTabBar-ObjectiveC/CYLFlatDesignTabBar"),

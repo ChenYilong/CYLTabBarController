@@ -37,6 +37,42 @@
 #endif
 
 /*!
+ * [EN] One switch per animation type, all here in the component's core so that any file can ask (an undefined macro would
+ *      silently count as 0 in `#if`). Each is 1 only when that type's engine subspec (`CYLAnimatedItem/GIF`, `PAG`,
+ *      `PAGEnterprise`, `Rive`, `SVGA`) is in the build, which brings its animator header, and its library is there.
+ *      The header is looked up through the header search paths only, never by a relative path, so a file on disk that
+ *      the build does not compile does not count. `CYL_LOTTIE_AVAILABLE` (above) asks for the Lottie library only: the
+ *      Lottie animator header is private, and the released Lottie keys depend on it.
+ * [CN] 每种动画类型一个开关，统一放在组件核心中，任何文件都能检查（未定义的宏在 `#if` 中会被静默当作 0）。只有该类型的引擎子库
+ *      （`CYLAnimatedItem/GIF`、`PAG`、`PAGEnterprise`、`Rive`、`SVGA`，会带入其 animator 头文件）参与构建且其动画库存在时才为 1。
+ *      头文件只通过头文件搜索路径查找，不使用相对路径，因此磁盘上存在但未参与编译的文件不算。`CYL_LOTTIE_AVAILABLE`（见上）只检查
+ *      Lottie 库：Lottie 的 animator 头文件是私有的，且已发布的 Lottie key 依赖它。
+ */
+#if (__has_include(<CYLAnimatedItem/CYLGIFTabBarItemAnimator.h>) || __has_include(<CYLTabBarController/CYLGIFTabBarItemAnimator.h>) || __has_include("CYLGIFTabBarItemAnimator.h")) && __has_include(<ImageIO/ImageIO.h>)
+#define CYL_GIF_AVAILABLE 1
+#else
+#define CYL_GIF_AVAILABLE 0
+#endif
+
+#if (__has_include(<CYLAnimatedItem/CYLPAGTabBarItemAnimator.h>) || __has_include(<CYLTabBarController/CYLPAGTabBarItemAnimator.h>) || __has_include("CYLPAGTabBarItemAnimator.h")) && __has_include(<libpag/PAGView.h>)
+#define CYL_PAG_AVAILABLE 1
+#else
+#define CYL_PAG_AVAILABLE 0
+#endif
+
+#if (__has_include(<CYLAnimatedItem/CYLRiveTabBarItemAnimator.h>) || __has_include(<CYLTabBarController/CYLRiveTabBarItemAnimator.h>) || __has_include("CYLRiveTabBarItemAnimator.h")) && __has_include(<RiveRuntime/RiveRuntime.h>)
+#define CYL_RIVE_AVAILABLE 1
+#else
+#define CYL_RIVE_AVAILABLE 0
+#endif
+
+#if (__has_include(<CYLAnimatedItem/CYLSVGATabBarItemAnimator.h>) || __has_include(<CYLTabBarController/CYLSVGATabBarItemAnimator.h>) || __has_include("CYLSVGATabBarItemAnimator.h")) && (__has_include(<SVGAPlayerLite/SVGA.h>) || __has_include(<SVGAPlayer/SVGA.h>) || __has_include("SVGA.h"))
+#define CYL_SVGA_AVAILABLE 1
+#else
+#define CYL_SVGA_AVAILABLE 0
+#endif
+
+/*!
  * [EN] Marks the released Lottie keys: a compile warning when Lottie is not part of the build.
  * [CN] 标记已发布的 Lottie key：没有 Lottie 时给出编译警告。
  */

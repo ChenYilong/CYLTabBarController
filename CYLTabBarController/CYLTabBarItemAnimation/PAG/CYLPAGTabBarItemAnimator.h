@@ -30,11 +30,14 @@
  *      使用 `CYLTabBarPAGURL` 会编译失败，而不是被静默忽略。App 自己只用于 PAG 的代码可用 `#if CYL_PAG_AVAILABLE` 包住。
  *      CocoaPods：`pod 'CYLTabBarController/PAG'`（或 `PAGEnterprise`）。
  */
-#if __has_include(<libpag/PAGView.h>)
-#define CYL_PAG_AVAILABLE 1
+#if __has_include(<CYLAnimatedItem/CYLAnimatedItemMacros.h>)
+#import <CYLAnimatedItem/CYLAnimatedItemMacros.h>
+#elif __has_include("../../CYLAnimatedItem/CYLAnimatedItemMacros.h")
+#import "../../CYLAnimatedItem/CYLAnimatedItemMacros.h"
 #else
-#define CYL_PAG_AVAILABLE 0
+#import "CYLAnimatedItemMacros.h"
 #endif
+// [EN] CYL_PAG_AVAILABLE is defined in CYLAnimatedItemMacros.h (the component's core). [CN] CYL_PAG_AVAILABLE 定义在 CYLAnimatedItemMacros.h（组件核心）中。
 
 #if CYL_PAG_AVAILABLE
 NS_ASSUME_NONNULL_BEGIN

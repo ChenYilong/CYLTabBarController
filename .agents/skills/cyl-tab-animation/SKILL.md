@@ -41,7 +41,7 @@ A new animation library, key, limit or demo also updates [Tab-Icon-Animation-Qui
 
 ## Rules for the library
 
-- Core and CYLUtils get no library switch. A library's keys exist only with that library: its header defines `CYL_<LIBRARY>_AVAILABLE` (`__has_include`), and the header's content and the `.m` definitions sit inside it. The released Lottie keys stay defined and are marked `CYL_LOTTIE_REQUIRED`.
+- CYLTabBarController's Core and CYLUtils define no library switch. All switches are in the component's core, `CYLAnimatedItem/CYLAnimatedItemMacros.h`: `CYL_ANIMATION_ENGINE_AVAILABLE`, `CYL_LOTTIE_AVAILABLE` (library), `CYL_GIF_AVAILABLE`, `CYL_PAG_AVAILABLE`, `CYL_RIVE_AVAILABLE`, `CYL_SVGA_AVAILABLE` (the type's engine subspec plus its library), so every file can ask. A library's keys exist only with that library: the animator header's content and the `.m` definitions sit inside its switch. The released Lottie keys stay defined and are marked `CYL_LOTTIE_REQUIRED`.
 - A new library is one more folder, one more animator class and one more subspec, with no change anywhere else. The animator registers itself in `+load` with `CYLTabBarItemAnimatorRegistry`.
 - Rive's Metal shader warnings in the console (`program_source ... Compilation succeeded`) come from the `RiveRuntime` binary. They are harmless and cannot be fixed here.
 

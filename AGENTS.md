@@ -93,9 +93,12 @@ Every new feature and user-visible change ships with bilingual documentation in 
     for `CYLTabBarStyleTypeFlatDesign`, so Liquid Glass and the classic style are never affected.
   - Lottie: separate `__has_include` guards; check keys first; call through `respondsToSelector:` and
     `cyl_performSelector`.
-  - An animation library's own keys exist only with that library: its header defines `CYL_<LIBRARY>_AVAILABLE`
-    (`__has_include` of the library), and the header's content and the `.m` definitions sit inside it (`CYL_PAG_AVAILABLE`,
-    `CYL_RIVE_AVAILABLE`). Core and CYLUtils get no library switch. The released Lottie keys stay defined and are marked
+  - An animation library's own keys exist only with that library. The switches are all defined in the component's core,
+    `CYLAnimatedItem/CYLAnimatedItemMacros.h` (2026-11-17): `CYL_ANIMATION_ENGINE_AVAILABLE` (any engine),
+    `CYL_LOTTIE_AVAILABLE` (the Lottie library), and `CYL_GIF_AVAILABLE`, `CYL_PAG_AVAILABLE`, `CYL_RIVE_AVAILABLE`,
+    `CYL_SVGA_AVAILABLE` (that type's engine subspec, found by its animator header through the header search paths,
+    plus its library). Each animator header imports that file, and its content and the `.m` definitions sit inside its
+    switch. CYLTabBarController's Core and CYLUtils define no library switch. The released Lottie keys stay defined and are marked
     `CYL_LOTTIE_REQUIRED` (a compile warning without Lottie). See docs/Tab-Bar-Item-Animation.md.
 - **Accessibility is required everywhere.** The library code shipped to CocoaPods / SPM and to Gradle / Maven, the
   React Native and Flutter components, and every example fully support accessibility (VoiceOver, TalkBack, Voice

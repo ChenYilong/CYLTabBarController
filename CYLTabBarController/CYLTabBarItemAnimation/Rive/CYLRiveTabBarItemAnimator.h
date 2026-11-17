@@ -35,11 +35,14 @@
  *      使用 `CYLTabBarRiveURL` 会编译失败，而不是被静默忽略。App 自己只用于 Rive 的代码可用 `#if CYL_RIVE_AVAILABLE` 包住。
  *      CocoaPods：`pod 'CYLTabBarController/Rive'`。
  */
-#if __has_include(<RiveRuntime/RiveRuntime.h>)
-#define CYL_RIVE_AVAILABLE 1
+#if __has_include(<CYLAnimatedItem/CYLAnimatedItemMacros.h>)
+#import <CYLAnimatedItem/CYLAnimatedItemMacros.h>
+#elif __has_include("../../CYLAnimatedItem/CYLAnimatedItemMacros.h")
+#import "../../CYLAnimatedItem/CYLAnimatedItemMacros.h"
 #else
-#define CYL_RIVE_AVAILABLE 0
+#import "CYLAnimatedItemMacros.h"
 #endif
+// [EN] CYL_RIVE_AVAILABLE is defined in CYLAnimatedItemMacros.h (the component's core). [CN] CYL_RIVE_AVAILABLE 定义在 CYLAnimatedItemMacros.h（组件核心）中。
 
 #if CYL_RIVE_AVAILABLE
 NS_ASSUME_NONNULL_BEGIN
