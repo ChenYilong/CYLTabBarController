@@ -20,6 +20,14 @@ public final class CYLTabBarItemAnimationKeys {
     public static final String CYLTabBarAnimationOptionRiveStateMachine = "stateMachine";
     public static final String CYLTabBarAnimationOptionRiveTriggerInput = "triggerInput";
     public static final String CYLTabBarAnimationOptionRiveTriggerProperty = "trigger";
+    /**
+     * [EN] Option of a tab's animation (`CYLTabBarAnimationOptions` / the URL fragment): a one-color tint drawn over the
+     *      animation, like a template image. "title" follows the tab's title color (normal / selected); a color such as
+     *      "#007AFF" is fixed. Played by the Rive view (bug B12, docs/Animated-Item.md).
+     * [CN] Tab 动画的选项（`CYLTabBarAnimationOptions` / URL 片段）：像模板图片一样的单色着色。"title" 跟随 Tab 标题颜色（普通 / 选中）；
+     *      "#007AFF" 这样的颜色为固定色。由 Rive 视图实现（问题 B12）。
+     */
+    public static final String CYLTabBarAnimationOptionTint = "tint";
     public static final String CYLTabBarAnimationSize = "CYLTabBarAnimationSize";
     public static final String CYLTabBarAnimationURL = "CYLTabBarAnimationURL";
     public static final String CYLTabBarGIFDarkFilePath = "CYLTabBarGIFDarkFilePath";

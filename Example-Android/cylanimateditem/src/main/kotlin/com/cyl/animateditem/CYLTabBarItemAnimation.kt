@@ -134,6 +134,15 @@ interface CYLTabBarItemAnimationPlayer {
      *      默认转发给 `applyDarkColors`。
      */
     fun applyColors(colors: Map<String, Int>?, configuration: Configuration) = applyDarkColors(colors.orEmpty(), configuration)
+    /**
+     * [EN] The tab's current tint (its title color, normal or selected), set by the tab bar on every state change; an
+     *      animation whose `CYLTabBarAnimationOptionTint` option is "title" draws in it. Libraries without a tint ignore it.
+     * [CN] Tab 当前的着色（其标题颜色，普通或选中），TabBar 在每次状态变化时设置；`CYLTabBarAnimationOptionTint` 选项为 "title" 的动画用它绘制。
+     *      没有着色的动画库忽略它。
+     */
+    var tintColor: Int?
+        get() = null
+        set(@Suppress("UNUSED_PARAMETER") value) { /* [EN] Optional. [CN] 可选。 */ }
 }
 
 /**
@@ -418,6 +427,10 @@ interface CYLTabBarItemAnimationPlayableView {
      * [EN] Colors for Dark Mode, already resolved; null restores the light colors. [CN] 深色模式颜色（已解析）；null 恢复浅色。
      */
     fun cyl_applyAnimationViewColors(colors: Map<String, Int>?) { /* [EN] Optional. [CN] 可选。 */ }
+    /**
+     * [EN] The tab's tint (see `CYLTabBarItemAnimationPlayer.tintColor`). [CN] Tab 的着色（见 `CYLTabBarItemAnimationPlayer.tintColor`）。
+     */
+    fun cyl_applyAnimationViewTintColor(color: Int?) { /* [EN] Optional. [CN] 可选。 */ }
 }
 
 /**
@@ -470,6 +483,8 @@ open class CYLTabBarItemViewAnimator(
             override fun play() = playable.cyl_playAnimationView()
             override fun showLastFrame() = playable.cyl_showAnimationViewLastFrame()
             override fun stop() = playable.cyl_stopAnimationView()
+            override var tintColor: Int? = null
+                set(value) { if (field != value) { field = value; playable.cyl_applyAnimationViewTintColor(value) } }
             override fun applyColors(colors: Map<String, Int>?, configuration: Configuration) {
                 // [EN] Only when the state changes, as on iOS. [CN] 与 iOS 一样，只在状态变化时应用。
                 val next = colors?.takeIf { it.isNotEmpty() }
@@ -904,6 +919,40 @@ class CYLRiveTabBarItemAnimationView private constructor(context: Context, priva
         addView(rive, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
         // [EN] A tab icon is not a control: TalkBack reads the tab button. [CN] Tab 图标不是控件：TalkBack 读取 Tab 按钮。
         importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS
+        // [EN] A fixed tint ("#RRGGBB" / "#AARRGGBB"). [CN] 固定着色。
+        tintOption?.takeIf { it != TINT_TITLE }?.let { value -> runCatching { android.graphics.Color.parseColor(value) }.getOrNull()?.let { applyTint(it) } }
+    }
+
+    private val tintOption get() = options[CYLTabBarItemAnimationKeys.CYLTabBarAnimationOptionTint]?.trim()?.takeIf { it.isNotEmpty() }
+
+    /**
+     * [EN] The tint currently drawn, or null. [CN] 当前绘制的着色，没有时为 null。
+     */
+    var appliedTintColor: Int? = null
+        private set
+
+    /**
+     * [EN] Bug B12: icons.riv draws light strokes that vanish on a light tab bar, and a Rive file has no tint of its own.
+     *      A one-color icon is tinted like a template image: its layer is drawn through a SRC_IN color filter (a
+     *      TextureView, as rive-android's view, takes it as its layer paint). null removes it.
+     * [CN] 问题 B12：icons.riv 绘制浅色描边，在浅色 TabBar 上几乎不可见，而 Rive 文件本身没有着色。单色图标像模板图片一样着色：通过 SRC_IN
+     *      颜色滤镜绘制其图层（rive-android 的视图是 TextureView，作为其 layer paint）。null 移除着色。
+     */
+    private fun applyTint(color: Int?) {
+        appliedTintColor = color
+        val paint = color?.let { android.graphics.Paint().apply { colorFilter = android.graphics.PorterDuffColorFilter(it, android.graphics.PorterDuff.Mode.SRC_IN) } }
+        if (rive is android.view.TextureView) {
+            rive.setLayerPaint(paint)
+        } else {
+            rive.setLayerType(if (paint != null) View.LAYER_TYPE_HARDWARE else View.LAYER_TYPE_NONE, paint)
+        }
+    }
+
+    /**
+     * [EN] The tab's title color, drawn when the `tint` option is "title". [CN] Tab 的标题颜色，`tint` 选项为 "title" 时绘制。
+     */
+    override fun cyl_applyAnimationViewTintColor(color: Int?) {
+        if (tintOption == TINT_TITLE) applyTint(color)
     }
 
     /**
@@ -961,6 +1010,11 @@ class CYLRiveTabBarItemAnimationView private constructor(context: Context, priva
     /**
      * [EN] Provides the views of `CYLRiveTabBarItemAnimator`. [CN] 为 `CYLRiveTabBarItemAnimator` 提供视图。
      */
+    companion object {
+        /** [EN] The `tint` option value that follows the tab's title color. [CN] 跟随 Tab 标题颜色的 `tint` 选项值。 */
+        const val TINT_TITLE = "title"
+    }
+
     object Provider : CYLTabBarItemAnimationViewProviding {
         @Volatile private var riveInitialized = false
 
