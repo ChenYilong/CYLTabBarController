@@ -185,6 +185,8 @@ const CYL_RIVE_LOOP_SECONDS: number = 1.5;
 const CYL_RIVE_LOOP_PAUSE_SECONDS: number = 0.4;
 /** [EN] A frame later: the state machine sees the reset or the false first. [CN] 一帧之后：状态机先看到重置或 false。 */
 const CYL_RIVE_NEXT_FRAME_MS: number = 50;
+/** [EN] A held input's off time before it goes on again, outside a loop: more than one frame on a slow device. [CN] 循环之外，保持的输入重新打开前的关闭时间：大于慢设备的一帧。 */
+const CYL_RIVE_INPUT_OFF_MS: number = 150;
 /** [EN] Time for the first frame to be drawn before a loaded file pauses. [CN] 加载的文件暂停前绘制第一帧的时间。 */
 const CYL_RIVE_FIRST_FRAME_MS: number = 100;
 
@@ -446,7 +448,9 @@ export struct CYLRiveIcon {
             }
           }, duration * 1000);
         }
-      }, CYL_RIVE_NEXT_FRAME_MS);
+        // [EN] Half a loop pass while looping a held input, so the machine spends real time closed (as Android and the mini
+        //      program); otherwise a frame. [CN] 循环保持的输入时为半个循环周期，使状态机真正停留在关闭状态（与 Android、小程序相同）；否则为一帧。
+      }, this.loops && duration <= 0 ? CYL_RIVE_LOOP_SECONDS * 500 : CYL_RIVE_INPUT_OFF_MS);
     } else {
       view.reset();
       view.play();

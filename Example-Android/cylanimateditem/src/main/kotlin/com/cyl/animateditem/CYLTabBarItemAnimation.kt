@@ -1089,7 +1089,7 @@ class CYLRiveTabBarItemAnimationView internal constructor(context: Context, priv
                 handler.postDelayed({
                     setActive(true)
                     if (activeDuration > 0) handler.postDelayed({ setActive(false) }, (activeDuration * 1000).toLong())
-                }, NEXT_FRAME_MS)
+                }, inputOffMilliseconds())
             }
             // [EN] rive-android `play(animationName, loop, direction, isStateMachine, settleInitialState)`, from the start.
             // [CN] rive-android 的 `play(animationName, loop, direction, isStateMachine, settleInitialState)`，从头开始。
@@ -1103,6 +1103,18 @@ class CYLRiveTabBarItemAnimationView internal constructor(context: Context, priv
      * [EN] Whether a play restarts the file (no usable trigger, number or boolean input, no named animation).
      * [CN] 一次播放是否重新开始文件（没有可用的 trigger、数字或布尔输入，也没有命名动画）。
      */
+    /**
+     * [EN] How long a held input stays off before it goes on again: half a loop pass while looping a held input (duration
+     *      0), so the state machine spends real time closed on a slow device and every pass toggles (menu_button.riv stuck
+     *      on an x86 emulator, the mini program's B20 fix 074285a6); otherwise INPUT_OFF_MS (150 ms): a slow device renders a
+     *      frame in more than 50 ms, and the machine must advance at least once with the input off.
+     * [CN] 保持的输入在重新打开前关闭多久：循环保持的输入（时长为 0）时为半个循环周期，使状态机在慢设备上也真正停留在关闭状态，每次循环都切换
+     *      （x86 模拟器上 menu_button.riv 卡住，同小程序的 B20 修复 074285a6）；否则为 INPUT_OFF_MS（150 ms）：慢设备渲染一帧超过 50 ms，
+     *      状态机必须在输入关闭时至少前进一次。
+     */
+    private fun inputOffMilliseconds(): Long =
+        if (loops && activeDuration <= 0) (LOOP_SECONDS * 1000 / 2).toLong() else INPUT_OFF_MS
+
     private fun restartsOnPlay(): Boolean {
         val machine = stateMachine ?: return options[CYLTabBarItemAnimationKeys.CYLTabBarAnimationOptionRiveAnimation] == null
         val trigger = options[CYLTabBarItemAnimationKeys.CYLTabBarAnimationOptionRiveTriggerInput] ?: options[CYLTabBarItemAnimationKeys.CYLTabBarAnimationOptionRiveTriggerProperty]
@@ -1154,6 +1166,8 @@ class CYLRiveTabBarItemAnimationView internal constructor(context: Context, priv
          * [EN] A frame later: the state machine sees the reset or the false first. [CN] 一帧之后：状态机先看到重置或 false。
          */
         internal const val NEXT_FRAME_MS = 50L
+        /** [EN] A held input's off time before it goes on again (outside a loop). [CN] 保持的输入重新打开前的关闭时间（循环之外）。 */
+        internal const val INPUT_OFF_MS = 150L
         /** [EN] Time for the first frame to be drawn before a loaded file pauses. [CN] 加载的文件暂停前绘制第一帧的时间。 */
         internal const val FIRST_FRAME_MS = 100L
     }

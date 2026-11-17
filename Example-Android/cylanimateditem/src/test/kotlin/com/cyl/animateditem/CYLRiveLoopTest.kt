@@ -53,8 +53,8 @@ class CYLRiveLoopTest {
     fun aHeldInputPlaysAgain() {
         val rive = FakeRive(context, listOf(Machine("State Machine", listOf("isOpen"))))
         val view = CYLRiveTabBarItemAnimationView(context, rive, mapOf("stateMachine" to "State Machine", "input" to "isOpen", "duration" to "0"))
-        view.cyl_playAnimationView(); idle(60)
-        view.cyl_playAnimationView(); idle(60)
+        view.cyl_playAnimationView(); idle(CYLRiveTabBarItemAnimationView.INPUT_OFF_MS + 10)
+        view.cyl_playAnimationView(); idle(CYLRiveTabBarItemAnimationView.INPUT_OFF_MS + 10)
         assertEquals(listOf("isOpen=false", "isOpen=true", "isOpen=false", "isOpen=true"), rive.calls)
     }
 
@@ -148,9 +148,21 @@ class CYLRiveLoopTest {
         val view = CYLRiveTabBarItemAnimationView(context, rive, mapOf("stateMachine" to "State Machine", "input" to "isOpen", "duration" to "0"))
         view.cyl_restUntilPlayed()
         idle(CYLRiveTabBarItemAnimationView.FIRST_FRAME_MS + 10)
-        view.cyl_playAnimationView(); idle(60)
-        view.cyl_playAnimationView(); idle(60)
+        view.cyl_playAnimationView(); idle(CYLRiveTabBarItemAnimationView.INPUT_OFF_MS + 10)
+        view.cyl_playAnimationView(); idle(CYLRiveTabBarItemAnimationView.INPUT_OFF_MS + 10)
         assertEquals("menu_button.riv: resumed once, then every play toggles isOpen",
             listOf("pause", "play:State Machine", "isOpen=false", "isOpen=true", "isOpen=false", "isOpen=true"), rive.calls)
+    }
+
+    @Test
+    fun aLoopedHeldInputStaysOffForHalfAPass() {
+        val rive = FakeRive(context, listOf(Machine("State Machine", listOf("isOpen"))))
+        val view = CYLRiveTabBarItemAnimationView(context, rive, mapOf("stateMachine" to "State Machine", "input" to "isOpen", "duration" to "0"))
+        view.cyl_setAnimationViewLoops(true)
+        view.cyl_playAnimationView()
+        idle(100)
+        assertEquals("still off a frame later, so a slow device renders the closed state", listOf("isOpen=false"), rive.calls)
+        idle((CYLRiveTabBarItemAnimationView.LOOP_SECONDS * 1000 / 2).toLong())
+        assertEquals(listOf("isOpen=false", "isOpen=true"), rive.calls)
     }
 }
