@@ -5815,5 +5815,15 @@
  "CYLCatchException()": {
   "status": "n/a",
   "note": "Catches an Objective-C exception for Swift callers (Swift cannot catch NSException); Kotlin has try / catch"
+ },
+ "CYLTabBarAnimationOptionRiveNumberInput": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarAnimationOptionRiveNumberInput",
+  "note": "played when libpag / rive-android is in the app"
+ },
+ "CYLTabBarAnimationOptionRiveNumberValues": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarAnimationOptionRiveNumberValues",
+  "note": "played when libpag / rive-android is in the app"
  }
 }

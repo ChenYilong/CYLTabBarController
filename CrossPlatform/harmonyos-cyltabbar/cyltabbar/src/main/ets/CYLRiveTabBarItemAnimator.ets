@@ -1,4 +1,4 @@
-import { Fit, Loop, RendererType, RiveAnimationView, ViewModelInstance, initializeRive } from '@ohos/rive';
+import { Fit, Loop, RendererType, RiveAnimationView, SMINumber, ViewModelInstance, initializeRive } from '@ohos/rive';
 import { deviceInfo } from '@kit.BasicServicesKit';
 import { common } from '@kit.AbilityKit';
 
@@ -71,6 +71,32 @@ export const CYLTabBarAnimationOptionRiveAnimation: string = 'animation';
  * [EN] `CYLTabBarAnimationOptionRiveLegacyRuntime`: "1" plays the file with no view model. [CN] "1" 表示不使用 view model 播放。
  */
 export const CYLTabBarAnimationOptionRiveLegacyRuntime: string = 'legacy';
+/**
+ * [EN] `CYLTabBarAnimationOptionRiveNumberInput`: a state machine number input set to the next of `values` on each play
+ *      (house.riv: "Rooms").
+ * [CN] 每次播放设为 `values` 中下一个值的状态机数字输入（house.riv："Rooms"）。
+ */
+export const CYLTabBarAnimationOptionRiveNumberInput: string = 'numberInput';
+/**
+ * [EN] `CYLTabBarAnimationOptionRiveNumberValues`: the values the number input steps through, "3,4,5,6", cycling; without it, +1.
+ * [CN] 数字输入依次使用的值，"3,4,5,6"，循环；没有时 +1。
+ */
+export const CYLTabBarAnimationOptionRiveNumberValues: string = 'values';
+
+/**
+ * [EN] The value after `current` in the `values` option ("3,4,5,6"), cycling (an unknown value starts the list); without
+ *      values, `current + 1`. As on iOS, Android and the WeChat Mini Program.
+ * [CN] `values` 选项（"3,4,5,6"）中 `current` 之后的值，循环（未知值从列表开头开始）；没有值时为 `current + 1`。与 iOS、Android、微信小程序一致。
+ */
+export function cylRiveNextNumber(values: string | undefined, current: number | undefined): number {
+  const list: number[] = (values ?? '').split(',').map((value: string) => value.trim()).filter((value: string) => value !== '')
+    .map((value: string) => Number(value)).filter((value: number) => Number.isFinite(value));
+  if (list.length === 0) {
+    return (current ?? 0) + 1;
+  }
+  const index = current === undefined ? -1 : list.indexOf(current);
+  return list[(index + 1) % list.length];
+}
 
 /**
  * [EN] `CYLTabBarAnimationURLWithOptions`: a file path or URL with its options as a query, as on iOS and Android.
@@ -248,7 +274,8 @@ export struct CYLRiveIcon {
     return this.cylOption(CYLTabBarAnimationOptionRiveLegacyRuntime) === '1'
       || this.cylOption(CYLTabBarAnimationOptionRiveInput) !== undefined
       || this.cylOption(CYLTabBarAnimationOptionRiveTriggerInput) !== undefined
-      || this.cylOption(CYLTabBarAnimationOptionRiveAnimation) !== undefined;
+      || this.cylOption(CYLTabBarAnimationOptionRiveAnimation) !== undefined
+      || this.cylOption(CYLTabBarAnimationOptionRiveNumberInput) !== undefined;
   }
 
   private cylDuration(): number {
@@ -329,6 +356,7 @@ export struct CYLRiveIcon {
     const trigger = this.cylOption(CYLTabBarAnimationOptionRiveTriggerProperty);
     const instance = this.cylUsesLegacyRuntime() ? null : this.cylViewModel(view);
     const legacyInput = this.cylOption(CYLTabBarAnimationOptionRiveInput);
+    const numberInput = this.cylOption(CYLTabBarAnimationOptionRiveNumberInput);
     if (animation !== undefined) {
       view.reset();
       view.play(animation, Loop.ONESHOT);
@@ -345,6 +373,11 @@ export struct CYLRiveIcon {
           }
         }
       }, CYL_RIVE_NEXT_FRAME_MS);
+    } else if (numberInput !== undefined && machine !== undefined && this.cylHasInput(view, machine, numberInput)) {
+      // [EN] The next value: house.riv moves only when Rooms changes. [CN] 下一个值：house.riv 只在 Rooms 变化时运动。
+      view.play();
+      view.setNumberState(machine, numberInput,
+        cylRiveNextNumber(this.cylOption(CYLTabBarAnimationOptionRiveNumberValues), this.cylNumberValue(view, machine, numberInput)));
     } else if (trigger !== undefined && instance !== null) {
       view.play();
       try {
@@ -379,6 +412,37 @@ export struct CYLRiveIcon {
     this.cylScheduleLoop(view, trigger !== undefined || triggerInput !== undefined);
   }
 
+  /** [EN] A number input's value, undefined when unknown. [CN] 数字输入的值，无法读取时为 undefined。 */
+  private cylNumberValue(view: RiveAnimationView, machine: string, input: string): number | undefined {
+    try {
+      const found = view.getStateMachines().find((instance) => instance.name === machine);
+      const value = found?.inputByName(input);
+      return value instanceof SMINumber ? value.value : undefined;
+    } catch (e) {
+      return undefined;
+    }
+  }
+
+  /**
+   * [EN] Whether a play restarts the file (no usable input or trigger, no named animation, no view model).
+   * [CN] 一次播放是否重新开始文件（没有可用的输入或 trigger、没有命名动画、没有 view model）。
+   */
+  private cylRestartsOnPlay(view: RiveAnimationView): boolean {
+    if (this.cylOption(CYLTabBarAnimationOptionRiveAnimation) !== undefined) {
+      return false;
+    }
+    const machine = this.cylStateMachine(view);
+    if (machine === undefined) {
+      return true;
+    }
+    if (!this.cylUsesLegacyRuntime() && this.cylViewModel(view) !== null) {
+      return false;
+    }
+    const inputs = [CYLTabBarAnimationOptionRiveTriggerInput, CYLTabBarAnimationOptionRiveNumberInput, CYLTabBarAnimationOptionRiveInput]
+      .map((key: string) => this.cylOption(key)).filter((name: string | undefined) => name !== undefined) as string[];
+    return !inputs.some((name: string) => this.cylHasInput(view, machine, name));
+  }
+
   /** [EN] The next pass while looping. [CN] 循环时的下一次播放。 */
   private cylScheduleLoop(view: RiveAnimationView, isTrigger: boolean): void {
     if (!this.loops) {
@@ -389,7 +453,13 @@ export struct CYLRiveIcon {
     this.loopTimer = setTimeout(() => {
       this.loopTimer = -1;
       if (this.loops && this.riveView === view && this.selected) {
-        this.cylPlay(view);
+        // [EN] A file still moving on its own (shapes.riv, truck.riv) is not cut short: check again after another pass.
+        // [CN] 仍在自行运动的文件（shapes.riv、truck.riv）不被打断：再等一次检查。
+        if (this.cylRestartsOnPlay(view) && view.isPlaying()) {
+          this.cylScheduleLoop(view, isTrigger);
+        } else {
+          this.cylPlay(view);
+        }
       }
     }, seconds * 1000);
   }

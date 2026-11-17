@@ -20,9 +20,11 @@ import java.util.concurrent.TimeUnit
  */
 @RunWith(RobolectricTestRunner::class)
 class CYLRiveLoopTest {
-    class Machine(private val name: String, private val inputs: List<String>) {
+    class Number(var number: Float) { fun getValue() = number }
+    class Machine(private val name: String, private val inputs: List<String>, private val numbers: Map<String, Number> = emptyMap()) {
         fun getName() = name
         fun getInputNames() = inputs
+        fun input(name: String): Any? = numbers[name]
     }
 
     /** [EN] Records reset / play / setBooleanState / fireState. [CN] 记录 reset / play / setBooleanState / fireState。 */
@@ -35,6 +37,12 @@ class CYLRiveLoopTest {
         fun play(animationName: String, loop: Any? = null, direction: Any? = null, isStateMachine: Boolean = false, settleInitialState: Boolean = true) { calls += "play:$animationName" }
         fun setBooleanState(machine: String, input: String, value: Boolean) { calls += "$input=$value" }
         fun fireState(machine: String, input: String) { calls += "fire:$input" }
+        var playing = false
+        fun isPlaying() = playing
+        fun setNumberState(machine: String, input: String, value: Float) {
+            calls += "$input=${value.toInt()}"
+            machines.forEach { (it.input(input) as? Number)?.number = value }
+        }
     }
 
     private val context: Context = ApplicationProvider.getApplicationContext()
@@ -79,5 +87,36 @@ class CYLRiveLoopTest {
         view.cyl_setAnimationViewLoops(false)
         idle(5000)
         assertEquals(3, rive.calls.count { it == "fire:Check" })
+    }
+
+    @Test
+    fun houseStepsItsRoomsNumberInput() {
+        val rooms = Number(3f)
+        val rive = FakeRive(context, listOf(Machine("State Machine 1", listOf("Rooms"), mapOf("Rooms" to rooms))))
+        val view = CYLRiveTabBarItemAnimationView(context, rive, mapOf("stateMachine" to "State Machine 1", "numberInput" to "Rooms", "values" to "3,4,5,6"))
+        repeat(4) { view.cyl_playAnimationView() }
+        assertEquals(listOf("Rooms=4", "Rooms=5", "Rooms=6", "Rooms=3"), rive.calls)
+    }
+
+    @Test
+    fun numberValuesAndNext() {
+        assertEquals(listOf(3f, 4f, 5f), CYLRiveInputs.numberValues("3, 4,x,5"))
+        assertEquals(4f, CYLRiveInputs.nextNumber(emptyList(), 3f))
+        assertEquals(3f, CYLRiveInputs.nextNumber(listOf(3f, 4f), null))
+        assertEquals(3f, CYLRiveInputs.nextNumber(listOf(3f, 4f), 4f))
+    }
+
+    @Test
+    fun aLoopPassDoesNotRestartAFileStillMoving() {
+        val rive = FakeRive(context, listOf(Machine("State Machine 1", emptyList())))
+        val view = CYLRiveTabBarItemAnimationView(context, rive, mapOf("stateMachine" to "State Machine 1"))
+        view.cyl_setAnimationViewLoops(true)
+        view.cyl_playAnimationView()
+        rive.playing = true
+        idle((CYLRiveTabBarItemAnimationView.LOOP_SECONDS * 1000).toLong() * 2 + 60)
+        assertEquals(1, rive.calls.count { it == "reset" })
+        rive.playing = false
+        idle((CYLRiveTabBarItemAnimationView.LOOP_SECONDS * 1000).toLong() + 60)
+        assertEquals(2, rive.calls.count { it == "reset" })
     }
 }

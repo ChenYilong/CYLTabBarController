@@ -17,6 +17,16 @@ public final class CYLTabBarItemAnimationKeys {
     public static final String CYLTabBarAnimationOptionRiveAnimation = "animation";
     public static final String CYLTabBarAnimationOptionRiveArtboard = "artboard";
     public static final String CYLTabBarAnimationOptionRiveInput = "input";
+    /**
+     * [EN] A state machine number input set to the next of `values` on each play (house.riv: "Rooms").
+     * [CN] 每次播放设为 `values` 中下一个值的状态机数字输入（house.riv："Rooms"）。
+     */
+    public static final String CYLTabBarAnimationOptionRiveNumberInput = "numberInput";
+    /**
+     * [EN] The values the number input steps through, "3,4,5,6", cycling; without it, +1.
+     * [CN] 数字输入依次使用的值，"3,4,5,6"，循环；没有时 +1。
+     */
+    public static final String CYLTabBarAnimationOptionRiveNumberValues = "values";
     public static final String CYLTabBarAnimationOptionRiveStateMachine = "stateMachine";
     public static final String CYLTabBarAnimationOptionRiveTriggerInput = "triggerInput";
     public static final String CYLTabBarAnimationOptionRiveTriggerProperty = "trigger";

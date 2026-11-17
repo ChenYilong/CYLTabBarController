@@ -115,6 +115,8 @@ public final class CYLConstants {
     public static final String CYLTabBarAnimationOptionRiveTriggerInput = CYLTabBarItemAnimationKeys.CYLTabBarAnimationOptionRiveTriggerInput;
     public static final String CYLTabBarAnimationOptionRiveAnimation = CYLTabBarItemAnimationKeys.CYLTabBarAnimationOptionRiveAnimation;
     public static final String CYLTabBarAnimationOptionRiveLegacyRuntime = "legacy";
+    public static final String CYLTabBarAnimationOptionRiveNumberInput = CYLTabBarItemAnimationKeys.CYLTabBarAnimationOptionRiveNumberInput;
+    public static final String CYLTabBarAnimationOptionRiveNumberValues = CYLTabBarItemAnimationKeys.CYLTabBarAnimationOptionRiveNumberValues;
 
     // MARK: - Configuration keys 配置键 (CYLTabBarController (CYLConfiguration))
 

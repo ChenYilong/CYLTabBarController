@@ -931,7 +931,19 @@ class CYLRiveTabBarItemAnimationView internal constructor(context: Context, priv
      * [EN] Plays again after each pass (`cyl_setAnimationViewLoops`). [CN] 每次播放后再次播放（`cyl_setAnimationViewLoops`）。
      */
     private var loops = false
-    private val loopRunnable = Runnable { if (loops) cyl_playAnimationView() }
+    private val numberInput get() = options[CYLTabBarItemAnimationKeys.CYLTabBarAnimationOptionRiveNumberInput]
+    private val numberValues get() = CYLRiveInputs.numberValues(options[CYLTabBarItemAnimationKeys.CYLTabBarAnimationOptionRiveNumberValues])
+    private var lastNumber: Float? = null
+    // [EN] A loop pass leaves a file that is still moving on its own alone (shapes.riv, truck.riv); only a play restarts it.
+    // [CN] 一次循环不打断仍在自行运动的文件（shapes.riv、truck.riv）；只有播放才会重新开始它。
+    private val loopRunnable: Runnable = Runnable {
+        if (!loops) return@Runnable
+        if (restartsOnPlay() && CYLReflection.call(rive, "isPlaying") == true) {
+            handler.postDelayed(loopRunnable, (LOOP_SECONDS * 1000).toLong())
+        } else {
+            cyl_playAnimationView()
+        }
+    }
 
     init {
         addView(rive, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
@@ -1018,12 +1030,19 @@ class CYLRiveTabBarItemAnimationView internal constructor(context: Context, priv
             CYLReflection.call(rive, "reset")
             CYLReflection.callKotlin(rive, "play", default, default, default)
         }
+        val number = numberInput
         when {
+            machine != null && trigger == null && number != null && hasInput(machine, number) -> {
+                // [EN] The next value: house.riv moves only when Rooms changes. [CN] 下一个值：house.riv 只在 Rooms 变化时运动。
+                val next = CYLRiveInputs.nextNumber(numberValues, CYLRiveInputs.numberValue(rive, machine, number) ?: lastNumber)
+                lastNumber = next
+                CYLReflection.call(rive, "setNumberState", machine, number, next)
+            }
             machine != null && trigger != null && hasInput(machine, trigger) -> {
                 restart()
                 handler.postDelayed({ CYLReflection.call(rive, "fireState", machine, trigger) }, NEXT_FRAME_MS)
             }
-            machine != null && trigger == null && hasInput(machine, booleanInput) -> {
+            machine != null && trigger == null && numberInput == null && hasInput(machine, booleanInput) -> {
                 setActive(false)
                 handler.postDelayed({
                     setActive(true)
@@ -1036,6 +1055,18 @@ class CYLRiveTabBarItemAnimationView internal constructor(context: Context, priv
             else -> restart()
         }
         if (loops) handler.postDelayed(loopRunnable, (loopSeconds(machine, trigger) * 1000).toLong())
+    }
+
+    /**
+     * [EN] Whether a play restarts the file (no usable trigger, number or boolean input, no named animation).
+     * [CN] 一次播放是否重新开始文件（没有可用的 trigger、数字或布尔输入，也没有命名动画）。
+     */
+    private fun restartsOnPlay(): Boolean {
+        val machine = stateMachine ?: return options[CYLTabBarItemAnimationKeys.CYLTabBarAnimationOptionRiveAnimation] == null
+        val trigger = options[CYLTabBarItemAnimationKeys.CYLTabBarAnimationOptionRiveTriggerInput] ?: options[CYLTabBarItemAnimationKeys.CYLTabBarAnimationOptionRiveTriggerProperty]
+        if (trigger != null) return !hasInput(machine, trigger)
+        numberInput?.let { return !hasInput(machine, it) }
+        return !hasInput(machine, booleanInput)
     }
 
     /**
@@ -1158,6 +1189,34 @@ internal object CYLRiveInputs {
         val instance = machines.firstOrNull { machineName(it) == machine } ?: return machines.isEmpty()
         val names = try { instance.javaClass.getMethod("getInputNames").invoke(instance) as? List<*> } catch (error: Exception) { null } ?: return true
         return names.contains(input)
+    }
+
+    /**
+     * [EN] The `values` option ("3,4,5,6") as numbers. [CN] `values` 选项（"3,4,5,6"）转为数字。
+     */
+    fun numberValues(values: String?): List<Float> = values.orEmpty().split(',').mapNotNull { it.trim().toFloatOrNull() }
+
+    /**
+     * [EN] The value after `current` in `values`, cycling (an unknown value starts the list); without values, `current + 1`.
+     * [CN] `values` 中 `current` 之后的值，循环（未知值从列表开头开始）；没有值时为 `current + 1`。
+     */
+    fun nextNumber(values: List<Float>, current: Float?): Float {
+        if (values.isEmpty()) return (current ?: 0f) + 1f
+        val index = if (current == null) -1 else values.indexOf(current)
+        return values[(index + 1) % values.size]
+    }
+
+    /**
+     * [EN] A number input's value (`input(name).getValue()` of rive-android), null when unknown.
+     * [CN] 数字输入的值（rive-android 的 `input(name).getValue()`），无法读取时为 null。
+     */
+    fun numberValue(rive: Any, machine: String, input: String): Float? {
+        val machines = try { rive.javaClass.getMethod("getStateMachines").invoke(rive) as? List<*> } catch (error: Exception) { null } ?: return null
+        val instance = machines.firstOrNull { machineName(it) == machine } ?: return null
+        return try {
+            val smi = instance.javaClass.getMethod("input", String::class.java).invoke(instance, input) ?: return null
+            (smi.javaClass.getMethod("getValue").invoke(smi) as? Number)?.toFloat()
+        } catch (error: Exception) { null }
     }
 
     private fun machineName(instance: Any?): String? = try { instance?.javaClass?.getMethod("getName")?.invoke(instance) as? String } catch (error: Exception) { null }
