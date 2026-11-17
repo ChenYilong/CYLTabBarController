@@ -25,6 +25,7 @@
 | [页眉、说明与页脚](#cn页眉说明与页脚) | [Header, captions and footer](#enheader-captions-and-footer) |
 | [参考示例](#cn参考示例) | [Reference example](#enreference-example) |
 | [工具](#cn工具) | [Tool](#entool) |
+| [检查](#cn检查) | [Check](#encheck) |
 
 <!-- navigation:end -->
 
@@ -90,3 +91,12 @@
 | 中文 | English |
 |:---|:---|
 | 本节按用户要求使用英文（见右列）。 | `scripts/stitch-screenshots.py` builds an image that follows these rules with ffmpeg only (no Python packages): a header band, the cells with a caption band above each (`--columns auto` by default: one column, or two when one column would be taller than a phone screen; `--columns N` to force), and a footer band; screenshots keep their pixels; it prints the size and warns when the result is landscape. Example: `python3 scripts/stitch-screenshots.py --out docs/assets/ios-rive-rest.png --header "iOS 27.2, iPhone 17 Pro simulator, macOS 27.3, Xcode 27.2 (27B52), CYLTabBarController dcbfdec6 (ef1d0313), feat/cross-platform-components, 2026-11-18. Purpose: Rive tags rest until played" --footer "Result: 0 changed pixels over 11 s (expected: still until played). Method: pixel diff of two simulator screenshots." "launch, no play=/tmp/a.png" "11 s later, 0 changed pixels=/tmp/b.png"`. Run it with bash or from Python, not with zsh word splitting (`AGENTS.md`, "Commands"). Checked 2026-11-18 on macOS 27.3 with ffmpeg 7 (Example-Rive tab bar crops: two crops gave one column, eight crops switched to two columns): the bands sit above and below the cells and never overlap them. |
+
+## [CN]检查
+## [EN]Check
+
+| 中文 | English |
+|:---|:---|
+| 本节按用户要求使用英文（见右列）。 | **Why the rules were not applied at first (2026-11-18)**: the eight images this session committed that day (the Rive and GIF rest checks, the HarmonyOS loop and replay checks, the iPhone Duo bar, the iOS per-icon loop) were made before the rules existed, and nothing checked new images afterwards: tiles were made with ffmpeg directly. They were rebuilt with headers, captions and footers (same file names, original pixels inside). |
+| 本节按用户要求使用英文（见右列）。 | **The check**: `scripts/stitch-screenshots.py` writes a PNG `tEXt` chunk `CYLScreenshot` (its header and footer) into every image; `python3 scripts/check-screenshot-labels.py` lists every PNG or JPEG added to `docs/assets` since 2026-11-18 (committed or staged) without it and exits 1. Run it before every commit that adds a screenshot, next to `scripts/update-docs-navigation.py`. Left on 2026-11-18: 11 images from other sessions (HarmonyOS plus button, Flutter and React Native Rive, Android tab badges, the iOS animated item demo); their sessions were told. |
+

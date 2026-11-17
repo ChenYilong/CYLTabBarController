@@ -21,12 +21,31 @@ import subprocess
 import sys
 import tempfile
 import textwrap
+import struct
+import zlib
 
 FONT = '/System/Library/Fonts/Supplemental/Arial Bold.ttf'
 TEXT_COLOR = '0xFF3B30'
 BACKGROUND = 'white'
 # [EN] A common phone screen (19.5:9): an image taller than this times its width needs scrolling at phone width.
 PHONE_SCREEN_RATIO = 19.5 / 9
+
+
+# [EN] Written into every PNG this script makes, so scripts/check-screenshot-labels.py can tell a labeled image.
+MARKER_KEY = 'CYLScreenshot'
+
+
+def add_marker(path, header, footer):
+    """Adds a PNG tEXt chunk (MARKER_KEY: header and footer) before IEND. Pixels are untouched."""
+    with open(path, 'rb') as handle:
+        data = handle.read()
+    if not data.startswith(b'\x89PNG'):
+        return
+    text = f'{MARKER_KEY}\0header={header}\nfooter={footer}'.encode('latin-1', 'replace')
+    chunk = struct.pack('>I', len(text)) + b'tEXt' + text + struct.pack('>I', zlib.crc32(b'tEXt' + text) & 0xffffffff)
+    end = data.rfind(b'IEND') - 4
+    with open(path, 'wb') as handle:
+        handle.write(data[:end] + chunk + data[end:])
 
 
 def run(args):
@@ -131,6 +150,7 @@ def main():
     header = band(options.header, total_width, font_size, os.path.join(work, 'header.png'))
     footer = band(options.footer, total_width, font_size, os.path.join(work, 'footer.png'))
     stack([header, grid, footer], options.out, vertical=True)
+    add_marker(options.out, options.header, options.footer)
     width, height = size_of(options.out)
     shutil.rmtree(work, ignore_errors=True)
     note = ''

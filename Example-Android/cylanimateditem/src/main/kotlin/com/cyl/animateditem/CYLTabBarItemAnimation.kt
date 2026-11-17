@@ -950,7 +950,13 @@ class CYLRiveTabBarItemAnimationView internal constructor(context: Context, priv
     internal fun cyl_restUntilPlayed() {
         handler.postDelayed({
             if (!hasPlayed) {
-                CYLReflection.call(rive, "pause")
+                // [EN] The file controller only: `RiveAnimationView.pause()` also stops the view's renderer, after which
+                //      the state machine no longer runs continuously (menu_button.riv crept one frame per input and never
+                //      reached its X on Android, dcbfdec6 and ad3dca0e). The fake view of the tests has no controller.
+                // [CN] 只暂停文件控制器：`RiveAnimationView.pause()` 还会停止视图的渲染器，之后状态机不再连续运行（Android 上
+                //      menu_button.riv 每次输入只前进一帧，始终到不了 X）。测试中的伪造视图没有控制器。
+                val controller = CYLReflection.call(rive, "getController")
+                if (controller != null) CYLReflection.call(controller, "pause") else CYLReflection.call(rive, "pause")
                 restingAfterLoad = true
             }
         }, FIRST_FRAME_MS)

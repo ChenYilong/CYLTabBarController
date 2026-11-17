@@ -204,6 +204,7 @@ docs/
 │   ├── android-liquid-glass-surface-slider.png
 │   ├── android-more-than-five-tabs-report.png
 │   ├── android-playback-controls-pag-example-api35-b57c844.png
+│   ├── android-rive-menu-loop-pause-fix.png
 │   ├── animated-icons-demo-controls-request-android.jpg
 │   ├── animated-item-android-demo-interaction.png
 │   ├── animated-item-android-demo-page.png

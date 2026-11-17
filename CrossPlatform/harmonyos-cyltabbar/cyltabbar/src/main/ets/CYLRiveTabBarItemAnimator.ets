@@ -365,7 +365,14 @@ export struct CYLRiveIcon {
     this.restingAfterLoad = false;
     setTimeout(() => {
       if (!this.hasPlayed && this.riveView === view) {
-        view.pause();
+        // [EN] The file controller only, as on Android: the view's `pause()` also stops its renderer, after which a state
+        //      machine crept one frame per input (menu_button.riv never reached its X on Android).
+        // [CN] 与 Android 相同，只暂停文件控制器：视图的 `pause()` 还会停止渲染器，之后状态机每次输入只前进一帧。
+        if (view.controller !== null) {
+          view.controller.pauseAllAnimations();
+        } else {
+          view.pause();
+        }
         this.restingAfterLoad = true;
       }
     }, CYL_RIVE_FIRST_FRAME_MS);
