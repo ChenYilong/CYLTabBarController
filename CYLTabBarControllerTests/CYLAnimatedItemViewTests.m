@@ -178,7 +178,65 @@
     XCTAssertEqual(item.animationSource, [CYLTabBarItemAnimationFactory sharedFactory]);
 }
 
+- (void)testOnlyAnUnplayableAnimationFileKeepsTheTitleLayout {
+    CYLAnimatedItemView *titleOnly = [[CYLAnimatedItemView alloc] init];
+    titleOnly.title = @"Home";
+    CYLAnimatedItemView *item = [[CYLAnimatedItemView alloc] initWithFrame:CGRectMake(0, 0, 200, 44)];
+    item.animationSource = [[CYLAnimatedItemFakeSource alloc] init];
+    item.title = @"Home";
+    item.animationURL = [NSURL fileURLWithPath:@"/tmp/home.json"];
+    [item layoutIfNeeded];
+    XCTAssertFalse(item.isAnimationReady);
+    XCTAssertTrue(CGSizeEqualToSize([titleOnly sizeThatFits:CGSizeMake(CGFLOAT_MAX, CGFLOAT_MAX)],
+                                    [item sizeThatFits:CGSizeMake(CGFLOAT_MAX, CGFLOAT_MAX)]), @"no space for an icon that cannot show");
+    XCTAssertEqual(CGRectGetWidth(item.imageView.frame), 0);
+    XCTAssertGreaterThan(CGRectGetWidth(item.titleLabel.frame), 0);
+    XCTAssertNoThrow([item playAnimation]);
+    XCTAssertNoThrow([item restartAnimation]);
+    XCTAssertNoThrow([item stopAnimation]);
+}
+
+- (void)testBothWithAnUnplayableFileShowTheImage {
+    UIImage *icon = [self icon];
+    CYLAnimatedItemView *imageOnly = [[CYLAnimatedItemView alloc] init];
+    imageOnly.title = @"Home";
+    imageOnly.image = icon;
+    CYLAnimatedItemView *item = [[CYLAnimatedItemView alloc] initWithFrame:CGRectMake(0, 0, 200, 44)];
+    item.animationSource = [[CYLAnimatedItemFakeSource alloc] init];
+    item.title = @"Home";
+    item.image = icon;
+    item.animationURL = [NSURL fileURLWithPath:@"/tmp/home.json"];
+    [item layoutIfNeeded];
+    XCTAssertFalse(item.imageView.hidden);
+    XCTAssertEqual(item.imageView.image, icon);
+    XCTAssertTrue(CGSizeEqualToSize([imageOnly sizeThatFits:CGSizeMake(CGFLOAT_MAX, CGFLOAT_MAX)],
+                                    [item sizeThatFits:CGSizeMake(CGFLOAT_MAX, CGFLOAT_MAX)]), @"the same layout as the image alone");
+}
+
+- (void)testBothWithAPlayableFilePreferTheAnimation {
+    CYLAnimatedItemView *item = [[CYLAnimatedItemView alloc] initWithFrame:CGRectMake(0, 0, 200, 44)];
+    item.animationSource = [[CYLAnimatedItemFakeSource alloc] init];
+    item.title = @"Home";
+    item.image = [self icon];
+    item.animationURL = [NSURL fileURLWithPath:@"/tmp/home.fake"];
+    [item layoutIfNeeded];
+    XCTAssertTrue(item.isAnimationReady);
+    XCTAssertTrue(item.imageView.hidden, @"the static image waits under the animation");
+    XCTAssertTrue(CGRectEqualToRect(item.animationView.frame, item.imageView.frame), @"the animation takes the icon's place");
+}
+
 #else
+- (void)testWithoutTheEngineBothShowTheImage {
+    UIImage *icon = [self icon];
+    CYLAnimatedItemView *item = [[CYLAnimatedItemView alloc] initWithFrame:CGRectMake(0, 0, 200, 44)];
+    item.image = icon;
+    item.animationURL = [NSURL fileURLWithPath:@"/tmp/home.json"];
+    [item layoutIfNeeded];
+    XCTAssertFalse(item.imageView.hidden);
+    XCTAssertEqual(item.imageView.image, icon);
+    XCTAssertGreaterThan(CGRectGetWidth(item.imageView.frame), 0);
+}
+
 - (void)testWithoutTheEngineOnlyTheStaticImageShows {
     CYLAnimatedItemView *item = [[CYLAnimatedItemView alloc] initWithFrame:CGRectMake(0, 0, 200, 44)];
     item.image = [self icon];

@@ -231,8 +231,13 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
     protected open fun iconSize(): Pair<Int, Int> {
         iconSizeDp?.let { return dp(it.width).roundToInt() to dp(it.height).roundToInt() }
         val drawable = iconView.drawable
-        if (animationView == null && drawable != null && drawable.intrinsicWidth > 0) return drawable.intrinsicWidth to drawable.intrinsicHeight
-        return if (animationView != null || animationURL != null) dp(24f).roundToInt().let { it to it } else 0 to 0
+        if (animationView == null && drawable != null && drawable.intrinsicWidth > 0 && drawable.intrinsicHeight > 0) {
+            return drawable.intrinsicWidth to drawable.intrinsicHeight
+        }
+        // [EN] The size follows what is shown, never `animationURL` alone: a file that cannot play (no engine or library)
+        //      leaves the layout of the static image, or of the title alone, unchanged.
+        // [CN] 尺寸取决于实际显示的内容，而不是只看 `animationURL`：无法播放的文件（没有引擎或动画库）不会改变静态图片或纯标题的布局。
+        return if (animationView != null || drawable != null) dp(24f).roundToInt().let { it to it } else 0 to 0
     }
 
     private fun showsIcon() = animationView != null || iconView.drawable != null
@@ -382,7 +387,10 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
         val url = animationURL
         if (!url.isNullOrBlank()) {
             val (w, h) = iconSizeDp?.let { it.width to it.height } ?: (24f to 24f)
-            animationSource.animationViewWithURL(context, url, CYLSize(w, h), ImageView.ScaleType.FIT_CENTER)?.let { view ->
+            // [EN] No engine, no library or a file it cannot read: no view, the static image stays (an app's own source that
+            //      throws is treated the same way). [CN] 没有引擎、没有动画库或文件无法读取：不创建视图，保留静态图片（App 自己的来源抛出异常时同样处理）。
+            val made = try { animationSource.animationViewWithURL(context, url, CYLSize(w, h), ImageView.ScaleType.FIT_CENTER) } catch (error: RuntimeException) { null }
+            made?.let { view ->
                 view.cyl_hideFromAccessibility()
                 addView(view, indexOfChild(iconView) + 1)
                 animationView = view
