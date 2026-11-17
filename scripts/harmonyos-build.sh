@@ -14,10 +14,13 @@ fi
 mkdir -p "$DST"
 for d in AppScope cyltabbar cylanimateditem entry hvigor; do
   rm -rf "$DST/$d/src"
-  (cd "$SRC" && find "$d" -path "*/oh_modules" -prune -o -path "*/build" -prune -o -path "*/.preview" -prune -o -type f -print) |
+  # [EN] `._*` are macOS AppleDouble files on an external drive; ArkTS compiles `._X.ets` and fails ("Invalid character").
+  # [CN] `._*` 是外置磁盘上的 macOS AppleDouble 文件；ArkTS 会编译 `._X.ets` 并报错（"Invalid character"）。
+  (cd "$SRC" && find "$d" -path "*/oh_modules" -prune -o -path "*/build" -prune -o -path "*/.preview" -prune -o -name "._*" -prune -o -type f -print) |
     while IFS= read -r f; do mkdir -p "$DST/$(dirname "$f")"; cp "$SRC/$f" "$DST/$f"; done
 done
 cp "$SRC"/*.json5 "$SRC"/hvigorfile.ts "$DST/"
+find "$DST" -name "._*" -not -path "*/oh_modules/*" -delete 2>/dev/null
 export JAVA_HOME="$DEVECO/jbr" DEVECO_SDK_HOME="$DEVECO/sdk"
 export PATH="$DEVECO/jbr/bin:$DEVECO/tools/node:$DEVECO/tools/ohpm/bin:$PATH"
 cd "$DST" || exit 1
