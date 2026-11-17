@@ -24,6 +24,17 @@ REQUIRED = [
     ("ohpm (HarmonyOS)", "cyltabbar", "CrossPlatform/harmonyos-cyltabbar/cyltabbar/LICENSE", "CrossPlatform/harmonyos-cyltabbar/cyltabbar/oh-package.json5"),
     ("npm (WeChat Mini Program)", "wechat-miniprogram-cyltabbar", "CrossPlatform/wechat-miniprogram-cyltabbar/LICENSE", "CrossPlatform/wechat-miniprogram-cyltabbar/package.json"),
     ("npm (WeChat Mini Program)", "wechat-miniprogram-cyltabbar (component folder)", "CrossPlatform/wechat-miniprogram-cyltabbar/src/LICENSE", "CrossPlatform/wechat-miniprogram-cyltabbar/package.json"),
+    ("Maven / Gradle", "cyltabbarcontroller-pages", "Example-Android/tabpages/src/main/resources/META-INF/tabpages/LICENSE", "Example-Android/tabpages/build.gradle.kts"),
+    ("npm (WeChat Mini Program)", "gif-miniprogram", "CrossPlatform/gif-miniprogram/LICENSE", "CrossPlatform/gif-miniprogram/package.json"),
+    ("npm (WeChat Mini Program)", "gif-miniprogram (component folder)", "CrossPlatform/gif-miniprogram/miniprogram_dist/LICENSE", "CrossPlatform/gif-miniprogram/package.json"),
+    ("npm (WeChat Mini Program)", "lottie-miniprogram", "CrossPlatform/lottie-miniprogram/LICENSE", "CrossPlatform/lottie-miniprogram/package.json"),
+    ("npm (WeChat Mini Program)", "lottie-miniprogram (component folder)", "CrossPlatform/lottie-miniprogram/miniprogram_dist/LICENSE", "CrossPlatform/lottie-miniprogram/package.json"),
+    ("npm (WeChat Mini Program)", "pag-miniprogram", "CrossPlatform/pag-miniprogram/LICENSE", "CrossPlatform/pag-miniprogram/package.json"),
+    ("npm (WeChat Mini Program)", "pag-miniprogram (component folder)", "CrossPlatform/pag-miniprogram/miniprogram_dist/LICENSE", "CrossPlatform/pag-miniprogram/package.json"),
+    ("npm (WeChat Mini Program)", "rive-miniprogram", "CrossPlatform/rive-miniprogram/LICENSE", "CrossPlatform/rive-miniprogram/package.json"),
+    ("npm (WeChat Mini Program)", "rive-miniprogram (component folder)", "CrossPlatform/rive-miniprogram/miniprogram_dist/LICENSE", "CrossPlatform/rive-miniprogram/package.json"),
+    ("npm (WeChat Mini Program)", "svga-miniprogram", "CrossPlatform/svga-miniprogram/LICENSE", "CrossPlatform/svga-miniprogram/package.json"),
+    ("npm (WeChat Mini Program)", "svga-miniprogram (component folder)", "CrossPlatform/svga-miniprogram/miniprogram_dist/LICENSE", "CrossPlatform/svga-miniprogram/package.json"),
 ]
 
 
