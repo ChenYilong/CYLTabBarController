@@ -228,6 +228,8 @@ tag.restartAnimation()
 | [`64f19ee3`](https://github.com/ChenYilong/CYLTabBarController/commit/64f19ee3) | CYLTableViewPlaceHolder 的 Android 迁移进度 | CYLTableViewPlaceHolder's Android migration status |
 | [`7511f7db`](https://github.com/ChenYilong/CYLTabBarController/commit/7511f7db) | CYLTableViewPlaceHolder `8791cfa` | CYLTableViewPlaceHolder `8791cfa` |
 | [`d4dea857`](https://github.com/ChenYilong/CYLTabBarController/commit/d4dea857) | Android `CYLTabBarItemButton` 继承 `CYLAnimatedItemView`（TODO 4 的 Android 部分） | Android `CYLTabBarItemButton` subclasses `CYLAnimatedItemView` (TODO 4, Android part) |
+| [`21e1e492`](https://github.com/ChenYilong/CYLTabBarController/commit/21e1e492) | 下游迁移与第一个 iOS 编译证据 | Downstream migrations and the first iOS compile evidence |
+| [`c53d2899`](https://github.com/ChenYilong/CYLTabBarController/commit/c53d2899) | `CYLAnimatedItem` 成为独立的 pod 与模块，不依赖 CYLTabBarController；Android 引擎类移到 `com.cyl.animateditem` | `CYLAnimatedItem` becomes its own pod and module, with no dependency on CYLTabBarController; Android engine classes move to `com.cyl.animateditem` |
 
 ## [CN]TODO
 ## [EN]TODO
