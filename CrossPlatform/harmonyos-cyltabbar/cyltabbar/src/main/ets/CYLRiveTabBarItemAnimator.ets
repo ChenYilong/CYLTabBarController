@@ -114,9 +114,27 @@ export function cylRiveRendererType(): RendererType {
 let cylRiveInitialized: boolean = false;
 
 /**
- * [EN] `initializeRive()` once per process. [CN] 每个进程只调用一次 `initializeRive()`。
+ * [EN] Whether @ohos/rive can run on this device. @ohos/rive 1.0.4 ships its native library (`libohos_rive.so`) for
+ *      `arm64-v8a` only; on an x86_64 emulator a Rive view crashes the app later ("Accessing released C++ object:
+ *      RiveArtboardRenderer", CYLTableViewPlaceHolder's HarmonyOS issue E15). Without `arm64-v8a` a Rive tab shows its
+ *      image instead.
+ * [CN] 本设备能否运行 @ohos/rive。@ohos/rive 1.0.4 只为 `arm64-v8a` 提供原生库（`libohos_rive.so`）；在 x86_64 模拟器上 Rive 视图稍后会使
+ *      App 崩溃（“Accessing released C++ object: RiveArtboardRenderer”，CYLTableViewPlaceHolder 鸿蒙问题 E15）。没有 `arm64-v8a` 时
+ *      Rive Tab 显示其图片。
+ */
+export function cylRiveIsSupported(): boolean {
+  const abis: string = deviceInfo.abiList ?? '';
+  return abis.split(',').map((abi: string) => abi.trim()).indexOf('arm64-v8a') >= 0;
+}
+
+/**
+ * [EN] `initializeRive()` once per process; throws where @ohos/rive cannot run (`cylRiveIsSupported()`).
+ * [CN] 每个进程只调用一次 `initializeRive()`；@ohos/rive 无法运行时抛出异常（`cylRiveIsSupported()`）。
  */
 export function cylEnsureRiveInitialized(): void {
+  if (!cylRiveIsSupported()) {
+    throw new Error('@ohos/rive has no native library for this device (' + (deviceInfo.abiList ?? '') + ')');
+  }
   if (!cylRiveInitialized) {
     initializeRive();
     cylRiveInitialized = true;

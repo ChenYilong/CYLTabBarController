@@ -211,6 +211,7 @@ docs/
 │   ├── animated-item-demo-ios26.3-zh-Hans.png
 │   ├── animated-item-demo-ios27-en.png
 │   ├── animated-item-flatdesign-tabbar-ios27.png
+│   ├── animated-item-flutter-rive-icons-faint.png
 │   ├── animated-item-harmonyos-lottie-done.png
 │   ├── animated-item-harmonyos-lottie-playing.png
 │   ├── animated-item-harmonyos-tabbar.jpeg

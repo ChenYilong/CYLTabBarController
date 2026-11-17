@@ -6,7 +6,7 @@ import { CYLPlusButton, cyl_liquidGlassContentDy } from './CYLPlusButton';
 import { CYLBadge, CYLBadgeView } from './CYLBadge';
 import { CYLLottieIcon } from './CYLLottieIcon';
 import { CYLSVGAView } from './svga/CYLSVGAView';
-import { CYLRiveIcon } from './CYLRiveTabBarItemAnimator';
+import { CYLRiveIcon, cylRiveIsSupported } from './CYLRiveTabBarItemAnimator';
 import { CYLAnimatedItemView, CYLAnimatedItemAnimationContext, CYLAnimatedItemEngines } from 'cylanimateditem';
 import { CYLLocalizedString, cyl_textOf } from './CYLLocalization';
 import { CYLTabButtonAnimation, CYLTabButtonProperty, CYLTabButtonView, CYLTabButtonViewImpl } from './CYLTabButtonAnimation';
@@ -1180,8 +1180,9 @@ export struct CYLTabBarController {
    */
   private cylRivePath(index: number): string | undefined {
     const item = this.tabBarItemsAttributes[index];
+    // [EN] No Rive view where @ohos/rive cannot run: the image shows. [CN] @ohos/rive 无法运行时不创建 Rive 视图：显示图片。
     if (item.lottieFilePath !== undefined || item.gifFilePath !== undefined || item.imageURL !== undefined
-      || this.cylRiveFailures.includes(index)) {
+      || this.cylRiveFailures.includes(index) || !cylRiveIsSupported()) {
       return undefined;
     }
     const dark = this.colorMode === 'dark';

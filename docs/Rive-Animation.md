@@ -240,3 +240,7 @@ NSDictionary *home = @{
 | Flutter on iOS / Android | the native tab bar above, as platform views | ➖ not affected: uses the official runtimes through the native host view |
 | WeChat mini program (`cyl-rive`) | `@rive-app/canvas-advanced` 2.39.1, WebAssembly on a `<canvas type="2d">` (CPU renderer) | ➖ not affected: a separate WebAssembly runtime with no GPU surface; `detached()` cancels the frame and deletes the Rive objects |
 
+
+| 中文 | English |
+|:---|:---|
+| **鸿蒙：只在有原生库的设备上使用 Rive（2026-11-17）**：@ohos/rive 1.0.4 只为 `arm64-v8a` 提供 `libohos_rive.so`，在 x86_64 模拟器上 Rive 视图稍后会使 App 崩溃（CYLTableViewPlaceHolder 鸿蒙问题 E15）。`cylRiveIsSupported()` 检查 `deviceInfo.abiList`；没有 `arm64-v8a` 时 Rive Tab 显示图片，`cylEnsureRiveInitialized()` 抛出异常。arm64 模拟器（Mate 70 Pro，API 21）上 Rive Tab 图标照常显示。 | **HarmonyOS: Rive only where its native library exists (2026-11-17)**: @ohos/rive 1.0.4 ships `libohos_rive.so` for `arm64-v8a` only, and on an x86_64 emulator a Rive view crashed the app later (CYLTableViewPlaceHolder HarmonyOS issue E15). `cylRiveIsSupported()` checks `deviceInfo.abiList`; without `arm64-v8a` a Rive tab shows its image and `cylEnsureRiveInitialized()` throws. On the arm64 emulator (Mate 70 Pro, API 21) the Rive tab icons draw as before. |

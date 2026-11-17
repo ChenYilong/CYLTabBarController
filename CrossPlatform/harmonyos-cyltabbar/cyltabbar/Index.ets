@@ -57,7 +57,7 @@ export {
   CYLTabBarAnimationOptionRiveArtboard, CYLTabBarAnimationOptionRiveStateMachine, CYLTabBarAnimationOptionRiveActiveProperty,
   CYLTabBarAnimationOptionRiveActiveDuration, CYLTabBarAnimationOptionRiveTriggerProperty, CYLTabBarAnimationOptionRiveInput,
   CYLTabBarAnimationOptionRiveTriggerInput, CYLTabBarAnimationOptionRiveAnimation, CYLTabBarAnimationOptionRiveLegacyRuntime,
-  CYLTabBarAnimationURLWithOptions, cylRiveFileAndOptions, cylRiveRendererType, cylEnsureRiveInitialized
+  CYLTabBarAnimationURLWithOptions, cylRiveFileAndOptions, cylRiveRendererType, cylEnsureRiveInitialized, cylRiveIsSupported
 } from './src/main/ets/CYLRiveTabBarItemAnimator';
 export {
   CYLTabBarPageRegistry, CYLTabBarPageRequest, CYLTabBarPage, CYLTabBarAsyncPageFactory, CYLTabBarPageResolver, CYLTabBarPageSource,
