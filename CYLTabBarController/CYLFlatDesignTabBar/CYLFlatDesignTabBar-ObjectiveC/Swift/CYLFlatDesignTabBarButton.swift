@@ -299,7 +299,6 @@ open class CYLFlatDesignTabBarButton: CYLAnimatedItemView {
         // [EN] Through the component's content, which shows it in `imageView`. [CN] 通过组件的内容写入，由组件显示在 `imageView` 中。
         self.image = image
         imageView.tintColor = iconColorForCurrentState()
-        hideImageUnderTabBarAnimation()
 
         let titleAttributes = titleTextAttributesForCurrentState()
         self.title = item?.title
@@ -381,23 +380,6 @@ open class CYLFlatDesignTabBarButton: CYLAnimatedItemView {
             imageView.frame = .zero
         }
         initTabBarItemAnimation()
-        hideImageUnderTabBarAnimation()
-    }
-
-    /**
-     * [EN] Bug B13 (docs/Animated-Item.md): the tab bar draws the icon animation in its own view and hides `imageView`, but
-     *      the component shows `imageView` again whenever its content or selection changes, because it only counts its
-     *      own `animationView`; the static image then showed under the animation (FlatDesign only). Hide it again while
-     *      the tab bar's animation view is on screen. Goes away with TODO (4)'s second step (one animation view).
-     * [CN] Bug B13（docs/Animated-Item.md）：TabBar 在自己的视图中绘制图标动画并隐藏 `imageView`，但组件在内容或选中状态变化时
-     *      会重新显示 `imageView`（它只认自己的 `animationView`），静态图片于是显示在动画下方（仅扁平样式）。TabBar 的动画视图
-     *      显示时再次隐藏它。TODO (4) 第二步（只有一个动画视图）完成后不再需要。
-     */
-    private func hideImageUnderTabBarAnimation() {
-        guard let animationView = cyl_tabBarItemAnimationView(), !animationView.isHidden, animationView.superview != nil else {
-            return
-        }
-        imageView.isHidden = true
     }
 
     private func titleTextAttributesForCurrentState() -> [NSAttributedString.Key: Any] {

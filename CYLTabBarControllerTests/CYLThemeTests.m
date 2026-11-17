@@ -803,6 +803,14 @@ FOUNDATION_EXTERN void CYLTabBarItemAnimationRegisterColors(NSURL *URL, NSDictio
     UIView *tabView = tabAnimationView(animated);
     XCTAssertNotNil(tabView, @"the selected tab has its GIF animation view");
     XCTAssertEqual([animated valueForKey:@"animationView"], tabView, @"the component's animation view is the tab's");
+    // [EN] Bug B13: the static image never shows under the tab bar's animation. [CN] Bug B13：静态图片不显示在 TabBar 的动画下方。
+    XCTAssertTrue(((UIImageView *)[animated valueForKey:@"imageView"]).hidden, @"B13: the image is hidden under the animation");
+    tabBarController.selectedIndex = 1;
+    [tabBarController.view layoutIfNeeded];
+    tabBarController.selectedIndex = 0;
+    [tabBarController.view layoutIfNeeded];
+    XCTAssertTrue(((UIImageView *)[animated valueForKey:@"imageView"]).hidden || tabAnimationView(animated) == nil,
+                  @"B13: still hidden after a selection change");
     XCTAssertTrue([[animated valueForKey:@"animationReady"] boolValue]);
     XCTAssertNil([buttons[@"B"] valueForKey:@"animationView"], @"a tab without an animation has none");
     XCTAssertFalse([[buttons[@"B"] valueForKey:@"animationReady"] boolValue]);
