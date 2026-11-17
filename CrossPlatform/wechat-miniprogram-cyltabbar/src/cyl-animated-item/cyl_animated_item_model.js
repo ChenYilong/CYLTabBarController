@@ -53,21 +53,52 @@ function cylAnimatedItemPackage(type) {
 }
 
 /**
+ * [EN] The resting progress (0...1) of an engine: 1 while selected (a selected tab shows its last frame), else
+ *      `restingProgress` clamped to 0...1, as `CYLAnimatedItemView.animationRestingProgress` on iOS.
+ * [CN] 引擎的静止进度（0...1）：选中时为 1（选中的 Tab 显示最后一帧），否则为限制在 0...1 的 `restingProgress`，与 iOS 的
+ *      `CYLAnimatedItemView.animationRestingProgress` 相同。
+ */
+function cylAnimatedItemRestingProgress(p) {
+  if (p.selected) return 1
+  const progress = Number(p.restingProgress)
+  return Number.isFinite(progress) ? Math.min(1, Math.max(0, progress)) : 0
+}
+
+/**
+ * [EN] What the GIF `<image>` shows. Without stills (`gifFirstFrame` / `gifLastFrame`) the GIF itself, always playing, as
+ *      before. With them: the GIF while it plays (`gifPlaying`), else its last frame while selected or resting at 1, its
+ *      first frame otherwise; a missing still falls back to the other one, then to the GIF.
+ * [CN] GIF `<image>` 显示的内容。没有静帧（`gifFirstFrame` / `gifLastFrame`）时显示 GIF 本身并一直播放（与之前相同）。有静帧时：
+ *      播放中（`gifPlaying`）显示 GIF，否则选中或静止进度为 1 时显示最后一帧，其余显示第一帧；缺少的静帧用另一帧代替，再退回 GIF。
+ */
+function cylAnimatedItemGifSource(p, animationPath) {
+  const first = p.gifFirstFrame || ''
+  const last = p.gifLastFrame || ''
+  if (!first && !last) return animationPath
+  if (p.gifPlaying) return animationPath
+  const atEnd = cylAnimatedItemRestingProgress(p) >= 1
+  return (atEnd ? last || first : first || last) || animationPath
+}
+
+/**
  * [EN] The model of one item from its properties and state (`animationLoaded`, `animationFailed`).
  * [CN] 由属性与状态（`animationLoaded`、`animationFailed`）得到一个条目的模型。
  */
 function cylAnimatedItemModel(p) {
   const animationPath = p.animationUrl || ''
+  const hasAnimationData = !!p.animationData && typeof p.animationData === 'object'
   // [EN] `animationType` names the type when the file name cannot (a URL without an extension). [CN] 文件名无法表明类型时（无扩展名的 URL），由 `animationType` 指定。
   const givenType = String(p.animationType || '').toLowerCase()
-  const animationType = CYL_ANIMATED_ITEM_TYPES.some((item) => item.type === givenType) ? givenType : cylAnimatedItemType(animationPath)
-  const usesEngine = !!animationPath && !!animationType && animationType !== 'gif' && !p.animationFailed
+  const namedType = CYL_ANIMATED_ITEM_TYPES.some((item) => item.type === givenType) ? givenType : ''
+  const animationType = hasAnimationData ? 'lottie' : namedType || cylAnimatedItemType(animationPath)
+  const hasSource = !!animationPath || hasAnimationData
+  const usesEngine = hasSource && !!animationType && animationType !== 'gif' && !p.animationFailed
   const gifShows = animationType === 'gif' && !p.animationFailed
   const animationShows = gifShows || (usesEngine && !!p.animationLoaded)
   const staticImage = (p.selected && p.selectedImage) || p.image || ''
   const placeholder = p.placeholderImage === undefined || p.placeholderImage === null ? CYL_ANIMATED_ITEM_PLACEHOLDER : p.placeholderImage
   let fallbackImage = staticImage
-  if (!fallbackImage && animationPath && !animationShows) {
+  if (!fallbackImage && hasSource && !animationShows) {
     fallbackImage = placeholder
   }
   const iconSize = Number(p.iconSize) > 0 ? Number(p.iconSize) : 24
@@ -79,15 +110,17 @@ function cylAnimatedItemModel(p) {
     title,
     animationPath,
     animationType,
+    restingFrame: p.selected ? 'last' : 'first',
     usesEngine,
-    gifPath: gifShows ? animationPath : '',
+    gifPath: gifShows ? cylAnimatedItemGifSource(p, animationPath) : '',
     fallbackImage,
     fallbackHidden: animationShows && !gifShows,
     showsIcon: !!(fallbackImage || usesEngine || gifShows),
     iconStyle: `width: ${iconWidth}px; height: ${iconHeight}px;`,
     // [EN] A tint applies to the static image only; an animation keeps its own colors. [CN] 着色只作用于静态图片。
     iconTint: p.iconTint || '',
-    axisClass: p.axis === 'vertical' ? 'cyl-animated-item-vertical' : 'cyl-animated-item-horizontal',
+    axisClass: (p.axis === 'vertical' ? 'cyl-animated-item-vertical' : 'cyl-animated-item-horizontal') + (p.embedded ? ' cyl-animated-item-embedded' : ''),
+    ariaHidden: !!p.embedded,
     accessoryPlacement: ['leading', 'trailing', 'topTrailing'].includes(p.accessoryPlacement) ? p.accessoryPlacement : 'trailing',
     hasAccessory: !!(p.accessoryImage || p.accessoryText),
     accessoryLabel: p.accessoryAccessibilityLabel || p.accessoryText || '',
@@ -101,6 +134,8 @@ module.exports = {
   cylAnimatedItemModel,
   cylAnimatedItemType,
   cylAnimatedItemPackage,
+  cylAnimatedItemRestingProgress,
+  cylAnimatedItemGifSource,
   CYL_ANIMATED_ITEM_PLACEHOLDER,
   CYL_ANIMATED_ITEM_TYPES,
 }

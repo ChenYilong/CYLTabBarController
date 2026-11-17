@@ -1,8 +1,8 @@
 <!-- [EN] One accessibility element: an icon (animation, static image or placeholder), a title and an optional accessory. [CN] 一个无障碍元素：图标（动画、静态图片或占位图）、标题与可选的附加图标。 -->
 <view
   class="cyl-animated-item {{m.axisClass}} {{bare ? 'cyl-animated-item-bare' : ''}} {{m.ariaDisabled ? 'cyl-animated-item-disabled' : ''}}"
-  aria-hidden="{{accessibilityHidden}}"
-  aria-role="button"
+  aria-role="{{(accessibilityHidden || m.ariaHidden) ? '' : 'button'}}"
+  aria-hidden="{{accessibilityHidden || m.ariaHidden}}"
   aria-label="{{m.ariaLabel}}"
   aria-selected="{{m.ariaSelected}}"
   aria-disabled="{{m.ariaDisabled}}"
@@ -22,10 +22,10 @@
     </view>
     <image wx:elif="{{m.fallbackImage}}" class="cyl-animated-item-image {{m.fallbackHidden ? 'cyl-animated-item-hidden' : ''}}" src="{{m.fallbackImage}}" mode="aspectFit" />
     <image wx:if="{{m.gifPath}}" class="cyl-animated-item-image" src="{{m.gifPath}}" mode="aspectFit" />
-    <cyl-lottie-view wx:if="{{m.usesEngine && m.animationType === 'lottie'}}" id="cyl-animated-item-animation" class="cyl-animated-item-animation" path="{{m.animationPath}}" colors="{{colors}}" loop="{{loop}}" speed="{{speed}}" autoplay="{{autoplay}}" resting-frame="{{selected ? 'last' : 'first'}}" bind:ready="cyl_onAnimationReady" bind:error="cyl_onAnimationError" />
-    <cyl-pag-view wx:elif="{{m.usesEngine && m.animationType === 'pag'}}" id="cyl-animated-item-animation" class="cyl-animated-item-animation" path="{{m.animationPath}}" loop="{{loop}}" speed="{{speed}}" autoplay="{{autoplay}}" resting-frame="{{selected ? 'last' : 'first'}}" bind:ready="cyl_onAnimationReady" bind:error="cyl_onAnimationError" />
-    <cyl-rive-view wx:elif="{{m.usesEngine && m.animationType === 'rive'}}" id="cyl-animated-item-animation" class="cyl-animated-item-animation" path="{{m.animationPath}}" colors="{{colors}}" loop="{{loop}}" speed="{{speed}}" autoplay="{{autoplay}}" bind:ready="cyl_onAnimationReady" bind:error="cyl_onAnimationError" />
-    <cyl-svga-view wx:elif="{{m.usesEngine && m.animationType === 'svga'}}" id="cyl-animated-item-animation" class="cyl-animated-item-animation" path="{{m.animationPath}}" loop="{{loop}}" speed="{{speed}}" autoplay="{{autoplay}}" resting-frame="{{selected ? 'last' : 'first'}}" bind:ready="cyl_onAnimationReady" bind:error="cyl_onAnimationError" />
+    <cyl-lottie-view id="cyl-animated-item-engine" wx:if="{{m.usesEngine && m.animationType === 'lottie'}}" class="cyl-animated-item-animation" path="{{m.animationPath}}" animation-data="{{lottieData}}" colors="{{colors}}" loop="{{loop}}" speed="{{speed}}" autoplay="{{autoplay}}" resting-frame="{{m.restingFrame}}" bind:ready="cyl_onAnimationReady" bind:error="cyl_onAnimationError" />
+    <cyl-pag-view id="cyl-animated-item-engine" wx:elif="{{m.usesEngine && m.animationType === 'pag'}}" class="cyl-animated-item-animation" path="{{m.animationPath}}" loop="{{loop}}" speed="{{speed}}" autoplay="{{autoplay}}" resting-frame="{{m.restingFrame}}" wasm-path="{{pagWasmPath}}" bind:ready="cyl_onAnimationReady" bind:error="cyl_onAnimationError" />
+    <cyl-rive-view id="cyl-animated-item-engine" wx:elif="{{m.usesEngine && m.animationType === 'rive'}}" class="cyl-animated-item-animation" path="{{m.animationPath}}" colors="{{colors}}" loop="{{loop}}" speed="{{speed}}" autoplay="{{autoplay}}" resting-frame="{{m.restingFrame}}" wasm-path="{{riveWasmPath}}" bind:ready="cyl_onAnimationReady" bind:error="cyl_onAnimationError" />
+    <cyl-svga-view id="cyl-animated-item-engine" wx:elif="{{m.usesEngine && m.animationType === 'svga'}}" class="cyl-animated-item-animation" path="{{m.animationPath}}" loop="{{loop}}" speed="{{speed}}" autoplay="{{autoplay}}" resting-frame="{{m.restingFrame}}" bind:ready="cyl_onAnimationReady" bind:error="cyl_onAnimationError" />
     <view wx:if="{{m.hasAccessory && m.accessoryPlacement === 'topTrailing'}}" class="cyl-animated-item-accessory cyl-animated-item-accessory-corner" aria-role="button" aria-label="{{m.accessoryLabel}}" catchtap="cyl_onAccessoryTap">
       <image wx:if="{{accessoryImage}}" class="cyl-animated-item-accessory-image" src="{{accessoryImage}}" mode="aspectFit" aria-hidden="true" />
       <text wx:else aria-hidden="true">{{accessoryText}}</text>
