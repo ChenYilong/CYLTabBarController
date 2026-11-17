@@ -199,3 +199,16 @@ test('the option names are exported for adapters', () => {
   }
   assert.ok(Object.isFrozen(CYL_RIVE_OPTION_NAMES))
 })
+
+test('menu_button.riv: a held input (isOpen, duration 0) still replays on every loop pass while the file moves', (t) => {
+  t.mock.timers.enable({ apis: ['setTimeout'] })
+  const definition = loadComponent()
+  const isOpen = boolInput('isOpen')
+  const { item } = makeItem(definition, { inputs: { isOpen }, duration: 0, options: { input: 'isOpen' } })
+  item.data.loop = true
+  item.cylState.settled = false
+  item.cyl_playFromStart()
+  t.mock.timers.tick(CYL_RIVE_LOOP_SECONDS * 1000)
+  t.mock.timers.tick(CYL_RIVE_LOOP_SECONDS * 1000)
+  assert.deepEqual(isOpen.history, [false, true, false, true, false, true], 'the settle check applies to restarts only')
+})
