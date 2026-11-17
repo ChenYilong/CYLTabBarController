@@ -42,7 +42,14 @@ val cylAndroidVersion = findProperty("cylAndroidVersion") ?: "1.100.0"
 val cylAnimatedItemModule = rootProject.findProject(":cylanimateditem")
 // [EN] Or an included build that has it (its dependency substitution maps the published coordinate to that project).
 // [CN] 或者包含它的 included build（其依赖替换会把发布坐标映射到该项目）。
-val cylAnimatedItemIncluded = gradle.includedBuilds.any { File(it.projectDir, "cylanimateditem").isDirectory }
+// [EN] Found by its folder at the included build's root or by its settings file declaring ":cylanimateditem" (a
+//      projectDir mapped elsewhere); or the app says so: `cylAnimatedItemProvided=true` in gradle.properties.
+// [CN] 通过 included build 根目录下的文件夹，或其 settings 文件声明 ":cylanimateditem"（projectDir 指向别处）判断；或由 App 指定：
+//      gradle.properties 中的 `cylAnimatedItemProvided=true`。
+val cylAnimatedItemIncluded = findProperty("cylAnimatedItemProvided")?.toString() == "true" || gradle.includedBuilds.any { build ->
+    File(build.projectDir, "cylanimateditem").isDirectory ||
+        listOf("settings.gradle.kts", "settings.gradle").any { name -> File(build.projectDir, name).let { it.isFile && it.readText().contains(":cylanimateditem") } }
+}
 val cylCompilesAnimatedItem = cylUseLocalSources && cylAnimatedItemModule == null && !cylAnimatedItemIncluded
 
 android {
