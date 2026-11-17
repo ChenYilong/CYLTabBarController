@@ -30,7 +30,9 @@ const RIVE_ARTBOARDS = ['TIMER', 'SEARCH', 'CHAT', 'USER'];
 /** A tab's Rive keys: the state machine input "active" plays on select, as example-rive. Tab 的 Rive key，选中时播放 "active"。 */
 const rive = (artboard: string) => ({
   CYLTabBarRiveFilePath: 'icons.riv',
-  CYLTabBarAnimationOptions: { artboard, stateMachine: `${artboard}_Interactivity`, input: 'active' },
+  // [EN] tint: 'title': icons.riv draws light strokes; the icon takes the tab's title color, normal or selected (B17).
+  // [CN] tint: 'title'：icons.riv 绘制浅色描边；图标使用 Tab 的标题颜色（普通或选中）（B17）。
+  CYLTabBarAnimationOptions: { artboard, stateMachine: `${artboard}_Interactivity`, input: 'active', tint: 'title' },
   CYLTabBarRiveSize: '{28, 28}',
 });
 
