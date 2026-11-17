@@ -115,4 +115,15 @@ Pod::Spec.new do |s|
     gif.public_header_files = 'CYLTabBarController/CYLTabBarItemAnimation/GIF/*.h'
     gif.frameworks = 'ImageIO', 'QuartzCore'
   end
+
+  # [EN] Tests that need an animation library (remote Lottie files: download, play or fall back). `pod lib lint` builds and runs
+  #      them on a simulator; they depend on the component only.
+  # [CN] 需要动画库的测试（远程 Lottie 文件：下载后播放或回退）。`pod lib lint` 会在模拟器上构建并运行；只依赖组件本身。
+  s.test_spec 'Tests' do |test|
+    # [EN] lottie-ios 2.x (iOS 12, like the root spec); LottieSwift needs iOS 13, which a test spec of a 12.0 root cannot resolve.
+    # [CN] lottie-ios 2.x（iOS 12，与根 spec 相同）；LottieSwift 需要 iOS 13，12.0 的根 spec 下的 test spec 无法解析。
+    test.dependency 'CYLAnimatedItem/LottieObjectiveC'
+    test.source_files = 'CYLAnimatedItemTests/*.{h,m}'
+    test.frameworks = 'XCTest', 'UIKit'
+  end
 end
