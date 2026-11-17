@@ -89,8 +89,9 @@ private fun View.cyl_insertAnimationView(state: CYLTabAnimationState) {
     player?.applyColors(CYLTabBarItemAnimationStyleSource.colorsForStyle(state.url, resources.configuration), resources.configuration)
     // [EN] The animation replaces the icon. [CN] 动画取代图标。
     when (this) {
-        is CYLTabBarItemButton -> iconView.visibility = View.INVISIBLE
-        is CYLPlusButton -> imageView.visibility = View.INVISIBLE
+        // [EN] While the file downloads, the tab keeps its image (or the placeholder). [CN] 文件下载期间，Tab 保留其图片（或占位图）。
+        is CYLTabBarItemButton -> iconView.visibility = if (CYLTabBarItemAnimationFailure.isLoading(view)) View.VISIBLE else View.INVISIBLE
+        is CYLPlusButton -> imageView.visibility = if (CYLTabBarItemAnimationFailure.isLoading(view)) View.VISIBLE else View.INVISIBLE
     }
     requestLayout()
 }
@@ -136,6 +137,13 @@ private fun cyl_installAnimationFailureFallback() {
             host.cyl_replaceTabBarItemAnimationWithURL(null, null)
             // [EN] A tab with no static image shows the placeholder rather than an empty icon. [CN] 没有静态图片的 Tab 显示占位图，而不是空图标。
             if (host is CYLTabBarItemButton && host.iconView.drawable == null) host.iconView.setImageDrawable(host.cyl_animationPlaceholder())
+        }
+        // [EN] A downloaded animation replaces the image or placeholder shown meanwhile. [CN] 下载完成的动画取代期间显示的图片或占位图。
+        CYLTabBarItemAnimationFailure.loadedFallbackHandler = { host ->
+            when (host) {
+                is CYLTabBarItemButton -> if (host.cyl_customIconView == null) host.iconView.visibility = View.INVISIBLE
+                is CYLPlusButton -> host.imageView.visibility = View.INVISIBLE
+            }
         }
     }
 }

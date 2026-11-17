@@ -116,7 +116,7 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
         set(value) { field = value; updateIcon(); requestLayout() }
 
     private fun placeholderIfNeeded(): Drawable? {
-        if (image != null || selectedImage != null || animationURL.isNullOrBlank() || animationView != null) return null
+        if (image != null || selectedImage != null || animationURL.isNullOrBlank() || animationShows()) return null
         val placeholder = placeholderImage ?: defaultPlaceholderImage(context)
         return placeholder?.takeIf { placeholderImage == null || (it.intrinsicWidth > 0 && it.intrinsicHeight > 0) }
     }
@@ -385,9 +385,16 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
      */
     protected open fun onItemStateChanged() { /* [EN] Optional. [CN] 可选。 */ }
 
+    /**
+     * [EN] Whether the animation is on screen: made, and not waiting for its file (a download). [CN] 动画是否已显示：已创建且不在等待其文件（下载）。
+     */
+    private fun animationShows() = animationView != null && !com.cyl.tabbar.CYLTabBarItemAnimationFailure.isLoading(animationView)
+
     private fun updateIcon() {
+        // [EN] The static image given, else the placeholder, until the animation shows (also while it downloads).
+        // [CN] 在动画显示之前（包括下载期间）显示传入的静态图片，没有时显示占位图。
         iconView.setImageDrawable((if (isSelected && selectedImage != null) selectedImage else image) ?: placeholderIfNeeded())
-        iconView.visibility = if (animationView != null) View.INVISIBLE else View.VISIBLE
+        iconView.visibility = if (animationShows()) View.INVISIBLE else View.VISIBLE
     }
 
     // MARK: - Animation 动画
@@ -469,6 +476,10 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
     /**
      * [EN] The engine could not load the file: drop the animation and show the static icon. [CN] 引擎无法加载文件：移除动画并显示静态图标。
      */
+    override fun cyl_animationViewDidLoad(animationView: View) {
+        if (animationView === this.animationView) { updateIcon(); requestLayout() }
+    }
+
     override fun cyl_animationViewDidFail(animationView: View) {
         if (animationView !== this.animationView) return
         removeView(animationView)

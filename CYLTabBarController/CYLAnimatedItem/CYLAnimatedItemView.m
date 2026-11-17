@@ -177,11 +177,24 @@ static BOOL CYLAnimatedItemLocalFileIsMissing(NSURL *URL) {
  * [EN] The placeholder, when there is no static image and the animation file cannot play. [CN] 没有静态图片且动画文件无法播放时的占位图。
  */
 - (UIImage *)cyl_placeholderIfNeeded {
-    if (self.image || self.selectedImage || !self.animationURL || self.animationView) {
+    if (self.image || self.selectedImage || !self.animationURL || [self cyl_animationShows]) {
         return nil;
     }
     UIImage *placeholder = self.placeholderImage;
     return (placeholder.size.width > 0 && placeholder.size.height > 0) ? placeholder : nil;
+}
+
+/*
+ * [EN] Whether the animation is on screen: made, and not waiting for its file (a download). Until then the static image
+ *      given, or the placeholder when there is none, shows.
+ * [CN] 动画是否已显示：已创建且不在等待其文件（下载）。在此之前显示传入的静态图片，没有时显示占位图。
+ */
+- (BOOL)cyl_animationShows {
+#if CYL_ANIMATION_ENGINE_AVAILABLE
+    return self.animationView != nil && !CYLTabBarItemAnimationIsLoading(self.animationView);
+#else
+    return NO;
+#endif
 }
 
 - (void)cyl_updateIcon {
@@ -190,7 +203,7 @@ static BOOL CYLAnimatedItemLocalFileIsMissing(NSURL *URL) {
         icon = [self cyl_placeholderIfNeeded];
     }
     self.imageView.image = icon;
-    self.imageView.hidden = (self.animationView != nil);
+    self.imageView.hidden = [self cyl_animationShows];
 }
 
 - (void)cyl_contentDidChange {
@@ -489,6 +502,13 @@ static BOOL CYLAnimatedItemLocalFileIsMissing(NSURL *URL) {
     }
     [self cyl_updateIcon];
     [self cyl_contentDidChange];
+}
+
+- (void)cylAnimationViewDidLoad:(UIView *)animationView {
+    if (animationView == self.animationView) {
+        [self cyl_updateIcon];
+        [self cyl_contentDidChange];
+    }
 }
 
 - (void)cylAnimationViewDidFail:(UIView *)animationView error:(NSError *)error {

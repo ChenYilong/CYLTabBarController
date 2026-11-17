@@ -43,7 +43,8 @@ class CYLTabBarItemButton(context: Context, val item: CYLTabBarItem, val index: 
     internal fun cyl_applyIconViewProvider() {
         cyl_customIconView?.let { removeView(it) }
         cyl_customIconView = cyl_iconViewProvider?.invoke(isSelected)?.also { custom -> (custom.parent as? ViewGroup)?.removeView(custom); addView(custom) }
-        iconView.visibility = if (cyl_customIconView == null && !cyl_isTabBarItemAnimationReady()) View.VISIBLE else View.INVISIBLE
+        val animationShows = cyl_isTabBarItemAnimationReady() && !CYLTabBarItemAnimationFailure.isLoading(cyl_tabBarItemAnimationView)
+        iconView.visibility = if (cyl_customIconView == null && !animationShows) View.VISIBLE else View.INVISIBLE
         requestLayout()
     }
     val titleLabel = TextView(context).apply { gravity = Gravity.CENTER; maxLines = 1; textSize = 10f }
@@ -248,7 +249,8 @@ class CYLTabBarItemButton(context: Context, val item: CYLTabBarItem, val index: 
      * [CN] 只有动画文件且无法播放（没有动画库、文件无法读取）的 Tab 显示动效组件的占位图（适合 Tab 图标的尺寸），而不是空图标；有静态图片时仍以该图片兜底。
      */
     internal fun cyl_animationPlaceholder(): android.graphics.drawable.Drawable? {
-        if (item.image != null || item.selectedImage != null || cyl_isTabBarItemAnimationReady()) return null
+        val animationShows = cyl_isTabBarItemAnimationReady() && !CYLTabBarItemAnimationFailure.isLoading(cyl_tabBarItemAnimationView)
+        if (item.image != null || item.selectedImage != null || animationShows) return null
         if (CYLTabBarItemAnimationURLOfAttributes(item.attributes).isNullOrBlank()) return null
         return com.cyl.animateditem.CYLAnimatedItemView.defaultPlaceholderImage(context)?.mutate()
     }

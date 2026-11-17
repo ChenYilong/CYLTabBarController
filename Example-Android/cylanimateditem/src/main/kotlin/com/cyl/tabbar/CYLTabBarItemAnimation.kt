@@ -634,6 +634,12 @@ object CYLLottieTabBarItemAnimator : CYLTabBarItemAnimator {
         val view = CYLReflection.newInstance(VIEW_CLASS, context) as? View ?: return null
         val file = url.substringBefore('#')
         setFailureListener(view, file)
+        if (CYLTabBarItemAnimationFiles.isRemote(file)) {
+            // [EN] A download: the host shows its static image or placeholder until the composition is loaded.
+            // [CN] 下载中：在动画加载完成之前，宿主显示其静态图片或占位图。
+            CYLTabBarItemAnimationFailure.markLoading(view)
+            setLoadedListener(view)
+        }
         val loaded = when {
             CYLTabBarItemAnimationFiles.isRemote(file) -> CYLReflection.call(view, "setAnimationFromUrl", file)
             CYLTabBarItemAnimationFiles.assetName(file) != null -> CYLReflection.call(view, "setAnimation", CYLTabBarItemAnimationFiles.assetName(file))
@@ -649,6 +655,23 @@ object CYLLottieTabBarItemAnimator : CYLTabBarItemAnimator {
      *      listener drops the animation view, so the tab shows its image, as on iOS.
      * [CN] 文件无法加载或解析时，Lottie 会在主线程抛出异常，除非设置了失败监听：监听移除动画视图，Tab 显示其图片，与 iOS 一致。
      */
+    /**
+     * [EN] Tells the host when Lottie has the composition of a remote file. [CN] Lottie 拿到远程文件的动画数据时通知宿主。
+     */
+    private fun setLoadedListener(view: View) {
+        val listenerType = CYLReflection.type("com.airbnb.lottie.LottieOnCompositionLoadedListener") ?: return
+        val listener = java.lang.reflect.Proxy.newProxyInstance(listenerType.classLoader, arrayOf(listenerType)) { proxy, method, args ->
+            when (method.name) {
+                "onCompositionLoaded" -> { CYLTabBarItemAnimationFailure.reportLoaded(view); null }
+                "hashCode" -> System.identityHashCode(proxy)
+                "equals" -> proxy === args?.firstOrNull()
+                "toString" -> "CYLLottieLoadedListener"
+                else -> null
+            }
+        }
+        CYLReflection.call(view, "addLottieOnCompositionLoadedListener", listener)
+    }
+
     private fun setFailureListener(view: View, file: String) {
         val listenerType = CYLReflection.type("com.airbnb.lottie.LottieListener") ?: return
         val listener = java.lang.reflect.Proxy.newProxyInstance(listenerType.classLoader, arrayOf(listenerType)) { proxy, method, args ->
@@ -738,8 +761,15 @@ object CYLPAGTabBarItemAnimator : CYLTabBarItemAnimator {
         val view = CYLReflection.newInstance(VIEW_CLASS, context) as? View ?: return null
         // [EN] PAGScaleMode: 1 stretch, 2 letterbox (fit), 3 zoom (fill). [CN] PAGScaleMode：1 拉伸，2 适应，3 填充。
         CYLReflection.call(view, "setScaleMode", when (contentMode) { ImageView.ScaleType.FIT_XY -> 1; ImageView.ScaleType.CENTER_CROP -> 3; else -> 2 })
+        // [EN] Until the file is here (a download), the host shows its static image or placeholder. [CN] 文件到达之前（下载中），宿主显示其静态图片或占位图。
+        CYLTabBarItemAnimationFailure.markLoading(view)
         CYLTabBarItemAnimationFiles.localFile(context, url.substringBefore('#')) { file ->
-            if (file != null) { CYLReflection.call(view, "setPath", file.absolutePath); CYLReflection.call(view, "flush") }
+            if (file != null) {
+                CYLReflection.call(view, "setPath", file.absolutePath); CYLReflection.call(view, "flush")
+                CYLTabBarItemAnimationFailure.reportLoaded(view)
+            } else {
+                CYLTabBarItemAnimationFailure.reportLater(view)
+            }
         }
         return view
     }
@@ -887,9 +917,16 @@ class CYLRiveTabBarItemAnimationView private constructor(context: Context, priva
             initializeRive(context)
             val rive = CYLReflection.newInstance(CYLRiveTabBarItemAnimator.VIEW_CLASS, context) as? View ?: return null
             val view = CYLRiveTabBarItemAnimationView(context, rive, options)
+            // [EN] Until the file is here (a download), the host shows its static image or placeholder. [CN] 文件到达之前（下载中），宿主显示其静态图片或占位图。
+            CYLTabBarItemAnimationFailure.markLoading(view)
             CYLTabBarItemAnimationFiles.localFile(context, fileURL) { file ->
-                val bytes = file?.readBytes() ?: return@localFile
+                val bytes = try { file?.readBytes() } catch (error: java.io.IOException) { null }
+                if (bytes == null || bytes.isEmpty()) {
+                    CYLTabBarItemAnimationFailure.reportLater(view)
+                    return@localFile
+                }
                 load(rive, bytes, options, contentMode)
+                CYLTabBarItemAnimationFailure.reportLoaded(view)
             }
             return view
         }

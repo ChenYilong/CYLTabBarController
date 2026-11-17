@@ -72,6 +72,7 @@ typedef NS_ENUM(NSInteger, CYLSVGATabBarItemAnimationState) {
     __weak CYLSVGATabBarItemAnimationView *weakView = view;
     void (^completion)(SVGAVideoEntity *) = ^(SVGAVideoEntity *videoItem) {
         [weakView cyl_showVideoItem:videoItem];
+        CYLTabBarItemAnimationReportLoaded(weakView);
     };
     void (^failure)(NSError *) = ^(NSError *error) {
 #if defined(DEBUG) || defined(BETA)
@@ -89,6 +90,9 @@ typedef NS_ENUM(NSInteger, CYLSVGATabBarItemAnimationState) {
         }
         [parser parseWithData:data cacheKey:fileURL.absoluteString completionBlock:completion failureBlock:failure];
     } else {
+        // [EN] A download: the host shows its static image, or its placeholder, until the file is parsed.
+        // [CN] 下载中：在文件解析完成之前，宿主显示其静态图片或占位图。
+        CYLTabBarItemAnimationMarkLoading(view);
         [parser parseWithURL:fileURL completionBlock:completion failureBlock:failure];
     }
     return view;

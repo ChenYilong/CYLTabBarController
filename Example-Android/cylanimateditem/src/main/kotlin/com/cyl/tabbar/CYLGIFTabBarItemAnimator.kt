@@ -84,6 +84,7 @@ class CYLGIFTabBarItemAnimationView internal constructor(context: Context, priva
             return
         }
         movie = android.graphics.Movie.decodeByteArray(bytes, 0, bytes.size)
+        CYLTabBarItemAnimationFailure.reportLoaded(this)
         invalidate()
     }
 
@@ -140,6 +141,8 @@ class CYLGIFTabBarItemAnimationView internal constructor(context: Context, priva
     object Provider : CYLTabBarItemAnimationViewProviding {
         override fun cyl_animationViewWithFileURL(context: Context, fileURL: String, options: Map<String, String>, contentMode: ImageView.ScaleType): View {
             val view = CYLGIFTabBarItemAnimationView(context, contentMode)
+            // [EN] Until the file is here (a download), the host shows its static image or placeholder. [CN] 文件到达之前（下载中），宿主显示其静态图片或占位图。
+            CYLTabBarItemAnimationFailure.markLoading(view)
             CYLTabBarItemAnimationFiles.localFile(context, fileURL) { file ->
                 // [EN] A missing file, a failed download or an unreadable one: the host shows its image or placeholder.
                 // [CN] 文件不存在、下载失败或无法读取：宿主显示其图片或占位图。

@@ -145,6 +145,47 @@ class CYLAnimatedItemFailureTest {
         assertEquals(View.VISIBLE, item.iconView.visibility)
     }
 
+    /**
+     * [EN] A source whose views wait for a download. [CN] 视图需要等待下载的来源。
+     */
+    class DownloadingSource : CYLTabBarItemAnimationViewMaking {
+        val source = CountingSource()
+        override fun animationViewWithURL(context: Context, url: String, size: CYLSize, contentMode: ImageView.ScaleType): View =
+            source.animationViewWithURL(context, url, size, contentMode).also { CYLTabBarItemAnimationFailure.markLoading(it) }
+        override fun playerForView(view: View?) = source.playerForView(view)
+        override fun isAnimationView(view: View?) = source.isAnimationView(view)
+    }
+
+    @Test
+    fun whileARemoteFileDownloadsTheStaticImageShows() {
+        val activity = activity()
+        val source = DownloadingSource()
+        val image = ColorDrawable(Color.BLUE)
+        val item = hosted(activity, CYLAnimatedItemView(activity).apply { animationSource = source; this.image = image; animationURL = "https://example.com/home.json" })
+        val animation = source.source.views.single()
+        assertTrue(CYLTabBarItemAnimationFailure.isLoading(animation))
+        assertSame("downloading: the static image", image, item.iconView.drawable)
+        assertEquals(View.VISIBLE, item.iconView.visibility)
+        CYLTabBarItemAnimationFailure.reportLoaded(animation)
+        idle()
+        assertEquals("downloaded: the animation", View.INVISIBLE, item.iconView.visibility)
+    }
+
+    @Test
+    fun whileARemoteFileDownloadsWithoutAnImageThePlaceholderShows() {
+        val activity = activity()
+        val source = DownloadingSource()
+        val item = hosted(activity, CYLAnimatedItemView(activity).apply { animationSource = source; title = "Home"; animationURL = "https://example.com/home.json" })
+        val animation = source.source.views.single()
+        assertNotNull("downloading: the placeholder", item.iconView.drawable)
+        assertEquals(View.VISIBLE, item.iconView.visibility)
+        CYLTabBarItemAnimationFailure.reportLater(animation)
+        idle()
+        assertFalse("a failed download drops the animation", item.isAnimationReady)
+        assertNotNull("and the placeholder stays", item.iconView.drawable)
+        assertFalse(CYLTabBarItemAnimationFailure.isLoading(animation))
+    }
+
     @Test
     fun aReportForAnOldViewIsIgnored() {
         val activity = activity()

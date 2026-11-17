@@ -95,10 +95,42 @@ static const void *CYLTabBarItemAnimationPlayerKey = &CYLTabBarItemAnimationPlay
 
 NSNotificationName const CYLTabBarItemAnimationDidFailNotification = @"CYLTabBarItemAnimationDidFailNotification";
 
+static const void *const CYLTabBarItemAnimationLoadingKey = &CYLTabBarItemAnimationLoadingKey;
+
+void CYLTabBarItemAnimationMarkLoading(UIView *animationView) {
+    if (animationView) {
+        objc_setAssociatedObject(animationView, CYLTabBarItemAnimationLoadingKey, @YES, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    }
+}
+
+BOOL CYLTabBarItemAnimationIsLoading(UIView *animationView) {
+    return animationView && [objc_getAssociatedObject(animationView, CYLTabBarItemAnimationLoadingKey) boolValue];
+}
+
+void CYLTabBarItemAnimationReportLoaded(UIView *animationView) {
+    if (!CYLTabBarItemAnimationIsLoading(animationView)) {
+        return;
+    }
+    objc_setAssociatedObject(animationView, CYLTabBarItemAnimationLoadingKey, nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    __weak UIView *weakView = animationView;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        UIView *view = weakView;
+        for (UIView *host = view.superview; host; host = host.superview) {
+            if ([host conformsToProtocol:@protocol(CYLTabBarItemAnimationFailureHandling)]) {
+                if ([host respondsToSelector:@selector(cylAnimationViewDidLoad:)]) {
+                    [(id<CYLTabBarItemAnimationFailureHandling>)host cylAnimationViewDidLoad:view];
+                }
+                return;
+            }
+        }
+    });
+}
+
 void CYLTabBarItemAnimationReportFailure(UIView *animationView, NSError *error) {
     if (!animationView) {
         return;
     }
+    objc_setAssociatedObject(animationView, CYLTabBarItemAnimationLoadingKey, nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     __weak UIView *weakView = animationView;
     dispatch_async(dispatch_get_main_queue(), ^{
         UIView *view = weakView;

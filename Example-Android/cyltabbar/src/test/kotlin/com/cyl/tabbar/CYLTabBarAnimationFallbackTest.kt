@@ -1,6 +1,8 @@
 package com.cyl.tabbar
 
+import android.content.Context
 import android.view.View
+import android.widget.ImageView
 import androidx.fragment.app.Fragment
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -49,5 +51,46 @@ class CYLTabBarAnimationFallbackTest {
         only.performClick()
         idle()
         assertEquals(0, controller.selectedIndex)
+    }
+
+    /**
+     * [EN] An animator whose views wait for a download. [CN] 视图需要等待下载的 animator。
+     */
+    private class DownloadingAnimator : CYLTabBarItemAnimator {
+        override val identifier = "TestDownloading"
+        override val fileExtensions = listOf("slow")
+        val views = ArrayList<View>()
+        override fun canAnimateFileAtURL(url: String) = CYLTabBarAnimationFileExtension(url) == "slow"
+        override fun animationViewWithURL(context: Context, url: String, size: CYLSize, contentMode: ImageView.ScaleType): View =
+            View(context).also { views += it; CYLTabBarItemAnimationFailure.markLoading(it) }
+        override fun playerForAnimationView(view: View): CYLTabBarItemAnimationPlayer? = null
+    }
+
+    @Test
+    fun whileATabsRemoteFileDownloadsItsImageOrThePlaceholderShows() = withActivity { activity ->
+        val animator = DownloadingAnimator()
+        CYLTabBarItemAnimatorRegistry.registerAnimator(animator)
+        try {
+            val image = androidx.core.content.ContextCompat.getDrawable(activity, android.R.drawable.ic_menu_add)
+            val items = listOf(
+                mapOf(CYLConstants.CYLTabBarItemTitle to "Image", CYLConstants.CYLTabBarItemImage to image, CYLConstants.CYLTabBarAnimationURL to "https://example.com/a.slow"),
+                mapOf(CYLConstants.CYLTabBarItemTitle to "None", CYLConstants.CYLTabBarAnimationURL to "https://example.com/b.slow"),
+            )
+            val controller = CYLTabBarController(activity, items.map { Page() }, items)
+            activity.setContentView(controller.view)
+            idle()
+            val (withImage, withoutImage) = controller.tabBar.tabBarButtonArray
+            assertTrue(withImage.cyl_isTabBarItemAnimationReady())
+            assertEquals("downloading: the tab's image", View.VISIBLE, withImage.iconView.visibility)
+            assertNotNull(withImage.iconView.drawable)
+            assertEquals("downloading, no image: the placeholder", View.VISIBLE, withoutImage.iconView.visibility)
+            assertNotNull(withoutImage.iconView.drawable)
+            animator.views.forEach { CYLTabBarItemAnimationFailure.reportLoaded(it) }
+            idle()
+            assertEquals("downloaded: the animation", View.INVISIBLE, withImage.iconView.visibility)
+            assertEquals(View.INVISIBLE, withoutImage.iconView.visibility)
+        } finally {
+            CYLTabBarItemAnimatorRegistry.unregisterAnimatorWithIdentifier("TestDownloading")
+        }
     }
 }

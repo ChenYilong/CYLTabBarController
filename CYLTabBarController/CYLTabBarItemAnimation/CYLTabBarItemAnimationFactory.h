@@ -97,6 +97,12 @@ NS_SWIFT_NAME(CYLTabBarItemAnimationFailureHandling)
  */
 - (void)cylAnimationViewDidFail:(UIView *)animationView error:(nullable NSError *)error
     NS_SWIFT_NAME(cylAnimationViewDidFail(_:error:));
+@optional
+/*!
+ * [EN] Called on the main thread when an animation view that was loading (a download) has its file: the host can now
+ *      hide its static image or placeholder. [CN] 正在加载（下载）的动画视图拿到文件时在主线程调用：宿主此时可以隐藏静态图片或占位图。
+ */
+- (void)cylAnimationViewDidLoad:(UIView *)animationView NS_SWIFT_NAME(cylAnimationViewDidLoad(_:));
 @end
 
 /*!
@@ -115,5 +121,27 @@ FOUNDATION_EXTERN NSNotificationName const CYLTabBarItemAnimationDidFailNotifica
  *      通知最近的遵守 `CYLTabBarItemAnimationFailureHandling` 的父视图；没有时发送 `CYLTabBarItemAnimationDidFailNotification`。
  */
 FOUNDATION_EXTERN void CYLTabBarItemAnimationReportFailure(UIView *animationView, NSError * _Nullable error);
+
+/*!
+ * [EN] For animators: `animationView` waits for its file (a download). Until `CYLTabBarItemAnimationReportLoaded()` or
+ *      `CYLTabBarItemAnimationReportFailure()`, hosts keep showing the static image given to them, or the placeholder
+ *      when there is none.
+ * [CN] 供 animator 使用：`animationView` 正在等待其文件（下载）。在 `CYLTabBarItemAnimationReportLoaded()` 或 `CYLTabBarItemAnimationReportFailure()`
+ *      之前，宿主继续显示传入的静态图片，没有时显示占位图。
+ */
+FOUNDATION_EXTERN void CYLTabBarItemAnimationMarkLoading(UIView *animationView);
+
+/*!
+ * [EN] Whether `animationView` still waits for its file. [CN] `animationView` 是否仍在等待其文件。
+ */
+FOUNDATION_EXTERN BOOL CYLTabBarItemAnimationIsLoading(UIView * _Nullable animationView);
+
+/*!
+ * [EN] For animators: `animationView` has its file and shows the animation now; the closest superview adopting
+ *      `CYLTabBarItemAnimationFailureHandling` gets `-cylAnimationViewDidLoad:` on the next main run loop turn.
+ * [CN] 供 animator 使用：`animationView` 已拿到文件，现在显示动画；在下一次主线程 run loop 中，最近的遵守 `CYLTabBarItemAnimationFailureHandling`
+ *      的父视图收到 `-cylAnimationViewDidLoad:`。
+ */
+FOUNDATION_EXTERN void CYLTabBarItemAnimationReportLoaded(UIView *animationView);
 
 NS_ASSUME_NONNULL_END

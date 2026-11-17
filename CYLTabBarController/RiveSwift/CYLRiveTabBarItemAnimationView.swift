@@ -233,6 +233,11 @@ public final class CYLRiveTabBarItemAnimationView: UIView, CYLTabBarItemAnimatio
     private func load() {
         let configuration = self.configuration
         let fileProvider = self.fileProvider
+        if !configuration.fileURL.isFileURL {
+            // [EN] A download: the host shows its static image, or its placeholder, until the file is loaded.
+            // [CN] 下载中：在文件加载完成之前，宿主显示其静态图片或占位图。
+            CYLTabBarItemAnimationMarkLoading(self)
+        }
         Task { @MainActor [weak self] in
             do {
                 let file = try await fileProvider.file(at: configuration.fileURL)
@@ -249,6 +254,7 @@ public final class CYLRiveTabBarItemAnimationView: UIView, CYLTabBarItemAnimatio
                                           stateMachine: stateMachine,
                                           fit: Self.fit(for: self.contentMode))
                 self.didLoad(rive: rive, viewModelInstance: instance)
+                CYLTabBarItemAnimationReportLoaded(self)
             } catch {
                 #if DEBUG
                 print("[CYLTabBarController] Could not load the Rive tab animation \(configuration.fileURL.lastPathComponent): \(error)")

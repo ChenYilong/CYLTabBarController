@@ -65,6 +65,22 @@
     return [self playerForView:view] != nil;
 }
 @end
+
+/*
+ * [EN] A source whose views wait for a download. [CN] 视图需要等待下载的来源。
+ */
+@interface CYLAnimatedItemDownloadingSource : CYLAnimatedItemFakeSource
+@end
+
+@implementation CYLAnimatedItemDownloadingSource
+- (UIView *)animationViewWithURL:(NSURL *)URL size:(CGSize)size contentMode:(UIViewContentMode)contentMode {
+    UIView *view = [super animationViewWithURL:URL size:size contentMode:contentMode];
+    if (view) {
+        CYLTabBarItemAnimationMarkLoading(view);
+    }
+    return view;
+}
+@end
 #endif
 
 /*
@@ -297,6 +313,32 @@
     XCTAssertEqual(item.imageView.image, image, @"the placeholder is only for an item without a static image");
     item.animationURL = [NSURL URLWithString:@"https://example.com/home.unknown"];
     XCTAssertEqual(item.imageView.image, image);
+}
+
+- (void)testWhileARemoteFileDownloadsTheStaticImageOrThePlaceholderShows {
+    UIImage *image = [self icon];
+    CYLAnimatedItemView *item = [[CYLAnimatedItemView alloc] initWithFrame:CGRectMake(0, 0, 200, 44)];
+    item.animationSource = [[CYLAnimatedItemDownloadingSource alloc] init];
+    item.image = image;
+    item.animationURL = [NSURL URLWithString:@"https://example.com/home.fake"];
+    XCTAssertTrue(CYLTabBarItemAnimationIsLoading(item.animationView));
+    XCTAssertEqual(item.imageView.image, image, @"downloading: the static image");
+    XCTAssertFalse(item.imageView.hidden);
+    CYLTabBarItemAnimationReportLoaded(item.animationView);
+    [[NSRunLoop mainRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.05]];
+    XCTAssertTrue(item.imageView.hidden, @"downloaded: the animation");
+
+    UIImage *placeholder = [self icon];
+    CYLAnimatedItemView *bare = [[CYLAnimatedItemView alloc] initWithFrame:CGRectMake(0, 0, 200, 44)];
+    bare.animationSource = [[CYLAnimatedItemDownloadingSource alloc] init];
+    bare.placeholderImage = placeholder;
+    bare.animationURL = [NSURL URLWithString:@"https://example.com/home.fake"];
+    XCTAssertEqual(bare.imageView.image, placeholder, @"downloading without a static image: the placeholder");
+    XCTAssertFalse(bare.imageView.hidden);
+    CYLTabBarItemAnimationReportFailure(bare.animationView, nil);
+    [[NSRunLoop mainRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.05]];
+    XCTAssertFalse(bare.isAnimationReady, @"a failed download drops the animation");
+    XCTAssertEqual(bare.imageView.image, placeholder);
 }
 
 - (void)testAFailureOfAnOldAnimationIsIgnored {
