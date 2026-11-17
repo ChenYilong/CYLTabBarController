@@ -127,7 +127,7 @@
 //      client that imports both modules (CollectionViewClassifyMenu's static-library app) then cannot load the
 //      `CYLAnimatedItemView` superclass. The quoted forms are only for the framework target and SwiftPM, which compile
 //      the component into this module.
-#if defined(COCOAPODS) && __has_include(<CYLAnimatedItem/CYLAnimatedItemView.h>)
+#if (defined(COCOAPODS) || defined(CYL_ANIMATED_ITEM_SEPARATE_MODULE)) && __has_include(<CYLAnimatedItem/CYLAnimatedItemView.h>)
 #import <CYLAnimatedItem/CYLAnimatedItemView.h>
 #elif __has_include("CYLAnimatedItem/CYLAnimatedItemView.h")
 #import "CYLAnimatedItem/CYLAnimatedItemView.h"
@@ -146,7 +146,7 @@
 //      the animation libraries. Not imported under CocoaPods (which defines `COCOAPODS`), where CYLAnimatedItem is a
 //      module of its own, so that no declaration lands in two modules. `__has_include(<CYLAnimatedItem/…>)` cannot
 //      tell them apart: the source folder `CYLAnimatedItem/` has that name, so the framework target finds it too.
-#if !defined(COCOAPODS) && __has_include("CYLTabBarItemAnimation/CYLTabBarItemViewAnimator.h")
+#if !defined(COCOAPODS) && !defined(CYL_ANIMATED_ITEM_SEPARATE_MODULE) && __has_include("CYLTabBarItemAnimation/CYLTabBarItemViewAnimator.h")
 #import "CYLTabBarItemAnimation/CYLTabBarItemViewAnimator.h"
 #if __has_include("CYLTabBarItemAnimation/GIF/CYLGIFTabBarItemAnimator.h")
 #import "CYLTabBarItemAnimation/GIF/CYLGIFTabBarItemAnimator.h"

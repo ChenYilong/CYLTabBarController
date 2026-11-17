@@ -209,10 +209,14 @@ docs/
 │   ├── animated-item-demo-ios26.3-zh-Hans.png
 │   ├── animated-item-demo-ios27-en.png
 │   ├── animated-item-flatdesign-tabbar-ios27.png
+│   ├── animated-item-harmonyos-lottie-done.png
+│   ├── animated-item-harmonyos-lottie-playing.png
+│   ├── animated-item-harmonyos-tabbar.jpeg
 │   ├── animated-item-miniprogram-b7-engines-fixed.jpg
 │   ├── animated-item-miniprogram-b7-engines-overflow.jpg
 │   ├── badge-debugging-animations-off-harmonyos.png
 │   ├── carthage-example-ios.png
+│   ├── carthage-example-two-frameworks-ios27.png
 │   ├── configuration-demo-json-zh-hans.png
 │   ├── configuration-localization-en.png
 │   ├── configuration-localization-zh-hans.png
