@@ -43,6 +43,32 @@ static NSURL *CYLTabBarItemAnimationFileURLFromURL(NSURL *URL) {
 @implementation CYLTabBarItemPlayableViewPlayer {
     /// [EN] Whether the dark colors are applied now. [CN] 当前是否已应用深色颜色。
     BOOL _darkColorsApplied;
+    BOOL _loops;
+}
+
+/*
+ * [EN] `loops` exists only when the view loops itself (`-cyl_setAnimationViewLoops:`, e.g. Rive): otherwise the host keeps
+ *      its own loop (CYLAnimatedItemView restarts a player with `progress`).
+ * [CN] 只有视图自己会循环时（`-cyl_setAnimationViewLoops:`，例如 Rive）才提供 `loops`；否则宿主保留自己的循环（CYLAnimatedItemView 会重新开始
+ *      带 `progress` 的播放器）。
+ */
+- (BOOL)respondsToSelector:(SEL)aSelector {
+    if (aSelector == @selector(setLoops:) || aSelector == @selector(loops)) {
+        return [self.playableView respondsToSelector:@selector(cyl_setAnimationViewLoops:)];
+    }
+    return [super respondsToSelector:aSelector];
+}
+
+- (BOOL)loops {
+    return _loops;
+}
+
+- (void)setLoops:(BOOL)loops {
+    _loops = loops;
+    id<CYLTabBarItemAnimationPlayableView> view = self.playableView;
+    if ([view respondsToSelector:@selector(cyl_setAnimationViewLoops:)]) {
+        [view cyl_setAnimationViewLoops:loops];
+    }
 }
 
 - (id<CYLTabBarItemAnimationPlayableView>)playableView {

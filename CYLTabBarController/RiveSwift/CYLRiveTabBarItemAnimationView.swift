@@ -46,6 +46,11 @@ struct CYLRiveTabBarItemAnimationConfiguration {
     /// [EN] Played through the legacy runtime even with none of the three above. [CN] 即使没有以上三项，也通过旧版运行时播放。
     let forcesLegacyRuntime: Bool
 
+    /// [EN] Seconds of a loop pass when the file gives none. [CN] 文件未给出时一次循环的秒数。
+    static let loopSeconds: TimeInterval = 1.5
+    /// [EN] The pause after an input goes back to false, before the next pass. [CN] 输入恢复为 false 后、下一次播放前的停顿。
+    static let loopPauseSeconds: TimeInterval = 0.4
+
     /// [EN] Whether the file is played through Rive's legacy runtime. [CN] 是否通过 Rive 旧版运行时播放该文件。
     var usesLegacyRuntime: Bool {
         return forcesLegacyRuntime || stateMachineInput != nil || triggerInput != nil || animationName != nil
@@ -87,6 +92,24 @@ struct CYLRiveTabBarItemAnimationConfiguration {
     }
 }
 
+/**
+ * [EN] Answers whether a local .riv file has no view model, so `CYLRiveTabBarItemAnimationView` can play it through the
+ *      legacy view instead of showing it still (house.riv, docs/Animated-Item.md). Adopted by the legacy view, which may
+ *      use Rive's deprecated API.
+ * [CN] 判断本地 .riv 文件是否没有 view model，使 `CYLRiveTabBarItemAnimationView` 可以改用旧版视图播放，而不是静止显示（house.riv，
+ *      docs/Animated-Item.md）。由旧版视图遵守，它可以使用 Rive 已废弃的 API。
+ */
+@MainActor
+@objc(CYLRiveFileInspecting)
+public protocol CYLRiveFileInspecting: NSObjectProtocol {
+    /**
+     * [EN] Whether the local file at `fileURL` has no view model (false when it cannot be read).
+     * [CN] `fileURL` 处的本地文件是否没有 view model（无法读取时为 false）。
+     */
+    @objc(cyl_fileHasNoViewModel:)
+    static func cylFileHasNoViewModel(_ fileURL: URL) -> Bool
+}
+
 /*!
  * [EN] A tab icon that plays a Rive artboard. It loads asynchronously; calls made before it has loaded are applied once
  *      it has. A tab "plays" through the artboard's view model: the boolean `activePropertyPath` is set to true, then back
@@ -111,6 +134,9 @@ public final class CYLRiveTabBarItemAnimationView: UIView, CYLTabBarItemAnimatio
     private var isLoaded = false
     private var playsWhenLoaded = false
     private var deactivateTask: Task<Void, Never>?
+    /// [EN] Plays again after each pass (`cyl_setAnimationViewLoops:`). [CN] 每次播放后再次播放（`cyl_setAnimationViewLoops:`）。
+    private var loops = false
+    private var loopTask: Task<Void, Never>?
 
     /// [EN] The colors asked for last (nil: the light colors), applied in order. [CN] 最近一次请求的颜色（nil 表示浅色颜色），按顺序应用。
     private var requestedColors: [String: UIColor]?
@@ -134,7 +160,11 @@ public final class CYLRiveTabBarItemAnimationView: UIView, CYLTabBarItemAnimatio
 
     public static func makeAnimationView(fileURL: URL, options: [String: String], contentMode: UIView.ContentMode) -> (UIView & CYLTabBarItemAnimationPlayableView)? {
         let configuration = CYLRiveTabBarItemAnimationConfiguration(fileURL: fileURL, options: options)
-        if configuration.usesLegacyRuntime {
+        // [EN] A local file without a view model has nothing to bind: the legacy view plays its state machine (house.riv).
+        // [CN] 没有 view model 的本地文件无可绑定：由旧版视图播放其状态机（house.riv）。
+        let fileHasNoViewModel = !configuration.usesLegacyRuntime
+            && ((legacyViewProvider as? CYLRiveFileInspecting.Type)?.cylFileHasNoViewModel(fileURL) ?? false)
+        if configuration.usesLegacyRuntime || fileHasNoViewModel {
             // [EN] Another implementation of the same interface (strategy), chosen by the options.
             // [CN] 同一接口的另一个实现（策略），根据选项选择。
             let legacyProvider = legacyViewProvider as? CYLTabBarItemAnimationViewProviding.Type
@@ -172,8 +202,11 @@ public final class CYLRiveTabBarItemAnimationView: UIView, CYLTabBarItemAnimatio
 
     // MARK: - [EN] CYLTabBarItemAnimationPlayableView [CN] 可播放视图接口
 
-    /// [EN] Plays once: sets the boolean to true, then false after `activeDuration`; or fires the trigger.
-    /// [CN] 播放一次：把布尔属性设为 true，`activeDuration` 后设为 false；或触发 trigger。
+    /// [EN] Plays from the start: fires the trigger, or sets the boolean to false, then true on a later frame (so a play is
+    ///      always a transition, also for a boolean held true), and false after `activeDuration`. With looping on, it plays
+    ///      again after each pass (docs/Animated-Item.md, the Rive loop).
+    /// [CN] 从头播放：触发 trigger，或先把布尔属性设为 false、在之后的帧设为 true（每次播放都是一次状态切换，保持为 true 的布尔属性也一样），
+    ///      `activeDuration` 后设为 false。开启循环时，每次播放后再次播放（docs/Animated-Item.md，Rive 循环）。
     public func playAnimation() {
         guard isLoaded else {
             playsWhenLoaded = true
@@ -183,23 +216,57 @@ public final class CYLRiveTabBarItemAnimationView: UIView, CYLTabBarItemAnimatio
             return
         }
         deactivateTask?.cancel()
+        loopTask?.cancel()
         if let triggerPropertyPath = configuration.triggerPropertyPath {
             instance.fire(trigger: TriggerProperty(path: triggerPropertyPath))
+        } else {
+            let property = BoolProperty(path: configuration.activePropertyPath)
+            let duration = configuration.activeDuration
+            instance.setValue(of: property, to: false)
+            deactivateTask = Task { @MainActor [weak self] in
+                try? await Task.sleep(nanoseconds: 50_000_000)
+                guard !Task.isCancelled, let self, let instance = self.viewModelInstance else {
+                    return
+                }
+                instance.setValue(of: property, to: true)
+                guard duration > 0 else {
+                    // [EN] Held until the animation stops. [CN] 保持到动画停止。
+                    return
+                }
+                try? await Task.sleep(nanoseconds: UInt64(duration * 1_000_000_000))
+                guard !Task.isCancelled else {
+                    return
+                }
+                instance.setValue(of: property, to: false)
+            }
+        }
+        scheduleLoop()
+    }
+
+    /// [EN] `cyl_setAnimationViewLoops:`. [CN] `cyl_setAnimationViewLoops:`。
+    public func setAnimationLoops(_ loops: Bool) {
+        self.loops = loops
+        if !loops {
+            loopTask?.cancel()
+            loopTask = nil
+        }
+    }
+
+    /// [EN] The next pass while looping: after the boolean goes back to false (plus a pause), else 1.5 s.
+    /// [CN] 循环时的下一次播放：布尔属性恢复为 false 之后（再停顿一下），否则 1.5 秒。
+    private func scheduleLoop() {
+        guard loops else {
             return
         }
-        let activePropertyPath = configuration.activePropertyPath
-        instance.setValue(of: BoolProperty(path: activePropertyPath), to: true)
-        guard configuration.activeDuration > 0 else {
-            // [EN] Held until the animation stops. [CN] 保持到动画停止。
-            return
-        }
-        let nanoseconds = UInt64(configuration.activeDuration * 1_000_000_000)
-        deactivateTask = Task { @MainActor [weak self] in
-            try? await Task.sleep(nanoseconds: nanoseconds)
-            guard !Task.isCancelled, let self, let instance = self.viewModelInstance else {
+        let seconds = (configuration.triggerPropertyPath == nil && configuration.activeDuration > 0)
+            ? configuration.activeDuration + CYLRiveTabBarItemAnimationConfiguration.loopPauseSeconds
+            : CYLRiveTabBarItemAnimationConfiguration.loopSeconds
+        loopTask = Task { @MainActor [weak self] in
+            try? await Task.sleep(nanoseconds: UInt64(seconds * 1_000_000_000))
+            guard !Task.isCancelled, let self, self.loops else {
                 return
             }
-            instance.setValue(of: BoolProperty(path: activePropertyPath), to: false)
+            self.playAnimation()
         }
     }
 
@@ -214,6 +281,8 @@ public final class CYLRiveTabBarItemAnimationView: UIView, CYLTabBarItemAnimatio
         playsWhenLoaded = false
         deactivateTask?.cancel()
         deactivateTask = nil
+        loopTask?.cancel()
+        loopTask = nil
         guard configuration.triggerPropertyPath == nil, let instance = viewModelInstance else {
             return
         }

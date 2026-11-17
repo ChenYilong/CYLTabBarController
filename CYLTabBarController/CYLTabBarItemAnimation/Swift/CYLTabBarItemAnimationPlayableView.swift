@@ -57,6 +57,16 @@ public protocol CYLTabBarItemAnimationPlayableView: NSObjectProtocol {
      */
     @objc(cyl_applyAnimationViewColors:)
     optional func applyAnimationColors(_ colors: [String: UIColor]?)
+
+    /**
+     * [EN] Whether the view plays again after each pass until this is set to NO (`loops` of the player, which forwards it
+     *      only when the view implements this). For views with no progress to restart, such as Rive state machines
+     *      (docs/Animated-Item.md, the Rive loop).
+     * [CN] 视图是否在每次播放后再次播放，直到设为 NO（播放器的 `loops`，仅在视图实现本方法时转发）。用于没有进度可重新开始的视图，例如 Rive 状态机
+     *      （docs/Animated-Item.md，Rive 循环）。
+     */
+    @objc(cyl_setAnimationViewLoops:)
+    optional func setAnimationLoops(_ loops: Bool)
 }
 
 /**
