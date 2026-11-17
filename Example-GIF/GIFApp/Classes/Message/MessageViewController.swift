@@ -35,7 +35,9 @@ class MessageViewController: UIViewController {
 
         let gif = Bundle.main.url(forResource: "tab_star", withExtension: "gif")
         addItem(title: "播放中的 GIF", image: nil, animationURL: gif, identifier: "CYLAnimatedItemDemoPlaying")
-        addItem(title: "静态图片", image: UIImage(systemName: "photo"), animationURL: nil,
+        // [EN] Not "photo": the placeholder below is a picture icon too, and the two looked alike (docs/Animated-Item.md B18).
+        // [CN] 不用 "photo"：下面的占位图也是图片图标，两者看起来一样（docs/Animated-Item.md B18）。
+        addItem(title: "静态图片", image: UIImage(systemName: "house.fill"), animationURL: nil,
                 identifier: "CYLAnimatedItemDemoImage")
         addItem(title: "占位图（文件损坏）", image: nil, animationURL: Self.brokenFileURL(),
                 identifier: "CYLAnimatedItemDemoPlaceholder")
