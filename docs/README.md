@@ -214,6 +214,9 @@ docs/
 │   ├── animated-item-harmonyos-tabbar.jpeg
 │   ├── animated-item-miniprogram-b7-engines-fixed.jpg
 │   ├── animated-item-miniprogram-b7-engines-overflow.jpg
+│   ├── b10-flatdesign-image-under-gif-after.png
+│   ├── b10-flatdesign-image-under-gif-before.png
+│   ├── b14-language-row-emoji-ios27.2.png
 │   ├── badge-debugging-animations-off-harmonyos.png
 │   ├── carthage-example-ios.png
 │   ├── carthage-example-two-frameworks-ios27.png
@@ -295,6 +298,7 @@ docs/
 │   ├── image-only-tabs-gallery-3-3-ios17.png
 │   ├── image-only-tabs-ios.png
 │   ├── inset-grouped-sections-demo-ios.png
+│   ├── ios-flatdesign-animateditem-tab-ios26-4-a6e88609.png
 │   ├── ios-playback-controls-message-tab-iphone17pro-ios26.1-dc04439.png
 │   ├── issue-561-ipad-tab-bars-ios.png
 │   ├── liquid-glass-plus-stand-in-landscape-ios.png
