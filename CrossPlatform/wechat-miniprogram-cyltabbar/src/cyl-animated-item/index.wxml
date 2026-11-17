@@ -1,0 +1,35 @@
+<!-- [EN] One accessibility element: an icon (animation, static image or placeholder), a title and an optional accessory. [CN] 一个无障碍元素：图标（动画、静态图片或占位图）、标题与可选的附加图标。 -->
+<view
+  class="cyl-animated-item {{m.axisClass}} {{m.ariaDisabled ? 'cyl-animated-item-disabled' : ''}}"
+  aria-role="button"
+  aria-label="{{m.ariaLabel}}"
+  aria-selected="{{m.ariaSelected}}"
+  aria-disabled="{{m.ariaDisabled}}"
+  bindtap="cyl_onTap"
+  bindlongpress="cyl_onLongPress"
+  bindtouchstart="cyl_onTouchStart"
+  bindtouchmove="cyl_onTouchMove"
+  bindtouchend="cyl_onTouchEnd"
+>
+  <view wx:if="{{m.hasAccessory && m.accessoryPlacement === 'leading'}}" class="cyl-animated-item-accessory" aria-role="button" aria-label="{{m.accessoryLabel}}" catchtap="cyl_onAccessoryTap">
+    <image wx:if="{{accessoryImage}}" class="cyl-animated-item-accessory-image" src="{{accessoryImage}}" mode="aspectFit" aria-hidden="true" />
+    <text wx:else aria-hidden="true">{{accessoryText}}</text>
+  </view>
+  <view wx:if="{{m.showsIcon}}" class="cyl-animated-item-icon" style="{{m.iconStyle}}" aria-hidden="true">
+    <image wx:if="{{m.fallbackImage}}" class="cyl-animated-item-image {{m.fallbackHidden ? 'cyl-animated-item-hidden' : ''}}" src="{{m.fallbackImage}}" mode="aspectFit" />
+    <image wx:if="{{m.gifPath}}" class="cyl-animated-item-image" src="{{m.gifPath}}" mode="aspectFit" />
+    <cyl-lottie-view wx:if="{{m.usesEngine && m.animationType === 'lottie'}}" class="cyl-animated-item-animation" path="{{m.animationPath}}" loop="{{loop}}" speed="{{speed}}" autoplay="{{true}}" resting-frame="{{selected ? 'last' : 'first'}}" bind:ready="cyl_onAnimationReady" bind:error="cyl_onAnimationError" />
+    <cyl-pag-view wx:elif="{{m.usesEngine && m.animationType === 'pag'}}" class="cyl-animated-item-animation" path="{{m.animationPath}}" loop="{{loop}}" speed="{{speed}}" autoplay="{{true}}" resting-frame="{{selected ? 'last' : 'first'}}" bind:ready="cyl_onAnimationReady" bind:error="cyl_onAnimationError" />
+    <cyl-rive-view wx:elif="{{m.usesEngine && m.animationType === 'rive'}}" class="cyl-animated-item-animation" path="{{m.animationPath}}" loop="{{loop}}" speed="{{speed}}" autoplay="{{true}}" bind:ready="cyl_onAnimationReady" bind:error="cyl_onAnimationError" />
+    <cyl-svga-view wx:elif="{{m.usesEngine && m.animationType === 'svga'}}" class="cyl-animated-item-animation" path="{{m.animationPath}}" loop="{{loop}}" speed="{{speed}}" autoplay="{{true}}" resting-frame="{{selected ? 'last' : 'first'}}" bind:ready="cyl_onAnimationReady" bind:error="cyl_onAnimationError" />
+    <view wx:if="{{m.hasAccessory && m.accessoryPlacement === 'topTrailing'}}" class="cyl-animated-item-accessory cyl-animated-item-accessory-corner" aria-role="button" aria-label="{{m.accessoryLabel}}" catchtap="cyl_onAccessoryTap">
+      <image wx:if="{{accessoryImage}}" class="cyl-animated-item-accessory-image" src="{{accessoryImage}}" mode="aspectFit" aria-hidden="true" />
+      <text wx:else aria-hidden="true">{{accessoryText}}</text>
+    </view>
+  </view>
+  <text wx:if="{{m.title}}" class="cyl-animated-item-title" aria-hidden="true">{{m.title}}</text>
+  <view wx:if="{{m.hasAccessory && m.accessoryPlacement === 'trailing'}}" class="cyl-animated-item-accessory" aria-role="button" aria-label="{{m.accessoryLabel}}" catchtap="cyl_onAccessoryTap">
+    <image wx:if="{{accessoryImage}}" class="cyl-animated-item-accessory-image" src="{{accessoryImage}}" mode="aspectFit" aria-hidden="true" />
+    <text wx:else aria-hidden="true">{{accessoryText}}</text>
+  </view>
+</view>

@@ -1,0 +1,61 @@
+/* [EN] Layout of cyl-animated-item. [CN] cyl-animated-item 的布局。 */
+.cyl-animated-item {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 4px;
+  box-sizing: border-box;
+}
+.cyl-animated-item-horizontal {
+  flex-direction: row;
+}
+.cyl-animated-item-vertical {
+  flex-direction: column;
+}
+.cyl-animated-item-disabled {
+  opacity: 0.5;
+}
+.cyl-animated-item-icon {
+  position: relative;
+  flex: none;
+}
+.cyl-animated-item-image,
+.cyl-animated-item-animation {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+}
+.cyl-animated-item-hidden {
+  opacity: 0;
+}
+.cyl-animated-item-horizontal .cyl-animated-item-title {
+  margin-left: 4px;
+}
+.cyl-animated-item-vertical .cyl-animated-item-title {
+  margin-top: 2px;
+}
+.cyl-animated-item-title {
+  font-size: 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.cyl-animated-item-accessory {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+}
+.cyl-animated-item-accessory-corner {
+  position: absolute;
+  top: -22px;
+  right: -22px;
+}
+.cyl-animated-item-accessory-image {
+  width: 18px;
+  height: 18px;
+}
