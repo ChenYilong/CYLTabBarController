@@ -161,6 +161,22 @@ export class CYLAnimatedItemEngines {
 }
 
 /**
+ * [EN] The color filter that paints a bitmap in `color` keeping each pixel's alpha (each channel = the color's component x
+ *      the pixel's alpha; no offsets, so it does not depend on the channel range); the identity when `color` is '' or not
+ *      a '#RRGGBB' / '#AARRGGBB' string. [CN] 以 `color` 绘制位图且保留每个像素透明度的颜色滤镜；color 为空或不是十六进制字符串时为恒等滤镜。
+ */
+export function cylIconColorFilter(color: ResourceColor): number[] {
+  const identity: number[] = [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0];
+  if (typeof color !== 'string' || !new RegExp('^#?([0-9a-fA-F]{6}|[0-9a-fA-F]{8})$').test(color)) {
+    return identity;
+  }
+  const hex = (color as string).replace('#', '');
+  const argb = hex.length === 6 ? 'FF' + hex : hex;
+  const c = (index: number): number => parseInt(argb.substring(index, index + 2), 16) / 255;
+  return [0, 0, 0, c(2), 0, 0, 0, 0, c(4), 0, 0, 0, 0, c(6), 0, 0, 0, 0, c(0), 0];
+}
+
+/**
  * [EN] An icon + title view to reuse or wrap (CollectionViewClassifyMenu's tags, CYLSearchViewController's bar items,
  *      CYLTableViewPlaceHolder's placeholders): an icon that plays an animation file through `animationBuilder`, its static
  *      image, a title beside or below it, an optional accessory with its own tap, and gestures on the whole item (tap, long
@@ -184,6 +200,13 @@ export struct CYLAnimatedItemView {
   @Prop isItemEnabled: boolean = true;
   @Prop axis: CYLAnimatedItemAxis = CYLAnimatedItemAxis.Horizontal;
   @Prop iconSize: number = 24;
+  /**
+   * [EN] The color of the static icon (`image` / `selectedImage` / the placeholder), as iOS tints template images: SVG
+   *      and symbol images take it as their fill, bitmaps through an alpha-preserving color filter. '' (the default)
+   *      keeps the image's own colors. A '#RRGGBB' / '#AARRGGBB' string tints bitmaps too; a resource color tints SVG
+   *      only. [CN] 静态图标的颜色（如 iOS 的模板图着色）：SVG 与符号图作为填充色，位图通过保留透明度的颜色滤镜着色；''（默认）保留原色。
+   */
+  @Prop iconColor: ResourceColor = '';
   @Prop spacing: number = 4;
   @Prop titleFontSize: number = 14;
   @Prop titleColor: ResourceColor = '#333333';
@@ -293,6 +316,8 @@ export struct CYLAnimatedItemView {
         Image(this.cylFallbackImage())
           .width(this.iconSize)
           .height(this.iconSize)
+          .fillColor(this.iconColor === '' ? undefined : this.iconColor)
+          .colorFilter(new ColorFilter(cylIconColorFilter(this.iconColor)))
           .objectFit(ImageFit.Contain)
           .opacity(this.cylMakesAnimation() && this.animationLoaded ? 0 : 1)
           .accessibilityLevel('no')
