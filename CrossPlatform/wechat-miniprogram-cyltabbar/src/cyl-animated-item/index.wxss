@@ -68,6 +68,16 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
+/* [EN] titleLines 0 (no limit) or more than 1: wraps; more than 1 ends with an ellipsis after that many lines.
+   [CN] titleLines 为 0（不限）或大于 1：换行；大于 1 时超出行数以省略号结尾。 */
+.cyl-animated-item-title-wrap {
+  white-space: normal;
+  word-break: break-word;
+}
+.cyl-animated-item-title-clamp {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+}
 .cyl-animated-item-accessory {
   display: flex;
   align-items: center;

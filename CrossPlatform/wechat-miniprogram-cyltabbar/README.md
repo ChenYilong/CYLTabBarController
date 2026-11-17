@@ -74,10 +74,10 @@ object, each item plays its own copy), `animationType` (when the extension does 
 true; false rests until `playAnimation()`), `restingProgress` (0...1, the frame at rest; selected shows the last),
 `gifFirstFrame` / `gifLastFrame` / `gifDuration` (GIF stills at rest and one pass in milliseconds on play; without
 stills a GIF always plays), `riveWasmPath` / `pagWasmPath` (cyl-rive / cyl-pag `wasm-path`; '' keeps their default), `accessoryImage`, `accessoryText`,
-`accessoryAccessibilityLabel`, `accessoryPlacement`, `dragEnabled`, `accessibilityLabel`, `embedded` (inside a control that is the accessibility element: no padding, no 44 px
+`accessoryAccessibilityLabel`, `accessoryPlacement`, `titleColor`, `titleFontSize` (px; 0 keeps 14), `titleLines` (1: one line with an ellipsis, the default; 0: no limit; n > 1: up to n lines), `dragEnabled`, `accessibilityLabel`, `embedded` (inside a control that is the accessibility element: no padding, no 44 px
 minimum, hidden from accessibility, no gestures). Methods (through
 `selectComponent`): `playAnimation()` (from progress 0; a file still loading plays when ready), `restartAnimation()`,
-`stopAnimation()`. Events: `itemtap`, `itemlongpress`, `accessorytap`, `dragstart` / `dragmove` / `dragend`.
+`stopAnimation()`. Events: `itemtap`, `itemlongpress`, `accessorytap`, `dragstart` / `dragmove` / `dragend`, and the engine's own, forwarded with its detail: `animationready` (e.g. `duration`), `animationcomplete` (a non-looping pass ended, e.g. to count repeats), `animationloopcomplete` (a looping pass ended), `animationerror` (`message`; the item still shows its image). GIF sends none of the four.
 
 ## Layout
 

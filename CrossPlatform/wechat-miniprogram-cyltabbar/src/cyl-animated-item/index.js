@@ -97,6 +97,21 @@ Component({
     colors: { type: Object, value: null },
     autoplay: { type: Boolean, value: true },
     iconTint: { type: String, value: '' },
+    /**
+     * [EN] The title's color (any CSS color); '' keeps the inherited color.
+     * [CN] 标题颜色（任意 CSS 颜色）；'' 时沿用继承的颜色。
+     */
+    titleColor: { type: String, value: '' },
+    /**
+     * [EN] The title's font size in px; 0 keeps the default 14 px.
+     * [CN] 标题字号（px）；0 时为默认的 14 px。
+     */
+    titleFontSize: { type: Number, value: 0 },
+    /**
+     * [EN] The title's line count: 1 one line with an ellipsis (default), 0 no limit, n > 1 up to n lines, then an ellipsis.
+     * [CN] 标题行数：1 为单行省略（默认），0 为不限，n > 1 为最多 n 行后省略。
+     */
+    titleLines: { type: Number, value: 1 },
     iconWidth: { type: Number, value: 0 },
     iconHeight: { type: Number, value: 0 },
     bare: { type: Boolean, value: false },
@@ -133,7 +148,7 @@ Component({
       this.setData({ animationLoaded: false, animationFailed: false, gifPlaying: false, lottieData })
       this.cyl_update()
     },
-    'title, image, selectedImage, placeholderImage, embedded, enabled, axis, iconSize, accessoryImage, accessoryText, accessoryAccessibilityLabel, accessoryPlacement, accessibilityLabel, gifFirstFrame, gifLastFrame, iconWidth, iconHeight, iconTint': function () {
+    'title, image, selectedImage, placeholderImage, embedded, enabled, axis, iconSize, accessoryImage, accessoryText, accessoryAccessibilityLabel, accessoryPlacement, accessibilityLabel, gifFirstFrame, gifLastFrame, iconWidth, iconHeight, iconTint, titleColor, titleFontSize, titleLines': function () {
       this.cyl_update()
     },
     'selected, restingProgress': function () {
@@ -163,8 +178,10 @@ Component({
     },
 
     /** [EN] The engine component drew the file. [CN] 引擎组件已绘制该文件。 */
-    cyl_onAnimationReady() {
+    cyl_onAnimationReady(event) {
       this.setData({ animationLoaded: true })
+      // [EN] Forwarded as `animationready` with the engine's detail (e.g. `duration`). [CN] 以 `animationready` 转发，带引擎的 detail（如 `duration`）。
+      this.triggerEvent('animationready', (event && event.detail) || {})
       this.cyl_update()
       if (this.cylPendingPlay) {
         this.playAnimation()
@@ -266,12 +283,28 @@ Component({
     cyl_onAnimationError(event) {
       this.setData({ animationFailed: true })
       this.cyl_update()
+      // [EN] Forwarded as `animationerror` with the engine's detail (`message`); the item still falls back to its image.
+      // [CN] 以 `animationerror` 转发，带引擎的 detail（`message`）；条目仍回到静态图片。
+      this.triggerEvent('animationerror', (event && event.detail) || {})
       const type = this.data.m.animationType
       if (type && !cylWarnedTypes.includes(type)) {
         cylWarnedTypes.push(type)
         console.warn(`[cyl-animated-item] ${type} animation (${this.data.animationUrl}) cannot play: ${(event && event.detail && event.detail.message) || 'no engine'}. ` +
           `Showing the static image, or the placeholder without one. Install ${cylAnimatedItemPackage(type)} and set generic:cyl-${type}-view.`)
       }
+    },
+
+    /**
+     * [EN] The engine finished a play (a non-looping pass): forwarded as `animationcomplete`, e.g. to count repeats.
+     * [CN] 引擎播放结束（非循环的一遍）：以 `animationcomplete` 转发，例如用于统计重复次数。
+     */
+    cyl_onAnimationComplete(event) {
+      this.triggerEvent('animationcomplete', (event && event.detail) || {})
+    },
+
+    /** [EN] A looping play finished one pass: forwarded as `animationloopcomplete`. [CN] 循环播放完成一遍：以 `animationloopcomplete` 转发。 */
+    cyl_onAnimationLoopComplete(event) {
+      this.triggerEvent('animationloopcomplete', (event && event.detail) || {})
     },
 
     /** [EN] The engine component, or null (no engine type, GIF, or not drawn yet). [CN] 引擎组件，没有时为 null。 */

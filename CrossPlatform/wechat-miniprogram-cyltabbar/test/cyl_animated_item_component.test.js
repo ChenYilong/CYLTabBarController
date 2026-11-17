@@ -32,7 +32,8 @@ function cylMount(properties, engine) {
     selectComponent(id) {
       return id === '#cyl-animated-item-engine' ? engine : null
     },
-    triggerEvent() {},
+    events: [],
+    triggerEvent(name, detail) { this.events.push([name, detail]) },
     set(patch) {
       this.setData(patch)
       observers.filter((o) => o.keys.some((k) => k in patch)).forEach((o) => o.fn.apply(this, o.keys.map((k) => this.data[k])))
@@ -85,4 +86,19 @@ test('a GIF with stills plays one pass, then shows its last still while selected
   await new Promise((resolve) => setTimeout(resolve, 40))
   assert.equal(item.data.m.gifPath, 'l.png')
   detach()
+})
+
+test('engine ready, complete, loop complete and error are forwarded as item events', () => {
+  const engine = cylEngine((r) => ({ cyl_setProgress: r('setProgress') }))
+  const { item } = cylMount({ animationUrl: 'a.json' }, engine)
+  item.cyl_onAnimationReady({ detail: { duration: 1.5 } })
+  item.cyl_onAnimationComplete({ detail: {} })
+  item.cyl_onAnimationLoopComplete({ detail: {} })
+  item.cyl_onAnimationError({ detail: { message: 'bad file' } })
+  assert.deepEqual(item.events, [
+    ['animationready', { duration: 1.5 }],
+    ['animationcomplete', {}],
+    ['animationloopcomplete', {}],
+    ['animationerror', { message: 'bad file' }],
+  ])
 })

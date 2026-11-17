@@ -106,8 +106,17 @@ function cylAnimatedItemModel(p) {
   const iconHeight = Number(p.iconHeight) > 0 ? Number(p.iconHeight) : iconSize
   const title = p.title || ''
   const label = p.accessibilityLabel || title
+  // [EN] Title look: color, font size (px) and line count (1: one line with an ellipsis, the default; 0: no limit;
+  //      n > 1: up to n lines, then an ellipsis). [CN] 标题外观：颜色、字号（px）与行数（1：单行省略，默认；0：不限；n > 1：最多 n 行后省略）。
+  const titleLines = Number.isFinite(Number(p.titleLines)) && Number(p.titleLines) >= 0 ? Math.floor(Number(p.titleLines)) : 1
+  const titleStyle = (p.titleColor ? `color: ${p.titleColor};` : '') +
+    (Number(p.titleFontSize) > 0 ? `font-size: ${Number(p.titleFontSize)}px;` : '') +
+    (titleLines > 1 ? `-webkit-line-clamp: ${titleLines};` : '')
+  const titleLinesClass = titleLines === 1 ? '' : (titleLines > 1 ? 'cyl-animated-item-title-wrap cyl-animated-item-title-clamp' : 'cyl-animated-item-title-wrap')
   return {
     title,
+    titleStyle,
+    titleLinesClass,
     animationPath,
     animationType,
     restingFrame: p.selected ? 'last' : 'first',
