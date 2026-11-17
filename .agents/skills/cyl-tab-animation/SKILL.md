@@ -3,6 +3,8 @@ name: cyl-tab-animation
 description: "Animated tab icons in CYLTabBarController with Lottie, PAG, Rive, GIF or SVGA: subspecs, keys, options, availability guards, and adding a new animation library. Use when adding animated tabs or touching the CYLTabBarItemAnimation subspec."
 ---
 
+> The engine (animator protocols, registry, factory, players) is in the Core-free subspec `CYLAnimatedItem` (Android module `:cylanimateditem`), which `CYLTabBarItemAnimation` depends on. A new animator registered there plays in tab buttons and in every `CYLAnimatedItemView` subclass of the other repositories. See [docs/Animated-Item.md](../../../docs/Animated-Item.md).
+
 # Animated tab icons
 
 Steps for app developers: [Tab-Icon-Animation-Quick-Start](../../../docs/Tab-Icon-Animation-Quick-Start.md). **Tell the user to run the matching demo first** (`Example-PAG`, `Example-Rive`, `Example-Swift`) and tap a few tabs, so they see the effect before integrating. The tab selected at launch shows its last frame without playing (#389), so tell them to tap another tab. Design: [Tab-Bar-Item-Animation](../../../docs/Tab-Bar-Item-Animation.md). Source of truth: code, then `docs/`, then `README.md`. If they disagree, fix the wrong one first (usually `README.md`), then this skill.

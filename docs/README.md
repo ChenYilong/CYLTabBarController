@@ -20,6 +20,7 @@
 | [Android 版 CYLTabBarController](Android-Library.md) | [CYLTabBarController for Android](Android-Library.md) |
 | [Android 液态玻璃](Android-Liquid-Glass.md) | [Android Liquid Glass](Android-Liquid-Glass.md) |
 | [Android 库与 QMUI_Android、XUI 的 Tab 对比](Android-QMUI-Comparison.md) | [The Android library compared with QMUI_Android's and XUI's tabs](Android-QMUI-Comparison.md) |
+| [动效 icon + title 共用组件：CYLAnimatedItem](Animated-Item.md) | [The shared animated icon + title component: CYLAnimatedItem](Animated-Item.md) |
 | [角标调试](Badge-Debugging.md) | [Badge debugging](Badge-Debugging.md) |
 | [中英文双语文档](Bilingual-Documentation.md) | [Bilingual Documentation](Bilingual-Documentation.md) |
 | [CYLTableViewPlaceHolder 集成问题](CYLTableViewPlaceHolder-Integration-Issues.md) | [CYLTableViewPlaceHolder Integration Issues](CYLTableViewPlaceHolder-Integration-Issues.md) |
@@ -116,6 +117,7 @@ docs/
 ├── Android-Library.md
 ├── Android-Liquid-Glass.md
 ├── Android-QMUI-Comparison.md
+├── Animated-Item.md
 ├── Badge-Debugging.md
 ├── Bilingual-Documentation.md
 ├── CYLTableViewPlaceHolder-Integration-Issues.md
