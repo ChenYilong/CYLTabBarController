@@ -74,7 +74,8 @@ object, each item plays its own copy), `animationType` (when the extension does 
 true; false rests until `playAnimation()`), `restingProgress` (0...1, the frame at rest; selected shows the last),
 `gifFirstFrame` / `gifLastFrame` / `gifDuration` (GIF stills at rest and one pass in milliseconds on play; without
 stills a GIF always plays), `riveWasmPath` / `pagWasmPath` (cyl-rive / cyl-pag `wasm-path`; '' keeps their default), `accessoryImage`, `accessoryText`,
-`accessoryAccessibilityLabel`, `accessoryPlacement`, `dragEnabled`, `accessibilityLabel`. Methods (through
+`accessoryAccessibilityLabel`, `accessoryPlacement`, `dragEnabled`, `accessibilityLabel`, `embedded` (inside a control that is the accessibility element: no padding, no 44 px
+minimum, hidden from accessibility, no gestures). Methods (through
 `selectComponent`): `playAnimation()` (from progress 0; a file still loading plays when ready), `restartAnimation()`,
 `stopAnimation()`. Events: `itemtap`, `itemlongpress`, `accessorytap`, `dragstart` / `dragmove` / `dragend`.
 

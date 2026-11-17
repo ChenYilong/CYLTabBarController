@@ -1,7 +1,8 @@
 <!-- [EN] One accessibility element: an icon (animation, static image or placeholder), a title and an optional accessory. [CN] 一个无障碍元素：图标（动画、静态图片或占位图）、标题与可选的附加图标。 -->
 <view
   class="cyl-animated-item {{m.axisClass}} {{m.ariaDisabled ? 'cyl-animated-item-disabled' : ''}}"
-  aria-role="button"
+  aria-role="{{m.ariaHidden ? '' : 'button'}}"
+  aria-hidden="{{m.ariaHidden}}"
   aria-label="{{m.ariaLabel}}"
   aria-selected="{{m.ariaSelected}}"
   aria-disabled="{{m.ariaDisabled}}"

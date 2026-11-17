@@ -51,6 +51,12 @@ Component({
      */
     animationType: { type: String, value: '' },
     /**
+     * [EN] Inside a control that is itself the accessibility element and handles taps (a tag, a bar item): no padding,
+     *      no 44 px minimum, hidden from accessibility, no gestures. The control keeps its own label and touch target.
+     * [CN] 位于本身就是无障碍元素并处理点击的控件内（标签、栏目）：无内边距、无 44 px 最小高度、对无障碍隐藏、无手势。控件保留自己的标签与触控区域。
+     */
+    embedded: { type: Boolean, value: false },
+    /**
      * [EN] Plays once when the file is ready (default, as before). false: rests until `playAnimation()`.
      * [CN] 文件就绪后播放一次（默认，与之前相同）。false：静止，直到调用 `playAnimation()`。
      */
@@ -100,7 +106,7 @@ Component({
       this.setData({ animationLoaded: false, animationFailed: false, gifPlaying: false, lottieData })
       this.cyl_update()
     },
-    'title, image, selectedImage, placeholderImage, animationType, enabled, axis, iconSize, accessoryImage, accessoryText, accessoryAccessibilityLabel, accessoryPlacement, accessibilityLabel, gifFirstFrame, gifLastFrame': function () {
+    'title, image, selectedImage, placeholderImage, animationType, embedded, enabled, axis, iconSize, accessoryImage, accessoryText, accessoryAccessibilityLabel, accessoryPlacement, accessibilityLabel, gifFirstFrame, gifLastFrame': function () {
       this.cyl_update()
     },
     'selected, restingProgress': function () {
@@ -242,13 +248,13 @@ Component({
     },
 
     cyl_onTap() {
-      if (this.data.enabled) {
+      if (this.data.enabled && !this.data.embedded) {
         this.triggerEvent('itemtap', {})
       }
     },
 
     cyl_onLongPress() {
-      if (this.data.enabled) {
+      if (this.data.enabled && !this.data.embedded) {
         this.triggerEvent('itemlongpress', {})
       }
     },
@@ -260,7 +266,7 @@ Component({
     },
 
     cyl_onTouchStart(event) {
-      if (!this.data.dragEnabled) return
+      if (!this.data.dragEnabled || this.data.embedded) return
       const touch = event.touches[0]
       this.cylDragStart = { x: touch.clientX, y: touch.clientY }
       this.triggerEvent('dragstart', {})

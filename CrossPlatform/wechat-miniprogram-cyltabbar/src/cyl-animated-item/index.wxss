@@ -7,6 +7,11 @@
   padding: 4px;
   box-sizing: border-box;
 }
+.cyl-animated-item-embedded {
+  display: flex;
+  min-height: 0;
+  padding: 0;
+}
 .cyl-animated-item-horizontal {
   flex-direction: row;
 }

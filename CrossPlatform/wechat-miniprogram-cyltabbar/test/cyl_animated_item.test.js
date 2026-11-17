@@ -104,3 +104,10 @@ test('a named type wins over the extension (files renamed to .bin for a code pac
   assert.equal(cylAnimatedItemModel({ animationUrl: '/pag/0.pag.bin' }).usesEngine, false)
   assert.equal(cylAnimatedItemModel({ animationUrl: 'a.json', animationType: 'unknown' }).animationType, 'lottie')
 })
+
+test('embedded in a control: hidden from accessibility, no padding class of its own', () => {
+  const m = cylAnimatedItemModel({ animationUrl: 'a.json', embedded: true })
+  assert.equal(m.ariaHidden, true)
+  assert.match(m.axisClass, /cyl-animated-item-embedded/)
+  assert.equal(cylAnimatedItemModel({ animationUrl: 'a.json' }).ariaHidden, false)
+})
