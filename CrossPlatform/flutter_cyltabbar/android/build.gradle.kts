@@ -40,7 +40,10 @@ val cylAndroidVersion = findProperty("cylAndroidVersion") ?: "1.100.0"
 // [CN] 构建中已有 :cylanimateditem 模块的 App（例如通过基于它的其他库，如 CollectionViewClassifyMenu）使用该模块，而不在这里编译其源码：
 //      两者都有会让组件在 App 中出现两份（"2 files found with path 'META-INF/cylanimateditem/LICENSE'"，然后是重复的类），见 docs/Animated-Item.md 问题 B9。
 val cylAnimatedItemModule = rootProject.findProject(":cylanimateditem")
-val cylCompilesAnimatedItem = cylUseLocalSources && cylAnimatedItemModule == null
+// [EN] Or an included build that has it (its dependency substitution maps the published coordinate to that project).
+// [CN] 或者包含它的 included build（其依赖替换会把发布坐标映射到该项目）。
+val cylAnimatedItemIncluded = gradle.includedBuilds.any { File(it.projectDir, "cylanimateditem").isDirectory }
+val cylCompilesAnimatedItem = cylUseLocalSources && cylAnimatedItemModule == null && !cylAnimatedItemIncluded
 
 android {
     // [EN] The library sources use com.cyl.tabbar.R. [CN] 库源码使用 com.cyl.tabbar.R。
@@ -107,7 +110,8 @@ dependencies {
         implementation("androidx.fragment:fragment-ktx:1.8.5")
         // As in cyltabbar: CYLViewPager2Binding compiles against ViewPager2, which an app adds when it uses it.
         compileOnly("androidx.viewpager2:viewpager2:1.0.0")
-        cylAnimatedItemModule?.let { implementation(it) }
+        if (cylAnimatedItemModule != null) implementation(cylAnimatedItemModule)
+        else if (cylAnimatedItemIncluded) implementation("io.github.chenyilong:cyltabbarcontroller-animateditem:$cylAndroidVersion")
     } else {
         implementation("io.github.chenyilong:cyltabbarcontroller:$cylAndroidVersion")
     }
