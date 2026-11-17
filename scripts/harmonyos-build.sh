@@ -12,7 +12,7 @@ else
   DEVECO="${DEVECO_HOME:-/c/Program Files/Huawei/DevEco Studio}"
 fi
 mkdir -p "$DST"
-for d in AppScope cyltabbar entry hvigor; do
+for d in AppScope cyltabbar cylanimateditem entry hvigor; do
   rm -rf "$DST/$d/src"
   (cd "$SRC" && find "$d" -path "*/oh_modules" -prune -o -path "*/build" -prune -o -path "*/.preview" -prune -o -type f -print) |
     while IFS= read -r f; do mkdir -p "$DST/$(dirname "$f")"; cp "$SRC/$f" "$DST/$f"; done
@@ -24,5 +24,8 @@ cd "$DST" || exit 1
 ohpm install --all >/dev/null 2>&1 || ohpm install --all
 LOG="$DST/build.log"
 node "$DEVECO/tools/hvigor/bin/hvigorw.js" --mode module -p product=default assembleHap --no-daemon >"$LOG" 2>&1
+# [EN] cylanimateditem is a HAR no module depends on yet (docs/Animated-Item.md): build it too, so its errors show.
+# [CN] cylanimateditem 是尚无模块依赖的 HAR（docs/Animated-Item.md）：一并编译，以便暴露其错误。
+node "$DEVECO/tools/hvigor/bin/hvigorw.js" --mode module -p module=cylanimateditem@default -p product=default assembleHar --no-daemon >>"$LOG" 2>&1
 grep -E "ERROR|Error Message|At File|BUILD|COMPILE RESULT" "$LOG" | sed 's/\x1b\[[0-9;]*m//g' | head -40
-grep -q "BUILD SUCCESSFUL" "$LOG" && find "$DST/entry/build" -name "*.hap"
+! grep -q "BUILD FAILED" "$LOG" && grep -q "BUILD SUCCESSFUL" "$LOG" && find "$DST/entry/build" -name "*.hap"
