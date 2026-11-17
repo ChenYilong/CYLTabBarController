@@ -120,7 +120,12 @@ Component({
 
   observers: {
     'path, fit': function () {
-      if (this.cylReady) {
+      // [EN] WeChat runs an observer on every set, even with the same value: a host that re-renders (cyl-animated-item
+      //      after `ready`) restarted the load dozens of times a second, so the file never played (bugs B8 / B11,
+      //      docs/Animated-Item.md). Reload only when an input really changed, or after a failed load.
+      // [CN] 微信在每次设置时都会运行 observer，即使值相同：重新渲染的宿主（`ready` 后的 cyl-animated-item）每秒重启加载数十次，
+      //      文件永远不播放（问题 B8 / B10）。只在输入确实变化或加载失败后重新加载。
+      if (this.cylReady && (this.cyl_loadKey() !== this.cylLoadKey || this.cylLoadFailed)) {
         this.cyl_load()
       }
     },
@@ -176,8 +181,21 @@ Component({
       }
     },
 
+    /** [EN] A failed load: the same inputs may load again. [CN] 加载失败：相同输入可再次加载。 */
+    cyl_reportError(detail) {
+      this.cylLoadFailed = true
+      this.triggerEvent('error', detail)
+    },
+
+    /** [EN] The inputs of a load. [CN] 一次加载的输入。 */
+    cyl_loadKey() {
+      return JSON.stringify([this.data.path, this.data.fit])
+    },
+
     cyl_load() {
       const token = ++this.cylLoadToken
+      this.cylLoadKey = this.cyl_loadKey()
+      this.cylLoadFailed = false
       this.cyl_destroy()
       if (!this.data.path) {
         return
@@ -191,7 +209,7 @@ Component({
             return
           }
           if (!info || !info.node) {
-            this.triggerEvent('error', { message: 'cyl-pag: the canvas node is not available.' })
+            this.cyl_reportError( { message: 'cyl-pag: the canvas node is not available.' })
             return
           }
           const canvas = info.node
@@ -211,12 +229,12 @@ Component({
               return
             }
             if (error) {
-              this.triggerEvent('error', { message: error.message })
+              this.cyl_reportError( { message: error.message })
               return
             }
             // [EN] A failure to start is reported like a failure to load. [CN] 启动失败与加载失败一样上报。
             this.cyl_start(data, canvas, token).catch((startError) => {
-              this.triggerEvent('error', { message: startError && startError.message })
+              this.cyl_reportError( { message: startError && startError.message })
             })
           })
         })
@@ -274,7 +292,7 @@ Component({
         }
         if (current()) {
           this.cyl_destroy()
-          this.triggerEvent('error', { message: `cyl-pag: ${(error && error.message) || error}` })
+          this.cyl_reportError( { message: `cyl-pag: ${(error && error.message) || error}` })
         }
       }
     },
