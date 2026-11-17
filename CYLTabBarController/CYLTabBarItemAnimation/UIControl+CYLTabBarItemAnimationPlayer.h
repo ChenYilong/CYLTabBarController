@@ -15,6 +15,9 @@
 // [EN] Part of Core; declared only when an animation subspec brings the engine (`CYL_ANIMATION_ENGINE_AVAILABLE`).
 // [CN] 属于 Core；只有动画子库带入引擎时才声明（`CYL_ANIMATION_ENGINE_AVAILABLE`）。
 #if CYL_ANIMATION_ENGINE_AVAILABLE
+#if __has_feature(modules) && __has_include(<CYLAnimatedItem/CYLAnimatedItem-umbrella.h>)
+@import CYLAnimatedItem;
+#else
 #if __has_include(<CYLTabBarController/CYLTabBarItemAnimationPlayer.h>)
 #if __has_include(<CYLAnimatedItem/CYLTabBarItemAnimationPlayer.h>)
 #import <CYLAnimatedItem/CYLTabBarItemAnimationPlayer.h>
@@ -26,6 +29,7 @@
 #import <CYLAnimatedItem/CYLTabBarItemAnimationPlayer.h>
 #else
 #import "CYLTabBarItemAnimationPlayer.h"
+#endif
 #endif
 #endif
 

@@ -103,6 +103,9 @@
 // [EN] The animation view protocols (a public header since the Swift migration): the framework's umbrella header must
 //      include it, or Xcode warns "umbrella header ... does not include header"; CocoaPods without the animation
 //      subspec has no such file.
+#if __has_feature(modules) && __has_include(<CYLAnimatedItem/CYLAnimatedItem-umbrella.h>)
+@import CYLAnimatedItem;
+#else
 #if __has_include(<CYLAnimatedItem/CYLTabBarItemAnimationPlayableView.h>) || __has_include("CYLTabBarItemAnimation/CYLTabBarItemAnimationPlayableView.h")
 #if __has_include(<CYLAnimatedItem/CYLTabBarItemAnimationPlayableView.h>)
 #import <CYLAnimatedItem/CYLTabBarItemAnimationPlayableView.h>
@@ -116,6 +119,7 @@
 #import "CYLTabBarItemAnimationPlayableView.h"
 #endif
 #endif
+#endif
 // [CN] 动效 icon + title 控件（CYLAnimatedItem 子库，有该子库时才有此文件），伞头文件需要包含它。
 // [EN] The animated icon + title control (the CYLAnimatedItem subspec; the file exists only with it), which the umbrella
 //      header must include.
@@ -127,6 +131,9 @@
 //      client that imports both modules (CollectionViewClassifyMenu's static-library app) then cannot load the
 //      `CYLAnimatedItemView` superclass. The quoted forms are only for the framework target and SwiftPM, which compile
 //      the component into this module.
+#if __has_feature(modules) && __has_include(<CYLAnimatedItem/CYLAnimatedItem-umbrella.h>)
+@import CYLAnimatedItem;
+#else
 #if (defined(COCOAPODS) || defined(CYL_ANIMATED_ITEM_SEPARATE_MODULE)) && __has_include(<CYLAnimatedItem/CYLAnimatedItemView.h>)
 #import <CYLAnimatedItem/CYLAnimatedItemView.h>
 #elif __has_include("CYLAnimatedItem/CYLAnimatedItemView.h")
@@ -135,6 +142,7 @@
 #import <CYLAnimatedItem/CYLAnimatedItemView.h>
 #elif __has_include("CYLAnimatedItemView.h")
 #import "CYLAnimatedItemView.h"
+#endif
 #endif
 // [CN] 引擎与各类型 animator 的公开头文件（Xcode 工程的 framework target 把它们编进本模块）：伞头文件需要包含它们，否则 Xcode 警告
 //      "umbrella header ... does not include header"。每个 animator 头文件只在其类型开关打开时才有声明，因此没有对应动画库时也能编译。
