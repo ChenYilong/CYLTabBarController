@@ -185,6 +185,8 @@ const CYL_RIVE_LOOP_SECONDS: number = 1.5;
 const CYL_RIVE_LOOP_PAUSE_SECONDS: number = 0.4;
 /** [EN] A frame later: the state machine sees the reset or the false first. [CN] 一帧之后：状态机先看到重置或 false。 */
 const CYL_RIVE_NEXT_FRAME_MS: number = 50;
+/** [EN] Time for the first frame to be drawn before a loaded file pauses. [CN] 加载的文件暂停前绘制第一帧的时间。 */
+const CYL_RIVE_FIRST_FRAME_MS: number = 100;
 
 @Component
 export struct CYLRiveIcon {
@@ -206,6 +208,9 @@ export struct CYLRiveIcon {
   private loaded: boolean = false;
   private deactivateTimer: number = -1;
   private loopTimer: number = -1;
+  /** [EN] Paused on its first frame after load, not played yet. [CN] 加载后暂停在第一帧、尚未播放。 */
+  private restingAfterLoad: boolean = false;
+  private hasPlayed: boolean = false;
 
   aboutToAppear(): void {
     try {
@@ -263,6 +268,7 @@ export struct CYLRiveIcon {
         this.cylOption(CYLTabBarAnimationOptionRiveAnimation), this.cylOption(CYLTabBarAnimationOptionRiveStateMachine),
         true, true, Fit.CONTAIN, undefined, Loop.AUTO);
       this.loaded = true;
+      this.cylRestUntilPlayed(view);
       this.cylUpdate();
       this.onLoaded();
     } catch (e) {
@@ -347,9 +353,33 @@ export struct CYLRiveIcon {
    *      false，一帧之后设为 true，每次播放都是一次状态切换（保持的布尔值以前只播放一次）；没有该输入的状态机重新开始（house.riv）。开启 `loops` 时，
    *      每次播放后再次播放。
    */
+  /**
+   * [EN] Rests on the first frame until the first play (docs/Animated-Item.md): a file whose state machine moves by itself
+   *      (shapes.riv, truck.riv) no longer runs from load. The machine is created (autoplay) so its inputs can be read, then
+   *      paused once drawn.
+   * [CN] 在第一次播放之前停在第一帧：状态机会自行运动的文件（shapes.riv、truck.riv）不再从加载起就运动。状态机先创建（autoplay）以便读取输入，
+   *      绘制后再暂停。
+   */
+  private cylRestUntilPlayed(view: RiveAnimationView): void {
+    this.hasPlayed = false;
+    this.restingAfterLoad = false;
+    setTimeout(() => {
+      if (!this.hasPlayed && this.riveView === view) {
+        view.pause();
+        this.restingAfterLoad = true;
+      }
+    }, CYL_RIVE_FIRST_FRAME_MS);
+  }
+
   private cylPlay(view: RiveAnimationView): void {
     this.cylCancelDeactivate();
     this.cylCancelLoop();
+    this.hasPlayed = true;
+    if (this.restingAfterLoad) {
+      // [EN] Resumed where it rests (no settling), then played as usual. [CN] 从静止处恢复（不重新定位），然后照常播放。
+      this.restingAfterLoad = false;
+      view.play(undefined, undefined, undefined, undefined, false);
+    }
     const animation = this.cylOption(CYLTabBarAnimationOptionRiveAnimation);
     const machine = animation === undefined ? this.cylStateMachine(view) : undefined;
     const triggerInput = this.cylOption(CYLTabBarAnimationOptionRiveTriggerInput);
