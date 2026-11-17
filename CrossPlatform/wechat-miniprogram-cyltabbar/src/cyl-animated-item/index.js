@@ -38,6 +38,20 @@ Component({
     accessoryPlacement: { type: String, value: 'trailing' },
     dragEnabled: { type: Boolean, value: false },
     accessibilityLabel: { type: String, value: '' },
+    // [EN] For a host that draws the icon with this component (the tab bar item): Lottie / Rive colors (keypath -> color),
+    //      autoplay, a tint for the static image, a non-square icon, the embedded layout and hiding it from screen
+    //      readers (the host is the accessibility element). [CN] 供用本组件绘制图标的宿主（TabBar Item）使用：Lottie / Rive
+    //      颜色（keypath -> 颜色）、自动播放、静态图片着色、非正方形图标、嵌入式布局，以及对读屏隐藏（宿主是无障碍元素）。
+    // [EN] 'lottie', 'pag', 'rive', 'svga' or 'gif' when the file name does not say it ('' reads the extension; "*.svga.bin" is read as SVGA).
+    // [CN] 文件名无法表明类型时指定 'lottie'、'pag'、'rive'、'svga' 或 'gif'（'' 按扩展名读取；"*.svga.bin" 读作 SVGA）。
+    animationType: { type: String, value: '' },
+    colors: { type: Object, value: null },
+    autoplay: { type: Boolean, value: true },
+    iconTint: { type: String, value: '' },
+    iconWidth: { type: Number, value: 0 },
+    iconHeight: { type: Number, value: 0 },
+    bare: { type: Boolean, value: false },
+    accessibilityHidden: { type: Boolean, value: false },
   },
 
   data: {
@@ -47,11 +61,11 @@ Component({
   },
 
   observers: {
-    'animationUrl': function () {
+    'animationUrl, animationType': function () {
       this.setData({ animationLoaded: false, animationFailed: false })
       this.cyl_update()
     },
-    'title, image, selectedImage, placeholderImage, selected, enabled, axis, iconSize, accessoryImage, accessoryText, accessoryAccessibilityLabel, accessoryPlacement, accessibilityLabel': function () {
+    'title, image, selectedImage, placeholderImage, selected, enabled, axis, iconSize, iconWidth, iconHeight, iconTint, accessoryImage, accessoryText, accessoryAccessibilityLabel, accessoryPlacement, accessibilityLabel': function () {
       this.cyl_update()
     },
   },
@@ -85,6 +99,30 @@ Component({
         cylWarnedTypes.push(type)
         console.warn(`[cyl-animated-item] ${type} animation (${this.data.animationUrl}) cannot play: ${(event && event.detail && event.detail.message) || 'no engine'}. ` +
           `Showing the static image, or the placeholder without one. Install ${cylAnimatedItemPackage(type)} and set generic:cyl-${type}-view.`)
+      }
+    },
+
+    /** [EN] The engine component, or null (no engine type, GIF, or not drawn yet). [CN] 引擎组件，没有时为 null。 */
+    cyl_animationView() {
+      return this.selectComponent('#cyl-animated-item-animation')
+    },
+
+    /**
+     * [EN] Plays the animation from its first frame, or `offset` seconds in, when its engine can.
+     * [CN] 引擎支持时，从首帧（或第 `offset` 秒）播放动画。
+     */
+    cyl_playFromStart(offset) {
+      const view = this.cyl_animationView()
+      if (view && typeof view.cyl_playFromStart === 'function') {
+        view.cyl_playFromStart(offset)
+      }
+    },
+
+    /** [EN] Stops the animation on its resting frame. [CN] 停止动画并显示静止帧。 */
+    cyl_stop() {
+      const view = this.cyl_animationView()
+      if (view && typeof view.cyl_stop === 'function') {
+        view.cyl_stop()
       }
     },
 

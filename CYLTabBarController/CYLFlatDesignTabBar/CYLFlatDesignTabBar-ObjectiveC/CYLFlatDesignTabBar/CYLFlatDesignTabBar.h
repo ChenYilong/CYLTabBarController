@@ -27,10 +27,12 @@ NS_ASSUME_NONNULL_BEGIN
 @class CYLFlatDesignTabBar;
 @class CYLFlatDesignTabBarItem;
 
-// [EN] Declared before the imports below: they can reach the generated Swift header, which imports the umbrella header,
-//      which adopts this protocol (`CYLTabBarController <CYLFlatDesignTabBarDelegate>`) while this file is still being read.
-// [CN] 在下面的导入之前声明：这些导入可能引入生成的 Swift 头文件，它会导入总头文件，而总头文件在本文件尚未读完时就遵守本协议
-//      （`CYLTabBarController <CYLFlatDesignTabBarDelegate>`）。
+/*!
+ * [EN] The delegate of `CYLFlatDesignTabBar`, told about user taps. Declared before the imports below: they can reach the generated Swift header, which imports the umbrella header,
+ *      which adopts this protocol (`CYLTabBarController <CYLFlatDesignTabBarDelegate>`) while this file is still being read.
+ * [CN] `CYLFlatDesignTabBar` 的代理，接收用户点击。在下面的导入之前声明：这些导入可能引入生成的 Swift 头文件，它会导入总头文件，而总头文件在本文件尚未读完时就遵守本协议
+ *      （`CYLTabBarController <CYLFlatDesignTabBarDelegate>`）。
+ */
 @protocol CYLFlatDesignTabBarDelegate<NSObject>
 @optional
 

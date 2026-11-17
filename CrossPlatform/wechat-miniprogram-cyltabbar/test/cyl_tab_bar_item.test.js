@@ -81,3 +81,12 @@ test('badge debugging switch (cyl_debug.js): off by default, on leaves out the a
   assert.equal(cylBadgeAnimationClass('bounce', true), '');
   assert.equal(cylBadgeAnimationClass('', false), '');
 });
+
+test('cyl-tab-bar-item: the icon box size goes to cyl-animated-item (iconWidth / iconHeight)', () => {
+  const sized = cylItemModel({ title: 'Home', image: 'a.png', imageSize: '{30, 20}' })
+  assert.equal(sized.iconWidth, 30)
+  assert.equal(sized.iconHeight, 20)
+  const plain = cylItemModel({ title: 'Home', image: 'a.png' })
+  assert.equal(plain.iconWidth, 28)
+  assert.equal(plain.iconHeight, 28)
+})

@@ -37,8 +37,10 @@
 // [CN] FIX: issue #605 — 需先引入：两者同时在构建中时（例如 Rive 与会引入 Lottie 的扁平样式），下面生成的头文件也声明了 Rive 子库的 Swift 视图，这些视图遵守本头文件的协议。
 #if __has_include("../CYLTabBarItemAnimationPlayableView.h")
 #import "../CYLTabBarItemAnimationPlayableView.h"
+#import "../CYLTabBarItemAnimationFactory.h"
 #else
 #import "CYLTabBarItemAnimationPlayableView.h"
+#import "CYLTabBarItemAnimationFactory.h"
 #endif
 #if __has_include(<CYLAnimatedItem/CYLAnimatedItem-Swift.h>)
 #import <CYLAnimatedItem/CYLAnimatedItem-Swift.h>
@@ -58,6 +60,46 @@
 
 #pragma mark - Lottie 2.x (Objective-C)
 
+#if __has_include(<Lottie/Lottie.h>) || __has_include(<Lottie/Lottie-Swift.h>)
+/**
+ * [EN] Whether `URL` is a remote file (http, https...), which this animator downloads itself.
+ * [CN] `URL` 是否为远程文件（http、https 等），由本 animator 自行下载。
+ */
+static BOOL CYLLottieURLIsRemote(NSURL *URL) {
+    return !URL.isFileURL && URL.scheme.length > 0;
+}
+
+/**
+ * [EN] A remote Lottie file, as the GIF and PAG animators do: `view` is marked as loading, so the item keeps its static
+ *      image (or the placeholder); the file is downloaded through the shared URL session (its HTTP cache applies) and
+ *      handed to `load` on the main queue; then `CYLTabBarItemAnimationReportLoaded` or, when the download fails, the
+ *      status is 400 or above, or `load` returns NO, `CYLTabBarItemAnimationReportFailure`.
+ * [CN] 远程 Lottie 文件，与 GIF、PAG animator 相同：`view` 标记为加载中，item 保留静态图片（或占位图）；通过共享 URL session 下载
+ *      （遵循其 HTTP 缓存），在主队列交给 `load`；随后调用 `CYLTabBarItemAnimationReportLoaded`，下载失败、状态码不小于 400 或 `load`
+ *      返回 NO 时调用 `CYLTabBarItemAnimationReportFailure`。
+ */
+static void CYLLottieDownload(NSURL *URL, UIView *view, BOOL (^load)(UIView *view, NSData *data)) {
+    CYLTabBarItemAnimationMarkLoading(view);
+    __weak UIView *weakView = view;
+    NSURLSessionDataTask *task = [[NSURLSession sharedSession] dataTaskWithURL:URL completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+        NSInteger status = [response isKindOfClass:[NSHTTPURLResponse class]] ? ((NSHTTPURLResponse *)response).statusCode : 200;
+        NSData *usable = (data.length > 0 && status < 400) ? data : nil;
+        dispatch_async(dispatch_get_main_queue(), ^{
+            UIView *strongView = weakView;
+            if (!strongView) {
+                return;
+            }
+            if (usable && load(strongView, usable)) {
+                CYLTabBarItemAnimationReportLoaded(strongView);
+            } else {
+                CYLTabBarItemAnimationReportFailure(strongView, error);
+            }
+        });
+    }];
+    [task resume];
+}
+#endif
+
 #if __has_include(<Lottie/Lottie.h>)
 /// [EN] Plays a `LOTAnimationView` (lottie-ios 2.x). [CN] 播放 `LOTAnimationView`（lottie-ios 2.x）。
 @interface CYLLottieObjectiveCTabBarItemAnimationPlayer : CYLTabBarItemAnimationBasePlayer <CYLTabBarItemAnimationPlayer>
@@ -72,6 +114,22 @@
 }
 
 + (UIView *)viewWithURL:(NSURL *)URL {
+    if (CYLLottieURLIsRemote(URL)) {
+        // [EN] Downloaded here, not by lottie-ios 2.x's -initWithContentsOfURL:, which reports neither success nor failure.
+        // [CN] 在这里下载，而不是使用 lottie-ios 2.x 的 -initWithContentsOfURL:，后者既不报告成功也不报告失败。
+        LOTAnimationView *view = [[LOTAnimationView alloc] initWithFrame:CGRectZero];
+        CYLLottieDownload(URL, view, ^BOOL(UIView *target, NSData *data) {
+            id JSON = [NSJSONSerialization JSONObjectWithData:data options:0 error:NULL];
+            LOTComposition *composition = [JSON isKindOfClass:[NSDictionary class]]
+                ? [LOTComposition animationFromJSON:JSON inBundle:nil] : nil;
+            if (!composition) {
+                return NO;
+            }
+            ((LOTAnimationView *)target).sceneModel = composition;
+            return YES;
+        });
+        return view;
+    }
     if (![LOTAnimationView instancesRespondToSelector:@selector(initWithContentsOfURL:)]) {
         return nil;
     }
@@ -171,6 +229,15 @@
 + (UIView *)viewWithURL:(NSURL *)URL {
     if (![CYLCompatibleLOTAnimationView instancesRespondToSelector:@selector(initWithCompatibleAnimation:)]) {
         return nil;
+    }
+    if (CYLLottieURLIsRemote(URL)) {
+        // [EN] lottie-ios 4.x reads local files only through this bridge: download, then load the data into the view.
+        // [CN] 经由此桥接，lottie-ios 4.x 只读本地文件：先下载，再把数据加载到视图。
+        CYLCompatibleLOTAnimationView *view = [[CYLCompatibleLOTAnimationView alloc] initWithFrame:CGRectZero];
+        CYLLottieDownload(URL, view, ^BOOL(UIView *target, NSData *data) {
+            return [(CYLCompatibleLOTAnimationView *)target cylLoadAnimationData:data];
+        });
+        return view;
     }
     CYLCompatibleLOTAnimation *composition = [[CYLCompatibleLOTAnimation alloc] initWithFilepath:URL.path];
     return [[CYLCompatibleLOTAnimationView alloc] initWithCompatibleAnimation:composition];

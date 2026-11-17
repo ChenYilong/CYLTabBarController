@@ -203,6 +203,10 @@ docs/
 │   ├── android-more-than-five-tabs-report.png
 │   ├── android-playback-controls-pag-example-api35-b57c844.png
 │   ├── animated-icons-demo-controls-request-android.jpg
+│   ├── animated-item-android-demo.png
+│   ├── animated-item-android-gif-tabs.png
+│   ├── animated-item-demo-ios26.3-en.png
+│   ├── animated-item-demo-ios26.3-zh-Hans.png
 │   ├── badge-debugging-animations-off-harmonyos.png
 │   ├── carthage-example-ios.png
 │   ├── configuration-demo-json-zh-hans.png

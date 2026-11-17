@@ -68,3 +68,39 @@ test('layout, accessory and accessibility', () => {
   assert.equal(cylAnimatedItemModel({ title: 'Tag', accessibilityLabel: 'Tag, 3 new' }).ariaLabel, 'Tag, 3 new')
   assert.equal(cylAnimatedItemModel({ accessoryPlacement: 'nowhere', accessoryText: 'x' }).accessoryPlacement, 'trailing')
 })
+
+test('cyl-animated-item: a non-square icon and a static image tint for a host (the tab bar item)', () => {
+  const m = cylAnimatedItemModel({ image: 'a.png', iconSize: 24, iconWidth: 30, iconHeight: 20, iconTint: '#ff0000' })
+  assert.equal(m.iconStyle, 'width: 30px; height: 20px;')
+  assert.equal(m.iconTint, '#ff0000')
+  // [EN] Without them: the square icon size, no tint. [CN] 未设置时：正方形图标尺寸，不着色。
+  const plain = cylAnimatedItemModel({ image: 'a.png', iconSize: 24 })
+  assert.equal(plain.iconStyle, 'width: 24px; height: 24px;')
+  assert.equal(plain.iconTint, '')
+})
+
+test('cyl-animated-item: a GIF tab icon draws itself; a failed engine shows the image, else the placeholder', () => {
+  const gif = cylAnimatedItemModel({ animationUrl: 'tab.gif', image: 'a.png' })
+  assert.equal(gif.gifPath, 'tab.gif')
+  const failed = cylAnimatedItemModel({ animationUrl: 'tab.json', animationFailed: true })
+  assert.equal(failed.usesEngine, false)
+  assert.equal(failed.fallbackImage, CYL_ANIMATED_ITEM_PLACEHOLDER)
+})
+
+test('cyl-animated-item: *.svga.bin / *.pag.bin / *.riv.bin keep their type, animationType names it (bug B6)', () => {
+  assert.equal(cylAnimatedItemType('/assets/tab/svga/tab_activity.svga.bin'), 'svga')
+  assert.equal(cylAnimatedItemType('home.pag.bin?v=2'), 'pag')
+  assert.equal(cylAnimatedItemType('icons.riv.BIN'), 'rive')
+  assert.equal(cylAnimatedItemType('data.bin'), '')
+  const m = cylAnimatedItemModel({ animationUrl: '/assets/tab/svga/tab_activity.svga.bin' })
+  assert.equal(m.animationType, 'svga')
+  assert.equal(m.usesEngine, true)
+  const named = cylAnimatedItemModel({ animationUrl: 'https://example.com/icon', animationType: 'Lottie' })
+  assert.equal(named.animationType, 'lottie')
+  assert.equal(cylAnimatedItemModel({ animationUrl: 'a.json', animationType: 'unknown' }).animationType, 'lottie')
+})
+
+test('cyl-animated-item: the placeholder is a data URI, not a path the page would resolve (bug B6)', () => {
+  assert.match(CYL_ANIMATED_ITEM_PLACEHOLDER, /^data:image\/png;base64,iVBORw0KGgo/)
+  assert.equal(cylAnimatedItemModel({ animationUrl: 'unknown.xyz' }).fallbackImage, CYL_ANIMATED_ITEM_PLACEHOLDER)
+})

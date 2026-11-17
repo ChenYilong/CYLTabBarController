@@ -120,3 +120,10 @@
 "SVGA（初始化 Key）" = "SVGA (inicializačné kľúče)";
 "SVGA（配置文件）" = "SVGA (konfiguračný súbor)";
 "Rive tab icons" = "Rive tab icons";
+
+/* [EN] The animated item demo (Example-GIF, docs/Animated-Item.md TODO 6). [CN] 动效 icon 组件 Demo。 */
+"动效 icon 组件" = "Animovaná položka";
+"播放中的 GIF" = "GIF sa prehráva";
+"静态图片" = "Statický obrázok";
+"占位图（文件损坏）" = "Zástupný obrázok (poškodený súbor)";
+"远程 GIF（下载中显示图片）" = "Vzdialený GIF (obrázok pri načítaní)";

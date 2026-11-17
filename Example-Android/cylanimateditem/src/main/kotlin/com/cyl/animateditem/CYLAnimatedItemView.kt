@@ -69,10 +69,13 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
     }
 
     /**
-     * [EN] The view playing `animationURL`, while ready. [CN] 正在播放 `animationURL` 的视图（就绪时）。
+     * [EN] The view playing `animationURL`, while ready. A subclass that makes the animation view itself (the tab bar's
+     *      `CYLTabBarItemButton`) sets it, so `animationView`, `animationPlayer` and `isAnimationReady` describe that view.
+     * [CN] 正在播放 `animationURL` 的视图（就绪时）。自己创建动画视图的子类（TabBar 的 `CYLTabBarItemButton`）会设置它，使
+     *      `animationView`、`animationPlayer` 与 `isAnimationReady` 描述该视图。
      */
     var animationView: View? = null
-        private set
+        protected set
 
     /**
      * [EN] The player of `animationView`. [CN] `animationView` 的播放器。
@@ -447,7 +450,8 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
                 context.assets.open(file.removePrefix(ANDROID_ASSET_PREFIX)).use { it.read() < 0 }
             } catch (error: java.io.IOException) { true }
             file.startsWith("file:") -> missing(android.net.Uri.parse(file).path)
-            file.startsWith("/") -> missing(file)
+            // [EN] An absolute path ("/..." on Android; also a drive path when the JVM tests run on Windows). [CN] 绝对路径（Android 上为 "/..."；JVM 测试在 Windows 上运行时也包括盘符路径）。
+            java.io.File(file).isAbsolute -> missing(file)
             else -> false
         }
     }

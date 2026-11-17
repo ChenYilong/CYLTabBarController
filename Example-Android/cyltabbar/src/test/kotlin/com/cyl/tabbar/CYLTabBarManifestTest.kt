@@ -105,7 +105,7 @@ class CYLTabBarManifestTest {
     @Test
     fun assetLookup() {
         val manifest = manifest(sample())
-        fun name(reference: String) = manifest.pathForAssetReference(reference)?.substringAfter("2.1.0/")
+        fun name(reference: String) = manifest.pathForAssetReference(reference)?.replace(File.separatorChar, '/')?.substringAfter("2.1.0/")
         assertEquals("light/home@3x.png", name("asset:home"))
         assertEquals("light/home_selected@3x.png", name("asset:home?state=selected"))
         assertEquals("dark/home@3x.png", name("asset:home?theme=dark"))
@@ -158,8 +158,8 @@ class CYLTabBarManifestTest {
         val dark = themes["dark"] as Map<*, *>
         assertEquals("#1C1C1E", dark[CYLConstants.CYLTabBarBackgroundColor])
         assertEquals("#8E8E93", dark[CYLConstants.CYLTabBarItemTitleColor])
-        assertTrue((dark["cyl.asset.home.normal"] as String).endsWith("dark/home@3x.png"))
-        assertTrue(((themes["light"] as Map<*, *>)["cyl.asset.home.selected"] as String).endsWith("light/home_selected@3x.png"))
+        assertTrue((dark["cyl.asset.home.normal"] as String).replace(File.separatorChar, '/').endsWith("dark/home@3x.png"))
+        assertTrue(((themes["light"] as Map<*, *>)["cyl.asset.home.selected"] as String).replace(File.separatorChar, '/').endsWith("light/home_selected@3x.png"))
         assertEquals("light", configuration[CYLConstants.CYLTabBarControllerThemeIdentifier])
         assertEquals("dark", configuration[CYLConstants.CYLTabBarControllerDarkThemeIdentifier])
         assertEquals("CYLManifestTest", configuration[CYLConstants.CYLTabBarControllerThemeManagerName])
@@ -173,7 +173,7 @@ class CYLTabBarManifestTest {
         val plain = manifest(callback).configuration()
         assertNull((plain[CYLConstants.CYLTabBarControllerPlusButton] as Map<*, *>)[CYLConstants.CYLTabBarItemPageIdentifier])
         @Suppress("UNCHECKED_CAST")
-        assertTrue(((plain[CYLConstants.CYLTabBarControllerTabBarItemsAttributes] as List<Map<String, Any?>>)[0][CYLConstants.CYLTabBarItemImage] as String).endsWith("light/home@3x.png"))
+        assertTrue(((plain[CYLConstants.CYLTabBarControllerTabBarItemsAttributes] as List<Map<String, Any?>>)[0][CYLConstants.CYLTabBarItemImage] as String).replace(File.separatorChar, '/').endsWith("light/home@3x.png"))
     }
 
     @Test
@@ -217,7 +217,7 @@ class CYLTabBarManifestTest {
         val (good, goodSource, goodError) = load(loader, publish(sample(), "good.json"))
         assertNull(goodError)
         assertEquals(CYLTabBarManifestSource.Remote, goodSource)
-        assertTrue(good!!.pathForAssetReference("asset:home").orEmpty().contains("CYLTabBarManifest/2.1.0"))
+        assertTrue(good!!.pathForAssetReference("asset:home").orEmpty().replace(File.separatorChar, '/').contains("CYLTabBarManifest/2.1.0"))
         assertEquals("2.1.0", loader.cachedManifest()?.version)
 
         val broken = sample() + mapOf("version" to "3.0.0", "assets" to mapOf("list" to listOf(mapOf("key" to "home", "path" to "light/home@3x.png", "hash" to "sha256-wrong"))))
