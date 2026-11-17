@@ -132,7 +132,11 @@ fun View.cyl_addTabBarItemAnimationWithURL(url: String?, size: CYLSize?, content
  */
 private fun cyl_installAnimationFailureFallback() {
     if (CYLTabBarItemAnimationFailure.fallbackHandler == null) {
-        CYLTabBarItemAnimationFailure.fallbackHandler = { host -> host.cyl_replaceTabBarItemAnimationWithURL(null, null) }
+        CYLTabBarItemAnimationFailure.fallbackHandler = { host ->
+            host.cyl_replaceTabBarItemAnimationWithURL(null, null)
+            // [EN] A tab with no static image shows the placeholder rather than an empty icon. [CN] 没有静态图片的 Tab 显示占位图，而不是空图标。
+            if (host is CYLTabBarItemButton && host.iconView.drawable == null) host.iconView.setImageDrawable(host.cyl_animationPlaceholder())
+        }
     }
 }
 

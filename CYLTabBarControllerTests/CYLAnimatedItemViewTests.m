@@ -178,22 +178,41 @@
     XCTAssertEqual(item.animationSource, [CYLTabBarItemAnimationFactory sharedFactory]);
 }
 
-- (void)testOnlyAnUnplayableAnimationFileKeepsTheTitleLayout {
-    CYLAnimatedItemView *titleOnly = [[CYLAnimatedItemView alloc] init];
-    titleOnly.title = @"Home";
+- (void)testOnlyAnUnplayableAnimationFileShowsThePlaceholder {
+    UIImage *placeholder = [self icon];
     CYLAnimatedItemView *item = [[CYLAnimatedItemView alloc] initWithFrame:CGRectMake(0, 0, 200, 44)];
     item.animationSource = [[CYLAnimatedItemFakeSource alloc] init];
+    item.placeholderImage = placeholder;
     item.title = @"Home";
     item.animationURL = [NSURL fileURLWithPath:@"/tmp/home.json"];
     [item layoutIfNeeded];
     XCTAssertFalse(item.isAnimationReady);
-    XCTAssertTrue(CGSizeEqualToSize([titleOnly sizeThatFits:CGSizeMake(CGFLOAT_MAX, CGFLOAT_MAX)],
-                                    [item sizeThatFits:CGSizeMake(CGFLOAT_MAX, CGFLOAT_MAX)]), @"no space for an icon that cannot show");
-    XCTAssertEqual(CGRectGetWidth(item.imageView.frame), 0);
-    XCTAssertGreaterThan(CGRectGetWidth(item.titleLabel.frame), 0);
+    XCTAssertEqual(item.imageView.image, placeholder, @"no static image, the file cannot play: the placeholder");
+    XCTAssertFalse(item.imageView.hidden);
+    XCTAssertGreaterThan(CGRectGetWidth(item.imageView.frame), 0);
     XCTAssertNoThrow([item playAnimation]);
     XCTAssertNoThrow([item restartAnimation]);
     XCTAssertNoThrow([item stopAnimation]);
+    item.animationURL = [NSURL fileURLWithPath:@"/tmp/home.fake"];
+    XCTAssertTrue(item.isAnimationReady);
+    XCTAssertTrue(item.imageView.hidden, @"the animation wins once it can play");
+    item.placeholderImage = [[UIImage alloc] init];
+    item.animationURL = [NSURL fileURLWithPath:@"/tmp/home.json"];
+    CYLAnimatedItemView *titleOnly = [[CYLAnimatedItemView alloc] init];
+    titleOnly.title = @"Home";
+    XCTAssertTrue(CGSizeEqualToSize([titleOnly sizeThatFits:CGSizeMake(CGFLOAT_MAX, CGFLOAT_MAX)],
+                                    [item sizeThatFits:CGSizeMake(CGFLOAT_MAX, CGFLOAT_MAX)]), @"an empty placeholder shows none");
+}
+
+- (void)testTheDefaultPlaceholderIsATabIconSizedTemplate {
+    UIImage *placeholder = CYLAnimatedItemView.defaultPlaceholderImage;
+    if (!placeholder) {
+        return; // [EN] The test host may not copy CYLAnimatedItem.bundle. [CN] 测试宿主可能未拷贝 CYLAnimatedItem.bundle。
+    }
+    XCTAssertTrue(CGSizeEqualToSize(placeholder.size, CGSizeMake(25, 25)));
+    XCTAssertEqual(placeholder.renderingMode, UIImageRenderingModeAlwaysTemplate);
+    CYLAnimatedItemView *item = [[CYLAnimatedItemView alloc] init];
+    XCTAssertEqual(item.placeholderImage, placeholder);
 }
 
 - (void)testBothWithAnUnplayableFileShowTheImage {
@@ -234,6 +253,16 @@
     [item layoutIfNeeded];
     XCTAssertFalse(item.imageView.hidden);
     XCTAssertEqual(item.imageView.image, icon);
+    XCTAssertGreaterThan(CGRectGetWidth(item.imageView.frame), 0);
+}
+
+- (void)testWithoutTheEngineOnlyAnAnimationShowsThePlaceholder {
+    UIImage *placeholder = [self icon];
+    CYLAnimatedItemView *item = [[CYLAnimatedItemView alloc] initWithFrame:CGRectMake(0, 0, 200, 44)];
+    item.placeholderImage = placeholder;
+    item.animationURL = [NSURL fileURLWithPath:@"/tmp/home.json"];
+    [item layoutIfNeeded];
+    XCTAssertEqual(item.imageView.image, placeholder);
     XCTAssertGreaterThan(CGRectGetWidth(item.imageView.frame), 0);
 }
 

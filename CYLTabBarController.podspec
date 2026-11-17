@@ -77,6 +77,11 @@ Pod::Spec.new do |s|
     item.dependency 'CYLTabBarController/CYLUtils'
     item.source_files = 'CYLTabBarController/CYLAnimatedItem/*.{h,m}'
     item.public_header_files = 'CYLTabBarController/CYLAnimatedItem/*.h'
+    # [EN] The component's resource bundle: the tab-icon-sized placeholder shown when only an animation file is given and it
+    #      cannot play, its LICENSE and POLICY.md. Found with `CYLResourceBundleNamed(@"CYLAnimatedItem")`.
+    # [CN] 组件的资源包：只传入动画文件且无法播放时显示的、适合 Tab 图标尺寸的占位图，及其 LICENSE 与 POLICY.md。通过
+    #      `CYLResourceBundleNamed(@"CYLAnimatedItem")` 查找。
+    item.resources = ['CYLTabBarController/CYLAnimatedItem/Resources/CYLAnimatedItem.bundle']
     item.frameworks = 'UIKit'
   end
 

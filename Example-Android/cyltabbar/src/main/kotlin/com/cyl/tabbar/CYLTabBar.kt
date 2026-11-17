@@ -242,12 +242,23 @@ class CYLTabBarItemButton(context: Context, val item: CYLTabBarItem, val index: 
     /**
      * [EN] Applies the item's title, images and colors for the current selection. [CN] 按当前选中状态应用标题、图片与颜色。
      */
+    /**
+     * [EN] A tab with only an animation file that cannot play (no library, an unreadable file) shows the animated item
+     *      component's placeholder, sized for a tab icon, instead of an empty icon; with a static image, that image stays the fallback.
+     * [CN] 只有动画文件且无法播放（没有动画库、文件无法读取）的 Tab 显示动效组件的占位图（适合 Tab 图标的尺寸），而不是空图标；有静态图片时仍以该图片兜底。
+     */
+    internal fun cyl_animationPlaceholder(): android.graphics.drawable.Drawable? {
+        if (item.image != null || item.selectedImage != null || cyl_isTabBarItemAnimationReady()) return null
+        if (CYLTabBarItemAnimationURLOfAttributes(item.attributes).isNullOrBlank()) return null
+        return com.cyl.animateditem.CYLAnimatedItemView.defaultPlaceholderImage(context)?.mutate()
+    }
+
     fun apply(selected: Boolean, tabBar: CYLTabBar) {
         val selectionChanged = isSelected != selected
         isSelected = selected
         if (selectionChanged && cyl_iconViewProvider != null) cyl_applyIconViewProvider()
         titleLabel.text = if (selected) item.cyl_selectedTitle ?: item.title ?: "" else item.title ?: ""
-        iconView.setImageDrawable((if (selected) item.selectedImage ?: item.image else item.image)?.mutate())
+        iconView.setImageDrawable((if (selected) item.selectedImage ?: item.image else item.image)?.mutate() ?: cyl_animationPlaceholder())
         val controller = tabBar.tabBarController
         titleLabel.setTextColor(titleColor(selected, tabBar))
         val font = if (selected) item.cyl_selectedTitleFont ?: controller?.cyl_tabBarItemSelectedTitleFont ?: item.cyl_titleFont ?: controller?.cyl_tabBarItemTitleFont

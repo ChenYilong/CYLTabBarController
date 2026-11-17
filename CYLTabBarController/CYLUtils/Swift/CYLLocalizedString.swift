@@ -79,6 +79,11 @@ public func cylResourceBundleEntryPoint() -> Bundle {
     CYLResourceBundle()
 }
 
+@_cdecl("CYLResourceBundleNamed")
+public func cylResourceBundleNamedEntryPoint(_ name: NSString) -> Bundle? {
+    CYLLocalization.bundle(named: name as String)
+}
+
 @_cdecl("CYLSetLocalizationLanguage")
 public func cylSetLocalizationLanguageEntryPoint(_ language: NSString?) {
     CYLSetLocalizationLanguage(language as String?)
@@ -118,6 +123,27 @@ private enum CYLLocalization {
         }
         return containers[0]
     }()
+
+    /**
+     * [EN] `<name>.bundle` in the same places as `resourceBundle`, or nil. [CN] 在与 `resourceBundle` 相同的位置查找 `<name>.bundle`，找不到时为 nil。
+     */
+    static func bundle(named name: String) -> Bundle? {
+        guard !name.isEmpty else {
+            return nil
+        }
+        var containers: [Bundle] = []
+        #if SWIFT_PACKAGE
+        containers.append(Bundle.module)
+        #endif
+        containers.append(Bundle(for: CYLUtils.self))
+        containers.append(Bundle.main)
+        for container in containers {
+            if let url = container.url(forResource: name, withExtension: "bundle"), let bundle = Bundle(url: url) {
+                return bundle
+            }
+        }
+        return nil
+    }
 
     static func string(_ key: String, bundle: Bundle) -> String {
         guard !key.isEmpty else {

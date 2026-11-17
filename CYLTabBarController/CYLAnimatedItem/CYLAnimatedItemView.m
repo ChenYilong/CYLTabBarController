@@ -6,6 +6,11 @@
 //
 
 #import "CYLAnimatedItemView.h"
+#if __has_include("../CYLUtils/CYLLocalizedString.h")
+#import "../CYLUtils/CYLLocalizedString.h"
+#else
+#import "CYLLocalizedString.h"
+#endif
 
 /*
  * [EN] How often a looping animation whose player has no `loops` checks whether it reached the end.
@@ -33,6 +38,7 @@ static const CGFloat CYLAnimatedItemDefaultAnimationSide = 24;
 @implementation CYLAnimatedItemView
 
 @synthesize title = _title;
+@synthesize placeholderImage = _placeholderImage;
 @synthesize image = _image;
 @synthesize selectedImage = _selectedImage;
 @synthesize animationURL = _animationURL;
@@ -119,8 +125,45 @@ static const CGFloat CYLAnimatedItemDefaultAnimationSide = 24;
     [self cyl_updateIcon];
 }
 
+#pragma mark - Placeholder 占位图
+
++ (UIImage *)defaultPlaceholderImage {
+    static UIImage *image = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        NSBundle *bundle = CYLResourceBundleNamed(@"CYLAnimatedItem");
+        UIImage *found = bundle ? [UIImage imageNamed:@"cyl_animated_item_placeholder" inBundle:bundle compatibleWithTraitCollection:nil] : nil;
+        image = [found imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+    });
+    return image;
+}
+
+- (UIImage *)placeholderImage {
+    return _placeholderImage ?: [[self class] defaultPlaceholderImage];
+}
+
+- (void)setPlaceholderImage:(UIImage *)placeholderImage {
+    _placeholderImage = placeholderImage;
+    [self cyl_updateIcon];
+    [self cyl_contentDidChange];
+}
+
+/*
+ * [EN] The placeholder, when there is no static image and the animation file cannot play. [CN] 没有静态图片且动画文件无法播放时的占位图。
+ */
+- (UIImage *)cyl_placeholderIfNeeded {
+    if (self.image || self.selectedImage || !self.animationURL || self.animationView) {
+        return nil;
+    }
+    UIImage *placeholder = self.placeholderImage;
+    return (placeholder.size.width > 0 && placeholder.size.height > 0) ? placeholder : nil;
+}
+
 - (void)cyl_updateIcon {
     UIImage *icon = (self.isSelected && self.selectedImage) ? self.selectedImage : self.image;
+    if (!icon) {
+        icon = [self cyl_placeholderIfNeeded];
+    }
     self.imageView.image = icon;
     self.imageView.hidden = (self.animationView != nil);
 }
@@ -498,6 +541,10 @@ static const CGFloat CYLAnimatedItemDefaultAnimationSide = 24;
  */
 - (void)setAnimationURL:(NSURL *)animationURL {
     _animationURL = [animationURL copy];
+    // [EN] No engine: the file cannot play, so the placeholder shows when there is no static image.
+    // [CN] 没有引擎：文件无法播放，没有静态图片时显示占位图。
+    [self cyl_updateIcon];
+    [self cyl_contentDidChange];
 }
 
 - (BOOL)isAnimationReady {

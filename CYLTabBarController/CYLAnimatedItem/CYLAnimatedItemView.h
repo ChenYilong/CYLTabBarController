@@ -229,6 +229,21 @@ NS_SWIFT_NAME(CYLAnimatedItemViewDelegate)
  */
 @property (nonatomic, strong, readonly) UILabel *titleLabel;
 /*!
+ * [EN] The library's placeholder: `cyl_animated_item_placeholder` in `CYLAnimatedItem.bundle`, a 25 x 25 pt template image
+ *      sized for a tab icon (it takes the tint). nil when the bundle is not in the app.
+ * [CN] 本库的占位图：`CYLAnimatedItem.bundle` 中的 `cyl_animated_item_placeholder`，25 x 25 pt、适合 Tab 图标的模板图（跟随 tint 颜色）。
+ *      App 中没有该资源包时为 nil。
+ */
+@property (class, nonatomic, strong, readonly, nullable) UIImage *defaultPlaceholderImage;
+/*!
+ * [EN] Shown when there is no static image (`image` / `selectedImage`) and `animationURL` cannot play: no animation engine,
+ *      no library for the file, or a file it cannot read. Set nil to go back to `defaultPlaceholderImage`, or an empty
+ *      `UIImage` to show none (the title alone). The animation still wins once it can play.
+ * [CN] 没有静态图片（`image` / `selectedImage`）且 `animationURL` 无法播放（没有动画引擎、没有该文件的动画库或文件无法读取）时显示。设为 nil
+ *      恢复为 `defaultPlaceholderImage`，设为空的 `UIImage` 则不显示（只有标题）。动画能播放时仍优先显示动画。
+ */
+@property (nonatomic, strong, null_resettable) UIImage *placeholderImage;
+/*!
  * [EN] The view playing `animationURL`, while ready; always nil without the animation engine.
  * [CN] 正在播放 `animationURL` 的视图（就绪时）；没有动画引擎时始终为 nil。
  */

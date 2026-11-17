@@ -105,6 +105,22 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
     override var selectedImage: Drawable? = null
         set(value) { field = value; updateIcon() }
 
+    /**
+     * [EN] Shown when there is no static image (`image` / `selectedImage`) and `animationURL` cannot play (no library for
+     *      the file, or a file it cannot read). null (default) uses `defaultPlaceholderImage`; an empty `ColorDrawable` with
+     *      no size shows none (the title alone). The animation still wins once it can play.
+     * [CN] 没有静态图片（`image` / `selectedImage`）且 `animationURL` 无法播放（没有该文件的动画库或文件无法读取）时显示。null（默认）使用
+     *      `defaultPlaceholderImage`；没有尺寸的空 `ColorDrawable` 则不显示（只有标题）。动画能播放时仍优先显示动画。
+     */
+    var placeholderImage: Drawable? = null
+        set(value) { field = value; updateIcon(); requestLayout() }
+
+    private fun placeholderIfNeeded(): Drawable? {
+        if (image != null || selectedImage != null || animationURL.isNullOrBlank() || animationView != null) return null
+        val placeholder = placeholderImage ?: defaultPlaceholderImage(context)
+        return placeholder?.takeIf { placeholderImage == null || (it.intrinsicWidth > 0 && it.intrinsicHeight > 0) }
+    }
+
     // MARK: - Layout 布局
 
     /**
@@ -370,7 +386,7 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
     protected open fun onItemStateChanged() { /* [EN] Optional. [CN] 可选。 */ }
 
     private fun updateIcon() {
-        iconView.setImageDrawable(if (isSelected && selectedImage != null) selectedImage else image)
+        iconView.setImageDrawable((if (isSelected && selectedImage != null) selectedImage else image) ?: placeholderIfNeeded())
         iconView.visibility = if (animationView != null) View.INVISIBLE else View.VISIBLE
     }
 
@@ -530,4 +546,16 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
      * [CN] 以本视图标题样式测得的标题宽度，供在创建条目前计算尺寸的调用方使用。
      */
     fun titleWidth(text: CharSequence?): Int = if (text.isNullOrEmpty()) 0 else ceil(titleView.paint.measureText(text.toString())).toInt()
+
+    companion object {
+        /**
+         * [EN] The library's placeholder, `R.drawable.cyl_animated_item_placeholder` (24 dp, a tab icon's size; the same
+         *      drawing as iOS's `CYLAnimatedItem.bundle`). Copyright and policy: `META-INF/cylanimateditem/`.
+         * [CN] 本库的占位图 `R.drawable.cyl_animated_item_placeholder`（24 dp，Tab 图标尺寸；与 iOS 的 `CYLAnimatedItem.bundle` 图形相同）。版权与政策：
+         *      `META-INF/cylanimateditem/`。
+         */
+        @JvmStatic
+        fun defaultPlaceholderImage(context: Context): Drawable? =
+            androidx.core.content.ContextCompat.getDrawable(context, com.cyl.animateditem.R.drawable.cyl_animated_item_placeholder)
+    }
 }

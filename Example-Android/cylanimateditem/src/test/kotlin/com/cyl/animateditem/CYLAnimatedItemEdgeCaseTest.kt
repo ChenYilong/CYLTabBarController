@@ -70,21 +70,45 @@ class CYLAnimatedItemEdgeCaseTest {
     }
 
     @Test
-    fun onlyAnAnimationFileWithoutAnEngineIsSafeAndKeepsTheLayout() {
+    fun onlyAnAnimationFileWithoutAnEngineShowsThePlaceholder() {
+        val activity = activity()
+        val item = CYLAnimatedItemView(activity).apply { title = "Home"; animationURL = "file:///android_asset/home.json" }
+        assertFalse(item.isAnimationReady)
+        assertNull(item.animationView)
+        laidOut(activity, item)
+        val placeholder = item.iconView.drawable
+        assertNotNull("no static image, the file cannot play: the placeholder", placeholder)
+        assertEquals(View.VISIBLE, item.iconView.visibility)
+        val side = (24 * activity.resources.displayMetrics.density).toInt()
+        assertEquals("a tab icon's size", side, item.iconView.width)
+        assertEquals(side, placeholder!!.intrinsicWidth)
+        assertTrue(item.titleView.left >= item.iconView.right)
+        item.playAnimation()
+        item.restartAnimation()
+        item.stopAnimation()
+        item.showAnimationLastFrame()
+        assertEquals("the file is kept for later", "file:///android_asset/home.json", item.animationURL)
+        item.animationSource = PlayingSource()
+        item.animationURL = "home.fake"
+        assertTrue(item.isAnimationReady)
+        assertEquals("the animation wins once it can play", View.INVISIBLE, item.iconView.visibility)
+    }
+
+    @Test
+    fun anEmptyPlaceholderKeepsTheTitleLayout() {
         val activity = activity()
         val titleOnly = CYLAnimatedItemView(activity).apply { title = "Home" }
-        val animationOnly = CYLAnimatedItemView(activity).apply { title = "Home"; animationURL = "file:///android_asset/home.json" }
-        assertFalse(animationOnly.isAnimationReady)
-        assertNull(animationOnly.animationView)
-        assertEquals("no space for an icon that cannot show", naturalSize(titleOnly), naturalSize(animationOnly))
-        laidOut(activity, animationOnly)
-        assertEquals(0, animationOnly.iconView.width)
-        assertTrue(animationOnly.titleView.width > 0)
-        animationOnly.playAnimation()
-        animationOnly.restartAnimation()
-        animationOnly.stopAnimation()
-        animationOnly.showAnimationLastFrame()
-        assertEquals("the file is kept for later", "file:///android_asset/home.json", animationOnly.animationURL)
+        val item = CYLAnimatedItemView(activity).apply {
+            title = "Home"; placeholderImage = android.graphics.drawable.ColorDrawable(Color.TRANSPARENT)
+            animationURL = "file:///android_asset/home.json"
+        }
+        assertEquals(naturalSize(titleOnly), naturalSize(item))
+        val custom = icon().apply { setBounds(0, 0, 10, 10) }
+        val shaped = android.graphics.drawable.ShapeDrawable().apply { intrinsicWidth = 20; intrinsicHeight = 20 }
+        item.placeholderImage = shaped
+        assertSame("a custom placeholder", shaped, item.iconView.drawable)
+        item.image = custom
+        assertSame("a static image wins over the placeholder", custom, item.iconView.drawable)
     }
 
     @Test

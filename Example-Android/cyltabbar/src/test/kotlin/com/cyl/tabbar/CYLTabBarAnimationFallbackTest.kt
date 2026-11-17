@@ -14,8 +14,8 @@ import org.robolectric.annotation.Config
 
 /**
  * [EN] Tab attributes with an animation file whose library is not in the app (libpag is not on this classpath): no
- *      crash and a normal layout with the animation alone; the static image shows when both are given.
- * [CN] Tab 属性中传入动画文件、但 App 中没有对应动画库（本 classpath 没有 libpag）：只传动画时不崩溃、布局正常；同时传入时显示静态图片。
+ *      crash, and the placeholder with the animation alone; the static image shows when both are given.
+ * [CN] Tab 属性中传入动画文件、但 App 中没有对应动画库（本 classpath 没有 libpag）：只传动画时不崩溃并显示占位图；同时传入时显示静态图片。
  */
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34])
@@ -36,6 +36,8 @@ class CYLTabBarAnimationFallbackTest {
         idle()
         val (only, both, image) = controller.tabBar.tabBarButtonArray
         assertNull(only.cyl_tabBarItemAnimationView)
+        assertNotNull("only an animation that cannot play: the placeholder", only.iconView.drawable)
+        assertEquals(View.VISIBLE, only.iconView.visibility)
         assertNull(both.cyl_tabBarItemAnimationView)
         assertTrue(only.titleLabel.width > 0)
         assertEquals("tabs keep equal widths", image.width, only.width)

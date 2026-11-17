@@ -17,6 +17,33 @@
 #import "UIControl+CYLTabBarItemAnimation.h"
 #import "UIImage+CYLTabBarControllerExtention.h"
 #import "NSObject+CYLTabBarControllerExtention.h"
+// [EN] The animated item component (Core depends on it) gives the placeholder; the engine registry only with an animation
+//      subspec (`CYL_ANIMATION_ENGINE_AVAILABLE`), looked up through the header search paths only.
+// [CN] 动效组件（Core 依赖它）提供占位图；引擎注册表只在引入动画子库时存在（`CYL_ANIMATION_ENGINE_AVAILABLE`），只通过头文件搜索路径查找。
+#if __has_include("CYLAnimatedItem/CYLAnimatedItemView.h")
+#import "CYLAnimatedItem/CYLAnimatedItemView.h"
+#else
+#import "CYLAnimatedItemView.h"
+#endif
+#if CYL_ANIMATION_ENGINE_AVAILABLE
+#if __has_include(<CYLTabBarController/CYLTabBarItemAnimatorRegistry.h>)
+#import <CYLTabBarController/CYLTabBarItemAnimatorRegistry.h>
+#else
+#import "CYLTabBarItemAnimatorRegistry.h"
+#endif
+#endif
+
+/*
+ * [EN] Whether a tab's animation file can play: an engine with an animator for its type. Without the engine nothing can.
+ * [CN] Tab 的动画文件能否播放：有引擎且有该类型的 animator。没有引擎时都不能播放。
+ */
+static BOOL CYLTabBarAnimationCanPlay(NSURL *URL) {
+#if CYL_ANIMATION_ENGINE_AVAILABLE
+    return URL != nil && [CYLTabBarItemAnimatorRegistry animatorForURL:URL] != nil;
+#else
+    return NO;
+#endif
+}
 
 
 
@@ -1987,6 +2014,12 @@ static const void *const CYLPlusButtonGlassLayoutRetryPendingKey = &CYLPlusButto
             NSString *animationFilePath = nil;
             setup.animationURL = CYLTabBarItemAnimationURLFromAttributes(attributes, &animationFilePath);
             setup.animationFilePath = animationFilePath;
+            // [EN] Only an animation file, which cannot play (no engine, no library): the component's placeholder, sized
+            //      for a tab icon, instead of an empty icon. With a static image, that image is the fallback as before.
+            // [CN] 只有动画文件且无法播放（没有引擎或动画库）：使用组件的占位图（适合 Tab 图标的尺寸），而不是空图标。有静态图片时仍以该图片兜底。
+            if (!setup.normalImageInfo && !setup.selectedImageInfo && setup.animationURL && !CYLTabBarAnimationCanPlay(setup.animationURL)) {
+                setup.normalImageInfo = CYLAnimatedItemView.defaultPlaceholderImage;
+            }
             setup.animationSizeValue = CYLTabBarItemAttributesAnimationValue(attributes, CYLTabBarAnimationSize);
             // FIX: issue #408 the tab's identifier. Tab 的标识。
             viewController.cyl_tabBarItemIdentifier = attributes[CYLTabBarItemIdentifier];

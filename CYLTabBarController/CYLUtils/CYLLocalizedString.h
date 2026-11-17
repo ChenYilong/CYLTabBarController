@@ -83,6 +83,15 @@ FOUNDATION_EXTERN NSString *CYLLocalizedString(NSString * _Nullable key) CYL_NOE
 FOUNDATION_EXTERN NSBundle *CYLResourceBundle(void) CYL_NOEXCEPT;
 
 /*!
+ * [EN] The resource bundle `<name>.bundle` of a subspec (e.g. `CYLAnimatedItem`), found where `CYLResourceBundle()` looks:
+ *      the SwiftPM module bundle, the library's own bundle (CocoaPods, frameworks), then the main bundle. nil when no
+ *      such bundle is in the app (the subspec that ships it is not part of the build).
+ * [CN] 某个子库的资源包 `<name>.bundle`（例如 `CYLAnimatedItem`），查找位置与 `CYLResourceBundle()` 相同：SwiftPM 模块 bundle、本库自身的
+ *      bundle（CocoaPods、framework）、主 bundle。App 中没有该资源包（提供它的子库未参与构建）时为 nil。
+ */
+FOUNDATION_EXTERN NSBundle * _Nullable CYLResourceBundleNamed(NSString *name) CYL_NOEXCEPT;
+
+/*!
  * [EN] Overrides the language of `CYLLocalizedString()`, e.g. @"ja" or @"zh-Hant", for an in-app language setting; nil
  *      follows the app again. Texts already shown keep their language until they are set again (e.g. the tab bar
  *      controller is created again).
