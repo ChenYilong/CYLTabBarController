@@ -43,6 +43,11 @@ struct CYLRiveTabBarItemAnimationConfiguration {
     let stateMachineInput: String?
     let triggerInput: String?
     let animationName: String?
+    /// [EN] A state machine number input set to the next value on each play (house.riv: `Rooms`).
+    /// [CN] 每次播放设为下一个值的状态机数字输入（house.riv：`Rooms`）。
+    let numberInput: String?
+    /// [EN] The values the number input steps through; empty: +1. [CN] 数字输入依次使用的值；为空时 +1。
+    let numberValues: [Float]
     /// [EN] Played through the legacy runtime even with none of the three above. [CN] 即使没有以上三项，也通过旧版运行时播放。
     let forcesLegacyRuntime: Bool
 
@@ -53,7 +58,7 @@ struct CYLRiveTabBarItemAnimationConfiguration {
 
     /// [EN] Whether the file is played through Rive's legacy runtime. [CN] 是否通过 Rive 旧版运行时播放该文件。
     var usesLegacyRuntime: Bool {
-        return forcesLegacyRuntime || stateMachineInput != nil || triggerInput != nil || animationName != nil
+        return forcesLegacyRuntime || stateMachineInput != nil || triggerInput != nil || animationName != nil || numberInput != nil
     }
 
     init(fileURL: URL, options: [String: String]) {
@@ -74,6 +79,19 @@ struct CYLRiveTabBarItemAnimationConfiguration {
         triggerInput = options[CYLTabBarAnimationOption.riveTriggerInput.rawValue]
         animationName = options[CYLTabBarAnimationOption.riveAnimation.rawValue]
         forcesLegacyRuntime = options[CYLTabBarAnimationOption.riveLegacyRuntime.rawValue] == "1"
+        numberInput = options[CYLTabBarAnimationOption.riveNumberInput.rawValue]
+        numberValues = (options[CYLTabBarAnimationOption.riveNumberValues.rawValue] ?? "").split(separator: ",")
+            .compactMap { Float($0.trimmingCharacters(in: .whitespaces)) }
+    }
+
+    /// [EN] The value a play sets on the number input: the one after `current` in `numberValues`, cycling; without values,
+    ///      `current + 1`. [CN] 一次播放设置到数字输入的值：`numberValues` 中 `current` 的下一个，循环；没有值时为 `current + 1`。
+    func nextNumber(after current: Float) -> Float {
+        guard !numberValues.isEmpty else {
+            return current + 1
+        }
+        let index = numberValues.firstIndex(of: current).map { $0 + 1 } ?? 0
+        return numberValues[index % numberValues.count]
     }
 
     /// [EN] "#RRGGBB" or "#RRGGBBAA" ("#" optional). [CN] "#RRGGBB" 或 "#RRGGBBAA"（"#" 可省略）。

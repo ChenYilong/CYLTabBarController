@@ -125,6 +125,19 @@ public final class CYLRiveLegacyTabBarItemAnimationView: UIView, CYLTabBarItemAn
     ///      播放都是一次状态切换（保持的输入、时长为 0 时以前只播放一次），经过时长后恢复为 NO；缺少或未指定输入的状态机重新开始（house.riv、shapes.riv）。
     ///      开启循环时，每次播放后再次播放。
     public func playAnimation() {
+        play(fromLoop: false)
+    }
+
+    /// [EN] `fromLoop`: a loop pass, which leaves a file that is still moving on its own alone (shapes.riv, truck.riv loop by
+    ///      themselves; resetting them every pass cut them short). [CN] `fromLoop`：一次循环，不打断仍在自行运动的文件（shapes.riv、truck.riv
+    ///      自身循环；每次循环重置会打断它们）。
+    private func play(fromLoop: Bool) {
+        let usableInput = configuration.stateMachineInput.map(hasInput) ?? false
+        if fromLoop, configuration.animationName == nil, configuration.triggerInput == nil, configuration.numberInput == nil, !usableInput,
+           viewModel.isPlaying {
+            scheduleLoop()
+            return
+        }
         deactivateTask?.cancel()
         loopTask?.cancel()
         if let animationName = configuration.animationName {
@@ -145,7 +158,12 @@ public final class CYLRiveLegacyTabBarItemAnimationView: UIView, CYLTabBarItemAn
                 self.viewModel.triggerInput(triggerInput)
                 self.viewModel.play()
             }
-        } else if let input = configuration.stateMachineInput, hasInput(input) {
+        } else if let name = configuration.numberInput, let number = numberInput(name) {
+            // [EN] The next value: a state machine that moves only when a number changes (house.riv's Rooms) plays each time.
+            // [CN] 下一个值：只在数字变化时运动的状态机（house.riv 的 Rooms）每次都会播放。
+            viewModel.setInput(name, value: configuration.nextNumber(after: number.value()))
+            viewModel.play()
+        } else if let input = configuration.stateMachineInput, usableInput {
             viewModel.setInput(input, value: false)
             let duration = configuration.activeDuration
             deactivateTask = Task { @MainActor [weak self] in
@@ -199,7 +217,7 @@ public final class CYLRiveLegacyTabBarItemAnimationView: UIView, CYLTabBarItemAn
             guard !Task.isCancelled, let self, self.loops else {
                 return
             }
-            self.playAnimation()
+            self.play(fromLoop: true)
         }
     }
 
@@ -209,6 +227,11 @@ public final class CYLRiveLegacyTabBarItemAnimationView: UIView, CYLTabBarItemAn
             return false
         }
         return (try? stateMachine.input(fromName: name)) != nil
+    }
+
+    /// [EN] The state machine's number input, nil when it has none or it is not a number. [CN] 状态机的数字输入；没有或不是数字时为 nil。
+    private func numberInput(_ name: String) -> RiveSMINumber? {
+        return (try? viewModel.riveModel?.stateMachine?.input(fromName: name)) as? RiveSMINumber
     }
 
     /// [EN] The resting state, without playing (#389). [CN] 静止状态，不播放（#389）。

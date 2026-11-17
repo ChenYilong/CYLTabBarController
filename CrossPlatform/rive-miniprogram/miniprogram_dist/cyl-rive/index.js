@@ -18,7 +18,7 @@
  *      cyl_input、cyl_animation。
  */
 const { Rive, CYLRiveEnvironment } = require('../rive/canvas_advanced.js')
-const { cylRiveOptions, cylRiveColor, cylRivePlayKind, cylRiveLoopDelay } = require('./cyl_rive_options')
+const { cylRiveOptions, cylRiveColor, cylRivePlayKind, cylRiveLoopDelay, cylRiveNumberValues, cylRiveNextNumber } = require('./cyl_rive_options')
 
 // [EN] A mini program cannot read files under miniprogram_npm, so the WebAssembly is copied to the package root
 //      (cylMiniprogramAssets in package.json); set `wasmPath` when it lives elsewhere ('' keeps this default).
@@ -118,6 +118,18 @@ Component({
     active: { type: String, value: '' },
     /** [EN] View model trigger fired instead. [CN] 改为触发的 view model trigger。 */
     trigger: { type: String, value: '' },
+    /**
+     * [EN] A state machine NUMBER input set on each play (house.riv: `Rooms`), with `values`. [CN] 每次播放设置的状态机 NUMBER 输入（house.riv：`Rooms`），配合 `values`。
+     */
+    numberInput: { type: String, value: '' },
+    /**
+     * [EN] Data binding: a view model number property path set on each play, with `values`. [CN] 数据绑定：每次播放设置的 view model 数字属性路径，配合 `values`。
+     */
+    number: { type: String, value: '' },
+    /**
+     * [EN] The numbers a play steps through, "3,4,5,6" (the next one each time, cycling); empty: +1. [CN] 每次播放依次使用的数字，"3,4,5,6"（每次取下一个，循环）；为空时 +1。
+     */
+    values: { type: String, value: '' },
     /** [EN] Seconds the input stays true (default 1, 0 keeps it). [CN] 输入保持 true 的秒数（默认 1，0 表示保持）。 */
     duration: { type: null, value: null },
     /** [EN] View model color path -> "#RRGGBB" (CYLTabBarRiveDarkColors). [CN] view model 颜色路径 -> 颜色。 */
@@ -382,7 +394,10 @@ Component({
       const { rive, renderer, artboard, instance, canvas } = state
       CYLRiveEnvironment.canvas = canvas
       if (state.playing && instance) {
-        instance.advance(elapsed)
+        // [EN] advance() answers whether it is still moving: a loop pass restarts a file only once it has settled.
+        // [CN] advance() 返回是否仍在运动：循环只在文件停止运动后才重新开始它。
+        const moving = instance.advance(elapsed)
+        state.settled = moving === false
         if (!state.isStateMachine) {
           instance.apply(1)
         }
@@ -445,8 +460,10 @@ Component({
       const boolInput = options.input && this.cyl_input(options.input)
       const activeName = options.active || (state.viewModelInstance && !boolInput ? 'active' : '')
       const activeProperty = activeName && state.viewModelInstance ? state.viewModelInstance.boolean(activeName) : null
+      const numberInput = options.numberInput && this.cyl_input(options.numberInput)
+      const numberProperty = options.number && state.viewModelInstance ? state.viewModelInstance.number(options.number) : null
       const kind = cylRivePlayKind({ hasTriggerInput: !!triggerInput, hasViewModelTrigger: !!viewModelTrigger,
-        hasBoolInput: !!(boolInput || activeProperty) })
+        hasNumber: !!(numberInput || numberProperty), hasBoolInput: !!(boolInput || activeProperty) })
       const speed = this.cyl_speed()
       const setActive = (value) => {
         if (boolInput) {
@@ -468,6 +485,10 @@ Component({
         }, 50)
       } else if (kind === 'viewModelTrigger') {
         viewModelTrigger.trigger()
+      } else if (kind === 'number') {
+        // [EN] The next value (house.riv moves only when `Rooms` changes). [CN] 下一个值（house.riv 只在 `Rooms` 变化时运动）。
+        const target = numberInput ? numberInput.asNumber() : numberProperty
+        target.value = cylRiveNextNumber(cylRiveNumberValues(options.values), target.value)
       } else if (kind === 'input') {
         // [EN] Off first, so a play always changes the value (an input left true, duration 0, played only once).
         // [CN] 先设为 false，每次播放都会改变取值（保持为 true 的输入、duration 为 0 时只播放一次）。
@@ -493,12 +514,20 @@ Component({
       // [CN] 循环（docs/Animated-Item.md，Rive 循环）：每种播放方式在一次播放后再次播放，直到关闭 `loop`。
       if (this.data.loop) {
         const delay = cylRiveLoopDelay({ kind, duration: options.duration, animationSeconds: state.animationSeconds, speed })
-        state.loopTimer = setTimeout(() => {
-          if (this.data.loop && this.cylState === state) {
-            this.triggerEvent('loopcomplete', {})
-            this.cyl_playFromStart()
+        const pass = () => {
+          if (!this.data.loop || this.cylState !== state) {
+            return
           }
-        }, Math.max(0, delay - seconds * 1000 / speed))
+          // [EN] A file that keeps moving on its own (shapes.riv, truck.riv loop by themselves) is not cut short: check
+          //      again after another pass. [CN] 自己持续运动的文件（shapes.riv、truck.riv 自身循环）不被打断：再等一次检查。
+          if (kind === 'restart' && !state.settled) {
+            state.loopTimer = setTimeout(pass, delay)
+            return
+          }
+          this.triggerEvent('loopcomplete', {})
+          this.cyl_playFromStart()
+        }
+        state.loopTimer = setTimeout(pass, Math.max(0, delay - seconds * 1000 / speed))
       }
     },
 

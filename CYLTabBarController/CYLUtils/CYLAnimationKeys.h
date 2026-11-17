@@ -232,6 +232,10 @@ FOUNDATION_EXTERN NSString *const CYLTabBarRiveDarkColors CYL_RIVE_REQUIRED;
  *        after `CYLTabBarAnimationOptionRiveActiveDuration` seconds, or when it stops.
  *      - `CYLTabBarAnimationOptionRiveTriggerInput`: a state machine trigger input fired when the tab plays.
  *      - `CYLTabBarAnimationOptionRiveAnimation`: a linear animation played when the tab plays (no state machine).
+ *      - `CYLTabBarAnimationOptionRiveNumberInput`: a state machine number input set to the next value each time the tab
+ *        plays, for a state machine that moves only when a number changes (house.riv: @"Rooms").
+ *      - `CYLTabBarAnimationOptionRiveNumberValues`: the values it steps through, @"3,4,5,6" (the next one each time,
+ *        cycling); without it, the current value plus 1.
  *      - `CYLTabBarAnimationOptionRiveLegacyRuntime`: @"1" plays the file through the legacy runtime with none of the above,
  *        e.g. a file without a state machine, whose default animation then loops.
  *      `CYLTabBarAnimationOptionRiveActiveDuration` @"0" keeps the boolean (view model or input) YES until the animation stops.
@@ -246,6 +250,8 @@ FOUNDATION_EXTERN NSString *const CYLTabBarRiveDarkColors CYL_RIVE_REQUIRED;
  *      - `CYLTabBarAnimationOptionRiveInput`：状态机布尔输入，播放时设为 YES，`CYLTabBarAnimationOptionRiveActiveDuration` 秒后或停止时恢复为 NO。
  *      - `CYLTabBarAnimationOptionRiveTriggerInput`：播放时触发的状态机 trigger 输入。
  *      - `CYLTabBarAnimationOptionRiveAnimation`：播放时播放的线性动画（不使用状态机）。
+ *      - `CYLTabBarAnimationOptionRiveNumberInput`：状态机数字输入，每次播放设为下一个值，用于只在数字变化时运动的状态机（house.riv：@"Rooms"）。
+ *      - `CYLTabBarAnimationOptionRiveNumberValues`：依次使用的值，@"3,4,5,6"（每次取下一个，循环）；没有时为当前值加 1。
  *      - `CYLTabBarAnimationOptionRiveLegacyRuntime`：@"1" 表示不使用以上选项、直接通过旧版运行时播放文件，例如没有状态机的文件，其默认动画会循环播放。
  *      `CYLTabBarAnimationOptionRiveActiveDuration` 为 @"0" 时，布尔属性（view model 或输入）保持 YES，直到动画停止。
  */
@@ -259,6 +265,8 @@ FOUNDATION_EXTERN CYLTabBarAnimationOption const CYLTabBarAnimationOptionRiveInp
 FOUNDATION_EXTERN CYLTabBarAnimationOption const CYLTabBarAnimationOptionRiveTriggerInput CYL_RIVE_REQUIRED;
 FOUNDATION_EXTERN CYLTabBarAnimationOption const CYLTabBarAnimationOptionRiveAnimation CYL_RIVE_REQUIRED;
 FOUNDATION_EXTERN CYLTabBarAnimationOption const CYLTabBarAnimationOptionRiveLegacyRuntime CYL_RIVE_REQUIRED;
+FOUNDATION_EXTERN CYLTabBarAnimationOption const CYLTabBarAnimationOptionRiveNumberInput CYL_RIVE_REQUIRED;
+FOUNDATION_EXTERN CYLTabBarAnimationOption const CYLTabBarAnimationOptionRiveNumberValues CYL_RIVE_REQUIRED;
 /*!
  * [EN] An SVGA file's URL (NSURL), the counterpart of `CYLTabBarLottieURL`; read from `CYLTabBarAnimationURL` too.
  * [CN] SVGA 文件的 URL（NSURL），对应 `CYLTabBarLottieURL`；也可以使用 `CYLTabBarAnimationURL`。

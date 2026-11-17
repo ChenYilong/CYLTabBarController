@@ -7,7 +7,7 @@
  */
 const test = require('node:test')
 const assert = require('node:assert')
-const { cylRivePlayKind, cylRiveLoopDelay, CYL_RIVE_LOOP_SECONDS } = require('../miniprogram_dist/cyl-rive/cyl_rive_options')
+const { cylRivePlayKind, cylRiveLoopDelay, cylRiveNumberValues, cylRiveNextNumber, CYL_RIVE_LOOP_SECONDS } = require('../miniprogram_dist/cyl-rive/cyl_rive_options')
 
 test('what a play does: trigger, view model trigger, input off then on, else a restart', () => {
   assert.equal(cylRivePlayKind({ hasTriggerInput: true, hasBoolInput: true }), 'trigger')
@@ -111,6 +111,7 @@ test('loop repeats a trigger, a restart and an input; turning it off stops the n
   assert.equal(fired, 3, 'no pass after loop is off')
 
   const machine = makeItem(definition, { inputs: {}, duration: 0 })
+  machine.item.cylState.settled = true
   machine.item.data.loop = true
   machine.item.cyl_playFromStart()
   t.mock.timers.tick(CYL_RIVE_LOOP_SECONDS * 1000)
@@ -136,4 +137,57 @@ test('a trigger restarts its state machine first, then fires (check.riv: the fin
   assert.equal(fired, 0, 'not yet: a frame later')
   t.mock.timers.tick(50)
   assert.equal(fired, 1)
+})
+
+test('number values: parsed, then the next one on each play, cycling; without values +1', () => {
+  assert.deepEqual(cylRiveNumberValues('3, 4,5,x,6'), [3, 4, 5, 6])
+  assert.deepEqual(cylRiveNumberValues(''), [])
+  assert.equal(cylRiveNextNumber([3, 4, 5, 6], 3), 4)
+  assert.equal(cylRiveNextNumber([3, 4, 5, 6], 6), 3, 'cycles')
+  assert.equal(cylRiveNextNumber([3, 4, 5, 6], 9), 3, 'an unknown value starts the list')
+  assert.equal(cylRiveNextNumber([], 3), 4)
+  assert.equal(cylRivePlayKind({ hasNumber: true, hasBoolInput: true }), 'number')
+})
+
+function numberInput(name, value) {
+  const holder = { value, history: [] }
+  return { name, holder, asNumber: () => ({ set value(v) { holder.value = v; holder.history.push(v) }, get value() { return holder.value } }) }
+}
+
+test('house.riv: each play changes the Rooms number input (3, 4, 5, 6, 3)', () => {
+  const definition = loadComponent()
+  const rooms = numberInput('Rooms', 3)
+  const { item, created } = makeItem(definition, { inputs: { Rooms: rooms }, options: { numberInput: 'Rooms', values: '3,4,5,6' } })
+  for (let i = 0; i < 4; i += 1) {
+    item.cyl_playFromStart()
+  }
+  assert.deepEqual(rooms.holder.history, [4, 5, 6, 3])
+  assert.equal(created.length, 1, 'a number play does not restart the state machine')
+})
+
+test('data binding: a view model number property steps the same way', () => {
+  const definition = loadComponent()
+  const property = { value: 0 }
+  const { item } = makeItem(definition, { inputs: {}, options: { number: 'rooms', values: '1,2' } })
+  item.cylState.viewModelInstance = { number: (path) => (path === 'rooms' ? property : null), trigger: () => null, boolean: () => null }
+  item.cyl_playFromStart()
+  assert.equal(property.value, 1)
+  item.cyl_playFromStart()
+  assert.equal(property.value, 2)
+})
+
+test('a loop pass does not restart a file that is still moving on its own (shapes.riv, truck.riv)', (t) => {
+  t.mock.timers.enable({ apis: ['setTimeout'] })
+  const definition = loadComponent()
+  const { item, created } = makeItem(definition, { inputs: {}, duration: 0 })
+  item.data.loop = true
+  item.cylState.settled = false
+  item.cyl_playFromStart()
+  assert.equal(created.length, 2, 'the explicit play restarts it')
+  t.mock.timers.tick(CYL_RIVE_LOOP_SECONDS * 1000)
+  t.mock.timers.tick(CYL_RIVE_LOOP_SECONDS * 1000)
+  assert.equal(created.length, 2, 'still moving: no restart')
+  item.cylState.settled = true
+  t.mock.timers.tick(CYL_RIVE_LOOP_SECONDS * 1000)
+  assert.equal(created.length, 3, 'settled: the next pass restarts it')
 })

@@ -77,6 +77,8 @@ pod 'CYLTabBarController/Rive'             # RiveRuntime ~> 6.29, iOS 14+
 | `CYLTabBarAnimationOptionRiveTriggerInput`（`.riveTriggerInput`） | — | 旧版：播放时触发的状态机 trigger 输入 | Legacy: the state machine trigger input fired when it plays |
 | `CYLTabBarAnimationOptionRiveAnimation`（`.riveAnimation`） | — | 旧版：播放时播放的线性动画 | Legacy: the linear animation played when it plays |
 | `CYLTabBarAnimationOptionRiveLegacyRuntime`（`.riveLegacyRuntime`） | — | 旧版：`"1"` 表示没有以上三项也使用旧版运行时，例如没有状态机的文件（默认动画循环播放） | Legacy: `"1"` uses the legacy runtime with none of the three above, e.g. a file without a state machine (its default animation loops) |
+| `CYLTabBarAnimationOptionRiveNumberInput`（`.riveNumberInput`，`"numberInput"`） | — | 旧版：每次播放设为下一个值的状态机数字输入，用于只在数字变化时运动的文件（house.riv：`Rooms`）；iOS、微信小程序 `cyl-rive`（也支持数据绑定的 view model 数字属性 `number`） | Legacy: a state machine number input set to the next value on each play, for files that move only when a number changes (house.riv: `Rooms`); iOS and the WeChat Mini Program `cyl-rive` (which also takes a data-binding view model number property, `number`) |
+| `CYLTabBarAnimationOptionRiveNumberValues`（`.riveNumberValues`，`"values"`） | 当前值 + 1 / current + 1 | 依次使用的值，`"3,4,5,6"`，每次取下一个，循环 | The values stepped through, `"3,4,5,6"`, the next one each time, cycling |
 
 ## [CN]没有 view model 的文件（旧版运行时）
 ## [EN]Files without a view model (legacy runtime)

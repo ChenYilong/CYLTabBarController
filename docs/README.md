@@ -218,6 +218,7 @@ docs/
 │   ├── animated-item-harmonyos-lottie-playing.png
 │   ├── animated-item-harmonyos-tabbar.jpeg
 │   ├── animated-item-ios-rive-loop-before-after.png
+│   ├── animated-item-ios-rive-loop-per-icon.png
 │   ├── animated-item-miniprogram-b7-engines-fixed.jpg
 │   ├── animated-item-miniprogram-b7-engines-overflow.jpg
 │   ├── b10-flatdesign-image-under-gif-after.png

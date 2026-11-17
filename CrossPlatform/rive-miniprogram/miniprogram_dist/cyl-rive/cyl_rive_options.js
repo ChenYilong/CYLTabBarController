@@ -7,7 +7,7 @@
  *      与组件属性，属性优先。纯函数，在 Node 中测试。
  */
 const CYL_OPTION_NAMES = ['artboard', 'stateMachine', 'animation', 'input', 'triggerInput', 'active', 'trigger',
-  'duration', 'color']
+  'duration', 'color', 'numberInput', 'number', 'values']
 
 /**
  * [EN] {path, options}: the file path without its fragment, and the fragment's options.
@@ -68,14 +68,40 @@ function cylRiveColor(hex) {
  *      'input' 先把布尔输入 / view model 布尔属性设为 false 再设为 true（即使原值已是 true，每次播放都会产生状态切换），'restart' 重新开始状态机
  *      （新实例）或动画：缺少输入或 trigger、或没有输入的文件也能再次播放。
  */
-function cylRivePlayKind({ hasTriggerInput, hasViewModelTrigger, hasBoolInput }) {
+function cylRivePlayKind({ hasTriggerInput, hasViewModelTrigger, hasNumber, hasBoolInput }) {
   if (hasTriggerInput) {
     return 'trigger'
   }
   if (hasViewModelTrigger) {
     return 'viewModelTrigger'
   }
+  if (hasNumber) {
+    return 'number'
+  }
   return hasBoolInput ? 'input' : 'restart'
+}
+
+/**
+ * [EN] The `values` option ("3,4,5,6") as numbers; an empty list when it has none. [CN] `values` 选项（"3,4,5,6"）转为数字；没有时为空数组。
+ */
+function cylRiveNumberValues(values) {
+  return String(values === undefined || values === null ? '' : values).split(',')
+    .map((value) => value.trim()).filter((value) => value !== '').map(Number).filter((value) => Number.isFinite(value))
+}
+
+/**
+ * [EN] Number inputs (house.riv's `Rooms`, a state machine NUMBER input, or a view model number for data binding): the value a
+ *      play sets: the one after `current` in `values`, cycling; without `values`, `current + 1`. A state machine that
+ *      moves only when the number changes plays on every call.
+ * [CN] 数字输入（house.riv 的 `Rooms` 状态机 NUMBER 输入，或数据绑定的 view model 数字属性）：一次播放设置的值：`values` 中 `current` 的下一个，循环；
+ *      没有 `values` 时为 `current + 1`。只在数字变化时运动的状态机，每次调用都会播放。
+ */
+function cylRiveNextNumber(values, current) {
+  if (!values.length) {
+    return (Number(current) || 0) + 1
+  }
+  const index = values.indexOf(Number(current))
+  return values[(index + 1) % values.length]
 }
 
 /** [EN] Seconds of a loop pass when the file gives none (held input, trigger, state machine). [CN] 文件未给出时一次循环的秒数。 */
@@ -104,4 +130,5 @@ function cylRiveLoopDelay({ kind, duration, animationSeconds, speed }) {
   return Math.round(seconds * 1000 / rate)
 }
 
-module.exports = { cylRiveRoute, cylRiveOptions, cylRiveColor, cylRivePlayKind, cylRiveLoopDelay, CYL_RIVE_LOOP_SECONDS }
+module.exports = { cylRiveRoute, cylRiveOptions, cylRiveColor, cylRivePlayKind, cylRiveLoopDelay, cylRiveNumberValues,
+  cylRiveNextNumber, CYL_RIVE_LOOP_SECONDS }
