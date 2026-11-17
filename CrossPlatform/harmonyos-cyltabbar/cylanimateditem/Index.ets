@@ -7,5 +7,5 @@
  */
 export {
   CYLAnimatedItemView, CYLAnimatedItemAxis, CYLAnimatedItemAccessoryPlacement, CYLAnimatedItemAnimationContext,
-  CYLAnimatedItemEngines, cylAnimatedItemTypeOf
+  CYLAnimatedItemEngines, cylAnimatedItemTypeOf, cylIconColorFilter
 } from './src/main/ets/CYLAnimatedItemView';
