@@ -72,3 +72,9 @@ export {
   CYLTabBarManifest, CYLTabBarManifestLoader, CYLTabBarManifestLoaderDelegate, CYLTabBarManifestCompletion, CYLTabBarManifestSource,
   CYLTabBarManifestError, CYLTabBarManifestErrorCode
 } from './src/main/ets/CYLTabBarManifest';
+export {
+  CYLTabButtonAnimation, CYLTabButtonView, CYLTabButtonProperty, CYLTabButtonAnimationBlock, CYLTabButtonBadgeAnimationBlock,
+  CYLTabButtonScaleAnimation, CYLTabButtonZoomInAnimation, CYLTabButtonBounceAnimation, CYLTabButtonRotationAnimation,
+  CYLTabButtonFumeAnimation, CYLTabButtonPressAnimation, CYLTabButtonBlockAnimation, CYLTabButtonFlipAnimation,
+  CYLTabButtonFrameAnimation
+} from './src/main/ets/CYLTabButtonAnimation';

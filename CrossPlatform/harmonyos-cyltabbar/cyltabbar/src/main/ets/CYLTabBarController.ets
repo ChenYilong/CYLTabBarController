@@ -8,6 +8,7 @@ import { CYLLottieIcon } from './CYLLottieIcon';
 import { CYLSVGAView } from './svga/CYLSVGAView';
 import { CYLRiveIcon } from './CYLRiveTabBarItemAnimator';
 import { CYLLocalizedString, cyl_textOf } from './CYLLocalization';
+import { CYLTabButtonAnimation, CYLTabButtonProperty, CYLTabButtonView, CYLTabButtonViewImpl } from './CYLTabButtonAnimation';
 
 import { vibrator } from '@kit.SensorServiceKit';
 import { media } from '@kit.MediaKit';
@@ -263,7 +264,7 @@ export struct CYLTabBarController {
   @Prop plusButton: CYLPlusButton | undefined = undefined;
   @Link @Watch('cylOnSelectedIndexChange') selectedIndex: number;
   /** [EN] The badge of each tab (-[UIView cyl_showBadgeValue:] on its tab button); created when unset. [CN] 每个 Tab 的角标；未设置时自动创建。 */
-  @State badges: CYLBadge[] = [];
+  @State @Watch('cylOnBadgesChange') badges: CYLBadge[] = [];
   /** [EN] The plus button's badge. [CN] 加号按钮的角标。 */
   @State plusButtonBadge: CYLBadge = new CYLBadge();
   @Prop @Watch('cylOnTabBarHiddenChange') tabBarHidden: boolean = false;
@@ -363,6 +364,18 @@ export struct CYLTabBarController {
   @State private tapAngle: number[] = [];
   @State private tapFlip: number[] = [];
   @State private tapOffset: number[] = [];
+  /**
+   * [EN] cyl_tabButtonAnimation (issue #535): a CYLTabButtonAnimation played on the tab buttons (select, deselect,
+   *      reselect, press, badge change); it replaces tapAnimationType. [CN] Tab 按钮的点击动画对象；设置后替代 tapAnimationType。
+   */
+  tabButtonAnimation?: CYLTabButtonAnimation;
+  @State private tapFlipX: number[] = [];
+  @State private tapTitleOpacity: number[] = [];
+  @State private tapTitleScale: number[] = [];
+  @State private tapBadgeScale: number[] = [];
+  @State private tapFrameImages: (ResourceStr | undefined)[] = [];
+  @State private tapFireworks: number[] = [];
+  @State private tapFireworkImages: (ResourceStr | undefined)[] = [];
   private lastTapIndex: number = -2;
   /** [EN] The tab whose long press just fired: its click is not a tap. [CN] 刚触发长按的 Tab：其 click 不算点击。 */
   private cylLongPressedIndex: number = -2;
@@ -798,7 +811,7 @@ export struct CYLTabBarController {
         // [EN] No vibrator or no permission. [CN] 没有振动器或没有权限。
       }
     }
-    if (index < 0 || this.tapAnimationType === CYLTabButtonTapAnimationType.None) {
+    if (index < 0 || this.tapAnimationType === CYLTabButtonTapAnimationType.None || this.tabButtonAnimation !== undefined) {
       return;
     }
     const set = (values: number[], value: number): number[] => {
@@ -832,6 +845,132 @@ export struct CYLTabBarController {
     }
   }
 
+  private cylTapValues(property: CYLTabButtonProperty): number[] {
+    switch (property) {
+      case CYLTabButtonProperty.IconScale: return this.tapScale;
+      case CYLTabButtonProperty.IconAngle: return this.tapAngle;
+      case CYLTabButtonProperty.IconFlipY: return this.tapFlip;
+      case CYLTabButtonProperty.IconFlipX: return this.tapFlipX;
+      case CYLTabButtonProperty.IconOffsetY: return this.tapOffset;
+      case CYLTabButtonProperty.TitleOpacity: return this.tapTitleOpacity;
+      case CYLTabButtonProperty.TitleScale: return this.tapTitleScale;
+      default: return this.tapBadgeScale;
+    }
+  }
+
+  private cylSetTapValue(index: number, property: CYLTabButtonProperty, value: number): void {
+    const copy = this.cylTapValues(property).slice();
+    copy[index] = value;
+    switch (property) {
+      case CYLTabButtonProperty.IconScale: this.tapScale = copy; break;
+      case CYLTabButtonProperty.IconAngle: this.tapAngle = copy; break;
+      case CYLTabButtonProperty.IconFlipY: this.tapFlip = copy; break;
+      case CYLTabButtonProperty.IconFlipX: this.tapFlipX = copy; break;
+      case CYLTabButtonProperty.IconOffsetY: this.tapOffset = copy; break;
+      case CYLTabButtonProperty.TitleOpacity: this.tapTitleOpacity = copy; break;
+      case CYLTabButtonProperty.TitleScale: this.tapTitleScale = copy; break;
+      default: this.tapBadgeScale = copy; break;
+    }
+  }
+
+  /** [EN] The CYLTabButtonView of a tab, for tabButtonAnimation. [CN] Tab 的 CYLTabButtonView。 */
+  cylButtonView(index: number): CYLTabButtonView {
+    const neutral = (property: CYLTabButtonProperty): number =>
+      property === CYLTabButtonProperty.IconScale || property === CYLTabButtonProperty.TitleOpacity ||
+        property === CYLTabButtonProperty.TitleScale || property === CYLTabButtonProperty.BadgeScale ? 1 : 0;
+    const ui = this.getUIContext();
+    return new CYLTabButtonViewImpl(index, this.tabBarItemsAttributes[index]?.title !== undefined,
+      (property: CYLTabButtonProperty): number => this.cylTapValues(property)[index] ?? neutral(property),
+      (property: CYLTabButtonProperty, value: number, duration?: number, curve?: Curve): void => {
+        if (duration === undefined || duration <= 0) {
+          this.cylSetTapValue(index, property, value);
+          return;
+        }
+        ui.animateTo({ duration: duration, curve: curve ?? Curve.EaseInOut }, () => this.cylSetTapValue(index, property, value));
+      },
+      (property: CYLTabButtonProperty, values: number[], duration: number, keyTimes?: number[]): void => {
+        if (values.length === 0) {
+          return;
+        }
+        this.cylSetTapValue(index, property, values[0]);
+        const steps: KeyframeState[] = [];
+        for (let i = 1; i < values.length; i++) {
+          const from = keyTimes?.[i - 1] ?? (i - 1) / (values.length - 1);
+          const to = keyTimes?.[i] ?? i / (values.length - 1);
+          const value = values[i];
+          steps.push({
+            duration: Math.max(1, Math.round((to - from) * duration)),
+            curve: Curve.EaseInOut,
+            event: () => this.cylSetTapValue(index, property, value),
+          });
+        }
+        if (steps.length > 0) {
+          ui.keyframeAnimateTo({ iterations: 1 }, steps);
+        }
+      },
+      (image: ResourceStr | undefined): void => {
+        const copy = this.tapFrameImages.slice();
+        copy[index] = image;
+        this.tapFrameImages = copy;
+      },
+      (image?: ResourceStr): void => {
+        const images = this.tapFireworkImages.slice();
+        images[index] = image;
+        this.tapFireworkImages = images;
+        const start = this.tapFireworks.slice();
+        start[index] = 0.01;
+        this.tapFireworks = start;
+        ui.animateTo({
+          duration: 600, curve: Curve.EaseOut, onFinish: () => {
+            const done = this.tapFireworks.slice();
+            done[index] = 0;
+            this.tapFireworks = done;
+          }
+        }, () => {
+          const end = this.tapFireworks.slice();
+          end[index] = 1;
+          this.tapFireworks = end;
+        });
+      });
+  }
+
+  /** [EN] tabButtonAnimation on a tap: reselect, or deselect the previous tab then select this one. [CN] 点击时播放动画对象。 */
+  private cylPlayTabButtonAnimation(index: number, previous: number): void {
+    const animation = this.tabButtonAnimation;
+    if (animation === undefined || index < 0) {
+      return;
+    }
+    if (index === previous) {
+      animation.cyl_playReselectAnimationWithTabButton(this.cylButtonView(index));
+      return;
+    }
+    if (previous >= 0) {
+      animation.cyl_toRight = index > previous;
+      animation.cyl_playDeselectAnimationWithTabButton(this.cylButtonView(previous));
+    }
+    animation.cyl_fromLeft = previous >= 0 && previous < index;
+    animation.cyl_playSelectAnimationWithTabButton(this.cylButtonView(index));
+  }
+
+  private cylLastBadgeValues: string[] = [];
+
+  /**
+   * [EN] A badge set or replaced in `badges`: tabButtonAnimation's badge-changed animation.
+   * [CN] `badges` 中的角标被设置或替换时，播放动画对象的角标动画。
+   */
+  cylOnBadgesChange(): void {
+    const values = this.badges.map((badge: CYLBadge) => `${badge?.value ?? 'none'}|${badge?.generation ?? 0}`);
+    const animation = this.tabButtonAnimation;
+    if (animation !== undefined) {
+      values.forEach((value: string, index: number) => {
+        if (this.cylLastBadgeValues[index] !== undefined && this.cylLastBadgeValues[index] !== value) {
+          animation.cyl_playBadgeChangedAnimationWithTabButton(this.cylButtonView(index));
+        }
+      });
+    }
+    this.cylLastBadgeValues = values;
+  }
+
   /** [EN] A tap on a tab button: double tap, feedback, then selection. [CN] 点击 Tab：双击检测、反馈，然后选中。 */
   cylTap(index: number): void {
     const now = Date.now();
@@ -844,6 +983,7 @@ export struct CYLTabBarController {
     }
     this.cylTapFeedback(index);
     const previous = this.selectedIndex;
+    this.cylPlayTabButtonAnimation(index, previous);
     this.cylSelect(index);
     if (this.didSelectControl !== undefined) {
       this.didSelectControl(index, previous);
@@ -1044,6 +1184,39 @@ export struct CYLTabBarController {
     return (dark ? item.riveDarkFilePath : undefined) ?? item.riveFilePath;
   }
 
+  /** [EN] Fireworks of tabButtonAnimation: 8 particles that burst out and fade. [CN] 烟花：8 个粒子向外散开并淡出。 */
+  @Builder
+  cylFireworks(index: number) {
+    Stack() {
+      ForEach([0, 1, 2, 3, 4, 5, 6, 7], (particle: number) => {
+        if (this.tapFireworkImages[index] !== undefined) {
+          Image(this.tapFireworkImages[index])
+            .width(6)
+            .height(6)
+            .translate({
+              x: Math.cos(particle * Math.PI / 4) * 22 * (this.tapFireworks[index] ?? 0),
+              y: Math.sin(particle * Math.PI / 4) * 22 * (this.tapFireworks[index] ?? 0),
+            })
+            .opacity(1 - (this.tapFireworks[index] ?? 0))
+        } else {
+          Circle()
+            .width(4)
+            .height(4)
+            .fill(this.tintColor)
+            .translate({
+              x: Math.cos(particle * Math.PI / 4) * 22 * (this.tapFireworks[index] ?? 0),
+              y: Math.sin(particle * Math.PI / 4) * 22 * (this.tapFireworks[index] ?? 0),
+            })
+            .opacity(1 - (this.tapFireworks[index] ?? 0))
+        }
+      }, (particle: number) => `${particle}`)
+    }
+    .width('100%')
+    .height('100%')
+    .hitTestBehavior(HitTestMode.Transparent)
+    .accessibilityLevel('no-hide-descendants')
+  }
+
   @Builder
   cylTab(index: number) {
     Column() {
@@ -1087,17 +1260,20 @@ export struct CYLTabBarController {
             },
           })
         } else {
-        Image(this.cylIcon(index))
+        Image(this.tapFrameImages[index] ?? this.cylIcon(index))
           .width(this.imageSize)
           .height(this.imageSize)
           .objectFit(ImageFit.Contain)
           .scale({ x: this.tapScale[index] ?? 1, y: this.tapScale[index] ?? 1 })
           .rotate({ z: 1, angle: this.tapAngle[index] ?? 0 })
           .rotate({ y: 1, angle: this.tapFlip[index] ?? 0 })
+          .rotate({ x: 1, angle: this.tapFlipX[index] ?? 0 })
           .translate({ y: this.tapOffset[index] ?? 0 })
           .padding(this.tabBarItemsAttributes[index].imageInsets ?? 0)
+          .overlay((this.tapFireworks[index] ?? 0) > 0 ? this.cylFireworks(index) : undefined)
         }
         CYLBadgeView({ badge: this.badges[index], anchorWidth: this.cylIconHeight(index) })
+          .scale({ x: this.tapBadgeScale[index] ?? 1, y: this.tapBadgeScale[index] ?? 1 })
       }
       // [EN] No fixed width: the badge is measured with the free width, so text badges grow with their text (issue list
       //      #1). The icon sits right above the title, whose top is at tabBarHeight - 17 like the plus title (#2).
@@ -1117,7 +1293,8 @@ export struct CYLTabBarController {
           .fontSize(10)
           .margin({ top: 3 })
           // [EN] Liquid Glass minimized: the title fades out with the morph. [CN] 液态玻璃缩小时标题随形变淡出。
-          .opacity(this.cylGlassMinimized() ? 0 : 1)
+          .opacity(this.cylGlassMinimized() ? 0 : (this.tapTitleOpacity[index] ?? 1))
+          .scale({ x: this.tapTitleScale[index] ?? 1, y: this.tapTitleScale[index] ?? 1 })
           .fontColor(this.selectedIndex === index
             ? (this.tabBarItemsAttributes[index].selectedTitleColor ?? this.tintColor)
             : (this.tabBarItemsAttributes[index].titleColor ?? this.unselectedColor))
@@ -1163,6 +1340,17 @@ export struct CYLTabBarController {
         return;
       }
       this.cylTap(index);
+    })
+    .onTouch((event: TouchEvent) => {
+      const animation = this.tabButtonAnimation;
+      if (animation === undefined) {
+        return;
+      }
+      if (event.type === TouchType.Down) {
+        animation.cyl_playHighlightAnimationWithTabButton(this.cylButtonView(index));
+      } else if (event.type === TouchType.Up || event.type === TouchType.Cancel) {
+        animation.cyl_playDehighlightAnimationWithTabButton(this.cylButtonView(index));
+      }
     })
     .parallelGesture(LongPressGesture({ duration: this.longPressDuration }).onAction(() => {
       this.cylLongPressedIndex = index;
