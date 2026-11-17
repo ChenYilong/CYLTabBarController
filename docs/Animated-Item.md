@@ -29,6 +29,7 @@
 | [接入](#cn接入) | [Integration](#enintegration) |
 | [四个仓库的迁移](#cn四个仓库的迁移) | [Migrating the four repositories](#enmigrating-the-four-repositories) |
 | [新增一种动画类型](#cn新增一种动画类型) | [Adding an animation type](#enadding-an-animation-type) |
+| [提交记录](#cn提交记录) | [Commits](#encommits) |
 | [TODO](#cntodo) | [TODO](#entodo) |
 
 <!-- navigation:end -->
@@ -179,6 +180,32 @@ tag.restartAnimation()
 | 中文 | English |
 |:---|:---|
 | 只改这个子库：写一个 animator（iOS 实现 `CYLTabBarItemAnimator`，或继承 `CYLTabBarItemViewAnimator` 用于自己会播放的视图；Android 实现 `CYLTabBarItemAnimator`），声明文件扩展名，向 `CYLTabBarItemAnimatorRegistry` 注册（iOS `+registerAnimator:`，Android `CYLTabBarItemAnimatorRegistry.registerAnimator`）。iOS 上把它放在 `CYLTabBarItemAnimation/<库名>/`，新建组件动效引擎 `CYLAnimatedItem<库名>`（`CYLAnimatedItem`、`CYLAnimationEngine` 与该库，绝不依赖 Core），再新建 TabBar 子库 `<库名>`（Core 加该引擎）；Android 上放在 `:cylanimateditem`，通过反射调用该库。所有 `CYLAnimatedItemView` 子类、Tab 按钮以及接入本子库的其他仓库都会自动支持，无需第二处修改。 | Change this sub-library only: write an animator (iOS: implement `CYLTabBarItemAnimator`, or subclass `CYLTabBarItemViewAnimator` for a view that plays itself; Android: implement `CYLTabBarItemAnimator`), declare its file extensions, and register it with `CYLTabBarItemAnimatorRegistry` (iOS `+registerAnimator:`, Android `CYLTabBarItemAnimatorRegistry.registerAnimator`). On iOS it goes in `CYLTabBarItemAnimation/<Library>/` with a component engine `CYLAnimatedItem<Library>` (`CYLAnimatedItem`, `CYLAnimationEngine` and the library, never Core) and a tab bar subspec `<Library>` (Core plus that engine); on Android in `:cylanimateditem`, reaching the library by reflection. Every `CYLAnimatedItemView` subclass, the tab buttons and the other repositories built on this sub-library support it at once, with no second change. |
+
+## [CN]提交记录
+## [EN]Commits
+
+| 中文 | English |
+|:---|:---|
+| 分支 `feat/cross-platform-components`（PR #788）上本组件的全部提交，按时间顺序。iOS CI 状态（2026-11-17 03:25 UTC）：每次推送都取消了上一次运行，因此 iOS 尚未完成过一次完整运行；最新运行为 [run 823](https://github.com/ChenYilong/CYLTabBarController/actions/runs/44009912374)（`2659cd06`，排队中）。Android 在 Linux 上验证：`cylanimateditem` 26 个测试、`cyltabbar` 125 个测试全部通过，lint 无问题，App 发布版构建通过。 | Every commit of this component on branch `feat/cross-platform-components` (PR #788), oldest first. iOS CI status (2026-11-17 03:25 UTC): each push cancelled the run before it, so iOS has not completed a full run yet; the latest is [run 823](https://github.com/ChenYilong/CYLTabBarController/actions/runs/44009912374) (`2659cd06`, queued). Android is verified on Linux: `cylanimateditem` 26 tests and `cyltabbar` 125 tests pass, lint is clean, the app's release build passes. |
+
+| 提交 / Commit | 中文 | English |
+|:---|:---|:---|
+| [`ffba28a2`](https://github.com/ChenYilong/CYLTabBarController/commit/ffba28a2) | 记录任务 | Task recorded |
+| [`86653bc1`](https://github.com/ChenYilong/CYLTabBarController/commit/86653bc1) | Android：`:cylanimateditem` 模块（引擎移入，`CYLAnimatedItemView`、协议、测试） | Android: the `:cylanimateditem` module (engine moved in, `CYLAnimatedItemView`, protocols, tests) |
+| [`2e6db787`](https://github.com/ChenYilong/CYLTabBarController/commit/2e6db787) | iOS：`CYLAnimatedItem` 子库与 `CYLAnimatedItemView`（Objective-C，Swift 可用） | iOS: the `CYLAnimatedItem` subspec and `CYLAnimatedItemView` (Objective-C, usable from Swift) |
+| [`61939e82`](https://github.com/ChenYilong/CYLTabBarController/commit/61939e82) | 本接入文档 | This integration guide |
+| [`4010b60f`](https://github.com/ChenYilong/CYLTabBarController/commit/4010b60f) | 编译期 guard：默认只有静态图片，引擎为 `CYLAnimationEngine` 子库 | Compile-time guard: static images by default, the engine is the `CYLAnimationEngine` subspec |
+| [`3427d9ad`](https://github.com/ChenYilong/CYLTabBarController/commit/3427d9ad) | 动画 key 移入 CYLUtils，可播放视图协议移入引擎，各动画库不再需要 Core | Animation keys moved to CYLUtils, playable view protocols to the engine, so no animator needs Core |
+| [`8fd2e503`](https://github.com/ChenYilong/CYLTabBarController/commit/8fd2e503) | Core 中使用引擎的部分由 `CYL_ANIMATION_ENGINE_AVAILABLE`（CYLUtilsMacros.h）包住 | Core's engine side behind `CYL_ANIMATION_ENGINE_AVAILABLE` (CYLUtilsMacros.h) |
+| [`13e717c9`](https://github.com/ChenYilong/CYLTabBarController/commit/13e717c9) | 最终结构：Core 依赖 `CYLAnimatedItem`；每种类型一个 `CYLAnimatedItem<类型>`；TabBar 的动画子库 = Core + 对应引擎 | Final layout: Core depends on `CYLAnimatedItem`; one `CYLAnimatedItem<Type>` per type; the tab bar's animation subspecs = Core + the matching engine |
+| [`8dffb160`](https://github.com/ChenYilong/CYLTabBarController/commit/8dffb160) | 边界情况；修复 Android 图标尺寸在无法播放时仍按动画计算的问题 | Edge cases; fix: Android sized the icon for an animation that could not play |
+| [`a7cc10c2`](https://github.com/ChenYilong/CYLTabBarController/commit/a7cc10c2) | `CYLAnimatedItem.bundle`：Tab 图标尺寸的占位图、LICENSE、POLICY.md；Android 资源与 META-INF | `CYLAnimatedItem.bundle`: the tab-icon-sized placeholder, LICENSE, POLICY.md; Android resources and META-INF |
+| [`81c9fefa`](https://github.com/ChenYilong/CYLTabBarController/commit/81c9fefa) | 占位图遵循 HIG：只提供 @2x、@3x | Placeholder per the HIG: @2x and @3x only |
+| [`0cb0baec`](https://github.com/ChenYilong/CYLTabBarController/commit/0cb0baec) | 异常场景：文件不存在 / 为空 / 损坏、下载失败、解析错误；iOS 的失败报告协议 | Failure cases: missing, empty or corrupted files, failed downloads, parse errors; the iOS failure reporting protocol |
+| [`523e348e`](https://github.com/ChenYilong/CYLTabBarController/commit/523e348e) | 显示优先级：动画 → 静态图片 → 占位图 | Display priority: animation, then the static image, then the placeholder |
+| [`35aa7577`](https://github.com/ChenYilong/CYLTabBarController/commit/35aa7577) | URL 动效下载期间显示静态图片或占位图（加载状态） | URL files: the static image or placeholder while downloading (a loading state) |
+| [`09e782af`](https://github.com/ChenYilong/CYLTabBarController/commit/09e782af) | React Native 与 Flutter 的源码构建加入 `cylanimateditem`；模块按名称查找资源 | The React Native and Flutter source builds include `cylanimateditem`; the module finds resources by name |
+| [`2659cd06`](https://github.com/ChenYilong/CYLTabBarController/commit/2659cd06) | 按当前结构刷新本文档 | This guide refreshed to the current layout |
 
 ## [CN]TODO
 ## [EN]TODO
