@@ -282,6 +282,8 @@ docs/
 │   ├── harmonyos-styles-recheck-6befe36.png
 │   ├── harmonyos-styles-space-skin-981db1e.png
 │   ├── harmonyos-system-tab-bar-plus-before-after.png
+│   ├── harmonyos-tab-badge-animations-on.png
+│   ├── harmonyos-tab-badge-top-left-before-after.png
 │   ├── harmonyos-verify-arabic.jpeg
 │   ├── harmonyos-verify-configuration-svga-eba8c44.jpeg
 │   ├── harmonyos-verify-home-eba8c44.jpeg

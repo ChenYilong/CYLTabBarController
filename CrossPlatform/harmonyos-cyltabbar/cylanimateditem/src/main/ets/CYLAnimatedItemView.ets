@@ -394,6 +394,11 @@ export struct CYLAnimatedItemView {
     }
   }
 
+  /** [EN] Bare and only an icon: no title, no accessory. [CN] 纯图标模式且只有图标：没有标题和附件。 */
+  private cylIsBareIcon(): boolean {
+    return this.isBare && this.itemTitle.length === 0 && this.cylIsEmpty(this.accessoryImage) && this.accessoryText.length === 0;
+  }
+
   build() {
     Flex({
       direction: this.axis === CYLAnimatedItemAxis.Vertical ? FlexDirection.Column : FlexDirection.Row,
@@ -403,6 +408,14 @@ export struct CYLAnimatedItemView {
       this.cylContent()
     }
     .padding(this.isBare ? 0 : 4)
+    // [EN] A Flex without a size fills its parent. A bare icon (a host's tab icon, no title, no accessory) is exactly the
+    //      icon, so a host can place things against its edges: the tab bar puts the badge at the icon's top-right, and an
+    //      item as wide as the tab slot moved it to the icon's top-left (HarmonyOS issue list #51). `undefined` keeps the
+    //      default size everywhere else.
+    // [CN] 未设置尺寸的 Flex 会填满父组件。纯图标（宿主的 Tab 图标，无标题、无附件）的尺寸就是图标尺寸，宿主才能依据其边缘布局：TabBar 把角标放在
+    //      图标右上角，而与 Tab 槽位同宽的条目把角标挪到了图标左上角（鸿蒙问题列表 #51）。其他情况为 `undefined`，保持默认尺寸。
+    .width(this.cylIsBareIcon() ? this.iconSize : undefined)
+    .height(this.cylIsBareIcon() ? this.iconSize : undefined)
     .opacity(this.isItemEnabled ? 1 : 0.5)
     .constraintSize({ minHeight: this.isBare ? 0 : 44 })
     .hitTestBehavior(this.isBare ? HitTestMode.None : HitTestMode.Default)

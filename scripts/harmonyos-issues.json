@@ -451,11 +451,11 @@
   },
   {
     "id": 51,
-    "status": "TODO (recorded 2026-11-17 before the fix; screenshots and fix follow)",
+    "status": "DONE (harmonyos-tab-badge-top-left-before-after.png: top, before, the 8 / 99+ / NEW badges at the icons' top-left; bottom, after, at their top-right, badge center 10 px inside the icon's corner as the plus button's; both with badge animations off (CYL_BADGE_ANIMATION_DISABLED, local build only); harmonyos-tab-badge-animations-on.png: the normal build, animations on, 同城 tapped: its Lottie icon plays and the badges stay at the top-right; Mate 70 Pro emulator, HarmonyOS 6.0.1, API 21, 127.0.0.1:5559, 2026-11-18. Liquid Glass not checked separately: it uses the same tab icon Stack)",
     "scope": "CrossPlatform/harmonyos-cyltabbar (cylanimateditem, core)",
     "title": "Tab badges sit at the icon's top-left instead of its top-right since animated tab icons are drawn by CYLAnimatedItemView",
     "evidence": "Maintainer report 2026-11-17, verbatim: \"鸿蒙系统tabbaritem的badge坐标，预期是右上角现在变左上角了。排查原因\" (English: on HarmonyOS the tab bar item's badge should be at the top-right, it is now at the top-left; find the cause). Started with 760dfba2 (22:18), which draws Lottie, Rive and SVGA tab icons with CYLAnimatedItemView(isBare)",
     "cause": "CYLAnimatedItemView's root is a Flex without a width, and an ArkUI Flex fills its parent: in the tab item it is as wide as the tab slot, with the icon centred in it, so the tab's icon Stack becomes that wide; the badge is placed at anchorWidth + 2 from the Stack's left edge, which is now left of the centred icon",
-    "fix": "TODO"
+    "fix": "Core fix in CYLAnimatedItemView (cylanimateditem, published to ohpm), not in the tab bar or the example: a bare item that shows only an icon (no title, no accessory) now has the icon's width and height, so a host can place things against the icon's edges; every other item keeps its default size (`undefined`). Measured with uitest dumpLayout: badge center vs icon top-right dx -96 px before, -10 px after, as the plus button"
   }
 ]
