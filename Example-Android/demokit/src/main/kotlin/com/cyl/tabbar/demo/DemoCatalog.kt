@@ -71,6 +71,9 @@ object DemoCatalog {
                     { "Every scene is a tab bar built with the public API: styles, animations, badges, Lottie and the newer tab API" }) {
                     startActivity(android.content.Intent(requireContext(), DemoGalleryActivity::class.java))
                 }))
+                sections += DemoSection("Animated item", listOf(DemoRow("CYLAnimatedItemView", { "The animated icon + title component on its own: GIF, Lottie, a missing file, an accessory and dragging" }) {
+                    startActivity(android.content.Intent(requireContext(), DemoAnimatedItemActivity::class.java))
+                }))
                 sections += DemoSection("Badges", badgeRows(page, maxOf(30, cyl_badgeStyleCount())))
             }
             MESSAGE -> {
