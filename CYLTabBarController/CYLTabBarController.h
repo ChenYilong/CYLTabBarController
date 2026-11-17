@@ -108,6 +108,14 @@
 #elif __has_include("CYLTabBarItemAnimationPlayableView.h")
 #import "CYLTabBarItemAnimationPlayableView.h"
 #endif
+// [CN] 动效 icon + title 控件（CYLAnimatedItem 子库，有该子库时才有此文件），伞头文件需要包含它。
+// [EN] The animated icon + title control (the CYLAnimatedItem subspec; the file exists only with it), which the umbrella
+//      header must include.
+#if __has_include("CYLAnimatedItem/CYLAnimatedItemView.h")
+#import "CYLAnimatedItem/CYLAnimatedItemView.h"
+#elif __has_include("CYLAnimatedItemView.h")
+#import "CYLAnimatedItemView.h"
+#endif
 #import "CYLPlusButton.h"
 #import "UIViewController+CYLTabBarControllerExtention.h"
 #import "UIViewController+CYLNavigationControllerExtention.h"
