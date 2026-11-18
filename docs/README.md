@@ -330,6 +330,9 @@ docs/
 │   ├── image-only-tabs-gallery-3-3-ios17.png
 │   ├── image-only-tabs-ios.png
 │   ├── inset-grouped-sections-demo-ios.png
+│   ├── ios-badge-breathe-not-under-icon.png
+│   ├── ios-badges-follow-swapped-animation-skin.png
+│   ├── ios-badges-on-animated-item-component.png
 │   ├── ios-flatdesign-animateditem-tab-ios26-4-a6e88609.png
 │   ├── ios-flatdesign-gif-no-image-under-animation-ios26-4-5ba3a089.png
 │   ├── ios-gif-image-rest-then-play.png
@@ -339,6 +342,7 @@ docs/
 │   ├── ios-rive-item-appearance-icon-title-tint.png
 │   ├── ios-rive-liquid-glass-item-appearance-plus-headroom.png
 │   ├── ios-rive-rest-then-play-bell.png
+│   ├── ios-rive-tab-badges-over-tinted-icons.png
 │   ├── ios-rive-tint-template.png
 │   ├── ios-rive-title-tint-light-dark.png
 │   ├── iphone-duo-example-rive-bottom-bar.png
