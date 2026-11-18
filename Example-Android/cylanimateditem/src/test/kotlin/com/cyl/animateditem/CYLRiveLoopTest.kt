@@ -126,20 +126,18 @@ class CYLRiveLoopTest {
         val rive = FakeRive(context, listOf(Machine("State Machine 1", emptyList())))
         val view = CYLRiveTabBarItemAnimationView(context, rive, mapOf("stateMachine" to "State Machine 1"))
         view.cyl_restUntilPlayed()
-        idle(CYLRiveTabBarItemAnimationView.FIRST_FRAME_MS + 10)
-        assertEquals("paused once its first frame is drawn", listOf("pause"), rive.calls)
+        assertEquals("paused at once, on its settled initial state, without waiting for a frame", listOf("pause"), rive.calls)
         view.cyl_playAnimationView()
         assertEquals("a play resumes only its state machine, then restarts it", listOf("pause", "play:State Machine 1", "reset", "play"), rive.calls)
     }
 
     @Test
-    fun aPlayBeforeTheFirstFrameKeepsItRunning() {
+    fun aFileLoadedAgainAfterAPlayKeepsRunning() {
         val rive = FakeRive(context, listOf(Machine("State Machine 1", emptyList())))
         val view = CYLRiveTabBarItemAnimationView(context, rive, mapOf("stateMachine" to "State Machine 1"))
-        view.cyl_restUntilPlayed()
         view.cyl_playAnimationView()
-        idle(CYLRiveTabBarItemAnimationView.FIRST_FRAME_MS + 10)
-        assertEquals(listOf("reset", "play"), rive.calls)
+        view.cyl_restUntilPlayed()
+        assertEquals("a played icon is not paused again by a later load", listOf("reset", "play"), rive.calls)
     }
 
     @Test
@@ -147,7 +145,6 @@ class CYLRiveLoopTest {
         val rive = FakeRive(context, listOf(Machine("State Machine", listOf("isOpen"))))
         val view = CYLRiveTabBarItemAnimationView(context, rive, mapOf("stateMachine" to "State Machine", "input" to "isOpen", "duration" to "0"))
         view.cyl_restUntilPlayed()
-        idle(CYLRiveTabBarItemAnimationView.FIRST_FRAME_MS + 10)
         view.cyl_playAnimationView(); idle(CYLRiveTabBarItemAnimationView.INPUT_OFF_MS + 10)
         view.cyl_playAnimationView(); idle(CYLRiveTabBarItemAnimationView.INPUT_OFF_MS + 10)
         assertEquals("menu_button.riv: resumed once, then every play toggles isOpen",

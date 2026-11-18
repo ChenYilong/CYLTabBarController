@@ -199,6 +199,7 @@ docs/
 ├── WeChat-Mini-Program.md
 ├── assets/
 │   ├── android-api37-20261118-rive-dark-mode-options.png
+│   ├── android-api37-20261118-rive-tint-at-0505042f.png
 │   ├── android-api37-20261118-rive-tint-title-and-dark-tint.png
 │   ├── android-liquid-glass-surface-000.png
 │   ├── android-liquid-glass-surface-040.png
@@ -207,6 +208,7 @@ docs/
 │   ├── android-more-than-five-tabs-report.png
 │   ├── android-playback-controls-pag-example-api35-b57c844.png
 │   ├── android-rive-menu-loop-pause-fix.png
+│   ├── android-rive-rest-same-frame-every-launch.png
 │   ├── animated-icons-demo-controls-request-android.jpg
 │   ├── animated-item-android-demo-interaction.png
 │   ├── animated-item-android-demo-page.png

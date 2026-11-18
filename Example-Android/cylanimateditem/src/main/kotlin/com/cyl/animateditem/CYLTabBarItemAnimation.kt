@@ -957,23 +957,26 @@ class CYLRiveTabBarItemAnimationView internal constructor(context: Context, priv
 
     /**
      * [EN] Rests on the first frame until the first play: a file whose state machine moves by itself (shapes.riv, truck.riv)
-     *      no longer runs from load. The machine is created (autoplay) so its inputs can be read, then paused once drawn.
+     *      no longer runs from load. The machine is created (autoplay) so its inputs can be read, then paused at once: called
+     *      right after the load, in the same main-thread step, while the machine still rests on its settled initial state
+     *      (rive-android builds the scene synchronously in `setRiveFile`). Every launch rests on the same frame, as on iOS;
+     *      the paused controller still draws that frame. It used to pause 100 ms later, on a frame that depended on the
+     *      device's speed (menu_button.riv on its X, check.riv further along, at 396d3fca).
      * [CN] 在第一次播放之前停在第一帧：状态机会自行运动的文件（shapes.riv、truck.riv）不再从加载起就运动。状态机先创建（autoplay）以便读取其输入，
-     *      绘制后再暂停。
+     *      然后立即暂停：在加载之后、同一个主线程步骤中调用，此时状态机仍停在已稳定的初始状态（rive-android 在 `setRiveFile` 中同步构建场景）。
+     *      每次启动都停在同一帧，与 iOS 一致；暂停的控制器仍会绘制这一帧。以前在 100 ms 后暂停，停在哪一帧取决于设备速度（396d3fca 时
+     *      menu_button.riv 停在 X 上，check.riv 进度更靠后）。
      */
     internal fun cyl_restUntilPlayed() {
-        handler.postDelayed({
-            if (!hasPlayed) {
-                // [EN] The file controller only: `RiveAnimationView.pause()` also stops the view's renderer, after which
-                //      the state machine no longer runs continuously (menu_button.riv crept one frame per input and never
-                //      reached its X on Android, dcbfdec6 and ad3dca0e). The fake view of the tests has no controller.
-                // [CN] 只暂停文件控制器：`RiveAnimationView.pause()` 还会停止视图的渲染器，之后状态机不再连续运行（Android 上
-                //      menu_button.riv 每次输入只前进一帧，始终到不了 X）。测试中的伪造视图没有控制器。
-                val controller = CYLReflection.call(rive, "getController")
-                if (controller != null) CYLReflection.call(controller, "pause") else CYLReflection.call(rive, "pause")
-                restingAfterLoad = true
-            }
-        }, FIRST_FRAME_MS)
+        if (hasPlayed) return
+        // [EN] The file controller only: `RiveAnimationView.pause()` also stops the view's renderer, after which the state
+        //      machine no longer runs continuously (menu_button.riv crept one frame per input and never reached its X on
+        //      Android, dcbfdec6 and ad3dca0e). The fake view of the tests has no controller.
+        // [CN] 只暂停文件控制器：`RiveAnimationView.pause()` 还会停止视图的渲染器，之后状态机不再连续运行（Android 上
+        //      menu_button.riv 每次输入只前进一帧，始终到不了 X）。测试中的伪造视图没有控制器。
+        val controller = CYLReflection.call(rive, "getController")
+        if (controller != null) CYLReflection.call(controller, "pause") else CYLReflection.call(rive, "pause")
+        restingAfterLoad = true
     }
     // [EN] A loop pass leaves a file that is still moving on its own alone (shapes.riv, truck.riv); only a play restarts it.
     // [CN] 一次循环不打断仍在自行运动的文件（shapes.riv、truck.riv）；只有播放才会重新开始它。
@@ -1264,10 +1267,6 @@ class CYLRiveTabBarItemAnimationView internal constructor(context: Context, priv
          * [EN] A held input's off time before it goes on again (outside a loop). [CN] 保持的输入重新打开前的关闭时间（循环之外）。
          */
         internal const val INPUT_OFF_MS = 150L
-        /**
-         * [EN] Time for the first frame to be drawn before a loaded file pauses. [CN] 加载的文件暂停前绘制第一帧的时间。
-         */
-        internal const val FIRST_FRAME_MS = 100L
     }
 
     object Provider : CYLTabBarItemAnimationViewProviding {
