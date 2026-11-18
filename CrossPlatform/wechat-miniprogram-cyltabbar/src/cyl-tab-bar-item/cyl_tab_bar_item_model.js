@@ -46,6 +46,17 @@ function cylTextStyle(attributes) {
 }
 
 /**
+ * [EN] The title color of text attributes ({color} / foregroundColor / NSForegroundColorAttributeName); '' without one.
+ * [CN] 文本属性中的标题颜色（{color} / foregroundColor / NSForegroundColorAttributeName）；没有时返回 ''。
+ */
+function cylTextColor(attributes) {
+  if (!attributes || typeof attributes !== 'object') {
+    return '';
+  }
+  return reader.cylColor(attributes.NSForegroundColorAttributeName || attributes.foregroundColor || attributes.color);
+}
+
+/**
  * [EN] The attributes for a state ("normal" / "selected", or UIControlState 0 / 4) from {normal, selected}.
  * [CN] 从 {normal, selected} 中取出某个状态（"normal" / "selected"，或 UIControlState 0 / 4）的属性。
  */
@@ -93,6 +104,14 @@ function cylItemModel(p) {
   const iconTint = reader.cylColor(appearance.iconColor) || reader.cylColor(selected ? p.selectedIconTint : p.iconTint);
   const titleAttributes = (p.titleTextAttributes && p.titleTextAttributes[stateKey])
     || (selected && p.titleTextAttributes && p.titleTextAttributes.normal) || null;
+  // [EN] The animation's one color (the `tint` option): "title" takes this state's title color (the appearance's, then
+  //      the title attributes'), like iOS and HarmonyOS; a color is used as it is; '' keeps the file's colors.
+  // [CN] 动画的单一颜色（`tint` 选项）："title" 取当前状态的标题颜色（先取 appearance，再取标题属性），与 iOS 和鸿蒙一致；
+  //      颜色原样使用；'' 保持文件自身的颜色。
+  const tintOption = String(p.animationTint || '').trim();
+  const animationTint = tintOption.toLowerCase() === 'title'
+    ? (cylTextColor(appearance.titleTextAttributes) || cylTextColor(titleAttributes))
+    : reader.cylColor(tintOption);
   const badgeAttributes = (p.badgeTextAttributes && p.badgeTextAttributes[stateKey])
     || (selected && p.badgeTextAttributes && p.badgeTextAttributes.normal) || null;
   const badgeValue = String(p.badgeValue === undefined || p.badgeValue === null ? '' : p.badgeValue);
@@ -108,6 +127,7 @@ function cylItemModel(p) {
     animationPath,
     animationType: cylAnimationType(animationPath),
     iconTint,
+    animationTint,
     iconWidth: iconBox.width,
     iconHeight: iconBox.height,
     centered,

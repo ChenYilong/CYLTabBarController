@@ -388,6 +388,33 @@ function cylAnimationFragment(route, extra) {
 }
 
 /**
+ * [EN] A "name=value&…" fragment as an object (values decoded); {} for ''.
+ * [CN] 把 "name=value&…" fragment 转为对象（值已解码）；'' 时返回 {}。
+ */
+function cylFragmentOptions(fragment) {
+  const options = {}
+  String(fragment || '').split('&').forEach((pair) => {
+    const [key, value] = pair.split('=')
+    if (key && value !== undefined) {
+      options[key] = decodeURIComponent(value)
+    }
+  })
+  return options
+}
+
+/**
+ * [EN] A `tint` option: "title" (when allowed) or a color as cylColor reads it; '' otherwise.
+ * [CN] `tint` 选项："title"（允许时）或 cylColor 能读取的颜色；否则返回 ''。
+ */
+function cylTintOption(value, allowsTitle) {
+  const text = String(value === undefined || value === null ? '' : value).trim()
+  if (allowsTitle && text.toLowerCase() === 'title') {
+    return 'title'
+  }
+  return cylColor(text) || ''
+}
+
+/**
  * [EN] The animated icon of one library: its own keys (CYLTabBar<Library>URL / FilePath / DarkURL / DarkFilePath /
  *      Size / DarkColors; Lottie also LoopsWhenUnselected), then the generic CYLTabBarAnimation… keys whose file has
  *      the library's file type.
@@ -410,8 +437,17 @@ function cylAnimationIcon(attributes, environment, library, pattern) {
   //      与 iOS 的 CYLTabBarAnimationURLWithOptions() 写入方式相同；CYLTabBarAnimationOptions 会补充这些选项。
   const route = [own('URL'), own('FilePath'), generic].find((value) => typeof value === 'string' && value.trim() !== '') || ''
   const fragment = cylAnimationFragment(route, attributes.CYLTabBarAnimationOptions)
+  // [EN] `tint` ("title" or a color) and `darkTint` (a color for a dark bar), from the fragment or CYLTabBarAnimationOptions,
+  //      as on iOS (CYLTabBarAnimationOptionTint) and HarmonyOS; cyl-tab-bar-item resolves "title" per state.
+  // [CN] `tint`（"title" 或颜色）与 `darkTint`（深色 TabBar 的颜色），来自 fragment 或 CYLTabBarAnimationOptions，与 iOS
+  //      （CYLTabBarAnimationOptionTint）和鸿蒙一致；"title" 由 cyl-tab-bar-item 按状态解析。
+  const tintOptions = cylFragmentOptions(fragment)
+  const tint = cylTintOption(tintOptions.tint, true)
+  const darkTint = cylTintOption(tintOptions.darkTint, false)
   return {
     library: library.toLowerCase(),
+    tint,
+    darkTint,
     path: library === 'Rive' && fragment ? `${path}#${fragment}` : path,
     darkPath: cylAnimationPath(own('DarkURL'), environment) || cylAnimationPath(own('DarkFilePath'), environment)
       || cylAnimationPath(genericDark, environment),

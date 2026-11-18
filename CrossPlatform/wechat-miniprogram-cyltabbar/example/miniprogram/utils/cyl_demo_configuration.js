@@ -202,7 +202,9 @@ function cylDemoRiveItems(items, files) {
   return items.map((attributes) => {
     const artboard = CYL_DEMO_RIVE[attributes.CYLTabBarItemIdentifier];
     return artboard ? Object.assign({}, attributes, {
-      CYLTabBarRiveFilePath: `${files[0]}#artboard=${artboard}&stateMachine=${artboard}_Interactivity&input=active`,
+      // [EN] tint=title: the white strokes take each state's title color, on light and dark bars (as iOS Example-Rive).
+      // [CN] tint=title：白色线条取每个状态的标题颜色，浅色与深色 TabBar 均可（与 iOS Example-Rive 一致）。
+      CYLTabBarRiveFilePath: `${files[0]}#artboard=${artboard}&stateMachine=${artboard}_Interactivity&input=active&tint=title`,
       CYLTabBarRiveSize: '{32, 32}',
     }) : attributes;
   });

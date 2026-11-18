@@ -370,6 +370,8 @@ Component({
         animationSize: lottie ? `{${lottie.width}, ${lottie.height}}` : null,
         animationColors: lottie ? ((isDarkBar && lottie.darkColors) || lottie.colors) : null,
         loopsWhenUnselected: Boolean(lottie && lottie.loopsWhenUnselected),
+        // [EN] The `tint` option; a dark bar takes `darkTint` when set. [CN] `tint` 选项；深色 TabBar 有 `darkTint` 时用它。
+        animationTint: lottie ? ((isDarkBar && lottie.darkTint) || lottie.tint || '') : '',
         imageSize: item.imageSize ? `{${item.imageSize.width}, ${item.imageSize.height}}` : null,
         imageInsets: item.imageInsets,
         titlePositionAdjustment: item.titleOffset,

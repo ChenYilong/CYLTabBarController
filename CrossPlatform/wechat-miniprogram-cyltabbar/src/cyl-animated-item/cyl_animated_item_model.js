@@ -156,6 +156,8 @@ function cylAnimatedItemModel(p) {
     iconStyle: `width: ${iconWidth}px; height: ${iconHeight}px;`,
     // [EN] A tint applies to the static image only; an animation keeps its own colors. [CN] 着色只作用于静态图片。
     iconTint: p.iconTint || '',
+    // [EN] The animation's one color (cyl-rive `tint`). [CN] 动画的单一颜色（cyl-rive 的 `tint`）。
+    animationTint: String(p.animationTint || '').trim(),
     axisClass: (p.axis === 'vertical' ? 'cyl-animated-item-vertical' : 'cyl-animated-item-horizontal') + (p.embedded ? ' cyl-animated-item-embedded' : ''),
     ariaHidden: !!p.embedded,
     accessoryPlacement: ['leading', 'trailing', 'topTrailing'].includes(p.accessoryPlacement) ? p.accessoryPlacement : 'trailing',

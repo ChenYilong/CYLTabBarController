@@ -228,3 +228,9 @@ test('title dark color follows userInterfaceStyle and the system theme', () => {
   assert.equal(model({ title: 'A', titleColor: '#333333', systemTheme: 'dark' }).titleStyle, 'color: #333333;')
   assert.equal(model({ title: 'A', titleDarkColor: '#EEEEEE', systemTheme: 'light' }).titleStyle, '')
 })
+
+test('animationTint passes to the Rive engine as one color', () => {
+  const { cylAnimatedItemModel: model } = require('../src/cyl-animated-item/cyl_animated_item_model')
+  assert.equal(model({ animationUrl: 'a.riv', animationTint: ' #007AFF ' }).animationTint, '#007AFF')
+  assert.equal(model({ animationUrl: 'a.riv' }).animationTint, '')
+})

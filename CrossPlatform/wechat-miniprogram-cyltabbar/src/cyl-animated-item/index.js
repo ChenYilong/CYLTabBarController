@@ -96,6 +96,13 @@ Component({
     colors: { type: Object, value: null },
     iconTint: { type: String, value: '' },
     /**
+     * [EN] One color for the animation (any CSS color), like a template image: Rive draws every pixel in it. '' keeps the
+     *      file's colors. Rive only for now; other engines keep their colors.
+     * [CN] 动画使用的一种颜色（任意 CSS 颜色），如同模板图片：Rive 把每个像素绘制为该颜色。'' 保持文件自身的颜色。
+     *      目前仅支持 Rive；其他引擎保持自身颜色。
+     */
+    animationTint: { type: String, value: '' },
+    /**
      * [EN] The title's color (any CSS color); '' keeps the inherited color.
      * [CN] 标题颜色（任意 CSS 颜色）；'' 时沿用继承的颜色。
      */
@@ -174,7 +181,7 @@ Component({
       this.setData({ animationLoaded: false, animationFailed: false, gifPlaying: false, lottieData })
       this.cyl_update()
     },
-    'title, image, selectedImage, placeholderImage, embedded, enabled, axis, iconSize, accessoryImage, accessoryText, accessoryAccessibilityLabel, accessoryPlacement, accessibilityLabel, gifFirstFrame, gifLastFrame, iconWidth, iconHeight, iconTint, titleColor, titleFontSize, titleFontWeight, titleDarkColor, userInterfaceStyle, titleLines, titleLineHeight, titleSpacing': function () {
+    'title, image, selectedImage, placeholderImage, embedded, enabled, axis, iconSize, accessoryImage, accessoryText, accessoryAccessibilityLabel, accessoryPlacement, accessibilityLabel, gifFirstFrame, gifLastFrame, iconWidth, iconHeight, iconTint, animationTint, titleColor, titleFontSize, titleFontWeight, titleDarkColor, userInterfaceStyle, titleLines, titleLineHeight, titleSpacing': function () {
       this.cyl_update()
     },
     'selected, restingProgress': function () {

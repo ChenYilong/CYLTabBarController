@@ -90,3 +90,14 @@ test('cyl-tab-bar-item: the icon box size goes to cyl-animated-item (iconWidth /
   assert.equal(plain.iconWidth, 28)
   assert.equal(plain.iconHeight, 28)
 })
+
+test('animation tint: "title" takes the state title color, a color stays, anything else is none', () => {
+  const titleTextAttributes = { normal: { color: '#8E8E93' }, selected: { color: '#007AFF' } };
+  assert.equal(cylItemModel({ animationTint: 'title', titleTextAttributes }).animationTint, '#8E8E93');
+  assert.equal(cylItemModel({ animationTint: 'title', titleTextAttributes, selected: true }).animationTint, '#007AFF');
+  assert.equal(cylItemModel({ animationTint: 'Title', titleTextAttributes, selected: true,
+    standardAppearance: { stackedLayoutAppearance: { selected: { titleTextAttributes: { color: '#FF3B30' } } } } }).animationTint, '#FF3B30');
+  assert.equal(cylItemModel({ animationTint: '#34C759', titleTextAttributes, selected: true }).animationTint, '#34C759');
+  assert.equal(cylItemModel({ animationTint: 'red', titleTextAttributes }).animationTint, '');
+  assert.equal(cylItemModel({ titleTextAttributes }).animationTint, '');
+});

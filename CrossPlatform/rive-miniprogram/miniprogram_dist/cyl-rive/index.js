@@ -168,6 +168,13 @@ Component({
     restingFrame: { type: String, value: 'first' },
     fit: { type: String, value: 'contain' },
     label: { type: String, value: '' },
+    /**
+     * [EN] One color for the whole drawing (any CSS color), like a template image tinted on iOS: every drawn pixel takes
+     *      it and keeps its alpha. '' keeps the file's own colors. cyl-tab-bar-item sets it from the `tint` option.
+     * [CN] 整个画面使用一种颜色（任意 CSS 颜色），如同 iOS 上着色的模板图片：每个已绘制的像素取该颜色并保留透明度。
+     *      '' 保持文件自身的颜色。cyl-tab-bar-item 根据 `tint` 选项设置它。
+     */
+    tint: { type: String, value: '' },
     /** [EN] The package path of rive.wasm.br. [CN] rive.wasm.br 的包内路径。 */
     wasmPath: { type: String, value: CYL_DEFAULT_WASM },
   },
@@ -436,10 +443,32 @@ Component({
       artboard.draw(renderer)
       renderer.restore()
       rive.resolveAnimationFrame()
+      this.cyl_applyTint(canvas)
       if (CYL_USES_SNAPSHOTS && Date.now() - (this.cylSnapshotAt || 0) >= CYL_SNAPSHOT_INTERVAL_MS) {
         this.cyl_captureSnapshot()
       }
       this.cyl_scheduleFrame()
+    },
+
+    /**
+     * [EN] Paints `tint` over the drawn pixels only (source-atop keeps their alpha), after Rive flushed the frame.
+     * [CN] 在 Rive 提交本帧后，只在已绘制的像素上涂 `tint`（source-atop 保留其透明度）。
+     */
+    cyl_applyTint(canvas) {
+      const tint = String(this.data.tint || '').trim()
+      if (!tint || typeof canvas.getContext !== 'function') {
+        return
+      }
+      const context = canvas.getContext('2d')
+      if (!context) {
+        return
+      }
+      context.save()
+      context.setTransform(1, 0, 0, 1, 0, 0)
+      context.globalCompositeOperation = 'source-atop'
+      context.fillStyle = tint
+      context.fillRect(0, 0, canvas.width, canvas.height)
+      context.restore()
     },
 
     /** [EN] Reads the canvas into the <image> (WeChat DevTools only). [CN] 把画布内容读入 <image>（仅微信开发者工具）。 */

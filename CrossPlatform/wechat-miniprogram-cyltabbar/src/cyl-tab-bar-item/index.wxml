@@ -24,6 +24,7 @@
       icon-width="{{m.iconWidth}}"
       icon-height="{{m.iconHeight}}"
       icon-tint="{{m.iconTint}}"
+      animation-tint="{{m.animationTint}}"
       colors="{{animationColors}}"
       loop="{{animationLoop || (!m.selected && loopsWhenUnselected)}}"
       speed="{{animationSpeed}}"
