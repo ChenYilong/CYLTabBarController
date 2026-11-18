@@ -342,7 +342,7 @@ docs/
 │   ├── ios-badges-on-animated-item-component.png
 │   ├── ios-flatdesign-animateditem-tab-ios26-4-a6e88609.png
 │   ├── ios-flatdesign-gif-no-image-under-animation-ios26-4-5ba3a089.png
-│   ├── ios-flatdesign-svga-selected-icon-missing.png
+│   ├── ios-flatdesign-svga-selected-icon-fixed.png
 │   ├── ios-gif-image-rest-then-play.png
 │   ├── ios-gif-svga-tint-option.png
 │   ├── ios-playback-controls-message-tab-iphone17pro-ios26.1-dc04439.png
