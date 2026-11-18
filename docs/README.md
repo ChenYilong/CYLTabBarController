@@ -361,6 +361,7 @@ docs/
 │   ├── ios-gif-image-rest-then-play.png
 │   ├── ios-gif-svga-tint-option.png
 │   ├── ios-lottie-pag-tint-option.png
+│   ├── ios-lottie4-tint-option.png
 │   ├── ios-playback-controls-message-tab-iphone17pro-ios26.1-dc04439.png
 │   ├── ios-rive-dark-tint-appearance-switch.png
 │   ├── ios-rive-flatdesign-item-appearance.png
