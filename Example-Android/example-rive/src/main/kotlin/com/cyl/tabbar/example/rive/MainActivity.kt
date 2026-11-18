@@ -36,7 +36,7 @@ enum class CourseTab(val artboard: String, val stateMachine: String, val icon: I
                 CYLConstants.CYLTabBarAnimationOptionRiveArtboard to artboard,
                 CYLConstants.CYLTabBarAnimationOptionRiveStateMachine to stateMachine,
                 CYLConstants.CYLTabBarAnimationOptionRiveInput to "active",
-            )),
+            ) + (if (CourseAppearance.followsSystem) mapOf(CYLConstants.CYLTabBarAnimationOptionTint to "title") else emptyMap())),
             CYLConstants.CYLTabBarRiveSize to "{32, 32}",
         )
 
@@ -60,6 +60,17 @@ object CourseColors {
 }
 
 /**
+ * [EN] iOS `-CYLDemoRiveFollowsAppearance YES` (the boolean extra `CYLDemoRiveFollowsAppearance`): the course follows the
+ *      system light / dark mode instead of forcing dark, and every Rive icon takes its title color (`tint` "title"): label
+ *      colors when unselected, system blue when selected, as iOS Example-Rive's per-state item appearance (0dc6d1c4).
+ * [CN] iOS `-CYLDemoRiveFollowsAppearance YES`（布尔 extra `CYLDemoRiveFollowsAppearance`）：课程跟随系统浅色 / 深色，而不是强制深色；每个 Rive 图标
+ *      使用其标题颜色（`tint` "title"）：未选中为 label 颜色，选中为系统蓝，与 iOS Example-Rive 的分状态外观（0dc6d1c4）相同。
+ */
+object CourseAppearance {
+    var followsSystem = false
+}
+
+/**
  * [EN] The Android port of Example-Rive (iOS `SceneDelegate` + `RiveTabBarController` + `CourseTabBarController`): a dark
  *      tab bar with white tints, Rive tab icons, the "Start" plus button, the shared plus button badge, and the Grapefruit
  *      skin swapping the icons of "Chat" and "User" in place (#216).
@@ -72,9 +83,17 @@ class MainActivity : DemoTabBarActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         // [EN] `CourseTabBarController`: `overrideUserInterfaceStyle = .dark`, the course is dark. [CN] `CourseTabBarController`：`overrideUserInterfaceStyle = .dark`，课程为深色。
-        delegate.localNightMode = androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_YES
+        CourseAppearance.followsSystem = intent.getBooleanExtra("CYLDemoRiveFollowsAppearance", false)
+        delegate.localNightMode = if (CourseAppearance.followsSystem) androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+            else androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_YES
         super.onCreate(savedInstanceState)
         CYLThemeManager.defaultManager.addListener(themeListener)
+    }
+
+    /** [EN] A live light / dark switch (the manifest handles uiMode): the tints follow it. [CN] 运行中切换浅色 / 深色（清单处理 uiMode）：着色随之变化。 */
+    override fun onConfigurationChanged(newConfig: android.content.res.Configuration) {
+        super.onConfigurationChanged(newConfig)
+        if (CourseAppearance.followsSystem) tabBarController?.applyCourseAppearance()
     }
 
     override fun onDestroy() {
@@ -100,6 +119,16 @@ class MainActivity : DemoTabBarActivity() {
 
     /** [EN] `applyCourseTabBarAppearance()`: dark, translucent, white tints. [CN] 深色、半透明、白色强调色。 */
     private fun CYLTabBarController.applyCourseAppearance() {
+        if (CourseAppearance.followsSystem) {
+            // [EN] iOS: normal icon and title `.label`, selected `.systemBlue` (dynamic colors). [CN] iOS：未选中为 `.label`，选中为 `.systemBlue`（动态颜色）。
+            val night = (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) == android.content.res.Configuration.UI_MODE_NIGHT_YES
+            val label = if (night) Color.WHITE else Color.BLACK
+            cyl_tabBarBackgroundColor = if (night) Color.argb(204, 0x17, 0x20, 0x3A) else Color.argb(235, 0xF9, 0xF9, 0xF9)
+            cyl_tabBarItemTitleColor = label
+            cyl_tabBarItemImageColor = label
+            setTintColor(if (night) Color.rgb(0x0A, 0x84, 0xFF) else Color.rgb(0x00, 0x7A, 0xFF))
+            return
+        }
         cyl_tabBarBackgroundColor = Color.argb(204, 0x17, 0x20, 0x3A)
         cyl_tabBarItemTitleColor = Color.argb(153, 255, 255, 255)
         cyl_tabBarItemImageColor = Color.argb(153, 255, 255, 255)
