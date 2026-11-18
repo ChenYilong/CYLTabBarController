@@ -6173,6 +6173,8 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
         CGSize lottieSize = [lottieSizeValue CGSizeValue];
         [control cyl_addTabBarItemAnimationWithURL:lottieURL size:lottieSize contentMode:self.tabBarItemAnimationViewContentMode animationSpeed:self.tabBarItemAnimationSpeed];
         [control cyl_setTabBarItemAnimationLoops:self.tabBarItemAnimationLoops];
+        // [EN] A view added after layout (React Native) gets its tint at once. [CN] 布局之后添加的视图（React Native）立即获得着色。
+        [self cyl_setNeedsApplyTabBarItemAnimationTintColors];
         if (animation) {
             // Library-neutral (#604): any animation library (Lottie, PAG). 与动画库无关：任意动画库（Lottie、PAG）。
             [self.cyl_tabBar cyl_playTabBarItemAnimationWithSelectedControl:control URL:lottieURL size:lottieSize defaultSelected:defaultSelected contentMode:self.tabBarItemAnimationViewContentMode];
@@ -6247,6 +6249,8 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
     CGSize lottieSize = [lottieSizeValue CGSizeValue];
     [control cyl_addTabBarItemAnimationWithURL:lottieURL size:lottieSize contentMode:self.tabBarItemAnimationViewContentMode animationSpeed:self.tabBarItemAnimationSpeed];
     [control cyl_setTabBarItemAnimationLoops:self.tabBarItemAnimationLoops];
+    // [EN] A view added after layout (React Native) gets its tint at once. [CN] 布局之后添加的视图（React Native）立即获得着色。
+    [self cyl_setNeedsApplyTabBarItemAnimationTintColors];
     
     if (![self.cyl_tabBar isKindOfClass:[CYLTabBar class]]) {
         return;
