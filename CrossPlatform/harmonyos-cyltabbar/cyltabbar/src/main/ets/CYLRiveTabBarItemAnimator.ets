@@ -34,6 +34,22 @@ export const CYLTabBarRiveDarkURL: string = 'CYLTabBarRiveDarkURL';
  */
 export const CYLTabBarRiveDarkFilePath: string = 'CYLTabBarRiveDarkFilePath';
 /**
+ * [EN] `CYLTabBarAnimationOptionTint`: draws a tab's animation (any engine) in one color, like a tinted template image:
+ *      "title" = the tab's title color for its state (selected / normal), or a fixed "#RRGGBB" / "#AARRGGBB", as on iOS
+ *      and Android. In the animation path's query, e.g. "rive/icons.riv?artboard=CHAT&tint=title".
+ * [CN] 以单一颜色绘制 Tab 的动画（任何引擎），与着色的模板图片一致："title" = Tab 当前状态（选中 / 普通）的标题颜色，或固定的
+ *      "#RRGGBB" / "#AARRGGBB"，与 iOS、Android 相同。写在动画路径的查询参数中。
+ */
+export const CYLTabBarAnimationOptionTint: string = 'tint';
+/**
+ * [EN] `CYLTabBarAnimationOptionDarkTint`: the fixed tint in dark mode ("title" already follows the title colors).
+ * [CN] 深色模式下的固定着色（"title" 已跟随标题颜色）。
+ */
+export const CYLTabBarAnimationOptionDarkTint: string = 'darkTint';
+/** [EN] The "title" value of `CYLTabBarAnimationOptionTint`. [CN] `CYLTabBarAnimationOptionTint` 的 "title" 值。 */
+export const CYLTabBarAnimationTintTitle: string = 'title';
+
+/**
  * [EN] `CYLTabBarAnimationOptionRiveArtboard`: the artboard. [CN] 画板。
  */
 export const CYLTabBarAnimationOptionRiveArtboard: string = 'artboard';

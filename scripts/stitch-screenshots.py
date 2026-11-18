@@ -94,7 +94,8 @@ def band(text, width, font_size, path):
     run(['ffmpeg', '-v', 'error', '-y', '-f', 'lavfi', '-i', f'color=c={BACKGROUND}:s={width}x{height}:d=1',
          '-frames:v', '1', '-vf',
          f"drawtext=fontfile='{filter_path(FONT)}':textfile='{filter_path(text_file)}':fontcolor={TEXT_COLOR}:fontsize={font_size}"
-         f':line_spacing={line_height - font_size}:x={margin}:y={margin}', path])
+         # [EN] expansion=none: a "%" in a label (e.g. "%23" in a URL) is drawn as is, not taken as a drawtext expansion.
+         f':line_spacing={line_height - font_size}:x={margin}:y={margin}:expansion=none', path])
     return path
 
 

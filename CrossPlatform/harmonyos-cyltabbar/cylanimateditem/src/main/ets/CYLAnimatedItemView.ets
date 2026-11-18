@@ -271,6 +271,14 @@ export struct CYLAnimatedItemView {
    */
   @Prop iconColor: ResourceColor = '';
   /**
+   * [EN] The color the animation is drawn in, as one color, like a tinted template image (iOS / Android
+   *      `CYLTabBarAnimationOptionTint`); '' keeps the file's own colors. Any engine: a layer of this color is
+   *      composited "source atop" over the engine view, in its own offscreen group.
+   * [CN] 动画以单一颜色绘制时使用的颜色，与着色的模板图片一致（iOS / Android 的 `CYLTabBarAnimationOptionTint`）；'' 保留文件自身的颜色。
+   *      适用于任何引擎：在引擎视图上方以 "source atop" 合成一层该颜色，位于独立的离屏组中。
+   */
+  @Prop animationTintColor: ResourceColor = '';
+  /**
    * [EN] The gap in vp between the icon and the title, and between an inline accessory and the rest (iOS `spacing`,
    *      Android `spacingDp`, the mini program's `titleSpacing`). Bug B21: it was declared but never read.
    * [CN] 图标与标题之间、行内附件与其余内容之间的间距（vp）（iOS `spacing`、Android `spacingDp`、小程序 `titleSpacing`）。问题 B21：此前声明了却从未使用。
@@ -430,6 +438,7 @@ export struct CYLAnimatedItemView {
           .accessibilityLevel('no')
       }
       if (this.cylMakesAnimation()) {
+        Stack() {
         Column() {
           // [EN] One object literal whose fields read state: ArkUI passes it by reference, so the engine view gets new
           //      values (selection, speed, loops, restarts) as they change; a context object alone is rendered once.
@@ -448,6 +457,22 @@ export struct CYLAnimatedItemView {
         }
         .width(this.iconSize)
         .height(this.iconSize)
+          if (this.animationTintColor !== '') {
+            // [EN] The tint: kept only where the animation draws (source atop). [CN] 着色：只保留动画绘制的区域（source atop）。
+            Column()
+              .width(this.iconSize)
+              .height(this.iconSize)
+              .backgroundColor(this.animationTintColor)
+              .blendMode(BlendMode.SRC_ATOP)
+              .hitTestBehavior(HitTestMode.Transparent)
+              .id('cyl-animated-item-tint')
+          }
+        }
+        .width(this.iconSize)
+        .height(this.iconSize)
+        // [EN] An offscreen group, so the tint only meets the animation, never what is behind the item.
+        // [CN] 离屏组，使着色只与动画合成，不影响条目背后的内容。
+        .blendMode(this.animationTintColor !== '' ? BlendMode.SRC_OVER : BlendMode.NONE, BlendApplyType.OFFSCREEN)
         .opacity(this.animationLoaded ? 1 : 0)
         .accessibilityLevel('no')
       }

@@ -6,7 +6,8 @@ import { CYLPlusButton, cyl_liquidGlassContentDy } from './CYLPlusButton';
 import { CYLBadge, CYLBadgeView } from './CYLBadge';
 import { CYLLottieIcon } from './CYLLottieIcon';
 import { CYLSVGAView } from './svga/CYLSVGAView';
-import { CYLRiveIcon, cylRiveIsSupported } from './CYLRiveTabBarItemAnimator';
+import { CYLRiveIcon, cylRiveIsSupported, cylRiveFileAndOptions, CYLTabBarAnimationOptionTint, CYLTabBarAnimationOptionDarkTint,
+  CYLTabBarAnimationTintTitle } from './CYLRiveTabBarItemAnimator';
 import { CYLAnimatedItemView, CYLAnimatedItemAnimationContext, CYLAnimatedItemEngines } from 'cylanimateditem';
 import { CYLLocalizedString, cyl_textOf } from './CYLLocalization';
 import { CYLTabButtonAnimation, CYLTabButtonProperty, CYLTabButtonView, CYLTabButtonViewImpl } from './CYLTabButtonAnimation';
@@ -1237,6 +1238,31 @@ export struct CYLTabBarController {
     return this.cylRivePath(index) ?? this.cylSVGAPath(index);
   }
 
+  /**
+   * [EN] The color a tab's animation is drawn in (`CYLTabBarAnimationOptionTint` in its path's query): "title" = the
+   *      tab's title color for its state; a fixed color, with `CYLTabBarAnimationOptionDarkTint` in dark mode; '' = the
+   *      file's own colors.
+   * [CN] Tab 动画的绘制颜色（路径查询参数中的 `CYLTabBarAnimationOptionTint`）："title" = Tab 当前状态的标题颜色；固定颜色，深色模式下使用
+   *      `CYLTabBarAnimationOptionDarkTint`；'' = 文件自身的颜色。
+   */
+  cylTabAnimationTint(index: number): ResourceColor {
+    const path = this.cylTabAnimationPath(index);
+    if (path === undefined) {
+      return '';
+    }
+    const options = cylRiveFileAndOptions(path)[1];
+    const tint = (options[CYLTabBarAnimationOptionTint] ?? '').trim();
+    if (tint.length === 0) {
+      return '';
+    }
+    if (tint === CYLTabBarAnimationTintTitle) {
+      const item = this.tabBarItemsAttributes[index];
+      return this.selectedIndex === index ? (item.selectedTitleColor ?? this.tintColor) : (item.titleColor ?? this.unselectedColor);
+    }
+    const dark = (options[CYLTabBarAnimationOptionDarkTint] ?? '').trim();
+    return this.colorMode === 'dark' && dark.length > 0 ? dark : tint;
+  }
+
   cylTabAnimationSize(index: number): number {
     const item = this.tabBarItemsAttributes[index];
     if (item.lottieFilePath !== undefined && item.gifFilePath === undefined && item.imageURL === undefined) {
@@ -1255,7 +1281,7 @@ export struct CYLTabBarController {
       && this.tabBarItemsAttributes[index].gifFilePath === undefined
       && this.tabBarItemsAttributes[index].imageURL === undefined) {
       CYLLottieIcon({
-        path: this.cylTabAnimationPath(index),
+        path: cylRiveFileAndOptions(this.cylTabAnimationPath(index) ?? '')[0],
         iconSize: this.cylTabAnimationSize(index),
         speed: context.speed,
         selected: this.selectedIndex === index,
@@ -1317,6 +1343,7 @@ export struct CYLTabBarController {
             animationUrl: this.cylTabAnimationPath(index),
             iconSize: this.cylTabAnimationSize(index),
             isItemSelected: this.selectedIndex === index,
+            animationTintColor: this.cylTabAnimationTint(index),
             // [EN] The playback goes through the component, which hands it to the engine in its context.
             // [CN] 播放设置经由组件传递，组件通过 context 交给引擎。
             animationSpeed: this.tabBarItemAnimationSpeed,

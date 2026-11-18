@@ -53,6 +53,7 @@ export {
 } from './src/main/ets/CYLFlatDesignTabBar';
 export { CYLColor } from './src/main/ets/CYLColor';
 export {
+  CYLTabBarAnimationOptionTint, CYLTabBarAnimationOptionDarkTint, CYLTabBarAnimationTintTitle,
   CYLRiveIcon, CYLTabBarRiveURL, CYLTabBarRiveFilePath, CYLTabBarRiveSize, CYLTabBarRiveDarkURL, CYLTabBarRiveDarkFilePath,
   CYLTabBarAnimationOptionRiveArtboard, CYLTabBarAnimationOptionRiveStateMachine, CYLTabBarAnimationOptionRiveActiveProperty,
   CYLTabBarAnimationOptionRiveActiveDuration, CYLTabBarAnimationOptionRiveTriggerProperty, CYLTabBarAnimationOptionRiveInput,
