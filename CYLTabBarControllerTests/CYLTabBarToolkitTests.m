@@ -165,9 +165,11 @@
     // [EN] In a window: a navigation controller outside one does not pop. [CN] 放入窗口：不在窗口中的导航控制器不会返回。
     UIWindow *window = [[UIWindow alloc] initWithFrame:CGRectMake(0, 0, 390, 844)];
     window.rootViewController = tabBarController;
-    window.hidden = NO;
+    [window makeKeyAndVisible];
+    [[NSRunLoop mainRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.2]];
     UINavigationController *navigationController = (UINavigationController *)tabBarController.viewControllers.firstObject;
     [navigationController pushViewController:[UIViewController new] animated:NO];
+    [[NSRunLoop mainRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.2]];
     XCTAssertEqual(navigationController.viewControllers.count, 2u);
     SEL selector = NSSelectorFromString(@"cyl_performReselectBehaviorForViewController:");
     XCTAssertTrue([tabBarController respondsToSelector:selector]);
@@ -177,7 +179,7 @@
     tabBarController.cyl_reselectBehavior = CYLTabBarReselectBehaviorPopToRoot;
     ((void (*)(id, SEL, id))[tabBarController methodForSelector:selector])(tabBarController, selector, navigationController);
     // [EN] An animated pop ends on a later run loop turn. [CN] 带动画的返回在之后的 runloop 中完成。
-    [[NSRunLoop mainRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.6]];
+    [[NSRunLoop mainRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:1.0]];
     XCTAssertEqual(navigationController.viewControllers.count, 1u);
 }
 
