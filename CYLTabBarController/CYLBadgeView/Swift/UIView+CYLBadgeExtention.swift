@@ -341,6 +341,9 @@ extension UIView {
 
     @objc(cyl_showBadgeValue:animationTypeValue:)
     public dynamic func cyl_showBadgeValue(_ value: String, animationTypeValue: NSNumber) {
+        if cyl_forwardBadgeToAnimatedItemIcon(#selector(UIView.cyl_showBadgeValue(_:animationTypeValue:)), value, animationTypeValue) {
+            return
+        }
         let generation = cyl_invalidatePendingBadgeValue()
         if cyl_shouldWaitForLayoutBeforeShowingBadgeValue(value) {
             cyl_showBadgeValue(value, animationTypeValue: animationTypeValue, afterLayoutWithGeneration: generation, attempt: 0)
@@ -486,6 +489,9 @@ extension UIView {
      */
     @objc(cyl_clearBadge)
     dynamic func cyl_clearBadge() {
+        if cyl_forwardBadgeToAnimatedItemIcon(#selector(UIView.cyl_clearBadge)) {
+            return
+        }
         cyl_invalidatePendingBadgeValue()
         cyl_badge?.cyl_setHidden(true)
         cyl_updateBadgeAccessibility()
@@ -493,6 +499,10 @@ extension UIView {
 
     @objc(cyl_isShowBadge)
     dynamic func cyl_isShowBadge() -> Bool {
+        // [EN] An animated item's badge is on its icon subview. [CN] 动效 item 的角标在其图标子视图上。
+        if let icon = cyl_animatedItemBadgeHost(), icon !== self {
+            return icon.cyl_isShowBadge()
+        }
         guard let badge = cyl_badge else {
             return false
         }
@@ -504,6 +514,9 @@ extension UIView {
      */
     @objc(cyl_resumeBadge)
     dynamic func cyl_resumeBadge() {
+        if cyl_forwardBadgeToAnimatedItemIcon(#selector(UIView.cyl_resumeBadge)) {
+            return
+        }
         if cyl_isPauseBadge() {
             cyl_badge?.cyl_setHidden(false)
             cyl_badgeEnvironmentDidChange()
@@ -512,6 +525,9 @@ extension UIView {
 
     @objc(cyl_isPauseBadge)
     dynamic func cyl_isPauseBadge() -> Bool {
+        if let icon = cyl_animatedItemBadgeHost(), icon !== self {
+            return icon.cyl_isPauseBadge()
+        }
         guard let badge = cyl_badge else {
             return false
         }
@@ -539,6 +555,22 @@ extension UIView {
      * [CN] 动效 item（`CYLAnimatedItemView`，所有动效格式播放所在的组件，包括扁平样式 Tab 按钮）的图标：其 `animationView` 显示时为它（任何引擎：
      *      GIF、Lottie、PAG、Rive、SVGA），否则为其 `imageView`（静态图片或占位图）。其他视图返回 nil。按类名查找组件，因此角标子库不依赖它。
      */
+    /**
+     * [EN] A badge message sent to an animated item itself (e.g. the badge subspec without Core, where `UIControl` does not
+     *      forward): sent on to its icon subview through the usual `-cyl_performSelector:withObject:withObject:`, so the badge
+     *      is added there. True when forwarded; false for any other view, and for the icon itself.
+     * [CN] 直接发给动效 item 的角标消息（例如没有 Core 的角标子库，此时 `UIControl` 不会转发）：通过常规的 `-cyl_performSelector:withObject:withObject:`
+     *      转发给其图标子视图，角标添加在那里。已转发时返回 true；其他视图及图标本身返回 false。
+     */
+    private func cyl_forwardBadgeToAnimatedItemIcon(_ selector: Selector, _ object1: Any? = nil, _ object2: Any? = nil) -> Bool {
+        guard let icon = cyl_animatedItemBadgeHost(), icon !== self else {
+            return false
+        }
+        icon.clipsToBounds = false
+        icon.cyl_perform(selector, with: object1, with: object2)
+        return true
+    }
+
     @objc(cyl_animatedItemBadgeHost)
     public func cyl_animatedItemBadgeHost() -> UIView? {
         guard let componentClass = NSClassFromString("CYLAnimatedItemView"), isKind(of: componentClass) else {
@@ -858,6 +890,9 @@ extension UIView {
      */
     @objc(cyl_refreshBadge)
     public dynamic func cyl_refreshBadge() {
+        if cyl_forwardBadgeToAnimatedItemIcon(#selector(UIView.cyl_refreshBadge)) {
+            return
+        }
         guard let badge = cyl_badge else {
             return
         }

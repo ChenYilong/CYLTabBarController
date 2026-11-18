@@ -662,6 +662,9 @@
     XCTAssertNotNil(badge, @"the badge is shown");
     XCTAssertTrue([badge isDescendantOfView:imageView], @"the badge is added to the icon subview, not to the item or an anchor: %@",
                   badge.superview);
+    XCTAssertTrue([item cyl_isShowBadge], @"the item reports the badge of its icon");
+    [item cyl_clearBadge];
+    XCTAssertFalse([item cyl_isShowBadge], @"clearing through the item clears the icon's badge");
     CGRect inItem = [badge convertRect:badge.bounds toView:item];
     CGRect icon = [imageView convertRect:imageView.bounds toView:item];
     XCTAssertTrue(CGRectIntersectsRect(CGRectInset(inItem, -4, -4), icon), @"the badge sits on the icon: %@ vs %@",
