@@ -311,7 +311,9 @@ extension UIControl {
         // [CN] 按类名判断：iOS 26 以前 `-cyl_isTabButton` 对所有 UIControl 都返回 YES。
         let className = NSStringFromClass(type(of: self))
         let isTabBarButton = className.contains("TabButton") || className.contains("TabBarButton")
-        if !isTabBarButton {
+        // [EN] An animated item, a tab or not: the badge goes on its icon subview itself (animation or image view), never on
+        //      the item or on an anchor. [CN] 动效 item（无论是否为 Tab）：角标直接放在其图标子视图（动画或图片视图）上，而不是 item 或锚点上。
+        if !isTabBarButton && cyl_animatedItemBadgeHost() == nil {
             return cyl_badgeAnchorViewAligned(to: actualBadgeSuperView)
         }
         if let actualBadgeSuperView {

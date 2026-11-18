@@ -649,8 +649,6 @@
     UIView *nonItem = [[UIView alloc] init];
     XCTAssertNil([nonItem cyl_animatedItemBadgeHost], @"other views are not animated items");
     [item cyl_showBadgeValue:@"3" animationType:CYLBadgeAnimationTypeNone];
-    // [EN] A control that is not a tab button puts its badge on an anchor aligned to the icon, maybe in its superview.
-    // [CN] 非 Tab 按钮的控件把角标放在与图标对齐的锚点上，锚点可能在其父视图中。
     UIView *badge = nil;
     NSMutableArray<UIView *> *queue = [NSMutableArray arrayWithObject:window];
     while (queue.count && !badge) {
@@ -662,6 +660,8 @@
         [queue addObjectsFromArray:view.subviews];
     }
     XCTAssertNotNil(badge, @"the badge is shown");
+    XCTAssertTrue([badge isDescendantOfView:imageView], @"the badge is added to the icon subview, not to the item or an anchor: %@",
+                  badge.superview);
     CGRect inItem = [badge convertRect:badge.bounds toView:item];
     CGRect icon = [imageView convertRect:imageView.bounds toView:item];
     XCTAssertTrue(CGRectIntersectsRect(CGRectInset(inItem, -4, -4), icon), @"the badge sits on the icon: %@ vs %@",
