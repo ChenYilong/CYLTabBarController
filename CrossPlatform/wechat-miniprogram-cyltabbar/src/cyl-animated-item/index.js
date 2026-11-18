@@ -148,6 +148,9 @@ Component({
     iconHeight: { type: Number, value: 0 },
     bare: { type: Boolean, value: false },
     accessibilityHidden: { type: Boolean, value: false },
+    // [EN] The role a screen reader announces: "button" (default) or "text" (a container's hint that takes no taps, e.g.
+    //      cyl-animated-item-stack). [CN] 读屏朗读的角色："button"（默认）或 "text"（容器中不接收点击的提示，例如 cyl-animated-item-stack）。
+    accessibilityRole: { type: String, value: 'button' },
   },
 
   data: {
