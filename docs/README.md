@@ -201,6 +201,7 @@ docs/
 │   ├── android-api37-20261118-rive-dark-mode-options.png
 │   ├── android-api37-20261118-rive-tint-at-0505042f.png
 │   ├── android-api37-20261118-rive-tint-title-and-dark-tint.png
+│   ├── android-api37-20261119-example-rive-live-uimode-switch.png
 │   ├── android-gif-decoder-frame-clock.png
 │   ├── android-gif-tint-option.png
 │   ├── android-liquid-glass-surface-000.png
