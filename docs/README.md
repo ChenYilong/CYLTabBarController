@@ -241,6 +241,7 @@ docs/
 │   ├── animated-item-harmonyos-spacing-before.png
 │   ├── animated-item-harmonyos-static-icon-color.png
 │   ├── animated-item-harmonyos-stack-view.png
+│   ├── android-animated-item-stack-view.png
 │   ├── animated-item-harmonyos-svga-retap-replay.png
 │   ├── animated-item-harmonyos-tabbar.jpeg
 │   ├── animated-item-harmonyos-tint-option.png
@@ -636,6 +637,7 @@ docs/
 │   ├── wechat-miniprogram-one-icon-layer-lottie-pag-rive-devtools-sdk3.17.6-e612393.png
 │   ├── wechat-miniprogram-rive-home-feed-one-layer-devtools-sdk3.17.6-e264ea2.png
 │   ├── wechat-miniprogram-rive-tint-title.png
+│   ├── wechat-miniprogram-animated-item-stack.png
 │   ├── wechat-miniprogram-scroll-icons-devtools-sdk3.17.6-88dd149.png
 │   ├── wechat-miniprogram-scroll-icons-still-images-devtools-sdk3.17.6-a157c97.png
 │   ├── wechat-miniprogram-two-icon-layers-user-1-devtools.jpg
