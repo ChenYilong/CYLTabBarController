@@ -115,6 +115,7 @@ typedef NS_ENUM(NSInteger, CYLSVGATabBarItemAnimationState) {
         return;
     }
     [self stepToFrame:0 andPlay:YES];
+    [self cyl_keepTintOverlayAboveDrawing];
 }
 
 - (void)cyl_showAnimationViewLastFrame {
@@ -123,6 +124,7 @@ typedef NS_ENUM(NSInteger, CYLSVGATabBarItemAnimationState) {
         return;
     }
     [self stepToFrame:self.videoItem.frames - 1 andPlay:NO];
+    [self cyl_keepTintOverlayAboveDrawing];
 }
 
 - (void)cyl_stopAnimationView {
@@ -131,6 +133,33 @@ typedef NS_ENUM(NSInteger, CYLSVGATabBarItemAnimationState) {
         return;
     }
     [self stepToFrame:0 andPlay:NO];
+    [self cyl_keepTintOverlayAboveDrawing];
+}
+
+/*!
+ * [EN] SVGAPlayer adds its drawing layer on top of its own layer each time it draws, which hid the `tint` overlay the engine
+ *      puts over the view (a layer composited "sourceAtop"): it goes back right above the drawing layer, sized to the view,
+ *      and nothing else moves (a badge keeps its place).
+ * [CN] SVGAPlayer 每次绘制都会把其绘制图层加到自身图层的最上方，遮住引擎放在视图上的 `tint` 叠加视图（以 "sourceAtop" 合成的图层）：把它放回绘制图层的正上方并与视图同尺寸，
+ *      其他内容位置不变（角标保持原位）。
+ */
+- (void)cyl_keepTintOverlayAboveDrawing {
+    CALayer *drawLayer = [self respondsToSelector:NSSelectorFromString(@"drawLayer")] ? [self valueForKey:@"drawLayer"] : nil;
+    if (!drawLayer || drawLayer.superlayer != self.layer) {
+        return;
+    }
+    for (CALayer *layer in self.layer.sublayers) {
+        if ([layer.name isEqualToString:@"CYLTabBarItemAnimationTintOverlay"]) {
+            layer.frame = self.bounds;
+            [self.layer insertSublayer:layer above:drawLayer];
+            return;
+        }
+    }
+}
+
+- (void)layoutSubviews {
+    [super layoutSubviews];
+    [self cyl_keepTintOverlayAboveDrawing];
 }
 
 @end

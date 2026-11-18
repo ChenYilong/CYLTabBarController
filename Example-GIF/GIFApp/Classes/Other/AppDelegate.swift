@@ -54,6 +54,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         items[2][CYLTabBarItemImageURL] = Bundle.main.url(forResource: "tab_fire", withExtension: "gif")
         items[2][CYLTabBarItemImageURLSize] = size
         // [EN] Tab 4 keeps its static images. [CN] 第 4 个 Tab 保持静态图片。
+        // [EN] `-CYLDemoAnimationTint YES`: the GIF tabs tinted like template images (`tint` option): tab 1 in its title's
+        //      colors ("title"), tab 2 in a fixed color with a Dark Mode one ("#1C1C1E" / `darkTint` "#FFFFFF").
+        // [CN] `-CYLDemoAnimationTint YES`：GIF Tab 像模板图片一样着色（`tint` 选项）：第 1 个 Tab 使用标题颜色（"title"），第 2 个 Tab 使用固定颜色及其深色模式
+        //      颜色（"#1C1C1E" / `darkTint` "#FFFFFF"）。
+        if UserDefaults.standard.bool(forKey: "CYLDemoAnimationTint") {
+            let rocket = Bundle.main.url(forResource: "tab_rocket", withExtension: "gif")
+            let star = Bundle.main.url(forResource: "tab_star", withExtension: "gif")
+            items[0][CYLTabBarGIFFilePath] = nil
+            items[0][CYLTabBarGIFURL] = CYLTabBarAnimationURLWithOptions(rocket, [.tint: "title"] as [CYLTabBarAnimationOption: String])
+            items[1][CYLTabBarAnimationFilePath] = nil
+            items[1][CYLTabBarAnimationURL] = CYLTabBarAnimationURLWithOptions(star, [.tint: "#1C1C1E", .darkTint: "#FFFFFF"] as [CYLTabBarAnimationOption: String])
+        }
         DemoPlusButton.register()
         return MainTabBarController(viewControllers: viewControllers(), tabBarItemsAttributes: items, styleType: CYLDemoTabBarStyle.styleType, context: nil)
     }

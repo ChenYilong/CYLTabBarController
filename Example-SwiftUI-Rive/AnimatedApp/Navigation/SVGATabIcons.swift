@@ -79,7 +79,11 @@ extension Tab {
         var attributes = self.attributes
         attributes[CYLTabBarRiveURL] = nil
         attributes[CYLTabBarRiveSize] = nil
-        attributes[CYLTabBarSVGAURL] = Bundle.main.url(forResource: svgaFileName, withExtension: "svga")
+        let url = Bundle.main.url(forResource: svgaFileName, withExtension: "svga")
+        // [EN] `-CYLDemoRiveFollowsAppearance YES`: SVGA (no tint API) tinted in its title's colors through the shared overlay.
+        // [CN] `-CYLDemoRiveFollowsAppearance YES`：SVGA（没有着色 API）通过共用的叠加图层使用标题颜色着色。
+        attributes[CYLTabBarSVGAURL] = UserDefaults.standard.bool(forKey: "CYLDemoRiveFollowsAppearance")
+            ? CYLTabBarAnimationURLWithOptions(url, [.tint: "title"] as [CYLTabBarAnimationOption: String]) : url
         attributes[CYLTabBarSVGASize] = NSValue(cgSize: CGSize(width: 32, height: 32))
         return attributes
     }
