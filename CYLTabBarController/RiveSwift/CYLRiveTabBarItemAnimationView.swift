@@ -271,7 +271,7 @@ public final class CYLRiveTabBarItemAnimationView: UIView, CYLTabBarItemAnimatio
         // [EN] The tab button describes itself to VoiceOver. [CN] 由 Tab 按钮向 VoiceOver 描述自己。
         accessibilityElementsHidden = true
         load()
-        if configuration.darkViewModelInstanceName != nil || configuration.fixedTintColor != nil {
+        if configuration.darkViewModelInstanceName != nil || configuration.fixedTintColor != nil || configuration.tintFollowsTitle {
             if #available(iOS 17.0, *) {
                 registerForTraitChanges([UITraitUserInterfaceStyle.self]) { (view: CYLRiveTabBarItemAnimationView, _: UITraitCollection) in
                     view.appearanceDidChange()
@@ -299,6 +299,9 @@ public final class CYLRiveTabBarItemAnimationView: UIView, CYLTabBarItemAnimatio
         }
         if let fixed = configuration.fixedTintColor {
             tintOverlay.apply(fixed, in: self)
+        } else if configuration.tintFollowsTitle, let titleTintColor {
+            // [EN] A dynamic title color, resolved again with this view's new appearance. [CN] 动态标题颜色，按本视图的新外观重新解析。
+            tintOverlay.apply(titleTintColor, in: self)
         }
         bindThemeInstance()
     }

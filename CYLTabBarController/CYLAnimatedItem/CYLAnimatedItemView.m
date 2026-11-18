@@ -36,6 +36,8 @@ static const CGFloat CYLAnimatedItemDefaultAnimationSide = 24;
 @property (nonatomic, strong, readwrite) UIPanGestureRecognizer *panGestureRecognizer;
 @property (nonatomic, strong, nullable) NSTimer *loopTimer;
 @property (nonatomic, assign) BOOL playing;
+/// [EN] The icon tint applied last (`-applyIconTintColor:`), given again to a new animation view. [CN] 最近应用的图标着色，再次交给新的动画视图。
+@property (nonatomic, strong, nullable) UIColor *cyl_iconTintColor;
 @end
 
 #if CYL_ANIMATION_ENGINE_AVAILABLE
@@ -208,7 +210,7 @@ static BOOL CYLAnimatedItemLocalFileIsMissing(NSURL *URL) {
     self.imageView.image = icon;
     self.imageView.hidden = [self cyl_animationShows];
     // [EN] A new animation view or icon takes the current icon tint. [CN] 新的动画视图或图标使用当前的图标着色。
-    UIColor *iconColor = self.currentItemStateAppearance.iconColor;
+    UIColor *iconColor = self.currentItemStateAppearance.iconColor ?: self.cyl_iconTintColor;
     if (iconColor) {
         [self applyIconTintColor:iconColor];
     }
@@ -447,6 +449,7 @@ static BOOL CYLAnimatedItemLocalFileIsMissing(NSURL *URL) {
 }
 
 - (void)applyIconTintColor:(UIColor *)color {
+    self.cyl_iconTintColor = color;
     self.imageView.tintColor = color;
 #if CYL_ANIMATION_ENGINE_AVAILABLE
     // [EN] By selector: the tint method is declared by the tab bar's animation subspec, which this component does not import.
@@ -482,6 +485,9 @@ static BOOL CYLAnimatedItemLocalFileIsMissing(NSURL *URL) {
     // [EN] A dynamic icon color is resolved again for the animation view's tint. [CN] 动态图标颜色为动画视图的着色重新解析。
     if ([self.traitCollection hasDifferentColorAppearanceComparedToTraitCollection:previousTraitCollection]) {
         [self applyItemAppearance];
+        if (!self.currentItemStateAppearance.iconColor && self.cyl_iconTintColor) {
+            [self applyIconTintColor:self.cyl_iconTintColor];
+        }
     }
 }
 

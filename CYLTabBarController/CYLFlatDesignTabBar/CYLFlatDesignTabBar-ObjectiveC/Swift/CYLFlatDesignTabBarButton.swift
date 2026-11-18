@@ -387,6 +387,10 @@ open class CYLFlatDesignTabBarButton: CYLAnimatedItemView {
             imageView.frame = .zero
         }
         initTabBarItemAnimation()
+        // [EN] The tab's animation view is made here, after the button was tinted: it takes the icon color now (a tab that
+        //      never changed state kept the file's own white strokes on a light bar).
+        // [CN] Tab 的动画视图在这里创建，晚于按钮着色：此时为其着色（从未改变状态的 Tab 曾在浅色 TabBar 上保持文件自身的白色线条）。
+        applyIconTintColor(iconColorForCurrentState())
     }
 
     private func titleTextAttributesForCurrentState() -> [NSAttributedString.Key: Any] {

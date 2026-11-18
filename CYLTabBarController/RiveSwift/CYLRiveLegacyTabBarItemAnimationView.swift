@@ -105,6 +105,32 @@ public final class CYLRiveLegacyTabBarItemAnimationView: UIView, CYLTabBarItemAn
         riveView.backgroundColor = .clear
         addSubview(riveView)
         tintOverlay.apply(configuration.fixedTintColor, in: self)
+        if #available(iOS 17.0, *) {
+            registerForTraitChanges([UITraitUserInterfaceStyle.self]) { (view: CYLRiveLegacyTabBarItemAnimationView, _: UITraitCollection) in
+                view.appearanceDidChange()
+            }
+        }
+    }
+
+    /// [EN] Before iOS 17: the light / dark switch. [CN] iOS 17 之前：浅色 / 深色切换。
+    override public func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        if #available(iOS 17.0, *) {
+            return
+        }
+        if traitCollection.hasDifferentColorAppearance(comparedTo: previousTraitCollection) {
+            appearanceDidChange()
+        }
+    }
+
+    /// [EN] A dynamic tint (a fixed tint with `darkTint`, or the title color) resolved again with this view's new appearance.
+    /// [CN] 按本视图的新外观重新解析动态着色（带 `darkTint` 的固定着色或标题颜色）。
+    private func appearanceDidChange() {
+        if let fixed = configuration.fixedTintColor {
+            tintOverlay.apply(fixed, in: self)
+        } else if configuration.tintFollowsTitle, let titleTintColor {
+            tintOverlay.apply(titleTintColor, in: self)
+        }
     }
 
     /// [EN] `cyl_applyAnimationViewTintColor:`: the tab's title color, drawn when the `tint` option is "title".
