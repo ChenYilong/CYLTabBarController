@@ -524,11 +524,10 @@ extension UIView {
         //      position; make sure a view's badge is shown after that.
         // [CN] 自动布局的 cell 需要调用 `-layoutIfNeeded` frame 才有值，角标才能找到对应位置；请确保在此之后显示角标。
         layoutIfNeeded()
-        // [EN] An animated item (`CYLAnimatedItemView`): the badge goes on its icon. [CN] 动效 item（`CYLAnimatedItemView`）：角标放在其图标上。
-        if let iconHost = cyl_animatedItemBadgeHost() {
-            iconHost.clipsToBounds = false
-            return iconHost
-        }
+        // [EN] Unchanged: a plain view hosts its own badge. An animated item is a UIControl, whose lookup (Core) asks
+        //      `-cyl_animatedItemBadgeHost` and then sends the badge messages to that icon through `-cyl_performSelector:…`.
+        // [CN] 保持不变：普通视图承载自己的角标。动效 item 是 UIControl，其查找（Core）会调用 `-cyl_animatedItemBadgeHost`，再通过
+        //      `-cyl_performSelector:…` 把角标消息发给该图标。
         return self
     }
 
