@@ -584,6 +584,93 @@
     window.hidden = YES;
 }
 
+/*
+ * [EN] The item appearance moved from the FlatDesign button into CYLAnimatedItemView (docs/Animated-Item.md, the every-engine
+ *      tint row): icon tint and title tint per state, title offset.
+ * [CN] 从扁平样式按钮移到 CYLAnimatedItemView 的 item 外观：每个状态的图标着色与标题着色、标题偏移。
+ */
+- (void)testAnimatedItemViewAppliesTheItemAppearancePerState {
+    Class componentClass = NSClassFromString(@"CYLAnimatedItemView");
+    if (!componentClass) {
+        XCTSkip(@"The component is not compiled into this target");
+    }
+    UIControl *item = [[componentClass alloc] initWithFrame:CGRectMake(0, 0, 80, 60)];
+    [item setValue:@"Title" forKey:@"title"];
+    [item setValue:[[UIImage systemImageNamed:@"star"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forKey:@"image"];
+    UITabBarItemAppearance *appearance = [[UITabBarItemAppearance alloc] init];
+    appearance.normal.iconColor = UIColor.redColor;
+    // [EN] The same font in both states, so only the offset moves the title. [CN] 两个状态使用同一字体，只有偏移会移动标题。
+    appearance.normal.titleTextAttributes = @{ NSForegroundColorAttributeName : UIColor.orangeColor,
+                                               NSFontAttributeName : [UIFont boldSystemFontOfSize:13] };
+    appearance.selected.iconColor = UIColor.greenColor;
+    appearance.selected.titleTextAttributes = @{ NSForegroundColorAttributeName : UIColor.blueColor,
+                                                 NSFontAttributeName : [UIFont boldSystemFontOfSize:13] };
+    appearance.selected.titlePositionAdjustment = UIOffsetMake(0, 3);
+    appearance.disabled.iconColor = UIColor.grayColor;
+    [item setValue:appearance forKey:@"itemAppearance"];
+    UIImageView *imageView = [item valueForKey:@"imageView"];
+    UILabel *titleLabel = [item valueForKey:@"titleLabel"];
+    XCTAssertEqualObjects(imageView.tintColor, UIColor.redColor, @"normal icon tint");
+    XCTAssertEqualObjects(titleLabel.textColor, UIColor.orangeColor, @"normal title tint, different from the icon's");
+    [item layoutIfNeeded];
+    CGRect unselectedTitle = titleLabel.frame;
+    item.selected = YES;
+    XCTAssertEqualObjects(imageView.tintColor, UIColor.greenColor, @"selected icon tint");
+    XCTAssertEqualObjects(titleLabel.textColor, UIColor.blueColor, @"selected title tint");
+    XCTAssertEqualObjects(titleLabel.font, [UIFont boldSystemFontOfSize:13]);
+    [item layoutIfNeeded];
+    XCTAssertEqualWithAccuracy(CGRectGetMinY(titleLabel.frame) - CGRectGetMinY(unselectedTitle), 3, 0.5, @"selected title offset");
+    item.enabled = NO;
+    XCTAssertEqualObjects(imageView.tintColor, UIColor.grayColor, @"disabled wins over selected");
+}
+
+/*
+ * [EN] The FlatDesign bar's standardAppearance reaches its buttons through the component's itemAppearance.
+ * [CN] 扁平样式 TabBar 的 standardAppearance 通过组件的 itemAppearance 到达其按钮。
+ */
+- (void)testFlatDesignButtonsTakeTheBarAppearanceThroughTheComponent {
+    Class buttonClass = NSClassFromString(@"CYLFlatDesignTabBarButton");
+    if (!buttonClass) {
+        XCTSkip(@"FlatDesign is not compiled into this target");
+    }
+    UIImage *image = [[UIImage systemImageNamed:@"star"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+    CYLTabBarController *tabBarController = [CYLTabBarController tabBarControllerWithConfiguration:@{
+        CYLTabBarControllerContext : [NSUUID UUID].UUIDString,
+        CYLTabBarControllerStyleType : @"flatDesign",
+        CYLTabBarControllerTabBarItemsAttributes : @[
+            @{ CYLTabBarItemIdentifier : @"a", CYLTabBarItemTitle : @"A", CYLTabBarItemImage : image },
+            @{ CYLTabBarItemIdentifier : @"b", CYLTabBarItemTitle : @"B", CYLTabBarItemImage : image },
+        ],
+        CYLTabBarControllerPageResolver : ^UIViewController *(NSString *pageIdentifier, NSDictionary *attributes) {
+            return [[UIViewController alloc] init];
+        },
+    }];
+    UITabBarAppearance *appearance = [[UITabBarAppearance alloc] init];
+    appearance.stackedLayoutAppearance.normal.iconColor = UIColor.redColor;
+    appearance.stackedLayoutAppearance.selected.iconColor = UIColor.greenColor;
+    appearance.stackedLayoutAppearance.selected.titleTextAttributes = @{ NSForegroundColorAttributeName : UIColor.blueColor };
+    tabBarController.tabBar.standardAppearance = appearance;
+    UIWindow *window = [[UIWindow alloc] initWithFrame:CGRectMake(0, 0, 390, 844)];
+    window.rootViewController = tabBarController;
+    window.hidden = NO;
+    [tabBarController.view layoutIfNeeded];
+    NSMutableDictionary<NSString *, UIControl *> *buttons = [NSMutableDictionary dictionary];
+    NSMutableArray<UIView *> *queue = [NSMutableArray arrayWithObject:tabBarController.view];
+    while (queue.count > 0) {
+        UIView *view = queue.firstObject;
+        [queue removeObjectAtIndex:0];
+        if ([view isKindOfClass:buttonClass] && [view valueForKey:@"title"]) {
+            buttons[[view valueForKey:@"title"]] = (UIControl *)view;
+        }
+        [queue addObjectsFromArray:view.subviews];
+    }
+    XCTAssertEqual(buttons.count, 2u, @"%@", buttons);
+    XCTAssertNotNil([buttons[@"A"] valueForKey:@"itemAppearance"], @"the bar's appearance is the component's item appearance");
+    XCTAssertEqualObjects(((UIImageView *)[buttons[@"A"] valueForKey:@"imageView"]).tintColor, UIColor.greenColor, @"selected icon tint");
+    XCTAssertEqualObjects(((UILabel *)[buttons[@"A"] valueForKey:@"titleLabel"]).textColor, UIColor.blueColor, @"selected title tint");
+    XCTAssertEqualObjects(((UIImageView *)[buttons[@"B"] valueForKey:@"imageView"]).tintColor, UIColor.redColor, @"normal icon tint");
+}
+
 - (void)testFlatDesignTabButtonIsTheAnimatedItemComponent {
     Class buttonClass = NSClassFromString(@"CYLFlatDesignTabBarButton");
     Class componentClass = NSClassFromString(@"CYLAnimatedItemView");

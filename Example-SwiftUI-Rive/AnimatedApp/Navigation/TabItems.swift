@@ -101,6 +101,15 @@ extension CYLTabBarController {
         // [EN] `-CYLDemoRiveFollowsAppearance YES`: the system bar in light and Dark Mode; the icons follow the system tints.
         // [CN] `-CYLDemoRiveFollowsAppearance YES`：浅色与深色模式下的系统 TabBar；图标跟随系统 tint。
         if UserDefaults.standard.bool(forKey: "CYLDemoRiveFollowsAppearance") {
+            // [EN] The icon tint and the title tint per state, as a FlatDesign item's appearance: the Rive icons (`.tint`
+            //      "title") take the icon color, the same as their titles here, in light and Dark Mode (dynamic colors).
+            // [CN] 每个状态的图标着色与标题着色，与扁平样式 item 的外观相同：Rive 图标（`.tint` 为 "title"）使用图标颜色，这里与标题相同，浅色与深色模式下
+            //      都适用（动态颜色）。
+            let item = appearance.stackedLayoutAppearance
+            item.normal.iconColor = .label
+            item.normal.titleTextAttributes = [.foregroundColor: UIColor.label]
+            item.selected.iconColor = .systemBlue
+            item.selected.titleTextAttributes = [.foregroundColor: UIColor.systemBlue]
             tabBar.standardAppearance = appearance
             tabBar.scrollEdgeAppearance = appearance
             return

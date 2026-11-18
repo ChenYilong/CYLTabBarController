@@ -207,6 +207,11 @@ static BOOL CYLAnimatedItemLocalFileIsMissing(NSURL *URL) {
     }
     self.imageView.image = icon;
     self.imageView.hidden = [self cyl_animationShows];
+    // [EN] A new animation view or icon takes the current icon tint. [CN] 新的动画视图或图标使用当前的图标着色。
+    UIColor *iconColor = self.currentItemStateAppearance.iconColor;
+    if (iconColor) {
+        [self applyIconTintColor:iconColor];
+    }
 }
 
 - (void)cyl_contentDidChange {
@@ -356,7 +361,9 @@ static BOOL CYLAnimatedItemLocalFileIsMissing(NSURL *URL) {
     }
     self.imageView.frame = iconFrame;
     self.animationView.frame = iconFrame;
-    self.titleLabel.frame = titleFrame;
+    // [EN] The appearance's title offset (`titlePositionAdjustment`). [CN] 外观的标题偏移（`titlePositionAdjustment`）。
+    UIOffset titleOffset = self.currentItemStateAppearance.titlePositionAdjustment;
+    self.titleLabel.frame = CGRectOffset(titleFrame, titleOffset.horizontal, titleOffset.vertical);
     [self cyl_layoutAccessoryInRect:rect iconFrame:iconFrame rightToLeft:rtl];
 }
 
@@ -388,6 +395,7 @@ static BOOL CYLAnimatedItemLocalFileIsMissing(NSURL *URL) {
     BOOL changed = (selected != self.isSelected);
     [super setSelected:selected];
     if (changed) {
+        [self applyItemAppearance];
         [self cyl_updateIcon];
         [self itemStateDidChange];
         [self updateItemAccessibility];
@@ -406,6 +414,7 @@ static BOOL CYLAnimatedItemLocalFileIsMissing(NSURL *URL) {
     BOOL changed = (enabled != self.isEnabled);
     [super setEnabled:enabled];
     if (changed) {
+        [self applyItemAppearance];
         [self itemStateDidChange];
         [self updateItemAccessibility];
     }
@@ -413,6 +422,67 @@ static BOOL CYLAnimatedItemLocalFileIsMissing(NSURL *URL) {
 
 - (void)itemStateDidChange {
     // [EN] Subclass hook; nothing by default. [CN] 子类钩子；默认不做任何事。
+}
+
+#pragma mark - Item appearance 外观
+
+- (void)setItemAppearance:(UITabBarItemAppearance *)itemAppearance {
+    if (_itemAppearance == itemAppearance || [_itemAppearance isEqual:itemAppearance]) {
+        return;
+    }
+    _itemAppearance = [itemAppearance copy];
+    [self applyItemAppearance];
+    [self cyl_contentDidChange];
+}
+
+- (UITabBarItemStateAppearance *)currentItemStateAppearance {
+    UITabBarItemAppearance *appearance = self.itemAppearance;
+    if (!appearance) {
+        return nil;
+    }
+    if (!self.isEnabled) {
+        return appearance.disabled;
+    }
+    return self.isSelected ? appearance.selected : appearance.normal;
+}
+
+- (void)applyIconTintColor:(UIColor *)color {
+    self.imageView.tintColor = color;
+#if CYL_ANIMATION_ENGINE_AVAILABLE
+    // [EN] By selector: the tint method is declared by the tab bar's animation subspec, which this component does not import.
+    // [CN] 通过 selector 调用：着色方法声明在 TabBar 的动画子库中，本组件不导入它。
+    UIView *animationView = self.animationView;
+    SEL tint = NSSelectorFromString(@"cyl_applyAnimationViewTintColor:");
+    if ([animationView respondsToSelector:tint]) {
+        ((void (*)(id, SEL, UIColor *))[animationView methodForSelector:tint])(animationView, tint, color);
+    }
+#endif
+}
+
+- (void)applyItemAppearance {
+    UITabBarItemStateAppearance *state = self.currentItemStateAppearance;
+    if (!state) {
+        return;
+    }
+    if (state.iconColor) {
+        [self applyIconTintColor:state.iconColor];
+    }
+    NSDictionary<NSAttributedStringKey, id> *attributes = state.titleTextAttributes;
+    if ([attributes[NSFontAttributeName] isKindOfClass:[UIFont class]]) {
+        self.titleLabel.font = attributes[NSFontAttributeName];
+    }
+    if ([attributes[NSForegroundColorAttributeName] isKindOfClass:[UIColor class]]) {
+        self.titleLabel.textColor = attributes[NSForegroundColorAttributeName];
+    }
+    [self setNeedsLayout];
+}
+
+- (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection {
+    [super traitCollectionDidChange:previousTraitCollection];
+    // [EN] A dynamic icon color is resolved again for the animation view's tint. [CN] 动态图标颜色为动画视图的着色重新解析。
+    if ([self.traitCollection hasDifferentColorAppearanceComparedToTraitCollection:previousTraitCollection]) {
+        [self applyItemAppearance];
+    }
 }
 
 #pragma mark - Animation 动画

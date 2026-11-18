@@ -119,7 +119,7 @@ open class CYLFlatDesignTabBarButton: CYLAnimatedItemView {
         super.tintColorDidChange()
         if isSelected {
             titleLabel.textColor = titleTextAttributesForCurrentState()[.foregroundColor] as? UIColor
-            imageView.tintColor = iconColorForCurrentState()
+            applyIconTintColor(iconColorForCurrentState())
         }
     }
 
@@ -176,9 +176,12 @@ open class CYLFlatDesignTabBarButton: CYLAnimatedItemView {
         return tabBar.selectedItem?.standardAppearance ?? tabBar.standardAppearance
     }
 
-    /// [EN] The state appearance of the current state, nil without an appearance. [CN] 当前状态的 state appearance，没有 appearance 时为 nil。
+    /// [EN] The state appearance of the current state, nil without an appearance: the component's (`itemAppearance`, set from
+    ///      `effectiveAppearance` on every update), so the icon and title part lives in `CYLAnimatedItemView`.
+    /// [CN] 当前状态的 state appearance，没有 appearance 时为 nil：即组件的（`itemAppearance`，每次更新时由 `effectiveAppearance` 设置），图标与标题部分
+    ///      位于 `CYLAnimatedItemView`。
     private var currentStateAppearance: UITabBarItemStateAppearance? {
-        effectiveAppearance.map { Self.stateAppearance($0.stackedLayoutAppearance, for: currentState) }
+        currentItemStateAppearance
     }
 
     private var defaultStateAppearance: UITabBarItemStateAppearance {
@@ -291,6 +294,8 @@ open class CYLFlatDesignTabBarButton: CYLAnimatedItemView {
     func cylUpdateTabBarButton() {
         let item = tabBarItemStorage
         isEnabled = item?.isEnabled ?? false
+        // [EN] The bar's (or the selected item's) appearance, icon and title part, to the component. [CN] 把 TabBar（或选中 item）外观的图标与标题部分交给组件。
+        itemAppearance = effectiveAppearance?.stackedLayoutAppearance
 
         var image = item?.image
         if isSelected, let selectedImage = item?.selectedImage {
@@ -298,7 +303,9 @@ open class CYLFlatDesignTabBarButton: CYLAnimatedItemView {
         }
         // [EN] Through the component's content, which shows it in `imageView`. [CN] 通过组件的内容写入，由组件显示在 `imageView` 中。
         self.image = image
-        imageView.tintColor = iconColorForCurrentState()
+        // [EN] The icon and its animation, through the component (the animation view takes it when its `tint` option asks).
+        // [CN] 图标及其动画，通过组件着色（动画视图在其 `tint` 选项需要时使用）。
+        applyIconTintColor(iconColorForCurrentState())
 
         let titleAttributes = titleTextAttributesForCurrentState()
         self.title = item?.title

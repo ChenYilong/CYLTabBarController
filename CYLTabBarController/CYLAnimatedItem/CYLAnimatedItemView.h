@@ -356,6 +356,38 @@ NS_SWIFT_NAME(CYLAnimatedItemViewDelegate)
  */
 - (void)updateItemAccessibility;
 
+#pragma mark - Item appearance 外观
+
+/*!
+ * [EN] The icon and title part of a tab bar item's appearance, as `UITabBarAppearance.stackedLayoutAppearance` (moved here
+ *      from the FlatDesign tab bar button, so every item, not only a tab, can use it): for the current state (disabled,
+ *      else selected, else normal), `iconColor` tints the icon (`imageView`, template images) and the animation view (when
+ *      it takes a tint, e.g. a Rive file with the `tint` option), `titleTextAttributes` styles `titleLabel` (font and
+ *      color), `titlePositionAdjustment` moves the title. So the icon tint and the title tint can differ. Values a state
+ *      does not set leave the item's own look. Badge values are not used. Nil (the default): the item's own look. The
+ *      FlatDesign tab bar assigns its `standardAppearance` here.
+ * [CN] Tab bar item 外观中图标与标题的部分，与 `UITabBarAppearance.stackedLayoutAppearance` 相同（从扁平样式 Tab 按钮移到这里，任何 item 都能使用，
+ *      不只是 Tab）：按当前状态（不可用，否则选中，否则普通），`iconColor` 为图标（`imageView`，模板图片）与动画视图（接受着色时，例如带 `tint` 选项的
+ *      Rive 文件）着色，`titleTextAttributes` 设置 `titleLabel` 的样式（字体与颜色），`titlePositionAdjustment` 移动标题。因此图标与标题可以使用不同的
+ *      着色。某状态未设置的值保持 item 自身的外观。不使用角标的值。nil（默认）：item 自身的外观。扁平样式 TabBar 会把其 `standardAppearance` 赋值到这里。
+ */
+@property (nonatomic, copy, nullable) UITabBarItemAppearance *itemAppearance;
+/*!
+ * [EN] The state appearance of `itemAppearance` for the current state (disabled, else selected, else normal); nil without one.
+ * [CN] `itemAppearance` 中当前状态（不可用，否则选中，否则普通）的 state appearance；没有 `itemAppearance` 时为 nil。
+ */
+@property (nonatomic, readonly, nullable) UITabBarItemStateAppearance *currentItemStateAppearance;
+/*!
+ * [EN] Tints the icon: `imageView.tintColor`, and the animation view when it takes a tint (`-cyl_applyAnimationViewTintColor:`, called by selector). Called with the current state's `iconColor`; a subclass with its own default colors calls it too.
+ * [CN] 为图标着色：`imageView.tintColor`，以及接受着色的动画视图（通过 selector 调用 `-cyl_applyAnimationViewTintColor:`）。以当前状态的 `iconColor` 调用；有自己默认颜色的子类也可以调用。
+ */
+- (void)applyIconTintColor:(nullable UIColor *)color;
+/*!
+ * [EN] Applies `itemAppearance` for the current state; called on state, appearance and trait changes and when the animation view loads.
+ * [CN] 按当前状态应用 `itemAppearance`；在状态、外观与 trait 变化以及动画视图加载时调用。
+ */
+- (void)applyItemAppearance;
+
 @end
 
 NS_ASSUME_NONNULL_END
