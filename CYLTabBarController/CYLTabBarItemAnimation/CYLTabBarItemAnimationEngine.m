@@ -106,6 +106,81 @@ static UIColor *CYLTabBarItemAnimationFixedTintColor(NSDictionary<NSString *, NS
 }
 
 /// [EN] Draws `color` (nil: no tint) over the view by its library's means. [CN] 用动画库的方式在视图上绘制 `color`（nil 表示不着色）。
+/*!
+ * [EN] Puts the tint overlay right above the library's own layers and below the view's subviews (a badge stays above it):
+ *      libraries add their content layers after the overlay is made (Lottie when its composition is set up, SVGA on each
+ *      draw), which hid it.
+ * [CN] 把着色叠加图层放在动画库自身图层的正上方、视图子视图之下（角标仍在其上方）：动画库在叠加图层创建之后才添加其内容图层（Lottie 在设置 composition 时，
+ *      SVGA 在每次绘制时），曾把它遮住。
+ */
+static void CYLTabBarItemAnimationRaiseTintOverlay(CALayer *hostLayer, CALayer *overlay) {
+    if (!overlay || overlay.superlayer != hostLayer) {
+        return;
+    }
+    CALayer *firstSubviewLayer = nil;
+    for (CALayer *layer in hostLayer.sublayers) {
+        if (layer != overlay && [layer.delegate isKindOfClass:[UIView class]]) {
+            firstSubviewLayer = layer;
+            break;
+        }
+    }
+    NSArray<CALayer *> *sublayers = hostLayer.sublayers;
+    NSUInteger index = [sublayers indexOfObjectIdenticalTo:overlay];
+    if (firstSubviewLayer) {
+        NSUInteger subviewIndex = [sublayers indexOfObjectIdenticalTo:firstSubviewLayer];
+        if (index + 1 != subviewIndex) {
+            [hostLayer insertSublayer:overlay below:firstSubviewLayer];
+        }
+    } else if (index != sublayers.count - 1) {
+        [hostLayer addSublayer:overlay];
+    }
+}
+
+/*!
+ * [EN] Keeps the tint overlay the size of its view's layer: the overlay is made when the view is still 0 x 0 (a fixed tint
+ *      is applied as the view is created) and most libraries' views (Lottie, PAG) never size their sublayers. Holds the
+ *      layer, so the observation is removed before the layer goes.
+ * [CN] 让着色叠加图层保持与其视图图层同尺寸：叠加图层在视图仍为 0 x 0 时创建（固定着色在创建视图时应用），而多数动画库的视图（Lottie、PAG）不会调整其子图层尺寸。
+ *      持有该图层，使观察在图层释放之前移除。
+ */
+@interface CYLTabBarItemAnimationTintOverlaySizer : NSObject
+@property (nonatomic, strong) CALayer *hostLayer;
+@property (nonatomic, weak) CALayer *overlay;
+@end
+
+@implementation CYLTabBarItemAnimationTintOverlaySizer
+
+static void *CYLTabBarItemAnimationTintOverlaySizerContext = &CYLTabBarItemAnimationTintOverlaySizerContext;
+
+- (instancetype)initWithHostLayer:(CALayer *)hostLayer overlay:(CALayer *)overlay {
+    if (self = [super init]) {
+        _hostLayer = hostLayer;
+        _overlay = overlay;
+        [hostLayer addObserver:self forKeyPath:@"bounds" options:0 context:CYLTabBarItemAnimationTintOverlaySizerContext];
+    }
+    return self;
+}
+
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
+    if (context != CYLTabBarItemAnimationTintOverlaySizerContext) {
+        [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
+        return;
+    }
+    [CATransaction begin];
+    [CATransaction setDisableActions:YES];
+    self.overlay.frame = self.hostLayer.bounds;
+    CYLTabBarItemAnimationRaiseTintOverlay(self.hostLayer, self.overlay);
+    [CATransaction commit];
+}
+
+- (void)dealloc {
+    [_hostLayer removeObserver:self forKeyPath:@"bounds" context:CYLTabBarItemAnimationTintOverlaySizerContext];
+}
+
+@end
+
+static const void *CYLTabBarItemAnimationTintOverlaySizerKey = &CYLTabBarItemAnimationTintOverlaySizerKey;
+
 static void CYLTabBarItemAnimationApplyTint(UIView *view, UIColor *color) {
     UIColor *resolved = [color resolvedColorWithTraitCollection:view.traitCollection];
     // [EN] GIF: template frames in the view's tint color (UIKit's own tint). [CN] GIF：以视图 tint 颜色绘制的模板帧（UIKit 自身的着色）。
@@ -146,6 +221,7 @@ static void CYLTabBarItemAnimationApplyTint(UIView *view, UIColor *color) {
     if (!resolved) {
         [overlay removeFromSuperlayer];
         objc_setAssociatedObject(view, CYLTabBarItemAnimationTintOverlayKey, nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+        objc_setAssociatedObject(view, CYLTabBarItemAnimationTintOverlaySizerKey, nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
         return;
     }
     if (!overlay) {
@@ -153,12 +229,15 @@ static void CYLTabBarItemAnimationApplyTint(UIView *view, UIColor *color) {
         overlay.compositingFilter = @"sourceAtop";
         overlay.name = @"CYLTabBarItemAnimationTintOverlay";
         objc_setAssociatedObject(view, CYLTabBarItemAnimationTintOverlayKey, overlay, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+        CYLTabBarItemAnimationTintOverlaySizer *sizer = [[CYLTabBarItemAnimationTintOverlaySizer alloc] initWithHostLayer:view.layer overlay:overlay];
+        objc_setAssociatedObject(view, CYLTabBarItemAnimationTintOverlaySizerKey, sizer, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     }
     overlay.backgroundColor = resolved.CGColor;
     overlay.frame = view.bounds;
     if (overlay.superlayer != view.layer) {
         [view.layer addSublayer:overlay];
     }
+    CYLTabBarItemAnimationRaiseTintOverlay(view.layer, overlay);
 }
 
 /// [EN] The `-cyl_applyAnimationViewTintColor:` added to a library's view class. [CN] 添加到动画库视图类上的 `-cyl_applyAnimationViewTintColor:`。
@@ -190,6 +269,12 @@ static void CYLTabBarItemAnimationPrepareTint(UIView *view, NSURL *sourceURL, id
     if (CYLTabBarItemAnimationFixedTintColor(options)) {
         ((void (*)(id, SEL, UIColor *))[view methodForSelector:tintSelector])(view, tintSelector, nil);
     }
+    // [EN] Once the library has set its view up (its content layers come after this call). [CN] 在动画库设置好视图之后（其内容图层在本调用之后添加）。
+    __weak UIView *weakView = view;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        UIView *strongView = weakView;
+        CYLTabBarItemAnimationRaiseTintOverlay(strongView.layer, objc_getAssociatedObject(strongView, CYLTabBarItemAnimationTintOverlayKey));
+    });
 }
 
 @implementation CYLTabBarItemAnimationEngine
