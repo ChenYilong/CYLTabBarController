@@ -226,9 +226,12 @@ def main():
     total_width = size_of(grid)[0]
     header = band(options.header, total_width, font_size, os.path.join(work, 'header.png'))
     footer = band(options.footer, total_width, font_size, os.path.join(work, 'footer.png'))
-    stack([header, grid, footer], out_path, vertical=True)
-    add_marker(out_path, options.header, options.footer)
-    width, height = size_of(out_path)
+    # [EN] ffmpeg writes only inside the work folder; the result is copied to --out, which never reaches a command line.
+    # [CN] ffmpeg 只在工作目录中写入；结果再复制到 --out，该路径不会进入任何命令行。
+    result = stack([header, grid, footer], os.path.join(work, 'result.png'), vertical=True)
+    add_marker(result, options.header, options.footer)
+    width, height = size_of(result)
+    shutil.copyfile(result, out_path)
     shutil.rmtree(work, ignore_errors=True)
     note = ''
     if options.columns == 1 and len(cells) > 1 and height > width * PHONE_SCREEN_RATIO:
