@@ -12,14 +12,22 @@ import android.graphics.Bitmap
 class CYLGIFFrames internal constructor(
     val width: Int,
     val height: Int,
-    /** [EN] ARGB pixels of each frame, `width * height` each. [CN] 每帧的 ARGB 像素，各 `width * height` 个。 */
+    /**
+     * [EN] ARGB pixels of each frame, `width * height` each. [CN] 每帧的 ARGB 像素，各 `width * height` 个。
+     */
     internal val pixels: List<IntArray>,
-    /** [EN] How long each frame shows, in ms. [CN] 每帧显示的时长（毫秒）。 */
+    /**
+     * [EN] How long each frame shows, in ms. [CN] 每帧显示的时长（毫秒）。
+     */
     val delays: IntArray,
 ) {
-    /** [EN] The number of frames. [CN] 帧数。 */
+    /**
+     * [EN] The number of frames. [CN] 帧数。
+     */
     val frameCount: Int get() = pixels.size
-    /** [EN] The length of one pass, in ms. [CN] 一次播放的时长（毫秒）。 */
+    /**
+     * [EN] The length of one pass, in ms. [CN] 一次播放的时长（毫秒）。
+     */
     val duration: Int = delays.sum().coerceAtLeast(1)
     private val bitmaps = arrayOfNulls<Bitmap>(pixels.size)
 
@@ -35,7 +43,9 @@ class CYLGIFFrames internal constructor(
         return delays.size - 1
     }
 
-    /** [EN] The bitmap of frame `index`, made on first use. [CN] 第 `index` 帧的位图，首次使用时创建。 */
+    /**
+     * [EN] The bitmap of frame `index`, made on first use. [CN] 第 `index` 帧的位图，首次使用时创建。
+     */
     fun bitmap(index: Int): Bitmap = bitmaps[index] ?: Bitmap.createBitmap(pixels[index], width, height, Bitmap.Config.ARGB_8888).also { bitmaps[index] = it }
 }
 
@@ -45,7 +55,9 @@ class CYLGIFFrames internal constructor(
  * [CN] 小型 GIF87a / GIF89a 解码器：LZW 图像数据、局部与全局颜色表、隔行扫描、透明色以及帧处置方式。10 毫秒或更短的帧延时按 100 毫秒显示，与浏览器相同。
  */
 object CYLGIFDecoder {
-    /** [EN] Upper bound of pixels kept for all frames (about 256 MB as ARGB). [CN] 所有帧保留像素数的上限（ARGB 约 256 MB）。 */
+    /**
+     * [EN] Upper bound of pixels kept for all frames (about 256 MB as ARGB). [CN] 所有帧保留像素数的上限（ARGB 约 256 MB）。
+     */
     private const val MAX_TOTAL_PIXELS = 64L * 1024 * 1024
 
     /**
@@ -143,7 +155,9 @@ object CYLGIFDecoder {
             }
         }
 
-        /** [EN] The image row of each stored row of an interlaced frame. [CN] 隔行帧中每个存储行对应的图像行。 */
+        /**
+         * [EN] The image row of each stored row of an interlaced frame. [CN] 隔行帧中每个存储行对应的图像行。
+         */
         private fun interlacedRows(height: Int): IntArray {
             val rows = IntArray(height)
             var stored = 0

@@ -59,26 +59,42 @@ class CYLGIFTabBarItemAnimationView internal constructor(context: Context, priva
      * [EN] The time shown, in ms. [CN] 显示的时刻（毫秒）。
      */
     private var time = 0
-    /** [EN] A pass is playing. [CN] 正在播放。 */
+    /**
+     * [EN] A pass is playing. [CN] 正在播放。
+     */
     private var playing = false
-    /** [EN] When the pass started (uptime ms) and the GIF time it started from. [CN] 本次播放开始的时刻（uptime 毫秒）及起始的 GIF 时刻。 */
+    /**
+     * [EN] When the pass started (uptime ms) and the GIF time it started from. [CN] 本次播放开始的时刻（uptime 毫秒）及起始的 GIF 时刻。
+     */
     private var startUptime = 0L
     private var startTime = 0f
-    /** [EN] The next frame of the pass playing. [CN] 当前播放的下一帧。 */
+    /**
+     * [EN] The next frame of the pass playing. [CN] 当前播放的下一帧。
+     */
     private val tick = Runnable { advance() }
-    /** [EN] Plays again after each pass (`loops`). [CN] 每次播放后再次播放（`loops`）。 */
+    /**
+     * [EN] Plays again after each pass (`loops`). [CN] 每次播放后再次播放（`loops`）。
+     */
     private var loops = false
-    /** [EN] The speed, 1 = the GIF's own (`animationSpeed`). [CN] 速度，1 = GIF 自身速度（`animationSpeed`）。 */
+    /**
+     * [EN] The speed, 1 = the GIF's own (`animationSpeed`). [CN] 速度，1 = GIF 自身速度（`animationSpeed`）。
+     */
     private var speed = 1f
-    /** [EN] The time shown, in ms (tests). [CN] 显示的时刻（毫秒，测试用）。 */
+    /**
+     * [EN] The time shown, in ms (tests). [CN] 显示的时刻（毫秒，测试用）。
+     */
     internal val shownTime: Int get() = time
-    /** [EN] Whether a pass is playing (tests). [CN] 是否正在播放（测试用）。 */
+    /**
+     * [EN] Whether a pass is playing (tests). [CN] 是否正在播放（测试用）。
+     */
     internal val isPlaying: Boolean get() = playing
     /**
      * [EN] The GIF's length in ms (1 s when the file gives none). [CN] GIF 的时长（毫秒，文件未给出时为 1 秒）。
      */
     val duration: Int get() = frames?.duration?.takeIf { it > 1 } ?: 1000
-    /** [EN] The frame shown (tests). [CN] 显示的帧（测试用）。 */
+    /**
+     * [EN] The frame shown (tests). [CN] 显示的帧（测试用）。
+     */
     internal val shownFrame: Int get() = frames?.frameAt(time) ?: 0
 
     private fun isGIF(bytes: ByteArray): Boolean {
@@ -148,7 +164,9 @@ class CYLGIFTabBarItemAnimationView internal constructor(context: Context, priva
         removeCallbacks(tick)
     }
 
-    /** [EN] Where the playing pass is, 0…1. [CN] 当前播放位置，0…1。 */
+    /**
+     * [EN] Where the playing pass is, 0…1. [CN] 当前播放位置，0…1。
+     */
     private val playingFraction: Float get() = time / (duration - 1).coerceAtLeast(1).toFloat()
 
     override fun cyl_setAnimationViewLoops(loops: Boolean) {
