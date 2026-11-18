@@ -46,6 +46,7 @@
 | &nbsp;&nbsp;&nbsp;&nbsp;↳ [结论与建议](#cn结论与建议) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [Conclusion and recommendation](#enconclusion-and-recommendation) |
 | [集成方式](#cn集成方式) | [Integrations](#enintegrations) |
 | [跟随主题（#216）](#cn跟随主题216) | [Following the theme (#216)](#enfollowing-the-theme-216) |
+| [着色或保持原色](#cn着色或保持原色) | [Tint, or keep the original colors](#entint-or-keep-the-original-colors) |
 | [测试](#cn测试) | [Testing](#entesting) |
 
 <!-- navigation:end -->
@@ -415,6 +416,39 @@ sequenceDiagram
 | 中文 | English |
 |:---|:---|
 | `CYLTabBarAnimationFilePath` 是完整路径：只写文件名时找不到文件，动画不变，并打印 `🔴[CYL #216]` 日志。在主题回调中修改动画时，请放在 `-cyl_themeDidChangeByManager:identifier:theme:` 的 `super` 之后，或控制器视图的 `cyl_themeDidChangeBlock` 中（Swift Demo 使用后者）；`CYLThemeDidChangeNotification` 比它们先发出，在通知中修改的动画会被记为 App 的原始外观。实测结果与截图见 [Theme-Switching-Evaluation.md](Theme-Switching-Evaluation.md) 第 8 节。 | `CYLTabBarAnimationFilePath` is a full path: a bare file name finds nothing, the animation stays, and `🔴[CYL #216]` is logged. To change an animation when the theme changes, do it after `super` in `-cyl_themeDidChangeByManager:identifier:theme:`, or in the `cyl_themeDidChangeBlock` of the controller's view (the Swift demos do); `CYLThemeDidChangeNotification` is posted earlier, and an animation changed there is saved as the app's original look. For results and screenshots, see section 8 of [Theme-Switching-Evaluation.md](Theme-Switching-Evaluation.md). |
+
+## [CN]着色或保持原色
+## [EN]Tint, or keep the original colors
+
+| 中文 | English |
+|:---|:---|
+| **默认保持原色。** 动画文件（GIF、Lottie、PAG、SVGA、Rive）按文件自己的颜色绘制，TabBar 的 `tintColor` 与标题颜色不会作用于它们；只有 URL 带 `tint` 选项时才着色。因此保持原色不需要任何设置：使用普通 key（`CYLTabBarAnimationFilePath`、`CYLTabBarGIFFilePath`…），或不带 `tint` 的 URL。iOS 与 Android 相同，`CYLAnimatedItemView` 单独使用时也相同。 | **Original colors are the default.** An animation file (GIF, Lottie, PAG, SVGA, Rive) draws in its own colors; the tab bar's `tintColor` and title colors never reach it. It is tinted only when its URL has the `tint` option, so keeping the original colors needs no setting at all: use the plain key (`CYLTabBarAnimationFilePath`, `CYLTabBarGIFFilePath`…) or a URL without `tint`. The same on iOS and Android, and for `CYLAnimatedItemView` on its own. |
+| **只给单色图标着色。** `tint` 把每个不透明像素画成同一种颜色（模板图片、source-atop 覆盖层、Android 的 SRC_IN），彩色文件因此变成平面剪影，失去渐变与细节：Example-GIF 的火箭、星星这类彩色 GIF 着色后效果差，应保持原色。`tint` 适合线条或单色图标（如 Example-Rive 的 icons.riv、Example-SVGA 的单色图标）。 | **Tint only one-color icons.** `tint` draws every opaque pixel in one color (a template image, a source-atop overlay, SRC_IN on Android), so a colorful file becomes a flat silhouette and loses its shading and details: colorful GIFs such as Example-GIF's rocket and star look poor tinted and should keep their colors. `tint` suits line or one-color icons (Example-Rive's icons.riv, the one-color SVGA icons). |
+| **按 Tab 选择。** 每个 Tab 有自己的 URL，可以只给部分 Tab 着色。 | **Per tab.** Each tab has its own URL, so only some tabs can be tinted. |
+
+```swift
+// [EN] iOS (Swift): original colors, the default: no option. [CN] iOS（Swift）：保持原色（默认）：不带选项。
+items[0][CYLTabBarGIFFilePath] = Bundle.main.path(forResource: "tab_rocket", ofType: "gif")
+// [EN] Tinted: only for a one-color icon. [CN] 着色：只用于单色图标。
+let icon = Bundle.main.url(forResource: "tab_line_icon", withExtension: "gif")
+items[1][CYLTabBarGIFURL] = CYLTabBarAnimationURLWithOptions(icon, [.tint: "title"] as [CYLTabBarAnimationOption: String])
+```
+
+```objc
+// [EN] iOS (Objective-C): original colors, the default. [CN] iOS（Objective-C）：保持原色（默认）。
+@{ CYLTabBarItemTitle : @"Home", CYLTabBarGIFFilePath : [[NSBundle mainBundle] pathForResource:@"tab_rocket" ofType:@"gif"] }
+```
+
+```kotlin
+// [EN] Android: original colors, the default: no option. [CN] Android：保持原色（默认）：不带选项。
+items[0][CYLConstants.CYLTabBarGIFFilePath] = "tab_rocket.gif"
+// [EN] Tinted: only for a one-color icon. [CN] 着色：只用于单色图标。
+items[1][CYLConstants.CYLTabBarGIFURL] = CYLTabBarAnimationURLWithOptions("tab_line_icon.gif", mapOf(CYLConstants.CYLTabBarAnimationOptionTint to "title"))
+```
+
+| 中文 | English |
+|:---|:---|
+| 对比截图（同一 Demo，默认启动与加 `tint` 选项启动）：<br>![tint or original colors](assets/gif-tint-or-original-colors.png) | Comparison (the same demo, launched by default and with the `tint` option):<br>![tint or original colors](assets/gif-tint-or-original-colors.png) |
 
 ## [CN]测试
 ## [EN]Testing
