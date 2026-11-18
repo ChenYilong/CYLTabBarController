@@ -28,7 +28,7 @@ class CYLRiveLoopTest {
     }
 
     /** [EN] Records reset / play / setBooleanState / fireState. [CN] 记录 reset / play / setBooleanState / fireState。 */
-    class FakeRive(context: Context, private val machines: List<Machine>) : View(context) {
+    open class FakeRive(context: Context, private val machines: List<Machine>) : View(context) {
         val calls = mutableListOf<String>()
         fun getStateMachines() = machines
         fun reset() { calls += "reset" }
@@ -44,6 +44,27 @@ class CYLRiveLoopTest {
             calls += "$input=${value.toInt()}"
             machines.forEach { (it.input(input) as? Number)?.number = value }
         }
+    }
+
+    /**
+     * [EN] rive-android's `RiveFileController`: `advance` moves the playing state machine, which pauses itself after
+     *      `settlesAfter` steps (never when null, a file that moves by itself).
+     * [CN] rive-android 的 `RiveFileController`：`advance` 推进正在播放的状态机，状态机在 `settlesAfter` 步后自行暂停（为 null 时从不暂停，即自行运动的文件）。
+     */
+    class FakeController(private val settlesAfter: Int?) {
+        val calls = mutableListOf<String>()
+        private val playing = mutableSetOf<Any>("machine")
+        var steps = 0
+        fun getPlayingStateMachines(): Set<Any> = playing
+        fun advance(elapsed: Float) {
+            steps++
+            if (settlesAfter != null && steps >= settlesAfter) playing.clear()
+        }
+        fun pause() { calls += "pause"; playing.clear() }
+    }
+
+    class FakeRiveWithController(context: Context, machines: List<Machine>, private val fileController: FakeController) : FakeRive(context, machines) {
+        fun getController() = fileController
     }
 
     private val context: Context = ApplicationProvider.getApplicationContext()
@@ -126,9 +147,29 @@ class CYLRiveLoopTest {
         val rive = FakeRive(context, listOf(Machine("State Machine 1", emptyList())))
         val view = CYLRiveTabBarItemAnimationView(context, rive, mapOf("stateMachine" to "State Machine 1"))
         view.cyl_restUntilPlayed()
-        assertEquals("paused at once, on its settled initial state, without waiting for a frame", listOf("pause"), rive.calls)
+        assertEquals("without a controller (this fake view): paused at once, without waiting for a frame", listOf("pause"), rive.calls)
         view.cyl_playAnimationView()
         assertEquals("a play resumes only its state machine, then restarts it", listOf("pause", "play:State Machine 1", "reset", "play"), rive.calls)
+    }
+
+    @Test
+    fun aStateMachineSettlesInFixedStepsBeforeItRests() {
+        val controller = FakeController(settlesAfter = 30)
+        val rive = FakeRiveWithController(context, listOf(Machine("State Machine", listOf("isOpen"))), controller)
+        val view = CYLRiveTabBarItemAnimationView(context, rive, mapOf("stateMachine" to "State Machine", "input" to "isOpen", "duration" to "0"))
+        view.cyl_restUntilPlayed()
+        assertEquals("menu_button.riv: advanced until it settled, the same on every device", 30, controller.steps)
+        assertEquals("a settled machine is not paused, so its inputs keep working", emptyList<String>(), controller.calls)
+    }
+
+    @Test
+    fun aStateMachineThatMovesByItselfIsPausedAfterTheSteps() {
+        val controller = FakeController(settlesAfter = null)
+        val rive = FakeRiveWithController(context, listOf(Machine("State Machine 1", emptyList())), controller)
+        val view = CYLRiveTabBarItemAnimationView(context, rive, mapOf("stateMachine" to "State Machine 1"))
+        view.cyl_restUntilPlayed()
+        assertEquals("shapes.riv: at most SETTLE_STEPS steps", CYLRiveTabBarItemAnimationView.SETTLE_STEPS, controller.steps)
+        assertEquals(listOf("pause"), controller.calls)
     }
 
     @Test

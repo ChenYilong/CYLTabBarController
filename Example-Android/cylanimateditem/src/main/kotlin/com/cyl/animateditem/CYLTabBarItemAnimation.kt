@@ -1007,25 +1007,40 @@ class CYLRiveTabBarItemAnimationView internal constructor(context: Context, priv
 
     /**
      * [EN] Rests on the first frame until the first play: a file whose state machine moves by itself (shapes.riv, truck.riv)
-     *      no longer runs from load. The machine is created (autoplay) so its inputs can be read, then paused at once: called
-     *      right after the load, in the same main-thread step, while the machine still rests on its settled initial state
-     *      (rive-android builds the scene synchronously in `setRiveFile`). Every launch rests on the same frame, as on iOS;
-     *      the paused controller still draws that frame. It used to pause 100 ms later, on a frame that depended on the
-     *      device's speed (menu_button.riv on its X, check.riv further along, at 396d3fca).
-     * [CN] 在第一次播放之前停在第一帧：状态机会自行运动的文件（shapes.riv、truck.riv）不再从加载起就运动。状态机先创建（autoplay）以便读取其输入，
-     *      然后立即暂停：在加载之后、同一个主线程步骤中调用，此时状态机仍停在已稳定的初始状态（rive-android 在 `setRiveFile` 中同步构建场景）。
-     *      每次启动都停在同一帧，与 iOS 一致；暂停的控制器仍会绘制这一帧。以前在 100 ms 后暂停，停在哪一帧取决于设备速度（396d3fca 时
-     *      menu_button.riv 停在 X 上，check.riv 进度更靠后）。
+     *      no longer runs from load. The machine is created (autoplay) so its inputs can be read. Called right after the load
+     *      (rive-android builds the scene synchronously in `setRiveFile`), it advances the machine in fixed steps of
+     *      `SETTLE_STEP_SECONDS` until it settles (rive-android then pauses it by itself), at most `SETTLE_STEPS` steps; a
+     *      machine still moving after that (shapes.riv, truck.riv) is paused. The steps do not depend on the device's speed,
+     *      so every launch rests on the same frame, as on iOS. A machine paused before it settled answered its inputs the
+     *      wrong way round (menu_button.riv went back to the hamburger when opened and showed its X when closed, 319ba8a4);
+     *      a pause 100 ms after load, at 396d3fca, rested on a frame that depended on the device (menu_button.riv on its X).
+     * [CN] 在第一次播放之前停在第一帧：状态机会自行运动的文件（shapes.riv、truck.riv）不再从加载起就运动。状态机先创建（autoplay）以便读取其输入。
+     *      在加载之后调用（rive-android 在 `setRiveFile` 中同步构建场景），以固定步长 `SETTLE_STEP_SECONDS` 推进状态机直到稳定（rive-android
+     *      随即自行暂停它），最多 `SETTLE_STEPS` 步；之后仍在运动的状态机（shapes.riv、truck.riv）被暂停。步数与设备速度无关，因此每次启动都停在
+     *      同一帧，与 iOS 一致。稳定之前就被暂停的状态机会反向响应输入（319ba8a4 时 menu_button.riv 打开时回到汉堡图标、关闭时显示 X）；
+     *      396d3fca 时加载 100 ms 后暂停，停在哪一帧取决于设备（menu_button.riv 停在 X 上）。
      */
     internal fun cyl_restUntilPlayed() {
         if (hasPlayed) return
+        val controller = CYLReflection.call(rive, "getController")
+        if (controller == null) {
+            // [EN] The fake view of the tests has no controller. [CN] 测试中的伪造视图没有控制器。
+            CYLReflection.call(rive, "pause")
+            restingAfterLoad = true
+            return
+        }
+        val isMoving = { (CYLReflection.call(controller, "getPlayingStateMachines") as? Collection<*>)?.isNotEmpty() == true }
+        var steps = 0
+        while (isMoving() && steps < SETTLE_STEPS) {
+            CYLReflection.call(controller, "advance", SETTLE_STEP_SECONDS)
+            steps++
+        }
         // [EN] The file controller only: `RiveAnimationView.pause()` also stops the view's renderer, after which the state
         //      machine no longer runs continuously (menu_button.riv crept one frame per input and never reached its X on
-        //      Android, dcbfdec6 and ad3dca0e). The fake view of the tests has no controller.
+        //      Android, dcbfdec6 and ad3dca0e).
         // [CN] 只暂停文件控制器：`RiveAnimationView.pause()` 还会停止视图的渲染器，之后状态机不再连续运行（Android 上
-        //      menu_button.riv 每次输入只前进一帧，始终到不了 X）。测试中的伪造视图没有控制器。
-        val controller = CYLReflection.call(rive, "getController")
-        if (controller != null) CYLReflection.call(controller, "pause") else CYLReflection.call(rive, "pause")
+        //      menu_button.riv 每次输入只前进一帧，始终到不了 X）。
+        if (isMoving()) CYLReflection.call(controller, "pause")
         restingAfterLoad = true
     }
     // [EN] A loop pass leaves a file that is still moving on its own alone (shapes.riv, truck.riv); only a play restarts it.
@@ -1317,6 +1332,14 @@ class CYLRiveTabBarItemAnimationView internal constructor(context: Context, priv
          * [EN] A held input's off time before it goes on again (outside a loop). [CN] 保持的输入重新打开前的关闭时间（循环之外）。
          */
         internal const val INPUT_OFF_MS = 150L
+        /**
+         * [EN] One step of the state machine before it rests (a 60 Hz frame). [CN] 静止之前推进状态机的一步（60 Hz 的一帧）。
+         */
+        internal const val SETTLE_STEP_SECONDS = 1f / 60f
+        /**
+         * [EN] At most two seconds of steps; a machine still moving then moves by itself. [CN] 最多两秒的步数；之后仍在运动的状态机会自行运动。
+         */
+        internal const val SETTLE_STEPS = 120
     }
 
     object Provider : CYLTabBarItemAnimationViewProviding {

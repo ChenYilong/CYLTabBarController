@@ -208,6 +208,7 @@ docs/
 │   ├── android-more-than-five-tabs-report.png
 │   ├── android-playback-controls-pag-example-api35-b57c844.png
 │   ├── android-rive-menu-loop-pause-fix.png
+│   ├── android-rive-menu-settles-then-rests.png
 │   ├── android-rive-rest-same-frame-every-launch.png
 │   ├── animated-icons-demo-controls-request-android.jpg
 │   ├── animated-item-android-demo-interaction.png
@@ -223,11 +224,13 @@ docs/
 │   ├── animated-item-flutter-rive-icons-tinted.png
 │   ├── animated-item-flutter-rive-switch-after.png
 │   ├── animated-item-flutter-rive-switch-before.png
+│   ├── animated-item-harmonyos-dark-tint.png
 │   ├── animated-item-harmonyos-lottie-done.png
 │   ├── animated-item-harmonyos-lottie-playing.png
 │   ├── animated-item-harmonyos-retap-replay.png
 │   ├── animated-item-harmonyos-spacing-before.png
 │   ├── animated-item-harmonyos-tabbar.jpeg
+│   ├── animated-item-harmonyos-tint-option.png
 │   ├── animated-item-ios-demo-interactive-ios27.2.png
 │   ├── animated-item-ios-rive-loop-before-after.png
 │   ├── animated-item-ios-rive-loop-per-icon.png
@@ -337,7 +340,9 @@ docs/
 │   ├── ios-badges-on-animated-item-component.png
 │   ├── ios-flatdesign-animateditem-tab-ios26-4-a6e88609.png
 │   ├── ios-flatdesign-gif-no-image-under-animation-ios26-4-5ba3a089.png
+│   ├── ios-flatdesign-svga-selected-icon-missing.png
 │   ├── ios-gif-image-rest-then-play.png
+│   ├── ios-gif-svga-tint-option.png
 │   ├── ios-playback-controls-message-tab-iphone17pro-ios26.1-dc04439.png
 │   ├── ios-rive-dark-tint-appearance-switch.png
 │   ├── ios-rive-flatdesign-item-appearance.png
