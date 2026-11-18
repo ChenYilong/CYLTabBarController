@@ -4990,22 +4990,10 @@ static char CYLObservedStandardAppearanceTabBarKey;
 // [EN] `-cyl_syncTabBarItemAccessibility` and its helpers are Swift (Swift/CYLTabBarController+CYLAccessibility.swift,
 //      docs/Swift-Migration.md, step 55). [CN] `-cyl_syncTabBarItemAccessibility` 及其辅助函数已迁移到 Swift（第 55 步）。
 
-/// [EN] Marks the tab buttons (and the controller) the library filled with a selected background color.
-/// [CN] 标记本库填充过选中背景色的 Tab 按钮（以及控制器）。
-static char CYLColoredTabButtonsKey;
-
-/// [EN] Moves the selected background color once the current run loop turn ends, after UIKit changed the selection.
-/// [CN] 在当前 runloop 结束后（UIKit 修改选中状态之后）移动选中背景色。
-- (void)cyl_setNeedsUpdateSelectedBackgroundColors {
-    __weak __typeof(self) weakSelf = self;
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [weakSelf cyl_updateSelectedBackgroundColorsOfTabButtons];
-        // [EN] Also selection dependent: looping Lottie icons and the selected tab's badge.
-        // [CN] 同样取决于选中状态：循环播放的 Lottie 图标与选中 Tab 的角标。
-        [weakSelf cyl_updateLoopingLottieViews];
-        [weakSelf cyl_updateBadgesOfSelectedTab];
-    });
-}
+// [EN] `-cyl_setNeedsUpdateSelectedBackgroundColors`, `-cyl_updateSelectedBackgroundColorsOfTabButtons`,
+//      `-cyl_updateBadgesOfSelectedTab`, `cyl_hidesBadgeOfSelectedTab` and `-cyl_syncTabBarAppearances` are Swift
+//      (Swift/CYLTabBarController+CYLTabBarItemColors.swift, docs/Swift-Migration.md, step 56).
+// [CN] 上述方法已迁移到 Swift（第 56 步）。
 
 #if CYL_LOTTIE_AVAILABLE
 /// [EN] Calls a no-argument method only when `object` implements it (Lottie 2.x and 4.x views differ).
@@ -5070,129 +5058,6 @@ static void CYLCallIfImplemented(id object, SEL selector) {
         }
     }
 #endif
-}
-
-static char CYLHidesBadgeOfSelectedTabKey;
-/// [EN] The badge value hidden on a tab item ([NSNull null] for a nil one never stored). [CN] Tab item 上被隐藏的角标值。
-static char CYLHiddenBadgeValueKey;
-/// [EN] Marks a view controller whose CYLBadge was cleared by the library. [CN] 标记本库清除过 CYLBadge 的控制器。
-static char CYLHiddenCYLBadgeKey;
-
-/*!
- * [EN] `cyl_hidesBadgeOfSelectedTab`: hides the selected tab's badge, restores the others'; with the property off, restores
- *      everything it hid.
- * [CN] `cyl_hidesBadgeOfSelectedTab`：隐藏选中 Tab 的角标，恢复其他 Tab 的角标；属性关闭时恢复所有被隐藏的角标。
- */
-- (void)cyl_updateBadgesOfSelectedTab {
-    BOOL hides = [objc_getAssociatedObject(self, &CYLHidesBadgeOfSelectedTabKey) boolValue];
-    UIViewController *selectedViewController = self.selectedViewController;
-    for (UIViewController *viewController in self.viewControllers) {
-        if (viewController.cyl_isPlaceholder) {
-            continue;
-        }
-        BOOL hideThis = hides && viewController == selectedViewController;
-        UITabBarItem *item = viewController.tabBarItem;
-        NSString *hiddenValue = objc_getAssociatedObject(item, &CYLHiddenBadgeValueKey);
-        if (hideThis && item.badgeValue) {
-            objc_setAssociatedObject(item, &CYLHiddenBadgeValueKey, item.badgeValue, OBJC_ASSOCIATION_COPY_NONATOMIC);
-            item.badgeValue = nil;
-        } else if (!hideThis && hiddenValue) {
-            item.badgeValue = hiddenValue;
-            objc_setAssociatedObject(item, &CYLHiddenBadgeValueKey, nil, OBJC_ASSOCIATION_COPY_NONATOMIC);
-        }
-        BOOL clearedByLibrary = [objc_getAssociatedObject(viewController, &CYLHiddenCYLBadgeKey) boolValue];
-        if (hideThis && !clearedByLibrary && [viewController cyl_isShowBadge]) {
-            [viewController cyl_clearBadge];
-            objc_setAssociatedObject(viewController, &CYLHiddenCYLBadgeKey, @YES, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-        } else if (!hideThis && clearedByLibrary) {
-            [viewController cyl_resumeBadge];
-            objc_setAssociatedObject(viewController, &CYLHiddenCYLBadgeKey, nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-        }
-    }
-}
-
-- (BOOL)cyl_hidesBadgeOfSelectedTab {
-    return [objc_getAssociatedObject(self, &CYLHidesBadgeOfSelectedTabKey) boolValue];
-}
-
-- (void)setCyl_hidesBadgeOfSelectedTab:(BOOL)hidesBadgeOfSelectedTab {
-    objc_setAssociatedObject(self, &CYLHidesBadgeOfSelectedTabKey, @(hidesBadgeOfSelectedTab), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-    [self cyl_updateBadgesOfSelectedTab];
-}
-
-/*!
- * [EN] Classic tab bar: fills each tab button with its `CYLTabBarItemBackgroundColor`, and the selected one with its
- *      `CYLTabBarItemSelectedBackgroundColor` (the unselected color when it has none). Tabs without either key are left
- *      alone. Liquid Glass draws its own selection, so it is not touched.
- * [CN] 经典 TabBar：用 `CYLTabBarItemBackgroundColor` 填充每个 Tab 按钮，选中的按钮使用 `CYLTabBarItemSelectedBackgroundColor`
- *      （未设置时使用未选中背景色）。两个键都没有的 Tab 保持不变。液态玻璃自带选中效果，不做处理。
- */
-- (void)cyl_updateSelectedBackgroundColorsOfTabButtons {
-    if (!self.isViewLoaded || CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType || [CYLConstants isLiquidGlassActive] ||
-        ![self.cyl_tabBar isKindOfClass:[CYLTabBar class]]) {
-        return;
-    }
-    // [EN] Fast path: no tab uses the key and no button was colored before. [CN] 快速返回：没有 Tab 使用该键，且之前没有填充过按钮。
-    BOOL usesSelectedBackgroundColor = NO;
-    for (NSDictionary *attributes in self.tabBarItemsAttributes) {
-        if ([attributes isKindOfClass:[NSDictionary class]] &&
-            (attributes[CYLTabBarItemSelectedBackgroundColor] || attributes[CYLTabBarItemBackgroundColor])) {
-            usesSelectedBackgroundColor = YES;
-            break;
-        }
-    }
-    BOOL coloredBefore = [objc_getAssociatedObject(self, &CYLColoredTabButtonsKey) boolValue];
-    if (!usesSelectedBackgroundColor && !coloredBefore) {
-        return;
-    }
-    CYLTabBar *tabBar = (CYLTabBar *)self.cyl_tabBar;
-    NSUInteger tabIndex = 0;
-    for (UIControl *control in tabBar.cyl_visibleControls) {
-        // [EN] Counted as in `-cyl_bindTabControlActions`: system tab buttons only. [CN] 与 `-cyl_bindTabControlActions` 相同，只计系统 Tab 按钮。
-        if (![control cyl_isTabButton]) {
-            continue;
-        }
-        NSUInteger controlTabIndex = tabIndex++;
-        NSDictionary *attributes = [self tabBarItemAttributesAtIndex:controlTabIndex];
-        id selectedColor = attributes[CYLTabBarItemSelectedBackgroundColor];
-        id normalColor = attributes[CYLTabBarItemBackgroundColor];
-        selectedColor = [selectedColor isKindOfClass:[UIColor class]] ? selectedColor : nil;
-        normalColor = [normalColor isKindOfClass:[UIColor class]] ? normalColor : nil;
-        BOOL coloredByCYL = [objc_getAssociatedObject(control, &CYLColoredTabButtonsKey) boolValue];
-        if (!selectedColor && !normalColor) {
-            // [EN] The key was removed (e.g. by a reload): clear the color the library set. [CN] 该键已被移除（如重新加载）：清除本库设置的颜色。
-            if (coloredByCYL) {
-                control.backgroundColor = nil;
-                objc_setAssociatedObject(control, &CYLColoredTabButtonsKey, nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-            }
-            continue;
-        }
-        // [EN] Selected: its own color, else the unselected one. [CN] 选中：使用选中背景色，未设置时使用未选中背景色。
-        control.backgroundColor = (controlTabIndex == self.selectedIndex) ? (selectedColor ?: normalColor) : normalColor;
-        objc_setAssociatedObject(control, &CYLColoredTabButtonsKey, @YES, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-    }
-    objc_setAssociatedObject(self, &CYLColoredTabButtonsKey, usesSelectedBackgroundColor ? @YES : nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-}
-
-/*!
- * [EN] Brings everything built from the system tab bar's appearances up to date: the title offset copies of the tabs
- *      (issue #475) or, for FlatDesign (only when CYLFlatDesignTabBar is integrated), the flat design tab bar. Runs on layout and when `tabBar.standardAppearance` /
- *      `scrollEdgeAppearance` is assigned (KVO), so a new appearance applies at once.
- * [CN] 更新所有基于系统 TabBar appearance 构建的内容：Tab 的标题偏移副本（issue #475），扁平样式时（仅在集成了 CYLFlatDesignTabBar 时）为扁平样式 TabBar。在布局时以及
- *      `tabBar.standardAppearance` / `scrollEdgeAppearance` 被赋值时（KVO）执行，新的 appearance 立即生效。
- */
-- (void)cyl_syncTabBarAppearances {
-    [self cyl_syncTabBarItemAccessibility];
-    if (CYLTabBarStyleTypeFlatDesign != self.tabBarStyleType) {
-        // FIX: issue #475
-        [self cyl_syncTitlePositionAdjustmentAppearances];
-    } else {
-#if CYL_FLATDESIGN_AVAILABLE
-        // `tabBar.standardAppearance` also styles the flat design tab bar. `tabBar.standardAppearance` 同样作用于扁平样式 TabBar。
-        [self cyl_syncFlatDesignStandardAppearance];
-        [self cyl_syncFlatDesignTabBarItemColors];
-#endif
-    }
 }
 
 /// `UITabBar.scrollEdgeAppearance` exists from iOS 15, `standardAppearance` from iOS 13.

@@ -235,7 +235,7 @@ extension CYLTabBarController {
         }
         // [EN] Bring the title offset copies (issue #475) and the flat design tab bar up to date now.
         // [CN] 立即更新标题偏移副本（issue #475）与扁平样式 TabBar。
-        cylPrivate.cylSyncTabBarAppearances()
+        cylSyncTabBarAppearances()
         tabBarTheme?.cyl_customize?(self)
         // [EN] Styles set in one place win over the theme's appearance. [CN] 在一处设置的样式优先于主题的外观。
         cylApplyTabBarItemStyles()

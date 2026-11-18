@@ -392,7 +392,7 @@ extension CYLTabBarController {
             apply(scrollEdgeAppearance)
             tabBar.scrollEdgeAppearance = scrollEdgeAppearance
         }
-        cylPrivate.cylSyncTabBarAppearances()
+        cylSyncTabBarAppearances()
     }
 }
 

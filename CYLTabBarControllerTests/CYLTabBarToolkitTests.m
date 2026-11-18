@@ -241,4 +241,30 @@
     XCTAssertNil(item.cyl_viewDidLayoutSubviewsBlock);
 }
 
+#pragma mark - Selected tab badge (Swift since step 56)
+
+/// [EN] The selected tab's badge value is stored while hidden and comes back when another tab is selected or the property is off.
+/// [CN] 选中 Tab 的角标值在隐藏期间被暂存，选中其他 Tab 或关闭属性后恢复。
+- (void)testHidesBadgeOfSelectedTab {
+    CYLTabBarController *tabBarController = [self newTabBarController];
+    UITabBarItem *firstItem = tabBarController.viewControllers[0].tabBarItem;
+    UITabBarItem *secondItem = tabBarController.viewControllers[1].tabBarItem;
+    firstItem.badgeValue = @"3";
+    secondItem.badgeValue = @"5";
+    tabBarController.selectedIndex = 0;
+    XCTAssertFalse(tabBarController.cyl_hidesBadgeOfSelectedTab);
+    tabBarController.cyl_hidesBadgeOfSelectedTab = YES;
+    XCTAssertTrue(tabBarController.cyl_hidesBadgeOfSelectedTab);
+    XCTAssertNil(firstItem.badgeValue, @"the selected tab's badge is hidden");
+    XCTAssertEqualObjects(secondItem.badgeValue, @"5");
+    tabBarController.selectedIndex = 1;
+    SEL update = NSSelectorFromString(@"cyl_updateBadgesOfSelectedTab");
+    XCTAssertTrue([tabBarController respondsToSelector:update]);
+    ((void (*)(id, SEL))[tabBarController methodForSelector:update])(tabBarController, update);
+    XCTAssertEqualObjects(firstItem.badgeValue, @"3", @"restored once another tab is selected");
+    XCTAssertNil(secondItem.badgeValue);
+    tabBarController.cyl_hidesBadgeOfSelectedTab = NO;
+    XCTAssertEqualObjects(secondItem.badgeValue, @"5", @"everything hidden comes back when the property is off");
+}
+
 @end

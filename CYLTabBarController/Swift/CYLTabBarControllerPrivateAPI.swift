@@ -15,7 +15,8 @@ import UIKit
  *      库内的 Swift 代码通过 `cylPrivate` 调用它们。其所属代码翻译为 Swift 后，对应条目即可删除。文档：docs/Swift-Migration.md，第 39 步。
  */
 @objc protocol CYLTabBarControllerPrivateAPI {
-    @objc(cyl_syncTabBarAppearances) func cylSyncTabBarAppearances()
+    @objc(cyl_syncTitlePositionAdjustmentAppearances) func cylSyncTitlePositionAdjustmentAppearances()
+    @objc(cyl_updateLoopingLottieViews) func cylUpdateLoopingLottieViews()
     @objc(cyl_rearmViewDidLayoutSubviewsBlockInvokeOnce) func cylRearmViewDidLayoutSubviewsBlockInvokeOnce()
     @objc(cyl_tabBarItemIconViewProviders) func cylTabBarItemIconViewProviders() -> NSMapTable<UIViewController, AnyObject>
     @objc(cyl_themeRemoveTabBarItemAttributeKeys:atIndex:) func cylThemeRemoveTabBarItemAttributeKeys(_ keys: [String], atIndex index: UInt)
