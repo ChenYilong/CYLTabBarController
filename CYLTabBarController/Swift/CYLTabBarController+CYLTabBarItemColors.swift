@@ -173,7 +173,7 @@ extension CYLTabBarController {
         cylSyncTabBarItemAccessibility()
         guard tabBarStyleType == .flatDesign else {
             // FIX: issue #475
-            cylPrivate.cylSyncTitlePositionAdjustmentAppearances()
+            cylSyncTitlePositionAdjustmentAppearances()
             return
         }
         // [EN] FlatDesign is an optional subspec: its methods exist only when it is integrated. `tabBar.standardAppearance`

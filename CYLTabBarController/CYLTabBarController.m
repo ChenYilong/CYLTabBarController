@@ -4549,22 +4549,10 @@ static void CYLSetAnimatedItemIconHidden(UIControl *tabButton, BOOL hidden) {
  *      范围：经典系统 TabBar（iOS 25 及以前、iOS 26 UI 兼容模式）与液态玻璃（iOS 26+、iPhone Duo），两者都使用 `UITabBarItem`。
  *      扁平样式不会执行到这里：其 item 为 `CYLFlatDesignTabBarItem`，没有可被覆盖的 appearance 代理。
  */
-static char CYLTitlePositionAdjustmentSetByCYLKey;
-- (void)cyl_applyTitlePositionAdjustment:(UIOffset)offset toTabBarItem:(UITabBarItem *)tabBarItem {
-    if (!tabBarItem) {
-        return;
-    }
-    BOOL isZero = UIOffsetEqualToOffset(UIOffsetZero, offset);
-    BOOL wasSetByCYL = (objc_getAssociatedObject(tabBarItem, &CYLTitlePositionAdjustmentSetByCYLKey) != nil);
-    if (isZero && !wasSetByCYL) {
-        return;
-    }
-    tabBarItem.titlePositionAdjustment = offset;
-    objc_setAssociatedObject(tabBarItem, &CYLTitlePositionAdjustmentSetByCYLKey, isZero ? nil : [NSValue valueWithUIOffset:offset], OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-    if (@available(iOS 13.0, *)) {
-        [self cyl_syncTitlePositionAdjustmentAppearanceOfTabBarItem:tabBarItem];
-    }
-}
+// [EN] `-cyl_applyTitlePositionAdjustment:toTabBarItem:` is Swift (Swift/CYLTabBarController+CYLTitlePositionAdjustment.swift,
+//      docs/Swift-Migration.md, step 57); the key is selector based, shared with Swift.
+// [CN] `-cyl_applyTitlePositionAdjustment:toTabBarItem:` 已迁移到 Swift（第 57 步）；key 基于 selector，与 Swift 共用。
+#define CYLTitlePositionAdjustmentSetByCYLKey ((const void *)sel_registerName("cyl_titlePositionAdjustmentSetByCYL"))
 
 #pragma mark - Title position adjustment (issue #475)
 
@@ -4583,8 +4571,6 @@ static char CYLTitlePositionAdjustmentSetByCYLKey;
  *      设置的 appearance 会作为基础保留，偏移重置时恢复。
  */
 static char CYLTitlePositionAdjustmentItemOffsetKey;
-static char CYLTitlePositionAdjustmentStandardAppearanceKey;
-static char CYLTitlePositionAdjustmentScrollEdgeAppearanceKey;
 
 /// The offset a tab asked for itself (`CYLTabBarItemTitlePositionAdjustment`), so a new controller-level offset does not
 /// replace it. 记录 Tab 自身设置的偏移，避免被控制器级别的新偏移覆盖。
@@ -4603,205 +4589,9 @@ static UIOffset CYLTitlePositionAdjustmentForItem(id _Nullable item, UIOffset co
     return itemOffset ? itemOffset.UIOffsetValue : controllerOffset;
 }
 
-API_AVAILABLE(ios(13.0))
-static void CYLSetTitlePositionAdjustmentOfItemAppearance(UITabBarItemAppearance *itemAppearance, UIOffset offset) {
-    for (UITabBarItemStateAppearance *state in @[ itemAppearance.normal, itemAppearance.selected, itemAppearance.disabled, itemAppearance.focused ]) {
-        state.titlePositionAdjustment = offset;
-    }
-}
-
-API_AVAILABLE(ios(13.0))
-static UITabBarAppearance *CYLTabBarAppearanceWithTitlePositionAdjustment(UITabBarAppearance *base, UIOffset offset) {
-    UITabBarAppearance *appearance = [base copy];
-    CYLSetTitlePositionAdjustmentOfItemAppearance(appearance.stackedLayoutAppearance, offset);
-    CYLSetTitlePositionAdjustmentOfItemAppearance(appearance.inlineLayoutAppearance, offset);
-    CYLSetTitlePositionAdjustmentOfItemAppearance(appearance.compactInlineLayoutAppearance, offset);
-    return appearance;
-}
-
-/// [EN] The per-tab colors and title fonts (`CYLTabBarItemTitleColor`, `CYLTabBarItemTitleFont`...) a tab asked for, kept on
-///      its UITabBarItem; nil when none.
-/// [CN] Tab 设置的颜色与标题字体（`CYLTabBarItemTitleColor`、`CYLTabBarItemTitleFont` 等），保存在其 UITabBarItem 上；没有时为 nil。
-static char CYLTabBarItemColorsKey;
-
-static NSDictionary<NSString *, id> *CYLTabBarItemColorsFromAttributes(NSDictionary *attributes) {
-    NSMutableDictionary<NSString *, id> *colors = nil;
-    for (NSString *key in @[ CYLTabBarItemTitleColor, CYLTabBarItemSelectedTitleColor, CYLTabBarItemIconColor, CYLTabBarItemSelectedIconColor ]) {
-        id color = attributes[key];
-        if ([color isKindOfClass:[UIColor class]]) {
-            if (!colors) {
-                colors = [NSMutableDictionary dictionary];
-            }
-            colors[key] = color;
-        }
-    }
-    for (NSString *key in @[ CYLTabBarItemTitleFont, CYLTabBarItemSelectedTitleFont ]) {
-        id font = attributes[key];
-        if ([font isKindOfClass:[UIFont class]]) {
-            if (!colors) {
-                colors = [NSMutableDictionary dictionary];
-            }
-            colors[key] = font;
-        }
-    }
-    return [colors copy];
-}
-
-/// [EN] Sets one title text attribute (color or font) of a state, keeping the others. [CN] 设置某个状态的一个标题属性（颜色或字体），保留其他属性。
-API_AVAILABLE(ios(13.0))
-static void CYLSetTitleAttributeOfStateAppearance(UITabBarItemStateAppearance *state, NSAttributedStringKey attributeName, id value) {
-    if (!value) {
-        return;
-    }
-    NSMutableDictionary<NSAttributedStringKey, id> *attributes = [state.titleTextAttributes mutableCopy] ?: [NSMutableDictionary dictionary];
-    attributes[attributeName] = value;
-    state.titleTextAttributes = attributes;
-}
-
-API_AVAILABLE(ios(13.0))
-static void CYLSetColorsOfItemAppearance(UITabBarItemAppearance *itemAppearance, NSDictionary<NSString *, id> *colors) {
-    CYLSetTitleAttributeOfStateAppearance(itemAppearance.normal, NSForegroundColorAttributeName, colors[CYLTabBarItemTitleColor]);
-    CYLSetTitleAttributeOfStateAppearance(itemAppearance.selected, NSForegroundColorAttributeName, colors[CYLTabBarItemSelectedTitleColor]);
-    // [EN] Fonts: the selected state uses the unselected font unless it has its own. [CN] 字体：选中状态没有单独设置时使用未选中的字体。
-    UIFont *titleFont = colors[CYLTabBarItemTitleFont];
-    UIFont *selectedTitleFont = colors[CYLTabBarItemSelectedTitleFont] ?: titleFont;
-    CYLSetTitleAttributeOfStateAppearance(itemAppearance.normal, NSFontAttributeName, titleFont);
-    CYLSetTitleAttributeOfStateAppearance(itemAppearance.selected, NSFontAttributeName, selectedTitleFont);
-    if (colors[CYLTabBarItemIconColor]) {
-        itemAppearance.normal.iconColor = colors[CYLTabBarItemIconColor];
-    }
-    if (colors[CYLTabBarItemSelectedIconColor]) {
-        itemAppearance.selected.iconColor = colors[CYLTabBarItemSelectedIconColor];
-    }
-}
-
-/*!
- * [EN] The appearance of one tab: a copy of `base` with its title offset (when `offsetValue` is set) and its colors (when
- *      `colors` is set) written into every layout.
- * [CN] 单个 Tab 的 appearance：`base` 的副本，写入其标题偏移（`offsetValue` 不为 nil 时）与颜色（`colors` 不为 nil 时），作用于所有布局。
- */
-API_AVAILABLE(ios(13.0))
-static UITabBarAppearance *CYLTabBarAppearanceForItem(UITabBarAppearance *base, NSValue *_Nullable offsetValue, NSDictionary<NSString *, id> *_Nullable colors) {
-    UITabBarAppearance *appearance = offsetValue ? CYLTabBarAppearanceWithTitlePositionAdjustment(base, offsetValue.UIOffsetValue) : [base copy];
-    if (colors.count > 0) {
-        CYLSetColorsOfItemAppearance(appearance.stackedLayoutAppearance, colors);
-        CYLSetColorsOfItemAppearance(appearance.inlineLayoutAppearance, colors);
-        CYLSetColorsOfItemAppearance(appearance.compactInlineLayoutAppearance, colors);
-    }
-    return appearance;
-}
-
-/*!
- * [EN] Keeps one appearance of `tabBarItem` (`standardAppearance` or `scrollEdgeAppearance`) in step with its offset.
- *      `barAppearance` is the tab bar's appearance it is built from; `transparent` builds it with a transparent
- *      background. The associated state is `@[installed, barAppearance, appBase or NSNull, offset or NSNull, colors or
- *      NSNull]`: the bar appearance itself is kept (not a copy), so an unchanged tab bar is recognized by identity and
- *      nothing is installed again on layout; the offset and the per-tab colors it was built with tell when to rebuild.
- * [CN] 使 `tabBarItem` 的某个 appearance（`standardAppearance` 或 `scrollEdgeAppearance`）与偏移保持一致。`barAppearance`
- *      为其所基于的 TabBar appearance，`transparent` 表示以透明背景构建。关联状态为 `@[installed, barAppearance, appBase 或 NSNull, offset 或 NSNull, colors 或 NSNull]`（offset 与单个 Tab 的颜色用于判断是否需要重建）：
- *      保存的是 bar appearance 本身（不是副本），TabBar 未改变时按对象身份即可识别，布局时不会重复安装。
- */
-API_AVAILABLE(ios(13.0))
-static void CYLSyncTitlePositionAdjustmentAppearance(UITabBarItem *tabBarItem, const void *stateKey, UITabBarAppearance *_Nullable current, UITabBarAppearance *_Nullable barAppearance, BOOL transparent, NSValue *_Nullable offsetValue, NSDictionary<NSString *, id> *_Nullable colors, void (^setter)(UITabBarAppearance *_Nullable appearance), UITabBarAppearance *_Nullable (^getter)(void)) {
-    // [EN] State: @[installed, source, appBase or NSNull, offset or NSNull, colors or NSNull] (the last two since the
-    //      per-tab colors were added; an older 3-element state reads them as missing).
-    // [CN] 状态：@[installed, source, appBase 或 NSNull, offset 或 NSNull, colors 或 NSNull]（后两项为加入单个 Tab 颜色后新增；
-    //      旧的 3 元素状态读取为缺失）。
-    NSArray *state = objc_getAssociatedObject(tabBarItem, stateKey);
-    UITabBarAppearance *installed = state.firstObject;
-    id storedAppBase = state.count > 2 ? state[2] : nil;
-    UITabBarAppearance *appBase = [storedAppBase isKindOfClass:[UITabBarAppearance class]] ? storedAppBase : nil;
-    BOOL installedByCYL = installed && (current == installed || [current isEqual:installed]);
-    if (current && !installedByCYL) {
-        // The app installed its own appearance on the item: build on it.
-        // App 在 item 上安装了自己的 appearance：在其基础上构建。
-        appBase = current;
-    }
-    if (!offsetValue && colors.count == 0) {
-        if (state) {
-            setter(appBase);
-            objc_setAssociatedObject(tabBarItem, stateKey, nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-        }
-        return;
-    }
-    id source = appBase ?: barAppearance;
-    if (!source) {
-        return;
-    }
-    id storedSource = state.count > 1 ? state[1] : nil;
-    id storedOffset = state.count > 3 ? state[3] : nil;
-    id storedColors = state.count > 4 ? state[4] : nil;
-    id offsetToStore = offsetValue ?: [NSNull null];
-    id colorsToStore = colors.count > 0 ? colors : [NSNull null];
-    BOOL upToDate = installedByCYL && (storedSource == source || [storedSource isEqual:source]) &&
-                    [storedOffset isEqual:offsetToStore] && [storedColors isEqual:colorsToStore];
-    if (upToDate) {
-        return;
-    }
-    UITabBarAppearance *base = source;
-    if (!appBase && transparent) {
-        base = [source copy];
-        [base configureWithTransparentBackground];
-    }
-    setter(CYLTabBarAppearanceForItem(base, offsetValue, colors));
-    UITabBarAppearance *newInstalled = getter();
-    if (!newInstalled) {
-        return;
-    }
-    objc_setAssociatedObject(tabBarItem, stateKey, @[ newInstalled, source, appBase ?: [NSNull null], offsetToStore, colorsToStore ], OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-}
-
-- (void)cyl_syncTitlePositionAdjustmentAppearanceOfTabBarItem:(UITabBarItem *)tabBarItem API_AVAILABLE(ios(13.0)) {
-    NSValue *offsetValue = objc_getAssociatedObject(tabBarItem, &CYLTitlePositionAdjustmentSetByCYLKey);
-    NSDictionary<NSString *, id> *colors = objc_getAssociatedObject(tabBarItem, &CYLTabBarItemColorsKey);
-    UITabBar *tabBar = self.tabBar;
-    UITabBarAppearance *standardAppearance = tabBar.standardAppearance;
-    CYLSyncTitlePositionAdjustmentAppearance(tabBarItem, &CYLTitlePositionAdjustmentStandardAppearanceKey, tabBarItem.standardAppearance, standardAppearance, NO, offsetValue, colors, ^(UITabBarAppearance *appearance) {
-        tabBarItem.standardAppearance = appearance;
-    }, ^UITabBarAppearance *{
-        return tabBarItem.standardAppearance;
-    });
-    if (@available(iOS 15.0, *)) {
-        // Without a scroll edge appearance the tab bar shows its standard one with a transparent background at the
-        // scroll edge: build the same, so the item's opaque standard copy is not used there.
-        // 没有 scrollEdgeAppearance 时，TabBar 在滚动边缘显示透明背景的 standardAppearance：按相同方式构建，避免在此处使用
-        // item 的不透明副本。
-        UITabBarAppearance *scrollEdgeAppearance = tabBar.scrollEdgeAppearance;
-        BOOL transparent = (scrollEdgeAppearance == nil);
-        CYLSyncTitlePositionAdjustmentAppearance(tabBarItem, &CYLTitlePositionAdjustmentScrollEdgeAppearanceKey, tabBarItem.scrollEdgeAppearance, scrollEdgeAppearance ?: standardAppearance, transparent, offsetValue, colors, ^(UITabBarAppearance *appearance) {
-            tabBarItem.scrollEdgeAppearance = appearance;
-        }, ^UITabBarAppearance *{
-            return tabBarItem.scrollEdgeAppearance;
-        });
-    }
-}
-
-/// Picks up changes the app made to the tab bar's appearance since the offsets were applied.
-/// 同步 App 在应用偏移后对 TabBar appearance 所做的修改。
-- (void)cyl_syncTitlePositionAdjustmentAppearances {
-    if (@available(iOS 13.0, *)) {
-        // [EN] Per-tab colors: read from `tabBarItemsAttributes` on every layout pass, so a reload or an in-place update
-        //      is picked up; kept on the item and built into the same per-item appearance as the title offset.
-        // [CN] 单个 Tab 的颜色：每次布局时从 `tabBarItemsAttributes` 读取，因此重新加载或原地更新后都会生效；保存在 item 上，
-        //      与标题偏移写入同一个 item appearance。
-        NSArray<UIViewController *> *viewControllers = self.viewControllers;
-        for (NSUInteger index = 0; index < viewControllers.count; index++) {
-            UITabBarItem *item = viewControllers[index].tabBarItem;
-            NSDictionary<NSString *, id> *colors = CYLTabBarItemColorsFromAttributes([self tabBarItemAttributesAtIndex:index]);
-            NSDictionary *storedColors = objc_getAssociatedObject(item, &CYLTabBarItemColorsKey);
-            if (item && !(colors == storedColors || [colors isEqual:storedColors])) {
-                objc_setAssociatedObject(item, &CYLTabBarItemColorsKey, colors, OBJC_ASSOCIATION_COPY_NONATOMIC);
-            }
-        }
-        for (UITabBarItem *tabBarItem in self.tabBar.items) {
-            if (objc_getAssociatedObject(tabBarItem, &CYLTitlePositionAdjustmentSetByCYLKey) ||
-                objc_getAssociatedObject(tabBarItem, &CYLTabBarItemColorsKey) ||
-                objc_getAssociatedObject(tabBarItem, &CYLTitlePositionAdjustmentStandardAppearanceKey)) {
-                [self cyl_syncTitlePositionAdjustmentAppearanceOfTabBarItem:tabBarItem];
-            }
-        }
-    }
-}
+// [EN] The per-item appearances (title offset and per-tab colors) and `-cyl_syncTitlePositionAdjustmentAppearances` are
+//      Swift (Swift/CYLTabBarController+CYLTitlePositionAdjustment.swift, docs/Swift-Migration.md, step 57).
+// [CN] 每个 item 的 appearance（标题偏移与单个 Tab 颜色）及 `-cyl_syncTitlePositionAdjustmentAppearances` 已迁移到 Swift（第 57 步）。
 
 - (void)setTitlePositionAdjustment:(UIOffset)titlePositionAdjustment {
     _titlePositionAdjustment = titlePositionAdjustment;
@@ -5364,7 +5154,7 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
         // The item's own offset, kept by CYL (`CYLTabBarItemTitlePositionAdjustment` or the controller-level offset).
         // CYL 记录的 item 自身偏移（`CYLTabBarItemTitlePositionAdjustment` 或控制器级别的偏移）。
         BOOL titleOffsetSetByCYL = (objc_getAssociatedObject(item, &CYLTitlePositionAdjustmentItemOffsetKey) != nil) ||
-                                   (objc_getAssociatedObject(item, &CYLTitlePositionAdjustmentSetByCYLKey) != nil);
+                                   (objc_getAssociatedObject(item, CYLTitlePositionAdjustmentSetByCYLKey) != nil);
         NSValue *appliedTitle = record[CYLImageOnlyTabAppliedTitleKey];
         BOOL titleIsOurs = appliedTitle && UIOffsetEqualToOffset(item.titlePositionAdjustment, appliedTitle.UIOffsetValue);
         BOOL titleIsFree = !appliedTitle && !titleOffsetSetByCYL && UIOffsetEqualToOffset(UIOffsetZero, item.titlePositionAdjustment);

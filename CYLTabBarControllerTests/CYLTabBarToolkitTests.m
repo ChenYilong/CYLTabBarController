@@ -267,4 +267,36 @@
     XCTAssertEqualObjects(secondItem.badgeValue, @"5", @"everything hidden comes back when the property is off");
 }
 
+#pragma mark - Per-tab colors and title offset (Swift since step 57, issue #475)
+
+/// [EN] A tab's own selected title color and the title offset go into its own appearance; the other tab keeps the bar's.
+/// [CN] Tab 自己的选中标题颜色与标题偏移写入它自己的 appearance；另一个 Tab 使用 TabBar 的 appearance。
+- (void)testPerTabColorAndOffsetReachTheItemAppearance {
+    UINavigationController *first = [[UINavigationController alloc] initWithRootViewController:[UIViewController new]];
+    UINavigationController *second = [[UINavigationController alloc] initWithRootViewController:[UIViewController new]];
+    CYLTabBarController *tabBarController = [[CYLTabBarController alloc] initWithViewControllers:@[ first, second ]
+                                                                           tabBarItemsAttributes:@[ @{ CYLTabBarItemTitle : @"First",
+                                                                                                       CYLTabBarItemSelectedTitleColor : UIColor.redColor },
+                                                                                                    @{ CYLTabBarItemTitle : @"Second" } ]];
+    tabBarController.view.frame = CGRectMake(0, 0, 390, 844);
+    [tabBarController.view layoutIfNeeded];
+    XCTAssertEqual(tabBarController.tabBar.items.count, 2u, @"the color pass walks the tab bar's items");
+    tabBarController.titlePositionAdjustment = UIOffsetMake(0, -3);
+    SEL sync = NSSelectorFromString(@"cyl_syncTitlePositionAdjustmentAppearances");
+    XCTAssertTrue([tabBarController respondsToSelector:sync]);
+    ((void (*)(id, SEL))[tabBarController methodForSelector:sync])(tabBarController, sync);
+    UITabBarAppearance *firstAppearance = first.tabBarItem.standardAppearance;
+    XCTAssertNotNil(firstAppearance);
+    UITabBarItemStateAppearance *selected = firstAppearance.stackedLayoutAppearance.selected;
+    XCTAssertEqualObjects(selected.titleTextAttributes[NSForegroundColorAttributeName], UIColor.redColor);
+    XCTAssertTrue(UIOffsetEqualToOffset(selected.titlePositionAdjustment, UIOffsetMake(0, -3)));
+    // [EN] Without its own colors, the second tab still gets the offset. [CN] 第二个 Tab 没有自己的颜色，仍会得到偏移。
+    UITabBarAppearance *secondAppearance = second.tabBarItem.standardAppearance;
+    XCTAssertTrue(UIOffsetEqualToOffset(secondAppearance.stackedLayoutAppearance.normal.titlePositionAdjustment, UIOffsetMake(0, -3)));
+    XCTAssertNil(secondAppearance.stackedLayoutAppearance.selected.titleTextAttributes[NSForegroundColorAttributeName]);
+    // [EN] Reset: the copies go away. [CN] 重置：副本被移除。
+    tabBarController.titlePositionAdjustment = UIOffsetZero;
+    XCTAssertNil(second.tabBarItem.standardAppearance);
+}
+
 @end
