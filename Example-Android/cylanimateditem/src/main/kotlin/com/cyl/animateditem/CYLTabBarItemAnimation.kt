@@ -1215,12 +1215,14 @@ class CYLRiveTabBarItemAnimationView internal constructor(context: Context, priv
         if (machine != null && trigger == null && activeDuration > 0) activeDuration + LOOP_PAUSE_SECONDS else LOOP_SECONDS
 
     override fun cyl_showAnimationViewLastFrame() {
-        if (stateMachine != null) setActive(true) else CYLReflection.call(rive, "pause")
+        // [EN] The selection is recorded either way, so a theme instance bound later (night mode) keeps it.
+        // [CN] 无论哪种情况都记录选中状态，之后绑定的主题实例（深色模式）会保留它。
+        if (stateMachine != null) setActive(true) else { isActive = true; CYLReflection.call(rive, "pause") }
     }
 
     override fun cyl_stopAnimationView() {
         handler.removeCallbacksAndMessages(null)
-        if (stateMachine != null) setActive(false) else { CYLReflection.call(rive, "stop"); CYLReflection.call(rive, "reset") }
+        if (stateMachine != null) setActive(false) else { isActive = false; CYLReflection.call(rive, "stop"); CYLReflection.call(rive, "reset") }
     }
 
     /**

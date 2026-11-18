@@ -36,7 +36,7 @@ class CYLRiveDarkModeTest {
     class Artboard
     class File(private val viewModel: ViewModel) { fun defaultViewModelForArtboard(artboard: Artboard) = viewModel }
     class Machine { var bound: Instance? = null; fun setViewModelInstance(instance: Instance) { bound = instance } }
-    class Controller(val file: File, val artboard: Artboard, val machines: List<Machine>) {
+    class Controller(private val file: File, private val artboard: Artboard, private val machines: List<Machine>) {
         fun getFile() = file
         fun getActiveArtboard() = artboard
         fun getStateMachines() = machines
