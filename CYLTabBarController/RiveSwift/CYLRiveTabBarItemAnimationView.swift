@@ -677,39 +677,29 @@ final class CYLRiveTabBarItemAnimationFileCache: CYLRiveTabBarItemAnimationFileP
 final class CYLRiveTintOverlay {
     private var layer: CALayer?
 
-    /// [EN] The view the tint covers: the Rive render view only, so a badge the tab bar adds to `host` (above it) keeps its own
-    ///      colors (a tinted badge drew in the icon color and could not be seen); `host` before the file is loaded.
-    /// [CN] 着色覆盖的视图：仅 Rive 渲染视图，TabBar 添加到 `host`（位于其上方）的角标保持自身颜色（被着色的角标会以图标颜色绘制，无法辨认）；
-    ///      文件加载之前为 `host`。
-    private func target(in host: UIView) -> UIView {
-        host.subviews.first { $0 is RiveUIView || $0 is RiveView } ?? host
-    }
-
-    /// [EN] Draws `color` over `host`'s icon (its Rive render view); nil removes the tint. [CN] 在 `host` 的图标（其 Rive 渲染视图）上绘制 `color`；nil 移除着色。
+    /// [EN] Draws `color` over `host`'s icon, above its subviews; nil removes the tint. [CN] 在 `host` 的图标上绘制 `color`；nil 移除着色。
     func apply(_ color: UIColor?, in host: UIView) {
         guard let color else {
             layer?.removeFromSuperlayer()
             layer = nil
             return
         }
-        let target = target(in: host)
         let overlay = layer ?? CALayer()
         overlay.compositingFilter = "sourceAtop"
         overlay.backgroundColor = color.resolvedColor(with: host.traitCollection).cgColor
-        overlay.frame = target.bounds
-        target.layer.addSublayer(overlay)
+        overlay.frame = host.bounds
+        host.layer.addSublayer(overlay)
         layer = overlay
     }
 
-    /// [EN] Keeps the tint over the whole render view, on top of it. [CN] 让着色覆盖整个渲染视图并位于其最上层。
+    /// [EN] Keeps the tint over the whole view, on top. [CN] 让着色覆盖整个视图并位于最上层。
     func layout(in host: UIView) {
         guard let overlay = layer else {
             return
         }
-        let target = target(in: host)
-        overlay.frame = target.bounds
-        if overlay.superlayer !== target.layer || target.layer.sublayers?.last !== overlay {
-            target.layer.addSublayer(overlay)
+        overlay.frame = host.bounds
+        if host.layer.sublayers?.last !== overlay {
+            host.layer.addSublayer(overlay)
         }
     }
 }
