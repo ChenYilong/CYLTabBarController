@@ -1183,7 +1183,25 @@ class CYLRiveTabBarItemAnimationView internal constructor(context: Context, priv
         isActive = active
         val machine = stateMachine ?: return
         if (!hasInput(machine, booleanInput)) return
+        cyl_resumeStateMachineIfSettled(machine)
         CYLReflection.call(rive, "setBooleanState", machine, booleanInput, active)
+    }
+
+    /**
+     * [EN] Plays the state machine again when the controller has none playing, before an input is set. A machine that settled
+     *      (after `cyl_restUntilPlayed`, or after any transition) is paused by rive-android; a new input is meant to restart
+     *      it, but on a slow x86_64 emulator (API 37) it did not: menu_button.riv stayed on its close icon while "isOpen"
+     *      flipped on every loop pass (3bd20b3c, logged by the CollectionViewClassifyMenu session). The fake view of the tests
+     *      has no controller.
+     * [CN] 设置输入之前，如果控制器中没有正在播放的状态机，则重新播放该状态机。已稳定的状态机（`cyl_restUntilPlayed` 之后，或任意一次切换之后）会被
+     *      rive-android 暂停；新的输入本应让它重新运行，但在较慢的 x86_64 模拟器（API 37）上没有：每次循环 "isOpen" 都在切换，menu_button.riv
+     *      却一直停在关闭图标上（3bd20b3c，CollectionViewClassifyMenu 会话记录）。测试中的伪造视图没有控制器。
+     */
+    private fun cyl_resumeStateMachineIfSettled(machine: String) {
+        val controller = CYLReflection.call(rive, "getController") ?: return
+        val playing = CYLReflection.call(controller, "getPlayingStateMachines") as? Collection<*> ?: return
+        if (playing.isNotEmpty()) return
+        CYLReflection.callKotlin(rive, "play", machine, CYLReflection.DEFAULT, CYLReflection.DEFAULT, true, false)
     }
 
     /**
@@ -1237,6 +1255,7 @@ class CYLRiveTabBarItemAnimationView internal constructor(context: Context, priv
                 // [EN] The next value: house.riv moves only when Rooms changes. [CN] 下一个值：house.riv 只在 Rooms 变化时运动。
                 val next = CYLRiveInputs.nextNumber(numberValues, CYLRiveInputs.numberValue(rive, machine, number) ?: lastNumber)
                 lastNumber = next
+                cyl_resumeStateMachineIfSettled(machine)
                 CYLReflection.call(rive, "setNumberState", machine, number, next)
             }
             machine != null && trigger != null && hasInput(machine, trigger) -> {

@@ -173,6 +173,17 @@ class CYLRiveLoopTest {
     }
 
     @Test
+    fun aSettledStateMachineIsPlayedAgainBeforeEachInput() {
+        val controller = FakeController(settlesAfter = 1)
+        val rive = FakeRiveWithController(context, listOf(Machine("State Machine", listOf("isOpen"))), controller)
+        val view = CYLRiveTabBarItemAnimationView(context, rive, mapOf("stateMachine" to "State Machine", "input" to "isOpen", "duration" to "0"))
+        view.cyl_restUntilPlayed()
+        view.cyl_playAnimationView(); idle(CYLRiveTabBarItemAnimationView.INPUT_OFF_MS + 10)
+        assertEquals("menu_button.riv on a slow emulator: the settled (paused) machine plays again before each input",
+            listOf("play:State Machine", "play:State Machine", "isOpen=false", "play:State Machine", "isOpen=true"), rive.calls)
+    }
+
+    @Test
     fun aFileLoadedAgainAfterAPlayKeepsRunning() {
         val rive = FakeRive(context, listOf(Machine("State Machine 1", emptyList())))
         val view = CYLRiveTabBarItemAnimationView(context, rive, mapOf("stateMachine" to "State Machine 1"))
