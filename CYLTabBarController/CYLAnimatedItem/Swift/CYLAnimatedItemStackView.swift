@@ -83,6 +83,19 @@ open class CYLAnimatedItemStackView: UIView, UIGestureRecognizerDelegate {
         }
     }
 
+    /**
+     [EN] Whether the stack runs an item's action when the item is tapped (true, default). false: each item handles its own
+          tap (e.g. CYLTableViewPlaceHolder's components run their own tap handler), so the stack neither runs actions on
+          item taps nor changes the items' `isUserInteractionEnabled`; it still performs the background tap (skipping items
+          that `isItemViewInteractive(_:)` reports as interactive), `performAction(_:)` and the VoiceOver roles.
+     [CN] 点击条目时堆叠视图是否执行其动作（true，默认）。false：每个条目自己处理点击（例如 CYLTableViewPlaceHolder 的组件运行自己的点击处理），
+          堆叠视图既不在点击条目时执行动作，也不修改条目的 `isUserInteractionEnabled`；仍然处理背景点击（跳过 `isItemViewInteractive(_:)` 认为可交互的条目）、
+          `performAction(_:)` 与 VoiceOver 角色。
+     */
+    public var dispatchesItemTaps = true {
+        didSet { updateInteractionOfItemViews() }
+    }
+
     // MARK: - Private state 私有状态
 
     /// [EN] One item: its view, its action and the size fitted to the view's width. [CN] 一个条目：视图、动作与按视图宽度计算的尺寸约束。
@@ -272,7 +285,7 @@ open class CYLAnimatedItemStackView: UIView, UIGestureRecognizerDelegate {
     /// [EN] Only an interactive item takes touches; the others let the background act.
     /// [CN] 只有可交互的条目接收触摸；其他条目让背景处理。
     private func updateInteraction(of itemView: CYLAnimatedItemView) {
-        itemView.isUserInteractionEnabled = isItemViewInteractive(itemView)
+        if dispatchesItemTaps { itemView.isUserInteractionEnabled = isItemViewInteractive(itemView) }
         updateAccessibility(of: itemView)
     }
 
@@ -351,7 +364,7 @@ open class CYLAnimatedItemStackView: UIView, UIGestureRecognizerDelegate {
     }
 
     @objc private func cyl_itemTapped(_ itemView: CYLAnimatedItemView) {
-        guard isItemViewInteractive(itemView) else { return }
+        guard dispatchesItemTaps, isItemViewInteractive(itemView) else { return }
         if let action = action(for: itemView) { performAction(action) }
     }
 
