@@ -27,7 +27,8 @@ import UIKit
     @objc(cyl_tabButtonsOfViewController:) func cylTabButtons(of viewController: UIViewController) -> [UIControl]
     @objc(cyl_contextPlusButton) func cylContextPlusButton() -> CYLPlusButton?
     @objc(cyl_contextPlusChildViewController) func cylContextPlusChildViewController() -> UIViewController?
-    @objc(cyl_reportedControlForControl:) func cylReportedControl(for control: UIControl?) -> UIControl?
+    /// [EN] The control reported in the current run loop turn (step 59). [CN] 当前 runloop 中已上报的控件（第 59 步）。
+    @objc(setCyl_controlReportedInCurrentRunLoop:) func cylSetControlReportedInCurrentRunLoop(_ control: UIControl?)
     /// [EN] The page registry state of the class extension (docs/Swift-Migration.md, step 54). [CN] 类扩展中的页面注册表状态（第 54 步）。
     @objc(pageRegistry) func cylPageRegistryState() -> CYLTabBarPageProviding?
     @objc(pageResolver) func cylPageResolverState() -> CYLTabBarPageProvider?
