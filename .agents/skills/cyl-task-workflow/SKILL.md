@@ -1,6 +1,6 @@
 ---
 name: cyl-task-workflow
-description: "How to start, score and finish every task in CYLTabBarController: check the other sessions first, put a TODO list and the current branch at the top, write the task and its scoring rubric (100 = full marks, 60 = pass) into docs/, keep working until the score passes, print the missing points as TODO at the end. Also: restart a hung or unopenable emulator after telling the other sessions. Use at the start of every task and whenever an emulator or simulator hangs."
+description: "How to start, score and finish every task in CYLTabBarController: check the other sessions first (Mac sessions take iOS, Win sessions the other platforms), put a TODO list and the current branch at the top, write the task and its scoring rubric (100 = full marks, 60 = pass) into docs/, keep working until the score passes, print the missing points as TODO at the end. Also: restart a hung or unopenable emulator after telling the other sessions. Use at the start of every task and whenever an emulator or simulator hangs."
 ---
 
 # Task workflow (added 2026-11-18)
@@ -16,6 +16,7 @@ The same rules are in `AGENTS.md` ("Git and pull requests"). When they disagree,
    - Yes: check whether its task duplicates yours. If it does, do not do the work twice: agree with that session who
      does what (split the items or hand them over). If it does not, continue, and tell that session which files you
      will change, so that the two of you do not edit the same lines.
+3. **Session roles by name (added 2026-11-19).** Before starting a task, check the names of the active sessions (for example with `ListAgents`). A session whose name starts with `Mac` (case-insensitive) mainly develops and tests the iOS side; a session whose name starts with `Win` (case-insensitive) mainly develops the other platforms (Android, HarmonyOS, React Native, Flutter, WeChat Mini Program). When sessions of both kinds are active, prefer to assign each platform's tasks to the matching session (iOS work to a `Mac` session, other platforms to a `Win` session), by message, instead of doing all of it in one session. When no session follows this naming, skip this rule and finish the task on your own.
 
 ## 2. TODO and branch at the top
 
