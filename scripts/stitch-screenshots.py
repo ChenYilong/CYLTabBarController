@@ -51,6 +51,14 @@ ALLOWED_FOLDERS = tuple(dict.fromkeys(os.path.realpath(folder) for folder in (RO
 SAFE_PATH = re.compile(r'/[A-Za-z0-9._@+ /-]*')
 
 
+def checked_pixels(value, name):
+    """`value` as an int from 0 to 400 pixels, or the script exits."""
+    pixels = int(value)
+    if not 0 <= pixels <= 400:
+        sys.exit(f'{name} must be from 0 to 400 pixels')
+    return pixels
+
+
 def checked_path(path, must_exist):
     """`path` resolved, of plain characters, inside ALLOWED_FOLDERS (and an existing file when `must_exist`), or the script exits."""
     resolved = os.path.realpath(path)
@@ -161,7 +169,10 @@ def main():
         sys.exit('labels are English only (ASCII) (docs/Screenshot-Guidelines.md)')
     if not shutil.which('ffmpeg'):
         sys.exit('ffmpeg is required')
-    options.out = checked_path(options.out, must_exist=False)
+    out_path = checked_path(options.out, must_exist=False)
+    # [EN] Whole numbers in a fixed range only reach the ffmpeg filters. [CN] 只有固定范围内的整数才会进入 ffmpeg 滤镜。
+    gap = checked_pixels(options.gap, '--gap')
+    top_gap = checked_pixels(options.top_gap, '--top-gap')
     work = tempfile.mkdtemp(prefix='cyl-stitch-')
     cells = []
     for index, cell in enumerate(options.cells):
@@ -173,7 +184,7 @@ def main():
     if options.columns == 'auto':
         # [EN] One column first; two when the one-column image (cells plus captions, header and footer, roughly) would be
         #      taller than one phone screen.
-        estimate = sum(size_of(path)[1] + options.gap + int(cell_width * 0.06) for _, path in cells) + int(cell_width * 0.3)
+        estimate = sum(size_of(path)[1] + gap + int(cell_width * 0.06) for _, path in cells) + int(cell_width * 0.3)
         options.columns = 2 if len(cells) > 1 and estimate > cell_width * PHONE_SCREEN_RATIO else 1
     else:
         options.columns = int(options.columns)
@@ -184,39 +195,39 @@ def main():
     for index, (caption, path) in enumerate(cells):
         parts = []
         if caption:
-            parts.append(band(caption, cell_width + options.gap, font_size, os.path.join(work, f'caption{index}.png')))
+            parts.append(band(caption, cell_width + gap, font_size, os.path.join(work, f'caption{index}.png')))
         width, height = size_of(path)
         # [EN] A white gap above the screenshot, below its caption or the header (docs/Screenshot-Guidelines.md, "Space
         #      above the tab bar and below the bands"). [CN] 截图上方、说明或页眉下方的白色间隔。
-        if options.top_gap > 0:
+        if top_gap > 0:
             gap_path = os.path.join(work, f'topgap{index}.png')
             run(['ffmpeg', '-v', 'error', '-y', '-f', 'lavfi', '-i',
-                 f'color=c={BACKGROUND}:s={cell_width + options.gap}x{options.top_gap}:d=1', '-frames:v', '1', gap_path])
+                 f'color=c={BACKGROUND}:s={cell_width + gap}x{top_gap}:d=1', '-frames:v', '1', gap_path])
             parts.append(gap_path)
-        parts.append(pad(path, cell_width + options.gap, height + options.gap, os.path.join(work, f'shot{index}.png')))
+        parts.append(pad(path, cell_width + gap, height + gap, os.path.join(work, f'shot{index}.png')))
         framed.append(stack(parts, os.path.join(work, f'cell{index}.png'), vertical=True))
     rows = []
     for start in range(0, len(framed), options.columns):
         row = framed[start:start + options.columns]
         row_height = max(size_of(path)[1] for path in row)
-        row = [pad(path, cell_width + options.gap, row_height, path + '.row.png') for path in row]
+        row = [pad(path, cell_width + gap, row_height, path + '.row.png') for path in row]
         while len(row) < options.columns:
-            row.append(pad(row[0], cell_width + options.gap, row_height, os.path.join(work, f'blank{start}.png')))
+            row.append(pad(row[0], cell_width + gap, row_height, os.path.join(work, f'blank{start}.png')))
             run(['ffmpeg', '-v', 'error', '-y', '-f', 'lavfi', '-i',
-                 f'color=c={BACKGROUND}:s={cell_width + options.gap}x{row_height}:d=1', '-frames:v', '1', row[-1]])
+                 f'color=c={BACKGROUND}:s={cell_width + gap}x{row_height}:d=1', '-frames:v', '1', row[-1]])
         rows.append(stack(row, os.path.join(work, f'row{start}.png'), vertical=False))
     grid = stack(rows, os.path.join(work, 'grid.png'), vertical=True)
     total_width = size_of(grid)[0]
     header = band(options.header, total_width, font_size, os.path.join(work, 'header.png'))
     footer = band(options.footer, total_width, font_size, os.path.join(work, 'footer.png'))
-    stack([header, grid, footer], options.out, vertical=True)
-    add_marker(options.out, options.header, options.footer)
-    width, height = size_of(options.out)
+    stack([header, grid, footer], out_path, vertical=True)
+    add_marker(out_path, options.header, options.footer)
+    width, height = size_of(out_path)
     shutil.rmtree(work, ignore_errors=True)
     note = ''
     if options.columns == 1 and len(cells) > 1 and height > width * PHONE_SCREEN_RATIO:
         note = ' (taller than one phone screen: use --columns 2)'
-    print(f'{options.out}: {width} x {height}, {options.columns} column(s){note}')
+    print(f'{out_path}: {width} x {height}, {options.columns} column(s){note}')
 
 
 if __name__ == '__main__':
