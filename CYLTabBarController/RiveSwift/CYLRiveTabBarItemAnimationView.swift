@@ -100,6 +100,22 @@ struct CYLRiveTabBarItemAnimationConfiguration {
             .compactMap { Float($0.trimmingCharacters(in: .whitespaces)) }
     }
 
+    /**
+     * [EN] The color the icon is drawn in. `tint` "title": the tab's title color. A fixed `tint` (with `darkTint`): drawn on the
+     *      unselected tab only; the selected tab takes the title's selected color, as with "title" (user decision,
+     *      2026-11-19). `selected` is nil when the caller does not tell the state (`-cyl_applyAnimationViewTintColor:`), then
+     *      the fixed color is used in both states, as before.
+     * [CN] 图标的绘制颜色。`tint` 为 "title"：Tab 的标题颜色。固定 `tint`（及 `darkTint`）：只用于未选中的 Tab；选中的 Tab 使用标题的选中颜色，
+     *      与 "title" 相同（用户决定，2026-11-19）。调用方未告知状态时 `selected` 为 nil（`-cyl_applyAnimationViewTintColor:`），此时两种状态都使用
+     *      固定颜色，与以前相同。
+     */
+    func tintColor(titleColor: UIColor?, selected: Bool?) -> UIColor? {
+        if let fixedTintColor {
+            return selected == true ? (titleColor ?? fixedTintColor) : fixedTintColor
+        }
+        return tintFollowsTitle ? titleColor : nil
+    }
+
     /// [EN] The value a play sets on the number input: the one after `current` in `numberValues`, cycling; without values,
     ///      `current + 1`. [CN] 一次播放设置到数字输入的值：`numberValues` 中 `current` 的下一个，循环；没有值时为 `current + 1`。
     func nextNumber(after current: Float) -> Float {
@@ -240,20 +256,27 @@ public final class CYLRiveTabBarItemAnimationView: UIView, CYLTabBarItemAnimatio
     private let tintOverlay = CYLRiveTintOverlay()
     /// [EN] The last title color, kept for a file that loads later. [CN] 最近的标题颜色，供稍后加载的文件使用。
     private var titleTintColor: UIColor?
+    /// [EN] The tab's selected state, nil until a caller tells it. [CN] Tab 的选中状态，调用方告知之前为 nil。
+    private var tintSelected: Bool?
 
-    /// [EN] `cyl_applyAnimationViewTintColor:`: the tab's title color, drawn when the `tint` option is "title".
-    /// [CN] `cyl_applyAnimationViewTintColor:`：Tab 的标题颜色，`tint` 选项为 "title" 时绘制。
+    /// [EN] The tint for the current title color and state. [CN] 当前标题颜色与状态下的着色。
+    private var currentTintColor: UIColor? {
+        configuration.tintColor(titleColor: titleTintColor, selected: tintSelected)
+    }
+
+    /// [EN] `cyl_applyAnimationViewTintColor:`: the tab's title color, without its state. [CN] Tab 的标题颜色，不含状态。
     public func applyAnimationTintColor(_ color: UIColor?) {
-        guard configuration.tintFollowsTitle else {
-            // [EN] Called again on a light / dark switch: a fixed tint with `darkTint` is resolved for the new appearance.
-            // [CN] 浅色 / 深色切换时会再次调用：带 `darkTint` 的固定着色按新外观解析。
-            if isLoaded, let fixed = configuration.fixedTintColor {
-                tintOverlay.apply(fixed, in: self)
-            }
-            return
-        }
         titleTintColor = color
-        tintOverlay.apply(color, in: self)
+        if isLoaded {
+            tintOverlay.apply(currentTintColor, in: self)
+        }
+    }
+
+    /// [EN] `cyl_applyAnimationViewTintColor:selected:`: the title color and the tab's state; a fixed tint only when unselected.
+    /// [CN] `cyl_applyAnimationViewTintColor:selected:`：标题颜色与 Tab 状态；固定着色只用于未选中状态。
+    public func applyAnimationTintColor(_ color: UIColor?, selected: Bool) {
+        tintSelected = selected
+        applyAnimationTintColor(color)
     }
 
     /// [EN] Keeps the tint over the Rive view. [CN] 让着色覆盖 Rive 视图。
@@ -297,11 +320,10 @@ public final class CYLRiveTabBarItemAnimationView: UIView, CYLTabBarItemAnimatio
         guard isLoaded else {
             return
         }
-        if let fixed = configuration.fixedTintColor {
-            tintOverlay.apply(fixed, in: self)
-        } else if configuration.tintFollowsTitle, let titleTintColor {
-            // [EN] A dynamic title color, resolved again with this view's new appearance. [CN] 动态标题颜色，按本视图的新外观重新解析。
-            tintOverlay.apply(titleTintColor, in: self)
+        // [EN] A dynamic color (a fixed tint with `darkTint`, or the title color), resolved again with the new appearance.
+        // [CN] 动态颜色（带 `darkTint` 的固定着色或标题颜色），按新外观重新解析。
+        if let tint = currentTintColor {
+            tintOverlay.apply(tint, in: self)
         }
         bindThemeInstance()
     }
@@ -319,7 +341,6 @@ public final class CYLRiveTabBarItemAnimationView: UIView, CYLTabBarItemAnimatio
         if configuration.triggerPropertyPath == nil {
             instance.setValue(of: BoolProperty(path: configuration.activePropertyPath), to: isActive)
         }
-        stateMachine.bindViewModelInstance(instance)
         viewModelInstance = instance
         originalColors.removeAll()
         overriddenColorPaths.removeAll()
@@ -330,7 +351,18 @@ public final class CYLRiveTabBarItemAnimationView: UIView, CYLTabBarItemAnimatio
         if requestedColors != nil {
             enqueueRequestedColors()
         }
-        riveView?.isPaused = false
+        // [EN] Rive 6.29+: `bindViewModelInstances(main:)` (async) replaces the deprecated `bindViewModelInstance(_:)`. The
+        //      values above live on the instance, so they apply once it is bound; the view resumes then, unless a newer
+        //      theme switch bound another instance meanwhile.
+        // [CN] Rive 6.29+：`bindViewModelInstances(main:)`（异步）取代已废弃的 `bindViewModelInstance(_:)`。上面的值保存在实例上，绑定后即生效；
+        //      之后恢复播放，除非期间更新的主题切换绑定了另一个实例。
+        Task { @MainActor [weak self] in
+            try? await stateMachine.bindViewModelInstances(main: instance)
+            guard let self, self.viewModelInstance === instance else {
+                return
+            }
+            self.riveView?.isPaused = false
+        }
     }
 
     /// [EN] Not used from Interface Builder. [CN] 不支持从 Interface Builder 创建。
@@ -518,7 +550,7 @@ public final class CYLRiveTabBarItemAnimationView: UIView, CYLTabBarItemAnimatio
         addSubview(riveView)
         self.riveView = riveView
         isLoaded = true
-        tintOverlay.apply(configuration.fixedTintColor ?? (configuration.tintFollowsTitle ? titleTintColor : nil), in: self)
+        tintOverlay.apply(currentTintColor, in: self)
         // [EN] Rests on its first frame until it is played (docs/Animated-Item.md): paused once the first frame is drawn.
         // [CN] 在被播放之前停在第一帧：第一帧绘制后暂停。
         Task { @MainActor [weak self, weak riveView] in

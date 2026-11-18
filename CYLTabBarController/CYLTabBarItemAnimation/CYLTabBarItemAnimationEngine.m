@@ -254,6 +254,25 @@ static void CYLTabBarItemAnimationTintMethod(UIView *view, SEL _cmd, UIColor *co
     }
 }
 
+/*!
+ * [EN] The `-cyl_applyAnimationViewTintColor:selected:` added to a library's view class: a fixed tint on the unselected tab
+ *      only; the selected tab takes `color`, the title's selected color (2026-11-19).
+ * [CN] 添加到动画库视图类上的 `-cyl_applyAnimationViewTintColor:selected:`：固定着色只用于未选中的 Tab；选中的 Tab 使用 `color`（标题的选中颜色，
+ *      2026-11-19）。
+ */
+static void CYLTabBarItemAnimationTintWithStateMethod(UIView *view, SEL _cmd, UIColor *color, BOOL selected) {
+    NSDictionary<NSString *, NSString *> *options = objc_getAssociatedObject(view, CYLTabBarItemAnimationTintOptionsKey);
+    if (!options) {
+        return;
+    }
+    UIColor *fixed = CYLTabBarItemAnimationFixedTintColor(options);
+    if (fixed) {
+        CYLTabBarItemAnimationApplyTint(view, (selected && color) ? color : fixed);
+    } else if ([options[@"tint"] isEqualToString:@"title"]) {
+        CYLTabBarItemAnimationApplyTint(view, color);
+    }
+}
+
 /// [EN] Gives a new animation view its tint options and method, and its fixed tint. [CN] 为新的动画视图设置着色选项与方法，以及固定着色。
 static void CYLTabBarItemAnimationPrepareTint(UIView *view, NSURL *sourceURL, id<CYLTabBarItemAnimationPlayer> player) {
     NSDictionary<NSString *, NSString *> *options = CYLTabBarItemAnimationTintOptionsFromURL(sourceURL);
@@ -263,6 +282,8 @@ static void CYLTabBarItemAnimationPrepareTint(UIView *view, NSURL *sourceURL, id
     SEL tintSelector = NSSelectorFromString(@"cyl_applyAnimationViewTintColor:");
     if (![view respondsToSelector:tintSelector]) {
         class_addMethod([view class], tintSelector, (IMP)CYLTabBarItemAnimationTintMethod, "v@:@");
+        class_addMethod([view class], NSSelectorFromString(@"cyl_applyAnimationViewTintColor:selected:"),
+                        (IMP)CYLTabBarItemAnimationTintWithStateMethod, "v@:@B");
     }
     objc_setAssociatedObject(view, CYLTabBarItemAnimationTintOptionsKey, options, OBJC_ASSOCIATION_COPY_NONATOMIC);
     objc_setAssociatedObject(view, CYLTabBarItemAnimationTintPlayerKey, player, OBJC_ASSOCIATION_RETAIN_NONATOMIC);

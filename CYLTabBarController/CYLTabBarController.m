@@ -158,6 +158,9 @@ static UIColor *CYLTemplateTintColor(UITabBar *tabBar, BOOL selected) {
  */
 @protocol CYLTabBarItemAnimationTintable <NSObject>
 - (void)cyl_applyAnimationViewTintColor:(nullable UIColor *)color;
+@optional
+/// [EN] With the tab's state: a fixed tint only on the unselected tab (2026-11-19). [CN] 带 Tab 状态：固定着色只用于未选中的 Tab（2026-11-19）。
+- (void)cyl_applyAnimationViewTintColor:(nullable UIColor *)color selected:(BOOL)selected;
 @end
 
 /*!
@@ -5257,7 +5260,12 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
                 [tabBar.cyl_platterSelectedContentViews containsObject:control];
             UIColor *color = CYLTemplateTintColor(tabBar, selected);
             for (UIView *view in views) {
-                [(id<CYLTabBarItemAnimationTintable>)view cyl_applyAnimationViewTintColor:color];
+                id<CYLTabBarItemAnimationTintable> tintable = (id<CYLTabBarItemAnimationTintable>)view;
+                if ([tintable respondsToSelector:@selector(cyl_applyAnimationViewTintColor:selected:)]) {
+                    [tintable cyl_applyAnimationViewTintColor:color selected:selected];
+                } else {
+                    [tintable cyl_applyAnimationViewTintColor:color];
+                }
             }
         }
     });

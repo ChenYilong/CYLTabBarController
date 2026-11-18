@@ -718,8 +718,15 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
         #if CYL_ANIMATION_ENGINE_AVAILABLE
         // [EN] By selector: the tint method is declared by the tab bar's animation subspec, which this component does not import.
         // [CN] 通过 selector 调用：着色方法声明在 TabBar 的动画子库中，本组件不导入它。
+        // [EN] With the state when the view takes it: a fixed tint only on the unselected item (2026-11-19).
+        // [CN] 视图支持时带上状态：固定着色只用于未选中的 item（2026-11-19）。
+        let tintWithState = NSSelectorFromString("cyl_applyAnimationViewTintColor:selected:")
         let tint = NSSelectorFromString("cyl_applyAnimationViewTintColor:")
-        if let view = animationView, view.responds(to: tint) {
+        if let view = animationView, view.responds(to: tintWithState) {
+            typealias CYLTintWithState = @convention(c) (AnyObject, Selector, UIColor?, Bool) -> Void
+            let implementation = unsafeBitCast(view.method(for: tintWithState), to: CYLTintWithState.self)
+            implementation(view, tintWithState, color, isSelected)
+        } else if let view = animationView, view.responds(to: tint) {
             _ = view.perform(tint, with: color)
         }
         #endif

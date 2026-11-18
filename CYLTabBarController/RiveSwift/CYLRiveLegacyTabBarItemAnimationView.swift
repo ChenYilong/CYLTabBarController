@@ -78,6 +78,13 @@ public final class CYLRiveLegacyTabBarItemAnimationView: UIView, CYLTabBarItemAn
     private let tintOverlay = CYLRiveTintOverlay()
     /// [EN] The last title color, kept for a file that loads later. [CN] 最近的标题颜色，供稍后加载的文件使用。
     private var titleTintColor: UIColor?
+    /// [EN] The tab's selected state, nil until a caller tells it. [CN] Tab 的选中状态，调用方告知之前为 nil。
+    private var tintSelected: Bool?
+
+    /// [EN] The tint for the current title color and state. [CN] 当前标题颜色与状态下的着色。
+    private var currentTintColor: UIColor? {
+        configuration.tintColor(titleColor: titleTintColor, selected: tintSelected)
+    }
 
     private init(configuration: CYLRiveTabBarItemAnimationConfiguration, file: RiveFile) {
         self.configuration = configuration
@@ -126,26 +133,22 @@ public final class CYLRiveLegacyTabBarItemAnimationView: UIView, CYLTabBarItemAn
     /// [EN] A dynamic tint (a fixed tint with `darkTint`, or the title color) resolved again with this view's new appearance.
     /// [CN] 按本视图的新外观重新解析动态着色（带 `darkTint` 的固定着色或标题颜色）。
     private func appearanceDidChange() {
-        if let fixed = configuration.fixedTintColor {
-            tintOverlay.apply(fixed, in: self)
-        } else if configuration.tintFollowsTitle, let titleTintColor {
-            tintOverlay.apply(titleTintColor, in: self)
+        if let tint = currentTintColor {
+            tintOverlay.apply(tint, in: self)
         }
     }
 
-    /// [EN] `cyl_applyAnimationViewTintColor:`: the tab's title color, drawn when the `tint` option is "title".
-    /// [CN] `cyl_applyAnimationViewTintColor:`：Tab 的标题颜色，`tint` 选项为 "title" 时绘制。
+    /// [EN] `cyl_applyAnimationViewTintColor:`: the tab's title color, without its state. [CN] Tab 的标题颜色，不含状态。
     public func applyAnimationTintColor(_ color: UIColor?) {
-        guard configuration.tintFollowsTitle else {
-            // [EN] Called again on a light / dark switch: a fixed tint with `darkTint` is resolved for the new appearance.
-            // [CN] 浅色 / 深色切换时会再次调用：带 `darkTint` 的固定着色按新外观解析。
-            if let fixed = configuration.fixedTintColor {
-                tintOverlay.apply(fixed, in: self)
-            }
-            return
-        }
         titleTintColor = color
-        tintOverlay.apply(color, in: self)
+        tintOverlay.apply(currentTintColor, in: self)
+    }
+
+    /// [EN] `cyl_applyAnimationViewTintColor:selected:`: the title color and the tab's state; a fixed tint only when unselected.
+    /// [CN] `cyl_applyAnimationViewTintColor:selected:`：标题颜色与 Tab 状态；固定着色只用于未选中状态。
+    public func applyAnimationTintColor(_ color: UIColor?, selected: Bool) {
+        tintSelected = selected
+        applyAnimationTintColor(color)
     }
 
     /// [EN] Keeps the tint over the Rive view. [CN] 让着色覆盖 Rive 视图。

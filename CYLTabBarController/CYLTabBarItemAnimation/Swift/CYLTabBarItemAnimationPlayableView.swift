@@ -99,6 +99,16 @@ public protocol CYLTabBarItemAnimationPlayableView: NSObjectProtocol {
      */
     @objc(cyl_applyAnimationViewTintColor:)
     optional func applyAnimationTintColor(_ color: UIColor?)
+
+    /**
+     * [EN] The same with the tab's state; preferred over `-cyl_applyAnimationViewTintColor:` when implemented. A fixed `tint`
+     *      ("#RRGGBB", with `darkTint`) is drawn on the unselected tab only; the selected tab takes `color`, the title's
+     *      selected color, as with "title" (2026-11-19).
+     * [CN] 同上，并带 Tab 的状态；实现后优先于 `-cyl_applyAnimationViewTintColor:` 调用。固定 `tint`（"#RRGGBB"，及 `darkTint`）只用于未选中的
+     *      Tab；选中的 Tab 使用 `color`（标题的选中颜色），与 "title" 相同（2026-11-19）。
+     */
+    @objc(cyl_applyAnimationViewTintColor:selected:)
+    optional func applyAnimationTintColor(_ color: UIColor?, selected: Bool)
 }
 
 /**
