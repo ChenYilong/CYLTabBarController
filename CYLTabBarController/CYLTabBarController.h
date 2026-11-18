@@ -1616,21 +1616,6 @@ didRecognizeTabBarItemGesture:(CYLTabBarItemGesture)gesture
                                             context:(nullable NSString *)context;
 
 /*!
- * [EN] Updates the plus button's selection state before `viewController` is selected. Call it from `-tabBarController:shouldSelectViewController:`. No effect in flat-design mode.
- * [CN] 在选中 viewController 之前更新 PlusButton 的选中状态，请在 -tabBarController:shouldSelectViewController: 中调用。扁平化模式下无效。
- */
-- (void)updateSelectionStatusIfNeededForTabBarController:(nullable UITabBarController *)tabBarController
-                              shouldSelectViewController:(UIViewController *)viewController;
-
-/*!
- * [EN] Same as above, but with an explicit `shouldSelect`; when NO, the target tab button's user interaction is disabled and nothing else changes.
- * [CN] 同上，但显式传入 shouldSelect；为 NO 时仅禁用目标 Tab 按钮的交互，不做其他处理。
- */
-- (void)updateSelectionStatusIfNeededForTabBarController:(nullable UITabBarController *)tabBarController
-                              shouldSelectViewController:(UIViewController *)viewController
-                                            shouldSelect:(BOOL)shouldSelect;
-
-/*!
  * [EN] Hides the tab bar's top shadow (separator line). No effect in flat-design mode.
  * [CN] 隐藏 TabBar 顶部的阴影（分割线）。扁平化模式下无效。
  */
@@ -2053,6 +2038,31 @@ typedef UIView * _Nullable (^CYLTabBarItemIconViewProvider)(BOOL selected);
 //@property (nonatomic, assign, getter=isLottieViewAdded) BOOL lottieViewAdded;
 
 #endif
+
+@end
+
+/*!
+ * [EN] The plus button's selection state around `-tabBarController:shouldSelectViewController:`. Implemented in Swift
+ *      (docs/Swift-Migration.md, step 61); the selectors are unchanged.
+ * [CN] 围绕 `-tabBarController:shouldSelectViewController:` 的 PlusButton 选中状态。由 Swift 实现（docs/Swift-Migration.md，第 61 步）；
+ *      selector 不变。
+ */
+@interface CYLTabBarController (CYLSelectionStatus)
+
+/*!
+ * [EN] Updates the plus button's selection state before `viewController` is selected. Call it from `-tabBarController:shouldSelectViewController:`. No effect in flat-design mode.
+ * [CN] 在选中 viewController 之前更新 PlusButton 的选中状态，请在 -tabBarController:shouldSelectViewController: 中调用。扁平化模式下无效。
+ */
+- (void)updateSelectionStatusIfNeededForTabBarController:(nullable UITabBarController *)tabBarController
+                              shouldSelectViewController:(UIViewController *)viewController;
+
+/*!
+ * [EN] Same as above, but with an explicit `shouldSelect`; when NO, the target tab button's user interaction is disabled and nothing else changes.
+ * [CN] 同上，但显式传入 shouldSelect；为 NO 时仅禁用目标 Tab 按钮的交互，不做其他处理。
+ */
+- (void)updateSelectionStatusIfNeededForTabBarController:(nullable UITabBarController *)tabBarController
+                              shouldSelectViewController:(UIViewController *)viewController
+                                            shouldSelect:(BOOL)shouldSelect;
 
 @end
 

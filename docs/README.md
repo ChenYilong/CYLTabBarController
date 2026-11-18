@@ -198,10 +198,12 @@ docs/
 ├── Version-Highlights.md
 ├── WeChat-Mini-Program.md
 ├── assets/
+│   ├── android-animated-item-stack-view.png
 │   ├── android-api37-20261118-rive-dark-mode-options.png
 │   ├── android-api37-20261118-rive-tint-at-0505042f.png
 │   ├── android-api37-20261118-rive-tint-title-and-dark-tint.png
 │   ├── android-api37-20261119-example-rive-live-uimode-switch.png
+│   ├── android-api37-20261119-rive-follows-appearance.png
 │   ├── android-gif-decoder-frame-clock.png
 │   ├── android-gif-tint-option.png
 │   ├── android-liquid-glass-surface-000.png
@@ -239,9 +241,8 @@ docs/
 │   ├── animated-item-harmonyos-rive-retap-replay.png
 │   ├── animated-item-harmonyos-rive-tint-option.png
 │   ├── animated-item-harmonyos-spacing-before.png
-│   ├── animated-item-harmonyos-static-icon-color.png
 │   ├── animated-item-harmonyos-stack-view.png
-│   ├── android-animated-item-stack-view.png
+│   ├── animated-item-harmonyos-static-icon-color.png
 │   ├── animated-item-harmonyos-svga-retap-replay.png
 │   ├── animated-item-harmonyos-tabbar.jpeg
 │   ├── animated-item-harmonyos-tint-option.png
@@ -554,6 +555,7 @@ docs/
 │   ├── update-tab-network-icons-plus-button.png
 │   ├── update-tab-plus-page-navigation-title-changed.png
 │   ├── update-tab-plus-page-navigation-title.png
+│   ├── wechat-miniprogram-animated-item-stack.png
 │   ├── wechat-miniprogram-api-01-home-lottie.png
 │   ├── wechat-miniprogram-api-02-discover-selected.png
 │   ├── wechat-miniprogram-api-03-badges-lottie.png
@@ -637,7 +639,6 @@ docs/
 │   ├── wechat-miniprogram-one-icon-layer-lottie-pag-rive-devtools-sdk3.17.6-e612393.png
 │   ├── wechat-miniprogram-rive-home-feed-one-layer-devtools-sdk3.17.6-e264ea2.png
 │   ├── wechat-miniprogram-rive-tint-title.png
-│   ├── wechat-miniprogram-animated-item-stack.png
 │   ├── wechat-miniprogram-scroll-icons-devtools-sdk3.17.6-88dd149.png
 │   ├── wechat-miniprogram-scroll-icons-still-images-devtools-sdk3.17.6-a157c97.png
 │   ├── wechat-miniprogram-two-icon-layers-user-1-devtools.jpg

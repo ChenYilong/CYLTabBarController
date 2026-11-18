@@ -20,6 +20,18 @@
 }
 @end
 
+/// [EN] A subclass that overrides the delegate method and calls super, as the examples do. [CN] 与示例一样重写代理方法并调用 super 的子类。
+@interface CYLSuperCallingTabBarController : CYLTabBarController
+@property (nonatomic, assign) NSInteger shouldSelectCalls;
+@end
+
+@implementation CYLSuperCallingTabBarController
+- (BOOL)tabBarController:(UITabBarController *)tabBarController shouldSelectViewController:(UIViewController *)viewController {
+    self.shouldSelectCalls += 1;
+    return [super tabBarController:tabBarController shouldSelectViewController:viewController];
+}
+@end
+
 @interface CYLTabBarToolkitTests : XCTestCase
 @end
 
@@ -347,6 +359,30 @@
     if (tabBar.liquidGlassLongGestureRecognizer) {
         XCTAssertTrue(tabBar.liquidGlassLongGestureRecognizer.enabled);
     }
+}
+
+#pragma mark - Selection (Swift since step 61)
+
+/// [EN] super reaches the library's `-tabBarController:shouldSelectViewController:`: the selected tab is refused, another
+///      one allowed, and a custom action tab refused.
+/// [CN] super 能调用到库的 `-tabBarController:shouldSelectViewController:`：已选中的 Tab 被拒绝，其他 Tab 允许，自定义操作的 Tab 被拒绝。
+- (void)testSubclassSuperReachesShouldSelect {
+    UINavigationController *first = [[UINavigationController alloc] initWithRootViewController:[UIViewController new]];
+    UINavigationController *second = [[UINavigationController alloc] initWithRootViewController:[UIViewController new]];
+    CYLSuperCallingTabBarController *tabBarController = [[CYLSuperCallingTabBarController alloc] initWithViewControllers:@[ first, second ]
+                                                                                                   tabBarItemsAttributes:@[ @{ CYLTabBarItemTitle : @"First" },
+                                                                                                                            @{ CYLTabBarItemTitle : @"Second" } ]];
+    tabBarController.view.frame = CGRectMake(0, 0, 390, 844);
+    [tabBarController.view layoutIfNeeded];
+    tabBarController.selectedIndex = 0;
+    XCTAssertFalse([tabBarController tabBarController:tabBarController shouldSelectViewController:first], @"already selected");
+    XCTAssertTrue([tabBarController tabBarController:tabBarController shouldSelectViewController:second]);
+    tabBarController.cyl_customActionTabBarItemIdentifiers = @[ second.cyl_tabBarItemIdentifier ];
+    tabBarController.cyl_customTabActionHandler = ^(CYLTabBarController *controller, UIViewController *viewController) {};
+    XCTAssertFalse([tabBarController tabBarController:tabBarController shouldSelectViewController:second], @"a custom action tab");
+    XCTAssertEqual(tabBarController.shouldSelectCalls, 3);
+    XCTAssertNoThrow([tabBarController updateSelectionStatusIfNeededForTabBarController:tabBarController shouldSelectViewController:second shouldSelect:NO]);
+    XCTAssertNoThrow([tabBarController updateSelectionStatusIfNeededForTabBarController:tabBarController shouldSelectViewController:second]);
 }
 
 @end

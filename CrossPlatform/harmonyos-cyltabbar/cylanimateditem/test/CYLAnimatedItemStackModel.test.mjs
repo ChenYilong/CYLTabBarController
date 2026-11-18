@@ -164,3 +164,61 @@ test('every change tells the listeners', () => {
   stack.appendItem('B');
   assert.equal(calls, 4);
 });
+
+test('a disabled item with an action lets the background act and reads as text', () => {
+  const { performed, handler } = recorder();
+  const stack = new CYLAnimatedItemStackModel([], new Map([['retry', handler], ['reload', handler]]));
+  stack.appendItem('Nothing here');
+  const button = stack.appendItem('Retry', '', '', 'retry');
+  stack.backgroundAction = 'reload';
+  assert.equal(stack.isItemInteractive(button), true, 'an action and enabled');
+  button.enabled = false;
+  stack.updateInteractionOfItemViews();
+  assert.equal(stack.isItemInteractive(button), false);
+  assert.equal(stack.takesTaps(button), false, 'a tap on it falls through to the background');
+  assert.equal(stack.readsAsButton(button), false, 'reads as text');
+  assert.equal(stack.actionFor(button), 'retry', 'it keeps its action');
+  assert.equal(stack.tapItem(button), false, 'its action does not run');
+  assert.equal(stack.tapBackground(), true);
+  assert.deepEqual(performed, ['reload']);
+  button.enabled = true;
+  stack.updateInteractionOfItemViews();
+  assert.equal(stack.tapItem(button), true);
+  assert.deepEqual(performed, ['reload', 'retry']);
+});
+
+test('a disabled first item with an action stands for the background', () => {
+  const { performed, handler } = recorder();
+  const stack = new CYLAnimatedItemStackModel([], new Map([['open', handler], ['reload', handler]]));
+  const first = stack.appendItem('Title', '', '', 'open');
+  stack.backgroundAction = 'reload';
+  first.enabled = false;
+  assert.equal(stack.actsOnBackground(first), true);
+  assert.equal(stack.readsAsButton(first), true, 'a button for the background action');
+  stack.tapItem(first);
+  assert.deepEqual(performed, ['reload']);
+});
+
+test('isItemInteractive can be overridden, and updateInteractionOfItemViews applies it again', () => {
+  class Placeholder extends CYLAnimatedItemStackModel {
+    tapInteractionEnabled = true;
+    isItemInteractive(item) {
+      return this.tapInteractionEnabled && super.isItemInteractive(item);
+    }
+  }
+  const { performed, handler } = recorder();
+  const stack = new Placeholder([], new Map([['retry', handler], ['reload', handler]]));
+  stack.appendItem('Title');
+  const button = stack.appendItem('Retry', '', '', 'retry');
+  stack.backgroundAction = 'reload';
+  let redraws = 0;
+  stack.addListener(() => { redraws += 1; });
+  stack.tapInteractionEnabled = false;
+  stack.updateInteractionOfItemViews();
+  assert.equal(redraws, 1, 'the view redraws');
+  assert.equal(stack.takesTaps(button), false);
+  assert.equal(stack.readsAsButton(button), false);
+  stack.tapItem(button);
+  stack.tapBackground();
+  assert.deepEqual(performed, ['reload']);
+});

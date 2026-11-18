@@ -105,6 +105,7 @@
 | [`CYLTabBarPageRegistry.h`](#cyltabbarpageregistryh) | [`CYLTabBarPageRegistry.h`](#cyltabbarpageregistryh) |
 | [`CYLTabBarTransition.h`](#cyltabbartransitionh) | [`CYLTabBarTransition.h`](#cyltabbartransitionh) |
 | [`CYLTabButtonAnimation.h`](#cyltabbuttonanimationh) | [`CYLTabButtonAnimation.h`](#cyltabbuttonanimationh) |
+| [`CYLUtils/CYLAnimationKeys.h`](#cylutilscylanimationkeysh) | [`CYLUtils/CYLAnimationKeys.h`](#cylutilscylanimationkeysh) |
 | [`CYLUtils/CYLComponents/CYLTheme/CALayer+CYLTheme.h`](#cylutilscylcomponentscylthemecalayercylthemeh) | [`CYLUtils/CYLComponents/CYLTheme/CALayer+CYLTheme.h`](#cylutilscylcomponentscylthemecalayercylthemeh) |
 | [`CYLUtils/CYLComponents/CYLTheme/CYLThemeManager.h`](#cylutilscylcomponentscylthemecylthememanagerh) | [`CYLUtils/CYLComponents/CYLTheme/CYLThemeManager.h`](#cylutilscylcomponentscylthemecylthememanagerh) |
 | [`CYLUtils/CYLComponents/CYLTheme/CYLThemeManagerCenter.h`](#cylutilscylcomponentscylthemecylthememanagercenterh) | [`CYLUtils/CYLComponents/CYLTheme/CYLThemeManagerCenter.h`](#cylutilscylcomponentscylthemecylthememanagercenterh) |
