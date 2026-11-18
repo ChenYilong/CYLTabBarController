@@ -122,7 +122,7 @@ function cylMain() {
     })
     const text = `${JSON.stringify(json, null, 2)}\n`
     // [EN] A Windows checkout (core.autocrlf) has CRLF line ends: not a change. [CN] Windows 检出（core.autocrlf）为 CRLF 行尾，不算变化。
-    if (fs.readFileSync(target, 'utf8').replace(/\r\n/g, '\n') !== text) {
+    if (fs.readFileSync(target, 'utf8').replaceAll('\r\n', '\n') !== text) {
       pageFiles[target] = text
     }
   })
@@ -158,7 +158,7 @@ function cylMain() {
   // [CN] 保留检出的行尾（Windows 上 core.autocrlf 为 CRLF），使 git 不会看到行尾变化。
   Object.entries(pageFiles).forEach(([target, text]) => {
     const crlf = fs.readFileSync(target, 'utf8').includes('\r\n')
-    fs.writeFileSync(target, crlf ? text.replace(/\n/g, '\r\n') : text)
+    fs.writeFileSync(target, crlf ? text.replaceAll('\n', '\r\n') : text)
   })
   console.log(`Animation: ${choice}. Installed ${Object.keys(packages).join(', ')} into miniprogram/miniprogram_npm (${changed.length} file(s) updated, ${stale.length} removed).`)
 }

@@ -35,7 +35,7 @@ function cylParsePath(d) {
   let lastControlX = 0
   let lastControlY = 0
   let lastType = ''
-  const number = () => parseFloat(tokens[index++])
+  const number = () => Number.parseFloat(tokens[index++])
   const hasNumber = () => index < tokens.length && !/[a-zA-Z]/.test(tokens[index])
   while (index < tokens.length) {
     if (/[a-zA-Z]/.test(tokens[index])) {

@@ -151,8 +151,8 @@ function cylBool(value, fallback) {
  * [CN] 逐段按数字比较 "1.2.10" 与 "1.10"，返回 -1、0 或 1（B24）。
  */
 function cylCompareVersions(left, right) {
-  const a = String(left).split('.').map((part) => parseInt(part, 10) || 0);
-  const b = String(right).split('.').map((part) => parseInt(part, 10) || 0);
+  const a = String(left).split('.').map((part) => Number.parseInt(part, 10) || 0);
+  const b = String(right).split('.').map((part) => Number.parseInt(part, 10) || 0);
   for (let index = 0; index < Math.max(a.length, b.length); index += 1) {
     const difference = (a[index] || 0) - (b[index] || 0);
     if (difference !== 0) {
@@ -450,7 +450,7 @@ const CYL_FONT_WEIGHTS = {
  */
 function cylFont(value) {
   let name = '';
-  let size = NaN;
+  let size = Number.NaN;
   let weight = '';
   if (typeof value === 'number' || (typeof value === 'string' && /^\s*\d+(\.\d+)?\s*$/.test(value))) {
     size = Number(value);
@@ -473,7 +473,7 @@ function cylFont(value) {
   }
   return `font-size: ${size}px; line-height: ${Math.round(size * 1.2)}px;`
     + (CYL_FONT_WEIGHTS[weight] ? ` font-weight: ${CYL_FONT_WEIGHTS[weight]};` : '')
-    + (name ? ` font-family: "${name.replace(/"/g, '')}";` : '');
+    + (name ? ` font-family: "${name.split('"').join('')}";` : '');
 }
 
 /**
@@ -585,7 +585,7 @@ function cylPlusButton(configuration, environment, theme, defaults, tabCount) {
     return null;
   }
   const item = cylItem(attributes, environment, theme, defaults);
-  const requestedIndex = parseInt(attributes.CYLPlusButtonIndexInTabBar, 10);
+  const requestedIndex = Number.parseInt(attributes.CYLPlusButtonIndexInTabBar, 10);
   const size = cylSize(attributes.CYLPlusButtonSize);
   const imageSize = cylSize(attributes.CYLPlusButtonImageSize);
   const multiplier = Number(attributes.CYLPlusButtonCenterYMultiplier);
@@ -678,7 +678,7 @@ function cylReadConfiguration(configuration, environment) {
     //      （1 左、2 右、3 上、4 下、5 向上卷页、6 向下卷页）。
     playsFireworks: cylBool(source.CYLTabBarControllerTabButtonPlaysFireworks, tapAnimation === 'bounceWithFireworks' || tapAnimation === 'frames'),
     fireworksImage: cylImagePath(source.CYLTabBarControllerTabButtonFireworksImage, env),
-    flipDirection: Math.min(6, Math.max(1, parseInt(source.CYLTabBarControllerTabButtonFlipDirection, 10) || 1)),
+    flipDirection: Math.min(6, Math.max(1, Number.parseInt(source.CYLTabBarControllerTabButtonFlipDirection, 10) || 1)),
     // [EN] cyl_tabButtonTapSoundURL and the haptic style (light, medium, heavy) of a tab tap (issue #535).
     // [CN] Tab 点击的声音文件（cyl_tabButtonTapSoundURL）与触感风格（light、medium、heavy）（issue #535）。
     tapSoundURL: cylImagePath(source.CYLTabBarControllerTabButtonTapSoundURL, env),

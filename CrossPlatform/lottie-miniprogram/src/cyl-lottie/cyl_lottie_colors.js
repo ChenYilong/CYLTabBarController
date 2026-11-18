@@ -20,7 +20,7 @@ function cylLottieColor(hex) {
   if (!/^[0-9a-fA-F]{6}([0-9a-fA-F]{2})?$/.test(full)) {
     return null
   }
-  const channels = full.match(/../g).map((pair) => parseInt(pair, 16) / 255)
+  const channels = full.match(/../g).map((pair) => Number.parseInt(pair, 16) / 255)
   return channels.length === 3 ? channels.concat(1) : channels
 }
 

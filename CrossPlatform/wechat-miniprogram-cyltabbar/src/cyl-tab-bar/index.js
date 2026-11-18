@@ -462,7 +462,8 @@ Component({
      * [CN] PlusButton 的渲染数据：按 CYLPlusButtonCenterYMultiplier（50 pt 高的 TabBar）与 CYLPlusButtonCenterYOffset
      *      凸起，尺寸由 CYLPlusButtonSize / CYLPlusButtonImageSize 决定。
      */
-    cyl_plusSlot(plus, selectedIdentifier, barHeight = CYL_BAR_HEIGHT, titleLine = { iconHeight: CYL_ITEM_ICON_HEIGHT, titleOffset: 0 }) {
+    cyl_plusSlot(plus, selectedIdentifier, barHeight = CYL_BAR_HEIGHT, tabTitleLine = null) {
+      const titleLine = tabTitleLine || { iconHeight: CYL_ITEM_ICON_HEIGHT, titleOffset: 0 };
       const selected = plus.hasPage && plus.identifier === selectedIdentifier;
       const imageWidth = plus.imageWidth || plus.width || 56;
       const imageHeight = plus.imageHeight || plus.height || 56;

@@ -445,7 +445,7 @@ function cylSameContent(current, expected) {
   if (current.includes(0) || buffer.includes(0)) {
     return false;
   }
-  return current.toString('utf8').replace(/\r\n/g, '\n') === buffer.toString('utf8').replace(/\r\n/g, '\n');
+  return current.toString('utf8').replaceAll('\r\n', '\n') === buffer.toString('utf8').replaceAll('\r\n', '\n');
 }
 
 function cylKeepLineEnds(current, expected) {

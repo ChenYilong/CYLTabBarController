@@ -21,5 +21,6 @@ xcrun clang -fobjc-arc -fmodules -Wall -Wextra -Wno-unused-parameter -DDEBUG=1 \
     "$animation/CYLTabBarItemAnimationEngine.m" \
     "$animation/CYLTabBarItemViewAnimator.m" \
     "$animation/CYLTabBarItemAnimationPlayer.m" \
-    -framework Foundation -framework CoreGraphics -o "$build/tests"
+    "$root/CYLTabBarController/CYLUtils/CYLAnimationKeys.m" \
+    -framework Foundation -framework CoreGraphics -framework QuartzCore -o "$build/tests"
 "$build/tests"

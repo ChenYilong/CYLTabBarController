@@ -63,6 +63,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)cyl_stopAnimationView;
 @optional
 - (void)cyl_applyAnimationViewColors:(nullable NSDictionary<NSString *, UIColor *> *)colors;
+- (void)cyl_setAnimationViewLoops:(BOOL)loops;
+- (void)cyl_applyAnimationViewTintColor:(nullable UIColor *)color;
 @end
 
 @protocol CYLTabBarItemAnimationViewProviding <NSObject>

@@ -4,7 +4,7 @@
 set -uo pipefail
 SRC="$(cd "$(dirname "$0")/../CrossPlatform/harmonyos-cyltabbar" && pwd)"
 # [EN] Windows (Git Bash) and macOS defaults; override with the first argument and DEVECO_HOME.
-if [ "$(uname)" = "Darwin" ]; then
+if [[ "$(uname)" = "Darwin" ]]; then
   DST="${1:-$HOME/cyl-hm}"
   DEVECO="${DEVECO_HOME:-/Applications/DevEco-Studio.app/Contents}"
 else

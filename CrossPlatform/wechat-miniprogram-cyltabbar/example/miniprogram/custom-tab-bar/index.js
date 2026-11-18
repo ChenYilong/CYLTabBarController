@@ -207,7 +207,7 @@ Component({
       if (liquidGlass || state.badges.plus === undefined || state.badges.plus === '') {
         return;
       }
-      const count = (parseInt(state.badges.plus, 10) || 0) + 1;
+      const count = (Number.parseInt(state.badges.plus, 10) || 0) + 1;
       app.cyl_updateTabBarState({ badges: Object.assign({}, state.badges, { plus: String(count) }) });
     },
 

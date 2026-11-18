@@ -115,7 +115,7 @@ export default class XMLHttpRequest {
             const len = bytes.byteLength
 
             for (let i = 0; i < len; i++) {
-              this.responseText += String.fromCharCode(bytes[i])
+              this.responseText += String.fromCodePoint(bytes[i])
             }
           } else {
             this.responseText = data

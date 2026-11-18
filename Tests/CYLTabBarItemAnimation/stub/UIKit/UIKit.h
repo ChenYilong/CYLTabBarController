@@ -7,6 +7,9 @@
 #if __has_include(<CoreGraphics/CoreGraphics.h>)
 #import <CoreGraphics/CoreGraphics.h>
 #endif
+// [EN] Real Core Animation layers (macOS has QuartzCore): the engine sizes and orders its tint overlay with them.
+// [CN] 真实的 Core Animation 图层（macOS 自带 QuartzCore）：引擎用它们设置着色叠加图层的尺寸与层级。
+#import <QuartzCore/QuartzCore.h>
 
 #ifndef NS_SWIFT_UI_ACTOR
 #define NS_SWIFT_UI_ACTOR
@@ -29,8 +32,15 @@ typedef NS_ENUM(NSInteger, UIUserInterfaceStyle) {
 @end
 
 @interface UIColor : NSObject
++ (UIColor *)colorWithRed:(CGFloat)red green:(CGFloat)green blue:(CGFloat)blue alpha:(CGFloat)alpha;
++ (UIColor *)colorWithDynamicProvider:(UIColor * (^)(UITraitCollection *traitCollection))dynamicProvider;
 - (UIColor *)resolvedColorWithTraitCollection:(UITraitCollection *)traitCollection;
+@property (nonatomic, readonly) CGColorRef CGColor;
 @end
+
+typedef struct UIEdgeInsets {
+    CGFloat top, left, bottom, right;
+} UIEdgeInsets;
 
 typedef NS_OPTIONS(NSUInteger, UIViewAutoresizing) {
     UIViewAutoresizingNone = 0,
@@ -54,15 +64,43 @@ typedef NS_OPTIONS(NSUInteger, UIViewAutoresizing) {
 @property (nonatomic, getter=isUserInteractionEnabled) BOOL userInteractionEnabled;
 @property (nonatomic) BOOL translatesAutoresizingMaskIntoConstraints;
 @property (nonatomic) BOOL clipsToBounds;
+@property (nonatomic, readonly) CALayer *layer;
+@end
+
+// [EN] Declared for CYLAnimatedItemView.h, which the tab bar's Swift interface imports. [CN] 供 CYLAnimatedItemView.h 使用（TabBar 的 Swift 接口会导入它）。
+@interface UILabel : UIView
+@end
+
+@interface UIGestureRecognizer : NSObject
+@end
+
+@interface UILongPressGestureRecognizer : UIGestureRecognizer
+@end
+
+@interface UIPanGestureRecognizer : UIGestureRecognizer
+@end
+
+@interface UITabBarItemStateAppearance : NSObject
+@end
+
+@interface UITabBarItemAppearance : NSObject
 @end
 
 @interface UIControl : UIView
 @end
 
 // [EN] Used by the engine's late-failure fallback (the tab's image view). [CN] 供引擎的延迟失败回退使用（Tab 的图片视图）。
+typedef NS_ENUM(NSInteger, UIImageRenderingMode) {
+    UIImageRenderingModeAutomatic,
+    UIImageRenderingModeAlwaysOriginal,
+    UIImageRenderingModeAlwaysTemplate,
+};
+
 @interface UIImage : NSObject
+- (UIImage *)imageWithRenderingMode:(UIImageRenderingMode)renderingMode;
 @end
 
 @interface UIImageView : UIView
 @property (nonatomic, strong) UIImage *image;
+@property (nonatomic, strong) UIColor *tintColor;
 @end

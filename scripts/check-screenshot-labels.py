@@ -14,6 +14,7 @@ Exit status: 0 when every checked image passes, 1 otherwise.
 """
 import argparse
 import os
+import re
 import subprocess
 import sys
 
@@ -39,6 +40,9 @@ def staged_images():
 
 
 def history_images(since):
+    # [EN] `since` comes from the command line: only a date reaches git. [CN] `since` 来自命令行：只有日期才会传给 git。
+    if not re.fullmatch(r'\d{4}-\d{2}-\d{2}', since):
+        sys.exit(f'--since must be a date (YYYY-MM-DD), not {since!r}')
     names = git('log', f'--since={since} 00:00', '--diff-filter=AM', '--name-only', '--format=', '--', 'docs/assets')
     return sorted({p for p in names.split('\n') if is_image(p)} | set(staged_images()))
 

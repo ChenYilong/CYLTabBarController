@@ -40,6 +40,25 @@ PHONE_SCREEN_RATIO = 19.5 / 9
 # [EN] Written into every PNG this script makes, so scripts/check-screenshot-labels.py can tell a labeled image.
 MARKER_KEY = 'CYLScreenshot'
 
+# [EN] The folders the images may be read from and written to: this repository and the temporary folders. Paths come
+#      from the command line (often written by an agent), so each is resolved and checked before it reaches open() or
+#      ffmpeg: no path outside these folders, and an absolute path can never be read as an ffmpeg option.
+# [CN] 允许读写图片的目录：本仓库与临时目录。路径来自命令行（常由 agent 生成），因此在交给 open() 或 ffmpeg 之前先解析并检查：
+#      不允许这些目录之外的路径，且绝对路径不会被 ffmpeg 当作选项。
+ROOT = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+ALLOWED_FOLDERS = tuple(dict.fromkeys(os.path.realpath(folder) for folder in (ROOT, tempfile.gettempdir(), '/tmp')
+                                      if os.path.isdir(folder)))
+
+
+def checked_path(path, must_exist):
+    """`path` resolved, inside ALLOWED_FOLDERS (and an existing file when `must_exist`), or the script exits."""
+    resolved = os.path.realpath(path)
+    if not any(os.path.commonpath([folder, resolved]) == folder for folder in ALLOWED_FOLDERS):
+        sys.exit(f'{path}: outside the repository and the temporary folders')
+    if must_exist and not os.path.isfile(resolved):
+        sys.exit(f'{path}: no such file')
+    return resolved
+
 
 def add_marker(path, header, footer):
     """Adds a PNG tEXt chunk (MARKER_KEY: header and footer) before IEND. Pixels are untouched."""
@@ -139,11 +158,12 @@ def main():
         sys.exit('labels are English only (ASCII) (docs/Screenshot-Guidelines.md)')
     if not shutil.which('ffmpeg'):
         sys.exit('ffmpeg is required')
+    options.out = checked_path(options.out, must_exist=False)
     work = tempfile.mkdtemp(prefix='cyl-stitch-')
     cells = []
     for index, cell in enumerate(options.cells):
         caption, path = cell.split('=', 1) if '=' in cell and not os.path.exists(cell) else ('', cell)
-        cells.append((caption, path))
+        cells.append((caption, checked_path(path, must_exist=True)))
     cell_width = max(size_of(path)[0] for _, path in cells)
     # [EN] Even: with an odd cell width plus the gap, an ffmpeg band can come out 1 px narrower and vstack refuses it.
     cell_width += cell_width % 2

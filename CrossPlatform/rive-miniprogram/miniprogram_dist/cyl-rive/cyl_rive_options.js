@@ -60,8 +60,8 @@ function cylRiveColor(hex) {
   if (!/^[0-9a-fA-F]{6}([0-9a-fA-F]{2})?$/.test(value)) {
     return null
   }
-  const alpha = value.length === 8 ? parseInt(value.slice(6, 8), 16) : 255
-  return ((alpha << 24) >>> 0) + parseInt(value.slice(0, 6), 16)
+  const alpha = value.length === 8 ? Number.parseInt(value.slice(6, 8), 16) : 255
+  return ((alpha << 24) >>> 0) + Number.parseInt(value.slice(0, 6), 16)
 }
 
 /**
