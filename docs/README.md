@@ -198,6 +198,8 @@ docs/
 ├── Version-Highlights.md
 ├── WeChat-Mini-Program.md
 ├── assets/
+│   ├── android-api37-20261118-rive-dark-mode-options.png
+│   ├── android-api37-20261118-rive-tint-title-and-dark-tint.png
 │   ├── android-liquid-glass-surface-000.png
 │   ├── android-liquid-glass-surface-040.png
 │   ├── android-liquid-glass-surface-100.png
@@ -221,6 +223,7 @@ docs/
 │   ├── animated-item-flutter-rive-switch-before.png
 │   ├── animated-item-harmonyos-lottie-done.png
 │   ├── animated-item-harmonyos-lottie-playing.png
+│   ├── animated-item-harmonyos-retap-replay.png
 │   ├── animated-item-harmonyos-spacing-before.png
 │   ├── animated-item-harmonyos-tabbar.jpeg
 │   ├── animated-item-ios-demo-interactive-ios27.2.png
@@ -331,8 +334,15 @@ docs/
 │   ├── ios-flatdesign-gif-no-image-under-animation-ios26-4-5ba3a089.png
 │   ├── ios-gif-image-rest-then-play.png
 │   ├── ios-playback-controls-message-tab-iphone17pro-ios26.1-dc04439.png
+│   ├── ios-rive-dark-tint-appearance-switch.png
+│   ├── ios-rive-flatdesign-item-appearance.png
+│   ├── ios-rive-item-appearance-icon-title-tint.png
+│   ├── ios-rive-liquid-glass-item-appearance-plus-headroom.png
 │   ├── ios-rive-rest-then-play-bell.png
 │   ├── ios-rive-tint-template.png
+│   ├── ios-rive-title-tint-light-dark.png
+│   ├── iphone-duo-example-rive-bottom-bar.png
+│   ├── iphone-duo-objc-vs-swift-side-bar.png
 │   ├── iphone-duo-tab-bar-ios27-2-b356c1e6.png
 │   ├── issue-561-ipad-tab-bars-ios.png
 │   ├── liquid-glass-plus-stand-in-landscape-ios.png
