@@ -393,19 +393,37 @@ open class CYLTabBarItemAnimationFactory(val registry: CYLTabBarItemAnimatorRegi
         view.isClickable = false
         view.isFocusable = false
         (view as? ImageView)?.scaleType = contentMode
-        view.cyl_setTag("cyl_tab_bar_item_animation_player", animator.playerForAnimationView(view))
+        val options = CYLTabBarAnimationFileAndOptions(url).second
+        view.cyl_setTag(OPTIONS_TAG, options)
+        view.cyl_setTag(PLAYER_TAG, animator.playerForAnimationView(view)?.let { tinting(it, view, options) })
         return view
     }
 
     override fun playerForView(view: View?): CYLTabBarItemAnimationPlayer? {
         view ?: return null
-        (view.cyl_getTag("cyl_tab_bar_item_animation_player") as? CYLTabBarItemAnimationPlayer)?.let { return it }
-        return registry.animators().firstNotNullOfOrNull { it.playerForAnimationView(view) }?.also { view.cyl_setTag("cyl_tab_bar_item_animation_player", it) }
+        (view.cyl_getTag(PLAYER_TAG) as? CYLTabBarItemAnimationPlayer)?.let { return it }
+        @Suppress("UNCHECKED_CAST")
+        val options = view.cyl_getTag(OPTIONS_TAG) as? Map<String, String> ?: emptyMap()
+        return registry.animators().firstNotNullOfOrNull { it.playerForAnimationView(view) }?.let { tinting(it, view, options) }?.also { view.cyl_setTag(PLAYER_TAG, it) }
+    }
+
+    /**
+     * [EN] The `tint` / `darkTint` options for every engine (`CYLTabBarItemAnimationTint`): the player draws them, and a
+     *      fixed tint is drawn at once. A view that draws its tint itself (Rive) keeps its own player.
+     * [CN] 所有引擎的 `tint` / `darkTint` 选项（`CYLTabBarItemAnimationTint`）：由播放器绘制，固定着色立即绘制。自己绘制着色的视图（Rive）保留自己的播放器。
+     */
+    private fun tinting(player: CYLTabBarItemAnimationPlayer, view: View, options: Map<String, String>): CYLTabBarItemAnimationPlayer {
+        if (!CYLTabBarItemAnimationTint.hasTint(options)) return player
+        if ((view as? CYLTabBarItemAnimationPlayableView)?.cyl_drawsAnimationViewTint == true) return player
+        CYLTabBarItemAnimationTint.fixedTintColor(options, view.resources.configuration)?.let { CYLTabBarItemAnimationTint.apply(view, it) }
+        return CYLTabBarItemAnimationTintingPlayer(player, options)
     }
 
     override fun isAnimationView(view: View?): Boolean = playerForView(view) != null
 
     companion object {
+        private const val PLAYER_TAG = "cyl_tab_bar_item_animation_player"
+        private const val OPTIONS_TAG = "cyl_tab_bar_item_animation_options"
         @JvmStatic
         val sharedFactory: CYLTabBarItemAnimationFactory by lazy { CYLTabBarItemAnimationFactory() }
         fun animationViewWithURL(context: Context, url: String, size: CYLSize, contentMode: ImageView.ScaleType) = sharedFactory.animationViewWithURL(context, url, size, contentMode)
@@ -431,6 +449,12 @@ interface CYLTabBarItemAnimationPlayableView {
      * [EN] The tab's tint (see `CYLTabBarItemAnimationPlayer.tintColor`). [CN] Tab 的着色（见 `CYLTabBarItemAnimationPlayer.tintColor`）。
      */
     fun cyl_applyAnimationViewTintColor(color: Int?) { /* [EN] Optional. [CN] 可选。 */ }
+    /**
+     * [EN] Whether the view draws the `tint` / `darkTint` options itself; false (the default): the factory draws them on
+     *      the view's layer (`CYLTabBarItemAnimationTint`), as for every engine without a tint of its own.
+     * [CN] 视图是否自己绘制 `tint` / `darkTint` 选项；false（默认）：由工厂在视图图层上绘制（`CYLTabBarItemAnimationTint`），与所有没有自身着色的引擎相同。
+     */
+    val cyl_drawsAnimationViewTint: Boolean get() = false
     /**
      * [EN] Whether the view plays again after each pass until this is turned off (the player's `loops`). For views with no
      *      progress to restart, such as Rive state machines (docs/Animated-Item.md, the Rive loop).
@@ -1062,21 +1086,13 @@ class CYLRiveTabBarItemAnimationView internal constructor(context: Context, priv
         fixedTintColor(resources.configuration)?.let { applyTint(it) }
     }
 
-    private val tintOption get() = options[CYLTabBarItemAnimationKeys.CYLTabBarAnimationOptionTint]?.trim()?.takeIf { it.isNotEmpty() }
+    private val tintOption get() = CYLTabBarItemAnimationTint.tintOption(options)
 
     /**
      * [EN] The fixed tint for `configuration`: `darkTint` in night mode when it is set, else `tint`; null for "title" or none.
      * [CN] `configuration` 下的固定着色：夜间模式且设置了 `darkTint` 时使用它，否则使用 `tint`；"title" 或未设置时为 null。
      */
-    internal fun fixedTintColor(configuration: Configuration): Int? {
-        val light = tintOption?.takeIf { it != TINT_TITLE }?.let { parseColor(it) }
-        val dark = options[CYLTabBarItemAnimationKeys.CYLTabBarAnimationOptionDarkTint]?.trim()?.takeIf { it.isNotEmpty() }?.let { parseColor(it) }
-        // [EN] Only a fixed tint has a night color: "title" follows the title colors. [CN] 只有固定着色才有夜间颜色："title" 跟随标题颜色。
-        light ?: return null
-        return if (isNight(configuration)) dark ?: light else light
-    }
-
-    private fun parseColor(value: String): Int? = runCatching { android.graphics.Color.parseColor(value) }.getOrNull()
+    internal fun fixedTintColor(configuration: Configuration): Int? = CYLTabBarItemAnimationTint.fixedTintColor(options, configuration)
 
     private fun isNight(configuration: Configuration) =
         (configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
@@ -1169,6 +1185,11 @@ class CYLRiveTabBarItemAnimationView internal constructor(context: Context, priv
     override fun cyl_applyAnimationViewTintColor(color: Int?) {
         if (tintOption == TINT_TITLE) applyTint(color)
     }
+
+    /**
+     * [EN] The Rive view draws its tint on rive-android's view, not on this container. [CN] Rive 视图在 rive-android 的视图上绘制着色，而不是在本容器上。
+     */
+    override val cyl_drawsAnimationViewTint: Boolean get() = true
 
     /**
      * [EN] Leaves every touch to the tab button: rive-android's `RiveAnimationView` consumes touches for its state

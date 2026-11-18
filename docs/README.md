@@ -202,6 +202,7 @@ docs/
 │   ├── android-api37-20261118-rive-tint-at-0505042f.png
 │   ├── android-api37-20261118-rive-tint-title-and-dark-tint.png
 │   ├── android-gif-decoder-frame-clock.png
+│   ├── android-gif-tint-option.png
 │   ├── android-liquid-glass-surface-000.png
 │   ├── android-liquid-glass-surface-040.png
 │   ├── android-liquid-glass-surface-100.png
