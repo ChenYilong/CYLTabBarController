@@ -137,7 +137,7 @@ extension CYLTabBarController {
             return
         }
         // [EN] Counted as in `-cyl_bindTabControlActions`: system tab buttons only. [CN] 与 `-cyl_bindTabControlActions` 相同，只计系统 Tab 按钮。
-        let tabButtons = (tabBar.cyl_visibleControls() ?? []).compactMap { $0 as? UIControl }.filter { $0.cyl_isTabButton() }
+        let tabButtons = (tabBar.cyl_visibleControls() ?? []).filter { $0.cyl_isTabButton() }
         for (tabIndex, control) in tabButtons.enumerated() {
             let attributes = tabBarItemAttributes(at: UInt(tabIndex))
             let selectedColor = attributes?[CYLTabBarItemSelectedBackgroundColor] as? UIColor

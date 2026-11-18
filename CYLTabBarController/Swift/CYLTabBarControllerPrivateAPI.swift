@@ -16,6 +16,10 @@ import UIKit
  */
 @objc protocol CYLTabBarControllerPrivateAPI {
     @objc(cyl_updateLoopingLottieViews) func cylUpdateLoopingLottieViews()
+    /// [EN] The image-only tabs state (docs/Swift-Migration.md, step 58). [CN] 纯图标 Tab 的状态（第 58 步）。
+    @objc(cyl_imageOnlyTabsAdjustmentDisabled) func cylImageOnlyTabsAdjustmentDisabled() -> Bool
+    @objc(setCyl_imageOnlyTabsAdjustmentDisabled:) func cylSetImageOnlyTabsAdjustmentDisabled(_ disabled: Bool)
+    @objc(cyl_storedTabBar) func cylStoredTabBar() -> UIView?
     @objc(cyl_rearmViewDidLayoutSubviewsBlockInvokeOnce) func cylRearmViewDidLayoutSubviewsBlockInvokeOnce()
     @objc(cyl_tabBarItemIconViewProviders) func cylTabBarItemIconViewProviders() -> NSMapTable<UIViewController, AnyObject>
     @objc(cyl_themeRemoveTabBarItemAttributeKeys:atIndex:) func cylThemeRemoveTabBarItemAttributeKeys(_ keys: [String], atIndex index: UInt)
