@@ -367,6 +367,7 @@ docs/
 │   ├── ios-lottie4-tint-option.png
 │   ├── ios-playback-controls-message-tab-iphone17pro-ios26.1-dc04439.png
 │   ├── ios-rive-dark-tint-appearance-switch.png
+│   ├── ios-rive-fixed-tint-unselected-only.png
 │   ├── ios-rive-flatdesign-item-appearance.png
 │   ├── ios-rive-item-appearance-icon-title-tint.png
 │   ├── ios-rive-liquid-glass-item-appearance-plus-headroom.png
