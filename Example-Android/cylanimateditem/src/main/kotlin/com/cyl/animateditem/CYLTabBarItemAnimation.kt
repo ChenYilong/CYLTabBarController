@@ -739,6 +739,13 @@ object CYLLottieTabBarItemAnimator : CYLTabBarItemAnimator {
         // [CN] 合并路径（After Effects 导出的文件中很常见）：lottie-android 默认关闭，此时这类文件会画错或完全不画，
         //      而 lottie-ios 会绘制它们。与 iOS 一致，打开。
         CYLReflection.call(view, "enableMergePathsForKitKatAndAbove", true)
+        // [EN] Image layers at the size the file declares for each image (its "w" / "h"), as lottie-ios draws them.
+        //      lottie-android otherwise sizes an image by its bitmap's pixels times the screen density, so a bitmap a
+        //      delegate decodes from a drawable folder (scaled to the screen) or a @2x / @3x file draws 2-3 times too
+        //      large and spills out of the icon.
+        // [CN] 图片图层使用文件为每张图片声明的尺寸（"w" / "h"），与 lottie-ios 一致。否则 lottie-android 按位图像素乘以屏幕密度确定图片尺寸，
+        //      代理从 drawable 目录解码（已按屏幕缩放）的位图或 @2x / @3x 文件会大 2-3 倍并溢出图标。
+        CYLReflection.call(view, "setMaintainOriginalImageBounds", true)
         val file = url.substringBefore('#')
         setFailureListener(view, file)
         if (CYLTabBarItemAnimationFiles.isRemote(file)) {
@@ -845,13 +852,21 @@ object CYLLottieTabBarItemAnimator : CYLTabBarItemAnimator {
 // MARK: - PAG
 
 /**
- * [EN] `CYLPAGTabBarItemAnimator`: PAG tab icons with libpag (`org.libpag.PAGView`), registered when libpag is in the
- *      app. ".pag" files; PAG has no playback speed.
- * [CN] 使用 libpag（`org.libpag.PAGView`）的 PAG Tab 图标，App 中有 libpag 时注册。".pag" 文件；PAG 没有播放速度。
+ * [EN] `CYLPAGTabBarItemAnimator`: PAG tab icons with libpag, registered when libpag is in the app. ".pag" files; PAG
+ *      has no playback speed. The view is `org.libpag.PAGImageView` (libpag 4.0+), else `org.libpag.PAGView`.
+ *      `PAGImageView` is a plain View that draws each frame as a bitmap, the view libpag recommends for many small
+ *      icons. `PAGView` is a TextureView with its own GL surface per icon. In a list of icons, on an emulator's
+ *      translated GL (libEGL "called unimplemented OpenGL ES API"), it drew the first frame and then stopped updating,
+ *      so the icons never played.
+ * [CN] 使用 libpag 的 PAG Tab 图标，App 中有 libpag 时注册。".pag" 文件；PAG 没有播放速度。视图为 `org.libpag.PAGImageView`
+ *      （libpag 4.0+），没有时为 `org.libpag.PAGView`。`PAGImageView` 是普通 View，将每帧绘制为位图，是 libpag 为大量小图标推荐的视图；
+ *      `PAGView` 是 TextureView，每个图标一个 GL 表面：在图标列表中、模拟器转译的 GL 上（libEGL "called unimplemented OpenGL ES API"）
+ *      它只画出第一帧便不再更新，图标从不播放。
  */
 object CYLPAGTabBarItemAnimator : CYLTabBarItemAnimator {
+    private const val IMAGE_VIEW_CLASS = "org.libpag.PAGImageView"
     private const val VIEW_CLASS = "org.libpag.PAGView"
-    val isAvailable: Boolean get() = CYLReflection.type(VIEW_CLASS) != null
+    val isAvailable: Boolean get() = CYLReflection.type(IMAGE_VIEW_CLASS) != null || CYLReflection.type(VIEW_CLASS) != null
     override val identifier: String = "PAG"
     override val fileExtensions: List<String> = listOf("pag")
     override val attributeKeys: Map<String, String> = mapOf(
@@ -865,14 +880,14 @@ object CYLPAGTabBarItemAnimator : CYLTabBarItemAnimator {
     override fun canAnimateFileAtURL(url: String): Boolean = CYLTabBarAnimationFileExtension(url) == "pag"
 
     override fun animationViewWithURL(context: Context, url: String, size: CYLSize, contentMode: ImageView.ScaleType): View? {
-        val view = CYLReflection.newInstance(VIEW_CLASS, context) as? View ?: return null
+        val view = (CYLReflection.newInstance(IMAGE_VIEW_CLASS, context) ?: CYLReflection.newInstance(VIEW_CLASS, context)) as? View ?: return null
         // [EN] PAGScaleMode: 1 stretch, 2 letterbox (fit), 3 zoom (fill). [CN] PAGScaleMode：1 拉伸，2 适应，3 填充。
         CYLReflection.call(view, "setScaleMode", when (contentMode) { ImageView.ScaleType.FIT_XY -> 1; ImageView.ScaleType.CENTER_CROP -> 3; else -> 2 })
-        // [EN] Until the file is here (a download), the host shows its static image or placeholder. [CN] 文件到达之前（下载中），宿主显示其静态图片或占位图。
         CYLTabBarItemAnimationFailure.markLoading(view)
         CYLTabBarItemAnimationFiles.localFile(context, url.substringBefore('#')) { file ->
-            if (file != null) {
-                CYLReflection.call(view, "setPath", file.absolutePath); CYLReflection.call(view, "flush")
+            // [EN] PAGImageView.setPath returns false for a file it cannot read. [CN] PAGImageView.setPath 无法读取文件时返回 false。
+            if (file != null && CYLReflection.call(view, "setPath", file.absolutePath) != false) {
+                CYLReflection.call(view, "flush")
                 CYLTabBarItemAnimationFailure.reportLoaded(view)
             } else {
                 CYLTabBarItemAnimationFailure.reportLater(view)
@@ -881,8 +896,43 @@ object CYLPAGTabBarItemAnimator : CYLTabBarItemAnimator {
         return view
     }
 
-    override fun playerForAnimationView(view: View): CYLTabBarItemAnimationPlayer? =
-        if (CYLReflection.type(VIEW_CLASS)?.isInstance(view) == true) PAGPlayer(view) else null
+    override fun playerForAnimationView(view: View): CYLTabBarItemAnimationPlayer? = when {
+        CYLReflection.type(IMAGE_VIEW_CLASS)?.isInstance(view) == true -> PAGImagePlayer(view)
+        CYLReflection.type(VIEW_CLASS)?.isInstance(view) == true -> PAGPlayer(view)
+        else -> null
+    }
+
+    /**
+     * [EN] `PAGImageView`: progress is a frame (`setCurrentFrame` / `currentFrame` of `numFrames`).
+     * [CN] `PAGImageView`：进度为帧（`numFrames` 中的 `setCurrentFrame` / `currentFrame`）。
+     */
+    private class PAGImagePlayer(view: View) : CYLTabBarItemAnimationBasePlayer(view) {
+        // [EN] setRepeatCount: 0 repeats without end, 1 plays once. [CN] setRepeatCount：0 为无限重复，1 为播放一次。
+        override var loops: Boolean = false
+            set(value) { field = value; animationView?.let { CYLReflection.call(it, "setRepeatCount", if (value) 0 else 1) } }
+
+        private fun frames(view: View) = (CYLReflection.call(view, "numFrames") as? Int)?.takeIf { it > 0 } ?: 1
+
+        private fun show(view: View, frame: Int) {
+            CYLReflection.call(view, "setCurrentFrame", frame)
+            CYLReflection.call(view, "flush")
+        }
+
+        override fun play() {
+            animationView?.let {
+                CYLReflection.call(it, "pause")
+                CYLReflection.call(it, "setRepeatCount", if (loops) 0 else 1)
+                show(it, 0)
+                CYLReflection.call(it, "play")
+            }
+        }
+
+        override fun showLastFrame() { animationView?.let { CYLReflection.call(it, "pause"); show(it, frames(it) - 1) } }
+        override fun stop() { animationView?.let { CYLReflection.call(it, "pause"); show(it, 0) } }
+        override var progress: Float
+            get() = animationView?.let { view -> ((CYLReflection.call(view, "currentFrame") as? Int) ?: 0).toFloat() / maxOf(1, frames(view) - 1) } ?: 0f
+            set(value) { animationView?.let { show(it, Math.round(value.coerceIn(0f, 1f) * (frames(it) - 1))) } }
+    }
 
     private class PAGPlayer(view: View) : CYLTabBarItemAnimationBasePlayer(view) {
         // [EN] PAGView.setRepeatCount: 0 repeats without end, 1 plays once. [CN] PAGView.setRepeatCount：0 为无限重复，1 为播放一次。
