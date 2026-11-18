@@ -101,3 +101,17 @@ test('animation tint: "title" takes the state title color, a color stays, anythi
   assert.equal(cylItemModel({ animationTint: 'red', titleTextAttributes }).animationTint, '');
   assert.equal(cylItemModel({ titleTextAttributes }).animationTint, '');
 });
+
+test('cyl-tab-bar passes every icon color option to cyl-tab-bar-item (B28)', () => {
+  // [EN] The models are tested above, but a value the tab bar computes reaches the item only through the template: the
+  //      tint option was computed and never bound, so Rive icons kept their own colors (B28, docs/Animated-Item.md).
+  // [CN] 上面测试的是模型，但 TabBar 计算出的值只能通过模板传给 Tab：tint 选项被计算却从未绑定，Rive 图标保持了自身颜色（B28）。
+  const fs = require('node:fs');
+  const path = require('node:path');
+  const template = fs.readFileSync(path.join(__dirname, '../src/cyl-tab-bar/index.wxml'), 'utf8');
+  const item = template.slice(template.indexOf('<cyl-tab-bar-item'), template.indexOf('/>', template.indexOf('<cyl-tab-bar-item')));
+  for (const [attribute, key] of [['animation-tint', 'animationTint'], ['icon-tint', 'iconTint'],
+    ['selected-icon-tint', 'selectedIconTint'], ['animation-colors', 'animationColors']]) {
+    assert.ok(item.includes(`${attribute}="{{item.item.${key}}}"`), `${attribute} is not bound`);
+  }
+});

@@ -62,7 +62,13 @@ def checked_pixels(value, name):
 def checked_path(path, must_exist):
     """`path` resolved, of plain characters, inside ALLOWED_FOLDERS (and an existing file when `must_exist`), or the script exits."""
     resolved = os.path.realpath(path)
-    if not SAFE_PATH.fullmatch(resolved):
+    # [EN] On Windows the resolved path is "C:\...": check it with forward slashes and without its drive letter, which
+    #      keeps the same plain characters (and a path that starts with a drive is never taken as an ffmpeg option).
+    # [CN] Windows 上解析后的路径为 "C:\..."：改用正斜杠并去掉盘符后检查，字符限制不变（以盘符开头的路径也不会被 ffmpeg 当作选项）。
+    plain = resolved.replace('\\', '/')
+    if os.name == 'nt' and len(plain) > 2 and plain[0].isalpha() and plain[1] == ':':
+        plain = plain[2:]
+    if not SAFE_PATH.fullmatch(plain):
         sys.exit(f'{path}: only letters, digits, spaces and ._@+/- are allowed in a path')
     if not any(resolved.startswith(folder + os.sep) for folder in ALLOWED_FOLDERS):
         sys.exit(f'{path}: outside the repository and the temporary folder')
