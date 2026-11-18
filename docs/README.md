@@ -201,6 +201,7 @@ docs/
 │   ├── android-api37-20261118-rive-dark-mode-options.png
 │   ├── android-api37-20261118-rive-tint-at-0505042f.png
 │   ├── android-api37-20261118-rive-tint-title-and-dark-tint.png
+│   ├── android-gif-decoder-frame-clock.png
 │   ├── android-liquid-glass-surface-000.png
 │   ├── android-liquid-glass-surface-040.png
 │   ├── android-liquid-glass-surface-100.png
@@ -267,6 +268,7 @@ docs/
 │   ├── flutter-component-ios-bar.png
 │   ├── flutter-component-ios.png
 │   ├── flutter-ios-simulated-taps-3ee06877.png
+│   ├── flutter-ios-simulator-tap-loses-location.png
 │   ├── flutter-pag-android-bar.png
 │   ├── flutter-pag-ios-bar.png
 │   ├── flutter-playback-controls-android-api35-93abe96.png
