@@ -103,3 +103,11 @@ test('performAction and itemIndexForAction', () => {
   assert.deepEqual(events[0].detail, { action: 'retry', index: 1, background: false })
   assert.equal(stack.itemIndexForAction('retry'), 1)
 })
+
+test('a disabled item with an action lets the background act and reads as text', () => {
+  const { stack, events } = cylMountStack({ items: [{ title: 'No connection' }, { title: 'Retry', action: 'retry', enabled: false }], backgroundAction: 'reload' })
+  assert.equal(stack.data.m.items[1].role, 'text')
+  assert.equal(stack.data.m.items[1].interactive, false)
+  cylTap(stack, 1, 100)
+  assert.deepEqual(events.map((event) => event.detail.action), ['reload'])
+})

@@ -34,3 +34,22 @@ public final class CYLAnimatedItemTestTag: CYLAnimatedItemView {
         stateChanges += 1
     }
 }
+
+/**
+ [EN] A stack whose items can be made not interactive from outside, as CYLTableViewPlaceHolder does with its own tap switch.
+      Swift, because Objective-C cannot subclass the Swift CYLAnimatedItemStackView.
+ [CN] 可以从外部把条目设为不可交互的堆叠视图，与 CYLTableViewPlaceHolder 用自己的点击开关的做法相同。用 Swift 编写：Objective-C 不能继承 Swift 的
+      CYLAnimatedItemStackView。
+ */
+@objc(CYLAnimatedItemTestStack)
+@objcMembers
+public final class CYLAnimatedItemTestStack: CYLAnimatedItemStackView {
+    /** [EN] Items that do not take taps even with an action. [CN] 即使有动作也不接收点击的条目。 */
+    public var blockedItemViews: [CYLAnimatedItemView] = [] {
+        didSet { updateInteractionOfItemViews() }
+    }
+
+    public override func isItemViewInteractive(_ itemView: CYLAnimatedItemView) -> Bool {
+        super.isItemViewInteractive(itemView) && !blockedItemViews.contains { $0 === itemView }
+    }
+}

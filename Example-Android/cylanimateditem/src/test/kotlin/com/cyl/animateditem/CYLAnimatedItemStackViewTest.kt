@@ -188,4 +188,32 @@ class CYLAnimatedItemStackViewTest {
         assertTrue(hint.width <= 300 - 2 * margin, "the item fits inside the margins")
         assertTrue(hint.height > oneLine.measuredHeight * 2, "the title wraps instead of widening the stack: hint ${hint.width}x${hint.height}, one line ${oneLine.measuredHeight}, title lines ${hint.titleView.lineCount}")
     }
+
+    @Test
+    fun aDisabledItemOrOneTheSubclassBlocksLetsTheBackgroundAct() {
+        val events = ArrayList<String>()
+        val blocked = HashSet<CYLAnimatedItemView>()
+        val stack = object : CYLAnimatedItemStackView(activity) {
+            override fun isItemInteractive(itemView: CYLAnimatedItemView) = super.isItemInteractive(itemView) && itemView !in blocked
+        }
+        stack.setHandler({ _, action -> events.add(action) }, "retry")
+        stack.setHandler({ _, action -> events.add(action) }, "reload")
+        stack.appendItem("No connection")
+        val retry = stack.appendItem("Retry", action = "retry")
+        stack.backgroundAction = "reload"
+        layOut(stack, 400, 800)
+        val x = stack.stackView.left + retry.left + retry.width / 2f
+        val y = stack.stackView.top + retry.top + retry.height / 2f
+        blocked.add(retry)
+        stack.updateInteractionOfItemViews()
+        assertEquals(TextView::class.java.name, nodeInfo(retry).className)
+        tap(stack, x, y)
+        blocked.clear()
+        stack.updateInteractionOfItemViews()
+        retry.isEnabled = false
+        tap(stack, x, y)
+        retry.isEnabled = true
+        tap(stack, x, y)
+        assertEquals(listOf("reload", "reload", "retry"), events)
+    }
 }

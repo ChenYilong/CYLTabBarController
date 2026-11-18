@@ -15,6 +15,7 @@
         selected-image="{{item.selectedImage}}"
         animation-url="{{item.animationUrl}}"
         axis="vertical"
+        enabled="{{item.enabled}}"
         icon-size="{{item.iconSize}}"
         loop="{{item.loop}}"
         title-lines="{{item.titleLines}}"
