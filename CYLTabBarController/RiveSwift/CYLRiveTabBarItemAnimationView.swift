@@ -48,8 +48,13 @@ struct CYLRiveTabBarItemAnimationConfiguration {
     let numberInput: String?
     /// [EN] `tint` = "title": the tab's title color, as a template image. [CN] `tint` 为 "title"：Tab 的标题颜色，与模板图片相同。
     let tintFollowsTitle: Bool
-    /// [EN] `tint` = "#RRGGBB(AA)": a fixed color. [CN] `tint` 为 "#RRGGBB(AA)"：固定颜色。
+    /// [EN] `tint` = "#RRGGBB(AA)": a fixed color; with `darkTint`, a dynamic color that switches in Dark Mode.
+    /// [CN] `tint` 为 "#RRGGBB(AA)"：固定颜色；同时有 `darkTint` 时为深色模式下切换的动态颜色。
     let fixedTintColor: UIColor?
+    /// [EN] Rive's theme pattern: the view model instance used in light mode (nil: the default instance) and in Dark Mode.
+    /// [CN] Rive 的主题方式：浅色模式下使用的 view model 实例（nil 表示默认实例）与深色模式下使用的实例。
+    let viewModelInstanceName: String?
+    let darkViewModelInstanceName: String?
     /// [EN] The values the number input steps through; empty: +1. [CN] 数字输入依次使用的值；为空时 +1。
     let numberValues: [Float]
     /// [EN] Played through the legacy runtime even with none of the three above. [CN] 即使没有以上三项，也通过旧版运行时播放。
@@ -86,7 +91,11 @@ struct CYLRiveTabBarItemAnimationConfiguration {
         numberInput = options[CYLTabBarAnimationOption.riveNumberInput.rawValue]
         let tint = options[CYLTabBarAnimationOption.tint.rawValue]?.trimmingCharacters(in: .whitespaces)
         tintFollowsTitle = tint == "title"
-        fixedTintColor = tint.flatMap { $0 == "title" ? nil : Self.color(hex: $0) }
+        let lightTint = tint.flatMap { $0 == "title" ? nil : Self.color(hex: $0) }
+        let darkTint = options[CYLTabBarAnimationOption.darkTint.rawValue].flatMap { Self.color(hex: $0.trimmingCharacters(in: .whitespaces)) }
+        fixedTintColor = Self.dynamicColor(light: lightTint, dark: darkTint)
+        viewModelInstanceName = options[CYLTabBarAnimationOption.riveViewModelInstance.rawValue].flatMap { $0.isEmpty ? nil : $0 }
+        darkViewModelInstanceName = options[CYLTabBarAnimationOption.riveDarkViewModelInstance.rawValue].flatMap { $0.isEmpty ? nil : $0 }
         numberValues = (options[CYLTabBarAnimationOption.riveNumberValues.rawValue] ?? "").split(separator: ",")
             .compactMap { Float($0.trimmingCharacters(in: .whitespaces)) }
     }
@@ -99,6 +108,15 @@ struct CYLRiveTabBarItemAnimationConfiguration {
         }
         let index = numberValues.firstIndex(of: current).map { $0 + 1 } ?? 0
         return numberValues[index % numberValues.count]
+    }
+
+    /// [EN] `light` in light mode and `dark` in Dark Mode; either alone when the other is nil.
+    /// [CN] 浅色模式为 `light`、深色模式为 `dark`；另一个为 nil 时只用其中一个。
+    static func dynamicColor(light: UIColor?, dark: UIColor?) -> UIColor? {
+        guard let light, let dark else {
+            return light ?? dark
+        }
+        return UIColor { $0.userInterfaceStyle == .dark ? dark : light }
     }
 
     /// [EN] "#RRGGBB" or "#RRGGBBAA" ("#" optional). [CN] "#RRGGBB" 或 "#RRGGBBAA"（"#" 可省略）。
@@ -156,6 +174,14 @@ public final class CYLRiveTabBarItemAnimationView: UIView, CYLTabBarItemAnimatio
     private var rive: Rive?
     private var riveView: RiveUIView?
     private var viewModelInstance: ViewModelInstance?
+    /// [EN] The state machine, kept to rebind the theme instance. [CN] 状态机，保存下来用于重新绑定主题实例。
+    private var stateMachine: StateMachine?
+    /// [EN] The light and Dark Mode instances (`viewModelInstance` / `darkViewModelInstance` options); nil: no theme switch.
+    /// [CN] 浅色与深色模式的实例（`viewModelInstance` / `darkViewModelInstance` 选项）；nil 表示不切换主题。
+    private var lightThemeInstance: ViewModelInstance?
+    private var darkThemeInstance: ViewModelInstance?
+    /// [EN] The selected state, carried over to the other instance on a theme switch. [CN] 选中状态，切换主题时带到另一个实例。
+    private var isActive = false
     private var isLoaded = false
     private var playsWhenLoaded = false
     /// [EN] Played at least once: the view is no longer paused on its first frame. [CN] 至少播放过一次：视图不再暂停在第一帧。
@@ -215,6 +241,11 @@ public final class CYLRiveTabBarItemAnimationView: UIView, CYLTabBarItemAnimatio
     /// [CN] `cyl_applyAnimationViewTintColor:`：Tab 的标题颜色，`tint` 选项为 "title" 时绘制。
     public func applyAnimationTintColor(_ color: UIColor?) {
         guard configuration.tintFollowsTitle else {
+            // [EN] Called again on a light / dark switch: a fixed tint with `darkTint` is resolved for the new appearance.
+            // [CN] 浅色 / 深色切换时会再次调用：带 `darkTint` 的固定着色按新外观解析。
+            if isLoaded, let fixed = configuration.fixedTintColor {
+                tintOverlay.apply(fixed, in: self)
+            }
             return
         }
         titleTintColor = color
@@ -236,6 +267,63 @@ public final class CYLRiveTabBarItemAnimationView: UIView, CYLTabBarItemAnimatio
         // [EN] The tab button describes itself to VoiceOver. [CN] 由 Tab 按钮向 VoiceOver 描述自己。
         accessibilityElementsHidden = true
         load()
+        if configuration.darkViewModelInstanceName != nil || configuration.fixedTintColor != nil {
+            if #available(iOS 17.0, *) {
+                registerForTraitChanges([UITraitUserInterfaceStyle.self]) { (view: CYLRiveTabBarItemAnimationView, _: UITraitCollection) in
+                    view.appearanceDidChange()
+                }
+            }
+        }
+    }
+
+    /// [EN] Before iOS 17: the light / dark switch. [CN] iOS 17 之前：浅色 / 深色切换。
+    override public func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        if #available(iOS 17.0, *) {
+            return
+        }
+        if traitCollection.hasDifferentColorAppearance(comparedTo: previousTraitCollection) {
+            appearanceDidChange()
+        }
+    }
+
+    /// [EN] Rebinds the theme instance and resolves a fixed tint again for the current appearance.
+    /// [CN] 按当前外观重新绑定主题实例，并重新解析固定着色。
+    private func appearanceDidChange() {
+        guard isLoaded else {
+            return
+        }
+        if let fixed = configuration.fixedTintColor {
+            tintOverlay.apply(fixed, in: self)
+        }
+        bindThemeInstance()
+    }
+
+    /// [EN] Binds the light or the Dark Mode instance (Rive: `StateMachine.bindViewModelInstance`), keeping the selected state.
+    /// [CN] 绑定浅色或深色模式的实例（Rive：`StateMachine.bindViewModelInstance`），保持选中状态。
+    private func bindThemeInstance() {
+        guard let stateMachine, let light = lightThemeInstance, let dark = darkThemeInstance else {
+            return
+        }
+        let instance = traitCollection.userInterfaceStyle == .dark ? dark : light
+        guard instance !== viewModelInstance else {
+            return
+        }
+        if configuration.triggerPropertyPath == nil {
+            instance.setValue(of: BoolProperty(path: configuration.activePropertyPath), to: isActive)
+        }
+        stateMachine.bindViewModelInstance(instance)
+        viewModelInstance = instance
+        originalColors.removeAll()
+        overriddenColorPaths.removeAll()
+        if let lightColor = configuration.lightColor {
+            originalColors[Self.colorPropertyPath] = Self.riveColor(lightColor)
+            instance.setValue(of: ColorProperty(path: Self.colorPropertyPath), to: Self.riveColor(lightColor))
+        }
+        if requestedColors != nil {
+            enqueueRequestedColors()
+        }
+        riveView?.isPaused = false
     }
 
     /// [EN] Not used from Interface Builder. [CN] 不支持从 Interface Builder 创建。
@@ -281,6 +369,7 @@ public final class CYLRiveTabBarItemAnimationView: UIView, CYLTabBarItemAnimatio
                     return
                 }
                 instance.setValue(of: property, to: true)
+                self.isActive = true
                 guard duration > 0 else {
                     // [EN] Held until the animation stops. [CN] 保持到动画停止。
                     return
@@ -290,6 +379,7 @@ public final class CYLRiveTabBarItemAnimationView: UIView, CYLTabBarItemAnimatio
                     return
                 }
                 instance.setValue(of: property, to: false)
+                self.isActive = false
             }
         }
         scheduleLoop()
@@ -339,6 +429,7 @@ public final class CYLRiveTabBarItemAnimationView: UIView, CYLTabBarItemAnimatio
             return
         }
         instance.setValue(of: BoolProperty(path: configuration.activePropertyPath), to: false)
+        isActive = false
     }
 
     /// [EN] Color property path -> color (Dark Mode); nil restores the light colors. [CN] 颜色属性路径 -> 颜色（深色模式）；nil 恢复浅色颜色。
@@ -368,8 +459,28 @@ public final class CYLRiveTabBarItemAnimationView: UIView, CYLTabBarItemAnimatio
                 let artboard = try await file.createArtboard(configuration.artboardName)
                 // [EN] The artboard's default view model instance, kept to play the icon; an artboard may have none.
                 // [CN] 画板默认的 view model 实例，保存下来用于播放图标；画板也可能没有。
-                let instance = try? await file.createViewModelInstance(.viewModelDefault(from: .artboardDefault(artboard)))
+                // [EN] With `viewModelInstance` / `darkViewModelInstance` (Rive's theme pattern), the named instances; the one
+                //      for the current appearance is bound first.
+                // [CN] 有 `viewModelInstance` / `darkViewModelInstance`（Rive 的主题方式）时为具名实例；先绑定当前外观对应的实例。
+                let source: ViewModelInstanceSource = configuration.viewModelInstanceName
+                    .map { .name($0, from: .artboardDefault(artboard)) } ?? .viewModelDefault(from: .artboardDefault(artboard))
+                let lightInstance = try? await file.createViewModelInstance(source)
+                var darkInstance: ViewModelInstance?
+                if let darkName = configuration.darkViewModelInstanceName {
+                    darkInstance = try? await file.createViewModelInstance(.name(darkName, from: .artboardDefault(artboard)))
+                    #if DEBUG
+                    if darkInstance == nil {
+                        print("[CYLTabBarController] The Rive file \(configuration.fileURL.lastPathComponent) has no view model instance named \(darkName)")
+                    }
+                    #endif
+                }
+                let instance = (self.traitCollection.userInterfaceStyle == .dark ? darkInstance : nil) ?? lightInstance
                 let stateMachine = try await artboard.createStateMachine(configuration.stateMachineName, binding: instance)
+                self.stateMachine = stateMachine
+                if darkInstance != nil {
+                    self.lightThemeInstance = lightInstance
+                    self.darkThemeInstance = darkInstance
+                }
                 let rive = try await Rive(file: file,
                                           artboard: artboard,
                                           stateMachine: stateMachine,

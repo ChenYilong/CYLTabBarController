@@ -276,6 +276,17 @@ FOUNDATION_EXTERN CYLTabBarAnimationOption const CYLTabBarAnimationOptionRiveNum
  */
 FOUNDATION_EXTERN CYLTabBarAnimationOption const CYLTabBarAnimationOptionTint;
 /*!
+ * [EN] The Dark Mode color of a fixed `CYLTabBarAnimationOptionTint` ("#RRGGBB" or "#RRGGBBAA"): with tint @"#1C1C1E" and darkTint @"#F2F2F7" a one-color icon stays readable on a light and on a dark bar, switching with the appearance. Not needed with tint @"title", which follows the tab bar's (dynamic) tints already. Rive on iOS.
+ * [CN] 固定 `CYLTabBarAnimationOptionTint`（"#RRGGBB" 或 "#RRGGBBAA"）在深色模式下的颜色：tint 为 @"#1C1C1E"、darkTint 为 @"#F2F2F7" 时，单色图标在浅色与深色 TabBar 上都清晰可辨，并随外观切换。tint 为 @"title" 时不需要，它已跟随 TabBar 的（动态）tint。iOS 上用于 Rive。
+ */
+FOUNDATION_EXTERN CYLTabBarAnimationOption const CYLTabBarAnimationOptionDarkTint;
+/*!
+ * [EN] Rive's own theme pattern (Rive data binding docs: named view model instances, rebound when the color scheme changes): `CYLTabBarAnimationOptionRiveViewModelInstance` names the instance of the artboard's default view model used in light mode (default: its default instance), `CYLTabBarAnimationOptionRiveDarkViewModelInstance` the one used in Dark Mode, e.g. @"Light" and @"Dark". The tab rebinds the instance when the appearance changes and keeps its selected state. For files with a view model (the data binding runtime); applied before `CYLTabBarAnimationDarkColors`.
+ * [CN] Rive 官方的主题方式（Rive 数据绑定文档：具名 view model 实例，颜色模式变化时重新绑定）：`CYLTabBarAnimationOptionRiveViewModelInstance` 指定画板默认 view model 在浅色模式下使用的实例（默认为其默认实例），`CYLTabBarAnimationOptionRiveDarkViewModelInstance` 指定深色模式下使用的实例，例如 @"Light" 与 @"Dark"。外观变化时 Tab 重新绑定实例并保持选中状态。用于带 view model 的文件（数据绑定运行时）；先于 `CYLTabBarAnimationDarkColors` 应用。
+ */
+FOUNDATION_EXTERN CYLTabBarAnimationOption const CYLTabBarAnimationOptionRiveViewModelInstance CYL_RIVE_REQUIRED;
+FOUNDATION_EXTERN CYLTabBarAnimationOption const CYLTabBarAnimationOptionRiveDarkViewModelInstance CYL_RIVE_REQUIRED;
+/*!
  * [EN] An SVGA file's URL (NSURL), the counterpart of `CYLTabBarLottieURL`; read from `CYLTabBarAnimationURL` too.
  * [CN] SVGA 文件的 URL（NSURL），对应 `CYLTabBarLottieURL`；也可以使用 `CYLTabBarAnimationURL`。
  */

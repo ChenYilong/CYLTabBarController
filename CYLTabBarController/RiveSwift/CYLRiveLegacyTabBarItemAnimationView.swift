@@ -111,6 +111,11 @@ public final class CYLRiveLegacyTabBarItemAnimationView: UIView, CYLTabBarItemAn
     /// [CN] `cyl_applyAnimationViewTintColor:`：Tab 的标题颜色，`tint` 选项为 "title" 时绘制。
     public func applyAnimationTintColor(_ color: UIColor?) {
         guard configuration.tintFollowsTitle else {
+            // [EN] Called again on a light / dark switch: a fixed tint with `darkTint` is resolved for the new appearance.
+            // [CN] 浅色 / 深色切换时会再次调用：带 `darkTint` 的固定着色按新外观解析。
+            if let fixed = configuration.fixedTintColor {
+                tintOverlay.apply(fixed, in: self)
+            }
             return
         }
         titleTintColor = color
