@@ -209,7 +209,7 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
      [CN] 没有静态图片（`image` / `selectedImage`）且 `animationURL` 无法播放（没有动画引擎、没有该文件的动画库或文件无法读取）时显示。设为 nil
           恢复为 `defaultPlaceholderImage`，设为空的 `UIImage` 则不显示（只有标题）。动画能播放时仍优先显示动画。
      */
-    public var placeholderImage: UIImage! {
+    open var placeholderImage: UIImage! {
         get { storedPlaceholderImage ?? type(of: self).defaultPlaceholderImage }
         set {
             storedPlaceholderImage = newValue
@@ -298,7 +298,7 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
      [CN] 可选的第二个图标，有自己的点击（`animatedItemViewDidTapAccessory(_:)`），例如删除叉号；nil 移除。它是独立的无障碍元素：请设置
           `accessibilityLabel`。
      */
-    @objc public dynamic var accessoryView: UIView? {
+    @objc open dynamic var accessoryView: UIView? {
         get { storedAccessoryView }
         set {
             guard storedAccessoryView !== newValue else { return }
