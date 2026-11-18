@@ -152,6 +152,9 @@ struct ConfigurationDemo {
           // [EN] Without a tint in the file: the demo's orange (its Home screen, the SVGA icons), not system blue.
           // [CN] 文件未设置强调色时：使用演示的橙色（与首页、SVGA 图标一致），而不是系统蓝。
           tintColor: this.result.tintColor ?? '#FF8000',
+          unselectedColor: this.result.unselectedColor ?? '#808080',
+          iconColor: this.result.iconColor,
+          selectedIconColor: this.result.selectedIconColor,
           tabBarBackgroundColor: this.result.backgroundColor ?? '#F8F8F8',
           titlePositionAdjustment: this.result.titlePositionAdjustment,
           tabBarItemAnimationLoops: this.loops,

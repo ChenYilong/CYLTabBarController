@@ -276,6 +276,16 @@ export struct CYLTabBarController {
   @Prop tintColor: ResourceColor = '#FF8000';
   /** [EN] cyl_tabBarItemTitleColor / CYLTabBarItemTitleColor. [CN] 未选中标题颜色。 */
   @Prop unselectedColor: ResourceColor = '#808080';
+  /**
+   * [EN] CYLTabBarControllerIconColor: the unselected icon color of every tab without its own `iconColor`; undefined
+   *      (default) = the title color. Animated icons with `tint=title` are drawn in it.
+   * [CN] 未单独设置 `iconColor` 的 Tab 的未选中图标颜色；未设置（默认）时用标题颜色。`tint=title` 的动效图标以此颜色绘制。
+   */
+  @Prop iconColor: ResourceColor | undefined = undefined;
+  /**
+   * [EN] CYLTabBarControllerSelectedIconColor: the same for the selected icon. [CN] 选中图标的颜色。
+   */
+  @Prop selectedIconColor: ResourceColor | undefined = undefined;
   plusButtonTitleSelectedColor?: ResourceColor;
   /** [EN] cyl_tabBarBackgroundColor / CYLTabBarBackgroundColor. [CN] TabBar 背景色。 */
   @Prop tabBarBackgroundColor: ResourceColor = '#F8F8F8';
@@ -1240,9 +1250,11 @@ export struct CYLTabBarController {
 
   /**
    * [EN] The color a tab's animation is drawn in (`CYLTabBarAnimationOptionTint` in its path's query): "title" = the
-   *      tab's title color for its state; a fixed color, with `CYLTabBarAnimationOptionDarkTint` in dark mode; '' = the
+   *      tab's icon color for its state, as iOS draws a template image (the item's `iconColor` / `selectedIconColor`, then
+   *      the controller's, then the title color); a fixed color, with `CYLTabBarAnimationOptionDarkTint` in dark mode; '' = the
    *      file's own colors.
-   * [CN] Tab 动画的绘制颜色（路径查询参数中的 `CYLTabBarAnimationOptionTint`）："title" = Tab 当前状态的标题颜色；固定颜色，深色模式下使用
+   * [CN] Tab 动画的绘制颜色（路径查询参数中的 `CYLTabBarAnimationOptionTint`）："title" = Tab 当前状态的图标颜色，与 iOS 模板图片一致（先 Tab 的
+   *      `iconColor` / `selectedIconColor`，再控制器的，最后标题颜色）；固定颜色，深色模式下使用
    *      `CYLTabBarAnimationOptionDarkTint`；'' = 文件自身的颜色。
    */
   cylTabAnimationTint(index: number): ResourceColor {
@@ -1257,7 +1269,9 @@ export struct CYLTabBarController {
     }
     if (tint === CYLTabBarAnimationTintTitle) {
       const item = this.tabBarItemsAttributes[index];
-      return this.selectedIndex === index ? (item.selectedTitleColor ?? this.tintColor) : (item.titleColor ?? this.unselectedColor);
+      return this.selectedIndex === index
+        ? (item.selectedIconColor ?? this.selectedIconColor ?? item.selectedTitleColor ?? this.tintColor)
+        : (item.iconColor ?? this.iconColor ?? item.titleColor ?? this.unselectedColor);
     }
     const dark = (options[CYLTabBarAnimationOptionDarkTint] ?? '').trim();
     return this.colorMode === 'dark' && dark.length > 0 ? dark : tint;

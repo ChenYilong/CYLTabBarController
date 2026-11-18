@@ -229,6 +229,7 @@ docs/
 │   ├── animated-item-harmonyos-lottie-done.png
 │   ├── animated-item-harmonyos-lottie-playing.png
 │   ├── animated-item-harmonyos-retap-replay.png
+│   ├── animated-item-harmonyos-rive-icon-color-tint.png
 │   ├── animated-item-harmonyos-rive-retap-replay.png
 │   ├── animated-item-harmonyos-rive-tint-option.png
 │   ├── animated-item-harmonyos-spacing-before.png

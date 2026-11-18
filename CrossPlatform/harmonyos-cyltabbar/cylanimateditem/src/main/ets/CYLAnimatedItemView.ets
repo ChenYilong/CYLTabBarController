@@ -273,9 +273,11 @@ export struct CYLAnimatedItemView {
   /**
    * [EN] The color the animation is drawn in, as one color, like a tinted template image (iOS / Android
    *      `CYLTabBarAnimationOptionTint`); '' keeps the file's own colors. Any engine: a layer of this color is
-   *      composited "source atop" over the engine view, in its own offscreen group.
+   *      composited "source in" over the engine view, in its own offscreen group, so the shape takes the color and its
+   *      alpha (a 60 % white tint draws a 60 % white icon, as Android's SRC_IN; "source atop" kept a white icon white).
    * [CN] 动画以单一颜色绘制时使用的颜色，与着色的模板图片一致（iOS / Android 的 `CYLTabBarAnimationOptionTint`）；'' 保留文件自身的颜色。
-   *      适用于任何引擎：在引擎视图上方以 "source atop" 合成一层该颜色，位于独立的离屏组中。
+   *      适用于任何引擎：在引擎视图上方以 "source in" 合成一层该颜色，位于独立的离屏组中，因此图形取该颜色及其透明度（60% 白色的着色绘制出
+   *      60% 白色的图标，与 Android 的 SRC_IN 一致；"source atop" 会让白色图标保持白色）。
    */
   @Prop animationTintColor: ResourceColor = '';
   /**
@@ -458,12 +460,13 @@ export struct CYLAnimatedItemView {
         .width(this.iconSize)
         .height(this.iconSize)
           if (this.animationTintColor !== '') {
-            // [EN] The tint: kept only where the animation draws (source atop). [CN] 着色：只保留动画绘制的区域（source atop）。
+            // [EN] The tint: kept only where the animation draws, with the animation's alpha (source in).
+            // [CN] 着色：只保留动画绘制的区域，并乘以动画的透明度（source in）。
             Column()
               .width(this.iconSize)
               .height(this.iconSize)
               .backgroundColor(this.animationTintColor)
-              .blendMode(BlendMode.SRC_ATOP)
+              .blendMode(BlendMode.SRC_IN)
               .hitTestBehavior(HitTestMode.Transparent)
               .id('cyl-animated-item-tint')
           }

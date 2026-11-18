@@ -39,6 +39,17 @@ export interface CYLTabBarConfigurationResult {
   titlePositionAdjustment: CYLOffset;
   tintColor?: string;
   unselectedColor?: string;
+  /**
+   * [EN] The theme's (or the file's) `CYLTabBarItemIconColor`, else `CYLTabBarControllerIconColor`: the unselected icon
+   *      color of every tab without its own; also copied into each such item.
+   * [CN] 主题（或文件）的 `CYLTabBarItemIconColor`，否则为 `CYLTabBarControllerIconColor`：未单独设置的 Tab 的未选中图标颜色；也写入这些 Tab。
+   */
+  iconColor?: string;
+  /**
+   * [EN] The same for the selected icon: `CYLTabBarItemSelectedIconColor`, else `CYLTabBarControllerSelectedIconColor`.
+   * [CN] 选中图标的颜色：`CYLTabBarItemSelectedIconColor`，否则为 `CYLTabBarControllerSelectedIconColor`。
+   */
+  selectedIconColor?: string;
   backgroundColor?: string;
   themeIdentifier?: string;
   plusButton?: CYLConfiguredPlusButton;
@@ -358,6 +369,8 @@ export class CYLTabBarConfiguration {
           pageIdentifier: typeof item['CYLTabBarItemPageIdentifier'] === 'string' ? item['CYLTabBarItemPageIdentifier'] as string : undefined,
           pageParameters: item['CYLTabBarItemPageParameters'] as Record<string, Object> | undefined,
           titlePositionAdjustment: CYLTabBarConfiguration.offsetValue(item['CYLTabBarItemTitlePositionAdjustment']),
+          iconColor: CYLTabBarConfiguration.colorValue(item['CYLTabBarItemIconColor']),
+          selectedIconColor: CYLTabBarConfiguration.colorValue(item['CYLTabBarItemSelectedIconColor']),
         };
         items.push(configured);
       });
@@ -372,6 +385,14 @@ export class CYLTabBarConfiguration {
       ? themes[themeIdentifier] as Record<string, Object> | undefined : undefined;
     const pick = (key: string): string | undefined =>
       CYLTabBarConfiguration.colorValue(theme?.[key]) ?? CYLTabBarConfiguration.colorValue(configuration[key]);
+    // [EN] Icon colors (iOS `CYLTabBarItemIconColor` / `CYLTabBarControllerIconColor`): a tab's own first, then the theme's.
+    // [CN] 图标颜色：先用 Tab 自己的，再用主题的。
+    const iconColor = pick('CYLTabBarItemIconColor') ?? pick('CYLTabBarControllerIconColor');
+    const selectedIconColor = pick('CYLTabBarItemSelectedIconColor') ?? pick('CYLTabBarControllerSelectedIconColor');
+    items.forEach((item: CYLConfiguredTabBarItem) => {
+      item.iconColor = item.iconColor ?? iconColor;
+      item.selectedIconColor = item.selectedIconColor ?? selectedIconColor;
+    });
     return {
       context: typeof configuration['CYLTabBarControllerContext'] === 'string' ? configuration['CYLTabBarControllerContext'] as string : undefined,
       styleType: typeof configuration['CYLTabBarControllerStyleType'] === 'string' ? configuration['CYLTabBarControllerStyleType'] as string : 'default',
@@ -380,6 +401,8 @@ export class CYLTabBarConfiguration {
         ?? { horizontal: 0, vertical: 0 },
       tintColor: pick('CYLTabBarItemSelectedTitleColor'),
       unselectedColor: pick('CYLTabBarItemTitleColor'),
+      iconColor: iconColor,
+      selectedIconColor: selectedIconColor,
       backgroundColor: pick('CYLTabBarBackgroundColor'),
       themeIdentifier: typeof themeIdentifier === 'string' ? themeIdentifier : undefined,
       plusButton: CYLTabBarConfiguration.plusButtonWithConfiguration(configuration),

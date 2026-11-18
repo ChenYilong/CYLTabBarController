@@ -10,7 +10,8 @@
   "CYLTabBarControllerThemes": {
     "course": {
       "CYLTabBarBackgroundColor": "#17203ACC",
-      "CYLTabBarItemTitleColor": "#99FFFFFF",
+      "CYLTabBarItemTitleColor": "#FFFFFF99",
+      "CYLTabBarItemIconColor": "#FFFFFF99",
       "CYLTabBarItemSelectedTitleColor": "#FFFFFF",
       "CYLTabBarItemSelectedIconColor": "#FFFFFF"
     }
@@ -31,7 +32,7 @@
       "CYLTabBarItemSelectedImage": "system:safari.fill",
       "CYLTabBarItemIdentifier": "discover",
       "CYLTabBarItemPageIdentifier": "rive-discover",
-      "CYLTabBarRiveURL": "rive/icons.riv?artboard=SEARCH&stateMachine=SEARCH_Interactivity&input=active",
+      "CYLTabBarRiveURL": "rive/icons.riv?artboard=SEARCH&stateMachine=SEARCH_Interactivity&input=active&tint=title",
       "CYLTabBarRiveSize": "{32, 32}"
     },
     {
@@ -40,7 +41,7 @@
       "CYLTabBarItemSelectedImage": "system:message.fill",
       "CYLTabBarItemIdentifier": "message",
       "CYLTabBarItemPageIdentifier": "rive-message",
-      "CYLTabBarRiveURL": "rive/icons.riv?artboard=BELL&stateMachine=BELL_Interactivity&input=active",
+      "CYLTabBarRiveURL": "rive/icons.riv?artboard=BELL&stateMachine=BELL_Interactivity&input=active&tint=title",
       "CYLTabBarRiveSize": "{32, 32}"
     },
     {
@@ -49,7 +50,7 @@
       "CYLTabBarItemSelectedImage": "system:person.fill",
       "CYLTabBarItemIdentifier": "me",
       "CYLTabBarItemPageIdentifier": "rive-me",
-      "CYLTabBarRiveURL": "rive/icons.riv?artboard=USER&stateMachine=USER_Interactivity&input=active",
+      "CYLTabBarRiveURL": "rive/icons.riv?artboard=USER&stateMachine=USER_Interactivity&input=active&tint=title",
       "CYLTabBarRiveSize": "{32, 32}"
     }
   ]
