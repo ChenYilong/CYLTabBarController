@@ -611,3 +611,5 @@ Before any HarmonyOS work (building, installing or running a HAP, taking emulato
    the image download asks for it, with hardware virtualization available on the Mac.
 4. **Signing is not needed on the emulator**: it installs the unsigned `entry-default-unsigned.hap`
    (`hdc install -r`). Do not ask the owner for a signing setup for emulator runs.
+
+- Screenshots of a tab bar (added 2026-11-18, maintainer): crop with at least 24 pt (72 px at @3x) above the raised plus button (or the bar), measured on the image (the drawn plus button and its badge reach above its accessibility frame), so the plus button and badges are whole; the stitched image keeps a white gap (`scripts/stitch-screenshots.py --top-gap`, 24 px by default) between every header or caption band and the screenshot below. Full rule: docs/Screenshot-Guidelines.md, "Space above the tab bar and below the bands".

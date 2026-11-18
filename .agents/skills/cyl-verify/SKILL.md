@@ -239,3 +239,5 @@ at the top, the task and its rubric (100 = full marks, 60 = pass) in `docs/`, wo
 missing points as `TODO` at the end. A hung or unopenable emulator or simulator: tell the other sessions that use it,
 then restart it from the command line without asking, and afterwards tell all active sessions it is available again
 so that they resume tasks paused because of it ("Hung emulator" in that skill).
+
+- Screenshots of a tab bar (added 2026-11-18, maintainer): crop with at least 24 pt (72 px at @3x) above the raised plus button (or the bar), measured on the image (the drawn plus button and its badge reach above its accessibility frame), so the plus button and badges are whole; the stitched image keeps a white gap (`scripts/stitch-screenshots.py --top-gap`, 24 px by default) between every header or caption band and the screenshot below. Full rule: docs/Screenshot-Guidelines.md, "Space above the tab bar and below the bands".

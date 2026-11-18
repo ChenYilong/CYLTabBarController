@@ -125,6 +125,8 @@ def main():
     parser.add_argument('--columns', default='auto',
                         help='Cells per row: "auto" (default: 1, or 2 when one column is taller than a phone screen), or a number.')
     parser.add_argument('--gap', type=int, default=16, help='White space after each cell, in pixels (default 16).')
+    parser.add_argument('--top-gap', type=int, default=24,
+                        help='White space between a header or caption band and the screenshot below it, in pixels (default 24), so a raised plus button or a badge at the top of a crop is never covered.')
     parser.add_argument('cells', nargs='+', help='"caption=path" or "path".')
     options = parser.parse_args()
     # [EN] The labels the rules require (docs/Screenshot-Guidelines.md); scripts/check-screenshot-labels.py checks them.
@@ -160,6 +162,13 @@ def main():
         if caption:
             parts.append(band(caption, cell_width + options.gap, font_size, os.path.join(work, f'caption{index}.png')))
         width, height = size_of(path)
+        # [EN] A white gap above the screenshot, below its caption or the header (docs/Screenshot-Guidelines.md, "Space
+        #      above the tab bar and below the bands"). [CN] 截图上方、说明或页眉下方的白色间隔。
+        if options.top_gap > 0:
+            gap_path = os.path.join(work, f'topgap{index}.png')
+            run(['ffmpeg', '-v', 'error', '-y', '-f', 'lavfi', '-i',
+                 f'color=c={BACKGROUND}:s={cell_width + options.gap}x{options.top_gap}:d=1', '-frames:v', '1', gap_path])
+            parts.append(gap_path)
         parts.append(pad(path, cell_width + options.gap, height + options.gap, os.path.join(work, f'shot{index}.png')))
         framed.append(stack(parts, os.path.join(work, f'cell{index}.png'), vertical=True))
     rows = []

@@ -192,3 +192,5 @@ classes link back to it:
   automatically. A declared class that cannot be found, or a document without a declaration, is an error, and the
   `Docs navigation` workflow fails.
 - Never edit the generated binding blocks by hand; change the declaration instead.
+
+- Screenshots of a tab bar (added 2026-11-18, maintainer): crop with at least 24 pt (72 px at @3x) above the raised plus button (or the bar), measured on the image (the drawn plus button and its badge reach above its accessibility frame), so the plus button and badges are whole; the stitched image keeps a white gap (`scripts/stitch-screenshots.py --top-gap`, 24 px by default) between every header or caption band and the screenshot below. Full rule: docs/Screenshot-Guidelines.md, "Space above the tab bar and below the bands".
