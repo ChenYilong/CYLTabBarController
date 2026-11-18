@@ -308,6 +308,12 @@ export struct CYLAnimatedItemView {
    *      无内边距、无最小高度、无手势，并对读屏隐藏。
    */
   @Prop isBare: boolean = false;
+  /**
+   * [EN] Sized by its content in both directions (B29), as in a stack (`CYLAnimatedItemStackView`); otherwise (default)
+   *      the item fills its parent, as a `Flex` without a size does, which suits a tag in a fixed-size cell.
+   * [CN] 两个方向都按内容决定尺寸（B29），用于堆叠（`CYLAnimatedItemStackView`）；否则（默认）条目与未设置尺寸的 `Flex` 一样填满父组件，适合固定尺寸单元格中的标签。
+   */
+  @Prop sizesToContent: boolean = false;
   @State animationLoaded: boolean = false;
   @State animationFailed: boolean = false;
   @BuilderParam animationBuilder: (context: CYLAnimatedItemAnimationContext) => void = this.cylNoAnimation;
@@ -572,8 +578,8 @@ export struct CYLAnimatedItemView {
     //      default size everywhere else.
     // [CN] 未设置尺寸的 Flex 会填满父组件。纯图标（宿主的 Tab 图标，无标题、无附件）的尺寸就是图标尺寸，宿主才能依据其边缘布局：TabBar 把角标放在
     //      图标右上角，而与 Tab 槽位同宽的条目把角标挪到了图标左上角（鸿蒙问题列表 #51）。其他情况为 `undefined`，保持默认尺寸。
-    .width(this.cylIsBareIcon() ? this.iconSize : undefined)
-    .height(this.cylIsBareIcon() ? this.iconSize : undefined)
+    .width(this.cylIsBareIcon() ? this.iconSize : (this.sizesToContent ? 'auto' : undefined))
+    .height(this.cylIsBareIcon() ? this.iconSize : (this.sizesToContent ? 'auto' : undefined))
     .opacity(this.isItemEnabled ? 1 : 0.5)
     .constraintSize({ minHeight: this.isBare ? 0 : 44 })
     .hitTestBehavior(this.isBare ? HitTestMode.None : HitTestMode.Default)

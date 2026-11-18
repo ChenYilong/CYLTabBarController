@@ -9,3 +9,7 @@ export {
   CYLAnimatedItemView, CYLAnimatedItemAxis, CYLAnimatedItemAccessoryPlacement, CYLAnimatedItemAnimationContext, CYLAnimatedItemController,
   CYLAnimatedItemEngines, cylAnimatedItemTypeOf, cylIconColorFilter
 } from './src/main/ets/CYLAnimatedItemView';
+export { CYLAnimatedItemStackView } from './src/main/ets/CYLAnimatedItemStackView';
+export {
+  CYLAnimatedItemStackModel, CYLAnimatedItemStackItem, CYLAnimatedItemStackActionHandler, CYLAnimatedItemStackDefaultSpacing
+} from './src/main/ets/CYLAnimatedItemStackModel';
