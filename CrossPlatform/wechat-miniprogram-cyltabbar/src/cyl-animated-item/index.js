@@ -108,6 +108,22 @@ Component({
      */
     titleFontSize: { type: Number, value: 0 },
     /**
+     * [EN] The title's font weight: 'normal', 'bold', 'bolder', 'lighter' or 100–900 (string or number); '' keeps the
+     *      default.
+     * [CN] 标题字重：'normal'、'bold'、'bolder'、'lighter' 或 100–900（字符串或数字）；'' 时保持默认。
+     */
+    titleFontWeight: { type: String, optionalTypes: [Number], value: '' },
+    /**
+     * [EN] The title's color in dark mode (any CSS color); '' keeps `titleColor`. Dark follows `userInterfaceStyle`.
+     * [CN] 深色模式下的标题颜色（任意 CSS 颜色）；'' 时沿用 `titleColor`。是否深色由 `userInterfaceStyle` 决定。
+     */
+    titleDarkColor: { type: String, value: '' },
+    /**
+     * [EN] 'system' (default) follows the system theme (needs `"darkmode": true` in app.json); 'light' or 'dark' forces it.
+     * [CN] 'system'（默认）跟随系统主题（需在 app.json 中设置 `"darkmode": true`）；'light' 或 'dark' 时强制。
+     */
+    userInterfaceStyle: { type: String, value: 'system' },
+    /**
      * [EN] The title's line count: 1 one line with an ellipsis (default), 0 no limit, n > 1 up to n lines, then an ellipsis.
      * [CN] 标题行数：1 为单行省略（默认），0 为不限，n > 1 为最多 n 行后省略。
      */
@@ -135,6 +151,7 @@ Component({
     gifPlaying: false,
     lottieData: null,
     m: {},
+    systemTheme: 'light',
   },
 
   observers: {
@@ -159,7 +176,7 @@ Component({
       this.setData({ animationLoaded: false, animationFailed: false, gifPlaying: false, lottieData })
       this.cyl_update()
     },
-    'title, image, selectedImage, placeholderImage, embedded, enabled, axis, iconSize, accessoryImage, accessoryText, accessoryAccessibilityLabel, accessoryPlacement, accessibilityLabel, gifFirstFrame, gifLastFrame, iconWidth, iconHeight, iconTint, titleColor, titleFontSize, titleLines, titleLineHeight, titleSpacing': function () {
+    'title, image, selectedImage, placeholderImage, embedded, enabled, axis, iconSize, accessoryImage, accessoryText, accessoryAccessibilityLabel, accessoryPlacement, accessibilityLabel, gifFirstFrame, gifLastFrame, iconWidth, iconHeight, iconTint, titleColor, titleFontSize, titleFontWeight, titleDarkColor, userInterfaceStyle, titleLines, titleLineHeight, titleSpacing': function () {
       this.cyl_update()
     },
     'selected, restingProgress': function () {
@@ -176,10 +193,25 @@ Component({
 
   lifetimes: {
     attached() {
+      // [EN] The system theme, kept current while attached. [CN] 系统主题，挂载期间保持最新。
+      let theme = 'light'
+      try {
+        const info = typeof wx.getAppBaseInfo === 'function' ? wx.getAppBaseInfo() : wx.getSystemInfoSync()
+        theme = info.theme === 'dark' ? 'dark' : 'light'
+      } catch (error) {
+        theme = 'light'
+      }
+      this.data.systemTheme = theme
+      this.cylThemeListener = (result) => {
+        this.data.systemTheme = result && result.theme === 'dark' ? 'dark' : 'light'
+        this.cyl_update()
+      }
+      if (typeof wx !== 'undefined' && typeof wx.onThemeChange === 'function') wx.onThemeChange(this.cylThemeListener)
       this.cyl_update()
     },
     detached() {
       clearTimeout(this.cylGifTimer)
+      if (typeof wx !== 'undefined' && typeof wx.offThemeChange === 'function' && this.cylThemeListener) wx.offThemeChange(this.cylThemeListener)
     },
   },
 

@@ -84,6 +84,18 @@ function cylAnimatedItemGifSource(p, animationPath) {
  * [EN] The model of one item from its properties and state (`animationLoaded`, `animationFailed`).
  * [CN] 由属性与状态（`animationLoaded`、`animationFailed`）得到一个条目的模型。
  */
+/**
+ * [EN] Whether the item is dark: `userInterfaceStyle` 'light' or 'dark' forces it (like the tab bar's
+ *      `CYLTabBarControllerUserInterfaceStyle`); 'system' or unset follows `systemTheme` ('dark' / 'light').
+ * [CN] 项是否为深色：`userInterfaceStyle` 为 'light' 或 'dark' 时强制（同 TabBar 的 `CYLTabBarControllerUserInterfaceStyle`）；
+ *      'system' 或未设置时跟随 `systemTheme`（'dark' / 'light'）。
+ */
+function cylAnimatedItemIsDark(p) {
+  const style = String(p.userInterfaceStyle || 'system').toLowerCase()
+  if (style === 'light' || style === 'dark') return style === 'dark'
+  return p.systemTheme === 'dark'
+}
+
 function cylAnimatedItemModel(p) {
   const animationPath = p.animationUrl || ''
   const hasAnimationData = !!p.animationData && typeof p.animationData === 'object'
@@ -109,7 +121,17 @@ function cylAnimatedItemModel(p) {
   // [EN] Title look: color, font size (px) and line count (1: one line with an ellipsis, the default; 0: no limit;
   //      n > 1: up to n lines, then an ellipsis). [CN] 标题外观：颜色、字号（px）与行数（1：单行省略，默认；0：不限；n > 1：最多 n 行后省略）。
   const titleLines = Number.isFinite(Number(p.titleLines)) && Number(p.titleLines) >= 0 ? Math.floor(Number(p.titleLines)) : 1
-  const titleStyle = (p.titleColor ? `color: ${p.titleColor};` : '') +
+  // [EN] Dark mode: `titleDarkColor` replaces `titleColor` while the item is dark (`userInterfaceStyle` 'dark', or
+  //      'system' / unset with the system theme dark). [CN] 深色模式：项为深色时（`userInterfaceStyle` 为 'dark'，或为 'system' /
+  //      未设置且系统主题为深色）以 `titleDarkColor` 代替 `titleColor`。
+  const dark = cylAnimatedItemIsDark(p)
+  const titleColor = dark && p.titleDarkColor ? p.titleDarkColor : p.titleColor
+  // [EN] Font weight: 'normal', 'bold', 'bolder', 'lighter' or 100–900; anything else keeps the default.
+  // [CN] 字重：'normal'、'bold'、'bolder'、'lighter' 或 100–900；其他值保持默认。
+  const titleFontWeight = /^(normal|bold|bolder|lighter|[1-9]00)$/.test(String(p.titleFontWeight == null ? '' : p.titleFontWeight).trim())
+    ? String(p.titleFontWeight).trim() : ''
+  const titleStyle = (titleColor ? `color: ${titleColor};` : '') +
+    (titleFontWeight ? `font-weight: ${titleFontWeight};` : '') +
     (Number(p.titleFontSize) > 0 ? `font-size: ${Number(p.titleFontSize)}px;` : '') +
     (titleLines > 1 ? `-webkit-line-clamp: ${titleLines};` : '') +
     (Number(p.titleLineHeight) > 0 ? `line-height: ${Number(p.titleLineHeight)}px;` : '') +
@@ -122,6 +144,7 @@ function cylAnimatedItemModel(p) {
     title,
     titleStyle,
     titleLinesClass,
+    dark,
     animationPath,
     animationType,
     restingFrame: p.selected ? 'last' : 'first',
@@ -145,6 +168,7 @@ function cylAnimatedItemModel(p) {
 }
 
 module.exports = {
+  cylAnimatedItemIsDark,
   cylAnimatedItemModel,
   cylAnimatedItemType,
   cylAnimatedItemPackage,

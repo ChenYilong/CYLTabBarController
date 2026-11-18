@@ -102,3 +102,24 @@ test('engine ready, complete, loop complete and error are forwarded as item even
     ['animationerror', { message: 'bad file' }],
   ])
 })
+
+test('the title switches to titleDarkColor when the system theme changes, and stops listening once detached', () => {
+  let listener = null
+  global.wx = {
+    getAppBaseInfo: () => ({ theme: 'light' }),
+    onThemeChange: (fn) => { listener = fn },
+    offThemeChange: (fn) => { if (listener === fn) listener = null },
+  }
+  try {
+    const { item, detach } = cylMount({ title: 'A', titleColor: '#333333', titleDarkColor: '#EEEEEE', titleFontWeight: 600 }, null)
+    assert.equal(item.data.m.titleStyle, 'color: #333333;font-weight: 600;')
+    listener({ theme: 'dark' })
+    assert.equal(item.data.m.titleStyle, 'color: #EEEEEE;font-weight: 600;')
+    item.set({ userInterfaceStyle: 'light' })
+    assert.equal(item.data.m.titleStyle, 'color: #333333;font-weight: 600;')
+    detach()
+    assert.equal(listener, null)
+  } finally {
+    delete global.wx
+  }
+})
