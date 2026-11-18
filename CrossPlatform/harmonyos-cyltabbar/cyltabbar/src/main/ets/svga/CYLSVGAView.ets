@@ -94,6 +94,15 @@ export struct CYLSVGAView {
   private bitmaps: Map<string, image.PixelMap> = new Map<string, image.PixelMap>();
   private frame: number = 0;
   private timer: number = -1;
+  /**
+   * [EN] Hands the host this view's replay, called on each restart (CYLAnimatedItemView `setRestartHandler`, B23).
+   * [CN] 把本视图的重播交给宿主，每次重播时调用（CYLAnimatedItemView `setRestartHandler`，B23）。
+   */
+  registerReplay: (replay: () => void) => void = (_replay: () => void) => {};
+
+  aboutToAppear(): void {
+    this.registerReplay(() => this.cylReplay());
+  }
 
   aboutToDisappear(): void {
     this.cylStop();

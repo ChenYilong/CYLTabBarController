@@ -46,6 +46,15 @@ export class CYLAnimatedItemAnimationContext {
   };
   onFailed: () => void = () => {
   };
+  /**
+   * [EN] The engine view registers how it replays (from progress 0); the item calls it each time `restartToken` grows.
+   *      ArkUI copies a builder's values once when an arrow function wraps the builder (a host's `this`), so a prop
+   *      alone may never see the new token (B23).
+   * [CN] 引擎视图注册其重播方式（从进度 0 播放）；`restartToken` 每次增长时条目调用它。宿主用箭头函数包装 builder（绑定 `this`）时，
+   *      ArkUI 只复制一次 builder 的值，因此仅靠 prop 可能永远看不到新标记（B23）。
+   */
+  setRestartHandler: (handler: () => void) => void = (_handler: () => void) => {
+  };
 }
 
 /**
@@ -245,6 +254,12 @@ export struct CYLAnimatedItemView {
   /** [EN] Optional imperative control (`restartAnimation()`). [CN] 可选的命令式控制（`restartAnimation()`）。 */
   controller?: CYLAnimatedItemController;
   @State private cylControllerRestarts: number = 0;
+  /** [EN] The engine view's replay (B23) and the token it last saw. [CN] 引擎视图的重播（B23）及其上次看到的标记。 */
+  private cylRestartHandler?: () => void;
+  private cylLastRestartToken: number = 0;
+  private cylSetRestartHandler: (handler: () => void) => void = (handler: () => void) => {
+    this.cylRestartHandler = handler;
+  };
   @Prop isItemEnabled: boolean = true;
   @Prop axis: CYLAnimatedItemAxis = CYLAnimatedItemAxis.Horizontal;
   @Prop iconSize: number = 24;
@@ -295,6 +310,7 @@ export struct CYLAnimatedItemView {
   @State private animationContext: CYLAnimatedItemAnimationContext = new CYLAnimatedItemAnimationContext();
 
   aboutToAppear(): void {
+    this.cylLastRestartToken = this.animationRestartToken + this.cylControllerRestarts;
     if (this.controller) {
       this.controller.cylRestart = () => {
         this.cylControllerRestarts += 1;
@@ -327,6 +343,11 @@ export struct CYLAnimatedItemView {
    */
   cylPlaybackDidChange(): void {
     this.cylUpdateContext();
+    const token = this.animationRestartToken + this.cylControllerRestarts;
+    if (token !== this.cylLastRestartToken) {
+      this.cylLastRestartToken = token;
+      this.cylRestartHandler?.();
+    }
   }
 
   private cylUpdateContext(): void {
@@ -337,6 +358,7 @@ export struct CYLAnimatedItemView {
     context.speed = this.animationSpeed;
     context.loops = this.animationLoops;
     context.restartToken = this.animationRestartToken + this.cylControllerRestarts;
+    context.setRestartHandler = this.cylSetRestartHandler;
     let url: string = this.animationUrl;
     context.onLoaded = () => {
       if (url === this.animationUrl) {
@@ -420,7 +442,8 @@ export struct CYLAnimatedItemView {
             loops: this.animationLoops,
             restartToken: this.animationRestartToken + this.cylControllerRestarts,
             onLoaded: this.animationContext.onLoaded,
-            onFailed: this.animationContext.onFailed
+            onFailed: this.animationContext.onFailed,
+            setRestartHandler: this.cylSetRestartHandler
           })
         }
         .width(this.iconSize)

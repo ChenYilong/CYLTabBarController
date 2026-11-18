@@ -142,6 +142,8 @@ def main():
         caption, path = cell.split('=', 1) if '=' in cell and not os.path.exists(cell) else ('', cell)
         cells.append((caption, path))
     cell_width = max(size_of(path)[0] for _, path in cells)
+    # [EN] Even: with an odd cell width plus the gap, an ffmpeg band can come out 1 px narrower and vstack refuses it.
+    cell_width += cell_width % 2
     if options.columns == 'auto':
         # [EN] One column first; two when the one-column image (cells plus captions, header and footer, roughly) would be
         #      taller than one phone screen.

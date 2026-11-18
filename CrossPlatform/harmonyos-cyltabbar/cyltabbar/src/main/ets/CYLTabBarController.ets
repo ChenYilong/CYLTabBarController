@@ -1261,6 +1261,7 @@ export struct CYLTabBarController {
         selected: this.selectedIndex === index,
         replayToken: context.restartToken,
         loops: context.loops,
+        registerReplay: (replay: () => void) => context.setRestartHandler(replay),
         onLoaded: () => context.onLoaded(),
         onLoadError: (_message: string) => context.onFailed(),
       })
@@ -1271,6 +1272,7 @@ export struct CYLTabBarController {
         selected: this.selectedIndex === index,
         replayToken: context.restartToken,
         loops: context.loops,
+        registerReplay: (replay: () => void) => context.setRestartHandler(replay),
         onLoaded: () => context.onLoaded(),
         onLoadError: (_message: string) => {
           context.onFailed();
@@ -1284,6 +1286,7 @@ export struct CYLTabBarController {
         selected: this.selectedIndex === index,
         replayToken: context.restartToken,
         loops: context.loops,
+        registerReplay: (replay: () => void) => context.setRestartHandler(replay),
         onLoaded: () => context.onLoaded(),
         onLoadError: (_message: string) => {
           context.onFailed();

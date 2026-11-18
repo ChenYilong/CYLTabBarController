@@ -202,6 +202,11 @@ export struct CYLRiveIcon {
    */
   @Prop @Watch('cylLoopsChanged') loops: boolean = false;
   onLoadError: (message: string) => void = () => {};
+  /**
+   * [EN] Hands the host this view's replay, called on each restart (CYLAnimatedItemView `setRestartHandler`, B23).
+   * [CN] 把本视图的重播交给宿主，每次重播时调用（CYLAnimatedItemView `setRestartHandler`，B23）。
+   */
+  registerReplay: (replay: () => void) => void = (_replay: () => void) => {};
   /** [EN] The file is drawn (CYLAnimatedItemView shows it from here on). [CN] 文件已绘制。 */
   onLoaded: () => void = () => {};
   private riveView: RiveAnimationView | null = null;
@@ -215,6 +220,7 @@ export struct CYLRiveIcon {
   private hasPlayed: boolean = false;
 
   aboutToAppear(): void {
+    this.registerReplay(() => this.cylReplay());
     try {
       cylEnsureRiveInitialized();
     } catch (e) {
