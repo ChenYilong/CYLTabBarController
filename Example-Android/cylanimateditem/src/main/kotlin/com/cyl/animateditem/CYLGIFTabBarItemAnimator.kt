@@ -42,7 +42,9 @@ object CYLGIFTabBarItemAnimator {
 /**
  * [EN] The GIF view of a tab: shows the first frame, plays once when the tab is selected and stays on the last frame;
  *      the tab selected at launch shows the last frame without playing (#389). Drawn with `android.graphics.Movie`,
- *      which can show any time of the GIF on every Android version.
+ *      which can show any time of the GIF on every Android version. It obeys the player's `loops` (plays again after
+ *      each pass), `animationSpeed` (scales the GIF's time) and `progress` (`CYLAnimatedItemView.restartAnimation()`
+ *      starts from frame 0), as the Lottie, PAG and Rive players do.
  * [CN] Tab 的 GIF 视图：显示第一帧，选中 Tab 时播放一次并停在最后一帧；启动时选中的 Tab 直接显示最后一帧（#389）。用 `android.graphics.Movie`
  *      绘制，它能在所有 Android 版本上显示 GIF 的任意时刻。
  */
@@ -57,6 +59,16 @@ class CYLGIFTabBarItemAnimationView internal constructor(context: Context, priva
      */
     private var time = 0
     private var animator: ValueAnimator? = null
+    /** [EN] Plays again after each pass (`loops`). [CN] 每次播放后再次播放（`loops`）。 */
+    private var loops = false
+    /** [EN] The speed, 1 = the GIF's own (`animationSpeed`). [CN] 速度，1 = GIF 自身速度（`animationSpeed`）。 */
+    private var speed = 1f
+    /** [EN] The time shown, in ms (tests). [CN] 显示的时刻（毫秒，测试用）。 */
+    internal val shownTime: Int get() = time
+    /** [EN] Whether a pass is playing (tests). [CN] 是否正在播放（测试用）。 */
+    internal val isPlaying: Boolean get() = animator?.isRunning == true
+    /** [EN] The animator of the pass playing (tests). [CN] 当前播放的 animator（测试用）。 */
+    internal val currentAnimator: ValueAnimator? get() = animator
     /**
      * [EN] The GIF's length in ms (1 s when the file gives none). [CN] GIF 的时长（毫秒，文件未给出时为 1 秒）。
      */
@@ -88,13 +100,54 @@ class CYLGIFTabBarItemAnimationView internal constructor(context: Context, priva
         invalidate()
     }
 
-    override fun cyl_playAnimationView() {
+    override fun cyl_playAnimationView() = playFrom(0f)
+
+    /**
+     * [EN] Plays the GIF from `fraction` (0…1) at `speed`; with `loops` it repeats through ValueAnimator's own repeat,
+     *      which also ends at once when the system's animator duration scale is 0 (a restart from an end listener would
+     *      spin there, as every pass ends instantly).
+     * [CN] 以 `speed` 从 `fraction`（0…1）播放 GIF；`loops` 时使用 ValueAnimator 自身的重复，系统动画时长缩放为 0 时也会立即结束（在结束回调中
+     *      重新开始会在那里空转，因为每次播放都立即结束）。
+     */
+    private fun playFrom(fraction: Float) {
         animator?.cancel()
-        animator = ValueAnimator.ofInt(0, duration - 1).apply {
-            duration = this@CYLGIFTabBarItemAnimationView.duration.toLong()
+        val last = duration - 1
+        time = (fraction.coerceIn(0f, 1f) * last).toInt()
+        animator = ValueAnimator.ofInt(0, last).apply {
+            duration = (last / speed).toLong().coerceAtLeast(1L)
             interpolator = android.view.animation.LinearInterpolator()
+            repeatCount = if (loops) ValueAnimator.INFINITE else 0
             addUpdateListener { time = it.animatedValue as Int; invalidate() }
             start()
+            if (fraction > 0f) setCurrentFraction(fraction.coerceIn(0f, 1f))
+        }
+    }
+
+    /** [EN] Where the playing pass is, 0…1. [CN] 当前播放位置，0…1。 */
+    private val playingFraction: Float get() = time / (duration - 1).coerceAtLeast(1).toFloat()
+
+    override fun cyl_setAnimationViewLoops(loops: Boolean) {
+        if (this.loops == loops) return
+        this.loops = loops
+        // [EN] Turned off: the pass playing still ends on the last frame; turned on: it goes on and repeats.
+        // [CN] 关闭时当前这次播放仍停在最后一帧；开启时继续播放并重复。
+        if (isPlaying) playFrom(playingFraction)
+    }
+
+    override fun cyl_setAnimationViewSpeed(speed: Float) {
+        val next = if (speed > 0f) speed else 1f
+        if (this.speed == next) return
+        this.speed = next
+        // [EN] A pass already playing goes on from where it is at the new speed. [CN] 正在播放的动画从当前位置以新速度继续。
+        if (isPlaying) playFrom(playingFraction)
+    }
+
+    override fun cyl_setAnimationViewProgress(progress: Float) {
+        if (isPlaying) {
+            playFrom(progress)
+        } else {
+            time = (progress.coerceIn(0f, 1f) * (duration - 1)).toInt()
+            invalidate()
         }
     }
 

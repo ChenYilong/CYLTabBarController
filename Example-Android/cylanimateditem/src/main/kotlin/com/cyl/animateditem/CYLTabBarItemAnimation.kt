@@ -437,6 +437,16 @@ interface CYLTabBarItemAnimationPlayableView {
      * [CN] 视图是否在每次播放后再次播放，直到关闭（播放器的 `loops`）。用于没有进度可重新开始的视图，例如 Rive 状态机（docs/Animated-Item.md，Rive 循环）。
      */
     fun cyl_setAnimationViewLoops(loops: Boolean) { /* [EN] Optional. [CN] 可选。 */ }
+    /**
+     * [EN] The playback speed (the player's `animationSpeed`, 1 = the file's own), applied to a pass already playing.
+     * [CN] 播放速度（播放器的 `animationSpeed`，1 = 文件自身速度），对正在播放的动画同样生效。
+     */
+    fun cyl_setAnimationViewSpeed(speed: Float) { /* [EN] Optional. [CN] 可选。 */ }
+    /**
+     * [EN] Shows the time at `progress` (0…1, the player's `progress`; 0 before `restartAnimation()` plays again).
+     * [CN] 显示 `progress`（0…1，播放器的 `progress`；`restartAnimation()` 重新播放前为 0）处的时刻。
+     */
+    fun cyl_setAnimationViewProgress(progress: Float) { /* [EN] Optional. [CN] 可选。 */ }
 }
 
 /**
@@ -491,6 +501,10 @@ open class CYLTabBarItemViewAnimator(
             override fun stop() = playable.cyl_stopAnimationView()
             override var loops: Boolean = false
                 set(value) { field = value; playable.cyl_setAnimationViewLoops(value) }
+            override var animationSpeed: Float = 1f
+                set(value) { field = value; playable.cyl_setAnimationViewSpeed(value) }
+            override var progress: Float = 0f
+                set(value) { field = value; playable.cyl_setAnimationViewProgress(value) }
             override var tintColor: Int? = null
                 set(value) { if (field != value) { field = value; playable.cyl_applyAnimationViewTintColor(value) } }
             override fun applyColors(colors: Map<String, Int>?, configuration: Configuration) {
