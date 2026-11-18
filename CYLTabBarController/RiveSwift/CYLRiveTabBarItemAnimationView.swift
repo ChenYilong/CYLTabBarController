@@ -110,11 +110,15 @@ struct CYLRiveTabBarItemAnimationConfiguration {
         return numberValues[index % numberValues.count]
     }
 
-    /// [EN] `light` in light mode and `dark` in Dark Mode; either alone when the other is nil.
-    /// [CN] 浅色模式为 `light`、深色模式为 `dark`；另一个为 nil 时只用其中一个。
+    /// [EN] `light` in light mode and `dark` in Dark Mode; nil without `light` (a "title" tint has no fixed color, so `dark`
+    ///      alone is ignored); `light` alone when `dark` is nil.
+    /// [CN] 浅色模式为 `light`、深色模式为 `dark`；没有 `light` 时为 nil（"title" 着色没有固定颜色，单独的 `dark` 被忽略）；`dark` 为 nil 时只用 `light`。
     static func dynamicColor(light: UIColor?, dark: UIColor?) -> UIColor? {
-        guard let light, let dark else {
-            return light ?? dark
+        guard let light else {
+            return nil
+        }
+        guard let dark else {
+            return light
         }
         return UIColor { $0.userInterfaceStyle == .dark ? dark : light }
     }

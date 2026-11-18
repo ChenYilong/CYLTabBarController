@@ -38,6 +38,26 @@ public final class CYLTabBarItemAnimationKeys {
      *      "#007AFF" 这样的颜色为固定色。由 Rive 视图实现（问题 B12）。
      */
     public static final String CYLTabBarAnimationOptionTint = "tint";
+    /**
+     * [EN] The night-mode color of a fixed `CYLTabBarAnimationOptionTint` ("#RRGGBB" / "#AARRGGBB"), re-applied when night
+     *      mode changes: tint "#1C1C1E" with darkTint "#FFFFFF" keeps a one-color icon readable on light and dark bars. Not
+     *      needed with tint "title". Same key as iOS.
+     * [CN] 固定 `CYLTabBarAnimationOptionTint`（"#RRGGBB" / "#AARRGGBB"）在夜间模式下的颜色，夜间模式变化时重新应用：tint "#1C1C1E" 配合
+     *      darkTint "#FFFFFF"，单色图标在浅色与深色 TabBar 上都清晰可辨。tint 为 "title" 时不需要。与 iOS 同名。
+     */
+    public static final String CYLTabBarAnimationOptionDarkTint = "darkTint";
+    /**
+     * [EN] Rive's theme pattern: the named instance of the artboard's default view model used in day mode (default: the
+     *      default instance). Same key as iOS.
+     * [CN] Rive 的主题方式：画板默认 view model 在日间模式下使用的具名实例（默认为默认实例）。与 iOS 同名。
+     */
+    public static final String CYLTabBarAnimationOptionRiveViewModelInstance = "viewModelInstance";
+    /**
+     * [EN] The named view model instance used in night mode, bound again when night mode changes, keeping the selected
+     *      state. Same key as iOS.
+     * [CN] 夜间模式下使用的具名 view model 实例，夜间模式变化时重新绑定，并保持选中状态。与 iOS 同名。
+     */
+    public static final String CYLTabBarAnimationOptionRiveDarkViewModelInstance = "darkViewModelInstance";
     public static final String CYLTabBarAnimationSize = "CYLTabBarAnimationSize";
     public static final String CYLTabBarAnimationURL = "CYLTabBarAnimationURL";
     public static final String CYLTabBarGIFDarkFilePath = "CYLTabBarGIFDarkFilePath";

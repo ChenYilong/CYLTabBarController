@@ -976,11 +976,87 @@ class CYLRiveTabBarItemAnimationView internal constructor(context: Context, priv
         addView(rive, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
         // [EN] A tab icon is not a control: TalkBack reads the tab button. [CN] Tab 图标不是控件：TalkBack 读取 Tab 按钮。
         importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS
-        // [EN] A fixed tint ("#RRGGBB" / "#AARRGGBB"). [CN] 固定着色。
-        tintOption?.takeIf { it != TINT_TITLE }?.let { value -> runCatching { android.graphics.Color.parseColor(value) }.getOrNull()?.let { applyTint(it) } }
+        // [EN] A fixed tint ("#RRGGBB" / "#AARRGGBB"), with its night-mode color (`darkTint`). [CN] 固定着色，及其夜间模式颜色（`darkTint`）。
+        fixedTintColor(resources.configuration)?.let { applyTint(it) }
     }
 
     private val tintOption get() = options[CYLTabBarItemAnimationKeys.CYLTabBarAnimationOptionTint]?.trim()?.takeIf { it.isNotEmpty() }
+
+    /**
+     * [EN] The fixed tint for `configuration`: `darkTint` in night mode when it is set, else `tint`; null for "title" or none.
+     * [CN] `configuration` 下的固定着色：夜间模式且设置了 `darkTint` 时使用它，否则使用 `tint`；"title" 或未设置时为 null。
+     */
+    internal fun fixedTintColor(configuration: Configuration): Int? {
+        val light = tintOption?.takeIf { it != TINT_TITLE }?.let { parseColor(it) }
+        val dark = options[CYLTabBarItemAnimationKeys.CYLTabBarAnimationOptionDarkTint]?.trim()?.takeIf { it.isNotEmpty() }?.let { parseColor(it) }
+        // [EN] Only a fixed tint has a night color: "title" follows the title colors. [CN] 只有固定着色才有夜间颜色："title" 跟随标题颜色。
+        light ?: return null
+        return if (isNight(configuration)) dark ?: light else light
+    }
+
+    private fun parseColor(value: String): Int? = runCatching { android.graphics.Color.parseColor(value) }.getOrNull()
+
+    private fun isNight(configuration: Configuration) =
+        (configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
+
+    /**
+     * [EN] Night mode changed: the fixed tint takes its color for the new mode, and the theme instance is bound again.
+     * [CN] 夜间模式变化：固定着色使用新模式的颜色，并重新绑定主题实例。
+     */
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        fixedTintColor(newConfig)?.let { applyTint(it) }
+        cyl_bindThemeInstance(newConfig)
+    }
+
+    private val lightInstanceName get() = options[CYLTabBarItemAnimationKeys.CYLTabBarAnimationOptionRiveViewModelInstance]?.takeIf { it.isNotEmpty() }
+    private val darkInstanceName get() = options[CYLTabBarItemAnimationKeys.CYLTabBarAnimationOptionRiveDarkViewModelInstance]?.takeIf { it.isNotEmpty() }
+    private var lightInstance: Any? = null
+    private var darkInstance: Any? = null
+    /**
+     * [EN] The instance bound last, by `cyl_bindThemeInstance`. [CN] `cyl_bindThemeInstance` 最近绑定的实例。
+     */
+    internal var boundThemeInstance: Any? = null
+        private set
+    /**
+     * [EN] The selected state, carried over to the other instance. [CN] 选中状态，切换实例时带过去。
+     */
+    private var isActive = false
+
+    /**
+     * [EN] Rive's theme pattern (the iOS options of the same name): binds the named instance of the artboard's default view
+     *      model for `configuration`'s mode (`viewModelInstance` by day, `darkViewModelInstance` at night) to every state
+     *      machine, keeping the selected state. rive-android by reflection: `getController().getFile()`,
+     *      `defaultViewModelForArtboard(getActiveArtboard())`, `createInstanceFromName`, `StateMachineInstance.setViewModelInstance`.
+     *      Called after the file loads and when night mode changes; nothing without the options.
+     * [CN] Rive 的主题方式（与 iOS 同名的选项）：按 `configuration` 的模式（日间为 `viewModelInstance`，夜间为 `darkViewModelInstance`）把画板默认
+     *      view model 的具名实例绑定到每个状态机，并保持选中状态。通过反射使用 rive-android：`getController().getFile()`、
+     *      `defaultViewModelForArtboard(getActiveArtboard())`、`createInstanceFromName`、`StateMachineInstance.setViewModelInstance`。
+     *      文件加载后及夜间模式变化时调用；没有这些选项时不做任何事。
+     */
+    internal fun cyl_bindThemeInstance(configuration: Configuration = resources.configuration) {
+        val darkName = darkInstanceName ?: return
+        val controller = CYLReflection.call(rive, "getController") ?: return
+        val file = CYLReflection.call(controller, "getFile") ?: return
+        val artboard = CYLReflection.call(controller, "getActiveArtboard") ?: return
+        val viewModel = CYLReflection.call(file, "defaultViewModelForArtboard", artboard) ?: return
+        if (lightInstance == null) {
+            lightInstance = lightInstanceName?.let { CYLReflection.call(viewModel, "createInstanceFromName", it) }
+                ?: CYLReflection.call(viewModel, "createDefaultInstance")
+        }
+        if (darkInstance == null) {
+            darkInstance = CYLReflection.call(viewModel, "createInstanceFromName", darkName)
+            if (darkInstance == null) Log.w(TAG, "The Rive file has no view model instance named $darkName")
+        }
+        val instance = (if (isNight(configuration)) darkInstance else lightInstance) ?: return
+        if (instance === boundThemeInstance) return
+        // [EN] The selected state goes with the theme. [CN] 选中状态随主题一起切换。
+        CYLReflection.call(instance, "getBooleanProperty", booleanInput)?.let { CYLReflection.call(it, "setValue", isActive) }
+        val machines = CYLReflection.call(controller, "getStateMachines") as? List<*>
+        machines?.filterNotNull()?.forEach { CYLReflection.call(it, "setViewModelInstance", instance) }
+        if (machines.isNullOrEmpty()) CYLReflection.call(artboard, "setViewModelInstance", instance)
+        boundThemeInstance = instance
+    }
 
     /**
      * [EN] The tint currently drawn, or null. [CN] 当前绘制的着色，没有时为 null。
@@ -1022,6 +1098,7 @@ class CYLRiveTabBarItemAnimationView internal constructor(context: Context, priv
     override fun dispatchTouchEvent(event: android.view.MotionEvent?): Boolean = false
 
     private fun setActive(active: Boolean) {
+        isActive = active
         val machine = stateMachine ?: return
         if (!hasInput(machine, booleanInput)) return
         CYLReflection.call(rive, "setBooleanState", machine, booleanInput, active)
@@ -1154,6 +1231,7 @@ class CYLRiveTabBarItemAnimationView internal constructor(context: Context, priv
          * [EN] The `tint` option value that follows the tab's title color. [CN] 跟随 Tab 标题颜色的 `tint` 选项值。
          */
         const val TINT_TITLE = "title"
+        private const val TAG = "CYLRiveTabBarItem"
         /**
          * [EN] Seconds of a loop pass when the file gives none. [CN] 文件未给出时一次循环的秒数。
          */
@@ -1206,6 +1284,8 @@ class CYLRiveTabBarItemAnimationView internal constructor(context: Context, priv
                     return@localFile
                 }
                 load(rive, bytes, options, contentMode)
+                // [EN] The theme instance for the current mode (`viewModelInstance` / `darkViewModelInstance`). [CN] 当前模式的主题实例。
+                view.cyl_bindThemeInstance()
                 view.cyl_restUntilPlayed()
                 CYLTabBarItemAnimationFailure.reportLoaded(view)
             }
