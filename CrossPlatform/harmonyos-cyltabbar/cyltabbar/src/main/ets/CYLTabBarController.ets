@@ -1070,7 +1070,8 @@ export struct CYLTabBarController {
   cylIcon(index: number): ResourceStr | undefined {
     const item = this.tabBarItemsAttributes[index];
     if (item.gifFilePath !== undefined) {
-      return item.gifFilePath.startsWith('http') ? item.gifFilePath : $rawfile(item.gifFilePath);
+      // [EN] A local file without its options ("gif/a.gif?tint=title" is gif/a.gif). [CN] 本地文件去掉选项（"gif/a.gif?tint=title" 即 gif/a.gif）。
+      return item.gifFilePath.startsWith('http') ? item.gifFilePath : $rawfile(cylRiveFileAndOptions(item.gifFilePath)[0]);
     }
     const selected = this.selectedIndex === index;
     if (item.imageURL !== undefined) {
@@ -1258,7 +1259,14 @@ export struct CYLTabBarController {
    *      `CYLTabBarAnimationOptionDarkTint`；'' = 文件自身的颜色。
    */
   cylTabAnimationTint(index: number): ResourceColor {
-    const path = this.cylTabAnimationPath(index);
+    return this.cylTintForPath(index, this.cylTabAnimationPath(index));
+  }
+
+  /**
+   * [EN] The tint of `path`'s options for tab `index` (see `cylTabAnimationTint`); '' for none.
+   * [CN] Tab `index` 的 `path` 选项中的着色（见 `cylTabAnimationTint`）；没有时为 ''。
+   */
+  cylTintForPath(index: number, path: string | undefined): ResourceColor {
     if (path === undefined) {
       return '';
     }
@@ -1275,6 +1283,30 @@ export struct CYLTabBarController {
     }
     const dark = (options[CYLTabBarAnimationOptionDarkTint] ?? '').trim();
     return this.colorMode === 'dark' && dark.length > 0 ? dark : tint;
+  }
+
+  /**
+   * [EN] The color filter of a GIF tab icon with the `tint` option (`gifFilePath` "gif/a.gif?tint=title"): RGB = the tint,
+   *      alpha = the GIF's alpha times the tint's, the same as the SRC_IN tint layer of the other engines
+   *      (`CYLAnimatedItemView.animationTintColor`), since a GIF is drawn as an Image, not an engine view. The identity
+   *      matrix without a tint (or with a color that is not "#RRGGBB" / "#AARRGGBB"): the GIF keeps its own colors.
+   * [CN] 带 `tint` 选项的 GIF Tab 图标（`gifFilePath` "gif/a.gif?tint=title"）的颜色滤镜：RGB = 着色，alpha = GIF 的 alpha 乘以着色的 alpha，
+   *      与其他引擎的 SRC_IN 着色层（`CYLAnimatedItemView.animationTintColor`）相同，因为 GIF 由 Image 绘制而不是引擎视图。没有着色（或颜色
+   *      不是 "#RRGGBB" / "#AARRGGBB"）时为单位矩阵：GIF 保持自身颜色。
+   */
+  cylGifColorFilter(index: number): ColorFilter {
+    const identity: number[] = [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0];
+    const tint = this.cylTintForPath(index, this.tabBarItemsAttributes[index].gifFilePath);
+    if (typeof tint !== 'string' || !/^#([0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/.test(tint)) {
+      return new ColorFilter(identity);
+    }
+    const hex = tint.substring(1);
+    const argb = hex.length === 8 ? hex : 'FF' + hex;
+    const a = parseInt(argb.substring(0, 2), 16) / 255;
+    const r = parseInt(argb.substring(2, 4), 16) / 255;
+    const g = parseInt(argb.substring(4, 6), 16) / 255;
+    const b = parseInt(argb.substring(6, 8), 16) / 255;
+    return new ColorFilter([0, 0, 0, 0, r, 0, 0, 0, 0, g, 0, 0, 0, 0, b, 0, 0, 0, a, 0]);
   }
 
   cylTabAnimationSize(index: number): number {
@@ -1372,6 +1404,8 @@ export struct CYLTabBarController {
           .width(this.imageSize)
           .height(this.imageSize)
           .objectFit(ImageFit.Contain)
+          // [EN] A GIF's `tint` option (identity otherwise). [CN] GIF 的 `tint` 选项（否则为单位矩阵）。
+          .colorFilter(this.cylGifColorFilter(index))
           .scale({ x: this.tapScale[index] ?? 1, y: this.tapScale[index] ?? 1 })
           .rotate({ z: 1, angle: this.tapAngle[index] ?? 0 })
           .rotate({ y: 1, angle: this.tapFlip[index] ?? 0 })
