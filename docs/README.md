@@ -272,6 +272,7 @@ docs/
 │   ├── flutter-component-android.png
 │   ├── flutter-component-ios-bar.png
 │   ├── flutter-component-ios.png
+│   ├── flutter-ios-default-taps-select.png
 │   ├── flutter-ios-simulated-taps-3ee06877.png
 │   ├── flutter-ios-simulator-tap-loses-location.png
 │   ├── flutter-pag-android-bar.png
@@ -350,6 +351,7 @@ docs/
 │   ├── ios-flatdesign-svga-selected-icon-fixed.png
 │   ├── ios-gif-image-rest-then-play.png
 │   ├── ios-gif-svga-tint-option.png
+│   ├── ios-lottie-pag-tint-option.png
 │   ├── ios-playback-controls-message-tab-iphone17pro-ios26.1-dc04439.png
 │   ├── ios-rive-dark-tint-appearance-switch.png
 │   ├── ios-rive-flatdesign-item-appearance.png

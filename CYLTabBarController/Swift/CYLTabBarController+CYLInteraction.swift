@@ -708,12 +708,23 @@ extension CYLTabBarController {
                 plusButton.cylSetLiquidGlassLensMaskSuspended(lensIsMoving)
             }
         }
+        // [EN] A touch delivered late by a host (Flutter's `UiKitView`, a simulator's one-event tap) ends UIKit's gesture with
+        //      no location, so UIKit selects nothing: select the tab under the touch's own hit test point, as a tap.
+        // [CN] 宿主延迟交付的触摸（Flutter 的 `UiKitView`、模拟器的单事件点击）结束系统手势时没有位置，系统不会选中任何 Tab：按该触摸 hitTest 的位置
+        //      像点击一样选中 Tab。
+        if gestureRecognizer.state == .ended, CYLConstants.isLiquidGlassActive(), let tabBar = cylCheckedTabBar,
+           tabBar.cylTouchLocationWasLost(gestureRecognizer) {
+            let windowPoint = tabBar.cylTouchWindowLocation(of: gestureRecognizer)
+            DispatchQueue.main.async { [weak self] in
+                self?.cylSelectTabAfterLostTouch(atWindowPoint: windowPoint)
+            }
+        }
         let handlesLongPress = cylHandlesTabButtonLongPress()
         let handlesTaps = cylHasTabBarItemTapReceiver()
         guard handlesLongPress || handlesTaps, cylLiquidGlassReceivesTabTouches() else { return }
         let settings = cylInteraction
         let press = settings.liquidGlassPress
-        let windowPoint = gestureRecognizer.location(in: view.window)
+        let windowPoint = cylCheckedTabBar?.cylTouchWindowLocation(of: gestureRecognizer) ?? gestureRecognizer.location(in: view.window)
         switch gestureRecognizer.state {
         case .began:
             // [EN] Both UIKit gestures can begin for the same touch: follow the first one.
@@ -757,6 +768,25 @@ extension CYLTabBarController {
         default:
             break
         }
+    }
+
+    /**
+     * [EN] Selects the tab under `windowPoint` as UIKit selects a tapped tab: the delegate (with the login check and the tap
+     *      report) is asked first, then the tab is selected and the delegate told. The selected tab and the plus button are left
+     *      alone (their taps are reported when the gesture begins). See `-[CYLTabBar cyl_touchWindowLocationOfGestureRecognizer:]`.
+     * [CN] 像系统选中被点击的 Tab 一样选中 `windowPoint` 处的 Tab：先询问代理（含登录检查与点击上报），再选中并通知代理。已选中的 Tab 与 PlusButton
+     *      不处理（它们的点击在手势开始时上报）。
+     */
+    private func cylSelectTabAfterLostTouch(atWindowPoint windowPoint: CGPoint) {
+        guard let control = cylLiquidGlassTabControl(atWindowPoint: windowPoint), !control.cyl_isPlusButton(),
+              let viewControllers, let index = viewControllers.firstIndex(where: { candidate in
+                  candidate.cyl_tabButton === control || cylPrivate.cylTabButtons(of: candidate).contains { $0 === control }
+              }) else { return }
+        let viewController = viewControllers[index]
+        guard viewController !== selectedViewController else { return }
+        guard delegate?.tabBarController?(self, shouldSelect: viewController) ?? true else { return }
+        selectedViewController = viewController
+        delegate?.tabBarController?(self, didSelect: viewController)
     }
 
     /**

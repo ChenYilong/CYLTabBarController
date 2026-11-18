@@ -57,6 +57,9 @@ final class CYLTabBarStorage: NSObject {
 
     /// [EN] YES between `-beginCustomizingItems:` and the end of More editing. [CN] 在 `-beginCustomizingItems:` 与「More」编辑结束之间为 YES。
     var isCustomizingItems = false
+    /// [EN] The window point and time of the last touch hit test, see `cylTouchWindowLocation(of:)`. [CN] 最近一次触摸 hitTest 的窗口坐标与时间。
+    var lastTouchHitWindowPoint: CGPoint?
+    var lastTouchHitTime: TimeInterval = 0
     /// [EN] The views whose `alpha` is observed, and their observations. [CN] 被观察 `alpha` 的视图及其观察。
     var alphaObservations: [ObjectIdentifier: NSKeyValueObservation] = [:]
     /// Whether the last layout found the tab buttons in the iOS 27.1 vertical bar, see `cylRefreshTabButtonsAfterVerticalBar()`.
@@ -1467,6 +1470,12 @@ extension CYLTabBar {
      */
     @objc(cyl_tabBarHitTest:withEvent:superHitTest:)
     func cylTabBarHitTest(_ point: CGPoint, with event: UIEvent?, superHitTest: (CGPoint) -> UIView?) -> UIView? {
+        // [EN] Remember where a touch hit, for a gesture that later reports no location (see `cylTouchWindowLocation(of:)`).
+        // [CN] 记录触摸命中的位置，供之后报告不出位置的手势使用（见 `cylTouchWindowLocation(of:)`）。
+        if event?.type == .touches, window != nil {
+            cylTabBarStorage.lastTouchHitWindowPoint = convert(point, to: nil)
+            cylTabBarStorage.lastTouchHitTime = ProcessInfo.processInfo.systemUptime
+        }
         // [CN] 1. 边界情况：不能响应点击事件
         // [EN] 1. Edge cases: cannot respond to tap events
         if cyl_canNotResponseEvent() {
@@ -1707,16 +1716,42 @@ extension CYLTabBar {
      * [CN] 处理PlusButton事件响应优先级为最优。由 `-gestureRecognizerShouldBegin:` 调用。
      * [EN] Give PlusButton event handling the highest priority. Called by `-gestureRecognizerShouldBegin:`.
      */
+    /**
+     * [EN] Where `gestureRecognizer`'s touch is, in window coordinates. A touch that a host delivers late (Flutter's
+     *      `UiKitView` forwards a simulator's one-event tap only after its gesture arena accepts it) reaches UIKit's Liquid Glass
+     *      gestures with no touch left: they report {0, 0}. Then the point of the touch's own hit test, made when it began, is
+     *      used, if it is at most a second old. Docs: docs/Flutter-Component.md (simulated taps).
+     * [CN] `gestureRecognizer` 的触摸在窗口坐标系中的位置。宿主延迟交付的触摸（Flutter 的 `UiKitView` 要等手势竞技场接受后才转发模拟器的单事件点击）
+     *      到达系统液态玻璃手势时已没有触摸，位置为 {0, 0}；此时使用该触摸开始时 hitTest 的位置（不超过 1 秒）。
+     */
+    @objc(cyl_touchWindowLocationOfGestureRecognizer:)
+    func cylTouchWindowLocation(of gestureRecognizer: UIGestureRecognizer) -> CGPoint {
+        let location = gestureRecognizer.location(in: nil)
+        guard location == .zero, cylTouchLocationWasLost(gestureRecognizer) else { return location }
+        return cylTabBarStorage.lastTouchHitWindowPoint ?? location
+    }
+
+    /**
+     * [EN] YES when `gestureRecognizer` reports no touch location ({0, 0} with no touches) and a recent touch hit test can stand
+     *      in for it. [CN] `gestureRecognizer` 报告不出触摸位置（{0, 0} 且无触摸）且有最近的触摸 hitTest 可替代时为 YES。
+     */
+    @objc(cyl_touchLocationWasLost:)
+    func cylTouchLocationWasLost(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+        guard gestureRecognizer.numberOfTouches == 0, gestureRecognizer.location(in: nil) == .zero,
+              cylTabBarStorage.lastTouchHitWindowPoint != nil else { return false }
+        return ProcessInfo.processInfo.systemUptime - cylTabBarStorage.lastTouchHitTime <= 1
+    }
+
     @objc(cyl_tabBarGestureRecognizerShouldBegin:)
     func cylTabBarGestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
         guard CYLConstants.isLiquidGlassActive() else { return true }
-        var hitView = hitTest(gestureRecognizer.location(in: self), with: nil)
+        var hitView = hitTest(convert(cylTouchWindowLocation(of: gestureRecognizer), from: nil), with: nil)
         if hitView == nil {
             // FIX: issue #653 — in the iOS 27.1 vertical bar the tab buttons are outside this tab bar, so the hit test
             // above finds nothing and a tap on the already selected tab never reached `-tabChangedToControl:`
             // (no `tabBarController:didSelectControl:` callback). Look the tab button up under the touch instead.
             // 竖向栏中 Tab 按钮不在本 TabBar 内，上面的 hitTest 为 nil，导致选中状态下再次点击不回调 didSelectControl，这里按触摸点查找 Tab 按钮。
-            hitView = cylTabBarVerticalBarTabButton(atWindowPoint: gestureRecognizer.location(in: nil))
+            hitView = cylTabBarVerticalBarTabButton(atWindowPoint: cylTouchWindowLocation(of: gestureRecognizer))
         }
         // [EN] FIX: issue #202 — on Liquid Glass a subview of the plus button that takes touches (e.g. an X button) got
         //      none: the hit test above returns it, but UIKit's selection gesture still began, selected the stand-in tab
