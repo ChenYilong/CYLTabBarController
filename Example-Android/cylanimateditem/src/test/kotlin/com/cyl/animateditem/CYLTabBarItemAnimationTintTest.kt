@@ -75,6 +75,34 @@ class CYLTabBarItemAnimationTintTest {
         assertEquals(Color.parseColor("#1C1C1E"), CYLTabBarItemAnimationTint.appliedColor(view))
     }
 
+    /**
+     * [EN] iOS 9a64feea: a fixed tint colors only the unselected tab; the selected one takes the title's selected color, also
+     *      after a night-mode change. [CN] iOS 9a64feea：固定着色只用于未选中的 Tab；选中的 Tab 使用标题的选中颜色，夜间模式变化后也是如此。
+     */
+    @Test
+    fun aFixedTintColorsOnlyTheUnselectedTab() {
+        val view = view(mapOf(CYLTabBarItemAnimationKeys.CYLTabBarAnimationOptionTint to "#1C1C1E", CYLTabBarItemAnimationKeys.CYLTabBarAnimationOptionDarkTint to "#FFFFFF"))
+        val player = factory.playerForView(view)!!
+        player.setTintColor(Color.BLUE, selected = true)
+        assertEquals(Color.BLUE, CYLTabBarItemAnimationTint.appliedColor(view))
+        player.setTintColor(Color.GRAY, selected = false)
+        assertEquals(Color.parseColor("#1C1C1E"), CYLTabBarItemAnimationTint.appliedColor(view))
+        player.applyColors(null, configuration(night = true))
+        assertEquals(Color.WHITE, CYLTabBarItemAnimationTint.appliedColor(view))
+        player.setTintColor(Color.BLUE, selected = true)
+        player.applyColors(null, configuration(night = true))
+        assertEquals("selected stays on the title color in night mode", Color.BLUE, CYLTabBarItemAnimationTint.appliedColor(view))
+    }
+
+    @Test
+    fun titleTintIsTheSameWithTheState() {
+        val options = mapOf(CYLTabBarItemAnimationKeys.CYLTabBarAnimationOptionTint to "title")
+        assertEquals(Color.RED, CYLTabBarItemAnimationTint.resolvedTintColor(options, Color.RED, configuration(false), selected = false))
+        assertEquals(Color.BLUE, CYLTabBarItemAnimationTint.resolvedTintColor(options, Color.BLUE, configuration(false), selected = true))
+        val fixed = mapOf(CYLTabBarItemAnimationKeys.CYLTabBarAnimationOptionTint to "#1C1C1E")
+        assertEquals("no state: fixed in both", Color.parseColor("#1C1C1E"), CYLTabBarItemAnimationTint.resolvedTintColor(fixed, Color.BLUE, configuration(false)))
+    }
+
     @Test
     fun withoutOptionsNothingIsTinted() {
         val view = view(null)

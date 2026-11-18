@@ -338,7 +338,7 @@ class CYLTabBarItemButton(context: Context, val item: CYLTabBarItem, val index: 
         val controller = tabBar.tabBarController
         titleLabel.setTextColor(titleColor(selected, tabBar))
         // [EN] The tint of an animation with the `tint` option "title" (bug B12). [CN] `tint` 选项为 "title" 的动画的着色（问题 B12）。
-        cyl_tabBarItemAnimationPlayer?.tintColor = titleColor(selected, tabBar)
+        cyl_tabBarItemAnimationPlayer?.setTintColor(titleColor(selected, tabBar), selected)
         val font = if (selected) item.cyl_selectedTitleFont ?: controller?.cyl_tabBarItemSelectedTitleFont ?: item.cyl_titleFont ?: controller?.cyl_tabBarItemTitleFont
                    else item.cyl_titleFont ?: controller?.cyl_tabBarItemTitleFont
         if (font != null) {

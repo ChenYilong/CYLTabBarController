@@ -143,6 +143,15 @@ interface CYLTabBarItemAnimationPlayer {
     var tintColor: Int?
         get() = null
         set(@Suppress("UNUSED_PARAMETER") value) { /* [EN] Optional. [CN] 可选。 */ }
+
+    /**
+     * [EN] The tab's tint with its state (iOS `-cyl_applyAnimationViewTintColor:selected:`): a fixed `tint` colors only the
+     *      unselected tab, the selected one takes `color` (the title's selected color), as "title" does. The default sets
+     *      `tintColor`, so a caller without the state keeps the fixed tint in both states.
+     * [CN] 带状态的 Tab 着色（iOS `-cyl_applyAnimationViewTintColor:selected:`）：固定 `tint` 只为未选中的 Tab 着色，选中的 Tab 使用
+     *      `color`（标题的选中颜色），与 "title" 相同。默认实现设置 `tintColor`，因此不带状态的调用方在两种状态下都保留固定着色。
+     */
+    fun setTintColor(color: Int?, selected: Boolean) { tintColor = color }
 }
 
 /**
@@ -450,6 +459,10 @@ interface CYLTabBarItemAnimationPlayableView {
      */
     fun cyl_applyAnimationViewTintColor(color: Int?) { /* [EN] Optional. [CN] 可选。 */ }
     /**
+     * [EN] The tab's tint with its state (see `CYLTabBarItemAnimationPlayer.setTintColor`). [CN] 带状态的 Tab 着色（见 `CYLTabBarItemAnimationPlayer.setTintColor`）。
+     */
+    fun cyl_applyAnimationViewTintColor(color: Int?, selected: Boolean) = cyl_applyAnimationViewTintColor(color)
+    /**
      * [EN] Whether the view draws the `tint` / `darkTint` options itself; false (the default): the factory draws them on
      *      the view's layer (`CYLTabBarItemAnimationTint`), as for every engine without a tint of its own.
      * [CN] 视图是否自己绘制 `tint` / `darkTint` 选项；false（默认）：由工厂在视图图层上绘制（`CYLTabBarItemAnimationTint`），与所有没有自身着色的引擎相同。
@@ -531,6 +544,13 @@ open class CYLTabBarItemViewAnimator(
                 set(value) { field = value; playable.cyl_setAnimationViewProgress(value) }
             override var tintColor: Int? = null
                 set(value) { if (field != value) { field = value; playable.cyl_applyAnimationViewTintColor(value) } }
+            private var tintSelected: Boolean? = null
+            override fun setTintColor(color: Int?, selected: Boolean) {
+                if (tintColor == color && tintSelected == selected) return
+                tintColor = color
+                tintSelected = selected
+                playable.cyl_applyAnimationViewTintColor(color, selected)
+            }
             override fun applyColors(colors: Map<String, Int>?, configuration: Configuration) {
                 // [EN] Only when the state changes, as on iOS. [CN] 与 iOS 一样，只在状态变化时应用。
                 val next = colors?.takeIf { it.isNotEmpty() }
@@ -1122,7 +1142,7 @@ class CYLRiveTabBarItemAnimationView internal constructor(context: Context, priv
      */
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
-        fixedTintColor(newConfig)?.let { applyTint(it) }
+        if (fixedTintColor(newConfig) != null) applyTint(CYLTabBarItemAnimationTint.resolvedTintColor(options, tintTitleColor, newConfig, tintSelected))
         cyl_bindThemeInstance(newConfig)
     }
 
@@ -1204,6 +1224,20 @@ class CYLRiveTabBarItemAnimationView internal constructor(context: Context, priv
      */
     override fun cyl_applyAnimationViewTintColor(color: Int?) {
         if (tintOption == TINT_TITLE) applyTint(color)
+    }
+
+    /** [EN] The title color and state given last, for a night-mode change. [CN] 最近给出的标题颜色与状态，供夜间模式变化使用。 */
+    private var tintTitleColor: Int? = null
+    private var tintSelected: Boolean? = null
+
+    /**
+     * [EN] A fixed tint only on the unselected tab; the selected tab takes the title color (iOS 9a64feea).
+     * [CN] 固定着色只用于未选中的 Tab；选中的 Tab 使用标题颜色（iOS 9a64feea）。
+     */
+    override fun cyl_applyAnimationViewTintColor(color: Int?, selected: Boolean) {
+        tintTitleColor = color
+        tintSelected = selected
+        if (tintOption != null) applyTint(CYLTabBarItemAnimationTint.resolvedTintColor(options, color, resources.configuration, selected))
     }
 
     /**
