@@ -303,6 +303,7 @@ docs/
 │   ├── harmonyos-flatdesign-liquidglass-taps-mate70pro.png
 │   ├── harmonyos-flatdesign-tint-fixed.png
 │   ├── harmonyos-gif-svga-tint-option.png
+│   ├── harmonyos-gif-svga-tint-x86_64.png
 │   ├── harmonyos-home-mate70pro-api21.jpeg
 │   ├── harmonyos-keyboard-moves-tab-bar-cylsearch.png
 │   ├── harmonyos-liquid-glass-badges-ios-vs-harmonyos.png
