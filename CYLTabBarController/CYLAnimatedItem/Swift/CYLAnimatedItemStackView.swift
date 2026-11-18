@@ -115,14 +115,17 @@ open class CYLAnimatedItemStackView: UIView, UIGestureRecognizerDelegate {
     // MARK: - Initializers 初始化
 
     /**
-     [EN] A stack of `itemViews` (each with no action) and the handlers of `actions`. An action without a handler does nothing.
-     [CN] 由 `itemViews`（均无动作）组成的堆叠视图，以及 `actions` 中的处理。没有处理的动作什么都不做。
+     [EN] A stack of `itemViews` (each with no action) and the handlers of `handlers`, keyed by action. An action without a
+          handler does nothing. The label is `handlers:`, not `actions:`: a Swift subclass marked `@objcMembers` exposes
+          inherited initializers to Objective-C, and `initWithItemViews:actions:` is taken by the Objective-C initializer.
+     [CN] 由 `itemViews`（均无动作）组成的堆叠视图，以及按动作索引的 `handlers`。没有处理的动作什么都不做。参数标签是 `handlers:` 而不是 `actions:`：
+          标记 `@objcMembers` 的 Swift 子类会把继承的构造器暴露给 Objective-C，而 `initWithItemViews:actions:` 已被 Objective-C 构造器占用。
      */
     @nonobjc
-    public init(itemViews: [CYLAnimatedItemView], actions: [String: ActionHandler]? = nil) {
+    public init(itemViews: [CYLAnimatedItemView], handlers: [String: ActionHandler]? = nil) {
         super.init(frame: .zero)
         setUp()
-        actions?.forEach { handlers[$0.key] = $0.value }
+        handlers?.forEach { self.handlers[$0.key] = $0.value }
         itemViews.forEach { append($0, action: nil, spacingBefore: stackView.spacing) }
     }
 
@@ -133,14 +136,14 @@ open class CYLAnimatedItemStackView: UIView, UIGestureRecognizerDelegate {
           `[String: ActionHandler]`，因此在这里逐个转换 block。
      */
     @objc(initWithItemViews:actions:)
-    @available(swift, obsoleted: 1, message: "Use init(itemViews:actions:)")
+    @available(swift, obsoleted: 1, message: "Use init(itemViews:handlers:)")
     public convenience init(objcItemViews itemViews: [CYLAnimatedItemView], actions: NSDictionary?) {
         var handlers: [String: ActionHandler] = [:]
         actions?.forEach { key, value in
             guard let action = key as? String else { return }
             handlers[action] = unsafeBitCast(value as AnyObject, to: ActionHandler.self)
         }
-        self.init(itemViews: itemViews, actions: handlers)
+        self.init(itemViews: itemViews, handlers: handlers)
     }
 
     /**
@@ -241,9 +244,35 @@ open class CYLAnimatedItemStackView: UIView, UIGestureRecognizerDelegate {
     open func setAction(_ action: String?, for itemView: CYLAnimatedItemView) {
         guard let entry = entry(for: itemView) else { return }
         entry.action = (action?.isEmpty == false) ? action : nil
-        // [EN] Only an item with an action takes touches; the others let the background act.
-        // [CN] 只有带动作的条目接收触摸；其他条目让背景处理。
-        itemView.isUserInteractionEnabled = entry.action != nil
+        updateInteraction(of: itemView)
+    }
+
+    /**
+     [EN] Whether an item takes taps: its tap performs its action, a tap on it is not a background tap, and VoiceOver reads it
+          as a button. By default: it has an action and it is enabled. Override for items with
+          their own switch (CYLTableViewPlaceHolder's tap interaction), then call `updateInteractionOfItemViews()` after
+          that switch changes.
+     [CN] 条目是否接收点击：点击它执行其动作、点击它不算背景点击、VoiceOver 把它读作按钮。默认：有动作且可用。条目有自己的开关时
+          （CYLTableViewPlaceHolder 的点击交互）重写本方法，并在开关变化后调用 `updateInteractionOfItemViews()`。
+     */
+    @objc(isItemViewInteractive:)
+    open func isItemViewInteractive(_ itemView: CYLAnimatedItemView) -> Bool {
+        action(for: itemView) != nil && itemView.isEnabled
+    }
+
+    /**
+     [EN] Applies `isItemViewInteractive(_:)` again to every item (touches and VoiceOver role), after a change the stack cannot see.
+     [CN] 在堆叠视图无法感知的变化之后，对所有条目重新应用 `isItemViewInteractive(_:)`（触摸与 VoiceOver 角色）。
+     */
+    @objc(updateInteractionOfItemViews)
+    open func updateInteractionOfItemViews() {
+        entries.forEach { updateInteraction(of: $0.view) }
+    }
+
+    /// [EN] Only an interactive item takes touches; the others let the background act.
+    /// [CN] 只有可交互的条目接收触摸；其他条目让背景处理。
+    private func updateInteraction(of itemView: CYLAnimatedItemView) {
+        itemView.isUserInteractionEnabled = isItemViewInteractive(itemView)
         updateAccessibility(of: itemView)
     }
 
@@ -293,7 +322,10 @@ open class CYLAnimatedItemStackView: UIView, UIGestureRecognizerDelegate {
             view.observe(\.accessoryView) { v, _ in refit(v) },
             view.observe(\.accessibilityLabel) { v, _ in reread(v) },
             view.observe(\.isSelected) { v, _ in reread(v) },
-            view.observe(\.isEnabled) { v, _ in reread(v) },
+            view.observe(\.isEnabled) { [weak self] v, _ in
+                guard let self = self, !self.updatingAccessibility else { return }
+                self.updateInteraction(of: v)
+            },
         ]
     }
 
@@ -319,6 +351,7 @@ open class CYLAnimatedItemStackView: UIView, UIGestureRecognizerDelegate {
     }
 
     @objc private func cyl_itemTapped(_ itemView: CYLAnimatedItemView) {
+        guard isItemViewInteractive(itemView) else { return }
         if let action = action(for: itemView) { performAction(action) }
     }
 
@@ -334,7 +367,7 @@ open class CYLAnimatedItemStackView: UIView, UIGestureRecognizerDelegate {
         guard gestureRecognizer === backgroundTapRecognizer else { return true }
         var view = touch.view
         while let current = view, current !== self {
-            if let item = current as? CYLAnimatedItemView, action(for: item) != nil { return false }
+            if let item = current as? CYLAnimatedItemView, isItemViewInteractive(item) { return false }
             view = current.superview
         }
         return true
@@ -356,7 +389,7 @@ open class CYLAnimatedItemStackView: UIView, UIGestureRecognizerDelegate {
     private func updateAccessibility(of itemView: CYLAnimatedItemView) {
         updatingAccessibility = true
         defer { updatingAccessibility = false }
-        let acts = action(for: itemView) != nil
+        let acts = isItemViewInteractive(itemView)
         let actsOnBackground = !acts && itemView === firstItemView && backgroundAction != nil
         var traits = itemView.accessibilityTraits
         traits.remove([.button, .staticText])

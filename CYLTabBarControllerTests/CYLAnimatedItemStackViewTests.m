@@ -8,6 +8,7 @@
 #import <XCTest/XCTest.h>
 #import <CYLTabBarController/CYLTabBarController.h>
 @import CYLAnimatedItem;
+#import "CYLTabBarControllerTests-Swift.h"
 
 /*
  * [EN] CYLAnimatedItemStackView (Swift): every element is a CYLAnimatedItemView; actions, background action, accessibility
@@ -167,6 +168,44 @@
     XCTAssertLessThanOrEqual(CGRectGetWidth(hint.frame), 200 - 2 * stack.contentMargin + 0.5);
     CGFloat oneLine = ceil(hint.titleLabel.font.lineHeight);
     XCTAssertGreaterThan(CGRectGetHeight(hint.frame), oneLine * 1.5, @"the title wraps instead of widening the stack");
+}
+
+- (void)testDisabledItemTakesNoTapsAndIsNotAButton {
+    __block NSInteger count = 0;
+    CYLAnimatedItemStackView *stack = [[CYLAnimatedItemStackView alloc] initWithItemViews:@[] actions:@{
+        @"retry": ^(CYLAnimatedItemStackView *view, NSString *action) { count++; },
+    }];
+    CYLAnimatedItemView *retry = [stack appendItemWithTitle:@"Retry" image:nil animationURL:nil action:@"retry" spacingBefore:0];
+    XCTAssertTrue([stack isItemViewInteractive:retry]);
+    retry.enabled = NO;
+    XCTAssertFalse([stack isItemViewInteractive:retry]);
+    XCTAssertFalse(retry.userInteractionEnabled, @"a disabled item lets the background act");
+    XCTAssertFalse(retry.accessibilityTraits & UIAccessibilityTraitButton);
+    [self sendTouchUpInsideTo:retry];
+    XCTAssertEqual(count, 0);
+    retry.enabled = YES;
+    XCTAssertTrue(retry.userInteractionEnabled);
+    [self sendTouchUpInsideTo:retry];
+    XCTAssertEqual(count, 1);
+}
+
+- (void)testSubclassDecidesWhichItemsAreInteractive {
+    __block NSInteger count = 0;
+    CYLAnimatedItemTestStack *stack = [[CYLAnimatedItemTestStack alloc] initWithItemViews:@[] actions:@{
+        @"retry": ^(CYLAnimatedItemStackView *view, NSString *action) { count++; },
+    }];
+    [stack appendItemWithTitle:@"No connection" image:nil animationURL:nil action:nil spacingBefore:0];
+    CYLAnimatedItemView *retry = [stack appendItemWithTitle:@"Retry" image:nil animationURL:nil action:@"retry" spacingBefore:16];
+    stack.blockedItemViews = @[retry];
+    XCTAssertFalse(retry.userInteractionEnabled, @"an item with an action but interaction off lets the background act");
+    XCTAssertFalse(retry.accessibilityTraits & UIAccessibilityTraitButton);
+    XCTAssertEqualObjects([stack actionForItemView:retry], @"retry", @"the action is kept");
+    [self sendTouchUpInsideTo:retry];
+    XCTAssertEqual(count, 0);
+    stack.blockedItemViews = @[];
+    XCTAssertTrue(retry.userInteractionEnabled);
+    [self sendTouchUpInsideTo:retry];
+    XCTAssertEqual(count, 1);
 }
 
 @end

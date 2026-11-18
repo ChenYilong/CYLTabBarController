@@ -40,10 +40,14 @@ function cylStackModel(p) {
   const list = Array.isArray(p.items) ? p.items.filter((item) => item && typeof item === 'object') : []
   const items = list.map((item, index) => {
     const action = cylStackAction(item.action)
-    const actsOnBackground = !action && index === 0 && Boolean(backgroundAction)
+    // [EN] Takes taps: an action, and not `enabled: false` (a tap on it then reaches the background).
+    // [CN] 接收点击：有动作且不是 `enabled: false`（否则点击传给背景）。
+    const enabled = item.enabled !== false
+    const interactive = Boolean(action) && enabled
+    const actsOnBackground = !interactive && index === 0 && Boolean(backgroundAction)
     const title = item.title === undefined || item.title === null ? '' : String(item.title)
     const label = String(item.accessibilityLabel || '')
-    const button = Boolean(action) || actsOnBackground
+    const button = interactive || actsOnBackground
     const spacing = index === 0 ? 0 : cylStackLength(item.spacingBefore, CYL_STACK_DEFAULT_SPACING)
     return {
       key: item.key !== undefined ? String(item.key) : `cyl-stack-${index}`,
@@ -61,6 +65,8 @@ function cylStackModel(p) {
       loop: Boolean(item.loop),
       accessibilityLabel: label,
       action,
+      enabled,
+      interactive,
       role: button ? 'button' : 'text',
       hidden: !button && !title && !label,
       wrapperStyle: spacing ? `margin-top: ${spacing}px;` : '',
@@ -70,12 +76,13 @@ function cylStackModel(p) {
 }
 
 /**
- * [EN] The action a tap on the item at `index` performs: its own, or '' (the tap then reaches the background).
- * [CN] 点击 `index` 处条目执行的动作：条目自己的动作，否则为 ''（点击随后传给背景）。
+ * [EN] The action a tap on the item at `index` performs: its own while it is interactive, or '' (the tap then reaches the
+ *      background).
+ * [CN] 点击 `index` 处条目执行的动作：条目可交互时为它自己的动作，否则为 ''（点击随后传给背景）。
  */
 function cylStackActionAt(model, index) {
   const item = model && model.items ? model.items[index] : null
-  return item ? item.action : ''
+  return item && item.interactive ? item.action : ''
 }
 
 /**

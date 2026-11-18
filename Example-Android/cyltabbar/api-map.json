@@ -5825,5 +5825,189 @@
   "status": "done",
   "android": "CYLConstants.CYLTabBarAnimationOptionRiveNumberValues",
   "note": "played when libpag / rive-android is in the app"
+ },
+ "UITabBarItem(CYLBadgeExtention) -cyl_moveBadgeToCurrentTabButtonIfNeeded": {
+  "status": "n/a",
+  "note": "UIKit workaround: the classic UITabBar rebuilds its tab buttons and the badge has to follow; Android tab buttons are the library's own views and keep their badge"
+ },
+ "CYLPlusButton reportsTapsToDelegate": {
+  "status": "done",
+  "android": "CYLPlusButton.reportsTapsToDelegate"
+ },
+ "CYLTabBarItemAnimationFailureHandling": {
+  "status": "done",
+  "android": "CYLTabBarItemAnimationFailureHandling"
+ },
+ "CYLTabBarItemAnimationFailureHandling -cylAnimationViewDidFail:error:": {
+  "status": "done",
+  "android": "CYLTabBarItemAnimationFailureHandling.cyl_animationViewDidFail",
+  "note": "no error argument: the view reports the failure, the cause is logged"
+ },
+ "CYLTabBarItemAnimationFailureHandling -cylAnimationViewDidLoad:": {
+  "status": "done",
+  "android": "CYLTabBarItemAnimationFailureHandling.cyl_animationViewDidLoad"
+ },
+ "CYLTabBarItemAnimationDidFailNotification": {
+  "status": "done",
+  "android": "CYLTabBarItemAnimationFailure.fallbackHandler",
+  "note": "a callback in place of an NSNotification: called with the host when the host does not handle the failure itself"
+ },
+ "CYLTabBarItemAnimationReportFailure()": {
+  "status": "done",
+  "android": "CYLTabBarItemAnimationFailure.report / reportLater"
+ },
+ "CYLTabBarItemAnimationMarkLoading()": {
+  "status": "done",
+  "android": "CYLTabBarItemAnimationFailure.markLoading"
+ },
+ "CYLTabBarItemAnimationIsLoading()": {
+  "status": "done",
+  "android": "CYLTabBarItemAnimationFailure.isLoading"
+ },
+ "CYLTabBarItemAnimationReportLoaded()": {
+  "status": "done",
+  "android": "CYLTabBarItemAnimationFailure.reportLoaded"
+ },
+ "CYLTabBarItemAnimatorRegistry +registeredIdentifiers": {
+  "status": "done",
+  "android": "CYLTabBarItemAnimatorRegistry.registeredIdentifiers()"
+ },
+ "CYLTabBarItemAnimatorRegistry -registeredIdentifiers": {
+  "status": "done",
+  "android": "CYLTabBarItemAnimatorRegistry.sharedRegistry.registeredIdentifiers()"
+ },
+ "CYLTabBarItemAnimatorRegistry +isAnimatorRegisteredWithIdentifier:": {
+  "status": "done",
+  "android": "CYLTabBarItemAnimatorRegistry.isAnimatorRegisteredWithIdentifier()"
+ },
+ "CYLTabBarItemAnimatorRegistry -isAnimatorRegisteredWithIdentifier:": {
+  "status": "done",
+  "android": "CYLTabBarItemAnimatorRegistry.sharedRegistry.isAnimatorRegisteredWithIdentifier()"
+ },
+ "CYLTabBarItemAnimatorRegistry +missingKnownIdentifiers": {
+  "status": "done",
+  "android": "CYLTabBarItemAnimatorRegistry.missingKnownIdentifiers()"
+ },
+ "CYLTabBarItemAnimatorRegistry -missingKnownIdentifiers": {
+  "status": "done",
+  "android": "CYLTabBarItemAnimatorRegistry.sharedRegistry.missingKnownIdentifiers()"
+ },
+ "CYLTabBarItemAnimatorRegistry +conflictDescriptions": {
+  "status": "done",
+  "android": "CYLTabBarItemAnimatorRegistry.conflictDescriptions()"
+ },
+ "CYLTabBarItemAnimatorRegistry -conflictDescriptions": {
+  "status": "done",
+  "android": "CYLTabBarItemAnimatorRegistry.sharedRegistry.conflictDescriptions()"
+ },
+ "CYLTabBarItemAnimatorRegistry +registrationReport": {
+  "status": "done",
+  "android": "CYLTabBarItemAnimatorRegistry.registrationReport()"
+ },
+ "CYLTabBarItemAnimatorRegistry -registrationReport": {
+  "status": "done",
+  "android": "CYLTabBarItemAnimatorRegistry.sharedRegistry.registrationReport()"
+ },
+ "CYLTabBarItemAnimatorRegistry +logRegistrationReport": {
+  "status": "done",
+  "android": "CYLTabBarItemAnimatorRegistry.logRegistrationReport()",
+  "note": "Logcat tag \"CYLAnimatedItem\""
+ },
+ "CYLTabBarItemAnimatorRegistry logsRegistrationReportOnLaunch": {
+  "status": "n/a",
+  "note": "iOS DEBUG launch hook (+load before main); Android has no such hook in a library: call CYLTabBarItemAnimatorRegistry.logRegistrationReport() from Application.onCreate"
+ },
+ "CYLTabBarItemAnimatorRegistryDidChangeNotification": {
+  "status": "n/a",
+  "note": "NSNotificationCenter broadcast for engines registered late (+load order); Android animators register synchronously (registerAnimator, or found by reflection on first use) before tab bars are built, so there is no change to broadcast"
+ },
+ "CYLTabBarItemAnimatorRegistryIdentifierKey": {
+  "status": "n/a",
+  "note": "the userInfo key of CYLTabBarItemAnimatorRegistryDidChangeNotification, n/a on Android (see that row)"
+ },
+ "CYLTabBarItemAnimationURLMayBeLottie()": {
+  "status": "n/a",
+  "note": "iOS Lottie animator takes every file no other animator takes (fallback priority), so it first checks the file is Lottie; the Android Lottie animator claims only .json / .lottie / .zip by extension, and a file that fails to parse is reported through CYLTabBarItemAnimationFailure, so the static image stays"
+ },
+ "CYLResourceBundleNamed()": {
+  "status": "n/a",
+  "note": "NSBundle lookup of the resource bundles; Android resources come from the module's res/ through R"
+ },
+ "CYLSVGATabBarItemAnimator": {
+  "status": "done",
+  "android": "com.cyl.animateditem.CYLSVGATabBarItemAnimator",
+  "note": "SVGAPlayer-Android found by reflection, registered when it is in the app"
+ },
+ "CYLSVGATabBarItemAnimator animator": {
+  "status": "done",
+  "android": "CYLSVGATabBarItemAnimator (a Kotlin object: the instance itself)"
+ },
+ "CYLTabBarAnimationOptionTint": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarAnimationOptionTint"
+ },
+ "CYLTabBarAnimationOptionDarkTint": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarAnimationOptionDarkTint"
+ },
+ "CYLTabBarAnimationOptionRiveViewModelInstance": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarAnimationOptionRiveViewModelInstance",
+  "note": "played when rive-android is in the app"
+ },
+ "CYLTabBarAnimationOptionRiveDarkViewModelInstance": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarAnimationOptionRiveDarkViewModelInstance",
+  "note": "played when rive-android is in the app"
+ },
+ "CYLTabBarSVGAURL": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarSVGAURL"
+ },
+ "CYLTabBarSVGAFilePath": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarSVGAFilePath"
+ },
+ "CYLTabBarSVGASize": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarSVGASize"
+ },
+ "CYLTabBarSVGADarkURL": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarSVGADarkURL"
+ },
+ "CYLTabBarSVGADarkFilePath": {
+  "status": "done",
+  "android": "CYLConstants.CYLTabBarSVGADarkFilePath"
+ },
+ "CYLAnimationAttributesValue()": {
+  "status": "done",
+  "android": "CYLAnimationEngines.attributesValue"
+ },
+ "CYLAnimationTypeOfFile()": {
+  "status": "done",
+  "android": "CYLAnimationEngines.typeOf"
+ },
+ "CYLAnimationTypeIsAvailable()": {
+  "status": "done",
+  "android": "CYLAnimationEngines.isAvailable"
+ },
+ "CYLAnimationKnownTypes()": {
+  "status": "done",
+  "android": "CYLAnimationEngines.knownTypes"
+ },
+ "CYLAnimationSubspecOfType()": {
+  "status": "done",
+  "android": "CYLAnimationEngines.dependencyOf",
+  "note": "the Gradle dependency of the type in place of the CocoaPods subspec"
+ },
+ "CYLAnimationFileExtensionsOfType()": {
+  "status": "partial",
+  "android": "CYLTabBarItemAnimatorRegistry.animatorWithIdentifier(type)?.fileExtensions",
+  "note": "for a registered engine only; the extensions of a known engine not in the app are kept private in CYLAnimationEngines"
+ },
+ "CYLAnimationWarnMissingEngine()": {
+  "status": "done",
+  "android": "CYLAnimationEngines.warnMissingEngine"
  }
 }

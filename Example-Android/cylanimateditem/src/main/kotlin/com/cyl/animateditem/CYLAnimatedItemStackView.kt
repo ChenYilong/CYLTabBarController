@@ -65,7 +65,9 @@ open class CYLAnimatedItemStackView @JvmOverloads constructor(
     private var downX = 0f
     private var downY = 0f
 
-    /** [EN] One item and its action. [CN] 一个条目及其动作。 */
+    /**
+     * [EN] One item and its action. [CN] 一个条目及其动作。
+     */
     private class Entry(val view: CYLAnimatedItemView, var action: String?)
 
     /**
@@ -125,7 +127,8 @@ open class CYLAnimatedItemStackView @JvmOverloads constructor(
         //      on items without an action go to the background). [CN] 执行自己的动作；没有动作的第一个条目执行背景动作（由读屏触发：
         //      落在无动作条目上的触摸交给背景）。
         itemView.setOnClickListener { view ->
-            val action = action(view as CYLAnimatedItemView) ?: backgroundAction.takeIf { view === firstItemView }
+            val item = view as CYLAnimatedItemView
+            val action = (if (isItemInteractive(item)) action(item) else null) ?: backgroundAction.takeIf { item === firstItemView }
             action?.let { performAction(it) }
         }
         setAction(action, itemView)
@@ -186,6 +189,23 @@ open class CYLAnimatedItemStackView @JvmOverloads constructor(
     fun action(itemView: CYLAnimatedItemView): String? = entries.firstOrNull { it.view === itemView }?.action
 
     /**
+     * [EN] Whether an item takes taps: its tap performs its action, a tap on it is not a background tap, and a screen reader
+     *      reads it as a button. By default: it has an action and it is enabled. Override for items with their own switch
+     *      (CYLTableViewPlaceHolder's tap interaction), then call `updateInteractionOfItemViews()` after that switch changes.
+     * [CN] 条目是否接收点击：点击它执行其动作、点击它不算背景点击、读屏把它读作按钮。默认：有动作且可用。条目有自己的开关时（CYLTableViewPlaceHolder
+     *      的点击交互）重写本方法，并在开关变化后调用 `updateInteractionOfItemViews()`。
+     */
+    open fun isItemInteractive(itemView: CYLAnimatedItemView): Boolean = action(itemView) != null && itemView.isEnabled
+
+    /**
+     * [EN] Applies `isItemInteractive` again to every item, after a change the stack cannot see.
+     * [CN] 在堆叠视图无法感知的变化之后，对所有条目重新应用 `isItemInteractive`。
+     */
+    fun updateInteractionOfItemViews() {
+        entries.forEach { updateAccessibility(it) }
+    }
+
+    /**
      * [EN] The first item whose tap performs `action`. [CN] 点击时执行 `action` 的第一个条目。
      */
     fun itemView(action: String): CYLAnimatedItemView? = entries.firstOrNull { it.action == action }?.view
@@ -241,7 +261,7 @@ open class CYLAnimatedItemStackView @JvmOverloads constructor(
 
     private fun itemWithActionAt(x: Float, y: Float): CYLAnimatedItemView? = entries.firstOrNull { entry ->
         val view = entry.view
-        if (entry.action == null || view.visibility != View.VISIBLE) return@firstOrNull false
+        if (!isItemInteractive(view) || view.visibility != View.VISIBLE) return@firstOrNull false
         val left = stackView.left + view.left
         val top = stackView.top + view.top
         x >= left && x < left + view.width && y >= top && y < top + view.height
@@ -262,7 +282,7 @@ open class CYLAnimatedItemStackView @JvmOverloads constructor(
         view.importantForAccessibility = if (reads) IMPORTANT_FOR_ACCESSIBILITY_YES else IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS
     }
 
-    private fun actsAsButton(entry: Entry) = entry.action != null || (entry.view === firstItemView && backgroundAction != null)
+    private fun actsAsButton(entry: Entry) = isItemInteractive(entry.view) || (entry.view === firstItemView && backgroundAction != null)
 
     // MARK: - Layout 布局
 
@@ -284,7 +304,9 @@ open class CYLAnimatedItemStackView @JvmOverloads constructor(
         TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, value, resources.displayMetrics).toInt()
 
     companion object {
-        /** [EN] The default space between items and around them, in dp. [CN] 条目之间及四周的默认间距，单位 dp。 */
+        /**
+         * [EN] The default space between items and around them, in dp. [CN] 条目之间及四周的默认间距，单位 dp。
+         */
         const val DEFAULT_SPACING_DP = 16f
     }
 }
