@@ -385,4 +385,22 @@
     XCTAssertNoThrow([tabBarController updateSelectionStatusIfNeededForTabBarController:tabBarController shouldSelectViewController:second]);
 }
 
+#pragma mark - Lens decision (Swift since step 62)
+
+/// [EN] Reached by selector, as CYLTabBar calls it: without a plus child view controller the lens shows on Liquid Glass;
+///      without Liquid Glass it never shows. The PR #793 check is NO without a plus button.
+/// [CN] 与 CYLTabBar 一样通过 selector 调用：没有 PlusButton 子控制器时，液态玻璃下显示放大镜；没有液态玻璃时从不显示。没有 PlusButton 时 PR #793 的判断为 NO。
+- (void)testShouldShowLensBySelector {
+    CYLTabBarController *tabBarController = [self newTabBarController];
+    SEL should = NSSelectorFromString(@"tabBarController:shouldShowPlatterLiquidLensViewForControl:");
+    XCTAssertTrue([tabBarController respondsToSelector:should]);
+    BOOL (*call)(id, SEL, id, id) = (BOOL (*)(id, SEL, id, id))[tabBarController methodForSelector:should];
+    BOOL shows = call(tabBarController, should, tabBarController, [UIControl new]);
+    BOOL liquidGlassBar = [CYLConstants isLiquidGlassActive] && [tabBarController.tabBar isKindOfClass:[CYLTabBar class]];
+    XCTAssertEqual(shows, liquidGlassBar);
+    SEL drawn = NSSelectorFromString(@"cyl_plusButtonTitleIsDrawnByItsTabItem");
+    XCTAssertTrue([tabBarController respondsToSelector:drawn]);
+    XCTAssertFalse(((BOOL (*)(id, SEL))[tabBarController methodForSelector:drawn])(tabBarController, drawn));
+}
+
 @end

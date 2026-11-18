@@ -1138,3 +1138,80 @@ extension CYLTabBarController {
         tabBar.liquidGlassLongGestureRecognizer.isEnabled = shows
     }
 }
+
+// MARK: - Whether the Liquid Glass lens shows (docs/Swift-Migration.md, step 62)
+
+/**
+ * [EN] The key CYLTabBarController.m sets from a configuration's `CYLPlusButtonShowsSelection` (selector based, the same
+ *      pointer on both sides). [CN] CYLTabBarController.m 根据配置的 `CYLPlusButtonShowsSelection` 设置的 key（基于 selector，两边是同一个指针）。
+ */
+enum CYLLiquidGlassLensKeys {
+    static let plusButtonShowsSelection = CYLUtilsKeys.key("cyl_plusButtonShowsSelection")
+}
+
+/**
+ * [EN] `CYLTabBarControllerDelegate`: whether the Liquid Glass lens shows for a control. Translated from Objective-C
+ *      (docs/Swift-Migration.md, step 62).
+ *      TODO (2026-11-13, to verify): PR #793 keeps the lens on the plus page when the plus button's title is drawn by its tab
+ *      item. The maintainer considers this as risky as `-[CYLPlusButton cyl_updateLiquidGlassMask]` (AGENTS.md). It is on by
+ *      default; on any plus button bug after selection, turn it off first with the Swift compilation condition
+ *      `CYL_PLUS_BUTTON_TITLE_KEEPS_LENS_DISABLED` (before step 62: the Objective-C macro `CYL_PLUS_BUTTON_TITLE_KEEPS_LENS_ENABLED`
+ *      set to 0), together with the mask, and test again.
+ * [CN] `CYLTabBarControllerDelegate`：某个控件是否显示液态玻璃放大镜。已从 Objective-C 翻译（docs/Swift-Migration.md，第 62 步）。
+ *      TODO（2026-11-13，待验证）：PR #793 在 PlusButton 标题由其 TabBarItem 绘制时，PlusButton 页面保留放大镜。维护者认为这与
+ *      `-[CYLPlusButton cyl_updateLiquidGlassMask]` 一样危险（AGENTS.md）。默认开启；选中后出现任何 PlusButton bug 时，先设置 Swift 编译条件
+ *      `CYL_PLUS_BUTTON_TITLE_KEEPS_LENS_DISABLED` 关闭它（第 62 步之前：Objective-C 宏 `CYL_PLUS_BUTTON_TITLE_KEEPS_LENS_ENABLED` 设为 0），连同遮罩一起关闭，再测试。
+ */
+extension CYLTabBarController {
+
+    /// [EN] The PR #793 switch: on unless `CYL_PLUS_BUTTON_TITLE_KEEPS_LENS_DISABLED` is set. [CN] PR #793 的开关：除非设置了该条件，否则开启。
+    private static var cylPlusButtonTitleKeepsLens: Bool {
+        #if CYL_PLUS_BUTTON_TITLE_KEEPS_LENS_DISABLED
+        return false
+        #else
+        return true
+        #endif
+    }
+
+    /**
+     * [EN] YES when the plus button's title is drawn by the tab item under it: the plus button class aligns its title with
+     *      the tab titles (`+alignsTitleWithTabBarItemTitles`), its picture is not a background image with the title on it,
+     *      and the plus child view controller's tab item has a title.
+     * [CN] PlusButton 的标题由其下方的 TabBarItem 绘制时为 YES：PlusButton 类要求标题与 Tab 标题对齐，其图片不是标题画在上面的背景图，且 PlusButton
+     *      子控制器的 TabBarItem 有标题。
+     */
+    @objc(cyl_plusButtonTitleIsDrawnByItsTabItem)
+    func cylPlusButtonTitleIsDrawnByItsTabItem() -> Bool {
+        guard let plusButton = cylPrivate.cylContextPlusButton(), plusButton.cylAlignsTitleWithTabBarItemTitles(),
+              !plusButton.cylDrawsTitleOverBackgroundImage() else {
+            return false
+        }
+        return !(cylPrivate.cylContextPlusChildViewController()?.tabBarItem.title ?? "").isEmpty
+    }
+
+    @objc(tabBarController:shouldShowPlatterLiquidLensViewForControl:)
+    func cylTabBarController(_ tabBarController: CYLTabBarController, shouldShowPlatterLiquidLensViewFor control: UIControl) -> Bool {
+        let tabBar: UITabBar = tabBarController.tabBar
+        guard CYLConstants.isLiquidGlassActive(), let tabBar = tabBar as? CYLTabBar else {
+            return false
+        }
+        guard hasPlusChildViewController() else {
+            return true
+        }
+        // [EN] `CYLPlusButtonShowsSelection`: the selection stays under the plus button while its page is selected.
+        // [CN] `CYLPlusButtonShowsSelection`：选中 PlusButton 的页面时，选中效果保留在 PlusButton 下方。
+        if (objc_getAssociatedObject(self, CYLLiquidGlassLensKeys.plusButtonShowsSelection) as? NSNumber)?.boolValue == true {
+            return true
+        }
+        // [EN] A plus button whose title is aligned with the tab titles leaves the title to its tab item, drawn by UIKit; the
+        //      selected tab's title is part of the lens content, so hiding the lens on the plus page hid the title as well
+        //      (CYLSearchViewController's Flutter example, docs/Liquid-Glass-Robustness.md). Keep the selection then.
+        // [CN] 标题与 Tab 标题对齐的 PlusButton 把标题交给其 TabBarItem，由 UIKit 绘制；选中 Tab 的标题属于放大镜内容，因此在 PlusButton 页面隐藏
+        //      放大镜也会隐藏标题（CYLSearchViewController 的 Flutter 示例，docs/Liquid-Glass-Robustness.md）。此时保留选中效果。
+        if Self.cylPlusButtonTitleKeepsLens && cylPlusButtonTitleIsDrawnByItsTabItem() {
+            return true
+        }
+        let plusPageSelected = tabBarController.selectedViewController?.isEqual(cylPrivate.cylContextPlusChildViewController()) == true
+        return !(plusPageSelected && !tabBar.isPlusButtonLayoutCentered())
+    }
+}
