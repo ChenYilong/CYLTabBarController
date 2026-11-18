@@ -111,6 +111,11 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)cyl_setNeedsUpdateSelectedBackgroundColors;
 - (void)cyl_updateLoopingLottieViews;
 - (void)cyl_updateBadgesOfSelectedTab;
+/// [EN] FIX: issue #475, implemented in Swift (step 57). [CN] FIX: issue #475，由 Swift 实现（第 57 步）。
+- (void)cyl_applyTitlePositionAdjustment:(UIOffset)offset toTabBarItem:(nullable UITabBarItem *)tabBarItem;
+/// [EN] FIX: issue #257, #522, implemented in Swift (step 58). [CN] FIX: issue #257、#522，由 Swift 实现（第 58 步）。
+- (void)offsetTabBarTabImageViewToFit:(CGFloat)tabImageViewDefaultOffset;
+- (void)cyl_restoreImageOnlyTabItems:(NSArray<UITabBarItem *> *)tabBarItems;
 - (void)cyl_syncTabBarItemAccessibility;
 #if CYL_FLATDESIGN_AVAILABLE
 - (void)cyl_syncFlatDesignTabBarItemColors;

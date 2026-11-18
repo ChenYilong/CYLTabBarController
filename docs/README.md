@@ -239,6 +239,7 @@ docs/
 │   ├── animated-item-harmonyos-rive-retap-replay.png
 │   ├── animated-item-harmonyos-rive-tint-option.png
 │   ├── animated-item-harmonyos-spacing-before.png
+│   ├── animated-item-harmonyos-static-icon-color.png
 │   ├── animated-item-harmonyos-svga-retap-replay.png
 │   ├── animated-item-harmonyos-tabbar.jpeg
 │   ├── animated-item-harmonyos-tint-option.png
@@ -360,6 +361,7 @@ docs/
 │   ├── ios-gif-image-rest-then-play.png
 │   ├── ios-gif-svga-tint-option.png
 │   ├── ios-lottie-pag-tint-option.png
+│   ├── ios-lottie4-tint-option.png
 │   ├── ios-playback-controls-message-tab-iphone17pro-ios26.1-dc04439.png
 │   ├── ios-rive-dark-tint-appearance-switch.png
 │   ├── ios-rive-flatdesign-item-appearance.png

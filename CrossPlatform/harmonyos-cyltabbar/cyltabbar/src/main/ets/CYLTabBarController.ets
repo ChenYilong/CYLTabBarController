@@ -1295,18 +1295,25 @@ export struct CYLTabBarController {
    *      不是 "#RRGGBB" / "#AARRGGBB"）时为单位矩阵：GIF 保持自身颜色。
    */
   cylGifColorFilter(index: number): ColorFilter {
-    const identity: number[] = [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0];
-    const tint = this.cylTintForPath(index, this.tabBarItemsAttributes[index].gifFilePath);
-    if (typeof tint !== 'string' || !/^#([0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/.test(tint)) {
-      return new ColorFilter(identity);
+    return cylTintColorFilter(this.cylTintForPath(index, this.tabBarItemsAttributes[index].gifFilePath));
+  }
+
+  /**
+   * [EN] The color filter of tab `index`'s icon Image: a GIF's `tint` option (`cylGifColorFilter`); for a static icon the
+   *      tab's icon color for its state (the item's `iconColor` / `selectedIconColor`, then the controller's), as Android
+   *      tints an icon only when an icon color is set ("automatic", #787); none set: the image keeps its own colors.
+   * [CN] Tab `index` 图标 Image 的颜色滤镜：GIF 用其 `tint` 选项（`cylGifColorFilter`）；静态图标用 Tab 当前状态的图标颜色（先 Tab 的
+   *      `iconColor` / `selectedIconColor`，再控制器的），与 Android 一致，只有设置了图标颜色才着色（"automatic"，#787）；都未设置时保持原图颜色。
+   */
+  cylIconColorFilter(index: number): ColorFilter {
+    const item = this.tabBarItemsAttributes[index];
+    if (item.gifFilePath !== undefined) {
+      return this.cylGifColorFilter(index);
     }
-    const hex = tint.substring(1);
-    const argb = hex.length === 8 ? hex : 'FF' + hex;
-    const a = parseInt(argb.substring(0, 2), 16) / 255;
-    const r = parseInt(argb.substring(2, 4), 16) / 255;
-    const g = parseInt(argb.substring(4, 6), 16) / 255;
-    const b = parseInt(argb.substring(6, 8), 16) / 255;
-    return new ColorFilter([0, 0, 0, 0, r, 0, 0, 0, 0, g, 0, 0, 0, 0, b, 0, 0, 0, a, 0]);
+    const color = this.selectedIndex === index
+      ? (item.selectedIconColor ?? this.selectedIconColor)
+      : (item.iconColor ?? this.iconColor);
+    return cylTintColorFilter(color ?? '');
   }
 
   cylTabAnimationSize(index: number): number {
@@ -1406,8 +1413,8 @@ export struct CYLTabBarController {
           .width(this.imageSize)
           .height(this.imageSize)
           .objectFit(ImageFit.Contain)
-          // [EN] A GIF's `tint` option (identity otherwise). [CN] GIF 的 `tint` 选项（否则为单位矩阵）。
-          .colorFilter(this.cylGifColorFilter(index))
+          // [EN] A GIF's `tint` option, or a static icon's icon color (identity otherwise). [CN] GIF 的 `tint` 选项，或静态图标的图标颜色（否则为单位矩阵）。
+          .colorFilter(this.cylIconColorFilter(index))
           .scale({ x: this.tapScale[index] ?? 1, y: this.tapScale[index] ?? 1 })
           .rotate({ z: 1, angle: this.tapAngle[index] ?? 0 })
           .rotate({ y: 1, angle: this.tapFlip[index] ?? 0 })
@@ -1786,4 +1793,31 @@ export struct CYLTabBarController {
       this.glassWidth = Number(area.width);
     })
   }
+}
+
+/**
+ * [EN] An SRC_IN color filter for `tint`: RGB = the tint, alpha = the image's alpha times the tint's. "#RRGGBB" /
+ *      "#AARRGGBB" strings and 0xAARRGGBB numbers; anything else (none, '', a resource) gives the identity matrix.
+ * [CN] `tint` 的 SRC_IN 颜色滤镜：RGB = 着色，alpha = 图像的 alpha 乘以着色的 alpha。支持 "#RRGGBB" / "#AARRGGBB" 字符串与 0xAARRGGBB
+ *      数字；其他（无、''、资源）为单位矩阵。
+ */
+export function cylTintColorFilter(tint: ResourceColor): ColorFilter {
+  const identity: number[] = [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0];
+  let hex: string;
+  if (typeof tint === 'number') {
+    hex = (tint >>> 0).toString(16).padStart(8, '0');
+    if (tint >>> 0 <= 0xFFFFFF) {
+      hex = 'FF' + hex.substring(2);
+    }
+  } else if (typeof tint === 'string' && /^#([0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/.test(tint)) {
+    hex = tint.substring(1);
+  } else {
+    return new ColorFilter(identity);
+  }
+  const argb = hex.length === 8 ? hex : 'FF' + hex;
+  const a = parseInt(argb.substring(0, 2), 16) / 255;
+  const r = parseInt(argb.substring(2, 4), 16) / 255;
+  const g = parseInt(argb.substring(4, 6), 16) / 255;
+  const b = parseInt(argb.substring(6, 8), 16) / 255;
+  return new ColorFilter([0, 0, 0, 0, r, 0, 0, 0, 0, g, 0, 0, 0, 0, b, 0, 0, 0, a, 0]);
 }
