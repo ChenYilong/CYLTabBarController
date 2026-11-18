@@ -49,12 +49,41 @@ def comment_of(path, name):
     return ''
 
 
+# [EN] Public symbols of Swift-only files, which the header inventory does not see: (owner, name, kind, comment).
+# [CN] 只有 Swift 实现的文件中的公开符号，头文件清单看不到它们：（所属类型、名称、种类、注释）。
+SWIFT_HEADER = 'CYLTabBarController/CYLAnimatedItem/Swift/CYLAnimatedItemStackView.swift'
+SWIFT_ROWS = [
+    ('', 'CYLAnimatedItemStackView', 'class', 'A centered vertical stack whose every element is a `CYLAnimatedItemView`: the reserved first item, more items with a spacing before each, an action per item run by handlers, a background action, VoiceOver grouping, titles wrapped to the width.'),
+    ('CYLAnimatedItemStackView', 'init(itemViews:actions:)', 'method', 'A stack of item views (each with no action) and the handlers of `actions`.'),
+    ('CYLAnimatedItemStackView', 'itemViews', 'property', 'Every item, top to bottom.'),
+    ('CYLAnimatedItemStackView', 'firstItemView', 'property', 'The reserved first item (the main icon and title); nil while the stack is empty.'),
+    ('CYLAnimatedItemStackView', 'contentMargin', 'property', 'The smallest space between the items and the edges of the view (16 by default).'),
+    ('CYLAnimatedItemStackView', 'backgroundAction', 'property', 'The action of a tap anywhere outside a tappable item; nil turns it off.'),
+    ('CYLAnimatedItemStackView', 'append(_:action:spacingBefore:)', 'method', 'Appends an item under the last one; an item without an action takes no touches.'),
+    ('CYLAnimatedItemStackView', 'appendItem(title:image:animationURL:action:spacingBefore:)', 'method', 'Makes, appends and returns an item with the icon above the title.'),
+    ('CYLAnimatedItemStackView', 'remove(_:)', 'method', 'Removes an item from the stack.'),
+    ('CYLAnimatedItemStackView', 'setAction(_:for:)', 'method', 'Sets or, with nil, removes the action of an item.'),
+    ('CYLAnimatedItemStackView', 'action(for:)', 'method', 'The action of an item.'),
+    ('CYLAnimatedItemStackView', 'itemView(for:)', 'method', 'The first item whose tap performs the action.'),
+    ('CYLAnimatedItemStackView', 'setHandler(_:for:)', 'method', 'Sets or, with nil, removes the handler of an action.'),
+    ('CYLAnimatedItemStackView', 'performAction(_:)', 'method', 'Runs the handler of an action; false when it has none.'),
+]
+
+
+def swift_rows():
+    out = []
+    for owner, name, kind, comment in SWIFT_ROWS:
+        key = '%s %s' % (owner, name) if owner else name
+        out.append({'header': SWIFT_HEADER, 'owner': owner, 'name': name, 'kind': kind, 'key': key, 'comment': comment})
+    return out
+
+
 def rows():
     out = []
     for row in android.inventory():
         row['comment'] = row.get('comment') or comment_of(row['header'], row['name'])
         out.append(row)
-    return out
+    return out + swift_rows()
 
 
 def load_map():

@@ -1056,5 +1056,19 @@
   "CYLTabButtonFrameAnimation": "`CYLTabButtonFrameAnimation` (`cyltabbar/CYLTabButtonAnimation.ets`) (built; emulator check pending / 已编译，模拟器验证待做)",
   "CYLTabButtonFrameAnimation images": "`CYLTabButtonFrameAnimation.images` (built; emulator check pending / 已编译，模拟器验证待做)",
   "CYLTabButtonFrameAnimation playsFireworks": "`CYLTabButtonFrameAnimation.playsFireworks` (8 particles drawn by CYLTabBarController) (built; emulator check pending / 已编译，模拟器验证待做)",
-  "CYLTabButtonFrameAnimation fireworksImage": "`CYLTabButtonFrameAnimation.fireworksImage` (8 particles drawn by CYLTabBarController) (built; emulator check pending / 已编译，模拟器验证待做)"
+  "CYLTabButtonFrameAnimation fireworksImage": "`CYLTabButtonFrameAnimation.fireworksImage` (8 particles drawn by CYLTabBarController) (built; emulator check pending / 已编译，模拟器验证待做)",
+  "CYLAnimatedItemStackView": "`CYLAnimatedItemStackView` (ArkUI component, its state in `CYLAnimatedItemStackModel`) (cylanimateditem; unit tests and emulator check 2026-11-19 / 单元测试与模拟器验证)",
+  "CYLAnimatedItemStackView init(itemViews:actions:)": "`new CYLAnimatedItemStackModel(items, actions: Map<string, handler>)`, shown by `CYLAnimatedItemStackView({ model })` (cylanimateditem; unit tests and emulator check 2026-11-19 / 单元测试与模拟器验证)",
+  "CYLAnimatedItemStackView itemViews": "`CYLAnimatedItemStackModel.items` (`CYLAnimatedItemStackItem[]`) (cylanimateditem; unit tests and emulator check 2026-11-19 / 单元测试与模拟器验证)",
+  "CYLAnimatedItemStackView firstItemView": "`CYLAnimatedItemStackModel.firstItem` (cylanimateditem; unit tests and emulator check 2026-11-19 / 单元测试与模拟器验证)",
+  "CYLAnimatedItemStackView contentMargin": "`CYLAnimatedItemStackModel.contentMargin` (cylanimateditem; unit tests and emulator check 2026-11-19 / 单元测试与模拟器验证)",
+  "CYLAnimatedItemStackView backgroundAction": "`CYLAnimatedItemStackModel.backgroundAction` (cylanimateditem; unit tests and emulator check 2026-11-19 / 单元测试与模拟器验证)",
+  "CYLAnimatedItemStackView append(_:action:spacingBefore:)": "`CYLAnimatedItemStackModel.append(item, action?, spacingBefore)` (cylanimateditem; unit tests and emulator check 2026-11-19 / 单元测试与模拟器验证)",
+  "CYLAnimatedItemStackView appendItem(title:image:animationURL:action:spacingBefore:)": "`CYLAnimatedItemStackModel.appendItem(title, image, animationUrl, action?, spacingBefore)` (cylanimateditem; unit tests and emulator check 2026-11-19 / 单元测试与模拟器验证)",
+  "CYLAnimatedItemStackView remove(_:)": "`CYLAnimatedItemStackModel.remove(item)` (cylanimateditem; unit tests and emulator check 2026-11-19 / 单元测试与模拟器验证)",
+  "CYLAnimatedItemStackView setAction(_:for:)": "`CYLAnimatedItemStackModel.setAction(action, item)` (cylanimateditem; unit tests and emulator check 2026-11-19 / 单元测试与模拟器验证)",
+  "CYLAnimatedItemStackView action(for:)": "`CYLAnimatedItemStackModel.actionFor(item)` (cylanimateditem; unit tests and emulator check 2026-11-19 / 单元测试与模拟器验证)",
+  "CYLAnimatedItemStackView itemView(for:)": "`CYLAnimatedItemStackModel.itemFor(action)` (cylanimateditem; unit tests and emulator check 2026-11-19 / 单元测试与模拟器验证)",
+  "CYLAnimatedItemStackView setHandler(_:for:)": "`CYLAnimatedItemStackModel.setHandler(handler, action)` (cylanimateditem; unit tests and emulator check 2026-11-19 / 单元测试与模拟器验证)",
+  "CYLAnimatedItemStackView performAction(_:)": "`CYLAnimatedItemStackModel.performAction(action)` (cylanimateditem; unit tests and emulator check 2026-11-19 / 单元测试与模拟器验证)"
 }

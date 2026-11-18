@@ -240,6 +240,7 @@ docs/
 │   ├── animated-item-harmonyos-rive-tint-option.png
 │   ├── animated-item-harmonyos-spacing-before.png
 │   ├── animated-item-harmonyos-static-icon-color.png
+│   ├── animated-item-harmonyos-stack-view.png
 │   ├── animated-item-harmonyos-svga-retap-replay.png
 │   ├── animated-item-harmonyos-tabbar.jpeg
 │   ├── animated-item-harmonyos-tint-option.png
