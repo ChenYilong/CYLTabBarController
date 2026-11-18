@@ -673,7 +673,15 @@ extension UIControl {
             completion?(true, self, newView)
             return
         }
-        if hidesOriginalView {
+        // [EN] The tab's own animation view, shown in the icon's place by the animation engine, is the icon: an animated item
+        //      (FlatDesign) must keep showing it. Marked hidden, the item hid it on its next update (a selection), and the
+        //      selected tab's icon went blank.
+        // [CN] 动效引擎显示在图标位置的 Tab 自身动画视图就是图标：动效 item（扁平样式）必须继续显示它。若标记为隐藏，item 会在下一次更新（切换选中）时隐藏它，
+        //      选中 Tab 的图标变为空白。
+        let isOwnAnimationView = newView.cyl_isTabBarItemAnimationView()
+        if hidesOriginalView && isOwnAnimationView {
+            swappableImageView?.isHidden = show
+        } else if hidesOriginalView {
             swappableImageView?.isHidden = show
             // [EN] An animated item shows its animation view instead of its image view while the animation plays: that view
             //      is the icon to hide (and show again), not only the image view (which the item hides itself then).

@@ -704,6 +704,58 @@
  * [CN] 扁平样式按钮（CYLAnimatedItemView，每次更新图标时会自行设置图片视图是否可见）上的 #601：替换图标的视图在切换选中后仍让 Tab 自身图标保持隐藏，
  *      移除 provider 后图标恢复。
  */
+/// [EN] The engine shows a tab's animation view in its icon's place (`-cyl_replaceTabImageViewWithNewView:show:`): in
+///      FlatDesign that view is the item's own icon, so a selection must not hide it (the selected tab's icon went blank).
+/// [CN] 引擎把 Tab 的动画视图显示在图标的位置（`-cyl_replaceTabImageViewWithNewView:show:`）：在扁平样式中该视图就是 item 自身的图标，因此
+///      切换选中不能隐藏它（选中 Tab 的图标曾变为空白）。
+- (void)testFlatDesignSelectedTabKeepsItsAnimationView {
+    Class buttonClass = NSClassFromString(@"CYLFlatDesignTabBarButton");
+    if (!buttonClass || !NSClassFromString(@"CYLGIFTabBarItemAnimator")) {
+        XCTSkip(@"FlatDesign or the GIF animator is not compiled into this target");
+    }
+    // [EN] A 1 x 1 GIF on disk. [CN] 磁盘上的 1 x 1 GIF。
+    NSString *path = [NSTemporaryDirectory() stringByAppendingPathComponent:[NSUUID UUID].UUIDString];
+    path = [path stringByAppendingPathExtension:@"gif"];
+    NSData *gif = [[NSData alloc] initWithBase64EncodedString:@"R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==" options:0];
+    XCTAssertTrue([gif writeToFile:path atomically:YES]);
+    NSURL *gifURL = [NSURL fileURLWithPath:path];
+    UIImage *image = [[UIImage systemImageNamed:@"star"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+    CYLTabBarController *tabBarController = [CYLTabBarController tabBarControllerWithConfiguration:@{
+        CYLTabBarControllerContext : [NSUUID UUID].UUIDString,
+        CYLTabBarControllerStyleType : @"flatDesign",
+        CYLTabBarControllerTabBarItemsAttributes : @[
+            @{ CYLTabBarItemIdentifier : @"a", CYLTabBarItemTitle : @"A", CYLTabBarItemImage : image, @"CYLTabBarGIFURL" : gifURL },
+            @{ CYLTabBarItemIdentifier : @"b", CYLTabBarItemTitle : @"B", CYLTabBarItemImage : image, @"CYLTabBarGIFURL" : gifURL },
+        ],
+        CYLTabBarControllerPageResolver : ^UIViewController *(NSString *pageIdentifier, NSDictionary *attributes) {
+            return [[UIViewController alloc] init];
+        },
+    }];
+    UIWindow *window = [[UIWindow alloc] initWithFrame:CGRectMake(0, 0, 390, 844)];
+    window.rootViewController = tabBarController;
+    window.hidden = NO;
+    [tabBarController.view layoutIfNeeded];
+    tabBarController.selectedIndex = 1;
+    [tabBarController.view layoutIfNeeded];
+    NSMutableArray<UIView *> *queue = [NSMutableArray arrayWithObject:tabBarController.view];
+    UIControl *button = nil;
+    while (queue.count > 0 && !button) {
+        UIView *view = queue.firstObject;
+        [queue removeObjectAtIndex:0];
+        if ([view isKindOfClass:buttonClass] && [[view valueForKey:@"title"] isEqual:@"B"]) {
+            button = (UIControl *)view;
+        }
+        [queue addObjectsFromArray:view.subviews];
+    }
+    XCTAssertNotNil(button);
+    UIView *animationView = [button valueForKey:@"animationView"];
+    XCTAssertNotNil(animationView, @"the engine made the tab's animation view");
+    XCTAssertTrue(button.selected);
+    XCTAssertFalse([[button valueForKey:@"iconHidden"] boolValue], @"its own animation view does not hide the item's icon");
+    XCTAssertFalse(animationView.hidden, @"the selected tab shows its animation");
+    [[NSFileManager defaultManager] removeItemAtPath:path error:nil];
+}
+
 - (void)testFlatDesignIconViewProviderKeepsTheComponentIconHidden {
     Class buttonClass = NSClassFromString(@"CYLFlatDesignTabBarButton");
     if (!buttonClass) {
