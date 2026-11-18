@@ -97,6 +97,27 @@ static CYLTestRiveView *CYLLastRiveView;
 - (void)cyl_stopAnimationView { self.stops++; }
 @end
 
+/// [EN] Like the SVGA view: seeks, loops and changes its rate. [CN] 与 SVGA 视图相同：能定位、循环并改变速率。
+@interface CYLTestSeekableView : UIView <CYLTabBarItemAnimationPlayableView, CYLTabBarItemAnimationViewProviding>
+@property (nonatomic, assign) CGFloat progressValue;
+@property (nonatomic, assign) CGFloat speedValue;
+@property (nonatomic, assign) BOOL loopsValue;
+@end
+@implementation CYLTestSeekableView
++ (UIView<CYLTabBarItemAnimationPlayableView> *)cyl_animationViewWithFileURL:(NSURL *)fileURL
+                                                                    options:(NSDictionary<NSString *, NSString *> *)options
+                                                                contentMode:(UIViewContentMode)contentMode {
+    return [[self alloc] init];
+}
+- (void)cyl_playAnimationView {}
+- (void)cyl_showAnimationViewLastFrame {}
+- (void)cyl_stopAnimationView {}
+- (void)cyl_setAnimationViewLoops:(BOOL)loops { self.loopsValue = loops; }
+- (CGFloat)cyl_animationViewProgress { return self.progressValue; }
+- (void)cyl_setAnimationViewProgress:(CGFloat)progress { self.progressValue = progress; }
+- (void)cyl_setAnimationViewSpeed:(CGFloat)speed { self.speedValue = speed; }
+@end
+
 /// [EN] Adopts only one of the two protocols: refused as a view provider. [CN] 只遵守两个协议之一：不能作为视图 provider。
 @interface CYLTestNotAProvider : UIView <CYLTabBarItemAnimationPlayableView>
 @end
@@ -362,6 +383,31 @@ int main(void) {
         CHECK(darkTab.subviews.count == 1 && darkView.superview == nil, "the old view is removed");
         CHECK(host.trackedReplacements == 1, "the host moves its layout tracking to the new view");
         CHECK(lightView.frame.size.width == 30, "the new view keeps the size");
+
+        printf("\n# The forwarding player: progress and speed only when the view offers them\n");
+        CYLTabBarItemViewAnimator *svga = [[CYLTabBarItemViewAnimator alloc] initWithIdentifier:@"SVGA"
+                                                                                fileExtensions:@[ @"svga" ]
+                                                                                 attributeKeys:@{ CYLTabBarAnimationURL : CYLTabBarAnimationURL }
+                                                                                  viewProvider:[CYLTestSeekableView class]];
+        CYLTestSeekableView *seekable = [[CYLTestSeekableView alloc] init];
+        id<CYLTabBarItemAnimationPlayer> seekPlayer = [svga playerForAnimationView:seekable];
+        CHECK([(id)seekPlayer respondsToSelector:@selector(setProgress:)] && [(id)seekPlayer respondsToSelector:@selector(progress)],
+              "a view with both progress methods gives its player progress");
+        CHECK([(id)seekPlayer respondsToSelector:@selector(setAnimationSpeed:)], "a view with a rate gives its player animationSpeed");
+        CHECK([(id)seekPlayer respondsToSelector:@selector(setLoops:)], "a view that loops itself gives its player loops");
+        seekPlayer.progress = 0.4;
+        CHECK(seekable.progressValue > 0.39 && seekable.progressValue < 0.41 && seekPlayer.progress > 0.39, "progress reaches the view and reads back");
+        seekPlayer.progress = 7;
+        CHECK(seekable.progressValue == 1, "progress is clamped to 0...1");
+        seekPlayer.animationSpeed = 2.5;
+        CHECK(seekable.speedValue == 2.5 && seekPlayer.animationSpeed == 2.5, "the speed reaches the view");
+        seekPlayer.animationSpeed = 0;
+        CHECK(seekable.speedValue == 2.5, "a speed that is not positive is ignored");
+        seekPlayer.loops = YES;
+        CHECK(seekable.loopsValue, "loops reach the view");
+        id<CYLTabBarItemAnimationPlayer> plainPlayer = [rive playerForAnimationView:[[CYLTestRiveView alloc] init]];
+        CHECK(![(id)plainPlayer respondsToSelector:@selector(setProgress:)] && ![(id)plainPlayer respondsToSelector:@selector(setAnimationSpeed:)],
+              "a view without them keeps the host's fallback (no progress, no speed)");
 
         printf("\n# Core's style registry: instance state, no global dictionaries\n");
         CYLTabBarItemAnimationStyleRegistry *styles = [[CYLTabBarItemAnimationStyleRegistry alloc] init];

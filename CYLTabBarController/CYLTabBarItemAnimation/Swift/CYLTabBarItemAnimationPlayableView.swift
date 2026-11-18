@@ -69,6 +69,29 @@ public protocol CYLTabBarItemAnimationPlayableView: NSObjectProtocol {
     optional func setAnimationLoops(_ loops: Bool)
 
     /**
+     * [EN] The playback position, 0 (first frame) to 1 (last frame). With `setAnimationProgress(_:)` it makes the player
+     *      offer `progress`, so the host can seek (a placeholder scrubbed by a pull) and restart a pass. Implement both or
+     *      neither.
+     * [CN] 播放位置，0（第一帧）到 1（最后一帧）。与 `setAnimationProgress(_:)` 一起让播放器提供 `progress`，宿主据此定位（随下拉定位的占位图）并
+     *      重新开始一遍。两者同时实现或都不实现。
+     */
+    @objc(cyl_animationViewProgress)
+    optional func animationProgress() -> CGFloat
+
+    /**
+     * [EN] Shows the frame at `progress` (0 to 1) without playing. [CN] 显示 `progress`（0 到 1）处的帧，不播放。
+     */
+    @objc(cyl_setAnimationViewProgress:)
+    optional func setAnimationProgress(_ progress: CGFloat)
+
+    /**
+     * [EN] The playback rate (1 = the file's own frame rate), applied live; the player offers `animationSpeed` only when
+     *      the view implements this. [CN] 播放速率（1 为文件自身帧率），实时生效；只有视图实现时播放器才提供 `animationSpeed`。
+     */
+    @objc(cyl_setAnimationViewSpeed:)
+    optional func setAnimationSpeed(_ speed: CGFloat)
+
+    /**
      * [EN] The tab's current title color, for a view whose `tint` option is "title" (`CYLTabBarAnimationOptionTint`): the
      *      icon is drawn in it like a template image. Called when the tab is selected or deselected and when the colors change.
      * [CN] Tab 当前的标题颜色，用于 `tint` 选项为 "title" 的视图（`CYLTabBarAnimationOptionTint`）：图标像模板图片一样用该颜色绘制。在 Tab

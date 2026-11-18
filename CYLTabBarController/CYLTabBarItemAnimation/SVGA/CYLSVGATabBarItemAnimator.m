@@ -48,8 +48,19 @@ typedef NS_ENUM(NSInteger, CYLSVGATabBarItemAnimationState) {
  * [CN] Tab 中的 SVGA 文件：一个 `SVGAPlayer`，播放一次并保持最后一帧（`fillMode` 为 "Forward"），或显示第一帧。解析后的视频由解析器的内存缓存
  *      按文件 URL 缓存。
  */
-@interface CYLSVGATabBarItemAnimationView : SVGAPlayer <CYLTabBarItemAnimationPlayableView, CYLTabBarItemAnimationViewProviding>
+@interface CYLSVGATabBarItemAnimationView : SVGAPlayer <CYLTabBarItemAnimationPlayableView, CYLTabBarItemAnimationViewProviding, SVGAPlayerDelegate>
 @property (nonatomic, assign) CYLSVGATabBarItemAnimationState cyl_requestedState;
+/// [EN] The frame shown now (SVGAPlayer keeps its own private). [CN] 当前显示的帧（SVGAPlayer 自己的是私有的）。
+@property (nonatomic, assign) NSInteger cyl_frame;
+/// [EN] Plays again after each pass (`loops = 0`). [CN] 每遍播放后再次播放（`loops = 0`）。
+@property (nonatomic, assign) BOOL cyl_loops;
+/// [EN] The playback rate; 1 plays with SVGAPlayer's own timer. [CN] 播放速率；为 1 时用 SVGAPlayer 自己的计时器。
+@property (nonatomic, assign) CGFloat cyl_speed;
+/// [EN] Steps the frames itself when the rate is not 1: SVGAPlayer's display link has a fixed, private frame interval.
+/// [CN] 速率不为 1 时自己逐帧推进：SVGAPlayer 的 display link 帧间隔固定且为私有。
+@property (nonatomic, strong, nullable) CADisplayLink *cyl_speedLink;
+@property (nonatomic, assign) CFTimeInterval cyl_speedStartTime;
+@property (nonatomic, assign) NSInteger cyl_speedStartFrame;
 @end
 
 @implementation CYLSVGATabBarItemAnimationView
@@ -59,6 +70,8 @@ typedef NS_ENUM(NSInteger, CYLSVGATabBarItemAnimationState) {
                                                                          contentMode:(UIViewContentMode)contentMode {
     CYLSVGATabBarItemAnimationView *view = [[self alloc] initWithFrame:CGRectZero];
     view.loops = 1;
+    view.cyl_speed = 1;
+    view.delegate = view;
     view.clearsAfterStop = NO;
     view.fillMode = @"Forward";
     view.contentMode = contentMode;
@@ -114,26 +127,137 @@ typedef NS_ENUM(NSInteger, CYLSVGATabBarItemAnimationState) {
     if (!self.videoItem) {
         return;
     }
-    [self stepToFrame:0 andPlay:YES];
+    [self cyl_stopSpeedLink];
+    self.cyl_frame = 0;
+    if (self.cyl_speed != 1 && self.videoItem.FPS > 0) {
+        [self stepToFrame:0 andPlay:NO];
+        [self cyl_startSpeedLink];
+    } else {
+        [self stepToFrame:0 andPlay:YES];
+    }
     [self cyl_keepTintOverlayAboveDrawing];
 }
 
 - (void)cyl_showAnimationViewLastFrame {
     self.cyl_requestedState = CYLSVGATabBarItemAnimationStateLastFrame;
+    [self cyl_stopSpeedLink];
     if (self.videoItem.frames <= 0) {
         return;
     }
+    self.cyl_frame = self.videoItem.frames - 1;
     [self stepToFrame:self.videoItem.frames - 1 andPlay:NO];
     [self cyl_keepTintOverlayAboveDrawing];
 }
 
 - (void)cyl_stopAnimationView {
     self.cyl_requestedState = CYLSVGATabBarItemAnimationStateFirstFrame;
+    [self cyl_stopSpeedLink];
     if (!self.videoItem) {
         return;
     }
+    self.cyl_frame = 0;
     [self stepToFrame:0 andPlay:NO];
     [self cyl_keepTintOverlayAboveDrawing];
+}
+
+#pragma mark - Loop, seek and speed
+
+- (void)cyl_setAnimationViewLoops:(BOOL)loops {
+    self.cyl_loops = loops;
+    // [EN] SVGAPlayer: 0 repeats until stopped. [CN] SVGAPlayer：0 表示一直重复直到停止。
+    self.loops = loops ? 0 : 1;
+}
+
+- (CGFloat)cyl_animationViewProgress {
+    NSInteger frames = self.videoItem.frames;
+    return frames > 1 ? (CGFloat)self.cyl_frame / (CGFloat)(frames - 1) : 0;
+}
+
+- (void)cyl_setAnimationViewProgress:(CGFloat)progress {
+    NSInteger frames = self.videoItem.frames;
+    if (frames <= 0) {
+        return;
+    }
+    [self cyl_stopSpeedLink];
+    NSInteger frame = (NSInteger)lround(MIN(MAX(progress, 0), 1) * (frames - 1));
+    self.cyl_frame = frame;
+    [self stepToFrame:frame andPlay:NO];
+    [self cyl_keepTintOverlayAboveDrawing];
+}
+
+- (void)cyl_setAnimationViewSpeed:(CGFloat)speed {
+    if (!(speed > 0) || !isfinite(speed) || speed == self.cyl_speed) {
+        return;
+    }
+    self.cyl_speed = speed;
+    BOOL playing = self.cyl_speedLink != nil || self.cyl_requestedState == CYLSVGATabBarItemAnimationStatePlaying;
+    if (!playing || !self.videoItem || self.videoItem.FPS <= 0) {
+        return;
+    }
+    // [EN] Live: continue from the frame shown now at the new rate. [CN] 实时生效：从当前帧以新速率继续。
+    NSInteger frame = self.cyl_frame;
+    [self cyl_stopSpeedLink];
+    if (speed == 1) {
+        [self stepToFrame:frame andPlay:YES];
+    } else {
+        [self pauseAnimation];
+        self.cyl_speedStartFrame = frame;
+        [self cyl_startSpeedLinkFromFrame:frame];
+    }
+}
+
+- (void)cyl_startSpeedLink {
+    [self cyl_startSpeedLinkFromFrame:0];
+}
+
+- (void)cyl_startSpeedLinkFromFrame:(NSInteger)frame {
+    self.cyl_speedStartFrame = frame;
+    self.cyl_speedStartTime = CACurrentMediaTime();
+    CADisplayLink *link = [CADisplayLink displayLinkWithTarget:self selector:@selector(cyl_speedTick:)];
+    [link addToRunLoop:[NSRunLoop mainRunLoop] forMode:NSRunLoopCommonModes];
+    self.cyl_speedLink = link;
+}
+
+- (void)cyl_stopSpeedLink {
+    [self.cyl_speedLink invalidate];
+    self.cyl_speedLink = nil;
+}
+
+- (void)cyl_speedTick:(CADisplayLink *)link {
+    NSInteger frames = self.videoItem.frames;
+    if (frames <= 0 || self.videoItem.FPS <= 0) {
+        [self cyl_stopSpeedLink];
+        return;
+    }
+    CFTimeInterval elapsed = CACurrentMediaTime() - self.cyl_speedStartTime;
+    NSInteger frame = self.cyl_speedStartFrame + (NSInteger)floor(elapsed * self.videoItem.FPS * self.cyl_speed);
+    if (frame >= frames) {
+        if (!self.cyl_loops) {
+            // [EN] One pass: rest on the last frame, as fillMode "Forward". [CN] 播放一遍：停在最后一帧，与 fillMode "Forward" 相同。
+            [self cyl_stopSpeedLink];
+            self.cyl_frame = frames - 1;
+            [self stepToFrame:frames - 1 andPlay:NO];
+            [self cyl_keepTintOverlayAboveDrawing];
+            return;
+        }
+        frame %= frames;
+    }
+    if (frame != self.cyl_frame) {
+        self.cyl_frame = frame;
+        [self stepToFrame:frame andPlay:NO];
+        [self cyl_keepTintOverlayAboveDrawing];
+    }
+}
+
+- (void)removeFromSuperview {
+    [self cyl_stopSpeedLink];
+    [super removeFromSuperview];
+}
+
+#pragma mark - SVGAPlayerDelegate
+
+- (void)svgaPlayer:(SVGAPlayer *)player didAnimatedToFrame:(NSInteger)frame {
+    self.cyl_frame = frame;
 }
 
 /*!
