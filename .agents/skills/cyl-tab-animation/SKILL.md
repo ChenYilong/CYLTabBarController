@@ -52,3 +52,7 @@ A new animation library, key, limit or demo also updates [Tab-Icon-Animation-Qui
 ## Animated icon examples: playback controls (TODO, 2026-11-13)
 
 Every example page that shows tab icon animations, on every platform, offers "Play all" (each animation restarts from progress 0), a speed slider and a loop switch, combined into one playback policy applied live (accessibility labels and values included). Change the core when an example needs it. Rule, scope and status: [docs/Tab-Icon-Animation-Quick-Start.md](../../../docs/Tab-Icon-Animation-Quick-Start.md#enplayback-controls-in-the-animation-examples).
+
+## Swift first on iOS (added 2026-11-19)
+
+- **The iOS core is Swift; every new piece of code is Swift first (added 2026-11-19, owner)**: the core code of this project on iOS (the CocoaPods / Swift Package Manager / Carthage sources under `CYLTabBarController/`, including the `CYLAnimatedItem` module) is Swift. Write every new class, extension, test and example in Swift. Use Objective-C only where Swift cannot do the job (a header that must stay importable from Objective-C without modules, a `+load`-time hook, a C macro), and give the reason in a comment and in the task's document in `docs/`. Keep the public API usable from Objective-C (`@objc`, `@objcMembers`, `NS_SWIFT_NAME` counterparts) so existing Objective-C callers keep working. When you touch Objective-C code for a new feature, prefer adding the feature in a Swift file over growing the Objective-C file. Migration log: `docs/Swift-Migration.md`. Details: `AGENTS.md`, "Code rules".

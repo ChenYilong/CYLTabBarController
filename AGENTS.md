@@ -55,6 +55,7 @@ Every new feature and user-visible change ships with bilingual documentation in 
 
 ## Code rules
 
+- **The iOS core is Swift; every new piece of code is Swift first (added 2026-11-19, owner)**: the core code of this project on iOS (the CocoaPods / Swift Package Manager / Carthage sources under `CYLTabBarController/`, including the `CYLAnimatedItem` module) is Swift. Write every new class, extension, test and example in Swift. Use Objective-C only where Swift cannot do the job (a header that must stay importable from Objective-C without modules, a `+load`-time hook, a C macro), and give the reason in a comment and in the task's document in `docs/`. Keep the public API usable from Objective-C (`@objc`, `@objcMembers`, `NS_SWIFT_NAME` counterparts) so existing Objective-C callers keep working. When you touch Objective-C code for a new feature, prefer adding the feature in a Swift file over growing the Objective-C file. Migration log: `docs/Swift-Migration.md`.
 - **Fix bugs in the core, not in the example (added 2026-11-17)**: when you fix an issue or a bug, change the core code
   first so that the whole class of problem is avoided for every app, not only the example. The core is the code
   published to a package manager: CocoaPods (the podspec's sources), Swift Package Manager, Maven / Gradle
