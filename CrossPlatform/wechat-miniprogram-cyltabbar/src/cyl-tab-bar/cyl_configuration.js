@@ -473,7 +473,7 @@ function cylFont(value) {
   }
   return `font-size: ${size}px; line-height: ${Math.round(size * 1.2)}px;`
     + (CYL_FONT_WEIGHTS[weight] ? ` font-weight: ${CYL_FONT_WEIGHTS[weight]};` : '')
-    + (name ? ` font-family: "${name.split('"').join('')}";` : '');
+    + (name ? ` font-family: "${name.replaceAll('"', '')}";` : '');
 }
 
 /**

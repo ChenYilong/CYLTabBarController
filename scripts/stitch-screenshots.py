@@ -46,15 +46,18 @@ MARKER_KEY = 'CYLScreenshot'
 # [CN] 允许读写图片的目录：本仓库与临时目录。路径来自命令行（常由 agent 生成），因此在交给 open() 或 ffmpeg 之前先解析并检查：
 #      不允许这些目录之外的路径，且绝对路径不会被 ffmpeg 当作选项。
 ROOT = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
-ALLOWED_FOLDERS = tuple(dict.fromkeys(os.path.realpath(folder) for folder in (ROOT, tempfile.gettempdir(), '/tmp')
-                                      if os.path.isdir(folder)))
+ALLOWED_FOLDERS = tuple(dict.fromkeys(os.path.realpath(folder) for folder in (ROOT, tempfile.gettempdir())))
+# [EN] An absolute path of plain characters only. [CN] 只含普通字符的绝对路径。
+SAFE_PATH = re.compile(r'/[A-Za-z0-9._@+ /-]*')
 
 
 def checked_path(path, must_exist):
-    """`path` resolved, inside ALLOWED_FOLDERS (and an existing file when `must_exist`), or the script exits."""
+    """`path` resolved, of plain characters, inside ALLOWED_FOLDERS (and an existing file when `must_exist`), or the script exits."""
     resolved = os.path.realpath(path)
-    if not any(os.path.commonpath([folder, resolved]) == folder for folder in ALLOWED_FOLDERS):
-        sys.exit(f'{path}: outside the repository and the temporary folders')
+    if not SAFE_PATH.fullmatch(resolved):
+        sys.exit(f'{path}: only letters, digits, spaces and ._@+/- are allowed in a path')
+    if not any(resolved.startswith(folder + os.sep) for folder in ALLOWED_FOLDERS):
+        sys.exit(f'{path}: outside the repository and the temporary folder')
     if must_exist and not os.path.isfile(resolved):
         sys.exit(f'{path}: no such file')
     return resolved

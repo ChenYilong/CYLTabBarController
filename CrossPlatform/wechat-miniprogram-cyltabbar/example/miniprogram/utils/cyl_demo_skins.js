@@ -46,7 +46,7 @@ const CYL_DEMO_SKINS = [
  * [CN] 节日皮肤图标所在文件夹：小写名字，去掉 "'"，空格换成 "-"（CYLDemoTheme.icon(named:)）。
  */
 function cylSkinIcon(skin, name, faded) {
-  const folder = skin.name.toLowerCase().split("'").join('').split(' ').join('-');
+  const folder = skin.name.toLowerCase().replaceAll("'", '').replaceAll(' ', '-');
   return `/shared/theme/${folder}/${name}${faded ? '_faded' : ''}.png`;
 }
 
