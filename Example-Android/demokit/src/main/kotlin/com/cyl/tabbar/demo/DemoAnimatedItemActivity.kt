@@ -12,6 +12,8 @@ import com.cyl.animateditem.CYLAnimatedItemAxis
 import com.cyl.animateditem.CYLAnimatedItemGestureListener
 import com.cyl.animateditem.CYLAnimatedItemView
 import com.cyl.animateditem.CYLSize
+import com.cyl.tabbar.CYLConstants
+import com.cyl.tabbar.CYLTabBarAnimationURLWithOptions
 
 /**
  * [EN] docs/Animated-Item.md, TODO 6: CYLAnimatedItemView on its own, with the public API only. A GIF (no library), a
@@ -81,6 +83,15 @@ class DemoAnimatedItemActivity : AppCompatActivity() {
         column.addView(item("GIF", "file:///android_asset/cyl_tab_sample_animated.gif"))
         column.addView(caption("Lottie (lottie-android is in this app)"))
         column.addView(item("Lottie", "file:///android_asset/green_lottie_tab_discover.json"))
+        // [EN] The same file with the tint options (docs/Tab-Bar-Item-Animation.md, "Tint, or keep the original colors"): the row
+        //      above keeps the file's own colors, the default; this one is drawn in one color, dark blue by day and white at night.
+        // [CN] 同一文件加上着色选项（docs/Tab-Bar-Item-Animation.md，"Tint, or keep the original colors"）：上一行保持文件自身颜色（默认）；
+        //      这一行用单一颜色绘制，日间深蓝，夜间白色。
+        column.addView(caption("Lottie with tint #3A57ED, darkTint #FFFFFF (the row above keeps its colors)"))
+        column.addView(item("Lottie tinted", CYLTabBarAnimationURLWithOptions("file:///android_asset/green_lottie_tab_discover.json", mapOf(
+            CYLConstants.CYLTabBarAnimationOptionTint to "#3A57ED",
+            CYLConstants.CYLTabBarAnimationOptionDarkTint to "#FFFFFF",
+        ))))
         column.addView(caption("A missing file: the placeholder shows"))
         column.addView(item("Missing", "file:///android_asset/cyl_missing_animation.json"))
         column.addView(caption("Vertical, with an accessory (×) and dragging"))

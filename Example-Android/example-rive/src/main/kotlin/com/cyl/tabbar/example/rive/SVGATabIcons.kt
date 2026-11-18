@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import androidx.fragment.app.FragmentActivity
 import com.cyl.tabbar.CYLConstants
+import com.cyl.tabbar.CYLTabBarAnimationURLWithOptions
 import com.cyl.tabbar.CYLTabBarController
 import com.cyl.tabbar.CYLTabBarPageRegistry
 
@@ -61,8 +62,10 @@ val CourseTab.svgaFileName: String
 /**
  * [EN] The SVGA keys of the tab's icon (iOS `CourseTab.svgaAttributes`). [CN] Tab 图标的 SVGA key。
  */
-val CourseTab.svgaAttributes: Map<String, Any?>
-    get() = mapOf(CYLConstants.CYLTabBarSVGAURL to svgaFileName, CYLConstants.CYLTabBarSVGASize to "{32, 32}")
+fun CourseTab.svgaAttributes(tinted: Boolean = false): Map<String, Any?> = mapOf(
+    CYLConstants.CYLTabBarSVGAURL to if (tinted) CYLTabBarAnimationURLWithOptions(svgaFileName, mapOf(CYLConstants.CYLTabBarAnimationOptionTint to "title")) else svgaFileName,
+    CYLConstants.CYLTabBarSVGASize to "{32, 32}",
+)
 
 /**
  * [EN] The tab bar of cyl_tabbar_configuration_svga.json (Example-Rive/RiveApp/SVGA): tabs, plus button and SVGA icons from

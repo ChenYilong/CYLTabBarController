@@ -91,7 +91,10 @@ class MainActivity : DemoTabBarActivity() {
         CYLPlusButton.registerPlusButton(StartPlusButton)
         val tabs = CourseTab.entries.filter { it != CourseTab.Timer }
         // [EN] Issue #415: SVGA icons given with the SVGA initialization keys, one for one with the Rive ones. [CN] Issue #415：用 SVGA 初始化 key 提供的 SVGA 图标，与 Rive 图标一一对应。
-        val attributes = tabs.map { tab -> if (source == CYLDemoTabIconSource.SVGAKeys) tab.attributes(this).filterKeys { !it.startsWith("CYLTabBarRive") } + tab.svgaAttributes else tab.attributes(this) }
+        // [EN] With the boolean extra `CYLDemoAnimationTint`, the SVGA icons follow their title colors (the `tint` option "title"), as
+        //      on iOS. [CN] 带布尔 extra `CYLDemoAnimationTint` 时，SVGA 图标跟随标题颜色（`tint` 选项 "title"），与 iOS 相同。
+        val tinted = intent.getBooleanExtra("CYLDemoAnimationTint", false)
+        val attributes = tabs.map { tab -> if (source == CYLDemoTabIconSource.SVGAKeys) tab.attributes(this).filterKeys { !it.startsWith("CYLTabBarRive") } + tab.svgaAttributes(tinted) else tab.attributes(this) }
         return CYLTabBarController(this, tabs.map { it.page() }, attributes, style, StartPlusButton.CONTEXT).apply { applyCourseAppearance() }
     }
 
