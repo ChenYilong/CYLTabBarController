@@ -39,6 +39,12 @@ export class CYLAnimatedItemStackItem {
   accessibilityText: string = '';
   /** [EN] The space above the item, in vp (ignored for the first item). [CN] 条目上方的间距（vp，第一个条目忽略）。 */
   spacingBefore: number = CYLAnimatedItemStackDefaultSpacing;
+  /**
+   * [EN] Whether the item is enabled (true by default). A disabled item is drawn dimmed and, by default, is not interactive
+   *      (`CYLAnimatedItemStackModel.isItemInteractive`): its action does not run and a tap on it reaches the background.
+   * [CN] 条目是否可用（默认 true）。不可用的条目变暗显示，默认也不可交互（`CYLAnimatedItemStackModel.isItemInteractive`）：不执行其动作，点击会到达背景。
+   */
+  enabled: boolean = true;
 
   constructor(title: string = '', image: Object | string = '', animationUrl: string = '') {
     cylNextStackItemNumber += 1;
@@ -197,7 +203,7 @@ export class CYLAnimatedItemStackModel {
    */
   tapItem(item: CYLAnimatedItemStackItem): boolean {
     const action = this.actions.get(item);
-    if (action !== undefined) {
+    if (action !== undefined && this.isItemInteractive(item)) {
       return this.performAction(action);
     }
     return this.actsOnBackground(item) ? this.tapBackground() : false;
@@ -211,20 +217,40 @@ export class CYLAnimatedItemStackModel {
   // [EN] Touches and the screen reader. [CN] 触摸与读屏。
 
   /**
-   * [EN] Whether the item takes taps: one with an action, and the first item while it stands for the background. Any other
-   *      item lets a tap through to the background.
-   * [CN] 条目是否接收点击：带动作的条目，以及代表背景的第一个条目。其他条目让点击穿透到背景。
+   * [EN] Whether an item is interactive: its tap performs its action, a tap on it is not a background tap, and a screen
+   *      reader reads it as a button. By default: it has an action and it is `enabled`. Override in a subclass for items
+   *      with their own switch (CYLTableViewPlaceHolder's tap interaction), then call `updateInteractionOfItemViews()` after
+   *      that switch changes. The same check as iOS `isItemViewInteractive(_:)` and Android `isItemInteractive`.
+   * [CN] 条目是否可交互：点击执行其动作，点击它不算背景点击，读屏把它作为按钮朗读。默认：有动作且 `enabled`。条目有自己的开关时（CYLTableViewPlaceHolder
+   *      的点击交互）在子类中重写，并在开关变化后调用 `updateInteractionOfItemViews()`。与 iOS `isItemViewInteractive(_:)`、Android `isItemInteractive` 相同。
    */
-  takesTaps(item: CYLAnimatedItemStackItem): boolean {
-    return this.actions.has(item) || this.actsOnBackground(item);
+  isItemInteractive(item: CYLAnimatedItemStackItem): boolean {
+    return this.actions.has(item) && item.enabled;
   }
 
   /**
-   * [EN] The first item without an action of its own while there is a background action: it reads as a button for it.
-   * [CN] 存在背景动作时、自身没有动作的第一个条目：它作为该动作的按钮朗读。
+   * [EN] Applies `isItemInteractive` again to every item (the view redraws), after a change the stack cannot see.
+   * [CN] 在堆叠无法感知的变化之后，对所有条目重新应用 `isItemInteractive`（视图重绘）。
+   */
+  updateInteractionOfItemViews(): void {
+    this.update();
+  }
+
+  /**
+   * [EN] Whether the item takes taps: an interactive item, and the first item while it stands for the background. Any other
+   *      item lets a tap through to the background (`HitTestMode.None`).
+   * [CN] 条目是否接收点击：可交互的条目，以及代表背景的第一个条目。其他条目让点击穿透到背景（`HitTestMode.None`）。
+   */
+  takesTaps(item: CYLAnimatedItemStackItem): boolean {
+    return this.isItemInteractive(item) || this.actsOnBackground(item);
+  }
+
+  /**
+   * [EN] The first item, while it is not interactive and there is a background action: it reads as a button for it.
+   * [CN] 存在背景动作时、自身不可交互的第一个条目：它作为该动作的按钮朗读。
    */
   actsOnBackground(item: CYLAnimatedItemStackItem): boolean {
-    return !this.actions.has(item) && this.background !== undefined && this.firstItem === item;
+    return !this.isItemInteractive(item) && this.background !== undefined && this.firstItem === item;
   }
 
   /** [EN] What a screen reader reads: the accessibility text, else the title. [CN] 读屏朗读的内容：无障碍文字，否则为标题。 */

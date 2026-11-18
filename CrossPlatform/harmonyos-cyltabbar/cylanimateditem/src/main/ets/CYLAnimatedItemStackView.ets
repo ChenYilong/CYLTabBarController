@@ -91,6 +91,7 @@ export struct CYLAnimatedItemStackView {
       titleColor: this.titleColor,
       titleFontSize: this.titleFontSize,
       itemId: item.id,
+      isItemEnabled: item.enabled,
       isBare: true,
       sizesToContent: true,
       animationBuilder: this.animationBuilder,

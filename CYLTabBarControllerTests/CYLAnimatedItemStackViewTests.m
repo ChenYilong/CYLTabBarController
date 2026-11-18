@@ -208,4 +208,24 @@
     XCTAssertEqual(count, 1);
 }
 
+- (void)testItemsCanHandleTheirOwnTaps {
+    __block NSInteger count = 0;
+    CYLAnimatedItemStackView *stack = [[CYLAnimatedItemStackView alloc] initWithItemViews:@[] actions:@{
+        @"retry": ^(CYLAnimatedItemStackView *view, NSString *action) { count++; },
+    }];
+    stack.dispatchesItemTaps = NO;
+    CYLAnimatedItemView *hint = [stack appendItemWithTitle:@"Hint" image:nil animationURL:nil action:nil spacingBefore:0];
+    CYLAnimatedItemView *retry = [stack appendItemWithTitle:@"Retry" image:nil animationURL:nil action:@"retry" spacingBefore:16];
+    [self sendTouchUpInsideTo:retry];
+    XCTAssertEqual(count, 0, @"the item runs its own tap; the stack does not run the action a second time");
+    XCTAssertTrue(hint.userInteractionEnabled, @"the stack leaves the items' touches alone");
+    retry.enabled = NO;
+    retry.enabled = YES;
+    XCTAssertTrue(retry.userInteractionEnabled);
+    XCTAssertTrue(retry.accessibilityTraits & UIAccessibilityTraitButton, @"roles still follow isItemViewInteractive");
+    XCTAssertFalse(hint.accessibilityTraits & UIAccessibilityTraitButton);
+    XCTAssertTrue([stack performAction:@"retry"]);
+    XCTAssertEqual(count, 1);
+}
+
 @end
