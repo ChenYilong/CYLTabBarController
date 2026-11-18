@@ -57,6 +57,10 @@ Pod::Spec.new do |s|
                           ['CYLTabBarController/CYLTabBarItemAnimation/Swift/*.swift']
     engine.public_header_files = files.map { |name| "CYLTabBarController/CYLTabBarItemAnimation/#{name}.h" }
     engine.frameworks = 'UIKit'
+    # [EN] The Swift CYLAnimatedItemView (Core) plays animations only with the engine: Swift cannot read the C macro, so the
+    #      engine sets the same name as a Swift condition. [CN] Swift 编写的 CYLAnimatedItemView（Core）只有引擎参与时才播放动画：Swift
+    #      读不到 C 宏，因此由引擎设置同名的 Swift 条件。
+    engine.pod_target_xcconfig = { 'SWIFT_ACTIVE_COMPILATION_CONDITIONS' => '$(inherited) CYL_ANIMATION_ENGINE_AVAILABLE' }
   end
 
   # [EN] One subspec per animation type, the same shape for each: Core + Engine + the library.

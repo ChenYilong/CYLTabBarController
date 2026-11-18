@@ -10,6 +10,10 @@ import UIKit
 #if canImport(CYLAnimatedItem)
 import CYLAnimatedItem
 #endif
+#if canImport(CYLAnimatedItemViews)
+// [EN] SwiftPM: CYLAnimatedItemView is in the views target. [CN] SwiftPM：CYLAnimatedItemView 位于 views target。
+import CYLAnimatedItemViews
+#endif
 
 // [EN] The implementation of `CYLFlatDesignTabBar`, translated from Objective-C (docs/Swift-Migration.md, step 50). The
 //      class stays declared in Objective-C: `CYLTabBarController.h` adopts `CYLFlatDesignTabBarDelegate`, which its

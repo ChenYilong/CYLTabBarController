@@ -120,27 +120,9 @@ FOUNDATION_EXTERN BOOL CYLTabBarItemAnimationURLMayBeLottie(NSURL *_Nullable URL
 @end
 #endif
 
-/*
- * [EN] A tag as another repository would write it: a delete accessory, a badge read with the title, a state hook.
- * [CN] 其他仓库会这样写的标签：删除附加图标、随标题朗读的角标、状态钩子。
- */
-@interface CYLAnimatedItemTestTag : CYLAnimatedItemView
-@property (nonatomic, copy, nullable) NSString *badge;
-@property (nonatomic, assign) NSInteger stateChanges;
-@end
-
-@implementation CYLAnimatedItemTestTag
-- (void)setBadge:(NSString *)badge {
-    _badge = [badge copy];
-    [self updateItemAccessibility];
-}
-- (NSString *)itemAccessibilityLabel {
-    return self.badge ? [NSString stringWithFormat:@"%@, %@", self.title, self.badge] : self.title;
-}
-- (void)itemStateDidChange {
-    self.stateChanges += 1;
-}
-@end
+// [EN] CYLAnimatedItemTestTag is in CYLAnimatedItemTestTag.swift: Objective-C cannot subclass the Swift CYLAnimatedItemView.
+// [CN] CYLAnimatedItemTestTag 位于 CYLAnimatedItemTestTag.swift：Objective-C 不能继承 Swift 的 CYLAnimatedItemView。
+#import "CYLTabBarControllerTests-Swift.h"
 
 @interface CYLAnimatedItemViewTests : XCTestCase <CYLAnimatedItemViewDelegate>
 @property (nonatomic, strong) NSMutableArray<NSString *> *events;
