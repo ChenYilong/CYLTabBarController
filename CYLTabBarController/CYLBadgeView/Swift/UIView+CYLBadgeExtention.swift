@@ -571,6 +571,40 @@ extension UIView {
         return true
     }
 
+    /**
+     * [EN] Moves this view's shown badge to `newHost`: its settings (font, colors, border, frame, offset, maximum, radius,
+     *      margin, corner radius, Reduce Motion) are copied, the badge is cleared here and shown on `newHost` with the same
+     *      value and animation, through `-cyl_performSelector:withObject:withObject:`. Nothing when no badge is shown. Used
+     *      when a tab's animation view is replaced by a new one (another file, the dark file, a skin), whose old view held the
+     *      badge.
+     * [CN] 把本视图显示中的角标移到 `newHost`：复制其设置（字体、颜色、边框、frame、偏移、最大值、半径、边距、圆角、减弱动态效果），在这里清除角标，
+     *      并通过 `-cyl_performSelector:withObject:withObject:` 在 `newHost` 上以相同的值与动画显示。没有显示角标时不做任何事。用于 Tab 的动画视图被
+     *      新视图替换时（另一个文件、深色文件、皮肤），旧视图承载着角标。
+     */
+    @objc(cyl_moveBadgeToView:)
+    public func cyl_moveBadge(to newHost: UIView) {
+        guard newHost !== self, let badge = cyl_badge, cyl_isShowBadge() else {
+            return
+        }
+        newHost.cyl_badgeFont = cyl_badgeFont
+        newHost.cyl_badgeBackgroundColor = cyl_badgeBackgroundColor
+        newHost.cyl_badgeTextColor = cyl_badgeTextColor
+        newHost.cyl_badgeBorderColor = cyl_badgeBorderColor
+        newHost.cyl_badgeBorderWidth = cyl_badgeBorderWidth
+        newHost.cyl_badgeRespectsReduceMotion = cyl_badgeRespectsReduceMotion
+        newHost.cyl_badgeFrameValue = cyl_badgeFrameValue
+        newHost.cyl_badgeCenterOffsetValue = cyl_badgeCenterOffsetValue
+        newHost.cyl_badgeMaximumBadgeNumberValue = cyl_badgeMaximumBadgeNumberValue
+        newHost.cyl_badgeRadiusValue = cyl_badgeRadiusValue
+        newHost.cyl_badgeMarginValue = cyl_badgeMarginValue
+        newHost.cyl_badgeCornerRadiusValue = cyl_badgeCornerRadiusValue
+        let value = badge.text ?? ""
+        let animationTypeValue = cyl_badgeAnimationTypeValue
+        cyl_clearBadge()
+        newHost.clipsToBounds = false
+        newHost.cyl_perform(#selector(UIView.cyl_showBadgeValue(_:animationTypeValue:)), with: value, with: animationTypeValue)
+    }
+
     @objc(cyl_animatedItemBadgeHost)
     public func cyl_animatedItemBadgeHost() -> UIView? {
         guard let componentClass = NSClassFromString("CYLAnimatedItemView"), isKind(of: componentClass) else {

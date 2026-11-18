@@ -671,6 +671,32 @@
                   NSStringFromCGRect(inItem), NSStringFromCGRect(icon));
 }
 
+/*
+ * [EN] A tab's animation view swapped for a new one (another file, the dark file, a skin) used to take the badge away with
+ *      it: the badge, its value and its settings move to the new view (docs/Animated-Item.md, the audit after the component).
+ * [CN] Tab 的动画视图被换成新视图（另一个文件、深色文件、皮肤）时，角标曾随旧视图一起消失：现在角标及其值与设置移到新视图。
+ */
+- (void)testABadgeMovesWithASwappedAnimationView {
+    UIWindow *window = [[UIWindow alloc] initWithFrame:CGRectMake(0, 0, 200, 200)];
+    UIView *button = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 100, 60)];
+    UIView *oldView = [[UIView alloc] initWithFrame:CGRectMake(30, 10, 30, 30)];
+    UIView *newView = [[UIView alloc] initWithFrame:CGRectMake(30, 10, 30, 30)];
+    [window addSubview:button];
+    [button addSubview:oldView];
+    window.hidden = NO;
+    oldView.cyl_badgeBackgroundColor = UIColor.purpleColor;
+    [oldView cyl_showBadgeValue:@"7" animationType:CYLBadgeAnimationTypeNone];
+    XCTAssertTrue([oldView cyl_isShowBadge]);
+    [button insertSubview:newView aboveSubview:oldView];
+    SEL replace = NSSelectorFromString(@"cyl_replaceTrackedSubview:withView:");
+    XCTAssertTrue([button respondsToSelector:replace]);
+    ((void (*)(id, SEL, UIView *, UIView *))[button methodForSelector:replace])(button, replace, oldView, newView);
+    [oldView removeFromSuperview];
+    XCTAssertFalse([oldView cyl_isShowBadge], @"cleared on the old view");
+    XCTAssertTrue([newView cyl_isShowBadge], @"shown on the new view");
+    XCTAssertEqualObjects(newView.cyl_badgeBackgroundColor, UIColor.purpleColor, @"settings move too");
+}
+
 - (void)testFlatDesignButtonsTakeTheBarAppearanceThroughTheComponent {
     Class buttonClass = NSClassFromString(@"CYLFlatDesignTabBarButton");
     if (!buttonClass) {

@@ -675,6 +675,12 @@ extension UIControl {
         }
         if hidesOriginalView {
             swappableImageView?.isHidden = show
+            // [EN] An animated item shows its animation view instead of its image view while the animation plays: that view
+            //      is the icon to hide (and show again), not only the image view (which the item hides itself then).
+            // [CN] 动效 item 在动画播放时显示其动画视图而不是图片视图：要隐藏（及重新显示）的图标是该视图，而不只是图片视图（此时 item 自己已将其隐藏）。
+            if let iconView = cyl_animatedItemBadgeHost(), iconView !== swappableImageView {
+                iconView.isHidden = show
+            }
             if isTabButton {
                 cyl_tabLabel()?.isHidden = show
             }
@@ -809,6 +815,16 @@ extension UIView {
         }
         for case let tracker as CYLTabButtonLayoutTracker in subviews {
             tracker.replaceTrackedView(view, with: newView)
+        }
+        // [EN] The old view (a tab's animation view swapped for another file, its dark file or a skin) held the tab's badge,
+        //      which would go away with it: it moves to the new view. The new view also takes the icon tint again.
+        // [CN] 旧视图（Tab 的动画视图被换成另一个文件、其深色文件或皮肤）承载着 Tab 的角标，会随之消失：把角标移到新视图。新视图也重新获得图标着色。
+        view.cyl_moveBadge(to: newView)
+        let control = view.cyl_insertedForTabControl ?? (self as? UIControl) ?? (superview as? UIControl)
+        control?.setNeedsLayout()
+        let tintSelector = NSSelectorFromString("cyl_setNeedsApplyTabBarItemAnimationTintColors")
+        if let tabBarController = control?.cyl_tabBarController, tabBarController.responds(to: tintSelector) {
+            tabBarController.perform(tintSelector)
         }
     }
 }
