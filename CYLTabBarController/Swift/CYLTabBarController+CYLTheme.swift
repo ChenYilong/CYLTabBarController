@@ -190,7 +190,7 @@ extension CYLTabBarController {
         settings.launchThemeApplied = true
         // [EN] Styles set before the tab bar was replaced by the library's own (CYLTabBar) are written into the bar shown now.
         // [CN] 在 TabBar 被替换为本库的 CYLTabBar 之前设置的样式，写入当前显示的 TabBar。
-        cylPrivate.cylApplyTabBarItemStyles()
+        cylApplyTabBarItemStyles()
         // [EN] Nothing to restore yet: only a tab bar theme changes anything here.
         // [CN] 此时尚无需恢复：只有 TabBar 主题才需要处理。
         if let theme = cylThemeManager().currentTheme, theme is CYLTabBarTheme {
@@ -238,7 +238,7 @@ extension CYLTabBarController {
         cylPrivate.cylSyncTabBarAppearances()
         tabBarTheme?.cyl_customize?(self)
         // [EN] Styles set in one place win over the theme's appearance. [CN] 在一处设置的样式优先于主题的外观。
-        cylPrivate.cylApplyTabBarItemStyles()
+        cylApplyTabBarItemStyles()
         // [EN] What the app adds to the tab buttons in its one-time layout block (`-setViewDidLayoutSubViewsBlockInvokeOnce:block:`, e.g. a
         //      cover over a tab, badges) is added again after the next layout: before, a theme switch left that block marked as run, and what
         //      UIKit dropped from the tab buttons never came back. Scope: every style. The block itself decides what to add; the theme's own

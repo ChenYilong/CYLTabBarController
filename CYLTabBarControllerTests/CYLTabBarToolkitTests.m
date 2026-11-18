@@ -150,6 +150,86 @@
     XCTAssertFalse(tabBarController.cyl_fixesOpaqueTabBarSafeAreaInsets);
 }
 
+#pragma mark - Reselect and custom tab actions (Swift since step 53)
+
+- (void)testReselectBehaviorIsKept {
+    CYLTabBarController *tabBarController = [self newTabBarController];
+    XCTAssertEqual(tabBarController.cyl_reselectBehavior, CYLTabBarReselectBehaviorNone);
+    tabBarController.cyl_reselectBehavior = CYLTabBarReselectBehaviorPopToRoot | CYLTabBarReselectBehaviorScrollToTop;
+    XCTAssertEqual(tabBarController.cyl_reselectBehavior, CYLTabBarReselectBehaviorPopToRoot | CYLTabBarReselectBehaviorScrollToTop);
+}
+
+/// [EN] Pop to root first; the private selector is reached at run time. [CN] 先返回根页面；私有 selector 在运行时调用。
+- (void)testReselectPopsToRoot {
+    CYLTabBarController *tabBarController = [self newTabBarController];
+    // [EN] In a window: a navigation controller outside one does not pop. [CN] 放入窗口：不在窗口中的导航控制器不会返回。
+    UIWindow *window = [[UIWindow alloc] initWithFrame:CGRectMake(0, 0, 390, 844)];
+    window.rootViewController = tabBarController;
+    window.hidden = NO;
+    UINavigationController *navigationController = (UINavigationController *)tabBarController.viewControllers.firstObject;
+    [navigationController pushViewController:[UIViewController new] animated:NO];
+    XCTAssertEqual(navigationController.viewControllers.count, 2u);
+    SEL selector = NSSelectorFromString(@"cyl_performReselectBehaviorForViewController:");
+    XCTAssertTrue([tabBarController respondsToSelector:selector]);
+    tabBarController.cyl_reselectBehavior = CYLTabBarReselectBehaviorNone;
+    ((void (*)(id, SEL, id))[tabBarController methodForSelector:selector])(tabBarController, selector, navigationController);
+    XCTAssertEqual(navigationController.viewControllers.count, 2u, @"no behavior, nothing happens");
+    tabBarController.cyl_reselectBehavior = CYLTabBarReselectBehaviorPopToRoot;
+    ((void (*)(id, SEL, id))[tabBarController methodForSelector:selector])(tabBarController, selector, navigationController);
+    // [EN] An animated pop ends on a later run loop turn. [CN] 带动画的返回在之后的 runloop 中完成。
+    [[NSRunLoop mainRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.6]];
+    XCTAssertEqual(navigationController.viewControllers.count, 1u);
+}
+
+- (void)testCustomTabActionRunsOncePerRunLoopTurn {
+    CYLTabBarController *tabBarController = [self newTabBarController];
+    UIViewController *first = tabBarController.viewControllers.firstObject;
+    UIViewController *second = tabBarController.viewControllers.lastObject;
+    XCTAssertNotNil(first.cyl_tabBarItemIdentifier);
+    tabBarController.cyl_customActionTabBarItemIdentifiers = @[ first.cyl_tabBarItemIdentifier ];
+    XCTAssertEqualObjects(tabBarController.cyl_customActionTabBarItemIdentifiers, @[ first.cyl_tabBarItemIdentifier ]);
+    __block NSInteger runs = 0;
+    tabBarController.cyl_customTabActionHandler = ^(CYLTabBarController *controller, UIViewController *viewController) {
+        XCTAssertEqual(viewController, first);
+        runs += 1;
+    };
+    XCTAssertTrue([tabBarController cyl_isCustomActionTabViewController:first]);
+    XCTAssertFalse([tabBarController cyl_isCustomActionTabViewController:second]);
+    XCTAssertTrue([tabBarController cyl_performCustomTabActionIfNeededForViewController:first]);
+    XCTAssertTrue([tabBarController cyl_performCustomTabActionIfNeededForViewController:first], @"the same tap: handled, not run again");
+    XCTAssertFalse([tabBarController cyl_performCustomTabActionIfNeededForViewController:second]);
+    XCTAssertEqual(runs, 1);
+    [[NSRunLoop mainRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.05]];
+    XCTAssertTrue([tabBarController cyl_performCustomTabActionIfNeededForViewController:first]);
+    XCTAssertEqual(runs, 2, @"a later run loop turn runs it again");
+}
+
+- (void)testShouldPerformCustomTabActionHandlerWins {
+    CYLTabBarController *tabBarController = [self newTabBarController];
+    UIViewController *second = tabBarController.viewControllers.lastObject;
+    tabBarController.cyl_customActionTabBarItemIdentifiers = @[];
+    tabBarController.cyl_shouldPerformCustomTabActionHandler = ^BOOL(CYLTabBarController *controller, UIViewController *viewController) {
+        return viewController == second;
+    };
+    XCTAssertTrue([tabBarController cyl_isCustomActionTabViewController:second]);
+    XCTAssertFalse([tabBarController cyl_isCustomActionTabViewController:tabBarController.viewControllers.firstObject]);
+    tabBarController.cyl_shouldPerformCustomTabActionHandler = nil;
+    XCTAssertFalse([tabBarController cyl_isCustomActionTabViewController:second]);
+}
+
+/// [EN] The item styles are kept and read back. [CN] item 样式会被保存并可读回。
+- (void)testItemStylesAreKept {
+    CYLTabBarController *tabBarController = [self newTabBarController];
+    UIFont *font = [UIFont systemFontOfSize:11];
+    tabBarController.cyl_tabBarItemTitleFont = font;
+    tabBarController.cyl_tabBarItemSelectedImageColor = UIColor.redColor;
+    XCTAssertEqualObjects(tabBarController.cyl_tabBarItemTitleFont, font);
+    XCTAssertEqualObjects(tabBarController.cyl_tabBarItemSelectedImageColor, UIColor.redColor);
+    XCTAssertNil(tabBarController.cyl_tabBarShadowColor);
+    tabBarController.cyl_tabBarItemTitleFont = nil;
+    XCTAssertNil(tabBarController.cyl_tabBarItemTitleFont);
+}
+
 - (void)testItemLayoutBlockIsKept {
     UITabBarItem *item = [[UITabBarItem alloc] initWithTitle:@"A" image:nil tag:0];
     void (^block)(UITabBarItem *, UIView *) = ^(UITabBarItem *tabBarItem, UIView *view) {};
