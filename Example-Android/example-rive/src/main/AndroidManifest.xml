@@ -13,8 +13,13 @@
         android:supportsRtl="true"
         android:usesCleartextTraffic="false"
         android:theme="@style/Theme.CYLTabBarExample">
+        <!-- configChanges uiMode: the course forces night (localNightMode = MODE_NIGHT_YES), so a system light / dark switch
+             needs no new activity; recreating it crashed in ART's JIT thread on the Android 17 x86_64 emulator (SIGSEGV in
+             JitCompileTask::Finalize, 2026-11-18/19; 6 live switches without a crash after this). Example-only: the library
+             cannot change how an app's activity is recreated; its views still follow the mode in onConfigurationChanged. -->
         <activity
             android:name=".MainActivity"
+            android:configChanges="uiMode"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
