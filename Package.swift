@@ -18,7 +18,7 @@ let package = Package(
         // [EN] The animated item component on its own (CocoaPods `CYLAnimatedItem` pod, docs/Animated-Item.md): the view, its
         //      placeholder bundle and the animation engine, without the tab bar.
         // [CN] 单独的动效条目组件（CocoaPods `CYLAnimatedItem` pod，docs/Animated-Item.md）：视图、占位图资源包与动画引擎，不含 TabBar。
-        .library(name: "CYLAnimatedItem", targets: ["CYLAnimatedItem"]),
+        .library(name: "CYLAnimatedItem", targets: ["CYLAnimatedItem", "CYLAnimatedItemViews"]),
     ],
     dependencies: [
         // Same requirement as the podspec's `LottieSwift` subspec: 'lottie-ios', '>= 4.5.1' (`removeValueProvider(for:)`).
@@ -44,7 +44,7 @@ let package = Package(
             name: "CYLAnimatedItem",
             dependencies: ["CYLAnimatedItemSwift"],
             path: "CYLTabBarController",
-            exclude: ["CYLAnimatedItem/Resources"],
+            exclude: ["CYLAnimatedItem/Resources", "CYLAnimatedItem/Swift"],
             sources: [
                 "CYLAnimatedItem",
                 "CYLUtils/CYLAnimationKeys.m",
@@ -59,6 +59,16 @@ let package = Package(
                 .headerSearchPath("CYLUtils"),
                 .headerSearchPath("CYLTabBarItemAnimation"),
             ]
+        ),
+        // [EN] CYLAnimatedItem, Swift views built on CYLAnimatedItemView (`CYLAnimatedItemStackView`): above the Objective-C
+        //      half, so SwiftPM users `import CYLAnimatedItemViews` (CocoaPods and the Xcode framework compile them into
+        //      `CYLAnimatedItem`).
+        // [CN] CYLAnimatedItem 中基于 CYLAnimatedItemView 的 Swift 视图（`CYLAnimatedItemStackView`）：位于 Objective-C 部分之上，因此 SwiftPM
+        //      用户需 `import CYLAnimatedItemViews`（CocoaPods 与 Xcode framework 把它们编进 `CYLAnimatedItem`）。
+        .target(
+            name: "CYLAnimatedItemViews",
+            dependencies: ["CYLAnimatedItem"],
+            path: "CYLTabBarController/CYLAnimatedItem/Swift"
         ),
         // Swift bridge that exposes Lottie 4.x to the Objective-C sources (`CYLCompatibleLOTAnimationView`).
         // SPM cannot mix Swift and Objective-C in one target, so it lives in its own target.
