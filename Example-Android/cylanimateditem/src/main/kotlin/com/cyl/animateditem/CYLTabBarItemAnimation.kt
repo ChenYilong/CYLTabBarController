@@ -1067,6 +1067,25 @@ class CYLRiveTabBarItemAnimationView internal constructor(context: Context, priv
         if (isMoving()) CYLReflection.call(controller, "pause")
         restingAfterLoad = true
     }
+    /**
+     * [EN] A resting icon shows the values of a newly bound theme instance (night mode switch), as on iOS (isPaused = false): its
+     *      controller is paused, so it drew the old frame until the next play (data_bind_test_impl.riv, 2026-11-19). The file
+     *      resumes as a first play resumes it, draws for two frames, and its controller is paused again; it keeps resting.
+     * [CN] 静止的图标显示新绑定主题实例的值（深色模式切换），与 iOS 一致（isPaused = false）：其控制器已暂停，所以在下次播放之前一直绘制旧帧。
+     *      文件按第一次播放的方式恢复，绘制两帧后控制器再次暂停；图标仍保持静止。
+     */
+    private fun redrawRestingFrame() {
+        if (!restingAfterLoad || hasPlayed) return
+        val controller = CYLReflection.call(rive, "getController") ?: return
+        val machine = stateMachine
+        if (machine != null) {
+            CYLReflection.callKotlin(rive, "play", machine, CYLReflection.DEFAULT, CYLReflection.DEFAULT, true, false)
+        } else if (options[CYLTabBarItemAnimationKeys.CYLTabBarAnimationOptionRiveAnimation] == null) {
+            CYLReflection.callKotlin(rive, "play", CYLReflection.DEFAULT, CYLReflection.DEFAULT, false)
+        }
+        handler.postDelayed({ if (restingAfterLoad && !hasPlayed) CYLReflection.call(controller, "pause") }, NEXT_FRAME_MS * 2)
+    }
+
     // [EN] A loop pass leaves a file that is still moving on its own alone (shapes.riv, truck.riv); only a play restarts it.
     // [CN] 一次循环不打断仍在自行运动的文件（shapes.riv、truck.riv）；只有播放才会重新开始它。
     private val loopRunnable: Runnable = Runnable {
@@ -1154,6 +1173,7 @@ class CYLRiveTabBarItemAnimationView internal constructor(context: Context, priv
         machines?.filterNotNull()?.forEach { CYLReflection.call(it, "setViewModelInstance", instance) }
         if (machines.isNullOrEmpty()) CYLReflection.call(artboard, "setViewModelInstance", instance)
         boundThemeInstance = instance
+        redrawRestingFrame()
     }
 
     /**
