@@ -1353,7 +1353,9 @@ export struct CYLTabBarController {
       })
     } else if (this.cylSVGAPath(index) !== undefined) {
       CYLSVGAView({
-        path: this.cylSVGAPath(index),
+        // [EN] The file without its options: "svga/a.svga?tint=title" failed to load, and the tab fell back to its untinted
+        //      image. [CN] 不带选项的文件："svga/a.svga?tint=title" 加载失败，Tab 退回未着色的图片。
+        path: cylRiveFileAndOptions(this.cylSVGAPath(index) ?? '')[0],
         iconSize: this.cylTabAnimationSize(index),
         selected: this.selectedIndex === index,
         replayToken: context.restartToken,
