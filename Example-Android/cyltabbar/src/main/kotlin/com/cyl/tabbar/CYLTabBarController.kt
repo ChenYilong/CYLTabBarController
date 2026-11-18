@@ -912,7 +912,9 @@ open class CYLTabBarController(val activity: FragmentActivity) {
         }
         cyl_playTabButtonAnimationForControl(plusButton)
         cyl_playTabButtonTapFeedback()
-        delegate?.tabBarController_didSelectControl(this, plusButton)
+        // [EN] `reportsTapsToDelegate` false keeps the plus button out of `didSelectControl`, as on iOS.
+        // [CN] `reportsTapsToDelegate` 为 false 时 PlusButton 不进入 `didSelectControl`，与 iOS 相同。
+        if (plusButton.reportsTapsToDelegate) delegate?.tabBarController_didSelectControl(this, plusButton)
     }
 
     // MARK: - hasPlusButton...

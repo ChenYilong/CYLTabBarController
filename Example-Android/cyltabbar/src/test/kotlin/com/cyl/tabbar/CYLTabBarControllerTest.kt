@@ -120,6 +120,32 @@ class CYLTabBarControllerTest {
     }
 
     @Test
+    fun plusButtonReportsTapsToDelegateUnlessTurnedOff() = withActivity { activity ->
+        CYLPlusButton.registerPlusButton(TestPlusButton)
+        val controller = CYLTabBarController(activity, listOf(Page(), Page()), attributes("Home", "Me"), CYLEnums.CYLTabBarStyleType.Default, "plus-test")
+        activity.setContentView(controller.view)
+        idle()
+        val controls = ArrayList<android.view.View>()
+        controller.delegate = object : CYLTabBarControllerDelegate {
+            override fun tabBarController_didSelectControl(tabBarController: CYLTabBarController, control: android.view.View) { controls += control }
+        }
+        val plus = controller.tabBar.plusButton!!
+        assertTrue("reported by default, as on iOS", plus.reportsTapsToDelegate)
+        plus.performClick()
+        idle()
+        assertEquals(listOf<android.view.View>(plus), controls)
+        plus.reportsTapsToDelegate = false
+        controller.tabBar.tabBarButtonArray[0].performClick()
+        idle()
+        controls.clear()
+        plus.performClick()
+        idle()
+        assertTrue("not reported once turned off", controls.isEmpty())
+        assertTrue("its page still shows", controller.tabBar.plusButtonActive)
+        CYLPlusButton.removePlusButtonForTabBarContext("plus-test")
+    }
+
+    @Test
     fun plusButtonAtItsIndexSelectsItsChild() = withActivity { activity ->
         CYLPlusButton.registerPlusButton(TestPlusButton)
         val controller = CYLTabBarController(activity, listOf(Page(), Page()), attributes("Home", "Me"), CYLEnums.CYLTabBarStyleType.Default, "plus-test")
