@@ -24,6 +24,17 @@ import UIKit
     @objc(cyl_contextPlusButton) func cylContextPlusButton() -> CYLPlusButton?
     @objc(cyl_contextPlusChildViewController) func cylContextPlusChildViewController() -> UIViewController?
     @objc(cyl_reportedControlForControl:) func cylReportedControl(for control: UIControl?) -> UIControl?
+    /// [EN] The page registry state of the class extension (docs/Swift-Migration.md, step 54). [CN] 类扩展中的页面注册表状态（第 54 步）。
+    @objc(pageRegistry) func cylPageRegistryState() -> CYLTabBarPageProviding?
+    @objc(pageResolver) func cylPageResolverState() -> CYLTabBarPageProvider?
+    @objc(pageLookupOrder) func cylPageLookupOrderState() -> [String]?
+    @objc(skippedTabs) func cylSkippedTabsState() -> [CYLTabBarSkippedTab]?
+    @objc(setSkippedTabs:) func cylSetSkippedTabsState(_ skippedTabs: [CYLTabBarSkippedTab])
+    @objc(pagesFromPageIdentifiers) func cylPagesFromPageIdentifiersState() -> Bool
+    @objc(pagesByPageIdentifier) func cylPagesByPageIdentifierState() -> [String: NSMutableArray]?
+    @objc(cyl_tabBarItemsAttributesIndexOfViewControllerAtIndex:) func cylTabBarItemsAttributesIndexOfViewController(at index: UInt) -> UInt
+    /// [EN] Replaces the attributes storage without the setter's work. [CN] 替换属性存储，不执行 setter 的逻辑。
+    @objc(cyl_replaceTabBarItemsAttributesStorage:) func cylReplaceTabBarItemsAttributesStorage(_ tabBarItemsAttributes: [[AnyHashable: Any]])
     /// FIX: issue #594 — implemented in CYLTabBarController.m (`CYLTabBarController (CYLPlusButtonSelection)`).
     @objc(cyl_plusButtonControlIfSelectingPlusChildViewController:) func cylPlusButtonControlIfSelectingPlusChildViewController(_ viewController: UIViewController) -> UIControl?
     /// FIX: issue #610 — implemented in CYLTabBarController.m, only with FlatDesign (`CYL_FLATDESIGN_AVAILABLE`).
