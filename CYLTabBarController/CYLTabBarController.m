@@ -5061,115 +5061,16 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
 // [CN] 上述方法已迁移到 Swift（第 58 步）。
 
 #pragma mark - delegate
-- (void)updateSelectionStatusIfNeededForTabBarController:(nullable UITabBarController *)tabBarController
-                              shouldSelectViewController:(UIViewController *)viewController {
-    CYL_IF_NOT_FLATDESIGN_BEGIN     //Not CYLTabBarStyleTypeFlatDesign
-    BOOL should = viewController != tabBarController.selectedViewController;
-    [self updateSelectionStatusIfNeededForTabBarController:tabBarController shouldSelectViewController:viewController shouldSelect:should];
-    // Guard: only CYLTabBar has the plus button label check; `tabBarController` can have a system tab bar.
-    if (![tabBarController.tabBar isKindOfClass:[CYLTabBar class]]) {
-        return;
-    }
-    CYLTabBar *tabBar = (CYLTabBar *)tabBarController.tabBar;
-    if (should && [tabBar cyl_shouldUpdateHiddenStatueForPlusButtonLabel]) {
-        if ([viewController isEqual:[self cyl_contextPlusChildViewController]]) {
-            [[self cyl_contextPlusButton] setTabLabelHidden:YES];
-        } else {
-            [[self cyl_contextPlusButton] setTabLabelHidden:NO];
-        }
-    }
-    if ([tabBarController.selectedViewController isEqual:[self cyl_contextPlusChildViewController]] && [tabBar cyl_shouldUpdateHiddenStatueForPlusButtonLabel]) {
-        if (!should) {
-            [[self cyl_contextPlusButton] setTabLabelHidden:YES];
-        }
-    }
 
-    } else {/**  CYLTabBarStyleTypeFlatDesign*/}
-}
+// [EN] `-updateSelectionStatusIfNeededForTabBarController:shouldSelectViewController:` (both) and
+//      `-tabBarController:shouldSelectViewController:` are Swift (Swift/CYLTabBarController+CYLSelection.swift,
+//      docs/Swift-Migration.md, step 61). [CN] 已迁移到 Swift（第 61 步）。
 
-- (void)updateSelectionStatusIfNeededForTabBarController:(nullable UITabBarController *)tabBarController
-                              shouldSelectViewController:(UIViewController *)viewController
-                                            shouldSelect:(BOOL)shouldSelect {
-    CYL_IF_NOT_FLATDESIGN_BEGIN     //Not CYLTabBarStyleTypeFlatDesign
-    CYLControlSetSelectionLocked([viewController.tabBarItem cyl_tabButton], !shouldSelect);
-    if (!shouldSelect) {
-        return;
-    }
-    UIButton *plusButton = [self cyl_contextPlusButton];
-    if (!viewController) {
-        viewController = self.selectedViewController;
-    }
-    if (![self hasPlusChildViewController]) {
-        return;
-    }
-    
-    BOOL isCurrentViewController = [viewController cyl_isEqualToViewController:[self cyl_contextPlusChildViewController]];
-    BOOL shouldConfigureSelectionStatus = (!isCurrentViewController);
-    
-    if (plusButton.selected) {
-        plusButton.selected = NO;
-    }
-    if (!shouldConfigureSelectionStatus) {
-        [[NSNotificationCenter defaultCenter] postNotificationName:CYLTabBarItemAnimationPlayingNotification object:self];
-    }
-} else {/**  CYLTabBarStyleTypeFlatDesign*/}
-}
-
+/// [EN] Forwards to Swift (`-cyl_tabBarController:shouldSelectViewController:`, step 61): Swift cannot define this UIKit
+///      selector on a class whose delegate conformance is declared here. Subclasses override this one and call super.
+/// [CN] 转发给 Swift（第 61 步）：代理协议声明在这里时，Swift 无法定义这个 UIKit selector。子类重写本方法并调用 super。
 - (BOOL)tabBarController:(UITabBarController *)tabBarController shouldSelectViewController:(UIViewController *)viewController {
-    // FIX: issue #152 — one user tap on a tab button, before the selection changes (also for a tab that needs login).
-    // 一次用户点击 Tab 按钮，在选中变化之前（需要登录的 Tab 也算）。
-    [self cyl_recognizeTabBarItemTapWillSelectViewController:viewController];
-    // FIX: issue #19 — a tab that needs login, tapped while logged out: refuse it before anything changes (no transition,
-    // no selection state) and start the login. 需要登录的 Tab 在未登录时被点击：在任何变化之前拒绝（无转场、不改选中状态），并发起登录。
-    if ([self cyl_interceptLoginIfNeededForViewController:viewController]) {
-        return NO;
-    }
-    // [EN] A custom action tab (CYLCustomTabAction): refuse the selection and run the action instead.
-    // [CN] 使用自定义点击操作的 Tab（CYLCustomTabAction）：拒绝选中，改为执行对应操作。
-    if ([self cyl_performCustomTabActionIfNeededForViewController:viewController]) {
-        return NO;
-    }
-    CYL_IF_NOT_FLATDESIGN_BEGIN     //Not CYLTabBarStyleTypeFlatDesign
-    if (YES == viewController.cyl_isPlaceholder) {
-        return NO;
-    }
-    if (@available(iOS 18.0, *)) {
-        
-        UIViewController *fromVC = self.selectedViewController;
-        
-        UIView *fromView = fromVC.view;
-        UIView *toView = viewController.view;
-        
-        if (fromView && toView && fromView != toView) {
-            // 自定义过渡效果，用于“隐藏” tabbar 切换时产生的 VC 闪烁
-            // FIX: issue #618
-            // [EN] This runs before the selection is decided: a subclass calls super first and may still return NO
-            //      (e.g. a tab that needs login). `+transitionFromView:toView:` removed `fromView` and inserted `toView`
-            //      right away, so a refused selection left the selected tab's view out of the hierarchy, and the next
-            //      tab switch could crash inside UIKit. Cross-dissolve the container instead: it animates whatever UIKit
-            //      changes in this run loop, and does nothing when the selection is refused.
-            // [CN] 这里在是否切换确定之前执行：子类会先调用 super，之后仍可能返回 NO（如需要登录的 Tab）。
-            //      `+transitionFromView:toView:` 会立即移除 `fromView` 并插入 `toView`，切换被拒绝时当前 Tab 的视图已不在
-            //      视图层级中，下一次切换 Tab 可能在 UIKit 内部崩溃。改为对容器做交叉溶解：只为本次 runloop 中 UIKit 的
-            //      视图变化做动画，切换被拒绝时不产生任何变化。
-            UIView *containerView = fromView.superview ?: self.view;
-            [UIView transitionWithView:containerView
-                              duration:0.01   // [CN] 几乎立即
-                              // [EN] Almost immediate
-                               options:UIViewAnimationOptionTransitionCrossDissolve
-                            animations:nil
-                            completion:nil];
-        }
-    }
-    
-    [self updateSelectionStatusIfNeededForTabBarController:tabBarController shouldSelectViewController:viewController];
-    } else {/**  CYLTabBarStyleTypeFlatDesign*/}
-
-
-    BOOL should = viewController != tabBarController.selectedViewController;
-    
-
-    return should;
+    return [self cyl_tabBarController:tabBarController shouldSelectViewController:viewController];
 }
 
 #ifndef CYL_PLUS_BUTTON_TITLE_KEEPS_LENS_ENABLED

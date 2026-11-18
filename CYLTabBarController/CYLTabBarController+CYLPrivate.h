@@ -121,6 +121,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)cyl_markControlReportedInCurrentRunLoop:(UIControl *)control;
 /// [EN] `CYLTabBarControllerDelegate`, implemented by the controller in Swift (step 59). [CN] 由控制器在 Swift 中实现（第 59 步）。
 - (void)tabBarController:(CYLTabBarController *)tabBarController beginShowPlatterLiquidLensViewForControl:(UIControl *)control;
+/// [EN] The body of `-tabBarController:shouldSelectViewController:`, implemented in Swift (step 61). [CN] 由 Swift 实现（第 61 步）。
+- (BOOL)cyl_tabBarController:(UITabBarController *)tabBarController shouldSelectViewController:(UIViewController *)viewController;
 - (void)cyl_syncTabBarItemAccessibility;
 #if CYL_FLATDESIGN_AVAILABLE
 - (void)cyl_syncFlatDesignTabBarItemColors;
