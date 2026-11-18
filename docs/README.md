@@ -232,6 +232,7 @@ docs/
 │   ├── animated-item-harmonyos-rive-retap-replay.png
 │   ├── animated-item-harmonyos-rive-tint-option.png
 │   ├── animated-item-harmonyos-spacing-before.png
+│   ├── animated-item-harmonyos-svga-retap-replay.png
 │   ├── animated-item-harmonyos-tabbar.jpeg
 │   ├── animated-item-harmonyos-tint-option.png
 │   ├── animated-item-ios-demo-interactive-ios27.2.png
