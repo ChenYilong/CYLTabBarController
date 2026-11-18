@@ -6,7 +6,6 @@
 //
 
 #import "CYLAnimatedItemMacros.h"
-#import "CYLAnimatedItemView.h"
 
 /*
  * [EN] Looks for `CYLAnimatedItem.bundle` where each package manager puts it: next to the component's code (CocoaPods, a
@@ -18,7 +17,8 @@ NSBundle *CYLAnimatedItemResourceBundle(void) {
     static NSBundle *resourceBundle = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        NSMutableArray<NSBundle *> *containers = [NSMutableArray arrayWithObjects:[NSBundle bundleForClass:[CYLAnimatedItemView class]], [NSBundle mainBundle], nil];
+        // [EN] The view is Swift (in SwiftPM another target), so its class is found by name. [CN] 视图是 Swift（在 SwiftPM 中位于另一个 target），因此按名称查找其类。
+        NSMutableArray<NSBundle *> *containers = [NSMutableArray arrayWithObjects:[NSBundle bundleForClass:NSClassFromString(@"CYLAnimatedItemView") ?: [NSBundle class]], [NSBundle mainBundle], nil];
         // [EN] Swift Package Manager: the resource bundle of the CYLAnimatedItemSwift target (before 2026-11-17 the bundle was in
         //      CYLTabBarControllerSwift's). [CN] Swift Package Manager：CYLAnimatedItemSwift target 的资源包（2026-11-17 之前在
         //      CYLTabBarControllerSwift 的资源包中）。

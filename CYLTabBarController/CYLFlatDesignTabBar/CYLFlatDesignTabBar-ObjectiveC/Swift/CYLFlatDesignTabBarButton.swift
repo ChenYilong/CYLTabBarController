@@ -10,6 +10,10 @@ import UIKit
 #if canImport(CYLAnimatedItem)
 import CYLAnimatedItem
 #endif
+#if canImport(CYLAnimatedItemViews)
+// [EN] SwiftPM: CYLAnimatedItemView is in the views target. [CN] SwiftPM：CYLAnimatedItemView 位于 views target。
+import CYLAnimatedItemViews
+#endif
 
 // [EN] The button of a FlatDesign tab, translated from Objective-C together with its item (docs/Swift-Migration.md,
 //      step 49). Objective-C names, selectors and Swift names are kept; `-_updateTabBarButton` keeps its selector for

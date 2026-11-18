@@ -60,15 +60,17 @@ let package = Package(
                 .headerSearchPath("CYLTabBarItemAnimation"),
             ]
         ),
-        // [EN] CYLAnimatedItem, Swift views built on CYLAnimatedItemView (`CYLAnimatedItemStackView`): above the Objective-C
-        //      half, so SwiftPM users `import CYLAnimatedItemViews` (CocoaPods and the Xcode framework compile them into
-        //      `CYLAnimatedItem`).
-        // [CN] CYLAnimatedItem 中基于 CYLAnimatedItemView 的 Swift 视图（`CYLAnimatedItemStackView`）：位于 Objective-C 部分之上，因此 SwiftPM
-        //      用户需 `import CYLAnimatedItemViews`（CocoaPods 与 Xcode framework 把它们编进 `CYLAnimatedItem`）。
+        // [EN] CYLAnimatedItem, Swift views: CYLAnimatedItemView and CYLAnimatedItemStackView (Swift since step 60), above the
+        //      Objective-C half (the engine), which they re-export; SwiftPM users `import CYLAnimatedItemViews` (CocoaPods and
+        //      the Xcode framework compile them into `CYLAnimatedItem`).
+        // [CN] CYLAnimatedItem 的 Swift 视图：CYLAnimatedItemView 与 CYLAnimatedItemStackView（自第 60 步起为 Swift），位于 Objective-C 部分（引擎）
+        //      之上并重新导出它；SwiftPM 用户需 `import CYLAnimatedItemViews`（CocoaPods 与 Xcode framework 把它们编进 `CYLAnimatedItem`）。
         .target(
             name: "CYLAnimatedItemViews",
             dependencies: ["CYLAnimatedItem"],
-            path: "CYLTabBarController/CYLAnimatedItem/Swift"
+            path: "CYLTabBarController/CYLAnimatedItem/Swift",
+            // [EN] SwiftPM always builds the engine (the CYLAnimatedItem target). [CN] SwiftPM 总是编译引擎（CYLAnimatedItem target）。
+            swiftSettings: [.define("CYL_ANIMATION_ENGINE_AVAILABLE")]
         ),
         // Swift bridge that exposes Lottie 4.x to the Objective-C sources (`CYLCompatibleLOTAnimationView`).
         // SPM cannot mix Swift and Objective-C in one target, so it lives in its own target.
@@ -85,7 +87,7 @@ let package = Package(
         //      （各 `Swift/` 目录）组成一个更底层的 target，由 Objective-C target 依赖。
         .target(
             name: "CYLTabBarControllerSwift",
-            dependencies: ["CYLAnimatedItem", "CYLAnimatedItemSwift"],
+            dependencies: ["CYLAnimatedItem", "CYLAnimatedItemSwift", "CYLAnimatedItemViews"],
             path: "CYLTabBarController",
             exclude: ["CYLUtils/Swift/CYLAnimationURLOptions.swift"],
             sources: ["CYLUtils/Swift", "CYLBadgeView/Swift", "Swift", "CYLFlatDesignTabBar/CYLFlatDesignTabBar-ObjectiveC/Swift"],

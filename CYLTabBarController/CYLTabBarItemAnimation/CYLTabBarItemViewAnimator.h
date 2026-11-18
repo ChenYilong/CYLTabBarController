@@ -20,7 +20,14 @@
 
 #import <Foundation/Foundation.h>
 #import "CYLTabBarItemAnimator.h"
-#import "CYLTabBarItemAnimationPlayableView.h"
+/*!
+ * [EN] Forward declarations only: the protocols are Swift (`CYLTabBarItemAnimationPlayableView.h` imports the generated
+ *      Swift interface), and that interface imports this module's umbrella header, which needs this class declared first.
+ *      The header itself is imported at the end.
+ * [CN] 这里只做前向声明：这些协议是 Swift（`CYLTabBarItemAnimationPlayableView.h` 导入生成的 Swift 接口），而该接口会导入本模块的伞头文件，
+ *      需要先声明本类。头文件在末尾导入。
+ */
+@protocol CYLTabBarItemAnimationPlayableView, CYLTabBarItemAnimationViewProviding;
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -74,3 +81,5 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 NS_ASSUME_NONNULL_END
+
+#import "CYLTabBarItemAnimationPlayableView.h"
