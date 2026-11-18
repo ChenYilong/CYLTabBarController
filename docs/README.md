@@ -215,6 +215,8 @@ docs/
 │   ├── animated-item-android-demo-interaction.png
 │   ├── animated-item-android-demo-page.png
 │   ├── animated-item-android-demo.png
+│   ├── animated-item-android-flutter-rive-blank-at-rest.png
+│   ├── animated-item-android-flutter-rive-hybrid-composition.png
 │   ├── animated-item-android-gif-tabs.png
 │   ├── animated-item-android-tab-badges.png
 │   ├── animated-item-demo-ios26.3-en.png
