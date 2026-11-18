@@ -201,6 +201,7 @@ docs/
 │   ├── android-api37-20261118-rive-dark-mode-options.png
 │   ├── android-api37-20261118-rive-tint-at-0505042f.png
 │   ├── android-api37-20261118-rive-tint-title-and-dark-tint.png
+│   ├── android-api37-20261119-example-rive-live-uimode-switch.png
 │   ├── android-gif-decoder-frame-clock.png
 │   ├── android-gif-tint-option.png
 │   ├── android-liquid-glass-surface-000.png
@@ -233,12 +234,12 @@ docs/
 │   ├── animated-item-harmonyos-lottie-done.png
 │   ├── animated-item-harmonyos-lottie-playing.png
 │   ├── animated-item-harmonyos-lottie-tint-src-in.png
-│   ├── animated-item-harmonyos-static-icon-color.png
 │   ├── animated-item-harmonyos-retap-replay.png
 │   ├── animated-item-harmonyos-rive-icon-color-tint.png
 │   ├── animated-item-harmonyos-rive-retap-replay.png
 │   ├── animated-item-harmonyos-rive-tint-option.png
 │   ├── animated-item-harmonyos-spacing-before.png
+│   ├── animated-item-harmonyos-static-icon-color.png
 │   ├── animated-item-harmonyos-svga-retap-replay.png
 │   ├── animated-item-harmonyos-tabbar.jpeg
 │   ├── animated-item-harmonyos-tint-option.png
