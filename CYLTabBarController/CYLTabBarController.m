@@ -3782,6 +3782,17 @@ static UIImage *CYLImageScaledToSize(UIImage *image, CGSize size) {
 
 /// [EN] Installs, removes or shows the icon views of every tab with a provider.
 /// [CN] 安装、移除或显示所有设置了 provider 的 Tab 的图标视图。
+/*!
+ * [EN] Tells a tab button that is a CYLAnimatedItemView (FlatDesign) to keep its icon hidden, by key: Core does not import
+ *      the component. Nothing for UIKit's tab buttons.
+ * [CN] 告诉作为 CYLAnimatedItemView 的 Tab 按钮（扁平样式）保持图标隐藏，按 key 设置：Core 不导入该组件。UIKit 的 Tab 按钮不做处理。
+ */
+static void CYLSetAnimatedItemIconHidden(UIControl *tabButton, BOOL hidden) {
+    if ([tabButton respondsToSelector:NSSelectorFromString(@"setIconHidden:")]) {
+        [tabButton setValue:@(hidden) forKey:@"iconHidden"];
+    }
+}
+
 - (void)cyl_updateTabBarItemIconViews {
     for (UIViewController *viewController in [self cyl_tabBarItemIconViewProviders].keyEnumerator.allObjects) {
         [self cyl_updateTabBarItemIconViewsOfViewController:viewController];
@@ -3820,6 +3831,7 @@ static UIImage *CYLImageScaledToSize(UIImage *image, CGSize size) {
                 // [EN] The tab's own icon and its badge come back, unless the cover hides them.
                 // [CN] Tab 自身的图标及其角标恢复，除非被封面隐藏。
                 [self cyl_setTabImageView:tabButton.cyl_tabImageView lottieView:lottieView replacedByIconView:NO];
+                CYLSetAnimatedItemIconHidden(tabButton, NO);
                 if (!isCovered) {
                     tabButton.cyl_tabImageView.hidden = (lottieView != nil);
                     lottieView.hidden = NO;
@@ -3857,6 +3869,9 @@ static UIImage *CYLImageScaledToSize(UIImage *image, CGSize size) {
         // [CN] Tab 自身图标保持隐藏（切换 Tab 时系统可能重新显示它）；其角标仍显示在它上方。
         tabButton.cyl_tabImageView.hidden = YES;
         lottieView.hidden = YES;
+        // [EN] A CYLAnimatedItemView (FlatDesign) shows its icon again on its own updates (a selection change) unless told.
+        // [CN] CYLAnimatedItemView（扁平样式）在自身更新（切换选中）时会重新显示图标，除非被告知。
+        CYLSetAnimatedItemIconHidden(tabButton, YES);
         // [EN] Under a cover the badge stays as the cover left it (cleared).
         // [CN] 有封面时角标保持封面设置的状态（已清除）。
         [self cyl_setTabImageView:tabButton.cyl_tabImageView lottieView:lottieView replacedByIconView:!isCovered];

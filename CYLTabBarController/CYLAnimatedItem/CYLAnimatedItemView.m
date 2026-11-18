@@ -208,7 +208,11 @@ static BOOL CYLAnimatedItemLocalFileIsMissing(NSURL *URL) {
         icon = [self cyl_placeholderIfNeeded];
     }
     self.imageView.image = icon;
-    self.imageView.hidden = [self cyl_animationShows];
+    // [EN] `iconHidden`: another view is shown in the icon's place. [CN] `iconHidden`：另一个视图显示在图标的位置。
+    self.imageView.hidden = self.iconHidden || [self cyl_animationShows];
+    if (self.iconHidden) {
+        self.animationView.hidden = YES;
+    }
     // [EN] A new animation view or icon takes the current icon tint. [CN] 新的动画视图或图标使用当前的图标着色。
     UIColor *iconColor = self.currentItemStateAppearance.iconColor ?: self.cyl_iconTintColor;
     if (iconColor) {
@@ -424,6 +428,16 @@ static BOOL CYLAnimatedItemLocalFileIsMissing(NSURL *URL) {
 
 - (void)itemStateDidChange {
     // [EN] Subclass hook; nothing by default. [CN] 子类钩子；默认不做任何事。
+}
+
+#pragma mark - Icon visibility 图标可见性
+
+- (void)setIconHidden:(BOOL)iconHidden {
+    if (_iconHidden == iconHidden) {
+        return;
+    }
+    _iconHidden = iconHidden;
+    [self cyl_updateIcon];
 }
 
 #pragma mark - Item appearance 外观

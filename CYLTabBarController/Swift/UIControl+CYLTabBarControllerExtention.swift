@@ -681,6 +681,10 @@ extension UIControl {
             if let iconView = cyl_animatedItemBadgeHost(), iconView !== swappableImageView {
                 iconView.isHidden = show
             }
+            // [EN] The item keeps it hidden across its own icon updates (a selection change). [CN] item 在自身图标更新（切换选中）时保持隐藏。
+            if responds(to: NSSelectorFromString("setIconHidden:")) {
+                setValue(show, forKey: "iconHidden")
+            }
             if isTabButton {
                 cyl_tabLabel()?.isHidden = show
             }

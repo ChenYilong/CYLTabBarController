@@ -356,6 +356,14 @@ NS_SWIFT_NAME(CYLAnimatedItemViewDelegate)
  */
 - (void)updateItemAccessibility;
 
+#pragma mark - Icon visibility 图标可见性
+
+/*!
+ * [EN] Keeps the icon hidden (the image view, and the animation view while it is set), e.g. while another view is shown in its place: the tab bar sets it for a view shown instead of a tab's icon (#601, `-cyl_replaceTabImageViewWithNewView:…`). The item's own icon updates (selection, a new image, an animation that loads) respect it. NO by default.
+ * [CN] 让图标保持隐藏（图片视图，以及设置期间的动画视图），例如另一个视图显示在其位置时：TabBar 在用其他视图替换 Tab 图标时设置（#601、`-cyl_replaceTabImageViewWithNewView:…`）。item 自身的图标更新（选中、新图片、动画加载）都会遵守它。默认为 NO。
+ */
+@property (nonatomic, getter=isIconHidden) BOOL iconHidden;
+
 #pragma mark - Item appearance 外观
 
 /*!

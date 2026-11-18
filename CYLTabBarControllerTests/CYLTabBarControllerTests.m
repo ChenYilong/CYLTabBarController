@@ -697,6 +697,70 @@
     XCTAssertEqualObjects(newView.cyl_badgeBackgroundColor, UIColor.purpleColor, @"settings move too");
 }
 
+/*
+ * [EN] #601 on a FlatDesign button (a CYLAnimatedItemView, which sets its own image view's visibility on every icon update):
+ *      a view shown in place of the icon keeps the tab's own icon hidden across selection changes, and the icon comes back
+ *      when the provider is removed.
+ * [CN] 扁平样式按钮（CYLAnimatedItemView，每次更新图标时会自行设置图片视图是否可见）上的 #601：替换图标的视图在切换选中后仍让 Tab 自身图标保持隐藏，
+ *      移除 provider 后图标恢复。
+ */
+- (void)testFlatDesignIconViewProviderKeepsTheComponentIconHidden {
+    Class buttonClass = NSClassFromString(@"CYLFlatDesignTabBarButton");
+    if (!buttonClass) {
+        XCTSkip(@"FlatDesign is not compiled into this target");
+    }
+    UIImage *image = [[UIImage systemImageNamed:@"star"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+    CYLTabBarController *tabBarController = [CYLTabBarController tabBarControllerWithConfiguration:@{
+        CYLTabBarControllerContext : [NSUUID UUID].UUIDString,
+        CYLTabBarControllerStyleType : @"flatDesign",
+        CYLTabBarControllerTabBarItemsAttributes : @[
+            @{ CYLTabBarItemIdentifier : @"a", CYLTabBarItemTitle : @"A", CYLTabBarItemImage : image },
+            @{ CYLTabBarItemIdentifier : @"b", CYLTabBarItemTitle : @"B", CYLTabBarItemImage : image },
+        ],
+        CYLTabBarControllerPageResolver : ^UIViewController *(NSString *pageIdentifier, NSDictionary *attributes) {
+            return [[UIViewController alloc] init];
+        },
+    }];
+    UIWindow *window = [[UIWindow alloc] initWithFrame:CGRectMake(0, 0, 390, 844)];
+    window.rootViewController = tabBarController;
+    window.hidden = NO;
+    [tabBarController.view layoutIfNeeded];
+    UIControl *(^buttonB)(void) = ^UIControl * {
+        NSMutableArray<UIView *> *queue = [NSMutableArray arrayWithObject:tabBarController.view];
+        while (queue.count > 0) {
+            UIView *view = queue.firstObject;
+            [queue removeObjectAtIndex:0];
+            if ([view isKindOfClass:buttonClass] && [[view valueForKey:@"title"] isEqual:@"B"]) {
+                return (UIControl *)view;
+            }
+            [queue addObjectsFromArray:view.subviews];
+        }
+        return nil;
+    };
+    NSMutableArray<UIView *> *customs = [NSMutableArray array];
+    XCTAssertTrue([tabBarController setTabBarItemIconViewProvider:^UIView *(BOOL selected) {
+        UIView *custom = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 24, 24)];
+        custom.backgroundColor = selected ? UIColor.orangeColor : UIColor.grayColor;
+        [customs addObject:custom];
+        return custom;
+    } atIndex:1]);
+    [tabBarController.view layoutIfNeeded];
+    UIControl *button = buttonB();
+    XCTAssertNotNil(button);
+    UIImageView *imageView = [button valueForKey:@"imageView"];
+    XCTAssertTrue(imageView.hidden, @"the tab's own icon is hidden under the view shown in its place");
+    tabBarController.selectedIndex = 1;
+    [tabBarController.view layoutIfNeeded];
+    tabBarController.selectedIndex = 0;
+    [tabBarController.view layoutIfNeeded];
+    XCTAssertTrue(imageView.hidden, @"still hidden after selection changes (the component updates its icon then)");
+    XCTAssertTrue([[customs filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"hidden == NO"]] count] >= 1,
+                  @"a view for the current look shows");
+    [tabBarController setTabBarItemIconViewProvider:nil atIndex:1];
+    [tabBarController.view layoutIfNeeded];
+    XCTAssertFalse(((UIImageView *)[buttonB() valueForKey:@"imageView"]).hidden, @"the tab's own icon comes back");
+}
+
 - (void)testFlatDesignButtonsTakeTheBarAppearanceThroughTheComponent {
     Class buttonClass = NSClassFromString(@"CYLFlatDesignTabBarButton");
     if (!buttonClass) {
