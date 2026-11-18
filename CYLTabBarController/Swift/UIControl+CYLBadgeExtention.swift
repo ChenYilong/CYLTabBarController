@@ -296,7 +296,13 @@ extension UIControl {
         let tabImageView = cyl_tabImageView()
         let animationView = cyl_tabBarItemAnimationView()
         var actualBadgeSuperView: UIView?
-        if let animationView, !animationView.cyl_isInvisiable() || animationView.cyl_badgeHostReplacedByIconView {
+        // [EN] An animated item (`CYLAnimatedItemView`, a FlatDesign tab button included): its animation view of any format
+        //      while it shows, else its image; the Lottie / image lookup below is for UIKit's tab buttons.
+        // [CN] 动效 item（`CYLAnimatedItemView`，包括扁平样式 Tab 按钮）：其任意格式的动画视图（显示时），否则为其图片；下面的 Lottie / 图片查找用于
+        //      UIKit 的 Tab 按钮。
+        if let iconHost = cyl_animatedItemBadgeHost() {
+            actualBadgeSuperView = iconHost
+        } else if let animationView, !animationView.cyl_isInvisiable() || animationView.cyl_badgeHostReplacedByIconView {
             actualBadgeSuperView = animationView
         } else if let tabImageView, !tabImageView.cyl_isInvisiable() || tabImageView.cyl_badgeHostReplacedByIconView {
             actualBadgeSuperView = tabImageView

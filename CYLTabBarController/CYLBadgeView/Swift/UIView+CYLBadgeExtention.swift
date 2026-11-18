@@ -524,7 +524,33 @@ extension UIView {
         //      position; make sure a view's badge is shown after that.
         // [CN] 自动布局的 cell 需要调用 `-layoutIfNeeded` frame 才有值，角标才能找到对应位置；请确保在此之后显示角标。
         layoutIfNeeded()
+        // [EN] An animated item (`CYLAnimatedItemView`): the badge goes on its icon. [CN] 动效 item（`CYLAnimatedItemView`）：角标放在其图标上。
+        if let iconHost = cyl_animatedItemBadgeHost() {
+            iconHost.clipsToBounds = false
+            return iconHost
+        }
         return self
+    }
+
+    /**
+     * [EN] The icon of an animated item (`CYLAnimatedItemView`, the component every animation format plays in, a FlatDesign
+     *      tab button included): its `animationView` while it shows (any engine: GIF, Lottie, PAG, Rive, SVGA), else its
+     *      `imageView` (the static image or the placeholder). Nil for any other view. The component is found by class name,
+     *      so the badge subspec does not depend on it.
+     * [CN] 动效 item（`CYLAnimatedItemView`，所有动效格式播放所在的组件，包括扁平样式 Tab 按钮）的图标：其 `animationView` 显示时为它（任何引擎：
+     *      GIF、Lottie、PAG、Rive、SVGA），否则为其 `imageView`（静态图片或占位图）。其他视图返回 nil。按类名查找组件，因此角标子库不依赖它。
+     */
+    @objc(cyl_animatedItemBadgeHost)
+    public func cyl_animatedItemBadgeHost() -> UIView? {
+        guard let componentClass = NSClassFromString("CYLAnimatedItemView"), isKind(of: componentClass) else {
+            return nil
+        }
+        let animationView = responds(to: NSSelectorFromString("animationView")) ? value(forKey: "animationView") as? UIView : nil
+        let imageView = responds(to: NSSelectorFromString("imageView")) ? value(forKey: "imageView") as? UIView : nil
+        if let animationView, animationView.superview != nil, !animationView.isHidden, animationView.alpha > 0.01 {
+            return animationView
+        }
+        return imageView ?? animationView
     }
 
     @objc(cyl_performSelector:)

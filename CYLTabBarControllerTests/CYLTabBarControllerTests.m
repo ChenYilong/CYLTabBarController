@@ -628,6 +628,46 @@
  * [EN] The FlatDesign bar's standardAppearance reaches its buttons through the component's itemAppearance.
  * [CN] 扁平样式 TabBar 的 standardAppearance 通过组件的 itemAppearance 到达其按钮。
  */
+/*
+ * [EN] The badge categories find an animated item's icon (docs/Animated-Item.md): a badge on a CYLAnimatedItemView goes on
+ *      its icon (the image here, no animation), not on the whole control.
+ * [CN] 角标分类方法能找到动效 item 的图标：CYLAnimatedItemView 上的角标放在其图标上（这里是图片，没有动画），而不是整个控件。
+ */
+- (void)testABadgeOnAnAnimatedItemGoesOnItsIcon {
+    Class componentClass = NSClassFromString(@"CYLAnimatedItemView");
+    if (!componentClass) {
+        XCTSkip(@"The component is not compiled into this target");
+    }
+    UIControl *item = [[componentClass alloc] initWithFrame:CGRectMake(0, 0, 80, 60)];
+    [item setValue:[UIImage systemImageNamed:@"star"] forKey:@"image"];
+    UIWindow *window = [[UIWindow alloc] initWithFrame:CGRectMake(0, 0, 200, 200)];
+    [window addSubview:item];
+    window.hidden = NO;
+    [item layoutIfNeeded];
+    UIImageView *imageView = [item valueForKey:@"imageView"];
+    XCTAssertEqual([item cyl_animatedItemBadgeHost], imageView, @"the icon hosts the badge");
+    UIView *nonItem = [[UIView alloc] init];
+    XCTAssertNil([nonItem cyl_animatedItemBadgeHost], @"other views are not animated items");
+    [item cyl_showBadgeValue:@"3" animationType:CYLBadgeAnimationTypeNone];
+    // [EN] A control that is not a tab button puts its badge on an anchor aligned to the icon, maybe in its superview.
+    // [CN] 非 Tab 按钮的控件把角标放在与图标对齐的锚点上，锚点可能在其父视图中。
+    UIView *badge = nil;
+    NSMutableArray<UIView *> *queue = [NSMutableArray arrayWithObject:window];
+    while (queue.count && !badge) {
+        UIView *view = queue.firstObject;
+        [queue removeObjectAtIndex:0];
+        if ([view isKindOfClass:[UILabel class]] && [((UILabel *)view).text isEqualToString:@"3"]) {
+            badge = view;
+        }
+        [queue addObjectsFromArray:view.subviews];
+    }
+    XCTAssertNotNil(badge, @"the badge is shown");
+    CGRect inItem = [badge convertRect:badge.bounds toView:item];
+    CGRect icon = [imageView convertRect:imageView.bounds toView:item];
+    XCTAssertTrue(CGRectIntersectsRect(CGRectInset(inItem, -4, -4), icon), @"the badge sits on the icon: %@ vs %@",
+                  NSStringFromCGRect(inItem), NSStringFromCGRect(icon));
+}
+
 - (void)testFlatDesignButtonsTakeTheBarAppearanceThroughTheComponent {
     Class buttonClass = NSClassFromString(@"CYLFlatDesignTabBarButton");
     if (!buttonClass) {

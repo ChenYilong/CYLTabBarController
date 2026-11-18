@@ -61,6 +61,10 @@ enum CYLTabBarItemBadgeSupport {
      * [CN] 没有 Core 时：角标所在的 Tab 图标；没有时为按钮本身。
      */
     static func iconView(in view: UIView) -> UIView {
+        // [EN] An animated item tab button: its animation view or image (any format). [CN] 动效 item Tab 按钮：其动画视图或图片（任何格式）。
+        if let iconHost = view.cyl_animatedItemBadgeHost() {
+            return iconHost
+        }
         for subview in view.subviews {
             if subview is UIImageView && !subview.isHidden && subview.frame.size.width > 0 {
                 return subview

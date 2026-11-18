@@ -279,6 +279,14 @@ extension UIBarButtonItem {
      */
     @objc(cyl_getActualBadgeSuperView)
     dynamic func cyl_getActualBadgeSuperView() -> Any? {
+        // [EN] A custom view that is, or holds, an animated item (`CYLAnimatedItemView`): the badge goes on its icon.
+        // [CN] 自定义视图是或包含动效 item（`CYLAnimatedItemView`）：角标放在其图标上。
+        if let custom = customView,
+           let iconHost = custom.cyl_animatedItemBadgeHost() ?? custom.subviews.lazy.compactMap({ $0.cyl_animatedItemBadgeHost() }).first {
+            iconHost.clipsToBounds = false
+            iconHost.layoutIfNeeded()
+            return iconHost
+        }
         let contentView = cyl_view()?.cyl_findBarButtonContentView()
         var actualBadgeSuperView: UIView? = contentView
         if let button = contentView as? UIButton {
