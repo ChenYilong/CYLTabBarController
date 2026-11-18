@@ -5236,28 +5236,8 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
     return YES;
 }
 
-- (void)tabBarController:(CYLTabBarController *)tabBarController beginShowPlatterLiquidLensViewForControl:(UIControl *)control {
-    if (![CYLConstants isLiquidGlassActive] || ![tabBarController.tabBar isKindOfClass:[CYLTabBar class]]) {
-        return;
-    }
-    SEL action = @selector(tabBarController:shouldShowPlatterLiquidLensViewForControl:);
-    BOOL shouldShowPlatterLiquidLensView = YES;
-    if ([self.delegate respondsToSelector:action]) {
-        CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS
-        (
-         shouldShowPlatterLiquidLensView = [self.delegate performSelector:action withObject:tabBarController withObject:control];
-         )
-    }
-    if (shouldShowPlatterLiquidLensView) {
-        [tabBarController.tabBar.cyl_platterLiquidLensViewContentView cyl_setHidden:NO];
-        tabBarController.tabBar.liquidGlassContinuousGestureRecognizer.enabled = YES;
-        tabBarController.tabBar.liquidGlassLongGestureRecognizer.enabled = YES;
-    } else {
-        [tabBarController.tabBar.cyl_platterLiquidLensViewContentView cyl_setHidden:YES];
-        tabBarController.tabBar.liquidGlassContinuousGestureRecognizer.enabled = NO;
-        tabBarController.tabBar.liquidGlassLongGestureRecognizer.enabled = NO;
-    }
-}
+// [EN] `-tabBarController:beginShowPlatterLiquidLensViewForControl:` is Swift (Swift/CYLTabBarController+CYLInteraction.swift,
+//      docs/Swift-Migration.md, step 59). [CN] 已迁移到 Swift（第 59 步）。
 
 - (BOOL)isLottieEnabled {
     // [EN] FIX: placeholder count mismatch — without the slot's entry: it is the first one when the plus button is the first tab.
@@ -5266,36 +5246,8 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
                                  tabBarItemsAttributes:[self cyl_tabBarItemsAttributesByRemovingPlusSlot:_tabBarItemsAttributes]];
 }
 
-/*!
- * [EN] The control to report for `control`: the plus button for the system tab button of its child view controller (the
- *      layer under the plus button), `control` otherwise.
- * [CN] 上报给代理的控件：PlusButton 子控制器的系统 Tab 按钮（PlusButton 下方的图层）换成 PlusButton 本身，其他控件不变。
- */
-- (nullable UIControl *)cyl_reportedControlForControl:(nullable UIControl *)control {
-    // [EN] Guards: only with a plus button, and only when it has a child view controller (the second layer).
-    // [CN] 仅在有 PlusButton，且其有子控制器（第二个图层）时处理。
-    if (!control || ![self hasPlusButton] || ![self hasPlusChildViewController]) {
-        return control;
-    }
-    UIControl *plusButton = [self cyl_contextPlusButton];
-    if (!plusButton || control == plusButton || [control cyl_isPlusButton]) {
-        return control;
-    }
-    UIViewController *plusChildViewController = [self cyl_contextPlusChildViewController];
-    BOOL isPlusChildTabButton = (control == plusChildViewController.cyl_tabButton) ||
-        (control == [plusChildViewController cyl_getViewControllerInsteadOfNavigationController].cyl_tabButton);
-    return isPlusChildTabButton ? plusButton : control;
-}
-
-/// [EN] Remembers `control` until the end of the current run loop turn.
-/// [CN] 记住 `control`，直到当前 runloop 结束。
-- (void)cyl_markControlReportedInCurrentRunLoop:(UIControl *)control {
-    self.cyl_controlReportedInCurrentRunLoop = control;
-    __weak __typeof(self) weakSelf = self;
-    dispatch_async(dispatch_get_main_queue(), ^{
-        weakSelf.cyl_controlReportedInCurrentRunLoop = nil;
-    });
-}
+// [EN] `-cyl_reportedControlForControl:` and `-cyl_markControlReportedInCurrentRunLoop:` are Swift
+//      (Swift/CYLTabBarController+CYLInteraction.swift, docs/Swift-Migration.md, step 59). [CN] 已迁移到 Swift（第 59 步）。
 
 /*!
  * [EN] Everything a reported tab tap does, the same in every style (`-didSelectControl:` for the classic style and Liquid

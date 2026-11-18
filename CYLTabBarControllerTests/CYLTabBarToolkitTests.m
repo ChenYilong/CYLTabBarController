@@ -9,6 +9,17 @@
 #import <CYLTabBarController/CYLTabBarController.h>
 #import <CYLTabBarController/CYLTabBar.h>
 
+
+/// [EN] A delegate that refuses the Liquid Glass lens. [CN] 拒绝液态玻璃放大镜的代理。
+@interface CYLLensRefusingDelegate : NSObject <CYLTabBarControllerDelegate>
+@end
+
+@implementation CYLLensRefusingDelegate
+- (BOOL)tabBarController:(CYLTabBarController *)tabBarController shouldShowPlatterLiquidLensViewForControl:(UIControl *)control {
+    return NO;
+}
+@end
+
 @interface CYLTabBarToolkitTests : XCTestCase
 @end
 
@@ -297,6 +308,45 @@
     // [EN] Reset: the copies go away. [CN] 重置：副本被移除。
     tabBarController.titlePositionAdjustment = UIOffsetZero;
     XCTAssertNil(second.tabBarItem.standardAppearance);
+}
+
+#pragma mark - Reported control and the lens (Swift since step 59)
+
+/// [EN] Without a plus button, a control reports itself; nil stays nil. [CN] 没有 PlusButton 时控件上报自身；nil 仍为 nil。
+- (void)testReportedControlWithoutPlusButtonIsTheControl {
+    CYLTabBarController *tabBarController = [self newTabBarController];
+    SEL reported = NSSelectorFromString(@"cyl_reportedControlForControl:");
+    XCTAssertTrue([tabBarController respondsToSelector:reported]);
+    UIControl *control = [UIControl new];
+    UIControl *(*call)(id, SEL, id) = (UIControl *(*)(id, SEL, id))[tabBarController methodForSelector:reported];
+    XCTAssertEqual(call(tabBarController, reported, control), control);
+    XCTAssertNil(call(tabBarController, reported, nil));
+}
+
+/// [EN] Liquid Glass: a delegate that refuses the lens turns its gestures off; without one they stay on.
+/// [CN] 液态玻璃：拒绝放大镜的代理会关闭其手势；没有代理时手势保持开启。
+- (void)testBeginShowLensFollowsTheDelegate {
+    CYLTabBarController *tabBarController = [self newTabBarController];
+    if (![CYLConstants isLiquidGlassActive] || ![tabBarController.tabBar isKindOfClass:[CYLTabBar class]]) {
+        return;
+    }
+    SEL begin = NSSelectorFromString(@"tabBarController:beginShowPlatterLiquidLensViewForControl:");
+    XCTAssertTrue([tabBarController respondsToSelector:begin]);
+    void (*call)(id, SEL, id, id) = (void (*)(id, SEL, id, id))[tabBarController methodForSelector:begin];
+    CYLTabBar *tabBar = tabBarController.tabBar;
+    UIControl *control = [UIControl new];
+    CYLLensRefusingDelegate *delegate = [CYLLensRefusingDelegate new];
+    tabBarController.delegate = delegate;
+    call(tabBarController, begin, tabBarController, control);
+    XCTAssertFalse(tabBar.liquidGlassContinuousGestureRecognizer.enabled);
+    // [EN] The long press recognizer exists only once the tab bar is in a window. [CN] 长按手势只在 TabBar 进入窗口后存在。
+    XCTAssertFalse(tabBar.liquidGlassLongGestureRecognizer.enabled);
+    tabBarController.delegate = nil;
+    call(tabBarController, begin, tabBarController, control);
+    XCTAssertTrue(tabBar.liquidGlassContinuousGestureRecognizer.enabled);
+    if (tabBar.liquidGlassLongGestureRecognizer) {
+        XCTAssertTrue(tabBar.liquidGlassLongGestureRecognizer.enabled);
+    }
 }
 
 @end

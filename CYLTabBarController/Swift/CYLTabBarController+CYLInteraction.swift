@@ -587,7 +587,7 @@ extension CYLTabBarController {
         if control.cyl_isPlatterSelectedControl() {
             control = control.cyl_platterNormal()
         }
-        return cylPrivate.cylReportedControl(for: control) ?? control
+        return cylReportedControl(for: control) ?? control
     }
 
     /**
@@ -688,7 +688,7 @@ extension CYLTabBarController {
         if found.cyl_isPlatterSelectedControl() {
             found = found.cyl_platterNormal()
         }
-        return cylPrivate.cylReportedControl(for: found) ?? found
+        return cylReportedControl(for: found) ?? found
     }
 
     /**
@@ -1074,5 +1074,67 @@ extension UIViewController {
         @objc(cyl_setTabButtonAnimation:) set {
             objc_setAssociatedObject(self, CYLInteractionKeys.tabButtonAnimation, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
         }
+    }
+}
+
+// MARK: - Reported control and the Liquid Glass lens (docs/Swift-Migration.md, step 59)
+
+/**
+ * [EN] The control reported to `tabBarController:didSelectControl:` and the start of the Liquid Glass lens. Translated
+ *      from Objective-C (docs/Swift-Migration.md, step 59); `CYLTabBarController+CYLPrivate.h` declares the two private
+ *      methods, as CYLTabBarController.m calls them.
+ * [CN] 上报给 `tabBarController:didSelectControl:` 的控件，以及液态玻璃放大镜的显示开始。已从 Objective-C 翻译
+ *      （docs/Swift-Migration.md，第 59 步）；`CYLTabBarController+CYLPrivate.h` 声明这两个私有方法，因为 CYLTabBarController.m 会调用。
+ */
+extension CYLTabBarController {
+
+    /**
+     * [EN] The control to report for `control`: the plus button for the system tab button of its child view controller
+     *      (the layer under the plus button), `control` otherwise.
+     * [CN] 上报给代理的控件：PlusButton 子控制器的系统 Tab 按钮（PlusButton 下方的图层）换成 PlusButton 本身，其他控件不变。
+     */
+    @objc(cyl_reportedControlForControl:)
+    func cylReportedControl(for control: UIControl?) -> UIControl? {
+        // [EN] Guards: only with a plus button, and only when it has a child view controller (the second layer).
+        // [CN] 仅在有 PlusButton，且其有子控制器（第二个图层）时处理。
+        guard let control, hasPlusButton(), hasPlusChildViewController(), let plusButton = cylPrivate.cylContextPlusButton(),
+              control !== plusButton, !control.cyl_isPlusButton() else {
+            return control
+        }
+        let plusChildViewController = cylPrivate.cylContextPlusChildViewController()
+        let isPlusChildTabButton = control === plusChildViewController?.cyl_tabButton ||
+            control === plusChildViewController?.cyl_getViewControllerInsteadOfNavigation().cyl_tabButton
+        return isPlusChildTabButton ? plusButton : control
+    }
+
+    /**
+     * [EN] Remembers `control` until the end of the current run loop turn (one report per tap).
+     * [CN] 记住 `control`，直到当前 runloop 结束（每次点击只上报一次）。
+     */
+    @objc(cyl_markControlReportedInCurrentRunLoop:)
+    func cylMarkControlReportedInCurrentRunLoop(_ control: UIControl) {
+        cylPrivate.cylSetControlReportedInCurrentRunLoop(control)
+        DispatchQueue.main.async { [weak self] in
+            self?.cylPrivate.cylSetControlReportedInCurrentRunLoop(nil)
+        }
+    }
+
+    /**
+     * [EN] `CYLTabBarControllerDelegate`: shows or hides the Liquid Glass lens (and its gestures) for `control`, as the
+     *      delegate's `-tabBarController:shouldShowPlatterLiquidLensViewForControl:` decides (YES without one).
+     * [CN] `CYLTabBarControllerDelegate`：按代理的 `-tabBarController:shouldShowPlatterLiquidLensViewForControl:` 显示或隐藏 `control`
+     *      的液态玻璃放大镜（及其手势）（没有实现时为 YES）。
+     */
+    @objc(tabBarController:beginShowPlatterLiquidLensViewForControl:)
+    func cylTabBarController(_ tabBarController: CYLTabBarController, beginShowPlatterLiquidLensViewFor control: UIControl) {
+        let tabBar: UITabBar = tabBarController.tabBar
+        guard CYLConstants.isLiquidGlassActive(), let tabBar = tabBar as? CYLTabBar else {
+            return
+        }
+        let delegate = (self as UITabBarController).delegate as? CYLTabBarControllerDelegate
+        let shows = delegate?.tabBarController?(tabBarController, shouldShowPlatterLiquidLensViewFor: control) ?? true
+        tabBar.cyl_platterLiquidLensViewContentView()?.cyl_setHidden(!shows)
+        tabBar.liquidGlassContinuousGestureRecognizer.isEnabled = shows
+        tabBar.liquidGlassLongGestureRecognizer.isEnabled = shows
     }
 }
