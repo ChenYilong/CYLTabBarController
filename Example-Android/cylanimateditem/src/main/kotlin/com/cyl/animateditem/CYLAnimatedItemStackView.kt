@@ -65,7 +65,9 @@ open class CYLAnimatedItemStackView @JvmOverloads constructor(
     private var downX = 0f
     private var downY = 0f
 
-    /** [EN] One item and its action. [CN] 一个条目及其动作。 */
+    /**
+     * [EN] One item and its action. [CN] 一个条目及其动作。
+     */
     private class Entry(val view: CYLAnimatedItemView, var action: String?)
 
     /**
@@ -302,7 +304,9 @@ open class CYLAnimatedItemStackView @JvmOverloads constructor(
         TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, value, resources.displayMetrics).toInt()
 
     companion object {
-        /** [EN] The default space between items and around them, in dp. [CN] 条目之间及四周的默认间距，单位 dp。 */
+        /**
+         * [EN] The default space between items and around them, in dp. [CN] 条目之间及四周的默认间距，单位 dp。
+         */
         const val DEFAULT_SPACING_DP = 16f
     }
 }
