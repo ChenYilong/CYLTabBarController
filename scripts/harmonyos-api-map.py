@@ -49,33 +49,123 @@ def comment_of(path, name):
     return ''
 
 
-# [EN] Public symbols of Swift-only files, which the header inventory does not see: (owner, name, kind, comment).
-# [CN] 只有 Swift 实现的文件中的公开符号，头文件清单看不到它们：（所属类型、名称、种类、注释）。
-SWIFT_HEADER = 'CYLTabBarController/CYLAnimatedItem/Swift/CYLAnimatedItemStackView.swift'
-SWIFT_ROWS = [
-    ('', 'CYLAnimatedItemStackView', 'class', 'A centered vertical stack whose every element is a `CYLAnimatedItemView`: the reserved first item, more items with a spacing before each, an action per item run by handlers, a background action, VoiceOver grouping, titles wrapped to the width.'),
-    ('CYLAnimatedItemStackView', 'init(itemViews:actions:)', 'method', 'A stack of item views (each with no action) and the handlers of `actions`.'),
-    ('CYLAnimatedItemStackView', 'itemViews', 'property', 'Every item, top to bottom.'),
-    ('CYLAnimatedItemStackView', 'firstItemView', 'property', 'The reserved first item (the main icon and title); nil while the stack is empty.'),
-    ('CYLAnimatedItemStackView', 'contentMargin', 'property', 'The smallest space between the items and the edges of the view (16 by default).'),
-    ('CYLAnimatedItemStackView', 'backgroundAction', 'property', 'The action of a tap anywhere outside a tappable item; nil turns it off.'),
-    ('CYLAnimatedItemStackView', 'append(_:action:spacingBefore:)', 'method', 'Appends an item under the last one; an item without an action takes no touches.'),
-    ('CYLAnimatedItemStackView', 'appendItem(title:image:animationURL:action:spacingBefore:)', 'method', 'Makes, appends and returns an item with the icon above the title.'),
-    ('CYLAnimatedItemStackView', 'remove(_:)', 'method', 'Removes an item from the stack.'),
-    ('CYLAnimatedItemStackView', 'setAction(_:for:)', 'method', 'Sets or, with nil, removes the action of an item.'),
-    ('CYLAnimatedItemStackView', 'action(for:)', 'method', 'The action of an item.'),
-    ('CYLAnimatedItemStackView', 'itemView(for:)', 'method', 'The first item whose tap performs the action.'),
-    ('CYLAnimatedItemStackView', 'setHandler(_:for:)', 'method', 'Sets or, with nil, removes the handler of an action.'),
-    ('CYLAnimatedItemStackView', 'performAction(_:)', 'method', 'Runs the handler of an action; false when it has none.'),
+# [EN] Swift-only sources of the iOS library (docs/Swift-Migration.md): their Objective-C API is not in any header (a
+#      compatibility header such as CYLAnimatedItemView.h holds no declarations), so it is read from the Swift file.
+# [CN] 只有 Swift 实现的 iOS 源文件（docs/Swift-Migration.md）：它们的 Objective-C API 不在任何头文件中（CYLAnimatedItemView.h 等兼容头文件
+#      没有声明），因此从 Swift 文件读取。
+SWIFT_SOURCES = [
+    'CYLTabBarController/CYLAnimatedItem/Swift/CYLAnimatedItemView.swift',
+    'CYLTabBarController/CYLAnimatedItem/Swift/CYLAnimatedItemStackView.swift',
 ]
+SWIFT_ADOPTED = {'gestureRecognizer'}
+SWIFT_TYPE = re.compile(r'^(?:@objc(?:\((\w+)\))?\s+)?(?:@objcMembers\s+)?(?:public|open)\s+(?:final\s+)?(enum|protocol|class)\s+(\w+)')
+SWIFT_OBJC_NAME = re.compile(r'@objc\(([\w:]+)\)')
+
+
+def swift_english(doc):
+    """[EN] The English part of a Swift documentation comment. [CN] Swift 文档注释的英文部分。"""
+    text = re.sub(r'^\s*(/\*\*|\*/|///?|\*)', '', doc, flags=re.M)
+    english = re.search(r'\[EN\]([\s\S]*?)(?=\[CN\]|$)', text)
+    body = english.group(1) if english else text
+    return ' '.join(body.split()).replace('|', '\\|')
+
+
+def swift_selector(name, params):
+    """[EN] The Objective-C selector Swift makes for `func name(params)`. [CN] Swift 为 `func name(params)` 生成的 Objective-C 选择器。"""
+    labels = []
+    depth = 0
+    part = ''
+    for char in params:
+        depth += char in '([<'
+        depth -= char in ')]>'
+        if char == ',' and depth == 0:
+            labels.append(part)
+            part = ''
+        else:
+            part += char
+    if part.strip():
+        labels.append(part)
+    labels = [label.split(':')[0].split() for label in labels]
+    if not labels:
+        return name
+    first = labels[0][0]
+    selector = name + (':' if first == '_' else 'With' + first[0].upper() + first[1:] + ':')
+    return selector + ''.join(label[0] + ':' for label in labels[1:])
 
 
 def swift_rows():
+    """[EN] The public Objective-C symbols of SWIFT_SOURCES, keyed as the header inventory keys them. [CN] SWIFT_SOURCES 的公开
+    Objective-C 符号，键与头文件清单相同。"""
     out = []
-    for owner, name, kind, comment in SWIFT_ROWS:
-        key = '%s %s' % (owner, name) if owner else name
-        out.append({'header': SWIFT_HEADER, 'owner': owner, 'name': name, 'kind': kind, 'key': key, 'comment': comment})
-    return out
+    for path in SWIFT_SOURCES:
+        header = path
+        depth = 0
+        owner = None
+        owner_kind = ''
+        members = False
+        doc = ''
+        in_doc = False
+        attributes = ''
+        for raw in open(os.path.join(ROOT, path), encoding='utf-8').read().split('\n'):
+            line = raw.strip()
+            if in_doc:
+                doc += '\n' + line
+                in_doc = '*/' not in line
+                continue
+            if line.startswith('/**'):
+                doc, in_doc = line, '*/' not in line
+                continue
+            if line.startswith('///'):
+                doc += '\n' + line
+                continue
+            if line.startswith('//') or not line:
+                continue
+            if depth == 0:
+                match = SWIFT_TYPE.match(attributes + ' ' + line if attributes else line)
+                if match and ('@objc' in attributes or '@objc' in line):
+                    owner, owner_kind = match.group(3), match.group(2)
+                    members = '@objcMembers' in attributes + line or owner_kind == 'protocol'
+                    out.append({'header': header, 'kind': owner_kind, 'owner': '', 'name': owner, 'key': owner,
+                                'comment': swift_english(doc)})
+                elif depth == 0 and not line.startswith('@'):
+                    owner = None
+            elif depth == 1 and owner is not None:
+                text = (attributes + ' ' + line).strip()
+                declaration = re.search(r'\b(var|let|func)\s+(\w+)', text)
+                # [EN] An initializer with an Objective-C name (`@objc(initWith…:)`) is a method of the API.
+                # [CN] 带 Objective-C 名称（`@objc(initWith…:)`）的初始化方法属于 API。
+                initializer = re.search(r'@objc\((init\w*:[\w:]*)\)', attributes) if re.search(r'\binit\s*\(', line) else None
+                if initializer and re.search(r'\b(public|open)\b', text):
+                    out.append({'header': header, 'kind': 'method', 'owner': owner, 'name': '-' + initializer.group(1),
+                                'key': '%s -%s' % (owner, initializer.group(1)), 'comment': swift_english(doc)})
+                public = owner_kind == 'protocol' or re.search(r'\b(public|open)\b', text)
+                # [EN] `private(set)` is still public to read; UIKit delegate methods the class adopts are not its own API.
+                # [CN] `private(set)` 仍可公开读取；类所采用的 UIKit 代理方法不属于它自己的 API。
+                excluded = (re.search(r'\b(private|fileprivate|override|internal)\b(?!\(set\))', text) or '@nonobjc' in text
+                            or (declaration is not None and declaration.group(2) in SWIFT_ADOPTED))
+                exposed = members or '@objc' in text
+                if declaration and public and not excluded and exposed and not line.startswith('@objc(') or (
+                        declaration and public and not excluded and exposed and re.match(r'@objc\([\w:]+\)\s+\S', line)):
+                    objc = SWIFT_OBJC_NAME.search(text[:text.find(declaration.group(0))])
+                    if declaration.group(1) == 'func':
+                        params = text[text.find('(', declaration.end()) + 1:]
+                        params = params[:params.find(')')] if ')' in params else params
+                        name = objc.group(1) if objc else swift_selector(declaration.group(2), params)
+                        name = ('+' if re.search(r'\b(class|static)\s+func', text) else '-') + name
+                        kind = 'method'
+                    else:
+                        name = objc.group(1) if objc else declaration.group(2)
+                        kind = 'property'
+                    out.append({'header': header, 'kind': kind, 'owner': owner, 'name': name, 'key': '%s %s' % (owner, name),
+                                'comment': swift_english(doc)})
+            attributes = (attributes + ' ' + line).strip() if line.startswith('@') and not re.search(
+                r'\b(var|let|func|class|enum|protocol|struct)\s', line) else ''
+            depth += raw.count('{') - raw.count('}')
+            # [EN] An attribute line keeps the comment above it for the declaration below. [CN] 属性行保留其上方的注释，留给下面的声明。
+            if not attributes:
+                doc = ''
+    seen = set()
+    return [row for row in out if not (row['key'] in seen or seen.add(row['key']))]
 
 
 def rows():
