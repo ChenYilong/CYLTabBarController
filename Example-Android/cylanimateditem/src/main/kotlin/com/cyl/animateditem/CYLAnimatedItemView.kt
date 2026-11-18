@@ -576,7 +576,9 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
 
     override fun onInitializeAccessibilityNodeInfo(info: AccessibilityNodeInfo) {
         super.onInitializeAccessibilityNodeInfo(info)
-        info.className = Button::class.java.name
+        // [EN] A button while it takes taps; text otherwise (an item a container made not clickable, e.g. a hint in
+        //      `CYLAnimatedItemStackView`). [CN] 接收点击时为按钮；否则为文字（容器设为不可点击的条目，例如 `CYLAnimatedItemStackView` 中的提示）。
+        info.className = if (isClickable) Button::class.java.name else android.widget.TextView::class.java.name
         info.isSelected = isSelected
     }
 
