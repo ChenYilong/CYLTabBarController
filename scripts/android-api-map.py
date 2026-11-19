@@ -36,7 +36,7 @@ STATUSES = ('done', 'partial', 'planned', 'n/a')
 # [EN] Private headers (podspec private_header_files, and the demo-only settings list). [CN] 私有头文件（podspec 的 private_header_files，以及仅用于演示的设置列表）。
 PRIVATE = {
     'CYLTabBarController/UIControl+CYLTabBarItemAnimation.h', 'CYLTabBarController/CYLTabBarItemAnimationService.h',
-    'CYLTabBarController/CYLTabBarController+CYLPrivate.h', 'CYLTabBarController/CYLUtils/CYLComponents/CYLTheme/CYLThemePrivate.h',
+    'CYLTabBarController/CYLUtils/CYLComponents/CYLTheme/CYLThemePrivate.h',
     'CYLTabBarController/CYLBadgeView/CYLBadgeViewDefines.h', 'CYLTabBarController/CYLTabBarItemAnimation/CYLTabBarItemAnimationEngine.h',
 }
 
