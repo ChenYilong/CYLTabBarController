@@ -27,12 +27,12 @@ extension CYLTabBarController {
      *      扁平化模式下无效。
      */
     @objc(updateSelectionStatusIfNeededForTabBarController:shouldSelectViewController:)
-    func cylUpdateSelectionStatusIfNeeded(for tabBarController: UITabBarController?, shouldSelect viewController: UIViewController) {
+    open func updateSelectionStatusIfNeeded(for tabBarController: UITabBarController?, shouldSelect viewController: UIViewController) {
         guard tabBarStyleType != .flatDesign else {
             return
         }
         let should = viewController !== tabBarController?.selectedViewController
-        cylUpdateSelectionStatusIfNeeded(for: tabBarController, shouldSelect: viewController, shouldSelect: should)
+        updateSelectionStatusIfNeeded(for: tabBarController, shouldSelect: viewController, shouldSelect: should)
         // [EN] Guard: only CYLTabBar has the plus button label check; `tabBarController` can have a system tab bar.
         // [CN] 只有 CYLTabBar 才有 PlusButton 标签的判断；`tabBarController` 的 TabBar 可能是系统 TabBar。
         guard let tabBar = tabBarController?.tabBar as? CYLTabBar, tabBar.cylShouldUpdateHiddenStatueForPlusButtonLabel() else {
@@ -55,8 +55,7 @@ extension CYLTabBarController {
      *      Tab 动画。
      */
     @objc(updateSelectionStatusIfNeededForTabBarController:shouldSelectViewController:shouldSelect:)
-    func cylUpdateSelectionStatusIfNeeded(for _: UITabBarController?, shouldSelect viewController: UIViewController?,
-                                          shouldSelect: Bool) {
+    open func updateSelectionStatusIfNeeded(for _: UITabBarController?, shouldSelect viewController: UIViewController, shouldSelect: Bool) {
         guard tabBarStyleType != .flatDesign else {
             return
         }
@@ -85,18 +84,18 @@ extension CYLTabBarController {
     // [CN] 由 Objective-C 的 `-tabBarController:shouldSelectViewController:`（转发方法）调用：类的代理协议声明在 Objective-C 中时，Swift
     //      无法在该类上定义这个 UIKit selector。
     @objc(cyl_tabBarController:shouldSelectViewController:)
-    func cylTabBarController(_ tabBarController: UITabBarController, shouldSelect viewController: UIViewController) -> Bool {
+    func cyl_tabBarController(_ tabBarController: UITabBarController, shouldSelect viewController: UIViewController) -> Bool {
         // FIX: issue #152 — one user tap on a tab button, before the selection changes (also for a tab that needs login).
         // [CN] 一次用户点击 Tab 按钮，在选中变化之前（需要登录的 Tab 也算）。
         cylRecognizeTabBarItemTapWillSelect(viewController)
         // FIX: issue #19 — a tab that needs login, tapped while logged out: refused before anything changes.
         // [CN] 需要登录的 Tab 在未登录时被点击：在任何变化之前拒绝。
-        if cylInterceptLoginIfNeeded(for: viewController) {
+        if cyl_interceptLoginIfNeeded(for: viewController) {
             return false
         }
         // [EN] A custom action tab (CYLCustomTabAction): refuse the selection and run the action instead.
         // [CN] 使用自定义点击操作的 Tab（CYLCustomTabAction）：拒绝选中，改为执行对应操作。
-        if cylPerformCustomTabActionIfNeeded(for: viewController) {
+        if cyl_performCustomTabActionIfNeeded(for: viewController) {
             return false
         }
         if tabBarStyleType != .flatDesign {
@@ -106,7 +105,7 @@ extension CYLTabBarController {
             if #available(iOS 18.0, *) {
                 cylCrossDissolveTabSwitch(to: viewController)
             }
-            cylUpdateSelectionStatusIfNeeded(for: tabBarController, shouldSelect: viewController)
+            updateSelectionStatusIfNeeded(for: tabBarController, shouldSelect: viewController)
         }
         return viewController !== tabBarController.selectedViewController
     }

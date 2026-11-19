@@ -861,7 +861,7 @@ extension CYLTabBarController {
         while index >= 0 && index < viewControllers.count {
             let candidate = viewControllers[index]
             if cylCanSwipe(to: candidate) {
-                if cylInterceptLoginIfNeeded(for: candidate) {
+                if cyl_interceptLoginIfNeeded(for: candidate) {
                     return false
                 }
                 let plusChild = hasPlusChildViewController() ? cylPrivate.cylContextPlusChildViewController() : nil
@@ -1126,7 +1126,7 @@ extension CYLTabBarController {
      *      的液态玻璃放大镜（及其手势）（没有实现时为 YES）。
      */
     @objc(tabBarController:beginShowPlatterLiquidLensViewForControl:)
-    func cylTabBarController(_ tabBarController: CYLTabBarController, beginShowPlatterLiquidLensViewFor control: UIControl) {
+    func cyl_tabBarController(_ tabBarController: CYLTabBarController, beginShowPlatterLiquidLensViewFor control: UIControl) {
         let tabBar: UITabBar = tabBarController.tabBar
         guard CYLConstants.isLiquidGlassActive(), let tabBar = tabBar as? CYLTabBar else {
             return
@@ -1190,7 +1190,7 @@ extension CYLTabBarController {
     }
 
     @objc(tabBarController:shouldShowPlatterLiquidLensViewForControl:)
-    func cylTabBarController(_ tabBarController: CYLTabBarController, shouldShowPlatterLiquidLensViewFor _: UIControl) -> Bool {
+    func cyl_tabBarController(_ tabBarController: CYLTabBarController, shouldShowPlatterLiquidLensViewFor _: UIControl) -> Bool {
         let tabBar: UITabBar = tabBarController.tabBar
         guard CYLConstants.isLiquidGlassActive(), let tabBar = tabBar as? CYLTabBar else {
             return false
@@ -1298,7 +1298,7 @@ extension CYLTabBarController {
             cylSetNeedsApplyTabBarItemAnimationTintColors()
             return
         }
-        cylTabBarController(self, beginShowPlatterLiquidLensViewFor: tappedControl)
+        cyl_tabBarController(self, beginShowPlatterLiquidLensViewFor: tappedControl)
         // FIX: plus button badge does not change on tap
         // [EN] A plus button with a child view controller has two layers: the plus button and, under it, the system tab
         //      button of `plusChildViewController`. A tap could be reported with that system tab button, or not at all (the

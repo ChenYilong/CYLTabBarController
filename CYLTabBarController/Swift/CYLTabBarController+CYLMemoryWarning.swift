@@ -31,30 +31,34 @@ extension CYLTabBarController {
     //      Objective-C 类中：在公开类的扩展中重写必须是 public。
 
     @objc(shouldUnloadViewOfViewController:)
-    func cylShouldUnloadView(of viewController: UIViewController) -> Bool {
+    open func shouldUnloadView(of viewController: UIViewController) -> Bool {
         guard let identifier = viewController.cyl_tabBarItemIdentifier else { return true }
         return !cylKeepsLoadedTabBarItemIdentifiers().contains(identifier)
     }
 
     @objc(cyl_keepsLoadedTabBarItemIdentifiers)
+    open var cyl_keepsLoadedTabBarItemIdentifiers: [String] {
+        @objc(cyl_keepsLoadedTabBarItemIdentifiers) get { cylKeepsLoadedTabBarItemIdentifiers() }
+        @objc(setCyl_keepsLoadedTabBarItemIdentifiers:) set { cylSetKeepsLoadedTabBarItemIdentifiers(newValue) }
+    }
+
     func cylKeepsLoadedTabBarItemIdentifiers() -> [String] {
         objc_getAssociatedObject(self, CYLKeepsLoadedTabBarItemIdentifiersKey) as? [String] ?? []
     }
 
-    @objc(setCyl_keepsLoadedTabBarItemIdentifiers:)
     func cylSetKeepsLoadedTabBarItemIdentifiers(_ identifiers: [String]) {
         objc_setAssociatedObject(self, CYLKeepsLoadedTabBarItemIdentifiersKey, identifiers, .OBJC_ASSOCIATION_COPY_NONATOMIC)
     }
 
     @objc(unloadViewsOfUnselectedViewControllers)
-    func cylUnloadViewsOfUnselectedViewControllers() {
+    open func unloadViewsOfUnselectedViewControllers() {
         let selected = selectedViewController
         for viewController in viewControllers ?? [] where viewController !== selected && !viewController.cyl_isPlaceholder {
             // [EN] A navigation controller's stack is unloaded with it, or not at all. [CN] 导航控制器的栈与它一起卸载，或都不卸载。
             var toUnload = (viewController as? UINavigationController)?.viewControllers ?? []
             toUnload.append(viewController)
             let busy = toUnload.contains { $0.isViewLoaded && ($0.view.window != nil || $0.presentedViewController != nil) }
-            guard !busy, cylShouldUnloadView(of: viewController) else { continue }
+            guard !busy, shouldUnloadView(of: viewController) else { continue }
             for each in toUnload where each.isViewLoaded {
                 // [EN] Setting `view` to nil does not take it out of its superview (e.g. the navigation controller's).
                 // [CN] 把 `view` 设为 nil 不会把它从父视图（例如导航控制器的视图）中移除。

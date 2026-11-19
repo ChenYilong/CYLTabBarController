@@ -156,11 +156,15 @@ extension CYLTabBarController {
     }
 
     @objc(cyl_themeManager)
+    open var cyl_themeManager: CYLThemeManager! {
+        @objc(cyl_themeManager) get { cylThemeManager() }
+        @objc(setCyl_themeManager:) set { cylSetThemeManager(newValue) }
+    }
+
     func cylThemeManager() -> CYLThemeManager {
         cyl_themeSettings.manager ?? CYLThemeManagerCenter.defaultThemeManager
     }
 
-    @objc(setCyl_themeManager:)
     func cylSetThemeManager(_ themeManager: CYLThemeManager?) {
         cyl_themeSettings.manager = themeManager
     }

@@ -116,7 +116,7 @@ extension CYLTabBarController {
         // [EN] `+indexForTabbarItemsCount:` asserts for an odd count without a custom index: only ask when it can answer.
         // [CN] Tab 数为奇数且没有自定义下标时 `+indexForTabbarItemsCount:` 会断言：只在它能给出结果时调用。
         guard implementsCustomIndex || tabCount % 2 == 0 else { return middle }
-        let customIndex = Int(plusButton.cylIndex(forTabbarItemsCount: UInt(tabCount)))
+        let customIndex = Int(plusButton.cyl_index(forTabbarItemsCount: UInt(tabCount)))
         return customIndex != NSNotFound && customIndex <= tabCount ? customIndex : middle
     }
 

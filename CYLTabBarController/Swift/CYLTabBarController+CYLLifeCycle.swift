@@ -138,7 +138,7 @@ extension CYLTabBarController {
      * [CN] Tab 按钮的事件（非扁平样式）。
      */
     @objc(tabChangedToControl:)
-    func cylTabChanged(to tappedControl: UIControl) {
+    open func tabChanged(to tappedControl: UIControl) {
         guard tabBarStyleType != .flatDesign else {
             return
         }
@@ -150,15 +150,15 @@ extension CYLTabBarController {
         let tappedIndex = tappedControl.cyl_tabBarChildViewControllerIndex
         let tappedViewController = !tappedControl.cyl_isPlusControl() && tappedIndex >= 0 && tappedIndex < viewControllers.count
             ? viewControllers[tappedIndex] : nil
-        if let tappedViewController, cylInterceptLoginIfNeeded(for: tappedViewController) {
+        if let tappedViewController, cyl_interceptLoginIfNeeded(for: tappedViewController) {
             return
         }
         // [EN] A custom action tab (CYLCustomTabAction) runs the action instead (once per tap). Liquid Glass calls this from the
         //      gesture delegate when a touch begins, and checks the tap in `-tabBarController:shouldSelectViewController:`.
         // [CN] 使用自定义点击操作的 Tab（CYLCustomTabAction）改为执行对应操作（每次点击一次）。液态玻璃在手指按下时从手势代理调用本方法，点击本身在
         //      `-tabBarController:shouldSelectViewController:` 中检查。
-        if !CYLConstants.isLiquidGlassActive(), let candidate = cylViewController(forTabControl: tappedControl),
-           cylPerformCustomTabActionIfNeeded(for: candidate) {
+        if !CYLConstants.isLiquidGlassActive(), let candidate = cyl_viewController(forTabControl: tappedControl),
+           cyl_performCustomTabActionIfNeeded(for: candidate) {
             return
         }
         // FIX: issue #232
@@ -172,16 +172,16 @@ extension CYLTabBarController {
             return
         }
         let control = cylTabButtonReplacingTappedControl(tappedControl)
-        cylTabChanged(toSelectedViewController: nil, control: control)
+        tabChanged(toSelectedViewController: nil, control: control)
         cylSetNeedsUpdateSelectedBackgroundColors()
     }
 
     @objc(tabChangedToSelectedViewController:control:)
-    func cylTabChanged(toSelectedViewController viewController: UIViewController?, control: UIControl?) {
+    func tabChanged(toSelectedViewController viewController: UIViewController?, control: UIControl?) {
         guard tabBarStyleType != .flatDesign else {
             return
         }
-        cylTabChanged(toSelectedIndex: UInt(selectedIndex), viewController: viewController, control: control)
+        tabChanged(toSelectedIndex: UInt(selectedIndex), viewController: viewController, control: control)
     }
 
     /**
@@ -190,7 +190,7 @@ extension CYLTabBarController {
      * [CN] 三个地方都要调用：选中状态下的重新点击（iOS 26 需要在手势代理方法中追加），用户切换 Tab，代码切换 Tab。
      */
     @objc(tabChangedToSelectedIndex:viewController:control:)
-    func cylTabChanged(toSelectedIndex selectedIndex: UInt, viewController: UIViewController?, control: UIControl?) {
+    func tabChanged(toSelectedIndex selectedIndex: UInt, viewController: UIViewController?, control: UIControl?) {
         guard tabBarStyleType != .flatDesign, cyl_tabBar is UITabBar else {
             return
         }
@@ -200,7 +200,7 @@ extension CYLTabBarController {
         let viewController = viewController ?? selectedViewController
         let control = control ?? viewController?.cyl_getViewControllerInsteadOfNavigation().cyl_tabButton ?? viewController?.cyl_tabButton
         if let viewController {
-            cylUpdateSelectionStatusIfNeeded(for: nil, shouldSelect: viewController)
+            updateSelectionStatusIfNeeded(for: nil, shouldSelect: viewController)
         }
         if let control {
             cylDidSelectControl(control)
@@ -273,7 +273,7 @@ extension CYLTabBarController {
      *      `invokeOnce` 参数按文档说明仍被忽略。
      */
     @objc(setViewDidLayoutSubViewsBlockInvokeOnce:block:)
-    func cylSetViewDidLayoutSubViewsBlockInvokeOnce(_ invokeOnce: Bool, block: @escaping CYLViewDidLayoutSubViewsBlock) {
+    open func setViewDidLayoutSubViewsBlockInvokeOnce(_ invokeOnce: Bool, block: @escaping CYLViewDidLayoutSubViewsBlock) {
         cylPrivate.cylSetInvokeOnceViewDidLayoutSubViewsBlock(true)
         viewDidLayoutSubviewsBlock = block
         cylRearmViewDidLayoutSubviewsBlockInvokeOnce()

@@ -82,12 +82,16 @@ private func cylAttributes(_ attributes: [NSAttributedString.Key: Any]?, setting
 extension CYLTabBarController {
 
     @objc(cyl_reselectBehavior)
+    open var cyl_reselectBehavior: CYLTabBarReselectBehavior {
+        @objc(cyl_reselectBehavior) get { cylReselectBehavior() }
+        @objc(setCyl_reselectBehavior:) set { cylSetReselectBehavior(newValue) }
+    }
+
     func cylReselectBehavior() -> CYLTabBarReselectBehavior {
         let value = (objc_getAssociatedObject(self, CYLTabBarToolkitKeys.reselectBehavior) as? NSNumber)?.uintValue ?? 0
         return CYLTabBarReselectBehavior(rawValue: value)
     }
 
-    @objc(setCyl_reselectBehavior:)
     func cylSetReselectBehavior(_ reselectBehavior: CYLTabBarReselectBehavior) {
         objc_setAssociatedObject(self, CYLTabBarToolkitKeys.reselectBehavior, NSNumber(value: reselectBehavior.rawValue),
                                  .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
@@ -102,7 +106,7 @@ extension CYLTabBarController {
      * [CN] Tab 按钮对应的控制器，PlusButton 返回 nil。
      */
     @objc(cyl_viewControllerForTabControl:)
-    func cylViewController(forTabControl control: UIControl?) -> UIViewController? {
+    func cyl_viewController(forTabControl control: UIControl?) -> UIViewController? {
         guard let control, !control.cyl_isPlusControl() else {
             return nil
         }
@@ -195,11 +199,15 @@ extension CYLTabBarController {
     typealias CYLCustomTabActionHandler = @convention(block) (CYLTabBarController, UIViewController) -> Void
 
     @objc(cyl_customActionTabBarItemIdentifiers)
+    open var cyl_customActionTabBarItemIdentifiers: [String]? {
+        @objc(cyl_customActionTabBarItemIdentifiers) get { cylCustomActionTabBarItemIdentifiers() }
+        @objc(setCyl_customActionTabBarItemIdentifiers:) set { cylSetCustomActionTabBarItemIdentifiers(newValue) }
+    }
+
     func cylCustomActionTabBarItemIdentifiers() -> [String]? {
         objc_getAssociatedObject(self, CYLTabBarToolkitKeys.customActionTabBarItemIdentifiers) as? [String]
     }
 
-    @objc(setCyl_customActionTabBarItemIdentifiers:)
     func cylSetCustomActionTabBarItemIdentifiers(_ identifiers: [String]?) {
         objc_setAssociatedObject(self, CYLTabBarToolkitKeys.customActionTabBarItemIdentifiers, identifiers, .OBJC_ASSOCIATION_COPY_NONATOMIC)
     }
@@ -234,7 +242,7 @@ extension CYLTabBarController {
     }
 
     @objc(cyl_isCustomActionTabViewController:)
-    func cylIsCustomActionTab(_ viewController: UIViewController?) -> Bool {
+    open func cyl_isCustomActionTab(_ viewController: UIViewController) -> Bool {
         guard let viewController, !viewController.cyl_isPlaceholder else {
             return false
         }
@@ -252,8 +260,8 @@ extension CYLTabBarController {
     }
 
     @objc(cyl_performCustomTabActionIfNeededForViewController:)
-    func cylPerformCustomTabActionIfNeeded(for viewController: UIViewController) -> Bool {
-        guard cylIsCustomActionTab(viewController) else {
+    open func cyl_performCustomTabActionIfNeeded(for viewController: UIViewController) -> Bool {
+        guard cyl_isCustomActionTab(viewController) else {
             return false
         }
         // [EN] One tap reaches here up to twice (`-tabBarController:shouldSelectViewController:`, then the tab button's action):
@@ -308,42 +316,90 @@ extension CYLTabBarController {
         cylTabBarItemStyles[key] as? T
     }
 
-    @objc(cyl_tabBarItemTitleFont) func cylTabBarItemTitleFont() -> UIFont? { cylTabBarItemStyle(CYLTabBarItemStyleKey.titleFont) }
-    @objc(setCyl_tabBarItemTitleFont:) func cylSetTabBarItemTitleFont(_ font: UIFont?) {
+    @objc(cyl_tabBarItemTitleFont)
+    open var cyl_tabBarItemTitleFont: UIFont? {
+        @objc(cyl_tabBarItemTitleFont) get { cylTabBarItemTitleFont() }
+        @objc(setCyl_tabBarItemTitleFont:) set { cylSetTabBarItemTitleFont(newValue) }
+    }
+
+    func cylTabBarItemTitleFont() -> UIFont? { cylTabBarItemStyle(CYLTabBarItemStyleKey.titleFont) }
+    func cylSetTabBarItemTitleFont(_ font: UIFont?) {
         cylSetTabBarItemStyle(font, forKey: CYLTabBarItemStyleKey.titleFont)
     }
-    @objc(cyl_tabBarItemSelectedTitleFont) func cylTabBarItemSelectedTitleFont() -> UIFont? {
+    @objc(cyl_tabBarItemSelectedTitleFont)
+    open var cyl_tabBarItemSelectedTitleFont: UIFont? {
+        @objc(cyl_tabBarItemSelectedTitleFont) get { cylTabBarItemSelectedTitleFont() }
+        @objc(setCyl_tabBarItemSelectedTitleFont:) set { cylSetTabBarItemSelectedTitleFont(newValue) }
+    }
+
+    func cylTabBarItemSelectedTitleFont() -> UIFont? {
         cylTabBarItemStyle(CYLTabBarItemStyleKey.selectedTitleFont)
     }
-    @objc(setCyl_tabBarItemSelectedTitleFont:) func cylSetTabBarItemSelectedTitleFont(_ font: UIFont?) {
+    func cylSetTabBarItemSelectedTitleFont(_ font: UIFont?) {
         cylSetTabBarItemStyle(font, forKey: CYLTabBarItemStyleKey.selectedTitleFont)
     }
-    @objc(cyl_tabBarItemTitleColor) func cylTabBarItemTitleColor() -> UIColor? { cylTabBarItemStyle(CYLTabBarItemStyleKey.titleColor) }
-    @objc(setCyl_tabBarItemTitleColor:) func cylSetTabBarItemTitleColor(_ color: UIColor?) {
+    @objc(cyl_tabBarItemTitleColor)
+    open var cyl_tabBarItemTitleColor: UIColor? {
+        @objc(cyl_tabBarItemTitleColor) get { cylTabBarItemTitleColor() }
+        @objc(setCyl_tabBarItemTitleColor:) set { cylSetTabBarItemTitleColor(newValue) }
+    }
+
+    func cylTabBarItemTitleColor() -> UIColor? { cylTabBarItemStyle(CYLTabBarItemStyleKey.titleColor) }
+    func cylSetTabBarItemTitleColor(_ color: UIColor?) {
         cylSetTabBarItemStyle(color, forKey: CYLTabBarItemStyleKey.titleColor)
     }
-    @objc(cyl_tabBarItemSelectedTitleColor) func cylTabBarItemSelectedTitleColor() -> UIColor? {
+    @objc(cyl_tabBarItemSelectedTitleColor)
+    open var cyl_tabBarItemSelectedTitleColor: UIColor? {
+        @objc(cyl_tabBarItemSelectedTitleColor) get { cylTabBarItemSelectedTitleColor() }
+        @objc(setCyl_tabBarItemSelectedTitleColor:) set { cylSetTabBarItemSelectedTitleColor(newValue) }
+    }
+
+    func cylTabBarItemSelectedTitleColor() -> UIColor? {
         cylTabBarItemStyle(CYLTabBarItemStyleKey.selectedTitleColor)
     }
-    @objc(setCyl_tabBarItemSelectedTitleColor:) func cylSetTabBarItemSelectedTitleColor(_ color: UIColor?) {
+    func cylSetTabBarItemSelectedTitleColor(_ color: UIColor?) {
         cylSetTabBarItemStyle(color, forKey: CYLTabBarItemStyleKey.selectedTitleColor)
     }
-    @objc(cyl_tabBarItemImageColor) func cylTabBarItemImageColor() -> UIColor? { cylTabBarItemStyle(CYLTabBarItemStyleKey.imageColor) }
-    @objc(setCyl_tabBarItemImageColor:) func cylSetTabBarItemImageColor(_ color: UIColor?) {
+    @objc(cyl_tabBarItemImageColor)
+    open var cyl_tabBarItemImageColor: UIColor? {
+        @objc(cyl_tabBarItemImageColor) get { cylTabBarItemImageColor() }
+        @objc(setCyl_tabBarItemImageColor:) set { cylSetTabBarItemImageColor(newValue) }
+    }
+
+    func cylTabBarItemImageColor() -> UIColor? { cylTabBarItemStyle(CYLTabBarItemStyleKey.imageColor) }
+    func cylSetTabBarItemImageColor(_ color: UIColor?) {
         cylSetTabBarItemStyle(color, forKey: CYLTabBarItemStyleKey.imageColor)
     }
-    @objc(cyl_tabBarItemSelectedImageColor) func cylTabBarItemSelectedImageColor() -> UIColor? {
+    @objc(cyl_tabBarItemSelectedImageColor)
+    open var cyl_tabBarItemSelectedImageColor: UIColor? {
+        @objc(cyl_tabBarItemSelectedImageColor) get { cylTabBarItemSelectedImageColor() }
+        @objc(setCyl_tabBarItemSelectedImageColor:) set { cylSetTabBarItemSelectedImageColor(newValue) }
+    }
+
+    func cylTabBarItemSelectedImageColor() -> UIColor? {
         cylTabBarItemStyle(CYLTabBarItemStyleKey.selectedImageColor)
     }
-    @objc(setCyl_tabBarItemSelectedImageColor:) func cylSetTabBarItemSelectedImageColor(_ color: UIColor?) {
+    func cylSetTabBarItemSelectedImageColor(_ color: UIColor?) {
         cylSetTabBarItemStyle(color, forKey: CYLTabBarItemStyleKey.selectedImageColor)
     }
-    @objc(cyl_tabBarBackgroundColor) func cylTabBarBackgroundColor() -> UIColor? { cylTabBarItemStyle(CYLTabBarItemStyleKey.backgroundColor) }
-    @objc(setCyl_tabBarBackgroundColor:) func cylSetTabBarBackgroundColor(_ color: UIColor?) {
+    @objc(cyl_tabBarBackgroundColor)
+    open var cyl_tabBarBackgroundColor: UIColor? {
+        @objc(cyl_tabBarBackgroundColor) get { cylTabBarBackgroundColor() }
+        @objc(setCyl_tabBarBackgroundColor:) set { cylSetTabBarBackgroundColor(newValue) }
+    }
+
+    func cylTabBarBackgroundColor() -> UIColor? { cylTabBarItemStyle(CYLTabBarItemStyleKey.backgroundColor) }
+    func cylSetTabBarBackgroundColor(_ color: UIColor?) {
         cylSetTabBarItemStyle(color, forKey: CYLTabBarItemStyleKey.backgroundColor)
     }
-    @objc(cyl_tabBarShadowColor) func cylTabBarShadowColor() -> UIColor? { cylTabBarItemStyle(CYLTabBarItemStyleKey.shadowColor) }
-    @objc(setCyl_tabBarShadowColor:) func cylSetTabBarShadowColor(_ color: UIColor?) {
+    @objc(cyl_tabBarShadowColor)
+    open var cyl_tabBarShadowColor: UIColor? {
+        @objc(cyl_tabBarShadowColor) get { cylTabBarShadowColor() }
+        @objc(setCyl_tabBarShadowColor:) set { cylSetTabBarShadowColor(newValue) }
+    }
+
+    func cylTabBarShadowColor() -> UIColor? { cylTabBarItemStyle(CYLTabBarItemStyleKey.shadowColor) }
+    func cylSetTabBarShadowColor(_ color: UIColor?) {
         cylSetTabBarItemStyle(color, forKey: CYLTabBarItemStyleKey.shadowColor)
     }
 
@@ -405,11 +461,15 @@ extension CYLTabBarController {
 extension CYLTabBarController {
 
     @objc(cyl_fixesOpaqueTabBarSafeAreaInsets)
+    open var cyl_fixesOpaqueTabBarSafeAreaInsets: Bool {
+        @objc(cyl_fixesOpaqueTabBarSafeAreaInsets) get { cylFixesOpaqueTabBarSafeAreaInsets() }
+        @objc(setCyl_fixesOpaqueTabBarSafeAreaInsets:) set { cylSetFixesOpaqueTabBarSafeAreaInsets(newValue) }
+    }
+
     func cylFixesOpaqueTabBarSafeAreaInsets() -> Bool {
         (objc_getAssociatedObject(self, CYLTabBarToolkitKeys.fixesOpaqueTabBarSafeAreaInsets) as? NSNumber)?.boolValue ?? true
     }
 
-    @objc(setCyl_fixesOpaqueTabBarSafeAreaInsets:)
     func cylSetFixesOpaqueTabBarSafeAreaInsets(_ fixes: Bool) {
         objc_setAssociatedObject(self, CYLTabBarToolkitKeys.fixesOpaqueTabBarSafeAreaInsets, NSNumber(value: fixes),
                                  .OBJC_ASSOCIATION_RETAIN_NONATOMIC)

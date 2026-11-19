@@ -296,7 +296,7 @@ extension CYLTabBarController {
     }
 
     /// [EN] A tab bar controller of the receiving class from a loaded configuration, or the error. [CN] 由加载的配置创建接收者类的 TabBarController，或返回错误。
-    private class func cylTabBarController(withLoadedConfiguration configuration: [String: Any]) throws -> Self {
+    private class func cyl_tabBarController(withLoadedConfiguration configuration: [String: Any]) throws -> Self {
         let tabBarController = self.init(configuration: configuration)
         if let pagesError = CYLTabBarController.cylConfigurationPagesError(for: tabBarController) {
             throw pagesError
@@ -311,7 +311,7 @@ extension CYLTabBarController {
     @objc(tabBarControllerWithConfigurationFile:error:)
     open class func tabBarController(withConfigurationFile filePath: String) throws -> Self {
         guard Thread.isMainThread else { throw CYLTabBarController.cylConfigurationMainThreadError() }
-        return try cylTabBarController(withLoadedConfiguration: try configuration(withContentsOfFile: filePath))
+        return try cyl_tabBarController(withLoadedConfiguration: try configuration(withContentsOfFile: filePath))
     }
 
     /**
@@ -331,7 +331,7 @@ extension CYLTabBarController {
             return
         }
         do {
-            completion(try cylTabBarController(withLoadedConfiguration: configuration), nil)
+            completion(try cyl_tabBarController(withLoadedConfiguration: configuration), nil)
         } catch {
             completion(nil, error)
         }
@@ -343,8 +343,7 @@ extension CYLTabBarController {
      */
     @objc(loadTabBarControllerWithConfigurationURLRequest:completion:)
     @discardableResult
-    open class func load(withConfigurationURLRequest request: URLRequest,
-                         completion: @escaping CYLTabBarControllerConfigurationCompletion) -> URLSessionDataTask? {
+    open class func load(withConfigurationURLRequest request: URLRequest, completion: @escaping CYLTabBarControllerConfigurationCompletion) -> URLSessionDataTask? {
         loadConfiguration(with: request) { configuration, error in
             cylFinishLoading(configuration, error, completion)
         }
@@ -357,8 +356,7 @@ extension CYLTabBarController {
      */
     @objc(loadTabBarControllerWithConfigurationURL:completion:)
     @discardableResult
-    open class func load(withConfigurationURL url: URL,
-                         completion: @escaping CYLTabBarControllerConfigurationCompletion) -> URLSessionDataTask? {
+    open class func load(withConfigurationURL url: URL, completion: @escaping CYLTabBarControllerConfigurationCompletion) -> URLSessionDataTask? {
         loadConfiguration(with: url) { configuration, error in
             cylFinishLoading(configuration, error, completion)
         }

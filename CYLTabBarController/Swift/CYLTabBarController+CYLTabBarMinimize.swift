@@ -932,7 +932,7 @@ extension CYLTabBarController {
     }
 
     @objc(cyl_tabBarMinimizeBehavior)
-    var cylTabBarMinimizeBehavior: CYLTabBarMinimizeBehavior {
+    open var cyl_tabBarMinimizeBehavior: CYLTabBarMinimizeBehavior {
         get { cylMinimize.behavior ?? .automatic }
         @objc(setCyl_tabBarMinimizeBehavior:) set {
             cylMinimize.behavior = newValue
@@ -988,12 +988,12 @@ extension CYLTabBarController {
     // MARK: cyl_hidesTabBarOnScroll
 
     @objc(cyl_isTabBarHiddenByScroll)
-    var cylIsTabBarHiddenByScroll: Bool {
+    open var cyl_isTabBarHiddenByScroll: Bool {
         cylMinimize.tracker?.isTabBarHiddenOrMinimizedByScroll() ?? false
     }
 
     @objc(cyl_simulateHideOnScrollForTesting)
-    func cylSimulateHideOnScrollForTesting() -> Bool {
+    open func cyl_simulateHideOnScrollForTesting() -> Bool {
         cylUpdateTabBarMinimizeTracking()
         guard let tracker = cylMinimize.tracker else {
             CYLTabBarMinimizeEnvironment.log("test hide refused", "no scroll tracker (scroll hiding is off, or no scroll view on the selected page)")
@@ -1009,9 +1009,9 @@ extension CYLTabBarController {
      *      样式改变后也一样。
      */
     @objc(cyl_hidesTabBarOnScroll)
-    var cylHidesTabBarOnScroll: Bool {
+    open var cyl_hidesTabBarOnScroll: Bool {
         get {
-            let behavior = cylTabBarMinimizeBehavior
+            let behavior = cyl_tabBarMinimizeBehavior
             return behavior == .onScrollDown || behavior == .onScrollUp
         }
         @objc(setCyl_hidesTabBarOnScroll:) set {
@@ -1024,7 +1024,7 @@ extension CYLTabBarController {
             // [EN] 2. FlatDesign and 3. the classic tab bar: CYLTabBarController follows the page's scroll view and hides the bar with
             //      `-setTabBarHidden:animated:`.
             // [CN] 2. 扁平样式与 3. 经典 TabBar：CYLTabBarController 跟随页面的滚动视图，用 `-setTabBarHidden:animated:` 隐藏 TabBar。
-            cylTabBarMinimizeBehavior = newValue ? .onScrollDown : .never
+            cyl_tabBarMinimizeBehavior = newValue ? .onScrollDown : .never
         }
     }
 
@@ -1040,7 +1040,7 @@ extension CYLTabBarController {
     @available(iOS 26.0, *)
     @objc(cyl_setSystemTabBarMinimizeBehaviorFromApp:)
     func cylSetSystemTabBarMinimizeBehaviorFromApp(_ behavior: UITabBarController.MinimizeBehavior) {
-        cylTabBarMinimizeBehavior = CYLTabBarMinimizeBehavior(system: behavior)
+        cyl_tabBarMinimizeBehavior = CYLTabBarMinimizeBehavior(system: behavior)
     }
 
     @available(iOS 26.0, *)

@@ -317,7 +317,7 @@ extension CYLTabBarController {
 
     @objc(setTabBarItemIconViewProvider:atIndex:)
     @discardableResult
-    func cylSetTabBarItemIconViewProvider(_ provider: CYLIconViewProvider?, at index: UInt) -> Bool {
+    open func setTabBarItemIconViewProvider(_ provider: CYLTabBarItemIconViewProvider?, at index: UInt) -> Bool {
         guard let viewController = cylIconTab(at: index) else {
             return false
         }
@@ -342,11 +342,11 @@ extension CYLTabBarController {
 
     @objc(setTabBarItemIconWithURL:selectedURL:size:atIndex:)
     @discardableResult
-    func cylSetTabBarItemIcon(withURL url: URL?, selectedURL: URL?, size: CGSize, at index: UInt) -> Bool {
+    open func setTabBarItemIconWith(_ url: URL, selectedURL: URL?, size: CGSize, at index: UInt) -> Bool {
         guard let url else {
             return false
         }
-        return cylSetTabBarItemIcon(url, selectedIcon: selectedURL, size: size, at: index)
+        return setTabBarItemIconWith(url, selectedIcon: selectedURL, size: size, at: index)
     }
 
     /**
@@ -356,7 +356,7 @@ extension CYLTabBarController {
      */
     @objc(setTabBarItemIcon:selectedIcon:size:atIndex:)
     @discardableResult
-    func cylSetTabBarItemIcon(_ icon: Any?, selectedIcon: Any?, size: CGSize, at index: UInt) -> Bool {
+    open func setTabBarItemIcon(_ icon: Any, selectedIcon: Any?, size: CGSize, at index: UInt) -> Bool {
         guard let icon, let viewController = cylIconTab(at: index) else {
             return false
         }
@@ -372,7 +372,7 @@ extension CYLTabBarController {
                 }
                 let originalImage = image.withRenderingMode(.alwaysOriginal)
                 let originalSelectedImage = (selectedImage ?? image).withRenderingMode(.alwaysOriginal)
-                self.cylSetTabBarItemIconViewProvider({ selected in
+                self.setTabBarItemIconViewProvider({ selected in
                     Self.cylIconView(selected ? originalSelectedImage : originalImage, size: size)
                 }, at: UInt(currentIndex))
             }
@@ -494,7 +494,7 @@ extension CYLTabBarController {
      */
     @objc(updatePlusButtonWithAttributes:)
     @discardableResult
-    func cylUpdatePlusButton(withAttributes attributes: [String: Any]) -> Bool {
+    open func updatePlusButton(attributes: [String : Any] = [:]) -> Bool {
         guard let plusButton = CYLPlusButton(forOwner: self), !attributes.isEmpty else {
             return false
         }

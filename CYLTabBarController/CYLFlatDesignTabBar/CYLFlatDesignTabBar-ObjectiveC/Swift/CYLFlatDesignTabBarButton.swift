@@ -525,7 +525,7 @@ open class CYLFlatDesignTabBarButton: CYLAnimatedItemView {
      *      （`-cylflatdesign_setTabBarController:`），再读取其子控制器的（与 `CYLPlusButton` 的查找方式相同，#650）。
      */
     private var animationTabBarController: CYLTabBarController? {
-        if let controller = cylTabBarController() {
+        if let controller = cyl_tabBarController {
             return controller
         }
         let item = tabBarItemStorage

@@ -566,7 +566,7 @@ extension CYLPlusButton {
      [EN] `+indexForTabbarItemsCount:` of the runtime class, sent through the Objective-C runtime.
      [CN] 通过 Objective-C 运行时调用运行时类的 `+indexForTabbarItemsCount:`。
      */
-    func cylIndex(forTabbarItemsCount tabbarItemsCount: UInt) -> UInt {
+    func cyl_index(forTabbarItemsCount tabbarItemsCount: UInt) -> UInt {
         typealias Index = @convention(c) (AnyObject, Selector, UInt) -> UInt
         let selector = NSSelectorFromString("indexForTabbarItemsCount:")
         let cls: AnyClass = cylRuntimeClass

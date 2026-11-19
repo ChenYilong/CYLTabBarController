@@ -1605,7 +1605,7 @@ extension CYLTabBarController {
      [CN] 应用默认值并检查过的配置（见 docs/Configuration-File.md）。
      */
     @objc(cyl_normalizedConfiguration:)
-    open class func cyl_normalizedConfiguration(_ configuration: [String: Any]) -> [String: Any] {
+    open class func cyl_normalizedConfiguration(_ configuration: [String : Any]) -> [String : Any] {
         cylNormalizedConfiguration(configuration)
     }
 

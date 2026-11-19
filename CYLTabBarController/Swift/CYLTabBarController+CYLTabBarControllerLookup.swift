@@ -140,14 +140,14 @@ extension CYLTabBarController {
      * [EN] Swift classes are named "Module.Class"; the module is dropped. [CN] Swift 类名形如「模块.类名」，去掉模块名。
      */
     @objc(cyl_defaultTabBarItemIdentifierForClass:)
-    static func cylDefaultTabBarItemIdentifier(forClass aClass: AnyClass?) -> String {
+    public static func cyl_defaultTabBarItemIdentifier(for aClass: AnyClass) -> String {
         let name = aClass.map { NSStringFromClass($0) } ?? ""
         guard let dot = name.range(of: ".", options: .backwards) else { return name }
         return String(name[dot.upperBound...])
     }
 
     @objc(cyl_defaultTabBarItemIdentifierForViewController:)
-    func cylDefaultTabBarItemIdentifier(for viewController: UIViewController?) -> String? {
+    open func cyl_defaultTabBarItemIdentifier(for viewController: UIViewController) -> String? {
         guard let viewController else { return nil }
         let tabs = viewControllers ?? []
         guard let index = tabs.firstIndex(where: { $0 === viewController || $0.cyl_getViewControllerInsteadOfNavigation() === viewController }) else {
@@ -159,40 +159,48 @@ extension CYLTabBarController {
             return plusButton.cyl_tabBarItemIdentifier
         }
         let contentClass: AnyClass = type(of: tab.cyl_getViewControllerInsteadOfNavigation())
-        let identifier = CYLTabBarController.cylDefaultTabBarItemIdentifier(forClass: contentClass)
+        let identifier = CYLTabBarController.cyl_defaultTabBarItemIdentifier(forClass: contentClass)
         // [EN] The next tabs of the same class: "_2", "_3"... [CN] 后续同类的 Tab 依次加 "_2"、"_3"……
         let occurrence = 1 + tabs[..<index].filter { type(of: $0.cyl_getViewControllerInsteadOfNavigation()) == contentClass }.count
         return occurrence == 1 ? identifier : "\(identifier)_\(occurrence)"
     }
 
     @objc(cyl_selectedTabBarItemIdentifier)
+    open var cyl_selectedTabBarItemIdentifier: String? {
+        @objc(cyl_selectedTabBarItemIdentifier) get { cylSelectedTabBarItemIdentifier() }
+    }
+
     func cylSelectedTabBarItemIdentifier() -> String? {
         cylTabBarItemIdentifier(for: selectedViewController)
     }
 
     @objc(cyl_indexOfTabBarItemIdentifier:)
-    func cylIndex(ofTabBarItemIdentifier identifier: String?) -> UInt {
+    open func cyl_index(ofTabBarItemIdentifier identifier: String) -> UInt {
         guard let identifier, !identifier.isEmpty else { return UInt(NSNotFound) }
         let index = (viewControllers ?? []).firstIndex { cylTabBarItemIdentifier(for: $0) == identifier }
         return index.map { UInt($0) } ?? UInt(NSNotFound)
     }
 
     @objc(cyl_viewControllerWithTabBarItemIdentifier:)
-    func cylViewController(withTabBarItemIdentifier identifier: String?) -> UIViewController? {
-        let index = cylIndex(ofTabBarItemIdentifier: identifier)
+    open func cyl_viewController(withTabBarItemIdentifier identifier: String) -> UIViewController? {
+        let index = cyl_index(ofTabBarItemIdentifier: identifier)
         return index == UInt(NSNotFound) ? nil : viewControllers?[Int(index)]
     }
 
     @objc(cyl_selectTabBarItemWithIdentifier:)
     @discardableResult
-    func cylSelectTabBarItem(withIdentifier identifier: String?) -> UIViewController? {
-        let index = cylIndex(ofTabBarItemIdentifier: identifier)
+    open func cyl_selectTabBarItem(withIdentifier identifier: String) -> UIViewController? {
+        let index = cyl_index(ofTabBarItemIdentifier: identifier)
         if index == UInt(NSNotFound) { return nil }
         selectedIndex = Int(index)
         return viewControllers?[Int(index)]
     }
 
     @objc(cyl_tabBarItemIdentifiers)
+    open var cyl_tabBarItemIdentifiers: [String] {
+        @objc(cyl_tabBarItemIdentifiers) get { cylTabBarItemIdentifiers() }
+    }
+
     func cylTabBarItemIdentifiers() -> [String] {
         var identifiers = (viewControllers ?? []).compactMap { cylTabBarItemIdentifier(for: $0) }
         if let plusIdentifier = identifiedPlusButton?.cyl_tabBarItemIdentifier, !identifiers.contains(plusIdentifier) {
@@ -202,12 +210,12 @@ extension CYLTabBarController {
     }
 
     @objc(cyl_controlWithTabBarItemIdentifier:)
-    func cylControl(withTabBarItemIdentifier identifier: String?) -> UIControl? {
+    open func cyl_control(withTabBarItemIdentifier identifier: String) -> UIControl? {
         guard let identifier, !identifier.isEmpty else { return nil }
         if let plusButton = identifiedPlusButton, plusButton.cyl_tabBarItemIdentifier == identifier {
             return plusButton
         }
-        return cylViewController(withTabBarItemIdentifier: identifier)?.cyl_tabButton
+        return cyl_viewController(withTabBarItemIdentifier: identifier)?.cyl_tabButton
     }
 }
 
@@ -227,12 +235,16 @@ extension CYLTabBarController {
     }
 
     @objc(cyl_viewControllersIgnoringPlusButton)
+    open var cyl_viewControllersIgnoringPlusButton: [UIViewController] {
+        @objc(cyl_viewControllersIgnoringPlusButton) get { cylViewControllersIgnoringPlusButton() }
+    }
+
     func cylViewControllersIgnoringPlusButton() -> [UIViewController] {
         (viewControllers ?? []).filter { !cylIsPlusButtonViewController($0) }
     }
 
     @objc(cyl_selectedIndexForIndexIgnoringPlusButton:)
-    func cylSelectedIndex(forIndexIgnoringPlusButton index: UInt) -> UInt {
+    open func cyl_selectedIndex(forIndexIgnoringPlusButton index: UInt) -> UInt {
         let candidates = cylViewControllersIgnoringPlusButton()
         guard Int(index) < candidates.count, let found = viewControllers?.firstIndex(of: candidates[Int(index)]) else {
             return UInt(NSNotFound)
@@ -241,6 +253,11 @@ extension CYLTabBarController {
     }
 
     @objc(cyl_selectedIndexIgnoringPlusButton)
+    open var cyl_selectedIndexIgnoringPlusButton: UInt {
+        @objc(cyl_selectedIndexIgnoringPlusButton) get { cylSelectedIndexIgnoringPlusButton() }
+        @objc(cyl_setSelectedIndexIgnoringPlusButton:) set { cylSetSelectedIndexIgnoringPlusButton(newValue) }
+    }
+
     func cylSelectedIndexIgnoringPlusButton() -> UInt {
         guard let selected = selectedViewController, let index = cylViewControllersIgnoringPlusButton().firstIndex(of: selected) else {
             return UInt(NSNotFound)
@@ -248,9 +265,8 @@ extension CYLTabBarController {
         return UInt(index)
     }
 
-    @objc(cyl_setSelectedIndexIgnoringPlusButton:)
     func cylSetSelectedIndexIgnoringPlusButton(_ index: UInt) {
-        let selected = cylSelectedIndex(forIndexIgnoringPlusButton: index)
+        let selected = cyl_selectedIndex(forIndexIgnoringPlusButton: index)
         if selected == UInt(NSNotFound) { return }
         selectedIndex = Int(selected)
     }
@@ -305,28 +321,28 @@ extension CYLTabBarController {
     }
 
     @objc(cyl_tabBarControllerForContext:matching:)
-    static func cylTabBarController(forContext context: String?, matching matcher: (@convention(block) (CYLTabBarController) -> Bool)?) -> CYLTabBarController? {
+    static func cyl_tabBarController(forContext context: String?, matching matcher: (@convention(block) (CYLTabBarController) -> Bool)?) -> CYLTabBarController? {
         CYLTabBarControllerActivationStack.mostRecent(context: context, matching: matcher)
     }
 
     @objc(cyl_tabBarControllerForContext:)
-    static func cylTabBarController(forContext context: String?) -> CYLTabBarController? {
+    public static func cyl_tabBarController(forContext context: String?) -> CYLTabBarController? {
         CYLTabBarControllerActivationStack.mostRecent(context: context, matching: nil)
     }
 
     /// [EN] The most recently active one is the context lookup without a context. [CN] 最近活跃的就是不带 context 的查找。
     @objc(cyl_activeTabBarController)
-    static func cylActiveTabBarController() -> CYLTabBarController? {
-        cylTabBarController(forContext: nil)
+    public static func cyl_active() -> CYLTabBarController? {
+        cyl_tabBarController(forContext: nil)
     }
 
     @objc(cyl_simulateMemoryWarning)
-    static func cylSimulateMemoryWarning() {
-        cylSimulateMemoryWarning(for: cylActiveTabBarController())
+    public static func cyl_simulateMemoryWarning() {
+        cyl_simulateMemoryWarning(for: cyl_active())
     }
 
     @objc(cyl_simulateMemoryWarningForTabBarController:)
-    static func cylSimulateMemoryWarning(for tabBarController: CYLTabBarController?) {
+    public static func cyl_simulateMemoryWarning(for tabBarController: CYLTabBarController?) {
         let application = UIApplication.shared
         NotificationCenter.default.post(name: UIApplication.didReceiveMemoryWarningNotification, object: application)
         application.delegate?.applicationDidReceiveMemoryWarning?(application)
@@ -344,7 +360,6 @@ extension CYLTabBarController {
 
 extension NSObject {
 
-    @objc(cyl_setTabBarController:)
     func cylSetTabBarController(_ tabBarController: CYLTabBarController?) {
         cyl_setWeakAssociatedObject(tabBarController, forKey: CYLUtilsKeys.key("cyl_tabBarController"))
     }
@@ -367,7 +382,7 @@ extension NSObject {
      *         因此 Tab 按钮、PlusButton 或 Tab 页面内的 View 找到的是自己的控制器，而不是根控制器；
      *      3. 若 `fallsBackToActive`，取最近活跃的那个（`+cyl_activeTabBarController`），最后才是根控制器（与以前一致）。
      */
-    func cylTabBarController(matching matcher: CYLTabBarControllerLookupMatcher?, fallsBackToActive: Bool) -> CYLTabBarController? {
+    func cyl_tabBarController(matching matcher: CYLTabBarControllerLookupMatcher?, fallsBackToActive: Bool) -> CYLTabBarController? {
         // [EN] 0. A tab bar controller it accepts is its own: `-visiableTabBarSize` and the `CYL_IS_IPHONE_X` /
         //      `CYL_NoNeed_UIDesignRequiresCompatibility` macros ask `self.cyl_tabBarController` from inside it. Asking an ancestor or the root
         //      instead gave a pushed tab bar controller the outer one's values.
@@ -419,16 +434,16 @@ extension NSObject {
     }
 
     @objc(cyl_owningTabBarController)
-    func cylOwningTabBarController() -> CYLTabBarController? {
+    public func cyl_owningTabBarController() -> CYLTabBarController? {
         // [EN] Only where it is: callers decide what to fall back to (the plus button registry must not take another controller's context for a
         //      tab bar that is not attached yet).
         // [CN] 只看对象所在的位置：回退到什么由调用方决定（PlusButton 注册表不能把其他控制器的 context 当作尚未加入的 TabBar 的 context）。
-        cylTabBarController(matching: nil, fallsBackToActive: false)
+        cyl_tabBarController(matching: nil, fallsBackToActive: false)
     }
 
     @objc(cyl_tabBarControllerForStyleType:)
-    func cylTabBarController(forStyleType styleType: CYLTabBarStyleType) -> CYLTabBarController? {
-        cylTabBarController(matching: CYLTabBarControllerMatcherForStyleType(styleType), fallsBackToActive: true)
+    public func cyl_tabBarController(forStyleType styleType: CYLTabBarStyleType) -> CYLTabBarController? {
+        cyl_tabBarController(matching: CYLTabBarControllerMatcherForStyleType(styleType), fallsBackToActive: true)
     }
 
     /**
@@ -437,7 +452,8 @@ extension NSObject {
      * [CN] 系统样式（除扁平样式外）。回退到最近活跃的那个，最后才是根控制器（#414：存在多个 TabBarController 时根控制器往往不是正在使用的那个）。
      */
     @objc(cyl_tabBarController)
-    func cylTabBarController() -> CYLTabBarController? {
-        cylTabBarController(forStyleType: .default)
+    public var cyl_tabBarController: CYLTabBarController? {
+        @objc(cyl_tabBarController) get { cyl_tabBarController(forStyleType: .default) }
+        @objc(cyl_setTabBarController:) set { cylSetTabBarController(newValue) }
     }
 }

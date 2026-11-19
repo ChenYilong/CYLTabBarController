@@ -33,11 +33,15 @@ private enum CYLTabBarItemColorsKeys {
 extension CYLTabBarController {
 
     @objc(cyl_hidesBadgeOfSelectedTab)
+    open var cyl_hidesBadgeOfSelectedTab: Bool {
+        @objc(cyl_hidesBadgeOfSelectedTab) get { cylHidesBadgeOfSelectedTab() }
+        @objc(setCyl_hidesBadgeOfSelectedTab:) set { cylSetHidesBadgeOfSelectedTab(newValue) }
+    }
+
     func cylHidesBadgeOfSelectedTab() -> Bool {
         (objc_getAssociatedObject(self, CYLTabBarItemColorsKeys.hidesBadgeOfSelectedTab) as? NSNumber)?.boolValue ?? false
     }
 
-    @objc(setCyl_hidesBadgeOfSelectedTab:)
     func cylSetHidesBadgeOfSelectedTab(_ hidesBadgeOfSelectedTab: Bool) {
         objc_setAssociatedObject(self, CYLTabBarItemColorsKeys.hidesBadgeOfSelectedTab, NSNumber(value: hidesBadgeOfSelectedTab),
                                  .OBJC_ASSOCIATION_RETAIN_NONATOMIC)

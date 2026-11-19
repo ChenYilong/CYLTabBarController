@@ -185,7 +185,7 @@ extension CYLTabBarController {
 
     @objc(updateTabBarItemForViewController:attributes:)
     @discardableResult
-    func cylUpdateTabBarItem(for viewController: UIViewController?, attributes: [String: Any]) -> Bool {
+    open func updateTabBarItem(for viewController: UIViewController, attributes: [String : Any] = [:]) -> Bool {
         let viewControllers = self.viewControllers ?? []
         var index = viewController.flatMap { target in viewControllers.firstIndex { $0 === target } }
         if index == nil {
@@ -194,7 +194,7 @@ extension CYLTabBarController {
         guard let index else {
             return false
         }
-        return cylUpdateTabBarItem(at: UInt(index), attributes: attributes)
+        return updateTabBarItem(at: UInt(index), attributes: attributes)
     }
 
     /**
@@ -205,7 +205,7 @@ extension CYLTabBarController {
      *      之后的 Tab，之后每个 Tab 都取到前一个 Tab 的属性。
      */
     @objc(updateTabBarItemsWithAttributes:)
-    func cylUpdateTabBarItems(withAttributes tabBarItemsAttributes: [[String: Any]]) {
+    open func updateTabBarItems(withAttributes tabBarItemsAttributes: [[String : Any]]) {
         let entries = tabBarItemsAttributes.filter { ($0[Self.cylPlusSlotPlaceholderKey] as? NSNumber)?.boolValue != true }
         var attributesIndex = 0
         for (index, viewController) in (viewControllers ?? []).enumerated() where attributesIndex < entries.count {
@@ -213,14 +213,14 @@ extension CYLTabBarController {
             if cylPrivate.cylIsPlusSlotViewController(viewController) {
                 continue
             }
-            cylUpdateTabBarItem(at: UInt(index), attributes: entries[attributesIndex])
+            updateTabBarItem(at: UInt(index), attributes: entries[attributesIndex])
             attributesIndex += 1
         }
     }
 
     @objc(updateTabBarItemAtIndex:attributes:)
     @discardableResult
-    func cylUpdateTabBarItem(at index: UInt, attributes: [String: Any]) -> Bool {
+    open func updateTabBarItem(at index: UInt, attributes: [String : Any] = [:]) -> Bool {
         let count = UInt(viewControllers?.count ?? 0)
         let oldTitle = index < count ? tabBarItemAttributes(at: index)?[CYLTabBarItemTitle] : nil
         guard cylApplyTabBarItemUpdate(at: index, attributes: attributes) else {
@@ -458,7 +458,7 @@ extension CYLTabBarController {
             return
         }
         if keys.contains(CYLTabBarItemTitle) {
-            cylUpdateTabBarItem(at: index, attributes: [CYLTabBarItemTitle: ""])
+            updateTabBarItem(at: index, attributes: [CYLTabBarItemTitle: ""])
         }
         var stored = cylStoredTabBarItemsAttributes
         var attributes = stored[attributesIndex]

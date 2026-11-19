@@ -76,10 +76,10 @@ extension CYLTabBarController {
         if let plusChild = cylPrivate.cylContextPlusChildViewController(), selectedViewController.isEqual(plusChild),
            let plusButton = cylPrivate.cylContextPlusButton() {
             plusButton.isSelected = true
-            cylTabChanged(toSelectedIndex: (cyl_tabBar as? UITabBar)?.cyl_plusButtonIndex() ?? 0, viewController: selectedViewController,
+            tabChanged(toSelectedIndex: (cyl_tabBar as? UITabBar)?.cyl_plusButtonIndex() ?? 0, viewController: selectedViewController,
                           control: plusButton)
         } else {
-            cylTabChanged(toSelectedIndex: UInt(selectedIndex), viewController: selectedViewController, control: selectedViewController.cyl_tabButton)
+            tabChanged(toSelectedIndex: UInt(selectedIndex), viewController: selectedViewController, control: selectedViewController.cyl_tabButton)
         }
         cylSetNeedsLiquidGlassTabBarResample()
     }
@@ -172,13 +172,13 @@ extension CYLTabBarController {
         if selectedViewController?.cyl_isPlaceholder == true {
             return
         }
-        cylTabChanged(toSelectedIndex: selectedIndex, viewController: selected,
+        tabChanged(toSelectedIndex: selectedIndex, viewController: selected,
                       control: cylPlusButtonControlIfSelectingPlusChildViewController(selected))
     }
 
     /// [EN] The size of the tab bar on screen. [CN] 屏幕上 TabBar 的尺寸。
     @objc(visiableTabBarSize)
-    func cylVisiableTabBarSize() -> CGSize {
+    open func visiableTabBarSize() -> CGSize {
         cyl_tabBarController?.tabBar.cyl_boundsSize() ?? .zero
     }
 }

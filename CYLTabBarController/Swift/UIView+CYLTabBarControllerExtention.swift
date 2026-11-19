@@ -505,7 +505,7 @@ extension UIView {
         if let slotIndex = cyl_plusSlotIndex() {
             return UInt(slotIndex)
         }
-        return plusButton.cylIndex(forTabbarItemsCount: cyl_tabbarItemsCount)
+        return plusButton.cyl_index(forTabbarItemsCount: cyl_tabbarItemsCount)
     }
 
     @objc(cyl_plusButtonWidth)

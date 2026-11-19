@@ -73,11 +73,15 @@ extension CYLTabBarController {
     }
 
     @objc(cyl_tabBarItemGestureHandler)
+    open var cyl_tabBarItemGestureHandler: CYLTabBarItemGestureHandler? {
+        @objc(cyl_tabBarItemGestureHandler) get { cylTabBarItemGestureHandler() }
+        @objc(cyl_setTabBarItemGestureHandler:) set { cylSetTabBarItemGestureHandler(newValue) }
+    }
+
     func cylTabBarItemGestureHandler() -> (@convention(block) (CYLTabBarController, CYLTabBarItemGesture, UIControl, UIViewController?) -> Void)? {
         cyl_gestureSettings.handler
     }
 
-    @objc(cyl_setTabBarItemGestureHandler:)
     func cylSetTabBarItemGestureHandler(_ handler: (@convention(block) (CYLTabBarController, CYLTabBarItemGesture, UIControl, UIViewController?) -> Void)?) {
         cyl_gestureSettings.handler = handler
         if isViewLoaded {
@@ -86,13 +90,23 @@ extension CYLTabBarController {
     }
 
     @objc(cyl_tabBarItemDoubleTapInterval)
+    open var cyl_tabBarItemDoubleTapInterval: TimeInterval {
+        @objc(cyl_tabBarItemDoubleTapInterval) get { cylTabBarItemDoubleTapInterval() }
+        @objc(cyl_setTabBarItemDoubleTapInterval:) set { cylSetTabBarItemDoubleTapInterval(newValue) }
+    }
+
     func cylTabBarItemDoubleTapInterval() -> TimeInterval {
         cyl_gestureSettings.doubleTapInterval?.doubleValue ?? 0.35
     }
 
-    @objc(cyl_setTabBarItemDoubleTapInterval:)
     func cylSetTabBarItemDoubleTapInterval(_ interval: TimeInterval) {
         cyl_gestureSettings.doubleTapInterval = NSNumber(value: max(interval, 0))
+    }
+
+    @objc(cyl_tabBarItemLongPressDuration)
+    open var cyl_tabBarItemLongPressDuration: TimeInterval {
+        @objc(cyl_tabBarItemLongPressDuration) get { cylTabBarItemLongPressDuration() }
+        @objc(cyl_setTabBarItemLongPressDuration:) set { cylSetTabBarItemLongPressDuration(newValue) }
     }
 
     /**
@@ -101,12 +115,10 @@ extension CYLTabBarController {
      * [CN] 与 `cyl_tabButtonLongPressMinimumDuration`（issue #535）是同一个时长：两套长按 API 共用一个手势，见
      *      `CYLTabBarController+CYLInteraction.m`。
      */
-    @objc(cyl_tabBarItemLongPressDuration)
     func cylTabBarItemLongPressDuration() -> TimeInterval {
         cyl_tabButtonLongPressMinimumDuration
     }
 
-    @objc(cyl_setTabBarItemLongPressDuration:)
     func cylSetTabBarItemLongPressDuration(_ duration: TimeInterval) {
         cyl_tabButtonLongPressMinimumDuration = duration
     }

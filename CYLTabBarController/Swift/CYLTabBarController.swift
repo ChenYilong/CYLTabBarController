@@ -139,7 +139,7 @@ open class CYLTabBarController: UITabBarController, CYLTabBarControllerDelegate,
     @objc var cyl_imageOnlyTabsAdjustmentDisabled = false
     @objc(shouldInvokeOnceViewDidLayoutSubViewsBlock) var invokeOnceViewDidLayoutSubViewsBlock = false
     @objc(cyl_controlReportedInCurrentRunLoop) weak var cyl_controlReportedInCurrentRunLoop: UIControl?
-    @objc(isTabBarItemAnimationViewAdded) var tabBarItemAnimationViewAdded = false
+    @objc(isTabBarItemAnimationViewAdded) var isTabBarItemAnimationViewAdded = false
     @objc var tabItemPlaceholderImage: UIImage?
     @objc var storedContext: String?
     @objc var cylClassicTabBarIsAnimating = false
@@ -198,12 +198,12 @@ open class CYLTabBarController: UITabBarController, CYLTabBarControllerDelegate,
 
     public required init?(coder: NSCoder) {
         super.init(coder: coder)
-        cylDidInitialize()
+        cyl_didInitialize()
     }
 
     public override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
-        cylDidInitialize()
+        cyl_didInitialize()
     }
 
     /// [EN] A tab bar controller without tabs. [CN] 没有 Tab 的 TabBarController。
@@ -303,7 +303,7 @@ open class CYLTabBarController: UITabBarController, CYLTabBarControllerDelegate,
 
     /// [EN] After a coder or nib initialization. [CN] 通过 coder 或 nib 初始化之后。
     @objc(cyl_didInitialize)
-    open func cylDidInitialize() {
+    open func cyl_didInitialize() {
     }
 
     // MARK: - UIKit overrides
@@ -543,7 +543,7 @@ open class CYLTabBarController: UITabBarController, CYLTabBarControllerDelegate,
     // MARK: - UITabBarControllerDelegate
 
     open func tabBarController(_ tabBarController: UITabBarController, shouldSelect viewController: UIViewController) -> Bool {
-        cylTabBarController(tabBarController, shouldSelect: viewController)
+        cyl_tabBarController(tabBarController, shouldSelect: viewController)
     }
 }
 

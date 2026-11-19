@@ -30,31 +30,55 @@ enum CYLTabBarItemTitleKeys {
 extension CYLTabBarController {
 
     @objc(cyl_pageRegistry)
+    open var cyl_pageRegistry: (any CYLTabBarPageProviding)? {
+        @objc(cyl_pageRegistry) get { cylPageRegistry() }
+    }
+
     func cylPageRegistry() -> CYLTabBarPageProviding? {
         cylPrivate.cylPageRegistryState()
     }
 
     @objc(cyl_pageResolver)
+    open var cyl_pageResolver: CYLTabBarPageProvider? {
+        @objc(cyl_pageResolver) get { cylPageResolver() }
+    }
+
     func cylPageResolver() -> CYLTabBarPageProvider? {
         cylPrivate.cylPageResolverState()
     }
 
     @objc(cyl_pageLookupOrder)
+    open var cyl_pageLookupOrder: [String] {
+        @objc(cyl_pageLookupOrder) get { cylPageLookupOrder() }
+    }
+
     func cylPageLookupOrder() -> [String] {
         cylPrivate.cylPageLookupOrderState() ?? CYLTabBarPageRegistry.defaultPageLookupOrder
     }
 
     @objc(cyl_skippedTabs)
+    open var cyl_skippedTabs: [CYLTabBarSkippedTab] {
+        @objc(cyl_skippedTabs) get { cylSkippedTabs() }
+    }
+
     func cylSkippedTabs() -> [CYLTabBarSkippedTab] {
         cylPrivate.cylSkippedTabsState() ?? []
     }
 
     @objc(cyl_pendingPages)
+    open var cyl_pendingPages: [UIViewController] {
+        @objc(cyl_pendingPages) get { cylPendingPages() }
+    }
+
     func cylPendingPages() -> [UIViewController] {
         (viewControllers ?? []).filter { $0.cyl_isPendingPage }
     }
 
     @objc(cyl_pagesFromPageIdentifiers)
+    open var cyl_pagesFromPageIdentifiers: Bool {
+        @objc(cyl_pagesFromPageIdentifiers) get { cylPagesFromPageIdentifiers() }
+    }
+
     func cylPagesFromPageIdentifiers() -> Bool {
         cylPrivate.cylPagesFromPageIdentifiersState()
     }

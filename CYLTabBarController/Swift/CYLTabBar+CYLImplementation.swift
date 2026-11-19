@@ -226,7 +226,7 @@ extension CYLTabBar {
             // [EN] Liquid Glass does not support a custom height: the Liquid Glass system style has a fixed height.
             return size
         }
-        let tabBarController = cylTabBarController()
+        let tabBarController = cyl_tabBarController
         let height = (tabBarController?.tabBarHeight ?? 0) + (tabBarController?.view.safeAreaInsets.bottom ?? 0)
         if height > 0 {
             size.height = height
@@ -276,7 +276,7 @@ extension CYLTabBar {
         didChangeValue(forKey: "tabBarItemWidth")
         NotificationCenter.default.post(name: NSNotification.Name("CYLTabBarItemWidthDidChangeNotification"), object: self)
         // [EN] `CYL_IS_IPHONE_X`: a screen of at least 375 × 812 pt. [CN] `CYL_IS_IPHONE_X`：屏幕至少为 375 × 812 pt。
-        if let size = cylTabBarController()?.visiableTabBarSize(),
+        if let size = cyl_tabBarController?.visiableTabBarSize(),
            min(size.width, size.height) >= 375 && max(size.width, size.height) >= 812 {
             layoutIfNeeded()
         }
@@ -358,7 +358,7 @@ extension CYLTabBar {
         //      so that PlusButton can support a custom index in the future.
         cyl_addPlatterViewThenBringSubview(toFront: plusButton)
         isPlusButtonActive = true
-        plusButton.cylSetTabBarController(cylTabBarController())
+        plusButton.cylSetTabBarController(cyl_tabBarController)
     }
 
     @objc(cyl_tabBarIsPlusButtonLayoutCentered)
@@ -373,7 +373,7 @@ extension CYLTabBar {
         if let owner = delegate as? CYLTabBarController {
             return owner
         }
-        return cylTabBarController()
+        return cyl_tabBarController
     }
 
     // MARK: - [EN] Classic styles and UITabBarAppearance [CN] 经典样式与 UITabBarAppearance
@@ -1096,7 +1096,7 @@ extension CYLTabBar {
     @objc(cyl_tabBarPlusButtonIndex)
     func cylTabBarPlusButtonIndex() -> UInt {
         let plusButton = cylTabBarPlusButton()
-        var plusButtonIndex = plusButton.map { Int($0.cylIndex(forTabbarItemsCount: cyl_tabbarItemsCount)) } ?? 0
+        var plusButtonIndex = plusButton.map { Int($0.cyl_index(forTabbarItemsCount: cyl_tabbarItemsCount)) } ?? 0
         let tabBarWidth = cylBoundsSize().width
         let tabBarHeight = cylBoundsSize().height
         let registeredPlusButton = cylRegisteredPlusButton
@@ -1315,7 +1315,7 @@ extension CYLTabBar {
     @objc(cyl_showsMinimizedBar)
     func cylTabBarShowsMinimizedBar() -> Bool {
         guard CYLConstants.isLiquidGlassActive(), traitCollection.userInterfaceIdiom == .phone else { return false }
-        let behavior = cylTabBarOwningTabBarController()?.cylTabBarMinimizeBehavior
+        let behavior = cylTabBarOwningTabBarController()?.cyl_tabBarMinimizeBehavior
         guard behavior == .onScrollDown || behavior == .onScrollUp else { return false }
         guard let platterView = cylPlatterView(), platterView.window != nil, platterView.isDescendant(of: self) else { return false }
         // [EN] In this bar's coordinates, so a scale transform counts too. [CN] 转换到本 TabBar 坐标系，缩放 transform 也会计入。
