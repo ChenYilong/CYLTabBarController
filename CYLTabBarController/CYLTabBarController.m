@@ -131,18 +131,18 @@ NSUInteger CYLTabbarItemsCount = 0;
 NSUInteger CYLPlusButtonIndex = 0;
 CGFloat CYLTabBarItemWidth = 0.0f;
 CGFloat CYLTabBarHeight = 49.0f;
-static const CGFloat kCYLDefaultTabBarHeight = 49.0f;
 
 NSString *const CYLTabBarItemLottieAnimationPlayingNotification = @"CYLTabBarItemLottieAnimationPlayingNotification";
 NSString *const CYLTabBarItemLottieAnimationViewDidAddNotification = @"CYLTabBarItemLottieAnimationViewDidAddNotification";
 // [EN] The same values as the Lottie names, so both names reach the same observers. [CN] 与 Lottie 名称取值相同，两个名称对应同一批观察者。
 
 NSString *const CYLTabBarStyleTypeDidChangeNotification = @"CYLTabBarStyleTypeDidChangeNotification";
-static void * const CYLTabImageViewDefaultOffsetContext = (void*)&CYLTabImageViewDefaultOffsetContext;
-static void * const CYLFlatDesignTabBarContext = (void*)&CYLFlatDesignTabBarContext;
+// [EN] The KVO contexts are Swift (Swift/CYLTabBarController+CYLKeyValueObserving.swift, step 127). [CN] KVO context 已改为 Swift（第 127 步）。
+#define CYLTabImageViewDefaultOffsetContext ([CYLTabBarController cyl_tabImageViewDefaultOffsetKVOContext])
+#define CYLFlatDesignTabBarContext ([CYLTabBarController cyl_flatDesignTabBarKVOContext])
 /// The system tab bar's `standardAppearance` / `scrollEdgeAppearance`: synced to the tabs' title offsets (issue #475) and to
 /// the flat design tab bar. 系统 TabBar 的 `standardAppearance` / `scrollEdgeAppearance`：同步到 Tab 的标题偏移（issue #475）与扁平样式 TabBar。
-static void * const CYLStandardAppearanceContext = (void*)&CYLStandardAppearanceContext;
+#define CYLStandardAppearanceContext ([CYLTabBarController cyl_standardAppearanceKVOContext])
 //static void * const CYLTabBarControllerVisiableItemsCountContext = (void*)&CYLTabBarControllerVisiableItemsCountContext;
 
 // [EN] The classic hide / show duration and distance are Swift (CYLTabBarController+CYLTabBarHidden.swift, step 75).
@@ -1390,9 +1390,9 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
 // [EN] The title offsets (issue #475) and image insets (issue #95) of the tabs, the looping Lottie tabs and the FlatDesign item
 //      colors / `standardAppearance` mirroring are Swift (Swift/CYLTabBarController+CYLItemAppearance.swift and
 //      CYLFlatDesignTabBar-ObjectiveC/Swift/CYLTabBarController+CYLFlatDesignItemAppearance.swift, step 125). The two setters stay
-//      here to store the ivar; the observers of `standardAppearance` stay with the KVO context they share.
+//      here: they store the ivar and call Swift (the forwarder shape until the class switch).
 // [CN] Tab 的标题偏移（issue #475）、图片内边距（issue #95）、循环播放的 Lottie Tab 以及扁平样式 item 的颜色 / `standardAppearance` 映射已改为 Swift
-//      （第 125 步）。两个 setter 留在这里保存实例变量；`standardAppearance` 的观察与其共用的 KVO context 一起留在这里。
+//      （第 125 步）。两个 setter 留在这里：保存实例变量并调用 Swift（类切换之前的转发形式）。
 - (void)setTitlePositionAdjustment:(UIOffset)titlePositionAdjustment {
     _titlePositionAdjustment = titlePositionAdjustment;
     [self cyl_applyTitlePositionAdjustmentToItems:titlePositionAdjustment];
@@ -1403,111 +1403,15 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
     [self cyl_applyImageInsetsToItems:imageInsets];
 }
 
-static char CYLObservedStandardAppearanceTabBarKey;
-
-static NSArray<NSString *> *CYLObservedAppearanceKeyPaths(void) {
-    if (@available(iOS 15.0, *)) {
-        return @[ @"standardAppearance", @"scrollEdgeAppearance" ];
-    }
-    return @[ @"standardAppearance" ];
-}
-
-- (void)cyl_startObservingStandardAppearance {
-    UITabBar *tabBar = self.tabBar;
-    UITabBar *observedTabBar = objc_getAssociatedObject(self, &CYLObservedStandardAppearanceTabBarKey);
-    if (observedTabBar == tabBar) {
-        return;
-    }
-    // The tab bar was replaced (`-setUpTabBar:` swaps in CYLTabBar): observe the current one.
-    // TabBar 已被替换（`-setUpTabBar:` 会换成 CYLTabBar）：改为观察当前的 TabBar。
-    [self cyl_stopObservingStandardAppearance];
-    if (!tabBar) {
-        return;
-    }
-    // The appearances exist from iOS 13. appearance 自 iOS 13 起提供。
-    if (@available(iOS 13.0, *)) {
-        for (NSString *keyPath in CYLObservedAppearanceKeyPaths()) {
-            [tabBar addObserver:self forKeyPath:keyPath options:NSKeyValueObservingOptionNew context:CYLStandardAppearanceContext];
-        }
-        objc_setAssociatedObject(self, &CYLObservedStandardAppearanceTabBarKey, tabBar, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-    }
-}
-
-- (void)cyl_stopObservingStandardAppearance {
-    UITabBar *tabBar = objc_getAssociatedObject(self, &CYLObservedStandardAppearanceTabBarKey);
-    if (!tabBar) {
-        return;
-    }
-    for (NSString *keyPath in CYLObservedAppearanceKeyPaths()) {
-        [tabBar cyl_removeObserver:self forKeyPath:keyPath context:CYLStandardAppearanceContext];
-    }
-    objc_setAssociatedObject(self, &CYLObservedStandardAppearanceTabBarKey, nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-}
-
-#pragma mark -
 #pragma mark - KVO Method
 
-// KVO监听执行
-// Dispatched by `context`, not by the current style: an observation outlives a change of `tabBarStyleType`, and an
-// observation of ours passed on to `super` raises an exception.
-// 按 `context` 分发，而不是按当前样式：观察会在 `tabBarStyleType` 改变后继续存在，把自己的观察交给 `super` 会抛异常。
+// [EN] The observers of `standardAppearance` and the dispatch by KVO context are Swift
+//      (Swift/CYLTabBarController+CYLKeyValueObserving.swift, step 127); this override stays as one line. The image-only tabs
+//      (issue #257, #522) are Swift since step 58 (Swift/CYLTabBarController+CYLImageOnlyTabs.swift).
+// [CN] `standardAppearance` 的观察与按 KVO context 的分发已改为 Swift（第 127 步）；此重写保留为一行。纯图标 Tab 自第 58 步起为 Swift。
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSKeyValueChangeKey,id> *)change context:(void *)context {
-    if (context == CYLTabImageViewDefaultOffsetContext) {
-        CYL_IF_NOT_FLATDESIGN_BEGIN     //Not CYLTabBarStyleTypeFlatDesign
-            CGFloat tabImageViewDefaultOffset = [change[NSKeyValueChangeNewKey] doubleValue];
-            [self offsetTabBarTabImageViewToFit:tabImageViewDefaultOffset];
-        } else {/**  CYLTabBarStyleTypeFlatDesign*/}
-        return;
-    }
-    if (context == CYLStandardAppearanceContext) {
-        [self cyl_syncTabBarAppearances];
-        return;
-    }
-    if (context == CYLFlatDesignTabBarContext) {
-#if CYL_FLATDESIGN_AVAILABLE
-        if (CYLTabBarStyleTypeFlatDesign != self.tabBarStyleType || ![_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) { return; }
-        id oldValue = change[NSKeyValueChangeOldKey];
-        id newValue = change[NSKeyValueChangeNewKey];
-        CYLFlatDesignTabBar *oldTabBar = (oldValue == [NSNull null]) ? nil : oldValue;
-        CYLFlatDesignTabBar *newTabBar = (newValue == [NSNull null]) ? nil : newValue;
-        // `-cyl_setTabBar:` already stored `newTabBar`. Setting it again here re-entered this callback forever.
-        // `-cyl_setTabBar:` 已经保存了 `newTabBar`，在这里再次赋值会无限重入本回调。
-        if (oldTabBar == newTabBar) { return; }
-        [oldTabBar removeFromSuperview];
-        if (@available(iOS 13.0, *)) {
-            newTabBar.standardAppearance = newTabBar.standardAppearance ?: oldTabBar.standardAppearance;
-        }
-        newTabBar.delegate = self;
-        newTabBar.items = oldTabBar.items;
-        newTabBar.selectedItem = oldTabBar.selectedItem;
-        if (newTabBar) {
-            [self.view addSubview:newTabBar];
-            [self.view setNeedsLayout];
-        }
-#endif
-        return;
-    }
-    [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
+    [self cyl_observeValueForKeyPath:keyPath ofObject:object change:change context:context];
 }
-
-
-#pragma mark - Image-only tabs (issue #257, #522)
-
-/*!
- * FIX: issue #257, issue #522
- * [EN] What the automatic adjustment of image-only tabs wrote into one tab bar item, so it is written only where the app
- *      set nothing, never twice, and can be undone (`automaticallyAdjustsImageOnlyTabs = NO`). Keys:
- *      `insets` / `appliedInsets`: the item's `imageInsets` before / after; `title` / `appliedTitle`: the same for
- *      `titlePositionAdjustment`. A pair is missing when that value was left to the app.
- * [CN] 纯图标 Tab 自动调整写入某个 TabBarItem 的内容：只在 App 未设置的地方写入、不会重复写入、并且可以撤销
- *      （`automaticallyAdjustsImageOnlyTabs = NO`）。键：`insets` / `appliedInsets`：item 原来 / 写入后的 `imageInsets`；
- *      `title` / `appliedTitle`：`titlePositionAdjustment` 的对应值。某一对缺失表示该值留给 App。
- *      The keys are defined at the top of this file. 这些键定义在本文件顶部。
- */
-
-// [EN] `automaticallyAdjustsImageOnlyTabs`, `-cyl_restoreImageOnlyTabItems:` and `-offsetTabBarTabImageViewToFit:` are Swift
-//      (Swift/CYLTabBarController+CYLImageOnlyTabs.swift, docs/Swift-Migration.md, step 58).
-// [CN] 上述方法已迁移到 Swift（第 58 步）。
 
 #pragma mark - delegate
 
@@ -1751,145 +1655,23 @@ static NSArray<NSString *> *CYLObservedAppearanceKeyPaths(void) {
 
 #pragma mark -
 #pragma mark - getter & setter
-// MARK: getter & setter
 
+// [EN] The bodies of the `cyl_tabBar` getter, `-setContext:` and the `tabBarHeight` accessors are Swift
+//      (Swift/CYLTabBarController+CYLTabBarAccessors.swift and, for FlatDesign, CYLTabBarController+CYLFlatDesignTabBarAccessors.swift;
+//      step 128). The accessors stay here as one-line forwarders: a Swift extension cannot replace the accessors of an
+//      Objective-C property. The lazy arrays below are storage.
+// [CN] `cyl_tabBar` getter、`-setContext:` 与 `tabBarHeight` 访问器的实现已改为 Swift（第 128 步）。访问器在这里保留为一行的转发：Swift 扩展
+//      无法替换 Objective-C 属性的访问器。下面的延迟创建数组属于存储。
 - (UIView __kindof *)cyl_tabBar {
-    CYL_IF_NOT_FLATDESIGN_BEGIN     //Not CYLTabBarStyleTypeFlatDesign
-        
-#if CYL_FLATDESIGN_AVAILABLE
-        if (_cyl_tabBar && [_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) {
-            _cyl_tabBar = nil;
-        }
-#else
-#endif
-    
-        if (!_cyl_tabBar) {
-            // [CN] 处理tabBar，使用自定义 tabBar 并添加 发布按钮。仅限 CYLTabBar，CYLTabBarStyleTypeFlatDesign 会在 setViewControllers 内部设置。
-            // [EN] Set up the tabBar: use the custom tabBar and add the publish button. CYLTabBar only;
-            //      CYLTabBarStyleTypeFlatDesign is set inside setViewControllers.
-            [self setUpDefaultStyleTabBar];
-            // [CN] KVO注册监听
-            // [EN] Register KVO observers
-            if (!self.isObservingTabImageViewDefaultOffset) {
-                @try {
-                    //CYLTabBarController may crash when deallocating
-                    [_cyl_tabBar addObserver:self forKeyPath:@"tabImageViewDefaultOffset" options:NSKeyValueObservingOptionNew context:CYLTabImageViewDefaultOffsetContext];
-                } @catch(NSException *exception) {
-#if defined(DEBUG) || defined(BETA)
-                    NSLog(CYLLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
-#endif
-                }
-                self.observingTabImageViewDefaultOffset = YES;
-            }
-            [[NSNotificationCenter defaultCenter] postNotificationName:CYLTabBarStyleTypeDidChangeNotification object:self];
-        
-        }
-        return _cyl_tabBar;
-        //    _cyl_tabBar = self.tabBar;
-    } else {/**  CYLTabBarStyleTypeFlatDesign*/
-
-    }
-    /*!
-     * [CN] 添加自定义的 CYLFlatDesignTabBar
-     * [EN] Add the custom CYLFlatDesignTabBar
-     */
-
-
-    if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType) {
-#if CYL_FLATDESIGN_AVAILABLE
-        if (_cyl_tabBar && [_cyl_tabBar isKindOfClass:[CYLTabBar class]]) {
-            // Otherwise the flag stays YES and the next CYLTabBar (back to a system style) is never observed.
-            // 否则标记一直为 YES，之后（切回系统样式时）新建的 CYLTabBar 永远不会被观察。
-            [self cyl_stopObservingTabImageViewDefaultOffset];
-            _cyl_tabBar = nil;
-        }
-        if (!_cyl_tabBar) {
-            // [CN] 通过KVC 换成 CYLFlatDesignTabBarHideTabBar 控制系统 UITabBar 永久隐藏
-            // [EN] Swap in CYLFlatDesignTabBarHideTabBar via KVC to keep the system UITabBar permanently hidden
-            CYLFlatDesignTabBarHideTabBar *tabBar = [[CYLFlatDesignTabBarHideTabBar alloc] init];
-            [self cyl_setValue:tabBar forKey:@"tabBar"];
-            // KVC can fail silently. Hide the actual system bar, not just the
-            // replacement object that may not have been installed.
-            if (!self.tabBar.hidden) { self.tabBar.hidden = YES; }
-            
-            CYLFlatDesignTabBar *flatDesignTabBar = [[CYLFlatDesignTabBar alloc] initWithFrame:self.tabBarFrame];
-            flatDesignTabBar.delegate = self;
-            // `-setContext:` usually ran before this tab bar existed (it only copies the context to an existing one).
-            // `-setContext:` 通常在本 TabBar 创建之前就执行了（它只会复制给已存在的 TabBar）。
-            flatDesignTabBar.context = self.cyl_context;
-            _cyl_tabBar = (UIView *)flatDesignTabBar;
-            _cylDidRefreshSystemTabBarVisibility = NO;
-            _cylRefreshedSystemTabBarWindow = nil;
-            [self.view addSubview:_cyl_tabBar];
-            [self addObserver:self forKeyPath:@"cyl_tabBar" options:NSKeyValueObservingOptionOld|NSKeyValueObservingOptionNew context:CYLFlatDesignTabBarContext];
-            
-            self.cyl_tabBarHidden = NO;
-            [self setTabBarHidden:NO];
-            [self _updateAdditionalSafeAreaInsetsWithAnimated:NO];
-            [[NSNotificationCenter defaultCenter] postNotificationName:CYLTabBarStyleTypeDidChangeNotification object:self];
-        }
-
-#else
-#endif
-    } else {}
-    
-    return _cyl_tabBar;
+    return [self cyl_lazyTabBar];
 }
-
-
-//- (void)cyl_setTabBar:(CYLTabBar *)cyl_tabBar {
-//    CYL_IF_NOT_FLATDESIGN_BEGIN     //Not CYLTabBarStyleTypeFlatDesign
-//    self.tabBar = cyl_tabBar;
-//} else {/**  CYLTabBarStyleTypeFlatDesign*/}
-//}
 
 - (NSString *)context {
     return self.cyl_context;
 }
 
 - (void)setContext:(nullable NSString *)context {
-    CYL_IF_NOT_FLATDESIGN_BEGIN     //Not CYLTabBarStyleTypeFlatDesign
-        self.cyl_context = context;
-        @try {
-            CYLTabBar *cyl_tabBar = (CYLTabBar *)self.cyl_tabBar;
-            cyl_tabBar.context = self.cyl_context;
-            [cyl_tabBar setValue:self.cyl_context forKey:@"context"];
-        } @catch (NSException *exception) {
-#if defined(DEBUG) || defined(BETA)
-            //fix [bug]: #556
-            NSLog(CYLLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@，[DEBUG] 请确保你的 CYLTabBarController 子类在 viewDidLoad 中调用了 `super.viewDidLoad()`，且放在最后一行，否则 CYLTabBar 的 KVC 设置会失败。"), @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
-#endif
-        }
-    } else {/**  CYLTabBarStyleTypeFlatDesign*/}
-
-
-    //CYLTabBarStyleTypeFlatDesign
-    if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType) {
-#if CYL_FLATDESIGN_AVAILABLE
-        if (![_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) { return; }
-        self.cyl_context = context;
-        @try {
-            CYLFlatDesignTabBar *cyl_tabBar = (CYLFlatDesignTabBar *)self.cyl_tabBar;
-
-            cyl_tabBar.context = self.cyl_context;
-            [cyl_tabBar setValue:self.cyl_context forKey:@"context"];
-        } @catch (NSException *exception) {
-#if defined(DEBUG) || defined(BETA)
-            //fix [bug]: #556
-            NSLog(CYLLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@，[DEBUG] 请确保你的 CYLTabBarController 子类在 viewDidLoad 中调用了 `super.viewDidLoad()`，且放在最后一行，否则 CYLTabBar 的 KVC 设置会失败。"), @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason);
-#endif
-        }
-        
-        // A plus button registered for ANOTHER context used to be removed here. With several tab bar controllers, each with its
-        // own context and plus button, that unregistered the plus button of the other one as soon as this one loaded (#414).
-        // This tab bar controller only uses the plus button of its own context (`-hasPlusButton`), nothing to remove.
-        // 这里曾经会移除为 **其他** context 注册的 PlusButton。存在多个 TabBarController（各自有 context 和 PlusButton）时，
-        // 一个 TabBarController 加载就会把另一个的 PlusButton 注销（#414）。本 TabBarController 只使用自己 context 的 PlusButton
-        // （`-hasPlusButton`），不需要移除任何东西。
-#else
-#endif
-        
-    } else {}
+    [self cyl_applyContext:context];
 }
 
 /// [EN] Lazily created. [CN] 懒加载。
@@ -1911,66 +1693,17 @@ static NSArray<NSString *> *CYLObservedAppearanceKeyPaths(void) {
 #pragma mark - Deprecated Lottie names (compatibility) 已废弃的 Lottie 名称（兼容）
 
 // [EN] The deprecated Lottie names (`lottieURLs`, `lottieSizes`, `lottieViewAdded`) and `-rootWindow` are Swift
-//      (`Swift/CYLTabBarController+CYLCompatibility.swift`, step 104); `tabBarHeight` and `items` stay here (instance variables).
+//      (`Swift/CYLTabBarController+CYLCompatibility.swift`, step 104); the `tabBarHeight` forwarders and the lazy `items` stay here (instance variables).
 // [CN] 已废弃的 Lottie 名称与 `-rootWindow` 已改为 Swift（第 104 步）；`tabBarHeight` 与 `items` 留在这里（使用实例变量）。
 
 - (void)setTabBarHeight:(CGFloat)tabBarHeight {
-    CYL_IF_NOT_FLATDESIGN_BEGIN     //Not CYLTabBarStyleTypeFlatDesign
-        _tabBarHeight = tabBarHeight;
-        CYLTabBarHeight = tabBarHeight;
-    } else {/**  CYLTabBarStyleTypeFlatDesign*/}
-
-    if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType) {
-#if CYL_FLATDESIGN_AVAILABLE
-        if (![_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) { return; }
-        
-        if (_tabBarHeight != tabBarHeight) {
-            _tabBarHeight = tabBarHeight;
-            
-            [self _updateAdditionalSafeAreaInsetsWithAnimated:NO];
-            [self.view setNeedsLayout];
-        }
-#else
-#endif
-    } else {/** Not CYLTabBarStyleTypeFlatDesign*/}
+    [self cyl_applyTabBarHeight:tabBarHeight];
 }
 
 - (CGFloat)tabBarHeight {
-    CYL_IF_NOT_FLATDESIGN_BEGIN     //Not CYLTabBarStyleTypeFlatDesign
-        if (0 == _tabBarHeight) {
-            // Not the global `CYLTabBarHeight`: another tab bar controller with a custom height wrote it.
-            // 不使用全局变量 `CYLTabBarHeight`：其他设置了自定义高度的 TabBarController 会改写它。
-            _tabBarHeight = kCYLDefaultTabBarHeight;
-        }
-        return _tabBarHeight;
-        
-    } else {/**  CYLTabBarStyleTypeFlatDesign*/}
-    
-    if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType) {
-#if CYL_FLATDESIGN_AVAILABLE
-        if (![_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) { return _tabBarHeight; }
-        if (0 == _tabBarHeight) {
-            // Not the global `CYLTabBarHeight`: another tab bar controller with a custom height wrote it.
-            // 不使用全局变量 `CYLTabBarHeight`：其他设置了自定义高度的 TabBarController 会改写它。
-            _tabBarHeight = kCYLDefaultTabBarHeight;
-        }
-        return _tabBarHeight;
-#else
-#endif
-    } else {/** Not CYLTabBarStyleTypeFlatDesign*/}
-    return _tabBarHeight;
+    return [self cyl_resolvedTabBarHeight];
 }
 
-//#if CYL_FLATDESIGN_AVAILABLE
-//- (void)tabBar:(CYLFlatDesignTabBar *)tabBar didSelectItemAt:(NSInteger)index {
-//    [self setSelectedIndex:index];
-//    if (tabBar.tabBarItems && tabBar.tabBarItems.count > index) {
-//        [self tabChangedToSelectedIndex:index
-//                         viewController:self.selectedViewController
-//                                       control:tabBar.tabBarItems[index]];
-//    }
-//}
-//#endif
 
 
 /**
@@ -2266,6 +1999,14 @@ static BOOL CYLIsImplementedOutsideSystemFrameworks(Class cls, SEL selector) {
 
 - (void)cyl_setStoredTabBar:(nullable UIView *)tabBar {
     _cyl_tabBar = tabBar;
+}
+
+- (CGFloat)cyl_tabBarHeightStorage {
+    return _tabBarHeight;
+}
+
+- (void)cyl_setTabBarHeightStorage:(CGFloat)tabBarHeight {
+    _tabBarHeight = tabBarHeight;
 }
 
 @end
