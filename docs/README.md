@@ -66,6 +66,7 @@
 | [SVGA 动画 Tab 图标（与 Rive、PAG、Lottie 用法相同）](SVGA-Animation.md) | [SVGA animated tab icons (used like Rive, PAG and Lottie)](SVGA-Animation.md) |
 | [截图规范](Screenshot-Guidelines.md) | [Screenshot guidelines](Screenshot-Guidelines.md) |
 | [selectedIndex 与 PlusButton：选中的文字与图片一致](SelectedIndex-PlusButton.md) | [selectedIndex and the PlusButton: the selected title and image match](SelectedIndex-PlusButton.md) |
+| [在 Swift 中继承本库的类](Subclassing-In-Swift.md) | [Subclassing the library's classes in Swift](Subclassing-In-Swift.md) |
 | [Swift 编码规范](Swift-Coding-Style.md) | [Swift coding style](Swift-Coding-Style.md) |
 | [在 Swift 项目中使用 CYLTabBarController](Swift-Guide.md) | [Using CYLTabBarController in Swift](Swift-Guide.md) |
 | [iOS 核心层迁移到 Swift](Swift-Migration.md) | [Migrating the iOS core layer to Swift](Swift-Migration.md) |
@@ -168,6 +169,7 @@ docs/
 ├── SVGA-Animation.md
 ├── Screenshot-Guidelines.md
 ├── SelectedIndex-PlusButton.md
+├── Subclassing-In-Swift.md
 ├── Swift-Coding-Style.md
 ├── Swift-Guide.md
 ├── Swift-Migration.md
