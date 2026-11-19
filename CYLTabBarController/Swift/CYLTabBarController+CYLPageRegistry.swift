@@ -205,8 +205,14 @@ extension CYLTabBarController {
  */
 extension UIViewController {
 
+    /**
+     * [EN] The title of this view controller's tab: the plus button's title for its page, else the normal title (also while the
+     *      selected title shows), the FlatDesign item's title, or the tab bar item's. nil without one.
+     * [CN] 本视图控制器所在 Tab 的标题：PlusButton 的页面为 PlusButton 的标题，否则为普通标题（显示选中标题时也是）、扁平样式 item 的标题或
+     *      TabBarItem 的标题；没有时为 nil。
+     */
     @objc(cyl_tabBarItemTitle)
-    func cylTabBarItemTitle() -> String? {
+    open var cyl_tabBarItemTitle: String? {
         let tab: UIViewController = navigationController?.viewControllers.first === self ? (navigationController ?? self) : self
         // [EN] The plus button's page: the plus button's title. [CN] PlusButton 的页面：PlusButton 的标题。
         if let tabBarController = tab.cyl_tabBarController, tab === tabBarController.cylPrivate.cylContextPlusChildViewController() {
@@ -229,17 +235,21 @@ extension UIViewController {
         return title
     }
 
+    /**
+     * [EN] Whether the navigation title follows the tab's title (kept in step when the title changes).
+     * [CN] 导航栏标题是否跟随 Tab 标题（标题变化时保持一致）。
+     */
     @objc(cyl_navigationTitleFollowsTabBarItemTitle)
-    func cylNavigationTitleFollowsTabBarItemTitle() -> Bool {
-        (objc_getAssociatedObject(self, CYLTabBarItemTitleKeys.navigationTitleFollowsTabBarItemTitle) as? NSNumber)?.boolValue ?? false
-    }
-
-    @objc(setCyl_navigationTitleFollowsTabBarItemTitle:)
-    func cylSetNavigationTitleFollowsTabBarItemTitle(_ follows: Bool) {
-        objc_setAssociatedObject(self, CYLTabBarItemTitleKeys.navigationTitleFollowsTabBarItemTitle, NSNumber(value: follows),
-                                 .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
-        if follows, let title = cylTabBarItemTitle() {
-            navigationItem.title = title
+    open var cyl_navigationTitleFollowsTabBarItemTitle: Bool {
+        @objc(cyl_navigationTitleFollowsTabBarItemTitle) get {
+            (objc_getAssociatedObject(self, CYLTabBarItemTitleKeys.navigationTitleFollowsTabBarItemTitle) as? NSNumber)?.boolValue ?? false
+        }
+        @objc(setCyl_navigationTitleFollowsTabBarItemTitle:) set {
+            objc_setAssociatedObject(self, CYLTabBarItemTitleKeys.navigationTitleFollowsTabBarItemTitle, NSNumber(value: newValue),
+                                     .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+            if newValue, let title = cyl_tabBarItemTitle {
+                navigationItem.title = title
+            }
         }
     }
 }

@@ -1,0 +1,4 @@
+module CYLTabBarControllerObjC {
+    umbrella header "CYLTabBarControllerObjC.h"
+    export *
+}
