@@ -144,10 +144,11 @@ open class CYLTabBarController: UITabBarController, CYLTabBarControllerDelegate,
     }
     /// [EN] Backing flag of `automaticallyAdjustsImageOnlyTabs`, negated so that the default (false) means true (issues #257, #522). [CN] `automaticallyAdjustsImageOnlyTabs` 的存储标记，取反存储。
     @objc var cyl_imageOnlyTabsAdjustmentDisabled = false
-    private var storedInvokeOnceViewDidLayoutSubViewsBlock = false
+    private var invokeOnceViewDidLayoutSubViewsBlockStorage = false
+    /// [EN] Getter `shouldInvokeOnce…`, setter `setInvokeOnce…:` (the selectors the Objective-C property had). [CN] getter 为 `shouldInvokeOnce…`、setter 为 `setInvokeOnce…:`（与原 Objective-C 属性的 selector 相同）。
     @objc(shouldInvokeOnceViewDidLayoutSubViewsBlock) var invokeOnceViewDidLayoutSubViewsBlock: Bool {
-        @objc(shouldInvokeOnceViewDidLayoutSubViewsBlock) get { storedInvokeOnceViewDidLayoutSubViewsBlock }
-        @objc(setInvokeOnceViewDidLayoutSubViewsBlock:) set { storedInvokeOnceViewDidLayoutSubViewsBlock = newValue }
+        @objc(shouldInvokeOnceViewDidLayoutSubViewsBlock) get { invokeOnceViewDidLayoutSubViewsBlockStorage }
+        @objc(setInvokeOnceViewDidLayoutSubViewsBlock:) set { invokeOnceViewDidLayoutSubViewsBlockStorage = newValue }
     }
     @objc(cyl_controlReportedInCurrentRunLoop) weak var cyl_controlReportedInCurrentRunLoop: UIControl?
     private var storedTabBarItemAnimationViewAdded = false

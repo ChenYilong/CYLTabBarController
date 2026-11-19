@@ -354,7 +354,8 @@ extension CYLTabBarController {
     @objc(setTabBarItemIcon:selectedIcon:size:atIndex:)
     @discardableResult
     open func setTabBarItemIcon(_ icon: Any?, selectedIcon: Any?, size: CGSize, at index: UInt) -> Bool {
-        // [EN] `icon` may be nil from Objective-C: nothing to show. [CN] Objective-C 调用方可能传入 nil：没有可显示的内容。
+        // [EN] `icon` is optional so that a nil from Objective-C is refused (NO) instead of reaching Swift as a non-optional.
+        // [CN] `icon` 为可选，使 Objective-C 传入的 nil 被拒绝（返回 NO），而不是以非可选值进入 Swift。
         guard let icon, let viewController = cylIconTab(at: index) else {
             return false
         }
