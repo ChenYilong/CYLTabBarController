@@ -5,13 +5,13 @@
      show), one values folder per iOS .lproj folder (33 languages), so the Android example says what the iOS example
      says (docs/Configuration-Localization.md, Android example strings). The texts are the English literals the Kotlin
      code passes to `cylDemoText("...")` / `DemoText.string("...")` in demokit and app; each is looked up by its English
-     value in the iOS tables, and its resource name is `cyl_demo_` + the first 10 hex digits of its SHA-1 (the same as
+     value in the iOS tables, and its resource name is `cyl_demo_` + the first 10 hex digits of its SHA-256 (the same as
      `DemoText.resourceName`). A text the iOS tables lack is reported and shown in English. `--check` fails when a file is
      out of date or a text has no iOS entry (for CI).
 [CN] 从 iOS 示例 bundle `Example-Shared/CYLDemo.bundle`（两端都显示的文字取自核心 bundle `CYLTabBarController.bundle`）生成 Android 示例层的
      字符串表（demokit 的 `res/values*/cyl_demo_strings.xml`），每个 iOS .lproj 文件夹对应一个 values 文件夹（33 种语言），使 Android 示例与 iOS
      示例说法一致（docs/Configuration-Localization.md「Android 示例字符串」）。文字为 demokit 与 app 的 Kotlin 代码传给 `cylDemoText("...")` /
-     `DemoText.string("...")` 的英文字面量；按英文值在 iOS 字符串表中查找，资源名为 `cyl_demo_` 加 SHA-1 前 10 位十六进制（与
+     `DemoText.string("...")` 的英文字面量；按英文值在 iOS 字符串表中查找，资源名为 `cyl_demo_` 加 SHA-256 前 10 位十六进制（与
      `DemoText.resourceName` 相同）。iOS 字符串表中没有的文字会被报告，并以英文显示。`--check` 在文件过期或文字没有 iOS 条目时失败（用于 CI）。
 """
 import glob
@@ -98,7 +98,7 @@ def app_strings(res):
 
 
 def resource_name(text):
-    return 'cyl_demo_' + hashlib.sha1(text.encode('utf-8')).hexdigest()[:10]
+    return 'cyl_demo_' + hashlib.sha256(text.encode('utf-8')).hexdigest()[:10]
 
 
 def folder_of(language):
