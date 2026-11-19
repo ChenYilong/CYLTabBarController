@@ -441,6 +441,7 @@ docs/
 │   ├── react-native-component-android.png
 │   ├── react-native-component-ios-bar.png
 │   ├── react-native-component-ios.png
+│   ├── react-native-ios27.2-iphone18pro-20261119-tab-switch-74f0b4cd.png
 │   ├── react-native-pag-android-bar.png
 │   ├── react-native-pag-ios-bar.png
 │   ├── react-native-pag-menu.png

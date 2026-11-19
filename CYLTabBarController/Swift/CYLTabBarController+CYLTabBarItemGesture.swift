@@ -187,7 +187,7 @@ extension CYLTabBarController {
             cylPrivateVoid("cyl_performReselectBehaviorForViewController:", viewController)
         }
         cyl_gestureSettings.handler?(self, gesture, control, viewController)
-        let delegate = (self as UITabBarController).delegate as? CYLTabBarControllerDelegate
+        let delegate = cylDelegate
         delegate?.tabBarController?(self, didRecognize: gesture, control: control, viewController: viewController)
         // [EN] The tab's own double tap block, after the handler and the delegate. [CN] Tab 自己的双击 block，在 handler 与代理之后。
         if gesture == .doubleTap, let viewController, let index = viewControllers?.firstIndex(of: viewController),

@@ -598,7 +598,7 @@ extension CYLTabBarController {
      */
     func cylReportLongPress(on control: UIControl) {
         cylInteraction.didLongPressControlBlock?(self, control)
-        (delegate.map { $0 as AnyObject } as? CYLTabBarControllerDelegate)?.tabBarController?(self, didLongPress: control)
+        cylDelegate?.tabBarController?(self, didLongPress: control)
         guard cylHasTabBarItemGestureReceiver() else { return }
         // [EN] The pressed control may be an interactive subview of the plus button (#202): the LongPress belongs to the tab button
         //      or plus button it is in.
@@ -1131,7 +1131,7 @@ extension CYLTabBarController {
         guard CYLConstants.isLiquidGlassActive(), let tabBar = tabBar as? CYLTabBar else {
             return
         }
-        let delegate = (self as UITabBarController).delegate as? CYLTabBarControllerDelegate
+        let delegate = cylDelegate
         let shows = delegate?.tabBarController?(tabBarController, shouldShowPlatterLiquidLensViewFor: control) ?? true
         tabBar.cyl_platterLiquidLensViewContentView()?.cyl_setHidden(!shows)
         tabBar.liquidGlassContinuousGestureRecognizer?.isEnabled = shows
@@ -1244,7 +1244,7 @@ extension CYLTabBarController {
                 plusButton.perform(tapped)
             }
         }
-        let delegate = (self as UITabBarController).delegate as? CYLTabBarControllerDelegate
+        let delegate = cylDelegate
         delegate?.tabBarController?(self, didSelect: control)
         cylRecognizeTabBarItemGestureForReportedControl(control)
     }
@@ -1337,5 +1337,28 @@ extension CYLTabBarController {
         if let selectedContentControl, selectedContentControl !== control {
             cylPlayAnimatedImages(ofTabButton: selectedContentControl)
         }
+    }
+}
+
+// MARK: - The delegate as CYLTabBarControllerDelegate
+
+extension CYLTabBarController {
+
+    /**
+     * [EN] The delegate seen as a `CYLTabBarControllerDelegate`, also when it only implements the methods without adopting the
+     *      protocol (React Native's `CYLTabBarHostView`, many Objective-C apps): every method of the protocol is optional, so
+     *      each call checks `respondsToSelector:` at run time, as the Objective-C code did. `delegate as?
+     *      CYLTabBarControllerDelegate` was nil for such a delegate, so its `-tabBarController:didSelectControl:` was never
+     *      called and React Native's onTabSelect stayed silent (regression of migration step 63, fixed 2026-11-19).
+     * [CN] 把 delegate 视为 `CYLTabBarControllerDelegate`，包括只实现方法而未采用该协议的 delegate（React Native 的 `CYLTabBarHostView`、
+     *      许多 Objective-C App）：协议的方法都是可选的，因此每次调用都会在运行时检查 `respondsToSelector:`，与 Objective-C 代码相同。
+     *      对这样的 delegate，`delegate as? CYLTabBarControllerDelegate` 为 nil，其 `-tabBarController:didSelectControl:` 从未被调用，
+     *      React Native 的 onTabSelect 没有任何事件（迁移第 63 步引入的回归，2026-11-19 修复）。
+     */
+    var cylDelegate: CYLTabBarControllerDelegate? {
+        guard let delegate = (self as UITabBarController).delegate else {
+            return nil
+        }
+        return unsafeBitCast(delegate as AnyObject, to: CYLTabBarControllerDelegate.self)
     }
 }

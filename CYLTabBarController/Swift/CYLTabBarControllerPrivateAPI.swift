@@ -45,6 +45,10 @@ import UIKit
     @objc(cyl_plusButtonControlIfSelectingPlusChildViewController:) func cylPlusButtonControlIfSelectingPlusChildViewController(_ viewController: UIViewController) -> UIControl?
     /// FIX: issue #610 — implemented in CYLTabBarController.m, only with FlatDesign (`CYL_FLATDESIGN_AVAILABLE`).
     @objc(cyl_flatDesignReportDidSelectControl:) optional func cylFlatDesignReportDidSelectControl(_ control: UIControl)
+    /// [EN] Implemented in CYLTabBarController.m ("Private Methods"); called by `-cyl_adoptTabButton:forTabBarItem:` (step 105).
+    /// [CN] 实现于 CYLTabBarController.m（"Private Methods"）；由 `-cyl_adoptTabButton:forTabBarItem:` 调用（第 105 步）。
+    @objc(addLottieImageWithControl:lottieURL:lottieSizeValue:animation:defaultSelected:)
+    func cylAddLottieImage(withControl control: UIControl, lottieURL: URL?, lottieSizeValue: NSValue?, animation: Bool, defaultSelected: Bool)
 }
 
 extension CYLTabBarController {
