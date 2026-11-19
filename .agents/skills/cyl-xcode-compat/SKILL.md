@@ -19,7 +19,7 @@ Source of truth: code, then `docs/`, then `README.md`. If they disagree, fix the
 
 | Item | Value | Where |
 |:---|:---|:---|
-| Library minimum | podspec iOS 12.0; `LottieSwift` and `CYLFlatDesignTabBar` 13.0; `Rive` 14.0; SPM 13 | `CYLTabBarController.podspec`, `Package.swift` |
+| Library minimum | podspec iOS 15.0 (raised 2026-11-20 from 12.0; every subspec 15.0); SPM 15 | `CYLTabBarController.podspec`, `Package.swift` |
 | Swift | `s.swift_versions = 5.0`, `SWIFT_VERSION = 5.0` in the demos; swift-tools 5.9 | podspec, `Package.swift` |
 | Local Xcode | 27 builds down to iOS 15.0 only, so linting forces 15.0 | `scripts/pod-lint.xcconfig` |
 | CI | `macos-26` (Xcode 26.x) unless the `MACOS_RUNNER` variable says otherwise | `.github/workflows/ios.yml`, [Mac-CI-CD](../../../docs/Mac-CI-CD.md) |

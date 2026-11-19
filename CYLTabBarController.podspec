@@ -7,7 +7,7 @@ Pod::Spec.new do |s|
   s.license      = { :type => 'MIT', :file => 'LICENSE' }
   s.author       = { "ChenYilong" => "luohanchenyilong@163.com" }
   s.social_media_url = 'http://weibo.com/luohanchenyilong/'
-  s.platform     = :ios, '12.0'
+  s.platform     = :ios, '15.0'
   s.swift_versions = ['5.0']
   s.source       = { :git => "https://github.com/ChenYilong/CYLTabBarController.git", :tag => s.version.to_s }
   s.requires_arc = true
@@ -101,7 +101,7 @@ Pod::Spec.new do |s|
 
   s.subspec 'CYLAnimatedItemLottieSwift' do |lottieswift|
     lottieswift.dependency 'CYLAnimatedItem/LottieSwift', s.version.to_s
-    lottieswift.ios.deployment_target = '13.0'
+    lottieswift.ios.deployment_target = '15.0'
   end
 
   s.subspec 'CYLAnimatedItemPAG' do |pag|
@@ -114,7 +114,7 @@ Pod::Spec.new do |s|
 
   s.subspec 'CYLAnimatedItemRive' do |rive|
     rive.dependency 'CYLAnimatedItem/Rive', s.version.to_s
-    rive.ios.deployment_target = '14.0'
+    rive.ios.deployment_target = '15.0'
   end
 
   s.subspec 'CYLAnimatedItemSVGA' do |svga|
@@ -203,7 +203,7 @@ Pod::Spec.new do |s|
     # [CN] TabBar（Core）加组件的动效引擎 `CYLAnimatedItemLottieSwift`（不依赖 Core）。
     lottieswift.dependency 'CYLTabBarController/Core'
     lottieswift.dependency 'CYLTabBarController/CYLAnimatedItemLottieSwift'
-    lottieswift.ios.deployment_target = '13.0'
+    lottieswift.ios.deployment_target = '15.0'
   end
 
   # FIX: issue #604 — PAG animations (Tencent libpag), the same way as Lottie: `pod 'CYLTabBarController/PAG'`.
@@ -247,7 +247,7 @@ Pod::Spec.new do |s|
     # [CN] TabBar（Core）加组件的动效引擎 `CYLAnimatedItemRive`（不依赖 Core）。
     rive.dependency 'CYLTabBarController/Core'
     rive.dependency 'CYLTabBarController/CYLAnimatedItemRive'
-    rive.ios.deployment_target = '14.0'
+    rive.ios.deployment_target = '15.0'
   end
 
   # FIX: issue #415 — SVGA tab icons (SVGAPlayer), integrated like Rive: the keys, the animator and its playable view.
@@ -272,13 +272,13 @@ Pod::Spec.new do |s|
 
   s.subspec 'CYLFlatDesignTabBar' do |flatdesign|
     flatdesign.dependency "CYLTabBarController/CYLFlatDesignTabBar-ObjectiveC"
-    flatdesign.ios.deployment_target = '13.0' # depends on LottieSwift
+    flatdesign.ios.deployment_target = '15.0' # depends on LottieSwift
   end
   
 
   s.subspec 'CYLFlatDesignTabBar-ObjectiveC' do |flatdesign|
     flatdesign.dependency "CYLTabBarController/LottieSwift"
-    flatdesign.ios.deployment_target = '13.0' # depends on LottieSwift
+    flatdesign.ios.deployment_target = '15.0' # depends on LottieSwift
     flatdesign.source_files = 'CYLTabBarController/**/CYLFlatDesignTabBar/CYLFlatDesignTabBar-ObjectiveC/**/*.{h,m,swift}'
 #    flatdesign.resource = 'CYLTabBarController/**/CYLFlatDesignUITabBarController.bundle'
 

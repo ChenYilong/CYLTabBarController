@@ -15,12 +15,12 @@ Every new demo in this repository is created with this skill. Source of truth: c
 |:---|:---|:---|:---|
 | Tab bar, plus button, badges, themes (no animation) | `pod 'CYLTabBarController'` (Core is the default subspec) | `Example-Swift-04` (smallest UIKit), `Example-Swift-03` | podspec 12.0; use 15.0 |
 | SwiftUI app | same pod, `UIViewControllerRepresentable` + `UIHostingController` | `Example-SwiftUI` | 15.0 |
-| Lottie 4.x tab icons | `pod 'CYLTabBarController/LottieSwift'` | `Example-Swift` | subspec 13.0; use 15.0 |
+| Lottie 4.x tab icons | `pod 'CYLTabBarController/LottieSwift'` | `Example-Swift` | subspec 15.0 |
 | Lottie 2.5 (Objective-C) | `pod 'CYLTabBarController/Lottie'` | `Example-Swift-02` | use 15.0 |
 | PAG tab icons | `pod 'CYLTabBarController/PAG'` | `Example-PAG` | use 15.0 |
 | Rive tab icons | `pod 'CYLTabBarController/Rive'` (RiveRuntime ~> 6.29; CocoaPods only) | `Example-Rive`, `Example-SwiftUI-Rive` | subspec 14.0; demos use 15.0 |
 | GIF tab icons that play once | `pod 'CYLTabBarController/GIF'` (no third-party dependency) | `Example-GIF` | use 15.0 |
-| FlatDesign (the classic layout on every system) | `pod 'CYLTabBarController/CYLFlatDesignTabBar'` | `Example-network-download`, the root ObjC demo | subspec 13.0; use 15.0 |
+| FlatDesign (the classic layout on every system) | `pod 'CYLTabBarController/CYLFlatDesignTabBar'` | `Example-network-download`, the root ObjC demo | subspec 15.0 |
 | Swift Package Manager | package URL or `relativePath = ..` (Core + FlatDesign + Lottie 4.x; no PAG or Rive) | `Example-Swift-SwiftManager-FlatDesign`, `Example-Swift-Gallery`, `Example-Swift-SwiftManager` (iOS 26) | package iOS 13; use 15.0 |
 | Carthage | `binary "https://raw.githubusercontent.com/ChenYilong/CYLTabBarController/master/CYLTabBarController.json"`, a prebuilt XCFramework (up to 1.100.0: `github "ChenYilong/CYLTabBarController"`; no Lottie, PAG or Rive; see docs/Carthage.md) | `Example-Swift-Carthage` | 15.0 |
 | Objective-C, every feature | root `CYLTabBarController.xcodeproj` + `Example/` | `Example/` (the Tab Bar Gallery has a scene per API) | 15.0 |

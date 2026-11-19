@@ -18,7 +18,7 @@ Pod::Spec.new do |s|
   s.homepage     = "https://github.com/ChenYilong/CYLTabBarController"
   s.license      = { :type => 'MIT', :file => 'LICENSE' }
   s.author       = { "ChenYilong" => "luohanchenyilong@163.com" }
-  s.platform     = :ios, '12.0'
+  s.platform     = :ios, '15.0'
   s.swift_versions = ['5.0']
   s.source       = { :git => "https://github.com/ChenYilong/CYLTabBarController.git", :tag => s.version.to_s }
   s.requires_arc = true
@@ -82,7 +82,7 @@ Pod::Spec.new do |s|
     lottieswift.source_files = 'CYLTabBarController/LottieSwift/*.swift', 'CYLTabBarController/CYLTabBarItemAnimation/Lottie/*.{h,m}'
     lottieswift.private_header_files = 'CYLTabBarController/CYLTabBarItemAnimation/Lottie/*.h'
     lottieswift.dependency 'lottie-ios', '>= 4.5.1'
-    lottieswift.ios.deployment_target = '13.0'
+    lottieswift.ios.deployment_target = '15.0'
   end
 
   s.subspec 'PAG' do |pag|
@@ -106,7 +106,7 @@ Pod::Spec.new do |s|
     rive.source_files = 'CYLTabBarController/CYLTabBarItemAnimation/Rive/*.{h,m}', 'CYLTabBarController/RiveSwift/*.swift'
     rive.public_header_files = 'CYLTabBarController/CYLTabBarItemAnimation/Rive/*.h'
     rive.dependency 'RiveRuntime', '~> 6.29'
-    rive.ios.deployment_target = '14.0'
+    rive.ios.deployment_target = '15.0'
   end
 
   s.subspec 'SVGA' do |svga|

@@ -11,7 +11,7 @@ let package = Package(
     defaultLocalization: "en",
     platforms: [
         // lottie-ios 4.x requires iOS 13.
-        .iOS(.v13),
+        .iOS(.v15),
     ],
     products: [
         .library(name: "CYLTabBarController", targets: ["CYLTabBarController", "CYLTabBarControllerEngine"]),

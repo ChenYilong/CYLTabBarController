@@ -8,7 +8,7 @@
 <p align="center">
 <a href="https://github.com/ChenYilong/CYLTabBarController/blob/master/CYLTabBarController.podspec"><img src="https://img.shields.io/badge/Pod-GetLatestVersion-green.svg?style=flat"></a>
 <a href=""><img src="https://img.shields.io/badge/Swift-core-orange.svg"></a>
-<a href=""><img src="https://img.shields.io/badge/platform-iOS%2012.0%2B-ff69b5152950834.svg"></a>
+<a href=""><img src="https://img.shields.io/badge/platform-iOS%2015.0%2B-ff69b5152950834.svg"></a>
 <a href="https://github.com/ChenYilong/CYLTabBarController/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-MIT-green.svg?style=flat"></a>
 
 </p>
@@ -328,7 +328,7 @@ Analyst.ai [App Store Link](https://itunes.apple.com/us/app/analyst-ai/id1345754
 
 | 中文 | English |
 |:---|:---|
-| podspec 最低 iOS 12.0；`LottieSwift` 与 `CYLFlatDesignTabBar` 需要 iOS 13.0，`Rive` 需要 iOS 14.0；SPM 需要 iOS 13。Xcode 27 只能构建 iOS 15.0 及以上，因此新工程建议使用 15.0。 | The podspec's minimum is iOS 12.0; `LottieSwift` and `CYLFlatDesignTabBar` need iOS 13.0, and `Rive` needs iOS 14.0; SPM needs iOS 13. Xcode 27 only builds for iOS 15.0 and later, so new projects should use 15.0. |
+| podspec 最低 iOS 15.0（2026-11-20 起，原为 12.0；所有子库均为 15.0）；SPM 需要 iOS 15。Xcode 27 只能构建 iOS 15.0 及以上，因此新工程使用 15.0。 | The podspec's minimum is iOS 15.0 (since 2026-11-20, was 12.0; every subspec is 15.0); SPM needs iOS 15. Xcode 27 only builds for iOS 15.0 and later, so new projects use 15.0. |
 | iOS 26 及以上默认显示液态玻璃；`CYLTabBarStyleTypeFlatDesign` 在所有系统上保持经典布局。使用 iOS 27 SDK 构建必须采用 UIScene 生命周期。 | iOS 26 and later show Liquid Glass by default; `CYLTabBarStyleTypeFlatDesign` keeps the classic layout on every system. Building with the iOS 27 SDK requires the UIScene life cycle. |
 | 用 AI 工具创建新项目时，可直接使用 [`.agents/skills`](.agents/skills) 中的 `cyl-new-project` 等 skill，见 [docs/Agent-Skills.md](docs/Agent-Skills.md)。 | When creating a new project with an AI tool, use the skills in [`.agents/skills`](.agents/skills), starting with `cyl-new-project`. See [docs/Agent-Skills.md](docs/Agent-Skills.md). |
 
