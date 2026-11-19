@@ -603,6 +603,18 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
     }
 
     /**
+     [EN] The x of a stacked (icon above title) element of `width`: leading aligned, at the leading edge (the trailing one in
+          right-to-left); otherwise centered.
+     [CN] 堆叠布局（图标在标题上方）中宽度为 `width` 的元素的 x：靠前对齐时位于前缘（从右到左时为后缘）；否则居中。
+     */
+    private static func cylStackedX(width: CGFloat, in content: CGRect, leadingAligned: Bool, rtl: Bool) -> CGFloat {
+        guard leadingAligned else {
+            return content.midX - width / 2
+        }
+        return rtl ? content.maxX - width : content.minX
+    }
+
+    /**
      [EN] Subclass hook: places the icon, the animation view, the title and the accessory in `rect` (the bounds minus
           `contentInsets`).
      [CN] 子类钩子：在 `rect`（边界减去 `contentInsets`）中放置图标、动画视图、标题与附加图标。
@@ -639,8 +651,8 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
         } else {
             let group = icon.height + gap + titleSize.height
             let top = content.minY + floor((content.height - group) / 2)
-            let iconX = leadingAligned ? (rtl ? content.maxX - icon.width : content.minX) : content.midX - icon.width / 2
-            let titleX = leadingAligned ? (rtl ? content.maxX - titleSize.width : content.minX) : content.midX - titleSize.width / 2
+            let iconX = Self.cylStackedX(width: icon.width, in: content, leadingAligned: leadingAligned, rtl: rtl)
+            let titleX = Self.cylStackedX(width: titleSize.width, in: content, leadingAligned: leadingAligned, rtl: rtl)
             iconFrame = CGRect(x: iconX, y: top, width: icon.width, height: icon.height)
             titleFrame = CGRect(x: titleX, y: top + icon.height + gap, width: titleSize.width, height: titleSize.height)
         }

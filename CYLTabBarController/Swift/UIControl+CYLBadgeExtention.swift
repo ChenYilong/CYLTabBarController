@@ -97,7 +97,10 @@ private func cylBadgeOpaqueUnitRect(of image: UIImage?) -> CGRect {
         }
         if drawn {
             // [EN] Row 0 of the buffer is the top of the image. [CN] 缓冲区第 0 行是图片顶部。
-            var minX = width, minY = height, maxX = 0, maxY = 0
+            var minX = width
+            var minY = height
+            var maxX = 0
+            var maxY = 0
             for y in 0..<height {
                 for x in 0..<width where alpha[y * width + x] > 25 {
                     minX = min(minX, x)
