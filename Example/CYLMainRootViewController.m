@@ -8,10 +8,6 @@
 
 #import "CYLMainRootViewController.h"
 #import "CYLFlatDesignTableViewController.h"
-#import "CYLHomeViewController.h"
-#import "CYLSameCityViewController.h"
-#import "CYLMessageViewController.h"
-#import "CYLMineViewController.h"
 #import "CYLTabBarControllerDemo-Swift.h"
 #import "CYLDemoLocalization.h"
 
