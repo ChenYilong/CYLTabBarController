@@ -42,7 +42,7 @@ def comment_of(path, name):
             continue
         start = before.rfind('/*')
         block = before[start:]
-        english = re.search(r'\[EN\]([\s\S]*?)(?=\[CN\]|\*/)', block)
+        english = re.search(r'\[EN\]((?:(?!\[CN\]|\*/)[\s\S])*)', block)
         body = english.group(1) if english else re.sub(r'(^/\*!?)|(\*/$)', '', block)
         body = ' '.join(l.strip().lstrip('*').strip() for l in body.split('\n'))
         return ' '.join(body.split()).replace('|', '\\|')
@@ -65,7 +65,7 @@ SWIFT_OBJC_NAME = re.compile(r'@objc\(([\w:]+)\)')
 def swift_english(doc):
     """[EN] The English part of a Swift documentation comment. [CN] Swift 文档注释的英文部分。"""
     text = re.sub(r'^\s*(/\*\*|\*/|///?|\*)', '', doc, flags=re.M)
-    english = re.search(r'\[EN\]([\s\S]*?)(?=\[CN\]|$)', text)
+    english = re.search(r'\[EN\]((?:(?!\[CN\])[\s\S])*)', text)
     body = english.group(1) if english else text
     return ' '.join(body.split()).replace('|', '\\|')
 

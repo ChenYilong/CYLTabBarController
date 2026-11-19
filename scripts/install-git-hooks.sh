@@ -9,11 +9,9 @@ hooks="$root/.git/hooks"
 for hook in "$root"/.githooks/*; do
     name=$(basename "$hook")
     target="$hooks/$name"
-    if [[ -e "$target" ]] && ! cmp -s "$hook" "$target"; then
-        if ! grep -q "check-screenshot-labels" "$target" 2>/dev/null; then
-            mv "$target" "$target.chained"
-            echo "kept the existing $name as $name.chained"
-        fi
+    if [[ -e "$target" ]] && ! cmp -s "$hook" "$target" && ! grep -q "check-screenshot-labels" "$target" 2>/dev/null; then
+        mv "$target" "$target.chained"
+        echo "kept the existing $name as $name.chained"
     fi
     cp "$hook" "$target"
     chmod +x "$target"

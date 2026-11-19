@@ -13,29 +13,33 @@ import sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 
+# [EN] Registry names used several times. [CN] 多次使用的发布平台名称。
+MAVEN = "Maven / Gradle"
+NPM_WECHAT = "npm (WeChat Mini Program)"
+
 # (registry, package, license file that must exist, file the package publishes it through)
 REQUIRED = [
     ("CocoaPods / SwiftPM / Carthage", "CYLTabBarController", "CYLTabBarController/Resources/CYLTabBarController.bundle/LICENSE", "CYLTabBarController.podspec"),
     ("CocoaPods / SwiftPM / Carthage", "CYLAnimatedItem", "CYLTabBarController/CYLAnimatedItem/Resources/CYLAnimatedItem.bundle/LICENSE", "CYLAnimatedItem.podspec"),
-    ("Maven / Gradle", "cyltabbarcontroller", "Example-Android/cyltabbar/src/main/resources/META-INF/cyltabbar/LICENSE", "Example-Android/cyltabbar/build.gradle.kts"),
-    ("Maven / Gradle", "cyltabbarcontroller-animateditem", "Example-Android/cylanimateditem/src/main/resources/META-INF/cylanimateditem/LICENSE", "Example-Android/cylanimateditem/build.gradle.kts"),
+    (MAVEN, "cyltabbarcontroller", "Example-Android/cyltabbar/src/main/resources/META-INF/cyltabbar/LICENSE", "Example-Android/cyltabbar/build.gradle.kts"),
+    (MAVEN, "cyltabbarcontroller-animateditem", "Example-Android/cylanimateditem/src/main/resources/META-INF/cylanimateditem/LICENSE", "Example-Android/cylanimateditem/build.gradle.kts"),
     ("npm (React Native)", "react-native-cyltabbar", "CrossPlatform/react-native-cyltabbar/LICENSE", "CrossPlatform/react-native-cyltabbar/package.json"),
     ("pub.dev (Flutter)", "flutter_cyltabbar", "CrossPlatform/flutter_cyltabbar/LICENSE", "CrossPlatform/flutter_cyltabbar/pubspec.yaml"),
     ("ohpm (HarmonyOS)", "cyltabbar", "CrossPlatform/harmonyos-cyltabbar/cyltabbar/LICENSE", "CrossPlatform/harmonyos-cyltabbar/cyltabbar/oh-package.json5"),
     ("ohpm (HarmonyOS)", "cylanimateditem", "CrossPlatform/harmonyos-cyltabbar/cylanimateditem/LICENSE", "CrossPlatform/harmonyos-cyltabbar/cylanimateditem/oh-package.json5"),
-    ("npm (WeChat Mini Program)", "wechat-miniprogram-cyltabbar", "CrossPlatform/wechat-miniprogram-cyltabbar/LICENSE", "CrossPlatform/wechat-miniprogram-cyltabbar/package.json"),
-    ("npm (WeChat Mini Program)", "wechat-miniprogram-cyltabbar (component folder)", "CrossPlatform/wechat-miniprogram-cyltabbar/src/LICENSE", "CrossPlatform/wechat-miniprogram-cyltabbar/package.json"),
-    ("Maven / Gradle", "cyltabbarcontroller-pages", "Example-Android/tabpages/src/main/resources/META-INF/tabpages/LICENSE", "Example-Android/tabpages/build.gradle.kts"),
-    ("npm (WeChat Mini Program)", "gif-miniprogram", "CrossPlatform/gif-miniprogram/LICENSE", "CrossPlatform/gif-miniprogram/package.json"),
-    ("npm (WeChat Mini Program)", "gif-miniprogram (component folder)", "CrossPlatform/gif-miniprogram/miniprogram_dist/LICENSE", "CrossPlatform/gif-miniprogram/package.json"),
-    ("npm (WeChat Mini Program)", "lottie-miniprogram", "CrossPlatform/lottie-miniprogram/LICENSE", "CrossPlatform/lottie-miniprogram/package.json"),
-    ("npm (WeChat Mini Program)", "lottie-miniprogram (component folder)", "CrossPlatform/lottie-miniprogram/miniprogram_dist/LICENSE", "CrossPlatform/lottie-miniprogram/package.json"),
-    ("npm (WeChat Mini Program)", "pag-miniprogram", "CrossPlatform/pag-miniprogram/LICENSE", "CrossPlatform/pag-miniprogram/package.json"),
-    ("npm (WeChat Mini Program)", "pag-miniprogram (component folder)", "CrossPlatform/pag-miniprogram/miniprogram_dist/LICENSE", "CrossPlatform/pag-miniprogram/package.json"),
-    ("npm (WeChat Mini Program)", "rive-miniprogram", "CrossPlatform/rive-miniprogram/LICENSE", "CrossPlatform/rive-miniprogram/package.json"),
-    ("npm (WeChat Mini Program)", "rive-miniprogram (component folder)", "CrossPlatform/rive-miniprogram/miniprogram_dist/LICENSE", "CrossPlatform/rive-miniprogram/package.json"),
-    ("npm (WeChat Mini Program)", "svga-miniprogram", "CrossPlatform/svga-miniprogram/LICENSE", "CrossPlatform/svga-miniprogram/package.json"),
-    ("npm (WeChat Mini Program)", "svga-miniprogram (component folder)", "CrossPlatform/svga-miniprogram/miniprogram_dist/LICENSE", "CrossPlatform/svga-miniprogram/package.json"),
+    (NPM_WECHAT, "wechat-miniprogram-cyltabbar", "CrossPlatform/wechat-miniprogram-cyltabbar/LICENSE", "CrossPlatform/wechat-miniprogram-cyltabbar/package.json"),
+    (NPM_WECHAT, "wechat-miniprogram-cyltabbar (component folder)", "CrossPlatform/wechat-miniprogram-cyltabbar/src/LICENSE", "CrossPlatform/wechat-miniprogram-cyltabbar/package.json"),
+    (MAVEN, "cyltabbarcontroller-pages", "Example-Android/tabpages/src/main/resources/META-INF/tabpages/LICENSE", "Example-Android/tabpages/build.gradle.kts"),
+    (NPM_WECHAT, "gif-miniprogram", "CrossPlatform/gif-miniprogram/LICENSE", "CrossPlatform/gif-miniprogram/package.json"),
+    (NPM_WECHAT, "gif-miniprogram (component folder)", "CrossPlatform/gif-miniprogram/miniprogram_dist/LICENSE", "CrossPlatform/gif-miniprogram/package.json"),
+    (NPM_WECHAT, "lottie-miniprogram", "CrossPlatform/lottie-miniprogram/LICENSE", "CrossPlatform/lottie-miniprogram/package.json"),
+    (NPM_WECHAT, "lottie-miniprogram (component folder)", "CrossPlatform/lottie-miniprogram/miniprogram_dist/LICENSE", "CrossPlatform/lottie-miniprogram/package.json"),
+    (NPM_WECHAT, "pag-miniprogram", "CrossPlatform/pag-miniprogram/LICENSE", "CrossPlatform/pag-miniprogram/package.json"),
+    (NPM_WECHAT, "pag-miniprogram (component folder)", "CrossPlatform/pag-miniprogram/miniprogram_dist/LICENSE", "CrossPlatform/pag-miniprogram/package.json"),
+    (NPM_WECHAT, "rive-miniprogram", "CrossPlatform/rive-miniprogram/LICENSE", "CrossPlatform/rive-miniprogram/package.json"),
+    (NPM_WECHAT, "rive-miniprogram (component folder)", "CrossPlatform/rive-miniprogram/miniprogram_dist/LICENSE", "CrossPlatform/rive-miniprogram/package.json"),
+    (NPM_WECHAT, "svga-miniprogram", "CrossPlatform/svga-miniprogram/LICENSE", "CrossPlatform/svga-miniprogram/package.json"),
+    (NPM_WECHAT, "svga-miniprogram (component folder)", "CrossPlatform/svga-miniprogram/miniprogram_dist/LICENSE", "CrossPlatform/svga-miniprogram/package.json"),
 ]
 
 
