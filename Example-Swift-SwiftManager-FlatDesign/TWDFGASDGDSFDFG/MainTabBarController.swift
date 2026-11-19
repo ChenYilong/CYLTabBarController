@@ -338,7 +338,7 @@ class MainTabBarController: CYLTabBarController, CYLFlatDesignUITabBarController
         NSLog("[#610] flat design tapped \"%@\" (%@)", control.cyl_tabBarItemIdentifier ?? "nil", control.cyl_isPlusButton() ? "plus button" : "tab button")
     }
 
-    override func tabBarController(_ _: UITabBarController, didSelect viewController: UIViewController) {
+    func tabBarController(_ _: UITabBarController, didSelect viewController: UIViewController) {
         // [CN] flatDesign 下点击时 selectedIndex 可能仍是旧值，用 VC 判断更准
         // [EN] With flatDesign, selectedIndex may still hold the old value on tap; checking the VC is more accurate
         let root = viewController.cyl_getViewControllerInsteadOfNavigation()
