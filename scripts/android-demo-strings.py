@@ -123,6 +123,46 @@ def render(entries):
     return '\n'.join(lines) + '\n'
 
 
+def key_for(text, key_of, english):
+    """[EN] The iOS key of a text: the key of that English text, else the text itself when it is a key. [CN] 文本对应的 iOS key：该英文文本的 key，否则文本本身（它本身就是 key 时）。"""
+    return key_of.get(text, text if text in english else None)
+
+
+def library_entries(table, wanted, key_of, english):
+    """[EN] The library strings of one language that have an iOS entry. [CN] 某种语言中有 iOS 条目的库字符串。"""
+    entries = []
+    for text in wanted:
+        key = key_for(text, key_of, english)
+        value = table.get(key) if key is not None else None
+        if value is not None:
+            entries.append((resource_name(text), value))
+    return entries
+
+
+def app_entries(table, pairs, key_of, english):
+    """[EN] The strings of one module app in one language; a missing translation keeps the English text. [CN] 某个模块 App 在某种语言中的字符串；缺少翻译时保留英文文本。"""
+    entries = []
+    for name, text in pairs:
+        key = key_for(text, key_of, english)
+        value = table.get(key) if key is not None else None
+        entries.append((name, value if value is not None else text))
+    return entries
+
+
+def outputs_for(language, table, wanted, apps, key_of, english):
+    """[EN] The (path, content) files of one language. [CN] 某种语言的（路径、内容）文件。"""
+    outputs = [(os.path.join(RES, folder_of(language), FILE), render(library_entries(table, wanted, key_of, english)))]
+    for res, pairs in apps:
+        if language != 'en' and pairs:
+            outputs.append((os.path.join(res, folder_of(language), APP_FILE), render(app_entries(table, pairs, key_of, english))))
+    return outputs
+
+
+def app_name(res):
+    """[EN] The module name of an app's resource folder. [CN] App 资源目录所属的模块名。"""
+    return os.path.basename(os.path.dirname(os.path.dirname(os.path.dirname(res))))
+
+
 def main():
     check = '--check' in sys.argv
     all_tables = tables()
@@ -132,31 +172,11 @@ def main():
         key_of.setdefault(value, key)
     wanted = texts()
     apps = [(res, app_strings(res)) for res in APPS]
-    missing = [text for text in wanted if text not in key_of and text not in english]
-    app_missing = [f'{os.path.basename(os.path.dirname(os.path.dirname(os.path.dirname(res))))}: {text}' for res, pairs in apps for _, text in pairs
-                if text not in key_of and text not in english]
+    missing = [text for text in wanted if key_for(text, key_of, english) is None]
+    app_missing = [f'{app_name(res)}: {text}' for res, pairs in apps for _, text in pairs if key_for(text, key_of, english) is None]
     stale = []
     for language, table in sorted(all_tables.items()):
-        entries = []
-        for text in wanted:
-            key = key_of.get(text, text if text in english else None)
-            if key is None:
-                continue
-            value = table.get(key)
-            if value is None:
-                continue
-            entries.append((resource_name(text), value))
-        outputs = [(os.path.join(RES, folder_of(language), FILE), render(entries))]
-        for res, pairs in apps:
-            if language == 'en' or not pairs:
-                continue
-            app_entries = []
-            for name, text in pairs:
-                key = key_of.get(text, text if text in english else None)
-                value = table.get(key) if key is not None else None
-                app_entries.append((name, value if value is not None else text))
-            outputs.append((os.path.join(res, folder_of(language), APP_FILE), render(app_entries)))
-        for path, content in outputs:
+        for path, content in outputs_for(language, table, wanted, apps, key_of, english):
             write_or_check(path, content, check, stale)
     missing += app_missing
     print(f'{len(wanted)} texts, {len(wanted) - len(missing) + len(app_missing)} with iOS entries, {len(all_tables)} languages; '

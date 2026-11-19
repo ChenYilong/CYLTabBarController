@@ -176,7 +176,7 @@ class CYLPlusButtonSubclass: CYLPlusButton, CYLPlusButtonSubclassing {
         true
     }
 
-    static func constantOfPlusButtonCenterYOffset(forTabBarHeight tabBarHeight: CGFloat) -> CGFloat {
+    static func constantOfPlusButtonCenterYOffset(forTabBarHeight _: CGFloat) -> CGFloat {
         -14
     }
 

@@ -74,7 +74,7 @@ function cylApplyLottieColors(animationData, colors) {
   if (rules.length === 0) {
     return animationData
   }
-  const copy = JSON.parse(JSON.stringify(animationData))
+  const copy = JSON.parse(JSON.stringify(animationData)) // NOSONAR: `structuredClone` is not in every mini program runtime
   const visitLayers = (layers) => {
     (layers || []).forEach((layer) => {
       cylVisitShapes(layer.shapes, [layer.nm || ''], (shape, names) => {

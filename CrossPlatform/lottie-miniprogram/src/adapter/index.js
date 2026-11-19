@@ -65,7 +65,7 @@ export function canvasOfContext(context) {
 }
 
 function currentCanvas() {
-  return g.canvases.length > 0 ? g.canvases[g.canvases.length - 1] : null
+  return g.canvases.length > 0 ? g.canvases[g.canvases.length - 1] : null // NOSONAR: `.at()` needs a newer mini program base library
 }
 
 /**

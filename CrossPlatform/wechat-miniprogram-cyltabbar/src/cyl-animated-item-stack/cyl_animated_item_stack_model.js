@@ -56,6 +56,8 @@ function cylStackModel(p) {
     const label = String(item.accessibilityLabel || '')
     const button = interactive || actsOnBackground
     const spacing = index === 0 ? 0 : cylStackLength(item.spacingBefore, stackSpacing)
+    const spacingProperty = horizontal ? 'margin-left' : 'margin-top'
+    const wrapperStyle = spacing ? `${spacingProperty}: ${spacing}px;` : ''
     // [EN] The icon color (iOS `itemAppearance` iconColor): the item's own, else the stack's; selected first tries the
     //      selected colors. `iconTint` is the older name of an item's `iconColor`.
     // [CN] 图标颜色（iOS `itemAppearance` 的 iconColor）：条目自己的，否则为堆叠的；选中时先取选中颜色。`iconTint` 是条目 `iconColor` 的旧名称。
@@ -83,7 +85,7 @@ function cylStackModel(p) {
       interactive,
       role: button ? 'button' : 'text',
       hidden: !button && !title && !label,
-      wrapperStyle: spacing ? `${horizontal ? 'margin-left' : 'margin-top'}: ${spacing}px;` : '',
+      wrapperStyle,
     }
   })
   return { items, backgroundAction, horizontal, containerStyle: `padding: ${margin}px;` }

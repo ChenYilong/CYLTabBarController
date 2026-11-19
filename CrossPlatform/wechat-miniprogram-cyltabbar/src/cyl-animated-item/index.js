@@ -183,7 +183,7 @@ Component({
       clearTimeout(this.cylGifTimer)
       this.cylPendingPlay = false
       // cyl-lottie keeps the data it gets and changes it while playing: every item gets its own copy.
-      const lottieData = animationData && typeof animationData === 'object' ? JSON.parse(JSON.stringify(animationData)) : null
+      const lottieData = animationData && typeof animationData === 'object' ? JSON.parse(JSON.stringify(animationData)) : null // NOSONAR: `structuredClone` is not in every mini program runtime
       this.setData({ animationLoaded: false, animationFailed: false, gifPlaying: false, lottieData })
       this.cyl_update()
     },
@@ -277,7 +277,7 @@ Component({
       const info = this.cylGIFImageInfo
       if (!info) return
       this.createSelectorQuery().select('#cyl-gif-image-still').fields({ node: true }).exec((result) => {
-        const canvas = result && result[0] && result[0].node
+        const canvas = result?.[0]?.node
         if (!canvas || this.cylGIFImageInfo !== info) return
         const side = Math.max(info.width, info.height)
         canvas.width = side
@@ -288,7 +288,7 @@ Component({
         context.clearRect(0, 0, side, side)
         context.putImageData(pixels, Math.floor((side - info.width) / 2), Math.floor((side - info.height) / 2))
         // [EN] A template image (`iconTint`): the still takes the tint as the <image> does. [CN] 模板图片（`iconTint`）：静帧与 <image> 一样着色。
-        const tint = this.data.m && this.data.m.iconTint
+        const tint = this.data.m?.iconTint
         if (tint) {
           context.globalCompositeOperation = 'source-in'
           context.fillStyle = tint
@@ -317,7 +317,7 @@ Component({
 
     /** [EN] The end of the pass in progress, then the still. [CN] 当前一遍结束后显示静帧。 */
     cyl_scheduleGIFImageEnd() {
-      const duration = (this.cylGIFImageInfo && this.cylGIFImageInfo.duration) || 1000
+      const duration = this.cylGIFImageInfo?.duration || 1000
       const elapsed = Date.now() - (this.cylGIFImageStartedAt || Date.now())
       this.cylGIFImageTimer = setTimeout(() => this.cyl_restGIFImage(), duration - (elapsed % duration))
     },

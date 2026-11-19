@@ -584,7 +584,8 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
         // [EN] A static selected icon over an animated `image` plays the `image`'s frames, as the classic tab bar does.
         // [CN] 静态的选中图标搭配动图 `image` 时播放 `image` 的帧，与经典 TabBar 相同。
         let iconIsAnimated = (icon?.images?.count ?? 0) > 1
-        let source = iconIsAnimated ? icon : ((image?.images?.count ?? 0) > 1 ? image : nil)
+        let imageIsAnimated = (image?.images?.count ?? 0) > 1
+        let source = iconIsAnimated ? icon : (imageIsAnimated ? image : nil)
         if let animated = source, let shown = icon {
             restingAnimatedImage = animated
             if !imageView.isAnimating {

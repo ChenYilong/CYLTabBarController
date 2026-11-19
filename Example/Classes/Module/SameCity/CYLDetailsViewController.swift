@@ -41,7 +41,7 @@ class CYLDetailsViewController: CYLBaseViewController {
         cyl_sharedAppDelegate()?.cyl_forceUpdateInterfaceOrientation(.portrait)
     }
 
-    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+    override func touchesBegan(_ _: Set<UITouch>, with _: UIEvent?) {
         cyl_popSelectTabBarChildViewController(forClassType: CYLMineViewController.self) { selected in
             (selected as? CYLMineViewController)?.testPush()
         }

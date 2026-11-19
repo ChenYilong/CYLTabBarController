@@ -55,7 +55,7 @@ extension CYLTabBarController {
      * [CN] 所有样式。扁平样式：刷新系统 TabBar 的可见性。滚动隐藏（issue #13）：出现时结束隐藏会话，TabBar 恢复显示。
      */
     @objc(cyl_viewDidAppear:)
-    func cylViewDidAppear(_ animated: Bool) {
+    func cylViewDidAppear(_ _: Bool) {
         // [EN] `super.viewDidAppear` is called by the Objective-C override (the analyzer wants it there). [CN] `super.viewDidAppear` 由 Objective-C 重写调用（静态分析要求在那里调用）。
         unsafeBitCast(self, to: CYLFlatDesignLifeCycle.self).cylRefreshSystemTabBarVisibilityIfNeeded?()
         cylTabBarMinimizeLifecycleEvent()
@@ -100,13 +100,13 @@ extension CYLTabBarController {
      * [CN] 滚动隐藏（issue #13）：消失时（全屏模态页面、在本控制器之上 push、外层控制器切换 Tab）结束隐藏会话，回来时 TabBar 正常显示。
      */
     @objc(cyl_viewWillDisappear:)
-    func cylViewWillDisappear(_ animated: Bool) {
+    func cylViewWillDisappear(_ _: Bool) {
         // [EN] `super.viewWillDisappear` is called by the Objective-C override (the analyzer wants it there). [CN] `super.viewWillDisappear` 由 Objective-C 重写调用（静态分析要求在那里调用）。
         cylTabBarMinimizeLifecycleEvent()
     }
 
     @objc(cyl_viewDidDisappear:)
-    func cylViewDidDisappear(_ animated: Bool) {
+    func cylViewDidDisappear(_ _: Bool) {
         // [EN] `super.viewDidDisappear` is called by the Objective-C override (the analyzer wants it there). [CN] `super.viewDidDisappear` 由 Objective-C 重写调用（静态分析要求在那里调用）。
         cylTabBarMinimizeLifecycleEvent()
     }
@@ -117,7 +117,7 @@ extension CYLTabBarController {
      * [CN] 所有样式：本控制器成为最近活跃的控制器（`+cyl_activeTabBarController`），对象不在任何 TabBarController 内时，`-cyl_tabBarController` 会回退到它。
      */
     @objc(cyl_viewWillAppear:)
-    func cylViewWillAppear(_ animated: Bool) {
+    func cylViewWillAppear(_ _: Bool) {
         // [EN] `super.viewWillAppear` is called by the Objective-C override (the analyzer wants it there). [CN] `super.viewWillAppear` 由 Objective-C 重写调用（静态分析要求在那里调用）。
         CYLTabBarController.cylMarkActive(self)
         // FIX: issue #216
@@ -190,7 +190,7 @@ extension CYLTabBarController {
      * [CN] 三个地方都要调用：选中状态下的重新点击（iOS 26 需要在手势代理方法中追加），用户切换 Tab，代码切换 Tab。
      */
     @objc(tabChangedToSelectedIndex:viewController:control:)
-    func tabChanged(toSelectedIndex selectedIndex: UInt, viewController: UIViewController?, control: UIControl?) {
+    func tabChanged(toSelectedIndex _: UInt, viewController: UIViewController?, control: UIControl?) {
         guard tabBarStyleType != .flatDesign, cyl_tabBar is UITabBar else {
             return
         }
@@ -273,7 +273,7 @@ extension CYLTabBarController {
      *      `invokeOnce` 参数按文档说明仍被忽略。
      */
     @objc(setViewDidLayoutSubViewsBlockInvokeOnce:block:)
-    open func setViewDidLayoutSubViewsBlockInvokeOnce(_ invokeOnce: Bool, block: @escaping CYLViewDidLayoutSubViewsBlock) {
+    open func setViewDidLayoutSubViewsBlockInvokeOnce(_ _: Bool, block: @escaping CYLViewDidLayoutSubViewsBlock) {
         cylPrivate.cylSetInvokeOnceViewDidLayoutSubViewsBlock(true)
         viewDidLayoutSubviewsBlock = block
         cylRearmViewDidLayoutSubviewsBlockInvokeOnce()

@@ -612,7 +612,7 @@ Component({
       const isOn = boolInput ? boolInput.asBool().value === true : !!activeProperty?.value
       if (isOn) {
         setActive(false)
-        const offMs = this.data.loop && !(options.duration > 0)
+        const offMs = this.data.loop && !(options.duration > 0) // NOSONAR: NaN / undefined count as "no duration", unlike `<= 0`
           ? cylRiveLoopDelay({ kind, duration: options.duration, animationSeconds: state.animationSeconds, speed }) / 2
           : CYL_RIVE_NEXT_FRAME_MS
         state.inputTimer = setTimeout(() => {
