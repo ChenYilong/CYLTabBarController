@@ -64,13 +64,13 @@ object DemoScrollHide {
     }
 
     private val simulations: List<Simulation> = listOf(
-        Simulation("AlertDialog (alert)", Kind.Restore) { page, _, done -> dialog(AlertDialog.Builder(page.requireContext()).setMessage("Alert").create(), done) },
+        Simulation("AlertDialog (alert)", Kind.Restore) { page, _, done -> dialog(AlertDialog.Builder(page.requireContext()).setMessage(cylDemoText("Alert")).create(), done) },
         Simulation("BottomSheetDialog (action sheet)", Kind.Restore) { page, _, done ->
-            dialog(BottomSheetDialog(page.requireContext()).apply { setContentView(TextView(context).apply { text = "Action sheet"; setPadding(48, 48, 48, 48) }) }, done)
+            dialog(BottomSheetDialog(page.requireContext()).apply { setContentView(TextView(context).apply { text = cylDemoText("Action sheet"); setPadding(48, 48, 48, 48) }) }, done)
         },
         Simulation("startActivity (full screen modal)", Kind.Restore) { page, _, done -> activity(page, "Full screen modal", done) },
         Simulation("Dialog with a page (page sheet)", Kind.Restore) { page, _, done ->
-            dialog(Dialog(page.requireContext()).apply { setContentView(TextView(context).apply { text = "Page sheet"; setPadding(96, 192, 96, 192) }) }, done)
+            dialog(Dialog(page.requireContext()).apply { setContentView(TextView(context).apply { text = cylDemoText("Page sheet"); setPadding(96, 192, 96, 192) }) }, done)
         },
         Simulation("cyl_pushViewController, then pop", Kind.Restore) { page, _, done ->
             page.pushText("Pushed")
@@ -92,7 +92,7 @@ object DemoScrollHide {
         },
         Simulation("onTrimMemory (memory warning)", Kind.Restore) { _, _, done -> CYLTabBarController.cyl_simulateMemoryWarning(); done() },
         Simulation("PopupWindow, focusable (another window)", Kind.Restore) { page, _, done ->
-            val popup = PopupWindow(TextView(page.requireContext()).apply { text = "Overlay window"; setBackgroundColor(Color.YELLOW); setPadding(48, 48, 48, 48) }, -2, -2, true)
+            val popup = PopupWindow(TextView(page.requireContext()).apply { text = cylDemoText("Overlay window"); setBackgroundColor(Color.YELLOW); setPadding(48, 48, 48, 48) }, -2, -2, true)
             popup.showAtLocation(page.requireView(), Gravity.CENTER, 0, 0)
             later(HOLD) { popup.dismiss(); done() }
         },
@@ -135,7 +135,7 @@ object DemoScrollHide {
         },
         Simulation("A side drawer slides in and away (a dialog from the left)", Kind.Restore) { page, _, done ->
             dialog(Dialog(page.requireContext()).apply {
-                setContentView(TextView(context).apply { text = "Drawer"; setPadding(96, 400, 200, 400); setBackgroundColor(Color.WHITE) })
+                setContentView(TextView(context).apply { text = cylDemoText("Drawer"); setPadding(96, 400, 200, 400); setBackgroundColor(Color.WHITE) })
                 window?.setGravity(Gravity.START)
             }, done)
         },
@@ -198,14 +198,14 @@ object DemoScrollHide {
 
     fun section(page: DemoListFragment): DemoSection {
         val rows = ArrayList<DemoRow>()
-        rows += DemoRow("Scroll hiding: simulated interruptions (issue #13)", { "Choose one from a list; the same simulations as the rows below" }) {
-            choose("Simulated interruptions", simulations.map { title(page.context, it) }) { index -> run(this, index) }
+        rows += DemoRow(cylDemoText("Scroll hiding: simulated interruptions (issue #13)"), { cylDemoText("Choose one from a list; the same simulations as the rows below") }) {
+            choose(cylDemoText("Simulated interruptions"), simulations.map { title(page.context, it) }) { index -> run(this, index) }
         }
         rows += DemoRow(if (expanded) "Collapse the simulations" else "Expand all ${simulations.size} simulations") { expanded = !expanded }
         if (expanded) simulations.forEachIndexed { index, simulation ->
             rows += DemoRow(title(page.context, simulation), { results[index] ?: hint(simulation) }) { run(this, index) }
         }
-        return DemoSection("Scroll hiding: simulated interruptions (issue #13)", rows)
+        return DemoSection(cylDemoText("Scroll hiding: simulated interruptions (issue #13)"), rows)
     }
 
     private fun hint(simulation: Simulation) = when (simulation.kind) {
@@ -284,5 +284,5 @@ class HidesTabBarPage : Fragment() {
 /** [EN] A translucent page over the current one (`UIModalPresentationOverCurrentContext`). [CN] 覆盖当前页面的半透明页面。 */
 class TranslucentPage : Fragment() {
     override fun onCreateView(inflater: android.view.LayoutInflater, container: android.view.ViewGroup?, savedInstanceState: android.os.Bundle?): View =
-        TextView(inflater.context).apply { text = "Over current context"; gravity = Gravity.CENTER; setBackgroundColor(Color.argb(128, 0, 0, 0)); setTextColor(Color.WHITE); isClickable = true }
+        TextView(inflater.context).apply { text = cylDemoText("Over current context"); gravity = Gravity.CENTER; setBackgroundColor(Color.argb(128, 0, 0, 0)); setTextColor(Color.WHITE); isClickable = true }
 }

@@ -34,9 +34,9 @@ object DemoConfiguration {
     /** [EN] The cases: ID, title, how to run it. [CN] 用例：编号、标题、执行方式。 */
     private class EdgeCase(val id: String, val title: String, val run: DemoListFragment.(finish: (CYLTabBarController?, Exception?) -> Unit) -> Unit)
 
-    fun rows(): List<DemoRow> = listOf(DemoRow("A tab bar controller from a configuration file", { "Every sample file shared with iOS (JSON, JSON5, YAML, TOML, plist, XML, INI, properties, protobuf...), or the network URL" }) {
+    fun rows(): List<DemoRow> = listOf(DemoRow(cylDemoText("A tab bar controller from a configuration file"), { cylDemoText("Every sample file shared with iOS (JSON, JSON5, YAML, TOML, plist, XML, INI, properties, protobuf...), or the network URL") }) {
         presentConfigurationDemo(this)
-    }, DemoRow("A tab bar from the configuration manifest (docs/Configuration-Manifest.md)", { "The manifest shared with iOS (Manifests/cyl_tabbar_manifest.json): choose its light, dark or christmas theme" }) {
+    }, DemoRow(cylDemoText("A tab bar from the configuration manifest (docs/Configuration-Manifest.md)"), { cylDemoText("The manifest shared with iOS (Manifests/cyl_tabbar_manifest.json): choose its light, dark or christmas theme") }) {
         presentManifestDemo(this)
     }) + edgeCases.map { edgeCase ->
         val key = edgeCase.id + edgeCase.title
@@ -74,7 +74,7 @@ object DemoConfiguration {
     private fun presentManifestDemo(page: DemoListFragment) {
         DemoPages.registerOnce()
         val themes = listOf("light", "dark", "christmas")
-        page.choose("Choose a theme of the manifest", themes) { index ->
+        page.choose(cylDemoText("Choose a theme of the manifest"), themes) { index ->
             val theme = themes[index]
             val result = runCatching { CYLTabBarManifest.manifestWithRoute(page.requireContext(), MANIFEST_ROUTE) }
             val manifest = result.getOrNull()
@@ -92,7 +92,7 @@ object DemoConfiguration {
         DemoPages.registerOnce()
         val extensions = CYLTabBarConfigurationParser.supportedPathExtensions()
         val files = page.requireContext().assets.list("").orEmpty().filter { name -> extensions.contains(name.substringAfterLast('.', "").lowercase()) }.sorted()
-        page.choose("Choose a configuration file", files + "Load from the network URL") { index ->
+        page.choose(cylDemoText("Choose a configuration file"), files + "Load from the network URL") { index ->
             if (index < files.size) {
                 val file = files[index]
                 val result = runCatching { CYLTabBarController.tabBarControllerWithConfigurationFile(page.requireActivity(), file) }

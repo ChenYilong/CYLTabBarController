@@ -45,7 +45,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 class DemoGalleryActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        title = "Tab Bar Gallery"
+        title = cylDemoText("Tab Bar Gallery")
         val items = DemoGallery.sections.flatMap { section -> listOf<Any>(section.first) + section.second }
         val list = ListView(this)
         list.adapter = object : android.widget.BaseAdapter() {
@@ -136,7 +136,7 @@ object DemoGallery {
     /** [EN] "Photo" opens a dialog instead of its page (`cyl_customActionTabBarItemIdentifiers`). [CN] "Photo" 打开弹窗而不是其页面。 */
     private fun photoOpensDialog(controller: CYLTabBarController) {
         controller.cyl_customActionTabBarItemIdentifiers = listOf("photo")
-        controller.cyl_customActionBlock = { tabBarController, _ -> AlertDialog.Builder(tabBarController.activity).setMessage("Photo").setPositiveButton(android.R.string.ok, null).show() }
+        controller.cyl_customActionBlock = { tabBarController, _ -> AlertDialog.Builder(tabBarController.activity).setMessage(cylDemoText("Photo")).setPositiveButton(android.R.string.ok, null).show() }
     }
 
     private fun systemBar(activity: FragmentActivity, count: Int, selected: Int = 0, badges: Boolean = false): View {
@@ -150,7 +150,7 @@ object DemoGallery {
         if (count > 5) bar.menu.add(0, 4, 4, "More").setIcon(android.R.drawable.ic_menu_more)
         bar.setOnItemSelectedListener { item ->
             if (item.itemId == 4 && count > 5) {
-                AlertDialog.Builder(activity).setTitle("More").setItems(titles.subList(4, count).toTypedArray()) { _, which -> label.text = titles[4 + which] }.show()
+                AlertDialog.Builder(activity).setTitle(cylDemoText("More")).setItems(titles.subList(4, count).toTypedArray()) { _, which -> label.text = titles[4 + which] }.show()
             } else label.text = item.title
             true
         }
@@ -249,7 +249,7 @@ object DemoGallery {
                         c.performWhenTabBarItemsReady { ready ->
                             val me = ready.tabBar.tabBarButtonArray.getOrNull(4) ?: return@performWhenTabBarItemsReady
                             val bubble = TextView(activity).apply {
-                                text = "New gift!"; setTextColor(Color.WHITE); textSize = 11f; setPadding(16, 6, 16, 6)
+                                text = cylDemoText("New gift!"); setTextColor(Color.WHITE); textSize = 11f; setPadding(16, 6, 16, 6)
                                 background = GradientDrawable().apply { cornerRadius = 24f; setColor(Color.rgb(255, 59, 48)) }
                             }
                             val root = ready.view as android.view.ViewGroup
@@ -342,7 +342,7 @@ object DemoGallery {
                         c.cyl_customActionTabBarItemIdentifiers = listOf("message")
                         c.cyl_customActionBlock = { t, _ ->
                             val control = t.tabBar.cyl_tabBarButtonWithTabIndex(t.selectedIndex)
-                            AlertDialog.Builder(activity).setTitle("Read").setMessage("index ${t.selectedIndex}, ${control?.javaClass?.simpleName}").show()
+                            AlertDialog.Builder(activity).setTitle(cylDemoText("Read")).setMessage("index ${t.selectedIndex}, ${control?.javaClass?.simpleName}").show()
                         }
                         c.updateTabBarItemAtIndex(1, mapOf(CYLConstants.CYLTabBarItemTitle to "Read"))
                     }
@@ -376,7 +376,7 @@ object DemoGallery {
                         c.updateTabBarItemAtIndex(4, mapOf(CYLConstants.CYLTabBarItemTitle to "More", CYLConstants.CYLTabBarItemIdentifier to "more"))
                         c.cyl_customActionTabBarItemIdentifiers = listOf("more", "me", "favor", "shop", "search")
                         c.cyl_customActionBlock = { t, _ ->
-                            AlertDialog.Builder(activity).setTitle("More").setItems(titles.subList(4, 8).toTypedArray()) { _, which ->
+                            AlertDialog.Builder(activity).setTitle(cylDemoText("More")).setItems(titles.subList(4, 8).toTypedArray()) { _, which ->
                                 t.replaceViewControllerAtIndex(4, pages[4 + which], all[4 + which])
                                 t.cyl_customActionTabBarItemIdentifiers = emptyList()
                                 t.selectedIndex = 4
@@ -434,7 +434,7 @@ object DemoGallery {
                 imageView.setColorFilter(Color.WHITE)
             }
             override fun plusChildViewControllerButtonClicked() {
-                AlertDialog.Builder(context).setTitle("Publish").setItems(arrayOf("Photo", "Video", "Text"), null).setNegativeButton(android.R.string.cancel, null).show()
+                AlertDialog.Builder(context).setTitle(cylDemoText("Publish")).setItems(arrayOf("Photo", "Video", "Text"), null).setNegativeButton(android.R.string.cancel, null).show()
             }
         }
         override fun tabBarContext() = ACTION_PLUS
