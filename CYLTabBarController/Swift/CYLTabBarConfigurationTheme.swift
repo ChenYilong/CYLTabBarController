@@ -146,7 +146,7 @@ open class CYLTabBarConfigurationTheme: NSObject, CYLTabBarTheme {
             return color
         }
         // [EN] Another kind of theme is current: the first skin of the file that has the color. [CN] 当前是其他类型的主题：使用文件中第一个提供该颜色的皮肤。
-        for candidate in manager.themes {
+        for candidate in manager.themes ?? [] {
             if let color = (candidate as? CYLTabBarConfigurationTheme)?.color(forName: name) {
                 return color
             }

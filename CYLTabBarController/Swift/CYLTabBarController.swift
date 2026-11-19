@@ -225,28 +225,28 @@ open class CYLTabBarController: UITabBarController, CYLTabBarControllerDelegate,
     }
 
     @objc(initWithViewControllers:tabBarItemsAttributes:imageInsets:titlePositionAdjustment:)
-    public convenience init(viewControllers: [UIViewController], tabBarItemsAttributes: [[AnyHashable: Any]], imageInsets: UIEdgeInsets,
+    public required convenience init(viewControllers: [UIViewController], tabBarItemsAttributes: [[AnyHashable: Any]], imageInsets: UIEdgeInsets,
                             titlePositionAdjustment: UIOffset) {
         self.init(viewControllers: viewControllers, tabBarItemsAttributes: tabBarItemsAttributes, imageInsets: imageInsets,
                   titlePositionAdjustment: titlePositionAdjustment, styleType: .default, context: nil)
     }
 
     @objc(initWithViewControllers:tabBarItemsAttributes:imageInsets:titlePositionAdjustment:context:)
-    public convenience init(viewControllers: [UIViewController], tabBarItemsAttributes: [[AnyHashable: Any]], imageInsets: UIEdgeInsets,
+    public required convenience init(viewControllers: [UIViewController], tabBarItemsAttributes: [[AnyHashable: Any]], imageInsets: UIEdgeInsets,
                             titlePositionAdjustment: UIOffset, context: String?) {
         self.init(viewControllers: viewControllers, tabBarItemsAttributes: tabBarItemsAttributes, imageInsets: imageInsets,
                   titlePositionAdjustment: titlePositionAdjustment, styleType: .default, context: context)
     }
 
     @objc(initWithViewControllers:tabBarItemsAttributes:styleType:context:)
-    public convenience init(viewControllers: [UIViewController], tabBarItemsAttributes: [[AnyHashable: Any]], styleType: CYLTabBarStyleType,
+    public required convenience init(viewControllers: [UIViewController], tabBarItemsAttributes: [[AnyHashable: Any]], styleType: CYLTabBarStyleType,
                             context: String?) {
         self.init(viewControllers: viewControllers, tabBarItemsAttributes: tabBarItemsAttributes, imageInsets: .zero,
                   titlePositionAdjustment: .zero, styleType: styleType, context: context)
     }
 
     @objc(initWithViewControllers:tabBarItemsAttributes:imageInsets:titlePositionAdjustment:styleType:context:)
-    public convenience init(viewControllers: [UIViewController], tabBarItemsAttributes: [[AnyHashable: Any]], imageInsets: UIEdgeInsets,
+    public required convenience init(viewControllers: [UIViewController], tabBarItemsAttributes: [[AnyHashable: Any]], imageInsets: UIEdgeInsets,
                             titlePositionAdjustment: UIOffset, styleType: CYLTabBarStyleType, context: String?) {
         var configuration: [String: Any] = [:]
         configuration[CYLTabBarControllerViewControllers] = viewControllers
@@ -454,7 +454,7 @@ open class CYLTabBarController: UITabBarController, CYLTabBarControllerDelegate,
         guard cylTabBarItemAnimationGetServiceEntryPoint() != nil, isViewLoaded, let tabBar = cyl_tabBar as? CYLTabBar else {
             return
         }
-        tabBar.cyl_setAllTabBarItemAnimationsSpeed(tabBarItemAnimationSpeed, loops: tabBarItemAnimationLoops)
+        tabBar.cylSetAllTabBarItemAnimations(speed: tabBarItemAnimationSpeed, loops: tabBarItemAnimationLoops)
     }
 
     /// [EN] Plays every tab's animation from the start. [CN] 让每个 Tab 的动画从头播放。
@@ -466,7 +466,7 @@ open class CYLTabBarController: UITabBarController, CYLTabBarControllerDelegate,
             return
         }
         cylApplyTabBarItemAnimationPlayback()
-        tabBar.cyl_restartAllTabBarItemAnimations()
+        tabBar.cylRestartAllTabBarItemAnimations()
     }
 
     // MARK: - Helpers

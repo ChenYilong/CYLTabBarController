@@ -530,8 +530,6 @@ extension CYLTabBar {
         get { cylSelectedControl() }
         set { cylSetSelectedControl(newValue) }
     }
-    /** [EN] The selected index. [CN] 选中的下标。 */
-    @nonobjc public func cyl_selectedIndex() -> Int { cyl_selectedIndex() }
     /** [EN] The visible tab buttons and the plus button, by x. [CN] 按 x 排序的可见 Tab 按钮与 PlusButton。 */
     @nonobjc public func cyl_visibleControls() -> [UIControl]? { cylVisibleControls() }
     /** [EN] The tab buttons and the plus button. [CN] Tab 按钮与 PlusButton。 */

@@ -235,7 +235,7 @@ extension CYLTabBarController {
 
     @objc(cyl_isCustomActionTabViewController:)
     open func cyl_isCustomActionTab(_ viewController: UIViewController) -> Bool {
-        guard let viewController, !viewController.cyl_isPlaceholder else {
+        guard !viewController.cyl_isPlaceholder else {
             return false
         }
         if let decider = cyl_shouldPerformCustomTabActionHandler {

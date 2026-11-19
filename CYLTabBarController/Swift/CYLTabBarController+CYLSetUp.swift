@@ -117,7 +117,7 @@ extension CYLTabBarController {
             for index in 0..<max(tabBarItemsAttributes.count, vcs.count) {
                 let item = index < tabBarItemsAttributes.count ? tabBarItemsAttributes[index] : nil
                 if let item, (item[CYLConfigurationValues.excludedKey] as? NSNumber)?.boolValue == true {
-                    skippedTabs.add(CYLTabBarPageRegistry.skippedTab(
+                    skippedTabs.add(CYLTabBarSkippedTab.skippedTab(
                         with: .excluded, pageIdentifier: CYLTabBarPageRegistry.pageIdentifier(ofTab: item), attributes: item,
                         detail: item[CYLConfigurationValues.exclusionReasonKey] as? String))
                     continue

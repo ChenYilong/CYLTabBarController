@@ -298,7 +298,7 @@ extension CYLTabBarController {
     // MARK: - Tap animation
 
     @objc(cyl_tabButtonTapAnimationType)
-    var cylTabButtonTapAnimationType: CYLTabButtonTapAnimationType {
+    open var cyl_tabButtonTapAnimationType: CYLTabButtonTapAnimationType {
         get { cylInteraction.tapAnimationType }
         @objc(cyl_setTabButtonTapAnimationType:) set {
             cylInteraction.tapAnimationType = newValue
@@ -307,7 +307,7 @@ extension CYLTabBarController {
     }
 
     @objc(cyl_defaultTabButtonAnimation)
-    var cylDefaultTabButtonAnimation: CYLTabButtonAnimation? {
+    open var cyl_defaultTabButtonAnimation: CYLTabButtonAnimation? {
         get { cylInteraction.defaultAnimation }
         @objc(cyl_setDefaultTabButtonAnimation:) set { cylInteraction.defaultAnimation = newValue }
     }
@@ -349,8 +349,7 @@ extension CYLTabBarController {
     }
 
     @objc(cyl_playTabButtonAnimationForControl:)
-    func cylPlayTabButtonAnimation(for control: UIControl?) {
-        guard let control else { return }
+    open func cyl_playTabButtonAnimation(for control: UIControl) {
         let settings = cylInteraction
         // [EN] Held weakly: a tab button can be replaced by UIKit. [CN] 弱引用：Tab 按钮可能被 UIKit 替换。
         let previousControl = settings.previousAnimatedControl
@@ -814,7 +813,7 @@ extension CYLTabBarController {
     // MARK: - Swipe
 
     @objc(cyl_swipeToSwitchTabEnabled)
-    var cylSwipeToSwitchTabEnabled: Bool {
+    open var cyl_swipeToSwitchTabEnabled: Bool {
         get { cylInteraction.swipeToSwitchTabEnabled }
         @objc(cyl_setSwipeToSwitchTabEnabled:) set {
             cylInteraction.swipeToSwitchTabEnabled = newValue
@@ -841,7 +840,8 @@ extension CYLTabBarController {
     }
 
     @objc(cyl_switchToAdjacentTabWithStep:animated:)
-    func cylSwitchToAdjacentTab(withStep step: Int, animated: Bool) -> Bool {
+    @discardableResult
+    open func cyl_switchToAdjacentTab(withStep step: Int, animated: Bool) -> Bool {
         let viewControllers = self.viewControllers ?? []
         let selectedIndex = self.selectedIndex
         guard step != 0, selectedIndex != NSNotFound, selectedIndex < viewControllers.count else { return false }
@@ -1060,7 +1060,7 @@ final class CYLTabBarInteractionHandler: NSObject, UIGestureRecognizerDelegate {
         let isSwipe = abs(translation.x) > 60 || abs(velocity.x) > 500
         guard isSwipe, abs(translation.x) >= abs(translation.y) else { return }
         // [EN] Finger to the left: the next tab. [CN] 手指向左：下一个 Tab。
-        _ = tabBarController.cylSwitchToAdjacentTab(withStep: translation.x < 0 ? 1 : -1, animated: true)
+        _ = tabBarController.cyl_switchToAdjacentTab(withStep: translation.x < 0 ? 1 : -1, animated: true)
     }
 }
 
@@ -1190,7 +1190,7 @@ extension CYLTabBarController {
     }
 
     @objc(tabBarController:shouldShowPlatterLiquidLensViewForControl:)
-    func cyl_tabBarController(_ tabBarController: CYLTabBarController, shouldShowPlatterLiquidLensViewFor _: UIControl) -> Bool {
+    open func tabBarController(_ tabBarController: CYLTabBarController, shouldShowPlatterLiquidLensViewFor control: UIControl) -> Bool {
         let tabBar: UITabBar = tabBarController.tabBar
         guard CYLConstants.isLiquidGlassActive(), let tabBar = tabBar as? CYLTabBar else {
             return false
@@ -1236,7 +1236,7 @@ extension CYLTabBarController {
      */
     @objc(cyl_sendDidSelectControl:)
     func cylSendDidSelectControl(_ control: UIControl) {
-        cylPlayTabButtonAnimation(for: control)
+        cyl_playTabButtonAnimation(for: control)
         cyl_playTabButtonTapFeedback()
         if control.cyl_isPlusControl(), let plusButton = CYLPlusButton.cylPlusButton(forTabBarContext: context) {
             let tapped = NSSelectorFromString("cyl_configurationPlusButtonTapped")

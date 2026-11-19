@@ -202,7 +202,7 @@ extension UIControl {
             return false
         }
         var isSelected = self.isSelected && tabBarController.selectedIndex == cyl_tabBarChildViewControllerIndex
-        if tabBarController.tabBar.cylHasPlusChildViewController() {
+        if tabBarController.hasPlusChildViewController() {
             isSelected = isSelected && CYLPlusButton.plusChildViewController(forOwner: self)?.cyl_plusViewControllerEverAdded == true
         }
         return isSelected
@@ -456,7 +456,7 @@ extension UIControl {
      */
     @objc(cyl_platterSelectedControl)
     public func cyl_platterSelected() -> UIControl? {
-        guard cyl_hasCYLTabBar, let tabBar = cyl_tabBarController?.tabBar as CYLTabBar? else {
+        guard cyl_hasCYLTabBar, let tabBar = cyl_tabBarController?.tabBar as? CYLTabBar else {
             return nil
         }
         return tabBar.cylSelectedContentControl(fromContentControl: self) ?? self
@@ -480,7 +480,7 @@ extension UIControl {
      */
     @objc(cyl_platterNormalControl)
     public func cyl_platterNormal() -> UIControl {
-        cyl_tabBarController?.tabBar.cyl_normalContentControl(fromSelectedContentControl: self) ?? self
+        (cyl_tabBarController?.tabBar as? CYLTabBar)?.cylNormalContentControl(fromSelectedContentControl: self) ?? self
     }
 
     /**
