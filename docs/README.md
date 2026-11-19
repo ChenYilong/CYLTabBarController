@@ -633,6 +633,7 @@ docs/
 │   ├── wechat-miniprogram-feed-taps-ios-parity-devtools-sdk3.17.6-ef5afc3-windows.png
 │   ├── wechat-miniprogram-feeds-ios-taps-devtools-sdk3.17.6-3dd395b.png
 │   ├── wechat-miniprogram-flat-login.png
+│   ├── wechat-miniprogram-gif-image-rest-then-play.png
 │   ├── wechat-miniprogram-home.png
 │   ├── wechat-miniprogram-objc-parity-batch1-launch-devtools-sdk3.17.6-4e2e327.png
 │   ├── wechat-miniprogram-objc-parity-batch2-skins-devtools-sdk3.17.6-b850f51.png
