@@ -313,4 +313,16 @@ FOUNDATION_EXTERN BOOL CYLControlReportsTaps(UIControl *_Nullable control);
 - (NSArray<UIViewController *> *)cyl_viewControllersAligningPlusSlotWithViewControllers:(nullable NSArray<UIViewController *> *)viewControllers;
 @end
 
+/*!
+ * [EN] Title offsets, image insets, looping Lottie tabs and the FlatDesign appearance (step 125,
+ *      `Swift/CYLTabBarController+CYLItemAppearance.swift`, `CYLTabBarController+CYLFlatDesignItemAppearance.swift`).
+ * [CN] 标题偏移、图片内边距、循环播放的 Lottie Tab 与扁平样式外观（第 125 步）。
+ */
+@interface CYLTabBarController (CYLItemAppearancePrivate)
+- (void)cyl_applyTitlePositionAdjustmentToItems:(UIOffset)titlePositionAdjustment;
+- (void)cyl_applyImageInsetsToItems:(UIEdgeInsets)imageInsets;
+- (void)cyl_recordDefaultStandardAppearance;
+- (void)cyl_syncFlatDesignStandardAppearance;
+@end
+
 NS_ASSUME_NONNULL_END
