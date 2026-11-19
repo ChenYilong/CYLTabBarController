@@ -152,46 +152,7 @@ NSString *const CYLTabBarStyleTypeDidChangeNotification = @"CYLTabBarStyleTypeDi
 #else
 #endif
 
-/*!
- * [EN] FIX: issue #91 — iOS 26 and later put the tab bar in a wrapper view only as tall as the bar, so UIKit never asks
- *      `-[CYLTabBar hitTest:withEvent:]` about a point above the bar: the raised part of the plus button and a touchable
- *      area grown with `touchableAreaOutsets` / `touchableAreaScale` went to the page behind (or to the scroll edge
- *      effect's touch blocker). This transparent view, in front of everything in the controller's view, asks the tab bar
- *      about points above the bar and keeps only the plus button (and its subviews); every other point returns nil, so
- *      the pages get their touches as before. The classic style and FlatDesign do not need it: their bar's superview is
- *      the controller's view, which already asks the tab bar.
- * [CN] FIX: issue #91 — iOS 26 及以上把 TabBar 放在只有 TabBar 高度的容器视图中，UIKit 不会就 TabBar 上方的点询问
- *      `-[CYLTabBar hitTest:withEvent:]`：PlusButton 凸出的部分、以及用 `touchableAreaOutsets` / `touchableAreaScale` 扩大的点击区域，
- *      触摸会交给后面的页面（或滚动边缘效果的触摸拦截视图）。这个透明视图位于控制器视图的最前面，就 TabBar 上方的点询问 TabBar，
- *      只保留 PlusButton（及其子视图）；其他点返回 nil，页面照常接收触摸。经典样式与扁平样式不需要它：其 TabBar 的父视图就是控制器的视图，
- *      已经会询问 TabBar。
- */
-@interface CYLTabBarOverflowTouchView : UIView
-@property (nonatomic, weak) UITabBar *tabBar;
-@end
-
-@implementation CYLTabBarOverflowTouchView
-
-- (UIView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event {
-    UITabBar *tabBar = self.tabBar;
-    if (!tabBar.window || tabBar.hidden || tabBar.alpha < 0.01 || !tabBar.userInteractionEnabled
-        || ![tabBar isKindOfClass:[CYLTabBar class]]) {
-        return nil;
-    }
-    CGPoint tabBarPoint = [self convertPoint:point toView:tabBar];
-    // [EN] On the bar itself UIKit already routes the touch. [CN] TabBar 本身范围内的触摸 UIKit 已经能正确分发。
-    if ([tabBar pointInside:tabBarPoint withEvent:event]) {
-        return nil;
-    }
-    UIView *plusButton = ((CYLTabBar *)tabBar).plusButton;
-    if (!plusButton) {
-        return nil;
-    }
-    UIView *hit = [tabBar hitTest:tabBarPoint withEvent:event];
-    return [hit isDescendantOfView:plusButton] ? hit : nil;
-}
-
-@end
+// [EN] `CYLTabBarOverflowTouchView` (FIX: issue #91) is Swift (Swift/CYLTabBarController+CYLLayout.swift, step 132). [CN] 已改为 Swift（第 132 步）。
 
 // [EN] `CYLTabBarControllerMemoryWarningSeam` (Swift, docs/Swift-Migration.md): lets the Swift memory warning demo read
 //      `unloadsUnselectedViewsOnMemoryWarning` and `-shouldUnloadViewOfViewController:`; removed when this class is Swift.
@@ -199,8 +160,6 @@ NSString *const CYLTabBarStyleTypeDidChangeNotification = @"CYLTabBarStyleTypeDi
 //      `unloadsUnselectedViewsOnMemoryWarning` 与 `-shouldUnloadViewOfViewController:`；本类迁移到 Swift 后删除。
 @interface CYLTabBarController () <UITabBarControllerDelegate, CYLTabBarControllerMemoryWarningSeam>
 
-/// [EN] iOS 26+: routes points above the bar to the plus button (issue #91). [CN] iOS 26+：把 TabBar 上方的点交给 PlusButton（issue #91）。
-@property (nonatomic, strong, nullable) CYLTabBarOverflowTouchView *cyl_overflowTouchView;
 
 /// [EN] Page registry state (docs/Tab-Page-Registry.md): whether the tabs came from page IDs, the sources, the pages by
 ///      ID (for `-reloadTabBarItemsWithAttributes:`) and the skipped tabs.
@@ -406,211 +365,19 @@ static NSString *const CYLImageOnlyTabAppliedTitleKey = @"appliedTitle";
 }
 #endif
 
+// [EN] The layout, the overflow touch view (issue #91) and the orientation are Swift (Swift/CYLTabBarController+CYLLayout.swift and,
+//      for FlatDesign, CYLTabBarController+CYLFlatDesignLayout.swift; step 132). These UIKit overrides stay one-line forwarders;
+//      `-shouldAutorotate` stays whole (it reads the deprecated `shouldAutorotate`, a warning Swift cannot silence).
+// [CN] 布局、溢出触摸视图（issue #91）与方向已改为 Swift（第 132 步）。这些 UIKit 重写保留为一行的转发；`-shouldAutorotate` 完整保留（它读取已废弃的
+//      `shouldAutorotate`，Swift 无法消除该警告）。
 - (void)viewDidLayoutSubviews {
     [super viewDidLayoutSubviews];
-    // [EN] Lottie views are added during layout: start the looping ones (`CYLTabBarLottieLoopsWhenUnselected`).
-    // [CN] Lottie 视图在布局时添加：启动需要循环播放的视图（`CYLTabBarLottieLoopsWhenUnselected`）。
-    [self cyl_updateLoopingLottieViews];
-    // [EN] Animation views added during layout get the tab's template tint (`CYLTabBarAnimationOptionTint`).
-    // [CN] 布局时添加的动画视图获得 Tab 的模板着色。
-    [self cyl_setNeedsApplyTabBarItemAnimationTintColors];
-    // [EN] FIX: issue #535 — long press and swipe to switch tabs, once the view exists (every style).
-    // [CN] FIX: issue #535 — view 已存在时安装长按与滑动切换手势（所有样式）。
-    [self cyl_installInteractionGestureRecognizersIfNeeded];
-    // [EN] FlatDesign `cyl_tabBarMinimizeBehavior` (issue #13): follow the scroll view of the page now on screen.
-    // [CN] 扁平样式的 `cyl_tabBarMinimizeBehavior`（issue #13）：跟随当前显示页面的滚动视图。
-    [self cyl_updateTabBarMinimizeTracking];
-    // Issue #601: tab buttons created again (e.g. after a rotation) get their icon views again.
-    [self cyl_setNeedsUpdateTabBarItemIconViews];
-    [self cyl_fixOpaqueTabBarSafeAreaInsetsIfNeeded];
-    // [EN] FIX: issue #91 — points above the bar reach the plus button on iOS 26+ too. [CN] iOS 26+ 上 TabBar 上方的点也能到达 PlusButton。
-    [self cyl_updateOverflowTouchView];
-    CYL_IF_NOT_FLATDESIGN_BEGIN     //Not CYLTabBarStyleTypeFlatDesign
-        // FIX: issue #585, #543 (follow-up to #93, #392)
-        // [EN] The forced `-layoutSubviews` below is an iOS 10 workaround: #93 (iOS 10.0–10.2) and #392 (iOS 10.3.x, items
-        //      misplaced next to the plus button) needed the tab bar laid out again after this controller. It later ran on
-        //      every layout pass on every system. On iOS 11+ notched iPhones that re-laid the tab bar out synchronously in
-        //      the middle of push/pop (#585: tab images flicker after `cyl_replaceTabImageView`) and rotation (#543: the tab
-        //      bar flickers when turning from landscape to portrait). From iOS 11 UIKit lays the tab bar out itself, so skip
-        //      it for the classic system tab bar on iOS 11 and later.
-        //      Scope: the classic (pre-Liquid Glass) system tab bar, i.e. iOS 25 and earlier plus iOS 26 in UI compatibility
-        //      mode (`UIDesignRequiresCompatibility`); `+[CYLConstants isLiquidGlassActive]` is NO exactly then. Liquid Glass
-        //      (iOS 26 without compatibility mode, every iOS 27+ system, the iPhone Duo) keeps the previous behavior, and
-        //      FlatDesign never reaches this code.
-        // [CN] 下面强制调用 `-layoutSubviews` 是针对 iOS 10 的处理：#93（iOS 10.0–10.2）与 #392（iOS 10.3.x，PlusButton 旁的 item
-        //      位置错误）需要在本控制器布局后再布局一次 TabBar。之后它在所有系统的每次布局中都会执行，iOS 11+ 刘海屏上会在
-        //      push/pop（#585：调用 `cyl_replaceTabImageView` 后 Tab 图片闪动）和旋转（#543：横屏转竖屏时 TabBar 闪动）过程中
-        //      同步地重新布局 TabBar。iOS 11 起 UIKit 会自行布局 TabBar，因此 iOS 11 及以上的经典系统 TabBar 不再执行。
-        //      范围：经典（液态玻璃之前的）系统 TabBar，即 iOS 25 及以前，以及 iOS 26 的 UI 兼容模式
-        //      （`UIDesignRequiresCompatibility`），此时 `+[CYLConstants isLiquidGlassActive]` 恰好为 NO。液态玻璃（未开启兼容模式
-        //      的 iOS 26、所有 iOS 27+、iPhone Duo）保持原有行为；扁平样式不会执行到这里。
-        BOOL isClassicSystemTabBar = ![CYLConstants isLiquidGlassActive];
-        BOOL needsIOS10Workaround = !CYL_SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(@"11.0");
-        if (!isClassicSystemTabBar || needsIOS10Workaround) {
-            [self.cyl_tabBar layoutSubviews];//Fix issue #93 #392
-        }
-        if ([self.cyl_tabBar isKindOfClass:[CYLTabBar class]] ) {
-            CYLTabBar *tabBar = (CYLTabBar *)self.cyl_tabBar;
-            [self cyl_bindTabControlActions];
-            // VoiceOver: the tab under the plus button has no title, so it was read as an empty tab.
-            // 加号按钮下方的占位 Tab 没有标题，VoiceOver 会读成空 Tab。
-            // [EN] Also the plus button's own view controller: its tab item has no title when the plus button keeps its
-            //      title (e.g. drawn on its background image).
-            // [CN] PlusButton 自己的子控制器也一样：PlusButton 保留自己的标题时（如画在背景图上），其 TabBarItem 没有标题。
-            UIViewController *plusChildViewController = [CYLPlusButton plusChildViewControllerForOwner:self];
-            for (UIViewController *viewController in self.viewControllers) {
-                if (viewController.cyl_isPlaceholder) {
-                    // Classic tab bar: the button is the element. Liquid Glass: the element comes from the item, which
-                    // then reads as the plus button it is covered by (a tap on it is forwarded to the plus button).
-                    viewController.cyl_tabButton.accessibilityElementsHidden = YES;
-                    viewController.cyl_tabButton.isAccessibilityElement = NO;
-                } else if (viewController != plusChildViewController || viewController.tabBarItem.title.length > 0) {
-                    continue;
-                }
-                viewController.tabBarItem.accessibilityLabel = [self cyl_contextPlusButton].accessibilityLabel;
-            }
-        
-            do {
-                if (self.isTabBarItemAnimationViewAdded) {
-                    break;
-                }
-                BOOL isLottieEnabled = [self isLottieEnabled];
-            
-                // FIX: issue #477 — only some tabs may have an animation (Lottie or PAG): each tab takes its own file
-                // (`-addLottieImageWithControl:…`), and the others keep their images. The classic tab bar used to need one
-                // file per tab button and turned every animation off otherwise. 只有部分 Tab 有动画（Lottie 或 PAG）时，
-                // 每个 Tab 使用自己的文件，其余 Tab 保持图片。经典 TabBar 以前要求每个 Tab 按钮都有文件，否则关闭全部动画。
-                if (!isLottieEnabled) {
-                    self.tabBarItemAnimationViewAdded = YES;
-                    break;
-                }
-                [self initLottieTabBar:tabBar];
-                break;
-            } while (NO);
-        }
-    
-    
-        // [EN] The plus button in the Liquid Glass layers; also run from `-[CYLTabBar layoutSubviews]`, see the method.
-        // [CN] 液态玻璃图层中的 PlusButton；`-[CYLTabBar layoutSubviews]` 中也会调用，见该方法。
-        [self cyl_layOutPlusButtonInLiquidGlassLayers];
-    
-
-    } else {/**  CYLTabBarStyleTypeFlatDesign*/}
-
-    if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType) {
-#if CYL_FLATDESIGN_AVAILABLE
-        if (![_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) { return; }
-        if (!_tabBarIsAnimating && !CGRectEqualToRect(self.cyl_tabBar.frame, self.tabBarFrame) && self.cyl_tabBar.superview == self.view) {
-            //目的是动态更新tabbar高度 ， 测试方法为 修改 tabBarController.tabBarHeight ， 预期为实时跟新UI中的tabbar高度。// The goal is to dynamically update the tab bar height. The test method involves modifying `tabBarController.tabBarHeight`; the expected result is that the tab bar height in the UI updates in real time.
-            self.cyl_tabBar.frame = self.tabBarFrame;
-        }
-        [self _cyl_refreshSystemTabBarVisibilityIfNeeded];
-
-#else
-#endif
-    } else {}
-
-
-    [self cyl_runPendingReloadBadgesBlocksIfReady];
-
-    if (self.shouldInvokeOnceViewDidLayoutSubViewsBlock) {
-        // [CN] 在对象生命周期内，不添加 flag 属性的情况下，防止多次调进这个方法
-        // [EN] Prevents this method from being called more than once during the object's lifetime, without adding a
-        //      flag property
-        if (objc_getAssociatedObject(self, _cmd)) {
-            return;
-        } else {
-            !self.viewDidLayoutSubviewsBlock ?: self.viewDidLayoutSubviewsBlock(self);
-            objc_setAssociatedObject(self, _cmd, @"shouldInvokeOnceViewDidLayoutSubViewsBlock", OBJC_ASSOCIATION_RETAIN);
-        }
-    } else {
-        !self.viewDidLayoutSubviewsBlock ?: self.viewDidLayoutSubviewsBlock(self);
-    }
-
-}
-
-/*!
- * [EN] FIX: issue #91 — installs `CYLTabBarOverflowTouchView` in front of the controller's view while the tab bar lives in
- *      a wrapper view of its own (iOS 26 and later), and removes it otherwise.
- * [CN] FIX: issue #91 — TabBar 位于自己的容器视图中时（iOS 26 及以上）在控制器视图最前面安装 `CYLTabBarOverflowTouchView`，否则移除。
- */
-- (void)cyl_updateOverflowTouchView {
-    UITabBar *tabBar = self.tabBar;
-    BOOL needed = self.isViewLoaded && tabBar.superview && tabBar.superview != self.view;
-    CYLTabBarOverflowTouchView *touchView = self.cyl_overflowTouchView;
-    if (!needed) {
-        [touchView removeFromSuperview];
-        self.cyl_overflowTouchView = nil;
-        return;
-    }
-    if (!touchView) {
-        touchView = [[CYLTabBarOverflowTouchView alloc] initWithFrame:self.view.bounds];
-        touchView.backgroundColor = UIColor.clearColor;
-        touchView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-        touchView.accessibilityElementsHidden = YES;   // [EN] Not a control: VoiceOver reads the plus button. [CN] 不是控件：VoiceOver 读 PlusButton。
-        self.cyl_overflowTouchView = touchView;
-    }
-    touchView.tabBar = tabBar;
-    if (touchView.superview != self.view) {
-        [self.view addSubview:touchView];
-    } else if (self.view.subviews.lastObject != touchView) {
-        [self.view bringSubviewToFront:touchView];
-    }
-    touchView.frame = self.view.bounds;
+    [self cyl_viewDidLayoutSubviews];
 }
 
 - (void)viewWillLayoutSubviews {
     [super viewWillLayoutSubviews];
-    [self cyl_startObservingStandardAppearance];
-    [self cyl_syncTabBarAppearances];
-    CYL_IF_NOT_FLATDESIGN_BEGIN     //Not CYLTabBarStyleTypeFlatDesign
-    if ([CYLConstants isLiquidGlassActive]) {
-        //如果不是扁平设计风格，也就是液态玻璃不支持自定义高度， 液态玻璃系统样式是固定高度的。// Unless it's a flat design style—in which case Liquid Glass does not support custom heights—the Liquid Glass system style has a fixed height.
-        return;
-    }
-    if (0 == self.tabBarHeight) {
-        return;
-    }
-    self.cyl_tabBar.frame = ({
-        CGRect frame = self.cyl_tabBar.frame;
-        CGFloat tabBarHeight = self.tabBarFrame.size.height;
-        frame.size.height = tabBarHeight;
-        // FIX: issue #591
-        // [EN] Use `bounds`, not `frame`: the tab bar is laid out in this view's own coordinate space, while `frame` is in
-        //      the superview's and includes the view's transform. A custom transition that scales the outgoing view
-        //      (`fromView.transform = CGAffineTransformMakeScale(...)`) shrinks `frame.size.height`, which moved the tab bar
-        //      up. Newer systems relaid the tab bar afterwards and hid the error; iOS 12 did not. `bounds` also matches
-        //      `-tabBarFrame`, and unlike the screen height it is right in Split View / Stage Manager.
-        //      Scope: Liquid Glass returns above and FlatDesign never reaches here; elsewhere `bounds` equals the old value
-        //      unless the view has a transform, so no version guard is needed.
-        // [CN] 使用 `bounds` 而不是 `frame`：TabBar 布局在本视图自身的坐标系中，`frame` 则在父视图坐标系中，并且包含视图的 transform。
-        //      自定义转场缩放 from 页面（`fromView.transform = CGAffineTransformMakeScale(...)`）时 `frame.size.height` 变小，
-        //      TabBar 因此被上移。高版本系统随后会重新布局 TabBar，掩盖了该问题，iOS 12 不会。`bounds` 也与 `-tabBarFrame` 一致，
-        //      且与屏幕高度不同，在分屏 / 台前调度下同样正确。
-        //      范围：液态玻璃已在上方返回，扁平样式不会执行到这里；其他情况下除非视图有 transform，`bounds` 与原值相同，无需版本判断。
-        frame.origin.y = CGRectGetHeight(self.view.bounds) - tabBarHeight;
-        frame;
-    });
-    } else {/**  CYLTabBarStyleTypeFlatDesign*/}
-}
-
-/*!
- * [EN] The view controller that decides the orientation now: one presented by this controller (not while it is being
- *      dismissed, and never a `UIAlertController`, which asks its presenting view controller back and would loop), else
- *      nil (the selected tab decides, below). The system's full screen video player (`AVFullScreenViewController`) is
- *      presented too, so a video can turn to landscape in a portrait app.
- * [CN] 当前决定方向的控制器：由本控制器 present 出的控制器（正在 dismiss 时除外，且不包括 `UIAlertController`：它会反过来询问
- *      presenting 控制器，造成循环），否则为 nil（由选中的 Tab 决定，见下方）。系统的全屏视频播放器（`AVFullScreenViewController`）
- *      同样是 present 出来的，因此竖屏 App 中的视频也能横屏。
- */
-- (nullable UIViewController *)cyl_presentedViewControllerForOrientation {
-    UIViewController *presentedViewController = self.presentedViewController;
-    if (!presentedViewController || presentedViewController.isBeingDismissed ||
-        presentedViewController.presentingViewController != self ||
-        [presentedViewController isKindOfClass:[UIAlertController class]]) {
-        return nil;
-    }
-    return presentedViewController;
+    [self cyl_viewWillLayoutSubviews];
 }
 
 #pragma clang diagnostic push
@@ -634,27 +401,7 @@ static NSString *const CYLImageOnlyTabAppliedTitleKey = @"appliedTitle";
 /// [CN] 控制器支持方向
 /// [EN] Orientations supported by the view controller
 - (UIInterfaceOrientationMask)supportedInterfaceOrientations {
-    UIViewController *presentedViewController = [self cyl_presentedViewControllerForOrientation];
-    if (presentedViewController) {
-        return presentedViewController.supportedInterfaceOrientations;
-    }
-    CYL_IF_NOT_FLATDESIGN_BEGIN     //Not CYLTabBarStyleTypeFlatDesign
-        UIViewController *controller = self.selectedViewController;
-        if ([controller isKindOfClass:[UINavigationController class]]) {
-            UINavigationController *navigationController = (UINavigationController *)controller;
-            return navigationController.topViewController.supportedInterfaceOrientations;
-        } else {
-            return controller.supportedInterfaceOrientations;
-        }
-    } else {/**  CYLTabBarStyleTypeFlatDesign*/}
-    if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType) {
-#if CYL_FLATDESIGN_AVAILABLE
-        if ([_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) {     return self.selectedViewController.supportedInterfaceOrientations; }
-        return self.selectedViewController.supportedInterfaceOrientations;
-#else
-#endif
-    } else {/** Not CYLTabBarStyleTypeFlatDesign*/ }
-    return self.selectedViewController.supportedInterfaceOrientations;
+    return [self cyl_supportedInterfaceOrientations];
 }
 
 #pragma mark - Memory warning (issue #426)
@@ -670,37 +417,7 @@ static NSString *const CYLImageOnlyTabAppliedTitleKey = @"appliedTitle";
 }
 
 - (void)dealloc {
-    // Whatever the style is now: the style can change after the observation started.
-    // 与当前样式无关：开始观察后样式可能已改变。
-    [self cyl_stopObservingStandardAppearance];
-    CYL_IF_NOT_FLATDESIGN_BEGIN     //Not CYLTabBarStyleTypeFlatDesign
-    
-        // `-removePlusButtonIfNeeded` used to run here: it removed the registered plus button when its context differed from
-        // this controller's, which with several tab bar controllers (each with its own plus button) unregistered a plus
-        // button that another controller still shows. A controller only uses the plus button of its own context
-        // (`-hasPlusButton`, so the contexts were equal and it removed nothing). Removed (#414).
-        // 这里原先会执行 `-removePlusButtonIfNeeded`：当已注册 PlusButton 的 context 与本控制器不同时将其移除，存在多个 TabBarController
-        // （各自有自己的 PlusButton）时，会注销另一个控制器仍在展示的 PlusButton。控制器只使用自己 context 的 PlusButton
-        // （`-hasPlusButton`，因此 context 本来就相同，什么也不会移除）。已删除（#414）。
-        /// MARK: 这里是全局处理，如果生成新的，这里操作时会破坏新的视图展示
-        //    BOOL isAdded = [self isPlusViewControllerAdded:_viewControllers];
-        //    BOOL hasPlusChildViewController = [self hasPlusChildViewController] && isAdded;
-        //    if (isAdded && hasPlusChildViewController && [self cyl_contextPlusChildViewController].cyl_plusViewControllerEverAdded == YES) {
-        //        [[self cyl_contextPlusChildViewController] cyl_setPlusViewControllerEverAdded:NO];
-        //    }
-        // [CN] KVO反注册
-        // [EN] Remove KVO observers
-        [self cyl_stopObservingTabImageViewDefaultOffset];
-    } else {/**  CYLTabBarStyleTypeFlatDesign*/}
-
-    //CYLTabBarStyleTypeFlatDesign
-    if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType) {
-#if CYL_FLATDESIGN_AVAILABLE
-        if (![_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) { return; }
-        [self cyl_removeObserver:self forKeyPath:@"cyl_tabBar" context:CYLFlatDesignTabBarContext];
-#else
-#endif
-    } else { }
+    [self cyl_stopObservingForDealloc];
 }
 
 #pragma mark - Overrides

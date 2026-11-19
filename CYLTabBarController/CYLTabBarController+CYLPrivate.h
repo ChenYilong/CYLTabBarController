@@ -387,4 +387,16 @@ FOUNDATION_EXTERN BOOL CYLControlReportsTaps(UIControl *_Nullable control);
 - (void)cyl_stopObservingTabImageViewDefaultOffset;
 @end
 
+/*!
+ * [EN] Layout and orientation (step 132, `Swift/CYLTabBarController+CYLLayout.swift`), called by CYLTabBarController.m.
+ * [CN] 布局与方向（第 132 步），由 CYLTabBarController.m 调用。
+ */
+@interface CYLTabBarController (CYLLayoutPrivate)
+- (void)cyl_viewDidLayoutSubviews;
+- (void)cyl_viewWillLayoutSubviews;
+- (nullable UIViewController *)cyl_presentedViewControllerForOrientation;
+- (UIInterfaceOrientationMask)cyl_supportedInterfaceOrientations;
+- (void)cyl_stopObservingForDealloc;
+@end
+
 NS_ASSUME_NONNULL_END

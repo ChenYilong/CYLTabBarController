@@ -29,6 +29,7 @@ private let CYLDefaultTabBarHeight: CGFloat = 49
     @objc(setCylRefreshedSystemTabBarWindow:) func cylSetRefreshedSystemTabBarWindow(_ window: UIWindow?)
     @objc(setTabBarHidden:) func cylSetTabBarHidden(_ hidden: Bool)
     @objc(setCyl_tabBarHidden:) func cylSetTabBarHiddenRequest(_ hidden: Bool)
+    @objc(tabBarIsAnimating) func cylTabBarIsAnimating() -> Bool
 }
 
 /**

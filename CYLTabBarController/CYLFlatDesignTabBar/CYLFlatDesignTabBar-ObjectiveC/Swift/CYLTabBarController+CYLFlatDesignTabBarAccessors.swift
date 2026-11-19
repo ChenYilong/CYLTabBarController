@@ -33,7 +33,7 @@ extension CYLTabBarController {
         if !tabBar.isHidden {
             tabBar.isHidden = true
         }
-        let flatDesignTabBar = CYLFlatDesignTabBar(frame: cylFlatDesignTabBarFrame())
+        let flatDesignTabBar = CYLFlatDesignTabBar(frame: cylLayoutHooks.cylTabBarFrame())
         flatDesignTabBar.delegate = (self as AnyObject) as? CYLFlatDesignTabBarDelegate
         // [EN] `-setContext:` usually ran before this tab bar existed (it only copies the context to an existing one).
         // [CN] `-setContext:` 通常在本 TabBar 创建之前就执行了（它只会复制给已存在的 TabBar）。
@@ -47,13 +47,6 @@ extension CYLTabBarController {
         accessors.cylSetTabBarHidden(false)
         cylFlatDesignUpdateAdditionalSafeAreaInsets(animated: false)
         NotificationCenter.default.post(name: NSNotification.Name.CYLTabBarStyleTypeDidChange, object: self)
-    }
-
-    /// [EN] The frame of the FlatDesign tab bar (`-tabBarFrame`). [CN] 扁平样式 TabBar 的 frame（`-tabBarFrame`）。
-    private func cylFlatDesignTabBarFrame() -> CGRect {
-        typealias Getter = @convention(c) (AnyObject, Selector) -> CGRect
-        let selector = NSSelectorFromString("tabBarFrame")
-        return unsafeBitCast(method(for: selector), to: Getter.self)(self, selector)
     }
 
     /// [EN] A new height re-lays out the FlatDesign tab bar and the safe area. [CN] 新的高度会重新布局扁平样式 TabBar 与安全区域。
