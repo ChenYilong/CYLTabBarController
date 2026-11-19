@@ -28,6 +28,13 @@ import UIKit
     func cylAddLottieImage(withControl control: UIControl, animation: Bool, defaultSelected: Bool)
     @objc(setTabBarItemAnimationViewAdded:) func cylSetTabBarItemAnimationViewAdded(_ added: Bool)
     @objc(setInvokeOnceViewDidLayoutSubViewsBlock:) func cylSetInvokeOnceViewDidLayoutSubViewsBlock(_ invokeOnce: Bool)
+    /// [EN] Class-extension state of the classic hide / show animation (step 75). [CN] 经典隐藏 / 显示动画的类扩展状态（第 75 步）。
+    @objc(cylClassicTabBarIsAnimating) func cylClassicTabBarIsAnimating() -> Bool
+    @objc(setCylClassicTabBarIsAnimating:) func cylSetClassicTabBarIsAnimating(_ value: Bool)
+    @objc(cylClassicTabBarHiddenRequest) func cylClassicTabBarHiddenRequest() -> Bool
+    @objc(setCylClassicTabBarHiddenRequest:) func cylSetClassicTabBarHiddenRequest(_ value: Bool)
+    @objc(cylClassicTabBarAnimationGeneration) func cylClassicTabBarAnimationGeneration() -> UInt
+    @objc(setCylClassicTabBarAnimationGeneration:) func cylSetClassicTabBarAnimationGeneration(_ value: UInt)
     /// [EN] Class-extension state and a loader still in Objective-C, used by the in-place update (step 73). [CN] 仍为 Objective-C 的类扩展状态与加载方法，供原地更新使用（第 73 步）。
     @objc(tabBarItemAnimationURLs) func cylTabBarItemAnimationURLs() -> NSMutableArray
     @objc(tabBarItemAnimationSizes) func cylTabBarItemAnimationSizes() -> NSMutableArray

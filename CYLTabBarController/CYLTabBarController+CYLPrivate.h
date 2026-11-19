@@ -164,6 +164,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)tabChangedToSelectedViewController:(nullable UIViewController *)viewController control:(nullable UIControl *)control;
 - (void)tabChangedToSelectedIndex:(NSUInteger)selectedIndex viewController:(nullable UIViewController *)viewController control:(nullable UIControl *)control;
 - (void)initLottieTabBar:(CYLTabBar *)tabBar;
+/// [EN] Implemented in Swift (CYLTabBarController+CYLTabBarHidden.swift, step 75). [CN] 由 Swift 实现（第 75 步）。
+- (BOOL)cyl_isTabBarHidden;
+- (void)cyl_setTabBarHidden:(BOOL)hidden animated:(BOOL)animated;
+- (void)cyl_setDelegate:(nullable id)delegate;
 /// [EN] FlatDesign subspec only, implemented in Swift (step 74). [CN] 仅扁平样式子库，由 Swift 实现（第 74 步）。
 - (void)_cyl_refreshSystemTabBarVisibilityIfNeeded;
 - (void)cyl_plusButton:(CYLPlusButton *)plusButton didChangeWithNotification:(NSNotificationName)name info:(NSDictionary *)info;

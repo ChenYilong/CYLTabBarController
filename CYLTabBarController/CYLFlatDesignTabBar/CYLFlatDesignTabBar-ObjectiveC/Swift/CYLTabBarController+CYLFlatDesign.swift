@@ -20,7 +20,21 @@ import UIKit
     @objc(setCylRefreshedSystemTabBarWindow:) func setRefreshedSystemTabBarWindow(_ window: UIWindow?)
     @objc(cylWaitingForVisibilityTransition) func waitingForVisibilityTransition() -> Bool
     @objc(setCylWaitingForVisibilityTransition:) func setWaitingForVisibilityTransition(_ value: Bool)
-    @objc(_checkHidesBottomBarWhenPushed) func checkHidesBottomBarWhenPushed() -> Bool
+    @objc(setTabBarIsAnimating:) func setTabBarIsAnimating(_ value: Bool)
+    @objc(lastShowHideTabBar) func lastShowHideTabBar() -> Bool
+    @objc(setLastShowHideTabBar:) func setLastShowHideTabBar(_ value: Bool)
+    @objc(lastShowHideTabBarAnimated) func lastShowHideTabBarAnimated() -> Bool
+    @objc(setLastShowHideTabBarAnimated:) func setLastShowHideTabBarAnimated(_ value: Bool)
+    @objc(cyl_tabBarHidden) func tabBarHiddenRequest() -> Bool
+    @objc(setCyl_tabBarHidden:) func setTabBarHiddenRequest(_ value: Bool)
+    @objc(cylDelegateHasWillShowTabBar) func delegateHasWillShowTabBar() -> Bool
+    @objc(setCylDelegateHasWillShowTabBar:) func setDelegateHasWillShowTabBar(_ value: Bool)
+    @objc(cylDelegateHasDidShowTabBar) func delegateHasDidShowTabBar() -> Bool
+    @objc(setCylDelegateHasDidShowTabBar:) func setDelegateHasDidShowTabBar(_ value: Bool)
+    @objc(cylDelegateHasWillHideTabBar) func delegateHasWillHideTabBar() -> Bool
+    @objc(setCylDelegateHasWillHideTabBar:) func setDelegateHasWillHideTabBar(_ value: Bool)
+    @objc(cylDelegateHasDidHideTabBar) func delegateHasDidHideTabBar() -> Bool
+    @objc(setCylDelegateHasDidHideTabBar:) func setDelegateHasDidHideTabBar(_ value: Bool)
     @objc(tabBarFrame) func tabBarFrame() -> CGRect
     @objc(parallaxOverlayView) func parallaxOverlayView() -> UIView?
     @objc(setParallaxOverlayView:) func setParallaxOverlayView(_ view: UIView?)
@@ -356,7 +370,7 @@ extension CYLTabBarController {
         guard cylFlatDesignTabBar != nil else {
             return true
         }
-        return !isTabBarHidden && cylFlatDesignHost.checkHidesBottomBarWhenPushed()
+        return !isTabBarHidden && cylFlatDesignCheckHidesBottomBarWhenPushed()
     }
 
     /// [EN] Shows or hides the FlatDesign tab bar for the page on screen. [CN] 根据当前页面显示或隐藏扁平样式 TabBar。
@@ -590,5 +604,161 @@ extension CYLTabBarController {
             if !self.tabBar.isHidden { self.tabBar.isHidden = true }
         }
         host.setRefreshingSystemTabBarVisibility(false)
+    }
+
+    // MARK: - Hiding the tab bar (docs/Swift-Migration.md, step 75; `CYLFlatDesignTabBarHiding` in Core)
+
+    /**
+     * [EN] Whether the page on screen lets the tab bar show: `hidesBottomBarWhenPushed` of the navigation stack (or of the page),
+     *      the More navigation controller included.
+     * [CN] 当前页面是否允许显示 TabBar：导航栈（或页面）的 `hidesBottomBarWhenPushed`，包括 More 导航控制器。
+     */
+    @objc(_checkHidesBottomBarWhenPushed)
+    func cylFlatDesignCheckHidesBottomBarWhenPushed() -> Bool {
+        guard cylFlatDesignTabBar != nil else {
+            return true
+        }
+        var selected = selectedViewController
+        if cylFlatDesignShowsMoreNavigationController(),
+           let moreIndex = (tabBar.items ?? []).firstIndex(where: { $0 === moreNavigationController.tabBarItem }),
+           selectedIndex >= moreIndex || selectedIndex == NSNotFound {
+            selected = moreNavigationController
+        }
+        if let navigationController = selected as? UINavigationController {
+            let stack = navigationController.viewControllers
+            let currentIndex = navigationController.topViewController.flatMap { top in stack.firstIndex { $0 === top } } ?? NSNotFound
+            var showsBottomBarIndex = -1
+            for (index, viewController) in stack.enumerated() {
+                if viewController.hidesBottomBarWhenPushed {
+                    showsBottomBarIndex = index - 1
+                    break
+                }
+                showsBottomBarIndex = index
+            }
+            return currentIndex <= showsBottomBarIndex
+        }
+        return !(selected?.hidesBottomBarWhenPushed ?? false)
+    }
+
+    /// [EN] Sends a show / hide callback to the delegate. [CN] 向 delegate 发送显示 / 隐藏回调。
+    private func cylFlatDesignSendTabBarCallback(_ selectorName: String, tabBar: UIView) {
+        _ = (delegate as AnyObject?)?.perform(NSSelectorFromString(selectorName), with: self, with: tabBar)
+    }
+
+    /// [EN] The will-hide / will-show callback, when the delegate answers it. [CN] delegate 响应时发送 will-hide / will-show 回调。
+    private func cylFlatDesignSendWillCallback(hidden: Bool, tabBar: UIView) {
+        let host = cylFlatDesignHost
+        if hidden, host.delegateHasWillHideTabBar() {
+            cylFlatDesignSendTabBarCallback("tabBarController:willHideTabBar:", tabBar: tabBar)
+        } else if !hidden, host.delegateHasWillShowTabBar() {
+            cylFlatDesignSendTabBarCallback("tabBarController:willShowTabBar:", tabBar: tabBar)
+        }
+    }
+
+    /// [EN] The did-hide / did-show callback, when the delegate answers it. [CN] delegate 响应时发送 did-hide / did-show 回调。
+    private func cylFlatDesignSendDidCallback(hidden: Bool, tabBar: UIView) {
+        let host = cylFlatDesignHost
+        if hidden, host.delegateHasDidHideTabBar() {
+            cylFlatDesignSendTabBarCallback("tabBarController:didHideTabBar:", tabBar: tabBar)
+        } else if !hidden, host.delegateHasDidShowTabBar() {
+            cylFlatDesignSendTabBarCallback("tabBarController:didShowTabBar:", tabBar: tabBar)
+        }
+    }
+
+    /**
+     * [EN] Shows or hides the FlatDesign tab bar (the system one stays hidden), optionally animated, with the delegate's
+     *      will / did callbacks. FIX: issue #662 — the request is recorded before any early return, so `isTabBarHidden` always
+     *      reports the newest one: a request during the animation is replayed when it ends (with its own `animated`), and one
+     *      during a navigation transition is applied when the bar returns. `hidesBottomBarWhenPushed` wins. A delegate that
+     *      re-enters with the opposite request wins too.
+     * [CN] 显示或隐藏扁平样式 TabBar（系统 TabBar 保持隐藏），可选动画，并发送 delegate 的 will / did 回调。FIX: issue #662——在任何提前返回之前记录请求，
+     *      `isTabBarHidden` 始终是最新请求：动画期间的请求在动画结束时重放（使用它自己的 animated），转场期间的请求在 TabBar 回来后应用。
+     *      `hidesBottomBarWhenPushed` 优先。在回调中反向重入的 delegate 也以其请求为准。
+     */
+    @objc(cyl_flatDesignSetTabBarHidden:animated:)
+    func cylFlatDesignSetTabBarHidden(_ hidden: Bool, animated: Bool) {
+        guard let flatTabBar = cylFlatDesignTabBar else {
+            return
+        }
+        let host = cylFlatDesignHost
+        // [EN] Hide the system tab bar; KVC may have left UIKit's original bar installed. [CN] 隐藏系统 TabBar；KVC 可能留下了 UIKit 原有的 TabBar。
+        if #available(iOS 18.0, *) {
+            super.setTabBarHidden(true, animated: animated)
+        } else {
+            tabBar.isHidden = true
+        }
+        if !tabBar.isHidden { tabBar.isHidden = true }
+        host.setTabBarHiddenRequest(hidden)
+        host.setLastShowHideTabBar(hidden)
+        if host.tabBarIsAnimating() {
+            host.setLastShowHideTabBarAnimated(animated)
+            return
+        }
+        guard flatTabBar.superview === view else {
+            return
+        }
+        // [EN] Compare with what is on screen, not with the recorded state: a request recorded during an animation is replayed
+        //      here and must still be applied. [CN] 与屏幕上的实际状态比较，而不是与记录值比较：动画期间记录的请求会在这里重放，仍需生效。
+        guard flatTabBar.isHidden != hidden, cylFlatDesignCheckHidesBottomBarWhenPushed() else {
+            return
+        }
+        // FIX: issue #662 — a bar hidden before the first layout can still have a stale (zero-height) frame.
+        // [CN] 首次布局前就隐藏的 TabBar 可能保留旧的（高度为 0 的）frame。
+        if !hidden && flatTabBar.frame != host.tabBarFrame() {
+            flatTabBar.frame = host.tabBarFrame()
+        }
+        guard animated else {
+            cylFlatDesignSendWillCallback(hidden: hidden, tabBar: flatTabBar)
+            // FIX: issue #662 — a delegate re-entered with the opposite request and already applied it. [CN] 代理已反向重入并生效。
+            if host.tabBarHiddenRequest() != hidden {
+                return
+            }
+            flatTabBar.isHidden = hidden
+            cylFlatDesignUpdateAdditionalSafeAreaInsets(animated: animated)
+            cylFlatDesignSendDidCallback(hidden: hidden, tabBar: flatTabBar)
+            return
+        }
+        host.setTabBarIsAnimating(true)
+        cylFlatDesignSendWillCallback(hidden: hidden, tabBar: flatTabBar)
+        // FIX: issue #662 — a delegate may re-enter with the opposite request; it was recorded and queued, and it wins.
+        // [CN] 代理回调里可能反向重入，以重入的最新请求为准。
+        if host.tabBarHiddenRequest() != hidden {
+            host.setTabBarIsAnimating(false)
+            setTabBarHidden(host.lastShowHideTabBar(), animated: host.lastShowHideTabBarAnimated())
+            return
+        }
+        let height = flatTabBar.frame.height
+        flatTabBar.transform = hidden ? .identity : CGAffineTransform(translationX: 0, y: height)
+        flatTabBar.isHidden = false
+        UIView.animate(withDuration: Self.cylTabBarHideShowDuration, animations: {
+            flatTabBar.transform = hidden ? CGAffineTransform(translationX: 0, y: height) : .identity
+        }, completion: { _ in
+            flatTabBar.transform = .identity
+            flatTabBar.isHidden = hidden
+            self.cylFlatDesignUpdateAdditionalSafeAreaInsets(animated: animated)
+            let host = self.cylFlatDesignHost
+            host.setTabBarIsAnimating(false)
+            self.cylFlatDesignSendDidCallback(hidden: hidden, tabBar: flatTabBar)
+            // [EN] A different request arrived during the animation (two within 0.2 s): replay it with its own `animated`.
+            // [CN] 动画期间收到了不同的请求（两次间隔小于 0.2 秒）：按它自己的 animated 重放。
+            if host.lastShowHideTabBar() != hidden {
+                self.setTabBarHidden(host.lastShowHideTabBar(), animated: host.lastShowHideTabBarAnimated())
+            }
+            self.cylFlatDesignRefreshSystemTabBarVisibilityIfNeeded()
+        })
+    }
+
+    /// [EN] Remembers which show / hide callbacks the delegate answers. [CN] 记录 delegate 响应哪些显示 / 隐藏回调。
+    @objc(cyl_flatDesignDelegateDidChange:)
+    func cylFlatDesignDelegateDidChange(_ delegate: AnyObject?) {
+        guard cylFlatDesignTabBar != nil else {
+            return
+        }
+        let host = cylFlatDesignHost
+        let answers = { (name: String) in delegate?.responds(to: NSSelectorFromString(name)) ?? false }
+        host.setDelegateHasWillShowTabBar(answers("tabBarController:willShowTabBar:"))
+        host.setDelegateHasDidShowTabBar(answers("tabBarController:didShowTabBar:"))
+        host.setDelegateHasWillHideTabBar(answers("tabBarController:willHideTabBar:"))
+        host.setDelegateHasDidHideTabBar(answers("tabBarController:didHideTabBar:"))
     }
 }
