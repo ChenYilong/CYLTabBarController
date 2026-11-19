@@ -14,6 +14,21 @@ done
     echo "pre-commit: screenshot without labels. Rebuild it with python3 scripts/stitch-screenshots.py (docs/Screenshot-Guidelines.md)." >&2
     exit 1
 }
+# [EN] A commit that adds, deletes or renames a file under docs/ changes the file tree in docs/README.md: check the generated
+#      navigation, which CI's "Docs navigation" job checks too (it failed four times on 2026-11-19 for screenshots pushed without
+#      a regeneration). Only then, so another session's untracked file does not block an unrelated commit; for such a false
+#      alarm, CYL_SKIP_DOCS_NAV_CHECK=1 skips it (never --no-verify).
+# [CN] 新增、删除或重命名 docs/ 下文件的提交会改变 docs/README.md 中的文件树：检查生成的导航（CI 的 "Docs navigation" 也会检查；2026-11-19
+#      因推送截图后未重新生成而失败四次）。只在这种情况下检查，避免其他会话未跟踪的文件阻挡无关的提交；遇到这种误报时可设置
+#      CYL_SKIP_DOCS_NAV_CHECK=1 跳过（不要使用 --no-verify）。
+if [ -z "${CYL_SKIP_DOCS_NAV_CHECK:-}" ] && git diff --cached --name-status --diff-filter=ADR -- docs | grep -q .; then
+    "$python" "$root/scripts/update-docs-navigation.py" --check >/dev/null 2>&1 || {
+        echo "pre-commit: this commit adds, deletes or renames a file in docs/, and the docs navigation is out of date." >&2
+        echo "  Run: python3 scripts/update-docs-navigation.py, stage docs/README.md (and the other files it changed), commit again." >&2
+        echo "  If the stale entry is another session's untracked file, commit with CYL_SKIP_DOCS_NAV_CHECK=1." >&2
+        exit 1
+    }
+fi
 if [ -x "$root/.git/hooks/pre-commit.chained" ]; then
     exec "$root/.git/hooks/pre-commit.chained" "$@"
 fi
