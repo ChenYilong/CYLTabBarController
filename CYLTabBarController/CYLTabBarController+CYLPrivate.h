@@ -352,4 +352,15 @@ FOUNDATION_EXTERN BOOL CYLControlReportsTaps(UIControl *_Nullable control);
 - (void)cyl_stopObservingStandardAppearance;
 @end
 
+/*!
+ * [EN] The accessors' bodies (step 128, `Swift/CYLTabBarController+CYLTabBarAccessors.swift`), called by CYLTabBarController.m.
+ * [CN] 访问器的实现（第 128 步），由 CYLTabBarController.m 调用。
+ */
+@interface CYLTabBarController (CYLTabBarAccessorsPrivate)
+- (nullable UIView *)cyl_lazyTabBar;
+- (void)cyl_applyContext:(nullable NSString *)context;
+- (CGFloat)cyl_resolvedTabBarHeight;
+- (void)cyl_applyTabBarHeight:(CGFloat)tabBarHeight;
+@end
+
 NS_ASSUME_NONNULL_END
