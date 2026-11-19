@@ -338,4 +338,18 @@ FOUNDATION_EXTERN BOOL CYLControlReportsTaps(UIControl *_Nullable control);
                                                                                                     tabs:(NSArray<NSDictionary *> *)tabs;
 @end
 
+/*!
+ * [EN] Key-value observing (step 127, `Swift/CYLTabBarController+CYLKeyValueObserving.swift`), called by CYLTabBarController.m.
+ * [CN] KVO（第 127 步），由 CYLTabBarController.m 调用。
+ */
+@interface CYLTabBarController (CYLKeyValueObservingPrivate)
++ (void *)cyl_tabImageViewDefaultOffsetKVOContext;
++ (void *)cyl_flatDesignTabBarKVOContext;
++ (void *)cyl_standardAppearanceKVOContext;
+- (void)cyl_observeValueForKeyPath:(nullable NSString *)keyPath ofObject:(nullable id)object
+                            change:(nullable NSDictionary<NSKeyValueChangeKey, id> *)change context:(nullable void *)context;
+- (void)cyl_startObservingStandardAppearance;
+- (void)cyl_stopObservingStandardAppearance;
+@end
+
 NS_ASSUME_NONNULL_END
