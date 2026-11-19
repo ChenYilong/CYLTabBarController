@@ -82,6 +82,36 @@ class CYLGIFDecoderTest {
         assertEquals("stop shows the first frame", 0, view.shownFrame)
         assertNotNull(CYLGIFDrawable.fromBytes(threeFrames))
     }
+
+    @Test
+    fun aGIFImageRestsUntilPlayedThenPlaysOnce() {
+        val gif = CYLGIFDrawable.fromBytes(threeFrames)!!
+        val now = android.os.SystemClock.uptimeMillis()
+        assertEquals("rests on its first frame", 0, gif.frameTimeAt(now + 5000))
+        assertEquals(false, gif.isPlaying)
+        gif.play()
+        assertEquals(true, gif.isPlaying)
+        assertEquals(350, gif.frameTimeAt(now + 350))
+        assertNull("one pass, then it rests", gif.frameTimeAt(now + 600))
+        gif.play()
+        assertEquals("a second play starts again", 0, gif.frameTimeAt(now))
+        gif.stop()
+        assertEquals(false, gif.isPlaying)
+        assertEquals(0, gif.frameTimeAt(now + 350))
+    }
+
+    @Test
+    fun aLoopingGIFImageRepeatsAndFinishesItsPassWhenLoopingStops() {
+        val gif = CYLGIFDrawable.fromBytes(threeFrames)!!
+        val now = android.os.SystemClock.uptimeMillis()
+        gif.play(loops = true)
+        assertEquals(100, gif.frameTimeAt(now + 1300))
+        org.robolectric.shadows.ShadowSystemClock.advanceBy(java.time.Duration.ofMillis(1300))
+        gif.loops = false
+        val later = android.os.SystemClock.uptimeMillis()
+        assertEquals("the current pass goes on", 400, gif.frameTimeAt(later + 300))
+        assertNull("and is the last", gif.frameTimeAt(later + 500))
+    }
 }
 
 /** [EN] The test GIFs (see CYLGIFDecoderTest). [CN] 测试用 GIF（见 CYLGIFDecoderTest）。 */

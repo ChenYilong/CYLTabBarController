@@ -253,25 +253,70 @@ class CYLGIFTabBarItemAnimationView internal constructor(context: Context, priva
 
 /**
  * [EN] A GIF given as an image (`CYLTabBarItemImageURL`, `setTabBarItemIconWithURL`, a `CYLTabBarItemImage` Drawable): it
- *      loops, selected or not, as `+[UIImage cyl_animatedImageWithGIFData:]` does on iOS (#605). Only the GIF keys
- *      (`CYLTabBarGIFURL`...) play it once when the tab is selected.
- * [CN] 作为图片传入的 GIF（`CYLTabBarItemImageURL`、`setTabBarItemIconWithURL`、作为 `CYLTabBarItemImage` 的 Drawable）：无论是否选中都循环播放，
- *      与 iOS 的 `+[UIImage cyl_animatedImageWithGIFData:]` 一致（#605）。只有 GIF key（`CYLTabBarGIFURL` 等）才会在选中时播放一次。
+ *      rests on its first frame until it is played, as an animation does (docs/GIF-Animation.md, as iOS 915bddbd):
+ *      `play(loops = false)` runs it once, then it shows the first frame again; `play(loops = true)` repeats it until
+ *      `stop()` or `loops = false` (which lets the current pass finish). `CYLTabBarController` plays it when its tab is
+ *      selected or tapped again, and on "Play all".
+ * [CN] 作为图片传入的 GIF（`CYLTabBarItemImageURL`、`setTabBarItemIconWithURL`、作为 `CYLTabBarItemImage` 的 Drawable）：与动画一样，
+ *      在被播放之前停在第一帧（docs/GIF-Animation.md，与 iOS 915bddbd 一致）：`play(loops = false)` 播放一次，之后回到第一帧；`play(loops = true)`
+ *      一直重复，直到 `stop()` 或 `loops = false`（让当前一遍播完）。`CYLTabBarController` 在 Tab 被选中、再次点击以及「全部播放」时播放它。
  */
 class CYLGIFDrawable private constructor(private val frames: CYLGIFFrames) : Drawable(), Runnable {
     private val paint = Paint(Paint.FILTER_BITMAP_FLAG)
-    private val start = SystemClock.uptimeMillis()
-    private val duration = frames.duration
+    private val duration = frames.duration.coerceAtLeast(1)
     private val destination = android.graphics.Rect()
+    /** [EN] When the current play started (uptime ms); -1 while resting. [CN] 当前播放的开始时刻（uptime 毫秒）；静止时为 -1。 */
+    private var playStart = -1L
+
+    /** [EN] Whether a play repeats; false lets the current pass finish. [CN] 播放是否重复；设为 false 时让当前一遍播完。 */
+    var loops: Boolean = false
+        set(value) {
+            // [EN] Turned off while playing: the current pass is the last one. [CN] 播放中关闭：当前这一遍是最后一遍。
+            if (field && !value && playStart >= 0 && duration > 0) {
+                val now = SystemClock.uptimeMillis()
+                playStart = now - (now - playStart) % duration
+            }
+            field = value
+        }
+
+    /** [EN] Whether it is playing (not resting on its first frame). [CN] 是否正在播放（不是停在第一帧）。 */
+    val isPlaying: Boolean
+        get() = playStart >= 0 && frameTimeAt(SystemClock.uptimeMillis()) != null
+
+    /** [EN] Plays from the first frame: once, or until stopped when `loops`. [CN] 从第一帧开始播放：一次，`loops` 时一直播放到停止。 */
+    fun play(loops: Boolean = false) {
+        this.loops = loops
+        playStart = SystemClock.uptimeMillis()
+        invalidateSelf()
+    }
+
+    /** [EN] Stops and shows the first frame. [CN] 停止并显示第一帧。 */
+    fun stop() {
+        playStart = -1
+        unscheduleSelf(this)
+        invalidateSelf()
+    }
+
+    /**
+     * [EN] The time inside the GIF shown at `now`: 0 while resting, null once a single play has ended (then it rests).
+     * [CN] `now` 时刻显示的 GIF 内部时间：静止时为 0；单次播放结束后为 null（随后回到静止）。
+     */
+    internal fun frameTimeAt(now: Long): Int? {
+        if (playStart < 0) return 0
+        val elapsed = now - playStart
+        if (!loops && elapsed >= duration) return null
+        return (elapsed % duration).toInt()
+    }
 
     override fun draw(canvas: Canvas) {
         val bounds = bounds
         if (bounds.isEmpty) return
-        val frame = frames.frameAt(((SystemClock.uptimeMillis() - start) % duration).toInt())
+        val now = SystemClock.uptimeMillis()
+        val time = frameTimeAt(now) ?: run { playStart = -1; 0 }
         destination.set(bounds)
-        canvas.drawBitmap(frames.bitmap(frame), null, destination, paint)
-        // [EN] The next frame, about 60 fps, while the drawable is shown. [CN] 显示期间约每秒 60 帧绘制下一帧。
-        scheduleSelf(this, SystemClock.uptimeMillis() + FRAME_MILLIS)
+        canvas.drawBitmap(frames.bitmap(frames.frameAt(time)), null, destination, paint)
+        // [EN] The next frame, about 60 fps, only while playing. [CN] 仅在播放时约每秒 60 帧绘制下一帧。
+        if (playStart >= 0) scheduleSelf(this, now + FRAME_MILLIS)
     }
 
     override fun run() = invalidateSelf()
@@ -292,7 +337,7 @@ class CYLGIFDrawable private constructor(private val frames: CYLGIFFrames) : Dra
         fun isGIF(bytes: ByteArray): Boolean = bytes.size >= 6 && String(bytes, 0, 6, Charsets.US_ASCII).let { it == "GIF87a" || it == "GIF89a" }
 
         /**
-         * [EN] A looping drawable for GIF `bytes`; null when they are not a GIF. [CN] GIF `bytes` 的循环 Drawable；不是 GIF 时为 null。
+         * [EN] A drawable for GIF `bytes`, resting on its first frame; null when they are not a GIF. [CN] GIF `bytes` 的 Drawable，停在第一帧；不是 GIF 时为 null。
          */
         @JvmStatic
         fun fromBytes(bytes: ByteArray): CYLGIFDrawable? {
