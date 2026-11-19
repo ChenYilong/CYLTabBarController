@@ -222,3 +222,45 @@ test('isItemInteractive can be overridden, and updateInteractionOfItemViews appl
   stack.tapBackground();
   assert.deepEqual(performed, ['reload']);
 });
+
+test('axis is vertical by default, horizontal lays the items in a row', () => {
+  const stack = new CYLAnimatedItemStackModel();
+  let redraws = 0;
+  stack.addListener(() => { redraws += 1; });
+  assert.equal(stack.axis, 'vertical');
+  assert.equal(stack.isHorizontal, false);
+  stack.axis = 'horizontal';
+  assert.equal(stack.isHorizontal, true);
+  assert.equal(redraws, 1, 'a change redraws the view');
+  stack.axis = 'diagonal';
+  assert.equal(stack.axis, 'vertical', 'anything else is vertical');
+});
+
+test('spacing applies to the items without their own spacingBefore', () => {
+  const stack = new CYLAnimatedItemStackModel();
+  stack.appendItem('Edit');
+  const remove = stack.appendItem('Remove');
+  const close = stack.appendItem('Close', '', '', undefined, 4);
+  assert.equal(stack.spacingBeforeOf(remove), CYLAnimatedItemStackDefaultSpacing);
+  stack.spacing = 10;
+  assert.equal(stack.spacingBeforeOf(remove), 10, 'as iOS stackView.spacing');
+  assert.equal(stack.spacingBeforeOf(close), 4, 'an item\'s own spacingBefore wins');
+  stack.spacing = -3;
+  assert.equal(stack.spacing, 0, 'never negative');
+});
+
+test('icon colors: the stack default, an item\'s own color wins, selected falls back to normal', () => {
+  const stack = new CYLAnimatedItemStackModel();
+  const edit = stack.appendItem('', 'edit.svg');
+  const remove = stack.appendItem('', 'remove.svg');
+  assert.equal(stack.iconColorOf(edit), '', 'no tint by default');
+  stack.iconColor = '#8E8E93';
+  assert.equal(stack.iconColorOf(edit), '#8E8E93');
+  remove.iconColor = '#FF3B30';
+  assert.equal(stack.iconColorOf(remove), '#FF3B30');
+  assert.equal(stack.iconColorOf(edit, true), '#8E8E93', 'selected without a selected color uses the normal one');
+  stack.selectedIconColor = '#007AFF';
+  assert.equal(stack.iconColorOf(edit, true), '#007AFF');
+  remove.selectedIconColor = '#34C759';
+  assert.equal(stack.iconColorOf(remove, true), '#34C759');
+});

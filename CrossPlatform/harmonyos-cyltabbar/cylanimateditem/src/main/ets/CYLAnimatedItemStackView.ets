@@ -92,15 +92,21 @@ export struct CYLAnimatedItemStackView {
       titleFontSize: this.titleFontSize,
       itemId: item.id,
       isItemEnabled: item.enabled,
+      iconColor: this.model.iconColorOf(item),
       isBare: true,
       sizesToContent: true,
       animationBuilder: this.animationBuilder,
     })
   }
 
-  build() {
-    Column() {
-      Column() {
+  /** [EN] The space before an element: above it, or on its leading side in a row. [CN] 元素之前的间距：上方，或在一行中的前侧。 */
+  private cylMarginOf(item: CYLAnimatedItemStackItem): Margin {
+    const spacing = this.model.spacingBeforeOf(item);
+    return this.model.isHorizontal ? { left: spacing } : { top: spacing };
+  }
+
+  @Builder
+  cylElements() {
         ForEach(this.cylItems(), (item: CYLAnimatedItemStackItem) => {
           // [EN] Each element is a wrapper around a bare item view: the wrapper takes the tap and is what the screen reader
           //      reads; the item view only draws (`isBare`), sized by its content (B29). Only an element that acts gets a
@@ -111,7 +117,7 @@ export struct CYLAnimatedItemStackView {
             Column() {
               this.cylItemView(item)
             }
-            .margin({ top: this.model.spacingBeforeOf(item) })
+            .margin(this.cylMarginOf(item))
             .constraintSize({ maxWidth: this.cylMaxItemWidth() })
             .id(`${item.id}-element`)
             .onClick(() => {
@@ -125,7 +131,7 @@ export struct CYLAnimatedItemStackView {
             Column() {
               this.cylItemView(item)
             }
-            .margin({ top: this.model.spacingBeforeOf(item) })
+            .margin(this.cylMarginOf(item))
             .constraintSize({ maxWidth: this.cylMaxItemWidth() })
             .id(`${item.id}-element`)
             .hitTestBehavior(HitTestMode.None)
@@ -135,8 +141,22 @@ export struct CYLAnimatedItemStackView {
             .accessibilityLevel(this.model.isAccessibilityHidden(item) ? 'no-hide-descendants' : 'yes')
           }
         }, (item: CYLAnimatedItemStackItem) => this.cylKey(item))
+  }
+
+  build() {
+    Column() {
+      // [EN] One column (default) or one row (`axis` 'horizontal', iOS `axis`). [CN] 一列（默认）或一行（`axis` 为 'horizontal'，iOS `axis`）。
+      if (this.model.isHorizontal && this.revision >= 0) {
+        Row() {
+          this.cylElements()
+        }
+        .alignItems(VerticalAlign.Center)
+      } else {
+        Column() {
+          this.cylElements()
+        }
+        .alignItems(HorizontalAlign.Center)
       }
-      .alignItems(HorizontalAlign.Center)
     }
     .width('100%')
     .height('100%')

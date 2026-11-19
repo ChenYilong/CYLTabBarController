@@ -37,8 +37,16 @@ export class CYLAnimatedItemStackItem {
   titleLines: number = 0;
   /** [EN] The text a screen reader reads instead of the title; '' reads the title. [CN] 读屏代替标题朗读的文字；'' 时朗读标题。 */
   accessibilityText: string = '';
-  /** [EN] The space above the item, in vp (ignored for the first item). [CN] 条目上方的间距（vp，第一个条目忽略）。 */
-  spacingBefore: number = CYLAnimatedItemStackDefaultSpacing;
+  /**
+   * [EN] The space before the item (above it, or on its leading side in a horizontal stack), in vp; ignored for the first
+   *      item; negative (the default, -1) uses the stack's `spacing`.
+   * [CN] 条目之前的间距（上方，水平堆叠时为前侧），单位 vp；第一个条目忽略；负数（默认 -1）使用堆叠的 `spacing`。
+   */
+  spacingBefore: number = -1;
+  /** [EN] The icon color of the item (a template / symbol image takes it); '' uses the stack's `iconColor`. [CN] 条目的图标颜色（模板 / 符号图片按此着色）；'' 时使用堆叠的 `iconColor`。 */
+  iconColor: string = '';
+  /** [EN] The icon color while the item view is selected; '' uses the stack's `selectedIconColor`, then `iconColor`. [CN] 条目视图选中时的图标颜色；'' 时依次使用堆叠的 `selectedIconColor` 与 `iconColor`。 */
+  selectedIconColor: string = '';
   /**
    * [EN] Whether the item is enabled (true by default). A disabled item is drawn dimmed and, by default, is not interactive
    *      (`CYLAnimatedItemStackModel.isItemInteractive`): its action does not run and a tap on it reaches the background.
@@ -68,6 +76,10 @@ export class CYLAnimatedItemStackModel {
   private readonly handlers: Map<string, CYLAnimatedItemStackActionHandler> = new Map();
   private readonly listeners: (() => void)[] = [];
   private margin: number = CYLAnimatedItemStackDefaultSpacing;
+  private stackAxis: string = 'vertical';
+  private stackSpacing: number = CYLAnimatedItemStackDefaultSpacing;
+  private stackIconColor: string = '';
+  private stackSelectedIconColor: string = '';
   private background: string | undefined = undefined;
   /** [EN] Bumped on every change; the view redraws when it changes. [CN] 每次变化时递增；变化时视图重绘。 */
   revision: number = 0;
@@ -81,7 +93,7 @@ export class CYLAnimatedItemStackModel {
     if (actions !== undefined) {
       actions.forEach((handler: CYLAnimatedItemStackActionHandler, action: string) => this.handlers.set(action, handler));
     }
-    items.forEach((item: CYLAnimatedItemStackItem) => this.append(item, undefined, item.spacingBefore));
+    items.forEach((item: CYLAnimatedItemStackItem) => this.append(item));
   }
 
   // [EN] Items. [CN] 条目。
@@ -97,16 +109,19 @@ export class CYLAnimatedItemStackModel {
   }
 
   /**
-   * [EN] Appends `item` under the last one, `spacingBefore` vp below it (ignored for the first item, negative counts as 0);
+   * [EN] Appends `item` after the last one, `spacingBefore` vp from it (ignored for the first item, negative counts as 0;
+   *      undefined keeps the item's own `spacingBefore`, by default the stack's `spacing`);
    *      a tap on it performs `action` when that is not undefined or ''. An item already in the stack is left where it is.
    * [CN] 在最后一个条目下方 `spacingBefore` vp 处追加 `item`（第一个条目忽略，负数按 0）；`action` 不为 undefined 或 '' 时点击它执行该动作。
    *      已在堆叠中的条目保持原位。
    */
-  append(item: CYLAnimatedItemStackItem, action?: string, spacingBefore: number = CYLAnimatedItemStackDefaultSpacing): void {
+  append(item: CYLAnimatedItemStackItem, action?: string, spacingBefore?: number): void {
     if (this.entries.includes(item)) {
       return;
     }
-    item.spacingBefore = Math.max(0, spacingBefore);
+    if (spacingBefore !== undefined) {
+      item.spacingBefore = Math.max(0, spacingBefore);
+    }
     this.entries.push(item);
     this.storeAction(action, item);
     this.update();
@@ -117,7 +132,7 @@ export class CYLAnimatedItemStackModel {
    * [CN] 创建、追加并返回一个条目（图标在标题上方，标题按宽度换行）。
    */
   appendItem(title: string, image: Object | string = '', animationUrl: string = '', action?: string,
-    spacingBefore: number = CYLAnimatedItemStackDefaultSpacing): CYLAnimatedItemStackItem {
+    spacingBefore?: number): CYLAnimatedItemStackItem {
     const item = new CYLAnimatedItemStackItem(title, image, animationUrl);
     this.append(item, action, spacingBefore);
     return item;
@@ -283,9 +298,75 @@ export class CYLAnimatedItemStackModel {
     this.update();
   }
 
-  /** [EN] The space above an item: 0 for the first. [CN] 条目上方的间距：第一个为 0。 */
+  /**
+   * [EN] The direction of the stack (iOS `axis`): 'vertical' (default, one item under the other) or 'horizontal' (one
+   *      row); anything else counts as 'vertical'.
+   * [CN] 堆叠方向（iOS `axis`）：'vertical'（默认，上下排列）或 'horizontal'（一行）；其他值按 'vertical'。
+   */
+  get axis(): string {
+    return this.stackAxis;
+  }
+
+  set axis(axis: string) {
+    this.stackAxis = axis === 'horizontal' ? 'horizontal' : 'vertical';
+    this.update();
+  }
+
+  /** [EN] Whether the items are in one row. [CN] 条目是否排成一行。 */
+  get isHorizontal(): boolean {
+    return this.stackAxis === 'horizontal';
+  }
+
+  /** [EN] The space between items without their own `spacingBefore` (iOS `spacing`; 16 by default, never negative). [CN] 没有自己 `spacingBefore` 的条目之间的间距（iOS `spacing`；默认 16，不为负）。 */
+  get spacing(): number {
+    return this.stackSpacing;
+  }
+
+  set spacing(spacing: number) {
+    this.stackSpacing = Math.max(0, spacing);
+    this.update();
+  }
+
+  /** [EN] The space before an item: 0 for the first, else its `spacingBefore` or the stack's `spacing`. [CN] 条目之前的间距：第一个为 0，否则为其 `spacingBefore` 或堆叠的 `spacing`。 */
   spacingBeforeOf(item: CYLAnimatedItemStackItem): number {
-    return this.entries.includes(item) && this.entries[0] !== item ? item.spacingBefore : 0;
+    if (!this.entries.includes(item) || this.entries[0] === item) {
+      return 0;
+    }
+    return item.spacingBefore >= 0 ? item.spacingBefore : this.stackSpacing;
+  }
+
+  /**
+   * [EN] The default icon color of the items (iOS `itemAppearance` of the stack): an item's own `iconColor` wins; '' for none.
+   * [CN] 条目的默认图标颜色（iOS 堆叠的 `itemAppearance`）：条目自己的 `iconColor` 优先；'' 表示没有。
+   */
+  get iconColor(): string {
+    return this.stackIconColor;
+  }
+
+  set iconColor(color: string) {
+    this.stackIconColor = color;
+    this.update();
+  }
+
+  /** [EN] The default icon color of selected item views; '' uses `iconColor`. [CN] 选中的条目视图的默认图标颜色；'' 时使用 `iconColor`。 */
+  get selectedIconColor(): string {
+    return this.stackSelectedIconColor;
+  }
+
+  set selectedIconColor(color: string) {
+    this.stackSelectedIconColor = color;
+    this.update();
+  }
+
+  /** [EN] The icon color an item view draws with ('' leaves the image as it is). [CN] 条目视图绘制时使用的图标颜色（'' 表示保持图片原样）。 */
+  iconColorOf(item: CYLAnimatedItemStackItem, selected: boolean = false): string {
+    if (selected) {
+      const color = item.selectedIconColor || this.stackSelectedIconColor;
+      if (color) {
+        return color;
+      }
+    }
+    return item.iconColor || this.stackIconColor;
   }
 
   /** [EN] The widest an item may be in a view `width` wide, so long titles wrap. [CN] 宽为 `width` 的视图中条目的最大宽度，使长标题换行。 */

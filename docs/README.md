@@ -300,6 +300,7 @@ docs/
 │   ├── gif-flat-design.png
 │   ├── gif-liquid-glass.png
 │   ├── gif-tint-or-original-colors.png
+│   ├── harmonyos-animated-item-stack-axis-tint.png
 │   ├── harmonyos-badge-bounce-around-place.png
 │   ├── harmonyos-bundle-image-row-localized.png
 │   ├── harmonyos-cvcm-issue26-all.jpeg
