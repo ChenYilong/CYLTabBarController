@@ -125,6 +125,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)cyl_tabBarController:(UITabBarController *)tabBarController shouldSelectViewController:(UIViewController *)viewController;
 /// [EN] Everything a reported tab tap does, implemented in Swift (step 63). [CN] 每次上报的 Tab 点击要做的事，由 Swift 实现（第 63 步）。
 - (void)cyl_sendDidSelectControl:(UIControl *)control;
+/// [EN] A tab button's tap (classic, Liquid Glass), implemented in Swift (step 64). [CN] Tab 按钮的点击，由 Swift 实现（第 64 步）。
+- (void)didSelectControl:(nullable UIControl *)control;
 - (void)cyl_syncTabBarItemAccessibility;
 #if CYL_FLATDESIGN_AVAILABLE
 - (void)cyl_syncFlatDesignTabBarItemColors;

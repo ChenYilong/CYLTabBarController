@@ -1249,3 +1249,93 @@ extension CYLTabBarController {
         cylRecognizeTabBarItemGestureForReportedControl(control)
     }
 }
+
+// MARK: - A tab button's tap, classic and Liquid Glass (docs/Swift-Migration.md, step 64)
+
+/**
+ * [EN] `-didSelectControl:`: what a tap on a tab button (classic tab bar and Liquid Glass) does to the controls, the lens
+ *      and the report. Translated from Objective-C (docs/Swift-Migration.md, step 64); the private header declares it, as
+ *      CYLTabBarController.m calls it. FlatDesign reports through `-cyl_flatDesignReportDidSelectControl:` instead.
+ * [CN] `-didSelectControl:`：点击 Tab 按钮（经典 TabBar 与液态玻璃）对控件、放大镜与上报所做的事。已从 Objective-C 翻译
+ *      （docs/Swift-Migration.md，第 64 步）；私有头文件声明它，因为 CYLTabBarController.m 会调用。扁平样式改为通过
+ *      `-cyl_flatDesignReportDidSelectControl:` 上报。
+ */
+extension CYLTabBarController {
+
+    @objc(didSelectControl:)
+    func cylDidSelectControl(_ control: UIControl?) {
+        cylPrivate.cylSetNeedsUpdateTabBarItemIconViews()
+        guard tabBarStyleType != .flatDesign else {
+            return
+        }
+        let shouldSelectViewController = control.map { cylControlReportsTapsEntryPoint($0) && !$0.isHidden } ?? false
+        var selectedContentControl: UIControl?
+        if let tabBar = cyl_tabBar as? CYLTabBar {
+            selectedContentControl = tabBar.cylSelectedContentControl(fromContentControl: control)
+            if control?.cyl_isPlusControl() == true {
+                tabBar.cylSetSelectedControl(cylPrivate.cylContextPlusButton())
+            } else {
+                tabBar.cylSetSelectedControl(selectedContentControl ?? control)
+            }
+            // [EN] Liquid Glass with a plus child view controller: the plus button's stand-in in the selected layer keeps its
+            //      own state (`-cyl_updateSelectedContentViewImage`); selecting it here left it with the old image after a
+            //      theme change (plus child theme test) once the plus button reported its taps.
+            // [CN] 液态玻璃且有 PlusButton 子控制器：PlusButton 在选中图层中的替身自己维护状态（`-cyl_updateSelectedContentViewImage`）；
+            //      PlusButton 上报点击时若在这里选中它，换肤后替身会保留旧图片（PlusButton 子控制器换肤测试）。
+            let plusButtonKeepsItsOwnState = CYLConstants.isLiquidGlassActive() && hasPlusChildViewController() &&
+                control?.cyl_isPlusControl() == true
+            if shouldSelectViewController {
+                ((tabBar.cyl_visibleControls() ?? []) + (tabBar.cylPlatterSelectedContentViews() ?? [])).forEach { $0.isSelected = false }
+                if !plusButtonKeepsItsOwnState {
+                    control?.isSelected = true
+                }
+                // [EN] Shared by the classic tab bar and Liquid Glass; Lottie playback lives in tabChangedToSelectedIndex.
+                // [CN] 非液态玻璃与液态玻璃逻辑共用，Lottie 播放逻辑都在 tabChangedToSelectedIndex 中。
+                selectedContentControl?.isSelected = true
+            }
+        }
+        guard let tappedControl = control ?? selectedViewController?.cyl_tabButton else {
+            cylPrivate.cylSetNeedsApplyTabBarItemAnimationTintColors()
+            return
+        }
+        cylTabBarController(self, beginShowPlatterLiquidLensViewFor: tappedControl)
+        // FIX: plus button badge does not change on tap
+        // [EN] A plus button with a child view controller has two layers: the plus button and, under it, the system tab
+        //      button of `plusChildViewController`. A tap could be reported with that system tab button, or not at all (the
+        //      plus child view controller already selected disables it). Report the plus button itself instead (its own
+        //      `reportsTapsToDelegate` still opts out), so the delegate always gets the same control for the plus button.
+        // [CN] 带子控制器的 PlusButton 有两个图层：PlusButton 本身，以及其下方 `plusChildViewController` 的系统 Tab 按钮。点击时可能上报的是该系统
+        //      Tab 按钮，或者根本不上报（子控制器已选中时该按钮被禁用）。这里统一上报 PlusButton 本身（其 `reportsTapsToDelegate` 仍可关闭回调）。
+        let reportedControl = cylReportedControl(for: tappedControl) ?? tappedControl
+        var shouldReport = shouldSelectViewController
+        if reportedControl !== tappedControl {
+            shouldReport = cylControlReportsTapsEntryPoint(reportedControl)
+        }
+        // [EN] One report per tap, only for a plus button with a child view controller: on Liquid Glass one tap reported it
+        //      two or three times (the `selectedViewController` setter, `-setSelectedIndex:`, the gesture path), and a badge
+        //      that toggles on each callback looked unchanged. Reports of the same control within one run loop turn belong
+        //      to the same tap, so only the first one is sent. Tab buttons are not affected.
+        // [CN] 每次点击只上报一次，仅限带子控制器的 PlusButton：液态玻璃下一次点击会上报两到三次（`selectedViewController` 的 setter、
+        //      `-setSelectedIndex:`、手势路径），每次回调切换一次的角标看起来没有变化。同一 runloop 内对同一控件的多次上报属于同一次点击，只发送第一次。
+        let isPlusButtonWithChildViewController = hasPlusButton() && hasPlusChildViewController() &&
+            reportedControl === cylPrivate.cylContextPlusButton()
+        if shouldReport && isPlusButtonWithChildViewController && reportedControl === cylPrivate.cylControlReportedInCurrentRunLoop() {
+            shouldReport = false
+        }
+        if shouldReport {
+            if isPlusButtonWithChildViewController {
+                cylMarkControlReportedInCurrentRunLoop(reportedControl)
+            }
+            cylSendDidSelectControl(reportedControl)
+        }
+        cylPrivate.cylSetNeedsApplyTabBarItemAnimationTintColors()
+        guard shouldSelectViewController, let control else {
+            return
+        }
+        // [EN] A tap plays the tab's animated images (they rest until played). [CN] 点击播放该 Tab 的动图（播放前保持静止）。
+        cylPrivate.cylPlayAnimatedImages(ofTabButton: control)
+        if let selectedContentControl, selectedContentControl !== control {
+            cylPrivate.cylPlayAnimatedImages(ofTabButton: selectedContentControl)
+        }
+    }
+}

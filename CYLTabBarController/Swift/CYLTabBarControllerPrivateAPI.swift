@@ -29,6 +29,11 @@ import UIKit
     @objc(cyl_contextPlusChildViewController) func cylContextPlusChildViewController() -> UIViewController?
     /// [EN] The control reported in the current run loop turn (step 59). [CN] 当前 runloop 中已上报的控件（第 59 步）。
     @objc(setCyl_controlReportedInCurrentRunLoop:) func cylSetControlReportedInCurrentRunLoop(_ control: UIControl?)
+    /// [EN] Used by `-didSelectControl:` (step 64). [CN] 供 `-didSelectControl:` 使用（第 64 步）。
+    @objc(cyl_controlReportedInCurrentRunLoop) func cylControlReportedInCurrentRunLoop() -> UIControl?
+    @objc(cyl_setNeedsUpdateTabBarItemIconViews) func cylSetNeedsUpdateTabBarItemIconViews()
+    @objc(cyl_setNeedsApplyTabBarItemAnimationTintColors) func cylSetNeedsApplyTabBarItemAnimationTintColors()
+    @objc(cyl_playAnimatedImagesOfTabButton:) func cylPlayAnimatedImages(ofTabButton control: UIControl)
     /// [EN] The page registry state of the class extension (docs/Swift-Migration.md, step 54). [CN] 类扩展中的页面注册表状态（第 54 步）。
     @objc(pageRegistry) func cylPageRegistryState() -> CYLTabBarPageProviding?
     @objc(pageResolver) func cylPageResolverState() -> CYLTabBarPageProvider?

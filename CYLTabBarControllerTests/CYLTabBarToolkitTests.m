@@ -433,4 +433,30 @@
     tabBarController.delegate = nil;
 }
 
+#pragma mark - Tab button tap (Swift since step 64)
+
+/// [EN] In a window, a tap on the second tab's button marks it selected and reports it once.
+/// [CN] 在窗口中，点击第二个 Tab 的按钮会把它标记为选中，并上报一次。
+- (void)testDidSelectControlSelectsAndReportsTheTabButton {
+    CYLTabBarController *tabBarController = [self newTabBarController];
+    UIWindow *window = [[UIWindow alloc] initWithFrame:CGRectMake(0, 0, 390, 844)];
+    window.rootViewController = tabBarController;
+    [window makeKeyAndVisible];
+    [[NSRunLoop mainRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.3]];
+    UIControl *button = tabBarController.viewControllers[1].cyl_tabButton;
+    if (!button) {
+        return;
+    }
+    CYLDidSelectRecordingDelegate *delegate = [CYLDidSelectRecordingDelegate new];
+    tabBarController.delegate = delegate;
+    SEL select = NSSelectorFromString(@"didSelectControl:");
+    XCTAssertTrue([tabBarController respondsToSelector:select]);
+    ((void (*)(id, SEL, id))[tabBarController methodForSelector:select])(tabBarController, select, button);
+    XCTAssertTrue(button.selected);
+    XCTAssertEqual(delegate.controls.count, 1u);
+    XCTAssertEqual(delegate.controls.firstObject, button);
+    tabBarController.delegate = nil;
+    window.hidden = YES;
+}
+
 @end
