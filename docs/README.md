@@ -69,6 +69,7 @@
 | [在 Swift 中继承本库的类](Subclassing-In-Swift.md) | [Subclassing the library's classes in Swift](Subclassing-In-Swift.md) |
 | [Swift 编码规范](Swift-Coding-Style.md) | [Swift coding style](Swift-Coding-Style.md) |
 | [在 Swift 项目中使用 CYLTabBarController](Swift-Guide.md) | [Using CYLTabBarController in Swift](Swift-Guide.md) |
+| [Swift 迁移第 ③ 阶段：协议、枚举与公开头文件](Swift-Migration-Phase3.md) | [Swift migration phase ③: protocols, enums and the public headers](Swift-Migration-Phase3.md) |
 | [iOS 核心层迁移到 Swift](Swift-Migration.md) | [Migrating the iOS core layer to Swift](Swift-Migration.md) |
 | [在 SwiftUI 项目中集成 CYLTabBarController](SwiftUI-Integration.md) | [Integrating CYLTabBarController in a SwiftUI app](SwiftUI-Integration.md) |
 | [TODO 总览与清理进度](TODO-Sweep.md) | [TODO sweep: every open TODO and its status](TODO-Sweep.md) |
@@ -172,6 +173,7 @@ docs/
 ├── Subclassing-In-Swift.md
 ├── Swift-Coding-Style.md
 ├── Swift-Guide.md
+├── Swift-Migration-Phase3.md
 ├── Swift-Migration.md
 ├── SwiftUI-Integration.md
 ├── TODO-Sweep.md
@@ -385,6 +387,7 @@ docs/
 │   ├── ios-rive-tab-badges-over-tinted-icons.png
 │   ├── ios-rive-tint-template.png
 │   ├── ios-rive-title-tint-light-dark.png
+│   ├── ios-swift-base-view-controllers.png
 │   ├── ios-swift-example-screens.png
 │   ├── ios-swift-flat-design-main-tab-bar-controller.png
 │   ├── ios-swift-main-tab-bar-controller.png

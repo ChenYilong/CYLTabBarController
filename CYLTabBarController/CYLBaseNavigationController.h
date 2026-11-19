@@ -15,10 +15,11 @@
 
 #import <UIKit/UIKit.h>
 
-NS_ASSUME_NONNULL_BEGIN
-
-@interface CYLBaseNavigationController : UINavigationController
-
-@end
-
-NS_ASSUME_NONNULL_END
+/*!
+ * [EN] `CYLBaseNavigationController` is an `open` Swift class since docs/Swift-Migration.md step 113 (`Swift/CYLBaseNavigationController.swift`): Objective-C sees it through
+ *      the generated Swift interface imported here, with the same name. Subclasses are written in Swift
+ *      (docs/Subclassing-In-Swift.md).
+ * [CN] 自第 113 步起 `CYLBaseNavigationController` 是 `open` 的 Swift 类（`Swift/CYLBaseNavigationController.swift`）：Objective-C 通过此处导入的生成的 Swift 接口看到它，类名不变。
+ *      子类用 Swift 编写（docs/Subclassing-In-Swift.md）。
+ */
+#import "CYLSwiftInterface.h"

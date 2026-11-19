@@ -65,8 +65,17 @@
 #endif
 
 
-FOUNDATION_EXTERN CGFloat CYLTabBarItemImagePlaceholderWidth;
-FOUNDATION_EXTERN CGFloat CYLTabBarItemImagePlaceholderHeight;
+FOUNDATION_EXTERN CGFloat CYLTabBarItemImagePlaceholderCurrentWidth(void);
+FOUNDATION_EXTERN CGFloat CYLTabBarItemImagePlaceholderCurrentHeight(void);
+/*!
+ * [EN] The placeholder size of a tab image: read-only Swift variables since step 114, read by Objective-C through these macros;
+ *      set it with `CYLConstants.tabBarItemImagePlaceholderSize`.
+ * [CN] Tab 图片的占位尺寸：自第 114 步起为只读的 Swift 变量，Objective-C 通过这些宏读取；用 `CYLConstants.tabBarItemImagePlaceholderSize` 设置。
+ */
+#ifndef __swift__
+#define CYLTabBarItemImagePlaceholderWidth (CYLTabBarItemImagePlaceholderCurrentWidth())
+#define CYLTabBarItemImagePlaceholderHeight (CYLTabBarItemImagePlaceholderCurrentHeight())
+#endif
 
 typedef NS_ENUM(NSInteger, CYLTabBarStyleType) {
     CYLTabBarStyleTypeDefault = 0,
@@ -113,112 +122,11 @@ typedef NS_ENUM(NSInteger, CYLTabBarMinimizeBehavior) {
     CYLTabBarMinimizeBehaviorOnScrollUp,
 };
 
-@interface CYLConstants : NSObject
-
 /*!
- * [EN] Returns the screen width divided by 375 (the iPhone 8 design width), for scaling layouts.
- * [CN] 返回屏幕宽度与 375（iPhone 8 设计稿宽度）的比例，用于等比适配布局。
+ * [EN] `CYLConstants` is a Swift class since docs/Swift-Migration.md step 114 (`Swift/CYLConstants.swift`): Objective-C sees it
+ *      through the generated Swift interface, imported at the end of this header, with the same selectors.
+ * [CN] 自第 114 步起 `CYLConstants` 是 Swift 类（`Swift/CYLConstants.swift`）：Objective-C 通过本头文件末尾导入的生成的 Swift 接口看到它，selector 不变。
  */
-+ (CGFloat)UIBasisWidthScale;
-
-/*!
- * [EN] Returns the screen height divided by 667 (the iPhone 8 design height), for scaling layouts.
- * [CN] 返回屏幕高度与 667（iPhone 8 设计稿高度）的比例，用于等比适配布局。
- */
-+ (CGFloat)UIBasisHeightScale;
-
-/*!
- * Liquid Glass, same as `+isUsedLiquidGlass`.
- * @return YES  if iOS Version > iOS 27.0
- * [EN] Returns YES if Liquid Glass is in use: always on iOS 27+, on iOS 26 unless `UIDesignRequiresCompatibility` is YES in Info.plist, never below iOS 26.
- * [CN] 判断是否启用了液态玻璃：iOS 27+ 始终为 YES；iOS 26 下除非 Info.plist 中 UIDesignRequiresCompatibility 为 YES；iOS 26 以下始终为 NO。
- */
-+ (BOOL)isLiquidGlassActive;
-
-/*!
- * Liquid Glass, same as `+isLiquidGlassActive`
- * @return YES  if iOS Version > iOS 27.0
- * [EN] Same as `+isLiquidGlassActive`; the result is computed once and cached.
- * [CN] 同 +isLiquidGlassActive，结果只计算一次并缓存。
- */
-+ (BOOL)isUsedLiquidGlass;
-
-/*!
- * [EN] Returns the Lottie size to use: `lottieSizeValue` if non-zero, else the normal image size, else the default placeholder size.
- * [CN] 返回实际使用的 Lottie 尺寸：优先 lottieSizeValue（非零），其次普通图片尺寸，最后使用默认占位尺寸。
- */
-+ (NSValue *)cyl_getTureLottieSizeValue:(NSValue *)lottieSizeValue fromNormalImage:(UIImage *)normalImage DEPRECATED_MSG_ATTRIBUTE("Use +cyl_tabBarItemAnimationSizeValue:fromNormalImage:");
-
-/*!
- * [EN] The size of a tab's animation: `sizeValue`, or the normal image's size, or the placeholder size (any library).
- * [CN] Tab 动画的尺寸：`sizeValue`，否则为普通图片的尺寸，再否则为占位尺寸（任意动画库）。
- */
-+ (NSValue *)cyl_tabBarItemAnimationSizeValue:(NSValue *)sizeValue fromNormalImage:(UIImage *)normalImage;
-
-/*!
- * [EN] Returns a file URL for a local file path, or nil if the file does not exist.
- * [CN] 将本地文件路径转换为文件 URL，文件不存在时返回 nil。
- */
-+ (NSURL *)cyl_getURLFromString:(NSString *)string;
-
-/*!
- * FIX: issue #442
- * [EN] Registers `darkLottieURL` as the Dark Mode version of the Lottie animation at `lottieURL` (nil removes it).
- *      `CYLTabBarLottieDarkURL` / `CYLTabBarLottieDarkFilePath` in `tabBarItemsAttributes` call it for you.
- * [CN] 将 `darkLottieURL` 注册为 `lottieURL` 处 Lottie 动画的深色模式版本（传 nil 移除）。`tabBarItemsAttributes` 中的
- *      `CYLTabBarLottieDarkURL` / `CYLTabBarLottieDarkFilePath` 会自动调用。
- */
-+ (void)cyl_registerDarkLottieURL:(NSURL *)darkLottieURL forLottieURL:(NSURL *)lottieURL DEPRECATED_MSG_ATTRIBUTE("Use the CYLTabBarAnimationDarkURL / CYLTabBarAnimationDarkFilePath tab item keys");
-
-/*!
- * [EN] The Lottie animation to show for `traitCollection`: the registered dark version where the style is dark,
- *      `lottieURL` otherwise (and always before iOS 13). nil `lottieURL` returns nil; nil `traitCollection` means light.
- * [CN] 在 `traitCollection` 下应显示的 Lottie 动画：风格为深色时返回已注册的深色版本，否则（以及 iOS 13 以下）返回 `lottieURL`。
- *      `lottieURL` 为 nil 时返回 nil；`traitCollection` 为 nil 时按浅色处理。
- */
-+ (NSURL *)cyl_lottieURL:(NSURL *)lottieURL forTraitCollection:(UITraitCollection *)traitCollection DEPRECATED_MSG_ATTRIBUTE("Use the CYLTabBarAnimationDarkURL tab item key");
-
-/*!
- * FIX: issue #442 (Lottie 4.x)
- * [EN] Registers `darkColors` (keypath -> UIColor) for the Lottie animation at `lottieURL`: one animation file that
- *      follows Dark Mode (nil removes them). `CYLTabBarLottieDarkColors` in `tabBarItemsAttributes` calls it for you.
- * [CN] 为 `lottieURL` 处的 Lottie 动画注册 `darkColors`（keypath -> UIColor）：一份动画文件即可适配深色模式（传 nil 移除）。
- *      `tabBarItemsAttributes` 中的 `CYLTabBarLottieDarkColors` 会自动调用。
- */
-+ (void)cyl_registerLottieDarkColors:(NSDictionary<NSString *, UIColor *> *)darkColors forLottieURL:(NSURL *)lottieURL DEPRECATED_MSG_ATTRIBUTE("Use the CYLTabBarAnimationDarkColors tab item key");
-
-/*!
- * [EN] The dark colors registered for `lottieURL`, nil when there are none.
- * [CN] 为 `lottieURL` 注册的深色颜色，没有时为 nil。
- */
-+ (NSDictionary<NSString *, UIColor *> *)cyl_lottieDarkColorsForLottieURL:(NSURL *)lottieURL DEPRECATED_MSG_ATTRIBUTE("Use the CYLTabBarAnimationDarkColors tab item key");
-
-/*!
- * [EN] YES once a dark Lottie animation or dark Lottie colors have been registered: only then does a change of style
- *      reload Lottie icons.
- * [CN] 注册过深色 Lottie 动画或深色 Lottie 颜色后为 YES：只有这时切换深浅色才会重新加载 Lottie 图标。
- */
-+ (BOOL)cyl_hasDarkLottieURLs DEPRECATED_MSG_ATTRIBUTE("Use the CYLTabBarAnimationDark… tab item keys");
-
-/*!
- * [EN] YES when a dark animation or dark colors are registered for `lottieURL`. Lottie icons without them never run
- *      any of the #442 code.
- * [CN] 为 `lottieURL` 注册了深色动画或深色颜色时为 YES。没有注册的 Lottie 图标不会执行任何 #442 相关代码。
- */
-+ (BOOL)cyl_hasDarkLottieForLottieURL:(NSURL *)lottieURL DEPRECATED_MSG_ATTRIBUTE("Use the CYLTabBarAnimationDark… tab item keys");
-
-/*!
- * [EN] Returns YES if Lottie is linked and either `lottieURLs` is non-empty or the first item attributes specify a Lottie URL or file path.
- * [CN] 判断是否启用 Lottie：需集成 Lottie，且 lottieURLs 非空或第一个 TabBarItem 属性中指定了 Lottie URL / 文件路径。
- */
-+ (BOOL)isLottieEnabledFromlottieURLs:(NSMutableArray *)lottieURLs tabBarItemsAttributes:(NSArray<NSDictionary *> *)tabBarItemsAttributes DEPRECATED_MSG_ATTRIBUTE("Use +isTabBarItemAnimationEnabledWithURLs:tabBarItemsAttributes:");
-
-/*!
- * [EN] YES when `URLs` is not empty or a tab item has an animation file (any library). [CN] `URLs` 非空或某个 Tab item 有动画文件时返回 YES（任意动画库）。
- */
-+ (BOOL)isTabBarItemAnimationEnabledWithURLs:(NSArray<NSURL *> *)URLs tabBarItemsAttributes:(NSArray<NSDictionary *> *)tabBarItemsAttributes;
-
-@end
 
 CG_INLINE UIWindowScene *CYLGetWindowScene(void) {
     UIWindowScene *windowScene = nil;
@@ -287,8 +195,16 @@ CG_INLINE CGFloat CYLGetTabBarFullH(CGFloat baseTabBarHeight) {
 #define CYLRGBColor(r, g, b) [UIColor colorWithRed:(r)/255.0 green:(g)/255.0 blue:(b)/255.0 alpha:1]
 #define CYLRGBAColor(r, g, b, a) [UIColor colorWithRed:(r)/255.0 green:(g)/255.0 blue:(b)/255.0 alpha:a]
 
-#define CYLScale [CYLConstants UIBasisWidthScale]
-#define CYLHScale [CYLConstants UIBasisHeightScale]
+/*!
+ * [EN] `+[CYLConstants UIBasisWidthScale]` / `UIBasisHeightScale` as C functions (Swift, step 114), so the inline functions
+ *      below compile before the generated Swift interface is imported.
+ * [CN] 以 C 函数形式提供的 `+[CYLConstants UIBasisWidthScale]` / `UIBasisHeightScale`（Swift，第 114 步），使下方的内联函数在导入生成的
+ *      Swift 接口之前即可编译。
+ */
+FOUNDATION_EXTERN CGFloat CYLConstantsUIBasisWidthScale(void);
+FOUNDATION_EXTERN CGFloat CYLConstantsUIBasisHeightScale(void);
+#define CYLScale (CYLConstantsUIBasisWidthScale())
+#define CYLHScale (CYLConstantsUIBasisHeightScale())
 
 #define CYL_PERFORM_SELECTOR_BOOL(Target, SelectorName, Result) \
 do { \
@@ -452,6 +368,8 @@ _CYLTypeEncodingDetectorGenerator(Character, char *)
 _CYLTypeEncodingDetectorGenerator(Object, id)
 _CYLTypeEncodingDetectorGenerator(Class, Class)
 _CYLTypeEncodingDetectorGenerator(Selector, SEL)
+
+#import "CYLSwiftInterface.h"
 
 #endif /* CYLConstants_h */
 

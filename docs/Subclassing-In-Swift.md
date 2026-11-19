@@ -64,6 +64,7 @@
 
 | 7. **全局变量变为只读**（第 109 步起）：`CYLExternPlusButton`、`CYLPlusChildViewController` 与 `CYLPlusButtonWidth` 现在是 Swift 变量，Objective-C 通过宏读取；为它们赋值的代码不再能编译（它们只是库保存的值，读取不受影响）。 | 7. **The globals are read-only** (since step 109): `CYLExternPlusButton`, `CYLPlusChildViewController` and `CYLPlusButtonWidth` are Swift variables, read by Objective-C through macros; code that assigned them no longer compiles (they are values the library keeps; reading them is unaffected). |
 | 8. **`+multiplerInCenterY`**（已废弃）现在是 `CYLPlusButtonSubclassing` 的可选方法，不再是 `CYLPlusButton` 的方法：Swift 子类实现它时去掉 `override`。 | 8. **`+multiplerInCenterY`** (deprecated) is now an optional method of `CYLPlusButtonSubclassing`, no longer a method of `CYLPlusButton`: a Swift subclass that implements it drops `override`. |
+| 9. **`CYLTabBarItemImagePlaceholderWidth` / `…Height` 变为只读**（第 114 步起）：在 Objective-C 中改用 `CYLConstants.tabBarItemImagePlaceholderSize` 设置。 | 9. **`CYLTabBarItemImagePlaceholderWidth` / `…Height` are read-only** in Objective-C (since step 114): set them with `CYLConstants.tabBarItemImagePlaceholderSize`. |
 
 ## [CN]示例
 ## [EN]Examples
