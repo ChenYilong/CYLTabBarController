@@ -174,7 +174,7 @@
 		9A9180BD2FCACE6D002DC8F3 /* CYLFlatDesignTabBarDemoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A9180B72FCACE6D002DC8F3 /* CYLFlatDesignTabBarDemoViewController.m */; };
 		9A9180BE2FCACE6D002DC8F3 /* CYLFlatDesignSystemTabBarController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A9180B22FCACE6D002DC8F3 /* CYLFlatDesignSystemTabBarController.m */; };
 		9A9180BF2FCACE6D002DC8F3 /* CYLFlatDesignModalViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A9180B52FCACE6D002DC8F3 /* CYLFlatDesignModalViewController.m */; };
-		9A9180C12FCACE6D002DC8F3 /* CYLFlatDesignMainTabBarController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A9180B02FCACE6D002DC8F3 /* CYLFlatDesignMainTabBarController.m */; };
+		B03E57F5201DA45B59A7AC33 /* CYLFlatDesignMainTabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57F9475C281221A4E1B4F367 /* CYLFlatDesignMainTabBarController.swift */; };
 		9A9180C32FCACE6D002DC8F3 /* CYLFlatDesignTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A9180B92FCACE6D002DC8F3 /* CYLFlatDesignTableViewController.m */; };
 		9A9681E674AF41B1AECE0EDD /* CYLTabBarConfigurationParser+Text.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30782717517B9EE6E41E2B4C /* CYLTabBarConfigurationParser+Text.swift */; };
 		9A975197DE889454A8CBBDE0 /* UIViewController+CYLFlatDesignTabBarItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3D5F41E7F84C9AF1386B45E /* UIViewController+CYLFlatDesignTabBarItem.swift */; };
@@ -530,8 +530,7 @@ DCC1BBA20425851756119035 /* CYLFlatDesignTabBar.swift in Sources */ = {isa = PBX
 		9A3865F52266FA3C008EE46F /* tab_me_animate.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = tab_me_animate.json; sourceTree = "<group>"; };
 		9A579C98225F6E3A00F3C8F0 /* Location.gpx */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = Location.gpx; path = ../../../../../Location.gpx; sourceTree = "<group>"; };
 		F3E654BFA1369475EF3AA4B5 /* MainTabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabBarController.swift; sourceTree = "<group>"; };
-		9A9180AF2FCACE6D002DC8F3 /* CYLFlatDesignMainTabBarController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CYLFlatDesignMainTabBarController.h; sourceTree = "<group>"; };
-		9A9180B02FCACE6D002DC8F3 /* CYLFlatDesignMainTabBarController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CYLFlatDesignMainTabBarController.m; sourceTree = "<group>"; };
+		57F9475C281221A4E1B4F367 /* CYLFlatDesignMainTabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CYLFlatDesignMainTabBarController.swift; sourceTree = "<group>"; };
 		9A9180B12FCACE6D002DC8F3 /* CYLFlatDesignSystemTabBarController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CYLFlatDesignSystemTabBarController.h; sourceTree = "<group>"; };
 		9A9180B22FCACE6D002DC8F3 /* CYLFlatDesignSystemTabBarController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CYLFlatDesignSystemTabBarController.m; sourceTree = "<group>"; };
 		9A9180B42FCACE6D002DC8F3 /* CYLFlatDesignModalViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CYLFlatDesignModalViewController.h; sourceTree = "<group>"; };
@@ -1047,8 +1046,7 @@ AB746249D061B771D1BA3E95 /* CYLTabBarController+CYLMemoryWarning.swift */ = {isa
 		9A9180B32FCACE6D002DC8F3 /* MainVC */ = {
 			isa = PBXGroup;
 			children = (
-				9A9180AF2FCACE6D002DC8F3 /* CYLFlatDesignMainTabBarController.h */,
-				9A9180B02FCACE6D002DC8F3 /* CYLFlatDesignMainTabBarController.m */,
+				57F9475C281221A4E1B4F367 /* CYLFlatDesignMainTabBarController.swift */,
 				9A9180B12FCACE6D002DC8F3 /* CYLFlatDesignSystemTabBarController.h */,
 				9A9180B22FCACE6D002DC8F3 /* CYLFlatDesignSystemTabBarController.m */,
 			);
@@ -1956,7 +1954,7 @@ AB746249D061B771D1BA3E95 /* CYLTabBarController+CYLMemoryWarning.swift */ = {isa
 				9A9180BD2FCACE6D002DC8F3 /* CYLFlatDesignTabBarDemoViewController.m in Sources */,
 				9A9180BE2FCACE6D002DC8F3 /* CYLFlatDesignSystemTabBarController.m in Sources */,
 				9A9180BF2FCACE6D002DC8F3 /* CYLFlatDesignModalViewController.m in Sources */,
-				9A9180C12FCACE6D002DC8F3 /* CYLFlatDesignMainTabBarController.m in Sources */,
+				B03E57F5201DA45B59A7AC33 /* CYLFlatDesignMainTabBarController.swift in Sources */,
 				9A9180C32FCACE6D002DC8F3 /* CYLFlatDesignTableViewController.m in Sources */,
 				9AE0BD3122303BA800302A35 /* CYLMainRootViewController.m in Sources */,
 				9A1559DE1CB6D56500CAB1AF /* CYLDetailsViewController.m in Sources */,

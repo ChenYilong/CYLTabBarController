@@ -12,7 +12,6 @@
 #import <CYLTabBarController/UIViewController+CYLSettingsSection.h>
 #import "CYLFlatDesignTabBarDemoViewController.h"
 #import "CYLPopPushDemoViewController.h"
-#import "CYLFlatDesignMainTabBarController.h"
 #import "CYLFlatDesignSystemTabBarController.h"
 #import "CYLMainRootViewController.h"
 #import "CYLDemoLocalization.h"

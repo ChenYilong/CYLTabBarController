@@ -7,7 +7,6 @@
 //
 
 #import "CYLMainRootViewController.h"
-#import "CYLFlatDesignMainTabBarController.h"
 #import "CYLFlatDesignTableViewController.h"
 #import "CYLHomeViewController.h"
 #import "CYLSameCityViewController.h"
