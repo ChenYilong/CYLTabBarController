@@ -14,7 +14,6 @@
 #import "CYLPopPushDemoViewController.h"
 #import "CYLFlatDesignMainTabBarController.h"
 #import "CYLFlatDesignSystemTabBarController.h"
-#import "MainTabBarController.h"
 #import "CYLMainRootViewController.h"
 #import "CYLDemoLocalization.h"
 #import "CYLTabBarControllerDemo-Swift.h"

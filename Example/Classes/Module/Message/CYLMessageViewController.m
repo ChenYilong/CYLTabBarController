@@ -11,7 +11,6 @@
 #import <CYLTabBarController/UITableViewCell+CYLBadgeExtention.h>
 #import <CYLTabBarController/UIViewController+CYLSettingsSection.h>
 #import "CYLMainRootViewController.h"
-#import "MainTabBarController.h"
 #import <CYLTableViewPlaceHolder/CYLTableViewPlaceHolder.h>
 #import "CYLDemoLocalization.h"
 #import "CYLTabBarControllerDemo-Swift.h"

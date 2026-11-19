@@ -7,7 +7,7 @@
 //
 
 #import "CYLFlatDesignMainTabBarController.h"
-#import "MainTabBarController.h"
+#import "CYLTabBarControllerDemo-Swift.h"
 #import "CYLFlatDesignTableViewController.h"
 #import "CYLFlatDesignModalViewController.h"
 #import "UIImage+CYLTabBarControllerExtention.h"

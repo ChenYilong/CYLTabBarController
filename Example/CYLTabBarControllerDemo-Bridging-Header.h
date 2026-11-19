@@ -10,3 +10,7 @@
 
 #import "CYLMainRootViewController.h"
 #import "CYLFlatDesignMainTabBarController.h"
+#import "CYLHomeViewController.h"
+#import "CYLMessageViewController.h"
+#import "CYLMineViewController.h"
+#import "CYLSameCityViewController.h"

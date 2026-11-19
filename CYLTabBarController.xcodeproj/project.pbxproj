@@ -170,7 +170,7 @@
 		9A3865F72266FA3C008EE46F /* tab_home_animate.json in Resources */ = {isa = PBXBuildFile; fileRef = 9A3865F32266FA3C008EE46F /* tab_home_animate.json */; };
 		9A3865F82266FA3C008EE46F /* tab_search_animate.json in Resources */ = {isa = PBXBuildFile; fileRef = 9A3865F42266FA3C008EE46F /* tab_search_animate.json */; };
 		9A3865F92266FA3C008EE46F /* tab_me_animate.json in Resources */ = {isa = PBXBuildFile; fileRef = 9A3865F52266FA3C008EE46F /* tab_me_animate.json */; };
-		9A7C59902181C39000EDB266 /* MainTabBarController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A7C598E2181C39000EDB266 /* MainTabBarController.m */; };
+		CEE46F807E08492265B99A7B /* MainTabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3E654BFA1369475EF3AA4B5 /* MainTabBarController.swift */; };
 		9A9180BD2FCACE6D002DC8F3 /* CYLFlatDesignTabBarDemoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A9180B72FCACE6D002DC8F3 /* CYLFlatDesignTabBarDemoViewController.m */; };
 		9A9180BE2FCACE6D002DC8F3 /* CYLFlatDesignSystemTabBarController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A9180B22FCACE6D002DC8F3 /* CYLFlatDesignSystemTabBarController.m */; };
 		9A9180BF2FCACE6D002DC8F3 /* CYLFlatDesignModalViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A9180B52FCACE6D002DC8F3 /* CYLFlatDesignModalViewController.m */; };
@@ -529,8 +529,7 @@ DCC1BBA20425851756119035 /* CYLFlatDesignTabBar.swift in Sources */ = {isa = PBX
 		9A3865F42266FA3C008EE46F /* tab_search_animate.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = tab_search_animate.json; sourceTree = "<group>"; };
 		9A3865F52266FA3C008EE46F /* tab_me_animate.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = tab_me_animate.json; sourceTree = "<group>"; };
 		9A579C98225F6E3A00F3C8F0 /* Location.gpx */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = Location.gpx; path = ../../../../../Location.gpx; sourceTree = "<group>"; };
-		9A7C598E2181C39000EDB266 /* MainTabBarController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MainTabBarController.m; sourceTree = "<group>"; };
-		9A7C598F2181C39000EDB266 /* MainTabBarController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MainTabBarController.h; sourceTree = "<group>"; };
+		F3E654BFA1369475EF3AA4B5 /* MainTabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabBarController.swift; sourceTree = "<group>"; };
 		9A9180AF2FCACE6D002DC8F3 /* CYLFlatDesignMainTabBarController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CYLFlatDesignMainTabBarController.h; sourceTree = "<group>"; };
 		9A9180B02FCACE6D002DC8F3 /* CYLFlatDesignMainTabBarController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CYLFlatDesignMainTabBarController.m; sourceTree = "<group>"; };
 		9A9180B12FCACE6D002DC8F3 /* CYLFlatDesignSystemTabBarController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CYLFlatDesignSystemTabBarController.h; sourceTree = "<group>"; };
@@ -1146,8 +1145,7 @@ AB746249D061B771D1BA3E95 /* CYLTabBarController+CYLMemoryWarning.swift */ = {isa
 				9A1559C61CB6D4D300CAB1AF /*  AppDelegate.m */,
 				9AE51DDA2F90C9D000BB0831 /* SceneDelegate.h */,
 				9AE51DDB2F90C9D000BB0831 /* SceneDelegate.m */,
-				9A7C598F2181C39000EDB266 /* MainTabBarController.h */,
-				9A7C598E2181C39000EDB266 /* MainTabBarController.m */,
+				F3E654BFA1369475EF3AA4B5 /* MainTabBarController.swift */,
 				9AE0BD2F22303BA800302A35 /* CYLMainRootViewController.h */,
 				9AE0BD3022303BA800302A35 /* CYLMainRootViewController.m */,
 				9AE942CF1BDC933E00354519 /* Classes */,
@@ -1967,7 +1965,7 @@ AB746249D061B771D1BA3E95 /* CYLTabBarController+CYLMemoryWarning.swift */ = {isa
 				9A1559DB1CB6D56500CAB1AF /* CYLHomeViewController.m in Sources */,
 				9A1559C81CB6D4D300CAB1AF /*  AppDelegate.m in Sources */,
 				9AE51DDC2F90C9D000BB0831 /* SceneDelegate.m in Sources */,
-				9A7C59902181C39000EDB266 /* MainTabBarController.m in Sources */,
+				CEE46F807E08492265B99A7B /* MainTabBarController.swift in Sources */,
 				9A1559DD1CB6D56500CAB1AF /* CYLMineViewController.m in Sources */,
 				9AE942F11BDC933E00354519 /* main.m in Sources */,
 				9AC0181B1FE90AA1001EC2D6 /* CYLPlusDemoChildViewController.swift in Sources */,
