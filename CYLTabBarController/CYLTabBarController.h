@@ -225,7 +225,10 @@ NS_ASSUME_NONNULL_BEGIN
 //};
 
 @class CYLTabBarController;
+#ifndef __swift__
 typedef void(^CYLViewDidLayoutSubViewsBlock)(CYLTabBarController *tabBarController);
+#endif
+
 
 #ifndef __swift__
 #define CYLTabBarItemTitle @"CYLTabBarItemTitle"
@@ -1071,11 +1074,15 @@ typedef NS_ENUM(NSInteger, CYLTabBarItemGesture) {
  * [CN] `cyl_tabBarItemGestureHandler` 的 block。`control` 为 Tab 按钮或 PlusButton；`viewController` 为对应 Tab 的控制器
  *      （PlusButton 为其子控制器），没有子控制器的 PlusButton 为 nil。
  */
+#ifndef __swift__
 typedef void (^CYLTabBarItemGestureHandler)(CYLTabBarController *tabBarController,
                                             CYLTabBarItemGesture gesture,
                                             UIControl *control,
                                             UIViewController *_Nullable viewController);
+#endif
 
+
+#ifndef __swift__
 @interface NSObject (CYLTabBarControllerReferenceExtension)
 
 /*!
@@ -1131,6 +1138,8 @@ typedef void (^CYLTabBarItemGestureHandler)(CYLTabBarController *tabBarControlle
 #endif
 
 @end
+#endif
+
 
 #pragma mark - Theme switching (issue #216)
 
@@ -1160,7 +1169,10 @@ FOUNDATION_EXTERN NSString *const CYLTabBarItemLottieAnimationPlayingNotificatio
  * [CN] `+loadTabBarControllerWithConfigurationURL:completion:` 的回调，在主队列执行：TabBarController，或 nil 与错误
  *      （`CYLTabBarConfigurationErrorDomain`）。
  */
+#ifndef __swift__
 typedef void (^CYLTabBarControllerConfigurationCompletion)(CYLTabBarController *_Nullable tabBarController, NSError *_Nullable error);
+#endif
+
 
 /*!
  * [EN] Completion of `+loadConfigurationWithURL:completion:`, on the main queue. [CN] `+loadConfigurationWithURL:completion:` 的回调，在主队列执行。

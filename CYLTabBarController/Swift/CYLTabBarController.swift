@@ -7,6 +7,15 @@
 
 import UIKit
 
+/// [EN] The block run at the end of `-viewDidLayoutSubviews`. [CN] 在 `-viewDidLayoutSubviews` 末尾执行的 block。
+public typealias CYLViewDidLayoutSubViewsBlock = (CYLTabBarController) -> Void
+/// [EN] The block called when a tab is long pressed. [CN] 长按 Tab 时调用的 block。
+public typealias CYLTabBarControllerDidLongPressControlBlock = (CYLTabBarController, UIControl) -> Void
+/// [EN] The completion of the configuration loaders. [CN] 配置加载方法的回调。
+public typealias CYLTabBarControllerConfigurationCompletion = (CYLTabBarController?, Error?) -> Void
+/// [EN] The handler of the tab bar item gestures. [CN] Tab 手势的处理 block。
+public typealias CYLTabBarItemGestureHandler = (CYLTabBarController, CYLTabBarItemGesture, UIControl, UIViewController?) -> Void
+
 /**
  * [EN] The delegate of `CYLTabBarController`: everything optional, on top of `UITabBarControllerDelegate`. Translated from the
  *      Objective-C protocol (docs/Swift-Migration.md, the class switch); the selectors are unchanged.
@@ -383,4 +392,167 @@ open class CYLTabBarController: UITabBarController, CYLTabBarControllerDelegate,
         super.traitCollectionDidChange(previousTraitCollection)
         cylTraitCollectionDidChange(from: previousTraitCollection)
     }
+
+    // MARK: - Properties with logic
+
+    /// [EN] The context (several tab bar controllers, plus buttons). [CN] context（多个 TabBarController 与 PlusButton）。
+    @objc open var context: String? { cyl_context }
+
+    /// [EN] The `tabBarHeight`: the system height until one is set. [CN] `tabBarHeight`：未设置时为系统高度。
+    @objc open var tabBarHeight: CGFloat {
+        get { cylResolvedTabBarHeight() }
+        set { cylApplyTabBarHeight(newValue) }
+    }
+
+    /// [EN] The tab bar of the style, created on first use. [CN] 当前样式的 TabBar，首次使用时创建。
+    @objc(cyl_tabBar) open var cyl_tabBar: UIView? {
+        get { cylLazyTabBar() }
+        set { cylSetStoredTabBar(newValue) }
+    }
+
+    @objc(cyl_setTabBar:) open func cyl_setTabBar(_ tabBar: UIView?) { cylSetStoredTabBar(tabBar) }
+
+    /**
+     * [EN] YES when the app does not use the compatibility design: only Liquid Glass can be in compatibility, and only below iOS 26
+     *      the answer is always YES.
+     * [CN] App 不使用兼容设计时为 YES：只有液态玻璃才可能处于兼容模式，iOS 26 以下始终为 YES。
+     */
+    @objc open var noNeedUIDesignCompatibility: Bool {
+        get {
+            guard #available(iOS 26.0, *), CYLConstants.isLiquidGlassActive() else {
+                return true
+            }
+            return storedNoNeedUIDesignCompatibility
+        }
+        set { storedNoNeedUIDesignCompatibility = newValue }
+    }
+
+    @objc open var allowsVerticalBar: Bool {
+        get { storedAllowsVerticalBar }
+        set { cylApplyAllowsVerticalBar(newValue) }
+    }
+
+    @objc open internal(set) var tabBarItemAnimationURLs: NSMutableArray = NSMutableArray()
+    @objc open internal(set) var tabBarItemAnimationSizes: NSMutableArray = NSMutableArray()
+
+    /// [EN] Sets the image insets of every tab. [CN] 设置所有 Tab 的图片内边距。
+    @objc open func updateImageInsets(_ imageInsets: UIEdgeInsets) {
+        self.imageInsets = imageInsets
+        cylApplyImageInsetsToItems(imageInsets)
+    }
+
+    /// [EN] The frame of the tab bar in the view (height plus the bottom safe area). [CN] TabBar 在 view 中的 frame（高度加底部安全区）。
+    @objc(tabBarFrame) var tabBarFrame: CGRect {
+        let height = tabBarHeight + view.safeAreaInsets.bottom
+        return CGRect(x: 0, y: view.bounds.height - height, width: view.bounds.width, height: height)
+    }
+
+    /// [EN] The speed and loop mode to the views already added (none before the tab bar is laid out). [CN] 把速度与循环模式应用到已添加的视图（TabBar 布局前没有视图）。
+    @objc(cyl_applyTabBarItemAnimationPlayback) func cylApplyTabBarItemAnimationPlayback() {
+        guard cylTabBarItemAnimationGetServiceEntryPoint() != nil, isViewLoaded, let tabBar = cyl_tabBar as? CYLTabBar else {
+            return
+        }
+        tabBar.cyl_setAllTabBarItemAnimationsSpeed(tabBarItemAnimationSpeed, loops: tabBarItemAnimationLoops)
+    }
+
+    /// [EN] Plays every tab's animation from the start. [CN] 让每个 Tab 的动画从头播放。
+    @objc open func cyl_playAllTabBarItemAnimations() {
+        for control in cylAllTabButtonsForAnimatedImages() {
+            cylPlayAnimatedImages(ofTabButton: control)
+        }
+        guard cylTabBarItemAnimationGetServiceEntryPoint() != nil, let tabBar = cyl_tabBar as? CYLTabBar else {
+            return
+        }
+        cylApplyTabBarItemAnimationPlayback()
+        tabBar.cyl_restartAllTabBarItemAnimations()
+    }
+
+    // MARK: - Helpers
+
+    @objc open func hideTabBarShadowImageView() {
+        guard tabBarStyleType != .flatDesign else {
+            return
+        }
+        cyl_tabBar?.layoutIfNeeded()
+        (cyl_tabBar as? UITabBar)?.cyl_tabShadowImageView()?.cyl_setHidden(true)
+    }
+
+    @available(*, deprecated)
+    @objc open func hideTabBadgeBackgroundSeparator() {
+        hideTabBarShadowImageView()
+    }
+
+    @objc open func hasPlusButton() -> Bool { cylContextPlusButton() != nil }
+
+    @objc(cyl_contextPlusButton) func cylContextPlusButton() -> CYLPlusButton? { CYLPlusButton.cylPlusButton(forOwner: self) as? CYLPlusButton }
+
+    @objc(cyl_contextPlusChildViewController) func cylContextPlusChildViewController() -> UIViewController? {
+        CYLPlusButton.plusChildViewController(forOwner: self)
+    }
+
+    @objc open func allItemsInTabBarCount() -> UInt {
+        var count = (cyl_tabBar as? UITabBar)?.cyl_tabbarItemsCount ?? 0
+        if hasPlusButton() { count += 1 }
+        return UInt(count)
+    }
+
+    @objc open func appDelegate() -> UIApplicationDelegate? { UIApplication.shared.delegate }
+
+    // MARK: - Status bar, orientation, layout (UIKit overrides)
+
+    open override var childForStatusBarStyle: UIViewController? { cylChildViewControllerForStatusBarStyle() }
+    open override var childForStatusBarHidden: UIViewController? { childForStatusBarStyle }
+    open override var childForScreenEdgesDeferringSystemGestures: UIViewController? { selectedViewController }
+    open override var preferredStatusBarUpdateAnimation: UIStatusBarAnimation {
+        childForStatusBarStyle?.preferredStatusBarUpdateAnimation ?? super.preferredStatusBarUpdateAnimation
+    }
+    open override var childForHomeIndicatorAutoHidden: UIViewController? { childForStatusBarStyle }
+
+    @available(iOS, deprecated: 16.0)
+    open override var shouldAutorotate: Bool {
+        if let presented = cylPresentedViewControllerForOrientation() {
+            return presented.shouldAutorotate
+        }
+        var controller = selectedViewController
+        if let navigationController = controller as? UINavigationController {
+            controller = navigationController.topViewController
+        }
+        return controller?.shouldAutorotate ?? true
+    }
+
+    open override var supportedInterfaceOrientations: UIInterfaceOrientationMask { cylSupportedInterfaceOrientations() }
+
+    open override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        cylTabBarMinimizeLifecycleEvent()
+        unsafeBitCast(self, to: CYLFlatDesignLayoutHooks.self).cylFlatDesignViewWillTransition?(to: size, with: coordinator)
+        super.viewWillTransition(to: size, with: coordinator)
+    }
+
+    /// [EN] The theme callback of every view controller: the work is `-cyl_tabBarThemeDidChangeByManager:theme:`. [CN] 每个控制器的主题回调：实际工作在 `-cyl_tabBarThemeDidChangeByManager:theme:`。
+    open override func cyl_themeDidChange(by manager: CYLThemeManager, identifier: (any NSCopying & NSObjectProtocol)?, theme: NSObject?) {
+        super.cyl_themeDidChange(by: manager, identifier: identifier, theme: theme)
+        cylTabBarThemeDidChange(by: manager, theme: theme)
+    }
+
+    @available(iOS 26.0, *)
+    open override var tabBarMinimizeBehavior: UITabBarController.MinimizeBehavior {
+        get { cylSystemTabBarMinimizeBehaviorForApp() }
+        set { cylSetSystemTabBarMinimizeBehaviorFromApp(newValue) }
+    }
+
+    // MARK: - UITabBarControllerDelegate
+
+    open func tabBarController(_ tabBarController: UITabBarController, shouldSelect viewController: UIViewController) -> Bool {
+        cylTabBarController(tabBarController, shouldSelect: viewController)
+    }
 }
+
+/**
+ * [EN] The FlatDesign side of `-viewWillTransitionToSize:withTransitionCoordinator:`, implemented in the FlatDesign subspec. Optional.
+ * [CN] `-viewWillTransitionToSize:withTransitionCoordinator:` 的扁平样式部分，由扁平样式子库实现。可选。
+ */
+@objc protocol CYLFlatDesignLayoutHooks {
+    @objc(cyl_flatDesignViewWillTransitionToSize:withTransitionCoordinator:)
+    optional func cylFlatDesignViewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator)
+}
+
