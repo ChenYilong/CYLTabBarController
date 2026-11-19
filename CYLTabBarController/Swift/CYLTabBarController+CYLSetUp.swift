@@ -117,7 +117,11 @@ extension CYLTabBarController {
         self.pageLookupOrder = pageLookupOrder
         pagesByPageIdentifier = viewControllersFromCode ? nil
             : Self.cylPagesByPageIdentifier(ofPages: viewControllers ?? [], tabs: tabBarItemsAttributes)
-        cylRecordDefaultStandardAppearance()
+        // [EN] FlatDesign only (the FlatDesign subspec implements it): records the default appearance. [CN] 仅扁平样式（由扁平样式子库实现）：记录默认外观。
+        let recordAppearance = NSSelectorFromString("cyl_recordDefaultStandardAppearance")
+        if responds(to: recordAppearance) {
+            perform(recordAppearance)
+        }
         // [EN] Step 1, with the setter: before `viewControllers`, which reads the style. [CN] 步骤 1，必须用 setter：在读取样式的 `viewControllers` 之前。
         cylSetTabBarStyleType(styleType)
         _ = cyl_tabBar

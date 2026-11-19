@@ -404,7 +404,7 @@ class MainTabBarController: CYLTabBarController, CYLFlatDesignUITabBarController
         }
     }
 
-    override func tabBarController(_ tabBarController: UITabBarController, didSelect control: UIControl) {
+    func tabBarController(_ tabBarController: UITabBarController, didSelect control: UIControl) {
         guard let tabBarController = tabBarController as? CYLTabBarController else { return }
         cyl_logTabBarItemIdentifiers(of: tabBarController, selectedControl: control)
         var animationView: UIView?

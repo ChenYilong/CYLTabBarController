@@ -1197,7 +1197,7 @@ extension CYLTabBarController {
     }
 
     @objc(tabBarController:shouldShowPlatterLiquidLensViewForControl:)
-    open func tabBarController(_ tabBarController: CYLTabBarController, shouldShowPlatterLiquidLensViewFor control: UIControl) -> Bool {
+    open dynamic func tabBarController(_ tabBarController: CYLTabBarController, shouldShowPlatterLiquidLensViewFor control: UIControl) -> Bool {
         let tabBar: UITabBar = tabBarController.tabBar
         guard CYLConstants.isLiquidGlassActive(), let tabBar = tabBar as? CYLTabBar else {
             return false

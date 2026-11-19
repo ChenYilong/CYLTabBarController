@@ -36,7 +36,7 @@ final class RiveTabBarController: CourseTabBarController, CYLFlatDesignUITabBarC
         }
     }
 
-    override func tabBarController(_: CYLTabBarController, didSelect control: UIControl) {
+    func tabBarController(_: CYLTabBarController, didSelect control: UIControl) {
         demoPlusButtonDidTap(control)
     }
 }
