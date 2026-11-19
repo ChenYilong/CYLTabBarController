@@ -1326,4 +1326,38 @@
     XCTAssertTrue([tabBarController shouldUnloadViewOfViewController:pages[1]]);
 }
 
+/*!
+ * [EN] `-rootWindow` before the app has a window (at launch) returns nil and does not trap: step 104 returned a non-optional
+ *      UIWindow from Swift and crashed the Objective-C example at launch. The window is taken away for the call: the app
+ *      delegate answers no window, and the scene's windows leave their scene.
+ * [CN] App 还没有窗口时（启动时）`-rootWindow` 返回 nil 且不崩溃：第 104 步在 Swift 中返回非可选的 UIWindow，使 Objective-C 示例启动即崩溃。
+ *      调用期间移走窗口：App 代理不返回窗口，场景中的窗口离开场景。
+ */
+- (void)testRootWindowIsNilBeforeTheAppHasAWindow {
+    CYLTabBarController *tabBarController = [[CYLTabBarController alloc] initWithViewControllers:@[ [UIViewController new] ]
+                                                                           tabBarItemsAttributes:@[ @{ CYLTabBarItemTitle : @"A" } ]];
+    id<UIApplicationDelegate> delegate = UIApplication.sharedApplication.delegate;
+    NSMutableArray<UIWindow *> *windows = [NSMutableArray array];
+    NSMutableArray<UIWindowScene *> *scenes = [NSMutableArray array];
+    for (UIScene *scene in UIApplication.sharedApplication.connectedScenes) {
+        if (![scene isKindOfClass:[UIWindowScene class]]) {
+            continue;
+        }
+        for (UIWindow *window in [((UIWindowScene *)scene).windows copy]) {
+            [windows addObject:window];
+            [scenes addObject:(UIWindowScene *)scene];
+            window.windowScene = nil;
+        }
+    }
+    UIApplication.sharedApplication.delegate = nil;
+    CYL_DEPRECATED_DECLARATIONS_PUSH
+    UIWindow *window = [tabBarController rootWindow];
+    CYL_DEPRECATED_DECLARATIONS_POP
+    UIApplication.sharedApplication.delegate = delegate;
+    [windows enumerateObjectsUsingBlock:^(UIWindow *each, NSUInteger index, BOOL *stop) {
+        each.windowScene = scenes[index];
+    }];
+    XCTAssertNil(window, @"no window yet: nil, as the Objective-C method returned");
+}
+
 @end

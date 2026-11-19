@@ -40,7 +40,7 @@
 
 | 中文 | English |
 |:---|:---|
-| **尚未发布（TODO）**：这些类目前仍是 Objective-C，现有的 Objective-C 子类照常工作。它们在迁移第 ② 阶段变为 Swift 类（[Swift-Migration.md](Swift-Migration.md)，"Plan"）；该版本发布时，本文与发布说明会写明版本号。现在就可以按下文把子类改写为 Swift：同样适用于当前的 Objective-C 类，切换时无需再改。 | **Not released yet (TODO)**: these classes are still Objective-C today, and existing Objective-C subclasses keep working. They become Swift classes in phase ② of the migration ([Swift-Migration.md](Swift-Migration.md), "Plan"); the release that ships it will be named here and in the release notes. You can port your subclasses to Swift now, as below: they also work with today's Objective-C classes, so nothing changes again at the switch. |
+| **进行中**：`CYLPlusButton` 自第 109 步起已是 Swift 类（尚未发布）；其余类目前仍是 Objective-C，现有的 Objective-C 子类照常工作。它们在迁移第 ② 阶段变为 Swift 类（[Swift-Migration.md](Swift-Migration.md)，"Plan"）；该版本发布时，本文与发布说明会写明版本号。现在就可以按下文把子类改写为 Swift：同样适用于当前的 Objective-C 类，切换时无需再改。 | **In progress**: `CYLPlusButton` is a Swift class since step 109 (not released yet); the other classes are still Objective-C today, and existing Objective-C subclasses of them keep working. They become Swift classes in phase ② of the migration ([Swift-Migration.md](Swift-Migration.md), "Plan"); the release that ships it will be named here and in the release notes. You can port your subclasses to Swift now, as below: they also work with today's Objective-C classes, so nothing changes again at the switch. |
 
 ## [CN]为什么
 ## [EN]Why
@@ -61,6 +61,9 @@
 | 4. **Objective-C 调用方导入生成的头文件**：使用这些子类的 `.m` 文件 `#import "<App模块名>-Swift.h"`，并删除旧的 `.h`。 | 4. **Objective-C callers import the generated header**: `.m` files that use the subclasses `#import "<AppModule>-Swift.h"`; delete the old `.h`. |
 | 5. **PlusButton 的注册**：Objective-C 子类常在 `+load` 中调用 `[super registerPlusButton]`；Swift 没有 `+load`，请在创建 `CYLTabBarController` 之前显式调用 `CYLPlusButtonSubclass.register()`（例如在 `application(_:didFinishLaunchingWithOptions:)` 或根控制器中）。 | 5. **Registering a plus button**: Objective-C subclasses often call `[super registerPlusButton]` in `+load`; Swift has no `+load`, so call `CYLPlusButtonSubclass.register()` explicitly before creating the `CYLTabBarController` (e.g. in `application(_:didFinishLaunchingWithOptions:)` or the root view controller). |
 | 6. **重写的方法**：`- (void)viewDidLoad` 变为 `override func viewDidLoad()`；`CYLPlusButtonSubclassing` 的类方法（`+plusButton`、`+indexOfPlusButtonInTabBar`、`+plusChildViewController` 等）变为 `static func`（或 `class func`，若子类还要再重写）。 | 6. **Overridden methods**: `- (void)viewDidLoad` becomes `override func viewDidLoad()`; the class methods of `CYLPlusButtonSubclassing` (`+plusButton`, `+indexOfPlusButtonInTabBar`, `+plusChildViewController`, …) become `static func` (or `class func` when a subclass overrides them again). |
+
+| 7. **全局变量变为只读**（第 109 步起）：`CYLExternPlusButton`、`CYLPlusChildViewController` 与 `CYLPlusButtonWidth` 现在是 Swift 变量，Objective-C 通过宏读取；为它们赋值的代码不再能编译（它们只是库保存的值，读取不受影响）。 | 7. **The globals are read-only** (since step 109): `CYLExternPlusButton`, `CYLPlusChildViewController` and `CYLPlusButtonWidth` are Swift variables, read by Objective-C through macros; code that assigned them no longer compiles (they are values the library keeps; reading them is unaffected). |
+| 8. **`+multiplerInCenterY`**（已废弃）现在是 `CYLPlusButtonSubclassing` 的可选方法，不再是 `CYLPlusButton` 的方法：Swift 子类实现它时去掉 `override`。 | 8. **`+multiplerInCenterY`** (deprecated) is now an optional method of `CYLPlusButtonSubclassing`, no longer a method of `CYLPlusButton`: a Swift subclass that implements it drops `override`. |
 
 ## [CN]示例
 ## [EN]Examples

@@ -33,8 +33,11 @@ extension CYLTabBarController {
         isTabBarItemAnimationViewAdded
     }
 
+    // [EN] nil before the app has a window (at launch), as the Objective-C method returned; a non-optional result crashed
+    //      the Objective-C example at launch (step 104, fixed in step 109). [CN] App 还没有窗口时（启动时）为 nil，与原 Objective-C 方法相同；
+    //      非可选的返回值曾使 Objective-C 示例启动即崩溃（第 104 步引入，第 109 步修复）。
     @objc(rootWindow)
-    func cylRootWindow() -> UIWindow {
+    func cylRootWindow() -> UIWindow? {
         CYLGetRootWindow()
     }
 }

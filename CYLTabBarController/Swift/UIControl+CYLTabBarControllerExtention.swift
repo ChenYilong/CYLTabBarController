@@ -293,7 +293,7 @@ extension UIControl {
         if let label = accessibilityLabel, !label.isEmpty {
             return label
         }
-        return cyl_tabBarItemIdentifier ?? NSStringFromClass(type(of: self))
+        return cyl_tabBarItemIdentifier ?? NSStringFromClass(object_getClass(self) ?? type(of: self))
     }
 
     /**
@@ -610,7 +610,9 @@ extension UIControl {
      * [CN] PlusButton 类的 `+tabBarItemIdentifier`，未实现时为类名（如 "CYLPlusButtonSubclass"）。
      */
     private var cyl_plusButtonClassIdentifier: String {
-        let buttonClass: AnyClass = type(of: self)
+        // [EN] `object_getClass`: `type(of:)` skips a class made at run time (a configuration's plus button, step 109).
+        // [CN] 使用 `object_getClass`：`type(of:)` 会跳过运行时创建的类（配置的 PlusButton，第 109 步）。
+        let buttonClass: AnyClass = object_getClass(self) ?? type(of: self)
         let selector = NSSelectorFromString("tabBarItemIdentifier")
         if (buttonClass as AnyObject).responds(to: selector),
            let identifier = (buttonClass as AnyObject).perform(selector)?.takeUnretainedValue() as? String,

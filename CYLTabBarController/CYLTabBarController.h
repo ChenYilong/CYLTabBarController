@@ -47,6 +47,8 @@
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Push-From-Anywhere.md
 //   - selectedIndex and the PlusButton: the selected title and image match / selectedIndex 与 PlusButton：选中的文字与图片一致
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/SelectedIndex-PlusButton.md
+//   - Subclassing the library's classes in Swift / 在 Swift 中继承本库的类
+//     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Subclassing-In-Swift.md
 //   - Using CYLTabBarController in Swift / 在 Swift 项目中使用 CYLTabBarController
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Swift-Guide.md
 //   - Integrating CYLTabBarController in a SwiftUI app / 在 SwiftUI 项目中集成 CYLTabBarController
@@ -993,7 +995,13 @@ FOUNDATION_EXTERN NSArray *CYLTabBarItemsAttributesAddingAnimationFiles(NSArray 
  */
 FOUNDATION_EXTERN NSUInteger CYLTabbarItemsCount;
 FOUNDATION_EXTERN NSUInteger CYLPlusButtonIndex;
-FOUNDATION_EXTERN CGFloat CYLPlusButtonWidth;
+FOUNDATION_EXTERN CGFloat CYLPlusButtonCurrentWidth(void);
+/*!
+ * [EN] A read-only Swift variable since step 109, read by Objective-C through this macro. [CN] 自第 109 步起为只读的 Swift 变量，Objective-C 通过此宏读取。
+ */
+#ifndef __swift__
+#define CYLPlusButtonWidth (CYLPlusButtonCurrentWidth())
+#endif
 FOUNDATION_EXTERN CGFloat CYLTabBarItemWidth;
 FOUNDATION_EXTERN CGFloat CYLTabBarHeight;
 
@@ -1918,7 +1926,7 @@ typedef UIView * _Nullable (^CYLTabBarItemIconViewProvider)(BOOL selected);
  * [EN] Returns the application's root window.
  * [CN] 返回应用的根 window。
  */
-- (UIWindow *)rootWindow;
+- (null_unspecified UIWindow *)rootWindow;
 
 @end
 
@@ -2697,7 +2705,9 @@ typedef UIView * _Nullable (^CYLTabBarItemIconViewProvider)(BOOL selected);
 
 @interface CYLTabBarController (CYLTabBarControllerDeprecated)
 
-// [EN] Implemented in Swift (`Swift/CYLTabBarController+CYLCompatibility.swift`, step 104). [CN] 在 Swift 中实现（第 104 步）。
+/*!
+ * [EN] Implemented in Swift (`Swift/CYLTabBarController+CYLCompatibility.swift`, step 104). [CN] 在 Swift 中实现（第 104 步）。
+ */
 @property (nonatomic, assign, getter=isLottieViewAdded, readonly) BOOL lottieViewAdded DEPRECATED_MSG_ATTRIBUTE("Use tabBarItemAnimationViewAdded");
 
 @property (nonatomic, strong, readonly) NSMutableArray<NSURL *> *lottieURLs DEPRECATED_MSG_ATTRIBUTE("Use tabBarItemAnimationURLs");

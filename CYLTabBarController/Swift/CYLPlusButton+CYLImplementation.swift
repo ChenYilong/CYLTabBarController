@@ -2347,7 +2347,9 @@ extension CYLPlusButton {
             // [EN] A shared plus child view controller stays shared. [CN] 共用的 PlusButton 子控制器保持共用。
             binding.plusChildViewController = registration.plusChildViewController
         }
-        (plusButtonClass as? CYLPlusButton.Type)?.cylPlusButtonAddSelectViewControllerTarget(plusButton)
+        // [EN] By selector, so a class made at run time is the target (Swift's metatype would be the nearest Swift class).
+        // [CN] 通过 selector 调用，使运行时创建的类成为 target（Swift 的元类型会是最近的 Swift 类）。
+        _ = (plusButtonClass as AnyObject).perform(NSSelectorFromString("cyl_plusButtonAddSelectViewControllerTarget:"), with: plusButton)
     }
 
     @objc(cyl_plusButtonWidthForOwner:)

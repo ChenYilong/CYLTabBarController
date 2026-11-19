@@ -1058,7 +1058,7 @@ extension CYLTabBar {
     }
 
     private func cylConstantOfPlusButtonCenterYOffset(forTabBarHeight tabBarHeight: CGFloat) -> CGFloat {
-        guard let plusButtonClass = cylTabBarPlusButton().map({ type(of: $0) as AnyObject }),
+        guard let plusButtonClass = cylTabBarPlusButton().map({ $0.cylRuntimeClass as AnyObject }),
               plusButtonClass.responds(to: #selector(CYLPlusButtonCenterYOffsetSource.constantOfPlusButtonCenterYOffset(forTabBarHeight:))) else {
             return 0
         }
@@ -1096,7 +1096,7 @@ extension CYLTabBar {
     @objc(cyl_tabBarPlusButtonIndex)
     func cylTabBarPlusButtonIndex() -> UInt {
         let plusButton = cylTabBarPlusButton()
-        var plusButtonIndex = plusButton.map { Int(type(of: $0).index(forTabbarItemsCount: cyl_tabbarItemsCount)) } ?? 0
+        var plusButtonIndex = plusButton.map { Int($0.cylIndex(forTabbarItemsCount: cyl_tabbarItemsCount)) } ?? 0
         let tabBarWidth = cylBoundsSize().width
         let tabBarHeight = cylBoundsSize().height
         let registeredPlusButton = cylRegisteredPlusButton

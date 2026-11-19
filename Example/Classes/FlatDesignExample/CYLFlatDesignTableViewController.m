@@ -16,7 +16,6 @@
 #import "CYLFlatDesignSystemTabBarController.h"
 #import "MainTabBarController.h"
 #import "CYLMainRootViewController.h"
-#import "CYLPlusButtonSubclass.h"
 #import "CYLDemoLocalization.h"
 #import "CYLTabBarControllerDemo-Swift.h"
 

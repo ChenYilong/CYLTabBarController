@@ -125,8 +125,6 @@ static BOOL CYLTabBarAnimationCanPlay(NSURL *URL) {
 //#import "NSObject+CYLTabBarControllerExtention.h"
 #endif
 
-/// [EN] Defined in CYLPlusButton.m: the plus button page, passed with its attributes. [CN] 定义在 CYLPlusButton.m：随属性传递的 PlusButton 页面。
-FOUNDATION_EXTERN NSString *const CYLConfigurationPlusButtonPageKey;
 /// [EN] Set from `CYLPlusButtonShowsSelection` of a configuration. [CN] 由配置中的 `CYLPlusButtonShowsSelection` 设置。
 #define CYLPlusButtonShowsSelectionKey ((const void *)sel_registerName("cyl_plusButtonShowsSelection"))
 /// [EN] Private: marks a tab left out by `CYLTabBarItemPlatforms` / `CYLTabBarItemMinimumAppVersion` (set by the normalization).

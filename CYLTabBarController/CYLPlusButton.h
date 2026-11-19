@@ -29,6 +29,8 @@
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/PlusButton.md
 //   - selectedIndex and the PlusButton: the selected title and image match / selectedIndex 与 PlusButton：选中的文字与图片一致
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/SelectedIndex-PlusButton.md
+//   - Subclassing the library's classes in Swift / 在 Swift 中继承本库的类
+//     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Subclassing-In-Swift.md
 //   - Using CYLTabBarController in Swift / 在 Swift 项目中使用 CYLTabBarController
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Swift-Guide.md
 //   - Integrating CYLTabBarController in a SwiftUI app / 在 SwiftUI 项目中集成 CYLTabBarController
@@ -251,6 +253,14 @@ if ([tabBarController.selectedViewController isEqual:CYLPlusChildViewController]
  */
 + (BOOL)matchedTabBarContext:(NSString *)tabBarContext;
 
+/*!
+ * [EN] Deprecated. Use `+multiplierOfTabBarHeight:` instead. A requirement of the protocol since step 109 (it was a category
+ *      method of the Objective-C class, implemented only by subclasses).
+ * [CN] 已废弃，请改用 +multiplierOfTabBarHeight:。自第 109 步起为协议的方法（原为 Objective-C 类的分类方法，只由子类实现）。
+ */
+@optional
++ (CGFloat)multiplerInCenterY CYL_DEPRECATED("Deprecated in 1.6.0. Use `+multiplierOfTabBarHeight:` instead.");
+
 @end
 
 @class CYLTabBar;
@@ -265,342 +275,29 @@ if ([tabBarController.selectedViewController isEqual:CYLPlusChildViewController]
  *      库内部不再读取它们：存在多个 PlusButton 时，每个 TabBarController 使用与自己 context 对应的那一个，
  *      见 `+plusButtonForTabBarContext:` 和 `+plusChildViewControllerForTabBarContext:`。只有一个 PlusButton 时，它们与以前完全一致。
  */
-FOUNDATION_EXTERN CYLPlusButton<CYLPlusButtonSubclassing> *CYLExternPlusButton;
-FOUNDATION_EXTERN UIViewController *CYLPlusChildViewController;
-
-@interface CYLPlusButton : UIButton 
+FOUNDATION_EXTERN CYLPlusButton *_Nullable CYLPlusButtonCurrentExternPlusButton(void);
+FOUNDATION_EXTERN UIViewController *_Nullable CYLPlusButtonCurrentPlusChildViewController(void);
+/*!
+ * [EN] Read-only since step 109: Swift variables (`CYLExternPlusButton`, `CYLPlusChildViewController`), read by Objective-C
+ *      through these macros. [CN] 自第 109 步起只读：Swift 变量，Objective-C 通过这些宏读取。
+ */
+#ifndef __swift__
+#define CYLExternPlusButton ((CYLPlusButton<CYLPlusButtonSubclassing> *)CYLPlusButtonCurrentExternPlusButton())
+#define CYLPlusChildViewController (CYLPlusButtonCurrentPlusChildViewController())
+#endif
+/*!
+ * [EN] The key of a plus button page passed with its attributes (`CYLTabBarControllerPlusButton`). [CN] 随属性传递的 PlusButton 页面的键。
+ */
+#define CYLConfigurationPlusButtonPageKey @"CYLConfigurationPlusButtonPage"
 
 /*!
- * plusButton state:
- * Register + Context match == Active
- * [EN] Registers the subclass as the plus button of its context (`+tabBarContext`, "CYLTabBarController" by default)
- *      and sets up its child view controller if provided. Several plus buttons can be registered at the same time, one
- *      per context; a tab bar controller uses the one whose context equals its own `context`. Registering a second
- *      plus button for a context that already has one replaces it. `CYLExternPlusButton` and
- *      `CYLPlusChildViewController` point at the one registered last.
- * [CN] 将当前子类注册为它所属 context（`+tabBarContext`，默认 "CYLTabBarController"）的 PlusButton，若提供了子控制器也一并设置。
- *      可以同时注册多个 PlusButton，每个 context 一个；TabBarController 使用 context 与自己的 `context` 相同的那一个。
- *      为已有 PlusButton 的 context 再注册一个会替换它。`CYLExternPlusButton` 与 `CYLPlusChildViewController` 指向最后注册的那一个。
+ * [EN] `CYLPlusButton` is an `open` Swift class since docs/Swift-Migration.md step 109 (`Swift/CYLPlusButton.swift`): Objective-C
+ *      code sees it through the generated Swift interface (imported below, `CYLSwiftInterface.h`), with the same selectors.
+ *      Subclasses are written in Swift (docs/Subclassing-In-Swift.md).
+ * [CN] 自第 109 步起 `CYLPlusButton` 是 `open` 的 Swift 类（`Swift/CYLPlusButton.swift`）：Objective-C 通过生成的 Swift 接口（下方
+ *      `CYLSwiftInterface.h`）看到它，selector 不变。子类用 Swift 编写（docs/Subclassing-In-Swift.md）。
  */
-+ (void)registerPlusButton;
-
-
-/*!
- * [EN] Lays the plus button out again when its class returns YES from `+alignsTitleWithTabBarItemTitles`, so its title
- *      follows the tab item titles. The tab bars call it after their own layout; call it after moving the tab titles
- *      yourself. Does nothing otherwise.
- * [CN] 当 PlusButton 类的 `+alignsTitleWithTabBarItemTitles` 返回 YES 时重新布局 PlusButton，使其标题跟随 TabBarItem 标题。TabBar
- *      在自身布局后会调用；自行移动 Tab 标题后也可以调用。其他情况不做处理。
- */
-- (void)cyl_setNeedsTitleAlignment;
-
-#pragma mark - Touchable area (issue #91)
-
-/*!
- * [EN] Issue #91: extra touchable area around the plus button, in points, without changing its frame. Positive values
- *      grow it outward (top, left, bottom, right), e.g. `UIEdgeInsetsMake(0, 10, 20, 10)` also takes the 20-pt gap below
- *      a raised plus button, so a tap there no longer falls through to the page behind. Default: zero. Every style
- *      (classic, Liquid Glass, FlatDesign). Set it in `+plusButton`, or later on the instance.
- * [CN] Issue #91：在不改变 frame 的情况下，扩大 PlusButton 四周的可点击区域（单位：点）。正值向外扩展（上、左、下、右），例如
- *      `UIEdgeInsetsMake(0, 10, 20, 10)` 会把凸起 PlusButton 下方 20 点的间隙也纳入点击范围，点在那里不再穿透到后面的页面。
- *      默认为 0。适用于所有样式（经典、液态玻璃、扁平）。可在 `+plusButton` 中设置，也可之后在实例上修改。
- */
-@property (nonatomic, assign) UIEdgeInsets touchableAreaOutsets;
-
-/*!
- * [EN] Whether a tap on this plus button is reported through `tabBarController:didSelectControl:`. Default YES; set NO when
- *      the plus button's own target-action is all you want. Unlike the deprecated `cyl_userInteractionDisabled`, it does
- *      not change when the plus button's page is selected, so every tap is reported (e.g. a badge that counts taps).
- *      While it is not set, the deprecated `cyl_userInteractionDisabled = YES` still keeps the taps out, as before.
- * [CN] 点击本 PlusButton 是否通过 `tabBarController:didSelectControl:` 上报。默认 YES；只需要 PlusButton 自己的 target-action 时设为 NO。
- *      与已废弃的 `cyl_userInteractionDisabled` 不同，它不会因为 PlusButton 页面被选中而改变，因此每次点击都会上报（例如统计点击次数的角标）。
- *      未设置时，已废弃的 `cyl_userInteractionDisabled = YES` 仍会阻止上报，与以前相同。
- */
-@property (nonatomic, assign) BOOL reportsTapsToDelegate;
-
-/*!
- * [EN] Scales the touchable area around the plus button's center, before `touchableAreaOutsets`: 1 is the frame
- *      (default), 2 doubles its width and height. Values below 1 count as 1, so the area never gets smaller than the
- *      button.
- * [CN] 以 PlusButton 中心为基准按倍数放大可点击区域，先于 `touchableAreaOutsets` 生效：1 为 frame 本身（默认），2 表示宽高各放大一倍。
- *      小于 1 的值按 1 处理，可点击区域不会小于按钮本身。
- */
-@property (nonatomic, assign) CGFloat touchableAreaScale;
-
-/*!
- * [EN] Debugging aid: shows the touchable area as a translucent overlay under the plus button (it takes no touches).
- *      Default: NO. Turn it off again to restore the normal look. A superview that clips its bounds also clips the
- *      overlay, while the hit test still uses the whole area.
- * [CN] 调试用：在 PlusButton 下方以半透明背景显示可点击区域（不响应点击）。默认 NO。设为 NO 即恢复正常外观。父视图裁剪时，
- *      覆盖层也会被裁剪，但点击判断仍使用完整区域。
- */
-@property (nonatomic, assign) BOOL showsTouchableArea;
-
-/*!
- * [EN] The overlay color of `showsTouchableArea`. nil: translucent red.
- * [CN] `showsTouchableArea` 覆盖层的颜色。nil 时为半透明红色。
- */
-@property (nonatomic, strong, nullable) UIColor *touchableAreaColor;
-
-/*!
- * [EN] `-touchableRect` converted to `view`'s coordinates (from the plus button's superview). The tab bars hit-test with
- *      it: in Liquid Glass and FlatDesign the plus button is not a direct subview of the tab bar.
- * [CN] 将 `-touchableRect` 从 PlusButton 的父视图坐标系转换到 `view` 的坐标系。TabBar 用它做点击判断：液态玻璃与扁平样式下，
- *      PlusButton 并不是 TabBar 的直接子视图。
- */
-- (CGRect)touchableRectInView:(nullable UIView *)view;
-
-/*!
- * [EN] FIX: issue #202. The subview of the plus button that should take a touch at `point` (in the plus button's
- *      coordinates), or nil. A subview takes touches when it, or one of its superviews below the plus button, is an
- *      enabled `UIControl` or has an enabled gesture recognizer, and it is visible with `userInteractionEnabled`; a
- *      subview that sticks out of the plus button counts too. The tab bars ask this first, so such subviews (e.g. the
- *      cover and close button of a minimized live room) get their own touches; every other point still goes to the plus
- *      button. Override to return nil and keep every touch on the plus button.
- * [CN] FIX: issue #202。返回 `point`（PlusButton 自身坐标系）处应接收触摸的 PlusButton 子视图，没有时返回 nil。子视图本身或它在
- *      PlusButton 之下的某个父视图是可用的 `UIControl`，或带有可用的手势，并且可见、`userInteractionEnabled` 为 YES 时接收触摸；
- *      超出 PlusButton 范围的子视图同样有效。TabBar 会先询问此方法，所以这类子视图（如直播间最小化后的封面与关闭按钮）
- *      能响应各自的事件；其他位置仍交给 PlusButton。如需所有触摸都交给 PlusButton，可重写并返回 nil。
- */
-- (nullable UIView *)hitTestInteractiveSubview:(CGPoint)point withEvent:(nullable UIEvent *)event;
-
-/*!
- * [EN] Issue #636. YES with Liquid Glass when the plus button has a title and its class returns YES from
- *      `+alignsTitleWithTabBarItemTitles`: the title is shown by the tab item under the plus button (`tabBarItem.title` of
- *      the plus button's view controller, or of the placeholder without one, drawn by the system in both Liquid Glass
- *      layers), and the plus button keeps only its image, in place of the tab icon. NO without a title: the plus button
- *      keeps covering the whole tab item.
- * [CN] Issue #636。液态玻璃下，PlusButton 有标题，且其类的 `+alignsTitleWithTabBarItemTitles` 返回 YES 时为 YES：标题由 PlusButton
- *      下方的 TabBarItem 显示（PlusButton 子控制器的 `tabBarItem.title`，没有子控制器时为占位控制器的，由系统在液态玻璃的两个图层中
- *      绘制），PlusButton 只保留图片，替换 Tab 的图标。没有标题时为 NO：PlusButton 仍覆盖整个 TabBarItem。
- */
-- (BOOL)cyl_showsTitleInTabBarItem;
-
-/*!
- * [EN] Liquid Glass, a plus button without a title: it replaces the whole tab item and is centered on it, ignoring
- *      `+multiplierOfTabBarHeight:` and `+constantOfPlusButtonCenterYOffsetForTabBarHeight:` (NO, the default). Set YES
- *      (e.g. in `+plusButton`) to place it with those methods. No effect with a title or in another style, where those
- *      methods always apply, nor in the iOS 27.1 vertical bar (iPhone Duo), where the plus button is always centered on
- *      its tab.
- * [CN] 液态玻璃下没有标题的 PlusButton：替换整个 TabBarItem 并居中，忽略 `+multiplierOfTabBarHeight:` 与
- *      `+constantOfPlusButtonCenterYOffsetForTabBarHeight:`（NO，默认值）。设为 YES（如在 `+plusButton` 中）则用这两个方法计算
- *      高度。有标题或其他样式时无效，始终使用这两个方法；iOS 27.1 竖向栏（iPhone Duo）中也无效，PlusButton 始终居中于其 Tab。
- */
-@property (nonatomic, assign, getter=cyl_appliesCenterYOffsetWithoutTitle, setter=cyl_setAppliesCenterYOffsetWithoutTitle:) BOOL cyl_appliesCenterYOffsetWithoutTitle;
-
-/*!
- * [EN] A plus button with `image` above its title, both centered (the image 70 % of the button's width). The titles go
- *      through `CYLLocalizedString()`; the normal title is gray, the selected one `selectedTitleColor` (default blue).
- *      The button does not darken on touch and is sized to fit. Call it on your subclass in `+plusButton`:
- *
- *          static func plusButton() -> Any {
- *              CYLPlusButtonSubclass.cyl_plusButton(with: UIImage(named: "post_normal")!, title: "发布",
- *                                                   selectedTitle: "选中", selectedTitleColor: .blue)
- *          }
- * [CN] 图片在上、标题在下且都居中的 PlusButton（图片宽度为按钮宽度的 70%）。标题经过 `CYLLocalizedString()`；普通状态标题为灰色，
- *      选中状态为 `selectedTitleColor`（默认蓝色）。按下时不变暗，并自动调整尺寸。在子类的 `+plusButton` 中调用（示例见上）。
- */
-+ (instancetype)cyl_plusButtonWithImage:(UIImage *)image
-                                  title:(NSString *)title
-                          selectedTitle:(nullable NSString *)selectedTitle
-                     selectedTitleColor:(nullable UIColor *)selectedTitleColor;
-
-/*!
- * [EN] Removes the plus button registered for this class's context from its superview, together with its child view
- *      controller, and unregisters them. The plus buttons of other contexts are not touched. When called on
- *      `CYLPlusButton` itself, which has no context of its own, it removes the one `CYLExternPlusButton` points at, as before.
- * [CN] 将本类所属 context 注册的 PlusButton 及其子控制器从父视图移除并取消注册，其他 context 的 PlusButton 不受影响。
- *      直接对没有自己 context 的 `CYLPlusButton` 调用时，与以前一样移除 `CYLExternPlusButton` 指向的那一个。
- */
-+ (void)removePlusButton;
-
-/*!
- * [EN] Same as `+removePlusButton`, for the given context.
- * [CN] 与 `+removePlusButton` 相同，作用于指定的 context。
- */
-+ (void)removePlusButtonForTabBarContext:(NSString *)tabBarContext;
-
-#pragma mark - Plus buttons by context
-
-/*!
- * [EN] The registry maps a context to its plus button, plus child view controller and plus button width. A plus button
- *      is bound to a CYLTabBarController, through the controller's `context`. The controller's `-hasPlusButton` and
- *      `-hasPlusChildViewController` read the registry, and its tab bar (system or flat design) asks the controller that
- *      owns it, so several tab bar controllers with different contexts each get their own plus button. Tab bar
- *      controllers that share a context each get their own too: the first one shows the registered instance, every other
- *      one an instance of the same class from `+plusButton` (and `+plusChildViewController`), since a view can only be in
- *      one tab bar. A `+plusButton` that always returns the same instance can still only be shown by one of them.
- * [CN] 注册表将 context 映射到对应的 PlusButton、PlusButton 子控制器和 PlusButton 宽度。PlusButton 绑定的是 CYLTabBarController，
- *      通过控制器的 `context`。控制器的 `-hasPlusButton`、`-hasPlusChildViewController` 读取注册表，它的 TabBar（系统样式或扁平样式）
- *      则向拥有它的控制器询问，因此 context 不同的多个 TabBarController 各自使用自己的 PlusButton。
- *      context 相同的多个 TabBarController 也各自有自己的 PlusButton：第一个展示已注册的实例，其余每个展示同一个类通过
- *      `+plusButton`（及 `+plusChildViewController`）创建的实例，因为一个 View 只能在一个 TabBar 中。若 `+plusButton` 总是返回同一个实例，
- *      则仍然只能在其中一个 TabBarController 中展示。
- *
- *      Example:
- *      @code
- *      [HomePlusButton registerPlusButton];     // +tabBarContext returns @"home"
- *      [MinePlusButton registerPlusButton];     // +tabBarContext returns @"mine"
- *      CYLTabBarController *home = [[CYLTabBarController alloc] initWithViewControllers:… tabBarItemsAttributes:… context:@"home"];
- *      CYLTabBarController *mine = [[CYLTabBarController alloc] initWithViewControllers:… tabBarItemsAttributes:… context:@"mine"];
- *      [CYLPlusButton plusButtonForTabBarContext:@"home"];   // the HomePlusButton instance
- *      @endcode
- */
-
-/*!
- * [EN] Returns the plus button registered for `tabBarContext`, or nil.
- * [CN] 返回为 tabBarContext 注册的 PlusButton，没有则返回 nil。
- */
-+ (nullable CYLPlusButton<CYLPlusButtonSubclassing> *)plusButtonForTabBarContext:(nullable NSString *)tabBarContext;
-
-/*!
- * [EN] Returns the plus child view controller registered for `tabBarContext`, or nil.
- * [CN] 返回为 tabBarContext 注册的 PlusButton 子控制器，没有则返回 nil。
- */
-+ (nullable UIViewController *)plusChildViewControllerForTabBarContext:(nullable NSString *)tabBarContext;
-
-/*!
- * [EN] Returns the width of the plus button registered for `tabBarContext`, or 0.
- * [CN] 返回为 tabBarContext 注册的 PlusButton 的宽度，没有则返回 0。
- */
-+ (CGFloat)plusButtonWidthForTabBarContext:(nullable NSString *)tabBarContext;
-
-/*!
- * [EN] The context of the CYLTabBarController `owner` belongs to: the controller itself, its tab bar, a view inside the
- *      tab bar (a tab button, the plus button), or a view controller (a tab's view controller, the plus child view controller). If it cannot be told,
- *      the context of the plus button registered last, which is what the global `CYLExternPlusButton` points at.
- * [CN] `owner` 所属 CYLTabBarController 的 context：控制器本身、它的 TabBar、TabBar 内的 View（Tab 按钮、PlusButton）或 ViewController
- *      （Tab 的控制器、PlusButton 子控制器）。无法判断时，返回最后注册的 PlusButton 的 context，即全局 `CYLExternPlusButton` 所指的那个。
- */
-+ (nullable NSString *)tabBarContextForOwner:(nullable id)owner;
-
-/*!
- * [EN] The plus button / plus child view controller / plus button width of `owner`. Inside a CYLTabBarController: the
- *      ones that controller shows (its own when it shares its context with another one). Otherwise the registered ones
- *      of the context of `owner` (see `+tabBarContextForOwner:`).
- * [CN] `owner` 的 PlusButton / PlusButton 子控制器 / PlusButton 宽度。在 CYLTabBarController 内：该控制器展示的那个（与其他控制器
- *      共用 context 时是它自己的那份）。否则取 `owner` 所属 context（见 `+tabBarContextForOwner:`）注册的那个。
- */
-+ (nullable CYLPlusButton<CYLPlusButtonSubclassing> *)plusButtonForOwner:(nullable id)owner;
-+ (nullable UIViewController *)plusChildViewControllerForOwner:(nullable id)owner;
-+ (CGFloat)plusButtonWidthForOwner:(nullable id)owner;
-
-/*!
- * [EN] Returns YES if `view` is the plus button of any context (the registered instance, or an instance of a registered class).
- * [CN] 判断 `view` 是否是任意 context 的 PlusButton（已注册的实例，或已注册类的实例）。
- */
-+ (BOOL)isPlusButtonView:(nullable UIView *)view;
-
-/*!
- * [EN] Action for plus button taps; selects the plus child view controller when appropriate.
- * [CN] PlusButton 的点击事件，在需要时选中 PlusButton 对应的子控制器。
- */
-- (void)plusChildViewControllerButtonClicked:(UIButton<CYLPlusButtonSubclassing> *)sender;
-
-/*!
- * plusButton state:
- * Register + Context match == Active
- * [EN] Returns `+tabBarContext` if implemented and non-empty, otherwise "CYLTabBarController".
- * [CN] 若实现了 +tabBarContext 且非空则返回其值，否则返回 "CYLTabBarController"。
- */
-+ (NSString *)matchedTabBarContext;
-
-/*!
- * [EN] Returns YES if a plus button is registered for `tabBarContext`.
- * [CN] 判断是否为 tabBarContext 注册了 PlusButton。
- */
-+ (BOOL)hasPlusButtonForTabBarContext:(NSString *)tabBarContext;
-
-/*!
- * [EN] Returns YES if a plus child view controller is registered for `tabBarContext`.
- * [CN] 判断是否为 tabBarContext 注册了 PlusButton 子控制器。
- */
-+ (BOOL)hasPlusChildViewControllerForTabBarContext:(NSString *)tabBarContext;
-
-/*!
- * [EN] Returns the centerY multiplier for `tabBarHeight`, from `+multiplierOfTabBarHeight:` or a computed default.
- * [CN] 返回 tabBarHeight 对应的中心点比例，取自 +multiplierOfTabBarHeight:，未实现时使用计算出的默认值。
- */
-- (CGFloat)multiplierOfTabBarHeight:(CGFloat)tabBarHeight;
-
-/*!
- * [EN] Returns the centerY offset from `+constantOfPlusButtonCenterYOffsetForTabBarHeight:`, or 0 if not implemented.
- * [CN] 返回 +constantOfPlusButtonCenterYOffsetForTabBarHeight: 提供的中心点偏移，未实现时返回 0。
- */
-- (CGFloat)constantOfPlusButtonCenterYOffsetForTabBarHeight:(CGFloat)tabBarHeight;
-
-/*!
- * [EN] Returns the plus button index for the given item count: `+indexOfPlusButtonInTabBar` if implemented, otherwise the middle (asserts in DEBUG when the count is odd).
- * [CN] 根据 TabBarItem 个数返回 PlusButton 索引：优先使用 +indexOfPlusButtonInTabBar，否则取中间位置（个数为奇数时 DEBUG 下会断言）。
- */
-+ (NSUInteger)indexForTabbarItemsCount:(NSUInteger)tabbarItemsCount;
-
-/*!
- * [EN] Liquid Glass only. Hides or shows the plus button's title label and inversely toggles the selected-content label.
- * [CN] 仅液态玻璃下生效。隐藏或显示 PlusButton 的标题 Label，并反向切换选中态内容的 Label。
- */
-- (void)setTabLabelHidden:(BOOL)hidden;
-
-/*!
- * FIX: issue #601
- * [EN] The title the plus button shows: its own, or, when it is shown by the tab item under it (Liquid Glass,
- *      `-cyl_showsTitleInTabBarItem`), that one. nil without a title.
- * [CN] PlusButton 显示的标题：它自己的，或由其下方 TabBarItem 显示时（液态玻璃，`-cyl_showsTitleInTabBarItem`）的那个。没有标题时为 nil。
- */
-- (nullable NSString *)cyl_title;
-
-/*!
- * FIX: issue #601
- * [EN] Changes the plus button in place, in every style: `title` (nil keeps it), shown by the plus button or by the tab
- *      item under it (Liquid Glass, `-cyl_showsTitleInTabBarItem`); `image` (normal and highlighted) and `selectedImage`
- *      (nil keeps them), drawn as given, also on its stand-in in the Liquid Glass selected layer. See
- *      `-[CYLTabBarController updatePlusButtonWithAttributes:]` for images from names, paths or URLs.
- *      With a plus child view controller on Liquid Glass (not FlatDesign), `selectedImage` stays on the plus button but its
- *      stand-in ignores it and shows the normal image. FlatDesign and the classic tab bar use it: https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/PlusButton.md
- * [CN] 原地修改 PlusButton，适用于所有样式：`title`（nil 保持不变），由 PlusButton 或其下方的 TabBarItem 显示（液态玻璃，
- *      `-cyl_showsTitleInTabBarItem`）；`image`（普通与高亮状态）和 `selectedImage`（nil 保持不变）按原样绘制，液态玻璃选中图层中的替身
- *      也会更新。图片来自图片名、路径或 URL 时，见 `-[CYLTabBarController updatePlusButtonWithAttributes:]`。
- *      有 PlusButton 子控制器且为液态玻璃（非扁平样式）时，`selectedImage` 保留在 PlusButton 上，但替身忽略它并显示普通状态的图片；
- *      扁平样式与经典 TabBar 使用它。见上面的链接。
- */
-- (void)cyl_updateTitle:(nullable NSString *)title image:(nullable UIImage *)image selectedImage:(nullable UIImage *)selectedImage;
-
-@end
-
-@interface CYLPlusButton (CYLConfigurationPlusButton)
-
-/*!
- * [EN] Registers a plus button made from attributes for `context` (nil: the default context), the way
- *      `CYLTabBarControllerPlusButton` of a configuration does: `CYLTabBarItemTitle`, `CYLTabBarItemImage` (a UIImage),
- *      `CYLTabBarItemSelectedTitle`, `CYLTabBarItemSelectedTitleColor` (a UIColor). `action` runs on each tap. Without an
- *      image, nothing is registered. Each context keeps its own plus button, attributes and action; registering again for
- *      the same context replaces them.
- * [CN] 根据属性为 `context`（nil 为默认 context）注册一个 PlusButton，与配置中的 `CYLTabBarControllerPlusButton` 相同：
- *      `CYLTabBarItemTitle`、`CYLTabBarItemImage`（UIImage）、`CYLTabBarItemSelectedTitle`、`CYLTabBarItemSelectedTitleColor`（UIColor）。
- *      每次点击执行 `action`。没有图片时不注册。每个 context 有自己的 PlusButton、属性与点击回调；为同一 context 再次注册会替换它们。
- */
-+ (void)cyl_registerPlusButtonWithAttributes:(NSDictionary<NSString *, id> *)attributes
-                                      action:(nullable void (^)(CYLPlusButton *plusButton))action
-                                     context:(nullable NSString *)context;
-
-@end
-
-#pragma mark - Deprecated API
-
-@interface CYLPlusButton (CYLPlusButtonDeprecated)
-
-/*!
- * [EN] Deprecated. Use `+registerPlusButton` instead.
- * [CN] 已废弃，请改用 +registerPlusButton。
- */
-+ (void)registerSubclass CYL_DEPRECATED("Deprecated in 1.6.0. Use `+[CYLPlusButton registerPlusButton]` instead.");
-
-/*!
- * [EN] Deprecated. Use `+multiplierOfTabBarHeight:` instead.
- * [CN] 已废弃，请改用 +multiplierOfTabBarHeight:。
- */
-+ (CGFloat)multiplerInCenterY CYL_DEPRECATED("Deprecated in 1.6.0. Use `+multiplierOfTabBarHeight:` instead.");
-
-@end
 
 NS_ASSUME_NONNULL_END
+
+#import "CYLSwiftInterface.h"
