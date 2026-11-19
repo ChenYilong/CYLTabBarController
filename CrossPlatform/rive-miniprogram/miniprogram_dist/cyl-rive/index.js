@@ -40,7 +40,7 @@ function cylIsDevTools() {
   try {
     const info = typeof wx.getDeviceInfo === 'function' ? wx.getDeviceInfo() : wx.getSystemInfoSync()
     return info.platform === 'devtools'
-  } catch (error) {
+  } catch {
     return false
   }
 }
@@ -70,7 +70,7 @@ function cylLoadRuntime(wasmPath) {
           .then((result) => success(result.instance))
           .catch((error) => {
             cylRuntime = null
-            console.error(`cyl-rive: loading ${wasmPath} failed: ${error && error.message}`)
+            console.error(`cyl-rive: loading ${wasmPath} failed: ${error ? error.message : error}`)
           })
         return {}
       },
@@ -88,7 +88,7 @@ function cylPixelRatio() {
 }
 
 function cylReadBytes(path, callback) {
-  const userData = (wx.env && wx.env.USER_DATA_PATH) || ''
+  const userData = wx.env?.USER_DATA_PATH || ''
   if (/^https?:\/\//.test(path) && !(userData && path.indexOf(userData) === 0)) {
     wx.request({
       url: path,
@@ -270,11 +270,11 @@ Component({
         .select(`#${this.data.cylCanvasId}`)
         .fields({ node: true, size: true })
         .exec((result) => {
-          const info = result && result[0]
+          const info = result?.[0]
           if (token !== this.cylLoadToken || !this.cylReady) {
             return
           }
-          if (!info || !info.node) {
+          if (!info?.node) {
             this.cyl_reportError( { message: 'cyl-rive: the canvas node is not available.' })
             return
           }
@@ -289,7 +289,7 @@ Component({
             }
             cylLoadRuntime(this.data.wasmPath || CYL_DEFAULT_WASM)
               .then((rive) => this.cyl_start(rive, canvas, bytes, options, token))
-              .catch((failure) => this.cyl_reportError( { message: `cyl-rive: ${failure && failure.message}` }))
+              .catch((error_) => this.cyl_reportError( { message: `cyl-rive: ${error_ ? error_.message : error_}` }))
           })
         })
     },
@@ -375,15 +375,15 @@ Component({
           state.instance.bindViewModelInstance(viewModelInstance)
         }
         return viewModelInstance
-      } catch (error) {
+      } catch {
         return null
       }
     },
 
     cyl_inputNames() {
-      const instance = this.cylState && this.cylState.instance
+      const instance = this.cylState?.instance
       const names = []
-      if (instance && instance.inputCount) {
+      if (instance?.inputCount) {
         for (let index = 0; index < instance.inputCount(); index += 1) {
           names.push(instance.input(index).name)
         }
@@ -396,8 +396,8 @@ Component({
      * [CN] 该名称的状态机输入，没有时返回 null。
      */
     cyl_input(name) {
-      const instance = this.cylState && this.cylState.instance
-      if (!instance || !instance.inputCount) {
+      const instance = this.cylState?.instance
+      if (!instance?.inputCount) {
         return null
       }
       for (let index = 0; index < instance.inputCount(); index += 1) {
@@ -411,7 +411,7 @@ Component({
 
     cyl_scheduleFrame() {
       const state = this.cylState
-      if (!state || !state.canvas.requestAnimationFrame) {
+      if (!state?.canvas.requestAnimationFrame) {
         return
       }
       state.frame = state.canvas.requestAnimationFrame((time) => this.cyl_drawFrame(time))
@@ -473,7 +473,7 @@ Component({
 
     /** [EN] Reads the canvas into the <image> (WeChat DevTools only). [CN] 把画布内容读入 <image>（仅微信开发者工具）。 */
     cyl_captureSnapshot() {
-      const canvas = this.cylState && this.cylState.canvas
+      const canvas = this.cylState?.canvas
       if (!canvas || typeof canvas.toDataURL !== 'function') {
         return
       }
@@ -497,7 +497,7 @@ Component({
     cyl_playFromStart(offset) {
       // [EN] `offset` (seconds) continues a playback another tab bar started: each tab page has its own tab bar.
       // [CN] `offset`（秒）继续另一个 TabBar 已开始的播放：每个 Tab 页面都有自己的 TabBar。
-      const seconds = Number(offset) > 0 ? Number(offset) : 0
+      const seconds = Math.max(0, Number(offset) || 0)
       const state = this.cylState
       if (!state) {
         // [EN] A play request made while the file loads (a new tab page's tab bar selects its tab at once) runs when it is ready.
@@ -566,7 +566,7 @@ Component({
             }, Math.max(0, options.duration - seconds) * 1000 / speed)
           }
         }
-        const isOn = boolInput ? boolInput.asBool().value === true : !!(activeProperty && activeProperty.value)
+        const isOn = boolInput ? boolInput.asBool().value === true : !!activeProperty?.value
         if (isOn) {
           setActive(false)
           const offMs = this.data.loop && !(options.duration > 0)
@@ -626,7 +626,7 @@ Component({
 
     /** [EN] A linear animation's length in seconds (0 when unknown). [CN] 线性动画的时长（秒，未知时为 0）。 */
     cyl_animationSeconds(instance) {
-      const animation = instance && instance.animation
+      const animation = instance?.animation
       if (animation && Number(animation.duration) > 0 && Number(animation.fps) > 0) {
         return Number(animation.duration) / Number(animation.fps)
       }

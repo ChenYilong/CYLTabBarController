@@ -73,8 +73,8 @@ function cylStateKey(state) {
  *      badgeTextAttributes}, selected: {…}}}。
  */
 function cylAppearanceState(appearance, selected) {
-  const layout = appearance && appearance.stackedLayoutAppearance;
-  return (layout && layout[selected ? 'selected' : 'normal']) || {};
+  const layout = appearance?.stackedLayoutAppearance;
+  return layout?.[selected ? 'selected' : 'normal'] || {};
 }
 
 /**
@@ -102,8 +102,8 @@ function cylItemModel(p) {
   const imageMoveX = imageOffset.horizontal + (imageInsets.left - imageInsets.right) / 2;
   const imageMoveY = imageOffset.vertical + (imageInsets.top - imageInsets.bottom) / 2;
   const iconTint = reader.cylColor(appearance.iconColor) || reader.cylColor(selected ? p.selectedIconTint : p.iconTint);
-  const titleAttributes = (p.titleTextAttributes && p.titleTextAttributes[stateKey])
-    || (selected && p.titleTextAttributes && p.titleTextAttributes.normal) || null;
+  const titleAttributes = p.titleTextAttributes?.[stateKey]
+    || (selected && p.titleTextAttributes?.normal) || null;
   // [EN] The animation's one color (the `tint` option): "title" takes this state's title color (the appearance's, then
   //      the title attributes'), like iOS and HarmonyOS; a color is used as it is; '' keeps the file's colors.
   // [CN] 动画的单一颜色（`tint` 选项）："title" 取当前状态的标题颜色（先取 appearance，再取标题属性），与 iOS 和鸿蒙一致；
@@ -112,8 +112,8 @@ function cylItemModel(p) {
   const animationTint = tintOption.toLowerCase() === 'title'
     ? (cylTextColor(appearance.titleTextAttributes) || cylTextColor(titleAttributes))
     : reader.cylColor(tintOption);
-  const badgeAttributes = (p.badgeTextAttributes && p.badgeTextAttributes[stateKey])
-    || (selected && p.badgeTextAttributes && p.badgeTextAttributes.normal) || null;
+  const badgeAttributes = p.badgeTextAttributes?.[stateKey]
+    || (selected && p.badgeTextAttributes?.normal) || null;
   const badgeValue = String(p.badgeValue === undefined || p.badgeValue === null ? '' : p.badgeValue);
   const showsBadge = badgeValue !== '' || Boolean(badgeSize);
   const background = reader.cylColor(selected ? p.selectedBackgroundColor : p.backgroundColor);

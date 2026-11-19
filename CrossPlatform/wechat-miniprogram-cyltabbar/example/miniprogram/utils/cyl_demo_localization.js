@@ -37,7 +37,7 @@ function cylSystemLanguage() {
   try {
     const info = typeof wx.getAppBaseInfo === 'function' ? wx.getAppBaseInfo() : wx.getSystemInfoSync();
     language = String(info.language || 'en').replace('_', '-');
-  } catch (error) {
+  } catch {
     language = 'en';
   }
   const lower = language.toLowerCase();
@@ -70,7 +70,7 @@ function cylIsRightToLeft() {
 function t(key) {
   const own = cylLanguage(cylDemoStrings);
   const table = own !== 'en' ? cylDemoStrings[own] : (cylMoreTable()[key] !== undefined ? cylMoreTable() : cylDemoStrings.en);
-  return (table && table[key]) || key;
+  return table?.[key] || key;
 }
 
 /**

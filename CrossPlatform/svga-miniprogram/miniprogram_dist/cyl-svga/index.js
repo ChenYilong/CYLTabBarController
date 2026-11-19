@@ -21,7 +21,7 @@ function cylIsDevTools() {
   try {
     const info = typeof wx.getDeviceInfo === 'function' ? wx.getDeviceInfo() : wx.getSystemInfoSync()
     return info.platform === 'devtools'
-  } catch (error) {
+  } catch {
     return false
   }
 }
@@ -48,7 +48,7 @@ function cylPixelRatio() {
  * [CN] 把 SVGA 文件读为 ArrayBuffer：http(s) 使用 wx.request，其他使用文件系统。
  */
 function cylReadSVGA(path, callback) {
-  const userData = (wx.env && wx.env.USER_DATA_PATH) || ''
+  const userData = wx.env?.USER_DATA_PATH || ''
   if (/^https?:\/\//.test(path) && !(userData && path.indexOf(userData) === 0)) {
     wx.request({
       url: path,
@@ -187,11 +187,11 @@ Component({
         .select(`#${this.data.cylCanvasId}`)
         .fields({ node: true, size: true })
         .exec((result) => {
-          const info = result && result[0]
+          const info = result?.[0]
           if (token !== this.cylLoadToken || !this.cylReady) {
             return
           }
-          if (!info || !info.node) {
+          if (!info?.node) {
             this.cyl_reportError( { message: 'cyl-svga: the canvas node is not available.' })
             return
           }
@@ -337,7 +337,7 @@ Component({
 
     /** [EN] Plays from the beginning (a tab that becomes selected); `offset` seconds continue another bar's playback. [CN] 从头播放（Tab 被选中时）；`offset` 秒继续另一个 TabBar 的播放。 */
     cyl_playFromStart(offset) {
-      const seconds = Number(offset) > 0 ? Number(offset) : 0
+      const seconds = Math.max(0, Number(offset) || 0)
       const movie = this.cylMovie
       if (!movie) {
         this.cylPendingPlay = { seconds, requestedAt: Date.now() }

@@ -5,8 +5,8 @@
  * [CN] `npm run setup [-- --animation=lottie|pag|rive|gif]` 与 `npm run check`：依次运行组件安装脚本、共用资源同步脚本
  *      与代码包大小检查（2 MB），使用相同的参数（npm 只把额外参数传给最后一个命令）。
  */
-const { execFileSync } = require('child_process')
-const path = require('path')
+const { execFileSync } = require('node:child_process')
+const path = require('node:path')
 
 const argv = process.argv.slice(2)
 for (const script of ['cyl_install_components.js', 'cyl_sync_shared.js', 'cyl_check_package_size.js']) {

@@ -141,11 +141,11 @@ Component({
 
   methods: {
     cyl_update() {
-      const properties = Object.assign({}, this.data);
+      const properties = { ...this.data };
       ['title', 'badge'].forEach((kind) => {
-        const set = this.cylAttributes && this.cylAttributes[kind];
+        const set = this.cylAttributes?.[kind];
         if (set && Object.keys(set).length > 0) {
-          properties[`${kind}TextAttributes`] = Object.assign({}, properties[`${kind}TextAttributes`] || {}, set);
+          properties[`${kind}TextAttributes`] = { ...properties[`${kind}TextAttributes`], ...set };
         }
       });
       const model = cylItemModel(properties);
@@ -178,7 +178,7 @@ Component({
     /** [EN] `-titleTextAttributesForState:`. [CN] 返回指定状态的标题文字属性。 */
     cyl_titleTextAttributesForState(state) {
       const key = cylStateKey(state);
-      return this.cylAttributes.title[key] || (this.data.titleTextAttributes || {})[key] || null;
+      return this.cylAttributes.title[key] || this.data.titleTextAttributes?.[key] || null;
     },
 
     /** [EN] `-setBadgeTextAttributes:forState:`. [CN] 设置指定状态的角标文字属性。 */
@@ -190,7 +190,7 @@ Component({
     /** [EN] `-badgeTextAttributesForState:`. [CN] 返回指定状态的角标文字属性。 */
     cyl_badgeTextAttributesForState(state) {
       const key = cylStateKey(state);
-      return this.cylAttributes.badge[key] || (this.data.badgeTextAttributes || {})[key] || null;
+      return this.cylAttributes.badge[key] || this.data.badgeTextAttributes?.[key] || null;
     },
 
     /**

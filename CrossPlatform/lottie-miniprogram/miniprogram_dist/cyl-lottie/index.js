@@ -29,7 +29,7 @@ function cylIsDevTools() {
   try {
     const info = typeof wx.getDeviceInfo === 'function' ? wx.getDeviceInfo() : wx.getSystemInfoSync()
     return info.platform === 'devtools'
-  } catch (error) {
+  } catch {
     return false
   }
 }
@@ -124,7 +124,7 @@ Component({
     },
     'loop, autoplay, restingFrame': function (loop, autoplay) {
       const animation = this.cylAnimation
-      if (!animation || !animation.isLoaded) {
+      if (!animation?.isLoaded) {
         return
       }
       animation.setLoop(loop)
@@ -242,11 +242,11 @@ Component({
         .select(`#${this.data.cylCanvasId}`)
         .fields({node: true, size: true})
         .exec((result) => {
-          const info = result && result[0]
+          const info = result?.[0]
           if (token !== this.cylLoadToken || !this.cylReady) {
             return
           }
-          if (!info || !info.node) {
+          if (!info?.node) {
             this.cyl_reportError({message: 'cyl-lottie: the canvas node is not available.'})
             return
           }
@@ -326,10 +326,10 @@ Component({
         animation.addEventListener('loopComplete', () => this.triggerEvent('loopcomplete', {}))
         animation.addEventListener('error', (event) => {
           const native = event && (event.nativeError || event)
-          this.cyl_reportError({message: (native && native.message) || 'cyl-lottie: rendering failed.'})
+          this.cyl_reportError({message: native?.message || 'cyl-lottie: rendering failed.'})
         })
         animation.addEventListener('data_failed', (error) => {
-          this.cyl_reportError({message: (error && error.message) || 'cyl-lottie: loading failed.'})
+          this.cyl_reportError({message: error?.message || 'cyl-lottie: loading failed.'})
         })
       } catch (error) {
         this.cyl_reportError({message: error.message})
@@ -351,7 +351,7 @@ Component({
 
     cyl_rest() {
       const animation = this.cyl_realAnimation()
-      if (!animation || !animation.totalFrames) {
+      if (!animation?.totalFrames) {
         return
       }
       const frame = this.data.restingFrame === 'last' ? Math.max(0, animation.totalFrames - 1) : 0
@@ -391,7 +391,7 @@ Component({
     cyl_playFromStart(offset) {
       // [EN] `offset` (seconds) continues a playback another tab bar started: each tab page has its own tab bar.
       // [CN] `offset`（秒）继续另一个 TabBar 已开始的播放：每个 Tab 页面都有自己的 TabBar。
-      const seconds = Number(offset) > 0 ? Number(offset) : 0
+      const seconds = Math.max(0, Number(offset) || 0)
       if (!this.cylAnimation) {
         // [EN] A play request made while the file loads (a new tab page's tab bar selects its tab at once) runs when it
         //      is ready; dropping it showed the selected icon on its last frame with no animation.

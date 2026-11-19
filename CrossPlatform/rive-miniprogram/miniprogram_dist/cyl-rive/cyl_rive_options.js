@@ -40,9 +40,9 @@ function cylRiveRoute(route) {
  */
 function cylRiveOptions(route, properties) {
   const { path, options } = cylRiveRoute(route)
-  const merged = Object.assign({}, options)
+  const merged = { ...options }
   CYL_OPTION_NAMES.forEach((key) => {
-    if (properties && properties[key] !== undefined && properties[key] !== null && properties[key] !== '') {
+    if (properties?.[key] !== undefined && properties[key] !== null && properties[key] !== '') {
       merged[key] = properties[key]
     }
   })

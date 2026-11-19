@@ -244,7 +244,7 @@ function cylDrawSVGAFrame(context, movie, bitmaps, frameIndex, width, height, fi
   context.clearRect(0, 0, width, height)
   let drawn = 0
   movie.sprites.forEach((sprite) => {
-    if (/\.matte$/.test(sprite.imageKey)) {
+    if (String(sprite.imageKey).endsWith('.matte')) {
       return
     }
     const frame = sprite.frames[index]

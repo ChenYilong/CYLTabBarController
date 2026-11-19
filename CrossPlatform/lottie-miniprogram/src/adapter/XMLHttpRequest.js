@@ -6,7 +6,7 @@ const _requestTask = new WeakMap()
 
 function _triggerEvent(type, ...args) {
   if (typeof this[`on${type}`] === 'function') {
-    this[`on${type}`].apply(this, args)
+    this[`on${type}`](...args)
   }
 }
 
@@ -79,6 +79,7 @@ export default class XMLHttpRequest {
   }
 
   overrideMimeType() {
+    // [EN] Not supported by wx.request: the response type is not overridden. [CN] wx.request 不支持：不覆盖响应类型。
   }
 
   send(data = '') {
@@ -126,7 +127,7 @@ export default class XMLHttpRequest {
         },
         fail: ({ errMsg }) => {
           // TODO 规范错误
-          if (errMsg.indexOf('abort') !== -1) {
+          if (errMsg.includes('abort')) {
             _triggerEvent.call(this, 'abort')
           } else {
             _triggerEvent.call(this, 'error', errMsg)

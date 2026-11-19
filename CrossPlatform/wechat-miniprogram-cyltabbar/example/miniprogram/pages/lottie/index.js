@@ -108,7 +108,7 @@ Page({
     wx.setClipboardData({ data: String(event.currentTarget.dataset.value) });
   },
   cyl_event(event) {
-    const message = event.detail && event.detail.message ? `: ${event.detail.message}` : '';
+    const message = event.detail?.message ? `: ${event.detail.message}` : '';
     const events = [`${event.type}${message}`].concat(this.data.events).slice(0, 4);
     this.setData({ events });
   },

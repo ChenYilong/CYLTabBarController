@@ -9,12 +9,13 @@ const { cylReadConfiguration } = require('cyl-tabbar-miniprogram/cyl-tab-bar/cyl
 const { cylDemoConfiguration, cylAvailableAnimationFiles } = require('./cyl_demo_configuration');
 const { t } = require('./cyl_demo_localization');
 
-const CYL_TAB = (title, identifier, extra) => Object.assign({
+const CYL_TAB = (title, identifier, extra) => ({
   CYLTabBarItemTitle: title,
   CYLTabBarItemImage: `/shared/skins/2.1.0/light/${identifier}@3x.png`,
   CYLTabBarItemSelectedImage: `/shared/skins/2.1.0/light/${identifier}_selected@3x.png`,
   CYLTabBarItemIdentifier: identifier,
-}, extra);
+  ...extra,
+});
 const CYL_TABS = () => [CYL_TAB('Home', 'home'), CYL_TAB('Message', 'message'), CYL_TAB('Discover', 'discover'), CYL_TAB('Me', 'me')];
 const CYL_JSON = (object) => JSON.stringify(object);
 
@@ -88,10 +89,11 @@ function cylLoad(text) {
 function cylRequest(options) {
   return (page) => {
     page.setData({ result: t('Loading…') });
-    const task = wx.request(Object.assign({
+    const task = wx.request({
       success: (response) => page.setData({ result: `HTTP ${response.statusCode}` }),
       fail: (error) => page.setData({ result: `${t('Failed, the default configuration is kept')}: ${error.errMsg}` }),
-    }, options));
+      ...options,
+    });
     if (options.cylCancel && task) {
       setTimeout(() => task.abort(), 50);
     }

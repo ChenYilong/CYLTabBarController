@@ -37,7 +37,7 @@ function cylTitleLine(slots) {
   const slot = slots.find((candidate) => candidate.item);
   const size = slot ? (slot.item.animationSize || slot.item.imageSize) : null;
   const match = /,\s*([\d.]+)\s*\}/.exec(size || '');
-  const offset = slot && slot.item.titlePositionAdjustment ? Number(slot.item.titlePositionAdjustment.vertical) : 0;
+  const offset = slot?.item.titlePositionAdjustment ? Number(slot.item.titlePositionAdjustment.vertical) : 0;
   return {
     iconHeight: match ? Number(match[1]) : CYL_ITEM_ICON_HEIGHT,
     titleOffset: Number.isFinite(offset) ? offset : 0,
@@ -75,7 +75,7 @@ function cylSystemTheme() {
   try {
     const info = typeof wx.getAppBaseInfo === 'function' ? wx.getAppBaseInfo() : wx.getSystemInfoSync();
     return info.theme === 'dark' ? 'dark' : 'light';
-  } catch (error) {
+  } catch {
     return 'light';
   }
 }
@@ -253,7 +253,7 @@ Component({
           // [CN] PlusButton 的位置按其前面的 Tab 计算；隐藏的 Tab 不再占位。
           const hiddenBefore = model.items.slice(0, model.plusButton.index).filter((item) => hidden.includes(item.identifier)).length;
           model.plusButton = hidden.includes(model.plusButton.identifier)
-            ? null : Object.assign({}, model.plusButton, { index: model.plusButton.index - hiddenBefore });
+            ? null : { ...model.plusButton, index: model.plusButton.index - hiddenBefore };
         }
         model.items = model.items.filter((item) => !hidden.includes(item.identifier));
       }
@@ -325,7 +325,7 @@ Component({
       if (!item) {
         return;
       }
-      const recordKey = `${(this.cylModel && this.cylModel.context) || ''}/${key}`;
+      const recordKey = `${this.cylModel?.context || ''}/${key}`;
       const elapsed = Date.now() - cylPlayback.startedAt;
       if (cylPlayback.key === recordKey && elapsed < CYL_PLAYBACK_WINDOW) {
         item.cyl_playAnimation(elapsed / 1000);
@@ -369,7 +369,7 @@ Component({
         animationPath: lottie ? ((isDarkBar && lottie.darkPath) || lottie.path) : '',
         animationSize: lottie ? `{${lottie.width}, ${lottie.height}}` : null,
         animationColors: lottie ? ((isDarkBar && lottie.darkColors) || lottie.colors) : null,
-        loopsWhenUnselected: Boolean(lottie && lottie.loopsWhenUnselected),
+        loopsWhenUnselected: Boolean(lottie?.loopsWhenUnselected),
         // [EN] The `tint` option; a dark bar takes `darkTint` when set. [CN] `tint` 选项；深色 TabBar 有 `darkTint` 时用它。
         animationTint: lottie ? ((isDarkBar && lottie.darkTint) || lottie.tint || '') : '',
         imageSize: item.imageSize ? `{${item.imageSize.width}, ${item.imageSize.height}}` : null,
@@ -620,12 +620,12 @@ Component({
       }
       const item = model.items.find((candidate) => candidate.identifier === key);
       // [EN] A tab's own animation wins (viewController.cyl_tabButtonAnimation). [CN] Tab 自己的动画优先。
-      const name = (item && item.tapAnimation) || model.tapAnimation;
+      const name = item?.tapAnimation || model.tapAnimation;
       if (!name || name === 'none') {
         return;
       }
       clearTimeout(this.cylAnimationTimer);
-      const fireworks = model.playsFireworks && (!item || !item.tapAnimation) ? this.cyl_fireworks(key) : null;
+      const fireworks = model.playsFireworks && !item?.tapAnimation ? this.cyl_fireworks(key) : null;
       this.setData({ cylAnimatingIdentifier: '', cylFireworks: null }, () => {
         this.setData({ cylAnimatingIdentifier: key, cylAnimatingName: name, cylFireworks: fireworks });
         this.cylAnimationTimer = setTimeout(() => this.setData({ cylAnimatingIdentifier: '', cylFireworks: null }),
@@ -639,7 +639,7 @@ Component({
      */
     cyl_playSelectedTapAnimation() {
       const model = this.cylModel;
-      const key = this.data.selectedIdentifier || (model && model.items[0] ? model.items[0].identifier : '');
+      const key = this.data.selectedIdentifier || (model?.items[0] ? model.items[0].identifier : '');
       this.cyl_playTapAnimation(key);
     },
 
@@ -714,7 +714,7 @@ Component({
         return false;
       }
       const plus = model.plusButton;
-      const slots = this.data.cylSlots.filter((slot) => !slot.isPlusButton || (plus && plus.hasPage));
+      const slots = this.data.cylSlots.filter((slot) => !slot.isPlusButton || plus?.hasPage);
       const current = this.data.selectedIdentifier || (model.items[0] ? model.items[0].identifier : '');
       const index = slots.findIndex((slot) => slot.key === current);
       const next = slots[index + (step > 0 ? 1 : -1)];
@@ -729,7 +729,7 @@ Component({
 
     cyl_selectAdjacent(step) {
       const model = this.cylModel;
-      if (!model || !model.swipeToSwitchTab) {
+      if (!model?.swipeToSwitchTab) {
         return false;
       }
       const current = this.data.selectedIdentifier || (model.items[0] ? model.items[0].identifier : '');
@@ -759,7 +759,7 @@ Component({
       // [EN] As iOS, attributes set before cyl_showBadgeValue stay until the badge is removed: pass them to change them.
       // [CN] 与 iOS 一样，在 cyl_showBadgeValue 之前设置的属性一直保留到角标被移除：传入属性以修改。
       if (attributes) {
-        this.cylBadgeAttributes[identifier] = Object.assign({}, attributes);
+        this.cylBadgeAttributes[identifier] = { ...attributes };
       }
       this.cyl_render();
     },
@@ -819,7 +819,7 @@ Component({
       if (requested !== '' && requested !== null && requested !== undefined) {
         return cylTabBarItemStyle(requested);
       }
-      return cylTabBarItemStyleForStyleType((model || this.cylModel || {}).styleType);
+      return cylTabBarItemStyleForStyleType((model || this.cylModel)?.styleType);
     },
 
     /**

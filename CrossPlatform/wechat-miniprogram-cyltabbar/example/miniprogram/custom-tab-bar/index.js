@@ -38,7 +38,7 @@ Component({
       ['Home', 'Refresh', 'Nearby', 'Messages', 'Me', 'Post'].forEach((title) => {
         titles[title] = t(title);
       });
-      this.setData({ strings: Object.assign({}, cylConfigurationTable(), titles), rtl: cylIsRightToLeft() });
+      this.setData({ strings: { ...cylConfigurationTable(), ...titles }, rtl: cylIsRightToLeft() });
       this.cyl_apply(app.globalData.cylTabBarState);
       this.cylUnsubscribe = app.cyl_subscribe((state) => this.cyl_apply(state));
     },
@@ -86,7 +86,7 @@ Component({
         const covers = state.covers || {};
         Object.keys(covers).forEach((identifier) => {
           const cover = covers[identifier];
-          tabBar.cyl_setCoverImage(identifier, cover && cover.image, cover && cover.size);
+          tabBar.cyl_setCoverImage(identifier, cover?.image, cover?.size);
         });
       });
     },
@@ -100,11 +100,11 @@ Component({
       if (!skin.tint || this.cyl_isLiquidGlass()) {
         return attributes;
       }
-      const tinted = Object.assign({}, attributes);
+      const tinted = { ...attributes };
       // [EN] The plus button's badge is the button's own, not a tab item's: it stays red. [CN] PlusButton 的角标属于按钮本身，不属于 Tab Item：保持红色。
       Object.keys(badges).filter((identifier) => identifier !== 'plus').forEach((identifier) => {
-        if (!(tinted[identifier] || {}).color) {
-          tinted[identifier] = Object.assign({}, tinted[identifier], { color: skin.tint });
+        if (!tinted[identifier]?.color) {
+          tinted[identifier] = { ...tinted[identifier], color: skin.tint };
         }
       });
       return tinted;
@@ -180,8 +180,8 @@ Component({
     cyl_markBadge(identifier) {
       const app = getApp();
       const state = app.globalData.cylTabBarState;
-      const badges = Object.assign({}, state.badges);
-      const attributes = Object.assign({}, state.badgeAttributes);
+      const badges = { ...state.badges };
+      const attributes = { ...state.badgeAttributes };
       const current = attributes[identifier] || {};
       const hasBadge = badges[identifier] !== undefined && badges[identifier] !== '';
       if (!this.cyl_isLiquidGlass()) {
@@ -208,7 +208,7 @@ Component({
         return;
       }
       const count = (Number.parseInt(state.badges.plus, 10) || 0) + 1;
-      app.cyl_updateTabBarState({ badges: Object.assign({}, state.badges, { plus: String(count) }) });
+      app.cyl_updateTabBarState({ badges: { ...state.badges, plus: String(count) } });
     },
 
     /**

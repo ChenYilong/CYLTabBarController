@@ -16,7 +16,7 @@ Component({
       const item = cylDemoConfiguration().CYLTabBarControllerTabBarItemsAttributes
         .find((attributes) => attributes.CYLTabBarItemPageIdentifier === 'web');
       this.setData({ feedRows: cylFeedRows() });
-      this.setData({ url: item && item.CYLTabBarItemPageParameters ? item.CYLTabBarItemPageParameters.url : '' });
+      this.setData({ url: item?.CYLTabBarItemPageParameters ? item.CYLTabBarItemPageParameters.url : '' });
       this.cylUnsubscribe = getApp().cyl_subscribe(() => this.cyl_showReplaced());
       this.cyl_showReplaced();
     },

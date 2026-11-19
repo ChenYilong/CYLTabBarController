@@ -84,7 +84,7 @@ Page({
       posts: feed.posts || [],
       cards: (cylReadJSON('/data/cyl_glass_cards.json').cards || []),
     });
-    this.cyl_showPanel((options && options.panel) || 'checkin');
+    this.cyl_showPanel(options?.panel || 'checkin');
   },
 
   /**
@@ -98,7 +98,7 @@ Page({
       const statusBar = window.statusBarHeight || 20;
       const height = (capsule.top - statusBar) * 2 + capsule.height;
       return { statusBar, height, capsuleRight: window.windowWidth - capsule.left + 8 };
-    } catch (error) {
+    } catch {
       return { statusBar: 20, height: 44, capsuleRight: 96 };
     }
   },
@@ -175,7 +175,7 @@ Page({
   // [EN] A day of the week: done or rest; the weekly stat follows. [CN] 一周中的某天：完成或休息；本周统计随之变化。
   cyl_toggleDay(event) {
     const index = event.currentTarget.dataset.index;
-    const week = this.data.checkin.week.map((day, position) => (position === index ? Object.assign({}, day, { done: !day.done }) : day));
+    const week = this.data.checkin.week.map((day, position) => (position === index ? { ...day, done: !day.done } : day));
     this.setData({ 'checkin.week': week, 'checkin.stats.week': week.filter((day) => day.done).length });
   },
 

@@ -11,7 +11,9 @@
  *      `generic:cyl-lottie-view="cyl-lottie"`。动画库未安装的 Tab 显示这个空视图，它发出一次 `error`，以便应用改用图片。
  *      它具有 cyl-lottie、cyl-pag、cyl-rive、cyl-svga 的方法，但不做任何事。
  */
-const cylNothing = function () {}
+const cylNothing = function () {
+  // [EN] Intentionally empty: the placeholder has the engines' methods but does nothing. [CN] 有意为空：占位视图具有各引擎的方法，但不做任何事。
+}
 
 Component({
   properties: {

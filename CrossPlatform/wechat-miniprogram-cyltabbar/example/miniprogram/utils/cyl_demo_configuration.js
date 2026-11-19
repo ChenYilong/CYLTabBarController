@@ -31,7 +31,7 @@ function cylAvailableAnimationFiles() {
     try {
       wx.getFileSystemManager().accessSync(file);
       return true;
-    } catch (error) {
+    } catch {
       return false;
     }
   });
@@ -54,33 +54,37 @@ const CYL_DEMO_OBJC_ITEM = {
   CYLTabBarItemTitleFont: 10,
 };
 const CYL_DEMO_OBJC_ITEMS = [
-  Object.assign({}, CYL_DEMO_OBJC_ITEM, {
+  {
+    ...CYL_DEMO_OBJC_ITEM,
     CYLTabBarItemTitle: 'Home',
     CYLTabBarItemSelectedTitle: 'Refresh',
     CYLTabBarItemIdentifier: 'home',
     CYLTabBarItemImage: CYL_DEMO_OBJC_IMAGE('home_normal'),
     CYLTabBarItemSelectedImage: CYL_DEMO_OBJC_IMAGE('home_highlight'),
-  }),
-  Object.assign({}, CYL_DEMO_OBJC_ITEM, {
+  },
+  {
+    ...CYL_DEMO_OBJC_ITEM,
     CYLTabBarItemTitle: 'Nearby',
     CYLTabBarItemIdentifier: 'city',
     CYLTabBarItemPageIdentifier: 'web',
     CYLTabBarItemImage: CYL_DEMO_OBJC_IMAGE('fishpond_normal'),
     CYLTabBarItemSelectedImage: CYL_DEMO_OBJC_IMAGE('fishpond_highlight'),
-  }),
-  Object.assign({}, CYL_DEMO_OBJC_ITEM, {
+  },
+  {
+    ...CYL_DEMO_OBJC_ITEM,
     CYLTabBarItemTitle: 'Messages',
     CYLTabBarItemIdentifier: 'message',
     CYLTabBarItemImage: CYL_DEMO_OBJC_IMAGE('message_normal'),
     CYLTabBarItemSelectedImage: CYL_DEMO_OBJC_IMAGE('message_highlight'),
-  }),
-  Object.assign({}, CYL_DEMO_OBJC_ITEM, {
+  },
+  {
+    ...CYL_DEMO_OBJC_ITEM,
     CYLTabBarItemTitle: 'Me',
     CYLTabBarItemIdentifier: 'CYLMineViewController',
     CYLTabBarItemPageIdentifier: 'me',
     CYLTabBarItemImage: CYL_DEMO_OBJC_IMAGE('account_normal'),
     CYLTabBarItemSelectedImage: CYL_DEMO_OBJC_IMAGE('account_highlight'),
-  }),
+  },
 ];
 
 /**
@@ -169,7 +173,7 @@ const CYL_DEMO_LOTTIE_COLORS = { city: { 'Icon_Discovery_Normal.**.Color': '#7F7
  */
 function cylDemoPlatforms(items) {
   return items.map((attributes) => (attributes.CYLTabBarItemPlatforms
-    ? Object.assign({}, attributes, { CYLTabBarItemPlatforms: `${attributes.CYLTabBarItemPlatforms},miniprogram` })
+    ? { ...attributes, CYLTabBarItemPlatforms: `${attributes.CYLTabBarItemPlatforms},miniprogram` }
     : attributes));
 }
 
@@ -183,10 +187,11 @@ function cylDemoPAGItems(items, files) {
   return items.map((attributes) => {
     const name = CYL_DEMO_PAG[attributes.CYLTabBarItemIdentifier];
     const file = name && files.find((path) => path.endsWith(`/${name}.pag.bin`));
-    return file ? Object.assign({}, attributes, {
+    return file ? {
+      ...attributes,
       CYLTabBarPAGFilePath: file,
       CYLTabBarPAGSize: '{30, 30}',
-    }) : attributes;
+    } : attributes;
   });
 }
 
@@ -201,12 +206,13 @@ const CYL_DEMO_RIVE = { home: 'CHAT', city: 'SEARCH', message: 'BELL', CYLMineVi
 function cylDemoRiveItems(items, files) {
   return items.map((attributes) => {
     const artboard = CYL_DEMO_RIVE[attributes.CYLTabBarItemIdentifier];
-    return artboard ? Object.assign({}, attributes, {
+    return artboard ? {
+      ...attributes,
       // [EN] tint=title: the white strokes take each state's title color, on light and dark bars (as iOS Example-Rive).
       // [CN] tint=title：白色线条取每个状态的标题颜色，浅色与深色 TabBar 均可（与 iOS Example-Rive 一致）。
       CYLTabBarRiveFilePath: `${files[0]}#artboard=${artboard}&stateMachine=${artboard}_Interactivity&input=active&tint=title`,
       CYLTabBarRiveSize: '{32, 32}',
-    }) : attributes;
+    } : attributes;
   });
 }
 
@@ -222,10 +228,11 @@ function cylDemoSVGAItems(items, files) {
   return items.map((attributes) => {
     const name = CYL_DEMO_SVGA[attributes.CYLTabBarItemIdentifier];
     const file = name && files.find((path) => path.endsWith(`/${name}.svga.bin`));
-    return file ? Object.assign({}, attributes, {
+    return file ? {
+      ...attributes,
       CYLTabBarSVGAFilePath: file,
       CYLTabBarSVGASize: '{30, 30}',
-    }) : attributes;
+    } : attributes;
   });
 }
 
@@ -233,11 +240,13 @@ function cylDemoLottieItems(items) {
   return items.map((attributes) => {
     const name = CYL_DEMO_LOTTIE[attributes.CYLTabBarItemIdentifier];
     const colors = CYL_DEMO_LOTTIE_COLORS[attributes.CYLTabBarItemIdentifier];
-    return name ? Object.assign({}, attributes, {
+    return name ? {
+      ...attributes,
       CYLTabBarLottieURL: `${name}.json`,
       CYLTabBarLottieDarkURL: `${name}_dark.json`,
       CYLTabBarLottieSize: '{30, 30}',
-    }, colors ? { CYLTabBarAnimationColors: colors } : {}) : attributes;
+      ...(colors ? { CYLTabBarAnimationColors: colors } : {}),
+    } : attributes;
   });
 }
 
@@ -257,7 +266,7 @@ function cylDemoGIFItems(items, files) {
   };
   return items.map((attributes) => {
     const extra = keys[attributes.CYLTabBarItemIdentifier];
-    return extra && Object.values(extra)[0] ? Object.assign({}, attributes, extra) : attributes;
+    return extra && Object.values(extra)[0] ? { ...attributes, ...extra } : attributes;
   });
 }
 
@@ -284,14 +293,15 @@ function cylReplacedItems(items, replaced) {
       return attributes;
     }
     const title = t('Replaced page %@').replace('%@', letter);
-    const changed = Object.assign({}, attributes, {
+    const changed = {
+      ...attributes,
       CYLTabBarItemTitle: title,
       CYLTabBarItemSelectedTitle: title,
       CYLTabBarItemImage: cylLetterIcon(letter, false),
       CYLTabBarItemSelectedImage: cylLetterIcon(letter, true),
       CYLTabBarItemImageURLSize: '{22, 22}',
       CYLTabBarItemIconRenderingMode: 'template',
-    });
+    };
     ['CYLTabBarLottieURL', 'CYLTabBarLottieDarkURL', 'CYLTabBarLottieSize', 'CYLTabBarAnimationColors', 'CYLTabBarPAGFilePath',
       'CYLTabBarRiveFilePath', 'CYLTabBarGIFFilePath', 'CYLTabBarAnimationFilePath'].forEach((key) => delete changed[key]);
     return changed;
@@ -303,7 +313,7 @@ function cylReplacedItems(items, replaced) {
  * [CN] 被替换 Tab 的空白页面：标题与背景色（A 为 systemTeal，B 为 systemPink），否则为 null。
  */
 function cylReplacedPage(overrides, identifier) {
-  const letter = ((overrides || {}).cylDemoReplaced || {})[identifier];
+  const letter = overrides?.cylDemoReplaced?.[identifier];
   return letter ? { title: t('Replaced page %@').replace('%@', letter), color: letter === 'A' ? '#30B0C7' : '#FF2D55' } : null;
 }
 
@@ -332,14 +342,14 @@ function cylDemoConfiguration(overrides, skin) {
     ? builders[icons](sharedItems, files) : sharedItems;
   let styledItems = items;
   if (options.cylDemoBoldTitles) {
-    styledItems = items.map((attributes) => Object.assign({}, attributes, { CYLTabBarItemSelectedTitleFont: 'bold:11' }));
+    styledItems = items.map((attributes) => ({ ...attributes, CYLTabBarItemSelectedTitleFont: 'bold:11' }));
   }
   // [EN] Per-tab attributes the Home rows change at run time (titles, icons, offsets, colors), by identifier.
   // [CN] 首页各行在运行时修改的单个 Tab 属性（标题、图标、偏移、颜色），按标识符。
   const itemAttributes = options.cylDemoItemAttributes || {};
-  const changedItems = cylReplacedItems(styledItems.map((attributes) => Object.assign({}, attributes,
-    itemAttributes['*'], itemAttributes[attributes.CYLTabBarItemIdentifier])), options.cylDemoReplaced);
-  const configurationOverrides = Object.assign({}, options);
+  const changedItems = cylReplacedItems(styledItems.map((attributes) => ({ ...attributes,
+    ...itemAttributes['*'], ...itemAttributes[attributes.CYLTabBarItemIdentifier] })), options.cylDemoReplaced);
+  const configurationOverrides = { ...options };
   delete configurationOverrides.cylDemoLottie;
   delete configurationOverrides.cylDemoIcons;
   delete configurationOverrides.cylDemoBoldTitles;
@@ -359,29 +369,32 @@ function cylDemoConfiguration(overrides, skin) {
   delete configurationOverrides.cylDemoAppearance;
   // [EN] The Home rows that change the tabs in place, last: they act on what is shown (utils/cyl_demo_updates.js).
   // [CN] 原地修改 Tab 的首页各行最后应用：它们作用于当前显示的内容（utils/cyl_demo_updates.js）。
-  return cylApplyUpdates(cylSkinnedConfiguration(Object.assign({}, cylSharedConfiguration, {
+  return cylApplyUpdates(cylSkinnedConfiguration({
+    ...cylSharedConfiguration,
     CYLTabBarControllerTabBarItemsAttributes: changedItems,
     // [EN] The Home row "PlusButton touchable area" (issue #91): showsTouchableArea and touchableAreaScale.
     // [CN] 首页「PlusButton 点击范围」行（issue #91）：showsTouchableArea 与 touchableAreaScale。
-    CYLTabBarControllerPlusButton: Object.assign({}, CYL_DEMO_PLUS_BUTTON, options.cylDemoPlusAttributes, options.cylDemoTouchableArea ? {
+    CYLTabBarControllerPlusButton: { ...CYL_DEMO_PLUS_BUTTON, ...options.cylDemoPlusAttributes, ...(options.cylDemoTouchableArea ? {
       CYLPlusButtonShowsTouchableArea: Boolean(options.cylDemoTouchableArea.shows),
       CYLPlusButtonTouchableAreaScale: options.cylDemoTouchableArea.scale || 1,
-    } : {}),
+    } : {}) },
     // [EN] The Objective-C example starts on Liquid Glass (CYLMainRootViewController). [CN] Objective-C 示例以液态玻璃启动。
     CYLTabBarControllerStyleType: 'liquidGlass',
     // [EN] The Objective-C example's title offset (0, -3.5), which the aligned plus button follows. [CN] Objective-C 示例的标题偏移。
     CYLTabBarControllerTitlePositionAdjustment: '{0, -3.5}',
-    CYLTabBarControllerThemes: Object.assign({}, cylSharedConfiguration.CYLTabBarControllerThemes, {
-      light: Object.assign({}, cylSharedConfiguration.CYLTabBarControllerThemes.light, CYL_DEMO_OBJC_COLORS),
-      dark: Object.assign({}, cylSharedConfiguration.CYLTabBarControllerThemes.dark, CYL_DEMO_DARK_ICON_COLORS,
-        CYL_DEMO_OBJC_COLORS),
+    CYLTabBarControllerThemes: {
+      ...cylSharedConfiguration.CYLTabBarControllerThemes,
+      light: { ...cylSharedConfiguration.CYLTabBarControllerThemes.light, ...CYL_DEMO_OBJC_COLORS },
+      dark: { ...cylSharedConfiguration.CYLTabBarControllerThemes.dark, ...CYL_DEMO_DARK_ICON_COLORS,
+        ...CYL_DEMO_OBJC_COLORS },
       christmas: CYL_DEMO_CHRISTMAS_THEME,
-    }),
+    },
     // [EN] -[MainTabBarController tabBarController:didSelectControl:] scales the tapped icon. [CN] 点击的图标播放缩放动画。
     CYLTabBarControllerTabButtonTapAnimation: 'scale',
     // [EN] -[MainTabBarController setUpLoginRequiredTabs] (issue #19). [CN] 需要登录的 Tab（issue #19）。
     CYLTabBarControllerLoginRequiredTabBarItemIdentifiers: ['message', 'CYLMineViewController'],
-  }, configurationOverrides), skin, t), options.cylDemoUpdates, options.cylDemoAppearance, t);
+    ...configurationOverrides,
+  }, skin, t), options.cylDemoUpdates, options.cylDemoAppearance, t);
 }
 
 module.exports = { cylDemoConfiguration, cylInstalledAnimation, cylAvailableAnimationFiles, cylReplacedPage };

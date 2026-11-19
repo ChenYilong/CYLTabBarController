@@ -46,7 +46,7 @@ function cylIsDevTools() {
   try {
     const info = typeof wx.getDeviceInfo === 'function' ? wx.getDeviceInfo() : wx.getSystemInfoSync()
     return info.platform === 'devtools'
-  } catch (error) {
+  } catch {
     return false
   }
 }
@@ -78,7 +78,7 @@ function cylPixelRatio() {
  *      "http://usr"）使用文件系统。
  */
 function cylReadPAG(path, callback) {
-  const userData = (wx.env && wx.env.USER_DATA_PATH) || ''
+  const userData = wx.env?.USER_DATA_PATH || ''
   if (/^https?:\/\//.test(path) && !(userData && path.indexOf(userData) === 0)) {
     wx.request({
       url: path,
@@ -204,11 +204,11 @@ Component({
         .select(`#${this.data.cylCanvasId}`)
         .fields({ node: true, size: true })
         .exec((result) => {
-          const info = result && result[0]
+          const info = result?.[0]
           if (token !== this.cylLoadToken || !this.cylReady) {
             return
           }
-          if (!info || !info.node) {
+          if (!info?.node) {
             this.cyl_reportError( { message: 'cyl-pag: the canvas node is not available.' })
             return
           }
@@ -234,7 +234,7 @@ Component({
             }
             // [EN] A failure to start is reported like a failure to load. [CN] 启动失败与加载失败一样上报。
             this.cyl_start(data, canvas, token).catch((startError) => {
-              this.cyl_reportError( { message: startError && startError.message })
+              this.cyl_reportError( { message: startError ? startError.message : startError })
             })
           })
         })
@@ -292,7 +292,7 @@ Component({
         }
         if (current()) {
           this.cyl_destroy()
-          this.cyl_reportError( { message: `cyl-pag: ${(error && error.message) || error}` })
+          this.cyl_reportError( { message: `cyl-pag: ${error?.message || error}` })
         }
       }
     },
@@ -395,7 +395,7 @@ Component({
     cyl_playFromStart(offset) {
       // [EN] `offset` (seconds) continues a playback another tab bar started: each tab page has its own tab bar.
       // [CN] `offset`（秒）继续另一个 TabBar 已开始的播放：每个 Tab 页面都有自己的 TabBar。
-      const seconds = Number(offset) > 0 ? Number(offset) : 0
+      const seconds = Math.max(0, Number(offset) || 0)
       const view = this.cylView
       if (!view) {
         // [EN] A play request made while the file loads (a new tab page's tab bar selects its tab at once) runs when it is ready.

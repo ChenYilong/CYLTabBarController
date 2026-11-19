@@ -81,8 +81,8 @@ function cylStackModel(p) {
  * [CN] 点击 `index` 处条目执行的动作：条目可交互时为它自己的动作，否则为 ''（点击随后传给背景）。
  */
 function cylStackActionAt(model, index) {
-  const item = model && model.items ? model.items[index] : null
-  return item && item.interactive ? item.action : ''
+  const item = model?.items ? model.items[index] : null
+  return item?.interactive ? item.action : ''
 }
 
 /**
@@ -90,7 +90,7 @@ function cylStackActionAt(model, index) {
  */
 function cylStackIndexForAction(model, action) {
   const name = cylStackAction(action)
-  if (!name || !model || !model.items) return -1
+  if (!name || !model?.items) return -1
   return model.items.findIndex((item) => item.action === name)
 }
 

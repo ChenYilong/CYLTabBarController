@@ -48,12 +48,13 @@ const CYL_ANIMATION_KEYS = ['CYLTabBarLottieURL', 'CYLTabBarLottieDarkURL', 'CYL
   'CYLTabBarAnimationFilePath', 'CYLTabBarGIFSize'];
 
 function cylIcon(attributes, image, selectedImage) {
-  const changed = Object.assign({}, attributes, {
+  const changed = {
+    ...attributes,
     CYLTabBarItemImage: image,
     CYLTabBarItemSelectedImage: selectedImage,
     CYLTabBarItemImageURLSize: CYL_ICON_SIZE,
     CYLTabBarItemIconRenderingMode: 'original',
-  });
+  };
   CYL_ANIMATION_KEYS.forEach((key) => delete changed[key]);
   return changed;
 }
@@ -110,7 +111,7 @@ function cylApplyUpdates(configuration, updates, appearance, translate) {
     items = items.map((attributes, index) => cylIcon(attributes, icons[index % icons.length][0], icons[index % icons.length][1]));
     if (plusButton) {
       const plusIcons = flags.allIcons === 'local' ? [CYL_SYMBOLS.plusCircle, CYL_SYMBOLS.plusCircleFill] : CYL_PLUS_NETWORK_ICONS;
-      plusButton = Object.assign({}, plusButton, { CYLTabBarItemImage: plusIcons[0], CYLTabBarItemSelectedImage: plusIcons[1] });
+      plusButton = { ...plusButton, CYLTabBarItemImage: plusIcons[0], CYLTabBarItemSelectedImage: plusIcons[1] };
     }
   }
   items = items.map((attributes, index) => {
@@ -128,25 +129,26 @@ function cylApplyUpdates(configuration, updates, appearance, translate) {
     }
     if (flags.changeTabTitle) {
       const title = translate('Purchased courses');
-      changed = Object.assign({}, changed, { CYLTabBarItemTitle: title, CYLTabBarItemSelectedTitle: title });
+      changed = { ...changed, CYLTabBarItemTitle: title, CYLTabBarItemSelectedTitle: title };
     }
     return changed;
   });
   if (flags.allTitles) {
-    items = items.map((attributes) => Object.assign({}, attributes, { CYLTabBarItemTitle: `★ ${translate(attributes.CYLTabBarItemTitle)}` }));
+    items = items.map((attributes) => ({ ...attributes, CYLTabBarItemTitle: `★ ${translate(attributes.CYLTabBarItemTitle)}` }));
     if (plusButton) {
-      plusButton = Object.assign({}, plusButton, { CYLTabBarItemTitle: `★ ${translate(plusButton.CYLTabBarItemTitle)}` });
+      plusButton = { ...plusButton, CYLTabBarItemTitle: `★ ${translate(plusButton.CYLTabBarItemTitle)}` };
     }
   }
-  const changed = Object.assign({}, configuration, {
+  const changed = {
+    ...configuration,
     CYLTabBarControllerTabBarItemsAttributes: items,
     CYLTabBarControllerPlusButton: plusButton,
-  });
+  };
   const theme = CYL_APPEARANCE_THEMES[appearance];
   if (theme) {
     const identifier = `appearance:${appearance}`;
     Object.assign(changed, {
-      CYLTabBarControllerThemes: Object.assign({}, configuration.CYLTabBarControllerThemes, { [identifier]: theme }),
+      CYLTabBarControllerThemes: { ...configuration.CYLTabBarControllerThemes, [identifier]: theme },
       CYLTabBarControllerThemeIdentifier: identifier,
       CYLTabBarControllerDarkThemeIdentifier: identifier,
     });

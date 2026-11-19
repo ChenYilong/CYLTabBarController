@@ -206,12 +206,12 @@ Component({
       try {
         const info = typeof wx.getAppBaseInfo === 'function' ? wx.getAppBaseInfo() : wx.getSystemInfoSync()
         theme = info.theme === 'dark' ? 'dark' : 'light'
-      } catch (error) {
+      } catch {
         theme = 'light'
       }
       this.data.systemTheme = theme
       this.cylThemeListener = (result) => {
-        this.data.systemTheme = result && result.theme === 'dark' ? 'dark' : 'light'
+        this.data.systemTheme = result?.theme === 'dark' ? 'dark' : 'light'
         this.cyl_update()
       }
       if (typeof wx !== 'undefined' && typeof wx.onThemeChange === 'function') wx.onThemeChange(this.cylThemeListener)
@@ -232,7 +232,7 @@ Component({
     cyl_onAnimationReady(event) {
       this.setData({ animationLoaded: true })
       // [EN] Forwarded as `animationready` with the engine's detail (e.g. `duration`). [CN] 以 `animationready` 转发，带引擎的 detail（如 `duration`）。
-      this.triggerEvent('animationready', (event && event.detail) || {})
+      this.triggerEvent('animationready', event?.detail || {})
       this.cyl_update()
       if (this.cylPendingPlay) {
         this.playAnimation()
@@ -294,7 +294,7 @@ Component({
         engine.cyl_setProgress(progress)
       } else if (typeof engine.cyl_goToAndStop === 'function' && typeof engine.cyl_animation === 'function') {
         const player = engine.cyl_animation()
-        const last = Math.max(0, ((player && player.totalFrames) || 1) - 1)
+        const last = Math.max(0, (player?.totalFrames || 1) - 1)
         engine.cyl_goToAndStop(Math.round(last * progress), true)
       } else if (typeof engine.cyl_rest === 'function') {
         engine.cyl_rest()
@@ -336,11 +336,11 @@ Component({
       this.cyl_update()
       // [EN] Forwarded as `animationerror` with the engine's detail (`message`); the item still falls back to its image.
       // [CN] 以 `animationerror` 转发，带引擎的 detail（`message`）；条目仍回到静态图片。
-      this.triggerEvent('animationerror', (event && event.detail) || {})
+      this.triggerEvent('animationerror', event?.detail || {})
       const type = this.data.m.animationType
       if (type && !cylWarnedTypes.includes(type)) {
         cylWarnedTypes.push(type)
-        console.warn(`[cyl-animated-item] ${type} animation (${this.data.animationUrl}) cannot play: ${(event && event.detail && event.detail.message) || 'no engine'}. ` +
+        console.warn(`[cyl-animated-item] ${type} animation (${this.data.animationUrl}) cannot play: ${event?.detail?.message || 'no engine'}. ` +
           `Showing the static image, or the placeholder without one. Install ${cylAnimatedItemPackage(type)} and set generic:cyl-${type}-view.`)
       }
     },
@@ -350,12 +350,12 @@ Component({
      * [CN] 引擎播放结束（非循环的一遍）：以 `animationcomplete` 转发，例如用于统计重复次数。
      */
     cyl_onAnimationComplete(event) {
-      this.triggerEvent('animationcomplete', (event && event.detail) || {})
+      this.triggerEvent('animationcomplete', event?.detail || {})
     },
 
     /** [EN] A looping play finished one pass: forwarded as `animationloopcomplete`. [CN] 循环播放完成一遍：以 `animationloopcomplete` 转发。 */
     cyl_onAnimationLoopComplete(event) {
-      this.triggerEvent('animationloopcomplete', (event && event.detail) || {})
+      this.triggerEvent('animationloopcomplete', event?.detail || {})
     },
 
     /** [EN] The engine component, or null (no engine type, GIF, or not drawn yet). [CN] 引擎组件，没有时为 null。 */

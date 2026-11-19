@@ -12,7 +12,7 @@
  * [EN] The platform names this component answers to in `CYLTabBarItemPlatforms`.
  * [CN] 本组件在 `CYLTabBarItemPlatforms` 中认可的平台名称。
  */
-const CYL_PLATFORM_NAMES = ['miniprogram', 'wechat', 'weixin', 'wechat-miniprogram', 'all'];
+const CYL_PLATFORM_NAMES = new Set(['miniprogram', 'wechat', 'weixin', 'wechat-miniprogram', 'all']);
 
 /**
  * [EN] Style types of `CYLTabBarControllerStyleType`, by name and by number (CYLTabBarStyleType).
@@ -24,7 +24,7 @@ const CYL_STYLE_TYPES = ['default', 'system', 'flatDesign', 'liquidGlass'];
  * [EN] Tap animations of `CYLTabBarControllerTabButtonTapAnimation`.
  * [CN] `CYLTabBarControllerTabButtonTapAnimation` 的点击动画。
  */
-const CYL_TAP_ANIMATIONS = ['none', 'scale', 'zoomIn', 'bounce', 'bounceWithFireworks', 'rotation', 'flip', 'fume', 'frames'];
+const CYL_TAP_ANIMATIONS = new Set(['none', 'scale', 'zoomIn', 'bounce', 'bounceWithFireworks', 'rotation', 'flip', 'fume', 'frames']);
 
 /**
  * [EN] Theme value keys the component applies to the whole bar.
@@ -81,7 +81,7 @@ function cylArray(value) {
 function cylNumbers(value, names) {
   let list = cylArray(value);
   if (!list && typeof value === 'string') {
-    list = value.replace(/[{}\[\]\s]/g, '').split(',').filter((part) => part !== '');
+    list = value.replace(/[{}[\]\s]/g, '').split(',').filter((part) => part !== '');
   } else if (!list && value && typeof value === 'object') {
     list = names.map((name) => value[name]);
   }
@@ -170,7 +170,7 @@ function cylCompareVersions(left, right) {
  */
 function cylIsItemEligible(attributes, environment) {
   const platforms = cylStringList(attributes.CYLTabBarItemPlatforms).map((name) => name.toLowerCase());
-  if (platforms.length > 0 && !platforms.some((name) => CYL_PLATFORM_NAMES.includes(name))) {
+  if (platforms.length > 0 && !platforms.some((name) => CYL_PLATFORM_NAMES.has(name))) {
     return false;
   }
   const minimum = attributes.CYLTabBarItemMinimumAppVersion;
@@ -196,7 +196,7 @@ function cylImagePath(route, environment) {
   }
   const value = route.trim();
   if (value.startsWith('system:')) {
-    return (environment.symbols || {})[value.slice('system:'.length)] || '';
+    return environment.symbols?.[value.slice('system:'.length)] || '';
   }
   if (/^(https?:\/\/|data:)/.test(value) || value.startsWith('/')) {
     return value;
@@ -216,7 +216,7 @@ function cylLocalizedTitle(title, environment) {
     return '';
   }
   const text = String(title);
-  return (environment.strings || {})[text] || text;
+  return environment.strings?.[text] || text;
 }
 
 /**
@@ -672,10 +672,11 @@ function cylReadConfiguration(configuration, environment) {
   const darkIdentifier = source.CYLTabBarControllerDarkThemeIdentifier;
   const isDark = env.themeIdentifier ? Boolean(darkIdentifier) && themeIdentifier === darkIdentifier : followsDark;
   const theme = themes[themeIdentifier] || {};
-  const themedEnvironment = Object.assign({}, env, {
+  const themedEnvironment = {
+    ...env,
     isDark,
     symbols: (env.symbolsByTheme && (env.symbolsByTheme[themeIdentifier] || env.symbolsByTheme.default)) || env.symbols,
-  });
+  };
   const defaults = {
     imageInsets: cylInsets(source.CYLTabBarControllerImageInsets),
     titleOffset: cylOffset(source.CYLTabBarControllerTitlePositionAdjustment),
@@ -688,7 +689,7 @@ function cylReadConfiguration(configuration, environment) {
     .filter((attributes) => attributes && typeof attributes === 'object' && cylIsItemEligible(attributes, env))
     .map((attributes) => Object.assign(cylItem(attributes, themedEnvironment, theme, defaults), {
       // [EN] viewController.cyl_tabButtonAnimation: this tab's own tap animation. [CN] 本 Tab 自己的点击动画。
-      tapAnimation: CYL_TAP_ANIMATIONS.includes(attributes.CYLTabBarItemTabButtonTapAnimation) ? attributes.CYLTabBarItemTabButtonTapAnimation : '',
+      tapAnimation: CYL_TAP_ANIMATIONS.has(attributes.CYLTabBarItemTabButtonTapAnimation) ? attributes.CYLTabBarItemTabButtonTapAnimation : '',
     }));
   const styleValue = source.CYLTabBarControllerStyleType;
   const styleType = typeof styleValue === 'number' ? CYL_STYLE_TYPES[styleValue] : styleValue;
@@ -703,7 +704,7 @@ function cylReadConfiguration(configuration, environment) {
     items,
     plusButton: cylPlusButton(source, themedEnvironment, theme, defaults, items.length),
     styleType: CYL_STYLE_TYPES.includes(styleType) ? styleType : 'default',
-    tapAnimation: CYL_TAP_ANIMATIONS.includes(tapAnimation) ? tapAnimation : 'none',
+    tapAnimation: CYL_TAP_ANIMATIONS.has(tapAnimation) ? tapAnimation : 'none',
     // [EN] CYLTabButtonAnimation.duration: 0.5 s by default (CYLTabBarControllerTabButtonTapAnimationDuration).
     // [CN] CYLTabButtonAnimation.duration：默认 0.5 秒（CYLTabBarControllerTabButtonTapAnimationDuration）。
     animationDuration: Math.round(cylPositive(source.CYLTabBarControllerTabButtonTapAnimationDuration, 0.5) * 1000

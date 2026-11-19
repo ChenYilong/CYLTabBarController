@@ -10,7 +10,7 @@ function cylDevtoolsCli() {
     return process.env.CYL_DEVTOOLS_CLI;
   }
   if (process.platform === 'win32') {
-    const programFiles = process.env['ProgramFiles(x86)'] || 'C:\\Program Files (x86)';
+    const programFiles = process.env['ProgramFiles(x86)'] || String.raw`C:\Program Files (x86)`;
     return path.join(programFiles, 'Tencent', '微信web开发者工具', 'cli.bat');
   }
   return '/Applications/wechatwebdevtools.app/Contents/MacOS/cli';
