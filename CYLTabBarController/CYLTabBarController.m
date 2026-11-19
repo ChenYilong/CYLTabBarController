@@ -394,16 +394,18 @@ static void CYLSetAdditionalSafeAreaBottom(UIViewController *viewController, CGF
 @property (nonatomic, weak) UIWindow *cylRefreshedSystemTabBarWindow;
 @property (nonatomic, strong) _CYLFlatDesignTabBarParallaxOverlayView *parallaxOverlayView;
 #endif
-/// [EN] Classic tab bar before iOS 18: the animated `-setTabBarHidden:animated:` (see `-cyl_setClassicTabBarHidden:animated:`).
-/// [CN] iOS 18 以前的经典 TabBar：带动画的 `-setTabBarHidden:animated:`（见 `-cyl_setClassicTabBarHidden:animated:`）。
-@property (nonatomic, assign) BOOL cylClassicTabBarIsAnimating;
-@property (nonatomic, assign) BOOL cylClassicTabBarHiddenRequest;
-@property (nonatomic, assign) NSUInteger cylClassicTabBarAnimationGeneration;
 - (void)_cyl_refreshSystemTabBarVisibilityIfNeeded;
 //@property (nonatomic, assign) CYLTabBarStyleType tabBarStyleType;
 //@property (nonatomic, readwrite) CYLFlatDesignTabBar *cyl_tabBar;
 #else
 #endif
+// [EN] Outside every `#if`: the classic tab bar uses them in every build (step 69 had them inside the FlatDesign `#if`).
+// [CN] 位于所有 `#if` 之外：经典 TabBar 在所有构建中都使用它们（第 69 步曾误放在 FlatDesign 的 `#if` 内）。
+/// [EN] Classic tab bar before iOS 18: the animated `-setTabBarHidden:animated:` (see `-cyl_setClassicTabBarHidden:animated:`).
+/// [CN] iOS 18 以前的经典 TabBar：带动画的 `-setTabBarHidden:animated:`（见 `-cyl_setClassicTabBarHidden:animated:`）。
+@property (nonatomic, assign) BOOL cylClassicTabBarIsAnimating;
+@property (nonatomic, assign) BOOL cylClassicTabBarHiddenRequest;
+@property (nonatomic, assign) NSUInteger cylClassicTabBarAnimationGeneration;
 @end
 
 
