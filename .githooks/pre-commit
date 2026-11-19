@@ -28,6 +28,13 @@ if [ -z "${CYL_SKIP_DOCS_NAV_CHECK:-}" ] && git diff --cached --name-status --di
         echo "  If the stale entry is another session's untracked file, commit with CYL_SKIP_DOCS_NAV_CHECK=1." >&2
         exit 1
     }
+    # [EN] A new document also needs its row in the cyl-api-map skill (the same CI job checks it; it failed on 5ac06d3f).
+    # [CN] 新文档还需要在 cyl-api-map skill 中有一行（同一个 CI 任务会检查；5ac06d3f 上因此失败）。
+    "$python" "$root/scripts/sync-agent-skills.py" --check >/dev/null 2>&1 || {
+        echo "pre-commit: this commit adds, deletes or renames a file in docs/, and the agent skills check fails." >&2
+        echo "  Run: python3 scripts/sync-agent-skills.py --check, and add the document's row to .agents/skills/cyl-api-map/SKILL.md." >&2
+        exit 1
+    }
 fi
 if [ -x "$root/.git/hooks/pre-commit.chained" ]; then
     exec "$root/.git/hooks/pre-commit.chained" "$@"
