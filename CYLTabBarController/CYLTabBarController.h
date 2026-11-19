@@ -1304,7 +1304,13 @@ didRecognizeTabBarItemGesture:(CYLTabBarItemGesture)gesture
  */
 - (void)updateImageInsets:(UIEdgeInsets)imageInsets;
 
+#pragma clang diagnostic push
+// [EN] CYLTabBar is a Swift class (migration step 100): here clang sees only `@class CYLTabBar`, not that it is a UITabBar;
+//      it is one at run time. The public type stays CYLTabBar.
+// [CN] CYLTabBar 是 Swift 类（迁移第 100 步）：此处 clang 只看到 `@class CYLTabBar`，不知道它是 UITabBar；运行时它就是。公开类型仍为 CYLTabBar。
+#pragma clang diagnostic ignored "-Wincompatible-property-type"
 @property (nonatomic, strong, readonly) CYLTabBar *tabBar;
+#pragma clang diagnostic pop
 @property (nonatomic, strong, nullable, setter=cyl_setTabBar:) UIView __kindof *cyl_tabBar;
 
 /*!
