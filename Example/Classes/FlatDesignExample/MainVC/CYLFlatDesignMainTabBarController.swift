@@ -31,9 +31,9 @@ class CYLFlatDesignMainTabBarController: CYLTabBarController, CYLFlatDesignUITab
      [EN] A FlatDesign tab bar controller of these tabs, for a context. [CN] 由这些 Tab 组成的扁平样式 TabBarController，对应一个 context。
      */
     @objc(initWithViewControllers:tabBarItemsAttributes:context:)
-    init(viewControllers: [UIViewController], tabBarItemsAttributes: [[String: Any]], context: String) {
+    convenience init(viewControllers: [UIViewController], tabBarItemsAttributes: [[String: Any]], context: String) {
         let titlePositionAdjustment = UIOffset(horizontal: 0, vertical: -3.5)
-        super.init(viewControllers: viewControllers, tabBarItemsAttributes: tabBarItemsAttributes, imageInsets: .zero,
+        self.init(viewControllers: viewControllers, tabBarItemsAttributes: tabBarItemsAttributes, imageInsets: .zero,
                    titlePositionAdjustment: titlePositionAdjustment, styleType: .flatDesign, context: context)
         // [EN] One UITabBarAppearance for every style: the same as MainTabBarController's, mapped onto the FlatDesign tab bar.
         // [CN] 所有样式共用一个 UITabBarAppearance：与 MainTabBarController 的相同，映射到扁平样式 TabBar。
@@ -45,13 +45,9 @@ class CYLFlatDesignMainTabBarController: CYLTabBarController, CYLFlatDesignUITab
         super.init(coder: coder)
     }
 
-    /// [EN] The superclass's initializers send these to `self` (see MainTabBarController). [CN] 父类的初始化方法会向 `self` 发送这些方法（见 MainTabBarController）。
-    override init(configuration: [String: Any]) {
+    /// [EN] The required designated initializer (see MainTabBarController). [CN] 必需的指定初始化方法（见 MainTabBarController）。
+    required init(configuration: [String: Any]) {
         super.init(configuration: configuration)
-    }
-
-    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
-        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
     }
 
     override func viewDidLoad() {

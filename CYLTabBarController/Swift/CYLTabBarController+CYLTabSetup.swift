@@ -61,7 +61,7 @@ extension CYLTabBarController {
 
     /// [EN] The tab bar's tint color; no effect with FlatDesign. [CN] TabBar 的 tintColor；扁平样式下无效。
     @objc(setTintColor:)
-    func cylSetTintColor(_ tintColor: UIColor?) {
+    public func setTintColor(_ tintColor: UIColor) {
         guard tabBarStyleType != .flatDesign else { return }
         cyl_tabBar?.tintColor = tintColor
     }
@@ -69,7 +69,7 @@ extension CYLTabBarController {
     /// [EN] Whether the plus button has a child view controller in this controller (bound by `context`, see `-hasPlusButton`).
     /// [CN] PlusButton 在本控制器中是否有子控制器（通过 `context` 绑定，见 `-hasPlusButton`）。
     @objc(hasPlusChildViewController)
-    func cylHasPlusChildViewController() -> Bool {
+    public func hasPlusChildViewController() -> Bool {
         cylPrivate.cylContextPlusChildViewController() != nil
     }
 
@@ -92,7 +92,7 @@ extension CYLTabBarController {
     /// [EN] The attributes of the tab at `index`; nil for the plus button's tab or when there is none.
     /// [CN] 第 `index` 个 Tab 的属性；PlusButton 的 Tab 或没有对应项时为 nil。
     @objc(tabBarItemAttributesAtIndex:)
-    func cylTabBarItemAttributes(at index: UInt) -> [String: Any]? {
+    public func tabBarItemAttributes(at index: UInt) -> [String: Any]? {
         let tabs = viewControllers ?? []
         guard Int(index) < tabs.count else { return nil }
         let viewController = tabs[Int(index)]
@@ -119,7 +119,7 @@ extension CYLTabBarController {
      [CN] 使用新的属性重新加载 Tab（重新设置 viewControllers）。由页面 ID 创建时，新的 Tab 从同样的来源获得页面。
      */
     @objc(reloadTabBarItemsWithAttributes:)
-    func cylReloadTabBarItems(withAttributes attributes: [[AnyHashable: Any]]) {
+    public func reloadTabBarItems(withAttributes attributes: [[AnyHashable: Any]]) {
         guard tabBarStyleType != .flatDesign else { return }
         var newAttributes = attributes
         var resolvedPages: [UIViewController]?
@@ -167,9 +167,10 @@ extension CYLTabBarController {
      [CN] 替换第 `index` 个 Tab 的视图控制器（见头文件）。没有该 Tab、是 PlusButton 的 Tab，或 `viewController` 已是某个 Tab 时返回 NO。
      */
     @objc(replaceViewControllerAtIndex:withViewController:attributes:)
-    func cylReplaceViewController(at index: UInt, with viewController: UIViewController?, attributes: [String: Any]?) -> Bool {
+    @discardableResult
+    public func replaceViewController(at index: UInt, with viewController: UIViewController, attributes: [String: Any]?) -> Bool {
         let current = viewControllers ?? []
-        guard Int(index) < current.count, let viewController, !current.contains(viewController) else { return false }
+        guard Int(index) < current.count, !current.contains(viewController) else { return false }
         let oldViewController = current[Int(index)]
         let plusChild = cylPrivate.cylContextPlusChildViewController()
         if oldViewController.cyl_isPlaceholder || oldViewController === plusChild {
@@ -183,7 +184,7 @@ extension CYLTabBarController {
         for (tabIndex, tab) in current.enumerated() {
             if tab.cyl_isPlaceholder || tab === plusChild { continue }
             var tabViewController = tab
-            var tabAttributes: [AnyHashable: Any] = cylTabBarItemAttributes(at: UInt(tabIndex)) ?? [:]
+            var tabAttributes: [AnyHashable: Any] = tabBarItemAttributes(at: UInt(tabIndex)) ?? [:]
             if tabIndex == Int(index) {
                 // [EN] The new tab's own entry; nil keeps the old one. [CN] 使用新 Tab 自己的属性；为 nil 时保留旧的。
                 tabViewController = viewController
@@ -415,7 +416,7 @@ extension CYLTabBarController {
                 tab.view.removeFromSuperview()
                 tab.removeFromParent()
             }
-            if cylHasPlusChildViewController() && !cyl_isPlusViewControllerAdded(oldTabs),
+            if hasPlusChildViewController() && !cyl_isPlusViewControllerAdded(oldTabs),
                let plusChild = cylPrivate.cylContextPlusChildViewController() {
                 plusChild.willMove(toParent: nil)
                 plusChild.view.removeFromSuperview()

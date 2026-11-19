@@ -40,11 +40,13 @@ class MainTabBarController: CYLTabBarController, CYLFlatDesignUITabBarController
      [CN] 由 Demo 四个 Tab 组成的 TabBarController，对应一个 context（每个 context 有自己的 PlusButton）。
      */
     @objc(initWithContext:)
-    init(context: String) {
+    convenience init(context: String) {
         // [EN] A title offset for the classic style; `CYLTabBarStyleTypeFlatDesign` / `…LiquidGlass` are the other styles.
         // [CN] 经典样式的标题偏移；其他样式为 `CYLTabBarStyleTypeFlatDesign` / `…LiquidGlass`。
         let titlePositionAdjustment = UIOffset(horizontal: 0, vertical: -3.5)
-        super.init(viewControllers: MainTabBarController.viewControllersForTabBar(),
+        // [EN] A convenience initializer of CYLTabBarController (inherited: this class implements the required designated ones).
+        // [CN] CYLTabBarController 的便利初始化方法（已继承：本类实现了必需的指定初始化方法）。
+        self.init(viewControllers: MainTabBarController.viewControllersForTabBar(),
                    tabBarItemsAttributes: MainTabBarController.tabBarItemsAttributesForTabBar(),
                    imageInsets: .zero,
                    titlePositionAdjustment: titlePositionAdjustment,
@@ -62,18 +64,13 @@ class MainTabBarController: CYLTabBarController, CYLFlatDesignUITabBarController
     }
 
     /**
-     [EN] The superclass's initializers end in `-initWithConfiguration:` (then `-initWithNibName:bundle:`), sent to `self`: a Swift subclass that has its own
-          initializer inherits none, so this one forwards it (without it the app trapped at launch: "unimplemented initializer").
-     [CN] 父类的初始化方法最终向 `self` 发送 `-initWithConfiguration:`：有自己初始化方法的 Swift 子类不会继承任何父类初始化方法，因此在这里转发
-          （否则 App 启动即崩溃："unimplemented initializer"）。
+     [EN] The designated initializer of CYLTabBarController (`required` since the class switch): every convenience initializer and
+          class factory ends here, so this subclass inherits them all (docs/Subclassing-In-Swift.md).
+     [CN] CYLTabBarController 的指定初始化方法（类切换起为 `required`）：所有便利初始化方法与类工厂方法都会走到这里，因此本子类继承它们
+          （docs/Subclassing-In-Swift.md）。
      */
-    override init(configuration: [String: Any]) {
+    required init(configuration: [String: Any]) {
         super.init(configuration: configuration)
-    }
-
-    /// [EN] Reached the same way, from `-initWithConfiguration:`. [CN] 同样经 `-initWithConfiguration:` 调用。
-    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
-        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
     }
 
     /// [EN] #152: gestures on the tab buttons and the plus button, with the block API.

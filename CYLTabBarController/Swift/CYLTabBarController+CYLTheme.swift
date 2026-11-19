@@ -198,7 +198,18 @@ extension CYLTabBarController {
         }
     }
 
+    /**
+     [EN] Restyles the tab bar with `theme` now, see `CYLTabBarTheme`; nil or a theme that does not adopt it restores the app's own
+          titles, icons and appearance. Called for you when the theme changes. Public with the name apps see since the class
+          switch (phase 3).
+     [CN] 立即用 `theme` 更新 TabBar 样式，见 `CYLTabBarTheme`；nil 或不遵循该协议的主题恢复 App 自己的标题、图标与外观。主题变化时会自动调用。
+          类切换起以 App 看到的名称公开（第 3 阶段）。
+     */
     @objc(cyl_applyTabBarTheme:)
+    public func cyl_applyTabBarTheme(_ theme: Any?) {
+        cylApplyTabBarTheme(theme)
+    }
+
     func cylApplyTabBarTheme(_ theme: Any?) {
         let settings = cyl_themeSettings
         settings.launchThemeApplied = true

@@ -1244,7 +1244,6 @@ extension CYLTabBarController {
         return (value as AnyObject).isKind(of: blockClass)
     }
 
-    @objc(cyl_normalizedConfiguration:)
     class func cylNormalizedConfiguration(_ configuration: Any?) -> [String: Any] {
         var normalized: [String: Any] = [:]
         if let dictionary = configuration as? NSDictionary {
@@ -1410,7 +1409,6 @@ extension CYLTabBarController {
         return Values.mainBundlePath((filePath as NSString).expandingTildeInPath)
     }
 
-    @objc(configurationWithContentsOfFile:error:)
     class func cylConfiguration(contentsOfFile filePath: Any?) throws -> [String: Any] {
         let path = (filePath as? String).map { cylPathOfConfigurationFile($0) } ?? ""
         var configuration = try CYLTabBarConfigurationParser.dictionary(withContentsOfFile: path)
@@ -1435,7 +1433,6 @@ extension CYLTabBarController {
         return path
     }
 
-    @objc(configurationWithRoute:error:)
     class func cylConfiguration(route: Any?) throws -> [String: Any] {
         try cylConfiguration(contentsOfFile: cylPathOfConfigurationRoute(route))
     }
@@ -1542,7 +1539,6 @@ extension CYLTabBarController {
         }
     }
 
-    @objc(loadConfigurationWithURL:completion:)
     @discardableResult
     class func cylLoadConfiguration(url: URL?, completion: (([String: Any]?, Error?) -> Void)?) -> URLSessionDataTask? {
         guard let completion else { return nil }
@@ -1554,7 +1550,6 @@ extension CYLTabBarController {
         return cylLoadConfiguration(request: request, completion: completion)
     }
 
-    @objc(loadConfigurationWithURLRequest:completion:)
     @discardableResult
     class func cylLoadConfiguration(request: URLRequest?, completion: (([String: Any]?, Error?) -> Void)?) -> URLSessionDataTask? {
         guard let completion else { return nil }
@@ -1593,5 +1588,61 @@ extension CYLTabBarController {
         }
         task.resume()
         return task
+    }
+}
+
+// MARK: - Public layer (the class switch, phase 3)
+
+/**
+ [EN] The members of `CYLTabBarController (CYLConfiguration)` with the Swift names and selectors apps see (they were declared in
+      CYLTabBarController.h until the class switch); each one forwards to the internal implementation above.
+ [CN] `CYLTabBarController (CYLConfiguration)` 的成员，使用 App 看到的 Swift 名称与 selector（类切换之前声明于 CYLTabBarController.h）；每个都转发给上面的内部实现。
+ */
+extension CYLTabBarController {
+
+    /**
+     [EN] The configuration with the defaults applied and the values checked (see docs/Configuration-File.md).
+     [CN] 应用默认值并检查过的配置（见 docs/Configuration-File.md）。
+     */
+    @objc(cyl_normalizedConfiguration:)
+    public class func cyl_normalizedConfiguration(_ configuration: [String: Any]) -> [String: Any] {
+        cylNormalizedConfiguration(configuration)
+    }
+
+    /**
+     [EN] The configuration in a file (JSON, YAML, plist, protobuf), a name in the main bundle or a path.
+     [CN] 文件中的配置（JSON、YAML、plist、protobuf），可以是主 bundle 中的名称或路径。
+     */
+    @objc(configurationWithContentsOfFile:error:)
+    public class func configuration(withContentsOfFile filePath: String) throws -> [String: Any] {
+        try cylConfiguration(contentsOfFile: filePath)
+    }
+
+    /**
+     [EN] The configuration of a resource route (docs/Configuration-File.md). [CN] 资源路由对应的配置。
+     */
+    @objc(configurationWithRoute:error:)
+    public class func configuration(withRoute route: String) throws -> [String: Any] {
+        try cylConfiguration(route: route)
+    }
+
+    /**
+     [EN] Downloads a configuration (15 second timeout; a local file URL is read at once); the completion runs on the main queue.
+     [CN] 下载配置（超时 15 秒；本地文件 URL 立即读取）；回调在主队列执行。
+     */
+    @objc(loadConfigurationWithURL:completion:)
+    @discardableResult
+    public class func loadConfiguration(with url: URL, completion: (([String: Any]?, Error?) -> Void)?) -> URLSessionDataTask? {
+        cylLoadConfiguration(url: url, completion: completion)
+    }
+
+    /**
+     [EN] `loadConfiguration(with:completion:)` with a request of your own (its timeout, cache policy and headers).
+     [CN] 使用自定义请求（其超时、缓存策略与请求头）的 `loadConfiguration(with:completion:)`。
+     */
+    @objc(loadConfigurationWithURLRequest:completion:)
+    @discardableResult
+    public class func loadConfiguration(with request: URLRequest, completion: (([String: Any]?, Error?) -> Void)?) -> URLSessionDataTask? {
+        cylLoadConfiguration(request: request, completion: completion)
     }
 }
