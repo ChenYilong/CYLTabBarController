@@ -122,75 +122,6 @@ typedef NS_ENUM(NSInteger, CYLTabBarMinimizeBehavior) {
     CYLTabBarMinimizeBehaviorOnScrollUp,
 };
 
-/*!
- * [EN] `CYLConstants` is a Swift class since docs/Swift-Migration.md step 114 (`Swift/CYLConstants.swift`): Objective-C sees it
- *      through the generated Swift interface, imported at the end of this header, with the same selectors.
- * [CN] 自第 114 步起 `CYLConstants` 是 Swift 类（`Swift/CYLConstants.swift`）：Objective-C 通过本头文件末尾导入的生成的 Swift 接口看到它，selector 不变。
- */
-
-CG_INLINE UIWindowScene *CYLGetWindowScene(void) {
-    UIWindowScene *windowScene = nil;
-    
-    if (@available(iOS 13.0, *)) {
-        for (UIWindowScene* wScene in [UIApplication sharedApplication].connectedScenes) {
-            if (wScene.activationState == UISceneActivationStateForegroundActive) {
-                windowScene = wScene;
-                break;
-            }
-        }
-    }
-    return windowScene;
-}
-
-CG_INLINE UIWindow *CYLGetRootWindow(void) {
-    UIWindow *window = nil;
-    if ([UIApplication.sharedApplication.delegate respondsToSelector:@selector(window)]) {
-        // [CN] 兼容新版项目结构，也就是AppDelegate没有window的情况
-        // [EN] Compatible with the newer project structure, i.e. when the AppDelegate has no window
-        window = UIApplication.sharedApplication.delegate.window;
-    }
-    if (window) {
-        return window;
-    }
-    if (@available(iOS 13.0, *)) {
-        UIWindowScene* wScene = CYLGetWindowScene();
-        if (wScene) {
-            window = wScene.windows.firstObject;
-        }
-    }
-    return window;
-}
-
-/*!
- * [EN] The topmost presented view controller from the window's root (the root itself when nothing is presented), so it can
- *      be a `UIAlertController`. Check its class before casting it.
- * [CN] 从窗口根控制器开始，最顶层被 present 的控制器（没有 present 时为根控制器本身），因此可能是 `UIAlertController`。强转前请先判断类型。
- */
-CG_INLINE UIViewController *CYLGetRootViewController(void) {
-    UIViewController *rootViewController ;
-    UIWindow *window = CYLGetRootWindow();
-    if (window) {
-        rootViewController = window.rootViewController;
-        UIViewController *topVC = rootViewController;
-        while (topVC.presentedViewController) {
-            topVC = topVC.presentedViewController;
-        }
-        
-        if (!topVC) { return nil; }
-        rootViewController = topVC;
-    }
-    
-    return rootViewController;
-}
-
-CG_INLINE CGFloat CYLGetTabBarFullH(CGFloat baseTabBarHeight) {
-    CGFloat bottom = CYLGetRootWindow().safeAreaInsets.bottom;
-    if (bottom > 0) {
-        return  baseTabBarHeight + CYLGetRootWindow().safeAreaInsets.bottom;
-    } else {
-        return baseTabBarHeight;
-    }
-}
 
 #define CYLRGBColor(r, g, b) [UIColor colorWithRed:(r)/255.0 green:(g)/255.0 blue:(b)/255.0 alpha:1]
 #define CYLRGBAColor(r, g, b, a) [UIColor colorWithRed:(r)/255.0 green:(g)/255.0 blue:(b)/255.0 alpha:a]
@@ -247,94 +178,17 @@ FOUNDATION_EXTERN CGFloat CYLConstantsUIBasisHeightScale(void);
 
 #define CYL_IS_IPHONE_X ((MIN(self.cyl_tabBarController.visiableTabBarSize.width, self.cyl_tabBarController.visiableTabBarSize.height) >= 375 && MAX(self.cyl_tabBarController.visiableTabBarSize.width, self.cyl_tabBarController.visiableTabBarSize.height) >= 812))
 
-/*!
- * [CN] 屏幕尺寸  不是tabbar尺寸
- * [EN] Screen size, not the tabbar size
- */
-CG_INLINE CGSize CYLScreenSize(void) {
-    CGSize size = CYLGetWindowScene().screen.bounds.size;
-    if (size.width == 0 || size.height == 0) {
-        CYL_DEPRECATED_DECLARATIONS_PUSH
-        size = [[UIScreen mainScreen] bounds].size;
-        CYL_DEPRECATED_DECLARATIONS_POP
-    }
-    return size;
-}
 
-CG_INLINE CGFloat CYLScreenWidth(void) {
-    return CYLScreenSize().width;
-}
-
-CG_INLINE CGFloat CYLScreenHeight(void) {
-    return CYLScreenSize().height;
-}
-
-CG_INLINE CGFloat CYLScaleValue(CGFloat value) {
-    return value * CYLScale;
-}
-
-CG_INLINE CGFloat CYLHScaleValue(CGFloat value) {
-    return value * CYLHScale;
-}
-
-CG_INLINE UIFont * CYLScaleFont(CGFloat fontSize)  {
-    return [UIFont systemFontOfSize:CYLScaleValue(fontSize)];
-}
-
-CG_INLINE UIFont * CYLScaleBoldFont(CGFloat fontSize) {
-    return [UIFont boldSystemFontOfSize:CYLScaleValue(fontSize)];
-}
+#pragma mark - Inline helpers
 
 /*!
- * [CN] 判断两个字符串是否相等（两个都为 nil 也算相等）
- * [EN] Check whether two strings are equal (two nil values also count as equal)
+ * [EN] The helper functions (`CYLGetRootWindow()`, `CYLGetRootViewController()`, `CYLScreenWidth()`, `CYLScaleValue()`…, and the
+ *      `cyl_is<Type>TypeEncoding()` / `cyl_is<Type>Ivar()` pairs) are Swift since step 133 (`Swift/CYLConstantsFunctions.swift`), with
+ *      the same C names: they are declared by the generated Swift interface imported below.
+ * [CN] 辅助函数（`CYLGetRootWindow()`、`CYLGetRootViewController()`、`CYLScreenWidth()`、`CYLScaleValue()`…，以及 `cyl_is<Type>TypeEncoding()` /
+ *      `cyl_is<Type>Ivar()` 函数对）自第 133 步起为 Swift，C 名称不变：由下方导入的生成 Swift 接口声明。
  */
-CG_INLINE BOOL CYLStringEqual(NSString *a, NSString *b) {
-    return (a == b) || [a isEqualToString:b];
-}
 
-CG_INLINE CGFloat CYLHalfOfDiff(CGFloat value1, CGFloat value2) {
-    return (value1 - value2) * 0.5;
-}
-#pragma mark - Ivar
-
-/*!
- [CN] 用于判断一个给定的 type encoding（const char *）或者 Ivar 是哪种类型的系列函数。
- [EN] A family of functions for determining which type a given type encoding (const char *) or Ivar is.
- 
- [CN] 为了节省代码量，函数由宏展开生成，一个宏会展开为两个函数定义：
- [EN] To save code, the functions are generated by macro expansion; one macro expands into two function definitions:
- 
- [CN] 1. isXxxTypeEncoding(const char *)，例如判断是否为 BOOL 类型的函数名为：isBOOLTypeEncoding()
- 2. isXxxIvar(Ivar)，例如判断是否为 BOOL 的 Ivar 的函数名为：isBOOLIvar()
- [EN] 1. isXxxTypeEncoding(const char *), e.g. the function to check for BOOL is named isBOOLTypeEncoding()
-      2. isXxxIvar(Ivar), e.g. the function to check for a BOOL Ivar is named isBOOLIvar()
- 
- @see https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/ObjCRuntimeGuide/Articles/ocrtTypeEncodings.html#//apple_ref/doc/uid/TP40008048-CH100-SW1
- */
-#define _CYLTypeEncodingDetectorGenerator(_TypeInFunctionName, _typeForEncode) CG_INLINE BOOL cyl_is##_TypeInFunctionName##TypeEncoding(const char *typeEncoding) { return strncmp(@encode(_typeForEncode), typeEncoding, strlen(@encode(_typeForEncode))) == 0; } CG_INLINE BOOL cyl_is##_TypeInFunctionName##Ivar(Ivar ivar) { return cyl_is##_TypeInFunctionName##TypeEncoding(ivar_getTypeEncoding(ivar)); }
-
-_CYLTypeEncodingDetectorGenerator(Char, char)
-_CYLTypeEncodingDetectorGenerator(Int, int)
-_CYLTypeEncodingDetectorGenerator(Short, short)
-_CYLTypeEncodingDetectorGenerator(Long, long)
-_CYLTypeEncodingDetectorGenerator(LongLong, long long)
-_CYLTypeEncodingDetectorGenerator(NSInteger, NSInteger)
-_CYLTypeEncodingDetectorGenerator(UnsignedChar, unsigned char)
-_CYLTypeEncodingDetectorGenerator(UnsignedInt, unsigned int)
-_CYLTypeEncodingDetectorGenerator(UnsignedShort, unsigned short)
-_CYLTypeEncodingDetectorGenerator(UnsignedLong, unsigned long)
-_CYLTypeEncodingDetectorGenerator(UnsignedLongLong, unsigned long long)
-_CYLTypeEncodingDetectorGenerator(NSUInteger, NSUInteger)
-_CYLTypeEncodingDetectorGenerator(Float, float)
-_CYLTypeEncodingDetectorGenerator(Double, double)
-_CYLTypeEncodingDetectorGenerator(CGFloat, CGFloat)
-_CYLTypeEncodingDetectorGenerator(BOOL, BOOL)
-_CYLTypeEncodingDetectorGenerator(Void, void)
-_CYLTypeEncodingDetectorGenerator(Character, char *)
-_CYLTypeEncodingDetectorGenerator(Object, id)
-_CYLTypeEncodingDetectorGenerator(Class, Class)
-_CYLTypeEncodingDetectorGenerator(Selector, SEL)
 
 #import "CYLSwiftInterface.h"
 
