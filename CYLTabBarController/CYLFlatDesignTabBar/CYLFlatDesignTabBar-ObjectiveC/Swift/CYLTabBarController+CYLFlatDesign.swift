@@ -21,6 +21,8 @@ import UIKit
     @objc(cylWaitingForVisibilityTransition) func waitingForVisibilityTransition() -> Bool
     @objc(setCylWaitingForVisibilityTransition:) func setWaitingForVisibilityTransition(_ value: Bool)
     @objc(setTabBarIsAnimating:) func setTabBarIsAnimating(_ value: Bool)
+    @objc(needsReloadItems) func needsReloadItems() -> Bool
+    @objc(setNeedsReloadItems:) func setNeedsReloadItems(_ value: Bool)
     @objc(addOneChildViewController:idx:WithTitle:normalImageInfo:selectedImageInfo:titlePositionAdjustment:imagePositionAdjustment:imageInsets:lottieURL:lottieFilePath:lottieSizeValue:)
     func addOneChildViewController(_ viewController: UIViewController, idx: UInt, withTitle title: String?, normalImageInfo: Any?,
                                    selectedImageInfo: Any?, titlePositionAdjustment: UIOffset, imagePositionAdjustment: UIOffset,
@@ -784,5 +786,86 @@ extension CYLTabBarController {
                                                     imagePositionAdjustment: setup.imagePositionAdjustment, imageInsets: setup.imageInsets,
                                                     lottieURL: setup.animationURL, lottieFilePath: setup.animationFilePath,
                                                     lottieSizeValue: setup.animationSizeValue)
+    }
+
+    // MARK: - Selection (docs/Swift-Migration.md, step 77; `CYLFlatDesignSelection` in Core)
+
+    /**
+     * [EN] Selects the FlatDesign item of `selectedIndex` (UIKit's More item for a tab under "More").
+     * [CN] 选中 `selectedIndex` 对应的扁平样式 item（收在「More」下的 Tab 选中 UIKit 的 More 项）。
+     */
+    @objc(tabChangedToSelectedIndex:viewController:selectedItem:)
+    func cylFlatDesignTabChanged(toSelectedIndex selectedIndex: UInt, viewController: UIViewController?, selectedItem: CYLFlatDesignTabBarItem?) {
+        guard let flatTabBar = cylFlatDesignTabBar, let items = cylFlatDesignHost.items() as? [CYLFlatDesignTabBarItem], !items.isEmpty else {
+            return
+        }
+        var item: CYLFlatDesignTabBarItem?
+        if cylFlatDesignShowsMoreNavigationController(),
+           let moreIndex = (tabBar.items ?? []).firstIndex(where: { $0 === moreNavigationController.tabBarItem }),
+           Int(selectedIndex) >= moreIndex {
+            item = moreNavigationController.cyl_tabBarItem
+        } else if Int(selectedIndex) < items.count {
+            item = items[Int(selectedIndex)]
+        }
+        flatTabBar.selectedItem = item
+    }
+
+    /**
+     * [EN] After `-setSelectedViewController:`: the stored index follows the view controller (any style, as before); in the
+     *      FlatDesign style the plus button and the item follow too, and the bar's visibility is updated.
+     * [CN] `-setSelectedViewController:` 之后：存储的下标跟随控制器（所有样式，与之前相同）；扁平样式下 PlusButton 与 item 也随之更新，并更新 TabBar 的可见性。
+     */
+    @objc(cyl_flatDesignDidSetSelectedViewController:)
+    func cylFlatDesignDidSetSelectedViewController(_ selectedViewController: UIViewController) {
+        guard let index = (viewControllers ?? []).firstIndex(where: { $0 === selectedViewController }) else {
+            return
+        }
+        cylPrivate.cylSetSelectedIndexStorage(UInt(index))
+        guard cylFlatDesignTabBar != nil else {
+            return
+        }
+        if let plusChild = cylPrivate.cylContextPlusChildViewController(), selectedViewController.isEqual(plusChild) {
+            cylPrivate.cylContextPlusButton()?.isSelected = true
+        }
+        cylFlatDesignTabChanged(toSelectedIndex: UInt(index), viewController: selectedViewController, selectedItem: nil)
+        cylFlatDesignUpdateBottomBarShowHideIfNeeded()
+    }
+
+    /**
+     * [EN] `-setSelectedIndex:` in the FlatDesign style. FIX: placeholder count mismatch — `selectedIndex` counts the slot, the
+     *      system list (`super.viewControllers`) has no placeholder and has the plus child view controller at its end: super gets
+     *      the index of the same view controller in its own list. The stored index is already the new one, so super would see no
+     *      change and not show the tab: it is shown through super, as a tap does.
+     * [CN] 扁平样式下的 `-setSelectedIndex:`。FIX：占位导致的数量不匹配——`selectedIndex` 计入了 slot，而系统列表（`super.viewControllers`）中没有占位控制器，
+     *      PlusButton 子控制器位于末尾：传给 super 的是同一个控制器在系统列表中的下标。存储的下标已是新值，super 会认为没有变化而不显示该 Tab：这里与点击一样通过 super 显示。
+     */
+    @objc(cyl_flatDesignSetSelectedIndex:)
+    func cylFlatDesignSetSelectedIndex(_ selectedIndex: UInt) {
+        guard let flatTabBar = cylFlatDesignTabBar else {
+            return
+        }
+        let viewControllers = self.viewControllers ?? []
+        if UInt(self.selectedIndex) != selectedIndex {
+            cylPrivate.cylSetSelectedIndexStorage(selectedIndex)
+            let viewControllerToSelect = selectedIndex < UInt(viewControllers.count) ? viewControllers[Int(selectedIndex)] : nil
+            if let viewControllerToSelect, let systemIndex = (super.viewControllers ?? []).firstIndex(where: { $0 === viewControllerToSelect }) {
+                super.selectedIndex = systemIndex
+            }
+            guard let viewControllerToSelect else {
+                return
+            }
+            super.selectedViewController = viewControllerToSelect
+            cylPrivate.cylSetSelectedViewControllerStorage(viewControllerToSelect)
+            let host = cylFlatDesignHost
+            if host.needsReloadItems() {
+                cylFlatDesignCaptureItems()
+                flatTabBar.items = (host.items() as? [CYLFlatDesignTabBarItem]) ?? []
+                host.setNeedsReloadItems(false)
+            }
+            cylFlatDesignTabChanged(toSelectedIndex: selectedIndex, viewController: nil, selectedItem: nil)
+        }
+        // FIX: issue #433 — the selected tab shows its selected title. [CN] 选中的 Tab 显示选中标题。
+        cylSetNeedsUpdateTabBarItemSelectedTitles(self)
+        cylFlatDesignUpdateBottomBarShowHideIfNeeded()
     }
 }

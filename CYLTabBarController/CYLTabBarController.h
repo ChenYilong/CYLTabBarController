@@ -1583,11 +1583,6 @@ didRecognizeTabBarItemGesture:(CYLTabBarItemGesture)gesture
 typedef UIView * _Nullable (^CYLTabBarItemIconViewProvider)(BOOL selected);
 
 
-/*!
- * [EN] Returns the visible tab bar size (see `-[UITabBar cyl_boundsSize]`).
- * [CN] 返回 TabBar 的可见尺寸（见 -[UITabBar cyl_boundsSize]）。
- */
-- (CGSize)visiableTabBarSize;
 
 /*!
  * double-check if to use CYLTabBarStyleTypeLiquidGlass or not:
@@ -2047,6 +2042,20 @@ typedef UIView * _Nullable (^CYLTabBarItemIconViewProvider)(BOOL selected);
  * [CN] 通知选中 Tab 已切换到 control，并触发相关回调。扁平化模式下无效。
  */
 - (void)tabChangedToControl:(UIControl *)control;
+
+@end
+
+/*!
+ * [EN] The size of the tab bar on screen. Implemented in Swift (docs/Swift-Migration.md, step 77); the selector is unchanged.
+ * [CN] 屏幕上 TabBar 的尺寸。由 Swift 实现（docs/Swift-Migration.md，第 77 步）；selector 不变。
+ */
+@interface CYLTabBarController (CYLVisibleTabBarSize)
+
+/*!
+ * [EN] Returns the visible tab bar size (see `-[UITabBar cyl_boundsSize]`).
+ * [CN] 返回 TabBar 的可见尺寸（见 -[UITabBar cyl_boundsSize]）。
+ */
+- (CGSize)visiableTabBarSize;
 
 @end
 

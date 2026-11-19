@@ -168,6 +168,11 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)cyl_isTabBarHidden;
 - (void)cyl_setTabBarHidden:(BOOL)hidden animated:(BOOL)animated;
 - (void)cyl_setDelegate:(nullable id)delegate;
+/// [EN] Implemented in Swift (CYLTabBarController+CYLSelectionOverrides.swift, step 77). [CN] 由 Swift 实现（第 77 步）。
+- (void)cyl_setSelectedViewController:(nullable UIViewController *)selectedViewController;
+- (void)cyl_setSelectedIndex:(NSUInteger)selectedIndex;
+- (void)cyl_setNeedsLiquidGlassTabBarResample;
+- (nullable UIControl *)cyl_plusButtonControlIfSelectingPlusChildViewController:(nullable UIViewController *)viewController;
 /// [EN] FlatDesign subspec only, implemented in Swift (step 74). [CN] 仅扁平样式子库，由 Swift 实现（第 74 步）。
 - (void)_cyl_refreshSystemTabBarVisibilityIfNeeded;
 - (void)cyl_plusButton:(CYLPlusButton *)plusButton didChangeWithNotification:(NSNotificationName)name info:(NSDictionary *)info;

@@ -1699,7 +1699,7 @@ extension CYLPlusButton {
         // [EN] `-setSelectedIndex:` already selected the plus button and reported it when the tab bar controller has a plus button
         //      with a child view controller; reporting again would report every tap twice.
         // [CN] TabBarController 有带子控制器的 PlusButton 时，`-setSelectedIndex:` 已经选中并上报了 PlusButton；再次上报会让每次点击上报两次。
-        let selectedBySetSelectedIndex = tabBarController.cylPrivate.cylPlusButtonControlIfSelectingPlusChildViewController(plusChildViewController) === sender
+        let selectedBySetSelectedIndex = tabBarController.cylPlusButtonControlIfSelectingPlusChildViewController(plusChildViewController) === sender
         if !selectedBySetSelectedIndex && cylControlReportsTapsEntryPoint(sender) {
             sender.isSelected = true
             tabBarController.tabChanged(to: sender)
