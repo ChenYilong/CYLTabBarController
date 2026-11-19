@@ -20,7 +20,14 @@ import UIKit
     @objc(cyl_imageOnlyTabsAdjustmentDisabled) func cylImageOnlyTabsAdjustmentDisabled() -> Bool
     @objc(setCyl_imageOnlyTabsAdjustmentDisabled:) func cylSetImageOnlyTabsAdjustmentDisabled(_ disabled: Bool)
     @objc(cyl_storedTabBar) func cylStoredTabBar() -> UIView?
-    @objc(cyl_rearmViewDidLayoutSubviewsBlockInvokeOnce) func cylRearmViewDidLayoutSubviewsBlockInvokeOnce()
+    /// [EN] Still Objective-C, used by the life cycle (step 74). [CN] 仍为 Objective-C，供生命周期使用（第 74 步）。
+    @objc(isLottieEnabled) func cylIsLottieEnabled() -> Bool
+    @objc(addLottieImageWithControl:lottieURL:lottieSizeValue:animation:)
+    func cylAddLottieImage(withControl control: UIControl, lottieURL: URL?, lottieSizeValue: NSValue?, animation: Bool)
+    @objc(addLottieImageWithControl:animation:defaultSelected:)
+    func cylAddLottieImage(withControl control: UIControl, animation: Bool, defaultSelected: Bool)
+    @objc(setTabBarItemAnimationViewAdded:) func cylSetTabBarItemAnimationViewAdded(_ added: Bool)
+    @objc(setInvokeOnceViewDidLayoutSubViewsBlock:) func cylSetInvokeOnceViewDidLayoutSubViewsBlock(_ invokeOnce: Bool)
     /// [EN] Class-extension state and a loader still in Objective-C, used by the in-place update (step 73). [CN] 仍为 Objective-C 的类扩展状态与加载方法，供原地更新使用（第 73 步）。
     @objc(tabBarItemAnimationURLs) func cylTabBarItemAnimationURLs() -> NSMutableArray
     @objc(tabBarItemAnimationSizes) func cylTabBarItemAnimationSizes() -> NSMutableArray

@@ -1212,15 +1212,6 @@ didRecognizeTabBarItemGesture:(CYLTabBarItemGesture)gesture
  */
 - (void)setViewDidLayoutSubViewsBlock:(CYLViewDidLayoutSubViewsBlock)viewDidLayoutSubviewsBlock;
 
-/*!
- * [EN] Sets the block invoked in `-viewDidLayoutSubviews`, marked to run only once. Note: `invokeOnce` is currently ignored and always treated as YES.
- *      It runs once more after the tab buttons or their contents are set up again: a theme switch (`CYLTabBarTheme`),
- *      `-reloadTabBarItemsWithAttributes:`, replacing a tab. Write it so it can run again (e.g. cover with the same views).
- * [CN] 设置在 -viewDidLayoutSubviews 中回调的 block，并标记为只执行一次。注意：目前 invokeOnce 参数未被使用，始终按 YES 处理。
- *      Tab 按钮或其内容重新设置后会再执行一次：换肤（`CYLTabBarTheme`）、`-reloadTabBarItemsWithAttributes:`、替换 Tab。
- *      请保证它可以重复执行（例如用同样的视图覆盖）。
- */
-- (void)setViewDidLayoutSubViewsBlockInvokeOnce:(BOOL)invokeOnce block:(CYLViewDidLayoutSubViewsBlock)viewDidLayoutSubviewsBlock;
 
 /*!
  * An array of the root view controllers displayed by the tab bar interface.
@@ -1666,11 +1657,6 @@ typedef UIView * _Nullable (^CYLTabBarItemIconViewProvider)(BOOL selected);
 - (CGSize)visiableTabBarSize;
 
 /*!
- * [EN] Notifies that the selected tab changed to `control` and triggers the related callbacks. No effect in flat-design mode.
- * [CN] 通知选中 Tab 已切换到 control，并触发相关回调。扁平化模式下无效。
- */
-- (void)tabChangedToControl:(UIControl *)control;
-/*!
  * double-check if to use CYLTabBarStyleTypeLiquidGlass or not:
  * UIDesignCompatibility == FlatDesign , noNeedUIDesignCompatibility == noNeed FlatDesign == LiquidGlass
  * [CN] 设置为 NO，表示扁平化设计， 本属性相当于UI兼容模式的代码替代版本，仅仅在 iOS26+ 系统有效。
@@ -2029,6 +2015,31 @@ typedef UIView * _Nullable (^CYLTabBarItemIconViewProvider)(BOOL selected);
              selectedIcon:(nullable id)selectedIcon
                      size:(CGSize)size
                   atIndex:(NSUInteger)index;
+
+@end
+
+/*!
+ * [EN] The one-time layout block and the tab button action. Implemented in Swift (docs/Swift-Migration.md, step 74); the
+ *      selectors are unchanged.
+ * [CN] 只执行一次的布局 block 与 Tab 按钮事件。由 Swift 实现（docs/Swift-Migration.md，第 74 步）；selector 不变。
+ */
+@interface CYLTabBarController (CYLLifeCycle)
+
+/*!
+ * [EN] Sets the block invoked in `-viewDidLayoutSubviews`, marked to run only once. Note: `invokeOnce` is currently ignored and always treated as YES.
+ *      It runs once more after the tab buttons or their contents are set up again: a theme switch (`CYLTabBarTheme`),
+ *      `-reloadTabBarItemsWithAttributes:`, replacing a tab. Write it so it can run again (e.g. cover with the same views).
+ * [CN] 设置在 -viewDidLayoutSubviews 中回调的 block，并标记为只执行一次。注意：目前 invokeOnce 参数未被使用，始终按 YES 处理。
+ *      Tab 按钮或其内容重新设置后会再执行一次：换肤（`CYLTabBarTheme`）、`-reloadTabBarItemsWithAttributes:`、替换 Tab。
+ *      请保证它可以重复执行（例如用同样的视图覆盖）。
+ */
+- (void)setViewDidLayoutSubViewsBlockInvokeOnce:(BOOL)invokeOnce block:(CYLViewDidLayoutSubViewsBlock)viewDidLayoutSubviewsBlock;
+
+/*!
+ * [EN] Notifies that the selected tab changed to `control` and triggers the related callbacks. No effect in flat-design mode.
+ * [CN] 通知选中 Tab 已切换到 control，并触发相关回调。扁平化模式下无效。
+ */
+- (void)tabChangedToControl:(UIControl *)control;
 
 @end
 

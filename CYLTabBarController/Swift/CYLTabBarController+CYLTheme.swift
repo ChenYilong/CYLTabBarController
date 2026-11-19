@@ -247,7 +247,7 @@ extension CYLTabBarController {
         // [CN] App 在只执行一次的布局 block（`-setViewDidLayoutSubViewsBlockInvokeOnce:block:`，如 Tab 上的封面、角标）中添加到 Tab 按钮的内容，
         //      在下一次布局后重新添加：之前换肤后该 block 仍被标记为已执行，UIKit 从 Tab 按钮中丢弃的内容不会再出现。范围：所有样式。添加什么由
         //      block 自己决定；主题自身的图标不依赖它：它们是替换每个图标的视图，液态玻璃下两个图层都有，每次布局后都会重新安装（#601）。
-        cylPrivate.cylRearmViewDidLayoutSubviewsBlockInvokeOnce()
+        cylRearmViewDidLayoutSubviewsBlockInvokeOnce()
         // [EN] Liquid Glass only: the next layout pass puts the stand-in on the plus button's new image and position (`-viewDidLayoutSubviews`).
         // [CN] 仅液态玻璃：每次换肤后，替身跟随 PlusButton 的新图片与新位置。
         if tabBarStyleType != .flatDesign && CYLConstants.isLiquidGlassActive() && isViewLoaded {

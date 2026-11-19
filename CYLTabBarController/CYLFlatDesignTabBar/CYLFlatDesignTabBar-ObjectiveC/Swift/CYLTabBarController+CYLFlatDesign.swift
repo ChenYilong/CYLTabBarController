@@ -13,7 +13,13 @@ import UIKit
  * [CN] 本文件调用的 `CYLTabBarController` 私有方法与状态（仍为 Objective-C，仅扁平样式）。只有 selector；该类在 `CYL_FLATDESIGN_AVAILABLE` 下实现它们。
  */
 @objc private protocol CYLFlatDesignTabBarControllerHostAPI {
-    @objc(_cyl_refreshSystemTabBarVisibilityIfNeeded) func refreshSystemTabBarVisibilityIfNeeded()
+    @objc(cylRefreshingSystemTabBarVisibility) func refreshingSystemTabBarVisibility() -> Bool
+    @objc(setCylRefreshingSystemTabBarVisibility:) func setRefreshingSystemTabBarVisibility(_ value: Bool)
+    @objc(setCylDidRefreshSystemTabBarVisibility:) func setDidRefreshSystemTabBarVisibility(_ value: Bool)
+    @objc(cylRefreshedSystemTabBarWindow) func refreshedSystemTabBarWindow() -> UIWindow?
+    @objc(setCylRefreshedSystemTabBarWindow:) func setRefreshedSystemTabBarWindow(_ window: UIWindow?)
+    @objc(cylWaitingForVisibilityTransition) func waitingForVisibilityTransition() -> Bool
+    @objc(setCylWaitingForVisibilityTransition:) func setWaitingForVisibilityTransition(_ value: Bool)
     @objc(_checkHidesBottomBarWhenPushed) func checkHidesBottomBarWhenPushed() -> Bool
     @objc(tabBarFrame) func tabBarFrame() -> CGRect
     @objc(parallaxOverlayView) func parallaxOverlayView() -> UIView?
@@ -86,7 +92,7 @@ extension CYLTabBarController {
             self.selectedViewController?.view.setNeedsLayout()
             self.selectedViewController?.view.layoutIfNeeded()
         }, completion: { _ in
-            self.cylFlatDesignHost.refreshSystemTabBarVisibilityIfNeeded()
+            self.cylFlatDesignRefreshSystemTabBarVisibilityIfNeeded()
         })
     }
 
@@ -177,7 +183,7 @@ extension CYLTabBarController {
     @objc(cylflatdesign_navigationController:navigationBarDidChangeHeight:)
     func cylFlatDesignNavigationController(_ navigationController: UINavigationController, navigationBarDidChangeHeight height: CGFloat) {
         if navigationController === selectedViewController {
-            cylFlatDesignHost.refreshSystemTabBarVisibilityIfNeeded()
+            cylFlatDesignRefreshSystemTabBarVisibilityIfNeeded()
         }
     }
 
@@ -243,10 +249,10 @@ extension CYLTabBarController {
         cylFlatDesignUpdateBottomBarShowHideIfNeeded()
         // [EN] A refresh deferred while the bar was in the transition overlay is retried after the overlay is removed
         //      (cancellation included). [CN] TabBar 位于转场遮罩中时推迟的刷新，在遮罩移除后重试（包括取消）。
-        host.refreshSystemTabBarVisibilityIfNeeded()
+        cylFlatDesignRefreshSystemTabBarVisibilityIfNeeded()
         if !host.didRefreshSystemTabBarVisibility() {
             DispatchQueue.main.async { [weak self] in
-                self?.cylFlatDesignHost.refreshSystemTabBarVisibilityIfNeeded()
+                self?.cylFlatDesignRefreshSystemTabBarVisibilityIfNeeded()
             }
         }
     }
@@ -520,5 +526,69 @@ extension CYLTabBarController {
     @objc(cyl_flatDesignSetAnimationURL:ofViewController:)
     func cylFlatDesignSetAnimationURL(_ URL: URL, of viewController: UIViewController) {
         viewController.cyl_tabBarItem?.lottieURL = URL
+    }
+
+    // MARK: - System tab bar visibility (docs/Swift-Migration.md, step 74)
+
+    /**
+     * FIX: issue #662 (iOS 27.1+)
+     * [EN] 1.99.65 hides the system bar view in `-initWithFrame:` (enough on iOS 27.0). From iOS 27.1, UIKit still reserves the
+     *      system bar's height in the children's safe area at first display: the `-setTabBarHidden:YES` sent from `viewDidLoad`
+     *      happens before the controller is in a window and is not applied to UIKit's controller-level state (34 + 49 + 49 =
+     *      132 instead of 83). UIKit's state is toggled once the selected child is in the window, without animating the bar;
+     *      a transition in progress is waited for.
+     * [CN] 1.99.65 只在 `-initWithFrame:` 里隐藏了系统 TabBar 视图（iOS 27.0 够用）。iOS 27.1 起，首次显示时 UIKit 仍为系统 TabBar 预留高度：
+     *      `viewDidLoad` 里的 `-setTabBarHidden:YES` 发生在进入 window 之前，没有生效（132 而不是 83）。在选中的子控制器进入 window 后，无动画地刷新一次
+     *      UIKit 的状态；有转场时等待其结束。
+     */
+    @objc(_cyl_refreshSystemTabBarVisibilityIfNeeded)
+    func cylFlatDesignRefreshSystemTabBarVisibilityIfNeeded() {
+        guard #available(iOS 27.1, *) else {
+            return
+        }
+        let host = cylFlatDesignHost
+        guard !host.refreshingSystemTabBarVisibility(), cylFlatDesignTabBar != nil else {
+            return
+        }
+        let selected = selectedViewController
+        guard let window = viewIfLoaded?.window, !window.isHidden, selected?.viewIfLoaded?.window === window else {
+            return
+        }
+        if host.didRefreshSystemTabBarVisibility() && host.refreshedSystemTabBarWindow() === window {
+            return
+        }
+        if host.tabBarIsAnimating() || host.parallaxOverlayView() != nil {
+            return
+        }
+        if let coordinator = selected?.transitionCoordinator ?? transitionCoordinator {
+            if !host.waitingForVisibilityTransition() {
+                host.setWaitingForVisibilityTransition(true)
+                let registered = coordinator.animate(alongsideTransition: nil) { [weak self] _ in
+                    guard let self else {
+                        return
+                    }
+                    self.cylFlatDesignHost.setWaitingForVisibilityTransition(false)
+                    DispatchQueue.main.async {
+                        self.cylFlatDesignRefreshSystemTabBarVisibilityIfNeeded()
+                    }
+                }
+                if !registered {
+                    host.setWaitingForVisibilityTransition(false)
+                }
+            }
+            return
+        }
+        host.setRefreshingSystemTabBarVisibility(true)
+        host.setDidRefreshSystemTabBarVisibility(true)
+        host.setRefreshedSystemTabBarWindow(window)
+        UIView.performWithoutAnimation {
+            super.setTabBarHidden(false, animated: false)
+            // [EN] If the KVC replacement failed, UIKit's original bar lacks the always-hidden setter of CYLFlatDesignTabBarHideTabBar.
+            // [CN] 若 KVC 替换失败，UIKit 原有的 TabBar 没有 CYLFlatDesignTabBarHideTabBar 的始终隐藏 setter。
+            if !self.tabBar.isHidden { self.tabBar.isHidden = true }
+            super.setTabBarHidden(true, animated: false)
+            if !self.tabBar.isHidden { self.tabBar.isHidden = true }
+        }
+        host.setRefreshingSystemTabBarVisibility(false)
     }
 }

@@ -156,6 +156,16 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)_updateAdditionalSafeAreaInsetsWithAnimated:(BOOL)animated;
 /// [EN] Implemented in Swift (CYLTabBarController+CYLTabBarItemUpdate.swift, step 73). [CN] 由 Swift 实现（第 73 步）。
 + (NSArray *)cyl_imageInfosOfAttributes:(NSDictionary *)attributes applyingIconRenderingModeToImageInfo:(nullable id)normalImageInfo selectedImageInfo:(nullable id)selectedImageInfo;
+/// [EN] Implemented in Swift (CYLTabBarController+CYLLifeCycle.swift, step 74). [CN] 由 Swift 实现（第 74 步）。
+- (void)cyl_viewWillAppear:(BOOL)animated;
+- (void)cyl_viewDidAppear:(BOOL)animated;
+- (void)cyl_viewWillDisappear:(BOOL)animated;
+- (void)cyl_viewDidDisappear:(BOOL)animated;
+- (void)tabChangedToSelectedViewController:(nullable UIViewController *)viewController control:(nullable UIControl *)control;
+- (void)tabChangedToSelectedIndex:(NSUInteger)selectedIndex viewController:(nullable UIViewController *)viewController control:(nullable UIControl *)control;
+- (void)initLottieTabBar:(CYLTabBar *)tabBar;
+/// [EN] FlatDesign subspec only, implemented in Swift (step 74). [CN] 仅扁平样式子库，由 Swift 实现（第 74 步）。
+- (void)_cyl_refreshSystemTabBarVisibilityIfNeeded;
 - (void)cyl_plusButton:(CYLPlusButton *)plusButton didChangeWithNotification:(NSNotificationName)name info:(NSDictionary *)info;
 - (void)cyl_syncTabBarItemAccessibility;
 #if CYL_FLATDESIGN_AVAILABLE
