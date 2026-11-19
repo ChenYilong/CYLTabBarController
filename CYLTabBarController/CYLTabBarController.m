@@ -1860,30 +1860,20 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
 
 @end
 
-#pragma mark - Attributes storage
-
-@implementation CYLTabBarController (CYLTabBarItemsAttributesStorage)
-
-/*!
- * [EN] Replaces `_tabBarItemsAttributes` without the setter's work, for the Swift asynchronous pages
- *      (Swift/CYLTabBarController+CYLPageRegistry.swift; `CYLPendingPages`, `CYLPageRegistry` and
- *      `UIViewController (CYLTabBarItemTitleSupport)` are Swift since docs/Swift-Migration.md, step 54).
- * [CN] 替换 `_tabBarItemsAttributes`，不执行 setter 的逻辑，供 Swift 的异步页面使用（Swift/CYLTabBarController+CYLPageRegistry.swift；
- *      `CYLPendingPages`、`CYLPageRegistry` 与 `UIViewController (CYLTabBarItemTitleSupport)` 自 docs/Swift-Migration.md 第 54 步起为 Swift）。
- */
-- (void)cyl_replaceTabBarItemsAttributesStorage:(NSArray<NSDictionary *> *)tabBarItemsAttributes {
-    _tabBarItemsAttributes = [tabBarItemsAttributes copy];
-}
-
-@end
-
 #pragma mark - Tab setup storage
 
 /*!
- * [EN] The ivars written by the Swift tab setup (Swift/CYLTabBarController+CYLTabSetup.swift, step 126), without any setter's work.
- * [CN] Swift 的 Tab 设置写入的实例变量（第 126 步），不执行 setter 的逻辑。
+ * [EN] The ivars written by the Swift code without any setter's work: the tab setup (steps 126–129) and the asynchronous pages
+ *      (`-cyl_replaceTabBarItemsAttributesStorage:`, Swift/CYLTabBarController+CYLPageRegistry.swift, step 54; formerly the
+ *      category `CYLTabBarItemsAttributesStorage`, merged here in step 130). The one place for storage until the class switch.
+ * [CN] Swift 代码写入的实例变量，不执行 setter 的逻辑：Tab 设置（第 126–129 步）与异步页面（`-cyl_replaceTabBarItemsAttributesStorage:`，第 54 步；
+ *      原为类别 `CYLTabBarItemsAttributesStorage`，第 130 步合并到这里）。类切换之前存储的唯一位置。
  */
 @implementation CYLTabBarController (CYLTabSetupStorage)
+
+- (void)cyl_replaceTabBarItemsAttributesStorage:(NSArray<NSDictionary *> *)tabBarItemsAttributes {
+    _tabBarItemsAttributes = [tabBarItemsAttributes copy];
+}
 
 - (void)cyl_setViewControllersStorage:(nullable NSArray<UIViewController *> *)viewControllers {
     _viewControllers = viewControllers;
