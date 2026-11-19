@@ -24,7 +24,7 @@ Pod::Spec.new do |s|
     #      depends on; CYLUtils re-exports it (Swift `@_exported import`, Objective-C headers).
     # [CN] 动画 key 与 URL 选项属于 CYLAnimatedItem pod（CYLAnimatedItem.podspec），CYLUtils 依赖它并重新导出（Swift `@_exported import`、
     #      Objective-C 头文件）。
-    utils.exclude_files = 'CYLTabBarController/CYLUtils/CYLAnimationKeys.{h,m}', 'CYLTabBarController/CYLUtils/Swift/CYLAnimationURLOptions.swift'
+    utils.exclude_files = 'CYLTabBarController/CYLUtils/CYLAnimationKeys.{h,m}', 'CYLTabBarController/CYLUtils/Swift/CYLAnimationURLOptions.swift', 'CYLTabBarController/CYLUtils/Swift/CYLAnimationKeyLookup.swift'
     utils.dependency 'CYLAnimatedItem/Core', s.version.to_s
     utils.public_header_files = 'CYLTabBarController/CYLUtils/**/*.h'
     # FIX: issue #216 — theme switching (skins): public headers in `CYLUtils/CYLComponents/CYLTheme/`, implementation in

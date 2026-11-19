@@ -5,6 +5,12 @@
 //  Copyright © 2026 https://github.com/ChenYilong . All rights reserved.
 //
 
+// CYL-SWIFT-MIGRATION: objc-required — [EN] What is left needs Objective-C: the key constants carry per-engine compile warnings
+//      (`CYL_PAG_REQUIRED` …, an AGENTS.md rule; Swift cannot attach a warning that depends on which engine pod is in the build),
+//      and `CYLAnimationTypeIsAvailable()` / `CYLAnimationWarnMissingEngine()` read the `__has_include` engine switches of
+//      CYLAnimatedItemMacros.h. The lookup is Swift (CYLUtils/Swift/CYLAnimationKeyLookup.swift, step 122).
+// [CN] 剩余部分需要 Objective-C：key 常量带有各引擎的编译警告（AGENTS.md 规则；Swift 无法附加取决于引擎子库是否存在的警告），
+//      `CYLAnimationTypeIsAvailable()` / `CYLAnimationWarnMissingEngine()` 读取 CYLAnimatedItemMacros.h 的 `__has_include` 引擎开关。查找逻辑为 Swift。
 #import "CYLAnimationKeys.h"
 
 // [EN] Moved from CYLTabBarController.m (same names and values). [CN] 从 CYLTabBarController.m 移来（名称与值不变）。
@@ -58,75 +64,9 @@ NSString *const CYLTabBarGIFSize = @"CYLTabBarGIFSize";
 NSString *const CYLTabBarGIFDarkURL = @"CYLTabBarGIFDarkURL";
 NSString *const CYLTabBarGIFDarkFilePath = @"CYLTabBarGIFDarkFilePath";
 
-/*
- * [EN] Each type with its own keys, by generic key. [CN] 每种类型及其自己的 key，按通用 key 排列。
- */
-static NSArray<NSDictionary<NSString *, id> *> *CYLAnimationTypeTable(void) {
-    static NSArray *table;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        table = @[
-            @{ @"type" : @"Lottie", @"extensions" : @[ @"json", @"lottie" ], @"pod" : @"LottieSwift",
-               @"keys" : @{ CYLTabBarAnimationURL : CYLTabBarLottieURL, CYLTabBarAnimationFilePath : CYLTabBarLottieFilePath,
-                            CYLTabBarAnimationSize : CYLTabBarLottieSize, CYLTabBarAnimationDarkURL : CYLTabBarLottieDarkURL,
-                            CYLTabBarAnimationDarkFilePath : CYLTabBarLottieDarkFilePath, CYLTabBarAnimationDarkColors : CYLTabBarLottieDarkColors } },
-            @{ @"type" : @"PAG", @"extensions" : @[ @"pag" ], @"pod" : @"PAG",
-               @"keys" : @{ CYLTabBarAnimationURL : CYLTabBarPAGURL, CYLTabBarAnimationFilePath : CYLTabBarPAGFilePath,
-                            CYLTabBarAnimationSize : CYLTabBarPAGSize, CYLTabBarAnimationDarkURL : CYLTabBarPAGDarkURL,
-                            CYLTabBarAnimationDarkFilePath : CYLTabBarPAGDarkFilePath } },
-            @{ @"type" : @"Rive", @"extensions" : @[ @"riv" ], @"pod" : @"Rive",
-               @"keys" : @{ CYLTabBarAnimationURL : CYLTabBarRiveURL, CYLTabBarAnimationFilePath : CYLTabBarRiveFilePath,
-                            CYLTabBarAnimationSize : CYLTabBarRiveSize, CYLTabBarAnimationDarkURL : CYLTabBarRiveDarkURL,
-                            CYLTabBarAnimationDarkFilePath : CYLTabBarRiveDarkFilePath, CYLTabBarAnimationDarkColors : CYLTabBarRiveDarkColors } },
-            @{ @"type" : @"SVGA", @"extensions" : @[ @"svga" ], @"pod" : @"SVGA",
-               @"keys" : @{ CYLTabBarAnimationURL : CYLTabBarSVGAURL, CYLTabBarAnimationFilePath : CYLTabBarSVGAFilePath,
-                            CYLTabBarAnimationSize : CYLTabBarSVGASize, CYLTabBarAnimationDarkURL : CYLTabBarSVGADarkURL,
-                            CYLTabBarAnimationDarkFilePath : CYLTabBarSVGADarkFilePath } },
-            @{ @"type" : @"GIF", @"extensions" : @[ @"gif" ], @"pod" : @"GIF",
-               @"keys" : @{ CYLTabBarAnimationURL : CYLTabBarGIFURL, CYLTabBarAnimationFilePath : CYLTabBarGIFFilePath,
-                            CYLTabBarAnimationSize : CYLTabBarGIFSize, CYLTabBarAnimationDarkURL : CYLTabBarGIFDarkURL,
-                            CYLTabBarAnimationDarkFilePath : CYLTabBarGIFDarkFilePath } },
-        ];
-    });
-    return table;
-}
+// [EN] The type table and the lookup functions are Swift since step 122 (CYLUtils/Swift/CYLAnimationKeyLookup.swift).
+// [CN] 类型表与查找函数自第 122 步起为 Swift（CYLUtils/Swift/CYLAnimationKeyLookup.swift）。
 #pragma clang diagnostic pop
-
-id CYLAnimationAttributesValue(NSDictionary *attributes, NSString *genericKey) {
-    if (![attributes isKindOfClass:[NSDictionary class]] || genericKey.length == 0) {
-        return nil;
-    }
-    id value = attributes[genericKey];
-    if (value) {
-        return value;
-    }
-    for (NSDictionary *entry in CYLAnimationTypeTable()) {
-        NSString *key = entry[@"keys"][genericKey];
-        if (key && attributes[key]) {
-            return attributes[key];
-        }
-    }
-    return nil;
-}
-
-NSString *CYLAnimationTypeOfFile(NSDictionary *attributes, NSURL *fileURL) {
-    NSString *extension = fileURL.path.pathExtension.lowercaseString;
-    for (NSDictionary *entry in CYLAnimationTypeTable()) {
-        if ([attributes isKindOfClass:[NSDictionary class]]) {
-            for (NSString *key in [entry[@"keys"] allValues]) {
-                if (attributes[key]) {
-                    return entry[@"type"];
-                }
-            }
-        }
-    }
-    for (NSDictionary *entry in CYLAnimationTypeTable()) {
-        if (extension.length > 0 && [entry[@"extensions"] containsObject:extension]) {
-            return entry[@"type"];
-        }
-    }
-    return nil;
-}
 
 BOOL CYLAnimationTypeIsAvailable(NSString *type) {
     // [EN] Evaluated where this pod is compiled, i.e. with the subspecs the project installed.
@@ -140,31 +80,6 @@ BOOL CYLAnimationTypeIsAvailable(NSString *type) {
 #else
     return NO;
 #endif
-}
-
-NSArray<NSString *> *CYLAnimationKnownTypes(void) {
-    return [CYLAnimationTypeTable() valueForKey:@"type"];
-}
-
-/// [EN] The table entry of `type`, or nil. [CN] `type` 在表中的条目；没有时为 nil。
-static NSDictionary<NSString *, id> *CYLAnimationTypeEntry(NSString *type) {
-    if (type.length == 0) {
-        return nil;
-    }
-    for (NSDictionary<NSString *, id> *entry in CYLAnimationTypeTable()) {
-        if ([entry[@"type"] isEqualToString:type]) {
-            return entry;
-        }
-    }
-    return nil;
-}
-
-NSString *CYLAnimationSubspecOfType(NSString *type) {
-    return CYLAnimationTypeEntry(type)[@"pod"];
-}
-
-NSArray<NSString *> *CYLAnimationFileExtensionsOfType(NSString *type) {
-    return CYLAnimationTypeEntry(type)[@"extensions"] ?: @[];
 }
 
 void CYLAnimationWarnMissingEngine(NSDictionary *attributes, NSURL *fileURL) {

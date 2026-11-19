@@ -5,6 +5,12 @@
 //  Copyright © 2026 https://github.com/ChenYilong . All rights reserved.
 //
 
+// CYL-SWIFT-MIGRATION: objc-required — [EN] What is left needs Objective-C: the key constants carry per-engine compile warnings
+//      (`CYL_PAG_REQUIRED` …, an AGENTS.md rule; Swift cannot attach a warning that depends on which engine pod is in the build),
+//      and `CYLAnimationTypeIsAvailable()` / `CYLAnimationWarnMissingEngine()` read the `__has_include` engine switches of
+//      CYLAnimatedItemMacros.h. The lookup is Swift (CYLUtils/Swift/CYLAnimationKeyLookup.swift, step 122).
+// [CN] 剩余部分需要 Objective-C：key 常量带有各引擎的编译警告（AGENTS.md 规则；Swift 无法附加取决于引擎子库是否存在的警告），
+//      `CYLAnimationTypeIsAvailable()` / `CYLAnimationWarnMissingEngine()` 读取 CYLAnimatedItemMacros.h 的 `__has_include` 引擎开关。查找逻辑为 Swift。
 #import <Foundation/Foundation.h>
 #if __has_include(<CYLAnimatedItem/CYLAnimatedItemMacros.h>)
 #import <CYLAnimatedItem/CYLAnimatedItemMacros.h>

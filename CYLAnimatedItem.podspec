@@ -40,6 +40,7 @@ Pod::Spec.new do |s|
     core.source_files = 'CYLTabBarController/CYLAnimatedItem/*.{h,m}',
                         'CYLTabBarController/CYLUtils/CYLAnimationKeys.{h,m}',
                         'CYLTabBarController/CYLUtils/Swift/CYLAnimationURLOptions.swift',
+                        'CYLTabBarController/CYLUtils/Swift/CYLAnimationKeyLookup.swift',
                         # [EN] Swift views built on CYLAnimatedItemView (CYLAnimatedItemStackView). [CN] 基于 CYLAnimatedItemView 的 Swift 视图（CYLAnimatedItemStackView）。
                         'CYLTabBarController/CYLAnimatedItem/Swift/*.swift'
     core.public_header_files = 'CYLTabBarController/CYLAnimatedItem/*.h', 'CYLTabBarController/CYLUtils/CYLAnimationKeys.h'

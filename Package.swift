@@ -33,7 +33,7 @@ let package = Package(
         .target(
             name: "CYLAnimatedItemSwift",
             path: "CYLTabBarController",
-            sources: ["CYLUtils/Swift/CYLAnimationURLOptions.swift", "CYLTabBarItemAnimation/Swift"],
+            sources: ["CYLUtils/Swift/CYLAnimationURLOptions.swift", "CYLUtils/Swift/CYLAnimationKeyLookup.swift", "CYLTabBarItemAnimation/Swift"],
             resources: [.copy("CYLAnimatedItem/Resources/CYLAnimatedItem.bundle")]
         ),
         // [EN] CYLAnimatedItem, Objective-C half: CYLAnimatedItemView, the animation keys and the engine (the CocoaPods
@@ -89,7 +89,7 @@ let package = Package(
             name: "CYLTabBarControllerSwift",
             dependencies: ["CYLAnimatedItem", "CYLAnimatedItemSwift", "CYLAnimatedItemViews"],
             path: "CYLTabBarController",
-            exclude: ["CYLUtils/Swift/CYLAnimationURLOptions.swift"],
+            exclude: ["CYLUtils/Swift/CYLAnimationURLOptions.swift", "CYLUtils/Swift/CYLAnimationKeyLookup.swift"],
             sources: ["CYLUtils/Swift", "CYLBadgeView/Swift", "Swift", "CYLFlatDesignTabBar/CYLFlatDesignTabBar-ObjectiveC/Swift"],
             // [EN] The resource bundle belongs to the target that reads it (`CYLResourceBundle()`, now in Swift).
             // [CN] 资源包属于读取它的 target（`CYLResourceBundle()`，现在用 Swift 实现）。
