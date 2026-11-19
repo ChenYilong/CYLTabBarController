@@ -134,7 +134,7 @@ extension CYLTabBarController {
         let wasSelected = selectedIndex == index
         if let problem {
             viewControllers.remove(at: index)
-            let attributesIndex = Int(cylPrivate.cylTabBarItemsAttributesIndexOfViewController(at: UInt(index)))
+            let attributesIndex = Int(cylTabBarItemsAttributesIndexOfViewController(at: UInt(index)))
             var tabBarItemsAttributes = self.tabBarItemsAttributes
             if attributesIndex < tabBarItemsAttributes.count {
                 tabBarItemsAttributes.remove(at: attributesIndex)

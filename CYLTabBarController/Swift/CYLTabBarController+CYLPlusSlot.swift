@@ -15,8 +15,8 @@ private let CYLTabBarItemPlusSlotPlaceholderKey = "CYLTabBarItemPlusSlotPlacehol
  [EN] The plus slot: the plus button's tab in `viewControllers`, the plus child view controller, or a placeholder for a plus
       button without one (Liquid Glass, FlatDesign). It is derived state: `-setViewControllers:` removes any slot the array
       carries and inserts exactly one, at `-cyl_plusSlotIndexForTabCount:`; everything else reads the slot's index from
-      `viewControllers`. Translated from Objective-C (docs/Swift-Migration.md, step 124); `-alignTabControlIfNeededWithViewControllers:`
-      stays a two-line wrapper in CYLTabBarController.m that stores the result in `_viewControllers` (its setter calls back here).
+      `viewControllers`. Translated from Objective-C (docs/Swift-Migration.md, step 124); the tab setup
+      (CYLTabBarController+CYLTabSetup.swift, step 126) stores the result in `_viewControllers`.
       Internal members with the Objective-C selectors, declared in CYLTabBarController+CYLPrivate.h.
 
       FIX: placeholder count mismatch. The slot used to be inserted by three methods with different conditions and indexes,
@@ -25,8 +25,7 @@ private let CYLTabBarItemPlusSlotPlaceholderKey = "CYLTabBarItemPlusSlotPlacehol
       slot in the middle while `-[UIView cyl_plusButtonIndex]` returned the custom index.
  [CN] 加号 slot：PlusButton 在 `viewControllers` 中对应的 Tab，即 PlusButton 子控制器，或没有子控制器时的占位控制器（液态玻璃、扁平样式）。
       它是派生状态：`-setViewControllers:` 先移除数组中已有的 slot，再在 `-cyl_plusSlotIndexForTabCount:` 处插入且只插入一个；其他地方都从
-      `viewControllers` 读取 slot 的下标。已从 Objective-C 翻译（第 124 步）；`-alignTabControlIfNeededWithViewControllers:` 在
-      CYLTabBarController.m 中保留为两行的包装方法，把结果存入 `_viewControllers`（其 setter 会回调这里）。以 Objective-C selector 实现的内部
+      `viewControllers` 读取 slot 的下标。已从 Objective-C 翻译（第 124 步）；Tab 设置（第 126 步）把结果存入 `_viewControllers`。以 Objective-C selector 实现的内部
       成员，声明于 CYLTabBarController+CYLPrivate.h。
 
       FIX：占位导致的数量不匹配。以前 slot 由三个方法以不同的条件与下标插入，且不先移除，因此重新赋值 `viewControllers` 时会丢失 PlusButton 子控制器
@@ -128,10 +127,10 @@ extension CYLTabBarController {
     }
 
     /**
-     [EN] `viewControllers` (any slot removed) with exactly one slot, for CYLTabBarController.m to store in `_viewControllers`;
+     [EN] `viewControllers` (any slot removed) with exactly one slot, stored in `_viewControllers` by the tab setup;
           keeps `tabBarItemsAttributes` in step (Liquid Glass and FlatDesign give the slot its own entry; the classic style
           skips it) and updates the plus button's indexes.
-     [CN] 返回 `viewControllers`（先去掉 slot）加上唯一一个 slot，由 CYLTabBarController.m 存入 `_viewControllers`；同步 `tabBarItemsAttributes`
+     [CN] 返回 `viewControllers`（先去掉 slot）加上唯一一个 slot，由 Tab 设置存入 `_viewControllers`；同步 `tabBarItemsAttributes`
           （液态玻璃与扁平样式为 slot 提供单独的一项；经典样式跳过），并更新 PlusButton 的下标。
      */
     @objc(cyl_viewControllersAligningPlusSlotWithViewControllers:)

@@ -1551,11 +1551,6 @@ didRecognizeTabBarItemGesture:(CYLTabBarItemGesture)gesture
  */
 - (void)hideTabBarShadowImageView;
 
-/*!
- * [EN] Sets the tab bar tint color. No effect in flat-design mode.
- * [CN] 设置 TabBar 的 tintColor。扁平化模式下无效。
- */
-- (void)setTintColor:(UIColor *)tintColor;
 
 /*!
  * Judge if there is plus button.
@@ -1564,14 +1559,6 @@ didRecognizeTabBarItemGesture:(CYLTabBarItemGesture)gesture
  */
 - (BOOL)hasPlusButton;
 
-/*!
- * [EN] Returns YES if the plus button has a child view controller (`+plusChildViewController`) in this tab bar
- *      controller. Then the plus button has two layers: the plus button and, under it, the system tab button of that
- *      view controller. Use it as a guard before touching `plusChildViewController`.
- * [CN] PlusButton 在本 TabBarController 中有子控制器（`+plusChildViewController`）时返回 YES。此时 PlusButton 有两个图层：
- *      PlusButton 本身，以及其下方该子控制器的系统 Tab 按钮。处理 `plusChildViewController` 之前用它判断。
- */
-- (BOOL)hasPlusChildViewController;
 
 /*!
  * @attention Include plusButton if exists.
@@ -1586,26 +1573,6 @@ didRecognizeTabBarItemGesture:(CYLTabBarItemGesture)gesture
  */
 - (id<UIApplicationDelegate>)appDelegate;
 
-/*!
- *更新TabBarItems
- *@attention 其内部其实也重新设置了viewControllers
- *@param tabBarItemsAttributes tabBarItemsAttributes
- * [EN] Reloads the tab bar items with new attributes; view controllers are set again internally.
- * [CN] 使用新的属性数组刷新 TabBarItems，内部会重新设置 viewControllers。
- */
-- (void)reloadTabBarItemsWithAttributes:(NSArray<NSDictionary *> *)tabBarItemsAttributes;
-
-
-
-/*!
- * [EN] The entry of `tabBarItemsAttributes` for the tab at `index` in `viewControllers`, with the updates of
- *      `-updateTabBarItemAtIndex:attributes:` merged in; nil for the plus button's tab or when there is none. The indexes
- *      of the two arrays differ when the system tab bar has a plus child view controller: this maps them.
- * [CN] `viewControllers` 中第 `index` 个 Tab 在 `tabBarItemsAttributes` 中对应的项，已合并 `-updateTabBarItemAtIndex:attributes:`
- *      的更新；PlusButton 的 Tab 或没有对应项时为 nil。系统 TabBar 有 PlusButton 子控制器时两个数组的索引不同，本方法负责对应。
- */
-- (nullable NSDictionary<NSString *, id> *)tabBarItemAttributesAtIndex:(NSUInteger)index;
-
 
 /*!
  * [EN] Returns the view that shows a tab's icon: `selected` NO for the unselected look, YES for the selected one. Called
@@ -1615,40 +1582,6 @@ didRecognizeTabBarItemGesture:(CYLTabBarItemGesture)gesture
  */
 typedef UIView * _Nullable (^CYLTabBarItemIconViewProvider)(BOOL selected);
 
-
-
-/*!
- * FIX: issue #481
- * [EN] Replaces the view controller of the tab at `index` with `viewController` (e.g. a tab whose content depends on
- *      another tab being selected), and sets its tab item with `attributes`: the new entry of `tabBarItemsAttributes` for
- *      that tab (title, images, Lottie...), in place of the old one; nil keeps the old one. The other tabs keep their view controllers, and the selected tab stays
- *      selected (the new view controller when it replaces the selected one). Put the old view controller back the same
- *      way, with its attributes, to restore the tab. The tab bar is set up again (`viewControllers` is assigned), so
- *      call it outside a transition, e.g. in `-tabBarController:didSelectViewController:`:
- *
- *          // [EN] The third tab selected: its neighbors show other pages; Home selected: the original ones.
- *          // [CN] 选中第三个 Tab：相邻的两个 Tab 显示其他页面；选中首页：恢复原来的页面。
- *          - (void)tabBarController:(CYLTabBarController *)tabBarController didSelectViewController:(UIViewController *)viewController {
- *              NSUInteger index = [tabBarController.viewControllers indexOfObject:viewController];
- *              if (index == 2) {
- *                  [tabBarController replaceViewControllerAtIndex:1 withViewController:self.otherPageA attributes:@{ CYLTabBarItemTitle : @"A" }];
- *                  [tabBarController replaceViewControllerAtIndex:3 withViewController:self.otherPageB attributes:@{ CYLTabBarItemTitle : @"B" }];
- *              } else if (index == 0) {
- *                  [tabBarController replaceViewControllerAtIndex:1 withViewController:self.originalPage1 attributes:self.originalAttributes1];
- *                  [tabBarController replaceViewControllerAtIndex:3 withViewController:self.originalPage3 attributes:self.originalAttributes3];
- *              }
- *          }
- *
- * [CN] 将第 `index` 个 Tab 的视图控制器替换为 `viewController`（例如某个 Tab 的内容取决于另一个 Tab 是否选中），并用 `attributes`
- *      设置其 TabBarItem：该 Tab 在 `tabBarItemsAttributes` 中的新属性（标题、图片、Lottie 等），替换旧的属性；nil 则保留旧的属性。其他 Tab 的视图控制器不变，选中的 Tab
- *      保持选中（替换的正是选中的 Tab 时，选中新的视图控制器）。用同样的方式放回原来的视图控制器及其属性即可恢复。TabBar 会重新设置
- *      （重新赋值 `viewControllers`），请在转场之外调用，如 `-tabBarController:didSelectViewController:` 中（示例见上）。
- * @return [EN] NO when there is no such tab, it is the plus button's, or `viewController` is already one of the tabs.
- *         [CN] 没有该 Tab、是 PlusButton 的 Tab，或 `viewController` 已是某个 Tab 时返回 NO。
- */
-- (BOOL)replaceViewControllerAtIndex:(NSUInteger)index
-                  withViewController:(UIViewController *)viewController
-                          attributes:(nullable NSDictionary<NSString *, id> *)attributes;
 
 /*!
  * [EN] Returns the visible tab bar size (see `-[UITabBar cyl_boundsSize]`).
@@ -1843,6 +1776,80 @@ typedef UIView * _Nullable (^CYLTabBarItemIconViewProvider)(BOOL selected);
 //@property (nonatomic, assign, getter=isLottieViewAdded) BOOL lottieViewAdded;
 
 #endif
+
+@end
+
+/*!
+ * [EN] Setting the tabs up: implemented in Swift (`Swift/CYLTabBarController+CYLTabSetup.swift`, step 126).
+ * [CN] 设置 Tab：在 Swift 中实现（`Swift/CYLTabBarController+CYLTabSetup.swift`，第 126 步）。
+ */
+@interface CYLTabBarController (CYLTabSetup)
+
+/*!
+ * [EN] Sets the tab bar tint color. No effect in flat-design mode.
+ * [CN] 设置 TabBar 的 tintColor。扁平化模式下无效。
+ */
+- (void)setTintColor:(UIColor *)tintColor;
+
+/*!
+ * [EN] Returns YES if the plus button has a child view controller (`+plusChildViewController`) in this tab bar
+ *      controller. Then the plus button has two layers: the plus button and, under it, the system tab button of that
+ *      view controller. Use it as a guard before touching `plusChildViewController`.
+ * [CN] PlusButton 在本 TabBarController 中有子控制器（`+plusChildViewController`）时返回 YES。此时 PlusButton 有两个图层：
+ *      PlusButton 本身，以及其下方该子控制器的系统 Tab 按钮。处理 `plusChildViewController` 之前用它判断。
+ */
+- (BOOL)hasPlusChildViewController;
+
+/*!
+ *更新TabBarItems
+ *@attention 其内部其实也重新设置了viewControllers
+ *@param tabBarItemsAttributes tabBarItemsAttributes
+ * [EN] Reloads the tab bar items with new attributes; view controllers are set again internally.
+ * [CN] 使用新的属性数组刷新 TabBarItems，内部会重新设置 viewControllers。
+ */
+- (void)reloadTabBarItemsWithAttributes:(NSArray<NSDictionary *> *)tabBarItemsAttributes;
+
+/*!
+ * [EN] The entry of `tabBarItemsAttributes` for the tab at `index` in `viewControllers`, with the updates of
+ *      `-updateTabBarItemAtIndex:attributes:` merged in; nil for the plus button's tab or when there is none. The indexes
+ *      of the two arrays differ when the system tab bar has a plus child view controller: this maps them.
+ * [CN] `viewControllers` 中第 `index` 个 Tab 在 `tabBarItemsAttributes` 中对应的项，已合并 `-updateTabBarItemAtIndex:attributes:`
+ *      的更新；PlusButton 的 Tab 或没有对应项时为 nil。系统 TabBar 有 PlusButton 子控制器时两个数组的索引不同，本方法负责对应。
+ */
+- (nullable NSDictionary<NSString *, id> *)tabBarItemAttributesAtIndex:(NSUInteger)index;
+
+/*!
+ * FIX: issue #481
+ * [EN] Replaces the view controller of the tab at `index` with `viewController` (e.g. a tab whose content depends on
+ *      another tab being selected), and sets its tab item with `attributes`: the new entry of `tabBarItemsAttributes` for
+ *      that tab (title, images, Lottie...), in place of the old one; nil keeps the old one. The other tabs keep their view controllers, and the selected tab stays
+ *      selected (the new view controller when it replaces the selected one). Put the old view controller back the same
+ *      way, with its attributes, to restore the tab. The tab bar is set up again (`viewControllers` is assigned), so
+ *      call it outside a transition, e.g. in `-tabBarController:didSelectViewController:`:
+ *
+ *          // [EN] The third tab selected: its neighbors show other pages; Home selected: the original ones.
+ *          // [CN] 选中第三个 Tab：相邻的两个 Tab 显示其他页面；选中首页：恢复原来的页面。
+ *          - (void)tabBarController:(CYLTabBarController *)tabBarController didSelectViewController:(UIViewController *)viewController {
+ *              NSUInteger index = [tabBarController.viewControllers indexOfObject:viewController];
+ *              if (index == 2) {
+ *                  [tabBarController replaceViewControllerAtIndex:1 withViewController:self.otherPageA attributes:@{ CYLTabBarItemTitle : @"A" }];
+ *                  [tabBarController replaceViewControllerAtIndex:3 withViewController:self.otherPageB attributes:@{ CYLTabBarItemTitle : @"B" }];
+ *              } else if (index == 0) {
+ *                  [tabBarController replaceViewControllerAtIndex:1 withViewController:self.originalPage1 attributes:self.originalAttributes1];
+ *                  [tabBarController replaceViewControllerAtIndex:3 withViewController:self.originalPage3 attributes:self.originalAttributes3];
+ *              }
+ *          }
+ *
+ * [CN] 将第 `index` 个 Tab 的视图控制器替换为 `viewController`（例如某个 Tab 的内容取决于另一个 Tab 是否选中），并用 `attributes`
+ *      设置其 TabBarItem：该 Tab 在 `tabBarItemsAttributes` 中的新属性（标题、图片、Lottie 等），替换旧的属性；nil 则保留旧的属性。其他 Tab 的视图控制器不变，选中的 Tab
+ *      保持选中（替换的正是选中的 Tab 时，选中新的视图控制器）。用同样的方式放回原来的视图控制器及其属性即可恢复。TabBar 会重新设置
+ *      （重新赋值 `viewControllers`），请在转场之外调用，如 `-tabBarController:didSelectViewController:` 中（示例见上）。
+ * @return [EN] NO when there is no such tab, it is the plus button's, or `viewController` is already one of the tabs.
+ *         [CN] 没有该 Tab、是 PlusButton 的 Tab，或 `viewController` 已是某个 Tab 时返回 NO。
+ */
+- (BOOL)replaceViewControllerAtIndex:(NSUInteger)index
+                  withViewController:(UIViewController *)viewController
+                          attributes:(nullable NSDictionary<NSString *, id> *)attributes;
 
 @end
 

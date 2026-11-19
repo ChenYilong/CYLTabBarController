@@ -910,31 +910,8 @@ static inline id _Nullable CYLObjectAtIndex(NSArray * _Nullable array, NSUIntege
 /// [EN] Private: the reason of a left-out tab; the same key as in CYLTabBarController+CYLConfiguration.m. [CN] 私有：被排除的 Tab 的原因；与 CYLTabBarController+CYLConfiguration.m 中的键相同。
 static NSString *const CYLTabBarItemExclusionReasonKey = @"_CYLTabBarItemExclusionReason";
 
-/*!
- * [EN] The tabs that may get a page: placeholders for invalid tabs (B4) and tabs left out by their platforms or minimum
- *      version (B22) are reported in `skipped` instead. The lookup itself is `+[CYLTabBarPageRegistry pagesOfTabs:...]`.
- * [CN] 可以获得页面的 Tab：无效 Tab 的占位（B4）与因平台或最低版本被排除的 Tab（B22）记录到 `skipped` 中。查找本身见
- *      `+[CYLTabBarPageRegistry pagesOfTabs:...]`。
- */
-static NSArray<NSDictionary *> *CYLResolvableTabs(NSArray<NSDictionary *> *items, NSMutableArray<CYLTabBarSkippedTab *> *skipped) {
-    NSMutableArray<NSDictionary *> *tabs = [NSMutableArray array];
-    for (id item in items) {
-        if (![item isKindOfClass:[NSDictionary class]] || [(NSDictionary *)item count] == 0) {
-            [skipped addObject:[CYLTabBarSkippedTab skippedTabWithReason:CYLTabBarPageSkipReasonInvalidTab pageIdentifier:nil attributes:nil
-                                                                  detail:@"a placeholder for a tab that is not a dictionary"]];
-            continue;
-        }
-        NSDictionary *attributes = item;
-        if ([attributes[CYLTabBarItemExcludedKey] boolValue]) {
-            [skipped addObject:[CYLTabBarSkippedTab skippedTabWithReason:CYLTabBarPageSkipReasonExcluded
-                                                          pageIdentifier:[CYLTabBarPageRegistry pageIdentifierOfTab:attributes]
-                                                              attributes:attributes detail:attributes[CYLTabBarItemExclusionReasonKey]]];
-            continue;
-        }
-        [tabs addObject:attributes];
-    }
-    return tabs;
-}
+// [EN] `CYLResolvableTabs()` and `CYLPagesByPageIdentifier()` are Swift (`+cyl_resolvableTabs:skipped:`,
+//      `+cyl_pagesByPageIdentifierOfPages:tabs:`, step 126). [CN] 已改为 Swift（第 126 步）。
 
 /*!
  * [EN] The lookup order of a normalized configuration: `CYLTabBarControllerPageLookupOrder` (else the default), without
@@ -952,22 +929,6 @@ static NSArray<CYLTabBarPageSource> *CYLPageLookupOrderOfConfiguration(NSDiction
         order = withoutAutomatic;
     }
     return [order copy];
-}
-
-/// [EN] The pages by page ID, in tab order (one ID may have several pages). [CN] 按页面 ID 分组的页面（按 Tab 顺序；一个 ID 可以有多个页面）。
-static NSMutableDictionary<NSString *, NSMutableArray<UIViewController *> *> *CYLPagesByPageIdentifier(NSArray<UIViewController *> *pages,
-                                                                                                        NSArray<NSDictionary *> *tabs) {
-    NSMutableDictionary<NSString *, NSMutableArray<UIViewController *> *> *pagesByIdentifier = [NSMutableDictionary dictionary];
-    for (NSUInteger index = 0; index < MIN(pages.count, tabs.count); index++) {
-        NSString *pageIdentifier = [CYLTabBarPageRegistry pageIdentifierOfTab:tabs[index]];
-        if (!pageIdentifier) {
-            continue;
-        }
-        NSMutableArray<UIViewController *> *list = pagesByIdentifier[pageIdentifier] ?: [NSMutableArray array];
-        [list addObject:pages[index]];
-        pagesByIdentifier[pageIdentifier] = list;
-    }
-    return pagesByIdentifier;
 }
 
 - (instancetype)initWithConfiguration:(NSDictionary<NSString *, id> *)configuration {
@@ -996,7 +957,7 @@ static NSMutableDictionary<NSString *, NSMutableArray<UIViewController *> *> *CY
         pageResolver = normalized[CYLTabBarControllerPageResolver];
         pageLookupOrder = CYLPageLookupOrderOfConfiguration(normalized);
         NSMutableArray<NSDictionary<NSString *, id> *> *keptItems = [NSMutableArray array];
-        viewControllers = [CYLTabBarPageRegistry pagesOfTabs:CYLResolvableTabs(tabBarItemsAttributes, skippedTabs)
+        viewControllers = [CYLTabBarPageRegistry pagesOfTabs:[CYLTabBarController cyl_resolvableTabs:tabBarItemsAttributes skipped:skippedTabs]
                                                     registry:pageRegistry resolver:pageResolver lookupOrder:pageLookupOrder
                                                     keptTabs:keptItems skipped:skippedTabs];
         tabBarItemsAttributes = keptItems;
@@ -1054,7 +1015,7 @@ static NSMutableDictionary<NSString *, NSMutableArray<UIViewController *> *> *CY
         _pageRegistry = pageRegistry;
         _pageResolver = [pageResolver copy];
         _pageLookupOrder = pageLookupOrder;
-        _pagesByPageIdentifier = viewControllersFromCode ? nil : CYLPagesByPageIdentifier(viewControllers, tabBarItemsAttributes);
+        _pagesByPageIdentifier = viewControllersFromCode ? nil : [CYLTabBarController cyl_pagesByPageIdentifierOfPages:viewControllers tabs:tabBarItemsAttributes];
 #if CYL_FLATDESIGN_AVAILABLE
         // FlatDesign only. Before a subclass customizes the tab bar: tells an app's `standardAppearance` from the default one.
         // 仅用于扁平样式。在子类自定义 TabBar 之前：用于区分 App 设置的 `standardAppearance` 与默认值。
@@ -1281,14 +1242,6 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
 
 #pragma mark - Plus slot (the plus button's tab)
 
-// [EN] The plus slot is Swift (`Swift/CYLTabBarController+CYLPlusSlot.swift`, step 124). This wrapper stays: it stores the
-//      aligned array in `_viewControllers`, which Swift cannot reach (the `viewControllers` setter calls back here).
-// [CN] 加号 slot 已改为 Swift（第 124 步）。保留此包装方法：它把对齐后的数组存入 `_viewControllers`（Swift 无法直接访问，`viewControllers` 的
-//      setter 会回调这里）。
-- (void)alignTabControlIfNeededWithViewControllers:(NSArray *)viewControllers {
-    _viewControllers = [self cyl_viewControllersAligningPlusSlotWithViewControllers:viewControllers];
-}
-
 /*!
  ** means ( CYL_NoNeed_UIDesignRequiresCompatibility_with_iOS26)
  * useCYL_UIDesignNewCYLTabBar if return YES
@@ -1420,636 +1373,18 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
 
 // [EN] `CYLImageScaledToSize` is Swift (step 68). [CN] 已迁移到 Swift（第 68 步）。
 
-- (BOOL)replaceViewControllerAtIndex:(NSUInteger)index
-                  withViewController:(UIViewController *)viewController
-                          attributes:(NSDictionary<NSString *, id> *)attributes {
-    if (index >= _viewControllers.count || !viewController || [_viewControllers containsObject:viewController]) {
-        return NO;
-    }
-    UIViewController *oldViewController = _viewControllers[index];
-    if (oldViewController.cyl_isPlaceholder || oldViewController == [self cyl_contextPlusChildViewController]) {
-        return NO;
-    }
-    UIViewController *selectedViewController = self.selectedViewController;
-    UIViewController *plusChildViewController = [self cyl_contextPlusChildViewController];
-    // [EN] The shape the tab bar controller was created with: no entry for the plus button's tab, which
-    //      `-setViewControllers:` inserts again (it would be inserted twice otherwise).
-    // [CN] 与创建 TabBarController 时相同的结构：不含 PlusButton 的 Tab，`-setViewControllers:` 会重新插入它（否则会插入两次）。
-    NSMutableArray<UIViewController *> *viewControllers = [NSMutableArray array];
-    NSMutableArray<NSDictionary *> *tabBarItemsAttributes = [NSMutableArray array];
-    for (NSUInteger tabIndex = 0; tabIndex < _viewControllers.count; tabIndex++) {
-        UIViewController *tabViewController = _viewControllers[tabIndex];
-        if (tabViewController.cyl_isPlaceholder || tabViewController == plusChildViewController) {
-            continue;
-        }
-        NSDictionary *tabAttributes = [self tabBarItemAttributesAtIndex:tabIndex] ?: @{};
-        if (tabIndex == index) {
-            // [EN] The new tab's own entry (a Lottie animation of the old tab must not stay); nil keeps the old one.
-            // [CN] 使用新 Tab 自己的属性（旧 Tab 的 Lottie 动画等不能保留）；为 nil 时保留旧的属性。
-            tabViewController = viewController;
-            tabAttributes = attributes ?: tabAttributes;
-        }
-        [viewControllers addObject:tabViewController];
-        [tabBarItemsAttributes addObject:tabAttributes];
-    }
-    [plusChildViewController cyl_setPlusViewControllerEverAdded:NO];
-    _tabBarItemsAttributes = [tabBarItemsAttributes copy];
-    // [EN] As `-reloadTabBarItemsWithAttributes:`: the Lottie views are added again, and the one-time layout block
-    //      (`-setViewDidLayoutSubViewsBlockInvokeOnce:block:`, e.g. covers and badges) runs again for the new tab buttons.
-    // [CN] 与 `-reloadTabBarItemsWithAttributes:` 相同：重新添加 Lottie 视图，并为新的 Tab 按钮再执行一次只执行一次的布局 block
-    //      （`-setViewDidLayoutSubViewsBlockInvokeOnce:block:`，如封面与角标）。
-    [self cyl_rearmViewDidLayoutSubviewsBlockInvokeOnce];
-    self.tabBarItemAnimationViewAdded = NO;
-    [_tabBarItemAnimationURLs removeAllObjects];
-    [_tabBarItemAnimationSizes removeAllObjects];
-    // [EN] As a new set of tabs (#608): the tab items, icons and Lottie views are set up again from the attributes.
-    // [CN] 与重新设置一组 Tab 相同（#608）：TabBarItem、图标与 Lottie 视图按属性重新设置。
-    self.viewControllers = viewControllers;
-    // FIX: issue #433
-    // [EN] The new tab may be the selected one: show its selected title.
-    // [CN] 新的 Tab 可能正是选中的 Tab：显示其选中标题。
-    CYLSetNeedsUpdateTabBarItemSelectedTitles(self);
-    // [EN] The tabs were installed as child view controllers after UIKit's list was cleared (#608): hand UIKit's own
-    //      setter the same tabs, so it builds their tab items again (Liquid Glass and the classic style).
-    // [CN] UIKit 的 Tab 列表被清空后（#608），Tab 以子控制器方式重新添加：把同样的 Tab 交给 UIKit 自身的 setter，使其重新生成
-    //      TabBarItem（液态玻璃与经典样式）。
-    if (CYLTabBarStyleTypeFlatDesign != self.tabBarStyleType && self.tabBar.items.count != [super viewControllers].count) {
-        [super setViewControllers:[super viewControllers] animated:NO];
-    }
-    UIViewController *viewControllerToSelect = (selectedViewController == oldViewController) ? viewController : selectedViewController;
-    NSUInteger selectedIndex = [self.viewControllers indexOfObject:viewControllerToSelect];
-    if (selectedIndex != NSNotFound) {
-        // [EN] Setting the tabs removed the selected page's view; selecting its index again would do nothing, so the
-        //      selection goes through another tab first and the page is shown again.
-        // [CN] 重新设置 Tab 时移除了选中页面的视图；再次选中同一索引不会有任何变化，所以先选中另一个 Tab，再选回来以重新显示该页面。
-        if (self.selectedIndex == selectedIndex && self.viewControllers.count > 1) {
-            [super setSelectedIndex:(selectedIndex == 0 ? 1 : 0)];
-        }
-        self.selectedIndex = selectedIndex;
-    }
-    [self.view setNeedsLayout];
-    return YES;
-}
-
-// [EN] `-cyl_plusButton:didChangeWithNotification:info:` and `-updatePlusButtonWithAttributes:` are Swift
-//      (Swift/CYLTabBarController+CYLTabBarItemIconViews.swift, step 68). [CN] 已迁移到 Swift（第 68 步）。
-
-// [EN] `-cyl_tabButtonsOfViewController:`, the icon view updates and `-cyl_setTabImageView:lottieView:replacedByIconView:`
-//      are Swift (step 66). [CN] 已迁移到 Swift（第 66 步）。
-
-/*!
- * [EN] Index into `tabBarItemsAttributes` of the tab at `index` in `viewControllers`, as `-setViewControllers:` pairs them:
- *      with a plus button, Liquid Glass and FlatDesign insert an entry for the plus button's tab; the system tab bar has
- *      none for a plus child view controller.
- * [CN] `viewControllers` 中第 `index` 个 Tab 在 `tabBarItemsAttributes` 中的索引，与 `-setViewControllers:` 的对应方式一致：有 PlusButton
- *      时，液态玻璃与扁平样式会为其 Tab 插入一项；系统 TabBar 不为 PlusButton 子控制器保留一项。
- */
-- (NSUInteger)cyl_tabBarItemsAttributesIndexOfViewControllerAtIndex:(NSUInteger)index {
-    // [EN] FIX: placeholder count mismatch — guarded by the data: with a slot entry the attributes match
-    //      `viewControllers` one to one; without one, tabs after the slot (placeholder or plus child) are one entry earlier.
-    // [CN] FIX：占位导致的数量不匹配——按数据判断：有 slot 项时属性与 `viewControllers` 一一对应；没有时，slot（占位或 PlusButton
-    //      子控制器）之后的 Tab 对应的属性前移一项。
-    if ([self cyl_tabBarItemsAttributesIncludePlusSlot]) {
-        return index;
-    }
-    NSUInteger slotIndex = [self cyl_plusSlotIndexInViewControllers];
-    return (slotIndex != NSNotFound && slotIndex < index) ? index - 1 : index;
-}
-
-- (NSDictionary<NSString *, id> *)tabBarItemAttributesAtIndex:(NSUInteger)index {
-    if (index >= _viewControllers.count) {
-        return nil;
-    }
-    UIViewController *viewController = _viewControllers[index];
-    if (viewController.cyl_isPlaceholder || viewController == [self cyl_contextPlusChildViewController]) {
-        return nil;
-    }
-    NSUInteger attributesIndex = [self cyl_tabBarItemsAttributesIndexOfViewControllerAtIndex:index];
-    return (attributesIndex < _tabBarItemsAttributes.count) ? _tabBarItemsAttributes[attributesIndex] : nil;
-}
-
-- (void)reloadTabBarItemsWithAttributes:(NSArray<NSDictionary *> *)tabBarItemsAttributes {
-    CYL_IF_NOT_FLATDESIGN_BEGIN     //Not CYLTabBarStyleTypeFlatDesign
-    NSArray<UIViewController *> *resolvedPages = nil;
-    if (self.pagesFromPageIdentifiers) {
-        // [EN] Created from page IDs: the new tabs get their pages from the same sources; a tab whose page ID already has a
-        //      page keeps it (its state too), the others are created, the rest are skipped (docs/Tab-Page-Registry.md).
-        // [CN] 由页面 ID 创建：新的 Tab 从同样的来源获得页面；页面 ID 已有页面的 Tab 继续使用它（状态保留），其余创建，找不到的跳过
-        //      （docs/Tab-Page-Registry.md）。
-        NSMutableArray<NSDictionary *> *keptItems = [NSMutableArray array];
-        resolvedPages = [self cyl_pagesOfReloadedTabs:tabBarItemsAttributes keptTabs:keptItems];
-        tabBarItemsAttributes = keptItems;
-    }
-    _tabBarItemsAttributes = tabBarItemsAttributes;
-    // [EN] The tab buttons are built again: their covers and badges too. [CN] Tab 按钮会重新创建：其封面与角标也需要重新添加。
-    [self cyl_rearmViewDidLayoutSubviewsBlockInvokeOnce];
-    self.tabBarItemAnimationViewAdded = NO;
-    [_tabBarItemAnimationURLs removeAllObjects];
-    [_tabBarItemAnimationSizes removeAllObjects];
-    NSInteger index = [self selectedIndex];
-    // FIX: issue #618 — `selectedIndex` is not always a valid index into `_viewControllers` (e.g. NSNotFound, or an
-    // extra tab UIKit created for a child that is not in `viewControllers`). Do not index out of range.
-    UIViewController *selected = (index >= 0 && index < (NSInteger)_viewControllers.count) ? _viewControllers[index] : nil;
-    UIView *superView = selected.view.superview;
-    NSMutableArray<UIViewController *> *viewControllers = resolvedPages ? [resolvedPages mutableCopy] : [_viewControllers mutableCopy];
-    if (resolvedPages && selected && [viewControllers indexOfObjectIdenticalTo:selected] == NSNotFound) {
-        // [EN] The selected tab is gone: select the first one. [CN] 选中的 Tab 已不存在：选中第一个。
-        selected = nil;
-        superView = nil;
-        index = 0;
-    }
-    if (!resolvedPages && [self hasPlusChildViewController]) {
-        // [EN] FIX: issue #515 — remove the plus child view controller itself: with a custom plus button position its index
-        //      is not always `cyl_plusButtonIndex` (Liquid Glass keeps it in the middle), and another tab was removed.
-        // [CN] 直接移除 PlusButton 子控制器本身：自定义 PlusButton 位置时，其下标不一定等于 `cyl_plusButtonIndex`（液态玻璃中位于中间），以前会移除其他 Tab。
-        UIViewController *plusChildViewController = [self cyl_contextPlusChildViewController];
-        NSUInteger plusChildIndex = plusChildViewController ? [viewControllers indexOfObject:plusChildViewController] : NSNotFound;
-        if (plusChildIndex != NSNotFound) {
-            [viewControllers removeObjectAtIndex:plusChildIndex];
-        }
-    }
-    [self setViewControllers:viewControllers];
-    [self cyl_adoptPendingPages];
-    // FIX: issue #433
-    // [EN] The reloaded tabs show the selected title on the selected tab.
-    // [CN] 重新加载后，选中的 Tab 显示选中标题。
-    CYLSetNeedsUpdateTabBarItemSelectedTitles(self);
-    [self.view setNeedsLayout];
-    if (!resolvedPages || (index >= 0 && index < (NSInteger)self.viewControllers.count)) {
-        self.selectedIndex = index;
-    }
-    if (superView && selected) {
-        [superView addSubview:selected.view];
-    }
-} else {/**  CYLTabBarStyleTypeFlatDesign*/}
-}
-
-/*!
- * [EN] The pages of reloaded tabs (`-reloadTabBarItemsWithAttributes:` on a controller created from page IDs): the
- *      attributes are normalized like a configuration (platforms, version, placeholders), a tab reuses an existing page of
- *      its page ID when one is left (in tab order), the other tabs are resolved through the controller's sources, and
- *      `cyl_skippedTabs` is replaced.
- * [CN] 重新加载的 Tab 的页面（由页面 ID 创建的控制器调用 `-reloadTabBarItemsWithAttributes:`）：属性像配置一样规范化（平台、版本、占位），
- *      页面 ID 还有剩余已有页面的 Tab 复用它（按 Tab 顺序），其余 Tab 通过控制器的页面来源解析，`cyl_skippedTabs` 被替换。
- */
-- (NSArray<UIViewController *> *)cyl_pagesOfReloadedTabs:(NSArray<NSDictionary *> *)tabBarItemsAttributes
-                                                keptTabs:(NSMutableArray<NSDictionary *> *)keptTabs {
-    NSDictionary<NSString *, id> *normalized = [CYLTabBarController cyl_normalizedConfiguration:@{
-        CYLTabBarControllerTabBarItemsAttributes : [tabBarItemsAttributes isKindOfClass:[NSArray class]] ? tabBarItemsAttributes : @[],
-    }];
-    NSMutableArray<CYLTabBarSkippedTab *> *skipped = [NSMutableArray array];
-    NSArray<NSDictionary *> *tabs = CYLResolvableTabs(normalized[CYLTabBarControllerTabBarItemsAttributes] ?: @[], skipped);
-    NSMutableDictionary<NSString *, NSMutableArray<UIViewController *> *> *available = [NSMutableDictionary dictionary];
-    [self.pagesByPageIdentifier enumerateKeysAndObjectsUsingBlock:^(NSString *pageIdentifier, NSMutableArray<UIViewController *> *pages, BOOL *stop) {
-        available[pageIdentifier] = [pages mutableCopy];
-    }];
-    // [EN] One entry per tab: the reused page, or NSNull for a tab to resolve. [CN] 每个 Tab 一项：复用的页面，或待解析时为 NSNull。
-    NSMutableArray<id> *reusedPages = [NSMutableArray array];
-    NSMutableArray<NSDictionary<NSString *, id> *> *tabsToResolve = [NSMutableArray array];
-    for (NSDictionary *tab in tabs) {
-        NSString *pageIdentifier = [CYLTabBarPageRegistry pageIdentifierOfTab:tab];
-        UIViewController *page = pageIdentifier ? available[pageIdentifier].firstObject : nil;
-        if (page) {
-            [available[pageIdentifier] removeObjectAtIndex:0];
-            [reusedPages addObject:page];
-        } else {
-            [reusedPages addObject:[NSNull null]];
-            [tabsToResolve addObject:tab];
-        }
-    }
-    NSMutableArray<NSDictionary<NSString *, id> *> *keptNewTabs = [NSMutableArray array];
-    NSArray<UIViewController *> *newPages = [CYLTabBarPageRegistry pagesOfTabs:tabsToResolve registry:self.pageRegistry resolver:self.pageResolver
-                                                                   lookupOrder:self.pageLookupOrder keptTabs:keptNewTabs skipped:skipped];
-    NSMutableArray<UIViewController *> *pages = [NSMutableArray array];
-    NSUInteger newIndex = 0;
-    for (NSUInteger index = 0; index < tabs.count; index++) {
-        NSDictionary *tab = tabs[index];
-        if (reusedPages[index] != [NSNull null]) {
-            [pages addObject:reusedPages[index]];
-            [keptTabs addObject:tab];
-        } else if (newIndex < keptNewTabs.count && keptNewTabs[newIndex] == tab) {
-            UIViewController *page = newPages[newIndex];
-            newIndex++;
-            if ([reusedPages indexOfObjectIdenticalTo:page] != NSNotFound) {
-                // [EN] A provider returned a page another tab keeps. [CN] 提供者返回了其他 Tab 继续使用的页面。
-                [skipped addObject:[CYLTabBarSkippedTab skippedTabWithReason:CYLTabBarPageSkipReasonProviderFailed
-                                                              pageIdentifier:[CYLTabBarPageRegistry pageIdentifierOfTab:tab] attributes:tab
-                                                                      detail:@"the page is already the page of another tab"]];
-                continue;
-            }
-            [pages addObject:page];
-            [keptTabs addObject:tab];
-        }
-    }
-    self.pagesByPageIdentifier = CYLPagesByPageIdentifier(pages, keptTabs);
-    self.skippedTabs = [skipped copy];
-    return pages;
-}
-
-/**
- * [CN] 利用 KVC 把系统的 tabBar 类型改为自定义类型。
- *  仅限 CYLTabBar，在ViewDidLoad中调用
- *  不涉及 CYLTabBarStyleTypeFlatDesign样式（ 会在 setViewControllers 内部设置。）
- * [EN] Use KVC to change the system tabBar's type to a custom type.
- *      CYLTabBar only; called in ViewDidLoad
- *      Does not cover the CYLTabBarStyleTypeFlatDesign style (that is set inside setViewControllers.)
- */
-- (void)setUpDefaultStyleTabBar {
-    CYL_IF_NOT_FLATDESIGN_BEGIN     //Not CYLTabBarStyleTypeFlatDesign
-    [self setUpTabBar:nil];
-} else {/**  CYLTabBarStyleTypeFlatDesign*/}
-}
-
-/**
- * [CN] 利用 KVC 把系统的 tabBar 类型改为自定义类型。
- *  包含所有样式类型：
- *   CYLTabBar，在ViewDidLoad中调用；因为考虑到PlusButton的逻辑， 涉及坐标计算，还有运行中增删 PlusButton的逻辑，需要涉及重新布局，需要layoutSubviews中进行。故延迟调用。
- *   CYLTabBarStyleTypeFlatDesign样式 会在 setViewControllers 内部调用，调用时机靠前。
- * [EN] Use KVC to change the system tabBar's type to a custom type.
- *      Covers all style types:
- *      CYLTabBar: called in ViewDidLoad. Because the PlusButton logic involves coordinate calculation, plus
- *      adding and removing
- *      the PlusButton at runtime, which requires relayout, this must happen in layoutSubviews, so the call
- *      is deferred.
- *      CYLTabBarStyleTypeFlatDesign style: called inside setViewControllers, which happens earlier.
- */
-- (void)setUpTabBar:(UIView __kindof *)_tabBar {
-    CYL_IF_NOT_FLATDESIGN_BEGIN //Not CYLTabBarStyleTypeFlatDesign
-    @try {
-        CYLTabBar *tabBar = (CYLTabBar *)_tabBar;
-        if (!tabBar) {
-            tabBar = [[CYLTabBar alloc] init];
-            [tabBar cyl_setTabBarController:self];
-            _cyl_tabBar = tabBar;
-        }
-        [self cyl_setValue:tabBar forKey:@"tabBar"];
-        [self setUpIPADForTabBar:tabBar];
-    } @catch (NSException *exception) {
-#if defined(DEBUG) || defined(BETA)
-        NSLog(CYLLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@: reason %@"), @(__PRETTY_FUNCTION__), @(__LINE__), @"setUpTabBar failed", exception.reason);
-#endif
-    }
-} else {/**  CYLTabBarStyleTypeFlatDesign*/}
-}
-
-/** [CN] ipados 18 固定tabbar 在底部 */
-/* [EN] Pin the tabbar to the bottom on iPadOS 18 */
-- (void)setUpIPADForTabBar:(CYLTabBar *)tabBar {
-    CYL_IF_NOT_FLATDESIGN_BEGIN     //Not CYLTabBarStyleTypeFlatDesign
-    if (@available(iOS 18.0, *)) {
-        if (UIDevice.currentDevice.userInterfaceIdiom == UIUserInterfaceIdiomPad) {
-            self.mode = UITabBarControllerModeTabBar;
-            self.traitOverrides.horizontalSizeClass = UIUserInterfaceSizeClassCompact;
-            BOOL setupSuccess = NO;
-            [self.view addSubview:tabBar];
-            for (UIView *subview in self.view.subviews) {
-                NSString *tabContainerClassName = [NSString stringWithFormat:@"%@%@%@", @"_UITab", @"Container", @"View"];
-                if ([NSStringFromClass(subview.class) isEqualToString:tabContainerClassName]) {
-                    [subview setHidden:YES];
-                    setupSuccess = YES;
-                }
-            }
-            if (!setupSuccess) {
-                // [CN] 防止未来类名变动， 暂时不会调用。
-                // [EN] Guards against future class name changes; not called for now.
-                [self.cyl_tabBar removeFromSuperview];
-                [self.view addSubview:self.cyl_tabBar];
-            }
-        }
-    }
-} else {/**  CYLTabBarStyleTypeFlatDesign*/}
-}
-
-- (BOOL)hasPlusChildViewController {
-    // Bound to this controller by its `context`, see `-hasPlusButton`.
-    // 通过本控制器的 `context` 绑定，见 `-hasPlusButton`。
-    return [self cyl_contextPlusChildViewController] != nil;
-}
-
-- (BOOL)isPlusViewControllerAdded:(NSArray *)viewControllers {
-    BOOL isAdded = [self cyl_isPlusViewControllerAdded:viewControllers];
-    return isAdded;
-}
-
-/*!
- * FIX: issue #618 — diagnostics only (DEBUG / BETA builds); release behavior is unchanged.
- * [EN] In the classic style, `viewControllers` is CYL's own list (`@synthesize viewControllers = _viewControllers`) and
- *      each tab is installed with `-addChildViewController:`. Any other child added to the tab bar controller (by app
- *      code, or by a library such as ZFPlayer during rotation) can become an extra, untitled tab when UIKit rebuilds the
- *      tab bar, e.g. after a rotation on iOS 18. That tab has no entry in `viewControllers`, and tapping it crashes inside
- *      UIKit, where no breakpoint stops. CYL cannot refuse the child (players rely on it), so it reports it here.
- *      A `tabBarItemsAttributes` array whose count differs from the tabs is reported too: the extra entries draw tab
- *      content (title, image) for tabs that have no view controller.
- * [CN] 经典样式下，`viewControllers` 是 CYL 自己维护的数组（`@synthesize viewControllers = _viewControllers`），每个 Tab
- *      通过 `-addChildViewController:` 添加。若有其他子控制器被直接添加到 TabBarController（App 代码，或横屏切换时的
- *      ZFPlayer 等第三方库），UIKit 重建 TabBar 时（如 iOS 18 旋转后）可能多出一个无标题的 Tab。该 Tab 在
- *      `viewControllers` 中没有对应项，点击后在 UIKit 内部崩溃，无法断点。CYL 不能拒绝该子控制器（播放器依赖它），因此在此提示。
- *      `tabBarItemsAttributes` 数量与 Tab 数量不一致时同样提示：多出的配置会为不存在控制器的 Tab 显示标题和图标。
- */
-- (void)addChildViewController:(UIViewController *)childController {
-    [super addChildViewController:childController];
-#if defined(DEBUG) || defined(BETA)
-    [self cyl_logChildViewControllerThatIsNotATabIfNeeded:childController];
-#endif
-}
-
-#if defined(DEBUG) || defined(BETA)
-- (void)cyl_logChildViewControllerThatIsNotATabIfNeeded:(UIViewController *)childController {
-    if (!childController || CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType) {
-        return;
-    }
-    if ([_viewControllers containsObject:childController] ||
-        childController == [self cyl_contextPlusChildViewController] ||
-        childController.cyl_isPlaceholder) {
-        return;
-    }
-    // UIKit adds controllers of its own (the "More" navigation controller, the iPad sidebar on iOS 18); those are not
-    // app tabs. Matched by class name so that the lazy `moreNavigationController` getter is never triggered from here.
-    NSString *className = NSStringFromClass([childController class]);
-    if ([className hasPrefix:@"_"] || [className hasPrefix:@"UI"]) {
-        return;
-    }
-    NSLog(@"🔴[CYL #618] %@ was added to %@ with -addChildViewController:, not through `viewControllers`. UIKit can turn it into an extra, untitled tab (e.g. after a rotation), and tapping that tab crashes. Present it, or push it from a tab's navigation controller, instead. See https://github.com/ChenYilong/CYLTabBarController/issues/618",
-          className, NSStringFromClass([self class]));
-}
-
-- (void)cyl_logTabBarItemsAttributesMismatchIfNeeded {
-    NSUInteger attributesCount = _tabBarItemsAttributes.count;
-    if (attributesCount == 0) {
-        return;
-    }
-    // [EN] The slot's own entry (Liquid Glass, FlatDesign) is not counted either. [CN] slot 自己的属性项（液态玻璃、扁平样式）同样不计。
-    attributesCount = [self cyl_tabBarItemsAttributesByRemovingPlusSlot:_tabBarItemsAttributes].count;
-    NSUInteger tabCount = [self cyl_viewControllersByRemovingPlusSlot:_viewControllers].count;
-    if (attributesCount == tabCount) {
-        return;
-    }
-    NSLog(@"🔴[CYL #618] tabBarItemsAttributes has %lu entries for %lu tab view controllers (the plus button's view controller not counted). Each tab needs exactly one entry; a mismatch shows tabs without a view controller, and tapping one can crash. See https://github.com/ChenYilong/CYLTabBarController/issues/618",
-          (unsigned long)attributesCount, (unsigned long)tabCount);
-}
-#endif
-
-/*!
- * [EN] FIX: more than five tabs showed only the first five on the classic style and Liquid Glass, with no "More": that
- *      path installs the tabs with -addChildViewController:, and UIKit builds its "More" tab only in -setViewControllers:,
- *      so the sixth tab and later could not be reached. With more than five tabs they are handed to UIKit too, as
- *      FlatDesign does; five or fewer keep the old path unchanged.
- * [CN] FIX：经典样式与液态玻璃下超过 5 个 Tab 时只显示前 5 个且没有「More」：这条路径用 -addChildViewController: 安装 Tab，而 UIKit
- *      只在 -setViewControllers: 中生成「More」，因此第 6 个及之后的 Tab 无法访问。超过 5 个时也交给 UIKit（与扁平样式相同）；
- *      5 个及以内保持原来的路径不变。
- */
-- (void)cyl_handTabsToUIKitIfMoreThanFive {
-    if (_viewControllers.count <= 5) {
-        return;
-    }
-    // [EN] UIKit adds "More" only for view controllers that are not children yet (found with a plain
-    //      UITabBarController: -addChildViewController: then -setViewControllers: gives five tabs and no More), so the
-    //      children this path added are taken out first; UIKit adds them back.
-    // [CN] UIKit 只为尚未成为子控制器的视图控制器生成「More」（用普通 UITabBarController 验证：先 -addChildViewController: 再
-    //      -setViewControllers: 只有 5 个 Tab 且没有 More），因此先移除这条路径添加的子控制器，由 UIKit 重新添加。
-    NSArray<UIViewController *> *tabs = _viewControllers;
-    for (UIViewController *viewController in tabs) {
-        if (viewController.parentViewController == self) {
-            [viewController willMoveToParentViewController:nil];
-            [viewController removeFromParentViewController];
-        }
-    }
-    // [EN] `viewControllers` is this class's own list (`@synthesize`), which UIKit reads as the old tabs: with the same
-    //      array it saw no change and added nothing. The list is empty while UIKit takes the tabs, then restored.
-    // [CN] `viewControllers` 是本类自己的数组（`@synthesize`），UIKit 会把它当作旧 Tab 读取：数组相同时它认为没有变化，什么也不添加。
-    //      UIKit 接收 Tab 期间该数组为空，之后恢复。
-    _viewControllers = nil;
-    [super setViewControllers:tabs animated:NO];
-    _viewControllers = tabs;
-}
-
+// [EN] Setting the tabs up is Swift (Swift/CYLTabBarController+CYLTabSetup.swift and, for FlatDesign,
+//      CYLTabBarController+CYLFlatDesignTabSetup.swift; step 126). The two UIKit overrides stay here as one line each (a Swift
+//      extension of an Objective-C class cannot override them); the ivars they write go through
+//      `CYLTabBarController (CYLTabSetupStorage)` at the end of this file.
+// [CN] 设置 Tab 已改为 Swift（第 126 步）。两个 UIKit 重写保留在这里，各一行（Objective-C 类的 Swift 扩展无法重写它们）；它们写入的实例变量通过本文件末尾的
+//      `CYLTabBarController (CYLTabSetupStorage)` 访问。
 - (void)setViewControllers:(NSArray<__kindof UIViewController *> *)viewControllers {
-    // Known from now on (`+cyl_tabBarControllerForContext:`), but not "active" until it appears. Only with view
-    // controllers: a nil / empty array is also what a tear-down sends, when no weak reference may be formed.
-    // 从现在起可以被查到（`+cyl_tabBarControllerForContext:`），但在显示之前不算“活跃”。只在有 viewControllers 时记录：
-    // 销毁过程中传入的也是 nil / 空数组，此时不能再建立弱引用。
-    if (viewControllers.count > 0) {
-        [CYLTabBarController cyl_registerTabBarController:self];
-    }
-    CYL_IF_NOT_FLATDESIGN_BEGIN     //Not CYLTabBarStyleTypeFlatDesign
-    
-        //#if CYL_FLATDESIGN_AVAILABLE
-        //    CYLFlatDesignTabBar *pureCustomTabBar;
-        //    if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType && [_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) {
-        //        pureCustomTabBar = [CYLFlatDesignTabBar new];
-        //        [self setUpTabBar:pureCustomTabBar];
-        //    }
-        //#endif
-    
-        if (_viewControllers && (_viewControllers.count > 0)) {
-            for (UIViewController *viewController in _viewControllers) {
-                [viewController willMoveToParentViewController:nil];
-                [viewController.view removeFromSuperview];
-                [viewController removeFromParentViewController];
-            }
-            BOOL isAdded = [self isPlusViewControllerAdded:_viewControllers];
-            BOOL hasPlusChildViewController = [self hasPlusChildViewController] && !isAdded;
-            if (hasPlusChildViewController) {
-                [[self cyl_contextPlusChildViewController] willMoveToParentViewController:nil];
-                [[self cyl_contextPlusChildViewController].view removeFromSuperview];
-                [[self cyl_contextPlusChildViewController] removeFromParentViewController];
-            }
-            // FIX: issue #608
-            // [EN] Re-assigning `viewControllers` (e.g. a new set of tabs after login) crashed on the next tap on iOS 16 with
-            //      "Inconsistency in UITabBar items and view controllers detected. No view controller matches the
-            //      UITabBarItem". The classic style installs tabs with -addChildViewController: and never calls super's
-            //      -setViewControllers:, so removing the old children above does not tell UIKit those tabs are gone: the tab
-            //      bar kept the old items while `viewControllers` (CYL's own list) held only the new controllers, and
-            //      UIKit's tap handling found no controller for the tapped item. Clear UIKit's tab list too, so the new
-            //      tabs are installed exactly as on the first assignment.
-            // [CN] 重新给 `viewControllers` 赋值（如登录后换成另一组 Tab）后，iOS 16 上再点击会崩溃：
-            //      "Inconsistency in UITabBar items and view controllers detected. No view controller matches the UITabBarItem"。
-            //      经典样式用 -addChildViewController: 添加 Tab，从不调用父类的 -setViewControllers:，上面移除旧子控制器并不会
-            //      让 UIKit 知道旧 Tab 已不存在：TabBar 仍保留旧的 item，而 `viewControllers`（CYL 自己的数组）只有新控制器，
-            //      UIKit 处理点击时找不到对应的控制器。这里同时清空 UIKit 的 Tab 列表，让新 Tab 与首次赋值时一样安装。
-            [super setViewControllers:nil animated:NO];
-        }
-    
-        if (!viewControllers || viewControllers.count == 0 || ![viewControllers isKindOfClass:[NSArray class]]) {
-            for (UIViewController *viewController in _viewControllers) {
-                CYLTabBarController *tabBarController = nil;
-                [[viewController cyl_getViewControllerInsteadOfNavigationController] cyl_setTabBarController:tabBarController];
-                [viewController cyl_setTabBarController:tabBarController];
-            }
-            _viewControllers = nil;
-            return;
-        }
-    
-        [self alignTabControlIfNeededWithViewControllers:viewControllers];
-#if defined(DEBUG) || defined(BETA)
-        [self cyl_logTabBarItemsAttributesMismatchIfNeeded];
-#endif
-    
-        // [EN] The app's own tabs: a slot carried by `viewControllers` (a re-assignment) is not a tab.
-        // [CN] App 自己的 Tab 数：`viewControllers` 自带的 slot（重新赋值时）不算 Tab。
-        [self.cyl_tabBar cyl_setTabbarItemsCount:[self cyl_viewControllersByRemovingPlusSlot:viewControllers].count];
-        if (![self.cyl_tabBar isKindOfClass:[CYLTabBar class]]) {
-            // [EN] FIX: placeholder count mismatch — `_viewControllers` is already aligned above; assigning the array passed
-            //      in again dropped the plus child view controller (or kept a stale slot it carried).
-            // [CN] FIX：占位导致的数量不匹配——`_viewControllers` 已在上面对齐；以前这里又赋值为传入的数组，丢失 PlusButton 子控制器
-            //      （或保留了数组自带的旧 slot）。
-            [self cyl_handTabsToUIKitIfMoreThanFive];
-            return;
-        }
-        CYLTabBar *cyl_tabBar = (CYLTabBar *)self.cyl_tabBar;
-
-        [cyl_tabBar cyl_setTabBarItemWidth:(cyl_tabBar.cyl_boundsSize.width - cyl_tabBar.cyl_plusButtonWidth) / (cyl_tabBar.cyl_tabbarItemsCount)];
-        NSUInteger idx = 0;
-        for (UIViewController *viewController in _viewControllers) {
-            // [EN] FIX: issue #604 — one place reads a tab item's attributes, for every style. [CN] 所有样式共用同一处读取 Tab item 属性的代码。
-            CYLTabBarItemSetup *setup = [self cyl_tabBarItemSetupForViewController:viewController idx:idx];
-            idx = setup.idx;
-            NSString *title = setup.title;
-            id normalImageInfo = setup.normalImageInfo;
-            id selectedImageInfo = setup.selectedImageInfo;
-            UIOffset titlePositionAdjustment = setup.titlePositionAdjustment;
-            UIOffset imagePositionAdjustment = setup.imagePositionAdjustment;
-            UIEdgeInsets imageInsets = setup.imageInsets;
-            NSURL *lottieURL = setup.animationURL;
-            NSValue *lottieSizeValue = setup.animationSizeValue;
-            // [EN] A placeholder without its own slot entry keeps the placeholder image (same tab item layout with or without
-            //      that entry).
-            // [CN] 没有自己 slot 属性项的占位控制器使用占位图片（有无该项时 TabBarItem 的布局相同）。
-            if (viewController.cyl_isPlaceholder && ![self cyl_tabBarItemsAttributesIncludePlusSlot]) {
-                normalImageInfo = [UIImage cyl_tabItemPlaceholderImage];
-                selectedImageInfo = [UIImage cyl_tabItemPlaceholderImage];
-            }
-        
-            [self addOneChildViewController:viewController
-                                  WithTitle:title
-                            normalImageInfo:normalImageInfo
-                          selectedImageInfo:selectedImageInfo
-                    titlePositionAdjustment:titlePositionAdjustment
-                    imagePositionAdjustment:imagePositionAdjustment
-                                imageInsets:imageInsets
-                                  lottieURL:lottieURL
-                            lottieSizeValue:lottieSizeValue
-         
-            ];
-        
-        
-            //        if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType && [_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) {
-            // [CN] //已经在addOneChildViewController 中操作， 这里无需重复处理
-            // [EN] Already handled in addOneChildViewController, no need to handle it again here
-            //            // [self addChildViewController:viewController];
-            //
-            //            if (!viewController.cyl_isPlaceholder && ![viewController cyl_isEqualToViewController:[self cyl_contextPlusChildViewController]]) {
-            //#if CYL_FLATDESIGN_AVAILABLE
-            //                pureCustomTabBar.delegate = self;
-            //                CYLFlatDesignTabBarItem *tabItem = [pureCustomTabBar addItemWithTitle:title
-            //                                                                      tabBarItemImage:normalImageInfo
-            //                                                              tabBarItemSelectedImage:selectedImageInfo
-            //                                                                                index:idx
-            //                                                              titlePositionAdjustment:titlePositionAdjustment
-            //                                                                          imageInsets:imageInsets
-            //                                                                       lottieFilePath:lottieFilePath
-            //                                                                      lottieSizeValue:lottieSizeValue];
-            //                [viewController cyl_setTabButton:tabItem];
-            //                [[viewController cyl_getViewControllerInsteadOfNavigationController] cyl_setTabButton:tabItem];
-            //#endif
-            //
-            //            }
-            //        }
-            [viewController cyl_setTabBarController:self];
-            [[viewController cyl_getViewControllerInsteadOfNavigationController] cyl_setTabBarController:self];
-            [viewController.cyl_getActualBadgeSuperView cyl_setTabBarController:self];
-            [[viewController cyl_getViewControllerInsteadOfNavigationController].cyl_getActualBadgeSuperView cyl_setTabBarController:self];
-            [viewController.tabBarItem.cyl_getActualBadgeSuperView cyl_setTabBarController:self];
-            [[viewController cyl_getViewControllerInsteadOfNavigationController].tabBarItem.cyl_getActualBadgeSuperView cyl_setTabBarController:self];
-        
-            idx++;
-        }
-        [self cyl_handTabsToUIKitIfMoreThanFive];
-    } else {/**  CYLTabBarStyleTypeFlatDesign*/}
-
-    if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType) {
-#if CYL_FLATDESIGN_AVAILABLE
-        if (![_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) { return; }
-        _needsReloadItems = YES;
-        // [EN] The app's own tabs and their attributes: a re-assignment may carry the slot (and its attributes), which
-        //      shifted `idx` below by one after the slot, and inserted a second slot.
-        // [CN] App 自己的 Tab 及其属性：重新赋值时可能带有 slot（及其属性），以前会使下面 slot 之后的 `idx` 错位一个，并插入第二个 slot。
-        viewControllers = [self cyl_viewControllersByRemovingPlusSlot:viewControllers];
-        _tabBarItemsAttributes = [self cyl_tabBarItemsAttributesByRemovingPlusSlot:_tabBarItemsAttributes];
-        __weak __typeof(self) weakSelf = self;
-        [viewControllers enumerateObjectsUsingBlock:^(__kindof UIViewController * _Nonnull childVC, NSUInteger idx, BOOL * _Nonnull stop) {
-            __strong typeof(self) self = weakSelf;
-            if (!self) {
-                return;
-            }
-            [childVC cylflatdesign_setTabBarController:self];
-            [self setupChildViewController:childVC idx:idx];;
-            [childVC cyl_setTabButton:childVC.cyl_tabBarItem.tabBarButton];
-            //TODO: if (_tabBarItemsAttributes.count > idx)
-        }];
-        [self.cyl_tabBar cyl_setTabbarItemsCount:[viewControllers count]];
-        [super setViewControllers:viewControllers];
-        if (@available(iOS 27.1, *)) {
-            _cylDidRefreshSystemTabBarVisibility = NO;
-            if (self.isViewLoaded) { [self.view setNeedsLayout]; }
-        }
-        //    _viewControllers = viewControllers;
-        [self alignTabControlIfNeededWithViewControllers:viewControllers];
-        // Legacy global (what was written last); this tab bar's own index is `-[UIView cyl_plusButtonIndex]`. Read after
-        // the slot is inserted: it is the slot's index in `viewControllers`.
-        // 旧的全局变量（最后写入的值）；本 TabBar 自己的下标见 `-[UIView cyl_plusButtonIndex]`。在插入 slot 之后读取：即 slot 在 `viewControllers` 中的下标。
-        CYLPlusButtonIndex = [self.cyl_tabBar cyl_plusButtonIndex];
-        if (_needsReloadItems) {
-            [self _captureItems];
-            [self.cyl_tabBar setItems:self.items];
-            _needsReloadItems = NO;
-        }
-        CYLFlatDesignTabBar *cyl_tabBar = (CYLFlatDesignTabBar *)self.cyl_tabBar;
-
-        cyl_tabBar.selectedItem = self.selectedViewController.cyl_tabBarItem;
-#else
-#endif
-        
-    } else {/** Not CYLTabBarStyleTypeFlatDesign*/}
-    [self cyl_loadTabBarItemImageURLs];
+    [self cyl_setViewControllers:viewControllers];
 }
 
-/*!
- * FIX: issue #601
- * [EN] Every tab whose attributes have `CYLTabBarItemImageURL` shows the downloaded icons once ready; until then, and on
- *      failure, its `CYLTabBarItemImage` (the placeholder).
- * [CN] 属性中带 `CYLTabBarItemImageURL` 的 Tab，在下载完成后显示下载的图标；此前及失败时显示其 `CYLTabBarItemImage`（占位图）。
- */
-- (void)cyl_loadTabBarItemImageURLs {
-    for (NSUInteger index = 0; index < _viewControllers.count; index++) {
-        NSUInteger attributesIndex = [self cyl_tabBarItemsAttributesIndexOfViewControllerAtIndex:index];
-        if (attributesIndex < _tabBarItemsAttributes.count) {
-            [self cyl_loadImageURLsOfAttributes:_tabBarItemsAttributes[attributesIndex] atIndex:index];
-        }
-    }
-}
-
-- (BOOL)cyl_loadImageURLsOfAttributes:(NSDictionary *)attributes atIndex:(NSUInteger)index {
-    id icon = attributes[CYLTabBarItemImageURL];
-    if (!icon) {
-        return NO;
-    }
-    NSValue *sizeValue = attributes[CYLTabBarItemImageURLSize];
-    CGSize size = [sizeValue isKindOfClass:[NSValue class]] ? sizeValue.CGSizeValue : CGSizeZero;
-    // [EN] The same sources as `-setTabBarItemIcon:selectedIcon:size:atIndex:`: a URL, and also a local image.
-    // [CN] 与 `-setTabBarItemIcon:selectedIcon:size:atIndex:` 相同的来源：URL，也可以是本地图片。
-    return [self setTabBarItemIcon:icon selectedIcon:attributes[CYLTabBarItemSelectedImageURL] size:size atIndex:index];
-}
-
-- (void)setTintColor:(UIColor *)tintColor {
-    CYL_IF_NOT_FLATDESIGN_BEGIN     //Not CYLTabBarStyleTypeFlatDesign
-    if ([[[UIDevice currentDevice] systemVersion] floatValue] < 8.f) {
-        CYL_DEPRECATED_DECLARATIONS_PUSH
-        [self.cyl_tabBar setSelectedImageTintColor:tintColor];
-        CYL_DEPRECATED_DECLARATIONS_POP
-    }
-    self.cyl_tabBar.tintColor = tintColor;
-} else {/**  CYLTabBarStyleTypeFlatDesign*/}
+- (void)addChildViewController:(UIViewController *)childController {
+    [self cyl_overrideAddChildViewController:childController];
 }
 
 /**
@@ -3302,6 +2637,24 @@ static BOOL CYLIsImplementedOutsideSystemFrameworks(Class cls, SEL selector) {
  */
 - (void)cyl_replaceTabBarItemsAttributesStorage:(NSArray<NSDictionary *> *)tabBarItemsAttributes {
     _tabBarItemsAttributes = [tabBarItemsAttributes copy];
+}
+
+@end
+
+#pragma mark - Tab setup storage
+
+/*!
+ * [EN] The ivars written by the Swift tab setup (Swift/CYLTabBarController+CYLTabSetup.swift, step 126), without any setter's work.
+ * [CN] Swift 的 Tab 设置写入的实例变量（第 126 步），不执行 setter 的逻辑。
+ */
+@implementation CYLTabBarController (CYLTabSetupStorage)
+
+- (void)cyl_setViewControllersStorage:(nullable NSArray<UIViewController *> *)viewControllers {
+    _viewControllers = viewControllers;
+}
+
+- (void)cyl_setStoredTabBar:(nullable UIView *)tabBar {
+    _cyl_tabBar = tabBar;
 }
 
 @end

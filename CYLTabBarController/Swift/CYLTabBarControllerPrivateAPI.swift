@@ -40,7 +40,6 @@ import UIKit
     /// [EN] Class-extension state and a loader still in Objective-C, used by the in-place update (step 73). [CN] 仍为 Objective-C 的类扩展状态与加载方法，供原地更新使用（第 73 步）。
     @objc(tabBarItemAnimationURLs) func cylTabBarItemAnimationURLs() -> NSMutableArray
     @objc(tabBarItemAnimationSizes) func cylTabBarItemAnimationSizes() -> NSMutableArray
-    @objc(cyl_loadImageURLsOfAttributes:atIndex:) @discardableResult func cylLoadImageURLs(ofAttributes attributes: [String: Any], at index: UInt) -> Bool
     @objc(cyl_isPlusSlotViewController:) func cylIsPlusSlotViewController(_ viewController: UIViewController) -> Bool
     @objc(cyl_contextPlusButton) func cylContextPlusButton() -> CYLPlusButton?
     @objc(cyl_contextPlusChildViewController) func cylContextPlusChildViewController() -> UIViewController?
@@ -57,7 +56,6 @@ import UIKit
     @objc(setSkippedTabs:) func cylSetSkippedTabsState(_ skippedTabs: [CYLTabBarSkippedTab])
     @objc(pagesFromPageIdentifiers) func cylPagesFromPageIdentifiersState() -> Bool
     @objc(pagesByPageIdentifier) func cylPagesByPageIdentifierState() -> [String: NSMutableArray]?
-    @objc(cyl_tabBarItemsAttributesIndexOfViewControllerAtIndex:) func cylTabBarItemsAttributesIndexOfViewController(at index: UInt) -> UInt
     /// [EN] Replaces the attributes storage without the setter's work. [CN] 替换属性存储，不执行 setter 的逻辑。
     @objc(cyl_replaceTabBarItemsAttributesStorage:) func cylReplaceTabBarItemsAttributesStorage(_ tabBarItemsAttributes: [[AnyHashable: Any]])
     /// FIX: issue #594 — implemented in CYLTabBarController.m (`CYLTabBarController (CYLPlusButtonSelection)`).

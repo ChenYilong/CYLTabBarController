@@ -320,4 +320,17 @@ FOUNDATION_EXTERN BOOL CYLControlReportsTaps(UIControl *_Nullable control);
 - (void)cyl_syncFlatDesignStandardAppearance;
 @end
 
+/*!
+ * [EN] Setting the tabs up (step 126, `Swift/CYLTabBarController+CYLTabSetup.swift`), called by CYLTabBarController.m.
+ * [CN] 设置 Tab（第 126 步），由 CYLTabBarController.m 调用。
+ */
+@interface CYLTabBarController (CYLTabSetupPrivate)
+- (void)cyl_setViewControllers:(nullable NSArray<UIViewController *> *)viewControllers;
+- (void)cyl_overrideAddChildViewController:(UIViewController *)childController;
+- (void)setUpDefaultStyleTabBar;
++ (NSArray<NSDictionary<NSString *, id> *> *)cyl_resolvableTabs:(NSArray *)items skipped:(NSMutableArray<CYLTabBarSkippedTab *> *)skipped;
++ (NSMutableDictionary<NSString *, NSMutableArray<UIViewController *> *> *)cyl_pagesByPageIdentifierOfPages:(NSArray<UIViewController *> *)pages
+                                                                                                    tabs:(NSArray<NSDictionary *> *)tabs;
+@end
+
 NS_ASSUME_NONNULL_END

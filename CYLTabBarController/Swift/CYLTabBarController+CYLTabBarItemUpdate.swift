@@ -324,7 +324,7 @@ extension CYLTabBarController {
             return false
         }
         var stored = cylStoredTabBarItemsAttributes
-        let attributesIndex = Int(cylPrivate.cylTabBarItemsAttributesIndexOfViewController(at: index))
+        let attributesIndex = Int(cylTabBarItemsAttributesIndexOfViewController(at: index))
         var newAttributes: [String: Any] = [:]
         if attributesIndex < stored.count {
             for (key, value) in stored[attributesIndex] {
@@ -396,7 +396,7 @@ extension CYLTabBarController {
                 cylApplyTabBarItemSelectedTitles(self)
             }
             if loadsImageURLs {
-                cylPrivate.cylLoadImageURLs(ofAttributes: newAttributes, at: index)
+                cylLoadImageURLs(ofAttributes: newAttributes, at: index)
             }
             return true
         }
@@ -434,7 +434,7 @@ extension CYLTabBarController {
         tabBar.cyl_reloadTabButtons()
         // [EN] Icons from the network replace the images once downloaded. [CN] 网络图标下载完成后覆盖图片。
         if loadsImageURLs {
-            cylPrivate.cylLoadImageURLs(ofAttributes: newAttributes, at: index)
+            cylLoadImageURLs(ofAttributes: newAttributes, at: index)
         }
         return true
     }
@@ -453,7 +453,7 @@ extension CYLTabBarController {
         guard index < UInt(viewControllers.count), !keys.isEmpty else {
             return
         }
-        let attributesIndex = Int(cylPrivate.cylTabBarItemsAttributesIndexOfViewController(at: index))
+        let attributesIndex = Int(cylTabBarItemsAttributesIndexOfViewController(at: index))
         guard attributesIndex < cylStoredTabBarItemsAttributes.count else {
             return
         }
