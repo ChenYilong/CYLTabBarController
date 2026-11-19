@@ -86,6 +86,10 @@ typedef NS_OPTIONS(NSUInteger, UIViewAutoresizing) {
 @interface UITabBarItemAppearance : NSObject
 @end
 
+// [EN] Only declared: CYLTabBarControllerTypedefs.h (imported by CYLSwiftInterface.h) names it in block typedefs. [CN] 仅声明：CYLTabBarControllerTypedefs.h（由 CYLSwiftInterface.h 导入）在 block typedef 中用到它。
+@interface UIViewController : NSObject
+@end
+
 @interface UIControl : UIView
 @end
 
