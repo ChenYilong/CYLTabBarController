@@ -219,32 +219,11 @@ static void CYLSetNeedsUpdateTabBarItemSelectedTitles(CYLTabBarController *tabBa
 
 #define CYLNavigationTitleFollowsTabBarItemTitleKey ((const void *)sel_registerName("cyl_navigationTitleFollowsTabBarItemTitle"))
 
-/// [EN] Sets the navigation bar title of a page that follows its tab title. [CN] 为跟随 Tab 标题的页面设置导航栏标题。
-static void CYLApplyNavigationTitleOfFollowingPage(UIViewController *viewController, NSString *_Nullable title) {
-    UIViewController *page = [viewController cyl_getViewControllerInsteadOfNavigationController] ?: viewController;
-    if (title.length > 0 && [objc_getAssociatedObject(page, CYLNavigationTitleFollowsTabBarItemTitleKey) boolValue]) {
-        page.navigationItem.title = title;
-    }
-}
+// [EN] `CYLApplyNavigationTitleOfFollowingPage` is Swift: `+cyl_applyNavigationTitleOfFollowingPage:title:` (step 68). [CN] 已迁移到 Swift（第 68 步）。
 
 // [EN] `CYLPostTabBarItemNotification` is Swift: `-cyl_postTabBarItemNotification:atIndex:extra:` (step 67). [CN] 已迁移到 Swift（第 67 步）。
 
-/// [EN] The image keys of `attributes` (an icon change), empty when there is none. [CN] `attributes` 中的图片 key（图标变化），没有时为空。
-static NSDictionary *CYLTabBarItemIconAttributes(NSDictionary *attributes) {
-    static NSArray<NSString *> *iconKeys;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        iconKeys = @[ CYLTabBarItemImage, CYLTabBarItemSelectedImage, CYLTabBarItemDarkImage, CYLTabBarItemSelectedDarkImage,
-                      CYLTabBarItemImageURL, CYLTabBarItemSelectedImageURL, CYLTabBarItemImageURLSize ];
-    });
-    NSMutableDictionary *iconAttributes = [NSMutableDictionary dictionary];
-    for (NSString *key in iconKeys) {
-        if (attributes[key]) {
-            iconAttributes[key] = attributes[key];
-        }
-    }
-    return [iconAttributes copy];
-}
+// [EN] `CYLTabBarItemIconAttributes` is Swift: `+cyl_iconAttributesOfAttributes:` (step 68). [CN] 已迁移到 Swift（第 68 步）。
 
 NSUInteger CYLTabbarItemsCount = 0;
 NSUInteger CYLPlusButtonIndex = 0;
@@ -1801,7 +1780,7 @@ static const void *const CYLPlusButtonGlassLayoutRetryPendingKey = &CYLPlusButto
             CYLRememberTabBarItemSelectedTitle(viewController, attributes, setup.title);
             // [EN] A page that follows its tab title gets it as its navigation bar title as soon as the tab is set up.
             // [CN] 跟随 Tab 标题的页面在 Tab 设置时即获得导航栏标题。
-            CYLApplyNavigationTitleOfFollowingPage(viewController, setup.title);
+            [CYLTabBarController cyl_applyNavigationTitleOfFollowingPage:viewController title:setup.title];
             setup.titlePositionAdjustment = [attributes[CYLTabBarItemTitlePositionAdjustment] UIOffsetValue];
             setup.imagePositionAdjustment = [attributes[CYLTabBarItemImagePositionAdjustment] UIOffsetValue];
             setup.imageInsets = [attributes[CYLTabBarItemImageInsets] UIEdgeInsetsValue];
@@ -1818,7 +1797,7 @@ static const void *const CYLPlusButtonGlassLayoutRetryPendingKey = &CYLPlusButto
         setup.title = @"";
         // [EN] The plus button's page that follows its tab title gets the plus button's title.
         // [CN] 跟随 Tab 标题的 PlusButton 页面获得 PlusButton 的标题。
-        CYLApplyNavigationTitleOfFollowingPage(viewController, [CYLPlusButton plusButtonForOwner:self].cyl_title);
+        [CYLTabBarController cyl_applyNavigationTitleOfFollowingPage:viewController title:[CYLPlusButton plusButtonForOwner:self].cyl_title];
         // [EN] Guarded by the data (`-cyl_tabBarItemsAttributesIncludePlusSlot`), not by the style.
         // [CN] 按数据判断（`-cyl_tabBarItemsAttributesIncludePlusSlot`），而不是按样式。
         if (![self cyl_tabBarItemsAttributesIncludePlusSlot]) {
@@ -2871,7 +2850,7 @@ static NSString *const CYLTabBarItemPlusSlotPlaceholderKey = @"CYLTabBarItemPlus
                  [NSPredicate predicateWithBlock:^BOOL(NSString *key, NSDictionary *bindings) { return attributes[key] != nil; }]]];
             [self cyl_postTabBarItemNotification:CYLTabBarItemTitleDidChangeNotification atIndex:index extra:titleInfo];
         }
-        NSDictionary *iconAttributes = CYLTabBarItemIconAttributes(attributes);
+        NSDictionary *iconAttributes = [CYLTabBarController cyl_iconAttributesOfAttributes:attributes];
         if (iconAttributes.count > 0) {
             [self cyl_postTabBarItemNotification:CYLTabBarItemIconDidChangeNotification atIndex:index extra:@{ CYLTabBarItemChangedAttributesKey : iconAttributes }];
         }
@@ -2957,7 +2936,7 @@ static NSString *const CYLTabBarItemPlusSlotPlaceholderKey = @"CYLTabBarItemPlus
         if (image) { tabBarItem.image = image; }
         if (selectedImage) { tabBarItem.selectedImage = selectedImage; }
         if (title) {
-            CYLApplyNavigationTitleOfFollowingPage(viewController, title);
+            [CYLTabBarController cyl_applyNavigationTitleOfFollowingPage:viewController title:title];
         }
         // FIX: issue #433
         // [EN] The selected tab shows its selected title, not the new normal title.
@@ -2985,7 +2964,7 @@ static NSString *const CYLTabBarItemPlusSlotPlaceholderKey = @"CYLTabBarItemPlus
         if (selectedImage) { tabBarItem.selectedImage = [CYLTabBarController cyl_restingTabBarItemImage:selectedImage forItem:tabBarItem selected:YES]; }
     }
     if (title) {
-        CYLApplyNavigationTitleOfFollowingPage(viewController, title);
+        [CYLTabBarController cyl_applyNavigationTitleOfFollowingPage:viewController title:title];
     }
     // FIX: issue #433
     // [EN] The selected tab shows its selected title, not the new normal title.
@@ -3065,31 +3044,7 @@ static NSString *const CYLTabBarItemPlusSlotPlaceholderKey = @"CYLTabBarItemPlus
 
 // [EN] `CYLLoadTabBarItemIcon` is Swift: `+cyl_loadTabBarItemIcon:completion:` (step 67). [CN] 已迁移到 Swift（第 67 步）。
 
-/// [EN] `image` drawn at `size` with its own colors, every frame of an animated one. [CN] 按 `size` 以原图颜色绘制 `image`，动图的每一帧都绘制。
-static UIImage *CYLImageScaledToSize(UIImage *image, CGSize size) {
-    if (!image || size.width <= 0 || size.height <= 0 || CGSizeEqualToSize(image.size, size)) {
-        return [image imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
-    }
-    UIImage *(^scale)(UIImage *) = ^UIImage *(UIImage *frame) {
-        CGFloat ratio = MIN(size.width / frame.size.width, size.height / frame.size.height);
-        CGSize fittedSize = CGSizeMake(frame.size.width * ratio, frame.size.height * ratio);
-        UIGraphicsImageRenderer *renderer = [[UIGraphicsImageRenderer alloc] initWithSize:fittedSize];
-        return [renderer imageWithActions:^(UIGraphicsImageRendererContext *context) {
-            [frame drawInRect:(CGRect){CGPointZero, fittedSize}];
-        }];
-    };
-    UIImage *scaledImage = nil;
-    if (image.images.count > 1) {
-        NSMutableArray<UIImage *> *frames = [NSMutableArray arrayWithCapacity:image.images.count];
-        for (UIImage *frame in image.images) {
-            [frames addObject:scale(frame)];
-        }
-        scaledImage = [UIImage animatedImageWithImages:frames duration:image.duration];
-    } else {
-        scaledImage = scale(image);
-    }
-    return [scaledImage imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
-}
+// [EN] `CYLImageScaledToSize` is Swift (step 68). [CN] 已迁移到 Swift（第 68 步）。
 
 - (BOOL)replaceViewControllerAtIndex:(NSUInteger)index
                   withViewController:(UIViewController *)viewController
@@ -3162,83 +3117,8 @@ static UIImage *CYLImageScaledToSize(UIImage *image, CGSize size) {
     return YES;
 }
 
-/*!
- * [EN] A change of the plus button: its page (the plus child view controller), when it has one, follows a new title, and
- *      the tab notification is posted with `CYLPlusButtonKey`. The object is that page, or the plus button without one
- *      (no index or tab bar item then).
- * [CN] PlusButton 的变化：它有页面（PlusButton 子控制器）时，页面跟随新标题；发送带有 `CYLPlusButtonKey` 的 Tab 通知。object 为该页面，
- *      没有页面时为 PlusButton（此时没有下标与 tabBarItem）。
- */
-- (void)cyl_plusButton:(CYLPlusButton *)plusButton didChangeWithNotification:(NSNotificationName)name info:(NSDictionary *)info {
-    NSMutableDictionary *extra = [info mutableCopy];
-    extra[CYLPlusButtonKey] = plusButton;
-    UIViewController *plusChild = [self cyl_contextPlusChildViewController];
-    NSUInteger index = plusChild ? [_viewControllers indexOfObject:plusChild] : NSNotFound;
-    if (name == CYLTabBarItemTitleDidChangeNotification && plusChild) {
-        CYLApplyNavigationTitleOfFollowingPage(plusChild, info[CYLTabBarItemTitle]);
-    }
-    if (index != NSNotFound) {
-        [self cyl_postTabBarItemNotification:name atIndex:index extra:extra];
-        return;
-    }
-    extra[CYLTabBarControllerKey] = self;
-    [[NSNotificationCenter defaultCenter] postNotificationName:name object:plusButton userInfo:[extra copy]];
-}
-
-- (BOOL)updatePlusButtonWithAttributes:(NSDictionary<NSString *, id> *)attributes {
-    CYLPlusButton *plusButton = [CYLPlusButton plusButtonForOwner:self];
-    if (!plusButton || attributes.count == 0) {
-        return NO;
-    }
-    NSString *title = attributes[CYLTabBarItemTitle];
-    if (title) {
-        NSString *oldTitle = plusButton.cyl_title;
-        [plusButton cyl_updateTitle:title image:nil selectedImage:nil];
-        // [EN] The plus button's page follows its title like any tab, and the title notification names the plus button.
-        // [CN] PlusButton 的页面与其他 Tab 一样跟随其标题，标题通知中带有 PlusButton。
-        NSMutableDictionary *titleInfo = [NSMutableDictionary dictionaryWithObject:title forKey:CYLTabBarItemTitle];
-        titleInfo[CYLTabBarItemOldTitleKey] = oldTitle;
-        titleInfo[CYLTabBarItemChangedAttributesKey] = @{ CYLTabBarItemTitle : title };
-        [self cyl_plusButton:plusButton didChangeWithNotification:CYLTabBarItemTitleDidChangeNotification info:titleInfo];
-    }
-    if (attributes[CYLTabBarItemImage] || attributes[CYLTabBarItemSelectedImage] || attributes[CYLTabBarItemImageURL] ||
-        attributes[CYLTabBarItemSelectedImageURL]) {
-        [self cyl_plusButton:plusButton didChangeWithNotification:CYLTabBarItemIconDidChangeNotification
-                        info:@{ CYLTabBarItemChangedAttributesKey : CYLTabBarItemIconAttributes(attributes) }];
-    }
-    [self cyl_plusButton:plusButton didChangeWithNotification:CYLTabBarItemDidChangeNotification
-                    info:@{ CYLTabBarItemChangedAttributesKey : [attributes copy] }];
-    id icon = attributes[CYLTabBarItemImageURL] ?: attributes[CYLTabBarItemImage];
-    id selectedIcon = attributes[CYLTabBarItemSelectedImageURL] ?: attributes[CYLTabBarItemSelectedImage];
-    NSValue *sizeValue = attributes[CYLTabBarItemImageURLSize];
-    CGSize size = [sizeValue isKindOfClass:[NSValue class]] ? sizeValue.CGSizeValue : [plusButton imageForState:UIControlStateNormal].size;
-    // FIX: issue #601
-    // [EN] Never left unscaled: a downloaded image keeps its own size (a 512 px icon is about 170 pt), which resizes the
-    //      plus button and moves it. Without a size, the image view's, else the tab icon's.
-    // [CN] 不保留原始尺寸：下载的图片会保持自身尺寸（512 px 的图标约 170 pt），导致 PlusButton 尺寸变化并移位。没有尺寸时
-    //      使用图片视图的尺寸，否则使用 Tab 图标的尺寸。
-    if (size.width <= 0 || size.height <= 0) {
-        size = plusButton.imageView.bounds.size;
-    }
-    if (size.width <= 0 || size.height <= 0) {
-        size = CGSizeMake(CYLTabBarItemImagePlaceholderWidth, CYLTabBarItemImagePlaceholderHeight);
-    }
-    __weak CYLPlusButton *weakPlusButton = plusButton;
-    __weak __typeof(self) weakSelf = self;
-    if (icon) {
-        [CYLTabBarController cyl_loadTabBarItemIcon:icon completion:^(UIImage *image) {
-            [weakPlusButton cyl_updateTitle:nil image:CYLImageScaledToSize(image, size) selectedImage:nil];
-            // [EN] A downloaded image arrives after the layout of the theme change. [CN] 下载的图片在换肤的布局之后才到达。
-            [weakSelf cyl_layOutPlusButtonInLiquidGlassLayers];
-        }];
-    }
-    if (selectedIcon) {
-        [CYLTabBarController cyl_loadTabBarItemIcon:selectedIcon completion:^(UIImage *image) {
-            [weakPlusButton cyl_updateTitle:nil image:nil selectedImage:CYLImageScaledToSize(image, size)];
-        }];
-    }
-    return YES;
-}
+// [EN] `-cyl_plusButton:didChangeWithNotification:info:` and `-updatePlusButtonWithAttributes:` are Swift
+//      (Swift/CYLTabBarController+CYLTabBarItemIconViews.swift, step 68). [CN] 已迁移到 Swift（第 68 步）。
 
 // [EN] `-cyl_tabButtonsOfViewController:`, the icon view updates and `-cyl_setTabImageView:lottieView:replacedByIconView:`
 //      are Swift (step 66). [CN] 已迁移到 Swift（第 66 步）。

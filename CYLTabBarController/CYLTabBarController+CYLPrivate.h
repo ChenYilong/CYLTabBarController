@@ -142,6 +142,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)cyl_setTabImageView:(nullable UIView *)tabImageView lottieView:(nullable UIView *)lottieView replacedByIconView:(BOOL)replaced;
 /// [EN] Posts a tab notification, implemented in Swift (step 67). [CN] 发送 Tab 通知，由 Swift 实现（第 67 步）。
 - (void)cyl_postTabBarItemNotification:(NSNotificationName)name atIndex:(NSUInteger)index extra:(nullable NSDictionary *)extra;
+/// [EN] Shared by the in-place updates, implemented in Swift (step 68). [CN] 原地更新共用，由 Swift 实现（第 68 步）。
++ (NSDictionary<NSString *, id> *)cyl_iconAttributesOfAttributes:(NSDictionary<NSString *, id> *)attributes;
++ (void)cyl_applyNavigationTitleOfFollowingPage:(UIViewController *)viewController title:(nullable NSString *)title;
+- (void)cyl_plusButton:(CYLPlusButton *)plusButton didChangeWithNotification:(NSNotificationName)name info:(NSDictionary *)info;
 - (void)cyl_syncTabBarItemAccessibility;
 #if CYL_FLATDESIGN_AVAILABLE
 - (void)cyl_syncFlatDesignTabBarItemColors;
