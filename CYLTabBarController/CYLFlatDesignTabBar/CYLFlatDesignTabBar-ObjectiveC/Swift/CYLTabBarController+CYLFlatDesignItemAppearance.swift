@@ -14,13 +14,13 @@ import UIKit
 //      颜色与字体，以及把 `tabBar.standardAppearance` 映射到扁平样式 TabBar。仅属于扁平样式子库。
 
 /// [EN] The FlatDesign item of a view controller, read without creating one. [CN] 视图控制器的扁平样式 item，读取时不会创建。
-private let CYLFlatDesignTabBarItemKey = CYLUtilsKeys.key("cyl_tabBarItem")
-private var CYLDefaultStandardAppearanceKey: UInt8 = 0
-private var CYLSyncedStandardAppearanceKey: UInt8 = 0
-private var CYLSyncedItemStandardAppearanceKey: UInt8 = 0
+private let cylFlatDesignTabBarItemKey = CYLUtilsKeys.key("cyl_tabBarItem")
+private var cylDefaultStandardAppearanceKey: UInt8 = 0
+private var cylSyncedStandardAppearanceKey: UInt8 = 0
+private var cylSyncedItemStandardAppearanceKey: UInt8 = 0
 
 /// [EN] Whether `appearance` differs from what was mirrored last. [CN] `appearance` 是否与上次映射的不同。
-private func CYLAppearanceChanged(_ appearance: AnyObject?, _ synced: AnyObject?) -> Bool {
+private func cylAppearanceChanged(_ appearance: AnyObject?, _ synced: AnyObject?) -> Bool {
     if appearance === synced { return false }
     guard let appearance else { return true }
     return !appearance.isEqual(synced)
@@ -34,7 +34,7 @@ extension CYLTabBarController {
 
     private func cylFlatDesignItems() -> [(UIViewController, CYLFlatDesignTabBarItem)] {
         (viewControllers ?? []).compactMap { viewController in
-            (objc_getAssociatedObject(viewController, CYLFlatDesignTabBarItemKey) as? CYLFlatDesignTabBarItem).map { (viewController, $0) }
+            (objc_getAssociatedObject(viewController, cylFlatDesignTabBarItemKey) as? CYLFlatDesignTabBarItem).map { (viewController, $0) }
         }
     }
 
@@ -76,7 +76,7 @@ extension CYLTabBarController {
         let viewControllers = self.viewControllers ?? []
         for (index, viewController) in viewControllers.enumerated() {
             guard let attributes = tabBarItemAttributes(at: UInt(index)),
-                  let item = objc_getAssociatedObject(viewController, CYLFlatDesignTabBarItemKey) as? CYLFlatDesignTabBarItem else { continue }
+                  let item = objc_getAssociatedObject(viewController, cylFlatDesignTabBarItemKey) as? CYLFlatDesignTabBarItem else { continue }
             let titleFont = attributes[CYLTabBarItemTitleFont] as? UIFont
             let selectedTitleFont = attributes[CYLTabBarItemSelectedTitleFont] as? UIFont ?? titleFont
             let values: [(UIControl.State, NSAttributedString.Key, Any?)] = [
@@ -105,13 +105,13 @@ extension CYLTabBarController {
     /// [EN] Records the system tab bar's default appearance, to tell a customized one later. [CN] 记录系统 TabBar 的默认外观，以便之后识别自定义外观。
     @objc(cyl_recordDefaultStandardAppearance)
     func cylRecordDefaultStandardAppearance() {
-        guard objc_getAssociatedObject(self, &CYLDefaultStandardAppearanceKey) == nil else { return }
-        objc_setAssociatedObject(self, &CYLDefaultStandardAppearanceKey, tabBar.standardAppearance, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+        guard objc_getAssociatedObject(self, &cylDefaultStandardAppearanceKey) == nil else { return }
+        objc_setAssociatedObject(self, &cylDefaultStandardAppearanceKey, tabBar.standardAppearance, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
     }
 
     private func cylIsCustomizedStandardAppearance(_ appearance: UITabBarAppearance?) -> Bool {
         guard let appearance else { return false }
-        let defaultAppearance = objc_getAssociatedObject(self, &CYLDefaultStandardAppearanceKey) as? UITabBarAppearance ?? UITabBarAppearance()
+        let defaultAppearance = objc_getAssociatedObject(self, &cylDefaultStandardAppearanceKey) as? UITabBarAppearance ?? UITabBarAppearance()
         return appearance !== defaultAppearance && !appearance.isEqual(defaultAppearance)
     }
 
@@ -124,22 +124,22 @@ extension CYLTabBarController {
     func cylSyncFlatDesignStandardAppearance() {
         guard let flatTabBar = cylFlatDesignTabBarIfShown else { return }
         let standardAppearance = tabBar.standardAppearance
-        let synced = objc_getAssociatedObject(self, &CYLSyncedStandardAppearanceKey) as AnyObject?
+        let synced = objc_getAssociatedObject(self, &cylSyncedStandardAppearanceKey) as AnyObject?
         let mirrored: UITabBarAppearance? = cylIsCustomizedStandardAppearance(standardAppearance) ? standardAppearance : nil
-        if CYLAppearanceChanged(mirrored, synced) {
+        if cylAppearanceChanged(mirrored, synced) {
             let flatAppearance = flatTabBar.standardAppearance
             let flatAppearanceIsMirrored = flatAppearance == nil || flatAppearance?.isEqual(synced) == true
             if mirrored != nil || flatAppearanceIsMirrored {
                 flatTabBar.standardAppearance = mirrored
             }
-            objc_setAssociatedObject(self, &CYLSyncedStandardAppearanceKey, mirrored, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+            objc_setAssociatedObject(self, &cylSyncedStandardAppearanceKey, mirrored, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
         }
         for (viewController, item) in cylFlatDesignItems() {
             let itemAppearance = viewController.tabBarItem.standardAppearance
-            let syncedItem = objc_getAssociatedObject(item, &CYLSyncedItemStandardAppearanceKey) as AnyObject?
-            if CYLAppearanceChanged(itemAppearance, syncedItem) {
+            let syncedItem = objc_getAssociatedObject(item, &cylSyncedItemStandardAppearanceKey) as AnyObject?
+            if cylAppearanceChanged(itemAppearance, syncedItem) {
                 item.standardAppearance = itemAppearance
-                objc_setAssociatedObject(item, &CYLSyncedItemStandardAppearanceKey, itemAppearance, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+                objc_setAssociatedObject(item, &cylSyncedItemStandardAppearanceKey, itemAppearance, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
             }
         }
     }

@@ -19,12 +19,12 @@ import UIKit
 //      `standardAppearance` 的观察留在 `.m` 中，与其共用的 KVO context 在一起。
 
 /// [EN] The title offset a tab asked for itself (issue #475). [CN] Tab 自身设置的标题偏移（issue #475）。
-private let CYLTitlePositionAdjustmentItemOffsetKey = CYLUtilsKeys.key("cyl_titlePositionAdjustmentItemOffset")
+private let cylTitlePositionAdjustmentItemOffsetKey = CYLUtilsKeys.key("cyl_titlePositionAdjustmentItemOffset")
 /// [EN] The image insets a tab asked for itself (issue #95). [CN] Tab 自身设置的图片内边距（issue #95）。
-private let CYLImageInsetsItemKey = CYLUtilsKeys.key("cyl_imageInsetsItem")
+private let cylImageInsetsItemKey = CYLUtilsKeys.key("cyl_imageInsetsItem")
 /// [EN] What the automatic adjustment of image-only tabs wrote into an item (the `.m` macro of the same selector name).
 /// [CN] 纯图标 Tab 自动调整写入 item 的记录（与 `.m` 中同一 selector 名称的宏相同）。
-private let CYLImageOnlyTabAdjustmentKey = CYLUtilsKeys.key("cyl_imageOnlyTabAdjustment")
+private let cylImageOnlyTabAdjustmentKey = CYLUtilsKeys.key("cyl_imageOnlyTabAdjustment")
 
 /**
  [EN] Remembers the title offset a tab asked for itself, so the controller's offset does not override it (nil for zero).
@@ -35,7 +35,7 @@ private let CYLImageOnlyTabAdjustmentKey = CYLUtilsKeys.key("cyl_imageOnlyTabAdj
 public func CYLRememberItemTitlePositionAdjustment(_ item: AnyObject?, _ offset: UIOffset) {
     guard let item else { return }
     let value: NSValue? = offset == .zero ? nil : NSValue(uiOffset: offset)
-    objc_setAssociatedObject(item, CYLTitlePositionAdjustmentItemOffsetKey, value, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+    objc_setAssociatedObject(item, cylTitlePositionAdjustmentItemOffsetKey, value, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
 }
 
 /**
@@ -46,12 +46,12 @@ public func CYLRememberItemTitlePositionAdjustment(_ item: AnyObject?, _ offset:
 public func CYLRememberItemImageInsets(_ item: AnyObject?, _ insets: UIEdgeInsets) {
     guard let item else { return }
     let value: NSValue? = insets == .zero ? nil : NSValue(uiEdgeInsets: insets)
-    objc_setAssociatedObject(item, CYLImageInsetsItemKey, value, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+    objc_setAssociatedObject(item, cylImageInsetsItemKey, value, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
 }
 
 /// [EN] The title offset of a tab: its own, else the controller's. [CN] Tab 的标题偏移：自身的，否则为控制器的。
 func CYLTitlePositionAdjustment(forItem item: AnyObject?, controllerOffset: UIOffset) -> UIOffset {
-    guard let item, let value = objc_getAssociatedObject(item, CYLTitlePositionAdjustmentItemOffsetKey) as? NSValue else {
+    guard let item, let value = objc_getAssociatedObject(item, cylTitlePositionAdjustmentItemOffsetKey) as? NSValue else {
         return controllerOffset
     }
     return value.uiOffsetValue
@@ -59,7 +59,7 @@ func CYLTitlePositionAdjustment(forItem item: AnyObject?, controllerOffset: UIOf
 
 /// [EN] The image insets of a tab: its own, else the controller's. [CN] Tab 的图片内边距：自身的，否则为控制器的。
 func CYLImageInsets(forItem item: AnyObject?, controllerInsets: UIEdgeInsets) -> UIEdgeInsets {
-    guard let item, let value = objc_getAssociatedObject(item, CYLImageInsetsItemKey) as? NSValue else {
+    guard let item, let value = objc_getAssociatedObject(item, cylImageInsetsItemKey) as? NSValue else {
         return controllerInsets
     }
     return value.uiEdgeInsetsValue
@@ -113,11 +113,11 @@ extension CYLTabBarController {
         }
         for viewController in viewControllers ?? [] {
             guard let item = viewController.tabBarItem,
-                  objc_getAssociatedObject(item, CYLImageInsetsItemKey) == nil else { continue }
-            if var record = objc_getAssociatedObject(item, CYLImageOnlyTabAdjustmentKey) as? [String: NSValue] {
+                  objc_getAssociatedObject(item, cylImageInsetsItemKey) == nil else { continue }
+            if var record = objc_getAssociatedObject(item, cylImageOnlyTabAdjustmentKey) as? [String: NSValue] {
                 record.removeValue(forKey: "insets")
                 record.removeValue(forKey: "appliedInsets")
-                objc_setAssociatedObject(item, CYLImageOnlyTabAdjustmentKey, record.isEmpty ? nil : record as NSDictionary,
+                objc_setAssociatedObject(item, cylImageOnlyTabAdjustmentKey, record.isEmpty ? nil : record as NSDictionary,
                                          .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
             }
             if item.imageInsets != insets {

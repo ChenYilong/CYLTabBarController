@@ -9,10 +9,10 @@ import UIKit
 
 /// [EN] Private: the reason of a left-out tab; the same key as in CYLTabBarController.m and the configuration.
 /// [CN] 私有：被排除的 Tab 的原因；与 CYLTabBarController.m 及配置中的键相同。
-private let CYLTabBarItemExclusionReasonKey = "_CYLTabBarItemExclusionReason"
+private let cylTabBarItemExclusionReasonKey = "_CYLTabBarItemExclusionReason"
 /// [EN] Private: marks a tab left out by its platforms or minimum version; the same key as in CYLTabBarController.m.
 /// [CN] 私有：标记因平台或最低版本被排除的 Tab；与 CYLTabBarController.m 中的键相同。
-private let CYLTabBarItemExcludedKey = "_CYLTabBarItemExcluded"
+private let cylTabBarItemExcludedKey = "_CYLTabBarItemExcluded"
 
 /**
  [EN] Block 1 of the sections handed over by Mac-CYLTabBarController文件夹 (docs/Swift-Migration.md, step 126): setting the tabs up.
@@ -234,9 +234,9 @@ extension CYLTabBarController {
                                                            detail: "a placeholder for a tab that is not a dictionary"))
                 continue
             }
-            if (attributes[CYLTabBarItemExcludedKey] as? NSNumber)?.boolValue == true {
+            if (attributes[cylTabBarItemExcludedKey] as? NSNumber)?.boolValue == true {
                 skipped.add(CYLTabBarSkippedTab.skippedTab(with: .excluded, pageIdentifier: CYLTabBarPageRegistry.pageIdentifier(ofTab: attributes),
-                                                           attributes: attributes, detail: attributes[CYLTabBarItemExclusionReasonKey] as? String))
+                                                           attributes: attributes, detail: attributes[cylTabBarItemExclusionReasonKey] as? String))
                 continue
             }
             tabs.append(attributes)
