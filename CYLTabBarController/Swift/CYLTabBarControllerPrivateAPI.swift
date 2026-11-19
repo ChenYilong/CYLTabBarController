@@ -47,25 +47,9 @@ import UIKit
     @objc(cyl_flatDesignReportDidSelectControl:) optional func cylFlatDesignReportDidSelectControl(_ control: UIControl)
 }
 
-/**
- * [EN] The class methods of `CYLTabBarController` that only the private header declares. A class method is an instance method of the
- *      class object, so it is declared as an instance method here and called on `CYLTabBarController.self`.
- * [CN] 只在私有头文件中声明的 `CYLTabBarController` 类方法。类方法是类对象的实例方法，因此这里声明为实例方法，并在 `CYLTabBarController.self` 上调用。
- */
-@objc protocol CYLTabBarControllerPrivateClassAPI {
-    @objc(cyl_loadTabBarItemIcon:completion:) func cylLoadTabBarItemIcon(_ icon: Any?, completion: @escaping (UIImage?) -> Void)
-}
-
 extension CYLTabBarController {
     /// [EN] The private methods of this controller. [CN] 本控制器的私有方法。
     var cylPrivate: CYLTabBarControllerPrivateAPI {
         unsafeBitCast(self as AnyObject, to: CYLTabBarControllerPrivateAPI.self)
-    }
-}
-
-extension CYLTabBarController {
-    /// [EN] The private class methods. [CN] 私有类方法。
-    static var cylPrivateClass: CYLTabBarControllerPrivateClassAPI {
-        unsafeBitCast(CYLTabBarController.self as AnyObject, to: CYLTabBarControllerPrivateClassAPI.self)
     }
 }

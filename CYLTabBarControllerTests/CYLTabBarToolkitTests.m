@@ -459,4 +459,27 @@
     window.hidden = YES;
 }
 
+#pragma mark - Tab icon setters (Swift since step 67, issue #601)
+
+/// [EN] The icon notification names the tab and hands back the very provider the app passed; nil removes it.
+/// [CN] 图标通知指出该 Tab，并交回 App 传入的同一个 provider；传 nil 时移除。
+- (void)testIconViewProviderNotificationKeepsTheProvider {
+    CYLTabBarController *tabBarController = [self newTabBarController];
+    CYLTabBarItemIconViewProvider provider = [^UIView *(BOOL selected) { return [UIView new]; } copy];
+    __block NSDictionary *userInfo = nil;
+    id observer = [[NSNotificationCenter defaultCenter] addObserverForName:CYLTabBarItemIconDidChangeNotification object:nil queue:nil
+                                                                usingBlock:^(NSNotification *note) { userInfo = note.userInfo; }];
+    XCTAssertTrue([tabBarController setTabBarItemIconViewProvider:provider atIndex:1]);
+    XCTAssertEqualObjects(userInfo[CYLTabBarItemIndexKey], @1);
+    XCTAssertEqual(userInfo[CYLTabBarControllerKey], tabBarController);
+    XCTAssertEqual((id)userInfo[CYLTabBarItemIconViewProviderKey], (id)provider, @"the same block, not a wrapper");
+    userInfo = nil;
+    XCTAssertTrue([tabBarController setTabBarItemIconViewProvider:nil atIndex:1]);
+    XCTAssertNotNil(userInfo);
+    XCTAssertNil(userInfo[CYLTabBarItemIconViewProviderKey]);
+    XCTAssertFalse([tabBarController setTabBarItemIconViewProvider:provider atIndex:9], @"no such tab");
+    XCTAssertFalse([tabBarController setTabBarItemIcon:nil selectedIcon:nil size:CGSizeZero atIndex:0], @"no icon");
+    [[NSNotificationCenter defaultCenter] removeObserver:observer];
+}
+
 @end

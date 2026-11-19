@@ -1733,60 +1733,6 @@ didRecognizeTabBarItemGesture:(CYLTabBarItemGesture)gesture
  */
 typedef UIView * _Nullable (^CYLTabBarItemIconViewProvider)(BOOL selected);
 
-/*!
- * FIX: issue #601, #337, #215, #605, #604, #136
- * [EN] Shows a view of yours in place of a tab's icon, without rebuilding the tab bar, in every style, also for a tab
- *      with a Lottie animation: the icon (or the Lottie view) is hidden and the view takes its place, as the Lottie
- *      animation does. The view can be anything: a `UIImageView` filled by SDWebImage or Kingfisher from a URL, an
- *      animated GIF (`+[UIImage cyl_animatedImageWithGIFData:]`), a PAG view, a themed image... CYLTabBarController
- *      depends on none of them. Size the view, or leave it zero-sized to get the icon's size.
- *      Liquid Glass shows the selected look through the lens, in another layer: that layer gets the `selected` YES view.
- *      The other styles show the YES view while the tab is selected. Pass nil to show the tab's own icon again.
- * [CN] 不重建 TabBar，用你的视图替换 Tab 的图标，适用于所有样式，包括使用 Lottie 动画的 Tab：与 Lottie 动画相同，隐藏图标（或 Lottie
- *      视图），由你的视图代替。视图可以是任意类型：用 SDWebImage 或 Kingfisher 从 URL 加载的 `UIImageView`、GIF 动图
- *      （`+[UIImage cyl_animatedImageWithGIFData:]`）、PAG 视图、主题图片……CYLTabBarController 不依赖它们。请设置视图尺寸；尺寸为零时
- *      使用图标的尺寸。液态玻璃的选中样式通过放大镜显示在另一个图层中，该图层使用 `selected` 为 YES 的视图；其他样式在 Tab 选中时显示
- *      YES 的视图。传入 nil 则恢复显示 Tab 自身的图标。
- * @param index [EN] The tab's index in `viewControllers`. [CN] Tab 在 `viewControllers` 中的索引。
- * @return [EN] NO when there is no such tab, or it is the plus button's. [CN] 没有该 Tab，或是 PlusButton 的 Tab 时返回 NO。
- */
-- (BOOL)setTabBarItemIconViewProvider:(nullable CYLTabBarItemIconViewProvider)provider atIndex:(NSUInteger)index;
-
-/*!
- * FIX: issue #601, #337, #215, #605
- * [EN] Shows images downloaded from `URL` (unselected) and `selectedURL` (selected; nil uses `URL`) in place of a tab's
- *      icon, through `-setTabBarItemIconViewProvider:atIndex:`: every style, also over a Lottie icon. The images are
- *      cached (`+[UIImage cyl_loadImageWithURL:completion:]`), drawn as is (their own colors, #337), a GIF animates (#605),
- *      and they fit `size` (zero: the icon's size). The tab keeps its own icon until the images are ready, and when the
- *      unselected one cannot be loaded.
- * [CN] 将从 `URL`（未选中）和 `selectedURL`（选中；为 nil 时使用 `URL`）下载的图片显示在 Tab 图标的位置，基于
- *      `-setTabBarItemIconViewProvider:atIndex:`：适用于所有样式，也能覆盖 Lottie 图标。图片会被缓存
- *      （`+[UIImage cyl_loadImageWithURL:completion:]`），按原图绘制（保持自身颜色，#337），GIF 会播放动画（#605），并按 `size`
- *      缩放（为零时使用图标尺寸）。图片就绪前，以及未选中图片加载失败时，Tab 保持自身图标。
- * @return [EN] NO when there is no such tab, or it is the plus button's. [CN] 没有该 Tab，或是 PlusButton 的 Tab 时返回 NO。
- */
-- (BOOL)setTabBarItemIconWithURL:(NSURL *)URL
-                     selectedURL:(nullable NSURL *)selectedURL
-                            size:(CGSize)size
-                         atIndex:(NSUInteger)index;
-
-/*!
- * FIX: issue #601, #535
- * [EN] `-setTabBarItemIconWithURL:selectedURL:size:atIndex:` for any image source, local or remote: `icon` (unselected)
- *      and `selectedIcon` (selected; nil uses `icon`) are each a `UIImage`, an image name (as `CYLTabBarItemImage`), the
- *      absolute path of an image file (#535), an `NSURL` (a file URL or a network one), or a URL string
- *      (`http://` / `https://`). Network images are downloaded and cached (`CYLImageCache`); local ones are shown at once.
- *      Every image is drawn with its own colors, a GIF animates, and it fits `size` (zero: the icon's size).
- * [CN] 适用于任意图片来源（本地或网络）的 `-setTabBarItemIconWithURL:selectedURL:size:atIndex:`：`icon`（未选中）与 `selectedIcon`
- *      （选中；为 nil 时使用 `icon`）可以是 `UIImage`、图片名（与 `CYLTabBarItemImage` 相同）、图片文件的绝对路径（#535）、`NSURL`
- *      （文件 URL 或网络 URL），或 URL 字符串（`http://` / `https://`）。网络图片会下载并缓存（`CYLImageCache`）；本地图片立即显示。
- *      所有图片按原图颜色绘制，GIF 会播放动画，并按 `size` 缩放（为零时使用图标尺寸）。
- * @return [EN] NO when there is no such tab, it is the plus button's, or `icon` is nil. [CN] 没有该 Tab、是 PlusButton 的 Tab，或 `icon` 为 nil 时返回 NO。
- */
-- (BOOL)setTabBarItemIcon:(id)icon
-             selectedIcon:(nullable id)selectedIcon
-                     size:(CGSize)size
-                  atIndex:(NSUInteger)index;
 
 /*!
  * FIX: issue #601
@@ -2044,6 +1990,70 @@ typedef UIView * _Nullable (^CYLTabBarItemIconViewProvider)(BOOL selected);
 //@property (nonatomic, assign, getter=isLottieViewAdded) BOOL lottieViewAdded;
 
 #endif
+
+@end
+
+/*!
+ * [EN] A tab's icon replaced at run time (issue #601). Implemented in Swift (docs/Swift-Migration.md, step 67); the
+ *      selectors are unchanged.
+ * [CN] 运行时替换 Tab 的图标（issue #601）。由 Swift 实现（docs/Swift-Migration.md，第 67 步）；selector 不变。
+ */
+@interface CYLTabBarController (CYLTabBarItemIcons)
+
+/*!
+ * FIX: issue #601, #337, #215, #605, #604, #136
+ * [EN] Shows a view of yours in place of a tab's icon, without rebuilding the tab bar, in every style, also for a tab
+ *      with a Lottie animation: the icon (or the Lottie view) is hidden and the view takes its place, as the Lottie
+ *      animation does. The view can be anything: a `UIImageView` filled by SDWebImage or Kingfisher from a URL, an
+ *      animated GIF (`+[UIImage cyl_animatedImageWithGIFData:]`), a PAG view, a themed image... CYLTabBarController
+ *      depends on none of them. Size the view, or leave it zero-sized to get the icon's size.
+ *      Liquid Glass shows the selected look through the lens, in another layer: that layer gets the `selected` YES view.
+ *      The other styles show the YES view while the tab is selected. Pass nil to show the tab's own icon again.
+ * [CN] 不重建 TabBar，用你的视图替换 Tab 的图标，适用于所有样式，包括使用 Lottie 动画的 Tab：与 Lottie 动画相同，隐藏图标（或 Lottie
+ *      视图），由你的视图代替。视图可以是任意类型：用 SDWebImage 或 Kingfisher 从 URL 加载的 `UIImageView`、GIF 动图
+ *      （`+[UIImage cyl_animatedImageWithGIFData:]`）、PAG 视图、主题图片……CYLTabBarController 不依赖它们。请设置视图尺寸；尺寸为零时
+ *      使用图标的尺寸。液态玻璃的选中样式通过放大镜显示在另一个图层中，该图层使用 `selected` 为 YES 的视图；其他样式在 Tab 选中时显示
+ *      YES 的视图。传入 nil 则恢复显示 Tab 自身的图标。
+ * @param index [EN] The tab's index in `viewControllers`. [CN] Tab 在 `viewControllers` 中的索引。
+ * @return [EN] NO when there is no such tab, or it is the plus button's. [CN] 没有该 Tab，或是 PlusButton 的 Tab 时返回 NO。
+ */
+- (BOOL)setTabBarItemIconViewProvider:(nullable CYLTabBarItemIconViewProvider)provider atIndex:(NSUInteger)index;
+
+/*!
+ * FIX: issue #601, #337, #215, #605
+ * [EN] Shows images downloaded from `URL` (unselected) and `selectedURL` (selected; nil uses `URL`) in place of a tab's
+ *      icon, through `-setTabBarItemIconViewProvider:atIndex:`: every style, also over a Lottie icon. The images are
+ *      cached (`+[UIImage cyl_loadImageWithURL:completion:]`), drawn as is (their own colors, #337), a GIF animates (#605),
+ *      and they fit `size` (zero: the icon's size). The tab keeps its own icon until the images are ready, and when the
+ *      unselected one cannot be loaded.
+ * [CN] 将从 `URL`（未选中）和 `selectedURL`（选中；为 nil 时使用 `URL`）下载的图片显示在 Tab 图标的位置，基于
+ *      `-setTabBarItemIconViewProvider:atIndex:`：适用于所有样式，也能覆盖 Lottie 图标。图片会被缓存
+ *      （`+[UIImage cyl_loadImageWithURL:completion:]`），按原图绘制（保持自身颜色，#337），GIF 会播放动画（#605），并按 `size`
+ *      缩放（为零时使用图标尺寸）。图片就绪前，以及未选中图片加载失败时，Tab 保持自身图标。
+ * @return [EN] NO when there is no such tab, or it is the plus button's. [CN] 没有该 Tab，或是 PlusButton 的 Tab 时返回 NO。
+ */
+- (BOOL)setTabBarItemIconWithURL:(NSURL *)URL
+                     selectedURL:(nullable NSURL *)selectedURL
+                            size:(CGSize)size
+                         atIndex:(NSUInteger)index;
+
+/*!
+ * FIX: issue #601, #535
+ * [EN] `-setTabBarItemIconWithURL:selectedURL:size:atIndex:` for any image source, local or remote: `icon` (unselected)
+ *      and `selectedIcon` (selected; nil uses `icon`) are each a `UIImage`, an image name (as `CYLTabBarItemImage`), the
+ *      absolute path of an image file (#535), an `NSURL` (a file URL or a network one), or a URL string
+ *      (`http://` / `https://`). Network images are downloaded and cached (`CYLImageCache`); local ones are shown at once.
+ *      Every image is drawn with its own colors, a GIF animates, and it fits `size` (zero: the icon's size).
+ * [CN] 适用于任意图片来源（本地或网络）的 `-setTabBarItemIconWithURL:selectedURL:size:atIndex:`：`icon`（未选中）与 `selectedIcon`
+ *      （选中；为 nil 时使用 `icon`）可以是 `UIImage`、图片名（与 `CYLTabBarItemImage` 相同）、图片文件的绝对路径（#535）、`NSURL`
+ *      （文件 URL 或网络 URL），或 URL 字符串（`http://` / `https://`）。网络图片会下载并缓存（`CYLImageCache`）；本地图片立即显示。
+ *      所有图片按原图颜色绘制，GIF 会播放动画，并按 `size` 缩放（为零时使用图标尺寸）。
+ * @return [EN] NO when there is no such tab, it is the plus button's, or `icon` is nil. [CN] 没有该 Tab、是 PlusButton 的 Tab，或 `icon` 为 nil 时返回 NO。
+ */
+- (BOOL)setTabBarItemIcon:(id)icon
+             selectedIcon:(nullable id)selectedIcon
+                     size:(CGSize)size
+                  atIndex:(NSUInteger)index;
 
 @end
 

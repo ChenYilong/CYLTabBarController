@@ -229,42 +229,7 @@ static void CYLApplyNavigationTitleOfFollowingPage(UIViewController *viewControl
     }
 }
 
-/*!
- * [EN] Posts a tab notification. The object is the tab's page; userInfo names exactly what changed: the tab bar controller,
- *      the tab's index, its entry in `viewControllers`, its tab bar item (`cyl_tabBarItem` on FlatDesign), plus `extra`.
- * [CN] 发送 Tab 通知。object 为该 Tab 的页面；userInfo 精确指出变化的对象：TabBar 控制器、Tab 下标、它在 `viewControllers` 中的控制器、
- *      它的 tabBarItem（扁平样式为 `cyl_tabBarItem`），以及 `extra`。
- */
-static void CYLPostTabBarItemNotification(NSNotificationName name, CYLTabBarController *tabBarController, NSUInteger index,
-                                          NSDictionary *_Nullable extra) {
-    if (index >= tabBarController.viewControllers.count) {
-        return;
-    }
-    UIViewController *viewController = tabBarController.viewControllers[index];
-    UIViewController *page = [viewController cyl_getViewControllerInsteadOfNavigationController] ?: viewController;
-    NSMutableDictionary *userInfo = [NSMutableDictionary dictionary];
-    userInfo[CYLTabBarControllerKey] = tabBarController;
-    userInfo[CYLTabBarItemIndexKey] = @(index);
-    userInfo[CYLTabBarItemViewControllerKey] = viewController;
-    // [EN] The tab's identifier (`CYLTabBarItemIdentifier`), more exact than its index. [CN] Tab 的 ID（`CYLTabBarItemIdentifier`），比下标更精确。
-    NSString *identifier = viewController.cyl_tabBarItemIdentifier ?: page.cyl_tabBarItemIdentifier;
-    if (identifier.length > 0) {
-        userInfo[CYLTabBarItemIdentifier] = identifier;
-    }
-    id tabBarItem = viewController.tabBarItem;
-#if CYL_FLATDESIGN_AVAILABLE
-    if (CYLTabBarStyleTypeFlatDesign == tabBarController.tabBarStyleType && viewController.cyl_tabBarItem) {
-        tabBarItem = viewController.cyl_tabBarItem;
-    }
-#endif
-    if (tabBarItem) {
-        userInfo[CYLTabBarItemKey] = tabBarItem;
-    }
-    if (extra.count > 0) {
-        [userInfo addEntriesFromDictionary:extra];
-    }
-    [[NSNotificationCenter defaultCenter] postNotificationName:name object:page userInfo:[userInfo copy]];
-}
+// [EN] `CYLPostTabBarItemNotification` is Swift: `-cyl_postTabBarItemNotification:atIndex:extra:` (step 67). [CN] 已迁移到 Swift（第 67 步）。
 
 /// [EN] The image keys of `attributes` (an icon change), empty when there is none. [CN] `attributes` 中的图片 key（图标变化），没有时为空。
 static NSDictionary *CYLTabBarItemIconAttributes(NSDictionary *attributes) {
@@ -3163,15 +3128,13 @@ static NSString *const CYLTabBarItemPlusSlotPlaceholderKey = @"CYLTabBarItemPlus
             titleInfo[CYLTabBarItemChangedAttributesKey] = [attributes dictionaryWithValuesForKeys:
                 [@[ CYLTabBarItemTitle, CYLTabBarItemSelectedTitle ] filteredArrayUsingPredicate:
                  [NSPredicate predicateWithBlock:^BOOL(NSString *key, NSDictionary *bindings) { return attributes[key] != nil; }]]];
-            CYLPostTabBarItemNotification(CYLTabBarItemTitleDidChangeNotification, self, index, titleInfo);
+            [self cyl_postTabBarItemNotification:CYLTabBarItemTitleDidChangeNotification atIndex:index extra:titleInfo];
         }
         NSDictionary *iconAttributes = CYLTabBarItemIconAttributes(attributes);
         if (iconAttributes.count > 0) {
-            CYLPostTabBarItemNotification(CYLTabBarItemIconDidChangeNotification, self, index,
-                                          @{ CYLTabBarItemChangedAttributesKey : iconAttributes });
+            [self cyl_postTabBarItemNotification:CYLTabBarItemIconDidChangeNotification atIndex:index extra:@{ CYLTabBarItemChangedAttributesKey : iconAttributes }];
         }
-        CYLPostTabBarItemNotification(CYLTabBarItemDidChangeNotification, self, index,
-                                      @{ CYLTabBarItemChangedAttributesKey : [attributes copy] });
+        [self cyl_postTabBarItemNotification:CYLTabBarItemDidChangeNotification atIndex:index extra:@{ CYLTabBarItemChangedAttributesKey : [attributes copy] }];
     }
     return updated;
 }
@@ -3356,56 +3319,10 @@ static NSString *const CYLTabBarItemPlusSlotPlaceholderKey = @"CYLTabBarItemPlus
 // [EN] The providers, the tab buttons of a tab and the icon views are Swift
 //      (Swift/CYLTabBarController+CYLTabBarItemIconViews.swift, docs/Swift-Migration.md, step 66). [CN] 已迁移到 Swift（第 66 步）。
 
-- (BOOL)setTabBarItemIconViewProvider:(CYLTabBarItemIconViewProvider)provider atIndex:(NSUInteger)index {
-    if (index >= _viewControllers.count) {
-        return NO;
-    }
-    UIViewController *viewController = _viewControllers[index];
-    if (viewController.cyl_isPlaceholder || viewController == [self cyl_contextPlusChildViewController]) {
-        return NO;
-    }
-    NSMapTable *providers = [self cyl_tabBarItemIconViewProviders];
-    if (provider) {
-        [providers setObject:[provider copy] forKey:viewController];
-    } else {
-        [providers removeObjectForKey:viewController];
-    }
-    [self cyl_updateTabBarItemIconViewsOfViewController:viewController];
-    // [EN] The tab bar lays its buttons out again, as when a tab is selected.
-    // [CN] TabBar 重新布局其按钮，与选中 Tab 时相同。
-    [self.tabBar setNeedsLayout];
-    [self cyl_setNeedsUpdateTabBarItemIconViews];
-    CYLPostTabBarItemNotification(CYLTabBarItemIconDidChangeNotification, self, index,
-                                  provider ? @{ CYLTabBarItemIconViewProviderKey : [provider copy] } : nil);
-    return YES;
-}
+// [EN] `-setTabBarItemIconViewProvider:atIndex:`, `-setTabBarItemIconWithURL:…` and `-setTabBarItemIcon:…` are Swift
+//      (Swift/CYLTabBarController+CYLTabBarItemIconViews.swift, step 67). [CN] 已迁移到 Swift（第 67 步）。
 
-- (BOOL)setTabBarItemIconWithURL:(NSURL *)URL selectedURL:(NSURL *)selectedURL size:(CGSize)size atIndex:(NSUInteger)index {
-    return URL && [self setTabBarItemIcon:URL selectedIcon:selectedURL size:size atIndex:index];
-}
-
-/*!
- * [EN] The image of `icon`, on the main queue: a `UIImage` as it is; an `NSURL` or an `http(s)` string loaded through
- *      `CYLImageCache`; any other string by name or absolute path (`+[UIImage cyl_imageNamed:]`, #535). nil when there is none.
- * [CN] 在主队列返回 `icon` 对应的图片：`UIImage` 原样返回；`NSURL` 或 `http(s)` 字符串通过 `CYLImageCache` 加载；其他字符串按图片名或
- *      绝对路径加载（`+[UIImage cyl_imageNamed:]`，#535）。没有图片时为 nil。
- */
-static void CYLLoadTabBarItemIcon(id _Nullable icon, void (^completion)(UIImage *_Nullable image)) {
-    if ([icon isKindOfClass:[UIImage class]]) {
-        completion(icon);
-        return;
-    }
-    NSURL *URL = [icon isKindOfClass:[NSURL class]] ? icon : nil;
-    if ([icon isKindOfClass:[NSString class]] && ([icon hasPrefix:@"http://"] || [icon hasPrefix:@"https://"])) {
-        URL = [NSURL URLWithString:icon];
-    }
-    if (URL) {
-        [UIImage cyl_loadImageWithURL:URL completion:completion];
-        return;
-    }
-    completion([icon isKindOfClass:[NSString class]] ? [UIImage cyl_imageNamed:icon] : nil);
-}
-
+// [EN] `CYLLoadTabBarItemIcon` is Swift: `+cyl_loadTabBarItemIcon:completion:` (step 67). [CN] 已迁移到 Swift（第 67 步）。
 
 /// [EN] `image` drawn at `size` with its own colors, every frame of an animated one. [CN] 按 `size` 以原图颜色绘制 `image`，动图的每一帧都绘制。
 static UIImage *CYLImageScaledToSize(UIImage *image, CGSize size) {
@@ -3504,10 +3421,6 @@ static UIImage *CYLImageScaledToSize(UIImage *image, CGSize size) {
     return YES;
 }
 
-+ (void)cyl_loadTabBarItemIcon:(id)icon completion:(void (^)(UIImage *_Nullable))completion {
-    CYLLoadTabBarItemIcon(icon, completion);
-}
-
 /*!
  * [EN] A change of the plus button: its page (the plus child view controller), when it has one, follows a new title, and
  *      the tab notification is posted with `CYLPlusButtonKey`. The object is that page, or the plus button without one
@@ -3524,7 +3437,7 @@ static UIImage *CYLImageScaledToSize(UIImage *image, CGSize size) {
         CYLApplyNavigationTitleOfFollowingPage(plusChild, info[CYLTabBarItemTitle]);
     }
     if (index != NSNotFound) {
-        CYLPostTabBarItemNotification(name, self, index, extra);
+        [self cyl_postTabBarItemNotification:name atIndex:index extra:extra];
         return;
     }
     extra[CYLTabBarControllerKey] = self;
@@ -3572,68 +3485,17 @@ static UIImage *CYLImageScaledToSize(UIImage *image, CGSize size) {
     __weak CYLPlusButton *weakPlusButton = plusButton;
     __weak __typeof(self) weakSelf = self;
     if (icon) {
-        CYLLoadTabBarItemIcon(icon, ^(UIImage *image) {
+        [CYLTabBarController cyl_loadTabBarItemIcon:icon completion:^(UIImage *image) {
             [weakPlusButton cyl_updateTitle:nil image:CYLImageScaledToSize(image, size) selectedImage:nil];
             // [EN] A downloaded image arrives after the layout of the theme change. [CN] 下载的图片在换肤的布局之后才到达。
             [weakSelf cyl_layOutPlusButtonInLiquidGlassLayers];
-        });
+        }];
     }
     if (selectedIcon) {
-        CYLLoadTabBarItemIcon(selectedIcon, ^(UIImage *image) {
+        [CYLTabBarController cyl_loadTabBarItemIcon:selectedIcon completion:^(UIImage *image) {
             [weakPlusButton cyl_updateTitle:nil image:nil selectedImage:CYLImageScaledToSize(image, size)];
-        });
+        }];
     }
-    return YES;
-}
-
-- (BOOL)setTabBarItemIcon:(id)icon selectedIcon:(id)selectedIcon size:(CGSize)size atIndex:(NSUInteger)index {
-    if (index >= _viewControllers.count || !icon) {
-        return NO;
-    }
-    UIViewController *viewController = _viewControllers[index];
-    if (viewController.cyl_isPlaceholder || viewController == [self cyl_contextPlusChildViewController]) {
-        return NO;
-    }
-    __weak __typeof(self) weakSelf = self;
-    __weak UIViewController *weakViewController = viewController;
-    CYLLoadTabBarItemIcon(icon, ^(UIImage *image) {
-        if (!image) {
-            return;
-        }
-        void (^show)(UIImage *) = ^(UIImage *selectedImage) {
-            __strong __typeof(weakSelf) self = weakSelf;
-            // [EN] Still a tab of this controller (the view controllers may have changed meanwhile).
-            // [CN] 仍是本控制器的 Tab（期间视图控制器可能已改变）。
-            NSUInteger currentIndex = weakViewController ? [self.viewControllers indexOfObject:weakViewController] : NSNotFound;
-            if (!self || currentIndex == NSNotFound) {
-                return;
-            }
-            UIImage *originalImage = [image imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
-            UIImage *originalSelectedImage = [(selectedImage ?: image) imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
-            [self setTabBarItemIconViewProvider:^UIView *(BOOL selected) {
-                UIImage *iconImage = selected ? originalSelectedImage : originalImage;
-                // [EN] An animated icon rests on its first frame; a tap or Play all plays its frames.
-                // [CN] 动图图标停在第一帧；点击或“全部播放”时播放其各帧。
-                UIImageView *iconView = [[UIImageView alloc] initWithImage:(iconImage.images.count > 1 ?
-                    [iconImage.images.firstObject imageWithRenderingMode:iconImage.renderingMode] : iconImage)];
-                if (iconImage.images.count > 1) {
-                    iconView.animationImages = iconImage.images;
-                    iconView.animationDuration = iconImage.duration;
-                    iconView.animationRepeatCount = 1;
-                }
-                iconView.contentMode = UIViewContentModeScaleAspectFit;
-                CGSize iconSize = CGSizeEqualToSize(size, CGSizeZero) ?
-                    CGSizeMake(CYLTabBarItemImagePlaceholderWidth, CYLTabBarItemImagePlaceholderHeight) : size;
-                iconView.frame = (CGRect){CGPointZero, iconSize};
-                return iconView;
-            } atIndex:currentIndex];
-        };
-        if (!selectedIcon || [selectedIcon isEqual:icon]) {
-            show(nil);
-        } else {
-            CYLLoadTabBarItemIcon(selectedIcon, show);
-        }
-    });
     return YES;
 }
 

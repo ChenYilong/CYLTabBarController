@@ -412,7 +412,7 @@ extension CYLTabBarController {
             restorables.setObject(value, forKey: viewController)
             value.prepare(currentValue: providers.object(forKey: viewController))
             let tabIcon = entry
-            CYLTabBarController.cylPrivateClass.cylLoadTabBarItemIcon(tabIcon.icon) { [weak self, weak viewController] image in
+            CYLTabBarController.cylLoadTabBarItemIcon(tabIcon.icon) { [weak self, weak viewController] image in
                 let show: (UIImage?) -> Void = { selectedImage in
                     // [EN] Dropped when another theme came in between, or the tab is gone. [CN] 期间切换了其他主题或 Tab 已不存在时丢弃。
                     guard let self, let viewController, self.isCurrentThemeGeneration(generation) else { return }
@@ -428,7 +428,7 @@ extension CYLTabBarController {
                 if image == nil || tabIcon.selectedIcon == nil || CYLThemeSameValue(tabIcon.selectedIcon, tabIcon.icon) {
                     show(nil)
                 } else {
-                    CYLTabBarController.cylPrivateClass.cylLoadTabBarItemIcon(tabIcon.selectedIcon, completion: show)
+                    CYLTabBarController.cylLoadTabBarItemIcon(tabIcon.selectedIcon, completion: show)
                 }
             }
         }
@@ -488,7 +488,7 @@ extension CYLTabBarController {
                 }
                 continue
             }
-            CYLTabBarController.cylPrivateClass.cylLoadTabBarItemIcon(themeValue) { [weak self, weak plusButton] image in
+            CYLTabBarController.cylLoadTabBarItemIcon(themeValue) { [weak self, weak plusButton] image in
                 // [EN] Dropped when another theme came in between. [CN] 期间切换了其他主题时丢弃。
                 guard let self, let plusButton, self.isCurrentThemeGeneration(generation) else { return }
                 // [EN] A background image arrived while the icon was loading: the button takes no theme image any more.

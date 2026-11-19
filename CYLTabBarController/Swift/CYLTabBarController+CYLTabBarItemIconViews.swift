@@ -29,7 +29,7 @@ private enum CYLTabBarItemIconViewKeys {
  */
 extension CYLTabBarController {
 
-    private typealias CYLIconViewProvider = @convention(block) (Bool) -> UIView?
+    typealias CYLIconViewProvider = @convention(block) (Bool) -> UIView?
 
     // MARK: - Resting animated images
 
@@ -232,5 +232,175 @@ extension CYLTabBarController {
             host.cyl_badgeHostReplacedByIconView = replaced
             host.cyl_refreshBadge()
         }
+    }
+}
+
+// MARK: - Tab notifications and icon setters (docs/Swift-Migration.md, step 67)
+
+/**
+ * [EN] `CYLTabBarController (CYLTabBarItemIcons)`: a tab's icon replaced at run time (issue #601), by a view of yours or by
+ *      an image from any source, and the tab notifications. Translated from Objective-C (docs/Swift-Migration.md, step 67);
+ *      the three public methods are declared in that category of CYLTabBarController.h, with their selectors unchanged.
+ * [CN] `CYLTabBarController (CYLTabBarItemIcons)`：运行时替换 Tab 的图标（issue #601），使用你自己的视图或任意来源的图片，以及 Tab 通知。
+ *      已从 Objective-C 翻译（docs/Swift-Migration.md，第 67 步）；三个公开方法声明在 CYLTabBarController.h 的该分类中，selector 不变。
+ */
+extension CYLTabBarController {
+
+    /**
+     * [EN] Posts a tab notification. The object is the tab's page; userInfo names exactly what changed: the tab bar
+     *      controller, the tab's index, its entry in `viewControllers`, its identifier, its tab bar item (`cyl_tabBarItem` on
+     *      FlatDesign), plus `extra`.
+     * [CN] 发送 Tab 通知。object 为该 Tab 的页面；userInfo 精确指出变化的对象：TabBar 控制器、Tab 下标、它在 `viewControllers` 中的控制器、
+     *      它的 ID、它的 tabBarItem（扁平样式为 `cyl_tabBarItem`），以及 `extra`。
+     */
+    @objc(cyl_postTabBarItemNotification:atIndex:extra:)
+    func cylPostTabBarItemNotification(_ name: NSNotification.Name, at index: UInt, extra: [AnyHashable: Any]?) {
+        let viewControllers = self.viewControllers ?? []
+        guard Int(index) < viewControllers.count else {
+            return
+        }
+        let viewController = viewControllers[Int(index)]
+        let page = viewController.cyl_getViewControllerInsteadOfNavigation()
+        var userInfo: [AnyHashable: Any] = [
+            CYLTabBarControllerKey: self,
+            CYLTabBarItemIndexKey: NSNumber(value: index),
+            CYLTabBarItemViewControllerKey: viewController,
+        ]
+        // [EN] The tab's identifier (`CYLTabBarItemIdentifier`), more exact than its index. [CN] Tab 的 ID，比下标更精确。
+        if let identifier = viewController.cyl_tabBarItemIdentifier ?? page.cyl_tabBarItemIdentifier, !identifier.isEmpty {
+            userInfo[CYLTabBarItemIdentifier] = identifier
+        }
+        // [EN] FlatDesign (an optional subspec): its own item, read at run time. [CN] 扁平样式（可选子库）：其自己的 item，在运行时读取。
+        let flatItem = tabBarStyleType == .flatDesign ? CYLFlatDesignLookup.tabBarItem(of: viewController) : nil
+        if let tabBarItem = flatItem ?? viewController.tabBarItem {
+            userInfo[CYLTabBarItemKey] = tabBarItem
+        }
+        extra?.forEach { userInfo[$0.key] = $0.value }
+        NotificationCenter.default.post(name: name, object: page, userInfo: userInfo)
+    }
+
+    /**
+     * [EN] The image of `icon`, on the main queue: a `UIImage` as it is; an `NSURL` or an `http(s)` string loaded through
+     *      `CYLImageCache`; any other string by name or absolute path (`+[UIImage cyl_imageNamed:]`, #535). nil when there is none.
+     * [CN] 在主队列返回 `icon` 对应的图片：`UIImage` 原样返回；`NSURL` 或 `http(s)` 字符串通过 `CYLImageCache` 加载；其他字符串按图片名或
+     *      绝对路径加载（#535）。没有图片时为 nil。
+     */
+    @objc(cyl_loadTabBarItemIcon:completion:)
+    static func cylLoadTabBarItemIcon(_ icon: Any?, completion: @escaping (UIImage?) -> Void) {
+        if let image = icon as? UIImage {
+            completion(image)
+            return
+        }
+        var url = icon as? URL
+        if let string = icon as? String, string.hasPrefix("http://") || string.hasPrefix("https://") {
+            url = URL(string: string)
+        }
+        if let url {
+            UIImage.cyl_load(with: url, completion: completion)
+            return
+        }
+        completion((icon as? String).flatMap { UIImage.cyl_imageNamed($0) })
+    }
+
+    /// [EN] The tab at `index` takes icons: not the plus button's slot or page. [CN] 第 `index` 个 Tab 可以设置图标：不是 PlusButton 的位置或页面。
+    private func cylIconTab(at index: UInt) -> UIViewController? {
+        let viewControllers = self.viewControllers ?? []
+        guard Int(index) < viewControllers.count else {
+            return nil
+        }
+        let viewController = viewControllers[Int(index)]
+        if viewController.cyl_isPlaceholder || viewController === cylPrivate.cylContextPlusChildViewController() {
+            return nil
+        }
+        return viewController
+    }
+
+    @objc(setTabBarItemIconViewProvider:atIndex:)
+    @discardableResult
+    func cylSetTabBarItemIconViewProvider(_ provider: CYLIconViewProvider?, at index: UInt) -> Bool {
+        guard let viewController = cylIconTab(at: index) else {
+            return false
+        }
+        let providers = cylTabBarItemIconViewProviders()
+        // [EN] The caller's own block object is stored (a block type, not a Swift closure, so it is not wrapped): the icon
+        //      notification hands back the same provider, as before.
+        // [CN] 保存调用方自己的 block 对象（参数为 block 类型而不是 Swift 闭包，因此不会被包装）：图标通知交回同一个 provider，与以前相同。
+        let block = provider.map { $0 as AnyObject }
+        if let block {
+            providers.setObject(block, forKey: viewController)
+        } else {
+            providers.removeObject(forKey: viewController)
+        }
+        cylUpdateTabBarItemIconViews(of: viewController)
+        // [EN] The tab bar lays its buttons out again, as when a tab is selected. [CN] TabBar 重新布局其按钮，与选中 Tab 时相同。
+        tabBar.setNeedsLayout()
+        cylSetNeedsUpdateTabBarItemIconViews()
+        cylPostTabBarItemNotification(.CYLTabBarItemIconDidChange, at: index,
+                                      extra: block.map { [CYLTabBarItemIconViewProviderKey: $0] })
+        return true
+    }
+
+    @objc(setTabBarItemIconWithURL:selectedURL:size:atIndex:)
+    @discardableResult
+    func cylSetTabBarItemIcon(withURL url: URL?, selectedURL: URL?, size: CGSize, at index: UInt) -> Bool {
+        guard let url else {
+            return false
+        }
+        return cylSetTabBarItemIcon(url, selectedIcon: selectedURL, size: size, at: index)
+    }
+
+    /**
+     * [EN] A tab's icon from any source (`+cyl_loadTabBarItemIcon:completion:`), shown with its own colors through an icon view
+     *      provider; an animated icon rests on its first frame until a tap or Play all plays it.
+     * [CN] 任意来源的 Tab 图标（`+cyl_loadTabBarItemIcon:completion:`），以原图颜色通过图标视图 provider 显示；动图图标停在第一帧，点击或「全部播放」时播放。
+     */
+    @objc(setTabBarItemIcon:selectedIcon:size:atIndex:)
+    @discardableResult
+    func cylSetTabBarItemIcon(_ icon: Any?, selectedIcon: Any?, size: CGSize, at index: UInt) -> Bool {
+        guard let icon, let viewController = cylIconTab(at: index) else {
+            return false
+        }
+        Self.cylLoadTabBarItemIcon(icon) { [weak self, weak viewController] image in
+            guard let image else {
+                return
+            }
+            let show: (UIImage?) -> Void = { selectedImage in
+                // [EN] Still a tab of this controller (the view controllers may have changed meanwhile).
+                // [CN] 仍是本控制器的 Tab（期间视图控制器可能已改变）。
+                guard let self, let viewController, let currentIndex = self.viewControllers?.firstIndex(of: viewController) else {
+                    return
+                }
+                let originalImage = image.withRenderingMode(.alwaysOriginal)
+                let originalSelectedImage = (selectedImage ?? image).withRenderingMode(.alwaysOriginal)
+                self.cylSetTabBarItemIconViewProvider({ selected in
+                    Self.cylIconView(selected ? originalSelectedImage : originalImage, size: size)
+                }, at: UInt(currentIndex))
+            }
+            if let selectedIcon, !(selectedIcon as AnyObject).isEqual(icon) {
+                Self.cylLoadTabBarItemIcon(selectedIcon, completion: show)
+            } else {
+                show(nil)
+            }
+        }
+        return true
+    }
+
+    /**
+     * [EN] The view of one look: an animated icon rests on its first frame (its frames play on a tap or Play all), at `size`
+     *      or the placeholder size.
+     * [CN] 一种样式的视图：动图图标停在第一帧（点击或「全部播放」时播放），尺寸为 `size` 或占位尺寸。
+     */
+    private static func cylIconView(_ iconImage: UIImage, size: CGSize) -> UIImageView {
+        let frames = iconImage.images ?? []
+        let iconView = UIImageView(image: frames.count > 1 ? frames.first?.withRenderingMode(iconImage.renderingMode) : iconImage)
+        if frames.count > 1 {
+            iconView.animationImages = frames
+            iconView.animationDuration = iconImage.duration
+            iconView.animationRepeatCount = 1
+        }
+        iconView.contentMode = .scaleAspectFit
+        let iconSize = size == .zero ? CGSize(width: CYLTabBarItemImagePlaceholderWidth, height: CYLTabBarItemImagePlaceholderHeight) : size
+        iconView.frame = CGRect(origin: .zero, size: iconSize)
+        return iconView
     }
 }
