@@ -315,7 +315,7 @@ function cylDecodeSVGA(data) {
     }
     return true
   })
-  if (!(movie.fps > 0)) {
+  if (!(movie.fps > 0)) { // NOSONAR: NaN / undefined fps are invalid too, unlike `<= 0`
     movie.fps = 20
   }
   return movie

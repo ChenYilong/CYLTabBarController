@@ -25,21 +25,50 @@ function cylReadColorTable(bytes, offset, size) {
   return table
 }
 
+/** [EN] The LZW dictionary after a clear code. [CN] 清除码之后的 LZW 字典。 */
+function cylLZWInitialDictionary(clear, end) {
+  const dictionary = []
+  for (let i = 0; i < clear; i++) dictionary[i] = [i]
+  dictionary[clear] = []
+  dictionary[end] = null
+  return dictionary
+}
+
+/**
+ * [EN] The entry of `code`, adding the next dictionary entry; null when the data is corrupt (an unknown code without a previous one).
+ * [CN] `code` 对应的条目，并添加下一个字典项；数据损坏（没有前一项却出现未知码）时返回 null。
+ */
+function cylLZWEntryForCode(dictionary, code, previous) {
+  if (code < dictionary.length && dictionary[code]) {
+    const entry = dictionary[code]
+    if (previous) dictionary.push(previous.concat([entry[0]]))
+    return entry
+  }
+  if (!previous) return null
+  const entry = previous.concat([previous[0]])
+  dictionary.push(entry)
+  return entry
+}
+
+/** [EN] The code size after the dictionary grew: one bit more when full, up to 12. [CN] 字典增长后的码长：字典满时加一位，最多 12 位。 */
+function cylLZWCodeSize(dictionaryLength, codeSize) {
+  return dictionaryLength === (1 << codeSize) && codeSize < 12 ? codeSize + 1 : codeSize
+}
+
+/** [EN] Writes `entry` into `output` from `position`, as far as it fits; returns the new position. [CN] 把 `entry` 写入 `output`，写到容量为止；返回新位置。 */
+function cylLZWWrite(output, position, entry) {
+  let out = position
+  for (let k = 0; k < entry.length && out < output.length; k++) output[out++] = entry[k]
+  return out
+}
+
 /** [EN] LZW decode of one image's sub-blocks into color indices. [CN] 将一帧的数据子块按 LZW 解码为颜色下标。 */
 function cylLZWDecode(data, minCodeSize, pixelCount) {
   const clear = 1 << minCodeSize
   const end = clear + 1
   const output = new Uint8Array(pixelCount)
   let codeSize = minCodeSize + 1
-  let dictionary = []
-  const reset = () => {
-    dictionary = []
-    for (let i = 0; i < clear; i++) dictionary[i] = [i]
-    dictionary[clear] = []
-    dictionary[end] = null
-    codeSize = minCodeSize + 1
-  }
-  reset()
+  let dictionary = cylLZWInitialDictionary(clear, end)
   let bitBuffer = 0
   let bitCount = 0
   let previous = null
@@ -52,40 +81,42 @@ function cylLZWDecode(data, minCodeSize, pixelCount) {
       bitBuffer >>= codeSize
       bitCount -= codeSize
       if (code === clear) {
-        reset()
+        dictionary = cylLZWInitialDictionary(clear, end)
+        codeSize = minCodeSize + 1
         previous = null
         continue
       }
       if (code === end) return output
-      let entry
-      if (code < dictionary.length && dictionary[code]) {
-        entry = dictionary[code]
-        if (previous) dictionary.push(previous.concat([entry[0]]))
-      } else if (previous) {
-        entry = previous.concat([previous[0]])
-        dictionary.push(entry)
-      } else {
-        return output
-      }
-      for (let k = 0; k < entry.length && out < pixelCount; k++) output[out++] = entry[k]
+      const entry = cylLZWEntryForCode(dictionary, code, previous)
+      if (!entry) return output
+      out = cylLZWWrite(output, out, entry)
       previous = entry
-      if (dictionary.length === (1 << codeSize) && codeSize < 12) codeSize += 1
+      codeSize = cylLZWCodeSize(dictionary.length, codeSize)
     }
   }
   return output
 }
 
+/** [EN] A little-endian 16 bit value. [CN] 小端 16 位值。 */
+function cylReadU16(bytes, offset) {
+  return bytes[offset] | (bytes[offset + 1] << 8)
+}
+
+/** [EN] The bytes of a GIF input. [CN] GIF 输入的字节。 */
+function cylGIFBytes(input) {
+  return input instanceof Uint8Array ? input : new Uint8Array(input || [])
+}
+
 /**
- * [EN] The logical width and height, the play time (ms) and the first frame (RGBA, width * height * 4) of a GIF.
- * [CN] GIF 的逻辑宽高、播放时长（毫秒）与第一帧（RGBA，width * height * 4）。
+ * [EN] The signature, the logical size and the global color table; `offset` is where the blocks start. Null when it is not a GIF.
+ * [CN] 签名、逻辑尺寸与全局颜色表；`offset` 是数据块的起点。不是 GIF 时为 null。
  */
-function cylGIFImageInfo(input) {
-  const bytes = input instanceof Uint8Array ? input : new Uint8Array(input || [])
+function cylReadGIFHeader(bytes) {
   if (bytes.length < 13) return null
-  const signature = String.fromCharCode(bytes[0], bytes[1], bytes[2], bytes[3], bytes[4], bytes[5])
+  const signature = String.fromCodePoint(bytes[0], bytes[1], bytes[2], bytes[3], bytes[4], bytes[5])
   if (signature !== 'GIF87a' && signature !== 'GIF89a') return null
-  const width = bytes[6] | (bytes[7] << 8)
-  const height = bytes[8] | (bytes[9] << 8)
+  const width = cylReadU16(bytes, 6)
+  const height = cylReadU16(bytes, 8)
   if (!width || !height) return null
   const flags = bytes[10]
   let offset = 13
@@ -95,6 +126,100 @@ function cylGIFImageInfo(input) {
     globalTable = cylReadColorTable(bytes, offset, size)
     offset += size * 3
   }
+  return { width, height, globalTable, offset }
+}
+
+/** [EN] The offset after the data sub-blocks that start at `offset` and their terminator. [CN] 从 `offset` 开始的数据子块及其结束符之后的位置。 */
+function cylSkipSubBlocks(bytes, offset) {
+  let position = offset
+  while (position < bytes.length && bytes[position] !== 0) position += bytes[position] + 1
+  return position + 1
+}
+
+/** [EN] The delay (ms) and the transparent color index of a graphic control extension at `offset`; null when it is too short. [CN] `offset` 处图形控制扩展的延时（毫秒）与透明色下标；太短时为 null。 */
+function cylReadGraphicControl(bytes, offset) {
+  if (bytes[offset] >= 4) {
+    return { delay: cylReadU16(bytes, offset + 2) * 10, transparent: (bytes[offset + 1] & 0x01) ? bytes[offset + 4] : -1 }
+  }
+  return null
+}
+
+/**
+ * [EN] One image block at `offset` (after the 0x2C): its place, its color table (the local one, else the global one), the LZW data and the
+ *      offset after the block. [CN] `offset` 处的一个图像块（0x2C 之后）：位置、颜色表（局部表，否则全局表）、LZW 数据以及块之后的位置。
+ */
+function cylReadGIFImage(bytes, offset, globalTable) {
+  const image = {
+    left: cylReadU16(bytes, offset), top: cylReadU16(bytes, offset + 2),
+    w: cylReadU16(bytes, offset + 4), h: cylReadU16(bytes, offset + 6),
+    flags: bytes[offset + 8], table: globalTable,
+  }
+  let position = offset + 9
+  if (image.flags & 0x80) {
+    const size = 1 << ((image.flags & 0x07) + 1)
+    image.table = cylReadColorTable(bytes, position, size)
+    position += size * 3
+  }
+  image.minCodeSize = bytes[position++]
+  const chunks = []
+  let length = 0
+  while (position < bytes.length && bytes[position] !== 0) {
+    const size = bytes[position]
+    chunks.push(bytes.subarray(position + 1, position + 1 + size))
+    length += size
+    position += size + 1
+  }
+  image.data = new Uint8Array(length)
+  let at = 0
+  chunks.forEach((chunk) => { image.data.set(chunk, at); at += chunk.length })
+  image.offset = position + 1
+  return image
+}
+
+/** [EN] The row order of an image: interlaced images store every 8th row first, then every 8th from 4, every 4th from 2, every 2nd from 1. [CN] 图像的行顺序：隔行图像先存每 8 行的第 0 行，再是从 4 开始每 8 行、从 2 开始每 4 行、从 1 开始每 2 行。 */
+function cylGIFRowOrder(height, interlaced) {
+  const rows = []
+  const passes = interlaced ? [[0, 8], [4, 8], [2, 4], [1, 2]] : [[0, 1]]
+  passes.forEach(([start, step]) => { for (let y = start; y < height; y += step) rows.push(y) })
+  return rows
+}
+
+/** [EN] The RGBA first frame (width * height * 4) of `image` on the logical screen; `transparent` is the transparent color index. [CN] `image` 在逻辑画面上的 RGBA 第一帧；`transparent` 为透明色下标。 */
+function cylRenderGIFFrame(image, width, height, transparent) {
+  const indices = cylLZWDecode(image.data, image.minCodeSize, image.w * image.h)
+  const frame = new Uint8ClampedArray(width * height * 4)
+  cylGIFRowOrder(image.h, (image.flags & 0x40) !== 0).forEach((y, row) => {
+    for (let x = 0; x < image.w; x++) {
+      const index = indices[row * image.w + x]
+      const px = image.left + x
+      const py = image.top + y
+      if (index === transparent || px >= width || py >= height) continue
+      const color = image.table[index] || [0, 0, 0]
+      const at = (py * width + px) * 4
+      frame[at] = color[0]
+      frame[at + 1] = color[1]
+      frame[at + 2] = color[2]
+      frame[at + 3] = 255
+    }
+  })
+  return frame
+}
+
+/** [EN] The result of `cylGIFImageInfo`; null without a frame. [CN] `cylGIFImageInfo` 的结果；没有帧时为 null。 */
+function cylGIFResult(width, height, duration, frame) {
+  return frame ? { width, height, duration: duration || 100, frame } : null
+}
+
+/**
+ * [EN] The logical width and height, the play time (ms) and the first frame (RGBA, width * height * 4) of a GIF.
+ * [CN] GIF 的逻辑宽高、播放时长（毫秒）与第一帧（RGBA，width * height * 4）。
+ */
+function cylGIFImageInfo(input) {
+  const bytes = cylGIFBytes(input)
+  const header = cylReadGIFHeader(bytes)
+  if (!header) return null
+  const { width, height } = header
+  let offset = header.offset
   let duration = 0
   let delay = 0
   let transparent = -1
@@ -104,71 +229,20 @@ function cylGIFImageInfo(input) {
     if (block === 0x3B) break
     if (block === 0x21) {
       const label = bytes[offset++]
-      if (label === 0xF9 && bytes[offset] >= 4) {
-        const packed = bytes[offset + 1]
-        delay = (bytes[offset + 2] | (bytes[offset + 3] << 8)) * 10
-        transparent = (packed & 0x01) ? bytes[offset + 4] : -1
-      }
-      while (offset < bytes.length && bytes[offset] !== 0) offset += bytes[offset] + 1
-      offset += 1
+      const control = label === 0xF9 ? cylReadGraphicControl(bytes, offset) : null
+      if (control) ({ delay, transparent } = control)
+      offset = cylSkipSubBlocks(bytes, offset)
       continue
     }
-    if (block !== 0x2C) return frame ? { width, height, duration: duration || 100, frame } : null
-    const left = bytes[offset] | (bytes[offset + 1] << 8)
-    const top = bytes[offset + 2] | (bytes[offset + 3] << 8)
-    const w = bytes[offset + 4] | (bytes[offset + 5] << 8)
-    const h = bytes[offset + 6] | (bytes[offset + 7] << 8)
-    const imageFlags = bytes[offset + 8]
-    offset += 9
-    let table = globalTable
-    if (imageFlags & 0x80) {
-      const size = 1 << ((imageFlags & 0x07) + 1)
-      table = cylReadColorTable(bytes, offset, size)
-      offset += size * 3
-    }
-    const minCodeSize = bytes[offset++]
-    const chunks = []
-    let length = 0
-    while (offset < bytes.length && bytes[offset] !== 0) {
-      const size = bytes[offset]
-      chunks.push(bytes.subarray(offset + 1, offset + 1 + size))
-      length += size
-      offset += size + 1
-    }
-    offset += 1
+    if (block !== 0x2C) return cylGIFResult(width, height, duration, frame)
+    const image = cylReadGIFImage(bytes, offset, header.globalTable)
+    offset = image.offset
     duration += delay > 0 ? delay : 100
-    if (!frame && table) {
-      const data = new Uint8Array(length)
-      let position = 0
-      chunks.forEach((chunk) => { data.set(chunk, position); position += chunk.length })
-      const indices = cylLZWDecode(data, minCodeSize, w * h)
-      frame = new Uint8ClampedArray(width * height * 4)
-      const interlaced = (imageFlags & 0x40) !== 0
-      const rows = []
-      if (interlaced) {
-        [[0, 8], [4, 8], [2, 4], [1, 2]].forEach(([start, step]) => { for (let y = start; y < h; y += step) rows.push(y) })
-      } else {
-        for (let y = 0; y < h; y++) rows.push(y)
-      }
-      rows.forEach((y, row) => {
-        for (let x = 0; x < w; x++) {
-          const index = indices[row * w + x]
-          const px = left + x
-          const py = top + y
-          if (index === transparent || px >= width || py >= height) continue
-          const color = table[index] || [0, 0, 0]
-          const at = (py * width + px) * 4
-          frame[at] = color[0]
-          frame[at + 1] = color[1]
-          frame[at + 2] = color[2]
-          frame[at + 3] = 255
-        }
-      })
-    }
+    if (!frame && image.table) frame = cylRenderGIFFrame(image, width, height, transparent)
     delay = 0
     transparent = -1
   }
-  return frame ? { width, height, duration: duration || 100, frame } : null
+  return cylGIFResult(width, height, duration, frame)
 }
 
 module.exports = { cylIsGIFImagePath, cylGIFImageInfo }

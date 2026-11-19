@@ -114,7 +114,7 @@ function cylParsePath(d) {
       p.command = tokens[p.index++]
     }
     const relative = p.command === p.command.toLowerCase()
-    const handler = Object.prototype.hasOwnProperty.call(CYL_PATH_COMMANDS, p.command.toUpperCase())
+    const handler = Object.prototype.hasOwnProperty.call(CYL_PATH_COMMANDS, p.command.toUpperCase()) // NOSONAR: `Object.hasOwn` needs a newer runtime
       ? CYL_PATH_COMMANDS[p.command.toUpperCase()] : null
     if (handler) {
       handler(p, relative ? p.x : 0, relative ? p.y : 0, relative)
@@ -248,7 +248,7 @@ function cylDrawSVGAFrame(context, movie, bitmaps, frameIndex, width, height, fi
       return
     }
     const frame = sprite.frames[index]
-    if (!frame || !(frame.alpha > 0)) {
+    if (!frame || !(frame.alpha > 0)) { // NOSONAR: NaN / undefined alpha is invisible, unlike `<= 0`
       return
     }
     context.save()

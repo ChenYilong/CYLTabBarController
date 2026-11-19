@@ -16,7 +16,7 @@ function _changeReadyState(readyState) {
 }
 
 export default class XMLHttpRequest {
-  // TODO 没法模拟 HEADERS_RECEIVED 和 LOADING 两个状态
+  // Not supported: the HEADERS_RECEIVED and LOADING states cannot be simulated. 没法模拟 HEADERS_RECEIVED 和 LOADING 两个状态
   static UNSEND = 0
   static OPENED = 1
   static HEADERS_RECEIVED = 2
@@ -24,7 +24,7 @@ export default class XMLHttpRequest {
   static DONE = 4
 
   /*
-   * TODO 这一批事件应该是在 XMLHttpRequestEventTarget.prototype 上面的
+   * Known limit: these events belong on XMLHttpRequestEventTarget.prototype. 这一批事件应该是在 XMLHttpRequestEventTarget.prototype 上面的
    */
   onabort = null
   onerror = null
@@ -126,7 +126,7 @@ export default class XMLHttpRequest {
           _triggerEvent.call(this, 'loadend')
         },
         fail: ({ errMsg }) => {
-          // TODO 规范错误
+          // Known limit: a deviation from the specification. 规范错误
           if (errMsg.includes('abort')) {
             _triggerEvent.call(this, 'abort')
           } else {

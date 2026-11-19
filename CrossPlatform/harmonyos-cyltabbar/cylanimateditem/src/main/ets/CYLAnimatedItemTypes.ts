@@ -66,7 +66,7 @@ export class CYLAnimatedItemTypeRegistry {
     const extension = file.substring(dot + 1).toLowerCase();
     const types = CYLAnimatedItemTypeRegistry.added.concat(CYL_BUILT_IN_TYPES);
     for (const type of types) {
-      if (CYLAnimatedItemTypeRegistry.extensionsOf(type.name).indexOf(extension) >= 0) {
+      if (CYLAnimatedItemTypeRegistry.extensionsOf(type.name).includes(extension)) {
         return type.name;
       }
     }
@@ -89,13 +89,13 @@ export class CYLAnimatedItemTypeRegistry {
     } else if (known !== undefined && clean.length > 0) {
       const extra = CYLAnimatedItemTypeRegistry.extraExtensions.get(name) ?? [];
       clean.forEach((extension: string) => {
-        if (known.extensions.indexOf(extension) < 0 && extra.indexOf(extension) < 0) {
+        if (!known.extensions.includes(extension) && !extra.includes(extension)) {
           extra.push(extension);
         }
       });
       CYLAnimatedItemTypeRegistry.extraExtensions.set(name, extra);
     }
-    if (CYLAnimatedItemTypeRegistry.registered.indexOf(name) < 0) {
+    if (!CYLAnimatedItemTypeRegistry.registered.includes(name)) {
       CYLAnimatedItemTypeRegistry.registered.push(name);
     }
   }
@@ -112,7 +112,7 @@ export class CYLAnimatedItemTypeRegistry {
   }
 
   static isRegistered(name: string): boolean {
-    return CYLAnimatedItemTypeRegistry.registered.indexOf(name) >= 0;
+    return CYLAnimatedItemTypeRegistry.registered.includes(name);
   }
 
   static registeredTypes(): string[] {
