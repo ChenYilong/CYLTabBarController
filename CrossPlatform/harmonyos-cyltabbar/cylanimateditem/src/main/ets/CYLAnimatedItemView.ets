@@ -1,3 +1,4 @@
+import { CYLAnimatedItemTypeRegistry } from './CYLAnimatedItemTypes';
 import { cylIsSymbolResource } from './CYLAnimatedItemResources';
 import BuildProfile from '../../../BuildProfile';
 
@@ -77,47 +78,12 @@ export class CYLAnimatedItemController {
 }
 
 /**
- * [EN] One known animation type: its name, the pod / package an app adds, and its file extensions.
- * [CN] 一种已知的动画类型：名称、App 需要加入的包，以及文件扩展名。
- */
-class CYLAnimatedItemType {
-  name: string = '';
-  packageName: string = '';
-  extensions: string[] = [];
-
-  constructor(name: string, packageName: string, extensions: string[]) {
-    this.name = name;
-    this.packageName = packageName;
-    this.extensions = extensions;
-  }
-}
-
-const CYL_ANIMATED_ITEM_TYPES: CYLAnimatedItemType[] = [
-  new CYLAnimatedItemType('Lottie', '@ohos/lottie', ['json', 'lottie']),
-  new CYLAnimatedItemType('PAG', 'libpag', ['pag']),
-  new CYLAnimatedItemType('Rive', '@ohos/rive', ['riv']),
-  new CYLAnimatedItemType('SVGA', 'an SVGA player', ['svga']),
-  new CYLAnimatedItemType('GIF', 'the system Image component', ['gif'])
-];
-
-/**
- * [EN] The animation type of a file from its extension ("Lottie", "PAG", "Rive", "SVGA", "GIF"), or '' when unknown.
- * [CN] 根据扩展名得到文件的动画类型（"Lottie"、"PAG"、"Rive"、"SVGA"、"GIF"），未知时为 ''。
+ * [EN] The animation type of a file from its extension ("Lottie", "PAG", "Rive", "SVGA", "GIF", or a type an app
+ *      registered with its extensions), or '' when unknown.
+ * [CN] 根据扩展名得到文件的动画类型（"Lottie"、"PAG"、"Rive"、"SVGA"、"GIF"，或 App 连同扩展名注册的类型），未知时为 ''。
  */
 export function cylAnimatedItemTypeOf(url: string): string {
-  // [EN] A trailing ".bin" is skipped ("icons.riv.bin" is Rive), as in the mini program. [CN] 忽略末尾的 ".bin"，与小程序相同。
-  let file: string = url.split('#')[0].split('?')[0].replace(/\.bin$/i, '');
-  let dot: number = file.lastIndexOf('.');
-  if (dot < 0) {
-    return '';
-  }
-  let extension: string = file.substring(dot + 1).toLowerCase();
-  for (let type of CYL_ANIMATED_ITEM_TYPES) {
-    if (type.extensions.indexOf(extension) >= 0) {
-      return type.name;
-    }
-  }
-  return '';
+  return CYLAnimatedItemTypeRegistry.typeOf(url);
 }
 
 /**
@@ -131,51 +97,45 @@ export function cylAnimatedItemTypeOf(url: string): string {
  *      `CYLAnimationWarnMissingEngine()` 与 Android 的 `CYLAnimationEngines`。
  */
 export class CYLAnimatedItemEngines {
-  private static registered: string[] = [];
   private static warned: string[] = [];
 
   /**
-   * [EN] Registers the engine of `type` ("Lottie", "PAG", "Rive", "SVGA", "GIF"). [CN] 注册 `type` 的引擎。
+   * [EN] Registers the engine of `type` ("Lottie", "PAG", "Rive", "SVGA", "GIF"). With `extensions`, an app can add its own
+   *      type (`register('APNG', ['apng'])`, then `animationBuilder` draws it) or more extensions for a known type;
+   *      `packageName` names what to add in the debug log.
+   * [CN] 注册 `type` 的引擎（"Lottie"、"PAG"、"Rive"、"SVGA"、"GIF"）。传入 `extensions` 时，App 可以添加自己的类型（`register('APNG', ['apng'])`，
+   *      再由 `animationBuilder` 绘制），或为已知类型添加扩展名；`packageName` 为 debug 日志中提示加入的包。
    */
-  static register(type: string): void {
-    if (CYLAnimatedItemEngines.registered.indexOf(type) < 0) {
-      CYLAnimatedItemEngines.registered.push(type);
-    }
+  static register(type: string, extensions?: string[], packageName?: string): void {
+    CYLAnimatedItemTypeRegistry.register(type, extensions, packageName);
   }
 
   /**
-   * [EN] Whether the engine of `type` is registered. [CN] `type` 的引擎是否已注册。
+   * [EN] Unregisters the engine of `type`: its files show the static image again; a type an app added is forgotten.
+   * [CN] 注销 `type` 的引擎：其文件重新显示静态图片；App 添加的类型被遗忘。
    */
+  static unregister(type: string): void {
+    CYLAnimatedItemTypeRegistry.unregister(type);
+  }
+
+  /** [EN] Whether the engine of `type` is registered. [CN] `type` 的引擎是否已注册。 */
   static isRegistered(type: string): boolean {
-    return CYLAnimatedItemEngines.registered.indexOf(type) >= 0;
+    return CYLAnimatedItemTypeRegistry.isRegistered(type);
   }
 
-  /**
-   * [EN] The registered types. [CN] 已注册的类型。
-   */
+  /** [EN] The registered types. [CN] 已注册的类型。 */
   static registeredTypes(): string[] {
-    return CYLAnimatedItemEngines.registered.slice();
+    return CYLAnimatedItemTypeRegistry.registeredTypes();
   }
 
-  /**
-   * [EN] The known types nobody registered. [CN] 没有注册的已知类型。
-   */
+  /** [EN] The known types nobody registered. [CN] 没有注册的已知类型。 */
   static missingTypes(): string[] {
-    let missing: string[] = [];
-    for (let type of CYL_ANIMATED_ITEM_TYPES) {
-      if (!CYLAnimatedItemEngines.isRegistered(type.name)) {
-        missing.push(type.name);
-      }
-    }
-    return missing;
+    return CYLAnimatedItemTypeRegistry.missingTypes();
   }
 
-  /**
-   * [EN] Whether a registered engine plays `url` (by its extension). [CN] 是否有已注册的引擎能播放 `url`（按扩展名）。
-   */
+  /** [EN] Whether a registered engine plays `url` (by its extension). [CN] 是否有已注册的引擎能播放 `url`（按扩展名）。 */
   static canPlay(url: string): boolean {
-    let type: string = cylAnimatedItemTypeOf(url);
-    return type.length > 0 && CYLAnimatedItemEngines.isRegistered(type);
+    return CYLAnimatedItemTypeRegistry.canPlay(url);
   }
 
   /**
@@ -191,7 +151,7 @@ export class CYLAnimatedItemEngines {
     }
     CYLAnimatedItemEngines.warned.push(name);
     let packageName: string = '';
-    for (let type of CYL_ANIMATED_ITEM_TYPES) {
+    for (let type of CYLAnimatedItemTypeRegistry.knownTypes()) {
       if (type.name === name) {
         packageName = type.packageName;
       }
