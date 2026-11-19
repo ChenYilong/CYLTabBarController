@@ -14,6 +14,11 @@
  *      原有的导入方式不受影响。
  */
 
+// CYL-SWIFT-MIGRATION: objc-required — [EN] The functions are Swift (`@_cdecl`); these declarations stay for Objective-C callers
+//      because they carry `NS_FORMAT_ARGUMENT(1)` and `CYL_RETURNS_LOCALIZED_STRING` (format checks of `CYLLocalizedString(@"…")`
+//      with `stringWithFormat:`), which the generated Swift interface does not have (docs/Swift-Migration-Phase3.md).
+// [CN] 函数为 Swift（`@_cdecl`）；这些声明为 Objective-C 调用方保留，因为它们带有 `NS_FORMAT_ARGUMENT(1)` 与 `CYL_RETURNS_LOCALIZED_STRING`
+//      （与 `stringWithFormat:` 一起使用时的格式检查），生成的 Swift 接口没有这些属性。
 #import <UIKit/UIKit.h>
 
 /*!

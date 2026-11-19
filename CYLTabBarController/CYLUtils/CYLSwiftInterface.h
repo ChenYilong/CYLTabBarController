@@ -33,7 +33,7 @@
  * [CN] Lottie、Rive、PAG 子库的 Swift 类遵守的动画协议：缺少它们时，framework 编译中生成的接口会失败。
  */
 #if __has_feature(modules) && __has_include(<CYLAnimatedItem/CYLAnimatedItem-umbrella.h>)
-@import CYLAnimatedItem;
+#pragma clang module import CYLAnimatedItem
 #else
 #if __has_include(<CYLAnimatedItem/CYLTabBarItemAnimationPlayableView.h>) || __has_include(<CYLTabBarController/CYLTabBarItemAnimationPlayableView.h>)
 #if __has_include(<CYLAnimatedItem/CYLTabBarItemAnimationPlayableView.h>)
@@ -54,7 +54,7 @@
 // [CN] Swift 头文件声明了 `CYLFlatDesignTabBarButton : CYLAnimatedItemView`；在把组件编译进同一模块的 framework 中（CYLTabBarController.xcodeproj、
 //      Carthage），必须先声明父类。
 #if __has_feature(modules) && __has_include(<CYLAnimatedItem/CYLAnimatedItem-umbrella.h>)
-@import CYLAnimatedItem;
+#pragma clang module import CYLAnimatedItem
 #else
 #if __has_include(<CYLAnimatedItem/CYLAnimatedItemView.h>)
 #import <CYLAnimatedItem/CYLAnimatedItemView.h>
@@ -65,7 +65,7 @@
 #endif
 #endif
 #if defined(SWIFT_PACKAGE)
-@import CYLTabBarControllerSwift;
+#pragma clang module import CYLTabBarControllerSwift
 #elif __has_include(<CYLTabBarController/CYLTabBarController-Swift.h>)
 #import <CYLTabBarController/CYLTabBarController-Swift.h>
 #elif __has_include("CYLTabBarController-Swift.h")

@@ -8,6 +8,15 @@
 
 import UIKit
 
+/**
+ [EN] Posted with the item as its object whenever a shown value of a `CYLFlatDesignTabBarItem` changes. Swift since
+      docs/Swift-Migration.md step 118 (it was the only content of CYLFlatDesignTabBar.m); Objective-C reads the same string
+      through the macro of CYLFlatDesignTabBarItem.h.
+ [CN] `CYLFlatDesignTabBarItem` 显示的值每次变化时发送，object 为该 item。自第 118 步起为 Swift（原为 CYLFlatDesignTabBar.m 的唯一内容）；
+      Objective-C 通过 CYLFlatDesignTabBarItem.h 中的宏读取同一字符串。
+ */
+public let CYLFlatDesignTabBarItemDidChange = "CYLFlatDesignTabBarItemDidChange"
+
 // [EN] The item of a FlatDesign tab, translated from Objective-C together with its button (docs/Swift-Migration.md,
 //      step 49): each interface names the other. Objective-C names, selectors and Swift names are kept;
 //      `CYLFlatDesignTabBarItemDidChange` stays a C constant (defined in CYLFlatDesignTabBar.m).

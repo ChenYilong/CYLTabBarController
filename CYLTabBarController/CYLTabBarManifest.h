@@ -20,6 +20,5 @@ NS_ASSUME_NONNULL_BEGIN
  *      （docs/Swift-Migration.md）。兼容性说明：`-tabBarControllerWithError:` 返回 `UITabBarController`（实际总是
  *      `CYLTabBarController`），请转换类型。
  */
-@class CYLTabBarManifest;
 
 NS_ASSUME_NONNULL_END

@@ -206,46 +206,19 @@ FOUNDATION_EXTERN CGFloat CYLConstantsUIBasisHeightScale(void);
 #define CYLScale (CYLConstantsUIBasisWidthScale())
 #define CYLHScale (CYLConstantsUIBasisHeightScale())
 
-#define CYL_PERFORM_SELECTOR_BOOL(Target, SelectorName, Result) \
-do { \
-    SEL action = @selector(SelectorName); \
-    if ([Target respondsToSelector:action]) { \
-        CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS( \
-            Result = ((BOOL (*)(id, SEL))[Target methodForSelector:action])(Target, action); \
-        ); \
-    } \
-} while (0)
+#define CYL_PERFORM_SELECTOR_BOOL(Target, SelectorName, Result) do { SEL action = @selector(SelectorName); if ([Target respondsToSelector:action]) { CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS( Result = ((BOOL (*)(id, SEL))[Target methodForSelector:action])(Target, action); ); } } while (0)
 
-#define CYL_PERFORM_SELECTOR(Target, SelectorName) \
-do { \
-    SEL action = @selector(SelectorName); \
-    if ([Target respondsToSelector:action]) { \
-        CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS( \
-            (( (*)(id, SEL))[Target methodForSelector:action])(Target, action); \
-        ); \
-    } \
-} while (0)
+#define CYL_PERFORM_SELECTOR(Target, SelectorName) do { SEL action = @selector(SelectorName); if ([Target respondsToSelector:action]) { CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS( (( (*)(id, SEL))[Target methodForSelector:action])(Target, action); ); } } while (0)
 
-#define CYL_PERFORM_SELECTOR_2OBJECT(Target, SelectorName, Obj1, Obj2) \
-do { \
-    SEL action = @selector(SelectorName); \
-    if ([Target respondsToSelector:action]) { \
-        CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS( \
-            [Target performSelector:action withObject:Obj1 withObject:Obj2]\
-        ); \
-    } \
-} while (0)
+#define CYL_PERFORM_SELECTOR_2OBJECT(Target, SelectorName, Obj1, Obj2) do { SEL action = @selector(SelectorName); if ([Target respondsToSelector:action]) { CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS( [Target performSelector:action withObject:Obj1 withObject:Obj2] ); } } while (0)
 
 
 #define CYL_IS_IPHONE (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
 #define CYL_IF_NOT_FLATDESIGN_BEGIN if (CYLTabBarStyleTypeFlatDesign != self.tabBarStyleType) {     //Not CYLTabBarStyleTypeFlatDesign
-#define CYL_IF_NOT_FLATDESIGN_END } else { \
-}
+#define CYL_IF_NOT_FLATDESIGN_END } else { }
 
-#define CYL_IF_FLATDESIGN_BEGIN if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType) { \
-
-#define CYL_IF_FLATDESIGN_END } else { \
-    }
+#define CYL_IF_FLATDESIGN_BEGIN if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType) {
+#define CYL_IF_FLATDESIGN_END } else { }
 
 #define CYL_NoNeed_UIDesignRequiresCompatibility_with_iOS26 CYL_IS_IOS_26 && (self.cyl_tabBarController.noNeedUIDesignCompatibility)
 
@@ -339,13 +312,7 @@ CG_INLINE CGFloat CYLHalfOfDiff(CGFloat value1, CGFloat value2) {
  
  @see https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/ObjCRuntimeGuide/Articles/ocrtTypeEncodings.html#//apple_ref/doc/uid/TP40008048-CH100-SW1
  */
-#define _CYLTypeEncodingDetectorGenerator(_TypeInFunctionName, _typeForEncode) \
-    CG_INLINE BOOL cyl_is##_TypeInFunctionName##TypeEncoding(const char *typeEncoding) {\
-        return strncmp(@encode(_typeForEncode), typeEncoding, strlen(@encode(_typeForEncode))) == 0;\
-    }\
-    CG_INLINE BOOL cyl_is##_TypeInFunctionName##Ivar(Ivar ivar) {\
-        return cyl_is##_TypeInFunctionName##TypeEncoding(ivar_getTypeEncoding(ivar));\
-    }
+#define _CYLTypeEncodingDetectorGenerator(_TypeInFunctionName, _typeForEncode) CG_INLINE BOOL cyl_is##_TypeInFunctionName##TypeEncoding(const char *typeEncoding) { return strncmp(@encode(_typeForEncode), typeEncoding, strlen(@encode(_typeForEncode))) == 0; } CG_INLINE BOOL cyl_is##_TypeInFunctionName##Ivar(Ivar ivar) { return cyl_is##_TypeInFunctionName##TypeEncoding(ivar_getTypeEncoding(ivar)); }
 
 _CYLTypeEncodingDetectorGenerator(Char, char)
 _CYLTypeEncodingDetectorGenerator(Int, int)

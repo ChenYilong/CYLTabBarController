@@ -50,27 +50,18 @@
 #define CYL_DEPRECATED(explain) __attribute__((deprecated(explain)))
 
 
-#define CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_PUSH \
-_Pragma("clang diagnostic push") \
-_Pragma("clang diagnostic ignored \"-Wdeprecated-implementations\"")
+#define CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_PUSH _Pragma("clang diagnostic push") _Pragma("clang diagnostic ignored \"-Wdeprecated-implementations\"")
 
-#define CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP \
-_Pragma("clang diagnostic pop")
+#define CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP _Pragma("clang diagnostic pop")
 
-#define CYL_DEPRECATED_DECLARATIONS_PUSH \
-_Pragma("clang diagnostic push") \
-_Pragma("clang diagnostic ignored \"-Wdeprecated-declarations\"")
+#define CYL_DEPRECATED_DECLARATIONS_PUSH _Pragma("clang diagnostic push") _Pragma("clang diagnostic ignored \"-Wdeprecated-declarations\"")
 
-#define CYL_DEPRECATED_DECLARATIONS_POP \
-_Pragma("clang diagnostic pop")
+#define CYL_DEPRECATED_DECLARATIONS_POP _Pragma("clang diagnostic pop")
 
 
-#define CYL_METHOD_SIGNATURES_PUSH \
-_Pragma("clang diagnostic push") \
-_Pragma("clang diagnostic ignored \"-Wmethod-signatures\"")
+#define CYL_METHOD_SIGNATURES_PUSH _Pragma("clang diagnostic push") _Pragma("clang diagnostic ignored \"-Wmethod-signatures\"")
 
-#define CYL_METHOD_SIGNATURES_POP \
-_Pragma("clang diagnostic pop")
+#define CYL_METHOD_SIGNATURES_POP _Pragma("clang diagnostic pop")
 
 
 
@@ -102,7 +93,7 @@ _Pragma("clang diagnostic pop")
 //      the CYLTabBarController module as text in a static-library app, and Swift clients then failed with "modularization
 //      issue on 'CYLAnimatedItemView' … expected in 'CYLAnimatedItem' but found in 'CYLTabBarController'".
 #if __has_feature(modules) && __has_include(<CYLAnimatedItem/CYLAnimatedItem-umbrella.h>)
-@import CYLAnimatedItem;
+#pragma clang module import CYLAnimatedItem
 #else
 #if __has_include(<CYLAnimatedItem/CYLAnimatedItemMacros.h>)
 #import <CYLAnimatedItem/CYLAnimatedItemMacros.h>
@@ -114,18 +105,7 @@ _Pragma("clang diagnostic pop")
 #endif
 
 #ifndef CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS
-#define CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS(Stuff) \
-do { \
-_Pragma("clang diagnostic push") \
-_Pragma("clang diagnostic ignored \"-Warc-performSelector-leaks\"") \
-@try { \
-Stuff; \
-} @catch (NSException *exception) { \
-NSLog(CYLLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), \
-@(__PRETTY_FUNCTION__), @(__LINE__), exception.reason); \
-} \
-_Pragma("clang diagnostic pop") \
-} while (0);
+#define CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS(Stuff) do { _Pragma("clang diagnostic push") _Pragma("clang diagnostic ignored \"-Warc-performSelector-leaks\"") @try { Stuff; } @catch (NSException *exception) { NSLog(CYLLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason); } _Pragma("clang diagnostic pop") } while (0);
 #endif
 
 #endif /* CYLUtilsMacros_h */
