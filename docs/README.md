@@ -385,6 +385,7 @@ docs/
 │   ├── ios-rive-tab-badges-over-tinted-icons.png
 │   ├── ios-rive-tint-template.png
 │   ├── ios-rive-title-tint-light-dark.png
+│   ├── ios-swift-plus-button-lens-drag.png
 │   ├── ios-swift-plus-button.png
 │   ├── iphone-duo-example-rive-bottom-bar.png
 │   ├── iphone-duo-objc-vs-swift-side-bar.png

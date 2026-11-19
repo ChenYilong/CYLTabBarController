@@ -5,7 +5,10 @@
 # [CN] 把仓库的 git hook（.githooks/）安装到 .git/hooks，保留已有的 hook。每个克隆运行一次。
 set -euo pipefail
 root=$(git rev-parse --show-toplevel)
-hooks="$root/.git/hooks"
+# [EN] Through git, so a linked worktree (where .git is a file) installs into the shared hooks folder.
+# [CN] 通过 git 获取，使链接的工作树（其中 .git 是文件）安装到共享的 hook 文件夹。
+hooks=$(git rev-parse --path-format=absolute --git-path hooks)
+mkdir -p "$hooks"
 for hook in "$root"/.githooks/*; do
     name=$(basename "$hook")
     target="$hooks/$name"
