@@ -146,7 +146,7 @@ update_navigation() {
 
 # The tag of a release must be the podspec's version (s.source uses it). 发布的 tag 必须等于 podspec 的版本（s.source 使用它）。
 check_tag() {
-  local tag="$1"
+  tag="$1"
   release_version
   if [ "$tag" != "$version" ]; then
     echo "error: the tag '$tag' does not match s.version $version in $PODSPEC. Bump it first (scripts/pod-lint.sh bump $tag), merge, then tag that commit." >&2
@@ -157,7 +157,7 @@ check_tag() {
 
 # Set s.version (only the first s.version line). 设置 s.version（只改第一行 s.version）。
 bump_version() {
-  local new_version="$1"
+  new_version="$1"
   case "$new_version" in
     [0-9]*.[0-9]*.[0-9]*) ;;
     *) echo "usage: $0 bump <x.y.z>   (e.g. $0 bump 1.99.73)" >&2; exit 1 ;;
