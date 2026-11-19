@@ -1215,3 +1215,37 @@ extension CYLTabBarController {
         return !(plusPageSelected && !tabBar.isPlusButtonLayoutCentered())
     }
 }
+
+// MARK: - A reported tab tap (docs/Swift-Migration.md, step 63)
+
+/**
+ * [EN] Everything a reported tab tap does, the same in every style (`-didSelectControl:` for the classic style and Liquid
+ *      Glass, `-cyl_flatDesignReportDidSelectControl:` for FlatDesign), each once per reported tap and also without a
+ *      `didSelectControl` delegate. Translated from Objective-C (docs/Swift-Migration.md, step 63).
+ * [CN] 每次上报的 Tab 点击要做的事，所有样式相同（经典样式与液态玻璃为 `-didSelectControl:`，扁平样式为
+ *      `-cyl_flatDesignReportDidSelectControl:`），每次上报各执行一次，没有实现 didSelectControl 代理时同样执行。已从 Objective-C 翻译
+ *      （docs/Swift-Migration.md，第 63 步）。
+ */
+extension CYLTabBarController {
+
+    /**
+     * [EN] 1. the tap animation, sound and haptic (issue #535); 2. a configuration plus button's action
+     *      (`CYLTabBarControllerPlusButtonAction`); 3. `-tabBarController:didSelectControl:`; 4. Reselect / DoubleTap (issue #152).
+     * [CN] 1. 点击动画、声音与触感反馈（issue #535）；2. 配置中 PlusButton 的回调（`CYLTabBarControllerPlusButtonAction`）；
+     *      3. `-tabBarController:didSelectControl:`；4. Reselect / DoubleTap（issue #152）。
+     */
+    @objc(cyl_sendDidSelectControl:)
+    func cylSendDidSelectControl(_ control: UIControl) {
+        cylPlayTabButtonAnimation(for: control)
+        cylPlayTabButtonTapFeedback()
+        if control.cyl_isPlusControl(), let plusButton = CYLPlusButton.cylPlusButton(forTabBarContext: context) {
+            let tapped = NSSelectorFromString("cyl_configurationPlusButtonTapped")
+            if plusButton.responds(to: tapped) {
+                plusButton.perform(tapped)
+            }
+        }
+        let delegate = (self as UITabBarController).delegate as? CYLTabBarControllerDelegate
+        delegate?.tabBarController?(self, didSelect: control)
+        cylRecognizeTabBarItemGestureForReportedControl(control)
+    }
+}

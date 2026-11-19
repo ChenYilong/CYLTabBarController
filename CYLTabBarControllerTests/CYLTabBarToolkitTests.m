@@ -32,6 +32,20 @@
 }
 @end
 
+/// [EN] A delegate that records `-tabBarController:didSelectControl:`. [CN] 记录 `-tabBarController:didSelectControl:` 的代理。
+@interface CYLDidSelectRecordingDelegate : NSObject <CYLTabBarControllerDelegate>
+@property (nonatomic, strong) NSMutableArray<UIControl *> *controls;
+@end
+
+@implementation CYLDidSelectRecordingDelegate
+- (void)tabBarController:(UITabBarController *)tabBarController didSelectControl:(UIControl *)control {
+    if (!self.controls) {
+        self.controls = [NSMutableArray array];
+    }
+    [self.controls addObject:control];
+}
+@end
+
 @interface CYLTabBarToolkitTests : XCTestCase
 @end
 
@@ -401,6 +415,22 @@
     SEL drawn = NSSelectorFromString(@"cyl_plusButtonTitleIsDrawnByItsTabItem");
     XCTAssertTrue([tabBarController respondsToSelector:drawn]);
     XCTAssertFalse(((BOOL (*)(id, SEL))[tabBarController methodForSelector:drawn])(tabBarController, drawn));
+}
+
+#pragma mark - Reported tap (Swift since step 63)
+
+/// [EN] A reported tap reaches `-tabBarController:didSelectControl:` once, with the control. [CN] 上报的点击以该控件调用一次代理。
+- (void)testSendDidSelectControlReachesTheDelegate {
+    CYLTabBarController *tabBarController = [self newTabBarController];
+    CYLDidSelectRecordingDelegate *delegate = [CYLDidSelectRecordingDelegate new];
+    tabBarController.delegate = delegate;
+    SEL send = NSSelectorFromString(@"cyl_sendDidSelectControl:");
+    XCTAssertTrue([tabBarController respondsToSelector:send]);
+    UIControl *control = [UIControl new];
+    ((void (*)(id, SEL, id))[tabBarController methodForSelector:send])(tabBarController, send, control);
+    XCTAssertEqual(delegate.controls.count, 1u);
+    XCTAssertEqual(delegate.controls.firstObject, control);
+    tabBarController.delegate = nil;
 }
 
 @end

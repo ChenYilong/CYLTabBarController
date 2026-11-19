@@ -5094,44 +5094,8 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
 // [EN] `-cyl_reportedControlForControl:` and `-cyl_markControlReportedInCurrentRunLoop:` are Swift
 //      (Swift/CYLTabBarController+CYLInteraction.swift, docs/Swift-Migration.md, step 59). [CN] 已迁移到 Swift（第 59 步）。
 
-/*!
- * [EN] Everything a reported tab tap does, the same in every style (`-didSelectControl:` for the classic style and Liquid
- *      Glass, `-cyl_flatDesignReportDidSelectControl:` for FlatDesign), each once per reported tap and also without a
- *      `didSelectControl` delegate:
- *      1. the tap animation, sound and haptic (issue #535);
- *      2. `-tabBarController:didSelectControl:`;
- *      3. Reselect / DoubleTap (issue #152).
- * [CN] 每次上报的 Tab 点击要做的事，所有样式相同（经典样式与液态玻璃为 `-didSelectControl:`，扁平样式为
- *      `-cyl_flatDesignReportDidSelectControl:`），每次上报各执行一次，没有实现 didSelectControl 代理时同样执行：
- *      1. 点击动画、声音与触感反馈（issue #535）；
- *      2. `-tabBarController:didSelectControl:`；
- *      3. Reselect / DoubleTap（issue #152）。
- */
-- (void)cyl_sendDidSelectControl:(UIControl *)control {
-    [self cyl_playTabButtonAnimationForControl:control];
-    [self cyl_playTabButtonTapFeedback];
-    // [EN] The plus button of a configuration (`CYLTabBarControllerPlusButtonAction`): its action, once per reported tap.
-    // [CN] 配置中的 PlusButton（`CYLTabBarControllerPlusButtonAction`）：每次上报的点击执行一次其回调。
-    if (control.cyl_isPlusControl) {
-        CYLPlusButton *plusButton = [CYLPlusButton plusButtonForTabBarContext:self.context];
-        SEL tapped = NSSelectorFromString(@"cyl_configurationPlusButtonTapped");
-        if ([plusButton respondsToSelector:tapped]) {
-            CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS
-            (
-             [plusButton performSelector:tapped];
-             );
-        }
-    }
-    SEL action = @selector(tabBarController:didSelectControl:);
-    if ([self.delegate respondsToSelector:action]) {
-        CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS
-        (
-         [self.delegate performSelector:action withObject:self withObject:control];
-         );
-    }
-    [self cyl_recognizeTabBarItemGestureForReportedControl:control];
-}
-
+// [EN] `-cyl_sendDidSelectControl:` is Swift (Swift/CYLTabBarController+CYLInteraction.swift, docs/Swift-Migration.md,
+//      step 63). [CN] 已迁移到 Swift（第 63 步）。
 
 /*!
  * [EN] Plays the animated images of a tab button (docs/GIF-Animation.md): the tab item's image shown by UIKit, and the

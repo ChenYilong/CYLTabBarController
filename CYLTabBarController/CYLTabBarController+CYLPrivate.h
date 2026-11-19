@@ -123,6 +123,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)tabBarController:(CYLTabBarController *)tabBarController beginShowPlatterLiquidLensViewForControl:(UIControl *)control;
 /// [EN] The body of `-tabBarController:shouldSelectViewController:`, implemented in Swift (step 61). [CN] 由 Swift 实现（第 61 步）。
 - (BOOL)cyl_tabBarController:(UITabBarController *)tabBarController shouldSelectViewController:(UIViewController *)viewController;
+/// [EN] Everything a reported tab tap does, implemented in Swift (step 63). [CN] 每次上报的 Tab 点击要做的事，由 Swift 实现（第 63 步）。
+- (void)cyl_sendDidSelectControl:(UIControl *)control;
 - (void)cyl_syncTabBarItemAccessibility;
 #if CYL_FLATDESIGN_AVAILABLE
 - (void)cyl_syncFlatDesignTabBarItemColors;
