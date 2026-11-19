@@ -363,4 +363,14 @@ FOUNDATION_EXTERN BOOL CYLControlReportsTaps(UIControl *_Nullable control);
 - (void)cyl_applyTabBarHeight:(CGFloat)tabBarHeight;
 @end
 
+/*!
+ * [EN] The status bar and the vertical bar (step 129, `Swift/CYLTabBarController+CYLSystemBars.swift`), called by CYLTabBarController.m.
+ * [CN] 状态栏与竖向栏（第 129 步），由 CYLTabBarController.m 调用。
+ */
+@interface CYLTabBarController (CYLSystemBarsPrivate)
+- (nullable UIViewController *)cyl_childViewControllerForStatusBarStyle;
+- (void)cyl_applyAllowsVerticalBar:(BOOL)allowsVerticalBar;
+- (BOOL)cyl_selectedChildOverridesVerticalBarBehavior;
+@end
+
 NS_ASSUME_NONNULL_END
