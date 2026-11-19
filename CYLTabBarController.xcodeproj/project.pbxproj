@@ -7,6 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		E86CDD18A373B09C64D8AF27 /* CYLDemoBadgeTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F239F99979BEEECA16CCD408 /* CYLDemoBadgeTableViewController.swift */; };
+		AA6412D6C537B3A835C02181 /* CYLSameCityViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E54D0C1079837F9C9129AD9 /* CYLSameCityViewController.swift */; };
+		C63C581B21A7AF9B937CD46C /* CYLDetailsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FD0F35BF0BC3FB2C2B07B49 /* CYLDetailsViewController.swift */; };
+		9DBF497E8814437FB75F5629 /* CYLMineViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7FF62BF1E029ACF3D4578C9 /* CYLMineViewController.swift */; };
+		439A8C48A1FFF9083E0EAC71 /* CYLMessageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76E0DB1C99546B75EE5AE647 /* CYLMessageViewController.swift */; };
+		2D6A5D836D92953A290358C3 /* CYLHomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD8BDCD2C68335FCFB086C77 /* CYLHomeViewController.swift */; };
 		002ACFDEC3236108A0445E6F /* UIColor+CYLTabBarControllerExtention.h in Headers */ = {isa = PBXBuildFile; fileRef = A494E02A66D2AE6B5B42B9E8 /* UIColor+CYLTabBarControllerExtention.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		028FAD0320AE983F53C7A9E6 /* CYLTabBar+CYLTabBarControllerExtention.h in Headers */ = {isa = PBXBuildFile; fileRef = 120EBF27E7ADE9A221F1993A /* CYLTabBar+CYLTabBarControllerExtention.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		0296C8C00075B28B8DD3FF62 /* CYLLocalization.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3F75A21AC28C015C4E878E4 /* CYLLocalization.swift */; };
@@ -160,11 +166,6 @@
 		94E113902D925FF63269743B /* CYLTabBarController+CYLInteraction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28437B67FAED7CC857EA2B10 /* CYLTabBarController+CYLInteraction.swift */; };
 		9628D68429F58AC1FC659762 /* CYLThemeRuntime.swift in Sources */ = {isa = PBXBuildFile; fileRef = 052F07405E0005F61BB82F29 /* CYLThemeRuntime.swift */; };
 		9A1559C81CB6D4D300CAB1AF /*  AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A1559C61CB6D4D300CAB1AF /*  AppDelegate.m */; };
-		9A1559DB1CB6D56500CAB1AF /* CYLHomeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A1559CC1CB6D56500CAB1AF /* CYLHomeViewController.m */; };
-		9A1559DC1CB6D56500CAB1AF /* CYLMessageViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A1559CF1CB6D56500CAB1AF /* CYLMessageViewController.m */; };
-		9A1559DD1CB6D56500CAB1AF /* CYLMineViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A1559D21CB6D56500CAB1AF /* CYLMineViewController.m */; };
-		9A1559DE1CB6D56500CAB1AF /* CYLDetailsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A1559D51CB6D56500CAB1AF /* CYLDetailsViewController.m */; };
-		9A1559DF1CB6D56500CAB1AF /* CYLSameCityViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A1559D71CB6D56500CAB1AF /* CYLSameCityViewController.m */; };
 		E31EE2F4156384AF7CC89DC2 /* CYLPlusButtonSubclass.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1D9FC857B42A6A8854A4624 /* CYLPlusButtonSubclass.swift */; };
 		9A3865F62266FA3C008EE46F /* tab_message_animate.json in Resources */ = {isa = PBXBuildFile; fileRef = 9A3865F22266FA3C008EE46F /* tab_message_animate.json */; };
 		9A3865F72266FA3C008EE46F /* tab_home_animate.json in Resources */ = {isa = PBXBuildFile; fileRef = 9A3865F32266FA3C008EE46F /* tab_home_animate.json */; };
@@ -513,16 +514,12 @@ DCC1BBA20425851756119035 /* CYLFlatDesignTabBar.swift in Sources */ = {isa = PBX
 		960B1D09E23FCCE38A747AB1 /* CYLTabBarItemViewAnimator.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = CYLTabBarItemViewAnimator.m; sourceTree = "<group>"; };
 		9A1559C61CB6D4D300CAB1AF /*  AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = " AppDelegate.m"; sourceTree = "<group>"; };
 		9A1559C71CB6D4D300CAB1AF /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
-		9A1559CB1CB6D56500CAB1AF /* CYLHomeViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLHomeViewController.h; sourceTree = "<group>"; };
-		9A1559CC1CB6D56500CAB1AF /* CYLHomeViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLHomeViewController.m; sourceTree = "<group>"; };
-		9A1559CE1CB6D56500CAB1AF /* CYLMessageViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLMessageViewController.h; sourceTree = "<group>"; };
-		9A1559CF1CB6D56500CAB1AF /* CYLMessageViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLMessageViewController.m; sourceTree = "<group>"; };
-		9A1559D11CB6D56500CAB1AF /* CYLMineViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLMineViewController.h; sourceTree = "<group>"; };
-		9A1559D21CB6D56500CAB1AF /* CYLMineViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLMineViewController.m; sourceTree = "<group>"; };
-		9A1559D41CB6D56500CAB1AF /* CYLDetailsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLDetailsViewController.h; sourceTree = "<group>"; };
-		9A1559D51CB6D56500CAB1AF /* CYLDetailsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLDetailsViewController.m; sourceTree = "<group>"; };
-		9A1559D61CB6D56500CAB1AF /* CYLSameCityViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYLSameCityViewController.h; sourceTree = "<group>"; };
-		9A1559D71CB6D56500CAB1AF /* CYLSameCityViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYLSameCityViewController.m; sourceTree = "<group>"; };
+		F239F99979BEEECA16CCD408 /* CYLDemoBadgeTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CYLDemoBadgeTableViewController.swift; path = Example/Classes/Module/CYLDemoBadgeTableViewController.swift; sourceTree = SOURCE_ROOT; };
+		AD8BDCD2C68335FCFB086C77 /* CYLHomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CYLHomeViewController.swift; sourceTree = "<group>"; };
+		76E0DB1C99546B75EE5AE647 /* CYLMessageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CYLMessageViewController.swift; sourceTree = "<group>"; };
+		D7FF62BF1E029ACF3D4578C9 /* CYLMineViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CYLMineViewController.swift; sourceTree = "<group>"; };
+		7FD0F35BF0BC3FB2C2B07B49 /* CYLDetailsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CYLDetailsViewController.swift; sourceTree = "<group>"; };
+		3E54D0C1079837F9C9129AD9 /* CYLSameCityViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CYLSameCityViewController.swift; sourceTree = "<group>"; };
 		A1D9FC857B42A6A8854A4624 /* CYLPlusButtonSubclass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CYLPlusButtonSubclass.swift; sourceTree = "<group>"; };
 		9A3865F22266FA3C008EE46F /* tab_message_animate.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = tab_message_animate.json; sourceTree = "<group>"; };
 		9A3865F32266FA3C008EE46F /* tab_home_animate.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = tab_home_animate.json; sourceTree = "<group>"; };
@@ -962,8 +959,8 @@ AB746249D061B771D1BA3E95 /* CYLTabBarController+CYLMemoryWarning.swift */ = {isa
 		9A1559CA1CB6D56500CAB1AF /* Home */ = {
 			isa = PBXGroup;
 			children = (
-				9A1559CB1CB6D56500CAB1AF /* CYLHomeViewController.h */,
-				9A1559CC1CB6D56500CAB1AF /* CYLHomeViewController.m */,
+				AD8BDCD2C68335FCFB086C77 /* CYLHomeViewController.swift */,
+				F239F99979BEEECA16CCD408 /* CYLDemoBadgeTableViewController.swift */,
 			);
 			path = Home;
 			sourceTree = "<group>";
@@ -971,8 +968,7 @@ AB746249D061B771D1BA3E95 /* CYLTabBarController+CYLMemoryWarning.swift */ = {isa
 		9A1559CD1CB6D56500CAB1AF /* Message */ = {
 			isa = PBXGroup;
 			children = (
-				9A1559CE1CB6D56500CAB1AF /* CYLMessageViewController.h */,
-				9A1559CF1CB6D56500CAB1AF /* CYLMessageViewController.m */,
+				76E0DB1C99546B75EE5AE647 /* CYLMessageViewController.swift */,
 			);
 			path = Message;
 			sourceTree = "<group>";
@@ -980,8 +976,7 @@ AB746249D061B771D1BA3E95 /* CYLTabBarController+CYLMemoryWarning.swift */ = {isa
 		9A1559D01CB6D56500CAB1AF /* Mine */ = {
 			isa = PBXGroup;
 			children = (
-				9A1559D11CB6D56500CAB1AF /* CYLMineViewController.h */,
-				9A1559D21CB6D56500CAB1AF /* CYLMineViewController.m */,
+				D7FF62BF1E029ACF3D4578C9 /* CYLMineViewController.swift */,
 			);
 			path = Mine;
 			sourceTree = "<group>";
@@ -989,10 +984,8 @@ AB746249D061B771D1BA3E95 /* CYLTabBarController+CYLMemoryWarning.swift */ = {isa
 		9A1559D31CB6D56500CAB1AF /* SameCity */ = {
 			isa = PBXGroup;
 			children = (
-				9A1559D41CB6D56500CAB1AF /* CYLDetailsViewController.h */,
-				9A1559D51CB6D56500CAB1AF /* CYLDetailsViewController.m */,
-				9A1559D61CB6D56500CAB1AF /* CYLSameCityViewController.h */,
-				9A1559D71CB6D56500CAB1AF /* CYLSameCityViewController.m */,
+				7FD0F35BF0BC3FB2C2B07B49 /* CYLDetailsViewController.swift */,
+				3E54D0C1079837F9C9129AD9 /* CYLSameCityViewController.swift */,
 				9A579C98225F6E3A00F3C8F0 /* Location.gpx */,
 			);
 			path = SameCity;
@@ -1950,21 +1943,22 @@ AB746249D061B771D1BA3E95 /* CYLTabBarController+CYLMemoryWarning.swift */ = {isa
 				E143F4B55AC42D0382DAE953 /* CYLGalleryModel.swift in Sources */,
 				DD7D6731A83F9197A0E2DB39 /* CYLDemoLocalization.swift in Sources */,
 				BB6CC09AA0154F56A950AF65 /* CYLDemoLocalization.m in Sources */,
-				9A1559DC1CB6D56500CAB1AF /* CYLMessageViewController.m in Sources */,
+				439A8C48A1FFF9083E0EAC71 /* CYLMessageViewController.swift in Sources */,
 				9A9180BD2FCACE6D002DC8F3 /* CYLFlatDesignTabBarDemoViewController.m in Sources */,
 				9A9180BE2FCACE6D002DC8F3 /* CYLFlatDesignSystemTabBarController.m in Sources */,
 				9A9180BF2FCACE6D002DC8F3 /* CYLFlatDesignModalViewController.m in Sources */,
 				B03E57F5201DA45B59A7AC33 /* CYLFlatDesignMainTabBarController.swift in Sources */,
 				9A9180C32FCACE6D002DC8F3 /* CYLFlatDesignTableViewController.m in Sources */,
 				9AE0BD3122303BA800302A35 /* CYLMainRootViewController.m in Sources */,
-				9A1559DE1CB6D56500CAB1AF /* CYLDetailsViewController.m in Sources */,
+				C63C581B21A7AF9B937CD46C /* CYLDetailsViewController.swift in Sources */,
 				E31EE2F4156384AF7CC89DC2 /* CYLPlusButtonSubclass.swift in Sources */,
-				9A1559DF1CB6D56500CAB1AF /* CYLSameCityViewController.m in Sources */,
-				9A1559DB1CB6D56500CAB1AF /* CYLHomeViewController.m in Sources */,
+				AA6412D6C537B3A835C02181 /* CYLSameCityViewController.swift in Sources */,
+				2D6A5D836D92953A290358C3 /* CYLHomeViewController.swift in Sources */,
+				E86CDD18A373B09C64D8AF27 /* CYLDemoBadgeTableViewController.swift in Sources */,
 				9A1559C81CB6D4D300CAB1AF /*  AppDelegate.m in Sources */,
 				9AE51DDC2F90C9D000BB0831 /* SceneDelegate.m in Sources */,
 				CEE46F807E08492265B99A7B /* MainTabBarController.swift in Sources */,
-				9A1559DD1CB6D56500CAB1AF /* CYLMineViewController.m in Sources */,
+				9DBF497E8814437FB75F5629 /* CYLMineViewController.swift in Sources */,
 				9AE942F11BDC933E00354519 /* main.m in Sources */,
 				9AC0181B1FE90AA1001EC2D6 /* CYLPlusDemoChildViewController.swift in Sources */,
 				30F844E1260777C69B048E2C /* CYLPopPushDemoViewController.m in Sources */,
