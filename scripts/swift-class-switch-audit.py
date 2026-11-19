@@ -40,8 +40,9 @@ def method_declarations(block):
     """[EN] (kind, +/-, selector) of the methods of one block. [CN] 一个块中各方法的（种类、+/-、selector）。"""
     found = []
     for match in METHOD.finditer(block):
-        signature = re.sub(r'\s+', ' ', match.group(3))
-        parts = re.findall(r'(\w+)\s*:', signature)
+        # [EN] Spaces normalized with split / join and `str.replace`: no backtracking patterns (python:S8786). [CN] 用 split / join 与 `str.replace` 规范空白：不使用会回溯的正则。
+        signature = ' '.join(match.group(3).split()).replace(' :', ':')
+        parts = re.findall(r'(\w+):', signature)
         selector = ''.join(part + ':' for part in parts) if parts else signature.split()[0]
         found.append(('method', match.group(1), selector))
     return found
@@ -51,9 +52,10 @@ def property_declarations(block):
     """[EN] (kind, '-', name) of the properties of one block: the identifier just before the semicolon. [CN] 一个块中各属性的（种类、'-'、名称）：分号前最后一个标识符。"""
     found = []
     for match in PROPERTY.finditer(block):
-        name = re.search(r'(\w+)\s*$', match.group(2))  # [EN] Block-typed properties end with ")" and are skipped. [CN] 块类型属性以 ")" 结尾，被跳过。
-        if name:
-            found.append(('property', '-', name.group(1)))
+        declaration = match.group(2).rstrip()
+        # [EN] Block-typed properties end with ")" and are skipped. [CN] 块类型属性以 ")" 结尾，被跳过。
+        if declaration and (declaration[-1].isalnum() or declaration[-1] == '_'):
+            found.append(('property', '-', re.findall(r'\w+', declaration)[-1]))
     return found
 
 
