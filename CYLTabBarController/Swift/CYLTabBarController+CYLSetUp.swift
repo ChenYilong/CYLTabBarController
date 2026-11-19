@@ -171,4 +171,47 @@ extension CYLTabBarController {
         noNeedUIDesignCompatibility = styleType != .flatDesign
         tabBarStyleType = styleType
     }
+
+    // MARK: - Adding a tab (system styles)
+
+    /**
+     * [EN] Adds the tab of `viewController` in the system styles (classic, Liquid Glass): title, resting images, the per-tab image
+     *      insets and offsets (which win over the controller's and are remembered on the item, #475, #95), the animation file, then the
+     *      view controller as a child. The FlatDesign counterpart is `-addOneChildViewController:idx:WithTitle:…`.
+     * [CN] 在系统样式（经典、液态玻璃）下添加 `viewController` 的 Tab：标题、静止图片、单个 Tab 的图片内边距与偏移（优先于控制器的设置，并记录在 item 上，#475、#95）、
+     *      动画文件，最后把控制器作为子控制器添加。扁平样式的对应方法是 `-addOneChildViewController:idx:WithTitle:…`。
+     */
+    @objc(addOneChildViewController:WithTitle:normalImageInfo:selectedImageInfo:titlePositionAdjustment:imagePositionAdjustment:imageInsets:lottieURL:lottieSizeValue:)
+    func cylAddOneChildViewController(_ viewController: UIViewController, withTitle title: String?, normalImageInfo: Any?, selectedImageInfo: Any?,
+                                      titlePositionAdjustment: UIOffset, imagePositionAdjustment: UIOffset, imageInsets: UIEdgeInsets,
+                                      lottieURL: URL?, lottieSizeValue: NSValue?) {
+        guard tabBarStyleType != .flatDesign else {
+            return
+        }
+        let contentTabBarItem = viewController.cyl_getViewControllerInsteadOfNavigation().tabBarItem
+        viewController.tabBarItem.title = title
+        contentTabBarItem?.title = title
+        let normalImage = normalImageInfo.flatMap { UIImage.cyl_imageNamed($0) }
+        viewController.tabBarItem.image = Self.cylRestingTabBarItemImage(normalImage, for: viewController.tabBarItem, selected: false)
+        let selectedImage = selectedImageInfo.flatMap { UIImage.cyl_imageNamed($0) }
+        viewController.tabBarItem.selectedImage = Self.cylRestingTabBarItemImage(selectedImage, for: viewController.tabBarItem, selected: true)
+        viewController.tabBarItem.imageInsets = imageInsets == .zero ? self.imageInsets : imageInsets
+        CYLRememberItemImageInsets(viewController.tabBarItem, imageInsets)
+        let offset = titlePositionAdjustment == .zero ? self.titlePositionAdjustment : titlePositionAdjustment
+        CYLRememberItemTitlePositionAdjustment(viewController.tabBarItem, titlePositionAdjustment)
+        cylApplyTitlePositionAdjustment(offset, to: viewController.tabBarItem)
+        viewController.tabBarItem.cyl_imagePositionAdjustment = imagePositionAdjustment == .zero ? self.imagePositionAdjustment : imagePositionAdjustment
+        if let lottieURL {
+            tabBarItemAnimationURLs.add(lottieURL)
+            viewController.tabBarItem.cyl_tabBarItemAnimationURL = lottieURL
+            contentTabBarItem?.cyl_tabBarItemAnimationURL = lottieURL
+            if let size = CYLConstants.cyl_tabBarItemAnimationSizeValue(lottieSizeValue, fromNormalImage: normalImage) {
+                tabBarItemAnimationSizes.add(size)
+                viewController.tabBarItem.cyl_tabBarItemAnimationSizeValue = size
+                contentTabBarItem?.cyl_tabBarItemAnimationSizeValue = size
+            }
+        }
+        addChild(viewController)
+    }
 }
+

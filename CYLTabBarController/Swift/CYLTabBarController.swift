@@ -136,12 +136,21 @@ open class CYLTabBarController: UITabBarController, CYLTabBarControllerDelegate,
     @objc var pageLookupOrder: [String]?
     @objc var pagesByPageIdentifier: NSMutableDictionary?
     @objc var skippedTabs: [CYLTabBarSkippedTab] = []
-    @objc(isObservingTabImageViewDefaultOffset) var isObservingTabImageViewDefaultOffset = false
+    private var storedObservingTabImageViewDefaultOffset = false
+    /// [EN] Explicit accessors: Swift would name the setter after `isObserving…`, the Objective-C callers use `-setObservingTabImageViewDefaultOffset:`. [CN] 显式访问器：Swift 会按 `isObserving…` 命名 setter，而 Objective-C 调用方使用 `-setObservingTabImageViewDefaultOffset:`。
+    @objc(isObservingTabImageViewDefaultOffset) var isObservingTabImageViewDefaultOffset: Bool {
+        @objc(isObservingTabImageViewDefaultOffset) get { storedObservingTabImageViewDefaultOffset }
+        @objc(setObservingTabImageViewDefaultOffset:) set { storedObservingTabImageViewDefaultOffset = newValue }
+    }
     /// [EN] Backing flag of `automaticallyAdjustsImageOnlyTabs`, negated so that the default (false) means true (issues #257, #522). [CN] `automaticallyAdjustsImageOnlyTabs` 的存储标记，取反存储。
     @objc var cyl_imageOnlyTabsAdjustmentDisabled = false
     @objc(shouldInvokeOnceViewDidLayoutSubViewsBlock) var invokeOnceViewDidLayoutSubViewsBlock = false
     @objc(cyl_controlReportedInCurrentRunLoop) weak var cyl_controlReportedInCurrentRunLoop: UIControl?
-    @objc(isTabBarItemAnimationViewAdded) var isTabBarItemAnimationViewAdded = false
+    private var storedTabBarItemAnimationViewAdded = false
+    @objc(isTabBarItemAnimationViewAdded) var isTabBarItemAnimationViewAdded: Bool {
+        @objc(isTabBarItemAnimationViewAdded) get { storedTabBarItemAnimationViewAdded }
+        @objc(setTabBarItemAnimationViewAdded:) set { storedTabBarItemAnimationViewAdded = newValue }
+    }
     @objc var tabItemPlaceholderImage: UIImage?
     @objc var storedContext: String?
     @objc var cylClassicTabBarIsAnimating = false
@@ -330,8 +339,11 @@ open class CYLTabBarController: UITabBarController, CYLTabBarControllerDelegate,
         set { cylSetDelegate(newValue) }
     }
 
-    open override var tabBar: UITabBar {
-        super.tabBar
+    /// [EN] The tab bar, typed `CYLTabBar` as the Objective-C header declared it (an unchecked cast, as before: the tab bar is replaced by
+    ///      `CYLTabBar` through KVC when the controller is set up). [CN] TabBar，类型为 `CYLTabBar`，与 Objective-C 头文件的声明一致（与以前一样不检查类型：
+    ///      设置控制器时已通过 KVC 把 TabBar 换成 `CYLTabBar`）。
+    open override var tabBar: CYLTabBar {
+        unsafeBitCast(super.tabBar, to: CYLTabBar.self)
     }
 
     open override var isTabBarHidden: Bool {
