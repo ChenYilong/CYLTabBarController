@@ -203,6 +203,7 @@ docs/
 │   ├── android-api37-20261118-rive-tint-at-0505042f.png
 │   ├── android-api37-20261118-rive-tint-title-and-dark-tint.png
 │   ├── android-api37-20261119-example-rive-live-uimode-switch.png
+│   ├── android-api37-20261119-rive-fixed-tint-unselected-only.png
 │   ├── android-api37-20261119-rive-follows-appearance.png
 │   ├── android-gif-decoder-frame-clock.png
 │   ├── android-gif-tint-option.png
