@@ -273,4 +273,17 @@ FOUNDATION_EXTERN BOOL CYLControlReportsTaps(UIControl *_Nullable control);
 - (void)cyl_reloadLottieAnimationViewsForCurrentStyle;
 @end
 
+/*!
+ * [EN] The plus slot (step 124, `Swift/CYLTabBarController+CYLPlusSlot.swift`), called by CYLTabBarController.m.
+ * [CN] 加号 slot（第 124 步），由 CYLTabBarController.m 调用。
+ */
+@interface CYLTabBarController (CYLPlusSlotPrivate)
+- (NSUInteger)cyl_plusSlotIndexInViewControllers;
+- (BOOL)cyl_tabBarItemsAttributesIncludePlusSlot;
+- (NSArray<UIViewController *> *)cyl_viewControllersByRemovingPlusSlot:(nullable NSArray<UIViewController *> *)viewControllers;
+- (nullable NSArray<NSDictionary *> *)cyl_tabBarItemsAttributesByRemovingPlusSlot:(nullable NSArray<NSDictionary *> *)tabBarItemsAttributes;
+- (NSInteger)cyl_plusSlotIndexForTabCount:(NSInteger)tabCount;
+- (NSArray<UIViewController *> *)cyl_viewControllersAligningPlusSlotWithViewControllers:(nullable NSArray<UIViewController *> *)viewControllers;
+@end
+
 NS_ASSUME_NONNULL_END
