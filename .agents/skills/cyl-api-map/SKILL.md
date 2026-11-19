@@ -11,6 +11,7 @@ Read the document for the feature before using its API. The public API is in the
 |:---|:---|
 | Installing, Swift, `import` failures | [Swift-Guide](../../../docs/Swift-Guide.md) |
 | SwiftUI | [SwiftUI-Integration](../../../docs/SwiftUI-Integration.md) |
+| Subclassing the library's classes in Swift (CYLTabBarController, CYLPlusButton, the base view controllers; Objective-C subclasses move to Swift) | [Subclassing-In-Swift](../../../docs/Subclassing-In-Swift.md) |
 | Carthage | [Carthage](../../../docs/Carthage.md) |
 | Carthage demo | [Carthage-Example](../../../docs/Carthage-Example.md) |
 | Every customization and its API | [Custom-Tab-Bar-Features](../../../docs/Custom-Tab-Bar-Features.md) |
