@@ -780,7 +780,7 @@ extension CYLTabBarController {
     private func cylSelectTabAfterLostTouch(atWindowPoint windowPoint: CGPoint) {
         guard let control = cylLiquidGlassTabControl(atWindowPoint: windowPoint), !control.cyl_isPlusButton(),
               let viewControllers, let index = viewControllers.firstIndex(where: { candidate in
-                  candidate.cyl_tabButton === control || cylPrivate.cylTabButtons(of: candidate).contains { $0 === control }
+                  candidate.cyl_tabButton === control || cylTabButtons(of: candidate).contains { $0 === control }
               }) else { return }
         let viewController = viewControllers[index]
         guard viewController !== selectedViewController else { return }

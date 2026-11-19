@@ -21,10 +21,8 @@ import UIKit
     @objc(setCyl_imageOnlyTabsAdjustmentDisabled:) func cylSetImageOnlyTabsAdjustmentDisabled(_ disabled: Bool)
     @objc(cyl_storedTabBar) func cylStoredTabBar() -> UIView?
     @objc(cyl_rearmViewDidLayoutSubviewsBlockInvokeOnce) func cylRearmViewDidLayoutSubviewsBlockInvokeOnce()
-    @objc(cyl_tabBarItemIconViewProviders) func cylTabBarItemIconViewProviders() -> NSMapTable<UIViewController, AnyObject>
     @objc(cyl_themeRemoveTabBarItemAttributeKeys:atIndex:) func cylThemeRemoveTabBarItemAttributeKeys(_ keys: [String], atIndex index: UInt)
     @objc(cyl_isPlusSlotViewController:) func cylIsPlusSlotViewController(_ viewController: UIViewController) -> Bool
-    @objc(cyl_tabButtonsOfViewController:) func cylTabButtons(of viewController: UIViewController) -> [UIControl]
     @objc(cyl_contextPlusButton) func cylContextPlusButton() -> CYLPlusButton?
     @objc(cyl_contextPlusChildViewController) func cylContextPlusChildViewController() -> UIViewController?
     /// [EN] The control reported in the current run loop turn (step 59). [CN] 当前 runloop 中已上报的控件（第 59 步）。

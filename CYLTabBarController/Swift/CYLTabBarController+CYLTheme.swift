@@ -174,7 +174,7 @@ extension CYLTabBarController {
     private func cylRefreshTabBarItemAnimationColors() {
         guard CYLTabBarItemAnimationCore.service != nil, isViewLoaded else { return }
         for viewController in viewControllers ?? [] {
-            for tabButton in cylPrivate.cylTabButtons(of: viewController) {
+            for tabButton in cylTabButtons(of: viewController) {
                 tabButton.cyl_refreshTabBarItemAnimationColors()
             }
         }
@@ -379,7 +379,7 @@ extension CYLTabBarController {
      */
     private func applyThemeIcons(ofTabAttributes tabAttributes: NSMapTable<UIViewController, NSDictionary>, generation: Int) {
         let restorables = cyl_themeSettings.iconRestorables
-        let providers = cylPrivate.cylTabBarItemIconViewProviders()
+        let providers = cylTabBarItemIconViewProviders()
         var themeIcons: [(viewController: UIViewController, icon: Any, selectedIcon: Any?, size: NSValue?)] = []
         for viewController in viewControllers(of: tabAttributes) {
             let attributes = tabAttributes.object(forKey: viewController) as? [String: Any] ?? [:]
@@ -423,7 +423,7 @@ extension CYLTabBarController {
                         self.restoreThemeIcon(of: viewController)
                         return
                     }
-                    value.didInstall(self.cylPrivate.cylTabBarItemIconViewProviders().object(forKey: viewController))
+                    value.didInstall(self.cylTabBarItemIconViewProviders().object(forKey: viewController))
                 }
                 if image == nil || tabIcon.selectedIcon == nil || CYLThemeSameValue(tabIcon.selectedIcon, tabIcon.icon) {
                     show(nil)
@@ -439,7 +439,7 @@ extension CYLTabBarController {
         let restorables = cyl_themeSettings.iconRestorables
         guard let value = restorables.object(forKey: viewController) else { return }
         restorables.removeObject(forKey: viewController)
-        let current = cylPrivate.cylTabBarItemIconViewProviders().object(forKey: viewController)
+        let current = cylTabBarItemIconViewProviders().object(forKey: viewController)
         if let index = viewControllers?.firstIndex(of: viewController) {
             let result = value.shouldRestore(currentValue: current)
             if result.restore {

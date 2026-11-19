@@ -110,25 +110,7 @@ static BOOL CYLTabBarAnimationCanPlay(NSURL *URL) {
 #define CYLTabBarItemAnimatedImageKey ((const void *)sel_registerName("cyl_tabBarItemAnimatedImage"))
 #define CYLTabBarItemAnimatedSelectedImageKey ((const void *)sel_registerName("cyl_tabBarItemAnimatedSelectedImage"))
 
-/*!
- * [EN] An animated image given as a tab's image (`CYLTabBarItemImage` with `+[UIImage cyl_animatedImageWithGIFData:]`, a GIF
- *      `CYLTabBarItemImageURL`) rests on its first frame until the tab is played, like an animation (docs/GIF-Animation.md):
- *      the item keeps the animated image and shows its first frame. Any other image is returned as it is.
- * [CN] 作为 Tab 图片传入的动图（`CYLTabBarItemImage` 传 `+[UIImage cyl_animatedImageWithGIFData:]`、GIF 的
- *      `CYLTabBarItemImageURL`）与动画一样，在 Tab 被播放之前停在第一帧：tabBarItem 保存动图，显示其第一帧。其他图片原样返回。
- */
-static UIImage *CYLRestingTabBarItemImage(UIImage *image, UITabBarItem *item, BOOL selected) {
-    const void *key = selected ? CYLTabBarItemAnimatedSelectedImageKey : CYLTabBarItemAnimatedImageKey;
-    if (!item) {
-        return image;
-    }
-    if (image.images.count < 2) {
-        objc_setAssociatedObject(item, key, nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-        return image;
-    }
-    objc_setAssociatedObject(item, key, image, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-    return [image.images.firstObject imageWithRenderingMode:image.renderingMode];
-}
+// [EN] `CYLRestingTabBarItemImage` is Swift: `+cyl_restingTabBarItemImage:forItem:selected:` (step 66). [CN] 已迁移到 Swift（第 66 步）。
 
 // [EN] The template tint color, the tintable and animated icon views, and the frame player are Swift
 //      (Swift/CYLTabBarController+CYLAnimatedImages.swift, docs/Swift-Migration.md, step 65). [CN] 已迁移到 Swift（第 65 步）。
@@ -3295,8 +3277,8 @@ static NSString *const CYLTabBarItemPlusSlotPlaceholderKey = @"CYLTabBarItemPlus
     }
     for (UITabBarItem *tabBarItem in tabBarItems) {
         if (title) { tabBarItem.title = title; }
-        if (image) { tabBarItem.image = CYLRestingTabBarItemImage(image, tabBarItem, NO); }
-        if (selectedImage) { tabBarItem.selectedImage = CYLRestingTabBarItemImage(selectedImage, tabBarItem, YES); }
+        if (image) { tabBarItem.image = [CYLTabBarController cyl_restingTabBarItemImage:image forItem:tabBarItem selected:NO]; }
+        if (selectedImage) { tabBarItem.selectedImage = [CYLTabBarController cyl_restingTabBarItemImage:selectedImage forItem:tabBarItem selected:YES]; }
     }
     if (title) {
         CYLApplyNavigationTitleOfFollowingPage(viewController, title);
@@ -3370,20 +3352,9 @@ static NSString *const CYLTabBarItemPlusSlotPlaceholderKey = @"CYLTabBarItemPlus
 
 #pragma mark - A view of yours in place of a tab's icon (issue #601)
 
-static char CYLTabBarItemIconViewProvidersKey;
-static char CYLTabBarItemIconViewsKey;
-static char CYLTabBarItemIconViewsProviderKey;
 
-/// [EN] The icon view providers by view controller (weak).
-/// [CN] 按子控制器（弱引用）保存的图标视图 provider。
-- (NSMapTable<UIViewController *, CYLTabBarItemIconViewProvider> *)cyl_tabBarItemIconViewProviders {
-    NSMapTable *providers = objc_getAssociatedObject(self, &CYLTabBarItemIconViewProvidersKey);
-    if (!providers) {
-        providers = [NSMapTable weakToStrongObjectsMapTable];
-        objc_setAssociatedObject(self, &CYLTabBarItemIconViewProvidersKey, providers, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-    }
-    return providers;
-}
+// [EN] The providers, the tab buttons of a tab and the icon views are Swift
+//      (Swift/CYLTabBarController+CYLTabBarItemIconViews.swift, docs/Swift-Migration.md, step 66). [CN] 已迁移到 Swift（第 66 步）。
 
 - (BOOL)setTabBarItemIconViewProvider:(CYLTabBarItemIconViewProvider)provider atIndex:(NSUInteger)index {
     if (index >= _viewControllers.count) {
@@ -3666,176 +3637,8 @@ static UIImage *CYLImageScaledToSize(UIImage *image, CGSize size) {
     return YES;
 }
 
-/*!
- * [EN] The tab buttons of `viewController`: the tab button, and with Liquid Glass the one in the selected layer (lens).
- * [CN] `viewController` 的 Tab 按钮：Tab 按钮本身，液态玻璃下还有选中图层（放大镜）中的那个。
- */
-- (NSArray<UIControl *> *)cyl_tabButtonsOfViewController:(UIViewController *)viewController {
-    UIControl *tabButton = nil;
-    if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType) {
-        tabButton = viewController.cyl_tabButton;
-    } else {
-        tabButton = viewController.tabBarItem.cyl_tabButton;
-    }
-    if (![tabButton isKindOfClass:[UIControl class]]) {
-        return @[];
-    }
-    // [EN] Liquid Glass active AND not the FlatDesign style (on iOS 26 `+isLiquidGlassActive` is YES with the FlatDesign tab
-    //      bar too, which has no selected layer). Used by the icon views of themes (`-setTabBarItemIcon:...`).
-    // [CN] 液态玻璃处于活动状态且不是扁平样式（iOS 26 上使用扁平样式 TabBar 时 `+isLiquidGlassActive` 也为 YES，而它没有选中图层）。
-    //      主题的图标视图（`-setTabBarItemIcon:...`）使用这里的结果。
-    BOOL isLiquidGlassTabBar = (CYLTabBarStyleTypeFlatDesign != self.tabBarStyleType && [CYLConstants isLiquidGlassActive]);
-    UIControl *selectedLayerTabButton = isLiquidGlassTabBar ? tabButton.cyl_platterSelectedControl : nil;
-    if (selectedLayerTabButton && selectedLayerTabButton != tabButton) {
-        return @[tabButton, selectedLayerTabButton];
-    }
-    return @[tabButton];
-}
-
-/// [EN] After layout and selection changes, on the next run loop: UIKit has updated the tab buttons by then.
-/// [CN] 布局与选中变化后，在下一个 run loop 执行：此时 UIKit 已更新 Tab 按钮。
-- (void)cyl_setNeedsUpdateTabBarItemIconViews {
-    if ([self cyl_tabBarItemIconViewProviders].count == 0) {
-        return;
-    }
-    __weak __typeof(self) weakSelf = self;
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [weakSelf cyl_updateTabBarItemIconViews];
-    });
-}
-
-/// [EN] Installs, removes or shows the icon views of every tab with a provider.
-/// [CN] 安装、移除或显示所有设置了 provider 的 Tab 的图标视图。
-/*!
- * [EN] Tells a tab button that is a CYLAnimatedItemView (FlatDesign) to keep its icon hidden, by key: Core does not import
- *      the component. Nothing for UIKit's tab buttons.
- * [CN] 告诉作为 CYLAnimatedItemView 的 Tab 按钮（扁平样式）保持图标隐藏，按 key 设置：Core 不导入该组件。UIKit 的 Tab 按钮不做处理。
- */
-static void CYLSetAnimatedItemIconHidden(UIControl *tabButton, BOOL hidden) {
-    if ([tabButton respondsToSelector:NSSelectorFromString(@"setIconHidden:")]) {
-        [tabButton setValue:@(hidden) forKey:@"iconHidden"];
-    }
-}
-
-- (void)cyl_updateTabBarItemIconViews {
-    for (UIViewController *viewController in [self cyl_tabBarItemIconViewProviders].keyEnumerator.allObjects) {
-        [self cyl_updateTabBarItemIconViewsOfViewController:viewController];
-    }
-}
-
-- (void)cyl_updateTabBarItemIconViewsOfViewController:(UIViewController *)viewController {
-    CYLTabBarItemIconViewProvider provider = [[self cyl_tabBarItemIconViewProviders] objectForKey:viewController];
-    NSArray<UIControl *> *tabButtons = [self cyl_tabButtonsOfViewController:viewController];
-    BOOL isSelected = (viewController == self.selectedViewController);
-    [tabButtons enumerateObjectsUsingBlock:^(UIControl *tabButton, NSUInteger idx, BOOL *stop) {
-        NSMutableDictionary<NSNumber *, UIView *> *iconViews = objc_getAssociatedObject(tabButton, &CYLTabBarItemIconViewsKey);
-        id installedProvider = objc_getAssociatedObject(tabButton, &CYLTabBarItemIconViewsProviderKey);
-        UIView *lottieView = tabButton.cyl_tabBarItemAnimationView;
-        // [EN] A cover over the tab button (e.g. a logo over the first tab) hides its other views, the tab's own icon too:
-        //      the views shown in place of the icon stay hidden under it.
-        // [CN] 覆盖 Tab 按钮的封面（如第一个 Tab 上的 Logo）会隐藏按钮
-        //      中的其他视图，包括 Tab 自身的图标：替换图标的视图在其下方保持隐藏。
-        BOOL isCovered = NO;
-        for (UIView *subview in tabButton.subviews) {
-            if (subview.cyl_isTabButtonCoverView && !subview.cyl_isInvisiable) {
-                isCovered = YES;
-                break;
-            }
-        }
-        if (installedProvider != provider) {
-            // [EN] Another provider, or none: remove the views of the previous one.
-            // [CN] 换了 provider 或已移除：移除之前的视图。
-            for (UIView *iconView in iconViews.allValues) {
-                [iconView removeFromSuperview];
-            }
-            iconViews = nil;
-            objc_setAssociatedObject(tabButton, &CYLTabBarItemIconViewsKey, nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-            objc_setAssociatedObject(tabButton, &CYLTabBarItemIconViewsProviderKey, provider, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-            if (!provider) {
-                // [EN] The tab's own icon and its badge come back, unless the cover hides them.
-                // [CN] Tab 自身的图标及其角标恢复，除非被封面隐藏。
-                [self cyl_setTabImageView:tabButton.cyl_tabImageView lottieView:lottieView replacedByIconView:NO];
-                CYLSetAnimatedItemIconHidden(tabButton, NO);
-                if (!isCovered) {
-                    tabButton.cyl_tabImageView.hidden = (lottieView != nil);
-                    lottieView.hidden = NO;
-                }
-                return;
-            }
-        }
-        if (!provider) {
-            return;
-        }
-        if (!iconViews) {
-            iconViews = [NSMutableDictionary dictionary];
-            // [EN] Liquid Glass: one look per layer (the second button is the selected layer); other styles: both looks here.
-            // [CN] 液态玻璃：每个图层一种样式（第二个按钮是选中图层）；其他样式：两种样式都在这个按钮上。
-            NSArray<NSNumber *> *looks = (tabButtons.count > 1) ? @[@(idx == 1)] : @[@NO, @YES];
-            for (NSNumber *look in looks) {
-                UIView *iconView = provider(look.boolValue);
-                if (!iconView) {
-                    continue;
-                }
-                iconView.userInteractionEnabled = NO;
-                iconView.cyl_tabBarItemIconView = YES;
-                [tabButton cyl_replaceTabImageViewWithNewView:iconView show:YES];
-                if (iconView.superview == tabButton) {
-                    iconViews[look] = iconView;
-                }
-            }
-            objc_setAssociatedObject(tabButton, &CYLTabBarItemIconViewsKey, iconViews, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-        }
-        if (iconViews.count == 0) {
-            return;
-        }
-        // [EN] The tab's own icon stays hidden (the system may show it again when the tab changes); its badge stays visible
-        //      above it.
-        // [CN] Tab 自身图标保持隐藏（切换 Tab 时系统可能重新显示它）；其角标仍显示在它上方。
-        tabButton.cyl_tabImageView.hidden = YES;
-        lottieView.hidden = YES;
-        // [EN] A CYLAnimatedItemView (FlatDesign) shows its icon again on its own updates (a selection change) unless told.
-        // [CN] CYLAnimatedItemView（扁平样式）在自身更新（切换选中）时会重新显示图标，除非被告知。
-        CYLSetAnimatedItemIconHidden(tabButton, YES);
-        // [EN] Under a cover the badge stays as the cover left it (cleared).
-        // [CN] 有封面时角标保持封面设置的状态（已清除）。
-        [self cyl_setTabImageView:tabButton.cyl_tabImageView lottieView:lottieView replacedByIconView:!isCovered];
-        // [EN] Below the tab's own icon, or the subview of the tab button holding it (Liquid Glass), so the badge shown above
-        //      that icon stays above this view too.
-        // [CN] 位于 Tab 自身图标（或液态玻璃中包含它的 Tab 按钮子视图）之下，使该图标上方的角标也位于此视图之上。
-        UIView *iconHolder = lottieView ?: tabButton.cyl_tabImageView;
-        while (iconHolder && iconHolder.superview != tabButton) {
-            iconHolder = iconHolder.superview;
-        }
-        for (UIView *iconView in iconViews.allValues) {
-            if (iconHolder && iconView.superview == tabButton) {
-                [tabButton insertSubview:iconView belowSubview:iconHolder];
-            }
-        }
-        UIView *unselectedView = iconViews[@NO];
-        UIView *selectedView = iconViews[@YES];
-        if (unselectedView && selectedView) {
-            unselectedView.hidden = isCovered || isSelected;
-            selectedView.hidden = isCovered || !isSelected;
-        } else {
-            for (UIView *iconView in iconViews.allValues) {
-                iconView.hidden = isCovered;
-            }
-        }
-    }];
-}
-
-/// [EN] Marks the tab's own icon as hidden for the view shown in its place, or not, and moves its badge accordingly: onto
-///      an overlay above it, or back into it.
-/// [CN] 标记 Tab 自身的图标是否因替换显示而隐藏，并相应移动其角标：移到其上方的浮层，或移回图标中。
-- (void)cyl_setTabImageView:(UIView *)tabImageView lottieView:(UIView *)lottieView replacedByIconView:(BOOL)replaced {
-    for (UIView *host in @[ tabImageView ?: (id)[NSNull null], lottieView ?: (id)[NSNull null] ]) {
-        if (![host isKindOfClass:[UIView class]] || host.cyl_isBadgeHostReplacedByIconView == replaced) {
-            continue;
-        }
-        host.cyl_badgeHostReplacedByIconView = replaced;
-        [host cyl_refreshBadge];
-    }
-}
+// [EN] `-cyl_tabButtonsOfViewController:`, the icon view updates and `-cyl_setTabImageView:lottieView:replacedByIconView:`
+//      are Swift (step 66). [CN] 已迁移到 Swift（第 66 步）。
 
 /*!
  * [EN] Index into `tabBarItemsAttributes` of the tab at `index` in `viewControllers`, as `-setViewControllers:` pairs them:
@@ -4414,10 +4217,10 @@ static void CYLSetAnimatedItemIconHidden(UIControl *tabButton, BOOL hidden) {
     viewController.tabBarItem.title = title;
     [viewController cyl_getViewControllerInsteadOfNavigationController].tabBarItem.title = title;
     UIImage *normalImage = [UIImage cyl_imageNamed:normalImageInfo];
-    viewController.tabBarItem.image = CYLRestingTabBarItemImage(normalImage, viewController.tabBarItem, NO);
+    viewController.tabBarItem.image = [CYLTabBarController cyl_restingTabBarItemImage:normalImage forItem:viewController.tabBarItem selected:NO];
     
     UIImage *selectedImage = [UIImage cyl_imageNamed:selectedImageInfo];;
-    viewController.tabBarItem.selectedImage = CYLRestingTabBarItemImage(selectedImage, viewController.tabBarItem, YES);
+    viewController.tabBarItem.selectedImage = [CYLTabBarController cyl_restingTabBarItemImage:selectedImage forItem:viewController.tabBarItem selected:YES];
     
     UIEdgeInsets insets = self.imageInsets;
     BOOL shouldCustomizeImageInsets = !(UIEdgeInsetsEqualToEdgeInsets(UIEdgeInsetsZero, imageInsets));

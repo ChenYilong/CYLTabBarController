@@ -133,6 +133,13 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)cyl_playAnimatedImagesOfTabButton:(nullable UIControl *)control;
 - (void)cyl_applyAnimatedImagesLoops:(BOOL)loops;
 - (void)cyl_setNeedsApplyTabBarItemAnimationTintColors;
+/// [EN] Views in place of a tab's icon and resting animated images, implemented in Swift (step 66). [CN] 由 Swift 实现（第 66 步）。
++ (nullable UIImage *)cyl_restingTabBarItemImage:(nullable UIImage *)image forItem:(nullable UITabBarItem *)item selected:(BOOL)selected;
+- (NSArray<UIControl *> *)cyl_tabButtonsOfViewController:(UIViewController *)viewController;
+- (void)cyl_setNeedsUpdateTabBarItemIconViews;
+- (void)cyl_updateTabBarItemIconViews;
+- (void)cyl_updateTabBarItemIconViewsOfViewController:(UIViewController *)viewController;
+- (void)cyl_setTabImageView:(nullable UIView *)tabImageView lottieView:(nullable UIView *)lottieView replacedByIconView:(BOOL)replaced;
 - (void)cyl_syncTabBarItemAccessibility;
 #if CYL_FLATDESIGN_AVAILABLE
 - (void)cyl_syncFlatDesignTabBarItemColors;
