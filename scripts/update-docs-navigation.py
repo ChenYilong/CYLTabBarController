@@ -356,7 +356,7 @@ def source_headers():
         for name in sorted(f for f in files if f.endswith(".h") and not f.startswith(".")):
             path = os.path.join(directory, name)
             with open(path, encoding=ENCODING, errors="replace") as handle:
-                yield os.path.relpath(path, ROOT), handle.read()
+                yield os.path.relpath(path, ROOT).replace(os.sep, "/"), handle.read()
 
 
 def swift_sources():
@@ -366,7 +366,7 @@ def swift_sources():
         for name in sorted(f for f in files if f.endswith(".swift") and not f.startswith(".")):
             path = os.path.join(directory, name)
             with open(path, encoding=ENCODING, errors="replace") as handle:
-                yield os.path.relpath(path, ROOT), handle.read()
+                yield os.path.relpath(path, ROOT).replace(os.sep, "/"), handle.read()
 
 
 def class_headers(headers):
