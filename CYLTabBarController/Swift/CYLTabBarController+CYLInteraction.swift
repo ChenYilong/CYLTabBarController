@@ -1295,7 +1295,7 @@ extension CYLTabBarController {
             }
         }
         guard let tappedControl = control ?? selectedViewController?.cyl_tabButton else {
-            cylPrivate.cylSetNeedsApplyTabBarItemAnimationTintColors()
+            cylSetNeedsApplyTabBarItemAnimationTintColors()
             return
         }
         cylTabBarController(self, beginShowPlatterLiquidLensViewFor: tappedControl)
@@ -1328,14 +1328,14 @@ extension CYLTabBarController {
             }
             cylSendDidSelectControl(reportedControl)
         }
-        cylPrivate.cylSetNeedsApplyTabBarItemAnimationTintColors()
+        cylSetNeedsApplyTabBarItemAnimationTintColors()
         guard shouldSelectViewController, let control else {
             return
         }
         // [EN] A tap plays the tab's animated images (they rest until played). [CN] 点击播放该 Tab 的动图（播放前保持静止）。
-        cylPrivate.cylPlayAnimatedImages(ofTabButton: control)
+        cylPlayAnimatedImages(ofTabButton: control)
         if let selectedContentControl, selectedContentControl !== control {
-            cylPrivate.cylPlayAnimatedImages(ofTabButton: selectedContentControl)
+            cylPlayAnimatedImages(ofTabButton: selectedContentControl)
         }
     }
 }
