@@ -42,7 +42,14 @@ function cylTextStyle(attributes) {
   }
   const color = reader.cylColor(attributes.NSForegroundColorAttributeName || attributes.foregroundColor || attributes.color);
   const font = reader.cylFont(attributes.NSFontAttributeName !== undefined ? attributes.NSFontAttributeName : attributes.font);
-  return `${color ? `color: ${color};` : ''}${font}`;
+  return `${cylDeclaration('color', color)}${font}`;
+}
+
+/**
+ * [EN] One CSS declaration, "name: value;", or '' without a value. [CN] 一条 CSS 声明「name: value;」，没有值时为 ''。
+ */
+function cylDeclaration(name, value) {
+  return value ? `${name}: ${value};` : '';
 }
 
 /**
@@ -78,6 +85,51 @@ function cylAppearanceState(appearance, selected) {
 }
 
 /**
+ * [EN] The text attributes of a state, falling back to the normal state's when selected; null without any.
+ * [CN] 某个状态的文本属性，选中时回退到普通状态的属性；都没有时为 null。
+ */
+function cylStateAttributes(attributes, stateKey, selected) {
+  return attributes?.[stateKey] || (selected && attributes?.normal) || null;
+}
+
+/**
+ * [EN] The animation's one color (the `tint` option): "title" takes this state's title color (the appearance's, then
+ *      the title attributes'), like iOS and HarmonyOS; a color is used as it is; '' keeps the file's colors.
+ * [CN] 动画的单一颜色（`tint` 选项）："title" 取当前状态的标题颜色（先取 appearance，再取标题属性），与 iOS 和鸿蒙一致；
+ *      颜色原样使用；'' 保持文件自身的颜色。
+ */
+function cylAnimationTint(animationTint, appearance, titleAttributes) {
+  const tintOption = String(animationTint || '').trim();
+  return tintOption.toLowerCase() === 'title'
+    ? (cylTextColor(appearance.titleTextAttributes) || cylTextColor(titleAttributes))
+    : reader.cylColor(tintOption);
+}
+
+/**
+ * [EN] The title's style: its offset, then the title attributes and the appearance's. [CN] 标题样式：偏移，然后是标题属性与 appearance 的属性。
+ */
+function cylTitleStyle(offset, titleAttributes, appearance) {
+  return (offset.horizontal || offset.vertical
+    ? `transform: translate(${offset.horizontal}px, ${offset.vertical}px);` : '')
+    + cylTextStyle(titleAttributes) + cylTextStyle(appearance.titleTextAttributes);
+}
+
+/**
+ * [EN] The badge's style: content insets, offset (by margins: the badge animations use transform), size, color and
+ *      text attributes. [CN] 角标样式：内容边距、偏移（用外边距：角标动画使用 transform）、尺寸、颜色与文本属性。
+ */
+function cylBadgeStyle(p, appearance, badge) {
+  const { inset, offset, size, attributes } = badge;
+  return `padding: ${inset.top}px ${inset.right}px ${inset.bottom}px ${inset.left}px;`
+    + (offset.horizontal || offset.vertical
+      ? ` margin-left: ${offset.horizontal}px; margin-top: ${offset.vertical}px;` : '')
+    + (size ? ` width: ${size.width}px; height: ${size.height}px; min-width: 0; padding: 0;` : '')
+    + (reader.cylColor(appearance.badgeBackgroundColor || p.badgeColor)
+      ? ` background-color: ${reader.cylColor(appearance.badgeBackgroundColor || p.badgeColor)};` : '')
+    + cylTextStyle(attributes) + cylTextStyle(appearance.badgeTextAttributes);
+}
+
+/**
  * [EN] The render model from the component's properties.
  * [CN] 根据组件属性生成渲染模型。
  */
@@ -102,18 +154,9 @@ function cylItemModel(p) {
   const imageMoveX = imageOffset.horizontal + (imageInsets.left - imageInsets.right) / 2;
   const imageMoveY = imageOffset.vertical + (imageInsets.top - imageInsets.bottom) / 2;
   const iconTint = reader.cylColor(appearance.iconColor) || reader.cylColor(selected ? p.selectedIconTint : p.iconTint);
-  const titleAttributes = p.titleTextAttributes?.[stateKey]
-    || (selected && p.titleTextAttributes?.normal) || null;
-  // [EN] The animation's one color (the `tint` option): "title" takes this state's title color (the appearance's, then
-  //      the title attributes'), like iOS and HarmonyOS; a color is used as it is; '' keeps the file's colors.
-  // [CN] 动画的单一颜色（`tint` 选项）："title" 取当前状态的标题颜色（先取 appearance，再取标题属性），与 iOS 和鸿蒙一致；
-  //      颜色原样使用；'' 保持文件自身的颜色。
-  const tintOption = String(p.animationTint || '').trim();
-  const animationTint = tintOption.toLowerCase() === 'title'
-    ? (cylTextColor(appearance.titleTextAttributes) || cylTextColor(titleAttributes))
-    : reader.cylColor(tintOption);
-  const badgeAttributes = p.badgeTextAttributes?.[stateKey]
-    || (selected && p.badgeTextAttributes?.normal) || null;
+  const titleAttributes = cylStateAttributes(p.titleTextAttributes, stateKey, selected);
+  const animationTint = cylAnimationTint(p.animationTint, appearance, titleAttributes);
+  const badgeAttributes = cylStateAttributes(p.badgeTextAttributes, stateKey, selected);
   const badgeValue = String(p.badgeValue === undefined || p.badgeValue === null ? '' : p.badgeValue);
   const showsBadge = badgeValue !== '' || Boolean(badgeSize);
   const background = reader.cylColor(selected ? p.selectedBackgroundColor : p.backgroundColor);
@@ -131,25 +174,16 @@ function cylItemModel(p) {
     iconWidth: iconBox.width,
     iconHeight: iconBox.height,
     centered,
-    itemStyle: `${background ? `background-color: ${background};` : ''}${p.enabled === false ? 'opacity: 0.4;' : ''}`,
+    itemStyle: `${cylDeclaration('background-color', background)}${p.enabled === false ? 'opacity: 0.4;' : ''}`,
     iconBoxStyle: `width: ${iconBox.width}px; height: ${iconBox.height}px;`
       + (imageMoveX || imageMoveY ? ` transform: translate(${imageMoveX}px, ${imageMoveY}px);` : ''),
-    titleStyle: (titleOffset.horizontal || titleOffset.vertical
-      ? `transform: translate(${titleOffset.horizontal}px, ${titleOffset.vertical}px);` : '')
-      + cylTextStyle(titleAttributes) + cylTextStyle(appearance.titleTextAttributes),
+    titleStyle: cylTitleStyle(titleOffset, titleAttributes, appearance),
     showsBadge,
     badgeIsDot: badgeValue === '•' || (badgeValue === '' && Boolean(badgeSize)),
     badgeText: badgeValue === '•' ? '' : badgeValue,
     badgeClass: /^(breathe|scale|shake|bounce|scaleOnce)$/.test(String(p.badgeAnimation || ''))
       ? cylBadgeAnimationClass(p.badgeAnimation) : '',
-    badgeStyle: `padding: ${badgeInset.top}px ${badgeInset.right}px ${badgeInset.bottom}px ${badgeInset.left}px;`
-      // [EN] Moved by margins: the badge animations use transform. [CN] 用外边距移动：角标动画使用 transform。
-      + (badgeOffset.horizontal || badgeOffset.vertical
-        ? ` margin-left: ${badgeOffset.horizontal}px; margin-top: ${badgeOffset.vertical}px;` : '')
-      + (badgeSize ? ` width: ${badgeSize.width}px; height: ${badgeSize.height}px; min-width: 0; padding: 0;` : '')
-      + (reader.cylColor(appearance.badgeBackgroundColor || p.badgeColor)
-        ? ` background-color: ${reader.cylColor(appearance.badgeBackgroundColor || p.badgeColor)};` : '')
-      + cylTextStyle(badgeAttributes) + cylTextStyle(appearance.badgeTextAttributes),
+    badgeStyle: cylBadgeStyle(p, appearance, { inset: badgeInset, offset: badgeOffset, size: badgeSize, attributes: badgeAttributes }),
     accessibilityLabel: String(p.label || title || '') + (badgeValue && badgeValue !== '•' ? `, ${badgeValue}` : ''),
   };
 }

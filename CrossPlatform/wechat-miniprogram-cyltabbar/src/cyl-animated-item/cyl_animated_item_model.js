@@ -96,26 +96,85 @@ function cylAnimatedItemIsDark(p) {
   return p.systemTheme === 'dark'
 }
 
+/** [EN] A positive size, or `fallback`. [CN] 正数尺寸，否则为 `fallback`。 */
+function cylAnimatedItemDimension(value, fallback) {
+  return Number(value) > 0 ? Number(value) : fallback
+}
+
+/**
+ * [EN] Font weight: 'normal', 'bold', 'bolder', 'lighter' or 100–900; anything else keeps the default ('').
+ * [CN] 字重：'normal'、'bold'、'bolder'、'lighter' 或 100–900；其他值保持默认（''）。
+ */
+function cylAnimatedItemFontWeight(weight) {
+  const text = weight === null || weight === undefined ? '' : String(weight).trim()
+  return /^(normal|bold|bolder|lighter|[1-9]00)$/.test(text) ? text : ''
+}
+
+/**
+ * [EN] The gap between the icon and the title (margin-top when vertical, margin-left when horizontal); -1 keeps the
+ *      default (2 px / 4 px). [CN] 图标与标题的间距（纵向为 margin-top，横向为 margin-left）；-1 为默认（2 px / 4 px）。
+ */
+function cylAnimatedItemSpacingStyle(p) {
+  if (Number(p.titleSpacing) >= 0 && p.titleSpacing !== null && p.titleSpacing !== undefined && p.titleSpacing !== '') {
+    const property = p.axis === 'vertical' ? 'margin-top' : 'margin-left'
+    return `${property}: ${Number(p.titleSpacing)}px;`
+  }
+  return ''
+}
+
+/** [EN] The title's inline style. [CN] 标题的行内样式。 */
+function cylAnimatedItemTitleStyle(p, titleColor, titleLines) {
+  const titleFontWeight = cylAnimatedItemFontWeight(p.titleFontWeight)
+  return (titleColor ? `color: ${titleColor};` : '') +
+    (titleFontWeight ? `font-weight: ${titleFontWeight};` : '') +
+    (Number(p.titleFontSize) > 0 ? `font-size: ${Number(p.titleFontSize)}px;` : '') +
+    (titleLines > 1 ? `-webkit-line-clamp: ${titleLines};` : '') +
+    (Number(p.titleLineHeight) > 0 ? `line-height: ${Number(p.titleLineHeight)}px;` : '') +
+    cylAnimatedItemSpacingStyle(p)
+}
+
+/** [EN] The title's line class: none for one line, wrapping for no limit, clamped for n > 1. [CN] 标题行数的类名：单行无类名，不限行数时换行，n > 1 时截断。 */
+function cylAnimatedItemTitleLinesClass(titleLines) {
+  if (titleLines === 1) {
+    return ''
+  }
+  return titleLines > 1 ? 'cyl-animated-item-title-wrap cyl-animated-item-title-clamp' : 'cyl-animated-item-title-wrap'
+}
+
+/**
+ * [EN] The animation type: 'lottie' for inline data; `animationType` names the type when the file name cannot (a URL
+ *      without an extension). [CN] 动画类型：内联数据为 'lottie'；文件名无法表明类型时（无扩展名的 URL），由 `animationType` 指定。
+ */
+function cylAnimatedItemResolvedType(p, animationPath, hasAnimationData) {
+  const givenType = String(p.animationType || '').toLowerCase()
+  const namedType = CYL_ANIMATED_ITEM_TYPES.some((item) => item.type === givenType) ? givenType : ''
+  return hasAnimationData ? 'lottie' : namedType || cylAnimatedItemType(animationPath)
+}
+
+/**
+ * [EN] The static image (the selected one when selected); the placeholder while a source has no animation showing.
+ * [CN] 静态图片（选中时为选中图片）；有动画源但动画未显示时为占位图。
+ */
+function cylAnimatedItemFallbackImage(p, hasSource, animationShows) {
+  const staticImage = (p.selected && p.selectedImage) || p.image || ''
+  if (staticImage || !hasSource || animationShows) {
+    return staticImage
+  }
+  return p.placeholderImage === undefined || p.placeholderImage === null ? CYL_ANIMATED_ITEM_PLACEHOLDER : p.placeholderImage
+}
+
 function cylAnimatedItemModel(p) {
   const animationPath = p.animationUrl || ''
   const hasAnimationData = !!p.animationData && typeof p.animationData === 'object'
-  // [EN] `animationType` names the type when the file name cannot (a URL without an extension). [CN] 文件名无法表明类型时（无扩展名的 URL），由 `animationType` 指定。
-  const givenType = String(p.animationType || '').toLowerCase()
-  const namedType = CYL_ANIMATED_ITEM_TYPES.some((item) => item.type === givenType) ? givenType : ''
-  const animationType = hasAnimationData ? 'lottie' : namedType || cylAnimatedItemType(animationPath)
+  const animationType = cylAnimatedItemResolvedType(p, animationPath, hasAnimationData)
   const hasSource = !!animationPath || hasAnimationData
   const usesEngine = hasSource && !!animationType && animationType !== 'gif' && !p.animationFailed
   const gifShows = animationType === 'gif' && !p.animationFailed
   const animationShows = gifShows || (usesEngine && !!p.animationLoaded)
-  const staticImage = (p.selected && p.selectedImage) || p.image || ''
-  const placeholder = p.placeholderImage === undefined || p.placeholderImage === null ? CYL_ANIMATED_ITEM_PLACEHOLDER : p.placeholderImage
-  let fallbackImage = staticImage
-  if (!fallbackImage && hasSource && !animationShows) {
-    fallbackImage = placeholder
-  }
-  const iconSize = Number(p.iconSize) > 0 ? Number(p.iconSize) : 24
-  const iconWidth = Number(p.iconWidth) > 0 ? Number(p.iconWidth) : iconSize
-  const iconHeight = Number(p.iconHeight) > 0 ? Number(p.iconHeight) : iconSize
+  const fallbackImage = cylAnimatedItemFallbackImage(p, hasSource, animationShows)
+  const iconSize = cylAnimatedItemDimension(p.iconSize, 24)
+  const iconWidth = cylAnimatedItemDimension(p.iconWidth, iconSize)
+  const iconHeight = cylAnimatedItemDimension(p.iconHeight, iconSize)
   const title = p.title || ''
   const label = p.accessibilityLabel || title
   // [EN] Title look: color, font size (px) and line count (1: one line with an ellipsis, the default; 0: no limit;
@@ -126,20 +185,8 @@ function cylAnimatedItemModel(p) {
   //      未设置且系统主题为深色）以 `titleDarkColor` 代替 `titleColor`。
   const dark = cylAnimatedItemIsDark(p)
   const titleColor = dark && p.titleDarkColor ? p.titleDarkColor : p.titleColor
-  // [EN] Font weight: 'normal', 'bold', 'bolder', 'lighter' or 100–900; anything else keeps the default.
-  // [CN] 字重：'normal'、'bold'、'bolder'、'lighter' 或 100–900；其他值保持默认。
-  const titleFontWeight = /^(normal|bold|bolder|lighter|[1-9]00)$/.test(String(p.titleFontWeight == null ? '' : p.titleFontWeight).trim())
-    ? String(p.titleFontWeight).trim() : ''
-  const titleStyle = (titleColor ? `color: ${titleColor};` : '') +
-    (titleFontWeight ? `font-weight: ${titleFontWeight};` : '') +
-    (Number(p.titleFontSize) > 0 ? `font-size: ${Number(p.titleFontSize)}px;` : '') +
-    (titleLines > 1 ? `-webkit-line-clamp: ${titleLines};` : '') +
-    (Number(p.titleLineHeight) > 0 ? `line-height: ${Number(p.titleLineHeight)}px;` : '') +
-    // [EN] The gap between the icon and the title (margin-top when vertical, margin-left when horizontal); -1 keeps the
-    //      default (2 px / 4 px). [CN] 图标与标题的间距（纵向为 margin-top，横向为 margin-left）；-1 为默认（2 px / 4 px）。
-    (Number(p.titleSpacing) >= 0 && p.titleSpacing !== null && p.titleSpacing !== undefined && p.titleSpacing !== ''
-      ? `${p.axis === 'vertical' ? 'margin-top' : 'margin-left'}: ${Number(p.titleSpacing)}px;` : '')
-  const titleLinesClass = titleLines === 1 ? '' : (titleLines > 1 ? 'cyl-animated-item-title-wrap cyl-animated-item-title-clamp' : 'cyl-animated-item-title-wrap')
+  const titleStyle = cylAnimatedItemTitleStyle(p, titleColor, titleLines)
+  const titleLinesClass = cylAnimatedItemTitleLinesClass(titleLines)
   return {
     title,
     titleStyle,

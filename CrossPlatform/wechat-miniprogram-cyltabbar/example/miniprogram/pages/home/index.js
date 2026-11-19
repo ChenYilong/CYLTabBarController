@@ -69,6 +69,19 @@ function cylFill(text, values) {
   return text.replace(/\{(\w+)\}/g, (match, name) => (values[name] !== undefined ? String(values[name]) : '—'));
 }
 
+/** [EN] A tab bar slot's title, '-' without one. [CN] TabBar 槽位的标题，没有时为 '-'。 */
+function cylSlotTitle(slot) {
+  return (slot.item ? slot.item.title : slot.title) || '-';
+}
+
+/** [EN] A row's accessory: a check mark for the switches in `on`, else the list's own. [CN] 行的附件：`on` 中的开关显示勾选状态，否则使用列表自身的。 */
+function cylRowAccessory(row, on) {
+  if (!(row.id in on)) {
+    return row.accessory;
+  }
+  return on[row.id] ? 'check' : 'none';
+}
+
 Component({
   behaviors: [cylTabPage],
   data: { sections: [], nav: { top: 20, height: 44, right: 100, menuHeight: 400, dots: [] }, navigationTitle: '', skinMenu: null },
@@ -125,7 +138,7 @@ Component({
         tapSound: this.t(CYL_SOUND_STEPS[state.overrides?.cylDemoSoundStep || 0].name),
         indexWithoutPlus: tabIndex < 0 ? '-' : tabIndex,
         selectedIndex: selectedIndex < 0 ? '-' : selectedIndex,
-        selectedTitle: selectedIndex < 0 ? '-' : (slots[selectedIndex].item ? slots[selectedIndex].item.title : slots[selectedIndex].title) || '-',
+        selectedTitle: selectedIndex < 0 ? '-' : cylSlotTitle(slots[selectedIndex]),
       };
     },
 
@@ -259,7 +272,7 @@ Component({
         id: row.id,
         title: cylFill(cylListText(row.title), values),
         subtitle: flatOnly && !unsupported ? '' : cylFill(cylListText(row.subtitle), values),
-        accessory: row.id in on ? (on[row.id] ? 'check' : 'none') : row.accessory,
+        accessory: cylRowAccessory(row, on),
         checked: this.cyl_isOn(row.id, state),
         dimmed: unsupported,
         // [EN] Item 30: the slider of touchableAreaScale (1 to 3). [CN] 第 30 项：touchableAreaScale 滑块（1 到 3）。

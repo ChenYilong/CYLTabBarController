@@ -280,7 +280,8 @@ function cylDemoGIFItems(items, files) {
 function cylLetterIcon(letter, filled) {
   const circle = filled ? '<circle cx="12" cy="12" r="11" fill="#000"/>' : '<circle cx="12" cy="12" r="10" fill="none" stroke="#000" stroke-width="1.8"/>';
   const text = `<text x="12" y="16.5" font-family="-apple-system, Helvetica, Arial" font-size="13" font-weight="600" text-anchor="middle" fill="${filled ? '#fff' : '#000'}">${letter.toLowerCase()}</text>`;
-  return `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">${circle}${text}</svg>`)}`;
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">${circle}${text}</svg>`;
+  return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
 }
 
 function cylReplacedItems(items, replaced) {

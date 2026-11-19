@@ -19,115 +19,110 @@ function cylRGBA(color) {
 }
 
 /**
+ * [EN] The handlers of the path commands (upper case), on the parser state `p` with the origin (ox, oy) of a relative
+ *      command. [CN] 路径命令（大写）的处理函数，作用于解析状态 `p`，(ox, oy) 为相对命令的原点。
+ */
+const CYL_PATH_COMMANDS = {
+  M(p, ox, oy, relative) {
+    p.x = ox + p.number()
+    p.y = oy + p.number()
+    p.startX = p.x
+    p.startY = p.y
+    p.commands.push(['M', p.x, p.y])
+    // [EN] More pairs after M are line-tos. [CN] M 之后的更多坐标对是 lineTo。
+    p.command = relative ? 'l' : 'L'
+    p.lastType = 'M'
+  },
+  L(p, ox, oy) {
+    p.x = ox + p.number()
+    p.y = oy + p.number()
+    p.commands.push(['L', p.x, p.y])
+    p.lastType = 'L'
+  },
+  H(p, ox) {
+    p.x = ox + p.number()
+    p.commands.push(['L', p.x, p.y])
+    p.lastType = 'L'
+  },
+  V(p, ox, oy) {
+    p.y = oy + p.number()
+    p.commands.push(['L', p.x, p.y])
+    p.lastType = 'L'
+  },
+  C(p, ox, oy) {
+    const x1 = ox + p.number(); const y1 = oy + p.number()
+    const x2 = ox + p.number(); const y2 = oy + p.number()
+    p.x = ox + p.number(); p.y = oy + p.number()
+    p.commands.push(['C', x1, y1, x2, y2, p.x, p.y])
+    p.lastControlX = x2; p.lastControlY = y2; p.lastType = 'C'
+  },
+  S(p, ox, oy) {
+    const x1 = p.lastType === 'C' ? 2 * p.x - p.lastControlX : p.x
+    const y1 = p.lastType === 'C' ? 2 * p.y - p.lastControlY : p.y
+    const x2 = ox + p.number(); const y2 = oy + p.number()
+    p.x = ox + p.number(); p.y = oy + p.number()
+    p.commands.push(['C', x1, y1, x2, y2, p.x, p.y])
+    p.lastControlX = x2; p.lastControlY = y2; p.lastType = 'C'
+  },
+  Q(p, ox, oy) {
+    const x1 = ox + p.number(); const y1 = oy + p.number()
+    p.x = ox + p.number(); p.y = oy + p.number()
+    p.commands.push(['Q', x1, y1, p.x, p.y])
+    p.lastControlX = x1; p.lastControlY = y1; p.lastType = 'Q'
+  },
+  T(p, ox, oy) {
+    const x1 = p.lastType === 'Q' ? 2 * p.x - p.lastControlX : p.x
+    const y1 = p.lastType === 'Q' ? 2 * p.y - p.lastControlY : p.y
+    p.x = ox + p.number(); p.y = oy + p.number()
+    p.commands.push(['Q', x1, y1, p.x, p.y])
+    p.lastControlX = x1; p.lastControlY = y1; p.lastType = 'Q'
+  },
+  A(p, ox, oy) {
+    p.index += 5
+    p.x = ox + p.number()
+    p.y = oy + p.number()
+    p.commands.push(['L', p.x, p.y])
+    p.lastType = 'L'
+  },
+  Z(p) {
+    p.commands.push(['Z'])
+    p.x = p.startX
+    p.y = p.startY
+    p.lastType = 'Z'
+    // [EN] Z takes no numbers; a number after it starts an implicit command, which SVG does not allow.
+    // [CN] Z 不带数字；其后的数字不合法，跳过。
+    while (p.hasNumber()) {
+      p.index++
+    }
+  },
+}
+
+/**
  * [EN] Parses an SVG path ("M0 0 L10 10 C … Z") into absolute commands: M, L, C, Q, Z (H, V, S, T, A and the relative
  *      forms are converted; an arc becomes a straight line to its end point).
  * [CN] 把 SVG 路径（"M0 0 L10 10 C … Z"）解析为绝对命令：M、L、C、Q、Z（H、V、S、T、A 与相对形式会被转换；圆弧变为到终点的直线）。
  */
 function cylParsePath(d) {
   const tokens = String(d || '').match(/[a-zA-Z]|-?(?:\d+\.?\d*|\.\d+)(?:e[-+]?\d+)?/g) || []
-  const commands = []
-  let index = 0
-  let command = ''
-  let x = 0
-  let y = 0
-  let startX = 0
-  let startY = 0
-  let lastControlX = 0
-  let lastControlY = 0
-  let lastType = ''
-  const number = () => Number.parseFloat(tokens[index++])
-  const hasNumber = () => index < tokens.length && !/[a-zA-Z]/.test(tokens[index])
-  while (index < tokens.length) {
-    if (/[a-zA-Z]/.test(tokens[index])) {
-      command = tokens[index++]
+  const p = {
+    commands: [], index: 0, command: '', x: 0, y: 0, startX: 0, startY: 0, lastControlX: 0, lastControlY: 0, lastType: '',
+  }
+  p.number = () => Number.parseFloat(tokens[p.index++])
+  p.hasNumber = () => p.index < tokens.length && !/[a-zA-Z]/.test(tokens[p.index])
+  while (p.index < tokens.length) {
+    if (/[a-zA-Z]/.test(tokens[p.index])) {
+      p.command = tokens[p.index++]
     }
-    const relative = command === command.toLowerCase()
-    const ox = relative ? x : 0
-    const oy = relative ? y : 0
-    switch (command.toUpperCase()) {
-      case 'M': {
-        x = ox + number()
-        y = oy + number()
-        startX = x
-        startY = y
-        commands.push(['M', x, y])
-        // [EN] More pairs after M are line-tos. [CN] M 之后的更多坐标对是 lineTo。
-        command = relative ? 'l' : 'L'
-        lastType = 'M'
-        break
-      }
-      case 'L':
-        x = ox + number()
-        y = oy + number()
-        commands.push(['L', x, y])
-        lastType = 'L'
-        break
-      case 'H':
-        x = ox + number()
-        commands.push(['L', x, y])
-        lastType = 'L'
-        break
-      case 'V':
-        y = oy + number()
-        commands.push(['L', x, y])
-        lastType = 'L'
-        break
-      case 'C': {
-        const x1 = ox + number(); const y1 = oy + number()
-        const x2 = ox + number(); const y2 = oy + number()
-        x = ox + number(); y = oy + number()
-        commands.push(['C', x1, y1, x2, y2, x, y])
-        lastControlX = x2; lastControlY = y2; lastType = 'C'
-        break
-      }
-      case 'S': {
-        const x1 = lastType === 'C' ? 2 * x - lastControlX : x
-        const y1 = lastType === 'C' ? 2 * y - lastControlY : y
-        const x2 = ox + number(); const y2 = oy + number()
-        x = ox + number(); y = oy + number()
-        commands.push(['C', x1, y1, x2, y2, x, y])
-        lastControlX = x2; lastControlY = y2; lastType = 'C'
-        break
-      }
-      case 'Q': {
-        const x1 = ox + number(); const y1 = oy + number()
-        x = ox + number(); y = oy + number()
-        commands.push(['Q', x1, y1, x, y])
-        lastControlX = x1; lastControlY = y1; lastType = 'Q'
-        break
-      }
-      case 'T': {
-        const x1 = lastType === 'Q' ? 2 * x - lastControlX : x
-        const y1 = lastType === 'Q' ? 2 * y - lastControlY : y
-        x = ox + number(); y = oy + number()
-        commands.push(['Q', x1, y1, x, y])
-        lastControlX = x1; lastControlY = y1; lastType = 'Q'
-        break
-      }
-      case 'A': {
-        index += 5
-        x = ox + number()
-        y = oy + number()
-        commands.push(['L', x, y])
-        lastType = 'L'
-        break
-      }
-      case 'Z':
-        commands.push(['Z'])
-        x = startX
-        y = startY
-        lastType = 'Z'
-        // [EN] Z takes no numbers; a number after it starts an implicit command, which SVG does not allow.
-        // [CN] Z 不带数字；其后的数字不合法，跳过。
-        while (hasNumber()) {
-          index++
-        }
-        break
-      default:
-        index++
+    const relative = p.command === p.command.toLowerCase()
+    const handler = Object.prototype.hasOwnProperty.call(CYL_PATH_COMMANDS, p.command.toUpperCase())
+      ? CYL_PATH_COMMANDS[p.command.toUpperCase()] : null
+    if (handler) {
+      handler(p, relative ? p.x : 0, relative ? p.y : 0, relative)
+    } else {
+      p.index++
     }
   }
-  return commands
+  return p.commands
 }
 
 const cylPathCache = {}
@@ -183,6 +178,23 @@ function cylTraceShape(context, shape) {
   return false
 }
 
+/** [EN] Strokes the traced shape with its style. [CN] 按样式描边已绘制路径的形状。 */
+function cylStrokeShape(context, style) {
+  context.strokeStyle = cylRGBA(style.stroke)
+  context.lineWidth = style.strokeWidth
+  context.lineCap = CYL_LINE_CAPS[style.lineCap] || 'butt'
+  context.lineJoin = CYL_LINE_JOINS[style.lineJoin] || 'miter'
+  if (style.miterLimit > 0) {
+    context.miterLimit = style.miterLimit
+  }
+  if (typeof context.setLineDash === 'function') {
+    const dash = style.lineDash[0] > 0 || style.lineDash[1] > 0 ? [style.lineDash[0], style.lineDash[1]] : []
+    context.setLineDash(dash)
+    context.lineDashOffset = style.lineDash[2] || 0
+  }
+  context.stroke()
+}
+
 function cylDrawShape(context, shape) {
   context.save()
   const t = shape.transform
@@ -196,19 +208,7 @@ function cylDrawShape(context, shape) {
       context.fill()
     }
     if (style.stroke && style.stroke.a > 0 && style.strokeWidth > 0) {
-      context.strokeStyle = cylRGBA(style.stroke)
-      context.lineWidth = style.strokeWidth
-      context.lineCap = CYL_LINE_CAPS[style.lineCap] || 'butt'
-      context.lineJoin = CYL_LINE_JOINS[style.lineJoin] || 'miter'
-      if (style.miterLimit > 0) {
-        context.miterLimit = style.miterLimit
-      }
-      if (typeof context.setLineDash === 'function') {
-        const dash = style.lineDash[0] > 0 || style.lineDash[1] > 0 ? [style.lineDash[0], style.lineDash[1]] : []
-        context.setLineDash(dash)
-        context.lineDashOffset = style.lineDash[2] || 0
-      }
-      context.stroke()
+      cylStrokeShape(context, style)
     }
   }
   context.restore()

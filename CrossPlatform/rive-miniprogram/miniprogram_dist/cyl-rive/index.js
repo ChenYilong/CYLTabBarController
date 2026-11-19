@@ -126,6 +126,38 @@ function cylRivePoseFirstFrame(state) {
   artboard.advance(0)
 }
 
+/**
+ * [EN] The state machine to run: none when a named animation wins over the state machines (button.riv has both: its
+ *      "active" animation is what plays), else the named one or the first.
+ * [CN] 要运行的状态机：指定的动画优先于状态机时没有（button.riv 两者都有：播放的是其 "active" 动画），否则为指定的或第一个。
+ */
+function cylRiveMachine(artboard, options, namedAnimation) {
+  if (namedAnimation) {
+    return null
+  }
+  if (options.stateMachine) {
+    return artboard.stateMachineByName(options.stateMachine)
+  }
+  return artboard.stateMachineCount() > 0 ? artboard.stateMachineByIndex(0) : null
+}
+
+/**
+ * [EN] The instance that plays the artboard: a state machine instance, or a linear animation instance, or null.
+ * [CN] 播放画板的实例：状态机实例、线性动画实例，或 null。
+ */
+function cylRiveInstance(rive, artboard, options) {
+  const namedAnimation = options.animation && !options.stateMachine ? artboard.animationByName(options.animation) : null
+  const machine = cylRiveMachine(artboard, options, namedAnimation)
+  if (machine) {
+    return { machine, instance: new rive.StateMachineInstance(machine, artboard), isStateMachine: true }
+  }
+  if (artboard.animationCount() > 0) {
+    const animation = options.animation ? artboard.animationByName(options.animation) : artboard.animationByIndex(0)
+    return { machine, instance: new rive.LinearAnimationInstance(animation, artboard), isStateMachine: false }
+  }
+  return { machine, instance: null, isStateMachine: false }
+}
+
 Component({
   properties: {
     /** [EN] A .riv file (or a .riv.bin package copy), with optional options in its fragment. [CN] .riv 文件（或包内的 .riv.bin 副本），fragment 中可带选项。 */
@@ -310,21 +342,7 @@ Component({
         this.cyl_reportError( { message: `cyl-rive: no artboard '${options.artboard || 'default'}'.` })
         return
       }
-      let instance = null
-      let isStateMachine = false
-      // [EN] A named animation wins over the state machines (button.riv has both: its "active" animation is what plays).
-      // [CN] 指定的动画优先于状态机（button.riv 两者都有：播放的是其 "active" 动画）。
-      const namedAnimation = options.animation && !options.stateMachine ? artboard.animationByName(options.animation) : null
-      const machine = namedAnimation ? null : (options.stateMachine
-        ? artboard.stateMachineByName(options.stateMachine)
-        : (artboard.stateMachineCount() > 0 ? artboard.stateMachineByIndex(0) : null))
-      if (machine) {
-        instance = new rive.StateMachineInstance(machine, artboard)
-        isStateMachine = true
-      } else if (artboard.animationCount() > 0) {
-        const animation = options.animation ? artboard.animationByName(options.animation) : artboard.animationByIndex(0)
-        instance = new rive.LinearAnimationInstance(animation, artboard)
-      }
+      const { machine, instance, isStateMachine } = cylRiveInstance(rive, artboard, options)
       // [EN] Rests on its first frame until it is played (docs/Animated-Item.md): a file whose state machine moves by itself
       //      (shapes.riv, truck.riv) no longer runs from load. A play, a loop pass or cyl_play() starts it.
       // [CN] 在被播放之前停在第一帧：状态机会自行运动的文件（shapes.riv、truck.riv）不再从加载起就运动。播放、循环或 cyl_play() 才开始。
@@ -510,23 +528,11 @@ Component({
       const { options } = state
       clearTimeout(state.inputTimer)
       clearTimeout(state.loopTimer)
-      const triggerInput = options.triggerInput && this.cyl_input(options.triggerInput)
-      const viewModelTrigger = options.trigger && state.viewModelInstance ? state.viewModelInstance.trigger(options.trigger) : null
-      const boolInput = options.input && this.cyl_input(options.input)
-      const activeName = options.active || (state.viewModelInstance && !boolInput ? 'active' : '')
-      const activeProperty = activeName && state.viewModelInstance ? state.viewModelInstance.boolean(activeName) : null
-      const numberInput = options.numberInput && this.cyl_input(options.numberInput)
-      const numberProperty = options.number && state.viewModelInstance ? state.viewModelInstance.number(options.number) : null
-      const kind = cylRivePlayKind({ hasTriggerInput: !!triggerInput, hasViewModelTrigger: !!viewModelTrigger,
+      const inputs = this.cyl_playInputs(state)
+      const { boolInput, activeProperty, numberInput, numberProperty } = inputs
+      const kind = cylRivePlayKind({ hasTriggerInput: !!inputs.triggerInput, hasViewModelTrigger: !!inputs.viewModelTrigger,
         hasNumber: !!(numberInput || numberProperty), hasBoolInput: !!(boolInput || activeProperty) })
       const speed = this.cyl_speed()
-      const setActive = (value) => {
-        if (boolInput) {
-          boolInput.asBool().value = value
-        } else if (activeProperty) {
-          activeProperty.value = value
-        }
-      }
       if (kind === 'trigger') {
         // [EN] A trigger does nothing once its state machine has reached the end (check.riv stayed on its finished check):
         //      restart it, then fire on the new instance a frame later.
@@ -539,69 +545,111 @@ Component({
           }
         }, 50)
       } else if (kind === 'viewModelTrigger') {
-        viewModelTrigger.trigger()
+        inputs.viewModelTrigger.trigger()
       } else if (kind === 'number') {
         // [EN] The next value (house.riv moves only when `Rooms` changes). [CN] 下一个值（house.riv 只在 `Rooms` 变化时运动）。
         const target = numberInput ? numberInput.asNumber() : numberProperty
         target.value = cylRiveNextNumber(cylRiveNumberValues(options.values), target.value)
       } else if (kind === 'input') {
-        // [EN] A play always changes the value. An input already on (held, duration 0) goes off first, and the state
-        //      machine needs real time with frames drawn in the off state: off and on in the same tick (advance(0))
-        //      never ran the close transition, so the mini program's menu_button stayed open (isOpen read true at
-        //      every 250 ms sample in DevTools). On a later frame (50 ms, as iOS and Android), or half a loop pass
-        //      while looping a held input, so it opens and closes in turn.
-        // [CN] 每次播放都会改变取值。已经为 true 的输入（保持、duration 为 0）先设为 false，状态机需要在 false 状态下经过真实时间并绘制帧：
-        //      同一个 tick 内先关后开（advance(0)）不会运行关闭过渡，小程序的 menu_button 一直停在打开状态（DevTools 中每 250 ms 读取
-        //      isOpen 都是 true）。在之后的帧（50 ms，与 iOS、Android 一致）再打开；循环保持的输入时等半个循环周期，使其交替打开与关闭。
-        const turnOn = () => {
-          setActive(true)
-          if (seconds > 0 && state.instance && typeof state.instance.advance === 'function') {
-            // [EN] Catch up with the playback the previous tab bar started. [CN] 追上前一个 TabBar 已开始的播放。
-            state.instance.advance(Math.min(seconds, 2))
-          }
-          if (options.duration > 0) {
-            state.inputTimer = setTimeout(() => {
-              setActive(false)
-              this.triggerEvent('complete', {})
-            }, Math.max(0, options.duration - seconds) * 1000 / speed)
-          }
-        }
-        const isOn = boolInput ? boolInput.asBool().value === true : !!activeProperty?.value
-        if (isOn) {
-          setActive(false)
-          const offMs = this.data.loop && !(options.duration > 0)
-            ? cylRiveLoopDelay({ kind, duration: options.duration, animationSeconds: state.animationSeconds, speed }) / 2
-            : CYL_RIVE_NEXT_FRAME_MS
-          state.inputTimer = setTimeout(() => {
-            if (this.cylState === state) {
-              turnOn()
-            }
-          }, offMs)
-        } else {
-          turnOn()
-        }
+        this.cyl_playInput(state, inputs, seconds, speed)
       } else {
         this.cyl_restart(state)
       }
+      this.cyl_scheduleLoop(state, kind, seconds, speed)
+    },
+
+    /**
+     * [EN] The inputs and view model properties the options name, for a play.
+     * [CN] 选项指定的输入与 view model 属性，用于一次播放。
+     */
+    cyl_playInputs(state) {
+      const { options } = state
+      const triggerInput = options.triggerInput && this.cyl_input(options.triggerInput)
+      const viewModelTrigger = options.trigger && state.viewModelInstance ? state.viewModelInstance.trigger(options.trigger) : null
+      const boolInput = options.input && this.cyl_input(options.input)
+      const activeName = options.active || (state.viewModelInstance && !boolInput ? 'active' : '')
+      const activeProperty = activeName && state.viewModelInstance ? state.viewModelInstance.boolean(activeName) : null
+      const numberInput = options.numberInput && this.cyl_input(options.numberInput)
+      const numberProperty = options.number && state.viewModelInstance ? state.viewModelInstance.number(options.number) : null
+      return { triggerInput, viewModelTrigger, boolInput, activeProperty, numberInput, numberProperty }
+    },
+
+    /**
+     * [EN] Plays a boolean input or view model boolean (`kind` 'input'). [CN] 播放布尔输入或 view model 布尔属性（`kind` 为 'input'）。
+     */
+    cyl_playInput(state, inputs, seconds, speed) {
+      const { options } = state
+      const { boolInput, activeProperty } = inputs
+      const kind = 'input'
+      const setActive = (value) => {
+        if (boolInput) {
+          boolInput.asBool().value = value
+        } else if (activeProperty) {
+          activeProperty.value = value
+        }
+      }
+      // [EN] A play always changes the value. An input already on (held, duration 0) goes off first, and the state
+      //      machine needs real time with frames drawn in the off state: off and on in the same tick (advance(0))
+      //      never ran the close transition, so the mini program's menu_button stayed open (isOpen read true at
+      //      every 250 ms sample in DevTools). On a later frame (50 ms, as iOS and Android), or half a loop pass
+      //      while looping a held input, so it opens and closes in turn.
+      // [CN] 每次播放都会改变取值。已经为 true 的输入（保持、duration 为 0）先设为 false，状态机需要在 false 状态下经过真实时间并绘制帧：
+      //      同一个 tick 内先关后开（advance(0)）不会运行关闭过渡，小程序的 menu_button 一直停在打开状态（DevTools 中每 250 ms 读取
+      //      isOpen 都是 true）。在之后的帧（50 ms，与 iOS、Android 一致）再打开；循环保持的输入时等半个循环周期，使其交替打开与关闭。
+      const turnOn = () => {
+        setActive(true)
+        if (seconds > 0 && state.instance && typeof state.instance.advance === 'function') {
+          // [EN] Catch up with the playback the previous tab bar started. [CN] 追上前一个 TabBar 已开始的播放。
+          state.instance.advance(Math.min(seconds, 2))
+        }
+        if (options.duration > 0) {
+          state.inputTimer = setTimeout(() => {
+            setActive(false)
+            this.triggerEvent('complete', {})
+          }, Math.max(0, options.duration - seconds) * 1000 / speed)
+        }
+      }
+      const isOn = boolInput ? boolInput.asBool().value === true : !!activeProperty?.value
+      if (isOn) {
+        setActive(false)
+        const offMs = this.data.loop && !(options.duration > 0)
+          ? cylRiveLoopDelay({ kind, duration: options.duration, animationSeconds: state.animationSeconds, speed }) / 2
+          : CYL_RIVE_NEXT_FRAME_MS
+        state.inputTimer = setTimeout(() => {
+          if (this.cylState === state) {
+            turnOn()
+          }
+        }, offMs)
+      } else {
+        turnOn()
+      }
+    },
+
+    /**
+     * [EN] Schedules the next pass while `loop` is on. [CN] `loop` 打开时安排下一次播放。
+     */
+    cyl_scheduleLoop(state, kind, seconds, speed) {
+      const { options } = state
       // [EN] Loop (docs/Animated-Item.md, the Rive loop): every kind plays again after its pass, while `loop` is on.
       // [CN] 循环（docs/Animated-Item.md，Rive 循环）：每种播放方式在一次播放后再次播放，直到关闭 `loop`。
-      if (this.data.loop) {
-        const delay = cylRiveLoopDelay({ kind, duration: options.duration, animationSeconds: state.animationSeconds, speed })
-        const pass = () => {
-          if (!this.data.loop || this.cylState !== state) {
-            return
-          }
-          // [EN] A file that keeps moving on its own (shapes.riv, truck.riv loop by themselves) is not cut short: check
-          //      again after another pass. [CN] 自己持续运动的文件（shapes.riv、truck.riv 自身循环）不被打断：再等一次检查。
-          if (kind === 'restart' && !state.settled) {
-            state.loopTimer = setTimeout(pass, delay)
-            return
-          }
-          this.triggerEvent('loopcomplete', {})
-          this.cyl_playFromStart()
-        }
-        state.loopTimer = setTimeout(pass, Math.max(0, delay - seconds * 1000 / speed))
+      if (!this.data.loop) {
+        return
       }
+      const delay = cylRiveLoopDelay({ kind, duration: options.duration, animationSeconds: state.animationSeconds, speed })
+      const pass = () => {
+        if (!this.data.loop || this.cylState !== state) {
+          return
+        }
+        // [EN] A file that keeps moving on its own (shapes.riv, truck.riv loop by themselves) is not cut short: check
+        //      again after another pass. [CN] 自己持续运动的文件（shapes.riv、truck.riv 自身循环）不被打断：再等一次检查。
+        if (kind === 'restart' && !state.settled) {
+          state.loopTimer = setTimeout(pass, delay)
+          return
+        }
+        this.triggerEvent('loopcomplete', {})
+        this.cyl_playFromStart()
+      }
+      state.loopTimer = setTimeout(pass, Math.max(0, delay - seconds * 1000 / speed))
     },
 
     /**

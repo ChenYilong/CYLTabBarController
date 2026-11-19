@@ -479,12 +479,10 @@ const CYL_FONT_WEIGHTS = {
 };
 
 /**
- * [EN] CYLTabBarItemTitleFont as CSS: a number (size), "bold:15" (a weight and a size), "Menlo-Regular:12" (a font name
- *      and a size) or {name, size, weight}; size 1–200; '' when invalid (B20).
- * [CN] 把 CYLTabBarItemTitleFont 转为 CSS：数字（字号）、"bold:15"（字重与字号）、"Menlo-Regular:12"（字体名与字号）或
- *      {name, size, weight}；字号 1–200；无效时返回 ''（B20）。
+ * [EN] The {name, size, weight} of a CYLTabBarItemTitleFont value (size NaN when there is none).
+ * [CN] CYLTabBarItemTitleFont 值的 {name, size, weight}（没有字号时 size 为 NaN）。
  */
-function cylFont(value) {
+function cylFontParts(value) {
   let name = '';
   let size = Number.NaN;
   let weight = '';
@@ -504,6 +502,17 @@ function cylFont(value) {
     size = Number(value.size);
     weight = typeof value.weight === 'string' ? value.weight.toLowerCase() : '';
   }
+  return { name, size, weight };
+}
+
+/**
+ * [EN] CYLTabBarItemTitleFont as CSS: a number (size), "bold:15" (a weight and a size), "Menlo-Regular:12" (a font name
+ *      and a size) or {name, size, weight}; size 1–200; '' when invalid (B20).
+ * [CN] 把 CYLTabBarItemTitleFont 转为 CSS：数字（字号）、"bold:15"（字重与字号）、"Menlo-Regular:12"（字体名与字号）或
+ *      {name, size, weight}；字号 1–200；无效时返回 ''（B20）。
+ */
+function cylFont(value) {
+  const { name, size, weight } = cylFontParts(value);
   if (!Number.isFinite(size) || size < 1 || size > 200) {
     return '';
   }

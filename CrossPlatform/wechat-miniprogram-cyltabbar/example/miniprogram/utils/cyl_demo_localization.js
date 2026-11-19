@@ -69,7 +69,12 @@ function cylIsRightToLeft() {
  */
 function t(key) {
   const own = cylLanguage(cylDemoStrings);
-  const table = own !== 'en' ? cylDemoStrings[own] : (cylMoreTable()[key] !== undefined ? cylMoreTable() : cylDemoStrings.en);
+  let table;
+  if (own !== 'en') {
+    table = cylDemoStrings[own];
+  } else {
+    table = cylMoreTable()[key] !== undefined ? cylMoreTable() : cylDemoStrings.en;
+  }
   return table?.[key] || key;
 }
 

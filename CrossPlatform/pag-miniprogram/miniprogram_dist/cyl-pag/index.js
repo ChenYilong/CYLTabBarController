@@ -240,6 +240,41 @@ Component({
         })
     },
 
+    /**
+     * [EN] Keeps the loaded file and view, applies the speed, fit and loop, listens to the view's events, then plays
+     *      (autoplay, or a play requested while loading) and reports `ready`.
+     * [CN] 保存已加载的文件与视图，应用速度、填充方式与循环，监听视图事件，然后播放（autoplay，或加载期间请求的播放）
+     *      并发出 `ready`。
+     */
+    cyl_attachView(file, view) {
+      this.cylFile = file
+      this.cylView = view
+      this.cylOriginalDuration = Number(file.duration()) || 0
+      this.cyl_applySpeed()
+      view.setScaleMode(CYL_SCALE_MODES[this.data.fit] || CYL_SCALE_MODES.contain)
+      view.setRepeatCount(this.data.loop ? 0 : 1)
+      view.addListener('onAnimationFlushed', () => {
+        if (CYL_USES_SNAPSHOTS && Date.now() - (this.cylSnapshotAt || 0) >= CYL_SNAPSHOT_INTERVAL_MS) {
+          this.cyl_captureSnapshot()
+        }
+      })
+      view.addListener('onAnimationEnd', () => {
+        this.cyl_syncSnapshot()
+        this.triggerEvent('complete', {})
+      })
+      view.addListener('onAnimationRepeat', () => this.triggerEvent('loopcomplete', {}))
+      this.cyl_rest()
+      if (this.data.autoplay) {
+        view.play()
+      }
+      this.cyl_syncSnapshot()
+      this.triggerEvent('ready', { duration: this.cyl_duration() })
+      if (this.cylPendingPlay) {
+        const pending = this.cylPendingPlay
+        this.cyl_playFromStart(pending.seconds + (Date.now() - pending.requestedAt) / 1000)
+      }
+    },
+
     async cyl_start(data, canvas, token) {
       const current = () => token === this.cylLoadToken && this.cylReady
       let file = null
@@ -258,32 +293,7 @@ Component({
           file.destroy()
           return
         }
-        this.cylFile = file
-        this.cylView = view
-        this.cylOriginalDuration = Number(file.duration()) || 0
-        this.cyl_applySpeed()
-        view.setScaleMode(CYL_SCALE_MODES[this.data.fit] || CYL_SCALE_MODES.contain)
-        view.setRepeatCount(this.data.loop ? 0 : 1)
-        view.addListener('onAnimationFlushed', () => {
-          if (CYL_USES_SNAPSHOTS && Date.now() - (this.cylSnapshotAt || 0) >= CYL_SNAPSHOT_INTERVAL_MS) {
-            this.cyl_captureSnapshot()
-          }
-        })
-        view.addListener('onAnimationEnd', () => {
-          this.cyl_syncSnapshot()
-          this.triggerEvent('complete', {})
-        })
-        view.addListener('onAnimationRepeat', () => this.triggerEvent('loopcomplete', {}))
-        this.cyl_rest()
-        if (this.data.autoplay) {
-          view.play()
-        }
-        this.cyl_syncSnapshot()
-        this.triggerEvent('ready', { duration: this.cyl_duration() })
-        if (this.cylPendingPlay) {
-          const pending = this.cylPendingPlay
-          this.cyl_playFromStart(pending.seconds + (Date.now() - pending.requestedAt) / 1000)
-        }
+        this.cyl_attachView(file, view)
       } catch (error) {
         if (file && file !== this.cylFile) {
           try {
