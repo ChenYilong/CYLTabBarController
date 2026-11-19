@@ -292,7 +292,7 @@ CYLTabBar(manifestRoute: 'bundle:Configurations/Manifests/cyl_tabbar_manifest.js
 | React Native / Flutter `manifestRoute` | ✅（部分 / partly） | 内置或沙盒中的清单可用；下载与回调见 TODO。 | Built-in and sandbox manifests work; downloads and callbacks: see TODO. |
 | 资源移出本库、按版本 / 主题 / Tab 存放 | ✅ | `Example-Shared/Configurations/Skins/`、`Manifests/`、`Localization/`。 | `Example-Shared/Configurations/Skins/`, `Manifests/`, `Localization/`. |
 | ObjC Example 演示与截图 | ✅ | 见下一节。 | See the next section. |
-| 评分 / Score | **90 / 100** | 扣分见 TODO。 | Deductions: see TODO. |
+| 评分 / Score | **91 / 100** | 扣分见 TODO（2026-11-19：Android 清单演示 +1）。 | Deductions: see TODO (2026-11-19: the Android manifest demo, +1). |
 
 ### [CN]TODO
 ### [EN]TODO
@@ -302,7 +302,7 @@ CYLTabBar(manifestRoute: 'bundle:Configurations/Manifests/cyl_tabbar_manifest.js
 | -3：PlusButton 的图标只取默认主题的图片，切换主题时不随之更换（Tab 的图标会更换）。需要让 PlusButton 也接受主题中的 `@名称` 图片。 | -3: the plus button takes the default theme's image only and does not change with the theme (tab icons do). The plus button needs to accept `@name` images of the themes too. |
 | -3：React Native 与 Flutter 只能读取已在本地的清单；`CYLTabBarManifestLoader` 的下载、回退与回调尚未通过宿主视图提供给 JavaScript / Dart（计划：宿主视图的 `manifestURL` 与 `onManifestApply` / `onManifestFail`）。 | -3: React Native and Flutter can only read a manifest that is already local; `CYLTabBarManifestLoader`'s download, fallback and callbacks are not given to JavaScript / Dart through the host view yet (planned: the host view's `manifestURL` with `onManifestApply` / `onManifestFail`). |
 | -2：示例清单中 `midButton.index` 为 2，但在 3 个 Tab 时 PlusButton 显示在第 2 位；需要确认 `CYLPlusButtonIndexInTabBar` 与带页面的 PlusButton 一起使用时的位置规则。 | -2: the sample's `midButton.index` is 2, but with 3 tabs the plus button shows in the second place; the rule of `CYLPlusButtonIndexInTabBar` with a plus button that has a page needs checking. |
-| -2：Android 示例尚未加入清单演示界面（规则与下载由单元测试覆盖）；示例在 Android 模拟器上的截图待补。 | -2: the Android examples have no manifest demo screen yet (the rules and downloads are covered by unit tests); screenshots on the Android emulator are still to come. |
+| -1（原 -2，2026-11-19 更新）：Android 示例已加入清单演示：「配置文件」组的「A tab bar from the configuration manifest」行，选择清单的 light、dark 或 christmas 主题后，用与 iOS 共用的 `Manifests/cyl_tabbar_manifest.json`（图片在 `Skins/2.1.0`）创建 TabBar，并通过 `cyl_themeManager.currentThemeIdentifier` 应用主题；`DemoMigrationTest.theManifestDemoBuildsATabBarInEveryTheme` 在三个主题下创建 TabBar（app 单元测试 8 / 8）。待补：Android 模拟器截图（应用户要求模拟器已关闭，下次启动模拟器时补）。 | -1 (was -2, updated 2026-11-19): the Android example has a manifest demo now: the "A tab bar from the configuration manifest" row of the "Configuration file" group; choose the manifest's light, dark or christmas theme, and it builds the tab bar from the `Manifests/cyl_tabbar_manifest.json` shared with iOS (images in `Skins/2.1.0`) and applies the theme through `cyl_themeManager.currentThemeIdentifier`. `DemoMigrationTest.theManifestDemoBuildsATabBarInEveryTheme` builds it in the three themes (app unit tests 8 / 8). Still to come: an Android emulator screenshot (the emulators were closed at the user's request; to add the next time one runs). |
 | 待验证：在真机上下载 http(s) 清单（单元测试与演示使用 file URL）。 | To verify: downloading an http(s) manifest on a device (the unit tests and the demo use file URLs). |
 
 ## [CN]测试与截图
