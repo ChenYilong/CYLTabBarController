@@ -28,6 +28,8 @@ import UIKit
     /// [EN] The control reported in the current run loop turn (step 59). [CN] 当前 runloop 中已上报的控件（第 59 步）。
     @objc(setCyl_controlReportedInCurrentRunLoop:) func cylSetControlReportedInCurrentRunLoop(_ control: UIControl?)
     /// [EN] Used by `-didSelectControl:` (step 64). [CN] 供 `-didSelectControl:` 使用（第 64 步）。
+    /// [EN] Still Objective-C ("Plus button in the Liquid Glass layers", phase 2); used by step 68. [CN] 仍为 Objective-C（第 2 阶段）；第 68 步使用。
+    @objc(cyl_layOutPlusButtonInLiquidGlassLayers) func cylLayOutPlusButtonInLiquidGlassLayers()
     @objc(cyl_controlReportedInCurrentRunLoop) func cylControlReportedInCurrentRunLoop() -> UIControl?
     @objc(cyl_setNeedsUpdateTabBarItemIconViews) func cylSetNeedsUpdateTabBarItemIconViews()
     /// [EN] The page registry state of the class extension (docs/Swift-Migration.md, step 54). [CN] 类扩展中的页面注册表状态（第 54 步）。
