@@ -696,6 +696,7 @@ static NSString *const CYLHostTestsLoggedInKey = @"CYLTabBarControllerLoggedIn";
     UIViewController *second = tabBarController.viewControllers[1];
     id<UITabBarControllerDelegate> delegate = tabBarController.delegate;
     XCTAssertNotNil(delegate);
+    NSLog(@"CYLDIAG liquidGlass=%d style=%ld delegate=%@ tabBar=%@ button=%@ isTabButton=%d", [CYLConstants isLiquidGlassActive], (long)tabBarController.tabBarStyleType, NSStringFromClass([(NSObject *)delegate class]), NSStringFromClass([tabBarController.tabBar class]), second.tabBarItem.cyl_tabButton, second.tabBarItem.cyl_tabButton.cyl_isTabButton);
     [reported removeAllObjects];
     if ([delegate tabBarController:tabBarController shouldSelectViewController:second]) {
         tabBarController.selectedViewController = second;
