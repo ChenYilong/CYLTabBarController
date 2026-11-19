@@ -133,6 +133,9 @@ open class CYLFlatDesignTabBarButton: CYLAnimatedItemView {
             guard super.isSelected != newValue else { return }
             super.isSelected = newValue
             cylUpdateTabBarButton()
+            // [EN] A GIF given as the tab image plays when its tab is selected, as on the classic tab bar (915bddbd).
+            // [CN] 作为 Tab 图片传入的 GIF 在选中其 Tab 时播放，与经典 TabBar 相同（915bddbd）。
+            if newValue, tabBarAnimationURL == nil { playAnimatedImage(animatedTabImage) }
         }
     }
 
@@ -465,7 +468,11 @@ open class CYLFlatDesignTabBarButton: CYLAnimatedItemView {
      * [EN] Plays the tab's animation, as a selection does. [CN] 播放 Tab 的动画，与选中时相同。
      */
     open override func playAnimation() {
-        guard CYLTabBarItemAnimationCore.service != nil, let url = tabBarAnimationURL else { return }
+        guard CYLTabBarItemAnimationCore.service != nil, let url = tabBarAnimationURL else {
+            // [EN] No animation file: an animated tab image plays. [CN] 没有动画文件：播放动图 Tab 图片。
+            playAnimatedImage(animatedTabImage)
+            return
+        }
         cyl_addTabBarItemAnimation(with: url, size: tabBarAnimationSize, contentMode: animationContentMode,
                                    animationSpeed: tabBarAnimationSpeed)
         cyl_playTabBarItemAnimation(with: url, size: tabBarAnimationSize, defaultSelected: false,
@@ -476,6 +483,7 @@ open class CYLFlatDesignTabBarButton: CYLAnimatedItemView {
      * [EN] Plays the tab's animation again from the start. [CN] 从头再次播放 Tab 的动画。
      */
     open override func restartAnimation() {
+        if tabBarAnimationURL == nil, playAnimatedImage(animatedTabImage) { return }
         cyl_restartTabBarItemAnimation()
     }
 
@@ -483,7 +491,18 @@ open class CYLFlatDesignTabBarButton: CYLAnimatedItemView {
      * [EN] Stops the tab's animation. [CN] 停止 Tab 的动画。
      */
     open override func stopAnimation() {
+        stopAnimatedImage()
         cyl_stopTabBarItemAnimation()
+    }
+
+    /// [EN] The tab's animated image (a GIF given as the tab image): the selected one when it is animated, else the normal
+    ///      one, as the classic tab bar plays it (a still selected copy plays the normal image's frames).
+    /// [CN] Tab 的动图（作为 Tab 图片传入的 GIF）：选中图片是动图时取选中图片，否则取普通图片，与经典 TabBar 的播放方式相同（静态的选中副本播放普通图片的帧）。
+    private var animatedTabImage: UIImage? {
+        let item = tabBarItemStorage
+        if let selected = item?.selectedImage, (selected.images?.count ?? 0) > 1 { return selected }
+        if let normal = item?.image, (normal.images?.count ?? 0) > 1 { return normal }
+        return nil
     }
 
     /// [EN] The item's animation size (`CYLTabBarLottieSize`). [CN] item 的动画尺寸（`CYLTabBarLottieSize`）。

@@ -458,6 +458,50 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
     }
 
     private var loopTimer: Timer?
+    /// [EN] The animated image shown on its first frame until it is played. [CN] 播放前停在第一帧显示的动图。
+    private var restingAnimatedImage: UIImage?
+
+    /**
+     [EN] Plays the frames of an animated `image` / `selectedImage` from the first one (once, or looping with
+          `animationLoops`); false when the icon is not an animated image. `playAnimation()` and `restartAnimation()` call it
+          when there is no animation file; a subclass whose own animation is elsewhere (the FlatDesign tab button) calls it too.
+     [CN] 从第一帧播放动图 `image` / `selectedImage` 的各帧（播放一次，`animationLoops` 时循环）；图标不是动图时返回 false。没有动画文件时由
+          `playAnimation()` 与 `restartAnimation()` 调用；动画在别处的子类（扁平样式 Tab 按钮）也可以调用。
+     */
+    @objc(playAnimatedImage)
+    @discardableResult
+    open func playAnimatedImage() -> Bool {
+        playAnimatedImage(restingAnimatedImage)
+    }
+
+    /**
+     [EN] Plays the frames of `animatedImage` on the icon (once, or looping with `animationLoops`), then shows the resting icon
+          again; false when it is not an animated image. For a subclass whose animated source is not its current `image`.
+     [CN] 在图标上播放 `animatedImage` 的各帧（播放一次，`animationLoops` 时循环），之后恢复显示静止图标；不是动图时返回 false。供动图来源不是当前
+          `image` 的子类使用。
+     */
+    @objc(playAnimatedImage:)
+    @discardableResult
+    open func playAnimatedImage(_ animatedImage: UIImage?) -> Bool {
+        guard let animated = animatedImage, let frames = animated.images, frames.count > 1 else { return false }
+        imageView.stopAnimating()
+        imageView.animationImages = frames.map { $0.withRenderingMode(animated.renderingMode) }
+        imageView.animationDuration = animated.duration
+        imageView.animationRepeatCount = animationLoops ? 0 : 1
+        imageView.startAnimating()
+        return true
+    }
+
+    /**
+     [EN] Stops the frames of an animated image and shows its first frame again. [CN] 停止动图的帧动画，重新显示其第一帧。
+     */
+    @objc(stopAnimatedImage)
+    open func stopAnimatedImage() {
+        guard imageView.isAnimating || imageView.animationImages != nil else { return }
+        imageView.stopAnimating()
+        imageView.animationImages = nil
+        cyl_updateIcon()
+    }
     private var playing = false
     /// [EN] The icon tint applied last (`applyIconTintColor(_:)`), given again to a new animation view. [CN] 最近应用的图标着色，再次交给新的动画视图。
     private var lastIconTintColor: UIColor?
@@ -533,7 +577,25 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
     private func cyl_updateIcon() {
         var icon = (isSelected && selectedImage != nil) ? selectedImage : image
         if icon == nil { icon = cyl_placeholderIfNeeded() }
-        imageView.image = icon
+        // [EN] An animated image (`UIImage.images`, e.g. a GIF) rests on its first frame until it is played, like an animation
+        //      file (docs/Animated-Item.md, "every animated tab icon rests until it is played"); `playAnimation()` plays it.
+        // [CN] 动图（`UIImage.images`，例如 GIF）与动画文件一样，在播放前停在第一帧（docs/Animated-Item.md，「每个动效 Tab 图标在播放前保持静止」）；
+        //      `playAnimation()` 播放它。
+        // [EN] A static selected icon over an animated `image` plays the `image`'s frames, as the classic tab bar does.
+        // [CN] 静态的选中图标搭配动图 `image` 时播放 `image` 的帧，与经典 TabBar 相同。
+        let iconIsAnimated = (icon?.images?.count ?? 0) > 1
+        let source = iconIsAnimated ? icon : ((image?.images?.count ?? 0) > 1 ? image : nil)
+        if let animated = source, let shown = icon {
+            restingAnimatedImage = animated
+            if !imageView.isAnimating {
+                imageView.image = iconIsAnimated ? shown.images![0].withRenderingMode(shown.renderingMode) : shown
+            }
+        } else {
+            restingAnimatedImage = nil
+            imageView.stopAnimating()
+            imageView.animationImages = nil
+            imageView.image = icon
+        }
         // [EN] `isIconHidden`: another view is shown in the icon's place. [CN] `isIconHidden`：另一个视图显示在图标的位置。
         imageView.isHidden = isIconHidden || cyl_animationShows()
         if isIconHidden { animationView?.isHidden = true }
@@ -796,16 +858,19 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
     /** [EN] Plays from the current progress. [CN] 从当前进度开始播放。 */
     open func playAnimation() {
         #if CYL_ANIMATION_ENGINE_AVAILABLE
-        guard let player = animationPlayer else { return }
+        guard let player = animationPlayer else { playAnimatedImage(); return }
         playing = true
         cyl_applyPlayerSettings()
         player.play()
         cyl_startLoopTimerIfNeeded()
+        #else
+        playAnimatedImage()
         #endif
     }
 
     /** [EN] Plays from progress 0 (the examples' "Play all"). [CN] 从进度 0 开始播放（示例中的「全部播放」）。 */
     open func restartAnimation() {
+        if animationView == nil, playAnimatedImage() { return }
         #if CYL_ANIMATION_ENGINE_AVAILABLE
         cyl_setPlayerValue(CGFloat(0), for: "progress")
         playAnimation()
@@ -814,6 +879,7 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
 
     /** [EN] Stops and shows the resting progress. [CN] 停止并显示静止进度。 */
     open func stopAnimation() {
+        stopAnimatedImage()
         #if CYL_ANIMATION_ENGINE_AVAILABLE
         let player = animationPlayer
         playing = false

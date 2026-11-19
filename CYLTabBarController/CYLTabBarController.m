@@ -106,8 +106,10 @@ static BOOL CYLTabBarAnimationCanPlay(NSURL *URL) {
 
 #pragma mark - Animated images rest until played
 
-static const void *CYLTabBarItemAnimatedImageKey = &CYLTabBarItemAnimatedImageKey;
-static const void *CYLTabBarItemAnimatedSelectedImageKey = &CYLTabBarItemAnimatedSelectedImageKey;
+// [EN] Selector-based keys, so the FlatDesign item (Swift) reads the same animated images (`sel_registerName`).
+// [CN] 以 selector 作为 key，使扁平样式 item（Swift）能读取同一张动图（`sel_registerName`）。
+#define CYLTabBarItemAnimatedImageKey ((const void *)sel_registerName("cyl_animatedTabImage"))
+#define CYLTabBarItemAnimatedSelectedImageKey ((const void *)sel_registerName("cyl_animatedSelectedTabImage"))
 
 /*!
  * [EN] An animated image given as a tab's image (`CYLTabBarItemImage` with `+[UIImage cyl_animatedImageWithGIFData:]`, a GIF

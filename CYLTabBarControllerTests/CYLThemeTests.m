@@ -698,6 +698,46 @@ FOUNDATION_EXTERN void CYLTabBarItemAnimationRegisterColors(NSURL *URL, NSDictio
     XCTAssertEqual(view.image.CGImage, lastFrame.CGImage);
 }
 
+/// [EN] FlatDesign: a GIF given as a tab image rests on its first frame and plays when its tab is selected, as on the classic
+///      tab bar (915bddbd, docs/Animated-Item.md, "every animated tab icon rests until it is played", part 2).
+/// [CN] 扁平样式：作为 Tab 图片传入的 GIF 停在第一帧，选中该 Tab 时播放，与经典 TabBar 相同（915bddbd，docs/Animated-Item.md，
+///      「每个动效 Tab 图标在播放前保持静止」第 2 部分）。
+- (void)testFlatDesignAnimatedTabImageRestsUntilItsTabIsSelected {
+    if (!NSClassFromString(@"CYLFlatDesignTabBar")) {
+        XCTSkip(@"FlatDesign is not compiled into this target");
+    }
+    UIImage *animated = [UIImage cyl_animatedImageWithGIFData:[NSData dataWithContentsOfURL:[self gifFileURL]]];
+    UIImage *icon = CYLTestImage(24, UIColor.grayColor);
+    CYLTabBarController *tabBarController = [CYLTabBarController tabBarControllerWithConfiguration:@{
+        CYLTabBarControllerContext : [NSUUID UUID].UUIDString,
+        CYLTabBarControllerStyleType : @"flatDesign",
+        CYLTabBarControllerTabBarItemsAttributes : @[
+            @{ CYLTabBarItemIdentifier : @"a", CYLTabBarItemTitle : @"A", CYLTabBarItemImage : icon },
+            @{ CYLTabBarItemIdentifier : @"b", CYLTabBarItemTitle : @"B", CYLTabBarItemImage : animated },
+        ],
+        CYLTabBarControllerPageResolver : ^UIViewController *(NSString *pageIdentifier, NSDictionary *attributes) {
+            return [[UIViewController alloc] init];
+        },
+    }];
+    UIWindow *window = [[UIWindow alloc] initWithFrame:CGRectMake(0, 0, 390, 844)];
+    window.rootViewController = tabBarController;
+    window.hidden = NO;
+    [tabBarController.view layoutIfNeeded];
+    [[NSRunLoop mainRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.2]];
+    UIControl *button = tabBarController.viewControllers[1].cyl_tabButton;
+    UIImageView *imageView = [button respondsToSelector:NSSelectorFromString(@"imageView")] ? [button valueForKey:@"imageView"] : nil;
+    XCTAssertNotNil(imageView, @"the FlatDesign button of tab B (%@)", button);
+    XCTAssertLessThan(imageView.image.images.count, 2U, @"at rest: one frame, not the animated image");
+    XCTAssertFalse(imageView.isAnimating, @"at rest: not playing");
+    [tabBarController setSelectedIndex:1];
+    [tabBarController.view layoutIfNeeded];
+    [[NSRunLoop mainRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.1]];
+    BOOL plays = imageView.isAnimating || imageView.image.images.count > 1;
+    XCTAssertTrue(plays, @"selected: the frames play (animating %d, frames %lu, animationImages %lu)", imageView.isAnimating,
+                  (unsigned long)imageView.image.images.count, (unsigned long)imageView.animationImages.count);
+    window.hidden = YES;
+}
+
 - (void)testTheGIFKeysAreAliasesOfTheGenericKeys {
     NSURL *URL = [self gifFileURL];
     XCTAssertEqualObjects(CYLTabBarItemAnimationURLFromAttributes(@{ CYLTabBarGIFURL : URL }, NULL), URL);
