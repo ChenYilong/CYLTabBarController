@@ -1813,11 +1813,6 @@ typedef UIView * _Nullable (^CYLTabBarItemIconViewProvider)(BOOL selected);
 // tabBar内容高度，默认49.0，真实高度会加上view.safeAreaInsets.bottom安全区域
 //@property (nonatomic, assign) CGFloat tabBarHeight;
 
-/*!
- * [EN] Replaces `item` with `toItem` in the flat-design tab bar. Only works in flat-design mode.
- * [CN] 在扁平化 TabBar 中用 toItem 替换 item，仅在扁平化模式下生效。
- */
-- (void)changeItem:(CYLFlatDesignTabBarItem *)item toItem:(CYLFlatDesignTabBarItem *)toItem;
 
 /*!
  [EN] This can be left unset; the default is CYLTabBarController. If set, please implement the `+[CYLPlusButton tabBarContext]` method in CYLPlusButton and ensure consistency. If neither is implemented, the default is CYLTabBarController for both.
@@ -2096,6 +2091,22 @@ typedef UIView * _Nullable (^CYLTabBarItemIconViewProvider)(BOOL selected);
 - (BOOL)updatePlusButtonWithAttributes:(NSDictionary<NSString *, id> *)attributes;
 
 @end
+
+#if CYL_FLATDESIGN_AVAILABLE
+/*!
+ * [EN] FlatDesign items. Implemented in Swift (docs/Swift-Migration.md, step 72); the selector is unchanged.
+ * [CN] 扁平样式的 item。由 Swift 实现（docs/Swift-Migration.md，第 72 步）；selector 不变。
+ */
+@interface CYLTabBarController (CYLFlatDesignItems)
+
+/*!
+ * [EN] Replaces `item` with `toItem` in the flat-design tab bar. Only works in flat-design mode.
+ * [CN] 在扁平化 TabBar 中用 toItem 替换 item，仅在扁平化模式下生效。
+ */
+- (void)changeItem:(CYLFlatDesignTabBarItem *)item toItem:(CYLFlatDesignTabBarItem *)toItem;
+
+@end
+#endif
 
 /*!
  * [EN] The plus button's selection state around `-tabBarController:shouldSelectViewController:`. Implemented in Swift

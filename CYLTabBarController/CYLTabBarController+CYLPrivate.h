@@ -149,6 +149,11 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)cyl_layOutPlusButtonInLiquidGlassLayers;
 /// [EN] FlatDesign subspec only, implemented in Swift (step 71). [CN] 仅扁平样式子库，由 Swift 实现（第 71 步）。
 - (void)cyl_flatDesignViewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator;
+/// [EN] FlatDesign subspec only, implemented in Swift (step 72). [CN] 仅扁平样式子库，由 Swift 实现（第 72 步）。
+- (BOOL)_showsMoreNavigationController;
+- (void)_captureItems;
+- (void)_updateBottomBarShowHideIfNeeded;
+- (void)_updateAdditionalSafeAreaInsetsWithAnimated:(BOOL)animated;
 - (void)cyl_plusButton:(CYLPlusButton *)plusButton didChangeWithNotification:(NSNotificationName)name info:(NSDictionary *)info;
 - (void)cyl_syncTabBarItemAccessibility;
 #if CYL_FLATDESIGN_AVAILABLE
