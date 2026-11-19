@@ -107,7 +107,7 @@ extension CYLTabBarController {
         guard isTabBarItemAnimationViewAdded, let animationURL = item.cyl_tabBarItemAnimationURL,
               tabButton.cyl_tabBarItemAnimationView() == nil else { return }
         let isSelected = item === selectedViewController?.tabBarItem
-        cylPrivate.cylAddLottieImage(withControl: tabButton, lottieURL: animationURL,
+        cylAddLottieImage(withControl: tabButton, lottieURL: animationURL,
                                      lottieSizeValue: item.cyl_tabBarItemAnimationSizeValue,
                                      animation: isSelected, defaultSelected: isSelected)
     }

@@ -25,7 +25,7 @@ extension CYLTabBarController {
         let storage = cylTabSetupStorage
         let accessors = cylTabBarAccessorsStorage
         if cylPrivate.cylStoredTabBar() is CYLTabBar {
-            accessors.cylStopObservingTabImageViewDefaultOffset()
+            cylStopObservingTabImageViewDefaultOffset()
             storage.cylSetStoredTabBar(nil)
         }
         guard cylPrivate.cylStoredTabBar() == nil else { return }

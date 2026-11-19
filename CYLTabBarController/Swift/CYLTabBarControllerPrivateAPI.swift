@@ -20,12 +20,6 @@ import UIKit
     @objc(cyl_imageOnlyTabsAdjustmentDisabled) func cylImageOnlyTabsAdjustmentDisabled() -> Bool
     @objc(setCyl_imageOnlyTabsAdjustmentDisabled:) func cylSetImageOnlyTabsAdjustmentDisabled(_ disabled: Bool)
     @objc(cyl_storedTabBar) func cylStoredTabBar() -> UIView?
-    /// [EN] Still Objective-C, used by the life cycle (step 74). [CN] 仍为 Objective-C，供生命周期使用（第 74 步）。
-    @objc(isLottieEnabled) func cylIsLottieEnabled() -> Bool
-    @objc(addLottieImageWithControl:lottieURL:lottieSizeValue:animation:)
-    func cylAddLottieImage(withControl control: UIControl, lottieURL: URL?, lottieSizeValue: NSValue?, animation: Bool)
-    @objc(addLottieImageWithControl:animation:defaultSelected:)
-    func cylAddLottieImage(withControl control: UIControl, animation: Bool, defaultSelected: Bool)
     @objc(setTabBarItemAnimationViewAdded:) func cylSetTabBarItemAnimationViewAdded(_ added: Bool)
     @objc(setInvokeOnceViewDidLayoutSubViewsBlock:) func cylSetInvokeOnceViewDidLayoutSubViewsBlock(_ invokeOnce: Bool)
     /// [EN] Class-extension state of the classic hide / show animation (step 75). [CN] 经典隐藏 / 显示动画的类扩展状态（第 75 步）。
@@ -63,10 +57,6 @@ import UIKit
     @objc(cyl_replaceTabBarItemsAttributesStorage:) func cylReplaceTabBarItemsAttributesStorage(_ tabBarItemsAttributes: [[AnyHashable: Any]])
     /// FIX: issue #610 — implemented in CYLTabBarController.m, only with FlatDesign (`CYL_FLATDESIGN_AVAILABLE`).
     @objc(cyl_flatDesignReportDidSelectControl:) optional func cylFlatDesignReportDidSelectControl(_ control: UIControl)
-    /// [EN] Implemented in CYLTabBarController.m ("Private Methods"); called by `-cyl_adoptTabButton:forTabBarItem:` (step 105).
-    /// [CN] 实现于 CYLTabBarController.m（"Private Methods"）；由 `-cyl_adoptTabButton:forTabBarItem:` 调用（第 105 步）。
-    @objc(addLottieImageWithControl:lottieURL:lottieSizeValue:animation:defaultSelected:)
-    func cylAddLottieImage(withControl control: UIControl, lottieURL: URL?, lottieSizeValue: NSValue?, animation: Bool, defaultSelected: Bool)
 }
 
 extension CYLTabBarController {

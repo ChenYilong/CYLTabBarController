@@ -212,9 +212,9 @@ extension CYLTabBarController {
         let isChildViewControllerPlusButton = control?.cyl_isChildViewControllerPlusButton() ?? false
         // [EN] Shared by Liquid Glass and the other styles: the Lottie playback lives here.
         // [CN] 液态玻璃与其他样式共用：Lottie 播放逻辑都在这里。
-        if cylPrivate.cylIsLottieEnabled(), !isChildViewControllerPlusButton, selectedViewController?.cyl_isPlaceholder != true,
+        if cylIsLottieEnabled(), !isChildViewControllerPlusButton, selectedViewController?.cyl_isPlaceholder != true,
            let control, let item = viewController?.tabBarItem {
-            cylPrivate.cylAddLottieImage(withControl: control, lottieURL: item.cyl_tabBarItemAnimationURL,
+            cylAddLottieImage(withControl: control, lottieURL: item.cyl_tabBarItemAnimationURL,
                                          lottieSizeValue: item.cyl_tabBarItemAnimationSizeValue, animation: true)
         }
     }
@@ -236,7 +236,7 @@ extension CYLTabBarController {
                         continue
                     }
                     let defaultSelected = index == self.selectedIndex
-                    self.cylPrivate.cylAddLottieImage(withControl: control, lottieURL: url,
+                    self.cylAddLottieImage(withControl: control, lottieURL: url,
                                                       lottieSizeValue: viewController.tabBarItem.cyl_tabBarItemAnimationSizeValue,
                                                       animation: defaultSelected, defaultSelected: defaultSelected)
                     self.cylPrivate.cylSetTabBarItemAnimationViewAdded(true)
@@ -253,7 +253,7 @@ extension CYLTabBarController {
                     } else {
                         defaultSelected = index == self.selectedIndex
                     }
-                    self.cylPrivate.cylAddLottieImage(withControl: tabButton, animation: defaultSelected, defaultSelected: defaultSelected)
+                    self.cylAddLottieImage(withControl: tabButton, animation: defaultSelected, defaultSelected: defaultSelected)
                     self.cylPrivate.cylSetTabBarItemAnimationViewAdded(true)
                 }
             }

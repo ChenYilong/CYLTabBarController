@@ -26,7 +26,6 @@ private let CYLDefaultTabBarHeight: CGFloat = 49
     @objc(cyl_setTabBarHeightStorage:) func cylSetTabBarHeightStorage(_ tabBarHeight: CGFloat)
     @objc(isObservingTabImageViewDefaultOffset) func cylIsObservingTabImageViewDefaultOffset() -> Bool
     @objc(setObservingTabImageViewDefaultOffset:) func cylSetObservingTabImageViewDefaultOffset(_ observing: Bool)
-    @objc(cyl_stopObservingTabImageViewDefaultOffset) func cylStopObservingTabImageViewDefaultOffset()
     @objc(setCylRefreshedSystemTabBarWindow:) func cylSetRefreshedSystemTabBarWindow(_ window: UIWindow?)
     @objc(setTabBarHidden:) func cylSetTabBarHidden(_ hidden: Bool)
     @objc(setCyl_tabBarHidden:) func cylSetTabBarHiddenRequest(_ hidden: Bool)

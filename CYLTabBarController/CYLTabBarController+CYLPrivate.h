@@ -373,4 +373,18 @@ FOUNDATION_EXTERN BOOL CYLControlReportsTaps(UIControl *_Nullable control);
 - (BOOL)cyl_selectedChildOverridesVerticalBarBehavior;
 @end
 
+/*!
+ * [EN] Animated tab icons (step 131, `Swift/CYLTabBarController+CYLTabBarItemAnimationViews.swift`), called by CYLTabBarController.m.
+ * [CN] 动画 Tab 图标（第 131 步），由 CYLTabBarController.m 调用。
+ */
+@interface CYLTabBarController (CYLTabBarItemAnimationViewsPrivate)
+- (BOOL)isLottieEnabled;
+- (void)addLottieImageWithControl:(UIControl *)control animation:(BOOL)animation;
+- (void)addLottieImageWithControl:(UIControl *)control lottieURL:(nullable NSURL *)lottieURL lottieSizeValue:(nullable NSValue *)lottieSizeValue animation:(BOOL)animation;
+- (void)addLottieImageWithControl:(UIControl *)control animation:(BOOL)animation defaultSelected:(BOOL)defaultSelected;
+- (void)addLottieImageWithControl:(UIControl *)control lottieURL:(nullable NSURL *)lottieURL lottieSizeValue:(nullable NSValue *)lottieSizeValue
+                        animation:(BOOL)animation defaultSelected:(BOOL)defaultSelected;
+- (void)cyl_stopObservingTabImageViewDefaultOffset;
+@end
+
 NS_ASSUME_NONNULL_END
