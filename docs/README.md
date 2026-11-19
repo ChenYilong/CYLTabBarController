@@ -220,6 +220,7 @@ docs/
 │   ├── android-liquid-glass-surface-slider.png
 │   ├── android-lottie-pag-svga-tint-option.png
 │   ├── android-manifest-demo-themes.png
+│   ├── android-manifest-plus-button-middle.png
 │   ├── android-more-than-five-tabs-report.png
 │   ├── android-playback-controls-pag-example-api35-b57c844.png
 │   ├── android-rive-menu-loop-pause-fix.png
