@@ -6,6 +6,12 @@
 //  Copyright © 2026 https://github.com/ChenYilong . All rights reserved.
 //
 
+// CYL-SWIFT-MIGRATION: objc-required — [EN] The category is Swift; these Objective-C declarations stay because their block
+//      parameter `CYLThemeEffectProvider` uses `__kindof`, which the generated Swift interface drops (it prints the block type expanded), so an
+//      Objective-C block with a narrower parameter type (`UIColor *theme`) would no longer compile (CYLThemeTests.m; step 116,
+//      docs/Swift-Migration-Phase3.md). Hidden from Swift (`__swift__`), which uses the Swift declarations.
+// [CN] 类别为 Swift；这些 Objective-C 声明保留，因为其 block 参数 `CYLThemeEffectProvider` 使用 `__kindof`，生成的 Swift 接口会丢掉它（展开打印 block 类型），
+//      参数类型更具体的 Objective-C block 将无法编译（CYLThemeTests.m；第 116 步）。对 Swift 隐藏，Swift 使用 Swift 声明。
 #import <UIKit/UIKit.h>
 
 NS_ASSUME_NONNULL_BEGIN
