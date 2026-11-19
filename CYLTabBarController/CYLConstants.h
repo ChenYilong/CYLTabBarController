@@ -65,8 +65,6 @@
 #endif
 
 
-FOUNDATION_EXTERN CGFloat CYLTabBarItemImagePlaceholderCurrentWidth(void);
-FOUNDATION_EXTERN CGFloat CYLTabBarItemImagePlaceholderCurrentHeight(void);
 /*!
  * [EN] The placeholder size of a tab image: read-only Swift variables since step 114, read by Objective-C through these macros;
  *      set it with `CYLConstants.tabBarItemImagePlaceholderSize`.
@@ -132,8 +130,6 @@ typedef NS_ENUM(NSInteger, CYLTabBarMinimizeBehavior) {
  * [CN] 以 C 函数形式提供的 `+[CYLConstants UIBasisWidthScale]` / `UIBasisHeightScale`（Swift，第 114 步），使下方的内联函数在导入生成的
  *      Swift 接口之前即可编译。
  */
-FOUNDATION_EXTERN CGFloat CYLConstantsUIBasisWidthScale(void);
-FOUNDATION_EXTERN CGFloat CYLConstantsUIBasisHeightScale(void);
 #define CYLScale (CYLConstantsUIBasisWidthScale())
 #define CYLHScale (CYLConstantsUIBasisHeightScale())
 

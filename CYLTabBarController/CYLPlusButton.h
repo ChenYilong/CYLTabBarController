@@ -263,7 +263,6 @@ if ([tabBarController.selectedViewController isEqual:CYLPlusChildViewController]
 
 @end
 
-@class CYLTabBar;
 
 /*!
  * [EN] The plus button and the plus child view controller registered LAST (and not removed since).
@@ -275,8 +274,6 @@ if ([tabBarController.selectedViewController isEqual:CYLPlusChildViewController]
  *      库内部不再读取它们：存在多个 PlusButton 时，每个 TabBarController 使用与自己 context 对应的那一个，
  *      见 `+plusButtonForTabBarContext:` 和 `+plusChildViewControllerForTabBarContext:`。只有一个 PlusButton 时，它们与以前完全一致。
  */
-FOUNDATION_EXTERN CYLPlusButton *_Nullable CYLPlusButtonCurrentExternPlusButton(void);
-FOUNDATION_EXTERN UIViewController *_Nullable CYLPlusButtonCurrentPlusChildViewController(void);
 /*!
  * [EN] Read-only since step 109: Swift variables (`CYLExternPlusButton`, `CYLPlusChildViewController`), read by Objective-C
  *      through these macros. [CN] 自第 109 步起只读：Swift 变量，Objective-C 通过这些宏读取。

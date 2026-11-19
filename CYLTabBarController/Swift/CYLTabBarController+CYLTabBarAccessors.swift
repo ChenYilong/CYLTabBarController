@@ -8,7 +8,7 @@
 import UIKit
 
 /// [EN] The system tab bar height, the default of `tabBarHeight`. [CN] 系统 TabBar 的高度，`tabBarHeight` 的默认值。
-private let CYLDefaultTabBarHeight: CGFloat = 49
+private let cylDefaultTabBarHeight: CGFloat = 49
 
 /**
  [EN] The FlatDesign parts of the accessors, implemented by CYLTabBarController+CYLFlatDesignTabBarAccessors.swift in the
@@ -113,7 +113,7 @@ extension CYLTabBarController {
         let isFlatDesignWithoutItsTabBar = tabBarStyleType == .flatDesign && !cylIsFlatDesignTabBar(cylPrivate.cylStoredTabBar())
         if !isFlatDesignWithoutItsTabBar && accessors.cylTabBarHeightStorage() == 0 {
             // [EN] Not the global `CYLTabBarHeight`: another controller with a custom height wrote it. [CN] 不使用全局变量：其他控制器会改写它。
-            accessors.cylSetTabBarHeightStorage(CYLDefaultTabBarHeight)
+            accessors.cylSetTabBarHeightStorage(cylDefaultTabBarHeight)
         }
         return accessors.cylTabBarHeightStorage()
     }

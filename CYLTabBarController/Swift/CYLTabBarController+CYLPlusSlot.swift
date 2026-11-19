@@ -9,7 +9,7 @@ import UIKit
 
 /// [EN] Marks the tab item attributes inserted for the slot (Liquid Glass, FlatDesign), so a re-assignment can remove them.
 /// [CN] 标记为 slot 插入的 TabBarItem 属性（液态玻璃、扁平样式），重新赋值时据此移除。
-private let CYLTabBarItemPlusSlotPlaceholderKey = "CYLTabBarItemPlusSlotPlaceholder"
+private let cylTabBarItemPlusSlotPlaceholderKey = "CYLTabBarItemPlusSlotPlaceholder"
 
 /**
  [EN] The plus slot: the plus button's tab in `viewControllers`, the plus child view controller, or a placeholder for a plus
@@ -66,7 +66,7 @@ extension CYLTabBarController {
     }
 
     private static func cylIsPlusSlotAttributes(_ attributes: Any) -> Bool {
-        ((attributes as? [AnyHashable: Any])?[CYLTabBarItemPlusSlotPlaceholderKey] as? NSNumber)?.boolValue == true
+        ((attributes as? [AnyHashable: Any])?[cylTabBarItemPlusSlotPlaceholderKey] as? NSNumber)?.boolValue == true
     }
 
     /// [EN] The app's own tab item attributes: without the entries inserted for the slot. [CN] 去掉为 slot 插入的属性。
@@ -123,7 +123,7 @@ extension CYLTabBarController {
     /// [EN] The attributes of the slot's tab item. [CN] slot 对应 TabBarItem 的属性。
     private func cylPlusSlotTabBarItemAttributes() -> [AnyHashable: Any] {
         [CYLTabBarItemTitle: "", CYLTabBarItemImage: UIImage.cyl_tabItemPlaceholder(), CYLTabBarItemSelectedImage: UIImage.cyl_tabItemPlaceholder(),
-         CYLTabBarItemPlusSlotPlaceholderKey: true]
+         cylTabBarItemPlusSlotPlaceholderKey: true]
     }
 
     /**

@@ -35,7 +35,7 @@ final class CYLTabBarOverflowTouchView: UIView {
 }
 
 /// [EN] The overflow touch view of a controller. [CN] 控制器的溢出触摸视图。
-private var CYLOverflowTouchViewKey: UInt8 = 0
+private var cylOverflowTouchViewKey: UInt8 = 0
 
 /// [EN] The layout steps implemented elsewhere (Swift or CYLTabBarController.m), called by selector. [CN] 在别处实现、按 selector 调用的布局步骤。
 @objc protocol CYLLayoutHooks {
@@ -166,10 +166,10 @@ extension CYLTabBarController {
     /// [CN] TabBar 位于自己的容器视图中时（iOS 26 及以上）安装溢出触摸视图，否则移除。
     private func cylUpdateOverflowTouchView() {
         let tabBar = self.tabBar
-        let touchView = objc_getAssociatedObject(self, &CYLOverflowTouchViewKey) as? CYLTabBarOverflowTouchView
+        let touchView = objc_getAssociatedObject(self, &cylOverflowTouchViewKey) as? CYLTabBarOverflowTouchView
         guard isViewLoaded, let superview = tabBar.superview, superview !== view else {
             touchView?.removeFromSuperview()
-            objc_setAssociatedObject(self, &CYLOverflowTouchViewKey, nil, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+            objc_setAssociatedObject(self, &cylOverflowTouchViewKey, nil, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
             return
         }
         let overflowView = touchView ?? {
@@ -178,7 +178,7 @@ extension CYLTabBarController {
             created.autoresizingMask = [.flexibleWidth, .flexibleHeight]
             // [EN] Not a control: VoiceOver reads the plus button. [CN] 不是控件：VoiceOver 读 PlusButton。
             created.accessibilityElementsHidden = true
-            objc_setAssociatedObject(self, &CYLOverflowTouchViewKey, created, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+            objc_setAssociatedObject(self, &cylOverflowTouchViewKey, created, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
             return created
         }()
         overflowView.tabBar = tabBar

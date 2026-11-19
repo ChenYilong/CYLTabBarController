@@ -15,7 +15,7 @@ private enum CYLKVOContexts {
 }
 
 /// [EN] The tab bar whose appearances are observed. [CN] 正在观察其外观的 TabBar。
-private var CYLObservedStandardAppearanceTabBarKey: UInt8 = 0
+private var cylObservedStandardAppearanceTabBarKey: UInt8 = 0
 
 /**
  [EN] The FlatDesign tab bar replaced (`cyl_tabBar` observed), implemented by CYLTabBarController+CYLFlatDesignKeyValueObserving.swift
@@ -89,23 +89,23 @@ extension CYLTabBarController {
     @objc(cyl_startObservingStandardAppearance)
     func cylStartObservingStandardAppearance() {
         let tabBar = self.tabBar
-        if (objc_getAssociatedObject(self, &CYLObservedStandardAppearanceTabBarKey) as? UITabBar) === tabBar {
+        if (objc_getAssociatedObject(self, &cylObservedStandardAppearanceTabBarKey) as? UITabBar) === tabBar {
             return
         }
         cylStopObservingStandardAppearance()
         for keyPath in CYLTabBarController.cylObservedAppearanceKeyPaths {
             tabBar.addObserver(self, forKeyPath: keyPath, options: .new, context: CYLKVOContexts.standardAppearance)
         }
-        objc_setAssociatedObject(self, &CYLObservedStandardAppearanceTabBarKey, tabBar, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+        objc_setAssociatedObject(self, &cylObservedStandardAppearanceTabBarKey, tabBar, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
     }
 
     /// [EN] Stops observing, whatever the style is now. [CN] 停止观察，与当前样式无关。
     @objc(cyl_stopObservingStandardAppearance)
     func cylStopObservingStandardAppearance() {
-        guard let tabBar = objc_getAssociatedObject(self, &CYLObservedStandardAppearanceTabBarKey) as? UITabBar else { return }
+        guard let tabBar = objc_getAssociatedObject(self, &cylObservedStandardAppearanceTabBarKey) as? UITabBar else { return }
         for keyPath in CYLTabBarController.cylObservedAppearanceKeyPaths {
             tabBar.cyl_removeObserver(self, forKeyPath: keyPath, context: CYLKVOContexts.standardAppearance)
         }
-        objc_setAssociatedObject(self, &CYLObservedStandardAppearanceTabBarKey, nil, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+        objc_setAssociatedObject(self, &cylObservedStandardAppearanceTabBarKey, nil, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
     }
 }

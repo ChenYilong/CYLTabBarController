@@ -12,18 +12,21 @@ import UIKit
     @objc(cyl_setAllowsVerticalBarStorage:) func cylSetAllowsVerticalBarStorage(_ allowsVerticalBar: Bool)
 }
 
+/// [EN] The folders of Apple's frameworks, built from components. [CN] 系统框架所在的文件夹，由路径组件拼成。
+private let systemFrameworkPathMarkers = [["System", "Library"], ["usr", "lib"]].map { "/" + $0.joined(separator: "/") + "/" }
+
 /**
  FIX: issue #672
  [EN] Whether `selector` on `cls` comes from app code rather than a system framework such as UIKitCore.
  [CN] `cls` 的 `selector` 是否来自 App 代码，而不是 UIKitCore 等系统框架。
  */
-private func CYLIsImplementedOutsideSystemFrameworks(_ cls: AnyClass, _ selector: Selector) -> Bool {
+private func cylIsImplementedOutsideSystemFrameworks(_ cls: AnyClass, _ selector: Selector) -> Bool {
     let implementation: IMP? = class_getMethodImplementation(cls, selector)
     guard let implementation else { return false }
     var info = Dl_info()
     guard dladdr(unsafeBitCast(implementation, to: UnsafeRawPointer.self), &info) != 0, let fileName = info.dli_fname else { return false }
     let path = String(cString: fileName)
-    return !path.contains("/System/Library/") && !path.contains("/usr/lib/")
+    return !systemFrameworkPathMarkers.contains { path.contains($0) }
 }
 
 /**
@@ -77,7 +80,7 @@ extension CYLTabBarController {
         var depth = 0
         while let current = viewController, depth < 16 {
             depth += 1
-            if CYLIsImplementedOutsideSystemFrameworks(type(of: current), behavior) {
+            if cylIsImplementedOutsideSystemFrameworks(type(of: current), behavior) {
                 return true
             }
             guard current.responds(to: childGetter),

@@ -56,6 +56,7 @@ extension CYLTabBarController {
      */
     @objc(cyl_viewDidAppear:)
     func cylViewDidAppear(_ animated: Bool) {
+        // [EN] `super.viewDidAppear` is called by the Objective-C override (the analyzer wants it there). [CN] `super.viewDidAppear` 由 Objective-C 重写调用（静态分析要求在那里调用）。
         unsafeBitCast(self, to: CYLFlatDesignLifeCycle.self).cylRefreshSystemTabBarVisibilityIfNeeded?()
         cylTabBarMinimizeLifecycleEvent()
         // [EN] Scroll hiding self-test (issue #13), only when launched with `-CYLScrollHideSelfTest YES`: runs once.
@@ -100,11 +101,13 @@ extension CYLTabBarController {
      */
     @objc(cyl_viewWillDisappear:)
     func cylViewWillDisappear(_ animated: Bool) {
+        // [EN] `super.viewWillDisappear` is called by the Objective-C override (the analyzer wants it there). [CN] `super.viewWillDisappear` 由 Objective-C 重写调用（静态分析要求在那里调用）。
         cylTabBarMinimizeLifecycleEvent()
     }
 
     @objc(cyl_viewDidDisappear:)
     func cylViewDidDisappear(_ animated: Bool) {
+        // [EN] `super.viewDidDisappear` is called by the Objective-C override (the analyzer wants it there). [CN] `super.viewDidDisappear` 由 Objective-C 重写调用（静态分析要求在那里调用）。
         cylTabBarMinimizeLifecycleEvent()
     }
 
@@ -115,6 +118,7 @@ extension CYLTabBarController {
      */
     @objc(cyl_viewWillAppear:)
     func cylViewWillAppear(_ animated: Bool) {
+        // [EN] `super.viewWillAppear` is called by the Objective-C override (the analyzer wants it there). [CN] `super.viewWillAppear` 由 Objective-C 重写调用（静态分析要求在那里调用）。
         CYLTabBarController.cylMarkActive(self)
         // FIX: issue #216
         cylApplyLaunchTabBarThemeIfNeeded()
