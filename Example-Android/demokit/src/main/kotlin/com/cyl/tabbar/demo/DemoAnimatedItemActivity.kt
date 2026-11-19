@@ -16,10 +16,10 @@ import com.cyl.tabbar.CYLConstants
 import com.cyl.tabbar.CYLTabBarAnimationURLWithOptions
 
 /**
- * [EN] docs/Animated-Item.md, TODO 6: CYLAnimatedItemView on its own, with the public API only. A GIF (no library), a
+ * [EN] docs/Animated-Item.md, task 6: CYLAnimatedItemView on its own, with the public API only. A GIF (no library), a
  *      Lottie file (lottie-android is in this app), a missing file (the placeholder), and a vertical item with an
  *      accessory and dragging. Tapping an item plays its animation; the last event shows at the bottom.
- * [CN] docs/Animated-Item.md，TODO 6：单独使用 CYLAnimatedItemView，只用公开 API。GIF（无需动画库）、Lottie 文件（本 App 引入了 lottie-android）、
+ * [CN] docs/Animated-Item.md，任务 6：单独使用 CYLAnimatedItemView，只用公开 API。GIF（无需动画库）、Lottie 文件（本 App 引入了 lottie-android）、
  *      缺失的文件（占位图），以及带附加图标与拖拽的纵向条目。点按条目播放其动画；最后一个事件显示在底部。
  */
 class DemoAnimatedItemActivity : AppCompatActivity() {
