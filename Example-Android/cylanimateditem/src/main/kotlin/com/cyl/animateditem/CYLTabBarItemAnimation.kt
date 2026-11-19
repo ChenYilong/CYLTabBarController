@@ -1226,7 +1226,9 @@ class CYLRiveTabBarItemAnimationView internal constructor(context: Context, priv
         if (tintOption == TINT_TITLE) applyTint(color)
     }
 
-    /** [EN] The title color and state given last, for a night-mode change. [CN] 最近给出的标题颜色与状态，供夜间模式变化使用。 */
+    /**
+     * [EN] The title color and state given last, for a night-mode change. [CN] 最近给出的标题颜色与状态，供夜间模式变化使用。
+     */
     private var tintTitleColor: Int? = null
     private var tintSelected: Boolean? = null
 

@@ -115,18 +115,24 @@ open class CYLAnimatedItemStackView @JvmOverloads constructor(
     var iconColor: Int? = null
         set(value) { field = value; entries.forEach { it.view.stackIconColor = value } }
 
-    /** [EN] The default icon color of selected items; null uses `iconColor`. [CN] 选中条目的默认图标颜色；null 时使用 `iconColor`。 */
+    /**
+     * [EN] The default icon color of selected items; null uses `iconColor`. [CN] 选中条目的默认图标颜色；null 时使用 `iconColor`。
+     */
     var selectedIconColor: Int? = null
         set(value) { field = value; entries.forEach { it.view.stackSelectedIconColor = value } }
 
-    /** [EN] The space before an item in dp: 0 for the first, else its own spacing or `spacingDp`. [CN] 条目之前的间距（dp）：第一个为 0，否则为其自身间距或 `spacingDp`。 */
+    /**
+     * [EN] The space before an item in dp: 0 for the first, else its own spacing or `spacingDp`. [CN] 条目之前的间距（dp）：第一个为 0，否则为其自身间距或 `spacingDp`。
+     */
     fun spacingBeforeDpOf(itemView: CYLAnimatedItemView): Float {
         val index = entries.indexOfFirst { it.view === itemView }
         if (index <= 0) return 0f
         return entries[index].spacingBeforeDp ?: spacingDp
     }
 
-    /** [EN] Sets every item's margin on the stack's axis. [CN] 按堆叠方向设置每个条目的外边距。 */
+    /**
+     * [EN] Sets every item's margin on the stack's axis. [CN] 按堆叠方向设置每个条目的外边距。
+     */
     private fun updateSpacing() {
         entries.forEach { entry ->
             val params = entry.view.layoutParams as? LinearLayout.LayoutParams ?: return@forEach

@@ -265,10 +265,14 @@ class CYLGIFDrawable private constructor(private val frames: CYLGIFFrames) : Dra
     private val paint = Paint(Paint.FILTER_BITMAP_FLAG)
     private val duration = frames.duration.coerceAtLeast(1)
     private val destination = android.graphics.Rect()
-    /** [EN] When the current play started (uptime ms); -1 while resting. [CN] 当前播放的开始时刻（uptime 毫秒）；静止时为 -1。 */
+    /**
+     * [EN] When the current play started (uptime ms); -1 while resting. [CN] 当前播放的开始时刻（uptime 毫秒）；静止时为 -1。
+     */
     private var playStart = -1L
 
-    /** [EN] Whether a play repeats; false lets the current pass finish. [CN] 播放是否重复；设为 false 时让当前一遍播完。 */
+    /**
+     * [EN] Whether a play repeats; false lets the current pass finish. [CN] 播放是否重复；设为 false 时让当前一遍播完。
+     */
     var loops: Boolean = false
         set(value) {
             // [EN] Turned off while playing: the current pass is the last one. [CN] 播放中关闭：当前这一遍是最后一遍。
@@ -279,18 +283,24 @@ class CYLGIFDrawable private constructor(private val frames: CYLGIFFrames) : Dra
             field = value
         }
 
-    /** [EN] Whether it is playing (not resting on its first frame). [CN] 是否正在播放（不是停在第一帧）。 */
+    /**
+     * [EN] Whether it is playing (not resting on its first frame). [CN] 是否正在播放（不是停在第一帧）。
+     */
     val isPlaying: Boolean
         get() = playStart >= 0 && frameTimeAt(SystemClock.uptimeMillis()) != null
 
-    /** [EN] Plays from the first frame: once, or until stopped when `loops`. [CN] 从第一帧开始播放：一次，`loops` 时一直播放到停止。 */
+    /**
+     * [EN] Plays from the first frame: once, or until stopped when `loops`. [CN] 从第一帧开始播放：一次，`loops` 时一直播放到停止。
+     */
     fun play(loops: Boolean = false) {
         this.loops = loops
         playStart = SystemClock.uptimeMillis()
         invalidateSelf()
     }
 
-    /** [EN] Stops and shows the first frame. [CN] 停止并显示第一帧。 */
+    /**
+     * [EN] Stops and shows the first frame. [CN] 停止并显示第一帧。
+     */
     fun stop() {
         playStart = -1
         unscheduleSelf(this)

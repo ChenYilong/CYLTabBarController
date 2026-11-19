@@ -408,14 +408,18 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
     var selectedIconColor: Int? = null
         set(value) { field = value; applyIconColor() }
 
-    /** [EN] The colors of the stack that holds the item, used when the item has none. [CN] 容纳该条目的堆叠视图的颜色，条目没有自己的颜色时使用。 */
+    /**
+     * [EN] The colors of the stack that holds the item, used when the item has none. [CN] 容纳该条目的堆叠视图的颜色，条目没有自己的颜色时使用。
+     */
     internal var stackIconColor: Int? = null
         set(value) { field = value; applyIconColor() }
     internal var stackSelectedIconColor: Int? = null
         set(value) { field = value; applyIconColor() }
     private var appliesIconColor = false
 
-    /** [EN] The icon color in effect now, or null. [CN] 当前生效的图标颜色，没有时为 null。 */
+    /**
+     * [EN] The icon color in effect now, or null. [CN] 当前生效的图标颜色，没有时为 null。
+     */
     val effectiveIconColor: Int?
         get() {
             if (isSelected) (selectedIconColor ?: stackSelectedIconColor)?.let { return it }

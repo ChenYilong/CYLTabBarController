@@ -66,7 +66,9 @@ object CYLGIFDecoder {
     @JvmStatic
     fun decode(bytes: ByteArray): CYLGIFFrames? = try { Reader(bytes).read() } catch (error: RuntimeException) { null }
 
-    /** [EN] The graphic control extension of the next frame. [CN] 下一帧的图形控制扩展。 */
+    /**
+     * [EN] The graphic control extension of the next frame. [CN] 下一帧的图形控制扩展。
+     */
     private class Control {
         var disposal = 0
         var delay = 0
@@ -74,12 +76,16 @@ object CYLGIFDecoder {
         fun reset() { disposal = 0; delay = 0; transparent = -1 }
     }
 
-    /** [EN] The logical screen the frames are drawn on. [CN] 绘制各帧的逻辑屏幕。 */
+    /**
+     * [EN] The logical screen the frames are drawn on. [CN] 绘制各帧的逻辑屏幕。
+     */
     private class Canvas(val width: Int, val height: Int) {
         val pixels = IntArray(width * height)
     }
 
-    /** [EN] One image descriptor with its color table and decoded indices. [CN] 一个图像描述符，及其颜色表与解码后的索引。 */
+    /**
+     * [EN] One image descriptor with its color table and decoded indices. [CN] 一个图像描述符，及其颜色表与解码后的索引。
+     */
     private class Frame(val left: Int, val top: Int, val width: Int, val height: Int, val interlaced: Boolean, val table: IntArray, val indices: ByteArray)
 
     private class Reader(private val data: ByteArray) {
@@ -271,7 +277,9 @@ object CYLGIFDecoder {
             return out
         }
 
-        /** [EN] The next code, or -1 when the data ends. [CN] 下一个码；数据结束时为 -1。 */
+        /**
+         * [EN] The next code, or -1 when the data ends. [CN] 下一个码；数据结束时为 -1。
+         */
         private fun readCode(): Int {
             while (bitCount < codeSize && index < codes.size) {
                 bits = bits or ((codes[index++].toInt() and 0xFF) shl bitCount)
@@ -284,7 +292,9 @@ object CYLGIFDecoder {
             return code
         }
 
-        /** [EN] The first code after a clear: a literal index. [CN] 清除码之后的第一个码：一个字面索引。 */
+        /**
+         * [EN] The first code after a clear: a literal index. [CN] 清除码之后的第一个码：一个字面索引。
+         */
         private fun writeFirst(code: Int): Boolean {
             if (code >= clear) return false
             out[written++] = code.toByte()
@@ -292,7 +302,9 @@ object CYLGIFDecoder {
             return true
         }
 
-        /** [EN] A code from the table (or the next one), written out, then added to the table. [CN] 表中的码（或下一个码），写出后加入表中。 */
+        /**
+         * [EN] A code from the table (or the next one), written out, then added to the table. [CN] 表中的码（或下一个码），写出后加入表中。
+         */
         private fun writeSequence(code: Int): Boolean {
             var current = code
             var top = 0
