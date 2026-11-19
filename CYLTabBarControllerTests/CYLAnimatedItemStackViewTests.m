@@ -228,4 +228,30 @@
     XCTAssertEqual(count, 1);
 }
 
+- (void)testAxisSpacingAndStackWideAppearance {
+    CYLAnimatedItemStackView *stack = [[CYLAnimatedItemStackView alloc] initWithItemViews:@[] actions:nil];
+    XCTAssertEqual(stack.axis, UILayoutConstraintAxisVertical);
+    stack.axis = UILayoutConstraintAxisHorizontal;
+    stack.spacing = 10;
+    XCTAssertEqual(stack.stackView.axis, UILayoutConstraintAxisHorizontal, @"axis wraps the stack view's");
+    XCTAssertEqual(stack.stackView.spacing, 10);
+    CYLAnimatedItemView *own = [[CYLAnimatedItemView alloc] initWithFrame:CGRectZero];
+    UITabBarItemAppearance *ownAppearance = [[UITabBarItemAppearance alloc] init];
+    ownAppearance.normal.iconColor = UIColor.redColor;
+    own.itemAppearance = ownAppearance;
+    [stack appendItemView:own action:nil spacingBefore:0];
+    CYLAnimatedItemView *plain = [stack appendItemWithTitle:@"Tag" image:nil animationURL:nil action:nil spacingBefore:8];
+    UITabBarItemAppearance *appearance = [[UITabBarItemAppearance alloc] init];
+    appearance.normal.iconColor = UIColor.grayColor;
+    appearance.selected.iconColor = UIColor.blueColor;
+    stack.itemAppearance = appearance;
+    XCTAssertEqualObjects(plain.itemAppearance.selected.iconColor, UIColor.blueColor, @"an item without its own takes the stack's");
+    XCTAssertEqualObjects(own.itemAppearance.normal.iconColor, UIColor.redColor, @"an item with its own keeps it");
+    CYLAnimatedItemView *later = [stack appendItemWithTitle:@"Later" image:nil animationURL:nil action:nil spacingBefore:8];
+    XCTAssertEqualObjects(later.itemAppearance.normal.iconColor, UIColor.grayColor, @"items appended later take it too");
+    stack.itemAppearance = nil;
+    XCTAssertNil(plain.itemAppearance);
+    XCTAssertNotNil(own.itemAppearance);
+}
+
 @end

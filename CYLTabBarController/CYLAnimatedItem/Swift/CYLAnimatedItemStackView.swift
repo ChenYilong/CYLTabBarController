@@ -56,6 +56,39 @@ open class CYLAnimatedItemStackView: UIView, UIGestureRecognizerDelegate {
     /**
      [EN] The smallest space between the items and the view's edges (16 by default). [CN] 条目与视图边缘之间的最小间距（默认 16）。
      */
+    /**
+     [EN] The direction of the items: `.vertical` (default, a column) or `.horizontal` (one row). Wraps `stackView.axis`;
+          `contentMargin` and each item's spacing before follow the axis.
+     [CN] 条目的方向：`.vertical`（默认，一列）或 `.horizontal`（一行）。封装 `stackView.axis`；`contentMargin` 与每个条目之前的间距随方向变化。
+     */
+    public var axis: NSLayoutConstraint.Axis {
+        get { stackView.axis }
+        set {
+            stackView.axis = newValue
+            setNeedsLayout()
+        }
+    }
+
+    /**
+     [EN] The default space between items (16); an item's own spacing before replaces it. Wraps `stackView.spacing`.
+     [CN] 条目之间的默认间距（16）；条目自己的前置间距优先。封装 `stackView.spacing`。
+     */
+    public var spacing: CGFloat {
+        get { stackView.spacing }
+        set { stackView.spacing = newValue }
+    }
+
+    /**
+     [EN] The default appearance of the items (icon tint per state, title attributes; `CYLAnimatedItemView.itemAppearance`), given
+          to every item without one of its own, items appended later included; nil (default) gives none. Symbol images are
+          templates, so their tint per state comes from here. Copied.
+     [CN] 条目的默认外观（各状态的图标着色与标题属性；`CYLAnimatedItemView.itemAppearance`），交给每个没有自己外观的条目，包括之后追加的条目；
+          nil（默认）不提供。SF Symbols 图片是模板图，各状态的着色由这里提供。会被复制。
+     */
+    @NSCopying public var itemAppearance: UITabBarItemAppearance? {
+        didSet { entries.forEach { applyStackAppearance(to: $0) } }
+    }
+
     public var contentMargin: CGFloat = 16 {
         didSet {
             contentMargin = max(0, contentMargin)
@@ -102,6 +135,8 @@ open class CYLAnimatedItemStackView: UIView, UIGestureRecognizerDelegate {
     private final class Entry {
         let view: CYLAnimatedItemView
         var action: String?
+        /// [EN] The item shows the stack's `itemAppearance` (it had none of its own). [CN] 条目显示堆叠视图的 `itemAppearance`（它自己没有）。
+        var usesStackAppearance = false
         let width: NSLayoutConstraint
         let height: NSLayoutConstraint
         var observations: [NSKeyValueObservation] = []
@@ -208,11 +243,19 @@ open class CYLAnimatedItemStackView: UIView, UIGestureRecognizerDelegate {
         stackView.addArrangedSubview(itemView)
         if let previous = previous { stackView.setCustomSpacing(max(0, spacingBefore), after: previous) }
         let entry = Entry(view: itemView)
+        entry.usesStackAppearance = itemView.itemAppearance == nil
         entries.append(entry)
         itemView.addTarget(self, action: #selector(cyl_itemTapped(_:)), for: .touchUpInside)
         observe(entry)
         setAction(action, for: itemView)
+        applyStackAppearance(to: entry)
         fit(entry)
+    }
+
+    /// [EN] Gives the stack's appearance to an item that has none of its own. [CN] 把堆叠视图的外观交给没有自己外观的条目。
+    private func applyStackAppearance(to entry: Entry) {
+        guard entry.usesStackAppearance else { return }
+        entry.view.itemAppearance = itemAppearance
     }
 
     /**
