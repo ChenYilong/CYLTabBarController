@@ -559,6 +559,25 @@ open class CYLTabBarController: UITabBarController, CYLTabBarControllerDelegate,
         set { cylSetSystemTabBarMinimizeBehaviorFromApp(newValue) }
     }
 
+    // MARK: - Delegate hooks a subclass can override
+
+    /**
+     * [EN] A tab item gesture (reselect, double tap, long press), for the controller's own subclasses; the library reports it to the
+     *      `delegate` too. Does nothing here. [CN] Tab 手势（重复点击、双击、长按），供控制器自己的子类重写；本库同时会把它上报给 `delegate`。这里不做任何处理。
+     */
+    @objc(tabBarController:didRecognizeTabBarItemGesture:control:viewController:)
+    open func tabBarController(_ tabBarController: CYLTabBarController, didRecognize gesture: CYLTabBarItemGesture, control: UIControl,
+                               viewController: UIViewController?) {
+    }
+
+    /**
+     * [EN] A tab button or the plus button was tapped (once per tap), for subclasses. Does nothing here.
+     * [CN] Tab 按钮或 PlusButton 被点击（每次点击一次），供子类重写。这里不做任何处理。
+     */
+    @objc(tabBarController:didSelectControl:)
+    open func tabBarController(_ tabBarController: UITabBarController, didSelect control: UIControl) {
+    }
+
     // MARK: - UITabBarControllerDelegate
 
     open func tabBarController(_ tabBarController: UITabBarController, shouldSelect viewController: UIViewController) -> Bool {
