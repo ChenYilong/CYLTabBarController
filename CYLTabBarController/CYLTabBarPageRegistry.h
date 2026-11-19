@@ -16,6 +16,8 @@
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Tab-Page-Registry.md
 // docs-binding:end
 
+// CYL-SWIFT-MIGRATION: objc-required — [EN] Only the block typedefs of the page registry (`CYLTabBarPageProvider` …, spelled by Objective-C source; Swift typealiases are not exported), the typed string `CYLTabBarPageSource` and forward declarations are left; the registry is Swift since step 35 (docs/Swift-Migration-Phase3.md).
+// [CN] Swift 无法替代的 Objective-C（原因见英文说明与 docs/Swift-Migration-Phase3.md）。
 #import <UIKit/UIKit.h>
 
 NS_ASSUME_NONNULL_BEGIN

@@ -41,22 +41,18 @@ private func CYLKey(_ name: String) -> UnsafeRawPointer {
  */
 extension UITabBar {
 
-    @objc(cyl_platterViewWidth)
     func cylPlatterViewWidth() -> CGFloat {
         CGFloat((objc_getAssociatedObject(self, CYLKey("cyl_platterViewWidth")) as? NSNumber)?.doubleValue ?? 0)
     }
 
-    @objc(cyl_setPlatterViewWidth:)
     func cylSetPlatterViewWidth(_ width: CGFloat) {
         objc_setAssociatedObject(self, CYLKey("cyl_platterViewWidth"), NSNumber(value: Double(width)), .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
     }
 
-    @objc(cyl_platterViewSize)
     func cylPlatterViewSize() -> NSValue? {
         objc_getAssociatedObject(self, CYLKey("cyl_platterViewSize")) as? NSValue
     }
 
-    @objc(cyl_setPlatterViewSize:)
     func cylSetPlatterViewSize(_ size: NSValue?) {
         objc_setAssociatedObject(self, CYLKey("cyl_platterViewSize"), size, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
     }
@@ -72,42 +68,34 @@ extension UITabBar {
     }
 
     /// [EN] Weak, as the header declares. [CN] 与头文件声明一致，弱引用。
-    @objc(cyl_platterView)
     func cylPlatterView() -> UIView? {
         cyl_weakAssociatedObject(forKey: CYLKey("cyl_platterView")) as? UIView
     }
 
-    @objc(cyl_setPlatterView:)
     func cylSetPlatterView(_ view: UIView?) {
         cyl_setWeakAssociatedObject(view, forKey: CYLKey("cyl_platterView"))
     }
 
-    @objc(cyl_platterContentView)
     func cylPlatterContentView() -> UIView? {
         cyl_weakAssociatedObject(forKey: CYLKey("cyl_platterContentView")) as? UIView
     }
 
-    @objc(cyl_setPlatterContentView:)
     func cylSetPlatterContentView(_ view: UIView?) {
         cyl_setWeakAssociatedObject(view, forKey: CYLKey("cyl_platterContentView"))
     }
 
-    @objc(cyl_portalLayer)
     func cylPortalLayer() -> CALayer? {
         cyl_weakAssociatedObject(forKey: CYLKey("cyl_portalLayer")) as? CALayer
     }
 
-    @objc(cyl_setPortalLayer:)
     func cylSetPortalLayer(_ layer: CALayer?) {
         cyl_setWeakAssociatedObject(layer, forKey: CYLKey("cyl_portalLayer"))
     }
 
-    @objc(cyl_portalView)
     func cylPortalView() -> UIView? {
         objc_getAssociatedObject(self, CYLKey("cyl_portalView")) as? UIView
     }
 
-    @objc(cyl_setPortalView:)
     func cylSetPortalView(_ view: UIView?) {
         objc_setAssociatedObject(self, CYLKey("cyl_portalView"), view, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
     }
@@ -116,7 +104,6 @@ extension UITabBar {
      * [EN] The tab buttons: the subviews, or with Liquid Glass (iOS 26 and later) the controls of the platter's content view, in visual order.
      * [CN] Tab 按钮：子视图；液态玻璃（iOS 26 及以后）下为 platter 的 content view 中的控件，按视觉顺序。
      */
-    @objc(cyl_tabBarSubviews)
     func cylTabBarSubviews() -> [UIView] {
         if !CYLConstants.isLiquidGlassActive() {
             return subviews
@@ -137,7 +124,6 @@ extension UITabBar {
         return cylAllTabViews(from: contentView) ?? subviews
     }
 
-    @objc(cyl_platterSelectedContentViewsWithoutPlusButton)
     func cylPlatterSelectedContentViewsWithoutPlusButton() -> [UIControl] {
         (cylPlatterSelectedContentViews() ?? []).filter { !$0.cyl_isPlusControl() }
     }
@@ -162,12 +148,10 @@ extension UITabBar {
         }
     }
 
-    @objc(cyl_fullHeight)
     func cylFullHeight() -> CGFloat {
         CYLGetTabBarFullH(cylBoundsSize().height)
     }
 
-    @objc(cyl_boundsSize)
     func cylBoundsSize() -> CGSize {
         let size = bounds.size
         if !CYLConstants.isLiquidGlassActive() {
@@ -184,27 +168,22 @@ extension UITabBar {
         return size
     }
 
-    @objc(cyl_boundsWidthOffset)
     func cylBoundsWidthOffset() -> CGFloat {
         CYLConstants.isLiquidGlassActive() ? (CYLScreenWidth() - cylBoundsSize().width) * 0.5 : 0
     }
 
-    @objc(cyl_platterViews)
     func cylPlatterViews() -> [UIView] {
         []
     }
 
-    @objc(cyl_platterViewWithIndex:)
     func cylPlatterView(withIndex index: Int) -> UIView? {
         CYLObjectAtIndex(cylPlatterViews(), index)
     }
 
-    @objc(cyl_platterContentViews)
     func cylPlatterContentViews() -> [UIView] {
         cylTabBarSubviews()
     }
 
-    @objc(cyl_platterContentViewWithIndex:)
     func cylPlatterContentView(withIndex index: Int) -> UIView? {
         CYLObjectAtIndex(cylPlatterContentViews(), index)
     }
@@ -213,28 +192,23 @@ extension UITabBar {
         cylPlatterView()?.subviews.first(where: test)
     }
 
-    @objc(cyl_platterSelectedContentView)
     func cylPlatterSelectedContentView() -> UIView? {
         platterSubview { $0.cyl_isPlatterSelectedContentView() }
     }
 
-    @objc(cyl_platterSelectedContentViews)
     func cylPlatterSelectedContentViews() -> [UIControl]? {
         guard let contentView = cylPlatterSelectedContentView() else { return nil }
         return (cylAllTabViews(from: contentView) ?? subviews).compactMap { $0 as? UIControl }
     }
 
-    @objc(cyl_platterLiquidLensView)
     func cylPlatterLiquidLensView() -> UIView? {
         platterSubview { $0.cyl_isPlatterLiquidLensView() }
     }
 
-    @objc(cyl_platterVisualProviderFloatingSelectedContentView)
     func cylPlatterVisualProviderFloatingSelectedContentView() -> UIView? {
         platterSubview { $0.cyl_isPlatterVisualProviderFloatingSelectedContentView() }
     }
 
-    @objc(cyl_platterLiquidLensViewContentView)
     func cylPlatterLiquidLensViewContentView() -> UIView? {
         if let source = cylPortalView()?.cyl_value(forKey: "sourceView") as? UIView {
             return source
@@ -248,37 +222,30 @@ extension UITabBar {
         return contentView
     }
 
-    @objc(cyl_platterLiquidLensClearGlassView)
     func cylPlatterLiquidLensClearGlassView() -> UIView? {
         cylPlatterLiquidLensViewSubViews()?.first { $0.cyl_isPlatterLiquidLensClearGlassView() }
     }
 
-    @objc(cyl_platterLiquidLensViewSubViews)
     func cylPlatterLiquidLensViewSubViews() -> [UIView]? {
         cylPlatterLiquidLensViewContentView()?.subviews
     }
 
-    @objc(cyl_platterDestOutView)
     func cylPlatterDestOutView() -> UIView? {
         platterSubview { $0.cyl_isPlatterDestOutView() }
     }
 
-    @objc(cyl_platterSelectedContentViewWithoutPlusButttonWithIndex:)
     func cylPlatterSelectedContentViewWithoutPlusButton(withIndex index: Int) -> UIControl? {
         CYLObjectAtIndex(cylPlatterSelectedContentViewsWithoutPlusButton(), index)
     }
 
-    @objc(cyl_platterSelectedContentViewWithIndex:)
     func cylPlatterSelectedContentView(withIndex index: Int) -> UIControl? {
         CYLObjectAtIndex(cylPlatterSelectedContentViews(), index)
     }
 
-    @objc(cyl_platterPortalViews)
     func cylPlatterPortalViews() -> [UIView] {
         []
     }
 
-    @objc(cyl_platterPortalViewWithIndex:)
     func cylPlatterPortalView(withIndex index: Int) -> UIView? {
         CYLObjectAtIndex(cylPlatterPortalViews(), index)
     }
@@ -601,4 +568,103 @@ extension CYLTabBar {
     @nonobjc public func cyl_cachedWidthOffset(withIndex index: CGFloat) -> CGFloat { cylCachedWidthOffset(withIndex: index) }
     /** [EN] Whether the plus button label's hidden state should be updated. [CN] 是否需要更新 PlusButton 标签的隐藏状态。 */
     @nonobjc public func cyl_shouldUpdateHiddenStatueForPlusButtonLabel() -> Bool { cylShouldUpdateHiddenStatueForPlusButtonLabel() }
+}
+
+// MARK: - The public API of `UITabBar (CYLTabBarControllerExtention)`
+
+/**
+ [EN] `UITabBar (CYLTabBarControllerExtention)` as Objective-C and Swift callers saw it in CYLTabBar+CYLTabBarControllerExtention.h:
+      the same selectors and Swift names, forwarding to the implementation above. Public Swift since docs/Swift-Migration.md
+      step 119; views the header declared nonnull are implicitly unwrapped (`UIView!`), so existing Swift code compiles and a
+      missing view does not trap on return.
+ [CN] Objective-C 与 Swift 调用方在 CYLTabBar+CYLTabBarControllerExtention.h 中看到的 `UITabBar (CYLTabBarControllerExtention)`：selector 与 Swift
+      名称不变，转发到上面的实现。自第 119 步起为公开的 Swift；头文件中声明为非空的视图改为隐式解包（`UIView!`），现有 Swift 代码可以编译，缺少视图时
+      返回也不会崩溃。
+ */
+extension UITabBar {
+
+    /** [EN] The full height of the bar. [CN] TabBar 的完整高度。 */
+    @objc(cyl_fullHeight) open func cyl_fullHeight() -> CGFloat { cylFullHeight() }
+    /** [EN] The size of the bar's bounds. [CN] TabBar bounds 的尺寸。 */
+    @objc(cyl_boundsSize) open func cyl_boundsSize() -> CGSize { cylBoundsSize() }
+    /** [EN] The width offset of the bar's bounds. [CN] TabBar bounds 的宽度偏移。 */
+    @objc(cyl_boundsWidthOffset) open func cyl_boundsWidthOffset() -> CGFloat { cylBoundsWidthOffset() }
+    /** [EN] The Liquid Glass platter views. [CN] 液态玻璃的 platter 视图。 */
+    @objc(cyl_platterViews) open func cyl_platterViews() -> [Any] { cylPlatterViews() }
+    /** [EN] The platter view at `index`. [CN] 第 `index` 个 platter 视图。 */
+    @objc(cyl_platterViewWithIndex:) open func cyl_platterView(with index: Int) -> UIView! { cylPlatterView(withIndex: index) }
+    /** [EN] The tab controls of the platter. [CN] platter 中的 Tab 控件。 */
+    @objc(cyl_platterContentViews) open func cyl_platterContentViews() -> [UIControl] { cylPlatterContentViews().compactMap { $0 as? UIControl } }
+    /** [EN] The tab control at `index`. [CN] 第 `index` 个 Tab 控件。 */
+    @objc(cyl_platterContentViewWithIndex:) open func cyl_platterContentView(with index: Int) -> UIControl! {
+        cylPlatterContentView(withIndex: index) as? UIControl
+    }
+    /** [EN] The controls of the selected layer. [CN] 选中图层中的控件。 */
+    @objc(cyl_platterSelectedContentViews) open func cyl_platterSelectedContentViews() -> [UIControl]? { cylPlatterSelectedContentViews() }
+    /** [EN] The floating selected content view of the visual provider. [CN] visual provider 中浮动的选中内容视图。 */
+    @objc(cyl_platterVisualProviderFloatingSelectedContentView) open func cyl_platterVisualProviderFloatingSelectedContentView() -> UIView? {
+        cylPlatterVisualProviderFloatingSelectedContentView()
+    }
+    /** [EN] The selected-layer control at `index`. [CN] 选中图层中第 `index` 个控件。 */
+    @objc(cyl_platterSelectedContentViewWithIndex:) open func cyl_platterSelectedContentView(with index: Int) -> UIControl! {
+        cylPlatterSelectedContentView(withIndex: index)
+    }
+    /** [EN] The selected-layer control at `index`, the plus button left out. [CN] 选中图层中第 `index` 个控件，不计 PlusButton。 */
+    @objc(cyl_platterSelectedContentViewWithoutPlusButttonWithIndex:)
+    open func cyl_platterSelectedContentViewWithoutPlusButtton(with index: Int) -> UIControl! {
+        cylPlatterSelectedContentViewWithoutPlusButton(withIndex: index)
+    }
+    /** [EN] The portal views. [CN] portal 视图。 */
+    @objc(cyl_platterPortalViews) open func cyl_platterPortalViews() -> [Any] { cylPlatterPortalViews() }
+    /** [EN] The portal view at `index`. [CN] 第 `index` 个 portal 视图。 */
+    @objc(cyl_platterPortalViewWithIndex:) open func cyl_platterPortalView(with index: Int) -> UIView! { cylPlatterPortalView(withIndex: index) }
+    /** [EN] The Liquid Glass lens. [CN] 液态玻璃的放大镜。 */
+    @objc(cyl_platterLiquidLensView) open func cyl_platterLiquidLensView() -> UIView? { cylPlatterLiquidLensView() }
+    /** [EN] The lens's subviews. [CN] 放大镜的子视图。 */
+    @objc(cyl_platterLiquidLensViewSubViews) open func cyl_platterLiquidLensViewSubViews() -> [UIView]? { cylPlatterLiquidLensViewSubViews() }
+    /** [EN] The lens's content view. [CN] 放大镜的内容视图。 */
+    @objc(cyl_platterLiquidLensViewContentView) open func cyl_platterLiquidLensViewContentView() -> UIView? { cylPlatterLiquidLensViewContentView() }
+    /** [EN] The dest-out view of the platter. [CN] platter 的 dest-out 视图。 */
+    @objc(cyl_platterDestOutView) open func cyl_platterDestOutView() -> UIView? { cylPlatterDestOutView() }
+    /** [EN] The lens's clear glass view. [CN] 放大镜的透明玻璃视图。 */
+    @objc(cyl_platterLiquidLensClearGlassView) open func cyl_platterLiquidLensClearGlassView() -> UIView? { cylPlatterLiquidLensClearGlassView() }
+    /** [EN] The selected content view of the platter. [CN] platter 的选中内容视图。 */
+    @objc(cyl_platterSelectedContentView) open func cyl_platterSelectedContentView() -> UIView? { cylPlatterSelectedContentView() }
+
+    /** [EN] The platter view, kept weakly. [CN] platter 视图，弱引用。 */
+    @objc open weak var cyl_platterView: UIView? {
+        @objc(cyl_platterView) get { cylPlatterView() }
+        @objc(cyl_setPlatterView:) set { cylSetPlatterView(newValue) }
+    }
+    /** [EN] The portal view, kept weakly. [CN] portal 视图，弱引用。 */
+    @objc open weak var cyl_portalView: UIView? {
+        @objc(cyl_portalView) get { cylPortalView() }
+        @objc(cyl_setPortalView:) set { cylSetPortalView(newValue) }
+    }
+    /** [EN] The platter's content view, kept weakly. [CN] platter 的内容视图，弱引用。 */
+    @objc open weak var cyl_platterContentView: UIView? {
+        @objc(cyl_platterContentView) get { cylPlatterContentView() }
+        @objc(cyl_setPlatterContentView:) set { cylSetPlatterContentView(newValue) }
+    }
+    /** [EN] The platter's width. [CN] platter 的宽度。 */
+    @objc open var cyl_platterViewWidth: CGFloat {
+        @objc(cyl_platterViewWidth) get { cylPlatterViewWidth() }
+        @objc(cyl_setPlatterViewWidth:) set { cylSetPlatterViewWidth(newValue) }
+    }
+    /** [EN] The platter's size, boxed. [CN] platter 的尺寸（包装形式）。 */
+    @objc open var cyl_platterViewSize: NSValue! {
+        @objc(cyl_platterViewSize) get { cylPlatterViewSize() }
+        @objc(cyl_setPlatterViewSize:) set { cylSetPlatterViewSize(newValue) }
+    }
+    /** [EN] The portal layer, kept weakly. [CN] portal 图层，弱引用。 */
+    @objc open weak var cyl_portalLayer: CALayer? {
+        @objc(cyl_portalLayer) get { cylPortalLayer() }
+        @objc(cyl_setPortalLayer:) set { cylSetPortalLayer(newValue) }
+    }
+    /** [EN] The selected-layer controls without the plus button. [CN] 选中图层中的控件，不含 PlusButton。 */
+    @objc(cyl_platterSelectedContentViewsWithoutPlusButton) open func cyl_platterSelectedContentViewsWithoutPlusButton() -> [UIControl] {
+        cylPlatterSelectedContentViewsWithoutPlusButton()
+    }
+    /** [EN] The tab controls of the bar. [CN] TabBar 中的 Tab 控件。 */
+    @objc(cyl_tabBarSubviews) open func cyl_tabBarSubviews() -> [UIControl] { cylTabBarSubviews().compactMap { $0 as? UIControl } }
 }

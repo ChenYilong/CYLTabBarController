@@ -315,7 +315,7 @@ extension UIView {
      *      因此由这一个 selector 在此分派。
      */
     @objc(cyl_contentView)
-    func cyl_contentView() -> UIView? {
+    public func cyl_contentView() -> UIView! {
         if let tabBar = self as? UITabBar {
             return tabBar.cylContentView()
         }
