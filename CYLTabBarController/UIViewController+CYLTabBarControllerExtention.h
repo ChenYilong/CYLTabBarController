@@ -13,6 +13,8 @@
 // [CN] FIX: issue #535 — shared with CYLBadgeView through CYLUtils. 通过 CYLUtils 与 CYLBadgeView 共用。
 // [EN] FIX: issue #535 — shared with CYLBadgeView through CYLUtils.
 #if __has_include("CYLUtils/UIViewController+CYLUtils.h")
+// CYL-SWIFT-MIGRATION: objc-required — [EN] Only the block typedefs `CYLPopSelectTabBarChildViewControllerCompletion`, `CYLPushOrPopCompletionHandler` and `CYLPushOrPopCallback` are left: Objective-C source spells them and Swift typealiases are not exported (step 116)
+//      (docs/Swift-Migration-Phase3.md). [CN] Swift 无法为 Objective-C 调用方导出的内容（见 docs/Swift-Migration-Phase3.md）。
 #import "CYLUtils/UIViewController+CYLUtils.h"
 #else
 #import "UIViewController+CYLUtils.h"
