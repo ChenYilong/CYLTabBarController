@@ -1849,17 +1849,14 @@ extension CYLTabBar {
  */
 extension UITabBar {
 
-    @objc(cyl_backgroundView)
     func cylBackgroundView() -> UIView? {
         cyl_value(forKey: "_backgroundView") as? UIView
     }
 
-    @objc(cyl_shadowImageView)
     func cylShadowImageView() -> UIImageView? {
         cyl_tabShadowImageView()
     }
 
-    @objc(cyl_effectViews)
     func cylEffectViews() -> [UIVisualEffectView]? {
         // [EN] Exactly UIVisualEffectView: the shadow is drawn by a subclass. [CN] 必须恰好是 UIVisualEffectView：阴影由其子类绘制。
         let effectViews = (cylBackgroundView()?.subviews ?? []).compactMap { subview -> UIVisualEffectView? in
@@ -1868,7 +1865,6 @@ extension UITabBar {
         return effectViews.isEmpty ? nil : effectViews
     }
 
-    @objc(cyl_effectView)
     func cylEffectView() -> UIVisualEffectView? {
         cylEffectViews()?.last { !$0.isHidden && $0.alpha > 0.01 }
     }
@@ -1884,23 +1880,47 @@ extension UITabBar {
         }
     }
 
-    @objc(cyl_backgroundEffect)
     func cylBackgroundEffect() -> UIBlurEffect? {
         standardAppearance.backgroundEffect
     }
 
-    @objc(cyl_setBackgroundEffect:)
     func cylSetBackgroundEffect(_ backgroundEffect: UIBlurEffect?) {
         cylUpdateAppearances { $0.backgroundEffect = backgroundEffect }
     }
 
-    @objc(cyl_effectForegroundColor)
     func cylEffectForegroundColor() -> UIColor? {
         standardAppearance.backgroundColor
     }
 
-    @objc(cyl_setEffectForegroundColor:)
     func cylSetEffectForegroundColor(_ effectForegroundColor: UIColor?) {
         cylUpdateAppearances { $0.backgroundColor = effectForegroundColor }
+    }
+}
+
+// MARK: - The public API of `UITabBar (CYLBarBackground)`
+
+/**
+ [EN] `UITabBar (CYLBarBackground)` as callers saw it in CYLTabBar.h: the same selectors and Swift names, forwarding to the
+      implementation above. Public Swift since docs/Swift-Migration.md step 121.
+ [CN] 调用方在 CYLTabBar.h 中看到的 `UITabBar (CYLBarBackground)`：selector 与 Swift 名称不变，转发到上面的实现。自第 121 步起为公开的 Swift。
+ */
+extension UITabBar {
+    /** [EN] The bar's background view. [CN] TabBar 的背景视图。 */
+    @objc open var cyl_backgroundView: UIView? { cylBackgroundView() }
+    /** [EN] The shadow line's image view. [CN] 阴影线的图片视图。 */
+    @objc open var cyl_shadowImageView: UIImageView? { cylShadowImageView() }
+    /** [EN] The blur views of the background. [CN] 背景中的模糊视图。 */
+    @objc open var cyl_effectViews: [UIVisualEffectView]? { cylEffectViews() }
+    /** [EN] The first blur view of the background. [CN] 背景中的第一个模糊视图。 */
+    @objc open var cyl_effectView: UIVisualEffectView? { cylEffectView() }
+    /** [EN] The background blur. [CN] 背景模糊效果。 */
+    @objc open var cyl_backgroundEffect: UIBlurEffect? {
+        @objc(cyl_backgroundEffect) get { cylBackgroundEffect() }
+        @objc(cyl_setBackgroundEffect:) set { cylSetBackgroundEffect(newValue) }
+    }
+    /** [EN] The foreground color over the blur. [CN] 模糊效果上的前景色。 */
+    @objc open var cyl_effectForegroundColor: UIColor? {
+        @objc(cyl_effectForegroundColor) get { cylEffectForegroundColor() }
+        @objc(cyl_setEffectForegroundColor:) set { cylSetEffectForegroundColor(newValue) }
     }
 }

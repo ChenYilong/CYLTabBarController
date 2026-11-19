@@ -35,6 +35,9 @@
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/TabBar-Minimize-On-Scroll.md
 // docs-binding:end
 
+// CYL-SWIFT-MIGRATION: objc-required — [EN] Only the block typedef `CYLTabBarDidLayoutSubViewsBlock` (and its `@class CYLTabBar`) is
+//      left: Objective-C source spells it and a Swift typealias is not exported (docs/Swift-Migration-Phase3.md).
+// [CN] 只剩 block 类型 `CYLTabBarDidLayoutSubViewsBlock`（及其 `@class CYLTabBar`）：Objective-C 源码使用该名称，而 Swift 的 typealias 不会导出。
 #import <UIKit/UIKit.h>
 #import "CYLPlusButton.h"
 
@@ -47,7 +50,6 @@ NS_ASSUME_NONNULL_BEGIN
 //      (i.e. `__has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)`), so setups that do not import the
 //      CYLFlatDesignTabBar subspec (e.g. the LottieSwift subspec) cannot see this type;
 //      so it is declared again explicitly here to make this header compile on its own.
-@class CYLTabBarController;
 typedef void(^CYLTabBarDidLayoutSubViewsBlock)(CYLTabBar *tabBar);
 
 /*!
@@ -62,54 +64,10 @@ typedef void(^CYLTabBarDidLayoutSubViewsBlock)(CYLTabBar *tabBar);
  */
 
 /*!
- * [EN] The views UIKit draws a tab bar's background with, and its blur, for any `UITabBar`.
- * [CN] UIKit 绘制 TabBar 背景所用的视图及其模糊效果，适用于任意 `UITabBar`。
+ * [EN] `UITabBar (CYLBarBackground)` is public Swift since docs/Swift-Migration.md step 121 (same selectors and Swift names);
+ *      Objective-C reads it from the generated Swift interface. [CN] 自第 121 步起 `UITabBar (CYLBarBackground)` 为公开的 Swift（selector 与 Swift
+ *      名称不变）；Objective-C 通过生成的 Swift 接口读取。
  */
-@interface UITabBar (CYLBarBackground)
-
-/*!
- * [EN] The view behind the items that holds the background, the blur and the shadow line (UIKit's private
- *      `_UIBarBackground`); nil if UIKit changes it.
- * [CN] item 后方承载背景、模糊与阴影线的视图（UIKit 私有的 `_UIBarBackground`）；UIKit 改变实现时为 nil。
- */
-@property (nonatomic, readonly, nullable) UIView *cyl_backgroundView;
-
-/*!
- * [EN] The image view of the shadow line on top of the bar (same as `-cyl_tabShadowImageView`).
- * [CN] TabBar 顶部阴影线的图片视图（同 `-cyl_tabShadowImageView`）。
- */
-@property (nonatomic, readonly, nullable) UIImageView *cyl_shadowImageView;
-
-/*!
- * [EN] The blur views of the background (UIKit uses one for the standard and one for the scroll edge look).
- * [CN] 背景中的模糊视图（UIKit 分别用于标准样式与滚动到边缘时的样式）。
- */
-@property (nonatomic, readonly, nullable) NSArray<UIVisualEffectView *> *cyl_effectViews;
-
-/*!
- * [EN] The blur view shown now, the last visible one of `cyl_effectViews`.
- * [CN] 当前显示的模糊视图，即 `cyl_effectViews` 中最后一个可见的。
- */
-@property (nonatomic, readonly, nullable) UIVisualEffectView *cyl_effectView;
-
-/*!
- * [EN] The background blur, e.g. `[UIBlurEffect effectWithStyle:UIBlurEffectStyleSystemThinMaterial]`. iOS 13+: written
- *      into `standardAppearance.backgroundEffect` (and `scrollEdgeAppearance`, when there is one), so it is kept across
- *      layouts and follows FlatDesign; before iOS 13 set on the blur views. nil removes the blur.
- * [CN] 背景模糊效果，例如 `[UIBlurEffect effectWithStyle:UIBlurEffectStyleSystemThinMaterial]`。iOS 13+ 写入
- *      `standardAppearance.backgroundEffect`（存在 `scrollEdgeAppearance` 时也写入），因此重新布局后不会丢失，扁平样式也随之更新；
- *      iOS 13 以前直接设置在模糊视图上。nil 去掉模糊。
- */
-@property (nonatomic, strong, nullable, getter=cyl_backgroundEffect, setter=cyl_setBackgroundEffect:) UIBlurEffect *cyl_backgroundEffect;
-
-/*!
- * [EN] A color drawn over the blur, e.g. a translucent tint: `standardAppearance.backgroundColor` (and the scroll edge
- *      one) on iOS 13+, `barTintColor` before.
- * [CN] 绘制在模糊之上的颜色，例如半透明的色调：iOS 13+ 为 `standardAppearance.backgroundColor`（以及滚动边缘的），之前为 `barTintColor`。
- */
-@property (nonatomic, strong, nullable, getter=cyl_effectForegroundColor, setter=cyl_setEffectForegroundColor:) UIColor *cyl_effectForegroundColor;
-
-@end
 
 NS_ASSUME_NONNULL_END
 
