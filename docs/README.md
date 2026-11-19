@@ -558,6 +558,7 @@ docs/
 │   ├── update-tab-plus-page-navigation-title-changed.png
 │   ├── update-tab-plus-page-navigation-title.png
 │   ├── wechat-miniprogram-animated-item-stack.png
+│   ├── wechat-miniprogram-animated-item-title-dark-color.png
 │   ├── wechat-miniprogram-api-01-home-lottie.png
 │   ├── wechat-miniprogram-api-02-discover-selected.png
 │   ├── wechat-miniprogram-api-03-badges-lottie.png
