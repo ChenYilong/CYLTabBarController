@@ -16,6 +16,14 @@
 // [CN] Tab 按钮使用引擎的部分，属于 Core：只有动画子库带入引擎时才编译。
 #if CYL_ANIMATION_ENGINE_AVAILABLE
 #import <objc/runtime.h>
+// [EN] `CYLTabBarItemAnimationSetService()`, `…DefaultStyleSource()` and `…DefaultHost()` are `@_cdecl` Swift functions (step 118): declared by the
+//      generated Swift interface, which this file must import itself (CI built it without any other header importing it).
+// [CN] 这三个函数是 `@_cdecl` 的 Swift 函数（第 118 步）：由生成的 Swift 接口声明，本文件必须自己导入它（CI 构建时没有其他头文件导入它）。
+#if __has_include("../CYLUtils/CYLSwiftInterface.h")
+#import "../CYLUtils/CYLSwiftInterface.h"
+#else
+#import "CYLSwiftInterface.h"
+#endif
 #if __has_include(<CYLAnimatedItem/CYLTabBarItemAnimatorRegistry.h>)
 #import <CYLAnimatedItem/CYLTabBarItemAnimatorRegistry.h>
 #else

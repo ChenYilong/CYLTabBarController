@@ -309,10 +309,10 @@ static NSString *const CYLImageOnlyTabAppliedTitleKey = @"appliedTitle";
 //      as one-line forwarders until the class is Swift: a public Swift override would put an extension of this class into the
 //      generated header before the class.
 // [CN] 生命周期与 Tab 切换已迁移到 Swift（第 74 步）；UIKit 重写在类迁移到 Swift 之前保留为一行转发。
-- (void)viewWillAppear:(BOOL)animated { [self cyl_viewWillAppear:animated]; }
-- (void)viewDidAppear:(BOOL)animated { [self cyl_viewDidAppear:animated]; }
-- (void)viewWillDisappear:(BOOL)animated { [self cyl_viewWillDisappear:animated]; }
-- (void)viewDidDisappear:(BOOL)animated { [self cyl_viewDidDisappear:animated]; }
+- (void)viewWillAppear:(BOOL)animated { [super viewWillAppear:animated]; [self cyl_viewWillAppear:animated]; }
+- (void)viewDidAppear:(BOOL)animated { [super viewDidAppear:animated]; [self cyl_viewDidAppear:animated]; }
+- (void)viewWillDisappear:(BOOL)animated { [super viewWillDisappear:animated]; [self cyl_viewWillDisappear:animated]; }
+- (void)viewDidDisappear:(BOOL)animated { [super viewDidDisappear:animated]; [self cyl_viewDidDisappear:animated]; }
 
 - (void)setViewDidLayoutSubViewsBlock:(CYLViewDidLayoutSubViewsBlock)viewDidLayoutSubviewsBlock {
     _viewDidLayoutSubviewsBlock = [viewDidLayoutSubviewsBlock copy];
@@ -1005,6 +1005,7 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
 }
 
 - (void)addChildViewController:(UIViewController *)childController {
+    [super addChildViewController:childController];
     [self cyl_overrideAddChildViewController:childController];
 }
 
