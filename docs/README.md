@@ -644,6 +644,7 @@ docs/
 │   ├── wechat-miniprogram-rive-tint-title.png
 │   ├── wechat-miniprogram-scroll-icons-devtools-sdk3.17.6-88dd149.png
 │   ├── wechat-miniprogram-scroll-icons-still-images-devtools-sdk3.17.6-a157c97.png
+│   ├── wechat-miniprogram-tab-item-badges.png
 │   ├── wechat-miniprogram-two-icon-layers-user-1-devtools.jpg
 │   ├── wechat-miniprogram-two-icon-layers-user-2-devtools.jpg
 │   └── wechat-miniprogram-visibility-hidden-identifiers-devtools-sdk3.17.6-49df44f.png
