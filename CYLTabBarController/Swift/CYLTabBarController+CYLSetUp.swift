@@ -28,7 +28,21 @@ extension CYLTabBarController {
         return order
     }
 
-    /**
+        /**
+     * [EN] The page provider block of a configuration. A block that Objective-C (or React Native, Flutter) put into the dictionary
+     *      is an `NSBlock`, which `as? CYLTabBarPageProvider` cannot cast to a Swift closure, so it is reinterpreted as the block it is.
+     * [CN] 配置中的页面提供者 block。Objective-C（或 React Native、Flutter）放入字典的 block 是 `NSBlock`，`as? CYLTabBarPageProvider` 无法把它
+     *      转换为 Swift 闭包，因此按它实际的 block 类型重新解释。
+     */
+    private static func cylPageProvider(_ value: Any?) -> CYLTabBarPageProvider? {
+        guard let object = value as AnyObject?, let blockClass = NSClassFromString("NSBlock"), object.isKind(of: blockClass) else {
+            return nil
+        }
+        let block = unsafeBitCast(object, to: (@convention(block) (String, [String: Any]) -> UIViewController?).self)
+        return { block($0, $1) }
+    }
+
+/**
      * [EN] Sets the tab bar controller up from a configuration, in the order that matters: the style first (it decides how
      *      `viewControllers` is read), the tab bar, the context (the plus button lookup), the tabs (excluded ones are skipped and
      *      recorded), then the options. Pages named by identifier are resolved before the plus button is registered.
@@ -55,7 +69,7 @@ extension CYLTabBarController {
         var pageLookupOrder: [String]?
         if !viewControllersFromCode {
             pageRegistry = normalized[CYLTabBarControllerPageRegistry] as? CYLTabBarPageProviding
-            pageResolver = normalized[CYLTabBarControllerPageResolver] as? CYLTabBarPageProvider
+            pageResolver = Self.cylPageProvider(normalized[CYLTabBarControllerPageResolver])
             pageLookupOrder = Self.cylPageLookupOrder(of: normalized)
             let keptItems = NSMutableArray()
             viewControllers = CYLTabBarPageRegistry.pages(
@@ -75,7 +89,7 @@ extension CYLTabBarController {
                 let pages = CYLTabBarPageRegistry.pages(
                     ofTabs: [[CYLTabBarItemPageIdentifier: plusPageIdentifier]],
                     registry: normalized[CYLTabBarControllerPageRegistry] as? CYLTabBarPageProviding,
-                    resolver: normalized[CYLTabBarControllerPageResolver] as? CYLTabBarPageProvider,
+                    resolver: Self.cylPageProvider(normalized[CYLTabBarControllerPageResolver]),
                     lookupOrder: Self.cylPageLookupOrder(of: normalized), keptTabs: nil, skipped: nil)
                 if let page = pages.first {
                     if (page.title ?? "").isEmpty, let plusTitle = plusButtonAttributes[CYLTabBarItemTitle] as? String, !plusTitle.isEmpty {
