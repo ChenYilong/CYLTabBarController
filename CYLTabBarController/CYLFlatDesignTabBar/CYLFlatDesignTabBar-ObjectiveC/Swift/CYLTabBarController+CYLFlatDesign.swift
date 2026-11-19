@@ -21,6 +21,10 @@ import UIKit
     @objc(cylWaitingForVisibilityTransition) func waitingForVisibilityTransition() -> Bool
     @objc(setCylWaitingForVisibilityTransition:) func setWaitingForVisibilityTransition(_ value: Bool)
     @objc(setTabBarIsAnimating:) func setTabBarIsAnimating(_ value: Bool)
+    @objc(addOneChildViewController:idx:WithTitle:normalImageInfo:selectedImageInfo:titlePositionAdjustment:imagePositionAdjustment:imageInsets:lottieURL:lottieFilePath:lottieSizeValue:)
+    func addOneChildViewController(_ viewController: UIViewController, idx: UInt, withTitle title: String?, normalImageInfo: Any?,
+                                   selectedImageInfo: Any?, titlePositionAdjustment: UIOffset, imagePositionAdjustment: UIOffset,
+                                   imageInsets: UIEdgeInsets, lottieURL: URL?, lottieFilePath: String?, lottieSizeValue: NSValue?)
     @objc(lastShowHideTabBar) func lastShowHideTabBar() -> Bool
     @objc(setLastShowHideTabBar:) func setLastShowHideTabBar(_ value: Bool)
     @objc(lastShowHideTabBarAnimated) func lastShowHideTabBarAnimated() -> Bool
@@ -760,5 +764,25 @@ extension CYLTabBarController {
         host.setDelegateHasDidShowTabBar(answers("tabBarController:didShowTabBar:"))
         host.setDelegateHasWillHideTabBar(answers("tabBarController:willHideTabBar:"))
         host.setDelegateHasDidHideTabBar(answers("tabBarController:didHideTabBar:"))
+    }
+
+    // MARK: - Adding a tab (docs/Swift-Migration.md, step 76; `CYLFlatDesignChildSetup` in Core)
+
+    /**
+     * [EN] Adds the FlatDesign item of the tab at `idx`, from the attributes read once for every style (FIX: issue #604).
+     * [CN] 根据为所有样式统一读取一次的属性（FIX: issue #604），添加第 `idx` 个 Tab 的扁平样式 item。
+     */
+    @objc(setupChildViewController:idx:)
+    func cylFlatDesignSetupChildViewController(_ viewController: UIViewController, idx: UInt) {
+        guard cylFlatDesignTabBar != nil else {
+            return
+        }
+        let setup = cylTabBarItemSetup(for: viewController, idx: idx)
+        cylFlatDesignHost.addOneChildViewController(viewController, idx: setup.idx, withTitle: setup.title,
+                                                    normalImageInfo: setup.normalImageInfo, selectedImageInfo: setup.selectedImageInfo,
+                                                    titlePositionAdjustment: setup.titlePositionAdjustment,
+                                                    imagePositionAdjustment: setup.imagePositionAdjustment, imageInsets: setup.imageInsets,
+                                                    lottieURL: setup.animationURL, lottieFilePath: setup.animationFilePath,
+                                                    lottieSizeValue: setup.animationSizeValue)
     }
 }

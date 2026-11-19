@@ -177,6 +177,28 @@ NS_ASSUME_NONNULL_BEGIN
 #endif
 @end
 
+/// [EN] Implemented in Swift (CYLTabBarController+CYLTabBarItemSetup.swift, step 76): the attributes of one tab, read once.
+/// [CN] 由 Swift 实现（第 76 步）：一个 Tab 的属性，只读取一次。
+@interface CYLTabBarItemSetup : NSObject
+@property (nonatomic, assign) NSUInteger idx;
+@property (nonatomic, copy, nullable) NSString *title;
+@property (nonatomic, strong, nullable) id normalImageInfo;
+@property (nonatomic, strong, nullable) id selectedImageInfo;
+@property (nonatomic, assign) UIOffset titlePositionAdjustment;
+@property (nonatomic, assign) UIOffset imagePositionAdjustment;
+@property (nonatomic, assign) UIEdgeInsets imageInsets;
+@property (nonatomic, strong, nullable) NSURL *animationURL;
+@property (nonatomic, copy, nullable) NSString *animationFilePath;
+@property (nonatomic, strong, nullable) NSValue *animationSizeValue;
+@end
+
+/// [EN] Implemented in Swift (step 76). [CN] 由 Swift 实现（第 76 步）。
+@interface CYLTabBarController (CYLTabBarItemSetupPrivate)
+- (CYLTabBarItemSetup *)cyl_tabBarItemSetupForViewController:(UIViewController *)viewController idx:(NSUInteger)idx;
+/// [EN] FlatDesign subspec only (CYLTabBarController+CYLFlatDesign.swift). [CN] 仅扁平样式子库。
+- (void)setupChildViewController:(UIViewController *)viewController idx:(NSUInteger)idx;
+@end
+
 /// [EN] Implemented in CYLTabBarController.m: the plus button of this controller's context, and its child view controller.
 ///      Used by CYLTabBarController+CYLTabBarControllerLookup.m (identifiers #408, the selected index without the plus
 ///      button #515).

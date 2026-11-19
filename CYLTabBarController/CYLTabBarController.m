@@ -52,17 +52,7 @@
 FOUNDATION_EXTERN NSURL *_Nullable CYLTabBarItemAnimationURLOfAnyType(NSDictionary *_Nullable attributes);
 // [EN] `CYLTabBarItemAnimationURLOfAnyType` is Swift (CYLTabBarController+CYLTabBarItemUpdate.swift, step 73).
 
-static BOOL CYLTabBarAnimationCanPlay(NSURL *URL) {
-#if CYL_ANIMATION_ENGINE_AVAILABLE
-    // [EN] The tab bar plays local files that exist (`-addAnimationWithURL:…` of the engine): a remote URL or a missing file
-    //      shows the tab's image, or the placeholder. [CN] TabBar 只播放存在的本地文件（引擎的 `-addAnimationWithURL:…`）：远程 URL
-    //      或不存在的文件显示 Tab 的图片，没有时显示占位图。
-    BOOL playableFile = URL.isFileURL && URL.path.length > 0 && [[NSFileManager defaultManager] fileExistsAtPath:URL.path];
-    return playableFile && [CYLTabBarItemAnimatorRegistry animatorForURL:URL] != nil;
-#else
-    return NO;
-#endif
-}
+// [EN] `CYLTabBarAnimationCanPlay` is Swift (step 76).
 
 
 
@@ -308,28 +298,7 @@ static NSString *const CYLImageOnlyTabAppliedInsetsKey = @"appliedInsets";
 static NSString *const CYLImageOnlyTabOriginalTitleKey = @"title";
 static NSString *const CYLImageOnlyTabAppliedTitleKey = @"appliedTitle";
 
-/*!
- * [EN] What a tab item's attributes give: read once by `-cyl_tabBarItemSetupForViewController:idx:` for every tab bar
- *      style. `idx` is the index to add the view controller at (one less after the plus child view controller, except
- *      in Liquid Glass with a plus button, issue #563).
- * [CN] Tab item 属性解析的结果：由 `-cyl_tabBarItemSetupForViewController:idx:` 为所有 TabBar 样式统一读取一次。`idx` 为添加该
- *      ViewController 的索引（PlusButton 子控制器之后减一，液态玻璃且有 PlusButton 时除外，issue #563）。
- */
-@interface CYLTabBarItemSetup : NSObject
-@property (nonatomic, assign) NSUInteger idx;
-@property (nonatomic, copy) NSString *title;
-@property (nonatomic, strong) id normalImageInfo;
-@property (nonatomic, strong) id selectedImageInfo;
-@property (nonatomic, assign) UIOffset titlePositionAdjustment;
-@property (nonatomic, assign) UIOffset imagePositionAdjustment;
-@property (nonatomic, assign) UIEdgeInsets imageInsets;
-@property (nonatomic, strong) NSURL *animationURL;
-@property (nonatomic, copy) NSString *animationFilePath;
-@property (nonatomic, strong) NSValue *animationSizeValue;
-@end
-
-@implementation CYLTabBarItemSetup
-@end
+// [EN] `CYLTabBarItemSetup` is a Swift class (CYLTabBarController+CYLTabBarItemSetup.swift, step 76), declared in +CYLPrivate.h.
 
 
 /// [EN] Implemented in CYLTabBar.m: YES during More editing. [CN] 在 CYLTabBar.m 中实现：「More」编辑期间为 YES。
@@ -761,122 +730,9 @@ static inline id _Nullable CYLObjectAtIndex(NSArray * _Nullable array, NSUIntege
 
 /// [EN] Reads the attributes of the tab item at `idx` for `viewController` (and sets its identifier, #408).
 /// [CN] 读取 `idx` 处 Tab item 的属性（并设置 `viewController` 的标识，#408）。
-- (CYLTabBarItemSetup *)cyl_tabBarItemSetupForViewController:(UIViewController *)viewController idx:(NSUInteger)idx {
-    CYLTabBarItemSetup *setup = [[CYLTabBarItemSetup alloc] init];
-    // [EN] FIX: placeholder count mismatch — a placeholder reads its own (marked) entry only when the attributes have one;
-    //      otherwise it is skipped like the plus child view controller, so later tabs keep their own entries.
-    // [CN] FIX：占位导致的数量不匹配——只有属性中有 slot 项时占位控制器才读取它（带标记的那一项）；否则与 PlusButton 子控制器一样跳过，
-    //      之后的 Tab 仍对应各自的属性。
-    BOOL readsTabBarItemAttributes = (viewController != [self cyl_contextPlusChildViewController]) &&
-        (!viewController.cyl_isPlaceholder || [self cyl_tabBarItemsAttributesIncludePlusSlot]);
-    if (readsTabBarItemAttributes) {
-        if (_tabBarItemsAttributes.count > idx) {
-            NSDictionary *attributes = _tabBarItemsAttributes[idx];
-            if (@available(iOS 13.0, *)) {
-                //fix https://github.com/ChenYilong/CYLTabBarController/issues/437
-                setup.title = attributes[CYLTabBarItemTitle] ?: @"";
-            } else {
-                setup.title = attributes[CYLTabBarItemTitle];
-            }
-            // #620: an optional dark image per state (a name or a UIImage), combined here so both styles get it.
-            setup.normalImageInfo = [UIImage cyl_imageWithImageInfo:attributes[CYLTabBarItemImage]
-                                                       darkImageInfo:attributes[CYLTabBarItemDarkImage]];
-            setup.selectedImageInfo = [UIImage cyl_imageWithImageInfo:attributes[CYLTabBarItemSelectedImage]
-                                                         darkImageInfo:attributes[CYLTabBarItemSelectedDarkImage]];
-            NSArray *imageInfos = [CYLTabBarController cyl_imageInfosOfAttributes:attributes
-                                             applyingIconRenderingModeToImageInfo:setup.normalImageInfo
-                                                                selectedImageInfo:setup.selectedImageInfo];
-            setup.normalImageInfo = imageInfos[0] == [NSNull null] ? nil : imageInfos[0];
-            setup.selectedImageInfo = imageInfos[1] == [NSNull null] ? nil : imageInfos[1];
-            NSString *animationFilePath = nil;
-            setup.animationURL = CYLTabBarItemAnimationURLFromAttributes(attributes, &animationFilePath);
-            setup.animationFilePath = animationFilePath;
-            // [EN] Only an animation file, which cannot play (no engine, no library): the component's placeholder, sized
-            //      for a tab icon, instead of an empty icon. With a static image, that image is the fallback as before.
-            // [CN] 只有动画文件且无法播放（没有引擎或动画库）：使用组件的占位图（适合 Tab 图标的尺寸），而不是空图标。有静态图片时仍以该图片兜底。
-            // [EN] A type's own key whose engine is not in the build (e.g. `CYLTabBarPAGURL` without the PAG subspec): the
-            //      engine does not know the key, so the file is found here, by the component's table of every type's keys.
-            // [CN] 引擎未参与构建的类型自己的 key（例如没有 PAG 子库时的 `CYLTabBarPAGURL`）：引擎不认识该 key，因此这里通过组件中
-            //      所有类型的 key 表找到文件。
-            NSURL *unplayableURL = setup.animationURL ?: CYLTabBarItemAnimationURLOfAnyType(attributes);
-            if (unplayableURL && !CYLTabBarAnimationCanPlay(unplayableURL)) {
-                // [EN] Debug builds: which pod to add. [CN] debug 构建：提示需要加入的 pod。
-                CYLAnimationWarnMissingEngine(attributes, unplayableURL);
-                if (!setup.normalImageInfo && !setup.selectedImageInfo) {
-                    setup.normalImageInfo = CYLAnimatedItemView.defaultPlaceholderImage;
-                }
-            }
-            setup.animationSizeValue = CYLTabBarItemAttributesAnimationValue(attributes, CYLTabBarAnimationSize);
-            // FIX: issue #408 the tab's identifier. Tab 的标识。
-            viewController.cyl_tabBarItemIdentifier = attributes[CYLTabBarItemIdentifier];
-            // FIX: issue #433
-            // [EN] The title shown while the tab is selected.
-            // [CN] 选中时显示的标题。
-            CYLRememberTabBarItemSelectedTitle(viewController, attributes, setup.title);
-            // [EN] A page that follows its tab title gets it as its navigation bar title as soon as the tab is set up.
-            // [CN] 跟随 Tab 标题的页面在 Tab 设置时即获得导航栏标题。
-            [CYLTabBarController cyl_applyNavigationTitleOfFollowingPage:viewController title:setup.title];
-            setup.titlePositionAdjustment = [attributes[CYLTabBarItemTitlePositionAdjustment] UIOffsetValue];
-            setup.imagePositionAdjustment = [attributes[CYLTabBarItemImagePositionAdjustment] UIOffsetValue];
-            setup.imageInsets = [attributes[CYLTabBarItemImageInsets] UIEdgeInsetsValue];
-        }
-    } else {
-        /** [CN] 如果是CYLPlusChildViewController ，title设置为空字符串，解决把第一个tabbarItem设置成plusButton后，其他的
-         tabbarItem会不显示title问题
-          见： https://github.com/ChenYilong/CYLTabBarController/issues/563
-         * [EN] If it is a CYLPlusChildViewController, set the title to an empty string. This fixes an issue where,
-         *      after making the
-         *      first tabbarItem the plusButton, the other tabbarItems would not show their titles
-         *      See: https://github.com/ChenYilong/CYLTabBarController/issues/563
-         **/
-        setup.title = @"";
-        // [EN] The plus button's page that follows its tab title gets the plus button's title.
-        // [CN] 跟随 Tab 标题的 PlusButton 页面获得 PlusButton 的标题。
-        [CYLTabBarController cyl_applyNavigationTitleOfFollowingPage:viewController title:[CYLPlusButton plusButtonForOwner:self].cyl_title];
-        // [EN] Guarded by the data (`-cyl_tabBarItemsAttributesIncludePlusSlot`), not by the style.
-        // [CN] 按数据判断（`-cyl_tabBarItemsAttributesIncludePlusSlot`），而不是按样式。
-        if (![self cyl_tabBarItemsAttributesIncludePlusSlot]) {
-            idx--;
-        }
-    }
-    setup.idx = idx;
-    return setup;
-}
-
-- (void)setupChildViewController:(UIViewController *)viewController
-                             idx:(NSUInteger)idx {
-    
-    if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType) {
-#if CYL_FLATDESIGN_AVAILABLE
-        if (![_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) { return; }
-        // [EN] FIX: issue #604 — one place reads a tab item's attributes, for every style. [CN] 所有样式共用同一处读取 Tab item 属性的代码。
-        CYLTabBarItemSetup *setup = [self cyl_tabBarItemSetupForViewController:viewController idx:idx];
-        idx = setup.idx;
-        NSString *title = setup.title;
-        id normalImageInfo = setup.normalImageInfo;
-        id selectedImageInfo = setup.selectedImageInfo;
-        UIOffset titlePositionAdjustment = setup.titlePositionAdjustment;
-        UIOffset imagePositionAdjustment = setup.imagePositionAdjustment;
-        UIEdgeInsets imageInsets = setup.imageInsets;
-        NSURL *lottieURL = setup.animationURL;
-        NSString *lottieFilePath = setup.animationFilePath;
-        NSValue *lottieSizeValue = setup.animationSizeValue;
-        [self addOneChildViewController:viewController
-                                    idx:idx
-                              WithTitle:title
-                        normalImageInfo:normalImageInfo
-                      selectedImageInfo:selectedImageInfo
-                titlePositionAdjustment:titlePositionAdjustment
-                imagePositionAdjustment:imagePositionAdjustment
-                            imageInsets:imageInsets
-                              lottieURL:lottieURL
-                         lottieFilePath:lottieFilePath
-                        lottieSizeValue:lottieSizeValue];
-#else
-#endif
-    } else {/** Not CYLTabBarStyleTypeFlatDesign*/    }
-}
-
+// [EN] `-cyl_tabBarItemSetupForViewController:idx:` (every style) is Swift (CYLTabBarController+CYLTabBarItemSetup.swift) and the
+//      FlatDesign `-setupChildViewController:idx:` is in CYLTabBarController+CYLFlatDesign.swift (step 76).
+// [CN] 已迁移到 Swift（第 76 步）。
 
 /**
  * [CN] 添加一个子控制器
