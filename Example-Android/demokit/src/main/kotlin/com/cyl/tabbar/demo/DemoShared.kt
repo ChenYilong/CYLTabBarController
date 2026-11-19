@@ -96,7 +96,7 @@ object DemoPlusButtonBadge {
                 is CYLPlusButton -> control.titleLabel.text.toString().ifEmpty { "PlusButton" }
                 else -> "PlusButton"
             }
-            AlertDialog.Builder(tabBarController.activity).setTitle("Long pressed \"$name\"").setNegativeButton(android.R.string.cancel, null).show()
+            AlertDialog.Builder(tabBarController.activity).setTitle(cylDemoText("Long pressed \"%@\"", name)).setNegativeButton(android.R.string.cancel, null).show()
         }
     }
 }

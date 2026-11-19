@@ -209,3 +209,22 @@
 "selectedIndex and PlusButton (issue #515)" = "selectedIndex 与 PlusButton（issue #515）";
 "system" = "系统";
 "Current: " = "当前：";
+
+/* [EN] Android example layer, texts with values (%@, as iOS). */
+/* [CN] Android 示例层，带值的文字（%@，与 iOS 相同）。 */
+"Tapped: %@" = "已点击：%@";
+"Long pressed: %@" = "已长按：%@";
+"Accessory tapped: %@" = "已点击附加图标：%@";
+"Dragging: %@ (%@, %@)" = "正在拖动：%@（%@, %@）";
+"Dropped: %@" = "已放下：%@";
+"Skins: holiday and color themes (%@)" = "皮肤：节日与颜色主题（%@）";
+"Current: %@; tap for the next one" = "当前：%@；点击切换下一个";
+"Current: %@" = "当前：%@";
+"%@ CYLTabBarController on Android %@" = "%@ CYLTabBarController，Android %@";
+"Logged in: %@. The \"Me\" tab needs a login (issue #19); tap to toggle" = "已登录：%@。「我的」Tab 需要登录（issue #19）；点击切换";
+"Tap to switch the tap animation of the tabs and the PlusButton, current: %@" = "点击切换 Tab 与 PlusButton 的点击动画，当前：%@";
+"Long press %@ s, double tap %@ s" = "长按 %@ 秒，双击 %@ 秒";
+"Tab %@" = "Tab %@";
+"Surface opacity: %@ (default 0.40)" = "表面不透明度：%@（默认 0.40）";
+"Speed: %@" = "速度：%@";
+"Long pressed \"%@\"" = "已长按「%@」";

@@ -209,3 +209,22 @@
 "selectedIndex and PlusButton (issue #515)" = "selectedIndex και PlusButton (issue #515)";
 "system" = "σύστημα";
 "Current: " = "Τρέχον: ";
+
+/* [EN] Android example layer, texts with values (%@, as iOS). */
+/* [CN] Android 示例层，带值的文字（%@，与 iOS 相同）。 */
+"Tapped: %@" = "Πατήθηκε: %@";
+"Long pressed: %@" = "Παρατεταμένο πάτημα: %@";
+"Accessory tapped: %@" = "Πατήθηκε το εξάρτημα: %@";
+"Dragging: %@ (%@, %@)" = "Σύρσιμο: %@ (%@, %@)";
+"Dropped: %@" = "Αφέθηκε: %@";
+"Skins: holiday and color themes (%@)" = "Εμφανίσεις: θέματα εορτών και χρωμάτων (%@)";
+"Current: %@; tap for the next one" = "Τρέχον: %@, πατήστε για το επόμενο";
+"Current: %@" = "Τρέχον: %@";
+"%@ CYLTabBarController on Android %@" = "%@ CYLTabBarController σε Android %@";
+"Logged in: %@. The \"Me\" tab needs a login (issue #19); tap to toggle" = "Συνδεδεμένος: %@. Η καρτέλα «Εγώ» απαιτεί σύνδεση (issue #19), πατήστε για εναλλαγή";
+"Tap to switch the tap animation of the tabs and the PlusButton, current: %@" = "Πατήστε για εναλλαγή της κίνησης πατήματος των καρτελών και του PlusButton, τρέχουσα: %@";
+"Long press %@ s, double tap %@ s" = "Παρατεταμένο πάτημα %@ δευτ., διπλό πάτημα %@ δευτ.";
+"Tab %@" = "Καρτέλα %@";
+"Surface opacity: %@ (default 0.40)" = "Αδιαφάνεια επιφάνειας: %@ (προεπιλογή 0.40)";
+"Speed: %@" = "Ταχύτητα: %@";
+"Long pressed \"%@\"" = "Παρατεταμένο πάτημα στο «%@»";

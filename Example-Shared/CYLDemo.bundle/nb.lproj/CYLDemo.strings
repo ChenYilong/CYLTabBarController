@@ -209,3 +209,22 @@
 "selectedIndex and PlusButton (issue #515)" = "selectedIndex og PlusButton (issue #515)";
 "system" = "system";
 "Current: " = "Gjeldende: ";
+
+/* [EN] Android example layer, texts with values (%@, as iOS). */
+/* [CN] Android 示例层，带值的文字（%@，与 iOS 相同）。 */
+"Tapped: %@" = "Trykket: %@";
+"Long pressed: %@" = "Trykket lenge: %@";
+"Accessory tapped: %@" = "Tilbehør trykket: %@";
+"Dragging: %@ (%@, %@)" = "Drar: %@ (%@, %@)";
+"Dropped: %@" = "Sluppet: %@";
+"Skins: holiday and color themes (%@)" = "Skall: høytids- og fargetemaer (%@)";
+"Current: %@; tap for the next one" = "Gjeldende: %@; trykk for neste";
+"Current: %@" = "Gjeldende: %@";
+"%@ CYLTabBarController on Android %@" = "%@ CYLTabBarController på Android %@";
+"Logged in: %@. The \"Me\" tab needs a login (issue #19); tap to toggle" = "Logget inn: %@. Fanen «Meg» krever innlogging (issue #19); trykk for å veksle";
+"Tap to switch the tap animation of the tabs and the PlusButton, current: %@" = "Trykk for å bytte trykkanimasjonen for fanene og PlusButton, gjeldende: %@";
+"Long press %@ s, double tap %@ s" = "Langt trykk %@ s, dobbelttrykk %@ s";
+"Tab %@" = "Fane %@";
+"Surface opacity: %@ (default 0.40)" = "Overflatens opasitet: %@ (standard 0.40)";
+"Speed: %@" = "Hastighet: %@";
+"Long pressed \"%@\"" = "Trykket lenge på «%@»";

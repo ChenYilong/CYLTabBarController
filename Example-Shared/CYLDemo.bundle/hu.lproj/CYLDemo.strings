@@ -209,3 +209,22 @@
 "selectedIndex and PlusButton (issue #515)" = "selectedIndex és PlusButton (issue #515)";
 "system" = "rendszer";
 "Current: " = "Jelenlegi:";
+
+/* [EN] Android example layer, texts with values (%@, as iOS). */
+/* [CN] Android 示例层，带值的文字（%@，与 iOS 相同）。 */
+"Tapped: %@" = "Koppintva: %@";
+"Long pressed: %@" = "Hosszan nyomva: %@";
+"Accessory tapped: %@" = "Kiegészítőre koppintva: %@";
+"Dragging: %@ (%@, %@)" = "Húzás: %@ (%@, %@)";
+"Dropped: %@" = "Elengedve: %@";
+"Skins: holiday and color themes (%@)" = "Témák: ünnepi és színtémák (%@)";
+"Current: %@; tap for the next one" = "Jelenlegi: %@; koppintson a következőhöz";
+"Current: %@" = "Jelenlegi: %@";
+"%@ CYLTabBarController on Android %@" = "%@ CYLTabBarController, Android %@";
+"Logged in: %@. The \"Me\" tab needs a login (issue #19); tap to toggle" = "Bejelentkezve: %@. Az „Én” lap bejelentkezést igényel (issue #19); koppintson a váltáshoz";
+"Tap to switch the tap animation of the tabs and the PlusButton, current: %@" = "Koppintson a lapok és a PlusButton koppintási animációjának váltásához, jelenlegi: %@";
+"Long press %@ s, double tap %@ s" = "Hosszú nyomás %@ mp, dupla koppintás %@ mp";
+"Tab %@" = "Lap %@";
+"Surface opacity: %@ (default 0.40)" = "Felület átlátszatlansága: %@ (alapértelmezett 0.40)";
+"Speed: %@" = "Sebesség: %@";
+"Long pressed \"%@\"" = "Hosszan nyomva: „%@”";

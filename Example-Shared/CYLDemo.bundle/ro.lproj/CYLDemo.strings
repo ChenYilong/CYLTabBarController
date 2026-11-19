@@ -209,3 +209,22 @@
 "selectedIndex and PlusButton (issue #515)" = "selectedIndex și PlusButton (issue #515)";
 "system" = "sistem";
 "Current: " = "Curent: ";
+
+/* [EN] Android example layer, texts with values (%@, as iOS). */
+/* [CN] Android 示例层，带值的文字（%@，与 iOS 相同）。 */
+"Tapped: %@" = "Atins: %@";
+"Long pressed: %@" = "Apăsat lung: %@";
+"Accessory tapped: %@" = "Accesoriu atins: %@";
+"Dragging: %@ (%@, %@)" = "Se trage: %@ (%@, %@)";
+"Dropped: %@" = "Lăsat: %@";
+"Skins: holiday and color themes (%@)" = "Skinuri: teme de sărbători și de culori (%@)";
+"Current: %@; tap for the next one" = "Curent: %@; atinge pentru următorul";
+"Current: %@" = "Curent: %@";
+"%@ CYLTabBarController on Android %@" = "%@ CYLTabBarController pe Android %@";
+"Logged in: %@. The \"Me\" tab needs a login (issue #19); tap to toggle" = "Conectat: %@. Fila „Eu” necesită autentificare (issue #19); atinge pentru comutare";
+"Tap to switch the tap animation of the tabs and the PlusButton, current: %@" = "Atinge pentru a schimba animația la atingerea filelor și a PlusButton, curentă: %@";
+"Long press %@ s, double tap %@ s" = "Apăsare lungă %@ s, atingere dublă %@ s";
+"Tab %@" = "Fila %@";
+"Surface opacity: %@ (default 0.40)" = "Opacitatea suprafeței: %@ (implicit 0.40)";
+"Speed: %@" = "Viteză: %@";
+"Long pressed \"%@\"" = "Apăsat lung „%@”";

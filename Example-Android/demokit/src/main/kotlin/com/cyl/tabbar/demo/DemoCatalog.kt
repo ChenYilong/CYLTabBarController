@@ -60,7 +60,7 @@ object DemoCatalog {
         sections += DemoSection(cylDemoText("Update tabs in place"), DemoInteractions.tabItemUpdateRows())
         sections += DemoSection(cylDemoText("Tab pages, selection and login"), DemoInteractions.pageRows())
         sections += DemoSection("PlusButton", DemoInteractions.plusButtonRows())
-        sections += DemoSection("Skins: holiday and color themes (${DemoTheme.all.size})", DemoTheme.all.map(::themeRow))
+        sections += DemoSection(cylDemoText("Skins: holiday and color themes (%@)", DemoTheme.all.size), DemoTheme.all.map(::themeRow))
         sections += DemoSection(cylDemoText("Tab interactions"), DemoInteractions.interactionRows())
         sections += DemoSection(cylDemoText("No base class, and helpers"), DemoInteractions.helperRows())
         sections += DemoSection(cylDemoText("Configuration file"), DemoConfiguration.rows())
@@ -153,12 +153,12 @@ object DemoCatalog {
             val controller = tabBarController ?: return@DemoRow
             DemoLiquidGlassSurface.showSlider(requireContext(), controller) { reload() }
         },
-        DemoRow(cylDemoText("standardAppearance theme (shared by Liquid Glass and FlatDesign)"), { "Current: ${appearanceNames[appearanceIndex]}; tap for the next one" }) {
+        DemoRow(cylDemoText("standardAppearance theme (shared by Liquid Glass and FlatDesign)"), { cylDemoText("Current: %@; tap for the next one", appearanceNames[appearanceIndex]) }) {
             val controller = tabBarController ?: return@DemoRow
             appearanceIndex = (appearanceIndex + 1) % appearanceNames.size
             applyAppearance(controller, appearanceIndex)
         },
-        DemoRow(cylDemoText("Skin (CYLThemeManager, issue #216)"), { "Current: ${DemoTheme.currentName}" }) {
+        DemoRow(cylDemoText("Skin (CYLThemeManager, issue #216)"), { cylDemoText("Current: %@", DemoTheme.currentName) }) {
             choose(cylDemoText("Choose a skin"), DemoTheme.all.map { it.name }, DemoTheme.all.indexOfFirst { it.name == DemoTheme.currentName }) { DemoTheme.apply(DemoTheme.all[it].name) }
         },
         DemoRow(cylDemoText("Shrink / hide the tab bar on scroll (issue #13)"), {
@@ -298,7 +298,7 @@ object DemoCatalog {
     )
 
     private fun badgeRows(page: DemoListFragment, count: Int): List<DemoRow> = (0 until count).map { row ->
-        DemoRow(cyl_badgeTitleForRow(row), { "${pageTitle(page.page)} CYLTabBarController on Android ${Build.VERSION.RELEASE}" }, row) {
+        DemoRow(cyl_badgeTitleForRow(row), { cylDemoText("%@ CYLTabBarController on Android %@", pageTitle(page.page), Build.VERSION.RELEASE) }, row) {
             when (page.page) {
                 HOME -> {
                     activity?.title = "Home($row)"

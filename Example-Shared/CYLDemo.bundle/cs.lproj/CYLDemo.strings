@@ -209,3 +209,22 @@
 "selectedIndex and PlusButton (issue #515)" = "selectedIndex a PlusButton (issue #515)";
 "system" = "systém";
 "Current: " = "Aktuální: ";
+
+/* [EN] Android example layer, texts with values (%@, as iOS). */
+/* [CN] Android 示例层，带值的文字（%@，与 iOS 相同）。 */
+"Tapped: %@" = "Klepnuto: %@";
+"Long pressed: %@" = "Dlouze stisknuto: %@";
+"Accessory tapped: %@" = "Klepnuto na doplněk: %@";
+"Dragging: %@ (%@, %@)" = "Přetahování: %@ (%@, %@)";
+"Dropped: %@" = "Puštěno: %@";
+"Skins: holiday and color themes (%@)" = "Vzhledy: sváteční a barevné motivy (%@)";
+"Current: %@; tap for the next one" = "Aktuální: %@; klepnutím přepnete na další";
+"Current: %@" = "Aktuální: %@";
+"%@ CYLTabBarController on Android %@" = "%@ CYLTabBarController v systému Android %@";
+"Logged in: %@. The \"Me\" tab needs a login (issue #19); tap to toggle" = "Přihlášeno: %@. Karta „Já“ vyžaduje přihlášení (issue #19); klepnutím přepnete";
+"Tap to switch the tap animation of the tabs and the PlusButton, current: %@" = "Klepnutím přepnete animaci klepnutí karet a PlusButton, aktuální: %@";
+"Long press %@ s, double tap %@ s" = "Dlouhé stisknutí %@ s, dvojité klepnutí %@ s";
+"Tab %@" = "Karta %@";
+"Surface opacity: %@ (default 0.40)" = "Neprůhlednost povrchu: %@ (výchozí 0.40)";
+"Speed: %@" = "Rychlost: %@";
+"Long pressed \"%@\"" = "Dlouze stisknuto „%@“";

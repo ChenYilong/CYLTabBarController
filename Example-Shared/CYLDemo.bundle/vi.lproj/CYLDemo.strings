@@ -209,3 +209,22 @@
 "selectedIndex and PlusButton (issue #515)" = "selectedIndex và PlusButton (issue #515)";
 "system" = "hệ thống";
 "Current: " = "Hiện tại: ";
+
+/* [EN] Android example layer, texts with values (%@, as iOS). */
+/* [CN] Android 示例层，带值的文字（%@，与 iOS 相同）。 */
+"Tapped: %@" = "Đã chạm: %@";
+"Long pressed: %@" = "Đã nhấn giữ: %@";
+"Accessory tapped: %@" = "Đã chạm phụ kiện: %@";
+"Dragging: %@ (%@, %@)" = "Đang kéo: %@ (%@, %@)";
+"Dropped: %@" = "Đã thả: %@";
+"Skins: holiday and color themes (%@)" = "Giao diện: chủ đề ngày lễ và màu sắc (%@)";
+"Current: %@; tap for the next one" = "Hiện tại: %@; chạm để chuyển sang mục tiếp theo";
+"Current: %@" = "Hiện tại: %@";
+"%@ CYLTabBarController on Android %@" = "%@ CYLTabBarController trên Android %@";
+"Logged in: %@. The \"Me\" tab needs a login (issue #19); tap to toggle" = "Đã đăng nhập: %@. Tab \"Tôi\" cần đăng nhập (issue #19); chạm để chuyển đổi";
+"Tap to switch the tap animation of the tabs and the PlusButton, current: %@" = "Chạm để chuyển hoạt ảnh khi chạm của các tab và PlusButton, hiện tại: %@";
+"Long press %@ s, double tap %@ s" = "Nhấn giữ %@ giây, chạm hai lần %@ giây";
+"Tab %@" = "Tab %@";
+"Surface opacity: %@ (default 0.40)" = "Độ mờ đục bề mặt: %@ (mặc định 0.40)";
+"Speed: %@" = "Tốc độ: %@";
+"Long pressed \"%@\"" = "Đã nhấn giữ \"%@\"";

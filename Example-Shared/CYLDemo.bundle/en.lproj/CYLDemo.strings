@@ -209,3 +209,22 @@
 "selectedIndex and PlusButton (issue #515)" = "selectedIndex and PlusButton (issue #515)";
 "system" = "system";
 "Current: " = "Current: ";
+
+/* [EN] Android example layer, texts with values (%@, as iOS). */
+/* [CN] Android 示例层，带值的文字（%@，与 iOS 相同）。 */
+"Tapped: %@" = "Tapped: %@";
+"Long pressed: %@" = "Long pressed: %@";
+"Accessory tapped: %@" = "Accessory tapped: %@";
+"Dragging: %@ (%@, %@)" = "Dragging: %@ (%@, %@)";
+"Dropped: %@" = "Dropped: %@";
+"Skins: holiday and color themes (%@)" = "Skins: holiday and color themes (%@)";
+"Current: %@; tap for the next one" = "Current: %@; tap for the next one";
+"Current: %@" = "Current: %@";
+"%@ CYLTabBarController on Android %@" = "%@ CYLTabBarController on Android %@";
+"Logged in: %@. The \"Me\" tab needs a login (issue #19); tap to toggle" = "Logged in: %@. The \"Me\" tab needs a login (issue #19); tap to toggle";
+"Tap to switch the tap animation of the tabs and the PlusButton, current: %@" = "Tap to switch the tap animation of the tabs and the PlusButton, current: %@";
+"Long press %@ s, double tap %@ s" = "Long press %@ s, double tap %@ s";
+"Tab %@" = "Tab %@";
+"Surface opacity: %@ (default 0.40)" = "Surface opacity: %@ (default 0.40)";
+"Speed: %@" = "Speed: %@";
+"Long pressed \"%@\"" = "Long pressed \"%@\"";

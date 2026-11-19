@@ -209,3 +209,22 @@
 "selectedIndex and PlusButton (issue #515)" = "selectedIndex와 PlusButton(issue #515)";
 "system" = "시스템";
 "Current: " = "현재: ";
+
+/* [EN] Android example layer, texts with values (%@, as iOS). */
+/* [CN] Android 示例层，带值的文字（%@，与 iOS 相同）。 */
+"Tapped: %@" = "탭함: %@";
+"Long pressed: %@" = "길게 누름: %@";
+"Accessory tapped: %@" = "액세서리 탭함: %@";
+"Dragging: %@ (%@, %@)" = "드래그 중: %@ (%@, %@)";
+"Dropped: %@" = "놓음: %@";
+"Skins: holiday and color themes (%@)" = "스킨: 기념일 및 색상 테마(%@)";
+"Current: %@; tap for the next one" = "현재: %@, 탭하여 다음으로";
+"Current: %@" = "현재: %@";
+"%@ CYLTabBarController on Android %@" = "%@ CYLTabBarController, Android %@";
+"Logged in: %@. The \"Me\" tab needs a login (issue #19); tap to toggle" = "로그인: %@. '나' 탭은 로그인이 필요합니다(issue #19). 탭하여 전환";
+"Tap to switch the tap animation of the tabs and the PlusButton, current: %@" = "탭하여 탭과 PlusButton의 터치 애니메이션 전환, 현재: %@";
+"Long press %@ s, double tap %@ s" = "길게 누르기 %@초, 두 번 탭 %@초";
+"Tab %@" = "탭 %@";
+"Surface opacity: %@ (default 0.40)" = "표면 불투명도: %@(기본값 0.40)";
+"Speed: %@" = "속도: %@";
+"Long pressed \"%@\"" = "'%@' 길게 누름";

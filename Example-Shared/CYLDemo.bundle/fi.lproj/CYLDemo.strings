@@ -209,3 +209,22 @@
 "selectedIndex and PlusButton (issue #515)" = "selectedIndex ja PlusButton (issue #515)";
 "system" = "järjestelmä";
 "Current: " = "Nykyinen: ";
+
+/* [EN] Android example layer, texts with values (%@, as iOS). */
+/* [CN] Android 示例层，带值的文字（%@，与 iOS 相同）。 */
+"Tapped: %@" = "Napautettu: %@";
+"Long pressed: %@" = "Painettu pitkään: %@";
+"Accessory tapped: %@" = "Lisäosaa napautettu: %@";
+"Dragging: %@ (%@, %@)" = "Vedetään: %@ (%@, %@)";
+"Dropped: %@" = "Pudotettu: %@";
+"Skins: holiday and color themes (%@)" = "Ulkoasut: juhla- ja väriteemat (%@)";
+"Current: %@; tap for the next one" = "Nykyinen: %@; napauta siirtyäksesi seuraavaan";
+"Current: %@" = "Nykyinen: %@";
+"%@ CYLTabBarController on Android %@" = "%@ CYLTabBarController, Android %@";
+"Logged in: %@. The \"Me\" tab needs a login (issue #19); tap to toggle" = "Kirjautunut: %@. ”Minä”-välilehti vaatii kirjautumisen (issue #19); vaihda napauttamalla";
+"Tap to switch the tap animation of the tabs and the PlusButton, current: %@" = "Napauta vaihtaaksesi välilehtien ja PlusButton-painikkeen napautusanimaatiota, nykyinen: %@";
+"Long press %@ s, double tap %@ s" = "Pitkä painallus %@ s, kaksoisnapautus %@ s";
+"Tab %@" = "Välilehti %@";
+"Surface opacity: %@ (default 0.40)" = "Pinnan peittävyys: %@ (oletus 0.40)";
+"Speed: %@" = "Nopeus: %@";
+"Long pressed \"%@\"" = "Painettu pitkään ”%@”";

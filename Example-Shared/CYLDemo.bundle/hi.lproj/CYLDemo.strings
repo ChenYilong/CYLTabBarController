@@ -209,3 +209,22 @@
 "selectedIndex and PlusButton (issue #515)" = "selectedIndex और PlusButton (issue #515)";
 "system" = "सिस्टम";
 "Current: " = "वर्तमान:";
+
+/* [EN] Android example layer, texts with values (%@, as iOS). */
+/* [CN] Android 示例层，带值的文字（%@，与 iOS 相同）。 */
+"Tapped: %@" = "टैप किया: %@";
+"Long pressed: %@" = "देर तक दबाया: %@";
+"Accessory tapped: %@" = "एक्सेसरी पर टैप किया: %@";
+"Dragging: %@ (%@, %@)" = "खींचा जा रहा है: %@ (%@, %@)";
+"Dropped: %@" = "छोड़ा गया: %@";
+"Skins: holiday and color themes (%@)" = "स्किन: त्योहार और रंग थीम (%@)";
+"Current: %@; tap for the next one" = "वर्तमान: %@; अगले के लिए टैप करें";
+"Current: %@" = "वर्तमान: %@";
+"%@ CYLTabBarController on Android %@" = "%@ CYLTabBarController, Android %@";
+"Logged in: %@. The \"Me\" tab needs a login (issue #19); tap to toggle" = "लॉग इन: %@. \"मैं\" टैब के लिए लॉग इन ज़रूरी है (issue #19); बदलने के लिए टैप करें";
+"Tap to switch the tap animation of the tabs and the PlusButton, current: %@" = "टैब और PlusButton का टैप एनिमेशन बदलने के लिए टैप करें, वर्तमान: %@";
+"Long press %@ s, double tap %@ s" = "देर तक दबाना %@ से., डबल टैप %@ से.";
+"Tab %@" = "टैब %@";
+"Surface opacity: %@ (default 0.40)" = "सतह की अपारदर्शिता: %@ (डिफ़ॉल्ट 0.40)";
+"Speed: %@" = "गति: %@";
+"Long pressed \"%@\"" = "\"%@\" को देर तक दबाया";

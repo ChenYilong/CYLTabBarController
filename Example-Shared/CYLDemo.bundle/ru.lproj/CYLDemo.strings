@@ -209,3 +209,22 @@
 "selectedIndex and PlusButton (issue #515)" = "selectedIndex и PlusButton (issue #515)";
 "system" = "системная";
 "Current: " = "Текущее: ";
+
+/* [EN] Android example layer, texts with values (%@, as iOS). */
+/* [CN] Android 示例层，带值的文字（%@，与 iOS 相同）。 */
+"Tapped: %@" = "Нажато: %@";
+"Long pressed: %@" = "Долгое нажатие: %@";
+"Accessory tapped: %@" = "Нажат аксессуар: %@";
+"Dragging: %@ (%@, %@)" = "Перетаскивание: %@ (%@, %@)";
+"Dropped: %@" = "Отпущено: %@";
+"Skins: holiday and color themes (%@)" = "Скины: праздничные и цветовые темы (%@)";
+"Current: %@; tap for the next one" = "Текущее: %@; нажмите для следующего";
+"Current: %@" = "Текущее: %@";
+"%@ CYLTabBarController on Android %@" = "%@ CYLTabBarController на Android %@";
+"Logged in: %@. The \"Me\" tab needs a login (issue #19); tap to toggle" = "Вход выполнен: %@. Вкладка «Я» требует входа (issue #19); нажмите для переключения";
+"Tap to switch the tap animation of the tabs and the PlusButton, current: %@" = "Нажмите, чтобы сменить анимацию нажатия вкладок и PlusButton, текущая: %@";
+"Long press %@ s, double tap %@ s" = "Долгое нажатие %@ с, двойное нажатие %@ с";
+"Tab %@" = "Вкладка %@";
+"Surface opacity: %@ (default 0.40)" = "Непрозрачность поверхности: %@ (по умолчанию 0.40)";
+"Speed: %@" = "Скорость: %@";
+"Long pressed \"%@\"" = "Долгое нажатие на «%@»";

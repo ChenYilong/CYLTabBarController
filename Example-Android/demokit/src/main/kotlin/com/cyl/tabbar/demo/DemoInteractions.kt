@@ -152,7 +152,7 @@ object DemoInteractions {
             val controller = tabBarController ?: return@DemoRow
             controller.cyl_selectedIndexIgnoringPlusButton = (controller.cyl_selectedIndexIgnoringPlusButton + 1) % controller.viewControllers.size
         },
-        DemoRow(cylDemoText("Login state"), { "Logged in: ${tabBarController?.cyl_loggedIn}. The \"Me\" tab needs a login (issue #19); tap to toggle" }) {
+        DemoRow(cylDemoText("Login state"), { cylDemoText("Logged in: %@. The \"Me\" tab needs a login (issue #19); tap to toggle", tabBarController?.cyl_loggedIn) }) {
             val controller = tabBarController ?: return@DemoRow
             controller.cyl_loginRequiredTabBarItemIdentifiers = listOf(DemoCatalog.ME, "me")
             controller.cyl_presentLoginBlock = { tabBarController, _, completion ->
@@ -229,7 +229,7 @@ object DemoInteractions {
     private val longPressDurations = listOf(0.3, 0.5, 1.0)
     private val doubleTapIntervals = listOf(0.2, 0.3, 0.5)
 
-    private fun tapAnimationRow() = DemoRow(cylDemoText("Tab tap animation (issue #535)"), { "Tap to switch the tap animation of the tabs and the PlusButton, current: ${tapSteps[tabBarController?.let { tapStepOf[it] } ?: 0].name}" }) {
+    private fun tapAnimationRow() = DemoRow(cylDemoText("Tab tap animation (issue #535)"), { cylDemoText("Tap to switch the tap animation of the tabs and the PlusButton, current: %@", tapSteps[tabBarController?.let { tapStepOf[it] } ?: 0].name) }) {
         val controller = tabBarController ?: return@DemoRow
         choose(cylDemoText("Tab tap animation"), tapSteps.map { it.name }, tapStepOf[controller] ?: 0) { index ->
             tapStepOf[controller] = index
@@ -243,7 +243,7 @@ object DemoInteractions {
         }
     }
 
-    private fun feedbackRow() = DemoRow(cylDemoText("Tab tap sound and haptic feedback (issue #535)"), { "Current: ${feedbackSteps[tabBarController?.let { feedbackStepOf[it] } ?: 0].name}" }) {
+    private fun feedbackRow() = DemoRow(cylDemoText("Tab tap sound and haptic feedback (issue #535)"), { cylDemoText("Current: %@", feedbackSteps[tabBarController?.let { feedbackStepOf[it] } ?: 0].name) }) {
         val controller = tabBarController ?: return@DemoRow
         choose(cylDemoText("Tap feedback"), feedbackSteps.map { it.name }, feedbackStepOf[controller] ?: 0) { index ->
             feedbackStepOf[controller] = index
@@ -259,7 +259,7 @@ object DemoInteractions {
     private fun longPressRow() = DemoRow(cylDemoText("Long press a tab (issue #535)"), { "cyl_didLongPressControlBlock: ${if (tabBarController?.cyl_didLongPressControlBlock != null) "on" else "off"}" }) {
         val controller = tabBarController ?: return@DemoRow
         controller.cyl_didLongPressControlBlock = if (controller.cyl_didLongPressControlBlock != null) null else { tabBarController, control ->
-            android.widget.Toast.makeText(tabBarController.activity, "Long pressed: " + ((control as? com.cyl.tabbar.CYLTabBarItemButton)?.item?.title ?: "PlusButton"), android.widget.Toast.LENGTH_SHORT).show()
+            android.widget.Toast.makeText(tabBarController.activity, cylDemoText("Long pressed: %@", (control as? com.cyl.tabbar.CYLTabBarItemButton)?.item?.title ?: "PlusButton"), android.widget.Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -272,7 +272,7 @@ object DemoInteractions {
         }) {
             val controller = tabBarController ?: return@DemoRow
             val options = longPressDurations.flatMap { press -> doubleTapIntervals.map { tap -> press to tap } }
-            choose(cylDemoText("Long press / double tap"), options.map { "Long press ${it.first} s, double tap ${it.second} s" },
+            choose(cylDemoText("Long press / double tap"), options.map { cylDemoText("Long press %@ s, double tap %@ s", it.first, it.second) },
                 options.indexOf(controller.cyl_tabBarItemLongPressDuration to controller.cyl_tabBarItemDoubleTapInterval)) { index ->
                 controller.cyl_tabBarItemLongPressDuration = options[index].first
                 controller.cyl_tabBarItemDoubleTapInterval = options[index].second
@@ -353,7 +353,7 @@ class DemoPopPushFragment : Fragment() {
         val context = inflater.context
         val column = LinearLayout(context).apply { orientation = LinearLayout.VERTICAL; gravity = Gravity.CENTER; setBackgroundColor(Color.WHITE); isClickable = true }
         fun button(title: String, action: () -> Unit) = column.addView(Button(context).apply { text = title; setOnClickListener { action() } })
-        column.addView(TextView(context).apply { text = "Tab ${cyl_tabIndex + 1}"; gravity = Gravity.CENTER; textSize = 18f })
+        column.addView(TextView(context).apply { text = cylDemoText("Tab %@", cyl_tabIndex + 1); gravity = Gravity.CENTER; textSize = 18f })
         button("cyl_pushViewController") { cyl_pushViewController(DemoPopPushFragment()) }
         button("cyl_pushOrPopToViewController (tab 1)") {
             cyl_pushOrPopToViewController(DemoPopPushFragment(), true) { stack, handler -> handler(stack.size > 1, stack.firstOrNull(), true, 0) }

@@ -209,3 +209,22 @@
 "selectedIndex and PlusButton (issue #515)" = "selectedIndex ve PlusButton (issue #515)";
 "system" = "sistem";
 "Current: " = "Geçerli: ";
+
+/* [EN] Android example layer, texts with values (%@, as iOS). */
+/* [CN] Android 示例层，带值的文字（%@，与 iOS 相同）。 */
+"Tapped: %@" = "Dokunuldu: %@";
+"Long pressed: %@" = "Uzun basıldı: %@";
+"Accessory tapped: %@" = "Aksesuara dokunuldu: %@";
+"Dragging: %@ (%@, %@)" = "Sürükleniyor: %@ (%@, %@)";
+"Dropped: %@" = "Bırakıldı: %@";
+"Skins: holiday and color themes (%@)" = "Dış görünümler: bayram ve renk temaları (%@)";
+"Current: %@; tap for the next one" = "Geçerli: %@; sonraki için dokunun";
+"Current: %@" = "Geçerli: %@";
+"%@ CYLTabBarController on Android %@" = "%@ CYLTabBarController, Android %@";
+"Logged in: %@. The \"Me\" tab needs a login (issue #19); tap to toggle" = "Oturum açık: %@. \"Ben\" sekmesi oturum açmayı gerektirir (issue #19); değiştirmek için dokunun";
+"Tap to switch the tap animation of the tabs and the PlusButton, current: %@" = "Sekmelerin ve PlusButton'ın dokunma animasyonunu değiştirmek için dokunun, geçerli: %@";
+"Long press %@ s, double tap %@ s" = "Uzun basma %@ sn, çift dokunma %@ sn";
+"Tab %@" = "Sekme %@";
+"Surface opacity: %@ (default 0.40)" = "Yüzey opaklığı: %@ (varsayılan 0.40)";
+"Speed: %@" = "Hız: %@";
+"Long pressed \"%@\"" = "\"%@\" öğesine uzun basıldı";

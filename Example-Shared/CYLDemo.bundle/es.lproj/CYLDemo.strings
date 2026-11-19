@@ -209,3 +209,22 @@
 "selectedIndex and PlusButton (issue #515)" = "selectedIndex y PlusButton (issue #515)";
 "system" = "sistema";
 "Current: " = "Actual: ";
+
+/* [EN] Android example layer, texts with values (%@, as iOS). */
+/* [CN] Android 示例层，带值的文字（%@，与 iOS 相同）。 */
+"Tapped: %@" = "Tocado: %@";
+"Long pressed: %@" = "Pulsado prolongadamente: %@";
+"Accessory tapped: %@" = "Accesorio tocado: %@";
+"Dragging: %@ (%@, %@)" = "Arrastrando: %@ (%@, %@)";
+"Dropped: %@" = "Soltado: %@";
+"Skins: holiday and color themes (%@)" = "Apariencias: temas festivos y de colores (%@)";
+"Current: %@; tap for the next one" = "Actual: %@; toca para pasar al siguiente";
+"Current: %@" = "Actual: %@";
+"%@ CYLTabBarController on Android %@" = "%@ CYLTabBarController en Android %@";
+"Logged in: %@. The \"Me\" tab needs a login (issue #19); tap to toggle" = "Sesión iniciada: %@. La pestaña «Yo» requiere iniciar sesión (issue #19); toca para alternar";
+"Tap to switch the tap animation of the tabs and the PlusButton, current: %@" = "Toca para cambiar la animación al tocar de las pestañas y el PlusButton, actual: %@";
+"Long press %@ s, double tap %@ s" = "Pulsación larga %@ s, doble toque %@ s";
+"Tab %@" = "Pestaña %@";
+"Surface opacity: %@ (default 0.40)" = "Opacidad de la superficie: %@ (predeterminado 0.40)";
+"Speed: %@" = "Velocidad: %@";
+"Long pressed \"%@\"" = "Pulsado prolongadamente «%@»";

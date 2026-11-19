@@ -209,3 +209,22 @@
 "selectedIndex and PlusButton (issue #515)" = "selectedIndex ו-PlusButton (issue #515)";
 "system" = "מערכת";
 "Current: " = "נוכחי:";
+
+/* [EN] Android example layer, texts with values (%@, as iOS). */
+/* [CN] Android 示例层，带值的文字（%@，与 iOS 相同）。 */
+"Tapped: %@" = "הקשה: %@";
+"Long pressed: %@" = "לחיצה ארוכה: %@";
+"Accessory tapped: %@" = "הקשה על אביזר: %@";
+"Dragging: %@ (%@, %@)" = "גרירה: %@ (%@, %@)";
+"Dropped: %@" = "שוחרר: %@";
+"Skins: holiday and color themes (%@)" = "ערכות עיצוב: ערכות חגים וצבעים (%@)";
+"Current: %@; tap for the next one" = "נוכחי: %@; הקישו למעבר לבא";
+"Current: %@" = "נוכחי: %@";
+"%@ CYLTabBarController on Android %@" = "%@ CYLTabBarController ב-Android %@";
+"Logged in: %@. The \"Me\" tab needs a login (issue #19); tap to toggle" = "מחובר: %@. הלשונית ״אני״ דורשת התחברות (issue #19); הקישו להחלפה";
+"Tap to switch the tap animation of the tabs and the PlusButton, current: %@" = "הקישו להחלפת אנימציית ההקשה של הלשוניות ושל PlusButton, נוכחית: %@";
+"Long press %@ s, double tap %@ s" = "לחיצה ארוכה %@ שנ׳, הקשה כפולה %@ שנ׳";
+"Tab %@" = "לשונית %@";
+"Surface opacity: %@ (default 0.40)" = "אטימות המשטח: %@ (ברירת מחדל 0.40)";
+"Speed: %@" = "מהירות: %@";
+"Long pressed \"%@\"" = "לחיצה ארוכה על ״%@״";

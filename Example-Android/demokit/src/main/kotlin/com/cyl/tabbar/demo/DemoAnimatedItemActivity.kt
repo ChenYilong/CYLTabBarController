@@ -31,27 +31,27 @@ class DemoAnimatedItemActivity : AppCompatActivity() {
     private val listener = object : CYLAnimatedItemGestureListener {
         override fun onItemTapped(item: CYLAnimatedItemView) {
             item.restartAnimation()
-            status.text = "Tapped: ${item.title}"
+            status.text = cylDemoText("Tapped: %@", item.title)
         }
 
         override fun onItemLongPressed(item: CYLAnimatedItemView): Boolean {
-            status.text = "Long pressed: ${item.title}"
+            status.text = cylDemoText("Long pressed: %@", item.title)
             return true
         }
 
         override fun onAccessoryTapped(item: CYLAnimatedItemView) {
-            status.text = "Accessory tapped: ${item.title}"
+            status.text = cylDemoText("Accessory tapped: %@", item.title)
         }
 
         override fun onDragChanged(item: CYLAnimatedItemView, dx: Float, dy: Float) {
             item.translationX = dx
             item.translationY = dy
-            status.text = "Dragging: ${item.title} (${dx.toInt()}, ${dy.toInt()})"
+            status.text = cylDemoText("Dragging: %@ (%@, %@)", item.title, dx.toInt(), dy.toInt())
         }
 
         override fun onDragEnded(item: CYLAnimatedItemView, dx: Float, dy: Float, cancelled: Boolean) {
             item.animate().translationX(0f).translationY(0f).start()
-            status.text = "Dropped: ${item.title}"
+            status.text = cylDemoText("Dropped: %@", item.title)
         }
     }
 

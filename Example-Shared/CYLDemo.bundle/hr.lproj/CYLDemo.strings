@@ -209,3 +209,22 @@
 "selectedIndex and PlusButton (issue #515)" = "selectedIndex i PlusButton (issue #515)";
 "system" = "sustav";
 "Current: " = "Trenutno:";
+
+/* [EN] Android example layer, texts with values (%@, as iOS). */
+/* [CN] Android 示例层，带值的文字（%@，与 iOS 相同）。 */
+"Tapped: %@" = "Dodirnuto: %@";
+"Long pressed: %@" = "Dugo pritisnuto: %@";
+"Accessory tapped: %@" = "Dodirnut dodatak: %@";
+"Dragging: %@ (%@, %@)" = "Povlačenje: %@ (%@, %@)";
+"Dropped: %@" = "Ispušteno: %@";
+"Skins: holiday and color themes (%@)" = "Izgledi: blagdanske teme i teme boja (%@)";
+"Current: %@; tap for the next one" = "Trenutno: %@; dodirnite za sljedeći";
+"Current: %@" = "Trenutno: %@";
+"%@ CYLTabBarController on Android %@" = "%@ CYLTabBarController na sustavu Android %@";
+"Logged in: %@. The \"Me\" tab needs a login (issue #19); tap to toggle" = "Prijavljen: %@. Kartica „Ja” zahtijeva prijavu (issue #19); dodirnite za prebacivanje";
+"Tap to switch the tap animation of the tabs and the PlusButton, current: %@" = "Dodirnite za promjenu animacije dodira kartica i gumba PlusButton, trenutno: %@";
+"Long press %@ s, double tap %@ s" = "Dugi pritisak %@ s, dvostruki dodir %@ s";
+"Tab %@" = "Kartica %@";
+"Surface opacity: %@ (default 0.40)" = "Neprozirnost površine: %@ (zadano 0.40)";
+"Speed: %@" = "Brzina: %@";
+"Long pressed \"%@\"" = "Dugo pritisnuto „%@”";

@@ -62,7 +62,7 @@ object DemoPlaybackControls {
             contentDescription = "Speed"
         }
         fun update(speed: Float) {
-            speedLabel.text = "Speed: ${speedText(speed)}"
+            speedLabel.text = cylDemoText("Speed: %@", speedText(speed))
             ViewCompat.setStateDescription(slider, speedDescription(speed))
         }
         update(current)
