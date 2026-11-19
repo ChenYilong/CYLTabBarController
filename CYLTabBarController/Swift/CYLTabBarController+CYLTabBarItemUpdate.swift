@@ -187,7 +187,7 @@ extension CYLTabBarController {
     @discardableResult
     open func updateTabBarItem(for viewController: UIViewController, attributes: [String : Any] = [:]) -> Bool {
         let viewControllers = self.viewControllers ?? []
-        var index = viewController.flatMap { target in viewControllers.firstIndex { $0 === target } }
+        var index = viewControllers.firstIndex { $0 === viewController }
         if index == nil {
             index = viewControllers.firstIndex { $0.cyl_getViewControllerInsteadOfNavigation() === viewController }
         }

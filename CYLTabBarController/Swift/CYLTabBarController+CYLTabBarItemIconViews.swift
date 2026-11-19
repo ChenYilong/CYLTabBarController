@@ -343,10 +343,7 @@ extension CYLTabBarController {
     @objc(setTabBarItemIconWithURL:selectedURL:size:atIndex:)
     @discardableResult
     open func setTabBarItemIconWith(_ url: URL, selectedURL: URL?, size: CGSize, at index: UInt) -> Bool {
-        guard let url else {
-            return false
-        }
-        return setTabBarItemIconWith(url, selectedIcon: selectedURL, size: size, at: index)
+        setTabBarItemIcon(url, selectedIcon: selectedURL, size: size, at: index)
     }
 
     /**
@@ -357,7 +354,7 @@ extension CYLTabBarController {
     @objc(setTabBarItemIcon:selectedIcon:size:atIndex:)
     @discardableResult
     open func setTabBarItemIcon(_ icon: Any, selectedIcon: Any?, size: CGSize, at index: UInt) -> Bool {
-        guard let icon, let viewController = cylIconTab(at: index) else {
+        guard let viewController = cylIconTab(at: index) else {
             return false
         }
         Self.cylLoadTabBarItemIcon(icon) { [weak self, weak viewController] image in

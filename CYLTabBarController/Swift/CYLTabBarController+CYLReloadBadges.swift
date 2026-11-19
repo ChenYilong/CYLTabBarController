@@ -37,12 +37,11 @@ extension CYLTabBarController {
 
     @objc(reloadBadgesWithBlock:)
     func cylReloadBadges(with block: CYLViewDidLayoutSubViewsBlock?) {
-        perform(block)
+        if let block { perform(whenTabBarItemsReady: block) }
     }
 
     @objc(performWhenTabBarItemsReady:)
     open func perform(whenTabBarItemsReady block: @escaping CYLViewDidLayoutSubViewsBlock) {
-        guard let block = block else { return }
         cylPendingReloadBadgesBlocks.add(block)
         cylRunPendingReloadBadgesBlocksIfReady()
         if cylPendingReloadBadgesBlocks.count > 0, isViewLoaded, view.window != nil {

@@ -125,7 +125,7 @@ extension CYLTabBarController {
      */
     @objc(cyl_isLoginRequiredForViewController:)
     open func cyl_isLoginRequired(for viewController: UIViewController) -> Bool {
-        guard let viewController, !viewController.cyl_isPlaceholder else { return false }
+        guard !viewController.cyl_isPlaceholder else { return false }
         if let block = cyl_loginSettings.requiredBlock {
             return block(self, viewController)
         }
@@ -146,7 +146,7 @@ extension CYLTabBarController {
      */
     @objc(cyl_interceptLoginIfNeededForViewController:)
     open func cyl_interceptLoginIfNeeded(for viewController: UIViewController) -> Bool {
-        guard let viewController, cyl_isLoginRequired(for: viewController), !cylLoggedIn() else { return false }
+        guard cyl_isLoginRequired(for: viewController), !cylLoggedIn() else { return false }
         let settings = cyl_loginSettings
         if settings.interceptedViewController === viewController {
             return true

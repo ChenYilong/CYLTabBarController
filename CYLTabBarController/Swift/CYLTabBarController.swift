@@ -13,6 +13,8 @@ public typealias CYLViewDidLayoutSubViewsBlock = (CYLTabBarController) -> Void
 public typealias CYLTabBarControllerDidLongPressControlBlock = (CYLTabBarController, UIControl) -> Void
 /// [EN] The completion of the configuration loaders. [CN] 配置加载方法的回调。
 public typealias CYLTabBarControllerConfigurationCompletion = (CYLTabBarController?, Error?) -> Void
+/// [EN] The provider of a view shown in place of a tab's icon. [CN] 显示在 Tab 图标位置的视图的提供 block。
+public typealias CYLTabBarItemIconViewProvider = (Bool) -> UIView?
 /// [EN] The handler of the tab bar item gestures. [CN] Tab 手势的处理 block。
 public typealias CYLTabBarItemGestureHandler = (CYLTabBarController, CYLTabBarItemGesture, UIControl, UIViewController?) -> Void
 
