@@ -37,6 +37,13 @@ function cylStackAction(value) {
 function cylStackModel(p) {
   const backgroundAction = cylStackAction(p.backgroundAction)
   const margin = cylStackLength(p.contentMargin, CYL_STACK_DEFAULT_SPACING)
+  // [EN] iOS `axis` and `spacing`: 'horizontal' lays the items in one row (anything else is vertical); `spacing` is the space
+  //      before items without their own `spacingBefore`. [CN] iOS 的 `axis` 与 `spacing`：'horizontal' 排成一行（其他值为竖向）；
+  //      `spacing` 是没有自己 `spacingBefore` 的条目之前的间距。
+  const horizontal = p.axis === 'horizontal'
+  const stackSpacing = cylStackLength(p.spacing, CYL_STACK_DEFAULT_SPACING)
+  const stackIconColor = String(p.iconColor || '')
+  const stackSelectedIconColor = String(p.selectedIconColor || '')
   const list = Array.isArray(p.items) ? p.items.filter((item) => item && typeof item === 'object') : []
   const items = list.map((item, index) => {
     const action = cylStackAction(item.action)
@@ -48,7 +55,13 @@ function cylStackModel(p) {
     const title = item.title === undefined || item.title === null ? '' : String(item.title)
     const label = String(item.accessibilityLabel || '')
     const button = interactive || actsOnBackground
-    const spacing = index === 0 ? 0 : cylStackLength(item.spacingBefore, CYL_STACK_DEFAULT_SPACING)
+    const spacing = index === 0 ? 0 : cylStackLength(item.spacingBefore, stackSpacing)
+    // [EN] The icon color (iOS `itemAppearance` iconColor): the item's own, else the stack's; selected first tries the
+    //      selected colors. `iconTint` is the older name of an item's `iconColor`.
+    // [CN] 图标颜色（iOS `itemAppearance` 的 iconColor）：条目自己的，否则为堆叠的；选中时先取选中颜色。`iconTint` 是条目 `iconColor` 的旧名称。
+    const selected = Boolean(item.selected)
+    const normalColor = String(item.iconColor || item.iconTint || '') || stackIconColor
+    const iconColor = (selected && (String(item.selectedIconColor || '') || stackSelectedIconColor)) || normalColor
     return {
       key: item.key !== undefined ? String(item.key) : `cyl-stack-${index}`,
       index,
@@ -61,7 +74,8 @@ function cylStackModel(p) {
       titleColor: String(item.titleColor || ''),
       titleFontSize: cylStackLength(item.titleFontSize, 0),
       titleFontWeight: item.titleFontWeight === undefined ? '' : item.titleFontWeight,
-      iconTint: String(item.iconTint || ''),
+      iconTint: iconColor,
+      selected,
       loop: Boolean(item.loop),
       accessibilityLabel: label,
       action,
@@ -69,10 +83,10 @@ function cylStackModel(p) {
       interactive,
       role: button ? 'button' : 'text',
       hidden: !button && !title && !label,
-      wrapperStyle: spacing ? `margin-top: ${spacing}px;` : '',
+      wrapperStyle: spacing ? `${horizontal ? 'margin-left' : 'margin-top'}: ${spacing}px;` : '',
     }
   })
-  return { items, backgroundAction, containerStyle: `padding: ${margin}px;` }
+  return { items, backgroundAction, horizontal, containerStyle: `padding: ${margin}px;` }
 }
 
 /**

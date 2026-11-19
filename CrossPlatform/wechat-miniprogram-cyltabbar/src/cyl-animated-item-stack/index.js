@@ -26,11 +26,19 @@ Component({
      * [EN] The action of a tap outside items with an action; '' (default) turns it off. [CN] 点击带动作条目以外位置时的动作；''（默认）关闭。
      */
     backgroundAction: { type: String, value: '' },
+    /** [EN] 'vertical' (default) or 'horizontal' (one row), as iOS `axis`. [CN] 'vertical'（默认）或 'horizontal'（一行），对应 iOS `axis`。 */
+    axis: { type: String, value: 'vertical' },
+    /** [EN] The space before items without their own `spacingBefore`, in px (16), as iOS `spacing`. [CN] 没有自己 `spacingBefore` 的条目之前的间距，单位 px（16），对应 iOS `spacing`。 */
+    spacing: { type: Number, value: 16 },
+    /** [EN] The icon color of items without their own (iOS stack `itemAppearance`); '' for none. [CN] 没有自己颜色的条目的图标颜色（iOS 堆叠的 `itemAppearance`）；'' 表示没有。 */
+    iconColor: { type: String, value: '' },
+    /** [EN] The icon color of selected items without their own; '' uses `iconColor`. [CN] 没有自己颜色的选中条目的图标颜色；'' 时使用 `iconColor`。 */
+    selectedIconColor: { type: String, value: '' },
   },
   data: { m: cylStackModel({}) },
   observers: {
-    'items, contentMargin, backgroundAction'(items, contentMargin, backgroundAction) {
-      this.setData({ m: cylStackModel({ items, contentMargin, backgroundAction }) })
+    'items, contentMargin, backgroundAction, axis, spacing, iconColor, selectedIconColor'(items, contentMargin, backgroundAction, axis, spacing, iconColor, selectedIconColor) {
+      this.setData({ m: cylStackModel({ items, contentMargin, backgroundAction, axis, spacing, iconColor, selectedIconColor }) })
     },
   },
   methods: {

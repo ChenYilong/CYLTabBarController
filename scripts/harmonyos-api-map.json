@@ -1071,5 +1071,8 @@
   "CYLAnimatedItemStackView -itemViewForAction:": "`CYLAnimatedItemStackModel.itemFor(action)` (cylanimateditem; unit tests and emulator check 2026-11-19 / 单元测试与模拟器验证)",
   "CYLAnimatedItemStackView -setHandler:forAction:": "`CYLAnimatedItemStackModel.setHandler(handler, action)` (cylanimateditem; unit tests and emulator check 2026-11-19 / 单元测试与模拟器验证)",
   "CYLAnimatedItemStackView -performAction:": "`CYLAnimatedItemStackModel.performAction(action)` (cylanimateditem; unit tests and emulator check 2026-11-19 / 单元测试与模拟器验证)",
-  "CYLAnimatedItemStackView stackView": "Not applicable: the component lays out its own `Column`, not exposed, as ArkUI composes views declaratively (cylanimateditem, 2026-11-19 / 不适用：组件自己布局内部的 `Column`，不对外暴露)"
+  "CYLAnimatedItemStackView stackView": "Not applicable: the component lays out its own `Column`, not exposed, as ArkUI composes views declaratively (cylanimateditem, 2026-11-19 / 不适用：组件自己布局内部的 `Column`，不对外暴露)",
+  "CYLAnimatedItemStackView axis": "`CYLAnimatedItemStackModel.axis` ('vertical' default, 'horizontal' = a `Row`; `isHorizontal`) (cylanimateditem; unit tests and emulator check 2026-11-19 / 单元测试与模拟器验证)",
+  "CYLAnimatedItemStackView spacing": "`CYLAnimatedItemStackModel.spacing` (16; used by items whose `spacingBefore` is -1, the default) (cylanimateditem; unit tests and emulator check 2026-11-19 / 单元测试与模拟器验证)",
+  "CYLAnimatedItemStackView itemAppearance": "partial: `CYLAnimatedItemStackModel.iconColor` / `selectedIconColor` (the icon colors of `UITabBarItemAppearance` normal / selected, for items without their own `CYLAnimatedItemStackItem.iconColor` / `selectedIconColor`; title attributes and the disabled color are not mapped) (cylanimateditem; unit tests and emulator check 2026-11-19 / 单元测试与模拟器验证)"
 }
