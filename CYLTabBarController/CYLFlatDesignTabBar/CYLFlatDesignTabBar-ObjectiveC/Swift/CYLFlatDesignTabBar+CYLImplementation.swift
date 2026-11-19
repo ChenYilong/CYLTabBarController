@@ -99,7 +99,7 @@ extension CYLFlatDesignTabBar {
     func cylFlatDesignCommonInit() {
         // [CN] 引入CYLFlatDesignTabBar，即表示同意 hook push行为
         // [EN] Importing CYLFlatDesignTabBar means you agree to hooking the push behavior.
-        UINavigationController.cylNavigationBarActionHook()
+        UINavigationController.cyl_navigationBarActionHook()
         let storage = cylFlatDesignStorage
         // [EN] VoiceOver announces its buttons as tabs ("tab, 2 of 5"). [CN] VoiceOver 将其中的按钮朗读为标签页。
         accessibilityTraits.insert(.tabBar)

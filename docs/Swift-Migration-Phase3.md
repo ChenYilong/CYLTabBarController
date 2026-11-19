@@ -82,5 +82,6 @@
 | DONE | 2026-11-19: inventory and groups (this document). Prompt of the user (verbatim): "continue fix swift Migration score: from 75/100 (14,323 Objective-C lines left) to 100"; the other session asked this session for "Phase ③ prep outside my four files: Swift versions of the enums and protocols, Package.swift as one target, and the list of headers that change together". |
 | DONE | 2026-11-19, group A (badges): docs/Swift-Migration.md step 115. |
 | DONE | 2026-11-19, groups C, D, E and the `UIView` / `UIViewController` part of B: docs/Swift-Migration.md step 116. |
-| TODO | Group B: `UIColor`, `UIImage`, `UIVisualEffect` theme categories stay Objective-C (their block parameters use `__kindof`, which the generated header drops; step 116). Groups J, K before the class switch. |
+| TODO | Group B: `UIColor`, `UIImage`, `UIVisualEffect` theme categories stay Objective-C (their block parameters use `__kindof`, which the generated header drops; step 116). Group J before the class switch. |
+| DONE | 2026-11-19, group K (FlatDesign private navigation header): docs/Swift-Migration.md step 117. |
 | TODO | Groups F, G, H, I and `Package.swift` with the class switch, in one change across both sessions. |
