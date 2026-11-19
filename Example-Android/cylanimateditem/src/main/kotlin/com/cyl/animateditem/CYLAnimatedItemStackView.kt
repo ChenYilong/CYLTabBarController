@@ -191,8 +191,10 @@ open class CYLAnimatedItemStackView @JvmOverloads constructor(
         //      落在无动作条目上的触摸交给背景）。
         itemView.setOnClickListener { view ->
             val item = view as CYLAnimatedItemView
-            val action = (if (isItemInteractive(item)) action(item) else null) ?: backgroundAction.takeIf { item === firstItemView }
-            action?.let { performAction(it) }
+            val ownAction = if (isItemInteractive(item)) action(item) else null
+            val fallbackAction = if (item === firstItemView) backgroundAction else null
+            val resolved = ownAction ?: fallbackAction
+            if (resolved != null) performAction(resolved)
         }
         setAction(action, itemView)
     }
