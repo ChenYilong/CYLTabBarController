@@ -52,8 +52,13 @@ object CYLTabBarItemAnimationTint {
      * [EN] The color to draw for `options`: the fixed tint for `configuration`, or `titleColor` when the option is "title".
      * [CN] `options` 应绘制的颜色：`configuration` 下的固定着色，或选项为 "title" 时的 `titleColor`。
      */
-    fun resolvedTintColor(options: Map<String, String>, titleColor: Int?, configuration: Configuration): Int? =
-        if (tintOption(options) == TINT_TITLE) titleColor else fixedTintColor(options, configuration)
+    fun resolvedTintColor(options: Map<String, String>, titleColor: Int?, configuration: Configuration, selected: Boolean? = null): Int? {
+        if (tintOption(options) == TINT_TITLE) return titleColor
+        val fixed = fixedTintColor(options, configuration) ?: return null
+        // [EN] A fixed tint colors only the unselected tab; the selected one takes the title's selected color (iOS 9a64feea).
+        //      Without a state (null) the fixed tint stays in both states. [CN] 固定着色只用于未选中的 Tab；选中的 Tab 使用标题的选中颜色（iOS 9a64feea）。没有状态（null）时两种状态都使用固定着色。
+        return if (selected == true) titleColor ?: fixed else fixed
+    }
 
     /**
      * [EN] Draws `view` in `color` (SRC_IN on its layer); null removes the tint. Applied only when the color changes.
@@ -98,12 +103,23 @@ internal class CYLTabBarItemAnimationTintingPlayer(
         set(value) {
             player.tintColor = value
             val view = animationView ?: return
-            CYLTabBarItemAnimationTint.apply(view, CYLTabBarItemAnimationTint.resolvedTintColor(options, value, view.resources.configuration))
+            CYLTabBarItemAnimationTint.apply(view, CYLTabBarItemAnimationTint.resolvedTintColor(options, value, view.resources.configuration, tintSelected))
         }
+    private var tintSelected: Boolean? = null
+    private var tintTitleColor: Int? = null
+    override fun setTintColor(color: Int?, selected: Boolean) {
+        tintSelected = selected
+        tintTitleColor = color
+        player.setTintColor(color, selected)
+        val view = animationView ?: return
+        CYLTabBarItemAnimationTint.apply(view, CYLTabBarItemAnimationTint.resolvedTintColor(options, color, view.resources.configuration, selected))
+    }
     override fun applyColors(colors: Map<String, Int>?, configuration: Configuration) {
         player.applyColors(colors, configuration)
         // [EN] Called when night mode changes: a fixed tint takes the new mode's color. [CN] 夜间模式变化时调用：固定着色使用新模式的颜色。
         val view = animationView ?: return
-        CYLTabBarItemAnimationTint.fixedTintColor(options, configuration)?.let { CYLTabBarItemAnimationTint.apply(view, it) }
+        if (CYLTabBarItemAnimationTint.fixedTintColor(options, configuration) != null) {
+            CYLTabBarItemAnimationTint.apply(view, CYLTabBarItemAnimationTint.resolvedTintColor(options, tintTitleColor, configuration, tintSelected))
+        }
     }
 }

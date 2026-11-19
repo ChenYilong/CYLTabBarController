@@ -36,7 +36,7 @@ enum class CourseTab(val artboard: String, val stateMachine: String, val icon: I
                 CYLConstants.CYLTabBarAnimationOptionRiveArtboard to artboard,
                 CYLConstants.CYLTabBarAnimationOptionRiveStateMachine to stateMachine,
                 CYLConstants.CYLTabBarAnimationOptionRiveInput to "active",
-            ) + (if (CourseAppearance.followsSystem) mapOf(CYLConstants.CYLTabBarAnimationOptionTint to "title") else emptyMap())),
+            ) + CourseAppearance.tintOptions(this)),
             CYLConstants.CYLTabBarRiveSize to "{32, 32}",
         )
 
@@ -60,14 +60,23 @@ object CourseColors {
 }
 
 /**
- * [EN] iOS `-CYLDemoRiveFollowsAppearance YES` (the boolean extra `CYLDemoRiveFollowsAppearance`): the course follows the
- *      system light / dark mode instead of forcing dark, and every Rive icon takes its title color (`tint` "title"): label
- *      colors when unselected, system blue when selected, as iOS Example-Rive's per-state item appearance (0dc6d1c4).
- * [CN] iOS `-CYLDemoRiveFollowsAppearance YES`（布尔 extra `CYLDemoRiveFollowsAppearance`）：课程跟随系统浅色 / 深色，而不是强制深色；每个 Rive 图标
- *      使用其标题颜色（`tint` "title"）：未选中为 label 颜色，选中为系统蓝，与 iOS Example-Rive 的分状态外观（0dc6d1c4）相同。
+ * [EN] As iOS Example-Rive (9a64feea): the course follows the system light / dark mode by default, every Rive icon takes its
+ *      title color (`tint` "title"): label colors when unselected, system blue when selected. `CYLDemoRiveForcesDark`
+ *      restores the dark bar; `CYLDemoRiveFixedTint` gives Search a fixed tint, drawn only while it is unselected.
+ * [CN] 与 iOS Example-Rive（9a64feea）相同：课程默认跟随系统浅色 / 深色，每个 Rive 图标使用其标题颜色（`tint` "title"）：未选中为 label 颜色，
+ *      选中为系统蓝。`CYLDemoRiveForcesDark` 恢复深色 TabBar；`CYLDemoRiveFixedTint` 为 Search 设置固定着色，只在未选中时绘制。
  */
 object CourseAppearance {
-    var followsSystem = false
+    var followsSystem = true
+    /** [EN] iOS `-CYLDemoRiveFixedTint YES`: Search gets the fixed tint #1C1C1E + darkTint #FFFFFF. [CN] iOS `-CYLDemoRiveFixedTint YES`：Search 使用固定着色 #1C1C1E + darkTint #FFFFFF。 */
+    var fixedTintOnSearch = false
+
+    /** [EN] The tint options of a tab when following the system. [CN] 跟随系统时 Tab 的着色选项。 */
+    fun tintOptions(tab: CourseTab): Map<String, String> = when {
+        !followsSystem -> emptyMap()
+        fixedTintOnSearch && tab == CourseTab.Search -> mapOf(CYLConstants.CYLTabBarAnimationOptionTint to "#1C1C1E", CYLConstants.CYLTabBarAnimationOptionDarkTint to "#FFFFFF")
+        else -> mapOf(CYLConstants.CYLTabBarAnimationOptionTint to "title")
+    }
 }
 
 /**
@@ -83,7 +92,10 @@ class MainActivity : DemoTabBarActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         // [EN] `CourseTabBarController`: `overrideUserInterfaceStyle = .dark`, the course is dark. [CN] `CourseTabBarController`：`overrideUserInterfaceStyle = .dark`，课程为深色。
-        CourseAppearance.followsSystem = intent.getBooleanExtra("CYLDemoRiveFollowsAppearance", false)
+        // [EN] iOS 9a64feea: the course follows the system light / dark mode by default; `CYLDemoRiveForcesDark` restores the dark
+        //      bar with white tints. [CN] iOS 9a64feea：课程默认跟随系统浅色 / 深色；`CYLDemoRiveForcesDark` 恢复白色着色的深色 TabBar。
+        CourseAppearance.followsSystem = !intent.getBooleanExtra("CYLDemoRiveForcesDark", false)
+        CourseAppearance.fixedTintOnSearch = intent.getBooleanExtra("CYLDemoRiveFixedTint", false)
         delegate.localNightMode = if (CourseAppearance.followsSystem) androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
             else androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_YES
         super.onCreate(savedInstanceState)
