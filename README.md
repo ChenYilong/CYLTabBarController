@@ -206,6 +206,7 @@ Analyst.ai [App Store Link](https://itunes.apple.com/us/app/analyst-ai/id1345754
 | [在 Swift 中继承本库的类](docs/Subclassing-In-Swift.md) | [Subclassing the library's classes in Swift](docs/Subclassing-In-Swift.md) |
 | [Swift 编码规范](docs/Swift-Coding-Style.md) | [Swift coding style](docs/Swift-Coding-Style.md) |
 | [在 Swift 项目中使用 CYLTabBarController](docs/Swift-Guide.md) | [Using CYLTabBarController in Swift](docs/Swift-Guide.md) |
+| [Swift 迁移第 ③ 阶段：协议、枚举与公开头文件](docs/Swift-Migration-Phase3.md) | [Swift migration phase ③: protocols, enums and the public headers](docs/Swift-Migration-Phase3.md) |
 | [iOS 核心层迁移到 Swift](docs/Swift-Migration.md) | [Migrating the iOS core layer to Swift](docs/Swift-Migration.md) |
 | [在 SwiftUI 项目中集成 CYLTabBarController](docs/SwiftUI-Integration.md) | [Integrating CYLTabBarController in a SwiftUI app](docs/SwiftUI-Integration.md) |
 | [TODO 总览与清理进度](docs/TODO-Sweep.md) | [TODO sweep: every open TODO and its status](docs/TODO-Sweep.md) |
