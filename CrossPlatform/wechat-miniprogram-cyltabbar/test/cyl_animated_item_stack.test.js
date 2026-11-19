@@ -26,7 +26,8 @@ function cylMountStack(properties) {
     triggerEvent(name, detail) { events.push({ name, detail }) },
     ...definition.methods,
   }
-  definition.observers['items, contentMargin, backgroundAction'].call(stack, data.items, data.contentMargin, data.backgroundAction)
+  const [keys, observer] = Object.entries(definition.observers)[0]
+  observer.apply(stack, keys.split(',').map((key) => data[key.trim()]))
   return { stack, events }
 }
 
@@ -110,4 +111,28 @@ test('a disabled item with an action lets the background act and reads as text',
   assert.equal(stack.data.m.items[1].interactive, false)
   cylTap(stack, 1, 100)
   assert.deepEqual(events.map((event) => event.detail.action), ['reload'])
+})
+
+test('axis horizontal lays the items in a row with the spacing on the left', () => {
+  const items = [{ title: 'Edit' }, { title: 'Remove' }, { title: 'Close', spacingBefore: 4 }]
+  const column = cylStackModel({ items })
+  assert.equal(column.horizontal, false, 'vertical by default')
+  assert.equal(column.items[1].wrapperStyle, 'margin-top: 16px;')
+  const row = cylStackModel({ items, axis: 'horizontal', spacing: 10 })
+  assert.equal(row.horizontal, true)
+  assert.equal(row.items[0].wrapperStyle, '', 'none before the first')
+  assert.equal(row.items[1].wrapperStyle, 'margin-left: 10px;', 'the stack spacing, as iOS stackView.spacing')
+  assert.equal(row.items[2].wrapperStyle, 'margin-left: 4px;', "an item's own spacingBefore wins")
+  assert.equal(cylStackModel({ items, axis: 'diagonal' }).horizontal, false, 'anything else is vertical')
+})
+
+test('icon colors: the stack default, the item color wins, selected falls back to normal', () => {
+  const items = [{ image: 'edit.png' }, { image: 'remove.png', iconColor: '#FF3B30' }, { image: 'old.png', iconTint: '#000000' }]
+  assert.equal(cylStackModel({ items }).items[0].iconTint, '', 'no tint by default')
+  const m = cylStackModel({ items, iconColor: '#8E8E93' })
+  assert.deepEqual(m.items.map((item) => item.iconTint), ['#8E8E93', '#FF3B30', '#000000'])
+  const selected = cylStackModel({ items: [{ selected: true }, { selected: true, selectedIconColor: '#34C759' }], iconColor: '#8E8E93' })
+  assert.equal(selected.items[0].iconTint, '#8E8E93', 'selected without a selected color')
+  assert.equal(selected.items[1].iconTint, '#34C759')
+  assert.equal(cylStackModel({ items: [{ selected: true }], selectedIconColor: '#007AFF' }).items[0].iconTint, '#007AFF')
 })

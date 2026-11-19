@@ -13,3 +13,4 @@ export { CYLAnimatedItemStackView } from './src/main/ets/CYLAnimatedItemStackVie
 export {
   CYLAnimatedItemStackModel, CYLAnimatedItemStackItem, CYLAnimatedItemStackActionHandler, CYLAnimatedItemStackDefaultSpacing
 } from './src/main/ets/CYLAnimatedItemStackModel';
+export { cylIsSymbolResource, CYL_SYMBOL_RESOURCE_TYPE } from './src/main/ets/CYLAnimatedItemResources';

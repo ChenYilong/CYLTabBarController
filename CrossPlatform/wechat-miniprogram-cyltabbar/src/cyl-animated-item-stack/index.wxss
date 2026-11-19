@@ -19,3 +19,7 @@
   display: flex;
   justify-content: center;
 }
+/* [EN] axis 'horizontal': one row, the spacing on the left of each item. [CN] axis 为 'horizontal'：一行，间距位于每个条目左侧。 */
+.cyl-stack-row {
+  flex-direction: row;
+}

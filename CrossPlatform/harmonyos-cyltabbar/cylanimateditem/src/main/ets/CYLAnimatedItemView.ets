@@ -1,3 +1,4 @@
+import { cylIsSymbolResource } from './CYLAnimatedItemResources';
 import BuildProfile from '../../../BuildProfile';
 
 /** [EN] `maxLines` for a title without a line limit (`titleLines` 0). [CN] 标题不限行数（`titleLines` 为 0）时的 `maxLines`。 */
@@ -435,7 +436,18 @@ export struct CYLAnimatedItemView {
   @Builder
   cylIcon() {
     Stack() {
-      if (!this.cylIsEmpty(this.cylFallbackImage())) {
+      if (cylIsSymbolResource(this.cylFallbackImage())) {
+        // [EN] A system symbol (`$r('sys.symbol.xmark')`): an Image draws nothing for it (B30), so it is a SymbolGlyph in
+        //      `iconColor` (the theme's primary color without one). [CN] 系统符号（`$r('sys.symbol.xmark')`）：Image 不绘制它（B30），
+        //      因此用 SymbolGlyph 按 `iconColor` 绘制（没有时为主题主色）。
+        SymbolGlyph(this.cylFallbackImage() as Resource)
+          .fontSize(this.iconSize)
+          .fontColor([this.iconColor === '' ? $r('sys.color.font_primary') : this.iconColor])
+          .width(this.iconSize)
+          .height(this.iconSize)
+          .opacity(this.cylMakesAnimation() && this.animationLoaded ? 0 : 1)
+          .accessibilityLevel('no')
+      } else if (!this.cylIsEmpty(this.cylFallbackImage())) {
         Image(this.cylFallbackImage())
           .width(this.iconSize)
           .height(this.iconSize)
