@@ -23,10 +23,6 @@ import UIKit
     @objc(setTabBarIsAnimating:) func setTabBarIsAnimating(_ value: Bool)
     @objc(needsReloadItems) func needsReloadItems() -> Bool
     @objc(setNeedsReloadItems:) func setNeedsReloadItems(_ value: Bool)
-    @objc(addOneChildViewController:idx:WithTitle:normalImageInfo:selectedImageInfo:titlePositionAdjustment:imagePositionAdjustment:imageInsets:lottieURL:lottieFilePath:lottieSizeValue:)
-    func addOneChildViewController(_ viewController: UIViewController, idx: UInt, withTitle title: String?, normalImageInfo: Any?,
-                                   selectedImageInfo: Any?, titlePositionAdjustment: UIOffset, imagePositionAdjustment: UIOffset,
-                                   imageInsets: UIEdgeInsets, lottieURL: URL?, lottieFilePath: String?, lottieSizeValue: NSValue?)
     @objc(lastShowHideTabBar) func lastShowHideTabBar() -> Bool
     @objc(setLastShowHideTabBar:) func setLastShowHideTabBar(_ value: Bool)
     @objc(lastShowHideTabBarAnimated) func lastShowHideTabBarAnimated() -> Bool
@@ -780,7 +776,7 @@ extension CYLTabBarController {
             return
         }
         let setup = cylTabBarItemSetup(for: viewController, idx: idx)
-        cylFlatDesignHost.addOneChildViewController(viewController, idx: setup.idx, withTitle: setup.title,
+        cylFlatDesignAddOneChildViewController(viewController, idx: setup.idx, withTitle: setup.title,
                                                     normalImageInfo: setup.normalImageInfo, selectedImageInfo: setup.selectedImageInfo,
                                                     titlePositionAdjustment: setup.titlePositionAdjustment,
                                                     imagePositionAdjustment: setup.imagePositionAdjustment, imageInsets: setup.imageInsets,
@@ -867,5 +863,43 @@ extension CYLTabBarController {
         // FIX: issue #433 — the selected tab shows its selected title. [CN] 选中的 Tab 显示选中标题。
         cylSetNeedsUpdateTabBarItemSelectedTitles(self)
         cylFlatDesignUpdateBottomBarShowHideIfNeeded()
+    }
+
+    /**
+     * [EN] Creates the FlatDesign item of a tab: the per-tab title offset, image offset and image insets win over the controller's
+     *      (`titlePositionAdjustment`, `imagePositionAdjustment`, `imageInsets`) and are remembered on the item (#475, #95), and the
+     *      animation file joins `tabBarItemAnimationURLs`. The item learns its tab bar controller first: it is set up before the
+     *      controller's initialization ends.
+     * [CN] 创建 Tab 的扁平样式 item：单个 Tab 的标题偏移、图片偏移与图片内边距优先于控制器的设置，并记录在 item 上（#475、#95）；动画文件加入
+     *      `tabBarItemAnimationURLs`。item 先获得其 TabBarController：它在控制器初始化结束之前就已设置。
+     */
+    @objc(addOneChildViewController:idx:WithTitle:normalImageInfo:selectedImageInfo:titlePositionAdjustment:imagePositionAdjustment:imageInsets:lottieURL:lottieFilePath:lottieSizeValue:)
+    func cylFlatDesignAddOneChildViewController(_ viewController: UIViewController, idx: UInt, withTitle title: String?, normalImageInfo: Any?,
+                                                selectedImageInfo: Any?, titlePositionAdjustment: UIOffset, imagePositionAdjustment: UIOffset,
+                                                imageInsets: UIEdgeInsets, lottieURL: URL?, lottieFilePath: String?, lottieSizeValue: NSValue?) {
+        guard cylFlatDesignTabBar != nil else {
+            return
+        }
+        let normalImage = normalImageInfo.flatMap { UIImage.cyl_imageNamed($0) }
+        let selectedImage = selectedImageInfo.flatMap { UIImage.cyl_imageNamed($0) }
+        let insets = imageInsets == .zero ? self.imageInsets : imageInsets
+        let titleOffset = titlePositionAdjustment == .zero ? self.titlePositionAdjustment : titlePositionAdjustment
+        let imageOffset = imagePositionAdjustment == .zero ? self.imagePositionAdjustment : imagePositionAdjustment
+        if let lottieURL {
+            cylPrivate.cylTabBarItemAnimationURLs().add(lottieURL)
+            if let size = CYLConstants.cyl_tabBarItemAnimationSizeValue(lottieSizeValue, fromNormalImage: normalImage) {
+                cylPrivate.cylTabBarItemAnimationSizes().add(size)
+            }
+        }
+        let item = CYLFlatDesignTabBarItem(title: title, image: normalImage, selectedImage: selectedImage, index: Int(idx),
+                                           titlePositionAdjustment: titleOffset, imagePositionAdjustment: imageOffset, imageInsets: insets,
+                                           lottieFilePath: lottieFilePath, lottieSizeValue: lottieSizeValue)
+        item.lottieURL = lottieURL
+        CYLRememberItemTitlePositionAdjustment(item, titlePositionAdjustment)
+        CYLRememberItemImageInsets(item, imageInsets)
+        item.cylFlatDesignSetTabBarController(self)
+        item.childViewController = viewController
+        item.setTitleTextAttributes([.foregroundColor: UIColor.systemYellow], for: .selected)
+        viewController.cyl_tabBarItem = item
     }
 }
