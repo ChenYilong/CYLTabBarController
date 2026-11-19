@@ -1215,55 +1215,6 @@ didRecognizeTabBarItemGesture:(CYLTabBarItemGesture)gesture
 - (void)setViewDidLayoutSubViewsBlockInvokeOnce:(BOOL)invokeOnce block:(CYLViewDidLayoutSubViewsBlock)viewDidLayoutSubviewsBlock;
 
 /*!
- * FIX: issue #404
- * [EN] Runs `block` as soon as the tab buttons exist, to show or update tab badges: right away if they are already laid
- *      out, otherwise once the tab bar is laid out. Call it whenever the badge data changes, from `-viewDidLoad` or any
- *      later time, as often as needed: each block runs once, in order, and none replaces another or
- *      `viewDidLayoutSubviewsBlock`. No `dispatch_after` is needed.
- *
- *          [self reloadBadgesWithBlock:^(CYLTabBarController *tabBarController) {
- *              [tabBarController.viewControllers[0] cyl_showBadge];
- *              [tabBarController.viewControllers[1] cyl_showBadgeValue:@"100" animationType:CYLBadgeAnimationTypeNone];
- *          }];
- *
- *      `-setViewDidLayoutSubViewsBlockInvokeOnce:block:` does not fit this: it holds one block (a later call replaces it),
- *      and a block set after the tab bar was laid out waits for a layout pass that may not come. Use it on the tab bar
- *      controller the app shows: subclass it with `[super initWithViewControllers:…]`, don't return another instance
- *      from `-init` (README, Step 2). Main thread only, like the rest of UIKit; the block is held until it runs.
- * [CN] 在 Tab 按钮创建完成后执行 block，用于显示或更新 Tab 角标：若已完成布局则立即执行，否则在 TabBar 布局完成后执行。
- *      角标数据变化时随时调用，可在 `-viewDidLoad` 中或之后任意时机、任意多次调用：每个 block 按顺序各执行一次，
- *      不会互相覆盖，也不会覆盖 `viewDidLayoutSubviewsBlock`。无需 `dispatch_after`（示例见上方英文部分）。
- *
- *      `-setViewDidLayoutSubViewsBlockInvokeOnce:block:` 不适合这个场景：它只保存一个 block（后设置的会覆盖之前的），
- *      并且在 TabBar 已完成布局后设置的 block 要等下一次布局，而下一次布局可能不会发生。请在 App 实际显示的 TabBarController 上调用：
- *      子类请通过 `[super initWithViewControllers:…]` 初始化，不要在 `-init` 中返回另一个实例（见 README 第二步）。
- *      请在主线程调用，与 UIKit 其他 API 一致；block 在执行前会被持有。
- */
-- (void)reloadBadgesWithBlock:(CYLViewDidLayoutSubViewsBlock)block;
-
-/*!
- * FIX: issue #22
- * [EN] Runs `block` as soon as the tab bar items exist, to customize them: `self.tabBar.items` (and the tab buttons)
- *      are filled once the tab bar is first laid out, not when `viewControllers` is set: the tabs are installed as child
- *      view controllers, so in `-init…` and `-viewDidLoad` `self.tabBar.items` is still empty. Right away when they
- *      already exist, otherwise after that layout; each block runs once, in order, from any time on the main thread.
- *      To change a tab's title or icon, the in-place APIs need no waiting: `-updateTabBarItemAtIndex:attributes:`,
- *      `-setTabBarItemIcon:selectedIcon:size:atIndex:` or `viewController.tabBarItem`.
- *
- *          [self performWhenTabBarItemsReady:^(CYLTabBarController *tabBarController) {
- *              for (UITabBarItem *item in tabBarController.tabBar.items) {
- *                  item.accessibilityHint = item.title;
- *              }
- *          }];
- *
- * [CN] 在 TabBarItem 创建后立即执行 `block`，用于自定义它们：`self.tabBar.items`（以及 Tab 按钮）在 TabBar 第一次布局时才生成，
- *      而不是在设置 `viewControllers` 时：Tab 以子控制器的方式添加，所以在 `-init…` 与 `-viewDidLoad` 中 `self.tabBar.items` 仍为空。
- *      已创建时立即执行，否则在该次布局后执行；每个 block 按顺序只执行一次，可在主线程的任意时刻调用。只修改 Tab 的标题或图标时，
- *      原地更新的 API 无需等待：`-updateTabBarItemAtIndex:attributes:`、`-setTabBarItemIcon:selectedIcon:size:atIndex:` 或
- *      `viewController.tabBarItem`。示例见上。
- */
-- (void)performWhenTabBarItemsReady:(CYLViewDidLayoutSubViewsBlock)block;
-/*!
  * An array of the root view controllers displayed by the tab bar interface.
  */
 @property (nullable, nonatomic, copy) NSArray<__kindof UIViewController *> *viewControllers;
@@ -2004,6 +1955,64 @@ typedef UIView * _Nullable (^CYLTabBarItemIconViewProvider)(BOOL selected);
  *      也可以直接调用，例如在 App 进入后台后。
  */
 - (void)unloadViewsOfUnselectedViewControllers;
+
+@end
+
+/*!
+ * [EN] Issue #404, badges once the tab buttons exist: implemented in Swift (`Swift/CYLTabBarController+CYLReloadBadges.swift`,
+ *      docs/Swift-Migration.md step 105). [CN] Issue #404，Tab 按钮创建后再显示角标：在 Swift 中实现（第 105 步）。
+ */
+@interface CYLTabBarController (CYLReloadBadges)
+
+/*!
+ * FIX: issue #404
+ * [EN] Runs `block` as soon as the tab buttons exist, to show or update tab badges: right away if they are already laid
+ *      out, otherwise once the tab bar is laid out. Call it whenever the badge data changes, from `-viewDidLoad` or any
+ *      later time, as often as needed: each block runs once, in order, and none replaces another or
+ *      `viewDidLayoutSubviewsBlock`. No `dispatch_after` is needed.
+ *
+ *          [self reloadBadgesWithBlock:^(CYLTabBarController *tabBarController) {
+ *              [tabBarController.viewControllers[0] cyl_showBadge];
+ *              [tabBarController.viewControllers[1] cyl_showBadgeValue:@"100" animationType:CYLBadgeAnimationTypeNone];
+ *          }];
+ *
+ *      `-setViewDidLayoutSubViewsBlockInvokeOnce:block:` does not fit this: it holds one block (a later call replaces it),
+ *      and a block set after the tab bar was laid out waits for a layout pass that may not come. Use it on the tab bar
+ *      controller the app shows: subclass it with `[super initWithViewControllers:…]`, don't return another instance
+ *      from `-init` (README, Step 2). Main thread only, like the rest of UIKit; the block is held until it runs.
+ * [CN] 在 Tab 按钮创建完成后执行 block，用于显示或更新 Tab 角标：若已完成布局则立即执行，否则在 TabBar 布局完成后执行。
+ *      角标数据变化时随时调用，可在 `-viewDidLoad` 中或之后任意时机、任意多次调用：每个 block 按顺序各执行一次，
+ *      不会互相覆盖，也不会覆盖 `viewDidLayoutSubviewsBlock`。无需 `dispatch_after`（示例见上方英文部分）。
+ *
+ *      `-setViewDidLayoutSubViewsBlockInvokeOnce:block:` 不适合这个场景：它只保存一个 block（后设置的会覆盖之前的），
+ *      并且在 TabBar 已完成布局后设置的 block 要等下一次布局，而下一次布局可能不会发生。请在 App 实际显示的 TabBarController 上调用：
+ *      子类请通过 `[super initWithViewControllers:…]` 初始化，不要在 `-init` 中返回另一个实例（见 README 第二步）。
+ *      请在主线程调用，与 UIKit 其他 API 一致；block 在执行前会被持有。
+ */
+- (void)reloadBadgesWithBlock:(CYLViewDidLayoutSubViewsBlock)block;
+
+/*!
+ * FIX: issue #22
+ * [EN] Runs `block` as soon as the tab bar items exist, to customize them: `self.tabBar.items` (and the tab buttons)
+ *      are filled once the tab bar is first laid out, not when `viewControllers` is set: the tabs are installed as child
+ *      view controllers, so in `-init…` and `-viewDidLoad` `self.tabBar.items` is still empty. Right away when they
+ *      already exist, otherwise after that layout; each block runs once, in order, from any time on the main thread.
+ *      To change a tab's title or icon, the in-place APIs need no waiting: `-updateTabBarItemAtIndex:attributes:`,
+ *      `-setTabBarItemIcon:selectedIcon:size:atIndex:` or `viewController.tabBarItem`.
+ *
+ *          [self performWhenTabBarItemsReady:^(CYLTabBarController *tabBarController) {
+ *              for (UITabBarItem *item in tabBarController.tabBar.items) {
+ *                  item.accessibilityHint = item.title;
+ *              }
+ *          }];
+ *
+ * [CN] 在 TabBarItem 创建后立即执行 `block`，用于自定义它们：`self.tabBar.items`（以及 Tab 按钮）在 TabBar 第一次布局时才生成，
+ *      而不是在设置 `viewControllers` 时：Tab 以子控制器的方式添加，所以在 `-init…` 与 `-viewDidLoad` 中 `self.tabBar.items` 仍为空。
+ *      已创建时立即执行，否则在该次布局后执行；每个 block 按顺序只执行一次，可在主线程的任意时刻调用。只修改 Tab 的标题或图标时，
+ *      原地更新的 API 无需等待：`-updateTabBarItemAtIndex:attributes:`、`-setTabBarItemIcon:selectedIcon:size:atIndex:` 或
+ *      `viewController.tabBarItem`。示例见上。
+ */
+- (void)performWhenTabBarItemsReady:(CYLViewDidLayoutSubViewsBlock)block;
 
 @end
 
