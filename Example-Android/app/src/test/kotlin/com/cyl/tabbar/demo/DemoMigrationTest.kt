@@ -85,7 +85,8 @@ class DemoMigrationTest {
     fun everyConfigurationFailureGivesAResult() {
         val (_, home) = launch()
         val network = setOf("D3", "D4", "D5", "D7 · An HTML page (network)", "D10", "C10", "C16")
-        val rows = DemoCatalog.sections(home).first { it.title == "Configuration file" }.rows.drop(1)
+        // [EN] The first two rows are the file and manifest demos. [CN] 前两行是配置文件与清单演示。
+        val rows = DemoCatalog.sections(home).first { it.title == "Configuration file" }.rows.drop(2)
         assertEquals(46, rows.size)
         for (row in rows.filter { row -> network.none { row.title.startsWith(it) } }) {
             row.action(home)
@@ -153,6 +154,20 @@ class DemoMigrationTest {
                 assertTrue("${scene.title} shows a view", host.get().window.decorView.findViewById<View>(android.R.id.content) != null)
                 host.pause().stop().destroy()
             }
+        }
+    }
+
+    @Test
+    fun theManifestDemoBuildsATabBarInEveryTheme() {
+        val (activity, home) = launch()
+        val row = DemoCatalog.sections(home).first { it.title == "Configuration file" }.rows[1]
+        assertTrue(row.title.contains("configuration manifest"))
+        val manifest = com.cyl.tabbar.CYLTabBarManifest.manifestWithRoute(activity, "Manifests/cyl_tabbar_manifest.json")
+        for (theme in listOf("light", "dark", "christmas")) {
+            val controller = manifest.tabBarController(activity)
+            controller.cyl_themeManager.currentThemeIdentifier = theme
+            assertTrue("$theme: tabs", controller.viewControllers.isNotEmpty())
+            assertEquals(theme, controller.cyl_themeManager.currentThemeIdentifier)
         }
     }
 }

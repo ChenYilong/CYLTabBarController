@@ -9,6 +9,7 @@ import com.cyl.tabbar.CYLConstants
 import com.cyl.tabbar.CYLTabBarConfiguration
 import com.cyl.tabbar.CYLTabBarConfigurationParser
 import com.cyl.tabbar.CYLTabBarController
+import com.cyl.tabbar.CYLTabBarManifest
 import com.cyl.tabbar.CYLTabBarPageProvider
 import com.cyl.tabbar.CYLTabBarPageRegistry
 import java.io.File
@@ -28,12 +29,15 @@ object DemoConfiguration {
 
     private val results = HashMap<String, String>()
     private val main = Handler(Looper.getMainLooper())
+    private const val MANIFEST_ROUTE = "Manifests/cyl_tabbar_manifest.json"
 
     /** [EN] The cases: ID, title, how to run it. [CN] 用例：编号、标题、执行方式。 */
     private class EdgeCase(val id: String, val title: String, val run: DemoListFragment.(finish: (CYLTabBarController?, Exception?) -> Unit) -> Unit)
 
     fun rows(): List<DemoRow> = listOf(DemoRow("A tab bar controller from a configuration file", { "Every sample file shared with iOS (JSON, JSON5, YAML, TOML, plist, XML, INI, properties, protobuf...), or the network URL" }) {
         presentConfigurationDemo(this)
+    }, DemoRow("A tab bar from the configuration manifest (docs/Configuration-Manifest.md)", { "The manifest shared with iOS (Manifests/cyl_tabbar_manifest.json): choose its light, dark or christmas theme" }) {
+        presentManifestDemo(this)
     }) + edgeCases.map { edgeCase ->
         val key = edgeCase.id + edgeCase.title
         DemoRow("${edgeCase.id} · ${edgeCase.title}", { results[key] }) {
@@ -60,6 +64,29 @@ object DemoConfiguration {
     }
 
     // MARK: - The sample files 示例文件
+
+    /**
+     * [EN] The configuration manifest demo (docs/Configuration-Manifest.md, as the iOS example's -CYLDemoManifestTheme): the
+     *      manifest shared with iOS, its images in Skins/2.1.0, and one of its themes applied through the theme manager.
+     * [CN] 配置清单演示（docs/Configuration-Manifest.md，对应 iOS 示例的 -CYLDemoManifestTheme）：与 iOS 共用的清单，其图片位于
+     *      Skins/2.1.0，并通过主题管理器应用其中一个主题。
+     */
+    private fun presentManifestDemo(page: DemoListFragment) {
+        DemoPages.registerOnce()
+        val themes = listOf("light", "dark", "christmas")
+        page.choose("Choose a theme of the manifest", themes) { index ->
+            val theme = themes[index]
+            val result = runCatching { CYLTabBarManifest.manifestWithRoute(page.requireContext(), MANIFEST_ROUTE) }
+            val manifest = result.getOrNull()
+            if (manifest == null) {
+                page.showMessage(MANIFEST_ROUTE, result.exceptionOrNull()?.message ?: "no manifest")
+                return@choose
+            }
+            DemoHostActivity.openTabBar(page.requireContext(), "Manifest · $theme") { activity ->
+                manifest.tabBarController(activity).also { it.cyl_themeManager.currentThemeIdentifier = theme }
+            }
+        }
+    }
 
     private fun presentConfigurationDemo(page: DemoListFragment) {
         DemoPages.registerOnce()
