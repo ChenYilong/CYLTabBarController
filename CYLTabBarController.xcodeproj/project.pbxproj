@@ -20,6 +20,7 @@
 		044C7B1A6334E1E0C9B03395 /* NSObject+CYLTabBarControllerExtention.h in Headers */ = {isa = PBXBuildFile; fileRef = E2745BEF0A35D75AC1EE1802 /* NSObject+CYLTabBarControllerExtention.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		050867CE961C24E785CFCEB0 /* CYLTabBarController+CYLInteraction.h in Headers */ = {isa = PBXBuildFile; fileRef = D8147F11E781DB50148FA4B8 /* CYLTabBarController+CYLInteraction.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		05A2007B516AB05AF890FCB0 /* UIView+CYLBadgeExtention.swift in Sources */ = {isa = PBXBuildFile; fileRef = D837C34EBDDBFF23CB60DBDF /* UIView+CYLBadgeExtention.swift */; };
+		D9B6D63DAD8574F07AEF1BD7 /* CYLBadgeProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1B21C6E4F6DD55647C84249 /* CYLBadgeProtocol.swift */; };
 		05D761411F50E1D1BF3C6B26 /* CYLThemeTests.m in Sources */ = {isa = PBXBuildFile; fileRef = D40978248EE9C4959E82A341 /* CYLThemeTests.m */; };
 		073ABA58A94EBC07982F15E3 /* UIImage+CYLTheme.h in Headers */ = {isa = PBXBuildFile; fileRef = ED11D4C15C040CE2FF02C084 /* UIImage+CYLTheme.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		074B489419EC087FA632AB23 /* CYLFlatDesignTabBar.m in Sources */ = {isa = PBXBuildFile; fileRef = EDF57434DE70CEC39141CF16 /* CYLFlatDesignTabBar.m */; };
@@ -620,6 +621,7 @@ DCC1BBA20425851756119035 /* CYLFlatDesignTabBar.swift in Sources */ = {isa = PBX
 		D6625CF58D32A543C1A2CCB1 /* CYLTabBarItemAnimationService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CYLTabBarItemAnimationService.swift; sourceTree = "<group>"; };
 		D8147F11E781DB50148FA4B8 /* CYLTabBarController+CYLInteraction.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "CYLTabBarController+CYLInteraction.h"; sourceTree = "<group>"; };
 		D837C34EBDDBFF23CB60DBDF /* UIView+CYLBadgeExtention.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "UIView+CYLBadgeExtention.swift"; sourceTree = "<group>"; };
+		D1B21C6E4F6DD55647C84249 /* CYLBadgeProtocol.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "CYLBadgeProtocol.swift"; sourceTree = "<group>"; };
 		D9EB498C4416043B208582C8 /* CYLTabBarItemAnimationService.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CYLTabBarItemAnimationService.h; sourceTree = "<group>"; };
 		D9FF0485BF3C33F2ACD09BEF /* UIControl+CYLTabBarItemAnimation.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "UIControl+CYLTabBarItemAnimation.h"; sourceTree = "<group>"; };
 		DA3B96AA760943E681D23AE7 /* CYLUtils.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CYLUtils.h; sourceTree = "<group>"; };
@@ -711,6 +713,7 @@ AB746249D061B771D1BA3E95 /* CYLTabBarController+CYLMemoryWarning.swift */ = {isa
 				B887D29E195F991B3BDC0011 /* CYLTabBarBadgeView.swift */,
 				B275C8925399CF9909CC0189 /* CAAnimation+CYLBadgeExtention.swift */,
 				D837C34EBDDBFF23CB60DBDF /* UIView+CYLBadgeExtention.swift */,
+				D1B21C6E4F6DD55647C84249 /* CYLBadgeProtocol.swift */,
 				F16E361F65E1DDED662D158F /* UITabBarItem+CYLBadgeExtention.swift */,
 				FBFC445362C954B6C6748A81 /* UIBarButtonItem+CYLBadgeExtention.swift */,
 			);
@@ -1859,6 +1862,7 @@ AB746249D061B771D1BA3E95 /* CYLTabBarController+CYLMemoryWarning.swift */ = {isa
 				B6120A1F9D9B4348CF57D47D /* NSObject+CYLTabBarControllerExtention.m in Sources */,
 				79B5F54EA630ABEC995563C1 /* UIControl+CYLTabBarItemAnimation.swift in Sources */,
 				05A2007B516AB05AF890FCB0 /* UIView+CYLBadgeExtention.swift in Sources */,
+				D9B6D63DAD8574F07AEF1BD7 /* CYLBadgeProtocol.swift in Sources */,
 				4D779C9632CAE66C50D77FF8 /* UIControl+CYLBadgeExtention.swift in Sources */,
 				C2D2706BB1447583E0B4096E /* UITabBarItem+CYLBadgeExtention.swift in Sources */,
 				19325584B4E42489F1DFC758 /* UIBarButtonItem+CYLBadgeExtention.swift in Sources */,

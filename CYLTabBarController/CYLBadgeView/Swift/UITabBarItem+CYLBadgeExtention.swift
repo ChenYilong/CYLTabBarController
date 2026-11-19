@@ -13,12 +13,12 @@ import UIKit
  *      the badge host of its tab button, in both Liquid Glass layers. Translated from Objective-C (docs/Swift-Migration.md,
  *      step 23); every selector is kept. It works with and without Core (the `CYLBadgeView` subspec alone): Core's helpers
  *      (`-cyl_imageView`, `-cyl_tabLabel`, the platter layers) are called by selector, only when Core is part of the build.
- *      The `CYLBadgeProtocol` members are internal; the conformance is declared in UITabBarItem+CYLBadgeExtention.h (see
+ *      The `CYLBadgeProtocol` members are public; the conformance is declared at the end of this file (step 115) (see
  *      UIView+CYLBadgeExtention.swift for why).
  * [CN] TabBarItem 上的角标（`UITabBarItem (CYLBadgeExtention)`）：item 不是视图，因此每个角标调用都转给其 Tab 按钮的角标宿主，并作用于
  *      液态玻璃的两个图层。已从 Objective-C 翻译（docs/Swift-Migration.md，第 23 步），保留所有 selector。有无 Core 都可使用（单独的
  *      `CYLBadgeView` 子库）：Core 的方法（`-cyl_imageView`、`-cyl_tabLabel`、platter 图层）只在 Core 参与编译时通过 selector 调用。
- *      `CYLBadgeProtocol` 的成员为 internal；遵守关系声明在 UITabBarItem+CYLBadgeExtention.h（原因见 UIView+CYLBadgeExtention.swift）。
+ *      `CYLBadgeProtocol` 的成员为 public；遵守关系在本文件末尾声明（第 115 步）（原因见 UIView+CYLBadgeExtention.swift）。
  */
 enum CYLTabBarItemBadgeSupport {
     static let delayIfNeededForSeconds = CYLUtilsKeys.key("cyl_delayIfNeededForSeconds")
@@ -102,7 +102,7 @@ extension UITabBarItem {
     }
 
     @objc(cyl_delayIfNeededForSeconds)
-    dynamic var cyl_delayIfNeededForSeconds: CGFloat {
+    public dynamic var cyl_delayIfNeededForSeconds: CGFloat {
         @objc(cyl_delayIfNeededForSeconds) get {
             (objc_getAssociatedObject(self, CYLTabBarItemBadgeSupport.delayIfNeededForSeconds) as? NSNumber)
                 .map { CGFloat($0.doubleValue) } ?? 0
@@ -114,7 +114,7 @@ extension UITabBarItem {
     }
 
     @objc(cyl_delayIfNeededForSecondsValue)
-    dynamic var cyl_delayIfNeededForSecondsValue: NSNumber {
+    public dynamic var cyl_delayIfNeededForSecondsValue: NSNumber {
         @objc(cyl_delayIfNeededForSecondsValue) get { NSNumber(value: Double(cyl_delayIfNeededForSeconds)) }
         @objc(cyl_setDelayIfNeededForSecondsValue:) set { cyl_delayIfNeededForSeconds = CGFloat(newValue.doubleValue) }
     }
@@ -125,7 +125,7 @@ extension UITabBarItem {
      * [EN] Shows a red dot badge, with no animation. [CN] 显示红点角标，无动画。
      */
     @objc(cyl_showBadge)
-    dynamic func cyl_showBadge() {
+    public dynamic func cyl_showBadge() {
         cyl_perform(NSSelectorFromString("cyl_showBadge"))
     }
 
@@ -135,27 +135,27 @@ extension UITabBarItem {
     }
 
     @objc(cyl_showBadgeValue:animationType:)
-    dynamic func cyl_showBadgeValue(_ value: String, animationType: CYLBadgeAnimationType) {
+    public dynamic func cyl_showBadgeValue(_ value: String, animationType: CYLBadgeAnimationType) {
         cyl_showBadgeValue(value, animationTypeValue: NSNumber(value: animationType.rawValue))
     }
 
     @objc(cyl_clearBadge)
-    dynamic func cyl_clearBadge() {
+    public dynamic func cyl_clearBadge() {
         cyl_perform(NSSelectorFromString("cyl_clearBadge"))
     }
 
     @objc(cyl_resumeBadge)
-    dynamic func cyl_resumeBadge() {
+    public dynamic func cyl_resumeBadge() {
         cyl_perform(NSSelectorFromString("cyl_resumeBadge"))
     }
 
     @objc(cyl_isShowBadge)
-    dynamic func cyl_isShowBadge() -> Bool {
+    public dynamic func cyl_isShowBadge() -> Bool {
         cyl_actualBadgeView?.cyl_isShowBadge() ?? false
     }
 
     @objc(cyl_isPauseBadge)
-    dynamic func cyl_isPauseBadge() -> Bool {
+    public dynamic func cyl_isPauseBadge() -> Bool {
         cyl_actualBadgeView?.cyl_isPauseBadge() ?? false
     }
 
@@ -169,7 +169,7 @@ extension UITabBarItem {
      *      液态玻璃下为 Tab 按钮本身（其角标方法会作用于两个图层）。
      */
     @objc(cyl_getActualBadgeSuperView)
-    dynamic func cyl_getActualBadgeSuperView() -> Any? {
+    public dynamic func cyl_getActualBadgeSuperView() -> Any? {
         let tabButton = cyl_tabButton
         if let tabButton {
             let host: Any? = CYLTabBarItemBadgeSupport.isCoreAvailable
@@ -183,17 +183,17 @@ extension UITabBarItem {
     }
 
     @objc(cyl_getActualBadgeSuperViewFromControl:)
-    dynamic func cyl_getActualBadgeSuperView(fromControl tabButton: UIControl) -> UIView? {
+    public dynamic func cyl_getActualBadgeSuperView(fromControl tabButton: UIControl) -> UIView? {
         (tabButton as UIView).cyl_getActualBadgeSuperView() as? UIView
     }
 
     @objc(cyl_performSelector:)
-    dynamic func cyl_perform(_ aSelector: Selector) {
+    public dynamic func cyl_perform(_ aSelector: Selector) {
         cyl_perform(aSelector, with: nil, with: nil)
     }
 
     @objc(cyl_performSelector:withObject:)
-    dynamic func cyl_perform(_ aSelector: Selector, with object: Any?) {
+    public dynamic func cyl_perform(_ aSelector: Selector, with object: Any?) {
         cyl_perform(aSelector, with: object, with: nil)
     }
 
@@ -205,7 +205,7 @@ extension UITabBarItem {
      *      并记录下来供 `-cyl_moveBadgeToCurrentTabButtonIfNeeded` 使用。没有 Core 时没有需要同步的 platter。
      */
     @objc(cyl_performSelector:withObject:withObject:)
-    dynamic func cyl_perform(_ aSelector: Selector, with object1: Any?, with object2: Any?) {
+    public dynamic func cyl_perform(_ aSelector: Selector, with object1: Any?, with object2: Any?) {
         if !CYLTabBarItemBadgeSupport.isCoreAvailable {
             _ = (cyl_actualBadgeView as NSObject?)?.perform(aSelector, with: object1, with: object2)
             return
@@ -270,7 +270,7 @@ extension UITabBarItem {
      * [CN] 该 item 的图片视图或标题 Label 完成布局（宽度大于 10）后为 YES；没有 Core 时询问 Tab 按钮。
      */
     @objc(cyl_isReady)
-    dynamic func cyl_isReady() -> Bool {
+    public dynamic func cyl_isReady() -> Bool {
         guard CYLTabBarItemBadgeSupport.isCoreAvailable else {
             return (cyl_tabButton as UIView?)?.cyl_isReady() ?? false
         }
@@ -297,25 +297,25 @@ extension UITabBarItem {
     }
 
     @objc(cyl_badgeFont)
-    dynamic var cyl_badgeFont: UIFont! {
+    public dynamic var cyl_badgeFont: UIFont! {
         @objc(cyl_badgeFont) get { cyl_actualBadgeView?.cyl_badgeFont }
         @objc(cyl_setBadgeFont:) set { cyl_perform(NSSelectorFromString("cyl_setBadgeFont:"), with: newValue) }
     }
 
     @objc(cyl_badgeBackgroundColor)
-    dynamic var cyl_badgeBackgroundColor: UIColor! {
+    public dynamic var cyl_badgeBackgroundColor: UIColor! {
         @objc(cyl_badgeBackgroundColor) get { cyl_actualBadgeView?.cyl_badgeBackgroundColor }
         @objc(cyl_setBadgeBackgroundColor:) set { cyl_perform(NSSelectorFromString("cyl_setBadgeBackgroundColor:"), with: newValue) }
     }
 
     @objc(cyl_badgeTextColor)
-    dynamic var cyl_badgeTextColor: UIColor! {
+    public dynamic var cyl_badgeTextColor: UIColor! {
         @objc(cyl_badgeTextColor) get { cyl_actualBadgeView?.cyl_badgeTextColor }
         @objc(cyl_setBadgeTextColor:) set { cyl_perform(NSSelectorFromString("cyl_setBadgeTextColor:"), with: newValue) }
     }
 
     @objc(cyl_badgeAnimationType)
-    dynamic var cyl_badgeAnimationType: CYLBadgeAnimationType {
+    public dynamic var cyl_badgeAnimationType: CYLBadgeAnimationType {
         @objc(cyl_badgeAnimationType) get { cyl_actualBadgeView?.cyl_badgeAnimationType ?? .none }
         @objc(cyl_setBadgeAnimationType:) set {
             cyl_perform(NSSelectorFromString("cyl_setBadgeAnimationTypeValue:"), with: NSNumber(value: newValue.rawValue))
@@ -323,7 +323,7 @@ extension UITabBarItem {
     }
 
     @objc(cyl_badgeAnimationTypeValue)
-    dynamic var cyl_badgeAnimationTypeValue: NSNumber {
+    public dynamic var cyl_badgeAnimationTypeValue: NSNumber {
         @objc(cyl_badgeAnimationTypeValue) get { NSNumber(value: cyl_badgeAnimationType.rawValue) }
         @objc(cyl_setBadgeAnimationTypeValue:) set {
             cyl_badgeAnimationType = CYLBadgeAnimationType(rawValue: newValue.uintValue) ?? .none
@@ -331,7 +331,7 @@ extension UITabBarItem {
     }
 
     @objc(cyl_badgeFrame)
-    dynamic var cyl_badgeFrame: CGRect {
+    public dynamic var cyl_badgeFrame: CGRect {
         @objc(cyl_badgeFrame) get { cyl_actualBadgeView?.cyl_badgeFrame ?? .zero }
         @objc(cyl_setBadgeFrame:) set {
             cyl_perform(NSSelectorFromString("cyl_setBadgeFrameValue:"), with: NSValue(cgRect: newValue))
@@ -339,13 +339,13 @@ extension UITabBarItem {
     }
 
     @objc(cyl_badgeFrameValue)
-    dynamic var cyl_badgeFrameValue: NSValue {
+    public dynamic var cyl_badgeFrameValue: NSValue {
         @objc(cyl_badgeFrameValue) get { NSValue(cgRect: cyl_badgeFrame) }
         @objc(cyl_setBadgeFrameValue:) set { cyl_badgeFrame = newValue.cgRectValue }
     }
 
     @objc(cyl_badgeCenterOffset)
-    dynamic var cyl_badgeCenterOffset: CGPoint {
+    public dynamic var cyl_badgeCenterOffset: CGPoint {
         @objc(cyl_badgeCenterOffset) get { cyl_actualBadgeView?.cyl_badgeCenterOffset ?? .zero }
         @objc(cyl_setBadgeCenterOffset:) set {
             cyl_perform(NSSelectorFromString("cyl_setBadgeCenterOffsetValue:"), with: NSValue(cgPoint: newValue))
@@ -353,13 +353,13 @@ extension UITabBarItem {
     }
 
     @objc(cyl_badgeCenterOffsetValue)
-    dynamic var cyl_badgeCenterOffsetValue: NSValue {
+    public dynamic var cyl_badgeCenterOffsetValue: NSValue {
         @objc(cyl_badgeCenterOffsetValue) get { NSValue(cgPoint: cyl_badgeCenterOffset) }
         @objc(cyl_setBadgeCenterOffsetValue:) set { cyl_badgeCenterOffset = newValue.cgPointValue }
     }
 
     @objc(cyl_badgeMaximumBadgeNumber)
-    dynamic var cyl_badgeMaximumBadgeNumber: Int {
+    public dynamic var cyl_badgeMaximumBadgeNumber: Int {
         @objc(cyl_badgeMaximumBadgeNumber) get { cyl_actualBadgeView?.cyl_badgeMaximumBadgeNumber ?? 0 }
         @objc(cyl_setBadgeMaximumBadgeNumber:) set {
             cyl_perform(NSSelectorFromString("cyl_setBadgeMaximumBadgeNumberValue:"), with: NSNumber(value: newValue))
@@ -367,13 +367,13 @@ extension UITabBarItem {
     }
 
     @objc(cyl_badgeMaximumBadgeNumberValue)
-    dynamic var cyl_badgeMaximumBadgeNumberValue: NSNumber {
+    public dynamic var cyl_badgeMaximumBadgeNumberValue: NSNumber {
         @objc(cyl_badgeMaximumBadgeNumberValue) get { NSNumber(value: cyl_badgeMaximumBadgeNumber) }
         @objc(cyl_setBadgeMaximumBadgeNumberValue:) set { cyl_badgeMaximumBadgeNumber = newValue.intValue }
     }
 
     @objc(cyl_badgeMargin)
-    dynamic var cyl_badgeMargin: CGFloat {
+    public dynamic var cyl_badgeMargin: CGFloat {
         @objc(cyl_badgeMargin) get { cyl_actualBadgeView?.cyl_badgeMargin ?? 0 }
         @objc(cyl_setBadgeMargin:) set {
             cyl_perform(NSSelectorFromString("cyl_setBadgeMarginValue:"), with: NSNumber(value: Double(newValue)))
@@ -381,13 +381,13 @@ extension UITabBarItem {
     }
 
     @objc(cyl_badgeMarginValue)
-    dynamic var cyl_badgeMarginValue: NSNumber {
+    public dynamic var cyl_badgeMarginValue: NSNumber {
         @objc(cyl_badgeMarginValue) get { NSNumber(value: Double(cyl_badgeMargin)) }
         @objc(cyl_setBadgeMarginValue:) set { cyl_badgeMargin = CGFloat(newValue.doubleValue) }
     }
 
     @objc(cyl_badgeRadius)
-    dynamic var cyl_badgeRadius: CGFloat {
+    public dynamic var cyl_badgeRadius: CGFloat {
         @objc(cyl_badgeRadius) get { cyl_actualBadgeView?.cyl_badgeRadius ?? 0 }
         @objc(cyl_setBadgeRadius:) set {
             cyl_perform(NSSelectorFromString("cyl_setBadgeRadiusValue:"), with: NSNumber(value: Double(newValue)))
@@ -395,13 +395,13 @@ extension UITabBarItem {
     }
 
     @objc(cyl_badgeRadiusValue)
-    dynamic var cyl_badgeRadiusValue: NSNumber {
+    public dynamic var cyl_badgeRadiusValue: NSNumber {
         @objc(cyl_badgeRadiusValue) get { NSNumber(value: Double(cyl_badgeRadius)) }
         @objc(cyl_setBadgeRadiusValue:) set { cyl_badgeRadius = CGFloat(newValue.doubleValue) }
     }
 
     @objc(cyl_badgeCornerRadius)
-    dynamic var cyl_badgeCornerRadius: CGFloat {
+    public dynamic var cyl_badgeCornerRadius: CGFloat {
         @objc(cyl_badgeCornerRadius) get { cyl_actualBadgeView?.cyl_badgeCornerRadius ?? 0 }
         @objc(cyl_setBadgeCornerRadius:) set {
             cyl_perform(NSSelectorFromString("cyl_setBadgeCornerRadiusValue:"), with: NSNumber(value: Double(newValue)))
@@ -409,8 +409,14 @@ extension UITabBarItem {
     }
 
     @objc(cyl_badgeCornerRadiusValue)
-    dynamic var cyl_badgeCornerRadiusValue: NSNumber {
+    public dynamic var cyl_badgeCornerRadiusValue: NSNumber {
         @objc(cyl_badgeCornerRadiusValue) get { NSNumber(value: Double(cyl_badgeCornerRadius)) }
         @objc(cyl_setBadgeCornerRadiusValue:) set { cyl_badgeCornerRadius = CGFloat(newValue.doubleValue) }
     }
 }
+
+/**
+ [EN] The `CYLBadgeProtocol` conformance, declared in Swift since step 115 (it was in the Objective-C category header).
+ [CN] `CYLBadgeProtocol` 遵循关系，自第 115 步起在 Swift 中声明（原在 Objective-C 类别头文件中）。
+ */
+extension UITabBarItem: CYLBadgeProtocol {}
