@@ -15,6 +15,21 @@
 // docs-binding:end
 
 #import <Foundation/Foundation.h>
+
+// [EN] Swift Package Manager: the protocols and C entry points this engine implements and calls are Swift (`CYLAnimatedItemSwift`,
+//      `CYLTabBarController`); the engine target sits above both. Not imported while the lower C module builds. [CN] Swift Package
+//      Manager：本引擎实现并调用的协议与 C 入口是 Swift 的（`CYLAnimatedItemSwift`、`CYLTabBarController`）；引擎目标位于两者之上。构建下层 C 模块时不导入。
+#if defined(SWIFT_PACKAGE) && !defined(CYL_OBJC_BASE_TARGET)
+#if defined(__building_module)
+#if !__building_module(CYLTabBarControllerObjC)
+#pragma clang module import CYLAnimatedItemSwift
+#pragma clang module import CYLTabBarController
+#endif
+#else
+#pragma clang module import CYLAnimatedItemSwift
+#pragma clang module import CYLTabBarController
+#endif
+#endif
 // Core, which this subspec depends on (the source tree, or flattened by CocoaPods). 本子库依赖的 Core（源码目录，或 CocoaPods 展平后）。
 #if __has_include("../CYLTabBarItemAnimationService.h")
 #import "../CYLTabBarItemAnimationService.h"

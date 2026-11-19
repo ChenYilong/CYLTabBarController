@@ -211,7 +211,7 @@ class MainTabBarController: CYLTabBarController, CYLFlatDesignUITabBarController
     // [EN] A convenience initializer: CYLTabBarController's initializers are inherited (this class declares no designated one), and
     //      they all end in `init(configuration:)` since the class switch. [CN] 便利初始化方法：本类不声明指定初始化方法，因此继承
     //      CYLTabBarController 的全部初始化方法，类切换起它们都走到 `init(configuration:)`。
-    convenience override init() {
+    convenience init() {
         self.init(configuration: [:])
         self.delegate = self
         // [CN] flatDesign 必须在 setViewControllers 之前；且需先触发 cyl_tabBar 创建扁平 TabBar
@@ -338,7 +338,7 @@ class MainTabBarController: CYLTabBarController, CYLFlatDesignUITabBarController
         NSLog("[#610] flat design tapped \"%@\" (%@)", control.cyl_tabBarItemIdentifier ?? "nil", control.cyl_isPlusButton() ? "plus button" : "tab button")
     }
 
-    override func tabBarController(_ _: UITabBarController, didSelect viewController: UIViewController) {
+    func tabBarController(_ _: UITabBarController, didSelect viewController: UIViewController) {
         // [CN] flatDesign 下点击时 selectedIndex 可能仍是旧值，用 VC 判断更准
         // [EN] With flatDesign, selectedIndex may still hold the old value on tap; checking the VC is more accurate
         let root = viewController.cyl_getViewControllerInsteadOfNavigation()

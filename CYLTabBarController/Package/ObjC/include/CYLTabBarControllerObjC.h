@@ -14,3 +14,15 @@
 //      该目标以 `CYL_OBJC_BASE_TARGET` 编译，因此 `CYLSwiftInterface.h` 不会把 Swift 模块再导入回来（docs/Swift-Migration.md，第 3 阶段）。
 
 #import "CYLTabBarController.h"
+
+// [EN] The headers that stay Objective-C on purpose (block typedefs, string enums, option sets, constants), which `CYLTabBarController.h`
+//      does not import. [CN] 有意保留为 Objective-C 的头文件（block typedef、字符串枚举、选项集、常量），`CYLTabBarController.h` 不导入它们。
+#import "CYLAnimationKeys.h"
+#import "CYLTabBarPageRegistry.h"
+#import "CYLTabButtonAnimation.h"
+#import "UIColor+CYLTheme.h"
+#import "UIImage+CYLTheme.h"
+#import "UIVisualEffect+CYLTheme.h"
+#import "UIImage+CYLTabBarControllerExtention.h"
+#import "UIViewController+CYLTabBarControllerExtention.h"
+#import "NSObject+CYLTabBarControllerExtention.h"
