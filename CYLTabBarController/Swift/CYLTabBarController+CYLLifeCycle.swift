@@ -56,7 +56,6 @@ extension CYLTabBarController {
      */
     @objc(cyl_viewDidAppear:)
     func cylViewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
         unsafeBitCast(self, to: CYLFlatDesignLifeCycle.self).cylRefreshSystemTabBarVisibilityIfNeeded?()
         cylTabBarMinimizeLifecycleEvent()
         // [EN] Scroll hiding self-test (issue #13), only when launched with `-CYLScrollHideSelfTest YES`: runs once.
@@ -101,13 +100,11 @@ extension CYLTabBarController {
      */
     @objc(cyl_viewWillDisappear:)
     func cylViewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
         cylTabBarMinimizeLifecycleEvent()
     }
 
     @objc(cyl_viewDidDisappear:)
     func cylViewDidDisappear(_ animated: Bool) {
-        super.viewDidDisappear(animated)
         cylTabBarMinimizeLifecycleEvent()
     }
 
@@ -118,7 +115,6 @@ extension CYLTabBarController {
      */
     @objc(cyl_viewWillAppear:)
     func cylViewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
         CYLTabBarController.cylMarkActive(self)
         // FIX: issue #216
         cylApplyLaunchTabBarThemeIfNeeded()

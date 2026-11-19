@@ -374,10 +374,9 @@ extension CYLTabBarController {
 
     // MARK: - Overrides (called by the one-line overrides in CYLTabBarController.m)
 
-    /// [EN] `-addChildViewController:`: super, then the #618 diagnostics. [CN] `-addChildViewController:`：调用 super，再做 #618 诊断。
+    /// [EN] `-addChildViewController:` after the Objective-C override called super: the #618 diagnostics. [CN] `-addChildViewController:`：调用 super，再做 #618 诊断。
     @objc(cyl_overrideAddChildViewController:)
     func cylOverrideAddChildViewController(_ childController: UIViewController) {
-        super.addChild(childController)
         #if DEBUG || BETA
         cylLogChildViewControllerThatIsNotATabIfNeeded(childController)
         #endif
