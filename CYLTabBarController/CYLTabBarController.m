@@ -5335,63 +5335,12 @@ static BOOL CYLIsImplementedOutsideSystemFrameworks(Class cls, SEL selector) {
 
 #pragma mark - Dark Mode Lottie (#442)
 
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-#pragma clang diagnostic ignored "-Wdeprecated-implementations"
+// [EN] The work of a light / dark switch and `-cyl_reloadLottieAnimationViewsForCurrentStyle` are Swift
+//      (`Swift/CYLTabBarController+CYLDarkModeLottie.swift`, step 106); this override only calls it.
+// [CN] 浅色 / 深色切换的处理与 `-cyl_reloadLottieAnimationViewsForCurrentStyle` 已改为 Swift（第 106 步）；本重写只调用它。
 - (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection {
     [super traitCollectionDidChange:previousTraitCollection];
-    [self cyl_setNeedsApplyTabBarItemAnimationTintColors];
-    // FIX: issue #216
-    // [EN] Themes that follow the system Dark Mode (`respondsSystemStyleAutomatically`): next run loop, once UIKit has
-    //      finished passing the new traits down.
-    // [CN] 跟随系统深色模式的主题（`respondsSystemStyleAutomatically`）：在下一个 runloop 处理，此时 UIKit 已向下传递完新的 trait。
-    if (@available(iOS 13.0, *)) {
-        if ([self.traitCollection hasDifferentColorAppearanceComparedToTraitCollection:previousTraitCollection]) {
-            UITraitCollection *traitCollection = self.traitCollection;
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [CYLThemeManagerCenter updateThemesForTraitCollection:traitCollection];
-            });
-        }
-    }
-    // First: only when a #442 key (dark Lottie file or colors) is in use. 首先：仅在使用了 #442 新增的 key 时处理。
-    if (![CYLTabBarItemAnimationDefaultStyleSource() hasStyleVariants]) {
-        return;
-    }
-    // Then: only with an animation library (#604), checked at runtime so that any library works. 其次：仅在引入动画库时处理（#604），
-    // 在运行时判断，以支持任意动画库。
-    if (!CYLTabBarItemAnimationIsAvailable()) {
-        return;
-    }
-    if (@available(iOS 13.0, *)) {
-        if ([self.traitCollection hasDifferentColorAppearanceComparedToTraitCollection:previousTraitCollection]) {
-            // Next run loop: the tab buttons have the new traits by then. 下一个 runloop：此时 Tab 按钮已更新为新的 trait。
-            __weak __typeof(self) weakSelf = self;
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [weakSelf cyl_reloadLottieAnimationViewsForCurrentStyle];
-            });
-        }
-    }
-}
-#pragma clang diagnostic pop
-
-/// FIX: issue #442 — every tab's Lottie view (classic, Liquid Glass and flat design tab bars) follows the new style.
-/// 所有 Tab 的 Lottie 视图（经典、液态玻璃、扁平样式）切换为新风格的动画。
-- (void)cyl_reloadLottieAnimationViewsForCurrentStyle {
-    if (![CYLTabBarItemAnimationDefaultStyleSource() hasStyleVariants]) {
-        return;
-    }
-    NSMutableArray<UIView *> *views = [NSMutableArray arrayWithObject:self.tabBar];
-    if (_cyl_tabBar && _cyl_tabBar != self.tabBar) {
-        [views addObject:_cyl_tabBar];
-    }
-    while (views.count > 0) {
-        UIView *view = views.lastObject;
-        [views removeLastObject];
-        if ([view isKindOfClass:[UIControl class]] && [view respondsToSelector:@selector(cyl_reloadTabBarItemAnimationViewForCurrentStyle)]) {
-            [view cyl_performSelector:@selector(cyl_reloadTabBarItemAnimationViewForCurrentStyle)];
-        }
-        [views addObjectsFromArray:view.subviews];
-    }
+    [self cyl_traitCollectionDidChangeFrom:previousTraitCollection];
 }
 
 #pragma mark - UIContentContainer

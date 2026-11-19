@@ -235,4 +235,13 @@ FOUNDATION_EXTERN BOOL CYLControlReportsTaps(UIControl *_Nullable control);
 - (void)cyl_adoptTabButton:(nullable UIControl *)tabButton forTabBarItem:(nullable UITabBarItem *)item;
 @end
 
+/*!
+ * [EN] Light / dark switches (#442): Swift (`Swift/CYLTabBarController+CYLDarkModeLottie.swift`, step 106).
+ * [CN] 浅色 / 深色切换（#442）：Swift 实现（第 106 步）。
+ */
+@interface CYLTabBarController (CYLDarkModeLottiePrivate)
+- (void)cyl_traitCollectionDidChangeFrom:(nullable UITraitCollection *)previousTraitCollection;
+- (void)cyl_reloadLottieAnimationViewsForCurrentStyle;
+@end
+
 NS_ASSUME_NONNULL_END
