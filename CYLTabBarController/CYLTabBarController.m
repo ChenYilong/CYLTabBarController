@@ -11,7 +11,6 @@
 #import "CYLTabBar.h"
 #import "UIViewController+CYLSettingsSection.h"
 #import <objc/runtime.h>
-#import <dlfcn.h>
 #import "UIViewController+CYLTabBarControllerExtention.h"
 #import "UIControl+CYLTabBarControllerExtention.h"
 #import "UIControl+CYLTabBarItemAnimation.h"
@@ -1824,51 +1823,17 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
 
 #pragma mark -
 #pragma mark - 状态栏
-// [CN] MARK: 状态栏
-// [EN] MARK: Status bar
-
+// [EN] MARK: Status bar, vertical bar (iOS 27.1+, iPhone Duo). The logic is Swift (Swift/CYLTabBarController+CYLSystemBars.swift,
+//      step 129); these UIKit overrides stay one-line forwarders. The two vertical bar overrides name iOS 27.1 types, so they stay
+//      behind the SDK check (CI builds with Xcode 26).
+// [CN] 状态栏、竖向栏（iOS 27.1+，iPhone Duo）。逻辑已改为 Swift（第 129 步）；这些 UIKit 重写保留为一行的转发。两个竖向栏重写使用 iOS 27.1 的
+//      类型，因此留在 SDK 判断之后（CI 使用 Xcode 26 构建）。
 - (UIViewController *)childViewControllerForStatusBarStyle {
-    UIViewController *childViewController = self.selectedViewController;
-    
-    do {
-        if (!childViewController) {
-            childViewController = _viewControllers.lastObject;
-            break;
-        }
-        if (!childViewController) {
-            childViewController = CYLGetRootViewController();
-
-            break;
-        }
-    } while (false); // same as : 0, NO
-    if (CYLTabBarStyleTypeFlatDesign == _tabBarStyleType) {     //CYLTabBarStyleTypeFlatDesign
-        
-#if CYL_FLATDESIGN_AVAILABLE
-        return childViewController;
-#else
-#endif
-        
-    } else {/** Not CYLTabBarStyleTypeFlatDesign*/}
-    
-    return childViewController;
+    return [self cyl_childViewControllerForStatusBarStyle];
 }
 
 - (UIViewController *)childViewControllerForStatusBarHidden {
-    
-    UIViewController *childViewController = self.childViewControllerForStatusBarStyle;
-    
-   
-    //    self.topViewController;
-    //    self.scene;
-    if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType) {
-#if CYL_FLATDESIGN_AVAILABLE
-        if (![_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) { return childViewController; }
-        return childViewController;
-#else
-#endif
-        
-    } else {/** Not CYLTabBarStyleTypeFlatDesign*/}
-    return childViewController;
+    return self.childViewControllerForStatusBarStyle;
 }
 
 /// [EN] The selected tab decides which edges defer the system gestures. [CN] 由选中的 Tab 决定哪些边缘延迟系统手势。
@@ -1877,101 +1842,28 @@ CYL_DEPRECATED_IGNORED_IMPLEMENTATIONS_POP
 }
 
 - (UIStatusBarAnimation)preferredStatusBarUpdateAnimation {
-    UIViewController *childViewController = self.childViewControllerForStatusBarStyle;
-
-    if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType) {
-#if CYL_FLATDESIGN_AVAILABLE
-        if (![_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) { return childViewController.preferredStatusBarUpdateAnimation; }
-        return childViewController.preferredStatusBarUpdateAnimation;
-#else
-#endif
-    } else {/** Not CYLTabBarStyleTypeFlatDesign*/    }
-    return childViewController.preferredStatusBarUpdateAnimation;
+    return self.childViewControllerForStatusBarStyle.preferredStatusBarUpdateAnimation;
 }
 
 /// HomeIndicator
 - (UIViewController *)childViewControllerForHomeIndicatorAutoHidden {
-    UIViewController *childViewController = self.childViewControllerForStatusBarStyle;
-
-    if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType) {
-#if CYL_FLATDESIGN_AVAILABLE
-        if (![_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) { return childViewController; }
-        return childViewController;
-#else
-#endif
-    } else {/** Not CYLTabBarStyleTypeFlatDesign*/    }
-    return childViewController;
+    return self.childViewControllerForStatusBarStyle;
 }
 
-
-#pragma mark - Vertical bar (iOS 27.1+, iPhone Duo)
-// MARK: Vertical bar
-
-/*!
- * FIX: issue #653
- * [EN] On the folded iPhone Duo, iOS 27.1 can move bar content to a vertical bar on the trailing edge.
- *      `allowsVerticalBar` (default NO) is a convenience switch for UIKit's `preferredVerticalBarBehavior`:
- *      NO keeps the tab bar horizontal; YES restores the system default. Returning nil from the child getter
- *      when NO stops UITabBarController from forwarding the choice to the selected view controller (whose default
- *      is Automatic). Unrelated to `sidebar.preferredPlacement` (tab bar vs. iPad-style sidebar, regular width).
- * [CN] iPhone Duo 折叠时，iOS 27.1 可能把栏内容放到右侧竖向栏。`allowsVerticalBar`（默认 NO）是 UIKit
- *      `preferredVerticalBarBehavior` 的便捷开关：NO 保持 TabBar 横向；YES 恢复系统默认行为。为 NO 时子控制器 getter 返回 nil，
- *      避免 UITabBarController 把决定权转交给选中的子控制器（其默认值为 Automatic）。
- *      与 `sidebar.preferredPlacement`（regular 宽度下 TabBar 与 iPad 式侧边栏之间的选择）无关。
- */
+/// FIX: issue #653 — see `-cyl_applyAllowsVerticalBar:`. [CN] 见 `-cyl_applyAllowsVerticalBar:`。
 - (void)setAllowsVerticalBar:(BOOL)allowsVerticalBar {
-    if (_allowsVerticalBar == allowsVerticalBar) { return; }
-    _allowsVerticalBar = allowsVerticalBar;
-#if defined(__IPHONE_27_1) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_27_1
-    if (@available(iOS 27.1, *)) {
-        [self setNeedsUpdateOfVerticalBarConfiguration];
-    }
-#endif
+    [self cyl_applyAllowsVerticalBar:allowsVerticalBar];
 }
 
 #if defined(__IPHONE_27_1) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_27_1
-/// FIX: issue #672 YES when `selector` on `cls` comes from app code rather than a system framework such as UIKitCore.
-static BOOL CYLIsImplementedOutsideSystemFrameworks(Class cls, SEL selector) {
-    IMP imp = class_getMethodImplementation(cls, selector);
-    Dl_info info;
-    if (!imp || dladdr((const void *)imp, &info) == 0 || !info.dli_fname) { return NO; }
-    return strstr(info.dli_fname, "/System/Library/") == NULL && strstr(info.dli_fname, "/usr/lib/") == NULL;
-}
-
 - (UIVerticalBarBehavior)preferredVerticalBarBehavior API_AVAILABLE(ios(27.1)) {
-    if (self.allowsVerticalBar) { return [super preferredVerticalBarBehavior]; }
-    return UIVerticalBarBehaviorDisabled;
+    return self.allowsVerticalBar ? [super preferredVerticalBarBehavior] : UIVerticalBarBehaviorDisabled;
 }
 
+/// FIX: issue #672 — a screen that overrides `preferredVerticalBarBehavior` makes its own choice. [CN] 重写了它的页面自己决定。
 - (UIViewController *)childViewControllerForPreferredVerticalBarBehavior API_AVAILABLE(ios(27.1)) {
     if (self.allowsVerticalBar) { return [super childViewControllerForPreferredVerticalBarBehavior]; }
-    // FIX: issue #672 a screen that overrides `preferredVerticalBarBehavior` makes its own choice.
-    if ([self cyl_selectedChildOverridesVerticalBarBehavior]) { return self.selectedViewController; }
-    return nil;
-}
-
-/*!
- * FIX: issue #672
- * [EN] Whether a view controller on the `childViewControllerForPreferredVerticalBarBehavior` chain that starts at
- *      the selected view controller (e.g. navigation controller -> top view controller) implements
- *      `preferredVerticalBarBehavior` in app code. UIKit's own implementations (UIViewController,
- *      UINavigationController, ...) do not count, so screens without an override still follow `allowsVerticalBar`.
- * [CN] 从选中的子控制器开始，沿 `childViewControllerForPreferredVerticalBarBehavior` 链（如导航控制器 -> 栈顶控制器）
- *      是否有控制器在 App 代码里实现了 `preferredVerticalBarBehavior`。UIKit 自带的实现（UIViewController、UINavigationController 等）
- *      不算，所以没有重写的页面仍按 `allowsVerticalBar` 处理。
- */
-- (BOOL)cyl_selectedChildOverridesVerticalBarBehavior API_AVAILABLE(ios(27.1)) {
-    UIViewController *viewController = self.selectedViewController;
-    NSUInteger depth = 0;
-    while (viewController && depth++ < 16) {
-        if (CYLIsImplementedOutsideSystemFrameworks(viewController.class, @selector(preferredVerticalBarBehavior))) {
-            return YES;
-        }
-        UIViewController *child = [viewController childViewControllerForPreferredVerticalBarBehavior];
-        if (child == viewController) { break; }
-        viewController = child;
-    }
-    return NO;
+    return [self cyl_selectedChildOverridesVerticalBarBehavior] ? self.selectedViewController : nil;
 }
 #endif
 
@@ -2093,6 +1985,10 @@ static BOOL CYLIsImplementedOutsideSystemFrameworks(Class cls, SEL selector) {
 
 - (void)cyl_setTabBarHeightStorage:(CGFloat)tabBarHeight {
     _tabBarHeight = tabBarHeight;
+}
+
+- (void)cyl_setAllowsVerticalBarStorage:(BOOL)allowsVerticalBar {
+    _allowsVerticalBar = allowsVerticalBar;
 }
 
 @end
