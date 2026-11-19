@@ -8,6 +8,41 @@
 import UIKit
 
 /**
+ * [EN] A block or closure stored in a configuration dictionary. A Swift closure casts with `as?`; an Objective-C block (what an
+ *      Objective-C app puts there) does not, so it is taken as the block object it is and wrapped.
+ * [CN] 存放在配置字典中的 block 或闭包。Swift 闭包可用 `as?` 转换；Objective-C block（Objective-C App 放入的）不行，因此把它当作 block 对象取出并包装。
+ */
+private func cylConfigurationPageProvider(_ value: Any?) -> CYLTabBarPageProvider? {
+    guard let value else {
+        return nil
+    }
+    if let closure = value as? CYLTabBarPageProvider {
+        return closure
+    }
+    guard let object = value as AnyObject?, object.isKind(of: NSClassFromString("NSBlock") ?? NSObject.self) else {
+        return nil
+    }
+    typealias CYLPageProviderBlock = @convention(block) (String, [String: Any]) -> UIViewController?
+    let block = unsafeBitCast(object, to: CYLPageProviderBlock.self)
+    return { block($0, $1) }
+}
+
+private func cylConfigurationPlusButtonAction(_ value: Any?) -> ((CYLPlusButton) -> Void)? {
+    guard let value else {
+        return nil
+    }
+    if let closure = value as? ((CYLPlusButton) -> Void) {
+        return closure
+    }
+    guard let object = value as AnyObject?, object.isKind(of: NSClassFromString("NSBlock") ?? NSObject.self) else {
+        return nil
+    }
+    typealias CYLPlusButtonActionBlock = @convention(block) (CYLPlusButton) -> Void
+    let block = unsafeBitCast(object, to: CYLPlusButtonActionBlock.self)
+    return { block($0) }
+}
+
+/**
  * [EN] The body of the designated initializer and the members that depend on the style, translated from Objective-C
  *      (`-initWithConfiguration:`, `-setTabBarStyleType:`, `-noNeedUIDesignCompatibility`; docs/Swift-Migration.md, the class switch).
  * [CN] 指定初始化方法的主体以及依赖样式的成员，已从 Objective-C 翻译（`-initWithConfiguration:`、`-setTabBarStyleType:`、`-noNeedUIDesignCompatibility`；
@@ -55,7 +90,7 @@ extension CYLTabBarController {
         var pageLookupOrder: [String]?
         if !viewControllersFromCode {
             pageRegistry = normalized[CYLTabBarControllerPageRegistry] as? CYLTabBarPageProviding
-            pageResolver = normalized[CYLTabBarControllerPageResolver] as? CYLTabBarPageProvider
+            pageResolver = cylConfigurationPageProvider(normalized[CYLTabBarControllerPageResolver])
             pageLookupOrder = Self.cylPageLookupOrder(of: normalized)
             let keptItems = NSMutableArray()
             viewControllers = CYLTabBarPageRegistry.pages(
@@ -75,7 +110,7 @@ extension CYLTabBarController {
                 let pages = CYLTabBarPageRegistry.pages(
                     ofTabs: [[CYLTabBarItemPageIdentifier: plusPageIdentifier]],
                     registry: normalized[CYLTabBarControllerPageRegistry] as? CYLTabBarPageProviding,
-                    resolver: normalized[CYLTabBarControllerPageResolver] as? CYLTabBarPageProvider,
+                    resolver: cylConfigurationPageProvider(normalized[CYLTabBarControllerPageResolver]),
                     lookupOrder: Self.cylPageLookupOrder(of: normalized), keptTabs: nil, skipped: nil)
                 if let page = pages.first {
                     if (page.title ?? "").isEmpty, let plusTitle = plusButtonAttributes[CYLTabBarItemTitle] as? String, !plusTitle.isEmpty {
@@ -88,7 +123,7 @@ extension CYLTabBarController {
                 }
             }
             CYLPlusButton.cyl_register(attributes: plusButtonAttributes,
-                                       action: normalized[CYLTabBarControllerPlusButtonAction] as? ((CYLPlusButton) -> Void), context: context)
+                                       action: cylConfigurationPlusButtonAction(normalized[CYLTabBarControllerPlusButtonAction]), context: context)
         }
 
         self.imageInsets = imageInsets

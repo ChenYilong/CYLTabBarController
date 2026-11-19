@@ -353,8 +353,9 @@ extension CYLTabBarController {
      */
     @objc(setTabBarItemIcon:selectedIcon:size:atIndex:)
     @discardableResult
-    open func setTabBarItemIcon(_ icon: Any, selectedIcon: Any?, size: CGSize, at index: UInt) -> Bool {
-        guard let viewController = cylIconTab(at: index) else {
+    open func setTabBarItemIcon(_ icon: Any?, selectedIcon: Any?, size: CGSize, at index: UInt) -> Bool {
+        // [EN] `icon` may be nil from Objective-C: nothing to show. [CN] Objective-C 调用方可能传入 nil：没有可显示的内容。
+        guard let icon, let viewController = cylIconTab(at: index) else {
             return false
         }
         Self.cylLoadTabBarItemIcon(icon) { [weak self, weak viewController] image in
