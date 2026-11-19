@@ -348,7 +348,7 @@ open class CYLTabBarController: UITabBarController, CYLTabBarControllerDelegate,
     ///      `CYLTabBar` through KVC when the controller is set up). [CN] TabBar，类型为 `CYLTabBar`，与 Objective-C 头文件的声明一致（与以前一样不检查类型：
     ///      设置控制器时已通过 KVC 把 TabBar 换成 `CYLTabBar`）。
     open override var tabBar: CYLTabBar {
-        unsafeBitCast(super.tabBar, to: CYLTabBar.self)
+        unsafeDowncast(super.tabBar, to: CYLTabBar.self)
     }
 
     open override var isTabBarHidden: Bool {
