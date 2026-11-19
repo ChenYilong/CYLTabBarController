@@ -20,10 +20,15 @@
 #import "UIControl+CYLTabBarItemAnimation.h"
 #endif
 
+#if defined(SWIFT_PACKAGE)
+// [EN] Swift Package Manager: the Swift modules this file uses through their Objective-C interface. [CN] Swift Package Manager：本文件通过其 Objective-C 接口使用的 Swift 模块。
+#pragma clang module import CYLTabBarController
+#endif
+
 @implementation UIControl (CYLTabBarItemAnimationPlayer)
 
 - (id<CYLTabBarItemAnimationPlayer>)cyl_tabBarItemAnimationPlayer {
-    return [CYLTabBarItemAnimationFactory playerForView:self.cyl_tabBarItemAnimationView];
+    return [CYLTabBarItemAnimationFactory playerForView:[self cyl_tabBarItemAnimationView]];
 }
 
 @end

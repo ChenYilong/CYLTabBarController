@@ -125,7 +125,7 @@ let package = Package(
         ),
         .target(
             name: "CYLTabBarControllerEngine",
-            dependencies: ["CYLTabBarController", "CYLTabBarControllerObjC", "CYLAnimatedItem"],
+            dependencies: ["CYLTabBarController", "CYLTabBarControllerObjC", "CYLAnimatedItem", "CYLAnimatedItemSwift", "CYLTabBarControllerLottieSwift"],
             path: "CYLTabBarController",
             sources: [
                 "CYLTabBarItemAnimation/CYLTabBarItemAnimationEngine.m",

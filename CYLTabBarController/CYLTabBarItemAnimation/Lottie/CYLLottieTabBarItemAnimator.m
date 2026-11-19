@@ -50,6 +50,12 @@
 #import <CYLTabBarController/CYLTabBarController-Swift.h>
 #endif
 
+#if defined(SWIFT_PACKAGE)
+// [EN] Swift Package Manager: the Swift modules this file uses through their Objective-C interface. [CN] Swift Package Manager：本文件通过其 Objective-C 接口使用的 Swift 模块。
+#pragma clang module import CYLAnimatedItemSwift
+#pragma clang module import CYLTabBarControllerLottieSwift
+#endif
+
 #if __has_include(<Lottie/Lottie.h>)
 #import <Lottie/Lottie.h>
 #endif

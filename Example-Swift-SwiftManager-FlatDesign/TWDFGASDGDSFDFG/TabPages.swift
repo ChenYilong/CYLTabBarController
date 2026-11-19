@@ -57,7 +57,7 @@ enum TabPages {
     /// [EN] A tab bar controller from a configuration, listing the tabs that got no page.
     static func makeTabBarController() -> CYLTabBarController {
         let tabBarController = CYLTabBarController(configuration: [
-            CYLTabBarControllerPageLookupOrder: [CYLTabBarPageSource.sharedRegistry, CYLTabBarPageSource.automaticRegistration],
+            CYLTabBarControllerPageLookupOrder: [CYLTabBarPageSourceSharedRegistry, CYLTabBarPageSourceAutomaticRegistration],
             CYLTabBarControllerTabBarItemsAttributes: [
                 [CYLTabBarItemTitle: "Home", CYLTabBarItemImage: "system:house", CYLTabBarItemPageIdentifier: "swift-home"],
                 [CYLTabBarItemTitle: "Auto", CYLTabBarItemImage: "system:star", CYLTabBarItemPageIdentifier: "swift-auto"],
