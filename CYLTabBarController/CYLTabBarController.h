@@ -1637,12 +1637,6 @@ didRecognizeTabBarItemGesture:(CYLTabBarItemGesture)gesture
 - (id<UIApplicationDelegate>)appDelegate;
 
 /*!
- * [EN] Returns the application's root window.
- * [CN] 返回应用的根 window。
- */
-- (UIWindow *)rootWindow;
-
-/*!
  *更新TabBarItems
  *@attention 其内部其实也重新设置了viewControllers
  *@param tabBarItemsAttributes tabBarItemsAttributes
@@ -1824,10 +1818,6 @@ typedef UIView * _Nullable (^CYLTabBarItemIconViewProvider)(BOOL selected);
  */
 @property (nonatomic, assign) BOOL allowsVerticalBar;
 
-@property (nonatomic, assign, getter=isLottieViewAdded, readonly) BOOL lottieViewAdded DEPRECATED_MSG_ATTRIBUTE("Use tabBarItemAnimationViewAdded");
-
-@property (nonatomic, strong, readonly) NSMutableArray<NSURL *> *lottieURLs DEPRECATED_MSG_ATTRIBUTE("Use tabBarItemAnimationURLs");
-@property (nonatomic, strong, readonly) NSMutableArray *lottieSizes DEPRECATED_MSG_ATTRIBUTE("Use tabBarItemAnimationSizes");
 
 /*!
  * [EN] YES once the tab icon animation views were added (any library). [CN] Tab 图标动画视图已添加时为 YES（任意动画库）。
@@ -1964,6 +1954,20 @@ typedef UIView * _Nullable (^CYLTabBarItemIconViewProvider)(BOOL selected);
 //@property (nonatomic, assign, getter=isLottieViewAdded) BOOL lottieViewAdded;
 
 #endif
+
+@end
+
+/*!
+ * [EN] The application's root window: implemented in Swift (`Swift/CYLTabBarController+CYLCompatibility.swift`, step 104).
+ * [CN] 应用的根 window：在 Swift 中实现（`Swift/CYLTabBarController+CYLCompatibility.swift`，第 104 步）。
+ */
+@interface CYLTabBarController (CYLRootWindow)
+
+/*!
+ * [EN] Returns the application's root window.
+ * [CN] 返回应用的根 window。
+ */
+- (UIWindow *)rootWindow;
 
 @end
 
@@ -2683,6 +2687,12 @@ typedef UIView * _Nullable (^CYLTabBarItemIconViewProvider)(BOOL selected);
 #pragma mark - Deprecated API
 
 @interface CYLTabBarController (CYLTabBarControllerDeprecated)
+
+// [EN] Implemented in Swift (`Swift/CYLTabBarController+CYLCompatibility.swift`, step 104). [CN] 在 Swift 中实现（第 104 步）。
+@property (nonatomic, assign, getter=isLottieViewAdded, readonly) BOOL lottieViewAdded DEPRECATED_MSG_ATTRIBUTE("Use tabBarItemAnimationViewAdded");
+
+@property (nonatomic, strong, readonly) NSMutableArray<NSURL *> *lottieURLs DEPRECATED_MSG_ATTRIBUTE("Use tabBarItemAnimationURLs");
+@property (nonatomic, strong, readonly) NSMutableArray *lottieSizes DEPRECATED_MSG_ATTRIBUTE("Use tabBarItemAnimationSizes");
 
 /*!
  * [EN] Deprecated. Use `-hideTabBarShadowImageView` instead.
