@@ -153,111 +153,13 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSArray<UIControl *> *)cyl_tabBarSubviews;
 @end
 
-@interface CYLTabBar (CYLTabBarControllerExtention)
-
-
 /*!
- * [EN] `null_unspecified`: nil when the tab bar has no tab button yet (it always could be); Swift still sees `UIControl!`,
- *      so existing Swift code keeps compiling.
- * [CN] `null_unspecified`：TabBar 还没有 Tab 按钮时为 nil（一直如此）；Swift 中仍为 `UIControl!`，已有的 Swift 代码可继续编译。
+ * [EN] The `CYLTabBar (CYLTabBarControllerExtention)` members (`cyl_selectedControl`, `-cyl_selectedIndex`, `-cyl_visibleControls`,
+ *      `-cyl_subTabBarButtons`, `-cyl_tabBarButtonWithTabIndex:` and the others) are implemented in Swift
+ *      (`Swift/CYLTabBar+CYLTabBarControllerExtention.swift`); since `CYLTabBar` itself is Swift (step 100), Objective-C callers get
+ *      them from the generated Swift interface (imported by `CYLTabBar.h`), as a category of a Swift class cannot be declared here.
+ * [CN] `CYLTabBar (CYLTabBarControllerExtention)` 的成员在 Swift 中实现（`Swift/CYLTabBar+CYLTabBarControllerExtention.swift`）；由于 `CYLTabBar`
+ *      本身已是 Swift（第 100 步），Objective-C 调用方从生成的 Swift 接口（由 `CYLTabBar.h` 导入）获得它们，因为这里不能为 Swift 类声明类别。
  */
-@property (nonatomic, strong, null_unspecified, getter=cyl_selectedControl, setter=cyl_setSelectedControl:) UIControl *cyl_selectedControl;
-
-/*!
- * [EN] Returns the currently selected control, nil when the tab bar has no tab button yet.
- * [CN] 返回当前选中的控件；TabBar 还没有 Tab 按钮时为 nil。
- */
-- (UIControl * _Null_unspecified)cyl_selectedControl;
-
-/*!
- * [EN] Returns the visible index of the selected control.
- * [CN] 返回当前选中控件的可见索引。
- */
-- (NSInteger)cyl_selectedIndex;
-
-/*!
- * [EN] Returns the visible tab controls, including the plus button when the tab bar has one.
- * [CN] 返回可见的 Tab 控件数组；TabBar 含 PlusButton 时也包含 PlusButton。
- */
-- (nullable NSArray<UIControl *> *)cyl_visibleControls;
-/*!
- * cyl_tabBarSubviews 的过滤后的结果， sub表示过滤， 可理解为filtered，子集合。
- * [EN] Returns the filtered tab bar buttons (a subset of `cyl_tabBarSubviews`).
- * [CN] 返回过滤后的 TabBar 按钮数组（cyl_tabBarSubviews 的子集）。
- */
-- (NSArray<UIControl *> *)cyl_subTabBarButtons;
-
-/*!
- * [EN] Returns the filtered tab bar buttons excluding the plus button.
- * [CN] 返回过滤后且剔除 PlusButton 的 TabBar 按钮数组。
- */
-- (NSArray<UIControl *> *)cyl_subTabBarButtonsWithoutPlusButton;
-
-/*!
- * [EN] Returns the tab bar button for `tabIndex`, accounting for whether the plus button has a child view controller.
- * [CN] 返回 tabIndex 对应的 TabBar 按钮，会考虑 PlusButton 是否添加了子控制器。
- */
-- (UIControl *)cyl_tabBarButtonWithTabIndex:(NSUInteger)tabIndex;
-
-/*!
- * [EN] Returns the normal-state content control that matches the given selected-state content control.
- * [CN] 根据选中态内容控件，返回与之对应的常态内容控件。
- */
-- (nullable UIControl *)cyl_normalContentControlFromSelectedContentControl:(UIControl *)selectedContentControl;
-
-/*!
- * [EN] Returns the selected-state content control that matches the given normal-state content control.
- * [CN] 根据常态内容控件，返回与之对应的选中态内容控件。
- */
-- (nullable UIControl *)cyl_selectedContentControlFromContentControl:(nullable UIControl *)contentControl;
-
-/*!
- * [EN] Plays the Lottie animation on `selectedControl`; shows the final frame without playing when `defaultSelected` is YES.
- * [CN] 在 selectedControl 上播放 Lottie 动画；defaultSelected 为 YES 时直接显示最后一帧而不播放。
- */
-- (void)cyl_animationLottieImageWithSelectedControl:(nullable UIControl *)selectedControl
-                                          lottieURL:(nullable NSURL *)lottieURL
-                                               size:(CGSize)size
-                                          defaultSelected:(BOOL)defaultSelected
-                                        contentMode:(UIViewContentMode)contentMode;
-
-/*!
- * [EN] Stops the Lottie animations on all visible and selected-state controls.
- * [CN] 停止所有可见控件与选中态控件上的 Lottie 动画。
- */
-- (void)cyl_stopAnimationOfAllLottieView;
-
-/*!
- *  原生 TabButton 数量，不包含PlusButton。
- * [EN] Returns the native tab bar buttons, excluding the plus button.
- * [CN] 返回原生 TabBar 按钮数组，不含 PlusButton。
- */
-- (NSArray *)cyl_originalTabBarButtons;
-
-/*!
- * [EN] Returns YES if the plus button's child view controller is added to this tab bar's controller in the same context.
- * [CN] 判断 PlusButton 的子控制器是否已添加到同一 context 的 TabBarController 中。
- */
-- (BOOL)cyl_hasPlusChildViewController;
-
-/*!
- * [EN] Returns the cached x offset for the item at `index` under Liquid Glass (sign depends on the plus button side); 0 otherwise.
- * [CN] 液态玻璃下返回指定索引按钮的 x 偏移缓存值（正负取决于位于 PlusButton 哪一侧），否则返回 0。
- */
-- (CGFloat)cyl_cachedXOffsetWithIndex:(CGFloat)index;
-
-/*!
- * [EN] Returns the width difference between the original and visible item width under Liquid Glass; 0 otherwise.
- * [CN] 液态玻璃下返回原始按钮宽度与可见按钮宽度的差值，否则返回 0。
- */
-- (CGFloat)cyl_cachedWidthOffsetWithIndex:(CGFloat)index;
-
-/*!
- * [EN] Returns YES if the plus button's title label visibility needs updating (Liquid Glass only).
- * [CN] 判断是否需要更新 PlusButton 标题 Label 的隐藏状态（仅液态玻璃下生效）。
- */
-- (BOOL)cyl_shouldUpdateHiddenStatueForPlusButtonLabel;
-
-@end
 
 NS_ASSUME_NONNULL_END

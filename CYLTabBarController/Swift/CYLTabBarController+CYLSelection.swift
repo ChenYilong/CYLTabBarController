@@ -35,7 +35,7 @@ extension CYLTabBarController {
         cylUpdateSelectionStatusIfNeeded(for: tabBarController, shouldSelect: viewController, shouldSelect: should)
         // [EN] Guard: only CYLTabBar has the plus button label check; `tabBarController` can have a system tab bar.
         // [CN] 只有 CYLTabBar 才有 PlusButton 标签的判断；`tabBarController` 的 TabBar 可能是系统 TabBar。
-        guard let tabBar = tabBarController?.tabBar as? CYLTabBar, tabBar.cyl_shouldUpdateHiddenStatueForPlusButtonLabel() else {
+        guard let tabBar = tabBarController?.tabBar as? CYLTabBar, tabBar.cylShouldUpdateHiddenStatueForPlusButtonLabel() else {
             return
         }
         let plusChildViewController = cylPrivate.cylContextPlusChildViewController()

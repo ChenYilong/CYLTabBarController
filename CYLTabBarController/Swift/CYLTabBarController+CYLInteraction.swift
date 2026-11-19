@@ -1134,8 +1134,8 @@ extension CYLTabBarController {
         let delegate = (self as UITabBarController).delegate as? CYLTabBarControllerDelegate
         let shows = delegate?.tabBarController?(tabBarController, shouldShowPlatterLiquidLensViewFor: control) ?? true
         tabBar.cyl_platterLiquidLensViewContentView()?.cyl_setHidden(!shows)
-        tabBar.liquidGlassContinuousGestureRecognizer.isEnabled = shows
-        tabBar.liquidGlassLongGestureRecognizer.isEnabled = shows
+        tabBar.liquidGlassContinuousGestureRecognizer?.isEnabled = shows
+        tabBar.liquidGlassLongGestureRecognizer?.isEnabled = shows
     }
 }
 

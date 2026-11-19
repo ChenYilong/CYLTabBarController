@@ -318,7 +318,7 @@ extension CYLTabBar {
      *      控制器的 `viewControllers` 做检查。
      */
     @objc(cyl_hasPlusChildViewController)
-    func cylHasPlusChildViewController() -> Bool {
+    public func cylHasPlusChildViewController() -> Bool {
         let tabBarController = self.owningTabBarController
         guard let plusChild = CYLPlusButton.plusChildViewController(forOwner: tabBarController ?? self) else { return false }
         let isAdded = tabBarController?.viewControllers?.contains(plusChild) ?? false
@@ -326,7 +326,7 @@ extension CYLTabBar {
     }
 
     @objc(cyl_originalTabBarButtons)
-    func cylOriginalTabBarButtons() -> [UIView] {
+    public func cylOriginalTabBarButtons() -> [UIView] {
         cylTabBarButtons(fromTabBarSubviews: cylSortedSubviews())
     }
 
@@ -368,7 +368,12 @@ extension CYLTabBar {
     }
 
     @objc(cyl_visibleControls)
-    func cylVisibleControls() -> [UIView]? {
+    public func cylVisibleControls() -> [UIControl]? {
+        // [EN] Typed as the former Objective-C header declared it. [CN] 类型与原 Objective-C 头文件的声明一致。
+        cylVisibleViews()?.compactMap { $0 as? UIControl }
+    }
+
+    private func cylVisibleViews() -> [UIView]? {
         var original = cylOriginalTabBarButtons()
         if let plusButton = CYLPlusButton(forOwner: self), !original.contains(where: { $0 === plusButton }) {
             original.append(plusButton)
@@ -383,7 +388,12 @@ extension CYLTabBar {
      * [CN] 与子控制器匹配的控件集合。FIX：占位导致的数量不匹配——PlusButton 视图本身从不对应任何控制器，因此去掉；slot 自己的 Tab 按钮保留。
      */
     @objc(cyl_subTabBarButtons)
-    func cylSubTabBarButtons() -> [UIView] {
+    public func cylSubTabBarButtons() -> [UIControl] {
+        // [EN] Typed as the former Objective-C header declared it. [CN] 类型与原 Objective-C 头文件的声明一致。
+        cylSubTabBarButtonViews().compactMap { $0 as? UIControl }
+    }
+
+    private func cylSubTabBarButtonViews() -> [UIView] {
         if CYLConstants.isLiquidGlassActive() {
             return cylTabBarSubviews()
         }
@@ -394,7 +404,12 @@ extension CYLTabBar {
      * [EN] The controls that match the system-style tab bar items. [CN] 与系统风格 TabBarItem 匹配的控件集合。
      */
     @objc(cyl_subTabBarButtonsWithoutPlusButton)
-    func cylSubTabBarButtonsWithoutPlusButton() -> [UIView] {
+    public func cylSubTabBarButtonsWithoutPlusButton() -> [UIControl] {
+        // [EN] Typed as the former Objective-C header declared it. [CN] 类型与原 Objective-C 头文件的声明一致。
+        cylSubTabBarButtonViewsWithoutPlusButton().compactMap { $0 as? UIControl }
+    }
+
+    private func cylSubTabBarButtonViewsWithoutPlusButton() -> [UIView] {
         (cylVisibleControls() ?? []).filter { !(($0 as? UIControl)?.cyl_isPlusControl() ?? false) }
     }
 
@@ -405,7 +420,7 @@ extension CYLTabBar {
      *      Tab 按钮：在所有样式下都与 `viewControllers` 一一对应。
      */
     @objc(cyl_tabBarButtonWithTabIndex:)
-    func cylTabBarButton(withTabIndex tabIndex: UInt) -> UIControl? {
+    public func cylTabBarButton(withTabIndex tabIndex: UInt) -> UIControl? {
         if let viewControllers = owningTabBarController?.viewControllers, Int(tabIndex) < viewControllers.count,
            let tabButton = viewControllers[Int(tabIndex)].tabBarItem.cyl_tabButton, tabButton.superview != nil,
            !CYLPlusButton.isPlusButtonView(tabButton) {
@@ -415,7 +430,7 @@ extension CYLTabBar {
     }
 
     @objc(cyl_visibleControlWithIndex:)
-    func cylVisibleControl(withIndex index: UInt) -> UIControl? {
+    public func cylVisibleControl(withIndex index: UInt) -> UIControl? {
         CYLObjectAtIndex(cylVisibleControls(), Int(index)) as? UIControl
     }
 
@@ -424,13 +439,13 @@ extension CYLTabBar {
      * [EN] Plays the tab icon animation. [CN] 播放 Tab 图标动画；任意动画库，构建中包含 `CYLTabBarItemAnimation` 子库时由它处理。
      */
     @objc(cyl_animationLottieImageWithSelectedControl:lottieURL:size:defaultSelected:contentMode:)
-    func cylAnimationLottieImage(selectedControl: UIControl?, lottieURL: URL?, size: CGSize, defaultSelected: Bool, contentMode: UIView.ContentMode) {
+    public func cylAnimationLottieImage(selectedControl: UIControl?, lottieURL: URL?, size: CGSize, defaultSelected: Bool, contentMode: UIView.ContentMode) {
         guard CYLTabBarItemAnimationCore.service != nil else { return }
         cylAnimationPrivate.cylPlayTabBarItemAnimation(withSelectedControl: selectedControl, url: lottieURL, size: size, defaultSelected: defaultSelected, contentMode: contentMode)
     }
 
     @objc(cyl_stopAnimationOfAllLottieView)
-    func cylStopAnimationOfAllLottieView() {
+    public func cylStopAnimationOfAllLottieView() {
         guard CYLTabBarItemAnimationCore.service != nil else { return }
         cylAnimationPrivate.cylStopAllTabBarItemAnimations()
     }
@@ -441,26 +456,26 @@ extension CYLTabBar {
      * [CN] 从当前图层的控件得到下标，再取选中图层中该下标的控件。以控件为锚点，下标仅辅助（PlusButton 可能导致下标变化）。
      */
     @objc(cyl_selectedContentControlFromContentControl:)
-    func cylSelectedContentControl(fromContentControl contentControl: UIControl?) -> UIControl? {
+    public func cylSelectedContentControl(fromContentControl contentControl: UIControl?) -> UIControl? {
         guard let contentControl, let index = cylSubTabBarButtons().firstIndex(where: { $0 === contentControl }) else { return nil }
         return cylPlatterSelectedContentView(withIndex: index)
     }
 
     @objc(cyl_normalContentControlFromSelectedContentControl:)
-    func cylNormalContentControl(fromSelectedContentControl selectedContentControl: UIControl) -> UIControl? {
+    public func cylNormalContentControl(fromSelectedContentControl selectedContentControl: UIControl) -> UIControl? {
         guard let index = cylPlatterSelectedContentViews()?.firstIndex(where: { $0 === selectedContentControl }) else { return nil }
         return CYLObjectAtIndex(cylSubTabBarButtons(), index) as? UIControl
     }
 
     @objc(cyl_cachedXOffsetWithIndex:)
-    func cylCachedXOffset(withIndex index: CGFloat) -> CGFloat {
+    public func cylCachedXOffset(withIndex index: CGFloat) -> CGFloat {
         guard CYLConstants.isLiquidGlassActive() else { return 0 }
         let boundsWidthOffset = (cylBoundsSize().width - CYLScreenWidth()) * 0.5
         return index < CGFloat(plusButtonIndex()) ? boundsWidthOffset : abs(boundsWidthOffset)
     }
 
     @objc(cyl_cachedWidthOffsetWithIndex:)
-    func cylCachedWidthOffset(withIndex index: CGFloat) -> CGFloat {
+    public func cylCachedWidthOffset(withIndex index: CGFloat) -> CGFloat {
         guard CYLConstants.isLiquidGlassActive() else { return 0 }
         let originalWidth = cylBoundsSize().width / CGFloat(cyl_tabbarItemsCount)
         return abs(originalWidth - cyl_tabBarItemWidth)
@@ -473,7 +488,7 @@ extension CYLTabBar {
      *      还没有任何控件时仍为 nil。
      */
     @objc(cyl_selectedControl)
-    func cylSelectedControl() -> UIControl? {
+    public func cylSelectedControl() -> UIControl? {
         if let selected = objc_getAssociatedObject(self, CYLKey("cyl_selectedControl")) as? UIControl {
             return selected
         }
@@ -487,17 +502,17 @@ extension CYLTabBar {
     }
 
     @objc(cyl_setSelectedControl:)
-    func cylSetSelectedControl(_ control: UIControl?) {
+    public func cylSetSelectedControl(_ control: UIControl?) {
         objc_setAssociatedObject(self, CYLKey("cyl_selectedControl"), control, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
     }
 
     @objc(cyl_selectedIndex)
-    func cylSelectedIndex() -> Int {
+    public func cylSelectedIndex() -> Int {
         cylSelectedControl()?.cyl_tabBarItemVisibleIndex ?? 0
     }
 
     @objc(cyl_shouldUpdateHiddenStatueForPlusButtonLabel)
-    func cylShouldUpdateHiddenStatueForPlusButtonLabel() -> Bool {
+    public func cylShouldUpdateHiddenStatueForPlusButtonLabel() -> Bool {
         cylShouldUpdateHiddenStatueForPlusButtonLabel(for: owningTabBarController)
     }
 
@@ -511,7 +526,7 @@ extension CYLTabBar {
      *      PlusButton 子控制器（重复点击或滑动）时不显示未选中状态的 Label，否则会重叠。
      */
     @objc(cyl_shouldUpdateHiddenStatueForPlusButtonLabelForTabBarController:)
-    func cylShouldUpdateHiddenStatueForPlusButtonLabel(for theTabBarController: CYLTabBarController?) -> Bool {
+    public func cylShouldUpdateHiddenStatueForPlusButtonLabel(for theTabBarController: CYLTabBarController?) -> Bool {
         guard CYLConstants.isLiquidGlassActive() else { return false }
         let tabBarController = theTabBarController ?? self.owningTabBarController
         // [EN] Its own tab bar when that is a CYLTabBar, otherwise this one. [CN] 控制器自己的 TabBar 是 CYLTabBar 时用它，否则用本 TabBar。
@@ -531,4 +546,59 @@ extension CYLTabBar {
         let showsLens = unsafeBitCast(implementation, to: Function.self)(tabBarController, selector, tabBarController, plusButton)
         return showsLens && !tabBar.isPlusButtonLayoutCentered()
     }
+}
+
+// MARK: - Swift names of the former Objective-C category 原 Objective-C 类别的 Swift 名称
+
+/**
+ [EN] The names Swift code used while `CYLTabBar (CYLTabBarControllerExtention)` was declared in Objective-C (the importer's names
+      of its selectors). Since `CYLTabBar` is Swift (docs/Swift-Migration.md step 100) that header is gone, so these forward to
+      the members above; `@nonobjc`, as the selectors already belong to those members.
+ [CN] `CYLTabBar (CYLTabBarControllerExtention)` 以 Objective-C 声明时 Swift 代码使用的名称（导入器为其 selector 生成的名称）。`CYLTabBar` 改为 Swift
+      （docs/Swift-Migration.md 第 100 步）后该头文件已删除，因此这些名称转发给上方的成员；标记 `@nonobjc`，因为 selector 已属于那些成员。
+ */
+extension CYLTabBar {
+    /** [EN] The selected tab button. [CN] 选中的 Tab 按钮。 */
+    @nonobjc public var cyl_selectedControl: UIControl! {
+        get { cylSelectedControl() }
+        set { cylSetSelectedControl(newValue) }
+    }
+    /** [EN] The selected index. [CN] 选中的下标。 */
+    @nonobjc public func cyl_selectedIndex() -> Int { cylSelectedIndex() }
+    /** [EN] The visible tab buttons and the plus button, by x. [CN] 按 x 排序的可见 Tab 按钮与 PlusButton。 */
+    @nonobjc public func cyl_visibleControls() -> [UIControl]? { cylVisibleControls() }
+    /** [EN] The tab buttons and the plus button. [CN] Tab 按钮与 PlusButton。 */
+    @nonobjc public func cyl_subTabBarButtons() -> [UIControl] { cylSubTabBarButtons() }
+    /** [EN] The tab buttons without the plus button. [CN] 不含 PlusButton 的 Tab 按钮。 */
+    @nonobjc public func cyl_subTabBarButtonsWithoutPlusButton() -> [UIControl] {
+        cylSubTabBarButtonsWithoutPlusButton()
+    }
+    /** [EN] The tab button at a tab index. [CN] 某个 Tab 下标的 Tab 按钮。 */
+    @nonobjc public func cyl_tabBarButton(withTabIndex tabIndex: UInt) -> UIControl! { cylTabBarButton(withTabIndex: tabIndex) }
+    /** [EN] The normal content control of a selected content control. [CN] 选中内容控件对应的普通内容控件。 */
+    @nonobjc public func cyl_normalContentControl(fromSelectedContentControl control: UIControl) -> UIControl? {
+        cylNormalContentControl(fromSelectedContentControl: control)
+    }
+    /** [EN] The selected content control of a content control. [CN] 内容控件对应的选中内容控件。 */
+    @nonobjc public func cyl_selectedContentControl(fromContentControl control: UIControl?) -> UIControl? {
+        cylSelectedContentControl(fromContentControl: control)
+    }
+    /** [EN] Plays a tab's animation. [CN] 播放 Tab 的动画。 */
+    @nonobjc public func cyl_animationLottieImage(withSelectedControl selectedControl: UIControl?, lottieURL: URL?, size: CGSize,
+                                                  defaultSelected: Bool, contentMode: UIView.ContentMode) {
+        cylAnimationLottieImage(selectedControl: selectedControl, lottieURL: lottieURL, size: size, defaultSelected: defaultSelected,
+                                contentMode: contentMode)
+    }
+    /** [EN] Stops every tab animation. [CN] 停止所有 Tab 动画。 */
+    @nonobjc public func cyl_stopAnimationOfAllLottieView() { cylStopAnimationOfAllLottieView() }
+    /** [EN] UIKit's tab buttons. [CN] UIKit 的 Tab 按钮。 */
+    @nonobjc public func cyl_originalTabBarButtons() -> [Any] { cylOriginalTabBarButtons() }
+    /** [EN] Whether the plus child view controller exists. [CN] PlusButton 子控制器是否存在。 */
+    @nonobjc public func cyl_hasPlusChildViewController() -> Bool { cylHasPlusChildViewController() }
+    /** [EN] The cached x offset of an index. [CN] 某个下标缓存的 x 偏移。 */
+    @nonobjc public func cyl_cachedXOffset(withIndex index: CGFloat) -> CGFloat { cylCachedXOffset(withIndex: index) }
+    /** [EN] The cached width offset of an index. [CN] 某个下标缓存的宽度偏移。 */
+    @nonobjc public func cyl_cachedWidthOffset(withIndex index: CGFloat) -> CGFloat { cylCachedWidthOffset(withIndex: index) }
+    /** [EN] Whether the plus button label's hidden state should be updated. [CN] 是否需要更新 PlusButton 标签的隐藏状态。 */
+    @nonobjc public func cyl_shouldUpdateHiddenStatueForPlusButtonLabel() -> Bool { cylShouldUpdateHiddenStatueForPlusButtonLabel() }
 }
