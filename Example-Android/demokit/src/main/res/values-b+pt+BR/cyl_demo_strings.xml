@@ -113,4 +113,6 @@
     <string name="cyl_demo_cdbfe2ac44">Interrupções simuladas</string>
     <string name="cyl_demo_83016763db">Sobre o contexto atual</string>
     <string name="cyl_demo_3b52b6d4f6" formatted="false">\"%@\" pressionado e segurado</string>
+    <string name="cyl_demo_adfd75097a">Abrir: duas barras de abas, um ID de página</string>
+    <string name="cyl_demo_300f18b032">Duas barras de abas, um ID de página</string>
 </resources>

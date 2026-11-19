@@ -228,3 +228,8 @@
 "Surface opacity: %@ (default 0.40)" = "Overfladens opacitet: %@ (standard 0.40)";
 "Speed: %@" = "Hastighed: %@";
 "Long pressed \"%@\"" = "Trykket længe på \"%@\"";
+
+/* [EN] Android example layer, the two tab bars page. */
+/* [CN] Android 示例层，两个 TabBar 的页面。 */
+"Two tab bars, one page ID" = "To fanelinjer, ét side-ID";
+"Open: two tab bars, one page ID" = "Åbn: to fanelinjer, ét side-ID";

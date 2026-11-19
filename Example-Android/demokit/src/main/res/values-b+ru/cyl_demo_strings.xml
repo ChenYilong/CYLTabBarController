@@ -113,4 +113,6 @@
     <string name="cyl_demo_cdbfe2ac44">Симуляция прерываний</string>
     <string name="cyl_demo_83016763db">Поверх текущего контекста</string>
     <string name="cyl_demo_3b52b6d4f6" formatted="false">Долгое нажатие на «%@»</string>
+    <string name="cyl_demo_adfd75097a">Открыть: две панели вкладок, один ID страницы</string>
+    <string name="cyl_demo_300f18b032">Две панели вкладок, один ID страницы</string>
 </resources>

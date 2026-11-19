@@ -113,4 +113,6 @@
     <string name="cyl_demo_cdbfe2ac44">Simulated interruptions</string>
     <string name="cyl_demo_83016763db">Over current context</string>
     <string name="cyl_demo_3b52b6d4f6" formatted="false">Long pressed \"%@\"</string>
+    <string name="cyl_demo_adfd75097a">Open: two tab bars, one page ID</string>
+    <string name="cyl_demo_300f18b032">Two tab bars, one page ID</string>
 </resources>

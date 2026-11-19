@@ -113,4 +113,6 @@
     <string name="cyl_demo_cdbfe2ac44">模拟意外情况</string>
     <string name="cyl_demo_83016763db">覆盖当前上下文</string>
     <string name="cyl_demo_3b52b6d4f6" formatted="false">已长按「%@」</string>
+    <string name="cyl_demo_adfd75097a">打开：两个 TabBar，同一个页面 ID</string>
+    <string name="cyl_demo_300f18b032">两个 TabBar，同一个页面 ID</string>
 </resources>

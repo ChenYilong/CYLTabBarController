@@ -9,7 +9,7 @@
         <activity
             android:name="com.cyl.tabbar.demo.TwoTabBarsActivity"
             android:exported="false"
-            android:label="@string/two_tab_bars" />
+            />
         <activity
             android:name="com.cyl.tabbar.demo.DemoHostActivity"
             android:exported="false" />

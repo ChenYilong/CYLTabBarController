@@ -228,3 +228,8 @@
 "Surface opacity: %@ (default 0.40)" = "Непрозрачность поверхности: %@ (по умолчанию 0.40)";
 "Speed: %@" = "Скорость: %@";
 "Long pressed \"%@\"" = "Долгое нажатие на «%@»";
+
+/* [EN] Android example layer, the two tab bars page. */
+/* [CN] Android 示例层，两个 TabBar 的页面。 */
+"Two tab bars, one page ID" = "Две панели вкладок, один ID страницы";
+"Open: two tab bars, one page ID" = "Открыть: две панели вкладок, один ID страницы";

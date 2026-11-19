@@ -228,3 +228,8 @@
 "Surface opacity: %@ (default 0.40)" = "표면 불투명도: %@(기본값 0.40)";
 "Speed: %@" = "속도: %@";
 "Long pressed \"%@\"" = "'%@' 길게 누름";
+
+/* [EN] Android example layer, the two tab bars page. */
+/* [CN] Android 示例层，两个 TabBar 的页面。 */
+"Two tab bars, one page ID" = "탭 바 두 개, 페이지 ID 하나";
+"Open: two tab bars, one page ID" = "열기: 탭 바 두 개, 페이지 ID 하나";

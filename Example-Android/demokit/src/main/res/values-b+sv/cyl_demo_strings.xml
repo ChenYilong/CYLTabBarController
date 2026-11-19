@@ -113,4 +113,6 @@
     <string name="cyl_demo_cdbfe2ac44">Simulerade avbrott</string>
     <string name="cyl_demo_83016763db">Över aktuell kontext</string>
     <string name="cyl_demo_3b52b6d4f6" formatted="false">Långt tryck på ”%@”</string>
+    <string name="cyl_demo_adfd75097a">Öppna: två flikfält, ett sid-ID</string>
+    <string name="cyl_demo_300f18b032">Två flikfält, ett sid-ID</string>
 </resources>

@@ -113,4 +113,6 @@
     <string name="cyl_demo_cdbfe2ac44">Simulovaná přerušení</string>
     <string name="cyl_demo_83016763db">Nad aktuálním kontextem</string>
     <string name="cyl_demo_3b52b6d4f6" formatted="false">Dlouze stisknuto „%@“</string>
+    <string name="cyl_demo_adfd75097a">Otevřít: dva panely karet, jedno ID stránky</string>
+    <string name="cyl_demo_300f18b032">Dva panely karet, jedno ID stránky</string>
 </resources>

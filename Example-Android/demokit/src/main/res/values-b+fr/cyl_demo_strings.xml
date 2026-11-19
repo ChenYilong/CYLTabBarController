@@ -113,4 +113,6 @@
     <string name="cyl_demo_cdbfe2ac44">Interruptions simulées</string>
     <string name="cyl_demo_83016763db">Par-dessus le contexte actuel</string>
     <string name="cyl_demo_3b52b6d4f6" formatted="false">Appui long sur « %@ »</string>
+    <string name="cyl_demo_adfd75097a">Ouvrir : deux barres d’onglets, un seul ID de page</string>
+    <string name="cyl_demo_300f18b032">Deux barres d’onglets, un seul ID de page</string>
 </resources>

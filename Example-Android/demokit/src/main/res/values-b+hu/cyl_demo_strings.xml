@@ -113,4 +113,6 @@
     <string name="cyl_demo_cdbfe2ac44">Szimulált megszakítások</string>
     <string name="cyl_demo_83016763db">A jelenlegi kontextus fölött</string>
     <string name="cyl_demo_3b52b6d4f6" formatted="false">Hosszan nyomva: „%@”</string>
+    <string name="cyl_demo_adfd75097a">Megnyitás: két lapsáv, egy oldalazonosító</string>
+    <string name="cyl_demo_300f18b032">Két lapsáv, egy oldalazonosító</string>
 </resources>
