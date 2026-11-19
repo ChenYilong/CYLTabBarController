@@ -47,7 +47,7 @@ open class CYLAnimatedItemStackView @JvmOverloads constructor(
      */
     constructor(context: Context, itemViews: List<CYLAnimatedItemView>, actions: Map<String, ActionHandler> = emptyMap()) : this(context) {
         handlers.putAll(actions)
-        itemViews.forEach { append(it, null, DEFAULT_SPACING_DP) }
+        itemViews.forEach { append(it) }
     }
 
     /**
@@ -68,7 +68,7 @@ open class CYLAnimatedItemStackView @JvmOverloads constructor(
     /**
      * [EN] One item and its action. [CN] 一个条目及其动作。
      */
-    private class Entry(val view: CYLAnimatedItemView, var action: String?)
+    private class Entry(val view: CYLAnimatedItemView, var action: String?, var spacingBeforeDp: Float? = null)
 
     /**
      * [EN] Every item, top to bottom. [CN] 所有条目，自上而下。
@@ -87,6 +87,60 @@ open class CYLAnimatedItemStackView @JvmOverloads constructor(
      */
     var contentMarginDp: Float = DEFAULT_SPACING_DP
         set(value) { field = maxOf(0f, value); updateMargins() }
+
+    /**
+     * [EN] The direction of the stack (iOS `axis`): `Vertical` (default, one item under the other) or `Horizontal` (one row,
+     *      the spacing on the leading side).
+     * [CN] 堆叠方向（iOS `axis`）：`Vertical`（默认，上下排列）或 `Horizontal`（一行，间距位于前侧）。
+     */
+    var axis: CYLAnimatedItemAxis = CYLAnimatedItemAxis.Vertical
+        set(value) {
+            field = value
+            stackView.orientation = if (value == CYLAnimatedItemAxis.Horizontal) LinearLayout.HORIZONTAL else LinearLayout.VERTICAL
+            stackView.gravity = if (value == CYLAnimatedItemAxis.Horizontal) Gravity.CENTER_VERTICAL else Gravity.CENTER_HORIZONTAL
+            updateSpacing()
+        }
+
+    /**
+     * [EN] The space between items appended without their own spacing, in dp (iOS `spacing`; 16 by default, never negative).
+     * [CN] 追加时没有指定间距的条目之间的间距，单位 dp（iOS `spacing`；默认 16，不为负）。
+     */
+    var spacingDp: Float = DEFAULT_SPACING_DP
+        set(value) { field = maxOf(0f, value); updateSpacing() }
+
+    /**
+     * [EN] The default icon color of the items (iOS stack `itemAppearance`): an item's own `iconColor` wins; null for none.
+     * [CN] 条目的默认图标颜色（iOS 堆叠的 `itemAppearance`）：条目自己的 `iconColor` 优先；null 表示没有。
+     */
+    var iconColor: Int? = null
+        set(value) { field = value; entries.forEach { it.view.stackIconColor = value } }
+
+    /** [EN] The default icon color of selected items; null uses `iconColor`. [CN] 选中条目的默认图标颜色；null 时使用 `iconColor`。 */
+    var selectedIconColor: Int? = null
+        set(value) { field = value; entries.forEach { it.view.stackSelectedIconColor = value } }
+
+    /** [EN] The space before an item in dp: 0 for the first, else its own spacing or `spacingDp`. [CN] 条目之前的间距（dp）：第一个为 0，否则为其自身间距或 `spacingDp`。 */
+    fun spacingBeforeDpOf(itemView: CYLAnimatedItemView): Float {
+        val index = entries.indexOfFirst { it.view === itemView }
+        if (index <= 0) return 0f
+        return entries[index].spacingBeforeDp ?: spacingDp
+    }
+
+    /** [EN] Sets every item's margin on the stack's axis. [CN] 按堆叠方向设置每个条目的外边距。 */
+    private fun updateSpacing() {
+        entries.forEach { entry ->
+            val params = entry.view.layoutParams as? LinearLayout.LayoutParams ?: return@forEach
+            val space = dp(spacingBeforeDpOf(entry.view))
+            if (axis == CYLAnimatedItemAxis.Horizontal) {
+                params.topMargin = 0
+                params.marginStart = space
+            } else {
+                params.marginStart = 0
+                params.topMargin = space
+            }
+            entry.view.layoutParams = params
+        }
+    }
 
     /**
      * [EN] The action of a tap anywhere outside an item with an action; null (default) turns that off. A screen reader
@@ -116,13 +170,16 @@ open class CYLAnimatedItemStackView @JvmOverloads constructor(
      *      点击会传给背景。已在堆叠中的条目保持原位。堆叠视图会设置条目的点击监听。
      */
     @JvmOverloads
-    open fun append(itemView: CYLAnimatedItemView, action: String? = null, spacingBeforeDp: Float = DEFAULT_SPACING_DP) {
+    open fun append(itemView: CYLAnimatedItemView, action: String? = null, spacingBeforeDp: Float? = null) {
         if (entries.any { it.view === itemView }) return
         val params = LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT)
-        if (entries.isNotEmpty()) params.topMargin = dp(maxOf(0f, spacingBeforeDp))
         stackView.addView(itemView, params)
-        val entry = Entry(itemView, null)
+        // [EN] null: the stack's `spacingDp`. [CN] null：使用堆叠的 `spacingDp`。
+        val entry = Entry(itemView, null, spacingBeforeDp?.let { maxOf(0f, it) })
         entries.add(entry)
+        itemView.stackIconColor = iconColor
+        itemView.stackSelectedIconColor = selectedIconColor
+        updateSpacing()
         // [EN] Its own action, or for the first item without one the background action (reached by a screen reader: touches
         //      on items without an action go to the background). [CN] 执行自己的动作；没有动作的第一个条目执行背景动作（由读屏触发：
         //      落在无动作条目上的触摸交给背景）。
@@ -144,7 +201,7 @@ open class CYLAnimatedItemStackView @JvmOverloads constructor(
         image: Drawable? = null,
         animationURL: String? = null,
         action: String? = null,
-        spacingBeforeDp: Float = DEFAULT_SPACING_DP,
+        spacingBeforeDp: Float? = null,
     ): CYLAnimatedItemView {
         val itemView = CYLAnimatedItemView(context)
         itemView.axis = CYLAnimatedItemAxis.Vertical
@@ -168,9 +225,11 @@ open class CYLAnimatedItemStackView @JvmOverloads constructor(
         itemView.isClickable = true
         itemView.importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_AUTO
         stackView.removeView(itemView)
+        itemView.stackIconColor = null
+        itemView.stackSelectedIconColor = null
         // [EN] The new first item has no spacing before it, and may carry the background action.
         // [CN] 新的第一个条目前没有间距，并可能承载背景动作。
-        (entries.firstOrNull()?.view?.layoutParams as? LinearLayout.LayoutParams)?.topMargin = 0
+        updateSpacing()
         entries.forEach { updateAccessibility(it) }
     }
 

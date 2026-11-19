@@ -1,6 +1,7 @@
 package com.cyl.animateditem
 
 import android.content.Context
+import android.graphics.PorterDuff
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.util.TypedValue
@@ -386,7 +387,51 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
     override fun setSelected(selected: Boolean) {
         val changed = selected != isSelected
         super.setSelected(selected)
-        if (changed) { updateIcon(); onItemStateChanged(); updateAccessibility() }
+        if (changed) { updateIcon(); applyIconColor(); onItemStateChanged(); updateAccessibility() }
+    }
+
+    // MARK: - Icon color 图标颜色
+
+    /**
+     * [EN] The icon color (iOS `itemAppearance.normal.iconColor`): the static icon is drawn in it (a template / symbol image
+     *      takes it whole); null (default) leaves the image as it is, or uses the stack's color in a `CYLAnimatedItemStackView`.
+     * [CN] 图标颜色（iOS `itemAppearance.normal.iconColor`）：静态图标按此颜色绘制（模板 / 符号图片整体着色）；null（默认）保持图片原样，
+     *      在 `CYLAnimatedItemStackView` 中则使用堆叠的颜色。
+     */
+    var iconColor: Int? = null
+        set(value) { field = value; applyIconColor() }
+
+    /**
+     * [EN] The icon color while selected (iOS `itemAppearance.selected.iconColor`); null uses `iconColor`.
+     * [CN] 选中时的图标颜色（iOS `itemAppearance.selected.iconColor`）；null 时使用 `iconColor`。
+     */
+    var selectedIconColor: Int? = null
+        set(value) { field = value; applyIconColor() }
+
+    /** [EN] The colors of the stack that holds the item, used when the item has none. [CN] 容纳该条目的堆叠视图的颜色，条目没有自己的颜色时使用。 */
+    internal var stackIconColor: Int? = null
+        set(value) { field = value; applyIconColor() }
+    internal var stackSelectedIconColor: Int? = null
+        set(value) { field = value; applyIconColor() }
+    private var appliesIconColor = false
+
+    /** [EN] The icon color in effect now, or null. [CN] 当前生效的图标颜色，没有时为 null。 */
+    val effectiveIconColor: Int?
+        get() {
+            if (isSelected) (selectedIconColor ?: stackSelectedIconColor)?.let { return it }
+            return iconColor ?: stackIconColor
+        }
+
+    private fun applyIconColor() {
+        val color = effectiveIconColor
+        if (color != null) {
+            iconView.setColorFilter(color, PorterDuff.Mode.SRC_IN)
+            appliesIconColor = true
+        } else if (appliesIconColor) {
+            // [EN] Only a filter this view set is cleared (a tab button sets its own). [CN] 只清除本视图设置的滤镜（Tab 按钮会设置自己的）。
+            iconView.clearColorFilter()
+            appliesIconColor = false
+        }
     }
 
     override fun setEnabled(enabled: Boolean) {

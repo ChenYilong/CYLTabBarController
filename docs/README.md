@@ -198,6 +198,7 @@ docs/
 ├── Version-Highlights.md
 ├── WeChat-Mini-Program.md
 ├── assets/
+│   ├── android-animated-item-stack-axis-tint.png
 │   ├── android-animated-item-stack-view.png
 │   ├── android-api37-20261118-rive-dark-mode-options.png
 │   ├── android-api37-20261118-rive-tint-at-0505042f.png

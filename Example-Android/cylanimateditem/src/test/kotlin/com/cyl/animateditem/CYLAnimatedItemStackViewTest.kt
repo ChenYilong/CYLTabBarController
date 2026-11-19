@@ -216,4 +216,46 @@ class CYLAnimatedItemStackViewTest {
         tap(stack, x, y)
         assertEquals(listOf("reload", "reload", "retry"), events)
     }
+
+    @Test
+    fun aHorizontalStackLaysItsItemsInARowWithTheSpacingOnTheLeadingSide() {
+        val stack = CYLAnimatedItemStackView(activity)
+        val density = activity.resources.displayMetrics.density
+        val edit = stack.appendItem("Edit")
+        val remove = stack.appendItem("Remove")
+        val close = stack.appendItem("Close", spacingBeforeDp = 4f)
+        assertEquals(LinearLayout.VERTICAL, stack.stackView.orientation, "vertical by default")
+        assertEquals((16 * density).toInt(), (remove.layoutParams as LinearLayout.LayoutParams).topMargin)
+        stack.axis = CYLAnimatedItemAxis.Horizontal
+        stack.spacingDp = 10f
+        assertEquals(LinearLayout.HORIZONTAL, stack.stackView.orientation)
+        val removeParams = remove.layoutParams as LinearLayout.LayoutParams
+        assertEquals((10 * density).toInt(), removeParams.marginStart, "as iOS stackView.spacing")
+        assertEquals(0, removeParams.topMargin)
+        assertEquals((4 * density).toInt(), (close.layoutParams as LinearLayout.LayoutParams).marginStart, "its own spacing wins")
+        assertEquals(0, (edit.layoutParams as LinearLayout.LayoutParams).marginStart, "the first item has none")
+        stack.remove(edit)
+        assertEquals(0f, stack.spacingBeforeDpOf(remove), "the new first item has none")
+    }
+
+    @Test
+    fun theStackIconColorTintsItemsWithoutTheirOwn() {
+        val stack = CYLAnimatedItemStackView(activity)
+        val edit = stack.appendItem(null, ColorDrawable(0xFF000000.toInt()))
+        val remove = stack.appendItem(null, ColorDrawable(0xFF000000.toInt()))
+        assertNull(edit.effectiveIconColor, "no tint by default")
+        assertNull(edit.iconView.colorFilter)
+        stack.iconColor = 0xFF8E8E93.toInt()
+        remove.iconColor = 0xFFFF3B30.toInt()
+        assertEquals(0xFF8E8E93.toInt(), edit.effectiveIconColor)
+        assertEquals(0xFFFF3B30.toInt(), remove.effectiveIconColor, "an item's own color wins")
+        assertTrue(edit.iconView.colorFilter != null)
+        stack.selectedIconColor = 0xFF007AFF.toInt()
+        edit.isSelected = true
+        assertEquals(0xFF007AFF.toInt(), edit.effectiveIconColor)
+        stack.remove(edit)
+        edit.isSelected = false
+        assertNull(edit.effectiveIconColor, "a removed item drops the stack color")
+        assertNull(edit.iconView.colorFilter)
+    }
 }
