@@ -18,6 +18,7 @@ class TwoTabBarsActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        DemoText.attach(this)
         val column = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
         for ((name, color) in listOf("A" to Color.argb(64, 0, 122, 255), "B" to Color.argb(64, 255, 149, 0))) {
             val registry = CYLTabBarPageRegistry().apply {

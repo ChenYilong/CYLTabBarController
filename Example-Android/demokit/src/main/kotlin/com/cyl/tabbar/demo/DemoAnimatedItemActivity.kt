@@ -71,9 +71,10 @@ class DemoAnimatedItemActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        DemoText.attach(this)
         title = "CYLAnimatedItemView"
         status = TextView(this).apply {
-            text = "Tap, long press or drag an item"
+            text = cylDemoText("Tap, long press or drag an item")
             setPadding(dp(16f), dp(16f), dp(16f), dp(16f))
             // [EN] Read out when it changes. [CN] 变化时朗读。
             accessibilityLiveRegion = android.view.View.ACCESSIBILITY_LIVE_REGION_POLITE

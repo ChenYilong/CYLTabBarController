@@ -43,7 +43,7 @@ object DemoLiquidGlassSurface {
             })
         }
         val reset = TextView(context).apply {
-            text = "Reset to 0.40"
+            text = cylDemoText("Reset to 0.40")
             setTextColor(Color.rgb(0, 122, 255))
             setPadding(0, padding / 2, 0, 0)
             setOnClickListener { slider.progress = (0.4f * STEPS).toInt() }

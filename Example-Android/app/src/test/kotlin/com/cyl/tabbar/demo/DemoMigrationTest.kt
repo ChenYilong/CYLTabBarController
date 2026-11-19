@@ -170,4 +170,17 @@ class DemoMigrationTest {
             assertEquals(theme, controller.cyl_themeManager.currentThemeIdentifier)
         }
     }
+
+    @Test
+    fun exampleTextsComeFromTheStringTablesInTheCurrentLanguage() {
+        val (activity, _) = launch()
+        assertEquals("Choose a skin", DemoText.string("Choose a skin", context = activity))
+        val chinese = activity.createConfigurationContext(android.content.res.Configuration(activity.resources.configuration).apply {
+            setLocale(java.util.Locale.forLanguageTag("zh-Hans"))
+        })
+        assertEquals("选择皮肤", DemoText.string("Choose a skin", context = chinese))
+        assertEquals("A text without an entry is shown as given", DemoText.string("A text without an entry is shown as given", context = chinese))
+        assertEquals("2 of 5", DemoText.fill("%1\$@ of %2\$@", arrayOf(2, 5)))
+        assertEquals("a b", DemoText.fill("%@ %@", arrayOf("a", "b")))
+    }
 }

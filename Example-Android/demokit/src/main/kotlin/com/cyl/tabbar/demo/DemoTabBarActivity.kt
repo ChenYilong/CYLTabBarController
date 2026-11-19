@@ -28,6 +28,7 @@ abstract class DemoTabBarActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        DemoText.attach(this)
         DemoPages.registerOnce()
         // [EN] Image names come from the iOS example's asset catalog first. [CN] 图片名称先在 iOS 示例的资源目录中查找。
         DemoAssets.install()
