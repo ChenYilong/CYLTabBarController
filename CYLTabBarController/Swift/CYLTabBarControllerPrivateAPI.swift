@@ -35,6 +35,8 @@ import UIKit
     @objc(setCylClassicTabBarHiddenRequest:) func cylSetClassicTabBarHiddenRequest(_ value: Bool)
     @objc(cylClassicTabBarAnimationGeneration) func cylClassicTabBarAnimationGeneration() -> UInt
     @objc(setCylClassicTabBarAnimationGeneration:) func cylSetClassicTabBarAnimationGeneration(_ value: UInt)
+    /// [EN] Still Objective-C ("Plus slot"), used by the tab item setup (step 76). [CN] 仍为 Objective-C，供 Tab item 设置使用（第 76 步）。
+    @objc(cyl_tabBarItemsAttributesIncludePlusSlot) func cylTabBarItemsAttributesIncludePlusSlot() -> Bool
     /// [EN] Class-extension state and a loader still in Objective-C, used by the in-place update (step 73). [CN] 仍为 Objective-C 的类扩展状态与加载方法，供原地更新使用（第 73 步）。
     @objc(tabBarItemAnimationURLs) func cylTabBarItemAnimationURLs() -> NSMutableArray
     @objc(tabBarItemAnimationSizes) func cylTabBarItemAnimationSizes() -> NSMutableArray
