@@ -1071,8 +1071,12 @@ final class CYLTabBarInteractionHandler: NSObject, UIGestureRecognizerDelegate {
 
 extension UIViewController {
 
+    /**
+     * [EN] The tap animation of this page's tab, over the controller's `cyl_tabButtonTapAnimationType`.
+     * [CN] 本页面所在 Tab 的点击动画，优先于控制器的 `cyl_tabButtonTapAnimationType`。
+     */
     @objc(cyl_tabButtonAnimation)
-    var cylTabButtonAnimation: CYLTabButtonAnimation? {
+    open var cyl_tabButtonAnimation: CYLTabButtonAnimation? {
         get { objc_getAssociatedObject(self, CYLInteractionKeys.tabButtonAnimation) as? CYLTabButtonAnimation }
         @objc(cyl_setTabButtonAnimation:) set {
             objc_setAssociatedObject(self, CYLInteractionKeys.tabButtonAnimation, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)

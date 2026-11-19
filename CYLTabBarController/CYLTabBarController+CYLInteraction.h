@@ -24,15 +24,8 @@ NS_ASSUME_NONNULL_BEGIN
 #ifndef __swift__
 #endif
 
-/*!
- * FIX: issue #535
- * [EN] A tap animation for this view controller's tab only; takes precedence over the tab bar controller's.
- * [CN] 仅用于该控制器所在 Tab 的点击动画，优先于 TabBarController 的设置。
- */
-@interface UIViewController (CYLTabButtonAnimation)
-
-@property (nonatomic, strong, nullable, setter=cyl_setTabButtonAnimation:) id<CYLTabButtonAnimation> cyl_tabButtonAnimation;
-
-@end
+// [EN] `UIViewController (CYLTabButtonAnimation)` (`cyl_tabButtonAnimation`) is public Swift since the class switch
+//      (Swift/CYLTabBarController+CYLInteraction.swift). [CN] `UIViewController (CYLTabButtonAnimation)`（`cyl_tabButtonAnimation`）自类切换起为
+//      公开的 Swift（Swift/CYLTabBarController+CYLInteraction.swift）。
 
 NS_ASSUME_NONNULL_END

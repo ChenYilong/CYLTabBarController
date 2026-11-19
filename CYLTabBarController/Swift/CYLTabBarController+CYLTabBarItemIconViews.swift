@@ -434,7 +434,7 @@ extension CYLTabBarController {
     @objc(cyl_applyNavigationTitleOfFollowingPage:title:)
     static func cylApplyNavigationTitle(ofFollowingPage viewController: UIViewController, title: String?) {
         let page = viewController.cyl_getViewControllerInsteadOfNavigation()
-        guard let title, !title.isEmpty, page.cylNavigationTitleFollowsTabBarItemTitle() else {
+        guard let title, !title.isEmpty, page.cyl_navigationTitleFollowsTabBarItemTitle else {
             return
         }
         page.navigationItem.title = title

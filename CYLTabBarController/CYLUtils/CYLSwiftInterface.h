@@ -14,7 +14,17 @@
  *      Swift 模块（SwiftPM）。已翻译为 Swift 的类只在这里声明，因为一个类不能声明两次。Swift 自身编译时不导入（`__swift__`），
  *      否则会把 Swift 自己的声明再导入回去。
  */
-#ifndef __swift__
+// [EN] Not for the SwiftPM C target `CYLTabBarControllerObjC` (-DCYL_OBJC_BASE_TARGET): it sits below the Swift module, which imports it,
+//      so it cannot import the Swift module back. [CN] SwiftPM 的 C 目标 `CYLTabBarControllerObjC`（-DCYL_OBJC_BASE_TARGET）不使用：它位于
+//      Swift 模块之下，由 Swift 模块导入，不能反过来导入 Swift 模块。
+#if defined(CYL_OBJC_BASE_TARGET)
+#define CYL_SKIP_SWIFT_INTERFACE 1
+#elif defined(__building_module)
+#if __building_module(CYLTabBarControllerObjC)
+#define CYL_SKIP_SWIFT_INTERFACE 1
+#endif
+#endif
+#if !defined(__swift__) && !defined(CYL_SKIP_SWIFT_INTERFACE)
 /*!
  * [EN] Objective-C declarations the generated interface uses and that stay Objective-C for now: they must come first, as the
  *      first header that imports this file may not have seen them (step 21: `UIView (CYLBadgeExtention)` adopts
@@ -70,7 +80,7 @@
 #endif
 #endif
 #if defined(SWIFT_PACKAGE)
-#pragma clang module import CYLTabBarControllerSwift
+#pragma clang module import CYLTabBarController
 #elif __has_include(<CYLTabBarController/CYLTabBarController-Swift.h>)
 #import <CYLTabBarController/CYLTabBarController-Swift.h>
 #elif __has_include("CYLTabBarController-Swift.h")

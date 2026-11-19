@@ -6,6 +6,9 @@
 //
 
 import UIKit
+#if SWIFT_PACKAGE
+import CYLAnimatedItemSwift // [EN] `cylTabBarAnimationURLWithOptionsEntryPoint`. [CN] 提供 `cylTabBarAnimationURLWithOptionsEntryPoint`。
+#endif
 #if canImport(CYLAnimatedItem)
 import CYLAnimatedItem
 #endif

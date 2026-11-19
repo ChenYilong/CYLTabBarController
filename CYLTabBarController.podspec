@@ -134,7 +134,7 @@ Pod::Spec.new do |s|
     core.dependency 'CYLTabBarController/CYLAnimatedItem'
     core.source_files = 'CYLTabBarController', 'CYLTabBarController/**/*.{h,m}', 'CYLTabBarController/Swift/*.swift'
     core.exclude_files = [
-    'CYLTabBarController/include/**/*', # SPM-only module map and header shims
+    'CYLTabBarController/Package/**/*', # SPM-only: the umbrella headers, module maps and header links of the C targets
     'CYLTabBarController/CYLUtils/**/*', # the CYLUtils subspec above
     'CYLTabBarController/CYLBadgeView/**/*', # the CYLBadgeView subspec above
     # [EN] The engine (CYLAnimationEngine) and the animators (one subspec each). Core keeps the tab buttons' side of the engine
