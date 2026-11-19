@@ -177,6 +177,9 @@ class DemoMigrationTest {
             val shown = (controller.tabBarItems[0].image as android.graphics.drawable.BitmapDrawable).bitmap
             val expected = (com.cyl.tabbar.CYLTabBarConfiguration.drawable(activity, manifest.pathOfAsset("home", theme, "normal")!!) as android.graphics.drawable.BitmapDrawable).bitmap
             assertTrue("$theme: the manifest's home image", shown.sameAs(expected))
+            // [EN] The plus button's default index is computed as on iOS: the middle of the visible regular tabs (2 here: 1).
+            // [CN] PlusButton 的默认位置与 iOS 相同按计算得出：可见常规 Tab 的正中（此处 2 个：1）。
+            assertEquals("$theme: plus button in the middle", controller.viewControllers.size / 2, controller.tabBar.plusButtonIndex())
         }
     }
 

@@ -147,6 +147,8 @@ NS_ASSUME_NONNULL_BEGIN
 + (void)cyl_applyNavigationTitleOfFollowingPage:(UIViewController *)viewController title:(nullable NSString *)title;
 /// [EN] The plus button in the Liquid Glass layers, implemented in Swift (step 70). [CN] PlusButton 在液态玻璃图层中的布局，由 Swift 实现（第 70 步）。
 - (void)cyl_layOutPlusButtonInLiquidGlassLayers;
+/// [EN] FlatDesign subspec only, implemented in Swift (step 71). [CN] 仅扁平样式子库，由 Swift 实现（第 71 步）。
+- (void)cyl_flatDesignViewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator;
 - (void)cyl_plusButton:(CYLPlusButton *)plusButton didChangeWithNotification:(NSNotificationName)name info:(NSDictionary *)info;
 - (void)cyl_syncTabBarItemAccessibility;
 #if CYL_FLATDESIGN_AVAILABLE
