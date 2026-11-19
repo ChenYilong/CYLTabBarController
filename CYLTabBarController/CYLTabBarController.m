@@ -304,7 +304,8 @@ static NSString *const CYLImageOnlyTabAppliedTitleKey = @"appliedTitle";
 #pragma mark -
 #pragma mark - Life Cycle
 
-// [EN] The life cycle and the tab change are Swift (Swift/CYLTabBarController+CYLLifeCycle.swift, step 74); the FlatDesign
+// [EN] The Objective-C forwarders call `super` themselves (the static analyzer, a CI gate, wants it in the override); the Swift
+//      methods do the rest. The life cycle and the tab change are Swift (Swift/CYLTabBarController+CYLLifeCycle.swift, step 74); the FlatDesign
 //      `-_cyl_refreshSystemTabBarVisibilityIfNeeded` is in CYLTabBarController+CYLFlatDesign.swift. The UIKit overrides stay here
 //      as one-line forwarders until the class is Swift: a public Swift override would put an extension of this class into the
 //      generated header before the class.
