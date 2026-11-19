@@ -12,6 +12,7 @@
 #import "../CYLTabBarController/CYLTabBarItemAnimation/CYLTabBarItemAnimatorRegistry.h"
 #import "../CYLTabBarController/CYLTabBarItemAnimation/CYLTabBarItemAnimationPlayableView.h"
 #import <ImageIO/ImageIO.h>
+#import "CYLTabBarControllerTests-Swift.h"
 
 /// [EN] A tab bar theme with a background color only. [CN] 只有背景色的 TabBar 主题。
 @interface CYLTestTabBarTheme : NSObject <CYLTabBarTheme>
@@ -626,19 +627,9 @@ FOUNDATION_EXTERN void CYLTabBarItemAnimationRegisterColors(NSURL *URL, NSDictio
 - (nullable NSDictionary<NSString *, UIColor *> *)colorsForURL:(nullable NSURL *)URL;
 @end
 
-/// [EN] A plus button as an app makes it: its stand-in comes from `+plusButton`. [CN] App 的 PlusButton：其替身来自 `+plusButton`。
-@interface CYLTestPlusButton : CYLPlusButton <CYLPlusButtonSubclassing>
-@end
-
 /// [EN] Implemented in `CYLPlusButton.m`. [CN] 在 `CYLPlusButton.m` 中实现。
 @interface CYLPlusButton (CYLThemeTestsPrivate)
 - (void)cyl_setBackgroundImageDidChangeHandler:(nullable void (^)(void))handler;
-@end
-
-@implementation CYLTestPlusButton
-+ (id)plusButton {
-    return [self new];
-}
 @end
 
 /*!

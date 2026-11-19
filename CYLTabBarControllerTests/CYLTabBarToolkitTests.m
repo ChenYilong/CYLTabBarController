@@ -8,6 +8,7 @@
 #import <XCTest/XCTest.h>
 #import <CYLTabBarController/CYLTabBarController.h>
 #import <CYLTabBarController/CYLTabBar.h>
+#import "CYLTabBarControllerTests-Swift.h"
 
 
 /// [EN] A delegate that refuses the Liquid Glass lens. [CN] 拒绝液态玻璃放大镜的代理。
@@ -17,18 +18,6 @@
 @implementation CYLLensRefusingDelegate
 - (BOOL)tabBarController:(CYLTabBarController *)tabBarController shouldShowPlatterLiquidLensViewForControl:(UIControl *)control {
     return NO;
-}
-@end
-
-/// [EN] A subclass that overrides the delegate method and calls super, as the examples do. [CN] 与示例一样重写代理方法并调用 super 的子类。
-@interface CYLSuperCallingTabBarController : CYLTabBarController
-@property (nonatomic, assign) NSInteger shouldSelectCalls;
-@end
-
-@implementation CYLSuperCallingTabBarController
-- (BOOL)tabBarController:(UITabBarController *)tabBarController shouldSelectViewController:(UIViewController *)viewController {
-    self.shouldSelectCalls += 1;
-    return [super tabBarController:tabBarController shouldSelectViewController:viewController];
 }
 @end
 
@@ -362,7 +351,7 @@
     CYLTabBar *tabBar = tabBarController.tabBar;
     UIControl *control = [UIControl new];
     CYLLensRefusingDelegate *delegate = [CYLLensRefusingDelegate new];
-    tabBarController.delegate = delegate;
+    tabBarController.delegate = (id)delegate;
     call(tabBarController, begin, tabBarController, control);
     XCTAssertFalse(tabBar.liquidGlassContinuousGestureRecognizer.enabled);
     // [EN] The long press recognizer exists only once the tab bar is in a window. [CN] 长按手势只在 TabBar 进入窗口后存在。
@@ -423,7 +412,7 @@
 - (void)testSendDidSelectControlReachesTheDelegate {
     CYLTabBarController *tabBarController = [self newTabBarController];
     CYLDidSelectRecordingDelegate *delegate = [CYLDidSelectRecordingDelegate new];
-    tabBarController.delegate = delegate;
+    tabBarController.delegate = (id)delegate;
     SEL send = NSSelectorFromString(@"cyl_sendDidSelectControl:");
     XCTAssertTrue([tabBarController respondsToSelector:send]);
     UIControl *control = [UIControl new];
@@ -448,7 +437,7 @@
         return;
     }
     CYLDidSelectRecordingDelegate *delegate = [CYLDidSelectRecordingDelegate new];
-    tabBarController.delegate = delegate;
+    tabBarController.delegate = (id)delegate;
     SEL select = NSSelectorFromString(@"didSelectControl:");
     XCTAssertTrue([tabBarController respondsToSelector:select]);
     ((void (*)(id, SEL, id))[tabBarController methodForSelector:select])(tabBarController, select, button);
@@ -478,7 +467,11 @@
     XCTAssertNotNil(userInfo);
     XCTAssertNil(userInfo[CYLTabBarItemIconViewProviderKey]);
     XCTAssertFalse([tabBarController setTabBarItemIconViewProvider:provider atIndex:9], @"no such tab");
+    // [EN] nil on purpose: the call must refuse it. [CN] 故意传入 nil：该调用必须拒绝它。
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wnonnull"
     XCTAssertFalse([tabBarController setTabBarItemIcon:nil selectedIcon:nil size:CGSizeZero atIndex:0], @"no icon");
+#pragma clang diagnostic pop
     [[NSNotificationCenter defaultCenter] removeObserver:observer];
 }
 
