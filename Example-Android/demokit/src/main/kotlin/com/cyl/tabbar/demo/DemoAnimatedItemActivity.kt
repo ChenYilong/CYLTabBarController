@@ -80,23 +80,23 @@ class DemoAnimatedItemActivity : AppCompatActivity() {
             accessibilityLiveRegion = android.view.View.ACCESSIBILITY_LIVE_REGION_POLITE
         }
         val column = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
-        column.addView(caption("GIF, drawn without any animation library"))
+        column.addView(caption(cylDemoText("GIF, drawn without any animation library")))
         column.addView(item("GIF", "file:///android_asset/cyl_tab_sample_animated.gif"))
-        column.addView(caption("Lottie (lottie-android is in this app)"))
+        column.addView(caption(cylDemoText("Lottie (lottie-android is in this app)")))
         column.addView(item("Lottie", "file:///android_asset/green_lottie_tab_discover.json"))
         // [EN] The same file with the tint options (docs/Tab-Bar-Item-Animation.md, "Tint, or keep the original colors"): the row
         //      above keeps the file's own colors, the default; this one is drawn in one color, dark blue by day and white at night.
         // [CN] 同一文件加上着色选项（docs/Tab-Bar-Item-Animation.md，"Tint, or keep the original colors"）：上一行保持文件自身颜色（默认）；
         //      这一行用单一颜色绘制，日间深蓝，夜间白色。
-        column.addView(caption("Lottie with tint #3A57ED, darkTint #FFFFFF (the row above keeps its colors)"))
-        column.addView(item("Lottie tinted", CYLTabBarAnimationURLWithOptions("file:///android_asset/green_lottie_tab_discover.json", mapOf(
+        column.addView(caption(cylDemoText("Lottie with tint #3A57ED, darkTint #FFFFFF (the row above keeps its colors)")))
+        column.addView(item(cylDemoText("Lottie tinted"), CYLTabBarAnimationURLWithOptions("file:///android_asset/green_lottie_tab_discover.json", mapOf(
             CYLConstants.CYLTabBarAnimationOptionTint to "#3A57ED",
             CYLConstants.CYLTabBarAnimationOptionDarkTint to "#FFFFFF",
         ))))
-        column.addView(caption("A missing file: the placeholder shows"))
+        column.addView(caption(cylDemoText("A missing file: the placeholder shows")))
         column.addView(item("Missing", "file:///android_asset/cyl_missing_animation.json"))
-        column.addView(caption("Vertical, with an accessory (×) and dragging"))
-        column.addView(item("Drag me", "file:///android_asset/cyl_tab_sample_animated.gif") {
+        column.addView(caption(cylDemoText("Vertical, with an accessory (×) and dragging")))
+        column.addView(item(cylDemoText("Drag me"), "file:///android_asset/cyl_tab_sample_animated.gif") {
             axis = CYLAnimatedItemAxis.Vertical
             isDragEnabled = true
             accessoryView = ImageView(context).apply {

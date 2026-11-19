@@ -644,7 +644,7 @@ open class CYLTabBarHostView @JvmOverloads constructor(context: Context, attrs: 
             val images = values.map { value ->
                 resolver?.invoke(value) ?: when (value) {
                     is Drawable -> value
-                    is String -> if (value.contains("://")) urlImage(value) else CYLTabBarConfiguration.imageResolver.drawable(context, value)
+                    is String -> if (value.contains("://")) urlImage(value) else CYLTabBarConfiguration.drawable(context, value)
                     else -> null
                 }
             }

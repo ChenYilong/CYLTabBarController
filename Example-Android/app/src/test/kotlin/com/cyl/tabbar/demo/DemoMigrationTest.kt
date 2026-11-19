@@ -163,11 +163,20 @@ class DemoMigrationTest {
         val row = DemoCatalog.sections(home).first { it.title == "Configuration file" }.rows[1]
         assertTrue(row.title.contains("configuration manifest"))
         val manifest = com.cyl.tabbar.CYLTabBarManifest.manifestWithRoute(activity, "Manifests/cyl_tabbar_manifest.json")
+        // [EN] The images of the manifest are in the app assets (Skins/2.1.0, "../" from Manifests). [CN] 清单的图片在 App assets 中（Skins/2.1.0，相对 Manifests 为 "../"）。
+        for (theme in listOf("light", "dark", "christmas")) {
+            assertNotNull("$theme home image", manifest.pathOfAsset("home", theme, "normal"))
+        }
+        assertEquals(null, manifest.assetError())
         for (theme in listOf("light", "dark", "christmas")) {
             val controller = manifest.tabBarController(activity)
             controller.cyl_themeManager.currentThemeIdentifier = theme
             assertTrue("$theme: tabs", controller.viewControllers.isNotEmpty())
             assertEquals(theme, controller.cyl_themeManager.currentThemeIdentifier)
+            // [EN] The tab images are the manifest's PNG assets, not the demo resolver's fallback icon. [CN] Tab 图片是清单的 PNG 资源，而不是演示解析器的后备图标。
+            val shown = (controller.tabBarItems[0].image as android.graphics.drawable.BitmapDrawable).bitmap
+            val expected = (com.cyl.tabbar.CYLTabBarConfiguration.drawable(activity, manifest.pathOfAsset("home", theme, "normal")!!) as android.graphics.drawable.BitmapDrawable).bitmap
+            assertTrue("$theme: the manifest's home image", shown.sameAs(expected))
         }
     }
 

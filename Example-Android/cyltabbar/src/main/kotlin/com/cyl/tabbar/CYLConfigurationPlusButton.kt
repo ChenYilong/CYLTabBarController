@@ -219,7 +219,7 @@ class CYLConfigurationPlusButton(context: Context, private val action: ((CYLPlus
 
         private fun drawable(viewContext: Context, value: Any?): Drawable? = when (value) {
             is Drawable -> value
-            is String -> CYLTabBarConfiguration.imageResolver.drawable(viewContext, value)
+            is String -> CYLTabBarConfiguration.drawable(viewContext, value)
             else -> null
         }
 

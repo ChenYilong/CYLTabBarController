@@ -667,15 +667,14 @@ open class CYLTabBarController(val activity: FragmentActivity) {
 
     private fun makeItem(attributes: Map<String, Any?>): CYLTabBarItem {
         val item = CYLTabBarItem(attributes)
-        val resolver = CYLTabBarConfiguration.imageResolver
-        (attributes[CYLConstants.CYLTabBarItemImage] as? String)?.let { item.image = resolver.drawable(activity, it) }
-        (attributes[CYLConstants.CYLTabBarItemSelectedImage] as? String)?.let { item.selectedImage = resolver.drawable(activity, it) }
+        (attributes[CYLConstants.CYLTabBarItemImage] as? String)?.let { item.image = CYLTabBarConfiguration.drawable(activity, it) }
+        (attributes[CYLConstants.CYLTabBarItemSelectedImage] as? String)?.let { item.selectedImage = CYLTabBarConfiguration.drawable(activity, it) }
         (attributes[CYLConstants.CYLTabBarItemImage] as? android.graphics.drawable.Drawable)?.let { item.image = it }
         (attributes[CYLConstants.CYLTabBarItemSelectedImage] as? android.graphics.drawable.Drawable)?.let { item.selectedImage = it }
         // [EN] `CYLTabBarItemDarkImage` / `CYLTabBarItemSelectedDarkImage` in night mode, as iOS picks them in Dark Mode. [CN] 夜间模式下使用 `CYLTabBarItemDarkImage` / `CYLTabBarItemSelectedDarkImage`，与 iOS 深色模式一致。
         if ((activity.resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) == android.content.res.Configuration.UI_MODE_NIGHT_YES) {
-            imageValue(attributes[CYLConstants.CYLTabBarItemDarkImage], resolver)?.let { item.image = it }
-            imageValue(attributes[CYLConstants.CYLTabBarItemSelectedDarkImage], resolver)?.let { item.selectedImage = it }
+            imageValue(attributes[CYLConstants.CYLTabBarItemDarkImage])?.let { item.image = it }
+            imageValue(attributes[CYLConstants.CYLTabBarItemSelectedDarkImage])?.let { item.selectedImage = it }
         }
         if (item.selectedImage == null) item.selectedImage = item.image
         item.cyl_imageInsets = CYLTabBarConfiguration.edgeInsetsValue(attributes[CYLConstants.CYLTabBarItemImageInsets]) ?: CYLEdgeInsets.zero
@@ -697,9 +696,9 @@ open class CYLTabBarController(val activity: FragmentActivity) {
         return item
     }
 
-    private fun imageValue(value: Any?, resolver: CYLTabBarConfiguration.CYLTabBarImageResolver): android.graphics.drawable.Drawable? = when (value) {
+    private fun imageValue(value: Any?): android.graphics.drawable.Drawable? = when (value) {
         is android.graphics.drawable.Drawable -> value
-        is String -> resolver.drawable(activity, value)
+        is String -> CYLTabBarConfiguration.drawable(activity, value)
         else -> null
     }
 
@@ -1098,7 +1097,7 @@ open class CYLTabBarController(val activity: FragmentActivity) {
             else -> CYLTabBarItemAnimationFiles.openLocal(activity, url)?.use { it.readBytes() }
         }
         when (bytes) {
-            null -> CYLTabBarConfiguration.imageResolver.drawable(activity, url)
+            null -> CYLTabBarConfiguration.drawable(activity, url)
             // [EN] A GIF that cannot be decoded as a movie shows its first frame. [CN] 无法按动画解码的 GIF 显示其第一帧。
             else -> (if (CYLGIFDrawable.isGIF(bytes)) CYLGIFDrawable.fromBytes(bytes) else null)
                 ?: android.graphics.drawable.BitmapDrawable(activity.resources, android.graphics.BitmapFactory.decodeByteArray(bytes, 0, bytes.size))
@@ -1122,8 +1121,8 @@ open class CYLTabBarController(val activity: FragmentActivity) {
         val plus = tabBar.plusButton ?: return
         val oldTitle = plus.cyl_title
         plus.cyl_updateTitle(attributes[CYLConstants.CYLTabBarItemTitle] as? String,
-            (attributes[CYLConstants.CYLTabBarItemImage] as? String)?.let { CYLTabBarConfiguration.imageResolver.drawable(activity, it) },
-            (attributes[CYLConstants.CYLTabBarItemSelectedImage] as? String)?.let { CYLTabBarConfiguration.imageResolver.drawable(activity, it) })
+            (attributes[CYLConstants.CYLTabBarItemImage] as? String)?.let { CYLTabBarConfiguration.drawable(activity, it) },
+            (attributes[CYLConstants.CYLTabBarItemSelectedImage] as? String)?.let { CYLTabBarConfiguration.drawable(activity, it) })
         cyl_applyNavigationTitleOfSelectedPage()
         // [EN] As on iOS: object is the plus button's page, or the plus button when it has none. [CN] 与 iOS 相同：object 为 PlusButton 的页面，没有页面时为 PlusButton。
         val plusChild = plus.provider?.plusChildViewController()

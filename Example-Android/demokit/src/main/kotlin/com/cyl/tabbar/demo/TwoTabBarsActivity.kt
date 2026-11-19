@@ -23,7 +23,7 @@ class TwoTabBarsActivity : AppCompatActivity() {
         val column = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
         for ((name, color) in listOf("A" to Color.argb(64, 0, 122, 255), "B" to Color.argb(64, 255, 149, 0))) {
             val registry = CYLTabBarPageRegistry().apply {
-                registerPageProvider({ id, _ -> TextPageFragment.newInstance("Tab bar $name · page ID \"$id\"", background = color) }, listOf("home", "me"))
+                registerPageProvider({ id, _ -> TextPageFragment.newInstance(cylDemoText("Tab bar %@ · page ID \"%@\"", name, id), background = color) }, listOf("home", "me"))
             }
             val controller = CYLTabBarController(this, mapOf(
                 CYLConstants.CYLTabBarControllerPageRegistry to registry,
