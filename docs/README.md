@@ -309,6 +309,7 @@ docs/
 │   ├── harmonyos-emulator-pages-b7fdf26.png
 │   ├── harmonyos-flatdesign-liquidglass-taps-mate70pro.png
 │   ├── harmonyos-flatdesign-tint-fixed.png
+│   ├── harmonyos-gif-image-rest-then-play.png
 │   ├── harmonyos-gif-svga-tint-option.png
 │   ├── harmonyos-gif-svga-tint-x86_64.png
 │   ├── harmonyos-home-mate70pro-api21.jpeg
