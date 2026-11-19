@@ -17,7 +17,7 @@ private final class CYLRecordingTintView: UIView {
     var plainCalls = 0
 
     @objc(cyl_applyAnimationViewTintColor:)
-    func applyTint(_ color: UIColor?) {
+    func applyTint(_: UIColor?) {
         plainCalls += 1
     }
 

@@ -1029,7 +1029,7 @@ final class CYLTabBarInteractionHandler: NSObject, UIGestureRecognizerDelegate {
      * [CN] 两个手势与其他手势同时识别：液态玻璃在 TabBar 上有自己的长按手势，竖向 tableView 的拖动手势在水平滑动时也会开始。
      */
     func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer,
-                           shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+                           shouldRecognizeSimultaneouslyWith _: UIGestureRecognizer) -> Bool {
         gestureRecognizer === longPressGestureRecognizer || gestureRecognizer === swipeGestureRecognizer
     }
 
@@ -1190,7 +1190,7 @@ extension CYLTabBarController {
     }
 
     @objc(tabBarController:shouldShowPlatterLiquidLensViewForControl:)
-    func cylTabBarController(_ tabBarController: CYLTabBarController, shouldShowPlatterLiquidLensViewFor control: UIControl) -> Bool {
+    func cylTabBarController(_ tabBarController: CYLTabBarController, shouldShowPlatterLiquidLensViewFor _: UIControl) -> Bool {
         let tabBar: UITabBar = tabBarController.tabBar
         guard CYLConstants.isLiquidGlassActive(), let tabBar = tabBar as? CYLTabBar else {
             return false

@@ -515,8 +515,8 @@ final class CYLTabBarMinimizeScrollTracker: NSObject, UIGestureRecognizerDelegat
         }
     }
 
-    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer,
-                           shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+    func gestureRecognizer(_: UIGestureRecognizer,
+                           shouldRecognizeSimultaneouslyWith _: UIGestureRecognizer) -> Bool {
         true
     }
 

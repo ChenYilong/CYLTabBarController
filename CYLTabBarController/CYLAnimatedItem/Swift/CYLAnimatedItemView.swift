@@ -953,7 +953,7 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
         set { super.accessibilityCustomActions = newValue }
     }
 
-    @objc private func cyl_performAccessoryAction(_ action: UIAccessibilityCustomAction) -> Bool {
+    @objc private func cyl_performAccessoryAction(_: UIAccessibilityCustomAction) -> Bool {
         cyl_handleAccessoryTap()
         return true
     }
@@ -976,7 +976,7 @@ extension CYLAnimatedItemView: CYLTabBarItemAnimationFailureHandling {
      [EN] A corrupted file, a parse error or a failed download: drop the animation; the static image or the placeholder shows.
      [CN] 文件损坏、解析错误或下载失败：移除动画，显示静态图片或占位图。
      */
-    open func cylAnimationViewDidFail(_ animationView: UIView, error: Error?) {
+    open func cylAnimationViewDidFail(_ animationView: UIView, error _: Error?) {
         guard animationView === self.animationView else { return }
         cyl_stopLoopTimer()
         animationView.removeFromSuperview()

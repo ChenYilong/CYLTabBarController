@@ -795,7 +795,7 @@ extension CYLTabBarHostView {
      * [CN] 每次点击 Tab（包括已选中的 Tab），与 Objective-C 示例中的 `-tabBarController:didSelectControl:` 相同。
      */
     @objc(tabBarController:didSelectControl:)
-    func cyl_tabBarController(_ tabBarController: UITabBarController, didSelectControl control: UIControl) {
+    func cyl_tabBarController(_: UITabBarController, didSelectControl control: UIControl) {
         guard let controller = self.tabBarController, control.cyl_isTabButton(), !control.cyl_isPlusControl() else { return }
         if let selected = controller.selectedViewController, let index = CYLTabBarHostSupport.pages(of: controller).firstIndex(of: selected) {
             didSelectTab?(index, selected.cyl_tabBarItemIdentifier ?? "")
@@ -808,7 +808,7 @@ extension CYLTabBarHostView {
      * [CN] Tab 由 `-tabBarController:didSelectControl:` 上报；这里只处理 PlusButton 自己的页面：下标 -1 与 PlusButton 的标识。
      */
     @objc(tabBarController:didSelectViewController:)
-    func cyl_tabBarController(_ tabBarController: UITabBarController, didSelectViewController viewController: UIViewController) {
+    func cyl_tabBarController(_: UITabBarController, didSelectViewController viewController: UIViewController) {
         guard let controller = self.tabBarController,
               viewController === CYLPlusButton.plusChildViewController(forTabBarContext: controller.context) else {
             return

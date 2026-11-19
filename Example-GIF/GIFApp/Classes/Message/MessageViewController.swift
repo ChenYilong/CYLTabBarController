@@ -84,19 +84,19 @@ class MessageViewController: UIViewController, CYLAnimatedItemViewDelegate {
 
     // MARK: - CYLAnimatedItemViewDelegate
 
-    func animatedItemViewDidTap(_ itemView: CYLAnimatedItemView) {
+    func animatedItemViewDidTap(_: CYLAnimatedItemView) {
         show(event: "点击了组件")
     }
 
-    func animatedItemViewDidTapAccessory(_ itemView: CYLAnimatedItemView) {
+    func animatedItemViewDidTapAccessory(_: CYLAnimatedItemView) {
         show(event: "点击了附加图标")
     }
 
-    func animatedItemViewDidBeginDrag(_ itemView: CYLAnimatedItemView) {
+    func animatedItemViewDidBeginDrag(_: CYLAnimatedItemView) {
         show(event: "拖拽中")
     }
 
-    func animatedItemView(_ itemView: CYLAnimatedItemView, didEndDragWithTranslation translation: CGPoint, cancelled: Bool) {
+    func animatedItemView(_: CYLAnimatedItemView, didEndDragWithTranslation _: CGPoint, cancelled _: Bool) {
         show(event: "拖拽结束，已弹回")
     }
 
