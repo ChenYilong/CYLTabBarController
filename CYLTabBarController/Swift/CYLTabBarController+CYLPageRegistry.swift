@@ -166,7 +166,7 @@ extension CYLTabBarController {
         if wasSelected && count > 0 {
             selectedIndex = min(index, count - 1)
         }
-        let delegate = (self as UITabBarController).delegate as? CYLTabBarControllerDelegate
+        let delegate = cylDelegate
         delegate?.cyl_tabBarController?(self, didLoadPage: page, forPlaceholder: placeholder, at: UInt(index))
     }
 }

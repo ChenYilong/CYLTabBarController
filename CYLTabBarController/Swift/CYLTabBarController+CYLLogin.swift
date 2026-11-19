@@ -121,7 +121,7 @@ extension CYLTabBarController {
         if let block = cyl_loginSettings.requiredBlock {
             return block(self, viewController)
         }
-        let delegate = (self as UITabBarController).delegate as? CYLTabBarControllerDelegate
+        let delegate = cylDelegate
         if let required = delegate?.tabBarController?(self, requiresLoginToSelect: viewController) {
             return required
         }
@@ -176,7 +176,7 @@ extension CYLTabBarController {
             handler(self, viewController, completion)
             return
         }
-        let delegate = (self as UITabBarController).delegate as? CYLTabBarControllerDelegate
+        let delegate = cylDelegate
         if let present = delegate?.tabBarController?(self, presentLoginFor: viewController, completion: completion) {
             return present
         }

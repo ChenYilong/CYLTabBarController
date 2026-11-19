@@ -241,7 +241,7 @@ extension CYLTabBarController {
         if let decider = cylShouldPerformCustomTabActionHandler() {
             return decider(self, viewController)
         }
-        if let delegate = (self as UITabBarController).delegate as? CYLTabBarControllerDelegate,
+        if let delegate = cylDelegate,
            let decision = delegate.tabBarController?(self, shouldPerformCustomActionFor: viewController) {
             return decision
         }
@@ -275,7 +275,7 @@ extension CYLTabBarController {
             handler(self, viewController)
             return true
         }
-        ((self as UITabBarController).delegate as? CYLTabBarControllerDelegate)?.tabBarController?(self, performCustomActionFor: viewController)
+        (cylDelegate)?.tabBarController?(self, performCustomActionFor: viewController)
         return true
     }
 }
