@@ -113,4 +113,6 @@
     <string name="cyl_demo_cdbfe2ac44">Interrupciones simuladas</string>
     <string name="cyl_demo_83016763db">Sobre el contexto actual</string>
     <string name="cyl_demo_3b52b6d4f6" formatted="false">Pulsado prolongadamente «%@»</string>
+    <string name="cyl_demo_adfd75097a">Abrir: dos barras de pestañas, un ID de página</string>
+    <string name="cyl_demo_300f18b032">Dos barras de pestañas, un ID de página</string>
 </resources>

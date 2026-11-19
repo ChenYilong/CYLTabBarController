@@ -113,4 +113,6 @@
     <string name="cyl_demo_cdbfe2ac44">중단 시뮬레이션</string>
     <string name="cyl_demo_83016763db">현재 컨텍스트 위에</string>
     <string name="cyl_demo_3b52b6d4f6" formatted="false">\'%@\' 길게 누름</string>
+    <string name="cyl_demo_adfd75097a">열기: 탭 바 두 개, 페이지 ID 하나</string>
+    <string name="cyl_demo_300f18b032">탭 바 두 개, 페이지 ID 하나</string>
 </resources>

@@ -5004,27 +5004,10 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
 
 #pragma mark - Deprecated Lottie names (compatibility) 已废弃的 Lottie 名称（兼容）
 
-// [EN] Deprecated Lottie names kept for compatibility: implemented here, forwarding to the neutral API.
-// [CN] 为兼容保留的已废弃 Lottie 名称：在此实现，并转发给通用 API。
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-implementations"
-- (NSMutableArray<NSURL *> *)lottieURLs {
-    return self.tabBarItemAnimationURLs;
-}
+// [EN] The deprecated Lottie names (`lottieURLs`, `lottieSizes`, `lottieViewAdded`) and `-rootWindow` are Swift
+//      (`Swift/CYLTabBarController+CYLCompatibility.swift`, step 104); `tabBarHeight` and `items` stay here (instance variables).
+// [CN] 已废弃的 Lottie 名称与 `-rootWindow` 已改为 Swift（第 104 步）；`tabBarHeight` 与 `items` 留在这里（使用实例变量）。
 
-- (NSMutableArray *)lottieSizes {
-    return self.tabBarItemAnimationSizes;
-}
-
-- (BOOL)isLottieViewAdded {
-    return self.isTabBarItemAnimationViewAdded;
-}
-
-#pragma clang diagnostic pop
-
-- (nonnull UIWindow *)rootWindow {
-    return CYLGetRootWindow();
-}
 - (void)setTabBarHeight:(CGFloat)tabBarHeight {
     CYL_IF_NOT_FLATDESIGN_BEGIN     //Not CYLTabBarStyleTypeFlatDesign
         _tabBarHeight = tabBarHeight;

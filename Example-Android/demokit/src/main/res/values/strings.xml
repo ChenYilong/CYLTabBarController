@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="two_tab_bars">Two tab bars, one page ID</string>
-    <string name="open_two_tab_bars">Open: two tab bars, one page ID</string>
-    <string name="open_in_browser">Open in the browser</string>
+    <!-- [EN] The other texts are in cyl_demo_strings.xml (scripts/android-demo-strings.py). [CN] 其他文字在 cyl_demo_strings.xml 中（scripts/android-demo-strings.py）。 -->
     <string name="language_chinese" translatable="false">简体中文</string>
-    <string name="publish">Publish</string>
 </resources>

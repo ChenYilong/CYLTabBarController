@@ -113,4 +113,6 @@
     <string name="cyl_demo_cdbfe2ac44">सिम्युलेटेड रुकावटें</string>
     <string name="cyl_demo_83016763db">वर्तमान context के ऊपर</string>
     <string name="cyl_demo_3b52b6d4f6" formatted="false">\"%@\" को देर तक दबाया</string>
+    <string name="cyl_demo_adfd75097a">खोलें: दो टैब बार, एक पेज ID</string>
+    <string name="cyl_demo_300f18b032">दो टैब बार, एक पेज ID</string>
 </resources>

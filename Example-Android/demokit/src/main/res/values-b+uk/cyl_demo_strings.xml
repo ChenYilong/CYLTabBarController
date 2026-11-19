@@ -113,4 +113,6 @@
     <string name="cyl_demo_cdbfe2ac44">Симульовані переривання</string>
     <string name="cyl_demo_83016763db">Поверх поточного контексту</string>
     <string name="cyl_demo_3b52b6d4f6" formatted="false">Довге натискання на «%@»</string>
+    <string name="cyl_demo_adfd75097a">Відкрити: дві панелі вкладок, один ID сторінки</string>
+    <string name="cyl_demo_300f18b032">Дві панелі вкладок, один ID сторінки</string>
 </resources>

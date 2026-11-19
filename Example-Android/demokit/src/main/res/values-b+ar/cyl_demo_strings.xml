@@ -113,4 +113,6 @@
     <string name="cyl_demo_cdbfe2ac44">انقطاعات محاكاة</string>
     <string name="cyl_demo_83016763db">فوق السياق الحالي</string>
     <string name="cyl_demo_3b52b6d4f6" formatted="false">تم الضغط مطولًا على «%@»</string>
+    <string name="cyl_demo_adfd75097a">فتح: شريطا علامات تبويب، معرّف صفحة واحد</string>
+    <string name="cyl_demo_300f18b032">شريطا علامات تبويب، معرّف صفحة واحد</string>
 </resources>

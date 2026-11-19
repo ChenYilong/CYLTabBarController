@@ -113,4 +113,6 @@
     <string name="cyl_demo_cdbfe2ac44">Interruzioni simulate</string>
     <string name="cyl_demo_83016763db">Sopra il contesto corrente</string>
     <string name="cyl_demo_3b52b6d4f6" formatted="false">Premuto a lungo «%@»</string>
+    <string name="cyl_demo_adfd75097a">Apri: due barre di schede, un ID pagina</string>
+    <string name="cyl_demo_300f18b032">Due barre di schede, un ID pagina</string>
 </resources>

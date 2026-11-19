@@ -113,4 +113,6 @@
     <string name="cyl_demo_cdbfe2ac44">Simulierte Unterbrechungen</string>
     <string name="cyl_demo_83016763db">Über aktuellem Kontext</string>
     <string name="cyl_demo_3b52b6d4f6" formatted="false">„%@“ lange gedrückt</string>
+    <string name="cyl_demo_adfd75097a">Öffnen: zwei Tab-Leisten, eine Seiten-ID</string>
+    <string name="cyl_demo_300f18b032">Zwei Tab-Leisten, eine Seiten-ID</string>
 </resources>

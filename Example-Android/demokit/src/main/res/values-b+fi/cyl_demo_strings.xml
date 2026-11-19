@@ -113,4 +113,6 @@
     <string name="cyl_demo_cdbfe2ac44">Simuloidut keskeytykset</string>
     <string name="cyl_demo_83016763db">Nykyisen kontekstin päällä</string>
     <string name="cyl_demo_3b52b6d4f6" formatted="false">Painettu pitkään ”%@”</string>
+    <string name="cyl_demo_adfd75097a">Avaa: kaksi välilehtipalkkia, yksi sivun tunnus</string>
+    <string name="cyl_demo_300f18b032">Kaksi välilehtipalkkia, yksi sivun tunnus</string>
 </resources>

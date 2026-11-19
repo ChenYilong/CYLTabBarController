@@ -228,3 +228,8 @@
 "Surface opacity: %@ (default 0.40)" = "Pinnan peittävyys: %@ (oletus 0.40)";
 "Speed: %@" = "Nopeus: %@";
 "Long pressed \"%@\"" = "Painettu pitkään ”%@”";
+
+/* [EN] Android example layer, the two tab bars page. */
+/* [CN] Android 示例层，两个 TabBar 的页面。 */
+"Two tab bars, one page ID" = "Kaksi välilehtipalkkia, yksi sivun tunnus";
+"Open: two tab bars, one page ID" = "Avaa: kaksi välilehtipalkkia, yksi sivun tunnus";

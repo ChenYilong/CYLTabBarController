@@ -113,4 +113,6 @@
     <string name="cyl_demo_cdbfe2ac44">Simulerte avbrudd</string>
     <string name="cyl_demo_83016763db">Over gjeldende kontekst</string>
     <string name="cyl_demo_3b52b6d4f6" formatted="false">Trykket lenge på «%@»</string>
+    <string name="cyl_demo_adfd75097a">Åpne: to fanelinjer, én side-ID</string>
+    <string name="cyl_demo_300f18b032">To fanelinjer, én side-ID</string>
 </resources>

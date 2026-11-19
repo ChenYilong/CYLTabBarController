@@ -113,4 +113,6 @@
     <string name="cyl_demo_cdbfe2ac44">Întreruperi simulate</string>
     <string name="cyl_demo_83016763db">Peste contextul curent</string>
     <string name="cyl_demo_3b52b6d4f6" formatted="false">Apăsat lung „%@”</string>
+    <string name="cyl_demo_adfd75097a">Deschide: două bare de file, un ID de pagină</string>
+    <string name="cyl_demo_300f18b032">Două bare de file, un ID de pagină</string>
 </resources>

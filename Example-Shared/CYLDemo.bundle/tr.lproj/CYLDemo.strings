@@ -228,3 +228,8 @@
 "Surface opacity: %@ (default 0.40)" = "Yüzey opaklığı: %@ (varsayılan 0.40)";
 "Speed: %@" = "Hız: %@";
 "Long pressed \"%@\"" = "\"%@\" öğesine uzun basıldı";
+
+/* [EN] Android example layer, the two tab bars page. */
+/* [CN] Android 示例层，两个 TabBar 的页面。 */
+"Two tab bars, one page ID" = "İki sekme çubuğu, tek sayfa kimliği";
+"Open: two tab bars, one page ID" = "Aç: iki sekme çubuğu, tek sayfa kimliği";

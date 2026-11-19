@@ -113,4 +113,6 @@
     <string name="cyl_demo_cdbfe2ac44">จำลองการขัดจังหวะ</string>
     <string name="cyl_demo_83016763db">ทับ context ปัจจุบัน</string>
     <string name="cyl_demo_3b52b6d4f6" formatted="false">กดค้างที่ \"%@\"</string>
+    <string name="cyl_demo_adfd75097a">เปิด: แถบแท็บสองแถบ รหัสหน้าเดียว</string>
+    <string name="cyl_demo_300f18b032">แถบแท็บสองแถบ รหัสหน้าเดียว</string>
 </resources>

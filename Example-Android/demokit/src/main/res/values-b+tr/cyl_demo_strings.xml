@@ -113,4 +113,6 @@
     <string name="cyl_demo_cdbfe2ac44">Simüle edilen kesintiler</string>
     <string name="cyl_demo_83016763db">Geçerli bağlamın üzerinde</string>
     <string name="cyl_demo_3b52b6d4f6" formatted="false">\"%@\" öğesine uzun basıldı</string>
+    <string name="cyl_demo_adfd75097a">Aç: iki sekme çubuğu, tek sayfa kimliği</string>
+    <string name="cyl_demo_300f18b032">İki sekme çubuğu, tek sayfa kimliği</string>
 </resources>
