@@ -15,7 +15,10 @@ import { CYLTabButtonAnimation, CYLTabButtonProperty, CYLTabButtonView, CYLTabBu
 import { vibrator } from '@kit.SensorServiceKit';
 import { media } from '@kit.MediaKit';
 import { audio } from '@kit.AudioKit';
-import { router } from '@kit.ArkUI';
+import { router, AnimatedDrawableDescriptor } from '@kit.ArkUI';
+import { image } from '@kit.ImageKit';
+import { http } from '@kit.NetworkKit';
+import { CYLGIFImagePlayback, CYLGIFImageState, cylIsGIFImagePath, cylGIFDuration } from './CYLGIFImagePlayback';
 
 /**
  * [EN] What a screen reader says for a badge (read as part of its host, e.g. "Messages, 99+ new messages"); '' none.
@@ -337,7 +340,13 @@ export struct CYLTabBarController {
    *      is turned off, also while playing (docs/Animated-Item.md, the Rive loop); off by default.
    * [CN] tabBarItemAnimationLoops：选中 Tab 的 Lottie、Rive 或 SVGA 图标每次播放后再次播放，直到关闭，播放中也立即生效；默认关闭。
    */
-  @Prop tabBarItemAnimationLoops: boolean = false;
+  @Prop @Watch('cylOnLoopsChange') tabBarItemAnimationLoops: boolean = false;
+  /** [EN] GIF tab images: playback, decoded frames by path, and a revision that redraws the icons. [CN] GIF Tab 图片：播放状态、按路径缓存的帧，以及触发重绘的修订号。 */
+  private cylGIFPlayback: CYLGIFImagePlayback = new CYLGIFImagePlayback();
+  private cylGIFFrames: Map<string, CYLGIFImageFrames> = new Map();
+  private cylGIFLoading: Set<string> = new Set();
+  private cylGIFDescriptors: Map<number, CYLGIFImageDescriptor> = new Map();
+  @State private cylGIFRevision: number = 0;
   /**
    * [EN] -cyl_coverVisiableTabImageViewOrTabButton:...: an image covering a whole tab button (index -> image), as the
    *      Example's Taobao-style Home cover; undefined: none.
@@ -492,6 +501,8 @@ export struct CYLTabBarController {
     // [CN] cyltabbar 播放 Lottie、Rive 与 SVGA（自带播放器）：由 CYLAnimatedItemView 绘制。
     ['Lottie', 'Rive', 'SVGA'].forEach((type: string) => CYLAnimatedItemEngines.register(type));
     this.loaded = [this.selectedIndex];
+    this.cylGIFPlayback.loops = this.tabBarItemAnimationLoops;
+    this.cylLoadGIFImages();
     while (this.badges.length < this.tabBarItemsAttributes.length) {
       this.badges.push(new CYLBadge());
     }
@@ -1060,10 +1071,131 @@ export struct CYLTabBarController {
     if (this.loaded.indexOf(index) < 0) {
       this.loaded = this.loaded.concat([index]);
     }
+    const previousIndex = this.selectedIndex;
     this.selectedIndex = index;
+    this.cylPlayGIFImageOnSelect(index, previousIndex);
     if (this.didSelect !== undefined) {
       this.didSelect(index, identifier);
     }
+  }
+
+  /**
+   * [EN] The GIF image path of a tab (a ".gif" image URL or path, not the GIF animation keys), or undefined.
+   * [CN] Tab 的 GIF 图片路径（以 ".gif" 结尾的图片 URL 或路径，不含 GIF 动画 key）；没有时为 undefined。
+   */
+  private cylGIFImagePath(index: number): string | undefined {
+    const item = this.tabBarItemsAttributes[index];
+    if (item === undefined || item.gifFilePath !== undefined) {
+      return undefined;
+    }
+    const icon = this.cylIcon(index);
+    return cylIsGIFImagePath(icon) ? icon as string : undefined;
+  }
+
+  /**
+   * [EN] What a GIF tab image shows (docs/GIF-Animation.md): its first frame at rest, an animated drawable of one pass or
+   *      repeating while played; undefined until it is decoded (the plain image is shown meanwhile).
+   * [CN] GIF Tab 图片显示的内容：静止时为第一帧，播放时为播放一遍或重复播放的动画 Drawable；解码完成之前为 undefined（期间显示普通图片）。
+   */
+  private cylGIFImageSource(index: number): image.PixelMap | AnimatedDrawableDescriptor | undefined {
+    const path = this.cylGIFImagePath(index);
+    if (path === undefined || this.cylGIFRevision < 0) {
+      return undefined;
+    }
+    const frames = this.cylGIFFrames.get(path);
+    if (frames === undefined) {
+      return undefined;
+    }
+    const state = this.cylGIFPlayback.stateOf(index);
+    if (state === CYLGIFImageState.Resting) {
+      return frames.frames[0];
+    }
+    // [EN] One drawable per play, so a redraw (a badge change) does not restart it. [CN] 每次播放一个 Drawable，重绘（如角标变化）不会重新开始。
+    const token = this.cylGIFPlayback.tokenOf(index);
+    const cached = this.cylGIFDescriptors.get(index);
+    if (cached !== undefined && cached.token === token && cached.path === path) {
+      return cached.descriptor;
+    }
+    const descriptor = new AnimatedDrawableDescriptor(frames.frames,
+      { duration: frames.duration, iterations: state === CYLGIFImageState.Looping ? -1 : 1 });
+    this.cylGIFDescriptors.set(index, new CYLGIFImageDescriptor(token, path, descriptor));
+    return descriptor;
+  }
+
+  /** [EN] Decodes the GIF images of every tab (normal and selected). [CN] 解码所有 Tab 的 GIF 图片（普通与选中）。 */
+  private cylLoadGIFImages(): void {
+    this.tabBarItemsAttributes.forEach((item: CYLTabBarItemAttributes) => {
+      if (item.gifFilePath !== undefined) {
+        return;
+      }
+      const paths: (Object | undefined)[] = [item.imageURL, item.selectedImageURL, item.image, item.selectedImage,
+        item.darkImage, item.darkSelectedImage];
+      paths.forEach((path: Object | undefined) => {
+        if (cylIsGIFImagePath(path)) {
+          this.cylLoadGIFImage(path as string);
+        }
+      });
+    });
+  }
+
+  private async cylLoadGIFImage(path: string): Promise<void> {
+    if (this.cylGIFFrames.has(path) || this.cylGIFLoading.has(path)) {
+      return;
+    }
+    this.cylGIFLoading.add(path);
+    try {
+      const bytes = await cylReadImageBytes(getContext(this), path);
+      const source = image.createImageSource(bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength));
+      const frames = await source.createPixelMapList();
+      let delays: number[] = [];
+      try {
+        delays = await source.getDelayTimeList();
+      } catch (error) {
+        // [EN] No delays: 100 ms a frame. [CN] 没有延时：每帧 100 毫秒。
+      }
+      await source.release();
+      if (frames.length > 0) {
+        this.cylGIFFrames.set(path, new CYLGIFImageFrames(frames, cylGIFDuration(delays)));
+        this.cylGIFRevision++;
+      }
+    } catch (error) {
+      // [EN] Not decoded: the plain image stays (it animates as before). [CN] 无法解码：保留普通图片（与之前一样播放）。
+      console.warn(`CYLTabBarController: the GIF image ${path} could not be decoded: ${(error as Error).message}`);
+    } finally {
+      this.cylGIFLoading.delete(path);
+    }
+  }
+
+  /**
+   * [EN] A tab was selected or tapped again: its GIF image plays (once, or repeating while looping), the previous tab's rests.
+   * [CN] Tab 被选中或再次点击：播放其 GIF 图片（一次，循环开启时重复），上一个 Tab 的 GIF 回到静止。
+   */
+  private cylPlayGIFImageOnSelect(index: number, previousIndex: number): void {
+    if (previousIndex !== index && previousIndex >= 0 && this.cylGIFPlayback.stateOf(previousIndex) !== CYLGIFImageState.Resting) {
+      this.cylGIFPlayback.stop(previousIndex);
+    }
+    this.cylLoadGIFImages();
+    const path = this.cylGIFImagePath(index);
+    const frames = path === undefined ? undefined : this.cylGIFFrames.get(path);
+    if (frames === undefined) {
+      this.cylGIFRevision++;
+      return;
+    }
+    const token = this.cylGIFPlayback.play(index);
+    this.cylGIFRevision++;
+    if (!this.cylGIFPlayback.loops) {
+      setTimeout(() => {
+        if (this.cylGIFPlayback.finish(index, token)) {
+          this.cylGIFRevision++;
+        }
+      }, frames.duration);
+    }
+  }
+
+  /** [EN] tabBarItemAnimationLoops changed: GIF images follow it. [CN] tabBarItemAnimationLoops 变化：GIF 图片随之变化。 */
+  cylOnLoopsChange(): void {
+    this.cylGIFPlayback.setLoops(this.tabBarItemAnimationLoops, this.selectedIndex, this.tabBarItemsAttributes.length);
+    this.cylGIFRevision++;
   }
 
   /** [EN] The icon of a tab: GIF, then URL, then the images. [CN] Tab 图标：GIF 优先，其次网络图片，最后本地图片。 */
@@ -1409,7 +1541,7 @@ export struct CYLTabBarController {
             },
           })
         } else {
-        Image(this.tapFrameImages[index] ?? this.cylIcon(index))
+        Image(this.tapFrameImages[index] ?? this.cylGIFImageSource(index) ?? this.cylIcon(index))
           .width(this.imageSize)
           .height(this.imageSize)
           .objectFit(ImageFit.Contain)
@@ -1820,4 +1952,51 @@ export function cylTintColorFilter(tint: ResourceColor): ColorFilter {
   const g = parseInt(argb.substring(4, 6), 16) / 255;
   const b = parseInt(argb.substring(6, 8), 16) / 255;
   return new ColorFilter([0, 0, 0, 0, r, 0, 0, 0, 0, g, 0, 0, 0, 0, b, 0, 0, 0, a, 0]);
+}
+
+/** [EN] The decoded frames of a GIF tab image and its play time (ms). [CN] GIF Tab 图片解码后的帧与播放时长（毫秒）。 */
+class CYLGIFImageFrames {
+  frames: image.PixelMap[];
+  duration: number;
+
+  constructor(frames: image.PixelMap[], duration: number) {
+    this.frames = frames;
+    this.duration = duration;
+  }
+}
+
+/** [EN] The animated drawable of one play of a tab's GIF image. [CN] 某个 Tab 的 GIF 图片一次播放的动画 Drawable。 */
+class CYLGIFImageDescriptor {
+  token: number;
+  path: string;
+  descriptor: AnimatedDrawableDescriptor;
+
+  constructor(token: number, path: string, descriptor: AnimatedDrawableDescriptor) {
+    this.token = token;
+    this.path = path;
+    this.descriptor = descriptor;
+  }
+}
+
+/**
+ * [EN] The bytes of an image: an http(s) URL (the app needs ohos.permission.INTERNET), else "resource://rawfile/..." or a
+ *      rawfile path.
+ * [CN] 图片的字节：http(s) 地址（App 需要 ohos.permission.INTERNET），否则为 "resource://rawfile/..." 或 rawfile 路径。
+ */
+async function cylReadImageBytes(context: Context, path: string): Promise<Uint8Array> {
+  if (/^https?:\/\//.test(path)) {
+    const request = http.createHttp();
+    try {
+      const response = await request.request(path, { expectDataType: http.HttpDataType.ARRAY_BUFFER });
+      if (response.responseCode < 200 || response.responseCode >= 300) {
+        throw new Error(`HTTP status ${response.responseCode}`);
+      }
+      return new Uint8Array(response.result as ArrayBuffer);
+    } finally {
+      request.destroy();
+    }
+  }
+  const prefix = 'resource://rawfile/';
+  const rawfile = path.startsWith(prefix) ? path.substring(prefix.length) : path.replace(/^\/+/, '');
+  return await context.resourceManager.getRawFileContent(rawfile);
 }

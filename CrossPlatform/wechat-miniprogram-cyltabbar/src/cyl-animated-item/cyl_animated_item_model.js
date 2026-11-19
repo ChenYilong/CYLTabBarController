@@ -1,3 +1,4 @@
+const { cylIsGIFImagePath } = require('./cyl_gif_image')
 /**
  * [EN] The render model of cyl-animated-item, the mini program counterpart of iOS `CYLAnimatedItemView` (the
  *      CYLAnimatedItem pod) and Android `com.cyl.animateditem.CYLAnimatedItemView`. Pure functions without any wx API,
@@ -163,6 +164,17 @@ function cylAnimatedItemFallbackImage(p, hasSource, animationShows) {
   return p.placeholderImage === undefined || p.placeholderImage === null ? CYL_ANIMATED_ITEM_PLACEHOLDER : p.placeholderImage
 }
 
+/** [EN] The GIF image of an item: its static image when that is a GIF and no animation shows. [CN] 条目的 GIF 图片：静态图片是 GIF 且没有动画显示时。 */
+function cylGIFImageOf(p, hasSource, fallbackImage) {
+  if (hasSource && !p.animationFailed) return ''
+  return cylIsGIFImagePath(fallbackImage) ? fallbackImage : ''
+}
+
+/** [EN] Whether the first-frame still covers the GIF image (decoded, not playing). [CN] 第一帧静帧是否代替 GIF 图片显示（已解码且未播放）。 */
+function cylGIFImageStillShows(p, hasSource, fallbackImage) {
+  return !!cylGIFImageOf(p, hasSource, fallbackImage) && !!p.gifImageReady && !p.gifImagePlaying
+}
+
 function cylAnimatedItemModel(p) {
   const animationPath = p.animationUrl || ''
   const hasAnimationData = !!p.animationData && typeof p.animationData === 'object'
@@ -198,7 +210,11 @@ function cylAnimatedItemModel(p) {
     usesEngine,
     gifPath: gifShows ? cylAnimatedItemGifSource(p, animationPath) : '',
     fallbackImage,
-    fallbackHidden: animationShows && !gifShows,
+    fallbackHidden: (animationShows && !gifShows) || cylGIFImageStillShows(p, hasSource, fallbackImage),
+    // [EN] A GIF given as the image (no animation, or a failed one): it rests on its first frame, drawn on a canvas, until
+    //      it is played (docs/GIF-Animation.md). [CN] 作为图片传入的 GIF（没有动画或动画失败）：在被播放之前停在第一帧（绘制在 canvas 上）。
+    gifImage: cylGIFImageOf(p, hasSource, fallbackImage),
+    gifImageStill: cylGIFImageStillShows(p, hasSource, fallbackImage),
     showsIcon: !!(fallbackImage || usesEngine || gifShows),
     iconStyle: `width: ${iconWidth}px; height: ${iconHeight}px;`,
     // [EN] A tint applies to the static image only; an animation keeps its own colors. [CN] 着色只作用于静态图片。

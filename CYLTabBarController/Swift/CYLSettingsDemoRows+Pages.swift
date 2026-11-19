@@ -228,7 +228,7 @@ final class CYLOutsideBoundsCell: UITableViewCell {
         reload()
     }
 
-    required init?(coder: NSCoder) {
+    required init?(coder _: NSCoder) {
         fatalError("init(coder:) is not used")
     }
 
@@ -296,7 +296,7 @@ final class CYLNavigationSettingSwitch: UISwitch {
         addTarget(self, action: #selector(valueDidChange), for: .valueChanged)
     }
 
-    required init?(coder: NSCoder) {
+    required init?(coder _: NSCoder) {
         fatalError("init(coder:) is not used")
     }
 
@@ -358,8 +358,8 @@ final class CYLSlideTransitionDemoTabBarController: UITabBarController, UITabBar
         return CYLTabBarSlideTransitionAnimator(targetEdge: forward ? .left : .right)
     }
 
-    func tabBarController(_ tabBarController: UITabBarController,
-                          interactionControllerFor animationController: UIViewControllerAnimatedTransitioning) -> UIViewControllerInteractiveTransitioning? {
+    func tabBarController(_: UITabBarController,
+                          interactionControllerFor _: UIViewControllerAnimatedTransitioning) -> UIViewControllerInteractiveTransitioning? {
         let state = panGestureRecognizer.state
         return state == .began || state == .changed ? CYLTabBarInteractiveTransition(gestureRecognizer: panGestureRecognizer) : nil
     }

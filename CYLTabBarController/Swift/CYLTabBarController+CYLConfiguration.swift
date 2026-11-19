@@ -53,18 +53,33 @@ enum CYLConfigurationValues {
 
     // [EN] The keys of the Lottie, PAG, Rive and GIF subspecs by name (#605, B29): a configuration may name them in any build.
     // [CN] Lottie、PAG、Rive 与 GIF 子库的键按名称引用（#605、B29）：配置在任何构建中都可以写这些键。
-    static let pagURL = "CYLTabBarPAGURL", pagFilePath = "CYLTabBarPAGFilePath", pagSize = "CYLTabBarPAGSize"
-    static let pagDarkURL = "CYLTabBarPAGDarkURL", pagDarkFilePath = "CYLTabBarPAGDarkFilePath"
-    static let riveURL = "CYLTabBarRiveURL", riveFilePath = "CYLTabBarRiveFilePath", riveSize = "CYLTabBarRiveSize"
-    static let riveDarkURL = "CYLTabBarRiveDarkURL", riveDarkFilePath = "CYLTabBarRiveDarkFilePath"
+    static let pagURL = "CYLTabBarPAGURL"
+    static let pagFilePath = "CYLTabBarPAGFilePath"
+    static let pagSize = "CYLTabBarPAGSize"
+    static let pagDarkURL = "CYLTabBarPAGDarkURL"
+    static let pagDarkFilePath = "CYLTabBarPAGDarkFilePath"
+    static let riveURL = "CYLTabBarRiveURL"
+    static let riveFilePath = "CYLTabBarRiveFilePath"
+    static let riveSize = "CYLTabBarRiveSize"
+    static let riveDarkURL = "CYLTabBarRiveDarkURL"
+    static let riveDarkFilePath = "CYLTabBarRiveDarkFilePath"
     static let riveDarkColors = "CYLTabBarRiveDarkColors"
-    static let gifURL = "CYLTabBarGIFURL", gifFilePath = "CYLTabBarGIFFilePath", gifSize = "CYLTabBarGIFSize"
-    static let gifDarkURL = "CYLTabBarGIFDarkURL", gifDarkFilePath = "CYLTabBarGIFDarkFilePath"
+    static let gifURL = "CYLTabBarGIFURL"
+    static let gifFilePath = "CYLTabBarGIFFilePath"
+    static let gifSize = "CYLTabBarGIFSize"
+    static let gifDarkURL = "CYLTabBarGIFDarkURL"
+    static let gifDarkFilePath = "CYLTabBarGIFDarkFilePath"
     // FIX: issue #415 — SVGA. [CN] SVGA。
-    static let svgaURL = "CYLTabBarSVGAURL", svgaFilePath = "CYLTabBarSVGAFilePath", svgaSize = "CYLTabBarSVGASize"
-    static let svgaDarkURL = "CYLTabBarSVGADarkURL", svgaDarkFilePath = "CYLTabBarSVGADarkFilePath"
-    static let lottieURL = "CYLTabBarLottieURL", lottieFilePath = "CYLTabBarLottieFilePath", lottieSize = "CYLTabBarLottieSize"
-    static let lottieDarkURL = "CYLTabBarLottieDarkURL", lottieDarkFilePath = "CYLTabBarLottieDarkFilePath"
+    static let svgaURL = "CYLTabBarSVGAURL"
+    static let svgaFilePath = "CYLTabBarSVGAFilePath"
+    static let svgaSize = "CYLTabBarSVGASize"
+    static let svgaDarkURL = "CYLTabBarSVGADarkURL"
+    static let svgaDarkFilePath = "CYLTabBarSVGADarkFilePath"
+    static let lottieURL = "CYLTabBarLottieURL"
+    static let lottieFilePath = "CYLTabBarLottieFilePath"
+    static let lottieSize = "CYLTabBarLottieSize"
+    static let lottieDarkURL = "CYLTabBarLottieDarkURL"
+    static let lottieDarkFilePath = "CYLTabBarLottieDarkFilePath"
     static let lottieDarkColors = "CYLTabBarLottieDarkColors"
     static let lottieLoopsWhenUnselected = "CYLTabBarLottieLoopsWhenUnselected"
 
@@ -584,7 +599,8 @@ enum CYLConfigurationValues {
 
     /** [EN] Case-insensitive edit distance (at most 64 characters); DEBUG hints only. [CN] 不区分大小写的编辑距离（最多 64 个字符），仅用于 DEBUG 提示。 */
     static func editDistance(_ a: String, _ b: String) -> Int {
-        let a = Array(a.lowercased().utf16.prefix(64)), b = Array(b.lowercased().utf16.prefix(64))
+        let a = Array(a.lowercased().utf16.prefix(64))
+        let b = Array(b.lowercased().utf16.prefix(64))
         var row = Array(0...b.count)
         for i in stride(from: 1, through: a.count, by: 1) {
             var diagonal = row[0]

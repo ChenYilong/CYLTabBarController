@@ -304,7 +304,33 @@ open class CYLTabBarController(val activity: FragmentActivity) {
         set(value) {
             field = value
             for (button in tabBar.tabBarButtonArray) if (button.cyl_isTabBarItemAnimationReady()) button.cyl_setTabBarItemAnimationLoops(value)
+            // [EN] GIF images (docs/GIF-Animation.md): off stops them on their first frame; on repeats the selected tab's.
+            // [CN] GIF 图片：关闭时停在第一帧；开启时重复播放选中 Tab 的 GIF。
+            for (button in tabBar.tabBarButtonArray) {
+                if (!value) cyl_gifImagesOfTabButton(button).forEach { it.stop() }
+                else if (button.isSelected) cyl_playAnimatedImagesOfTabButton(button)
+            }
         }
+
+    /**
+     * [EN] The GIF images (`CYLGIFDrawable`) of a tab button: its normal and selected image and the drawable it shows.
+     * [CN] Tab 按钮的 GIF 图片（`CYLGIFDrawable`）：普通与选中图片，以及正在显示的 Drawable。
+     */
+    private fun cyl_gifImagesOfTabButton(control: View): List<CYLGIFDrawable> {
+        val button = control as? CYLTabBarItemButton ?: return emptyList()
+        return listOfNotNull(button.item.image, button.item.selectedImage, button.iconView.drawable)
+            .filterIsInstance<CYLGIFDrawable>().distinct()
+    }
+
+    /**
+     * [EN] Plays the GIF images of a tab button (docs/GIF-Animation.md, as iOS `-cyl_playAnimatedImagesOfTabButton:`): once,
+     *      or repeating while `tabBarItemAnimationLoops` is on. They rest on their first frame otherwise.
+     * [CN] 播放 Tab 按钮的 GIF 图片（与 iOS `-cyl_playAnimatedImagesOfTabButton:` 一致）：播放一次，`tabBarItemAnimationLoops` 开启时重复播放。
+     *      其他时候停在第一帧。
+     */
+    fun cyl_playAnimatedImagesOfTabButton(control: View) {
+        for (gif in cyl_gifImagesOfTabButton(control)) gif.play(tabBarItemAnimationLoops)
+    }
 
     /**
      * [EN] `-cyl_playAllTabBarItemAnimations`: applies the speed and the loop setting, then plays every tab icon
@@ -314,6 +340,7 @@ open class CYLTabBarController(val activity: FragmentActivity) {
     fun cyl_playAllTabBarItemAnimations() {
         tabBar.cyl_setAllTabBarItemAnimationsSpeed(tabBarItemAnimationSpeed, tabBarItemAnimationLoops)
         tabBar.cyl_restartAllTabBarItemAnimations()
+        for (button in tabBar.tabBarButtonArray) cyl_playAnimatedImagesOfTabButton(button)
     }
     /**
      * [EN] `noNeedUIDesignCompatibility`: false means FlatDesign (`tabBarStyleType`), true Liquid Glass; prefer `tabBarStyleType`. [CN] false 表示扁平样式（`tabBarStyleType`），true 表示液态玻璃；建议直接设置 `tabBarStyleType`。
@@ -1053,14 +1080,14 @@ open class CYLTabBarController(val activity: FragmentActivity) {
     }
 
     /**
-     * [EN] An icon from a URL, a path, an asset name or a resolver name. A GIF loops (`CYLGIFDrawable`), as a GIF image does
+     * [EN] An icon from a URL, a path, an asset name or a resolver name. A GIF rests until played (`CYLGIFDrawable`), as a GIF image does
      *      on iOS (#605).
-     * [CN] 来自 URL、路径、asset 名称或解析器名称的图标。GIF 循环播放（`CYLGIFDrawable`），与 iOS 的 GIF 图片一致（#605）。
+     * [CN] 来自 URL、路径、asset 名称或解析器名称的图标。GIF 在被播放前停在第一帧（`CYLGIFDrawable`），与 iOS 的 GIF 图片一致（#605）。
      */
     private fun loadDrawable(url: String): android.graphics.drawable.Drawable? {
         iconCache.get(url)?.let { return it.newDrawable(activity.resources) }
         val drawable = decodeDrawable(url) ?: return null
-        // [EN] A looping GIF is not shared (it keeps its own clock). [CN] 循环的 GIF 不共用（它有自己的时钟）。
+        // [EN] A GIF is not shared (it keeps its own clock). [CN] GIF 不共用（它有自己的时钟）。
         if (drawable !is CYLGIFDrawable) drawable.constantState?.let { iconCache.put(url, it) }
         return drawable
     }
@@ -1470,6 +1497,7 @@ open class CYLTabBarController(val activity: FragmentActivity) {
      * [CN] 之前选中的按钮播放取消选中动画，然后本按钮播放选中动画（再次点击已选中的 Tab 时播放重选动画），与 iOS 一致。
      */
     fun cyl_playTabButtonAnimationForControl(control: View) {
+        cyl_playAnimatedImagesOfTabButton(control)
         val previous = previousAnimatedControl?.get()
         if (previous != null && previous !== control) resetAnimationIfReplaced(previous, animationForTabControl(previous))
         val index = viewControllerIndexForTabControl(control)

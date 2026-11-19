@@ -63,10 +63,10 @@ export class CYLAnimatedItemStackItem {
  *      （没有动作的条目不接收点击）执行 `backgroundAction`。
  */
 export class CYLAnimatedItemStackModel {
-  private entries: CYLAnimatedItemStackItem[] = [];
-  private actions: Map<CYLAnimatedItemStackItem, string> = new Map();
-  private handlers: Map<string, CYLAnimatedItemStackActionHandler> = new Map();
-  private listeners: (() => void)[] = [];
+  private readonly entries: CYLAnimatedItemStackItem[] = [];
+  private readonly actions: Map<CYLAnimatedItemStackItem, string> = new Map();
+  private readonly handlers: Map<string, CYLAnimatedItemStackActionHandler> = new Map();
+  private readonly listeners: (() => void)[] = [];
   private margin: number = CYLAnimatedItemStackDefaultSpacing;
   private background: string | undefined = undefined;
   /** [EN] Bumped on every change; the view redraws when it changes. [CN] 每次变化时递增；变化时视图重绘。 */
@@ -103,7 +103,7 @@ export class CYLAnimatedItemStackModel {
    *      已在堆叠中的条目保持原位。
    */
   append(item: CYLAnimatedItemStackItem, action?: string, spacingBefore: number = CYLAnimatedItemStackDefaultSpacing): void {
-    if (this.entries.indexOf(item) >= 0) {
+    if (this.entries.includes(item)) {
       return;
     }
     item.spacingBefore = Math.max(0, spacingBefore);
@@ -136,7 +136,7 @@ export class CYLAnimatedItemStackModel {
 
   /** [EN] Sets or, with undefined or '', removes the action of an item in the stack. [CN] 设置堆叠中条目的动作；传 undefined 或 '' 移除。 */
   setAction(action: string | undefined, item: CYLAnimatedItemStackItem): void {
-    if (this.entries.indexOf(item) < 0) {
+    if (!this.entries.includes(item)) {
       return;
     }
     this.storeAction(action, item);
@@ -285,7 +285,7 @@ export class CYLAnimatedItemStackModel {
 
   /** [EN] The space above an item: 0 for the first. [CN] 条目上方的间距：第一个为 0。 */
   spacingBeforeOf(item: CYLAnimatedItemStackItem): number {
-    return this.entries.indexOf(item) > 0 ? item.spacingBefore : 0;
+    return this.entries.includes(item) && this.entries[0] !== item ? item.spacingBefore : 0;
   }
 
   /** [EN] The widest an item may be in a view `width` wide, so long titles wrap. [CN] 宽为 `width` 的视图中条目的最大宽度，使长标题换行。 */
@@ -308,6 +308,9 @@ export class CYLAnimatedItemStackModel {
 
   /** [EN] Stops calling `listener`. [CN] 停止调用 `listener`。 */
   removeListener(listener: () => void): void {
-    this.listeners = this.listeners.filter((each: () => void) => each !== listener);
+    const index = this.listeners.indexOf(listener);
+    if (index !== -1) {
+      this.listeners.splice(index, 1);
+    }
   }
 }

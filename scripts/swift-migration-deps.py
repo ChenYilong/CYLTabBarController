@@ -42,5 +42,5 @@ for v in units:
 def size(comp): return sum(lines[n] for u in comp for n in units[u])
 # sccs come out in reverse topological order (leaves first)
 for comp in sccs:
-    deps=set(w for u in comp for w in edges[u] if w not in comp)
+    deps={w for u in comp for w in edges[u] if w not in comp}
     print(f"{size(comp):6d}  {len(comp):3d} units  {', '.join(sorted(comp))[:150]}  <- needs: {', '.join(sorted(deps))[:120]}")

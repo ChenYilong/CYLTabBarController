@@ -127,6 +127,12 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)cyl_sendDidSelectControl:(UIControl *)control;
 /// [EN] A tab button's tap (classic, Liquid Glass), implemented in Swift (step 64). [CN] Tab 按钮的点击，由 Swift 实现（第 64 步）。
 - (void)didSelectControl:(nullable UIControl *)control;
+/// [EN] Animated images and the template tint, implemented in Swift (step 65). [CN] 动图与模板着色，由 Swift 实现（第 65 步）。
+- (nullable UITabBarItem *)cyl_tabBarItemForTabButton:(nullable UIControl *)control;
+- (NSArray<UIControl *> *)cyl_allTabButtonsForAnimatedImages;
+- (void)cyl_playAnimatedImagesOfTabButton:(nullable UIControl *)control;
+- (void)cyl_applyAnimatedImagesLoops:(BOOL)loops;
+- (void)cyl_setNeedsApplyTabBarItemAnimationTintColors;
 - (void)cyl_syncTabBarItemAccessibility;
 #if CYL_FLATDESIGN_AVAILABLE
 - (void)cyl_syncFlatDesignTabBarItemColors;

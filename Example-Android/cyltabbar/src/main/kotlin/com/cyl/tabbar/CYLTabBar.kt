@@ -136,10 +136,10 @@ class CYLTabBarItemButton(context: Context, val item: CYLTabBarItem, val index: 
 
     /**
      * [EN] The tab bar makes the tab's animation view (`cyl_addTabBarItemAnimationWithURL`) and hands it to the component:
-     *      `animationView` is `cyl_tabBarItemAnimationView` (docs/Animated-Item.md, TODO 4). Called with null when the
+     *      `animationView` is `cyl_tabBarItemAnimationView` (docs/Animated-Item.md, task 4). Called with null when the
      *      animation is removed.
      * [CN] TabBar 创建 Tab 的动画视图（`cyl_addTabBarItemAnimationWithURL`）并交给组件：`animationView` 即
-     *      `cyl_tabBarItemAnimationView`（docs/Animated-Item.md，TODO 4）。移除动画时传 null。
+     *      `cyl_tabBarItemAnimationView`（docs/Animated-Item.md，任务 4）。移除动画时传 null。
      */
     internal fun cyl_setTabBarItemAnimationView(view: View?) {
         animationView = view

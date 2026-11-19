@@ -36,6 +36,7 @@
 		E99A711D80DD2FDF627C45CF /* CYLTabBarController+CYLTitlePositionAdjustment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 978F8B8E04B367E13B597E7E /* CYLTabBarController+CYLTitlePositionAdjustment.swift */; };
 		6D5B733C9B21E9FA4274CD58 /* CYLTabBarController+CYLImageOnlyTabs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85A8F93C2A22CF31EF7EC7E7 /* CYLTabBarController+CYLImageOnlyTabs.swift */; };
 		08B34C0122545E40731E824A /* CYLTabBarController+CYLSelection.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2B3147B77FFDF7425ADB784 /* CYLTabBarController+CYLSelection.swift */; };
+		AC95F631625FFD54A4F3B0D0 /* CYLTabBarController+CYLAnimatedImages.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF7122CC1ACE6F2A1B789434 /* CYLTabBarController+CYLAnimatedImages.swift */; };
 		AD3646673361A1A632F50547 /* CYLTabBarController+CYLPageRegistry.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3A29A81CEBC8BFFC70DFAB5 /* CYLTabBarController+CYLPageRegistry.swift */; };
 		17B7BF3FFC5C4CA250F394AC /* CYLAnimatedItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21BB208E919470BD7E295947 /* CYLAnimatedItemView.swift */; };
 		FAD4E45EE92A7B9BE5C34B6F /* CYLAnimatedItemStackView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7358A37970FCF7D3118C3E5 /* CYLAnimatedItemStackView.swift */; };
@@ -370,6 +371,7 @@
 		978F8B8E04B367E13B597E7E /* CYLTabBarController+CYLTitlePositionAdjustment.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "CYLTabBarController+CYLTitlePositionAdjustment.swift"; sourceTree = "<group>"; };
 		85A8F93C2A22CF31EF7EC7E7 /* CYLTabBarController+CYLImageOnlyTabs.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "CYLTabBarController+CYLImageOnlyTabs.swift"; sourceTree = "<group>"; };
 		A2B3147B77FFDF7425ADB784 /* CYLTabBarController+CYLSelection.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "CYLTabBarController+CYLSelection.swift"; sourceTree = "<group>"; };
+		FF7122CC1ACE6F2A1B789434 /* CYLTabBarController+CYLAnimatedImages.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "CYLTabBarController+CYLAnimatedImages.swift"; sourceTree = "<group>"; };
 		E3A29A81CEBC8BFFC70DFAB5 /* CYLTabBarController+CYLPageRegistry.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "CYLTabBarController+CYLPageRegistry.swift"; sourceTree = "<group>"; };
 		094524FA87C4432A9D005C73 /* CYLTabBarManifest.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CYLTabBarManifest.h; sourceTree = "<group>"; };
 		0B42D556C6D31DBDCF523AD3 /* CYLBadgeAppearance.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CYLBadgeAppearance.h; sourceTree = "<group>"; };
@@ -865,6 +867,7 @@
 				978F8B8E04B367E13B597E7E /* CYLTabBarController+CYLTitlePositionAdjustment.swift */,
 				85A8F93C2A22CF31EF7EC7E7 /* CYLTabBarController+CYLImageOnlyTabs.swift */,
 				A2B3147B77FFDF7425ADB784 /* CYLTabBarController+CYLSelection.swift */,
+				FF7122CC1ACE6F2A1B789434 /* CYLTabBarController+CYLAnimatedImages.swift */,
 				E3A29A81CEBC8BFFC70DFAB5 /* CYLTabBarController+CYLPageRegistry.swift */,
 				5D6256F27B17550C865B62B6 /* CYLTabBarController+CYLTabBarToolkit.swift */,
 				EB2FC614BF198DF7F9A1E7D0 /* CYLTabBarController+CYLTabBarItemGesture.swift */,
@@ -1866,6 +1869,7 @@
 				E99A711D80DD2FDF627C45CF /* CYLTabBarController+CYLTitlePositionAdjustment.swift in Sources */,
 				6D5B733C9B21E9FA4274CD58 /* CYLTabBarController+CYLImageOnlyTabs.swift in Sources */,
 				08B34C0122545E40731E824A /* CYLTabBarController+CYLSelection.swift in Sources */,
+				AC95F631625FFD54A4F3B0D0 /* CYLTabBarController+CYLAnimatedImages.swift in Sources */,
 				AD3646673361A1A632F50547 /* CYLTabBarController+CYLPageRegistry.swift in Sources */,
 				CB94F5A8D42AF37C701F574D /* CYLTabBarController+CYLTabBarToolkit.swift in Sources */,
 				8D03A5A4178694B74779EC18 /* CYLTabBarController+CYLTabBarItemGesture.swift in Sources */,

@@ -165,7 +165,7 @@ final class CYLBadgeHostOverlayView: UIView {
     }
 
     @available(*, unavailable)
-    required init?(coder: NSCoder) {
+    required init?(coder _: NSCoder) {
         fatalError("init(coder:) is not supported")
     }
 

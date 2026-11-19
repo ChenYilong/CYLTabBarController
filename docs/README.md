@@ -206,6 +206,7 @@ docs/
 │   ├── android-api37-20261119-rive-fixed-tint-unselected-only.png
 │   ├── android-api37-20261119-rive-follows-appearance.png
 │   ├── android-gif-decoder-frame-clock.png
+│   ├── android-gif-image-rest-then-play.png
 │   ├── android-gif-tint-option.png
 │   ├── android-liquid-glass-surface-000.png
 │   ├── android-liquid-glass-surface-040.png
@@ -308,6 +309,7 @@ docs/
 │   ├── harmonyos-emulator-pages-b7fdf26.png
 │   ├── harmonyos-flatdesign-liquidglass-taps-mate70pro.png
 │   ├── harmonyos-flatdesign-tint-fixed.png
+│   ├── harmonyos-gif-image-rest-then-play.png
 │   ├── harmonyos-gif-svga-tint-option.png
 │   ├── harmonyos-gif-svga-tint-x86_64.png
 │   ├── harmonyos-home-mate70pro-api21.jpeg
@@ -558,6 +560,7 @@ docs/
 │   ├── update-tab-plus-page-navigation-title-changed.png
 │   ├── update-tab-plus-page-navigation-title.png
 │   ├── wechat-miniprogram-animated-item-stack.png
+│   ├── wechat-miniprogram-animated-item-title-dark-color.png
 │   ├── wechat-miniprogram-api-01-home-lottie.png
 │   ├── wechat-miniprogram-api-02-discover-selected.png
 │   ├── wechat-miniprogram-api-03-badges-lottie.png
@@ -630,6 +633,7 @@ docs/
 │   ├── wechat-miniprogram-feed-taps-ios-parity-devtools-sdk3.17.6-ef5afc3-windows.png
 │   ├── wechat-miniprogram-feeds-ios-taps-devtools-sdk3.17.6-3dd395b.png
 │   ├── wechat-miniprogram-flat-login.png
+│   ├── wechat-miniprogram-gif-image-rest-then-play.png
 │   ├── wechat-miniprogram-home.png
 │   ├── wechat-miniprogram-objc-parity-batch1-launch-devtools-sdk3.17.6-4e2e327.png
 │   ├── wechat-miniprogram-objc-parity-batch2-skins-devtools-sdk3.17.6-b850f51.png
@@ -640,9 +644,12 @@ docs/
 │   ├── wechat-miniprogram-objc-parity-item12-memory-warning-devtools-sdk3.17.6-5bbadb8.png
 │   ├── wechat-miniprogram-one-icon-layer-lottie-pag-rive-devtools-sdk3.17.6-e612393.png
 │   ├── wechat-miniprogram-rive-home-feed-one-layer-devtools-sdk3.17.6-e264ea2.png
+│   ├── wechat-miniprogram-rive-house-devtools.png
+│   ├── wechat-miniprogram-rive-play-all-loop-devtools.png
 │   ├── wechat-miniprogram-rive-tint-title.png
 │   ├── wechat-miniprogram-scroll-icons-devtools-sdk3.17.6-88dd149.png
 │   ├── wechat-miniprogram-scroll-icons-still-images-devtools-sdk3.17.6-a157c97.png
+│   ├── wechat-miniprogram-tab-item-badges.png
 │   ├── wechat-miniprogram-two-icon-layers-user-1-devtools.jpg
 │   ├── wechat-miniprogram-two-icon-layers-user-2-devtools.jpg
 │   └── wechat-miniprogram-visibility-hidden-identifiers-devtools-sdk3.17.6-49df44f.png

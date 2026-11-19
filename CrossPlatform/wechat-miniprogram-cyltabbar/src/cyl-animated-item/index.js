@@ -16,6 +16,7 @@
  *      `accessibility-label`（否则为标题），带选中与禁用状态。
  */
 const { cylAnimatedItemModel, cylAnimatedItemPackage, cylAnimatedItemRestingProgress } = require('./cyl_animated_item_model')
+const { cylGIFImageInfo } = require('./cyl_gif_image')
 
 /**
  * [EN] The id of the engine node (only one is rendered), reached by `selectComponent` for the playback methods.
@@ -157,6 +158,8 @@ Component({
     animationLoaded: false,
     animationFailed: false,
     gifPlaying: false,
+    gifImageReady: false,
+    gifImagePlaying: false,
     lottieData: null,
     m: {},
     systemTheme: 'light',
@@ -190,8 +193,15 @@ Component({
     'selected, restingProgress': function () {
       this.cyl_update()
       if (!this.data.autoplay || this.data.gifFirstFrame || this.data.gifLastFrame) this.cyl_rest()
+      // [EN] Another tab is selected: a playing GIF image rests. [CN] 选中了其他 Tab：正在播放的 GIF 图片回到静止。
+      if (!this.data.selected && this.data.gifImagePlaying) this.cyl_restGIFImage()
     },
     'loop': function () {
+      // [EN] A GIF image: off lets the pass in progress end, on keeps it playing. [CN] GIF 图片：关闭时让当前一遍播完，开启时一直播放。
+      if (this.data.gifImagePlaying) {
+        clearTimeout(this.cylGIFImageTimer)
+        if (!this.data.loop) this.cyl_scheduleGIFImageEnd()
+      }
       // Engines take `loop` live; a GIF with stills is timed here: off lets the pass in progress end, on keeps it playing.
       if (!this.data.gifPlaying) return
       clearTimeout(this.cylGifTimer)
@@ -219,13 +229,106 @@ Component({
     },
     detached() {
       clearTimeout(this.cylGifTimer)
+      clearTimeout(this.cylGIFImageTimer)
       if (typeof wx !== 'undefined' && typeof wx.offThemeChange === 'function' && this.cylThemeListener) wx.offThemeChange(this.cylThemeListener)
     },
   },
 
   methods: {
     cyl_update() {
-      this.setData({ m: cylAnimatedItemModel({ ...this.data }) })
+      const m = cylAnimatedItemModel({ ...this.data })
+      this.setData({ m })
+      if ((m.gifImage || '') !== (this.cylGIFImageSource || '')) this.cyl_loadGIFImage(m.gifImage || '')
+      else if (m.gifImage && this.cylGIFImageInfo && (m.iconTint || '') !== (this.cylGIFImageTint || '')) this.cyl_drawGIFImageStill()
+    },
+
+    /**
+     * [EN] Reads and decodes a GIF image (a package or local file, or an http(s) URL), then draws its first frame.
+     * [CN] 读取并解码 GIF 图片（代码包或本地文件，或 http(s) 地址），然后绘制其第一帧。
+     */
+    cyl_loadGIFImage(path) {
+      this.cylGIFImageSource = path
+      this.cylGIFImageInfo = null
+      clearTimeout(this.cylGIFImageTimer)
+      if (this.data.gifImageReady || this.data.gifImagePlaying) this.setData({ gifImageReady: false, gifImagePlaying: false })
+      if (!path || typeof wx === 'undefined') return
+      const decoded = (buffer) => {
+        if (this.cylGIFImageSource !== path || !buffer) return
+        const info = cylGIFImageInfo(new Uint8Array(buffer))
+        if (!info) return
+        this.cylGIFImageInfo = info
+        this.cyl_drawGIFImageStill()
+      }
+      if (/^https?:\/\//.test(path)) {
+        wx.request({ url: path, responseType: 'arraybuffer', success: (result) => {
+          if (result.statusCode >= 200 && result.statusCode < 300) decoded(result.data)
+        } })
+        return
+      }
+      const fs = wx.getFileSystemManager()
+      fs.readFile({ filePath: path, success: (result) => decoded(result.data), fail: () => {
+        // [EN] A package path may also be read without its leading slash. [CN] 代码包路径也可以去掉开头的斜杠读取。
+        if (path.startsWith('/')) fs.readFile({ filePath: path.slice(1), success: (result) => decoded(result.data) })
+      } })
+    },
+
+    /** [EN] Draws the first frame of the GIF image, centered in a square canvas. [CN] 在正方形 canvas 中居中绘制 GIF 图片的第一帧。 */
+    cyl_drawGIFImageStill() {
+      const info = this.cylGIFImageInfo
+      if (!info) return
+      this.createSelectorQuery().select('#cyl-gif-image-still').fields({ node: true }).exec((result) => {
+        const canvas = result && result[0] && result[0].node
+        if (!canvas || this.cylGIFImageInfo !== info) return
+        const side = Math.max(info.width, info.height)
+        canvas.width = side
+        canvas.height = side
+        const context = canvas.getContext('2d')
+        const pixels = context.createImageData(info.width, info.height)
+        pixels.data.set(info.frame)
+        context.clearRect(0, 0, side, side)
+        context.putImageData(pixels, Math.floor((side - info.width) / 2), Math.floor((side - info.height) / 2))
+        // [EN] A template image (`iconTint`): the still takes the tint as the <image> does. [CN] 模板图片（`iconTint`）：静帧与 <image> 一样着色。
+        const tint = this.data.m && this.data.m.iconTint
+        if (tint) {
+          context.globalCompositeOperation = 'source-in'
+          context.fillStyle = tint
+          context.fillRect(0, 0, side, side)
+          context.globalCompositeOperation = 'source-over'
+        }
+        this.cylGIFImageTint = tint || ''
+        this.setData({ gifImageReady: true })
+        this.cyl_update()
+      })
+    },
+
+    /**
+     * [EN] Plays the GIF image from its first frame: one pass, or until `loop` is turned off; then the still again.
+     * [CN] 从第一帧播放 GIF 图片：播放一遍，或一直播放到关闭 `loop`；之后回到静帧。
+     */
+    cyl_playGIFImage() {
+      clearTimeout(this.cylGIFImageTimer)
+      this.cylGIFImageStartedAt = Date.now()
+      // [EN] Setting the source again restarts the GIF from its first frame. [CN] 重新设置图片来源会让 GIF 从第一帧开始。
+      this.setData({ gifImagePlaying: true, 'm.fallbackImage': '' }, () => {
+        this.cyl_update()
+        if (!this.data.loop) this.cyl_scheduleGIFImageEnd()
+      })
+    },
+
+    /** [EN] The end of the pass in progress, then the still. [CN] 当前一遍结束后显示静帧。 */
+    cyl_scheduleGIFImageEnd() {
+      const duration = (this.cylGIFImageInfo && this.cylGIFImageInfo.duration) || 1000
+      const elapsed = Date.now() - (this.cylGIFImageStartedAt || Date.now())
+      this.cylGIFImageTimer = setTimeout(() => this.cyl_restGIFImage(), duration - (elapsed % duration))
+    },
+
+    /** [EN] Back to the first-frame still. [CN] 回到第一帧静帧。 */
+    cyl_restGIFImage() {
+      clearTimeout(this.cylGIFImageTimer)
+      if (!this.data.gifImagePlaying) return
+      // [EN] The canvas comes back empty: draw the still again. [CN] canvas 重新创建后为空：再次绘制静帧。
+      this.setData({ gifImagePlaying: false }, () => this.cyl_drawGIFImageStill())
+      this.cyl_update()
     },
 
     /** [EN] The engine component drew the file. [CN] 引擎组件已绘制该文件。 */
@@ -249,6 +352,10 @@ Component({
      */
     playAnimation() {
       const m = this.data.m
+      if (m.gifImage && this.cylGIFImageInfo) {
+        this.cyl_playGIFImage()
+        return
+      }
       if (m.animationType === 'gif' && m.gifPath) {
         this.cyl_playGif()
         return
@@ -368,6 +475,11 @@ Component({
      * [CN] 引擎支持时，从首帧（或第 `offset` 秒）播放动画。
      */
     cyl_playFromStart(offset) {
+      // [EN] A GIF image plays from its first frame (a selected tab, a re-tap, Play all). [CN] GIF 图片从第一帧播放（选中、再次点击、全部播放）。
+      if (this.data.m.gifImage && this.cylGIFImageInfo) {
+        this.cyl_playGIFImage()
+        return
+      }
       const view = this.cyl_animationView()
       if (view && typeof view.cyl_playFromStart === 'function') {
         view.cyl_playFromStart(offset)

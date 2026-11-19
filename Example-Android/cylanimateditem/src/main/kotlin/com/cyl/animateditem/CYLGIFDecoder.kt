@@ -66,8 +66,25 @@ object CYLGIFDecoder {
     @JvmStatic
     fun decode(bytes: ByteArray): CYLGIFFrames? = try { Reader(bytes).read() } catch (error: RuntimeException) { null }
 
+    /** [EN] The graphic control extension of the next frame. [CN] 下一帧的图形控制扩展。 */
+    private class Control {
+        var disposal = 0
+        var delay = 0
+        var transparent = -1
+        fun reset() { disposal = 0; delay = 0; transparent = -1 }
+    }
+
+    /** [EN] The logical screen the frames are drawn on. [CN] 绘制各帧的逻辑屏幕。 */
+    private class Canvas(val width: Int, val height: Int) {
+        val pixels = IntArray(width * height)
+    }
+
+    /** [EN] One image descriptor with its color table and decoded indices. [CN] 一个图像描述符，及其颜色表与解码后的索引。 */
+    private class Frame(val left: Int, val top: Int, val width: Int, val height: Int, val interlaced: Boolean, val table: IntArray, val indices: ByteArray)
+
     private class Reader(private val data: ByteArray) {
         private var position = 0
+        private var globalTable: IntArray? = null
 
         private fun byte(): Int = if (position < data.size) data[position++].toInt() and 0xFF else throw IndexOutOfBoundsException("end of GIF")
         private fun short(): Int = byte() or (byte() shl 8)
@@ -75,6 +92,32 @@ object CYLGIFDecoder {
         private fun skipSubBlocks() { while (true) { val length = byte(); if (length == 0) return; position += length } }
 
         fun read(): CYLGIFFrames? {
+            val canvas = readHeader() ?: return null
+            val frames = ArrayList<IntArray>()
+            val delays = ArrayList<Int>()
+            val control = Control()
+            while (position < data.size) {
+                when (byte()) {
+                    0x21 -> readExtension(control)
+                    0x2C -> {
+                        if ((frames.size + 1L) * canvas.width * canvas.height > MAX_TOTAL_PIXELS) break
+                        val frame = readFrame() ?: return null
+                        frames.add(compose(canvas, frame, control))
+                        delays.add(if (control.delay <= 10) 100 else control.delay)
+                        control.reset()
+                    }
+                    else -> break // [EN] 0x3B (the trailer) or an unknown block. [CN] 0x3B（结束块）或未知块。
+                }
+            }
+            if (frames.isEmpty()) return null
+            return CYLGIFFrames(canvas.width, canvas.height, frames, delays.toIntArray())
+        }
+
+        /**
+         * [EN] The signature and the logical screen descriptor (with the global color table); null when not a GIF.
+         * [CN] 签名与逻辑屏幕描述符（及全局颜色表）；不是 GIF 时为 null。
+         */
+        private fun readHeader(): Canvas? {
             if (data.size < 13) return null
             val signature = String(data, 0, 6, Charsets.US_ASCII)
             if (signature != "GIF87a" && signature != "GIF89a") return null
@@ -85,72 +128,67 @@ object CYLGIFDecoder {
             val packed = byte()
             byte() // [EN] Background color index: disposal 2 clears to transparent, as browsers do. [CN] 背景色索引：处置方式 2 清为透明，与浏览器相同。
             byte() // [EN] Pixel aspect ratio. [CN] 像素宽高比。
-            val globalTable = if (packed and 0x80 != 0) colorTable(1 shl ((packed and 7) + 1)) else null
-            val canvas = IntArray(width * height)
-            val frames = ArrayList<IntArray>()
-            val delays = ArrayList<Int>()
-            var disposal = 0
-            var delay = 0
-            var transparent = -1
-            while (position < data.size) {
-                when (byte()) {
-                    0x21 -> {
-                        val label = byte()
-                        if (label == 0xF9) {
-                            val size = byte()
-                            val flags = byte()
-                            disposal = (flags shr 2) and 7
-                            delay = short() * 10
-                            val index = byte()
-                            transparent = if (flags and 1 != 0) index else -1
-                            position += size - 4
-                            skipSubBlocks()
-                        } else {
-                            skipSubBlocks()
-                        }
-                    }
-                    0x2C -> {
-                        if ((frames.size + 1L) * width * height > MAX_TOTAL_PIXELS) break
-                        val left = short()
-                        val top = short()
-                        val frameWidth = short()
-                        val frameHeight = short()
-                        val flags = byte()
-                        val table = if (flags and 0x80 != 0) colorTable(1 shl ((flags and 7) + 1)) else globalTable ?: return null
-                        val interlaced = flags and 0x40 != 0
-                        val indices = lzw(byte(), frameWidth * frameHeight)
-                        val previous = if (disposal == 3) canvas.copyOf() else null
-                        draw(canvas, width, height, indices, left, top, frameWidth, frameHeight, interlaced, table, transparent)
-                        frames.add(canvas.copyOf())
-                        delays.add(if (delay <= 10) 100 else delay)
-                        when (disposal) {
-                            2 -> clear(canvas, width, height, left, top, frameWidth, frameHeight)
-                            3 -> previous?.copyInto(canvas)
-                        }
-                        disposal = 0
-                        delay = 0
-                        transparent = -1
-                    }
-                    0x3B -> break
-                    else -> break
-                }
-            }
-            if (frames.isEmpty()) return null
-            return CYLGIFFrames(width, height, frames, delays.toIntArray())
+            globalTable = if (packed and 0x80 != 0) colorTable(1 shl ((packed and 7) + 1)) else null
+            return Canvas(width, height)
         }
 
-        private fun draw(canvas: IntArray, width: Int, height: Int, indices: ByteArray, left: Int, top: Int, frameWidth: Int,
-                         frameHeight: Int, interlaced: Boolean, table: IntArray, transparent: Int) {
-            val rows = if (interlaced) interlacedRows(frameHeight) else IntArray(frameHeight) { it }
-            for (pass in 0 until frameHeight) {
-                val y = top + rows[pass]
-                if (y !in 0 until height) continue
-                for (x in 0 until frameWidth) {
-                    val canvasX = left + x
-                    if (canvasX !in 0 until width) continue
-                    val index = indices[pass * frameWidth + x].toInt() and 0xFF
-                    if (index == transparent || index >= table.size) continue
-                    canvas[y * width + canvasX] = table[index]
+        /**
+         * [EN] An extension block: a graphic control extension sets `control`; every other one is skipped.
+         * [CN] 扩展块：图形控制扩展设置 `control`；其他扩展跳过。
+         */
+        private fun readExtension(control: Control) {
+            if (byte() == 0xF9) {
+                val size = byte()
+                val flags = byte()
+                control.disposal = (flags shr 2) and 7
+                control.delay = short() * 10
+                val index = byte()
+                control.transparent = if (flags and 1 != 0) index else -1
+                position += size - 4
+            }
+            skipSubBlocks()
+        }
+
+        /**
+         * [EN] An image descriptor and its data; null when it has no color table at all.
+         * [CN] 图像描述符及其数据；完全没有颜色表时为 null。
+         */
+        private fun readFrame(): Frame? {
+            val left = short()
+            val top = short()
+            val width = short()
+            val height = short()
+            val flags = byte()
+            val table = if (flags and 0x80 != 0) colorTable(1 shl ((flags and 7) + 1)) else globalTable ?: return null
+            return Frame(left, top, width, height, flags and 0x40 != 0, table, lzw(byte(), width * height))
+        }
+
+        /**
+         * [EN] Draws `frame` on `canvas`, returns the composed picture, then applies the frame's disposal.
+         * [CN] 将 `frame` 绘制到 `canvas`，返回合成后的画面，然后执行该帧的处置方式。
+         */
+        private fun compose(canvas: Canvas, frame: Frame, control: Control): IntArray {
+            val previous = if (control.disposal == 3) canvas.pixels.copyOf() else null
+            draw(canvas, frame, control.transparent)
+            val picture = canvas.pixels.copyOf()
+            when (control.disposal) {
+                2 -> clear(canvas, frame)
+                3 -> previous?.copyInto(canvas.pixels)
+            }
+            return picture
+        }
+
+        private fun draw(canvas: Canvas, frame: Frame, transparent: Int) {
+            val rows = if (frame.interlaced) interlacedRows(frame.height) else IntArray(frame.height) { it }
+            for (pass in 0 until frame.height) {
+                val y = frame.top + rows[pass]
+                if (y !in 0 until canvas.height) continue
+                for (x in 0 until frame.width) {
+                    val canvasX = frame.left + x
+                    if (canvasX !in 0 until canvas.width) continue
+                    val index = frame.indices[pass * frame.width + x].toInt() and 0xFF
+                    if (index == transparent || index >= frame.table.size) continue
+                    canvas.pixels[y * canvas.width + canvasX] = frame.table[index]
                 }
             }
         }
@@ -168,9 +206,9 @@ object CYLGIFDecoder {
             return rows
         }
 
-        private fun clear(canvas: IntArray, width: Int, height: Int, left: Int, top: Int, frameWidth: Int, frameHeight: Int) {
-            for (y in maxOf(0, top) until minOf(height, top + frameHeight)) {
-                for (x in maxOf(0, left) until minOf(width, left + frameWidth)) canvas[y * width + x] = 0
+        private fun clear(canvas: Canvas, frame: Frame) {
+            for (y in maxOf(0, frame.top) until minOf(canvas.height, frame.top + frame.height)) {
+                for (x in maxOf(0, frame.left) until minOf(canvas.width, frame.left + frame.width)) canvas.pixels[y * canvas.width + x] = 0
             }
         }
 
@@ -188,68 +226,95 @@ object CYLGIFDecoder {
                 stream.write(data, position, minOf(length, data.size - position))
                 position += length
             }
-            val codes = stream.toByteArray()
             if (minimumCodeSize !in 1..11) return out
-            val clear = 1 shl minimumCodeSize
-            val end = clear + 1
-            val prefix = IntArray(4096)
-            val suffix = ByteArray(4096)
-            val stack = ByteArray(4097)
+            return LzwDecoder(stream.toByteArray(), minimumCodeSize, out).decode()
+        }
+    }
+
+    /**
+     * [EN] The LZW decoder of one frame: reads variable-width codes from `codes` and writes color indices into `out`.
+     * [CN] 一帧的 LZW 解码器：从 `codes` 读取变长码，并将颜色索引写入 `out`。
+     */
+    private class LzwDecoder(private val codes: ByteArray, private val minimumCodeSize: Int, private val out: ByteArray) {
+        private val clear = 1 shl minimumCodeSize
+        private val end = clear + 1
+        private val prefix = IntArray(4096)
+        private val suffix = ByteArray(4096)
+        private val stack = ByteArray(4097)
+        private var codeSize = minimumCodeSize + 1
+        private var next = clear + 2
+        private var old = -1
+        private var first = 0
+        private var written = 0
+        private var bits = 0
+        private var bitCount = 0
+        private var index = 0
+
+        init {
             for (code in 0 until clear) suffix[code] = code.toByte()
-            var codeSize = minimumCodeSize + 1
-            var next = clear + 2
-            var old = -1
-            var first = 0
-            var written = 0
-            var bits = 0
-            var bitCount = 0
-            var index = 0
-            while (written < count) {
-                while (bitCount < codeSize && index < codes.size) {
-                    bits = bits or ((codes[index++].toInt() and 0xFF) shl bitCount)
-                    bitCount += 8
-                }
-                if (bitCount < codeSize) break
-                val code = bits and ((1 shl codeSize) - 1)
-                bits = bits ushr codeSize
-                bitCount -= codeSize
+        }
+
+        fun decode(): ByteArray {
+            while (written < out.size) {
+                val code = readCode()
+                if (code < 0 || code == end) break
                 if (code == clear) {
                     codeSize = minimumCodeSize + 1
                     next = clear + 2
                     old = -1
                     continue
                 }
-                if (code == end) break
-                if (old == -1) {
-                    if (code >= clear) break
-                    out[written++] = code.toByte()
-                    old = code
-                    first = code
-                    continue
-                }
-                var current = code
-                var top = 0
-                if (code >= next) {
-                    stack[top++] = first.toByte()
-                    current = old
-                }
-                while (current >= clear) {
-                    if (top >= stack.size - 1 || current >= 4096) return out
-                    stack[top++] = suffix[current]
-                    current = prefix[current]
-                }
-                first = suffix[current].toInt() and 0xFF
-                stack[top++] = first.toByte()
-                while (top > 0 && written < count) out[written++] = stack[--top]
-                if (next < 4096) {
-                    prefix[next] = old
-                    suffix[next] = first.toByte()
-                    next++
-                    if (next == (1 shl codeSize) && codeSize < 12) codeSize++
-                }
+                val decoded = if (old == -1) writeFirst(code) else writeSequence(code)
+                if (!decoded) break
                 old = code
             }
             return out
+        }
+
+        /** [EN] The next code, or -1 when the data ends. [CN] 下一个码；数据结束时为 -1。 */
+        private fun readCode(): Int {
+            while (bitCount < codeSize && index < codes.size) {
+                bits = bits or ((codes[index++].toInt() and 0xFF) shl bitCount)
+                bitCount += 8
+            }
+            if (bitCount < codeSize) return -1
+            val code = bits and ((1 shl codeSize) - 1)
+            bits = bits ushr codeSize
+            bitCount -= codeSize
+            return code
+        }
+
+        /** [EN] The first code after a clear: a literal index. [CN] 清除码之后的第一个码：一个字面索引。 */
+        private fun writeFirst(code: Int): Boolean {
+            if (code >= clear) return false
+            out[written++] = code.toByte()
+            first = code
+            return true
+        }
+
+        /** [EN] A code from the table (or the next one), written out, then added to the table. [CN] 表中的码（或下一个码），写出后加入表中。 */
+        private fun writeSequence(code: Int): Boolean {
+            var current = code
+            var top = 0
+            if (code >= next) {
+                stack[top++] = first.toByte()
+                current = old
+            }
+            while (current >= clear) {
+                if (top >= stack.size - 1 || current >= 4096) return false
+                stack[top++] = suffix[current]
+                current = prefix[current]
+            }
+            first = suffix[current].toInt() and 0xFF
+            stack[top++] = first.toByte()
+            while (top > 0 && written < out.size) out[written++] = stack[--top]
+            if (next < 4096) {
+                prefix[next] = old
+                suffix[next] = first.toByte()
+                next++
+                if (next == (1 shl codeSize) && codeSize < 12) codeSize++
+            }
+            return true
         }
     }
 }

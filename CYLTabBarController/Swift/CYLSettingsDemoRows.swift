@@ -474,7 +474,7 @@ final class CYLLoginStateSwitch: UISwitch {
                                                name: .CYLTabBarLoginStateDidChange, object: nil)
     }
 
-    required init?(coder: NSCoder) {
+    required init?(coder _: NSCoder) {
         fatalError("init(coder:) is not used")
     }
 
@@ -534,7 +534,7 @@ final class CYLTouchableAreaCell: UITableViewCell {
         ])
     }
 
-    required init?(coder: NSCoder) {
+    required init?(coder _: NSCoder) {
         fatalError("init(coder:) is not used")
     }
 
@@ -587,7 +587,7 @@ final class CYLInteractionDemoSwitch: UISwitch {
         addTarget(self, action: #selector(valueDidChange), for: .valueChanged)
     }
 
-    required init?(coder: NSCoder) {
+    required init?(coder _: NSCoder) {
         fatalError("init(coder:) is not used")
     }
 

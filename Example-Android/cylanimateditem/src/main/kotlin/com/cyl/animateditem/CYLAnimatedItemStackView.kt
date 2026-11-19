@@ -129,7 +129,7 @@ open class CYLAnimatedItemStackView @JvmOverloads constructor(
         itemView.setOnClickListener { view ->
             val item = view as CYLAnimatedItemView
             val action = (if (isItemInteractive(item)) action(item) else null) ?: backgroundAction.takeIf { item === firstItemView }
-            action?.let { performAction(it) }
+            if (action != null) performAction(action)
         }
         setAction(action, itemView)
     }

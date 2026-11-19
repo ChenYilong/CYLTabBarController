@@ -7,6 +7,7 @@ import com.cyl.tabbar.cyl_badge
 import com.cyl.tabbar.demo.DemoListFragment
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Assume.assumeTrue
 import org.junit.Test
@@ -36,15 +37,27 @@ class ExampleGIFTest {
     }
 
     @Test
-    fun theGIFGivenAsAnImageLoops() {
+    fun theGIFGivenAsAnImageRestsUntilPlayed() {
         val activity = Robolectric.buildActivity(MainActivity::class.java).setup().get()
         val controller = activity.tabBarController ?: error("no tab bar controller")
-        // [EN] The image entry: the GIF loops (a CYLGIFDrawable), it is not an animation. Movie decodes nothing on the JVM, so
+        // [EN] The image entry: the GIF (a CYLGIFDrawable) is not an animation; it rests on its first frame until its tab
+        //      is played (docs/GIF-Animation.md), once per play. The GIF decoder may decode nothing on the JVM, so
         //      this part runs only where it can (a device, or a Robolectric with native graphics).
-        // [CN] 图片入口：GIF 循环播放（CYLGIFDrawable），不是动画。Movie 在 JVM 上无法解码，因此这部分只在能运行的环境中执行（设备，或使用原生图形的 Robolectric）。
+        // [CN] 图片入口：GIF（CYLGIFDrawable）不是动画；在其 Tab 被播放之前停在第一帧，每次播放一遍。Movie 在 JVM 上无法解码，因此这部分只在能运行的环境中执行（设备，或使用原生图形的 Robolectric）。
         val gif = activity.assets.open("tab_fire.gif").use { it.readBytes() }
         assumeTrue("Movie decodes GIFs here", CYLGIFDrawable.fromBytes(gif) != null)
         repeat(30) { if (controller.tabBarItems[2].image !is CYLGIFDrawable) { Thread.sleep(100); shadowOf(Looper.getMainLooper()).idle() } }
-        assertTrue(controller.tabBarItems[2].image is CYLGIFDrawable)
+        val image = controller.tabBarItems[2].image as CYLGIFDrawable
+        assertFalse("rests at launch", image.isPlaying)
+        controller.cyl_playAllTabBarItemAnimations()
+        assertTrue("Play all plays it", image.isPlaying)
+        shadowOf(Looper.getMainLooper()).idleFor(Duration.ofMillis(10_000))
+        assertFalse("once: it rests again", image.isPlaying)
+        controller.tabBarItemAnimationLoops = true
+        controller.cyl_playAllTabBarItemAnimations()
+        shadowOf(Looper.getMainLooper()).idleFor(Duration.ofMillis(10_000))
+        assertTrue("it repeats while looping", image.isPlaying)
+        controller.tabBarItemAnimationLoops = false
+        assertFalse("turning looping off stops it", image.isPlaying)
     }
 }

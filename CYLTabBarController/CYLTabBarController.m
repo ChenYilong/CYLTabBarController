@@ -106,10 +106,9 @@ static BOOL CYLTabBarAnimationCanPlay(NSURL *URL) {
 
 #pragma mark - Animated images rest until played
 
-// [EN] Selector-based keys, so the FlatDesign item (Swift) reads the same animated images (`sel_registerName`).
-// [CN] 以 selector 作为 key，使扁平样式 item（Swift）能读取同一张动图（`sel_registerName`）。
-#define CYLTabBarItemAnimatedImageKey ((const void *)sel_registerName("cyl_animatedTabImage"))
-#define CYLTabBarItemAnimatedSelectedImageKey ((const void *)sel_registerName("cyl_animatedSelectedTabImage"))
+// [EN] Selector-based keys, shared with Swift/CYLTabBarController+CYLAnimatedImages.swift (step 65). [CN] 基于 selector 的 key，与 Swift 共用（第 65 步）。
+#define CYLTabBarItemAnimatedImageKey ((const void *)sel_registerName("cyl_tabBarItemAnimatedImage"))
+#define CYLTabBarItemAnimatedSelectedImageKey ((const void *)sel_registerName("cyl_tabBarItemAnimatedSelectedImage"))
 
 /*!
  * [EN] An animated image given as a tab's image (`CYLTabBarItemImage` with `+[UIImage cyl_animatedImageWithGIFData:]`, a GIF
@@ -131,83 +130,8 @@ static UIImage *CYLRestingTabBarItemImage(UIImage *image, UITabBarItem *item, BO
     return [image.images.firstObject imageWithRenderingMode:image.renderingMode];
 }
 
-/*!
- * [EN] The color UIKit draws a template tab image in, from the tint the tab bar was set up with: selected, the appearance's
- *      selected icon color, else `tintColor`; not selected, the appearance's normal icon color, else
- *      `unselectedItemTintColor`, else UIKit's default (the label color with Liquid Glass, system gray before).
- * [CN] UIKit 绘制模板 Tab 图片所用的颜色，来自 TabBar 设置的 tint：选中时为外观的选中图标颜色，否则为 `tintColor`；未选中时为外观的普通图标颜色，
- *      否则为 `unselectedItemTintColor`，再否则为 UIKit 的默认值（液态玻璃下为 label 颜色，之前为系统灰色）。
- */
-static UIColor *CYLTemplateTintColor(UITabBar *tabBar, BOOL selected) {
-    UITabBarItemStateAppearance *state = selected ? tabBar.standardAppearance.stackedLayoutAppearance.selected
-                                                  : tabBar.standardAppearance.stackedLayoutAppearance.normal;
-    if (state.iconColor) {
-        return state.iconColor;
-    }
-    if (selected) {
-        return tabBar.tintColor ?: UIColor.systemBlueColor;
-    }
-    if (tabBar.unselectedItemTintColor) {
-        return tabBar.unselectedItemTintColor;
-    }
-    return [CYLConstants isLiquidGlassActive] ? UIColor.labelColor : UIColor.systemGrayColor;
-}
-
-/*!
- * [EN] The optional tint method of `CYLTabBarItemAnimationPlayableView` (declared in the animation subspec, which Core does
- *      not import), called by selector.
- * [CN] `CYLTabBarItemAnimationPlayableView` 的可选着色方法（声明在动画子库中，Core 不导入它），通过 selector 调用。
- */
-@protocol CYLTabBarItemAnimationTintable <NSObject>
-- (void)cyl_applyAnimationViewTintColor:(nullable UIColor *)color;
-@optional
-/// [EN] With the tab's state: a fixed tint only on the unselected tab (2026-11-19). [CN] 带 Tab 状态：固定着色只用于未选中的 Tab（2026-11-19）。
-- (void)cyl_applyAnimationViewTintColor:(nullable UIColor *)color selected:(BOOL)selected;
-@end
-
-/*!
- * [EN] The animation views of a tab button that take a template tint (`-cyl_applyAnimationViewTintColor:`, the `tint` option).
- * [CN] Tab 按钮中接受模板着色的动画视图（`-cyl_applyAnimationViewTintColor:`，`tint` 选项）。
- */
-static void CYLCollectTintableAnimationViews(UIView *view, NSMutableArray<UIView *> *result) {
-    for (UIView *subview in view.subviews) {
-        if ([subview respondsToSelector:@selector(cyl_applyAnimationViewTintColor:)]) {
-            [result addObject:subview];
-        }
-        CYLCollectTintableAnimationViews(subview, result);
-    }
-}
-
-/*!
- * [EN] Plays `image`'s frames on `imageView` from the first one: once, or until stopped when `loops` is YES. The image view
- *      then shows its resting image again.
- * [CN] 在 `imageView` 上从第一帧播放 `image` 的各帧：播放一次，`loops` 为 YES 时一直播放到停止。之后图片视图恢复显示静止的图片。
- */
-static void CYLPlayAnimatedImage(UIImageView *imageView, UIImage *image, BOOL loops) {
-    if (!imageView || image.images.count < 2) {
-        return;
-    }
-    [imageView stopAnimating];
-    imageView.animationImages = image.images;
-    imageView.animationDuration = image.duration;
-    imageView.animationRepeatCount = loops ? 0 : 1;
-    [imageView startAnimating];
-}
-
-/*!
- * [EN] The icon views a tab draws itself (`-setTabBarItemIconViewProvider:atIndex:`, URL icons) that hold animation frames.
- * [CN] Tab 自己绘制的、带有动画帧的图标视图（`-setTabBarItemIconViewProvider:atIndex:`、URL 图标）。
- */
-static void CYLCollectAnimatedIconViews(UIView *view, NSMutableArray<UIImageView *> *result) {
-    for (UIView *subview in view.subviews) {
-        if ([subview isKindOfClass:[UIImageView class]] && ((UIImageView *)subview).animationImages.count > 1) {
-            [result addObject:(UIImageView *)subview];
-        }
-        CYLCollectAnimatedIconViews(subview, result);
-    }
-}
-
-
+// [EN] The template tint color, the tintable and animated icon views, and the frame player are Swift
+//      (Swift/CYLTabBarController+CYLAnimatedImages.swift, docs/Swift-Migration.md, step 65). [CN] 已迁移到 Swift（第 65 步）。
 
 #if __has_include(<CYLTabBarController/CYLTabBarController.h>)
 //#import <CYLTabBarController/CYLTabBarController.h>
@@ -2705,23 +2629,9 @@ static NSMutableDictionary<NSString *, NSMutableArray<UIViewController *> *> *CY
 - (void)setTabBarItemAnimationLoops:(BOOL)tabBarItemAnimationLoops {
     _tabBarItemAnimationLoops = tabBarItemAnimationLoops;
     [self cyl_applyTabBarItemAnimationPlayback];
-    // [EN] Animated images: off stops them on their resting frame, on plays the selected tab's. [CN] 动图：关闭时停在静止帧，开启时播放选中的 Tab。
-    for (UIControl *control in [self cyl_allTabButtonsForAnimatedImages]) {
-        NSMutableArray<UIImageView *> *iconViews = [NSMutableArray array];
-        CYLCollectAnimatedIconViews(control, iconViews);
-        UIImageView *tabImageView = [control cyl_tabImageView];
-        if (tabImageView.animationImages.count > 1 && ![iconViews containsObject:tabImageView]) {
-            [iconViews addObject:tabImageView];
-        }
-        for (UIImageView *iconView in iconViews) {
-            if (!tabBarItemAnimationLoops) {
-                [iconView stopAnimating];
-            }
-        }
-        if (tabBarItemAnimationLoops && control.selected) {
-            [self cyl_playAnimatedImagesOfTabButton:control];
-        }
-    }
+    // [EN] Animated images: off stops them on their resting frame, on plays the selected tab's (Swift, step 65).
+    // [CN] 动图：关闭时停在静止帧，开启时播放选中的 Tab（Swift，第 65 步）。
+    [self cyl_applyAnimatedImagesLoops:tabBarItemAnimationLoops];
 }
 
 /// [EN] The speed and the loop mode, to the views already added (none before the tab bar is laid out).
@@ -5099,84 +5009,9 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
 // [EN] `-cyl_sendDidSelectControl:` is Swift (Swift/CYLTabBarController+CYLInteraction.swift, docs/Swift-Migration.md,
 //      step 63). [CN] 已迁移到 Swift（第 63 步）。
 
-/*!
- * [EN] Plays the animated images of a tab button (docs/GIF-Animation.md): the tab item's image shown by UIKit, and the
- *      tab's own icon views. They rest on their first frame otherwise.
- * [CN] 播放 Tab 按钮的动图：UIKit 显示的 tabBarItem 图片，以及 Tab 自己的图标视图。其他时候停在第一帧。
- */
-- (void)cyl_playAnimatedImagesOfTabButton:(UIControl *)control {
-    if (!control || [control cyl_isPlusControl]) {
-        return;
-    }
-    UITabBarItem *item = [self cyl_tabBarItemForTabButton:control];
-    UIImage *animatedImage = nil;
-    if (item) {
-        BOOL selected = (item == self.selectedViewController.tabBarItem);
-        animatedImage = objc_getAssociatedObject(item, selected ? CYLTabBarItemAnimatedSelectedImageKey : CYLTabBarItemAnimatedImageKey)
-            ?: objc_getAssociatedObject(item, CYLTabBarItemAnimatedImageKey);
-    }
-    UIImageView *tabImageView = [control cyl_tabImageView];
-    CYLPlayAnimatedImage(tabImageView, animatedImage, self.tabBarItemAnimationLoops);
-    NSMutableArray<UIImageView *> *iconViews = [NSMutableArray array];
-    CYLCollectAnimatedIconViews(control, iconViews);
-    for (UIImageView *iconView in iconViews) {
-        if (iconView == tabImageView && animatedImage) {
-            continue;
-        }
-        [iconView stopAnimating];
-        iconView.animationRepeatCount = self.tabBarItemAnimationLoops ? 0 : 1;
-        [iconView startAnimating];
-    }
-}
+// [EN] `-cyl_playAnimatedImagesOfTabButton:` and `-cyl_allTabButtonsForAnimatedImages` are Swift (step 65). [CN] 已迁移到 Swift（第 65 步）。
 
-/// [EN] Every tab button, the selected-state layer's too. [CN] 所有 Tab 按钮，包括选中态图层中的。
-- (NSArray<UIControl *> *)cyl_allTabButtonsForAnimatedImages {
-    if (![self.cyl_tabBar isKindOfClass:[CYLTabBar class]]) {
-        return @[];
-    }
-    CYLTabBar *tabBar = (CYLTabBar *)self.cyl_tabBar;
-    NSMutableArray<UIControl *> *controls = [NSMutableArray array];
-    [controls addObjectsFromArray:tabBar.cyl_visibleControls ?: @[]];
-    [controls addObjectsFromArray:tabBar.cyl_platterSelectedContentViews ?: @[]];
-    return controls;
-}
-
-/*!
- * [EN] Gives every tab's animation view the tab's current title color (`CYLTabBarAnimationOptionTint` "title"): the tab bar's
- *      tint when selected, its unselected tint otherwise, as UIKit draws a template image. Next run loop, once UIKit has set
- *      the labels' colors for the new selection or traits.
- * [CN] 把每个 Tab 当前的标题颜色交给其动画视图（`CYLTabBarAnimationOptionTint` 为 "title"）：选中时为 TabBar 的 tint，否则为未选中 tint，
- *      与 UIKit 绘制模板图片相同。在下一个 runloop 执行，此时 UIKit 已为新的选中状态或 trait 设置好标签颜色。
- */
-- (void)cyl_setNeedsApplyTabBarItemAnimationTintColors {
-    __weak __typeof(self) weakSelf = self;
-    dispatch_async(dispatch_get_main_queue(), ^{
-        __strong __typeof(weakSelf) self = weakSelf;
-        if (![self.cyl_tabBar isKindOfClass:[CYLTabBar class]]) {
-            return;
-        }
-        CYLTabBar *tabBar = (CYLTabBar *)self.cyl_tabBar;
-        for (UIControl *control in [self cyl_allTabButtonsForAnimatedImages]) {
-            NSMutableArray<UIView *> *views = [NSMutableArray array];
-            CYLCollectTintableAnimationViews(control, views);
-            if (views.count == 0) {
-                continue;
-            }
-            UITabBarItem *item = [self cyl_tabBarItemForTabButton:control];
-            BOOL selected = (item && item == self.selectedViewController.tabBarItem) ||
-                [tabBar.cyl_platterSelectedContentViews containsObject:control];
-            UIColor *color = CYLTemplateTintColor(tabBar, selected);
-            for (UIView *view in views) {
-                id<CYLTabBarItemAnimationTintable> tintable = (id<CYLTabBarItemAnimationTintable>)view;
-                if ([tintable respondsToSelector:@selector(cyl_applyAnimationViewTintColor:selected:)]) {
-                    [tintable cyl_applyAnimationViewTintColor:color selected:selected];
-                } else {
-                    [tintable cyl_applyAnimationViewTintColor:color];
-                }
-            }
-        }
-    });
-}
+// [EN] `-cyl_setNeedsApplyTabBarItemAnimationTintColors` is Swift (step 65). [CN] 已迁移到 Swift（第 65 步）。
 
 // [EN] `-didSelectControl:` is Swift (Swift/CYLTabBarController+CYLInteraction.swift, docs/Swift-Migration.md, step 64).
 // [CN] 已迁移到 Swift（第 64 步）。
@@ -5202,34 +5037,8 @@ static BOOL CYLAppearanceChanged(id _Nullable appearance, id _Nullable syncedApp
 }
 
 //TODO:  selected content, double add
-/*!
- * Issue #423 (hardening)
- * [EN] The tab bar item a tab button belongs to, found through the view controllers instead of the button's position.
- *      Each item keeps its own Lottie file (`cyl_lottieURL` / `cyl_lottieSizeValue`, from `CYLTabBarLottieURL`, or
- *      `CYLTabBarLottieFilePath` turned into a file URL), the same value `tabBarItemAnimationURLs` holds, so this never shifts.
- *      Selecting a tab already uses the item (`-tabChangedToSelectedIndex:…`). The position-based lookups below only run
- *      at launch, where the counts are checked first, so they were aligned; this makes them independent of the plus
- *      button and of tabs without Lottie.
- * [CN] 通过子控制器（而不是按钮的位置）找到 Tab 按钮所属的 tabBarItem。每个 item 保存着自己的 Lottie 文件
- *      （`cyl_lottieURL` / `cyl_lottieSizeValue`，来自 `CYLTabBarLottieURL`，或由 `CYLTabBarLottieFilePath` 转成的文件 URL），
- *      与 `tabBarItemAnimationURLs` 中的值相同，不会错位。选中 Tab 时本来就按 item 取（`-tabChangedToSelectedIndex:…`）；下面按位置取的代码只在
- *      启动时执行，且事先校验了数量，因此是对齐的。这里让它们不再依赖 PlusButton 和未设置 Lottie 的 Tab。
- */
-- (nullable UITabBarItem *)cyl_tabBarItemForTabButton:(nullable UIControl *)control {
-    if (!control || [control cyl_isPlusControl]) {
-        return nil;
-    }
-    for (UIViewController *viewController in self.viewControllers) {
-        if (viewController.cyl_isPlaceholder) {
-            continue;
-        }
-        UITabBarItem *item = viewController.tabBarItem;
-        if (item.cyl_tabButton == control || viewController.cyl_tabButton == control) {
-            return item;
-        }
-    }
-    return nil;
-}
+// [EN] `-cyl_tabBarItemForTabButton:` is Swift (Swift/CYLTabBarController+CYLAnimatedImages.swift, step 65).
+// [CN] 已迁移到 Swift（第 65 步）。
 
 /*!
  * FIX: issue #477

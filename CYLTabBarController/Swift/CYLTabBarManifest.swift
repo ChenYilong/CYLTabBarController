@@ -200,14 +200,26 @@ enum CYLManifestValues {
             if subject == "device.os" {
                 let os = value.lowercased()
                 let isIOS = os == "ios" || os == "apple"
-                return operation == "==" ? isIOS : (operation == "!=" ? !isIOS : false)
+                switch operation {
+                case "==": return isIOS
+                case "!=": return !isIOS
+                default: return false
+                }
             }
             if subject == "app.version" {
                 return compare(compareVersions(appVersion, value), operation)
             }
             let current = percentile
             let limit = (value as NSString).integerValue
-            return compare(current < limit ? .orderedAscending : (current > limit ? .orderedDescending : .orderedSame), operation)
+            let order: ComparisonResult
+            if current < limit {
+                order = .orderedAscending
+            } else if current > limit {
+                order = .orderedDescending
+            } else {
+                order = .orderedSame
+            }
+            return compare(order, operation)
         }
         if let parts = match("^percent\\s+between\\s+(\\d+)\\s+and\\s+(\\d+)$", text) {
             let current = percentile

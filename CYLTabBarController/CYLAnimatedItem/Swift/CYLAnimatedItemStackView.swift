@@ -368,7 +368,7 @@ open class CYLAnimatedItemStackView: UIView, UIGestureRecognizerDelegate {
         if let action = action(for: itemView) { performAction(action) }
     }
 
-    @objc private func cyl_backgroundTapped(_ recognizer: UITapGestureRecognizer) {
+    @objc private func cyl_backgroundTapped(_: UITapGestureRecognizer) {
         if let action = backgroundAction { performAction(action) }
     }
 

@@ -55,7 +55,7 @@ extension CYLTabBarController {
      *      Tab 动画。
      */
     @objc(updateSelectionStatusIfNeededForTabBarController:shouldSelectViewController:shouldSelect:)
-    func cylUpdateSelectionStatusIfNeeded(for tabBarController: UITabBarController?, shouldSelect viewController: UIViewController?,
+    func cylUpdateSelectionStatusIfNeeded(for _: UITabBarController?, shouldSelect viewController: UIViewController?,
                                           shouldSelect: Bool) {
         guard tabBarStyleType != .flatDesign else {
             return

@@ -475,7 +475,7 @@ extension CYLTabBar {
     }
 
     @objc(cyl_cachedWidthOffsetWithIndex:)
-    public func cylCachedWidthOffset(withIndex index: CGFloat) -> CGFloat {
+    public func cylCachedWidthOffset(withIndex _: CGFloat) -> CGFloat {
         guard CYLConstants.isLiquidGlassActive() else { return 0 }
         let originalWidth = cylBoundsSize().width / CGFloat(cyl_tabbarItemsCount)
         return abs(originalWidth - cyl_tabBarItemWidth)

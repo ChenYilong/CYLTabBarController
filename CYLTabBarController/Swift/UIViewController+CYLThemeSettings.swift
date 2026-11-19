@@ -163,7 +163,7 @@ final class CYLDemoTheme: NSObject, CYLTabBarTheme {
      *      leaves it alone.
      * [CN] PlusButton：节日皮肤使用其最后一个图标，网络皮肤从网络下载图片；配色主题不修改。
      */
-    func cyl_plusButtonAttributes(for tabBarController: CYLTabBarController) -> [String: Any]? {
+    func cyl_plusButtonAttributes(for _: CYLTabBarController) -> [String: Any]? {
         if let first = plusButtonIconURLs.first, let last = plusButtonIconURLs.last {
             return [CYLTabBarItemImageURL: first, CYLTabBarItemSelectedImageURL: last]
         }
@@ -171,7 +171,7 @@ final class CYLDemoTheme: NSObject, CYLTabBarTheme {
         return [CYLTabBarItemImage: icon, CYLTabBarItemSelectedImage: icon]
     }
 
-    func cyl_tabBarAppearance(for tabBarController: CYLTabBarController) -> UITabBarAppearance? {
+    func cyl_tabBarAppearance(for _: CYLTabBarController) -> UITabBarAppearance? {
         guard let tintColor else { return nil }
         let appearance = UITabBarAppearance()
         appearance.configureWithOpaqueBackground()
