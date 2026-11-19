@@ -84,20 +84,20 @@ object DemoInteractions {
     }
 
     fun tabItemUpdateRows() = listOf(
-        updateRow("title", "Change the tab title", "Changes the title of this page's tab in place; tap again to restore", { controller, index ->
+        updateRow("title", cylDemoText("Change the tab title"), cylDemoText("Changes the title of this page's tab in place; tap again to restore"), { controller, index ->
             controller.tabBarItemAttributesAtIndex(index).also { controller.updateTabBarItemAtIndex(index, mapOf(CYLConstants.CYLTabBarItemTitle to "Courses")) }
         }) { controller, index, saved -> @Suppress("UNCHECKED_CAST") (saved as? Map<String, Any?>)?.let { controller.updateTabBarItemAtIndex(index, it) } },
-        updateRow("iconView", "Switch the tab icon", "Replaces the icon of this page's tab with a custom view; tap again to restore", { controller, index ->
+        updateRow("iconView", cylDemoText("Switch the tab icon"), cylDemoText("Replaces the icon of this page's tab with a custom view; tap again to restore"), { controller, index ->
             controller.setTabBarItemIconViewProvider({ selected ->
                 TextView(controller.activity).apply { text = if (selected) "★" else "☆"; textSize = 22f; gravity = Gravity.CENTER; setTextColor(Color.rgb(255, 149, 0)) }
             }, index)
         }) { controller, index, _ -> controller.setTabBarItemIconViewProvider(null, index) },
-        updateRow("networkIcon", "Download a network icon", "Downloads the icon of this page's tab (cached); tap again to restore", { controller, index ->
+        updateRow("networkIcon", cylDemoText("Download a network icon"), cylDemoText("Downloads the icon of this page's tab (cached); tap again to restore"), { controller, index ->
             controller.tabBarItemsAttributes.toList().also {
                 controller.setTabBarItemIconWithURL("https://cdn-icons-png.flaticon.com/512/3132/3132732.png", "https://cdn-icons-png.flaticon.com/512/3132/3132779.png", CYLSize(24f, 24f), index)
             }
         }) { controller, _, saved -> restoreAll(controller, saved) },
-        updateRow("allNetworkIcons", "Download every network icon", "Downloads and updates the icons of every tab; tap again to restore", { controller, _ ->
+        updateRow("allNetworkIcons", cylDemoText("Download every network icon"), cylDemoText("Downloads and updates the icons of every tab; tap again to restore"), { controller, _ ->
             controller.tabBarItemsAttributes.toList().also {
                 controller.tabBarItemsAttributes.indices.forEach { index ->
                     val (url, selected) = networkIcons[index % networkIcons.size]
@@ -105,7 +105,7 @@ object DemoInteractions {
                 }
             }
         }) { controller, _, saved -> restoreAll(controller, saved) },
-        updateRow("allLocalIcons", "Use local icons for every tab", "Updates every tab icon from local images (a resource, an asset file, a Drawable); tap again to restore", { controller, _ ->
+        updateRow("allLocalIcons", cylDemoText("Use local icons for every tab"), cylDemoText("Updates every tab icon from local images (a resource, an asset file, a Drawable); tap again to restore"), { controller, _ ->
             controller.tabBarItemsAttributes.toList().also {
                 controller.tabBarItemsAttributes.indices.forEach { index ->
                     val icon = when (index % 3) {
@@ -117,13 +117,13 @@ object DemoInteractions {
                 }
             }
         }) { controller, _, saved -> restoreAll(controller, saved) },
-        updateRow("gif", "GIF icon", "This page's tab shows a GIF (CYLTabBarGIFFilePath); tap again to restore", { controller, index ->
+        updateRow("gif", "GIF icon", cylDemoText("This page's tab shows a GIF (CYLTabBarGIFFilePath); tap again to restore"), { controller, index ->
             controller.tabBarItemAttributesAtIndex(index).also {
                 controller.updateTabBarItemAtIndex(index, mapOf(CYLConstants.CYLTabBarGIFFilePath to "file:///android_asset/cyl_tab_sample_animated.gif"))
             }
         }) { controller, index, saved -> @Suppress("UNCHECKED_CAST") (saved as? Map<String, Any?>)?.let { attributes ->
             controller.updateTabBarItemAtIndex(index, attributes + (CYLConstants.CYLTabBarGIFFilePath to null)) } },
-        updateRow("allTitles", "Change every title", "Updates the titles of every tab at once; tap again to restore", { controller, _ ->
+        updateRow("allTitles", cylDemoText("Change every title"), cylDemoText("Updates the titles of every tab at once; tap again to restore"), { controller, _ ->
             controller.tabBarItemsAttributes.toList().also { saved ->
                 controller.updateTabBarItemsWithAttributes(saved.mapIndexed { index, attributes -> attributes + (CYLConstants.CYLTabBarItemTitle to "Tab ${index + 1}") })
             }
@@ -137,10 +137,10 @@ object DemoInteractions {
     // MARK: - Pages, selection, login 页面、选中与登录
 
     fun pageRows() = listOf(
-        updateRow("replace", "Replace the pages of the neighboring tabs", "Replaces the tabs on both sides of this tab with other pages (issue #481); tap again to restore", { controller, index ->
+        updateRow("replace", cylDemoText("Replace the pages of the neighboring tabs"), cylDemoText("Replaces the tabs on both sides of this tab with other pages (issue #481); tap again to restore"), { controller, index ->
             val saved = controller.viewControllers.toList() to controller.tabBarItemsAttributes.toList()
             listOf(index - 1, index + 1).filter { it in controller.viewControllers.indices }.forEach { side ->
-                controller.replaceViewControllerAtIndex(side, TextPageFragment.newInstance("Replacement page ${side + 1}", background = Color.rgb(230, 230, 250)),
+                controller.replaceViewControllerAtIndex(side, TextPageFragment.newInstance(cylDemoText("Replacement page %@", side + 1), background = Color.rgb(230, 230, 250)),
                     controller.tabBarItemsAttributes[side] + (CYLConstants.CYLTabBarItemTitle to "Replaced ${side + 1}"))
             }
             saved
@@ -169,9 +169,9 @@ object DemoInteractions {
     fun plusButtonRows() = listOf(
         DemoRow(cylDemoText("PlusButton touchable area (issue #91)"), {
             val plus = tabBarController?.tabBar?.plusButton
-            "Switch on to show the touchable area in translucent red; the slider scales it, current: ${plus?.touchableAreaScale ?: "-"}x"
+            cylDemoText("Switch on to show the touchable area in translucent red; the slider scales it, current: %@x", plus?.touchableAreaScale ?: "-")
         }) {
-            val plus = tabBarController?.tabBar?.plusButton ?: return@DemoRow showMessage("PlusButton", "This tab bar has no plus button.")
+            val plus = tabBarController?.tabBar?.plusButton ?: return@DemoRow showMessage("PlusButton", cylDemoText("This tab bar has no plus button."))
             val context = requireContext()
             val switch = SwitchCompat(context).apply { text = cylDemoText("Show the touchable area"); isChecked = plus.showsTouchableArea }
             val slider = SeekBar(context).apply { max = 20; progress = ((plus.touchableAreaScale - 1f) * 10).toInt() }
@@ -198,31 +198,31 @@ object DemoInteractions {
     private val tapSteps = listOf(
         TapStep("None"),
         TapStep("Scale", CYLEnums.CYLTabButtonTapAnimationType.Scale),
-        TapStep("Zoom in", CYLEnums.CYLTabButtonTapAnimationType.ZoomIn),
+        TapStep(cylDemoText("Zoom in"), CYLEnums.CYLTabButtonTapAnimationType.ZoomIn),
         TapStep("Bounce", CYLEnums.CYLTabButtonTapAnimationType.Bounce),
         TapStep("Bounce + fireworks", CYLEnums.CYLTabButtonTapAnimationType.BounceWithFireworks),
         TapStep("Rotation", CYLEnums.CYLTabButtonTapAnimationType.Rotation),
         TapStep("Flip", CYLEnums.CYLTabButtonTapAnimationType.Flip),
         TapStep("Fume", CYLEnums.CYLTabButtonTapAnimationType.Fume),
-        TapStep("Slow scale (CYLTabButtonScaleAnimation, duration 1.2 s)", animation = { CYLTabButtonScaleAnimation().apply { duration = 1.2 } }),
-        TapStep("Slow zoom in (CYLTabButtonZoomInAnimation, duration 1.2 s)", animation = { CYLTabButtonZoomInAnimation().apply { duration = 1.2 } }),
-        TapStep("Star fireworks (CYLTabButtonBounceAnimation.fireworksImage)", animation = {
+        TapStep(cylDemoText("Slow scale (CYLTabButtonScaleAnimation, duration 1.2 s)"), animation = { CYLTabButtonScaleAnimation().apply { duration = 1.2 } }),
+        TapStep(cylDemoText("Slow zoom in (CYLTabButtonZoomInAnimation, duration 1.2 s)"), animation = { CYLTabButtonZoomInAnimation().apply { duration = 1.2 } }),
+        TapStep(cylDemoText("Star fireworks (CYLTabButtonBounceAnimation.fireworksImage)"), animation = {
             CYLTabButtonBounceAnimation().apply { playsFireworks = true; fireworksImage = EmojiDrawable("⭐") }
         }),
-        TapStep("Curl up (CYLTabButtonFlipAnimation.direction = 5)", animation = { CYLTabButtonFlipAnimation().apply { direction = 5; disablesDeselectAnimation = true } }),
-        TapStep("Only this tab rotates (page.cyl_tabButtonAnimation)", animation = { CYLTabButtonRotationAnimation() }, oneTab = true),
+        TapStep(cylDemoText("Curl up (CYLTabButtonFlipAnimation.direction = 5)"), animation = { CYLTabButtonFlipAnimation().apply { direction = 5; disablesDeselectAnimation = true } }),
+        TapStep(cylDemoText("Only this tab rotates (page.cyl_tabButtonAnimation)"), animation = { CYLTabButtonRotationAnimation() }, oneTab = true),
     )
     private val tapStepOf = java.util.WeakHashMap<CYLTabBarController, Int>()
 
     private class FeedbackStep(val name: String, val sound: Boolean, val custom: Boolean = false, val haptic: CYLEnums.CYLImpactFeedbackStyle? = null)
     private val feedbackSteps = listOf(
         FeedbackStep("Off", false),
-        FeedbackStep("Default tap sound", true),
-        FeedbackStep("Custom sound file (cyl_tabButtonTapSoundURL)", true, custom = true),
-        FeedbackStep("Light haptic", false, haptic = CYLEnums.CYLImpactFeedbackStyle.Light),
-        FeedbackStep("Medium haptic", false, haptic = CYLEnums.CYLImpactFeedbackStyle.Medium),
-        FeedbackStep("Heavy haptic", false, haptic = CYLEnums.CYLImpactFeedbackStyle.Heavy),
-        FeedbackStep("Tap sound + haptic", true, haptic = CYLEnums.CYLImpactFeedbackStyle.Medium),
+        FeedbackStep(cylDemoText("Default tap sound"), true),
+        FeedbackStep(cylDemoText("Custom sound file (cyl_tabButtonTapSoundURL)"), true, custom = true),
+        FeedbackStep(cylDemoText("Light haptic"), false, haptic = CYLEnums.CYLImpactFeedbackStyle.Light),
+        FeedbackStep(cylDemoText("Medium haptic"), false, haptic = CYLEnums.CYLImpactFeedbackStyle.Medium),
+        FeedbackStep(cylDemoText("Heavy haptic"), false, haptic = CYLEnums.CYLImpactFeedbackStyle.Heavy),
+        FeedbackStep(cylDemoText("Tap sound + haptic"), true, haptic = CYLEnums.CYLImpactFeedbackStyle.Medium),
     )
     private val feedbackStepOf = java.util.WeakHashMap<CYLTabBarController, Int>()
 
@@ -286,7 +286,7 @@ object DemoInteractions {
         },
         DemoRow(cylDemoText("Switch to the previous / next tab (issue #535)"), { "cyl_switchToAdjacentTabWithStep:animated:" }) {
             val controller = tabBarController ?: return@DemoRow
-            choose(cylDemoText("Adjacent tab"), listOf("Previous tab", "Next tab")) { index -> controller.cyl_switchToAdjacentTabWithStep(if (index == 0) -1 else 1, true) }
+            choose(cylDemoText("Adjacent tab"), listOf(cylDemoText("Previous tab"), cylDemoText("Next tab"))) { index -> controller.cyl_switchToAdjacentTabWithStep(if (index == 0) -1 else 1, true) }
         },
         DemoRow(cylDemoText("Slide transition (CYLTabBarSlideTransitionAnimator)"), { "Delegate returns a slide animator: ${if (tabBarController?.delegate is SlideDelegate) "on" else "off"}" }) {
             val controller = tabBarController ?: return@DemoRow
@@ -309,7 +309,7 @@ object DemoInteractions {
             cyl_pushViewController(NavigationBarHiddenPage())
         },
         DemoRow(cylDemoText("Touches outside the super view (issue #535)"), { cylDemoText("The plus button sticks out of the bar; its part above the bar responds (shown in red)") }) {
-            val plus = tabBarController?.tabBar?.plusButton ?: return@DemoRow showMessage("PlusButton", "This tab bar has no plus button.")
+            val plus = tabBarController?.tabBar?.plusButton ?: return@DemoRow showMessage("PlusButton", cylDemoText("This tab bar has no plus button."))
             plus.showsTouchableArea = !plus.showsTouchableArea
             plus.invalidate()
         },
@@ -372,8 +372,8 @@ class DemoPopPushFragment : Fragment() {
  */
 object LateImagePlusButton {
     enum class Case(val title: String) {
-        Loaded("Load an image"), Replaced("Replace with a larger image"), Removed("Remove the image"), BackgroundLoaded("Load a background image"),
-        ReadyImage("Image from the start (reference)"), ReadyLargerImage("Larger image from the start (reference)"), ReadyBackground("Background from the start (reference)"),
+        Loaded(cylDemoText("Load an image")), Replaced(cylDemoText("Replace with a larger image")), Removed(cylDemoText("Remove the image")), BackgroundLoaded(cylDemoText("Load a background image")),
+        ReadyImage(cylDemoText("Image from the start (reference)")), ReadyLargerImage(cylDemoText("Larger image from the start (reference)")), ReadyBackground(cylDemoText("Background from the start (reference)")),
     }
 
     private const val CONTEXT = "LateImagePlusButton"

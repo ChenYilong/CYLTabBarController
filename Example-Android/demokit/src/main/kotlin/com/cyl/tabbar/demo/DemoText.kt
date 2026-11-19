@@ -62,3 +62,17 @@ object DemoText {
 
 /** [EN] Shorthand of `DemoText.string`. [CN] `DemoText.string` 的简写。 */
 fun cylDemoText(english: String, vararg arguments: Any?): String = DemoText.string(english, *arguments)
+
+/**
+ * [EN] English keys kept as they are (e.g. tab titles that are also identifiers), listed so that
+ *      `scripts/android-demo-strings.py` writes their translations; show them with `cylDemoText(key)`.
+ * [CN] 原样保留的英文键（例如同时作为标识的 Tab 标题），列在这里以便 `scripts/android-demo-strings.py` 生成其译文；显示时使用 `cylDemoText(key)`。
+ */
+fun cylDemoTextKeys(vararg english: String): List<String> = english.toList()
+
+/**
+ * [EN] One English key kept as it is (e.g. a title that is also part of a lookup key), listed so that
+ *      `scripts/android-demo-strings.py` writes its translations; show it with `cylDemoText(key)`.
+ * [CN] 原样保留的一个英文键（例如同时用作查找键一部分的标题），列在这里以便 `scripts/android-demo-strings.py` 生成其译文；显示时使用 `cylDemoText(key)`。
+ */
+fun cylDemoTextKey(english: String): String = english

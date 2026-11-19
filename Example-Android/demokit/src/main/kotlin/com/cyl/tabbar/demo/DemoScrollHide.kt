@@ -201,7 +201,7 @@ object DemoScrollHide {
         rows += DemoRow(cylDemoText("Scroll hiding: simulated interruptions (issue #13)"), { cylDemoText("Choose one from a list; the same simulations as the rows below") }) {
             choose(cylDemoText("Simulated interruptions"), simulations.map { title(page.context, it) }) { index -> run(this, index) }
         }
-        rows += DemoRow(if (expanded) "Collapse the simulations" else "Expand all ${simulations.size} simulations") { expanded = !expanded }
+        rows += DemoRow(if (expanded) cylDemoText("Collapse the simulations") else cylDemoText("Expand all %@ simulations", simulations.size)) { expanded = !expanded }
         if (expanded) simulations.forEachIndexed { index, simulation ->
             rows += DemoRow(title(page.context, simulation), { results[index] ?: hint(simulation) }) { run(this, index) }
         }
@@ -209,11 +209,11 @@ object DemoScrollHide {
     }
 
     private fun hint(simulation: Simulation) = when (simulation.kind) {
-        Kind.Restore -> "Tap: the bar hides, then the interruption comes. Expected: the bar comes back."
-        Kind.Keep -> if (simulation.expectsVisible) "Expected: the bar stays shown." else "Expected: the bar stays as it is (no restore)."
-        Kind.Manual -> "Manual: tap to turn scroll hiding on, scroll down to hide the bar, then do what the title says. Expected: the bar comes back."
-        Kind.NotApplicable -> "n/a on Android: an app cannot post this system event."
-        Kind.SelfTest -> "Runs every automatic row, one after the other."
+        Kind.Restore -> cylDemoText("Tap: the bar hides, then the interruption comes. Expected: the bar comes back.")
+        Kind.Keep -> if (simulation.expectsVisible) cylDemoText("Expected: the bar stays shown.") else cylDemoText("Expected: the bar stays as it is (no restore).")
+        Kind.Manual -> cylDemoText("Manual: tap to turn scroll hiding on, scroll down to hide the bar, then do what the title says. Expected: the bar comes back.")
+        Kind.NotApplicable -> cylDemoText("n/a on Android: an app cannot post this system event.")
+        Kind.SelfTest -> cylDemoText("Runs every automatic row, one after the other.")
     }
 
     private fun run(page: DemoListFragment, index: Int) {

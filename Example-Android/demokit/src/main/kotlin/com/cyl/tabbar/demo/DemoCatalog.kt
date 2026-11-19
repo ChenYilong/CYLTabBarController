@@ -105,9 +105,12 @@ object DemoCatalog {
      * [EN] Playback of the tab icon animations: Play all, speed, loop (AGENTS.md "Animated icon examples").
      * [CN] Tab 图标动画的播放：全部播放、倍速、循环（AGENTS.md「Animated icon examples」）。
      */
+    // [EN] Keys shown through cylDemoText(...). [CN] 通过 cylDemoText(...) 显示的键。
+    private val playbackWords = cylDemoTextKeys("on", "off")
+
     private fun playbackSection() = DemoSection(cylDemoText("Playback"), listOf(DemoRow(cylDemoText("Tab icon animations: Play all, speed, loop"), {
         val controller = tabBarController
-        "Speed ${DemoPlaybackControls.speedText(controller?.tabBarItemAnimationSpeed?.takeIf { it > 0 && it.isFinite() } ?: 1f)}, loop ${if (controller?.tabBarItemAnimationLoops == true) "on" else "off"}; tap for the controls"
+        cylDemoText("Speed %@, loop %@; tap for the controls", DemoPlaybackControls.speedText(controller?.tabBarItemAnimationSpeed?.takeIf { it > 0 && it.isFinite() } ?: 1f), cylDemoText(if (controller?.tabBarItemAnimationLoops == true) "on" else "off"))
     }) {
         val controller = tabBarController ?: return@DemoRow
         DemoPlaybackControls.show(requireContext(), controller) { reload() }
@@ -115,9 +118,9 @@ object DemoCatalog {
 
     // MARK: - General 通用
 
-    private fun languageRow() = DemoRow(cylDemoText("Language"), { cylDemoText("Current: ") + (AppCompatDelegate.getApplicationLocales().toLanguageTags().ifEmpty { cylDemoText("system") }) }) {
+    private fun languageRow() = DemoRow(cylDemoText("Language"), { cylDemoText("Current: %@", AppCompatDelegate.getApplicationLocales().toLanguageTags().ifEmpty { cylDemoText("system") }) }) {
         val tags = listOf("", "en", "zh-CN")
-        val names = listOf("Follow the system", "English", getString(R.string.language_chinese))
+        val names = listOf(cylDemoText("Follow the system"), "English", getString(R.string.language_chinese))
         val current = tags.indexOf(AppCompatDelegate.getApplicationLocales().toLanguageTags()).coerceAtLeast(0)
         choose(cylDemoText("Language"), names, current) { index -> AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(tags[index])) }
     }
@@ -133,12 +136,12 @@ object DemoCatalog {
 
     private val titleOffsets = listOf(0f, -4f, 4f)
     private var appearanceIndex = 0
-    private val appearanceNames = listOf("System default", "Dark", "Centered capsule", "Green line")
+    private val appearanceNames = listOf(cylDemoText("System default"), "Dark", cylDemoText("Centered capsule"), cylDemoText("Green line"))
 
     private fun appearanceRows() = listOf(
         DemoRow(cylDemoText("Title offset (titlePositionAdjustment)"), {
             val offset = tabBarController?.titlePositionAdjustment ?: CYLOffset.zero
-            "Tap to cycle the vertical offset of every tab title, current: (${offset.horizontal}, ${offset.vertical})"
+            cylDemoText("Tap to cycle the vertical offset of every tab title, current: (%@, %@)", offset.horizontal, offset.vertical)
         }) {
             val controller = tabBarController ?: return@DemoRow
             val next = titleOffsets[(titleOffsets.indexOf(controller.titlePositionAdjustment.vertical) + 1) % titleOffsets.size]
@@ -148,7 +151,7 @@ object DemoCatalog {
         },
         DemoRow(cylDemoText("Liquid Glass surface tint (cyl_liquidGlassSurfaceOpacity)"), {
             val opacity = tabBarController?.tabBar?.cyl_liquidGlassSurfaceOpacity ?: 0.4f
-            "Android only: drag the slider to see the dock change, from clear glass (0) to a solid board (1); now ${"%.2f".format(opacity)}"
+            cylDemoText("Android only: drag the slider to see the dock change, from clear glass (0) to a solid board (1); now %@", "%.2f".format(opacity))
         }) {
             val controller = tabBarController ?: return@DemoRow
             DemoLiquidGlassSurface.showSlider(requireContext(), controller) { reload() }
@@ -243,10 +246,10 @@ object DemoCatalog {
             DemoHostActivity.open(requireContext(), "BottomNavigationView") { activity -> systemTabBar(activity) }
         },
         DemoRow(cylDemoText("Push to the system tab bar (another PlusButton)"), { cylDemoText("The system bar has no plus button: a floating action button stands in") }) {
-            DemoHostActivity.open(requireContext(), "System tab bar") { activity -> systemTabBar(activity, withPlus = true) }
+            DemoHostActivity.open(requireContext(), cylDemoText("System tab bar")) { activity -> systemTabBar(activity, withPlus = true) }
         },
         DemoRow(cylDemoText("Push to another CYLTabBarController (another PlusButton)"), { cylDemoText("A tab bar controller of another context, with a square plus button") }) {
-            DemoHostActivity.openTabBar(requireContext(), "Another plus button") { activity -> DemoTabs.controller(activity, SQUARE_PLUS_CONTEXT, squarePlus) }
+            DemoHostActivity.openTabBar(requireContext(), cylDemoText("Another plus button")) { activity -> DemoTabs.controller(activity, SQUARE_PLUS_CONTEXT, squarePlus) }
         },
         DemoRow(cylDemoText("cyl_pop / cyl_push methods"), { "cyl_pushViewController, cyl_popSelectTabBarChildViewControllerAtIndex, cyl_pushOrPopToViewController" }) {
             DemoHostActivity.openTabBar(requireContext(), "cyl_pop / cyl_push") { activity -> DemoTabs.controller(activity, null, null) { DemoPopPushFragment() } }
@@ -289,7 +292,7 @@ object DemoCatalog {
     private fun messageRows() = listOf(
         DemoRow(cylDemoText("Push a TabBarController of the same context (the same PlusButton class)"), { cyl_badgeTitleForRow(0) }, 0) {
             val context = tabBarController?.context ?: PLUS_CONTEXT
-            DemoHostActivity.openTabBar(requireContext(), "Same context") { activity -> DemoTabs.controller(activity, context, null) }
+            DemoHostActivity.openTabBar(requireContext(), cylDemoText("Same context")) { activity -> DemoTabs.controller(activity, context, null) }
         },
         DemoRow(cylDemoText("Push a TabBarController of a new context (PlusButton with a tappable X, issue #202)"),
             { cylDemoText("Tap the X at the top right of the PlusButton: the X changes color at random and the PlusButton does not respond") }, 1) {
@@ -304,7 +307,7 @@ object DemoCatalog {
                     activity?.title = "Home($row)"
                     pushText("CYLBaseViewController", Color.rgb(255, 165, 0))
                 }
-                MESSAGE -> DemoHostActivity.openTabBar(requireContext(), "Alternate plus button") { activity -> DemoTabs.controller(activity, SQUARE_PLUS_CONTEXT, squarePlus) }
+                MESSAGE -> DemoHostActivity.openTabBar(requireContext(), cylDemoText("Alternate plus button")) { activity -> DemoTabs.controller(activity, SQUARE_PLUS_CONTEXT, squarePlus) }
                 DISCOVER -> pushText("CYLDetailsViewController (navigation bar hidden)", Color.rgb(90, 200, 250))
                 else -> {
                     tabBarController?.tabBar?.tabBarButtonArray?.getOrNull(3)?.cyl_showBadgeValue(row.toString(), CYLEnums.CYLBadgeAnimationType.None)
