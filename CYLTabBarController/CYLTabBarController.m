@@ -529,7 +529,14 @@ static void CYLApplyIconRenderingMode(NSDictionary *attributes, id _Nullable *_N
     }
 }
 
+// [EN] `-shouldUnloadViewOfViewController:` of `CYLTabBarControllerMemoryWarningSeam` is implemented in Swift (step 103), which
+//      clang cannot see here; the class conforms at run time (`testMemoryWarningReportThroughTheSeam`).
+// [CN] `CYLTabBarControllerMemoryWarningSeam` 的 `-shouldUnloadViewOfViewController:` 在 Swift 中实现（第 103 步），clang 在这里看不到；
+//      运行时该类是遵守协议的（`testMemoryWarningReportThroughTheSeam`）。
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wprotocol"
 @implementation CYLTabBarController {
+#pragma clang diagnostic pop
 #if CYL_FLATDESIGN_AVAILABLE
     struct {
         unsigned willShowTabBar : 1;
@@ -1595,57 +1602,13 @@ static const void *const CYLPlusButtonGlassLayoutRetryPendingKey = &CYLPlusButto
 
 #pragma mark - Memory warning (issue #426)
 
+// [EN] `-shouldUnloadViewOfViewController:`, `cyl_keepsLoadedTabBarItemIdentifiers` and `-unloadViewsOfUnselectedViewControllers`
+//      are Swift (`Swift/CYLTabBarController+CYLMemoryWarning.swift`, step 103); this override only calls them.
+// [CN] 上述方法已改为 Swift（`Swift/CYLTabBarController+CYLMemoryWarning.swift`，第 103 步）；本重写只调用它们。
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     if (self.unloadsUnselectedViewsOnMemoryWarning) {
         [self unloadViewsOfUnselectedViewControllers];
-    }
-}
-
-- (BOOL)shouldUnloadViewOfViewController:(UIViewController *)viewController {
-    NSString *identifier = viewController.cyl_tabBarItemIdentifier;
-    return !(identifier && [self.cyl_keepsLoadedTabBarItemIdentifiers containsObject:identifier]);
-}
-
-- (NSArray<NSString *> *)cyl_keepsLoadedTabBarItemIdentifiers {
-    return objc_getAssociatedObject(self, @selector(cyl_keepsLoadedTabBarItemIdentifiers)) ?: @[];
-}
-
-- (void)setCyl_keepsLoadedTabBarItemIdentifiers:(NSArray<NSString *> *)identifiers {
-    objc_setAssociatedObject(self, @selector(cyl_keepsLoadedTabBarItemIdentifiers), [identifiers copy], OBJC_ASSOCIATION_COPY_NONATOMIC);
-}
-
-- (void)unloadViewsOfUnselectedViewControllers {
-    UIViewController *selectedViewController = self.selectedViewController;
-    for (UIViewController *viewController in self.viewControllers) {
-        if (viewController == selectedViewController || viewController.cyl_isPlaceholder) {
-            continue;
-        }
-        // A navigation controller's stack is unloaded with it, or not at all.
-        NSMutableArray<UIViewController *> *viewControllersToUnload = [NSMutableArray array];
-        if ([viewController isKindOfClass:[UINavigationController class]]) {
-            [viewControllersToUnload addObjectsFromArray:((UINavigationController *)viewController).viewControllers];
-        }
-        [viewControllersToUnload addObject:viewController];
-        BOOL canUnload = YES;
-        for (UIViewController *viewControllerToUnload in viewControllersToUnload) {
-            if (viewControllerToUnload.isViewLoaded &&
-                (viewControllerToUnload.view.window || viewControllerToUnload.presentedViewController)) {
-                canUnload = NO;
-                break;
-            }
-        }
-        if (!canUnload || ![self shouldUnloadViewOfViewController:viewController]) {
-            continue;
-        }
-        for (UIViewController *viewControllerToUnload in viewControllersToUnload) {
-            if (!viewControllerToUnload.isViewLoaded) {
-                continue;
-            }
-            // Setting `view` to nil does not take the view out of its superview (e.g. the navigation controller's).
-            [viewControllerToUnload.view removeFromSuperview];
-            viewControllerToUnload.view = nil;
-        }
     }
 }
 

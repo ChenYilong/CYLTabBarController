@@ -49,55 +49,55 @@ object DemoCatalog {
         val sections = ArrayList<DemoSection>()
         page.url?.let { url ->
             // [EN] The shared file gives this tab the page ID "web" with a URL parameter (docs/Tab-Page-Registry.md). [CN] 共用文件为此 Tab 指定页面 ID "web" 与 URL 参数（docs/Tab-Page-Registry.md）。
-            sections += DemoSection("Page ID \"web\" · CYLTabBarItemPageParameters", listOf(DemoRow(url, { "Open in the browser" }) {
+            sections += DemoSection(cylDemoText("Page ID \"web\" · CYLTabBarItemPageParameters"), listOf(DemoRow(url, { cylDemoText("Open in the browser") }) {
                 startActivity(android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse(url)))
             }))
         }
         if (page.page == SETTINGS) return sections + settingsSections(page)
-        sections += DemoSection("General", listOf(languageRow(), memoryWarningRow()))
-        sections += DemoSection("Tab bar appearance", appearanceRows() + flatDesignRows())
+        sections += DemoSection(cylDemoText("General"), listOf(languageRow(), memoryWarningRow()))
+        sections += DemoSection(cylDemoText("Tab bar appearance"), appearanceRows() + flatDesignRows())
         sections += DemoScrollHide.section(page)
-        sections += DemoSection("Update tabs in place", DemoInteractions.tabItemUpdateRows())
-        sections += DemoSection("Tab pages, selection and login", DemoInteractions.pageRows())
+        sections += DemoSection(cylDemoText("Update tabs in place"), DemoInteractions.tabItemUpdateRows())
+        sections += DemoSection(cylDemoText("Tab pages, selection and login"), DemoInteractions.pageRows())
         sections += DemoSection("PlusButton", DemoInteractions.plusButtonRows())
-        sections += DemoSection("Skins: holiday and color themes (${DemoTheme.all.size})", DemoTheme.all.map(::themeRow))
-        sections += DemoSection("Tab interactions", DemoInteractions.interactionRows())
-        sections += DemoSection("No base class, and helpers", DemoInteractions.helperRows())
-        sections += DemoSection("Configuration file", DemoConfiguration.rows())
-        sections += DemoSection("Jump and compare", jumpRows())
+        sections += DemoSection(cylDemoText("Skins: holiday and color themes (%@)", DemoTheme.all.size), DemoTheme.all.map(::themeRow))
+        sections += DemoSection(cylDemoText("Tab interactions"), DemoInteractions.interactionRows())
+        sections += DemoSection(cylDemoText("No base class, and helpers"), DemoInteractions.helperRows())
+        sections += DemoSection(cylDemoText("Configuration file"), DemoConfiguration.rows())
+        sections += DemoSection(cylDemoText("Jump and compare"), jumpRows())
         when (page.page) {
             HOME -> {
-                sections += DemoSection("Tab Bar Gallery", listOf(DemoRow("Open the tab bar gallery",
-                    { "Every scene is a tab bar built with the public API: styles, animations, badges, Lottie and the newer tab API" }) {
+                sections += DemoSection(cylDemoText("Tab Bar Gallery"), listOf(DemoRow(cylDemoText("Open the tab bar gallery"),
+                    { cylDemoText("Every scene is a tab bar built with the public API: styles, animations, badges, Lottie and the newer tab API") }) {
                     startActivity(android.content.Intent(requireContext(), DemoGalleryActivity::class.java))
                 }))
-                sections += DemoSection("Animated item", listOf(DemoRow("CYLAnimatedItemView", { "The animated icon + title component on its own: GIF, Lottie, a missing file, an accessory and dragging" }) {
+                sections += DemoSection(cylDemoText("Animated item"), listOf(DemoRow("CYLAnimatedItemView", { cylDemoText("The animated icon + title component on its own: GIF, Lottie, a missing file, an accessory and dragging") }) {
                     startActivity(android.content.Intent(requireContext(), DemoAnimatedItemActivity::class.java))
                 }))
-                sections += DemoSection("Badges", badgeRows(page, maxOf(30, cyl_badgeStyleCount())))
+                sections += DemoSection(cylDemoText("Badges"), badgeRows(page, maxOf(30, cyl_badgeStyleCount())))
             }
             MESSAGE -> {
                 // [EN] Not on the first tab (AGENTS.md "Demo table rows"). [CN] 不放在第一个 Tab（AGENTS.md「Demo table rows」）。
                 sections += playbackSection()
-                sections += DemoSection("Badges", messageRows() + badgeRows(page, maxOf(15, cyl_badgeStyleCount())).drop(2))
+                sections += DemoSection(cylDemoText("Badges"), messageRows() + badgeRows(page, maxOf(15, cyl_badgeStyleCount())).drop(2))
             }
-            DISCOVER -> sections += DemoSection("Badges", badgeRows(page, maxOf(15, cyl_badgeStyleCount())))
-            else -> sections += DemoSection("Badges", badgeRows(page, maxOf(30, cyl_badgeStyleCount())))
+            DISCOVER -> sections += DemoSection(cylDemoText("Badges"), badgeRows(page, maxOf(15, cyl_badgeStyleCount())))
+            else -> sections += DemoSection(cylDemoText("Badges"), badgeRows(page, maxOf(30, cyl_badgeStyleCount())))
         }
         return sections
     }
 
     /** [EN] The settings groups of the library, in the iOS order. [CN] 库的设置分组，顺序与 iOS 相同。 */
     private fun settingsSections(page: DemoListFragment) = listOf(
-        DemoSection("General", listOf(languageRow(), memoryWarningRow())),
-        DemoSection("Tab bar appearance", appearanceRows()),
+        DemoSection(cylDemoText("General"), listOf(languageRow(), memoryWarningRow())),
+        DemoSection(cylDemoText("Tab bar appearance"), appearanceRows()),
         DemoScrollHide.section(page),
-        DemoSection("Update tabs in place", DemoInteractions.tabItemUpdateRows()),
-        DemoSection("Tab pages, selection and login", DemoInteractions.pageRows()),
+        DemoSection(cylDemoText("Update tabs in place"), DemoInteractions.tabItemUpdateRows()),
+        DemoSection(cylDemoText("Tab pages, selection and login"), DemoInteractions.pageRows()),
         DemoSection("PlusButton", DemoInteractions.plusButtonRows()),
-        DemoSection("Tab interactions", DemoInteractions.interactionRows()),
-        DemoSection("No base class, and helpers", DemoInteractions.helperRows()),
-        DemoSection("Configuration file", DemoConfiguration.rows()),
+        DemoSection(cylDemoText("Tab interactions"), DemoInteractions.interactionRows()),
+        DemoSection(cylDemoText("No base class, and helpers"), DemoInteractions.helperRows()),
+        DemoSection(cylDemoText("Configuration file"), DemoConfiguration.rows()),
         playbackSection(),
     )
 
@@ -105,7 +105,7 @@ object DemoCatalog {
      * [EN] Playback of the tab icon animations: Play all, speed, loop (AGENTS.md "Animated icon examples").
      * [CN] Tab 图标动画的播放：全部播放、倍速、循环（AGENTS.md「Animated icon examples」）。
      */
-    private fun playbackSection() = DemoSection("Playback", listOf(DemoRow("Tab icon animations: Play all, speed, loop", {
+    private fun playbackSection() = DemoSection(cylDemoText("Playback"), listOf(DemoRow(cylDemoText("Tab icon animations: Play all, speed, loop"), {
         val controller = tabBarController
         "Speed ${DemoPlaybackControls.speedText(controller?.tabBarItemAnimationSpeed?.takeIf { it > 0 && it.isFinite() } ?: 1f)}, loop ${if (controller?.tabBarItemAnimationLoops == true) "on" else "off"}; tap for the controls"
     }) {
@@ -115,15 +115,15 @@ object DemoCatalog {
 
     // MARK: - General 通用
 
-    private fun languageRow() = DemoRow("Language", { "Current: " + (AppCompatDelegate.getApplicationLocales().toLanguageTags().ifEmpty { "system" }) }) {
+    private fun languageRow() = DemoRow(cylDemoText("Language"), { cylDemoText("Current: ") + (AppCompatDelegate.getApplicationLocales().toLanguageTags().ifEmpty { cylDemoText("system") }) }) {
         val tags = listOf("", "en", "zh-CN")
         val names = listOf("Follow the system", "English", getString(R.string.language_chinese))
         val current = tags.indexOf(AppCompatDelegate.getApplicationLocales().toLanguageTags()).coerceAtLeast(0)
-        choose("Language", names, current) { index -> AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(tags[index])) }
+        choose(cylDemoText("Language"), names, current) { index -> AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(tags[index])) }
     }
 
     private fun memoryWarningRow() = DemoRow(
-        "Simulate a memory warning", { "Unloads the views of unselected tabs when unloadsUnselectedViewsOnMemoryWarning is on (#426), then lists each tab" },
+        cylDemoText("Simulate a memory warning"), { cylDemoText("Unloads the views of unselected tabs when unloadsUnselectedViewsOnMemoryWarning is on (#426), then lists each tab") },
     ) {
         tabBarController?.unloadsUnselectedViewsOnMemoryWarning = true
         cyl_simulateMemoryWarningAndShowResult()
@@ -136,7 +136,7 @@ object DemoCatalog {
     private val appearanceNames = listOf("System default", "Dark", "Centered capsule", "Green line")
 
     private fun appearanceRows() = listOf(
-        DemoRow("Title offset (titlePositionAdjustment)", {
+        DemoRow(cylDemoText("Title offset (titlePositionAdjustment)"), {
             val offset = tabBarController?.titlePositionAdjustment ?: CYLOffset.zero
             "Tap to cycle the vertical offset of every tab title, current: (${offset.horizontal}, ${offset.vertical})"
         }) {
@@ -146,22 +146,22 @@ object DemoCatalog {
             controller.tabBar.requestLayout()
             controller.tabBar.tabBarButtonArray.forEach { it.requestLayout() }
         },
-        DemoRow("Liquid Glass surface tint (cyl_liquidGlassSurfaceOpacity)", {
+        DemoRow(cylDemoText("Liquid Glass surface tint (cyl_liquidGlassSurfaceOpacity)"), {
             val opacity = tabBarController?.tabBar?.cyl_liquidGlassSurfaceOpacity ?: 0.4f
             "Android only: drag the slider to see the dock change, from clear glass (0) to a solid board (1); now ${"%.2f".format(opacity)}"
         }) {
             val controller = tabBarController ?: return@DemoRow
             DemoLiquidGlassSurface.showSlider(requireContext(), controller) { reload() }
         },
-        DemoRow("standardAppearance theme (shared by Liquid Glass and FlatDesign)", { "Current: ${appearanceNames[appearanceIndex]}; tap for the next one" }) {
+        DemoRow(cylDemoText("standardAppearance theme (shared by Liquid Glass and FlatDesign)"), { cylDemoText("Current: %@; tap for the next one", appearanceNames[appearanceIndex]) }) {
             val controller = tabBarController ?: return@DemoRow
             appearanceIndex = (appearanceIndex + 1) % appearanceNames.size
             applyAppearance(controller, appearanceIndex)
         },
-        DemoRow("Skin (CYLThemeManager, issue #216)", { "Current: ${DemoTheme.currentName}" }) {
-            choose("Choose a skin", DemoTheme.all.map { it.name }, DemoTheme.all.indexOfFirst { it.name == DemoTheme.currentName }) { DemoTheme.apply(DemoTheme.all[it].name) }
+        DemoRow(cylDemoText("Skin (CYLThemeManager, issue #216)"), { cylDemoText("Current: %@", DemoTheme.currentName) }) {
+            choose(cylDemoText("Choose a skin"), DemoTheme.all.map { it.name }, DemoTheme.all.indexOfFirst { it.name == DemoTheme.currentName }) { DemoTheme.apply(DemoTheme.all[it].name) }
         },
-        DemoRow("Shrink / hide the tab bar on scroll (issue #13)", {
+        DemoRow(cylDemoText("Shrink / hide the tab bar on scroll (issue #13)"), {
             val controller = tabBarController
             "cyl_hidesTabBarOnScroll = ${controller?.cyl_hidesTabBarOnScroll}, cyl_tabBarMinimizeBehavior = ${controller?.cyl_tabBarMinimizeBehavior}"
         }) {
@@ -201,19 +201,19 @@ object DemoCatalog {
     private var savedTabBarHeight: Float? = null
 
     private fun flatDesignRows() = listOf(
-        DemoRow("Show / hide the tab bar (setTabBarHidden:animated:)") {
+        DemoRow(cylDemoText("Show / hide the tab bar (setTabBarHidden:animated:)")) {
             val controller = tabBarController ?: return@DemoRow
             controller.setTabBarHidden(controller.tabBar.visibility == View.VISIBLE, true)
         },
-        DemoRow("Change the tab bar height", { "tabBarHeight = ${tabBarController?.tabBarHeight}" }) {
+        DemoRow(cylDemoText("Change the tab bar height"), { "tabBarHeight = ${tabBarController?.tabBarHeight}" }) {
             val controller = tabBarController ?: return@DemoRow
             val original = savedTabBarHeight ?: controller.tabBarHeight.also { savedTabBarHeight = it }
             controller.tabBarHeight = if (controller.tabBarHeight == original) original + 20 else original
             controller.tabBar.requestLayout()
         },
-        DemoRow("Tab items not centered (system layout)") { setItemsCentered(tabBarController, false) },
-        DemoRow("Tab items centered") { setItemsCentered(tabBarController, true) },
-        DemoRow("Set the tab item background color", { "CYLTabBarItemBackgroundColor / CYLTabBarItemSelectedBackgroundColor" }) {
+        DemoRow(cylDemoText("Tab items not centered (system layout)")) { setItemsCentered(tabBarController, false) },
+        DemoRow(cylDemoText("Tab items centered")) { setItemsCentered(tabBarController, true) },
+        DemoRow(cylDemoText("Set the tab item background color"), { "CYLTabBarItemBackgroundColor / CYLTabBarItemSelectedBackgroundColor" }) {
             val controller = tabBarController ?: return@DemoRow
             val on = controller.tabBarItemAttributesAtIndex(0)?.get(CYLConstants.CYLTabBarItemBackgroundColor) == null
             controller.tabBarItemsAttributes.indices.forEach { index ->
@@ -239,23 +239,23 @@ object DemoCatalog {
     // MARK: - Jump and compare 跳转与对比
 
     private fun jumpRows() = listOf(
-        DemoRow("Compare with the system tab bar", { "BottomNavigationView, the Android system tab bar, with the same tabs" }) {
+        DemoRow(cylDemoText("Compare with the system tab bar"), { cylDemoText("BottomNavigationView, the Android system tab bar, with the same tabs") }) {
             DemoHostActivity.open(requireContext(), "BottomNavigationView") { activity -> systemTabBar(activity) }
         },
-        DemoRow("Push to the system tab bar (another PlusButton)", { "The system bar has no plus button: a floating action button stands in" }) {
+        DemoRow(cylDemoText("Push to the system tab bar (another PlusButton)"), { cylDemoText("The system bar has no plus button: a floating action button stands in") }) {
             DemoHostActivity.open(requireContext(), "System tab bar") { activity -> systemTabBar(activity, withPlus = true) }
         },
-        DemoRow("Push to another CYLTabBarController (another PlusButton)", { "A tab bar controller of another context, with a square plus button" }) {
+        DemoRow(cylDemoText("Push to another CYLTabBarController (another PlusButton)"), { cylDemoText("A tab bar controller of another context, with a square plus button") }) {
             DemoHostActivity.openTabBar(requireContext(), "Another plus button") { activity -> DemoTabs.controller(activity, SQUARE_PLUS_CONTEXT, squarePlus) }
         },
-        DemoRow("cyl_pop / cyl_push methods", { "cyl_pushViewController, cyl_popSelectTabBarChildViewControllerAtIndex, cyl_pushOrPopToViewController" }) {
+        DemoRow(cylDemoText("cyl_pop / cyl_push methods"), { "cyl_pushViewController, cyl_popSelectTabBarChildViewControllerAtIndex, cyl_pushOrPopToViewController" }) {
             DemoHostActivity.openTabBar(requireContext(), "cyl_pop / cyl_push") { activity -> DemoTabs.controller(activity, null, null) { DemoPopPushFragment() } }
         },
     )
 
     private fun systemTabBar(activity: FragmentActivity, withPlus: Boolean = false): View {
         val root = android.widget.LinearLayout(activity).apply { orientation = android.widget.LinearLayout.VERTICAL }
-        val label = TextView(activity).apply { gravity = Gravity.CENTER; textSize = 18f; text = "Home" }
+        val label = TextView(activity).apply { gravity = Gravity.CENTER; textSize = 18f; text = cylDemoText("Home") }
         root.addView(FrameLayout(activity).apply {
             addView(label, FrameLayout.LayoutParams(-1, -1))
             if (withPlus) addView(com.google.android.material.floatingactionbutton.FloatingActionButton(activity).apply {
@@ -287,18 +287,18 @@ object DemoCatalog {
     // MARK: - Page rows 页面自己的行
 
     private fun messageRows() = listOf(
-        DemoRow("Push a TabBarController of the same context (the same PlusButton class)", { cyl_badgeTitleForRow(0) }, 0) {
+        DemoRow(cylDemoText("Push a TabBarController of the same context (the same PlusButton class)"), { cyl_badgeTitleForRow(0) }, 0) {
             val context = tabBarController?.context ?: PLUS_CONTEXT
             DemoHostActivity.openTabBar(requireContext(), "Same context") { activity -> DemoTabs.controller(activity, context, null) }
         },
-        DemoRow("Push a TabBarController of a new context (PlusButton with a tappable X, issue #202)",
-            { "Tap the X at the top right of the PlusButton: the X changes color at random and the PlusButton does not respond" }, 1) {
+        DemoRow(cylDemoText("Push a TabBarController of a new context (PlusButton with a tappable X, issue #202)"),
+            { cylDemoText("Tap the X at the top right of the PlusButton: the X changes color at random and the PlusButton does not respond") }, 1) {
             DemoHostActivity.openTabBar(requireContext(), "Issue #202") { activity -> DemoTabs.controller(activity, CloseSubviewPlusButton.CONTEXT, CloseSubviewPlusButton.Provider) }
         },
     )
 
     private fun badgeRows(page: DemoListFragment, count: Int): List<DemoRow> = (0 until count).map { row ->
-        DemoRow(cyl_badgeTitleForRow(row), { "${pageTitle(page.page)} CYLTabBarController on Android ${Build.VERSION.RELEASE}" }, row) {
+        DemoRow(cyl_badgeTitleForRow(row), { cylDemoText("%@ CYLTabBarController on Android %@", pageTitle(page.page), Build.VERSION.RELEASE) }, row) {
             when (page.page) {
                 HOME -> {
                     activity?.title = "Home($row)"

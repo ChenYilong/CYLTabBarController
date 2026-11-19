@@ -1346,32 +1346,6 @@ didRecognizeTabBarItemGesture:(CYLTabBarItemGesture)gesture
 @property (nonatomic, assign) BOOL unloadsUnselectedViewsOnMemoryWarning;
 
 /*!
- * [EN] Issue #426: the identifiers (`CYLTabBarItemIdentifier`) of the tabs `-unloadViewsOfUnselectedViewControllers` never
- *      unloads, without a subclass (e.g. from a configuration, `CYLTabBarControllerKeepsLoadedTabBarItemIdentifiers`).
- * [CN] Issue #426：`-unloadViewsOfUnselectedViewControllers` 不会卸载的 Tab 的标识（`CYLTabBarItemIdentifier`），无需子类
- *      （例如来自配置的 `CYLTabBarControllerKeepsLoadedTabBarItemIdentifiers`）。
- */
-@property (nonatomic, copy) NSArray<NSString *> *cyl_keepsLoadedTabBarItemIdentifiers;
-
-/*!
- * [EN] Issue #426: whether `-unloadViewsOfUnselectedViewControllers` may unload this tab's view controller (an element of
- *      `viewControllers`). Default: YES, except for the tabs in `cyl_keepsLoadedTabBarItemIdentifiers`; override in a
- *      subclass to keep other tabs loaded.
- * [CN] Issue #426：`-unloadViewsOfUnselectedViewControllers` 是否可以卸载该 Tab 的 ViewController（`viewControllers` 中的元素）。
- *      默认 YES，`cyl_keepsLoadedTabBarItemIdentifiers` 中的 Tab 除外；可在子类中重写以保留其他 Tab。
- */
-- (BOOL)shouldUnloadViewOfViewController:(UIViewController *)viewController;
-
-/*!
- * [EN] Issue #426: unloads the views of the tabs that are not selected now; see `unloadsUnselectedViewsOnMemoryWarning`.
- *      Called on a memory warning when that property is YES; can also be called directly, e.g. after the app enters
- *      the background.
- * [CN] Issue #426：立即卸载未选中 Tab 的视图，规则见 `unloadsUnselectedViewsOnMemoryWarning`。该属性为 YES 时在收到内存警告时调用；
- *      也可以直接调用，例如在 App 进入后台后。
- */
-- (void)unloadViewsOfUnselectedViewControllers;
-
-/*!
  * [EN] Playback speed of the Lottie animation views (`animationSpeed`). Default is 1.0; set it, e.g. to 1.5 to play 1.5
  *      times as fast, before the tab bar is laid out (in `-init…` or `-viewDidLoad`), or override the getter in a
  *      subclass. Applied once to each Lottie view when it is added, in every tab bar style, so there is no need to wait
@@ -1990,6 +1964,42 @@ typedef UIView * _Nullable (^CYLTabBarItemIconViewProvider)(BOOL selected);
 //@property (nonatomic, assign, getter=isLottieViewAdded) BOOL lottieViewAdded;
 
 #endif
+
+@end
+
+/*!
+ * [EN] Issue #426, unloading the views of unselected tabs: implemented in Swift (`Swift/CYLTabBarController+CYLMemoryWarning.swift`,
+ *      docs/Swift-Migration.md step 103). A category, so the Objective-C class needs no implementation of its own.
+ * [CN] Issue #426，卸载未选中 Tab 的视图：在 Swift 中实现（`Swift/CYLTabBarController+CYLMemoryWarning.swift`，docs/Swift-Migration.md
+ *      第 103 步）。以类别声明，Objective-C 类本身无需实现。
+ */
+@interface CYLTabBarController (CYLMemoryWarning)
+
+/*!
+ * [EN] Issue #426: the identifiers (`CYLTabBarItemIdentifier`) of the tabs `-unloadViewsOfUnselectedViewControllers` never
+ *      unloads, without a subclass (e.g. from a configuration, `CYLTabBarControllerKeepsLoadedTabBarItemIdentifiers`).
+ * [CN] Issue #426：`-unloadViewsOfUnselectedViewControllers` 不会卸载的 Tab 的标识（`CYLTabBarItemIdentifier`），无需子类
+ *      （例如来自配置的 `CYLTabBarControllerKeepsLoadedTabBarItemIdentifiers`）。
+ */
+@property (nonatomic, copy) NSArray<NSString *> *cyl_keepsLoadedTabBarItemIdentifiers;
+
+/*!
+ * [EN] Issue #426: whether `-unloadViewsOfUnselectedViewControllers` may unload this tab's view controller (an element of
+ *      `viewControllers`). Default: YES, except for the tabs in `cyl_keepsLoadedTabBarItemIdentifiers`; override in a
+ *      subclass to keep other tabs loaded.
+ * [CN] Issue #426：`-unloadViewsOfUnselectedViewControllers` 是否可以卸载该 Tab 的 ViewController（`viewControllers` 中的元素）。
+ *      默认 YES，`cyl_keepsLoadedTabBarItemIdentifiers` 中的 Tab 除外；可在子类中重写以保留其他 Tab。
+ */
+- (BOOL)shouldUnloadViewOfViewController:(UIViewController *)viewController;
+
+/*!
+ * [EN] Issue #426: unloads the views of the tabs that are not selected now; see `unloadsUnselectedViewsOnMemoryWarning`.
+ *      Called on a memory warning when that property is YES; can also be called directly, e.g. after the app enters
+ *      the background.
+ * [CN] Issue #426：立即卸载未选中 Tab 的视图，规则见 `unloadsUnselectedViewsOnMemoryWarning`。该属性为 YES 时在收到内存警告时调用；
+ *      也可以直接调用，例如在 App 进入后台后。
+ */
+- (void)unloadViewsOfUnselectedViewControllers;
 
 @end
 

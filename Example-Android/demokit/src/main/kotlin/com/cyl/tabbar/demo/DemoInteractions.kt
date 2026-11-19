@@ -145,18 +145,18 @@ object DemoInteractions {
             }
             saved
         }) { controller, _, saved -> @Suppress("UNCHECKED_CAST") (saved as? Pair<List<Fragment>, List<Map<String, Any?>>>)?.let { controller.setViewControllers(it.first, it.second) } },
-        DemoRow("selectedIndex and PlusButton (issue #515)", {
+        DemoRow(cylDemoText("selectedIndex and PlusButton (issue #515)"), {
             val controller = tabBarController
             "selectedIndex = ${controller?.selectedIndex}, cyl_selectedIndexIgnoringPlusButton = ${controller?.cyl_selectedIndexIgnoringPlusButton}, plus button active: ${controller?.tabBar?.plusButtonActive}"
         }) {
             val controller = tabBarController ?: return@DemoRow
             controller.cyl_selectedIndexIgnoringPlusButton = (controller.cyl_selectedIndexIgnoringPlusButton + 1) % controller.viewControllers.size
         },
-        DemoRow("Login state", { "Logged in: ${tabBarController?.cyl_loggedIn}. The \"Me\" tab needs a login (issue #19); tap to toggle" }) {
+        DemoRow(cylDemoText("Login state"), { cylDemoText("Logged in: %@. The \"Me\" tab needs a login (issue #19); tap to toggle", tabBarController?.cyl_loggedIn) }) {
             val controller = tabBarController ?: return@DemoRow
             controller.cyl_loginRequiredTabBarItemIdentifiers = listOf(DemoCatalog.ME, "me")
             controller.cyl_presentLoginBlock = { tabBarController, _, completion ->
-                android.app.AlertDialog.Builder(tabBarController.activity).setTitle("Log in")
+                android.app.AlertDialog.Builder(tabBarController.activity).setTitle(cylDemoText("Log in"))
                     .setPositiveButton("Log in") { _, _ -> completion(true) }
                     .setNegativeButton(android.R.string.cancel) { _, _ -> completion(false) }.show()
             }
@@ -167,16 +167,16 @@ object DemoInteractions {
     // MARK: - PlusButton
 
     fun plusButtonRows() = listOf(
-        DemoRow("PlusButton touchable area (issue #91)", {
+        DemoRow(cylDemoText("PlusButton touchable area (issue #91)"), {
             val plus = tabBarController?.tabBar?.plusButton
             "Switch on to show the touchable area in translucent red; the slider scales it, current: ${plus?.touchableAreaScale ?: "-"}x"
         }) {
             val plus = tabBarController?.tabBar?.plusButton ?: return@DemoRow showMessage("PlusButton", "This tab bar has no plus button.")
             val context = requireContext()
-            val switch = SwitchCompat(context).apply { text = "Show the touchable area"; isChecked = plus.showsTouchableArea }
+            val switch = SwitchCompat(context).apply { text = cylDemoText("Show the touchable area"); isChecked = plus.showsTouchableArea }
             val slider = SeekBar(context).apply { max = 20; progress = ((plus.touchableAreaScale - 1f) * 10).toInt() }
             val content = LinearLayout(context).apply { orientation = LinearLayout.VERTICAL; setPadding(48, 24, 48, 0); addView(switch); addView(slider) }
-            android.app.AlertDialog.Builder(context).setTitle("PlusButton touchable area").setView(content)
+            android.app.AlertDialog.Builder(context).setTitle(cylDemoText("PlusButton touchable area")).setView(content)
                 .setPositiveButton(android.R.string.ok) { _, _ ->
                     plus.showsTouchableArea = switch.isChecked
                     plus.touchableAreaScale = 1f + slider.progress / 10f
@@ -184,9 +184,9 @@ object DemoInteractions {
                     reload()
                 }.show()
         },
-        DemoRow("PlusButton image set later", { "Pushes a tab bar controller whose plus button has no image; 2 s later the image loads, is replaced or removed, or a background loads. The layout must match a button that had its image from the start." }) {
+        DemoRow(cylDemoText("PlusButton image set later"), { cylDemoText("Pushes a tab bar controller whose plus button has no image; 2 s later the image loads, is replaced or removed, or a background loads. The layout must match a button that had its image from the start.") }) {
             val cases = LateImagePlusButton.Case.values()
-            choose("PlusButton image set later", cases.map { it.title }) { index -> LateImagePlusButton.open(requireContext(), cases[index]) }
+            choose(cylDemoText("PlusButton image set later"), cases.map { it.title }) { index -> LateImagePlusButton.open(requireContext(), cases[index]) }
         },
     )
 
@@ -229,9 +229,9 @@ object DemoInteractions {
     private val longPressDurations = listOf(0.3, 0.5, 1.0)
     private val doubleTapIntervals = listOf(0.2, 0.3, 0.5)
 
-    private fun tapAnimationRow() = DemoRow("Tab tap animation (issue #535)", { "Tap to switch the tap animation of the tabs and the PlusButton, current: ${tapSteps[tabBarController?.let { tapStepOf[it] } ?: 0].name}" }) {
+    private fun tapAnimationRow() = DemoRow(cylDemoText("Tab tap animation (issue #535)"), { cylDemoText("Tap to switch the tap animation of the tabs and the PlusButton, current: %@", tapSteps[tabBarController?.let { tapStepOf[it] } ?: 0].name) }) {
         val controller = tabBarController ?: return@DemoRow
-        choose("Tab tap animation", tapSteps.map { it.name }, tapStepOf[controller] ?: 0) { index ->
+        choose(cylDemoText("Tab tap animation"), tapSteps.map { it.name }, tapStepOf[controller] ?: 0) { index ->
             tapStepOf[controller] = index
             val step = tapSteps[index]
             controller.cyl_defaultTabButtonAnimation = null
@@ -243,9 +243,9 @@ object DemoInteractions {
         }
     }
 
-    private fun feedbackRow() = DemoRow("Tab tap sound and haptic feedback (issue #535)", { "Current: ${feedbackSteps[tabBarController?.let { feedbackStepOf[it] } ?: 0].name}" }) {
+    private fun feedbackRow() = DemoRow(cylDemoText("Tab tap sound and haptic feedback (issue #535)"), { cylDemoText("Current: %@", feedbackSteps[tabBarController?.let { feedbackStepOf[it] } ?: 0].name) }) {
         val controller = tabBarController ?: return@DemoRow
-        choose("Tap feedback", feedbackSteps.map { it.name }, feedbackStepOf[controller] ?: 0) { index ->
+        choose(cylDemoText("Tap feedback"), feedbackSteps.map { it.name }, feedbackStepOf[controller] ?: 0) { index ->
             feedbackStepOf[controller] = index
             val step = feedbackSteps[index]
             controller.cyl_tabButtonTapSoundEnabled = step.sound
@@ -256,10 +256,10 @@ object DemoInteractions {
         }
     }
 
-    private fun longPressRow() = DemoRow("Long press a tab (issue #535)", { "cyl_didLongPressControlBlock: ${if (tabBarController?.cyl_didLongPressControlBlock != null) "on" else "off"}" }) {
+    private fun longPressRow() = DemoRow(cylDemoText("Long press a tab (issue #535)"), { "cyl_didLongPressControlBlock: ${if (tabBarController?.cyl_didLongPressControlBlock != null) "on" else "off"}" }) {
         val controller = tabBarController ?: return@DemoRow
         controller.cyl_didLongPressControlBlock = if (controller.cyl_didLongPressControlBlock != null) null else { tabBarController, control ->
-            android.widget.Toast.makeText(tabBarController.activity, "Long pressed: " + ((control as? com.cyl.tabbar.CYLTabBarItemButton)?.item?.title ?: "PlusButton"), android.widget.Toast.LENGTH_SHORT).show()
+            android.widget.Toast.makeText(tabBarController.activity, cylDemoText("Long pressed: %@", (control as? com.cyl.tabbar.CYLTabBarItemButton)?.item?.title ?: "PlusButton"), android.widget.Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -267,12 +267,12 @@ object DemoInteractions {
         tapAnimationRow(),
         feedbackRow(),
         longPressRow(),
-        DemoRow("Long press duration and double tap interval (issue #535 / #152)", {
+        DemoRow(cylDemoText("Long press duration and double tap interval (issue #535 / #152)"), {
             "cyl_tabBarItemLongPressDuration = ${tabBarController?.cyl_tabBarItemLongPressDuration} s, cyl_tabBarItemDoubleTapInterval = ${tabBarController?.cyl_tabBarItemDoubleTapInterval} s"
         }) {
             val controller = tabBarController ?: return@DemoRow
             val options = longPressDurations.flatMap { press -> doubleTapIntervals.map { tap -> press to tap } }
-            choose("Long press / double tap", options.map { "Long press ${it.first} s, double tap ${it.second} s" },
+            choose(cylDemoText("Long press / double tap"), options.map { cylDemoText("Long press %@ s, double tap %@ s", it.first, it.second) },
                 options.indexOf(controller.cyl_tabBarItemLongPressDuration to controller.cyl_tabBarItemDoubleTapInterval)) { index ->
                 controller.cyl_tabBarItemLongPressDuration = options[index].first
                 controller.cyl_tabBarItemDoubleTapInterval = options[index].second
@@ -281,14 +281,14 @@ object DemoInteractions {
                 }
             }
         },
-        DemoRow("Swipe left or right to switch tabs (issue #535)", { "cyl_swipeToSwitchTabEnabled = ${tabBarController?.cyl_swipeToSwitchTabEnabled}" }) {
+        DemoRow(cylDemoText("Swipe left or right to switch tabs (issue #535)"), { "cyl_swipeToSwitchTabEnabled = ${tabBarController?.cyl_swipeToSwitchTabEnabled}" }) {
             tabBarController?.let { it.cyl_swipeToSwitchTabEnabled = !it.cyl_swipeToSwitchTabEnabled }
         },
-        DemoRow("Switch to the previous / next tab (issue #535)", { "cyl_switchToAdjacentTabWithStep:animated:" }) {
+        DemoRow(cylDemoText("Switch to the previous / next tab (issue #535)"), { "cyl_switchToAdjacentTabWithStep:animated:" }) {
             val controller = tabBarController ?: return@DemoRow
-            choose("Adjacent tab", listOf("Previous tab", "Next tab")) { index -> controller.cyl_switchToAdjacentTabWithStep(if (index == 0) -1 else 1, true) }
+            choose(cylDemoText("Adjacent tab"), listOf("Previous tab", "Next tab")) { index -> controller.cyl_switchToAdjacentTabWithStep(if (index == 0) -1 else 1, true) }
         },
-        DemoRow("Slide transition (CYLTabBarSlideTransitionAnimator)", { "Delegate returns a slide animator: ${if (tabBarController?.delegate is SlideDelegate) "on" else "off"}" }) {
+        DemoRow(cylDemoText("Slide transition (CYLTabBarSlideTransitionAnimator)"), { "Delegate returns a slide animator: ${if (tabBarController?.delegate is SlideDelegate) "on" else "off"}" }) {
             val controller = tabBarController ?: return@DemoRow
             controller.delegate = if (controller.delegate is SlideDelegate) null else SlideDelegate
         },
@@ -305,20 +305,20 @@ object DemoInteractions {
     // MARK: - Helpers 工具方法
 
     fun helperRows() = listOf(
-        DemoRow("Hide the navigation bar without a base class (issue #535)", { "Pushes a page that hides the action bar while shown, with no base class" }) {
+        DemoRow(cylDemoText("Hide the navigation bar without a base class (issue #535)"), { cylDemoText("Pushes a page that hides the action bar while shown, with no base class") }) {
             cyl_pushViewController(NavigationBarHiddenPage())
         },
-        DemoRow("Touches outside the super view (issue #535)", { "The plus button sticks out of the bar; its part above the bar responds (shown in red)" }) {
+        DemoRow(cylDemoText("Touches outside the super view (issue #535)"), { cylDemoText("The plus button sticks out of the bar; its part above the bar responds (shown in red)") }) {
             val plus = tabBarController?.tabBar?.plusButton ?: return@DemoRow showMessage("PlusButton", "This tab bar has no plus button.")
             plus.showsTouchableArea = !plus.showsTouchableArea
             plus.invalidate()
         },
-        DemoRow("Load an image from the bundle (issue #535)", { "The image of this page's tab from the app assets (the resource bundle of Android)" }) {
+        DemoRow(cylDemoText("Load an image from the bundle (issue #535)"), { cylDemoText("The image of this page's tab from the app assets (the resource bundle of Android)") }) {
             val controller = tabBarController ?: return@DemoRow
             val icon = assetImage(requireContext(), "cyl_tab_sample_animated.gif")
             controller.setTabBarItemIcon(icon, icon, CYLSize(24f, 24f), cyl_tabIndex.coerceAtLeast(0))
         },
-        DemoRow("Helpers: find tab buttons and weak references (issue #535)", { "cyl_controlWithTabBarItemIdentifier, cyl_viewControllerWithTabBarItemIdentifier, cyl_tabBarController" }) {
+        DemoRow(cylDemoText("Helpers: find tab buttons and weak references (issue #535)"), { "cyl_controlWithTabBarItemIdentifier, cyl_viewControllerWithTabBarItemIdentifier, cyl_tabBarController" }) {
             val controller = tabBarController ?: return@DemoRow
             val lines = controller.cyl_tabBarItemIdentifiers.map { identifier ->
                 "$identifier: button ${controller.cyl_controlWithTabBarItemIdentifier(identifier)?.javaClass?.simpleName}, page ${controller.cyl_viewControllerWithTabBarItemIdentifier(identifier)?.javaClass?.simpleName}"
@@ -333,7 +333,7 @@ object DemoInteractions {
 class NavigationBarHiddenPage : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
         TextView(inflater.context).apply {
-            text = "The action bar is hidden while this page is shown.\nPress Back."
+            text = cylDemoText("The action bar is hidden while this page is shown.\nPress Back.")
             gravity = Gravity.CENTER
             setBackgroundColor(Color.rgb(255, 204, 0))
             isClickable = true
@@ -353,7 +353,7 @@ class DemoPopPushFragment : Fragment() {
         val context = inflater.context
         val column = LinearLayout(context).apply { orientation = LinearLayout.VERTICAL; gravity = Gravity.CENTER; setBackgroundColor(Color.WHITE); isClickable = true }
         fun button(title: String, action: () -> Unit) = column.addView(Button(context).apply { text = title; setOnClickListener { action() } })
-        column.addView(TextView(context).apply { text = "Tab ${cyl_tabIndex + 1}"; gravity = Gravity.CENTER; textSize = 18f })
+        column.addView(TextView(context).apply { text = cylDemoText("Tab %@", cyl_tabIndex + 1); gravity = Gravity.CENTER; textSize = 18f })
         button("cyl_pushViewController") { cyl_pushViewController(DemoPopPushFragment()) }
         button("cyl_pushOrPopToViewController (tab 1)") {
             cyl_pushOrPopToViewController(DemoPopPushFragment(), true) { stack, handler -> handler(stack.size > 1, stack.firstOrNull(), true, 0) }
@@ -381,7 +381,7 @@ object LateImagePlusButton {
     fun open(context: Context, case: Case) {
         val provider = object : CYLPlusButtonSubclassing {
             override fun plusButton(context: Context) = CYLPlusButton(context).apply {
-                setTitle("Publish")
+                setTitle(cylDemoText("Publish"))
                 val small = ContextCompat.getDrawable(context, android.R.drawable.ic_input_add)
                 val large = ContextCompat.getDrawable(context, android.R.drawable.ic_menu_add)
                 val background = GradientDrawable().apply { shape = GradientDrawable.OVAL; setColor(Color.rgb(0, 122, 255)) }

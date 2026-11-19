@@ -1297,4 +1297,33 @@
     }];
 }
 
+/// [EN] Issue #426 (step 103, Swift): unloading the views of unselected tabs skips the selected tab and the kept identifiers.
+/// [CN] Issue #426（第 103 步，Swift）：卸载未选中 Tab 的视图时跳过选中的 Tab 与保留的标识。
+- (void)testUnloadingUnselectedViewsKeepsTheSelectedAndTheKeptTabs {
+    CYLTabBarController *tabBarController = [CYLTabBarController tabBarControllerWithConfiguration:@{
+        CYLTabBarControllerContext : [NSUUID UUID].UUIDString,
+        CYLTabBarControllerTabBarItemsAttributes : @[
+            @{ CYLTabBarItemIdentifier : @"home", CYLTabBarItemTitle : @"Home" },
+            @{ CYLTabBarItemIdentifier : @"feed", CYLTabBarItemTitle : @"Feed" },
+            @{ CYLTabBarItemIdentifier : @"me", CYLTabBarItemTitle : @"Me" },
+        ],
+        CYLTabBarControllerPageResolver : ^UIViewController *(NSString *pageIdentifier, NSDictionary *attributes) {
+            return [[UIViewController alloc] init];
+        },
+    }];
+    tabBarController.cyl_keepsLoadedTabBarItemIdentifiers = @[ @"me" ];
+    for (UIViewController *viewController in tabBarController.viewControllers) {
+        [viewController loadViewIfNeeded];
+    }
+    NSArray<UIViewController *> *pages = tabBarController.viewControllers;
+    XCTAssertEqual(pages.count, 3u);
+    tabBarController.selectedIndex = 0;
+    [tabBarController unloadViewsOfUnselectedViewControllers];
+    XCTAssertTrue(pages[0].isViewLoaded, @"the selected tab keeps its view");
+    XCTAssertFalse(pages[1].isViewLoaded, @"an unselected tab is unloaded");
+    XCTAssertTrue(pages[2].isViewLoaded, @"a kept identifier is not unloaded");
+    XCTAssertFalse([tabBarController shouldUnloadViewOfViewController:pages[2]]);
+    XCTAssertTrue([tabBarController shouldUnloadViewOfViewController:pages[1]]);
+}
+
 @end
