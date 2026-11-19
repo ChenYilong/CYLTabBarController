@@ -374,6 +374,31 @@ static void CYLSetAdditionalSafeAreaBottom(UIViewController *viewController, CGF
 #if CYL_FLATDESIGN_AVAILABLE
 @property (nonatomic, strong) NSMutableArray<CYLFlatDesignTabBarItem *> *items;
 @property (nonatomic, assign) BOOL cyl_tabBarHidden;
+// [EN] Former instance variables (step 69): same backing names, so the Objective-C code reading `_name` is unchanged.
+// [CN] 原先的实例变量（第 69 步）：后备变量名不变，读取 `_name` 的 Objective-C 代码无需修改。
+#if CYL_FLATDESIGN_AVAILABLE
+@property (nonatomic, assign) BOOL cylDelegateHasWillShowTabBar;
+@property (nonatomic, assign) BOOL cylDelegateHasDidShowTabBar;
+@property (nonatomic, assign) BOOL cylDelegateHasWillHideTabBar;
+@property (nonatomic, assign) BOOL cylDelegateHasDidHideTabBar;
+@property (nonatomic, assign) BOOL tabBarIsAnimating;
+/// [EN] The last state of quick show / hide requests. [CN] 用于记录快速设置 tabBar 显示和隐藏最后一次的状态。
+@property (nonatomic, assign) BOOL lastShowHideTabBar;
+/// [EN] `animated` of the request queued while `_tabBarIsAnimating`; replayed with its own value.
+/// [CN] 动画期间排队的那次请求自己的 animated 参数，动画结束后按它重放。
+@property (nonatomic, assign) BOOL lastShowHideTabBarAnimated;
+@property (nonatomic, assign) BOOL needsReloadItems;
+@property (nonatomic, assign) BOOL cylDidRefreshSystemTabBarVisibility;
+@property (nonatomic, assign) BOOL cylRefreshingSystemTabBarVisibility;
+@property (nonatomic, assign) BOOL cylWaitingForVisibilityTransition;
+@property (nonatomic, weak) UIWindow *cylRefreshedSystemTabBarWindow;
+@property (nonatomic, strong) _CYLFlatDesignTabBarParallaxOverlayView *parallaxOverlayView;
+#endif
+/// [EN] Classic tab bar before iOS 18: the animated `-setTabBarHidden:animated:` (see `-cyl_setClassicTabBarHidden:animated:`).
+/// [CN] iOS 18 以前的经典 TabBar：带动画的 `-setTabBarHidden:animated:`（见 `-cyl_setClassicTabBarHidden:animated:`）。
+@property (nonatomic, assign) BOOL cylClassicTabBarIsAnimating;
+@property (nonatomic, assign) BOOL cylClassicTabBarHiddenRequest;
+@property (nonatomic, assign) NSUInteger cylClassicTabBarAnimationGeneration;
 - (void)_cyl_refreshSystemTabBarVisibilityIfNeeded;
 //@property (nonatomic, assign) CYLTabBarStyleType tabBarStyleType;
 //@property (nonatomic, readwrite) CYLFlatDesignTabBar *cyl_tabBar;
@@ -512,34 +537,9 @@ static void CYLApplyIconRenderingMode(NSDictionary *attributes, id _Nullable *_N
 #pragma clang diagnostic ignored "-Wprotocol"
 @implementation CYLTabBarController {
 #pragma clang diagnostic pop
-#if CYL_FLATDESIGN_AVAILABLE
-    struct {
-        unsigned willShowTabBar : 1;
-        unsigned didShowTabBar : 1;
-        unsigned willHideTabBar : 1;
-        unsigned didHideTabBar : 1;
-    } _delegateHas;
-    
-    BOOL _tabBarIsAnimating;
-    // 用于记录快速设置tabBar显示和隐藏最后一次的状态
-    BOOL _lastShowHideTabBar;
-    // `animated` of the request queued while `_tabBarIsAnimating`; replayed with its own value.
-    // 动画期间排队的那次请求自己的 animated 参数，动画结束后按它重放。
-    BOOL _lastShowHideTabBarAnimated;
-    BOOL _needsReloadItems;
-    BOOL _cylDidRefreshSystemTabBarVisibility;
-    BOOL _cylRefreshingSystemTabBarVisibility;
-    BOOL _cylWaitingForVisibilityTransition;
-    __weak UIWindow *_cylRefreshedSystemTabBarWindow;
-    
-    _CYLFlatDesignTabBarParallaxOverlayView *_parallaxOverlayView;
-#else
-#endif
-    // [EN] Classic tab bar before iOS 18: the animated `-setTabBarHidden:animated:` (see `-cyl_setClassicTabBarHidden:animated:`).
-    // [CN] iOS 18 以前的经典 TabBar：带动画的 `-setTabBarHidden:animated:`（见 `-cyl_setClassicTabBarHidden:animated:`）。
-    BOOL _cylClassicTabBarIsAnimating;
-    BOOL _cylClassicTabBarHiddenRequest;
-    NSUInteger _cylClassicTabBarAnimationGeneration;
+// [EN] The former instance variables are private properties below (class extension), with the same backing names,
+//      so Swift extensions reach them through their accessors (docs/Swift-Migration.md, step 69).
+// [CN] 原先的实例变量已改为下面类扩展中的私有属性，后备变量名不变，Swift 扩展可以通过存取方法访问它们（第 69 步）。
 }
 
 @synthesize viewControllers = _viewControllers;
@@ -1489,13 +1489,13 @@ static const void *const CYLPlusButtonGlassLayoutRetryPendingKey = &CYLPlusButto
                         
                 if (hidden) {
                             
-                    if (_delegateHas.willHideTabBar) {
+                    if (self.cylDelegateHasWillHideTabBar) {
                                 
                         CYL_PERFORM_SELECTOR_2OBJECT(self.delegate, tabBarController:willHideTabBar:, self, self.cyl_tabBar);
                         //                                [self.delegate tabBarController:self willHideTabBar:self.cyl_tabBar];
                     }
                 } else {
-                    if (_delegateHas.willShowTabBar) {
+                    if (self.cylDelegateHasWillShowTabBar) {
                         //                                [self.delegate tabBarController:self willShowTabBar:self.cyl_tabBar];
                         CYL_PERFORM_SELECTOR_2OBJECT(self.delegate, tabBarController:willShowTabBar:, self, self.cyl_tabBar);
                     }
@@ -1525,13 +1525,13 @@ static const void *const CYLPlusButtonGlassLayoutRetryPendingKey = &CYLPlusButto
                             
                     if (hidden) {
                                 
-                        if (self->_delegateHas.didHideTabBar) {
+                        if (self.cylDelegateHasDidHideTabBar) {
 //                                    [self.delegate tabBarController:self didHideTabBar:self.cyl_tabBar];
                         CYL_PERFORM_SELECTOR_2OBJECT(self.delegate, tabBarController:didHideTabBar:, self, self.cyl_tabBar);
                                                         }
 
                     } else {
-                        if (self->_delegateHas.didShowTabBar) {
+                        if (self.cylDelegateHasDidShowTabBar) {
 //                                    [self.delegate tabBarController:self didShowTabBar:self.cyl_tabBar];
                         CYL_PERFORM_SELECTOR_2OBJECT(self.delegate, tabBarController:didShowTabBar:, self, self.cyl_tabBar);
                                                             }
@@ -1548,14 +1548,14 @@ static const void *const CYLPlusButtonGlassLayoutRetryPendingKey = &CYLPlusButto
             } else {
                         
                 if (hidden) {
-                    if (_delegateHas.willHideTabBar) {
+                    if (self.cylDelegateHasWillHideTabBar) {
                         //                                [self.delegate tabBarController:self willHideTabBar:self.cyl_tabBar];
                         CYL_PERFORM_SELECTOR_2OBJECT(self.delegate, tabBarController:willHideTabBar:, self, self.cyl_tabBar);
 
                     }
 
                 } else {
-                    if (_delegateHas.willShowTabBar) {
+                    if (self.cylDelegateHasWillShowTabBar) {
                         //                                [self.delegate tabBarController:self willShowTabBar:self.cyl_tabBar];
                         CYL_PERFORM_SELECTOR_2OBJECT(self.delegate, tabBarController:willShowTabBar:, self, self.cyl_tabBar);
 
@@ -1570,14 +1570,14 @@ static const void *const CYLPlusButtonGlassLayoutRetryPendingKey = &CYLPlusButto
                 [self _updateAdditionalSafeAreaInsetsWithAnimated:animated];
                         
                 if (hidden) {
-                    if (_delegateHas.didHideTabBar) {
+                    if (self.cylDelegateHasDidHideTabBar) {
                         //                                [self.delegate tabBarController:self didHideTabBar:self.cyl_tabBar];
                         CYL_PERFORM_SELECTOR_2OBJECT(self.delegate, tabBarController:didHideTabBar:, self, self.cyl_tabBar);
 
                     }
 
                 } else {
-                    if (_delegateHas.didShowTabBar) {
+                    if (self.cylDelegateHasDidShowTabBar) {
                         //                                [self.delegate tabBarController:self didShowTabBar:self.cyl_tabBar];
                         CYL_PERFORM_SELECTOR_2OBJECT(self.delegate, tabBarController:didShowTabBar:, self, self.cyl_tabBar);
                     }
@@ -1714,10 +1714,10 @@ static const void *const CYLPlusButtonGlassLayoutRetryPendingKey = &CYLPlusButto
         if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType) {
 #if CYL_FLATDESIGN_AVAILABLE
             if (![_cyl_tabBar isKindOfClass:[CYLFlatDesignTabBar class]]) { return; }
-            _delegateHas.willShowTabBar = [delegate respondsToSelector:@selector(tabBarController:willShowTabBar:)];
-            _delegateHas.didShowTabBar = [delegate respondsToSelector:@selector(tabBarController:didShowTabBar:)];
-            _delegateHas.willHideTabBar = [delegate respondsToSelector:@selector(tabBarController:willHideTabBar:)];
-            _delegateHas.didHideTabBar = [delegate respondsToSelector:@selector(tabBarController:didHideTabBar:)];
+            self.cylDelegateHasWillShowTabBar = [delegate respondsToSelector:@selector(tabBarController:willShowTabBar:)];
+            self.cylDelegateHasDidShowTabBar = [delegate respondsToSelector:@selector(tabBarController:didShowTabBar:)];
+            self.cylDelegateHasWillHideTabBar = [delegate respondsToSelector:@selector(tabBarController:willHideTabBar:)];
+            self.cylDelegateHasDidHideTabBar = [delegate respondsToSelector:@selector(tabBarController:didHideTabBar:)];
 #else
 #endif
         
