@@ -765,8 +765,10 @@ FOUNDATION_EXTERN void CYLTabBarItemAnimationRegisterColors(NSURL *URL, NSDictio
 /// [CN] 由 CYLAnimatedItemView 绘制的扁平样式 Tab 上的角标：带 GIF 动画的 Tab 与静态图标的 Tab，在动画加载后（此时组件会隐藏图片视图）
 ///      角标都保持可见，并位于图标右上角附近（docs/Animated-Item.md，各端角标，2026-11-18）。
 - (void)testFlatDesignTabBadgesStayVisibleWithAnimatedIcons {
-    Class buttonClass = NSClassFromString(@"CYLFlatDesignTabBarButton");
-    if (!buttonClass) {
+    // [EN] Checked after the tab bar exists (below): in the distribution framework the Swift button class is known to the
+    //      Objective-C runtime only after its first use, so checking here skipped the test every time.
+    // [CN] 在 TabBar 创建之后检查（见下方）：在分发用 framework 中，Swift 按钮类要首次使用后 Objective-C 运行时才认识，在这里检查会每次都跳过测试。
+    if (!NSClassFromString(@"CYLFlatDesignTabBar")) {
         XCTSkip(@"FlatDesign is not compiled into this target");
     }
     NSURL *URL = [self gifFileURL];
@@ -792,6 +794,8 @@ FOUNDATION_EXTERN void CYLTabBarItemAnimationRegisterColors(NSURL *URL, NSDictio
     window.rootViewController = tabBarController;
     window.hidden = NO;
     [tabBarController.view layoutIfNeeded];
+    Class buttonClass = NSClassFromString(@"CYLFlatDesignTabBarButton");
+    XCTAssertNotNil(buttonClass, @"the FlatDesign button class is known once the tab bar exists");
     // [EN] Badges first, as apps do at launch, then let the animations load. [CN] 先设置角标（与 App 启动时相同），再等待动画加载。
     for (UIViewController *viewController in tabBarController.viewControllers) {
         [viewController.tabBarItem cyl_showBadgeValue:@"3" animationType:CYLBadgeAnimationTypeNone];
@@ -802,14 +806,6 @@ FOUNDATION_EXTERN void CYLTabBarItemAnimationRegisterColors(NSURL *URL, NSDictio
     [[NSRunLoop mainRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.5]];
     NSArray<NSString *> *titles = @[ @"A", @"B", @"C" ];
     [tabBarController.viewControllers enumerateObjectsUsingBlock:^(UIViewController *viewController, NSUInteger index, BOOL *stop) {
-        if (index == 0) {
-            // [EN] Known, older than CYLAnimatedItemView (it fails the same way at 357c314b, a static icon too): the first
-            //      tab's `tabBarItem.cyl_tabButton` is still the hidden system tab button, so its badge is added there.
-            //      docs/Animated-Item.md, task log 2026-11-18, TODO. Remove this when it is fixed.
-            // [CN] 已知问题，早于 CYLAnimatedItemView（在 357c314b、静态图标下同样失败）：第一个 Tab 的 `tabBarItem.cyl_tabButton` 仍是隐藏的系统
-            //      Tab 按钮，角标被加到那里。docs/Animated-Item.md，2026-11-18 任务记录，TODO。修复后删除此处。
-            XCTExpectFailure(@"the first FlatDesign tab's badge goes to the hidden system tab button (TODO)");
-        }
         UIView *host = (UIView *)[viewController.tabBarItem cyl_getActualBadgeSuperView];
         UIView *badge = host.cyl_badge;
         XCTAssertNotNil(badge, @"tab %@ has a badge (host %@)", titles[index], host);
@@ -839,8 +835,9 @@ FOUNDATION_EXTERN void CYLTabBarItemAnimationRegisterColors(NSURL *URL, NSDictio
 }
 
 - (void)testFlatDesignTabButtonsComponentAnimationIsTheTabsAnimation {
-    Class buttonClass = NSClassFromString(@"CYLFlatDesignTabBarButton");
-    if (!buttonClass) {
+    // [EN] The button class is looked up after the tab bar exists (see testFlatDesignTabBadgesStayVisibleWithAnimatedIcons).
+    // [CN] 按钮类在 TabBar 创建后查找（见 testFlatDesignTabBadgesStayVisibleWithAnimatedIcons）。
+    if (!NSClassFromString(@"CYLFlatDesignTabBar")) {
         XCTSkip(@"FlatDesign is not compiled into this target");
     }
     NSURL *URL = [self gifFileURL];
@@ -862,6 +859,8 @@ FOUNDATION_EXTERN void CYLTabBarItemAnimationRegisterColors(NSURL *URL, NSDictio
     window.hidden = NO;
     [tabBarController.view layoutIfNeeded];
     [[NSRunLoop mainRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.3]];
+    Class buttonClass = NSClassFromString(@"CYLFlatDesignTabBarButton");
+    XCTAssertNotNil(buttonClass, @"the FlatDesign button class is known once the tab bar exists");
     NSMutableDictionary<NSString *, UIControl *> *buttons = [NSMutableDictionary dictionary];
     NSMutableArray<UIView *> *queue = [NSMutableArray arrayWithObject:tabBarController.view];
     while (queue.count > 0) {

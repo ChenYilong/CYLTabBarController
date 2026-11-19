@@ -175,6 +175,14 @@ extension UIViewController {
             objc_setAssociatedObject(self, CYLViewControllerTabBarKeys.tabButton, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
             objc_setAssociatedObject(cyl_getViewControllerInsteadOfNavigation(), CYLViewControllerTabBarKeys.tabButton, newValue,
                                      .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+            // [EN] A button that is not UIKit's own (the FlatDesign tab button) also becomes the item's button, so badges set on
+            //      `tabBarItem` reach it: UIKit's button is hidden then (iOS 27, every FlatDesign tab).
+            // [CN] 不是 UIKit 自身的按钮（扁平样式的 Tab 按钮）同时成为 item 的按钮，使设置在 `tabBarItem` 上的角标到达它：此时 UIKit 的按钮是隐藏的
+            //      （iOS 27，扁平样式的每个 Tab）。
+            for item in [tabBarItem, cyl_getViewControllerInsteadOfNavigation().tabBarItem].compactMap({ $0 }) {
+                let systemButton = item.cyl_view()
+                item.cyl_replacementTabButton = (newValue != nil && newValue !== systemButton) ? newValue : nil
+            }
         }
     }
 

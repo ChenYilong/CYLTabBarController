@@ -715,7 +715,19 @@ extension UIControl {
 }
 
 enum CYLControlTabBarSupport {
-    static let flatDesignTabBarButtonClass: AnyClass? = NSClassFromString("CYLFlatDesignTabBarButton")
+    /// [EN] Looked up by name (Core does not import FlatDesign) and kept once found, never while missing: in a framework built
+    ///      for distribution (Carthage), `CYLFlatDesignTabBarButton`'s superclass is in another resilient module, so the
+    ///      Objective-C runtime only knows the class after its first use, and an early lookup returns nil. A cached nil
+    ///      (the old `static let`) then hid every FlatDesign button for the app's lifetime.
+    /// [CN] 按名称查找（Core 不导入扁平样式），找到后才缓存，未找到时不缓存：在为分发构建的 framework（Carthage）中，`CYLFlatDesignTabBarButton`
+    ///      的父类位于另一个 resilient 模块，Objective-C 运行时要在该类首次使用后才认识它，过早查找会返回 nil。旧的 `static let` 缓存了 nil，
+    ///      会在 App 整个生命周期内认不出扁平样式按钮。
+    static var flatDesignTabBarButtonClass: AnyClass? {
+        if let found = foundFlatDesignTabBarButtonClass { return found }
+        foundFlatDesignTabBarButtonClass = NSClassFromString("CYLFlatDesignTabBarButton")
+        return foundFlatDesignTabBarButtonClass
+    }
+    private static var foundFlatDesignTabBarButtonClass: AnyClass?
 }
 
 // MARK: - UIControl (CYLTabBarControllerExtentionDeprecated)
