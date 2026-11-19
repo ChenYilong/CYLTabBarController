@@ -80,19 +80,19 @@ class CYLHomeViewController: CYLDemoBadgeTableViewController, UITabBarController
     }
 
     /// [EN] Issue #216: the skin (theme) picker. [CN] Issue #216：换肤（主题）选择器。
-    @objc private func showThemePicker(_ sender: Any?) {
+    @objc private func showThemePicker(_ _: Any?) {
         cyl_presentThemePicker(from: nil) { [weak self] in
             self?.tableView.reloadData()
         }
     }
 
     /// [EN] A new Liquid Glass tab bar with the registered plus button's context. [CN] 使用已注册 PlusButton 的 context 新建液态玻璃 TabBar。
-    @objc private func refreshTabBar(_ sender: Any?) {
+    @objc private func refreshTabBar(_ _: Any?) {
         CYLPlusButtonSubclass.register()
         CYLMainRootViewController.current()?.createNewTabBar(withContext: NSStringFromClass(CYLTabBarController.self))
     }
 
-    @objc private func flatDesignTabBar(_ sender: Any?) {
+    @objc private func flatDesignTabBar(_ _: Any?) {
         CYLMainRootViewController.current()?.createFlatDesignTabBar()
     }
 
@@ -124,7 +124,7 @@ class CYLHomeViewController: CYLDemoBadgeTableViewController, UITabBarController
         pushToNewViewController()
     }
 
-    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+    override func touchesBegan(_ _: Set<UITouch>, with _: UIEvent?) {
         pushToNewViewController()
     }
 

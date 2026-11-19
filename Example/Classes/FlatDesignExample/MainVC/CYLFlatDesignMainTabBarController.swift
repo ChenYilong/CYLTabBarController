@@ -152,19 +152,19 @@ class CYLFlatDesignMainTabBarController: CYLTabBarController, CYLFlatDesignUITab
         }
     }
 
-    func tabBarController(_ tabBarController: CYLTabBarController!, willShow tabBar: CYLFlatDesignTabBar!) {
+    func tabBarController(_ _: CYLTabBarController!, willShow _: CYLFlatDesignTabBar!) {
         cyl_demo_log(#function)
     }
 
-    func tabBarController(_ tabBarController: CYLTabBarController!, didShow tabBar: CYLFlatDesignTabBar!) {
+    func tabBarController(_ _: CYLTabBarController!, didShow _: CYLFlatDesignTabBar!) {
         cyl_demo_log(#function)
     }
 
-    func tabBarController(_ tabBarController: CYLTabBarController!, willHide tabBar: CYLFlatDesignTabBar!) {
+    func tabBarController(_ _: CYLTabBarController!, willHide _: CYLFlatDesignTabBar!) {
         cyl_demo_log(#function)
     }
 
-    func tabBarController(_ tabBarController: CYLTabBarController!, didHide tabBar: CYLFlatDesignTabBar!) {
+    func tabBarController(_ _: CYLTabBarController!, didHide _: CYLFlatDesignTabBar!) {
         cyl_demo_log(#function)
     }
 

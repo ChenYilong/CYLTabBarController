@@ -197,15 +197,15 @@ extension CYLTabBarController {
     // MARK: - UINavigationControllerExtensionDelegate
 
     @objc(cylflatdesign_navigationController:navigationBarDidChangeHeight:)
-    func cylFlatDesignNavigationController(_ navigationController: UINavigationController, navigationBarDidChangeHeight height: CGFloat) {
+    func cylFlatDesignNavigationController(_ navigationController: UINavigationController, navigationBarDidChangeHeight _: CGFloat) {
         if navigationController === selectedViewController {
             cylFlatDesignRefreshSystemTabBarVisibilityIfNeeded()
         }
     }
 
     @objc(cylflatdesign_navigationController:didBeginTransitionFrom:to:operation:)
-    func cylFlatDesignNavigationController(_ navigationController: UINavigationController, didBeginTransitionFrom fromVC: UIViewController?,
-                                           to toVC: UIViewController?, operation: UINavigationController.Operation) {
+    func cylFlatDesignNavigationController(_ _: UINavigationController, didBeginTransitionFrom _: UIViewController?,
+                                           to _: UIViewController?, operation _: UINavigationController.Operation) {
         guard cylFlatDesignTabBar != nil else {
             return
         }
@@ -216,20 +216,20 @@ extension CYLTabBarController {
     }
 
     @objc(cylflatdesign_navigationController:didUpdateInteractiveFrom:to:percentComplete:)
-    func cylFlatDesignNavigationController(_ navigationController: UINavigationController, didUpdateInteractiveFrom fromVC: UIViewController?,
-                                           to toVC: UIViewController?, percentComplete: CGFloat) {
+    func cylFlatDesignNavigationController(_ _: UINavigationController, didUpdateInteractiveFrom _: UIViewController?,
+                                           to _: UIViewController?, percentComplete _: CGFloat) {
         // [EN] Nothing to do. [CN] 无需处理。
     }
 
     @objc(cylflatdesign_navigationController:didUpdateInteractiveFrom:to:popGestureRecognizer:)
-    func cylFlatDesignNavigationController(_ navigationController: UINavigationController, didUpdateInteractiveFrom fromVC: UIViewController?,
-                                           to toVC: UIViewController?, popGestureRecognizer: UIGestureRecognizer) {
+    func cylFlatDesignNavigationController(_ _: UINavigationController, didUpdateInteractiveFrom _: UIViewController?,
+                                           to _: UIViewController?, popGestureRecognizer _: UIGestureRecognizer) {
         // [EN] Nothing to do. [CN] 无需处理。
     }
 
     @objc(cylflatdesign_navigationController:willEndTransitionFrom:to:operation:cancelled:)
-    func cylFlatDesignNavigationController(_ navigationController: UINavigationController, willEndTransitionFrom fromVC: UIViewController?,
-                                           to toVC: UIViewController?, operation: UINavigationController.Operation, cancelled: Bool) {
+    func cylFlatDesignNavigationController(_ _: UINavigationController, willEndTransitionFrom fromVC: UIViewController?,
+                                           to toVC: UIViewController?, operation: UINavigationController.Operation, cancelled _: Bool) {
         guard let tabBar = cylFlatDesignTabBar else {
             return
         }
@@ -247,8 +247,8 @@ extension CYLTabBarController {
     }
 
     @objc(cylflatdesign_navigationController:didEndTransitionFrom:to:operation:cancelled:)
-    func cylFlatDesignNavigationController(_ navigationController: UINavigationController, didEndTransitionFrom fromVC: UIViewController?,
-                                           to toVC: UIViewController?, operation: UINavigationController.Operation, cancelled: Bool) {
+    func cylFlatDesignNavigationController(_ _: UINavigationController, didEndTransitionFrom _: UIViewController?,
+                                           to _: UIViewController?, operation _: UINavigationController.Operation, cancelled _: Bool) {
         guard let tabBar = cylFlatDesignTabBar else {
             return
         }
@@ -791,7 +791,7 @@ extension CYLTabBarController {
      * [CN] 选中 `selectedIndex` 对应的扁平样式 item（收在「More」下的 Tab 选中 UIKit 的 More 项）。
      */
     @objc(tabChangedToSelectedIndex:viewController:selectedItem:)
-    func cylFlatDesignTabChanged(toSelectedIndex selectedIndex: UInt, viewController: UIViewController?, selectedItem: CYLFlatDesignTabBarItem?) {
+    func cylFlatDesignTabChanged(toSelectedIndex selectedIndex: UInt, viewController _: UIViewController?, selectedItem _: CYLFlatDesignTabBarItem?) {
         guard let flatTabBar = cylFlatDesignTabBar, let items = cylFlatDesignHost.items() as? [CYLFlatDesignTabBarItem], !items.isEmpty else {
             return
         }

@@ -374,7 +374,7 @@ open class CYLBadgeHelperTableViewController: UITableViewController {
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: CYLBadgeSample.cellIdentifier)
     }
 
-    override open func numberOfSections(in tableView: UITableView) -> Int {
+    override open func numberOfSections(in _: UITableView) -> Int {
         2
     }
 

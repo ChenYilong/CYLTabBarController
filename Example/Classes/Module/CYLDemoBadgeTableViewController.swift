@@ -86,19 +86,21 @@ class CYLDemoBadgeTableViewController: CYLBaseTableViewController {
     }
 
     /// [EN] A tap on a row of this page (not of the demo sections). [CN] 点击本页的行（不属于演示 section）。
-    func didSelectPageRow(at indexPath: IndexPath) {}
+    func didSelectPageRow(at _: IndexPath) {
+        // [EN] This page has no rows of its own to act on. [CN] 本页没有需要处理的自有行。
+    }
 
     // MARK: - UITableViewDataSource / UITableViewDelegate
 
-    override func numberOfSections(in tableView: UITableView) -> Int {
+    override func numberOfSections(in _: UITableView) -> Int {
         cyl_demoSectionCount() + pageSectionCount
     }
 
-    override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+    override func tableView(_ _: UITableView, titleForHeaderInSection section: Int) -> String? {
         section < cyl_demoSectionCount() ? cyl_demoTitle(forSection: section) : cylDemoLocalizedString("角标")
     }
 
-    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    override func tableView(_ _: UITableView, numberOfRowsInSection section: Int) -> Int {
         if section < cyl_demoSectionCount() {
             return cyl_demoRowCount(inSection: section)
         }

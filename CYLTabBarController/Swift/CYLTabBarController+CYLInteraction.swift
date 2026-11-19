@@ -23,7 +23,10 @@ final class CYLTabButtonLongPressGestureRecognizer: UILongPressGestureRecognizer
  * [EN] The pan of `cyl_swipeToSwitchTabEnabled`. [CN] `cyl_swipeToSwitchTabEnabled` 的拖动手势。
  */
 @objc(CYLTabBarSwipeGestureRecognizer)
-final class CYLTabBarSwipeGestureRecognizer: UIPanGestureRecognizer {}
+final class CYLTabBarSwipeGestureRecognizer: UIPanGestureRecognizer {
+    // [EN] A class of its own so the pan can be found among a view's recognizers (`as?`); it adds no behavior.
+    // [CN] 单独的类，使该拖动手势能在视图的手势识别器中被找到（`as?`）；不增加任何行为。
+}
 
 /**
  * FIX: issue #152 / #535 — long press, Reselect and DoubleTap in Liquid Glass.

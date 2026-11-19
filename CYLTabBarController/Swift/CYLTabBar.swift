@@ -113,7 +113,7 @@ open class CYLTabBar: UITabBar, UIGestureRecognizerDelegate {
         }
     }
 
-    open override class func automaticallyNotifiesObservers(forKey key: String) -> Bool {
+    open override class func automaticallyNotifiesObservers(forKey _: String) -> Bool {
         false
     }
 

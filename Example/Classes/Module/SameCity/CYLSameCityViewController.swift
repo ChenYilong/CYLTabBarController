@@ -19,7 +19,7 @@ class CYLSameCityViewController: CYLDemoBadgeTableViewController {
 
     override var placeholderAnimation: CYLDemoPlaceholderAnimation { .pag }
 
-    override func didSelectPageRow(at indexPath: IndexPath) {
+    override func didSelectPageRow(at _: IndexPath) {
         let viewController = CYLDetailsViewController()
         viewController.cyl_navigationBarHidden = true
         viewController.cyl_disablePopGestureRecognizer = true
