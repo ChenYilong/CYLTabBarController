@@ -1831,7 +1831,7 @@ extension CYLTabBar {
 
     /// [EN] The tab buttons, then the selected-state layers (Liquid Glass). [CN] Tab 按钮，然后是选中态图层（液态玻璃）。
     private func cylEnumerateAnimatedControls(_ block: (UIControl) -> Void) {
-        for case let control as UIControl in cylVisibleControls() ?? [] {
+        for control in cylVisibleControls() ?? [] {
             block(control)
         }
         for control in cylPlatterSelectedContentViews() ?? [] {

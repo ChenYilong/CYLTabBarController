@@ -202,7 +202,7 @@ extension UIControl {
             return false
         }
         var isSelected = self.isSelected && tabBarController.selectedIndex == cyl_tabBarChildViewControllerIndex
-        if let tabBar = tabBarController.tabBar as? CYLTabBar, tabBar.cylHasPlusChildViewController() {
+        if tabBarController.tabBar.cylHasPlusChildViewController() {
             isSelected = isSelected && CYLPlusButton.plusChildViewController(forOwner: self)?.cyl_plusViewControllerEverAdded == true
         }
         return isSelected

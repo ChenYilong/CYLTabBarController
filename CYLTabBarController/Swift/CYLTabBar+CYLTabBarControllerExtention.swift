@@ -410,7 +410,7 @@ extension CYLTabBar {
     }
 
     private func cylSubTabBarButtonViewsWithoutPlusButton() -> [UIView] {
-        (cylVisibleControls() ?? []).filter { !(($0 as? UIControl)?.cyl_isPlusControl() ?? false) }
+        (cylVisibleControls() ?? []).filter { !$0.cyl_isPlusControl() }
     }
 
     /**
@@ -426,12 +426,12 @@ extension CYLTabBar {
            !CYLPlusButton.isPlusButtonView(tabButton) {
             return tabButton
         }
-        return CYLObjectAtIndex(cylSubTabBarButtons(), Int(tabIndex)) as? UIControl
+        return CYLObjectAtIndex(cylSubTabBarButtons(), Int(tabIndex))
     }
 
     @objc(cyl_visibleControlWithIndex:)
     public func cylVisibleControl(withIndex index: UInt) -> UIControl? {
-        CYLObjectAtIndex(cylVisibleControls(), Int(index)) as? UIControl
+        CYLObjectAtIndex(cylVisibleControls(), Int(index))
     }
 
     /**
@@ -464,7 +464,7 @@ extension CYLTabBar {
     @objc(cyl_normalContentControlFromSelectedContentControl:)
     public func cylNormalContentControl(fromSelectedContentControl selectedContentControl: UIControl) -> UIControl? {
         guard let index = cylPlatterSelectedContentViews()?.firstIndex(where: { $0 === selectedContentControl }) else { return nil }
-        return CYLObjectAtIndex(cylSubTabBarButtons(), index) as? UIControl
+        return CYLObjectAtIndex(cylSubTabBarButtons(), index)
     }
 
     @objc(cyl_cachedXOffsetWithIndex:)
