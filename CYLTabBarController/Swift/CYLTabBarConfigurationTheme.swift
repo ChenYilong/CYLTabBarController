@@ -66,7 +66,7 @@ private let CYLTabBarItemPlusSlotPlaceholderKey = "CYLTabBarItemPlusSlotPlacehol
       同样的值：`CYLTabBarConfigurationTheme.colorNamed("accent")` 是随皮肤变化的颜色。
  */
 @objc(CYLTabBarConfigurationTheme)
-public class CYLTabBarConfigurationTheme: NSObject, CYLTabBarTheme {
+open class CYLTabBarConfigurationTheme: NSObject, CYLTabBarTheme {
 
     /**
      [EN] The skin's identifier, e.g. "dark". [CN] 皮肤的标识，例如 "dark"。
@@ -104,7 +104,7 @@ public class CYLTabBarConfigurationTheme: NSObject, CYLTabBarTheme {
      [CN] 文件中名为 `name` 的值（字符串、数字、代码中的颜色），没有时为 nil。
      */
     @objc(valueForName:)
-    public func value(forName name: String) -> Any? {
+    open func value(forName name: String) -> Any? {
         values[name]
     }
 
@@ -113,7 +113,7 @@ public class CYLTabBarConfigurationTheme: NSObject, CYLTabBarTheme {
      [CN] 名为 `name` 的值作为颜色（"#RRGGBB"、"#RRGGBBAA"、UIColor），否则为 nil。
      */
     @objc(colorForName:)
-    public func color(forName name: String) -> UIColor? {
+    open func color(forName name: String) -> UIColor? {
         CYLTabBarController.cylConfigurationColorValue(value(forName: name))
     }
 
@@ -122,7 +122,7 @@ public class CYLTabBarConfigurationTheme: NSObject, CYLTabBarTheme {
      [CN] 名为 `name` 的值作为字体（"bold:15"、"PingFangSC-Medium:12"、UIFont），否则为 nil。
      */
     @objc(fontForName:)
-    public func font(forName name: String) -> UIFont? {
+    open func font(forName name: String) -> UIFont? {
         value(forName: name).flatMap { CYLTabBarController.cylConfigurationFontValue($0) }
     }
 
@@ -131,7 +131,7 @@ public class CYLTabBarConfigurationTheme: NSObject, CYLTabBarTheme {
      [CN] 名为 `name` 的值作为图片（"system:house"、图片名、UIImage），否则为 nil。
      */
     @objc(imageForName:)
-    public func image(forName name: String) -> UIImage? {
+    open func image(forName name: String) -> UIImage? {
         let value = value(forName: name)
         if let image = value as? UIImage {
             return image
@@ -159,7 +159,7 @@ public class CYLTabBarConfigurationTheme: NSObject, CYLTabBarTheme {
      [CN] 跟随 `CYLThemeManagerCenter.defaultThemeManager` 皮肤的颜色：其当前皮肤中名为 `name` 的值。
      */
     @objc(colorNamed:)
-    public class func colorNamed(_ name: String) -> UIColor {
+    open class func colorNamed(_ name: String) -> UIColor {
         UIColor.cyl_color(withName: name) { manager, _, theme in
             cylColor(named: name, in: manager, theme: theme)
         }
@@ -170,7 +170,7 @@ public class CYLTabBarConfigurationTheme: NSObject, CYLTabBarTheme {
      [CN] 同上，用于名为 `managerName` 的管理器（`CYLTabBarControllerThemeManagerName`）。
      */
     @objc(colorNamed:themeManagerName:)
-    public class func colorNamed(_ name: String, themeManagerName managerName: NSCopying & NSObjectProtocol) -> UIColor {
+    open class func colorNamed(_ name: String, themeManagerName managerName: NSCopying & NSObjectProtocol) -> UIColor {
         UIColor.cyl_color(withName: name, themeManagerName: managerName) { manager, _, theme in
             cylColor(named: name, in: manager, theme: theme)
         }
@@ -178,7 +178,7 @@ public class CYLTabBarConfigurationTheme: NSObject, CYLTabBarTheme {
 
     // MARK: CYLTabBarTheme
 
-    public func cyl_tabBarItemsAttributes(for tabBarController: CYLTabBarController) -> [[String: Any]]? {
+    open func cyl_tabBarItemsAttributes(for tabBarController: CYLTabBarController) -> [[String: Any]]? {
         var items: [[String: Any]] = []
         var themed = false
         var position = 0
@@ -202,7 +202,7 @@ public class CYLTabBarConfigurationTheme: NSObject, CYLTabBarTheme {
         return themed ? items : nil
     }
 
-    public func cyl_tabBarAppearance(for tabBarController: CYLTabBarController) -> UITabBarAppearance? {
+    open func cyl_tabBarAppearance(for tabBarController: CYLTabBarController) -> UITabBarAppearance? {
         let background = color(forName: CYLTabBarBackgroundColor)
         let shadow = color(forName: CYLTabBarShadowColor)
         let titleColor = color(forName: CYLTabBarItemTitleColor)
@@ -309,7 +309,7 @@ extension CYLTabBarController {
      [CN] `init(configurationFile:)` 的便利构造方法；创建调用它的类。
      */
     @objc(tabBarControllerWithConfigurationFile:error:)
-    public class func tabBarController(withConfigurationFile filePath: String) throws -> Self {
+    open class func tabBarController(withConfigurationFile filePath: String) throws -> Self {
         guard Thread.isMainThread else { throw CYLTabBarController.cylConfigurationMainThreadError() }
         return try cylTabBarController(withLoadedConfiguration: try configuration(withContentsOfFile: filePath))
     }
@@ -319,13 +319,13 @@ extension CYLTabBarController {
      [CN] `init(configurationRoute:)` 的便利构造方法；创建调用它的类。
      */
     @objc(tabBarControllerWithConfigurationRoute:error:)
-    public class func tabBarController(withConfigurationRoute route: String) throws -> Self {
+    open class func tabBarController(withConfigurationRoute route: String) throws -> Self {
         try tabBarController(withConfigurationFile: try CYLTabBarController.cylPathOfConfigurationRoute(route))
     }
 
     /// [EN] The completion of the asynchronous factories with a tab bar controller of the receiving class. [CN] 异步工厂方法的回调，带接收者类的 TabBarController。
     private class func cylFinishLoading(_ configuration: [String: Any]?, _ error: Error?,
-                                        _ completion: @escaping (CYLTabBarController?, Error?) -> Void) {
+                                        _ completion: @escaping CYLTabBarControllerConfigurationCompletion) {
         guard let configuration else {
             completion(nil, error)
             return
@@ -343,11 +343,9 @@ extension CYLTabBarController {
      */
     @objc(loadTabBarControllerWithConfigurationURLRequest:completion:)
     @discardableResult
-    public class func load(withConfigurationURLRequest request: URLRequest,
-                           completion: ((CYLTabBarController?, Error?) -> Void)?) -> URLSessionDataTask? {
-        // [EN] No completion: nothing to deliver, no download (as before). [CN] 没有回调：不下载（与以前相同）。
-        guard let completion else { return nil }
-        return loadConfiguration(with: request) { configuration, error in
+    open class func load(withConfigurationURLRequest request: URLRequest,
+                         completion: @escaping CYLTabBarControllerConfigurationCompletion) -> URLSessionDataTask? {
+        loadConfiguration(with: request) { configuration, error in
             cylFinishLoading(configuration, error, completion)
         }
     }
@@ -359,10 +357,9 @@ extension CYLTabBarController {
      */
     @objc(loadTabBarControllerWithConfigurationURL:completion:)
     @discardableResult
-    public class func load(withConfigurationURL url: URL,
-                           completion: ((CYLTabBarController?, Error?) -> Void)?) -> URLSessionDataTask? {
-        guard let completion else { return nil }
-        return loadConfiguration(with: url) { configuration, error in
+    open class func load(withConfigurationURL url: URL,
+                         completion: @escaping CYLTabBarControllerConfigurationCompletion) -> URLSessionDataTask? {
+        loadConfiguration(with: url) { configuration, error in
             cylFinishLoading(configuration, error, completion)
         }
     }

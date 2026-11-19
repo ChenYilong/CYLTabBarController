@@ -206,7 +206,7 @@ extension CYLTabBarController {
           类切换起以 App 看到的名称公开（第 3 阶段）。
      */
     @objc(cyl_applyTabBarTheme:)
-    public func cyl_applyTabBarTheme(_ theme: Any?) {
+    open func cyl_applyTabBarTheme(_ theme: Any?) {
         cylApplyTabBarTheme(theme)
     }
 

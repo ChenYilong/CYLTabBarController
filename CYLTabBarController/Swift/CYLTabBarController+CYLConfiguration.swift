@@ -1605,7 +1605,7 @@ extension CYLTabBarController {
      [CN] 应用默认值并检查过的配置（见 docs/Configuration-File.md）。
      */
     @objc(cyl_normalizedConfiguration:)
-    public class func cyl_normalizedConfiguration(_ configuration: [String: Any]) -> [String: Any] {
+    open class func cyl_normalizedConfiguration(_ configuration: [String: Any]) -> [String: Any] {
         cylNormalizedConfiguration(configuration)
     }
 
@@ -1614,7 +1614,7 @@ extension CYLTabBarController {
      [CN] 文件中的配置（JSON、YAML、plist、protobuf），可以是主 bundle 中的名称或路径。
      */
     @objc(configurationWithContentsOfFile:error:)
-    public class func configuration(withContentsOfFile filePath: String) throws -> [String: Any] {
+    open class func configuration(withContentsOfFile filePath: String) throws -> [String: Any] {
         try cylConfiguration(contentsOfFile: filePath)
     }
 
@@ -1622,7 +1622,7 @@ extension CYLTabBarController {
      [EN] The configuration of a resource route (docs/Configuration-File.md). [CN] 资源路由对应的配置。
      */
     @objc(configurationWithRoute:error:)
-    public class func configuration(withRoute route: String) throws -> [String: Any] {
+    open class func configuration(withRoute route: String) throws -> [String: Any] {
         try cylConfiguration(route: route)
     }
 
@@ -1632,7 +1632,7 @@ extension CYLTabBarController {
      */
     @objc(loadConfigurationWithURL:completion:)
     @discardableResult
-    public class func loadConfiguration(with url: URL, completion: (([String: Any]?, Error?) -> Void)?) -> URLSessionDataTask? {
+    open class func loadConfiguration(with url: URL, completion: @escaping CYLTabBarConfigurationCompletion) -> URLSessionDataTask? {
         cylLoadConfiguration(url: url, completion: completion)
     }
 
@@ -1642,7 +1642,7 @@ extension CYLTabBarController {
      */
     @objc(loadConfigurationWithURLRequest:completion:)
     @discardableResult
-    public class func loadConfiguration(with request: URLRequest, completion: (([String: Any]?, Error?) -> Void)?) -> URLSessionDataTask? {
+    open class func loadConfiguration(with request: URLRequest, completion: @escaping CYLTabBarConfigurationCompletion) -> URLSessionDataTask? {
         cylLoadConfiguration(request: request, completion: completion)
     }
 }

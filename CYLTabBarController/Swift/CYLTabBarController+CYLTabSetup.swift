@@ -61,7 +61,7 @@ extension CYLTabBarController {
 
     /// [EN] The tab bar's tint color; no effect with FlatDesign. [CN] TabBar 的 tintColor；扁平样式下无效。
     @objc(setTintColor:)
-    public func setTintColor(_ tintColor: UIColor) {
+    open func setTintColor(_ tintColor: UIColor) {
         guard tabBarStyleType != .flatDesign else { return }
         cyl_tabBar?.tintColor = tintColor
     }
@@ -69,7 +69,7 @@ extension CYLTabBarController {
     /// [EN] Whether the plus button has a child view controller in this controller (bound by `context`, see `-hasPlusButton`).
     /// [CN] PlusButton 在本控制器中是否有子控制器（通过 `context` 绑定，见 `-hasPlusButton`）。
     @objc(hasPlusChildViewController)
-    public func hasPlusChildViewController() -> Bool {
+    open func hasPlusChildViewController() -> Bool {
         cylPrivate.cylContextPlusChildViewController() != nil
     }
 
@@ -92,7 +92,7 @@ extension CYLTabBarController {
     /// [EN] The attributes of the tab at `index`; nil for the plus button's tab or when there is none.
     /// [CN] 第 `index` 个 Tab 的属性；PlusButton 的 Tab 或没有对应项时为 nil。
     @objc(tabBarItemAttributesAtIndex:)
-    public func tabBarItemAttributes(at index: UInt) -> [String: Any]? {
+    open func tabBarItemAttributes(at index: UInt) -> [String: Any]? {
         let tabs = viewControllers ?? []
         guard Int(index) < tabs.count else { return nil }
         let viewController = tabs[Int(index)]
@@ -119,7 +119,7 @@ extension CYLTabBarController {
      [CN] 使用新的属性重新加载 Tab（重新设置 viewControllers）。由页面 ID 创建时，新的 Tab 从同样的来源获得页面。
      */
     @objc(reloadTabBarItemsWithAttributes:)
-    public func reloadTabBarItems(withAttributes attributes: [[AnyHashable: Any]]) {
+    open func reloadTabBarItems(withAttributes attributes: [[AnyHashable: Any]]) {
         guard tabBarStyleType != .flatDesign else { return }
         var newAttributes = attributes
         var resolvedPages: [UIViewController]?
@@ -168,7 +168,7 @@ extension CYLTabBarController {
      */
     @objc(replaceViewControllerAtIndex:withViewController:attributes:)
     @discardableResult
-    public func replaceViewController(at index: UInt, with viewController: UIViewController, attributes: [String: Any]?) -> Bool {
+    open func replaceViewController(at index: UInt, with viewController: UIViewController, attributes: [String: Any]? = nil) -> Bool {
         let current = viewControllers ?? []
         guard Int(index) < current.count, !current.contains(viewController) else { return false }
         let oldViewController = current[Int(index)]
