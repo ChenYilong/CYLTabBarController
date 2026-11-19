@@ -154,6 +154,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)_captureItems;
 - (void)_updateBottomBarShowHideIfNeeded;
 - (void)_updateAdditionalSafeAreaInsetsWithAnimated:(BOOL)animated;
+/// [EN] Implemented in Swift (CYLTabBarController+CYLTabBarItemUpdate.swift, step 73). [CN] 由 Swift 实现（第 73 步）。
++ (NSArray *)cyl_imageInfosOfAttributes:(NSDictionary *)attributes applyingIconRenderingModeToImageInfo:(nullable id)normalImageInfo selectedImageInfo:(nullable id)selectedImageInfo;
 - (void)cyl_plusButton:(CYLPlusButton *)plusButton didChangeWithNotification:(NSNotificationName)name info:(NSDictionary *)info;
 - (void)cyl_syncTabBarItemAccessibility;
 #if CYL_FLATDESIGN_AVAILABLE

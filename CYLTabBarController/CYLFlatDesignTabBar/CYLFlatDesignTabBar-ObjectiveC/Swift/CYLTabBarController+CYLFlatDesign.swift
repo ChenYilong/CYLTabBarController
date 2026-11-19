@@ -490,4 +490,35 @@ extension CYLTabBarController {
         items.replaceObject(at: index, with: toItem)
         tabBar.items = items.compactMap { $0 as? CYLFlatDesignTabBarItem }
     }
+
+    // MARK: - In-place update (docs/Swift-Migration.md, step 73; `CYLFlatDesignTabBarItemUpdating` in Core)
+
+    /**
+     * [EN] Sets what is given on the tab's FlatDesign item (each change posts `CYLFlatDesignTabBarItemDidChange`, and its button
+     *      lays itself out again). A title is set only when it changes. NO when the tab has no FlatDesign item.
+     * [CN] 设置该 Tab 扁平样式 item 的给定属性（每次变化都会发送 `CYLFlatDesignTabBarItemDidChange`，其按钮随之重新布局）。标题变化时才设置。
+     *      该 Tab 没有扁平样式 item 时返回 NO。
+     */
+    @objc(cyl_flatDesignUpdateTabBarItemOfViewController:title:image:selectedImage:)
+    func cylFlatDesignUpdateTabBarItem(of viewController: UIViewController, title: String?, image: UIImage?, selectedImage: UIImage?) -> Bool {
+        guard let item = viewController.cyl_tabBarItem else {
+            return false
+        }
+        if let title, item.title != title {
+            item.title = title
+        }
+        if let image {
+            item.image = image
+        }
+        if let selectedImage {
+            item.selectedImage = selectedImage
+        }
+        return true
+    }
+
+    /// [EN] The tab's FlatDesign item plays `URL`. [CN] 该 Tab 的扁平样式 item 播放 `URL`。
+    @objc(cyl_flatDesignSetAnimationURL:ofViewController:)
+    func cylFlatDesignSetAnimationURL(_ URL: URL, of viewController: UIViewController) {
+        viewController.cyl_tabBarItem?.lottieURL = URL
+    }
 }

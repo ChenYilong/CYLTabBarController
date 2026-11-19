@@ -345,7 +345,7 @@ extension CYLTabBarController {
                 updateTabBarItem(at: UInt(index), attributes: toWrite)
             }
             if !toRemove.isEmpty {
-                cylPrivate.cylThemeRemoveTabBarItemAttributeKeys(toRemove, atIndex: UInt(index))
+                cylThemeRemoveTabBarItemAttributeKeys(toRemove, atIndex: UInt(index))
             }
             let written = tabBarItemAttributes(at: UInt(index)) ?? [:]
             for (key, themeValue) in themeValues {

@@ -49,23 +49,8 @@
  * [EN] Whether a tab's animation file can play: an engine with an animator for its type. Without the engine nothing can.
  * [CN] Tab 的动画文件能否播放：有引擎且有该类型的 animator。没有引擎时都不能播放。
  */
-/*
- * [EN] The animation file a tab's attributes give under the generic keys or any type's own keys, whether or not that type's
- *      engine is in the build (`CYLAnimationAttributesValue()` of the CYLAnimatedItem pod).
- * [CN] Tab 属性通过通用 key 或任一类型自己的 key 给出的动画文件，与该类型的引擎是否参与构建无关（CYLAnimatedItem pod 的
- *      `CYLAnimationAttributesValue()`）。
- */
-static NSURL *CYLTabBarItemAnimationURLOfAnyType(NSDictionary *attributes) {
-    id URL = CYLAnimationAttributesValue(attributes, CYLTabBarAnimationURL);
-    if ([URL isKindOfClass:[NSURL class]]) {
-        return URL;
-    }
-    if ([URL isKindOfClass:[NSString class]] && [(NSString *)URL length] > 0) {
-        return [NSURL URLWithString:URL];
-    }
-    id path = CYLAnimationAttributesValue(attributes, CYLTabBarAnimationFilePath);
-    return [path isKindOfClass:[NSString class]] && [(NSString *)path length] > 0 ? [NSURL fileURLWithPath:path] : nil;
-}
+FOUNDATION_EXTERN NSURL *_Nullable CYLTabBarItemAnimationURLOfAnyType(NSDictionary *_Nullable attributes);
+// [EN] `CYLTabBarItemAnimationURLOfAnyType` is Swift (CYLTabBarController+CYLTabBarItemUpdate.swift, step 73).
 
 static BOOL CYLTabBarAnimationCanPlay(NSURL *URL) {
 #if CYL_ANIMATION_ENGINE_AVAILABLE
@@ -135,70 +120,11 @@ static NSString *const CYLTabBarControllerKeepsEmptyViewControllersKey = @"_CYLT
 
 #pragma mark - Selected title (FIX: issue #433)
 
-static const void *CYLTabBarItemSelectedTitleKey = &CYLTabBarItemSelectedTitleKey;
-// [EN] Selector-based keys, shared with Swift/CYLTabBarController+CYLPageRegistry.swift (`CYLTabBarItemTitleKeys`).
-// [CN] 基于 selector 的 key，与 Swift/CYLTabBarController+CYLPageRegistry.swift（`CYLTabBarItemTitleKeys`）共用。
-#define CYLTabBarItemNormalTitleKey ((const void *)sel_registerName("cyl_tabBarItemNormalTitle"))
-
-/*!
- * FIX: issue #433
- * [EN] Remembers the tab's `CYLTabBarItemSelectedTitle` and its normal title on the view controller, or forgets them
- *      when the attributes have no selected title (tabs set up again without it).
- * [CN] 在控制器上记录 Tab 的 `CYLTabBarItemSelectedTitle` 与普通标题；属性中没有选中标题时清除（重新设置 Tab 时去掉了该键）。
- */
-static void CYLRememberTabBarItemSelectedTitle(UIViewController *viewController, NSDictionary *attributes, NSString *normalTitle) {
-    if (!viewController) {
-        return;
-    }
-    id selectedTitle = attributes[CYLTabBarItemSelectedTitle];
-    if (![selectedTitle isKindOfClass:[NSString class]]) {
-        selectedTitle = nil;
-    }
-    objc_setAssociatedObject(viewController, CYLTabBarItemSelectedTitleKey, selectedTitle, OBJC_ASSOCIATION_COPY_NONATOMIC);
-    objc_setAssociatedObject(viewController, CYLTabBarItemNormalTitleKey, selectedTitle ? (normalTitle ?: @"") : nil, OBJC_ASSOCIATION_COPY_NONATOMIC);
-}
-
-/*!
- * FIX: issue #433
- * [EN] Shows the selected title on the selected tab and the normal title on the others. Idempotent and cheap: only tabs
- *      that have a `CYLTabBarItemSelectedTitle` are touched, and a title is set only when it changes. FlatDesign sets
- *      the title of its own item; the classic style and Liquid Glass set `tabBarItem.title` (and the one of the
- *      navigation controller's root), which UIKit shows.
- * [CN] 选中的 Tab 显示选中标题，其他 Tab 显示普通标题。可重复调用、开销很小：只处理设置了 `CYLTabBarItemSelectedTitle` 的 Tab，
- *      标题变化时才设置。FlatDesign 设置其自身 item 的标题；经典样式与液态玻璃设置 `tabBarItem.title`（以及导航控制器根控制器的），
- *      由 UIKit 显示。
- */
-static void CYLApplyTabBarItemSelectedTitles(CYLTabBarController *tabBarController) {
-    if (!tabBarController) {
-        return;
-    }
-    UIViewController *selectedViewController = tabBarController.selectedViewController;
-    for (UIViewController *viewController in tabBarController.viewControllers) {
-        NSString *selectedTitle = objc_getAssociatedObject(viewController, CYLTabBarItemSelectedTitleKey);
-        if (!selectedTitle) {
-            continue;
-        }
-        NSString *normalTitle = objc_getAssociatedObject(viewController, CYLTabBarItemNormalTitleKey) ?: @"";
-        NSString *title = (viewController == selectedViewController) ? selectedTitle : normalTitle;
-        if (CYLTabBarStyleTypeFlatDesign == tabBarController.tabBarStyleType) {
-#if CYL_FLATDESIGN_AVAILABLE
-            CYLFlatDesignTabBarItem *item = viewController.cyl_tabBarItem;
-            if (item && ![item.title isEqualToString:title]) {
-                item.title = title;
-            }
-#endif
-            continue;
-        }
-        UIViewController *contentViewController = [viewController cyl_getViewControllerInsteadOfNavigationController];
-        if (![viewController.tabBarItem.title isEqualToString:title]) {
-            viewController.tabBarItem.title = title;
-        }
-        if (contentViewController && contentViewController != viewController &&
-            ![contentViewController.tabBarItem.title isEqualToString:title]) {
-            contentViewController.tabBarItem.title = title;
-        }
-    }
-}
+FOUNDATION_EXTERN void CYLRememberTabBarItemSelectedTitle(UIViewController *_Nullable viewController, NSDictionary *_Nullable attributes, NSString *_Nullable normalTitle);
+FOUNDATION_EXTERN void CYLApplyTabBarItemSelectedTitles(CYLTabBarController *_Nullable tabBarController);
+// [EN] `CYLRememberTabBarItemSelectedTitle` and `CYLApplyTabBarItemSelectedTitles` are Swift (CYLTabBarController+CYLTabBarItemUpdate.swift,
+//      step 73), with their C names; the keys are selector-based (`cyl_tabBarItemSelectedTitle`, `cyl_tabBarItemNormalTitle`).
+// [CN] 这两个函数已迁移到 Swift（第 73 步），保留 C 名称；key 基于 selector。
 
 /*!
  * FIX: issue #433
@@ -470,55 +396,7 @@ static inline id _Nullable CYLObjectAtIndex(NSArray * _Nullable array, NSUIntege
     return index < array.count ? array[index] : nil;
 }
 
-/*!
- * [EN] FIX: issue #787. A tab's images in its `CYLTabBarItemIconRenderingMode`: "template" makes both images templates (the
- *      selected one falls back to the normal one, so one image is enough), "original" keeps their colors; otherwise the
- *      image infos are returned as they are.
- * [CN] FIX: issue #787。按 Tab 的 `CYLTabBarItemIconRenderingMode` 处理其图片："template" 把两张图片都设为模板（没有选中图片时使用普通图片，
- *      因此一张图即可），"original" 保持原色；否则原样返回图片信息。
- */
-/*!
- * [EN] FIX: issue #787 — `image` in `renderingMode`, keeping its dark image: `-imageWithRenderingMode:` alone returns the
- *      current appearance only, so a tab with `CYLTabBarItemDarkImage` stayed light in Dark Mode. Both appearances are
- *      converted and combined again.
- * [CN] FIX: issue #787——以 `renderingMode` 返回 `image`，并保留其深色图片：单独调用 `-imageWithRenderingMode:` 只返回当前外观的那张，
- *      带 `CYLTabBarItemDarkImage` 的 Tab 在深色模式下仍为浅色。因此两种外观分别转换后重新合成。
- */
-static UIImage *CYLImageWithRenderingMode(UIImage *image, UIImageRenderingMode renderingMode) {
-    if (@available(iOS 13.0, *)) {
-        UIImageAsset *imageAsset = image.imageAsset;
-        UIImage *lightImage = [imageAsset imageWithTraitCollection:[UITraitCollection traitCollectionWithUserInterfaceStyle:UIUserInterfaceStyleLight]];
-        UIImage *darkImage = [imageAsset imageWithTraitCollection:[UITraitCollection traitCollectionWithUserInterfaceStyle:UIUserInterfaceStyleDark]];
-        if (lightImage && darkImage && ![lightImage isEqual:darkImage]) {
-            return [UIImage cyl_imageWithLightImage:[lightImage imageWithRenderingMode:renderingMode]
-                                          darkImage:[darkImage imageWithRenderingMode:renderingMode]];
-        }
-    }
-    return [image imageWithRenderingMode:renderingMode];
-}
-
-static void CYLApplyIconRenderingMode(NSDictionary *attributes, id _Nullable *_Nonnull normalImageInfo, id _Nullable *_Nonnull selectedImageInfo) {
-    NSString *mode = [attributes[CYLTabBarItemIconRenderingMode] isKindOfClass:[NSString class]] ? attributes[CYLTabBarItemIconRenderingMode] : nil;
-    UIImageRenderingMode renderingMode;
-    if ([mode isEqualToString:@"template"]) {
-        renderingMode = UIImageRenderingModeAlwaysTemplate;
-    } else if ([mode isEqualToString:@"original"]) {
-        renderingMode = UIImageRenderingModeAlwaysOriginal;
-    } else {
-        return;
-    }
-    UIImage *normal = *normalImageInfo ? [UIImage cyl_imageNamed:*normalImageInfo] : nil;
-    UIImage *selected = *selectedImageInfo ? [UIImage cyl_imageNamed:*selectedImageInfo] : nil;
-    if (!selected && renderingMode == UIImageRenderingModeAlwaysTemplate) {
-        selected = normal;
-    }
-    if (normal) {
-        *normalImageInfo = CYLImageWithRenderingMode(normal, renderingMode);
-    }
-    if (selected) {
-        *selectedImageInfo = CYLImageWithRenderingMode(selected, renderingMode);
-    }
-}
+// [EN] The icon rendering mode (FIX: issue #787) is Swift: `+cyl_imageInfosOfAttributes:applyingIconRenderingModeToImageInfo:selectedImageInfo:` (step 73).
 
 // [EN] `-shouldUnloadViewOfViewController:` of `CYLTabBarControllerMemoryWarningSeam` is implemented in Swift (step 103), which
 //      clang cannot see here; the class conforms at run time (`testMemoryWarningReportThroughTheSeam`).
@@ -1610,11 +1488,11 @@ static void CYLApplyIconRenderingMode(NSDictionary *attributes, id _Nullable *_N
                                                        darkImageInfo:attributes[CYLTabBarItemDarkImage]];
             setup.selectedImageInfo = [UIImage cyl_imageWithImageInfo:attributes[CYLTabBarItemSelectedImage]
                                                          darkImageInfo:attributes[CYLTabBarItemSelectedDarkImage]];
-            id normalImageInfo = setup.normalImageInfo;
-            id selectedImageInfo = setup.selectedImageInfo;
-            CYLApplyIconRenderingMode(attributes, &normalImageInfo, &selectedImageInfo);
-            setup.normalImageInfo = normalImageInfo;
-            setup.selectedImageInfo = selectedImageInfo;
+            NSArray *imageInfos = [CYLTabBarController cyl_imageInfosOfAttributes:attributes
+                                             applyingIconRenderingModeToImageInfo:setup.normalImageInfo
+                                                                selectedImageInfo:setup.selectedImageInfo];
+            setup.normalImageInfo = imageInfos[0] == [NSNull null] ? nil : imageInfos[0];
+            setup.selectedImageInfo = imageInfos[1] == [NSNull null] ? nil : imageInfos[1];
             NSString *animationFilePath = nil;
             setup.animationURL = CYLTabBarItemAnimationURLFromAttributes(attributes, &animationFilePath);
             setup.animationFilePath = animationFilePath;
@@ -2590,310 +2468,10 @@ static NSString *const CYLTabBarItemPlusSlotPlaceholderKey = @"CYLTabBarItemPlus
 
 #pragma mark - Update a tab item in place (issue #601)
 
-- (BOOL)updateTabBarItemForViewController:(UIViewController *)viewController attributes:(NSDictionary<NSString *, id> *)attributes {
-    NSUInteger index = viewController ? [_viewControllers indexOfObject:viewController] : NSNotFound;
-    if (index == NSNotFound) {
-        index = [_viewControllers indexOfObjectPassingTest:^BOOL(UIViewController *obj, NSUInteger idx, BOOL *stop) {
-            return [obj cyl_getViewControllerInsteadOfNavigationController] == viewController;
-        }];
-    }
-    return index != NSNotFound && [self updateTabBarItemAtIndex:index attributes:attributes];
-}
-
-- (void)updateTabBarItemsWithAttributes:(NSArray<NSDictionary<NSString *, id> *> *)tabBarItemsAttributes {
-    // [EN] FIX: placeholder count mismatch — one entry per tab, none for the slot: an array read back from
-    //      `tabBarItemsAttributes` (Liquid Glass, FlatDesign) carries the slot's own entry, which used to be given to the
-    //      tab after the slot, and every later tab took the entry before its own. A theme restored this way (a skin, then
-    //      another one) left that tab without icon and title, and showed each later tab with its neighbor's.
-    // [CN] FIX：占位导致的数量不匹配——每个 Tab 一项，slot 不占项：从 `tabBarItemsAttributes` 读回的数组（液态玻璃、扁平样式）带有
-    //      slot 自己的一项，以前会被分给 slot 之后的 Tab，之后每个 Tab 都取到前一个 Tab 的属性。用它恢复主题（换一种皮肤后再换另一种）时，
-    //      该 Tab 没有图标和标题，之后的 Tab 显示相邻 Tab 的内容。
-    tabBarItemsAttributes = [self cyl_tabBarItemsAttributesByRemovingPlusSlot:tabBarItemsAttributes];
-    NSUInteger attributesIndex = 0;
-    for (NSUInteger index = 0; index < _viewControllers.count && attributesIndex < tabBarItemsAttributes.count; index++) {
-        UIViewController *viewController = _viewControllers[index];
-        // [EN] The plus button's tab has no entry.
-        // [CN] PlusButton 的 Tab 不占项。
-        if ([self cyl_isPlusSlotViewController:viewController]) {
-            continue;
-        }
-        [self updateTabBarItemAtIndex:index attributes:tabBarItemsAttributes[attributesIndex]];
-        attributesIndex++;
-    }
-}
-
-/*!
- * FIX: issue #216
- * [EN] The animation keys of an in-place update (`CYLTabBarAnimationURL` / `…FilePath`, a library's alias, `…Size`,
- *      `…Colors`, the #442 dark keys): the new file is bound to its library and its colors are registered (as at setup),
- *      the tab items and `tabBarItemAnimationURLs` learn the new file, and every tab button of the tab (two with Liquid
- *      Glass) swaps its animation view, keeping the playback state. Without an animation library the keys are logged
- *      and ignored, so a theme made for an app with Lottie does not fail silently in one without.
- * [CN] 原地更新中的动画 key（`CYLTabBarAnimationURL` / `…FilePath`、动画库别名、`…Size`、`…Colors`、#442 的深色 key）：新文件绑定到
- *      其动画库并注册颜色（与初始设置相同），Tab item 与 `tabBarItemAnimationURLs` 记录新文件，该 Tab 的每个按钮（液态玻璃为两个）
- *      替换动画视图并保留播放状态。没有动画库时打印日志并忽略，避免为带 Lottie 的 App 编写的主题在没有 Lottie 的 App 中静默失效。
- */
-- (void)cyl_updateAnimationOfViewController:(UIViewController *)viewController
-                                 attributes:(NSDictionary<NSString *, id> *)attributes
-                              newAttributes:(NSDictionary<NSString *, id> *)newAttributes {
-    // [EN] The generic keys and every library's aliases share these prefixes. [CN] 通用 key 与各动画库的别名都以这些前缀开头。
-    BOOL hasAnimationKey = NO;
-    for (NSString *key in attributes) {
-        if ([key hasPrefix:@"CYLTabBarAnimation"] || [key hasPrefix:@"CYLTabBarLottie"] || [key hasPrefix:@"CYLTabBarPAG"] || [key hasPrefix:@"CYLTabBarRive"]) {
-            hasAnimationKey = YES;
-            break;
-        }
-    }
-    if (!hasAnimationKey) {
-        return;
-    }
-    if (!CYLTabBarItemAnimationIsAvailable()) {
-        CYLAnimationWarnMissingEngine(newAttributes, CYLTabBarItemAnimationURLOfAnyType(newAttributes));
-        NSLog(@"🔴[CYL #216] tab bar item attributes carry an animation key (%@) but no animation library is linked: add pod 'CYLTabBarController/Lottie', 'CYLTabBarController/PAG' or 'CYLTabBarController/Rive'. The key is ignored and the tab keeps its image.", [attributes.allKeys componentsJoinedByString:@", "]);
-        return;
-    }
-    NSString *animationFilePath = nil;
-    NSURL *animationURL = CYLTabBarItemAnimationURLFromAttributes(newAttributes, &animationFilePath);
-    if (!animationURL) {
-        // [EN] `CYLTabBarAnimationFilePath` is a full path: a bare file name finds nothing and would fail silently.
-        //      `CYLTabBarItemAttributesAddingAnimationFile()` looks a name up in a bundle.
-        // [CN] `CYLTabBarAnimationFilePath` 是完整路径：只写文件名时找不到文件，且不会有任何提示。按名称在 bundle 中查找请用
-        //      `CYLTabBarItemAttributesAddingAnimationFile()`。
-        NSLog(@"🔴[CYL #216] no animation file found at \"%@\": CYLTabBarAnimationFilePath is a full path; use CYLTabBarItemAttributesAddingAnimationFile() for a file name in a bundle.", animationFilePath);
-        return;
-    }
-    NSValue *sizeValue = CYLTabBarItemAttributesAnimationValue(newAttributes, CYLTabBarAnimationSize);
-    UITabBarItem *tabBarItem = viewController.tabBarItem;
-    UITabBarItem *rootTabBarItem = [viewController cyl_getViewControllerInsteadOfNavigationController].tabBarItem;
-    NSURL *oldURL = tabBarItem.cyl_tabBarItemAnimationURL ?: rootTabBarItem.cyl_tabBarItemAnimationURL;
-    NSUInteger oldIndex = oldURL ? [self.tabBarItemAnimationURLs indexOfObject:oldURL] : NSNotFound;
-    if (oldIndex != NSNotFound) {
-        self.tabBarItemAnimationURLs[oldIndex] = animationURL;
-        if (sizeValue && oldIndex < self.tabBarItemAnimationSizes.count) {
-            self.tabBarItemAnimationSizes[oldIndex] = sizeValue;
-        }
-    } else {
-        [self.tabBarItemAnimationURLs addObject:animationURL];
-        if (sizeValue) {
-            [self.tabBarItemAnimationSizes addObject:sizeValue];
-        }
-    }
-    for (UITabBarItem *item in rootTabBarItem && rootTabBarItem != tabBarItem ? @[ tabBarItem, rootTabBarItem ] : @[ tabBarItem ]) {
-        item.cyl_tabBarItemAnimationURL = animationURL;
-        if (sizeValue) {
-            item.cyl_tabBarItemAnimationSizeValue = sizeValue;
-        }
-    }
-#if CYL_FLATDESIGN_AVAILABLE
-    if ([viewController.cyl_tabBarItem isKindOfClass:[CYLFlatDesignTabBarItem class]]) {
-        viewController.cyl_tabBarItem.lottieURL = animationURL;
-    }
-#endif
-    CGSize size = sizeValue ? [sizeValue CGSizeValue] : (tabBarItem.cyl_tabBarItemAnimationSizeValue ? [tabBarItem.cyl_tabBarItemAnimationSizeValue CGSizeValue] : CGSizeZero);
-    for (UIControl *tabButton in [self cyl_tabButtonsOfViewController:viewController]) {
-        [tabButton cyl_replaceTabBarItemAnimationWithURL:animationURL size:size contentMode:self.tabBarItemAnimationViewContentMode];
-    }
-}
-
-- (BOOL)updateTabBarItemAtIndex:(NSUInteger)index attributes:(NSDictionary<NSString *, id> *)attributes {
-    NSString *oldTitle = (index < _viewControllers.count) ? [self tabBarItemAttributesAtIndex:index][CYLTabBarItemTitle] : nil;
-    BOOL updated = [self cyl_applyTabBarItemUpdateAtIndex:index attributes:attributes];
-    if (updated) {
-        // [EN] After the tab shows the change: the title and icon notifications for their keys, then one for every change.
-        // [CN] Tab 显示变化之后：标题与图标 key 分别发送标题、图标通知，然后每次变化发送一次通用通知。
-        if (attributes[CYLTabBarItemTitle] || attributes[CYLTabBarItemSelectedTitle]) {
-            NSDictionary *current = [self tabBarItemAttributesAtIndex:index];
-            NSMutableDictionary *titleInfo = [NSMutableDictionary dictionary];
-            titleInfo[CYLTabBarItemTitle] = current[CYLTabBarItemTitle] ?: @"";
-            titleInfo[CYLTabBarItemSelectedTitle] = current[CYLTabBarItemSelectedTitle];
-            titleInfo[CYLTabBarItemOldTitleKey] = oldTitle;
-            titleInfo[CYLTabBarItemChangedAttributesKey] = [attributes dictionaryWithValuesForKeys:
-                [@[ CYLTabBarItemTitle, CYLTabBarItemSelectedTitle ] filteredArrayUsingPredicate:
-                 [NSPredicate predicateWithBlock:^BOOL(NSString *key, NSDictionary *bindings) { return attributes[key] != nil; }]]];
-            [self cyl_postTabBarItemNotification:CYLTabBarItemTitleDidChangeNotification atIndex:index extra:titleInfo];
-        }
-        NSDictionary *iconAttributes = [CYLTabBarController cyl_iconAttributesOfAttributes:attributes];
-        if (iconAttributes.count > 0) {
-            [self cyl_postTabBarItemNotification:CYLTabBarItemIconDidChangeNotification atIndex:index extra:@{ CYLTabBarItemChangedAttributesKey : iconAttributes }];
-        }
-        [self cyl_postTabBarItemNotification:CYLTabBarItemDidChangeNotification atIndex:index extra:@{ CYLTabBarItemChangedAttributesKey : [attributes copy] }];
-    }
-    return updated;
-}
-
-/// [EN] The in-place update itself; `-updateTabBarItemAtIndex:attributes:` posts the notification. [CN] 原地更新本身；通知由 `-updateTabBarItemAtIndex:attributes:` 发送。
-- (BOOL)cyl_applyTabBarItemUpdateAtIndex:(NSUInteger)index attributes:(NSDictionary<NSString *, id> *)attributes {
-    if (index >= _viewControllers.count || attributes.count == 0) {
-        return NO;
-    }
-    UIViewController *viewController = _viewControllers[index];
-    // The plus button's tab shows the plus button (its own title and image); a placeholder has nothing to show.
-    if (viewController.cyl_isPlaceholder || viewController == [self cyl_contextPlusChildViewController]) {
-        return NO;
-    }
-    NSUInteger attributesIndex = [self cyl_tabBarItemsAttributesIndexOfViewControllerAtIndex:index];
-    NSDictionary *oldAttributes = (attributesIndex < _tabBarItemsAttributes.count) ? _tabBarItemsAttributes[attributesIndex] : @{};
-    NSMutableDictionary *newAttributes = [oldAttributes mutableCopy];
-    [newAttributes addEntriesFromDictionary:attributes];
-    // [EN] FIX: placeholder count mismatch — a tab's entry never takes the slot's marker (an entry copied from the slot's):
-    //      it would be taken for the slot's entry and removed on the next `-setViewControllers:`.
-    // [CN] FIX：占位导致的数量不匹配——Tab 的属性永远不带 slot 的标记（从 slot 那一项复制过来时）：否则会被当成 slot 的属性，
-    //      在下一次 `-setViewControllers:` 时被移除。
-    [newAttributes removeObjectForKey:CYLTabBarItemPlusSlotPlaceholderKey];
-    if (attributesIndex < _tabBarItemsAttributes.count) {
-        NSMutableArray *tabBarItemsAttributes = [_tabBarItemsAttributes mutableCopy];
-        tabBarItemsAttributes[attributesIndex] = [newAttributes copy];
-        _tabBarItemsAttributes = [tabBarItemsAttributes copy];
-    }
-    // FIX: issue #433
-    // [EN] A new normal or selected title is remembered, so a later selection change shows the new ones.
-    // [CN] 记录新的普通标题或选中标题，之后切换选中时显示新的标题。
-    BOOL updatesSelectedTitle = (attributes[CYLTabBarItemTitle] || attributes[CYLTabBarItemSelectedTitle]);
-    if (updatesSelectedTitle) {
-        CYLRememberTabBarItemSelectedTitle(viewController, newAttributes, newAttributes[CYLTabBarItemTitle]);
-    }
-    // [EN] Per-tab colors are applied on the next layout pass (`-cyl_syncTabBarAppearances`, `-cyl_bindTabControlActions`).
-    // [CN] 单个 Tab 的颜色在下一次布局时生效（`-cyl_syncTabBarAppearances`、`-cyl_bindTabControlActions`）。
-    if (self.isViewLoaded && (attributes[CYLTabBarItemTitleColor] || attributes[CYLTabBarItemSelectedTitleColor] ||
-                              attributes[CYLTabBarItemIconColor] || attributes[CYLTabBarItemSelectedIconColor] ||
-                              attributes[CYLTabBarItemSelectedBackgroundColor] || attributes[CYLTabBarItemBackgroundColor] ||
-                              attributes[CYLTabBarItemTitleFont] || attributes[CYLTabBarItemSelectedTitleFont])) {
-        [self.view setNeedsLayout];
-        [self cyl_updateSelectedBackgroundColorsOfTabButtons];
-    }
-
-    // As when the tab was set up (`-setViewControllers:`), so a dark image is combined with its light one (#620).
-    NSString *title = attributes[CYLTabBarItemTitle];
-    // FIX: issue #787 — a new rendering mode alone redraws both images. [CN] 只更新渲染方式时也重新绘制两张图片。
-    BOOL updatesRenderingMode = attributes[CYLTabBarItemIconRenderingMode] != nil;
-    BOOL updatesImage = attributes[CYLTabBarItemImage] || attributes[CYLTabBarItemDarkImage] || updatesRenderingMode;
-    BOOL updatesSelectedImage = attributes[CYLTabBarItemSelectedImage] || attributes[CYLTabBarItemSelectedDarkImage] || updatesRenderingMode;
-    UIImage *image = updatesImage ? [UIImage cyl_imageNamed:[UIImage cyl_imageWithImageInfo:newAttributes[CYLTabBarItemImage]
-                                                                               darkImageInfo:newAttributes[CYLTabBarItemDarkImage]]] : nil;
-    UIImage *selectedImage = updatesSelectedImage ?
-        [UIImage cyl_imageNamed:[UIImage cyl_imageWithImageInfo:newAttributes[CYLTabBarItemSelectedImage]
-                                                  darkImageInfo:newAttributes[CYLTabBarItemSelectedDarkImage]]] : nil;
-    if (updatesImage || updatesSelectedImage) {
-        // FIX: issue #787 — the tab's rendering mode applies to images updated in place too.
-        // [CN] Tab 的渲染方式同样作用于原地更新的图片。
-        id normalInfo = image;
-        id selectedInfo = selectedImage;
-        CYLApplyIconRenderingMode(newAttributes, &normalInfo, &selectedInfo);
-        image = normalInfo;
-        selectedImage = selectedInfo;
-    }
-
-    // FIX: issue #216 — an animation key (e.g. from a `CYLTabBarTheme`) replaces the tab's animation in place, in every style.
-    // 动画 key（例如来自 `CYLTabBarTheme`）在所有样式下原地替换该 Tab 的动画。
-    [self cyl_updateAnimationOfViewController:viewController attributes:attributes newAttributes:newAttributes];
-
-    if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType) {
-#if CYL_FLATDESIGN_AVAILABLE
-        // Each change posts `CYLFlatDesignTabBarItemDidChange`, and its button lays itself out again.
-        CYLFlatDesignTabBarItem *tabBarItem = viewController.cyl_tabBarItem;
-        if (![tabBarItem isKindOfClass:[CYLFlatDesignTabBarItem class]]) {
-            return NO;
-        }
-        if (title) { tabBarItem.title = title; }
-        if (image) { tabBarItem.image = image; }
-        if (selectedImage) { tabBarItem.selectedImage = selectedImage; }
-        if (title) {
-            [CYLTabBarController cyl_applyNavigationTitleOfFollowingPage:viewController title:title];
-        }
-        // FIX: issue #433
-        // [EN] The selected tab shows its selected title, not the new normal title.
-        // [CN] 选中的 Tab 显示选中标题，而不是新的普通标题。
-        if (updatesSelectedTitle) {
-            CYLApplyTabBarItemSelectedTitles(self);
-        }
-        if (attributes[CYLTabBarItemImageURL] || attributes[CYLTabBarItemSelectedImageURL] || attributes[CYLTabBarItemImageURLSize]) {
-            [self cyl_loadImageURLsOfAttributes:newAttributes atIndex:index];
-        }
-        return YES;
-#else
-        return NO;
-#endif
-    }
-    // Liquid Glass and the system tab bar: `UITabBarItem` redraws its tab when a property changes.
-    NSMutableArray<UITabBarItem *> *tabBarItems = [NSMutableArray arrayWithObject:viewController.tabBarItem];
-    UITabBarItem *rootTabBarItem = [viewController cyl_getViewControllerInsteadOfNavigationController].tabBarItem;
-    if (rootTabBarItem && rootTabBarItem != viewController.tabBarItem) {
-        [tabBarItems addObject:rootTabBarItem];
-    }
-    for (UITabBarItem *tabBarItem in tabBarItems) {
-        if (title) { tabBarItem.title = title; }
-        if (image) { tabBarItem.image = [CYLTabBarController cyl_restingTabBarItemImage:image forItem:tabBarItem selected:NO]; }
-        if (selectedImage) { tabBarItem.selectedImage = [CYLTabBarController cyl_restingTabBarItemImage:selectedImage forItem:tabBarItem selected:YES]; }
-    }
-    if (title) {
-        [CYLTabBarController cyl_applyNavigationTitleOfFollowingPage:viewController title:title];
-    }
-    // FIX: issue #433
-    // [EN] The selected tab shows its selected title, not the new normal title.
-    // [CN] 选中的 Tab 显示选中标题，而不是新的普通标题。
-    if (updatesSelectedTitle) {
-        CYLApplyTabBarItemSelectedTitles(self);
-    }
-    // FIX: issue #257, #522
-    // [EN] An image-only tab that gets a title is no longer image-only: undo the automatic adjustment, or the title stays
-    //      off screen (`UIOffsetMake(0, MAXFLOAT)`). A tab whose title becomes empty gets it again.
-    // [CN] 纯图标 Tab 设置标题后就不再是纯图标 Tab：撤销自动调整，否则标题会一直在屏幕外（`UIOffsetMake(0, MAXFLOAT)`）。
-    //      标题被清空的 Tab 重新获得自动调整。
-    if (title) {
-        if (title.length > 0) {
-            [self cyl_restoreImageOnlyTabItems:tabBarItems];
-        } else if ([_cyl_tabBar isKindOfClass:[CYLTabBar class]] && ((CYLTabBar *)_cyl_tabBar).tabImageViewDefaultOffset != 0.f) {
-            [self offsetTabBarTabImageViewToFit:((CYLTabBar *)_cyl_tabBar).tabImageViewDefaultOffset];
-        }
-    }
-    // [EN] Liquid Glass may keep the tab buttons' previous layout (a longer title overlapping the plus button and the next
-    //      tab) until a tab is tapped: reload them as a tap does.
-    // [CN] 液态玻璃可能保持 Tab 按钮原来的布局（较长的标题与 PlusButton 及
-    //      后一个 Tab 重叠），直到点击某个 Tab：像点击一样重新加载它们。
-    if ([self.tabBar isKindOfClass:[CYLTabBar class]]) {
-        [(CYLTabBar *)self.tabBar cyl_reloadTabButtons];
-    }
-    // [EN] Icons from the network replace the images once downloaded (`CYLTabBarItemImageURL`).
-    // [CN] 网络图标下载完成后覆盖图片。
-    if (attributes[CYLTabBarItemImageURL] || attributes[CYLTabBarItemSelectedImageURL] || attributes[CYLTabBarItemImageURLSize]) {
-        [self cyl_loadImageURLsOfAttributes:newAttributes atIndex:index];
-    }
-    return YES;
-}
-
-/*!
- * FIX: issue #216
- * [EN] Removes `keys` from the attributes of the tab at `index`: a key a theme added that the app did not have. A title
- *      becomes empty again (an image-only tab), a selected title stops overriding the title, and colors and fonts fall
- *      back on the next layout pass.
- * [CN] 从第 `index` 个 Tab 的 attributes 中移除 `keys`：主题添加、App 原本没有的 key。标题恢复为空（纯图标 Tab），选中标题不再覆盖标题，
- *      颜色与字体在下一次布局时回退。
- */
-- (void)cyl_themeRemoveTabBarItemAttributeKeys:(NSArray<NSString *> *)keys atIndex:(NSUInteger)index {
-    if (index >= _viewControllers.count || keys.count == 0) {
-        return;
-    }
-    NSUInteger attributesIndex = [self cyl_tabBarItemsAttributesIndexOfViewControllerAtIndex:index];
-    if (attributesIndex >= _tabBarItemsAttributes.count) {
-        return;
-    }
-    if ([keys containsObject:CYLTabBarItemTitle]) {
-        [self updateTabBarItemAtIndex:index attributes:@{ CYLTabBarItemTitle : @"" }];
-    }
-    NSMutableArray *tabBarItemsAttributes = [_tabBarItemsAttributes mutableCopy];
-    NSMutableDictionary *attributes = [tabBarItemsAttributes[attributesIndex] mutableCopy];
-    [attributes removeObjectsForKeys:keys];
-    tabBarItemsAttributes[attributesIndex] = [attributes copy];
-    _tabBarItemsAttributes = [tabBarItemsAttributes copy];
-    if ([keys containsObject:CYLTabBarItemSelectedTitle]) {
-        CYLRememberTabBarItemSelectedTitle(_viewControllers[index], attributes, attributes[CYLTabBarItemTitle]);
-        CYLApplyTabBarItemSelectedTitles(self);
-    }
-    if (self.isViewLoaded) {
-        [self.view setNeedsLayout];
-        [self cyl_updateSelectedBackgroundColorsOfTabButtons];
-    }
-}
+// [EN] The in-place updates (`-updateTabBarItemAtIndex:attributes:`, `-updateTabBarItemForViewController:attributes:`,
+//      `-updateTabBarItemsWithAttributes:`, the animation keys, `-cyl_themeRemoveTabBarItemAttributeKeys:atIndex:`) are Swift:
+//      Swift/CYLTabBarController+CYLTabBarItemUpdate.swift (step 73).
+// [CN] 原地更新已迁移到 Swift（第 73 步）。
 
 #pragma mark - A view of yours in place of a tab's icon (issue #601)
 
