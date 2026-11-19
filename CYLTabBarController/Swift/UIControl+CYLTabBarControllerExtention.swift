@@ -835,7 +835,7 @@ extension UIView {
      * [CN] 把 `view` 的布局跟踪（#653）改为跟随 `newView`，`newView` 同时沿用 `view` 的 Tab 按钮标记。
      */
     @objc(cyl_replaceTrackedSubview:withView:)
-    func cyl_replaceTrackedSubview(_ view: UIView, withView newView: UIView) {
+    public func cyl_replaceTrackedSubview(_ view: UIView, withView newView: UIView) {
         if let tabControl = view.cyl_insertedForTabControl ?? (self as? UIControl) {
             newView.cyl_markAsInserted(forTabControl: tabControl)
         }

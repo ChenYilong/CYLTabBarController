@@ -1802,7 +1802,7 @@ extension CYLTabBar {
     // [CN] 在 UIControl+CYLTabBarItemAnimation.h（私有头文件）中声明；原为 UIControl+CYLTabBarItemAnimation.m。
 
     @objc(cyl_playTabBarItemAnimationWithSelectedControl:URL:size:defaultSelected:contentMode:)
-    func cylPlayTabBarItemAnimation(withSelectedControl selectedControl: UIControl?, url: URL?, size: CGSize,
+    public func cylPlayTabBarItemAnimation(withSelectedControl selectedControl: UIControl?, url: URL?, size: CGSize,
                                     defaultSelected: Bool, contentMode: UIView.ContentMode) {
         guard let url else { return }
         // [CN] 统一使用CYLTabBarItemAnimationPlayingNotification进行动画重置， 故删除手动重置。
@@ -1812,17 +1812,17 @@ extension CYLTabBar {
     }
 
     @objc(cyl_stopAllTabBarItemAnimations)
-    func cylStopAllTabBarItemAnimations() {
+    public func cylStopAllTabBarItemAnimations() {
         cylEnumerateAnimatedControls { $0.cyl_stopTabBarItemAnimation() }
     }
 
     @objc(cyl_restartAllTabBarItemAnimations)
-    func cylRestartAllTabBarItemAnimations() {
+    public func cylRestartAllTabBarItemAnimations() {
         cylEnumerateAnimatedControls { $0.cyl_restartTabBarItemAnimation() }
     }
 
     @objc(cyl_setAllTabBarItemAnimationsSpeed:loops:)
-    func cylSetAllTabBarItemAnimations(speed: CGFloat, loops: Bool) {
+    public func cylSetAllTabBarItemAnimations(speed: CGFloat, loops: Bool) {
         cylEnumerateAnimatedControls { control in
             control.cyl_setTabBarItemAnimationSpeed(speed)
             control.cyl_setTabBarItemAnimationLoops(loops)
