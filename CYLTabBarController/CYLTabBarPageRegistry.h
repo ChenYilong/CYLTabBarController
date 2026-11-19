@@ -20,23 +20,14 @@
 // [CN] Swift 无法替代的 Objective-C（原因见英文说明与 docs/Swift-Migration-Phase3.md）。
 #import <UIKit/UIKit.h>
 
+#import "CYLTabBarControllerTypedefs.h"
+
 NS_ASSUME_NONNULL_BEGIN
 
 // [EN] Defined in Swift (see the end of this header); declared here for the headers that use them.
 // [CN] 在 Swift 中定义（见本头文件末尾）；在此声明，供使用它们的头文件引用。
 @class CYLTabBarPageRequest, CYLTabBarSkippedTab, CYLTabBarPageRegistry;
 @protocol CYLTabBarPageProviding, CYLTabBarPage;
-
-/*!
- * [EN] Creates the page (view controller) of a tab. `pageIdentifier` is the tab's page ID (see
- *      `CYLTabBarItemPageIdentifier`), `tabAttributes` the tab's normalized attributes (title, icons,
- *      `CYLTabBarItemPageParameters`, ...). Return nil to skip the tab. The page may be a navigation controller that wraps
- *      the content. Called on the main thread, once per tab and tab bar controller.
- * [CN] 创建 Tab 的页面（视图控制器）。`pageIdentifier` 为该 Tab 的页面 ID（见 `CYLTabBarItemPageIdentifier`），`tabAttributes` 为该 Tab
- *      规范化后的属性（标题、图标、`CYLTabBarItemPageParameters` 等）。返回 nil 则跳过该 Tab。页面可以是包裹内容的导航控制器。
- *      在主线程调用，每个 TabBarController 的每个 Tab 调用一次。
- */
-typedef UIViewController *_Nullable (^CYLTabBarPageProvider)(NSString *pageIdentifier, NSDictionary<NSString *, id> *tabAttributes);
 
 /*!
  * [EN] Creates the page of a tab from a `CYLTabBarPageRequest`: the same as `CYLTabBarPageProvider`, with a typed,

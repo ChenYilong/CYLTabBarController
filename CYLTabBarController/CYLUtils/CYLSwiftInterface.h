@@ -22,6 +22,11 @@
  * [CN] 生成的接口所用、目前仍为 Objective-C 的声明：必须先导入，因为第一个导入本文件的头文件可能还没有看到它们（第 21 步：
  *      `UIView (CYLBadgeExtention)` 遵守 `CYLBadgeProtocol` 并使用 `CYLBadgeAnimationType`）。这里只放不导入本模块其他头文件的头文件。
  */
+#if __has_include(<CYLTabBarController/CYLTabBarControllerTypedefs.h>)
+#import <CYLTabBarController/CYLTabBarControllerTypedefs.h>
+#elif __has_include("CYLTabBarControllerTypedefs.h")
+#import "CYLTabBarControllerTypedefs.h"
+#endif
 #if __has_include(<CYLTabBarController/CYLBadgeProtocol.h>)
 #import <CYLTabBarController/CYLBadgeProtocol.h>
 #elif __has_include("CYLBadgeProtocol.h")

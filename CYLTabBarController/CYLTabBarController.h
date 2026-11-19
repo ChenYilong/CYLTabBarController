@@ -207,6 +207,8 @@
 #else
 #endif
 
+#import "CYLTabBarControllerTypedefs.h"
+
 NS_ASSUME_NONNULL_BEGIN
 
 /*!
@@ -226,7 +228,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class CYLTabBarController;
 #ifndef __swift__
-typedef void(^CYLViewDidLayoutSubViewsBlock)(CYLTabBarController *tabBarController);
 #endif
 
 
@@ -1009,63 +1010,12 @@ FOUNDATION_EXTERN CGFloat CYLTabBarItemWidth;
 FOUNDATION_EXTERN CGFloat CYLTabBarHeight;
 
 /*!
- * FIX: issue #19
- * [EN] Called once a login started by `-cyl_loginHandler` / `-tabBarController:presentLoginForViewController:completion:`
- *      ends: YES when the user logged in (the tab they tapped is then selected), NO when they cancelled.
- * [CN] 由 `-cyl_loginHandler` / `-tabBarController:presentLoginForViewController:completion:` 发起的登录结束时调用：用户登录成功
- *      为 YES（随后选中用户点击的 Tab），取消为 NO。
- */
-typedef void (^CYLTabBarLoginCompletion)(BOOL loggedIn);
-
-/*!
  * [EN] Posted when `-[CYLTabBarController cyl_loggedIn]` is set; `object` is the tab bar controller it was set on.
  * [CN] 设置 `-[CYLTabBarController cyl_loggedIn]` 时发送；`object` 为被设置的 TabBarController。
  */
 #ifndef __swift__
 #define CYLTabBarLoginStateDidChangeNotification ((NSNotificationName)@"CYLTabBarLoginStateDidChangeNotification")
 #endif
-
-/*!
- * [EN] What the library does when the user taps the tab that is already selected (a "reselect"). See
- *      `-[CYLTabBarController cyl_reselectBehavior]` and docs/Tab-Reselect.md.
- *      - PopToRoot: a navigation controller with pushed pages pops back to its root page.
- *      - ScrollToTop: the page's scroll view scrolls back to the top.
- *      - PopToRootThenScrollToTop: both, as the system apps do: the first tap pops, the next one (already at the root)
- *        scrolls to the top.
- * [CN] 用户点击已选中的 Tab（"重复点击"）时本库执行的操作。见 `-[CYLTabBarController cyl_reselectBehavior]` 与 docs/Tab-Reselect.md。
- *      - PopToRoot：push 了页面的导航控制器返回根页面。
- *      - ScrollToTop：页面的滚动视图滚动到顶部。
- *      - PopToRootThenScrollToTop：二者兼有，与系统 App 一致：第一次点击返回根页面，再点击一次（已在根页面）滚动到顶部。
- */
-typedef NS_OPTIONS(NSUInteger, CYLTabBarReselectBehavior) {
-    CYLTabBarReselectBehaviorNone        = 0,
-    CYLTabBarReselectBehaviorPopToRoot   = 1 << 0,
-    CYLTabBarReselectBehaviorScrollToTop = 1 << 1,
-    CYLTabBarReselectBehaviorPopToRootThenScrollToTop = CYLTabBarReselectBehaviorPopToRoot | CYLTabBarReselectBehaviorScrollToTop,
-};
-
-/*!
- * FIX: issue #152
- * [EN] Gestures on a tab button or the plus button, reported by `cyl_tabBarItemGestureHandler` and
- *      `-tabBarController:didRecognizeTabBarItemGesture:control:viewController:`, in every style (classic, Liquid Glass,
- *      FlatDesign). See `CYLTabBarController (CYLTabBarItemGesture)` and docs/TabBarItem-Gestures.md.
- *      - Reselect: a tap on the tab that is already selected (e.g. scroll to the top).
- *      - DoubleTap: two taps on the same tab within `cyl_tabBarItemDoubleTapInterval` (e.g. refresh, as Weibo does). The
- *        second tap is also a Reselect, reported first.
- *      - LongPress: a long press began on the tab (e.g. a menu). The tab is still selected when the finger lifts.
- * [CN] Tab 按钮或 PlusButton 上的手势，通过 `cyl_tabBarItemGestureHandler` 和
- *      `-tabBarController:didRecognizeTabBarItemGesture:control:viewController:` 回调，适用于所有样式（经典、液态玻璃、扁平）。
- *      见 `CYLTabBarController (CYLTabBarItemGesture)` 与 docs/TabBarItem-Gestures.md。
- *      - Reselect：点击已选中的 Tab（例如滚动到顶部）。
- *      - DoubleTap：在 `cyl_tabBarItemDoubleTapInterval` 内连续两次点击同一个 Tab（例如像微博一样双击刷新）。第二次点击同时也是
- *        Reselect，Reselect 先回调。
- *      - LongPress：在 Tab 上开始长按（例如弹出菜单）。手指抬起时该 Tab 仍会被选中。
- */
-typedef NS_ENUM(NSInteger, CYLTabBarItemGesture) {
-    CYLTabBarItemGestureReselect = 0,
-    CYLTabBarItemGestureDoubleTap,
-    CYLTabBarItemGestureLongPress,
-};
 
 /*!
  * FIX: issue #152
@@ -1075,69 +1025,6 @@ typedef NS_ENUM(NSInteger, CYLTabBarItemGesture) {
  *      （PlusButton 为其子控制器），没有子控制器的 PlusButton 为 nil。
  */
 #ifndef __swift__
-typedef void (^CYLTabBarItemGestureHandler)(CYLTabBarController *tabBarController,
-                                            CYLTabBarItemGesture gesture,
-                                            UIControl *control,
-                                            UIViewController *_Nullable viewController);
-#endif
-
-
-#ifndef __swift__
-@interface NSObject (CYLTabBarControllerReferenceExtension)
-
-/*!
- * [EN] The CYLTabBarController of a system style (Default, System, LiquidGlass) `self` belongs to, made for several
- *      tab bar controllers (#414) rather than one:
- *      0. a system style CYLTabBarController is its own;
- *      1. the reference set with `-cyl_setTabBarController:`;
- *      2. where `self` is: a view controller's nearest tab bar controller above it; a view's, through the view controller
- *         that owns it (so a tab button or the plus button finds its own controller, not the root one);
- *      3. otherwise the most recently active one (`+cyl_activeTabBarController`), then, as before, the root view controller.
- *      Same lookup as `-cylflatdesign_tabBarController`, see `-cyl_tabBarControllerForStyleType:`.
- * [CN] `self` 所属的系统样式（Default、System、LiquidGlass）CYLTabBarController，按多个 TabBarController 的场景（#414）设计，而不是单例式：
- *      0. 系统样式的 CYLTabBarController 就是它自己；
- *      1. 通过 `-cyl_setTabBarController:` 设置的引用；
- *      2. `self` 所在的位置：ViewController 取上方最近的 TabBarController；View 通过拥有它的 ViewController 查找
- *         （因此 Tab 按钮或 PlusButton 找到的是自己的控制器，而不是根控制器）；
- *      3. 否则取最近活跃的那个（`+cyl_activeTabBarController`），最后与以前一样取根控制器。
- *      与 `-cylflatdesign_tabBarController` 使用同一个查找，见 `-cyl_tabBarControllerForStyleType:`。
- */
-@property (nonatomic, nullable, setter=cyl_setTabBarController:) CYLTabBarController *cyl_tabBarController;
-
-/*!
- * [EN] The lookup behind `-cyl_tabBarController` and `-cylflatdesign_tabBarController`, merged into one: the type picks
- *      the style family, `CYLTabBarStyleTypeFlatDesign` for flat design, any other value for the system styles
- *      (Default, System, LiquidGlass, as `-cyl_isSystemStyleTabBar` counts them). It falls back to the most recently
- *      active controller of that family. `-cylflatdesign_tabBarController` keeps returning nil instead, as before.
- * [CN] `-cyl_tabBarController` 与 `-cylflatdesign_tabBarController` 合并后的查找：类型决定样式类别，`CYLTabBarStyleTypeFlatDesign`
- *      表示扁平样式，其他任意值表示系统样式（Default、System、LiquidGlass，与 `-cyl_isSystemStyleTabBar` 的判断一致）。
- *      最后会回退到该类别中最近活跃的控制器；`-cylflatdesign_tabBarController` 则与以前一样返回 nil。
- */
-- (nullable CYLTabBarController *)cyl_tabBarControllerForStyleType:(CYLTabBarStyleType)styleType;
-
-/*!
- * [EN] The same lookup for a CYLTabBarController of any style, without a fallback: the one `self` is in (or is), nil if
- *      it is not inside one. The plus button registry uses it to find the context of a tab button, a view in a tab or a
- *      view controller.
- * [CN] 同一个查找，但不限样式、没有回退：`self` 所在（或本身就是）的 CYLTabBarController，不在任何一个之内时为 nil。
- *      PlusButton 注册表用它确定 Tab 按钮、Tab 内的 View 或 ViewController 的 context。
- */
-- (nullable CYLTabBarController *)cyl_owningTabBarController;
-
-#if CYL_FLATDESIGN_AVAILABLE
-
-/*!
- * [EN] Flat design. The flat design CYLTabBarController `self` belongs to, nil if none. Same lookup as
- *      `-cyl_tabBarController` (`-cyl_tabBarControllerForStyleType:` with `CYLTabBarStyleTypeFlatDesign`), except that an
- *      explicit reference is returned as it is and there is no fallback, as before.
- * [CN] 扁平样式。`self` 所属的扁平样式 CYLTabBarController，没有则为 nil。与 `-cyl_tabBarController` 使用同一个查找
- *      （`-cyl_tabBarControllerForStyleType:` 传 `CYLTabBarStyleTypeFlatDesign`），区别是显式设置的引用原样返回、没有回退，与以前一致。
- */
-@property (nullable, nonatomic, weak, getter=cylflatdesign_tabBarController, setter=cylflatdesign_setTabBarController:) UIViewController __kindof *cylflatdesign_tabBarController;
-
-#endif
-
-@end
 #endif
 
 
@@ -1170,14 +1057,8 @@ FOUNDATION_EXTERN NSString *const CYLTabBarItemLottieAnimationPlayingNotificatio
  *      （`CYLTabBarConfigurationErrorDomain`）。
  */
 #ifndef __swift__
-typedef void (^CYLTabBarControllerConfigurationCompletion)(CYLTabBarController *_Nullable tabBarController, NSError *_Nullable error);
 #endif
 
-
-/*!
- * [EN] Completion of `+loadConfigurationWithURL:completion:`, on the main queue. [CN] `+loadConfigurationWithURL:completion:` 的回调，在主队列执行。
- */
-typedef void (^CYLTabBarConfigurationCompletion)(NSDictionary<NSString *, id> *_Nullable configuration, NSError *_Nullable error);
 
 /*!
  * [EN] Posted after a Lottie animation view is added to a tab button (issue #428). The notification's `object` is the tab
