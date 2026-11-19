@@ -86,25 +86,24 @@ class CYLFlatDesignMainTabBarController: CYLTabBarController, CYLFlatDesignUITab
     }
 
     /// [EN] #19, delegate API: the last two tabs need login (the tabs share one class, so by position). [CN] #19 代理方式：最后两个 Tab 需要登录（按位置判断）。
-    override func tabBarController(_ tabBarController: CYLTabBarController, requiresLoginToSelect viewController: UIViewController) -> Bool {
+    func tabBarController(_ tabBarController: CYLTabBarController, requiresLoginToSelect viewController: UIViewController) -> Bool {
         guard let viewControllers = tabBarController.viewControllers, let index = viewControllers.firstIndex(of: viewController) else { return false }
         return viewControllers.count >= 2 && index >= viewControllers.count - 2
     }
 
-    override func tabBarController(_ tabBarController: CYLTabBarController, presentLoginFor viewController: UIViewController,
+    func tabBarController(_ tabBarController: CYLTabBarController, presentLoginFor viewController: UIViewController,
                           completion: @escaping @Sendable (Bool) -> Void) {
         tabBarController.cyl_demo_presentLogin(for: viewController, completion: completion)
     }
 
     /// [EN] #152: the delegate API of the tab item gestures. [CN] #152：TabBarItem 手势的代理方式。
-    override func tabBarController(_ tabBarController: CYLTabBarController, didRecognize gesture: CYLTabBarItemGesture, control: UIControl,
+    func tabBarController(_ tabBarController: CYLTabBarController, didRecognize gesture: CYLTabBarItemGesture, control: UIControl,
                           viewController: UIViewController?) {
         guard let viewController else { return }
         tabBarController.cyl_demo_handleTabBarItemGesture(gesture, control: control, viewController: viewController)
     }
 
-    override func tabBarController(_ tabBarController: UITabBarController, didSelect control: UIControl) {
-        guard let tabBarController = tabBarController as? CYLTabBarController else { return }
+    func tabBarController(_ tabBarController: CYLTabBarController, didSelect control: UIControl) {
         #if DEBUG
         // [EN] #610 / #408: every tab button and the plus button report here; the identifier tells which.
         // [CN] #610 / #408：每个 Tab 按钮和 PlusButton 都会回调；用标识区分。
@@ -129,13 +128,21 @@ class CYLFlatDesignMainTabBarController: CYLTabBarController, CYLFlatDesignUITab
                 tabBarController.selectedViewController?.cyl_showBadge()
             }
         }
+        cyl_demo_didSelectItem(of: control)
     }
 
-    // MARK: - CYLFlatDesignTabBarDelegate
+    // MARK: - The selected item
 
-    /// [EN] The middle item opens a modal page; the last one turns the bar black. [CN] 中间的 item 打开模态页面；最后一个让 TabBar 变黑。
-    override func tabBar(_ tabBar: CYLFlatDesignTabBar, didSelect item: CYLFlatDesignTabBarItem) {
-        let index = tabBar.items?.firstIndex(of: item)
+    /**
+     [EN] The middle item opens a modal page; the last one turns the bar black. This used to be `-tabBar:didSelectItem:` of
+          `CYLFlatDesignTabBarDelegate`; a Swift subclass of `UITabBarController` cannot define that selector (UIKit's own
+          `UITabBarDelegate` method has it), so it follows the tapped button of `-tabBarController:didSelectControl:` instead.
+     [CN] 中间的 item 打开模态页面；最后一个让 TabBar 变黑。以前用 `CYLFlatDesignTabBarDelegate` 的 `-tabBar:didSelectItem:`；`UITabBarController` 的
+          Swift 子类无法定义该 selector（UIKit 自己的 `UITabBarDelegate` 方法使用它），因此改为依据 `-tabBarController:didSelectControl:` 中被点击的按钮。
+     */
+    private func cyl_demo_didSelectItem(of control: UIControl) {
+        guard let tabBar = cyl_tabBar as? CYLFlatDesignTabBar,
+              let index = tabBar.items?.firstIndex(where: { $0.tabBarButton === control }) else { return }
         if index == 2 {
             present(CYLFlatDesignModalViewController(), animated: true)
             return
@@ -147,6 +154,8 @@ class CYLFlatDesignMainTabBarController: CYLTabBarController, CYLFlatDesignUITab
             viewController.cyl_tabBarItem?.setTitleTextAttributes(titleTextAttributes, for: .normal)
         }
     }
+
+    // MARK: - CYLFlatDesignUITabBarControllerDelegate
 
     func tabBarController(_ _: CYLTabBarController!, willShow _: CYLFlatDesignTabBar!) {
         cyl_demo_log(#function)

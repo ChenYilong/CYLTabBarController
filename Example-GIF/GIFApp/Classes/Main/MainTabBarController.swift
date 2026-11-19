@@ -18,7 +18,7 @@ class MainTabBarController: CYLTabBarController, CYLFlatDesignUITabBarController
         demoShowPlusButtonBadgeAfterLayout()
     }
 
-    override func tabBarController(_ _: CYLTabBarController, didSelect control: UIControl) {
+    func tabBarController(_ _: CYLTabBarController, didSelect control: UIControl) {
         demoPlusButtonDidTap(control)
     }
 

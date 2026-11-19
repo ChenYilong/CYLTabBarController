@@ -7,11 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		F618DA17597B437580976BF5 /* Configurations in Resources */ = {isa = PBXBuildFile; fileRef = A1839EF9BFD2474F9B1A186E /* Configurations */; };
 		0A226B506615FEAF53B63F15 /* Pods_GIFApp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D9539E3C35FC9862B9097017 /* Pods_GIFApp.framework */; };
+		1CB632357B8E3CCE9E6BA02F /* CYLDemo.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 56985C2EDDA0C8652F2D7553 /* CYLDemo.bundle */; };
+		29B5FBC7CF242F1F12769B22 /* CYLDemoTabBarStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 863ECC7ADA9F01AD11686382 /* CYLDemoTabBarStyle.swift */; };
 		3B8A0B44005BA319F2BA6056 /* tab_star.gif in Resources */ = {isa = PBXBuildFile; fileRef = D29B96195DFAC3AA0ECC45FD /* tab_star.gif */; };
 		3C25258E344C2986B798F917 /* tab_rocket.gif in Resources */ = {isa = PBXBuildFile; fileRef = 765B3B6B67AACD02647430B5 /* tab_rocket.gif */; };
 		49544877C51922514902BAF2 /* tab_fire.gif in Resources */ = {isa = PBXBuildFile; fileRef = AC3396B126CBEE668E7D5E8E /* tab_fire.gif */; };
+		71AEA93ED30237538010454F /* CYLDemoLocalization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D5219E67C001E73250DF2DF /* CYLDemoLocalization.swift */; };
 		922DCEE61FF63399005C89BE /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 922DCEE41FF63399005C89BE /* Main.storyboard */; };
 		922DCEE81FF63399005C89BE /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 922DCEE71FF63399005C89BE /* Assets.xcassets */; };
 		922DCEEB1FF63399005C89BE /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 922DCEE91FF63399005C89BE /* LaunchScreen.storyboard */; };
@@ -27,19 +29,18 @@
 		92DD37E120A5740500754AC8 /* NextHomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92DD37DF20A5740500754AC8 /* NextHomeViewController.swift */; };
 		92DD37E220A5740500754AC8 /* NextHomeViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 92DD37E020A5740500754AC8 /* NextHomeViewController.xib */; };
 		A6BB576F53C889C5B808FE44 /* CYLSettingsDemoTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B2B41390DA6BE0F43BB0E1 /* CYLSettingsDemoTableViewController.swift */; };
-		29B5FBC7CF242F1F12769B22 /* CYLDemoTabBarStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 863ECC7ADA9F01AD11686382 /* CYLDemoTabBarStyle.swift */; };
 		C1A5CE0E2E00000000000001 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1A5CE0E2E00000000000002 /* SceneDelegate.swift */; };
 		DD17472BCA9743B7B160F884 /* CYLPlusButtonBadgeDemo.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6B9DA7EE87C4B448F2A9C22 /* CYLPlusButtonBadgeDemo.swift */; };
-		71AEA93ED30237538010454F /* CYLDemoLocalization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D5219E67C001E73250DF2DF /* CYLDemoLocalization.swift */; };
-		1CB632357B8E3CCE9E6BA02F /* CYLDemo.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 56985C2EDDA0C8652F2D7553 /* CYLDemo.bundle */; };
+		F618DA17597B437580976BF5 /* Configurations in Resources */ = {isa = PBXBuildFile; fileRef = A1839EF9BFD2474F9B1A186E /* Configurations */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		A1839EF9BFD2474F9B1A186E /* Configurations */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Configurations; path = "../Example-Shared/Configurations"; sourceTree = SOURCE_ROOT; };
 		10B2B41390DA6BE0F43BB0E1 /* CYLSettingsDemoTableViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CYLSettingsDemoTableViewController.swift; path = "../Example-Shared/CYLSettingsDemoTableViewController.swift"; sourceTree = "<group>"; };
-		863ECC7ADA9F01AD11686382 /* CYLDemoTabBarStyle.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CYLDemoTabBarStyle.swift; path = "../Example-Shared/CYLDemoTabBarStyle.swift"; sourceTree = "<group>"; };
 		2CDA77BCC28E878CAB5EFD15 /* Pods-GIFApp.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-GIFApp.release.xcconfig"; path = "Pods/Target Support Files/Pods-GIFApp/Pods-GIFApp.release.xcconfig"; sourceTree = "<group>"; };
+		56985C2EDDA0C8652F2D7553 /* CYLDemo.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; name = CYLDemo.bundle; path = "../Example-Shared/CYLDemo.bundle"; sourceTree = SOURCE_ROOT; };
 		765B3B6B67AACD02647430B5 /* tab_rocket.gif */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.gif; path = tab_rocket.gif; sourceTree = "<group>"; };
+		7D5219E67C001E73250DF2DF /* CYLDemoLocalization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CYLDemoLocalization.swift; path = "../Example-Shared/CYLDemoLocalization.swift"; sourceTree = SOURCE_ROOT; };
+		863ECC7ADA9F01AD11686382 /* CYLDemoTabBarStyle.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CYLDemoTabBarStyle.swift; path = "../Example-Shared/CYLDemoTabBarStyle.swift"; sourceTree = "<group>"; };
 		922DCEDD1FF63399005C89BE /* GIFApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GIFApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		922DCEE51FF63399005C89BE /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		922DCEE71FF63399005C89BE /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -56,14 +57,13 @@
 		922DCF081FF63402005C89BE /* CYLPlusButtonSubclass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CYLPlusButtonSubclass.swift; path = "../Example-Swift-02/CYLTabBarController-Swift/Classes/Main/CYLPlusButtonSubclass.swift"; sourceTree = SOURCE_ROOT; };
 		92DD37DF20A5740500754AC8 /* NextHomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = NextHomeViewController.swift; path = "../Example-Swift-02/CYLTabBarController-Swift/Classes/Home/NextHomeViewController.swift"; sourceTree = SOURCE_ROOT; };
 		92DD37E020A5740500754AC8 /* NextHomeViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NextHomeViewController.xib; sourceTree = "<group>"; };
+		A1839EF9BFD2474F9B1A186E /* Configurations */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Configurations; path = "../Example-Shared/Configurations"; sourceTree = SOURCE_ROOT; };
 		AC3396B126CBEE668E7D5E8E /* tab_fire.gif */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.gif; path = tab_fire.gif; sourceTree = "<group>"; };
 		C1A5CE0E2E00000000000002 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		C7C15F27AFB129417A291CF9 /* Pods-GIFApp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-GIFApp.debug.xcconfig"; path = "Pods/Target Support Files/Pods-GIFApp/Pods-GIFApp.debug.xcconfig"; sourceTree = "<group>"; };
 		D29B96195DFAC3AA0ECC45FD /* tab_star.gif */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.gif; path = tab_star.gif; sourceTree = "<group>"; };
 		D6B9DA7EE87C4B448F2A9C22 /* CYLPlusButtonBadgeDemo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CYLPlusButtonBadgeDemo.swift; path = "../Example-Shared/CYLPlusButtonBadgeDemo.swift"; sourceTree = SOURCE_ROOT; };
 		D9539E3C35FC9862B9097017 /* Pods_GIFApp.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_GIFApp.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		7D5219E67C001E73250DF2DF /* CYLDemoLocalization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CYLDemoLocalization.swift; path = "../Example-Shared/CYLDemoLocalization.swift"; sourceTree = SOURCE_ROOT; };
-		56985C2EDDA0C8652F2D7553 /* CYLDemo.bundle */ = {isa = PBXFileReference; lastKnownFileType = wrapper.plug-in; name = CYLDemo.bundle; path = "../Example-Shared/CYLDemo.bundle"; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -328,10 +328,12 @@
 			);
 			inputPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-GIFApp/Pods-GIFApp-resources.sh",
+				"${PODS_ROOT}/../../CYLTabBarController/CYLAnimatedItem/Resources/CYLAnimatedItem.bundle",
 				"${PODS_ROOT}/../../CYLTabBarController/Resources/CYLTabBarController.bundle",
 			);
 			name = "[CP] Copy Pods Resources";
 			outputPaths = (
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/CYLAnimatedItem.bundle",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/CYLTabBarController.bundle",
 			);
 			runOnlyForDeploymentPostprocessing = 0;

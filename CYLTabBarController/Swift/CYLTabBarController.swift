@@ -110,12 +110,12 @@ open class CYLTabBarController: UITabBarController, CYLTabBarControllerDelegate,
 
     /// [EN] The deprecated name of `tabBarItemAnimationViewContentMode()`. [CN] `tabBarItemAnimationViewContentMode()` 的已废弃名称。
     @available(*, deprecated, message: "Use -tabBarItemAnimationViewContentMode")
-    @objc open func lottieAnimationViewContentMode() -> UIView.ContentMode {
+    @objc open dynamic func lottieAnimationViewContentMode() -> UIView.ContentMode {
         .scaleAspectFit
     }
 
     /// [EN] How the animation views of the tabs are scaled (through the deprecated name, so an old override keeps working). [CN] Tab 动画视图的缩放方式（经由已废弃的名称，旧的重写仍然有效）。
-    @objc open func tabBarItemAnimationViewContentMode() -> UIView.ContentMode {
+    @objc open dynamic func tabBarItemAnimationViewContentMode() -> UIView.ContentMode {
         lottieAnimationViewContentMode()
     }
 
@@ -217,9 +217,9 @@ open class CYLTabBarController: UITabBarController, CYLTabBarControllerDelegate,
         cyl_didInitialize()
     }
 
-    public override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
-        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
-        cyl_didInitialize()
+    /// [EN] Convenience, so a subclass that overrides `init(configuration:)` inherits every initializer. [CN] 便利初始化方法：重写了 `init(configuration:)` 的子类因此继承所有初始化方法。
+    public override convenience init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
+        self.init(configuration: [:])
     }
 
     /// [EN] A tab bar controller without tabs. [CN] 没有 Tab 的 TabBarController。
@@ -559,28 +559,9 @@ open class CYLTabBarController: UITabBarController, CYLTabBarControllerDelegate,
         set { cylSetSystemTabBarMinimizeBehaviorFromApp(newValue) }
     }
 
-    // MARK: - Delegate hooks a subclass can override
-
-    /**
-     * [EN] A tab item gesture (reselect, double tap, long press), for the controller's own subclasses; the library reports it to the
-     *      `delegate` too. Does nothing here. [CN] Tab 手势（重复点击、双击、长按），供控制器自己的子类重写；本库同时会把它上报给 `delegate`。这里不做任何处理。
-     */
-    @objc(tabBarController:didRecognizeTabBarItemGesture:control:viewController:)
-    open func tabBarController(_ tabBarController: CYLTabBarController, didRecognize gesture: CYLTabBarItemGesture, control: UIControl,
-                               viewController: UIViewController?) {
-    }
-
-    /**
-     * [EN] A tab button or the plus button was tapped (once per tap), for subclasses. Does nothing here.
-     * [CN] Tab 按钮或 PlusButton 被点击（每次点击一次），供子类重写。这里不做任何处理。
-     */
-    @objc(tabBarController:didSelectControl:)
-    open func tabBarController(_ tabBarController: UITabBarController, didSelect control: UIControl) {
-    }
-
     // MARK: - UITabBarControllerDelegate
 
-    open func tabBarController(_ tabBarController: UITabBarController, shouldSelect viewController: UIViewController) -> Bool {
+    open dynamic func tabBarController(_ tabBarController: UITabBarController, shouldSelect viewController: UIViewController) -> Bool {
         cyl_tabBarController(tabBarController, shouldSelect: viewController)
     }
 }

@@ -31,7 +31,7 @@ extension CYLTabBarController {
     //      Objective-C 类中：在公开类的扩展中重写必须是 public。
 
     @objc(shouldUnloadViewOfViewController:)
-    open func shouldUnloadView(of viewController: UIViewController) -> Bool {
+    open dynamic func shouldUnloadView(of viewController: UIViewController) -> Bool {
         guard let identifier = viewController.cyl_tabBarItemIdentifier else { return true }
         return !cylKeepsLoadedTabBarItemIdentifiers().contains(identifier)
     }
