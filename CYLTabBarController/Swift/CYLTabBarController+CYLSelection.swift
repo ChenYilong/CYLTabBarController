@@ -59,10 +59,11 @@ extension CYLTabBarController {
         guard tabBarStyleType != .flatDesign else {
             return
         }
-        cylControlSetSelectionLockedEntryPoint(viewController?.tabBarItem.cyl_tabButton, !shouldSelect)
-        guard shouldSelect, hasPlusChildViewController(), let target = viewController ?? selectedViewController else {
+        cylControlSetSelectionLockedEntryPoint(viewController.tabBarItem.cyl_tabButton, !shouldSelect)
+        guard shouldSelect, hasPlusChildViewController() else {
             return
         }
+        let target = viewController
         let plusButton = cylPrivate.cylContextPlusButton()
         if plusButton?.isSelected == true {
             plusButton?.isSelected = false

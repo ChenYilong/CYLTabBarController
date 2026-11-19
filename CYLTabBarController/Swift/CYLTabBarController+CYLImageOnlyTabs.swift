@@ -41,11 +41,15 @@ extension CYLTabBarController {
     private typealias CYLImageOnlyTabRecord = [String: NSValue]
 
     @objc(automaticallyAdjustsImageOnlyTabs)
+    open var automaticallyAdjustsImageOnlyTabs: Bool {
+        @objc(automaticallyAdjustsImageOnlyTabs) get { cylAutomaticallyAdjustsImageOnlyTabs() }
+        @objc(setAutomaticallyAdjustsImageOnlyTabs:) set { cylSetAutomaticallyAdjustsImageOnlyTabs(newValue) }
+    }
+
     func cylAutomaticallyAdjustsImageOnlyTabs() -> Bool {
         !cylPrivate.cylImageOnlyTabsAdjustmentDisabled()
     }
 
-    @objc(setAutomaticallyAdjustsImageOnlyTabs:)
     func cylSetAutomaticallyAdjustsImageOnlyTabs(_ automaticallyAdjustsImageOnlyTabs: Bool) {
         if cylAutomaticallyAdjustsImageOnlyTabs() == automaticallyAdjustsImageOnlyTabs {
             return

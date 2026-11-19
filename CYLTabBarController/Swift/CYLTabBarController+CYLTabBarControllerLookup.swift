@@ -141,14 +141,13 @@ extension CYLTabBarController {
      */
     @objc(cyl_defaultTabBarItemIdentifierForClass:)
     public static func cyl_defaultTabBarItemIdentifier(for aClass: AnyClass) -> String {
-        let name = aClass.map { NSStringFromClass($0) } ?? ""
+        let name = NSStringFromClass(aClass)
         guard let dot = name.range(of: ".", options: .backwards) else { return name }
         return String(name[dot.upperBound...])
     }
 
     @objc(cyl_defaultTabBarItemIdentifierForViewController:)
     open func cyl_defaultTabBarItemIdentifier(for viewController: UIViewController) -> String? {
-        guard let viewController else { return nil }
         let tabs = viewControllers ?? []
         guard let index = tabs.firstIndex(where: { $0 === viewController || $0.cyl_getViewControllerInsteadOfNavigation() === viewController }) else {
             return nil
@@ -159,7 +158,7 @@ extension CYLTabBarController {
             return plusButton.cyl_tabBarItemIdentifier
         }
         let contentClass: AnyClass = type(of: tab.cyl_getViewControllerInsteadOfNavigation())
-        let identifier = CYLTabBarController.cyl_defaultTabBarItemIdentifier(forClass: contentClass)
+        let identifier = CYLTabBarController.cyl_defaultTabBarItemIdentifier(for: contentClass)
         // [EN] The next tabs of the same class: "_2", "_3"... [CN] 后续同类的 Tab 依次加 "_2"、"_3"……
         let occurrence = 1 + tabs[..<index].filter { type(of: $0.cyl_getViewControllerInsteadOfNavigation()) == contentClass }.count
         return occurrence == 1 ? identifier : "\(identifier)_\(occurrence)"
@@ -176,7 +175,7 @@ extension CYLTabBarController {
 
     @objc(cyl_indexOfTabBarItemIdentifier:)
     open func cyl_index(ofTabBarItemIdentifier identifier: String) -> UInt {
-        guard let identifier, !identifier.isEmpty else { return UInt(NSNotFound) }
+        guard !identifier.isEmpty else { return UInt(NSNotFound) }
         let index = (viewControllers ?? []).firstIndex { cylTabBarItemIdentifier(for: $0) == identifier }
         return index.map { UInt($0) } ?? UInt(NSNotFound)
     }
@@ -211,7 +210,7 @@ extension CYLTabBarController {
 
     @objc(cyl_controlWithTabBarItemIdentifier:)
     open func cyl_control(withTabBarItemIdentifier identifier: String) -> UIControl? {
-        guard let identifier, !identifier.isEmpty else { return nil }
+        guard !identifier.isEmpty else { return nil }
         if let plusButton = identifiedPlusButton, plusButton.cyl_tabBarItemIdentifier == identifier {
             return plusButton
         }

@@ -501,7 +501,7 @@ extension CYLTabBarController {
 
     /// [EN] Replaces one FlatDesign item. [CN] 替换一个扁平样式 item。
     @objc(changeItem:toItem:)
-    func cylFlatDesignChangeItem(_ item: CYLFlatDesignTabBarItem, toItem: CYLFlatDesignTabBarItem) {
+    public func change(_ item: CYLFlatDesignTabBarItem, to toItem: CYLFlatDesignTabBarItem) {
         guard let tabBar = cylFlatDesignTabBar, let items = cylFlatDesignHost.items() else {
             return
         }
