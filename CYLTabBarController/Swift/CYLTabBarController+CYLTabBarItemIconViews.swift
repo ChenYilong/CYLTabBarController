@@ -530,7 +530,7 @@ extension CYLTabBarController {
             Self.cylLoadTabBarItemIcon(icon) { [weak self, weak plusButton] image in
                 plusButton?.cyl_updateTitle(nil, image: Self.cylImage(image, scaledTo: size), selectedImage: nil)
                 // [EN] A downloaded image arrives after the layout of the theme change. [CN] 下载的图片在换肤的布局之后才到达。
-                self?.cylPrivate.cylLayOutPlusButtonInLiquidGlassLayers()
+                self?.cylLayOutPlusButtonInLiquidGlassLayers()
             }
         }
         if let selectedIcon {

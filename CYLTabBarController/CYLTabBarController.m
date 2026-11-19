@@ -394,16 +394,18 @@ static void CYLSetAdditionalSafeAreaBottom(UIViewController *viewController, CGF
 @property (nonatomic, weak) UIWindow *cylRefreshedSystemTabBarWindow;
 @property (nonatomic, strong) _CYLFlatDesignTabBarParallaxOverlayView *parallaxOverlayView;
 #endif
-/// [EN] Classic tab bar before iOS 18: the animated `-setTabBarHidden:animated:` (see `-cyl_setClassicTabBarHidden:animated:`).
-/// [CN] iOS 18 以前的经典 TabBar：带动画的 `-setTabBarHidden:animated:`（见 `-cyl_setClassicTabBarHidden:animated:`）。
-@property (nonatomic, assign) BOOL cylClassicTabBarIsAnimating;
-@property (nonatomic, assign) BOOL cylClassicTabBarHiddenRequest;
-@property (nonatomic, assign) NSUInteger cylClassicTabBarAnimationGeneration;
 - (void)_cyl_refreshSystemTabBarVisibilityIfNeeded;
 //@property (nonatomic, assign) CYLTabBarStyleType tabBarStyleType;
 //@property (nonatomic, readwrite) CYLFlatDesignTabBar *cyl_tabBar;
 #else
 #endif
+// [EN] Outside every `#if`: the classic tab bar uses them in every build (step 69 had them inside the FlatDesign `#if`).
+// [CN] 位于所有 `#if` 之外：经典 TabBar 在所有构建中都使用它们（第 69 步曾误放在 FlatDesign 的 `#if` 内）。
+/// [EN] Classic tab bar before iOS 18: the animated `-setTabBarHidden:animated:` (see `-cyl_setClassicTabBarHidden:animated:`).
+/// [CN] iOS 18 以前的经典 TabBar：带动画的 `-setTabBarHidden:animated:`（见 `-cyl_setClassicTabBarHidden:animated:`）。
+@property (nonatomic, assign) BOOL cylClassicTabBarIsAnimating;
+@property (nonatomic, assign) BOOL cylClassicTabBarHiddenRequest;
+@property (nonatomic, assign) NSUInteger cylClassicTabBarAnimationGeneration;
 @end
 
 
@@ -939,137 +941,8 @@ static void CYLApplyIconRenderingMode(NSDictionary *attributes, id _Nullable *_N
 
 #pragma mark - Plus button in the Liquid Glass layers
 
-static const void *const CYLLayingOutPlusButtonInGlassLayersKey = &CYLLayingOutPlusButtonInGlassLayersKey;
-static const void *const CYLPlusButtonGlassLayoutRetryPendingKey = &CYLPlusButtonGlassLayoutRetryPendingKey;
-
-/*!
- * [EN] Hides the tab icon under the plus button in both Liquid Glass layers and puts the plus button's stand-in
- *      (`selectedContentView`) in the selected layer. Idempotent, and run on every layout pass of the controller and of
- *      the tab bar: the selected layer is rendered later than the normal one, so whatever is missing now is added on a
- *      later pass, instead of after a fixed delay acting on views looked up before it (nil when the layer was not there
- *      yet). Everything is looked up again on each call. When the selected layer is still missing, one retry is
- *      scheduled as a fallback. A stand-in still inside an old tab button (UIKit rebuilds the buttons, e.g. when an item
- *      image changes) is taken out first, so it can be put in the new one.
- * [CN] 在液态玻璃的两个图层中隐藏 PlusButton 下方的 Tab 图标，并把 PlusButton 的替身（`selectedContentView`）放进选中层。可重复调用，
- *      控制器与 TabBar 每次布局都会执行：选中层比普通层渲染得晚，本次缺少的部分会在之后的布局中补上，而不是固定延迟后再操作延迟前
- *      取到的视图（图层尚未出现时为 nil）。每次调用都重新查找全部视图。选中层仍不存在时，安排一次重试作为兜底。替身仍留在旧 Tab
- *      按钮中时（UIKit 会重建按钮，例如修改 item 图片后），先把它移出，才能放进新按钮。
- */
-- (void)cyl_layOutPlusButtonInLiquidGlassLayers {
-    [self cyl_layOutPlusButtonInLiquidGlassLayersIsRetry:NO];
-}
-
-/// [EN] `isRetry`: the fallback run, which acts without waiting for readiness and schedules nothing more, as the old
-///      delayed block did. [CN] `isRetry`：兜底执行，与原来延迟执行的 block 一样，不再等待就绪，也不再安排新的重试。
-- (void)cyl_layOutPlusButtonInLiquidGlassLayersIsRetry:(BOOL)isRetry {
-    if (CYLTabBarStyleTypeFlatDesign == self.tabBarStyleType || ![CYLConstants isLiquidGlassActive] || ![self hasPlusButton] ||
-        ![self.cyl_tabBar isKindOfClass:[CYLTabBar class]]) {
-        return;
-    }
-    // [EN] More editing: the views are hidden until it ends (`-[CYLTabBar endCustomizingAnimated:]`).
-    // [CN] 「More」编辑期间这些视图保持隐藏，直到编辑结束（`-[CYLTabBar endCustomizingAnimated:]`）。
-    if (((CYLTabBar *)self.cyl_tabBar).cyl_isCustomizingItems) {
-        return;
-    }
-    // [EN] Re-entrancy guard: adding the stand-in can lay views out again. [CN] 防止重入：添加替身可能再次触发布局。
-    if ([objc_getAssociatedObject(self, CYLLayingOutPlusButtonInGlassLayersKey) boolValue]) {
-        return;
-    }
-    objc_setAssociatedObject(self, CYLLayingOutPlusButtonInGlassLayersKey, @YES, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-
-    CYLPlusButton<CYLPlusButtonSubclassing> *contextPlusButton = [self cyl_contextPlusButton];
-    UIControl *plusControlOrigin = [self.cyl_tabBar cyl_platterContentViewWithIndex:contextPlusButton.cyl_tabBarItemVisibleIndex];
-    UIButton *selectedCover = contextPlusButton.selectedContentView;
-    // [EN] FIX: issue #216 — on every layout pass, before the early return below: a theme changes the image of a stand-in
-    //      that is already in its tab button. [CN] FIX: issue #216 — 每次布局都执行，且在下面的提前返回之前：主题会修改已在 Tab 按钮中的替身的图片。
-    [contextPlusButton cyl_updateSelectedContentViewImage];
-    [contextPlusButton cyl_moveSelectedContentViewWithPlusButton];
-    UIControl *plusSelectedControl = plusControlOrigin.cyl_platterSelectedControl;
-    [plusControlOrigin.cyl_tabImageView cyl_setHidden:YES];
-    [plusControlOrigin.cyl_swappableImageViewViewInTabBarButton cyl_setHidden:YES];
-
-    // [CN] 由于 SelectedControl 所在图层的渲染比未选中图层有延迟，可能暂时取不到；之后的布局或下面的一次重试会补上。
-    // [EN] The selected layer renders later than the normal one, so it may be missing now; a later layout pass or the
-    //      single retry below adds what is missing.
-    NSTimeInterval delaySecondsForSelectedContentView = 0.5;
-    BOOL needsRetry = (plusSelectedControl == nil);
-    if (plusSelectedControl && [self hasPlusChildViewController]) {
-        // [EN] A stand-in left in another (old) tab button is taken out, so it can be put in this one.
-        // [CN] 留在其他（旧）Tab 按钮中的替身先移出，才能放进当前按钮。
-        if (selectedCover.superview && selectedCover.cyl_insertedForTabControl != plusSelectedControl) {
-            [selectedCover removeFromSuperview];
-        }
-        // [EN] Already in this button: nothing to do (this runs on every layout pass, so nothing is queued again).
-        // [CN] 已在当前按钮中：无需处理（每次布局都会执行，因此不再重复排队）。
-        if (!isRetry && selectedCover.superview == plusSelectedControl && selectedCover.cyl_insertedForTabControl == plusSelectedControl) {
-            objc_setAssociatedObject(self, CYLLayingOutPlusButtonInGlassLayersKey, nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-            return;
-        }
-        /*!
-         * [CN] 我要求 selectedCover 的中心坐标 强制与 CYLExternPlusButton坐标一致。 坐标系转换
-         * [EN] Force the center of selectedCover to match the CYLExternPlusButton position. Converts between
-         *      coordinate systems
-         * _UITabBarPlatterView
-         ├── SelectedContentView
-         │    └── selectedCover
-         │
-         └── CYLPlusButtonSubclass
-         */
-        __weak CYLPlusButton *weakPlusButton = contextPlusButton;
-        void (^centerOnPlusButton)(BOOL, UIControl *, UIView *) = ^(BOOL isReplaced, UIControl *tabBarButton, UIView *selectedCover) {
-            // [EN] The stand-in on the plus button (`CYLPlusButton.m`). [CN] 替身与 PlusButton 对齐（`CYLPlusButton.m`）。
-            [weakPlusButton cyl_placeSelectedContentView];
-        };
-        if ([contextPlusButton cyl_showsTitleInTabBarItem]) {
-            // [EN] FIX: issue #636 — the tab item shows the plus button's title (`-cyl_showsTitleInTabBarItem`): as the
-            //      plus button does in the normal layer, its stand-in replaces only the tab icon, and the tab's title
-            //      and the rest of the tab button stay as the system lays them out. Covering the whole tab button hid
-            //      all its other subviews, the title's container included, so the title stayed hidden.
-            // [CN] TabBarItem 显示 PlusButton 的标题：与普通图层中的 PlusButton 一样，替身只替换 Tab 图标，Tab 的标题及按钮的
-            //      其他子视图保持系统布局。覆盖整个 Tab 按钮会隐藏它的其他全部子视图（包括标题的容器），标题因此一直不显示。
-            if (isRetry || plusSelectedControl.cyl_isReady) {
-                [plusSelectedControl cyl_replaceTabImageViewWithNewView:selectedCover
-                                                                 offset:UIOffsetZero
-                                                                   show:YES
-                                                             completion:centerOnPlusButton];
-                [plusSelectedControl.cyl_swappableImageViewViewInTabBarButton cyl_setHidden:YES];
-            } else {
-                needsRetry = YES;
-            }
-        } else {
-            [plusSelectedControl cyl_coverTabImageViewOrTabButton:YES
-                                                          newView:selectedCover
-                                                           offset:UIOffsetZero
-                                                             show:YES
-                                          delayIfNeededForSeconds:delaySecondsForSelectedContentView
-                                                       completion:centerOnPlusButton];
-        }
-    } else if (plusSelectedControl) {
-        // [CN] imageView 是主要的；有几率暂时取不到 cyl_tabImageView，此时重试。
-        // [EN] imageView is the main one; cyl_tabImageView is sometimes not there yet, then it is retried.
-        UIView *tabImageView = plusSelectedControl.cyl_tabImageView;
-        [tabImageView cyl_setHidden:YES];
-        // [CN] cyl_swappableImageViewViewInTabBarButton这个是防御性的， 理论上可以不隐藏。
-        // [EN] cyl_swappableImageViewViewInTabBarButton is defensive; in theory it does not need to be hidden.
-        [plusSelectedControl.cyl_swappableImageViewViewInTabBarButton cyl_setHidden:YES];
-        needsRetry = (tabImageView == nil);
-    }
-    objc_setAssociatedObject(self, CYLLayingOutPlusButtonInGlassLayersKey, nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-
-    // [EN] Fallback: one pending retry at a time, which looks everything up again. [CN] 兜底：同一时间只安排一次重试，重试时重新查找全部视图。
-    if (needsRetry && !isRetry && ![objc_getAssociatedObject(self, CYLPlusButtonGlassLayoutRetryPendingKey) boolValue]) {
-        objc_setAssociatedObject(self, CYLPlusButtonGlassLayoutRetryPendingKey, @YES, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-        __weak __typeof(self) weakSelf = self;
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delaySecondsForSelectedContentView * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            __typeof(self) strongSelf = weakSelf;
-            if (!strongSelf) {
-                return;
-            }
-            objc_setAssociatedObject(strongSelf, CYLPlusButtonGlassLayoutRetryPendingKey, nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-            [strongSelf cyl_layOutPlusButtonInLiquidGlassLayersIsRetry:YES];
-        });
-    }
-}
+// [EN] `-cyl_layOutPlusButtonInLiquidGlassLayers` and its retry are Swift (Swift/CYLTabBarController+CYLInteraction.swift, step 70).
+// [CN] `-cyl_layOutPlusButtonInLiquidGlassLayers` 及其重试已迁移到 Swift（第 70 步）。
 
 /*!
  * FIX: issue #216

@@ -145,6 +145,8 @@ NS_ASSUME_NONNULL_BEGIN
 /// [EN] Shared by the in-place updates, implemented in Swift (step 68). [CN] 原地更新共用，由 Swift 实现（第 68 步）。
 + (NSDictionary<NSString *, id> *)cyl_iconAttributesOfAttributes:(NSDictionary<NSString *, id> *)attributes;
 + (void)cyl_applyNavigationTitleOfFollowingPage:(UIViewController *)viewController title:(nullable NSString *)title;
+/// [EN] The plus button in the Liquid Glass layers, implemented in Swift (step 70). [CN] PlusButton 在液态玻璃图层中的布局，由 Swift 实现（第 70 步）。
+- (void)cyl_layOutPlusButtonInLiquidGlassLayers;
 - (void)cyl_plusButton:(CYLPlusButton *)plusButton didChangeWithNotification:(NSNotificationName)name info:(NSDictionary *)info;
 - (void)cyl_syncTabBarItemAccessibility;
 #if CYL_FLATDESIGN_AVAILABLE
