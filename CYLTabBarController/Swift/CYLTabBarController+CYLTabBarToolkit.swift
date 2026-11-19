@@ -222,23 +222,15 @@ extension CYLTabBarController {
     }
 
     @objc(cyl_shouldPerformCustomTabActionHandler)
-    func cylShouldPerformCustomTabActionHandler() -> CYLCustomTabActionDecider? {
-        cylCustomTabActionSettings.decider
-    }
-
-    @objc(setCyl_shouldPerformCustomTabActionHandler:)
-    func cylSetShouldPerformCustomTabActionHandler(_ handler: CYLCustomTabActionDecider?) {
-        cylCustomTabActionSettings.decider = handler
+    open var cyl_shouldPerformCustomTabActionHandler: ((CYLTabBarController, UIViewController) -> Bool)? {
+        @objc(cyl_shouldPerformCustomTabActionHandler) get { cylCustomTabActionSettings.decider }
+        @objc(setCyl_shouldPerformCustomTabActionHandler:) set { cylCustomTabActionSettings.decider = newValue }
     }
 
     @objc(cyl_customTabActionHandler)
-    func cylCustomTabActionHandler() -> CYLCustomTabActionHandler? {
-        cylCustomTabActionSettings.handler
-    }
-
-    @objc(setCyl_customTabActionHandler:)
-    func cylSetCustomTabActionHandler(_ handler: CYLCustomTabActionHandler?) {
-        cylCustomTabActionSettings.handler = handler
+    open var cyl_customTabActionHandler: ((CYLTabBarController, UIViewController) -> Void)? {
+        @objc(cyl_customTabActionHandler) get { cylCustomTabActionSettings.handler }
+        @objc(setCyl_customTabActionHandler:) set { cylCustomTabActionSettings.handler = newValue }
     }
 
     @objc(cyl_isCustomActionTabViewController:)
@@ -246,7 +238,7 @@ extension CYLTabBarController {
         guard let viewController, !viewController.cyl_isPlaceholder else {
             return false
         }
-        if let decider = cylShouldPerformCustomTabActionHandler() {
+        if let decider = cyl_shouldPerformCustomTabActionHandler {
             return decider(self, viewController)
         }
         if let delegate = cylDelegate,
@@ -279,7 +271,7 @@ extension CYLTabBarController {
             }
             objc_setAssociatedObject(self, CYLTabBarToolkitKeys.customTabActionViewController, nil, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
         }
-        if let handler = cylCustomTabActionHandler() {
+        if let handler = cyl_customTabActionHandler {
             handler(self, viewController)
             return true
         }

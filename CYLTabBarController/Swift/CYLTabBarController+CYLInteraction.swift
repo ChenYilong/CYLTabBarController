@@ -462,13 +462,13 @@ extension CYLTabBarController {
     // MARK: - Tap sound and haptic feedback
 
     @objc(cyl_tabButtonTapSoundEnabled)
-    var cylTabButtonTapSoundEnabled: Bool {
+    open var cyl_tabButtonTapSoundEnabled: Bool {
         get { cylInteraction.tapSoundEnabled }
         @objc(cyl_setTabButtonTapSoundEnabled:) set { cylInteraction.tapSoundEnabled = newValue }
     }
 
     @objc(cyl_tabButtonTapSoundURL)
-    var cylTabButtonTapSoundURL: URL? {
+    open var cyl_tabButtonTapSoundURL: URL? {
         get { cylInteraction.tapSound?.url }
         @objc(cyl_setTabButtonTapSoundURL:) set {
             // [EN] The old sound is disposed of when its object is released. nil, or a file that cannot be played: the click.
@@ -484,7 +484,7 @@ extension CYLTabBarController {
     }
 
     @objc(cyl_tabButtonHapticFeedbackEnabled)
-    var cylTabButtonHapticFeedbackEnabled: Bool {
+    open var cyl_tabButtonHapticFeedbackEnabled: Bool {
         get { cylInteraction.hapticFeedbackEnabled }
         @objc(cyl_setTabButtonHapticFeedbackEnabled:) set {
             cylInteraction.hapticFeedbackEnabled = newValue
@@ -498,7 +498,7 @@ extension CYLTabBarController {
     }
 
     @objc(cyl_tabButtonHapticFeedbackStyle)
-    var cylTabButtonHapticFeedbackStyle: UIImpactFeedbackGenerator.FeedbackStyle {
+    open var cyl_tabButtonHapticFeedbackStyle: UIImpactFeedbackGenerator.FeedbackStyle {
         get { cylInteraction.hapticFeedbackStyle }
         @objc(cyl_setTabButtonHapticFeedbackStyle:) set {
             cylInteraction.hapticFeedbackStyle = newValue
@@ -516,7 +516,7 @@ extension CYLTabBarController {
     }
 
     @objc(cyl_playTabButtonTapFeedback)
-    func cylPlayTabButtonTapFeedback() {
+    open func cyl_playTabButtonTapFeedback() {
         let settings = cylInteraction
         if settings.tapSoundEnabled {
             AudioServicesPlaySystemSound(settings.tapSound?.soundID ?? CYLTabBarTapSound.defaultSoundID)
@@ -532,8 +532,8 @@ extension CYLTabBarController {
     // MARK: - Long press
 
     @objc(cyl_didLongPressControlBlock)
-    var cylDidLongPressControlBlock: CYLTabBarControllerDidLongPressControlBlock? {
-        get { cylInteraction.didLongPressControlBlock }
+    open var cyl_didLongPressControlBlock: CYLTabBarControllerDidLongPressControlBlock? {
+        @objc(cyl_didLongPressControlBlock) get { cylInteraction.didLongPressControlBlock }
         @objc(cyl_setDidLongPressControlBlock:) set {
             cylInteraction.didLongPressControlBlock = newValue
             cylInstallInteractionGestureRecognizersIfNeeded()
@@ -546,7 +546,7 @@ extension CYLTabBarController {
      * [CN] 唯一的长按时长，`cyl_tabBarItemLongPressDuration`（issue #152）也使用它：两个功能共用同一个手势。最短 0.1 秒。
      */
     @objc(cyl_tabButtonLongPressMinimumDuration)
-    var cylTabButtonLongPressMinimumDuration: TimeInterval {
+    open var cyl_tabButtonLongPressMinimumDuration: TimeInterval {
         get { cylInteraction.longPressMinimumDuration }
         @objc(cyl_setTabButtonLongPressMinimumDuration:) set {
             let duration = max(newValue, 0.1)
@@ -1237,7 +1237,7 @@ extension CYLTabBarController {
     @objc(cyl_sendDidSelectControl:)
     func cylSendDidSelectControl(_ control: UIControl) {
         cylPlayTabButtonAnimation(for: control)
-        cylPlayTabButtonTapFeedback()
+        cyl_playTabButtonTapFeedback()
         if control.cyl_isPlusControl(), let plusButton = CYLPlusButton.cylPlusButton(forTabBarContext: context) {
             let tapped = NSSelectorFromString("cyl_configurationPlusButtonTapped")
             if plusButton.responds(to: tapped) {

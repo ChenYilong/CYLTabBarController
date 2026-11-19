@@ -76,13 +76,9 @@ extension CYLTabBarController {
     }
 
     @objc(cyl_loginStateProvider)
-    func cylLoginStateProvider() -> (@convention(block) () -> Bool)? {
-        cyl_loginSettings.stateProvider
-    }
-
-    @objc(cyl_setLoginStateProvider:)
-    func cylSetLoginStateProvider(_ provider: (@convention(block) () -> Bool)?) {
-        cyl_loginSettings.stateProvider = provider
+    open var cyl_loginStateProvider: (() -> Bool)? {
+        @objc(cyl_loginStateProvider) get { cyl_loginSettings.stateProvider }
+        @objc(cyl_setLoginStateProvider:) set { cyl_loginSettings.stateProvider = newValue }
     }
 
     @objc(cyl_loginRequiredTabBarItemIdentifiers)
@@ -100,23 +96,15 @@ extension CYLTabBarController {
     }
 
     @objc(cyl_loginRequiredBlock)
-    func cylLoginRequiredBlock() -> (@convention(block) (CYLTabBarController, UIViewController) -> Bool)? {
-        cyl_loginSettings.requiredBlock
-    }
-
-    @objc(cyl_setLoginRequiredBlock:)
-    func cylSetLoginRequiredBlock(_ block: (@convention(block) (CYLTabBarController, UIViewController) -> Bool)?) {
-        cyl_loginSettings.requiredBlock = block
+    open var cyl_loginRequiredBlock: ((CYLTabBarController, UIViewController) -> Bool)? {
+        @objc(cyl_loginRequiredBlock) get { cyl_loginSettings.requiredBlock }
+        @objc(cyl_setLoginRequiredBlock:) set { cyl_loginSettings.requiredBlock = newValue }
     }
 
     @objc(cyl_loginHandler)
-    func cylLoginHandler() -> (@convention(block) (CYLTabBarController, UIViewController, @escaping CYLTabBarLoginCompletion) -> Void)? {
-        cyl_loginSettings.handler
-    }
-
-    @objc(cyl_setLoginHandler:)
-    func cylSetLoginHandler(_ handler: (@convention(block) (CYLTabBarController, UIViewController, @escaping CYLTabBarLoginCompletion) -> Void)?) {
-        cyl_loginSettings.handler = handler
+    open var cyl_loginHandler: ((CYLTabBarController, UIViewController, @escaping CYLTabBarLoginCompletion) -> Void)? {
+        @objc(cyl_loginHandler) get { cyl_loginSettings.handler }
+        @objc(cyl_setLoginHandler:) set { cyl_loginSettings.handler = newValue }
     }
 
     /**
