@@ -223,4 +223,16 @@ FOUNDATION_EXTERN BOOL CYLControlReportsTaps(UIControl *_Nullable control);
 + (nullable NSString *)cyl_pathOfConfigurationRoute:(nullable id)route error:(NSError *_Nullable *_Nullable)error;
 @end
 
+/*!
+ * [EN] Reload badges (#404) and the classic tab buttons' target-actions (#610, #605): Swift
+ *      (`Swift/CYLTabBarController+CYLReloadBadges.swift`, docs/Swift-Migration.md step 105), called by CYLTabBarController.m.
+ * [CN] 刷新角标（#404）与经典 Tab 按钮的点击事件（#610、#605）：Swift 实现（第 105 步），由 CYLTabBarController.m 调用。
+ */
+@interface CYLTabBarController (CYLReloadBadgesPrivate)
+- (nullable UIControl *)cyl_tabButtonReplacingTappedControl:(nullable UIControl *)control;
+- (void)cyl_bindTabControlActions;
+- (void)cyl_runPendingReloadBadgesBlocksIfReady;
+- (void)cyl_adoptTabButton:(nullable UIControl *)tabButton forTabBarItem:(nullable UITabBarItem *)item;
+@end
+
 NS_ASSUME_NONNULL_END
