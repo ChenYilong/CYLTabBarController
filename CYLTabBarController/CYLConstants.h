@@ -21,12 +21,6 @@
 #endif
 
 
-// [CN] 必须在 flat design guard 之外，否则未引入 CYLFlatDesignTabBar 子库的
-// subspec（如 LottieSwift）看不到该前向声明，会报 "expected a type"。
-// [EN] Must be outside the flat design guard; otherwise subspecs that do not import the CYLFlatDesignTabBar subspec
-//      (e.g. LottieSwift) cannot see this forward declaration and report "expected a type".
-@class CYLTabBarController;
-
 // [EN] `CYLFlatDesignUITabBarControllerDelegate` is Swift since the class switch (FlatDesign subspec). [CN] 自类切换起为 Swift（扁平样式子库）。
 
 
@@ -40,10 +34,10 @@
 #define CYLRGBAColor(r, g, b, a) [UIColor colorWithRed:(r)/255.0 green:(g)/255.0 blue:(b)/255.0 alpha:a]
 
 /*!
- * [EN] `+[CYLConstants UIBasisWidthScale]` / `UIBasisHeightScale` as C functions (Swift, step 114), so the inline functions
- *      below compile before the generated Swift interface is imported.
- * [CN] 以 C 函数形式提供的 `+[CYLConstants UIBasisWidthScale]` / `UIBasisHeightScale`（Swift，第 114 步），使下方的内联函数在导入生成的
- *      Swift 接口之前即可编译。
+ * [EN] `+[CYLConstants UIBasisWidthScale]` / `UIBasisHeightScale` as C functions (Swift, step 114), declared by the generated Swift
+ *      interface imported at the end of this file (the header declarations went with the inline functions, phase 3).
+ * [CN] 以 C 函数形式提供的 `+[CYLConstants UIBasisWidthScale]` / `UIBasisHeightScale`（Swift，第 114 步），由本文件末尾导入的生成 Swift 接口
+ *      声明（头文件中的声明随内联函数一起删除，第 3 阶段）。
  */
 #define CYLScale (CYLConstantsUIBasisWidthScale())
 #define CYLHScale (CYLConstantsUIBasisHeightScale())

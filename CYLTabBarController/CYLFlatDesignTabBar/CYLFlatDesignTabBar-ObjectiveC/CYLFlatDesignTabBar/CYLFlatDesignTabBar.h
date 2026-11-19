@@ -24,8 +24,6 @@
 #import <UIKit/UIKit.h>
 NS_ASSUME_NONNULL_BEGIN
 
-@class CYLFlatDesignTabBar;
-@class CYLFlatDesignTabBarItem;
 
 // [EN] `CYLFlatDesignTabBarDelegate` is Swift since the class switch. [CN] 自类切换起为 Swift。
 

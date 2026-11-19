@@ -51,7 +51,6 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@class CYLPlusButton;
 
 /*!
  * [EN] `CYLPlusButtonSubclassing` is Swift since the class switch (`Swift/CYLTabBarControllerTypes.swift`).
