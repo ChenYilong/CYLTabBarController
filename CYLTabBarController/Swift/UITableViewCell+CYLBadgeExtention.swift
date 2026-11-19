@@ -377,11 +377,11 @@ open class CYLBadgeHelperTableViewController: UITableViewController {
         2
     }
 
-    override open func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    override open func tableView(_: UITableView, numberOfRowsInSection section: Int) -> Int {
         section == Int(CYLSettingsSection) ? cyl_settingsRowCount() : UITableViewCell.cyl_badgeStyleCount()
     }
 
-    override open func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    override open func tableView(_: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if indexPath.section == Int(CYLSettingsSection) {
             return cyl_settingsCell(for: tableView, at: indexPath)
         }

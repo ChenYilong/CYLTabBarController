@@ -559,13 +559,12 @@ extension UIViewController {
            let control = items[tabIndex].cyl_tabButton {
             return control
         }
+        // [EN] The plus child view controller: its tab button is the plus button.
+        // [CN] PlusButton 子控制器：其 Tab 按钮为 PlusButton。
         if tabIndex == NSNotFound || (cyl_tabBarController?.tabBar.items?.count ?? 0) <= tabIndex,
-           cyl_isPlaceholder || cyl_getViewControllerInsteadOfNavigation().cyl_isPlaceholder {
-            // [EN] The plus child view controller: its tab button is the plus button.
-            // [CN] PlusButton 子控制器：其 Tab 按钮为 PlusButton。
-            if let plusButton = CYLPlusButton(forOwner: self) {
-                return plusButton
-            }
+           cyl_isPlaceholder || cyl_getViewControllerInsteadOfNavigation().cyl_isPlaceholder,
+           let plusButton = CYLPlusButton(forOwner: self) {
+            return plusButton
         }
         if let control = CYLFlatDesignLookup.object(CYLFlatDesignLookup.tabBarItem(of: self), "tabBarButton") as? UIControl {
             return control

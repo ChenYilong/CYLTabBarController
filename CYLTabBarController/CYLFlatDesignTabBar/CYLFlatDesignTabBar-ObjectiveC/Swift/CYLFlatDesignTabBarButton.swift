@@ -115,7 +115,7 @@ open class CYLFlatDesignTabBarButton: CYLAnimatedItemView {
     /**
      * [EN] The tab bar's layout instead of the component's. [CN] 使用 TabBar 的布局代替组件的布局。
      */
-    open override func layoutContent(in rect: CGRect) {
+    open override func layoutContent(in _: CGRect) {
         updateLayout()
     }
 

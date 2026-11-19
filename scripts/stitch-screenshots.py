@@ -35,6 +35,8 @@ TEXT_COLOR = '0xFF3B30'
 BACKGROUND = 'white'
 # [EN] A common phone screen (19.5:9): an image taller than this times its width needs scrolling at phone width.
 PHONE_SCREEN_RATIO = 19.5 / 9
+# [EN] ffmpeg writes one frame per still image. [CN] ffmpeg 为每张静态图片只写一帧。
+ONE_FRAME = ['-frames:v', '1']
 
 
 # [EN] Written into every PNG this script makes, so scripts/check-screenshot-labels.py can tell a labeled image.
@@ -128,7 +130,7 @@ def band(text, width, font_size, path):
     with open(text_file, 'w', encoding='utf-8') as handle:
         handle.write('\n'.join(lines))
     run(['ffmpeg', '-v', 'error', '-y', '-f', 'lavfi', '-i', f'color=c={BACKGROUND}:s={width}x{height}:d=1',
-         '-frames:v', '1', '-vf',
+         *ONE_FRAME, '-vf',
          f"drawtext=fontfile='{filter_path(FONT)}':textfile='{filter_path(text_file)}':fontcolor={TEXT_COLOR}:fontsize={font_size}"
          # [EN] expansion=none: a "%" in a label (e.g. "%23" in a URL) is drawn as is, not taken as a drawtext expansion.
          f':line_spacing={line_height - font_size}:x={margin}:y={margin}:expansion=none', path])
@@ -138,7 +140,7 @@ def band(text, width, font_size, path):
 def pad(path, width, height, out):
     """`path` on a white canvas of `width` x `height`, top left (no scaling)."""
     run(['ffmpeg', '-v', 'error', '-y', '-i', path, '-vf', f'pad={width}:{height}:0:0:color={BACKGROUND}',
-         '-frames:v', '1', out])
+         *ONE_FRAME, out])
     return out
 
 
@@ -150,11 +152,23 @@ def stack(paths, out, vertical):
     for path in paths:
         inputs += ['-i', path]
     kind = 'vstack' if vertical else 'hstack'
-    run(['ffmpeg', '-v', 'error', '-y', *inputs, '-filter_complex', f'{kind}=inputs={len(paths)}', '-frames:v', '1', out])
+    run(['ffmpeg', '-v', 'error', '-y', *inputs, '-filter_complex', f'{kind}=inputs={len(paths)}', *ONE_FRAME, out])
     return out
 
 
-def main():
+def blank(width, height, path):
+    """
+    [EN] A white image of the given size. [CN] 指定大小的白色图片。
+    """
+    run(['ffmpeg', '-v', 'error', '-y', '-f', 'lavfi', '-i', f'color=c={BACKGROUND}:s={width}x{height}:d=1', *ONE_FRAME, path])
+    return path
+
+
+def parse_options():
+    """
+    [EN] The command line, with the labels the rules require (docs/Screenshot-Guidelines.md) checked.
+    [CN] 命令行参数，并检查规则要求的标签（docs/Screenshot-Guidelines.md）。
+    """
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument('--out', required=True)
     parser.add_argument('--header', required=True, help='Environment and purpose (English).')
@@ -166,7 +180,7 @@ def main():
                         help='White space between a header or caption band and the screenshot below it, in pixels (default 24), so a raised plus button or a badge at the top of a crop is never covered.')
     parser.add_argument('cells', nargs='+', help='"caption=path" or "path".')
     options = parser.parse_args()
-    # [EN] The labels the rules require (docs/Screenshot-Guidelines.md); scripts/check-screenshot-labels.py checks them.
+    # [EN] scripts/check-screenshot-labels.py checks the same labels. [CN] scripts/check-screenshot-labels.py 检查同样的标签。
     if 'Purpose:' not in options.header:
         sys.exit('--header must end with "Purpose: <what the image shows>" (docs/Screenshot-Guidelines.md)')
     if 'Result:' not in options.footer:
@@ -175,54 +189,82 @@ def main():
         sys.exit('labels are English only (ASCII) (docs/Screenshot-Guidelines.md)')
     if not shutil.which('ffmpeg'):
         sys.exit('ffmpeg is required')
-    out_path = checked_path(options.out, must_exist=False)
-    # [EN] Whole numbers in a fixed range only reach the ffmpeg filters. [CN] 只有固定范围内的整数才会进入 ffmpeg 滤镜。
-    gap = checked_pixels(options.gap, '--gap')
-    top_gap = checked_pixels(options.top_gap, '--top-gap')
-    work = tempfile.mkdtemp(prefix='cyl-stitch-')
+    return options
+
+
+def read_cells(arguments):
+    """
+    [EN] (caption, checked path) for each "caption=path" or "path". [CN] 每个 "caption=path" 或 "path" 对应的（说明，校验后的路径）。
+    """
     cells = []
-    for index, cell in enumerate(options.cells):
+    for cell in arguments:
         caption, path = cell.split('=', 1) if '=' in cell and not os.path.exists(cell) else ('', cell)
         cells.append((caption, checked_path(path, must_exist=True)))
-    cell_width = max(size_of(path)[0] for _, path in cells)
-    # [EN] Even: with an odd cell width plus the gap, an ffmpeg band can come out 1 px narrower and vstack refuses it.
-    cell_width += cell_width % 2
-    if options.columns == 'auto':
-        # [EN] One column first; two when the one-column image (cells plus captions, header and footer, roughly) would be
-        #      taller than one phone screen.
-        estimate = sum(size_of(path)[1] + gap + int(cell_width * 0.06) for _, path in cells) + int(cell_width * 0.3)
-        options.columns = 2 if len(cells) > 1 and estimate > cell_width * PHONE_SCREEN_RATIO else 1
-    else:
-        options.columns = int(options.columns)
-    font_size = max(28, int(cell_width * options.columns * 0.02))
-    # [EN] Each cell: its caption band above it, then the screenshot; all cells as wide as the widest, rows as tall as
-    #      the tallest cell of the row.
+    return cells
+
+
+def choose_columns(requested, cells, cell_width, gap):
+    """
+    [EN] One column first; two when the one-column image (cells plus captions, header and footer, roughly) would be taller
+         than one phone screen; or the number asked for.
+    [CN] 优先一列；一列的图片（单元格加说明、页眉与页脚，粗略估计）高于一个手机屏幕时为两列；或使用指定的列数。
+    """
+    if requested != 'auto':
+        return int(requested)
+    estimate = sum(size_of(path)[1] + gap + int(cell_width * 0.06) for _, path in cells) + int(cell_width * 0.3)
+    return 2 if len(cells) > 1 and estimate > cell_width * PHONE_SCREEN_RATIO else 1
+
+
+def frame_cells(cells, cell_width, gap, top_gap, font_size, work):
+    """
+    [EN] Each cell: its caption band above it, a white gap (docs/Screenshot-Guidelines.md, "Space above the tab bar and
+         below the bands"), then the screenshot, all as wide as the widest cell.
+    [CN] 每个单元格：上方为说明，接着是白色间隔（docs/Screenshot-Guidelines.md「Space above the tab bar and below the bands」），
+         然后是截图，宽度都与最宽的单元格相同。
+    """
     framed = []
     for index, (caption, path) in enumerate(cells):
         parts = []
         if caption:
             parts.append(band(caption, cell_width + gap, font_size, os.path.join(work, f'caption{index}.png')))
-        width, height = size_of(path)
-        # [EN] A white gap above the screenshot, below its caption or the header (docs/Screenshot-Guidelines.md, "Space
-        #      above the tab bar and below the bands"). [CN] 截图上方、说明或页眉下方的白色间隔。
         if top_gap > 0:
-            gap_path = os.path.join(work, f'topgap{index}.png')
-            run(['ffmpeg', '-v', 'error', '-y', '-f', 'lavfi', '-i',
-                 f'color=c={BACKGROUND}:s={cell_width + gap}x{top_gap}:d=1', '-frames:v', '1', gap_path])
-            parts.append(gap_path)
+            parts.append(blank(cell_width + gap, top_gap, os.path.join(work, f'topgap{index}.png')))
+        height = size_of(path)[1]
         parts.append(pad(path, cell_width + gap, height + gap, os.path.join(work, f'shot{index}.png')))
         framed.append(stack(parts, os.path.join(work, f'cell{index}.png'), vertical=True))
+    return framed
+
+
+def grid_of(framed, columns, cell_width, gap, work):
+    """
+    [EN] The framed cells in rows of `columns`, each row as tall as its tallest cell, a short last row padded with white.
+    [CN] 把单元格按每行 `columns` 个排列，每行与其中最高的单元格同高，最后一行不足时用白色补齐。
+    """
     rows = []
-    for start in range(0, len(framed), options.columns):
-        row = framed[start:start + options.columns]
+    for start in range(0, len(framed), columns):
+        row = framed[start:start + columns]
         row_height = max(size_of(path)[1] for path in row)
         row = [pad(path, cell_width + gap, row_height, path + '.row.png') for path in row]
-        while len(row) < options.columns:
-            row.append(pad(row[0], cell_width + gap, row_height, os.path.join(work, f'blank{start}.png')))
-            run(['ffmpeg', '-v', 'error', '-y', '-f', 'lavfi', '-i',
-                 f'color=c={BACKGROUND}:s={cell_width + gap}x{row_height}:d=1', '-frames:v', '1', row[-1]])
+        while len(row) < columns:
+            row.append(blank(cell_width + gap, row_height, os.path.join(work, f'blank{start}-{len(row)}.png')))
         rows.append(stack(row, os.path.join(work, f'row{start}.png'), vertical=False))
-    grid = stack(rows, os.path.join(work, 'grid.png'), vertical=True)
+    return stack(rows, os.path.join(work, 'grid.png'), vertical=True)
+
+
+def main():
+    options = parse_options()
+    out_path = checked_path(options.out, must_exist=False)
+    # [EN] Whole numbers in a fixed range only reach the ffmpeg filters. [CN] 只有固定范围内的整数才会进入 ffmpeg 滤镜。
+    gap = checked_pixels(options.gap, '--gap')
+    top_gap = checked_pixels(options.top_gap, '--top-gap')
+    work = tempfile.mkdtemp(prefix='cyl-stitch-')
+    cells = read_cells(options.cells)
+    cell_width = max(size_of(path)[0] for _, path in cells)
+    # [EN] Even: with an odd cell width plus the gap, an ffmpeg band can come out 1 px narrower and vstack refuses it.
+    cell_width += cell_width % 2
+    columns = choose_columns(options.columns, cells, cell_width, gap)
+    font_size = max(28, int(cell_width * columns * 0.02))
+    grid = grid_of(frame_cells(cells, cell_width, gap, top_gap, font_size, work), columns, cell_width, gap, work)
     total_width = size_of(grid)[0]
     header = band(options.header, total_width, font_size, os.path.join(work, 'header.png'))
     footer = band(options.footer, total_width, font_size, os.path.join(work, 'footer.png'))
@@ -234,10 +276,9 @@ def main():
     shutil.copyfile(result, out_path)
     shutil.rmtree(work, ignore_errors=True)
     note = ''
-    if options.columns == 1 and len(cells) > 1 and height > width * PHONE_SCREEN_RATIO:
+    if columns == 1 and len(cells) > 1 and height > width * PHONE_SCREEN_RATIO:
         note = ' (taller than one phone screen: use --columns 2)'
-    print(f'{out_path}: {width} x {height}, {options.columns} column(s){note}')
-
+    print(f'{out_path}: {width} x {height}, {columns} column(s){note}')
 
 if __name__ == '__main__':
     main()

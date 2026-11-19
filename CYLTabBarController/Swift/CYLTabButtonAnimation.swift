@@ -300,7 +300,7 @@ open class CYLTabButtonScaleAnimation: NSObject, CYLTabButtonAnimation {
     @objc open var duration: TimeInterval = CYLTabButtonAnimationKit.duration
 
     @objc(cyl_playSelectAnimationWithTabButton:iconView:titleLabel:)
-    open func cyl_playSelectAnimation(withTabButton button: UIControl, iconView: UIView, titleLabel: UILabel?) {
+    open func cyl_playSelectAnimation(withTabButton _: UIControl, iconView: UIView, titleLabel _: UILabel?) {
         // [EN] Layer keyframes, so a transform the tab bar set on the icon is left alone.
         // [CN] 使用图层关键帧动画，不会覆盖 TabBar 设置在图标上的 transform。
         let animation = CAKeyframeAnimation(keyPath: "transform.scale")
@@ -324,7 +324,7 @@ open class CYLTabButtonZoomInAnimation: NSObject, CYLTabButtonAnimation {
     @objc open var duration: TimeInterval = CYLTabButtonAnimationKit.duration
 
     @objc(cyl_playSelectAnimationWithTabButton:iconView:titleLabel:)
-    open func cyl_playSelectAnimation(withTabButton button: UIControl, iconView: UIView, titleLabel: UILabel?) {
+    open func cyl_playSelectAnimation(withTabButton _: UIControl, iconView: UIView, titleLabel _: UILabel?) {
         let animation = CAKeyframeAnimation(keyPath: "transform.scale")
         animation.values = [0.1, 1.2, 0.9, 1.0]
         animation.keyTimes = [0, 0.5, 0.75, 1]
@@ -352,7 +352,7 @@ open class CYLTabButtonBounceAnimation: NSObject, CYLTabButtonAnimation {
     @objc open var fireworksImage: UIImage?
 
     @objc(cyl_playSelectAnimationWithTabButton:iconView:titleLabel:)
-    open func cyl_playSelectAnimation(withTabButton button: UIControl, iconView: UIView, titleLabel: UILabel?) {
+    open func cyl_playSelectAnimation(withTabButton _: UIControl, iconView: UIView, titleLabel _: UILabel?) {
         let animation = CYLTabButtonAnimationKit.keyframe("transform.scale", [1.0, 0.85, 1.15, 0.95, 1.02, 1.0])
         iconView.layer.add(animation, forKey: "cyl.tabButton.bounce")
         if playsFireworks {
@@ -368,7 +368,7 @@ open class CYLTabButtonBounceAnimation: NSObject, CYLTabButtonAnimation {
 @objc(CYLTabButtonRotationAnimation)
 open class CYLTabButtonRotationAnimation: NSObject, CYLTabButtonAnimation {
     @objc(cyl_playSelectAnimationWithTabButton:iconView:titleLabel:)
-    open func cyl_playSelectAnimation(withTabButton button: UIControl, iconView: UIView, titleLabel: UILabel?) {
+    open func cyl_playSelectAnimation(withTabButton _: UIControl, iconView: UIView, titleLabel _: UILabel?) {
         let animation = CABasicAnimation(keyPath: "transform.rotation")
         animation.fromValue = 0.0
         animation.toValue = -Double.pi * 2
@@ -398,7 +398,7 @@ open class CYLTabButtonFumeAnimation: NSObject, CYLTabButtonAnimation {
     }
 
     @objc(cyl_playSelectAnimationWithTabButton:iconView:titleLabel:)
-    open func cyl_playSelectAnimation(withTabButton button: UIControl, iconView: UIView, titleLabel: UILabel?) {
+    open func cyl_playSelectAnimation(withTabButton _: UIControl, iconView: UIView, titleLabel: UILabel?) {
         let iconY = iconView.layer.position.y
         Self.moveIcon(iconView, [iconY, iconY + 4])
         guard let titleLabel else { return }
@@ -410,7 +410,7 @@ open class CYLTabButtonFumeAnimation: NSObject, CYLTabButtonAnimation {
     }
 
     @objc(cyl_playDeselectAnimationWithTabButton:iconView:titleLabel:)
-    open func cyl_playDeselectAnimation(withTabButton button: UIControl, iconView: UIView, titleLabel: UILabel?) {
+    open func cyl_playDeselectAnimation(withTabButton _: UIControl, iconView: UIView, titleLabel: UILabel?) {
         // [EN] Removing the forward-filled move puts the icon back where the layout placed it.
         // [CN] 移除保持在终点的位移动画，图标回到布局给出的位置。
         iconView.layer.removeAnimation(forKey: Self.iconKey)
@@ -422,7 +422,7 @@ open class CYLTabButtonFumeAnimation: NSObject, CYLTabButtonAnimation {
     }
 
     @objc(cyl_resetTabButton:iconView:titleLabel:)
-    open func cyl_resetTabButton(_ button: UIControl, iconView: UIView, titleLabel: UILabel?) {
+    open func cyl_resetTabButton(_: UIControl, iconView: UIView, titleLabel: UILabel?) {
         iconView.layer.removeAnimation(forKey: Self.iconKey)
         for key in [Self.moveKey, Self.scaleKey, Self.opacityKey] {
             titleLabel?.layer.removeAnimation(forKey: key)
@@ -444,12 +444,12 @@ open class CYLTabButtonPressAnimation: NSObject, CYLTabButtonAnimation {
     @objc open var pressedScale: CGFloat = 0.85
 
     @objc(cyl_playSelectAnimationWithTabButton:iconView:titleLabel:)
-    open func cyl_playSelectAnimation(withTabButton button: UIControl, iconView: UIView, titleLabel: UILabel?) {
+    open func cyl_playSelectAnimation(withTabButton _: UIControl, iconView _: UIView, titleLabel _: UILabel?) {
         // [EN] Pressing is the whole animation; nothing more on selection. [CN] 按压即是全部动画，选中时不再播放。
     }
 
     @objc(cyl_playHighlightAnimationWithTabButton:iconView:titleLabel:)
-    open func cyl_playHighlightAnimation(withTabButton button: UIControl, iconView: UIView, titleLabel: UILabel?) {
+    open func cyl_playHighlightAnimation(withTabButton _: UIControl, iconView: UIView, titleLabel _: UILabel?) {
         let scale = pressedScale
         UIView.animate(withDuration: 0.12, delay: 0, options: [.beginFromCurrentState, .allowUserInteraction]) {
             iconView.transform = CGAffineTransform(scaleX: scale, y: scale)
@@ -457,7 +457,7 @@ open class CYLTabButtonPressAnimation: NSObject, CYLTabButtonAnimation {
     }
 
     @objc(cyl_playDehighlightAnimationWithTabButton:iconView:titleLabel:)
-    open func cyl_playDehighlightAnimation(withTabButton button: UIControl, iconView: UIView, titleLabel: UILabel?) {
+    open func cyl_playDehighlightAnimation(withTabButton _: UIControl, iconView: UIView, titleLabel _: UILabel?) {
         UIView.animate(withDuration: 0.35, delay: 0, usingSpringWithDamping: 0.5, initialSpringVelocity: 0,
                        options: [.beginFromCurrentState, .allowUserInteraction]) {
             iconView.transform = .identity
@@ -586,13 +586,13 @@ open class CYLTabButtonFlipAnimation: NSObject, CYLTabButtonAnimation {
     }
 
     @objc(cyl_playSelectAnimationWithTabButton:iconView:titleLabel:)
-    open func cyl_playSelectAnimation(withTabButton button: UIControl, iconView: UIView, titleLabel: UILabel?) {
+    open func cyl_playSelectAnimation(withTabButton _: UIControl, iconView: UIView, titleLabel _: UILabel?) {
         UIView.transition(with: iconView, duration: CYLTabButtonAnimationKit.duration, options: Self.option(clampedDirection),
                           animations: nil)
     }
 
     @objc(cyl_playDeselectAnimationWithTabButton:iconView:titleLabel:)
-    open func cyl_playDeselectAnimation(withTabButton button: UIControl, iconView: UIView, titleLabel: UILabel?) {
+    open func cyl_playDeselectAnimation(withTabButton _: UIControl, iconView: UIView, titleLabel _: UILabel?) {
         guard !disablesDeselectAnimation else { return }
         // [EN] The opposite direction: 1 ↔ 2, 3 ↔ 4, 5 ↔ 6. [CN] 反方向：1 ↔ 2、3 ↔ 4、5 ↔ 6。
         let direction = clampedDirection
@@ -628,7 +628,7 @@ open class CYLTabButtonFrameAnimation: NSObject, CYLTabButtonAnimation {
     @objc open var fireworksImage: UIImage?
 
     @objc(cyl_playSelectAnimationWithTabButton:iconView:titleLabel:)
-    open func cyl_playSelectAnimation(withTabButton button: UIControl, iconView: UIView, titleLabel: UILabel?) {
+    open func cyl_playSelectAnimation(withTabButton _: UIControl, iconView: UIView, titleLabel _: UILabel?) {
         guard let images, !images.isEmpty else { return }
         CYLTabButtonAnimationKit.playFrames(on: iconView, images: images, reversed: false)
         if playsFireworks {
@@ -637,13 +637,13 @@ open class CYLTabButtonFrameAnimation: NSObject, CYLTabButtonAnimation {
     }
 
     @objc(cyl_playDeselectAnimationWithTabButton:iconView:titleLabel:)
-    open func cyl_playDeselectAnimation(withTabButton button: UIControl, iconView: UIView, titleLabel: UILabel?) {
+    open func cyl_playDeselectAnimation(withTabButton _: UIControl, iconView: UIView, titleLabel _: UILabel?) {
         guard let images, !images.isEmpty else { return }
         CYLTabButtonAnimationKit.playFrames(on: iconView, images: images, reversed: true)
     }
 
     @objc(cyl_resetTabButton:iconView:titleLabel:)
-    open func cyl_resetTabButton(_ button: UIControl, iconView: UIView, titleLabel: UILabel?) {
+    open func cyl_resetTabButton(_: UIControl, iconView: UIView, titleLabel _: UILabel?) {
         iconView.layer.removeAnimation(forKey: CYLTabButtonAnimationKit.frameAnimationKey)
     }
 }

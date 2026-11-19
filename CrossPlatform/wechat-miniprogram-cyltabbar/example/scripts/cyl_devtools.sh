@@ -15,18 +15,19 @@ CYL_EXAMPLE="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)"
 CYL_ASSETS="$(cd "$CYL_EXAMPLE/../../../docs/assets" && pwd)"
 
 cyl_wechatide() { timeout 200 wechatide -c Claude "$@" 2>&1 | grep -v -E "codesign_util|skill-call"; }
-cyl_eval() { cyl_wechatide automation_evaluate --project "$CYL_EXAMPLE" --fn-source "$1" | grep '"result": "' | tail -1; }
+cyl_eval() { local source="$1"; cyl_wechatide automation_evaluate --project "$CYL_EXAMPLE" --fn-source "$source" | grep '"result": "' | tail -1; }
 cyl_refresh() { cyl_wechatide simulator_refresh --project "$CYL_EXAMPLE" | grep -c '"success": true'; }
-cyl_shot() { sleep "${2:-1}"; cyl_wechatide simulator_screenshot --project "$CYL_EXAMPLE" --optimize false --path "$CYL_ASSETS/wechat-miniprogram-api-$1.png" | grep -c '"success": true'; }
-cyl_console() { cyl_wechatide get_simulator_console --project "$CYL_EXAMPLE" --command "${1:-grep -n -i error}"; }
-cyl_state() { cyl_eval "function(){ getApp().cyl_updateTabBarState($1); return 'state'; }"; }
-cyl_tap() { cyl_eval "function(){ const p=getCurrentPages(); p[p.length-1].getTabBar().selectComponent('#cyl-tab-bar').cyl_onTap({currentTarget:{dataset:{key:'$1'}}}); return 'tap $1'; }"; }
+cyl_shot() { local name="$1" delay="${2:-1}"; sleep "$delay"; cyl_wechatide simulator_screenshot --project "$CYL_EXAMPLE" --optimize false --path "$CYL_ASSETS/wechat-miniprogram-api-$name.png" | grep -c '"success": true'; }
+cyl_console() { local command="${1:-grep -n -i error}"; cyl_wechatide get_simulator_console --project "$CYL_EXAMPLE" --command "$command"; }
+cyl_state() { local state="$1"; cyl_eval "function(){ getApp().cyl_updateTabBarState($state); return 'state'; }"; }
+cyl_tap() { local key="$1"; cyl_eval "function(){ const p=getCurrentPages(); p[p.length-1].getTabBar().selectComponent('#cyl-tab-bar').cyl_onTap({currentTarget:{dataset:{key:'$key'}}}); return 'tap $key'; }"; }
 
 # [EN] A probe that spans a page switch cannot wait inside one evaluation (the automator times out), so it stores its
 #      samples on getApp() and a second evaluation reads them.
 # [CN] 跨越页面切换的探测不能在一次执行中等待（automator 会超时），因此把采样存在 getApp() 上，再用第二次执行读取。
 cyl_playback() {
-  cyl_eval "function(){ const app=getApp(); app.cylProbe=[]; const p0=getCurrentPages(); const key='$1';
+  local key="$1"
+  cyl_eval "function(){ const app=getApp(); app.cylProbe=[]; const p0=getCurrentPages(); const key='$key';
     p0[p0.length-1].getTabBar().selectComponent('#cyl-tab-bar').cyl_onTap({currentTarget:{dataset:{key}}});
     const t=Date.now(); const tick=()=>{ const p=getCurrentPages(); const page=p[p.length-1]; let info='-';
       try { const it=page.getTabBar().selectComponent('#cyl-tab-bar').selectComponent('#cyl-item-'+key);
@@ -35,7 +36,7 @@ cyl_playback() {
         info=page.route.split('/')[1]+(a ? ' frame='+Math.round(a.currentFrame)+(a.isPaused?' paused':'') : '')
           +(input ? ' active='+input.asBool().value : ''); } catch(e){ info='error '+e.message }
       app.cylProbe.push((Date.now()-t)+'ms '+info); if (Date.now()-t<2000) setTimeout(tick,100); };
-    tick(); return 'probing $1'; }" >/dev/null
+    tick(); return 'probing $key'; }" >/dev/null
   sleep 5
   cyl_eval "function(){ return getApp().cylProbe.join(' | '); }"
 }

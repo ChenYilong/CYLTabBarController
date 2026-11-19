@@ -32,8 +32,6 @@ import UIKit
     /// [EN] Used by `-didSelectControl:` (step 64). [CN] 供 `-didSelectControl:` 使用（第 64 步）。
     @objc(cyl_controlReportedInCurrentRunLoop) func cylControlReportedInCurrentRunLoop() -> UIControl?
     @objc(cyl_setNeedsUpdateTabBarItemIconViews) func cylSetNeedsUpdateTabBarItemIconViews()
-    @objc(cyl_setNeedsApplyTabBarItemAnimationTintColors) func cylSetNeedsApplyTabBarItemAnimationTintColors()
-    @objc(cyl_playAnimatedImagesOfTabButton:) func cylPlayAnimatedImages(ofTabButton control: UIControl)
     /// [EN] The page registry state of the class extension (docs/Swift-Migration.md, step 54). [CN] 类扩展中的页面注册表状态（第 54 步）。
     @objc(pageRegistry) func cylPageRegistryState() -> CYLTabBarPageProviding?
     @objc(pageResolver) func cylPageResolverState() -> CYLTabBarPageProvider?
