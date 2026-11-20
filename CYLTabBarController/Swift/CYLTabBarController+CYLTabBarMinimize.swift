@@ -282,10 +282,13 @@ final class CYLTabBarMinimizeScrollTracker: NSObject, UIGestureRecognizerDelegat
             UIScene.willEnterForegroundNotification,
             UIScene.didActivateNotification,
         ]
-        notificationObservers = names.map { name in
-            NotificationCenter.default.addObserver(forName: name, object: nil, queue: .main) { [weak self] notification in
-                MainActor.assumeIsolated { self?.restoreTabBar(for: notification) }
-            }
+        notificationObservers = names.map { observeNotification($0) }
+    }
+
+    /// [EN] One observer that restores the tab bar (a separate function: closures nest at most two deep). [CN] 恢复 TabBar 的一个观察者（单独的函数：闭包最多嵌套两层）。
+    private func observeNotification(_ name: Notification.Name) -> NSObjectProtocol {
+        NotificationCenter.default.addObserver(forName: name, object: nil, queue: .main) { [weak self] notification in
+            MainActor.assumeIsolated { self?.restoreTabBar(for: notification) }
         }
     }
 
