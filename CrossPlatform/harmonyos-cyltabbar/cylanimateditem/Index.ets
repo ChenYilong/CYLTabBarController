@@ -6,6 +6,11 @@
  *      `com.cyl.animateditem.CYLAnimatedItemView`。它不依赖任何其他包（不依赖 cyltabbar），也不依赖任何动画库。文档：docs/Animated-Item.md。
  */
 export {
-  CYLAnimatedItemView, CYLAnimatedItemAxis, CYLAnimatedItemAccessoryPlacement, CYLAnimatedItemAnimationContext,
-  CYLAnimatedItemEngines, cylAnimatedItemTypeOf
+  CYLAnimatedItemView, CYLAnimatedItemAxis, CYLAnimatedItemAccessoryPlacement, CYLAnimatedItemAnimationContext, CYLAnimatedItemController,
+  CYLAnimatedItemEngines, cylAnimatedItemTypeOf, cylIconColorFilter
 } from './src/main/ets/CYLAnimatedItemView';
+export { CYLAnimatedItemStackView } from './src/main/ets/CYLAnimatedItemStackView';
+export {
+  CYLAnimatedItemStackModel, CYLAnimatedItemStackItem, CYLAnimatedItemStackActionHandler, CYLAnimatedItemStackDefaultSpacing
+} from './src/main/ets/CYLAnimatedItemStackModel';
+export { cylIsSymbolResource, CYL_SYMBOL_RESOURCE_TYPE } from './src/main/ets/CYLAnimatedItemResources';

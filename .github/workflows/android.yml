@@ -51,6 +51,22 @@ jobs:
       - uses: gradle/actions/setup-gradle@ed408507eac070d1f99cc633dbcf757c94c7933a # v4
         with:
           gradle-version: "8.14.3"
+      # [EN] Maven Central sometimes answers 429 Too Many Requests to shared runners (run 44404316209: kotlin-reflect on the
+      #      build classpath). Configuring the build resolves the classpath and the plugins; try it up to three times with
+      #      a pause, so a rate limit does not fail the job. A real build error still fails the next step.
+      # [CN] Maven Central 有时会对共享 runner 返回 429 Too Many Requests（run 44404316209：构建 classpath 中的 kotlin-reflect）。
+      #      配置构建会解析 classpath 与插件；最多尝试三次并在中间等待，避免限流导致任务失败。真正的构建错误仍会让下一步失败。
+      - name: Resolve the build classpath (retried) 解析构建 classpath（重试）
+        shell: bash
+        run: |
+          for attempt in 1 2 3; do
+            if gradle -p Example-Android --console=plain help; then
+              exit 0
+            fi
+            echo "Gradle configuration failed (attempt ${attempt}); retrying in $((attempt * 30)) s"
+            sleep $((attempt * 30))
+          done
+          exit 1
       - name: Unit tests, lint and release builds 单元测试、lint 与 release 构建
         run: gradle -p Example-Android --console=plain testDebugUnitTest :tabpages:test lintDebug assembleRelease
       - name: Maven bundle 发布包

@@ -52,7 +52,7 @@ class CYLTabBarConfigurationTheme internal constructor(
      */
     fun imageForName(context: Context, name: String): Drawable? = when (val value = values[name]) {
         is Drawable -> value
-        is String -> CYLTabBarConfiguration.imageResolver.drawable(context, value)
+        is String -> CYLTabBarConfiguration.drawable(context, value)
         else -> null
     }
 

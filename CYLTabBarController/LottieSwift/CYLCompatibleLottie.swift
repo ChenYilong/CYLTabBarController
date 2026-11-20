@@ -125,6 +125,20 @@ public final class CYLCompatibleLOTAnimationView: UIView {
     
     // MARK: Public
     
+    /**
+     * [EN] Loads a Lottie JSON downloaded by the caller (a remote animation file) into this view. Returns false when the
+     *      data is not a Lottie animation; the view is then left empty.
+     * [CN] 把调用方下载的 Lottie JSON（远程动画文件）加载到本视图。数据不是 Lottie 动画时返回 false，视图保持为空。
+     */
+    @objc(cylLoadAnimationData:)
+    public func cylLoadAnimationData(_ data: Data) -> Bool {
+        guard let animation = try? LottieAnimation.from(data: data) else {
+            return false
+        }
+        animationView.animation = animation
+        return true
+    }
+
     @objc
     public var compatibleAnimation: CYLCompatibleLOTAnimation? {
         didSet {

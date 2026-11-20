@@ -13,6 +13,8 @@
 // [CN] FIX: issue #535 — shared with CYLBadgeView through CYLUtils. 通过 CYLUtils 与 CYLBadgeView 共用。
 // [EN] FIX: issue #535 — shared with CYLBadgeView through CYLUtils.
 #if __has_include("CYLUtils/UIViewController+CYLUtils.h")
+// CYL-SWIFT-MIGRATION: objc-required — [EN] Only the block typedefs `CYLPopSelectTabBarChildViewControllerCompletion`, `CYLPushOrPopCompletionHandler` and `CYLPushOrPopCallback` are left: Objective-C source spells them and Swift typealiases are not exported (step 116)
+//      (docs/Swift-Migration-Phase3.md). [CN] Swift 无法为 Objective-C 调用方导出的内容（见 docs/Swift-Migration-Phase3.md）。
 #import "CYLUtils/UIViewController+CYLUtils.h"
 #else
 #import "UIViewController+CYLUtils.h"
@@ -46,19 +48,16 @@ typedef void (^CYLPushOrPopCallback)(NSArray<__kindof UIViewController *> *viewC
 /*!
  * [EN] `UIViewController (CYLTabBarControllerExtention)` and `UIViewController (CYLTabBarControllerExtentionDeprecated)` are
  *      implemented in Swift (`Swift/UIViewController+CYLTabBarControllerExtention.swift`, every selector kept) and declared by
- *      the generated Swift interface (`CYLSwiftInterface.h`), imported at the end of this header. The `CYLBadgeProtocol`
- *      conformance stays declared here: a public Swift conformance to a protocol of this module would make the generated
- *      header import the umbrella header. The FlatDesign `cyl_tabBarItem` is in the FlatDesign subspec
+ *      the generated Swift interface (`CYLSwiftInterface.h`), imported at the end of this header, with the `CYLBadgeProtocol`
+ *      conformance (declared in Swift since step 115, when the protocol became Swift). The FlatDesign `cyl_tabBarItem` is in the FlatDesign subspec
  *      (`UIViewController+CYLFlatDesignTabBarItem.swift`); `cylflatdesign_tabBarController` is declared on `NSObject` in
  *      CYLTabBarController.h (docs/Swift-Migration.md, step 27).
  * [CN] `UIViewController (CYLTabBarControllerExtention)` 与 `UIViewController (CYLTabBarControllerExtentionDeprecated)` 在 Swift 中实现
  *      （`Swift/UIViewController+CYLTabBarControllerExtention.swift`，所有 selector 不变），由本头文件末尾导入的 Swift 生成接口
- *      （`CYLSwiftInterface.h`）声明。`CYLBadgeProtocol` 遵循仍在此声明：Swift 公开遵循本模块的协议会让生成的头文件导入总头文件。扁平样式的
+ *      （`CYLSwiftInterface.h`）声明。`CYLBadgeProtocol` 遵循关系自第 115 步（协议改为 Swift）起也在 Swift 中声明。扁平样式的
  *      `cyl_tabBarItem` 位于扁平样式子库（`UIViewController+CYLFlatDesignTabBarItem.swift`）；`cylflatdesign_tabBarController` 在
  *      CYLTabBarController.h 中声明于 `NSObject`（docs/Swift-Migration.md，第 27 步）。
  */
-@interface UIViewController (CYLTabBarControllerExtention)<CYLBadgeProtocol>
-@end
 
 NS_ASSUME_NONNULL_END
 

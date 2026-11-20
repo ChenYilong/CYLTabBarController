@@ -135,16 +135,27 @@ class CYLTabBarItemButton(context: Context, val item: CYLTabBarItem, val index: 
     override fun updateIcon() { /* [EN] See apply. [CN] 见 apply。 */ }
 
     /**
-     * [EN] The tab's animation view is the tab bar's (`cyl_tabBarItemAnimationView`), not the component's: its load and
-     *      failure go to the tab bar's handlers (the static image, else the placeholder).
-     * [CN] Tab 的动画视图属于 TabBar（`cyl_tabBarItemAnimationView`），而不是组件：其加载与失败交给 TabBar 的处理（静态图片，没有时为占位图）。
+     * [EN] The tab bar makes the tab's animation view (`cyl_addTabBarItemAnimationWithURL`) and hands it to the component:
+     *      `animationView` is `cyl_tabBarItemAnimationView` (docs/Animated-Item.md, task 4). Called with null when the
+     *      animation is removed.
+     * [CN] TabBar 创建 Tab 的动画视图（`cyl_addTabBarItemAnimationWithURL`）并交给组件：`animationView` 即
+     *      `cyl_tabBarItemAnimationView`（docs/Animated-Item.md，任务 4）。移除动画时传 null。
+     */
+    internal fun cyl_setTabBarItemAnimationView(view: View?) {
+        animationView = view
+    }
+
+    /**
+     * [EN] The animation's load and failure go to the tab bar's handlers (the static image, else the placeholder), which
+     *      also remove the view from the tab bar's state; the component's own handling would leave that state behind.
+     * [CN] 动画的加载与失败交给 TabBar 的处理（静态图片，没有时为占位图），它也会从 TabBar 的状态中移除该视图；组件自身的处理会遗留该状态。
      */
     override fun cyl_animationViewDidLoad(animationView: View) {
-        if (animationView === this.animationView) super.cyl_animationViewDidLoad(animationView) else CYLTabBarItemAnimationFailure.loadedFallbackHandler?.invoke(this)
+        CYLTabBarItemAnimationFailure.loadedFallbackHandler?.invoke(this)
     }
 
     override fun cyl_animationViewDidFail(animationView: View) {
-        if (animationView === this.animationView) super.cyl_animationViewDidFail(animationView) else CYLTabBarItemAnimationFailure.fallbackHandler?.invoke(this)
+        CYLTabBarItemAnimationFailure.fallbackHandler?.invoke(this)
     }
 
     /**
@@ -326,6 +337,8 @@ class CYLTabBarItemButton(context: Context, val item: CYLTabBarItem, val index: 
         cyl_warnMissingAnimationEngine()
         val controller = tabBar.tabBarController
         titleLabel.setTextColor(titleColor(selected, tabBar))
+        // [EN] The tint of an animation with the `tint` option "title" (bug B12). [CN] `tint` 选项为 "title" 的动画的着色（问题 B12）。
+        cyl_tabBarItemAnimationPlayer?.setTintColor(titleColor(selected, tabBar), selected)
         val font = if (selected) item.cyl_selectedTitleFont ?: controller?.cyl_tabBarItemSelectedTitleFont ?: item.cyl_titleFont ?: controller?.cyl_tabBarItemTitleFont
                    else item.cyl_titleFont ?: controller?.cyl_tabBarItemTitleFont
         if (font != null) {

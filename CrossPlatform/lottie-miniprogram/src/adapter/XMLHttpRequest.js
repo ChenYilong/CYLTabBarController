@@ -6,7 +6,7 @@ const _requestTask = new WeakMap()
 
 function _triggerEvent(type, ...args) {
   if (typeof this[`on${type}`] === 'function') {
-    this[`on${type}`].apply(this, args)
+    this[`on${type}`](...args)
   }
 }
 
@@ -16,7 +16,7 @@ function _changeReadyState(readyState) {
 }
 
 export default class XMLHttpRequest {
-  // TODO 没法模拟 HEADERS_RECEIVED 和 LOADING 两个状态
+  // Not supported: the HEADERS_RECEIVED and LOADING states cannot be simulated. 没法模拟 HEADERS_RECEIVED 和 LOADING 两个状态
   static UNSEND = 0
   static OPENED = 1
   static HEADERS_RECEIVED = 2
@@ -24,7 +24,7 @@ export default class XMLHttpRequest {
   static DONE = 4
 
   /*
-   * TODO 这一批事件应该是在 XMLHttpRequestEventTarget.prototype 上面的
+   * Known limit: these events belong on XMLHttpRequestEventTarget.prototype. 这一批事件应该是在 XMLHttpRequestEventTarget.prototype 上面的
    */
   onabort = null
   onerror = null
@@ -79,6 +79,7 @@ export default class XMLHttpRequest {
   }
 
   overrideMimeType() {
+    // [EN] Not supported by wx.request: the response type is not overridden. [CN] wx.request 不支持：不覆盖响应类型。
   }
 
   send(data = '') {
@@ -115,7 +116,7 @@ export default class XMLHttpRequest {
             const len = bytes.byteLength
 
             for (let i = 0; i < len; i++) {
-              this.responseText += String.fromCharCode(bytes[i])
+              this.responseText += String.fromCodePoint(bytes[i])
             }
           } else {
             this.responseText = data
@@ -125,8 +126,8 @@ export default class XMLHttpRequest {
           _triggerEvent.call(this, 'loadend')
         },
         fail: ({ errMsg }) => {
-          // TODO 规范错误
-          if (errMsg.indexOf('abort') !== -1) {
+          // Known limit: a deviation from the specification. 规范错误
+          if (errMsg.includes('abort')) {
             _triggerEvent.call(this, 'abort')
           } else {
             _triggerEvent.call(this, 'error', errMsg)

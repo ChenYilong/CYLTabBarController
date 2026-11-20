@@ -293,6 +293,10 @@
       "value": "Rive tab icons (configuration file)"
     },
     {
+      "name": "cyl_l10n_9d01c837b4bc",
+      "value": "Rive tab icon: house.riv (number input Rooms)"
+    },
+    {
       "name": "cyl_l10n_f0c792c049bc",
       "value": "Bergulir sekali"
     },
@@ -351,6 +355,14 @@
     {
       "name": "cyl_l10n_fee4a478923f",
       "value": "Interaksi tab"
+    },
+    {
+      "name": "cyl_l10n_5ea7bf3d8e63",
+      "value": "Tab icon animations loop: off"
+    },
+    {
+      "name": "cyl_l10n_918aff638366",
+      "value": "Tab icon animations loop: on"
     },
     {
       "name": "cyl_l10n_98559580dcc7",
@@ -439,6 +451,10 @@
     {
       "name": "cyl_l10n_4abddd944c2e",
       "value": "harmonyos-liquid-glass-tabbar: kapsul tab, bola pencarian, dan bilah musik di atas konten berwarna; gulir untuk mengecilkan"
+    },
+    {
+      "name": "cyl_l10n_3b4e07b5542e",
+      "value": "numberInput=Rooms: each select or tap again sets Rooms to the next value (3, 4, 5, 6)"
     },
     {
       "name": "cyl_l10n_f3f4ecf4a4a6",
@@ -615,6 +631,10 @@
     {
       "name": "cyl_l10n_758903c327de",
       "value": "Menampilkan GIF animasi sebagai ikon tab; ketuk lagi untuk memulihkan"
+    },
+    {
+      "name": "cyl_l10n_56e6ecf97176",
+      "value": "Loop"
     },
     {
       "name": "cyl_l10n_c7db6d4f1a42",

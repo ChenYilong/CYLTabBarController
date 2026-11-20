@@ -13,9 +13,9 @@
  *        canvas.createPath2D()）、DOMMatrix、performance 与 requestAnimationFrame / cancelAnimationFrame（画布自己的）；
  *      - rive.wasm.br：用 Brotli 压缩的 rive.wasm，WXWebAssembly 可以从包内加载（2 MB -> 约 570 KB）。
  */
-const fs = require('fs')
-const path = require('path')
-const zlib = require('zlib')
+const fs = require('node:fs')
+const path = require('node:path')
+const zlib = require('node:zlib')
 
 const CYL_ROOT = path.resolve(__dirname, '..')
 const CYL_SOURCE = path.join(CYL_ROOT, 'node_modules', '@rive-app', 'canvas-advanced')

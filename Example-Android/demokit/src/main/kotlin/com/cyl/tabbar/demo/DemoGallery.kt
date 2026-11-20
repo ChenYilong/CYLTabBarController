@@ -45,7 +45,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 class DemoGalleryActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        title = "Tab Bar Gallery"
+        title = cylDemoText("Tab Bar Gallery")
         val items = DemoGallery.sections.flatMap { section -> listOf<Any>(section.first) + section.second }
         val list = ListView(this)
         list.adapter = object : android.widget.BaseAdapter() {
@@ -96,19 +96,20 @@ object DemoGallery {
     private fun tabBar(title: String, subtitle: String, build: (DemoHostActivity) -> CYLTabBarController) =
         Scene(title, subtitle) { activity -> build(activity).also { activity.tabBarController = it }.view }
 
-    private val titles = listOf("Home", "Video", "Photo", "Message", "Me", "Favor", "Shop", "Search")
+    // [EN] English keys: also the identifiers (lower case); shown through cylDemoText. [CN] 英文键：同时作为标识（小写）；通过 cylDemoText 显示。
+    private val titles = cylDemoTextKeys("Home", "Video", "Photo", "Message", "Me", "Favor", "Shop", "Search")
     private val icons = listOf(android.R.drawable.ic_menu_myplaces, android.R.drawable.ic_media_play, android.R.drawable.ic_menu_camera,
         android.R.drawable.ic_dialog_email, android.R.drawable.ic_menu_my_calendar, android.R.drawable.btn_star, android.R.drawable.ic_menu_agenda, android.R.drawable.ic_menu_search)
 
     private fun attributes(context: Context, count: Int, extra: (Int) -> Map<String, Any?> = { emptyMap() }) = (0 until count).map { index ->
-        mapOf(CYLConstants.CYLTabBarItemTitle to titles[index], CYLConstants.CYLTabBarItemImage to ContextCompat.getDrawable(context, icons[index]),
+        mapOf(CYLConstants.CYLTabBarItemTitle to cylDemoText(titles[index]), CYLConstants.CYLTabBarItemImage to ContextCompat.getDrawable(context, icons[index]),
               CYLConstants.CYLTabBarItemIdentifier to titles[index].lowercase()) + extra(index)
     }
 
     /** [EN] A tab bar controller of `count` text pages. [CN] 由 `count` 个文字页面组成的 TabBarController。 */
     private fun controller(activity: FragmentActivity, count: Int, style: CYLEnums.CYLTabBarStyleType = CYLEnums.CYLTabBarStyleType.Default,
                            context: String? = null, extra: (Int) -> Map<String, Any?> = { emptyMap() },
-                           page: (Int) -> Fragment = { TextPageFragment.newInstance(titles[it]) }): CYLTabBarController =
+                           page: (Int) -> Fragment = { TextPageFragment.newInstance(cylDemoText(titles[it])) }): CYLTabBarController =
         CYLTabBarController(activity, (0 until count).map(page), attributes(activity, count, extra), style, context)
 
     /**
@@ -127,16 +128,16 @@ object DemoGallery {
         )
         val pages = listOf(0, 1, 5, 6)
         val attributes = pages.mapIndexed { index, title ->
-            mapOf(CYLConstants.CYLTabBarItemTitle to titles[title], CYLConstants.CYLTabBarItemImage to ContextCompat.getDrawable(activity, icons[title]),
+            mapOf(CYLConstants.CYLTabBarItemTitle to cylDemoText(titles[title]), CYLConstants.CYLTabBarItemImage to ContextCompat.getDrawable(activity, icons[title]),
                   CYLConstants.CYLTabBarItemIdentifier to titles[title].lowercase()) + tabs[index]
         }
-        return CYLTabBarController(activity, pages.map { TextPageFragment.newInstance(titles[it]) }, attributes, style, null)
+        return CYLTabBarController(activity, pages.map { TextPageFragment.newInstance(cylDemoText(titles[it])) }, attributes, style, null)
     }
 
     /** [EN] "Photo" opens a dialog instead of its page (`cyl_customActionTabBarItemIdentifiers`). [CN] "Photo" 打开弹窗而不是其页面。 */
     private fun photoOpensDialog(controller: CYLTabBarController) {
         controller.cyl_customActionTabBarItemIdentifiers = listOf("photo")
-        controller.cyl_customActionBlock = { tabBarController, _ -> AlertDialog.Builder(tabBarController.activity).setMessage("Photo").setPositiveButton(android.R.string.ok, null).show() }
+        controller.cyl_customActionBlock = { tabBarController, _ -> AlertDialog.Builder(tabBarController.activity).setMessage(cylDemoText("Photo")).setPositiveButton(android.R.string.ok, null).show() }
     }
 
     private fun systemBar(activity: FragmentActivity, count: Int, selected: Int = 0, badges: Boolean = false): View {
@@ -146,16 +147,16 @@ object DemoGallery {
         val bar = BottomNavigationView(activity)
         // [EN] BottomNavigationView holds at most 5 items: the fifth becomes "More" with the others, as UIKit does. [CN] BottomNavigationView 最多 5 项：第 5 项成为 "More"，包含其余页面，与 UIKit 相同。
         val shown = if (count > 5) 4 else count
-        (0 until shown).forEach { index -> bar.menu.add(0, index, index, titles[index]).setIcon(icons[index]) }
+        (0 until shown).forEach { index -> bar.menu.add(0, index, index, cylDemoText(titles[index])).setIcon(icons[index]) }
         if (count > 5) bar.menu.add(0, 4, 4, "More").setIcon(android.R.drawable.ic_menu_more)
         bar.setOnItemSelectedListener { item ->
             if (item.itemId == 4 && count > 5) {
-                AlertDialog.Builder(activity).setTitle("More").setItems(titles.subList(4, count).toTypedArray()) { _, which -> label.text = titles[4 + which] }.show()
+                AlertDialog.Builder(activity).setTitle(cylDemoText("More")).setItems(titles.subList(4, count).map { cylDemoText(it) }.toTypedArray()) { _, which -> label.text = cylDemoText(titles[4 + which]) }.show()
             } else label.text = item.title
             true
         }
         bar.selectedItemId = selected
-        label.text = titles[selected]
+        label.text = cylDemoText(titles[selected])
         if (badges) { bar.getOrCreateBadge(0).number = 3; bar.getOrCreateBadge(1); bar.getOrCreateBadge(2).number = 120 }
         root.addView(bar)
         return root
@@ -165,29 +166,29 @@ object DemoGallery {
 
     val sections: List<Pair<String, List<Scene>>> by lazy {
         listOf(
-            "Basic" to listOf(
-                Scene("UITabBarController style", "The system tab bar, for comparison") { systemBar(it, 3) },
-                tabBar("CYLTabBarController like system style", "Three tabs; full width") { controller(it, 3) },
-                tabBar("Mix styled and system items", "Tabs 1, 3 and 5 bounce; tabs 2 and 4 are plain") { activity ->
+            cylDemoText("Basic") to listOf(
+                Scene(cylDemoText("UITabBarController style"), cylDemoText("The system tab bar, for comparison")) { systemBar(it, 3) },
+                tabBar(cylDemoText("CYLTabBarController like system style"), cylDemoText("Three tabs; full width")) { controller(it, 3) },
+                tabBar(cylDemoText("Mix styled and system items"), cylDemoText("Tabs 1, 3 and 5 bounce; tabs 2 and 4 are plain")) { activity ->
                     controller(activity, 5).also { c -> c.viewControllers.forEachIndexed { index, page -> if (index % 2 == 0) page.cyl_tabButtonAnimation = bounce() } }
                 },
-                tabBar("CYLTabBarController with Liquid Glass", "\"Photo\" opens a dialog (cyl_customActionTabBarItemIdentifiers)") { activity ->
+                tabBar(cylDemoText("CYLTabBarController with Liquid Glass"), cylDemoText("\"Photo\" opens a dialog (cyl_customActionTabBarItemIdentifiers)")) { activity ->
                     controller(activity, 5, CYLEnums.CYLTabBarStyleType.LiquidGlass).also(::photoOpensDialog)
                 },
-                Scene("UITabBarController with 'More'", "Eight tabs; the system bar holds five, the fifth is \"More\"") { systemBar(it, 8) },
-                tabBar("CYLTabBarController with 'More'", "Eight tabs, full width") { controller(it, 8) },
-                tabBar("Mix styled and system items with 'More'", "Eight tabs; every other one bounces") { activity ->
+                Scene(cylDemoText("UITabBarController with 'More'"), cylDemoText("Eight tabs; the system bar holds five, the fifth is \"More\"")) { systemBar(it, 8) },
+                tabBar(cylDemoText("CYLTabBarController with 'More'"), cylDemoText("Eight tabs, full width")) { controller(it, 8) },
+                tabBar(cylDemoText("Mix styled and system items with 'More'"), cylDemoText("Eight tabs; every other one bounces")) { activity ->
                     controller(activity, 8).also { c -> c.viewControllers.forEachIndexed { index, page -> if (index % 2 == 0) page.cyl_tabButtonAnimation = bounce() } }
                 },
-                tabBar("Liquid Glass with 'More'", "Eight tabs with Liquid Glass") { controller(it, 8, CYLEnums.CYLTabBarStyleType.LiquidGlass) },
-                Scene("UITabBarController with non-zero default index", "selectedIndex = 2 after presenting") { systemBar(it, 5, selected = 2) },
-                tabBar("CYLTabBarController with non-zero default index", "selectedIndex = 2 after presenting") { activity ->
+                tabBar(cylDemoText("Liquid Glass with 'More'"), cylDemoText("Eight tabs with Liquid Glass")) { controller(it, 8, CYLEnums.CYLTabBarStyleType.LiquidGlass) },
+                Scene(cylDemoText("UITabBarController with non-zero default index"), cylDemoText("selectedIndex = 2 after presenting")) { systemBar(it, 5, selected = 2) },
+                tabBar(cylDemoText("CYLTabBarController with non-zero default index"), cylDemoText("selectedIndex = 2 after presenting")) { activity ->
                     controller(activity, 5).also { c -> c.view.post { c.selectedIndex = 2 } }
                 },
-                tabBar("Classic design on every system", "CYLTabBarStyleTypeFlatDesign, white bar; \"Photo\" opens a dialog") { activity ->
+                tabBar(cylDemoText("Classic design on every system"), cylDemoText("CYLTabBarStyleTypeFlatDesign, white bar; \"Photo\" opens a dialog")) { activity ->
                     controller(activity, 5, CYLEnums.CYLTabBarStyleType.FlatDesign).also { c -> c.cyl_tabBarBackgroundColor = Color.WHITE; photoOpensDialog(c) }
                 },
-                tabBar("Liquid Glass with badges", "New, 99+, a blue 1, a dot, none; the selected tab hides its badge") { activity ->
+                tabBar(cylDemoText("Liquid Glass with badges"), cylDemoText("New, 99+, a blue 1, a dot, none; the selected tab hides its badge")) { activity ->
                     controller(activity, 5, CYLEnums.CYLTabBarStyleType.LiquidGlass).also { c ->
                         c.cyl_hidesBadgeOfSelectedTab = true
                         c.performWhenTabBarItemsReady { ready ->
@@ -199,30 +200,30 @@ object DemoGallery {
                         }
                     }
                 },
-                Scene("UITabBarController tab style", "UITab (iOS 18+), eight tabs, \"Favor\" selected",
-                    "n/a on Android: UITab and the iOS 18 tab sidebar are UIKit API. The 8-tab scenes above show the same tabs with CYLTabBarController."),
+                Scene(cylDemoText("UITabBarController tab style"), cylDemoText("UITab (iOS 18+), eight tabs, \"Favor\" selected"),
+                    cylDemoText("n/a on Android: UITab and the iOS 18 tab sidebar are UIKit API. The 8-tab scenes above show the same tabs with CYLTabBarController.")),
             ),
-            "Embed" to listOf(
-                tabBar("UINavigationController embeds CYLTabBarController", "One action bar above the tab bar controller") { controller(it, 4) },
-                tabBar("CYLTabBarController embeds UINavigationController", "A navigation stack in every tab (cyl_pushViewController)") { activity ->
+            cylDemoText("Embed") to listOf(
+                tabBar(cylDemoText("UINavigationController embeds CYLTabBarController"), cylDemoText("One action bar above the tab bar controller")) { controller(it, 4) },
+                tabBar(cylDemoText("CYLTabBarController embeds UINavigationController"), cylDemoText("A navigation stack in every tab (cyl_pushViewController)")) { activity ->
                     controller(activity, 4, page = { DemoPopPushFragment() })
                 },
             ),
-            "Animation" to listOf(
-                tabBar("Customize the selected color", "CYLTabBarItemTitleColor / IconColor per tab") { activity ->
+            cylDemoText("Animation") to listOf(
+                tabBar(cylDemoText("Customize the selected color"), cylDemoText("CYLTabBarItemTitleColor / IconColor per tab")) { activity ->
                     val colors = listOf(Color.rgb(255, 59, 48), Color.rgb(52, 199, 89), Color.rgb(0, 122, 255), Color.rgb(255, 149, 0))
                     controller(activity, 4, extra = { mapOf(CYLConstants.CYLTabBarItemSelectedTitleColor to colors[it], CYLConstants.CYLTabBarItemSelectedIconColor to colors[it]) })
                 },
-                tabBar("Spring animation", "A CYLTabButtonAnimation that bounces on select and reselect") { activity ->
+                tabBar(cylDemoText("Spring animation"), cylDemoText("A CYLTabButtonAnimation that bounces on select and reselect")) { activity ->
                     controller(activity, 4).also { it.cyl_defaultTabButtonAnimation = CYLTabButtonBounceAnimation() }
                 },
-                tabBar("Background color change", "CYLTabBarItemBackgroundColor / SelectedBackgroundColor") { activity ->
+                tabBar(cylDemoText("Background color change"), cylDemoText("CYLTabBarItemBackgroundColor / SelectedBackgroundColor")) { activity ->
                     controller(activity, 4, extra = { mapOf(CYLConstants.CYLTabBarItemBackgroundColor to Color.rgb(240, 240, 245), CYLConstants.CYLTabBarItemSelectedBackgroundColor to Color.rgb(255, 214, 10)) })
                 },
-                tabBar("With a pressed effect", "Larger icons that shrink while pressed (highlight hooks)") { activity ->
+                tabBar(cylDemoText("With a pressed effect"), cylDemoText("Larger icons that shrink while pressed (highlight hooks)")) { activity ->
                     controller(activity, 4, extra = { mapOf(CYLConstants.CYLTabBarItemImageInsets to CYLEdgeInsets(-3f, -3f, -3f, -3f)) }).also { it.cyl_defaultTabButtonAnimation = CYLTabButtonPressAnimation() }
                 },
-                tabBar("Suggest a click", "The middle tab pulses every 3 s until it is selected") { activity ->
+                tabBar(cylDemoText("Suggest a click"), cylDemoText("The middle tab pulses every 3 s until it is selected")) { activity ->
                     controller(activity, 5).also { c ->
                         repeating(1000, 3000) {
                             val pulses = c.selectedIndex != 2 && !activity.isFinishing
@@ -232,24 +233,24 @@ object DemoGallery {
                     }
                 },
             ),
-            "Irregular" to listOf(
-                tabBar("A larger button in the middle", "A raised round CYLPlusButton that responds inside its circle") { activity ->
+            cylDemoText("Irregular") to listOf(
+                tabBar(cylDemoText("A larger button in the middle"), cylDemoText("A raised round CYLPlusButton that responds inside its circle")) { activity ->
                     CYLPlusButton.registerPlusButton(largePlus)
                     controller(activity, 4, context = LARGE_PLUS)
                 },
             ),
-            "Customize click" to listOf(
-                tabBar("Custom action for the button click", "The center button shows an action sheet instead of a page") { activity ->
+            cylDemoText("Customize click") to listOf(
+                tabBar(cylDemoText("Custom action for the button click"), cylDemoText("The center button shows an action sheet instead of a page")) { activity ->
                     CYLPlusButton.registerPlusButton(actionPlus)
                     controller(activity, 4, context = ACTION_PLUS)
                 },
-                tabBar("Add a special reminder bubble", "A bubble above \"Me\"; \"Photo\" opens a dialog") { activity ->
+                tabBar(cylDemoText("Add a special reminder bubble"), cylDemoText("A bubble above \"Me\"; \"Photo\" opens a dialog")) { activity ->
                     controller(activity, 5).also { c ->
                         photoOpensDialog(c)
                         c.performWhenTabBarItemsReady { ready ->
                             val me = ready.tabBar.tabBarButtonArray.getOrNull(4) ?: return@performWhenTabBarItemsReady
                             val bubble = TextView(activity).apply {
-                                text = "New gift!"; setTextColor(Color.WHITE); textSize = 11f; setPadding(16, 6, 16, 6)
+                                text = cylDemoText("New gift!"); setTextColor(Color.WHITE); textSize = 11f; setPadding(16, 6, 16, 6)
                                 background = GradientDrawable().apply { cornerRadius = 24f; setColor(Color.rgb(255, 59, 48)) }
                             }
                             val root = ready.view as android.view.ViewGroup
@@ -265,34 +266,34 @@ object DemoGallery {
                     }
                 },
             ),
-            "Remind" to listOf(
-                Scene("System remind style", "BottomNavigationView badges on the system tab bar") { systemBar(it, 4, badges = true) },
-                tabBar("Imitate system remind style", "The same badges on CYLTabBarController") { activity ->
+            cylDemoText("Remind") to listOf(
+                Scene(cylDemoText("System remind style"), cylDemoText("BottomNavigationView badges on the system tab bar")) { systemBar(it, 4, badges = true) },
+                tabBar(cylDemoText("Imitate system remind style"), cylDemoText("The same badges on CYLTabBarController")) { activity ->
                     controller(activity, 4).also { c -> c.performWhenTabBarItemsReady { r -> r.tabBar.tabBarButtonArray.let { b -> b[0].cyl_showBadgeValue("3"); b[1].cyl_showBadge(); b[2].cyl_showBadgeValue("120") } } }
                 },
-                tabBar("Remind with animation", "The icon jumps when the badge appears (CYLTabButtonBlockAnimation.badgeChangedAnimation)") { activity ->
+                tabBar(cylDemoText("Remind with animation"), cylDemoText("The icon jumps when the badge appears (CYLTabButtonBlockAnimation.badgeChangedAnimation)")) { activity ->
                     badgeAnimationScene(activity) { _, icon, _ -> icon.animate().translationY(-12f).setDuration(150).withEndAction { icon.animate().translationY(0f).setDuration(150).start() }.start() }
                 },
-                tabBar("Remind with animation (2)", "The badge scales in when it appears (CYLTabButtonBlockAnimation.badgeChangedAnimation)") { activity ->
+                tabBar(cylDemoText("Remind with animation (2)"), cylDemoText("The badge scales in when it appears (CYLTabButtonBlockAnimation.badgeChangedAnimation)")) { activity ->
                     badgeAnimationScene(activity) { _, _, badge -> badge?.let { it.scaleX = 0f; it.scaleY = 0f; it.animate().scaleX(1f).scaleY(1f).setDuration(300).start() } }
                 },
-                tabBar("Customize remind style", "A gray bubble instead of the red badge") { activity ->
+                tabBar(cylDemoText("Customize remind style"), cylDemoText("A gray bubble instead of the red badge")) { activity ->
                     controller(activity, 4).also { c -> c.performWhenTabBarItemsReady { r -> r.tabBar.tabBarButtonArray.forEach { b -> b.cyl_badgeBackgroundColor = Color.GRAY; b.cyl_showBadgeValue("8") } } }
                 },
             ),
-            "Lottie" to listOf(
-                tabBar("Lottie", "The middle tab loops its Lottie animation until it is selected (CYLTabBarLottieLoopsWhenUnselected)") { activity ->
+            cylDemoText("Lottie") to listOf(
+                tabBar(cylDemoText("Lottie"), cylDemoText("The middle tab loops its Lottie animation until it is selected (CYLTabBarLottieLoopsWhenUnselected)")) { activity ->
                     controller(activity, 5, extra = { index ->
                         if (index == 2) mapOf(CYLConstants.CYLTabBarLottieURL to "https://raw.githubusercontent.com/airbnb/lottie-android/master/sample/src/main/res/raw/heart.json",
                                               CYLConstants.CYLTabBarLottieLoopsWhenUnselected to true) else emptyMap()
                     })
                 },
             ),
-            "New APIs" to listOf(
-                tabBar("Reselect: pop to root, then scroll to top", "cyl_reselectBehavior = PopToRootThenScrollToTop") { activity ->
+            cylDemoText("New APIs") to listOf(
+                tabBar(cylDemoText("Reselect: pop to root, then scroll to top"), cylDemoText("cyl_reselectBehavior = PopToRootThenScrollToTop")) { activity ->
                     controller(activity, 4, page = { DemoPopPushFragment() }).also { it.cyl_reselectBehavior = CYLEnums.CYLTabBarReselectBehavior.PopToRootThenScrollToTop }
                 },
-                tabBar("Press and reselect animations", "CYLTabButtonPressAnimation + a reselect turn") { activity ->
+                tabBar(cylDemoText("Press and reselect animations"), cylDemoText("CYLTabButtonPressAnimation + a reselect turn")) { activity ->
                     controller(activity, 4).also { c ->
                         c.cyl_defaultTabButtonAnimation = CYLTabButtonBlockAnimation().apply {
                             highlightAnimation = { button, _, _ -> button.animate().scaleX(0.9f).scaleY(0.9f).setDuration(100).start() }
@@ -301,13 +302,13 @@ object DemoGallery {
                         }
                     }
                 },
-                tabBar("Custom action on a regular tab", "cyl_customActionTabBarItemIdentifiers + cyl_customTabActionHandler") { activity ->
+                tabBar(cylDemoText("Custom action on a regular tab"), cylDemoText("cyl_customActionTabBarItemIdentifiers + cyl_customTabActionHandler")) { activity ->
                     controller(activity, 4).also { c ->
                         c.cyl_customActionTabBarItemIdentifiers = listOf("message")
-                        c.cyl_customTabActionHandler = { tabBarController, _ -> android.widget.Toast.makeText(tabBarController.activity, "Custom action", android.widget.Toast.LENGTH_SHORT).show() }
+                        c.cyl_customTabActionHandler = { tabBarController, _ -> android.widget.Toast.makeText(tabBarController.activity, cylDemoText("Custom action"), android.widget.Toast.LENGTH_SHORT).show() }
                     }
                 },
-                tabBar("Per-tab colors, fonts and backgrounds", "Every tab has its own title color, font and background") { activity ->
+                tabBar(cylDemoText("Per-tab colors, fonts and backgrounds"), cylDemoText("Every tab has its own title color, font and background")) { activity ->
                     val colors = listOf(Color.rgb(255, 59, 48), Color.rgb(52, 199, 89), Color.rgb(0, 122, 255), Color.rgb(175, 82, 222))
                     controller(activity, 4, extra = { index ->
                         mapOf(CYLConstants.CYLTabBarItemSelectedTitleColor to colors[index], CYLConstants.CYLTabBarItemTitleColor to Color.GRAY,
@@ -315,46 +316,46 @@ object DemoGallery {
                               CYLConstants.CYLTabBarItemSelectedBackgroundColor to Color.argb(40, Color.red(colors[index]), Color.green(colors[index]), Color.blue(colors[index])))
                     })
                 },
-                tabBar("Icon rendering mode (#787)", "template: one image, two colors · original: own colors · automatic") { activity ->
+                tabBar(cylDemoText("Icon rendering mode (#787)"), cylDemoText("template: one image, two colors · original: own colors · automatic")) { activity ->
                     iconRenderingController(activity, CYLEnums.CYLTabBarStyleType.Default)
                 },
-                tabBar("Icon rendering mode on Liquid Glass (#787)", "template icons take the bar's tint without an icon color") { activity ->
+                tabBar(cylDemoText("Icon rendering mode on Liquid Glass (#787)"), cylDemoText("template icons take the bar's tint without an icon color")) { activity ->
                     iconRenderingController(activity, CYLEnums.CYLTabBarStyleType.LiquidGlass)
                 },
-                tabBar("Accessibility identifiers", "Each tab has CYLTabBarItemAccessibilityIdentifier (home, video...) for UI tests") { activity ->
-                    controller(activity, 4, extra = { mapOf(CYLConstants.CYLTabBarItemAccessibilityIdentifier to titles[it].lowercase(), CYLConstants.CYLTabBarItemAccessibilityLabel to titles[it]) }).also { c ->
+                tabBar(cylDemoText("Accessibility identifiers"), cylDemoText("Each tab has CYLTabBarItemAccessibilityIdentifier (home, video...) for UI tests")) { activity ->
+                    controller(activity, 4, extra = { mapOf(CYLConstants.CYLTabBarItemAccessibilityIdentifier to titles[it].lowercase(), CYLConstants.CYLTabBarItemAccessibilityLabel to cylDemoText(titles[it])) }).also { c ->
                         c.performWhenTabBarItemsReady { r ->
                             AlertDialog.Builder(activity).setMessage(r.tabBar.tabBarButtonArray.joinToString("\n") { "${it.item.accessibilityIdentifier}: ${it.contentDescription}" }).show()
                         }
                     }
                 },
-                tabBar("Centered tabs around a plus button", "Tabs packed around the middle plus button (cyl_itemEdgeInsets)") { activity ->
+                tabBar(cylDemoText("Centered tabs around a plus button"), cylDemoText("Tabs packed around the middle plus button (cyl_itemEdgeInsets)")) { activity ->
                     CYLPlusButton.registerPlusButton(DemoPlusButton.Provider)
                     controller(activity, 4, context = DemoCatalog.PLUS_CONTEXT).also { c -> c.tabBar.cyl_itemEdgeInsets = CYLEdgeInsets(0f, 6f, 0f, 6f) }
                 },
-                tabBar("Edge insets and gaps between tabs", "cyl_itemEdgeInsets 16 dp + a 2 dp gap") { activity ->
+                tabBar(cylDemoText("Edge insets and gaps between tabs"), cylDemoText("cyl_itemEdgeInsets 16 dp + a 2 dp gap")) { activity ->
                     controller(activity, 4, extra = { mapOf(CYLConstants.CYLTabBarItemBackgroundColor to Color.rgb(240, 240, 245)) }).also { c -> c.tabBar.cyl_itemEdgeInsets = CYLEdgeInsets(4f, 1f, 4f, 1f) }
                 },
             ),
-            "Liquid Glass robustness" to listOf(
-                tabBar("Selected control with bounds checks", "\"Read\" shows the selected tab's index and class") { activity ->
+            cylDemoText("Liquid Glass robustness") to listOf(
+                tabBar(cylDemoText("Selected control with bounds checks"), cylDemoText("\"Read\" shows the selected tab's index and class")) { activity ->
                     controller(activity, 4).also { c ->
                         c.cyl_customActionTabBarItemIdentifiers = listOf("message")
                         c.cyl_customActionBlock = { t, _ ->
                             val control = t.tabBar.cyl_tabBarButtonWithTabIndex(t.selectedIndex)
-                            AlertDialog.Builder(activity).setTitle("Read").setMessage("index ${t.selectedIndex}, ${control?.javaClass?.simpleName}").show()
+                            AlertDialog.Builder(activity).setTitle(cylDemoText("Read")).setMessage("index ${t.selectedIndex}, ${control?.javaClass?.simpleName}").show()
                         }
                         c.updateTabBarItemAtIndex(1, mapOf(CYLConstants.CYLTabBarItemTitle to "Read"))
                     }
                 },
-                tabBar("Out-of-range reads return nil", "Index 99 on the tab button readers: null, no exception") { activity ->
+                tabBar(cylDemoText("Out-of-range reads return nil"), cylDemoText("Index 99 on the tab button readers: null, no exception")) { activity ->
                     controller(activity, 4).also { c ->
                         c.performWhenTabBarItemsReady { r ->
                             AlertDialog.Builder(activity).setMessage("cyl_tabBarButtonWithTabIndex(99) = ${r.tabBar.cyl_tabBarButtonWithTabIndex(99)}\nviewControllers.getOrNull(99) = ${r.viewControllers.getOrNull(99)}\ncyl_viewControllerWithTabBarItemIdentifier(\"none\") = ${r.cyl_viewControllerWithTabBarItemIdentifier("none")}").show()
                         }
                     }
                 },
-                tabBar("Marked views in tab buttons", "A star replaces Home's icon; \"Hide\" / \"Show\" toggles it") { activity ->
+                tabBar(cylDemoText("Marked views in tab buttons"), cylDemoText("A star replaces Home's icon; \"Hide\" / \"Show\" toggles it")) { activity ->
                     controller(activity, 4).also { c ->
                         var shown = true
                         val star = { _: Boolean -> TextView(activity).apply { text = "★"; textSize = 22f; gravity = Gravity.CENTER; setTextColor(Color.rgb(255, 204, 0)) } }
@@ -364,19 +365,19 @@ object DemoGallery {
                         c.cyl_customActionBlock = { t, _ -> shown = !shown; t.setTabBarItemIconViewProvider(if (shown) star else null, 0) }
                     }
                 },
-                Scene("Plus stand-in after an item image changes", "Liquid Glass only", "n/a on Android: the stand-in exists because UIKit rebuilds the Liquid Glass tab buttons. The Android plus button is a real view in the bar."),
-                Scene("Plus stand-in on first display and rotation", "Liquid Glass only", "n/a on Android: there is no stand-in; after a rotation the activity lays the plus button out again."),
-                Scene("More editing with 8 tabs", "UIKit's \"More\" editor", "n/a on Android: the system \"More\" editor (Edit, drag, Done) is UIKit API."),
+                Scene(cylDemoText("Plus stand-in after an item image changes"), cylDemoText("Liquid Glass only"), cylDemoText("n/a on Android: the stand-in exists because UIKit rebuilds the Liquid Glass tab buttons. The Android plus button is a real view in the bar.")),
+                Scene(cylDemoText("Plus stand-in on first display and rotation"), cylDemoText("Liquid Glass only"), cylDemoText("n/a on Android: there is no stand-in; after a rotation the activity lays the plus button out again.")),
+                Scene(cylDemoText("More editing with 8 tabs"), cylDemoText("UIKit's \"More\" editor"), cylDemoText("n/a on Android: the system \"More\" editor (Edit, drag, Done) is UIKit API.")),
             ),
-            "More than five tabs" to listOf(
-                tabBar("8 tabs without the system \"More\"", "Issue #472: the fifth tab opens your own menu of the other pages; the chosen page takes that slot with its own title and icon") { activity ->
+            cylDemoText("More than five tabs") to listOf(
+                tabBar(cylDemoText("8 tabs without the system \"More\""), cylDemoText("Issue #472: the fifth tab opens your own menu of the other pages; the chosen page takes that slot with its own title and icon")) { activity ->
                     val all = attributes(activity, 8)
-                    val pages = (0 until 8).map { TextPageFragment.newInstance(titles[it]) }
+                    val pages = (0 until 8).map { TextPageFragment.newInstance(cylDemoText(titles[it])) }
                     controller(activity, 5, page = { pages[it] }).also { c ->
                         c.updateTabBarItemAtIndex(4, mapOf(CYLConstants.CYLTabBarItemTitle to "More", CYLConstants.CYLTabBarItemIdentifier to "more"))
                         c.cyl_customActionTabBarItemIdentifiers = listOf("more", "me", "favor", "shop", "search")
                         c.cyl_customActionBlock = { t, _ ->
-                            AlertDialog.Builder(activity).setTitle("More").setItems(titles.subList(4, 8).toTypedArray()) { _, which ->
+                            AlertDialog.Builder(activity).setTitle(cylDemoText("More")).setItems(titles.subList(4, 8).toTypedArray()) { _, which ->
                                 t.replaceViewControllerAtIndex(4, pages[4 + which], all[4 + which])
                                 t.cyl_customActionTabBarItemIdentifiers = emptyList()
                                 t.selectedIndex = 4
@@ -385,7 +386,7 @@ object DemoGallery {
                         }
                     }
                 },
-                Scene("For comparison: 8 tabs with the system \"More\"", "The system bar shows four tabs and \"More\" once there are more than five") { systemBar(it, 8) },
+                Scene(cylDemoText("For comparison: 8 tabs with the system \"More\""), cylDemoText("The system bar shows four tabs and \"More\" once there are more than five")) { systemBar(it, 8) },
             ),
         )
     }
@@ -434,7 +435,7 @@ object DemoGallery {
                 imageView.setColorFilter(Color.WHITE)
             }
             override fun plusChildViewControllerButtonClicked() {
-                AlertDialog.Builder(context).setTitle("Publish").setItems(arrayOf("Photo", "Video", "Text"), null).setNegativeButton(android.R.string.cancel, null).show()
+                AlertDialog.Builder(context).setTitle(cylDemoText("Publish")).setItems(arrayOf("Photo", "Video", "Text"), null).setNegativeButton(android.R.string.cancel, null).show()
             }
         }
         override fun tabBarContext() = ACTION_PLUS

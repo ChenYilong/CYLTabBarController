@@ -85,3 +85,37 @@ test('a broken file sends error', async () => {
   await cylWaitFor(() => component.events.some((e) => e.name === 'error'))
   assert.ok(component.events.some((e) => e.name === 'error'))
 })
+
+test('setting the same path again does not reload, so the file plays (bug B11)', async () => {
+  const { component, definition } = cylMakeComponent()
+  Object.assign(component.data, { path: CYL_FILE, autoplay: false, loop: true })
+  component.lifetimes.ready.call(component)
+  await cylWaitFor(() => component.events.some((e) => e.name === 'ready'))
+  const token = component.cylLoadToken
+  const movie = component.cylMovie
+  // [EN] A host re-renders and sets the same inputs: WeChat runs the observer anyway. [CN] 宿主重新渲染并设置相同输入：微信仍会运行 observer。
+  for (let i = 0; i < 5; i++) {
+    definition.observers['path, fit'].call(component, component.data.path, component.data.fit)
+  }
+  assert.strictEqual(component.cylLoadToken, token)
+  assert.strictEqual(component.cylMovie, movie)
+  component.cyl_playFromStart(0)
+  assert.strictEqual(component.cylPlaying, true)
+  // [EN] A new path still reloads. [CN] 新路径仍会重新加载。
+  component.data.path = CYL_FILE.replace('tab_home', 'tab_chat')
+  definition.observers['path, fit'].call(component, component.data.path, component.data.fit)
+  assert.strictEqual(component.cylLoadToken, token + 1)
+  component.lifetimes.detached.call(component)
+})
+
+test('after a failed load the same path loads again (bug B11)', async () => {
+  const { component, definition } = cylMakeComponent()
+  const broken = path.join(require('os').tmpdir(), 'cyl-broken-again.svga')
+  fs.writeFileSync(broken, Buffer.from([1, 2, 3, 4]))
+  Object.assign(component.data, { path: broken })
+  component.lifetimes.ready.call(component)
+  await cylWaitFor(() => component.events.some((e) => e.name === 'error'))
+  const token = component.cylLoadToken
+  definition.observers['path, fit'].call(component, component.data.path, component.data.fit)
+  assert.strictEqual(component.cylLoadToken, token + 1)
+})

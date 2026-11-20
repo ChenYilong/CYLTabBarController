@@ -16,7 +16,8 @@ const CYL_ICON_SIZE = '{24, 24}';
  * [CN] 以 data URL 表示的小 SVG（iOS 各行绘制的 SF Symbols：heart、heart.fill、plus.circle、plus.circle.fill）。
  */
 function cylSVG(body) {
-  return `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">${body}</svg>`)}`;
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">${body}</svg>`;
+  return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
 }
 const CYL_HEART_PATH = 'M12 20.5s-7.5-4.6-9.2-9.1C1.6 8.2 3.6 4.5 7.2 4.5c2 0 3.6 1.1 4.8 2.8 1.2-1.7 2.8-2.8 4.8-2.8 3.6 0 5.6 3.7 4.4 6.9-1.7 4.5-9.2 9.1-9.2 9.1z';
 const CYL_SYMBOLS = {
@@ -48,12 +49,13 @@ const CYL_ANIMATION_KEYS = ['CYLTabBarLottieURL', 'CYLTabBarLottieDarkURL', 'CYL
   'CYLTabBarAnimationFilePath', 'CYLTabBarGIFSize'];
 
 function cylIcon(attributes, image, selectedImage) {
-  const changed = Object.assign({}, attributes, {
+  const changed = {
+    ...attributes,
     CYLTabBarItemImage: image,
     CYLTabBarItemSelectedImage: selectedImage,
     CYLTabBarItemImageURLSize: CYL_ICON_SIZE,
     CYLTabBarItemIconRenderingMode: 'original',
-  });
+  };
   CYL_ANIMATION_KEYS.forEach((key) => delete changed[key]);
   return changed;
 }
@@ -110,7 +112,7 @@ function cylApplyUpdates(configuration, updates, appearance, translate) {
     items = items.map((attributes, index) => cylIcon(attributes, icons[index % icons.length][0], icons[index % icons.length][1]));
     if (plusButton) {
       const plusIcons = flags.allIcons === 'local' ? [CYL_SYMBOLS.plusCircle, CYL_SYMBOLS.plusCircleFill] : CYL_PLUS_NETWORK_ICONS;
-      plusButton = Object.assign({}, plusButton, { CYLTabBarItemImage: plusIcons[0], CYLTabBarItemSelectedImage: plusIcons[1] });
+      plusButton = { ...plusButton, CYLTabBarItemImage: plusIcons[0], CYLTabBarItemSelectedImage: plusIcons[1] };
     }
   }
   items = items.map((attributes, index) => {
@@ -128,25 +130,26 @@ function cylApplyUpdates(configuration, updates, appearance, translate) {
     }
     if (flags.changeTabTitle) {
       const title = translate('Purchased courses');
-      changed = Object.assign({}, changed, { CYLTabBarItemTitle: title, CYLTabBarItemSelectedTitle: title });
+      changed = { ...changed, CYLTabBarItemTitle: title, CYLTabBarItemSelectedTitle: title };
     }
     return changed;
   });
   if (flags.allTitles) {
-    items = items.map((attributes) => Object.assign({}, attributes, { CYLTabBarItemTitle: `★ ${translate(attributes.CYLTabBarItemTitle)}` }));
+    items = items.map((attributes) => ({ ...attributes, CYLTabBarItemTitle: `★ ${translate(attributes.CYLTabBarItemTitle)}` }));
     if (plusButton) {
-      plusButton = Object.assign({}, plusButton, { CYLTabBarItemTitle: `★ ${translate(plusButton.CYLTabBarItemTitle)}` });
+      plusButton = { ...plusButton, CYLTabBarItemTitle: `★ ${translate(plusButton.CYLTabBarItemTitle)}` };
     }
   }
-  const changed = Object.assign({}, configuration, {
+  const changed = {
+    ...configuration,
     CYLTabBarControllerTabBarItemsAttributes: items,
     CYLTabBarControllerPlusButton: plusButton,
-  });
+  };
   const theme = CYL_APPEARANCE_THEMES[appearance];
   if (theme) {
     const identifier = `appearance:${appearance}`;
     Object.assign(changed, {
-      CYLTabBarControllerThemes: Object.assign({}, configuration.CYLTabBarControllerThemes, { [identifier]: theme }),
+      CYLTabBarControllerThemes: { ...configuration.CYLTabBarControllerThemes, [identifier]: theme },
       CYLTabBarControllerThemeIdentifier: identifier,
       CYLTabBarControllerDarkThemeIdentifier: identifier,
     });

@@ -36,16 +36,16 @@
 		184F198E23F7E8A3002DBAE4 /* NextVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 184F198D23F7E8A3002DBAE4 /* NextVC.swift */; };
 		184F199023F7EE40002DBAE4 /* APPDelegate+Categories.swift in Sources */ = {isa = PBXBuildFile; fileRef = 184F198F23F7EE40002DBAE4 /* APPDelegate+Categories.swift */; };
 		4672768B00F7389B9E4E50F8 /* Pods_HealthyHome.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 49A270299539A5C33415EAAA /* Pods_HealthyHome.framework */; };
+		49365174AEC34770999D0F24 /* CYLDemoLocalization.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8D00E67FBEB6D1838DA68D0 /* CYLDemoLocalization.swift */; };
 		4D1BE67EE402613EB5A9BB00 /* Pods_HealthyHomeTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 95B70182D157AED1FB5147B7 /* Pods_HealthyHomeTests.framework */; };
 		61DAEAC8826B3FA13591202F /* green_lottie_tab_home.json in Resources */ = {isa = PBXBuildFile; fileRef = 4922A55212D47F955B7CC7B6 /* green_lottie_tab_home.json */; };
 		727E633E0971BFF96CD5500C /* green_lottie_tab_mine.json in Resources */ = {isa = PBXBuildFile; fileRef = 6E1E0ABEF12843137AA02521 /* green_lottie_tab_mine.json */; };
 		7E36C3D378B559F4FFC753C7 /* green_lottie_tab_discover.json in Resources */ = {isa = PBXBuildFile; fileRef = A593EAE45850977BFCF8C68A /* green_lottie_tab_discover.json */; };
+		88AE1B46DDCC8516A5858574 /* CYLDemo.bundle in Resources */ = {isa = PBXBuildFile; fileRef = DE71A09CFAF6B9F0BA5D4931 /* CYLDemo.bundle */; };
 		A520A43B0231F8A9A36D72A4 /* green_lottie_tab_news.json in Resources */ = {isa = PBXBuildFile; fileRef = 346F662B91D3859FF99D0822 /* green_lottie_tab_news.json */; };
 		C1A5CE0E2E00000000000003 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1A5CE0E2E00000000000004 /* SceneDelegate.swift */; };
 		E462EF3903016B48B7150636 /* Pods_HealthyHome_HealthyHomeUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 791B5EAC446039618D1575F4 /* Pods_HealthyHome_HealthyHomeUITests.framework */; };
 		F0D378B6FAC34A5E99CE238D /* CYLPlusButtonBadgeDemo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78BCD0BDB8E54748A466D7E9 /* CYLPlusButtonBadgeDemo.swift */; };
-		49365174AEC34770999D0F24 /* CYLDemoLocalization.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8D00E67FBEB6D1838DA68D0 /* CYLDemoLocalization.swift */; };
-		88AE1B46DDCC8516A5858574 /* CYLDemo.bundle in Resources */ = {isa = PBXBuildFile; fileRef = DE71A09CFAF6B9F0BA5D4931 /* CYLDemo.bundle */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -115,8 +115,8 @@
 		BB7EFE8FB9B45E33A24FDB92 /* Pods-HealthyHome.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HealthyHome.release.xcconfig"; path = "Target Support Files/Pods-HealthyHome/Pods-HealthyHome.release.xcconfig"; sourceTree = "<group>"; };
 		C1A5CE0E2E00000000000004 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		D496295660CB726F51EEFE39 /* Pods-HealthyHomeTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HealthyHomeTests.release.xcconfig"; path = "Target Support Files/Pods-HealthyHomeTests/Pods-HealthyHomeTests.release.xcconfig"; sourceTree = "<group>"; };
+		DE71A09CFAF6B9F0BA5D4931 /* CYLDemo.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; name = CYLDemo.bundle; path = "../Example-Shared/CYLDemo.bundle"; sourceTree = SOURCE_ROOT; };
 		E8D00E67FBEB6D1838DA68D0 /* CYLDemoLocalization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CYLDemoLocalization.swift; path = "../Example-Shared/CYLDemoLocalization.swift"; sourceTree = SOURCE_ROOT; };
-		DE71A09CFAF6B9F0BA5D4931 /* CYLDemo.bundle */ = {isa = PBXFileReference; lastKnownFileType = wrapper.plug-in; name = CYLDemo.bundle; path = "../Example-Shared/CYLDemo.bundle"; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -599,10 +599,12 @@
 			);
 			inputPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-HealthyHome/Pods-HealthyHome-resources.sh",
+				"${PODS_ROOT}/../../CYLTabBarController/CYLAnimatedItem/Resources/CYLAnimatedItem.bundle",
 				"${PODS_ROOT}/../../CYLTabBarController/Resources/CYLTabBarController.bundle",
 			);
 			name = "[CP] Copy Pods Resources";
 			outputPaths = (
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/CYLAnimatedItem.bundle",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/CYLTabBarController.bundle",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -617,10 +619,12 @@
 			);
 			inputPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-HealthyHome-HealthyHomeUITests/Pods-HealthyHome-HealthyHomeUITests-resources.sh",
+				"${PODS_ROOT}/../../CYLTabBarController/CYLAnimatedItem/Resources/CYLAnimatedItem.bundle",
 				"${PODS_ROOT}/../../CYLTabBarController/Resources/CYLTabBarController.bundle",
 			);
 			name = "[CP] Copy Pods Resources";
 			outputPaths = (
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/CYLAnimatedItem.bundle",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/CYLTabBarController.bundle",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -872,7 +876,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				INFOPLIST_FILE = HealthyHomeTests/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.HealthyHomeTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -890,7 +894,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				INFOPLIST_FILE = HealthyHomeTests/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.HealthyHomeTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";

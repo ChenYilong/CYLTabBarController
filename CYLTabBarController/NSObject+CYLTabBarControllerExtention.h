@@ -6,6 +6,8 @@
 //  Copyright © 2026 https://github.com/ChenYilong . All rights reserved.
 //
 
+// CYL-SWIFT-MIGRATION: objc-required — [EN] The KVO-safety category and `CYLCatchException()` catch Objective-C exceptions with `@try`, which Swift cannot do; implemented in NSObject+CYLTabBarControllerExtention.m, also marked (docs/Swift-Migration-Phase3.md).
+// [CN] Swift 无法替代的 Objective-C（原因见英文说明与 docs/Swift-Migration-Phase3.md）。
 #import <UIKit/UIKit.h>
 // [CN] FIX: issue #535 — shared with CYLBadgeView through CYLUtils. 通过 CYLUtils 与 CYLBadgeView 共用。
 // [EN] FIX: issue #535 — shared with CYLBadgeView through CYLUtils.

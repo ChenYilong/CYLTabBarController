@@ -7,8 +7,8 @@
  *      `npm run setup -- --animation=pag`）选择它，并记在 `.cyl-animation`（git 忽略）中；没有选择时使用 package.json
  *      的 "cylExampleAnimation"（Lottie）。每种动画都在自己的包中，因此主包只包含一个运行时及其图标。
  */
-const fs = require('fs')
-const path = require('path')
+const fs = require('node:fs')
+const path = require('node:path')
 
 const CYL_EXAMPLE = path.resolve(__dirname, '..')
 const CYL_CHOICE_FILE = path.join(CYL_EXAMPLE, '.cyl-animation')

@@ -11,13 +11,13 @@ interface CYLTabBarItemAnimationFailureHandling {
     /**
      * [EN] Called on the main thread with the animation view whose file failed. [CN] 在主线程调用，参数为文件加载失败的动画视图。
      */
-    fun cyl_animationViewDidFail(animationView: View)
+    fun cyl_animationViewDidFail(animationView: View) // NOSONAR: shipped API name, the cyl_ prefix is the project's rule
 
     /**
      * [EN] Called on the main thread when an animation view that was loading (a download) has its file: the host can
      *      now hide its static image or placeholder. [CN] 正在加载（下载）的动画视图拿到文件时在主线程调用：宿主此时可以隐藏静态图片或占位图。
      */
-    fun cyl_animationViewDidLoad(animationView: View) { /* [EN] Optional. [CN] 可选。 */ }
+    fun cyl_animationViewDidLoad(animationView: View) { /* [EN] Optional. [CN] 可选。 */ } // NOSONAR: shipped API name
 }
 
 /**

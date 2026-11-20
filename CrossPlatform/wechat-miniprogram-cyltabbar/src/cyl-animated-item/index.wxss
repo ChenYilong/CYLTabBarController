@@ -18,6 +18,26 @@
 .cyl-animated-item-vertical {
   flex-direction: column;
 }
+/* [EN] Embedded in a host that is the touch target (the tab bar item): no padding, no minimum size, fills the host.
+   [CN] 嵌入在作为触摸目标的宿主中（TabBar Item）：无内边距、无最小尺寸，填满宿主。 */
+.cyl-animated-item-bare {
+  display: flex;
+  min-height: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+}
+/* [EN] Tinting: the image is drawn outside the clipped box and its drop shadow lands in place (#787).
+   [CN] 着色：图片画在裁剪框外，投影落在原位（#787）。 */
+.cyl-animated-item-tint {
+  overflow: hidden;
+}
+.cyl-animated-item-tinted {
+  display: block;
+  width: 100%;
+  height: 100%;
+  transform: translateX(-200px);
+}
 .cyl-animated-item-disabled {
   opacity: 0.5;
 }
@@ -41,12 +61,24 @@
 }
 .cyl-animated-item-vertical .cyl-animated-item-title {
   margin-top: 2px;
+  /* [EN] Wrapped lines are centred under the icon. [CN] 换行后的每一行在图标下方居中。 */
+  text-align: center;
 }
 .cyl-animated-item-title {
   font-size: 14px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+/* [EN] titleLines 0 (no limit) or more than 1: wraps; more than 1 ends with an ellipsis after that many lines.
+   [CN] titleLines 为 0（不限）或大于 1：换行；大于 1 时超出行数以省略号结尾。 */
+.cyl-animated-item-title-wrap {
+  white-space: normal;
+  word-break: break-word;
+}
+.cyl-animated-item-title-clamp {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
 }
 .cyl-animated-item-accessory {
   display: flex;

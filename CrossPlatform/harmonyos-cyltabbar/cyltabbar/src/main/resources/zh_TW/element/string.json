@@ -293,6 +293,10 @@
       "value": "Rive Tab 圖示（設定檔）"
     },
     {
+      "name": "cyl_l10n_9d01c837b4bc",
+      "value": "Rive Tab 圖示：house.riv（數字輸入 Rooms）"
+    },
+    {
       "name": "cyl_l10n_f0c792c049bc",
       "value": "滾動一次"
     },
@@ -351,6 +355,14 @@
     {
       "name": "cyl_l10n_fee4a478923f",
       "value": "Tab 互動"
+    },
+    {
+      "name": "cyl_l10n_5ea7bf3d8e63",
+      "value": "Tab 圖示動畫循環播放：關"
+    },
+    {
+      "name": "cyl_l10n_918aff638366",
+      "value": "Tab 圖示動畫循環播放：開"
     },
     {
       "name": "cyl_l10n_98559580dcc7",
@@ -439,6 +451,10 @@
     {
       "name": "cyl_l10n_4abddd944c2e",
       "value": "harmonyos-liquid-glass-tabbar：頁籤膠囊、搜尋球與音樂列懸浮在彩色內容之上；捲動即可縮小"
+    },
+    {
+      "name": "cyl_l10n_3b4e07b5542e",
+      "value": "numberInput=Rooms：每次選中或再次點擊時 Rooms 變為下一個值（3、4、5、6）"
     },
     {
       "name": "cyl_l10n_f3f4ecf4a4a6",
@@ -615,6 +631,10 @@
     {
       "name": "cyl_l10n_758903c327de",
       "value": "目前頁面 Tab 顯示 GIF 動圖，再點一次還原"
+    },
+    {
+      "name": "cyl_l10n_56e6ecf97176",
+      "value": "循環播放"
     },
     {
       "name": "cyl_l10n_c7db6d4f1a42",

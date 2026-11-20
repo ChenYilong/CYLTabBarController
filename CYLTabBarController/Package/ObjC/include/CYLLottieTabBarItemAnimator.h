@@ -1,0 +1,1 @@
+../../../CYLTabBarItemAnimation/Lottie/CYLLottieTabBarItemAnimator.h

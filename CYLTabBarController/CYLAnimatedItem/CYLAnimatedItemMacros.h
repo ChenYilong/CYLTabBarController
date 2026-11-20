@@ -109,10 +109,11 @@
 #endif
 
 /*!
- * [EN] Runs `Stuff` without the performSelector-leaks warning and logs an exception instead of crashing. CYLTabBarController's
- *      `CYLUtilsMacros.h` defines the same macro with a localized message; the first definition wins.
- * [CN] 执行 `Stuff`，屏蔽 performSelector 泄漏警告，并在发生异常时记录日志而不是崩溃。CYLTabBarController 的 `CYLUtilsMacros.h`
- *      以本地化的日志定义同名宏；以先出现的定义为准。
+ * [EN] Runs `Stuff` without the performSelector-leaks warning and logs an exception instead of crashing. CYLTabBarController
+ *      uses this definition too (`CYLUtilsMacros.h` defines it only when the component is missing), so there is one
+ *      definition and no "ambiguous expansion of macro" warning across the two modules.
+ * [CN] 执行 `Stuff`，屏蔽 performSelector 泄漏警告，并在发生异常时记录日志而不是崩溃。CYLTabBarController 也使用这个定义
+ *      （`CYLUtilsMacros.h` 只在缺少组件时定义），因此只有一个定义，两个 module 之间不会出现 "ambiguous expansion of macro" 警告。
  */
 #ifndef CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS
 #define CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS(Stuff) \

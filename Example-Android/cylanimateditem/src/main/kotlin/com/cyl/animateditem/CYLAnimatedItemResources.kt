@@ -28,7 +28,7 @@ object CYLAnimatedItemResources {
 /**
  * [EN] `setTag` with a tag key found by name; a missing key (0) stores nothing. [CN] 以按名称查找的 key 调用 `setTag`；找不到 key（0）时不保存。
  */
-internal fun android.view.View.cyl_setTag(name: String, value: Any?) {
+internal fun android.view.View.cyl_setTag(name: String, value: Any?) { // NOSONAR: the cyl_ prefix is the project's naming rule
     val key = CYLAnimatedItemResources.id(context, name)
     if (key != 0) setTag(key, value)
 }
@@ -36,7 +36,7 @@ internal fun android.view.View.cyl_setTag(name: String, value: Any?) {
 /**
  * [EN] `getTag` with a tag key found by name. [CN] 以按名称查找的 key 调用 `getTag`。
  */
-internal fun android.view.View.cyl_getTag(name: String): Any? {
+internal fun android.view.View.cyl_getTag(name: String): Any? { // NOSONAR: the cyl_ prefix is the project's naming rule
     val key = CYLAnimatedItemResources.id(context, name)
     return if (key != 0) getTag(key) else null
 }

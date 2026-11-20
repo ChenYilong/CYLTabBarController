@@ -16,7 +16,6 @@ NS_ASSUME_NONNULL_BEGIN
  * [CN] `_CYLFlatDesignTabBarParallaxOverlayView` 在 Swift 中实现（`Swift/CYLFlatDesignTabBarHideTabBar.swift`，docs/Swift-Migration.md，第 47 步）；Objective-C 调用方从下方
  *      导入的 Swift 生成接口获得其声明。
  */
-@class _CYLFlatDesignTabBarParallaxOverlayView;
 
 NS_ASSUME_NONNULL_END
 

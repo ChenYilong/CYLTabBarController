@@ -28,8 +28,8 @@ function cylPushedPage() {
       const bar = options.bar || '';
       let configuration = null;
       if (bar) {
-        configuration = cylDemoConfiguration(Object.assign({}, getApp().globalData.cylTabBarState.overrides,
-          { cylDemoIcons: 'images' }, bar === 'other' ? { cylDemoPlusAttributes: CYL_OTHER_PLUS } : {}));
+        configuration = cylDemoConfiguration({ ...getApp().globalData.cylTabBarState.overrides,
+          cylDemoIcons: 'images', ...(bar === 'other' ? { cylDemoPlusAttributes: CYL_OTHER_PLUS } : {}) });
       }
       this.setData({
         color: CYL_PUSHED_COLORS[options.color] || CYL_PUSHED_COLORS.orange,

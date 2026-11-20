@@ -23,8 +23,8 @@
  *        normal、默认皮肤 + 状态、默认 normal）。
  *      修改 Example-Shared 后运行：`node scripts/cyl_sync_shared.js`；`--check` 在副本过期时以 1 退出。
  */
-const fs = require('fs');
-const path = require('path');
+const fs = require('node:fs');
+const path = require('node:path');
 
 const CYL_COMPONENT_ROOT = path.resolve(__dirname, '..');
 const CYL_REPOSITORY_ROOT = path.resolve(CYL_COMPONENT_ROOT, '..', '..', '..');
@@ -70,7 +70,7 @@ function cylRunPython(execFileSync, args) {
   // [CN] macOS / Linux 有 python3；Windows 往往只有 `python` 或 `py` 启动器，其 `python3` 可能是会失败的应用商店占位程序。
   //      强制 UTF-8 输出，避免 Windows 控制台编码损坏中文。
   const candidates = [['python3', []], ['python', []], ['py', ['-3']]];
-  const env = Object.assign({}, process.env, { PYTHONIOENCODING: 'utf-8', PYTHONUTF8: '1' });
+  const env = { ...process.env, PYTHONIOENCODING: 'utf-8', PYTHONUTF8: '1' };
   let lastError;
   for (const [command, prefix] of candidates) {
     try {
@@ -79,7 +79,7 @@ function cylRunPython(execFileSync, args) {
       lastError = error;
     }
   }
-  throw new Error(`Python 3 is required to read scripts/sync-example-shared.py (tried python3, python, py -3): ${lastError && lastError.message}`);
+  throw new Error(`Python 3 is required to read scripts/sync-example-shared.py (tried python3, python, py -3): ${lastError?.message}`);
 }
 
 /**
@@ -90,7 +90,7 @@ function cylRunPython(execFileSync, args) {
  *      scripts/sync-example-shared.py 的 strings_source()（所有示例共用一个翻译器）。
  */
 function cylDemoListSource() {
-  const { execFileSync } = require('child_process');
+  const { execFileSync } = require('node:child_process');
   const list = JSON.parse(fs.readFileSync(path.join(CYL_REPOSITORY_ROOT, 'Example-Shared', 'DemoList', 'demo-list.json'), 'utf8'));
   const script = 'import importlib.util, sys\n'
     + 'spec = importlib.util.spec_from_file_location("cyl_sync", sys.argv[1])\n'
@@ -445,7 +445,7 @@ function cylSameContent(current, expected) {
   if (current.includes(0) || buffer.includes(0)) {
     return false;
   }
-  return current.toString('utf8').replace(/\r\n/g, '\n') === buffer.toString('utf8').replace(/\r\n/g, '\n');
+  return current.toString('utf8').replaceAll('\r\n', '\n') === buffer.toString('utf8').replaceAll('\r\n', '\n');
 }
 
 function cylKeepLineEnds(current, expected) {

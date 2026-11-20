@@ -16,7 +16,7 @@ const CYL_PROPERTIES = ['title', 'image', 'selectedImage', 'index', 'titlePositi
   'imageInsets', 'lottieFilePath', 'lottieURL', 'lottieSizeValue', 'enabled', 'selected', 'badgeValue', 'badgeColor',
   'badgeSize', 'badgeContentInset', 'badgePositionAdjustment', 'badgeAnimation', 'layoutCentered', 'backgroundColor',
   'selectedBackgroundColor', 'titleTextAttributes', 'badgeTextAttributes', 'standardAppearance', 'animationPath',
-  'animationSize', 'imageSize', 'iconTint', 'selectedIconTint', 'label', 'animationColors', 'loopsWhenUnselected',
+  'animationSize', 'imageSize', 'iconTint', 'selectedIconTint', 'animationTint', 'label', 'animationColors', 'loopsWhenUnselected',
   'animationClass', 'animationDuration', 'itemStyle', 'glassLensStyle', 'isDark', 'animationSpeed', 'animationLoop'];
 
 Component({
@@ -87,6 +87,11 @@ Component({
     iconTint: { type: String, value: '' },
     /** [EN] The selected icon tint (CYLTabBarItemSelectedIconColor). [CN] 选中图标着色。 */
     selectedIconTint: { type: String, value: '' },
+    /**
+     * [EN] The animation's one color (the `tint` option): "title" (this state's title color), a color, or '' for none.
+     * [CN] 动画的单一颜色（`tint` 选项）："title"（当前状态的标题颜色）、颜色，或 '' 表示不着色。
+     */
+    animationTint: { type: String, value: '' },
     /** [EN] The accessibility label (default: the title, with the badge). [CN] 无障碍标签（默认：标题与角标）。 */
     label: { type: String, value: '' },
     /** [EN] The tap animation class name (CYLTabBarControllerTabButtonTapAnimation). [CN] 点击动画类名。 */
@@ -136,11 +141,11 @@ Component({
 
   methods: {
     cyl_update() {
-      const properties = Object.assign({}, this.data);
+      const properties = { ...this.data };
       ['title', 'badge'].forEach((kind) => {
-        const set = this.cylAttributes && this.cylAttributes[kind];
+        const set = this.cylAttributes?.[kind];
         if (set && Object.keys(set).length > 0) {
-          properties[`${kind}TextAttributes`] = Object.assign({}, properties[`${kind}TextAttributes`] || {}, set);
+          properties[`${kind}TextAttributes`] = { ...properties[`${kind}TextAttributes`], ...set };
         }
       });
       const model = cylItemModel(properties);
@@ -173,7 +178,7 @@ Component({
     /** [EN] `-titleTextAttributesForState:`. [CN] 返回指定状态的标题文字属性。 */
     cyl_titleTextAttributesForState(state) {
       const key = cylStateKey(state);
-      return this.cylAttributes.title[key] || (this.data.titleTextAttributes || {})[key] || null;
+      return this.cylAttributes.title[key] || this.data.titleTextAttributes?.[key] || null;
     },
 
     /** [EN] `-setBadgeTextAttributes:forState:`. [CN] 设置指定状态的角标文字属性。 */
@@ -185,7 +190,7 @@ Component({
     /** [EN] `-badgeTextAttributesForState:`. [CN] 返回指定状态的角标文字属性。 */
     cyl_badgeTextAttributesForState(state) {
       const key = cylStateKey(state);
-      return this.cylAttributes.badge[key] || (this.data.badgeTextAttributes || {})[key] || null;
+      return this.cylAttributes.badge[key] || this.data.badgeTextAttributes?.[key] || null;
     },
 
     /**
@@ -209,9 +214,11 @@ Component({
       return owner && typeof owner.cyl_selectAdjacent === 'function' ? owner : null;
     },
 
-    /** [EN] The animation component (cyl-lottie, cyl-pag or cyl-rive), or null. [CN] 动画组件，没有时为 null。 */
+    /**
+     * [EN] The icon component (cyl-animated-item), which plays and stops its engine view. [CN] 图标组件（cyl-animated-item），由它播放与停止引擎视图。
+     */
     cyl_animationView() {
-      return this.selectComponent('#cyl-item-animation');
+      return this.selectComponent('#cyl-item-icon');
     },
 
     /**

@@ -73,14 +73,14 @@ extension UINavigationController {
         cylflatdesignState.extensionDelegate.map { unsafeBitCast($0, to: CYLFlatDesignNavigationExtensionDelegate.self) }
     }
 
-    @objc(cylflatdesign_customPopGestureRecognizer)
-    func cylflatdesignCustomPopGestureRecognizer() -> UIGestureRecognizer? {
-        cylflatdesignState.customPopGestureRecognizer
-    }
-
-    @objc(cylflatdesign_setCustomPopGestureRecognizer:)
-    func cylflatdesignSetCustomPopGestureRecognizer(_ recognizer: UIGestureRecognizer?) {
-        cylflatdesignState.customPopGestureRecognizer = recognizer
+    /**
+     [EN] The pop gesture recognizer used instead of the system one (public Swift since step 117; it was declared in
+          UINavigationController+CYLFlatDesignTabBarPrivate.h).
+     [CN] 代替系统返回手势的识别器（自第 117 步起为公开的 Swift 属性；原声明在 UINavigationController+CYLFlatDesignTabBarPrivate.h）。
+     */
+    @objc public var cylflatdesign_customPopGestureRecognizer: UIGestureRecognizer? {
+        @objc(cylflatdesign_customPopGestureRecognizer) get { cylflatdesignState.customPopGestureRecognizer }
+        @objc(cylflatdesign_setCustomPopGestureRecognizer:) set { cylflatdesignState.customPopGestureRecognizer = newValue }
     }
 
     // MARK: Hook
@@ -92,7 +92,7 @@ extension UINavigationController {
      *      由 CYLFlatDesignTabBar 调用，因此只有扁平样式会安装。
      */
     @objc(cyl_navigationBarActionHook)
-    class func cylNavigationBarActionHook() {
+    public class func cyl_navigationBarActionHook() {
         _ = cylflatdesignHookInstalled
     }
 
@@ -298,4 +298,36 @@ extension UINavigationController {
         let height = (contentView?.frame.maxY ?? 0) + view.safeAreaInsets.top
         cylflatdesignExtensionDelegate?.navigationController?(self, navigationBarDidChangeHeight: height)
     }
+}
+
+/**
+ [EN] The callbacks of a navigation controller's transitions to the FlatDesign tab bar controller. Swift since step 117 (it was
+      declared in UINavigationController+CYLFlatDesignTabBarPrivate.h); kept under its name for source compatibility, the
+      library itself uses `CYLFlatDesignNavigationExtensionDelegate`.
+ [CN] 导航控制器转场回调给扁平样式 TabBarController 的协议。自第 117 步起为 Swift（原声明在 UINavigationController+CYLFlatDesignTabBarPrivate.h 中）；
+      为保持源码兼容保留此名称，库内部使用 `CYLFlatDesignNavigationExtensionDelegate`。
+ */
+@objc public protocol UINavigationControllerExtensionDelegate: NSObjectProtocol {
+    @objc(cylflatdesign_navigationController:navigationBarDidChangeHeight:)
+    func cylflatdesign_navigationController(_ navigationController: UINavigationController, navigationBarDidChangeHeight height: CGFloat)
+
+    @objc(cylflatdesign_navigationController:didBeginTransitionFrom:to:operation:)
+    func cylflatdesign_navigationController(_ navigationController: UINavigationController, didBeginTransitionFrom fromVC: UIViewController?,
+                                            to toVC: UIViewController?, operation: UINavigationController.Operation)
+
+    @objc(cylflatdesign_navigationController:didUpdateInteractiveFrom:to:percentComplete:)
+    func cylflatdesign_navigationController(_ navigationController: UINavigationController, didUpdateInteractiveFrom fromVC: UIViewController?,
+                                            to toVC: UIViewController?, percentComplete: CGFloat)
+
+    @objc(cylflatdesign_navigationController:didUpdateInteractiveFrom:to:popGestureRecognizer:)
+    func cylflatdesign_navigationController(_ navigationController: UINavigationController, didUpdateInteractiveFrom fromVC: UIViewController?,
+                                            to toVC: UIViewController?, popGestureRecognizer: UIGestureRecognizer)
+
+    @objc(cylflatdesign_navigationController:willEndTransitionFrom:to:operation:cancelled:)
+    func cylflatdesign_navigationController(_ navigationController: UINavigationController, willEndTransitionFrom fromVC: UIViewController?,
+                                            to toVC: UIViewController?, operation: UINavigationController.Operation, cancelled: Bool)
+
+    @objc(cylflatdesign_navigationController:didEndTransitionFrom:to:operation:cancelled:)
+    func cylflatdesign_navigationController(_ navigationController: UINavigationController, didEndTransitionFrom fromVC: UIViewController?,
+                                            to toVC: UIViewController?, operation: UINavigationController.Operation, cancelled: Bool)
 }

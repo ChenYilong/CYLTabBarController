@@ -24,7 +24,6 @@ extension NSObject {
      * [CN] 该属性是弱引用：保存弱引用盒子，而不是直接持有 TabBarController。强引用会产生循环引用（TabBarController -> 子控制器 -> TabBarController），
      *      导致整个 FlatDesign Tab 树在 pop 之后永远不会释放（#661）。
      */
-    @objc(cylflatdesign_setTabBarController:)
     func cylFlatDesignSetTabBarController(_ tabBarController: UIViewController?) {
         let key = CYLUtilsKeys.key("cylflatdesign_tabBarController")
         cyl_setWeakAssociatedObject(tabBarController, forKey: key)
@@ -41,11 +40,16 @@ extension NSObject {
      *      （调用方依此判断是否在其中）。
      */
     @objc(cylflatdesign_tabBarController)
+    public var cylflatdesign_tabBarController: UIViewController? {
+        @objc(cylflatdesign_tabBarController) get { cylFlatDesignTabBarController() }
+        @objc(cylflatdesign_setTabBarController:) set { cylFlatDesignSetTabBarController(newValue) }
+    }
+
     func cylFlatDesignTabBarController() -> UIViewController? {
         if let reference = cyl_weakAssociatedObject(forKey: CYLUtilsKeys.key("cylflatdesign_tabBarController")) as? UIViewController {
             return reference
         }
-        return cylTabBarController(matching: { $0.tabBarStyleType == .flatDesign }, fallsBackToActive: false)
+        return cyl_tabBarController(matching: { $0.tabBarStyleType == .flatDesign }, fallsBackToActive: false)
     }
 
     @objc(cyl_nearestParentViewControllerThatIsKindOf:)

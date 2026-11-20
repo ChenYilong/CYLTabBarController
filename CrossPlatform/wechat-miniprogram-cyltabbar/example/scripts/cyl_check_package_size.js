@@ -8,8 +8,8 @@
  *      2 MB。打印大小；带 `--check` 时超出限制则以 1 退出。示例一次只安装一个动画库（`npm run setup -- --animation=…`），
  *      因此每个库单独测量：setup 之后运行 `npm run check` 检查已安装的那个。
  */
-const fs = require('fs')
-const path = require('path')
+const fs = require('node:fs')
+const path = require('node:path')
 
 const CYL_LIMIT = 2 * 1024 * 1024
 const CYL_ROOT = path.resolve(__dirname, '..', 'miniprogram')

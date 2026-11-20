@@ -19,7 +19,6 @@
 
 #import <UIKit/UIKit.h>
 
-@class CYLTabBarController;
 
 NS_ASSUME_NONNULL_BEGIN
 

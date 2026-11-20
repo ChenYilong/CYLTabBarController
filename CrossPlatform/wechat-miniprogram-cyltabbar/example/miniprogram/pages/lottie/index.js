@@ -10,6 +10,18 @@ const { cylInstalledAnimation, cylAvailableAnimationFiles } = require('../../uti
 
 const CYL_FILES = ['green_lottie_tab_home', 'green_lottie_tab_discover', 'green_lottie_tab_mine'];
 
+/**
+ * [EN] With Rive installed, the files and their options (docs/Animated-Item.md, the Rive loop): an icons.riv tab icon (a boolean
+ *      input) and house.riv, whose state machine moves only when its NUMBER input `Rooms` changes, so each play sets the
+ *      next of 3, 4, 5, 6 (`numberInput`, `values`).
+ * [CN] 安装 Rive 时的文件及其选项（docs/Animated-Item.md，Rive 循环）：icons.riv 的一个 Tab 图标（布尔输入），以及 house.riv：其状态机只在 NUMBER 输入
+ *      `Rooms` 变化时运动，因此每次播放设置 3、4、5、6 中的下一个（`numberInput`、`values`）。
+ */
+const CYL_RIVE_FILES = [
+  { name: 'icons.riv · CHAT', file: 'icons.riv.bin', fragment: 'artboard=CHAT&stateMachine=CHAT_Interactivity&input=active' },
+  { name: 'house.riv · Rooms', file: 'house.riv.bin', fragment: 'stateMachine=State%20Machine%201&numberInput=Rooms&values=3,4,5,6' },
+];
+
 Page({
   data: {
     texts: {},
@@ -29,6 +41,16 @@ Page({
     // [EN] The files of the installed package: Lottie (cyl-lottie) or, with PAG installed, the PAG icons (cyl-pag).
     // [CN] 已安装包的文件：Lottie（cyl-lottie），或安装 PAG 时的 PAG 图标（cyl-pag）。
     this.cylPAGFiles = cylInstalledAnimation() === 'pag' ? cylAvailableAnimationFiles() : [];
+    if (cylInstalledAnimation() === 'rive') {
+      const available = cylAvailableAnimationFiles();
+      this.cylRiveFiles = CYL_RIVE_FILES.map((entry) => {
+        const file = available.find((candidate) => candidate.endsWith(`/${entry.file}`));
+        return file ? { name: entry.name, path: `${file}#${entry.fragment}` } : null;
+      }).filter(Boolean);
+      if (this.cylRiveFiles.length) {
+        this.setData({ files: this.cylRiveFiles.map((entry) => entry.name), file: this.cylRiveFiles[0].name, path: this.cylRiveFiles[0].path, isRive: true });
+      }
+    }
     if (this.cylPAGFiles.length) {
       const names = this.cylPAGFiles.map((file) => file.split('/').pop().replace(/\.bin$/, ''));
       this.setData({ files: names, file: names[0], path: this.cylPAGFiles[0], isPAG: true });
@@ -45,11 +67,23 @@ Page({
   },
   cyl_file(event) {
     const file = event.currentTarget.dataset.value;
+    const rive = (this.cylRiveFiles || []).find((entry) => entry.name === file);
+    if (rive) {
+      this.setData({ file, path: rive.path });
+      return;
+    }
     const pag = this.cylPAGFiles.find((candidate) => candidate.endsWith(`/${file}.bin`));
     this.setData({ file, path: pag || `/shared/lottie/${file}.json`, isPAG: Boolean(pag) });
   },
   cyl_play() {
-    this.cyl_lottie().cyl_play();
+    // [EN] cyl-rive's cyl_play only resumes; a play from the start sets the next Rooms value of house.riv.
+    // [CN] cyl-rive 的 cyl_play 只是继续播放；从头播放才会设置 house.riv 的下一个 Rooms 值。
+    const view = this.cyl_lottie();
+    if (this.data.isRive && typeof view.cyl_playFromStart === 'function') {
+      view.cyl_playFromStart();
+    } else {
+      view.cyl_play();
+    }
   },
   cyl_pause() {
     this.cyl_lottie().cyl_pause();
@@ -74,7 +108,7 @@ Page({
     wx.setClipboardData({ data: String(event.currentTarget.dataset.value) });
   },
   cyl_event(event) {
-    const message = event.detail && event.detail.message ? `: ${event.detail.message}` : '';
+    const message = event.detail?.message ? `: ${event.detail.message}` : '';
     const events = [`${event.type}${message}`].concat(this.data.events).slice(0, 4);
     this.setData({ events });
   },

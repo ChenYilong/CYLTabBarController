@@ -26,7 +26,7 @@ function cylRun(command, args, env) {
   const shell = process.platform === 'win32' && /\.(bat|cmd)$/i.test(command);
   const quote = (text) => (shell ? `"${text}"` : text);
   return spawnSync(quote(command), args.map(quote), {
-    cwd: CYL_ROOT, stdio: 'inherit', shell, env: Object.assign({}, process.env, env),
+    cwd: CYL_ROOT, stdio: 'inherit', shell, env: { ...process.env, ...env },
   }).status;
 }
 

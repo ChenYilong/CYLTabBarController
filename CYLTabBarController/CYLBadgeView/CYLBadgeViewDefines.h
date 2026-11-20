@@ -43,15 +43,11 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /*!
- * [EN] The animation a badge plays for `animationType`, sized for a badge of `badgeSize`; nil for
- *      `CYLBadgeAnimationTypeNone`. Add it with the key `CYLBadgeAnimationKeyForType(animationType)`. Shared by the
- *      library's badges (`-[UIView cyl_beginAnimation]`) and the system badge of a bar button item on iOS 26+; private to
- *      CYLBadgeView, not public API.
- * [CN] 角标在 `animationType` 下播放的动画，按 `badgeSize` 计算幅度；`CYLBadgeAnimationTypeNone` 时为 nil。使用
- *      `CYLBadgeAnimationKeyForType(animationType)` 作为 key 添加。由本库角标（`-[UIView cyl_beginAnimation]`）与 iOS 26+ 上
- *      bar button item 的系统角标共用；仅供 CYLBadgeView 内部使用，不是公开 API。
+ * [EN] `CYLBadgeAnimationForType()` is Swift since docs/Swift-Migration.md step 115 (phase ③, group A of docs/Swift-Migration-Phase3.md): Objective-C
+ *      sees it through the generated Swift interface (`CYLSwiftInterface.h`), with the same names.
+ * [CN] `CYLBadgeAnimationForType()` is 自第 115 步（第 ③ 阶段 A 组）起为 Swift：Objective-C 通过生成的 Swift 接口（`CYLSwiftInterface.h`）看到它，名称不变。
  */
-FOUNDATION_EXTERN CAAnimation *_Nullable CYLBadgeAnimationForType(CYLBadgeAnimationType animationType, CGSize badgeSize);
+
 
 NS_ASSUME_NONNULL_END
 

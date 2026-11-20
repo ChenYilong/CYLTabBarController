@@ -8,6 +8,15 @@
 
 import UIKit
 
+/**
+ [EN] Posted with the item as its object whenever a shown value of a `CYLFlatDesignTabBarItem` changes. Swift since
+      docs/Swift-Migration.md step 118 (it was the only content of CYLFlatDesignTabBar.m); Objective-C reads the same string
+      through the macro of CYLFlatDesignTabBarItem.h.
+ [CN] `CYLFlatDesignTabBarItem` 显示的值每次变化时发送，object 为该 item。自第 118 步起为 Swift（原为 CYLFlatDesignTabBar.m 的唯一内容）；
+      Objective-C 通过 CYLFlatDesignTabBarItem.h 中的宏读取同一字符串。
+ */
+public let CYLFlatDesignTabBarItemDidChange = "CYLFlatDesignTabBarItemDidChange"
+
 // [EN] The item of a FlatDesign tab, translated from Objective-C together with its button (docs/Swift-Migration.md,
 //      step 49): each interface names the other. Objective-C names, selectors and Swift names are kept;
 //      `CYLFlatDesignTabBarItemDidChange` stays a C constant (defined in CYLFlatDesignTabBar.m).
@@ -29,7 +38,22 @@ open class CYLFlatDesignTabBarItem: NSObject {
      * [EN] The button that shows this item; set by the button.
      * [CN] 显示本 item 的按钮；由按钮设置。
      */
-    @objc open var tabBarButton: CYLFlatDesignTabBarButton?
+    @objc open var tabBarButton: CYLFlatDesignTabBarButton? {
+        didSet { cyl_linkSystemTabBarItem() }
+    }
+
+    /// [EN] Makes this item's button the system item's button (`UITabBarItem.cyl_replacementTabButton`), so a badge set on the
+    ///      page's `tabBarItem` reaches the visible FlatDesign button instead of UIKit's hidden one. Runs when the button or
+    ///      the page is set, whichever comes last.
+    /// [CN] 把本 item 的按钮设为系统 item 的按钮（`UITabBarItem.cyl_replacementTabButton`），使设置在页面 `tabBarItem` 上的角标到达可见的扁平样式
+    ///      按钮，而不是 UIKit 隐藏的按钮。在设置按钮或页面时运行，以后设置的一方为准。
+    private func cyl_linkSystemTabBarItem() {
+        guard let button = tabBarButton, let page = childViewController else { return }
+        page.tabBarItem?.cyl_replacementTabButton = button
+        if let navigation = page as? UINavigationController, let root = navigation.viewControllers.first {
+            root.tabBarItem?.cyl_replacementTabButton = button
+        }
+    }
 
     // MARK: - [EN] Properties of the system UITabBarItem [CN] 系统 UITabBarItem 有的属性
 
@@ -88,7 +112,10 @@ open class CYLFlatDesignTabBarItem: NSObject {
      *      so tab child controllers were never released after being popped. Changed to weak.
      */
     @objc open weak var childViewController: UIViewController? {
-        didSet { childViewController?.cylflatdesign_tabBarController = cylflatdesign_tabBarController }
+        didSet {
+            childViewController?.cylflatdesign_tabBarController = cylflatdesign_tabBarController
+            cyl_linkSystemTabBarItem()
+        }
     }
 
     /**

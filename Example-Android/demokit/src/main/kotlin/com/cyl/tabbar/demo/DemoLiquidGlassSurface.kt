@@ -28,7 +28,7 @@ object DemoLiquidGlassSurface {
         val density = context.resources.displayMetrics.density
         val padding = (20 * density).toInt()
         val label = TextView(context).apply { textSize = 15f }
-        fun update() { label.text = "Surface opacity: ${"%.2f".format(bar.cyl_liquidGlassSurfaceOpacity)} (default 0.40)" }
+        fun update() { label.text = cylDemoText("Surface opacity: %@ (default 0.40)", "%.2f".format(bar.cyl_liquidGlassSurfaceOpacity)) }
         update()
         val slider = SeekBar(context).apply {
             max = STEPS
@@ -43,7 +43,7 @@ object DemoLiquidGlassSurface {
             })
         }
         val reset = TextView(context).apply {
-            text = "Reset to 0.40"
+            text = cylDemoText("Reset to 0.40")
             setTextColor(Color.rgb(0, 122, 255))
             setPadding(0, padding / 2, 0, 0)
             setOnClickListener { slider.progress = (0.4f * STEPS).toInt() }

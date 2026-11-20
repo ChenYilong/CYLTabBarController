@@ -15,7 +15,7 @@ function cylRead(key, fallback) {
   try {
     const value = wx.getStorageSync(key);
     return value === '' || value === undefined ? fallback : value;
-  } catch (error) {
+  } catch {
     return fallback;
   }
 }
@@ -81,7 +81,7 @@ App({
     try {
       const info = typeof wx.getAppBaseInfo === 'function' ? wx.getAppBaseInfo() : wx.getSystemInfoSync();
       state.systemTheme = info.theme === 'dark' ? 'dark' : 'light';
-    } catch (error) {
+    } catch {
       state.systemTheme = 'light';
     }
     if (typeof wx.onThemeChange === 'function') {
@@ -175,10 +175,10 @@ App({
     if (!covers.home) {
       return;
     }
-    this.cyl_updateTabBarState({ covers: Object.assign({}, covers, { home: null }) });
+    this.cyl_updateTabBarState({ covers: { ...covers, home: null } });
     clearTimeout(this.cylCoverTimer);
     this.cylCoverTimer = setTimeout(() => {
-      this.cyl_updateTabBarState({ covers: Object.assign({}, this.globalData.cylTabBarState.covers, { home: covers.home }) });
+      this.cyl_updateTabBarState({ covers: { ...this.globalData.cylTabBarState.covers, home: covers.home } });
     }, delay);
   },
 
@@ -217,7 +217,7 @@ App({
     if ('loggedIn' in change && change.loggedIn !== this.globalData.cylTabBarState.loggedIn) {
       cylWrite(CYL_LOGGED_IN_KEY, Boolean(change.loggedIn));
     }
-    this.globalData.cylTabBarState = Object.assign({}, this.globalData.cylTabBarState, change);
+    this.globalData.cylTabBarState = { ...this.globalData.cylTabBarState, ...change };
     this.cylListeners.forEach((listener) => listener(this.globalData.cylTabBarState));
   },
 

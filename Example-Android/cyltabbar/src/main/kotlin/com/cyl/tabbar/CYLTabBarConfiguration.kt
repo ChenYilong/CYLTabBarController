@@ -65,6 +65,42 @@ object CYLTabBarConfiguration {
         }
     }
 
+    /**
+     * [EN] An image of a configuration or manifest: an app asset ("asset:Skins/2.1.0/light/home@3x.png", or an asset name with a folder, the forms
+     *      manifests and resource routes produce) is read by the library, at the density of its @2x / @3x suffix; any other name goes to
+     *      `imageResolver`. So an app resolver (e.g. one that maps "system:" names) does not have to know asset paths.
+     * [CN] 配置或清单中的图片：App asset（"asset:Skins/2.1.0/light/home@3x.png"，清单与资源路由生成的形式）由库读取，并按 @2x / @3x 后缀设置
+     *      密度；其他名称交给 `imageResolver`。因此 App 的解析器（例如映射 "system:" 名称的解析器）无需了解 asset 路径。
+     */
+    @JvmStatic
+    fun drawable(context: Context, name: String): Drawable? {
+        if (name.startsWith(CYLResourceRoute.ASSET_PREFIX)) {
+            assetDrawable(context, name.removePrefix(CYLResourceRoute.ASSET_PREFIX))?.let { return it }
+        } else if ('/' in name && !name.contains("://") && !File(name).exists()) {
+            // [EN] An asset name with a folder (what a manifest gives `CYLTabBarController`, e.g. "Skins/2.1.0/light/home@3x.png").
+            // [CN] 带目录的 asset 名称（清单交给 `CYLTabBarController` 的形式，例如 "Skins/2.1.0/light/home@3x.png"）。
+            assetDrawable(context, name)?.let { return it }
+        }
+        return imageResolver.drawable(context, name)
+    }
+
+    /** [EN] The density (dpi) of an image file from its @2x / @3x suffix. [CN] 根据 @2x / @3x 后缀得到图片文件的密度（dpi）。 */
+    internal fun densityOfImageName(path: String): Int {
+        val scale = Regex("@(\\d)x\\.[A-Za-z]+$").find(path)?.groupValues?.get(1)?.toIntOrNull() ?: 1
+        return android.util.DisplayMetrics.DENSITY_MEDIUM * scale
+    }
+
+    private fun assetDrawable(context: Context, path: String): Drawable? = runCatching {
+        context.assets.open(path).use { stream ->
+            val options = android.graphics.BitmapFactory.Options().apply {
+                inDensity = densityOfImageName(path)
+                inTargetDensity = context.resources.displayMetrics.densityDpi
+                inScaled = true
+            }
+            android.graphics.BitmapFactory.decodeStream(stream, null, options)?.let { android.graphics.drawable.BitmapDrawable(context.resources, it) }
+        }
+    }.getOrNull()
+
     const val maximumFileSize = 5 * 1024 * 1024
 
     /**

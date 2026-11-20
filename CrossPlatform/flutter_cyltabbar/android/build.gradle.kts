@@ -9,7 +9,7 @@ buildscript {
     }
 
     dependencies {
-        classpath("com.android.tools.build:gradle:9.1.0")
+        classpath("com.android.tools.build:gradle:9.1.1")
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion")
     }
 }
@@ -33,6 +33,24 @@ plugins {
 val cylAndroidRoot = file(findProperty("cylAndroidRoot") ?: "$projectDir/../../../Example-Android")
 val cylUseLocalSources = File(cylAndroidRoot, "cyltabbar/src/main/kotlin").exists()
 val cylAndroidVersion = findProperty("cylAndroidVersion") ?: "1.100.0"
+// [EN] An app whose build already has the :cylanimateditem module (e.g. through another library built on it, such as
+//      CollectionViewClassifyMenu) uses that module instead of compiling its sources here: compiling them as well put
+//      the component in the app twice ("2 files found with path 'META-INF/cylanimateditem/LICENSE'", then duplicate
+//      classes), bug B9 in docs/Animated-Item.md.
+// [CN] 构建中已有 :cylanimateditem 模块的 App（例如通过基于它的其他库，如 CollectionViewClassifyMenu）使用该模块，而不在这里编译其源码：
+//      两者都有会让组件在 App 中出现两份（"2 files found with path 'META-INF/cylanimateditem/LICENSE'"，然后是重复的类），见 docs/Animated-Item.md 问题 B9。
+val cylAnimatedItemModule = rootProject.findProject(":cylanimateditem")
+// [EN] Or an included build that has it (its dependency substitution maps the published coordinate to that project).
+// [CN] 或者包含它的 included build（其依赖替换会把发布坐标映射到该项目）。
+// [EN] Found by its folder at the included build's root or by its settings file declaring ":cylanimateditem" (a
+//      projectDir mapped elsewhere); or the app says so: `cylAnimatedItemProvided=true` in gradle.properties.
+// [CN] 通过 included build 根目录下的文件夹，或其 settings 文件声明 ":cylanimateditem"（projectDir 指向别处）判断；或由 App 指定：
+//      gradle.properties 中的 `cylAnimatedItemProvided=true`。
+val cylAnimatedItemIncluded = findProperty("cylAnimatedItemProvided")?.toString() == "true" || gradle.includedBuilds.any { build ->
+    File(build.projectDir, "cylanimateditem").isDirectory ||
+        listOf("settings.gradle.kts", "settings.gradle").any { name -> File(build.projectDir, name).let { it.isFile && it.readText().contains(":cylanimateditem") } }
+}
+val cylCompilesAnimatedItem = cylUseLocalSources && cylAnimatedItemModule == null && !cylAnimatedItemIncluded
 
 android {
     // [EN] The library sources use com.cyl.tabbar.R. [CN] 库源码使用 com.cyl.tabbar.R。
@@ -54,12 +72,15 @@ android {
                     "$cylAndroidRoot/cyltabbar/src/main/kotlin",
                     // [EN] cyltabbar depends on CYLAnimatedItem (the animated icon + title component and the animation
                     //      engine, no animation library). [CN] cyltabbar 依赖 CYLAnimatedItem（动效 icon + title 组件与动画引擎，不含动画库）。
-                    "$cylAndroidRoot/cylanimateditem/src/main/java",
-                    "$cylAndroidRoot/cylanimateditem/src/main/kotlin",
                     "$cylAndroidRoot/tabpages/src/main/kotlin",
                 )
-                res.srcDirs("$cylAndroidRoot/cyltabbar/src/main/res", "$cylAndroidRoot/cylanimateditem/src/main/res")
-                resources.srcDirs("$cylAndroidRoot/cyltabbar/src/main/resources", "$cylAndroidRoot/cylanimateditem/src/main/resources")
+                res.srcDirs("$cylAndroidRoot/cyltabbar/src/main/res")
+                resources.srcDirs("$cylAndroidRoot/cyltabbar/src/main/resources")
+                if (cylCompilesAnimatedItem) {
+                    java.srcDirs("$cylAndroidRoot/cylanimateditem/src/main/java", "$cylAndroidRoot/cylanimateditem/src/main/kotlin")
+                    res.srcDirs("$cylAndroidRoot/cylanimateditem/src/main/res")
+                    resources.srcDirs("$cylAndroidRoot/cylanimateditem/src/main/resources")
+                }
             }
         }
     }
@@ -70,7 +91,8 @@ android {
         //      libpag's PAGView) must come along, or a minified release build removes them and the tabs show their images.
         // [CN] 这里编译的是库的源码而不是它的模块：必须一并带上库的 R8 规则（反射查找的类，如 libpag 的 PAGView），否则开启混淆的发布版会删除它们，
         //      Tab 只显示图片。
-        if (cylUseLocalSources) consumerProguardFiles("$cylAndroidRoot/cyltabbar/consumer-rules.pro", "$cylAndroidRoot/cylanimateditem/consumer-rules.pro")
+        if (cylUseLocalSources) consumerProguardFiles("$cylAndroidRoot/cyltabbar/consumer-rules.pro")
+        if (cylCompilesAnimatedItem) consumerProguardFiles("$cylAndroidRoot/cylanimateditem/consumer-rules.pro")
         // [EN] The library's CYLBadge reads BuildConfig.CYL_BADGE_ANIMATION_DISABLED, the badge debugging build option
         //      (docs/Badge-Debugging.md): `-PcylBadgeAnimationDisabled=true` turns badge animations off.
         // [CN] 库的 CYLBadge 读取角标调试编译选项 BuildConfig.CYL_BADGE_ANIMATION_DISABLED（docs/Badge-Debugging.md）。
@@ -95,6 +117,8 @@ dependencies {
         implementation("androidx.fragment:fragment-ktx:1.8.5")
         // As in cyltabbar: CYLViewPager2Binding compiles against ViewPager2, which an app adds when it uses it.
         compileOnly("androidx.viewpager2:viewpager2:1.0.0")
+        if (cylAnimatedItemModule != null) implementation(cylAnimatedItemModule)
+        else if (cylAnimatedItemIncluded) implementation("io.github.chenyilong:cyltabbarcontroller-animateditem:$cylAndroidVersion")
     } else {
         implementation("io.github.chenyilong:cyltabbarcontroller:$cylAndroidVersion")
     }

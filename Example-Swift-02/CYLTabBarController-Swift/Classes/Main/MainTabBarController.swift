@@ -150,7 +150,7 @@ class MainTabBarController: CYLTabBarController {
         NSLog("[#610] swapped tab bar icons to set %ld", issue610IconSetIndex)
     }
 
-    override func tabBarController(_ _: CYLTabBarController, didSelect control: UIControl) {
+    func tabBarController(_ _: CYLTabBarController, didSelect control: UIControl) {
         demoPlusButtonDidTap(control)
         issue610CallbackCount += 1
         let index = selectedIndex

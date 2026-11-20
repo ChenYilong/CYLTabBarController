@@ -57,7 +57,7 @@ function cylVertical(offset) {
  * [EN] Turns update flags on or off (utils/cyl_demo_updates.js). [CN] 打开或关闭更新标记（utils/cyl_demo_updates.js）。
  */
 function cylSetUpdates(context, change) {
-  const updates = Object.assign({}, context.overrides().cylDemoUpdates, change);
+  const updates = { ...context.overrides().cylDemoUpdates, ...change };
   Object.keys(updates).forEach((key) => {
     if (!updates[key]) {
       delete updates[key];
@@ -75,9 +75,9 @@ function cylUpdates(context) {
  * [CN] 给多个 Tab 设置相同的键（null 表示移除）。
  */
 function cylSetAttributes(context, valuesByIdentifier) {
-  const all = Object.assign({}, context.overrides().cylDemoItemAttributes);
+  const all = { ...context.overrides().cylDemoItemAttributes };
   Object.keys(valuesByIdentifier).forEach((identifier) => {
-    const current = Object.assign({}, all[identifier]);
+    const current = { ...all[identifier] };
     Object.entries(valuesByIdentifier[identifier]).forEach(([key, value]) => {
       if (value === null) {
         delete current[key];
@@ -147,7 +147,7 @@ const CYL_HOME_ACTIONS = {
       });
       return;
     }
-    const on = !((context.overrides().cylDemoItemAttributes || {})['*'] || {}).CYLTabBarItemBackgroundColor;
+    const on = !context.overrides().cylDemoItemAttributes?.['*']?.CYLTabBarItemBackgroundColor;
     cylSetAttributes(context, { '*': { CYLTabBarItemBackgroundColor: on ? '#2E2E2E' : null, CYLTabBarItemSelectedBackgroundColor: on ? '#000000' : null } });
   },
   // [EN] Item 21: this page's tab title becomes "Purchased courses"; tap again to restore. [CN] 第 21 项：当前页 Tab 标题改为「已购课程」；再点恢复。
@@ -192,7 +192,7 @@ const CYL_HOME_ACTIONS = {
     const presets = [[0.5, 0.35], [1, 0.6], [0.25, 0.25]];
     const current = context.configuration().CYLTabBarControllerTabBarItemLongPressDuration || 0.5;
     const index = presets.findIndex(([value]) => Math.abs(value - current) < 0.001);
-    const [longPress, doubleTap] = presets[((index < 0 ? 0 : index) + 1) % presets.length];
+    const [longPress, doubleTap] = presets[(Math.max(0, index) + 1) % presets.length];
     context.override({ CYLTabBarControllerTabBarItemLongPressDuration: longPress, CYLTabBarControllerTabBarItemDoubleTapInterval: doubleTap });
   },
   // [EN] The long press switch: a long press on a tab or the plus button shows its identifier. [CN] 长按开关：长按 Tab 或 PlusButton 显示其标识。
@@ -207,15 +207,15 @@ const CYL_HOME_ACTIONS = {
     const step = ((context.overrides().cylDemoTapStep || 0) + 1) % CYL_TAP_STEPS.length;
     const entry = CYL_TAP_STEPS[step];
     const bar = context.tabBar();
-    const selected = bar ? (bar.data.cylSlots.find((slot) => slot.selected) || {}).key : '';
-    const attributes = Object.assign({}, context.overrides().cylDemoItemAttributes);
+    const selected = bar ? bar.data.cylSlots.find((slot) => slot.selected)?.key : '';
+    const attributes = { ...context.overrides().cylDemoItemAttributes };
     Object.keys(attributes).forEach((identifier) => {
-      const changed = Object.assign({}, attributes[identifier]);
+      const changed = { ...attributes[identifier] };
       delete changed.CYLTabBarItemTabButtonTapAnimation;
       attributes[identifier] = changed;
     });
     if (entry.thisTab && selected) {
-      attributes[selected] = Object.assign({}, attributes[selected], { CYLTabBarItemTabButtonTapAnimation: entry.thisTab });
+      attributes[selected] = { ...attributes[selected], CYLTabBarItemTabButtonTapAnimation: entry.thisTab };
     }
     context.override({
       cylDemoTapStep: step,

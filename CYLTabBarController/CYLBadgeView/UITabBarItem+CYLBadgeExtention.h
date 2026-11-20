@@ -13,16 +13,11 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /*!
- * [EN] `UITabBarItem (CYLBadgeExtention)` is implemented in Swift (`CYLBadgeView/Swift/UITabBarItem+CYLBadgeExtention.swift`,
- *      docs/Swift-Migration.md, step 23): every badge call goes to the badge host of the item's tab button, in both Liquid
- *      Glass layers. The conformance is declared here; the protocol's members are internal in Swift, so the generated header
- *      does not import the umbrella header. `-cyl_moveBadgeToCurrentTabButtonIfNeeded` comes from the generated interface.
- * [CN] `UITabBarItem (CYLBadgeExtention)` 在 Swift 中实现（`CYLBadgeView/Swift/UITabBarItem+CYLBadgeExtention.swift`，
- *      docs/Swift-Migration.md，第 23 步）：每个角标调用都转给 item 的 Tab 按钮的角标宿主，并作用于液态玻璃的两个图层。遵守关系声明在
- *      这里；协议成员在 Swift 中为 internal，生成的头文件因此不会导入伞头文件。`-cyl_moveBadgeToCurrentTabButtonIfNeeded` 来自生成的接口。
+ * [EN] `UITabBarItem (CYLBadgeExtention)` (the `CYLBadgeProtocol` conformance) is Swift since docs/Swift-Migration.md step 115 (phase ③, group A of docs/Swift-Migration-Phase3.md): Objective-C
+ *      sees it through the generated Swift interface (`CYLSwiftInterface.h`), with the same names.
+ * [CN] `UITabBarItem (CYLBadgeExtention)` (the `CYLBadgeProtocol` conformance) is 自第 115 步（第 ③ 阶段 A 组）起为 Swift：Objective-C 通过生成的 Swift 接口（`CYLSwiftInterface.h`）看到它，名称不变。
  */
-@interface UITabBarItem (CYLBadgeExtention)<CYLBadgeProtocol>
-@end
+
 
 NS_ASSUME_NONNULL_END
 

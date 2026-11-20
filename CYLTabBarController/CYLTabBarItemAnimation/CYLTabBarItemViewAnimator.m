@@ -43,6 +43,71 @@ static NSURL *CYLTabBarItemAnimationFileURLFromURL(NSURL *URL) {
 @implementation CYLTabBarItemPlayableViewPlayer {
     /// [EN] Whether the dark colors are applied now. [CN] 当前是否已应用深色颜色。
     BOOL _darkColorsApplied;
+    BOOL _loops;
+    CGFloat _animationSpeed;
+}
+
+/*
+ * [EN] `loops` exists only when the view loops itself (`-cyl_setAnimationViewLoops:`, e.g. Rive): otherwise the host keeps
+ *      its own loop (CYLAnimatedItemView restarts a player with `progress`).
+ * [CN] 只有视图自己会循环时（`-cyl_setAnimationViewLoops:`，例如 Rive）才提供 `loops`；否则宿主保留自己的循环（CYLAnimatedItemView 会重新开始
+ *      带 `progress` 的播放器）。
+ */
+- (BOOL)respondsToSelector:(SEL)aSelector {
+    if (aSelector == @selector(setLoops:) || aSelector == @selector(loops)) {
+        return [self.playableView respondsToSelector:@selector(cyl_setAnimationViewLoops:)];
+    }
+    // [EN] `progress` and `animationSpeed` likewise exist only when the view can seek (both progress methods) or change
+    //      its rate (e.g. SVGA): otherwise the host keeps its own fallback (no seeking, the file's own speed).
+    // [CN] `progress` 与 `animationSpeed` 同样只在视图能定位（两个进度方法）或能改变速率（例如 SVGA）时提供；否则宿主保持自己的回退（不定位、文件自身速度）。
+    if (aSelector == @selector(progress) || aSelector == @selector(setProgress:)) {
+        id<CYLTabBarItemAnimationPlayableView> view = self.playableView;
+        return [view respondsToSelector:@selector(cyl_animationViewProgress)]
+            && [view respondsToSelector:@selector(cyl_setAnimationViewProgress:)];
+    }
+    if (aSelector == @selector(animationSpeed) || aSelector == @selector(setAnimationSpeed:)) {
+        return [self.playableView respondsToSelector:@selector(cyl_setAnimationViewSpeed:)];
+    }
+    return [super respondsToSelector:aSelector];
+}
+
+- (CGFloat)progress {
+    id<CYLTabBarItemAnimationPlayableView> view = self.playableView;
+    return [view respondsToSelector:@selector(cyl_animationViewProgress)] ? [view cyl_animationViewProgress] : 0;
+}
+
+- (void)setProgress:(CGFloat)progress {
+    id<CYLTabBarItemAnimationPlayableView> view = self.playableView;
+    if ([view respondsToSelector:@selector(cyl_setAnimationViewProgress:)]) {
+        [view cyl_setAnimationViewProgress:MIN(MAX(progress, 0), 1)];
+    }
+}
+
+- (CGFloat)animationSpeed {
+    return _animationSpeed > 0 ? _animationSpeed : 1;
+}
+
+- (void)setAnimationSpeed:(CGFloat)animationSpeed {
+    if (!(animationSpeed > 0) || !isfinite(animationSpeed)) {
+        return;
+    }
+    _animationSpeed = animationSpeed;
+    id<CYLTabBarItemAnimationPlayableView> view = self.playableView;
+    if ([view respondsToSelector:@selector(cyl_setAnimationViewSpeed:)]) {
+        [view cyl_setAnimationViewSpeed:animationSpeed];
+    }
+}
+
+- (BOOL)loops {
+    return _loops;
+}
+
+- (void)setLoops:(BOOL)loops {
+    _loops = loops;
+    id<CYLTabBarItemAnimationPlayableView> view = self.playableView;
+    if ([view respondsToSelector:@selector(cyl_setAnimationViewLoops:)]) {
+        [view cyl_setAnimationViewLoops:loops];
+    }
 }
 
 - (id<CYLTabBarItemAnimationPlayableView>)playableView {

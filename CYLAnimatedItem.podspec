@@ -18,7 +18,7 @@ Pod::Spec.new do |s|
   s.homepage     = "https://github.com/ChenYilong/CYLTabBarController"
   s.license      = { :type => 'MIT', :file => 'LICENSE' }
   s.author       = { "ChenYilong" => "luohanchenyilong@163.com" }
-  s.platform     = :ios, '12.0'
+  s.platform     = :ios, '15.0'
   s.swift_versions = ['5.0']
   s.source       = { :git => "https://github.com/ChenYilong/CYLTabBarController.git", :tag => s.version.to_s }
   s.requires_arc = true
@@ -39,7 +39,10 @@ Pod::Spec.new do |s|
   s.subspec 'Core' do |core|
     core.source_files = 'CYLTabBarController/CYLAnimatedItem/*.{h,m}',
                         'CYLTabBarController/CYLUtils/CYLAnimationKeys.{h,m}',
-                        'CYLTabBarController/CYLUtils/Swift/CYLAnimationURLOptions.swift'
+                        'CYLTabBarController/CYLUtils/Swift/CYLAnimationURLOptions.swift',
+                        'CYLTabBarController/CYLUtils/Swift/CYLAnimationKeyLookup.swift',
+                        # [EN] Swift views built on CYLAnimatedItemView (CYLAnimatedItemStackView). [CN] 基于 CYLAnimatedItemView 的 Swift 视图（CYLAnimatedItemStackView）。
+                        'CYLTabBarController/CYLAnimatedItem/Swift/*.swift'
     core.public_header_files = 'CYLTabBarController/CYLAnimatedItem/*.h', 'CYLTabBarController/CYLUtils/CYLAnimationKeys.h'
     core.resources = ['CYLTabBarController/CYLAnimatedItem/Resources/CYLAnimatedItem.bundle']
     core.frameworks = 'UIKit'
@@ -55,6 +58,10 @@ Pod::Spec.new do |s|
                           ['CYLTabBarController/CYLTabBarItemAnimation/Swift/*.swift']
     engine.public_header_files = files.map { |name| "CYLTabBarController/CYLTabBarItemAnimation/#{name}.h" }
     engine.frameworks = 'UIKit'
+    # [EN] The Swift CYLAnimatedItemView (Core) plays animations only with the engine: Swift cannot read the C macro, so the
+    #      engine sets the same name as a Swift condition. [CN] Swift 编写的 CYLAnimatedItemView（Core）只有引擎参与时才播放动画：Swift
+    #      读不到 C 宏，因此由引擎设置同名的 Swift 条件。
+    engine.pod_target_xcconfig = { 'SWIFT_ACTIVE_COMPILATION_CONDITIONS' => '$(inherited) CYL_ANIMATION_ENGINE_AVAILABLE' }
   end
 
   # [EN] One subspec per animation type, the same shape for each: Core + Engine + the library.
@@ -75,7 +82,7 @@ Pod::Spec.new do |s|
     lottieswift.source_files = 'CYLTabBarController/LottieSwift/*.swift', 'CYLTabBarController/CYLTabBarItemAnimation/Lottie/*.{h,m}'
     lottieswift.private_header_files = 'CYLTabBarController/CYLTabBarItemAnimation/Lottie/*.h'
     lottieswift.dependency 'lottie-ios', '>= 4.5.1'
-    lottieswift.ios.deployment_target = '13.0'
+    lottieswift.ios.deployment_target = '15.0'
   end
 
   s.subspec 'PAG' do |pag|
@@ -99,7 +106,7 @@ Pod::Spec.new do |s|
     rive.source_files = 'CYLTabBarController/CYLTabBarItemAnimation/Rive/*.{h,m}', 'CYLTabBarController/RiveSwift/*.swift'
     rive.public_header_files = 'CYLTabBarController/CYLTabBarItemAnimation/Rive/*.h'
     rive.dependency 'RiveRuntime', '~> 6.29'
-    rive.ios.deployment_target = '14.0'
+    rive.ios.deployment_target = '15.0'
   end
 
   s.subspec 'SVGA' do |svga|
@@ -114,5 +121,20 @@ Pod::Spec.new do |s|
     gif.source_files = 'CYLTabBarController/CYLTabBarItemAnimation/GIF/*.{h,m}'
     gif.public_header_files = 'CYLTabBarController/CYLTabBarItemAnimation/GIF/*.h'
     gif.frameworks = 'ImageIO', 'QuartzCore'
+  end
+
+  # [EN] Tests that need an animation library (remote Lottie files: download, play or fall back). `pod lib lint` builds and runs
+  #      them on a simulator; they depend on the component only.
+  # [CN] 需要动画库的测试（远程 Lottie 文件：下载后播放或回退）。`pod lib lint` 会在模拟器上构建并运行；只依赖组件本身。
+  s.test_spec 'Tests' do |test|
+    # [EN] lottie-ios 2.x (iOS 12, like the root spec); LottieSwift needs iOS 13, which a test spec of a 12.0 root cannot resolve.
+    # [CN] lottie-ios 2.x（iOS 12，与根 spec 相同）；LottieSwift 需要 iOS 13，12.0 的根 spec 下的 test spec 无法解析。
+    test.dependency 'CYLAnimatedItem/LottieObjectiveC'
+    # [EN] One Swift file, so the test bundle links the Swift runtime that the component's Swift code needs
+    #      (otherwise Xcode 26 fails with "Undefined symbol: __swift_FORCE_LOAD_$_swiftCompatibility56").
+    # [CN] 一个 Swift 文件，使测试 bundle 链接组件 Swift 代码所需的 Swift 运行时（否则 Xcode 26 报
+    #      "Undefined symbol: __swift_FORCE_LOAD_$_swiftCompatibility56"）。
+    test.source_files = 'CYLAnimatedItemTests/*.{h,m,swift}'
+    test.frameworks = 'XCTest', 'UIKit'
   end
 end

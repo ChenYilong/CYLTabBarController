@@ -292,8 +292,8 @@ private final class CYLXMLTreeBuilder: NSObject, XMLParserDelegate {
         }
     }
 
-    func parser(_: XMLParser, foundCDATA CDATABlock: Data) {
-        if let string = String(data: CDATABlock, encoding: .utf8) {
+    func parser(_: XMLParser, foundCDATA cdataBlock: Data) {
+        if let string = String(data: cdataBlock, encoding: .utf8) {
             stack.last?.text.append(string)
         }
     }

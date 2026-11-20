@@ -77,8 +77,15 @@ export struct CYLSVGAView {
    */
   @Prop @Watch('cylReplay') replayToken: number = 0;
   /**
+   * [EN] Plays again from the start after each pass while the tab is selected (tabBarItemAnimationLoops); off by default.
+   * [CN] Tab 选中期间每次播放结束后从头再次播放（tabBarItemAnimationLoops）；默认关闭。
+   */
+  @Prop @Watch('cylLoopsChanged') loops: boolean = false;
+  /**
    * [EN] The file could not be loaded or decoded, with the reason. [CN] 文件无法加载或解码，附原因。
    */
+  /** [EN] The file is drawn (CYLAnimatedItemView shows it from here on). [CN] 文件已绘制。 */
+  onLoaded: () => void = () => {};
   onLoadError: (message: string) => void = (_message: string) => {
   };
   private settings: RenderingContextSettings = new RenderingContextSettings(true);
@@ -87,6 +94,15 @@ export struct CYLSVGAView {
   private bitmaps: Map<string, image.PixelMap> = new Map<string, image.PixelMap>();
   private frame: number = 0;
   private timer: number = -1;
+  /**
+   * [EN] Hands the host this view's replay, called on each restart (CYLAnimatedItemView `setRestartHandler`, B23).
+   * [CN] 把本视图的重播交给宿主，每次重播时调用（CYLAnimatedItemView `setRestartHandler`，B23）。
+   */
+  registerReplay: (replay: () => void) => void = (_replay: () => void) => {};
+
+  aboutToAppear(): void {
+    this.registerReplay(() => this.cylReplay());
+  }
 
   aboutToDisappear(): void {
     this.cylStop();
@@ -105,6 +121,13 @@ export struct CYLSVGAView {
 
   cylReplay(): void {
     if (this.selected) {
+      this.cylPlayFromStart();
+    }
+  }
+
+  /** [EN] Applied while playing; turning it on replays a finished animation. [CN] 播放中立即生效；开启时重新播放已结束的动画。 */
+  cylLoopsChanged(): void {
+    if (this.loops && this.selected && this.timer === -1) {
       this.cylPlayFromStart();
     }
   }
@@ -136,6 +159,7 @@ export struct CYLSVGAView {
       } else {
         this.cylDraw();
       }
+      this.onLoaded();
     } catch (error) {
       this.onLoadError(`${(error as Error).message ?? error}`);
     }
@@ -164,7 +188,10 @@ export struct CYLSVGAView {
     this.cylDraw();
     this.timer = setInterval(() => {
       this.frame += 1;
-      if (this.frame >= movie.frames - 1) {
+      if (this.frame >= movie.frames) {
+        // [EN] Looping: back to the first frame; else rest on the last one. [CN] 循环时回到第一帧，否则停在最后一帧。
+        this.frame = 0;
+      } else if (this.frame >= movie.frames - 1 && !this.loops) {
         this.frame = movie.frames - 1;
         this.cylStop();
       }

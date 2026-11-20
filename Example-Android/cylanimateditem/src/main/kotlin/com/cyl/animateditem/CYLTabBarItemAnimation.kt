@@ -134,6 +134,24 @@ interface CYLTabBarItemAnimationPlayer {
      *      默认转发给 `applyDarkColors`。
      */
     fun applyColors(colors: Map<String, Int>?, configuration: Configuration) = applyDarkColors(colors.orEmpty(), configuration)
+    /**
+     * [EN] The tab's current tint (its title color, normal or selected), set by the tab bar on every state change; an
+     *      animation whose `CYLTabBarAnimationOptionTint` option is "title" draws in it. Libraries without a tint ignore it.
+     * [CN] Tab 当前的着色（其标题颜色，普通或选中），TabBar 在每次状态变化时设置；`CYLTabBarAnimationOptionTint` 选项为 "title" 的动画用它绘制。
+     *      没有着色的动画库忽略它。
+     */
+    var tintColor: Int?
+        get() = null
+        set(@Suppress("UNUSED_PARAMETER") value) { /* [EN] Optional. [CN] 可选。 */ }
+
+    /**
+     * [EN] The tab's tint with its state (iOS `-cyl_applyAnimationViewTintColor:selected:`): a fixed `tint` colors only the
+     *      unselected tab, the selected one takes `color` (the title's selected color), as "title" does. The default sets
+     *      `tintColor`, so a caller without the state keeps the fixed tint in both states.
+     * [CN] 带状态的 Tab 着色（iOS `-cyl_applyAnimationViewTintColor:selected:`）：固定 `tint` 只为未选中的 Tab 着色，选中的 Tab 使用
+     *      `color`（标题的选中颜色），与 "title" 相同。默认实现设置 `tintColor`，因此不带状态的调用方在两种状态下都保留固定着色。
+     */
+    fun setTintColor(color: Int?, selected: Boolean) { tintColor = color }
 }
 
 /**
@@ -384,19 +402,37 @@ open class CYLTabBarItemAnimationFactory(val registry: CYLTabBarItemAnimatorRegi
         view.isClickable = false
         view.isFocusable = false
         (view as? ImageView)?.scaleType = contentMode
-        view.cyl_setTag("cyl_tab_bar_item_animation_player", animator.playerForAnimationView(view))
+        val options = CYLTabBarAnimationFileAndOptions(url).second
+        view.cyl_setTag(OPTIONS_TAG, options)
+        view.cyl_setTag(PLAYER_TAG, animator.playerForAnimationView(view)?.let { tinting(it, view, options) })
         return view
     }
 
     override fun playerForView(view: View?): CYLTabBarItemAnimationPlayer? {
         view ?: return null
-        (view.cyl_getTag("cyl_tab_bar_item_animation_player") as? CYLTabBarItemAnimationPlayer)?.let { return it }
-        return registry.animators().firstNotNullOfOrNull { it.playerForAnimationView(view) }?.also { view.cyl_setTag("cyl_tab_bar_item_animation_player", it) }
+        (view.cyl_getTag(PLAYER_TAG) as? CYLTabBarItemAnimationPlayer)?.let { return it }
+        @Suppress("UNCHECKED_CAST")
+        val options = view.cyl_getTag(OPTIONS_TAG) as? Map<String, String> ?: emptyMap()
+        return registry.animators().firstNotNullOfOrNull { it.playerForAnimationView(view) }?.let { tinting(it, view, options) }?.also { view.cyl_setTag(PLAYER_TAG, it) }
+    }
+
+    /**
+     * [EN] The `tint` / `darkTint` options for every engine (`CYLTabBarItemAnimationTint`): the player draws them, and a
+     *      fixed tint is drawn at once. A view that draws its tint itself (Rive) keeps its own player.
+     * [CN] 所有引擎的 `tint` / `darkTint` 选项（`CYLTabBarItemAnimationTint`）：由播放器绘制，固定着色立即绘制。自己绘制着色的视图（Rive）保留自己的播放器。
+     */
+    private fun tinting(player: CYLTabBarItemAnimationPlayer, view: View, options: Map<String, String>): CYLTabBarItemAnimationPlayer {
+        if (!CYLTabBarItemAnimationTint.hasTint(options)) return player
+        if ((view as? CYLTabBarItemAnimationPlayableView)?.cyl_drawsAnimationViewTint == true) return player
+        CYLTabBarItemAnimationTint.fixedTintColor(options, view.resources.configuration)?.let { CYLTabBarItemAnimationTint.apply(view, it) }
+        return CYLTabBarItemAnimationTintingPlayer(player, options)
     }
 
     override fun isAnimationView(view: View?): Boolean = playerForView(view) != null
 
     companion object {
+        private const val PLAYER_TAG = "cyl_tab_bar_item_animation_player"
+        private const val OPTIONS_TAG = "cyl_tab_bar_item_animation_options"
         @JvmStatic
         val sharedFactory: CYLTabBarItemAnimationFactory by lazy { CYLTabBarItemAnimationFactory() }
         fun animationViewWithURL(context: Context, url: String, size: CYLSize, contentMode: ImageView.ScaleType) = sharedFactory.animationViewWithURL(context, url, size, contentMode)
@@ -418,6 +454,36 @@ interface CYLTabBarItemAnimationPlayableView {
      * [EN] Colors for Dark Mode, already resolved; null restores the light colors. [CN] 深色模式颜色（已解析）；null 恢复浅色。
      */
     fun cyl_applyAnimationViewColors(colors: Map<String, Int>?) { /* [EN] Optional. [CN] 可选。 */ }
+    /**
+     * [EN] The tab's tint (see `CYLTabBarItemAnimationPlayer.tintColor`). [CN] Tab 的着色（见 `CYLTabBarItemAnimationPlayer.tintColor`）。
+     */
+    fun cyl_applyAnimationViewTintColor(color: Int?) { /* [EN] Optional. [CN] 可选。 */ }
+    /**
+     * [EN] The tab's tint with its state (see `CYLTabBarItemAnimationPlayer.setTintColor`). [CN] 带状态的 Tab 着色（见 `CYLTabBarItemAnimationPlayer.setTintColor`）。
+     */
+    fun cyl_applyAnimationViewTintColor(color: Int?, selected: Boolean) = cyl_applyAnimationViewTintColor(color)
+    /**
+     * [EN] Whether the view draws the `tint` / `darkTint` options itself; false (the default): the factory draws them on
+     *      the view's layer (`CYLTabBarItemAnimationTint`), as for every engine without a tint of its own.
+     * [CN] 视图是否自己绘制 `tint` / `darkTint` 选项；false（默认）：由工厂在视图图层上绘制（`CYLTabBarItemAnimationTint`），与所有没有自身着色的引擎相同。
+     */
+    val cyl_drawsAnimationViewTint: Boolean get() = false
+    /**
+     * [EN] Whether the view plays again after each pass until this is turned off (the player's `loops`). For views with no
+     *      progress to restart, such as Rive state machines (docs/Animated-Item.md, the Rive loop).
+     * [CN] 视图是否在每次播放后再次播放，直到关闭（播放器的 `loops`）。用于没有进度可重新开始的视图，例如 Rive 状态机（docs/Animated-Item.md，Rive 循环）。
+     */
+    fun cyl_setAnimationViewLoops(loops: Boolean) { /* [EN] Optional. [CN] 可选。 */ }
+    /**
+     * [EN] The playback speed (the player's `animationSpeed`, 1 = the file's own), applied to a pass already playing.
+     * [CN] 播放速度（播放器的 `animationSpeed`，1 = 文件自身速度），对正在播放的动画同样生效。
+     */
+    fun cyl_setAnimationViewSpeed(speed: Float) { /* [EN] Optional. [CN] 可选。 */ }
+    /**
+     * [EN] Shows the time at `progress` (0…1, the player's `progress`; 0 before `restartAnimation()` plays again).
+     * [CN] 显示 `progress`（0…1，播放器的 `progress`；`restartAnimation()` 重新播放前为 0）处的时刻。
+     */
+    fun cyl_setAnimationViewProgress(progress: Float) { /* [EN] Optional. [CN] 可选。 */ }
 }
 
 /**
@@ -470,6 +536,21 @@ open class CYLTabBarItemViewAnimator(
             override fun play() = playable.cyl_playAnimationView()
             override fun showLastFrame() = playable.cyl_showAnimationViewLastFrame()
             override fun stop() = playable.cyl_stopAnimationView()
+            override var loops: Boolean = false
+                set(value) { field = value; playable.cyl_setAnimationViewLoops(value) }
+            override var animationSpeed: Float = 1f
+                set(value) { field = value; playable.cyl_setAnimationViewSpeed(value) }
+            override var progress: Float = 0f
+                set(value) { field = value; playable.cyl_setAnimationViewProgress(value) }
+            override var tintColor: Int? = null
+                set(value) { if (field != value) { field = value; playable.cyl_applyAnimationViewTintColor(value) } }
+            private var tintSelected: Boolean? = null
+            override fun setTintColor(color: Int?, selected: Boolean) {
+                if (tintColor == color && tintSelected == selected) return
+                tintColor = color
+                tintSelected = selected
+                playable.cyl_applyAnimationViewTintColor(color, selected)
+            }
             override fun applyColors(colors: Map<String, Int>?, configuration: Configuration) {
                 // [EN] Only when the state changes, as on iOS. [CN] 与 iOS 一样，只在状态变化时应用。
                 val next = colors?.takeIf { it.isNotEmpty() }
@@ -521,7 +602,7 @@ object CYLTabBarItemAnimationFiles {
             isRemote(url) -> null
             assetName(url) != null -> context.assets.open(assetName(url)!!)
             url.startsWith("file:") -> Uri.parse(url).path?.let { File(it).inputStream() }
-            url.startsWith("/") -> File(url).inputStream()
+            File(url).isAbsolute -> File(url).inputStream()
             else -> context.contentResolver.openInputStream(Uri.parse(url))
         }
     } catch (error: java.io.IOException) { null } catch (error: SecurityException) { null }
@@ -530,7 +611,8 @@ object CYLTabBarItemAnimationFiles {
      * [EN] A local file of `url` (copied to the cache when it is an asset, a stream or remote), delivered on the main thread. [CN] `url` 的本地文件（asset、流或远程文件会复制到缓存），在主线程回调。
      */
     fun localFile(context: Context, url: String, completion: (File?) -> Unit) {
-        if (url.startsWith("/") && File(url).exists()) return completion(File(url))
+        // [EN] An absolute path ("/..." on Android; a drive path in JVM tests on Windows). [CN] 绝对路径（Android 上为 "/..."；Windows 上的 JVM 测试中为盘符路径）。
+        if (File(url).isAbsolute && File(url).exists()) return completion(File(url))
         if (url.startsWith("file:") && !url.startsWith(ANDROID_ASSET_PREFIX)) return completion(Uri.parse(url).path?.let { File(it) }?.takeIf { it.exists() })
         val appContext = context.applicationContext
         executor.execute {
@@ -696,6 +778,18 @@ object CYLLottieTabBarItemAnimator : CYLTabBarItemAnimator {
 
     override fun animationViewWithURL(context: Context, url: String, size: CYLSize, contentMode: ImageView.ScaleType): View? {
         val view = CYLReflection.newInstance(VIEW_CLASS, context) as? View ?: return null
+        // [EN] Merge paths (common in After Effects exports): lottie-android leaves them off and then draws such a file
+        //      wrongly or not at all, while lottie-ios draws them. On, as on iOS.
+        // [CN] 合并路径（After Effects 导出的文件中很常见）：lottie-android 默认关闭，此时这类文件会画错或完全不画，
+        //      而 lottie-ios 会绘制它们。与 iOS 一致，打开。
+        CYLReflection.call(view, "enableMergePathsForKitKatAndAbove", true)
+        // [EN] Image layers at the size the file declares for each image (its "w" / "h"), as lottie-ios draws them.
+        //      lottie-android otherwise sizes an image by its bitmap's pixels times the screen density, so a bitmap a
+        //      delegate decodes from a drawable folder (scaled to the screen) or a @2x / @3x file draws 2-3 times too
+        //      large and spills out of the icon.
+        // [CN] 图片图层使用文件为每张图片声明的尺寸（"w" / "h"），与 lottie-ios 一致。否则 lottie-android 按位图像素乘以屏幕密度确定图片尺寸，
+        //      代理从 drawable 目录解码（已按屏幕缩放）的位图或 @2x / @3x 文件会大 2-3 倍并溢出图标。
+        CYLReflection.call(view, "setMaintainOriginalImageBounds", true)
         val file = url.substringBefore('#')
         setFailureListener(view, file)
         if (CYLTabBarItemAnimationFiles.isRemote(file)) {
@@ -802,13 +896,21 @@ object CYLLottieTabBarItemAnimator : CYLTabBarItemAnimator {
 // MARK: - PAG
 
 /**
- * [EN] `CYLPAGTabBarItemAnimator`: PAG tab icons with libpag (`org.libpag.PAGView`), registered when libpag is in the
- *      app. ".pag" files; PAG has no playback speed.
- * [CN] 使用 libpag（`org.libpag.PAGView`）的 PAG Tab 图标，App 中有 libpag 时注册。".pag" 文件；PAG 没有播放速度。
+ * [EN] `CYLPAGTabBarItemAnimator`: PAG tab icons with libpag, registered when libpag is in the app. ".pag" files; PAG
+ *      has no playback speed. The view is `org.libpag.PAGImageView` (libpag 4.0+), else `org.libpag.PAGView`.
+ *      `PAGImageView` is a plain View that draws each frame as a bitmap, the view libpag recommends for many small
+ *      icons. `PAGView` is a TextureView with its own GL surface per icon. In a list of icons, on an emulator's
+ *      translated GL (libEGL "called unimplemented OpenGL ES API"), it drew the first frame and then stopped updating,
+ *      so the icons never played.
+ * [CN] 使用 libpag 的 PAG Tab 图标，App 中有 libpag 时注册。".pag" 文件；PAG 没有播放速度。视图为 `org.libpag.PAGImageView`
+ *      （libpag 4.0+），没有时为 `org.libpag.PAGView`。`PAGImageView` 是普通 View，将每帧绘制为位图，是 libpag 为大量小图标推荐的视图；
+ *      `PAGView` 是 TextureView，每个图标一个 GL 表面：在图标列表中、模拟器转译的 GL 上（libEGL "called unimplemented OpenGL ES API"）
+ *      它只画出第一帧便不再更新，图标从不播放。
  */
 object CYLPAGTabBarItemAnimator : CYLTabBarItemAnimator {
+    private const val IMAGE_VIEW_CLASS = "org.libpag.PAGImageView"
     private const val VIEW_CLASS = "org.libpag.PAGView"
-    val isAvailable: Boolean get() = CYLReflection.type(VIEW_CLASS) != null
+    val isAvailable: Boolean get() = CYLReflection.type(IMAGE_VIEW_CLASS) != null || CYLReflection.type(VIEW_CLASS) != null
     override val identifier: String = "PAG"
     override val fileExtensions: List<String> = listOf("pag")
     override val attributeKeys: Map<String, String> = mapOf(
@@ -822,14 +924,14 @@ object CYLPAGTabBarItemAnimator : CYLTabBarItemAnimator {
     override fun canAnimateFileAtURL(url: String): Boolean = CYLTabBarAnimationFileExtension(url) == "pag"
 
     override fun animationViewWithURL(context: Context, url: String, size: CYLSize, contentMode: ImageView.ScaleType): View? {
-        val view = CYLReflection.newInstance(VIEW_CLASS, context) as? View ?: return null
+        val view = (CYLReflection.newInstance(IMAGE_VIEW_CLASS, context) ?: CYLReflection.newInstance(VIEW_CLASS, context)) as? View ?: return null
         // [EN] PAGScaleMode: 1 stretch, 2 letterbox (fit), 3 zoom (fill). [CN] PAGScaleMode：1 拉伸，2 适应，3 填充。
         CYLReflection.call(view, "setScaleMode", when (contentMode) { ImageView.ScaleType.FIT_XY -> 1; ImageView.ScaleType.CENTER_CROP -> 3; else -> 2 })
-        // [EN] Until the file is here (a download), the host shows its static image or placeholder. [CN] 文件到达之前（下载中），宿主显示其静态图片或占位图。
         CYLTabBarItemAnimationFailure.markLoading(view)
         CYLTabBarItemAnimationFiles.localFile(context, url.substringBefore('#')) { file ->
-            if (file != null) {
-                CYLReflection.call(view, "setPath", file.absolutePath); CYLReflection.call(view, "flush")
+            // [EN] PAGImageView.setPath returns false for a file it cannot read. [CN] PAGImageView.setPath 无法读取文件时返回 false。
+            if (file != null && CYLReflection.call(view, "setPath", file.absolutePath) != false) {
+                CYLReflection.call(view, "flush")
                 CYLTabBarItemAnimationFailure.reportLoaded(view)
             } else {
                 CYLTabBarItemAnimationFailure.reportLater(view)
@@ -838,8 +940,43 @@ object CYLPAGTabBarItemAnimator : CYLTabBarItemAnimator {
         return view
     }
 
-    override fun playerForAnimationView(view: View): CYLTabBarItemAnimationPlayer? =
-        if (CYLReflection.type(VIEW_CLASS)?.isInstance(view) == true) PAGPlayer(view) else null
+    override fun playerForAnimationView(view: View): CYLTabBarItemAnimationPlayer? = when {
+        CYLReflection.type(IMAGE_VIEW_CLASS)?.isInstance(view) == true -> PAGImagePlayer(view)
+        CYLReflection.type(VIEW_CLASS)?.isInstance(view) == true -> PAGPlayer(view)
+        else -> null
+    }
+
+    /**
+     * [EN] `PAGImageView`: progress is a frame (`setCurrentFrame` / `currentFrame` of `numFrames`).
+     * [CN] `PAGImageView`：进度为帧（`numFrames` 中的 `setCurrentFrame` / `currentFrame`）。
+     */
+    private class PAGImagePlayer(view: View) : CYLTabBarItemAnimationBasePlayer(view) {
+        // [EN] setRepeatCount: 0 repeats without end, 1 plays once. [CN] setRepeatCount：0 为无限重复，1 为播放一次。
+        override var loops: Boolean = false
+            set(value) { field = value; animationView?.let { CYLReflection.call(it, "setRepeatCount", if (value) 0 else 1) } }
+
+        private fun frames(view: View) = (CYLReflection.call(view, "numFrames") as? Int)?.takeIf { it > 0 } ?: 1
+
+        private fun show(view: View, frame: Int) {
+            CYLReflection.call(view, "setCurrentFrame", frame)
+            CYLReflection.call(view, "flush")
+        }
+
+        override fun play() {
+            animationView?.let {
+                CYLReflection.call(it, "pause")
+                CYLReflection.call(it, "setRepeatCount", if (loops) 0 else 1)
+                show(it, 0)
+                CYLReflection.call(it, "play")
+            }
+        }
+
+        override fun showLastFrame() { animationView?.let { CYLReflection.call(it, "pause"); show(it, frames(it) - 1) } }
+        override fun stop() { animationView?.let { CYLReflection.call(it, "pause"); show(it, 0) } }
+        override var progress: Float
+            get() = animationView?.let { view -> ((CYLReflection.call(view, "currentFrame") as? Int) ?: 0).toFloat() / maxOf(1, frames(view) - 1) } ?: 0f
+            set(value) { animationView?.let { show(it, Math.round(value.coerceIn(0f, 1f) * (frames(it) - 1))) } }
+    }
 
     private class PAGPlayer(view: View) : CYLTabBarItemAnimationBasePlayer(view) {
         // [EN] PAGView.setRepeatCount: 0 repeats without end, 1 plays once. [CN] PAGView.setRepeatCount：0 为无限重复，1 为播放一次。
@@ -891,19 +1028,224 @@ object CYLRiveTabBarItemAnimator {
  *      （`CYLTabBarAnimationOptionRiveInput` 或 active 属性）、触发器、线性动画、持续时间。
  */
 @android.annotation.SuppressLint("ViewConstructor") // [EN] Made by its provider around a RiveAnimationView, never inflated. [CN] 由 provider 围绕 RiveAnimationView 创建，不从 XML 加载。
-class CYLRiveTabBarItemAnimationView private constructor(context: Context, private val rive: View, private val options: Map<String, String>) :
+class CYLRiveTabBarItemAnimationView internal constructor(context: Context, private val rive: View, private val options: Map<String, String>) :
     android.widget.FrameLayout(context), CYLTabBarItemAnimationPlayableView {
 
     private val handler = Handler(Looper.getMainLooper())
     private val stateMachine get() = options[CYLTabBarItemAnimationKeys.CYLTabBarAnimationOptionRiveStateMachine]
     private val booleanInput get() = options[CYLTabBarItemAnimationKeys.CYLTabBarAnimationOptionRiveInput] ?: options[CYLTabBarItemAnimationKeys.CYLTabBarAnimationOptionRiveActiveProperty] ?: "active"
     private val activeDuration get() = options[CYLTabBarItemAnimationKeys.CYLTabBarAnimationOptionRiveActiveDuration]?.toDoubleOrNull() ?: 1.0
+    /**
+     * [EN] Plays again after each pass (`cyl_setAnimationViewLoops`). [CN] 每次播放后再次播放（`cyl_setAnimationViewLoops`）。
+     */
+    private var loops = false
+    private val numberInput get() = options[CYLTabBarItemAnimationKeys.CYLTabBarAnimationOptionRiveNumberInput]
+    private val numberValues get() = CYLRiveInputs.numberValues(options[CYLTabBarItemAnimationKeys.CYLTabBarAnimationOptionRiveNumberValues])
+    private var lastNumber: Float? = null
+    /**
+     * [EN] Paused on its first frame after load, not played yet (docs/Animated-Item.md): the next play resumes it first.
+     * [CN] 加载后暂停在第一帧、尚未播放：下一次播放先恢复它。
+     */
+    private var restingAfterLoad = false
+    private var hasPlayed = false
+
+    /**
+     * [EN] Rests on the first frame until the first play: a file whose state machine moves by itself (shapes.riv, truck.riv)
+     *      no longer runs from load. The machine is created (autoplay) so its inputs can be read. Called right after the load
+     *      (rive-android builds the scene synchronously in `setRiveFile`), it advances the machine in fixed steps of
+     *      `SETTLE_STEP_SECONDS` until it settles (rive-android then pauses it by itself), at most `SETTLE_STEPS` steps; a
+     *      machine still moving after that (shapes.riv, truck.riv) is paused. The steps do not depend on the device's speed,
+     *      so every launch rests on the same frame, as on iOS. A machine paused before it settled answered its inputs the
+     *      wrong way round (menu_button.riv went back to the hamburger when opened and showed its X when closed, 319ba8a4);
+     *      a pause 100 ms after load, at 396d3fca, rested on a frame that depended on the device (menu_button.riv on its X).
+     * [CN] 在第一次播放之前停在第一帧：状态机会自行运动的文件（shapes.riv、truck.riv）不再从加载起就运动。状态机先创建（autoplay）以便读取其输入。
+     *      在加载之后调用（rive-android 在 `setRiveFile` 中同步构建场景），以固定步长 `SETTLE_STEP_SECONDS` 推进状态机直到稳定（rive-android
+     *      随即自行暂停它），最多 `SETTLE_STEPS` 步；之后仍在运动的状态机（shapes.riv、truck.riv）被暂停。步数与设备速度无关，因此每次启动都停在
+     *      同一帧，与 iOS 一致。稳定之前就被暂停的状态机会反向响应输入（319ba8a4 时 menu_button.riv 打开时回到汉堡图标、关闭时显示 X）；
+     *      396d3fca 时加载 100 ms 后暂停，停在哪一帧取决于设备（menu_button.riv 停在 X 上）。
+     */
+    internal fun cyl_restUntilPlayed() {
+        if (hasPlayed) return
+        val controller = CYLReflection.call(rive, "getController")
+        if (controller == null) {
+            // [EN] The fake view of the tests has no controller. [CN] 测试中的伪造视图没有控制器。
+            CYLReflection.call(rive, "pause")
+            restingAfterLoad = true
+            return
+        }
+        val isMoving = { (CYLReflection.call(controller, "getPlayingStateMachines") as? Collection<*>)?.isNotEmpty() == true }
+        var steps = 0
+        while (isMoving() && steps < SETTLE_STEPS) {
+            CYLReflection.call(controller, "advance", SETTLE_STEP_SECONDS)
+            steps++
+        }
+        // [EN] The file controller only: `RiveAnimationView.pause()` also stops the view's renderer, after which the state
+        //      machine no longer runs continuously (menu_button.riv crept one frame per input and never reached its X on
+        //      Android, dcbfdec6 and ad3dca0e).
+        // [CN] 只暂停文件控制器：`RiveAnimationView.pause()` 还会停止视图的渲染器，之后状态机不再连续运行（Android 上
+        //      menu_button.riv 每次输入只前进一帧，始终到不了 X）。
+        if (isMoving()) CYLReflection.call(controller, "pause")
+        restingAfterLoad = true
+    }
+    /**
+     * [EN] A resting icon shows the values of a newly bound theme instance (night mode switch), as on iOS (isPaused = false): its
+     *      controller is paused, so it drew the old frame until the next play (data_bind_test_impl.riv, 2026-11-19). The file
+     *      resumes as a first play resumes it, draws for two frames, and its controller is paused again; it keeps resting.
+     * [CN] 静止的图标显示新绑定主题实例的值（深色模式切换），与 iOS 一致（isPaused = false）：其控制器已暂停，所以在下次播放之前一直绘制旧帧。
+     *      文件按第一次播放的方式恢复，绘制两帧后控制器再次暂停；图标仍保持静止。
+     */
+    private fun redrawRestingFrame() {
+        if (!restingAfterLoad || hasPlayed) return
+        val controller = CYLReflection.call(rive, "getController") ?: return
+        val machine = stateMachine
+        if (machine != null) {
+            CYLReflection.callKotlin(rive, "play", machine, CYLReflection.DEFAULT, CYLReflection.DEFAULT, true, false)
+        } else if (options[CYLTabBarItemAnimationKeys.CYLTabBarAnimationOptionRiveAnimation] == null) {
+            CYLReflection.callKotlin(rive, "play", CYLReflection.DEFAULT, CYLReflection.DEFAULT, false)
+        }
+        handler.postDelayed({ if (restingAfterLoad && !hasPlayed) CYLReflection.call(controller, "pause") }, NEXT_FRAME_MS * 2)
+    }
+
+    // [EN] A loop pass leaves a file that is still moving on its own alone (shapes.riv, truck.riv); only a play restarts it.
+    // [CN] 一次循环不打断仍在自行运动的文件（shapes.riv、truck.riv）；只有播放才会重新开始它。
+    private val loopRunnable: Runnable = Runnable {
+        if (!loops) return@Runnable
+        if (restartsOnPlay() && CYLReflection.call(rive, "isPlaying") == true) {
+            handler.postDelayed(loopRunnable, (LOOP_SECONDS * 1000).toLong())
+        } else {
+            cyl_playAnimationView()
+        }
+    }
 
     init {
         addView(rive, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
         // [EN] A tab icon is not a control: TalkBack reads the tab button. [CN] Tab 图标不是控件：TalkBack 读取 Tab 按钮。
         importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS
+        // [EN] A fixed tint ("#RRGGBB" / "#AARRGGBB"), with its night-mode color (`darkTint`). [CN] 固定着色，及其夜间模式颜色（`darkTint`）。
+        fixedTintColor(resources.configuration)?.let { applyTint(it) }
     }
+
+    private val tintOption get() = CYLTabBarItemAnimationTint.tintOption(options)
+
+    /**
+     * [EN] The fixed tint for `configuration`: `darkTint` in night mode when it is set, else `tint`; null for "title" or none.
+     * [CN] `configuration` 下的固定着色：夜间模式且设置了 `darkTint` 时使用它，否则使用 `tint`；"title" 或未设置时为 null。
+     */
+    internal fun fixedTintColor(configuration: Configuration): Int? = CYLTabBarItemAnimationTint.fixedTintColor(options, configuration)
+
+    private fun isNight(configuration: Configuration) =
+        (configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
+
+    /**
+     * [EN] Night mode changed: the fixed tint takes its color for the new mode, and the theme instance is bound again.
+     * [CN] 夜间模式变化：固定着色使用新模式的颜色，并重新绑定主题实例。
+     */
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        if (fixedTintColor(newConfig) != null) applyTint(CYLTabBarItemAnimationTint.resolvedTintColor(options, tintTitleColor, newConfig, tintSelected))
+        cyl_bindThemeInstance(newConfig)
+    }
+
+    private val lightInstanceName get() = options[CYLTabBarItemAnimationKeys.CYLTabBarAnimationOptionRiveViewModelInstance]?.takeIf { it.isNotEmpty() }
+    private val darkInstanceName get() = options[CYLTabBarItemAnimationKeys.CYLTabBarAnimationOptionRiveDarkViewModelInstance]?.takeIf { it.isNotEmpty() }
+    private var lightInstance: Any? = null
+    private var darkInstance: Any? = null
+    /**
+     * [EN] The instance bound last, by `cyl_bindThemeInstance`. [CN] `cyl_bindThemeInstance` 最近绑定的实例。
+     */
+    internal var boundThemeInstance: Any? = null
+        private set
+    /**
+     * [EN] The selected state, carried over to the other instance. [CN] 选中状态，切换实例时带过去。
+     */
+    private var isActive = false
+
+    /**
+     * [EN] Rive's theme pattern (the iOS options of the same name): binds the named instance of the artboard's default view
+     *      model for `configuration`'s mode (`viewModelInstance` by day, `darkViewModelInstance` at night) to every state
+     *      machine, keeping the selected state. rive-android by reflection: `getController().getFile()`,
+     *      `defaultViewModelForArtboard(getActiveArtboard())`, `createInstanceFromName`, `StateMachineInstance.setViewModelInstance`.
+     *      Called after the file loads and when night mode changes; nothing without the options.
+     * [CN] Rive 的主题方式（与 iOS 同名的选项）：按 `configuration` 的模式（日间为 `viewModelInstance`，夜间为 `darkViewModelInstance`）把画板默认
+     *      view model 的具名实例绑定到每个状态机，并保持选中状态。通过反射使用 rive-android：`getController().getFile()`、
+     *      `defaultViewModelForArtboard(getActiveArtboard())`、`createInstanceFromName`、`StateMachineInstance.setViewModelInstance`。
+     *      文件加载后及夜间模式变化时调用；没有这些选项时不做任何事。
+     */
+    internal fun cyl_bindThemeInstance(configuration: Configuration = resources.configuration) {
+        val darkName = darkInstanceName ?: return
+        val controller = CYLReflection.call(rive, "getController") ?: return
+        val file = CYLReflection.call(controller, "getFile") ?: return
+        val artboard = CYLReflection.call(controller, "getActiveArtboard") ?: return
+        val viewModel = CYLReflection.call(file, "defaultViewModelForArtboard", artboard) ?: return
+        if (lightInstance == null) {
+            lightInstance = lightInstanceName?.let { CYLReflection.call(viewModel, "createInstanceFromName", it) }
+                ?: CYLReflection.call(viewModel, "createDefaultInstance")
+        }
+        if (darkInstance == null) {
+            darkInstance = CYLReflection.call(viewModel, "createInstanceFromName", darkName)
+            if (darkInstance == null) Log.w(TAG, "The Rive file has no view model instance named $darkName")
+        }
+        val instance = (if (isNight(configuration)) darkInstance else lightInstance) ?: return
+        if (instance === boundThemeInstance) return
+        // [EN] The selected state goes with the theme. [CN] 选中状态随主题一起切换。
+        CYLReflection.call(instance, "getBooleanProperty", booleanInput)?.let { CYLReflection.call(it, "setValue", isActive) }
+        val machines = CYLReflection.call(controller, "getStateMachines") as? List<*>
+        machines?.filterNotNull()?.forEach { CYLReflection.call(it, "setViewModelInstance", instance) }
+        if (machines.isNullOrEmpty()) CYLReflection.call(artboard, "setViewModelInstance", instance)
+        boundThemeInstance = instance
+        redrawRestingFrame()
+    }
+
+    /**
+     * [EN] The tint currently drawn, or null. [CN] 当前绘制的着色，没有时为 null。
+     */
+    var appliedTintColor: Int? = null
+        private set
+
+    /**
+     * [EN] Bug B12: icons.riv draws light strokes that vanish on a light tab bar, and a Rive file has no tint of its own.
+     *      A one-color icon is tinted like a template image: its layer is drawn through a SRC_IN color filter (a
+     *      TextureView, as rive-android's view, takes it as its layer paint). null removes it.
+     * [CN] 问题 B12：icons.riv 绘制浅色描边，在浅色 TabBar 上几乎不可见，而 Rive 文件本身没有着色。单色图标像模板图片一样着色：通过 SRC_IN
+     *      颜色滤镜绘制其图层（rive-android 的视图是 TextureView，作为其 layer paint）。null 移除着色。
+     */
+    private fun applyTint(color: Int?) {
+        appliedTintColor = color
+        val paint = color?.let { android.graphics.Paint().apply { colorFilter = android.graphics.PorterDuffColorFilter(it, android.graphics.PorterDuff.Mode.SRC_IN) } }
+        if (rive is android.view.TextureView) {
+            rive.setLayerPaint(paint)
+        } else {
+            rive.setLayerType(if (paint != null) View.LAYER_TYPE_HARDWARE else View.LAYER_TYPE_NONE, paint)
+        }
+    }
+
+    /**
+     * [EN] The tab's title color, drawn when the `tint` option is "title". [CN] Tab 的标题颜色，`tint` 选项为 "title" 时绘制。
+     */
+    override fun cyl_applyAnimationViewTintColor(color: Int?) {
+        if (tintOption == TINT_TITLE) applyTint(color)
+    }
+
+    /**
+     * [EN] The title color and state given last, for a night-mode change. [CN] 最近给出的标题颜色与状态，供夜间模式变化使用。
+     */
+    private var tintTitleColor: Int? = null
+    private var tintSelected: Boolean? = null
+
+    /**
+     * [EN] A fixed tint only on the unselected tab; the selected tab takes the title color (iOS 9a64feea).
+     * [CN] 固定着色只用于未选中的 Tab；选中的 Tab 使用标题颜色（iOS 9a64feea）。
+     */
+    override fun cyl_applyAnimationViewTintColor(color: Int?, selected: Boolean) {
+        tintTitleColor = color
+        tintSelected = selected
+        if (tintOption != null) applyTint(CYLTabBarItemAnimationTint.resolvedTintColor(options, color, resources.configuration, selected))
+    }
+
+    /**
+     * [EN] The Rive view draws its tint on rive-android's view, not on this container. [CN] Rive 视图在 rive-android 的视图上绘制着色，而不是在本容器上。
+     */
+    override val cyl_drawsAnimationViewTint: Boolean get() = true
 
     /**
      * [EN] Leaves every touch to the tab button: rive-android's `RiveAnimationView` consumes touches for its state
@@ -915,9 +1257,28 @@ class CYLRiveTabBarItemAnimationView private constructor(context: Context, priva
     override fun dispatchTouchEvent(event: android.view.MotionEvent?): Boolean = false
 
     private fun setActive(active: Boolean) {
+        isActive = active
         val machine = stateMachine ?: return
         if (!hasInput(machine, booleanInput)) return
+        cyl_resumeStateMachineIfSettled(machine)
         CYLReflection.call(rive, "setBooleanState", machine, booleanInput, active)
+    }
+
+    /**
+     * [EN] Plays the state machine again when the controller has none playing, before an input is set. A machine that settled
+     *      (after `cyl_restUntilPlayed`, or after any transition) is paused by rive-android; a new input is meant to restart
+     *      it, but on a slow x86_64 emulator (API 37) it did not: menu_button.riv stayed on its close icon while "isOpen"
+     *      flipped on every loop pass (3bd20b3c, logged by the CollectionViewClassifyMenu session). The fake view of the tests
+     *      has no controller.
+     * [CN] 设置输入之前，如果控制器中没有正在播放的状态机，则重新播放该状态机。已稳定的状态机（`cyl_restUntilPlayed` 之后，或任意一次切换之后）会被
+     *      rive-android 暂停；新的输入本应让它重新运行，但在较慢的 x86_64 模拟器（API 37）上没有：每次循环 "isOpen" 都在切换，menu_button.riv
+     *      却一直停在关闭图标上（3bd20b3c，CollectionViewClassifyMenu 会话记录）。测试中的伪造视图没有控制器。
+     */
+    private fun cyl_resumeStateMachineIfSettled(machine: String) {
+        val controller = CYLReflection.call(rive, "getController") ?: return
+        val playing = CYLReflection.call(controller, "getPlayingStateMachines") as? Collection<*> ?: return
+        if (playing.isNotEmpty()) return
+        CYLReflection.callKotlin(rive, "play", machine, CYLReflection.DEFAULT, CYLReflection.DEFAULT, true, false)
     }
 
     /**
@@ -929,37 +1290,154 @@ class CYLRiveTabBarItemAnimationView private constructor(context: Context, priva
      */
     internal fun hasInput(machine: String, input: String): Boolean = CYLRiveInputs.hasInput(rive, machine, input)
 
+    /**
+     * [EN] Plays from the start (docs/Animated-Item.md, the Rive loop): a trigger restarts the state machine, then fires a frame
+     *      later (check.riv stayed on its finished check); a boolean input the state machine has goes false, then true a
+     *      frame later, so every play is a transition (a held input used to play once), and false after the duration; a
+     *      state machine without that input restarts (house.riv); a linear animation restarts. With looping on, it plays
+     *      again after each pass.
+     * [CN] 从头播放（docs/Animated-Item.md，Rive 循环）：trigger 先重新开始状态机，一帧之后再触发（check.riv 停在完成的对勾上）；状态机中存在的布尔输入先设为
+     *      false，一帧之后设为 true，每次播放都是一次状态切换（保持的输入以前只播放一次），经过时长后设为 false；没有该输入的状态机重新开始（house.riv）；
+     *      线性动画重新开始。开启循环时，每次播放后再次播放。
+     */
     override fun cyl_playAnimationView() {
         handler.removeCallbacksAndMessages(null)
+        hasPlayed = true
+        if (restingAfterLoad) {
+            // [EN] Resumed where it rests (no settling), then played as usual. Only the state machine: an unnamed `play()` also
+            //      starts every linear animation of the artboard, which then overrides the machine (menu_button.riv stuck after
+            //      one play on Android, dcbfdec6).
+            // [CN] 从静止处恢复（不重新定位），然后照常播放。只恢复状态机：不带名字的 `play()` 还会启动画板的所有线性动画，它们会覆盖状态机
+            //      （Android 上 menu_button.riv 播放一次后卡住，dcbfdec6）。
+            restingAfterLoad = false
+            val machineName = stateMachine
+            if (machineName != null) {
+                CYLReflection.callKotlin(rive, "play", machineName, CYLReflection.DEFAULT, CYLReflection.DEFAULT, true, false)
+            } else if (options[CYLTabBarItemAnimationKeys.CYLTabBarAnimationOptionRiveAnimation] == null) {
+                CYLReflection.callKotlin(rive, "play", CYLReflection.DEFAULT, CYLReflection.DEFAULT, false)
+            }
+        }
         val machine = stateMachine
         val trigger = options[CYLTabBarItemAnimationKeys.CYLTabBarAnimationOptionRiveTriggerInput] ?: options[CYLTabBarItemAnimationKeys.CYLTabBarAnimationOptionRiveTriggerProperty]
         val animation = options[CYLTabBarItemAnimationKeys.CYLTabBarAnimationOptionRiveAnimation]
         val default = CYLReflection.DEFAULT
-        when {
-            machine != null && trigger != null -> { if (hasInput(machine, trigger)) CYLReflection.call(rive, "fireState", machine, trigger) }
-            machine != null -> {
-                setActive(true)
-                if (activeDuration > 0) handler.postDelayed({ setActive(false) }, (activeDuration * 1000).toLong())
-            }
-            // [EN] rive-android `play(animationName, loop, direction, isStateMachine, settleInitialState)`. [CN] rive-android 的 `play(animationName, loop, direction, isStateMachine, settleInitialState)`。
-            animation != null -> CYLReflection.callKotlin(rive, "play", animation, default, default, false, default)
+        val restart = {
             // [EN] `reset()`, then `play(loop, direction, settleInitialState)` with its defaults. [CN] `reset()` 后以默认值调用 `play(loop, direction, settleInitialState)`。
-            else -> { CYLReflection.call(rive, "reset"); CYLReflection.callKotlin(rive, "play", default, default, default) }
+            CYLReflection.call(rive, "reset")
+            CYLReflection.callKotlin(rive, "play", default, default, default)
         }
+        val number = numberInput
+        when {
+            machine != null && trigger == null && number != null && hasInput(machine, number) -> {
+                // [EN] The next value: house.riv moves only when Rooms changes. [CN] 下一个值：house.riv 只在 Rooms 变化时运动。
+                val next = CYLRiveInputs.nextNumber(numberValues, CYLRiveInputs.numberValue(rive, machine, number) ?: lastNumber)
+                lastNumber = next
+                cyl_resumeStateMachineIfSettled(machine)
+                CYLReflection.call(rive, "setNumberState", machine, number, next)
+            }
+            machine != null && trigger != null && hasInput(machine, trigger) -> {
+                restart()
+                handler.postDelayed({ CYLReflection.call(rive, "fireState", machine, trigger) }, NEXT_FRAME_MS)
+            }
+            machine != null && trigger == null && numberInput == null && hasInput(machine, booleanInput) -> {
+                setActive(false)
+                handler.postDelayed({
+                    setActive(true)
+                    if (activeDuration > 0) handler.postDelayed({ setActive(false) }, (activeDuration * 1000).toLong())
+                }, inputOffMilliseconds())
+            }
+            // [EN] rive-android `play(animationName, loop, direction, isStateMachine, settleInitialState)`, from the start.
+            // [CN] rive-android 的 `play(animationName, loop, direction, isStateMachine, settleInitialState)`，从头开始。
+            animation != null -> { CYLReflection.call(rive, "reset"); CYLReflection.callKotlin(rive, "play", animation, default, default, false, default) }
+            else -> restart()
+        }
+        if (loops) handler.postDelayed(loopRunnable, (loopSeconds(machine, trigger) * 1000).toLong())
     }
 
+    /**
+     * [EN] Whether a play restarts the file (no usable trigger, number or boolean input, no named animation).
+     * [CN] 一次播放是否重新开始文件（没有可用的 trigger、数字或布尔输入，也没有命名动画）。
+     */
+    /**
+     * [EN] How long a held input stays off before it goes on again: half a loop pass while looping a held input (duration
+     *      0), so the state machine spends real time closed on a slow device and every pass toggles (menu_button.riv stuck
+     *      on an x86 emulator, the mini program's B20 fix 074285a6); otherwise INPUT_OFF_MS (150 ms): a slow device renders a
+     *      frame in more than 50 ms, and the machine must advance at least once with the input off.
+     * [CN] 保持的输入在重新打开前关闭多久：循环保持的输入（时长为 0）时为半个循环周期，使状态机在慢设备上也真正停留在关闭状态，每次循环都切换
+     *      （x86 模拟器上 menu_button.riv 卡住，同小程序的 B20 修复 074285a6）；否则为 INPUT_OFF_MS（150 ms）：慢设备渲染一帧超过 50 ms，
+     *      状态机必须在输入关闭时至少前进一次。
+     */
+    private fun inputOffMilliseconds(): Long =
+        if (loops && activeDuration <= 0) (LOOP_SECONDS * 1000 / 2).toLong() else INPUT_OFF_MS
+
+    private fun restartsOnPlay(): Boolean {
+        val machine = stateMachine ?: return options[CYLTabBarItemAnimationKeys.CYLTabBarAnimationOptionRiveAnimation] == null
+        val trigger = options[CYLTabBarItemAnimationKeys.CYLTabBarAnimationOptionRiveTriggerInput] ?: options[CYLTabBarItemAnimationKeys.CYLTabBarAnimationOptionRiveTriggerProperty]
+        if (trigger != null) return !hasInput(machine, trigger)
+        numberInput?.let { return !hasInput(machine, it) }
+        return !hasInput(machine, booleanInput)
+    }
+
+    /**
+     * [EN] `cyl_setAnimationViewLoops`. [CN] `cyl_setAnimationViewLoops`。
+     */
+    override fun cyl_setAnimationViewLoops(loops: Boolean) {
+        this.loops = loops
+        if (!loops) handler.removeCallbacks(loopRunnable)
+    }
+
+    /**
+     * [EN] A loop pass: after the input goes back to false (plus a pause), else LOOP_SECONDS. [CN] 一次循环：输入恢复为 false 之后（再停顿一下），否则 LOOP_SECONDS。
+     */
+    private fun loopSeconds(machine: String?, trigger: String?): Double =
+        if (machine != null && trigger == null && activeDuration > 0) activeDuration + LOOP_PAUSE_SECONDS else LOOP_SECONDS
+
     override fun cyl_showAnimationViewLastFrame() {
-        if (stateMachine != null) setActive(true) else CYLReflection.call(rive, "pause")
+        // [EN] The selection is recorded either way, so a theme instance bound later (night mode) keeps it.
+        // [CN] 无论哪种情况都记录选中状态，之后绑定的主题实例（深色模式）会保留它。
+        if (stateMachine != null) setActive(true) else { isActive = true; CYLReflection.call(rive, "pause") }
     }
 
     override fun cyl_stopAnimationView() {
         handler.removeCallbacksAndMessages(null)
-        if (stateMachine != null) setActive(false) else { CYLReflection.call(rive, "stop"); CYLReflection.call(rive, "reset") }
+        if (stateMachine != null) setActive(false) else { isActive = false; CYLReflection.call(rive, "stop"); CYLReflection.call(rive, "reset") }
     }
 
     /**
      * [EN] Provides the views of `CYLRiveTabBarItemAnimator`. [CN] 为 `CYLRiveTabBarItemAnimator` 提供视图。
      */
+    companion object {
+        /**
+         * [EN] The `tint` option value that follows the tab's title color. [CN] 跟随 Tab 标题颜色的 `tint` 选项值。
+         */
+        const val TINT_TITLE = "title"
+        private const val TAG = "CYLRiveTabBarItem"
+        /**
+         * [EN] Seconds of a loop pass when the file gives none. [CN] 文件未给出时一次循环的秒数。
+         */
+        const val LOOP_SECONDS = 1.5
+        /**
+         * [EN] The pause after an input goes back to false, before the next pass. [CN] 输入恢复为 false 后、下一次播放前的停顿。
+         */
+        const val LOOP_PAUSE_SECONDS = 0.4
+        /**
+         * [EN] A frame later: the state machine sees the reset or the false first. [CN] 一帧之后：状态机先看到重置或 false。
+         */
+        internal const val NEXT_FRAME_MS = 50L
+        /**
+         * [EN] A held input's off time before it goes on again (outside a loop). [CN] 保持的输入重新打开前的关闭时间（循环之外）。
+         */
+        internal const val INPUT_OFF_MS = 150L
+        /**
+         * [EN] One step of the state machine before it rests (a 60 Hz frame). [CN] 静止之前推进状态机的一步（60 Hz 的一帧）。
+         */
+        internal const val SETTLE_STEP_SECONDS = 1f / 60f
+        /**
+         * [EN] At most two seconds of steps; a machine still moving then moves by itself. [CN] 最多两秒的步数；之后仍在运动的状态机会自行运动。
+         */
+        internal const val SETTLE_STEPS = 120
+    }
+
     object Provider : CYLTabBarItemAnimationViewProviding {
         @Volatile private var riveInitialized = false
 
@@ -990,6 +1468,9 @@ class CYLRiveTabBarItemAnimationView private constructor(context: Context, priva
                     return@localFile
                 }
                 load(rive, bytes, options, contentMode)
+                // [EN] The theme instance for the current mode (`viewModelInstance` / `darkViewModelInstance`). [CN] 当前模式的主题实例。
+                view.cyl_bindThemeInstance()
+                view.cyl_restUntilPlayed()
                 CYLTabBarItemAnimationFailure.reportLoaded(view)
             }
             return view
@@ -1035,6 +1516,34 @@ internal object CYLRiveInputs {
         val instance = machines.firstOrNull { machineName(it) == machine } ?: return machines.isEmpty()
         val names = try { instance.javaClass.getMethod("getInputNames").invoke(instance) as? List<*> } catch (error: Exception) { null } ?: return true
         return names.contains(input)
+    }
+
+    /**
+     * [EN] The `values` option ("3,4,5,6") as numbers. [CN] `values` 选项（"3,4,5,6"）转为数字。
+     */
+    fun numberValues(values: String?): List<Float> = values.orEmpty().split(',').mapNotNull { it.trim().toFloatOrNull() }
+
+    /**
+     * [EN] The value after `current` in `values`, cycling (an unknown value starts the list); without values, `current + 1`.
+     * [CN] `values` 中 `current` 之后的值，循环（未知值从列表开头开始）；没有值时为 `current + 1`。
+     */
+    fun nextNumber(values: List<Float>, current: Float?): Float {
+        if (values.isEmpty()) return (current ?: 0f) + 1f
+        val index = if (current == null) -1 else values.indexOf(current)
+        return values[(index + 1) % values.size]
+    }
+
+    /**
+     * [EN] A number input's value (`input(name).getValue()` of rive-android), null when unknown.
+     * [CN] 数字输入的值（rive-android 的 `input(name).getValue()`），无法读取时为 null。
+     */
+    fun numberValue(rive: Any, machine: String, input: String): Float? {
+        val machines = try { rive.javaClass.getMethod("getStateMachines").invoke(rive) as? List<*> } catch (error: Exception) { null } ?: return null
+        val instance = machines.firstOrNull { machineName(it) == machine } ?: return null
+        return try {
+            val smi = instance.javaClass.getMethod("input", String::class.java).invoke(instance, input) ?: return null
+            (smi.javaClass.getMethod("getValue").invoke(smi) as? Number)?.toFloat()
+        } catch (error: Exception) { null }
     }
 
     private fun machineName(instance: Any?): String? = try { instance?.javaClass?.getMethod("getName")?.invoke(instance) as? String } catch (error: Exception) { null }

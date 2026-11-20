@@ -56,11 +56,15 @@ two places**:
 - **Debugging screenshots** that show the feature working (no bugs visible) are kept: save them in `docs/assets/` and
   embed them in the feature's `docs/` file.
 - **Final screenshots** of the finished feature also go into `README.md`.
-- **Screenshot layout**: a matrix (e.g. styles × libraries) stays a grid. Any other set of screenshots is stacked **top to
-  bottom**, one per row (a two-column table row each, or one image per line), never side by side: stacked, the same tab
-  bar item lines up vertically, so its states (selected, pressed, a value of a setting, before and after a fix) compare
-  at a glance. Crop each screenshot to the same region and width (e.g. only the tab bar), and label each row with the
-  state it shows. Example: `docs/Android-Liquid-Glass.md` (the dock at three surface opacities).
+- **Screenshot layout** (updated 2026-11-18, [Screenshot-Guidelines](../../../docs/Screenshot-Guidelines.md) wins over this
+  summary): one column with several rows, top to bottom, first, the same element lined up vertically; two columns with
+  several rows only when the one-column image would be taller than one phone screen (height above about 2.17 times the
+  width); a matrix (e.g. styles × libraries) stays a grid. Crop each screenshot to the same region and width. Every
+  stitched image has a header band (platform and OS version, simulator / emulator / device, host OS, IDE version, commit,
+  branch, date, `Purpose: …`), a caption band above each cell (state and measurement) and a footer band (`Result: …
+  Method: …`), English only, added around the screenshots and never over them: `scripts/stitch-screenshots.py`.
+  Enforced: the pre-commit hook (`bash scripts/install-git-hooks.sh`) runs `scripts/check-screenshot-labels.py` (not CI).
+  Example: `docs/Android-Liquid-Glass.md` (the dock at three surface opacities).
 - If a change could not be run (no simulator or device), say so in the document instead of adding screenshots, and
   never present a mock-up or a diagram as a screenshot.
 - **Attachment layout (Obsidian rule)**: a Markdown file's attachments live in an `assets/` folder **next to that file**,
@@ -188,3 +192,9 @@ classes link back to it:
   automatically. A declared class that cannot be found, or a document without a declaration, is an error, and the
   `Docs navigation` workflow fails.
 - Never edit the generated binding blocks by hand; change the declaration instead.
+
+- Screenshots of a tab bar (added 2026-11-18, maintainer): crop with at least 24 pt (72 px at @3x) above the raised plus button (or the bar), measured on the image (the drawn plus button and its badge reach above its accessibility frame), so the plus button and badges are whole; the stitched image keeps a white gap (`scripts/stitch-screenshots.py --top-gap`, 24 px by default) between every header or caption band and the screenshot below. Full rule: docs/Screenshot-Guidelines.md, "Space above the tab bar and below the bands".
+
+## Swift first on iOS (added 2026-11-19)
+
+- **The iOS core is Swift; every new piece of code is Swift first (added 2026-11-19, owner)**: the core code of this project on iOS (the CocoaPods / Swift Package Manager / Carthage sources under `CYLTabBarController/`, including the `CYLAnimatedItem` module) is Swift. Write every new class, extension, test and example in Swift. Use Objective-C only where Swift cannot do the job (a header that must stay importable from Objective-C without modules, a `+load`-time hook, a C macro), and give the reason in a comment and in the task's document in `docs/`. Keep the public API usable from Objective-C (`@objc`, `@objcMembers`, `NS_SWIFT_NAME` counterparts) so existing Objective-C callers keep working. When you touch Objective-C code for a new feature, prefer adding the feature in a Swift file over growing the Objective-C file. Migration log: `docs/Swift-Migration.md`. Details: `AGENTS.md`, "Code rules".

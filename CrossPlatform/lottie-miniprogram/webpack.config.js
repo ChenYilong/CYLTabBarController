@@ -1,6 +1,6 @@
-const path = require('path')
+const path = require('node:path')
 const webpack = require('webpack')
-const fs = require('fs')
+const fs = require('node:fs')
 const CopyPlugin = require('copy-webpack-plugin')
 
 module.exports = {

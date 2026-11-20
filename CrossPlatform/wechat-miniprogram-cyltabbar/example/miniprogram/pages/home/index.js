@@ -43,7 +43,7 @@ function cylNavigationFrame() {
     const top = window.statusBarHeight || 20;
     const height = capsule.height + (capsule.top - top) * 2;
     return { top, height, right: window.windowWidth - capsule.left + 8, menuHeight: window.windowHeight - top - height - 150 };
-  } catch (error) {
+  } catch {
     return { top: 20, height: 44, right: 100, menuHeight: 400 };
   }
 }
@@ -67,6 +67,19 @@ function cylListText(text) {
  */
 function cylFill(text, values) {
   return text.replace(/\{(\w+)\}/g, (match, name) => (values[name] !== undefined ? String(values[name]) : '—'));
+}
+
+/** [EN] A tab bar slot's title, '-' without one. [CN] TabBar 槽位的标题，没有时为 '-'。 */
+function cylSlotTitle(slot) {
+  return (slot.item ? slot.item.title : slot.title) || '-';
+}
+
+/** [EN] A row's accessory: a check mark for the switches in `on`, else the list's own. [CN] 行的附件：`on` 中的开关显示勾选状态，否则使用列表自身的。 */
+function cylRowAccessory(row, on) {
+  if (!(row.id in on)) {
+    return row.accessory;
+  }
+  return on[row.id] ? 'check' : 'none';
 }
 
 Component({
@@ -108,11 +121,11 @@ Component({
       return {
         titleOffset: offset ? `(${Number(offset[1])}, ${Number(offset[2])})` : '(0, 0)',
         // [EN] Item 14: the standardAppearance theme's name. [CN] 第 14 项：standardAppearance 主题名。
-        appearance: this.t((state.overrides || {}).cylDemoAppearance || 'Original'),
+        appearance: this.t(state.overrides?.cylDemoAppearance || 'Original'),
         // [EN] Item 16: the code name, not translated, as iOS. [CN] 第 16 项：代码名，与 iOS 一样不翻译。
         scrollBehavior: state.scrollBehavior || 'Automatic',
         // [EN] Items 30, 35, 37. [CN] 第 30、35、37 项。
-        touchScale: Number(((state.overrides || {}).cylDemoTouchableArea || {}).scale || 1).toFixed(1),
+        touchScale: Number(state.overrides?.cylDemoTouchableArea?.scale || 1).toFixed(1),
         longPress: String(configuration.CYLTabBarControllerTabBarItemLongPressDuration || 0.5),
         doubleTap: String(configuration.CYLTabBarControllerTabBarItemDoubleTapInterval || 0.35),
         adjacent: state.adjacentResult || '-',
@@ -121,11 +134,11 @@ Component({
         login: this.t(state.loggedIn ? 'Logged in' : 'Logged out'),
         loginTabs: loginTabs.join(', ') || '—',
         // [EN] Item 33: the names of the current steps. [CN] 第 33 项：当前步骤的名字。
-        tapAnimation: this.t(CYL_TAP_STEPS[(state.overrides || {}).cylDemoTapStep || 0].name),
-        tapSound: this.t(CYL_SOUND_STEPS[(state.overrides || {}).cylDemoSoundStep || 0].name),
+        tapAnimation: this.t(CYL_TAP_STEPS[state.overrides?.cylDemoTapStep || 0].name),
+        tapSound: this.t(CYL_SOUND_STEPS[state.overrides?.cylDemoSoundStep || 0].name),
         indexWithoutPlus: tabIndex < 0 ? '-' : tabIndex,
         selectedIndex: selectedIndex < 0 ? '-' : selectedIndex,
-        selectedTitle: selectedIndex < 0 ? '-' : (slots[selectedIndex].item ? slots[selectedIndex].item.title : slots[selectedIndex].title) || '-',
+        selectedTitle: selectedIndex < 0 ? '-' : cylSlotTitle(slots[selectedIndex]),
       };
     },
 
@@ -164,7 +177,7 @@ Component({
           title: cylListText(sample.title),
           text: this.cyl_badgeText(sample),
           dot: !sample.value,
-          animation: CYL_BADGE_ANIMATIONS.find((name) => sample.animation && sample.animation.startsWith(name)) || '',
+          animation: CYL_BADGE_ANIMATIONS.find((name) => sample.animation?.startsWith(name)) || '',
           style: this.cyl_badgeStyle(sample),
           position: sample.position || 'topRight',
         })),
@@ -231,7 +244,7 @@ Component({
      *      仅扁平样式支持的行变灰并显示说明（CYLFlatDesignTableViewController）。
      */
     cyl_row(row, values, state, configuration) {
-      const updates = (state.overrides || {}).cylDemoUpdates || {};
+      const updates = state.overrides?.cylDemoUpdates || {};
       const on = {
         changeTabTitle: updates.changeTabTitle,
         switchTabIcon: updates.homeIcon === 'custom',
@@ -240,7 +253,7 @@ Component({
         allNetworkIcons: updates.allIcons === 'network',
         allLocalIcons: updates.allIcons === 'local',
         allTitles: updates.allTitles,
-        replaceNeighbors: Boolean((state.overrides || {}).cylDemoReplaced),
+        replaceNeighbors: Boolean(state.overrides?.cylDemoReplaced),
       };
       const flatOnly = row.id === 'flatBackground';
       const unsupported = flatOnly && configuration.CYLTabBarControllerStyleType !== 'flatDesign';
@@ -259,7 +272,7 @@ Component({
         id: row.id,
         title: cylFill(cylListText(row.title), values),
         subtitle: flatOnly && !unsupported ? '' : cylFill(cylListText(row.subtitle), values),
-        accessory: row.id in on ? (on[row.id] ? 'check' : 'none') : row.accessory,
+        accessory: cylRowAccessory(row, on),
         checked: this.cyl_isOn(row.id, state),
         dimmed: unsupported,
         // [EN] Item 30: the slider of touchableAreaScale (1 to 3). [CN] 第 30 项：touchableAreaScale 滑块（1 到 3）。
@@ -308,10 +321,10 @@ Component({
         return Boolean(state.loggedIn);
       }
       if (id === 'swipe') {
-        return Boolean((state.overrides || {}).CYLTabBarControllerSwipeToSwitchTab);
+        return Boolean(state.overrides?.CYLTabBarControllerSwipeToSwitchTab);
       }
       if (id === 'touchableArea') {
-        return Boolean(((state.overrides || {}).cylDemoTouchableArea || {}).shows);
+        return Boolean(state.overrides?.cylDemoTouchableArea?.shows);
       }
       if (id === 'longPress') {
         return Boolean(state.longPressEnabled);
@@ -359,13 +372,12 @@ Component({
     },
 
     cyl_override(change) {
-      this.cyl_update({ overrides: Object.assign({}, getApp().globalData.cylTabBarState.overrides, change) });
+      this.cyl_update({ overrides: { ...getApp().globalData.cylTabBarState.overrides, ...change } });
     },
 
     cyl_onRow(event) {
       const id = event.currentTarget.dataset.id;
       const state = getApp().globalData.cylTabBarState;
-      const configuration = cylDemoConfiguration(state.overrides, cylEffectiveSkin(state));
       if (id.startsWith('skin:')) {
         getApp().cyl_setSkin(id.slice('skin:'.length));
         return;
@@ -388,7 +400,7 @@ Component({
         },
         gallery: () => wx.navigateTo({ url: '/pages/glass/index' }),
         login: () => this.cyl_update({ loggedIn: !state.loggedIn }),
-        swipe: () => this.cyl_override({ CYLTabBarControllerSwipeToSwitchTab: !(state.overrides || {}).CYLTabBarControllerSwipeToSwitchTab }),
+        swipe: () => this.cyl_override({ CYLTabBarControllerSwipeToSwitchTab: !state.overrides?.CYLTabBarControllerSwipeToSwitchTab }),
       };
       if (actions[id]) {
         actions[id]();
@@ -471,8 +483,8 @@ Component({
      * [CN] 第 30 项：开关显示可点击区域，滑块按倍数扩大（步长 0.1）。
      */
     cyl_touchableArea(change) {
-      const current = (getApp().globalData.cylTabBarState.overrides || {}).cylDemoTouchableArea || { shows: false, scale: 1 };
-      this.cyl_override({ cylDemoTouchableArea: Object.assign({}, current, change) });
+      const current = getApp().globalData.cylTabBarState.overrides?.cylDemoTouchableArea || { shows: false, scale: 1 };
+      this.cyl_override({ cylDemoTouchableArea: { ...current, ...change } });
     },
 
     cyl_onTouchSlider(event) {

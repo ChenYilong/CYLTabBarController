@@ -46,7 +46,7 @@ function cylIsDevTools() {
   try {
     const info = typeof wx.getDeviceInfo === 'function' ? wx.getDeviceInfo() : wx.getSystemInfoSync()
     return info.platform === 'devtools'
-  } catch (error) {
+  } catch {
     return false
   }
 }
@@ -78,7 +78,7 @@ function cylPixelRatio() {
  *      "http://usr"）使用文件系统。
  */
 function cylReadPAG(path, callback) {
-  const userData = (wx.env && wx.env.USER_DATA_PATH) || ''
+  const userData = wx.env?.USER_DATA_PATH || ''
   if (/^https?:\/\//.test(path) && !(userData && path.indexOf(userData) === 0)) {
     wx.request({
       url: path,
@@ -120,7 +120,12 @@ Component({
 
   observers: {
     'path, fit': function () {
-      if (this.cylReady) {
+      // [EN] WeChat runs an observer on every set, even with the same value: a host that re-renders (cyl-animated-item
+      //      after `ready`) restarted the load dozens of times a second, so the file never played (bugs B8 / B11,
+      //      docs/Animated-Item.md). Reload only when an input really changed, or after a failed load.
+      // [CN] 微信在每次设置时都会运行 observer，即使值相同：重新渲染的宿主（`ready` 后的 cyl-animated-item）每秒重启加载数十次，
+      //      文件永远不播放（问题 B8 / B10）。只在输入确实变化或加载失败后重新加载。
+      if (this.cylReady && (this.cyl_loadKey() !== this.cylLoadKey || this.cylLoadFailed)) {
         this.cyl_load()
       }
     },
@@ -176,8 +181,21 @@ Component({
       }
     },
 
+    /** [EN] A failed load: the same inputs may load again. [CN] 加载失败：相同输入可再次加载。 */
+    cyl_reportError(detail) {
+      this.cylLoadFailed = true
+      this.triggerEvent('error', detail)
+    },
+
+    /** [EN] The inputs of a load. [CN] 一次加载的输入。 */
+    cyl_loadKey() {
+      return JSON.stringify([this.data.path, this.data.fit])
+    },
+
     cyl_load() {
       const token = ++this.cylLoadToken
+      this.cylLoadKey = this.cyl_loadKey()
+      this.cylLoadFailed = false
       this.cyl_destroy()
       if (!this.data.path) {
         return
@@ -186,12 +204,12 @@ Component({
         .select(`#${this.data.cylCanvasId}`)
         .fields({ node: true, size: true })
         .exec((result) => {
-          const info = result && result[0]
+          const info = result?.[0]
           if (token !== this.cylLoadToken || !this.cylReady) {
             return
           }
-          if (!info || !info.node) {
-            this.triggerEvent('error', { message: 'cyl-pag: the canvas node is not available.' })
+          if (!info?.node) {
+            this.cyl_reportError( { message: 'cyl-pag: the canvas node is not available.' })
             return
           }
           const canvas = info.node
@@ -211,15 +229,50 @@ Component({
               return
             }
             if (error) {
-              this.triggerEvent('error', { message: error.message })
+              this.cyl_reportError( { message: error.message })
               return
             }
             // [EN] A failure to start is reported like a failure to load. [CN] 启动失败与加载失败一样上报。
             this.cyl_start(data, canvas, token).catch((startError) => {
-              this.triggerEvent('error', { message: startError && startError.message })
+              this.cyl_reportError( { message: startError ? startError.message : startError })
             })
           })
         })
+    },
+
+    /**
+     * [EN] Keeps the loaded file and view, applies the speed, fit and loop, listens to the view's events, then plays
+     *      (autoplay, or a play requested while loading) and reports `ready`.
+     * [CN] 保存已加载的文件与视图，应用速度、填充方式与循环，监听视图事件，然后播放（autoplay，或加载期间请求的播放）
+     *      并发出 `ready`。
+     */
+    cyl_attachView(file, view) {
+      this.cylFile = file
+      this.cylView = view
+      this.cylOriginalDuration = Number(file.duration()) || 0
+      this.cyl_applySpeed()
+      view.setScaleMode(CYL_SCALE_MODES[this.data.fit] || CYL_SCALE_MODES.contain)
+      view.setRepeatCount(this.data.loop ? 0 : 1)
+      view.addListener('onAnimationFlushed', () => {
+        if (CYL_USES_SNAPSHOTS && Date.now() - (this.cylSnapshotAt || 0) >= CYL_SNAPSHOT_INTERVAL_MS) {
+          this.cyl_captureSnapshot()
+        }
+      })
+      view.addListener('onAnimationEnd', () => {
+        this.cyl_syncSnapshot()
+        this.triggerEvent('complete', {})
+      })
+      view.addListener('onAnimationRepeat', () => this.triggerEvent('loopcomplete', {}))
+      this.cyl_rest()
+      if (this.data.autoplay) {
+        view.play()
+      }
+      this.cyl_syncSnapshot()
+      this.triggerEvent('ready', { duration: this.cyl_duration() })
+      if (this.cylPendingPlay) {
+        const pending = this.cylPendingPlay
+        this.cyl_playFromStart(pending.seconds + (Date.now() - pending.requestedAt) / 1000)
+      }
     },
 
     async cyl_start(data, canvas, token) {
@@ -240,32 +293,7 @@ Component({
           file.destroy()
           return
         }
-        this.cylFile = file
-        this.cylView = view
-        this.cylOriginalDuration = Number(file.duration()) || 0
-        this.cyl_applySpeed()
-        view.setScaleMode(CYL_SCALE_MODES[this.data.fit] || CYL_SCALE_MODES.contain)
-        view.setRepeatCount(this.data.loop ? 0 : 1)
-        view.addListener('onAnimationFlushed', () => {
-          if (CYL_USES_SNAPSHOTS && Date.now() - (this.cylSnapshotAt || 0) >= CYL_SNAPSHOT_INTERVAL_MS) {
-            this.cyl_captureSnapshot()
-          }
-        })
-        view.addListener('onAnimationEnd', () => {
-          this.cyl_syncSnapshot()
-          this.triggerEvent('complete', {})
-        })
-        view.addListener('onAnimationRepeat', () => this.triggerEvent('loopcomplete', {}))
-        this.cyl_rest()
-        if (this.data.autoplay) {
-          view.play()
-        }
-        this.cyl_syncSnapshot()
-        this.triggerEvent('ready', { duration: this.cyl_duration() })
-        if (this.cylPendingPlay) {
-          const pending = this.cylPendingPlay
-          this.cyl_playFromStart(pending.seconds + (Date.now() - pending.requestedAt) / 1000)
-        }
+        this.cyl_attachView(file, view)
       } catch (error) {
         if (file && file !== this.cylFile) {
           try {
@@ -274,7 +302,7 @@ Component({
         }
         if (current()) {
           this.cyl_destroy()
-          this.triggerEvent('error', { message: `cyl-pag: ${(error && error.message) || error}` })
+          this.cyl_reportError( { message: `cyl-pag: ${error?.message || error}` })
         }
       }
     },
@@ -377,7 +405,7 @@ Component({
     cyl_playFromStart(offset) {
       // [EN] `offset` (seconds) continues a playback another tab bar started: each tab page has its own tab bar.
       // [CN] `offset`（秒）继续另一个 TabBar 已开始的播放：每个 Tab 页面都有自己的 TabBar。
-      const seconds = Number(offset) > 0 ? Number(offset) : 0
+      const seconds = Math.max(0, Number(offset) || 0)
       const view = this.cylView
       if (!view) {
         // [EN] A play request made while the file loads (a new tab page's tab bar selects its tab at once) runs when it is ready.

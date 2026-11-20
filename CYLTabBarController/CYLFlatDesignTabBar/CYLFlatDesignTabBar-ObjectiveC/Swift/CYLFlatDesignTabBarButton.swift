@@ -10,6 +10,10 @@ import UIKit
 #if canImport(CYLAnimatedItem)
 import CYLAnimatedItem
 #endif
+#if canImport(CYLAnimatedItemViews)
+// [EN] SwiftPM: CYLAnimatedItemView is in the views target. [CN] SwiftPM：CYLAnimatedItemView 位于 views target。
+import CYLAnimatedItemViews
+#endif
 
 // [EN] The button of a FlatDesign tab, translated from Objective-C together with its item (docs/Swift-Migration.md,
 //      step 49). Objective-C names, selectors and Swift names are kept; `-_updateTabBarButton` keeps its selector for
@@ -28,23 +32,18 @@ import CYLAnimatedItem
 
 /**
  * [EN] One tab of the FlatDesign tab bar: draws its item (image, title, background, badge, animation) and maps the
- *      bar's `UITabBarAppearance` onto it.
- * [CN] 扁平样式 TabBar 的一个 Tab：绘制其 item（图片、标题、背景、角标、动画），并把 TabBar 的 `UITabBarAppearance` 映射到其上。
+ *      bar's `UITabBarAppearance` onto it. It is the shared animated item component, `CYLAnimatedItemView`
+ *      (docs/Animated-Item.md, item 4; Android: `CYLTabBarItemButton`): the item's image and title go into the
+ *      component's content (`image`, `title`), shown by its `imageView` and `titleLabel` (the same properties the button
+ *      had); the tab bar's own layout replaces the component's (`-layoutContentInRect:`), and the tab icon animation still
+ *      comes from the tab bar. The component's long press is off: the tab bar handles its own gestures.
+ * [CN] 扁平样式 TabBar 的一个 Tab：绘制其 item（图片、标题、背景、角标、动画），并把 TabBar 的 `UITabBarAppearance` 映射到其上。它就是共用的
+ *      动效条目组件 `CYLAnimatedItemView`（docs/Animated-Item.md，条目 4；Android 为 `CYLTabBarItemButton`）：item 的图片与标题写入组件的
+ *      内容（`image`、`title`），由其 `imageView` 与 `titleLabel` 显示（与按钮原有的属性相同）；TabBar 自己的布局代替组件的布局
+ *      （`-layoutContentInRect:`），Tab 图标动画仍由 TabBar 提供。组件的长按已关闭：TabBar 自行处理手势。
  */
 @objc(CYLFlatDesignTabBarButton)
-open class CYLFlatDesignTabBarButton: UIControl {
-
-    /**
-     * [EN] The image view of the tab.
-     * [CN] Tab 的图片视图。
-     */
-    @objc public let imageView = UIImageView()
-
-    /**
-     * [EN] The title label of the tab.
-     * [CN] Tab 的标题标签。
-     */
-    @objc public let titleLabel = UILabel()
+open class CYLFlatDesignTabBarButton: CYLAnimatedItemView {
 
     private var tabBarItemStorage: CYLFlatDesignTabBarItem?
 
@@ -98,15 +97,25 @@ open class CYLFlatDesignTabBarButton: UIControl {
         addTabSubviews()
     }
 
+    /**
+     * [EN] The component made `imageView` and `titleLabel`; they keep the tab bar's look: unclipped, the appearance's
+     *      title font (no Dynamic Type, as the system tab bar), no long press of the component, no identifier of its own.
+     * [CN] `imageView` 与 `titleLabel` 由组件创建；保持 TabBar 的外观：不裁剪，使用 appearance 的标题字体（与系统 TabBar 相同，不随动态字体变化），
+     *      不使用组件的长按，也不使用组件的标识符。
+     */
     private func addTabSubviews() {
         imageView.clipsToBounds = false
-        addSubview(imageView)
+        imageView.contentMode = .scaleToFill
         titleLabel.clipsToBounds = false
-        addSubview(titleLabel)
+        titleLabel.adjustsFontForContentSizeCategory = false
+        longPressGestureRecognizer.isEnabled = false
+        accessibilityIdentifier = nil
     }
 
-    open override func layoutSubviews() {
-        super.layoutSubviews()
+    /**
+     * [EN] The tab bar's layout instead of the component's. [CN] 使用 TabBar 的布局代替组件的布局。
+     */
+    open override func layoutContent(in _: CGRect) {
         updateLayout()
     }
 
@@ -114,7 +123,7 @@ open class CYLFlatDesignTabBarButton: UIControl {
         super.tintColorDidChange()
         if isSelected {
             titleLabel.textColor = titleTextAttributesForCurrentState()[.foregroundColor] as? UIColor
-            imageView.tintColor = iconColorForCurrentState()
+            applyIconTintColor(iconColorForCurrentState())
         }
     }
 
@@ -124,6 +133,9 @@ open class CYLFlatDesignTabBarButton: UIControl {
             guard super.isSelected != newValue else { return }
             super.isSelected = newValue
             cylUpdateTabBarButton()
+            // [EN] A GIF given as the tab image plays when its tab is selected, as on the classic tab bar (915bddbd).
+            // [CN] 作为 Tab 图片传入的 GIF 在选中其 Tab 时播放，与经典 TabBar 相同（915bddbd）。
+            if newValue, tabBarAnimationURL == nil { playAnimatedImage(animatedTabImage) }
         }
     }
 
@@ -171,9 +183,12 @@ open class CYLFlatDesignTabBarButton: UIControl {
         return tabBar.selectedItem?.standardAppearance ?? tabBar.standardAppearance
     }
 
-    /// [EN] The state appearance of the current state, nil without an appearance. [CN] 当前状态的 state appearance，没有 appearance 时为 nil。
+    /// [EN] The state appearance of the current state, nil without an appearance: the component's (`itemAppearance`, set from
+    ///      `effectiveAppearance` on every update), so the icon and title part lives in `CYLAnimatedItemView`.
+    /// [CN] 当前状态的 state appearance，没有 appearance 时为 nil：即组件的（`itemAppearance`，每次更新时由 `effectiveAppearance` 设置），图标与标题部分
+    ///      位于 `CYLAnimatedItemView`。
     private var currentStateAppearance: UITabBarItemStateAppearance? {
-        effectiveAppearance.map { Self.stateAppearance($0.stackedLayoutAppearance, for: currentState) }
+        currentItemStateAppearance
     }
 
     private var defaultStateAppearance: UITabBarItemStateAppearance {
@@ -286,16 +301,21 @@ open class CYLFlatDesignTabBarButton: UIControl {
     func cylUpdateTabBarButton() {
         let item = tabBarItemStorage
         isEnabled = item?.isEnabled ?? false
+        // [EN] The bar's (or the selected item's) appearance, icon and title part, to the component. [CN] 把 TabBar（或选中 item）外观的图标与标题部分交给组件。
+        itemAppearance = effectiveAppearance?.stackedLayoutAppearance
 
         var image = item?.image
         if isSelected, let selectedImage = item?.selectedImage {
             image = selectedImage
         }
-        imageView.image = image
-        imageView.tintColor = iconColorForCurrentState()
+        // [EN] Through the component's content, which shows it in `imageView`. [CN] 通过组件的内容写入，由组件显示在 `imageView` 中。
+        self.image = image
+        // [EN] The icon and its animation, through the component (the animation view takes it when its `tint` option asks).
+        // [CN] 图标及其动画，通过组件着色（动画视图在其 `tint` 选项需要时使用）。
+        applyIconTintColor(iconColorForCurrentState())
 
         let titleAttributes = titleTextAttributesForCurrentState()
-        titleLabel.text = item?.title
+        self.title = item?.title
         titleLabel.textColor = titleAttributes[.foregroundColor] as? UIColor
         titleLabel.font = titleAttributes[.font] as? UIFont
 
@@ -318,7 +338,7 @@ open class CYLFlatDesignTabBarButton: UIControl {
         //      the button's top-left corner.
         // [CN] 只有动画的 item 没有图片，但动画视图以 `imageView` 为中心，因此仍按动画尺寸布局图片位置；否则它会缩成零，动画绘制在按钮左上角附近。
         let animationSize = item?.lottieSizeValue?.cgSizeValue ?? .zero
-        let isAnimationOnly = imageView.image == nil && animationSize.width > 0 && animationSize.height > 0 && animationURL != nil
+        let isAnimationOnly = imageView.image == nil && animationSize.width > 0 && animationSize.height > 0 && tabBarAnimationURL != nil
         let showsImage = imageView.image != nil || isAnimationOnly
         let showsTitle = !(titleLabel.text ?? "").isEmpty
 
@@ -374,6 +394,10 @@ open class CYLFlatDesignTabBarButton: UIControl {
             imageView.frame = .zero
         }
         initTabBarItemAnimation()
+        // [EN] The tab's animation view is made here, after the button was tinted: it takes the icon color now (a tab that
+        //      never changed state kept the file's own white strokes on a light bar).
+        // [CN] Tab 的动画视图在这里创建，晚于按钮着色：此时为其着色（从未改变状态的 Tab 曾在浅色 TabBar 上保持文件自身的白色线条）。
+        applyIconTintColor(iconColorForCurrentState())
     }
 
     private func titleTextAttributesForCurrentState() -> [NSAttributedString.Key: Any] {
@@ -409,8 +433,86 @@ open class CYLFlatDesignTabBarButton: UIControl {
 
     // MARK: - [EN] Tab icon animation [CN] Tab 图标动画
 
+    // [EN] docs/Animated-Item.md item 4, second step: the component's animation is the tab's. The tab bar keeps making and
+    //      driving the tab's animation view (late failures, speed, loops, dark colors, themes, the classic tab bar shares
+    //      it), and the component's animation members answer with that view, so callers and the component's own icon logic
+    //      see one animation view; the component never makes or removes a second one.
+    // [CN] docs/Animated-Item.md item 4 第二步：组件的动画就是 Tab 的动画。Tab 的动画视图仍由 TabBar 创建与驱动（加载后失败、速度、循环、深色颜色、
+    //      主题，经典 TabBar 也共用），组件的动画成员返回该视图，调用方与组件自己的图标逻辑看到的是同一个动画视图；组件从不创建或移除第二个。
+
+    /**
+     * [EN] The tab's animation view (`-cyl_tabBarItemAnimationView`), nil without one.
+     * [CN] Tab 的动画视图（`-cyl_tabBarItemAnimationView`），没有时为 nil。
+     */
+    open override var animationView: UIView? {
+        cyl_tabBarItemAnimationView()
+    }
+
+    /**
+     * [EN] Whether this tab has an animation view and the tab bar's animations are loaded (`-cyl_isTabBarItemAnimationReady`
+     *      alone is about the whole tab bar, YES also for a tab without an animation).
+     * [CN] 本 Tab 是否有动画视图且 TabBar 的动画已加载（单独的 `-cyl_isTabBarItemAnimationReady` 针对整个 TabBar，没有动画的 Tab 也返回 YES）。
+     */
+    open override var isAnimationReady: Bool {
+        animationView != nil && cyl_isTabBarItemAnimationReady()
+    }
+
+    /**
+     * [EN] Rebuilds the tab's animation view for the current style. [CN] 按当前样式重建 Tab 的动画视图。
+     */
+    open override func reloadAnimation() {
+        cyl_reloadTabBarItemAnimationViewForCurrentStyle()
+    }
+
+    /**
+     * [EN] Plays the tab's animation, as a selection does. [CN] 播放 Tab 的动画，与选中时相同。
+     */
+    open override func playAnimation() {
+        guard CYLTabBarItemAnimationCore.service != nil, let url = tabBarAnimationURL else {
+            // [EN] No animation file: an animated tab image plays. [CN] 没有动画文件：播放动图 Tab 图片。
+            playAnimatedImage(animatedTabImage)
+            return
+        }
+        cyl_addTabBarItemAnimation(with: url, size: tabBarAnimationSize, contentMode: animationContentMode,
+                                   animationSpeed: tabBarAnimationSpeed)
+        cyl_playTabBarItemAnimation(with: url, size: tabBarAnimationSize, defaultSelected: false,
+                                    contentMode: animationContentMode)
+    }
+
+    /**
+     * [EN] Plays the tab's animation again from the start. [CN] 从头再次播放 Tab 的动画。
+     */
+    open override func restartAnimation() {
+        if tabBarAnimationURL == nil, playAnimatedImage(animatedTabImage) { return }
+        cyl_restartTabBarItemAnimation()
+    }
+
+    /**
+     * [EN] Stops the tab's animation. [CN] 停止 Tab 的动画。
+     */
+    open override func stopAnimation() {
+        stopAnimatedImage()
+        cyl_stopTabBarItemAnimation()
+    }
+
+    /// [EN] The tab's animated image (a GIF given as the tab image): the selected one when it is animated, else the normal
+    ///      one, as the classic tab bar plays it (a still selected copy plays the normal image's frames).
+    /// [CN] Tab 的动图（作为 Tab 图片传入的 GIF）：选中图片是动图时取选中图片，否则取普通图片，与经典 TabBar 的播放方式相同（静态的选中副本播放普通图片的帧）。
+    private var animatedTabImage: UIImage? {
+        let item = tabBarItemStorage
+        if let selected = item?.selectedImage, (selected.images?.count ?? 0) > 1 { return selected }
+        if let normal = item?.image, (normal.images?.count ?? 0) > 1 { return normal }
+        return nil
+    }
+
+    /// [EN] The item's animation size (`CYLTabBarLottieSize`). [CN] item 的动画尺寸（`CYLTabBarLottieSize`）。
+    private var tabBarAnimationSize: CGSize {
+        tabBarItemStorage?.lottieSizeValue?.cgSizeValue ?? .zero
+    }
+
+
     /// [EN] The animation URL first, as on the system tab bar, then the local path. [CN] 与系统 TabBar 相同，先取动画 URL，再取本地路径。
-    private var animationURL: URL? {
+    private var tabBarAnimationURL: URL? {
         guard let item = tabBarItemStorage else { return nil }
         return item.lottieURL ?? CYLConstants.cyl_getURL(from: item.lottieFilePath)
     }
@@ -423,7 +525,7 @@ open class CYLFlatDesignTabBarButton: UIControl {
      *      （`-cylflatdesign_setTabBarController:`），再读取其子控制器的（与 `CYLPlusButton` 的查找方式相同，#650）。
      */
     private var animationTabBarController: CYLTabBarController? {
-        if let controller = cylTabBarController() {
+        if let controller = cyl_tabBarController {
             return controller
         }
         let item = tabBarItemStorage
@@ -441,21 +543,21 @@ open class CYLFlatDesignTabBarButton: UIControl {
     }
 
     /// FIX: issue #428 — `-[CYLTabBarController tabBarItemAnimationSpeed]` in flat design, resolved like the content mode.
-    private var animationSpeed: CGFloat {
+    private var tabBarAnimationSpeed: CGFloat {
         animationTabBarController?.tabBarItemAnimationSpeed ?? 1
     }
 
     private func initTabBarItemAnimation() {
         // FIX: issue #604 — only with the `CYLTabBarItemAnimation` subspec. 仅在包含 `CYLTabBarItemAnimation` 子库时。
-        guard CYLTabBarItemAnimationCore.service != nil, let url = animationURL else { return }
-        let size = tabBarItemStorage?.lottieSizeValue?.cgSizeValue ?? .zero
-        cyl_addTabBarItemAnimation(with: url, size: size, contentMode: animationContentMode, animationSpeed: animationSpeed)
+        guard CYLTabBarItemAnimationCore.service != nil, let url = tabBarAnimationURL else { return }
+        let size = tabBarAnimationSize
+        cyl_addTabBarItemAnimation(with: url, size: size, contentMode: animationContentMode, animationSpeed: tabBarAnimationSpeed)
     }
 
     private func updateTabBarItemAnimation() {
         // FIX: issue #604 — only with the `CYLTabBarItemAnimation` subspec. 仅在包含 `CYLTabBarItemAnimation` 子库时。
         guard CYLTabBarItemAnimationCore.service != nil, tabBarItemStorage != nil, isSelected else { return }
-        guard let url = animationURL else {
+        guard let url = tabBarAnimationURL else {
             // FIX: issue #477 — a selected tab without an animation: the animated tabs stop and go back to their first
             // frame, as when another animated tab is selected. 选中没有动画的 Tab：有动画的 Tab 停止并回到第一帧，与选中其他动画 Tab 时一致。
             if let tabBar = flatDesignTabBar {
@@ -463,10 +565,10 @@ open class CYLFlatDesignTabBarButton: UIControl {
             }
             return
         }
-        let size = tabBarItemStorage?.lottieSizeValue?.cgSizeValue ?? .zero
+        let size = tabBarAnimationSize
         // [EN] The selected button can get here before `initTabBarItemAnimation()`; add the view with the speed first (#428).
         // [CN] 选中的按钮可能先于 `initTabBarItemAnimation()` 执行到这里；先按速度添加视图（#428）。
-        cyl_addTabBarItemAnimation(with: url, size: size, contentMode: animationContentMode, animationSpeed: animationSpeed)
+        cyl_addTabBarItemAnimation(with: url, size: size, contentMode: animationContentMode, animationSpeed: tabBarAnimationSpeed)
         cyl_playTabBarItemAnimation(with: url, size: size, defaultSelected: false, contentMode: animationContentMode)
     }
 

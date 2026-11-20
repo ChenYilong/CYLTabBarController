@@ -74,10 +74,10 @@ object, each item plays its own copy), `animationType` (when the extension does 
 true; false rests until `playAnimation()`), `restingProgress` (0...1, the frame at rest; selected shows the last),
 `gifFirstFrame` / `gifLastFrame` / `gifDuration` (GIF stills at rest and one pass in milliseconds on play; without
 stills a GIF always plays), `riveWasmPath` / `pagWasmPath` (cyl-rive / cyl-pag `wasm-path`; '' keeps their default), `accessoryImage`, `accessoryText`,
-`accessoryAccessibilityLabel`, `accessoryPlacement`, `dragEnabled`, `accessibilityLabel`, `embedded` (inside a control that is the accessibility element: no padding, no 44 px
+`accessoryAccessibilityLabel`, `accessoryPlacement`, `animationTint` (one color for a Rive animation, passed to cyl-rive `tint`; '' keeps the file's colors), `titleColor`, `titleDarkColor` (the title color while dark; '' keeps `titleColor`), `userInterfaceStyle` ('system', the default, follows the system theme and needs `"darkmode": true` in app.json; 'light' or 'dark' forces it), `titleFontSize` (px; 0 keeps 14), `titleFontWeight` ('normal', 'bold', 'bolder', 'lighter' or 100–900; '' keeps the default), `titleLines` (1: one line with an ellipsis, the default; 0: no limit; n > 1: up to n lines), `titleLineHeight` (px; 0 keeps the default), `titleSpacing` (px between the icon and the title; -1 keeps 2 px vertical / 4 px horizontal; a vertical item centres each wrapped line), `dragEnabled`, `accessibilityLabel`, `embedded` (inside a control that is the accessibility element: no padding, no 44 px
 minimum, hidden from accessibility, no gestures). Methods (through
 `selectComponent`): `playAnimation()` (from progress 0; a file still loading plays when ready), `restartAnimation()`,
-`stopAnimation()`. Events: `itemtap`, `itemlongpress`, `accessorytap`, `dragstart` / `dragmove` / `dragend`.
+`stopAnimation()`. Events: `itemtap`, `itemlongpress`, `accessorytap`, `dragstart` / `dragmove` / `dragend`, and the engine's own, forwarded with its detail: `animationready` (e.g. `duration`), `animationcomplete` (a non-looping pass ended, e.g. to count repeats), `animationloopcomplete` (a looping pass ended), `animationerror` (`message`; the item still shows its image). GIF sends none of the four.
 
 ## Layout
 

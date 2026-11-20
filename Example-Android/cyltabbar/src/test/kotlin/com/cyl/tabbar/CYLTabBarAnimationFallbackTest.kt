@@ -82,9 +82,9 @@ class CYLTabBarAnimationFallbackTest {
     }
 
     /**
-     * [EN] TODO 4 of docs/Animated-Item.md: the tab button is the animated item component, keeps its tab look and its
+     * [EN] Task 4 of docs/Animated-Item.md: the tab button is the animated item component, keeps its tab look and its
      *      own label, and stays a frame for badges.
-     * [CN] docs/Animated-Item.md 的 TODO 4：Tab 按钮即动效组件，保留 Tab 外观与自己的朗读文本，并仍是可承载角标的帧布局。
+     * [CN] docs/Animated-Item.md 的任务 4：Tab 按钮即动效组件，保留 Tab 外观与自己的朗读文本，并仍是可承载角标的帧布局。
      */
     @Test
     fun theTabButtonIsTheAnimatedItemComponent() = withActivity { activity ->

@@ -15,12 +15,12 @@ Every new demo in this repository is created with this skill. Source of truth: c
 |:---|:---|:---|:---|
 | Tab bar, plus button, badges, themes (no animation) | `pod 'CYLTabBarController'` (Core is the default subspec) | `Example-Swift-04` (smallest UIKit), `Example-Swift-03` | podspec 12.0; use 15.0 |
 | SwiftUI app | same pod, `UIViewControllerRepresentable` + `UIHostingController` | `Example-SwiftUI` | 15.0 |
-| Lottie 4.x tab icons | `pod 'CYLTabBarController/LottieSwift'` | `Example-Swift` | subspec 13.0; use 15.0 |
+| Lottie 4.x tab icons | `pod 'CYLTabBarController/LottieSwift'` | `Example-Swift` | subspec 15.0 |
 | Lottie 2.5 (Objective-C) | `pod 'CYLTabBarController/Lottie'` | `Example-Swift-02` | use 15.0 |
 | PAG tab icons | `pod 'CYLTabBarController/PAG'` | `Example-PAG` | use 15.0 |
 | Rive tab icons | `pod 'CYLTabBarController/Rive'` (RiveRuntime ~> 6.29; CocoaPods only) | `Example-Rive`, `Example-SwiftUI-Rive` | subspec 14.0; demos use 15.0 |
 | GIF tab icons that play once | `pod 'CYLTabBarController/GIF'` (no third-party dependency) | `Example-GIF` | use 15.0 |
-| FlatDesign (the classic layout on every system) | `pod 'CYLTabBarController/CYLFlatDesignTabBar'` | `Example-network-download`, the root ObjC demo | subspec 13.0; use 15.0 |
+| FlatDesign (the classic layout on every system) | `pod 'CYLTabBarController/CYLFlatDesignTabBar'` | `Example-network-download`, the root ObjC demo | subspec 15.0 |
 | Swift Package Manager | package URL or `relativePath = ..` (Core + FlatDesign + Lottie 4.x; no PAG or Rive) | `Example-Swift-SwiftManager-FlatDesign`, `Example-Swift-Gallery`, `Example-Swift-SwiftManager` (iOS 26) | package iOS 13; use 15.0 |
 | Carthage | `binary "https://raw.githubusercontent.com/ChenYilong/CYLTabBarController/master/CYLTabBarController.json"`, a prebuilt XCFramework (up to 1.100.0: `github "ChenYilong/CYLTabBarController"`; no Lottie, PAG or Rive; see docs/Carthage.md) | `Example-Swift-Carthage` | 15.0 |
 | Objective-C, every feature | root `CYLTabBarController.xcodeproj` + `Example/` | `Example/` (the Tab Bar Gallery has a scene per API) | 15.0 |
@@ -136,3 +136,7 @@ Add it to `docs/License-Notices.md` and `scripts/check-license-notices.py`, and 
 ## Animated icon examples: playback controls (TODO, 2026-11-13)
 
 Every example page that shows tab icon animations, on every platform, offers "Play all" (each animation restarts from progress 0), a speed slider and a loop switch, combined into one playback policy applied live (accessibility labels and values included). Change the core when an example needs it. Rule, scope and status: [docs/Tab-Icon-Animation-Quick-Start.md](../../../docs/Tab-Icon-Animation-Quick-Start.md#enplayback-controls-in-the-animation-examples).
+
+## Swift first on iOS (added 2026-11-19)
+
+- **The iOS core is Swift; every new piece of code is Swift first (added 2026-11-19, owner)**: the core code of this project on iOS (the CocoaPods / Swift Package Manager / Carthage sources under `CYLTabBarController/`, including the `CYLAnimatedItem` module) is Swift. Write every new class, extension, test and example in Swift. Use Objective-C only where Swift cannot do the job (a header that must stay importable from Objective-C without modules, a `+load`-time hook, a C macro), and give the reason in a comment and in the task's document in `docs/`. Keep the public API usable from Objective-C (`@objc`, `@objcMembers`, `NS_SWIFT_NAME` counterparts) so existing Objective-C callers keep working. When you touch Objective-C code for a new feature, prefer adding the feature in a Swift file over growing the Objective-C file. Migration log: `docs/Swift-Migration.md`. Details: `AGENTS.md`, "Code rules".

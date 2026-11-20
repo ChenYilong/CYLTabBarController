@@ -302,7 +302,7 @@ extension UIViewController {
      * [CN] viewDidAppear 中的一站式设置：重置返回手势状态。
      */
     @objc(cyl_viewDidAppearNavigationSetting:)
-    public func cyl_viewDidAppearNavigationSetting(_ animated: Bool) {
+    public func cyl_viewDidAppearNavigationSetting(_: Bool) {
         cyl_resetInteractivePopGestureRecognizer()
     }
 

@@ -256,8 +256,8 @@ private func CYLPlusButtonCenterOfStandIn(_ plusButton: CYLPlusButton, _ standIn
  */
 private func CYLPlusButtonIsInLiquidGlassTabBar(_ plusButton: CYLPlusButton) -> Bool {
     guard CYLConstants.isLiquidGlassActive() else { return false }
-    let tabBarController = plusButton.cylOwningTabBarController()
-        ?? CYLTabBarController.cylTabBarController(forContext: CYLPlusButton.cylPlusButtonTabBarContext(forOwner: plusButton))
+    let tabBarController = plusButton.cyl_owningTabBarController()
+        ?? CYLTabBarController.cyl_tabBarController(forContext: CYLPlusButton.cylPlusButtonTabBarContext(forOwner: plusButton))
     guard let tabBarController else { return false }
     return tabBarController.tabBarStyleType != .flatDesign
 }
@@ -905,7 +905,7 @@ extension CYLPlusButton {
         if let plusChildViewController = CYLPlusButton.cylPlusChildViewController(forOwner: self) {
             return plusChildViewController
         }
-        return cylOwningTabBarController()?.viewControllers?.first { $0.cyl_isPlaceholder }
+        return cyl_owningTabBarController()?.viewControllers?.first { $0.cyl_isPlaceholder }
     }
 
     private func cylLayOutForTitleInTabBarItem() {
@@ -1235,7 +1235,7 @@ extension CYLPlusButton {
         // [EN] The plus button's own `selected` flag stays NO while its page is selected: ask the tab bar controller.
         // [CN] PlusButton 的页面被选中时，按钮自身的 `selected` 仍为 NO：以 TabBarController 的选中为准。
         let plusPage = CYLPlusButton.cylPlusChildViewController(forOwner: self)
-        let selectedPage = cylOwningTabBarController()?.selectedViewController
+        let selectedPage = cyl_owningTabBarController()?.selectedViewController
         let plusPageSelected = plusPage != nil && (selectedPage === plusPage || (selectedPage != nil && selectedPage === plusPage?.navigationController))
         var masks = plusPageSelected && standIn != nil && standIn !== self && standIn?.window != nil && standIn?.window === window &&
             standIn?.isHidden == false && standInTabButton != nil && !cylIsInPlatterSelectedLayer() && CYLPlusButtonIsInLiquidGlassTabBar(self)
@@ -1675,9 +1675,9 @@ extension CYLPlusButton {
             return
         }
         let context = CYLPlusButton.cylPlusButtonTabBarContext(forOwner: sender)
-        var tabBarController = sender.cylOwningTabBarController()
+        var tabBarController = sender.cyl_owningTabBarController()
         if tabBarController?.cyl_context != context {
-            tabBarController = CYLTabBarController.cylTabBarController(forContext: context)
+            tabBarController = CYLTabBarController.cyl_tabBarController(forContext: context)
         }
         // [EN] That controller's own plus child view controller. [CN] 该控制器自己的 PlusButton 子控制器。
         guard let tabBarController,
@@ -1699,7 +1699,7 @@ extension CYLPlusButton {
         // [EN] `-setSelectedIndex:` already selected the plus button and reported it when the tab bar controller has a plus button
         //      with a child view controller; reporting again would report every tap twice.
         // [CN] TabBarController 有带子控制器的 PlusButton 时，`-setSelectedIndex:` 已经选中并上报了 PlusButton；再次上报会让每次点击上报两次。
-        let selectedBySetSelectedIndex = tabBarController.cylPrivate.cylPlusButtonControlIfSelectingPlusChildViewController(plusChildViewController) === sender
+        let selectedBySetSelectedIndex = tabBarController.cylPlusButtonControlIfSelectingPlusChildViewController(plusChildViewController) === sender
         if !selectedBySetSelectedIndex && cylControlReportsTapsEntryPoint(sender) {
             sender.isSelected = true
             tabBarController.tabChanged(to: sender)
@@ -1725,8 +1725,8 @@ extension CYLPlusButton {
 
     @objc(isLayoutCentered)
     func cylIsLayoutCentered() -> Bool {
-        cylConstantOfPlusButtonCenterYOffset(forTabBarHeight: cylTabBarController()?.tabBar.cylBoundsSize().height ?? 0) == 0 &&
-            cylMultiplierOfTabBarHeight(cylTabBarController()?.tabBar.cylBoundsSize().height ?? 0, plusButtonHeight: frame.height) == 0.5
+        cylConstantOfPlusButtonCenterYOffset(forTabBarHeight: cyl_tabBarController?.tabBar.cylBoundsSize().height ?? 0) == 0 &&
+            cylMultiplierOfTabBarHeight(cyl_tabBarController?.tabBar.cylBoundsSize().height ?? 0, plusButtonHeight: frame.height) == 0.5
     }
 
     @objc(cyl_plusButtonMultiplierOfTabBarHeight:)
@@ -1955,18 +1955,18 @@ extension CYLPlusButton {
 
     @objc(cyl_tabButtonHighlightTouchDown)
     func cylTabButtonHighlightTouchDown() {
-        cylOwningTabBarController()?.cylTabButtonTouchDown(self)
+        cyl_owningTabBarController()?.cylTabButtonTouchDown(self)
     }
 
     @objc(cyl_tabButtonHighlightTouchUp)
     func cylTabButtonHighlightTouchUp() {
-        cylOwningTabBarController()?.cylTabButtonTouchUp(self)
+        cyl_owningTabBarController()?.cylTabButtonTouchUp(self)
     }
 
     @objc(cyl_tabBarItemGestureTouchDown)
     func cylTabBarItemGestureTouchDown() {
         let storage = cylPlusButtonStorage
-        storage.selectedViewControllerAtTouchDown = cylOwningTabBarController()?.selectedViewController
+        storage.selectedViewControllerAtTouchDown = cyl_owningTabBarController()?.selectedViewController
         storage.hasTouchDownForTabBarItemGesture = true
     }
 
@@ -1976,7 +1976,7 @@ extension CYLPlusButton {
         let selectedViewController = storage.hasTouchDownForTabBarItemGesture ? storage.selectedViewControllerAtTouchDown : nil
         storage.hasTouchDownForTabBarItemGesture = false
         storage.selectedViewControllerAtTouchDown = nil
-        cylOwningTabBarController()?.cylRecognizePlusButtonTap(self, selectedViewControllerAtTouchDown: selectedViewController)
+        cyl_owningTabBarController()?.cylRecognizePlusButtonTap(self, selectedViewControllerAtTouchDown: selectedViewController)
     }
 
     // MARK: The stand-in in the selected layer
@@ -2257,9 +2257,9 @@ extension CYLPlusButton {
             return context
         }
         guard let owner = owner as? NSObject else {
-            return CYLTabBarController.cylActiveTabBarController()?.cyl_context ?? CYLPlusButtonRegistry.shared.latestContext
+            return CYLTabBarController.cyl_active()?.cyl_context ?? CYLPlusButtonRegistry.shared.latestContext
         }
-        if let tabBarController = owner.cylOwningTabBarController() {
+        if let tabBarController = owner.cyl_owningTabBarController() {
             return tabBarController.cyl_context
         }
         // [EN] A tab bar that is not attached to its controller yet carries the context the controller copied to it.
@@ -2270,12 +2270,12 @@ extension CYLPlusButton {
         }
         // [EN] Nothing to go by: the most recently active controller, else the context registered last.
         // [CN] 无从判断：取最近活跃的控制器，否则取最后注册的 context。
-        return CYLTabBarController.cylActiveTabBarController()?.cyl_context ?? CYLPlusButtonRegistry.shared.latestContext
+        return CYLTabBarController.cyl_active()?.cyl_context ?? CYLPlusButtonRegistry.shared.latestContext
     }
 
     @objc(cyl_plusButtonForOwner:)
     class func cylPlusButton(forOwner owner: Any?) -> CYLPlusButton? {
-        if let tabBarController = (owner as? NSObject)?.cylOwningTabBarController() {
+        if let tabBarController = (owner as? NSObject)?.cyl_owningTabBarController() {
             return cylBinding(for: tabBarController)?.plusButton
         }
         return cylPlusButton(forTabBarContext: cylPlusButtonTabBarContext(forOwner: owner))
@@ -2283,7 +2283,7 @@ extension CYLPlusButton {
 
     @objc(cyl_plusChildViewControllerForOwner:)
     class func cylPlusChildViewController(forOwner owner: Any?) -> UIViewController? {
-        if let tabBarController = (owner as? NSObject)?.cylOwningTabBarController() {
+        if let tabBarController = (owner as? NSObject)?.cyl_owningTabBarController() {
             return cylBinding(for: tabBarController)?.plusChildViewController
         }
         return cylPlusChildViewController(forTabBarContext: cylPlusButtonTabBarContext(forOwner: owner))
@@ -2347,7 +2347,9 @@ extension CYLPlusButton {
             // [EN] A shared plus child view controller stays shared. [CN] 共用的 PlusButton 子控制器保持共用。
             binding.plusChildViewController = registration.plusChildViewController
         }
-        (plusButtonClass as? CYLPlusButton.Type)?.cylPlusButtonAddSelectViewControllerTarget(plusButton)
+        // [EN] By selector, so a class made at run time is the target (Swift's metatype would be the nearest Swift class).
+        // [CN] 通过 selector 调用，使运行时创建的类成为 target（Swift 的元类型会是最近的 Swift 类）。
+        _ = (plusButtonClass as AnyObject).perform(NSSelectorFromString("cyl_plusButtonAddSelectViewControllerTarget:"), with: plusButton)
     }
 
     @objc(cyl_plusButtonWidthForOwner:)

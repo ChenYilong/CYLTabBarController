@@ -9,6 +9,24 @@ import UIKit
 import CYLTabBarController
 
 /*!
+ * [EN] The demo's appearance switches (launch arguments). By default the demo follows the system's light and Dark Mode
+ *      (2026-11-19, the owner); `-CYLDemoRiveForcesDark YES` brings back the course's dark bar with white icons.
+ *      `-CYLDemoRiveFixedTint YES` gives the Search tab a fixed tint ("#1C1C1E", darkTint "#FFFFFF"): drawn while the tab
+ *      is unselected, the selected tab takes the title's selected color.
+ * [CN] Demo 的外观开关（启动参数）。默认跟随系统的浅色与深色模式（2026-11-19，维护者）；`-CYLDemoRiveForcesDark YES` 恢复课程的深色 TabBar 与白色图标。
+ *      `-CYLDemoRiveFixedTint YES` 为 Search Tab 设置固定着色（"#1C1C1E"，darkTint "#FFFFFF"）：未选中时使用，选中时使用标题的选中颜色。
+ */
+enum CYLDemoRiveAppearance {
+    static var followsSystem: Bool {
+        !UserDefaults.standard.bool(forKey: "CYLDemoRiveForcesDark")
+    }
+
+    static var fixedTint: Bool {
+        UserDefaults.standard.bool(forKey: "CYLDemoRiveFixedTint")
+    }
+}
+
+/*!
  * [EN] The tabs of the demo and their CYLTabBarController attributes, shared by Example-SwiftUI-Rive (SwiftUI app) and
  *      Example-Rive (UIKit app). This is all the Rive integration needs: each tab's icon is an artboard of the course's
  *      icons.riv, given as `CYLTabBarRiveURL` like a Lottie or PAG file.
@@ -56,15 +74,27 @@ enum Tab: String, CaseIterable {
     }
 
     /// [EN] The tab's Rive icon only. The course's icons.riv has no view model: `.riveInput` plays its state machine input
-    ///      "active" instead.
-    /// [CN] 仅该 Tab 的 Rive 图标。课程的 icons.riv 没有 view model：使用 `.riveInput` 播放其状态机输入 "active"。
+    ///      "active" instead. Its strokes are white, drawn for a dark bar, so `.tint` "title" draws each icon in its title's
+    ///      color: the bar's tint when selected, its unselected tint otherwise, both following light and Dark Mode
+    ///      (the default; `-CYLDemoRiveForcesDark YES` keeps the dark bar). A fixed color uses `.tint` "#RRGGBB" with
+    ///      `.darkTint` (`-CYLDemoRiveFixedTint YES`), drawn while the tab is unselected.
+    /// [CN] 仅该 Tab 的 Rive 图标。课程的 icons.riv 没有 view model：使用 `.riveInput` 播放其状态机输入 "active"。它的线条是白色的，为深色
+    ///      TabBar 设计，因此 `.tint` 为 "title" 时每个图标使用其标题的颜色：选中时为 TabBar 的 tint，否则为未选中 tint，二者都随浅色与深色模式切换
+    ///      （默认；`-CYLDemoRiveForcesDark YES` 保持深色 TabBar）。固定颜色使用 `.tint` "#RRGGBB" 配合 `.darkTint`（`-CYLDemoRiveFixedTint YES`），
+    ///      在 Tab 未选中时使用。
     fileprivate var animationAttributes: [AnyHashable: Any] {
         let iconsURL = Bundle.main.url(forResource: "icons", withExtension: "riv")
-        guard let url = CYLTabBarAnimationURLWithOptions(iconsURL, [
+        var options: [CYLTabBarAnimationOption: String] = [
             .riveArtboard: rive.artboard,
             .riveStateMachine: rive.stateMachine,
             .riveInput: "active",
-        ] as [CYLTabBarAnimationOption: String]) else {
+            .tint: "title",
+        ]
+        if CYLDemoRiveAppearance.fixedTint && self == .search {
+            options[.tint] = "#1C1C1E"
+            options[.darkTint] = "#FFFFFF"
+        }
+        guard let url = CYLTabBarAnimationURLWithOptions(iconsURL, options) else {
             return [:]
         }
         return [CYLTabBarRiveURL: url, CYLTabBarRiveSize: NSValue(cgSize: CGSize(width: 32, height: 32))]
@@ -93,6 +123,22 @@ extension CYLTabBarController {
         }
         let appearance = UITabBarAppearance()
         appearance.configureWithDefaultBackground()
+        // [EN] By default: the system bar in light and Dark Mode; the icons follow the system tints.
+        // [CN] 默认：浅色与深色模式下的系统 TabBar；图标跟随系统 tint。
+        if CYLDemoRiveAppearance.followsSystem {
+            // [EN] The icon tint and the title tint per state, as a FlatDesign item's appearance: the Rive icons (`.tint`
+            //      "title") take the icon color, the same as their titles here, in light and Dark Mode (dynamic colors).
+            // [CN] 每个状态的图标着色与标题着色，与扁平样式 item 的外观相同：Rive 图标（`.tint` 为 "title"）使用图标颜色，这里与标题相同，浅色与深色模式下
+            //      都适用（动态颜色）。
+            let item = appearance.stackedLayoutAppearance
+            item.normal.iconColor = .label
+            item.normal.titleTextAttributes = [.foregroundColor: UIColor.label]
+            item.selected.iconColor = .systemBlue
+            item.selected.titleTextAttributes = [.foregroundColor: UIColor.systemBlue]
+            tabBar.standardAppearance = appearance
+            tabBar.scrollEdgeAppearance = appearance
+            return
+        }
         appearance.backgroundColor = UIColor(named: "Background 2")?.withAlphaComponent(0.8)
         tabBar.standardAppearance = appearance
         tabBar.scrollEdgeAppearance = appearance
@@ -116,7 +162,11 @@ class CourseTabBarController: CYLTabBarController {
         // [EN] The course's Rive icons are white: in dark mode the glass of the tab bar keeps them, and their animation,
         //      visible over light pages too. Liquid Glass ignores a background color in `standardAppearance`.
         // [CN] 课程的 Rive 图标是白色的：深色模式下 TabBar 的玻璃让图标及其动画在浅色页面上也能看清。液态玻璃不使用 `standardAppearance` 的背景色。
-        overrideUserInterfaceStyle = .dark
+        // [EN] Only with `-CYLDemoRiveForcesDark YES`; by default the system appearance is kept, and the icons follow it.
+        // [CN] 仅在 `-CYLDemoRiveForcesDark YES` 时；默认保持系统外观，图标随之切换。
+        if !CYLDemoRiveAppearance.followsSystem {
+            overrideUserInterfaceStyle = .dark
+        }
         view.cyl_themeDidChangeBlock = { [weak self] in
             self?.applySkinAnimations()
         }

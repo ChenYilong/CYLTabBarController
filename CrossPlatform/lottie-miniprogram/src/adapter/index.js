@@ -8,7 +8,7 @@ function systemInfo() {
       return wx.getWindowInfo()
     }
     return wx.getSystemInfoSync()
-  } catch (e) {
+  } catch {
     return {pixelRatio: 2}
   }
 }
@@ -65,7 +65,7 @@ export function canvasOfContext(context) {
 }
 
 function currentCanvas() {
-  return g.canvases.length > 0 ? g.canvases[g.canvases.length - 1] : null
+  return g.canvases.length > 0 ? g.canvases[g.canvases.length - 1] : null // NOSONAR: `.at()` needs a newer mini program base library
 }
 
 /**
@@ -77,7 +77,7 @@ function currentCanvas() {
 let dataFileIndex = 0
 function imageSource(src) {
   const match = /^data:image\/(\w+);base64,(.*)$/.exec(String(src || ''))
-  if (!match || typeof wx.getFileSystemManager !== 'function' || !wx.env || !wx.env.USER_DATA_PATH) {
+  if (!match || typeof wx.getFileSystemManager !== 'function' || !wx.env?.USER_DATA_PATH) {
     return src
   }
   try {
@@ -85,13 +85,13 @@ function imageSource(src) {
     const filePath = `${wx.env.USER_DATA_PATH}/cyl_lottie_${Date.now()}_${dataFileIndex}.${match[1]}`
     wx.getFileSystemManager().writeFileSync(filePath, match[2], 'base64')
     return filePath
-  } catch (e) {
+  } catch {
     return src
   }
 }
 
 function createImg(canvas) {
-  if (!canvas || typeof canvas.createImage === 'undefined') {
+  if (canvas?.createImage === undefined) {
     return {}
   }
   const img = canvas.createImage()
@@ -105,7 +105,7 @@ function createImg(canvas) {
     }
   }
   const descriptor = Object.getOwnPropertyDescriptor(Object.getPrototypeOf(img), 'src')
-  if (descriptor && descriptor.set) {
+  if (descriptor?.set) {
     Object.defineProperty(img, 'src', {
       configurable: true,
       get() {
@@ -133,7 +133,9 @@ function createCanvas(width, height) {
         offscreen.style = {}
         return offscreen
       }
-    } catch (e) {}
+    } catch {
+      // [EN] No offscreen canvas here: the stub below is used. [CN] 此处没有离屏 canvas：使用下面的占位对象。
+    }
   }
   return {
     style: {},

@@ -159,7 +159,7 @@ targets: [
 |:---|:---|
 | **`No such module 'CYLTabBarController'`**：① 打开的是 `.xcodeproj` 而不是 `.xcworkspace`；② Podfile 没有 `use_frameworks!` 也没有 `:modular_headers => true`；③ 改完 Podfile 没有重新 `pod install`；④ 先 Product → Build 一次（模块要编译后才可见），仍不行就 Clean Build Folder（⇧⌘K）并删除 DerivedData。 | **`No such module 'CYLTabBarController'`**: ① you opened the `.xcodeproj` instead of the `.xcworkspace`; ② the Podfile has neither `use_frameworks!` nor `:modular_headers => true`; ③ you changed the Podfile without running `pod install` again; ④ build once (Product → Build; a module is visible only after it is built). If it still fails, Clean Build Folder (⇧⌘K) and delete DerivedData. |
 | **桥接头中 `'CYLTabBarController.h' file not found`**：改为 `@import CYLTabBarController;` 或尖括号形式，见上。 | **`'CYLTabBarController.h' file not found` in the bridging header**: switch to `@import CYLTabBarController;` or the angle-bracket form, see above. |
-| **`Use of unimplemented initializer 'init(nibName:bundle:)'` 或启动时栈溢出**：Swift 子类的初始化方法写法不对，见 [第 3 节](#cn3-继承-cyltabbarcontroller)。 | **`Use of unimplemented initializer 'init(nibName:bundle:)'`, or a stack overflow at launch**: the Swift subclass's initializers are wrong; see [section 3](#en3-subclassing-cyltabbarcontroller). |
+| **`Must call a designated initializer of the superclass 'CYLTabBarController'`** 或 `Use of unimplemented initializer`：Swift 子类的初始化方法写法不对（应为 `convenience init` + `self.init(…)`，或 `required init(configuration:)`），见 [第 3 节](#cn3-继承-cyltabbarcontroller)。 | **`Must call a designated initializer of the superclass 'CYLTabBarController'`** or `Use of unimplemented initializer`: the Swift subclass's initializers are wrong (use `convenience init` + `self.init(…)`, or `required init(configuration:)`); see [section 3](#en3-subclassing-cyltabbarcontroller). |
 | **`Cannot find 'CYLTabBarLottieURL' in scope`** 等 Lottie / FlatDesign 符号找不到：只引入了 Core。改用对应 subspec（`LottieSwift`、`CYLFlatDesignTabBar`）或 SPM。 | **`Cannot find 'CYLTabBarLottieURL' in scope`** or other Lottie / FlatDesign symbols missing: only Core is installed. Use the matching subspec (`LottieSwift`, `CYLFlatDesignTabBar`) or SPM. |
 | **PlusButton 不显示**：`CYLPlusButtonSubclass.register()` 必须在创建 TabBarController **之前**调用。 | **The PlusButton does not show**: call `CYLPlusButtonSubclass.register()` **before** creating the tab bar controller. |
 
@@ -288,45 +288,13 @@ CYLTabBarController(viewControllers: vcs, tabBarItemsAttributes: attrs,
 
 | 中文 | English |
 |:---|:---|
-| 需要重写代理方法、改样式时一般会继承。Swift 子类有两个坑：① OC 的便利初始化方法会通过 `self` 转发到带 `styleType:` 的指定初始化方法，**两个都要 override**，否则运行时报 `Use of unimplemented initializer`；② `init(nibName:bundle:)` **只能**转发给 `super.init(nibName:bundle:)`，在里面调用 `super.init(viewControllers:...)` 会无限递归导致栈溢出。以下摘自 [`Example-Swift-02/.../MainTabBarController.swift`](../Example-Swift-02/CYLTabBarController-Swift/Classes/Main/MainTabBarController.swift)： | You usually subclass to override delegate methods or change the style. Two traps in Swift: ① the Objective-C convenience initializers forward through `self` to the designated one with `styleType:`, so **override both**, or you get `Use of unimplemented initializer` at run time; ② `init(nibName:bundle:)` must **only** forward to `super.init(nibName:bundle:)`; calling `super.init(viewControllers:...)` from it recurses until the stack overflows. From [`Example-Swift-02/.../MainTabBarController.swift`](../Example-Swift-02/CYLTabBarController-Swift/Classes/Main/MainTabBarController.swift): |
+| 需要重写代理方法、改样式时一般会继承。CYLTabBarController 是 Swift 类（类切换之后）：唯一的指定初始化方法是 `required init(configuration:)`，其他初始化方法（`init(viewControllers:tabBarItemsAttributes:…)`、`init(configurationFile:)`、`init(nibName:bundle:)`、`init()`）都是便利初始化方法，最终走到它。因此：① 子类不声明指定初始化方法时，自动继承全部初始化方法；② 需要在初始化时做事时，写 `convenience init`，在里面调用 `self.init(viewControllers:…)`，**不要**调用 `super.init(viewControllers:…)`（父类的这些方法是便利初始化方法，编译器会报错）；③ 子类自己写指定初始化方法时，必须写 `required init(configuration:)` 与 `required init?(coder:)`，这样仍会继承全部便利初始化方法。以下摘自 [`Example-Swift/MainTabBarController.swift`](../Example-Swift/MainTabBarController.swift)。 | Subclass to override delegate methods or change the style. CYLTabBarController is a Swift class (since the class switch): its only designated initializer is `required init(configuration:)`; the others (`init(viewControllers:tabBarItemsAttributes:…)`, `init(configurationFile:)`, `init(nibName:bundle:)`, `init()`) are convenience initializers that end there. So: ① a subclass without a designated initializer of its own inherits every initializer; ② to do work at init time, write a `convenience init` that calls `self.init(viewControllers:…)`, **not** `super.init(viewControllers:…)` (those are convenience initializers of the superclass, and the compiler rejects it); ③ a subclass with a designated initializer of its own writes `required init(configuration:)` and `required init?(coder:)`, and still inherits every convenience initializer. From [`Example-Swift/MainTabBarController.swift`](../Example-Swift/MainTabBarController.swift). |
 
 ```swift
 import UIKit
 import CYLTabBarController
 
 class MainTabBarController: CYLTabBarController {
-
-    override init(viewControllers: [UIViewController],
-                  tabBarItemsAttributes: [[AnyHashable: Any]],
-                  imageInsets: UIEdgeInsets,
-                  titlePositionAdjustment: UIOffset,
-                  context: String?) {
-        super.init(viewControllers: viewControllers, tabBarItemsAttributes: tabBarItemsAttributes,
-                   imageInsets: imageInsets, titlePositionAdjustment: titlePositionAdjustment, context: context)
-    }
-
-    // [CN] 上面的方法会经 `self` 转发到这里，所以也必须 override
-    // [EN] The initializer above forwards here through `self`, so it must be overridden too
-    override init(viewControllers: [UIViewController],
-                  tabBarItemsAttributes: [[AnyHashable: Any]],
-                  imageInsets: UIEdgeInsets,
-                  titlePositionAdjustment: UIOffset,
-                  styleType: CYLTabBarStyleType,
-                  context: String?) {
-        super.init(viewControllers: viewControllers, tabBarItemsAttributes: tabBarItemsAttributes,
-                   imageInsets: imageInsets, titlePositionAdjustment: titlePositionAdjustment,
-                   styleType: styleType, context: context)
-    }
-
-    // [CN] 只转发给 super，不要在这里构建 Tab
-    // [EN] Only forward to super; don't build tabs here
-    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
-        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
-    }
-
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
 
     // [CN] 便利构造：外部只需 MainTabBarController()
     // [EN] Convenience: callers just write MainTabBarController()

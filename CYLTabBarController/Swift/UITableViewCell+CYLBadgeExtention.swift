@@ -318,13 +318,14 @@ extension UIViewController {
 
     /**
      * [EN] Shows `value` ("" for a red dot) on `navigationItem.rightBarButtonItem`; when there is none, a bell button with no
-     *      action is added first. Declared in UITableViewCell+CYLBadgeExtention.h, since its signature has an Objective-C enum
-     *      of this module.
-     * [CN] 在 `navigationItem.rightBarButtonItem` 上显示 `value`（"" 为红点）；没有右侧按钮时先添加一个没有点击事件的铃铛按钮。由于签名中含
-     *      本模块的 Objective-C 枚举，声明位于 UITableViewCell+CYLBadgeExtention.h。
+     *      action is added first. Public Swift since step 115 (it was declared in UITableViewCell+CYLBadgeExtention.h while
+     *      `CYLBadgeAnimationType` was an Objective-C enum).
+     * [CN] 在 `navigationItem.rightBarButtonItem` 上显示 `value`（"" 为红点）；没有右侧按钮时先添加一个没有点击事件的铃铛按钮。自第 115 步起为
+     *      公开的 Swift 方法（`CYLBadgeAnimationType` 为 Objective-C 枚举时声明在 UITableViewCell+CYLBadgeExtention.h 中）。
      */
     @objc(cyl_showNavigationBadgeValue:animationType:backgroundColor:)
-    func cyl_showNavigationBadgeValue(_ value: String, animationType: CYLBadgeAnimationType, backgroundColor: UIColor?) -> UIBarButtonItem {
+    @discardableResult
+    public func cyl_showNavigationBadge(value: String, animationType: CYLBadgeAnimationType, backgroundColor: UIColor?) -> UIBarButtonItem {
         let item = navigationItem.rightBarButtonItem ?? {
             let item = UIBarButtonItem(image: UIImage(systemName: "bell"), style: .plain, target: nil, action: nil)
             navigationItem.rightBarButtonItem = item
@@ -373,15 +374,15 @@ open class CYLBadgeHelperTableViewController: UITableViewController {
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: CYLBadgeSample.cellIdentifier)
     }
 
-    override open func numberOfSections(in tableView: UITableView) -> Int {
+    override open func numberOfSections(in _: UITableView) -> Int {
         2
     }
 
-    override open func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    override open func tableView(_: UITableView, numberOfRowsInSection section: Int) -> Int {
         section == Int(CYLSettingsSection) ? cyl_settingsRowCount() : UITableViewCell.cyl_badgeStyleCount()
     }
 
-    override open func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    override open func tableView(_: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if indexPath.section == Int(CYLSettingsSection) {
             return cyl_settingsCell(for: tableView, at: indexPath)
         }

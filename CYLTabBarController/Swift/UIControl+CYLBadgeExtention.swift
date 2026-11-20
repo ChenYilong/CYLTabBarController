@@ -97,7 +97,10 @@ private func cylBadgeOpaqueUnitRect(of image: UIImage?) -> CGRect {
         }
         if drawn {
             // [EN] Row 0 of the buffer is the top of the image. [CN] 缓冲区第 0 行是图片顶部。
-            var minX = width, minY = height, maxX = 0, maxY = 0
+            var minX = width
+            var minY = height
+            var maxX = 0
+            var maxY = 0
             for y in 0..<height {
                 for x in 0..<width where alpha[y * width + x] > 25 {
                     minX = min(minX, x)
@@ -165,37 +168,37 @@ extension UIControl {
         cyl_asView.cyl_showBadgeValue(badgeValue, animationType: .none)
     }
 
-    override var cyl_badgeAnimationTypeValue: NSNumber {
+    public override var cyl_badgeAnimationTypeValue: NSNumber {
         get { NSNumber(value: cyl_asView.cyl_badgeAnimationType.rawValue) }
         set { cyl_asView.cyl_badgeAnimationType = CYLBadgeAnimationType(rawValue: newValue.uintValue) ?? .none }
     }
 
-    override var cyl_badgeCenterOffsetValue: NSValue {
+    public override var cyl_badgeCenterOffsetValue: NSValue {
         get { NSValue(cgPoint: cyl_asView.cyl_badgeCenterOffset) }
         set { cyl_asView.cyl_badgeCenterOffset = newValue.cgPointValue }
     }
 
-    override var cyl_badgeCornerRadiusValue: NSNumber {
+    public override var cyl_badgeCornerRadiusValue: NSNumber {
         get { NSNumber(value: Double(cyl_asView.cyl_badgeCornerRadius)) }
         set { cyl_asView.cyl_badgeCornerRadius = CGFloat(newValue.doubleValue) }
     }
 
-    override var cyl_badgeFrameValue: NSValue {
+    public override var cyl_badgeFrameValue: NSValue {
         get { NSValue(cgRect: cyl_asView.cyl_badgeFrame) }
         set { cyl_asView.cyl_badgeFrame = newValue.cgRectValue }
     }
 
-    override var cyl_badgeMarginValue: NSNumber {
+    public override var cyl_badgeMarginValue: NSNumber {
         get { NSNumber(value: Double(cyl_asView.cyl_badgeMargin)) }
         set { cyl_asView.cyl_badgeMargin = CGFloat(newValue.doubleValue) }
     }
 
-    override var cyl_badgeMaximumBadgeNumberValue: NSNumber {
+    public override var cyl_badgeMaximumBadgeNumberValue: NSNumber {
         get { NSNumber(value: cyl_asView.cyl_badgeMaximumBadgeNumber) }
         set { cyl_asView.cyl_badgeMaximumBadgeNumber = newValue.intValue }
     }
 
-    override var cyl_badgeRadiusValue: NSNumber {
+    public override var cyl_badgeRadiusValue: NSNumber {
         get { NSNumber(value: Double(cyl_asView.cyl_badgeRadius)) }
         set { cyl_asView.cyl_badgeRadius = CGFloat(newValue.doubleValue) }
     }
@@ -203,7 +206,7 @@ extension UIControl {
     /**
      * [EN] 0 by default for a control (a view: 0.5 s). [CN] 控件默认为 0（视图为 0.5 秒）。
      */
-    override var cyl_delayIfNeededForSeconds: CGFloat {
+    public override var cyl_delayIfNeededForSeconds: CGFloat {
         get {
             (objc_getAssociatedObject(self, CYLControlBadgeKeys.delayIfNeededForSeconds) as? NSNumber).map { CGFloat($0.doubleValue) } ?? 0
         }
@@ -213,18 +216,18 @@ extension UIControl {
         }
     }
 
-    override var cyl_delayIfNeededForSecondsValue: NSNumber {
+    public override var cyl_delayIfNeededForSecondsValue: NSNumber {
         get { NSNumber(value: Double(cyl_asView.cyl_delayIfNeededForSeconds)) }
         set { cyl_asView.cyl_delayIfNeededForSeconds = CGFloat(newValue.doubleValue) }
     }
 
     // MARK: Public methods
 
-    override func cyl_showBadge() {
+    public override func cyl_showBadge() {
         cyl_showBadgeValue("", animationTypeValue: NSNumber(value: CYLBadgeAnimationType.none.rawValue))
     }
 
-    override func cyl_showBadgeValue(_ value: String, animationType: CYLBadgeAnimationType) {
+    public override func cyl_showBadgeValue(_ value: String, animationType: CYLBadgeAnimationType) {
         cyl_showBadgeValue(value, animationTypeValue: NSNumber(value: animationType.rawValue))
     }
 
@@ -245,15 +248,15 @@ extension UIControl {
         cyl_actualBadgeView?.cyl_showBadgeValue(value, animationType: CYLBadgeAnimationType(rawValue: animationTypeValue.uintValue) ?? .none)
     }
 
-    override func cyl_isShowBadge() -> Bool {
+    public override func cyl_isShowBadge() -> Bool {
         cyl_actualBadgeView?.cyl_isShowBadge() ?? false
     }
 
-    override func cyl_isPauseBadge() -> Bool {
+    public override func cyl_isPauseBadge() -> Bool {
         cyl_actualBadgeView?.cyl_isPauseBadge() ?? false
     }
 
-    override func cyl_clearBadge() {
+    public override func cyl_clearBadge() {
         if CYLControlBadgeKeys.layerPerformDepth == 0 {
             cyl_asView.cyl_perform(#selector(UIView.cyl_clearBadge))
             return
@@ -261,7 +264,7 @@ extension UIControl {
         cyl_actualBadgeView?.cyl_clearBadge()
     }
 
-    override func cyl_resumeBadge() {
+    public override func cyl_resumeBadge() {
         if CYLControlBadgeKeys.layerPerformDepth == 0 {
             cyl_asView.cyl_perform(#selector(UIView.cyl_resumeBadge))
             return
@@ -292,11 +295,17 @@ extension UIControl {
      * [CN] 角标所在的视图：Tab 按钮为其 Lottie 视图或图片视图（被替换显示而隐藏的图标仍承载角标，#601）；其他控件（PlusButton、UIButton）
      *      为其内容之上、与图标对齐的透明锚点视图（`-cyl_badgeAnchorViewAlignedToView:`），控件自身的内容不会遮挡或裁剪角标。
      */
-    override func cyl_getActualBadgeSuperView() -> Any? {
+    public override func cyl_getActualBadgeSuperView() -> Any? {
         let tabImageView = cyl_tabImageView()
         let animationView = cyl_tabBarItemAnimationView()
         var actualBadgeSuperView: UIView?
-        if let animationView, !animationView.cyl_isInvisiable() || animationView.cyl_badgeHostReplacedByIconView {
+        // [EN] An animated item (`CYLAnimatedItemView`, a FlatDesign tab button included): its animation view of any format
+        //      while it shows, else its image; the Lottie / image lookup below is for UIKit's tab buttons.
+        // [CN] 动效 item（`CYLAnimatedItemView`，包括扁平样式 Tab 按钮）：其任意格式的动画视图（显示时），否则为其图片；下面的 Lottie / 图片查找用于
+        //      UIKit 的 Tab 按钮。
+        if let iconHost = cyl_animatedItemBadgeHost() {
+            actualBadgeSuperView = iconHost
+        } else if let animationView, !animationView.cyl_isInvisiable() || animationView.cyl_badgeHostReplacedByIconView {
             actualBadgeSuperView = animationView
         } else if let tabImageView, !tabImageView.cyl_isInvisiable() || tabImageView.cyl_badgeHostReplacedByIconView {
             actualBadgeSuperView = tabImageView
@@ -305,7 +314,9 @@ extension UIControl {
         // [CN] 按类名判断：iOS 26 以前 `-cyl_isTabButton` 对所有 UIControl 都返回 YES。
         let className = NSStringFromClass(type(of: self))
         let isTabBarButton = className.contains("TabButton") || className.contains("TabBarButton")
-        if !isTabBarButton {
+        // [EN] An animated item, a tab or not: the badge goes on its icon subview itself (animation or image view), never on
+        //      the item or on an anchor. [CN] 动效 item（无论是否为 Tab）：角标直接放在其图标子视图（动画或图片视图）上，而不是 item 或锚点上。
+        if !isTabBarButton && cyl_animatedItemBadgeHost() == nil {
             return cyl_badgeAnchorViewAligned(to: actualBadgeSuperView)
         }
         if let actualBadgeSuperView {
@@ -409,15 +420,15 @@ extension UIControl {
         return anchorView
     }
 
-    override func cyl_perform(_ aSelector: Selector) {
+    public override func cyl_perform(_ aSelector: Selector) {
         cyl_asView.cyl_perform(aSelector, with: nil, with: nil)
     }
 
-    override func cyl_perform(_ aSelector: Selector, with object: Any?) {
+    public override func cyl_perform(_ aSelector: Selector, with object: Any?) {
         cyl_asView.cyl_perform(aSelector, with: object, with: nil)
     }
 
-    override func cyl_perform(_ aSelector: Selector, with object1: Any?, with object2: Any?) {
+    public override func cyl_perform(_ aSelector: Selector, with object1: Any?, with object2: Any?) {
         cyl_performOnBadgeLayers { control in
             _ = control.perform(aSelector, with: object1, with: object2)
         }
@@ -464,7 +475,7 @@ extension UIControl {
      *      label) and, with animated icons, the animation are laid out. Elsewhere, always ready.
      * [CN] 液态玻璃下选中图层比普通图层渲染得晚：角标要等到 Tab 图片视图（或标题）以及动画图标布局完成。其他情况总是就绪。
      */
-    override func cyl_isReady() -> Bool {
+    public override func cyl_isReady() -> Bool {
         if !CYLUtils.isLiquidGlassActive() {
             return true
         }
@@ -487,22 +498,22 @@ extension UIControl {
         set { cyl_actualBadgeView?.cyl_badge = newValue }
     }
 
-    override var cyl_badgeFont: UIFont! {
+    public override var cyl_badgeFont: UIFont! {
         get { cyl_actualBadgeView?.cyl_badgeFont ?? CYLBadgeAppearance.global.font }
         set { cyl_performOnBadgeLayers { (($0 as UIView).cyl_getActualBadgeSuperView() as? UIView)?.cyl_badgeFont = newValue } }
     }
 
-    override var cyl_badgeBackgroundColor: UIColor! {
+    public override var cyl_badgeBackgroundColor: UIColor! {
         get { cyl_actualBadgeView?.cyl_badgeBackgroundColor ?? CYLBadgeAppearance.global.backgroundColor }
         set { cyl_performOnBadgeLayers { (($0 as UIView).cyl_getActualBadgeSuperView() as? UIView)?.cyl_badgeBackgroundColor = newValue } }
     }
 
-    override var cyl_badgeTextColor: UIColor! {
+    public override var cyl_badgeTextColor: UIColor! {
         get { cyl_actualBadgeView?.cyl_badgeTextColor ?? CYLBadgeAppearance.global.textColor }
         set { cyl_performOnBadgeLayers { (($0 as UIView).cyl_getActualBadgeSuperView() as? UIView)?.cyl_badgeTextColor = newValue } }
     }
 
-    override var cyl_badgeAnimationType: CYLBadgeAnimationType {
+    public override var cyl_badgeAnimationType: CYLBadgeAnimationType {
         get { cyl_actualBadgeView?.cyl_badgeAnimationType ?? .none }
         set { cyl_performOnBadgeLayers { (($0 as UIView).cyl_getActualBadgeSuperView() as? UIView)?.cyl_badgeAnimationType = newValue } }
     }
@@ -522,32 +533,32 @@ extension UIControl {
         set { cyl_performOnBadgeLayers { (($0 as UIView).cyl_getActualBadgeSuperView() as? UIView)?.cyl_badgeRespectsReduceMotion = newValue } }
     }
 
-    override var cyl_badgeFrame: CGRect {
+    public override var cyl_badgeFrame: CGRect {
         get { cyl_actualBadgeView?.cyl_badgeFrame ?? .zero }
         set { cyl_performOnBadgeLayers { (($0 as UIView).cyl_getActualBadgeSuperView() as? UIView)?.cyl_badgeFrame = newValue } }
     }
 
-    override var cyl_badgeCenterOffset: CGPoint {
+    public override var cyl_badgeCenterOffset: CGPoint {
         get { cyl_actualBadgeView?.cyl_badgeCenterOffset ?? .zero }
         set { cyl_performOnBadgeLayers { (($0 as UIView).cyl_getActualBadgeSuperView() as? UIView)?.cyl_badgeCenterOffset = newValue } }
     }
 
-    override var cyl_badgeMaximumBadgeNumber: Int {
+    public override var cyl_badgeMaximumBadgeNumber: Int {
         get { cyl_actualBadgeView?.cyl_badgeMaximumBadgeNumber ?? 0 }
         set { cyl_performOnBadgeLayers { (($0 as UIView).cyl_getActualBadgeSuperView() as? UIView)?.cyl_badgeMaximumBadgeNumber = newValue } }
     }
 
-    override var cyl_badgeMargin: CGFloat {
+    public override var cyl_badgeMargin: CGFloat {
         get { cyl_actualBadgeView?.cyl_badgeMargin ?? 0 }
         set { cyl_performOnBadgeLayers { (($0 as UIView).cyl_getActualBadgeSuperView() as? UIView)?.cyl_badgeMargin = newValue } }
     }
 
-    override var cyl_badgeRadius: CGFloat {
+    public override var cyl_badgeRadius: CGFloat {
         get { cyl_actualBadgeView?.cyl_badgeRadius ?? 0 }
         set { cyl_performOnBadgeLayers { (($0 as UIView).cyl_getActualBadgeSuperView() as? UIView)?.cyl_badgeRadius = newValue } }
     }
 
-    override var cyl_badgeCornerRadius: CGFloat {
+    public override var cyl_badgeCornerRadius: CGFloat {
         get { cyl_actualBadgeView?.cyl_badgeCornerRadius ?? 0 }
         set { cyl_performOnBadgeLayers { (($0 as UIView).cyl_getActualBadgeSuperView() as? UIView)?.cyl_badgeCornerRadius = newValue } }
     }

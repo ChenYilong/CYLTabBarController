@@ -315,7 +315,7 @@ extension UIView {
      *      因此由这一个 selector 在此分派。
      */
     @objc(cyl_contentView)
-    func cyl_contentView() -> UIView? {
+    public func cyl_contentView() -> UIView! {
         if let tabBar = self as? UITabBar {
             return tabBar.cylContentView()
         }
@@ -505,7 +505,7 @@ extension UIView {
         if let slotIndex = cyl_plusSlotIndex() {
             return UInt(slotIndex)
         }
-        return type(of: plusButton).index(forTabbarItemsCount: cyl_tabbarItemsCount)
+        return plusButton.cyl_index(forTabbarItemsCount: cyl_tabbarItemsCount)
     }
 
     @objc(cyl_plusButtonWidth)

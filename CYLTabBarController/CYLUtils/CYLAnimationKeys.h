@@ -5,6 +5,12 @@
 //  Copyright © 2026 https://github.com/ChenYilong . All rights reserved.
 //
 
+// CYL-SWIFT-MIGRATION: objc-required — [EN] What is left needs Objective-C: the key constants carry per-engine compile warnings
+//      (`CYL_PAG_REQUIRED` …, an AGENTS.md rule; Swift cannot attach a warning that depends on which engine pod is in the build),
+//      and `CYLAnimationTypeIsAvailable()` / `CYLAnimationWarnMissingEngine()` read the `__has_include` engine switches of
+//      CYLAnimatedItemMacros.h. The lookup is Swift (CYLUtils/Swift/CYLAnimationKeyLookup.swift, step 122).
+// [CN] 剩余部分需要 Objective-C：key 常量带有各引擎的编译警告（AGENTS.md 规则；Swift 无法附加取决于引擎子库是否存在的警告），
+//      `CYLAnimationTypeIsAvailable()` / `CYLAnimationWarnMissingEngine()` 读取 CYLAnimatedItemMacros.h 的 `__has_include` 引擎开关。查找逻辑为 Swift。
 #import <Foundation/Foundation.h>
 #if __has_include(<CYLAnimatedItem/CYLAnimatedItemMacros.h>)
 #import <CYLAnimatedItem/CYLAnimatedItemMacros.h>
@@ -36,59 +42,6 @@
 #endif
 
 NS_ASSUME_NONNULL_BEGIN
-
-FOUNDATION_EXTERN NSString *const CYLTabBarLottieFilePath CYL_LOTTIE_REQUIRED;
-FOUNDATION_EXTERN NSString *const CYLTabBarLottieURL CYL_LOTTIE_REQUIRED;
-FOUNDATION_EXTERN NSString *const CYLTabBarLottieSize CYL_LOTTIE_REQUIRED;
-/*!
- * FIX: issue #442
- * [EN] Optional Dark Mode versions of `CYLTabBarLottieURL` / `CYLTabBarLottieFilePath` (an NSURL / a file path). A
- *      Lottie animation draws its own colors, so a tab with `CYLTabBarLottieURL` used to stay light in Dark Mode, whatever
- *      its images. With one of these, the tab shows the dark animation where the interface style is dark (system setting
- *      or `overrideUserInterfaceStyle`), and switches by itself, keeping the selected tab's state.
- *
- *          CYLTabBarLottieURL : [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"tab_home" ofType:@"json"]],
- *          CYLTabBarLottieDarkURL : [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"tab_home_dark" ofType:@"json"]],
- *
- * [CN] 可选的深色模式 Lottie 动画，对应 `CYLTabBarLottieURL` / `CYLTabBarLottieFilePath`（NSURL / 文件路径）。Lottie 动画自带颜色，
- *      所以设置了 `CYLTabBarLottieURL` 的 Tab 以前在深色模式下保持浅色样式，与图片无关。设置后，界面风格为深色时（系统设置或
- *      `overrideUserInterfaceStyle`）Tab 显示深色动画，并自动切换，选中状态保持不变。示例见上。
- */
-FOUNDATION_EXTERN NSString *const CYLTabBarLottieDarkURL CYL_LOTTIE_REQUIRED;
-FOUNDATION_EXTERN NSString *const CYLTabBarLottieDarkFilePath CYL_LOTTIE_REQUIRED;
-/*!
- * FIX: issue #442 — Lottie 4.x (`CYLTabBarController/LottieSwift`, `CYLFlatDesignTabBar`, SPM)
- * [EN] One Lottie file for both styles: an NSDictionary of keypath -> UIColor, the colors used where the interface style
- *      is dark. They are set with Lottie's official value providers (`setValueProvider(_:keypath:)` with a
- *      `ColorValueProvider`), which both rendering engines support, and removed in light mode, so the animation shows its
- *      own colors again. Switching keeps the view and its progress. Keypaths use Lottie's syntax: layer, group and item
- *      names joined by ".", with "*" for one name and "**" for any number (see `logHierarchyKeypaths()`):
- *
- *          CYLTabBarLottieDarkColors : @{
- *              @"Icon_Shop_Normal.**.Color" : [UIColor colorWithWhite:0.78 alpha:1],     // gray strokes, lighter
- *              @"Icon_Shop_Active_Main.**.Color" : [UIColor colorWithRed:0.15 green:0.39 blue:0.16 alpha:1],
- *          },
- *
- *      Lottie 2.x (`CYLTabBarController/LottieObjectiveC`) ignores it; use `CYLTabBarLottieDarkFilePath` there. A dark
- *      file and dark colors can be combined: the colors then apply to the dark file.
- * [CN] 一份 Lottie 文件适配深浅两种风格：keypath -> UIColor 的 NSDictionary，即界面风格为深色时使用的颜色。通过 Lottie 官方的
- *      value provider（`setValueProvider(_:keypath:)` + `ColorValueProvider`）设置，两种渲染引擎都支持；浅色模式下移除，动画恢复自身颜色。
- *      切换时保留原视图及播放进度。keypath 使用 Lottie 的语法：图层、组、元素名称用 "." 连接，"*" 匹配一个名称，"**" 匹配任意多个
- *      （见 `logHierarchyKeypaths()`），示例见上。
- *      Lottie 2.x（`CYLTabBarController/LottieObjectiveC`）不支持，请使用 `CYLTabBarLottieDarkFilePath`。深色文件与深色颜色可同时设置，
- *      此时颜色作用于深色文件。
- */
-FOUNDATION_EXTERN NSString *const CYLTabBarLottieDarkColors CYL_LOTTIE_REQUIRED;
-
-/*!
- * [EN] Optional, per tab (an NSNumber BOOL, default NO): the tab's Lottie animation (`CYLTabBarLottieURL` /
- *      `CYLTabBarLottieFilePath`) loops while the tab is NOT selected, inviting a tap, and pauses while it is selected,
- *      instead of playing once on selection. Lottie 2.x and 4.x; every style. See docs/Custom-Tab-Bar-Features.md.
- * [CN] 可选，单个 Tab 设置（NSNumber BOOL，默认 NO）：该 Tab 的 Lottie 动画（`CYLTabBarLottieURL` / `CYLTabBarLottieFilePath`）在
- *      **未选中**时循环播放以吸引点击，选中时暂停，而不是在选中时播放一次。支持 Lottie 2.x 与 4.x，适用于所有样式。见
- *      docs/Custom-Tab-Bar-Features.md。
- */
-FOUNDATION_EXTERN NSString *const CYLTabBarLottieLoopsWhenUnselected CYL_LOTTIE_REQUIRED;
 
 /*!
  * FIX: issue #604 — generic animation keys, for every animation library.
@@ -164,14 +117,83 @@ FOUNDATION_EXTERN NSURL * _Nullable CYLTabBarAnimationURLWithOptions(NSURL * _Nu
                                                                      NSDictionary * _Nullable options) CYL_NOEXCEPT;
 
 /*!
- * [EN] The keys of each animation type (PAG, Rive, SVGA, GIF; Lottie's are above), declared here in the component's core so
+ * [EN] The keys of each animation type (Lottie, PAG, Rive, SVGA, GIF), declared here in the component's core so
  *      that they always exist: a project that passes one without that type's engine still compiles, gets a compile
  *      warning on the key (`CYL_PAG_REQUIRED` and its siblings, from `CYLAnimatedItemMacros.h`), a debug log at run
  *      time (`CYLAnimationWarnMissingEngine()`), and shows the static image, or the placeholder without one.
- * [CN] 各动画类型（PAG、Rive、SVGA、GIF；Lottie 见上）的 key，声明在组件核心中，因此总是存在：没有该类型的引擎却传入了它的 key 时，
+ * [CN] 各动画类型（Lottie、PAG、Rive、SVGA、GIF）的 key，声明在组件核心中，因此总是存在：没有该类型的引擎却传入了它的 key 时，
  *      项目仍能编译，在该 key 上得到编译警告（`CYL_PAG_REQUIRED` 等，来自 `CYLAnimatedItemMacros.h`），运行时在 debug 下输出日志
  *      （`CYLAnimationWarnMissingEngine()`），并显示静态图片，没有时显示占位图。
  */
+/*!
+ * [EN] Keys for a tab's Lottie animation, aliases of the generic `CYLTabBarAnimation…` keys (either works), like the PAG and
+ *      Rive keys below. Needs a Lottie subspec (`CYLTabBarController/LottieSwift` or `LottieObjectiveC`) to play; the keys
+ *      always exist (without one they get a compile warning and the tab shows its image).
+ *      - `CYLTabBarLottieURL`: an NSURL of a .json (or .lottie) file; `CYLTabBarLottieFilePath`: its path (NSString). The URL wins.
+ *      - `CYLTabBarLottieSize`: the view size, an NSValue of CGSize (default: the icon placeholder size).
+ *      - `CYLTabBarLottieDarkURL` / `CYLTabBarLottieDarkFilePath`: the Dark Mode version (#442).
+ *      - `CYLTabBarLottieDarkColors`: keypath -> UIColor for Dark Mode (Lottie 4.x value providers, #442).
+ *      - `CYLTabBarLottieLoopsWhenUnselected`: loops while the tab is not selected.
+ * [CN] Tab 的 Lottie 动画 key，是通用 key `CYLTabBarAnimation…` 的别名（两者都可以用），与下面 PAG、Rive 的 key 相同。播放需要引入 Lottie 子库
+ *      （`CYLTabBarController/LottieSwift` 或 `LottieObjectiveC`）；这些 key 总是存在（未引入时会有编译警告，Tab 显示图片）。
+ *      - `CYLTabBarLottieURL`：.json（或 .lottie）文件的 NSURL；`CYLTabBarLottieFilePath`：其路径（NSString）。URL 优先。
+ *      - `CYLTabBarLottieSize`：视图尺寸，CGSize 的 NSValue（默认使用图标占位尺寸）。
+ *      - `CYLTabBarLottieDarkURL` / `CYLTabBarLottieDarkFilePath`：深色模式版本（#442）。
+ *      - `CYLTabBarLottieDarkColors`：深色模式下 keypath -> UIColor（Lottie 4.x 的 value provider，#442）。
+ *      - `CYLTabBarLottieLoopsWhenUnselected`：Tab 未选中时循环播放。
+ */
+FOUNDATION_EXTERN NSString *const CYLTabBarLottieFilePath CYL_LOTTIE_REQUIRED;
+FOUNDATION_EXTERN NSString *const CYLTabBarLottieURL CYL_LOTTIE_REQUIRED;
+FOUNDATION_EXTERN NSString *const CYLTabBarLottieSize CYL_LOTTIE_REQUIRED;
+/*!
+ * FIX: issue #442
+ * [EN] Optional Dark Mode versions of `CYLTabBarLottieURL` / `CYLTabBarLottieFilePath` (an NSURL / a file path). A
+ *      Lottie animation draws its own colors, so a tab with `CYLTabBarLottieURL` used to stay light in Dark Mode, whatever
+ *      its images. With one of these, the tab shows the dark animation where the interface style is dark (system setting
+ *      or `overrideUserInterfaceStyle`), and switches by itself, keeping the selected tab's state.
+ *
+ *          CYLTabBarLottieURL : [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"tab_home" ofType:@"json"]],
+ *          CYLTabBarLottieDarkURL : [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"tab_home_dark" ofType:@"json"]],
+ *
+ * [CN] 可选的深色模式 Lottie 动画，对应 `CYLTabBarLottieURL` / `CYLTabBarLottieFilePath`（NSURL / 文件路径）。Lottie 动画自带颜色，
+ *      所以设置了 `CYLTabBarLottieURL` 的 Tab 以前在深色模式下保持浅色样式，与图片无关。设置后，界面风格为深色时（系统设置或
+ *      `overrideUserInterfaceStyle`）Tab 显示深色动画，并自动切换，选中状态保持不变。示例见上。
+ */
+FOUNDATION_EXTERN NSString *const CYLTabBarLottieDarkURL CYL_LOTTIE_REQUIRED;
+FOUNDATION_EXTERN NSString *const CYLTabBarLottieDarkFilePath CYL_LOTTIE_REQUIRED;
+/*!
+ * FIX: issue #442 — Lottie 4.x (`CYLTabBarController/LottieSwift`, `CYLFlatDesignTabBar`, SPM)
+ * [EN] One Lottie file for both styles: an NSDictionary of keypath -> UIColor, the colors used where the interface style
+ *      is dark. They are set with Lottie's official value providers (`setValueProvider(_:keypath:)` with a
+ *      `ColorValueProvider`), which both rendering engines support, and removed in light mode, so the animation shows its
+ *      own colors again. Switching keeps the view and its progress. Keypaths use Lottie's syntax: layer, group and item
+ *      names joined by ".", with "*" for one name and "**" for any number (see `logHierarchyKeypaths()`):
+ *
+ *          CYLTabBarLottieDarkColors : @{
+ *              @"Icon_Shop_Normal.**.Color" : [UIColor colorWithWhite:0.78 alpha:1],     // gray strokes, lighter
+ *              @"Icon_Shop_Active_Main.**.Color" : [UIColor colorWithRed:0.15 green:0.39 blue:0.16 alpha:1],
+ *          },
+ *
+ *      Lottie 2.x (`CYLTabBarController/LottieObjectiveC`) ignores it; use `CYLTabBarLottieDarkFilePath` there. A dark
+ *      file and dark colors can be combined: the colors then apply to the dark file.
+ * [CN] 一份 Lottie 文件适配深浅两种风格：keypath -> UIColor 的 NSDictionary，即界面风格为深色时使用的颜色。通过 Lottie 官方的
+ *      value provider（`setValueProvider(_:keypath:)` + `ColorValueProvider`）设置，两种渲染引擎都支持；浅色模式下移除，动画恢复自身颜色。
+ *      切换时保留原视图及播放进度。keypath 使用 Lottie 的语法：图层、组、元素名称用 "." 连接，"*" 匹配一个名称，"**" 匹配任意多个
+ *      （见 `logHierarchyKeypaths()`），示例见上。
+ *      Lottie 2.x（`CYLTabBarController/LottieObjectiveC`）不支持，请使用 `CYLTabBarLottieDarkFilePath`。深色文件与深色颜色可同时设置，
+ *      此时颜色作用于深色文件。
+ */
+FOUNDATION_EXTERN NSString *const CYLTabBarLottieDarkColors CYL_LOTTIE_REQUIRED;
+
+/*!
+ * [EN] Optional, per tab (an NSNumber BOOL, default NO): the tab's Lottie animation (`CYLTabBarLottieURL` /
+ *      `CYLTabBarLottieFilePath`) loops while the tab is NOT selected, inviting a tap, and pauses while it is selected,
+ *      instead of playing once on selection. Lottie 2.x and 4.x; every style. See docs/Custom-Tab-Bar-Features.md.
+ * [CN] 可选，单个 Tab 设置（NSNumber BOOL，默认 NO）：该 Tab 的 Lottie 动画（`CYLTabBarLottieURL` / `CYLTabBarLottieFilePath`）在
+ *      **未选中**时循环播放以吸引点击，选中时暂停，而不是在选中时播放一次。支持 Lottie 2.x 与 4.x，适用于所有样式。见
+ *      docs/Custom-Tab-Bar-Features.md。
+ */
+FOUNDATION_EXTERN NSString *const CYLTabBarLottieLoopsWhenUnselected CYL_LOTTIE_REQUIRED;
 /*!
  * FIX: issue #604 — PAG animations (Tencent libpag), the same way as Lottie.
  * [EN] Keys for a tab's PAG animation, used exactly like their Lottie twins and through the same pipeline: the view is
@@ -232,6 +254,10 @@ FOUNDATION_EXTERN NSString *const CYLTabBarRiveDarkColors CYL_RIVE_REQUIRED;
  *        after `CYLTabBarAnimationOptionRiveActiveDuration` seconds, or when it stops.
  *      - `CYLTabBarAnimationOptionRiveTriggerInput`: a state machine trigger input fired when the tab plays.
  *      - `CYLTabBarAnimationOptionRiveAnimation`: a linear animation played when the tab plays (no state machine).
+ *      - `CYLTabBarAnimationOptionRiveNumberInput`: a state machine number input set to the next value each time the tab
+ *        plays, for a state machine that moves only when a number changes (house.riv: @"Rooms").
+ *      - `CYLTabBarAnimationOptionRiveNumberValues`: the values it steps through, @"3,4,5,6" (the next one each time,
+ *        cycling); without it, the current value plus 1.
  *      - `CYLTabBarAnimationOptionRiveLegacyRuntime`: @"1" plays the file through the legacy runtime with none of the above,
  *        e.g. a file without a state machine, whose default animation then loops.
  *      `CYLTabBarAnimationOptionRiveActiveDuration` @"0" keeps the boolean (view model or input) YES until the animation stops.
@@ -246,6 +272,8 @@ FOUNDATION_EXTERN NSString *const CYLTabBarRiveDarkColors CYL_RIVE_REQUIRED;
  *      - `CYLTabBarAnimationOptionRiveInput`：状态机布尔输入，播放时设为 YES，`CYLTabBarAnimationOptionRiveActiveDuration` 秒后或停止时恢复为 NO。
  *      - `CYLTabBarAnimationOptionRiveTriggerInput`：播放时触发的状态机 trigger 输入。
  *      - `CYLTabBarAnimationOptionRiveAnimation`：播放时播放的线性动画（不使用状态机）。
+ *      - `CYLTabBarAnimationOptionRiveNumberInput`：状态机数字输入，每次播放设为下一个值，用于只在数字变化时运动的状态机（house.riv：@"Rooms"）。
+ *      - `CYLTabBarAnimationOptionRiveNumberValues`：依次使用的值，@"3,4,5,6"（每次取下一个，循环）；没有时为当前值加 1。
  *      - `CYLTabBarAnimationOptionRiveLegacyRuntime`：@"1" 表示不使用以上选项、直接通过旧版运行时播放文件，例如没有状态机的文件，其默认动画会循环播放。
  *      `CYLTabBarAnimationOptionRiveActiveDuration` 为 @"0" 时，布尔属性（view model 或输入）保持 YES，直到动画停止。
  */
@@ -259,6 +287,29 @@ FOUNDATION_EXTERN CYLTabBarAnimationOption const CYLTabBarAnimationOptionRiveInp
 FOUNDATION_EXTERN CYLTabBarAnimationOption const CYLTabBarAnimationOptionRiveTriggerInput CYL_RIVE_REQUIRED;
 FOUNDATION_EXTERN CYLTabBarAnimationOption const CYLTabBarAnimationOptionRiveAnimation CYL_RIVE_REQUIRED;
 FOUNDATION_EXTERN CYLTabBarAnimationOption const CYLTabBarAnimationOptionRiveLegacyRuntime CYL_RIVE_REQUIRED;
+FOUNDATION_EXTERN CYLTabBarAnimationOption const CYLTabBarAnimationOptionRiveNumberInput CYL_RIVE_REQUIRED;
+FOUNDATION_EXTERN CYLTabBarAnimationOption const CYLTabBarAnimationOptionRiveNumberValues CYL_RIVE_REQUIRED;
+/*!
+ * [EN] A tab icon tinted like a template image (bug B12; Android's key of the same name): "title" draws the icon in the tab's
+ *      title color, the tab bar's tint when the tab is selected and its unselected tint otherwise, as UIKit draws a template
+ *      static image; "#RRGGBB" or "#RRGGBBAA" draws it in that fixed color on the unselected tab, while the selected tab
+ *      takes the title's selected color, as with "title" (2026-11-19). For one-color icons (icons.riv). Rive on iOS.
+ * [CN] 像模板图片一样为 Tab 图标着色（问题 B12；与 Android 同名的 key）："title" 用 Tab 标题的颜色绘制图标：选中时为 TabBar 的 tint，
+ *      未选中时为未选中 tint，与 UIKit 绘制模板静态图片相同；"#RRGGBB" 或 "#RRGGBBAA" 在未选中的 Tab 上用该固定颜色绘制，选中的 Tab 使用标题的选中颜色，
+ *      与 "title" 相同（2026-11-19）。用于单色图标（icons.riv）。iOS 上用于 Rive。
+ */
+FOUNDATION_EXTERN CYLTabBarAnimationOption const CYLTabBarAnimationOptionTint;
+/*!
+ * [EN] The Dark Mode color of a fixed `CYLTabBarAnimationOptionTint` ("#RRGGBB" or "#RRGGBBAA"): with tint @"#1C1C1E" and darkTint @"#F2F2F7" a one-color icon stays readable on a light and on a dark bar, switching with the appearance. Not needed with tint @"title", which follows the tab bar's (dynamic) tints already. Rive on iOS.
+ * [CN] 固定 `CYLTabBarAnimationOptionTint`（"#RRGGBB" 或 "#RRGGBBAA"）在深色模式下的颜色：tint 为 @"#1C1C1E"、darkTint 为 @"#F2F2F7" 时，单色图标在浅色与深色 TabBar 上都清晰可辨，并随外观切换。tint 为 @"title" 时不需要，它已跟随 TabBar 的（动态）tint。iOS 上用于 Rive。
+ */
+FOUNDATION_EXTERN CYLTabBarAnimationOption const CYLTabBarAnimationOptionDarkTint;
+/*!
+ * [EN] Rive's own theme pattern (Rive data binding docs: named view model instances, rebound when the color scheme changes): `CYLTabBarAnimationOptionRiveViewModelInstance` names the instance of the artboard's default view model used in light mode (default: its default instance), `CYLTabBarAnimationOptionRiveDarkViewModelInstance` the one used in Dark Mode, e.g. @"Light" and @"Dark". The tab rebinds the instance when the appearance changes and keeps its selected state. For files with a view model (the data binding runtime); applied before `CYLTabBarAnimationDarkColors`.
+ * [CN] Rive 官方的主题方式（Rive 数据绑定文档：具名 view model 实例，颜色模式变化时重新绑定）：`CYLTabBarAnimationOptionRiveViewModelInstance` 指定画板默认 view model 在浅色模式下使用的实例（默认为其默认实例），`CYLTabBarAnimationOptionRiveDarkViewModelInstance` 指定深色模式下使用的实例，例如 @"Light" 与 @"Dark"。外观变化时 Tab 重新绑定实例并保持选中状态。用于带 view model 的文件（数据绑定运行时）；先于 `CYLTabBarAnimationDarkColors` 应用。
+ */
+FOUNDATION_EXTERN CYLTabBarAnimationOption const CYLTabBarAnimationOptionRiveViewModelInstance CYL_RIVE_REQUIRED;
+FOUNDATION_EXTERN CYLTabBarAnimationOption const CYLTabBarAnimationOptionRiveDarkViewModelInstance CYL_RIVE_REQUIRED;
 /*!
  * [EN] An SVGA file's URL (NSURL), the counterpart of `CYLTabBarLottieURL`; read from `CYLTabBarAnimationURL` too.
  * [CN] SVGA 文件的 URL（NSURL），对应 `CYLTabBarLottieURL`；也可以使用 `CYLTabBarAnimationURL`。
@@ -309,21 +360,21 @@ FOUNDATION_EXTERN NSString *const CYLTabBarGIFDarkFilePath CYL_GIF_REQUIRED;
  * [CN] `attributes` 中 `genericKey`（`CYLTabBarAnimationURL`、`…FilePath`、`…Size`、`…DarkURL`、`…DarkFilePath`、`…DarkColors`）的值，
  *      取通用 key 或任一类型自己的 key（Lottie、PAG、Rive、SVGA、GIF），与该类型的引擎是否参与构建无关。用于在无法播放时也能找到 Tab 的文件。
  */
-FOUNDATION_EXTERN id _Nullable CYLAnimationAttributesValue(NSDictionary * _Nullable attributes, NSString *genericKey);
+FOUNDATION_EXTERN id _Nullable CYLAnimationAttributesValue(NSDictionary * _Nullable attributes, NSString *genericKey) CYL_NOEXCEPT;
 
 /*!
  * [EN] The animation type of a file: "Lottie", "PAG", "Rive", "SVGA" or "GIF", from the type keys in `attributes`, else from
  *      the file's extension; nil when unknown.
  * [CN] 文件的动画类型："Lottie"、"PAG"、"Rive"、"SVGA" 或 "GIF"，先看 `attributes` 中的类型 key，否则看文件扩展名；未知时为 nil。
  */
-FOUNDATION_EXTERN NSString * _Nullable CYLAnimationTypeOfFile(NSDictionary * _Nullable attributes, NSURL * _Nullable fileURL);
+FOUNDATION_EXTERN NSString * _Nullable CYLAnimationTypeOfFile(NSDictionary * _Nullable attributes, NSURL * _Nullable fileURL) CYL_NOEXCEPT;
 
 /*!
  * [EN] Whether the engine of `type` is in the build (`CYL_LOTTIE_AVAILABLE`, `CYL_PAG_AVAILABLE`, `CYL_RIVE_AVAILABLE`,
  *      `CYL_SVGA_AVAILABLE`, `CYL_GIF_AVAILABLE`, and the engine itself, `CYL_ANIMATION_ENGINE_AVAILABLE`).
  * [CN] `type` 的引擎是否参与构建（`CYL_LOTTIE_AVAILABLE` 等各类型开关，以及引擎本身 `CYL_ANIMATION_ENGINE_AVAILABLE`）。
  */
-FOUNDATION_EXTERN BOOL CYLAnimationTypeIsAvailable(NSString * _Nullable type);
+FOUNDATION_EXTERN BOOL CYLAnimationTypeIsAvailable(NSString * _Nullable type) CYL_NOEXCEPT;
 
 /*!
  * [EN] The animation types this library knows, in a fixed order: "Lottie", "PAG", "Rive", "SVGA", "GIF". Each name is also
@@ -332,7 +383,7 @@ FOUNDATION_EXTERN BOOL CYLAnimationTypeIsAvailable(NSString * _Nullable type);
  * [CN] 本库已知的动画类型，顺序固定："Lottie"、"PAG"、"Rive"、"SVGA"、"GIF"。每个名称也是其 animator 在 `CYLTabBarItemAnimatorRegistry`
  *      中的名称，因此注册表中缺少的类型就是未参与构建的引擎。
  */
-FOUNDATION_EXTERN NSArray<NSString *> *CYLAnimationKnownTypes(void);
+FOUNDATION_EXTERN NSArray *CYLAnimationKnownTypes(void) CYL_NOEXCEPT;
 
 /*!
  * [EN] The subspec that brings the engine of `type` (e.g. "LottieSwift" for "Lottie"), to add as
@@ -340,13 +391,13 @@ FOUNDATION_EXTERN NSArray<NSString *> *CYLAnimationKnownTypes(void);
  * [CN] 提供 `type` 引擎的子库（例如 "Lottie" 对应 "LottieSwift"），以 `pod 'CYLAnimatedItem/<子库>'` 或
  *      `pod 'CYLTabBarController/<子库>'` 加入；未知类型返回 nil。
  */
-FOUNDATION_EXTERN NSString * _Nullable CYLAnimationSubspecOfType(NSString * _Nullable type);
+FOUNDATION_EXTERN NSString * _Nullable CYLAnimationSubspecOfType(NSString * _Nullable type) CYL_NOEXCEPT;
 
 /*!
  * [EN] The file extensions of `type` (e.g. @[@"json", @"lottie"] for "Lottie"); empty for an unknown type.
  * [CN] `type` 的文件扩展名（例如 "Lottie" 为 @[@"json", @"lottie"]）；未知类型为空数组。
  */
-FOUNDATION_EXTERN NSArray<NSString *> *CYLAnimationFileExtensionsOfType(NSString * _Nullable type);
+FOUNDATION_EXTERN NSArray *CYLAnimationFileExtensionsOfType(NSString * _Nullable type) CYL_NOEXCEPT;
 
 /*!
  * [EN] In debug builds (`DEBUG`), logs once per type that a file cannot play because its engine is not in the build, with

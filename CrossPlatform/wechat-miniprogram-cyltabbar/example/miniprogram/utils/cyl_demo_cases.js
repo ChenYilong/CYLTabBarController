@@ -9,12 +9,13 @@ const { cylReadConfiguration } = require('cyl-tabbar-miniprogram/cyl-tab-bar/cyl
 const { cylDemoConfiguration, cylAvailableAnimationFiles } = require('./cyl_demo_configuration');
 const { t } = require('./cyl_demo_localization');
 
-const CYL_TAB = (title, identifier, extra) => Object.assign({
+const CYL_TAB = (title, identifier, extra) => ({
   CYLTabBarItemTitle: title,
   CYLTabBarItemImage: `/shared/skins/2.1.0/light/${identifier}@3x.png`,
   CYLTabBarItemSelectedImage: `/shared/skins/2.1.0/light/${identifier}_selected@3x.png`,
   CYLTabBarItemIdentifier: identifier,
-}, extra);
+  ...extra,
+});
 const CYL_TABS = () => [CYL_TAB('Home', 'home'), CYL_TAB('Message', 'message'), CYL_TAB('Discover', 'discover'), CYL_TAB('Me', 'me')];
 const CYL_JSON = (object) => JSON.stringify(object);
 
@@ -88,10 +89,11 @@ function cylLoad(text) {
 function cylRequest(options) {
   return (page) => {
     page.setData({ result: t('Loading…') });
-    const task = wx.request(Object.assign({
+    const task = wx.request({
       success: (response) => page.setData({ result: `HTTP ${response.statusCode}` }),
       fail: (error) => page.setData({ result: `${t('Failed, the default configuration is kept')}: ${error.errMsg}` }),
-    }, options));
+      ...options,
+    });
     if (options.cylCancel && task) {
       setTimeout(() => task.abort(), 50);
     }
@@ -135,11 +137,24 @@ const CYL_CASES = {
   popPush: () => ({
     note: t('Push a new page on the stack, or pop this one.'),
     actions: [
-      { label: 'cyl_push', run: (page) => wx.navigateTo({ url: `/pages/demo/index?id=popPush&title=${encodeURIComponent(`cyl_push ${getCurrentPages().length}`)}` }) },
+      { label: 'cyl_push', run: (page) => {
+        const title = encodeURIComponent(`cyl_push ${getCurrentPages().length}`);
+        return wx.navigateTo({ url: `/pages/demo/index?id=popPush&title=${title}` });
+      } },
       { label: 'cyl_pop', run: () => wx.navigateBack() },
     ],
   }),
 };
+
+/**
+ * [EN] The input file as shown: '' without one, the first 400 characters of a long one. [CN] 显示的输入文件：没有时为 ''，过长时取前 400 个字符。
+ */
+function cylShownInput(input) {
+  if (input === null) {
+    return '';
+  }
+  return input.length > 400 ? `${input.slice(0, 400)}… (${input.length} ${t('characters')})` : input;
+}
 
 /**
  * [EN] The case of row `id`: a configuration-file case is loaded and drawn; other code-only cases explain the
@@ -155,7 +170,7 @@ function cylDemoCase(id) {
     const loaded = cylLoad(input);
     return {
       note: t('This file is loaded with cylReadConfiguration of the core.'),
-      input: input === null ? '' : (input.length > 400 ? `${input.slice(0, 400)}… (${input.length} ${t('characters')})` : input),
+      input: cylShownInput(input),
       result: loaded.result,
       configuration: loaded.configuration,
     };
