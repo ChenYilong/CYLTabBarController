@@ -104,9 +104,39 @@ def parameter(value):
                           "configuration values)")
 
 
+# [EN] The keys that hold a geometry value, and how many numbers it has: an inset has 4 (top, left, bottom, right), an
+#      offset or a size has 2. A string is only read as a geometry for these keys, so a title such as "{1}" stays text.
+# [CN] 几何值所在的 key 及数字个数：内边距 4 个（上、左、下、右），偏移与尺寸 2 个。只有这些 key 的字符串才按几何值读取，因此 "{1}" 这样的标题仍是文本。
+GEOMETRY_KEYS = (
+    (re.compile(r"^CYLTabBar(Controller|Item)?Image(Insets)$"), 4),
+    (re.compile(r"^CYLTabBar(Controller|Item)?(Title|Image)PositionAdjustment$"), 2),
+    (re.compile(r"^CYLTabBar(Item)?(ImageURL|Lottie|Animation|PAG|Rive|GIF)Size$"), 2),
+)
+
+
+def native_geometry(value, key=None):
+    """[EN] `value` with each geometry string ("{0, -2}") of a geometry key turned into the JSON array Remote Config's JSON type holds
+    ([0, -2]); everything else is kept. The library reads both forms (the string form is for old files). Applied to the
+    nested values too (the tab items, the themes).
+    [CN] 把几何 key 中的每个几何字符串（"{0, -2}"）转换为 Remote Config 的 JSON 类型所存的 JSON 数组（[0, -2]），其余保持不变。
+    本库两种写法都能读取（字符串写法供旧文件使用）。嵌套的值（Tab 项、主题）同样转换。"""
+    if isinstance(value, dict):
+        return {name: native_geometry(item, name) for name, item in value.items()}
+    if isinstance(value, list):
+        return [native_geometry(item, key) for item in value]
+    if isinstance(value, str) and key and GEOMETRY.match(value.strip()):
+        count = next((expected for pattern, expected in GEOMETRY_KEYS if pattern.match(key)), None)
+        numbers = [float(part) for part in value.strip().strip("{}").split(",")]
+        if count == len(numbers):
+            return [int(number) if number == int(number) else number for number in numbers]
+    return value
+
+
 def parameters_of(configuration, whole=False):
-    """[EN] The parameters ({key: (value, type)}) of a configuration, checked against Remote Config's quotas.
-    [CN] 配置对应的参数（{key: (值, 类型)}），并按 Remote Config 的配额检查。"""
+    """[EN] The parameters ({key: (value, type)}) of a configuration, checked against Remote Config's quotas. Geometry
+    strings become JSON arrays (`native_geometry`). [CN] 配置对应的参数（{key: (值, 类型)}），并按 Remote Config 的配额检查；
+    几何字符串转换为 JSON 数组（`native_geometry`）。"""
+    configuration = {key: native_geometry(value, key) for key, value in configuration.items()}
     if whole:
         result = {WHOLE_CONFIGURATION_KEY: (json_text(configuration), "JSON")}
     else:
@@ -270,7 +300,8 @@ def self_test():
                         failures += 1
                         print(f"  FAIL {relative} → {suffix}{' (whole)' if whole else ''}: {error}")
                         continue
-                    if back != configuration:
+                    # [EN] The geometry strings come back as the JSON arrays of Remote Config. [CN] 几何字符串读回时是 Remote Config 的 JSON 数组。
+                    if back != {key: native_geometry(value, key) for key, value in configuration.items()}:
                         failures += 1
                         print(f"  FAIL {relative} → {suffix}{' (whole)' if whole else ''}: reads back differently")
     print(f"{checks} round trips, {failures} failures, {len(samples)} sample files looked at")

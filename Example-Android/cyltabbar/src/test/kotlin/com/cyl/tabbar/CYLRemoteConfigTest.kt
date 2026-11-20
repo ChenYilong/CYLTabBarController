@@ -79,6 +79,27 @@ class CYLRemoteConfigTest {
     }
 
     @Test
+    fun geometryAsJSONArraysOrAsStringsIsTheSame() {
+        // [EN] Remote Config's JSON type holds arrays; the file formats' "{0, -2}" strings keep working (A1 of the audit in
+        //      docs/Configuration-File.md): both read as the same inset and offset. A title that looks like a geometry stays text.
+        // [CN] Remote Config 的 JSON 类型存数组；文件格式中的 "{0, -2}" 字符串仍可使用（docs/Configuration-File.md 审计中的 A1）：两种写法读出相同的内边距与偏移。
+        //      看起来像几何值的标题仍是文本。
+        val arrays = CYLTabBarConfiguration.configurationWithRemoteConfigValues(values + mapOf(
+            "CYLTabBarControllerImageInsets" to "[1,0,-1,0]",
+            "CYLTabBarControllerTitlePositionAdjustment" to "[0,-2]"))
+        val strings = CYLTabBarConfiguration.configurationWithRemoteConfigValues(values + mapOf(
+            "CYLTabBarControllerImageInsets" to "{1, 0, -1, 0}",
+            "CYLTabBarControllerTitlePositionAdjustment" to "{0, -2}"))
+        assertEquals(CYLEdgeInsets(1f, 0f, -1f, 0f), CYLTabBarConfiguration.edgeInsetsValue(arrays["CYLTabBarControllerImageInsets"]))
+        assertEquals(CYLEdgeInsets(1f, 0f, -1f, 0f), CYLTabBarConfiguration.edgeInsetsValue(strings["CYLTabBarControllerImageInsets"]))
+        assertEquals(CYLTabBarConfiguration.offsetValue(strings["CYLTabBarControllerTitlePositionAdjustment"]),
+            CYLTabBarConfiguration.offsetValue(arrays["CYLTabBarControllerTitlePositionAdjustment"]))
+        assertEquals(CYLOffset(0f, -2f), CYLTabBarConfiguration.offsetValue(arrays["CYLTabBarControllerTitlePositionAdjustment"]))
+        val text = CYLTabBarConfiguration.configurationWithRemoteConfigValues(values + mapOf("CYLTabBarControllerContext" to "{1}"))
+        assertEquals("{1}", text["CYLTabBarControllerContext"])
+    }
+
+    @Test
     fun invalidValuesKeepTheDefaults() {
         assertError(CYLTabBarConfiguration.CYLTabBarConfigurationError.InvalidSyntax, "CYLTabBarControllerPlusButton") {
             CYLTabBarConfiguration.configurationWithRemoteConfigValues(values + ("CYLTabBarControllerPlusButton" to """{"CYLTabBarItemTitle": """))
