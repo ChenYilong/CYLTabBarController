@@ -142,6 +142,22 @@ FOUNDATION_EXTERN BOOL CYLTabBarItemAnimationURLMayBeLottie(NSURL *_Nullable URL
 }
 @end
 
+/*
+ * [EN] A clock the tests move by hand. [CN] 由测试手动拨动的时钟。
+ */
+@interface CYLAnimatedItemTestClock : NSObject
+@property (nonatomic, strong) NSDate *date;
++ (instancetype)clockAt:(NSDate *)date;
+@end
+
+@implementation CYLAnimatedItemTestClock
++ (instancetype)clockAt:(NSDate *)date {
+    CYLAnimatedItemTestClock *clock = [[self alloc] init];
+    clock.date = date;
+    return clock;
+}
+@end
+
 @interface CYLAnimatedItemViewTests : XCTestCase <CYLAnimatedItemViewDelegate>
 @property (nonatomic, strong) NSMutableArray<NSString *> *events;
 @end
@@ -196,6 +212,160 @@ FOUNDATION_EXTERN BOOL CYLTabBarItemAnimationURLMayBeLottie(NSURL *_Nullable URL
     XCTAssertTrue(item.accessibilityTraits & UIAccessibilityTraitSelected);
     item.badge = @"3 new";
     XCTAssertEqualObjects(item.accessibilityLabel, @"Tag, 3 new");
+}
+
+#pragma mark - Countdown 倒计时
+
+- (void)animatedItemViewDidStartCountdown:(CYLAnimatedItemView *)itemView {
+    [self.events addObject:@"start"];
+}
+
+- (void)animatedItemView:(CYLAnimatedItemView *)itemView didTickCountdown:(NSInteger)remainingSeconds {
+    [self.events addObject:[NSString stringWithFormat:@"tick %ld", (long)remainingSeconds]];
+}
+
+- (void)animatedItemViewDidFinishCountdown:(CYLAnimatedItemView *)itemView {
+    [self.events addObject:@"finish"];
+}
+
+/*
+ * [EN] A countdown view on a clock the test moves: no timer is waited for. [CN] 使用由测试拨动的时钟的倒计时视图：不需要等待定时器。
+ */
+- (CYLAnimatedItemView *)countdownItemWithClock:(CYLAnimatedItemTestClock *)clock {
+    CYLAnimatedItemView *item = [[CYLAnimatedItemView alloc] initWithFrame:CGRectMake(0, 0, 200, 44)];
+    item.countdownDateProvider = ^NSDate * {
+        return clock.date;
+    };
+    item.countdownIdleTitle = @"Get code";
+    item.countdownRunningTitleFormat = @"%ld s left";
+    item.countdownFinishedTitle = @"Resend";
+    item.delegate = self;
+    item.style = CYLAnimatedItemStyleCountdown;
+    return item;
+}
+
+/*
+ * [EN] FIX: issue #1 of SMSCodeButton: the seconds spent in the background count. The control reads the end date again when the
+ *      app returns, so 4 seconds in the background leave 6, not 10. [CN] 修复 SMSCodeButton 的 issue #1：后台度过的秒数计入。
+ *      App 返回时控件重新读取结束时间，后台 4 秒后剩 6 秒，而不是 10 秒。
+ */
+- (void)testCountdownCountsTheSecondsSpentInTheBackground {
+    CYLAnimatedItemTestClock *clock = [CYLAnimatedItemTestClock clockAt:[NSDate dateWithTimeIntervalSince1970:1000]];
+    CYLAnimatedItemView *item = [self countdownItemWithClock:clock];
+    XCTAssertEqualObjects(item.title, @"Get code");
+    XCTAssertEqual(item.countdownState, CYLAnimatedItemCountdownStateIdle);
+
+    [item startCountdownWithDuration:10];
+    XCTAssertEqual(item.countdownState, CYLAnimatedItemCountdownStateRunning);
+    XCTAssertEqualObjects(item.title, @"10 s left");
+    XCTAssertFalse(item.isEnabled, @"a tap cannot start a second countdown");
+    XCTAssertEqual(item.countdownRemainingSeconds, 10);
+
+    clock.date = [NSDate dateWithTimeIntervalSince1970:1004];
+    [[NSNotificationCenter defaultCenter] postNotificationName:UIApplicationWillEnterForegroundNotification object:nil];
+    XCTAssertEqualObjects(item.title, @"6 s left");
+    XCTAssertEqual(item.countdownRemainingSeconds, 6);
+
+    clock.date = [NSDate dateWithTimeIntervalSince1970:1020];
+    [[NSNotificationCenter defaultCenter] postNotificationName:UIApplicationDidBecomeActiveNotification object:nil];
+    XCTAssertEqual(item.countdownState, CYLAnimatedItemCountdownStateFinished, @"it ended while the app was away");
+    XCTAssertEqualObjects(item.title, @"Resend");
+    XCTAssertTrue(item.isEnabled);
+    XCTAssertNil(item.countdownEndDate);
+    XCTAssertEqualObjects(self.events, (@[ @"start", @"tick 10", @"tick 6", @"finish" ]));
+}
+
+/*
+ * [EN] The title changes only when the whole seconds left change, and a late read cannot skip the end. [CN] 只有剩余整秒数变化时标题才变化，
+ *      读取延迟也不会错过结束。
+ */
+- (void)testCountdownTicksOncePerSecondAndFinishesExactly {
+    CYLAnimatedItemTestClock *clock = [CYLAnimatedItemTestClock clockAt:[NSDate dateWithTimeIntervalSince1970:500]];
+    CYLAnimatedItemView *item = [self countdownItemWithClock:clock];
+    [item startCountdownWithDuration:3];
+    clock.date = [NSDate dateWithTimeIntervalSince1970:500.4];
+    [item refreshCountdown];
+    clock.date = [NSDate dateWithTimeIntervalSince1970:500.9];
+    [item refreshCountdown];
+    XCTAssertEqualObjects(item.title, @"3 s left", @"still within the first second");
+    clock.date = [NSDate dateWithTimeIntervalSince1970:501.1];
+    [item refreshCountdown];
+    XCTAssertEqualObjects(item.title, @"2 s left");
+    clock.date = [NSDate dateWithTimeIntervalSince1970:503];
+    [item refreshCountdown];
+    XCTAssertEqual(item.countdownState, CYLAnimatedItemCountdownStateFinished);
+    XCTAssertEqualObjects(self.events, (@[ @"start", @"tick 3", @"tick 2", @"finish" ]));
+    [item refreshCountdown];
+    XCTAssertEqual(self.events.count, 4u, @"a finished countdown reports nothing more");
+}
+
+- (void)testCountdownResetAndRestartAndTheTapThatStartsIt {
+    CYLAnimatedItemTestClock *clock = [CYLAnimatedItemTestClock clockAt:[NSDate dateWithTimeIntervalSince1970:0]];
+    CYLAnimatedItemView *item = [self countdownItemWithClock:clock];
+    item.countdownDuration = 30;
+    item.startsCountdownOnTap = YES;
+    [item sendActionsForControlEvents:UIControlEventTouchUpInside];
+    XCTAssertEqual(item.countdownState, CYLAnimatedItemCountdownStateRunning);
+    XCTAssertEqualObjects(item.title, @"30 s left");
+
+    [item resetCountdown];
+    XCTAssertEqual(item.countdownState, CYLAnimatedItemCountdownStateIdle);
+    XCTAssertEqualObjects(item.title, @"Get code");
+    XCTAssertTrue(item.isEnabled);
+    XCTAssertFalse([self.events containsObject:@"finish"], @"a reset is not a finish");
+
+    // [EN] The server asks for 120 seconds, more than the default. [CN] 服务器要求 120 秒，比默认值长。
+    [item startCountdownWithDuration:120];
+    XCTAssertEqualObjects(item.title, @"120 s left");
+    clock.date = [NSDate dateWithTimeIntervalSince1970:1];
+    [item refreshCountdown];
+    XCTAssertEqualObjects(item.title, @"119 s left");
+}
+
+/*
+ * [EN] No flicker and no jump: the same label changes its text, the icon is the countdown icon only while running, and the
+ *      width is that of the widest title. [CN] 不闪烁、不抖动：同一个 label 改变文字，只有倒计时期间显示倒计时图标，宽度为最宽标题的宽度。
+ */
+- (void)testCountdownKeepsOneLabelTheWidthAndShowsTheCountdownIconWhileRunning {
+    CYLAnimatedItemTestClock *clock = [CYLAnimatedItemTestClock clockAt:[NSDate dateWithTimeIntervalSince1970:0]];
+    CYLAnimatedItemView *item = [self countdownItemWithClock:clock];
+    UIImage *idle = [self icon];
+    UIImage *clock = [self icon];
+    item.image = idle;
+    item.countdownImage = clock;
+    item.countdownDuration = 60;
+    UILabel *label = item.titleLabel;
+    CGSize idleSize = [item sizeThatFits:CGSizeMake(CGFLOAT_MAX, CGFLOAT_MAX)];
+    XCTAssertEqual(item.imageView.image, idle);
+
+    [item startCountdown];
+    XCTAssertEqual(item.titleLabel, label, @"the label is reused");
+    XCTAssertEqual(item.imageView.image, clock);
+    XCTAssertEqualWithAccuracy([item sizeThatFits:CGSizeMake(CGFLOAT_MAX, CGFLOAT_MAX)].width, idleSize.width, 0.5);
+    clock.date = [NSDate dateWithTimeIntervalSince1970:51];
+    [item refreshCountdown];
+    XCTAssertEqualObjects(item.title, @"9 s left");
+    XCTAssertEqualWithAccuracy([item sizeThatFits:CGSizeMake(CGFLOAT_MAX, CGFLOAT_MAX)].width, idleSize.width, 0.5, @"two digits or one, the width stays");
+    XCTAssertTrue(item.accessibilityTraits & UIAccessibilityTraitNotEnabled, @"VoiceOver hears that it cannot be used now");
+    XCTAssertEqualObjects(item.accessibilityLabel, @"9 s left");
+
+    clock.date = [NSDate dateWithTimeIntervalSince1970:60];
+    [item refreshCountdown];
+    XCTAssertEqual(item.imageView.image, idle);
+    XCTAssertFalse(item.accessibilityTraits & UIAccessibilityTraitNotEnabled);
+}
+
+- (void)testPlainStyleHasNoCountdownLook {
+    CYLAnimatedItemView *item = [[CYLAnimatedItemView alloc] initWithFrame:CGRectMake(0, 0, 200, 44)];
+    item.title = @"Home";
+    XCTAssertEqual(item.style, CYLAnimatedItemStylePlain);
+    XCTAssertEqual(item.layer.borderWidth, 0);
+    [item refreshCountdown];
+    XCTAssertEqualObjects(item.title, @"Home", @"not touched without the style");
+    item.style = CYLAnimatedItemStyleCountdown;
+    XCTAssertGreaterThan(item.layer.borderWidth, 0);
+    item.style = CYLAnimatedItemStylePlain;
+    XCTAssertEqual(item.layer.borderWidth, 0);
 }
 
 #if CYL_ANIMATION_ENGINE_AVAILABLE

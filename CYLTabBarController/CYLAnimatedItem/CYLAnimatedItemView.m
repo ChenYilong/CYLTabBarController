@@ -36,6 +36,12 @@ static const CGFloat CYLAnimatedItemDefaultAnimationSide = 24;
 @property (nonatomic, strong, readwrite) UIPanGestureRecognizer *panGestureRecognizer;
 @property (nonatomic, strong, nullable) NSTimer *loopTimer;
 @property (nonatomic, assign) BOOL playing;
+@property (nonatomic, assign, readwrite) CYLAnimatedItemCountdownState countdownState;
+@property (nonatomic, strong, readwrite, nullable) NSDate *countdownEndDate;
+@property (nonatomic, strong, nullable) NSTimer *countdownTimer;
+@property (nonatomic, assign) NSInteger countdownShownSeconds;
+@property (nonatomic, assign) NSTimeInterval countdownRunDuration;
+@property (nonatomic, strong, nullable) UIColor *countdownRestingTitleColor;
 @end
 
 #if CYL_ANIMATION_ENGINE_AVAILABLE
@@ -63,6 +69,31 @@ static BOOL CYLAnimatedItemLocalFileIsMissing(NSURL *URL) {
 }
 #endif
 
+/*
+ * [EN] How often a running countdown reads the clock. The title changes only when the whole seconds left change, so a tick
+ *      that is a little late (a busy main thread) shows the right number, and the display is never ahead by more than this.
+ * [CN] 运行中的倒计时读取时钟的间隔。只有剩余整秒数变化时才改变标题，因此 tick 稍有延迟（主线程繁忙）时仍显示正确的数字，显示最多超前此间隔。
+ */
+static const NSTimeInterval CYLAnimatedItemCountdownTickInterval = 0.25;
+
+/*
+ * [EN] `format` with its `%ld` (or `%d`) replaced by `seconds`, in the user's digits. A replacement instead of
+ *      `stringWithFormat:` because the format is the app's text, not a literal.
+ * [CN] 把 `format` 中的 `%ld`（或 `%d`）替换为 `seconds`（使用用户所在地区的数字）。使用替换而不是 `stringWithFormat:`，因为格式是 App 的文本，不是字面量。
+ */
+static NSString *CYLAnimatedItemCountdownText(NSString *format, NSInteger seconds) {
+    static NSNumberFormatter *formatter = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        formatter = [[NSNumberFormatter alloc] init];
+        formatter.locale = [NSLocale autoupdatingCurrentLocale];
+        formatter.usesGroupingSeparator = NO;
+    });
+    NSString *number = [formatter stringFromNumber:@(seconds)] ?: [NSString stringWithFormat:@"%ld", (long)seconds];
+    NSString *text = [format stringByReplacingOccurrencesOfString:@"%ld" withString:number];
+    return [text stringByReplacingOccurrencesOfString:@"%d" withString:number];
+}
+
 @implementation CYLAnimatedItemView
 
 @synthesize title = _title;
@@ -73,6 +104,16 @@ static BOOL CYLAnimatedItemLocalFileIsMissing(NSURL *URL) {
 @synthesize animationSpeed = _animationSpeed;
 @synthesize animationLoops = _animationLoops;
 @synthesize animationRestingProgress = _animationRestingProgress;
+@synthesize countdownDuration = _countdownDuration;
+@synthesize countdownIdleTitle = _countdownIdleTitle;
+@synthesize countdownRunningTitleFormat = _countdownRunningTitleFormat;
+@synthesize countdownFinishedTitle = _countdownFinishedTitle;
+@synthesize countdownImage = _countdownImage;
+@synthesize countdownRunningTitleColor = _countdownRunningTitleColor;
+@synthesize startsCountdownOnTap = _startsCountdownOnTap;
+@synthesize countdownState = _countdownState;
+@synthesize countdownEndDate = _countdownEndDate;
+@synthesize countdownDateProvider = _countdownDateProvider;
 #if CYL_ANIMATION_ENGINE_AVAILABLE
 @synthesize animationSource = _animationSource;
 #endif
@@ -95,6 +136,8 @@ static BOOL CYLAnimatedItemLocalFileIsMissing(NSURL *URL) {
 
 - (void)dealloc {
     [_loopTimer invalidate];
+    [_countdownTimer invalidate];
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 - (void)cyl_animatedItemSetUp {
@@ -102,6 +145,11 @@ static BOOL CYLAnimatedItemLocalFileIsMissing(NSURL *URL) {
     _spacing = 4;
     _accessorySize = CGSizeMake(18, 18);
     _accessoryPlacement = CYLAnimatedItemAccessoryPlacementTrailing;
+    _countdownDuration = 60;
+    _countdownIdleTitle = @"Get code";
+    _countdownRunningTitleFormat = @"%ld s left";
+    _countdownFinishedTitle = @"Resend";
+    _countdownRunningTitleColor = [UIColor grayColor];
 
     _imageView = [[UIImageView alloc] init];
     _imageView.contentMode = UIViewContentModeScaleAspectFit;
@@ -202,6 +250,9 @@ static BOOL CYLAnimatedItemLocalFileIsMissing(NSURL *URL) {
 
 - (void)cyl_updateIcon {
     UIImage *icon = (self.isSelected && self.selectedImage) ? self.selectedImage : self.image;
+    if (self.countdownState == CYLAnimatedItemCountdownStateRunning && self.countdownImage) {
+        icon = self.countdownImage;
+    }
     if (!icon) {
         icon = [self cyl_placeholderIfNeeded];
     }
@@ -289,6 +340,9 @@ static BOOL CYLAnimatedItemLocalFileIsMissing(NSURL *URL) {
     CGFloat titleLimit = MAX(0, size.width - accessory - accessorySpacing - (self.axis == CYLAnimatedItemAxisHorizontal ? icon.width + spacing : 0));
     CGSize title = showsTitle ? [self.titleLabel sizeThatFits:CGSizeMake(titleLimit, CGFLOAT_MAX)] : CGSizeZero;
     title.width = MIN(ceil(title.width), titleLimit);
+    if (showsTitle) {
+        title.width = MIN(MAX(title.width, [self cyl_countdownTitleWidth]), titleLimit);
+    }
     title.height = ceil(title.height);
     CGFloat accessoryHeight = [self cyl_accessoryInline] ? self.accessorySize.height : 0;
     if (self.axis == CYLAnimatedItemAxisHorizontal) {
@@ -313,6 +367,7 @@ static BOOL CYLAnimatedItemLocalFileIsMissing(NSURL *URL) {
 - (void)layoutSubviews {
     [super layoutSubviews];
     [self layoutContentInRect:UIEdgeInsetsInsetRect(self.bounds, self.contentInsets)];
+    [self cyl_applyCountdownAppearance];
 }
 
 - (void)layoutContentInRect:(CGRect)rect {
@@ -335,6 +390,9 @@ static BOOL CYLAnimatedItemLocalFileIsMissing(NSURL *URL) {
     CGFloat titleLimit = self.axis == CYLAnimatedItemAxisHorizontal ? MAX(0, CGRectGetWidth(content) - icon.width - spacing) : CGRectGetWidth(content);
     CGSize title = showsTitle ? [self.titleLabel sizeThatFits:CGSizeMake(titleLimit, CGRectGetHeight(content))] : CGSizeZero;
     title.width = MIN(ceil(title.width), titleLimit);
+    if (showsTitle) {
+        title.width = MIN(MAX(title.width, [self cyl_countdownTitleWidth]), titleLimit);
+    }
     title.height = MIN(ceil(title.height), CGRectGetHeight(content));
     BOOL leadingAligned = (self.alignment == CYLAnimatedItemAlignmentLeading);
     CGRect iconFrame;
@@ -398,6 +456,7 @@ static BOOL CYLAnimatedItemLocalFileIsMissing(NSURL *URL) {
     BOOL changed = (highlighted != self.isHighlighted);
     [super setHighlighted:highlighted];
     if (changed) {
+        [self cyl_applyCountdownAppearance];
         [self itemStateDidChange];
     }
 }
@@ -406,6 +465,7 @@ static BOOL CYLAnimatedItemLocalFileIsMissing(NSURL *URL) {
     BOOL changed = (enabled != self.isEnabled);
     [super setEnabled:enabled];
     if (changed) {
+        [self cyl_applyCountdownAppearance];
         [self itemStateDidChange];
         [self updateItemAccessibility];
     }
@@ -660,11 +720,290 @@ static BOOL CYLAnimatedItemLocalFileIsMissing(NSURL *URL) {
 
 #endif
 
+#pragma mark - Countdown 倒计时
+
+- (NSDate *)cyl_now {
+    return self.countdownDateProvider();
+}
+
+- (NSDate *(^)(void))countdownDateProvider {
+    return _countdownDateProvider ?: ^NSDate *{
+        return [NSDate date];
+    };
+}
+
+- (void)setStyle:(CYLAnimatedItemStyle)style {
+    if (_style == style) {
+        return;
+    }
+    _style = style;
+    if (style == CYLAnimatedItemStyleCountdown) {
+        // [EN] The default look of a countdown button: a rounded border and a light background, as the original SMSCodeButton. Set
+        //      these properties again after the style to change them.
+        // [CN] 倒计时按钮的默认外观：圆角边框与浅色背景，与最初的 SMSCodeButton 一致。要修改，请在设置样式之后再设置这些属性。
+        if (UIEdgeInsetsEqualToEdgeInsets(self.contentInsets, UIEdgeInsetsZero)) {
+            self.contentInsets = UIEdgeInsetsMake(8, 12, 8, 12);
+        }
+        if (!self.backgroundColor) {
+            self.backgroundColor = [self cyl_countdownBackgroundColor];
+        }
+        self.layer.cornerRadius = 6;
+        self.layer.masksToBounds = YES;
+        self.titleLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleBody];
+        [self cyl_showCountdownIdleOrFinishedTitle];
+        [self cyl_applyCountdownAppearance];
+    } else {
+        [self resetCountdown];
+        self.layer.cornerRadius = 0;
+        self.layer.borderWidth = 0;
+        self.titleLabel.alpha = 1;
+        self.imageView.alpha = 1;
+    }
+    [self cyl_contentDidChange];
+}
+
+- (UIColor *)cyl_countdownBackgroundColor {
+    if (@available(iOS 13.0, *)) {
+        return [UIColor secondarySystemBackgroundColor];
+    }
+    return [UIColor colorWithWhite:0.96 alpha:1];
+}
+
+- (void)setCountdownIdleTitle:(NSString *)countdownIdleTitle {
+    _countdownIdleTitle = [countdownIdleTitle copy] ?: @"";
+    [self cyl_refreshCountdownTitle];
+}
+
+- (void)setCountdownRunningTitleFormat:(NSString *)countdownRunningTitleFormat {
+    _countdownRunningTitleFormat = [countdownRunningTitleFormat copy] ?: @"%ld";
+    [self cyl_refreshCountdownTitle];
+}
+
+- (void)setCountdownFinishedTitle:(NSString *)countdownFinishedTitle {
+    _countdownFinishedTitle = [countdownFinishedTitle copy] ?: @"";
+    [self cyl_refreshCountdownTitle];
+}
+
+- (void)setCountdownImage:(UIImage *)countdownImage {
+    _countdownImage = countdownImage;
+    [self cyl_updateIcon];
+    [self cyl_contentDidChange];
+}
+
+- (void)setCountdownRunningTitleColor:(UIColor *)countdownRunningTitleColor {
+    _countdownRunningTitleColor = countdownRunningTitleColor ?: [UIColor grayColor];
+    [self cyl_applyCountdownAppearance];
+}
+
+/*
+ * [EN] Shows the title that belongs to the current state, after a title property changed.
+ * [CN] 某个标题属性变化后，显示与当前状态对应的标题。
+ */
+- (void)cyl_refreshCountdownTitle {
+    if (self.style != CYLAnimatedItemStyleCountdown) {
+        return;
+    }
+    if (self.countdownState == CYLAnimatedItemCountdownStateRunning) {
+        self.title = CYLAnimatedItemCountdownText(self.countdownRunningTitleFormat, MAX(self.countdownShownSeconds, 0));
+    } else {
+        [self cyl_showCountdownIdleOrFinishedTitle];
+    }
+}
+
+- (void)cyl_showCountdownIdleOrFinishedTitle {
+    self.title = (self.countdownState == CYLAnimatedItemCountdownStateFinished) ? self.countdownFinishedTitle : self.countdownIdleTitle;
+}
+
+/*
+ * [EN] The widest title the countdown shows, so the control keeps its width: the idle and finished titles and the running
+ *      one with the widest digits of `countdownDuration`. 0 for another style.
+ * [CN] 倒计时会显示的最宽标题，使控件保持宽度：待机标题、结束标题，以及用 `countdownDuration` 位数的最宽数字组成的倒计时标题。其他样式为 0。
+ */
+- (CGFloat)cyl_countdownTitleWidth {
+    if (self.style != CYLAnimatedItemStyleCountdown) {
+        return 0;
+    }
+    NSInteger digits = [NSString stringWithFormat:@"%ld", (long)MAX(1, (NSInteger)ceil(self.countdownDuration))].length;
+    NSInteger widest = 0;
+    for (NSInteger i = 0; i < digits; i++) {
+        widest = widest * 10 + 8;
+    }
+    NSDictionary<NSAttributedStringKey, id> *attributes = @{ NSFontAttributeName : self.titleLabel.font };
+    CGFloat width = 0;
+    for (NSString *text in @[ self.countdownIdleTitle, self.countdownFinishedTitle, CYLAnimatedItemCountdownText(self.countdownRunningTitleFormat, widest) ]) {
+        width = MAX(width, ceil([text sizeWithAttributes:attributes].width));
+    }
+    return width;
+}
+
+/*
+ * [EN] The border, the title color and the pressed look of the countdown style, for the state it is in.
+ * [CN] 倒计时样式在当前状态下的边框、标题颜色与按下外观。
+ */
+- (void)cyl_applyCountdownAppearance {
+    if (self.style != CYLAnimatedItemStyleCountdown) {
+        return;
+    }
+    BOOL running = (self.countdownState == CYLAnimatedItemCountdownStateRunning);
+    UIColor *border = running ? [UIColor lightGrayColor] : self.tintColor;
+    if (@available(iOS 13.0, *)) {
+        border = [border resolvedColorWithTraitCollection:self.traitCollection];
+    }
+    self.layer.borderColor = border.CGColor;
+    self.layer.borderWidth = 1.0 / MAX(1, self.traitCollection.displayScale);
+    if (running) {
+        self.titleLabel.textColor = self.countdownRunningTitleColor;
+    }
+    CGFloat alpha = self.isHighlighted ? 0.5 : 1;
+    self.titleLabel.alpha = alpha;
+    self.imageView.alpha = alpha;
+}
+
+/*
+ * [EN] Puts back the title color the running color replaced. [CN] 恢复被倒计时颜色替换的标题颜色。
+ */
+- (void)cyl_restoreCountdownTitleColor {
+    if (self.countdownRestingTitleColor) {
+        self.titleLabel.textColor = self.countdownRestingTitleColor;
+        self.countdownRestingTitleColor = nil;
+    }
+}
+
+- (NSInteger)countdownRemainingSeconds {
+    if (self.countdownState != CYLAnimatedItemCountdownStateRunning || !self.countdownEndDate) {
+        return 0;
+    }
+    NSTimeInterval left = [self.countdownEndDate timeIntervalSinceDate:[self cyl_now]];
+    return left > 0 ? (NSInteger)ceil(left) : 0;
+}
+
+- (void)startCountdown {
+    [self startCountdownWithDuration:self.countdownDuration];
+}
+
+- (void)startCountdownWithDuration:(NSTimeInterval)duration {
+    if (!(duration > 0)) {
+        [self resetCountdown];
+        return;
+    }
+    if (self.style != CYLAnimatedItemStyleCountdown) {
+        self.style = CYLAnimatedItemStyleCountdown;
+    }
+    if (self.countdownState != CYLAnimatedItemCountdownStateRunning) {
+        // [EN] The color to go back to when the time is up, taken before the running color replaces it.
+        // [CN] 时间到之后要恢复的颜色，在倒计时颜色替换它之前取得。
+        self.countdownRestingTitleColor = self.titleLabel.textColor;
+    }
+    self.countdownRunDuration = duration;
+    self.countdownEndDate = [[self cyl_now] dateByAddingTimeInterval:duration];
+    self.countdownState = CYLAnimatedItemCountdownStateRunning;
+    self.countdownShownSeconds = -1;
+    self.enabled = NO;
+    [self cyl_startCountdownTimer];
+    [self cyl_updateIcon];
+    if ([self.delegate respondsToSelector:@selector(animatedItemViewDidStartCountdown:)]) {
+        [self.delegate animatedItemViewDidStartCountdown:self];
+    }
+    [self refreshCountdown];
+    [self cyl_contentDidChange];
+}
+
+- (void)resetCountdown {
+    BOOL wasRunning = (self.countdownState == CYLAnimatedItemCountdownStateRunning);
+    [self cyl_stopCountdownTimer];
+    self.countdownEndDate = nil;
+    self.countdownState = CYLAnimatedItemCountdownStateIdle;
+    if (wasRunning) {
+        self.enabled = YES;
+        [self cyl_restoreCountdownTitleColor];
+    }
+    if (self.style == CYLAnimatedItemStyleCountdown) {
+        [self cyl_showCountdownIdleOrFinishedTitle];
+        [self cyl_applyCountdownAppearance];
+    }
+    [self cyl_updateIcon];
+    [self cyl_contentDidChange];
+}
+
+- (void)refreshCountdown {
+    if (self.countdownState != CYLAnimatedItemCountdownStateRunning || !self.countdownEndDate) {
+        return;
+    }
+    NSTimeInterval left = [self.countdownEndDate timeIntervalSinceDate:[self cyl_now]];
+    if (left <= 0) {
+        [self cyl_finishCountdown];
+        return;
+    }
+    // [EN] Never more than the duration, if the clock was set back meanwhile. [CN] 如果期间系统时间被调回，也不会超过总时长。
+    NSInteger seconds = MIN((NSInteger)ceil(left), (NSInteger)ceil(self.countdownRunDuration));
+    if (seconds == self.countdownShownSeconds) {
+        return;
+    }
+    self.countdownShownSeconds = seconds;
+    self.title = CYLAnimatedItemCountdownText(self.countdownRunningTitleFormat, seconds);
+    [self cyl_applyCountdownAppearance];
+    if ([self.delegate respondsToSelector:@selector(animatedItemView:didTickCountdown:)]) {
+        [self.delegate animatedItemView:self didTickCountdown:seconds];
+    }
+}
+
+- (void)cyl_finishCountdown {
+    [self cyl_stopCountdownTimer];
+    self.countdownEndDate = nil;
+    self.countdownState = CYLAnimatedItemCountdownStateFinished;
+    self.enabled = YES;
+    [self cyl_restoreCountdownTitleColor];
+    [self cyl_showCountdownIdleOrFinishedTitle];
+    [self cyl_applyCountdownAppearance];
+    [self cyl_updateIcon];
+    [self cyl_contentDidChange];
+    if (UIAccessibilityIsVoiceOverRunning()) {
+        UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, self.countdownFinishedTitle);
+    }
+    if ([self.delegate respondsToSelector:@selector(animatedItemViewDidFinishCountdown:)]) {
+        [self.delegate animatedItemViewDidFinishCountdown:self];
+    }
+}
+
+/*
+ * [EN] The timer only schedules the reads; the end date decides. The app returning from the background reads the clock at once,
+ *      so the seconds spent there count (FIX: issue #1 of SMSCodeButton).
+ * [CN] 定时器只负责安排读取，由结束时间决定剩余时间。App 从后台返回时立即读取时钟，因此在后台度过的秒数会计入（修复 SMSCodeButton 的 issue #1）。
+ */
+- (void)cyl_startCountdownTimer {
+    [self cyl_stopCountdownTimer];
+    __weak typeof(self) weakSelf = self;
+    self.countdownTimer = [NSTimer timerWithTimeInterval:CYLAnimatedItemCountdownTickInterval repeats:YES block:^(NSTimer *timer) {
+        __strong typeof(weakSelf) strongSelf = weakSelf;
+        if (!strongSelf) {
+            [timer invalidate];
+            return;
+        }
+        [strongSelf refreshCountdown];
+    }];
+    self.countdownTimer.tolerance = CYLAnimatedItemCountdownTickInterval / 2;
+    [[NSRunLoop mainRunLoop] addTimer:self.countdownTimer forMode:NSRunLoopCommonModes];
+    NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
+    [center addObserver:self selector:@selector(refreshCountdown) name:UIApplicationWillEnterForegroundNotification object:nil];
+    [center addObserver:self selector:@selector(refreshCountdown) name:UIApplicationDidBecomeActiveNotification object:nil];
+}
+
+- (void)cyl_stopCountdownTimer {
+    [self.countdownTimer invalidate];
+    self.countdownTimer = nil;
+    NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
+    [center removeObserver:self name:UIApplicationWillEnterForegroundNotification object:nil];
+    [center removeObserver:self name:UIApplicationDidBecomeActiveNotification object:nil];
+}
+
 #pragma mark - Gestures 手势
 
 - (void)cyl_handleTap {
     if ([self.delegate respondsToSelector:@selector(animatedItemViewDidTap:)]) {
         [self.delegate animatedItemViewDidTap:self];
+    }
+    if (self.style == CYLAnimatedItemStyleCountdown && self.startsCountdownOnTap && self.countdownState != CYLAnimatedItemCountdownStateRunning) {
+        [self startCountdown];
     }
 }
 

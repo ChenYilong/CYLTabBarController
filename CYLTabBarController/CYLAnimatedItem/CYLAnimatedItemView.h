@@ -83,6 +83,41 @@ typedef NS_ENUM(NSInteger, CYLAnimatedItemAccessoryPlacement) {
 };
 
 /*!
+ * [EN] The look of the control: the plain animated icon + title (default), or a countdown button, e.g. for "Get the SMS
+ *      code" (`CYLAnimatedItemCountdowning`).
+ * [CN] 控件的样式：普通的动效 icon + title（默认），或倒计时按钮，例如「获取验证码」（`CYLAnimatedItemCountdowning`）。
+ */
+typedef NS_ENUM(NSInteger, CYLAnimatedItemStyle) {
+    /*!
+     * [EN] The plain animated icon + title (default). [CN] 普通的动效 icon + title（默认）。
+     */
+    CYLAnimatedItemStylePlain = 0,
+    /*!
+     * [EN] A bordered countdown button: idle title, then "N seconds left" until the time is up, then a finished title.
+     * [CN] 带边框的倒计时按钮：先显示待机标题，再显示「还剩 N 秒」直到时间到，最后显示结束标题。
+     */
+    CYLAnimatedItemStyleCountdown,
+};
+
+/*!
+ * [EN] Where a countdown is. [CN] 倒计时所处的阶段。
+ */
+typedef NS_ENUM(NSInteger, CYLAnimatedItemCountdownState) {
+    /*!
+     * [EN] Not started: the idle title shows and a tap can start it. [CN] 未开始：显示待机标题，点击可以开始。
+     */
+    CYLAnimatedItemCountdownStateIdle = 0,
+    /*!
+     * [EN] Counting down: the control is disabled. [CN] 倒计时中：控件不可用。
+     */
+    CYLAnimatedItemCountdownStateRunning,
+    /*!
+     * [EN] The time is up: the finished title shows and a tap can start it again. [CN] 时间到：显示结束标题，点击可以再次开始。
+     */
+    CYLAnimatedItemCountdownStateFinished,
+};
+
+/*!
  * [EN] What the item shows. `CYLAnimatedItemView` stores every property; a subclass may compute them instead.
  * [CN] 条目显示的内容。`CYLAnimatedItemView` 保存所有属性；子类也可以自行计算。
  */
@@ -153,6 +188,88 @@ NS_SWIFT_NAME(CYLAnimatedItemAnimating)
 @end
 
 /*!
+ * [EN] The countdown of `CYLAnimatedItemStyleCountdown`, e.g. the "Get the code" button of an SMS login. The end is kept
+ *      as a date, not counted by a timer: the seconds that pass while the app is in the background, or the device is
+ *      locked, still count (the time left is read again on every tick and when the app returns), and a late timer cannot
+ *      make it drift (FIX: issue #1 of SMSCodeButton). Only the title changes, once per second, on the same label: no
+ *      system button is rebuilt, so nothing flickers; the control keeps the width of its widest title, so it does not
+ *      jump either. While it runs the control is disabled, and VoiceOver reads the remaining seconds.
+ * [CN] `CYLAnimatedItemStyleCountdown` 的倒计时，例如短信登录的「获取验证码」按钮。结束时间保存为日期，而不是靠定时器累减：App 在后台、设备锁屏
+ *      期间经过的秒数同样计入（每次 tick 与 App 返回前台时重新读取剩余时间），定时器延迟也不会造成偏差（修复 SMSCodeButton 的 issue #1）。
+ *      每秒只改变同一个 label 的标题，不重建系统按钮，因此不会闪烁；控件保持最宽标题的宽度，也不会抖动。倒计时期间控件不可用，VoiceOver 朗读剩余秒数。
+ */
+NS_SWIFT_NAME(CYLAnimatedItemCountdowning)
+@protocol CYLAnimatedItemCountdowning <NSObject>
+/*!
+ * [EN] The length in seconds, 60 by default. Used by `-startCountdown`. [CN] 总时长（秒），默认 60。`-startCountdown` 使用。
+ */
+@property (nonatomic) NSTimeInterval countdownDuration;
+/*!
+ * [EN] The title before it starts, e.g. "Get code" (the default text is English; set the app's localized text).
+ * [CN] 开始前的标题，例如「获取验证码」（默认文本为英文；请设置 App 本地化后的文本）。
+ */
+@property (nonatomic, copy) NSString *countdownIdleTitle;
+/*!
+ * [EN] The title while counting: a format with one `%ld`, the whole seconds left, e.g. "%ld s left".
+ * [CN] 倒计时中的标题：带一个 `%ld`（剩余整秒数）的格式，例如「还剩%ld秒」。
+ */
+@property (nonatomic, copy) NSString *countdownRunningTitleFormat;
+/*!
+ * [EN] The title once the time is up, e.g. "Resend". [CN] 时间到之后的标题，例如「重新获取」。
+ */
+@property (nonatomic, copy) NSString *countdownFinishedTitle;
+/*!
+ * [EN] The icon while counting (e.g. a clock); nil keeps `image`. [CN] 倒计时中的图标（例如时钟）；为 nil 时保持 `image`。
+ */
+@property (nonatomic, strong, nullable) UIImage *countdownImage;
+/*!
+ * [EN] The title color while counting (gray by default). Idle and finished use `titleLabel.textColor`.
+ * [CN] 倒计时中的标题颜色（默认灰色）。待机与结束使用 `titleLabel.textColor`。
+ */
+@property (nonatomic, strong) UIColor *countdownRunningTitleColor;
+/*!
+ * [EN] Whether a tap starts the countdown after the delegate's `-animatedItemViewDidTap:` (off by default). With it off the
+ *      app starts it itself, e.g. once the server accepted the request.
+ * [CN] 点击是否在代理的 `-animatedItemViewDidTap:` 之后开始倒计时（默认关闭）。关闭时由 App 自己开始，例如服务器接受请求之后。
+ */
+@property (nonatomic) BOOL startsCountdownOnTap;
+/*!
+ * [EN] Where the countdown is. [CN] 倒计时所处的阶段。
+ */
+@property (nonatomic, readonly) CYLAnimatedItemCountdownState countdownState;
+/*!
+ * [EN] The whole seconds left (rounded up): 0 when it is not running. [CN] 剩余整秒数（向上取整）：未运行时为 0。
+ */
+@property (nonatomic, readonly) NSInteger countdownRemainingSeconds;
+/*!
+ * [EN] When the running countdown ends; nil when it is not running. [CN] 运行中的倒计时的结束时间；未运行时为 nil。
+ */
+@property (nonatomic, strong, readonly, nullable) NSDate *countdownEndDate;
+/*!
+ * [EN] The clock, for tests: `[NSDate date]` by default. [CN] 时钟，供测试使用：默认为 `[NSDate date]`。
+ */
+@property (nonatomic, copy, null_resettable) NSDate * (^countdownDateProvider)(void);
+/*!
+ * [EN] Starts (or restarts) for `countdownDuration` seconds. Switches the style to countdown when it is not.
+ * [CN] 开始（或重新开始）`countdownDuration` 秒的倒计时。样式不是倒计时时会切换为倒计时样式。
+ */
+- (void)startCountdown;
+/*!
+ * [EN] Starts for `duration` seconds, e.g. the "retry after" the server sent. [CN] 开始 `duration` 秒的倒计时，例如服务器返回的「多少秒后重试」。
+ */
+- (void)startCountdownWithDuration:(NSTimeInterval)duration;
+/*!
+ * [EN] Stops and shows the idle title, with no finish callback. [CN] 停止并显示待机标题，不触发结束回调。
+ */
+- (void)resetCountdown;
+/*!
+ * [EN] Reads the clock now: a tick on demand, e.g. after the app returns (done by the control itself).
+ * [CN] 立即读取时钟：按需 tick，例如 App 返回前台后（控件自己会做）。
+ */
+- (void)refreshCountdown;
+@end
+
+/*!
  * [EN] The delegate of an item's gestures. Every method is optional.
  * [CN] 条目手势的代理。所有方法都是可选的。
  */
@@ -172,6 +289,18 @@ NS_SWIFT_NAME(CYLAnimatedItemViewDelegate)
  * [EN] The accessory icon was tapped. [CN] 点击了附加图标。
  */
 - (void)animatedItemViewDidTapAccessory:(CYLAnimatedItemView *)itemView;
+/*!
+ * [EN] The countdown started. [CN] 倒计时开始。
+ */
+- (void)animatedItemViewDidStartCountdown:(CYLAnimatedItemView *)itemView;
+/*!
+ * [EN] The whole seconds left changed, once per second. [CN] 剩余整秒数变化，每秒一次。
+ */
+- (void)animatedItemView:(CYLAnimatedItemView *)itemView didTickCountdown:(NSInteger)remainingSeconds;
+/*!
+ * [EN] The time is up. [CN] 时间到。
+ */
+- (void)animatedItemViewDidFinishCountdown:(CYLAnimatedItemView *)itemView;
 /*!
  * [EN] Whether a drag may start (asked only when `dragEnabled`). [CN] 是否允许开始拖拽（仅在 `dragEnabled` 时询问）。
  */
@@ -216,7 +345,15 @@ NS_SWIFT_NAME(CYLAnimatedItemViewDelegate)
  *      属于 CYLAnimatedItem pod 与模块（`import CYLAnimatedItem`），不依赖任何其他 pod，也不依赖 CYLTabBarController；只有引擎参与编译时才播放动画
  *      （`CYL_ANIMATION_ENGINE_AVAILABLE`），否则只显示静态图片。
  */
-@interface CYLAnimatedItemView : UIControl <CYLAnimatedItemContent, CYLAnimatedItemAnimating>
+@interface CYLAnimatedItemView : UIControl <CYLAnimatedItemContent, CYLAnimatedItemAnimating, CYLAnimatedItemCountdowning>
+
+/*!
+ * [EN] The look: plain (default) or a countdown button. Countdown gives the control a border and a rounded corner and
+ *      manages its title; set the `countdown…` properties, then call `-startCountdown` (or set `startsCountdownOnTap`).
+ * [CN] 样式：普通（默认）或倒计时按钮。倒计时样式为控件加上边框与圆角并接管标题；设置 `countdown…` 属性后调用 `-startCountdown`
+ *      （或设置 `startsCountdownOnTap`）。
+ */
+@property (nonatomic) CYLAnimatedItemStyle style;
 
 /*!
  * [EN] The static icon. Hidden from accessibility (the control reads as one element). [CN] 静态图标。对无障碍隐藏（控件作为一个元素朗读）。
