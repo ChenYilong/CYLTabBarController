@@ -95,6 +95,11 @@
 
 // [CN] FIX: issue #535 — shared with CYLBadgeView through CYLUtils. 通过 CYLUtils 与 CYLBadgeView 共用。
 // [EN] FIX: issue #535 — shared with CYLBadgeView through CYLUtils.
+// CYL-SWIFT-MIGRATION: objc-required — [EN] What is left is what Objective-C source spells and Swift cannot export: the attribute key
+//      macros (`CYLTabBarItemTitle`…; Swift globals are not exported to Objective-C), the notification names and counters as C globals
+//      (defined in CYLTabBarControllerGlobals.m), and the imports. The class and its categories are Swift (docs/Swift-Migration.md).
+// [CN] 剩下的是 Objective-C 源码使用而 Swift 无法导出的内容：属性 key 宏（`CYLTabBarItemTitle` 等；Swift 全局常量不会导出给 Objective-C）、
+//      作为 C 全局变量的通知名与计数器（定义在 CYLTabBarControllerGlobals.m），以及导入。类及其分类已是 Swift（docs/Swift-Migration.md）。
 #if __has_include("CYLUtils/CYLUtils.h")
 #import "CYLUtils/CYLUtils.h"
 #else
@@ -228,10 +233,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class CYLTabBarController;
 #ifndef __swift__
-#endif
-
-
-#ifndef __swift__
 #define CYLTabBarItemTitle @"CYLTabBarItemTitle"
 #endif
 /*!
@@ -317,62 +318,6 @@ NS_ASSUME_NONNULL_BEGIN
 #define CYLTabBarItemImageURLSize @"CYLTabBarItemImageURLSize"
 #endif
 
-/*!
- * [EN] Returns `attributes` with a Lottie animation added to each item: `CYLTabBarLottieFilePath` for "<name>.json" in
- *      `bundle` (nil: the main bundle), and `CYLTabBarLottieDarkFilePath` for "<name>_dark.json" when that file exists
- *      (the suffix is `UIImage.cyl_darkImageNameSuffix`, as for images). Names are matched by position; an item without a
- *      name, or whose file is missing, is left as it is.
- *
- *          // green_lottie_tab_home.json, green_lottie_tab_home_dark.json, ...
- *          CYLTabBarItemsAttributesAddingLottieFiles(attributes, @[@"green_lottie_tab_home", @"green_lottie_tab_discover"], nil);
- *
- *      A Lottie file holds fixed colors and lottie-ios has no themes, so a dark version is a copy of the animation with
- *      dark colors. With Lottie 4.x, one file can also follow Dark Mode by itself: see `CYLTabBarLottieDarkColors`.
- * [CN] 返回为每个 item 添加了 Lottie 动画的 `attributes`：`CYLTabBarLottieFilePath` 为 `bundle`（nil 表示 main bundle）中的
- *      「<名称>.json」；存在「<名称>_dark.json」时再加上 `CYLTabBarLottieDarkFilePath`（后缀与图片相同，为
- *      `UIImage.cyl_darkImageNameSuffix`）。名称按位置对应；没有名称或文件不存在的 item 保持不变。示例见上。
- *      Lottie 文件中的颜色是固定的，lottie-ios 也不支持主题，因此深色版本即改为深色配色的动画副本。使用 Lottie 4.x 时，也可以只用一份文件
- *      适配深色模式，见 `CYLTabBarLottieDarkColors`。
- */
-FOUNDATION_EXTERN NSArray *CYLTabBarItemsAttributesAddingLottieFiles(NSArray *attributes,
-                                                                     NSArray *lottieFileNames,
-                                                                                    NSBundle * _Nullable bundle) CYL_NOEXCEPT CYL_LOTTIE_REQUIRED;
-
-
-/*!
- * FIX: issue #477 — only some tabs animated, with any animation library.
- * [EN] Returns one tab's `attributes` with an animation added (`CYLTabBarAnimationFilePath`, and
- *      `CYLTabBarAnimationDarkFilePath` when "<name>_dark.<ext>" exists), so that only that tab is animated and the others
- *      keep their images. `fileName` is "<name>.<ext>" for that file, or "<name>" for the first file found with the
- *      extensions of the libraries in the build, in their lookup order (PAG ".pag", Lottie ".json" / ".lottie", or any
- *      library added later). `bundle` nil means the main bundle. A missing file, or no animation library, leaves
- *      `attributes` as they are. Animated and static tabs, and tabs of different libraries, can be mixed in one tab bar,
- *      in every style.
- *
- *          NSArray *attributes = @[
- *              homeAttributes,                                                                     // images only
- *              CYLTabBarItemAttributesAddingAnimationFile(messageAttributes, @"tab_message.json", nil), // Lottie
- *              CYLTabBarItemAttributesAddingAnimationFile(mineAttributes, @"tab_mine.pag", nil),        // PAG
- *          ];
- * [CN] 返回添加了动画的单个 Tab 的 `attributes`（`CYLTabBarAnimationFilePath`；存在「名称_dark.扩展名」时再加上
- *      `CYLTabBarAnimationDarkFilePath`），使只有该 Tab 有动画，其他 Tab 保持图片。`fileName` 为「名称.扩展名」时使用该文件；为「名称」时，
- *      按查找顺序使用构建中各动画库的扩展名（PAG ".pag"、Lottie ".json" / ".lottie"，或以后新增的动画库），取第一个存在的文件。`bundle` 为 nil
- *      表示 main bundle。文件不存在或没有动画库时 `attributes` 保持不变。同一个 TabBar 中可以混用有动画与无动画的 Tab，以及不同动画库的 Tab，
- *      所有样式均支持。示例见上。
- */
-FOUNDATION_EXTERN NSDictionary *CYLTabBarItemAttributesAddingAnimationFile(NSDictionary *attributes,
-                                                                          NSString *fileName,
-                                                                          NSBundle * _Nullable bundle) CYL_NOEXCEPT;
-
-/*!
- * [EN] The same for every tab, by position: an empty name or `NSNull` leaves that tab static (#477).
- *
- *          CYLTabBarItemsAttributesAddingAnimationFiles(attributes, @[@"tab_home.json", @"", @"tab_mine.pag"], nil);
- * [CN] 按位置为每个 Tab 执行上面的操作：名称为空字符串或 `NSNull` 的 Tab 保持静态（#477）。示例见上。
- */
-FOUNDATION_EXTERN NSArray *CYLTabBarItemsAttributesAddingAnimationFiles(NSArray *attributes,
-                                                                        NSArray *fileNames,
-                                                                                    NSBundle * _Nullable bundle) CYL_NOEXCEPT;
 #ifndef __swift__
 #define CYLTabBarItemImageInsets @"CYLTabBarItemImageInsets"
 #endif
@@ -999,7 +944,6 @@ FOUNDATION_EXTERN NSArray *CYLTabBarItemsAttributesAddingAnimationFiles(NSArray 
  */
 FOUNDATION_EXTERN NSUInteger CYLTabbarItemsCount;
 FOUNDATION_EXTERN NSUInteger CYLPlusButtonIndex;
-FOUNDATION_EXTERN CGFloat CYLPlusButtonCurrentWidth(void);
 /*!
  * [EN] A read-only Swift variable since step 109, read by Objective-C through this macro. [CN] 自第 109 步起为只读的 Swift 变量，Objective-C 通过此宏读取。
  */
@@ -1024,10 +968,6 @@ FOUNDATION_EXTERN CGFloat CYLTabBarHeight;
  * [CN] `cyl_tabBarItemGestureHandler` 的 block。`control` 为 Tab 按钮或 PlusButton；`viewController` 为对应 Tab 的控制器
  *      （PlusButton 为其子控制器），没有子控制器的 PlusButton 为 nil。
  */
-#ifndef __swift__
-#endif
-
-
 #pragma mark - Theme switching (issue #216)
 
 /*!
@@ -1056,10 +996,6 @@ FOUNDATION_EXTERN NSString *const CYLTabBarItemLottieAnimationPlayingNotificatio
  * [CN] `+loadTabBarControllerWithConfigurationURL:completion:` 的回调，在主队列执行：TabBarController，或 nil 与错误
  *      （`CYLTabBarConfigurationErrorDomain`）。
  */
-#ifndef __swift__
-#endif
-
-
 /*!
  * [EN] Posted after a Lottie animation view is added to a tab button (issue #428). The notification's `object` is the tab
  *      button; get the view with `-[UIControl cyl_lottieAnimationView]`. Posted on the main queue, after

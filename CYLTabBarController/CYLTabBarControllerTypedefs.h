@@ -5,6 +5,9 @@
 //  Copyright © 2026 https://github.com/ChenYilong . All rights reserved.
 //
 
+// CYL-SWIFT-MIGRATION: objc-required — [EN] Block typedefs, `NS_ENUM` and `NS_OPTIONS` that Objective-C source spells and the generated
+//      `-Swift.h` needs first; Swift cannot export block typedefs or option sets (docs/Swift-Migration-Phase3.md).
+// [CN] Objective-C 源码使用、且生成的 `-Swift.h` 需要先看到的 block typedef、`NS_ENUM` 与 `NS_OPTIONS`；Swift 无法导出 block typedef 与选项集。
 #import <UIKit/UIKit.h>
 
 NS_ASSUME_NONNULL_BEGIN
