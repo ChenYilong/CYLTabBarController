@@ -316,24 +316,43 @@ def round_trip_problem(configuration, writer, path):
     return None if back == expected else "reads back differently"
 
 
+def _round_trip_label(suffix, whole):
+    """[EN] The name of one round trip for a message ("defaults.xml (whole)"). [CN] 一次往返测试在信息中的名字（"defaults.xml (whole)"）。"""
+    return f"{suffix}{' (whole)' if whole else ''}"
+
+
+def _round_trips_for_configuration(relative, configuration, work):
+    """[EN] Every round trip of one sample configuration: how many ran, and the failure message of each one that did not
+    read back as itself. [CN] 单个示例配置的每一次往返测试：共运行了多少次，以及每个读不回自身的失败信息。"""
+    flat_ok = all(key.startswith(PARAMETER_PREFIX) for key in configuration)
+    wholes = [False, True] if flat_ok else [True]
+    checks = 0
+    failures = []
+    for whole in wholes:
+        prefix = "whole-" if whole else ""
+        for suffix, writer in writers(whole):
+            checks += 1
+            problem = round_trip_problem(configuration, writer, os.path.join(work, prefix + suffix))
+            if problem:
+                failures.append(f"  FAIL {relative} → {_round_trip_label(suffix, whole)}: {problem}")
+    return checks, failures
+
+
 def self_test():
     """[EN] Every JSON, property list and TOML sample: each output reads back into the input, and the files written are
     valid (a template is JSON, a defaults file is a <defaultsMap>). [CN] 每个 JSON、属性列表与 TOML 示例文件：每种输出都能读取回输入，且写出的
     文件有效（模板是 JSON，默认值文件是 <defaultsMap>）。"""
-    failures = checks = samples = 0
+    total_checks = total_failures = samples = 0
     with tempfile.TemporaryDirectory() as work:
         for relative, configuration in sample_configurations():
             samples += 1
-            flat_ok = all(key.startswith(PARAMETER_PREFIX) for key in configuration)
-            for whole in ([False, True] if flat_ok else [True]):
-                for suffix, writer in writers(whole):
-                    checks += 1
-                    problem = round_trip_problem(configuration, writer, os.path.join(work, ("whole-" if whole else "") + suffix))
-                    if problem:
-                        failures += 1
-                        print(f"  FAIL {relative} → {suffix}{' (whole)' if whole else ''}: {problem}")
-    print(f"{checks} round trips, {failures} failures, {samples} sample configurations looked at")
-    return failures == 0 and checks > 0
+            checks, failures = _round_trips_for_configuration(relative, configuration, work)
+            total_checks += checks
+            total_failures += len(failures)
+            for failure in failures:
+                print(failure)
+    print(f"{total_checks} round trips, {total_failures} failures, {samples} sample configurations looked at")
+    return total_failures == 0 and total_checks > 0
 
 
 def build_parser():
