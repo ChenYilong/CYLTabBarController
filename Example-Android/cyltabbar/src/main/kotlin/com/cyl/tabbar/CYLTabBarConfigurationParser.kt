@@ -2629,15 +2629,25 @@ internal object CYLRemoteConfigReader {
         // [EN] The template's own `version` (number, time, description, origin, type) becomes the version key of the configuration,
         //      next to the tabs it describes; a template with no "CYL…" parameter stays empty. [CN] 模板自己的 `version`（编号、时间、说明、来源、类型）成为配置的版本键，
         //      与其描述的 Tab 放在一起；没有 "CYL…" 参数的模板仍为空。
-        val version = dictionary["version"] as? Map<*, *>
-        if (version != null && values.keys.any { it.startsWith(PARAMETER_PREFIX) }) {
-            val kept = LinkedHashMap<String, Any?>()
-            for (name in listOf("versionNumber", "updateTime", "description", "updateOrigin", "updateType")) {
-                version[name]?.let { kept[name] = if (name == "versionNumber") ((it as? String)?.trim()?.toLongOrNull() ?: it) else it }
-            }
-            if (kept.isNotEmpty()) values[CYLConstants.CYLTabBarControllerConfigurationVersion] = kept
+        if (values.keys.any { it.startsWith(PARAMETER_PREFIX) }) {
+            templateVersion(dictionary["version"] as? Map<*, *>)?.let { values[CYLConstants.CYLTabBarControllerConfigurationVersion] = it }
         }
         return values
+    }
+
+    /**
+     * [EN] The fields of a template's `version` that the app keeps (who published it is not copied); the REST API writes the int64
+     *      `versionNumber` as a string, which becomes a number. Null when none is there. [CN] 应用保留的模板 `version` 字段（谁发布的不复制）；
+     *      REST API 把 int64 的 `versionNumber` 写成字符串，这里转换为数字。没有任何字段时为 null。
+     */
+    private fun templateVersion(version: Map<*, *>?): Map<String, Any?>? {
+        if (version == null) return null
+        val kept = LinkedHashMap<String, Any?>()
+        for (name in listOf("versionNumber", "updateTime", "description", "updateOrigin", "updateType")) {
+            val value = version[name] ?: continue
+            kept[name] = if (name == "versionNumber") (value as? String)?.trim()?.toLongOrNull() ?: value else value
+        }
+        return kept.takeIf { it.isNotEmpty() }
     }
 
     private fun isTemplateParameter(parameter: Map<*, *>?): Boolean =

@@ -41,6 +41,7 @@ import plistlib
 import re
 import sys
 import tomllib
+import tempfile
 import xml.etree.ElementTree as ElementTree
 
 WHOLE_CONFIGURATION_KEY = "CYLTabBarConfiguration"
@@ -48,15 +49,30 @@ PARAMETER_PREFIX = "CYL"
 MAXIMUM_PARAMETERS = 3000
 MAXIMUM_KEY_LENGTH = 256
 MAXIMUM_VALUE_CHARACTERS = 1_000_000
-KEY_PATTERN = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
+KEY_PATTERN = re.compile(r"^[A-Za-z_]\w*$", re.ASCII)
 # [EN] Geometry strings ("{0, -2}") start with "{" but are not JSON. [CN] 几何字符串（"{0, -2}"）以 "{" 开头但不是 JSON。
 GEOMETRY = re.compile(r"^\{\s*-?[0-9.]+(\s*,\s*-?[0-9.]+)*\s*\}$")
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SAMPLES = os.path.join(ROOT, "Example-Shared", "Configurations")
+PLIST_EXTENSION = ".plist"
 
 
 class ConversionError(Exception):
     """[EN] A file that cannot be converted, with the reason. [CN] 无法转换的文件及原因。"""
+
+
+def checked_path(path, must_exist):
+    """[EN] `path` resolved (symbolic links and `..` followed), and inside this repository, the current folder or the temporary
+    folder, so that an argument written by a person or by an agent cannot reach another place; an existing file when `must_exist`.
+    [CN] 解析后的 `path`（跟随符号链接与 `..`），必须位于本仓库、当前目录或临时目录之内，因此由人或 agent 写出的参数无法到达其他位置；
+    `must_exist` 时必须是已存在的文件。"""
+    resolved = os.path.realpath(path)
+    allowed = {os.path.normcase(os.path.realpath(folder)) for folder in (ROOT, os.getcwd(), tempfile.gettempdir())}
+    if not any(os.path.normcase(resolved).startswith(folder + os.sep) for folder in allowed):
+        raise ConversionError(f"{path}: outside this repository, the current folder and the temporary folder")
+    if must_exist and not os.path.isfile(resolved):
+        raise ConversionError(f"{path}: no such file")
+    return resolved
 
 
 # MARK: - Reading configuration files 读取配置文件
@@ -64,10 +80,10 @@ class ConversionError(Exception):
 def read_configuration(path):
     """[EN] A configuration file as a dictionary (JSON, property list, TOML). [CN] 将配置文件读取为字典（JSON、属性列表、TOML）。"""
     extension = os.path.splitext(path)[1].lower()
-    with open(path, "rb") as handle:
+    with open(checked_path(path, True), "rb") as handle:
         data = handle.read()
     try:
-        if extension == ".plist":
+        if extension == PLIST_EXTENSION:
             value = plistlib.loads(data)
         elif extension == ".toml":
             value = tomllib.loads(data.decode("utf-8"))
@@ -76,7 +92,7 @@ def read_configuration(path):
         else:
             raise ConversionError(f"{path}: use a .json, .plist or .toml file (other formats: convert them to JSON "
                                   "first, e.g. with the Example's \"export\" row)")
-    except (ValueError, plistlib.InvalidFileException, tomllib.TOMLDecodeError) as error:
+    except ValueError as error:  # [EN] also plistlib.InvalidFileException and tomllib.TOMLDecodeError. [CN] 也包括它们。
         raise ConversionError(f"{path}: {error}") from error
     if not isinstance(value, dict) or not value:
         raise ConversionError(f"{path}: the top level must be a non-empty dictionary")
@@ -238,7 +254,7 @@ def read_remote_config_file(path):
     """[EN] A template JSON, a defaults .xml or a defaults .plist as a configuration.
     [CN] 将模板 JSON、默认值 .xml 或默认值 .plist 读取为配置。"""
     extension = os.path.splitext(path)[1].lower()
-    with open(path, "rb") as handle:
+    with open(checked_path(path, True), "rb") as handle:
         data = handle.read()
     if extension == ".xml":
         root = ElementTree.fromstring(data)
@@ -246,7 +262,7 @@ def read_remote_config_file(path):
             raise ConversionError(f"{path}: not a Remote Config defaults file (<defaultsMap>)")
         values = {entry.findtext("key", ""): entry.findtext("value", "") for entry in root.iter("entry")}
         return configuration_from_values(values)
-    if extension == ".plist":
+    if extension == PLIST_EXTENSION:
         return configuration_from_values(plistlib.loads(data))
     template = json.loads(data.decode("utf-8-sig"))
     values, types = {}, {}
@@ -264,47 +280,59 @@ def read_remote_config_file(path):
 
 # MARK: - Self-test 自测
 
+def sample_configurations():
+    """[EN] (relative path, configuration) of every sample file that is a configuration (not, for example, a manifest or a
+    localization table). [CN] 每个属于配置的示例文件的（相对路径，配置）（例如清单或字符串表不算）。"""
+    for folder, _, files in os.walk(SAMPLES):
+        for name in sorted(files):
+            if os.path.splitext(name)[1].lower() not in (".json", PLIST_EXTENSION, ".toml"):
+                continue
+            sample = os.path.join(folder, name)
+            try:
+                configuration = read_configuration(sample)
+            except ConversionError:
+                continue
+            if any(key.startswith(PARAMETER_PREFIX) for key in configuration):
+                yield os.path.relpath(sample, ROOT), configuration
+
+
+def writers(whole):
+    """[EN] (file name, function) of the three outputs, for the flat or the whole-file mapping. [CN] 三种输出的（文件名，函数），分别用于扁平映射或整个文件映射。"""
+    return (("template.json", lambda configuration: template_json(configuration, whole).encode()),
+            ("defaults.xml", lambda configuration: defaults_xml(configuration, whole).encode()),
+            ("defaults.plist", lambda configuration: defaults_plist(configuration, whole)))
+
+
+def round_trip_problem(configuration, writer, path):
+    """[EN] Why `configuration` written by `writer` to `path` does not read back as itself (the geometry strings come back as the
+    JSON arrays of Remote Config), or None. [CN] `writer` 写入 `path` 的 `configuration` 为什么读不回自身（几何字符串读回时是 Remote Config 的 JSON 数组），没有问题时为 None。"""
+    try:
+        with open(path, "wb") as handle:
+            handle.write(writer(configuration))
+        back = read_remote_config_file(path)
+    except (ConversionError, ValueError, ElementTree.ParseError) as error:
+        return str(error)
+    expected = {key: native_geometry(value, key) for key, value in configuration.items()}
+    return None if back == expected else "reads back differently"
+
+
 def self_test():
     """[EN] Every JSON, property list and TOML sample: each output reads back into the input, and the files written are
     valid (a template is JSON, a defaults file is a <defaultsMap>). [CN] 每个 JSON、属性列表与 TOML 示例文件：每种输出都能读取回输入，且写出的
     文件有效（模板是 JSON，默认值文件是 <defaultsMap>）。"""
-    import tempfile
-    samples = []
-    for folder, _, files in os.walk(SAMPLES):
-        for name in sorted(files):
-            if os.path.splitext(name)[1].lower() in (".json", ".plist", ".toml"):
-                samples.append(os.path.join(folder, name))
-    failures = checks = 0
+    failures = checks = samples = 0
     with tempfile.TemporaryDirectory() as work:
-        for sample in samples:
-            try:
-                configuration = read_configuration(sample)
-            except ConversionError:
-                continue  # [EN] e.g. a manifest or a localization table, not a configuration. [CN] 例如清单或字符串表，不是配置。
-            if not any(key.startswith(PARAMETER_PREFIX) for key in configuration):
-                continue
-            relative = os.path.relpath(sample, ROOT)
+        for relative, configuration in sample_configurations():
+            samples += 1
             flat_ok = all(key.startswith(PARAMETER_PREFIX) for key in configuration)
             for whole in ([False, True] if flat_ok else [True]):
-                writers = (("template.json", lambda c: template_json(c, whole).encode()),
-                           ("defaults.xml", lambda c: defaults_xml(c, whole).encode()),
-                           ("defaults.plist", lambda c: defaults_plist(c, whole)))
-                for suffix, writer in writers:
+                for suffix, writer in writers(whole):
                     checks += 1
-                    path = os.path.join(work, ("whole-" if whole else "") + suffix)
-                    try:
-                        with open(path, "wb") as handle:
-                            handle.write(writer(configuration))
-                        back = read_remote_config_file(path)
-                    except (ConversionError, ValueError, ElementTree.ParseError) as error:
+                    problem = round_trip_problem(configuration, writer, os.path.join(work, ("whole-" if whole else "") + suffix))
+                    if problem:
                         failures += 1
-                        print(f"  FAIL {relative} → {suffix}{' (whole)' if whole else ''}: {error}")
-                        continue
-                    # [EN] The geometry strings come back as the JSON arrays of Remote Config. [CN] 几何字符串读回时是 Remote Config 的 JSON 数组。
-                    if back != {key: native_geometry(value, key) for key, value in configuration.items()}:
-                        failures += 1
-                        print(f"  FAIL {relative} → {suffix}{' (whole)' if whole else ''}: reads back differently")
-    print(f"{checks} round trips, {failures} failures, {len(samples)} sample files looked at")
+                        print(f"  FAIL {relative} → {suffix}{' (whole)' if whole else ''}: {problem}")
+    print(f"{checks} round trips, {failures} failures, {samples} sample configurations looked at")
     return failures == 0 and checks > 0
 
 
@@ -338,7 +366,12 @@ def main(argv=None):
         print(f"remote-config.py: {error}", file=sys.stderr)
         return 1
     if arguments.output:
-        with open(arguments.output, "wb") as handle:
+        try:
+            target = checked_path(arguments.output, False)
+        except ConversionError as error:
+            print(f"remote-config.py: {error}", file=sys.stderr)
+            return 1
+        with open(target, "wb") as handle:
             handle.write(output)
     else:
         sys.stdout.buffer.write(output)

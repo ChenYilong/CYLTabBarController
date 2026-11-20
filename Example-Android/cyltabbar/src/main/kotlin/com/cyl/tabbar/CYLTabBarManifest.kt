@@ -619,11 +619,10 @@ class CYLTabBarManifestLoader(context: Context) {
         val baseURL = CYLTabBarManifest.string(manifest.dictionary["assets"], "baseURL") ?: url?.let { it.substringBeforeLast('/') + "/" }
         try {
             for (entry in staged.assetEntries()) {
-                if (baseURL == null && CYLTabBarManifest.string(entry, "url") == null) {
-                    throw CYLConfigurationException(CYLTabBarConfigurationError.AssetInvalid, "A manifest without a URL needs \"assets.baseURL\" (or a \"url\" per asset) to download its images.")
-                }
                 val path = staged.pathOfEntry(entry) ?: throw CYLConfigurationException(CYLTabBarConfigurationError.AssetInvalid, "Asset ${CYLTabBarManifest.string(entry, "path")} is outside the assets folder.")
-                val source = CYLTabBarManifest.string(entry, "url") ?: URI(baseURL.orEmpty()).resolve(CYLTabBarManifest.string(entry, "path").orEmpty()).toString()
+                val source = CYLTabBarManifest.string(entry, "url")
+                    ?: baseURL?.let { URI(it).resolve(CYLTabBarManifest.string(entry, "path").orEmpty()).toString() }
+                    ?: throw CYLConfigurationException(CYLTabBarConfigurationError.AssetInvalid, "A manifest without a URL needs \"assets.baseURL\" (or a \"url\" per asset) to download its images.")
                 val data = runCatching { URI(source).toURL().openStream().use { it.readBytes() } }.getOrNull()
                     ?: throw CYLConfigurationException(CYLTabBarConfigurationError.AssetInvalid, "Asset ${CYLTabBarManifest.string(entry, "path")} could not be downloaded.")
                 File(path).apply { parentFile?.mkdirs(); writeBytes(data) }
