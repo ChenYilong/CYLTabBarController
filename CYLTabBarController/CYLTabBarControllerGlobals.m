@@ -5,8 +5,8 @@
 //  Copyright © 2026 https://github.com/ChenYilong . All rights reserved.
 //
 
-// CYL-SWIFT-MIGRATION: objc-required — [EN] C data symbols (counters, widths, notification names): Swift cannot export a global variable
-//      to C (`@_cdecl` covers functions only). [CN] C 数据符号（计数、宽度、通知名）：Swift 无法把全局变量导出给 C（`@_cdecl` 只适用于函数）。
+// CYL-SWIFT-MIGRATION: objc-required — [EN] C data symbols (see the comment below): Swift cannot export one. [CN] C 数据符号（见下方注释）：Swift 无法导出。
+
 #import "CYLTabBarController.h"
 
 /*!

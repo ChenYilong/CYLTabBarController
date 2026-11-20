@@ -95,11 +95,6 @@
 
 // [CN] FIX: issue #535 — shared with CYLBadgeView through CYLUtils. 通过 CYLUtils 与 CYLBadgeView 共用。
 // [EN] FIX: issue #535 — shared with CYLBadgeView through CYLUtils.
-// CYL-SWIFT-MIGRATION: objc-required — [EN] What is left is what Objective-C source spells and Swift cannot export: the attribute key
-//      macros (`CYLTabBarItemTitle`…; Swift globals are not exported to Objective-C), the notification names and counters as C globals
-//      (defined in CYLTabBarControllerGlobals.m), and the imports. The class and its categories are Swift (docs/Swift-Migration.md).
-// [CN] 剩下的是 Objective-C 源码使用而 Swift 无法导出的内容：属性 key 宏（`CYLTabBarItemTitle` 等；Swift 全局常量不会导出给 Objective-C）、
-//      作为 C 全局变量的通知名与计数器（定义在 CYLTabBarControllerGlobals.m），以及导入。类及其分类已是 Swift（docs/Swift-Migration.md）。
 #if __has_include("CYLUtils/CYLUtils.h")
 #import "CYLUtils/CYLUtils.h"
 #else
@@ -231,7 +226,10 @@ NS_ASSUME_NONNULL_BEGIN
 //    CYLTabBarStyleTypeLiquidGlass
 //};
 
-@class CYLTabBarController;
+#ifndef __swift__
+#endif
+
+
 #ifndef __swift__
 #define CYLTabBarItemTitle @"CYLTabBarItemTitle"
 #endif
@@ -317,6 +315,9 @@ NS_ASSUME_NONNULL_BEGIN
 #ifndef __swift__
 #define CYLTabBarItemImageURLSize @"CYLTabBarItemImageURLSize"
 #endif
+
+
+
 
 #ifndef __swift__
 #define CYLTabBarItemImageInsets @"CYLTabBarItemImageInsets"
@@ -930,28 +931,11 @@ NS_ASSUME_NONNULL_BEGIN
 #define CYLTabBarItemAccessibilityHint @"CYLTabBarItemAccessibilityHint"
 #endif
 /*!
- * [EN] These globals hold what was written LAST, by whichever tab bar controller or plus button wrote last. The library
- *      no longer lays out with them: with several tab bar controllers they overwrote each other (a tab bar with 5 items
- *      was laid out with the 3 of the one pushed after it, issues #414, #489). Each tab bar keeps its own values:
- *      `-[UIView cyl_tabbarItemsCount]`, `-[UIView cyl_tabBarItemWidth]`, `-[UIView cyl_plusButtonIndex]`,
- *      `-[UIView cyl_plusButtonWidth]` (see UIView+CYLTabBarControllerExtention.h) and `-[CYLTabBarController tabBarHeight]`.
- *      With one tab bar controller they are what they always were.
- * [CN] 这些全局变量保存的是 **最后一次** 写入的值，由最后写入的 TabBarController 或 PlusButton 决定。库不再使用它们来布局：
- *      存在多个 TabBarController 时它们会互相覆盖（5 个 item 的 TabBar 按后面 push 进来的 3 个 item 来布局，issue #414、#489）。
- *      每个 TabBar 保存自己的值：`-[UIView cyl_tabbarItemsCount]`、`-[UIView cyl_tabBarItemWidth]`、`-[UIView cyl_plusButtonIndex]`、
- *      `-[UIView cyl_plusButtonWidth]`（见 UIView+CYLTabBarControllerExtention.h）和 `-[CYLTabBarController tabBarHeight]`。
- *      只有一个 TabBarController 时，它们与以前完全一致。
- */
-FOUNDATION_EXTERN NSUInteger CYLTabbarItemsCount;
-FOUNDATION_EXTERN NSUInteger CYLPlusButtonIndex;
-/*!
  * [EN] A read-only Swift variable since step 109, read by Objective-C through this macro. [CN] 自第 109 步起为只读的 Swift 变量，Objective-C 通过此宏读取。
  */
 #ifndef __swift__
 #define CYLPlusButtonWidth (CYLPlusButtonCurrentWidth())
 #endif
-FOUNDATION_EXTERN CGFloat CYLTabBarItemWidth;
-FOUNDATION_EXTERN CGFloat CYLTabBarHeight;
 
 /*!
  * [EN] Posted when `-[CYLTabBarController cyl_loggedIn]` is set; `object` is the tab bar controller it was set on.
@@ -968,6 +952,10 @@ FOUNDATION_EXTERN CGFloat CYLTabBarHeight;
  * [CN] `cyl_tabBarItemGestureHandler` 的 block。`control` 为 Tab 按钮或 PlusButton；`viewController` 为对应 Tab 的控制器
  *      （PlusButton 为其子控制器），没有子控制器的 PlusButton 为 nil。
  */
+#ifndef __swift__
+#endif
+
+
 #pragma mark - Theme switching (issue #216)
 
 /*!
@@ -980,7 +968,6 @@ FOUNDATION_EXTERN CGFloat CYLTabBarHeight;
  *      主题）。不遵守 `CYLTabBarTheme` 的主题会让 TabBar 恢复 App 自己的外观。其他管理器的主题仅在遵守 `CYLTabBarTheme` 时应用。
  *      液态玻璃、系统 TabBar、扁平样式均适用。
  */
-@class CYLThemeManager;
 
 #pragma mark - Item styles in one place
 
@@ -988,7 +975,6 @@ FOUNDATION_EXTERN CGFloat CYLTabBarHeight;
 
 #pragma mark - Deprecated API
 
-FOUNDATION_EXTERN NSString *const CYLTabBarItemLottieAnimationPlayingNotification DEPRECATED_MSG_ATTRIBUTE("Use CYLTabBarItemAnimationPlayingNotification");
 
 /*!
  * [EN] Completion of `+loadTabBarControllerWithConfigurationURL:completion:`, on the main queue: a tab bar controller, or
@@ -996,16 +982,10 @@ FOUNDATION_EXTERN NSString *const CYLTabBarItemLottieAnimationPlayingNotificatio
  * [CN] `+loadTabBarControllerWithConfigurationURL:completion:` 的回调，在主队列执行：TabBarController，或 nil 与错误
  *      （`CYLTabBarConfigurationErrorDomain`）。
  */
-/*!
- * [EN] Posted after a Lottie animation view is added to a tab button (issue #428). The notification's `object` is the tab
- *      button; get the view with `-[UIControl cyl_lottieAnimationView]`. Posted on the main queue, after
- *      `-[CYLTabBarController lottieAnimationSpeed]` has been applied, so a value set in the handler is kept.
- *      In the Liquid Glass style a tab has two buttons (normal and selected), so it is posted once for each.
- * [CN] Lottie 动画视图添加到 Tab 按钮后发送（issue #428）。通知的 `object` 为 Tab 按钮，可用
- *      `-[UIControl cyl_lottieAnimationView]` 取得动画视图。在主队列发送，此时已设置 `-[CYLTabBarController lottieAnimationSpeed]`，
- *      在回调中设置的值不会被覆盖。液态玻璃样式中每个 Tab 有普通与选中两个按钮，因此各发送一次。
- */
-FOUNDATION_EXTERN NSString *const CYLTabBarItemLottieAnimationViewDidAddNotification DEPRECATED_MSG_ATTRIBUTE("Use CYLTabBarItemAnimationViewDidAddNotification");
+#ifndef __swift__
+#endif
+
+
 
 /*!
  * FIX: issue #604
@@ -1020,12 +1000,6 @@ FOUNDATION_EXTERN NSString *const CYLTabBarItemLottieAnimationViewDidAddNotifica
 #define CYLTabBarItemAnimationViewDidAddNotification ((NSNotificationName)@"CYLTabBarItemLottieAnimationViewDidAddNotification")
 #endif
 
- //TODO:  
-/*!
- * [CN] * 液态玻璃开关变化
- * [EN] Liquid Glass toggle changed
- */
- FOUNDATION_EXTERN NSString *const CYLTabBarStyleTypeDidChangeNotification;
 // FxxOUNDATION_EXTERN NSString *const CYLTabBarDarkModeShowDarkDidChangeNotification;
 #ifndef __swift__
 #define CYLTabBarItemWidthDidChangeNotification @"CYLTabBarItemWidthDidChangeNotification"

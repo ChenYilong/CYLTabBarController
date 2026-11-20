@@ -374,7 +374,7 @@ FOUNDATION_EXTERN NSString * _Nullable CYLAnimationTypeOfFile(NSDictionary * _Nu
  *      `CYL_SVGA_AVAILABLE`, `CYL_GIF_AVAILABLE`, and the engine itself, `CYL_ANIMATION_ENGINE_AVAILABLE`).
  * [CN] `type` 的引擎是否参与构建（`CYL_LOTTIE_AVAILABLE` 等各类型开关，以及引擎本身 `CYL_ANIMATION_ENGINE_AVAILABLE`）。
  */
-FOUNDATION_EXTERN BOOL CYLAnimationTypeIsAvailable(NSString * _Nullable type);
+FOUNDATION_EXTERN BOOL CYLAnimationTypeIsAvailable(NSString * _Nullable type) CYL_NOEXCEPT;
 
 /*!
  * [EN] The animation types this library knows, in a fixed order: "Lottie", "PAG", "Rive", "SVGA", "GIF". Each name is also

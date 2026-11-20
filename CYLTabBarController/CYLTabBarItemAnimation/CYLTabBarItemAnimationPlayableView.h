@@ -30,6 +30,17 @@ NS_ASSUME_NONNULL_END
 // [CN] Swift 协议，来自编译它们的模块：CYLAnimatedItem pod、Swift Package Manager 的 Swift target，或 CYLTabBarController.xcodeproj
 //      的 framework target。不来自 CYLTabBarController 的 CocoaPods 模块。
 #ifndef __swift__
+// FIX: React Native example (static-library pods) — "Import of module 'CYLAnimatedItem' appears within same top-level module".
+// [EN] While the clang module `CYLAnimatedItem` itself is built, its `-Swift.h` does not exist yet; the last branch below then found the
+//      tab bar's `CYLTabBarController-Swift.h`, whose chain reaches `@import CYLAnimatedItem` (a cycle). That branch is for a framework
+//      that holds both, and never applies to the module being built here.
+// [CN] 构建 clang 模块 `CYLAnimatedItem` 本身时，它的 `-Swift.h` 还不存在；下面最后一个分支便找到 TabBar 的 `CYLTabBarController-Swift.h`，
+//      其导入链会到达 `@import CYLAnimatedItem`（循环）。该分支只用于同时包含两者的 framework，不适用于这里正在构建的模块。
+#if defined(__building_module)
+#if __building_module(CYLAnimatedItem)
+#define CYL_BUILDING_ANIMATED_ITEM_MODULE 1
+#endif
+#endif
 #if __has_include(<CYLAnimatedItem/CYLAnimatedItem-Swift.h>)
 #import <CYLAnimatedItem/CYLAnimatedItem-Swift.h>
 #elif __has_include("CYLAnimatedItem-Swift.h")
@@ -38,7 +49,7 @@ NS_ASSUME_NONNULL_END
 // [EN] Swift Package Manager: the protocols are in the component's own Swift target, never in the tab bar's.
 // [CN] Swift Package Manager：协议位于组件自己的 Swift target 中，不在 TabBar 的 target 中。
 @import CYLAnimatedItemSwift;
-#elif __has_include(<CYLTabBarController/CYLTabBarController-Swift.h>) || __has_include("CYLTabBarController-Swift.h")
+#elif !defined(CYL_BUILDING_ANIMATED_ITEM_MODULE) && (__has_include(<CYLTabBarController/CYLTabBarController-Swift.h>) || __has_include("CYLTabBarController-Swift.h"))
 // [EN] A framework with the component and the tab bar in one module: the Swift header declares a subclass of
 //      CYLAnimatedItemView (CYLFlatDesignTabBarButton), so the component's interface comes first.
 // [CN] 组件与 TabBar 在同一模块的 framework：Swift 头文件声明了 CYLAnimatedItemView 的子类（CYLFlatDesignTabBarButton），因此先导入组件的接口。
