@@ -1,5 +1,11 @@
 import { CYLAnimatedItemTypeRegistry } from './CYLAnimatedItemTypes';
 import { cylIsSymbolResource } from './CYLAnimatedItemResources';
+import {
+  CYLAnimatedItemCountdown, CYLAnimatedItemCountdownListener, CYLAnimatedItemCountdownStorage, CYLCountdownRunning, CYLCountdownFinished,
+  CYLCountdownTickIntervalMillis, cylCountdownText, cylCountdownTitleWidth
+} from './CYLAnimatedItemCountdown';
+import { preferences } from '@kit.ArkData';
+import { ApplicationStateChangeCallback } from '@kit.AbilityKit';
 import BuildProfile from '../../../BuildProfile';
 
 /** [EN] `maxLines` for a title without a line limit (`titleLines` 0). [CN] 标题不限行数（`titleLines` 为 0）时的 `maxLines`。 */
@@ -21,6 +27,59 @@ export enum CYLAnimatedItemAccessoryPlacement {
   Leading = 0,
   Trailing = 1,
   TopTrailing = 2
+}
+
+/**
+ * [EN] The look of `CYLAnimatedItemView`: the plain animated icon + title (default), or a countdown button, e.g. for "Get the
+ *      SMS code" (iOS `CYLAnimatedItemStyle`).
+ * [CN] `CYLAnimatedItemView` 的样式：普通的动效 icon + title（默认），或倒计时按钮，例如「获取验证码」（对应 iOS 的 `CYLAnimatedItemStyle`）。
+ */
+export enum CYLAnimatedItemStyle {
+  Plain = 0,
+  Countdown = 1
+}
+
+/**
+ * [EN] Keeps a running countdown in the app's preferences, so it survives the app being ended in the background.
+ * [CN] 把运行中的倒计时保存在 App 的 preferences 中，使其在 App 于后台被结束后仍然有效。
+ */
+class CYLAnimatedItemPreferencesStorage implements CYLAnimatedItemCountdownStorage {
+  private store?: preferences.Preferences;
+
+  constructor(context: Context) {
+    try {
+      this.store = preferences.getPreferencesSync(context, { name: 'CYLAnimatedItemCountdown' });
+    } catch (error) {
+      // [EN] Without preferences the countdown only loses the restart case. [CN] 没有 preferences 时只会丢失重启恢复。
+    }
+  }
+
+  get(name: string): string | undefined {
+    try {
+      let value: preferences.ValueType | undefined = this.store?.getSync(name, '');
+      return typeof value === 'string' && value.length > 0 ? value : undefined;
+    } catch (error) {
+      return undefined;
+    }
+  }
+
+  set(name: string, value: string): void {
+    try {
+      this.store?.putSync(name, value);
+      this.store?.flush();
+    } catch (error) {
+      // [EN] A failed write only loses the restart case. [CN] 写入失败只会丢失重启恢复。
+    }
+  }
+
+  remove(name: string): void {
+    try {
+      this.store?.deleteSync(name);
+      this.store?.flush();
+    } catch (error) {
+      // [EN] Nothing to drop. [CN] 没有可丢弃的内容。
+    }
+  }
 }
 
 /**
@@ -74,6 +133,33 @@ export class CYLAnimatedItemController {
   /** [EN] Plays the animation again from progress 0. [CN] 从进度 0 重新播放动画。 */
   restartAnimation(): void {
     this.cylRestart();
+  }
+
+  /** [EN] Set by the item it is attached to. [CN] 由所关联的条目设置。 */
+  cylStartCountdown: (seconds: number) => void = (_seconds: number) => {
+  };
+  cylResetCountdown: () => void = () => {
+  };
+  cylRefreshCountdown: () => void = () => {
+  };
+
+  /**
+   * [EN] Starts (or restarts) the countdown for `seconds` (0 or less: `countdownDuration`, e.g. the server's "retry after").
+   *      The item must have `itemStyle` `CYLAnimatedItemStyle.Countdown`. [CN] 开始（或重新开始）`seconds` 秒的倒计时
+   *      （0 或更小：使用 `countdownDuration`，例如服务器返回的「多少秒后重试」）。条目的 `itemStyle` 必须为 `CYLAnimatedItemStyle.Countdown`。
+   */
+  startCountdown(seconds: number = 0): void {
+    this.cylStartCountdown(seconds);
+  }
+
+  /** [EN] Stops and shows the idle title, with no finish callback. [CN] 停止并显示待机标题，不触发结束回调。 */
+  resetCountdown(): void {
+    this.cylResetCountdown();
+  }
+
+  /** [EN] Reads the clock now (done by the item itself). [CN] 立即读取时钟（条目自己会做）。 */
+  refreshCountdown(): void {
+    this.cylRefreshCountdown();
   }
 }
 
@@ -259,6 +345,55 @@ export struct CYLAnimatedItemView {
   @Prop accessoryAccessibilityText: string = '';
   @Prop accessoryPlacement: CYLAnimatedItemAccessoryPlacement = CYLAnimatedItemAccessoryPlacement.Trailing;
   @Prop isDragEnabled: boolean = false;
+  /**
+   * [EN] The look: plain (default) or a countdown button (iOS `style`). Set the `countdown…` props, then call
+   *      `controller.startCountdown()` (or set `startsCountdownOnTap`). The end is a time read from the local clock, so the
+   *      seconds in the background count (FIX: issue #1 of SMSCodeButton); a clock past the longest duration, or set back to
+   *      before the start, closes it; `countdownCacheKey` keeps it across a restart. While it runs the item is disabled.
+   * [CN] 样式：普通（默认）或倒计时按钮（对应 iOS 的 `style`）。设置 `countdown…` prop 后调用 `controller.startCountdown()`
+   *      （或设置 `startsCountdownOnTap`）。结束是从本地时钟读取的时间点，因此后台的秒数计入（修复 SMSCodeButton 的 issue #1）；时钟超过最长时长
+   *      或被调回到开始之前时关闭；`countdownCacheKey` 使其在重启后继续。倒计时中条目不可用。
+   */
+  @Prop @Watch('cylCountdownKeyDidChange') itemStyle: CYLAnimatedItemStyle = CYLAnimatedItemStyle.Plain;
+  /** [EN] The length in seconds, 60 by default. [CN] 总时长（秒），默认 60。 */
+  @Prop countdownDuration: number = 60;
+  /** [EN] The title before it starts (the default text is English; pass the app's localized text). [CN] 开始前的标题（默认文本为英文；请传入 App 本地化后的文本）。 */
+  @Prop countdownIdleTitle: string = 'Get code';
+  /** [EN] The title while counting: a format with one `%d` (or `%ld`), the seconds left. [CN] 倒计时中的标题：带一个 `%d`（或 `%ld`，剩余秒数）的格式。 */
+  @Prop countdownRunningTitleFormat: string = '%d s left';
+  /** [EN] The title once the time is up. [CN] 时间到之后的标题。 */
+  @Prop countdownFinishedTitle: string = 'Resend';
+  /** [EN] The icon while counting (e.g. a clock); '' keeps `image`. [CN] 倒计时中的图标（例如时钟）；'' 时保持 `image`。 */
+  @Prop countdownImage: ResourceStr = '';
+  /** [EN] The title color while counting. [CN] 倒计时中的标题颜色。 */
+  @Prop countdownRunningTitleColor: ResourceColor = '#999999';
+  /** [EN] The border color while it is not counting. [CN] 非倒计时状态下的边框颜色。 */
+  @Prop countdownBorderColor: ResourceColor = '#07C160';
+  /** [EN] Whether a tap starts the countdown after `onItemTap` (off by default). [CN] 点击是否在 `onItemTap` 之后开始倒计时（默认关闭）。 */
+  @Prop startsCountdownOnTap: boolean = false;
+  /**
+   * [EN] A key that keeps the running countdown in the app's preferences, so a new item with the same key takes it up again
+   *      after the app was ended in the background; '' keeps nothing. One key per thing counted, e.g. one per phone number.
+   * [CN] 把运行中的倒计时保存到 App preferences 的 key，使 App 在后台被结束后，相同 key 的新条目接续倒计时；'' 表示不保存。
+   *      每个被计时的对象一个 key，例如每个手机号一个。
+   */
+  @Prop @Watch('cylCountdownKeyDidChange') countdownCacheKey: string = '';
+  /** [EN] The clock in epoch millis, for tests; undefined is `Date.now()`. [CN] 以 epoch 毫秒计的时钟，供测试使用；undefined 为 `Date.now()`。 */
+  countdownClock?: () => number;
+  onCountdownStart?: () => void;
+  onCountdownTick?: (remainingSeconds: number) => void;
+  onCountdownFinish?: () => void;
+  @State private cylCountdownState: number = 0;
+  @State private cylCountdownSeconds: number = 0;
+  private cylCountdown?: CYLAnimatedItemCountdown;
+  private cylCountdownTimer: number = -1;
+  private cylForegroundCallback: ApplicationStateChangeCallback = {
+    onApplicationForeground: () => {
+      this.cylCountdown?.refresh();
+    },
+    onApplicationBackground: () => {
+    }
+  };
   @Prop itemAccessibilityText: string = '';
   @Prop itemDescription: string = '';
   @Prop selectedDescription: string = '';
@@ -294,7 +429,142 @@ export struct CYLAnimatedItemView {
         this.cylPlaybackDidChange();
       };
     }
+    this.cylSetUpCountdown();
     this.cylAnimationDidChange();
+  }
+
+  aboutToDisappear(): void {
+    this.cylStopCountdownTimer();
+    try {
+      this.getUIContext().getHostContext()?.getApplicationContext().off('applicationStateChange', this.cylForegroundCallback);
+    } catch (error) {
+      // [EN] No application context (a preview): nothing to remove. [CN] 没有 application context（预览）：没有可移除的内容。
+    }
+  }
+
+  /**
+   * [EN] Makes the countdown with the local clock and the app's preferences, and takes up a cached one. The app coming to
+   *      the foreground reads the clock at once, so the seconds in the background count.
+   * [CN] 以本地时钟与 App 的 preferences 创建倒计时，并接续缓存的倒计时。App 回到前台时立即读取时钟，因此后台的秒数计入。
+   */
+  private cylSetUpCountdown(): void {
+    let listener: CYLAnimatedItemCountdownListener = {
+      onChanged: () => {
+        this.cylSyncCountdown();
+      },
+      onStarted: () => {
+        this.onCountdownStart?.();
+      },
+      onTicked: (remainingSeconds: number) => {
+        this.onCountdownTick?.(remainingSeconds);
+      },
+      onFinished: () => {
+        this.onCountdownFinish?.();
+      }
+    };
+    let context: Context | undefined = this.getUIContext().getHostContext();
+    this.cylCountdown = new CYLAnimatedItemCountdown(
+      () => this.countdownClock ? this.countdownClock() : Date.now(),
+      context ? new CYLAnimatedItemPreferencesStorage(context) : undefined,
+      listener);
+    try {
+      context?.getApplicationContext().on('applicationStateChange', this.cylForegroundCallback);
+    } catch (error) {
+      // [EN] No application context (a preview): the timer still reads the clock. [CN] 没有 application context（预览）：定时器仍会读取时钟。
+    }
+    if (this.controller) {
+      this.controller.cylStartCountdown = (seconds: number) => {
+        this.cylCountdown?.start(seconds > 0 ? seconds : this.countdownDuration);
+      };
+      this.controller.cylResetCountdown = () => {
+        this.cylCountdown?.reset();
+      };
+      this.controller.cylRefreshCountdown = () => {
+        this.cylCountdown?.refresh();
+      };
+    }
+    this.cylCountdownKeyDidChange();
+  }
+
+  /** [EN] The cache key or the style changed: a countdown kept under the key is taken up. [CN] 缓存 key 或样式变化：接续保存在该 key 下的倒计时。 */
+  cylCountdownKeyDidChange(): void {
+    if (this.cylCountdown && this.itemStyle === CYLAnimatedItemStyle.Countdown) {
+      this.cylCountdown.setCacheKey(this.countdownCacheKey);
+    }
+  }
+
+  /** [EN] The state or the seconds changed: render, and run the timer only while counting. [CN] 状态或秒数变化：重新渲染，只在倒计时中运行定时器。 */
+  private cylSyncCountdown(): void {
+    if (!this.cylCountdown) {
+      return;
+    }
+    this.cylCountdownState = this.cylCountdown.state;
+    this.cylCountdownSeconds = this.cylCountdown.shownSeconds;
+    if (this.cylCountdown.state === CYLCountdownRunning) {
+      if (this.cylCountdownTimer < 0) {
+        this.cylCountdownTimer = setInterval(() => {
+          this.cylCountdown?.refresh();
+        }, CYLCountdownTickIntervalMillis);
+      }
+    } else {
+      this.cylStopCountdownTimer();
+    }
+  }
+
+  private cylStopCountdownTimer(): void {
+    if (this.cylCountdownTimer >= 0) {
+      clearInterval(this.cylCountdownTimer);
+      this.cylCountdownTimer = -1;
+    }
+  }
+
+  cylIsCountdown(): boolean {
+    return this.itemStyle === CYLAnimatedItemStyle.Countdown;
+  }
+
+  cylIsRunning(): boolean {
+    return this.cylIsCountdown() && this.cylCountdownState === CYLCountdownRunning;
+  }
+
+  /** [EN] Enabled, and not counting down. [CN] 可用，且不在倒计时中。 */
+  cylEnabled(): boolean {
+    return this.isItemEnabled && !this.cylIsRunning();
+  }
+
+  /** [EN] The title: the item's, or the countdown's for the state. [CN] 标题：条目自己的，或倒计时在当前状态下的标题。 */
+  cylTitleText(): string {
+    if (!this.cylIsCountdown()) {
+      return this.itemTitle;
+    }
+    if (this.cylCountdownState === CYLCountdownRunning) {
+      return cylCountdownText(this.countdownRunningTitleFormat, this.cylCountdownSeconds);
+    }
+    return this.cylCountdownState === CYLCountdownFinished ? this.countdownFinishedTitle : this.countdownIdleTitle;
+  }
+
+  /** [EN] The widest title the countdown shows, so the item keeps its width. [CN] 倒计时会显示的最宽标题，使条目保持宽度。 */
+  private cylCountdownMinWidth(): number {
+    return this.cylIsCountdown() ?
+      cylCountdownTitleWidth(this.countdownIdleTitle, this.countdownRunningTitleFormat, this.countdownFinishedTitle,
+        this.countdownDuration, this.titleFontSize) : 0;
+  }
+
+  private cylPadding(): Padding | number {
+    if (this.isBare) {
+      return 0;
+    }
+    return this.cylIsCountdown() ? { top: 8, bottom: 8, left: 12, right: 12 } : 4;
+  }
+
+  /** [EN] A tap: the callback, then the countdown when `startsCountdownOnTap`. [CN] 点击：先回调，再在 `startsCountdownOnTap` 时开始倒计时。 */
+  private cylHandleTap(): void {
+    if (!this.cylEnabled()) {
+      return;
+    }
+    this.onItemTap?.();
+    if (this.cylIsCountdown() && this.startsCountdownOnTap) {
+      this.cylCountdown?.start(this.countdownDuration);
+    }
   }
 
   @Builder
@@ -361,6 +631,9 @@ export struct CYLAnimatedItemView {
    * [EN] The static image of the state, or '' when there is none. [CN] 当前状态的静态图片，没有时为 ''。
    */
   cylStaticImage(): ResourceStr {
+    if (this.cylIsRunning() && !this.cylIsEmpty(this.countdownImage)) {
+      return this.countdownImage;
+    }
     if (this.isItemSelected && !this.cylIsEmpty(this.selectedImage)) {
       return this.selectedImage;
     }
@@ -390,7 +663,7 @@ export struct CYLAnimatedItemView {
   }
 
   cylAccessibilityText(): string {
-    return this.itemAccessibilityText.length > 0 ? this.itemAccessibilityText : this.itemTitle;
+    return this.itemAccessibilityText.length > 0 ? this.itemAccessibilityText : this.cylTitleText();
   }
 
   @Builder
@@ -494,13 +767,14 @@ export struct CYLAnimatedItemView {
 
   @Builder
   cylTitle() {
-    if (this.itemTitle.length > 0) {
-      Text(this.itemTitle)
+    if (this.cylTitleText().length > 0) {
+      Text(this.cylTitleText())
         .fontSize(this.titleFontSize)
-        .fontColor(this.titleColor)
+        .fontColor(this.cylIsRunning() ? this.countdownRunningTitleColor : this.titleColor)
+        .constraintSize({ minWidth: this.cylCountdownMinWidth() })
         .maxLines(this.titleLines > 0 ? Math.floor(this.titleLines) : CYL_UNLIMITED_LINES)
         .textOverflow({ overflow: this.titleLines > 0 ? TextOverflow.Ellipsis : TextOverflow.None })
-        .textAlign(this.axis === CYLAnimatedItemAxis.Vertical ? TextAlign.Center : TextAlign.Start)
+        .textAlign(this.axis === CYLAnimatedItemAxis.Vertical || this.cylIsCountdown() ? TextAlign.Center : TextAlign.Start)
         .margin(this.cylShowsIcon() ? this.cylLeadingGap(this.spacing) : 0)
         .accessibilityLevel('no')
     }
@@ -513,7 +787,7 @@ export struct CYLAnimatedItemView {
 
   /** [EN] Whether the icon or the title shows (an inline accessory keeps `spacing` from them). [CN] 是否显示图标或标题（行内附件与它们保持 `spacing`）。 */
   private cylShowsIconOrTitle(): boolean {
-    return this.cylShowsIcon() || this.itemTitle.length > 0;
+    return this.cylShowsIcon() || this.cylTitleText().length > 0;
   }
 
   @Builder
@@ -532,7 +806,7 @@ export struct CYLAnimatedItemView {
 
   /** [EN] Bare and only an icon: no title, no accessory. [CN] 纯图标模式且只有图标：没有标题和附件。 */
   private cylIsBareIcon(): boolean {
-    return this.isBare && this.itemTitle.length === 0 && this.cylIsEmpty(this.accessoryImage) && this.accessoryText.length === 0;
+    return this.isBare && this.cylTitleText().length === 0 && this.cylIsEmpty(this.accessoryImage) && this.accessoryText.length === 0;
   }
 
   build() {
@@ -543,7 +817,11 @@ export struct CYLAnimatedItemView {
     }) {
       this.cylContent()
     }
-    .padding(this.isBare ? 0 : 4)
+    .padding(this.cylPadding())
+    .backgroundColor(this.cylIsCountdown() ? '#F2F2F7' : Color.Transparent)
+    .borderRadius(this.cylIsCountdown() ? 6 : 0)
+    .borderWidth(this.cylIsCountdown() ? 0.5 : 0)
+    .borderColor(this.cylIsRunning() ? '#C7C7CC' : this.countdownBorderColor)
     // [EN] A Flex without a size fills its parent. A bare icon (a host's tab icon, no title, no accessory) is exactly the
     //      icon, so a host can place things against its edges: the tab bar puts the badge at the icon's top-right, and an
     //      item as wide as the tab slot moved it to the icon's top-left (HarmonyOS issue list #51). `undefined` keeps the
@@ -552,7 +830,7 @@ export struct CYLAnimatedItemView {
     //      图标右上角，而与 Tab 槽位同宽的条目把角标挪到了图标左上角（鸿蒙问题列表 #51）。其他情况为 `undefined`，保持默认尺寸。
     .width(this.cylIsBareIcon() ? this.iconSize : (this.sizesToContent ? 'auto' : undefined))
     .height(this.cylIsBareIcon() ? this.iconSize : (this.sizesToContent ? 'auto' : undefined))
-    .opacity(this.isItemEnabled ? 1 : 0.5)
+    .opacity(this.cylEnabled() ? 1 : 0.5)
     .constraintSize({ minHeight: this.isBare ? 0 : 44 })
     .hitTestBehavior(this.isBare ? HitTestMode.None : HitTestMode.Default)
     .accessibilityLevel(this.isBare ? 'no-hide-descendants' : 'auto')
@@ -562,14 +840,12 @@ export struct CYLAnimatedItemView {
       [this.itemDescription, this.selectedDescription].filter((part: string) => part.length > 0).join(', ') : this.itemDescription)
     .id(this.itemId)
     .onClick(() => {
-      if (this.isItemEnabled && this.onItemTap) {
-        this.onItemTap();
-      }
+      this.cylHandleTap();
     })
     .gesture(
       LongPressGesture()
         .onAction(() => {
-          if (this.isItemEnabled && this.onItemLongPress) {
+          if (this.cylEnabled() && this.onItemLongPress) {
             this.onItemLongPress();
           }
         })

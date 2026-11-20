@@ -1,4 +1,5 @@
 const { cylIsGIFImagePath } = require('./cyl_gif_image')
+const { cylCountdownText } = require('./cyl_animated_item_countdown')
 /**
  * [EN] The render model of cyl-animated-item, the mini program counterpart of iOS `CYLAnimatedItemView` (the
  *      CYLAnimatedItem pod) and Android `com.cyl.animateditem.CYLAnimatedItemView`. Pure functions without any wx API,
@@ -175,7 +176,47 @@ function cylGIFImageStillShows(p, hasSource, fallbackImage) {
   return !!cylGIFImageOf(p, hasSource, fallbackImage) && !!p.gifImageReady && !p.gifImagePlaying
 }
 
-function cylAnimatedItemModel(p) {
+/**
+ * [EN] The widest title a countdown shows (idle, finished, the running one with the widest digits of the duration), in px,
+ *      estimated from the font size (a CJK character is one em wide, any other 0.6 em), so the item keeps its width while the
+ *      digits change. 0 for another style. [CN] 倒计时会显示的最宽标题（待机、结束、以最宽数字组成的倒计时），单位 px，按字号估算
+ *      （中日韩字符宽 1 em，其他字符 0.6 em），使条目在数字变化时保持宽度。其他样式为 0。
+ */
+function cylAnimatedItemCountdownTitleWidth(p) {
+  if (p.itemStyle !== 'countdown') return 0
+  const fontSize = Number(p.titleFontSize) > 0 ? Number(p.titleFontSize) : 14
+  const digits = String(Math.max(1, Math.ceil(Number(p.countdownDuration) || 60))).length
+  const widest = Number('8'.repeat(digits))
+  const width = (text) => Array.from(text).reduce((sum, ch) => sum + (/[\u2e80-\u9fff\uac00-\ud7af\uff00-\uffef]/.test(ch) ? 1 : 0.6), 0) * fontSize
+  return Math.ceil(Math.max(
+    width(p.countdownIdleTitle || ''),
+    width(p.countdownFinishedTitle || ''),
+    width(cylCountdownText(p.countdownRunningTitleFormat || '', widest))))
+}
+
+/**
+ * [EN] The properties of a countdown item: its title for the state (idle, running with the seconds left, finished), the
+ *      countdown icon and the gray title color while running, and disabled while running. Another style keeps `p`.
+ * [CN] 倒计时条目的属性：当前状态的标题（待机、带剩余秒数的倒计时、结束）、倒计时中的图标与灰色标题、倒计时中不可用。其他样式保持 `p` 不变。
+ */
+function cylAnimatedItemCountdownProperties(p) {
+  if (p.itemStyle !== 'countdown') return p
+  const running = p.countdownState === 'running'
+  let title = p.countdownIdleTitle || ''
+  if (running) title = cylCountdownText(p.countdownRunningTitleFormat || '', Math.max(Number(p.countdownSeconds) || 0, 0))
+  else if (p.countdownState === 'finished') title = p.countdownFinishedTitle || ''
+  return {
+    ...p,
+    title,
+    image: running && p.countdownImage ? p.countdownImage : p.image,
+    enabled: p.enabled !== false && !running,
+    titleColor: running ? p.countdownRunningTitleColor || '#999999' : p.titleColor,
+    titleDarkColor: running ? '' : p.titleDarkColor,
+  }
+}
+
+function cylAnimatedItemModel(input) {
+  const p = cylAnimatedItemCountdownProperties(input)
   const animationPath = p.animationUrl || ''
   const hasAnimationData = !!p.animationData && typeof p.animationData === 'object'
   const animationType = cylAnimatedItemResolvedType(p, animationPath, hasAnimationData)
@@ -197,7 +238,8 @@ function cylAnimatedItemModel(p) {
   //      未设置且系统主题为深色）以 `titleDarkColor` 代替 `titleColor`。
   const dark = cylAnimatedItemIsDark(p)
   const titleColor = dark && p.titleDarkColor ? p.titleDarkColor : p.titleColor
-  const titleStyle = cylAnimatedItemTitleStyle(p, titleColor, titleLines)
+  const countdownWidth = cylAnimatedItemCountdownTitleWidth(p)
+  const titleStyle = cylAnimatedItemTitleStyle(p, titleColor, titleLines) + (countdownWidth > 0 ? `min-width: ${countdownWidth}px; text-align: center;` : '')
   const titleLinesClass = cylAnimatedItemTitleLinesClass(titleLines)
   return {
     title,
@@ -221,7 +263,7 @@ function cylAnimatedItemModel(p) {
     iconTint: p.iconTint || '',
     // [EN] The animation's one color (cyl-rive `tint`). [CN] 动画的单一颜色（cyl-rive 的 `tint`）。
     animationTint: String(p.animationTint || '').trim(),
-    axisClass: (p.axis === 'vertical' ? 'cyl-animated-item-vertical' : 'cyl-animated-item-horizontal') + (p.embedded ? ' cyl-animated-item-embedded' : ''),
+    axisClass: (p.axis === 'vertical' ? 'cyl-animated-item-vertical' : 'cyl-animated-item-horizontal') + (p.embedded ? ' cyl-animated-item-embedded' : '') + (p.itemStyle === 'countdown' ? ' cyl-animated-item-countdown' : ''),
     ariaHidden: !!p.embedded,
     accessoryPlacement: ['leading', 'trailing', 'topTrailing'].includes(p.accessoryPlacement) ? p.accessoryPlacement : 'trailing',
     hasAccessory: !!(p.accessoryImage || p.accessoryText),
@@ -233,6 +275,7 @@ function cylAnimatedItemModel(p) {
 }
 
 module.exports = {
+  cylAnimatedItemCountdownTitleWidth,
   cylAnimatedItemIsDark,
   cylAnimatedItemModel,
   cylAnimatedItemType,

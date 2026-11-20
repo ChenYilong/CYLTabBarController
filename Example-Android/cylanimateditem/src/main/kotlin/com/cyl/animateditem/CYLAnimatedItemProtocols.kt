@@ -123,6 +123,21 @@ interface CYLAnimatedItemGestureListener {
     fun onAccessoryTapped(item: CYLAnimatedItemView) { /* [EN] Optional. [CN] 可选。 */ }
 
     /**
+     * [EN] The countdown started. [CN] 倒计时开始。
+     */
+    fun onCountdownStarted(item: CYLAnimatedItemView) { /* [EN] Optional. [CN] 可选。 */ }
+
+    /**
+     * [EN] The whole seconds left changed, once per second. [CN] 剩余整秒数变化，每秒一次。
+     */
+    fun onCountdownTicked(item: CYLAnimatedItemView, remainingSeconds: Int) { /* [EN] Optional. [CN] 可选。 */ }
+
+    /**
+     * [EN] The time is up. [CN] 时间到。
+     */
+    fun onCountdownFinished(item: CYLAnimatedItemView) { /* [EN] Optional. [CN] 可选。 */ }
+
+    /**
      * [EN] Whether a drag may start (only asked when `isDragEnabled`). [CN] 是否允许开始拖拽（仅在 `isDragEnabled` 时询问）。
      */
     fun shouldBeginDrag(item: CYLAnimatedItemView): Boolean = true

@@ -17,6 +17,7 @@
  */
 const { cylAnimatedItemModel, cylAnimatedItemPackage, cylAnimatedItemRestingProgress } = require('./cyl_animated_item_model')
 const { cylGIFImageInfo } = require('./cyl_gif_image')
+const { CYLAnimatedItemCountdown, CYL_COUNTDOWN_TICK_INTERVAL } = require('./cyl_animated_item_countdown')
 
 /**
  * [EN] The id of the engine node (only one is rendered), reached by `selectComponent` for the playback methods.
@@ -145,6 +146,27 @@ Component({
      * [CN] 图标与标题的间距（px；纵向在图标下方，横向在图标旁）；-1 为默认的 2 px（纵向）/ 4 px（横向）。
      */
     titleSpacing: { type: Number, value: -1 },
+    /**
+     * [EN] 'plain' (default) or 'countdown': a countdown button, e.g. "Get code" of an SMS login (iOS `style`, named
+     *      `itemStyle` here because `style` is the host's own attribute). Set the `countdown…` properties, then call
+     *      `startCountdown()` (or set `startsCountdownOnTap`). The end is a time read from the local clock, so the seconds in the
+     *      background count (FIX: issue #1 of SMSCodeButton); a clock past the longest duration, or set back to before the start,
+     *      closes it; `countdownCacheKey` keeps it across a restart. While it runs the item is disabled. Events: `countdownstart`,
+     *      `countdowntick` (`detail.seconds`, once per second), `countdownfinish`.
+     * [CN] 'plain'（默认）或 'countdown'：倒计时按钮，例如短信登录的「获取验证码」（对应 iOS 的 `style`；因为 `style` 是宿主自己的属性，
+     *      这里命名为 `itemStyle`）。设置 `countdown…` 属性后调用 `startCountdown()`（或设置 `startsCountdownOnTap`）。结束是从本地时钟读取的时间点，
+     *      因此后台的秒数计入（修复 SMSCodeButton 的 issue #1）；时钟超过最长时长或被调回到开始之前时关闭；`countdownCacheKey` 使其在重启后继续。
+     *      倒计时中条目不可用。事件：`countdownstart`、`countdowntick`（`detail.seconds`，每秒一次）、`countdownfinish`。
+     */
+    itemStyle: { type: String, value: 'plain' },
+    countdownDuration: { type: Number, value: 60 },
+    countdownIdleTitle: { type: String, value: 'Get code' },
+    countdownRunningTitleFormat: { type: String, value: '%ld s left' },
+    countdownFinishedTitle: { type: String, value: 'Resend' },
+    countdownImage: { type: String, value: '' },
+    countdownRunningTitleColor: { type: String, value: '#999999' },
+    startsCountdownOnTap: { type: Boolean, value: false },
+    countdownCacheKey: { type: String, value: '' },
     iconWidth: { type: Number, value: 0 },
     iconHeight: { type: Number, value: 0 },
     bare: { type: Boolean, value: false },
@@ -163,6 +185,8 @@ Component({
     lottieData: null,
     m: {},
     systemTheme: 'light',
+    countdownState: 'idle',
+    countdownSeconds: 0,
   },
 
   observers: {
@@ -189,6 +213,13 @@ Component({
     },
     'title, image, selectedImage, placeholderImage, embedded, enabled, axis, iconSize, accessoryImage, accessoryText, accessoryAccessibilityLabel, accessoryPlacement, accessibilityLabel, gifFirstFrame, gifLastFrame, iconWidth, iconHeight, iconTint, animationTint, titleColor, titleFontSize, titleFontWeight, titleDarkColor, userInterfaceStyle, titleLines, titleLineHeight, titleSpacing': function () {
       this.cyl_update()
+    },
+    'itemStyle, countdownIdleTitle, countdownRunningTitleFormat, countdownFinishedTitle, countdownImage, countdownRunningTitleColor, countdownDuration': function (itemStyle) {
+      if (itemStyle !== 'countdown' && this.cylCountdown && this.data.countdownState !== 'idle') this.resetCountdown()
+      this.cyl_update()
+    },
+    'countdownCacheKey, itemStyle': function (key, itemStyle) {
+      if (itemStyle === 'countdown') this.cyl_countdown().setCacheKey(key)
     },
     'selected, restingProgress': function () {
       this.cyl_update()
@@ -225,9 +256,13 @@ Component({
         this.cyl_update()
       }
       if (typeof wx !== 'undefined' && typeof wx.onThemeChange === 'function') wx.onThemeChange(this.cylThemeListener)
+      // [EN] A countdown kept before a restart continues. [CN] 重启之前保存的倒计时继续。
+      if (this.data.itemStyle === 'countdown') this.cyl_countdown().setCacheKey(this.data.countdownCacheKey)
       this.cyl_update()
     },
     detached() {
+      this.cyl_stopCountdownTimer()
+      if (typeof wx !== 'undefined' && typeof wx.offAppShow === 'function' && this.cylAppShowListener) wx.offAppShow(this.cylAppShowListener)
       clearTimeout(this.cylGifTimer)
       clearTimeout(this.cylGIFImageTimer)
       if (typeof wx !== 'undefined' && typeof wx.offThemeChange === 'function' && this.cylThemeListener) wx.offThemeChange(this.cylThemeListener)
@@ -235,6 +270,71 @@ Component({
   },
 
   methods: {
+    /**
+     * [EN] The countdown state machine of this item, made on first use with the local clock and the mini program storage.
+     * [CN] 本条目的倒计时状态机，首次使用时以本地时钟与小程序存储创建。
+     */
+    cyl_countdown() {
+      if (this.cylCountdown) return this.cylCountdown
+      const storage = typeof wx !== 'undefined' && typeof wx.getStorageSync === 'function' ? {
+        get: (name) => { try { return wx.getStorageSync(name) } catch { return null } },
+        set: (name, value) => { try { wx.setStorageSync(name, value) } catch { /* [EN] a full storage only loses the restart case. [CN] 存储已满只会丢失重启恢复。 */ } },
+        remove: (name) => { try { wx.removeStorageSync(name) } catch { /* [EN] nothing to drop. [CN] 没有可丢弃的内容。 */ } },
+      } : null
+      const countdown = new CYLAnimatedItemCountdown({
+        storage,
+        onChange: () => {
+          const running = countdown.state === 'running'
+          this.setData({ countdownState: countdown.state, countdownSeconds: countdown.shown })
+          if (running) this.cyl_startCountdownTimer()
+          else this.cyl_stopCountdownTimer()
+          this.cyl_update()
+        },
+        onStart: () => this.triggerEvent('countdownstart', {}),
+        onTick: (seconds) => this.triggerEvent('countdowntick', { seconds }),
+        onFinish: () => this.triggerEvent('countdownfinish', {}),
+      })
+      this.cylCountdown = countdown
+      // [EN] The time spent in the background counts: read the clock when the mini program is shown again.
+      // [CN] 后台度过的时间计入：小程序再次显示时读取时钟。
+      this.cylAppShowListener = () => countdown.refresh()
+      if (typeof wx !== 'undefined' && typeof wx.onAppShow === 'function') wx.onAppShow(this.cylAppShowListener)
+      return countdown
+    },
+
+    cyl_startCountdownTimer() {
+      if (this.cylCountdownTimer) return
+      this.cylCountdownTimer = setInterval(() => this.cyl_countdown().refresh(), CYL_COUNTDOWN_TICK_INTERVAL)
+    },
+
+    cyl_stopCountdownTimer() {
+      clearInterval(this.cylCountdownTimer)
+      this.cylCountdownTimer = null
+    },
+
+    /**
+     * [EN] Starts (or restarts) the countdown for `seconds` (default `countdownDuration`, e.g. the server's "retry after").
+     *      Switches the item to the countdown style when it is not. [CN] 开始（或重新开始）`seconds` 秒的倒计时（默认 `countdownDuration`，
+     *      例如服务器返回的「多少秒后重试」）。条目不是倒计时样式时切换为倒计时样式。
+     */
+    startCountdown(seconds) {
+      if (this.data.itemStyle !== 'countdown') {
+        this.setData({ itemStyle: 'countdown' })
+        this.cyl_countdown().setCacheKey(this.data.countdownCacheKey)
+      }
+      this.cyl_countdown().startFor(Number(seconds) > 0 ? Number(seconds) : this.data.countdownDuration)
+    },
+
+    /** [EN] Stops and goes idle, with no finish event. [CN] 停止并回到待机，不触发结束事件。 */
+    resetCountdown() {
+      this.cyl_countdown().reset()
+    },
+
+    /** [EN] Reads the clock now (done by the item itself). [CN] 立即读取时钟（条目自己会做）。 */
+    refreshCountdown() {
+      this.cyl_countdown().refresh()
+    },
+
     cyl_update() {
       const m = cylAnimatedItemModel({ ...this.data })
       this.setData({ m })
@@ -495,8 +595,10 @@ Component({
     },
 
     cyl_onTap() {
-      if (this.data.enabled && !this.data.embedded) {
+      if (this.data.enabled && !this.data.embedded && this.data.countdownState !== 'running') {
         this.triggerEvent('itemtap', {})
+        // [EN] After the page handled the tap (send the code there), the countdown starts. [CN] 页面处理点击（在那里发送验证码）之后开始倒计时。
+        if (this.data.itemStyle === 'countdown' && this.data.startsCountdownOnTap) this.startCountdown()
       }
     },
 
