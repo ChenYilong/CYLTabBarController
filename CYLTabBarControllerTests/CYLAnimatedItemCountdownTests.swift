@@ -30,15 +30,15 @@ private final class CYLCountdownTestClock {
 private final class CYLCountdownTestDelegate: NSObject, CYLAnimatedItemViewDelegate {
     var events: [String] = []
 
-    func animatedItemViewDidStartCountdown(_ itemView: CYLAnimatedItemView) {
+    func animatedItemViewDidStartCountdown(_: CYLAnimatedItemView) {
         events.append("start")
     }
 
-    func animatedItemView(_ itemView: CYLAnimatedItemView, didTickCountdown remainingSeconds: Int) {
+    func animatedItemView(_: CYLAnimatedItemView, didTickCountdown remainingSeconds: Int) {
         events.append("tick \(remainingSeconds)")
     }
 
-    func animatedItemViewDidFinishCountdown(_ itemView: CYLAnimatedItemView) {
+    func animatedItemViewDidFinishCountdown(_: CYLAnimatedItemView) {
         events.append("finish")
     }
 }

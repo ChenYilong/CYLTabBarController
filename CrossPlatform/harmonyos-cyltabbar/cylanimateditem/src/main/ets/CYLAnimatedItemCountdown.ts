@@ -89,8 +89,8 @@ export class CYLAnimatedItemCountdown {
   /** [EN] The cache key; set it with `setCacheKey`. [CN] 缓存 key；通过 `setCacheKey` 设置。 */
   cacheKey: string = '';
   storage?: CYLAnimatedItemCountdownStorage;
-  private now: () => number;
-  private listener: CYLAnimatedItemCountdownListener;
+  private readonly now: () => number;
+  private readonly listener: CYLAnimatedItemCountdownListener;
   private startMillis: number = 0;
   private endMillis: number = 0;
   private durationMillis: number = 0;
@@ -136,7 +136,7 @@ export class CYLAnimatedItemCountdown {
   /** [EN] Starts (or restarts) for `seconds`; 0 or less resets. [CN] 开始（或重新开始）`seconds` 秒；0 或更小则重置。 */
   start(seconds: number): void {
     let duration: number = seconds * 1000;
-    if (!(duration > 0)) {
+    if (Number.isNaN(duration) || duration <= 0) {
       this.reset();
       return;
     }
@@ -191,7 +191,7 @@ export class CYLAnimatedItemCountdown {
     if (text === undefined) {
       return;
     }
-    let parts: number[] = text.split(',').map((part: string) => Number(part));
+    let parts: number[] = text.split(',').map(Number);
     if (parts.length !== 3 || parts.some((part: number) => !Number.isFinite(part))) {
       this.storage.remove(name);
       return;

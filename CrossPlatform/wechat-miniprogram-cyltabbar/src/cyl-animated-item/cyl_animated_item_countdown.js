@@ -92,7 +92,7 @@ class CYLAnimatedItemCountdown {
   /** [EN] Starts (or restarts) for `seconds`. [CN] 开始（或重新开始）`seconds` 秒。 */
   startFor(seconds) {
     const duration = Number(seconds) * 1000
-    if (!(duration > 0)) {
+    if (Number.isNaN(duration) || duration <= 0) {
       this.reset()
       return
     }
@@ -118,7 +118,7 @@ class CYLAnimatedItemCountdown {
     if (this.state !== 'running') return
     const now = this.now()
     const left = this.end - now
-    if (!(left > 0) || now - this.start_ < -CYL_COUNTDOWN_TOLERANCE || left > this.duration + CYL_COUNTDOWN_TOLERANCE) {
+    if (Number.isNaN(left) || left <= 0 || now - this.start_ < -CYL_COUNTDOWN_TOLERANCE || left > this.duration + CYL_COUNTDOWN_TOLERANCE) {
       this.cyl_finish()
       return
     }

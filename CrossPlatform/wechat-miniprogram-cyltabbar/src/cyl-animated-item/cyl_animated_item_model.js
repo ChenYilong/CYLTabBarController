@@ -215,15 +215,28 @@ function cylAnimatedItemCountdownProperties(p) {
   }
 }
 
+// [EN] Which animation path is in use and whether the animation shows (a separate function, for readability).
+// [CN] 使用哪条动画路径以及动画是否显示（单独的函数，便于阅读）。
+function cylAnimatedItemAnimationState(p, animationType, hasSource) {
+  const failed = !!p.animationFailed
+  const usesEngine = hasSource && !!animationType && animationType !== 'gif' && !failed
+  const gifShows = animationType === 'gif' && !failed
+  return { usesEngine, gifShows, animationShows: gifShows || (usesEngine && !!p.animationLoaded) }
+}
+
+// [EN] The title's line count: 1 (the default) unless a number of at least 0 is given. [CN] 标题行数：未给出不小于 0 的数字时为 1（默认）。
+function cylAnimatedItemTitleLines(value) {
+  const lines = Number(value)
+  return Number.isFinite(lines) && lines >= 0 ? Math.floor(lines) : 1
+}
+
 function cylAnimatedItemModel(input) {
   const p = cylAnimatedItemCountdownProperties(input)
   const animationPath = p.animationUrl || ''
   const hasAnimationData = !!p.animationData && typeof p.animationData === 'object'
   const animationType = cylAnimatedItemResolvedType(p, animationPath, hasAnimationData)
   const hasSource = !!animationPath || hasAnimationData
-  const usesEngine = hasSource && !!animationType && animationType !== 'gif' && !p.animationFailed
-  const gifShows = animationType === 'gif' && !p.animationFailed
-  const animationShows = gifShows || (usesEngine && !!p.animationLoaded)
+  const { usesEngine, gifShows, animationShows } = cylAnimatedItemAnimationState(p, animationType, hasSource)
   const fallbackImage = cylAnimatedItemFallbackImage(p, hasSource, animationShows)
   const iconSize = cylAnimatedItemDimension(p.iconSize, 24)
   const iconWidth = cylAnimatedItemDimension(p.iconWidth, iconSize)
@@ -232,7 +245,7 @@ function cylAnimatedItemModel(input) {
   const label = p.accessibilityLabel || title
   // [EN] Title look: color, font size (px) and line count (1: one line with an ellipsis, the default; 0: no limit;
   //      n > 1: up to n lines, then an ellipsis). [CN] 标题外观：颜色、字号（px）与行数（1：单行省略，默认；0：不限；n > 1：最多 n 行后省略）。
-  const titleLines = Number.isFinite(Number(p.titleLines)) && Number(p.titleLines) >= 0 ? Math.floor(Number(p.titleLines)) : 1
+  const titleLines = cylAnimatedItemTitleLines(p.titleLines)
   // [EN] Dark mode: `titleDarkColor` replaces `titleColor` while the item is dark (`userInterfaceStyle` 'dark', or
   //      'system' / unset with the system theme dark). [CN] 深色模式：项为深色时（`userInterfaceStyle` 为 'dark'，或为 'system' /
   //      未设置且系统主题为深色）以 `titleDarkColor` 代替 `titleColor`。
