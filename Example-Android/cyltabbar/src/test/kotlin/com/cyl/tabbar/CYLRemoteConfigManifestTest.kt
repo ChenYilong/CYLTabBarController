@@ -132,8 +132,9 @@ class CYLRemoteConfigManifestTest {
 
         val withoutBase = manifest() + mapOf("assets" to mapOf("list" to listOf(mapOf("key" to "home", "path" to "light/home@3x.png"))))
         val needsBase = load(withoutBase)
-        assertEquals(CYLTabBarConfigurationError.AssetInvalid, (needsBase.error as CYLConfigurationException).error)
-        assertTrue(needsBase.error?.message.orEmpty().contains("assets.baseURL"))
+        val needsBaseError = needsBase.error as CYLConfigurationException
+        assertEquals(CYLTabBarConfigurationError.AssetInvalid, needsBaseError.error)
+        assertTrue(needsBaseError.message.orEmpty().contains("assets.baseURL"))
 
         val noContext = load(manifest(), withContext = false)
         assertFalse(noContext.isRemote)

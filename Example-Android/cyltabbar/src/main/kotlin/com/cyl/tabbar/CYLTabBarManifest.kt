@@ -616,13 +616,15 @@ class CYLTabBarManifestLoader(context: Context) {
         val folder = File(cacheDirectory, version)
         val staging = File(cacheDirectory, "$version.download").apply { deleteRecursively(); mkdirs() }
         val staged = manifest.cachedCopy(staging)
-        val baseURL = CYLTabBarManifest.string(manifest.dictionary["assets"], "baseURL") ?: url?.let { it.substringBeforeLast('/') + "/" }
+        val baseURL = CYLTabBarManifest.string(manifest.dictionary["assets"], "baseURL") ?: url?.substringBeforeLast('/')?.plus("/").orEmpty()
         try {
             for (entry in staged.assetEntries()) {
                 val path = staged.pathOfEntry(entry) ?: throw CYLConfigurationException(CYLTabBarConfigurationError.AssetInvalid, "Asset ${CYLTabBarManifest.string(entry, "path")} is outside the assets folder.")
-                val source = CYLTabBarManifest.string(entry, "url")
-                    ?: baseURL?.let { URI(it).resolve(CYLTabBarManifest.string(entry, "path").orEmpty()).toString() }
-                    ?: throw CYLConfigurationException(CYLTabBarConfigurationError.AssetInvalid, "A manifest without a URL needs \"assets.baseURL\" (or a \"url\" per asset) to download its images.")
+                val explicitURL = CYLTabBarManifest.string(entry, "url")
+                if (explicitURL == null && baseURL.isEmpty()) {
+                    throw CYLConfigurationException(CYLTabBarConfigurationError.AssetInvalid, "A manifest without a URL needs \"assets.baseURL\" (or a \"url\" per asset) to download its images.")
+                }
+                val source = explicitURL ?: URI(baseURL).resolve(CYLTabBarManifest.string(entry, "path").orEmpty()).toString()
                 val data = runCatching { URI(source).toURL().openStream().use { it.readBytes() } }.getOrNull()
                     ?: throw CYLConfigurationException(CYLTabBarConfigurationError.AssetInvalid, "Asset ${CYLTabBarManifest.string(entry, "path")} could not be downloaded.")
                 File(path).apply { parentFile?.mkdirs(); writeBytes(data) }

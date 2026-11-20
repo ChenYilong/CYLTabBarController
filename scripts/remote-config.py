@@ -336,7 +336,8 @@ def self_test():
     return failures == 0 and checks > 0
 
 
-def main(argv=None):
+def build_parser():
+    """[EN] The command line. [CN] 命令行。"""
     parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     parser.add_argument("--self-test", action="store_true", help="round trips of the sample files")
     sub = parser.add_subparsers(dest="command")
@@ -347,6 +348,32 @@ def main(argv=None):
         if name != "to-config":
             command.add_argument("--whole", action="store_true",
                                  help=f"one JSON parameter, {WHOLE_CONFIGURATION_KEY}, holding the whole file")
+    return parser
+
+
+def convert(arguments):
+    """[EN] The bytes of the output file of the command `arguments` names. [CN] `arguments` 所指命令的输出文件内容。"""
+    if arguments.command == "to-config":
+        return (json.dumps(read_remote_config_file(arguments.input), ensure_ascii=False, indent=2) + "\n").encode()
+    configuration = read_configuration(arguments.input)
+    if arguments.command == "to-template":
+        return template_json(configuration, arguments.whole).encode()
+    if arguments.command == "to-defaults-xml":
+        return defaults_xml(configuration, arguments.whole).encode()
+    return defaults_plist(configuration, arguments.whole)
+
+
+def write_output(output, destination):
+    """[EN] `output` into `destination` (a path checked like the inputs), or to standard output. [CN] 将 `output` 写入 `destination`（路径与输入一样检查），没有时写到标准输出。"""
+    if destination:
+        with open(checked_path(destination, False), "wb") as handle:
+            handle.write(output)
+    else:
+        sys.stdout.buffer.write(output)
+
+
+def main(argv=None):
+    parser = build_parser()
     arguments = parser.parse_args(argv)
     if arguments.self_test:
         return 0 if self_test() else 1
@@ -354,27 +381,10 @@ def main(argv=None):
         parser.print_help()
         return 2
     try:
-        if arguments.command == "to-config":
-            output = (json.dumps(read_remote_config_file(arguments.input), ensure_ascii=False, indent=2) + "\n").encode()
-        else:
-            configuration = read_configuration(arguments.input)
-            writer = {"to-template": lambda: template_json(configuration, arguments.whole).encode(),
-                      "to-defaults-xml": lambda: defaults_xml(configuration, arguments.whole).encode(),
-                      "to-defaults-plist": lambda: defaults_plist(configuration, arguments.whole)}[arguments.command]
-            output = writer()
+        write_output(convert(arguments), arguments.output)
     except (ConversionError, ValueError, OSError, ElementTree.ParseError) as error:
         print(f"remote-config.py: {error}", file=sys.stderr)
         return 1
-    if arguments.output:
-        try:
-            target = checked_path(arguments.output, False)
-        except ConversionError as error:
-            print(f"remote-config.py: {error}", file=sys.stderr)
-            return 1
-        with open(target, "wb") as handle:
-            handle.write(output)
-    else:
-        sys.stdout.buffer.write(output)
     return 0
 
 
