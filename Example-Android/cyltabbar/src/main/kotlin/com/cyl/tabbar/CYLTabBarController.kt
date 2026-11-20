@@ -908,6 +908,10 @@ open class CYLTabBarController(val activity: FragmentActivity) {
         commitPages()
         (more as? CYLTabBarMoreListFragment)?.cyl_reloadRows()
         tabBar.refreshSelection()
+        // [EN] The tab selected before goes back to its unselected look, its animation too, as for the plus button's page: "More" has no
+        //      animation of its own, so the select path that stops the other tabs never ran and the previous tab kept playing.
+        // [CN] 之前选中的 Tab 恢复未选中外观（包括其动画），与 PlusButton 的页面相同：「更多」自己没有动画，停止其他 Tab 的选中路径不会执行，上一个 Tab 会继续播放。
+        tabBar.cyl_stopAnimationsOfAllTabBarItemsExcept(button)
         cyl_playTabButtonAnimationForControl(button)
         cyl_playTabButtonTapFeedback()
         delegate?.tabBarController_didSelectViewController(this, more)
