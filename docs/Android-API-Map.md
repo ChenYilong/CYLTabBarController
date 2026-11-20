@@ -1938,3 +1938,11 @@
 | `CYLTabBar.cyl_itemWidthWeights` | Tab widths by weight / 按权重分配宽度 |
 | `CYLTabBarController.cyl_swipesBetweenPages` | Swipe between pages / 滑动翻页 |
 | `CYLTabBarController.cyl_setupWithViewPager2` | Pages in a ViewPager2 / 页面放进 ViewPager2 |
+| `CYLRemoteConfigSource` | A remote configuration service that fetches its values (the Firebase adapter implements it) / 拉取值的远程配置服务（Firebase 适配器实现它） |
+| `CYLRemoteConfigPayload` | What a service delivered: identifier, values by key, value types / 服务下发的内容：标识、按 key 的值、值类型 |
+| `CYLRemoteConfigValueType` | STRING, NUMBER, BOOLEAN or JSON, as a Remote Config template names it / STRING、NUMBER、BOOLEAN 或 JSON，与 Remote Config 模板同名 |
+| `CYLRemoteConfigMapper` | Maps a service's payload into the library's configuration dictionary / 把服务下发的内容映射为本库的配置字典 |
+| `CYLRemoteConfigMappers` | The mappers by service identifier; register another service's / 按服务标识保存的映射器，可注册其他服务的 |
+| `CYLFirebaseRemoteConfigMapper` | The mapper of Firebase Remote Config values / Firebase Remote Config 值的映射器 |
+| `CYLRemoteConfigLoader` | Fetch policy: the defaults, the fetched values over them, never a broken tab bar / 拉取策略：默认值，拉取的值覆盖其上，不会得到坏掉的 TabBar |
+| `CYLRemoteConfigResult` | The configuration to build from, whether the fetched values are in it, and why not / 用于构建的配置、是否包含拉取的值，以及没有包含的原因 |

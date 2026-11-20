@@ -149,12 +149,23 @@ object CYLTabBarConfiguration {
         } catch (error: CYLTabBarConfigurationException) {
             throw CYLConfigurationException(CYLTabBarConfigurationError.of(error.code), error.message ?: error.code.name)
         }
+        requireTabs(configuration)
+        return configuration
+    }
+
+    /**
+     * [EN] Throws `NoTabs` when `configuration` has no tab. Shared by the Remote Config entry points: a value set alone must have
+     *      tabs, and so must the remote values merged over the defaults (`CYLRemoteConfigLoader`).
+     * [CN] `configuration` 没有 Tab 时抛出 `NoTabs`。Remote Config 的各入口共用：单独的一组值必须有 Tab，合并到默认值之上的远程值同样如此
+     *      （`CYLRemoteConfigLoader`）。
+     */
+    @Throws(CYLConfigurationException::class)
+    internal fun requireTabs(configuration: Map<String, Any?>) {
         val items = configuration[CYLConstants.CYLTabBarControllerTabBarItemsAttributes]
         if (items !is Map<*, *> && (items as? List<*>)?.any { it is Map<*, *> } != true) {
             throw CYLConfigurationException(CYLTabBarConfigurationError.NoTabs,
                 "The configuration has no tab: CYLTabBarControllerTabBarItemsAttributes is missing or empty.")
         }
-        return configuration
     }
 
     /**
