@@ -1360,4 +1360,29 @@
     XCTAssertNil(window, @"no window yet: nil, as the Objective-C method returned");
 }
 
+/// [EN] The initializer taking a configuration file (`try CYLTabBarController(configurationFile:)` in Swift) sets the controller up
+///      during `init`, when its tab bar must already be the library's `CYLTabBar`: a checked downcast of `tabBar` trapped here
+///      at launch of CYLSearchViewController's example (Debug).
+/// [CN] 接收配置文件的初始化方法（Swift 中的 `try CYLTabBarController(configurationFile:)`）在 `init` 期间完成设置，此时 `tabBar`
+///      必须已是本库的 `CYLTabBar`：对 `tabBar` 做检查式向下转换会在 CYLSearchViewController 示例启动时（Debug）陷入陷阱。
+- (void)testInitWithConfigurationFileSetsUpWithoutTrapping {
+    NSString *folder = [NSTemporaryDirectory() stringByAppendingPathComponent:NSUUID.UUID.UUIDString];
+    XCTAssertTrue([NSFileManager.defaultManager createDirectoryAtPath:folder withIntermediateDirectories:YES attributes:nil error:NULL]);
+    NSString *json = @"{\"CYLTabBarControllerTabBarItemsAttributes\": ["
+                     @"{\"CYLTabBarItemIdentifier\": \"home\", \"CYLTabBarItemTitle\": \"Home\"},"
+                     @"{\"CYLTabBarItemIdentifier\": \"me\", \"CYLTabBarItemTitle\": \"Me\"}]}";
+    NSString *file = [folder stringByAppendingPathComponent:@"tabs.json"];
+    XCTAssertTrue([json writeToFile:file atomically:YES encoding:NSUTF8StringEncoding error:NULL]);
+    NSError *error = nil;
+    NSMutableDictionary *configuration = [[CYLTabBarController configurationWithContentsOfFile:file error:&error] mutableCopy];
+    XCTAssertNil(error);
+    configuration[CYLTabBarControllerPageResolver] = ^UIViewController *(NSString *pageIdentifier, NSDictionary *attributes) {
+        return [[UIViewController alloc] init];
+    };
+    CYLTabBarController *controller = [[CYLTabBarController alloc] initWithConfiguration:configuration];
+    XCTAssertNotNil(controller);
+    XCTAssertTrue([controller.tabBar isKindOfClass:[CYLTabBar class]], @"the library tab bar is in place");
+    XCTAssertEqual(controller.tabBarItemsAttributes.count, 2u);
+}
+
 @end

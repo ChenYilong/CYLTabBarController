@@ -202,7 +202,7 @@ open class CYLTabBarConfigurationTheme: NSObject, CYLTabBarTheme {
         return themed ? items : nil
     }
 
-    open func cyl_tabBarAppearance(for tabBarController: CYLTabBarController) -> UITabBarAppearance? {
+    open func cyl_tabBarAppearance(for _: CYLTabBarController) -> UITabBarAppearance? {
         let background = color(forName: CYLTabBarBackgroundColor)
         let shadow = color(forName: CYLTabBarShadowColor)
         let titleColor = color(forName: CYLTabBarItemTitleColor)

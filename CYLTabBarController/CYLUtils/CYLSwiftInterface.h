@@ -32,6 +32,12 @@
  * [CN] 生成的接口所用、目前仍为 Objective-C 的声明：必须先导入，因为第一个导入本文件的头文件可能还没有看到它们（第 21 步：
  *      `UIView (CYLBadgeExtention)` 遵守 `CYLBadgeProtocol` 并使用 `CYLBadgeAnimationType`）。这里只放不导入本模块其他头文件的头文件。
  */
+/*!
+ * [EN] `Ivar` (a parameter of the `cyl_is<Type>Ivar()` functions) comes from the Objective-C runtime header, which a build
+ *      without modules (React Native's) does not import by itself before the generated interface.
+ * [CN] `Ivar`（`cyl_is<Type>Ivar()` 函数的参数）来自 Objective-C 运行时头文件；不使用 modules 的构建（React Native）不会在生成的接口之前自动导入它。
+ */
+#import <objc/runtime.h>
 #if __has_include(<CYLTabBarController/CYLTabBarControllerTypedefs.h>)
 #import <CYLTabBarController/CYLTabBarControllerTypedefs.h>
 #elif __has_include("CYLTabBarControllerTypedefs.h")

@@ -218,7 +218,7 @@ open class CYLTabBarController: UITabBarController, CYLTabBarControllerDelegate,
     }
 
     /// [EN] Convenience, so a subclass that overrides `init(configuration:)` inherits every initializer. [CN] 便利初始化方法：重写了 `init(configuration:)` 的子类因此继承所有初始化方法。
-    public override convenience init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
+    public override convenience init(nibName _: String?, bundle _: Bundle?) {
         self.init(configuration: [:])
     }
 
@@ -320,6 +320,7 @@ open class CYLTabBarController: UITabBarController, CYLTabBarControllerDelegate,
     /// [EN] After a coder or nib initialization. [CN] 通过 coder 或 nib 初始化之后。
     @objc(cyl_didInitialize)
     open func cyl_didInitialize() {
+        // [EN] A hook for subclasses; the class itself has nothing to do after a coder or nib initialization. [CN] 供子类使用的钩子；通过 coder 或 nib 初始化之后，本类自身无需处理。
     }
 
     // MARK: - UIKit overrides
