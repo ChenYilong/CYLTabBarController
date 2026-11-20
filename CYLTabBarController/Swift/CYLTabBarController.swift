@@ -352,7 +352,7 @@ open class CYLTabBarController: UITabBarController, CYLTabBarControllerDelegate,
     ///      `unsafeDowncast` traps on it in a Debug build; `unsafeBitCast` never checks, as the Objective-C cast did.
     ///      启动崩溃：换成 `CYLTabBar` 之前 TabBar 还是普通 `UITabBar`，`unsafeDowncast` 在 Debug 构建中会崩溃；`unsafeBitCast` 不检查，与 Objective-C 的强制转换一致。
     open override var tabBar: CYLTabBar {
-        unsafeBitCast(super.tabBar, to: CYLTabBar.self)
+        unsafeBitCast(super.tabBar as AnyObject, to: CYLTabBar.self)
     }
 
     open override var isTabBarHidden: Bool {

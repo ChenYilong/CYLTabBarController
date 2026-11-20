@@ -353,8 +353,8 @@ extension CYLTabBar {
         guard let plusButton, cylTabBarHasPlusButton() else { return }
         cylTabBarStorage.plusButton = plusButton
         guard !isPlusButtonActive, plusButton.superview == nil else { return }
-        // [CN] TODO:  iOS26 考虑应该放进选中图层，而非粗暴放进最底层，这样未来可以 PlusButton 支持自定义index
-        // [EN] TODO:  On iOS26, consider putting this into the selected layer instead of crudely putting it at the bottom,
+        // [CN] 待改进：iOS26 考虑应该放进选中图层，而非粗暴放进最底层，这样未来可以 PlusButton 支持自定义index
+        // [EN] To improve: on iOS26, consider putting this into the selected layer instead of crudely putting it at the bottom,
         //      so that PlusButton can support a custom index in the future.
         cyl_addPlatterViewThenBringSubview(toFront: plusButton)
         isPlusButtonActive = true

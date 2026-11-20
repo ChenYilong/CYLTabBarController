@@ -208,8 +208,8 @@ public class CYLTabBarConfigurationParser: NSObject {
      * [CN] HTTP Content-Type 对应的格式；无法确定时为 `.unknown`（XML 也可能是属性列表）。
      */
     @objc(formatForMIMEType:)
-    public class func format(forMIMEType MIMEType: String?) -> CYLTabBarConfigurationFormat {
-        let type = Text.trimmed(MIMEType?.components(separatedBy: ";").first?.lowercased() ?? "")
+    public class func format(forMIMEType mimeType: String?) -> CYLTabBarConfigurationFormat {
+        let type = Text.trimmed(mimeType?.components(separatedBy: ";").first?.lowercased() ?? "")
         if type.isEmpty {
             return .unknown
         }

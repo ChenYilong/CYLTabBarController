@@ -20,7 +20,7 @@ import UIKit
                                                 selectedImage: UIImage?) -> Bool
     /// [EN] The tab's FlatDesign item plays `URL`. [CN] 该 Tab 的扁平样式 item 播放 `URL`。
     @objc(cyl_flatDesignSetAnimationURL:ofViewController:)
-    optional func cylFlatDesignSetAnimationURL(_ URL: URL, of viewController: UIViewController)
+    optional func cylFlatDesignSetAnimationURL(_ url: URL, of viewController: UIViewController)
 }
 
 /**

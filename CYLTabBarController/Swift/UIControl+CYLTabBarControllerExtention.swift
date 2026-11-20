@@ -653,9 +653,9 @@ extension UIControl {
             completion?(false, self, newView)
             return
         }
-        // [EN] TODO: tell the cover and the replace cases apart and decide whether to limit the new view's size; it is not
+        // [EN] Open question: tell the cover and the replace cases apart and decide whether to limit the new view's size; it is not
         //      limited for now, as covering is the main case. A size set on `newView` decides how large it shows.
-        // [CN] TODO：区分覆盖与替换两种场景，决定是否限制新视图尺寸；目前不限制，因为主要场景为覆盖。`newView` 设置的尺寸决定其显示大小。
+        // [CN] 待定：区分覆盖与替换两种场景，决定是否限制新视图尺寸；目前不限制，因为主要场景为覆盖。`newView` 设置的尺寸决定其显示大小。
         if newView.frame.width == 0 || newView.frame.height == 0 {
             if cyl_tabBarController?.adjustTabBarItemImageViewSizeDependOnSuperView == true {
                 newView.frame.size = frame.size
