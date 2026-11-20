@@ -99,7 +99,8 @@ class CYLAnimatedItemCountdownViewTest {
 
     @Test
     fun aNewViewWithTheSameCacheKeyContinuesTheCountdown() {
-        val clock = Clock(1_000)
+        // [EN] `Clock(millis)` takes milliseconds and `set(seconds)` seconds: start at 1000 s, then 42 s later. [CN] `Clock(millis)` 以毫秒计，`set(seconds)` 以秒计：从 1000 秒开始，42 秒后。
+        val clock = Clock(1_000_000)
         val storage = MemoryStorage()
         val first = makeView(clock, storage)
         first.countdownCacheKey = "sms-code"
