@@ -84,7 +84,9 @@ object CYLTabBarConfiguration {
         return imageResolver.drawable(context, name)
     }
 
-    /** [EN] The density (dpi) of an image file from its @2x / @3x suffix. [CN] 根据 @2x / @3x 后缀得到图片文件的密度（dpi）。 */
+    /**
+     * [EN] The density (dpi) of an image file from its @2x / @3x suffix. [CN] 根据 @2x / @3x 后缀得到图片文件的密度（dpi）。
+     */
     internal fun densityOfImageName(path: String): Int {
         val scale = Regex("@(\\d)x\\.[A-Za-z]+$").find(path)?.groupValues?.get(1)?.toIntOrNull() ?: 1
         return android.util.DisplayMetrics.DENSITY_MEDIUM * scale

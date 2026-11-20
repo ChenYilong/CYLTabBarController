@@ -97,13 +97,51 @@ const CYL_PATH_COMMANDS = {
   },
 }
 
+// [EN] One SVG path number ("-12", ".5", "12.5", "1e-3"), matched on its own (the `y` sticky flag anchors it to one
+//      position) instead of inside one regex alternated with the command letters: a single-purpose regex has a lower
+//      complexity than a combined one (SonarCloud javascript:S5843), and `cylSVGPathTokens` below matches the exact
+//      same tokens as the earlier combined regex.
+// [CN] 单独匹配的一个 SVG 路径数字（"-12"、".5"、"12.5"、"1e-3"，`y` 粘滞标志把它锚定在一个位置），而不是放进一个与命令字母
+//      做选择的正则里：只做一件事的正则复杂度更低（SonarCloud javascript:S5843），下面的 `cylSVGPathTokens` 与之前的组合正则
+//      匹配出的 token 完全相同。
+const CYL_SVG_PATH_NUMBER = /-?(?:\d+\.?\d*|\.\d+)(?:e[-+]?\d+)?/y
+const CYL_SVG_PATH_LETTER = /[a-zA-Z]/
+
+/**
+ * [EN] The command letters and numbers of an SVG path, in order; a character that is neither (whitespace, a comma) is
+ *      skipped, as `String.match` of the earlier combined regex also skipped it.
+ * [CN] SVG 路径中按顺序出现的命令字母与数字；既不是字母也不是数字的字符（空白、逗号）被跳过，与之前组合正则的 `String.match`
+ *      行为一致。
+ */
+function cylSVGPathTokens(d) {
+  const text = String(d || '')
+  const tokens = []
+  let index = 0
+  while (index < text.length) {
+    if (CYL_SVG_PATH_LETTER.test(text[index])) {
+      tokens.push(text[index])
+      index += 1
+      continue
+    }
+    CYL_SVG_PATH_NUMBER.lastIndex = index
+    const number = CYL_SVG_PATH_NUMBER.exec(text)
+    if (number && number[0].length > 0) {
+      tokens.push(number[0])
+      index += number[0].length
+    } else {
+      index += 1
+    }
+  }
+  return tokens
+}
+
 /**
  * [EN] Parses an SVG path ("M0 0 L10 10 C … Z") into absolute commands: M, L, C, Q, Z (H, V, S, T, A and the relative
  *      forms are converted; an arc becomes a straight line to its end point).
  * [CN] 把 SVG 路径（"M0 0 L10 10 C … Z"）解析为绝对命令：M、L、C、Q、Z（H、V、S、T、A 与相对形式会被转换；圆弧变为到终点的直线）。
  */
 function cylParsePath(d) {
-  const tokens = String(d || '').match(/[a-zA-Z]|-?(?:\d+\.?\d*|\.\d+)(?:e[-+]?\d+)?/g) || []
+  const tokens = cylSVGPathTokens(d)
   const p = {
     commands: [], index: 0, command: '', x: 0, y: 0, startX: 0, startY: 0, lastControlX: 0, lastControlY: 0, lastType: '',
   }
