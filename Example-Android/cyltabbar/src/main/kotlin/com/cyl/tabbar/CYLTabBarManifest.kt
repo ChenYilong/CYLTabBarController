@@ -412,9 +412,24 @@ class CYLTabBarManifest private constructor(
 }
 
 /**
- * [EN] Firebase Remote Config's expression subset: device.os, app.version, device.language, percent. [CN] Firebase Remote Config 表达式的子集。
+ * [EN] Firebase Remote Config's expression subset: device.os, app.version, device.language, percent, and dateTime
+ *      (`dateTime >= dateTime('2026-12-20T00:00:00', 'Pacific/Auckland') && dateTime < dateTime('2027-01-02T00:00:00')`).
+ *      Remote Config compares dateTime with "the time of the last fetch the device performs", on the server; here the
+ *      manifest is already on the device, so it is compared with the device's clock when the manifest is read. A time
+ *      without a zone is in the device's time zone (Remote Config's page does not say which zone it takes); a time with
+ *      "Z" or an offset is exact.
+ * [CN] Firebase Remote Config 表达式的子集：device.os、app.version、device.language、percent，以及 dateTime
+ *      （`dateTime >= dateTime('2026-12-20T00:00:00', 'Pacific/Auckland') && dateTime < dateTime('2027-01-02T00:00:00')`）。Remote Config 在服务端把 dateTime
+ *      与"设备最后一次拉取的时间"比较；这里的清单已经在设备上，因此在读取清单时与设备时钟比较。不带时区的时间使用设备的时区（Remote Config 的页面没有说明用哪个时区）；
+ *      带 "Z" 或偏移量的时间是确定的时刻。
  */
 internal object CYLManifestConditions {
+    /**
+     * [EN] The clock the dateTime conditions read; a test sets it. [CN] dateTime 条件读取的时钟；测试可以设置。
+     */
+    internal var clock: () -> Long = { System.currentTimeMillis() }
+
+    private val dateTime = Regex("""^dateTime\s*(==|!=|>=|<=|>|<)\s*dateTime\(\s*'([^']+)'\s*(?:,\s*'([^']+)'\s*)?\)$""")
     private val comparison = Regex("""^(device\.os|app\.version|percent)\s*(==|!=|>=|<=|>|<)\s*(.+)$""")
     private val between = Regex("""^percent\s+between\s+(\d+)\s+and\s+(\d+)$""")
     private val language = Regex("""^device\.language\s+in\s+\[(.*)]$""")
@@ -437,7 +452,31 @@ internal object CYLManifestConditions {
         return preferences.getInt("percentile", 0)
     }
 
+    /**
+     * [EN] The moment `text` names: an ISO 8601 time with "Z" or an offset, else a local time in `zone` (default: the device's). Null when it does not parse.
+     * [CN] `text` 表示的时刻：带 "Z" 或偏移量的 ISO 8601 时间，否则是 `zone`（默认设备时区）中的本地时间。无法解析时为 null。
+     */
+    private fun moment(text: String, zone: String?): Long? {
+        if (Regex("""(Z|[+-]\d{2}:?\d{2})$""").containsMatchIn(text)) {
+            val normalized = text.replace(Regex("Z$"), "+0000").replace(Regex("""([+-]\d{2}):(\d{2})$"""), "$1$2")
+            val exact = java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.US).apply { isLenient = false }
+            return runCatching { exact.parse(normalized)?.time }.getOrNull()
+        }
+        val format = java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US)
+        format.isLenient = false
+        if (zone != null) format.timeZone = java.util.TimeZone.getTimeZone(zone).takeIf { it.id == zone } ?: return null
+        return runCatching { format.parse(text)?.time }.getOrNull()
+    }
+
     private fun element(context: Context, text: String): Boolean {
+        dateTime.matchEntire(text)?.let { match ->
+            val target = moment(match.groupValues[2], match.groupValues[3].takeIf { it.isNotEmpty() })
+            if (target == null) {
+                android.util.Log.w("CYLTabBarController", "manifest: the time of \"$text\" cannot be read; the condition is false")
+                return false
+            }
+            return compare(clock().compareTo(target), match.groupValues[1])
+        }
         comparison.matchEntire(text)?.let { match ->
             val (subject, operator, raw) = match.destructured
             val value = unquoted(raw)
