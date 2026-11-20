@@ -440,7 +440,31 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
         let left = end.timeIntervalSince(cyl_now)
         return left > 0 ? Int(ceil(left)) : 0
     }
+    /**
+     [EN] A key that keeps the running countdown in `countdownCacheStore`, so it survives the app being ended in the background
+          (or quit) and started again: a view with the same key, in the countdown style, takes it up again, with the seconds
+          that passed meanwhile counted. The cache holds the start, the end and the longest duration; it is dropped when the
+          time is up, on `resetCountdown()`, and when it is no longer valid (see `refreshCountdown()`). nil (default): nothing
+          is kept. Use one key per thing counted, e.g. one per phone number.
+     [CN] 用于把运行中的倒计时保存到 `countdownCacheStore` 的 key，使倒计时在 App 于后台被结束（或退出）后再次启动时仍然有效：
+          样式为倒计时且 key 相同的视图会接着倒计时，期间经过的秒数同样计入。缓存保存开始时间、结束时间与最长时长；时间到、
+          `resetCountdown()` 以及缓存失效（见 `refreshCountdown()`）时丢弃。nil（默认）：不保存。每个被计时的对象使用一个 key，例如每个手机号一个。
+     */
+    public var countdownCacheKey: String? {
+        didSet {
+            guard countdownCacheKey != oldValue else { return }
+            if let old = oldValue { countdownCacheStore.removeObject(forKey: Self.cyl_countdownCacheName(old)) }
+            if countdownState == .running {
+                cyl_saveCountdownToCache()
+            } else {
+                cyl_restoreCountdownFromCache()
+            }
+        }
+    }
+    /** [EN] Where the cache is kept: `UserDefaults.standard` by default; an app group's suite, or one for tests. [CN] 缓存的保存位置：默认为 `UserDefaults.standard`；也可以是 App Group 的 suite，或测试用的 suite。 */
+    public var countdownCacheStore: UserDefaults = .standard
     private var countdownTimer: Timer?
+    private var countdownStartDate: Date?
     private var countdownShownSeconds = -1
     private var countdownRunDuration: TimeInterval = 0
     private var countdownRestingTitleColor: UIColor?
@@ -1149,6 +1173,7 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
             titleLabel.font = UIFont.preferredFont(forTextStyle: .body)
             cyl_showCountdownIdleOrFinishedTitle()
             cyl_applyCountdownAppearance()
+            cyl_restoreCountdownFromCache()
         } else {
             resetCountdown()
             layer.cornerRadius = 0
@@ -1224,19 +1249,28 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
             return
         }
         if style != .countdown { style = .countdown }
+        let start = cyl_now
+        cyl_beginCountdown(start: start, end: start.addingTimeInterval(duration), duration: duration, announcesStart: true)
+    }
+
+    /// [EN] Enters the running state for `start`...`end`; `announcesStart` is false when a cached countdown is taken up again.
+    /// [CN] 进入 `start`…`end` 的运行状态；接续缓存的倒计时时 `announcesStart` 为 false。
+    private func cyl_beginCountdown(start: Date, end: Date, duration: TimeInterval, announcesStart: Bool) {
         if countdownState != .running {
             // [EN] The color to go back to when the time is up, taken before the running color replaces it.
             // [CN] 时间到之后要恢复的颜色，在倒计时颜色替换它之前取得。
             countdownRestingTitleColor = titleLabel.textColor
         }
         countdownRunDuration = duration
-        countdownEndDate = cyl_now.addingTimeInterval(duration)
+        countdownStartDate = start
+        countdownEndDate = end
         countdownState = .running
         countdownShownSeconds = -1
         isEnabled = false
+        cyl_saveCountdownToCache()
         cyl_startCountdownTimer()
         cyl_updateIcon()
-        delegate?.animatedItemViewDidStartCountdown?(self)
+        if announcesStart { delegate?.animatedItemViewDidStartCountdown?(self) }
         refreshCountdown()
         cyl_contentDidChange()
     }
@@ -1248,6 +1282,8 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
         let wasRunning = countdownState == .running
         cyl_stopCountdownTimer()
         countdownEndDate = nil
+        countdownStartDate = nil
+        cyl_clearCountdownCache()
         countdownState = .idle
         if wasRunning {
             isEnabled = true
@@ -1266,13 +1302,18 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
      [CN] 立即读取时钟：按需 tick，例如 App 返回前台后（控件自己会做）。
      */
     @objc open func refreshCountdown() {
-        guard countdownState == .running, let end = countdownEndDate else { return }
-        let left = end.timeIntervalSince(cyl_now)
-        guard left > 0 else {
+        guard countdownState == .running, let start = countdownStartDate, let end = countdownEndDate else { return }
+        let now = cyl_now
+        let left = end.timeIntervalSince(now)
+        // [EN] Closed when the time is up, and also when the local clock is no longer plausible for this countdown: the clock
+        //      was set back to before the start (a left time longer than the longest duration, which was recorded at the
+        //      start). The control is then enabled again and a new countdown can start. A second of tolerance for clock sync.
+        // [CN] 时间到时关闭；本地时钟对这次倒计时不再合理时也关闭：时钟被调回到开始之前（剩余时间超过开始时记录的最长时长）。
+        //      此时控件恢复可用，可以重新开始倒计时。允许 1 秒的时钟同步误差。
+        guard left > 0, now.timeIntervalSince(start) >= -1, left <= countdownRunDuration + 1 else {
             cyl_finishCountdown()
             return
         }
-        // [EN] Never more than the duration, if the clock was set back meanwhile. [CN] 如果期间系统时间被调回，也不会超过总时长。
         let seconds = min(Int(ceil(left)), Int(ceil(countdownRunDuration)))
         guard seconds != countdownShownSeconds else { return }
         countdownShownSeconds = seconds
@@ -1284,6 +1325,8 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
     private func cyl_finishCountdown() {
         cyl_stopCountdownTimer()
         countdownEndDate = nil
+        countdownStartDate = nil
+        cyl_clearCountdownCache()
         countdownState = .finished
         isEnabled = true
         cyl_restoreCountdownTitleColor()
@@ -1295,6 +1338,41 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
             UIAccessibility.post(notification: .announcement, argument: countdownFinishedTitle)
         }
         delegate?.animatedItemViewDidFinishCountdown?(self)
+    }
+
+    private static func cyl_countdownCacheName(_ key: String) -> String {
+        "CYLAnimatedItemCountdown.\(key)"
+    }
+
+    /// [EN] Keeps the running countdown (start, end, longest duration) when `countdownCacheKey` is set.
+    /// [CN] 设置了 `countdownCacheKey` 时保存运行中的倒计时（开始时间、结束时间、最长时长）。
+    private func cyl_saveCountdownToCache() {
+        guard let key = countdownCacheKey, let start = countdownStartDate, let end = countdownEndDate else { return }
+        countdownCacheStore.set(["start": start.timeIntervalSince1970, "end": end.timeIntervalSince1970, "duration": countdownRunDuration],
+                                forKey: Self.cyl_countdownCacheName(key))
+    }
+
+    private func cyl_clearCountdownCache() {
+        guard let key = countdownCacheKey else { return }
+        countdownCacheStore.removeObject(forKey: Self.cyl_countdownCacheName(key))
+    }
+
+    /// [EN] Takes up a cached countdown that is still valid by the local clock (not over, not from the future, not longer than
+    ///      the longest duration it recorded); an invalid one is dropped, and the control stays idle. Nothing is announced.
+    /// [CN] 接续按本地时钟仍然有效的缓存倒计时（未结束、不是来自未来、不超过其记录的最长时长）；无效的缓存被丢弃，控件保持待机。不触发开始回调。
+    private func cyl_restoreCountdownFromCache() {
+        guard style == .countdown, countdownState != .running, let key = countdownCacheKey,
+              let cached = countdownCacheStore.dictionary(forKey: Self.cyl_countdownCacheName(key)) as? [String: TimeInterval],
+              let start = cached["start"], let end = cached["end"], let duration = cached["duration"] else { return }
+        let now = cyl_now
+        let startDate = Date(timeIntervalSince1970: start)
+        let endDate = Date(timeIntervalSince1970: end)
+        guard duration > 0, endDate.timeIntervalSince(now) > 0, now.timeIntervalSince(startDate) >= -1,
+              endDate.timeIntervalSince(now) <= duration + 1 else {
+            countdownCacheStore.removeObject(forKey: Self.cyl_countdownCacheName(key))
+            return
+        }
+        cyl_beginCountdown(start: startDate, end: endDate, duration: duration, announcesStart: false)
     }
 
     /// [EN] The timer only schedules the reads; the end date decides. The app returning from the background reads the clock

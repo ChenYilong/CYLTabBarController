@@ -182,6 +182,110 @@ final class CYLAnimatedItemCountdownTests: XCTestCase {
         XCTAssertFalse(item.accessibilityTraits.contains(.notEnabled))
     }
 
+    // MARK: - The local clock and the cache 本地时钟与缓存
+
+    private let cacheSuite = "CYLAnimatedItemCountdownTests"
+
+    private func makeCachedItem(clock: CYLCountdownTestClock, delegate: CYLCountdownTestDelegate) -> CYLAnimatedItemView {
+        let item = makeItem(clock: clock, delegate: delegate)
+        item.countdownCacheStore = UserDefaults(suiteName: cacheSuite)!
+        item.countdownCacheKey = "sms-code"
+        return item
+    }
+
+    override func setUp() {
+        super.setUp()
+        UserDefaults(suiteName: cacheSuite)?.removePersistentDomain(forName: cacheSuite)
+    }
+
+    override func tearDown() {
+        UserDefaults(suiteName: cacheSuite)?.removePersistentDomain(forName: cacheSuite)
+        super.tearDown()
+    }
+
+    /**
+     * [EN] Issue #1, the owner's rule: when the app returns and the local clock is past the longest duration recorded at the
+     *      start, the countdown is closed and the control can be used again.
+     * [CN] issue #1 中所有者的要求：App 返回时，如果本地时钟已超过开始时记录的最长时长，则关闭倒计时，控件恢复可用。
+     */
+    func testAClockPastTheLongestDurationClosesTheCountdownAndTheControlIsUsableAgain() {
+        let clock = CYLCountdownTestClock(0)
+        let delegate = CYLCountdownTestDelegate()
+        let item = makeItem(clock: clock, delegate: delegate)
+        item.startCountdown(withDuration: 60)
+        clock.set(100_000)
+        NotificationCenter.default.post(name: UIApplication.willEnterForegroundNotification, object: nil)
+        XCTAssertEqual(item.countdownState, .finished)
+        XCTAssertTrue(item.isEnabled)
+        XCTAssertEqual(item.title, "Resend")
+        item.startCountdown()
+        XCTAssertEqual(item.countdownState, .running, "a new countdown can start")
+    }
+
+    /**
+     * [EN] A clock set back to before the start leaves more time than the longest duration: that is closed too, not shown.
+     * [CN] 时钟被调回到开始之前，剩余时间会超过最长时长：同样关闭，而不是显示出来。
+     */
+    func testAClockSetBackBeforeTheStartClosesTheCountdown() {
+        let clock = CYLCountdownTestClock(10_000)
+        let item = makeItem(clock: clock, delegate: CYLCountdownTestDelegate())
+        item.startCountdown(withDuration: 60)
+        clock.set(5_000)
+        item.refreshCountdown()
+        XCTAssertEqual(item.countdownState, .finished)
+        XCTAssertTrue(item.isEnabled)
+    }
+
+    /**
+     * [EN] The app is ended in the background and started again: a new view with the same key takes the countdown up, with the
+     *      seconds that passed counted, and announces no start.
+     * [CN] App 在后台被结束后再次启动：使用相同 key 的新视图接续倒计时，期间经过的秒数计入，且不触发开始回调。
+     */
+    func testACachedCountdownIsTakenUpAgainByANewView() {
+        let clock = CYLCountdownTestClock(1000)
+        let first = makeCachedItem(clock: clock, delegate: CYLCountdownTestDelegate())
+        first.startCountdown(withDuration: 60)
+        clock.set(1042)
+
+        let delegate = CYLCountdownTestDelegate()
+        let second = makeCachedItem(clock: clock, delegate: delegate)
+        XCTAssertEqual(second.countdownState, .running)
+        XCTAssertEqual(second.title, "18 s left")
+        XCTAssertFalse(second.isEnabled)
+        XCTAssertEqual(delegate.events, ["tick 18"], "no start is announced")
+        clock.set(1060)
+        second.refreshCountdown()
+        XCTAssertEqual(second.countdownState, .finished)
+    }
+
+    func testAnExpiredOrFinishedOrResetCountdownIsNotTakenUpAgain() {
+        let clock = CYLCountdownTestClock(1000)
+        let first = makeCachedItem(clock: clock, delegate: CYLCountdownTestDelegate())
+        first.startCountdown(withDuration: 60)
+        clock.set(2000)
+        XCTAssertEqual(makeCachedItem(clock: clock, delegate: CYLCountdownTestDelegate()).countdownState, .idle, "over meanwhile")
+
+        clock.set(3000)
+        let second = makeCachedItem(clock: clock, delegate: CYLCountdownTestDelegate())
+        second.startCountdown(withDuration: 60)
+        second.resetCountdown()
+        XCTAssertEqual(makeCachedItem(clock: clock, delegate: CYLCountdownTestDelegate()).countdownState, .idle, "a reset drops the cache")
+
+        let third = makeCachedItem(clock: clock, delegate: CYLCountdownTestDelegate())
+        third.startCountdown(withDuration: 60)
+        clock.set(3061)
+        third.refreshCountdown()
+        XCTAssertEqual(makeCachedItem(clock: clock, delegate: CYLCountdownTestDelegate()).countdownState, .idle, "finished drops the cache")
+    }
+
+    func testACachedCountdownFromTheFutureIsNotTakenUp() {
+        let clock = CYLCountdownTestClock(10_000)
+        let first = makeCachedItem(clock: clock, delegate: CYLCountdownTestDelegate())
+        first.startCountdown(withDuration: 60)
+        clock.set(2_000)
+        XCTAssertEqual(makeCachedItem(clock: clock, delegate: CYLCountdownTestDelegate()).countdownState, .idle, "the clock was set back")
+    }
+
     func testPlainStyleHasNoCountdownLook() {
         let item = CYLAnimatedItemView(frame: CGRect(x: 0, y: 0, width: 200, height: 44))
         item.title = "Home"
