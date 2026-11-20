@@ -236,7 +236,9 @@ Component({
     /** [EN] Stops the animation on its resting frame. [CN] 停止动画并显示静止帧。 */
     cyl_stopAnimation() {
       const view = this.cyl_animationView();
-      if (view && typeof view.cyl_stop === 'function') {
+      if (view && typeof view.stopAnimation === 'function') {
+        view.stopAnimation();
+      } else if (view && typeof view.cyl_stop === 'function') {
         view.cyl_stop();
       }
     },

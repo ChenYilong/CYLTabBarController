@@ -401,8 +401,32 @@ Component({
       const previous = this.cylLottieSelected;
       this.cylLottieSelected = selected;
       if (previous !== undefined && previous !== selected) {
+        // [EN] The iOS contract: a switch stops and resets every other tab first, then the selected one plays, so a tab tapped
+        //      mid-animation never keeps playing next to the new one (and exactly one tab looks selected).
+        // [CN] iOS 约定：切换时先停止并重置其他所有 Tab，再播放选中的 Tab，因此动画途中被切走的 Tab 不会与新 Tab 同时播放
+        //      （且只有一个 Tab 看起来是选中的）。
+        this.cyl_stopOtherAnimations(selected);
         this.cyl_playLottie(selected);
       }
+    },
+
+    /**
+     * [EN] Stops every tab except `selected` and shows its resting frame; a tab that loops while unselected
+     *      (CYLTabBarLottieLoopsWhenUnselected) keeps looping.
+     * [CN] 停止除 `selected` 以外的所有 Tab 并显示其静止帧；未选中时循环的 Tab（CYLTabBarLottieLoopsWhenUnselected）继续循环。
+     */
+    cyl_stopOtherAnimations(selected) {
+      const model = this.cylModel;
+      if (!model) {
+        return;
+      }
+      const keys = model.items.filter((item) => !item.lottie?.loopsWhenUnselected).map((item) => item.identifier);
+      keys.filter((key) => key !== selected).forEach((key) => {
+        const item = this.selectComponent(`#cyl-item-${key}`);
+        if (item && typeof item.cyl_stopAnimation === 'function') {
+          item.cyl_stopAnimation();
+        }
+      });
     },
 
     /**

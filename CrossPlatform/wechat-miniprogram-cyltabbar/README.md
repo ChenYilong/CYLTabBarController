@@ -79,6 +79,16 @@ minimum, hidden from accessibility, no gestures). Methods (through
 `selectComponent`): `playAnimation()` (from progress 0; a file still loading plays when ready), `restartAnimation()`,
 `stopAnimation()`. Events: `itemtap`, `itemlongpress`, `accessorytap`, `dragstart` / `dragmove` / `dragend`, and the engine's own, forwarded with its detail: `animationready` (e.g. `duration`), `animationcomplete` (a non-looping pass ended, e.g. to count repeats), `animationloopcomplete` (a looping pass ended), `animationerror` (`message`; the item still shows its image). GIF sends none of the four.
 
+## The tab switch contract
+
+The same as iOS (`CYLTabBar` / `CYLAnimatedItemView`): **a switch stops and resets every other tab first, then the selected tab
+plays.** After any switch exactly one tab is selected (its `selected` comes from the one `selectedIdentifier`), and every other tab is
+stopped on its unselected look (`restingProgress` frame or static image), also when the switch comes mid-animation or two taps arrive
+quickly. `cyl-tab-bar` does it in `cyl_syncLottie` (`cyl_stopOtherAnimations`, then `cyl_playLottie`); `cyl-animated-item` does it for
+itself when `selected` turns false (`cyl_halt`: cancel a play still waiting for the file, pause the engine, then the resting frame).
+Exception: a tab with `CYLTabBarLottieLoopsWhenUnselected` keeps looping. Engines must stop on `cyl_pause()` and cancel a pending
+`cyl_playFromStart`; a seek alone (`cyl_setProgress`) is not a stop. Tests: `test/cyl_tab_switch.test.js`.
+
 ## Layout
 
 | Path | What |
