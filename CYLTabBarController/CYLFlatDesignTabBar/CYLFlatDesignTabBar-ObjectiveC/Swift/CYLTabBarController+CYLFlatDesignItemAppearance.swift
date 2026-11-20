@@ -106,7 +106,12 @@ extension CYLTabBarController {
     @objc(cyl_recordDefaultStandardAppearance)
     func cylRecordDefaultStandardAppearance() {
         guard objc_getAssociatedObject(self, &cylDefaultStandardAppearanceKey) == nil else { return }
-        objc_setAssociatedObject(self, &cylDefaultStandardAppearanceKey, tabBar.standardAppearance, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+        // [EN] Through KVC, not the typed `tabBar`: this runs during `init`, before the library's `CYLTabBar` replaces UIKit's plain
+        //      `UITabBar` (a typed access trapped at launch of CYLSearchViewController's example). Only UIKit's property is read.
+        // [CN] 通过 KVC 而不是带类型的 `tabBar`：这在 `init` 期间运行，此时本库的 `CYLTabBar` 尚未替换 UIKit 的普通 `UITabBar`
+        //      （带类型的访问曾在 CYLSearchViewController 示例启动时陷入陷阱）。只读取 UIKit 的属性。
+        guard let systemTabBar = value(forKey: "tabBar") as? UITabBar else { return }
+        objc_setAssociatedObject(self, &cylDefaultStandardAppearanceKey, systemTabBar.standardAppearance, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
     }
 
     private func cylIsCustomizedStandardAppearance(_ appearance: UITabBarAppearance?) -> Bool {
