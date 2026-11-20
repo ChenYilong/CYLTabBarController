@@ -367,6 +367,8 @@ Component({
     },
 
     cyl_pause() {
+      // [EN] Also cancels a play that waits for the file. [CN] 同时取消仍在等待文件的播放。
+      this.cylPendingPlay = null
       if (this.cylAnimation) {
         this.cylAnimation.pause()
         this.cyl_syncSnapshot()

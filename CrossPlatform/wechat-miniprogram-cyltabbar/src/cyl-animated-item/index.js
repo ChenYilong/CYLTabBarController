@@ -223,7 +223,13 @@ Component({
     },
     'selected, restingProgress': function () {
       this.cyl_update()
-      if (!this.data.autoplay || this.data.gifFirstFrame || this.data.gifLastFrame) this.cyl_rest()
+      if (!this.data.autoplay || this.data.gifFirstFrame || this.data.gifLastFrame) {
+        // [EN] No longer selected: stop the engine (and any play still waiting for it) before showing the resting frame, so
+        //      two tabs never look selected (the iOS contract: a switch stops and resets the other tabs).
+        // [CN] 不再被选中：先停止引擎（以及仍在等待它的播放），再显示静止帧，避免两个 Tab 同时看起来是选中的（iOS 约定：切换时停止并重置其他 Tab）。
+        if (!this.data.selected) this.cyl_halt()
+        this.cyl_rest()
+      }
       // [EN] Another tab is selected: a playing GIF image rests. [CN] 选中了其他 Tab：正在播放的 GIF 图片回到静止。
       if (!this.data.selected && this.data.gifImagePlaying) this.cyl_restGIFImage()
     },
@@ -477,8 +483,23 @@ Component({
 
     /** [EN] Stops and shows the resting frame (iOS `stopAnimation`). [CN] 停止并显示静止帧（iOS 的 `stopAnimation`）。 */
     stopAnimation() {
-      this.cylPendingPlay = false
+      this.cyl_halt()
       this.cyl_rest()
+    },
+
+    /**
+     * [EN] Cancels a play that waits for the file and stops the engine where it is (a seek alone, `cyl_setProgress`, does not stop
+     *      SVGA or PAG, and Rive has no seek), so the resting frame that follows is the last thing drawn.
+     * [CN] 取消仍在等待文件的播放，并让引擎停在当前位置（单独的跳转 `cyl_setProgress` 不会停止 SVGA 或 PAG，Rive 也没有跳转），
+     *      这样随后显示的静止帧就是最后绘制的内容。
+     */
+    cyl_halt() {
+      this.cylPendingPlay = false
+      clearTimeout(this.cylGifTimer)
+      if (this.data.gifImagePlaying) this.cyl_restGIFImage()
+      if (!this.data.m.usesEngine || !this.data.animationLoaded) return
+      const engine = this.selectComponent(CYL_ENGINE_ID)
+      if (engine && typeof engine.cyl_pause === 'function') engine.cyl_pause()
     },
 
     /**
@@ -505,6 +526,9 @@ Component({
         engine.cyl_goToAndStop(Math.round(last * progress), true)
       } else if (typeof engine.cyl_rest === 'function') {
         engine.cyl_rest()
+      } else if (typeof engine.cyl_stop === 'function') {
+        // [EN] Rive: stopping resets its input, which is its resting state. [CN] Rive：停止会重置其输入，即静止状态。
+        engine.cyl_stop()
       }
     },
 
