@@ -10,7 +10,7 @@ import UIKit
 import CYLTabBarController
 
 /// [EN] The gallery is opened once at launch with `-CYLDemoGalleryScene`. [CN] 使用 `-CYLDemoGalleryScene` 时启动后只打开一次图库。
-private var CYLHomeDidOpenLaunchGallery = false
+private var cYLHomeDidOpenLaunchGallery = false
 
 /**
  [EN] The "Home" tab of the Objective-C example (Swift since docs/Swift-Migration.md step 112): buttons to rebuild the tab bar in
@@ -38,8 +38,8 @@ class CYLHomeViewController: CYLDemoBadgeTableViewController, UITabBarController
         super.viewDidAppear(animated)
         // [EN] `-CYLDemoGalleryScene 8.1`: opens the gallery once at launch, which opens that scene (screenshots).
         // [CN] `-CYLDemoGalleryScene 8.1`：启动时打开一次图库，再由图库打开该场景（用于截图）。
-        if !CYLHomeDidOpenLaunchGallery, CYLGalleryViewController.launchSceneNumber != nil, let navigationController {
-            CYLHomeDidOpenLaunchGallery = true
+        if !cYLHomeDidOpenLaunchGallery, CYLGalleryViewController.launchSceneNumber != nil, let navigationController {
+            cYLHomeDidOpenLaunchGallery = true
             navigationController.pushViewController(CYLGalleryViewController(), animated: false)
         }
     }

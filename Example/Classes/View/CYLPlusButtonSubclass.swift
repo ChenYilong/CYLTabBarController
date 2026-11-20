@@ -10,7 +10,7 @@ import UIKit
 import CYLTabBarController
 
 /// [EN] The demo plus button's width, in points. [CN] Demo PlusButton 的宽度（pt）。
-private let CYLDemoPlusButtonWidth: CGFloat = 55
+private let cYLDemoPlusButtonWidth: CGFloat = 55
 
 /**
  [EN] The Objective-C example's plus button, ported to Swift (docs/Swift-Migration.md, phase ②;
@@ -109,7 +109,7 @@ class CYLPlusButtonSubclass: CYLPlusButton, CYLPlusButtonSubclassing {
         configuration.imagePlacement = .top
         // [EN] `-setTitleColor:forState:` does nothing with a configuration: the color is fixed in the transformer.
         // [CN] 使用 configuration 时 `-setTitleColor:forState:` 不生效：颜色在 transformer 中给定。
-        let font = titleFont(fittingWidth: CYLDemoPlusButtonWidth)
+        let font = titleFont(fittingWidth: cYLDemoPlusButtonWidth)
         configuration.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { attributes in
             var attributes = attributes
             attributes.font = font
@@ -131,7 +131,7 @@ class CYLPlusButtonSubclass: CYLPlusButton, CYLPlusButtonSubclassing {
         button.setTitle(plusButtonTitle(), for: .normal)
         button.setTitle(plusButtonTitle(), for: [.selected, .highlighted])
         button.setTitleColor(selectedHighlightedTitleColor, for: [.selected, .highlighted])
-        button.bounds = CGRect(x: 0, y: 0, width: CYLDemoPlusButtonWidth, height: 80)
+        button.bounds = CGRect(x: 0, y: 0, width: cYLDemoPlusButtonWidth, height: 80)
 
         // [EN] With `+plusChildViewController`, do not add a target to the plus button.
         // [CN] 使用 `+plusChildViewController` 时，不要给 PlusButton 添加 target。
@@ -273,9 +273,9 @@ class CYLSecondPlusButtonSubclass: CYLPlusButtonSubclass {
 }
 
 /// [EN] Side of the X button, in points. [CN] X 按钮的边长（pt）。
-private let CYLCloseSubviewButtonSide: CGFloat = 22
+private let cYLCloseSubviewButtonSide: CGFloat = 22
 /// [EN] The X button's current color, shared with the copy in the Liquid Glass selected layer. [CN] X 按钮当前的颜色，与液态玻璃选中图层中的副本共用。
-private var CYLCloseSubviewCurrentColor: UIColor?
+private var cYLCloseSubviewCurrentColor: UIColor?
 
 /**
  [EN] Issue #202 demo: a third plus button, with its own context, carrying an X button at its top right. Tapping the X gives
@@ -305,11 +305,11 @@ class CYLCloseSubviewPlusButtonSubclass: CYLPlusButtonSubclass {
     override class func makePlusButton() -> CYLPlusButtonSubclass {
         let button = super.makePlusButton()
         guard let closeSubviewButton = button as? CYLCloseSubviewPlusButtonSubclass else { return button }
-        let configuration = UIImage.SymbolConfiguration(pointSize: CYLCloseSubviewButtonSide, weight: .bold)
+        let configuration = UIImage.SymbolConfiguration(pointSize: cYLCloseSubviewButtonSide, weight: .bold)
         let closeButton = UIButton(type: .custom)
         closeButton.setImage(UIImage(systemName: "xmark.circle.fill", withConfiguration: configuration)?.withRenderingMode(.alwaysTemplate),
                              for: .normal)
-        closeButton.tintColor = CYLCloseSubviewCurrentColor ?? .systemRed
+        closeButton.tintColor = cYLCloseSubviewCurrentColor ?? .systemRed
         closeButton.accessibilityLabel = "X"
         // [EN] A UIControl subview: the tab bar hands it its own touches (issue #202).
         // [CN] UIControl 子视图：TabBar 把它自己的触摸交给它（issue #202）。
@@ -330,14 +330,14 @@ class CYLCloseSubviewPlusButtonSubclass: CYLPlusButtonSubclass {
         super.layoutSubviews()
         // [EN] Top right, inside the bounds, above the image and the title. [CN] 右上角，在按钮范围内，位于图片与标题之上。
         guard let closeButton else { return }
-        closeButton.frame = CGRect(x: bounds.width - CYLCloseSubviewButtonSide, y: 0,
-                                   width: CYLCloseSubviewButtonSide, height: CYLCloseSubviewButtonSide)
+        closeButton.frame = CGRect(x: bounds.width - cYLCloseSubviewButtonSide, y: 0,
+                                   width: cYLCloseSubviewButtonSide, height: cYLCloseSubviewButtonSide)
         bringSubviewToFront(closeButton)
     }
 
     @objc func closeButtonTapped(_ sender: UIButton) {
         let color = UIColor(hue: CGFloat.random(in: 0..<1), saturation: 0.85, brightness: 0.9, alpha: 1)
-        CYLCloseSubviewCurrentColor = color
+        cYLCloseSubviewCurrentColor = color
         sender.tintColor = color
         // [EN] The Liquid Glass selected layer shows another instance (`selectedContentView`): keep it in step.
         // [CN] 液态玻璃的选中图层显示的是另一个实例（`selectedContentView`）：同步它的颜色。

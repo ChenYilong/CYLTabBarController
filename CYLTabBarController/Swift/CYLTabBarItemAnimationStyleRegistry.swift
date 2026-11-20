@@ -64,25 +64,25 @@ final class CYLTabBarItemAnimationStyleRegistry: NSObject, CYLTabBarItemAnimatio
         !darkURLs.isEmpty || !darkColors.isEmpty || !colors.isEmpty
     }
 
-    func hasStyleVariant(for URL: URL?) -> Bool {
-        guard let key = Self.key(URL) else { return false }
+    func hasStyleVariant(for url: URL?) -> Bool {
+        guard let key = Self.key(url) else { return false }
         return darkURLs[key] != nil || !(darkColors[key] ?? [:]).isEmpty || !(colors[key] ?? [:]).isEmpty
     }
 
-    func url(_ URL: URL?, for traitCollection: UITraitCollection?) -> URL? {
-        guard let URL else { return nil }
-        if traitCollection?.userInterfaceStyle == .dark, let key = Self.key(URL) {
-            return darkURLs[key] ?? URL
+    func url(_ url: URL?, for traitCollection: UITraitCollection?) -> URL? {
+        guard let url else { return nil }
+        if traitCollection?.userInterfaceStyle == .dark, let key = Self.key(url) {
+            return darkURLs[key] ?? url
         }
-        return URL
+        return url
     }
 
-    func darkColors(for URL: URL?) -> [String: UIColor]? {
-        Self.key(URL).flatMap { darkColors[$0] }
+    func darkColors(for url: URL?) -> [String: UIColor]? {
+        Self.key(url).flatMap { darkColors[$0] }
     }
 
-    func colors(for URL: URL?) -> [String: UIColor]? {
-        Self.key(URL).flatMap { colors[$0] }
+    func colors(for url: URL?) -> [String: UIColor]? {
+        Self.key(url).flatMap { colors[$0] }
     }
 }
 

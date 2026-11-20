@@ -9,11 +9,11 @@
 import UIKit
 import CYLAnimatedItem
 
-/// [EN] The animated item component on its own (docs/Animated-Item.md, TODO 6): four `CYLAnimatedItemView`s, one per
+/// [EN] The animated item component on its own (docs/Animated-Item.md, item 6): four `CYLAnimatedItemView`s, one per
 ///      display state: a GIF that plays, a static image (no animation file), the placeholder (a broken file, no image),
 ///      a remote GIF whose static image shows while it downloads, and a vertical item with an accessory icon that can be
 ///      dragged (it springs back), whose last event shows under it, as the Android demo's last item.
-/// [CN] 单独使用的动效组件（docs/Animated-Item.md，TODO 6）：四个 `CYLAnimatedItemView`，每个对应一种显示状态：播放中的 GIF、
+/// [CN] 单独使用的动效组件（docs/Animated-Item.md，item 6）：四个 `CYLAnimatedItemView`，每个对应一种显示状态：播放中的 GIF、
 ///      静态图片（没有动效文件）、占位图（文件损坏且没有图片）、远程 GIF（下载期间显示静态图片）；以及一个带附加图标、可拖拽（松手弹回）的
 ///      竖排组件，其最近的事件显示在下方，与 Android Demo 的最后一项相同。
 class MessageViewController: UIViewController, CYLAnimatedItemViewDelegate {

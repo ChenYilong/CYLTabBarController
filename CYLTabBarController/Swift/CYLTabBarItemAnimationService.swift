@@ -28,22 +28,22 @@ public protocol CYLTabBarItemAnimationStyleSource: NSObjectProtocol {
      * [EN] Whether the animation at `URL` has a variant.
      * [CN] `URL` 处的动画是否带有变体。
      */
-    @objc(hasStyleVariantForURL:) func hasStyleVariant(for URL: URL?) -> Bool
+    @objc(hasStyleVariantForURL:) func hasStyleVariant(for url: URL?) -> Bool
     /**
      * [EN] The file of the animation at `URL` for a trait collection (its dark file in dark mode).
      * [CN] `URL` 处的动画在某特征集合下对应的文件（深色模式下为其深色文件）。
      */
-    @objc(URL:forTraitCollection:) func url(_ URL: URL?, for traitCollection: UITraitCollection?) -> URL?
+    @objc(URL:forTraitCollection:) func url(_ url: URL?, for traitCollection: UITraitCollection?) -> URL?
     /**
      * [EN] The dark mode colors of the animation at `URL`.
      * [CN] `URL` 处动画的深色模式颜色。
      */
-    @objc(darkColorsForURL:) func darkColors(for URL: URL?) -> [String: UIColor]?
+    @objc(darkColorsForURL:) func darkColors(for url: URL?) -> [String: UIColor]?
     /**
      * [EN] The colors of the animation at `URL` in every mode.
      * [CN] `URL` 处动画在所有模式下的颜色。
      */
-    @objc(colorsForURL:) optional func colors(for URL: URL?) -> [String: UIColor]?
+    @objc(colorsForURL:) optional func colors(for url: URL?) -> [String: UIColor]?
 }
 
 /**
@@ -116,7 +116,7 @@ public protocol CYLTabBarItemAnimationService: NSObjectProtocol {
      * [CN] 向 `control` 添加 `URL` 处的动画。
      */
     @objc(addAnimationWithURL:size:contentMode:animationSpeed:toControl:)
-    func addAnimation(with URL: URL?, size: CGSize, contentMode: UIView.ContentMode, animationSpeed: CGFloat,
+    func addAnimation(with url: URL?, size: CGSize, contentMode: UIView.ContentMode, animationSpeed: CGFloat,
                       to control: UIControl)
     /**
      * [EN] Changes the speed of the animation of `control`.
@@ -133,7 +133,7 @@ public protocol CYLTabBarItemAnimationService: NSObjectProtocol {
      * [CN] 在 `control` 中播放 `URL` 处的动画。
      */
     @objc(playAnimationWithURL:size:defaultSelected:contentMode:inControl:)
-    func playAnimation(with URL: URL, size: CGSize, defaultSelected: Bool, contentMode: UIView.ContentMode,
+    func playAnimation(with url: URL, size: CGSize, defaultSelected: Bool, contentMode: UIView.ContentMode,
                        in control: UIControl)
     /**
      * [EN] Stops the animation of `control`.
@@ -150,13 +150,13 @@ public protocol CYLTabBarItemAnimationService: NSObjectProtocol {
      * [EN] Remembers that `URL` came from `attributes`.
      * [CN] 记录 `URL` 来自 `attributes`。
      */
-    @objc(bindAnimationURL:toAttributes:) func bindAnimationURL(_ URL: URL, toAttributes attributes: [AnyHashable: Any])
+    @objc(bindAnimationURL:toAttributes:) func bindAnimationURL(_ url: URL, toAttributes attributes: [AnyHashable: Any])
     /**
      * [EN] Replaces the animation of `control` with the one at `URL`.
      * [CN] 用 `URL` 处的动画替换 `control` 的动画。
      */
     @objc(replaceAnimationWithURL:size:contentMode:inControl:)
-    optional func replaceAnimation(with URL: URL, size: CGSize, contentMode: UIView.ContentMode, in control: UIControl)
+    optional func replaceAnimation(with url: URL, size: CGSize, contentMode: UIView.ContentMode, in control: UIControl)
     /**
      * [EN] Applies the current colors to the animation of `control`.
      * [CN] 将当前颜色应用到 `control` 的动画。

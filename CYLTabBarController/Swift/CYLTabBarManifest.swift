@@ -788,8 +788,8 @@ public class CYLTabBarManifestLoader: NSObject {
      * [CN] 下载 `URL` 处的清单及其资源，然后在主队列调用 `completion`，传入所应用的清单（远程、缓存或内置）以及导致回退的错误。
      */
     @objc(loadManifestWithURL:completion:)
-    public func loadManifest(with URL: URL, completion: @escaping CYLTabBarManifestCompletion) {
-        URLSession.shared.dataTask(with: URL) { data, _, downloadError in
+    public func loadManifest(with url: URL, completion: @escaping CYLTabBarManifestCompletion) {
+        URLSession.shared.dataTask(with: url) { data, _, downloadError in
             var error = downloadError
             var dictionary: [String: Any]?
             if let data {
@@ -816,7 +816,7 @@ public class CYLTabBarManifestLoader: NSObject {
             var saved: CYLTabBarManifest?
             if let remote, let data {
                 do {
-                    saved = try self.save(remote, data: data, from: URL)
+                    saved = try self.save(remote, data: data, from: url)
                 } catch let saveError {
                     error = saveError
                 }
@@ -830,7 +830,7 @@ public class CYLTabBarManifestLoader: NSObject {
         }.resume()
     }
 
-    private func save(_ manifest: CYLTabBarManifest, data _: Data, from URL: URL) throws -> CYLTabBarManifest {
+    private func save(_ manifest: CYLTabBarManifest, data _: Data, from url: URL) throws -> CYLTabBarManifest {
         let version = manifest.version ?? "0"
         if version.contains("/") || version.contains("..") {
             throw Values.error(.unsupportedManifest, "The manifest version is not a valid folder name.")
@@ -841,7 +841,7 @@ public class CYLTabBarManifestLoader: NSObject {
         try? manager.removeItem(atPath: staging)
         try? manager.createDirectory(atPath: staging, withIntermediateDirectories: true)
         let assets = Values.dictionary(manifest.dictionary, "assets")
-        let baseURL = Values.string(assets, "baseURL").flatMap { Foundation.URL(string: $0) } ?? URL.deletingLastPathComponent()
+        let baseURL = Values.string(assets, "baseURL").flatMap { Foundation.URL(string: $0) } ?? url.deletingLastPathComponent()
         var cached = manifest.dictionary
         var cachedAssets = assets ?? [:]
         cachedAssets["baseRoute"] = "."

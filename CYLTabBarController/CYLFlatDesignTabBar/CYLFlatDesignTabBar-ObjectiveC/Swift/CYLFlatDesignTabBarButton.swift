@@ -33,12 +33,12 @@ import CYLAnimatedItemViews
 /**
  * [EN] One tab of the FlatDesign tab bar: draws its item (image, title, background, badge, animation) and maps the
  *      bar's `UITabBarAppearance` onto it. It is the shared animated item component, `CYLAnimatedItemView`
- *      (docs/Animated-Item.md, TODO 4; Android: `CYLTabBarItemButton`): the item's image and title go into the
+ *      (docs/Animated-Item.md, item 4; Android: `CYLTabBarItemButton`): the item's image and title go into the
  *      component's content (`image`, `title`), shown by its `imageView` and `titleLabel` (the same properties the button
  *      had); the tab bar's own layout replaces the component's (`-layoutContentInRect:`), and the tab icon animation still
  *      comes from the tab bar. The component's long press is off: the tab bar handles its own gestures.
  * [CN] 扁平样式 TabBar 的一个 Tab：绘制其 item（图片、标题、背景、角标、动画），并把 TabBar 的 `UITabBarAppearance` 映射到其上。它就是共用的
- *      动效条目组件 `CYLAnimatedItemView`（docs/Animated-Item.md，TODO 4；Android 为 `CYLTabBarItemButton`）：item 的图片与标题写入组件的
+ *      动效条目组件 `CYLAnimatedItemView`（docs/Animated-Item.md，条目 4；Android 为 `CYLTabBarItemButton`）：item 的图片与标题写入组件的
  *      内容（`image`、`title`），由其 `imageView` 与 `titleLabel` 显示（与按钮原有的属性相同）；TabBar 自己的布局代替组件的布局
  *      （`-layoutContentInRect:`），Tab 图标动画仍由 TabBar 提供。组件的长按已关闭：TabBar 自行处理手势。
  */
@@ -433,11 +433,11 @@ open class CYLFlatDesignTabBarButton: CYLAnimatedItemView {
 
     // MARK: - [EN] Tab icon animation [CN] Tab 图标动画
 
-    // [EN] docs/Animated-Item.md TODO 4, second step: the component's animation is the tab's. The tab bar keeps making and
+    // [EN] docs/Animated-Item.md item 4, second step: the component's animation is the tab's. The tab bar keeps making and
     //      driving the tab's animation view (late failures, speed, loops, dark colors, themes, the classic tab bar shares
     //      it), and the component's animation members answer with that view, so callers and the component's own icon logic
     //      see one animation view; the component never makes or removes a second one.
-    // [CN] docs/Animated-Item.md TODO 4 第二步：组件的动画就是 Tab 的动画。Tab 的动画视图仍由 TabBar 创建与驱动（加载后失败、速度、循环、深色颜色、
+    // [CN] docs/Animated-Item.md item 4 第二步：组件的动画就是 Tab 的动画。Tab 的动画视图仍由 TabBar 创建与驱动（加载后失败、速度、循环、深色颜色、
     //      主题，经典 TabBar 也共用），组件的动画成员返回该视图，调用方与组件自己的图标逻辑看到的是同一个动画视图；组件从不创建或移除第二个。
 
     /**

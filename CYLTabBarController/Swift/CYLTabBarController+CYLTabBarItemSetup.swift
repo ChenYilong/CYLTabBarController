@@ -47,8 +47,8 @@ extension CYLTabBarController {
      * [CN] TabBar 能否播放 `URL`：存在的本地文件，且有其类型的 animator（引擎的 `-addAnimationWithURL:…`）。远程 URL、不存在的文件或构建中没有引擎时：
      *      显示 Tab 的图片，没有时显示占位图。
      */
-    private static func cylTabBarAnimationCanPlay(_ URL: URL) -> Bool {
-        guard URL.isFileURL, !URL.path.isEmpty, FileManager.default.fileExists(atPath: URL.path),
+    private static func cylTabBarAnimationCanPlay(_ url: URL) -> Bool {
+        guard url.isFileURL, !url.path.isEmpty, FileManager.default.fileExists(atPath: url.path),
               let registry = NSClassFromString("CYLTabBarItemAnimatorRegistry") as AnyObject? else {
             return false
         }
@@ -56,7 +56,7 @@ extension CYLTabBarController {
         guard registry.responds(to: selector) else {
             return false
         }
-        return registry.perform(selector, with: URL)?.takeUnretainedValue() != nil
+        return registry.perform(selector, with: url)?.takeUnretainedValue() != nil
     }
 
     /**

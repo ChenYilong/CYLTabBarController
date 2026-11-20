@@ -182,8 +182,8 @@ open class CYLTabBarHostView: UIView {
      * [EN] Sets the configuration from a JSON string; NO when it is not a JSON object. [CN] 用 JSON 字符串设置配置；不是 JSON 对象时返回 NO。
      */
     @discardableResult
-    @objc open func setConfigurationJSON(_ JSON: String?) -> Bool {
-        guard let data = JSON?.data(using: .utf8), !data.isEmpty,
+    @objc open func setConfigurationJSON(_ json: String?) -> Bool {
+        guard let data = json?.data(using: .utf8), !data.isEmpty,
               let parsed = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any] else {
             return false
         }
