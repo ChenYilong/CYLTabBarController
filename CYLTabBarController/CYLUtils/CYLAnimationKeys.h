@@ -360,21 +360,21 @@ FOUNDATION_EXTERN NSString *const CYLTabBarGIFDarkFilePath CYL_GIF_REQUIRED;
  * [CN] `attributes` 中 `genericKey`（`CYLTabBarAnimationURL`、`…FilePath`、`…Size`、`…DarkURL`、`…DarkFilePath`、`…DarkColors`）的值，
  *      取通用 key 或任一类型自己的 key（Lottie、PAG、Rive、SVGA、GIF），与该类型的引擎是否参与构建无关。用于在无法播放时也能找到 Tab 的文件。
  */
-FOUNDATION_EXTERN id _Nullable CYLAnimationAttributesValue(NSDictionary * _Nullable attributes, NSString *genericKey);
+FOUNDATION_EXTERN id _Nullable CYLAnimationAttributesValue(NSDictionary * _Nullable attributes, NSString *genericKey) CYL_NOEXCEPT;
 
 /*!
  * [EN] The animation type of a file: "Lottie", "PAG", "Rive", "SVGA" or "GIF", from the type keys in `attributes`, else from
  *      the file's extension; nil when unknown.
  * [CN] 文件的动画类型："Lottie"、"PAG"、"Rive"、"SVGA" 或 "GIF"，先看 `attributes` 中的类型 key，否则看文件扩展名；未知时为 nil。
  */
-FOUNDATION_EXTERN NSString * _Nullable CYLAnimationTypeOfFile(NSDictionary * _Nullable attributes, NSURL * _Nullable fileURL);
+FOUNDATION_EXTERN NSString * _Nullable CYLAnimationTypeOfFile(NSDictionary * _Nullable attributes, NSURL * _Nullable fileURL) CYL_NOEXCEPT;
 
 /*!
  * [EN] Whether the engine of `type` is in the build (`CYL_LOTTIE_AVAILABLE`, `CYL_PAG_AVAILABLE`, `CYL_RIVE_AVAILABLE`,
  *      `CYL_SVGA_AVAILABLE`, `CYL_GIF_AVAILABLE`, and the engine itself, `CYL_ANIMATION_ENGINE_AVAILABLE`).
  * [CN] `type` 的引擎是否参与构建（`CYL_LOTTIE_AVAILABLE` 等各类型开关，以及引擎本身 `CYL_ANIMATION_ENGINE_AVAILABLE`）。
  */
-FOUNDATION_EXTERN BOOL CYLAnimationTypeIsAvailable(NSString * _Nullable type);
+FOUNDATION_EXTERN BOOL CYLAnimationTypeIsAvailable(NSString * _Nullable type) CYL_NOEXCEPT;
 
 /*!
  * [EN] The animation types this library knows, in a fixed order: "Lottie", "PAG", "Rive", "SVGA", "GIF". Each name is also
@@ -383,7 +383,7 @@ FOUNDATION_EXTERN BOOL CYLAnimationTypeIsAvailable(NSString * _Nullable type);
  * [CN] 本库已知的动画类型，顺序固定："Lottie"、"PAG"、"Rive"、"SVGA"、"GIF"。每个名称也是其 animator 在 `CYLTabBarItemAnimatorRegistry`
  *      中的名称，因此注册表中缺少的类型就是未参与构建的引擎。
  */
-FOUNDATION_EXTERN NSArray<NSString *> *CYLAnimationKnownTypes(void);
+FOUNDATION_EXTERN NSArray *CYLAnimationKnownTypes(void) CYL_NOEXCEPT;
 
 /*!
  * [EN] The subspec that brings the engine of `type` (e.g. "LottieSwift" for "Lottie"), to add as
@@ -391,13 +391,13 @@ FOUNDATION_EXTERN NSArray<NSString *> *CYLAnimationKnownTypes(void);
  * [CN] 提供 `type` 引擎的子库（例如 "Lottie" 对应 "LottieSwift"），以 `pod 'CYLAnimatedItem/<子库>'` 或
  *      `pod 'CYLTabBarController/<子库>'` 加入；未知类型返回 nil。
  */
-FOUNDATION_EXTERN NSString * _Nullable CYLAnimationSubspecOfType(NSString * _Nullable type);
+FOUNDATION_EXTERN NSString * _Nullable CYLAnimationSubspecOfType(NSString * _Nullable type) CYL_NOEXCEPT;
 
 /*!
  * [EN] The file extensions of `type` (e.g. @[@"json", @"lottie"] for "Lottie"); empty for an unknown type.
  * [CN] `type` 的文件扩展名（例如 "Lottie" 为 @[@"json", @"lottie"]）；未知类型为空数组。
  */
-FOUNDATION_EXTERN NSArray<NSString *> *CYLAnimationFileExtensionsOfType(NSString * _Nullable type);
+FOUNDATION_EXTERN NSArray *CYLAnimationFileExtensionsOfType(NSString * _Nullable type) CYL_NOEXCEPT;
 
 /*!
  * [EN] In debug builds (`DEBUG`), logs once per type that a file cannot play because its engine is not in the build, with

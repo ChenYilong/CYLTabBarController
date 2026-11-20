@@ -229,7 +229,7 @@ FOUNDATION_EXTERN NSUInteger CYLTabbarItemsCount;
 
 FOUNDATION_EXTERN NSUInteger CYLPlusButtonIndex;
 
-FOUNDATION_EXTERN CGFloat CYLPlusButtonCurrentWidth(void);
+FOUNDATION_EXTERN CGFloat CYLPlusButtonCurrentWidth(void) CYL_NOEXCEPT;
 
 FOUNDATION_EXTERN CGFloat CYLTabBarItemWidth;
 
