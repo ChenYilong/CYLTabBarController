@@ -908,6 +908,10 @@ open class CYLTabBarController(val activity: FragmentActivity) {
         commitPages()
         (more as? CYLTabBarMoreListFragment)?.cyl_reloadRows()
         tabBar.refreshSelection()
+        // [EN] The tab selected before goes back to its unselected look, its animation too, as for the plus button's page: "More" has no
+        //      animation of its own, so the select path that stops the other tabs never ran and the previous tab kept playing.
+        // [CN] 之前选中的 Tab 恢复未选中外观（包括其动画），与 PlusButton 的页面相同：「更多」自己没有动画，停止其他 Tab 的选中路径不会执行，上一个 Tab 会继续播放。
+        tabBar.cyl_stopAnimationsOfAllTabBarItemsExcept(button)
         cyl_playTabButtonAnimationForControl(button)
         cyl_playTabButtonTapFeedback()
         delegate?.tabBarController_didSelectViewController(this, more)
@@ -1866,6 +1870,13 @@ open class CYLTabBarController(val activity: FragmentActivity) {
             if (controller.viewControllers.isEmpty()) throw CYLTabBarConfiguration.CYLConfigurationException(CYLTabBarConfiguration.CYLTabBarConfigurationError.NoPages, "no tab of $path found its page")
             return controller
         }
+
+        /**
+         * [EN] `+configurationWithRemoteConfigValues:error:`: a configuration from Firebase Remote Config values, without Firebase
+         *      (docs/Configuration-File.md, "Firebase Remote Config"). [CN] 根据 Firebase Remote Config 的值生成配置，不依赖 Firebase。
+         */
+        @JvmStatic @Throws(CYLTabBarConfiguration.CYLConfigurationException::class)
+        fun configurationWithRemoteConfigValues(values: Map<String, Any?>) = CYLTabBarConfiguration.configurationWithRemoteConfigValues(values)
 
         /**
          * [EN] `+configurationWithRoute:error:` / `+tabBarControllerWithConfigurationRoute:error:` (docs/Resource-Routes.md). [CN] 从资源路由创建。

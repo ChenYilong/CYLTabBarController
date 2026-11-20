@@ -17,7 +17,7 @@
 | 中文 | English |
 |:---|:---|
 | iOS 库的每个公开符号（公开头文件中的类、协议、方法、属性、常量、枚举、函数）及其 Android 版本（`Example-Android/cyltabbar`，Kotlin 与 Java）。状态：done 行为相同；partial 部分行为（见说明）；planned 尚未移植；n/a 仅 iOS（UIKit、扁平样式、液态玻璃、Core Animation 等），不计入完成率。 | Every public symbol of the iOS library (classes, protocols, methods, properties, constants, enums and functions of the public headers) with its Android version (`Example-Android/cyltabbar`, Kotlin and Java). Status: done, the same behavior; partial, part of it (see the note); planned, not ported yet; n/a, iOS only (UIKit, FlatDesign, Liquid Glass, Core Animation...), left out of the score. |
-| **迁移完成率：100 / 100**（done + 0.5 × partial，共 1068 个计入的符号；done 1062、partial 6、planned 0、n/a 387）。 | **Migration score: 100 / 100** (done + 0.5 × partial over 1068 counted symbols; done 1062, partial 6, planned 0, n/a 387). |
+| **迁移完成率：100 / 100**（done + 0.5 × partial，共 1069 个计入的符号；done 1063、partial 6、planned 0、n/a 387）。 | **Migration score: 100 / 100** (done + 0.5 × partial over 1069 counted symbols; done 1063, partial 6, planned 0, n/a 387). |
 
 ## 目录 / Contents
 
@@ -895,6 +895,7 @@
 | `CYLTabBarController(CYLConfiguration)` | `CYLTabBarController` | done |  |
 | `CYLTabBarController(CYLConfiguration)` `+cyl_normalizedConfiguration:` | `CYLTabBarController.cyl_normalizedConfiguration` | done |  |
 | `CYLTabBarController(CYLConfiguration)` `+configurationWithContentsOfFile:error:` | `CYLTabBarController.configurationWithContentsOfFile` | done | every format of CYLTabBarConfigurationParser; a path or an asset name |
+| `CYLTabBarController(CYLConfiguration)` `+configurationWithRemoteConfigValues:error:` | `CYLTabBarController.configurationWithRemoteConfigValues / CYLTabBarConfiguration.configurationWithRemoteConfigValues` | done | Firebase Remote Config values without Firebase (docs/Configuration-File.md); NoTabs when no tab is left |
 | `CYLTabBarController(CYLConfiguration)` `-initWithConfigurationFile:error:` | `CYLTabBarController(activity, file) / tabBarControllerWithConfigurationFile` | done | every format of CYLTabBarConfigurationParser; a path or an asset name |
 | `CYLTabBarController(CYLConfiguration)` `+tabBarControllerWithConfigurationFile:error:` | `CYLTabBarController.tabBarControllerWithConfigurationFile` | done |  |
 | `CYLTabBarController(CYLConfiguration)` `+configurationWithRoute:error:` | `CYLTabBarController.configurationWithRoute` | done | a resource route (docs/Resource-Routes.md); FileNotFound when no file matches |
@@ -1937,3 +1938,20 @@
 | `CYLTabBar.cyl_itemWidthWeights` | Tab widths by weight / 按权重分配宽度 |
 | `CYLTabBarController.cyl_swipesBetweenPages` | Swipe between pages / 滑动翻页 |
 | `CYLTabBarController.cyl_setupWithViewPager2` | Pages in a ViewPager2 / 页面放进 ViewPager2 |
+| `CYLRemoteConfigSource` | A remote configuration service that fetches its values (the Firebase adapter implements it) / 拉取值的远程配置服务（Firebase 适配器实现它） |
+| `CYLRemoteConfigPayload` | What a service delivered: identifier, values by key, value types / 服务下发的内容：标识、按 key 的值、值类型 |
+| `CYLRemoteConfigValueType` | STRING, NUMBER, BOOLEAN or JSON, as a Remote Config template names it / STRING、NUMBER、BOOLEAN 或 JSON，与 Remote Config 模板同名 |
+| `CYLRemoteConfigMapper` | Maps a service's payload into the library's configuration dictionary / 把服务下发的内容映射为本库的配置字典 |
+| `CYLRemoteConfigMappers` | The mappers by service identifier; register another service's / 按服务标识保存的映射器，可注册其他服务的 |
+| `CYLFirebaseRemoteConfigMapper` | The mapper of Firebase Remote Config values / Firebase Remote Config 值的映射器 |
+| `CYLRemoteConfigLoader` | Fetch policy: the defaults, the fetched values over them, never a broken tab bar / 拉取策略：默认值，拉取的值覆盖其上，不会得到坏掉的 TabBar |
+| `CYLRemoteConfigResult` | The configuration to build from, whether the fetched values are in it, and why not / 用于构建的配置、是否包含拉取的值，以及没有包含的原因 |
+| `CYLResourceRoute.Source` | Where a resource comes from: Bundle (default), Sandbox (downloaded), Local; named as Remote Config names a value source / 资源来源：Bundle（默认值）、Sandbox（下载）、Local；命名与 Remote Config 的值来源一致 |
+| `CYLResourceRoute.Location.source` | The source of the place a route leads to / 路由指向位置的来源 |
+| `CYLTabBarConfiguration.configurationWithRoutes` | The first of an ordered list of routes that leads to a configuration file / 有序路由列表中第一个指向配置文件的路由 |
+| `CYLTabBarConfiguration.sourceOfRoutes` | The source of the first route of a list that leads to a readable file / 列表中第一个指向可读文件的路由的来源 |
+| `CYLTabBarConfiguration.versionNumber` | The versionNumber of a configuration, or null / 配置的 versionNumber，没有时为 null |
+| `CYLConstants.CYLTabBarControllerConfigurationVersion` | The version of a configuration as a whole, as Remote Config versions a template / 整份配置的版本，与 Remote Config 对模板的版本管理一致 |
+| `CYLRemoteConfigLoader.MANIFEST_KEY` | The Remote Config parameter that holds a whole tab bar manifest as JSON / 以 JSON 保存完整 TabBar 清单的 Remote Config 参数 |
+| `CYLRemoteConfigResult.manifestSource` | Where the manifest of the CYLTabBarManifest parameter came from, or null / CYLTabBarManifest 参数中清单的来源，没有时为 null |
+| `CYLTabBarManifestLoader.loadManifestWithDictionary` | Loads a manifest already in hand (conditions not evaluated again, assets from assets.baseURL) / 加载已拿到手的清单（不再计算条件，资源来自 assets.baseURL） |

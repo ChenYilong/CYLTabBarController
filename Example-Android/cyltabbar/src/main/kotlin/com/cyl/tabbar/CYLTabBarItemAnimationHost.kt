@@ -289,9 +289,18 @@ fun View.cyl_isLottieAnimationView(): Boolean = CYLLottieTabBarItemAnimator.isAv
  */
 @JvmOverloads
 fun CYLTabBar.cyl_animationLottieImageWithSelectedControl(selectedControl: View?, lottieURL: String?, size: CYLSize?, defaultSelected: Boolean, contentMode: ImageView.ScaleType = ImageView.ScaleType.FIT_CENTER) {
+    cyl_stopAnimationsOfAllTabBarItemsExcept(selectedControl)
+    selectedControl?.cyl_playTabBarItemAnimationWithURL(lottieURL, size, defaultSelected, contentMode)
+}
+
+/**
+ * [EN] Stops the animation of every tab button and of the plus button except `selectedControl`; each tab switch does this first,
+ *      whichever tab is selected, so exactly one item looks selected, as on iOS. [CN] 停止除 `selectedControl` 外所有 Tab 按钮和 PlusButton 的动画；
+ *      每次切换 Tab 都先执行，不论选中哪个 Tab，保证只有一个 item 呈选中外观，与 iOS 一致。
+ */
+internal fun CYLTabBar.cyl_stopAnimationsOfAllTabBarItemsExcept(selectedControl: View?) {
     for (button in tabBarButtonArray) if (button !== selectedControl) button.cyl_stopTabBarItemAnimation()
     plusButton?.takeIf { it !== selectedControl }?.cyl_stopTabBarItemAnimation()
-    selectedControl?.cyl_playTabBarItemAnimationWithURL(lottieURL, size, defaultSelected, contentMode)
 }
 
 /**

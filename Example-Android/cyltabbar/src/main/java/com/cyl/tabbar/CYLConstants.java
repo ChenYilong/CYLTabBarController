@@ -210,6 +210,17 @@ public final class CYLConstants {
      * [CN] 指向 TabBar 配置清单的资源路由（CYLTabBarManifest）；其他键覆盖清单的配置。
      */
     public static final String CYLTabBarControllerManifestRoute = "CYLTabBarControllerManifestRoute";
+    /**
+     * [EN] The version of the configuration as a whole, as Firebase Remote Config versions a template: an object with
+     *      `versionNumber` (a whole number that only grows; a rollback publishes the old content under a new, higher number),
+     *      and optionally `updateTime` (ISO 8601), `description`, `updateOrigin` and `updateType`. A Remote Config template's
+     *      `version` is read into this key. A remote configuration with a lower number than the app's own is not applied
+     *      (docs/Configuration-File.md, "Versions and routes").
+     * [CN] 整份配置的版本，与 Firebase Remote Config 对模板的版本管理一致：对象，包含 `versionNumber`（只增不减的整数；回滚会以新的更大的编号
+     *      发布旧内容），以及可选的 `updateTime`（ISO 8601）、`description`、`updateOrigin`、`updateType`。Remote Config 模板的 `version` 会读入这个键。
+     *      编号低于 App 自带配置的远程配置不会被应用（docs/Configuration-File.md，“Versions and routes”）。
+     */
+    public static final String CYLTabBarControllerConfigurationVersion = "CYLTabBarControllerConfigurationVersion";
     public static final String CYLTabBarLocalizationTableName = "CYLTabBarLocalizationTableName";
     public static final String CYLTabBarLocalizationPath = "CYLTabBarLocalizationPath";
     public static final String CYLTabBarLocalizationBundleName = "CYLTabBarLocalizationBundleName";

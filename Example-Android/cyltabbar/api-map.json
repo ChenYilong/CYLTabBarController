@@ -6009,5 +6009,10 @@
  "CYLAnimationWarnMissingEngine()": {
   "status": "done",
   "android": "CYLAnimationEngines.warnMissingEngine"
+ },
+ "CYLTabBarController(CYLConfiguration) +configurationWithRemoteConfigValues:error:": {
+  "android": "CYLTabBarController.configurationWithRemoteConfigValues / CYLTabBarConfiguration.configurationWithRemoteConfigValues",
+  "note": "Firebase Remote Config values without Firebase (docs/Configuration-File.md); NoTabs when no tab is left",
+  "status": "done"
  }
 }

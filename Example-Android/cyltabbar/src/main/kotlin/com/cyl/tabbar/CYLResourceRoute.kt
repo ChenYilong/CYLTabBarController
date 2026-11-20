@@ -29,9 +29,18 @@ object CYLResourceRoute {
     const val ASSET_PREFIX = "asset:"
 
     /**
-     * [EN] Where a route leads: a path in the assets, or a file on disk. [CN] 路由指向的位置：assets 中的路径，或磁盘上的文件。
+     * [EN] Where a resource comes from, named as Firebase Remote Config names the source of a value
+     *      (`FirebaseRemoteConfig.VALUE_SOURCE_*`): `Bundle` is what the app ships (the defaults), `Sandbox` is what was
+     *      downloaded into the app's folders (the remote values), `Local` is any other local file ("file:", "/", "~/").
+     * [CN] 资源的来源，命名与 Firebase Remote Config 对值来源的命名一致（`FirebaseRemoteConfig.VALUE_SOURCE_*`）：`Bundle` 是 App 内置的（默认值），
+     *      `Sandbox` 是下载到 App 目录中的（远程值），`Local` 是其他本地文件（"file:"、"/"、"~/"）。
      */
-    class Location(val assetPath: String?, val file: File?) {
+    enum class Source { Bundle, Sandbox, Local }
+
+    /**
+     * [EN] Where a route leads: a path in the assets, or a file on disk, and its `source`. [CN] 路由指向的位置：assets 中的路径，或磁盘上的文件，以及其 `source`。
+     */
+    class Location(val assetPath: String?, val file: File?, val source: Source = Source.Local) {
         /**
          * [EN] A path `configurationWithContentsOfFile` reads (a file path or an asset name). [CN] `configurationWithContentsOfFile` 可读取的路径（文件路径或 asset 名称）。
          */
@@ -74,7 +83,7 @@ object CYLResourceRoute {
             ?: try { context.assets.list(location.assetPath.orEmpty())?.toList() } catch (error: java.io.IOException) { null }
             ?: return null
         val file = pickFile(names, name, query["theme"], query["version"], query["format"]) ?: return null
-        return location.file?.let { Location(null, File(it, file)) } ?: Location(join(location.assetPath.orEmpty(), file), null)
+        return location.file?.let { Location(null, File(it, file), location.source) } ?: Location(join(location.assetPath.orEmpty(), file), null, location.source)
     }
 
     /**
@@ -83,22 +92,22 @@ object CYLResourceRoute {
     private fun locationOf(context: Context, location: String, baseDirectory: String?): Location {
         val dataFolder = context.filesDir.parentFile ?: context.filesDir
         return when {
-            location.startsWith("bundle:") -> Location(location.removePrefix("bundle:").trim('/'), null)
+            location.startsWith("bundle:") -> Location(location.removePrefix("bundle:").trim('/'), null, Source.Bundle)
             location.startsWith("sandbox:") -> {
                 val rest = location.removePrefix("sandbox:").trimStart('/')
                 val remainder = if ('/' in rest) rest.substringAfter('/') else ""
                 when (rest.substringBefore('/')) {
-                    "Documents" -> Location(null, File(context.filesDir, remainder))
-                    "Caches", "tmp" -> Location(null, File(context.cacheDir, remainder))
-                    else -> Location(null, File(dataFolder, rest))
+                    "Documents" -> Location(null, File(context.filesDir, remainder), Source.Sandbox)
+                    "Caches", "tmp" -> Location(null, File(context.cacheDir, remainder), Source.Sandbox)
+                    else -> Location(null, File(dataFolder, rest), Source.Sandbox)
                 }
             }
             location.startsWith("file:") -> Location(null, File(runCatching { java.net.URI(location).path }.getOrNull() ?: location.removePrefix("file:")))
             location.startsWith("~/") -> Location(null, File(dataFolder, location.removePrefix("~/")))
             location.startsWith("/") -> Location(null, File(location))
-            baseDirectory != null && baseDirectory.startsWith(ASSET_PREFIX) -> Location(join(baseDirectory.removePrefix(ASSET_PREFIX), location), null)
+            baseDirectory != null && baseDirectory.startsWith(ASSET_PREFIX) -> Location(join(baseDirectory.removePrefix(ASSET_PREFIX), location), null, Source.Bundle)
             !baseDirectory.isNullOrEmpty() -> Location(null, File(baseDirectory, location))
-            else -> Location(location.trim('/'), null)
+            else -> Location(location.trim('/'), null, Source.Bundle)
         }
     }
 

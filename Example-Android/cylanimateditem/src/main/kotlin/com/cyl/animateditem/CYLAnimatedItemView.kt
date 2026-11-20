@@ -231,7 +231,9 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
     private var restingTitleColor: Int? = null
     private val countdownTicker = Runnable { tickCountdown() }
 
-    /** [EN] One tick: refreshes the title and schedules the next one while it runs. [CN] 一次滴答：刷新标题，运行期间安排下一次。 */
+    /**
+     * [EN] One tick: refreshes the title and schedules the next one while it runs. [CN] 一次滴答：刷新标题，运行期间安排下一次。
+     */
     private fun tickCountdown() {
         countdown.refresh()
         if (countdown.state == CYLAnimatedItemCountdownState.Running) postDelayed(countdownTicker, CYLAnimatedItemCountdown.TICK_INTERVAL_MILLIS)

@@ -1425,6 +1425,21 @@ extension CYLTabBarController {
         return configuration
     }
 
+    /**
+     * [EN] A configuration from Firebase Remote Config values, without Firebase (docs/Configuration-File.md, "Firebase
+     *      Remote Config"). Throws the parser's error for an invalid value, and `.noTabs` when no tab is left, so the app
+     *      keeps its defaults.
+     * [CN] 根据 Firebase Remote Config 的值生成配置，不依赖 Firebase（docs/Configuration-File.md，“Firebase Remote Config”）。值无效时抛出
+     *      解析器的错误，没有 Tab 时抛出 `.noTabs`，App 因此保留默认值。
+     */
+    class func cylConfiguration(remoteConfigValues values: [String: Any]) throws -> [String: Any] {
+        let configuration = try CYLTabBarConfigurationParser.dictionary(withRemoteConfigValues: values)
+        if let error = Values.tabsError(configuration) {
+            throw error
+        }
+        return configuration
+    }
+
     /** [EN] The path of a route, or a file-not-found error. [CN] 路由对应的路径；没有时抛出“文件不存在”错误。 */
     @objc(cyl_pathOfConfigurationRoute:error:)
     class func cylPathOfConfigurationRoute(_ route: Any?) throws -> String {
@@ -1627,6 +1642,18 @@ extension CYLTabBarController {
     @objc(configurationWithRoute:error:)
     open class func configuration(withRoute route: String) throws -> [String: Any] {
         try cylConfiguration(route: route)
+    }
+
+    /**
+     [EN] A configuration from Firebase Remote Config values, without Firebase (docs/Configuration-File.md, "Firebase
+          Remote Config"). Throws the parser's error for an invalid value, and `.noTabs` when no tab is left, so the app
+          keeps its defaults.
+     [CN] 根据 Firebase Remote Config 的值生成配置，不依赖 Firebase（docs/Configuration-File.md，“Firebase Remote Config”）。值无效时抛出
+          解析器的错误，没有 Tab 时抛出 `.noTabs`，App 因此保留默认值。
+     */
+    @objc(configurationWithRemoteConfigValues:error:)
+    open class func configuration(withRemoteConfigValues values: [String: Any]) throws -> [String: Any] {
+        try cylConfiguration(remoteConfigValues: values)
     }
 
     /**

@@ -102,6 +102,109 @@ static void CYLHostTestsTap(CYLPlusButton *plusButton) {
     XCTAssertEqualObjects([CYLTabBarConfigurationParser dictionaryWithData:text format:CYLTabBarConfigurationFormatProtobufText error:NULL][CYLTabBarControllerPlusButton], expected);
 }
 
+#pragma mark - Firebase Remote Config (docs/Configuration-File.md)
+
+/// [EN] The configuration the Remote Config tests compare with, as the `.json` file gives it. [CN] Remote Config 测试用来比较的配置，与 `.json` 文件读取的结果相同。
+static NSDictionary *CYLRemoteConfigExpectedConfiguration(void) {
+    NSString *json = @"{\"CYLTabBarControllerStyleType\": \"flatDesign\", \"CYLTabBarControllerContext\": \"remote\","
+                     @" \"CYLTabBarControllerTabBarItemsAttributes\": [{\"CYLTabBarItemIdentifier\": \"home\", \"CYLTabBarItemTitle\": \"Home\"},"
+                     @" {\"CYLTabBarItemIdentifier\": \"me\", \"CYLTabBarItemTitle\": \"Me\"}],"
+                     @" \"CYLTabBarControllerPlusButton\": {\"CYLTabBarItemTitle\": \"Post\", \"CYLTabBarItemImage\": \"post\"}}";
+    return [CYLTabBarConfigurationParser dictionaryWithData:[json dataUsingEncoding:NSUTF8StringEncoding]
+                                                     format:CYLTabBarConfigurationFormatJSON error:NULL];
+}
+
+/// [EN] The same configuration as Remote Config values: scalars as strings, nested values as JSON strings.
+/// [CN] 同样的配置，以 Remote Config 值表示：标量为字符串，嵌套的值为 JSON 字符串。
+static NSDictionary<NSString *, NSString *> *CYLRemoteConfigValues(void) {
+    return @{
+        @"CYLTabBarControllerStyleType" : @"flatDesign",
+        @"CYLTabBarControllerContext" : @"remote",
+        @"CYLTabBarControllerTabBarItemsAttributes" : @"[{\"CYLTabBarItemIdentifier\": \"home\", \"CYLTabBarItemTitle\": \"Home\"},"
+                                                      @" {\"CYLTabBarItemIdentifier\": \"me\", \"CYLTabBarItemTitle\": \"Me\"}]",
+        @"CYLTabBarControllerPlusButton" : @"{\"CYLTabBarItemTitle\": \"Post\", \"CYLTabBarItemImage\": \"post\"}",
+    };
+}
+
+- (void)testRemoteConfigValuesGiveTheConfigurationOfTheJSONFile {
+    NSMutableDictionary *values = [CYLRemoteConfigValues() mutableCopy];
+    // [EN] The app's other parameters and parameters Firebase does not have (empty) are left out.
+    // [CN] App 的其他参数，以及 Firebase 中没有的参数（空值）都会被忽略。
+    values[@"welcome_message"] = @"Hello";
+    values[@"CYLTabBarControllerThemeIdentifier"] = @"";
+    NSError *error;
+    NSDictionary *configuration = [CYLTabBarController configurationWithRemoteConfigValues:values error:&error];
+    XCTAssertNil(error);
+    XCTAssertEqualObjects(configuration, CYLRemoteConfigExpectedConfiguration());
+}
+
+- (void)testRemoteConfigWholeConfigurationParameter {
+    NSDictionary *expected = CYLRemoteConfigExpectedConfiguration();
+    NSString *file = [[NSString alloc] initWithData:[NSJSONSerialization dataWithJSONObject:expected options:0 error:NULL]
+                                           encoding:NSUTF8StringEncoding];
+    NSError *error;
+    XCTAssertEqualObjects([CYLTabBarController configurationWithRemoteConfigValues:@{ @"CYLTabBarConfiguration" : file } error:&error], expected);
+    XCTAssertNil(error);
+    // [EN] A flat parameter replaces the key of the whole configuration. [CN] 扁平参数替换完整配置中的 key。
+    NSDictionary *both = [CYLTabBarController configurationWithRemoteConfigValues:@{ @"CYLTabBarConfiguration" : file,
+                                                                                     @"CYLTabBarControllerStyleType" : @"liquidGlass" }
+                                                                            error:NULL];
+    XCTAssertEqualObjects(both[@"CYLTabBarControllerStyleType"], @"liquidGlass");
+    XCTAssertEqualObjects(both[CYLTabBarControllerPlusButton], expected[CYLTabBarControllerPlusButton]);
+}
+
+- (void)testRemoteConfigTemplateAndAndroidDefaultsFiles {
+    NSDictionary *expected = CYLRemoteConfigExpectedConfiguration();
+    NSMutableDictionary *parameters = [NSMutableDictionary dictionary];
+    [CYLRemoteConfigValues() enumerateKeysAndObjectsUsingBlock:^(NSString *key, NSString *value, BOOL *stop) {
+        BOOL isJSON = [value hasPrefix:@"{"] || [value hasPrefix:@"["];
+        parameters[key] = @{ @"defaultValue" : @{ @"value" : value }, @"valueType" : isJSON ? @"JSON" : @"STRING" };
+    }];
+    // [EN] A parameter that uses the in-app default is left out. [CN] 使用 App 内默认值的参数会被忽略。
+    parameters[@"CYLTabBarControllerThemeIdentifier"] = @{ @"defaultValue" : @{ @"useInAppDefault" : @YES } };
+    NSDictionary *template = @{ @"parameters" : parameters, @"version" : @{ @"versionNumber" : @"7" } };
+    NSData *templateData = [NSJSONSerialization dataWithJSONObject:template options:0 error:NULL];
+    NSError *error;
+    XCTAssertEqualObjects([CYLTabBarConfigurationParser dictionaryWithData:templateData format:CYLTabBarConfigurationFormatUnknown error:&error], expected);
+    XCTAssertNil(error);
+    NSMutableString *xml = [NSMutableString stringWithString:@"<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<defaultsMap>\n"];
+    [CYLRemoteConfigValues() enumerateKeysAndObjectsUsingBlock:^(NSString *key, NSString *value, BOOL *stop) {
+        NSString *escaped = [[value stringByReplacingOccurrencesOfString:@"&" withString:@"&amp;"] stringByReplacingOccurrencesOfString:@"<" withString:@"&lt;"];
+        [xml appendFormat:@"  <entry><key>%@</key><value>%@</value></entry>\n", key, escaped];
+    }];
+    [xml appendString:@"</defaultsMap>\n"];
+    XCTAssertEqualObjects([CYLTabBarConfigurationParser dictionaryWithData:[xml dataUsingEncoding:NSUTF8StringEncoding]
+                                                                    format:CYLTabBarConfigurationFormatXML error:&error], expected);
+    XCTAssertNil(error);
+    // [EN] An iOS defaults property list (`setDefaults(fromPlist:)`): nested values as JSON strings, a geometry string kept.
+    // [CN] iOS 默认值属性列表（`setDefaults(fromPlist:)`）：嵌套的值为 JSON 字符串，几何字符串保持不变。
+    NSMutableDictionary *defaults = [CYLRemoteConfigValues() mutableCopy];
+    defaults[@"CYLTabBarControllerTitlePositionAdjustment"] = @"{0, -2}";
+    NSData *plist = [NSPropertyListSerialization dataWithPropertyList:defaults format:NSPropertyListXMLFormat_v1_0 options:0 error:NULL];
+    NSMutableDictionary *expectedWithOffset = [expected mutableCopy];
+    expectedWithOffset[@"CYLTabBarControllerTitlePositionAdjustment"] = @"{0, -2}";
+    XCTAssertEqualObjects([CYLTabBarConfigurationParser dictionaryWithData:plist format:CYLTabBarConfigurationFormatPropertyList error:&error], expectedWithOffset);
+    XCTAssertNil(error);
+}
+
+- (void)testRemoteConfigInvalidValuesKeepTheDefaults {
+    NSMutableDictionary *values = [CYLRemoteConfigValues() mutableCopy];
+    values[CYLTabBarControllerPlusButton] = @"{\"CYLTabBarItemTitle\": ";
+    NSError *error;
+    XCTAssertNil([CYLTabBarController configurationWithRemoteConfigValues:values error:&error], @"a bad console edit is rejected");
+    XCTAssertEqual(error.code, CYLTabBarConfigurationErrorInvalidSyntax);
+    XCTAssertTrue([error.localizedDescription containsString:CYLTabBarControllerPlusButton], @"%@", error.localizedDescription);
+    error = nil;
+    XCTAssertNil([CYLTabBarController configurationWithRemoteConfigValues:@{ @"welcome_message" : @"Hello" } error:&error]);
+    XCTAssertEqual(error.code, CYLTabBarConfigurationErrorEmpty);
+    error = nil;
+    XCTAssertNil([CYLTabBarController configurationWithRemoteConfigValues:@{ @"CYLTabBarControllerStyleType" : @"flatDesign" } error:&error]);
+    XCTAssertEqual(error.code, CYLTabBarConfigurationErrorNoTabs);
+    error = nil;
+    XCTAssertNil([CYLTabBarController configurationWithRemoteConfigValues:@{ @"CYLTabBarConfiguration" : @"{ not a configuration" } error:&error]);
+    XCTAssertEqual(error.code, CYLTabBarConfigurationErrorInvalidSyntax);
+}
+
 - (void)testPlusButtonLayoutKeys {
     NSDictionary *configuration = @{
         CYLTabBarControllerContext : @"host-tests-layout",

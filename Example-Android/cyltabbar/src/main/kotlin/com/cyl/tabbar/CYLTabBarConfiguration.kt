@@ -84,7 +84,9 @@ object CYLTabBarConfiguration {
         return imageResolver.drawable(context, name)
     }
 
-    /** [EN] The density (dpi) of an image file from its @2x / @3x suffix. [CN] 根据 @2x / @3x 后缀得到图片文件的密度（dpi）。 */
+    /**
+     * [EN] The density (dpi) of an image file from its @2x / @3x suffix. [CN] 根据 @2x / @3x 后缀得到图片文件的密度（dpi）。
+     */
     internal fun densityOfImageName(path: String): Int {
         val scale = Regex("@(\\d)x\\.[A-Za-z]+$").find(path)?.groupValues?.get(1)?.toIntOrNull() ?: 1
         return android.util.DisplayMetrics.DENSITY_MEDIUM * scale
@@ -130,6 +132,60 @@ object CYLTabBarConfiguration {
     }
 
     /**
+     * [EN] `+configurationWithRemoteConfigValues:error:`: a configuration from Firebase Remote Config values, without Firebase
+     *      (docs/Configuration-File.md, "Firebase Remote Config"), e.g.
+     *      `CYLTabBarConfiguration.configurationWithRemoteConfigValues(remoteConfig.all.mapValues { it.value.asString() })`.
+     *      Only "CYL…" parameters are read; a nested value is a JSON parameter; `CYLTabBarConfiguration` may hold a whole
+     *      configuration file. Throws the parser's error for an invalid value, and `NoTabs` when no tab is left, so the app
+     *      keeps the tab bar of its local file (the defaults).
+     * [CN] 根据 Firebase Remote Config 的值生成配置，不依赖 Firebase（docs/Configuration-File.md，“Firebase Remote Config”），例如
+     *      `CYLTabBarConfiguration.configurationWithRemoteConfigValues(remoteConfig.all.mapValues { it.value.asString() })`。只读取 "CYL…" 参数；
+     *      嵌套的值为 JSON 参数；`CYLTabBarConfiguration` 可以存放完整的配置文件。值无效时抛出解析器的错误，没有 Tab 时抛出 `NoTabs`，App 因此保留
+     *      本地文件（默认值）中的 TabBar。
+     */
+    @JvmStatic
+    @Throws(CYLConfigurationException::class)
+    fun configurationWithRemoteConfigValues(values: Map<String, Any?>): Map<String, Any?> {
+        val configuration = try {
+            CYLTabBarConfigurationParser.dictionaryWithRemoteConfigValues(values)
+        } catch (error: CYLTabBarConfigurationException) {
+            throw CYLConfigurationException(CYLTabBarConfigurationError.of(error.code), error.message ?: error.code.name)
+        }
+        requireTabs(configuration)
+        return configuration
+    }
+
+    /**
+     * [EN] The `versionNumber` of `CYLTabBarControllerConfigurationVersion` in `configuration` (a number, or a numeric string as the
+     *      Remote Config REST API writes an int64), or null when it has none.
+     * [CN] `configuration` 中 `CYLTabBarControllerConfigurationVersion` 的 `versionNumber`（数字，或 Remote Config REST API 写 int64 时使用的数字字符串），没有时为 null。
+     */
+    @JvmStatic
+    fun versionNumber(configuration: Map<String, Any?>): Long? {
+        val number = (configuration[CYLConstants.CYLTabBarControllerConfigurationVersion] as? Map<*, *>)?.get("versionNumber")
+        return when (number) {
+            is Number -> number.toLong()
+            is String -> number.trim().toLongOrNull()
+            else -> null
+        }
+    }
+
+    /**
+     * [EN] Throws `NoTabs` when `configuration` has no tab. Shared by the Remote Config entry points: a value set alone must have
+     *      tabs, and so must the remote values merged over the defaults (`CYLRemoteConfigLoader`).
+     * [CN] `configuration` 没有 Tab 时抛出 `NoTabs`。Remote Config 的各入口共用：单独的一组值必须有 Tab，合并到默认值之上的远程值同样如此
+     *      （`CYLRemoteConfigLoader`）。
+     */
+    @Throws(CYLConfigurationException::class)
+    internal fun requireTabs(configuration: Map<String, Any?>) {
+        val items = configuration[CYLConstants.CYLTabBarControllerTabBarItemsAttributes]
+        if (items !is Map<*, *> && (items as? List<*>)?.any { it is Map<*, *> } != true) {
+            throw CYLConfigurationException(CYLTabBarConfigurationError.NoTabs,
+                "The configuration has no tab: CYLTabBarControllerTabBarItemsAttributes is missing or empty.")
+        }
+    }
+
+    /**
      * [EN] `+configurationWithRoute:error:`: the configuration file a resource route points to (`CYLResourceRoute`,
      *      docs/Resource-Routes.md), e.g. "bundle:Configurations?name=tabbar" or
      *      "sandbox:Caches/tabbar?name=tabbar&theme=dark&version=2.1&format=json"; `FileNotFound` when it matches no file.
@@ -145,10 +201,40 @@ object CYLTabBarConfiguration {
     }
 
     /**
-     * [EN] `CYLTabBarControllerConfigurationRoute`: the routed file's keys, then the other keys of `configuration` over them;
-     *      a route that matches no file is logged and ignored, as on iOS.
-     * [CN] `CYLTabBarControllerConfigurationRoute`：先取路由指向文件中的键，再用 `configuration` 中的其他键覆盖；没有匹配文件的路由会打印日志
-     *      并被忽略，与 iOS 相同。
+     * [EN] The first of `routes` that leads to a configuration file, as that file's configuration: an ordered list, highest
+     *      priority first, like the conditions of a Remote Config template. The usual list is the downloaded file first and the
+     *      built-in one after it, `["sandbox:Caches/tabbar?name=tabbar", "bundle:Configurations?name=tabbar"]`: the app
+     *      gets the built-in configuration until a download exists, and again when the download is removed. `FileNotFound`
+     *      when no route matches a file; another error (a file that cannot be read) moves on to the next route.
+     * [CN] `routes` 中第一个指向配置文件的路由，返回该文件的配置：有序列表，优先级从高到低，与 Remote Config 模板的条件相同。常见的列表是先下载的文件、
+     *      后内置的文件：`["sandbox:Caches/tabbar?name=tabbar", "bundle:Configurations?name=tabbar"]`：下载文件出现之前使用内置配置，下载文件被删除后
+     *      也回到内置配置。没有路由匹配文件时抛出 `FileNotFound`；其他错误（无法读取的文件）会继续尝试下一个路由。
+     */
+    @JvmStatic
+    @Throws(CYLConfigurationException::class)
+    fun configurationWithRoutes(context: Context, routes: List<String>): Map<String, Any?> {
+        for (route in routes) {
+            runCatching { configurationWithRoute(context, route) }.getOrNull()?.let { return it }
+        }
+        throw CYLConfigurationException(CYLTabBarConfigurationError.FileNotFound, "No configuration file matches the routes $routes.")
+    }
+
+    /**
+     * [EN] Where the configuration of `routes` comes from (`CYLResourceRoute.Source`): the source of the first route that
+     *      leads to a readable configuration file, or null when none does. The same order as `configurationWithRoutes`.
+     * [CN] `routes` 的配置来自哪里（`CYLResourceRoute.Source`）：第一个指向可读取配置文件的路由的来源，没有时为 null。顺序与 `configurationWithRoutes` 相同。
+     */
+    @JvmStatic
+    fun sourceOfRoutes(context: Context, routes: List<String>): CYLResourceRoute.Source? = routes.firstOrNull { route ->
+        runCatching { configurationWithRoute(context, route) }.isSuccess
+    }?.let { CYLResourceRoute.locationForRoute(context, it)?.source }
+
+    /**
+     * [EN] `CYLTabBarControllerConfigurationRoute`: a route, or an ordered list of routes (`configurationWithRoutes`); the routed
+     *      file's keys, then the other keys of `configuration` over them; a route that matches no file is logged and ignored,
+     *      as on iOS.
+     * [CN] `CYLTabBarControllerConfigurationRoute`：一个路由，或有序的路由列表（`configurationWithRoutes`）；先取路由指向文件中的键，再用 `configuration`
+     *      中的其他键覆盖；没有匹配文件的路由会打印日志并被忽略，与 iOS 相同。
      */
     @JvmStatic
     fun withRoutedFile(context: Context, configuration: Map<String, Any?>): Map<String, Any?> {
@@ -156,7 +242,12 @@ object CYLTabBarConfiguration {
         if (withManifest !== configuration) return withRoutedFile(context, withManifest)
         val route = configuration[CYLConstants.CYLTabBarControllerConfigurationRoute] ?: return configuration
         val rest = configuration - CYLConstants.CYLTabBarControllerConfigurationRoute
-        val file = (route as? String)?.let { runCatching { configurationWithRoute(context, it) }.getOrNull() }
+        val routes = when (route) {
+            is String -> listOf(route)
+            is List<*> -> route.filterIsInstance<String>()
+            else -> emptyList()
+        }
+        val file = runCatching { configurationWithRoutes(context, routes) }.getOrNull()
         if (file == null) {
             android.util.Log.w("CYLTabBarController", "configuration: invalid ${CYLConstants.CYLTabBarControllerConfigurationRoute}: $route")
             return rest
