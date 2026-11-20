@@ -55,6 +55,20 @@ final class CYLAnimatedItemCountdownTests: XCTestCase {
         }
     }
 
+    /**
+     * [EN] A tap: runs the actions the item registered for `.touchUpInside`. `sendActions(for:)` does nothing for a control that
+     *      is not in a window (CI, iOS 26), so the registered actions are performed directly.
+     * [CN] 点击：执行条目为 `.touchUpInside` 注册的动作。控件不在 window 中时 `sendActions(for:)` 什么也不做（CI，iOS 26），
+     *      因此直接执行已注册的动作。
+     */
+    private func tap(_ item: CYLAnimatedItemView) {
+        for target in item.allTargets {
+            for action in item.actions(forTarget: target, forControlEvent: .touchUpInside) ?? [] {
+                _ = (target as AnyObject).perform(Selector(action))
+            }
+        }
+    }
+
     private func makeItem(clock: CYLCountdownTestClock, delegate: CYLCountdownTestDelegate) -> CYLAnimatedItemView {
         let item = CYLAnimatedItemView(frame: CGRect(x: 0, y: 0, width: 200, height: 44))
         item.countdownDateProvider = { clock.date }
@@ -129,7 +143,7 @@ final class CYLAnimatedItemCountdownTests: XCTestCase {
         let item = makeItem(clock: clock, delegate: delegate)
         item.countdownDuration = 30
         item.startsCountdownOnTap = true
-        item.sendActions(for: .touchUpInside)
+        tap(item)
         XCTAssertEqual(item.countdownState, .running)
         XCTAssertEqual(item.title, "30 s left")
 
