@@ -348,10 +348,10 @@ open class CYLTabBarController: UITabBarController, CYLTabBarControllerDelegate,
     /// [EN] The tab bar, typed `CYLTabBar` as the Objective-C header declared it (an unchecked cast, as before: the tab bar is replaced by
     ///      `CYLTabBar` through KVC when the controller is set up). [CN] TabBar，类型为 `CYLTabBar`，与 Objective-C 头文件的声明一致（与以前一样不检查类型：
     ///      设置控制器时已通过 KVC 把 TabBar 换成 `CYLTabBar`）。
+    ///      FIX: launch crash in `init(configurationFile:)` — before that swap the tab bar is still a plain `UITabBar`, and
+    ///      `unsafeDowncast` traps on it in a Debug build; `unsafeBitCast` never checks, as the Objective-C cast did.
+    ///      启动崩溃：换成 `CYLTabBar` 之前 TabBar 还是普通 `UITabBar`，`unsafeDowncast` 在 Debug 构建中会崩溃；`unsafeBitCast` 不检查，与 Objective-C 的强制转换一致。
     open override var tabBar: CYLTabBar {
-        // [EN] Unchecked on purpose (`unsafeDowncast` traps in Debug): during `init` the system's plain `UITabBar` is still in place, and the
-        //      Objective-C header always declared the type without checking it. [CN] 有意不检查（`unsafeDowncast` 在 Debug 下会陷入陷阱）：`init` 期间
-        //      仍是系统的普通 `UITabBar`，而 Objective-C 头文件一直只声明类型、不做检查。
         unsafeBitCast(super.tabBar, to: CYLTabBar.self)
     }
 
