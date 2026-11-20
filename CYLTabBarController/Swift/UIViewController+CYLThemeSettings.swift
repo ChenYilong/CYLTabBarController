@@ -388,19 +388,25 @@ enum CYLPlusChildThemeTest {
                selectIndex < (tabBarController.viewControllers?.count ?? 0) {
                 tabBarController.selectedIndex = selectIndex
             }
-            after(3) {
-                checkAndPhotograph("before") {
-                    guard !switchIdentifier.isEmpty else {
-                        log("plus child theme test: done")
-                        return
-                    }
-                    switchTheme()
-                    after(3) {
-                        checkAndPhotograph("after") { log("plus child theme test: done") }
-                    }
-                }
-            }
+            after(3) { checkBeforeSwitch(switchIdentifier, switchTheme: switchTheme) }
         }
+    }
+
+    /// [EN] The check before the theme switch, then (with an identifier) the switch and the check after it. [CN] 切换主题之前的检查，然后（有标识时）切换并检查切换之后。
+    private static func checkBeforeSwitch(_ switchIdentifier: String, switchTheme: @escaping () -> Void) {
+        checkAndPhotograph("before") {
+            guard !switchIdentifier.isEmpty else {
+                log("plus child theme test: done")
+                return
+            }
+            switchTheme()
+            after(3, checkAfterSwitch)
+        }
+    }
+
+    /// [EN] The check after the theme switch. [CN] 切换主题之后的检查。
+    private static func checkAfterSwitch() {
+        checkAndPhotograph("after") { log("plus child theme test: done") }
     }
 
     private static func after(_ seconds: TimeInterval, _ block: @escaping () -> Void) {
@@ -453,12 +459,17 @@ enum CYLPlusChildThemeTest {
             }
             let alpha = plusButton.alpha
             plusButton.alpha = 0
-            after(0.5) {
-                log("plus child theme test: stand-in only \(phase)")
-                waitForAck("stand-in-only-" + phase) {
-                    plusButton.alpha = alpha
-                    after(1, next)
-                }
+            photographStandInOnly(phase, plusButton: plusButton, alpha: alpha, next: next)
+        }
+    }
+
+    /// [EN] The stand-in alone (the real plus button hidden), its screenshot, then the plus button back. [CN] 只看替身（隐藏真实 PlusButton），截图，然后恢复 PlusButton。
+    private static func photographStandInOnly(_ phase: String, plusButton: UIView, alpha: CGFloat, next: @escaping () -> Void) {
+        after(0.5) {
+            log("plus child theme test: stand-in only \(phase)")
+            waitForAck("stand-in-only-" + phase) {
+                plusButton.alpha = alpha
+                after(1, next)
             }
         }
     }

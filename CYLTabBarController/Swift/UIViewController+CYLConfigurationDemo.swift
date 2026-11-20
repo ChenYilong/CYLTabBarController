@@ -229,7 +229,10 @@ extension UIViewController {
         add(CYLLocalizedString("从网络 URL 加载")) { [weak self] in
             guard let url = URL(string: CYLConfigurationDemo.sampleURLString) else { return }
             CYLTabBarController.loadConfiguration(with: url) { configuration, error in
-                var tabBarController = configuration.map { CYLTabBarController(configuration: $0) }
+                var tabBarController: CYLTabBarController?
+                if let configuration {
+                    tabBarController = CYLTabBarController(configuration: configuration)
+                }
                 if (tabBarController?.viewControllers?.count ?? 0) == 0 {
                     tabBarController = nil
                 }
@@ -296,7 +299,10 @@ extension UIViewController {
                     } catch let caught as NSError {
                         createError = caught
                     }
-                    let fallback = error.map { "\nfallback because: " + $0.localizedDescription } ?? ""
+                    var fallback = ""
+                    if let error {
+                        fallback = "\nfallback because: " + error.localizedDescription
+                    }
                     let summary = "\(url.lastPathComponent)\nsource: \(sources[source.rawValue]) · version \(manifest?.version ?? "-")\(fallback)"
                     self?.cyl_presentConfigurationDemoTabBarController(tabBarController, source: summary,
                                                                         sourceText: CYLConfigurationDemo.sourceText(nil, manifest?.dictionary),
@@ -309,6 +315,19 @@ extension UIViewController {
     /**
      * [EN] Runs a throwing factory, reporting its error. [CN] 执行可能抛错的工厂方法，并报告错误。
      */
+    /**
+     * [EN] A green page created on the main thread, for the "later" page of the async factory demo, which runs off it (a separate
+     *      function: closures nest at most two deep). [CN] 在主线程创建的绿色页面，供异步工厂示例的 "later" 页面使用（该示例在主线程之外运行）（单独的函数：闭包最多嵌套两层）。
+     */
+    static func cyl_greenPageOnMainThread(titled title: String?) -> UIViewController {
+        let page = UIViewController()
+        DispatchQueue.main.sync {
+            page.title = title
+            page.view.backgroundColor = .systemGreen
+        }
+        return page
+    }
+
     static func cyl_tabBarController(_ make: () throws -> CYLTabBarController, error report: (NSError) -> Void) -> CYLTabBarController? {
         do {
             return try make()
@@ -715,11 +734,7 @@ extension UIViewController {
                 DispatchQueue.global(qos: .utility).asyncAfter(deadline: .now() + 2) {
                     var page: UIViewController?
                     if request.pageIdentifier == "later" {
-                        DispatchQueue.main.sync {
-                            page = UIViewController()
-                            page?.title = request.title
-                            page?.view.backgroundColor = .systemGreen
-                        }
+                        page = UIViewController.cyl_greenPageOnMainThread(titled: request.title)
                     }
                     completion(page)
                     completion(page)
