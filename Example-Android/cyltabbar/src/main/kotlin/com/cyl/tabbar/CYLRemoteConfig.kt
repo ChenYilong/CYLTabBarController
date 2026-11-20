@@ -163,7 +163,8 @@ data class CYLRemoteConfigResult(
  * [EN] The fetch policy, over the interfaces: the defaults (the configuration file shipped in the app) are the answer at once
  *      when the fetch fails or the values are invalid; otherwise the mapped values replace the defaults key by key, as
  *      Remote Config's fetched values replace its in-app defaults. The result must have a tab, so a bad console edit never
- *      breaks the tab bar. `mapper` defaults to the one registered for the source (`CYLRemoteConfigMappers`).
+ *      breaks the tab bar; a remote version number lower than the defaults' (`CYLTabBarControllerConfigurationVersion`) is refused as
+ *      stale. `mapper` defaults to the one registered for the source (`CYLRemoteConfigMappers`).
  * [CN] 面向接口的拉取策略：拉取失败或值无效时，直接使用默认值（随 App 打包的配置文件）；否则映射后的值按 key 覆盖默认值，与 Remote Config 拉取的值覆盖应用内默认值
  *      的方式相同。结果必须有 Tab，因此控制台的错误编辑不会破坏 TabBar。`mapper` 默认使用为该服务注册的映射器（`CYLRemoteConfigMappers`）。
  */
@@ -189,8 +190,18 @@ class CYLRemoteConfigLoader(
             ?: return keep(CYLTabBarConfiguration.CYLConfigurationException(CYLTabBarConfigurationError.UnknownFormat,
                 "No mapper is registered for the remote configuration source \"${payload.sourceIdentifier}\"."))
         return try {
+            val mapped = chosen.configuration(payload)
+            // [EN] Version numbers only grow (Remote Config publishes a rollback under a new, higher number), so a lower number than
+            //      the defaults' own is a stale or foreign template, never applied. No number on either side: the values apply.
+            // [CN] 版本号只增不减（Remote Config 会以新的更大的编号发布回滚），因此低于默认值自身编号的是过期或不相干的模板，不会被应用。任何一方没有编号时，值照常应用。
+            val remoteVersion = CYLTabBarConfiguration.versionNumber(mapped)
+            val currentVersion = CYLTabBarConfiguration.versionNumber(defaults)
+            if (remoteVersion != null && currentVersion != null && remoteVersion < currentVersion) {
+                throw CYLTabBarConfiguration.CYLConfigurationException(CYLTabBarConfigurationError.NotEligible,
+                    "The remote configuration is version $remoteVersion, older than the version $currentVersion in use.")
+            }
             val result = LinkedHashMap(defaults)
-            result.putAll(chosen.configuration(payload))
+            result.putAll(mapped)
             CYLTabBarConfiguration.requireTabs(result)
             CYLRemoteConfigResult(result, true, null)
         } catch (error: CYLTabBarConfiguration.CYLConfigurationException) {

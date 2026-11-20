@@ -18,5 +18,11 @@
  {"android": "CYLRemoteConfigMappers", "note": "The mappers by service identifier; register another service's / 按服务标识保存的映射器，可注册其他服务的"},
  {"android": "CYLFirebaseRemoteConfigMapper", "note": "The mapper of Firebase Remote Config values / Firebase Remote Config 值的映射器"},
  {"android": "CYLRemoteConfigLoader", "note": "Fetch policy: the defaults, the fetched values over them, never a broken tab bar / 拉取策略：默认值，拉取的值覆盖其上，不会得到坏掉的 TabBar"},
- {"android": "CYLRemoteConfigResult", "note": "The configuration to build from, whether the fetched values are in it, and why not / 用于构建的配置、是否包含拉取的值，以及没有包含的原因"}
+ {"android": "CYLRemoteConfigResult", "note": "The configuration to build from, whether the fetched values are in it, and why not / 用于构建的配置、是否包含拉取的值，以及没有包含的原因"},
+ {"android": "CYLResourceRoute.Source", "note": "Where a resource comes from: Bundle (default), Sandbox (downloaded), Local; named as Remote Config names a value source / 资源来源：Bundle（默认值）、Sandbox（下载）、Local；命名与 Remote Config 的值来源一致"},
+ {"android": "CYLResourceRoute.Location.source", "note": "The source of the place a route leads to / 路由指向位置的来源"},
+ {"android": "CYLTabBarConfiguration.configurationWithRoutes", "note": "The first of an ordered list of routes that leads to a configuration file / 有序路由列表中第一个指向配置文件的路由"},
+ {"android": "CYLTabBarConfiguration.sourceOfRoutes", "note": "The source of the first route of a list that leads to a readable file / 列表中第一个指向可读文件的路由的来源"},
+ {"android": "CYLTabBarConfiguration.versionNumber", "note": "The versionNumber of a configuration, or null / 配置的 versionNumber，没有时为 null"},
+ {"android": "CYLConstants.CYLTabBarControllerConfigurationVersion", "note": "The version of a configuration as a whole, as Remote Config versions a template / 整份配置的版本，与 Remote Config 对模板的版本管理一致"}
 ]

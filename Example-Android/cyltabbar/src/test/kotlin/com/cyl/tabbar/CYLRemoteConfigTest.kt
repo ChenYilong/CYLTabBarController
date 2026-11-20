@@ -62,7 +62,9 @@ class CYLRemoteConfigTest {
         // [EN] A parameter that uses the in-app default is left out. [CN] 使用 App 内默认值的参数会被忽略。
         val template = """{"parameters": {$parameters, "CYLTabBarControllerThemeIdentifier": {"defaultValue": {"useInAppDefault": true}}},
             "version": {"versionNumber": "7"}}"""
-        assertEquals(expected, CYLTabBarConfigurationParser.dictionaryWithData(template.toByteArray(), CYLTabBarConfigurationFormat.Unknown))
+        // [EN] The template's `version` is the version of the configuration (docs/Configuration-File.md, "Versions and routes"). [CN] 模板的 `version` 是配置的版本。
+        assertEquals(expected + ("CYLTabBarControllerConfigurationVersion" to mapOf("versionNumber" to 7L)),
+            CYLTabBarConfigurationParser.dictionaryWithData(template.toByteArray(), CYLTabBarConfigurationFormat.Unknown))
         val entries = values.entries.joinToString("\n") { (key, value) ->
             "  <entry><key>$key</key><value>${value.replace("&", "&amp;").replace("<", "&lt;")}</value></entry>"
         }

@@ -1946,3 +1946,9 @@
 | `CYLFirebaseRemoteConfigMapper` | The mapper of Firebase Remote Config values / Firebase Remote Config 值的映射器 |
 | `CYLRemoteConfigLoader` | Fetch policy: the defaults, the fetched values over them, never a broken tab bar / 拉取策略：默认值，拉取的值覆盖其上，不会得到坏掉的 TabBar |
 | `CYLRemoteConfigResult` | The configuration to build from, whether the fetched values are in it, and why not / 用于构建的配置、是否包含拉取的值，以及没有包含的原因 |
+| `CYLResourceRoute.Source` | Where a resource comes from: Bundle (default), Sandbox (downloaded), Local; named as Remote Config names a value source / 资源来源：Bundle（默认值）、Sandbox（下载）、Local；命名与 Remote Config 的值来源一致 |
+| `CYLResourceRoute.Location.source` | The source of the place a route leads to / 路由指向位置的来源 |
+| `CYLTabBarConfiguration.configurationWithRoutes` | The first of an ordered list of routes that leads to a configuration file / 有序路由列表中第一个指向配置文件的路由 |
+| `CYLTabBarConfiguration.sourceOfRoutes` | The source of the first route of a list that leads to a readable file / 列表中第一个指向可读文件的路由的来源 |
+| `CYLTabBarConfiguration.versionNumber` | The versionNumber of a configuration, or null / 配置的 versionNumber，没有时为 null |
+| `CYLConstants.CYLTabBarControllerConfigurationVersion` | The version of a configuration as a whole, as Remote Config versions a template / 整份配置的版本，与 Remote Config 对模板的版本管理一致 |

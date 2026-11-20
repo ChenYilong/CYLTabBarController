@@ -2626,6 +2626,17 @@ internal object CYLRemoteConfigReader {
                 values[key.toString()] = defaultValue["value"]
             }
         }
+        // [EN] The template's own `version` (number, time, description, origin, type) becomes the version key of the configuration,
+        //      next to the tabs it describes; a template with no "CYL…" parameter stays empty. [CN] 模板自己的 `version`（编号、时间、说明、来源、类型）成为配置的版本键，
+        //      与其描述的 Tab 放在一起；没有 "CYL…" 参数的模板仍为空。
+        val version = dictionary["version"] as? Map<*, *>
+        if (version != null && values.keys.any { it.startsWith(PARAMETER_PREFIX) }) {
+            val kept = LinkedHashMap<String, Any?>()
+            for (name in listOf("versionNumber", "updateTime", "description", "updateOrigin", "updateType")) {
+                version[name]?.let { kept[name] = if (name == "versionNumber") ((it as? String)?.trim()?.toLongOrNull() ?: it) else it }
+            }
+            if (kept.isNotEmpty()) values[CYLConstants.CYLTabBarControllerConfigurationVersion] = kept
+        }
         return values
     }
 
