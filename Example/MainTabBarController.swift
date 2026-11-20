@@ -11,10 +11,10 @@ import ObjectiveC
 import CYLTabBarController
 
 /// [EN] The tab bar height the selection indicator image is drawn for. [CN] 绘制选中指示图所用的 TabBar 高度。
-private let CYLTabBarControllerHeight: CGFloat = 40
+private let cYLTabBarControllerHeight: CGFloat = 40
 
 /// [EN] iOS 26 or later (`CYL_IS_IOS_26`). [CN] iOS 26 及以后（`CYL_IS_IOS_26`）。
-private var CYLDemoIsIOS26: Bool {
+private var cYLDemoIsIOS26: Bool {
     ProcessInfo.processInfo.isOperatingSystemAtLeast(OperatingSystemVersion(majorVersion: 26, minorVersion: 0, patchVersion: 0))
 }
 
@@ -78,7 +78,7 @@ class MainTabBarController: CYLTabBarController, CYLFlatDesignUITabBarController
     private func setUpTabBarItemGestures() {
         cyl_tabBarItemGestureHandler = { [weak self] _, gesture, control, viewController in
             guard let viewController else { return }
-            self?.cyl_demo_handleTabBarItemGesture(gesture, control: control, viewController: viewController)
+            self?.cylDemoHandleTabBarItemGesture(gesture, control: control, viewController: viewController)
         }
         // [EN] `-CYLDemoDoubleTapInterval 0.8`: a longer double tap interval for automated taps on the simulator.
         // [CN] `-CYLDemoDoubleTapInterval 0.8`：加长双击间隔，供模拟器上的自动点击使用。
@@ -93,7 +93,7 @@ class MainTabBarController: CYLTabBarController, CYLFlatDesignUITabBarController
         // [EN] "Me" has no identifier, so it uses its class name (#408). [CN] 「我的」没有设置标识，使用类名（#408）。
         cyl_loginRequiredTabBarItemIdentifiers = ["message", NSStringFromClass(CYLMineViewController.self)]
         cyl_loginHandler = { tabBarController, viewController, completion in
-            tabBarController.cyl_demo_presentLogin(for: viewController, completion: completion)
+            tabBarController.cylDemoPresentLogin(for: viewController, completion: completion)
         }
     }
 
@@ -229,7 +229,7 @@ class MainTabBarController: CYLTabBarController, CYLFlatDesignUITabBarController
         tabBar.unselectedItemTintColor = .red
         tabBar.standardAppearance = appearance
         tabBar.scrollEdgeAppearance = appearance
-        if !CYLDemoIsIOS26 {
+        if !cYLDemoIsIOS26 {
             // [EN] Not on iOS 26: the glass decides the unselected title color. [CN] iOS 26 上不设置：未选中标题颜色由玻璃决定。
             UITabBar.appearance().isTranslucent = false
         }
@@ -237,9 +237,9 @@ class MainTabBarController: CYLTabBarController, CYLFlatDesignUITabBarController
 
     /// [EN] The red selection indicator of the classic style. [CN] 经典样式的红色选中指示图。
     private func customizeTabBarSelectionIndicatorImage() {
-        guard !CYLDemoIsIOS26 else { return }
+        guard !cYLDemoIsIOS26 else { return }
         // [EN] This tab bar's own item width. [CN] 本 TabBar 自己的 item 宽度。
-        let size = CGSize(width: cyl_tabBar?.cyl_tabBarItemWidth ?? 0, height: CYLTabBarControllerHeight)
+        let size = CGSize(width: cyl_tabBar?.cyl_tabBarItemWidth ?? 0, height: cYLTabBarControllerHeight)
         let image = UIImage.cyl_image(with: .red, size: size)?.resizableImage(withCapInsets: UIEdgeInsets(top: 1, left: 0, bottom: 0, right: 0))
         tabBar.selectionIndicatorImage = image
     }
@@ -301,8 +301,8 @@ class MainTabBarController: CYLTabBarController, CYLFlatDesignUITabBarController
 
     private func customizeInterface() {
         setViewDidLayoutSubViewsBlockInvokeOnce(true) { [weak self] tabBarController in
-            self?.cyl_demo_decorate(tabBarController)
-            self?.cyl_demo_selectTabFromLaunchArgument(of: tabBarController)
+            self?.cylDemoDecorate(tabBarController)
+            self?.cylDemoSelectTabFromLaunchArgument(of: tabBarController)
         }
     }
 
@@ -312,7 +312,7 @@ class MainTabBarController: CYLTabBarController, CYLFlatDesignUITabBarController
      [CN] 启动参数（截图、UI 测试）：`-CYLDemoSelectedTab <identifier>` 启动 2 秒后登录并选中该 Tab；`-CYLDemoOrientation landscape` 旋转主
           TabBar；`-CYLDemoPlaceholderPreview <kind>` 展示占位图。
      */
-    private func cyl_demo_selectTabFromLaunchArgument(of tabBarController: CYLTabBarController) {
+    private func cylDemoSelectTabFromLaunchArgument(of tabBarController: CYLTabBarController) {
         let defaults = UserDefaults.standard
         if defaults.string(forKey: "CYLDemoOrientation") == "landscape", (defaults.string(forKey: "CYLDemoGalleryScene") ?? "").isEmpty {
             DispatchQueue.main.asyncAfter(deadline: .now() + 3) { [weak tabBarController] in
@@ -339,7 +339,7 @@ class MainTabBarController: CYLTabBarController, CYLFlatDesignUITabBarController
           are set up again (issue #481).
      [CN] Tab 按钮创建后添加角标、第一个 Tab 的封面与选中指示图；Tab 按钮重新创建后再次调用（issue #481）。
      */
-    private func cyl_demo_decorate(_ tabBarController: CYLTabBarController) {
+    private func cylDemoDecorate(_ tabBarController: CYLTabBarController) {
         customizeTabBarSelectionIndicatorImage()
         // [EN] The delay only makes the badge animations easy to see. [CN] 延迟只是为了方便看清角标动画。
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak self] in
@@ -362,7 +362,7 @@ class MainTabBarController: CYLTabBarController, CYLFlatDesignUITabBarController
                 viewControllers[4].cyl_showBadgeValue("NEW", animationType: .breathe)
             }
             // [EN] #535: the plus button gets a badge too; each tap adds 1. [CN] #535：PlusButton 也显示角标；每次点击加 1。
-            tabBarController.cyl_demo_showPlusButtonBadge()
+            tabBarController.cylDemoShowPlusButtonBadge()
         }
     }
 
@@ -387,7 +387,7 @@ class MainTabBarController: CYLTabBarController, CYLFlatDesignUITabBarController
      [EN] #408: tabs by identifier, not by index; every tab bar controller answers for its own tabs and plus button.
      [CN] #408：按标识而不是下标区分 Tab；每个 TabBarController 只处理自己的 Tab 和 PlusButton。
      */
-    private func cyl_logTabBarItemIdentifiers(of tabBarController: CYLTabBarController, selectedControl control: UIControl) {
+    private func cylLogTabBarItemIdentifiers(of tabBarController: CYLTabBarController, selectedControl control: UIControl) {
         let identifier = control.cyl_tabBarItemIdentifier
         NSLog("🟢 #408 [%@] tapped \"%@\" (selected \"%@\")", tabBarController.context ?? "", identifier ?? "",
               tabBarController.cyl_selectedTabBarItemIdentifier ?? "")
@@ -406,13 +406,13 @@ class MainTabBarController: CYLTabBarController, CYLFlatDesignUITabBarController
 
     func tabBarController(_ tabBarController: UITabBarController, didSelect control: UIControl) {
         guard let tabBarController = tabBarController as? CYLTabBarController else { return }
-        cyl_logTabBarItemIdentifiers(of: tabBarController, selectedControl: control)
+        cylLogTabBarItemIdentifiers(of: tabBarController, selectedControl: control)
         var animationView: UIView?
         // [EN] #535: the plus button's badge changes on every tap; checked first (before iOS 26 `cyl_isTabButton` is also true
         //      for the plus button). [CN] #535：每次点击 PlusButton 角标都会变化；需先判断（iOS 26 以前 `cyl_isTabButton` 对 PlusButton 也为真）。
         let isPlusControl = tabBarController.hasPlusButton() && control.cyl_isPlusControl()
         if isPlusControl {
-            tabBarController.cyl_demo_plusButtonDidTap()
+            tabBarController.cylDemoPlusButtonDidTap()
             animationView = CYLPlusButton(forOwner: tabBarController)?.imageView
         } else if control.cyl_isTabButton() {
             // [EN] Toggle the red dot. [CN] 切换红点。
@@ -435,7 +435,7 @@ class MainTabBarController: CYLTabBarController, CYLFlatDesignUITabBarController
 
     /// [EN] A scale animation; none on iOS 26, where the glass already animates. [CN] 缩放动画；iOS 26 上不使用（玻璃已有动画）。
     private func addScaleAnimation(on view: UIView?, repeatCount: Float) {
-        guard let view, !CYLDemoIsIOS26 else { return }
+        guard let view, !cYLDemoIsIOS26 else { return }
         let animation = CAKeyframeAnimation(keyPath: "transform.scale")
         animation.values = [1.0, 1.3, 0.9, 1.15, 0.95, 1.02, 1.0]
         animation.duration = 1
@@ -459,13 +459,13 @@ class MainTabBarController: CYLTabBarController, CYLFlatDesignUITabBarController
 
 // MARK: - Demo helpers on every tab bar controller (also used by CYLFlatDesignMainTabBarController)
 
-private var CYLDemoPlusButtonBadgeCountKey: UInt8 = 0
+private var cYLDemoPlusButtonBadgeCountKey: UInt8 = 0
 
 extension CYLTabBarController {
 
     private var cyl_demo_plusButtonBadgeCount: Int {
-        get { (objc_getAssociatedObject(self, &CYLDemoPlusButtonBadgeCountKey) as? Int) ?? 0 }
-        set { objc_setAssociatedObject(self, &CYLDemoPlusButtonBadgeCountKey, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC) }
+        get { (objc_getAssociatedObject(self, &cYLDemoPlusButtonBadgeCountKey) as? Int) ?? 0 }
+        set { objc_setAssociatedObject(self, &cYLDemoPlusButtonBadgeCountKey, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC) }
     }
 
     /**
@@ -473,7 +473,7 @@ extension CYLTabBarController {
           button (the layer under the plus button) shows the same value.
      [CN] #535：PlusButton 的角标，与 Tab 角标相同的 API 和样式；有 PlusButton 子控制器时，其系统 Tab 按钮（PlusButton 下方的图层）显示相同的值。
      */
-    @objc func cyl_demo_showPlusButtonBadge() {
+    @objc func cylDemoShowPlusButtonBadge() {
         guard hasPlusButton(), let plusButton = CYLPlusButton(forOwner: self) else { return }
         let count = max(cyl_demo_plusButtonBadgeCount, 1)
         cyl_demo_plusButtonBadgeCount = count
@@ -488,14 +488,14 @@ extension CYLTabBarController {
     }
 
     /// [EN] #535: each tap adds 1. [CN] #535：每次点击加 1。
-    @objc func cyl_demo_plusButtonDidTap() {
+    @objc func cylDemoPlusButtonDidTap() {
         cyl_demo_plusButtonBadgeCount += 1
-        cyl_demo_showPlusButtonBadge()
+        cylDemoShowPlusButtonBadge()
     }
 
     /// [EN] #19: the login alert of the demo. [CN] #19：Demo 的登录弹框。
     @objc(cyl_demo_presentLoginForViewController:completion:)
-    func cyl_demo_presentLogin(for viewController: UIViewController, completion: @escaping CYLTabBarLoginCompletion) {
+    func cylDemoPresentLogin(for viewController: UIViewController, completion: @escaping CYLTabBarLoginCompletion) {
         let title = viewController.tabBarItem.title ?? viewController.cyl_getViewControllerInsteadOfNavigation().title ?? ""
         let alert = UIAlertController(title: cylDemoLocalizedString("需要登录"),
                                       message: String(format: cylDemoLocalizedString("「%@」需要登录后才能查看"), title), preferredStyle: .alert)
@@ -511,26 +511,26 @@ extension CYLTabBarController {
 
     /// [EN] #152: re-tap refreshes the list (or scrolls to the top), long press shows a menu. [CN] #152：再次点击刷新列表（或滚动到顶部），长按显示菜单。
     @objc(cyl_demo_handleTabBarItemGesture:control:viewController:)
-    func cyl_demo_handleTabBarItemGesture(_ gesture: CYLTabBarItemGesture, control: UIControl, viewController: UIViewController) {
+    func cylDemoHandleTabBarItemGesture(_ gesture: CYLTabBarItemGesture, control: UIControl, viewController: UIViewController) {
         let content = viewController.cyl_getViewControllerInsteadOfNavigation()
         NSLog("🟣 #152 gesture %@ on \"%@\"", "\(gesture.rawValue)", control.cyl_tabBarItemIdentifier ?? "")
         switch gesture {
         case .reselect:
             if !CYLDemoPlaceholder.refreshList(of: content) {
-                cyl_demo_scrollToTop(content)
+                cylDemoScrollToTop(content)
             }
         case .doubleTap:
             // [EN] The second tap was already reported as a Reselect. [CN] 第二次点击已作为 Reselect 回调。
             break
         case .longPress:
-            cyl_demo_showActions(for: control)
+            cylDemoShowActions(for: control)
         @unknown default:
             break
         }
     }
 
     /// [EN] Scrolls the page's first scroll view to its top. [CN] 将页面中的第一个滚动视图滚动到顶部。
-    private func cyl_demo_scrollToTop(_ viewController: UIViewController) {
+    private func cylDemoScrollToTop(_ viewController: UIViewController) {
         var views: [UIView] = viewController.isViewLoaded ? [viewController.view] : []
         while !views.isEmpty {
             let each = views.removeFirst()
@@ -543,7 +543,7 @@ extension CYLTabBarController {
     }
 
     /// [EN] The long press menu: the tab's identifier and a way to select it. [CN] 长按菜单：显示 Tab 标识，并可选中它。
-    private func cyl_demo_showActions(for control: UIControl) {
+    private func cylDemoShowActions(for control: UIControl) {
         let identifier = control.cyl_tabBarItemIdentifier ?? ""
         let sheet = UIAlertController(title: identifier, message: cylDemoLocalizedString("长按（#152）"), preferredStyle: .actionSheet)
         if !identifier.isEmpty, !control.cyl_isPlusButton() {

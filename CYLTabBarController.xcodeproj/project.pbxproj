@@ -273,6 +273,7 @@
 		C519141473EF362AB972F657 /* CYLAnimatedItemViewTests.m in Sources */ = {isa = PBXBuildFile; fileRef = A3950BF6A76EBE0344FCDD39 /* CYLAnimatedItemViewTests.m */; };
 		956ABDDEFB5138F55F3E5371 /* CYLAnimatedItemTestTag.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CEB1B59951AD293D835F1D5 /* CYLAnimatedItemTestTag.swift */; };
 		D7FC63F63FFB38293772402B /* CYLTestSubclasses.swift in Sources */ = {isa = PBXBuildFile; fileRef = 961BC0F62694C23750891477 /* CYLTestSubclasses.swift */; };
+		B7C0DE5A11A2233D4001FB02 /* CYLAnimatedItemCountdownTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7C0DE5A11A2233D4001FB01 /* CYLAnimatedItemCountdownTests.swift */; };
 		F53850E7A7B858FE08DA6371 /* CYLAnimatedItemTintStateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEE6420896408BF196FDE8B1 /* CYLAnimatedItemTintStateTests.swift */; };
 		D7DE53073873012C7550BB8D /* CYLAnimatedItemStackViewTests.m in Sources */ = {isa = PBXBuildFile; fileRef = B9742EEB9F5580FC8B76001C /* CYLAnimatedItemStackViewTests.m */; };
 		C55EB2BC5D6C89C66BF454DF /* UIViewController+CYLThemeSettings.h in Headers */ = {isa = PBXBuildFile; fileRef = 1B125B4B6B9CBD155357BAD3 /* UIViewController+CYLThemeSettings.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -601,6 +602,7 @@
 		A3950BF6A76EBE0344FCDD39 /* CYLAnimatedItemViewTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CYLAnimatedItemViewTests.m; sourceTree = "<group>"; };
 		0CEB1B59951AD293D835F1D5 /* CYLAnimatedItemTestTag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CYLAnimatedItemTestTag.swift; sourceTree = "<group>"; };
 		961BC0F62694C23750891477 /* CYLTestSubclasses.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CYLTestSubclasses.swift; sourceTree = "<group>"; };
+		B7C0DE5A11A2233D4001FB01 /* CYLAnimatedItemCountdownTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CYLAnimatedItemCountdownTests.swift; sourceTree = "<group>"; };
 		BEE6420896408BF196FDE8B1 /* CYLAnimatedItemTintStateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CYLAnimatedItemTintStateTests.swift; sourceTree = "<group>"; };
 		B9742EEB9F5580FC8B76001C /* CYLAnimatedItemStackViewTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CYLAnimatedItemStackViewTests.m; sourceTree = "<group>"; };
 		A494E02A66D2AE6B5B42B9E8 /* UIColor+CYLTabBarControllerExtention.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "UIColor+CYLTabBarControllerExtention.h"; sourceTree = "<group>"; };
@@ -1171,6 +1173,7 @@
 				A3950BF6A76EBE0344FCDD39 /* CYLAnimatedItemViewTests.m */,
 				0CEB1B59951AD293D835F1D5 /* CYLAnimatedItemTestTag.swift */,
 				961BC0F62694C23750891477 /* CYLTestSubclasses.swift */,
+				B7C0DE5A11A2233D4001FB01 /* CYLAnimatedItemCountdownTests.swift */,
 				BEE6420896408BF196FDE8B1 /* CYLAnimatedItemTintStateTests.swift */,
 				B9742EEB9F5580FC8B76001C /* CYLAnimatedItemStackViewTests.m */,
 				8D116232EB2440CC01A94254 /* CYLTabBarPageRegistryTests.m */,
@@ -2025,6 +2028,7 @@
 				C519141473EF362AB972F657 /* CYLAnimatedItemViewTests.m in Sources */,
 				956ABDDEFB5138F55F3E5371 /* CYLAnimatedItemTestTag.swift in Sources */,
 				D7FC63F63FFB38293772402B /* CYLTestSubclasses.swift in Sources */,
+				B7C0DE5A11A2233D4001FB02 /* CYLAnimatedItemCountdownTests.swift in Sources */,
 				F53850E7A7B858FE08DA6371 /* CYLAnimatedItemTintStateTests.swift in Sources */,
 				D7DE53073873012C7550BB8D /* CYLAnimatedItemStackViewTests.m in Sources */,
 				AD70F28867C640F7B1AC49C1 /* CYLTabBarPageRegistryTests.m in Sources */,

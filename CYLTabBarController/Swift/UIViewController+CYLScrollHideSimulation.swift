@@ -125,6 +125,15 @@ enum CYLScrollHideSimulation {
         case .rotation: return ("requestGeometryUpdate: landscape, then portrait (iOS 16+)", .restore)
         case .overCurrentContext: return ("present (OverCurrentContext) from a page that definesPresentationContext", .restore)
         case .popover: return ("present (UIModalPresentationPopover)", .restore)
+        default: return titleOfLaterRow(row)
+        }
+    }
+
+    /**
+     * [EN] The titles of the rows from `.drawer` on (a second switch keeps each under 30 cases). [CN] 从 `.drawer` 起的行标题（第二个 switch 使每个 switch 不超过 30 个分支）。
+     */
+    private static func titleOfLaterRow(_ row: Row) -> (String, Kind) {
+        switch row {
         case .drawer: return ("tabBarController.view slides away and back (side menu / drawer)", .restore)
         case .safeAreaTop: return ("additionalSafeAreaInsets.top + 20 (in-call / hotspot status bar)", .restore)
         case .sceneDeactivate: return ("UISceneWillDeactivateNotification (this scene)", .restore)
@@ -139,6 +148,7 @@ enum CYLScrollHideSimulation {
         case .turnOnAgain: return ("cyl_hidesTabBarOnScroll = YES again (no change)", .keep)
         case .appShowsTabBar: return ("App: setTabBarHidden:NO", .restore)
         case .selfTest: return (CYLLocalizedString("自测：依次运行所有自动模拟，报告 PASS / FAIL"), .selfTest)
+        default: preconditionFailure("every row has a title")
         }
     }
 
@@ -381,12 +391,32 @@ extension UIViewController {
             page.preferredContentSize = CGSize(width: 240, height: 160)
             cyl_anchorPopover(page.popoverPresentationController)
             cyl_presentThenDismiss(page)
+        default:
+            cyl_runLaterScrollHideSimulation(simulation, tabBarController: tabBarController)
+        }
+    }
+
+    /**
+     * [EN] The simulations from `.drawer` on (a second switch keeps each under 30 cases). [CN] 从 `.drawer` 起的模拟（第二个 switch 使每个 switch 不超过 30 个分支）。
+     */
+    /// [EN] The drawer simulation's way back (a separate function: closures nest at most two deep). [CN] 抽屉模拟的返回动画（单独的函数：闭包最多嵌套两层）。
+    private static func cyl_slideDrawerBack(_ controllerView: UIView) {
+        UIView.animate(withDuration: 0.3) { controllerView.transform = .identity }
+    }
+
+    // swiftlint:disable:next cyclomatic_complexity function_body_length
+    private func cyl_runLaterScrollHideSimulation(_ simulation: CYLScrollHideSimulation.Row, tabBarController: CYLTabBarController) {
+        let center = NotificationCenter.default
+        let application = UIApplication.shared
+        let hold = CYLScrollHideSimulation.hold
+        let after = CYLScrollHideSimulation.after
+        switch simulation {
         case .drawer:
             let controllerView = tabBarController.view!
             UIView.animate(withDuration: 0.3, animations: {
                 controllerView.transform = CGAffineTransform(translationX: controllerView.bounds.width * 0.6, y: 0)
             }, completion: { _ in
-                after(hold) { UIView.animate(withDuration: 0.3) { controllerView.transform = .identity } }
+                after(hold) { Self.cyl_slideDrawerBack(controllerView) }
             })
         case .safeAreaTop:
             let insets = tabBarController.additionalSafeAreaInsets
@@ -426,7 +456,7 @@ extension UIViewController {
             tabBarController.cyl_hidesTabBarOnScroll = true
         case .appShowsTabBar:
             tabBarController.setTabBarHidden(false, animated: true)
-        case .selfTest, .manualLongPress, .manualTapOutside, .manualKeepDragging:
+        default:
             break
         }
     }

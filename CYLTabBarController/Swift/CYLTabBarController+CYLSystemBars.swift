@@ -12,8 +12,21 @@ import UIKit
     @objc(cyl_setAllowsVerticalBarStorage:) func cylSetAllowsVerticalBarStorage(_ allowsVerticalBar: Bool)
 }
 
-/// [EN] The folders of Apple's frameworks, built from components. [CN] 系统框架所在的文件夹，由路径组件拼成。
-private let systemFrameworkPathMarkers = [["System", "Library"], ["usr", "lib"]].map { "/" + $0.joined(separator: "/") + "/" }
+/// [EN] The folders of Apple's frameworks, as path components. [CN] 系统框架所在的文件夹，以路径组件表示。
+private let systemFrameworkFolders = [["System", "Library"], ["usr", "lib"], ["Developer", "Library"]]
+
+/**
+ [EN] Whether an image path lies in a folder of Apple's frameworks (compared by path components, so no path literal is spelled out).
+ [CN] 镜像路径是否位于系统框架所在的文件夹（按路径组件比较，因此不写出路径字面量）。
+ */
+func cylIsSystemFrameworkPath(_ path: String) -> Bool {
+    let components = (path as NSString).pathComponents
+    return systemFrameworkFolders.contains { folder in
+        components.indices.contains { start in
+            start + folder.count < components.count && Array(components[start..<(start + folder.count)]) == folder
+        }
+    }
+}
 
 /**
  FIX: issue #672
@@ -26,7 +39,7 @@ private func cylIsImplementedOutsideSystemFrameworks(_ cls: AnyClass, _ selector
     var info = Dl_info()
     guard dladdr(unsafeBitCast(implementation, to: UnsafeRawPointer.self), &info) != 0, let fileName = info.dli_fname else { return false }
     let path = String(cString: fileName)
-    return !systemFrameworkPathMarkers.contains { path.contains($0) }
+    return !cylIsSystemFrameworkPath(path)
 }
 
 /**

@@ -232,8 +232,8 @@ extension UIControl {
      * [CN] 向本控件添加 `URL` 处的动画。
      */
     @objc(cyl_addTabBarItemAnimationWithURL:size:contentMode:)
-    public func cyl_addTabBarItemAnimation(with URL: URL?, size: CGSize, contentMode: UIView.ContentMode) {
-        CYLTabBarItemAnimationCore.service?.addAnimation(with: URL, size: size, contentMode: contentMode, animationSpeed: 0, to: self)
+    public func cyl_addTabBarItemAnimation(with url: URL?, size: CGSize, contentMode: UIView.ContentMode) {
+        CYLTabBarItemAnimationCore.service?.addAnimation(with: url, size: size, contentMode: contentMode, animationSpeed: 0, to: self)
     }
 
     /**
@@ -241,9 +241,9 @@ extension UIControl {
      * [CN] 以指定速度向本控件添加 `URL` 处的动画。
      */
     @objc(cyl_addTabBarItemAnimationWithURL:size:contentMode:animationSpeed:)
-    public func cyl_addTabBarItemAnimation(with URL: URL?, size: CGSize, contentMode: UIView.ContentMode,
+    public func cyl_addTabBarItemAnimation(with url: URL?, size: CGSize, contentMode: UIView.ContentMode,
                                            animationSpeed: CGFloat) {
-        CYLTabBarItemAnimationCore.service?.addAnimation(with: URL, size: size, contentMode: contentMode,
+        CYLTabBarItemAnimationCore.service?.addAnimation(with: url, size: size, contentMode: contentMode,
                                                          animationSpeed: animationSpeed, to: self)
     }
 
@@ -288,14 +288,14 @@ extension UIControl {
      * [CN] 用 `URL` 处的动画替换本控件的动画。
      */
     @objc(cyl_replaceTabBarItemAnimationWithURL:size:contentMode:)
-    public func cyl_replaceTabBarItemAnimation(with URL: URL, size: CGSize, contentMode: UIView.ContentMode) {
+    public func cyl_replaceTabBarItemAnimation(with url: URL, size: CGSize, contentMode: UIView.ContentMode) {
         guard let service = CYLTabBarItemAnimationCore.service else {
             return
         }
         if service.responds(to: #selector(CYLTabBarItemAnimationService.replaceAnimation(with:size:contentMode:in:))) {
-            service.replaceAnimation?(with: URL, size: size, contentMode: contentMode, in: self)
+            service.replaceAnimation?(with: url, size: size, contentMode: contentMode, in: self)
         } else {
-            service.addAnimation(with: URL, size: size, contentMode: contentMode, animationSpeed: 0, to: self)
+            service.addAnimation(with: url, size: size, contentMode: contentMode, animationSpeed: 0, to: self)
         }
     }
 
@@ -313,9 +313,9 @@ extension UIControl {
      * [CN] 在本控件中播放 `URL` 处的动画。
      */
     @objc(cyl_playTabBarItemAnimationWithURL:size:defaultSelected:contentMode:)
-    public func cyl_playTabBarItemAnimation(with URL: URL, size: CGSize, defaultSelected: Bool,
+    public func cyl_playTabBarItemAnimation(with url: URL, size: CGSize, defaultSelected: Bool,
                                             contentMode: UIView.ContentMode) {
-        CYLTabBarItemAnimationCore.service?.playAnimation(with: URL, size: size, defaultSelected: defaultSelected,
+        CYLTabBarItemAnimationCore.service?.playAnimation(with: url, size: size, defaultSelected: defaultSelected,
                                                           contentMode: contentMode, in: self)
     }
 

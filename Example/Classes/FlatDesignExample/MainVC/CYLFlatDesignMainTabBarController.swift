@@ -10,7 +10,7 @@ import UIKit
 import CYLTabBarController
 
 /// [EN] The key of the spring animation on a tapped tab icon. [CN] 被点击 Tab 图标上弹簧动画的键。
-private let CYLSpringAnimationKey = "CYLSpringAnimationKey"
+private let cYLSpringAnimationKey = "cYLSpringAnimationKey"
 
 /**
  [EN] The FlatDesign demo tab bar controller, ported to Swift (docs/Swift-Migration.md, step 111): `CYLTabBarController` becomes
@@ -93,14 +93,14 @@ class CYLFlatDesignMainTabBarController: CYLTabBarController, CYLFlatDesignUITab
 
     func tabBarController(_ tabBarController: CYLTabBarController, presentLoginFor viewController: UIViewController,
                           completion: @escaping @Sendable (Bool) -> Void) {
-        tabBarController.cyl_demo_presentLogin(for: viewController, completion: completion)
+        tabBarController.cylDemoPresentLogin(for: viewController, completion: completion)
     }
 
     /// [EN] #152: the delegate API of the tab item gestures. [CN] #152：TabBarItem 手势的代理方式。
     func tabBarController(_ tabBarController: CYLTabBarController, didRecognize gesture: CYLTabBarItemGesture, control: UIControl,
                           viewController: UIViewController?) {
         guard let viewController else { return }
-        tabBarController.cyl_demo_handleTabBarItemGesture(gesture, control: control, viewController: viewController)
+        tabBarController.cylDemoHandleTabBarItemGesture(gesture, control: control, viewController: viewController)
     }
 
     func tabBarController(_ tabBarController: CYLTabBarController, didSelect control: UIControl) {
@@ -112,7 +112,7 @@ class CYLFlatDesignMainTabBarController: CYLTabBarController, CYLFlatDesignUITab
         // [EN] #535: the plus button's badge changes on every tap; checked first. [CN] #535：每次点击 PlusButton 角标都会变化；需先判断。
         let isPlusControl = tabBarController.hasPlusButton() && control.cyl_isPlusControl()
         if isPlusControl {
-            tabBarController.cyl_demo_plusButtonDidTap()
+            tabBarController.cylDemoPlusButtonDidTap()
         } else if control.cyl_isTabButton() {
             // [EN] Toggle the red dot. [CN] 切换红点。
             let isFlatDesign = tabBarController.tabBarStyleType == .flatDesign
@@ -128,7 +128,7 @@ class CYLFlatDesignMainTabBarController: CYLTabBarController, CYLFlatDesignUITab
                 tabBarController.selectedViewController?.cyl_showBadge()
             }
         }
-        cyl_demo_didSelectItem(of: control)
+        cylDemoDidSelectItem(of: control)
     }
 
     // MARK: - The selected item
@@ -140,7 +140,7 @@ class CYLFlatDesignMainTabBarController: CYLTabBarController, CYLFlatDesignUITab
      [CN] 中间的 item 打开模态页面；最后一个让 TabBar 变黑。以前用 `CYLFlatDesignTabBarDelegate` 的 `-tabBar:didSelectItem:`；`UITabBarController` 的
           Swift 子类无法定义该 selector（UIKit 自己的 `UITabBarDelegate` 方法使用它），因此改为依据 `-tabBarController:didSelectControl:` 中被点击的按钮。
      */
-    private func cyl_demo_didSelectItem(of control: UIControl) {
+    private func cylDemoDidSelectItem(of control: UIControl) {
         guard let tabBar = cyl_tabBar as? CYLFlatDesignTabBar,
               let index = tabBar.items?.firstIndex(where: { $0.tabBarButton === control }) else { return }
         if index == 2 {
@@ -158,22 +158,22 @@ class CYLFlatDesignMainTabBarController: CYLTabBarController, CYLFlatDesignUITab
     // MARK: - CYLFlatDesignUITabBarControllerDelegate
 
     func tabBarController(_ _: CYLTabBarController!, willShow _: CYLFlatDesignTabBar!) {
-        cyl_demo_log(#function)
+        cylDemoLog(#function)
     }
 
     func tabBarController(_ _: CYLTabBarController!, didShow _: CYLFlatDesignTabBar!) {
-        cyl_demo_log(#function)
+        cylDemoLog(#function)
     }
 
     func tabBarController(_ _: CYLTabBarController!, willHide _: CYLFlatDesignTabBar!) {
-        cyl_demo_log(#function)
+        cylDemoLog(#function)
     }
 
     func tabBarController(_ _: CYLTabBarController!, didHide _: CYLFlatDesignTabBar!) {
-        cyl_demo_log(#function)
+        cylDemoLog(#function)
     }
 
-    private func cyl_demo_log(_ function: String) {
+    private func cylDemoLog(_ function: String) {
         #if DEBUG
         NSLog(cylDemoLocalizedString("🔴类名与方法名：%@（在第%@行）, 描述：%@"), function, "\(#line)", "")
         #endif
@@ -201,7 +201,7 @@ class CYLFlatDesignMainTabBarController: CYLTabBarController, CYLFlatDesignUITab
                     viewControllers[4].cyl_showBadgeValue("NEW", animationType: .breathe)
                 }
                 // [EN] #535: the plus button's badge; each tap adds 1. [CN] #535：PlusButton 的角标；每次点击加 1。
-                tabBarController.cyl_demo_showPlusButtonBadge()
+                tabBarController.cylDemoShowPlusButtonBadge()
             }
         }
     }
@@ -247,7 +247,7 @@ class CYLFlatDesignMainTabBarController: CYLTabBarController, CYLFlatDesignUITab
 
     private func springAnimation(on view: UIView?) {
         guard let view else { return }
-        view.layer.removeAnimation(forKey: CYLSpringAnimationKey)
-        view.layer.add(CAKeyframeAnimation.cyl_springAnimation(forDuration: 0.6), forKey: CYLSpringAnimationKey)
+        view.layer.removeAnimation(forKey: cYLSpringAnimationKey)
+        view.layer.add(CAKeyframeAnimation.cyl_springAnimation(forDuration: 0.6), forKey: cYLSpringAnimationKey)
     }
 }

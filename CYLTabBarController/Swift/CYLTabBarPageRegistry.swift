@@ -458,7 +458,7 @@ open class CYLTabBarPageRegistry: NSObject, CYLTabBarPageProviding {
         for index in 0..<_dyld_image_count() {
             guard let imagePath = _dyld_get_image_name(index) else { continue }
             let path = String(cString: imagePath)
-            if path.contains("/System/Library/") || path.contains("/usr/lib/") || path.contains("/Developer/Library/") {
+            if cylIsSystemFrameworkPath(path) {
                 continue
             }
             var classCount: UInt32 = 0

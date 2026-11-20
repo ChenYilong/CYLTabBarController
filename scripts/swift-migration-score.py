@@ -35,7 +35,7 @@ SHELL_MARKER = 'CYL-SWIFT-MIGRATION: objc-shell'
 # [EN] Objective-C that Swift cannot replace (e.g. catching an Objective-C exception), listed with its size.
 # [CN] Swift 无法替代的 Objective-C（例如捕获 Objective-C 异常），会连同行数一起列出。
 REQUIRED_MARKER = 'CYL-SWIFT-MIGRATION: objc-required'
-COMPATIBLE = re.compile(r'^\s*(#|//|/\*|\*|\*/|NS_ASSUME_NONNULL_(BEGIN|END)|$)')
+COMPATIBLE = re.compile(r'^\s*(#|@import |//|/\*|\*|\*/|NS_ASSUME_NONNULL_(BEGIN|END)|$)')  # `@import` is the module form of `#import`
 
 
 def core_files():

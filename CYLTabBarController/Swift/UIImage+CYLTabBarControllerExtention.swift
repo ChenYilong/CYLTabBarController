@@ -167,11 +167,11 @@ public class CYLImageCache: NSObject {
      * [CN] `URL` 对应的缓存图片（先内存后磁盘），没有时为 nil。
      */
     @objc(imageFromCacheForURL:)
-    public func imageFromCache(for URL: URL?) -> UIImage? {
-        guard let URL else {
+    public func imageFromCache(for url: URL?) -> UIImage? {
+        guard let url else {
             return nil
         }
-        let key = CYLImageCache.key(for: URL)
+        let key = CYLImageCache.key(for: url)
         if let image = memoryCache.object(forKey: key as NSString) {
             return image
         }
@@ -188,11 +188,11 @@ public class CYLImageCache: NSObject {
      * [CN] 从内存与磁盘中移除 `URL` 对应的图片。
      */
     @objc(removeImageForURL:)
-    public func removeImage(for URL: URL?) {
-        guard let URL else {
+    public func removeImage(for url: URL?) {
+        guard let url else {
             return
         }
-        let key = CYLImageCache.key(for: URL)
+        let key = CYLImageCache.key(for: url)
         memoryCache.removeObject(forKey: key as NSString)
         ioQueue.async {
             try? FileManager.default.removeItem(atPath: self.filePath(forKey: key))
@@ -253,8 +253,8 @@ public class CYLImageCache: NSObject {
 
     // MARK: - Loading
 
-    func loadImage(with URL: URL, options: CYLImageLoadOptions, finish: @escaping (UIImage?) -> Void) {
-        let key = CYLImageCache.key(for: URL)
+    func loadImage(with url: URL, options: CYLImageLoadOptions, finish: @escaping (UIImage?) -> Void) {
+        let key = CYLImageCache.key(for: url)
         let refreshes = options.contains(.refreshCached)
         let keepsInMemory = !options.contains(.avoidMemoryCache)
         if !refreshes, let image = memoryCache.object(forKey: key as NSString) {
@@ -273,7 +273,7 @@ public class CYLImageCache: NSObject {
                 finish(nil)
                 return
             }
-            let request = URLRequest(url: URL, cachePolicy: refreshes ? .reloadIgnoringLocalCacheData : .useProtocolCachePolicy,
+            let request = URLRequest(url: url, cachePolicy: refreshes ? .reloadIgnoringLocalCacheData : .useProtocolCachePolicy,
                                      timeoutInterval: self.downloadTimeout)
             URLSession.shared.dataTask(with: request) { data, response, error in
                 let statusCode = (response as? HTTPURLResponse)?.statusCode ?? 200
@@ -293,8 +293,8 @@ public class CYLImageCache: NSObject {
 
     // MARK: - Private
 
-    private static func key(for URL: URL) -> String {
-        SHA256.hash(data: Data(URL.absoluteString.utf8)).map { String(format: "%02x", $0) }.joined()
+    private static func key(for url: URL) -> String {
+        SHA256.hash(data: Data(url.absoluteString.utf8)).map { String(format: "%02x", $0) }.joined()
     }
 
     private static func image(with data: Data) -> UIImage? {
@@ -421,25 +421,25 @@ extension UIImage {
      * [CN] 通过 `CYLImageCache` 加载 `URL` 处的图片；`completion` 在主队列执行。
      */
     @objc(cyl_loadImageWithURL:completion:)
-    public class func cyl_load(with URL: URL?, completion: @escaping (UIImage?) -> Void) {
-        cyl_load(with: URL, options: [], completion: completion)
+    public class func cyl_load(with url: URL?, completion: @escaping (UIImage?) -> Void) {
+        cyl_load(with: url, options: [], completion: completion)
     }
 
     /**
      * [EN] Loads the image at `URL` with options; `completion` runs on the main queue.
      * [CN] 按选项加载 `URL` 处的图片；`completion` 在主队列执行。
      */
-    public class func cyl_load(with URL: URL?, options: CYLImageLoadOptions, completion: @escaping (UIImage?) -> Void) {
+    public class func cyl_load(with url: URL?, options: CYLImageLoadOptions, completion: @escaping (UIImage?) -> Void) {
         let finish: (UIImage?) -> Void = { image in
             DispatchQueue.main.async {
                 completion(image)
             }
         }
-        guard let URL else {
+        guard let url else {
             finish(nil)
             return
         }
-        CYLImageCache.shared().loadImage(with: URL, options: options, finish: finish)
+        CYLImageCache.shared().loadImage(with: url, options: options, finish: finish)
     }
 
     /**
@@ -448,8 +448,8 @@ extension UIImage {
      * [CN] `cyl_load(with:options:completion:)` 的 Objective-C 入口：`options` 为 `CYLImageLoadOptions` 的原始值。
      */
     @objc(cyl_loadImageWithURL:options:completion:)
-    public class func cyl_load(with URL: URL?, rawOptions: UInt, completion: @escaping (UIImage?) -> Void) {
-        cyl_load(with: URL, options: CYLImageLoadOptions(rawValue: rawOptions), completion: completion)
+    public class func cyl_load(with url: URL?, rawOptions: UInt, completion: @escaping (UIImage?) -> Void) {
+        cyl_load(with: url, options: CYLImageLoadOptions(rawValue: rawOptions), completion: completion)
     }
 
     // MARK: - GIF

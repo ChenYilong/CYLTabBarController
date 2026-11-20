@@ -371,9 +371,8 @@ extension CYLTabBarController {
                 }
                 let originalImage = image.withRenderingMode(.alwaysOriginal)
                 let originalSelectedImage = (selectedImage ?? image).withRenderingMode(.alwaysOriginal)
-                self.setTabBarItemIconViewProvider({ selected in
-                    Self.cylIconView(selected ? originalSelectedImage : originalImage, size: size)
-                }, at: UInt(currentIndex))
+                self.setTabBarItemIconViewProvider(Self.cylIconViewProvider(normal: originalImage, selected: originalSelectedImage, size: size),
+                                                   at: UInt(currentIndex))
             }
             if let selectedIcon, !(selectedIcon as AnyObject).isEqual(icon) {
                 Self.cylLoadTabBarItemIcon(selectedIcon, completion: show)
@@ -389,6 +388,11 @@ extension CYLTabBarController {
      *      or the placeholder size.
      * [CN] 一种样式的视图：动图图标停在第一帧（点击或「全部播放」时播放），尺寸为 `size` 或占位尺寸。
      */
+    /// [EN] The provider showing `normal` or `selected` (a separate function: closures nest at most two deep). [CN] 显示 `normal` 或 `selected` 的 provider（单独的函数：闭包最多嵌套两层）。
+    private static func cylIconViewProvider(normal: UIImage, selected: UIImage, size: CGSize) -> CYLTabBarItemIconViewProvider {
+        { isSelected in cylIconView(isSelected ? selected : normal, size: size) }
+    }
+
     private static func cylIconView(_ iconImage: UIImage, size: CGSize) -> UIImageView {
         let frames = iconImage.images ?? []
         let iconView = UIImageView(image: frames.count > 1 ? frames.first?.withRenderingMode(iconImage.renderingMode) : iconImage)

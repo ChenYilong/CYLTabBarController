@@ -1,7 +1,9 @@
 package com.cyl.animateditem
 
 import android.content.Context
+import android.graphics.Color
 import android.graphics.PorterDuff
+import android.graphics.drawable.GradientDrawable
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.util.TypedValue
@@ -93,6 +95,147 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
      * [EN] The listener of taps, long presses, accessory taps and drags. [CN] 点击、长按、附加图标点击与拖拽的监听者。
      */
     var gestureListener: CYLAnimatedItemGestureListener? = null
+
+    // MARK: - Countdown 倒计时
+
+    /**
+     * [EN] The look: plain (default) or a countdown button. Countdown gives the view a border and a rounded corner and manages
+     *      its title; set the `countdown…` properties, then call `startCountdown()` (or set `startsCountdownOnTap`). The end is
+     *      a time read from the local clock, not a counter: the seconds spent in the background count, a clock past the longest
+     *      duration or set back to before the start closes the countdown, and `countdownCacheKey` keeps it across a restart
+     *      (FIX: issue #1 of SMSCodeButton). Only the title text changes, once per second, and the view keeps the width of its
+     *      widest title, so nothing flickers or jumps. While it runs the view is disabled.
+     * [CN] 样式：普通（默认）或倒计时按钮。倒计时样式为视图加上边框与圆角并接管标题；设置 `countdown…` 属性后调用 `startCountdown()`
+     *      （或设置 `startsCountdownOnTap`）。结束是从本地时钟读取的时间点，而不是计数器：后台度过的秒数计入，时钟超过最长时长或被调回到开始之前时
+     *      关闭倒计时，`countdownCacheKey` 使其在重启后继续（修复 SMSCodeButton 的 issue #1）。每秒只改变标题文字，视图保持最宽标题的宽度，
+     *      因此不会闪烁或抖动。倒计时期间视图不可用。
+     */
+    var style: CYLAnimatedItemStyle = CYLAnimatedItemStyle.Plain
+        set(value) {
+            if (field == value) return
+            field = value
+            countdownStyleChanged()
+        }
+
+    /**
+     * [EN] The length in seconds, 60 by default. Used by `startCountdown()`. [CN] 总时长（秒），默认 60。`startCountdown()` 使用。
+     */
+    var countdownDuration: Int = 60
+        set(value) { field = value; updateCountdownTitleWidth() }
+
+    /**
+     * [EN] The title before it starts, e.g. "Get code" (the default text is English; set the app's localized text).
+     * [CN] 开始前的标题，例如「获取验证码」（默认文本为英文；请设置 App 本地化后的文本）。
+     */
+    var countdownIdleTitle: String = "Get code"
+        set(value) { field = value; refreshCountdownTitle() }
+
+    /**
+     * [EN] The title while counting: a format with one `%d` (or `%ld`), the whole seconds left, e.g. "%d s left".
+     * [CN] 倒计时中的标题：带一个 `%d`（或 `%ld`，剩余整秒数）的格式，例如「还剩%d秒」。
+     */
+    var countdownRunningTitleFormat: String = "%d s left"
+        set(value) { field = value; refreshCountdownTitle() }
+
+    /**
+     * [EN] The title once the time is up, e.g. "Resend". [CN] 时间到之后的标题，例如「重新获取」。
+     */
+    var countdownFinishedTitle: String = "Resend"
+        set(value) { field = value; refreshCountdownTitle() }
+
+    /**
+     * [EN] The icon while counting (e.g. a clock); null keeps `image`. [CN] 倒计时中的图标（例如时钟）；为 null 时保持 `image`。
+     */
+    var countdownImage: Drawable? = null
+        set(value) { field = value; updateIcon(); requestLayout() }
+
+    /**
+     * [EN] The title color while counting (gray by default). Idle and finished keep the title's own color.
+     * [CN] 倒计时中的标题颜色（默认灰色）。待机与结束保持标题自己的颜色。
+     */
+    var countdownRunningTitleColor: Int = Color.GRAY
+        set(value) { field = value; applyCountdownAppearance() }
+
+    /**
+     * [EN] The border color of the countdown style while it is not counting. [CN] 倒计时样式在非倒计时状态下的边框颜色。
+     */
+    var countdownBorderColor: Int = 0xFF07C160.toInt()
+        set(value) { field = value; applyCountdownAppearance() }
+
+    /**
+     * [EN] Whether a tap starts the countdown after the listener's `onItemTapped` (off by default). With it off the app starts it
+     *      itself, e.g. once the server accepted the request. [CN] 点击是否在监听者的 `onItemTapped` 之后开始倒计时（默认关闭）。
+     *      关闭时由 App 自己开始，例如服务器接受请求之后。
+     */
+    var startsCountdownOnTap: Boolean = false
+
+    /**
+     * [EN] A key that keeps the running countdown in `countdownStorage`, so it survives the process being ended in the
+     *      background (or the app quit) and started again: a view with the same key, in the countdown style, takes it up again,
+     *      with the seconds that passed meanwhile counted. The cache holds the start, the end and the longest duration; it is
+     *      dropped when the time is up, on `resetCountdown()`, and when it is no longer valid. null (default): nothing is kept.
+     *      Use one key per thing counted, e.g. one per phone number.
+     * [CN] 用于把运行中的倒计时保存到 `countdownStorage` 的 key，使倒计时在进程于后台被结束（或 App 退出）后再次启动时仍然有效：样式为倒计时且
+     *      key 相同的视图会接着倒计时，期间经过的秒数同样计入。缓存保存开始时间、结束时间与最长时长；时间到、`resetCountdown()` 以及缓存失效时丢弃。
+     *      null（默认）：不保存。每个被计时的对象使用一个 key，例如每个手机号一个。
+     */
+    var countdownCacheKey: String? = null
+        set(value) {
+            field = value
+            if (style == CYLAnimatedItemStyle.Countdown) countdown.setCacheKey(value)
+        }
+
+    /**
+     * [EN] Where the cache is kept: a `SharedPreferences` file of the app by default. [CN] 缓存的保存位置：默认为 App 的一个 `SharedPreferences` 文件。
+     */
+    var countdownStorage: CYLAnimatedItemCountdownStorage? = null
+        set(value) { field = value; countdown.storage = value ?: sharedPreferencesStorage }
+
+    /**
+     * [EN] The clock in epoch millis, for tests: null (default) is `System.currentTimeMillis()`.
+     * [CN] 以 epoch 毫秒计的时钟，供测试使用：null（默认）为 `System.currentTimeMillis()`。
+     */
+    var countdownClock: (() -> Long)? = null
+
+    /**
+     * [EN] Where the countdown is. [CN] 倒计时所处的阶段。
+     */
+    val countdownState: CYLAnimatedItemCountdownState get() = countdown.state
+
+    /**
+     * [EN] The whole seconds left (rounded up): 0 when it is not running. [CN] 剩余整秒数（向上取整）：未运行时为 0。
+     */
+    val countdownRemainingSeconds: Int get() = countdown.remainingSeconds
+
+    private val sharedPreferencesStorage = object : CYLAnimatedItemCountdownStorage {
+        private val preferences get() = context.getSharedPreferences("CYLAnimatedItemCountdown", Context.MODE_PRIVATE)
+        override fun get(name: String): String? = preferences.getString(name, null)
+        override fun set(name: String, value: String) { preferences.edit().putString(name, value).apply() }
+        override fun remove(name: String) { preferences.edit().remove(name).apply() }
+    }
+
+    private val countdown = CYLAnimatedItemCountdown(
+        now = { countdownClock?.invoke() ?: System.currentTimeMillis() },
+        storage = sharedPreferencesStorage,
+        listener = object : CYLAnimatedItemCountdownListener {
+            override fun onCountdownChanged() { countdownChanged() }
+            override fun onCountdownStarted() { gestureListener?.onCountdownStarted(this@CYLAnimatedItemView) }
+            override fun onCountdownTicked(remainingSeconds: Int) { gestureListener?.onCountdownTicked(this@CYLAnimatedItemView, remainingSeconds) }
+            override fun onCountdownFinished() {
+                announceForAccessibility(countdownFinishedTitle)
+                gestureListener?.onCountdownFinished(this@CYLAnimatedItemView)
+            }
+        },
+    )
+    private var countdownDisabledIt = false
+    private var restingTitleColor: Int? = null
+    private val countdownTicker = Runnable { tickCountdown() }
+
+    /** [EN] One tick: refreshes the title and schedules the next one while it runs. [CN] 一次滴答：刷新标题，运行期间安排下一次。 */
+    private fun tickCountdown() {
+        countdown.refresh()
+        if (countdown.state == CYLAnimatedItemCountdownState.Running) postDelayed(countdownTicker, CYLAnimatedItemCountdown.TICK_INTERVAL_MILLIS)
+    }
 
     // MARK: - Content 内容
 
@@ -463,7 +606,8 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
     protected open fun updateIcon() {
         // [EN] The static image given, else the placeholder, until the animation shows (also while it downloads).
         // [CN] 在动画显示之前（包括下载期间）显示传入的静态图片，没有时显示占位图。
-        val shown = selectedImage.takeIf { isSelected } ?: image
+        val running = countdown.state == CYLAnimatedItemCountdownState.Running
+        val shown = countdownImage.takeIf { running } ?: selectedImage.takeIf { isSelected } ?: image
         iconView.setImageDrawable(shown ?: placeholderIfNeeded())
         iconView.visibility = if (animationShows()) View.INVISIBLE else View.VISIBLE
     }
@@ -634,7 +778,134 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
     override fun performClick(): Boolean {
         val handled = super.performClick()
         gestureListener?.onItemTapped(this)
+        // [EN] After the listener handled the tap (send the code there), the countdown starts. [CN] 监听者处理点击（在那里发送验证码）之后开始倒计时。
+        if (style == CYLAnimatedItemStyle.Countdown && startsCountdownOnTap && countdown.state != CYLAnimatedItemCountdownState.Running) startCountdown()
         return handled
+    }
+
+    // MARK: - Countdown logic 倒计时逻辑
+
+    /**
+     * [EN] Starts (or restarts) for `durationSeconds` (default `countdownDuration`, e.g. the server's "retry after"). Switches
+     *      the view to the countdown style when it is not. [CN] 开始（或重新开始）`durationSeconds` 秒（默认 `countdownDuration`，
+     *      例如服务器返回的「多少秒后重试」）。视图不是倒计时样式时切换为倒计时样式。
+     */
+    @JvmOverloads
+    fun startCountdown(durationSeconds: Int = countdownDuration) {
+        if (style != CYLAnimatedItemStyle.Countdown) style = CYLAnimatedItemStyle.Countdown
+        countdown.start(durationSeconds)
+    }
+
+    /**
+     * [EN] Stops and shows the idle title, with no finish callback. [CN] 停止并显示待机标题，不触发结束回调。
+     */
+    fun resetCountdown() {
+        countdown.reset()
+    }
+
+    /**
+     * [EN] Reads the clock now (done by the view itself on every tick and when the window is shown again).
+     * [CN] 立即读取时钟（视图自己会在每次 tick 与窗口再次显示时读取）。
+     */
+    fun refreshCountdown() {
+        countdown.refresh()
+    }
+
+    private fun countdownStyleChanged() {
+        if (style == CYLAnimatedItemStyle.Countdown) {
+            // [EN] The default look of a countdown button: a rounded border and a light background, as the original SMSCodeButton.
+            // [CN] 倒计时按钮的默认外观：圆角边框与浅色背景，与最初的 SMSCodeButton 一致。
+            if (paddingLeft == 0 && paddingTop == 0 && paddingRight == 0 && paddingBottom == 0) {
+                setPadding(dp(12f).roundToInt(), dp(8f).roundToInt(), dp(12f).roundToInt(), dp(8f).roundToInt())
+            }
+            countdown.storage = countdownStorage ?: sharedPreferencesStorage
+            countdownChanged()
+            countdown.setCacheKey(countdownCacheKey)
+        } else {
+            countdown.reset()
+            background = null
+            titleView.minWidth = 0
+        }
+        requestLayout()
+    }
+
+    /**
+     * [EN] The state or the seconds changed: the title, the icon, the look, enabled and the ticker.
+     * [CN] 状态或秒数变化：标题、图标、外观、可用状态与定时 tick。
+     */
+    private fun countdownChanged() {
+        if (style != CYLAnimatedItemStyle.Countdown) return
+        val running = countdown.state == CYLAnimatedItemCountdownState.Running
+        if (running && restingTitleColor == null) restingTitleColor = titleView.currentTextColor
+        if (!running) restingTitleColor?.let { titleView.setTextColor(it); restingTitleColor = null }
+        title = when (countdown.state) {
+            CYLAnimatedItemCountdownState.Running -> CYLAnimatedItemCountdown.text(countdownRunningTitleFormat, countdown.shownSeconds)
+            CYLAnimatedItemCountdownState.Finished -> countdownFinishedTitle
+            CYLAnimatedItemCountdownState.Idle -> countdownIdleTitle
+        }
+        if (running && isEnabled) { countdownDisabledIt = true; isEnabled = false }
+        if (!running && countdownDisabledIt) { countdownDisabledIt = false; isEnabled = true }
+        updateIcon()
+        applyCountdownAppearance()
+        updateCountdownTitleWidth()
+        removeCallbacks(countdownTicker)
+        if (running) postDelayed(countdownTicker, CYLAnimatedItemCountdown.TICK_INTERVAL_MILLIS)
+        requestLayout()
+    }
+
+    private fun refreshCountdownTitle() {
+        if (style == CYLAnimatedItemStyle.Countdown) countdownChanged()
+    }
+
+    /**
+     * [EN] The border, the background and the title color of the countdown style, for the state it is in.
+     * [CN] 倒计时样式在当前状态下的边框、背景与标题颜色。
+     */
+    private fun applyCountdownAppearance() {
+        if (style != CYLAnimatedItemStyle.Countdown) return
+        val running = countdown.state == CYLAnimatedItemCountdownState.Running
+        background = GradientDrawable().apply {
+            cornerRadius = dp(6f)
+            setColor(0xFFF2F2F7.toInt())
+            setStroke(max(1, dp(0.5f).roundToInt()), if (running) Color.LTGRAY else countdownBorderColor)
+        }
+        if (running) titleView.setTextColor(countdownRunningTitleColor)
+    }
+
+    /**
+     * [EN] The widest title the countdown shows (idle, finished, the running one with the widest digits of the duration) is the
+     *      title's minimum width, so the view keeps its width while the digits change. [CN] 倒计时会显示的最宽标题（待机、结束、
+     *      以时长位数的最宽数字组成的倒计时）作为标题的最小宽度，使视图在数字变化时保持宽度。
+     */
+    private fun updateCountdownTitleWidth() {
+        if (style != CYLAnimatedItemStyle.Countdown) return
+        val digits = max(1, countdownDuration).toString().length
+        val widest = "8".repeat(digits).toInt()
+        titleView.minWidth = maxOf(
+            titleWidth(countdownIdleTitle),
+            titleWidth(countdownFinishedTitle),
+            titleWidth(CYLAnimatedItemCountdown.text(countdownRunningTitleFormat, widest)),
+        )
+    }
+
+    override fun onWindowVisibilityChanged(visibility: Int) {
+        super.onWindowVisibilityChanged(visibility)
+        // [EN] The window is shown again (the app returns from the background): read the clock at once. [CN] 窗口再次显示（App 从后台返回）：立即读取时钟。
+        if (visibility == View.VISIBLE) countdown.refresh()
+    }
+
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+        countdown.refresh()
+        if (countdown.state == CYLAnimatedItemCountdownState.Running) {
+            removeCallbacks(countdownTicker)
+            postDelayed(countdownTicker, CYLAnimatedItemCountdown.TICK_INTERVAL_MILLIS)
+        }
+    }
+
+    override fun onDetachedFromWindow() {
+        removeCallbacks(countdownTicker)
+        super.onDetachedFromWindow()
     }
 
     // MARK: - Accessibility 无障碍

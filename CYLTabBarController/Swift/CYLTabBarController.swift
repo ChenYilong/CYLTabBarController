@@ -218,7 +218,7 @@ open class CYLTabBarController: UITabBarController, CYLTabBarControllerDelegate,
     }
 
     /// [EN] Convenience, so a subclass that overrides `init(configuration:)` inherits every initializer. [CN] 便利初始化方法：重写了 `init(configuration:)` 的子类因此继承所有初始化方法。
-    public override convenience init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
+    public override convenience init(nibName _: String?, bundle _: Bundle?) {
         self.init(configuration: [:])
     }
 
@@ -320,6 +320,7 @@ open class CYLTabBarController: UITabBarController, CYLTabBarControllerDelegate,
     /// [EN] After a coder or nib initialization. [CN] 通过 coder 或 nib 初始化之后。
     @objc(cyl_didInitialize)
     open func cyl_didInitialize() {
+        // [EN] A hook for subclasses; the class itself has nothing to do after a coder or nib initialization. [CN] 供子类使用的钩子；通过 coder 或 nib 初始化之后，本类自身无需处理。
     }
 
     // MARK: - UIKit overrides
@@ -347,8 +348,11 @@ open class CYLTabBarController: UITabBarController, CYLTabBarControllerDelegate,
     /// [EN] The tab bar, typed `CYLTabBar` as the Objective-C header declared it (an unchecked cast, as before: the tab bar is replaced by
     ///      `CYLTabBar` through KVC when the controller is set up). [CN] TabBar，类型为 `CYLTabBar`，与 Objective-C 头文件的声明一致（与以前一样不检查类型：
     ///      设置控制器时已通过 KVC 把 TabBar 换成 `CYLTabBar`）。
+    ///      FIX: launch crash in `init(configurationFile:)` — before that swap the tab bar is still a plain `UITabBar`, and
+    ///      `unsafeDowncast` traps on it in a Debug build; `unsafeBitCast` never checks, as the Objective-C cast did.
+    ///      启动崩溃：换成 `CYLTabBar` 之前 TabBar 还是普通 `UITabBar`，`unsafeDowncast` 在 Debug 构建中会崩溃；`unsafeBitCast` 不检查，与 Objective-C 的强制转换一致。
     open override var tabBar: CYLTabBar {
-        unsafeDowncast(super.tabBar, to: CYLTabBar.self)
+        unsafeBitCast(super.tabBar as AnyObject, to: CYLTabBar.self)
     }
 
     open override var isTabBarHidden: Bool {

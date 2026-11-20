@@ -40,8 +40,8 @@ extension UIViewController {
         }
         @objc(cyl_setTabBarItem:) set {
             let item = newValue ?? CYLFlatDesignTabBarItem(title: title, image: nil)
-            // [EN] FIXME: `-[CYLFlatDesignTabBarButton setTabBarItem:]` must run before this, or the item has no button yet.
-            // [CN] FIXME：`-[CYLFlatDesignTabBarButton setTabBarItem:]` 需要在此之前调用，否则 item 还没有按钮。
+            // [EN] Note: `-[CYLFlatDesignTabBarButton setTabBarItem:]` must run before this, or the item has no button yet.
+            // [CN] 注意：`-[CYLFlatDesignTabBarButton setTabBarItem:]` 需要在此之前调用，否则 item 还没有按钮。
             let contentItem = objc_getAssociatedObject(cyl_getViewControllerInsteadOfNavigation(), Self.cyl_flatDesignTabBarItemKey)
                 as? CYLFlatDesignTabBarItem
             let oldItem: CYLFlatDesignTabBarItem = contentItem ?? cyl_tabBarItem

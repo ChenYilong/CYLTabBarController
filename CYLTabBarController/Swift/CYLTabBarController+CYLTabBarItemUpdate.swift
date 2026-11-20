@@ -20,7 +20,7 @@ import UIKit
                                                 selectedImage: UIImage?) -> Bool
     /// [EN] The tab's FlatDesign item plays `URL`. [CN] 该 Tab 的扁平样式 item 播放 `URL`。
     @objc(cyl_flatDesignSetAnimationURL:ofViewController:)
-    optional func cylFlatDesignSetAnimationURL(_ URL: URL, of viewController: UIViewController)
+    optional func cylFlatDesignSetAnimationURL(_ url: URL, of viewController: UIViewController)
 }
 
 /**
@@ -431,7 +431,7 @@ extension CYLTabBarController {
         }
         // [EN] Liquid Glass may keep the tab buttons' previous layout until a tab is tapped: reload them as a tap does.
         // [CN] 液态玻璃可能保持 Tab 按钮原来的布局，直到点击某个 Tab：像点击一样重新加载它们。
-        (tabBar as? CYLTabBar)?.cyl_reloadTabButtons()
+        (tabBar as CYLTabBar).cyl_reloadTabButtons()
         // [EN] Icons from the network replace the images once downloaded. [CN] 网络图标下载完成后覆盖图片。
         if loadsImageURLs {
             cylLoadImageURLs(ofAttributes: newAttributes, at: index)

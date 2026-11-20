@@ -96,3 +96,14 @@
   width: 18px;
   height: 18px;
 }
+/* [EN] The countdown style (`itemStyle` "countdown"): a bordered, rounded button with a light background; the border is
+        gray while it counts down. [CN] 倒计时样式（`itemStyle` 为 "countdown"）：带边框与圆角、浅色背景的按钮；倒计时中边框为灰色。 */
+.cyl-animated-item-countdown {
+  padding: 8px 12px;
+  border: 0.5px solid #07c160;
+  border-radius: 6px;
+  background-color: #f2f2f7;
+}
+.cyl-animated-item-countdown.cyl-animated-item-disabled {
+  border-color: #c7c7cc;
+}

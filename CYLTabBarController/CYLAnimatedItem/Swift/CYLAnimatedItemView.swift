@@ -60,6 +60,33 @@ import UIKit
 }
 
 /**
+ [EN] The look of the control: the plain animated icon + title (default), or a countdown button, e.g. for "Get the SMS
+      code" (see `CYLAnimatedItemView.startCountdown()`).
+ [CN] 控件的样式：普通的动效 icon + title（默认），或倒计时按钮，例如「获取验证码」（见 `CYLAnimatedItemView.startCountdown()`）。
+ */
+@objc public enum CYLAnimatedItemStyle: Int {
+    /** [EN] The plain animated icon + title (default). [CN] 普通的动效 icon + title（默认）。 */
+    case plain = 0
+    /**
+     [EN] A bordered countdown button: idle title, then "N seconds left" until the time is up, then a finished title.
+     [CN] 带边框的倒计时按钮：先显示待机标题，再显示「还剩 N 秒」直到时间到，最后显示结束标题。
+     */
+    case countdown
+}
+
+/**
+ [EN] Where a countdown is. [CN] 倒计时所处的阶段。
+ */
+@objc public enum CYLAnimatedItemCountdownState: Int {
+    /** [EN] Not started: the idle title shows and a tap can start it. [CN] 未开始：显示待机标题，点击可以开始。 */
+    case idle = 0
+    /** [EN] Counting down: the control is disabled. [CN] 倒计时中：控件不可用。 */
+    case running
+    /** [EN] The time is up: the finished title shows and a tap can start it again. [CN] 时间到：显示结束标题，点击可以再次开始。 */
+    case finished
+}
+
+/**
  [EN] What the item shows. `CYLAnimatedItemView` stores every property; a subclass may compute them instead.
  [CN] 条目显示的内容。`CYLAnimatedItemView` 保存所有属性；子类也可以自行计算。
  */
@@ -112,6 +139,13 @@ import UIKit
     @objc optional func animatedItemViewDidLongPress(_ itemView: CYLAnimatedItemView)
     /** [EN] The accessory icon was tapped. [CN] 点击了附加图标。 */
     @objc optional func animatedItemViewDidTapAccessory(_ itemView: CYLAnimatedItemView)
+    /** [EN] The countdown started. [CN] 倒计时开始。 */
+    @objc optional func animatedItemViewDidStartCountdown(_ itemView: CYLAnimatedItemView)
+    /** [EN] The whole seconds left changed, once per second. [CN] 剩余整秒数变化，每秒一次。 */
+    @objc(animatedItemView:didTickCountdown:)
+    optional func animatedItemView(_ itemView: CYLAnimatedItemView, didTickCountdown remainingSeconds: Int)
+    /** [EN] The time is up. [CN] 时间到。 */
+    @objc optional func animatedItemViewDidFinishCountdown(_ itemView: CYLAnimatedItemView)
     /** [EN] Whether a drag may start (asked only when `isDragEnabled`). [CN] 是否允许开始拖拽（仅在 `isDragEnabled` 时询问）。 */
     @objc optional func animatedItemViewShouldBeginDrag(_ itemView: CYLAnimatedItemView) -> Bool
     /** [EN] A drag started. [CN] 拖拽开始。 */
@@ -122,6 +156,26 @@ import UIKit
     /** [EN] The drag ended (or was cancelled) at `translation`. [CN] 拖拽在 `translation` 处结束（或取消）。 */
     @objc(animatedItemView:didEndDragWithTranslation:cancelled:)
     optional func animatedItemView(_ itemView: CYLAnimatedItemView, didEndDragWithTranslation translation: CGPoint, cancelled: Bool)
+}
+
+/// [EN] How often a running countdown reads the clock. The title changes only when the whole seconds left change, so a tick
+///      that is a little late (a busy main thread) shows the right number, and the display is never ahead by more than this.
+/// [CN] 运行中的倒计时读取时钟的间隔。只有剩余整秒数变化时才改变标题，因此 tick 稍有延迟（主线程繁忙）时仍显示正确的数字，显示最多超前此间隔。
+private let CYLAnimatedItemCountdownTickInterval: TimeInterval = 0.25
+
+private let CYLAnimatedItemCountdownNumberFormatter: NumberFormatter = {
+    let formatter = NumberFormatter()
+    formatter.locale = Locale.autoupdatingCurrent
+    formatter.usesGroupingSeparator = false
+    return formatter
+}()
+
+/// [EN] `format` with its `%ld` (or `%d`) replaced by `seconds`, in the user's digits. A replacement instead of
+///      `String(format:)` because the format is the app's text, not a literal.
+/// [CN] 把 `format` 中的 `%ld`（或 `%d`）替换为 `seconds`（使用用户所在地区的数字）。使用替换而不是 `String(format:)`，因为格式是 App 的文本，不是字面量。
+private func CYLAnimatedItemCountdownText(_ format: String, seconds: Int) -> String {
+    let number = CYLAnimatedItemCountdownNumberFormatter.string(from: NSNumber(value: seconds)) ?? String(seconds)
+    return format.replacingOccurrences(of: "%ld", with: number).replacingOccurrences(of: "%d", with: number)
 }
 
 /// [EN] The default animation size, as the tab bar's. [CN] 默认动画尺寸，与 TabBar 一致。
@@ -324,6 +378,97 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
     /** [EN] The accessory's size (18 x 18 by default). [CN] 附加图标的尺寸（默认 18 x 18）。 */
     public var accessorySize = CGSize(width: 18, height: 18) { didSet { cyl_contentDidChange() } }
 
+    // MARK: - Countdown properties 倒计时属性
+
+    /**
+     [EN] The look: plain (default) or a countdown button. Countdown gives the control a border and a rounded corner and
+          manages its title; set the `countdown…` properties, then call `startCountdown()` (or set `startsCountdownOnTap`).
+          The end is kept as a date, not counted by a timer: the seconds that pass while the app is in the background, or the
+          device is locked, still count (the time left is read again on every tick and when the app returns), and a late timer
+          cannot make it drift (FIX: issue #1 of SMSCodeButton). Only the title changes, once per second, on the same label:
+          no system button is rebuilt, so nothing flickers; the control keeps the width of its widest title, so it does not
+          jump either. While it runs the control is disabled, and VoiceOver reads the remaining seconds.
+     [CN] 样式：普通（默认）或倒计时按钮。倒计时样式为控件加上边框与圆角并接管标题；设置 `countdown…` 属性后调用 `startCountdown()`
+          （或设置 `startsCountdownOnTap`）。结束时间保存为日期，而不是靠定时器累减：App 在后台、设备锁屏期间经过的秒数同样计入
+          （每次 tick 与 App 返回前台时重新读取剩余时间），定时器延迟也不会造成偏差（修复 SMSCodeButton 的 issue #1）。每秒只改变同一个
+          label 的标题，不重建系统按钮，因此不会闪烁；控件保持最宽标题的宽度，也不会抖动。倒计时期间控件不可用，VoiceOver 朗读剩余秒数。
+     */
+    public var style: CYLAnimatedItemStyle = .plain {
+        didSet { cyl_countdownStyleDidChange(from: oldValue) }
+    }
+    /** [EN] The length in seconds, 60 by default. Used by `startCountdown()`. [CN] 总时长（秒），默认 60。`startCountdown()` 使用。 */
+    public var countdownDuration: TimeInterval = 60
+    /**
+     [EN] The title before it starts, e.g. "Get code" (the default text is English; set the app's localized text).
+     [CN] 开始前的标题，例如「获取验证码」（默认文本为英文；请设置 App 本地化后的文本）。
+     */
+    public var countdownIdleTitle = "Get code" { didSet { cyl_refreshCountdownTitle() } }
+    /**
+     [EN] The title while counting: a format with one `%ld`, the whole seconds left, e.g. "%ld s left".
+     [CN] 倒计时中的标题：带一个 `%ld`（剩余整秒数）的格式，例如「还剩%ld秒」。
+     */
+    public var countdownRunningTitleFormat = "%ld s left" { didSet { cyl_refreshCountdownTitle() } }
+    /** [EN] The title once the time is up, e.g. "Resend". [CN] 时间到之后的标题，例如「重新获取」。 */
+    public var countdownFinishedTitle = "Resend" { didSet { cyl_refreshCountdownTitle() } }
+    /** [EN] The icon while counting (e.g. a clock); nil keeps `image`. [CN] 倒计时中的图标（例如时钟）；为 nil 时保持 `image`。 */
+    public var countdownImage: UIImage? {
+        didSet {
+            cyl_updateIcon()
+            cyl_contentDidChange()
+        }
+    }
+    /**
+     [EN] The title color while counting (gray by default). Idle and finished use `titleLabel.textColor`.
+     [CN] 倒计时中的标题颜色（默认灰色）。待机与结束使用 `titleLabel.textColor`。
+     */
+    public var countdownRunningTitleColor: UIColor = .gray { didSet { cyl_applyCountdownAppearance() } }
+    /**
+     [EN] Whether a tap starts the countdown after the delegate's `animatedItemViewDidTap(_:)` (off by default). With it off
+          the app starts it itself, e.g. once the server accepted the request.
+     [CN] 点击是否在代理的 `animatedItemViewDidTap(_:)` 之后开始倒计时（默认关闭）。关闭时由 App 自己开始，例如服务器接受请求之后。
+     */
+    public var startsCountdownOnTap = false
+    /** [EN] Where the countdown is. [CN] 倒计时所处的阶段。 */
+    public private(set) var countdownState: CYLAnimatedItemCountdownState = .idle
+    /** [EN] When the running countdown ends; nil when it is not running. [CN] 运行中的倒计时的结束时间；未运行时为 nil。 */
+    public private(set) var countdownEndDate: Date?
+    /** [EN] The clock, for tests: `Date()` by default (nil). [CN] 时钟，供测试使用：默认为 `Date()`（nil）。 */
+    public var countdownDateProvider: (() -> Date)?
+    /** [EN] The whole seconds left (rounded up): 0 when it is not running. [CN] 剩余整秒数（向上取整）：未运行时为 0。 */
+    public var countdownRemainingSeconds: Int {
+        guard countdownState == .running, let end = countdownEndDate else { return 0 }
+        let left = end.timeIntervalSince(cyl_now)
+        return left > 0 ? Int(ceil(left)) : 0
+    }
+    /**
+     [EN] A key that keeps the running countdown in `countdownCacheStore`, so it survives the app being ended in the background
+          (or quit) and started again: a view with the same key, in the countdown style, takes it up again, with the seconds
+          that passed meanwhile counted. The cache holds the start, the end and the longest duration; it is dropped when the
+          time is up, on `resetCountdown()`, and when it is no longer valid (see `refreshCountdown()`). nil (default): nothing
+          is kept. Use one key per thing counted, e.g. one per phone number.
+     [CN] 用于把运行中的倒计时保存到 `countdownCacheStore` 的 key，使倒计时在 App 于后台被结束（或退出）后再次启动时仍然有效：
+          样式为倒计时且 key 相同的视图会接着倒计时，期间经过的秒数同样计入。缓存保存开始时间、结束时间与最长时长；时间到、
+          `resetCountdown()` 以及缓存失效（见 `refreshCountdown()`）时丢弃。nil（默认）：不保存。每个被计时的对象使用一个 key，例如每个手机号一个。
+     */
+    public var countdownCacheKey: String? {
+        didSet {
+            guard countdownCacheKey != oldValue else { return }
+            if let old = oldValue { countdownCacheStore.removeObject(forKey: Self.cyl_countdownCacheName(old)) }
+            if countdownState == .running {
+                cyl_saveCountdownToCache()
+            } else {
+                cyl_restoreCountdownFromCache()
+            }
+        }
+    }
+    /** [EN] Where the cache is kept: `UserDefaults.standard` by default; an app group's suite, or one for tests. [CN] 缓存的保存位置：默认为 `UserDefaults.standard`；也可以是 App Group 的 suite，或测试用的 suite。 */
+    public var countdownCacheStore: UserDefaults = .standard
+    private var countdownTimer: Timer?
+    private var countdownStartDate: Date?
+    private var countdownShownSeconds = -1
+    private var countdownRunDuration: TimeInterval = 0
+    private var countdownRestingTitleColor: UIColor?
+
     // MARK: - Gestures 手势
 
     /** [EN] Whether the control reports drags (off by default). [CN] 是否报告拖拽（默认关闭）。 */
@@ -520,6 +665,8 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
 
     deinit {
         loopTimer?.invalidate()
+        countdownTimer?.invalidate()
+        NotificationCenter.default.removeObserver(self)
     }
 
     private func cyl_animatedItemSetUp() {
@@ -576,6 +723,7 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
 
     private func cyl_updateIcon() {
         var icon = (isSelected && selectedImage != nil) ? selectedImage : image
+        if countdownState == .running, let countdownIcon = countdownImage { icon = countdownIcon }
         if icon == nil { icon = cyl_placeholderIfNeeded() }
         // [EN] An animated image (`UIImage.images`, e.g. a GIF) rests on its first frame until it is played, like an animation
         //      file (docs/Animated-Item.md, "every animated tab icon rests until it is played"); `playAnimation()` plays it.
@@ -639,6 +787,7 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
         let titleLimit = max(0, size.width - accessory - accessorySpacing - (axis == .horizontal ? icon.width + gap : 0))
         var titleSize = showsTitle ? titleLabel.sizeThatFits(CGSize(width: titleLimit, height: .greatestFiniteMagnitude)) : .zero
         titleSize.width = min(ceil(titleSize.width), titleLimit)
+        if showsTitle { titleSize.width = min(max(titleSize.width, cyl_countdownTitleWidth), titleLimit) }
         titleSize.height = ceil(titleSize.height)
         let accessoryHeight = cyl_accessoryInline ? accessorySize.height : 0
         if axis == .horizontal {
@@ -663,6 +812,7 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
     open override func layoutSubviews() {
         super.layoutSubviews()
         layoutContent(in: bounds.inset(by: contentInsets))
+        cyl_applyCountdownAppearance()
     }
 
     /**
@@ -700,6 +850,7 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
         let titleLimit = axis == .horizontal ? max(0, content.width - icon.width - gap) : content.width
         var titleSize = showsTitle ? titleLabel.sizeThatFits(CGSize(width: titleLimit, height: content.height)) : .zero
         titleSize.width = min(ceil(titleSize.width), titleLimit)
+        if showsTitle { titleSize.width = min(max(titleSize.width, cyl_countdownTitleWidth), titleLimit) }
         titleSize.height = min(ceil(titleSize.height), content.height)
         let leadingAligned = alignment == .leading
         let iconFrame: CGRect
@@ -757,6 +908,7 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
     open override var isHighlighted: Bool {
         didSet {
             guard isHighlighted != oldValue else { return }
+            cyl_applyCountdownAppearance()
             itemStateDidChange()
         }
     }
@@ -765,6 +917,7 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
         didSet {
             guard isEnabled != oldValue else { return }
             applyItemAppearance()
+            cyl_applyCountdownAppearance()
             itemStateDidChange()
             updateItemAccessibility()
         }
@@ -958,6 +1111,9 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
 
     @objc private func cyl_handleTap() {
         delegate?.animatedItemViewDidTap?(self)
+        if style == .countdown, startsCountdownOnTap, countdownState != .running {
+            startCountdown()
+        }
     }
 
     @objc private func cyl_handleAccessoryTap() {
@@ -998,6 +1154,253 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
             return delegate?.responds(to: #selector(CYLAnimatedItemViewDelegate.animatedItemViewDidLongPress(_:))) ?? false
         }
         return super.gestureRecognizerShouldBegin(gestureRecognizer)
+    }
+
+    // MARK: - Countdown 倒计时
+
+    private var cyl_now: Date { countdownDateProvider?() ?? Date() }
+
+    private func cyl_countdownStyleDidChange(from oldStyle: CYLAnimatedItemStyle) {
+        guard style != oldStyle else { return }
+        if style == .countdown {
+            // [EN] The default look of a countdown button: a rounded border and a light background, as the original
+            //      SMSCodeButton. Set these properties again after the style to change them.
+            // [CN] 倒计时按钮的默认外观：圆角边框与浅色背景，与最初的 SMSCodeButton 一致。要修改，请在设置样式之后再设置这些属性。
+            if contentInsets == .zero { contentInsets = UIEdgeInsets(top: 8, left: 12, bottom: 8, right: 12) }
+            if backgroundColor == nil { backgroundColor = .secondarySystemBackground }
+            layer.cornerRadius = 6
+            layer.masksToBounds = true
+            titleLabel.font = UIFont.preferredFont(forTextStyle: .body)
+            cyl_showCountdownIdleOrFinishedTitle()
+            cyl_applyCountdownAppearance()
+            cyl_restoreCountdownFromCache()
+        } else {
+            resetCountdown()
+            layer.cornerRadius = 0
+            layer.borderWidth = 0
+            titleLabel.alpha = 1
+            imageView.alpha = 1
+        }
+        cyl_contentDidChange()
+    }
+
+    /// [EN] Shows the title that belongs to the current state, after a title property changed. [CN] 某个标题属性变化后，显示与当前状态对应的标题。
+    private func cyl_refreshCountdownTitle() {
+        guard style == .countdown else { return }
+        if countdownState == .running {
+            title = CYLAnimatedItemCountdownText(countdownRunningTitleFormat, seconds: max(countdownShownSeconds, 0))
+        } else {
+            cyl_showCountdownIdleOrFinishedTitle()
+        }
+    }
+
+    private func cyl_showCountdownIdleOrFinishedTitle() {
+        title = countdownState == .finished ? countdownFinishedTitle : countdownIdleTitle
+    }
+
+    /// [EN] The widest title the countdown shows, so the control keeps its width: the idle and finished titles and the
+    ///      running one with the widest digits of `countdownDuration`. 0 for another style.
+    /// [CN] 倒计时会显示的最宽标题，使控件保持宽度：待机标题、结束标题，以及用 `countdownDuration` 位数的最宽数字组成的倒计时标题。其他样式为 0。
+    private var cyl_countdownTitleWidth: CGFloat {
+        guard style == .countdown else { return 0 }
+        let digits = String(max(1, Int(ceil(countdownDuration)))).count
+        let widest = Int(String(repeating: "8", count: digits)) ?? 88
+        let attributes: [NSAttributedString.Key: Any] = [.font: titleLabel.font as Any]
+        let texts = [countdownIdleTitle, countdownFinishedTitle, CYLAnimatedItemCountdownText(countdownRunningTitleFormat, seconds: widest)]
+        return texts.map { ceil(($0 as NSString).size(withAttributes: attributes).width) }.max() ?? 0
+    }
+
+    /// [EN] The border, the title color and the pressed look of the countdown style, for the state it is in.
+    /// [CN] 倒计时样式在当前状态下的边框、标题颜色与按下外观。
+    private func cyl_applyCountdownAppearance() {
+        guard style == .countdown else { return }
+        let running = countdownState == .running
+        let border: UIColor = running ? .lightGray : (tintColor ?? .systemBlue)
+        layer.borderColor = border.resolvedColor(with: traitCollection).cgColor
+        layer.borderWidth = 1 / max(1, traitCollection.displayScale)
+        if running { titleLabel.textColor = countdownRunningTitleColor }
+        let alpha: CGFloat = isHighlighted ? 0.5 : 1
+        titleLabel.alpha = alpha
+        imageView.alpha = alpha
+    }
+
+    /// [EN] Puts back the title color the running color replaced. [CN] 恢复被倒计时颜色替换的标题颜色。
+    private func cyl_restoreCountdownTitleColor() {
+        guard let color = countdownRestingTitleColor else { return }
+        titleLabel.textColor = color
+        countdownRestingTitleColor = nil
+    }
+
+    /**
+     [EN] Starts (or restarts) for `countdownDuration` seconds. Switches the style to countdown when it is not.
+     [CN] 开始（或重新开始）`countdownDuration` 秒的倒计时。样式不是倒计时时会切换为倒计时样式。
+     */
+    open func startCountdown() {
+        startCountdown(withDuration: countdownDuration)
+    }
+
+    /**
+     [EN] Starts for `duration` seconds, e.g. the "retry after" the server sent. [CN] 开始 `duration` 秒的倒计时，例如服务器返回的「多少秒后重试」。
+     */
+    @objc(startCountdownWithDuration:)
+    open func startCountdown(withDuration duration: TimeInterval) {
+        guard duration > 0 else {
+            resetCountdown()
+            return
+        }
+        if style != .countdown { style = .countdown }
+        let start = cyl_now
+        cyl_beginCountdown(start: start, end: start.addingTimeInterval(duration), duration: duration, announcesStart: true)
+    }
+
+    /// [EN] Enters the running state for `start`...`end`; `announcesStart` is false when a cached countdown is taken up again.
+    /// [CN] 进入 `start`…`end` 的运行状态；接续缓存的倒计时时 `announcesStart` 为 false。
+    private func cyl_beginCountdown(start: Date, end: Date, duration: TimeInterval, announcesStart: Bool) {
+        if countdownState != .running {
+            // [EN] The color to go back to when the time is up, taken before the running color replaces it.
+            // [CN] 时间到之后要恢复的颜色，在倒计时颜色替换它之前取得。
+            countdownRestingTitleColor = titleLabel.textColor
+        }
+        countdownRunDuration = duration
+        countdownStartDate = start
+        countdownEndDate = end
+        countdownState = .running
+        countdownShownSeconds = -1
+        isEnabled = false
+        cyl_saveCountdownToCache()
+        cyl_startCountdownTimer()
+        cyl_updateIcon()
+        if announcesStart { delegate?.animatedItemViewDidStartCountdown?(self) }
+        refreshCountdown()
+        cyl_contentDidChange()
+    }
+
+    /**
+     [EN] Stops and shows the idle title, with no finish callback. [CN] 停止并显示待机标题，不触发结束回调。
+     */
+    open func resetCountdown() {
+        let wasRunning = countdownState == .running
+        cyl_stopCountdownTimer()
+        countdownEndDate = nil
+        countdownStartDate = nil
+        cyl_clearCountdownCache()
+        countdownState = .idle
+        if wasRunning {
+            isEnabled = true
+            cyl_restoreCountdownTitleColor()
+        }
+        if style == .countdown {
+            cyl_showCountdownIdleOrFinishedTitle()
+            cyl_applyCountdownAppearance()
+        }
+        cyl_updateIcon()
+        cyl_contentDidChange()
+    }
+
+    /**
+     [EN] Reads the clock now: a tick on demand, e.g. after the app returns (done by the control itself).
+     [CN] 立即读取时钟：按需 tick，例如 App 返回前台后（控件自己会做）。
+     */
+    @objc open func refreshCountdown() {
+        guard countdownState == .running, let start = countdownStartDate, let end = countdownEndDate else { return }
+        let now = cyl_now
+        let left = end.timeIntervalSince(now)
+        // [EN] Closed when the time is up, and also when the local clock is no longer plausible for this countdown: the clock
+        //      was set back to before the start (a left time longer than the longest duration, which was recorded at the
+        //      start). The control is then enabled again and a new countdown can start. A second of tolerance for clock sync.
+        // [CN] 时间到时关闭；本地时钟对这次倒计时不再合理时也关闭：时钟被调回到开始之前（剩余时间超过开始时记录的最长时长）。
+        //      此时控件恢复可用，可以重新开始倒计时。允许 1 秒的时钟同步误差。
+        guard left > 0, now.timeIntervalSince(start) >= -1, left <= countdownRunDuration + 1 else {
+            cyl_finishCountdown()
+            return
+        }
+        let seconds = min(Int(ceil(left)), Int(ceil(countdownRunDuration)))
+        guard seconds != countdownShownSeconds else { return }
+        countdownShownSeconds = seconds
+        title = CYLAnimatedItemCountdownText(countdownRunningTitleFormat, seconds: seconds)
+        cyl_applyCountdownAppearance()
+        delegate?.animatedItemView?(self, didTickCountdown: seconds)
+    }
+
+    private func cyl_finishCountdown() {
+        cyl_stopCountdownTimer()
+        countdownEndDate = nil
+        countdownStartDate = nil
+        cyl_clearCountdownCache()
+        countdownState = .finished
+        isEnabled = true
+        cyl_restoreCountdownTitleColor()
+        cyl_showCountdownIdleOrFinishedTitle()
+        cyl_applyCountdownAppearance()
+        cyl_updateIcon()
+        cyl_contentDidChange()
+        if UIAccessibility.isVoiceOverRunning {
+            UIAccessibility.post(notification: .announcement, argument: countdownFinishedTitle)
+        }
+        delegate?.animatedItemViewDidFinishCountdown?(self)
+    }
+
+    private static func cyl_countdownCacheName(_ key: String) -> String {
+        "CYLAnimatedItemCountdown.\(key)"
+    }
+
+    /// [EN] Keeps the running countdown (start, end, longest duration) when `countdownCacheKey` is set.
+    /// [CN] 设置了 `countdownCacheKey` 时保存运行中的倒计时（开始时间、结束时间、最长时长）。
+    private func cyl_saveCountdownToCache() {
+        guard let key = countdownCacheKey, let start = countdownStartDate, let end = countdownEndDate else { return }
+        countdownCacheStore.set(["start": start.timeIntervalSince1970, "end": end.timeIntervalSince1970, "duration": countdownRunDuration],
+                                forKey: Self.cyl_countdownCacheName(key))
+    }
+
+    private func cyl_clearCountdownCache() {
+        guard let key = countdownCacheKey else { return }
+        countdownCacheStore.removeObject(forKey: Self.cyl_countdownCacheName(key))
+    }
+
+    /// [EN] Takes up a cached countdown that is still valid by the local clock (not over, not from the future, not longer than
+    ///      the longest duration it recorded); an invalid one is dropped, and the control stays idle. Nothing is announced.
+    /// [CN] 接续按本地时钟仍然有效的缓存倒计时（未结束、不是来自未来、不超过其记录的最长时长）；无效的缓存被丢弃，控件保持待机。不触发开始回调。
+    private func cyl_restoreCountdownFromCache() {
+        guard style == .countdown, countdownState != .running, let key = countdownCacheKey,
+              let cached = countdownCacheStore.dictionary(forKey: Self.cyl_countdownCacheName(key)) as? [String: TimeInterval],
+              let start = cached["start"], let end = cached["end"], let duration = cached["duration"] else { return }
+        let now = cyl_now
+        let startDate = Date(timeIntervalSince1970: start)
+        let endDate = Date(timeIntervalSince1970: end)
+        guard duration > 0, endDate.timeIntervalSince(now) > 0, now.timeIntervalSince(startDate) >= -1,
+              endDate.timeIntervalSince(now) <= duration + 1 else {
+            countdownCacheStore.removeObject(forKey: Self.cyl_countdownCacheName(key))
+            return
+        }
+        cyl_beginCountdown(start: startDate, end: endDate, duration: duration, announcesStart: false)
+    }
+
+    /// [EN] The timer only schedules the reads; the end date decides. The app returning from the background reads the clock
+    ///      at once, so the seconds spent there count (FIX: issue #1 of SMSCodeButton).
+    /// [CN] 定时器只负责安排读取，由结束时间决定剩余时间。App 从后台返回时立即读取时钟，因此在后台度过的秒数会计入（修复 SMSCodeButton 的 issue #1）。
+    private func cyl_startCountdownTimer() {
+        cyl_stopCountdownTimer()
+        let timer = Timer(timeInterval: CYLAnimatedItemCountdownTickInterval, repeats: true) { [weak self] timer in
+            guard let self = self else {
+                timer.invalidate()
+                return
+            }
+            self.refreshCountdown()
+        }
+        timer.tolerance = CYLAnimatedItemCountdownTickInterval / 2
+        RunLoop.main.add(timer, forMode: .common)
+        countdownTimer = timer
+        let center = NotificationCenter.default
+        center.addObserver(self, selector: #selector(refreshCountdown), name: UIApplication.willEnterForegroundNotification, object: nil)
+        center.addObserver(self, selector: #selector(refreshCountdown), name: UIApplication.didBecomeActiveNotification, object: nil)
+    }
+
+    private func cyl_stopCountdownTimer() {
+        countdownTimer?.invalidate()
+        countdownTimer = nil
+        let center = NotificationCenter.default
+        center.removeObserver(self, name: UIApplication.willEnterForegroundNotification, object: nil)
+        center.removeObserver(self, name: UIApplication.didBecomeActiveNotification, object: nil)
     }
 
     // MARK: - Accessibility 无障碍
