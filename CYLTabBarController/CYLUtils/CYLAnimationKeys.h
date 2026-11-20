@@ -41,6 +41,21 @@
 #endif
 #endif
 
+/*
+ * [EN] The type of an array of strings returned by a function that Swift implements with @_cdecl. The generated Swift header declares such
+ *      a function with a plain `NSArray *` (the generics are lost for a C function), and C++ rejects two different declarations of one
+ *      function, so Objective-C++ gets the plain type; C, Objective-C and Swift get the typed one (Swift sees `[String]`).
+ * [CN] 由 Swift 以 @_cdecl 实现的函数所返回的字符串数组类型。生成的 Swift 头文件以普通 `NSArray *` 声明这类函数（C 函数会丢失泛型），
+ *      而 C++ 不允许同一函数有两个不同的声明，所以 Objective-C++ 使用普通类型；C、Objective-C 与 Swift 使用带泛型的类型（Swift 看到 `[String]`）。
+ */
+#ifndef CYL_STRING_ARRAY
+#if defined(__cplusplus)
+#define CYL_STRING_ARRAY NSArray *
+#else
+#define CYL_STRING_ARRAY NSArray<NSString *> *
+#endif
+#endif
+
 NS_ASSUME_NONNULL_BEGIN
 
 /*!
@@ -383,7 +398,7 @@ FOUNDATION_EXTERN BOOL CYLAnimationTypeIsAvailable(NSString * _Nullable type) CY
  * [CN] 本库已知的动画类型，顺序固定："Lottie"、"PAG"、"Rive"、"SVGA"、"GIF"。每个名称也是其 animator 在 `CYLTabBarItemAnimatorRegistry`
  *      中的名称，因此注册表中缺少的类型就是未参与构建的引擎。
  */
-FOUNDATION_EXTERN NSArray *CYLAnimationKnownTypes(void) CYL_NOEXCEPT;
+FOUNDATION_EXTERN CYL_STRING_ARRAY CYLAnimationKnownTypes(void) CYL_NOEXCEPT;
 
 /*!
  * [EN] The subspec that brings the engine of `type` (e.g. "LottieSwift" for "Lottie"), to add as
@@ -397,7 +412,7 @@ FOUNDATION_EXTERN NSString * _Nullable CYLAnimationSubspecOfType(NSString * _Nul
  * [EN] The file extensions of `type` (e.g. @[@"json", @"lottie"] for "Lottie"); empty for an unknown type.
  * [CN] `type` 的文件扩展名（例如 "Lottie" 为 @[@"json", @"lottie"]）；未知类型为空数组。
  */
-FOUNDATION_EXTERN NSArray *CYLAnimationFileExtensionsOfType(NSString * _Nullable type) CYL_NOEXCEPT;
+FOUNDATION_EXTERN CYL_STRING_ARRAY CYLAnimationFileExtensionsOfType(NSString * _Nullable type) CYL_NOEXCEPT;
 
 /*!
  * [EN] In debug builds (`DEBUG`), logs once per type that a file cannot play because its engine is not in the build, with
