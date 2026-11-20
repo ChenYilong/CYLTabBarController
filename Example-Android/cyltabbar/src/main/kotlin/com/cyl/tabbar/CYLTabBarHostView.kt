@@ -74,13 +74,73 @@ open class CYLTabBarHostView @JvmOverloads constructor(context: Context, attrs: 
         }
 
     /**
+     * [EN] The URL of a tab bar manifest to download (docs/Configuration-Manifest.md); setting it downloads the manifest and
+     *      applies its configuration under the app's own configuration, which wins. [CN] 要下载的 TabBar 配置清单的 URL
+     *      （docs/Configuration-Manifest.md）；设置后下载清单，并把它的配置放在 App 自己的配置之下，App 的配置优先。
+     */
+    var manifestURL: String? = null
+        set(value) {
+            field = value
+            loadManifest()
+        }
+
+    /**
+     * [EN] The route of the manifest shipped with the app, used when the download fails (else the manifest's own
+     *      `fallback.embeddedRoute`). [CN] 随 App 发布的清单的路由，下载失败时使用（否则使用清单自身的
+     *      `fallback.embeddedRoute`）。
+     */
+    var embeddedManifestRoute: String? = null
+
+    /**
+     * [EN] The source of the manifest that was applied: "remote", "cache" or "embedded". [CN] 已应用的清单的来源：
+     *      "remote"、"cache" 或 "embedded"。
+     */
+    var didApplyManifest: ((String) -> Unit)? = null
+
+    /**
+     * [EN] The message of the failure that made the loader fall back to another source. [CN] 导致加载器回退到其他来源的失败原因。
+     */
+    var didFailManifest: ((String) -> Unit)? = null
+
+    /**
      * [EN] Builds the controller again from `configuration` (images first). [CN] 由 `configuration` 重新创建控制器（先加载图片）。
      */
     private fun reloadConfiguration() {
         generation++
         pendingConfiguration = null
-        val current = configuration
+        val current = effectiveConfiguration()
         if (current == null) removeController() else loadImages(current, generation)
+    }
+
+    /**
+     * [EN] The manifest's configuration first, the app's own configuration over it, as the `CYLTabBarControllerManifestRoute`
+     *      key does. [CN] 先取清单的配置，再由 App 自己的配置覆盖，与 `CYLTabBarControllerManifestRoute` 键相同。
+     */
+    private fun effectiveConfiguration(): Map<String, Any?>? {
+        val own = configuration ?: return manifestConfiguration
+        val manifest = manifestConfiguration ?: return own
+        return manifest + own
+    }
+
+    /**
+     * [EN] Downloads the manifest at [manifestURL] and applies its configuration; a failure falls back to the cached or the
+     *      embedded manifest, as `CYLTabBarManifestLoader` does. [CN] 下载 [manifestURL] 处的清单并应用它的配置；失败时按
+     *      `CYLTabBarManifestLoader` 的规则回退到缓存或内置清单。
+     */
+    private fun loadManifest() {
+        val url = manifestURL
+        if (url.isNullOrEmpty()) return
+        val loader = CYLTabBarManifestLoader(context)
+        loader.embeddedManifestRoute = embeddedManifestRoute
+        loader.loadManifestWithURL(url) { manifest, source, error ->
+            if (error != null) didFailManifest?.invoke(error.message.orEmpty())
+            val applied = manifest?.configuration()
+            if (applied != null) {
+                manifestConfiguration = applied
+                reloadConfiguration()
+            }
+            if (source != CYLTabBarManifest.CYLTabBarManifestSource.None) didApplyManifest?.invoke(source.name.lowercase())
+        }
     }
 
     /**
@@ -342,6 +402,12 @@ open class CYLTabBarHostView @JvmOverloads constructor(context: Context, attrs: 
 
     private var generation = 0
     private var pendingConfiguration: Map<String, Any?>? = null
+
+    /**
+     * [EN] The configuration of the manifest that was downloaded, under the app's own configuration. [CN] 已下载清单的配置，
+     *      位于 App 自己的配置之下。
+     */
+    private var manifestConfiguration: Map<String, Any?>? = null
     private val mainHandler = Handler(Looper.getMainLooper())
 
     init {
@@ -450,7 +516,7 @@ open class CYLTabBarHostView @JvmOverloads constructor(context: Context, attrs: 
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
         // [EN] Rebuilt when attached again: the fragments cannot outlive the view tree. [CN] 再次附加时重新创建：Fragment 不能比视图树存活更久。
-        if (tabBarController != null && configuration != null) {
+        if (tabBarController != null && effectiveConfiguration() != null) {
             // [EN] Loading the same configuration again builds the controller on the next attach.
             // [CN] 再次加载同一配置，在下次附加时重新创建控制器。
             removeController()

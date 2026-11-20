@@ -209,6 +209,9 @@ class CYLTabBar extends StatefulWidget {
     this.plusButton,
     this.configurationRoute,
     this.manifestRoute,
+    this.manifestURL,
+    this.onManifestApply,
+    this.onManifestFail,
     this.configuration = const {},
     this.selectedIndex,
     this.badgeValues = const [],
@@ -345,6 +348,17 @@ class CYLTabBar extends StatefulWidget {
   /// version, platforms. The manifest is read first; the other parameters and [configuration] win over it.
   final String? manifestRoute;
 
+  /// The URL of a tab bar manifest to download (docs/Configuration-Manifest.md). The manifest is downloaded, and its
+  /// configuration is applied under the configuration of the other parameters, which win over it. A failed download falls
+  /// back to the cached or the embedded manifest, and [onManifestFail] says why.
+  final String? manifestURL;
+
+  /// The manifest was applied: its source is 'remote', 'cache' or 'embedded'.
+  final ValueChanged<String>? onManifestApply;
+
+  /// The manifest could not be downloaded: the message says why, and another source was used if there was one.
+  final ValueChanged<String>? onManifestFail;
+
   /// The configuration sent to the native library.
   Map<String, Object?> buildConfiguration() => {
         if (configurationRoute != null) 'CYLTabBarControllerConfigurationRoute': configurationRoute,
@@ -388,6 +402,7 @@ class _CYLTabBarState extends State<CYLTabBar> {
         'playbackSpeed': widget.playbackSpeed,
         'playbackLoops': widget.playbackLoops,
         'titlePositionAdjustment': _titleOffset(widget),
+        'manifestURL': widget.manifestURL,
       };
 
   static List<double>? _titleOffset(CYLTabBar bar) {
@@ -458,6 +473,9 @@ class _CYLTabBarState extends State<CYLTabBar> {
     if (widget.loggedIn != oldWidget.loggedIn) {
       channel?.invokeMethod<void>('setLoggedIn', widget.loggedIn);
     }
+    if (widget.manifestURL != oldWidget.manifestURL && widget.manifestURL != null) {
+      channel?.invokeMethod<void>('setManifestURL', widget.manifestURL);
+    }
   }
 
   void _onPlatformViewCreated(int id) {
@@ -490,6 +508,10 @@ class _CYLTabBarState extends State<CYLTabBar> {
           if (mounted && height > 0 && (height - _height).abs() >= 0.5) {
             setState(() => _height = height);
           }
+        case 'onManifestApply':
+          widget.onManifestApply?.call((arguments as String?) ?? '');
+        case 'onManifestFail':
+          widget.onManifestFail?.call((arguments as String?) ?? '');
       }
     });
     _channel = channel;

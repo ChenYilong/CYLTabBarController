@@ -22,6 +22,7 @@ static id CYLRNJSONObject(NSString *JSON);
 @implementation CyltabbarView {
   CYLTabBarHostView *_hostView;
   NSString *_configurationJSON;
+  NSString *_manifestURL;
   NSString *_badgeStylesJSON;
   NSString *_plusButtonBadgeStyleJSON;
   /// [EN] The last memory warning request handled. [CN] 最近处理的内存警告请求。
@@ -59,6 +60,12 @@ static id CYLRNJSONObject(NSString *JSON);
     _hostView.loginStateDidChange = ^(BOOL loggedIn) {
       [weakSelf emitLoginStateChange:loggedIn];
     };
+    _hostView.didApplyManifest = ^(NSString *source) {
+      [weakSelf emitManifestApplyWithSource:source];
+    };
+    _hostView.didFailManifest = ^(NSString *message) {
+      [weakSelf emitManifestFailWithMessage:message];
+    };
     // React Native does not clip: the plus button may rise above the bar. React Native 不裁剪：PlusButton 可以高出 TabBar。
     self.contentView = _hostView;
   }
@@ -76,6 +83,12 @@ static id CYLRNJSONObject(NSString *JSON);
   if (![configuration isEqualToString:_configurationJSON ?: @""]) {
     _configurationJSON = configuration;
     [_hostView setConfigurationJSON:configuration];
+  }
+  // [EN] The manifest to download; a new URL downloads it again. [CN] 要下载的清单；新的 URL 会重新下载。
+  NSString *manifestURL = [NSString stringWithUTF8String:newViewProps.manifestURL.c_str()];
+  if (![manifestURL isEqualToString:_manifestURL ?: @""]) {
+    _manifestURL = manifestURL;
+    _hostView.manifestURL = manifestURL.length > 0 ? manifestURL : nil;
   }
   _hostView.selectedIndex = newViewProps.selectedIndex;
   _hostView.tabBarHidden = newViewProps.tabBarHidden;
@@ -153,7 +166,9 @@ static id CYLRNJSONObject(NSString *JSON)
 {
   [super prepareForRecycle];
   _configurationJSON = nil;
+  _manifestURL = nil;
   _hostView.configuration = nil;
+  _hostView.manifestURL = nil;
   _hostView.badgeValues = @[];
   _hostView.plusButtonBadgeValue = nil;
   _hostView.badgeAttributes = nil;
@@ -252,6 +267,24 @@ static id CYLRNJSONObject(NSString *JSON)
   }
   std::static_pointer_cast<CyltabbarViewEventEmitter const>(_eventEmitter)
       ->onTabBarLayout(CyltabbarViewEventEmitter::OnTabBarLayout{.height = height});
+}
+
+- (void)emitManifestApplyWithSource:(NSString *)source
+{
+  if (!_eventEmitter) {
+    return;
+  }
+  std::static_pointer_cast<CyltabbarViewEventEmitter const>(_eventEmitter)
+      ->onManifestApply(CyltabbarViewEventEmitter::OnManifestApply{.source = std::string(source.UTF8String)});
+}
+
+- (void)emitManifestFailWithMessage:(NSString *)message
+{
+  if (!_eventEmitter) {
+    return;
+  }
+  std::static_pointer_cast<CyltabbarViewEventEmitter const>(_eventEmitter)
+      ->onManifestFail(CyltabbarViewEventEmitter::OnManifestFail{.message = std::string(message.UTF8String)});
 }
 
 @end

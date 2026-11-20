@@ -121,6 +121,12 @@ class CyltabbarViewManager : SimpleViewManager<CyltabbarView>(),
     view?.tabCoverImages = (0 until (value?.size() ?: 0)).map { value?.getString(it)?.takeIf { image -> image.isNotEmpty() } }
   }
 
+  /** [EN] The URL of a tab bar manifest to download (docs/Configuration-Manifest.md). [CN] 要下载的 TabBar 配置清单的 URL（docs/Configuration-Manifest.md）。 */
+  @ReactProp(name = "manifestURL")
+  override fun setManifestURL(view: CyltabbarView?, value: String?) {
+    view?.applyManifestURL(value)
+  }
+
   override fun getExportedCustomDirectEventTypeConstants(): MutableMap<String, Any> = mutableMapOf(
     "topTabSelect" to mapOf("registrationName" to "onTabSelect"),
     "topPlusButtonPress" to mapOf("registrationName" to "onPlusButtonPress"),
@@ -129,6 +135,8 @@ class CyltabbarViewManager : SimpleViewManager<CyltabbarView>(),
     "topLoginRequest" to mapOf("registrationName" to "onLoginRequest"),
     "topLoginStateChange" to mapOf("registrationName" to "onLoginStateChange"),
     "topMemoryWarning" to mapOf("registrationName" to "onMemoryWarning"),
+    "topManifestApply" to mapOf("registrationName" to "onManifestApply"),
+    "topManifestFail" to mapOf("registrationName" to "onManifestFail"),
   )
 
   companion object {

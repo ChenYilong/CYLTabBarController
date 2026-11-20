@@ -93,6 +93,12 @@ static UIImage *CYLFlutterAssetImage(NSString *asset, NSObject<FlutterPluginRegi
         _hostView.loginStateDidChange = ^(BOOL loggedIn) {
             [weakChannel invokeMethod:@"onLoginStateChange" arguments:@(loggedIn)];
         };
+        _hostView.didApplyManifest = ^(NSString *source) {
+            [weakChannel invokeMethod:@"onManifestApply" arguments:source];
+        };
+        _hostView.didFailManifest = ^(NSString *message) {
+            [weakChannel invokeMethod:@"onManifestFail" arguments:message];
+        };
         [self applyLoggedIn:arguments[@"loggedIn"]];
         // [EN] Before the configuration, so it is built once, in this language. [CN] 在配置之前，使 TabBar 以该语言只创建一次。
         [self applyLanguage:arguments[@"language"]];
@@ -113,6 +119,12 @@ static UIImage *CYLFlutterAssetImage(NSString *asset, NSObject<FlutterPluginRegi
         [self applyTabCoverImages:arguments[@"tabCoverImages"]];
         id configuration = arguments[@"configuration"];
         [_hostView setConfigurationJSON:[configuration isKindOfClass:[NSString class]] ? configuration : nil];
+        // [EN] The manifest to download, after the configuration: the manifest's keys are under the app's own ones.
+        // [CN] 要下载的清单，在配置之后：清单的键位于 App 自己的键之下。
+        id manifestURL = arguments[@"manifestURL"];
+        if ([manifestURL isKindOfClass:[NSString class]] && [(NSString *)manifestURL length] > 0) {
+            _hostView.manifestURL = manifestURL;
+        }
         __weak __typeof(self) weakSelf = self;
         [channel setMethodCallHandler:^(FlutterMethodCall *call, FlutterResult result) {
             [weakSelf handleMethodCall:call result:result];
@@ -194,6 +206,10 @@ static UIImage *CYLFlutterAssetImage(NSString *asset, NSObject<FlutterPluginRegi
         [self applyLanguage:arguments];
     } else if ([call.method isEqualToString:@"setLoggedIn"]) {
         [self applyLoggedIn:arguments];
+    } else if ([call.method isEqualToString:@"setManifestURL"]) {
+        if ([arguments isKindOfClass:[NSString class]] && [(NSString *)arguments length] > 0) {
+            _hostView.manifestURL = arguments;
+        }
     } else {
         result(FlutterMethodNotImplemented);
         return;

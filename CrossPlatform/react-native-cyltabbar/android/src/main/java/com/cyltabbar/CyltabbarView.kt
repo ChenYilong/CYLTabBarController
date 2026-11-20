@@ -34,6 +34,8 @@ class CyltabbarView(private val reactContext: ThemedReactContext) : CYLTabBarHos
     didLongPressTab = { index, identifier, title -> dispatch(TabLongPressEvent(surfaceId(), id, index, identifier, title)) }
     didRequestLogin = { index, identifier, title -> dispatch(TabLongPressEvent(surfaceId(), id, index, identifier, title, "topLoginRequest")) }
     loginStateDidChange = { loggedIn -> dispatch(LoginStateEvent(surfaceId(), id, loggedIn)) }
+    didApplyManifest = { source -> dispatch(ManifestApplyEvent(surfaceId(), id, source)) }
+    didFailManifest = { message -> dispatch(ManifestFailEvent(surfaceId(), id, message)) }
   }
 
   private var configurationJSON: String? = null
@@ -56,6 +58,16 @@ class CyltabbarView(private val reactContext: ThemedReactContext) : CYLTabBarHos
     if (json == configurationJSON) return
     configurationJSON = json
     if (!setConfigurationJSON(json)) configuration = null
+  }
+
+  /**
+   * [EN] The manifest to download (docs/Configuration-Manifest.md); the same URL is not downloaded again.
+   * [CN] 要下载的清单（docs/Configuration-Manifest.md）；同一个 URL 不会再次下载。
+   */
+  fun applyManifestURL(url: String?) {
+    val value = url?.takeIf { it.isNotEmpty() } ?: return
+    if (manifestURL == value) return
+    manifestURL = value
   }
 
   // React Native does not lay out views it did not create: measure and lay out the tab bar controller here.
@@ -120,4 +132,16 @@ class PlusButtonPressEvent(surfaceId: Int, viewId: Int, private val context: Str
 class TabBarLayoutEvent(surfaceId: Int, viewId: Int, private val height: Double) : Event<TabBarLayoutEvent>(surfaceId, viewId) {
   override fun getEventName() = "topTabBarLayout"
   override fun getEventData(): WritableMap = Arguments.createMap().apply { putDouble("height", height) }
+}
+
+/** [EN] The manifest was applied; the source is "remote", "cache" or "embedded". [CN] 清单已应用；来源是 "remote"、"cache" 或 "embedded"。 */
+class ManifestApplyEvent(surfaceId: Int, viewId: Int, private val source: String) : Event<ManifestApplyEvent>(surfaceId, viewId) {
+  override fun getEventName() = "topManifestApply"
+  override fun getEventData(): WritableMap = Arguments.createMap().apply { putString("source", source) }
+}
+
+/** [EN] The manifest could not be downloaded; the message says why. [CN] 清单下载失败；消息说明原因。 */
+class ManifestFailEvent(surfaceId: Int, viewId: Int, private val message: String) : Event<ManifestFailEvent>(surfaceId, viewId) {
+  override fun getEventName() = "topManifestFail"
+  override fun getEventData(): WritableMap = Arguments.createMap().apply { putString("message", message) }
 }
