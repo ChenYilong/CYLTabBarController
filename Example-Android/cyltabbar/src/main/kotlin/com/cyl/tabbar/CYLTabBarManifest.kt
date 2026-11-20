@@ -57,7 +57,18 @@ class CYLTabBarManifest private constructor(
          */
         @JvmStatic
         @Throws(CYLConfigurationException::class)
-        fun manifestWithDictionary(context: Context, dictionary: Map<String, Any?>, baseDirectory: String?): CYLTabBarManifest {
+        fun manifestWithDictionary(context: Context, dictionary: Map<String, Any?>, baseDirectory: String?): CYLTabBarManifest =
+            manifestWithDictionary(context, dictionary, baseDirectory, evaluatesConditions = true)
+
+        /**
+         * [EN] The same, and `evaluatesConditions` false leaves `conditions` and `overrides` alone: a manifest that Remote Config
+         *      delivered was chosen by the service, which has evaluated its own conditions (docs/Configuration-File.md, audit A2);
+         *      `runtime` (platforms, app versions, time window) is still checked by `eligibilityError`.
+         * [CN] 同上；`evaluatesConditions` 为 false 时不处理 `conditions` 与 `overrides`：Remote Config 下发的清单是服务选定的，服务已经计算过自己的条件
+         *      （docs/Configuration-File.md，审计 A2）；`runtime`（平台、App 版本、时间段）仍由 `eligibilityError` 检查。
+         */
+        @Throws(CYLConfigurationException::class)
+        internal fun manifestWithDictionary(context: Context, dictionary: Map<String, Any?>, baseDirectory: String?, evaluatesConditions: Boolean): CYLTabBarManifest {
             if (dictionary["tabBar"] !is Map<*, *>) throw CYLConfigurationException(CYLTabBarConfigurationError.UnsupportedManifest, "Not a tab bar manifest: it has no \"tabBar\" dictionary.")
             val schema = (dictionary["schemaVersion"] as? Number)?.toInt() ?: (dictionary["schemaVersion"] as? String)?.toIntOrNull()
             if (schema != supportedSchemaVersion) {
@@ -66,7 +77,7 @@ class CYLTabBarManifest private constructor(
             var merged: Map<String, Any?> = dictionary
             // [EN] Overrides of the conditions that hold, in order (Firebase). [CN] 按顺序合并成立条件的覆盖项（Firebase）。
             val overrides = dictionary["overrides"] as? List<*> ?: emptyList<Any?>()
-            for (condition in dictionary["conditions"] as? List<*> ?: emptyList<Any?>()) {
+            for (condition in (dictionary["conditions"] as? List<*>).takeIf { evaluatesConditions } ?: emptyList<Any?>()) {
                 val name = string(condition, "name") ?: continue
                 if (!CYLManifestConditions.holds(context, string(condition, "expression"))) continue
                 for (override in overrides) {
@@ -569,19 +580,50 @@ class CYLTabBarManifestLoader(context: Context) {
     }
 
     /**
-     * [EN] Downloads every asset next to the manifest, keeps the folder only when all match (Expo). [CN] 下载清单旁边的每个资源，全部一致才保留目录（Expo）。
+     * [EN] Loads a manifest that is already in hand, e.g. the `CYLTabBarManifest` parameter of Remote Config, on a background
+     *      thread: its conditions are not evaluated again (the service chose it), its `runtime` is checked, and its assets are
+     *      downloaded from `assets.baseURL` (an absolute URL: there is no manifest URL to resolve against), checked by their
+     *      hashes and kept like those of `loadManifestWithURL`; the fallbacks are the same.
+     * [CN] 加载已经拿到手的清单，例如 Remote Config 的 `CYLTabBarManifest` 参数，在后台线程执行：不再计算其条件（服务已选定），检查其 `runtime`，
+     *      并从 `assets.baseURL`（绝对 URL：没有清单 URL 可供解析相对路径）下载资源，按哈希校验并像 `loadManifestWithURL` 一样保存；回退方式相同。
      */
-    private fun save(manifest: CYLTabBarManifest, url: String): CYLTabBarManifest {
+    fun loadManifestWithDictionary(dictionary: Map<String, Any?>, completion: (CYLTabBarManifest?, CYLTabBarManifest.CYLTabBarManifestSource, CYLConfigurationException?) -> Unit) {
+        Thread {
+            var error: CYLConfigurationException? = null
+            val saved = try {
+                val manifest = CYLTabBarManifest.manifestWithDictionary(context, dictionary, null, evaluatesConditions = false)
+                manifest.eligibilityError(nowMillis ?: System.currentTimeMillis())?.let { throw it }
+                save(manifest, null)
+            } catch (exception: CYLConfigurationException) {
+                error = exception; null
+            } catch (exception: CYLTabBarConfigurationException) {
+                error = CYLConfigurationException(CYLTabBarConfigurationError.of(exception.code), exception.message.orEmpty()); null
+            } catch (exception: Exception) {
+                error = CYLConfigurationException(CYLTabBarConfigurationError.Network, exception.message ?: exception.toString()); null
+            }
+            Handler(Looper.getMainLooper()).post { finish(saved, dictionary, error, completion) }
+        }.start()
+    }
+
+    /**
+     * [EN] Downloads every asset next to the manifest, keeps the folder only when all match (Expo). `url` is the manifest's own
+     *      URL, or null for a manifest in hand, which then needs `assets.baseURL`. [CN] 下载清单旁边的每个资源，全部一致才保留目录（Expo）。`url` 是清单自己的
+     *      URL；已经拿到手的清单为 null，此时需要 `assets.baseURL`。
+     */
+    private fun save(manifest: CYLTabBarManifest, url: String?): CYLTabBarManifest {
         val version = manifest.version ?: "0"
         if ('/' in version || ".." in version) throw CYLConfigurationException(CYLTabBarConfigurationError.UnsupportedManifest, "The manifest version is not a valid folder name.")
         val folder = File(cacheDirectory, version)
         val staging = File(cacheDirectory, "$version.download").apply { deleteRecursively(); mkdirs() }
         val staged = manifest.cachedCopy(staging)
-        val baseURL = CYLTabBarManifest.string(manifest.dictionary["assets"], "baseURL") ?: url.substringBeforeLast('/') + "/"
+        val baseURL = CYLTabBarManifest.string(manifest.dictionary["assets"], "baseURL") ?: url?.let { it.substringBeforeLast('/') + "/" }
         try {
             for (entry in staged.assetEntries()) {
+                if (baseURL == null && CYLTabBarManifest.string(entry, "url") == null) {
+                    throw CYLConfigurationException(CYLTabBarConfigurationError.AssetInvalid, "A manifest without a URL needs \"assets.baseURL\" (or a \"url\" per asset) to download its images.")
+                }
                 val path = staged.pathOfEntry(entry) ?: throw CYLConfigurationException(CYLTabBarConfigurationError.AssetInvalid, "Asset ${CYLTabBarManifest.string(entry, "path")} is outside the assets folder.")
-                val source = CYLTabBarManifest.string(entry, "url") ?: URI(baseURL).resolve(CYLTabBarManifest.string(entry, "path").orEmpty()).toString()
+                val source = CYLTabBarManifest.string(entry, "url") ?: URI(baseURL.orEmpty()).resolve(CYLTabBarManifest.string(entry, "path").orEmpty()).toString()
                 val data = runCatching { URI(source).toURL().openStream().use { it.readBytes() } }.getOrNull()
                     ?: throw CYLConfigurationException(CYLTabBarConfigurationError.AssetInvalid, "Asset ${CYLTabBarManifest.string(entry, "path")} could not be downloaded.")
                 File(path).apply { parentFile?.mkdirs(); writeBytes(data) }

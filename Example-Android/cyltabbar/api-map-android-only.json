@@ -24,5 +24,8 @@
  {"android": "CYLTabBarConfiguration.configurationWithRoutes", "note": "The first of an ordered list of routes that leads to a configuration file / 有序路由列表中第一个指向配置文件的路由"},
  {"android": "CYLTabBarConfiguration.sourceOfRoutes", "note": "The source of the first route of a list that leads to a readable file / 列表中第一个指向可读文件的路由的来源"},
  {"android": "CYLTabBarConfiguration.versionNumber", "note": "The versionNumber of a configuration, or null / 配置的 versionNumber，没有时为 null"},
- {"android": "CYLConstants.CYLTabBarControllerConfigurationVersion", "note": "The version of a configuration as a whole, as Remote Config versions a template / 整份配置的版本，与 Remote Config 对模板的版本管理一致"}
+ {"android": "CYLConstants.CYLTabBarControllerConfigurationVersion", "note": "The version of a configuration as a whole, as Remote Config versions a template / 整份配置的版本，与 Remote Config 对模板的版本管理一致"},
+ {"android": "CYLRemoteConfigLoader.MANIFEST_KEY", "note": "The Remote Config parameter that holds a whole tab bar manifest as JSON / 以 JSON 保存完整 TabBar 清单的 Remote Config 参数"},
+ {"android": "CYLRemoteConfigResult.manifestSource", "note": "Where the manifest of the CYLTabBarManifest parameter came from, or null / CYLTabBarManifest 参数中清单的来源，没有时为 null"},
+ {"android": "CYLTabBarManifestLoader.loadManifestWithDictionary", "note": "Loads a manifest already in hand (conditions not evaluated again, assets from assets.baseURL) / 加载已拿到手的清单（不再计算条件，资源来自 assets.baseURL）"}
 ]

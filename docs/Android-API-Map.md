@@ -1952,3 +1952,6 @@
 | `CYLTabBarConfiguration.sourceOfRoutes` | The source of the first route of a list that leads to a readable file / 列表中第一个指向可读文件的路由的来源 |
 | `CYLTabBarConfiguration.versionNumber` | The versionNumber of a configuration, or null / 配置的 versionNumber，没有时为 null |
 | `CYLConstants.CYLTabBarControllerConfigurationVersion` | The version of a configuration as a whole, as Remote Config versions a template / 整份配置的版本，与 Remote Config 对模板的版本管理一致 |
+| `CYLRemoteConfigLoader.MANIFEST_KEY` | The Remote Config parameter that holds a whole tab bar manifest as JSON / 以 JSON 保存完整 TabBar 清单的 Remote Config 参数 |
+| `CYLRemoteConfigResult.manifestSource` | Where the manifest of the CYLTabBarManifest parameter came from, or null / CYLTabBarManifest 参数中清单的来源，没有时为 null |
+| `CYLTabBarManifestLoader.loadManifestWithDictionary` | Loads a manifest already in hand (conditions not evaluated again, assets from assets.baseURL) / 加载已拿到手的清单（不再计算条件，资源来自 assets.baseURL） |

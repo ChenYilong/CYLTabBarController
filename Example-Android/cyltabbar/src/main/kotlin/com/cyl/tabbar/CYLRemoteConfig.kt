@@ -1,5 +1,6 @@
 package com.cyl.tabbar
 
+import android.content.Context
 import com.cyl.tabbar.CYLTabBarConfiguration.CYLTabBarConfigurationError
 import java.util.concurrent.ConcurrentHashMap
 
@@ -157,6 +158,12 @@ data class CYLRemoteConfigResult(
     val configuration: Map<String, Any?>,
     val isRemote: Boolean,
     val error: Throwable?,
+    /**
+     * [EN] Where the manifest of the `CYLTabBarManifest` parameter came from (Remote when it was downloaded and verified, Cache or Embedded when
+     *      its fallback applied, None when nothing could be used); null when the values had no manifest. [CN] `CYLTabBarManifest` 参数中清单的来源
+     *      （下载并校验通过为 Remote，使用回退时为 Cache 或 Embedded，没有可用内容时为 None）；值中没有清单时为 null。
+     */
+    val manifestSource: CYLTabBarManifest.CYLTabBarManifestSource? = null,
 )
 
 /**
@@ -168,21 +175,69 @@ data class CYLRemoteConfigResult(
  * [CN] 面向接口的拉取策略：拉取失败或值无效时，直接使用默认值（随 App 打包的配置文件）；否则映射后的值按 key 覆盖默认值，与 Remote Config 拉取的值覆盖应用内默认值
  *      的方式相同。结果必须有 Tab，因此控制台的错误编辑不会破坏 TabBar。`mapper` 默认使用为该服务注册的映射器（`CYLRemoteConfigMappers`）。
  */
-class CYLRemoteConfigLoader(
+class CYLRemoteConfigLoader @JvmOverloads constructor(
     private val source: CYLRemoteConfigSource,
     private val mapper: CYLRemoteConfigMapper? = null,
+    /**
+     * [EN] Needed only for the `CYLTabBarManifest` parameter, whose images are downloaded into the app's cache. [CN] 只有 `CYLTabBarManifest` 参数需要，其图片会下载到 App 的缓存中。
+     */
+    private val context: Context? = null,
 ) {
     /**
-     * [EN] Fetches and merges. `completion` runs once, on the thread the source completes on. [CN] 拉取并合并。`completion` 只执行一次，在服务完成时所在的线程。
+     * [EN] The parameter that holds a whole tab bar manifest as JSON (docs/Configuration-Manifest.md): the manifest's own tabs, plus its images
+     *      downloaded from `assets.baseURL` and checked by their hashes (Firebase Hosting, Cloud Storage or any CDN: Remote Config carries strings only).
+     *      The manifest's configuration is the base; the other values, over the defaults, win over it. [CN] 以 JSON 保存完整 TabBar 清单的参数
+     *      （docs/Configuration-Manifest.md）：清单自己的 Tab，加上从 `assets.baseURL` 下载并按哈希校验的图片（Firebase Hosting、Cloud Storage 或任意 CDN：
+     *      Remote Config 只能传递字符串）。清单的配置是底层；叠加在默认值之上的其他值优先于它。
+     */
+    companion object {
+        const val MANIFEST_KEY = "CYLTabBarManifest"
+    }
+
+    /**
+     * [EN] Fetches and merges. `completion` runs once: on the thread the source completes on, or on the main thread when a manifest was
+     *      loaded. [CN] 拉取并合并。`completion` 只执行一次：在服务完成时所在的线程，加载了清单时在主线程。
      */
     fun load(defaults: Map<String, Any?>, completion: (CYLRemoteConfigResult) -> Unit) {
         source.fetch { payload, failure ->
-            completion(merged(defaults, payload, failure))
+            val (result, remote) = merged(defaults, payload, failure)
+            val manifest = result.configuration[MANIFEST_KEY] as? Map<*, *>
+            if (manifest == null || !result.isRemote) {
+                completion(result.copy(configuration = result.configuration - MANIFEST_KEY))
+                return@fetch
+            }
+            val application = context
+            if (application == null) {
+                completion(CYLRemoteConfigResult(defaults - MANIFEST_KEY, false, CYLTabBarConfiguration.CYLConfigurationException(
+                    CYLTabBarConfigurationError.UnsupportedManifest, "The values have a $MANIFEST_KEY parameter, and the loader has no Context to download its images.")))
+                return@fetch
+            }
+            @Suppress("UNCHECKED_CAST")
+            CYLTabBarManifestLoader(application).loadManifestWithDictionary(manifest as Map<String, Any?>) { loaded, manifestSource, error ->
+                if (loaded == null) {
+                    // [EN] Nothing usable from the manifest, not even a fallback: the defaults. [CN] 清单没有任何可用内容，连回退也没有：使用默认值。
+                    completion(CYLRemoteConfigResult(defaults - MANIFEST_KEY, false, error, manifestSource))
+                    return@loadManifestWithDictionary
+                }
+                try {
+                    // [EN] The order of strength: the defaults, the manifest's configuration, the other remote values. [CN] 由弱到强的顺序：默认值、清单的配置、其他远程值。
+                    val configuration = defaults - MANIFEST_KEY + loaded.configuration() + (remote - MANIFEST_KEY)
+                    CYLTabBarConfiguration.requireTabs(configuration)
+                    completion(CYLRemoteConfigResult(configuration, true, error, manifestSource))
+                } catch (failure: CYLTabBarConfiguration.CYLConfigurationException) {
+                    completion(CYLRemoteConfigResult(defaults - MANIFEST_KEY, false, failure, manifestSource))
+                }
+            }
         }
     }
 
-    private fun merged(defaults: Map<String, Any?>, payload: CYLRemoteConfigPayload?, failure: Throwable?): CYLRemoteConfigResult {
-        fun keep(error: Throwable) = CYLRemoteConfigResult(defaults, false, error)
+    /**
+     * [EN] The result of the defaults and the mapped values, and the mapped (remote) values alone, which a manifest needs to
+     *      keep the order defaults, manifest, remote values. [CN] 默认值与映射后的值合并的结果，以及单独的映射后（远程）的值；清单需要它们来保持
+     *      默认值、清单、远程值 的顺序。
+     */
+    private fun merged(defaults: Map<String, Any?>, payload: CYLRemoteConfigPayload?, failure: Throwable?): Pair<CYLRemoteConfigResult, Map<String, Any?>> {
+        fun keep(error: Throwable) = CYLRemoteConfigResult(defaults, false, error) to emptyMap<String, Any?>()
         if (payload == null) {
             return keep(failure ?: CYLTabBarConfiguration.CYLConfigurationException(CYLTabBarConfigurationError.Network, "The source returned no values."))
         }
@@ -202,8 +257,9 @@ class CYLRemoteConfigLoader(
             }
             val result = LinkedHashMap(defaults)
             result.putAll(mapped)
-            CYLTabBarConfiguration.requireTabs(result)
-            CYLRemoteConfigResult(result, true, null)
+            // [EN] With a manifest the tabs may come from it: `load` checks them after the manifest is resolved. [CN] 有清单时 Tab 可能来自清单：`load` 在清单解析之后检查。
+            if (MANIFEST_KEY !in result) CYLTabBarConfiguration.requireTabs(result)
+            CYLRemoteConfigResult(result, true, null) to mapped
         } catch (error: CYLTabBarConfiguration.CYLConfigurationException) {
             keep(error)
         }
