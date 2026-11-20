@@ -21,11 +21,26 @@ import RiveRuntime
 
 @available(*, deprecated, message: "Wraps Rive's legacy API for .riv files without a view model; created only through CYLTabBarItemAnimationViewProviding.")
 @objc(CYLRiveLegacyTabBarItemAnimationView)
-public final class CYLRiveLegacyTabBarItemAnimationView: UIView, CYLTabBarItemAnimationPlayableView, CYLTabBarItemAnimationViewProviding {
+public final class CYLRiveLegacyTabBarItemAnimationView: UIView, CYLTabBarItemAnimationPlayableView, CYLTabBarItemAnimationViewProviding, CYLRiveFileInspecting {
 
     private let configuration: CYLRiveTabBarItemAnimationConfiguration
     private let viewModel: RiveViewModel
     private var deactivateTask: Task<Void, Never>?
+    /// [EN] Plays again after each pass (`cyl_setAnimationViewLoops:`). [CN] 每次播放后再次播放（`cyl_setAnimationViewLoops:`）。
+    private var loops = false
+    private var loopTask: Task<Void, Never>?
+
+    // MARK: - [EN] CYLRiveFileInspecting [CN] 文件检查接口
+
+    /// [EN] A local file without a view model: `CYLRiveTabBarItemAnimationView` plays it here (house.riv), not through data binding.
+    /// [CN] 没有 view model 的本地文件：由 `CYLRiveTabBarItemAnimationView` 交给本视图播放（house.riv），而不是通过数据绑定。
+    public static func cylFileHasNoViewModel(_ fileURL: URL) -> Bool {
+        guard fileURL.isFileURL, let data = try? Data(contentsOf: fileURL),
+              let file = try? RiveFile(data: data, loadCdn: false) else {
+            return false
+        }
+        return file.viewModelCount == 0
+    }
 
     // MARK: - [EN] CYLTabBarItemAnimationViewProviding [CN] 视图工厂接口
 
@@ -59,6 +74,18 @@ public final class CYLRiveLegacyTabBarItemAnimationView: UIView, CYLTabBarItemAn
         return true
     }
 
+    /// [EN] The template tint (`CYLTabBarAnimationOptionTint`). [CN] 模板着色（`CYLTabBarAnimationOptionTint`）。
+    private let tintOverlay = CYLRiveTintOverlay()
+    /// [EN] The last title color, kept for a file that loads later. [CN] 最近的标题颜色，供稍后加载的文件使用。
+    private var titleTintColor: UIColor?
+    /// [EN] The tab's selected state, nil until a caller tells it. [CN] Tab 的选中状态，调用方告知之前为 nil。
+    private var tintSelected: Bool?
+
+    /// [EN] The tint for the current title color and state. [CN] 当前标题颜色与状态下的着色。
+    private var currentTintColor: UIColor? {
+        configuration.tintColor(titleColor: titleTintColor, selected: tintSelected)
+    }
+
     private init(configuration: CYLRiveTabBarItemAnimationConfiguration, file: RiveFile) {
         self.configuration = configuration
         let model = RiveModel(riveFile: file)
@@ -67,9 +94,11 @@ public final class CYLRiveLegacyTabBarItemAnimationView: UIView, CYLTabBarItemAn
             viewModel = RiveViewModel(model, animationName: animationName, fit: .contain, alignment: .center,
                                       autoPlay: false, artboardName: configuration.artboardName)
         } else {
-            // [EN] A state machine, running from the start (it waits for its inputs). [CN] 状态机，从一开始就运行（等待输入）。
+            // [EN] A state machine, resting on its first frame until it is played (docs/Animated-Item.md): a file that moves
+            //      by itself (shapes.riv, truck.riv) no longer runs from launch. Every play calls `play()`.
+            // [CN] 状态机，在被播放之前停在第一帧：会自行运动的文件（shapes.riv、truck.riv）不再从启动起就运动。每次播放都会调用 `play()`。
             viewModel = RiveViewModel(model, stateMachineName: configuration.stateMachineName, fit: .contain, alignment: .center,
-                                      autoPlay: true, artboardName: configuration.artboardName)
+                                      autoPlay: false, artboardName: configuration.artboardName)
         }
         super.init(frame: .zero)
         isUserInteractionEnabled = false
@@ -82,7 +111,52 @@ public final class CYLRiveLegacyTabBarItemAnimationView: UIView, CYLTabBarItemAn
         riveView.isUserInteractionEnabled = false
         riveView.backgroundColor = .clear
         addSubview(riveView)
+        tintOverlay.apply(configuration.fixedTintColor, in: self)
+        if #available(iOS 17.0, *) {
+            registerForTraitChanges([UITraitUserInterfaceStyle.self]) { (view: CYLRiveLegacyTabBarItemAnimationView, _: UITraitCollection) in
+                view.appearanceDidChange()
+            }
+        }
     }
+
+    /// [EN] Before iOS 17: the light / dark switch. [CN] iOS 17 之前：浅色 / 深色切换。
+    override public func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        if #available(iOS 17.0, *) {
+            return
+        }
+        if traitCollection.hasDifferentColorAppearance(comparedTo: previousTraitCollection) {
+            appearanceDidChange()
+        }
+    }
+
+    /// [EN] A dynamic tint (a fixed tint with `darkTint`, or the title color) resolved again with this view's new appearance.
+    /// [CN] 按本视图的新外观重新解析动态着色（带 `darkTint` 的固定着色或标题颜色）。
+    private func appearanceDidChange() {
+        if let tint = currentTintColor {
+            tintOverlay.apply(tint, in: self)
+        }
+    }
+
+    /// [EN] `cyl_applyAnimationViewTintColor:`: the tab's title color, without its state. [CN] Tab 的标题颜色，不含状态。
+    public func applyAnimationTintColor(_ color: UIColor?) {
+        titleTintColor = color
+        tintOverlay.apply(currentTintColor, in: self)
+    }
+
+    /// [EN] `cyl_applyAnimationViewTintColor:selected:`: the title color and the tab's state; a fixed tint only when unselected.
+    /// [CN] `cyl_applyAnimationViewTintColor:selected:`：标题颜色与 Tab 状态；固定着色只用于未选中状态。
+    public func applyAnimationTintColor(_ color: UIColor?, selected: Bool) {
+        tintSelected = selected
+        applyAnimationTintColor(color)
+    }
+
+    /// [EN] Keeps the tint over the Rive view. [CN] 让着色覆盖 Rive 视图。
+    override public func layoutSubviews() {
+        super.layoutSubviews()
+        tintOverlay.layout(in: self)
+    }
+
 
     /// [EN] Not used from Interface Builder. [CN] 不支持从 Interface Builder 创建。
     public required init?(coder _: NSCoder) {
@@ -102,33 +176,121 @@ public final class CYLRiveLegacyTabBarItemAnimationView: UIView, CYLTabBarItemAn
 
     // MARK: - [EN] CYLTabBarItemAnimationPlayableView [CN] 可播放视图接口
 
-    /// [EN] Fires the trigger, sets the input to YES (back to NO after the duration, unless it is 0), or plays the animation.
-    /// [CN] 触发 trigger、把输入设为 YES（经过指定时长后恢复为 NO，时长为 0 时保持），或播放动画。
+    /// [EN] Plays from the start (docs/Animated-Item.md, the Rive loop): a linear animation restarts; a trigger fires; an input
+    ///      the state machine has goes to NO, then YES on a later frame, so every play is a transition (a held input,
+    ///      duration 0, used to play once), and back to NO after the duration; a state machine whose input is missing or
+    ///      not named restarts (house.riv, shapes.riv). With looping on, it plays again after each pass.
+    /// [CN] 从头播放（docs/Animated-Item.md，Rive 循环）：线性动画重新开始；trigger 触发；状态机中存在的输入先设为 NO，在之后的帧再设为 YES，每次
+    ///      播放都是一次状态切换（保持的输入、时长为 0 时以前只播放一次），经过时长后恢复为 NO；缺少或未指定输入的状态机重新开始（house.riv、shapes.riv）。
+    ///      开启循环时，每次播放后再次播放。
     public func playAnimation() {
-        if let animationName = configuration.animationName {
-            viewModel.play(animationName: animationName)
-            return
-        }
-        if let triggerInput = configuration.triggerInput {
-            viewModel.triggerInput(triggerInput)
-            return
-        }
-        guard let input = configuration.stateMachineInput else {
+        play(fromLoop: false)
+    }
+
+    /// [EN] `fromLoop`: a loop pass, which leaves a file that is still moving on its own alone (shapes.riv, truck.riv loop by
+    ///      themselves; resetting them every pass cut them short). [CN] `fromLoop`：一次循环，不打断仍在自行运动的文件（shapes.riv、truck.riv
+    ///      自身循环；每次循环重置会打断它们）。
+    private func play(fromLoop: Bool) {
+        let usableInput = configuration.stateMachineInput.map(hasInput) ?? false
+        if fromLoop, configuration.animationName == nil, configuration.triggerInput == nil, configuration.numberInput == nil, !usableInput,
+           viewModel.isPlaying {
+            scheduleLoop()
             return
         }
         deactivateTask?.cancel()
-        viewModel.setInput(input, value: true)
-        guard configuration.activeDuration > 0 else {
+        loopTask?.cancel()
+        if let animationName = configuration.animationName {
+            // [EN] stop() goes back to the start, so a finished one-shot plays again. [CN] stop() 回到开头，播放完毕的单次动画可以再次播放。
+            viewModel.stop()
+            viewModel.play(animationName: animationName)
+        } else if let triggerInput = configuration.triggerInput {
+            // [EN] A trigger does nothing once its state machine has reached the end (check.riv stayed on its finished check):
+            //      restart the state machine, then fire it a frame later.
+            // [CN] 状态机到达结束状态后 trigger 不再起作用（check.riv 停在完成的对勾上）：先重新开始状态机，一帧之后再触发。
+            viewModel.reset()
+            viewModel.play()
+            deactivateTask = Task { @MainActor [weak self] in
+                try? await Task.sleep(nanoseconds: 50_000_000)
+                guard !Task.isCancelled, let self else {
+                    return
+                }
+                self.viewModel.triggerInput(triggerInput)
+                self.viewModel.play()
+            }
+        } else if let name = configuration.numberInput, let number = numberInput(name) {
+            // [EN] The next value: a state machine that moves only when a number changes (house.riv's Rooms) plays each time.
+            // [CN] 下一个值：只在数字变化时运动的状态机（house.riv 的 Rooms）每次都会播放。
+            viewModel.setInput(name, value: configuration.nextNumber(after: number.value()))
+            viewModel.play()
+        } else if let input = configuration.stateMachineInput, usableInput {
+            viewModel.setInput(input, value: false)
+            let duration = configuration.activeDuration
+            deactivateTask = Task { @MainActor [weak self] in
+                // [EN] A frame later: the state machine sees NO, then YES. [CN] 一帧之后：状态机先看到 NO，再看到 YES。
+                try? await Task.sleep(nanoseconds: 50_000_000)
+                guard !Task.isCancelled, let self else {
+                    return
+                }
+                self.viewModel.setInput(input, value: true)
+                self.viewModel.play()
+                guard duration > 0 else {
+                    return
+                }
+                try? await Task.sleep(nanoseconds: UInt64(duration * 1_000_000_000))
+                guard !Task.isCancelled else {
+                    return
+                }
+                self.viewModel.setInput(input, value: false)
+            }
+        } else {
+            viewModel.reset()
+            viewModel.play()
+        }
+        scheduleLoop()
+    }
+
+    /// [EN] `cyl_setAnimationViewLoops:`. [CN] `cyl_setAnimationViewLoops:`。
+    public func setAnimationLoops(_ loops: Bool) {
+        self.loops = loops
+        if !loops {
+            loopTask?.cancel()
+            loopTask = nil
+        }
+    }
+
+    /// [EN] The next pass while looping: after the input goes back to NO (plus a pause), the animation's length, or 1.5 s.
+    /// [CN] 循环时的下一次播放：输入恢复为 NO 之后（再停顿一下）、动画时长，或 1.5 秒。
+    private func scheduleLoop() {
+        guard loops else {
             return
         }
-        let nanoseconds = UInt64(configuration.activeDuration * 1_000_000_000)
-        deactivateTask = Task { @MainActor [weak self] in
-            try? await Task.sleep(nanoseconds: nanoseconds)
-            guard !Task.isCancelled, let self else {
+        var seconds = CYLRiveTabBarItemAnimationConfiguration.loopSeconds
+        if configuration.stateMachineInput != nil, configuration.activeDuration > 0 {
+            seconds = configuration.activeDuration + CYLRiveTabBarItemAnimationConfiguration.loopPauseSeconds
+        } else if configuration.animationName != nil, let animation = viewModel.riveModel?.animation,
+                  animation.effectiveDurationInSeconds() > 0 {
+            seconds = TimeInterval(animation.effectiveDurationInSeconds())
+        }
+        loopTask = Task { @MainActor [weak self] in
+            try? await Task.sleep(nanoseconds: UInt64(seconds * 1_000_000_000))
+            guard !Task.isCancelled, let self, self.loops else {
                 return
             }
-            self.viewModel.setInput(input, value: false)
+            self.play(fromLoop: true)
         }
+    }
+
+    /// [EN] Whether the state machine has the input (RiveRuntime only logs a missing one). [CN] 状态机是否有该输入（RiveRuntime 对不存在的输入只打印日志）。
+    private func hasInput(_ name: String) -> Bool {
+        guard let stateMachine = viewModel.riveModel?.stateMachine else {
+            return false
+        }
+        return (try? stateMachine.input(fromName: name)) != nil
+    }
+
+    /// [EN] The state machine's number input, nil when it has none or it is not a number. [CN] 状态机的数字输入；没有或不是数字时为 nil。
+    private func numberInput(_ name: String) -> RiveSMINumber? {
+        return (try? viewModel.riveModel?.stateMachine?.input(fromName: name)) as? RiveSMINumber
     }
 
     /// [EN] The resting state, without playing (#389). [CN] 静止状态，不播放（#389）。
@@ -140,6 +302,8 @@ public final class CYLRiveLegacyTabBarItemAnimationView: UIView, CYLTabBarItemAn
     public func stopAnimation() {
         deactivateTask?.cancel()
         deactivateTask = nil
+        loopTask?.cancel()
+        loopTask = nil
         if configuration.animationName != nil {
             viewModel.stop()
         } else if let input = configuration.stateMachineInput {

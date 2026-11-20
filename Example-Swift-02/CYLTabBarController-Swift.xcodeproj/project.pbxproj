@@ -7,11 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		24B67B788E54419C9D18E36B /* CYLPlusButtonSubclass+Layout.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA5B87D183E542DD9F80CF4F /* CYLPlusButtonSubclass+Layout.swift */; };
 		28748AFB39319E9F7B73710D /* green_lottie_tab_discover_dark.json in Resources */ = {isa = PBXBuildFile; fileRef = 9C05D49F7CD4A6D88F0769A1 /* green_lottie_tab_discover_dark.json */; };
 		5438148C5C896F9F9610FB6D /* green_lottie_tab_news.json in Resources */ = {isa = PBXBuildFile; fileRef = 5E8A7073E2F0AFF33142AFC6 /* green_lottie_tab_news.json */; };
 		5680EEAF491BCEB80DD8D8D6 /* green_lottie_tab_news_dark.json in Resources */ = {isa = PBXBuildFile; fileRef = 9BB04F05AFDC060B60A38EF5 /* green_lottie_tab_news_dark.json */; };
 		63E710F79A1D4EC39CDDAA78 /* CYLPlusButtonBadgeDemo.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC2CEB58769B4604979F218E /* CYLPlusButtonBadgeDemo.swift */; };
-		24B67B788E54419C9D18E36B /* CYLPlusButtonSubclass+Layout.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA5B87D183E542DD9F80CF4F /* CYLPlusButtonSubclass+Layout.swift */; };
 		7D964DAFD4243B4488C0EDE8 /* green_lottie_tab_home.json in Resources */ = {isa = PBXBuildFile; fileRef = 424CE7A0A05E5F4F5C6F86B5 /* green_lottie_tab_home.json */; };
 		902C98FED82B8D76B708F906 /* green_lottie_tab_mine.json in Resources */ = {isa = PBXBuildFile; fileRef = C1523562301F1A2799053C75 /* green_lottie_tab_mine.json */; };
 		922DCEE61FF63399005C89BE /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 922DCEE41FF63399005C89BE /* Main.storyboard */; };
@@ -30,16 +30,18 @@
 		92DD37E220A5740500754AC8 /* NextHomeViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 92DD37E020A5740500754AC8 /* NextHomeViewController.xib */; };
 		93EC443C4B3EDC43DE4F1A0B /* green_lottie_tab_mine_dark.json in Resources */ = {isa = PBXBuildFile; fileRef = 913B24C46A451B563FD59593 /* green_lottie_tab_mine_dark.json */; };
 		9AE51DD92F8BC39100BB0831 /* MainRootNavigationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AE51DD82F8BC39100BB0831 /* MainRootNavigationViewController.swift */; };
+		9AE843096CB371AF02D35512 /* CYLDemo.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 5CC495958EFBE492FAFFD0BD /* CYLDemo.bundle */; };
+		BD52B7E316C76B8A9EC71802 /* CYLDemoLocalization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54E6756B8D67C221F7408FC6 /* CYLDemoLocalization.swift */; };
 		C0196AB673A3C11A8689ED66 /* Pods_CYLTabBarController_Swift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9DEC604443F0BED5845C1590 /* Pods_CYLTabBarController_Swift.framework */; };
 		C9D8B6D1492D8AFC7CB009FE /* green_lottie_tab_home_dark.json in Resources */ = {isa = PBXBuildFile; fileRef = E387C5547F3C194D8A5B2D6F /* green_lottie_tab_home_dark.json */; };
 		F92B16E0537AA694ADD60287 /* green_lottie_tab_discover.json in Resources */ = {isa = PBXBuildFile; fileRef = C271E16724FB5461A34B0D2F /* green_lottie_tab_discover.json */; };
-		BD52B7E316C76B8A9EC71802 /* CYLDemoLocalization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54E6756B8D67C221F7408FC6 /* CYLDemoLocalization.swift */; };
-		9AE843096CB371AF02D35512 /* CYLDemo.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 5CC495958EFBE492FAFFD0BD /* CYLDemo.bundle */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		2CDA77BCC28E878CAB5EFD15 /* Pods-CYLTabBarController-Swift.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CYLTabBarController-Swift.release.xcconfig"; path = "Pods/Target Support Files/Pods-CYLTabBarController-Swift/Pods-CYLTabBarController-Swift.release.xcconfig"; sourceTree = "<group>"; };
 		424CE7A0A05E5F4F5C6F86B5 /* green_lottie_tab_home.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = green_lottie_tab_home.json; path = ../Example/Classes/Other/LottieResources/green_lottie_tab_home.json; sourceTree = SOURCE_ROOT; };
+		54E6756B8D67C221F7408FC6 /* CYLDemoLocalization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CYLDemoLocalization.swift; path = "../Example-Shared/CYLDemoLocalization.swift"; sourceTree = SOURCE_ROOT; };
+		5CC495958EFBE492FAFFD0BD /* CYLDemo.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; name = CYLDemo.bundle; path = "../Example-Shared/CYLDemo.bundle"; sourceTree = SOURCE_ROOT; };
 		5E8A7073E2F0AFF33142AFC6 /* green_lottie_tab_news.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = green_lottie_tab_news.json; path = ../Example/Classes/Other/LottieResources/green_lottie_tab_news.json; sourceTree = SOURCE_ROOT; };
 		913B24C46A451B563FD59593 /* green_lottie_tab_mine_dark.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = green_lottie_tab_mine_dark.json; path = ../Example/Classes/Other/LottieResources/green_lottie_tab_mine_dark.json; sourceTree = SOURCE_ROOT; };
 		922DCEDD1FF63399005C89BE /* CYLTabBarController-Swift.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "CYLTabBarController-Swift.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -63,13 +65,11 @@
 		9C05D49F7CD4A6D88F0769A1 /* green_lottie_tab_discover_dark.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = green_lottie_tab_discover_dark.json; path = ../Example/Classes/Other/LottieResources/green_lottie_tab_discover_dark.json; sourceTree = SOURCE_ROOT; };
 		9DEC604443F0BED5845C1590 /* Pods_CYLTabBarController_Swift.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_CYLTabBarController_Swift.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		AC2CEB58769B4604979F218E /* CYLPlusButtonBadgeDemo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CYLPlusButtonBadgeDemo.swift; path = "../Example-Shared/CYLPlusButtonBadgeDemo.swift"; sourceTree = SOURCE_ROOT; };
-		DA5B87D183E542DD9F80CF4F /* CYLPlusButtonSubclass+Layout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "CYLPlusButtonSubclass+Layout.swift"; path = "../Example-Shared/CYLPlusButtonSubclass+Layout.swift"; sourceTree = SOURCE_ROOT; };
 		C1523562301F1A2799053C75 /* green_lottie_tab_mine.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = green_lottie_tab_mine.json; path = ../Example/Classes/Other/LottieResources/green_lottie_tab_mine.json; sourceTree = SOURCE_ROOT; };
 		C271E16724FB5461A34B0D2F /* green_lottie_tab_discover.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = green_lottie_tab_discover.json; path = ../Example/Classes/Other/LottieResources/green_lottie_tab_discover.json; sourceTree = SOURCE_ROOT; };
 		C7C15F27AFB129417A291CF9 /* Pods-CYLTabBarController-Swift.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CYLTabBarController-Swift.debug.xcconfig"; path = "Pods/Target Support Files/Pods-CYLTabBarController-Swift/Pods-CYLTabBarController-Swift.debug.xcconfig"; sourceTree = "<group>"; };
+		DA5B87D183E542DD9F80CF4F /* CYLPlusButtonSubclass+Layout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "CYLPlusButtonSubclass+Layout.swift"; path = "../Example-Shared/CYLPlusButtonSubclass+Layout.swift"; sourceTree = SOURCE_ROOT; };
 		E387C5547F3C194D8A5B2D6F /* green_lottie_tab_home_dark.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = green_lottie_tab_home_dark.json; path = ../Example/Classes/Other/LottieResources/green_lottie_tab_home_dark.json; sourceTree = SOURCE_ROOT; };
-		54E6756B8D67C221F7408FC6 /* CYLDemoLocalization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CYLDemoLocalization.swift; path = "../Example-Shared/CYLDemoLocalization.swift"; sourceTree = SOURCE_ROOT; };
-		5CC495958EFBE492FAFFD0BD /* CYLDemo.bundle */ = {isa = PBXFileReference; lastKnownFileType = wrapper.plug-in; name = CYLDemo.bundle; path = "../Example-Shared/CYLDemo.bundle"; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -332,10 +332,12 @@
 			);
 			inputPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-CYLTabBarController-Swift/Pods-CYLTabBarController-Swift-resources.sh",
+				"${PODS_ROOT}/../../CYLTabBarController/CYLAnimatedItem/Resources/CYLAnimatedItem.bundle",
 				"${PODS_ROOT}/../../CYLTabBarController/Resources/CYLTabBarController.bundle",
 			);
 			name = "[CP] Copy Pods Resources";
 			outputPaths = (
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/CYLAnimatedItem.bundle",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/CYLTabBarController.bundle",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -458,7 +460,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -512,7 +514,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";

@@ -17,7 +17,7 @@
   "cylExampleResources": {
     "folder": "rive",
     "source": "Example-SwiftUI-Rive/AnimatedApp/RiveAssets",
-    "files": ["icons.riv"]
+    "files": ["icons.riv", "house.riv"]
   },
   "files": ["miniprogram_dist", "README.md", "LICENSE", "NOTICE"],
   "scripts": {

@@ -247,7 +247,7 @@ extension CYLSettingsDemo {
 final class CYLSwitchAdjacentTabCell: UITableViewCell {
     weak var tabBarController: CYLTabBarController?
 
-    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+    override init(style _: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: .subtitle, reuseIdentifier: reuseIdentifier)
         selectionStyle = .none
         imageView?.image = UIImage(systemName: "arrow.left.arrow.right")
@@ -267,7 +267,7 @@ final class CYLSwitchAdjacentTabCell: UITableViewCell {
         accessoryView = stackView
     }
 
-    required init?(coder: NSCoder) {
+    required init?(coder _: NSCoder) {
         fatalError("init(coder:) is not used")
     }
 

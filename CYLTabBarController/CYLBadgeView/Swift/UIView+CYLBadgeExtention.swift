@@ -75,7 +75,7 @@ final class CYLBadgeLabel: UILabel {
  * [CN] 角标为 `animationType` 播放的动画（无动画时为 nil）。循环动画在 App 从后台返回后继续播放。声明在 CYLBadgeViewDefines.h。
  */
 @_cdecl("CYLBadgeAnimationForType")
-func cylBadgeAnimationForTypeEntryPoint(_ animationType: CYLBadgeAnimationType, _ badgeSize: CGSize) -> CAAnimation? {
+public func cylBadgeAnimationForTypeEntryPoint(_ animationType: CYLBadgeAnimationType, _ badgeSize: CGSize) -> CAAnimation? {
     let moveDistance = badgeSize.width * 1.5
     switch animationType {
     case .breathe:
@@ -165,7 +165,7 @@ final class CYLBadgeHostOverlayView: UIView {
     }
 
     @available(*, unavailable)
-    required init?(coder: NSCoder) {
+    required init?(coder _: NSCoder) {
         fatalError("init(coder:) is not supported")
     }
 
@@ -306,20 +306,18 @@ private func cylBadgeContainer(forHost host: UIView) -> UIView {
 // MARK: - UIView (CYLBadgeExtention)
 
 /**
- * [EN] The members of `CYLBadgeProtocol` are internal: the conformance is declared in UIView+CYLBadgeExtention.h
- *      (`@interface UIView (CYLBadgeExtention) <CYLBadgeProtocol>`), where Objective-C and Swift callers see them through the
- *      protocol. A public Swift conformance to this Objective-C protocol (or `CYLBadgeAnimationType` in a public signature)
- *      makes the generated header import the umbrella header, which then runs in a circle with the core headers.
- * [CN] `CYLBadgeProtocol` 的成员为 internal：遵守关系声明在 UIView+CYLBadgeExtention.h（`@interface UIView (CYLBadgeExtention)
- *      <CYLBadgeProtocol>`），Objective-C 与 Swift 调用方通过协议看到它们。公开的 Swift 遵守该 Objective-C 协议（或在公开签名中使用
- *      `CYLBadgeAnimationType`）会让生成的头文件导入伞头文件，从而与核心头文件形成循环导入。
+ * [EN] The members of `CYLBadgeProtocol` are public and the conformance is declared at the end of this file: since step 115
+ *      the protocol and its enums are Swift (CYLBadgeProtocol.swift), so the generated header declares them itself and no
+ *      longer imports the umbrella header (the import cycle that kept the members internal while the protocol was Objective-C).
+ * [CN] `CYLBadgeProtocol` 的成员为 public，遵循关系在本文件末尾声明：自第 115 步起协议与其枚举为 Swift（CYLBadgeProtocol.swift），
+ *      生成的头文件自行声明它们，不再导入伞头文件（协议为 Objective-C 时成员只能为 internal，以避免该循环导入）。
  */
 extension UIView {
 
     // MARK: Public methods
 
     @objc(cyl_isReady)
-    dynamic func cyl_isReady() -> Bool {
+    public dynamic func cyl_isReady() -> Bool {
         if cyl_badgeClass() == nil {
             return false
         }
@@ -335,12 +333,15 @@ extension UIView {
      * [EN] Shows a red dot badge, with no animation. [CN] 显示红点角标，无动画。
      */
     @objc(cyl_showBadge)
-    dynamic func cyl_showBadge() {
+    public dynamic func cyl_showBadge() {
         cyl_showBadgeValue("", animationType: .none)
     }
 
     @objc(cyl_showBadgeValue:animationTypeValue:)
     public dynamic func cyl_showBadgeValue(_ value: String, animationTypeValue: NSNumber) {
+        if cyl_forwardBadgeToAnimatedItemIcon(#selector(UIView.cyl_showBadgeValue(_:animationTypeValue:)), value, animationTypeValue) {
+            return
+        }
         let generation = cyl_invalidatePendingBadgeValue()
         if cyl_shouldWaitForLayoutBeforeShowingBadgeValue(value) {
             cyl_showBadgeValue(value, animationTypeValue: animationTypeValue, afterLayoutWithGeneration: generation, attempt: 0)
@@ -417,7 +418,7 @@ extension UIView {
     }
 
     @objc(cyl_showBadgeValue:animationType:)
-    dynamic func cyl_showBadgeValue(_ value: String, animationType: CYLBadgeAnimationType) {
+    public dynamic func cyl_showBadgeValue(_ value: String, animationType: CYLBadgeAnimationType) {
         cyl_showBadgeValue(value, animationTypeValue: NSNumber(value: animationType.rawValue))
     }
 
@@ -456,7 +457,7 @@ extension UIView {
     }
 
     @objc(cyl_showBadgeWithValue:)
-    dynamic func cyl_showBadge(withValue value: String?) {
+    public dynamic func cyl_showBadge(withValue value: String?) {
         guard let value else {
             return
         }
@@ -485,14 +486,21 @@ extension UIView {
      * [EN] Clears the badge. [CN] 清除角标。
      */
     @objc(cyl_clearBadge)
-    dynamic func cyl_clearBadge() {
+    public dynamic func cyl_clearBadge() {
+        if cyl_forwardBadgeToAnimatedItemIcon(#selector(UIView.cyl_clearBadge)) {
+            return
+        }
         cyl_invalidatePendingBadgeValue()
         cyl_badge?.cyl_setHidden(true)
         cyl_updateBadgeAccessibility()
     }
 
     @objc(cyl_isShowBadge)
-    dynamic func cyl_isShowBadge() -> Bool {
+    public dynamic func cyl_isShowBadge() -> Bool {
+        // [EN] An animated item's badge is on its icon subview. [CN] 动效 item 的角标在其图标子视图上。
+        if let icon = cyl_animatedItemBadgeHost(), icon !== self {
+            return icon.cyl_isShowBadge()
+        }
         guard let badge = cyl_badge else {
             return false
         }
@@ -503,7 +511,10 @@ extension UIView {
      * [EN] Shows the badge again if it exists and is hidden. [CN] 角标存在且被隐藏时重新显示。
      */
     @objc(cyl_resumeBadge)
-    dynamic func cyl_resumeBadge() {
+    public dynamic func cyl_resumeBadge() {
+        if cyl_forwardBadgeToAnimatedItemIcon(#selector(UIView.cyl_resumeBadge)) {
+            return
+        }
         if cyl_isPauseBadge() {
             cyl_badge?.cyl_setHidden(false)
             cyl_badgeEnvironmentDidChange()
@@ -511,7 +522,10 @@ extension UIView {
     }
 
     @objc(cyl_isPauseBadge)
-    dynamic func cyl_isPauseBadge() -> Bool {
+    public dynamic func cyl_isPauseBadge() -> Bool {
+        if let icon = cyl_animatedItemBadgeHost(), icon !== self {
+            return icon.cyl_isPauseBadge()
+        }
         guard let badge = cyl_badge else {
             return false
         }
@@ -519,26 +533,101 @@ extension UIView {
     }
 
     @objc(cyl_getActualBadgeSuperView)
-    dynamic func cyl_getActualBadgeSuperView() -> Any? {
+    public dynamic func cyl_getActualBadgeSuperView() -> Any? {
         // [EN] Auto Layout cells must call `-layoutIfNeeded` for the frame to have a value, so the badge can find its
         //      position; make sure a view's badge is shown after that.
         // [CN] 自动布局的 cell 需要调用 `-layoutIfNeeded` frame 才有值，角标才能找到对应位置；请确保在此之后显示角标。
         layoutIfNeeded()
+        // [EN] Unchanged: a plain view hosts its own badge. An animated item is a UIControl, whose lookup (Core) asks
+        //      `-cyl_animatedItemBadgeHost` and then sends the badge messages to that icon through `-cyl_performSelector:…`.
+        // [CN] 保持不变：普通视图承载自己的角标。动效 item 是 UIControl，其查找（Core）会调用 `-cyl_animatedItemBadgeHost`，再通过
+        //      `-cyl_performSelector:…` 把角标消息发给该图标。
         return self
     }
 
+    /**
+     * [EN] The icon of an animated item (`CYLAnimatedItemView`, the component every animation format plays in, a FlatDesign
+     *      tab button included): its `animationView` while it shows (any engine: GIF, Lottie, PAG, Rive, SVGA), else its
+     *      `imageView` (the static image or the placeholder). Nil for any other view. The component is found by class name,
+     *      so the badge subspec does not depend on it.
+     * [CN] 动效 item（`CYLAnimatedItemView`，所有动效格式播放所在的组件，包括扁平样式 Tab 按钮）的图标：其 `animationView` 显示时为它（任何引擎：
+     *      GIF、Lottie、PAG、Rive、SVGA），否则为其 `imageView`（静态图片或占位图）。其他视图返回 nil。按类名查找组件，因此角标子库不依赖它。
+     */
+    /**
+     * [EN] A badge message sent to an animated item itself (e.g. the badge subspec without Core, where `UIControl` does not
+     *      forward): sent on to its icon subview through the usual `-cyl_performSelector:withObject:withObject:`, so the badge
+     *      is added there. True when forwarded; false for any other view, and for the icon itself.
+     * [CN] 直接发给动效 item 的角标消息（例如没有 Core 的角标子库，此时 `UIControl` 不会转发）：通过常规的 `-cyl_performSelector:withObject:withObject:`
+     *      转发给其图标子视图，角标添加在那里。已转发时返回 true；其他视图及图标本身返回 false。
+     */
+    private func cyl_forwardBadgeToAnimatedItemIcon(_ selector: Selector, _ object1: Any? = nil, _ object2: Any? = nil) -> Bool {
+        guard let icon = cyl_animatedItemBadgeHost(), icon !== self else {
+            return false
+        }
+        icon.clipsToBounds = false
+        icon.cyl_perform(selector, with: object1, with: object2)
+        return true
+    }
+
+    /**
+     * [EN] Moves this view's shown badge to `newHost`: its settings (font, colors, border, frame, offset, maximum, radius,
+     *      margin, corner radius, Reduce Motion) are copied, the badge is cleared here and shown on `newHost` with the same
+     *      value and animation, through `-cyl_performSelector:withObject:withObject:`. Nothing when no badge is shown. Used
+     *      when a tab's animation view is replaced by a new one (another file, the dark file, a skin), whose old view held the
+     *      badge.
+     * [CN] 把本视图显示中的角标移到 `newHost`：复制其设置（字体、颜色、边框、frame、偏移、最大值、半径、边距、圆角、减弱动态效果），在这里清除角标，
+     *      并通过 `-cyl_performSelector:withObject:withObject:` 在 `newHost` 上以相同的值与动画显示。没有显示角标时不做任何事。用于 Tab 的动画视图被
+     *      新视图替换时（另一个文件、深色文件、皮肤），旧视图承载着角标。
+     */
+    @objc(cyl_moveBadgeToView:)
+    public func cyl_moveBadge(to newHost: UIView) {
+        guard newHost !== self, let badge = cyl_badge, cyl_isShowBadge() else {
+            return
+        }
+        newHost.cyl_badgeFont = cyl_badgeFont
+        newHost.cyl_badgeBackgroundColor = cyl_badgeBackgroundColor
+        newHost.cyl_badgeTextColor = cyl_badgeTextColor
+        newHost.cyl_badgeBorderColor = cyl_badgeBorderColor
+        newHost.cyl_badgeBorderWidth = cyl_badgeBorderWidth
+        newHost.cyl_badgeRespectsReduceMotion = cyl_badgeRespectsReduceMotion
+        newHost.cyl_badgeFrameValue = cyl_badgeFrameValue
+        newHost.cyl_badgeCenterOffsetValue = cyl_badgeCenterOffsetValue
+        newHost.cyl_badgeMaximumBadgeNumberValue = cyl_badgeMaximumBadgeNumberValue
+        newHost.cyl_badgeRadiusValue = cyl_badgeRadiusValue
+        newHost.cyl_badgeMarginValue = cyl_badgeMarginValue
+        newHost.cyl_badgeCornerRadiusValue = cyl_badgeCornerRadiusValue
+        let value = badge.text ?? ""
+        let animationTypeValue = cyl_badgeAnimationTypeValue
+        cyl_clearBadge()
+        newHost.clipsToBounds = false
+        newHost.cyl_perform(#selector(UIView.cyl_showBadgeValue(_:animationTypeValue:)), with: value, with: animationTypeValue)
+    }
+
+    @objc(cyl_animatedItemBadgeHost)
+    public func cyl_animatedItemBadgeHost() -> UIView? {
+        guard let componentClass = NSClassFromString("CYLAnimatedItemView"), isKind(of: componentClass) else {
+            return nil
+        }
+        let animationView = responds(to: NSSelectorFromString("animationView")) ? value(forKey: "animationView") as? UIView : nil
+        let imageView = responds(to: NSSelectorFromString("imageView")) ? value(forKey: "imageView") as? UIView : nil
+        if let animationView, animationView.superview != nil, !animationView.isHidden, animationView.alpha > 0.01 {
+            return animationView
+        }
+        return imageView ?? animationView
+    }
+
     @objc(cyl_performSelector:)
-    dynamic func cyl_perform(_ aSelector: Selector) {
+    public dynamic func cyl_perform(_ aSelector: Selector) {
         cyl_perform(aSelector, with: nil, with: nil)
     }
 
     @objc(cyl_performSelector:withObject:)
-    dynamic func cyl_perform(_ aSelector: Selector, with object: Any?) {
+    public dynamic func cyl_perform(_ aSelector: Selector, with object: Any?) {
         cyl_perform(aSelector, with: object, with: nil)
     }
 
     @objc(cyl_performSelector:withObject:withObject:)
-    dynamic func cyl_perform(_ aSelector: Selector, with object1: Any?, with object2: Any?) {
+    public dynamic func cyl_perform(_ aSelector: Selector, with object1: Any?, with object2: Any?) {
         _ = perform(aSelector, with: object1, with: object2)
     }
 
@@ -833,6 +922,9 @@ extension UIView {
      */
     @objc(cyl_refreshBadge)
     public dynamic func cyl_refreshBadge() {
+        if cyl_forwardBadgeToAnimatedItemIcon(#selector(UIView.cyl_refreshBadge)) {
+            return
+        }
         guard let badge = cyl_badge else {
             return
         }
@@ -990,7 +1082,7 @@ extension UIView {
         }
     }
 
-    @objc(cyl_badgeFont) dynamic var cyl_badgeFont: UIFont! {
+    @objc(cyl_badgeFont) public dynamic var cyl_badgeFont: UIFont! {
         @objc(cyl_badgeFont) get {
             objc_getAssociatedObject(self, CYLBadgeViewKeys.font) as? UIFont ?? CYLBadgeAppearance.global.font
         }
@@ -1004,7 +1096,7 @@ extension UIView {
         }
     }
 
-    @objc(cyl_badgeBackgroundColor) dynamic var cyl_badgeBackgroundColor: UIColor! {
+    @objc(cyl_badgeBackgroundColor) public dynamic var cyl_badgeBackgroundColor: UIColor! {
         @objc(cyl_badgeBackgroundColor) get {
             objc_getAssociatedObject(self, CYLBadgeViewKeys.backgroundColor) as? UIColor ?? CYLBadgeAppearance.global.backgroundColor
         }
@@ -1017,7 +1109,7 @@ extension UIView {
         }
     }
 
-    @objc(cyl_badgeTextColor) dynamic var cyl_badgeTextColor: UIColor! {
+    @objc(cyl_badgeTextColor) public dynamic var cyl_badgeTextColor: UIColor! {
         @objc(cyl_badgeTextColor) get {
             objc_getAssociatedObject(self, CYLBadgeViewKeys.textColor) as? UIColor ?? CYLBadgeAppearance.global.textColor
         }
@@ -1030,7 +1122,7 @@ extension UIView {
         }
     }
 
-    @objc(cyl_badgeAnimationType) dynamic var cyl_badgeAnimationType: CYLBadgeAnimationType {
+    @objc(cyl_badgeAnimationType) public dynamic var cyl_badgeAnimationType: CYLBadgeAnimationType {
         @objc(cyl_badgeAnimationType) get {
             (objc_getAssociatedObject(self, CYLBadgeViewKeys.animationType) as? NSNumber)
                 .flatMap { CYLBadgeAnimationType(rawValue: $0.uintValue) } ?? .none
@@ -1045,7 +1137,7 @@ extension UIView {
         }
     }
 
-    @objc(cyl_badgeAnimationTypeValue) dynamic var cyl_badgeAnimationTypeValue: NSNumber {
+    @objc(cyl_badgeAnimationTypeValue) public dynamic var cyl_badgeAnimationTypeValue: NSNumber {
         @objc(cyl_badgeAnimationTypeValue) get {
             NSNumber(value: cyl_badgeAnimationType.rawValue)
         }
@@ -1054,7 +1146,7 @@ extension UIView {
         }
     }
 
-    @objc(cyl_badgeFrame) dynamic var cyl_badgeFrame: CGRect {
+    @objc(cyl_badgeFrame) public dynamic var cyl_badgeFrame: CGRect {
         @objc(cyl_badgeFrame) get {
             guard let info = objc_getAssociatedObject(self, CYLBadgeViewKeys.frame) as? [String: NSNumber], info.count == 4 else {
                 return .zero
@@ -1082,7 +1174,7 @@ extension UIView {
         }
     }
 
-    @objc(cyl_badgeFrameValue) dynamic var cyl_badgeFrameValue: NSValue {
+    @objc(cyl_badgeFrameValue) public dynamic var cyl_badgeFrameValue: NSValue {
         @objc(cyl_badgeFrameValue) get {
             NSValue(cgRect: cyl_badgeFrame)
         }
@@ -1091,7 +1183,7 @@ extension UIView {
         }
     }
 
-    @objc(cyl_badgeCornerRadius) dynamic var cyl_badgeCornerRadius: CGFloat {
+    @objc(cyl_badgeCornerRadius) public dynamic var cyl_badgeCornerRadius: CGFloat {
         @objc(cyl_badgeCornerRadius) get {
             (objc_getAssociatedObject(self, CYLBadgeViewKeys.cornerRadius) as? NSNumber).map { CGFloat($0.doubleValue) }
                 ?? CYLBadgeAppearance.global.cornerRadius
@@ -1102,7 +1194,7 @@ extension UIView {
         }
     }
 
-    @objc(cyl_badgeCornerRadiusValue) dynamic var cyl_badgeCornerRadiusValue: NSNumber {
+    @objc(cyl_badgeCornerRadiusValue) public dynamic var cyl_badgeCornerRadiusValue: NSNumber {
         @objc(cyl_badgeCornerRadiusValue) get {
             NSNumber(value: Double(cyl_badgeCornerRadius))
         }
@@ -1111,7 +1203,7 @@ extension UIView {
         }
     }
 
-    @objc(cyl_badgeCenterOffset) dynamic var cyl_badgeCenterOffset: CGPoint {
+    @objc(cyl_badgeCenterOffset) public dynamic var cyl_badgeCenterOffset: CGPoint {
         @objc(cyl_badgeCenterOffset) get {
             guard let info = objc_getAssociatedObject(self, CYLBadgeViewKeys.centerOffset) as? [String: NSNumber], info.count == 2 else {
                 return CYLBadgeAppearance.global.centerOffset
@@ -1131,7 +1223,7 @@ extension UIView {
         }
     }
 
-    @objc(cyl_badgeCenterOffsetValue) dynamic var cyl_badgeCenterOffsetValue: NSValue {
+    @objc(cyl_badgeCenterOffsetValue) public dynamic var cyl_badgeCenterOffsetValue: NSValue {
         @objc(cyl_badgeCenterOffsetValue) get {
             NSValue(cgPoint: cyl_badgeCenterOffset)
         }
@@ -1140,7 +1232,7 @@ extension UIView {
         }
     }
 
-    @objc(cyl_badgeRadius) dynamic var cyl_badgeRadius: CGFloat {
+    @objc(cyl_badgeRadius) public dynamic var cyl_badgeRadius: CGFloat {
         @objc(cyl_badgeRadius) get {
             (objc_getAssociatedObject(self, CYLBadgeViewKeys.radius) as? NSNumber).map { CGFloat($0.doubleValue) }
                 ?? CYLBadgeAppearance.global.radius
@@ -1153,7 +1245,7 @@ extension UIView {
         }
     }
 
-    @objc(cyl_badgeRadiusValue) dynamic var cyl_badgeRadiusValue: NSNumber {
+    @objc(cyl_badgeRadiusValue) public dynamic var cyl_badgeRadiusValue: NSNumber {
         @objc(cyl_badgeRadiusValue) get {
             NSNumber(value: Double(cyl_badgeRadius))
         }
@@ -1162,7 +1254,7 @@ extension UIView {
         }
     }
 
-    @objc(cyl_badgeMargin) dynamic var cyl_badgeMargin: CGFloat {
+    @objc(cyl_badgeMargin) public dynamic var cyl_badgeMargin: CGFloat {
         @objc(cyl_badgeMargin) get {
             (objc_getAssociatedObject(self, CYLBadgeViewKeys.margin) as? NSNumber).map { CGFloat($0.doubleValue) }
                 ?? CYLBadgeAppearance.global.margin
@@ -1175,7 +1267,7 @@ extension UIView {
         }
     }
 
-    @objc(cyl_badgeMarginValue) dynamic var cyl_badgeMarginValue: NSNumber {
+    @objc(cyl_badgeMarginValue) public dynamic var cyl_badgeMarginValue: NSNumber {
         @objc(cyl_badgeMarginValue) get {
             NSNumber(value: Double(cyl_badgeMargin))
         }
@@ -1184,7 +1276,7 @@ extension UIView {
         }
     }
 
-    @objc(cyl_badgeMaximumBadgeNumber) dynamic var cyl_badgeMaximumBadgeNumber: Int {
+    @objc(cyl_badgeMaximumBadgeNumber) public dynamic var cyl_badgeMaximumBadgeNumber: Int {
         @objc(cyl_badgeMaximumBadgeNumber) get {
             (objc_getAssociatedObject(self, CYLBadgeViewKeys.maximumBadgeNumber) as? NSNumber)?.intValue
                 ?? CYLBadgeAppearance.global.maximumBadgeNumber
@@ -1197,7 +1289,7 @@ extension UIView {
         }
     }
 
-    @objc(cyl_badgeMaximumBadgeNumberValue) dynamic var cyl_badgeMaximumBadgeNumberValue: NSNumber {
+    @objc(cyl_badgeMaximumBadgeNumberValue) public dynamic var cyl_badgeMaximumBadgeNumberValue: NSNumber {
         @objc(cyl_badgeMaximumBadgeNumberValue) get {
             NSNumber(value: cyl_badgeMaximumBadgeNumber)
         }
@@ -1252,7 +1344,7 @@ extension UIView {
         }
     }
 
-    @objc(cyl_delayIfNeededForSeconds) dynamic var cyl_delayIfNeededForSeconds: CGFloat {
+    @objc(cyl_delayIfNeededForSeconds) public dynamic var cyl_delayIfNeededForSeconds: CGFloat {
         @objc(cyl_delayIfNeededForSeconds) get {
             (objc_getAssociatedObject(self, CYLBadgeViewKeys.delayIfNeededForSeconds) as? NSNumber).map { CGFloat($0.doubleValue) }
                 ?? CYLBadgeViewKeys.defaultDelayIfNeededForSeconds
@@ -1265,7 +1357,7 @@ extension UIView {
         }
     }
 
-    @objc(cyl_delayIfNeededForSecondsValue) dynamic var cyl_delayIfNeededForSecondsValue: NSNumber {
+    @objc(cyl_delayIfNeededForSecondsValue) public dynamic var cyl_delayIfNeededForSecondsValue: NSNumber {
         @objc(cyl_delayIfNeededForSecondsValue) get {
             NSNumber(value: Double(cyl_delayIfNeededForSeconds))
         }
@@ -1333,3 +1425,9 @@ extension UIView {
         CYLUtils.isLiquidGlassActive()
     }
 }
+
+/**
+ [EN] The `CYLBadgeProtocol` conformance, declared in Swift since step 115 (it was in the Objective-C category header).
+ [CN] `CYLBadgeProtocol` 遵循关系，自第 115 步起在 Swift 中声明（原在 Objective-C 类别头文件中）。
+ */
+extension UIView: CYLBadgeProtocol {}

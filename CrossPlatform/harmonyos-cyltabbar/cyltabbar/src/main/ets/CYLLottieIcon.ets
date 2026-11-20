@@ -14,9 +14,24 @@ let cylLottieCount: number = 0;
 export struct CYLLottieIcon {
   @Prop @Watch('cylReload') path: string = '';
   iconSize: number = 26;
-  speed: number = 1;
+  /** [EN] Playback speed, applied live (B22). [CN] 播放速度，立即生效（B22）。 */
+  @Prop @Watch('cylSpeedChanged') speed: number = 1;
   @Prop @Watch('cylUpdate') selected: boolean = false;
   @Prop @Watch('cylReplay') replayToken: number = 0;
+  /**
+   * [EN] Plays again from the start after each pass while the tab is selected (tabBarItemAnimationLoops); off by default.
+   * [CN] Tab 选中期间每次播放结束后从头再次播放（tabBarItemAnimationLoops）；默认关闭。
+   */
+  @Prop @Watch('cylLoopsChanged') loops: boolean = false;
+  /** [EN] The file is drawn (CYLAnimatedItemView shows it from here on). [CN] 文件已绘制（CYLAnimatedItemView 从此显示它）。 */
+  /**
+   * [EN] Hands the host this view's replay, called on each restart (CYLAnimatedItemView `setRestartHandler`, B23).
+   * [CN] 把本视图的重播交给宿主，每次重播时调用（CYLAnimatedItemView `setRestartHandler`，B23）。
+   */
+  registerReplay: (replay: () => void) => void = (_replay: () => void) => {};
+  onLoaded: () => void = () => {};
+  /** [EN] The file cannot be loaded. [CN] 文件无法加载。 */
+  onLoadError: (message: string) => void = (_message: string) => {};
   private settings: RenderingContextSettings = new RenderingContextSettings(true);
   private context: CanvasRenderingContext2D = new CanvasRenderingContext2D(this.settings);
   private lottieItem?: AnimationItem;
@@ -25,6 +40,7 @@ export struct CYLLottieIcon {
   aboutToAppear(): void {
     cylLottieCount += 1;
     this.name = `cyl-lottie-${cylLottieCount}`;
+    this.registerReplay(() => this.cylReplay());
   }
 
   aboutToDisappear(): void {
@@ -36,13 +52,21 @@ export struct CYLLottieIcon {
     this.lottieItem = lottie.loadAnimation({
       container: this.context,
       renderer: 'canvas',
-      loop: false,
+      loop: this.loops,
       autoplay: false,
       name: this.name,
       path: this.path,
     });
     this.lottieItem.setSpeed(this.speed);
-    this.lottieItem.addEventListener('DOMLoaded', () => this.cylUpdate());
+    this.lottieItem.addEventListener('DOMLoaded', () => {
+      this.cylUpdate();
+      this.onLoaded();
+    });
+    this.lottieItem.addEventListener('data_failed', () => this.onLoadError(`cannot load ${this.path}`));
+  }
+
+  cylSpeedChanged(): void {
+    this.lottieItem?.setSpeed(this.speed);
   }
 
   /** [EN] A new path (e.g. the dark file after a color mode change) reloads the animation. [CN] 新路径（如切换深色模式后）重新加载动画。 */
@@ -68,6 +92,18 @@ export struct CYLLottieIcon {
   cylReplay(): void {
     if (this.selected) {
       this.lottieItem?.goToAndPlay(0, true);
+    }
+  }
+
+  /** [EN] Applied to the animation already playing; turning it on replays a finished one. [CN] 对正在播放的动画生效；开启时重新播放已结束的动画。 */
+  cylLoopsChanged(): void {
+    const item = this.lottieItem;
+    if (item === undefined) {
+      return;
+    }
+    item.loop = this.loops;
+    if (this.loops && this.selected && item.isPaused) {
+      item.goToAndPlay(0, true);
     }
   }
 

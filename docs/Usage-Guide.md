@@ -774,7 +774,7 @@ CYLPlusButton(forOwner: tabBarController)?.cyl_showBadgeValue("1", animationType
 | 中文 | English |
 |:---|:---|
 | 单独使用与配合 CYLTabBarController 使用时 API 完全相同，区别只在 TabBar 相关的部分：`UIControl` 的角标显示在控件本身上（配合 CYLTabBarController 时，Tab 按钮的角标显示在图标或 Lottie 视图上，并同步到液态玻璃 platter）；`UITabBarItem` 的角标显示在 Tab 图标上。无障碍朗读文案两种情况下相同，都使用 CYLUtils 内置的 33 种语言。 | The API is the same alone or with CYLTabBarController; only the tab bar parts differ. A `UIControl` gets its badge on the control itself (with CYLTabBarController, a tab button's badge goes on its icon or Lottie view and is mirrored to the Liquid Glass platter). A `UITabBarItem` gets its badge on the tab icon. VoiceOver texts are the same either way, in CYLUtils' 33 built-in languages. |
-| SPM 和 Carthage 只提供完整的 CYLTabBarController（包含角标）。 | SPM and Carthage only provide the whole of CYLTabBarController, badges included. |
+| SPM 和 Carthage 只提供完整的 CYLTabBarController（包含角标）。另外，SPM 单独提供动效条目组件 `CYLAnimatedItem` 产品（`.product(name: "CYLAnimatedItem", package: "CYLTabBarController")`，不含 TabBar，见 [docs/Animated-Item.md](Animated-Item.md)）；Carthage 暂无单独的组件 framework。 | SPM and Carthage only provide the whole of CYLTabBarController, badges included. SPM also offers the animated item component alone, the `CYLAnimatedItem` product (`.product(name: "CYLAnimatedItem", package: "CYLTabBarController")`, without the tab bar, see [docs/Animated-Item.md](Animated-Item.md)); Carthage has no separate component framework yet. |
 
 ## [CN]全局设置角标样式
 ## [EN]Setting the badge style globally

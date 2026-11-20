@@ -1,6 +1,6 @@
-const path = require('path')
+const path = require('node:path')
 const webpack = require('webpack')
-const fs = require('fs')
+const fs = require('node:fs')
 const CopyPlugin = require('copy-webpack-plugin')
 
 module.exports = {
@@ -52,6 +52,11 @@ module.exports = {
         { 
           from: path.resolve(__dirname, 'src', 'index.d.ts'), 
           to: path.resolve(__dirname, 'miniprogram_dist', 'index.d.ts')
+        },
+        {
+          // [EN] The license travels with the built package (docs/License-Notices.md). [CN] 协议文件随构建产物发布（docs/License-Notices.md）。
+          from: path.resolve(__dirname, 'LICENSE'),
+          to: path.resolve(__dirname, 'miniprogram_dist', 'LICENSE')
         },
         {
           // [EN] The cyl-lottie component, copied as is (it requires ../index.js). [CN] cyl-lottie 组件，原样复制（它引用 ../index.js）。

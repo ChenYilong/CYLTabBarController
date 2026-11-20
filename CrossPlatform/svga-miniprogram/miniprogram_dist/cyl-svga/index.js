@@ -21,7 +21,7 @@ function cylIsDevTools() {
   try {
     const info = typeof wx.getDeviceInfo === 'function' ? wx.getDeviceInfo() : wx.getSystemInfoSync()
     return info.platform === 'devtools'
-  } catch (error) {
+  } catch {
     return false
   }
 }
@@ -48,7 +48,7 @@ function cylPixelRatio() {
  * [CN] 把 SVGA 文件读为 ArrayBuffer：http(s) 使用 wx.request，其他使用文件系统。
  */
 function cylReadSVGA(path, callback) {
-  const userData = (wx.env && wx.env.USER_DATA_PATH) || ''
+  const userData = wx.env?.USER_DATA_PATH || ''
   if (/^https?:\/\//.test(path) && !(userData && path.indexOf(userData) === 0)) {
     wx.request({
       url: path,
@@ -120,7 +120,12 @@ Component({
 
   observers: {
     'path, fit': function () {
-      if (this.cylReady) {
+      // [EN] WeChat runs an observer on every set, even with the same value: a host that re-renders (cyl-animated-item
+      //      after `ready`) restarted the load dozens of times a second, so the file never played (bugs B8 / B11,
+      //      docs/Animated-Item.md). Reload only when an input really changed, or after a failed load.
+      // [CN] 微信在每次设置时都会运行 observer，即使值相同：重新渲染的宿主（`ready` 后的 cyl-animated-item）每秒重启加载数十次，
+      //      文件永远不播放（问题 B8 / B10）。只在输入确实变化或加载失败后重新加载。
+      if (this.cylReady && (this.cyl_loadKey() !== this.cylLoadKey || this.cylLoadFailed)) {
         this.cyl_load()
       }
     },
@@ -157,8 +162,21 @@ Component({
   },
 
   methods: {
+    /** [EN] A failed load: the same inputs may load again. [CN] 加载失败：相同输入可再次加载。 */
+    cyl_reportError(detail) {
+      this.cylLoadFailed = true
+      this.triggerEvent('error', detail)
+    },
+
+    /** [EN] The inputs of a load. [CN] 一次加载的输入。 */
+    cyl_loadKey() {
+      return JSON.stringify([this.data.path, this.data.fit])
+    },
+
     cyl_load() {
       const token = ++this.cylLoadToken
+      this.cylLoadKey = this.cyl_loadKey()
+      this.cylLoadFailed = false
       this.cyl_cancelFrame()
       this.cylMovie = null
       this.cylPlaying = false
@@ -169,12 +187,12 @@ Component({
         .select(`#${this.data.cylCanvasId}`)
         .fields({ node: true, size: true })
         .exec((result) => {
-          const info = result && result[0]
+          const info = result?.[0]
           if (token !== this.cylLoadToken || !this.cylReady) {
             return
           }
-          if (!info || !info.node) {
-            this.triggerEvent('error', { message: 'cyl-svga: the canvas node is not available.' })
+          if (!info?.node) {
+            this.cyl_reportError( { message: 'cyl-svga: the canvas node is not available.' })
             return
           }
           const canvas = info.node
@@ -188,14 +206,14 @@ Component({
               return
             }
             if (error) {
-              this.triggerEvent('error', { message: error.message })
+              this.cyl_reportError( { message: error.message })
               return
             }
             let movie
             try {
               movie = cylDecodeSVGA(data)
             } catch (decodeError) {
-              this.triggerEvent('error', { message: decodeError.message })
+              this.cyl_reportError( { message: decodeError.message })
               return
             }
             cylLoadBitmaps(canvas, movie, (bitmaps) => {
@@ -319,7 +337,7 @@ Component({
 
     /** [EN] Plays from the beginning (a tab that becomes selected); `offset` seconds continue another bar's playback. [CN] 从头播放（Tab 被选中时）；`offset` 秒继续另一个 TabBar 的播放。 */
     cyl_playFromStart(offset) {
-      const seconds = Number(offset) > 0 ? Number(offset) : 0
+      const seconds = Math.max(0, Number(offset) || 0)
       const movie = this.cylMovie
       if (!movie) {
         this.cylPendingPlay = { seconds, requestedAt: Date.now() }

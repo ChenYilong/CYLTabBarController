@@ -21,7 +21,9 @@ NS_ASSUME_NONNULL_BEGIN
  * [EN] Posted with the item as its object whenever a shown value of a `CYLFlatDesignTabBarItem` changes.
  * [CN] `CYLFlatDesignTabBarItem` 显示的值每次变化时发送，object 为该 item。
  */
-extern NSString *const CYLFlatDesignTabBarItemDidChange;
+#ifndef __swift__
+#define CYLFlatDesignTabBarItemDidChange @"CYLFlatDesignTabBarItemDidChange"
+#endif
 
 /*!
  * [EN] `CYLFlatDesignTabBarItem` and `CYLFlatDesignTabBarButton` are implemented in Swift (`Swift/CYLFlatDesignTabBarItem.swift`,
@@ -31,7 +33,6 @@ extern NSString *const CYLFlatDesignTabBarItemDidChange;
  *      `Swift/CYLFlatDesignTabBarButton.swift`，docs/Swift-Migration.md，第 49 步）；Objective-C 调用方从下方导入的 Swift 生成接口获得其声明。
  *      selector 与 Swift 名称不变。
  */
-@class CYLFlatDesignTabBarItem, CYLFlatDesignTabBarButton;
 
 NS_ASSUME_NONNULL_END
 

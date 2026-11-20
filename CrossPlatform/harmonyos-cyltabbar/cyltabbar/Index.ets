@@ -4,6 +4,7 @@
 export {
   CYLTabBarItemAttributes, CYLTabBarItemTitle, CYLTabBarItemSelectedTitle, CYLTabBarItemImage, CYLTabBarItemSelectedImage,
   CYLTabBarItemIdentifier, CYLTitleOffset, CYLTabBarItemTitleColor, CYLTabBarItemSelectedTitleColor,
+  CYLTabBarItemIconColor, CYLTabBarItemSelectedIconColor,
   CYLTabBarItemBackgroundColor, CYLTabBarItemSelectedBackgroundColor, CYLTabBarItemImageInsets
 } from './src/main/ets/CYLTabBarItem';
 export { CYLPlusButton, CYLPlusButtonInsets, cyl_plusButtonOverhang, cyl_liquidGlassContentDy } from './src/main/ets/CYLPlusButton';
@@ -53,11 +54,13 @@ export {
 } from './src/main/ets/CYLFlatDesignTabBar';
 export { CYLColor } from './src/main/ets/CYLColor';
 export {
+  CYLTabBarAnimationOptionTint, CYLTabBarAnimationOptionDarkTint, CYLTabBarAnimationTintTitle,
   CYLRiveIcon, CYLTabBarRiveURL, CYLTabBarRiveFilePath, CYLTabBarRiveSize, CYLTabBarRiveDarkURL, CYLTabBarRiveDarkFilePath,
   CYLTabBarAnimationOptionRiveArtboard, CYLTabBarAnimationOptionRiveStateMachine, CYLTabBarAnimationOptionRiveActiveProperty,
   CYLTabBarAnimationOptionRiveActiveDuration, CYLTabBarAnimationOptionRiveTriggerProperty, CYLTabBarAnimationOptionRiveInput,
   CYLTabBarAnimationOptionRiveTriggerInput, CYLTabBarAnimationOptionRiveAnimation, CYLTabBarAnimationOptionRiveLegacyRuntime,
-  CYLTabBarAnimationURLWithOptions, cylRiveFileAndOptions, cylRiveRendererType, cylEnsureRiveInitialized
+  CYLTabBarAnimationOptionRiveNumberInput, CYLTabBarAnimationOptionRiveNumberValues, cylRiveNextNumber,
+  CYLTabBarAnimationURLWithOptions, cylRiveFileAndOptions, cylRiveRendererType, cylEnsureRiveInitialized, cylRiveIsSupported
 } from './src/main/ets/CYLRiveTabBarItemAnimator';
 export {
   CYLTabBarPageRegistry, CYLTabBarPageRequest, CYLTabBarPage, CYLTabBarAsyncPageFactory, CYLTabBarPageResolver, CYLTabBarPageSource,
@@ -72,3 +75,9 @@ export {
   CYLTabBarManifest, CYLTabBarManifestLoader, CYLTabBarManifestLoaderDelegate, CYLTabBarManifestCompletion, CYLTabBarManifestSource,
   CYLTabBarManifestError, CYLTabBarManifestErrorCode
 } from './src/main/ets/CYLTabBarManifest';
+export {
+  CYLTabButtonAnimation, CYLTabButtonView, CYLTabButtonProperty, CYLTabButtonAnimationBlock, CYLTabButtonBadgeAnimationBlock,
+  CYLTabButtonScaleAnimation, CYLTabButtonZoomInAnimation, CYLTabButtonBounceAnimation, CYLTabButtonRotationAnimation,
+  CYLTabButtonFumeAnimation, CYLTabButtonPressAnimation, CYLTabButtonBlockAnimation, CYLTabButtonFlipAnimation,
+  CYLTabButtonFrameAnimation
+} from './src/main/ets/CYLTabButtonAnimation';

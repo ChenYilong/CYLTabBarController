@@ -7,6 +7,13 @@
 //
 
 import UIKit
+#if canImport(CYLAnimatedItem)
+import CYLAnimatedItem
+#endif
+#if canImport(CYLAnimatedItemViews)
+// [EN] SwiftPM: CYLAnimatedItemView is in the views target. [CN] SwiftPM：CYLAnimatedItemView 位于 views target。
+import CYLAnimatedItemViews
+#endif
 
 // [EN] The implementation of `CYLFlatDesignTabBar`, translated from Objective-C (docs/Swift-Migration.md, step 50). The
 //      class stays declared in Objective-C: `CYLTabBarController.h` adopts `CYLFlatDesignTabBarDelegate`, which its
@@ -92,7 +99,7 @@ extension CYLFlatDesignTabBar {
     func cylFlatDesignCommonInit() {
         // [CN] 引入CYLFlatDesignTabBar，即表示同意 hook push行为
         // [EN] Importing CYLFlatDesignTabBar means you agree to hooking the push behavior.
-        UINavigationController.cylNavigationBarActionHook()
+        UINavigationController.cyl_navigationBarActionHook()
         let storage = cylFlatDesignStorage
         // [EN] VoiceOver announces its buttons as tabs ("tab, 2 of 5"). [CN] VoiceOver 将其中的按钮朗读为标签页。
         accessibilityTraits.insert(.tabBar)
@@ -482,9 +489,9 @@ extension CYLFlatDesignTabBar {
         // FIX: issue #19 — a tab that needs login, tapped while logged out: the button is not selected (no animation), the
         // tap is not reported as a selection, and the login starts instead.
         // 需要登录的 Tab 在未登录时被点击：按钮不会被选中（不播放动画），不作为选中上报，改为发起登录。
-        if let loginTabBarController = cylOwningTabBarController(), !tabBarButton.cyl_isPlaceholder,
+        if let loginTabBarController = cyl_owningTabBarController(), !tabBarButton.cyl_isPlaceholder,
            let viewControllers = loginTabBarController.viewControllers, selectedIndex < viewControllers.count {
-            if loginTabBarController.cylInterceptLoginIfNeeded(for: viewControllers[selectedIndex]) {
+            if loginTabBarController.cyl_interceptLoginIfNeeded(for: viewControllers[selectedIndex]) {
                 return
             }
             // [EN] A custom action tab (CYLCustomTabAction): not selected, not reported; its action runs instead.
@@ -830,7 +837,7 @@ extension CYLFlatDesignTabBar {
         }
         // [EN] Not inside any CYLTabBarController (not attached yet): keep the context lookup.
         // [CN] 不在任何 CYLTabBarController 中（尚未挂上）：保留按 context 查找。
-        return cylOwningTabBarController() != nil
+        return cyl_owningTabBarController() != nil
     }
 
     @objc(cyl_flatDesignHasPlusButton)

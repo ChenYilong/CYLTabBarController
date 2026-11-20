@@ -193,11 +193,10 @@ final class CYLTOMLParser {
         }
         let raw = text.substring(with: NSRange(location: start, length: index - start))
         var parts = Text.splitDottedKey(raw as NSString)
-        if let found = parts, !raw.contains("\""), !raw.contains("'") {
-            // [EN] Bare keys only (A17): `[1, 2]` is not a table. [CN] 仅裸键（A17）：`[1, 2]` 不是表。
-            if found.contains(where: { $0.rangeOfCharacter(from: CYLTOMLParser.bareKeyCharacters) != nil }) {
-                parts = nil
-            }
+        // [EN] Bare keys only (A17): `[1, 2]` is not a table. [CN] 仅裸键（A17）：`[1, 2]` 不是表。
+        if let found = parts, !raw.contains("\""), !raw.contains("'"),
+           found.contains(where: { $0.rangeOfCharacter(from: CYLTOMLParser.bareKeyCharacters) != nil }) {
+            parts = nil
         }
         if parts == nil {
             fail("invalid key")

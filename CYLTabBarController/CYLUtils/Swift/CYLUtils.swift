@@ -6,6 +6,12 @@
 //
 
 import UIKit
+// [EN] CocoaPods: the animated item component is its own pod and module, CYLAnimatedItem; re-exported so that
+//      `import CYLTabBarController` keeps giving its keys and classes to Swift callers.
+// [CN] CocoaPods：动效组件是独立的 pod 与模块 CYLAnimatedItem；在此重新导出，使 `import CYLTabBarController` 仍向 Swift 调用方提供其 key 与类。
+#if canImport(CYLAnimatedItem)
+@_exported import CYLAnimatedItem
+#endif
 
 /**
  * [EN] Shared helpers of the CYLUtils subspec. Translated from Objective-C (docs/Swift-Migration.md); Objective-C

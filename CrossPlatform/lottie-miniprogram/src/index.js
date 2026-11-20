@@ -31,7 +31,7 @@ const lottieWeb = (function (module, exports, define, self) {
 function isNetworkPath(path) {
   // [EN] The user data folder is "http://usr" in the DevTools and "wxfile://usr" on devices: always a file.
   // [CN] 用户数据目录在开发者工具中为 "http://usr"，在真机上为 "wxfile://usr"：始终是文件。
-  const userDataPath = (typeof wx !== 'undefined' && wx.env && wx.env.USER_DATA_PATH) || ''
+  const userDataPath = (typeof wx !== 'undefined' && wx.env?.USER_DATA_PATH) || ''
   if (userDataPath && path.indexOf(userDataPath) === 0) {
     return false
   }
@@ -145,7 +145,7 @@ function createPendingAnimation(options, canvas) {
       return
     }
     setup(canvas)
-    animation = loadAnimation(Object.assign({}, options, {path: undefined, animationData: data}))
+    animation = loadAnimation({ ...options, path: undefined, animationData: data })
     calls.forEach(([name, args]) => animation[name](...args))
     calls.length = 0
     Object.keys(animation).forEach((key) => {
@@ -171,9 +171,9 @@ function completeFonts(animationData) {
   }
   const used = new Set()
   const visit = (layers) => (layers || []).forEach((layer) => {
-    if (layer && layer.ty === 5 && layer.t && layer.t.d && Array.isArray(layer.t.d.k)) {
+    if (layer?.ty === 5 && Array.isArray(layer.t?.d?.k)) {
       layer.t.d.k.forEach((keyframe) => {
-        if (keyframe && keyframe.s && keyframe.s.f) {
+        if (keyframe?.s?.f) {
           used.add(keyframe.s.f)
         }
       })
@@ -186,11 +186,12 @@ function completeFonts(animationData) {
   if (missing.length === 0) {
     return animationData
   }
-  return Object.assign({}, animationData, {
+  return {
+    ...animationData,
     fonts: {
       list: list.concat(missing.map((name) => ({fName: name, fFamily: 'sans-serif', fStyle: 'Regular', ascent: 75}))),
     },
-  })
+  }
 }
 
 function loadAnimation(options) {
@@ -199,7 +200,7 @@ function loadAnimation(options) {
       throw new Error(`Not support '${key}' parameter in miniprogram version of lottie.`)
     }
   })
-  if (!options.rendererSettings || !options.rendererSettings.context) {
+  if (!options.rendererSettings?.context) {
     throw new Error(`Parameter 'rendererSettings.context' should be a CanvasRenderingContext2D.`)
   }
   const canvas = canvasOfContext(options.rendererSettings.context)
@@ -220,7 +221,7 @@ function loadAnimation(options) {
     })
     return pending
   }
-  const settings = Object.assign({}, options, {renderer: 'canvas', animationData: completeFonts(options.animationData)})
+  const settings = { ...options, renderer: 'canvas', animationData: completeFonts(options.animationData) }
   delete settings.path
   return wrapDestroy(lottieWeb.loadAnimation(settings), canvas)
 }

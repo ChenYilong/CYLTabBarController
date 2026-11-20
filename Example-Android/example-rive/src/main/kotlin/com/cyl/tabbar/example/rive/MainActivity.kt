@@ -36,7 +36,7 @@ enum class CourseTab(val artboard: String, val stateMachine: String, val icon: I
                 CYLConstants.CYLTabBarAnimationOptionRiveArtboard to artboard,
                 CYLConstants.CYLTabBarAnimationOptionRiveStateMachine to stateMachine,
                 CYLConstants.CYLTabBarAnimationOptionRiveInput to "active",
-            )),
+            ) + CourseAppearance.tintOptions(this)),
             CYLConstants.CYLTabBarRiveSize to "{32, 32}",
         )
 
@@ -60,6 +60,26 @@ object CourseColors {
 }
 
 /**
+ * [EN] As iOS Example-Rive (9a64feea): the course follows the system light / dark mode by default, every Rive icon takes its
+ *      title color (`tint` "title"): label colors when unselected, system blue when selected. `CYLDemoRiveForcesDark`
+ *      restores the dark bar; `CYLDemoRiveFixedTint` gives Search a fixed tint, drawn only while it is unselected.
+ * [CN] 与 iOS Example-Rive（9a64feea）相同：课程默认跟随系统浅色 / 深色，每个 Rive 图标使用其标题颜色（`tint` "title"）：未选中为 label 颜色，
+ *      选中为系统蓝。`CYLDemoRiveForcesDark` 恢复深色 TabBar；`CYLDemoRiveFixedTint` 为 Search 设置固定着色，只在未选中时绘制。
+ */
+object CourseAppearance {
+    var followsSystem = true
+    /** [EN] iOS `-CYLDemoRiveFixedTint YES`: Search gets the fixed tint #1C1C1E + darkTint #FFFFFF. [CN] iOS `-CYLDemoRiveFixedTint YES`：Search 使用固定着色 #1C1C1E + darkTint #FFFFFF。 */
+    var fixedTintOnSearch = false
+
+    /** [EN] The tint options of a tab when following the system. [CN] 跟随系统时 Tab 的着色选项。 */
+    fun tintOptions(tab: CourseTab): Map<String, String> = when {
+        !followsSystem -> emptyMap()
+        fixedTintOnSearch && tab == CourseTab.Search -> mapOf(CYLConstants.CYLTabBarAnimationOptionTint to "#1C1C1E", CYLConstants.CYLTabBarAnimationOptionDarkTint to "#FFFFFF")
+        else -> mapOf(CYLConstants.CYLTabBarAnimationOptionTint to "title")
+    }
+}
+
+/**
  * [EN] The Android port of Example-Rive (iOS `SceneDelegate` + `RiveTabBarController` + `CourseTabBarController`): a dark
  *      tab bar with white tints, Rive tab icons, the "Start" plus button, the shared plus button badge, and the Grapefruit
  *      skin swapping the icons of "Chat" and "User" in place (#216).
@@ -72,9 +92,20 @@ class MainActivity : DemoTabBarActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         // [EN] `CourseTabBarController`: `overrideUserInterfaceStyle = .dark`, the course is dark. [CN] `CourseTabBarController`：`overrideUserInterfaceStyle = .dark`，课程为深色。
-        delegate.localNightMode = androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_YES
+        // [EN] iOS 9a64feea: the course follows the system light / dark mode by default; `CYLDemoRiveForcesDark` restores the dark
+        //      bar with white tints. [CN] iOS 9a64feea：课程默认跟随系统浅色 / 深色；`CYLDemoRiveForcesDark` 恢复白色着色的深色 TabBar。
+        CourseAppearance.followsSystem = !intent.getBooleanExtra("CYLDemoRiveForcesDark", false)
+        CourseAppearance.fixedTintOnSearch = intent.getBooleanExtra("CYLDemoRiveFixedTint", false)
+        delegate.localNightMode = if (CourseAppearance.followsSystem) androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+            else androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_YES
         super.onCreate(savedInstanceState)
         CYLThemeManager.defaultManager.addListener(themeListener)
+    }
+
+    /** [EN] A live light / dark switch (the manifest handles uiMode): the tints follow it. [CN] 运行中切换浅色 / 深色（清单处理 uiMode）：着色随之变化。 */
+    override fun onConfigurationChanged(newConfig: android.content.res.Configuration) {
+        super.onConfigurationChanged(newConfig)
+        if (CourseAppearance.followsSystem) tabBarController?.applyCourseAppearance()
     }
 
     override fun onDestroy() {
@@ -91,12 +122,25 @@ class MainActivity : DemoTabBarActivity() {
         CYLPlusButton.registerPlusButton(StartPlusButton)
         val tabs = CourseTab.entries.filter { it != CourseTab.Timer }
         // [EN] Issue #415: SVGA icons given with the SVGA initialization keys, one for one with the Rive ones. [CN] Issue #415：用 SVGA 初始化 key 提供的 SVGA 图标，与 Rive 图标一一对应。
-        val attributes = tabs.map { tab -> if (source == CYLDemoTabIconSource.SVGAKeys) tab.attributes(this).filterKeys { !it.startsWith("CYLTabBarRive") } + tab.svgaAttributes else tab.attributes(this) }
+        // [EN] With the boolean extra `CYLDemoAnimationTint`, the SVGA icons follow their title colors (the `tint` option "title"), as
+        //      on iOS. [CN] 带布尔 extra `CYLDemoAnimationTint` 时，SVGA 图标跟随标题颜色（`tint` 选项 "title"），与 iOS 相同。
+        val tinted = intent.getBooleanExtra("CYLDemoAnimationTint", false)
+        val attributes = tabs.map { tab -> if (source == CYLDemoTabIconSource.SVGAKeys) tab.attributes(this).filterKeys { !it.startsWith("CYLTabBarRive") } + tab.svgaAttributes(tinted) else tab.attributes(this) }
         return CYLTabBarController(this, tabs.map { it.page() }, attributes, style, StartPlusButton.CONTEXT).apply { applyCourseAppearance() }
     }
 
     /** [EN] `applyCourseTabBarAppearance()`: dark, translucent, white tints. [CN] 深色、半透明、白色强调色。 */
     private fun CYLTabBarController.applyCourseAppearance() {
+        if (CourseAppearance.followsSystem) {
+            // [EN] iOS: normal icon and title `.label`, selected `.systemBlue` (dynamic colors). [CN] iOS：未选中为 `.label`，选中为 `.systemBlue`（动态颜色）。
+            val night = (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) == android.content.res.Configuration.UI_MODE_NIGHT_YES
+            val label = if (night) Color.WHITE else Color.BLACK
+            cyl_tabBarBackgroundColor = if (night) Color.argb(204, 0x17, 0x20, 0x3A) else Color.argb(235, 0xF9, 0xF9, 0xF9)
+            cyl_tabBarItemTitleColor = label
+            cyl_tabBarItemImageColor = label
+            setTintColor(if (night) Color.rgb(0x0A, 0x84, 0xFF) else Color.rgb(0x00, 0x7A, 0xFF))
+            return
+        }
         cyl_tabBarBackgroundColor = Color.argb(204, 0x17, 0x20, 0x3A)
         cyl_tabBarItemTitleColor = Color.argb(153, 255, 255, 255)
         cyl_tabBarItemImageColor = Color.argb(153, 255, 255, 255)

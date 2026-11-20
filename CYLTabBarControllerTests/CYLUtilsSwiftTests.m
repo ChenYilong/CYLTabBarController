@@ -128,4 +128,47 @@ static char CYLUtilsSwiftTestsWeakKey;
     XCTAssertFalse([noController containsString:@"\n"], @"%@", noController);
 }
 
+/*!
+ * [EN] Step 133: the `cyl_is<Type>TypeEncoding()` functions are Swift with hard-coded encodings; each one is checked against the
+ *      compiler's `@encode` here, which only Objective-C has (the reason this test is not Swift). Also the moved inline helpers.
+ * [CN] 第 133 步：`cyl_is<Type>TypeEncoding()` 函数改为 Swift，编码为硬编码；这里与编译器的 `@encode` 逐一比较，只有 Objective-C 有
+ *      `@encode`（因此本测试不是 Swift）。另检查迁移的内联辅助函数。
+ */
+- (void)testTypeEncodingFunctionsMatchTheCompilersEncodings {
+    XCTAssertTrue(cyl_isCharTypeEncoding(@encode(char)));
+    XCTAssertTrue(cyl_isIntTypeEncoding(@encode(int)));
+    XCTAssertTrue(cyl_isShortTypeEncoding(@encode(short)));
+    XCTAssertTrue(cyl_isLongTypeEncoding(@encode(long)));
+    XCTAssertTrue(cyl_isLongLongTypeEncoding(@encode(long long)));
+    XCTAssertTrue(cyl_isNSIntegerTypeEncoding(@encode(NSInteger)));
+    XCTAssertTrue(cyl_isUnsignedCharTypeEncoding(@encode(unsigned char)));
+    XCTAssertTrue(cyl_isUnsignedIntTypeEncoding(@encode(unsigned int)));
+    XCTAssertTrue(cyl_isUnsignedShortTypeEncoding(@encode(unsigned short)));
+    XCTAssertTrue(cyl_isUnsignedLongTypeEncoding(@encode(unsigned long)));
+    XCTAssertTrue(cyl_isUnsignedLongLongTypeEncoding(@encode(unsigned long long)));
+    XCTAssertTrue(cyl_isNSUIntegerTypeEncoding(@encode(NSUInteger)));
+    XCTAssertTrue(cyl_isFloatTypeEncoding(@encode(float)));
+    XCTAssertTrue(cyl_isDoubleTypeEncoding(@encode(double)));
+    XCTAssertTrue(cyl_isCGFloatTypeEncoding(@encode(CGFloat)));
+    XCTAssertTrue(cyl_isBOOLTypeEncoding(@encode(BOOL)));
+    XCTAssertTrue(cyl_isVoidTypeEncoding(@encode(void)));
+    XCTAssertTrue(cyl_isCharacterTypeEncoding(@encode(char *)));
+    XCTAssertTrue(cyl_isObjectTypeEncoding(@encode(id)));
+    XCTAssertTrue(cyl_isClassTypeEncoding(@encode(Class)));
+    XCTAssertTrue(cyl_isSelectorTypeEncoding(@encode(SEL)));
+    XCTAssertFalse(cyl_isIntTypeEncoding(@encode(double)));
+    XCTAssertFalse(cyl_isObjectTypeEncoding(NULL));
+    Ivar ivar = class_getInstanceVariable([UIView class], "_layer");
+    if (ivar) {
+        XCTAssertTrue(cyl_isObjectIvar(ivar));
+        XCTAssertFalse(cyl_isBOOLIvar(ivar));
+    }
+    XCTAssertTrue(CYLStringEqual(nil, nil));
+    XCTAssertTrue(CYLStringEqual(@"a", [NSString stringWithFormat:@"%@", @"a"]));
+    XCTAssertFalse(CYLStringEqual(@"a", nil));
+    XCTAssertEqual(CYLHalfOfDiff(10, 4), 3);
+    XCTAssertGreaterThan(CYLScreenWidth(), 0);
+    XCTAssertEqual(CYLGetTabBarFullH(49), 49 + MAX(CYLGetRootWindow().safeAreaInsets.bottom, 0));
+}
+
 @end

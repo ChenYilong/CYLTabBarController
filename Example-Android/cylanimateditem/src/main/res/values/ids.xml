@@ -2,7 +2,11 @@
 <!-- [EN] View tag keys of the animation engine. [CN] 动画引擎使用的视图 tag key。 -->
 <resources>
     <item name="cyl_tab_bar_item_animation_player" type="id" />
+    <item name="cyl_tab_bar_item_animation_options" type="id" />
+    <item name="cyl_tab_bar_item_animation_tint" type="id" />
     <item name="cyl_tab_bar_item_view_animator" type="id" />
     <!-- [EN] The parse state of an SVGA tab icon. [CN] SVGA Tab 图标的解析状态。 -->
     <item name="cyl_svga_state" type="id" />
+    <!-- [EN] Set while an animation view waits for its file (a download, a copy). [CN] 动画视图等待其文件（下载、复制）期间设置。 -->
+    <item name="cyl_tab_bar_item_animation_loading" type="id" />
 </resources>

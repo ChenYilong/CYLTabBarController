@@ -1,4 +1,4 @@
-import { Fit, Loop, RendererType, RiveAnimationView, ViewModelInstance, initializeRive } from '@ohos/rive';
+import { Fit, Loop, RendererType, RiveAnimationView, SMINumber, ViewModelInstance, initializeRive } from '@ohos/rive';
 import { deviceInfo } from '@kit.BasicServicesKit';
 import { common } from '@kit.AbilityKit';
 
@@ -33,6 +33,22 @@ export const CYLTabBarRiveDarkURL: string = 'CYLTabBarRiveDarkURL';
  * [EN] `CYLTabBarRiveDarkFilePath`: the rawfile path in dark mode. [CN] 深色模式的 rawfile 路径。
  */
 export const CYLTabBarRiveDarkFilePath: string = 'CYLTabBarRiveDarkFilePath';
+/**
+ * [EN] `CYLTabBarAnimationOptionTint`: draws a tab's animation (any engine) in one color, like a tinted template image:
+ *      "title" = the tab's title color for its state (selected / normal), or a fixed "#RRGGBB" / "#AARRGGBB", as on iOS
+ *      and Android. In the animation path's query, e.g. "rive/icons.riv?artboard=CHAT&tint=title".
+ * [CN] 以单一颜色绘制 Tab 的动画（任何引擎），与着色的模板图片一致："title" = Tab 当前状态（选中 / 普通）的标题颜色，或固定的
+ *      "#RRGGBB" / "#AARRGGBB"，与 iOS、Android 相同。写在动画路径的查询参数中。
+ */
+export const CYLTabBarAnimationOptionTint: string = 'tint';
+/**
+ * [EN] `CYLTabBarAnimationOptionDarkTint`: the fixed tint in dark mode ("title" already follows the title colors).
+ * [CN] 深色模式下的固定着色（"title" 已跟随标题颜色）。
+ */
+export const CYLTabBarAnimationOptionDarkTint: string = 'darkTint';
+/** [EN] The "title" value of `CYLTabBarAnimationOptionTint`. [CN] `CYLTabBarAnimationOptionTint` 的 "title" 值。 */
+export const CYLTabBarAnimationTintTitle: string = 'title';
+
 /**
  * [EN] `CYLTabBarAnimationOptionRiveArtboard`: the artboard. [CN] 画板。
  */
@@ -71,6 +87,32 @@ export const CYLTabBarAnimationOptionRiveAnimation: string = 'animation';
  * [EN] `CYLTabBarAnimationOptionRiveLegacyRuntime`: "1" plays the file with no view model. [CN] "1" 表示不使用 view model 播放。
  */
 export const CYLTabBarAnimationOptionRiveLegacyRuntime: string = 'legacy';
+/**
+ * [EN] `CYLTabBarAnimationOptionRiveNumberInput`: a state machine number input set to the next of `values` on each play
+ *      (house.riv: "Rooms").
+ * [CN] 每次播放设为 `values` 中下一个值的状态机数字输入（house.riv："Rooms"）。
+ */
+export const CYLTabBarAnimationOptionRiveNumberInput: string = 'numberInput';
+/**
+ * [EN] `CYLTabBarAnimationOptionRiveNumberValues`: the values the number input steps through, "3,4,5,6", cycling; without it, +1.
+ * [CN] 数字输入依次使用的值，"3,4,5,6"，循环；没有时 +1。
+ */
+export const CYLTabBarAnimationOptionRiveNumberValues: string = 'values';
+
+/**
+ * [EN] The value after `current` in the `values` option ("3,4,5,6"), cycling (an unknown value starts the list); without
+ *      values, `current + 1`. As on iOS, Android and the WeChat Mini Program.
+ * [CN] `values` 选项（"3,4,5,6"）中 `current` 之后的值，循环（未知值从列表开头开始）；没有值时为 `current + 1`。与 iOS、Android、微信小程序一致。
+ */
+export function cylRiveNextNumber(values: string | undefined, current: number | undefined): number {
+  const list: number[] = (values ?? '').split(',').map((value: string) => value.trim()).filter((value: string) => value !== '')
+    .map((value: string) => Number(value)).filter((value: number) => Number.isFinite(value));
+  if (list.length === 0) {
+    return (current ?? 0) + 1;
+  }
+  const index = current === undefined ? -1 : list.indexOf(current);
+  return list[(index + 1) % list.length];
+}
 
 /**
  * [EN] `CYLTabBarAnimationURLWithOptions`: a file path or URL with its options as a query, as on iOS and Android.
@@ -114,9 +156,27 @@ export function cylRiveRendererType(): RendererType {
 let cylRiveInitialized: boolean = false;
 
 /**
- * [EN] `initializeRive()` once per process. [CN] 每个进程只调用一次 `initializeRive()`。
+ * [EN] Whether @ohos/rive can run on this device. @ohos/rive 1.0.4 ships its native library (`libohos_rive.so`) for
+ *      `arm64-v8a` only; on an x86_64 emulator a Rive view crashes the app later ("Accessing released C++ object:
+ *      RiveArtboardRenderer", CYLTableViewPlaceHolder's HarmonyOS issue E15). Without `arm64-v8a` a Rive tab shows its
+ *      image instead.
+ * [CN] 本设备能否运行 @ohos/rive。@ohos/rive 1.0.4 只为 `arm64-v8a` 提供原生库（`libohos_rive.so`）；在 x86_64 模拟器上 Rive 视图稍后会使
+ *      App 崩溃（“Accessing released C++ object: RiveArtboardRenderer”，CYLTableViewPlaceHolder 鸿蒙问题 E15）。没有 `arm64-v8a` 时
+ *      Rive Tab 显示其图片。
+ */
+export function cylRiveIsSupported(): boolean {
+  const abis: string = deviceInfo.abiList ?? '';
+  return abis.split(',').map((abi: string) => abi.trim()).indexOf('arm64-v8a') >= 0;
+}
+
+/**
+ * [EN] `initializeRive()` once per process; throws where @ohos/rive cannot run (`cylRiveIsSupported()`).
+ * [CN] 每个进程只调用一次 `initializeRive()`；@ohos/rive 无法运行时抛出异常（`cylRiveIsSupported()`）。
  */
 export function cylEnsureRiveInitialized(): void {
+  if (!cylRiveIsSupported()) {
+    throw new Error('@ohos/rive has no native library for this device (' + (deviceInfo.abiList ?? '') + ')');
+  }
   if (!cylRiveInitialized) {
     initializeRive();
     cylRiveInitialized = true;
@@ -135,20 +195,48 @@ export function cylEnsureRiveInitialized(): void {
  *      （或 `trigger`），旧版文件则用状态机 `input` / `triggerInput` 或线性 `animation`；未选中时布尔值恢复为 false。文件无法加载时调用
  *      `onLoadError`，Tab 显示图片。
  */
+/** [EN] Seconds of a loop pass when the file gives none. [CN] 文件未给出时一次循环的秒数。 */
+const CYL_RIVE_LOOP_SECONDS: number = 1.5;
+/** [EN] The pause after a boolean goes back to false, before the next pass. [CN] 布尔值恢复为 false 后、下一次播放前的停顿。 */
+const CYL_RIVE_LOOP_PAUSE_SECONDS: number = 0.4;
+/** [EN] A frame later: the state machine sees the reset or the false first. [CN] 一帧之后：状态机先看到重置或 false。 */
+const CYL_RIVE_NEXT_FRAME_MS: number = 50;
+/** [EN] A held input's off time before it goes on again, outside a loop: more than one frame on a slow device. [CN] 循环之外，保持的输入重新打开前的关闭时间：大于慢设备的一帧。 */
+const CYL_RIVE_INPUT_OFF_MS: number = 150;
+/** [EN] Time for the first frame to be drawn before a loaded file pauses. [CN] 加载的文件暂停前绘制第一帧的时间。 */
+const CYL_RIVE_FIRST_FRAME_MS: number = 100;
+
 @Component
 export struct CYLRiveIcon {
   @Prop @Watch('cylReload') path: string = '';
   iconSize: number = 26;
   @Prop @Watch('cylUpdate') selected: boolean = false;
   @Prop @Watch('cylReplay') replayToken: number = 0;
+  /**
+   * [EN] Plays again after each pass while the tab is selected (docs/Animated-Item.md, the Rive loop); off by default.
+   * [CN] Tab 选中期间，每次播放后再次播放（docs/Animated-Item.md，Rive 循环）；默认关闭。
+   */
+  @Prop @Watch('cylLoopsChanged') loops: boolean = false;
   onLoadError: (message: string) => void = () => {};
+  /**
+   * [EN] Hands the host this view's replay, called on each restart (CYLAnimatedItemView `setRestartHandler`, B23).
+   * [CN] 把本视图的重播交给宿主，每次重播时调用（CYLAnimatedItemView `setRestartHandler`，B23）。
+   */
+  registerReplay: (replay: () => void) => void = (_replay: () => void) => {};
+  /** [EN] The file is drawn (CYLAnimatedItemView shows it from here on). [CN] 文件已绘制。 */
+  onLoaded: () => void = () => {};
   private riveView: RiveAnimationView | null = null;
   private bytes: ArrayBuffer | null = null;
   private options: Record<string, string> = {};
   private loaded: boolean = false;
   private deactivateTimer: number = -1;
+  private loopTimer: number = -1;
+  /** [EN] Paused on its first frame after load, not played yet. [CN] 加载后暂停在第一帧、尚未播放。 */
+  private restingAfterLoad: boolean = false;
+  private hasPlayed: boolean = false;
 
   aboutToAppear(): void {
+    this.registerReplay(() => this.cylReplay());
     try {
       cylEnsureRiveInitialized();
     } catch (e) {
@@ -160,6 +248,7 @@ export struct CYLRiveIcon {
 
   aboutToDisappear(): void {
     this.cylCancelDeactivate();
+    this.cylCancelLoop();
     this.riveView = null;
   }
 
@@ -203,7 +292,9 @@ export struct CYLRiveIcon {
         this.cylOption(CYLTabBarAnimationOptionRiveAnimation), this.cylOption(CYLTabBarAnimationOptionRiveStateMachine),
         true, true, Fit.CONTAIN, undefined, Loop.AUTO);
       this.loaded = true;
+      this.cylRestUntilPlayed(view);
       this.cylUpdate();
+      this.onLoaded();
     } catch (e) {
       this.onLoadError(`${e}`);
     }
@@ -213,7 +304,8 @@ export struct CYLRiveIcon {
     return this.cylOption(CYLTabBarAnimationOptionRiveLegacyRuntime) === '1'
       || this.cylOption(CYLTabBarAnimationOptionRiveInput) !== undefined
       || this.cylOption(CYLTabBarAnimationOptionRiveTriggerInput) !== undefined
-      || this.cylOption(CYLTabBarAnimationOptionRiveAnimation) !== undefined;
+      || this.cylOption(CYLTabBarAnimationOptionRiveAnimation) !== undefined
+      || this.cylOption(CYLTabBarAnimationOptionRiveNumberInput) !== undefined;
   }
 
   private cylDuration(): number {
@@ -264,48 +356,201 @@ export struct CYLRiveIcon {
     }
   }
 
+  /**
+   * [EN] Whether the state machine has the input (an unknown answer counts as yes). [CN] 状态机是否有该输入（无法判断时视为有）。
+   */
+  private cylHasInput(view: RiveAnimationView, machine: string, input: string): boolean {
+    try {
+      const found = view.getStateMachines().find((instance) => instance.name === machine);
+      return found === undefined ? true : found.inputNames.includes(input);
+    } catch (e) {
+      return true;
+    }
+  }
+
+  /**
+   * [EN] Plays from the start (docs/Animated-Item.md, the Rive loop): a linear animation restarts; a trigger restarts the state
+   *      machine, then fires a frame later (check.riv stayed on its finished check); a boolean goes false, then true a frame
+   *      later, so every play is a transition (a held one used to play once); a state machine without the input restarts
+   *      (house.riv). With `loops` on, it plays again after each pass.
+   * [CN] 从头播放（docs/Animated-Item.md，Rive 循环）：线性动画重新开始；trigger 先重新开始状态机，一帧之后再触发（check.riv 停在完成的对勾上）；布尔值先设为
+   *      false，一帧之后设为 true，每次播放都是一次状态切换（保持的布尔值以前只播放一次）；没有该输入的状态机重新开始（house.riv）。开启 `loops` 时，
+   *      每次播放后再次播放。
+   */
+  /**
+   * [EN] Rests on the first frame until the first play (docs/Animated-Item.md): a file whose state machine moves by itself
+   *      (shapes.riv, truck.riv) no longer runs from load. The machine is created (autoplay) so its inputs can be read, then
+   *      paused once drawn.
+   * [CN] 在第一次播放之前停在第一帧：状态机会自行运动的文件（shapes.riv、truck.riv）不再从加载起就运动。状态机先创建（autoplay）以便读取输入，
+   *      绘制后再暂停。
+   */
+  private cylRestUntilPlayed(view: RiveAnimationView): void {
+    this.hasPlayed = false;
+    this.restingAfterLoad = false;
+    setTimeout(() => {
+      if (!this.hasPlayed && this.riveView === view) {
+        // [EN] The file controller only, as on Android: the view's `pause()` also stops its renderer, after which a state
+        //      machine crept one frame per input (menu_button.riv never reached its X on Android).
+        // [CN] 与 Android 相同，只暂停文件控制器：视图的 `pause()` 还会停止渲染器，之后状态机每次输入只前进一帧。
+        if (view.controller !== null) {
+          view.controller.pauseAllAnimations();
+        } else {
+          view.pause();
+        }
+        this.restingAfterLoad = true;
+      }
+    }, CYL_RIVE_FIRST_FRAME_MS);
+  }
+
   private cylPlay(view: RiveAnimationView): void {
     this.cylCancelDeactivate();
-    const animation = this.cylOption(CYLTabBarAnimationOptionRiveAnimation);
-    if (animation !== undefined) {
-      view.play(animation, Loop.ONESHOT);
-      return;
-    }
-    view.play();
-    const machine = this.cylStateMachine(view);
-    const triggerInput = this.cylOption(CYLTabBarAnimationOptionRiveTriggerInput);
-    if (triggerInput !== undefined && machine !== undefined) {
-      try {
-        view.fireState(machine, triggerInput);
-      } catch (e) {
-        // [EN] No such trigger. [CN] 没有该 trigger。
+    this.cylCancelLoop();
+    this.hasPlayed = true;
+    if (this.restingAfterLoad) {
+      // [EN] Resumed where it rests (no settling), then played as usual. Only the state machine: an unnamed `play()` also
+      //      starts the artboard's linear animations, which override the machine (Android, menu_button.riv).
+      // [CN] 从静止处恢复（不重新定位），然后照常播放。只恢复状态机：不带名字的 `play()` 还会启动画板的线性动画并覆盖状态机（Android，menu_button.riv）。
+      this.restingAfterLoad = false;
+      const machineName = this.cylOption(CYLTabBarAnimationOptionRiveAnimation) === undefined ? this.cylStateMachine(view) : undefined;
+      if (machineName !== undefined) {
+        view.play(machineName, undefined, undefined, true, false);
       }
-      return;
     }
+    const animation = this.cylOption(CYLTabBarAnimationOptionRiveAnimation);
+    const machine = animation === undefined ? this.cylStateMachine(view) : undefined;
+    const triggerInput = this.cylOption(CYLTabBarAnimationOptionRiveTriggerInput);
     const trigger = this.cylOption(CYLTabBarAnimationOptionRiveTriggerProperty);
     const instance = this.cylUsesLegacyRuntime() ? null : this.cylViewModel(view);
-    if (trigger !== undefined && instance !== null) {
+    const legacyInput = this.cylOption(CYLTabBarAnimationOptionRiveInput);
+    const numberInput = this.cylOption(CYLTabBarAnimationOptionRiveNumberInput);
+    if (animation !== undefined) {
+      view.reset();
+      view.play(animation, Loop.ONESHOT);
+    } else if (triggerInput !== undefined && machine !== undefined && this.cylHasInput(view, machine, triggerInput)) {
+      view.reset();
+      view.play();
+      this.deactivateTimer = setTimeout(() => {
+        this.deactivateTimer = -1;
+        if (this.riveView === view) {
+          try {
+            view.fireState(machine, triggerInput);
+          } catch (e) {
+            // [EN] No such trigger. [CN] 没有该 trigger。
+          }
+        }
+      }, CYL_RIVE_NEXT_FRAME_MS);
+    } else if (numberInput !== undefined && machine !== undefined && this.cylHasInput(view, machine, numberInput)) {
+      // [EN] The next value: house.riv moves only when Rooms changes. [CN] 下一个值：house.riv 只在 Rooms 变化时运动。
+      view.play();
+      view.setNumberState(machine, numberInput,
+        cylRiveNextNumber(this.cylOption(CYLTabBarAnimationOptionRiveNumberValues), this.cylNumberValue(view, machine, numberInput)));
+    } else if (trigger !== undefined && instance !== null) {
+      view.play();
       try {
         instance.getTriggerProperty(trigger).trigger();
       } catch (e) {
         // [EN] No such trigger. [CN] 没有该 trigger。
       }
-      return;
-    }
-    this.cylSetActive(view, true);
-    const duration = this.cylDuration();
-    if (duration > 0) {
+    } else if (instance !== null || (legacyInput !== undefined && machine !== undefined
+      && this.cylHasInput(view, machine, legacyInput))) {
+      view.play();
+      this.cylSetActive(view, false);
+      const duration = this.cylDuration();
       this.deactivateTimer = setTimeout(() => {
         this.deactivateTimer = -1;
-        if (this.riveView === view) {
-          this.cylSetActive(view, false);
+        if (this.riveView !== view) {
+          return;
         }
-      }, duration * 1000);
+        this.cylSetActive(view, true);
+        if (duration > 0) {
+          this.deactivateTimer = setTimeout(() => {
+            this.deactivateTimer = -1;
+            if (this.riveView === view) {
+              this.cylSetActive(view, false);
+            }
+          }, duration * 1000);
+        }
+        // [EN] Half a loop pass while looping a held input, so the machine spends real time closed (as Android and the mini
+        //      program); otherwise a frame. [CN] 循环保持的输入时为半个循环周期，使状态机真正停留在关闭状态（与 Android、小程序相同）；否则为一帧。
+      }, this.loops && duration <= 0 ? CYL_RIVE_LOOP_SECONDS * 500 : CYL_RIVE_INPUT_OFF_MS);
+    } else {
+      view.reset();
+      view.play();
+    }
+    this.cylScheduleLoop(view, trigger !== undefined || triggerInput !== undefined);
+  }
+
+  /** [EN] A number input's value, undefined when unknown. [CN] 数字输入的值，无法读取时为 undefined。 */
+  private cylNumberValue(view: RiveAnimationView, machine: string, input: string): number | undefined {
+    try {
+      const found = view.getStateMachines().find((instance) => instance.name === machine);
+      const value = found?.inputByName(input);
+      return value instanceof SMINumber ? value.value : undefined;
+    } catch (e) {
+      return undefined;
+    }
+  }
+
+  /**
+   * [EN] Whether a play restarts the file (no usable input or trigger, no named animation, no view model).
+   * [CN] 一次播放是否重新开始文件（没有可用的输入或 trigger、没有命名动画、没有 view model）。
+   */
+  private cylRestartsOnPlay(view: RiveAnimationView): boolean {
+    if (this.cylOption(CYLTabBarAnimationOptionRiveAnimation) !== undefined) {
+      return false;
+    }
+    const machine = this.cylStateMachine(view);
+    if (machine === undefined) {
+      return true;
+    }
+    if (!this.cylUsesLegacyRuntime() && this.cylViewModel(view) !== null) {
+      return false;
+    }
+    const inputs = [CYLTabBarAnimationOptionRiveTriggerInput, CYLTabBarAnimationOptionRiveNumberInput, CYLTabBarAnimationOptionRiveInput]
+      .map((key: string) => this.cylOption(key)).filter((name: string | undefined) => name !== undefined) as string[];
+    return !inputs.some((name: string) => this.cylHasInput(view, machine, name));
+  }
+
+  /** [EN] The next pass while looping. [CN] 循环时的下一次播放。 */
+  private cylScheduleLoop(view: RiveAnimationView, isTrigger: boolean): void {
+    if (!this.loops) {
+      return;
+    }
+    const duration = this.cylDuration();
+    const seconds = !isTrigger && duration > 0 ? duration + CYL_RIVE_LOOP_PAUSE_SECONDS : CYL_RIVE_LOOP_SECONDS;
+    this.loopTimer = setTimeout(() => {
+      this.loopTimer = -1;
+      if (this.loops && this.riveView === view && this.selected) {
+        // [EN] A file still moving on its own (shapes.riv, truck.riv) is not cut short: check again after another pass.
+        // [CN] 仍在自行运动的文件（shapes.riv、truck.riv）不被打断：再等一次检查。
+        if (this.cylRestartsOnPlay(view) && view.isPlaying()) {
+          this.cylScheduleLoop(view, isTrigger);
+        } else {
+          this.cylPlay(view);
+        }
+      }
+    }, seconds * 1000);
+  }
+
+  cylLoopsChanged(): void {
+    const view = this.riveView;
+    if (!this.loops) {
+      this.cylCancelLoop();
+    } else if (view !== null && this.loaded && this.selected && this.loopTimer < 0) {
+      this.cylPlay(view);
+    }
+  }
+
+  private cylCancelLoop(): void {
+    if (this.loopTimer >= 0) {
+      clearTimeout(this.loopTimer);
+      this.loopTimer = -1;
     }
   }
 
   private cylStop(view: RiveAnimationView): void {
     this.cylCancelDeactivate();
+    this.cylCancelLoop();
     if (this.cylOption(CYLTabBarAnimationOptionRiveAnimation) !== undefined) {
       view.stop();
       return;

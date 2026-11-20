@@ -223,7 +223,6 @@
     ],
     "midButton": {
       "key": "plus",
-      "index": 2,
       "text": "Post",
       "width": 55,
       "height": 80,

@@ -12,7 +12,7 @@ const STEP = 0.05;
 
 /** The speed as text without trailing zeros: "1.5". 不带多余 0 的速度文字："1.5"。 */
 export function CYLSpeedText(speed: number): string {
-  return speed.toFixed(2).replace(/\.?0+$/, '');
+  return String(Number(speed.toFixed(2)));
 }
 
 function clampedStep(speed: number): number {

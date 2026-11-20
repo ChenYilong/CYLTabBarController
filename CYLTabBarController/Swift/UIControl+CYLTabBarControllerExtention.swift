@@ -7,6 +7,9 @@
 //
 
 import UIKit
+#if canImport(CYLAnimatedItem)
+import CYLAnimatedItem
+#endif
 
 /**
  * [EN] `UIControl (CYLTabBarControllerExtention)` and `(CYLTabBarControllerExtentionDeprecated)`: what a tab button or plus
@@ -199,7 +202,7 @@ extension UIControl {
             return false
         }
         var isSelected = self.isSelected && tabBarController.selectedIndex == cyl_tabBarChildViewControllerIndex
-        if tabBarController.tabBar.isKind(of: CYLTabBar.self), tabBarController.tabBar.cyl_hasPlusChildViewController() {
+        if tabBarController.hasPlusChildViewController() {
             isSelected = isSelected && CYLPlusButton.plusChildViewController(forOwner: self)?.cyl_plusViewControllerEverAdded == true
         }
         return isSelected
@@ -290,7 +293,7 @@ extension UIControl {
         if let label = accessibilityLabel, !label.isEmpty {
             return label
         }
-        return cyl_tabBarItemIdentifier ?? NSStringFromClass(type(of: self))
+        return cyl_tabBarItemIdentifier ?? NSStringFromClass(object_getClass(self) ?? type(of: self))
     }
 
     /**
@@ -453,10 +456,10 @@ extension UIControl {
      */
     @objc(cyl_platterSelectedControl)
     public func cyl_platterSelected() -> UIControl? {
-        guard cyl_hasCYLTabBar, let tabBar = cyl_tabBarController?.tabBar as CYLTabBar? else {
+        guard cyl_hasCYLTabBar, let tabBar = cyl_tabBarController?.tabBar as? CYLTabBar else {
             return nil
         }
-        return tabBar.cyl_selectedContentControl(fromContentControl: self) ?? self
+        return tabBar.cylSelectedContentControl(fromContentControl: self) ?? self
     }
 
     /**
@@ -477,7 +480,7 @@ extension UIControl {
      */
     @objc(cyl_platterNormalControl)
     public func cyl_platterNormal() -> UIControl {
-        cyl_tabBarController?.tabBar.cyl_normalContentControl(fromSelectedContentControl: self) ?? self
+        (cyl_tabBarController?.tabBar as? CYLTabBar)?.cylNormalContentControl(fromSelectedContentControl: self) ?? self
     }
 
     /**
@@ -607,7 +610,9 @@ extension UIControl {
      * [CN] PlusButton 类的 `+tabBarItemIdentifier`，未实现时为类名（如 "CYLPlusButtonSubclass"）。
      */
     private var cyl_plusButtonClassIdentifier: String {
-        let buttonClass: AnyClass = type(of: self)
+        // [EN] `object_getClass`: `type(of:)` skips a class made at run time (a configuration's plus button, step 109).
+        // [CN] 使用 `object_getClass`：`type(of:)` 会跳过运行时创建的类（配置的 PlusButton，第 109 步）。
+        let buttonClass: AnyClass = object_getClass(self) ?? type(of: self)
         let selector = NSSelectorFromString("tabBarItemIdentifier")
         if (buttonClass as AnyObject).responds(to: selector),
            let identifier = (buttonClass as AnyObject).perform(selector)?.takeUnretainedValue() as? String,
@@ -670,8 +675,26 @@ extension UIControl {
             completion?(true, self, newView)
             return
         }
-        if hidesOriginalView {
+        // [EN] The tab's own animation view, shown in the icon's place by the animation engine, is the icon: an animated item
+        //      (FlatDesign) must keep showing it. Marked hidden, the item hid it on its next update (a selection), and the
+        //      selected tab's icon went blank.
+        // [CN] 动效引擎显示在图标位置的 Tab 自身动画视图就是图标：动效 item（扁平样式）必须继续显示它。若标记为隐藏，item 会在下一次更新（切换选中）时隐藏它，
+        //      选中 Tab 的图标变为空白。
+        let isOwnAnimationView = newView.cyl_isTabBarItemAnimationView()
+        if hidesOriginalView && isOwnAnimationView {
             swappableImageView?.isHidden = show
+        } else if hidesOriginalView {
+            swappableImageView?.isHidden = show
+            // [EN] An animated item shows its animation view instead of its image view while the animation plays: that view
+            //      is the icon to hide (and show again), not only the image view (which the item hides itself then).
+            // [CN] 动效 item 在动画播放时显示其动画视图而不是图片视图：要隐藏（及重新显示）的图标是该视图，而不只是图片视图（此时 item 自己已将其隐藏）。
+            if let iconView = cyl_animatedItemBadgeHost(), iconView !== swappableImageView {
+                iconView.isHidden = show
+            }
+            // [EN] The item keeps it hidden across its own icon updates (a selection change). [CN] item 在自身图标更新（切换选中）时保持隐藏。
+            if responds(to: NSSelectorFromString("setIconHidden:")) {
+                setValue(show, forKey: "iconHidden")
+            }
             if isTabButton {
                 cyl_tabLabel()?.isHidden = show
             }
@@ -694,7 +717,19 @@ extension UIControl {
 }
 
 enum CYLControlTabBarSupport {
-    static let flatDesignTabBarButtonClass: AnyClass? = NSClassFromString("CYLFlatDesignTabBarButton")
+    /// [EN] Looked up by name (Core does not import FlatDesign) and kept once found, never while missing: in a framework built
+    ///      for distribution (Carthage), `CYLFlatDesignTabBarButton`'s superclass is in another resilient module, so the
+    ///      Objective-C runtime only knows the class after its first use, and an early lookup returns nil. A cached nil
+    ///      (the old `static let`) then hid every FlatDesign button for the app's lifetime.
+    /// [CN] 按名称查找（Core 不导入扁平样式），找到后才缓存，未找到时不缓存：在为分发构建的 framework（Carthage）中，`CYLFlatDesignTabBarButton`
+    ///      的父类位于另一个 resilient 模块，Objective-C 运行时要在该类首次使用后才认识它，过早查找会返回 nil。旧的 `static let` 缓存了 nil，
+    ///      会在 App 整个生命周期内认不出扁平样式按钮。
+    static var flatDesignTabBarButtonClass: AnyClass? {
+        if let found = foundFlatDesignTabBarButtonClass { return found }
+        foundFlatDesignTabBarButtonClass = NSClassFromString("CYLFlatDesignTabBarButton")
+        return foundFlatDesignTabBarButtonClass
+    }
+    private static var foundFlatDesignTabBarButtonClass: AnyClass?
 }
 
 // MARK: - UIControl (CYLTabBarControllerExtentionDeprecated)
@@ -800,12 +835,22 @@ extension UIView {
      * [CN] 把 `view` 的布局跟踪（#653）改为跟随 `newView`，`newView` 同时沿用 `view` 的 Tab 按钮标记。
      */
     @objc(cyl_replaceTrackedSubview:withView:)
-    func cyl_replaceTrackedSubview(_ view: UIView, withView newView: UIView) {
+    public func cyl_replaceTrackedSubview(_ view: UIView, withView newView: UIView) {
         if let tabControl = view.cyl_insertedForTabControl ?? (self as? UIControl) {
             newView.cyl_markAsInserted(forTabControl: tabControl)
         }
         for case let tracker as CYLTabButtonLayoutTracker in subviews {
             tracker.replaceTrackedView(view, with: newView)
+        }
+        // [EN] The old view (a tab's animation view swapped for another file, its dark file or a skin) held the tab's badge,
+        //      which would go away with it: it moves to the new view. The new view also takes the icon tint again.
+        // [CN] 旧视图（Tab 的动画视图被换成另一个文件、其深色文件或皮肤）承载着 Tab 的角标，会随之消失：把角标移到新视图。新视图也重新获得图标着色。
+        view.cyl_moveBadge(to: newView)
+        let control = view.cyl_insertedForTabControl ?? (self as? UIControl) ?? (superview as? UIControl)
+        control?.setNeedsLayout()
+        let tintSelector = NSSelectorFromString("cyl_setNeedsApplyTabBarItemAnimationTintColors")
+        if let tabBarController = control?.cyl_tabBarController, tabBarController.responds(to: tintSelector) {
+            tabBarController.perform(tintSelector)
         }
     }
 }

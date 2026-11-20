@@ -12,6 +12,7 @@ on:
       - "scripts/sync-agent-skills.py"
       - "scripts/sync-example-shared.py"
       - "scripts/android-library-strings.py"
+      - "scripts/android-demo-strings.py"
       - "CYLTabBarController/Resources/**"
       - "CrossPlatform/**"
       - ".agents/**"
@@ -27,6 +28,7 @@ on:
       - "scripts/sync-agent-skills.py"
       - "scripts/sync-example-shared.py"
       - "scripts/android-library-strings.py"
+      - "scripts/android-demo-strings.py"
       - "CYLTabBarController/Resources/**"
       - "CrossPlatform/**"
       - ".agents/**"
@@ -50,3 +52,5 @@ jobs:
         run: python3 scripts/sync-example-shared.py --check
       - name: Check the Android library strings
         run: python3 scripts/android-library-strings.py --check
+      - name: Check the Android example strings
+        run: python3 scripts/android-demo-strings.py --check

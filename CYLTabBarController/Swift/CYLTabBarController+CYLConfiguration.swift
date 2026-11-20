@@ -6,6 +6,12 @@
 //
 
 import UIKit
+#if SWIFT_PACKAGE
+import CYLAnimatedItemSwift // [EN] `cylTabBarAnimationURLWithOptionsEntryPoint`. [CN] 提供 `cylTabBarAnimationURLWithOptionsEntryPoint`。
+#endif
+#if canImport(CYLAnimatedItem)
+import CYLAnimatedItem
+#endif
 
 // [EN] Configuration dictionaries (`CYLTabBarController (CYLConfiguration)`), translated from Objective-C (docs/Swift-Migration.md,
 //      step 44): value conversion, skins, localization, routes, files and URLs. Every selector of the header is kept.
@@ -50,18 +56,33 @@ enum CYLConfigurationValues {
 
     // [EN] The keys of the Lottie, PAG, Rive and GIF subspecs by name (#605, B29): a configuration may name them in any build.
     // [CN] Lottie、PAG、Rive 与 GIF 子库的键按名称引用（#605、B29）：配置在任何构建中都可以写这些键。
-    static let pagURL = "CYLTabBarPAGURL", pagFilePath = "CYLTabBarPAGFilePath", pagSize = "CYLTabBarPAGSize"
-    static let pagDarkURL = "CYLTabBarPAGDarkURL", pagDarkFilePath = "CYLTabBarPAGDarkFilePath"
-    static let riveURL = "CYLTabBarRiveURL", riveFilePath = "CYLTabBarRiveFilePath", riveSize = "CYLTabBarRiveSize"
-    static let riveDarkURL = "CYLTabBarRiveDarkURL", riveDarkFilePath = "CYLTabBarRiveDarkFilePath"
+    static let pagURL = "CYLTabBarPAGURL"
+    static let pagFilePath = "CYLTabBarPAGFilePath"
+    static let pagSize = "CYLTabBarPAGSize"
+    static let pagDarkURL = "CYLTabBarPAGDarkURL"
+    static let pagDarkFilePath = "CYLTabBarPAGDarkFilePath"
+    static let riveURL = "CYLTabBarRiveURL"
+    static let riveFilePath = "CYLTabBarRiveFilePath"
+    static let riveSize = "CYLTabBarRiveSize"
+    static let riveDarkURL = "CYLTabBarRiveDarkURL"
+    static let riveDarkFilePath = "CYLTabBarRiveDarkFilePath"
     static let riveDarkColors = "CYLTabBarRiveDarkColors"
-    static let gifURL = "CYLTabBarGIFURL", gifFilePath = "CYLTabBarGIFFilePath", gifSize = "CYLTabBarGIFSize"
-    static let gifDarkURL = "CYLTabBarGIFDarkURL", gifDarkFilePath = "CYLTabBarGIFDarkFilePath"
+    static let gifURL = "CYLTabBarGIFURL"
+    static let gifFilePath = "CYLTabBarGIFFilePath"
+    static let gifSize = "CYLTabBarGIFSize"
+    static let gifDarkURL = "CYLTabBarGIFDarkURL"
+    static let gifDarkFilePath = "CYLTabBarGIFDarkFilePath"
     // FIX: issue #415 — SVGA. [CN] SVGA。
-    static let svgaURL = "CYLTabBarSVGAURL", svgaFilePath = "CYLTabBarSVGAFilePath", svgaSize = "CYLTabBarSVGASize"
-    static let svgaDarkURL = "CYLTabBarSVGADarkURL", svgaDarkFilePath = "CYLTabBarSVGADarkFilePath"
-    static let lottieURL = "CYLTabBarLottieURL", lottieFilePath = "CYLTabBarLottieFilePath", lottieSize = "CYLTabBarLottieSize"
-    static let lottieDarkURL = "CYLTabBarLottieDarkURL", lottieDarkFilePath = "CYLTabBarLottieDarkFilePath"
+    static let svgaURL = "CYLTabBarSVGAURL"
+    static let svgaFilePath = "CYLTabBarSVGAFilePath"
+    static let svgaSize = "CYLTabBarSVGASize"
+    static let svgaDarkURL = "CYLTabBarSVGADarkURL"
+    static let svgaDarkFilePath = "CYLTabBarSVGADarkFilePath"
+    static let lottieURL = "CYLTabBarLottieURL"
+    static let lottieFilePath = "CYLTabBarLottieFilePath"
+    static let lottieSize = "CYLTabBarLottieSize"
+    static let lottieDarkURL = "CYLTabBarLottieDarkURL"
+    static let lottieDarkFilePath = "CYLTabBarLottieDarkFilePath"
     static let lottieDarkColors = "CYLTabBarLottieDarkColors"
     static let lottieLoopsWhenUnselected = "CYLTabBarLottieLoopsWhenUnselected"
 
@@ -581,7 +602,8 @@ enum CYLConfigurationValues {
 
     /** [EN] Case-insensitive edit distance (at most 64 characters); DEBUG hints only. [CN] 不区分大小写的编辑距离（最多 64 个字符），仅用于 DEBUG 提示。 */
     static func editDistance(_ a: String, _ b: String) -> Int {
-        let a = Array(a.lowercased().utf16.prefix(64)), b = Array(b.lowercased().utf16.prefix(64))
+        let a = Array(a.lowercased().utf16.prefix(64))
+        let b = Array(b.lowercased().utf16.prefix(64))
         var row = Array(0...b.count)
         for i in stride(from: 1, through: a.count, by: 1) {
             var diagonal = row[0]
@@ -1225,7 +1247,6 @@ extension CYLTabBarController {
         return (value as AnyObject).isKind(of: blockClass)
     }
 
-    @objc(cyl_normalizedConfiguration:)
     class func cylNormalizedConfiguration(_ configuration: Any?) -> [String: Any] {
         var normalized: [String: Any] = [:]
         if let dictionary = configuration as? NSDictionary {
@@ -1391,7 +1412,6 @@ extension CYLTabBarController {
         return Values.mainBundlePath((filePath as NSString).expandingTildeInPath)
     }
 
-    @objc(configurationWithContentsOfFile:error:)
     class func cylConfiguration(contentsOfFile filePath: Any?) throws -> [String: Any] {
         let path = (filePath as? String).map { cylPathOfConfigurationFile($0) } ?? ""
         var configuration = try CYLTabBarConfigurationParser.dictionary(withContentsOfFile: path)
@@ -1432,7 +1452,6 @@ extension CYLTabBarController {
         return path
     }
 
-    @objc(configurationWithRoute:error:)
     class func cylConfiguration(route: Any?) throws -> [String: Any] {
         try cylConfiguration(contentsOfFile: cylPathOfConfigurationRoute(route))
     }
@@ -1539,7 +1558,6 @@ extension CYLTabBarController {
         }
     }
 
-    @objc(loadConfigurationWithURL:completion:)
     @discardableResult
     class func cylLoadConfiguration(url: URL?, completion: (([String: Any]?, Error?) -> Void)?) -> URLSessionDataTask? {
         guard let completion else { return nil }
@@ -1551,7 +1569,6 @@ extension CYLTabBarController {
         return cylLoadConfiguration(request: request, completion: completion)
     }
 
-    @objc(loadConfigurationWithURLRequest:completion:)
     @discardableResult
     class func cylLoadConfiguration(request: URLRequest?, completion: (([String: Any]?, Error?) -> Void)?) -> URLSessionDataTask? {
         guard let completion else { return nil }
@@ -1590,5 +1607,61 @@ extension CYLTabBarController {
         }
         task.resume()
         return task
+    }
+}
+
+// MARK: - Public layer (the class switch, phase 3)
+
+/**
+ [EN] The members of `CYLTabBarController (CYLConfiguration)` with the Swift names and selectors apps see (they were declared in
+      CYLTabBarController.h until the class switch); each one forwards to the internal implementation above.
+ [CN] `CYLTabBarController (CYLConfiguration)` 的成员，使用 App 看到的 Swift 名称与 selector（类切换之前声明于 CYLTabBarController.h）；每个都转发给上面的内部实现。
+ */
+extension CYLTabBarController {
+
+    /**
+     [EN] The configuration with the defaults applied and the values checked (see docs/Configuration-File.md).
+     [CN] 应用默认值并检查过的配置（见 docs/Configuration-File.md）。
+     */
+    @objc(cyl_normalizedConfiguration:)
+    open class func cyl_normalizedConfiguration(_ configuration: [String : Any]) -> [String : Any] {
+        cylNormalizedConfiguration(configuration)
+    }
+
+    /**
+     [EN] The configuration in a file (JSON, YAML, plist, protobuf), a name in the main bundle or a path.
+     [CN] 文件中的配置（JSON、YAML、plist、protobuf），可以是主 bundle 中的名称或路径。
+     */
+    @objc(configurationWithContentsOfFile:error:)
+    open class func configuration(withContentsOfFile filePath: String) throws -> [String: Any] {
+        try cylConfiguration(contentsOfFile: filePath)
+    }
+
+    /**
+     [EN] The configuration of a resource route (docs/Configuration-File.md). [CN] 资源路由对应的配置。
+     */
+    @objc(configurationWithRoute:error:)
+    open class func configuration(withRoute route: String) throws -> [String: Any] {
+        try cylConfiguration(route: route)
+    }
+
+    /**
+     [EN] Downloads a configuration (15 second timeout; a local file URL is read at once); the completion runs on the main queue.
+     [CN] 下载配置（超时 15 秒；本地文件 URL 立即读取）；回调在主队列执行。
+     */
+    @objc(loadConfigurationWithURL:completion:)
+    @discardableResult
+    open class func loadConfiguration(with url: URL, completion: @escaping CYLTabBarConfigurationCompletion) -> URLSessionDataTask? {
+        cylLoadConfiguration(url: url, completion: completion)
+    }
+
+    /**
+     [EN] `loadConfiguration(with:completion:)` with a request of your own (its timeout, cache policy and headers).
+     [CN] 使用自定义请求（其超时、缓存策略与请求头）的 `loadConfiguration(with:completion:)`。
+     */
+    @objc(loadConfigurationWithURLRequest:completion:)
+    @discardableResult
+    open class func loadConfiguration(with request: URLRequest, completion: @escaping CYLTabBarConfigurationCompletion) -> URLSessionDataTask? {
+        cylLoadConfiguration(request: request, completion: completion)
     }
 }

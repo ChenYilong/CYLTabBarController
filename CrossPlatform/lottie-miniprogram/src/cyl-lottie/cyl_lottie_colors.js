@@ -20,7 +20,7 @@ function cylLottieColor(hex) {
   if (!/^[0-9a-fA-F]{6}([0-9a-fA-F]{2})?$/.test(full)) {
     return null
   }
-  const channels = full.match(/../g).map((pair) => parseInt(pair, 16) / 255)
+  const channels = full.match(/../g).map((pair) => Number.parseInt(pair, 16) / 255)
   return channels.length === 3 ? channels.concat(1) : channels
 }
 
@@ -74,7 +74,7 @@ function cylApplyLottieColors(animationData, colors) {
   if (rules.length === 0) {
     return animationData
   }
-  const copy = JSON.parse(JSON.stringify(animationData))
+  const copy = JSON.parse(JSON.stringify(animationData)) // NOSONAR: `structuredClone` is not in every mini program runtime
   const visitLayers = (layers) => {
     (layers || []).forEach((layer) => {
       cylVisitShapes(layer.shapes, [layer.nm || ''], (shape, names) => {

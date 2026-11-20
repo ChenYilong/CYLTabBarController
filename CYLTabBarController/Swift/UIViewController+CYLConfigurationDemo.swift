@@ -6,6 +6,9 @@
 //
 
 import UIKit
+#if canImport(CYLAnimatedItem)
+import CYLAnimatedItem
+#endif
 
 /**
  * [EN] The configuration file demo of the settings section: a tab bar controller from a sample file, a resource route, a
@@ -514,8 +517,8 @@ enum CYLConfigurationEdgeCases {
     static let requests: [String: (url: String, timeout: TimeInterval, cancel: Bool)] = [
         "HTTP 404": ("https://raw.githubusercontent.com/ChenYilong/CYLTabBarController/master/no_such_configuration.json", 0, false),
         "Unknown host": ("https://configuration.cyltabbarcontroller.invalid/tabbar.json", 0, false),
-        // [EN] 10.255.255.1 is not routed: the request can only time out. [CN] 10.255.255.1 不可路由：请求只会超时。
-        "Server timeout (3 s)": ("https://10.255.255.1/tabbar.json", 3, false),
+        // [EN] 192.0.2.1 (TEST-NET-1, RFC 5737, for documentation) is not routed: the request can only time out. [CN] 192.0.2.1（TEST-NET-1，RFC 5737，文档专用）不可路由：请求只会超时。
+        "Server timeout (3 s)": ("https://192.0.2.1/tabbar.json", 3, false),
         "Request cancelled": (CYLConfigurationDemo.sampleURLString, 0, true),
         "An HTML page (network)": ("https://example.com/", 0, false),
         // [EN] C10: a request without a URL gives a FileNotFound error. [CN] C10：没有 URL 的请求返回 FileNotFound 错误。

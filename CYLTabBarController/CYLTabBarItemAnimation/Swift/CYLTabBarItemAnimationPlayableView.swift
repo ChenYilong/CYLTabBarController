@@ -57,6 +57,58 @@ public protocol CYLTabBarItemAnimationPlayableView: NSObjectProtocol {
      */
     @objc(cyl_applyAnimationViewColors:)
     optional func applyAnimationColors(_ colors: [String: UIColor]?)
+
+    /**
+     * [EN] Whether the view plays again after each pass until this is set to NO (`loops` of the player, which forwards it
+     *      only when the view implements this). For views with no progress to restart, such as Rive state machines
+     *      (docs/Animated-Item.md, the Rive loop).
+     * [CN] 视图是否在每次播放后再次播放，直到设为 NO（播放器的 `loops`，仅在视图实现本方法时转发）。用于没有进度可重新开始的视图，例如 Rive 状态机
+     *      （docs/Animated-Item.md，Rive 循环）。
+     */
+    @objc(cyl_setAnimationViewLoops:)
+    optional func setAnimationLoops(_ loops: Bool)
+
+    /**
+     * [EN] The playback position, 0 (first frame) to 1 (last frame). With `setAnimationProgress(_:)` it makes the player
+     *      offer `progress`, so the host can seek (a placeholder scrubbed by a pull) and restart a pass. Implement both or
+     *      neither.
+     * [CN] 播放位置，0（第一帧）到 1（最后一帧）。与 `setAnimationProgress(_:)` 一起让播放器提供 `progress`，宿主据此定位（随下拉定位的占位图）并
+     *      重新开始一遍。两者同时实现或都不实现。
+     */
+    @objc(cyl_animationViewProgress)
+    optional func animationProgress() -> CGFloat
+
+    /**
+     * [EN] Shows the frame at `progress` (0 to 1) without playing. [CN] 显示 `progress`（0 到 1）处的帧，不播放。
+     */
+    @objc(cyl_setAnimationViewProgress:)
+    optional func setAnimationProgress(_ progress: CGFloat)
+
+    /**
+     * [EN] The playback rate (1 = the file's own frame rate), applied live; the player offers `animationSpeed` only when
+     *      the view implements this. [CN] 播放速率（1 为文件自身帧率），实时生效；只有视图实现时播放器才提供 `animationSpeed`。
+     */
+    @objc(cyl_setAnimationViewSpeed:)
+    optional func setAnimationSpeed(_ speed: CGFloat)
+
+    /**
+     * [EN] The tab's current title color, for a view whose `tint` option is "title" (`CYLTabBarAnimationOptionTint`): the
+     *      icon is drawn in it like a template image. Called when the tab is selected or deselected and when the colors change.
+     * [CN] Tab 当前的标题颜色，用于 `tint` 选项为 "title" 的视图（`CYLTabBarAnimationOptionTint`）：图标像模板图片一样用该颜色绘制。在 Tab
+     *      选中或取消选中、颜色变化时调用。
+     */
+    @objc(cyl_applyAnimationViewTintColor:)
+    optional func applyAnimationTintColor(_ color: UIColor?)
+
+    /**
+     * [EN] The same with the tab's state; preferred over `-cyl_applyAnimationViewTintColor:` when implemented. A fixed `tint`
+     *      ("#RRGGBB", with `darkTint`) is drawn on the unselected tab only; the selected tab takes `color`, the title's
+     *      selected color, as with "title" (2026-11-19).
+     * [CN] 同上，并带 Tab 的状态；实现后优先于 `-cyl_applyAnimationViewTintColor:` 调用。固定 `tint`（"#RRGGBB"，及 `darkTint`）只用于未选中的
+     *      Tab；选中的 Tab 使用 `color`（标题的选中颜色），与 "title" 相同（2026-11-19）。
+     */
+    @objc(cyl_applyAnimationViewTintColor:selected:)
+    optional func applyAnimationTintColor(_ color: UIColor?, selected: Bool)
 }
 
 /**

@@ -68,8 +68,14 @@ extension UIViewController {
      */
     private func cyl_makeFlatDesignTabBarItem() -> CYLFlatDesignTabBarItem {
         let systemItem = tabBarItem
-        var image = systemItem?.image
-        var selectedImage = systemItem?.selectedImage
+        // [EN] An animated tab image: the system item shows its first frame and keeps the animated image under a selector key
+        //      (`CYLTabBarController.m`); the FlatDesign button takes the animated one, rests on its first frame and plays it.
+        // [CN] 动图 Tab 图片：系统 item 显示其第一帧，并以 selector 为 key 保存动图（`CYLTabBarController.m`）；扁平样式按钮取动图，停在第一帧并播放它。
+        let animated = { (name: String) -> UIImage? in
+            systemItem.flatMap { objc_getAssociatedObject($0, unsafeBitCast(sel_registerName(name), to: UnsafeRawPointer.self)) as? UIImage }
+        }
+        var image = animated("cyl_tabBarItemAnimatedImage") ?? systemItem?.image
+        var selectedImage = animated("cyl_tabBarItemAnimatedSelectedImage") ?? animated("cyl_tabBarItemAnimatedImage").map { _ in image } ?? systemItem?.selectedImage
         // [EN] Matched by class name, so the lazy `moreNavigationController` getter is never triggered from here.
         // [CN] 按类名匹配，避免在这里触发懒加载的 `moreNavigationController` getter。
         if image == nil, NSStringFromClass(type(of: self)) == "UIMoreNavigationController" {

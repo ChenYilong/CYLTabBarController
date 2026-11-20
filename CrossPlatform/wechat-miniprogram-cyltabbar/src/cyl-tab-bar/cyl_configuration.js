@@ -12,7 +12,7 @@
  * [EN] The platform names this component answers to in `CYLTabBarItemPlatforms`.
  * [CN] 本组件在 `CYLTabBarItemPlatforms` 中认可的平台名称。
  */
-const CYL_PLATFORM_NAMES = ['miniprogram', 'wechat', 'weixin', 'wechat-miniprogram', 'all'];
+const CYL_PLATFORM_NAMES = new Set(['miniprogram', 'wechat', 'weixin', 'wechat-miniprogram', 'all']);
 
 /**
  * [EN] Style types of `CYLTabBarControllerStyleType`, by name and by number (CYLTabBarStyleType).
@@ -24,7 +24,7 @@ const CYL_STYLE_TYPES = ['default', 'system', 'flatDesign', 'liquidGlass'];
  * [EN] Tap animations of `CYLTabBarControllerTabButtonTapAnimation`.
  * [CN] `CYLTabBarControllerTabButtonTapAnimation` 的点击动画。
  */
-const CYL_TAP_ANIMATIONS = ['none', 'scale', 'zoomIn', 'bounce', 'bounceWithFireworks', 'rotation', 'flip', 'fume', 'frames'];
+const CYL_TAP_ANIMATIONS = new Set(['none', 'scale', 'zoomIn', 'bounce', 'bounceWithFireworks', 'rotation', 'flip', 'fume', 'frames']);
 
 /**
  * [EN] Theme value keys the component applies to the whole bar.
@@ -81,7 +81,7 @@ function cylArray(value) {
 function cylNumbers(value, names) {
   let list = cylArray(value);
   if (!list && typeof value === 'string') {
-    list = value.replace(/[{}\[\]\s]/g, '').split(',').filter((part) => part !== '');
+    list = value.replace(/[{}[\]\s]/g, '').split(',').filter((part) => part !== '');
   } else if (!list && value && typeof value === 'object') {
     list = names.map((name) => value[name]);
   }
@@ -151,8 +151,8 @@ function cylBool(value, fallback) {
  * [CN] 逐段按数字比较 "1.2.10" 与 "1.10"，返回 -1、0 或 1（B24）。
  */
 function cylCompareVersions(left, right) {
-  const a = String(left).split('.').map((part) => parseInt(part, 10) || 0);
-  const b = String(right).split('.').map((part) => parseInt(part, 10) || 0);
+  const a = String(left).split('.').map((part) => Number.parseInt(part, 10) || 0);
+  const b = String(right).split('.').map((part) => Number.parseInt(part, 10) || 0);
   for (let index = 0; index < Math.max(a.length, b.length); index += 1) {
     const difference = (a[index] || 0) - (b[index] || 0);
     if (difference !== 0) {
@@ -170,7 +170,7 @@ function cylCompareVersions(left, right) {
  */
 function cylIsItemEligible(attributes, environment) {
   const platforms = cylStringList(attributes.CYLTabBarItemPlatforms).map((name) => name.toLowerCase());
-  if (platforms.length > 0 && !platforms.some((name) => CYL_PLATFORM_NAMES.includes(name))) {
+  if (platforms.length > 0 && !platforms.some((name) => CYL_PLATFORM_NAMES.has(name))) {
     return false;
   }
   const minimum = attributes.CYLTabBarItemMinimumAppVersion;
@@ -196,7 +196,7 @@ function cylImagePath(route, environment) {
   }
   const value = route.trim();
   if (value.startsWith('system:')) {
-    return (environment.symbols || {})[value.slice('system:'.length)] || '';
+    return environment.symbols?.[value.slice('system:'.length)] || '';
   }
   if (/^(https?:\/\/|data:)/.test(value) || value.startsWith('/')) {
     return value;
@@ -216,7 +216,7 @@ function cylLocalizedTitle(title, environment) {
     return '';
   }
   const text = String(title);
-  return (environment.strings || {})[text] || text;
+  return environment.strings?.[text] || text;
 }
 
 /**
@@ -388,6 +388,33 @@ function cylAnimationFragment(route, extra) {
 }
 
 /**
+ * [EN] A "name=value&…" fragment as an object (values decoded); {} for ''.
+ * [CN] 把 "name=value&…" fragment 转为对象（值已解码）；'' 时返回 {}。
+ */
+function cylFragmentOptions(fragment) {
+  const options = {}
+  String(fragment || '').split('&').forEach((pair) => {
+    const [key, value] = pair.split('=')
+    if (key && value !== undefined) {
+      options[key] = decodeURIComponent(value)
+    }
+  })
+  return options
+}
+
+/**
+ * [EN] A `tint` option: "title" (when allowed) or a color as cylColor reads it; '' otherwise.
+ * [CN] `tint` 选项："title"（允许时）或 cylColor 能读取的颜色；否则返回 ''。
+ */
+function cylTintOption(value, allowsTitle) {
+  const text = String(value === undefined || value === null ? '' : value).trim()
+  if (allowsTitle && text.toLowerCase() === 'title') {
+    return 'title'
+  }
+  return cylColor(text) || ''
+}
+
+/**
  * [EN] The animated icon of one library: its own keys (CYLTabBar<Library>URL / FilePath / DarkURL / DarkFilePath /
  *      Size / DarkColors; Lottie also LoopsWhenUnselected), then the generic CYLTabBarAnimation… keys whose file has
  *      the library's file type.
@@ -410,8 +437,17 @@ function cylAnimationIcon(attributes, environment, library, pattern) {
   //      与 iOS 的 CYLTabBarAnimationURLWithOptions() 写入方式相同；CYLTabBarAnimationOptions 会补充这些选项。
   const route = [own('URL'), own('FilePath'), generic].find((value) => typeof value === 'string' && value.trim() !== '') || ''
   const fragment = cylAnimationFragment(route, attributes.CYLTabBarAnimationOptions)
+  // [EN] `tint` ("title" or a color) and `darkTint` (a color for a dark bar), from the fragment or CYLTabBarAnimationOptions,
+  //      as on iOS (CYLTabBarAnimationOptionTint) and HarmonyOS; cyl-tab-bar-item resolves "title" per state.
+  // [CN] `tint`（"title" 或颜色）与 `darkTint`（深色 TabBar 的颜色），来自 fragment 或 CYLTabBarAnimationOptions，与 iOS
+  //      （CYLTabBarAnimationOptionTint）和鸿蒙一致；"title" 由 cyl-tab-bar-item 按状态解析。
+  const tintOptions = cylFragmentOptions(fragment)
+  const tint = cylTintOption(tintOptions.tint, true)
+  const darkTint = cylTintOption(tintOptions.darkTint, false)
   return {
     library: library.toLowerCase(),
+    tint,
+    darkTint,
     path: library === 'Rive' && fragment ? `${path}#${fragment}` : path,
     darkPath: cylAnimationPath(own('DarkURL'), environment) || cylAnimationPath(own('DarkFilePath'), environment)
       || cylAnimationPath(genericDark, environment),
@@ -443,14 +479,12 @@ const CYL_FONT_WEIGHTS = {
 };
 
 /**
- * [EN] CYLTabBarItemTitleFont as CSS: a number (size), "bold:15" (a weight and a size), "Menlo-Regular:12" (a font name
- *      and a size) or {name, size, weight}; size 1–200; '' when invalid (B20).
- * [CN] 把 CYLTabBarItemTitleFont 转为 CSS：数字（字号）、"bold:15"（字重与字号）、"Menlo-Regular:12"（字体名与字号）或
- *      {name, size, weight}；字号 1–200；无效时返回 ''（B20）。
+ * [EN] The {name, size, weight} of a CYLTabBarItemTitleFont value (size NaN when there is none).
+ * [CN] CYLTabBarItemTitleFont 值的 {name, size, weight}（没有字号时 size 为 NaN）。
  */
-function cylFont(value) {
+function cylFontParts(value) {
   let name = '';
-  let size = NaN;
+  let size = Number.NaN;
   let weight = '';
   if (typeof value === 'number' || (typeof value === 'string' && /^\s*\d+(\.\d+)?\s*$/.test(value))) {
     size = Number(value);
@@ -468,12 +502,23 @@ function cylFont(value) {
     size = Number(value.size);
     weight = typeof value.weight === 'string' ? value.weight.toLowerCase() : '';
   }
+  return { name, size, weight };
+}
+
+/**
+ * [EN] CYLTabBarItemTitleFont as CSS: a number (size), "bold:15" (a weight and a size), "Menlo-Regular:12" (a font name
+ *      and a size) or {name, size, weight}; size 1–200; '' when invalid (B20).
+ * [CN] 把 CYLTabBarItemTitleFont 转为 CSS：数字（字号）、"bold:15"（字重与字号）、"Menlo-Regular:12"（字体名与字号）或
+ *      {name, size, weight}；字号 1–200；无效时返回 ''（B20）。
+ */
+function cylFont(value) {
+  const { name, size, weight } = cylFontParts(value);
   if (!Number.isFinite(size) || size < 1 || size > 200) {
     return '';
   }
   return `font-size: ${size}px; line-height: ${Math.round(size * 1.2)}px;`
     + (CYL_FONT_WEIGHTS[weight] ? ` font-weight: ${CYL_FONT_WEIGHTS[weight]};` : '')
-    + (name ? ` font-family: "${name.replace(/"/g, '')}";` : '');
+    + (name ? ` font-family: "${name.replaceAll('"', '')}";` : '');
 }
 
 /**
@@ -585,7 +630,7 @@ function cylPlusButton(configuration, environment, theme, defaults, tabCount) {
     return null;
   }
   const item = cylItem(attributes, environment, theme, defaults);
-  const requestedIndex = parseInt(attributes.CYLPlusButtonIndexInTabBar, 10);
+  const requestedIndex = Number.parseInt(attributes.CYLPlusButtonIndexInTabBar, 10);
   const size = cylSize(attributes.CYLPlusButtonSize);
   const imageSize = cylSize(attributes.CYLPlusButtonImageSize);
   const multiplier = Number(attributes.CYLPlusButtonCenterYMultiplier);
@@ -636,10 +681,11 @@ function cylReadConfiguration(configuration, environment) {
   const darkIdentifier = source.CYLTabBarControllerDarkThemeIdentifier;
   const isDark = env.themeIdentifier ? Boolean(darkIdentifier) && themeIdentifier === darkIdentifier : followsDark;
   const theme = themes[themeIdentifier] || {};
-  const themedEnvironment = Object.assign({}, env, {
+  const themedEnvironment = {
+    ...env,
     isDark,
     symbols: (env.symbolsByTheme && (env.symbolsByTheme[themeIdentifier] || env.symbolsByTheme.default)) || env.symbols,
-  });
+  };
   const defaults = {
     imageInsets: cylInsets(source.CYLTabBarControllerImageInsets),
     titleOffset: cylOffset(source.CYLTabBarControllerTitlePositionAdjustment),
@@ -652,7 +698,7 @@ function cylReadConfiguration(configuration, environment) {
     .filter((attributes) => attributes && typeof attributes === 'object' && cylIsItemEligible(attributes, env))
     .map((attributes) => Object.assign(cylItem(attributes, themedEnvironment, theme, defaults), {
       // [EN] viewController.cyl_tabButtonAnimation: this tab's own tap animation. [CN] 本 Tab 自己的点击动画。
-      tapAnimation: CYL_TAP_ANIMATIONS.includes(attributes.CYLTabBarItemTabButtonTapAnimation) ? attributes.CYLTabBarItemTabButtonTapAnimation : '',
+      tapAnimation: CYL_TAP_ANIMATIONS.has(attributes.CYLTabBarItemTabButtonTapAnimation) ? attributes.CYLTabBarItemTabButtonTapAnimation : '',
     }));
   const styleValue = source.CYLTabBarControllerStyleType;
   const styleType = typeof styleValue === 'number' ? CYL_STYLE_TYPES[styleValue] : styleValue;
@@ -667,7 +713,7 @@ function cylReadConfiguration(configuration, environment) {
     items,
     plusButton: cylPlusButton(source, themedEnvironment, theme, defaults, items.length),
     styleType: CYL_STYLE_TYPES.includes(styleType) ? styleType : 'default',
-    tapAnimation: CYL_TAP_ANIMATIONS.includes(tapAnimation) ? tapAnimation : 'none',
+    tapAnimation: CYL_TAP_ANIMATIONS.has(tapAnimation) ? tapAnimation : 'none',
     // [EN] CYLTabButtonAnimation.duration: 0.5 s by default (CYLTabBarControllerTabButtonTapAnimationDuration).
     // [CN] CYLTabButtonAnimation.duration：默认 0.5 秒（CYLTabBarControllerTabButtonTapAnimationDuration）。
     animationDuration: Math.round(cylPositive(source.CYLTabBarControllerTabButtonTapAnimationDuration, 0.5) * 1000
@@ -678,7 +724,7 @@ function cylReadConfiguration(configuration, environment) {
     //      （1 左、2 右、3 上、4 下、5 向上卷页、6 向下卷页）。
     playsFireworks: cylBool(source.CYLTabBarControllerTabButtonPlaysFireworks, tapAnimation === 'bounceWithFireworks' || tapAnimation === 'frames'),
     fireworksImage: cylImagePath(source.CYLTabBarControllerTabButtonFireworksImage, env),
-    flipDirection: Math.min(6, Math.max(1, parseInt(source.CYLTabBarControllerTabButtonFlipDirection, 10) || 1)),
+    flipDirection: Math.min(6, Math.max(1, Number.parseInt(source.CYLTabBarControllerTabButtonFlipDirection, 10) || 1)),
     // [EN] cyl_tabButtonTapSoundURL and the haptic style (light, medium, heavy) of a tab tap (issue #535).
     // [CN] Tab 点击的声音文件（cyl_tabButtonTapSoundURL）与触感风格（light、medium、heavy）（issue #535）。
     tapSoundURL: cylImagePath(source.CYLTabBarControllerTabButtonTapSoundURL, env),

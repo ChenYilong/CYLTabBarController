@@ -46,7 +46,7 @@ const CYL_DEMO_SKINS = [
  * [CN] 节日皮肤图标所在文件夹：小写名字，去掉 "'"，空格换成 "-"（CYLDemoTheme.icon(named:)）。
  */
 function cylSkinIcon(skin, name, faded) {
-  const folder = skin.name.toLowerCase().replace(/'/g, '').replace(/ /g, '-');
+  const folder = skin.name.toLowerCase().replaceAll("'", '').replaceAll(' ', '-');
   return `/shared/theme/${folder}/${name}${faded ? '_faded' : ''}.png`;
 }
 
@@ -60,8 +60,8 @@ function cylSkinNamed(name) {
  * [CN] 当前使用的皮肤（CYLDemoThemes.setFollowsSystem）：跟随系统时深色模式为 Dark；浅色模式从 Dark 回到 Default，否则为所选皮肤。
  */
 function cylEffectiveSkin(state) {
-  const chosen = (state && state.skin) || 'Default';
-  if (!state || !state.skinFollowsSystem) {
+  const chosen = state?.skin || 'Default';
+  if (!state?.skinFollowsSystem) {
     return cylSkinNamed(chosen);
   }
   if (state.systemTheme === 'dark') {
@@ -98,7 +98,7 @@ function cylSkinPreview(skin) {
  *      （cyl_plusButtonAttributesFor...）。`translate` 给出示例语言中的标题。
  */
 function cylSkinnedConfiguration(configuration, skin, translate) {
-  if (!skin || !skin.tint) {
+  if (!skin?.tint) {
     return configuration;
   }
   const identifier = `skin:${skin.name}`;
@@ -112,43 +112,47 @@ function cylSkinnedConfiguration(configuration, skin, translate) {
   const items = (configuration.CYLTabBarControllerTabBarItemsAttributes || []).map((attributes, index) => {
     if (skin.icons) {
       const name = skin.icons[index % skin.icons.length];
-      return Object.assign({}, attributes, {
+      return {
+        ...attributes,
         CYLTabBarItemImage: cylSkinIcon(skin, name, true),
         CYLTabBarItemSelectedImage: cylSkinIcon(skin, name, false),
         // [EN] Full color icons are drawn as they are (UIImageRenderingModeAlwaysOriginal), 75 px @3x. [CN] 全彩图标按原图绘制，@3x 75 像素。
         CYLTabBarItemIconRenderingMode: 'original',
         CYLTabBarItemImageURLSize: '{25, 25}',
-      });
+      };
     }
     if (skin.network) {
       const [image, selectedImage] = skin.network.tabs[index % skin.network.tabs.length];
-      return Object.assign({}, attributes, {
+      return {
+        ...attributes,
         CYLTabBarItemTitle: `${skin.network.titlePrefix} ${translate(attributes.CYLTabBarItemTitle)}`,
         CYLTabBarItemImage: CYL_NETWORK_ICON(image),
         CYLTabBarItemSelectedImage: CYL_NETWORK_ICON(selectedImage),
         CYLTabBarItemIconRenderingMode: 'original',
         CYLTabBarItemImageURLSize: '{24, 24}',
-      });
+      };
     }
     return attributes;
   });
   let plusButton = configuration.CYLTabBarControllerPlusButton;
   if (plusButton && skin.icons) {
     const icon = cylSkinIcon(skin, skin.icons[skin.icons.length - 1], false);
-    plusButton = Object.assign({}, plusButton, { CYLTabBarItemImage: icon, CYLTabBarItemSelectedImage: icon });
+    plusButton = { ...plusButton, CYLTabBarItemImage: icon, CYLTabBarItemSelectedImage: icon };
   } else if (plusButton && skin.network) {
-    plusButton = Object.assign({}, plusButton, {
+    plusButton = {
+      ...plusButton,
       CYLTabBarItemImage: CYL_NETWORK_ICON(skin.network.plusButton[0]),
       CYLTabBarItemSelectedImage: CYL_NETWORK_ICON(skin.network.plusButton[1]),
-    });
+    };
   }
-  return Object.assign({}, configuration, {
+  return {
+    ...configuration,
     CYLTabBarControllerTabBarItemsAttributes: items,
     CYLTabBarControllerPlusButton: plusButton,
-    CYLTabBarControllerThemes: Object.assign({}, configuration.CYLTabBarControllerThemes, { [identifier]: theme }),
+    CYLTabBarControllerThemes: { ...configuration.CYLTabBarControllerThemes, [identifier]: theme },
     CYLTabBarControllerThemeIdentifier: identifier,
     CYLTabBarControllerDarkThemeIdentifier: identifier,
-  });
+  };
 }
 
 /**

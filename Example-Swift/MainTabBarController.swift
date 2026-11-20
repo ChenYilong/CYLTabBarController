@@ -65,7 +65,7 @@ class MainTabBarController: CYLTabBarController {
         demoShowPlusButtonBadgeAfterLayout()
     }
 
-    override func tabBarController(_ _: CYLTabBarController, didSelect control: UIControl) {
+    func tabBarController(_ _: CYLTabBarController, didSelect control: UIControl) {
         demoPlusButtonDidTap(control)
     }
 }
@@ -128,7 +128,7 @@ extension MainTabBarController {
     // [EN] `override`: CYLTabBarController adopts CYLTabBarControllerDelegate, which declares this method.
     // [CN] `override`：CYLTabBarController 遵循声明该方法的 CYLTabBarControllerDelegate。
     @objc(tabBarController:didRecognizeTabBarItemGesture:control:viewController:)
-    override func tabBarController(_ _: CYLTabBarController, didRecognize gesture: CYLTabBarItemGesture,
+    func tabBarController(_ _: CYLTabBarController, didRecognize gesture: CYLTabBarItemGesture,
                                 control: UIControl, viewController: UIViewController?) {
         let content = viewController?.cyl_getViewControllerInsteadOfNavigation()
         switch gesture {

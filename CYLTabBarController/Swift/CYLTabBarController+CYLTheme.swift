@@ -6,6 +6,9 @@
 //
 
 import UIKit
+#if canImport(CYLAnimatedItem)
+import CYLAnimatedItem
+#endif
 
 /**
  * [EN] The same object, or equal ones (nil only matches nil). [CN] 同一对象或相等的对象（nil 只与 nil 匹配）。
@@ -153,11 +156,15 @@ extension CYLTabBarController {
     }
 
     @objc(cyl_themeManager)
+    open var cyl_themeManager: CYLThemeManager! {
+        @objc(cyl_themeManager) get { cylThemeManager() }
+        @objc(setCyl_themeManager:) set { cylSetThemeManager(newValue) }
+    }
+
     func cylThemeManager() -> CYLThemeManager {
         cyl_themeSettings.manager ?? CYLThemeManagerCenter.defaultThemeManager
     }
 
-    @objc(setCyl_themeManager:)
     func cylSetThemeManager(_ themeManager: CYLThemeManager?) {
         cyl_themeSettings.manager = themeManager
     }
@@ -171,7 +178,7 @@ extension CYLTabBarController {
     private func cylRefreshTabBarItemAnimationColors() {
         guard CYLTabBarItemAnimationCore.service != nil, isViewLoaded else { return }
         for viewController in viewControllers ?? [] {
-            for tabButton in cylPrivate.cylTabButtons(of: viewController) {
+            for tabButton in cylTabButtons(of: viewController) {
                 tabButton.cyl_refreshTabBarItemAnimationColors()
             }
         }
@@ -187,7 +194,7 @@ extension CYLTabBarController {
         settings.launchThemeApplied = true
         // [EN] Styles set before the tab bar was replaced by the library's own (CYLTabBar) are written into the bar shown now.
         // [CN] 在 TabBar 被替换为本库的 CYLTabBar 之前设置的样式，写入当前显示的 TabBar。
-        cylPrivate.cylApplyTabBarItemStyles()
+        cylApplyTabBarItemStyles()
         // [EN] Nothing to restore yet: only a tab bar theme changes anything here.
         // [CN] 此时尚无需恢复：只有 TabBar 主题才需要处理。
         if let theme = cylThemeManager().currentTheme, theme is CYLTabBarTheme {
@@ -195,7 +202,18 @@ extension CYLTabBarController {
         }
     }
 
+    /**
+     [EN] Restyles the tab bar with `theme` now, see `CYLTabBarTheme`; nil or a theme that does not adopt it restores the app's own
+          titles, icons and appearance. Called for you when the theme changes. Public with the name apps see since the class
+          switch (phase 3).
+     [CN] 立即用 `theme` 更新 TabBar 样式，见 `CYLTabBarTheme`；nil 或不遵循该协议的主题恢复 App 自己的标题、图标与外观。主题变化时会自动调用。
+          类切换起以 App 看到的名称公开（第 3 阶段）。
+     */
     @objc(cyl_applyTabBarTheme:)
+    open func cyl_applyTabBarTheme(_ theme: Any?) {
+        cylApplyTabBarTheme(theme)
+    }
+
     func cylApplyTabBarTheme(_ theme: Any?) {
         let settings = cyl_themeSettings
         settings.launchThemeApplied = true
@@ -232,10 +250,10 @@ extension CYLTabBarController {
         }
         // [EN] Bring the title offset copies (issue #475) and the flat design tab bar up to date now.
         // [CN] 立即更新标题偏移副本（issue #475）与扁平样式 TabBar。
-        cylPrivate.cylSyncTabBarAppearances()
+        cylSyncTabBarAppearances()
         tabBarTheme?.cyl_customize?(self)
         // [EN] Styles set in one place win over the theme's appearance. [CN] 在一处设置的样式优先于主题的外观。
-        cylPrivate.cylApplyTabBarItemStyles()
+        cylApplyTabBarItemStyles()
         // [EN] What the app adds to the tab buttons in its one-time layout block (`-setViewDidLayoutSubViewsBlockInvokeOnce:block:`, e.g. a
         //      cover over a tab, badges) is added again after the next layout: before, a theme switch left that block marked as run, and what
         //      UIKit dropped from the tab buttons never came back. Scope: every style. The block itself decides what to add; the theme's own
@@ -244,7 +262,7 @@ extension CYLTabBarController {
         // [CN] App 在只执行一次的布局 block（`-setViewDidLayoutSubViewsBlockInvokeOnce:block:`，如 Tab 上的封面、角标）中添加到 Tab 按钮的内容，
         //      在下一次布局后重新添加：之前换肤后该 block 仍被标记为已执行，UIKit 从 Tab 按钮中丢弃的内容不会再出现。范围：所有样式。添加什么由
         //      block 自己决定；主题自身的图标不依赖它：它们是替换每个图标的视图，液态玻璃下两个图层都有，每次布局后都会重新安装（#601）。
-        cylPrivate.cylRearmViewDidLayoutSubviewsBlockInvokeOnce()
+        cylRearmViewDidLayoutSubviewsBlockInvokeOnce()
         // [EN] Liquid Glass only: the next layout pass puts the stand-in on the plus button's new image and position (`-viewDidLayoutSubviews`).
         // [CN] 仅液态玻璃：每次换肤后，替身跟随 PlusButton 的新图片与新位置。
         if tabBarStyleType != .flatDesign && CYLConstants.isLiquidGlassActive() && isViewLoaded {
@@ -342,7 +360,7 @@ extension CYLTabBarController {
                 updateTabBarItem(at: UInt(index), attributes: toWrite)
             }
             if !toRemove.isEmpty {
-                cylPrivate.cylThemeRemoveTabBarItemAttributeKeys(toRemove, atIndex: UInt(index))
+                cylThemeRemoveTabBarItemAttributeKeys(toRemove, atIndex: UInt(index))
             }
             let written = tabBarItemAttributes(at: UInt(index)) ?? [:]
             for (key, themeValue) in themeValues {
@@ -376,7 +394,7 @@ extension CYLTabBarController {
      */
     private func applyThemeIcons(ofTabAttributes tabAttributes: NSMapTable<UIViewController, NSDictionary>, generation: Int) {
         let restorables = cyl_themeSettings.iconRestorables
-        let providers = cylPrivate.cylTabBarItemIconViewProviders()
+        let providers = cylTabBarItemIconViewProviders()
         var themeIcons: [(viewController: UIViewController, icon: Any, selectedIcon: Any?, size: NSValue?)] = []
         for viewController in viewControllers(of: tabAttributes) {
             let attributes = tabAttributes.object(forKey: viewController) as? [String: Any] ?? [:]
@@ -409,7 +427,7 @@ extension CYLTabBarController {
             restorables.setObject(value, forKey: viewController)
             value.prepare(currentValue: providers.object(forKey: viewController))
             let tabIcon = entry
-            CYLTabBarController.cylPrivateClass.cylLoadTabBarItemIcon(tabIcon.icon) { [weak self, weak viewController] image in
+            CYLTabBarController.cylLoadTabBarItemIcon(tabIcon.icon) { [weak self, weak viewController] image in
                 let show: (UIImage?) -> Void = { selectedImage in
                     // [EN] Dropped when another theme came in between, or the tab is gone. [CN] 期间切换了其他主题或 Tab 已不存在时丢弃。
                     guard let self, let viewController, self.isCurrentThemeGeneration(generation) else { return }
@@ -420,12 +438,12 @@ extension CYLTabBarController {
                         self.restoreThemeIcon(of: viewController)
                         return
                     }
-                    value.didInstall(self.cylPrivate.cylTabBarItemIconViewProviders().object(forKey: viewController))
+                    value.didInstall(self.cylTabBarItemIconViewProviders().object(forKey: viewController))
                 }
                 if image == nil || tabIcon.selectedIcon == nil || CYLThemeSameValue(tabIcon.selectedIcon, tabIcon.icon) {
                     show(nil)
                 } else {
-                    CYLTabBarController.cylPrivateClass.cylLoadTabBarItemIcon(tabIcon.selectedIcon, completion: show)
+                    CYLTabBarController.cylLoadTabBarItemIcon(tabIcon.selectedIcon, completion: show)
                 }
             }
         }
@@ -436,7 +454,7 @@ extension CYLTabBarController {
         let restorables = cyl_themeSettings.iconRestorables
         guard let value = restorables.object(forKey: viewController) else { return }
         restorables.removeObject(forKey: viewController)
-        let current = cylPrivate.cylTabBarItemIconViewProviders().object(forKey: viewController)
+        let current = cylTabBarItemIconViewProviders().object(forKey: viewController)
         if let index = viewControllers?.firstIndex(of: viewController) {
             let result = value.shouldRestore(currentValue: current)
             if result.restore {
@@ -485,7 +503,7 @@ extension CYLTabBarController {
                 }
                 continue
             }
-            CYLTabBarController.cylPrivateClass.cylLoadTabBarItemIcon(themeValue) { [weak self, weak plusButton] image in
+            CYLTabBarController.cylLoadTabBarItemIcon(themeValue) { [weak self, weak plusButton] image in
                 // [EN] Dropped when another theme came in between. [CN] 期间切换了其他主题时丢弃。
                 guard let self, let plusButton, self.isCurrentThemeGeneration(generation) else { return }
                 // [EN] A background image arrived while the icon was loading: the button takes no theme image any more.

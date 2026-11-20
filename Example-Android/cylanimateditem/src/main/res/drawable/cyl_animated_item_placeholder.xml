@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  [EN] The placeholder of CYLAnimatedItem (24 dp, a tab icon's size): shown when there is no static image and the
+       animation file cannot play. The same drawing as iOS's CYLAnimatedItem.bundle. Copyright and policy:
+       META-INF/cylanimateditem/LICENSE and POLICY.md (MIT).
+  [CN] CYLAnimatedItem 的占位图（24 dp，Tab 图标尺寸）：没有静态图片且动画文件无法播放时显示。与 iOS 的 CYLAnimatedItem.bundle 图形相同。版权与政策：
+       META-INF/cylanimateditem/LICENSE 与 POLICY.md（MIT）。
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="25"
+    android:viewportHeight="25"
+    android:tint="?android:attr/textColorSecondary">
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="@android:color/black"
+        android:strokeWidth="1.6"
+        android:pathData="M6.5,3.5 L18.5,3.5 A4,4 0,0 1,22.5 7.5 L22.5,17.5 A4,4 0,0 1,18.5 21.5 L6.5,21.5 A4,4 0,0 1,2.5 17.5 L2.5,7.5 A4,4 0,0 1,6.5 3.5 Z" />
+    <path
+        android:fillColor="@android:color/black"
+        android:pathData="M8.5,9.5 m-2,0 a2,2 0,1 1,4 0 a2,2 0,1 1,-4 0" />
+    <path
+        android:fillColor="@android:color/black"
+        android:pathData="M3.3,20.7 L10,12.5 L14,16.5 L16.5,14 L21.7,20.7 Z" />
+</vector>

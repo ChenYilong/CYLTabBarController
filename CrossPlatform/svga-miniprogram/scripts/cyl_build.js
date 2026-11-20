@@ -6,8 +6,8 @@
  * [CN] 从 fflate 0.8.2（MIT，先执行 `npm install`）构建 miniprogram_dist/svga/fflate.js：使用其 UMD 版本，并去掉异步 API
  *      可选的 Node `worker_threads` 查找（小程序没有该模块；SVGA 播放器只调用同步的 unzlibSync）。
  */
-const fs = require('fs')
-const path = require('path')
+const fs = require('node:fs')
+const path = require('node:path')
 
 const CYL_ROOT = path.resolve(__dirname, '..')
 const CYL_SOURCE = path.join(CYL_ROOT, 'node_modules', 'fflate')

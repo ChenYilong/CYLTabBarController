@@ -13,12 +13,12 @@ const CYL_SWIPE_DISTANCE = 60
 module.exports = Behavior({
   methods: {
     cyl_onSwipeStart(event) {
-      const touch = event.touches && event.touches[0]
+      const touch = event.touches?.[0]
       this.cylSwipeStart = touch ? {x: touch.clientX, y: touch.clientY} : null
     },
     cyl_onSwipeEnd(event) {
       const start = this.cylSwipeStart
-      const touch = event.changedTouches && event.changedTouches[0]
+      const touch = event.changedTouches?.[0]
       this.cylSwipeStart = null
       if (!start || !touch) {
         return

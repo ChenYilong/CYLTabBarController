@@ -19,20 +19,17 @@
 #if CYL_PAG_AVAILABLE
 #import <libpag/PAGView.h>
 
-// [EN] The PAG keys, declared by the PAG subspec (aliases of the generic keys, see `attributeKeys`).
-// [CN] PAG 的 key，由 PAG 子库声明（通用 key 的别名，见 `attributeKeys`）。
-NSString *const CYLTabBarPAGURL = @"CYLTabBarPAGURL";
-NSString *const CYLTabBarPAGFilePath = @"CYLTabBarPAGFilePath";
-NSString *const CYLTabBarPAGSize = @"CYLTabBarPAGSize";
-NSString *const CYLTabBarPAGDarkURL = @"CYLTabBarPAGDarkURL";
-NSString *const CYLTabBarPAGDarkFilePath = @"CYLTabBarPAGDarkFilePath";
+// [EN] The PAG keys are declared and defined in the component's core (CYLAnimationKeys), so they exist without libpag.
+// [CN] PAG 的 key 在组件核心（CYLAnimationKeys）中声明与定义，没有 libpag 时也存在。
 
 // The protocol and the registry of the `CYLTabBarItemAnimation` subspec (the source tree, or flattened by CocoaPods).
 // `CYLTabBarItemAnimation` 子库的协议与注册表（源码目录，或 CocoaPods 展平后）。
 #if __has_include("../CYLTabBarItemAnimatorRegistry.h")
 #import "../CYLTabBarItemAnimatorRegistry.h"
+#import "../CYLTabBarItemAnimationFactory.h"
 #else
 #import "CYLTabBarItemAnimatorRegistry.h"
+#import "CYLTabBarItemAnimationFactory.h"
 #endif
 
 /// [EN] Plays a `PAGView`. [CN] 播放 `PAGView`。
@@ -125,8 +122,9 @@ NSString *const CYLTabBarPAGDarkFilePath = @"CYLTabBarPAGDarkFilePath";
     // Loaded as the official samples (libpag/pag-ios) do: `-setComposition:` with `+[PAGFile Load:]`, which every
     // libpag version has (3.x and later).
     // 与官方示例（libpag/pag-ios）一致：用 `+[PAGFile Load:]` 加 `-setComposition:` 加载，各版本均支持。
-    PAGFile *pagFile = URL.path.length > 0 ? [PAGFile Load:URL.path] : nil;
-    if (!pagFile) {
+    BOOL remote = !URL.isFileURL && URL.scheme.length > 0;
+    PAGFile *pagFile = (!remote && URL.path.length > 0) ? [PAGFile Load:URL.path] : nil;
+    if (!pagFile && !remote) {
         return nil;
     }
     PAGView *pagView = [[PAGView alloc] initWithFrame:CGRectMake(0, 0, size.width, size.height)];
@@ -137,7 +135,15 @@ NSString *const CYLTabBarPAGDarkFilePath = @"CYLTabBarPAGDarkFilePath";
     // [CN] 所有环境都在主线程绘制：TabBar 中有多个很小的 PAGView。每个一个绘制线程时，这些线程会在模拟器的软件 OpenGL 内部卡住并持有播放器的锁，
     //      之后第一个需要该锁的调用（`-stop`、`-setHidden:`）会阻塞主线程：图标空白，不播放。所有环境走同一条路径，模拟器上看到的就是真机运行的。
     [pagView setSync:YES];
-    [pagView setComposition:pagFile];
+    if (pagFile) {
+        [pagView setComposition:pagFile];
+    } else {
+        // [EN] A remote file (http, https): downloaded first, then loaded; meanwhile the item keeps its static image (or the
+        //      placeholder), and a failed download or file goes back to it (`CYLTabBarItemAnimationReportFailure`).
+        // [CN] 远程文件（http、https）：先下载再加载；期间条目保留静态图片（或占位图），下载或文件失败时回到静态图片
+        //      （`CYLTabBarItemAnimationReportFailure`）。
+        [self cyl_loadRemoteURL:URL intoView:pagView];
+    }
     // Like a Lottie view: plays once, shows its first frame until then. 与 Lottie 视图一致：播放一次，播放前显示第一帧。
     [pagView setRepeatCount:1];
     switch (contentMode) {
@@ -148,6 +154,45 @@ NSString *const CYLTabBarPAGDarkFilePath = @"CYLTabBarPAGDarkFilePath";
     [pagView setProgress:0];
     [pagView flush];
     return pagView;
+}
+
+/*!
+ * [EN] Downloads `URL` through the shared URL session into the caches folder, then gives it to `pagView` on the main
+ *      thread. The view is marked loading until then.
+ * [CN] 通过共享的 URL session 把 `URL` 下载到缓存目录，然后在主线程交给 `pagView`。在此之前视图被标记为加载中。
+ */
+- (void)cyl_loadRemoteURL:(NSURL *)URL intoView:(PAGView *)pagView {
+    CYLTabBarItemAnimationMarkLoading(pagView);
+    __weak PAGView *weakView = pagView;
+    NSURLSessionDownloadTask *task = [[NSURLSession sharedSession] downloadTaskWithURL:URL completionHandler:^(NSURL *location, NSURLResponse *response, NSError *error) {
+        NSInteger status = [response isKindOfClass:[NSHTTPURLResponse class]] ? ((NSHTTPURLResponse *)response).statusCode : 200;
+        NSString *path = nil;
+        if (location && status < 400) {
+            NSString *caches = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES).firstObject;
+            NSString *name = [NSString stringWithFormat:@"cyl-pag-%lu.pag", (unsigned long)URL.absoluteString.hash];
+            path = [caches stringByAppendingPathComponent:name];
+            [[NSFileManager defaultManager] removeItemAtPath:path error:NULL];
+            if (![[NSFileManager defaultManager] moveItemAtURL:location toURL:[NSURL fileURLWithPath:path] error:NULL]) {
+                path = nil;
+            }
+        }
+        dispatch_async(dispatch_get_main_queue(), ^{
+            PAGView *view = weakView;
+            if (!view) {
+                return;
+            }
+            PAGFile *file = path ? [PAGFile Load:path] : nil;
+            if (!file) {
+                CYLTabBarItemAnimationReportFailure(view, error);
+                return;
+            }
+            [view setComposition:file];
+            [view setProgress:0];
+            [view flush];
+            CYLTabBarItemAnimationReportLoaded(view);
+        });
+    }];
+    [task resume];
 }
 
 - (id<CYLTabBarItemAnimationPlayer>)playerForAnimationView:(UIView *)view {

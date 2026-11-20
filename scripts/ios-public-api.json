@@ -1,5 +1,5 @@
 {
- "source": "Public API of the Objective-C headers at 1fddee2 (2026-11-12), the commit before the Swift migration began; generated once from those headers (with the comments of scripts/harmonyos-api-map.py). The Public API rule forbids removing any of these symbols. Later public symbols whose declarations moved into Swift are appended (2026-11-13: -cyl_moveBadgeToCurrentTabButtonIfNeeded).",
+ "source": "Public API of the Objective-C headers at 1fddee2 (2026-11-12), the commit before the Swift migration began; generated once from those headers (with the comments of scripts/harmonyos-api-map.py). The Public API rule forbids removing any of these symbols. Later public symbols whose declarations moved into Swift are appended (2026-11-13: -cyl_moveBadgeToCurrentTabButtonIfNeeded; 2026-11-20: +configurationWithRemoteConfigValues:error:).",
  "symbols": [
   {
    "header": "CYLTabBarController/CYLBadgeView/CAAnimation+CYLBadgeExtention.h",
@@ -5392,6 +5392,14 @@
    "name": "+configurationWithContentsOfFile:error:",
    "key": "CYLTabBarController(CYLConfiguration) +configurationWithContentsOfFile:error:",
    "comment": ""
+  },
+  {
+   "header": "CYLTabBarController/CYLTabBarController.h",
+   "kind": "method",
+   "owner": "CYLTabBarController(CYLConfiguration)",
+   "name": "+configurationWithRemoteConfigValues:error:",
+   "key": "CYLTabBarController(CYLConfiguration) +configurationWithRemoteConfigValues:error:",
+   "comment": "A configuration from Firebase Remote Config values, without linking Firebase (docs/Configuration-File.md, \"Firebase Remote Config\")."
   },
   {
    "header": "CYLTabBarController/CYLTabBarController.h",

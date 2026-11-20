@@ -25,8 +25,32 @@ NS_ASSUME_NONNULL_BEGIN
 
 NS_ASSUME_NONNULL_END
 
-#if __has_include("../CYLUtils/CYLSwiftInterface.h")
-#import "../CYLUtils/CYLSwiftInterface.h"
+// [EN] The Swift protocols, from the module that compiles them: the CYLAnimatedItem pod, Swift Package Manager's Swift target,
+//      or the framework target of CYLTabBarController.xcodeproj. Never CYLTabBarController's CocoaPods module.
+// [CN] Swift 协议，来自编译它们的模块：CYLAnimatedItem pod、Swift Package Manager 的 Swift target，或 CYLTabBarController.xcodeproj
+//      的 framework target。不来自 CYLTabBarController 的 CocoaPods 模块。
+#ifndef __swift__
+#if __has_include(<CYLAnimatedItem/CYLAnimatedItem-Swift.h>)
+#import <CYLAnimatedItem/CYLAnimatedItem-Swift.h>
+#elif __has_include("CYLAnimatedItem-Swift.h")
+#import "CYLAnimatedItem-Swift.h"
+#elif defined(SWIFT_PACKAGE)
+// [EN] Swift Package Manager: the protocols are in the component's own Swift target, never in the tab bar's.
+// [CN] Swift Package Manager：协议位于组件自己的 Swift target 中，不在 TabBar 的 target 中。
+@import CYLAnimatedItemSwift;
+#elif __has_include(<CYLTabBarController/CYLTabBarController-Swift.h>) || __has_include("CYLTabBarController-Swift.h")
+// [EN] A framework with the component and the tab bar in one module: the Swift header declares a subclass of
+//      CYLAnimatedItemView (CYLFlatDesignTabBarButton), so the component's interface comes first.
+// [CN] 组件与 TabBar 在同一模块的 framework：Swift 头文件声明了 CYLAnimatedItemView 的子类（CYLFlatDesignTabBarButton），因此先导入组件的接口。
+#if __has_include(<CYLTabBarController/CYLAnimatedItemView.h>)
+#import <CYLTabBarController/CYLAnimatedItemView.h>
+#elif __has_include("CYLAnimatedItemView.h")
+#import "CYLAnimatedItemView.h"
+#endif
+#if __has_include(<CYLTabBarController/CYLTabBarController-Swift.h>)
+#import <CYLTabBarController/CYLTabBarController-Swift.h>
 #else
-#import "CYLSwiftInterface.h"
+#import "CYLTabBarController-Swift.h"
+#endif
+#endif
 #endif

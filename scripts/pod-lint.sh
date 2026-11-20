@@ -39,6 +39,9 @@ cd "$(dirname "$0")/.."
 export XCODE_XCCONFIG_FILE="$PWD/scripts/pod-lint.xcconfig"
 
 PODSPEC=CYLTabBarController.podspec
+# [EN] The animated item component, a pod of its own that CYLTabBarController depends on: linted and pushed first, same version.
+# [CN] 动效组件，CYLTabBarController 依赖的独立 pod：先检查、先发布，版本相同。
+COMPONENT_PODSPEC=CYLAnimatedItem.podspec
 CARTFILE=Example-Swift-Carthage/Cartfile
 CARTHAGE_SPEC=CYLTabBarController.json
 CARTHAGE_SPEC_URL='https://raw.githubusercontent.com/ChenYilong/CYLTabBarController/master/CYLTabBarController.json'
@@ -104,7 +107,11 @@ build_xcframework() {
   (cd "$work" && carthage build --no-skip-current --use-xcframeworks --platform iOS)
   mkdir -p "$root/build"
   rm -f "$root/build/$CARTHAGE_ASSET"
-  (cd "$work/Carthage/Build" && zip -qry "$root/build/$CARTHAGE_ASSET" CYLTabBarController.xcframework)
+  # [EN] Both frameworks in one zip: CYLTabBarController links CYLAnimatedItem (docs/Animated-Item.md), and Carthage's binary
+  #      spec extracts every framework of the archive.
+  # [CN] 两个 framework 放在同一个 zip 中：CYLTabBarController 链接 CYLAnimatedItem（docs/Animated-Item.md），Carthage 的二进制规格会解压
+  #      压缩包中的每个 framework。
+  (cd "$work/Carthage/Build" && zip -qry "$root/build/$CARTHAGE_ASSET" CYLTabBarController.xcframework CYLAnimatedItem.xcframework)
   rm -rf "$work"
   echo "Carthage: build/$CARTHAGE_ASSET (upload it to the GitHub release of the tag)"
 }
@@ -139,36 +146,40 @@ update_navigation() {
 
 # The tag of a release must be the podspec's version (s.source uses it). 发布的 tag 必须等于 podspec 的版本（s.source 使用它）。
 check_tag() {
+  tag="$1"
   release_version
-  if [ "$1" != "$version" ]; then
-    echo "error: the tag '$1' does not match s.version $version in $PODSPEC. Bump it first (scripts/pod-lint.sh bump $1), merge, then tag that commit." >&2
+  if [ "$tag" != "$version" ]; then
+    echo "error: the tag '$tag' does not match s.version $version in $PODSPEC. Bump it first (scripts/pod-lint.sh bump $tag), merge, then tag that commit." >&2
     exit 1
   fi
-  echo "Tag $1 matches s.version in $PODSPEC"
+  echo "Tag $tag matches s.version in $PODSPEC"
 }
 
 # Set s.version (only the first s.version line). 设置 s.version（只改第一行 s.version）。
 bump_version() {
-  case "$1" in
+  new_version="$1"
+  case "$new_version" in
     [0-9]*.[0-9]*.[0-9]*) ;;
     *) echo "usage: $0 bump <x.y.z>   (e.g. $0 bump 1.99.73)" >&2; exit 1 ;;
   esac
-  if printf '%s' "$1" | grep -q '[^0-9.]'; then
-    echo "error: '$1' is not a version like 1.99.73" >&2
+  if printf '%s' "$new_version" | grep -q '[^0-9.]'; then
+    echo "error: '$new_version' is not a version like 1.99.73" >&2
     exit 1
   fi
   release_version
-  sed "1,/^[[:space:]]*s\.version[[:space:]]*=/s|^\([[:space:]]*s\.version[[:space:]]*=[[:space:]]*[\"']\)[^\"']*\([\"']\)|\1$1\2|" "$PODSPEC" > "$PODSPEC.tmp"
+  sed "1,/^[[:space:]]*s\.version[[:space:]]*=/s|^\([[:space:]]*s\.version[[:space:]]*=[[:space:]]*[\"']\)[^\"']*\([\"']\)|\1$new_version\2|" "$PODSPEC" > "$PODSPEC.tmp"
   mv "$PODSPEC.tmp" "$PODSPEC"
-  if [ "$(pod_version)" != "$1" ]; then
+  sed "1,/^[[:space:]]*s\.version[[:space:]]*=/s|^\([[:space:]]*s\.version[[:space:]]*=[[:space:]]*[\"']\)[^\"']*\([\"']\)|\1$new_version\2|" "$COMPONENT_PODSPEC" > "$COMPONENT_PODSPEC.tmp"
+  mv "$COMPONENT_PODSPEC.tmp" "$COMPONENT_PODSPEC"
+  if [ "$(pod_version)" != "$new_version" ]; then
     echo "error: could not set s.version in $PODSPEC" >&2
     exit 1
   fi
-  echo "Podspec: s.version $version → $1 (commit this change, then tag the merged commit $1)"
+  echo "Podspec: s.version $version → $new_version (commit this change, then tag the merged commit $new_version)"
 }
 
 case "$1" in
-  push)      shift; pod trunk push "$PODSPEC" --allow-warnings "$@"; update_carthage; update_spm; update_navigation ;;
+  push)      shift; pod trunk push "$COMPONENT_PODSPEC" --allow-warnings "$@"; pod trunk push "$PODSPEC" --allow-warnings "$@"; update_carthage; update_spm; update_navigation ;;
   version)   release_version; echo "$version" ;;
   check-tag) check_tag "${2:?usage: $0 check-tag <tag>}" ;;
   bump)      bump_version "${2:-}"; update_carthage; update_spm; update_navigation ;;
@@ -176,5 +187,7 @@ case "$1" in
   xcframework) build_xcframework ;;
   spm)      update_spm; update_navigation ;;
   versions) update_carthage; update_spm; update_navigation ;;
-  *)        [ "$1" = lib ] && shift; pod lib lint "$PODSPEC" --allow-warnings "$@" ;;
+  *)        [ "$1" = lib ] && shift
+            pod lib lint "$COMPONENT_PODSPEC" --allow-warnings "$@"
+            pod lib lint "$PODSPEC" --allow-warnings --include-podspecs="$COMPONENT_PODSPEC" "$@" ;;
 esac

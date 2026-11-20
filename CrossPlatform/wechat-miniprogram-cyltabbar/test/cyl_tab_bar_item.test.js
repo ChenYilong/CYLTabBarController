@@ -81,3 +81,37 @@ test('badge debugging switch (cyl_debug.js): off by default, on leaves out the a
   assert.equal(cylBadgeAnimationClass('bounce', true), '');
   assert.equal(cylBadgeAnimationClass('', false), '');
 });
+
+test('cyl-tab-bar-item: the icon box size goes to cyl-animated-item (iconWidth / iconHeight)', () => {
+  const sized = cylItemModel({ title: 'Home', image: 'a.png', imageSize: '{30, 20}' })
+  assert.equal(sized.iconWidth, 30)
+  assert.equal(sized.iconHeight, 20)
+  const plain = cylItemModel({ title: 'Home', image: 'a.png' })
+  assert.equal(plain.iconWidth, 28)
+  assert.equal(plain.iconHeight, 28)
+})
+
+test('animation tint: "title" takes the state title color, a color stays, anything else is none', () => {
+  const titleTextAttributes = { normal: { color: '#8E8E93' }, selected: { color: '#007AFF' } };
+  assert.equal(cylItemModel({ animationTint: 'title', titleTextAttributes }).animationTint, '#8E8E93');
+  assert.equal(cylItemModel({ animationTint: 'title', titleTextAttributes, selected: true }).animationTint, '#007AFF');
+  assert.equal(cylItemModel({ animationTint: 'Title', titleTextAttributes, selected: true,
+    standardAppearance: { stackedLayoutAppearance: { selected: { titleTextAttributes: { color: '#FF3B30' } } } } }).animationTint, '#FF3B30');
+  assert.equal(cylItemModel({ animationTint: '#34C759', titleTextAttributes, selected: true }).animationTint, '#34C759');
+  assert.equal(cylItemModel({ animationTint: 'red', titleTextAttributes }).animationTint, '');
+  assert.equal(cylItemModel({ titleTextAttributes }).animationTint, '');
+});
+
+test('cyl-tab-bar passes every icon color option to cyl-tab-bar-item (B28)', () => {
+  // [EN] The models are tested above, but a value the tab bar computes reaches the item only through the template: the
+  //      tint option was computed and never bound, so Rive icons kept their own colors (B28, docs/Animated-Item.md).
+  // [CN] 上面测试的是模型，但 TabBar 计算出的值只能通过模板传给 Tab：tint 选项被计算却从未绑定，Rive 图标保持了自身颜色（B28）。
+  const fs = require('node:fs');
+  const path = require('node:path');
+  const template = fs.readFileSync(path.join(__dirname, '../src/cyl-tab-bar/index.wxml'), 'utf8');
+  const item = template.slice(template.indexOf('<cyl-tab-bar-item'), template.indexOf('/>', template.indexOf('<cyl-tab-bar-item')));
+  for (const [attribute, key] of [['animation-tint', 'animationTint'], ['icon-tint', 'iconTint'],
+    ['selected-icon-tint', 'selectedIconTint'], ['animation-colors', 'animationColors']]) {
+    assert.ok(item.includes(`${attribute}="{{item.item.${key}}}"`), `${attribute} is not bound`);
+  }
+});

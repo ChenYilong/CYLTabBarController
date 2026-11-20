@@ -11,8 +11,8 @@ import UIKit
 /**
  * [EN] Badges on a bar button item (`UIBarButtonItem (CYLBadgeExtention)`). The item is not a view: the badge goes on the
  *      image or title inside its button. Translated from Objective-C (docs/Swift-Migration.md, step 24); every selector is
- *      kept. The `CYLBadgeProtocol` members are internal; the conformance is declared in UIBarButtonItem+CYLBadgeExtention.h
- *      (see UIView+CYLBadgeExtention.swift for why).
+ *      kept. The `CYLBadgeProtocol` members are public; the conformance is declared at the end of this file (step 115,
+ *      see UIView+CYLBadgeExtention.swift).
  *
  *      FIX: badge colors of bar button items on iOS 26+ (Liquid Glass). There the content of a bar button item is drawn
  *      monochrome in the bar's tint, and colors drawn by layers inside it are lost (Apple Developer Forums 794886, 795908),
@@ -22,8 +22,8 @@ import UIKit
  *      `cyl_badgeMaximumBadgeNumber`), "new" / "NEW" localized, any other text. The animation is applied to the system
  *      badge view when it can be found in the bar. Before iOS 26, and with `UIDesignRequiresCompatibility`, nothing changes.
  * [CN] 导航栏按钮上的角标（`UIBarButtonItem (CYLBadgeExtention)`）。item 不是视图：角标放在其按钮内的图片或标题上。已从 Objective-C 翻译
- *      （docs/Swift-Migration.md，第 24 步），保留所有 selector。`CYLBadgeProtocol` 的成员为 internal；遵守关系声明在
- *      UIBarButtonItem+CYLBadgeExtention.h（原因见 UIView+CYLBadgeExtention.swift）。
+ *      （docs/Swift-Migration.md，第 24 步），保留所有 selector。`CYLBadgeProtocol` 的成员为 public；遵守关系在本文件末尾声明
+ *      （第 115 步，见 UIView+CYLBadgeExtention.swift）。
  *
  *      修复 iOS 26+（液态玻璃）上导航栏按钮角标的颜色：其内容按导航栏的 tint 以单色绘制，内部 layer 绘制的颜色会丢失，本库角标因此在浅色
  *      导航栏上显示为黑点。液态玻璃生效时改用系统角标（iOS 26 的 `UIBarButtonItem.Badge`），UIKit 会保留其颜色：背景色
@@ -143,7 +143,7 @@ extension UIBarButtonItem {
     // MARK: Public methods
 
     @objc(cyl_isReady)
-    dynamic func cyl_isReady() -> Bool {
+    public dynamic func cyl_isReady() -> Bool {
         // [EN] The system badge (iOS 26+) needs no laid-out view. [CN] 系统角标（iOS 26+）不依赖已布局的视图。
         if CYLBarButtonItemBadgeSupport.usesSystemBadge {
             return true
@@ -156,7 +156,7 @@ extension UIBarButtonItem {
      * [CN] 显示红点角标，无动画；bar button 尚未布局时等待 0.5 秒。
      */
     @objc(cyl_showBadge)
-    dynamic func cyl_showBadge() {
+    public dynamic func cyl_showBadge() {
         if CYLBarButtonItemBadgeSupport.usesSystemBadge {
             cyl_showBadgeValue("", animationType: .none)
             return
@@ -168,7 +168,7 @@ extension UIBarButtonItem {
     }
 
     @objc(cyl_showBadgeValue:animationType:)
-    dynamic func cyl_showBadgeValue(_ value: String, animationType: CYLBadgeAnimationType) {
+    public dynamic func cyl_showBadgeValue(_ value: String, animationType: CYLBadgeAnimationType) {
         if #available(iOS 26.0, *), CYLBarButtonItemBadgeSupport.usesSystemBadge {
             let host = cyl_actualBadgeView
             // [EN] The library's own badge would be drawn monochrome here, so it is not shown.
@@ -198,12 +198,11 @@ extension UIBarButtonItem {
      * [EN] Shows `value` with `animationType`, after setting the badge's background color when one is given.
      * [CN] 以 `animationType` 显示 `value`；传入背景色时先设置角标背景色。
      *
-     * [EN] Internal: declared in UIBarButtonItem+CYLBadgeExtention.h, as `CYLBadgeAnimationType` in a public Swift signature makes
-     *      the generated header import the umbrella header.
-     * [CN] internal：声明在 UIBarButtonItem+CYLBadgeExtention.h，因为公开 Swift 签名中的 `CYLBadgeAnimationType` 会让生成的头文件导入伞头文件。
+     * [EN] Public since step 115 (it was declared in UIBarButtonItem+CYLBadgeExtention.h while `CYLBadgeAnimationType` was an
+     *      Objective-C enum). [CN] 自第 115 步起为 public（`CYLBadgeAnimationType` 为 Objective-C 枚举时声明在 UIBarButtonItem+CYLBadgeExtention.h 中）。
      */
     @objc(cyl_showBadgeValue:animationType:backgroundColor:)
-    dynamic func cyl_showBadgeValue(_ value: String, animationType: CYLBadgeAnimationType, backgroundColor: UIColor?) {
+    public dynamic func cyl_showBadgeValue(_ value: String, animationType: CYLBadgeAnimationType, backgroundColor: UIColor?) {
         if let backgroundColor {
             cyl_badgeBackgroundColor = backgroundColor
         }
@@ -211,7 +210,7 @@ extension UIBarButtonItem {
     }
 
     @objc(cyl_clearBadge)
-    dynamic func cyl_clearBadge() {
+    public dynamic func cyl_clearBadge() {
         if #available(iOS 26.0, *), let badge = self.badge {
             // [EN] Kept for `-cyl_resumeBadge`. [CN] 保留，供 `-cyl_resumeBadge` 恢复。
             objc_setAssociatedObject(self, CYLBarButtonItemBadgeSupport.pausedSystemBadge, badge, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
@@ -221,7 +220,7 @@ extension UIBarButtonItem {
     }
 
     @objc(cyl_resumeBadge)
-    dynamic func cyl_resumeBadge() {
+    public dynamic func cyl_resumeBadge() {
         if #available(iOS 26.0, *),
            let pausedBadge = objc_getAssociatedObject(self, CYLBarButtonItemBadgeSupport.pausedSystemBadge) as? UIBarButtonItem.Badge,
            self.badge == nil {
@@ -234,7 +233,7 @@ extension UIBarButtonItem {
     }
 
     @objc(cyl_isPauseBadge)
-    dynamic func cyl_isPauseBadge() -> Bool {
+    public dynamic func cyl_isPauseBadge() -> Bool {
         if #available(iOS 26.0, *), self.badge == nil,
            objc_getAssociatedObject(self, CYLBarButtonItemBadgeSupport.pausedSystemBadge) != nil {
             return true
@@ -243,7 +242,7 @@ extension UIBarButtonItem {
     }
 
     @objc(cyl_isShowBadge)
-    dynamic func cyl_isShowBadge() -> Bool {
+    public dynamic func cyl_isShowBadge() -> Bool {
         if #available(iOS 26.0, *), self.badge != nil {
             return true
         }
@@ -278,7 +277,15 @@ extension UIBarButtonItem {
      * [CN] item 按钮（`_UIModernBarButton`）中的图片或标题，否则为按钮本身。
      */
     @objc(cyl_getActualBadgeSuperView)
-    dynamic func cyl_getActualBadgeSuperView() -> Any? {
+    public dynamic func cyl_getActualBadgeSuperView() -> Any? {
+        // [EN] A custom view that is, or holds, an animated item (`CYLAnimatedItemView`): the badge goes on its icon.
+        // [CN] 自定义视图是或包含动效 item（`CYLAnimatedItemView`）：角标放在其图标上。
+        if let custom = customView,
+           let iconHost = custom.cyl_animatedItemBadgeHost() ?? custom.subviews.lazy.compactMap({ $0.cyl_animatedItemBadgeHost() }).first {
+            iconHost.clipsToBounds = false
+            iconHost.layoutIfNeeded()
+            return iconHost
+        }
         let contentView = cyl_view()?.cyl_findBarButtonContentView()
         var actualBadgeSuperView: UIView? = contentView
         if let button = contentView as? UIButton {
@@ -294,17 +301,17 @@ extension UIBarButtonItem {
     }
 
     @objc(cyl_performSelector:)
-    dynamic func cyl_perform(_ aSelector: Selector) {
+    public dynamic func cyl_perform(_ aSelector: Selector) {
         cyl_perform(aSelector, with: nil, with: nil)
     }
 
     @objc(cyl_performSelector:withObject:)
-    dynamic func cyl_perform(_ aSelector: Selector, with object: Any?) {
+    public dynamic func cyl_perform(_ aSelector: Selector, with object: Any?) {
         cyl_perform(aSelector, with: object, with: nil)
     }
 
     @objc(cyl_performSelector:withObject:withObject:)
-    dynamic func cyl_perform(_ aSelector: Selector, with object1: Any?, with object2: Any?) {
+    public dynamic func cyl_perform(_ aSelector: Selector, with object1: Any?, with object2: Any?) {
         _ = perform(aSelector, with: object1, with: object2)
     }
 
@@ -314,13 +321,13 @@ extension UIBarButtonItem {
      * [CN] bar button 已布局时为 0，否则为 0.5 秒，即角标方法等待的时间（与协议声明一致的 `CGFloat`）。设置无效：延迟由 `-cyl_isReady` 决定。
      */
     @objc(cyl_delayIfNeededForSeconds)
-    dynamic var cyl_delayIfNeededForSeconds: CGFloat {
+    public dynamic var cyl_delayIfNeededForSeconds: CGFloat {
         @objc(cyl_delayIfNeededForSeconds) get { cyl_isReady() ? 0 : 0.5 }
         @objc(cyl_setDelayIfNeededForSeconds:) set { _ = newValue }
     }
 
     @objc(cyl_delayIfNeededForSecondsValue)
-    dynamic var cyl_delayIfNeededForSecondsValue: NSNumber {
+    public dynamic var cyl_delayIfNeededForSecondsValue: NSNumber {
         @objc(cyl_delayIfNeededForSecondsValue) get { NSNumber(value: Double(cyl_delayIfNeededForSeconds)) }
         @objc(cyl_setDelayIfNeededForSecondsValue:) set { cyl_delayIfNeededForSeconds = CGFloat(newValue.doubleValue) }
     }
@@ -340,7 +347,7 @@ extension UIBarButtonItem {
     //      laid out.
     // [CN] 字体与颜色同时保存在 item 上，供系统角标（iOS 26+）以及 bar button 尚未布局时使用。
     @objc(cyl_badgeFont)
-    dynamic var cyl_badgeFont: UIFont! {
+    public dynamic var cyl_badgeFont: UIFont! {
         @objc(cyl_badgeFont) get {
             objc_getAssociatedObject(self, CYLBarButtonItemBadgeSupport.font) as? UIFont
                 ?? cyl_actualBadgeView?.cyl_badgeFont ?? CYLBadgeAppearance.global.font
@@ -352,7 +359,7 @@ extension UIBarButtonItem {
     }
 
     @objc(cyl_badgeBackgroundColor)
-    dynamic var cyl_badgeBackgroundColor: UIColor! {
+    public dynamic var cyl_badgeBackgroundColor: UIColor! {
         @objc(cyl_badgeBackgroundColor) get {
             objc_getAssociatedObject(self, CYLBarButtonItemBadgeSupport.backgroundColor) as? UIColor
                 ?? cyl_actualBadgeView?.cyl_badgeBackgroundColor ?? CYLBadgeAppearance.global.backgroundColor
@@ -364,7 +371,7 @@ extension UIBarButtonItem {
     }
 
     @objc(cyl_badgeTextColor)
-    dynamic var cyl_badgeTextColor: UIColor! {
+    public dynamic var cyl_badgeTextColor: UIColor! {
         @objc(cyl_badgeTextColor) get {
             objc_getAssociatedObject(self, CYLBarButtonItemBadgeSupport.textColor) as? UIColor
                 ?? cyl_actualBadgeView?.cyl_badgeTextColor ?? CYLBadgeAppearance.global.textColor
@@ -376,7 +383,7 @@ extension UIBarButtonItem {
     }
 
     @objc(cyl_badgeAnimationType)
-    dynamic var cyl_badgeAnimationType: CYLBadgeAnimationType {
+    public dynamic var cyl_badgeAnimationType: CYLBadgeAnimationType {
         @objc(cyl_badgeAnimationType) get {
             // [EN] The system badge (iOS 26+) has no view of the library to keep it in. [CN] 系统角标没有本库的视图来保存它。
             if CYLBarButtonItemBadgeSupport.usesSystemBadge,
@@ -393,7 +400,7 @@ extension UIBarButtonItem {
     }
 
     @objc(cyl_badgeAnimationTypeValue)
-    dynamic var cyl_badgeAnimationTypeValue: NSNumber {
+    public dynamic var cyl_badgeAnimationTypeValue: NSNumber {
         @objc(cyl_badgeAnimationTypeValue) get { NSNumber(value: cyl_badgeAnimationType.rawValue) }
         @objc(cyl_setBadgeAnimationTypeValue:) set {
             cyl_badgeAnimationType = CYLBadgeAnimationType(rawValue: newValue.uintValue) ?? .none
@@ -401,73 +408,73 @@ extension UIBarButtonItem {
     }
 
     @objc(cyl_badgeFrame)
-    dynamic var cyl_badgeFrame: CGRect {
+    public dynamic var cyl_badgeFrame: CGRect {
         @objc(cyl_badgeFrame) get { cyl_actualBadgeView?.cyl_badgeFrame ?? .zero }
         @objc(cyl_setBadgeFrame:) set { cyl_performWithBadgeSuperView { $0.cyl_badgeFrame = newValue } }
     }
 
     @objc(cyl_badgeFrameValue)
-    dynamic var cyl_badgeFrameValue: NSValue {
+    public dynamic var cyl_badgeFrameValue: NSValue {
         @objc(cyl_badgeFrameValue) get { NSValue(cgRect: cyl_badgeFrame) }
         @objc(cyl_setBadgeFrameValue:) set { cyl_badgeFrame = newValue.cgRectValue }
     }
 
     @objc(cyl_badgeCenterOffset)
-    dynamic var cyl_badgeCenterOffset: CGPoint {
+    public dynamic var cyl_badgeCenterOffset: CGPoint {
         @objc(cyl_badgeCenterOffset) get { cyl_actualBadgeView?.cyl_badgeCenterOffset ?? .zero }
         @objc(cyl_setBadgeCenterOffset:) set { cyl_performWithBadgeSuperView { $0.cyl_badgeCenterOffset = newValue } }
     }
 
     @objc(cyl_badgeCenterOffsetValue)
-    dynamic var cyl_badgeCenterOffsetValue: NSValue {
+    public dynamic var cyl_badgeCenterOffsetValue: NSValue {
         @objc(cyl_badgeCenterOffsetValue) get { NSValue(cgPoint: cyl_badgeCenterOffset) }
         @objc(cyl_setBadgeCenterOffsetValue:) set { cyl_badgeCenterOffset = newValue.cgPointValue }
     }
 
     @objc(cyl_badgeMaximumBadgeNumber)
-    dynamic var cyl_badgeMaximumBadgeNumber: Int {
+    public dynamic var cyl_badgeMaximumBadgeNumber: Int {
         @objc(cyl_badgeMaximumBadgeNumber) get { cyl_actualBadgeView?.cyl_badgeMaximumBadgeNumber ?? 0 }
         @objc(cyl_setBadgeMaximumBadgeNumber:) set { cyl_performWithBadgeSuperView { $0.cyl_badgeMaximumBadgeNumber = newValue } }
     }
 
     @objc(cyl_badgeMaximumBadgeNumberValue)
-    dynamic var cyl_badgeMaximumBadgeNumberValue: NSNumber {
+    public dynamic var cyl_badgeMaximumBadgeNumberValue: NSNumber {
         @objc(cyl_badgeMaximumBadgeNumberValue) get { NSNumber(value: cyl_badgeMaximumBadgeNumber) }
         @objc(cyl_setBadgeMaximumBadgeNumberValue:) set { cyl_badgeMaximumBadgeNumber = newValue.intValue }
     }
 
     @objc(cyl_badgeMargin)
-    dynamic var cyl_badgeMargin: CGFloat {
+    public dynamic var cyl_badgeMargin: CGFloat {
         @objc(cyl_badgeMargin) get { cyl_actualBadgeView?.cyl_badgeMargin ?? 0 }
         @objc(cyl_setBadgeMargin:) set { cyl_performWithBadgeSuperView { $0.cyl_badgeMargin = newValue } }
     }
 
     @objc(cyl_badgeMarginValue)
-    dynamic var cyl_badgeMarginValue: NSNumber {
+    public dynamic var cyl_badgeMarginValue: NSNumber {
         @objc(cyl_badgeMarginValue) get { NSNumber(value: Double(cyl_badgeMargin)) }
         @objc(cyl_setBadgeMarginValue:) set { cyl_badgeMargin = CGFloat(newValue.doubleValue) }
     }
 
     @objc(cyl_badgeRadius)
-    dynamic var cyl_badgeRadius: CGFloat {
+    public dynamic var cyl_badgeRadius: CGFloat {
         @objc(cyl_badgeRadius) get { cyl_actualBadgeView?.cyl_badgeRadius ?? 0 }
         @objc(cyl_setBadgeRadius:) set { cyl_performWithBadgeSuperView { $0.cyl_badgeRadius = newValue } }
     }
 
     @objc(cyl_badgeRadiusValue)
-    dynamic var cyl_badgeRadiusValue: NSNumber {
+    public dynamic var cyl_badgeRadiusValue: NSNumber {
         @objc(cyl_badgeRadiusValue) get { NSNumber(value: Double(cyl_badgeRadius)) }
         @objc(cyl_setBadgeRadiusValue:) set { cyl_badgeRadius = CGFloat(newValue.doubleValue) }
     }
 
     @objc(cyl_badgeCornerRadius)
-    dynamic var cyl_badgeCornerRadius: CGFloat {
+    public dynamic var cyl_badgeCornerRadius: CGFloat {
         @objc(cyl_badgeCornerRadius) get { cyl_actualBadgeView?.cyl_badgeCornerRadius ?? 0 }
         @objc(cyl_setBadgeCornerRadius:) set { cyl_performWithBadgeSuperView { $0.cyl_badgeCornerRadius = newValue } }
     }
 
     @objc(cyl_badgeCornerRadiusValue)
-    dynamic var cyl_badgeCornerRadiusValue: NSNumber {
+    public dynamic var cyl_badgeCornerRadiusValue: NSNumber {
         @objc(cyl_badgeCornerRadiusValue) get { NSNumber(value: Double(cyl_badgeCornerRadius)) }
         @objc(cyl_setBadgeCornerRadiusValue:) set { cyl_badgeCornerRadius = CGFloat(newValue.doubleValue) }
     }
@@ -496,3 +503,9 @@ extension CYLBarButtonItemBadgeSupport {
         method_exchangeImplementations(originalMethod, swizzledMethod)
     }()
 }
+
+/**
+ [EN] The `CYLBadgeProtocol` conformance, declared in Swift since step 115 (it was in the Objective-C category header).
+ [CN] `CYLBadgeProtocol` 遵循关系，自第 115 步起在 Swift 中声明（原在 Objective-C 类别头文件中）。
+ */
+extension UIBarButtonItem: CYLBadgeProtocol {}

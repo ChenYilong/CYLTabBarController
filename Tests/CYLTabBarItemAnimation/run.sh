@@ -14,12 +14,14 @@ build="$(mktemp -d)"
 trap 'rm -rf "$build"' EXIT
 
 xcrun clang -fobjc-arc -fmodules -Wall -Wextra -Wno-unused-parameter -DDEBUG=1 \
+    -include "$here/CYLCoreStandIns.h" \
     -I"$here/stub" -I"$animation" -I"$root/CYLTabBarController" -I"$root/CYLTabBarController/CYLUtils" \
-    "$here/main.m" "$here/stub/UIKit.m" "$here/CYLCoreStandIns.m" \
+    "$here/main.m" "$here/stub/UIKit.m" "$here/CYLCoreStandIns.m" "$here/CYLAnimationKeyLookupStandIns.m" \
     "$animation/CYLTabBarItemAnimatorRegistry.m" \
     "$animation/CYLTabBarItemAnimationFactory.m" \
     "$animation/CYLTabBarItemAnimationEngine.m" \
     "$animation/CYLTabBarItemViewAnimator.m" \
     "$animation/CYLTabBarItemAnimationPlayer.m" \
-    -framework Foundation -framework CoreGraphics -o "$build/tests"
+    "$root/CYLTabBarController/CYLUtils/CYLAnimationKeys.m" \
+    -framework Foundation -framework CoreGraphics -framework QuartzCore -o "$build/tests"
 "$build/tests"

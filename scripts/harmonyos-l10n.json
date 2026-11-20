@@ -56,7 +56,12 @@
     "Dark mode": "Dark mode",
     "Search": "Search",
     "Liquid Glass: the see-through effect of the reference": "Liquid Glass: the see-through effect of the reference",
-    "harmonyos-liquid-glass-tabbar: tab capsule, search ball and music bar over colorful content; scroll to minimize": "harmonyos-liquid-glass-tabbar: tab capsule, search ball and music bar over colorful content; scroll to minimize"
+    "harmonyos-liquid-glass-tabbar: tab capsule, search ball and music bar over colorful content; scroll to minimize": "harmonyos-liquid-glass-tabbar: tab capsule, search ball and music bar over colorful content; scroll to minimize",
+    "Rive Tab 图标：house.riv（数字输入 Rooms）": "Rive tab icon: house.riv (number input Rooms)",
+    "numberInput=Rooms：每次选中或再次点击时 Rooms 变为下一个值（3、4、5、6）": "numberInput=Rooms: each select or tap again sets Rooms to the next value (3, 4, 5, 6)",
+    "循环播放": "Loop",
+    "Tab 图标动画循环播放：开": "Tab icon animations loop: on",
+    "Tab 图标动画循环播放：关": "Tab icon animations loop: off"
   },
   "zh-Hans": {
     "Previous tab (cyl_selectPreviousTab, issue #535)": "上一个 Tab（cyl_selectPreviousTab，issue #535）",
@@ -115,7 +120,12 @@
     "Dark mode": "深色模式",
     "Search": "搜索",
     "Liquid Glass: the see-through effect of the reference": "液态玻璃：参考工程的透视效果",
-    "harmonyos-liquid-glass-tabbar: tab capsule, search ball and music bar over colorful content; scroll to minimize": "harmonyos-liquid-glass-tabbar：页签胶囊、搜索球与音乐条悬浮在彩色内容之上；滚动即可缩小"
+    "harmonyos-liquid-glass-tabbar: tab capsule, search ball and music bar over colorful content; scroll to minimize": "harmonyos-liquid-glass-tabbar：页签胶囊、搜索球与音乐条悬浮在彩色内容之上；滚动即可缩小",
+    "Rive Tab 图标：house.riv（数字输入 Rooms）": "Rive Tab 图标：house.riv（数字输入 Rooms）",
+    "numberInput=Rooms：每次选中或再次点击时 Rooms 变为下一个值（3、4、5、6）": "numberInput=Rooms：每次选中或再次点击时 Rooms 变为下一个值（3、4、5、6）",
+    "循环播放": "循环播放",
+    "Tab 图标动画循环播放：开": "Tab 图标动画循环播放：开",
+    "Tab 图标动画循环播放：关": "Tab 图标动画循环播放：关"
   },
   "zh-Hant": {
     "Previous tab (cyl_selectPreviousTab, issue #535)": "上一個 Tab（cyl_selectPreviousTab，issue #535）",
@@ -174,7 +184,12 @@
     "Dark mode": "深色模式",
     "Search": "搜尋",
     "Liquid Glass: the see-through effect of the reference": "液態玻璃：參考專案的透視效果",
-    "harmonyos-liquid-glass-tabbar: tab capsule, search ball and music bar over colorful content; scroll to minimize": "harmonyos-liquid-glass-tabbar：頁籤膠囊、搜尋球與音樂列懸浮在彩色內容之上；捲動即可縮小"
+    "harmonyos-liquid-glass-tabbar: tab capsule, search ball and music bar over colorful content; scroll to minimize": "harmonyos-liquid-glass-tabbar：頁籤膠囊、搜尋球與音樂列懸浮在彩色內容之上；捲動即可縮小",
+    "Rive Tab 图标：house.riv（数字输入 Rooms）": "Rive Tab 圖示：house.riv（數字輸入 Rooms）",
+    "numberInput=Rooms：每次选中或再次点击时 Rooms 变为下一个值（3、4、5、6）": "numberInput=Rooms：每次選中或再次點擊時 Rooms 變為下一個值（3、4、5、6）",
+    "循环播放": "循環播放",
+    "Tab 图标动画循环播放：开": "Tab 圖示動畫循環播放：開",
+    "Tab 图标动画循环播放：关": "Tab 圖示動畫循環播放：關"
   },
   "de": {
     "Previous tab (cyl_selectPreviousTab, issue #535)": "Vorheriger Tab (cyl_selectPreviousTab, issue #535)",
@@ -231,7 +246,8 @@
     "Dark mode": "Dunkelmodus",
     "Search": "Suchen",
     "Liquid Glass: the see-through effect of the reference": "Liquid Glass: der Durchsicht-Effekt der Referenz",
-    "harmonyos-liquid-glass-tabbar: tab capsule, search ball and music bar over colorful content; scroll to minimize": "harmonyos-liquid-glass-tabbar: Tab-Kapsel, Suchkugel und Musikleiste über farbigem Inhalt; zum Verkleinern scrollen"
+    "harmonyos-liquid-glass-tabbar: tab capsule, search ball and music bar over colorful content; scroll to minimize": "harmonyos-liquid-glass-tabbar: Tab-Kapsel, Suchkugel und Musikleiste über farbigem Inhalt; zum Verkleinern scrollen",
+    "循环播放": "Wiederholen"
   },
   "fr": {
     "Previous tab (cyl_selectPreviousTab, issue #535)": "Onglet précédent (cyl_selectPreviousTab, issue #535)",
@@ -288,7 +304,8 @@
     "Dark mode": "Mode sombre",
     "Search": "Rechercher",
     "Liquid Glass: the see-through effect of the reference": "Liquid Glass : l’effet de transparence de la référence",
-    "harmonyos-liquid-glass-tabbar: tab capsule, search ball and music bar over colorful content; scroll to minimize": "harmonyos-liquid-glass-tabbar : capsule d’onglets, bulle de recherche et barre musicale sur un contenu coloré ; faire défiler pour réduire"
+    "harmonyos-liquid-glass-tabbar: tab capsule, search ball and music bar over colorful content; scroll to minimize": "harmonyos-liquid-glass-tabbar : capsule d’onglets, bulle de recherche et barre musicale sur un contenu coloré ; faire défiler pour réduire",
+    "循环播放": "Boucle"
   },
   "es": {
     "Previous tab (cyl_selectPreviousTab, issue #535)": "Pestaña anterior (cyl_selectPreviousTab, issue #535)",
@@ -345,7 +362,8 @@
     "Dark mode": "Modo oscuro",
     "Search": "Buscar",
     "Liquid Glass: the see-through effect of the reference": "Liquid Glass: el efecto de transparencia de la referencia",
-    "harmonyos-liquid-glass-tabbar: tab capsule, search ball and music bar over colorful content; scroll to minimize": "harmonyos-liquid-glass-tabbar: cápsula de pestañas, bola de búsqueda y barra de música sobre contenido colorido; desplaza para minimizar"
+    "harmonyos-liquid-glass-tabbar: tab capsule, search ball and music bar over colorful content; scroll to minimize": "harmonyos-liquid-glass-tabbar: cápsula de pestañas, bola de búsqueda y barra de música sobre contenido colorido; desplaza para minimizar",
+    "循环播放": "Repetir"
   },
   "it": {
     "Previous tab (cyl_selectPreviousTab, issue #535)": "Scheda precedente (cyl_selectPreviousTab, issue #535)",
@@ -402,7 +420,8 @@
     "Dark mode": "Modalità scura",
     "Search": "Cerca",
     "Liquid Glass: the see-through effect of the reference": "Liquid Glass: l’effetto trasparenza del riferimento",
-    "harmonyos-liquid-glass-tabbar: tab capsule, search ball and music bar over colorful content; scroll to minimize": "harmonyos-liquid-glass-tabbar: capsula delle schede, sfera di ricerca e barra musicale su contenuti colorati; scorri per ridurre"
+    "harmonyos-liquid-glass-tabbar: tab capsule, search ball and music bar over colorful content; scroll to minimize": "harmonyos-liquid-glass-tabbar: capsula delle schede, sfera di ricerca e barra musicale su contenuti colorati; scorri per ridurre",
+    "循环播放": "Ripeti"
   },
   "pt-BR": {
     "Previous tab (cyl_selectPreviousTab, issue #535)": "Aba anterior (cyl_selectPreviousTab, issue #535)",
@@ -459,7 +478,8 @@
     "Dark mode": "Modo escuro",
     "Search": "Buscar",
     "Liquid Glass: the see-through effect of the reference": "Liquid Glass: o efeito de transparência da referência",
-    "harmonyos-liquid-glass-tabbar: tab capsule, search ball and music bar over colorful content; scroll to minimize": "harmonyos-liquid-glass-tabbar: cápsula de abas, bola de busca e barra de música sobre conteúdo colorido; role para minimizar"
+    "harmonyos-liquid-glass-tabbar: tab capsule, search ball and music bar over colorful content; scroll to minimize": "harmonyos-liquid-glass-tabbar: cápsula de abas, bola de busca e barra de música sobre conteúdo colorido; role para minimizar",
+    "循环播放": "Repetir"
   },
   "ca": {
     "Previous tab (cyl_selectPreviousTab, issue #535)": "Pestanya anterior (cyl_selectPreviousTab, issue #535)",
@@ -1371,7 +1391,12 @@
     "Dark mode": "ダークモード",
     "Search": "検索",
     "Liquid Glass: the see-through effect of the reference": "Liquid Glass：参考プロジェクトの透過効果",
-    "harmonyos-liquid-glass-tabbar: tab capsule, search ball and music bar over colorful content; scroll to minimize": "harmonyos-liquid-glass-tabbar：カラフルなコンテンツ上のタブカプセル、検索ボール、音楽バー。スクロールで縮小"
+    "harmonyos-liquid-glass-tabbar: tab capsule, search ball and music bar over colorful content; scroll to minimize": "harmonyos-liquid-glass-tabbar：カラフルなコンテンツ上のタブカプセル、検索ボール、音楽バー。スクロールで縮小",
+    "Rive Tab 图标：house.riv（数字输入 Rooms）": "Rive タブアイコン：house.riv（数値入力 Rooms）",
+    "numberInput=Rooms：每次选中或再次点击时 Rooms 变为下一个值（3、4、5、6）": "numberInput=Rooms：選択または再タップのたびに Rooms が次の値（3、4、5、6）になります",
+    "循环播放": "ループ",
+    "Tab 图标动画循环播放：开": "タブアイコンのアニメーションをループ：オン",
+    "Tab 图标动画循环播放：关": "タブアイコンのアニメーションをループ：オフ"
   },
   "ko": {
     "Previous tab (cyl_selectPreviousTab, issue #535)": "이전 탭 (cyl_selectPreviousTab, issue #535)",
@@ -1428,7 +1453,9 @@
     "Dark mode": "다크 모드",
     "Search": "검색",
     "Liquid Glass: the see-through effect of the reference": "Liquid Glass: 참고 프로젝트의 투명 효과",
-    "harmonyos-liquid-glass-tabbar: tab capsule, search ball and music bar over colorful content; scroll to minimize": "harmonyos-liquid-glass-tabbar: 다채로운 콘텐츠 위의 탭 캡슐, 검색 볼, 음악 바. 스크롤하면 축소"
+    "harmonyos-liquid-glass-tabbar: tab capsule, search ball and music bar over colorful content; scroll to minimize": "harmonyos-liquid-glass-tabbar: 다채로운 콘텐츠 위의 탭 캡슐, 검색 볼, 음악 바. 스크롤하면 축소",
+    "Rive Tab 图标：house.riv（数字输入 Rooms）": "Rive 탭 아이콘: house.riv (숫자 입력 Rooms)",
+    "循环播放": "반복"
   },
   "ar": {
     "Previous tab (cyl_selectPreviousTab, issue #535)": "علامة التبويب السابقة (cyl_selectPreviousTab، issue #535)",

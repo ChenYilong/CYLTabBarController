@@ -35,6 +35,9 @@
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/TabBar-Minimize-On-Scroll.md
 // docs-binding:end
 
+// CYL-SWIFT-MIGRATION: objc-required — [EN] Only the block typedef `CYLTabBarDidLayoutSubViewsBlock` (and its `@class CYLTabBar`) is
+//      left: Objective-C source spells it and a Swift typealias is not exported (docs/Swift-Migration-Phase3.md).
+// [CN] 只剩 block 类型 `CYLTabBarDidLayoutSubViewsBlock`（及其 `@class CYLTabBar`）：Objective-C 源码使用该名称，而 Swift 的 typealias 不会导出。
 #import <UIKit/UIKit.h>
 #import "CYLPlusButton.h"
 
@@ -47,178 +50,24 @@ NS_ASSUME_NONNULL_BEGIN
 //      (i.e. `__has_include(<CYLTabBarController/CYLFlatDesignTabBar.h>)`), so setups that do not import the
 //      CYLFlatDesignTabBar subspec (e.g. the LottieSwift subspec) cannot see this type;
 //      so it is declared again explicitly here to make this header compile on its own.
-@class CYLTabBarController;
 typedef void(^CYLTabBarDidLayoutSubViewsBlock)(CYLTabBar *tabBar);
 
-@interface CYLTabBar : UITabBar
-
 /*!
- * [CN] 让 `TabImageView` 垂直居中时，所需要的默认偏移量。
- * @attention 该值将在设置 top 和 bottom 时被同时使用，具体的操作等价于如下行为：
- * [EN] The default offset needed to vertically center the `TabImageView`.
- *      @attention This value is used for both top and bottom; the operation is equivalent to the following:
- * `viewController.tabBarItem.imageInsets = UIEdgeInsetsMake(tabImageViewDefaultOffset, 0, -tabImageViewDefaultOffset, 0);`
+ * [EN] `CYLTabBar` is implemented in Swift (`Swift/CYLTabBar.swift`, docs/Swift-Migration.md, step 100), with the same
+ *      Objective-C API: `syncsClassicStylesToAppearance`, `context`, `didLayoutSubViewsBlock`, `cyl_itemEdgeInsets`,
+ *      `plusButton`, `tabBarItemWidth`, `tabBarButtonArray`, `plusButtonActive`, `isLensViewLifed`, the Liquid Glass gesture
+ *      recognizers, `-plusButtonIndex`, `-cyl_reloadTabButtons`, `-hasPlusButton`, `-hasPlusChildViewController`,
+ *      `-isPlusButtonLayoutCentered`, `-tabBarController`. Objective-C callers get its declaration from the generated
+ *      Swift interface imported at the end of this header.
+ * [CN] `CYLTabBar` 在 Swift 中实现（`Swift/CYLTabBar.swift`，docs/Swift-Migration.md，第 100 步），Objective-C API 不变（属性与方法见英文）。
+ *      Objective-C 调用方从本头文件末尾导入的 Swift 生成接口获得其声明。
  */
-@property (nonatomic, assign, readonly) CGFloat tabImageViewDefaultOffset;
 
 /*!
- * [EN] Since iOS 13 UIKit ignores the classic styles (`tintColor`, `barTintColor`, `unselectedItemTintColor`,
- *      `backgroundImage`, `shadowImage`, `barStyle`) once the tab bar uses `UITabBarAppearance`. When YES (default), each
- *      classic setter also writes its value into `standardAppearance` (and `scrollEdgeAppearance` when there is one), so
- *      both ways of styling work together; only a value that changed is written. Not with Liquid Glass, where the
- *      system draws the bar. Set NO to keep UIKit's own behavior.
- * [CN] iOS 13 起，TabBar 使用 `UITabBarAppearance` 后，UIKit 会忽略经典样式（`tintColor`、`barTintColor`、`unselectedItemTintColor`、
- *      `backgroundImage`、`shadowImage`、`barStyle`）。为 YES（默认）时，每个经典 setter 同时把值写入 `standardAppearance`（存在
- *      `scrollEdgeAppearance` 时也写入），两种设置方式可以同时使用；只写入发生变化的值。液态玻璃（由系统绘制 TabBar）时不同步。
- *      设为 NO 则保持 UIKit 原有行为。
+ * [EN] `UITabBar (CYLBarBackground)` is public Swift since docs/Swift-Migration.md step 121 (same selectors and Swift names);
+ *      Objective-C reads it from the generated Swift interface. [CN] 自第 121 步起 `UITabBar (CYLBarBackground)` 为公开的 Swift（selector 与 Swift
+ *      名称不变）；Objective-C 通过生成的 Swift 接口读取。
  */
-@property (nonatomic, assign) BOOL syncsClassicStylesToAppearance;
-
-/*!
- [EN] This can be left unset; the default is CYLTabBarController. If set, please implement the `+[CYLPlusButton tabBarContext]` method in CYLPlusButton and ensure consistency. If neither is implemented, the default is CYLTabBarController for both.
-
- [CN] 可以不设置， 默认为 CYLTabBarController，如果设置了，请实现 CYLPlusButton 里 的 `+[CYLPlusButton tabBarContext]` 并保持一致。如果两个都不是实现，默认为一致均为 CYLTabBarController
- */
-@property (nonatomic, copy, nullable) NSString *context;
-
-@property (nonatomic, copy, nullable) CYLTabBarDidLayoutSubViewsBlock didLayoutSubViewsBlock;
-
-/*!
- * [EN] Space kept free at the two ends of the classic tab bar: the tab buttons (and the plus button) are laid out between
- *      `left` (the leading end, mirrored in right-to-left layouts) and `right` (the trailing end); `top` and `bottom` are
- *      not used. Default `UIEdgeInsetsZero` (the layout is exactly as before). Works with and without a plus button, and
- *      together with centered positioning (docs/Tab-Item-Positioning.md). Liquid Glass and FlatDesign are not affected.
- *
- *          ((CYLTabBar *)tabBarController.tabBar).cyl_itemEdgeInsets = UIEdgeInsetsMake(0, 16, 0, 16);
- *
- * [CN] 经典 TabBar 两端留出的空白：Tab 按钮（以及 PlusButton）排列在 `left`（起始端，从右到左布局时镜像）与 `right`（末端）之间；
- *      不使用 `top` 与 `bottom`。默认 `UIEdgeInsetsZero`（布局与以前完全相同）。有无 PlusButton 均可，也可与居中排列同时使用
- *      （docs/Tab-Item-Positioning.md）。液态玻璃与扁平样式不受影响。示例见上。
- */
-@property (nonatomic, assign) UIEdgeInsets cyl_itemEdgeInsets;
-
-/*!
- * [CN] 发布按钮
- */
-/* [EN] Publish button */
-@property (nonatomic, strong, nullable) CYLPlusButton<CYLPlusButtonSubclassing> *plusButton;
-@property (nonatomic, assign) CGFloat tabBarItemWidth;
-@property (nonatomic, copy) NSArray<UIControl *> *tabBarButtonArray;
-
-/*!
- * plusButton state:
- * Register + Context match == Active
- */
-@property (nonatomic, assign, getter=isPlusButtonActive) BOOL plusButtonActive;
-@property (nonatomic, assign) BOOL isLensViewLifed;
-@property (nonatomic, strong) UIGestureRecognizer *liquidGlassContinuousGestureRecognizer;
-
-/*!
- * [CN] 之前 tabbar 上有长按手势，iOS 26 液态玻璃，长按手势都不起作用了，需要重新增加自定义手势。
- * [EN] The tabbar used to have a long-press gesture; with iOS 26 Liquid Glass, long-press gestures no longer work,
- *      so a custom gesture needs to be added again.
- * FIX: issue #152 / #535
- * [CN] 已处理：液态玻璃下不再另加手势，而是跟踪本手势与 `liquidGlassContinuousGestureRecognizer` 的状态（`CYLTabBar` 转发给
- *      `-[CYLTabBarController cyl_liquidGlassTabBarGestureRecognizerDidUpdate:]`），按位置识别 Tab 的长按、Reselect 与 DoubleTap。
- * [EN] Done: in Liquid Glass no gesture is added; the states of this gesture and of
- *      `liquidGlassContinuousGestureRecognizer` are followed instead (`CYLTabBar` forwards them to
- *      `-[CYLTabBarController cyl_liquidGlassTabBarGestureRecognizerDidUpdate:]`), and the long press, Reselect and
- *      DoubleTap of a tab are recognized by position.
-  */
-@property (nonatomic, strong) UIGestureRecognizer *liquidGlassLongGestureRecognizer;
-
-/*!
- * [EN] Returns the plus button's index in the tab bar. Note: it also repositions the plus button as a side effect.
- * [CN] 返回 PlusButton 在 TabBar 中的索引。注意：调用时会顺带重新设置 PlusButton 的位置。
- */
-- (NSUInteger)plusButtonIndex;
-
-/*!
- * [EN] Lays the tab buttons out again, as a tap on a tab does, on the next run loop and once more 0.5 s later; calls
- *      made in the meantime are merged. Liquid Glass may keep the previous layout of the tab buttons, with the plus
- *      button off its title, after a tab item's title changes or after the iOS 27.1 vertical bar. Both cases call it;
- *      call it yourself after other changes to the tab items that the tab bar doesn't see.
- * [CN] 像点击 Tab 一样重新布局 Tab 按钮：下一个 run loop 执行一次，0.5 秒后再执行一次；期间的多次调用会合并。TabBarItem 标题改变后，
- *      或离开 iOS 27.1 竖向栏后，液态玻璃可能保持 Tab 按钮原来的布局，PlusButton 偏离自己的标题。这两种情况会自动调用；TabBar
- *      无法感知的其他 TabBarItem 改动后，可手动调用。
- */
-- (void)cyl_reloadTabButtons;
-
-/*!
- * [EN] Returns YES if the registered plus button's context matches this tab bar's context.
- * [CN] 判断已注册 PlusButton 的 context 是否与当前 TabBar 的 context 一致。
- */
-- (BOOL)hasPlusButton;
-
-/*!
- * [EN] Returns YES if the plus child view controller exists and matches this tab bar's context.
- * [CN] 判断 PlusButton 子控制器是否存在且与当前 TabBar 的 context 一致。
- */
-- (BOOL)hasPlusChildViewController;
-
-/*!
- * [EN] Returns YES if the plus button is vertically centered in the tab bar.
- * [CN] 判断 PlusButton 是否在 TabBar 中垂直居中。
- */
-- (BOOL)isPlusButtonLayoutCentered;
-
-/*!
- * [EN] Returns the owning CYLTabBarController (the delegate if it is one, otherwise `cyl_tabBarController`).
- * [CN] 返回所属的 CYLTabBarController（优先取 delegate，否则取 cyl_tabBarController）。
- */
-- (CYLTabBarController *)tabBarController;
-
-@end
-
-/*!
- * [EN] The views UIKit draws a tab bar's background with, and its blur, for any `UITabBar`.
- * [CN] UIKit 绘制 TabBar 背景所用的视图及其模糊效果，适用于任意 `UITabBar`。
- */
-@interface UITabBar (CYLBarBackground)
-
-/*!
- * [EN] The view behind the items that holds the background, the blur and the shadow line (UIKit's private
- *      `_UIBarBackground`); nil if UIKit changes it.
- * [CN] item 后方承载背景、模糊与阴影线的视图（UIKit 私有的 `_UIBarBackground`）；UIKit 改变实现时为 nil。
- */
-@property (nonatomic, readonly, nullable) UIView *cyl_backgroundView;
-
-/*!
- * [EN] The image view of the shadow line on top of the bar (same as `-cyl_tabShadowImageView`).
- * [CN] TabBar 顶部阴影线的图片视图（同 `-cyl_tabShadowImageView`）。
- */
-@property (nonatomic, readonly, nullable) UIImageView *cyl_shadowImageView;
-
-/*!
- * [EN] The blur views of the background (UIKit uses one for the standard and one for the scroll edge look).
- * [CN] 背景中的模糊视图（UIKit 分别用于标准样式与滚动到边缘时的样式）。
- */
-@property (nonatomic, readonly, nullable) NSArray<UIVisualEffectView *> *cyl_effectViews;
-
-/*!
- * [EN] The blur view shown now, the last visible one of `cyl_effectViews`.
- * [CN] 当前显示的模糊视图，即 `cyl_effectViews` 中最后一个可见的。
- */
-@property (nonatomic, readonly, nullable) UIVisualEffectView *cyl_effectView;
-
-/*!
- * [EN] The background blur, e.g. `[UIBlurEffect effectWithStyle:UIBlurEffectStyleSystemThinMaterial]`. iOS 13+: written
- *      into `standardAppearance.backgroundEffect` (and `scrollEdgeAppearance`, when there is one), so it is kept across
- *      layouts and follows FlatDesign; before iOS 13 set on the blur views. nil removes the blur.
- * [CN] 背景模糊效果，例如 `[UIBlurEffect effectWithStyle:UIBlurEffectStyleSystemThinMaterial]`。iOS 13+ 写入
- *      `standardAppearance.backgroundEffect`（存在 `scrollEdgeAppearance` 时也写入），因此重新布局后不会丢失，扁平样式也随之更新；
- *      iOS 13 以前直接设置在模糊视图上。nil 去掉模糊。
- */
-@property (nonatomic, strong, nullable, getter=cyl_backgroundEffect, setter=cyl_setBackgroundEffect:) UIBlurEffect *cyl_backgroundEffect;
-
-/*!
- * [EN] A color drawn over the blur, e.g. a translucent tint: `standardAppearance.backgroundColor` (and the scroll edge
- *      one) on iOS 13+, `barTintColor` before.
- * [CN] 绘制在模糊之上的颜色，例如半透明的色调：iOS 13+ 为 `standardAppearance.backgroundColor`（以及滚动边缘的），之前为 `barTintColor`。
- */
-@property (nonatomic, strong, nullable, getter=cyl_effectForegroundColor, setter=cyl_setEffectForegroundColor:) UIColor *cyl_effectForegroundColor;
-
-@end
 
 NS_ASSUME_NONNULL_END
 
@@ -230,3 +79,5 @@ NS_ASSUME_NONNULL_END
  *      该类别需要先有这个类（放在前面时 framework 编译报 "cannot define category for undefined class 'CYLTabBar'"）。
  */
 #import "NSObject+CYLTabBarControllerExtention.h"
+
+#import "CYLSwiftInterface.h"

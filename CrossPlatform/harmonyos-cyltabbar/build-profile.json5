@@ -41,6 +41,10 @@
     {
       "name": "cyltabbar",
       "srcPath": "./cyltabbar"
+    },
+    {
+      "name": "cylanimateditem",
+      "srcPath": "./cylanimateditem"
     }
   ]
 }

@@ -293,6 +293,10 @@
       "value": "Rive tab icons (configuration file)"
     },
     {
+      "name": "cyl_l10n_9d01c837b4bc",
+      "value": "Rive タブアイコン：house.riv（数値入力 Rooms）"
+    },
+    {
       "name": "cyl_l10n_f0c792c049bc",
       "value": "回転して表示（1回）"
     },
@@ -351,6 +355,14 @@
     {
       "name": "cyl_l10n_fee4a478923f",
       "value": "タブの操作"
+    },
+    {
+      "name": "cyl_l10n_5ea7bf3d8e63",
+      "value": "タブアイコンのアニメーションをループ：オフ"
+    },
+    {
+      "name": "cyl_l10n_918aff638366",
+      "value": "タブアイコンのアニメーションをループ：オン"
     },
     {
       "name": "cyl_l10n_98559580dcc7",
@@ -439,6 +451,10 @@
     {
       "name": "cyl_l10n_4abddd944c2e",
       "value": "harmonyos-liquid-glass-tabbar：カラフルなコンテンツ上のタブカプセル、検索ボール、音楽バー。スクロールで縮小"
+    },
+    {
+      "name": "cyl_l10n_3b4e07b5542e",
+      "value": "numberInput=Rooms：選択または再タップのたびに Rooms が次の値（3、4、5、6）になります"
     },
     {
       "name": "cyl_l10n_f3f4ecf4a4a6",
@@ -615,6 +631,10 @@
     {
       "name": "cyl_l10n_758903c327de",
       "value": "このページのタブに GIF アニメを表示。もう一度タップで元に戻す"
+    },
+    {
+      "name": "cyl_l10n_56e6ecf97176",
+      "value": "ループ"
     },
     {
       "name": "cyl_l10n_c7db6d4f1a42",

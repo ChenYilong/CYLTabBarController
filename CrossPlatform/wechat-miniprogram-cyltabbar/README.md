@@ -63,12 +63,29 @@ Properties: `itemStyle` (CYLTabBarItemStyle `flat` / `liquidGlass`), `glassLensS
 `cyl_showBadgeDot`, `cyl_removeBadge`, `cyl_setThemeIdentifier`, `cyl_themeIdentifiers`, `cyl_playLottie`,
 `cyl_selectAdjacent`, `cyl_setItemStyle`, `cyl_setGlassLensStyle`, `cyl_playAll`, `cyl_setAnimationSpeed`, `cyl_setAnimationLoop`, `cyl_setHiddenIdentifiers` (property `hiddenIdentifiers`: tabs or the plus button left out of the bar, e.g. by user role), `cyl_setTabBarHidden` (property `tabBarHidden`: hides the bar of one page). Page behavior for swiping between tabs: `cyl-tabbar-miniprogram/cyl-tab-bar/cyl_swipe_behavior`.
 
+## The icon + title component: `cyl-animated-item`
+
+`src/cyl-animated-item/` is the icon + title view other repositories reuse (the counterpart of iOS and Android
+`CYLAnimatedItemView`, see [docs/Animated-Item.md](../../docs/Animated-Item.md)). It takes the same abstract nodes
+(`cyl-lottie-view`, `cyl-pag-view`, `cyl-rive-view`, `cyl-svga-view`) and draws GIF with `<image>`.
+
+Properties: `title`, `image`, `selectedImage`, `placeholderImage`, `animationUrl` or `animationData` (Lottie JSON as an
+object, each item plays its own copy), `animationType` (when the extension does not say it, e.g. `.riv.bin`), `selected`, `enabled`, `axis`, `iconSize`, `loop`, `speed`, `autoplay` (default
+true; false rests until `playAnimation()`), `restingProgress` (0...1, the frame at rest; selected shows the last),
+`gifFirstFrame` / `gifLastFrame` / `gifDuration` (GIF stills at rest and one pass in milliseconds on play; without
+stills a GIF always plays), `riveWasmPath` / `pagWasmPath` (cyl-rive / cyl-pag `wasm-path`; '' keeps their default), `accessoryImage`, `accessoryText`,
+`accessoryAccessibilityLabel`, `accessoryPlacement`, `animationTint` (one color for a Rive animation, passed to cyl-rive `tint`; '' keeps the file's colors), `titleColor`, `titleDarkColor` (the title color while dark; '' keeps `titleColor`), `userInterfaceStyle` ('system', the default, follows the system theme and needs `"darkmode": true` in app.json; 'light' or 'dark' forces it), `titleFontSize` (px; 0 keeps 14), `titleFontWeight` ('normal', 'bold', 'bolder', 'lighter' or 100–900; '' keeps the default), `titleLines` (1: one line with an ellipsis, the default; 0: no limit; n > 1: up to n lines), `titleLineHeight` (px; 0 keeps the default), `titleSpacing` (px between the icon and the title; -1 keeps 2 px vertical / 4 px horizontal; a vertical item centres each wrapped line), `dragEnabled`, `accessibilityLabel`, `embedded` (inside a control that is the accessibility element: no padding, no 44 px
+minimum, hidden from accessibility, no gestures). Methods (through
+`selectComponent`): `playAnimation()` (from progress 0; a file still loading plays when ready), `restartAnimation()`,
+`stopAnimation()`. Events: `itemtap`, `itemlongpress`, `accessorytap`, `dragstart` / `dragmove` / `dragend`, and the engine's own, forwarded with its detail: `animationready` (e.g. `duration`), `animationcomplete` (a non-looping pass ended, e.g. to count repeats), `animationloopcomplete` (a looping pass ended), `animationerror` (`message`; the item still shows its image). GIF sends none of the four.
+
 ## Layout
 
 | Path | What |
 |:---|:---|
 | `src/cyl-tab-bar/` | The component; `cyl_configuration.js` reads the configuration (no wx API, tested in Node) |
 | `src/cyl-tab-bar-item/` | The icon and title of a tab (`CYLFlatDesignTabBarItem`); its abstract nodes take the animation components |
+| `src/cyl-animated-item/` | The reusable icon + title component; `cyl_animated_item_model.js` holds its display logic (tested in Node) |
 | `src/cyl-animation-placeholder/` | The default of the abstract nodes: an empty view for a library that is not installed |
 | `test/` | Node tests of the configuration reader |
 | `example/` | The example mini program: `project.config.json`, `miniprogram/` (pages, custom tab bar, generated `shared/`), `scripts/` |

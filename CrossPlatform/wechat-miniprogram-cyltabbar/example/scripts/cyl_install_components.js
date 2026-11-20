@@ -14,8 +14,8 @@
  *      exFAT 磁盘无法保存符号链接；`--install-links` 又会从错误的目录解析嵌套的相对路径。）`--check` 在
  *      miniprogram_npm 过期时以 1 退出。
  */
-const fs = require('fs')
-const path = require('path')
+const fs = require('node:fs')
+const path = require('node:path')
 const { CYL_ANIMATIONS, CYL_EXAMPLE, cylChosenAnimation, cylAnimationComponents } = require('./cyl_animation_choice')
 
 const CYL_TARGET = path.join(CYL_EXAMPLE, 'miniprogram', 'miniprogram_npm')
@@ -45,7 +45,7 @@ function cylFiles(folder, prefix = '') {
  */
 function cylPackages(packageFolder, found = {}, extra = {}) {
   const manifest = JSON.parse(fs.readFileSync(path.join(packageFolder, 'package.json'), 'utf8'))
-  Object.entries(Object.assign({}, manifest.dependencies, extra)).forEach(([name, spec]) => {
+  Object.entries({ ...manifest.dependencies, ...extra }).forEach(([name, spec]) => {
     if (!String(spec).startsWith('file:') || found[name]) {
       return
     }
@@ -88,8 +88,8 @@ function cylMain() {
   // [CN] 资源文件（见下）不复制到 miniprogram_npm：小程序在那里读取不到，而每个 WebAssembly 的第二份副本（约 0.6 MB）
   //      会计入 2 MB 的主包。
   Object.entries(packages).forEach(([name, {folder, distFolder, assets}]) => {
-    const skipped = assets.map((file) => path.resolve(folder, file))
-    cylFiles(distFolder).filter((file) => !skipped.includes(path.join(distFolder, file))).forEach((file) => {
+    const skipped = new Set(assets.map((file) => path.resolve(folder, file)))
+    cylFiles(distFolder).filter((file) => !skipped.has(path.join(distFolder, file))).forEach((file) => {
       expected[path.join(name, file)] = path.join(distFolder, file)
     })
   })
@@ -122,7 +122,7 @@ function cylMain() {
     })
     const text = `${JSON.stringify(json, null, 2)}\n`
     // [EN] A Windows checkout (core.autocrlf) has CRLF line ends: not a change. [CN] Windows 检出（core.autocrlf）为 CRLF 行尾，不算变化。
-    if (fs.readFileSync(target, 'utf8').replace(/\r\n/g, '\n') !== text) {
+    if (fs.readFileSync(target, 'utf8').replaceAll('\r\n', '\n') !== text) {
       pageFiles[target] = text
     }
   })
@@ -158,7 +158,7 @@ function cylMain() {
   // [CN] 保留检出的行尾（Windows 上 core.autocrlf 为 CRLF），使 git 不会看到行尾变化。
   Object.entries(pageFiles).forEach(([target, text]) => {
     const crlf = fs.readFileSync(target, 'utf8').includes('\r\n')
-    fs.writeFileSync(target, crlf ? text.replace(/\n/g, '\r\n') : text)
+    fs.writeFileSync(target, crlf ? text.replaceAll('\n', '\r\n') : text)
   })
   console.log(`Animation: ${choice}. Installed ${Object.keys(packages).join(', ')} into miniprogram/miniprogram_npm (${changed.length} file(s) updated, ${stale.length} removed).`)
 }

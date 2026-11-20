@@ -96,7 +96,7 @@ object DemoPlusButtonBadge {
                 is CYLPlusButton -> control.titleLabel.text.toString().ifEmpty { "PlusButton" }
                 else -> "PlusButton"
             }
-            AlertDialog.Builder(tabBarController.activity).setTitle("Long pressed \"$name\"").setNegativeButton(android.R.string.cancel, null).show()
+            AlertDialog.Builder(tabBarController.activity).setTitle(cylDemoText("Long pressed \"%@\"", name)).setNegativeButton(android.R.string.cancel, null).show()
         }
     }
 }
@@ -116,7 +116,7 @@ object DemoPublishPlusButton : com.cyl.tabbar.CYLPlusButtonSubclassing {
             android.graphics.drawable.GradientDrawable().apply { shape = android.graphics.drawable.GradientDrawable.OVAL; setColor(android.graphics.Color.rgb(0, 122, 255)) },
             androidx.core.content.ContextCompat.getDrawable(context, android.R.drawable.ic_input_add)?.mutate()?.apply { setTint(android.graphics.Color.WHITE) },
         )).apply { setLayerInset(1, (6 * density).toInt(), (6 * density).toInt(), (6 * density).toInt(), (6 * density).toInt()) })
-        setTitle(context.getString(com.cyl.tabbar.demokit.R.string.publish))
+        setTitle(cylDemoText("Publish"))
         minimumWidth = (36 * density).toInt()
         minimumHeight = (36 * density).toInt()
     }

@@ -140,6 +140,14 @@ open class CYLPlusButton(context: Context) : FrameLayout(context) {
      */
     var cyl_plusViewControllerEverAdded: Boolean = false
         internal set
+    /**
+     * [EN] `reportsTapsToDelegate`: whether a tap on this plus button is reported through
+     *      `CYLTabBarControllerDelegate.tabBarController_didSelectControl` (true by default, as on iOS). False keeps its taps
+     *      out of that method; its own action and its page still run.
+     * [CN] 点击此 PlusButton 是否通过 `CYLTabBarControllerDelegate.tabBarController_didSelectControl` 报告（默认 true，与 iOS 相同）。
+     *      false 时不进入该方法；它自己的动作与页面仍正常执行。
+     */
+    var reportsTapsToDelegate: Boolean = true
     internal var provider: CYLPlusButtonSubclassing? = null
         set(value) {
             field = value

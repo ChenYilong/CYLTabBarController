@@ -52,7 +52,9 @@ const _riveArtboards = ['TIMER', 'SEARCH', 'CHAT', 'USER'];
 /// so its state machine input "active" plays on select, as in example_rive. Tab 的 Rive key：选中时播放状态机输入 "active"。
 Map<String, Object?> _rive(String artboard) => {
   'CYLTabBarRiveFilePath': 'icons.riv',
-  'CYLTabBarAnimationOptions': {'artboard': artboard, 'stateMachine': '${artboard}_Interactivity', 'input': 'active'},
+  // [EN] tint: 'title': icons.riv draws light strokes; the icon takes the tab's title color, normal or selected (B17).
+  // [CN] tint: 'title'：icons.riv 绘制浅色描边；图标使用 Tab 的标题颜色（普通或选中）（B17）。
+  'CYLTabBarAnimationOptions': {'artboard': artboard, 'stateMachine': '${artboard}_Interactivity', 'input': 'active', 'tint': 'title'},
   'CYLTabBarRiveSize': '{28, 28}',
 };
 
@@ -355,10 +357,10 @@ class _ExampleAppState extends State<CYLExampleApp> {
       onLoggedInChange: (loggedIn) => setState(() => _loggedIn = loggedIn),
       language: _language,
       onLanguageChange: (language) => setState(() => _language = language),
-      onRiveIconsChanged: (on) => setState(() {
-        cylRiveTabIcons = on;
-        _generation++;
-      }),
+      // Bug B20: no new generation (a new page would select the first tab again). CYLTabBar sends the changed items with
+      // setConfiguration and keeps the selected tab. 问题 B20：不创建新一代页面（新页面会重新选中第一个 Tab）；CYLTabBar 用
+      // setConfiguration 发送变化的条目并保持选中的 Tab。
+      onRiveIconsChanged: (on) => setState(() => cylRiveTabIcons = on),
     );
   }
 }
@@ -484,7 +486,8 @@ class CYLExamplePage extends StatefulWidget {
   final bool? loggedIn;
   final ValueChanged<bool> onLoggedInChange;
 
-  /// The "Rive tab icons" switch: rebuilds the tab bar with Rive or Lottie icons. 切换 Rive / Lottie 图标并重建 TabBar。
+  /// The "Rive tab icons" switch: the tab bar updates in place with Rive or Lottie icons, on the same tab.
+  /// 切换 Rive / Lottie 图标：TabBar 原地更新，停留在当前 Tab。
   final ValueChanged<bool> onRiveIconsChanged;
   final String? language;
   final ValueChanged<String?> onLanguageChange;

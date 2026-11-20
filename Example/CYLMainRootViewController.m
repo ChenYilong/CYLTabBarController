@@ -7,14 +7,7 @@
 //
 
 #import "CYLMainRootViewController.h"
-#import "MainTabBarController.h"
-#import "CYLPlusButtonSubclass.h"
-#import "CYLFlatDesignMainTabBarController.h"
 #import "CYLFlatDesignTableViewController.h"
-#import "CYLHomeViewController.h"
-#import "CYLSameCityViewController.h"
-#import "CYLMessageViewController.h"
-#import "CYLMineViewController.h"
 #import "CYLTabBarControllerDemo-Swift.h"
 #import "CYLDemoLocalization.h"
 

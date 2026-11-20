@@ -27,8 +27,8 @@ Component({
       // [EN] CYLMessageViewController: rows 0 and 1 push tab bar controllers, the others the other plus button.
       // [CN] CYLMessageViewController：第 0、1 行 push TabBarController，其余 push 另一个 PlusButton。
       const rows = cylFeedRows();
-      rows[0] = Object.assign({}, rows[0], { title: t('Push a tab bar controller of the same context (same plus button class)'), subtitle: rows[0].title });
-      rows[1] = Object.assign({}, rows[1], { title: t('Push a tab bar controller of a new context (plus button with a tappable X, issue #202)'), subtitle: t('Tap the X at the top right of the plus button: the X changes color, the plus button does not respond') });
+      rows[0] = { ...rows[0], title: t('Push a tab bar controller of the same context (same plus button class)'), subtitle: rows[0].title };
+      rows[1] = { ...rows[1], title: t('Push a tab bar controller of a new context (plus button with a tappable X, issue #202)'), subtitle: t('Tap the X at the top right of the plus button: the X changes color, the plus button does not respond') };
       this.setData({ feedRows: rows });
     },
   },

@@ -11,11 +11,15 @@
  *      `generic:cyl-lottie-view="cyl-lottie"`。动画库未安装的 Tab 显示这个空视图，它发出一次 `error`，以便应用改用图片。
  *      它具有 cyl-lottie、cyl-pag、cyl-rive、cyl-svga 的方法，但不做任何事。
  */
-const cylNothing = function () {}
+const cylNothing = function () {
+  // [EN] Intentionally empty: the placeholder has the engines' methods but does nothing. [CN] 有意为空：占位视图具有各引擎的方法，但不做任何事。
+}
 
 Component({
   properties: {
     path: { type: String, value: '' },
+    animationData: { type: Object, value: null },
+    wasmPath: { type: String, value: '' },
     loop: { type: Boolean, value: false },
     autoplay: { type: Boolean, value: true },
     restingFrame: { type: String, value: 'first' },
@@ -26,9 +30,9 @@ Component({
 
   lifetimes: {
     ready() {
-      if (this.data.path) {
+      if (this.data.path || this.data.animationData) {
         this.triggerEvent('error', {
-          message: `cyl-tab-bar: no animation component for '${this.data.path}'; install its package and set the generic (see README).`,
+          message: `cyl-tab-bar: no animation component for '${this.data.path || 'animation data'}'; install its package and set the generic (see README).`,
         })
       }
     },

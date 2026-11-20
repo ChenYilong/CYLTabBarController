@@ -1,0 +1,25 @@
+/* [EN] Fills its parent and centers the column. [CN] 填满父视图并让条目列居中。 */
+.cyl-stack {
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+/* [EN] Sized by its items, never wider than the stack: titles wrap. [CN] 大小由条目决定，不超过堆叠宽度：标题换行。 */
+.cyl-stack-column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 100%;
+}
+.cyl-stack-item {
+  max-width: 100%;
+  display: flex;
+  justify-content: center;
+}
+/* [EN] axis 'horizontal': one row, the spacing on the left of each item. [CN] axis 为 'horizontal'：一行，间距位于每个条目左侧。 */
+.cyl-stack-row {
+  flex-direction: row;
+}

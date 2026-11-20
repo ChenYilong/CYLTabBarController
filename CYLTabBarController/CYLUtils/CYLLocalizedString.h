@@ -14,6 +14,11 @@
  *      原有的导入方式不受影响。
  */
 
+// CYL-SWIFT-MIGRATION: objc-required — [EN] The functions are Swift (`@_cdecl`); these declarations stay for Objective-C callers
+//      because they carry `NS_FORMAT_ARGUMENT(1)` and `CYL_RETURNS_LOCALIZED_STRING` (format checks of `CYLLocalizedString(@"…")`
+//      with `stringWithFormat:`), which the generated Swift interface does not have (docs/Swift-Migration-Phase3.md).
+// [CN] 函数为 Swift（`@_cdecl`）；这些声明为 Objective-C 调用方保留，因为它们带有 `NS_FORMAT_ARGUMENT(1)` 与 `CYL_RETURNS_LOCALIZED_STRING`
+//      （与 `stringWithFormat:` 一起使用时的格式检查），生成的 Swift 接口没有这些属性。
 #import <UIKit/UIKit.h>
 
 /*!
@@ -81,6 +86,15 @@ FOUNDATION_EXTERN NSString *CYLLocalizedString(NSString * _Nullable key) CYL_NOE
  *      放进同一个 bundle，并从中读取，例如上面的 `UIImage` 示例。
  */
 FOUNDATION_EXTERN NSBundle *CYLResourceBundle(void) CYL_NOEXCEPT;
+
+/*!
+ * [EN] The resource bundle `<name>.bundle` of a subspec (e.g. `CYLAnimatedItem`), found where `CYLResourceBundle()` looks:
+ *      the SwiftPM module bundle, the library's own bundle (CocoaPods, frameworks), then the main bundle. nil when no
+ *      such bundle is in the app (the subspec that ships it is not part of the build).
+ * [CN] 某个子库的资源包 `<name>.bundle`（例如 `CYLAnimatedItem`），查找位置与 `CYLResourceBundle()` 相同：SwiftPM 模块 bundle、本库自身的
+ *      bundle（CocoaPods、framework）、主 bundle。App 中没有该资源包（提供它的子库未参与构建）时为 nil。
+ */
+FOUNDATION_EXTERN NSBundle * _Nullable CYLResourceBundleNamed(NSString *name) CYL_NOEXCEPT;
 
 /*!
  * [EN] Overrides the language of `CYLLocalizedString()`, e.g. @"ja" or @"zh-Hant", for an in-app language setting; nil

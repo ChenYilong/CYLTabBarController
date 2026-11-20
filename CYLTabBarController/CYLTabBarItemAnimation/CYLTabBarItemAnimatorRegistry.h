@@ -139,6 +139,93 @@ NS_ASSUME_NONNULL_BEGIN
  */
 + (NSArray<NSString *> *)fileExtensions;
 
+#pragma mark - Engine status (several engines in one app) 引擎状态（一个 App 中的多个引擎）
+
+/*!
+ * [EN] The identifiers of the registered animators, in lookup order, e.g. @[@"PAG", @"Rive", @"Lottie"]. Each engine
+ *      subspec registers itself when it is linked, so this is the list of engines in the build.
+ * [CN] 已注册 animator 的名称，按查找顺序，例如 @[@"PAG", @"Rive", @"Lottie"]。每个引擎子库被链接时自行注册，因此这就是参与构建的引擎列表。
+ */
++ (NSArray<NSString *> *)registeredIdentifiers;
+- (NSArray<NSString *> *)registeredIdentifiers;
+
+/*!
+ * [EN] YES when an animator with `identifier` (e.g. "Rive") is registered, i.e. its engine is in the build and ready.
+ * [CN] 名称为 `identifier`（例如 "Rive"）的 animator 已注册时返回 YES，即其引擎已参与构建并可用。
+ */
++ (BOOL)isAnimatorRegisteredWithIdentifier:(NSString *)identifier;
+- (BOOL)isAnimatorRegisteredWithIdentifier:(NSString *)identifier;
+
+/*!
+ * [EN] The engines this library knows (`CYLAnimationKnownTypes()`) that are not registered, i.e. not in the build; add
+ *      `CYLAnimationSubspecOfType()` to the Podfile to bring one in.
+ * [CN] 本库已知（`CYLAnimationKnownTypes()`）但未注册、即未参与构建的引擎；将 `CYLAnimationSubspecOfType()` 加入 Podfile 即可引入。
+ */
++ (NSArray<NSString *> *)missingKnownIdentifiers;
+- (NSArray<NSString *> *)missingKnownIdentifiers;
+
+/*!
+ * [EN] Conflicts between the registered animators, one sentence each: two animators of the same priority that claim the
+ *      same file extension (the one registered first wins, and the order of `+load` is not fixed, so give one of them
+ *      another `priority`). Empty when there is none.
+ * [CN] 已注册 animator 之间的冲突，每条一句：相同优先级的两个 animator 声明了相同的文件扩展名（先注册的生效，而 `+load` 的顺序不固定，
+ *      因此请为其中一个设置不同的 `priority`）。没有冲突时为空数组。
+ */
++ (NSArray<NSString *> *)conflictDescriptions;
+- (NSArray<NSString *> *)conflictDescriptions;
+
+/*!
+ * [EN] A readable report of the engines: each registered one (identifier, class, priority, file extensions), each known one
+ *      that is missing with the pod line that adds it, and the conflicts. Show it in a debug screen or a log to confirm
+ *      that every engine you added is in.
+ * [CN] 可读的引擎报告：每个已注册引擎（名称、类、优先级、文件扩展名），每个缺少的已知引擎及加入它的 pod 行，以及冲突。可显示在调试页面
+ *      或日志中，确认加入的每个引擎都已接入成功。
+ */
++ (NSString *)registrationReport;
+- (NSString *)registrationReport;
+
+/*!
+ * [EN] Logs `+registrationReport` with `NSLog`, in any build.
+ * [CN] 使用 `NSLog` 打印 `+registrationReport`，任何构建中都会打印。
+ */
++ (void)logRegistrationReport;
+
+/*!
+ * [EN] Whether debug builds (`DEBUG`) log `+registrationReport` once, when the main queue first runs after launch (after
+ *      every engine's `+load`). Default YES; set NO in `main()` or `+load` to silence it. Release builds never log it.
+ * [CN] debug 构建（`DEBUG`）是否在启动后主队列首次运行时（所有引擎的 `+load` 之后）打印一次 `+registrationReport`。默认 YES；
+ *      在 `main()` 或 `+load` 中设为 NO 即可关闭。release 构建从不打印。
+ */
+@property (class, nonatomic, assign) BOOL logsRegistrationReportOnLaunch;
+
 @end
+
+/*!
+ * [EN] Posted by a registry after an animator is registered or unregistered; `object` is the registry and `userInfo`
+ *      holds `CYLTabBarItemAnimatorRegistryIdentifierKey`. Posted on the thread that changed the registry.
+ * [CN] 注册表在注册或移除 animator 后发送；`object` 为注册表，`userInfo` 含 `CYLTabBarItemAnimatorRegistryIdentifierKey`。在修改注册表的线程上发送。
+ */
+FOUNDATION_EXTERN NSNotificationName const CYLTabBarItemAnimatorRegistryDidChangeNotification;
+
+/*!
+ * [EN] The identifier of the animator that was registered or unregistered (`NSString`).
+ * [CN] 被注册或移除的 animator 的名称（`NSString`）。
+ */
+FOUNDATION_EXTERN NSString *const CYLTabBarItemAnimatorRegistryIdentifierKey;
+
+/*!
+ * FIX: an unplayable file hid the static image when Lottie was linked
+ * [EN] NO when `URL` is a local file that is not a Lottie animation: missing, unreadable, or not a Lottie document (a JSON
+ *      object with a `layers` array, or, when `acceptsDotLottie` is YES, a `.lottie` zip archive). YES otherwise, also for a
+ *      remote URL, which can only be judged once it is downloaded. The Lottie animator takes every file no other animator
+ *      takes (`CYLTabBarItemAnimatorPriorityFallback`) and asks this first, so a picture or a broken file makes no Lottie
+ *      view and the static image stays (docs/Tab-Bar-Item-Animation.md). The answer is cached by path, size and
+ *      modification date.
+ * [CN] `URL` 是本地文件但不是 Lottie 动画时返回 NO：文件不存在、无法读取，或不是 Lottie 文档（带 `layers` 数组的 JSON 对象，`acceptsDotLottie`
+ *      为 YES 时也包括 `.lottie` zip 压缩包）。其他情况返回 YES，远程 URL 也返回 YES（下载后才能判断）。Lottie animator 接收其他 animator 都不处理的
+ *      文件（`CYLTabBarItemAnimatorPriorityFallback`），会先调用本函数，因此图片或损坏的文件不会创建 Lottie 视图，静态图片保持显示
+ *      （docs/Tab-Bar-Item-Animation.md）。结果按路径、大小与修改时间缓存。
+ */
+FOUNDATION_EXTERN BOOL CYLTabBarItemAnimationURLMayBeLottie(NSURL *_Nullable URL, BOOL acceptsDotLottie);
 
 NS_ASSUME_NONNULL_END

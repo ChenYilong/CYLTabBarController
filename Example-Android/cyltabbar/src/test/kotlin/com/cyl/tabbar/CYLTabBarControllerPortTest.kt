@@ -299,6 +299,8 @@ class CYLTabBarControllerPortTest {
         val view = CYLTabBarItemAnimationFactory.animationViewWithURL(activity, file.absolutePath, CYLSize(30f, 30f), ImageView.ScaleType.FIT_CENTER)
         assertNotNull(view)
         assertTrue(view!!.cyl_isLottieAnimationView())
+        assertEquals("merge paths are on, as on iOS", true,
+            view.javaClass.getMethod("isMergePathsEnabledForKitKatAndAbove").invoke(view))
         val player = CYLTabBarItemAnimationFactory.playerForView(view)!!
         player.animationSpeed = 1.5f
         assertEquals(1.5f, player.animationSpeed, 0.01f)
@@ -329,6 +331,14 @@ class CYLTabBarControllerPortTest {
         val player = button.cyl_tabBarItemAnimationPlayer!!
         player.play(); player.stop(); player.showLastFrame()
         assertTrue(view.duration > 0)
+        // [EN] One animation view: the component's animationView is the tab bar's (docs/Animated-Item.md, task 4).
+        // [CN] 只有一个动画视图：组件的 animationView 即 TabBar 的动画视图（docs/Animated-Item.md，任务 4）。
+        assertSame(view, button.animationView)
+        assertTrue(button.isAnimationReady)
+        assertNotNull(button.animationPlayer)
+        button.cyl_replaceTabBarItemAnimationWithURL(null, null)
+        assertNull(button.animationView)
+        assertNull(button.cyl_tabBarItemAnimationView)
     }
 
     // MARK: - Themes 主题

@@ -119,11 +119,24 @@ class TabBarCommon: NSObject {
         //      「名称.json」为 Lottie，或以后新增动画库的文件类型）；"" 表示该 Tab 保持图片。
         //      选中之前显示动画的第一帧，因此这些文件的第一帧就能看到图标。
         let animationFiles = ["tab_home.pag", "tab_health.pag", "tab_moments.pag", "tab_me.pag"]
-        return zip(tabBarItemsAttributes, animationFiles).map { attributes, fileName in
+        // [EN] `-CYLDemoAnimationTint YES`: the `tint` option, which PAG (no tint API) gets as a color layer composited over its
+        //      view: tab 1 in its title's colors ("title"), tab 2 in a fixed color with a Dark Mode one ("#1C1C1E" /
+        //      `darkTint` "#FFFFFF").
+        // [CN] `-CYLDemoAnimationTint YES`：`tint` 选项，PAG（没有着色 API）通过合成在其视图上方的颜色图层实现：第 1 个 Tab 使用标题颜色（"title"），
+        //      第 2 个 Tab 使用固定颜色及其深色模式颜色（"#1C1C1E" / `darkTint` "#FFFFFF"）。
+        let tints: [[CYLTabBarAnimationOption: String]] = UserDefaults.standard.bool(forKey: "CYLDemoAnimationTint")
+            ? [[.tint: "title"], [.tint: "#1C1C1E", .darkTint: "#FFFFFF"]] : []
+        return zip(tabBarItemsAttributes, animationFiles).enumerated().map { index, pair in
+            let (attributes, fileName) = pair
             var item = CYLTabBarItemAttributesAddingAnimationFile(attributes, fileName, nil)
+            if index < tints.count, let path = item[CYLTabBarAnimationFilePath] as? String {
+                item[CYLTabBarAnimationFilePath] = nil
+                item[CYLTabBarAnimationDarkFilePath] = nil
+                item[CYLTabBarAnimationURL] = CYLTabBarAnimationURLWithOptions(URL(fileURLWithPath: path), tints[index])
+            }
             // [EN] The generic size key, for any animation library: `CYLTabBarAnimationSize` (only for the animated tabs).
             // [CN] 通用的尺寸 key，适用于任意动画库：`CYLTabBarAnimationSize`（仅用于有动画的 Tab）。
-            if item[CYLTabBarAnimationFilePath] != nil {
+            if item[CYLTabBarAnimationFilePath] != nil || item[CYLTabBarAnimationURL] != nil {
                 item[CYLTabBarAnimationSize] = NSValue(cgSize: CGSize(width: 33, height: 33))
             }
             return item
@@ -141,9 +154,25 @@ class TabBarCommon: NSObject {
             ["\(layer)_Normal.**.Color": UIColor(white: 0.78, alpha: 1),
              "\(layer)_Active_Main.**.Color": UIColor(red: 0.15, green: 0.39, blue: 0.16, alpha: 1)]
         }
-        return zip(lottieAttributes, darkColors).map { item, colors in
-            var item = item
-            item[CYLTabBarLottieDarkColors] = colors
+        // [EN] `-CYLDemoAnimationTint YES`: the `tint` option, which Lottie 4.x gets through its official API (a
+        //      `ColorValueProvider` on "**.Color"): tab 1 in its title's colors ("title"), tab 2 in a fixed color with a Dark
+        //      Mode one ("#1C1C1E" / `darkTint` "#FFFFFF"); the other tabs keep their files' colors and `CYLTabBarLottieDarkColors`.
+        // [CN] `-CYLDemoAnimationTint YES`：`tint` 选项，Lottie 4.x 通过其官方 API（"**.Color" 上的 `ColorValueProvider`）实现：
+        //      第 1 个 Tab 使用标题颜色（"title"），第 2 个 Tab 使用固定颜色及其深色模式颜色（"#1C1C1E" / `darkTint` "#FFFFFF"）；
+        //      其余 Tab 保持文件原色与 `CYLTabBarLottieDarkColors`。
+        let tints: [[CYLTabBarAnimationOption: String]] = UserDefaults.standard.bool(forKey: "CYLDemoAnimationTint")
+            ? [[.tint: "title"], [.tint: "#1C1C1E", .darkTint: "#FFFFFF"]] : []
+        return zip(lottieAttributes, darkColors).enumerated().map { index, pair in
+            var (item, colors) = pair
+            if index < tints.count, let path = item["CYLTabBarLottieFilePath"] as? String {
+                item["CYLTabBarLottieFilePath"] = nil
+                item["CYLTabBarLottieDarkFilePath"] = nil
+                item[CYLTabBarAnimationURL] = CYLTabBarAnimationURLWithOptions(URL(fileURLWithPath: path), tints[index])
+                colors = [:]
+            }
+            if !colors.isEmpty {
+                item[CYLTabBarLottieDarkColors] = colors
+            }
             return item
         }
         #else

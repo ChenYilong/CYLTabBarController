@@ -11,88 +11,13 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /*!
- * [EN] The implementation is Swift (`Swift/UINavigationController+CYLFlatDesignTabBarPrivate.swift`, docs/Swift-Migration.md,
- *      step 48); the selectors below are unchanged. The delegate's methods are called by selector, so an implementer does
- *      not need to declare this protocol.
- * [CN] 实现位于 Swift（`Swift/UINavigationController+CYLFlatDesignTabBarPrivate.swift`，docs/Swift-Migration.md，第 48 步）；下面的
- *      selector 保持不变。代理方法按 selector 调用，实现方无需声明遵守本协议。
+ * [EN] `UINavigationControllerExtensionDelegate` and `UINavigationController (CYLFlatDesignTabBarPrivate)` are Swift since
+ *      docs/Swift-Migration.md step 117 (phase ③, group K): Objective-C sees them through the generated Swift interface.
+ * [CN] 自第 117 步（第 ③ 阶段 K 组）起 `UINavigationControllerExtensionDelegate` 与 `UINavigationController (CYLFlatDesignTabBarPrivate)` 为 Swift：
+ *      Objective-C 通过生成的 Swift 接口看到它们。
  */
-@protocol UINavigationControllerExtensionDelegate <NSObject>
 
-@required
-
-/*!
- * [EN] Called when the navigation bar height changes; `height` includes the top safe area.
- * [CN] 导航栏高度变化时回调，height 包含顶部安全区。
- */
-- (void)cylflatdesign_navigationController:(UINavigationController *)navigationController
-   navigationBarDidChangeHeight:(CGFloat)height;
-
-/*!
- * [EN] Called when a push/pop transition from `fromVC` to `toVC` begins.
- * [CN] 从 fromVC 到 toVC 的 Push/Pop 转场开始时回调。
- */
-- (void)cylflatdesign_navigationController:(UINavigationController *)navigationController
-         didBeginTransitionFrom:(nullable UIViewController *)fromVC
-                             to:(nullable UIViewController *)toVC
-                      operation:(UINavigationControllerOperation)operation;
-
-/*!
- * [EN] Called as an interactive pop progresses, with its completion percentage.
- * [CN] 交互式返回进行中回调，携带完成百分比。
- */
-- (void)cylflatdesign_navigationController:(UINavigationController *)navigationController
-       didUpdateInteractiveFrom:(nullable UIViewController *)fromVC
-                             to:(nullable UIViewController *)toVC
-                percentComplete:(CGFloat)percentComplete;
-
-/*!
- * [EN] Called as an interactive pop progresses, with the driving gesture recognizer.
- * [CN] 交互式返回进行中回调，携带驱动转场的手势识别器。
- */
-- (void)cylflatdesign_navigationController:(UINavigationController *)navigationController
-       didUpdateInteractiveFrom:(nullable UIViewController *)fromVC
-                             to:(nullable UIViewController *)toVC
-           popGestureRecognizer:(UIGestureRecognizer *)popGestureRecognizer;
-
-/*!
- * [EN] Called when a transition is about to end; `cancelled` tells whether it was cancelled.
- * [CN] 转场即将结束时回调，cancelled 表示是否被取消。
- */
-- (void)cylflatdesign_navigationController:(UINavigationController *)navigationController
-          willEndTransitionFrom:(nullable UIViewController *)fromVC
-                             to:(nullable UIViewController *)toVC
-                      operation:(UINavigationControllerOperation)operation
-                      cancelled:(BOOL)cancelled;
-
-/*!
- * [EN] Called after a transition ends; `cancelled` tells whether it was cancelled.
- * [CN] 转场结束后回调，cancelled 表示是否被取消。
- */
-- (void)cylflatdesign_navigationController:(UINavigationController *)navigationController
-           didEndTransitionFrom:(nullable UIViewController *)fromVC
-                             to:(nullable UIViewController *)toVC
-                      operation:(UINavigationControllerOperation)operation
-                      cancelled:(BOOL)cancelled;
-
-@end
-
-@interface UINavigationController (CYLFlatDesignTabBarPrivate)
-
-/**
- [CN] 当有自定义全屏返回手势时，需要设置该值（比如一些第三方实现的全屏返回手势）
- 用系统自带pop返回手势，则不用管
- [EN] Set this value when there is a custom full-screen back gesture (e.g. one implemented by a third party).
-      If you use the system's built-in pop back gesture, you can ignore it.
- */
-@property (nonatomic, strong, nullable, getter=cylflatdesign_customPopGestureRecognizer, setter=cylflatdesign_setCustomPopGestureRecognizer:) UIGestureRecognizer *cylflatdesign_customPopGestureRecognizer;
-
-/*!
- * [EN] Swizzles the navigation controller's pop methods (once) so the flat-design tab bar can follow push/pop transitions.
- * [CN] （只执行一次）Hook 导航控制器的 Pop 系列方法，使扁平化 TabBar 能跟随 Push/Pop 转场。
- */
-+ (void)cyl_navigationBarActionHook;
-
-@end
 
 NS_ASSUME_NONNULL_END
+
+#import "CYLSwiftInterface.h"

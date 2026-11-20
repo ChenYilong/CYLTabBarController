@@ -1,3 +1,6 @@
 *.h linguist-detectable=false
 *.m linguist-detectable=false
 .agents/skills/** linguist-vendored
+# [EN] Shell hooks and scripts keep LF on Windows checkouts (sh cannot run CRLF scripts).
+.githooks/* text eol=lf
+*.sh text eol=lf

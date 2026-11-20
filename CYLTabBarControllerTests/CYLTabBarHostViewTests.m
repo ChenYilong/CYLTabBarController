@@ -780,4 +780,37 @@ static NSString *const CYLHostTestsLoggedInKey = @"CYLTabBarControllerLoggedIn";
     XCTAssertNotNil(ancestor, @"the badge sits on a visible flat button, not on the hidden system tab button");
 }
 
+/// [EN] A tap as UIKit runs it (the delegate's should-select, then the selection, then didSelectViewController): the callback
+///      reports the tapped tab, not the one selected before (CYLSearchViewController's React Native report, 2026-11-19).
+/// [CN] 按 UIKit 的顺序模拟点击（代理的 should-select、修改选中、didSelectViewController）：回调上报被点击的 Tab，而不是之前选中的 Tab
+///      （CYLSearchViewController 的 React Native 报告，2026-11-19）。
+- (void)testATapAsUIKitRunsItReportsTheTappedTab {
+    CYLTabBarHostView *hostView = [self hostViewInWindow];
+    NSMutableArray<NSNumber *> *reported = [NSMutableArray array];
+    hostView.didSelectTab = ^(NSInteger index, NSString *identifier) {
+        [reported addObject:@(index)];
+    };
+    hostView.configuration = @{ CYLTabBarControllerTabBarItemsAttributes : @[ @{ CYLTabBarItemTitle : @"A", CYLTabBarItemIdentifier : @"a" },
+                                                                               @{ CYLTabBarItemTitle : @"B", CYLTabBarItemIdentifier : @"b" } ] };
+    [self waitForTabBarControllerOf:hostView];
+    CYLTabBarController *tabBarController = hostView.tabBarController;
+    XCTAssertEqual(tabBarController.selectedIndex, 0u);
+    [tabBarController.tabBar layoutIfNeeded];
+    UIViewController *second = tabBarController.viewControllers[1];
+    id<UITabBarControllerDelegate> delegate = tabBarController.delegate;
+    XCTAssertNotNil(delegate);
+    [reported removeAllObjects];
+    if ([delegate tabBarController:tabBarController shouldSelectViewController:second]) {
+        tabBarController.selectedViewController = second;
+        if ([delegate respondsToSelector:@selector(tabBarController:didSelectViewController:)]) {
+            [delegate tabBarController:tabBarController didSelectViewController:second];
+        }
+    }
+    [[NSRunLoop mainRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.2]];
+    XCTAssertEqual(tabBarController.selectedIndex, 1u);
+    XCTAssertTrue(reported.count > 0, @"the tap is reported");
+    XCTAssertEqualObjects(reported.lastObject, @1, @"reported %@: the tapped tab, not the old one", reported);
+    XCTAssertFalse([reported containsObject:@0], @"never the tab selected before: %@", reported);
+}
+
 @end

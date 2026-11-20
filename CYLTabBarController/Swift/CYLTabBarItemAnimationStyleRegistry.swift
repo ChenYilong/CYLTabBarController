@@ -6,6 +6,9 @@
 //
 
 import UIKit
+#if canImport(CYLAnimatedItem)
+import CYLAnimatedItem
+#endif
 
 // [EN] Core's style registry of tab icon animations (dark URLs, dark colors and colors of every appearance, #442, #216) and the
 //      animation URL of a tab's attributes, translated from Objective-C (CYLConstants.m, UIControl+CYLTabBarItemAnimation.m;

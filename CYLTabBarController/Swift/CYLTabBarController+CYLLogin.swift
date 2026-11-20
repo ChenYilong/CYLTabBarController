@@ -47,10 +47,15 @@ extension CYLTabBarController {
         return settings
     }
 
+    @objc(cyl_loggedIn)
+    open var cyl_loggedIn: Bool {
+        @objc(cyl_loggedIn) get { cylLoggedIn() }
+        @objc(cyl_setLoggedIn:) set { cylSetLoggedIn(newValue) }
+    }
+
     /**
      * [EN] The cached login state, or the app's own when it set a state provider. [CN] 缓存的登录状态；设置了状态提供者时为 App 自己的状态。
      */
-    @objc(cyl_loggedIn)
     func cylLoggedIn() -> Bool {
         if let provider = cyl_loginSettings.stateProvider {
             return provider()
@@ -62,7 +67,6 @@ extension CYLTabBarController {
      * [EN] Caches the login state, leaves a tab that needs login on logout, and posts the state change notification.
      * [CN] 缓存登录状态；退出登录时离开需要登录的 Tab；并发送状态变化通知。
      */
-    @objc(cyl_setLoggedIn:)
     func cylSetLoggedIn(_ loggedIn: Bool) {
         UserDefaults.standard.set(loggedIn, forKey: CYLLoginKeys.loggedInDefaultsKey)
         if !loggedIn {
@@ -72,43 +76,35 @@ extension CYLTabBarController {
     }
 
     @objc(cyl_loginStateProvider)
-    func cylLoginStateProvider() -> (@convention(block) () -> Bool)? {
-        cyl_loginSettings.stateProvider
-    }
-
-    @objc(cyl_setLoginStateProvider:)
-    func cylSetLoginStateProvider(_ provider: (@convention(block) () -> Bool)?) {
-        cyl_loginSettings.stateProvider = provider
+    open var cyl_loginStateProvider: (() -> Bool)? {
+        @objc(cyl_loginStateProvider) get { cyl_loginSettings.stateProvider }
+        @objc(cyl_setLoginStateProvider:) set { cyl_loginSettings.stateProvider = newValue }
     }
 
     @objc(cyl_loginRequiredTabBarItemIdentifiers)
+    open var cyl_loginRequiredTabBarItemIdentifiers: [String]? {
+        @objc(cyl_loginRequiredTabBarItemIdentifiers) get { cylLoginRequiredTabBarItemIdentifiers() }
+        @objc(cyl_setLoginRequiredTabBarItemIdentifiers:) set { cylSetLoginRequiredTabBarItemIdentifiers(newValue) }
+    }
+
     func cylLoginRequiredTabBarItemIdentifiers() -> [String]? {
         cyl_loginSettings.requiredIdentifiers
     }
 
-    @objc(cyl_setLoginRequiredTabBarItemIdentifiers:)
     func cylSetLoginRequiredTabBarItemIdentifiers(_ identifiers: [String]?) {
         cyl_loginSettings.requiredIdentifiers = identifiers
     }
 
     @objc(cyl_loginRequiredBlock)
-    func cylLoginRequiredBlock() -> (@convention(block) (CYLTabBarController, UIViewController) -> Bool)? {
-        cyl_loginSettings.requiredBlock
-    }
-
-    @objc(cyl_setLoginRequiredBlock:)
-    func cylSetLoginRequiredBlock(_ block: (@convention(block) (CYLTabBarController, UIViewController) -> Bool)?) {
-        cyl_loginSettings.requiredBlock = block
+    open var cyl_loginRequiredBlock: ((CYLTabBarController, UIViewController) -> Bool)? {
+        @objc(cyl_loginRequiredBlock) get { cyl_loginSettings.requiredBlock }
+        @objc(cyl_setLoginRequiredBlock:) set { cyl_loginSettings.requiredBlock = newValue }
     }
 
     @objc(cyl_loginHandler)
-    func cylLoginHandler() -> (@convention(block) (CYLTabBarController, UIViewController, @escaping CYLTabBarLoginCompletion) -> Void)? {
-        cyl_loginSettings.handler
-    }
-
-    @objc(cyl_setLoginHandler:)
-    func cylSetLoginHandler(_ handler: (@convention(block) (CYLTabBarController, UIViewController, @escaping CYLTabBarLoginCompletion) -> Void)?) {
-        cyl_loginSettings.handler = handler
+    open var cyl_loginHandler: ((CYLTabBarController, UIViewController, @escaping CYLTabBarLoginCompletion) -> Void)? {
+        @objc(cyl_loginHandler) get { cyl_loginSettings.handler }
+        @objc(cyl_setLoginHandler:) set { cyl_loginSettings.handler = newValue }
     }
 
     /**
@@ -116,12 +112,12 @@ extension CYLTabBarController {
      * [CN] 选中 `viewController` 是否需要登录：依次取 required block、代理、标识列表。
      */
     @objc(cyl_isLoginRequiredForViewController:)
-    func cylIsLoginRequired(for viewController: UIViewController?) -> Bool {
-        guard let viewController, !viewController.cyl_isPlaceholder else { return false }
+    open func cyl_isLoginRequired(for viewController: UIViewController) -> Bool {
+        guard !viewController.cyl_isPlaceholder else { return false }
         if let block = cyl_loginSettings.requiredBlock {
             return block(self, viewController)
         }
-        let delegate = (self as UITabBarController).delegate as? CYLTabBarControllerDelegate
+        let delegate = cylDelegate
         if let required = delegate?.tabBarController?(self, requiresLoginToSelect: viewController) {
             return required
         }
@@ -137,8 +133,8 @@ extension CYLTabBarController {
      *      （`-tabBarController:shouldSelectViewController:`，然后是 Tab 按钮的 action）：每个 runloop 只发起一次登录。
      */
     @objc(cyl_interceptLoginIfNeededForViewController:)
-    func cylInterceptLoginIfNeeded(for viewController: UIViewController?) -> Bool {
-        guard let viewController, cylIsLoginRequired(for: viewController), !cylLoggedIn() else { return false }
+    open func cyl_interceptLoginIfNeeded(for viewController: UIViewController) -> Bool {
+        guard cyl_isLoginRequired(for: viewController), !cylLoggedIn() else { return false }
         let settings = cyl_loginSettings
         if settings.interceptedViewController === viewController {
             return true
@@ -176,7 +172,7 @@ extension CYLTabBarController {
             handler(self, viewController, completion)
             return
         }
-        let delegate = (self as UITabBarController).delegate as? CYLTabBarControllerDelegate
+        let delegate = cylDelegate
         if let present = delegate?.tabBarController?(self, presentLoginFor: viewController, completion: completion) {
             return present
         }
@@ -190,8 +186,8 @@ extension CYLTabBarController {
      * [EN] Logged out on a tab that needs login: select the first tab that does not. [CN] 在需要登录的 Tab 上退出登录：切换到第一个不需要登录的 Tab。
      */
     private func leaveTabRequiringLoginIfNeeded() {
-        guard let selected = selectedViewController, cylIsLoginRequired(for: selected) else { return }
-        if let index = (viewControllers ?? []).firstIndex(where: { !$0.cyl_isPlaceholder && !cylIsLoginRequired(for: $0) }) {
+        guard let selected = selectedViewController, cyl_isLoginRequired(for: selected) else { return }
+        if let index = (viewControllers ?? []).firstIndex(where: { !$0.cyl_isPlaceholder && !cyl_isLoginRequired(for: $0) }) {
             selectedIndex = index
         }
     }

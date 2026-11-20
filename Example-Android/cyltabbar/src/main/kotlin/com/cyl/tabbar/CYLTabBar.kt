@@ -28,9 +28,8 @@ import kotlin.math.abs
  *      TabBar 的手势（点击、双击、长按、滑动）。
  */
 @android.annotation.SuppressLint("ViewConstructor") // [EN] Made by the tab bar for an item, never inflated. [CN] 由 TabBar 为 item 创建，不从 XML 加载。
-class CYLTabBarItemButton(context: Context, val item: CYLTabBarItem, val index: Int) : FrameLayout(context) {
+class CYLTabBarItemButton(context: Context, val item: CYLTabBarItem, val index: Int) : com.cyl.animateditem.CYLAnimatedItemView(context) {
 
-    val iconView = ImageView(context).apply { scaleType = ImageView.ScaleType.CENTER_INSIDE }
     /**
      * [EN] The view of `setTabBarItemIconViewProvider`, laid out in place of the icon. [CN] `setTabBarItemIconViewProvider` 提供的视图，代替图标布局。
      */
@@ -43,10 +42,14 @@ class CYLTabBarItemButton(context: Context, val item: CYLTabBarItem, val index: 
     internal fun cyl_applyIconViewProvider() {
         cyl_customIconView?.let { removeView(it) }
         cyl_customIconView = cyl_iconViewProvider?.invoke(isSelected)?.also { custom -> (custom.parent as? ViewGroup)?.removeView(custom); addView(custom) }
-        iconView.visibility = if (cyl_customIconView == null && !cyl_isTabBarItemAnimationReady()) View.VISIBLE else View.INVISIBLE
+        val animationShows = cyl_isTabBarItemAnimationReady() && !CYLTabBarItemAnimationFailure.isLoading(cyl_tabBarItemAnimationView)
+        iconView.visibility = if (cyl_customIconView == null && !animationShows) View.VISIBLE else View.INVISIBLE
         requestLayout()
     }
-    val titleLabel = TextView(context).apply { gravity = Gravity.CENTER; maxLines = 1; textSize = 10f }
+    /**
+     * [EN] The title, the animated item component's `titleView`. [CN] 标题，即动效组件的 `titleView`。
+     */
+    val titleLabel: TextView get() = titleView
 
     /**
      * [EN] `-[UIControl cyl_coverVisiableTabImageViewOrTabButton:YES ...]`: a view covering the whole tab button (icon,
@@ -110,12 +113,74 @@ class CYLTabBarItemButton(context: Context, val item: CYLTabBarItem, val index: 
     }
 
     init {
-        addView(iconView, LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, Gravity.CENTER_HORIZONTAL))
-        addView(titleLabel, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT, Gravity.BOTTOM))
+        // [EN] The component adds the icon and the title; the tab keeps its own look (10 sp titles, icons not scaled up)
+        //      and layout. [CN] 组件已添加图标与标题；Tab 保留自己的外观（10 sp 标题、图标不放大）与布局。
+        iconView.scaleType = ImageView.ScaleType.CENTER_INSIDE
+        iconView.layoutParams = LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, Gravity.CENTER_HORIZONTAL)
+        titleLabel.layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT, Gravity.BOTTOM)
+        titleLabel.ellipsize = null
+        titleLabel.textSize = 10f
+        // [EN] A disabled tab is not dimmed, as before. [CN] 不可用的 Tab 不变暗，与之前一致。
+        disabledAlpha = 1f
         isClickable = true
         isFocusable = true
         contentDescription = item.accessibilityLabel ?: item.title
         item.cyl_visiableTabButton = this
+    }
+
+    /**
+     * [EN] The tab's icon follows `apply(selected, tabBar)` (images, tint, the placeholder), not the component's
+     *      `image` / `selectedImage`. [CN] Tab 的图标由 `apply(selected, tabBar)` 设置（图片、着色、占位图），而不是组件的 `image` / `selectedImage`。
+     */
+    override fun updateIcon() { /* [EN] See apply. [CN] 见 apply。 */ }
+
+    /**
+     * [EN] The tab bar makes the tab's animation view (`cyl_addTabBarItemAnimationWithURL`) and hands it to the component:
+     *      `animationView` is `cyl_tabBarItemAnimationView` (docs/Animated-Item.md, task 4). Called with null when the
+     *      animation is removed.
+     * [CN] TabBar 创建 Tab 的动画视图（`cyl_addTabBarItemAnimationWithURL`）并交给组件：`animationView` 即
+     *      `cyl_tabBarItemAnimationView`（docs/Animated-Item.md，任务 4）。移除动画时传 null。
+     */
+    internal fun cyl_setTabBarItemAnimationView(view: View?) {
+        animationView = view
+    }
+
+    /**
+     * [EN] The animation's load and failure go to the tab bar's handlers (the static image, else the placeholder), which
+     *      also remove the view from the tab bar's state; the component's own handling would leave that state behind.
+     * [CN] 动画的加载与失败交给 TabBar 的处理（静态图片，没有时为占位图），它也会从 TabBar 的状态中移除该视图；组件自身的处理会遗留该状态。
+     */
+    override fun cyl_animationViewDidLoad(animationView: View) {
+        CYLTabBarItemAnimationFailure.loadedFallbackHandler?.invoke(this)
+    }
+
+    override fun cyl_animationViewDidFail(animationView: View) {
+        CYLTabBarItemAnimationFailure.fallbackHandler?.invoke(this)
+    }
+
+    /**
+     * [EN] The tab's label: its accessibility label, else its title. [CN] Tab 的朗读文本：无障碍标签，否则为标题。
+     */
+    override fun accessibilityText(): CharSequence = item.accessibilityLabel ?: titleLabel.text ?: ""
+
+    /**
+     * [EN] Measured as a frame: every child at its own layout params (the tab lays them out in `onLayout`).
+     * [CN] 按帧布局测量：每个子视图按自己的布局参数测量（Tab 在 `onLayout` 中布局）。
+     */
+    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+        var maxWidth = 0
+        var maxHeight = 0
+        for (index in 0 until childCount) {
+            val child = getChildAt(index)
+            if (child.visibility == View.GONE) continue
+            measureChildWithMargins(child, widthMeasureSpec, 0, heightMeasureSpec, 0)
+            maxWidth = maxOf(maxWidth, child.measuredWidth)
+            maxHeight = maxOf(maxHeight, child.measuredHeight)
+        }
+        setMeasuredDimension(
+            resolveSize(maxOf(maxWidth + paddingLeft + paddingRight, suggestedMinimumWidth), widthMeasureSpec),
+            resolveSize(maxOf(maxHeight + paddingTop + paddingBottom, suggestedMinimumHeight), heightMeasureSpec),
+        )
     }
 
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
@@ -242,14 +307,38 @@ class CYLTabBarItemButton(context: Context, val item: CYLTabBarItem, val index: 
     /**
      * [EN] Applies the item's title, images and colors for the current selection. [CN] 按当前选中状态应用标题、图片与颜色。
      */
+    /**
+     * [EN] A tab with only an animation file that cannot play (no library, an unreadable file) shows the animated item
+     *      component's placeholder, sized for a tab icon, instead of an empty icon; with a static image, that image stays the fallback.
+     * [CN] 只有动画文件且无法播放（没有动画库、文件无法读取）的 Tab 显示动效组件的占位图（适合 Tab 图标的尺寸），而不是空图标；有静态图片时仍以该图片兜底。
+     */
+    internal fun cyl_animationPlaceholder(): android.graphics.drawable.Drawable? {
+        val animationShows = cyl_isTabBarItemAnimationReady() && !CYLTabBarItemAnimationFailure.isLoading(cyl_tabBarItemAnimationView)
+        if (item.image != null || item.selectedImage != null || animationShows) return null
+        if (CYLTabBarItemAnimationURLOfAttributes(item.attributes).isNullOrBlank()) return null
+        return com.cyl.animateditem.CYLAnimatedItemView.defaultPlaceholderImage(context)?.mutate()
+    }
+
+    /**
+     * [EN] Debug builds: a tab whose animation type has no library in the app says which dependency to add (once per type).
+     * [CN] debug 构建：动画类型的动画库不在 App 中的 Tab 提示需要加入的依赖（每种类型一次）。
+     */
+    private fun cyl_warnMissingAnimationEngine() {
+        val url = CYLTabBarItemAnimationURLOfAttributes(item.attributes) ?: return
+        com.cyl.animateditem.CYLAnimationEngines.warnMissingEngine(context, item.attributes, url)
+    }
+
     fun apply(selected: Boolean, tabBar: CYLTabBar) {
         val selectionChanged = isSelected != selected
         isSelected = selected
         if (selectionChanged && cyl_iconViewProvider != null) cyl_applyIconViewProvider()
         titleLabel.text = if (selected) item.cyl_selectedTitle ?: item.title ?: "" else item.title ?: ""
-        iconView.setImageDrawable((if (selected) item.selectedImage ?: item.image else item.image)?.mutate())
+        iconView.setImageDrawable((if (selected) item.selectedImage ?: item.image else item.image)?.mutate() ?: cyl_animationPlaceholder())
+        cyl_warnMissingAnimationEngine()
         val controller = tabBar.tabBarController
         titleLabel.setTextColor(titleColor(selected, tabBar))
+        // [EN] The tint of an animation with the `tint` option "title" (bug B12). [CN] `tint` 选项为 "title" 的动画的着色（问题 B12）。
+        cyl_tabBarItemAnimationPlayer?.setTintColor(titleColor(selected, tabBar), selected)
         val font = if (selected) item.cyl_selectedTitleFont ?: controller?.cyl_tabBarItemSelectedTitleFont ?: item.cyl_titleFont ?: controller?.cyl_tabBarItemTitleFont
                    else item.cyl_titleFont ?: controller?.cyl_tabBarItemTitleFont
         if (font != null) {

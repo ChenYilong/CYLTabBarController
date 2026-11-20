@@ -43,7 +43,7 @@ object DemoPlaybackControls {
         val current = controller.tabBarItemAnimationSpeed.takeIf { it > 0 && it.isFinite() } ?: 1f
 
         val playAll = Button(context).apply {
-            text = "Play all"
+            text = cylDemoText("Play all")
             isAllCaps = false
             setOnClickListener { controller.cyl_playAllTabBarItemAnimations() }
         }
@@ -62,7 +62,7 @@ object DemoPlaybackControls {
             contentDescription = "Speed"
         }
         fun update(speed: Float) {
-            speedLabel.text = "Speed: ${speedText(speed)}"
+            speedLabel.text = cylDemoText("Speed: %@", speedText(speed))
             ViewCompat.setStateDescription(slider, speedDescription(speed))
         }
         update(current)
@@ -76,7 +76,7 @@ object DemoPlaybackControls {
             override fun onStopTrackingTouch(seekBar: SeekBar) { /* [EN] Only the value matters. [CN] 只关心数值。 */ }
         })
         val loop = SwitchCompat(context).apply {
-            text = "Loop"
+            text = cylDemoText("Loop")
             textSize = 15f
             setTextColor(textColor)
             isChecked = controller.tabBarItemAnimationLoops

@@ -12,6 +12,7 @@
 #import "../CYLTabBarController/CYLTabBarItemAnimation/CYLTabBarItemAnimatorRegistry.h"
 #import "../CYLTabBarController/CYLTabBarItemAnimation/CYLTabBarItemAnimationPlayableView.h"
 #import <ImageIO/ImageIO.h>
+#import "CYLTabBarControllerTests-Swift.h"
 
 /// [EN] A tab bar theme with a background color only. [CN] 只有背景色的 TabBar 主题。
 @interface CYLTestTabBarTheme : NSObject <CYLTabBarTheme>
@@ -626,19 +627,9 @@ FOUNDATION_EXTERN void CYLTabBarItemAnimationRegisterColors(NSURL *URL, NSDictio
 - (nullable NSDictionary<NSString *, UIColor *> *)colorsForURL:(nullable NSURL *)URL;
 @end
 
-/// [EN] A plus button as an app makes it: its stand-in comes from `+plusButton`. [CN] App 的 PlusButton：其替身来自 `+plusButton`。
-@interface CYLTestPlusButton : CYLPlusButton <CYLPlusButtonSubclassing>
-@end
-
 /// [EN] Implemented in `CYLPlusButton.m`. [CN] 在 `CYLPlusButton.m` 中实现。
 @interface CYLPlusButton (CYLThemeTestsPrivate)
 - (void)cyl_setBackgroundImageDidChangeHandler:(nullable void (^)(void))handler;
-@end
-
-@implementation CYLTestPlusButton
-+ (id)plusButton {
-    return [self new];
-}
 @end
 
 /*!
@@ -698,6 +689,46 @@ FOUNDATION_EXTERN void CYLTabBarItemAnimationRegisterColors(NSURL *URL, NSDictio
     XCTAssertEqual(view.image.CGImage, lastFrame.CGImage);
 }
 
+/// [EN] FlatDesign: a GIF given as a tab image rests on its first frame and plays when its tab is selected, as on the classic
+///      tab bar (915bddbd, docs/Animated-Item.md, "every animated tab icon rests until it is played", part 2).
+/// [CN] 扁平样式：作为 Tab 图片传入的 GIF 停在第一帧，选中该 Tab 时播放，与经典 TabBar 相同（915bddbd，docs/Animated-Item.md，
+///      「每个动效 Tab 图标在播放前保持静止」第 2 部分）。
+- (void)testFlatDesignAnimatedTabImageRestsUntilItsTabIsSelected {
+    if (!NSClassFromString(@"CYLFlatDesignTabBar")) {
+        XCTSkip(@"FlatDesign is not compiled into this target");
+    }
+    UIImage *animated = [UIImage cyl_animatedImageWithGIFData:[NSData dataWithContentsOfURL:[self gifFileURL]]];
+    UIImage *icon = CYLTestImage(24, UIColor.grayColor);
+    CYLTabBarController *tabBarController = [CYLTabBarController tabBarControllerWithConfiguration:@{
+        CYLTabBarControllerContext : [NSUUID UUID].UUIDString,
+        CYLTabBarControllerStyleType : @"flatDesign",
+        CYLTabBarControllerTabBarItemsAttributes : @[
+            @{ CYLTabBarItemIdentifier : @"a", CYLTabBarItemTitle : @"A", CYLTabBarItemImage : icon },
+            @{ CYLTabBarItemIdentifier : @"b", CYLTabBarItemTitle : @"B", CYLTabBarItemImage : animated },
+        ],
+        CYLTabBarControllerPageResolver : ^UIViewController *(NSString *pageIdentifier, NSDictionary *attributes) {
+            return [[UIViewController alloc] init];
+        },
+    }];
+    UIWindow *window = [[UIWindow alloc] initWithFrame:CGRectMake(0, 0, 390, 844)];
+    window.rootViewController = tabBarController;
+    window.hidden = NO;
+    [tabBarController.view layoutIfNeeded];
+    [[NSRunLoop mainRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.2]];
+    UIControl *button = tabBarController.viewControllers[1].cyl_tabButton;
+    UIImageView *imageView = [button respondsToSelector:NSSelectorFromString(@"imageView")] ? [button valueForKey:@"imageView"] : nil;
+    XCTAssertNotNil(imageView, @"the FlatDesign button of tab B (%@)", button);
+    XCTAssertLessThan(imageView.image.images.count, 2U, @"at rest: one frame, not the animated image");
+    XCTAssertFalse(imageView.isAnimating, @"at rest: not playing");
+    [tabBarController setSelectedIndex:1];
+    [tabBarController.view layoutIfNeeded];
+    [[NSRunLoop mainRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.1]];
+    BOOL plays = imageView.isAnimating || imageView.image.images.count > 1;
+    XCTAssertTrue(plays, @"selected: the frames play (animating %d, frames %lu, animationImages %lu)", imageView.isAnimating,
+                  (unsigned long)imageView.image.images.count, (unsigned long)imageView.animationImages.count);
+    window.hidden = YES;
+}
+
 - (void)testTheGIFKeysAreAliasesOfTheGenericKeys {
     NSURL *URL = [self gifFileURL];
     XCTAssertEqualObjects(CYLTabBarItemAnimationURLFromAttributes(@{ CYLTabBarGIFURL : URL }, NULL), URL);
@@ -752,6 +783,163 @@ FOUNDATION_EXTERN void CYLTabBarItemAnimationRegisterColors(NSURL *URL, NSDictio
     NSURL *URL = [NSURL fileURLWithPath:[NSTemporaryDirectory() stringByAppendingPathComponent:@"cyl_missing.gif"]];
     [[NSFileManager defaultManager] removeItemAtURL:URL error:NULL];
     XCTAssertNil([[CYLTabBarItemAnimatorRegistry animatorForURL:URL] animationViewWithURL:URL size:CGSizeMake(24, 24) contentMode:UIViewContentModeScaleAspectFit]);
+}
+
+/// [EN] docs/Animated-Item.md TODO 4, second step: a FlatDesign tab button's component animation is the tab's own:
+///      `animationView` and `animationReady` answer with the tab bar's animation view, and `reloadAnimation` /
+///      `stopAnimation` act on it instead of making a second view.
+/// [CN] docs/Animated-Item.md TODO 4 第二步：扁平样式 Tab 按钮的组件动画就是 Tab 自己的动画：`animationView` 与 `animationReady` 返回 TabBar 的
+///      动画视图，`reloadAnimation` / `stopAnimation` 作用于它，而不是创建第二个视图。
+/// [EN] Badges on FlatDesign tabs drawn by CYLAnimatedItemView: a tab with a GIF animation and a tab with a static icon both
+///      keep a visible badge once the animation has loaded (the component hides its image view then), near the icon's
+///      top-right (docs/Animated-Item.md, badges on every platform, 2026-11-18).
+/// [CN] 由 CYLAnimatedItemView 绘制的扁平样式 Tab 上的角标：带 GIF 动画的 Tab 与静态图标的 Tab，在动画加载后（此时组件会隐藏图片视图）
+///      角标都保持可见，并位于图标右上角附近（docs/Animated-Item.md，各端角标，2026-11-18）。
+- (void)testFlatDesignTabBadgesStayVisibleWithAnimatedIcons {
+    // [EN] Checked after the tab bar exists (below): in the distribution framework the Swift button class is known to the
+    //      Objective-C runtime only after its first use, so checking here skipped the test every time.
+    // [CN] 在 TabBar 创建之后检查（见下方）：在分发用 framework 中，Swift 按钮类要首次使用后 Objective-C 运行时才认识，在这里检查会每次都跳过测试。
+    if (!NSClassFromString(@"CYLFlatDesignTabBar")) {
+        XCTSkip(@"FlatDesign is not compiled into this target");
+    }
+    NSURL *URL = [self gifFileURL];
+    UIImage *icon = CYLTestImage(24, UIColor.grayColor);
+    NSMutableArray<UIViewController *> *pages = [NSMutableArray array];
+    CYLTabBarController *tabBarController = [CYLTabBarController tabBarControllerWithConfiguration:@{
+        CYLTabBarControllerContext : [NSUUID UUID].UUIDString,
+        CYLTabBarControllerStyleType : @"flatDesign",
+        CYLTabBarControllerTabBarItemsAttributes : @[
+            @{ CYLTabBarItemIdentifier : @"a", CYLTabBarItemTitle : @"A", CYLTabBarItemImage : icon,
+               CYLTabBarAnimationURL : URL, CYLTabBarAnimationSize : [NSValue valueWithCGSize:CGSizeMake(24, 24)] },
+            @{ CYLTabBarItemIdentifier : @"b", CYLTabBarItemTitle : @"B", CYLTabBarItemImage : icon,
+               CYLTabBarAnimationURL : URL, CYLTabBarAnimationSize : [NSValue valueWithCGSize:CGSizeMake(24, 24)] },
+            @{ CYLTabBarItemIdentifier : @"c", CYLTabBarItemTitle : @"C", CYLTabBarItemImage : icon },
+        ],
+        CYLTabBarControllerPageResolver : ^UIViewController *(NSString *pageIdentifier, NSDictionary *attributes) {
+            UIViewController *page = [[UIViewController alloc] init];
+            [pages addObject:page];
+            return page;
+        },
+    }];
+    UIWindow *window = [[UIWindow alloc] initWithFrame:CGRectMake(0, 0, 390, 844)];
+    window.rootViewController = tabBarController;
+    window.hidden = NO;
+    [tabBarController.view layoutIfNeeded];
+    Class buttonClass = NSClassFromString(@"CYLFlatDesignTabBarButton");
+    XCTAssertNotNil(buttonClass, @"the FlatDesign button class is known once the tab bar exists");
+    // [EN] Badges first, as apps do at launch, then let the animations load. [CN] 先设置角标（与 App 启动时相同），再等待动画加载。
+    for (UIViewController *viewController in tabBarController.viewControllers) {
+        [viewController.tabBarItem cyl_showBadgeValue:@"3" animationType:CYLBadgeAnimationTypeNone];
+    }
+    [[NSRunLoop mainRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.5]];
+    [tabBarController setSelectedIndex:1];
+    [tabBarController.view layoutIfNeeded];
+    [[NSRunLoop mainRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.5]];
+    NSArray<NSString *> *titles = @[ @"A", @"B", @"C" ];
+    [tabBarController.viewControllers enumerateObjectsUsingBlock:^(UIViewController *viewController, NSUInteger index, BOOL *stop) {
+        UIView *host = (UIView *)[viewController.tabBarItem cyl_getActualBadgeSuperView];
+        UIView *badge = host.cyl_badge;
+        XCTAssertNotNil(badge, @"tab %@ has a badge (host %@)", titles[index], host);
+        XCTAssertNotNil(badge.window, @"tab %@: the badge is in the window", titles[index]);
+        BOOL hidden = NO;
+        for (UIView *view = badge; view; view = view.superview) {
+            if (view.hidden || view.alpha < 0.01) {
+                hidden = YES;
+                XCTFail(@"tab %@: the badge is hidden by %@", titles[index], view);
+                break;
+            }
+        }
+        XCTAssertFalse(hidden);
+        UIControl *button = viewController.tabBarItem.cyl_tabButton;
+        if (![button respondsToSelector:NSSelectorFromString(@"imageView")]) {
+            XCTFail(@"tab %@: its button is %@, not the FlatDesign button", titles[index], button);
+            return;
+        }
+        UIView *imageView = [button valueForKey:@"imageView"];
+        CGRect iconFrame = [imageView convertRect:imageView.bounds toView:window];
+        CGRect badgeFrame = [badge convertRect:badge.bounds toView:window];
+        XCTAssertGreaterThan(CGRectGetMidX(badgeFrame), CGRectGetMidX(iconFrame), @"tab %@: the badge is right of the icon's center (%@ vs %@)",
+                             titles[index], NSStringFromCGRect(badgeFrame), NSStringFromCGRect(iconFrame));
+        XCTAssertLessThan(CGRectGetMidY(badgeFrame), CGRectGetMidY(iconFrame), @"tab %@: the badge is above the icon's center", titles[index]);
+    }];
+    window.hidden = YES;
+}
+
+- (void)testFlatDesignTabButtonsComponentAnimationIsTheTabsAnimation {
+    // [EN] The button class is looked up after the tab bar exists (see testFlatDesignTabBadgesStayVisibleWithAnimatedIcons).
+    // [CN] 按钮类在 TabBar 创建后查找（见 testFlatDesignTabBadgesStayVisibleWithAnimatedIcons）。
+    if (!NSClassFromString(@"CYLFlatDesignTabBar")) {
+        XCTSkip(@"FlatDesign is not compiled into this target");
+    }
+    NSURL *URL = [self gifFileURL];
+    UIImage *icon = CYLTestImage(10, UIColor.grayColor);
+    CYLTabBarController *tabBarController = [CYLTabBarController tabBarControllerWithConfiguration:@{
+        CYLTabBarControllerContext : [NSUUID UUID].UUIDString,
+        CYLTabBarControllerStyleType : @"flatDesign",
+        CYLTabBarControllerTabBarItemsAttributes : @[
+            @{ CYLTabBarItemIdentifier : @"a", CYLTabBarItemTitle : @"A", CYLTabBarItemImage : icon,
+               CYLTabBarAnimationURL : URL, CYLTabBarAnimationSize : [NSValue valueWithCGSize:CGSizeMake(24, 24)] },
+            @{ CYLTabBarItemIdentifier : @"b", CYLTabBarItemTitle : @"B", CYLTabBarItemImage : icon },
+        ],
+        CYLTabBarControllerPageResolver : ^UIViewController *(NSString *pageIdentifier, NSDictionary *attributes) {
+            return [[UIViewController alloc] init];
+        },
+    }];
+    UIWindow *window = [[UIWindow alloc] initWithFrame:CGRectMake(0, 0, 390, 844)];
+    window.rootViewController = tabBarController;
+    window.hidden = NO;
+    [tabBarController.view layoutIfNeeded];
+    [[NSRunLoop mainRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.3]];
+    Class buttonClass = NSClassFromString(@"CYLFlatDesignTabBarButton");
+    XCTAssertNotNil(buttonClass, @"the FlatDesign button class is known once the tab bar exists");
+    NSMutableDictionary<NSString *, UIControl *> *buttons = [NSMutableDictionary dictionary];
+    NSMutableArray<UIView *> *queue = [NSMutableArray arrayWithObject:tabBarController.view];
+    while (queue.count > 0) {
+        UIView *view = queue.firstObject;
+        [queue removeObjectAtIndex:0];
+        NSString *title = [view isKindOfClass:buttonClass] ? [view valueForKey:@"title"] : nil;
+        if (title) {
+            buttons[title] = (UIControl *)view;
+        }
+        [queue addObjectsFromArray:view.subviews];
+    }
+    UIControl *animated = buttons[@"A"];
+    XCTAssertNotNil(animated, @"%@", buttons);
+    SEL tabViewSelector = NSSelectorFromString(@"cyl_tabBarItemAnimationView");
+    UIView *(^tabAnimationView)(UIControl *) = ^UIView *(UIControl *button) {
+        return ((UIView *(*)(id, SEL))[button methodForSelector:tabViewSelector])(button, tabViewSelector);
+    };
+    UIView *tabView = tabAnimationView(animated);
+    XCTAssertNotNil(tabView, @"the selected tab has its GIF animation view");
+    XCTAssertEqual([animated valueForKey:@"animationView"], tabView, @"the component's animation view is the tab's");
+    // [EN] Bug B13: the static image never shows under the tab bar's animation. [CN] Bug B13：静态图片不显示在 TabBar 的动画下方。
+    XCTAssertTrue(((UIImageView *)[animated valueForKey:@"imageView"]).hidden, @"B13: the image is hidden under the animation");
+    tabBarController.selectedIndex = 1;
+    [tabBarController.view layoutIfNeeded];
+    tabBarController.selectedIndex = 0;
+    [tabBarController.view layoutIfNeeded];
+    XCTAssertTrue(((UIImageView *)[animated valueForKey:@"imageView"]).hidden || tabAnimationView(animated) == nil,
+                  @"B13: still hidden after a selection change");
+    XCTAssertTrue([[animated valueForKey:@"animationReady"] boolValue]);
+    XCTAssertNil([buttons[@"B"] valueForKey:@"animationView"], @"a tab without an animation has none");
+    XCTAssertFalse([[buttons[@"B"] valueForKey:@"animationReady"] boolValue]);
+
+    [animated performSelector:@selector(stopAnimation)];
+    XCTAssertEqual([animated valueForKey:@"animationView"], tabAnimationView(animated), @"stopping keeps one view, the tab's");
+    [animated performSelector:@selector(reloadAnimation)];
+    [tabBarController.view layoutIfNeeded];
+    UIView *reloaded = tabAnimationView(animated);
+    XCTAssertNotNil(reloaded, @"reloading keeps the tab's animation");
+    XCTAssertEqual([animated valueForKey:@"animationView"], reloaded);
+    NSUInteger animationViews = 0;
+    for (UIView *subview in animated.subviews) {
+        if (subview != [animated valueForKey:@"imageView"] && subview != [animated valueForKey:@"titleLabel"] &&
+            [subview isKindOfClass:UIImageView.class] && subview == reloaded) {
+            animationViews++;
+        }
+    }
+    XCTAssertLessThanOrEqual(animationViews, 1u, @"no second animation view from the component");
+    window.hidden = YES;
 }
 
 @end

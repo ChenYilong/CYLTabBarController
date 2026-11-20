@@ -20,7 +20,7 @@ module.exports = Behavior({
   lifetimes: {
     detached() {
       const app = getApp();
-      if (app.cylLoadedTabPages && app.cylLoadedTabPages[this.route] === this) {
+      if (app.cylLoadedTabPages?.[this.route] === this) {
         delete app.cylLoadedTabPages[this.route];
       }
     },

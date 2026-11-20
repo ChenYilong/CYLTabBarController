@@ -83,4 +83,65 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+/*!
+ * [EN] A view that holds an animation view and wants to know when its file fails after the view was made: a corrupted
+ *      file, a parse error, a failed download. `CYLAnimatedItemView` adopts it: it drops the animation and shows its
+ *      static image, or its placeholder when it has none.
+ * [CN] 持有动画视图、需要知道其文件在视图创建后失败（文件损坏、解析错误、下载失败）的视图。`CYLAnimatedItemView` 遵守它：移除动画并显示静态图片，
+ *      没有静态图片时显示占位图。
+ */
+NS_SWIFT_NAME(CYLTabBarItemAnimationFailureHandling)
+@protocol CYLTabBarItemAnimationFailureHandling <NSObject>
+/*!
+ * [EN] Called on the main thread with the animation view whose file failed. [CN] 在主线程调用，参数为文件失败的动画视图。
+ */
+- (void)cylAnimationViewDidFail:(UIView *)animationView error:(nullable NSError *)error
+    NS_SWIFT_NAME(cylAnimationViewDidFail(_:error:));
+@optional
+/*!
+ * [EN] Called on the main thread when an animation view that was loading (a download) has its file: the host can now
+ *      hide its static image or placeholder. [CN] 正在加载（下载）的动画视图拿到文件时在主线程调用：宿主此时可以隐藏静态图片或占位图。
+ */
+- (void)cylAnimationViewDidLoad:(UIView *)animationView NS_SWIFT_NAME(cylAnimationViewDidLoad(_:));
+@end
+
+/*!
+ * [EN] Posted on the main thread when a failed animation view has no superview that adopts
+ *      `CYLTabBarItemAnimationFailureHandling`; the object is the animation view, `NSUnderlyingErrorKey` the error.
+ * [CN] 失败的动画视图没有遵守 `CYLTabBarItemAnimationFailureHandling` 的父视图时在主线程发送；object 为动画视图，`NSUnderlyingErrorKey` 为错误。
+ */
+FOUNDATION_EXTERN NSNotificationName const CYLTabBarItemAnimationDidFailNotification;
+
+/*!
+ * [EN] For animators: reports that `animationView` could not load its file (corrupted, unreadable, a failed download).
+ *      On the next main run loop turn, so a failure found while the view is being made is not lost, the closest
+ *      superview that adopts `CYLTabBarItemAnimationFailureHandling` is told; otherwise
+ *      `CYLTabBarItemAnimationDidFailNotification` is posted.
+ * [CN] 供 animator 使用：报告 `animationView` 无法加载其文件（已损坏、无法读取、下载失败）。在下一次主线程 run loop 中执行（创建视图期间发现的失败也不会丢失），
+ *      通知最近的遵守 `CYLTabBarItemAnimationFailureHandling` 的父视图；没有时发送 `CYLTabBarItemAnimationDidFailNotification`。
+ */
+FOUNDATION_EXTERN void CYLTabBarItemAnimationReportFailure(UIView *animationView, NSError * _Nullable error);
+
+/*!
+ * [EN] For animators: `animationView` waits for its file (a download). Until `CYLTabBarItemAnimationReportLoaded()` or
+ *      `CYLTabBarItemAnimationReportFailure()`, hosts keep showing the static image given to them, or the placeholder
+ *      when there is none.
+ * [CN] 供 animator 使用：`animationView` 正在等待其文件（下载）。在 `CYLTabBarItemAnimationReportLoaded()` 或 `CYLTabBarItemAnimationReportFailure()`
+ *      之前，宿主继续显示传入的静态图片，没有时显示占位图。
+ */
+FOUNDATION_EXTERN void CYLTabBarItemAnimationMarkLoading(UIView *animationView);
+
+/*!
+ * [EN] Whether `animationView` still waits for its file. [CN] `animationView` 是否仍在等待其文件。
+ */
+FOUNDATION_EXTERN BOOL CYLTabBarItemAnimationIsLoading(UIView * _Nullable animationView);
+
+/*!
+ * [EN] For animators: `animationView` has its file and shows the animation now; the closest superview adopting
+ *      `CYLTabBarItemAnimationFailureHandling` gets `-cylAnimationViewDidLoad:` on the next main run loop turn.
+ * [CN] 供 animator 使用：`animationView` 已拿到文件，现在显示动画；在下一次主线程 run loop 中，最近的遵守 `CYLTabBarItemAnimationFailureHandling`
+ *      的父视图收到 `-cylAnimationViewDidLoad:`。
+ */
+FOUNDATION_EXTERN void CYLTabBarItemAnimationReportLoaded(UIView *animationView);
+
 NS_ASSUME_NONNULL_END

@@ -7,6 +7,9 @@
 //
 
 import UIKit
+#if canImport(CYLAnimatedItem)
+import CYLAnimatedItem
+#endif
 
 // [EN] The implementation of `CYLTabBar`, translated from Objective-C (docs/Swift-Migration.md, step 51). The class stays
 //      declared in Objective-C: `CYLTabBarController.h` and `CYLPlusButton.h` name it, so it moves with them. CYLTabBar.m
@@ -54,6 +57,9 @@ final class CYLTabBarStorage: NSObject {
 
     /// [EN] YES between `-beginCustomizingItems:` and the end of More editing. [CN] 在 `-beginCustomizingItems:` 与「More」编辑结束之间为 YES。
     var isCustomizingItems = false
+    /// [EN] The window point and time of the last touch hit test, see `cylTouchWindowLocation(of:)`. [CN] 最近一次触摸 hitTest 的窗口坐标与时间。
+    var lastTouchHitWindowPoint: CGPoint?
+    var lastTouchHitTime: TimeInterval = 0
     /// [EN] The views whose `alpha` is observed, and their observations. [CN] 被观察 `alpha` 的视图及其观察。
     var alphaObservations: [ObjectIdentifier: NSKeyValueObservation] = [:]
     /// Whether the last layout found the tab buttons in the iOS 27.1 vertical bar, see `cylRefreshTabButtonsAfterVerticalBar()`.
@@ -220,7 +226,7 @@ extension CYLTabBar {
             // [EN] Liquid Glass does not support a custom height: the Liquid Glass system style has a fixed height.
             return size
         }
-        let tabBarController = cylTabBarController()
+        let tabBarController = cyl_tabBarController
         let height = (tabBarController?.tabBarHeight ?? 0) + (tabBarController?.view.safeAreaInsets.bottom ?? 0)
         if height > 0 {
             size.height = height
@@ -270,7 +276,7 @@ extension CYLTabBar {
         didChangeValue(forKey: "tabBarItemWidth")
         NotificationCenter.default.post(name: NSNotification.Name("CYLTabBarItemWidthDidChangeNotification"), object: self)
         // [EN] `CYL_IS_IPHONE_X`: a screen of at least 375 × 812 pt. [CN] `CYL_IS_IPHONE_X`：屏幕至少为 375 × 812 pt。
-        if let size = cylTabBarController()?.visiableTabBarSize(),
+        if let size = cyl_tabBarController?.visiableTabBarSize(),
            min(size.width, size.height) >= 375 && max(size.width, size.height) >= 812 {
             layoutIfNeeded()
         }
@@ -352,7 +358,7 @@ extension CYLTabBar {
         //      so that PlusButton can support a custom index in the future.
         cyl_addPlatterViewThenBringSubview(toFront: plusButton)
         isPlusButtonActive = true
-        plusButton.cylSetTabBarController(cylTabBarController())
+        plusButton.cylSetTabBarController(cyl_tabBarController)
     }
 
     @objc(cyl_tabBarIsPlusButtonLayoutCentered)
@@ -367,7 +373,7 @@ extension CYLTabBar {
         if let owner = delegate as? CYLTabBarController {
             return owner
         }
-        return cylTabBarController()
+        return cyl_tabBarController
     }
 
     // MARK: - [EN] Classic styles and UITabBarAppearance [CN] 经典样式与 UITabBarAppearance
@@ -1052,7 +1058,7 @@ extension CYLTabBar {
     }
 
     private func cylConstantOfPlusButtonCenterYOffset(forTabBarHeight tabBarHeight: CGFloat) -> CGFloat {
-        guard let plusButtonClass = cylTabBarPlusButton().map({ type(of: $0) as AnyObject }),
+        guard let plusButtonClass = cylTabBarPlusButton().map({ $0.cylRuntimeClass as AnyObject }),
               plusButtonClass.responds(to: #selector(CYLPlusButtonCenterYOffsetSource.constantOfPlusButtonCenterYOffset(forTabBarHeight:))) else {
             return 0
         }
@@ -1090,7 +1096,7 @@ extension CYLTabBar {
     @objc(cyl_tabBarPlusButtonIndex)
     func cylTabBarPlusButtonIndex() -> UInt {
         let plusButton = cylTabBarPlusButton()
-        var plusButtonIndex = plusButton.map { Int(type(of: $0).index(forTabbarItemsCount: cyl_tabbarItemsCount)) } ?? 0
+        var plusButtonIndex = plusButton.map { Int($0.cyl_index(forTabbarItemsCount: cyl_tabbarItemsCount)) } ?? 0
         let tabBarWidth = cylBoundsSize().width
         let tabBarHeight = cylBoundsSize().height
         let registeredPlusButton = cylRegisteredPlusButton
@@ -1309,7 +1315,7 @@ extension CYLTabBar {
     @objc(cyl_showsMinimizedBar)
     func cylTabBarShowsMinimizedBar() -> Bool {
         guard CYLConstants.isLiquidGlassActive(), traitCollection.userInterfaceIdiom == .phone else { return false }
-        let behavior = cylTabBarOwningTabBarController()?.cylTabBarMinimizeBehavior
+        let behavior = cylTabBarOwningTabBarController()?.cyl_tabBarMinimizeBehavior
         guard behavior == .onScrollDown || behavior == .onScrollUp else { return false }
         guard let platterView = cylPlatterView(), platterView.window != nil, platterView.isDescendant(of: self) else { return false }
         // [EN] In this bar's coordinates, so a scale transform counts too. [CN] 转换到本 TabBar 坐标系，缩放 transform 也会计入。
@@ -1464,6 +1470,12 @@ extension CYLTabBar {
      */
     @objc(cyl_tabBarHitTest:withEvent:superHitTest:)
     func cylTabBarHitTest(_ point: CGPoint, with event: UIEvent?, superHitTest: (CGPoint) -> UIView?) -> UIView? {
+        // [EN] Remember where a touch hit, for a gesture that later reports no location (see `cylTouchWindowLocation(of:)`).
+        // [CN] 记录触摸命中的位置，供之后报告不出位置的手势使用（见 `cylTouchWindowLocation(of:)`）。
+        if event?.type == .touches, window != nil {
+            cylTabBarStorage.lastTouchHitWindowPoint = convert(point, to: nil)
+            cylTabBarStorage.lastTouchHitTime = ProcessInfo.processInfo.systemUptime
+        }
         // [CN] 1. 边界情况：不能响应点击事件
         // [EN] 1. Edge cases: cannot respond to tap events
         if cyl_canNotResponseEvent() {
@@ -1704,16 +1716,42 @@ extension CYLTabBar {
      * [CN] 处理PlusButton事件响应优先级为最优。由 `-gestureRecognizerShouldBegin:` 调用。
      * [EN] Give PlusButton event handling the highest priority. Called by `-gestureRecognizerShouldBegin:`.
      */
+    /**
+     * [EN] Where `gestureRecognizer`'s touch is, in window coordinates. A touch that a host delivers late (Flutter's
+     *      `UiKitView` forwards a simulator's one-event tap only after its gesture arena accepts it) reaches UIKit's Liquid Glass
+     *      gestures with no touch left: they report {0, 0}. Then the point of the touch's own hit test, made when it began, is
+     *      used, if it is at most a second old. Docs: docs/Flutter-Component.md (simulated taps).
+     * [CN] `gestureRecognizer` 的触摸在窗口坐标系中的位置。宿主延迟交付的触摸（Flutter 的 `UiKitView` 要等手势竞技场接受后才转发模拟器的单事件点击）
+     *      到达系统液态玻璃手势时已没有触摸，位置为 {0, 0}；此时使用该触摸开始时 hitTest 的位置（不超过 1 秒）。
+     */
+    @objc(cyl_touchWindowLocationOfGestureRecognizer:)
+    func cylTouchWindowLocation(of gestureRecognizer: UIGestureRecognizer) -> CGPoint {
+        let location = gestureRecognizer.location(in: nil)
+        guard location == .zero, cylTouchLocationWasLost(gestureRecognizer) else { return location }
+        return cylTabBarStorage.lastTouchHitWindowPoint ?? location
+    }
+
+    /**
+     * [EN] YES when `gestureRecognizer` reports no touch location ({0, 0} with no touches) and a recent touch hit test can stand
+     *      in for it. [CN] `gestureRecognizer` 报告不出触摸位置（{0, 0} 且无触摸）且有最近的触摸 hitTest 可替代时为 YES。
+     */
+    @objc(cyl_touchLocationWasLost:)
+    func cylTouchLocationWasLost(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+        guard gestureRecognizer.numberOfTouches == 0, gestureRecognizer.location(in: nil) == .zero,
+              cylTabBarStorage.lastTouchHitWindowPoint != nil else { return false }
+        return ProcessInfo.processInfo.systemUptime - cylTabBarStorage.lastTouchHitTime <= 1
+    }
+
     @objc(cyl_tabBarGestureRecognizerShouldBegin:)
     func cylTabBarGestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
         guard CYLConstants.isLiquidGlassActive() else { return true }
-        var hitView = hitTest(gestureRecognizer.location(in: self), with: nil)
+        var hitView = hitTest(convert(cylTouchWindowLocation(of: gestureRecognizer), from: nil), with: nil)
         if hitView == nil {
             // FIX: issue #653 — in the iOS 27.1 vertical bar the tab buttons are outside this tab bar, so the hit test
             // above finds nothing and a tap on the already selected tab never reached `-tabChangedToControl:`
             // (no `tabBarController:didSelectControl:` callback). Look the tab button up under the touch instead.
             // 竖向栏中 Tab 按钮不在本 TabBar 内，上面的 hitTest 为 nil，导致选中状态下再次点击不回调 didSelectControl，这里按触摸点查找 Tab 按钮。
-            hitView = cylTabBarVerticalBarTabButton(atWindowPoint: gestureRecognizer.location(in: nil))
+            hitView = cylTabBarVerticalBarTabButton(atWindowPoint: cylTouchWindowLocation(of: gestureRecognizer))
         }
         // [EN] FIX: issue #202 — on Liquid Glass a subview of the plus button that takes touches (e.g. an X button) got
         //      none: the hit test above returns it, but UIKit's selection gesture still began, selected the stand-in tab
@@ -1764,7 +1802,7 @@ extension CYLTabBar {
     // [CN] 在 UIControl+CYLTabBarItemAnimation.h（私有头文件）中声明；原为 UIControl+CYLTabBarItemAnimation.m。
 
     @objc(cyl_playTabBarItemAnimationWithSelectedControl:URL:size:defaultSelected:contentMode:)
-    func cylPlayTabBarItemAnimation(withSelectedControl selectedControl: UIControl?, url: URL?, size: CGSize,
+    public func cylPlayTabBarItemAnimation(withSelectedControl selectedControl: UIControl?, url: URL?, size: CGSize,
                                     defaultSelected: Bool, contentMode: UIView.ContentMode) {
         guard let url else { return }
         // [CN] 统一使用CYLTabBarItemAnimationPlayingNotification进行动画重置， 故删除手动重置。
@@ -1774,17 +1812,17 @@ extension CYLTabBar {
     }
 
     @objc(cyl_stopAllTabBarItemAnimations)
-    func cylStopAllTabBarItemAnimations() {
+    public func cylStopAllTabBarItemAnimations() {
         cylEnumerateAnimatedControls { $0.cyl_stopTabBarItemAnimation() }
     }
 
     @objc(cyl_restartAllTabBarItemAnimations)
-    func cylRestartAllTabBarItemAnimations() {
+    public func cylRestartAllTabBarItemAnimations() {
         cylEnumerateAnimatedControls { $0.cyl_restartTabBarItemAnimation() }
     }
 
     @objc(cyl_setAllTabBarItemAnimationsSpeed:loops:)
-    func cylSetAllTabBarItemAnimations(speed: CGFloat, loops: Bool) {
+    public func cylSetAllTabBarItemAnimations(speed: CGFloat, loops: Bool) {
         cylEnumerateAnimatedControls { control in
             control.cyl_setTabBarItemAnimationSpeed(speed)
             control.cyl_setTabBarItemAnimationLoops(loops)
@@ -1793,7 +1831,7 @@ extension CYLTabBar {
 
     /// [EN] The tab buttons, then the selected-state layers (Liquid Glass). [CN] Tab 按钮，然后是选中态图层（液态玻璃）。
     private func cylEnumerateAnimatedControls(_ block: (UIControl) -> Void) {
-        for case let control as UIControl in cylVisibleControls() ?? [] {
+        for control in cylVisibleControls() ?? [] {
             block(control)
         }
         for control in cylPlatterSelectedContentViews() ?? [] {
@@ -1811,17 +1849,14 @@ extension CYLTabBar {
  */
 extension UITabBar {
 
-    @objc(cyl_backgroundView)
     func cylBackgroundView() -> UIView? {
         cyl_value(forKey: "_backgroundView") as? UIView
     }
 
-    @objc(cyl_shadowImageView)
     func cylShadowImageView() -> UIImageView? {
         cyl_tabShadowImageView()
     }
 
-    @objc(cyl_effectViews)
     func cylEffectViews() -> [UIVisualEffectView]? {
         // [EN] Exactly UIVisualEffectView: the shadow is drawn by a subclass. [CN] 必须恰好是 UIVisualEffectView：阴影由其子类绘制。
         let effectViews = (cylBackgroundView()?.subviews ?? []).compactMap { subview -> UIVisualEffectView? in
@@ -1830,7 +1865,6 @@ extension UITabBar {
         return effectViews.isEmpty ? nil : effectViews
     }
 
-    @objc(cyl_effectView)
     func cylEffectView() -> UIVisualEffectView? {
         cylEffectViews()?.last { !$0.isHidden && $0.alpha > 0.01 }
     }
@@ -1846,23 +1880,47 @@ extension UITabBar {
         }
     }
 
-    @objc(cyl_backgroundEffect)
     func cylBackgroundEffect() -> UIBlurEffect? {
         standardAppearance.backgroundEffect
     }
 
-    @objc(cyl_setBackgroundEffect:)
     func cylSetBackgroundEffect(_ backgroundEffect: UIBlurEffect?) {
         cylUpdateAppearances { $0.backgroundEffect = backgroundEffect }
     }
 
-    @objc(cyl_effectForegroundColor)
     func cylEffectForegroundColor() -> UIColor? {
         standardAppearance.backgroundColor
     }
 
-    @objc(cyl_setEffectForegroundColor:)
     func cylSetEffectForegroundColor(_ effectForegroundColor: UIColor?) {
         cylUpdateAppearances { $0.backgroundColor = effectForegroundColor }
+    }
+}
+
+// MARK: - The public API of `UITabBar (CYLBarBackground)`
+
+/**
+ [EN] `UITabBar (CYLBarBackground)` as callers saw it in CYLTabBar.h: the same selectors and Swift names, forwarding to the
+      implementation above. Public Swift since docs/Swift-Migration.md step 121.
+ [CN] 调用方在 CYLTabBar.h 中看到的 `UITabBar (CYLBarBackground)`：selector 与 Swift 名称不变，转发到上面的实现。自第 121 步起为公开的 Swift。
+ */
+extension UITabBar {
+    /** [EN] The bar's background view. [CN] TabBar 的背景视图。 */
+    @objc open var cyl_backgroundView: UIView? { cylBackgroundView() }
+    /** [EN] The shadow line's image view. [CN] 阴影线的图片视图。 */
+    @objc open var cyl_shadowImageView: UIImageView? { cylShadowImageView() }
+    /** [EN] The blur views of the background. [CN] 背景中的模糊视图。 */
+    @objc open var cyl_effectViews: [UIVisualEffectView]? { cylEffectViews() }
+    /** [EN] The first blur view of the background. [CN] 背景中的第一个模糊视图。 */
+    @objc open var cyl_effectView: UIVisualEffectView? { cylEffectView() }
+    /** [EN] The background blur. [CN] 背景模糊效果。 */
+    @objc open var cyl_backgroundEffect: UIBlurEffect? {
+        @objc(cyl_backgroundEffect) get { cylBackgroundEffect() }
+        @objc(cyl_setBackgroundEffect:) set { cylSetBackgroundEffect(newValue) }
+    }
+    /** [EN] The foreground color over the blur. [CN] 模糊效果上的前景色。 */
+    @objc open var cyl_effectForegroundColor: UIColor? {
+        @objc(cyl_effectForegroundColor) get { cylEffectForegroundColor() }
+        @objc(cyl_setEffectForegroundColor:) set { cylSetEffectForegroundColor(newValue) }
     }
 }

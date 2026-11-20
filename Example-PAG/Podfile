@@ -16,6 +16,9 @@ target 'HealthyHome' do
   # #604: PAG tab icons (Tencent libpag), the same way as `CYLTabBarController/LottieSwift`.
   # #604：PAG Tab 图标（腾讯 libpag），用法与 `CYLTabBarController/LottieSwift` 相同。
   pod 'CYLTabBarController/PAG', :path => '../'
+  # [EN] The animated item component's own pod (CYLAnimatedItem.podspec), by the same path until it is on the trunk.
+  # [CN] 动效组件独立的 pod（CYLAnimatedItem.podspec），发布到 trunk 之前按相同路径引入。
+  pod 'CYLAnimatedItem', :path => '../'
   # libpag 4.5.101, not on CocoaPods trunk yet: pinned to the commit that ships it, as the official pag-ios does.
   # libpag 4.5.101 尚未发布到 CocoaPods trunk：固定到官方 pag-ios 中包含它的 commit。
   # [EN] Third-party code: its warnings (OpenGL deprecated since iOS 12 in PAGSurface.h) are not ours to fix.

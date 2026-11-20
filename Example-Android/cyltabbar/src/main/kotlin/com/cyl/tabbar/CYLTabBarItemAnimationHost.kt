@@ -83,14 +83,18 @@ private fun View.cyl_insertAnimationView(state: CYLTabAnimationState) {
     host.addView(view, FrameLayout.LayoutParams(width, height, Gravity.CENTER))
     state.view = view
     state.loadedURL = url
+    (this as? CYLTabBarItemButton)?.cyl_setTabBarItemAnimationView(view)
     val player = CYLTabBarItemAnimationFactory.playerForView(view)
     if (state.speed > 0 && state.speed.isFinite()) player?.animationSpeed = state.speed
     if (state.loops) player?.loops = true
     player?.applyColors(CYLTabBarItemAnimationStyleSource.colorsForStyle(state.url, resources.configuration), resources.configuration)
+    // [EN] The tab's current title color, for an animation with the `tint` option "title" (bug B12). [CN] Tab 当前标题颜色，供 `tint` 选项为 "title" 的动画使用（问题 B12）。
+    (this as? CYLTabBarItemButton)?.let { player?.setTintColor(it.titleLabel.currentTextColor, it.isSelected) }
     // [EN] The animation replaces the icon. [CN] 动画取代图标。
     when (this) {
-        is CYLTabBarItemButton -> iconView.visibility = View.INVISIBLE
-        is CYLPlusButton -> imageView.visibility = View.INVISIBLE
+        // [EN] While the file downloads, the tab keeps its image (or the placeholder). [CN] 文件下载期间，Tab 保留其图片（或占位图）。
+        is CYLTabBarItemButton -> iconView.visibility = if (CYLTabBarItemAnimationFailure.isLoading(view)) View.VISIBLE else View.INVISIBLE
+        is CYLPlusButton -> imageView.visibility = if (CYLTabBarItemAnimationFailure.isLoading(view)) View.VISIBLE else View.INVISIBLE
     }
     requestLayout()
 }
@@ -132,7 +136,18 @@ fun View.cyl_addTabBarItemAnimationWithURL(url: String?, size: CYLSize?, content
  */
 private fun cyl_installAnimationFailureFallback() {
     if (CYLTabBarItemAnimationFailure.fallbackHandler == null) {
-        CYLTabBarItemAnimationFailure.fallbackHandler = { host -> host.cyl_replaceTabBarItemAnimationWithURL(null, null) }
+        CYLTabBarItemAnimationFailure.fallbackHandler = { host ->
+            host.cyl_replaceTabBarItemAnimationWithURL(null, null)
+            // [EN] A tab with no static image shows the placeholder rather than an empty icon. [CN] 没有静态图片的 Tab 显示占位图，而不是空图标。
+            if (host is CYLTabBarItemButton && host.iconView.drawable == null) host.iconView.setImageDrawable(host.cyl_animationPlaceholder())
+        }
+        // [EN] A downloaded animation replaces the image or placeholder shown meanwhile. [CN] 下载完成的动画取代期间显示的图片或占位图。
+        CYLTabBarItemAnimationFailure.loadedFallbackHandler = { host ->
+            when (host) {
+                is CYLTabBarItemButton -> if (host.cyl_customIconView == null) host.iconView.visibility = View.INVISIBLE
+                is CYLPlusButton -> host.imageView.visibility = View.INVISIBLE
+            }
+        }
     }
 }
 
@@ -189,6 +204,7 @@ fun View.cyl_replaceTabBarItemAnimationWithURL(url: String?, size: CYLSize?, con
     if (url.isNullOrBlank()) {
         previous?.view?.let { (this as? ViewGroup)?.removeView(it) }
         animationStates.remove(this)
+        (this as? CYLTabBarItemButton)?.cyl_setTabBarItemAnimationView(null)
         when (this) {
             is CYLTabBarItemButton -> iconView.visibility = View.VISIBLE
             is CYLPlusButton -> imageView.visibility = View.VISIBLE
@@ -313,15 +329,9 @@ fun CYLTabBar.cyl_setAllTabBarItemAnimationsSpeed(speed: Float, loops: Boolean) 
 internal fun CYLTabBarItemAttributesAnimationValue(attributes: Map<String, Any?>, genericKey: String): Any? {
     attributes[genericKey]?.let { return it }
     CYLTabBarItemAnimatorRegistry.attributeKeyForGenericKey(genericKey, attributes)?.let { key -> attributes[key]?.let { return it } }
-    val known = mapOf(
-        CYLConstants.CYLTabBarAnimationURL to listOf(CYLConstants.CYLTabBarLottieURL, CYLConstants.CYLTabBarPAGURL, CYLConstants.CYLTabBarRiveURL, CYLConstants.CYLTabBarGIFURL),
-        CYLConstants.CYLTabBarAnimationFilePath to listOf(CYLConstants.CYLTabBarLottieFilePath, CYLConstants.CYLTabBarPAGFilePath, CYLConstants.CYLTabBarRiveFilePath, CYLConstants.CYLTabBarGIFFilePath),
-        CYLConstants.CYLTabBarAnimationSize to listOf(CYLConstants.CYLTabBarLottieSize, CYLConstants.CYLTabBarPAGSize, CYLConstants.CYLTabBarRiveSize, CYLConstants.CYLTabBarGIFSize),
-        CYLConstants.CYLTabBarAnimationDarkURL to listOf(CYLConstants.CYLTabBarLottieDarkURL, CYLConstants.CYLTabBarPAGDarkURL, CYLConstants.CYLTabBarRiveDarkURL, CYLConstants.CYLTabBarGIFDarkURL),
-        CYLConstants.CYLTabBarAnimationDarkFilePath to listOf(CYLConstants.CYLTabBarLottieDarkFilePath, CYLConstants.CYLTabBarPAGDarkFilePath, CYLConstants.CYLTabBarRiveDarkFilePath, CYLConstants.CYLTabBarGIFDarkFilePath),
-        CYLConstants.CYLTabBarAnimationDarkColors to listOf(CYLConstants.CYLTabBarLottieDarkColors, CYLConstants.CYLTabBarRiveDarkColors),
-    )
-    return known[genericKey]?.firstNotNullOfOrNull { attributes[it] }
+    // [EN] Any type's own key, also when its library is not in the app (the tab then shows its image, or the placeholder).
+    // [CN] 任一类型自己的 key，包括其动画库不在 App 中时（此时 Tab 显示图片，没有时显示占位图）。
+    return com.cyl.animateditem.CYLAnimationEngines.attributesValue(attributes, genericKey)
 }
 
 /**

@@ -4,8 +4,6 @@ package com.cyl.animateditem
 
 import android.graphics.drawable.Drawable
 import android.view.View
-import com.cyl.tabbar.CYLTabBarItemAnimationFactory
-import com.cyl.tabbar.CYLTabBarItemAnimationViewMaking
 
 /**
  * [EN] How the icon and the title are arranged: side by side (a tag, a chip) or the icon above the title (a tab, a

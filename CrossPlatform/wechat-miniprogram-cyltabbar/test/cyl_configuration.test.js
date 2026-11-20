@@ -159,6 +159,8 @@ test('Lottie, PAG, Rive, generic animation and GIF keys', () => {
   }, env);
   assert.deepEqual(lottie, {
     library: 'lottie',
+    tint: '',
+    darkTint: '',
     path: '/shared/lottie/home.json',
     darkPath: 'https://x/home_dark.json',
     width: 30,
@@ -256,4 +258,15 @@ test('tap animation keys: duration, per-tab animation, frames, fireworks, flip d
   assert.deepEqual([model.tapSoundURL, model.tapHapticStyle], ['/click.wav', 'heavy']);
   const plain = reader.cylReadConfiguration({ CYLTabBarControllerTabBarItemsAttributes: [{ CYLTabBarItemTitle: 'Home' }], CYLTabBarControllerTabButtonTapHapticStyle: 'loud' }, {});
   assert.deepEqual([plain.animationDuration, plain.playsFireworks, plain.flipDirection, plain.tapHapticStyle], [500, false, 1, '']);
+});
+
+test('Rive tint options: "title" or a color from the fragment or CYLTabBarAnimationOptions, darkTint a color only', () => {
+  const env = { animationBasePath: '/shared/lottie', isDark: false };
+  const fromFragment = reader.cylRive({ CYLTabBarRiveURL: 'https://x/a.riv#artboard=CHAT&tint=title&darkTint=%23FFFFFF' }, env);
+  assert.deepEqual([fromFragment.tint, fromFragment.darkTint], ['title', '#FFFFFF']);
+  const fromOptions = reader.cylRive({ CYLTabBarRiveURL: 'https://x/a.riv', CYLTabBarAnimationOptions: { tint: '#007AFF', darkTint: 'title' } }, env);
+  assert.deepEqual([fromOptions.tint, fromOptions.darkTint], ['#007AFF', ''], 'darkTint takes a color only');
+  const invalid = reader.cylRive({ CYLTabBarRiveURL: 'https://x/a.riv', CYLTabBarAnimationOptions: { tint: 'red;x' } }, env);
+  assert.equal(invalid.tint, '');
+  assert.equal(reader.cylRive({ CYLTabBarRiveURL: 'https://x/a.riv' }, env).tint, '');
 });

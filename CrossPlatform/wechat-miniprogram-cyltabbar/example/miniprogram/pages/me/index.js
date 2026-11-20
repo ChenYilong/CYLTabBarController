@@ -73,7 +73,7 @@ Component({
         animationSpeed: state.animationSpeed || 1,
         animationLoop: Boolean(state.animationLoop),
         currentTapAnimation: configuration.CYLTabBarControllerTabButtonTapAnimation,
-        icons: (state.overrides || {}).cylDemoIcons === 'images' || (state.overrides || {}).cylDemoLottie === false
+        icons: state.overrides?.cylDemoIcons === 'images' || state.overrides?.cylDemoLottie === false
           ? 'images' : cylInstalledAnimation(),
         installed: cylInstalledAnimation(),
         installedLabel: this.t(CYL_ANIMATION_LABELS[cylInstalledAnimation()]),
@@ -84,11 +84,11 @@ Component({
       getApp().cyl_updateTabBarState(change);
     },
     cyl_override(change) {
-      this.cyl_update({ overrides: Object.assign({}, getApp().globalData.cylTabBarState.overrides, change) });
+      this.cyl_update({ overrides: { ...getApp().globalData.cylTabBarState.overrides, ...change } });
     },
     cyl_badge(event) {
       const value = event.currentTarget.dataset.value;
-      const badges = Object.assign({}, getApp().globalData.cylTabBarState.badges);
+      const badges = { ...getApp().globalData.cylTabBarState.badges };
       if (value === 'clear') {
         Object.keys(badges).forEach((identifier) => {
           badges[identifier] = '';
@@ -101,7 +101,7 @@ Component({
     // [EN] CYLMineViewController: shows the row number as Me's badge, then pushes a red page with the pop gesture off.
     // [CN] CYLMineViewController：把行号显示为「我的」的角标，然后 push 一个关闭返回手势的红色页面。
     cyl_onFeedRow(event) {
-      const badges = Object.assign({}, getApp().globalData.cylTabBarState.badges, { me: String(event.currentTarget.dataset.index) });
+      const badges = { ...getApp().globalData.cylTabBarState.badges, me: String(event.currentTarget.dataset.index) };
       this.cyl_update({ badges });
       wx.navigateTo({ url: `/pages/pushed/locked?color=red&note=${encodeURIComponent('Pushed by Me: the pop gesture is off')}` });
     },
@@ -109,8 +109,8 @@ Component({
       this.cyl_update({ themeIdentifier: event.currentTarget.dataset.value });
     },
     cyl_playAll() {
-      const tabBar = this.getTabBar && this.getTabBar();
-      const bar = tabBar && tabBar.selectComponent('#cyl-tab-bar');
+      const tabBar = this.getTabBar?.();
+      const bar = tabBar?.selectComponent('#cyl-tab-bar');
       if (bar) {
         bar.cyl_playAll();
       }
@@ -148,7 +148,7 @@ Component({
         return;
       }
       const state = getApp().globalData.cylTabBarState;
-      const change = { overrides: Object.assign({}, state.overrides, { cylDemoIcons: icons, cylDemoLottie: icons !== 'images' }) };
+      const change = { overrides: { ...state.overrides, cylDemoIcons: icons, cylDemoLottie: icons !== 'images' } };
       // [EN] The Rive icons (the iOS examples' icons.riv) are white strokes: like Example-Rive and Example-SwiftUI-Rive,
       //      which run in dark mode, Rive mode picks the dark skin when no other skin was chosen.
       // [CN] Rive 图标（iOS 示例的 icons.riv）是白色线条：与运行在深色模式下的 Example-Rive、Example-SwiftUI-Rive 一样，

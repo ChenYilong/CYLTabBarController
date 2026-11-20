@@ -6,13 +6,19 @@ import { CYLPlusButton, cyl_liquidGlassContentDy } from './CYLPlusButton';
 import { CYLBadge, CYLBadgeView } from './CYLBadge';
 import { CYLLottieIcon } from './CYLLottieIcon';
 import { CYLSVGAView } from './svga/CYLSVGAView';
-import { CYLRiveIcon } from './CYLRiveTabBarItemAnimator';
+import { CYLRiveIcon, cylRiveIsSupported, cylRiveFileAndOptions, CYLTabBarAnimationOptionTint, CYLTabBarAnimationOptionDarkTint,
+  CYLTabBarAnimationTintTitle } from './CYLRiveTabBarItemAnimator';
+import { CYLAnimatedItemView, CYLAnimatedItemAnimationContext, CYLAnimatedItemEngines } from 'cylanimateditem';
 import { CYLLocalizedString, cyl_textOf } from './CYLLocalization';
+import { CYLTabButtonAnimation, CYLTabButtonProperty, CYLTabButtonView, CYLTabButtonViewImpl } from './CYLTabButtonAnimation';
 
 import { vibrator } from '@kit.SensorServiceKit';
 import { media } from '@kit.MediaKit';
 import { audio } from '@kit.AudioKit';
-import { router } from '@kit.ArkUI';
+import { router, AnimatedDrawableDescriptor } from '@kit.ArkUI';
+import { image } from '@kit.ImageKit';
+import { http } from '@kit.NetworkKit';
+import { CYLGIFImagePlayback, CYLGIFImageState, cylIsGIFImagePath, cylGIFDuration } from './CYLGIFImagePlayback';
 
 /**
  * [EN] What a screen reader says for a badge (read as part of its host, e.g. "Messages, 99+ new messages"); '' none.
@@ -263,7 +269,7 @@ export struct CYLTabBarController {
   @Prop plusButton: CYLPlusButton | undefined = undefined;
   @Link @Watch('cylOnSelectedIndexChange') selectedIndex: number;
   /** [EN] The badge of each tab (-[UIView cyl_showBadgeValue:] on its tab button); created when unset. [CN] 每个 Tab 的角标；未设置时自动创建。 */
-  @State badges: CYLBadge[] = [];
+  @State @Watch('cylOnBadgesChange') badges: CYLBadge[] = [];
   /** [EN] The plus button's badge. [CN] 加号按钮的角标。 */
   @State plusButtonBadge: CYLBadge = new CYLBadge();
   @Prop @Watch('cylOnTabBarHiddenChange') tabBarHidden: boolean = false;
@@ -273,6 +279,16 @@ export struct CYLTabBarController {
   @Prop tintColor: ResourceColor = '#FF8000';
   /** [EN] cyl_tabBarItemTitleColor / CYLTabBarItemTitleColor. [CN] 未选中标题颜色。 */
   @Prop unselectedColor: ResourceColor = '#808080';
+  /**
+   * [EN] CYLTabBarControllerIconColor: the unselected icon color of every tab without its own `iconColor`; undefined
+   *      (default) = the title color. Animated icons with `tint=title` are drawn in it.
+   * [CN] 未单独设置 `iconColor` 的 Tab 的未选中图标颜色；未设置（默认）时用标题颜色。`tint=title` 的动效图标以此颜色绘制。
+   */
+  @Prop iconColor: ResourceColor | undefined = undefined;
+  /**
+   * [EN] CYLTabBarControllerSelectedIconColor: the same for the selected icon. [CN] 选中图标的颜色。
+   */
+  @Prop selectedIconColor: ResourceColor | undefined = undefined;
   plusButtonTitleSelectedColor?: ResourceColor;
   /** [EN] cyl_tabBarBackgroundColor / CYLTabBarBackgroundColor. [CN] TabBar 背景色。 */
   @Prop tabBarBackgroundColor: ResourceColor = '#F8F8F8';
@@ -320,6 +336,18 @@ export struct CYLTabBarController {
   /** [EN] CYLTabBarControllerTabBarItemAnimationSpeed (Lottie). [CN] Lottie 动画速度。 */
   tabBarItemAnimationSpeed: number = 1;
   /**
+   * [EN] tabBarItemAnimationLoops: the selected tab's Lottie, Rive or SVGA icon plays again after each pass until this
+   *      is turned off, also while playing (docs/Animated-Item.md, the Rive loop); off by default.
+   * [CN] tabBarItemAnimationLoops：选中 Tab 的 Lottie、Rive 或 SVGA 图标每次播放后再次播放，直到关闭，播放中也立即生效；默认关闭。
+   */
+  @Prop @Watch('cylOnLoopsChange') tabBarItemAnimationLoops: boolean = false;
+  /** [EN] GIF tab images: playback, decoded frames by path, and a revision that redraws the icons. [CN] GIF Tab 图片：播放状态、按路径缓存的帧，以及触发重绘的修订号。 */
+  private cylGIFPlayback: CYLGIFImagePlayback = new CYLGIFImagePlayback();
+  private cylGIFFrames: Map<string, CYLGIFImageFrames> = new Map();
+  private cylGIFLoading: Set<string> = new Set();
+  private cylGIFDescriptors: Map<number, CYLGIFImageDescriptor> = new Map();
+  @State private cylGIFRevision: number = 0;
+  /**
    * [EN] -cyl_coverVisiableTabImageViewOrTabButton:...: an image covering a whole tab button (index -> image), as the
    *      Example's Taobao-style Home cover; undefined: none.
    * [CN] 覆盖整个 Tab 按钮的图片（索引 -> 图片），如示例中仿淘宝的首页封面；undefined 表示无。
@@ -363,6 +391,18 @@ export struct CYLTabBarController {
   @State private tapAngle: number[] = [];
   @State private tapFlip: number[] = [];
   @State private tapOffset: number[] = [];
+  /**
+   * [EN] cyl_tabButtonAnimation (issue #535): a CYLTabButtonAnimation played on the tab buttons (select, deselect,
+   *      reselect, press, badge change); it replaces tapAnimationType. [CN] Tab 按钮的点击动画对象；设置后替代 tapAnimationType。
+   */
+  tabButtonAnimation?: CYLTabButtonAnimation;
+  @State private tapFlipX: number[] = [];
+  @State private tapTitleOpacity: number[] = [];
+  @State private tapTitleScale: number[] = [];
+  @State private tapBadgeScale: number[] = [];
+  @State private tapFrameImages: (ResourceStr | undefined)[] = [];
+  @State private tapFireworks: number[] = [];
+  @State private tapFireworkImages: (ResourceStr | undefined)[] = [];
   private lastTapIndex: number = -2;
   /** [EN] The tab whose long press just fired: its click is not a tap. [CN] 刚触发长按的 Tab：其 click 不算点击。 */
   private cylLongPressedIndex: number = -2;
@@ -457,7 +497,12 @@ export struct CYLTabBarController {
   }
 
   aboutToAppear(): void {
+    // [EN] cyltabbar plays Lottie (@ohos/lottie), Rive (@ohos/rive) and SVGA (its own player): CYLAnimatedItemView draws them.
+    // [CN] cyltabbar 播放 Lottie、Rive 与 SVGA（自带播放器）：由 CYLAnimatedItemView 绘制。
+    ['Lottie', 'Rive', 'SVGA'].forEach((type: string) => CYLAnimatedItemEngines.register(type));
     this.loaded = [this.selectedIndex];
+    this.cylGIFPlayback.loops = this.tabBarItemAnimationLoops;
+    this.cylLoadGIFImages();
     while (this.badges.length < this.tabBarItemsAttributes.length) {
       this.badges.push(new CYLBadge());
     }
@@ -798,7 +843,7 @@ export struct CYLTabBarController {
         // [EN] No vibrator or no permission. [CN] 没有振动器或没有权限。
       }
     }
-    if (index < 0 || this.tapAnimationType === CYLTabButtonTapAnimationType.None) {
+    if (index < 0 || this.tapAnimationType === CYLTabButtonTapAnimationType.None || this.tabButtonAnimation !== undefined) {
       return;
     }
     const set = (values: number[], value: number): number[] => {
@@ -832,6 +877,132 @@ export struct CYLTabBarController {
     }
   }
 
+  private cylTapValues(property: CYLTabButtonProperty): number[] {
+    switch (property) {
+      case CYLTabButtonProperty.IconScale: return this.tapScale;
+      case CYLTabButtonProperty.IconAngle: return this.tapAngle;
+      case CYLTabButtonProperty.IconFlipY: return this.tapFlip;
+      case CYLTabButtonProperty.IconFlipX: return this.tapFlipX;
+      case CYLTabButtonProperty.IconOffsetY: return this.tapOffset;
+      case CYLTabButtonProperty.TitleOpacity: return this.tapTitleOpacity;
+      case CYLTabButtonProperty.TitleScale: return this.tapTitleScale;
+      default: return this.tapBadgeScale;
+    }
+  }
+
+  private cylSetTapValue(index: number, property: CYLTabButtonProperty, value: number): void {
+    const copy = this.cylTapValues(property).slice();
+    copy[index] = value;
+    switch (property) {
+      case CYLTabButtonProperty.IconScale: this.tapScale = copy; break;
+      case CYLTabButtonProperty.IconAngle: this.tapAngle = copy; break;
+      case CYLTabButtonProperty.IconFlipY: this.tapFlip = copy; break;
+      case CYLTabButtonProperty.IconFlipX: this.tapFlipX = copy; break;
+      case CYLTabButtonProperty.IconOffsetY: this.tapOffset = copy; break;
+      case CYLTabButtonProperty.TitleOpacity: this.tapTitleOpacity = copy; break;
+      case CYLTabButtonProperty.TitleScale: this.tapTitleScale = copy; break;
+      default: this.tapBadgeScale = copy; break;
+    }
+  }
+
+  /** [EN] The CYLTabButtonView of a tab, for tabButtonAnimation. [CN] Tab 的 CYLTabButtonView。 */
+  cylButtonView(index: number): CYLTabButtonView {
+    const neutral = (property: CYLTabButtonProperty): number =>
+      property === CYLTabButtonProperty.IconScale || property === CYLTabButtonProperty.TitleOpacity ||
+        property === CYLTabButtonProperty.TitleScale || property === CYLTabButtonProperty.BadgeScale ? 1 : 0;
+    const ui = this.getUIContext();
+    return new CYLTabButtonViewImpl(index, this.tabBarItemsAttributes[index]?.title !== undefined,
+      (property: CYLTabButtonProperty): number => this.cylTapValues(property)[index] ?? neutral(property),
+      (property: CYLTabButtonProperty, value: number, duration?: number, curve?: Curve): void => {
+        if (duration === undefined || duration <= 0) {
+          this.cylSetTapValue(index, property, value);
+          return;
+        }
+        ui.animateTo({ duration: duration, curve: curve ?? Curve.EaseInOut }, () => this.cylSetTapValue(index, property, value));
+      },
+      (property: CYLTabButtonProperty, values: number[], duration: number, keyTimes?: number[]): void => {
+        if (values.length === 0) {
+          return;
+        }
+        this.cylSetTapValue(index, property, values[0]);
+        const steps: KeyframeState[] = [];
+        for (let i = 1; i < values.length; i++) {
+          const from = keyTimes?.[i - 1] ?? (i - 1) / (values.length - 1);
+          const to = keyTimes?.[i] ?? i / (values.length - 1);
+          const value = values[i];
+          steps.push({
+            duration: Math.max(1, Math.round((to - from) * duration)),
+            curve: Curve.EaseInOut,
+            event: () => this.cylSetTapValue(index, property, value),
+          });
+        }
+        if (steps.length > 0) {
+          ui.keyframeAnimateTo({ iterations: 1 }, steps);
+        }
+      },
+      (image: ResourceStr | undefined): void => {
+        const copy = this.tapFrameImages.slice();
+        copy[index] = image;
+        this.tapFrameImages = copy;
+      },
+      (image?: ResourceStr): void => {
+        const images = this.tapFireworkImages.slice();
+        images[index] = image;
+        this.tapFireworkImages = images;
+        const start = this.tapFireworks.slice();
+        start[index] = 0.01;
+        this.tapFireworks = start;
+        ui.animateTo({
+          duration: 600, curve: Curve.EaseOut, onFinish: () => {
+            const done = this.tapFireworks.slice();
+            done[index] = 0;
+            this.tapFireworks = done;
+          }
+        }, () => {
+          const end = this.tapFireworks.slice();
+          end[index] = 1;
+          this.tapFireworks = end;
+        });
+      });
+  }
+
+  /** [EN] tabButtonAnimation on a tap: reselect, or deselect the previous tab then select this one. [CN] 点击时播放动画对象。 */
+  private cylPlayTabButtonAnimation(index: number, previous: number): void {
+    const animation = this.tabButtonAnimation;
+    if (animation === undefined || index < 0) {
+      return;
+    }
+    if (index === previous) {
+      animation.cyl_playReselectAnimationWithTabButton(this.cylButtonView(index));
+      return;
+    }
+    if (previous >= 0) {
+      animation.cyl_toRight = index > previous;
+      animation.cyl_playDeselectAnimationWithTabButton(this.cylButtonView(previous));
+    }
+    animation.cyl_fromLeft = previous >= 0 && previous < index;
+    animation.cyl_playSelectAnimationWithTabButton(this.cylButtonView(index));
+  }
+
+  private cylLastBadgeValues: string[] = [];
+
+  /**
+   * [EN] A badge set or replaced in `badges`: tabButtonAnimation's badge-changed animation.
+   * [CN] `badges` 中的角标被设置或替换时，播放动画对象的角标动画。
+   */
+  cylOnBadgesChange(): void {
+    const values = this.badges.map((badge: CYLBadge) => `${badge?.value ?? 'none'}|${badge?.generation ?? 0}`);
+    const animation = this.tabButtonAnimation;
+    if (animation !== undefined) {
+      values.forEach((value: string, index: number) => {
+        if (this.cylLastBadgeValues[index] !== undefined && this.cylLastBadgeValues[index] !== value) {
+          animation.cyl_playBadgeChangedAnimationWithTabButton(this.cylButtonView(index));
+        }
+      });
+    }
+    this.cylLastBadgeValues = values;
+  }
+
   /** [EN] A tap on a tab button: double tap, feedback, then selection. [CN] 点击 Tab：双击检测、反馈，然后选中。 */
   cylTap(index: number): void {
     const now = Date.now();
@@ -844,6 +1015,7 @@ export struct CYLTabBarController {
     }
     this.cylTapFeedback(index);
     const previous = this.selectedIndex;
+    this.cylPlayTabButtonAnimation(index, previous);
     this.cylSelect(index);
     if (this.didSelectControl !== undefined) {
       this.didSelectControl(index, previous);
@@ -899,17 +1071,139 @@ export struct CYLTabBarController {
     if (this.loaded.indexOf(index) < 0) {
       this.loaded = this.loaded.concat([index]);
     }
+    const previousIndex = this.selectedIndex;
     this.selectedIndex = index;
+    this.cylPlayGIFImageOnSelect(index, previousIndex);
     if (this.didSelect !== undefined) {
       this.didSelect(index, identifier);
     }
+  }
+
+  /**
+   * [EN] The GIF image path of a tab (a ".gif" image URL or path, not the GIF animation keys), or undefined.
+   * [CN] Tab 的 GIF 图片路径（以 ".gif" 结尾的图片 URL 或路径，不含 GIF 动画 key）；没有时为 undefined。
+   */
+  private cylGIFImagePath(index: number): string | undefined {
+    const item = this.tabBarItemsAttributes[index];
+    if (item === undefined || item.gifFilePath !== undefined) {
+      return undefined;
+    }
+    const icon = this.cylIcon(index);
+    return cylIsGIFImagePath(icon) ? icon as string : undefined;
+  }
+
+  /**
+   * [EN] What a GIF tab image shows (docs/GIF-Animation.md): its first frame at rest, an animated drawable of one pass or
+   *      repeating while played; undefined until it is decoded (the plain image is shown meanwhile).
+   * [CN] GIF Tab 图片显示的内容：静止时为第一帧，播放时为播放一遍或重复播放的动画 Drawable；解码完成之前为 undefined（期间显示普通图片）。
+   */
+  private cylGIFImageSource(index: number): image.PixelMap | AnimatedDrawableDescriptor | undefined {
+    const path = this.cylGIFImagePath(index);
+    if (path === undefined || this.cylGIFRevision < 0) {
+      return undefined;
+    }
+    const frames = this.cylGIFFrames.get(path);
+    if (frames === undefined) {
+      return undefined;
+    }
+    const state = this.cylGIFPlayback.stateOf(index);
+    if (state === CYLGIFImageState.Resting) {
+      return frames.frames[0];
+    }
+    // [EN] One drawable per play, so a redraw (a badge change) does not restart it. [CN] 每次播放一个 Drawable，重绘（如角标变化）不会重新开始。
+    const token = this.cylGIFPlayback.tokenOf(index);
+    const cached = this.cylGIFDescriptors.get(index);
+    if (cached !== undefined && cached.token === token && cached.path === path) {
+      return cached.descriptor;
+    }
+    const descriptor = new AnimatedDrawableDescriptor(frames.frames,
+      { duration: frames.duration, iterations: state === CYLGIFImageState.Looping ? -1 : 1 });
+    this.cylGIFDescriptors.set(index, new CYLGIFImageDescriptor(token, path, descriptor));
+    return descriptor;
+  }
+
+  /** [EN] Decodes the GIF images of every tab (normal and selected). [CN] 解码所有 Tab 的 GIF 图片（普通与选中）。 */
+  private cylLoadGIFImages(): void {
+    this.tabBarItemsAttributes.forEach((item: CYLTabBarItemAttributes) => {
+      if (item.gifFilePath !== undefined) {
+        return;
+      }
+      const paths: (Object | undefined)[] = [item.imageURL, item.selectedImageURL, item.image, item.selectedImage,
+        item.darkImage, item.darkSelectedImage];
+      paths.forEach((path: Object | undefined) => {
+        if (cylIsGIFImagePath(path)) {
+          this.cylLoadGIFImage(path as string);
+        }
+      });
+    });
+  }
+
+  private async cylLoadGIFImage(path: string): Promise<void> {
+    if (this.cylGIFFrames.has(path) || this.cylGIFLoading.has(path)) {
+      return;
+    }
+    this.cylGIFLoading.add(path);
+    try {
+      const bytes = await cylReadImageBytes(getContext(this), path);
+      const source = image.createImageSource(bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength));
+      const frames = await source.createPixelMapList();
+      let delays: number[] = [];
+      try {
+        delays = await source.getDelayTimeList();
+      } catch (error) {
+        // [EN] No delays: 100 ms a frame. [CN] 没有延时：每帧 100 毫秒。
+      }
+      await source.release();
+      if (frames.length > 0) {
+        this.cylGIFFrames.set(path, new CYLGIFImageFrames(frames, cylGIFDuration(delays)));
+        this.cylGIFRevision++;
+      }
+    } catch (error) {
+      // [EN] Not decoded: the plain image stays (it animates as before). [CN] 无法解码：保留普通图片（与之前一样播放）。
+      console.warn(`CYLTabBarController: the GIF image ${path} could not be decoded: ${(error as Error).message}`);
+    } finally {
+      this.cylGIFLoading.delete(path);
+    }
+  }
+
+  /**
+   * [EN] A tab was selected or tapped again: its GIF image plays (once, or repeating while looping), the previous tab's rests.
+   * [CN] Tab 被选中或再次点击：播放其 GIF 图片（一次，循环开启时重复），上一个 Tab 的 GIF 回到静止。
+   */
+  private cylPlayGIFImageOnSelect(index: number, previousIndex: number): void {
+    if (previousIndex !== index && previousIndex >= 0 && this.cylGIFPlayback.stateOf(previousIndex) !== CYLGIFImageState.Resting) {
+      this.cylGIFPlayback.stop(previousIndex);
+    }
+    this.cylLoadGIFImages();
+    const path = this.cylGIFImagePath(index);
+    const frames = path === undefined ? undefined : this.cylGIFFrames.get(path);
+    if (frames === undefined) {
+      this.cylGIFRevision++;
+      return;
+    }
+    const token = this.cylGIFPlayback.play(index);
+    this.cylGIFRevision++;
+    if (!this.cylGIFPlayback.loops) {
+      setTimeout(() => {
+        if (this.cylGIFPlayback.finish(index, token)) {
+          this.cylGIFRevision++;
+        }
+      }, frames.duration);
+    }
+  }
+
+  /** [EN] tabBarItemAnimationLoops changed: GIF images follow it. [CN] tabBarItemAnimationLoops 变化：GIF 图片随之变化。 */
+  cylOnLoopsChange(): void {
+    this.cylGIFPlayback.setLoops(this.tabBarItemAnimationLoops, this.selectedIndex, this.tabBarItemsAttributes.length);
+    this.cylGIFRevision++;
   }
 
   /** [EN] The icon of a tab: GIF, then URL, then the images. [CN] Tab 图标：GIF 优先，其次网络图片，最后本地图片。 */
   cylIcon(index: number): ResourceStr | undefined {
     const item = this.tabBarItemsAttributes[index];
     if (item.gifFilePath !== undefined) {
-      return item.gifFilePath.startsWith('http') ? item.gifFilePath : $rawfile(item.gifFilePath);
+      // [EN] A local file without its options ("gif/a.gif?tint=title" is gif/a.gif). [CN] 本地文件去掉选项（"gif/a.gif?tint=title" 即 gif/a.gif）。
+      return item.gifFilePath.startsWith('http') ? item.gifFilePath : $rawfile(cylRiveFileAndOptions(item.gifFilePath)[0]);
     }
     const selected = this.selectedIndex === index;
     if (item.imageURL !== undefined) {
@@ -1036,12 +1330,183 @@ export struct CYLTabBarController {
    */
   private cylRivePath(index: number): string | undefined {
     const item = this.tabBarItemsAttributes[index];
+    // [EN] No Rive view where @ohos/rive cannot run: the image shows. [CN] @ohos/rive 无法运行时不创建 Rive 视图：显示图片。
     if (item.lottieFilePath !== undefined || item.gifFilePath !== undefined || item.imageURL !== undefined
-      || this.cylRiveFailures.includes(index)) {
+      || this.cylRiveFailures.includes(index) || !cylRiveIsSupported()) {
       return undefined;
     }
     const dark = this.colorMode === 'dark';
     return (dark ? item.riveDarkFilePath : undefined) ?? item.riveFilePath;
+  }
+
+  /** [EN] Fireworks of tabButtonAnimation: 8 particles that burst out and fade. [CN] 烟花：8 个粒子向外散开并淡出。 */
+  @Builder
+  cylFireworks(index: number) {
+    Stack() {
+      ForEach([0, 1, 2, 3, 4, 5, 6, 7], (particle: number) => {
+        if (this.tapFireworkImages[index] !== undefined) {
+          Image(this.tapFireworkImages[index])
+            .width(6)
+            .height(6)
+            .translate({
+              x: Math.cos(particle * Math.PI / 4) * 22 * (this.tapFireworks[index] ?? 0),
+              y: Math.sin(particle * Math.PI / 4) * 22 * (this.tapFireworks[index] ?? 0),
+            })
+            .opacity(1 - (this.tapFireworks[index] ?? 0))
+        } else {
+          Circle()
+            .width(4)
+            .height(4)
+            .fill(this.tintColor)
+            .translate({
+              x: Math.cos(particle * Math.PI / 4) * 22 * (this.tapFireworks[index] ?? 0),
+              y: Math.sin(particle * Math.PI / 4) * 22 * (this.tapFireworks[index] ?? 0),
+            })
+            .opacity(1 - (this.tapFireworks[index] ?? 0))
+        }
+      }, (particle: number) => `${particle}`)
+    }
+    .width('100%')
+    .height('100%')
+    .hitTestBehavior(HitTestMode.Transparent)
+    .accessibilityLevel('no-hide-descendants')
+  }
+
+  /** [EN] The animation file of a tab (Lottie, Rive or SVGA), or undefined. [CN] Tab 的动画文件（Lottie、Rive 或 SVGA），没有时为 undefined。 */
+  cylTabAnimationPath(index: number): string | undefined {
+    const item = this.tabBarItemsAttributes[index];
+    if (item.lottieFilePath !== undefined && item.gifFilePath === undefined && item.imageURL === undefined) {
+      return this.colorMode === 'dark' && item.lottieDarkFilePath !== undefined ? item.lottieDarkFilePath : item.lottieFilePath;
+    }
+    return this.cylRivePath(index) ?? this.cylSVGAPath(index);
+  }
+
+  /**
+   * [EN] The color a tab's animation is drawn in (`CYLTabBarAnimationOptionTint` in its path's query): "title" = the
+   *      tab's icon color for its state, as iOS draws a template image (the item's `iconColor` / `selectedIconColor`, then
+   *      the controller's, then the title color); a fixed color, with `CYLTabBarAnimationOptionDarkTint` in dark mode; '' = the
+   *      file's own colors.
+   * [CN] Tab 动画的绘制颜色（路径查询参数中的 `CYLTabBarAnimationOptionTint`）："title" = Tab 当前状态的图标颜色，与 iOS 模板图片一致（先 Tab 的
+   *      `iconColor` / `selectedIconColor`，再控制器的，最后标题颜色）；固定颜色，深色模式下使用
+   *      `CYLTabBarAnimationOptionDarkTint`；'' = 文件自身的颜色。
+   */
+  cylTabAnimationTint(index: number): ResourceColor {
+    return this.cylTintForPath(index, this.cylTabAnimationPath(index));
+  }
+
+  /**
+   * [EN] The tint of `path`'s options for tab `index` (see `cylTabAnimationTint`); '' for none.
+   * [CN] Tab `index` 的 `path` 选项中的着色（见 `cylTabAnimationTint`）；没有时为 ''。
+   */
+  cylTintForPath(index: number, path: string | undefined): ResourceColor {
+    if (path === undefined) {
+      return '';
+    }
+    const options = cylRiveFileAndOptions(path)[1];
+    const tint = (options[CYLTabBarAnimationOptionTint] ?? '').trim();
+    if (tint.length === 0) {
+      return '';
+    }
+    if (tint === CYLTabBarAnimationTintTitle) {
+      const item = this.tabBarItemsAttributes[index];
+      return this.selectedIndex === index
+        ? (item.selectedIconColor ?? this.selectedIconColor ?? item.selectedTitleColor ?? this.tintColor)
+        : (item.iconColor ?? this.iconColor ?? item.titleColor ?? this.unselectedColor);
+    }
+    const dark = (options[CYLTabBarAnimationOptionDarkTint] ?? '').trim();
+    return this.colorMode === 'dark' && dark.length > 0 ? dark : tint;
+  }
+
+  /**
+   * [EN] The color filter of a GIF tab icon with the `tint` option (`gifFilePath` "gif/a.gif?tint=title"): RGB = the tint,
+   *      alpha = the GIF's alpha times the tint's, the same as the SRC_IN tint layer of the other engines
+   *      (`CYLAnimatedItemView.animationTintColor`), since a GIF is drawn as an Image, not an engine view. The identity
+   *      matrix without a tint (or with a color that is not "#RRGGBB" / "#AARRGGBB"): the GIF keeps its own colors.
+   * [CN] 带 `tint` 选项的 GIF Tab 图标（`gifFilePath` "gif/a.gif?tint=title"）的颜色滤镜：RGB = 着色，alpha = GIF 的 alpha 乘以着色的 alpha，
+   *      与其他引擎的 SRC_IN 着色层（`CYLAnimatedItemView.animationTintColor`）相同，因为 GIF 由 Image 绘制而不是引擎视图。没有着色（或颜色
+   *      不是 "#RRGGBB" / "#AARRGGBB"）时为单位矩阵：GIF 保持自身颜色。
+   */
+  cylGifColorFilter(index: number): ColorFilter {
+    return cylTintColorFilter(this.cylTintForPath(index, this.tabBarItemsAttributes[index].gifFilePath));
+  }
+
+  /**
+   * [EN] The color filter of tab `index`'s icon Image: a GIF's `tint` option (`cylGifColorFilter`); for a static icon the
+   *      tab's icon color for its state (the item's `iconColor` / `selectedIconColor`, then the controller's), as Android
+   *      tints an icon only when an icon color is set ("automatic", #787); none set: the image keeps its own colors.
+   * [CN] Tab `index` 图标 Image 的颜色滤镜：GIF 用其 `tint` 选项（`cylGifColorFilter`）；静态图标用 Tab 当前状态的图标颜色（先 Tab 的
+   *      `iconColor` / `selectedIconColor`，再控制器的），与 Android 一致，只有设置了图标颜色才着色（"automatic"，#787）；都未设置时保持原图颜色。
+   */
+  cylIconColorFilter(index: number): ColorFilter {
+    const item = this.tabBarItemsAttributes[index];
+    if (item.gifFilePath !== undefined) {
+      return this.cylGifColorFilter(index);
+    }
+    const color = this.selectedIndex === index
+      ? (item.selectedIconColor ?? this.selectedIconColor)
+      : (item.iconColor ?? this.iconColor);
+    return cylTintColorFilter(color ?? '');
+  }
+
+  cylTabAnimationSize(index: number): number {
+    const item = this.tabBarItemsAttributes[index];
+    if (item.lottieFilePath !== undefined && item.gifFilePath === undefined && item.imageURL === undefined) {
+      return item.lottieSize ?? this.imageSize;
+    }
+    if (this.cylRivePath(index) !== undefined) {
+      return item.riveSize ?? this.imageSize;
+    }
+    return item.svgaSize ?? this.imageSize;
+  }
+
+  /** [EN] The engine view CYLAnimatedItemView shows for a tab. [CN] CYLAnimatedItemView 为 Tab 显示的引擎视图。 */
+  @Builder
+  cylTabEngine(index: number, context: CYLAnimatedItemAnimationContext) {
+    if (this.tabBarItemsAttributes[index].lottieFilePath !== undefined
+      && this.tabBarItemsAttributes[index].gifFilePath === undefined
+      && this.tabBarItemsAttributes[index].imageURL === undefined) {
+      CYLLottieIcon({
+        path: cylRiveFileAndOptions(this.cylTabAnimationPath(index) ?? '')[0],
+        iconSize: this.cylTabAnimationSize(index),
+        speed: context.speed,
+        selected: this.selectedIndex === index,
+        replayToken: context.restartToken,
+        loops: context.loops,
+        registerReplay: (replay: () => void) => context.setRestartHandler(replay),
+        onLoaded: () => context.onLoaded(),
+        onLoadError: (_message: string) => context.onFailed(),
+      })
+    } else if (this.cylRivePath(index) !== undefined) {
+      CYLRiveIcon({
+        path: this.cylRivePath(index),
+        iconSize: this.cylTabAnimationSize(index),
+        selected: this.selectedIndex === index,
+        replayToken: context.restartToken,
+        loops: context.loops,
+        registerReplay: (replay: () => void) => context.setRestartHandler(replay),
+        onLoaded: () => context.onLoaded(),
+        onLoadError: (_message: string) => {
+          context.onFailed();
+          this.cylRiveFailures = this.cylRiveFailures.concat([index]);
+        },
+      })
+    } else if (this.cylSVGAPath(index) !== undefined) {
+      CYLSVGAView({
+        // [EN] The file without its options: "svga/a.svga?tint=title" failed to load, and the tab fell back to its untinted
+        //      image. [CN] 不带选项的文件："svga/a.svga?tint=title" 加载失败，Tab 退回未着色的图片。
+        path: cylRiveFileAndOptions(this.cylSVGAPath(index) ?? '')[0],
+        iconSize: this.cylTabAnimationSize(index),
+        selected: this.selectedIndex === index,
+        replayToken: context.restartToken,
+        loops: context.loops,
+        registerReplay: (replay: () => void) => context.setRestartHandler(replay),
+        onLoaded: () => context.onLoaded(),
+        onLoadError: (_message: string) => {
+          context.onFailed();
+          this.cylSVGAFailures = this.cylSVGAFailures.concat([index]);
+        },
+      })
+    }
   }
 
   @Builder
@@ -1055,49 +1520,43 @@ export struct CYLTabBarController {
           .id(`cyl-cover-${this.cylIdentifier(index)}`)
       } else {
       Stack() {
-        if (this.tabBarItemsAttributes[index].lottieFilePath !== undefined
-          && this.tabBarItemsAttributes[index].gifFilePath === undefined
-          && this.tabBarItemsAttributes[index].imageURL === undefined) {
-          CYLLottieIcon({
-            path: this.colorMode === 'dark' && this.tabBarItemsAttributes[index].lottieDarkFilePath !== undefined
-              ? this.tabBarItemsAttributes[index].lottieDarkFilePath : this.tabBarItemsAttributes[index].lottieFilePath,
-            iconSize: this.tabBarItemsAttributes[index].lottieSize ?? this.imageSize,
-            speed: this.tabBarItemAnimationSpeed,
-            selected: this.selectedIndex === index,
-            replayToken: this.replayTokens[index] ?? 0,
-          })
-        } else if (this.cylRivePath(index) !== undefined) {
-          CYLRiveIcon({
-            path: this.cylRivePath(index),
-            iconSize: this.tabBarItemsAttributes[index].riveSize ?? this.imageSize,
-            selected: this.selectedIndex === index,
-            replayToken: this.replayTokens[index] ?? 0,
-            onLoadError: (_message: string) => {
-              this.cylRiveFailures = this.cylRiveFailures.concat([index]);
-            },
-          })
-        } else if (this.cylSVGAPath(index) !== undefined) {
-          CYLSVGAView({
-            path: this.cylSVGAPath(index),
-            iconSize: this.tabBarItemsAttributes[index].svgaSize ?? this.imageSize,
-            selected: this.selectedIndex === index,
-            replayToken: this.replayTokens[index] ?? 0,
-            onLoadError: (_message: string) => {
-              this.cylSVGAFailures = this.cylSVGAFailures.concat([index]);
+        if (this.cylTabAnimationPath(index) !== undefined) {
+          // [EN] The animated icon is CYLAnimatedItemView (docs/Animated-Item.md, TODO 5): the static image (else the
+          //      placeholder) until the engine view reports it is drawn, and again when it fails.
+          // [CN] 动效图标由 CYLAnimatedItemView 绘制（docs/Animated-Item.md，TODO 5）：引擎视图报告绘制完成之前，以及失败之后，显示静态图片（没有时为占位图）。
+          CYLAnimatedItemView({
+            isBare: true,
+            image: this.cylIcon(index) ?? '',
+            animationUrl: this.cylTabAnimationPath(index),
+            iconSize: this.cylTabAnimationSize(index),
+            isItemSelected: this.selectedIndex === index,
+            animationTintColor: this.cylTabAnimationTint(index),
+            // [EN] The playback goes through the component, which hands it to the engine in its context.
+            // [CN] 播放设置经由组件传递，组件通过 context 交给引擎。
+            animationSpeed: this.tabBarItemAnimationSpeed,
+            animationLoops: this.tabBarItemAnimationLoops,
+            animationRestartToken: this.replayTokens[index] ?? 0,
+            animationBuilder: (context: CYLAnimatedItemAnimationContext) => {
+              this.cylTabEngine(index, context)
             },
           })
         } else {
-        Image(this.cylIcon(index))
+        Image(this.tapFrameImages[index] ?? this.cylGIFImageSource(index) ?? this.cylIcon(index))
           .width(this.imageSize)
           .height(this.imageSize)
           .objectFit(ImageFit.Contain)
+          // [EN] A GIF's `tint` option, or a static icon's icon color (identity otherwise). [CN] GIF 的 `tint` 选项，或静态图标的图标颜色（否则为单位矩阵）。
+          .colorFilter(this.cylIconColorFilter(index))
           .scale({ x: this.tapScale[index] ?? 1, y: this.tapScale[index] ?? 1 })
           .rotate({ z: 1, angle: this.tapAngle[index] ?? 0 })
           .rotate({ y: 1, angle: this.tapFlip[index] ?? 0 })
+          .rotate({ x: 1, angle: this.tapFlipX[index] ?? 0 })
           .translate({ y: this.tapOffset[index] ?? 0 })
           .padding(this.tabBarItemsAttributes[index].imageInsets ?? 0)
+          .overlay((this.tapFireworks[index] ?? 0) > 0 ? this.cylFireworks(index) : undefined)
         }
         CYLBadgeView({ badge: this.badges[index], anchorWidth: this.cylIconHeight(index) })
+          .scale({ x: this.tapBadgeScale[index] ?? 1, y: this.tapBadgeScale[index] ?? 1 })
       }
       // [EN] No fixed width: the badge is measured with the free width, so text badges grow with their text (issue list
       //      #1). The icon sits right above the title, whose top is at tabBarHeight - 17 like the plus title (#2).
@@ -1117,7 +1576,8 @@ export struct CYLTabBarController {
           .fontSize(10)
           .margin({ top: 3 })
           // [EN] Liquid Glass minimized: the title fades out with the morph. [CN] 液态玻璃缩小时标题随形变淡出。
-          .opacity(this.cylGlassMinimized() ? 0 : 1)
+          .opacity(this.cylGlassMinimized() ? 0 : (this.tapTitleOpacity[index] ?? 1))
+          .scale({ x: this.tapTitleScale[index] ?? 1, y: this.tapTitleScale[index] ?? 1 })
           .fontColor(this.selectedIndex === index
             ? (this.tabBarItemsAttributes[index].selectedTitleColor ?? this.tintColor)
             : (this.tabBarItemsAttributes[index].titleColor ?? this.unselectedColor))
@@ -1163,6 +1623,17 @@ export struct CYLTabBarController {
         return;
       }
       this.cylTap(index);
+    })
+    .onTouch((event: TouchEvent) => {
+      const animation = this.tabButtonAnimation;
+      if (animation === undefined) {
+        return;
+      }
+      if (event.type === TouchType.Down) {
+        animation.cyl_playHighlightAnimationWithTabButton(this.cylButtonView(index));
+      } else if (event.type === TouchType.Up || event.type === TouchType.Cancel) {
+        animation.cyl_playDehighlightAnimationWithTabButton(this.cylButtonView(index));
+      }
     })
     .parallelGesture(LongPressGesture({ duration: this.longPressDuration }).onAction(() => {
       this.cylLongPressedIndex = index;
@@ -1292,6 +1763,27 @@ export struct CYLTabBarController {
       .hitTestBehavior(HitTestMode.Transparent)
   }
 
+  /**
+   * [EN] The classic / FlatDesign top line (0.5 vp of the shadow color, or `shadowImage`), as the row's first child placed
+   *      at its top: the tabs and the raised plus button are drawn after it, so it never crosses them (HarmonyOS issue
+   *      list #52). As the row's border or overlay, ArkUI painted it over the children.
+   * [CN] 经典 / 扁平样式的顶部线条（0.5 vp 的阴影色，或 `shadowImage`），作为 Row 的第一个子节点放在顶部：Tab 与凸起的加号按钮在其后绘制，
+   *      线条不会横穿它们（鸿蒙问题列表 #52）。作为 Row 的描边或 overlay 时，ArkUI 会把它画在子节点之上。
+   */
+  @Builder
+  cylTopLine() {
+    if (this.shadowImage !== undefined) {
+      this.cylShadowImage()
+    } else {
+      Row()
+        .width('100%')
+        .height(0.5)
+        .backgroundColor(this.tabBarShadowColor)
+        .accessibilityLevel('no')
+        .hitTestBehavior(HitTestMode.Transparent)
+    }
+  }
+
   build() {
     Column() {
       Stack() {
@@ -1331,6 +1823,15 @@ export struct CYLTabBarController {
           if (this.tabBarStyleType === CYLTabBarStyleType.LiquidGlass) {
             this.cylGlassSheen()
             this.cylGlassLens()
+          } else {
+            // [EN] The top line first, under the tabs and the plus button (issue list #52).
+            // [CN] 先画顶部线条，位于 Tab 与加号按钮之下（问题列表 #52）。
+            Stack() {
+              this.cylTopLine()
+            }
+            .width('100%')
+            .position({ x: 0, y: 0 })
+            .hitTestBehavior(HitTestMode.Transparent)
           }
           ForEach(this.cylSlots(), (slot: CYLSlot) => {
             if (slot.tabIndex >= 0) {
@@ -1353,10 +1854,10 @@ export struct CYLTabBarController {
         //      button); the glass rim is drawn by cylGlassSheen, under the tabs. The classic top line would also leave the
         //      other edges black after a re-render.
         // [CN] 液态玻璃：Row 不设描边（ArkUI 把描边画在子节点之上，会在凸起的加号按钮上留下一条线）；玻璃亮边由 cylGlassSheen 画在 Tab 之下。
-        .border(this.tabBarStyleType === CYLTabBarStyleType.LiquidGlass
-          ? { width: 0 }
-          : { width: { top: this.shadowImage !== undefined ? 0 : 0.5 }, color: { top: this.tabBarShadowColor } })
-        .overlay(this.shadowImage !== undefined ? this.cylShadowImage : undefined, { align: Alignment.Top })
+        // [EN] No border and no overlay in any style: both are painted over the children. The classic / FlatDesign top line
+        //      is cylTopLine, the row's first child (issue list #52).
+        // [CN] 任何样式都不用描边与 overlay：两者都画在子节点之上。经典 / 扁平样式的顶部线条是 Row 的第一个子节点 cylTopLine（问题列表 #52）。
+        .border({ width: 0 })
         // [EN] Liquid Glass: the lens slides behind the tabs; touching lifts it, dragging moves it (iOS 26).
         // [CN] 液态玻璃：镜片在 Tab 后滑动；触摸时抬起，拖动时跟随（iOS 26）。
         .scale({ x: 1 + 0.02 * this.glassLensLift, y: 1 + 0.02 * this.glassLensLift })
@@ -1424,4 +1925,78 @@ export struct CYLTabBarController {
       this.glassWidth = Number(area.width);
     })
   }
+}
+
+/**
+ * [EN] An SRC_IN color filter for `tint`: RGB = the tint, alpha = the image's alpha times the tint's. "#RRGGBB" /
+ *      "#AARRGGBB" strings and 0xAARRGGBB numbers; anything else (none, '', a resource) gives the identity matrix.
+ * [CN] `tint` 的 SRC_IN 颜色滤镜：RGB = 着色，alpha = 图像的 alpha 乘以着色的 alpha。支持 "#RRGGBB" / "#AARRGGBB" 字符串与 0xAARRGGBB
+ *      数字；其他（无、''、资源）为单位矩阵。
+ */
+export function cylTintColorFilter(tint: ResourceColor): ColorFilter {
+  const identity: number[] = [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0];
+  let hex: string;
+  if (typeof tint === 'number') {
+    hex = (tint >>> 0).toString(16).padStart(8, '0');
+    if (tint >>> 0 <= 0xFFFFFF) {
+      hex = 'FF' + hex.substring(2);
+    }
+  } else if (typeof tint === 'string' && /^#([0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/.test(tint)) {
+    hex = tint.substring(1);
+  } else {
+    return new ColorFilter(identity);
+  }
+  const argb = hex.length === 8 ? hex : 'FF' + hex;
+  const a = parseInt(argb.substring(0, 2), 16) / 255;
+  const r = parseInt(argb.substring(2, 4), 16) / 255;
+  const g = parseInt(argb.substring(4, 6), 16) / 255;
+  const b = parseInt(argb.substring(6, 8), 16) / 255;
+  return new ColorFilter([0, 0, 0, 0, r, 0, 0, 0, 0, g, 0, 0, 0, 0, b, 0, 0, 0, a, 0]);
+}
+
+/** [EN] The decoded frames of a GIF tab image and its play time (ms). [CN] GIF Tab 图片解码后的帧与播放时长（毫秒）。 */
+class CYLGIFImageFrames {
+  frames: image.PixelMap[];
+  duration: number;
+
+  constructor(frames: image.PixelMap[], duration: number) {
+    this.frames = frames;
+    this.duration = duration;
+  }
+}
+
+/** [EN] The animated drawable of one play of a tab's GIF image. [CN] 某个 Tab 的 GIF 图片一次播放的动画 Drawable。 */
+class CYLGIFImageDescriptor {
+  token: number;
+  path: string;
+  descriptor: AnimatedDrawableDescriptor;
+
+  constructor(token: number, path: string, descriptor: AnimatedDrawableDescriptor) {
+    this.token = token;
+    this.path = path;
+    this.descriptor = descriptor;
+  }
+}
+
+/**
+ * [EN] The bytes of an image: an http(s) URL (the app needs ohos.permission.INTERNET), else "resource://rawfile/..." or a
+ *      rawfile path.
+ * [CN] 图片的字节：http(s) 地址（App 需要 ohos.permission.INTERNET），否则为 "resource://rawfile/..." 或 rawfile 路径。
+ */
+async function cylReadImageBytes(context: Context, path: string): Promise<Uint8Array> {
+  if (/^https?:\/\//.test(path)) {
+    const request = http.createHttp();
+    try {
+      const response = await request.request(path, { expectDataType: http.HttpDataType.ARRAY_BUFFER });
+      if (response.responseCode < 200 || response.responseCode >= 300) {
+        throw new Error(`HTTP status ${response.responseCode}`);
+      }
+      return new Uint8Array(response.result as ArrayBuffer);
+    } finally {
+      request.destroy();
+    }
+  }
+  const prefix = 'resource://rawfile/';
+  const rawfile = path.startsWith(prefix) ? path.substring(prefix.length) : path.replace(/^\/+/, '');
+  return await context.resourceManager.getRawFileContent(rawfile);
 }

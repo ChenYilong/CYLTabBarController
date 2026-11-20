@@ -63,6 +63,12 @@ class DemoListFragment : Fragment() {
     /** [EN] The tab bar controller of this page. [CN] 本页面所在的 TabBarController。 */
     val tabBarController: CYLTabBarController? get() = cyl_tabBarController
 
+    override fun onAttach(context: android.content.Context) {
+        super.onAttach(context)
+        // [EN] The texts follow this page's locale (DemoText). [CN] 文字跟随本页面的语言（DemoText）。
+        DemoText.attach(context)
+    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val context = inflater.context
         val list = ListView(context).apply {

@@ -1,6 +1,7 @@
 package com.cyl.animateditem
 
 import android.content.Context
+import android.graphics.PorterDuff
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.util.TypedValue
@@ -12,12 +13,9 @@ import android.view.ViewConfiguration
 import android.view.ViewGroup
 import android.view.accessibility.AccessibilityNodeInfo
 import android.widget.Button
+import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
-import com.cyl.tabbar.CYLSize
-import com.cyl.tabbar.CYLTabBarItemAnimationFailureHandling
-import com.cyl.tabbar.CYLTabBarItemAnimationPlayer
-import com.cyl.tabbar.CYLTabBarItemAnimationViewMaking
 import kotlin.math.abs
 import kotlin.math.ceil
 import kotlin.math.max
@@ -50,7 +48,7 @@ import kotlin.math.roundToInt
 open class CYLAnimatedItemView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-) : ViewGroup(context, attrs), CYLAnimatedItemContent, CYLAnimatedItemAnimating, CYLTabBarItemAnimationFailureHandling {
+) : FrameLayout(context, attrs), CYLAnimatedItemContent, CYLAnimatedItemAnimating, CYLTabBarItemAnimationFailureHandling {
 
     /**
      * [EN] The static icon. Hidden from accessibility (the item reads as one element). [CN] 静态图标。对无障碍隐藏（条目作为一个元素朗读）。
@@ -72,10 +70,13 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
     }
 
     /**
-     * [EN] The view playing `animationURL`, while ready. [CN] 正在播放 `animationURL` 的视图（就绪时）。
+     * [EN] The view playing `animationURL`, while ready. A subclass that makes the animation view itself (the tab bar's
+     *      `CYLTabBarItemButton`) sets it, so `animationView`, `animationPlayer` and `isAnimationReady` describe that view.
+     * [CN] 正在播放 `animationURL` 的视图（就绪时）。自己创建动画视图的子类（TabBar 的 `CYLTabBarItemButton`）会设置它，使
+     *      `animationView`、`animationPlayer` 与 `isAnimationReady` 描述该视图。
      */
     var animationView: View? = null
-        private set
+        protected set
 
     /**
      * [EN] The player of `animationView`. [CN] `animationView` 的播放器。
@@ -104,6 +105,22 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
 
     override var selectedImage: Drawable? = null
         set(value) { field = value; updateIcon() }
+
+    /**
+     * [EN] Shown when there is no static image (`image` / `selectedImage`) and `animationURL` cannot play (no library for
+     *      the file, or a file it cannot read). null (default) uses `defaultPlaceholderImage`; an empty `ColorDrawable` with
+     *      no size shows none (the title alone). The animation still wins once it can play.
+     * [CN] 没有静态图片（`image` / `selectedImage`）且 `animationURL` 无法播放（没有该文件的动画库或文件无法读取）时显示。null（默认）使用
+     *      `defaultPlaceholderImage`；没有尺寸的空 `ColorDrawable` 则不显示（只有标题）。动画能播放时仍优先显示动画。
+     */
+    var placeholderImage: Drawable? = null
+        set(value) { field = value; updateIcon(); requestLayout() }
+
+    private fun placeholderIfNeeded(): Drawable? {
+        if (image != null || selectedImage != null || animationURL.isNullOrBlank() || animationShows()) return null
+        val placeholder = placeholderImage ?: defaultPlaceholderImage(context)
+        return placeholder?.takeIf { placeholderImage == null || (it.intrinsicWidth > 0 && it.intrinsicHeight > 0) }
+    }
 
     // MARK: - Layout 布局
 
@@ -218,7 +235,9 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
         isFocusable = true
         addView(iconView)
         addView(titleView)
-        updateAccessibility()
+        // [EN] Not `updateAccessibility()`: a subclass's `accessibilityText()` would run before its own properties exist.
+        // [CN] 不调用 `updateAccessibility()`：子类的 `accessibilityText()` 会在其属性初始化之前运行。
+        contentDescription = CYLAnimatedItemAccessibilityText(title, null)
     }
 
     // MARK: - Measuring and layout 测量与布局
@@ -231,8 +250,13 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
     protected open fun iconSize(): Pair<Int, Int> {
         iconSizeDp?.let { return dp(it.width).roundToInt() to dp(it.height).roundToInt() }
         val drawable = iconView.drawable
-        if (animationView == null && drawable != null && drawable.intrinsicWidth > 0) return drawable.intrinsicWidth to drawable.intrinsicHeight
-        return if (animationView != null || animationURL != null) dp(24f).roundToInt().let { it to it } else 0 to 0
+        if (animationView == null && drawable != null && drawable.intrinsicWidth > 0 && drawable.intrinsicHeight > 0) {
+            return drawable.intrinsicWidth to drawable.intrinsicHeight
+        }
+        // [EN] The size follows what is shown, never `animationURL` alone: a file that cannot play (no engine or library)
+        //      leaves the layout of the static image, or of the title alone, unchanged.
+        // [CN] 尺寸取决于实际显示的内容，而不是只看 `animationURL`：无法播放的文件（没有引擎或动画库）不会改变静态图片或纯标题的布局。
+        return if (animationView != null || drawable != null) dp(24f).roundToInt().let { it to it } else 0 to 0
     }
 
     private fun showsIcon() = animationView != null || iconView.drawable != null
@@ -280,14 +304,7 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
      * [CN] 在给定区域（视图边界减去 padding）中放置图标、动画视图、标题与附加图标。需要其他排列时重写；附加图标调用 `placeAccessory`。
      */
     protected open fun layoutContent(left: Int, top: Int, right: Int, bottom: Int) {
-        val accessorySize = dp(accessorySizeDp).roundToInt()
-        val accessorySpacing = if (accessoryInline() && (showsIcon() || showsTitle())) dp(spacingDp).roundToInt() else 0
-        var contentLeft = left
-        var contentRight = right
-        if (accessoryInline()) {
-            if (accessoryPlacement == CYLAnimatedItemAccessoryPlacement.Leading) contentLeft += accessorySize + accessorySpacing
-            else contentRight -= accessorySize + accessorySpacing
-        }
+        val (contentLeft, contentRight) = contentHorizontalBounds(left, right)
         val (iconW, iconH) = if (showsIcon()) iconSize() else 0 to 0
         val spacing = if (showsIcon() && showsTitle()) dp(spacingDp).roundToInt() else 0
         val boxW = max(0, contentRight - contentLeft)
@@ -296,24 +313,45 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
         titleView.measure(MeasureSpec.makeMeasureSpec(maxTitleW, MeasureSpec.AT_MOST), MeasureSpec.makeMeasureSpec(boxH, MeasureSpec.AT_MOST))
         val titleW = if (showsTitle()) titleView.measuredWidth else 0
         val titleH = if (showsTitle()) titleView.measuredHeight else 0
-        val iconLeft: Int
-        val iconTop: Int
-        if (axis == CYLAnimatedItemAxis.Horizontal) {
-            val group = iconW + spacing + titleW
-            val start = if (alignment == CYLAnimatedItemAlignment.Leading) contentLeft else contentLeft + (boxW - group) / 2
-            iconLeft = start
-            iconTop = top + (boxH - iconH) / 2
-            titleView.layout(start + iconW + spacing, top + (boxH - titleH) / 2, start + iconW + spacing + titleW, top + (boxH - titleH) / 2 + titleH)
-        } else {
-            val group = iconH + spacing + titleH
-            val startY = top + (boxH - group) / 2
-            iconLeft = if (alignment == CYLAnimatedItemAlignment.Leading) contentLeft else contentLeft + (boxW - iconW) / 2
-            iconTop = startY
-            val titleLeft = if (alignment == CYLAnimatedItemAlignment.Leading) contentLeft else contentLeft + (boxW - titleW) / 2
-            titleView.layout(titleLeft, startY + iconH + spacing, titleLeft + titleW, startY + iconH + spacing + titleH)
-        }
+        val box = android.graphics.Rect(contentLeft, top, contentLeft + boxW, top + boxH)
+        val (iconLeft, iconTop) = if (axis == CYLAnimatedItemAxis.Horizontal) layoutRow(box, iconW, iconH, titleW, titleH, spacing)
+            else layoutColumn(box, iconW, iconH, titleW, titleH, spacing)
         placeIcon(iconLeft, iconTop, iconW, iconH)
         placeAccessory(left, top, right, bottom, iconLeft, iconTop, iconW)
+    }
+
+    /**
+     * [EN] The left and right of the icon and title, without an inline accessory's room. [CN] 图标与标题的左右边界，除去行内附加图标占用的空间。
+     */
+    private fun contentHorizontalBounds(left: Int, right: Int): Pair<Int, Int> {
+        if (!accessoryInline()) return left to right
+        val accessorySpacing = if (showsIcon() || showsTitle()) dp(spacingDp).roundToInt() else 0
+        val inset = dp(accessorySizeDp).roundToInt() + accessorySpacing
+        return if (accessoryPlacement == CYLAnimatedItemAccessoryPlacement.Leading) left + inset to right else left to right - inset
+    }
+
+    /**
+     * [EN] Horizontal axis: the icon then the title, centred (or leading) in `box`; returns the icon's origin.
+     * [CN] 水平方向：图标在前、标题在后，在 `box` 中居中（或靠前）；返回图标的原点。
+     */
+    private fun layoutRow(box: android.graphics.Rect, iconW: Int, iconH: Int, titleW: Int, titleH: Int, spacing: Int): Pair<Int, Int> {
+        val group = iconW + spacing + titleW
+        val start = if (alignment == CYLAnimatedItemAlignment.Leading) box.left else box.left + (box.width() - group) / 2
+        val titleTop = box.top + (box.height() - titleH) / 2
+        titleView.layout(start + iconW + spacing, titleTop, start + iconW + spacing + titleW, titleTop + titleH)
+        return start to box.top + (box.height() - iconH) / 2
+    }
+
+    /**
+     * [EN] Vertical axis: the icon above the title, centred (or leading) in `box`; returns the icon's origin.
+     * [CN] 垂直方向：图标在上、标题在下，在 `box` 中居中（或靠前）；返回图标的原点。
+     */
+    private fun layoutColumn(box: android.graphics.Rect, iconW: Int, iconH: Int, titleW: Int, titleH: Int, spacing: Int): Pair<Int, Int> {
+        val startY = box.top + (box.height() - (iconH + spacing + titleH)) / 2
+        val leading = alignment == CYLAnimatedItemAlignment.Leading
+        val titleLeft = if (leading) box.left else box.left + (box.width() - titleW) / 2
+        titleView.layout(titleLeft, startY + iconH + spacing, titleLeft + titleW, startY + iconH + spacing + titleH)
+        return (if (leading) box.left else box.left + (box.width() - iconW) / 2) to startY
     }
 
     /**
@@ -349,7 +387,55 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
     override fun setSelected(selected: Boolean) {
         val changed = selected != isSelected
         super.setSelected(selected)
-        if (changed) { updateIcon(); onItemStateChanged(); updateAccessibility() }
+        if (changed) { updateIcon(); applyIconColor(); onItemStateChanged(); updateAccessibility() }
+    }
+
+    // MARK: - Icon color 图标颜色
+
+    /**
+     * [EN] The icon color (iOS `itemAppearance.normal.iconColor`): the static icon is drawn in it (a template / symbol image
+     *      takes it whole); null (default) leaves the image as it is, or uses the stack's color in a `CYLAnimatedItemStackView`.
+     * [CN] 图标颜色（iOS `itemAppearance.normal.iconColor`）：静态图标按此颜色绘制（模板 / 符号图片整体着色）；null（默认）保持图片原样，
+     *      在 `CYLAnimatedItemStackView` 中则使用堆叠的颜色。
+     */
+    var iconColor: Int? = null
+        set(value) { field = value; applyIconColor() }
+
+    /**
+     * [EN] The icon color while selected (iOS `itemAppearance.selected.iconColor`); null uses `iconColor`.
+     * [CN] 选中时的图标颜色（iOS `itemAppearance.selected.iconColor`）；null 时使用 `iconColor`。
+     */
+    var selectedIconColor: Int? = null
+        set(value) { field = value; applyIconColor() }
+
+    /**
+     * [EN] The colors of the stack that holds the item, used when the item has none. [CN] 容纳该条目的堆叠视图的颜色，条目没有自己的颜色时使用。
+     */
+    internal var stackIconColor: Int? = null
+        set(value) { field = value; applyIconColor() }
+    internal var stackSelectedIconColor: Int? = null
+        set(value) { field = value; applyIconColor() }
+    private var appliesIconColor = false
+
+    /**
+     * [EN] The icon color in effect now, or null. [CN] 当前生效的图标颜色，没有时为 null。
+     */
+    val effectiveIconColor: Int?
+        get() {
+            if (isSelected) (selectedIconColor ?: stackSelectedIconColor)?.let { return it }
+            return iconColor ?: stackIconColor
+        }
+
+    private fun applyIconColor() {
+        val color = effectiveIconColor
+        if (color != null) {
+            iconView.setColorFilter(color, PorterDuff.Mode.SRC_IN)
+            appliesIconColor = true
+        } else if (appliesIconColor) {
+            // [EN] Only a filter this view set is cleared (a tab button sets its own). [CN] 只清除本视图设置的滤镜（Tab 按钮会设置自己的）。
+            iconView.clearColorFilter()
+            appliesIconColor = false
+        }
     }
 
     override fun setEnabled(enabled: Boolean) {
@@ -364,9 +450,22 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
      */
     protected open fun onItemStateChanged() { /* [EN] Optional. [CN] 可选。 */ }
 
-    private fun updateIcon() {
-        iconView.setImageDrawable(if (isSelected && selectedImage != null) selectedImage else image)
-        iconView.visibility = if (animationView != null) View.INVISIBLE else View.VISIBLE
+    /**
+     * [EN] Whether the animation is on screen: made, and not waiting for its file (a download). [CN] 动画是否已显示：已创建且不在等待其文件（下载）。
+     */
+    private fun animationShows() = animationView != null && !com.cyl.animateditem.CYLTabBarItemAnimationFailure.isLoading(animationView)
+
+    /**
+     * [EN] Shows the static image, else the placeholder, until the animation shows. A subclass that lays out its own
+     *      icon (the tab bar's button) overrides it.
+     * [CN] 在动画显示之前显示静态图片，没有时显示占位图。自行布局图标的子类（TabBar 的按钮）可以重写。
+     */
+    protected open fun updateIcon() {
+        // [EN] The static image given, else the placeholder, until the animation shows (also while it downloads).
+        // [CN] 在动画显示之前（包括下载期间）显示传入的静态图片，没有时显示占位图。
+        val shown = selectedImage.takeIf { isSelected } ?: image
+        iconView.setImageDrawable(shown ?: placeholderIfNeeded())
+        iconView.visibility = if (animationShows()) View.INVISIBLE else View.VISIBLE
     }
 
     // MARK: - Animation 动画
@@ -380,9 +479,12 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
         animationView = null
         playing = false
         val url = animationURL
-        if (!url.isNullOrBlank()) {
+        if (!url.isNullOrBlank() && !localFileIsMissing(url)) {
             val (w, h) = iconSizeDp?.let { it.width to it.height } ?: (24f to 24f)
-            animationSource.animationViewWithURL(context, url, CYLSize(w, h), ImageView.ScaleType.FIT_CENTER)?.let { view ->
+            // [EN] No engine, no library or a file it cannot read: no view, the static image stays (an app's own source that
+            //      throws is treated the same way). [CN] 没有引擎、没有动画库或文件无法读取：不创建视图，保留静态图片（App 自己的来源抛出异常时同样处理）。
+            val made = try { animationSource.animationViewWithURL(context, url, CYLSize(w, h), ImageView.ScaleType.FIT_CENTER) } catch (error: RuntimeException) { null }
+            made?.let { view ->
                 view.cyl_hideFromAccessibility()
                 addView(view, indexOfChild(iconView) + 1)
                 animationView = view
@@ -391,10 +493,31 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
                     if (animationSpeed > 0f) player.animationSpeed = animationSpeed
                     player.progress = animationRestingProgress
                 }
-            }
+            } ?: CYLAnimationEngines.warnMissingEngine(context, null, url)
         }
         updateIcon()
         requestLayout()
+    }
+
+    /**
+     * [EN] Whether `url` names a local file (a path, `file://`, an asset) that is missing or empty: no animation view is made
+     *      for it, so the static image or the placeholder shows at once. Remote files are checked by the animator, which
+     *      reports a failed download (`CYLTabBarItemAnimationFailure`).
+     * [CN] `url` 是否指向不存在或为空的本地文件（路径、`file://`、asset）：不为其创建动画视图，立即显示静态图片或占位图。远程文件由 animator 检查，
+     *      下载失败时报告（`CYLTabBarItemAnimationFailure`）。
+     */
+    protected open fun localFileIsMissing(url: String): Boolean {
+        val file = url.substringBefore('#')
+        fun missing(path: String?) = path == null || java.io.File(path).let { !it.isFile || it.length() == 0L }
+        return when {
+            file.startsWith(ANDROID_ASSET_PREFIX) -> try {
+                context.assets.open(file.removePrefix(ANDROID_ASSET_PREFIX)).use { it.read() < 0 }
+            } catch (error: java.io.IOException) { true }
+            file.startsWith("file:") -> missing(android.net.Uri.parse(file).path)
+            // [EN] An absolute path ("/..." on Android; also a drive path when the JVM tests run on Windows). [CN] 绝对路径（Android 上为 "/..."；JVM 测试在 Windows 上运行时也包括盘符路径）。
+            java.io.File(file).isAbsolute -> missing(file)
+            else -> false
+        }
     }
 
     override fun playAnimation() {
@@ -425,6 +548,10 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
     /**
      * [EN] The engine could not load the file: drop the animation and show the static icon. [CN] 引擎无法加载文件：移除动画并显示静态图标。
      */
+    override fun cyl_animationViewDidLoad(animationView: View) {
+        if (animationView === this.animationView) { updateIcon(); requestLayout() }
+    }
+
     override fun cyl_animationViewDidFail(animationView: View) {
         if (animationView !== this.animationView) return
         removeView(animationView)
@@ -449,38 +576,53 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
     override fun onTouchEvent(event: MotionEvent): Boolean {
         if (!isEnabled) return false
         if (onItemTouchEvent(event)) return true
-        when (event.actionMasked) {
-            MotionEvent.ACTION_DOWN -> { downX = event.rawX; downY = event.rawY; dragging = false; longPressed = false; isPressed = true }
-            MotionEvent.ACTION_MOVE -> if (isDragEnabled) {
-                val dx = event.rawX - downX
-                val dy = event.rawY - downY
-                if (!dragging && exceedsSlop(event) && !longPressed && gestureListener?.shouldBeginDrag(this) != false) {
-                    dragging = true
-                    isPressed = false
-                    parent?.requestDisallowInterceptTouchEvent(true)
-                    gestureListener?.onDragBegan(this)
-                }
-                if (dragging) {
-                    if (dragMovesView) { translationX = dx; translationY = dy }
-                    gestureListener?.onDragChanged(this, dx, dy)
-                    return true
-                }
-            }
-            MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
-                isPressed = false
-                if (dragging) {
-                    dragging = false
-                    val dx = event.rawX - downX
-                    val dy = event.rawY - downY
-                    if (dragMovesView) animate().translationX(0f).translationY(0f).setDuration(200).start()
-                    gestureListener?.onDragEnded(this, dx, dy, event.actionMasked == MotionEvent.ACTION_CANCEL)
-                    return true
-                }
-                if (longPressed) { longPressed = false; return true }
-            }
+        val consumed = when (event.actionMasked) {
+            MotionEvent.ACTION_DOWN -> { downX = event.rawX; downY = event.rawY; dragging = false; longPressed = false; isPressed = true; false }
+            MotionEvent.ACTION_MOVE -> isDragEnabled && handleDragMove(event)
+            MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> handleRelease(event)
+            else -> false
         }
+        if (consumed) return true
         detector.onTouchEvent(event)
         return true
+    }
+
+    /**
+     * [EN] A move: starts the drag past the touch slop (unless a long press fired or the listener refuses), then moves.
+     *      True when the drag consumed the event.
+     * [CN] 移动：超过触摸阈值后开始拖拽（除非已触发长按或监听者拒绝），然后移动。拖拽消费事件时返回 true。
+     */
+    private fun handleDragMove(event: MotionEvent): Boolean {
+        if (!dragging && exceedsSlop(event) && !longPressed && gestureListener?.shouldBeginDrag(this) != false) {
+            dragging = true
+            isPressed = false
+            parent?.requestDisallowInterceptTouchEvent(true)
+            gestureListener?.onDragBegan(this)
+        }
+        if (!dragging) return false
+        val dx = event.rawX - downX
+        val dy = event.rawY - downY
+        if (dragMovesView) { translationX = dx; translationY = dy }
+        gestureListener?.onDragChanged(this, dx, dy)
+        return true
+    }
+
+    /**
+     * [EN] Up or cancel: ends a drag (the view springs back) or a long press. True when either consumed the event.
+     * [CN] 抬起或取消：结束拖拽（视图弹回）或长按。任一消费事件时返回 true。
+     */
+    private fun handleRelease(event: MotionEvent): Boolean {
+        isPressed = false
+        if (dragging) {
+            dragging = false
+            val dx = event.rawX - downX
+            val dy = event.rawY - downY
+            if (dragMovesView) animate().translationX(0f).translationY(0f).setDuration(200).start()
+            gestureListener?.onDragEnded(this, dx, dy, event.actionMasked == MotionEvent.ACTION_CANCEL)
+            return true
+        }
+        if (longPressed) { longPressed = false; return true }
+        return false
     }
 
     /**
@@ -513,7 +655,9 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
 
     override fun onInitializeAccessibilityNodeInfo(info: AccessibilityNodeInfo) {
         super.onInitializeAccessibilityNodeInfo(info)
-        info.className = Button::class.java.name
+        // [EN] A button while it takes taps; text otherwise (an item a container made not clickable, e.g. a hint in
+        //      `CYLAnimatedItemStackView`). [CN] 接收点击时为按钮；否则为文字（容器设为不可点击的条目，例如 `CYLAnimatedItemStackView` 中的提示）。
+        info.className = if (isClickable) Button::class.java.name else android.widget.TextView::class.java.name
         info.isSelected = isSelected
     }
 
@@ -522,4 +666,18 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
      * [CN] 以本视图标题样式测得的标题宽度，供在创建条目前计算尺寸的调用方使用。
      */
     fun titleWidth(text: CharSequence?): Int = if (text.isNullOrEmpty()) 0 else ceil(titleView.paint.measureText(text.toString())).toInt()
+
+    companion object {
+        private const val ANDROID_ASSET_PREFIX = "file:///android_asset/"
+
+        /**
+         * [EN] The library's placeholder, `R.drawable.cyl_animated_item_placeholder` (24 dp, a tab icon's size; the same
+         *      drawing as iOS's `CYLAnimatedItem.bundle`). Copyright and policy: `META-INF/cylanimateditem/`.
+         * [CN] 本库的占位图 `R.drawable.cyl_animated_item_placeholder`（24 dp，Tab 图标尺寸；与 iOS 的 `CYLAnimatedItem.bundle` 图形相同）。版权与政策：
+         *      `META-INF/cylanimateditem/`。
+         */
+        @JvmStatic
+        fun defaultPlaceholderImage(context: Context): Drawable? =
+            com.cyl.animateditem.CYLAnimatedItemResources.id(context, "cyl_animated_item_placeholder", "drawable").takeIf { it != 0 }?.let { androidx.core.content.ContextCompat.getDrawable(context, it) }
+    }
 }

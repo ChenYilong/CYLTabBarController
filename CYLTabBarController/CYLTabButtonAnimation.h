@@ -5,6 +5,8 @@
 //  Copyright © 2026 https://github.com/ChenYilong . All rights reserved.
 //
 
+// CYL-SWIFT-MIGRATION: objc-required — [EN] Only the block typedefs `CYLTabButtonAnimationBlock` / `CYLTabButtonBadgeAnimationBlock` and the forward declaration of the Swift protocol they go with are left: Swift typealiases are not exported (step 116)
+//      (docs/Swift-Migration-Phase3.md). [CN] Swift 无法为 Objective-C 调用方导出的内容（见 docs/Swift-Migration-Phase3.md）。
 #import <UIKit/UIKit.h>
 
 NS_ASSUME_NONNULL_BEGIN

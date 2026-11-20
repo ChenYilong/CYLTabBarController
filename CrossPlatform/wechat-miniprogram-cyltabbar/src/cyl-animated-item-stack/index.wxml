@@ -1,0 +1,37 @@
+<!-- [EN] A centered vertical stack of cyl-animated-item; the screen reader reads the items top to bottom. [CN] cyl-animated-item 的居中竖向堆叠；读屏自上而下朗读这些条目。 -->
+<view class="cyl-stack" style="{{m.containerStyle}}" bindtap="cyl_onBackgroundTap">
+  <view class="cyl-stack-column {{m.horizontal ? 'cyl-stack-row' : ''}}">
+    <view
+      wx:for="{{m.items}}"
+      wx:key="key"
+      class="cyl-stack-item"
+      style="{{item.wrapperStyle}}"
+      data-index="{{index}}"
+      bindtap="cyl_onItemTap"
+    >
+      <cyl-animated-item
+        title="{{item.title}}"
+        image="{{item.image}}"
+        selected-image="{{item.selectedImage}}"
+        animation-url="{{item.animationUrl}}"
+        selected="{{item.selected}}"
+        axis="vertical"
+        enabled="{{item.enabled}}"
+        icon-size="{{item.iconSize}}"
+        loop="{{item.loop}}"
+        title-lines="{{item.titleLines}}"
+        title-color="{{item.titleColor}}"
+        title-font-size="{{item.titleFontSize}}"
+        title-font-weight="{{item.titleFontWeight}}"
+        icon-tint="{{item.iconTint}}"
+        accessibility-label="{{item.accessibilityLabel}}"
+        accessibility-role="{{item.role}}"
+        accessibility-hidden="{{item.hidden}}"
+        generic:cyl-lottie-view="cyl-lottie-view"
+        generic:cyl-pag-view="cyl-pag-view"
+        generic:cyl-rive-view="cyl-rive-view"
+        generic:cyl-svga-view="cyl-svga-view"
+      />
+    </view>
+  </view>
+</view>

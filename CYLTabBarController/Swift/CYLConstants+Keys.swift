@@ -6,6 +6,9 @@
 //
 
 import Foundation
+#if canImport(CYLAnimatedItem)
+import CYLAnimatedItem
+#endif
 
 // [EN] The configuration keys, attribute keys and notification names of CYLTabBarController, translated from Objective-C
 //      (docs/Swift-Migration.md, branch swift-core). Objective-C keeps the same names as macros in the headers (hidden from

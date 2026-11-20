@@ -175,6 +175,14 @@ extension UIViewController {
             objc_setAssociatedObject(self, CYLViewControllerTabBarKeys.tabButton, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
             objc_setAssociatedObject(cyl_getViewControllerInsteadOfNavigation(), CYLViewControllerTabBarKeys.tabButton, newValue,
                                      .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+            // [EN] A button that is not UIKit's own (the FlatDesign tab button) also becomes the item's button, so badges set on
+            //      `tabBarItem` reach it: UIKit's button is hidden then (iOS 27, every FlatDesign tab).
+            // [CN] 不是 UIKit 自身的按钮（扁平样式的 Tab 按钮）同时成为 item 的按钮，使设置在 `tabBarItem` 上的角标到达它：此时 UIKit 的按钮是隐藏的
+            //      （iOS 27，扁平样式的每个 Tab）。
+            for item in [tabBarItem, cyl_getViewControllerInsteadOfNavigation().tabBarItem].compactMap({ $0 }) {
+                let systemButton = item.cyl_view()
+                item.cyl_replacementTabButton = (newValue != nil && newValue !== systemButton) ? newValue : nil
+            }
         }
     }
 
@@ -559,13 +567,12 @@ extension UIViewController {
            let control = items[tabIndex].cyl_tabButton {
             return control
         }
+        // [EN] The plus child view controller: its tab button is the plus button.
+        // [CN] PlusButton 子控制器：其 Tab 按钮为 PlusButton。
         if tabIndex == NSNotFound || (cyl_tabBarController?.tabBar.items?.count ?? 0) <= tabIndex,
-           cyl_isPlaceholder || cyl_getViewControllerInsteadOfNavigation().cyl_isPlaceholder {
-            // [EN] The plus child view controller: its tab button is the plus button.
-            // [CN] PlusButton 子控制器：其 Tab 按钮为 PlusButton。
-            if let plusButton = CYLPlusButton(forOwner: self) {
-                return plusButton
-            }
+           cyl_isPlaceholder || cyl_getViewControllerInsteadOfNavigation().cyl_isPlaceholder,
+           let plusButton = CYLPlusButton(forOwner: self) {
+            return plusButton
         }
         if let control = CYLFlatDesignLookup.object(CYLFlatDesignLookup.tabBarItem(of: self), "tabBarButton") as? UIControl {
             return control
@@ -692,7 +699,7 @@ extension UIViewController {
      * [CN] 承载角标的视图或 item：扁平样式按钮的角标视图、Tab 按钮（液态玻璃），否则为 Tab 按钮或导航控制器 item 的角标父视图。
      */
     @objc(cyl_getActualBadgeSuperView)
-    func cyl_getActualBadgeSuperView() -> Any? {
+    public func cyl_getActualBadgeSuperView() -> Any? {
         if cyl_isPlaceholder {
             return nil
         }
@@ -737,22 +744,22 @@ extension UIViewController {
     }
 
     @objc(cyl_isReady)
-    func cyl_isReady() -> Bool {
+    public func cyl_isReady() -> Bool {
         true
     }
 
     @objc(cyl_performSelector:)
-    func cyl_perform(_ aSelector: Selector) {
+    public func cyl_perform(_ aSelector: Selector) {
         cyl_perform(aSelector, with: nil, with: nil)
     }
 
     @objc(cyl_performSelector:withObject:)
-    func cyl_perform(_ aSelector: Selector, with object: Any?) {
+    public func cyl_perform(_ aSelector: Selector, with object: Any?) {
         cyl_perform(aSelector, with: object, with: nil)
     }
 
     @objc(cyl_performSelector:withObject:withObject:)
-    func cyl_perform(_ aSelector: Selector, with object1: Any?, with object2: Any?) {
+    public func cyl_perform(_ aSelector: Selector, with object1: Any?, with object2: Any?) {
         _ = perform(aSelector, with: object1, with: object2)
     }
 
@@ -761,7 +768,7 @@ extension UIViewController {
      * [CN] 在页面所在 Tab 上显示红点，无动画（PlusButton 子控制器的 Tab 忽略）。
      */
     @objc(cyl_showBadge)
-    func cyl_showBadge() {
+    public func cyl_showBadge() {
         cyl_forwardToBadgeHost("cyl_showBadge")
         cyl_setBadgeAccessibilityValue("")
     }
@@ -773,28 +780,28 @@ extension UIViewController {
     }
 
     @objc(cyl_showBadgeValue:animationType:)
-    func cyl_showBadgeValue(_ value: String, animationType: CYLBadgeAnimationType) {
+    public func cyl_showBadgeValue(_ value: String, animationType: CYLBadgeAnimationType) {
         cyl_showBadgeValue(value, animationTypeValue: NSNumber(value: animationType.rawValue))
     }
 
     @objc(cyl_clearBadge)
-    func cyl_clearBadge() {
+    public func cyl_clearBadge() {
         cyl_forwardToBadgeHost("cyl_clearBadge")
         cyl_setBadgeAccessibilityValue(nil)
     }
 
     @objc(cyl_resumeBadge)
-    func cyl_resumeBadge() {
+    public func cyl_resumeBadge() {
         cyl_forwardToBadgeHost("cyl_resumeBadge")
     }
 
     @objc(cyl_isShowBadge)
-    func cyl_isShowBadge() -> Bool {
+    public func cyl_isShowBadge() -> Bool {
         (cyl_badgeHost as? CYLBadgeProtocol)?.cyl_isShowBadge() ?? false
     }
 
     @objc(cyl_isPauseBadge)
-    func cyl_isPauseBadge() -> Bool {
+    public func cyl_isPauseBadge() -> Bool {
         (cyl_badgeHost as? CYLBadgeProtocol)?.cyl_isPauseBadge() ?? false
     }
 
@@ -811,25 +818,25 @@ extension UIViewController {
     }
 
     @objc(cyl_badgeFont)
-    var cyl_badgeFont: UIFont! {
+    public var cyl_badgeFont: UIFont! {
         @objc(cyl_badgeFont) get { CYLFlatDesignLookup.object(cyl_badgeHost, "cyl_badgeFont") as? UIFont }
         @objc(cyl_setBadgeFont:) set { cyl_forwardToBadgeHost("cyl_setBadgeFont:", newValue) }
     }
 
     @objc(cyl_badgeBackgroundColor)
-    var cyl_badgeBackgroundColor: UIColor! {
+    public var cyl_badgeBackgroundColor: UIColor! {
         @objc(cyl_badgeBackgroundColor) get { CYLFlatDesignLookup.object(cyl_badgeHost, "cyl_badgeBackgroundColor") as? UIColor }
         @objc(cyl_setBadgeBackgroundColor:) set { cyl_forwardToBadgeHost("cyl_setBadgeBackgroundColor:", newValue) }
     }
 
     @objc(cyl_badgeTextColor)
-    var cyl_badgeTextColor: UIColor! {
+    public var cyl_badgeTextColor: UIColor! {
         @objc(cyl_badgeTextColor) get { CYLFlatDesignLookup.object(cyl_badgeHost, "cyl_badgeTextColor") as? UIColor }
         @objc(cyl_setBadgeTextColor:) set { cyl_forwardToBadgeHost("cyl_setBadgeTextColor:", newValue) }
     }
 
     @objc(cyl_badgeAnimationType)
-    var cyl_badgeAnimationType: CYLBadgeAnimationType {
+    public var cyl_badgeAnimationType: CYLBadgeAnimationType {
         @objc(cyl_badgeAnimationType) get {
             CYLBadgeAnimationType(rawValue: cyl_badgeHostNumber("cyl_badgeAnimationTypeValue")?.uintValue ?? 0) ?? .none
         }
@@ -839,7 +846,7 @@ extension UIViewController {
     }
 
     @objc(cyl_badgeAnimationTypeValue)
-    var cyl_badgeAnimationTypeValue: NSNumber {
+    public var cyl_badgeAnimationTypeValue: NSNumber {
         @objc(cyl_badgeAnimationTypeValue) get { NSNumber(value: cyl_badgeAnimationType.rawValue) }
         @objc(cyl_setBadgeAnimationTypeValue:) set {
             cyl_badgeAnimationType = CYLBadgeAnimationType(rawValue: newValue.uintValue) ?? .none
@@ -847,19 +854,19 @@ extension UIViewController {
     }
 
     @objc(cyl_badgeFrame)
-    var cyl_badgeFrame: CGRect {
+    public var cyl_badgeFrame: CGRect {
         @objc(cyl_badgeFrame) get { cyl_badgeHostValue("cyl_badgeFrameValue")?.cgRectValue ?? .zero }
         @objc(cyl_setBadgeFrame:) set { cyl_forwardToBadgeHost("cyl_setBadgeFrameValue:", NSValue(cgRect: newValue)) }
     }
 
     @objc(cyl_badgeFrameValue)
-    var cyl_badgeFrameValue: NSValue {
+    public var cyl_badgeFrameValue: NSValue {
         @objc(cyl_badgeFrameValue) get { NSValue(cgRect: cyl_badgeFrame) }
         @objc(cyl_setBadgeFrameValue:) set { cyl_badgeFrame = newValue.cgRectValue }
     }
 
     @objc(cyl_badgeCenterOffset)
-    var cyl_badgeCenterOffset: CGPoint {
+    public var cyl_badgeCenterOffset: CGPoint {
         @objc(cyl_badgeCenterOffset) get { cyl_badgeHostValue("cyl_badgeCenterOffsetValue")?.cgPointValue ?? .zero }
         @objc(cyl_setBadgeCenterOffset:) set {
             cyl_forwardToBadgeHost("cyl_setBadgeCenterOffsetValue:", NSValue(cgPoint: newValue))
@@ -867,13 +874,13 @@ extension UIViewController {
     }
 
     @objc(cyl_badgeCenterOffsetValue)
-    var cyl_badgeCenterOffsetValue: NSValue {
+    public var cyl_badgeCenterOffsetValue: NSValue {
         @objc(cyl_badgeCenterOffsetValue) get { NSValue(cgPoint: cyl_badgeCenterOffset) }
         @objc(cyl_setBadgeCenterOffsetValue:) set { cyl_badgeCenterOffset = newValue.cgPointValue }
     }
 
     @objc(cyl_badgeMaximumBadgeNumber)
-    var cyl_badgeMaximumBadgeNumber: Int {
+    public var cyl_badgeMaximumBadgeNumber: Int {
         @objc(cyl_badgeMaximumBadgeNumber) get { cyl_badgeHostNumber("cyl_badgeMaximumBadgeNumberValue")?.intValue ?? 0 }
         @objc(cyl_setBadgeMaximumBadgeNumber:) set {
             cyl_forwardToBadgeHost("cyl_setBadgeMaximumBadgeNumberValue:", NSNumber(value: newValue))
@@ -881,37 +888,37 @@ extension UIViewController {
     }
 
     @objc(cyl_badgeMaximumBadgeNumberValue)
-    var cyl_badgeMaximumBadgeNumberValue: NSNumber {
+    public var cyl_badgeMaximumBadgeNumberValue: NSNumber {
         @objc(cyl_badgeMaximumBadgeNumberValue) get { NSNumber(value: cyl_badgeMaximumBadgeNumber) }
         @objc(cyl_setBadgeMaximumBadgeNumberValue:) set { cyl_badgeMaximumBadgeNumber = newValue.intValue }
     }
 
     @objc(cyl_badgeMargin)
-    var cyl_badgeMargin: CGFloat {
+    public var cyl_badgeMargin: CGFloat {
         @objc(cyl_badgeMargin) get { CGFloat(cyl_badgeHostNumber("cyl_badgeMarginValue")?.doubleValue ?? 0) }
         @objc(cyl_setBadgeMargin:) set { cyl_forwardToBadgeHost("cyl_setBadgeMarginValue:", NSNumber(value: Double(newValue))) }
     }
 
     @objc(cyl_badgeMarginValue)
-    var cyl_badgeMarginValue: NSNumber {
+    public var cyl_badgeMarginValue: NSNumber {
         @objc(cyl_badgeMarginValue) get { NSNumber(value: Double(cyl_badgeMargin)) }
         @objc(cyl_setBadgeMarginValue:) set { cyl_badgeMargin = CGFloat(newValue.doubleValue) }
     }
 
     @objc(cyl_badgeRadius)
-    var cyl_badgeRadius: CGFloat {
+    public var cyl_badgeRadius: CGFloat {
         @objc(cyl_badgeRadius) get { CGFloat(cyl_badgeHostNumber("cyl_badgeRadiusValue")?.doubleValue ?? 0) }
         @objc(cyl_setBadgeRadius:) set { cyl_forwardToBadgeHost("cyl_setBadgeRadiusValue:", NSNumber(value: Double(newValue))) }
     }
 
     @objc(cyl_badgeRadiusValue)
-    var cyl_badgeRadiusValue: NSNumber {
+    public var cyl_badgeRadiusValue: NSNumber {
         @objc(cyl_badgeRadiusValue) get { NSNumber(value: Double(cyl_badgeRadius)) }
         @objc(cyl_setBadgeRadiusValue:) set { cyl_badgeRadius = CGFloat(newValue.doubleValue) }
     }
 
     @objc(cyl_badgeCornerRadius)
-    var cyl_badgeCornerRadius: CGFloat {
+    public var cyl_badgeCornerRadius: CGFloat {
         @objc(cyl_badgeCornerRadius) get { CGFloat(cyl_badgeHostNumber("cyl_badgeCornerRadiusValue")?.doubleValue ?? 0) }
         @objc(cyl_setBadgeCornerRadius:) set {
             cyl_forwardToBadgeHost("cyl_setBadgeCornerRadiusValue:", NSNumber(value: Double(newValue)))
@@ -919,7 +926,7 @@ extension UIViewController {
     }
 
     @objc(cyl_badgeCornerRadiusValue)
-    var cyl_badgeCornerRadiusValue: NSNumber {
+    public var cyl_badgeCornerRadiusValue: NSNumber {
         @objc(cyl_badgeCornerRadiusValue) get { NSNumber(value: Double(cyl_badgeCornerRadius)) }
         @objc(cyl_setBadgeCornerRadiusValue:) set { cyl_badgeCornerRadius = CGFloat(newValue.doubleValue) }
     }
@@ -929,7 +936,7 @@ extension UIViewController {
      * [CN] 与上面的属性一样转发给角标宿主（原先是 `@dynamic` 且没有实现，会抛异常）。
      */
     @objc(cyl_delayIfNeededForSeconds)
-    var cyl_delayIfNeededForSeconds: CGFloat {
+    public var cyl_delayIfNeededForSeconds: CGFloat {
         @objc(cyl_delayIfNeededForSeconds) get { CGFloat(cyl_badgeHostNumber("cyl_delayIfNeededForSecondsValue")?.doubleValue ?? 0) }
         @objc(cyl_setDelayIfNeededForSeconds:) set {
             cyl_forwardToBadgeHost("cyl_setDelayIfNeededForSecondsValue:", NSNumber(value: Double(newValue)))
@@ -937,8 +944,14 @@ extension UIViewController {
     }
 
     @objc(cyl_delayIfNeededForSecondsValue)
-    var cyl_delayIfNeededForSecondsValue: NSNumber {
+    public var cyl_delayIfNeededForSecondsValue: NSNumber {
         @objc(cyl_delayIfNeededForSecondsValue) get { NSNumber(value: Double(cyl_delayIfNeededForSeconds)) }
         @objc(cyl_setDelayIfNeededForSecondsValue:) set { cyl_delayIfNeededForSeconds = CGFloat(newValue.doubleValue) }
     }
 }
+
+/**
+ [EN] The `CYLBadgeProtocol` conformance, declared in Swift since step 115 (it was in the Objective-C category header).
+ [CN] `CYLBadgeProtocol` 遵循关系，自第 115 步起在 Swift 中声明（原在 Objective-C 类别头文件中）。
+ */
+extension UIViewController: CYLBadgeProtocol {}

@@ -25,6 +25,9 @@ import os
 import re
 import sys
 
+# [EN] The separator row of the two-column tables. [CN] 两列表格的分隔行。
+TABLE_RULE = '|:---|:---|'
+
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 HEADERS_ROOT = os.path.join(ROOT, 'CYLTabBarController')
 MAP_PATH = os.path.join(ROOT, 'Example-Android', 'cyltabbar', 'api-map.json')
@@ -33,7 +36,7 @@ STATUSES = ('done', 'partial', 'planned', 'n/a')
 # [EN] Private headers (podspec private_header_files, and the demo-only settings list). [CN] 私有头文件（podspec 的 private_header_files，以及仅用于演示的设置列表）。
 PRIVATE = {
     'CYLTabBarController/UIControl+CYLTabBarItemAnimation.h', 'CYLTabBarController/CYLTabBarItemAnimationService.h',
-    'CYLTabBarController/CYLTabBarController+CYLPrivate.h', 'CYLTabBarController/CYLUtils/CYLComponents/CYLTheme/CYLThemePrivate.h',
+    'CYLTabBarController/CYLUtils/CYLComponents/CYLTheme/CYLThemePrivate.h',
     'CYLTabBarController/CYLBadgeView/CYLBadgeViewDefines.h', 'CYLTabBarController/CYLTabBarItemAnimation/CYLTabBarItemAnimationEngine.h',
 }
 
@@ -251,7 +254,7 @@ def document(rows, mapping):
     counts = dict.fromkeys(STATUSES, 0)
     for row in rows:
         counts[mapping.get(row['key'], {}).get('status', 'planned')] += 1
-    out += ['| 中文 | English |', '|:---|:---|',
+    out += ['| 中文 | English |', TABLE_RULE,
             '| iOS 库的每个公开符号（公开头文件中的类、协议、方法、属性、常量、枚举、函数）及其 Android 版本（`Example-Android/cyltabbar`，Kotlin 与 Java）。状态：done 行为相同；partial 部分行为（见说明）；planned 尚未移植；n/a 仅 iOS（UIKit、扁平样式、液态玻璃、Core Animation 等），不计入完成率。 | Every public symbol of the iOS library (classes, protocols, methods, properties, constants, enums and functions of the public headers) with its Android version (`Example-Android/cyltabbar`, Kotlin and Java). Status: done, the same behavior; partial, part of it (see the note); planned, not ported yet; n/a, iOS only (UIKit, FlatDesign, Liquid Glass, Core Animation...), left out of the score. |',
             '| **迁移完成率：%d / 100**（done + 0.5 × partial，共 %d 个计入的符号；done %d、partial %d、planned %d、n/a %d）。 | **Migration score: %d / 100** (done + 0.5 × partial over %d counted symbols; done %d, partial %d, planned %d, n/a %d). |'
             % (percent, total, counts['done'], counts['partial'], counts['planned'], counts['n/a'], percent, total, counts['done'], counts['partial'], counts['planned'], counts['n/a']),
@@ -276,9 +279,9 @@ def document(rows, mapping):
     extensions = load_android_only()
     if extensions:
         out += ['## 仅 Android / Android only', '',
-                '| 中文 | English |', '|:---|:---|',
+                '| 中文 | English |', TABLE_RULE,
                 '| 这些 API 只在 Android 上存在，iOS 库没有对应 API，不计入完成率。详见 [Android-Library](Android-Library.md) 的「仅 Android 的扩展」。 | These APIs exist on Android only; the iOS library has no counterpart, and they are left out of the score. Details: "Android-only extensions" in [Android-Library](Android-Library.md). |', '',
-                '| Android API | 说明 / Note |', '|:---|:---|']
+                '| Android API | 说明 / Note |', TABLE_RULE]
         out += ['| `%s` | %s |' % (entry['android'], entry.get('note', '')) for entry in extensions]
         out.append('')
     return '\n'.join(out)
@@ -299,12 +302,21 @@ def with_navigation_of(existing, text):
     """[EN] Keeps the navigation blocks of the existing document in the new text. [CN] 把现有文档的导航块保留到新文本中。"""
     binding = NAV_BLOCKS[0].search(existing or '')
     contents = NAV_BLOCKS[1].search(existing or '')
+    # [EN] Each block goes back with exactly one blank line after it: its regex also takes the newlines that follow it, and
+    #      putting them back as they were added one blank line per run (the document grew on every regeneration).
+    # [CN] 每个块放回时后面只保留一个空行：其正则同时取走了后面的换行，原样放回会每运行一次多一个空行（文档每次重新生成都会变长）。
     if binding:
-        text = text.replace('<!-- bound-classes: none -->\n', '<!-- bound-classes: none -->\n' + binding.group(0), 1)
+        block = binding.group(0).rstrip('\n') + '\n\n'
+        text = text.replace('<!-- bound-classes: none -->\n', '<!-- bound-classes: none -->\n' + block, 1)
     if contents:
         first = text.find('\n## ')
+        block = contents.group(0).rstrip('\n') + '\n\n'
         if first >= 0:
-            text = text[:first + 1] + contents.group(0) + text[first + 1:]
+            text = text[:first + 1] + block + text[first + 1:].lstrip('\n')
+        else:
+            # [EN] No section heading (the HarmonyOS map): update-docs-navigation.py keeps the block at the end.
+            # [CN] 没有章节标题（鸿蒙对照表）：update-docs-navigation.py 把该块放在末尾。
+            text = text.rstrip('\n') + '\n\n' + block
     return text
 
 
