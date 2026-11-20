@@ -5,7 +5,18 @@
 //  Copyright © 2026 https://github.com/ChenYilong . All rights reserved.
 //
 
+// CYL-SWIFT-MIGRATION: objc-required — [EN] the block typedefs and option sets above, and the C symbols below (the C data globals defined in
+// CYLTabBarControllerGlobals.m, and the prototypes of the `@_cdecl` functions): Swift cannot export a data symbol or an `NS_OPTIONS`, and
+// Objective-C callers that do not import the Swift module need the prototypes. [CN] 上述 block typedef 与选项集，以及下方的 C 符号（定义于
+// CYLTabBarControllerGlobals.m 的 C 全局变量，以及 `@_cdecl` 函数的原型）：Swift 无法导出数据符号或 `NS_OPTIONS`，不导入 Swift 模块的
+// Objective-C 调用方需要这些原型。
+
 #import <UIKit/UIKit.h>
+#if __has_include("CYLUtils/CYLUtilsMacros.h")
+#import "CYLUtils/CYLUtilsMacros.h"
+#else
+#import "CYLUtilsMacros.h"
+#endif
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -142,5 +153,108 @@ typedef void (^CYLTabBarControllerDidLongPressControlBlock)(CYLTabBarController 
  * [CN] 返回显示 Tab 图标的视图：`selected` 为 NO 表示未选中外观，为 YES 表示选中外观（`-setTabBarItemIconViewProvider:atIndex:`）。
  */
 typedef UIView * _Nullable (^CYLTabBarItemIconViewProvider)(BOOL selected);
+
+#pragma mark - C symbols (moved from CYLTabBarController.h)
+
+/*!
+ * [EN] Returns `attributes` with a Lottie animation added to each item: `CYLTabBarLottieFilePath` for "<name>.json" in
+ *      `bundle` (nil: the main bundle), and `CYLTabBarLottieDarkFilePath` for "<name>_dark.json" when that file exists
+ *      (the suffix is `UIImage.cyl_darkImageNameSuffix`, as for images). Names are matched by position; an item without a
+ *      name, or whose file is missing, is left as it is.
+ *
+ *          // green_lottie_tab_home.json, green_lottie_tab_home_dark.json, ...
+ *          CYLTabBarItemsAttributesAddingLottieFiles(attributes, @[@"green_lottie_tab_home", @"green_lottie_tab_discover"], nil);
+ *
+ *      A Lottie file holds fixed colors and lottie-ios has no themes, so a dark version is a copy of the animation with
+ *      dark colors. With Lottie 4.x, one file can also follow Dark Mode by itself: see `CYLTabBarLottieDarkColors`.
+ * [CN] 返回为每个 item 添加了 Lottie 动画的 `attributes`：`CYLTabBarLottieFilePath` 为 `bundle`（nil 表示 main bundle）中的
+ *      「<名称>.json」；存在「<名称>_dark.json」时再加上 `CYLTabBarLottieDarkFilePath`（后缀与图片相同，为
+ *      `UIImage.cyl_darkImageNameSuffix`）。名称按位置对应；没有名称或文件不存在的 item 保持不变。示例见上。
+ *      Lottie 文件中的颜色是固定的，lottie-ios 也不支持主题，因此深色版本即改为深色配色的动画副本。使用 Lottie 4.x 时，也可以只用一份文件
+ *      适配深色模式，见 `CYLTabBarLottieDarkColors`。
+ */
+FOUNDATION_EXTERN NSArray *CYLTabBarItemsAttributesAddingLottieFiles(NSArray *attributes,
+                                                                     NSArray *lottieFileNames,
+                                                                                    NSBundle * _Nullable bundle) CYL_NOEXCEPT CYL_LOTTIE_REQUIRED;
+
+/*!
+ * FIX: issue #477 — only some tabs animated, with any animation library.
+ * [EN] Returns one tab's `attributes` with an animation added (`CYLTabBarAnimationFilePath`, and
+ *      `CYLTabBarAnimationDarkFilePath` when "<name>_dark.<ext>" exists), so that only that tab is animated and the others
+ *      keep their images. `fileName` is "<name>.<ext>" for that file, or "<name>" for the first file found with the
+ *      extensions of the libraries in the build, in their lookup order (PAG ".pag", Lottie ".json" / ".lottie", or any
+ *      library added later). `bundle` nil means the main bundle. A missing file, or no animation library, leaves
+ *      `attributes` as they are. Animated and static tabs, and tabs of different libraries, can be mixed in one tab bar,
+ *      in every style.
+ *
+ *          NSArray *attributes = @[
+ *              homeAttributes,                                                                     // images only
+ *              CYLTabBarItemAttributesAddingAnimationFile(messageAttributes, @"tab_message.json", nil), // Lottie
+ *              CYLTabBarItemAttributesAddingAnimationFile(mineAttributes, @"tab_mine.pag", nil),        // PAG
+ *          ];
+ * [CN] 返回添加了动画的单个 Tab 的 `attributes`（`CYLTabBarAnimationFilePath`；存在「名称_dark.扩展名」时再加上
+ *      `CYLTabBarAnimationDarkFilePath`），使只有该 Tab 有动画，其他 Tab 保持图片。`fileName` 为「名称.扩展名」时使用该文件；为「名称」时，
+ *      按查找顺序使用构建中各动画库的扩展名（PAG ".pag"、Lottie ".json" / ".lottie"，或以后新增的动画库），取第一个存在的文件。`bundle` 为 nil
+ *      表示 main bundle。文件不存在或没有动画库时 `attributes` 保持不变。同一个 TabBar 中可以混用有动画与无动画的 Tab，以及不同动画库的 Tab，
+ *      所有样式均支持。示例见上。
+ */
+FOUNDATION_EXTERN NSDictionary *CYLTabBarItemAttributesAddingAnimationFile(NSDictionary *attributes,
+                                                                          NSString *fileName,
+                                                                          NSBundle * _Nullable bundle) CYL_NOEXCEPT;
+
+/*!
+ * [EN] The same for every tab, by position: an empty name or `NSNull` leaves that tab static (#477).
+ *
+ *          CYLTabBarItemsAttributesAddingAnimationFiles(attributes, @[@"tab_home.json", @"", @"tab_mine.pag"], nil);
+ * [CN] 按位置为每个 Tab 执行上面的操作：名称为空字符串或 `NSNull` 的 Tab 保持静态（#477）。示例见上。
+ */
+FOUNDATION_EXTERN NSArray *CYLTabBarItemsAttributesAddingAnimationFiles(NSArray *attributes,
+                                                                        NSArray *fileNames,
+                                                                                    NSBundle * _Nullable bundle) CYL_NOEXCEPT;
+
+/*!
+ * [EN] These globals hold what was written LAST, by whichever tab bar controller or plus button wrote last. The library
+ *      no longer lays out with them: with several tab bar controllers they overwrote each other (a tab bar with 5 items
+ *      was laid out with the 3 of the one pushed after it, issues #414, #489). Each tab bar keeps its own values:
+ *      `-[UIView cyl_tabbarItemsCount]`, `-[UIView cyl_tabBarItemWidth]`, `-[UIView cyl_plusButtonIndex]`,
+ *      `-[UIView cyl_plusButtonWidth]` (see UIView+CYLTabBarControllerExtention.h) and `-[CYLTabBarController tabBarHeight]`.
+ *      With one tab bar controller they are what they always were.
+ * [CN] 这些全局变量保存的是 **最后一次** 写入的值，由最后写入的 TabBarController 或 PlusButton 决定。库不再使用它们来布局：
+ *      存在多个 TabBarController 时它们会互相覆盖（5 个 item 的 TabBar 按后面 push 进来的 3 个 item 来布局，issue #414、#489）。
+ *      每个 TabBar 保存自己的值：`-[UIView cyl_tabbarItemsCount]`、`-[UIView cyl_tabBarItemWidth]`、`-[UIView cyl_plusButtonIndex]`、
+ *      `-[UIView cyl_plusButtonWidth]`（见 UIView+CYLTabBarControllerExtention.h）和 `-[CYLTabBarController tabBarHeight]`。
+ *      只有一个 TabBarController 时，它们与以前完全一致。
+ */
+FOUNDATION_EXTERN NSUInteger CYLTabbarItemsCount;
+
+FOUNDATION_EXTERN NSUInteger CYLPlusButtonIndex;
+
+FOUNDATION_EXTERN CGFloat CYLPlusButtonCurrentWidth(void);
+
+FOUNDATION_EXTERN CGFloat CYLTabBarItemWidth;
+
+FOUNDATION_EXTERN CGFloat CYLTabBarHeight;
+
+FOUNDATION_EXTERN NSString *const CYLTabBarItemLottieAnimationPlayingNotification DEPRECATED_MSG_ATTRIBUTE("Use CYLTabBarItemAnimationPlayingNotification");
+
+/*!
+ * [EN] Posted after a Lottie animation view is added to a tab button (issue #428). The notification's `object` is the tab
+ *      button; get the view with `-[UIControl cyl_lottieAnimationView]`. Posted on the main queue, after
+ *      `-[CYLTabBarController lottieAnimationSpeed]` has been applied, so a value set in the handler is kept.
+ *      In the Liquid Glass style a tab has two buttons (normal and selected), so it is posted once for each.
+ * [CN] Lottie 动画视图添加到 Tab 按钮后发送（issue #428）。通知的 `object` 为 Tab 按钮，可用
+ *      `-[UIControl cyl_lottieAnimationView]` 取得动画视图。在主队列发送，此时已设置 `-[CYLTabBarController lottieAnimationSpeed]`，
+ *      在回调中设置的值不会被覆盖。液态玻璃样式中每个 Tab 有普通与选中两个按钮，因此各发送一次。
+ */
+FOUNDATION_EXTERN NSString *const CYLTabBarItemLottieAnimationViewDidAddNotification DEPRECATED_MSG_ATTRIBUTE("Use CYLTabBarItemAnimationViewDidAddNotification");
+
+@class CYLThemeManager;
+
+ //TODO:  
+/*!
+ * [CN] * 液态玻璃开关变化
+ * [EN] Liquid Glass toggle changed
+ */
+FOUNDATION_EXTERN NSString *const CYLTabBarStyleTypeDidChangeNotification;
 
 NS_ASSUME_NONNULL_END

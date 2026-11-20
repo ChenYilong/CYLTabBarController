@@ -5,6 +5,8 @@
 //  Copyright © 2026 https://github.com/ChenYilong . All rights reserved.
 //
 
+// CYL-SWIFT-MIGRATION: objc-required — [EN] C data symbols (see the comment below): Swift cannot export one. [CN] C 数据符号（见下方注释）：Swift 无法导出。
+
 #import "CYLTabBarController.h"
 
 /*!
