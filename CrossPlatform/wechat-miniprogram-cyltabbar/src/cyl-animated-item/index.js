@@ -64,6 +64,17 @@ Component({
      */
     autoplay: { type: Boolean, value: true },
     /**
+     * [EN] Whether a play-once animation (`loop` off) is replaced by the still image when it ends (iOS / Android
+     *      `showsImageWhenAnimationEnds`): the engine is hidden and `selectedImage` / `image` (else the placeholder)
+     *      shows. Off by default, so the last frame stays. `playAnimation()`, `stopAnimation()`, a new selection, a new
+     *      file or turning `loop` on shows the animation again. The end is the engine's `complete` (Lottie, PAG, Rive,
+     *      SVGA) or the end of a timed GIF pass (with stills); `animationcomplete` is sent either way.
+     * [CN] 只播放一次的动画（`loop` 关闭）结束时是否换成静态图片（iOS / Android 的 `showsImageWhenAnimationEnds`）：隐藏引擎，显示
+     *      `selectedImage` / `image`（没有时为占位图）。默认关闭，保留最后一帧。`playAnimation()`、`stopAnimation()`、重新选中、新文件或开启
+     *      `loop` 时重新显示动画。结束来自引擎的 `complete`（Lottie、PAG、Rive、SVGA）或有静帧的 GIF 一遍计时结束；两种情况都发送 `animationcomplete`。
+     */
+    showsImageWhenAnimationEnds: { type: Boolean, value: false },
+    /**
      * [EN] The frame (0...1) shown at rest while not selected (iOS `animationRestingProgress`); selected shows the last.
      * [CN] 未选中时静止显示的帧（0...1，iOS 的 `animationRestingProgress`）；选中时显示最后一帧。
      */
@@ -182,6 +193,7 @@ Component({
     gifPlaying: false,
     gifImageReady: false,
     gifImagePlaying: false,
+    animationEnded: false,
     lottieData: null,
     m: {},
     systemTheme: 'light',
@@ -208,7 +220,7 @@ Component({
       this.cylPendingPlay = false
       // cyl-lottie keeps the data it gets and changes it while playing: every item gets its own copy.
       const lottieData = animationData && typeof animationData === 'object' ? JSON.parse(JSON.stringify(animationData)) : null // NOSONAR: `structuredClone` is not in every mini program runtime
-      this.setData({ animationLoaded: false, animationFailed: false, gifPlaying: false, lottieData })
+      this.setData({ animationLoaded: false, animationFailed: false, gifPlaying: false, animationEnded: false, lottieData })
       this.cyl_update()
     },
     'title, image, selectedImage, placeholderImage, embedded, enabled, axis, iconSize, accessoryImage, accessoryText, accessoryAccessibilityLabel, accessoryPlacement, accessibilityLabel, gifFirstFrame, gifLastFrame, iconWidth, iconHeight, iconTint, animationTint, titleColor, titleFontSize, titleFontWeight, titleDarkColor, userInterfaceStyle, titleLines, titleLineHeight, titleSpacing': function () {
@@ -221,7 +233,11 @@ Component({
     'countdownCacheKey, itemStyle': function (key, itemStyle) {
       if (itemStyle === 'countdown') this.cyl_countdown().setCacheKey(key)
     },
+    'showsImageWhenAnimationEnds': function (shows) {
+      if (!shows) this.cyl_showAnimationAgain()
+    },
     'selected, restingProgress': function () {
+      this.cyl_showAnimationAgain()
       this.cyl_update()
       if (!this.data.autoplay || this.data.gifFirstFrame || this.data.gifLastFrame) {
         // [EN] No longer selected: stop the engine (and any play still waiting for it) before showing the resting frame, so
@@ -234,6 +250,7 @@ Component({
       if (!this.data.selected && this.data.gifImagePlaying) this.cyl_restGIFImage()
     },
     'loop': function () {
+      if (this.data.loop) this.cyl_showAnimationAgain()
       // [EN] A GIF image: off lets the pass in progress end, on keeps it playing. [CN] GIF 图片：关闭时让当前一遍播完，开启时一直播放。
       if (this.data.gifImagePlaying) {
         clearTimeout(this.cylGIFImageTimer)
@@ -457,6 +474,7 @@ Component({
      *      “全部播放”对每个条目调用此方法。
      */
     playAnimation() {
+      this.cyl_showAnimationAgain()
       const m = this.data.m
       if (m.gifImage && this.cylGIFImageInfo) {
         this.cyl_playGIFImage()
@@ -483,6 +501,7 @@ Component({
 
     /** [EN] Stops and shows the resting frame (iOS `stopAnimation`). [CN] 停止并显示静止帧（iOS 的 `stopAnimation`）。 */
     stopAnimation() {
+      this.cyl_showAnimationAgain()
       this.cyl_halt()
       this.cyl_rest()
     },
@@ -555,7 +574,27 @@ Component({
       this.cylGifTimer = setTimeout(() => {
         this.setData({ gifPlaying: false })
         this.cyl_update()
+        // [EN] A timed pass of a GIF with stills ended: the same as an engine's `complete`. [CN] 有静帧的 GIF 一遍计时结束：与引擎的 `complete` 相同。
+        this.cyl_animationDidEnd()
+        this.triggerEvent('animationcomplete', { type: 'gif' })
       }, duration - (elapsed % duration))
+    },
+
+    /**
+     * [EN] A play-once pass ended: the still image replaces the animation when `showsImageWhenAnimationEnds`.
+     * [CN] 只播放一次的一遍结束：开启 `showsImageWhenAnimationEnds` 时用静态图片替换动画。
+     */
+    cyl_animationDidEnd() {
+      if (this.data.loop || !this.data.showsImageWhenAnimationEnds || this.data.animationEnded) return
+      this.setData({ animationEnded: true })
+      this.cyl_update()
+    },
+
+    /** [EN] The animation shows again in place of the still image. [CN] 重新显示动画，替换静态图片。 */
+    cyl_showAnimationAgain() {
+      if (!this.data.animationEnded) return
+      this.setData({ animationEnded: false })
+      this.cyl_update()
     },
 
     /**
@@ -581,6 +620,7 @@ Component({
      * [CN] 引擎播放结束（非循环的一遍）：以 `animationcomplete` 转发，例如用于统计重复次数。
      */
     cyl_onAnimationComplete(event) {
+      this.cyl_animationDidEnd()
       this.triggerEvent('animationcomplete', event?.detail || {})
     },
 

@@ -108,6 +108,14 @@ export class CYLAnimatedItemAnimationContext {
   onFailed: () => void = () => {
   };
   /**
+   * [EN] Called by the engine when a play-once pass (`loops` off) reaches its end; the item then shows its still image
+   *      (`showsImageWhenAnimationEnds`) and calls `onAnimationEnd`. An engine that cannot tell never calls it.
+   * [CN] 只播放一次（`loops` 关闭）的一遍播放到结尾时由引擎调用；条目随即显示静态图片（`showsImageWhenAnimationEnds`）并调用
+   *      `onAnimationEnd`。无法判断结束的引擎从不调用它。
+   */
+  onEnded: () => void = () => {
+  };
+  /**
    * [EN] The engine view registers how it replays (from progress 0); the item calls it each time `restartToken` grows.
    *      ArkUI copies a builder's values once when an arrow function wraps the builder (a host's `this`), so a prop
    *      alone may never see the new token (B23).
@@ -298,6 +306,23 @@ export struct CYLAnimatedItemView {
    * [CN] 任何变化都会让动画从进度 0 重新播放（声明式的 `restartAnimation`）；另见 `controller`。
    */
   @Prop @Watch('cylPlaybackDidChange') animationRestartToken: number = 0;
+  /**
+   * [EN] Whether a play-once animation (`animationLoops` off) is replaced by the still image when it ends (iOS / Android
+   *      `showsImageWhenAnimationEnds`): the animation is hidden and `selectedImage` / `image` (else the placeholder)
+   *      shows. Off by default, so the last frame stays. The next play (a restart, a new selection) shows the animation
+   *      again. Needs an engine that reports the end (`CYLAnimatedItemAnimationContext.onEnded`: Lottie and SVGA in cyltabbar).
+   * [CN] 只播放一次的动画（`animationLoops` 关闭）结束时是否换成静态图片（iOS / Android 的 `showsImageWhenAnimationEnds`）：隐藏动画，
+   *      显示 `selectedImage` / `image`（没有时为占位图）。默认关闭，保留最后一帧。下一次播放（重播、重新选中）重新显示动画。需要能报告结束的引擎
+   *      （`CYLAnimatedItemAnimationContext.onEnded`：cyltabbar 中的 Lottie 与 SVGA）。
+   */
+  @Prop @Watch('cylEndImageDidChange') showsImageWhenAnimationEnds: boolean = false;
+  /**
+   * [EN] Called when a play-once animation ends (iOS / Android `animationEndListener`). [CN] 只播放一次的动画结束时调用。
+   */
+  onAnimationEnd?: () => void;
+  /** [EN] The still image replaces the ended animation. [CN] 静态图片替换了已结束的动画。 */
+  @State cylShowsImageAfterEnd: boolean = false;
+  private cylLastSelected: boolean = false;
   /** [EN] Optional imperative control (`restartAnimation()`). [CN] 可选的命令式控制（`restartAnimation()`）。 */
   controller?: CYLAnimatedItemController;
   @State private cylControllerRestarts: number = 0;
@@ -423,6 +448,7 @@ export struct CYLAnimatedItemView {
 
   aboutToAppear(): void {
     this.cylLastRestartToken = this.animationRestartToken + this.cylControllerRestarts;
+    this.cylLastSelected = this.isItemSelected;
     if (this.controller) {
       this.controller.cylRestart = () => {
         this.cylControllerRestarts += 1;
@@ -578,6 +604,7 @@ export struct CYLAnimatedItemView {
   cylAnimationDidChange(): void {
     this.animationLoaded = false;
     this.animationFailed = false;
+    this.cylShowsImageAfterEnd = false;
     this.cylUpdateContext();
     if (this.animationUrl.length > 0 && !CYLAnimatedItemEngines.canPlay(this.animationUrl)) {
       CYLAnimatedItemEngines.warnMissingEngine(this.animationUrl);
@@ -591,6 +618,11 @@ export struct CYLAnimatedItemView {
   cylPlaybackDidChange(): void {
     this.cylUpdateContext();
     const token = this.animationRestartToken + this.cylControllerRestarts;
+    // [EN] A new pass (a restart, a new selection) or looping shows the animation again. [CN] 新的一遍播放（重播、重新选中）或开启循环时重新显示动画。
+    if (token !== this.cylLastRestartToken || this.isItemSelected !== this.cylLastSelected || this.animationLoops) {
+      this.cylShowsImageAfterEnd = false;
+    }
+    this.cylLastSelected = this.isItemSelected;
     if (token !== this.cylLastRestartToken) {
       this.cylLastRestartToken = token;
       this.cylRestartHandler?.();
@@ -617,7 +649,28 @@ export struct CYLAnimatedItemView {
         this.animationFailed = true;
       }
     };
+    context.onEnded = () => {
+      if (url !== this.animationUrl || this.animationLoops) {
+        return;
+      }
+      if (this.showsImageWhenAnimationEnds) {
+        this.cylShowsImageAfterEnd = true;
+      }
+      this.onAnimationEnd?.();
+    };
     this.animationContext = context;
+  }
+
+  /** [EN] Turned off: the animation shows again. [CN] 关闭时重新显示动画。 */
+  cylEndImageDidChange(): void {
+    if (!this.showsImageWhenAnimationEnds) {
+      this.cylShowsImageAfterEnd = false;
+    }
+  }
+
+  /** [EN] The animation is drawn and not replaced by the still image. [CN] 动画已绘制且未被静态图片替换。 */
+  cylAnimationShows(): boolean {
+    return this.cylMakesAnimation() && this.animationLoaded && !this.cylShowsImageAfterEnd;
   }
 
   /**
@@ -654,7 +707,7 @@ export struct CYLAnimatedItemView {
     if (!this.cylIsEmpty(image)) {
       return image;
     }
-    let animationShows: boolean = this.cylMakesAnimation() && this.animationLoaded;
+    let animationShows: boolean = this.cylAnimationShows();
     return (this.animationUrl.length > 0 && !animationShows) ? this.placeholderImage : '';
   }
 
@@ -678,7 +731,7 @@ export struct CYLAnimatedItemView {
           .fontColor([this.iconColor === '' ? $r('sys.color.font_primary') : this.iconColor])
           .width(this.iconSize)
           .height(this.iconSize)
-          .opacity(this.cylMakesAnimation() && this.animationLoaded ? 0 : 1)
+          .opacity(this.cylAnimationShows() ? 0 : 1)
           .accessibilityLevel('no')
       } else if (!this.cylIsEmpty(this.cylFallbackImage())) {
         Image(this.cylFallbackImage())
@@ -687,7 +740,7 @@ export struct CYLAnimatedItemView {
           .fillColor(this.iconColor === '' ? undefined : this.iconColor)
           .colorFilter(new ColorFilter(cylIconColorFilter(this.iconColor)))
           .objectFit(ImageFit.Contain)
-          .opacity(this.cylMakesAnimation() && this.animationLoaded ? 0 : 1)
+          .opacity(this.cylAnimationShows() ? 0 : 1)
           .accessibilityLevel('no')
       }
       if (this.cylMakesAnimation()) {
@@ -705,6 +758,7 @@ export struct CYLAnimatedItemView {
             restartToken: this.animationRestartToken + this.cylControllerRestarts,
             onLoaded: this.animationContext.onLoaded,
             onFailed: this.animationContext.onFailed,
+            onEnded: this.animationContext.onEnded,
             setRestartHandler: this.cylSetRestartHandler
           })
         }
@@ -727,7 +781,7 @@ export struct CYLAnimatedItemView {
         // [EN] An offscreen group, so the tint only meets the animation, never what is behind the item.
         // [CN] 离屏组，使着色只与动画合成，不影响条目背后的内容。
         .blendMode(this.animationTintColor !== '' ? BlendMode.SRC_OVER : BlendMode.NONE, BlendApplyType.OFFSCREEN)
-        .opacity(this.animationLoaded ? 1 : 0)
+        .opacity(this.animationLoaded && !this.cylShowsImageAfterEnd ? 1 : 0)
         .accessibilityLevel('no')
       }
       if (this.accessoryPlacement === CYLAnimatedItemAccessoryPlacement.TopTrailing) {

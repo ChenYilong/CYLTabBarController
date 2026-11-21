@@ -152,6 +152,15 @@ interface CYLTabBarItemAnimationPlayer {
      *      `color`（标题的选中颜色），与 "title" 相同。默认实现设置 `tintColor`，因此不带状态的调用方在两种状态下都保留固定着色。
      */
     fun setTintColor(color: Int?, selected: Boolean) { tintColor = color }
+
+    /**
+     * [EN] Whether a pass is playing now: true or false, or null when the library cannot tell (the default).
+     *      `CYLAnimatedItemView` reads it to find the end of a play-once animation (`showsImageWhenAnimationEnds`,
+     *      `animationEndListener`); with null it falls back to `progress` reaching 1.
+     * [CN] 当前是否正在播放：true 或 false；动画库无法判断时为 null（默认）。`CYLAnimatedItemView` 读取它来发现只播放一次的动画何时结束
+     *      （`showsImageWhenAnimationEnds`、`animationEndListener`）；为 null 时改为判断 `progress` 是否到达 1。
+     */
+    val isPlaying: Boolean? get() = null
 }
 
 /**
@@ -475,6 +484,11 @@ interface CYLTabBarItemAnimationPlayableView {
      */
     fun cyl_setAnimationViewLoops(loops: Boolean) { /* [EN] Optional. [CN] 可选。 */ }
     /**
+     * [EN] Whether a pass is playing now (the player's `isPlaying`); null (the default) when the view cannot tell.
+     * [CN] 当前是否正在播放（播放器的 `isPlaying`）；视图无法判断时为 null（默认）。
+     */
+    fun cyl_isAnimationViewPlaying(): Boolean? = null
+    /**
      * [EN] The playback speed (the player's `animationSpeed`, 1 = the file's own), applied to a pass already playing.
      * [CN] 播放速度（播放器的 `animationSpeed`，1 = 文件自身速度），对正在播放的动画同样生效。
      */
@@ -536,6 +550,7 @@ open class CYLTabBarItemViewAnimator(
             override fun play() = playable.cyl_playAnimationView()
             override fun showLastFrame() = playable.cyl_showAnimationViewLastFrame()
             override fun stop() = playable.cyl_stopAnimationView()
+            override val isPlaying: Boolean? get() = playable.cyl_isAnimationViewPlaying()
             override var loops: Boolean = false
                 set(value) { field = value; playable.cyl_setAnimationViewLoops(value) }
             override var animationSpeed: Float = 1f
@@ -857,6 +872,7 @@ object CYLLottieTabBarItemAnimator : CYLTabBarItemAnimator {
         override fun play() { animationView?.let { CYLReflection.call(it, "setProgress", 0f); CYLReflection.call(it, "playAnimation") } }
         override fun showLastFrame() { animationView?.let { CYLReflection.call(it, "cancelAnimation"); CYLReflection.call(it, "setProgress", 1f) } }
         override fun stop() { animationView?.let { CYLReflection.call(it, "cancelAnimation"); CYLReflection.call(it, "setProgress", 0f) } }
+        override val isPlaying: Boolean? get() = animationView?.let { CYLReflection.call(it, "isAnimating") as? Boolean }
         override var progress: Float
             get() = animationView?.let { CYLReflection.call(it, "getProgress") as? Float } ?: 0f
             set(value) { animationView?.let { CYLReflection.call(it, "setProgress", value) } }
@@ -973,6 +989,7 @@ object CYLPAGTabBarItemAnimator : CYLTabBarItemAnimator {
 
         override fun showLastFrame() { animationView?.let { CYLReflection.call(it, "pause"); show(it, frames(it) - 1) } }
         override fun stop() { animationView?.let { CYLReflection.call(it, "pause"); show(it, 0) } }
+        override val isPlaying: Boolean? get() = animationView?.let { CYLReflection.call(it, "isPlaying") as? Boolean }
         override var progress: Float
             get() = animationView?.let { view -> ((CYLReflection.call(view, "currentFrame") as? Int) ?: 0).toFloat() / maxOf(1, frames(view) - 1) } ?: 0f
             set(value) { animationView?.let { show(it, Math.round(value.coerceIn(0f, 1f) * (frames(it) - 1))) } }
@@ -985,6 +1002,7 @@ object CYLPAGTabBarItemAnimator : CYLTabBarItemAnimator {
         override fun play() { animationView?.let { CYLReflection.call(it, "setRepeatCount", if (loops) 0 else 1); CYLReflection.call(it, "setProgress", 0.0); CYLReflection.call(it, "play") } }
         override fun showLastFrame() { animationView?.let { CYLReflection.call(it, "stop"); CYLReflection.call(it, "setProgress", 1.0); CYLReflection.call(it, "flush") } }
         override fun stop() { animationView?.let { CYLReflection.call(it, "stop"); CYLReflection.call(it, "setProgress", 0.0); CYLReflection.call(it, "flush") } }
+        override val isPlaying: Boolean? get() = animationView?.let { CYLReflection.call(it, "isPlaying") as? Boolean }
         override var progress: Float
             get() = animationView?.let { (CYLReflection.call(it, "getProgress") as? Double)?.toFloat() } ?: 0f
             set(value) { animationView?.let { CYLReflection.call(it, "setProgress", value.toDouble()); CYLReflection.call(it, "flush") } }
@@ -1397,6 +1415,12 @@ class CYLRiveTabBarItemAnimationView internal constructor(context: Context, priv
         // [CN] 无论哪种情况都记录选中状态，之后绑定的主题实例（深色模式）会保留它。
         if (stateMachine != null) setActive(true) else { isActive = true; CYLReflection.call(rive, "pause") }
     }
+
+    /**
+     * [EN] rive-android's `isPlaying`: false once the animation ends or the state machine settles (rive-android pauses it).
+     * [CN] rive-android 的 `isPlaying`：动画结束或状态机稳定（rive-android 会暂停它）后为 false。
+     */
+    override fun cyl_isAnimationViewPlaying(): Boolean? = CYLReflection.call(rive, "isPlaying") as? Boolean
 
     override fun cyl_stopAnimationView() {
         handler.removeCallbacksAndMessages(null)

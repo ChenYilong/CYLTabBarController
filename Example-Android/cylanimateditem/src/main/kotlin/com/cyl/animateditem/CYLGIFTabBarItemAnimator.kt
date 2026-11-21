@@ -119,6 +119,8 @@ class CYLGIFTabBarItemAnimationView internal constructor(context: Context, priva
 
     override fun cyl_playAnimationView() = playFrom(0f)
 
+    override fun cyl_isAnimationViewPlaying(): Boolean = playing
+
     /**
      * [EN] Plays the GIF from `fraction` (0…1) at `speed`, on the display's frame clock (`postOnAnimation`) with the GIF's
      *      own time, as Lottie does. Not a ValueAnimator: one ends at once wherever the process's animator duration scale is

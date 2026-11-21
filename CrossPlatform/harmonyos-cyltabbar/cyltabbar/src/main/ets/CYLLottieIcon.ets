@@ -30,6 +30,11 @@ export struct CYLLottieIcon {
    */
   registerReplay: (replay: () => void) => void = (_replay: () => void) => {};
   onLoaded: () => void = () => {};
+  /**
+   * [EN] A play-once pass reached its last frame (lottie's "complete"; CYLAnimatedItemAnimationContext `onEnded`).
+   * [CN] 只播放一次的一遍播放到最后一帧（lottie 的 "complete"；CYLAnimatedItemAnimationContext 的 `onEnded`）。
+   */
+  onEnded: () => void = () => {};
   /** [EN] The file cannot be loaded. [CN] 文件无法加载。 */
   onLoadError: (message: string) => void = (_message: string) => {};
   private settings: RenderingContextSettings = new RenderingContextSettings(true);
@@ -61,6 +66,11 @@ export struct CYLLottieIcon {
     this.lottieItem.addEventListener('DOMLoaded', () => {
       this.cylUpdate();
       this.onLoaded();
+    });
+    this.lottieItem.addEventListener('complete', () => {
+      if (!this.loops) {
+        this.onEnded();
+      }
     });
     this.lottieItem.addEventListener('data_failed', () => this.onLoadError(`cannot load ${this.path}`));
   }

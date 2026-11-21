@@ -114,6 +114,9 @@ object CYLSVGATabBarItemAnimator : CYLTabBarItemAnimator {
 
         override fun stop() = perform { view -> CYLReflection.call(view, "stepToFrame", 0, false) }
 
+        // [EN] SVGAImageView.isAnimating; false before the file is parsed. [CN] SVGAImageView.isAnimating；文件解析前为 false。
+        override val isPlaying: Boolean? get() = animationView?.let { CYLReflection.call(it, "isAnimating") as? Boolean }
+
         override var progress: Float
             get() = 0f
             set(value) { perform { view -> CYLReflection.call(view, "stepToPercentage", value.toDouble(), false) } }
