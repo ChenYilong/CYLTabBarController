@@ -84,4 +84,11 @@ hdc shell aa test -b com.cyl.tabbar.harmony -m entry_test -s unittest OpenHarmon
 Result on 2026-11-22 (x86_64 emulator, HarmonyOS 6.0.1): Tests run: 6, Failure: 0, Error: 0, Pass: 6. On Windows give hdc
 backslash paths (`tools/cyl_hap_x86_64.py` does).
 
+### 5. Next: PAG and Rive playback on x86_64 (owner's plan, TODO)
+
+Plan 1: load x86_64 builds of the PAG and Rive libraries (from their GitHub sources) when the device is x86_64; compile and
+never crash first, then play correctly; behind a debug build option until verified, and the guard is removed only with the
+owner's approval. Plan 2, if Plan 1 fails: the macOS (arm64) session runs these tests. Full text: CYLTabBarController
+`instructions.md`, "Rive and PAG on the x86_64 emulator: two plans for arm64-only tests".
+
 Say in every report and screenshot footer which part ran on x86_64 and which still needs an arm64 device.

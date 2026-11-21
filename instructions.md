@@ -51,3 +51,16 @@ Read this file before reading or writing files in this repository. It inherits t
   3. Every test that depends on the component passes on the x86_64 emulator with PAG and Rive items on their still images; PAG and Rive playback itself is still checked on an arm64 device, and the report says so.
 - **Until it is done (local workaround, never committed).** Build the HAP, copy it without `libs/` (for example with Python's `zipfile`), and in a local copy of the example skip the PAG and Rive views when `deviceInfo.abiList` has no `arm64-v8a`. Used on 2026-11-22 for HarmonyOS-Issues rows 28 and 29 (CollectionViewClassifyMenu `9dc1f761`).
 - Status (2026-11-22): built in `cylanimateditem` (ABI check in `CYLAnimatedItemEngines`, `tools/cyl_hap_x86_64.py`, the `emulator` target recipe in `cylanimateditem/README.md`, used by the cyltabbar example); dependents adopt it next. Task and score: `docs/Animated-Item.md`, "HarmonyOS x86_64 emulator".
+
+## Rive and PAG on the x86_64 emulator: two plans for arm64-only tests (added 2026-11-22, owner)
+
+Tests that today can only run on arm64 (PAG and Rive playback, their `onEnded`, Rive's dispose crash workarounds) get one of two plans, in this order:
+
+1. **Plan 1: x86_64 libraries inside CYLTabBarController's CYLAnimatedItemView.** Change the HarmonyOS `cylanimateditem` (and the engine views it hands work to) so that, on an x86_64 device, PAG and Rive load x86_64 builds of their dependency libraries brought in from GitHub (the upstream sources of `@tencent/libpag` and `@ohos/rive` built for x86_64), so these tests run on the x86_64 emulator.
+   - **Guard condition:** the architecture of the running system: the x86_64 path is taken only when the device reports x86_64 (`deviceInfo.abiList`).
+   - **Order of goals:** first, the x86_64 build compiles and never crashes or breaks any other feature (Lottie, SVGA, GIF, still images, the arm64 path on phones); only then make PAG and Rive actually play correctly on x86_64.
+   - **Debug guard until verified:** until Plan 1 passes its tests, keep it behind a debug build option (off in release builds and in every published package), because it is only triggered on the emulator. Remove the debug guard only after Plan 1 is verified, and **only with the owner's approval: ask first**.
+   - Until Plan 1 works, the current fallback stays: on x86_64, PAG and Rive items show their still images (`CYLAnimatedItemEngines.isSupportedOnDevice`, the `emulator` build target, `cylanimateditem/README.md`, "x86_64 emulator").
+2. **Plan 2, if Plan 1 fails: hand the test to the macOS session.** A Mac (Apple silicon) is arm64, so its arm64 HarmonyOS emulator runs PAG and Rive natively. Send the task to the active session whose name starts with `Mac` (`ListAgents`), with the build, the commands and what to check; when none is reachable, record it as a TODO in the task's document for the next Mac session.
+
+Status: TODO (Plan 1 not started). Task and score: `docs/Animated-Item.md`, "Rive and PAG on the x86_64 emulator".
