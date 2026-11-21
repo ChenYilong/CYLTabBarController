@@ -148,3 +148,23 @@ test('exactly one slot is selected after a switch (selection comes from one iden
   assert.equal(selectedCount('b'), 1)
   assert.equal(selectedCount('a'), 1)
 })
+
+test('a bar shown after a tap draws the tapped tab at once, not its own stale selection', () => {
+  const definition = cylDefinition('../src/cyl-tab-bar/index.js')
+  assert.equal(typeof definition.pageLifetimes.show, 'function')
+  const sent = []
+  const model = { context: 'flicker', items: [{ identifier: 'a' }, { identifier: 'b' }] }
+  const tapped = { cylModel: model, data: { selectedIdentifier: 'a' }, setData(patch) { sent.push(patch) }, ...definition.methods }
+  tapped.cylLongPressed = false
+  tapped.cyl_recordTap = () => {}
+  tapped.cyl_playTapAnimation = () => {}
+  tapped.cyl_playTabButtonTapFeedback = () => {}
+  tapped.triggerEvent = () => {}
+  tapped.data.cylSlots = [{ key: 'a' }, { key: 'b' }]
+  tapped.data.loggedIn = true
+  model.loginRequiredIdentifiers = []
+  tapped.cyl_onTap({ type: 'tap', currentTarget: { dataset: { key: 'b' } } })
+  const cached = { cylModel: model, data: { selectedIdentifier: 'a' }, setData(patch) { sent.push(patch) } }
+  definition.pageLifetimes.show.call(cached)
+  assert.deepEqual(sent[sent.length - 1], { selectedIdentifier: 'b' })
+})

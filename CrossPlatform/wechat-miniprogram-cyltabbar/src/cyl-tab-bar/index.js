@@ -59,6 +59,20 @@ function cylTitleLine(slots) {
 const cylPlayback = { key: '', startedAt: 0 };
 const CYL_PLAYBACK_WINDOW = 3000;
 
+/**
+ * [EN] The tab tapped last, shared by every bar of the app (each tab page has its own bar). A page shown by the tap draws
+ *      this selection at once, instead of its own stale one (the lens sat on the previous tab for a moment, then jumped).
+ * [CN] 最后被点击的 Tab，App 中所有 TabBar 共享（每个 Tab 页面都有自己的 TabBar）。被点击而显示的页面立即绘制这个选中项，
+ *      而不是自己过期的选中项（之前透镜先停在上一个 Tab，随后才跳过去）。
+ */
+const cylLastSelection = { context: '', identifier: '', time: 0 };
+
+function cylRecentSelection(context) {
+  const recent = cylLastSelection.identifier && cylLastSelection.context === context
+    && Date.now() - cylLastSelection.time < CYL_PLAYBACK_WINDOW;
+  return recent ? cylLastSelection.identifier : '';
+}
+
 function cylBadgeText(value) {
   if (value === undefined || value === null || value === '') {
     return '';
@@ -308,6 +322,20 @@ Component({
     },
   },
 
+  pageLifetimes: {
+    /**
+     * [EN] A cached tab page is shown again with the selection it had: follow the tab that was just tapped before its own
+     *      onShow syncs the route.
+     * [CN] 被缓存的 Tab 页面再次显示时带着旧的选中项：在页面自己的 onShow 同步路由之前，先跟随刚被点击的 Tab。
+     */
+    show() {
+      const recent = this.cylModel ? cylRecentSelection(this.cylModel.context || '') : '';
+      if (recent && recent !== this.data.selectedIdentifier) {
+        this.setData({ selectedIdentifier: recent });
+      }
+    },
+  },
+
   lifetimes: {
     attached() {
       this.cylBadges = {};
@@ -355,7 +383,11 @@ Component({
         cylHideItems(model, hidden);
       }
       this.cylModel = model;
-      const requested = this.data.selectedIdentifier;
+      const recent = this.cylRendered ? '' : cylRecentSelection(model.context || '');
+      this.cylRendered = true;
+      // [EN] The first render of a bar follows the tab just tapped, and keeps it as its selection.
+      // [CN] TabBar 的首次渲染跟随刚被点击的 Tab，并把它保存为自己的选中项。
+      const requested = recent || this.data.selectedIdentifier;
       const shown = model.items.some((item) => item.identifier === requested)
         || (model.plusButton && model.plusButton.identifier === requested);
       const selected = shown ? requested : cylFirstIdentifier(model);
@@ -375,6 +407,7 @@ Component({
       const itemStyle = this.cyl_itemStyle(model);
       const styleType = cylBarStyleType(itemStyle, model.styleType);
       this.setData({
+        ...(recent && recent !== this.data.selectedIdentifier ? { selectedIdentifier: recent } : {}),
         cylSlots: slots,
         cylItemStyle: itemStyle,
         cylGlassLensStyle: cylGlassLensStyle(this.cylRequestedGlassLensStyle !== undefined
@@ -712,6 +745,9 @@ Component({
       }
       // [EN] Select and play at once on the tapped bar; the page's own bar continues the playback (cylPlayback).
       // [CN] 在被点击的 TabBar 上立即选中并播放；页面自己的 TabBar 继续该播放（cylPlayback）。
+      cylLastSelection.context = model.context || '';
+      cylLastSelection.identifier = item.identifier;
+      cylLastSelection.time = Date.now();
       this.setData({ selectedIdentifier: item.identifier });
       this.triggerEvent('select', detail);
     },
