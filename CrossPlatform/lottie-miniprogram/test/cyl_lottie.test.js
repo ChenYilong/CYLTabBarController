@@ -340,6 +340,28 @@ test('cyl-lottie reloads only when path / animationData / colors / fit really ch
   assert.equal(loads, 6, 'a new fit reloads')
 })
 
+test('cyl-lottie plays again only when loop / autoplay / restingFrame really change', () => {
+  // [EN] cyl-animated-item re-renders after each "complete" and sets the same values; play() then ran the finished
+  //      animation from its last frame and "complete" came twice per pass.
+  // [CN] cyl-animated-item 在每次 "complete" 之后重新渲染并设置相同的值；play() 会让已结束的动画从最后一帧再播放，每一遍收到两次 "complete"。
+  let definition = null
+  global.Component = (options) => { definition = options }
+  delete require.cache[require.resolve('../miniprogram_dist/cyl-lottie/index.js')]
+  require('../miniprogram_dist/cyl-lottie/index.js')
+  const observer = definition.observers['loop, autoplay, restingFrame']
+  let plays = 0
+  const animation = {isLoaded: true, isPaused: true, setLoop() {}, play() { plays += 1 }}
+  const component = Object.assign({}, definition.methods, {cylAnimation: animation, cyl_rest() {}, cyl_syncSnapshot() {}})
+  component.cyl_playbackInputsChanged(false, true, 'last')
+  observer.call(component, false, true, 'last')
+  observer.call(component, false, true, 'last')
+  assert.equal(plays, 0, 'the values the load applied, set again, do not play')
+  observer.call(component, true, true, 'last')
+  assert.equal(plays, 1, 'turning loop on plays')
+  observer.call(component, true, true, 'last')
+  assert.equal(plays, 1, 'the same values again do not play')
+})
+
 test('cyl-lottie loads the same inputs again after a failed load (a retry)', () => {
   let definition = null
   global.Component = (options) => { definition = options }

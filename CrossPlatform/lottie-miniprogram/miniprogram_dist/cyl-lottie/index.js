@@ -122,9 +122,18 @@ Component({
         this.cylAnimation.setSpeed(speed)
       }
     },
-    'loop, autoplay, restingFrame': function (loop, autoplay) {
+    'loop, autoplay, restingFrame': function (loop, autoplay, restingFrame) {
       const animation = this.cylAnimation
       if (!animation?.isLoaded) {
+        return
+      }
+      // [EN] Only a real change: a host that re-renders sets the same values again (cyl-animated-item does after each
+      //      "complete"), and play() then ran a finished play-once animation from its last frame, so "complete" came twice
+      //      per pass (docs/Animated-Item.md, showsImageWhenAnimationEnds; seen in WeChat DevTools 2026-11-22).
+      // [CN] 只处理真正的变化：宿主重新渲染时会再次设置相同的值（cyl-animated-item 在每次 "complete" 之后都会这样做），此时
+      //      play() 会让已结束的只播放一次的动画从最后一帧再播放，每一遍都收到两次 "complete"（docs/Animated-Item.md，
+      //      showsImageWhenAnimationEnds；2026-11-22 在微信开发者工具中发现）。
+      if (!this.cyl_playbackInputsChanged(loop, autoplay, restingFrame)) {
         return
       }
       animation.setLoop(loop)
@@ -158,6 +167,19 @@ Component({
   },
 
   methods: {
+    /**
+     * [EN] Whether loop / autoplay / restingFrame differ from the last values applied; remembers the new ones.
+     * [CN] loop / autoplay / restingFrame 是否与上次应用的值不同；记住新的值。
+     */
+    cyl_playbackInputsChanged(loop, autoplay, restingFrame) {
+      const last = this.cylPlaybackInputs
+      if (last && last.loop === loop && last.autoplay === autoplay && last.restingFrame === restingFrame) {
+        return false
+      }
+      this.cylPlaybackInputs = {loop, autoplay, restingFrame}
+      return true
+    },
+
     /**
      * [EN] Whether path / animationData / colors / fit differ from the last values seen; remembers the new ones.
      *      animationData is compared by reference, colors by content.
@@ -297,6 +319,7 @@ Component({
           //      loaded would be lost. [CN] 使用此刻的值而不是开始加载时的值：加载期间设置的 speed / loop / autoplay 否则会丢失。
           const {speed: currentSpeed, loop: currentLoop} = this.data
           this.cylAnimation.setLoop(currentLoop)
+          this.cyl_playbackInputsChanged(currentLoop, this.data.autoplay, this.data.restingFrame)
           if (currentSpeed > 0 && currentSpeed !== 1) {
             this.cylAnimation.setSpeed(currentSpeed)
           }
@@ -367,8 +390,6 @@ Component({
     },
 
     cyl_pause() {
-      // [EN] Also cancels a play that waits for the file. [CN] 同时取消仍在等待文件的播放。
-      this.cylPendingPlay = null
       if (this.cylAnimation) {
         this.cylAnimation.pause()
         this.cyl_syncSnapshot()

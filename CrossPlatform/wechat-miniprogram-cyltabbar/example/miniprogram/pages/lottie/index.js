@@ -35,6 +35,8 @@ Page({
     fits: ['contain', 'cover', 'fill'],
     colors: null,
     events: [],
+    endImage: true,
+    endCount: 0,
   },
 
   onLoad() {
@@ -102,6 +104,17 @@ Page({
   },
   cyl_recolor(event) {
     this.setData({ colors: event.detail.value ? { '**': '#FF3B30' } : null });
+  },
+  // [EN] showsImageWhenAnimationEnds: Play from the start, the switch, and the count of ended passes.
+  // [CN] showsImageWhenAnimationEnds：从头播放、开关，以及已结束的播放次数。
+  cyl_endItemPlay() {
+    this.selectComponent('#cyl-end-item').playAnimation();
+  },
+  cyl_endImage(event) {
+    this.setData({ endImage: event.detail.value });
+  },
+  cyl_endItemComplete() {
+    this.setData({ endCount: this.data.endCount + 1 });
   },
   // [EN] Tapping an event row copies it. [CN] 点击事件行复制该事件。
   cyl_copyEvent(event) {

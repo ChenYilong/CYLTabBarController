@@ -11,6 +11,11 @@
   background-color: #ffffff;
 }
 
+.cyl-end-item {
+  width: 96px;
+  height: 96px;
+}
+
 .cyl-buttons {
   margin-top: 16px;
 }
