@@ -85,6 +85,10 @@ Preview of the latest version on iOS 27+
 | ✅ **AI 工具的 skill**：`cyl-new-project`、`cyl-plus-button` 等项目专属 skill，帮助基于本库快速创建项目。见 [AI 工具的 skill](docs/Agent-Skills.md)。 | ✅ **Skills for AI tools**: project skills such as `cyl-new-project` and `cyl-plus-button` help create a project with this library quickly. See [Agent skills](docs/Agent-Skills.md). |
 | 📝 **研究报告**：通过配置与页面注册表注册 PlusButton 的设计方案（尚未实现），见 [PlusButton 注册研究](docs/PlusButton-Registration-Research.md)；配置中的 Tab 如何找到页面对象（已按其中选定的方案实现为页面注册表），见 [Tab 页面解析研究](docs/Tab-View-Controller-Resolution-Research.md)。 | 📝 **Research reports**: a design for registering the PlusButton through configurations and the page registry (not implemented yet), in [PlusButton registration research](docs/PlusButton-Registration-Research.md); how a tab in a configuration finds its page object (implemented as the page registry, with the option chosen there), in [Tab page resolution research](docs/Tab-View-Controller-Resolution-Research.md). |
 
+`CYLAnimatedItemView` 的倒计时样式（「获取验证码」按钮）：待机、倒计时中、结束 / The countdown style of `CYLAnimatedItemView` (a "Get code" button): idle, running, finished ([Countdown style](docs/Animated-Item.md#encountdown-style)):
+
+![iOS 27.2, iPhone 18 Pro simulator, macOS 27.3, Xcode 27.2 (27B52), CYLTabBarController bf242302 (countdown demo in this change), feat/cross-platform-components, 2026-11-21. Purpose: CYLAnimatedItemView countdown style in Example-GIF](docs/assets/animated-item-countdown-ios.png)
+
 
 | 中文 | English |
 |:---|:---|
@@ -446,6 +450,10 @@ PlusButton.register()
 | Flutter | `CrossPlatform/flutter_cyltabbar` | [跨端组件](docs/Cross-Platform-Components.md) |
 | 鸿蒙 / HarmonyOS（ArkTS / ArkUI） | `CrossPlatform/harmonyos-cyltabbar` | [鸿蒙对照](docs/HarmonyOS-Parity.md) |
 | 微信小程序 / WeChat mini program | `CrossPlatform/wechat-miniprogram-cyltabbar` | [微信小程序](docs/WeChat-Mini-Program.md) |
+
+Flutter 与 React Native 基础示例在 iOS 上链接 Rive 后的 TabBar / The Flutter and React Native basic examples on iOS with Rive linked ([Rive](docs/Rive-Animation.md)):
+
+![iOS 27.2, iPhone 18 Pro simulator, macOS 27.3, Xcode 27.2 (27B52), Flutter and React Native basic examples with CYLTabBarController/Rive (RiveRuntime 6.29.0), CYLTabBarController b026b0e1, feat/cross-platform-components, 2026-11-21. Purpose: the basic examples build and run with Rive linked](docs/assets/rive-flutter-rn-basic-examples-ios.png)
 
 ## [CN]常见问题
 ## [EN]FAQ
