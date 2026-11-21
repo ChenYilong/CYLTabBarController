@@ -393,7 +393,7 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
           （每次 tick 与 App 返回前台时重新读取剩余时间），定时器延迟也不会造成偏差（修复 SMSCodeButton 的 issue #1）。每秒只改变同一个
           label 的标题，不重建系统按钮，因此不会闪烁；控件保持最宽标题的宽度，也不会抖动。倒计时期间控件不可用，VoiceOver 朗读剩余秒数。
      */
-    public var style: CYLAnimatedItemStyle = .plain {
+    public var itemStyle: CYLAnimatedItemStyle = .plain {
         didSet { cyl_countdownStyleDidChange(from: oldValue) }
     }
     /** [EN] The length in seconds, 60 by default. Used by `startCountdown()`. [CN] 总时长（秒），默认 60。`startCountdown()` 使用。 */
@@ -1118,7 +1118,7 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
 
     @objc private func cyl_handleTap() {
         delegate?.animatedItemViewDidTap?(self)
-        if style == .countdown, startsCountdownOnTap, countdownState != .running {
+        if itemStyle == .countdown, startsCountdownOnTap, countdownState != .running {
             startCountdown()
         }
     }
@@ -1168,8 +1168,8 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
     private var cyl_now: Date { countdownDateProvider?() ?? Date() }
 
     private func cyl_countdownStyleDidChange(from oldStyle: CYLAnimatedItemStyle) {
-        guard style != oldStyle else { return }
-        if style == .countdown {
+        guard itemStyle != oldStyle else { return }
+        if itemStyle == .countdown {
             // [EN] The default look of a countdown button: a rounded border and a light background, as the original
             //      SMSCodeButton. Set these properties again after the style to change them.
             // [CN] 倒计时按钮的默认外观：圆角边框与浅色背景，与最初的 SMSCodeButton 一致。要修改，请在设置样式之后再设置这些属性。
@@ -1193,7 +1193,7 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
 
     /// [EN] Shows the title that belongs to the current state, after a title property changed. [CN] 某个标题属性变化后，显示与当前状态对应的标题。
     private func cyl_refreshCountdownTitle() {
-        guard style == .countdown else { return }
+        guard itemStyle == .countdown else { return }
         if countdownState == .running {
             title = CYLAnimatedItemCountdownText(countdownRunningTitleFormat, seconds: max(countdownShownSeconds, 0))
         } else {
@@ -1209,7 +1209,7 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
     ///      running one with the widest digits of `countdownDuration`. 0 for another style.
     /// [CN] 倒计时会显示的最宽标题，使控件保持宽度：待机标题、结束标题，以及用 `countdownDuration` 位数的最宽数字组成的倒计时标题。其他样式为 0。
     private var cyl_countdownTitleWidth: CGFloat {
-        guard style == .countdown else { return 0 }
+        guard itemStyle == .countdown else { return 0 }
         let digits = String(max(1, Int(ceil(countdownDuration)))).count
         let widest = Int(String(repeating: "8", count: digits)) ?? 88
         let attributes: [NSAttributedString.Key: Any] = [.font: titleLabel.font as Any]
@@ -1220,7 +1220,7 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
     /// [EN] The border, the title color and the pressed look of the countdown style, for the state it is in.
     /// [CN] 倒计时样式在当前状态下的边框、标题颜色与按下外观。
     private func cyl_applyCountdownAppearance() {
-        guard style == .countdown else { return }
+        guard itemStyle == .countdown else { return }
         let running = countdownState == .running
         let border: UIColor = running ? .lightGray : (tintColor ?? .systemBlue)
         layer.borderColor = border.resolvedColor(with: traitCollection).cgColor
@@ -1255,7 +1255,7 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
             resetCountdown()
             return
         }
-        if style != .countdown { style = .countdown }
+        if itemStyle != .countdown { itemStyle = .countdown }
         let start = cyl_now
         cyl_beginCountdown(start: start, end: start.addingTimeInterval(duration), duration: duration, announcesStart: true)
     }
@@ -1296,7 +1296,7 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
             isEnabled = true
             cyl_restoreCountdownTitleColor()
         }
-        if style == .countdown {
+        if itemStyle == .countdown {
             cyl_showCountdownIdleOrFinishedTitle()
             cyl_applyCountdownAppearance()
         }
@@ -1368,7 +1368,7 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
     ///      the longest duration it recorded); an invalid one is dropped, and the control stays idle. Nothing is announced.
     /// [CN] 接续按本地时钟仍然有效的缓存倒计时（未结束、不是来自未来、不超过其记录的最长时长）；无效的缓存被丢弃，控件保持待机。不触发开始回调。
     private func cyl_restoreCountdownFromCache() {
-        guard style == .countdown, countdownState != .running, let key = countdownCacheKey,
+        guard itemStyle == .countdown, countdownState != .running, let key = countdownCacheKey,
               let cached = countdownCacheStore.dictionary(forKey: Self.cyl_countdownCacheName(key)) as? [String: TimeInterval],
               let start = cached["start"], let end = cached["end"], let duration = cached["duration"] else { return }
         let now = cyl_now

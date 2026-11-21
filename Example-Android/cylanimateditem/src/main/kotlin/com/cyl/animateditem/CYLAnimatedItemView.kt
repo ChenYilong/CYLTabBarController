@@ -110,7 +110,7 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
      *      关闭倒计时，`countdownCacheKey` 使其在重启后继续（修复 SMSCodeButton 的 issue #1）。每秒只改变标题文字，视图保持最宽标题的宽度，
      *      因此不会闪烁或抖动。倒计时期间视图不可用。
      */
-    var style: CYLAnimatedItemStyle = CYLAnimatedItemStyle.Plain
+    var itemStyle: CYLAnimatedItemStyle = CYLAnimatedItemStyle.Plain
         set(value) {
             if (field == value) return
             field = value
@@ -182,7 +182,7 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
     var countdownCacheKey: String? = null
         set(value) {
             field = value
-            if (style == CYLAnimatedItemStyle.Countdown) countdown.setCacheKey(value)
+            if (itemStyle == CYLAnimatedItemStyle.Countdown) countdown.setCacheKey(value)
         }
 
     /**
@@ -781,7 +781,7 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
         val handled = super.performClick()
         gestureListener?.onItemTapped(this)
         // [EN] After the listener handled the tap (send the code there), the countdown starts. [CN] 监听者处理点击（在那里发送验证码）之后开始倒计时。
-        if (style == CYLAnimatedItemStyle.Countdown && startsCountdownOnTap && countdown.state != CYLAnimatedItemCountdownState.Running) startCountdown()
+        if (itemStyle == CYLAnimatedItemStyle.Countdown && startsCountdownOnTap && countdown.state != CYLAnimatedItemCountdownState.Running) startCountdown()
         return handled
     }
 
@@ -794,7 +794,7 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
      */
     @JvmOverloads
     fun startCountdown(durationSeconds: Int = countdownDuration) {
-        if (style != CYLAnimatedItemStyle.Countdown) style = CYLAnimatedItemStyle.Countdown
+        if (itemStyle != CYLAnimatedItemStyle.Countdown) itemStyle = CYLAnimatedItemStyle.Countdown
         countdown.start(durationSeconds)
     }
 
@@ -814,7 +814,7 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
     }
 
     private fun countdownStyleChanged() {
-        if (style == CYLAnimatedItemStyle.Countdown) {
+        if (itemStyle == CYLAnimatedItemStyle.Countdown) {
             // [EN] The default look of a countdown button: a rounded border and a light background, as the original SMSCodeButton.
             // [CN] 倒计时按钮的默认外观：圆角边框与浅色背景，与最初的 SMSCodeButton 一致。
             if (paddingLeft == 0 && paddingTop == 0 && paddingRight == 0 && paddingBottom == 0) {
@@ -836,7 +836,7 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
      * [CN] 状态或秒数变化：标题、图标、外观、可用状态与定时 tick。
      */
     private fun countdownChanged() {
-        if (style != CYLAnimatedItemStyle.Countdown) return
+        if (itemStyle != CYLAnimatedItemStyle.Countdown) return
         val running = countdown.state == CYLAnimatedItemCountdownState.Running
         if (running && restingTitleColor == null) restingTitleColor = titleView.currentTextColor
         if (!running) restingTitleColor?.let { titleView.setTextColor(it); restingTitleColor = null }
@@ -856,7 +856,7 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
     }
 
     private fun refreshCountdownTitle() {
-        if (style == CYLAnimatedItemStyle.Countdown) countdownChanged()
+        if (itemStyle == CYLAnimatedItemStyle.Countdown) countdownChanged()
     }
 
     /**
@@ -864,7 +864,7 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
      * [CN] 倒计时样式在当前状态下的边框、背景与标题颜色。
      */
     private fun applyCountdownAppearance() {
-        if (style != CYLAnimatedItemStyle.Countdown) return
+        if (itemStyle != CYLAnimatedItemStyle.Countdown) return
         val running = countdown.state == CYLAnimatedItemCountdownState.Running
         background = GradientDrawable().apply {
             cornerRadius = dp(6f)
@@ -880,7 +880,7 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
      *      以时长位数的最宽数字组成的倒计时）作为标题的最小宽度，使视图在数字变化时保持宽度。
      */
     private fun updateCountdownTitleWidth() {
-        if (style != CYLAnimatedItemStyle.Countdown) return
+        if (itemStyle != CYLAnimatedItemStyle.Countdown) return
         val digits = max(1, countdownDuration).toString().length
         val widest = "8".repeat(digits).toInt()
         titleView.minWidth = maxOf(

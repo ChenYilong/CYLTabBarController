@@ -1,6 +1,6 @@
 /**
  * [EN] The countdown of `CYLAnimatedItemView` (`itemStyle` `CYLAnimatedItemStyle.Countdown`), the HarmonyOS counterpart of iOS
- *      `CYLAnimatedItemView.style = .countdown` and Android `CYLAnimatedItemStyle.Countdown`: the "Get code" button of an SMS
+ *      `CYLAnimatedItemView.itemStyle = .countdown` and Android `CYLAnimatedItemStyle.Countdown`: the "Get code" button of an SMS
  *      login. A state machine without any ArkUI or system API (the clock and the storage are given), tested in Node
  *      (test/CYLAnimatedItemCountdown.test.mjs). The same rules as on the other platforms:
  *      - the end is a time, not a counter: the seconds spent in the background count, because the time left is read from the
@@ -10,7 +10,7 @@
  *        the state is `finished` and a new countdown can start;
  *      - with a cache key the running countdown is kept in the storage, so a new item with the same key takes it up again
  *        after the app was ended in the background (no start callback).
- * [CN] `CYLAnimatedItemView` 的倒计时（`itemStyle` 为 `CYLAnimatedItemStyle.Countdown`），对应 iOS 的 `CYLAnimatedItemView.style = .countdown` 与
+ * [CN] `CYLAnimatedItemView` 的倒计时（`itemStyle` 为 `CYLAnimatedItemStyle.Countdown`），对应 iOS 的 `CYLAnimatedItemView.itemStyle = .countdown` 与
  *      Android 的 `CYLAnimatedItemStyle.Countdown`：短信登录的「获取验证码」按钮。不使用任何 ArkUI 或系统 API 的状态机（时钟与存储由外部传入），
  *      在 Node 中测试（test/CYLAnimatedItemCountdown.test.mjs）。规则与其他平台相同：
  *      - 结束是一个时间点，而不是计数器：后台度过的秒数计入，因为每次 tick 与 App 回到前台时都从本地时钟读取剩余时间（修复 SMSCodeButton 的 issue #1）；

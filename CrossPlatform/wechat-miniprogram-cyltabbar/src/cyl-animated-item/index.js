@@ -147,14 +147,14 @@ Component({
      */
     titleSpacing: { type: Number, value: -1 },
     /**
-     * [EN] 'plain' (default) or 'countdown': a countdown button, e.g. "Get code" of an SMS login (iOS `style`, named
-     *      `itemStyle` here because `style` is the host's own attribute). Set the `countdown…` properties, then call
+     * [EN] 'plain' (default) or 'countdown': a countdown button, e.g. "Get code" of an SMS login (`itemStyle`, the same name
+     *      as on iOS, Android and HarmonyOS; `style` is the host's own attribute). Set the `countdown…` properties, then call
      *      `startCountdown()` (or set `startsCountdownOnTap`). The end is a time read from the local clock, so the seconds in the
      *      background count (FIX: issue #1 of SMSCodeButton); a clock past the longest duration, or set back to before the start,
      *      closes it; `countdownCacheKey` keeps it across a restart. While it runs the item is disabled. Events: `countdownstart`,
      *      `countdowntick` (`detail.seconds`, once per second), `countdownfinish`.
-     * [CN] 'plain'（默认）或 'countdown'：倒计时按钮，例如短信登录的「获取验证码」（对应 iOS 的 `style`；因为 `style` 是宿主自己的属性，
-     *      这里命名为 `itemStyle`）。设置 `countdown…` 属性后调用 `startCountdown()`（或设置 `startsCountdownOnTap`）。结束是从本地时钟读取的时间点，
+     * [CN] 'plain'（默认）或 'countdown'：倒计时按钮，例如短信登录的「获取验证码」（`itemStyle`，与 iOS、Android、HarmonyOS
+     *      同名；`style` 是宿主自己的属性）。设置 `countdown…` 属性后调用 `startCountdown()`（或设置 `startsCountdownOnTap`）。结束是从本地时钟读取的时间点，
      *      因此后台的秒数计入（修复 SMSCodeButton 的 issue #1）；时钟超过最长时长或被调回到开始之前时关闭；`countdownCacheKey` 使其在重启后继续。
      *      倒计时中条目不可用。事件：`countdownstart`、`countdowntick`（`detail.seconds`，每秒一次）、`countdownfinish`。
      */
