@@ -15,6 +15,18 @@ export function cyl_setTabBarItemImagePlaceholderSize(width: number, height: num
   CYLTabBarItemImagePlaceholderHeight = height;
 }
 
+/**
+ * [EN] CYLTabBarDefaultHeight: the tab bar's height when the app sets none (no `tabBarHeight`): 56 vp, the height of the
+ *      HarmonyOS system tab bar (ArkUI `Tabs` with a bottom bar, its default `barHeight`), so a CYLTabBarController and a
+ *      system tab bar are the same height, as on iOS (UITabBar's own height) and Android (the Material navigation bar).
+ *      A `tabBarHeight` the app passes still wins. It was 49 vp (the iOS 49 pt) before 2026-11-22
+ *      (docs/Cross-Platform-Components.md, "default tab bar height = the system tab bar's").
+ * [CN] CYLTabBarDefaultHeight：App 未设置 `tabBarHeight` 时的 TabBar 高度：56 vp，即鸿蒙系统 TabBar（底部 TabBar 的 ArkUI `Tabs`，默认
+ *      `barHeight`）的高度，使 CYLTabBarController 与系统 TabBar 等高，与 iOS（UITabBar 自身高度）、Android（Material 导航栏）一致。App 传入的
+ *      `tabBarHeight` 仍然优先。2026-11-22 之前为 49 vp（iOS 的 49 pt）。
+ */
+export const CYLTabBarDefaultHeight: number = 56;
+
 /** [EN] A size in vp. [CN] 尺寸（vp）。 */
 export interface CYLSize {
   width: number;
