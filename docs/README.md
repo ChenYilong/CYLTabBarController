@@ -45,6 +45,7 @@
 | [鸿蒙端对齐](HarmonyOS-Parity.md) | [HarmonyOS parity](HarmonyOS-Parity.md) |
 | [纯图标 Tab 的自动居中](Image-Only-Tabs.md) | [Automatic centering of image-only tabs](Image-Only-Tabs.md) |
 | [发布包中的协议声明](License-Notices.md) | [License notices in published packages](License-Notices.md) |
+| [生命周期库 CYLDeallocBlockExecutor](Lifecycle-Library.md) | [The lifecycle library CYLDeallocBlockExecutor](Lifecycle-Library.md) |
 | [液态玻璃的健壮性改进](Liquid-Glass-Robustness.md) | [Liquid Glass Robustness](Liquid-Glass-Robustness.md) |
 | [需要登录的 Tab](Login-Required-Tabs.md) | [Tabs That Need Login](Login-Required-Tabs.md) |
 | [macOS CI/CD 调研报告：用 Mac 服务器构建本项目](Mac-CI-CD.md) | [macOS CI/CD research: building this project on Mac servers](Mac-CI-CD.md) |
@@ -146,6 +147,7 @@ docs/
 ├── HarmonyOS-Parity.md
 ├── Image-Only-Tabs.md
 ├── License-Notices.md
+├── Lifecycle-Library.md
 ├── Liquid-Glass-Robustness.md
 ├── Login-Required-Tabs.md
 ├── Mac-CI-CD.md

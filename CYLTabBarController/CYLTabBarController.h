@@ -25,6 +25,8 @@
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/FlatDesign-StandardAppearance.md
 //   - Automatic centering of image-only tabs / 纯图标 Tab 的自动居中
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Image-Only-Tabs.md
+//   - The lifecycle library CYLDeallocBlockExecutor / 生命周期库 CYLDeallocBlockExecutor
+//     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Lifecycle-Library.md
 //   - Liquid Glass Robustness / 液态玻璃的健壮性改进
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Liquid-Glass-Robustness.md
 //   - Tabs That Need Login / 需要登录的 Tab
