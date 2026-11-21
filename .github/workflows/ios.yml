@@ -66,7 +66,8 @@ jobs:
     name: pod lib lint
     needs: changes
     runs-on: ${{ vars.MACOS_RUNNER || 'macos-26' }}
-    timeout-minutes: 45
+    # [EN] The lint takes 42 to 44 minutes (every subspec, Lottie in Release); 45 cancelled run 44750813149. [CN] lint 需要 42 到 44 分钟（所有子库，Lottie Release 编译）；45 分钟曾取消运行 44750813149。
+    timeout-minutes: 90
     steps:
       - uses: actions/checkout@v4
       - name: CocoaPods cache
