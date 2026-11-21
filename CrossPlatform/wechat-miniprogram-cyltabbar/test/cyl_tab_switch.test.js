@@ -168,3 +168,39 @@ test('a bar shown after a tap draws the tapped tab at once, not its own stale se
   definition.pageLifetimes.show.call(cached)
   assert.deepEqual(sent[sent.length - 1], { selectedIdentifier: 'b' })
 })
+
+test('every live bar follows a tap before its page is shown, so the page never shows the previous tab first', () => {
+  // [EN] Each tab page has its own bar, and a cached page is drawn before its JavaScript runs: pageLifetimes.show and onShow
+  //      come a frame too late. So the tap itself selects the tab in every live bar of the same context, before wx.switchTab.
+  // [CN] 每个 Tab 页面都有自己的 TabBar，被缓存的页面在其 JavaScript 运行前就已绘制：pageLifetimes.show 与 onShow 晚了一帧。
+  //      因此点击本身在同一上下文的所有存活 TabBar 中选中该 Tab，早于 wx.switchTab。
+  global.wx = { getSystemInfoSync: () => ({ theme: 'light' }), getAppBaseInfo: () => ({ theme: 'light' }) }
+  const definition = cylDefinition('../src/cyl-tab-bar/index.js')
+  const model = { context: 'live', items: [{ identifier: 'home' }, { identifier: 'message' }], loginRequiredIdentifiers: [] }
+  const other = { context: 'other', items: [{ identifier: 'home' }, { identifier: 'message' }], loginRequiredIdentifiers: [] }
+  const mount = (barModel) => {
+    const bar = { cylModel: barModel, sent: [], data: { selectedIdentifier: 'home', loggedIn: true, cylSlots: [{ key: 'home' }, { key: 'message' }] } }
+    Object.assign(bar, definition.methods)
+    bar.setData = (patch) => { bar.sent.push(patch); Object.assign(bar.data, patch) }
+    bar.cyl_render = () => {}
+    bar.cyl_playTapAnimation = () => {}
+    bar.cyl_playTabButtonTapFeedback = () => {}
+    bar.triggerEvent = (name) => { bar.sent.push({ event: name, cachedSelection: cached.data.selectedIdentifier }) }
+    bar.cylLongPressed = false
+    definition.lifetimes.attached.call(bar)
+    return bar
+  }
+  const shown = mount(model)
+  const cached = mount(model)
+  const unrelated = mount(other)
+  shown.cyl_onTap({ type: 'tap', currentTarget: { dataset: { key: 'message' } } })
+  assert.equal(cached.data.selectedIdentifier, 'message', 'the cached page bar already selects the tapped tab')
+  assert.deepEqual(shown.sent.find((patch) => patch.event === 'select'), { event: 'select', cachedSelection: 'message' },
+    'before the select event that makes the app call wx.switchTab')
+  assert.equal(unrelated.data.selectedIdentifier, 'home', 'a bar of another configuration context is left alone')
+  definition.lifetimes.detached.call(cached)
+  shown.cyl_onTap({ type: 'tap', currentTarget: { dataset: { key: 'home' } } })
+  assert.equal(cached.data.selectedIdentifier, 'message', 'a detached bar is not updated')
+  ;[shown, unrelated].forEach((bar) => definition.lifetimes.detached.call(bar))
+  delete global.wx
+})

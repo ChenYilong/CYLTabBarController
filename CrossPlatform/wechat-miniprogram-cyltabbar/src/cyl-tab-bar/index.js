@@ -67,6 +67,17 @@ const CYL_PLAYBACK_WINDOW = 3000;
  */
 const cylLastSelection = { context: '', identifier: '', time: 0 };
 
+/**
+ * [EN] Every attached bar of the app. A tap selects the tab in each bar of the same configuration context at once, so
+ *      the page that wx.switchTab shows next, often a cached page drawn before any of its JavaScript runs, already has
+ *      the new selection: pageLifetimes.show and the page's onShow come at least one frame too late, and the previous
+ *      tab flashed first.
+ * [CN] App 中所有已挂载的 TabBar。点击会立即在同一配置上下文的每个 TabBar 中选中该 Tab，因此 wx.switchTab 接下来显示的
+ *      页面（通常是在其 JavaScript 运行前就已绘制的缓存页面）已带有新的选中项：pageLifetimes.show 与页面的 onShow
+ *      至少晚一帧，之前会先闪现上一个 Tab。
+ */
+const cylLiveBars = new Set();
+
 function cylRecentSelection(context) {
   const recent = cylLastSelection.identifier && cylLastSelection.context === context
     && Date.now() - cylLastSelection.time < CYL_PLAYBACK_WINDOW;
@@ -350,9 +361,11 @@ Component({
       if (typeof wx.onThemeChange === 'function') {
         wx.onThemeChange(this.cylThemeListener);
       }
+      cylLiveBars.add(this);
       this.cyl_render();
     },
     detached() {
+      cylLiveBars.delete(this);
       if (typeof wx.offThemeChange === 'function') {
         wx.offThemeChange(this.cylThemeListener);
       }
@@ -749,7 +762,28 @@ Component({
       cylLastSelection.identifier = item.identifier;
       cylLastSelection.time = Date.now();
       this.setData({ selectedIdentifier: item.identifier });
+      cylLiveBars.forEach((bar) => {
+        if (bar !== this) {
+          bar.cyl_followSelection(model.context || '', item.identifier);
+        }
+      });
       this.triggerEvent('select', detail);
+    },
+
+    /**
+     * [EN] Selects a tab tapped on another bar of the same context (see cylLiveBars), when this bar shows it.
+     * [CN] 选中同一上下文中另一个 TabBar 上被点击的 Tab（见 cylLiveBars），前提是本 TabBar 显示该 Tab。
+     */
+    cyl_followSelection(context, identifier) {
+      const model = this.cylModel;
+      if (!model || (model.context || '') !== context || identifier === this.data.selectedIdentifier) {
+        return;
+      }
+      const shown = model.items.some((candidate) => candidate.identifier === identifier)
+        || (model.plusButton && model.plusButton.identifier === identifier);
+      if (shown) {
+        this.setData({ selectedIdentifier: identifier });
+      }
     },
 
     /**
