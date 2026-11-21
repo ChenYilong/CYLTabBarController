@@ -118,7 +118,7 @@ Pod::Spec.new do |s|
 
   s.subspec 'GIF' do |gif|
     gif.dependency 'CYLAnimatedItem/Engine'
-    gif.source_files = 'CYLTabBarController/CYLTabBarItemAnimation/GIF/*.{h,m}'
+    gif.source_files = 'CYLTabBarController/CYLTabBarItemAnimation/GIF/*.{h,m,swift}'
     gif.public_header_files = 'CYLTabBarController/CYLTabBarItemAnimation/GIF/*.h'
     gif.frameworks = 'ImageIO', 'QuartzCore'
   end

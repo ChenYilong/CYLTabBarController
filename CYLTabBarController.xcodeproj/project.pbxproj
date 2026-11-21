@@ -317,6 +317,7 @@
 		FC2645E143BEC2310AF550C3 /* CYLDemoPlaceholder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3328D7F6D42DD55B99C24546 /* CYLDemoPlaceholder.swift */; };
 		FD9F87B7AF2EF1118AEDFC0B /* CYLSettingsDemoRows.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8EC53F13DFB7439CFABA029 /* CYLSettingsDemoRows.swift */; };
 		FEC9F8C46A3B167916110B50 /* CYLTabBarItemAnimationEngine.h in Headers */ = {isa = PBXBuildFile; fileRef = 5423B525B553B0DAE94BC048 /* CYLTabBarItemAnimationEngine.h */; };
+		C0DE0B5E00000000000AC002 /* CYLGIFTabBarItemAnimationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0DE0B5E00000000000AC001 /* CYLGIFTabBarItemAnimationView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -717,6 +718,7 @@
 		FEAE77FC4A017D57E648057E /* CYLThemeManager.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CYLThemeManager.h; sourceTree = "<group>"; };
 		FF128D8055C6E884727ED5E9 /* CYLTabBarController+CYLTabBarMinimize.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "CYLTabBarController+CYLTabBarMinimize.swift"; sourceTree = "<group>"; };
 		FF9F2AB372724E429E82DE06 /* CYLDemo.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; name = CYLDemo.bundle; path = "Example-Shared/CYLDemo.bundle"; sourceTree = SOURCE_ROOT; };
+		C0DE0B5E00000000000AC001 /* CYLGIFTabBarItemAnimationView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CYLGIFTabBarItemAnimationView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -820,6 +822,7 @@
 			children = (
 				4C7A2E92D3F06B5A18E2C4D2 /* CYLGIFTabBarItemAnimator.h */,
 				4C7A2E93D3F06B5A18E2C4D3 /* CYLGIFTabBarItemAnimator.m */,
+				C0DE0B5E00000000000AC001 /* CYLGIFTabBarItemAnimationView.swift */,
 			);
 			path = GIF;
 			sourceTree = "<group>";
@@ -1870,6 +1873,7 @@
 				CF3C28298101C33B5E37078E /* CYLPAGTabBarItemAnimator.m in Sources */,
 				2E599A23506C34AD723D85F2 /* CYLRiveTabBarItemAnimator.m in Sources */,
 				39B8CB2D96675F18A8039638 /* CYLGIFTabBarItemAnimator.m in Sources */,
+				C0DE0B5E00000000000AC002 /* CYLGIFTabBarItemAnimationView.swift in Sources */,
 				C046389FC44630D114B91877 /* CYLTabBarItemAnimatorRegistry.m in Sources */,
 				C4515A3C0B125116E95EE16D /* CYLTabBarItemViewAnimator.m in Sources */,
 				6E6312E441722D5B4E919B58 /* CYLAnimationURLOptions.swift in Sources */,

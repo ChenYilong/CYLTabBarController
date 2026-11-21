@@ -12,6 +12,8 @@
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/GIF-Animation.md
 // docs-binding:end
 
+// CYL-SWIFT-MIGRATION: objc-required — [EN] Declares the GIF animator, an Objective-C class because its `+load` registers it (Swift has no `+load`); the view is Swift. [CN] 声明 GIF animator：它的 `+load` 负责注册（Swift 没有 `+load`），因此是 Objective-C 类；视图为 Swift。
+
 #import <Foundation/Foundation.h>
 #if __has_include("../CYLTabBarItemViewAnimator.h")
 #import "../CYLTabBarItemViewAnimator.h"

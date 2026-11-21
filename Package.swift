@@ -68,7 +68,10 @@ let package = Package(
         .target(
             name: "CYLAnimatedItemViews",
             dependencies: ["CYLAnimatedItem"],
-            path: "CYLTabBarController/CYLAnimatedItem/Swift",
+            path: "CYLTabBarController",
+            // [EN] The views, plus the GIF view (the GIF animator, its Objective-C composition root, is in CYLTabBarControllerEngine).
+            // [CN] 视图，以及 GIF 视图（GIF animator 这个 Objective-C 组合根位于 CYLTabBarControllerEngine）。
+            sources: ["CYLAnimatedItem/Swift", "CYLTabBarItemAnimation/GIF/CYLGIFTabBarItemAnimationView.swift"],
             // [EN] SwiftPM always builds the engine (the CYLAnimatedItem target). [CN] SwiftPM 总是编译引擎（CYLAnimatedItem target）。
             swiftSettings: [.define("CYL_ANIMATION_ENGINE_AVAILABLE")]
         ),

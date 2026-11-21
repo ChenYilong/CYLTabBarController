@@ -17,7 +17,11 @@ whose logic is in Swift (Objective-C cannot subclass a Swift class; the maintain
 as compatibility code, and is listed under "Objective-C shells" with its size, so a shell that grows logic is visible.
 
     python3 scripts/swift-migration-score.py            # score and the remaining files
-    python3 scripts/swift-migration-score.py --brief    # the score line only
+    python3 scripts/swift-migration-score.py --brief    # the score lines only
+
+The animation engine (CYLTabBarItemAnimation/ and CYLAnimatedItem/: the engine, its glue in Core and the animators) has its
+own score line with the same rules and its own baseline (2026-11-21, before its migration started; docs/Swift-Migration.md,
+the engine row of 2026-11-21). It does not change the core score.
 
 [CN] iOS 核心层 Objective-C → Swift 迁移的评分（docs/Swift-Migration.md）。核心层为 `Core` subspec 及其依赖的 `CYLUtils`、
 `CYLBadgeView`。`.m` 的每一行都算 Objective-C；`.h` 只含宏、预处理、注释与 Swift 兼容标记时算作已兼容。
@@ -35,6 +39,9 @@ SHELL_MARKER = 'CYL-SWIFT-MIGRATION: objc-shell'
 # [EN] Objective-C that Swift cannot replace (e.g. catching an Objective-C exception), listed with its size.
 # [CN] Swift 无法替代的 Objective-C（例如捕获 Objective-C 异常），会连同行数一起列出。
 REQUIRED_MARKER = 'CYL-SWIFT-MIGRATION: objc-required'
+# [EN] Objective-C lines of the animation engine on 2026-11-21 (commit 70cd731e), before its migration. [CN] 引擎迁移开始前（2026-11-21，70cd731e）的行数。
+ENGINE_BASELINE = 4562
+ENGINE_FOLDERS = ('CYLTabBarItemAnimation', 'CYLAnimatedItem')
 COMPATIBLE = re.compile(r'^\s*(#|@import |//|/\*|\*|\*/|NS_ASSUME_NONNULL_(BEGIN|END)|$)')  # `@import` is the module form of `#import`
 
 
@@ -45,6 +52,15 @@ def core_files():
         if name.endswith(('.h', '.m')) and not name.startswith('._'):
             found.append(os.path.join(LIBRARY, name))
     for folder in ('CYLUtils', 'CYLBadgeView', 'CYLFlatDesignTabBar'):
+        for directory, _, names in os.walk(os.path.join(LIBRARY, folder)):
+            found += [os.path.join(directory, n) for n in names if n.endswith(('.h', '.m')) and not n.startswith('._')]
+    return sorted(found)
+
+
+def engine_files():
+    """[EN] Objective-C files of the animation engine. [CN] 动画引擎的 Objective-C 文件。"""
+    found = []
+    for folder in ENGINE_FOLDERS:
         for directory, _, names in os.walk(os.path.join(LIBRARY, folder)):
             found += [os.path.join(directory, n) for n in names if n.endswith(('.h', '.m')) and not n.startswith('._')]
     return sorted(found)
@@ -69,11 +85,12 @@ def objc_lines(path):
     return len(lines) if remaining else 0
 
 
-def main():
-    counted = [(objc_lines(path), path) for path in core_files()]
+def report(title, files, baseline):
+    """[EN] Prints one score line and, unless --brief, its remaining files and shells. [CN] 输出一行评分，非 --brief 时列出剩余文件与外壳。"""
+    counted = [(objc_lines(path), path) for path in files]
     remaining = sum(count for count, _ in counted)
-    score = max(0, int(100 * (1 - remaining / BASELINE)))
-    print('Swift migration score: %d / 100 (%d of %d Objective-C lines left)' % (score, remaining, BASELINE))
+    score = max(0, int(100 * (1 - remaining / baseline)))
+    print('%s: %d / 100 (%d of %d Objective-C lines left)' % (title, score, remaining, baseline))
     if '--brief' not in sys.argv:
         for count, path in sorted(counted, reverse=True):
             if count:
@@ -84,6 +101,11 @@ def main():
             for path in shells:
                 with open(path, encoding='utf-8', errors='replace') as handle:
                     print('%6d  %s' % (len(handle.read().split('\n')), os.path.relpath(path, ROOT)))
+
+
+def main():
+    report('Swift migration score', core_files(), BASELINE)
+    report('Animation engine score', engine_files(), ENGINE_BASELINE)
     return 0
 
 
