@@ -2,7 +2,7 @@
 // JSON5：注释、不加引号的键、单引号与尾逗号。
 {
   CYLTabBarControllerContext: 'CYLConfigurationDemo',
-  CYLTabBarControllerLocalization: { CYLTabBarLocalizationTableName: 'ConfigurationDemo', CYLTabBarLocalizationPath: 'Localization' },
+  CYLTabBarControllerLocalization: { CYLTabBarLocalizationTableName: 'ConfigurationDemo', CYLTabBarLocalizationPath: 'CYLConfigurationDemo.bundle' },
   CYLTabBarControllerThemeManagerName: 'CYLConfigurationDemo',
   CYLTabBarControllerThemeIdentifier: 'light',
   CYLTabBarControllerDarkThemeIdentifier: 'dark',

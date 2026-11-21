@@ -11,7 +11,7 @@
 	<key>CYLTabBarControllerLocalization</key>
 	<dict>
 		<key>CYLTabBarLocalizationPath</key>
-		<string>Localization</string>
+		<string>CYLConfigurationDemo.bundle</string>
 		<key>CYLTabBarLocalizationTableName</key>
 		<string>ConfigurationDemo</string>
 	</dict>

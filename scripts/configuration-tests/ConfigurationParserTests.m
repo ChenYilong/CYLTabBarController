@@ -192,7 +192,7 @@ static void CYLTestSamples(NSString *folder) {
                 CYLChecks++;
                 if (![localization isKindOfClass:[NSDictionary class]]
                     || ![[localization objectForKey:@"CYLTabBarLocalizationTableName"] isEqual:@"ConfigurationDemo"]
-                    || ![[localization objectForKey:@"CYLTabBarLocalizationPath"] isEqual:@"Localization"]) {
+                    || ![[localization objectForKey:@"CYLTabBarLocalizationPath"] isEqual:@"CYLConfigurationDemo.bundle"]) {
                     CYLFail([NSString stringWithFormat:@"%@ (%@): CYLTabBarControllerLocalization is %@", file, sniff ? @"content" : @"extension", localization]);
                 }
             }

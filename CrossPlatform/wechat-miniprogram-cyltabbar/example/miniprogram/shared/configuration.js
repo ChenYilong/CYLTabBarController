@@ -3,7 +3,7 @@ module.exports = {
   "CYLTabBarControllerContext": "CYLConfigurationDemo",
   "CYLTabBarControllerLocalization": {
     "CYLTabBarLocalizationTableName": "ConfigurationDemo",
-    "CYLTabBarLocalizationPath": "Localization"
+    "CYLTabBarLocalizationPath": "CYLConfigurationDemo.bundle"
   },
   "CYLTabBarControllerStyleType": "default",
   "CYLTabBarControllerImageInsets": "{0, 0, 0, 0}",

@@ -1,6 +1,6 @@
 {
   "CYLTabBarControllerContext": "CYLConfigurationDemo",
-  "CYLTabBarControllerLocalization": { "CYLTabBarLocalizationTableName": "ConfigurationDemo", "CYLTabBarLocalizationPath": "Localization" },
+  "CYLTabBarControllerLocalization": { "CYLTabBarLocalizationTableName": "ConfigurationDemo", "CYLTabBarLocalizationPath": "CYLConfigurationDemo.bundle" },
   "CYLTabBarControllerStyleType": "default",
   "CYLTabBarControllerImageInsets": "{0, 0, 0, 0}",
   "CYLTabBarControllerTitlePositionAdjustment": "{0, -2}",

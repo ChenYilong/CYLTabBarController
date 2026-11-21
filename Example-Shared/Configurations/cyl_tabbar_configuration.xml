@@ -5,7 +5,7 @@
     <CYLTabBarControllerContext>CYLConfigurationDemo</CYLTabBarControllerContext>
     <CYLTabBarControllerLocalization>
         <CYLTabBarLocalizationTableName>ConfigurationDemo</CYLTabBarLocalizationTableName>
-        <CYLTabBarLocalizationPath>Localization</CYLTabBarLocalizationPath>
+        <CYLTabBarLocalizationPath>CYLConfigurationDemo.bundle</CYLTabBarLocalizationPath>
     </CYLTabBarControllerLocalization>
     <CYLTabBarControllerThemeManagerName>CYLConfigurationDemo</CYLTabBarControllerThemeManagerName>
     <CYLTabBarControllerThemeIdentifier>light</CYLTabBarControllerThemeIdentifier>

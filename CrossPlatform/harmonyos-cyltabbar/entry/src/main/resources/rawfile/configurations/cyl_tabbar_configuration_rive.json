@@ -2,7 +2,7 @@
   "CYLTabBarControllerContext": "CYLRiveConfigurationDemo",
   "CYLTabBarControllerLocalization": {
     "CYLTabBarLocalizationTableName": "ConfigurationDemo",
-    "CYLTabBarLocalizationPath": "Localization"
+    "CYLTabBarLocalizationPath": "CYLConfigurationDemo.bundle"
   },
   "CYLTabBarControllerThemeManagerName": "CYLRiveConfigurationDemo",
   "CYLTabBarControllerThemeIdentifier": "course",

@@ -102,7 +102,7 @@ class CYLTabBarConfigurationParserTest {
         if (file.extension == "binpb") return null
         val localization = parsed?.get(CYLConstants.CYLTabBarControllerLocalization) as? Map<*, *>
         val named = localization?.get(CYLConstants.CYLTabBarLocalizationTableName) == "ConfigurationDemo" &&
-            localization[CYLConstants.CYLTabBarLocalizationPath] == "Localization"
+            localization[CYLConstants.CYLTabBarLocalizationPath] == "CYLConfigurationDemo.bundle"
         return if (named) null else "CYLTabBarControllerLocalization is $localization"
     }
 
