@@ -219,9 +219,13 @@ function cylAnimatedItemCountdownProperties(p) {
 // [CN] 使用哪条动画路径以及动画是否显示（单独的函数，便于阅读）。
 function cylAnimatedItemAnimationState(p, animationType, hasSource) {
   const failed = !!p.animationFailed
+  // [EN] A play-once animation that ended gives way to the still image (`showsImageWhenAnimationEnds`); the engine stays,
+  //      hidden, so the next play needs no reload. [CN] 已结束的只播放一次的动画让位给静态图片（`showsImageWhenAnimationEnds`）；
+  //      引擎保留并隐藏，下一次播放无需重新加载。
+  const ended = !!p.showsImageWhenAnimationEnds && !!p.animationEnded
   const usesEngine = hasSource && !!animationType && animationType !== 'gif' && !failed
-  const gifShows = animationType === 'gif' && !failed
-  return { usesEngine, gifShows, animationShows: gifShows || (usesEngine && !!p.animationLoaded) }
+  const gifShows = animationType === 'gif' && !failed && !ended
+  return { usesEngine, gifShows, ended, animationShows: gifShows || (usesEngine && !!p.animationLoaded && !ended) }
 }
 
 // [EN] The title's line count: 1 (the default) unless a number of at least 0 is given. [CN] 标题行数：未给出不小于 0 的数字时为 1（默认）。
@@ -236,7 +240,7 @@ function cylAnimatedItemModel(input) {
   const hasAnimationData = !!p.animationData && typeof p.animationData === 'object'
   const animationType = cylAnimatedItemResolvedType(p, animationPath, hasAnimationData)
   const hasSource = !!animationPath || hasAnimationData
-  const { usesEngine, gifShows, animationShows } = cylAnimatedItemAnimationState(p, animationType, hasSource)
+  const { usesEngine, gifShows, ended, animationShows } = cylAnimatedItemAnimationState(p, animationType, hasSource)
   const fallbackImage = cylAnimatedItemFallbackImage(p, hasSource, animationShows)
   const iconSize = cylAnimatedItemDimension(p.iconSize, 24)
   const iconWidth = cylAnimatedItemDimension(p.iconWidth, iconSize)
@@ -263,6 +267,8 @@ function cylAnimatedItemModel(input) {
     animationType,
     restingFrame: p.selected ? 'last' : 'first',
     usesEngine,
+    // [EN] The engine is hidden: its play-once animation ended and the still image shows. [CN] 引擎被隐藏：只播放一次的动画已结束，显示静态图片。
+    animationHidden: usesEngine && ended,
     gifPath: gifShows ? cylAnimatedItemGifSource(p, animationPath) : '',
     fallbackImage,
     fallbackHidden: (animationShows && !gifShows) || cylGIFImageStillShows(p, hasSource, fallbackImage),

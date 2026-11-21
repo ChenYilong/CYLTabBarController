@@ -86,6 +86,10 @@ export struct CYLSVGAView {
    */
   /** [EN] The file is drawn (CYLAnimatedItemView shows it from here on). [CN] 文件已绘制。 */
   onLoaded: () => void = () => {};
+  /**
+   * [EN] A play-once pass reached its last frame (CYLAnimatedItemAnimationContext `onEnded`). [CN] 只播放一次的一遍播放到最后一帧。
+   */
+  onEnded: () => void = () => {};
   onLoadError: (message: string) => void = (_message: string) => {
   };
   private settings: RenderingContextSettings = new RenderingContextSettings(true);
@@ -194,6 +198,9 @@ export struct CYLSVGAView {
       } else if (this.frame >= movie.frames - 1 && !this.loops) {
         this.frame = movie.frames - 1;
         this.cylStop();
+        this.cylDraw();
+        this.onEnded();
+        return;
       }
       this.cylDraw();
     }, 1000 / movie.fps);

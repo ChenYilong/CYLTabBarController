@@ -186,3 +186,14 @@ fun CYLAnimatedItemAccessibilityText(title: CharSequence?, extra: CharSequence?)
 internal fun View.cyl_hideFromAccessibility() {
     importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS
 }
+
+/**
+ * [EN] Told when a play-once animation of a `CYLAnimatedItemView` ends (`CYLAnimatedItemView.animationEndListener`).
+ * [CN] `CYLAnimatedItemView` 只播放一次的动画结束时收到通知（`CYLAnimatedItemView.animationEndListener`）。
+ */
+fun interface CYLAnimatedItemAnimationEndListener {
+    /**
+     * [EN] The animation of `item` reached its end. [CN] `item` 的动画播放到结尾。
+     */
+    fun onAnimationEnd(item: CYLAnimatedItemView)
+}

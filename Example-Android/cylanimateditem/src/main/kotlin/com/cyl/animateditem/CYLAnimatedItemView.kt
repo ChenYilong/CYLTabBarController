@@ -341,6 +341,46 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
 
     override val isAnimationReady: Boolean get() = animationView != null
 
+    /**
+     * [EN] Whether a play-once animation (`animationLoops` off) is replaced by the still image when it ends: the animation
+     *      view is hidden and `iconView` shows `selectedImage` / `image` (else the placeholder). Off by default, so the
+     *      last frame stays. The next `playAnimation()`, `restartAnimation()`, `stopAnimation()` or
+     *      `showAnimationLastFrame()` shows the animation again. For an animation whose last frame is empty (a success
+     *      check that fades out). The end is read from the player's `isPlaying` (Lottie, PAG, Rive, GIF, SVGA), else from
+     *      its `progress` reaching 1; a player that tells neither never ends. A subclass that lays out its own icon
+     *      (overriding `updateIcon`) reads `isShowingImageAfterAnimationEnd`.
+     * [CN] 只播放一次的动画（`animationLoops` 关闭）结束时是否换成静态图片：隐藏动画视图，`iconView` 显示 `selectedImage` / `image`
+     *      （没有时显示占位图）。默认关闭，保留最后一帧。下一次 `playAnimation()`、`restartAnimation()`、`stopAnimation()` 或
+     *      `showAnimationLastFrame()` 会重新显示动画。用于最后一帧为空的动画（逐渐消失的成功对勾）。结束从播放器的 `isPlaying` 读取
+     *      （Lottie、PAG、Rive、GIF、SVGA），没有时判断 `progress` 是否到达 1；两者都无法提供的播放器不会结束。自行布局图标的子类
+     *      （重写 `updateIcon`）读取 `isShowingImageAfterAnimationEnd`。
+     */
+    var showsImageWhenAnimationEnds: Boolean = false
+        set(value) {
+            field = value
+            if (!value) showAnimationAgain()
+            if (playing) watchForAnimationEnd()
+        }
+
+    /**
+     * [EN] Called when a play-once animation ends (after the still image is shown, when `showsImageWhenAnimationEnds`).
+     *      Not called for a looping animation, nor after `stopAnimation()`.
+     * [CN] 只播放一次的动画结束时调用（开启 `showsImageWhenAnimationEnds` 时在显示静态图片之后）。循环动画以及 `stopAnimation()` 之后不会调用。
+     */
+    var animationEndListener: CYLAnimatedItemAnimationEndListener? = null
+        set(value) { field = value; if (playing) watchForAnimationEnd() }
+
+    /**
+     * [EN] Whether the still image replaces the ended animation now (`showsImageWhenAnimationEnds`). [CN] 静态图片当前是否替换了已结束的动画。
+     */
+    var isShowingImageAfterAnimationEnd: Boolean = false
+        private set
+
+    /**
+     * [EN] Bumped by every play, stop and reload, so an older end watch stops. [CN] 每次播放、停止与重新加载时递增，使旧的结束检测停止。
+     */
+    private var endWatchGeneration = 0
+
     private var playing = false
 
     /**
@@ -598,7 +638,7 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
     /**
      * [EN] Whether the animation is on screen: made, and not waiting for its file (a download). [CN] 动画是否已显示：已创建且不在等待其文件（下载）。
      */
-    private fun animationShows() = animationView != null && !com.cyl.animateditem.CYLTabBarItemAnimationFailure.isLoading(animationView)
+    private fun animationShows() = animationView != null && !isShowingImageAfterAnimationEnd && !com.cyl.animateditem.CYLTabBarItemAnimationFailure.isLoading(animationView)
 
     /**
      * [EN] Shows the static image, else the placeholder, until the animation shows. A subclass that lays out its own
@@ -624,6 +664,8 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
         animationView?.let { removeView(it) }
         animationView = null
         playing = false
+        endWatchGeneration++
+        isShowingImageAfterAnimationEnd = false
         val url = animationURL
         if (!url.isNullOrBlank() && !localFileIsMissing(url)) {
             val (w, h) = iconSizeDp?.let { it.width to it.height } ?: (24f to 24f)
@@ -668,10 +710,12 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
 
     override fun playAnimation() {
         val player = animationPlayer ?: return
+        showAnimationAgain()
         playing = true
         player.loops = animationLoops
         if (animationSpeed > 0f) player.animationSpeed = animationSpeed
         player.play()
+        watchForAnimationEnd()
     }
 
     override fun restartAnimation() {
@@ -682,13 +726,67 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
     override fun stopAnimation() {
         val player = animationPlayer ?: return
         playing = false
+        endWatchGeneration++
+        showAnimationAgain()
         player.stop()
         player.progress = animationRestingProgress
     }
 
     override fun showAnimationLastFrame() {
         playing = false
+        endWatchGeneration++
+        showAnimationAgain()
         animationPlayer?.showLastFrame()
+    }
+
+    /**
+     * [EN] Watches a play-once pass on the display's frame clock until it ends: the player's `isPlaying` goes false after it
+     *      was seen true (an engine may start a frame late), or, without `isPlaying`, `progress` reaches 1 after it was
+     *      below. Only when `showsImageWhenAnimationEnds` or `animationEndListener` needs it.
+     * [CN] 基于显示帧时钟检测一次只播放一次的动画，直到结束：播放器的 `isPlaying` 在曾为 true 之后变为 false（引擎可能晚一帧开始），
+     *      或在没有 `isPlaying` 时 `progress` 从小于 1 到达 1。只在 `showsImageWhenAnimationEnds` 或 `animationEndListener` 需要时检测。
+     */
+    private fun watchForAnimationEnd() {
+        val generation = ++endWatchGeneration
+        if (!showsImageWhenAnimationEnds && animationEndListener == null) return
+        var started = false
+        val check = object : Runnable {
+            override fun run() {
+                if (generation != endWatchGeneration || !playing) return
+                // [EN] Looping: keep watching, a later `animationLoops = false` lets the pass end. [CN] 循环时继续检测，之后关闭循环会让这一遍结束。
+                val player = animationPlayer ?: return
+                val ended = if (animationLoops) false else when (player.isPlaying) {
+                    true -> { started = true; false }
+                    false -> started
+                    null -> player.progress.let { progress -> if (progress < END_PROGRESS) { started = true; false } else started }
+                }
+                if (ended) animationDidEnd() else postOnAnimationDelayed(this, END_WATCH_INTERVAL_MS)
+            }
+        }
+        postOnAnimationDelayed(check, END_WATCH_INTERVAL_MS)
+    }
+
+    private fun animationDidEnd() {
+        playing = false
+        endWatchGeneration++
+        if (showsImageWhenAnimationEnds && animationView != null) {
+            isShowingImageAfterAnimationEnd = true
+            animationView?.visibility = View.INVISIBLE
+            updateIcon()
+            requestLayout()
+        }
+        animationEndListener?.onAnimationEnd(this)
+    }
+
+    /**
+     * [EN] Shows the animation again in place of the still image shown after its end. [CN] 重新显示动画，替换结束后显示的静态图片。
+     */
+    private fun showAnimationAgain() {
+        if (!isShowingImageAfterAnimationEnd) return
+        isShowingImageAfterAnimationEnd = false
+        animationView?.visibility = View.VISIBLE
+        updateIcon()
+        requestLayout()
     }
 
     /**
@@ -942,6 +1040,8 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
 
     companion object {
         private const val ANDROID_ASSET_PREFIX = "file:///android_asset/"
+        private const val END_WATCH_INTERVAL_MS = 16L
+        private const val END_PROGRESS = 0.999f
 
         /**
          * [EN] The library's placeholder, `R.drawable.cyl_animated_item_placeholder` (24 dp, a tab icon's size; the same
