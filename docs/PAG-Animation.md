@@ -226,7 +226,9 @@ return pagAttributes.map { item in
 | ![iOS 17.5 模拟器，修复前点击同城后崩溃](assets/pag-nearby-ios17-simulator-crash.png) | ![iOS 17.5 simulator, crash after tapping Nearby, before the fix](assets/pag-nearby-ios17-simulator-crash.png) |
 | ![iOS 17.5 模拟器，修复后同城正常打开](assets/pag-nearby-ios17-simulator-fixed.png) | ![iOS 17.5 simulator, Nearby opens after the fix](assets/pag-nearby-ios17-simulator-fixed.png) |
 | ![iOS 26.3 模拟器，同城正常打开](assets/pag-nearby-ios26-simulator.png) | ![iOS 26.3 simulator, Nearby opens](assets/pag-nearby-ios26-simulator.png) |
-| **TODO**：iOS 26.3 截图中「语言」行的地球与国旗 emoji 显示为方框（iOS 17.5 正常），待查。 | **TODO**: in the iOS 26.3 screenshot, the globe and flag emoji of the Language row show as boxes (fine on iOS 17.5); to investigate. |
+| **DONE**（2026-11-21，模拟器运行时问题，与本库无关）：原 TODO「iOS 26.3 截图中「语言」行的地球与国旗 emoji 显示为方框（iOS 17.5 正常），待查」。同一份 Example-GIF 构建在 iOS 27.2 模拟器上正常显示 emoji，在 iOS 26.3.1 模拟器上显示为方框；该行是使用系统字体的普通 `UILabel`（`CYLLocalization.swift` 的 `cyl_languageCell`），没有自定义字体，运行时中也有 `AppleColorEmoji-160px.ttc`，因此方框来自 iOS 26.3.1 模拟器运行时（macOS 27.3 主机），不是本库的问题，无需修改代码。截图见下。 | **DONE** (2026-11-21, a simulator runtime problem, not the library): was TODO "in the iOS 26.3 screenshot, the globe and flag emoji of the Language row show as boxes (fine on iOS 17.5); to investigate". The same Example-GIF build draws the emoji on the iOS 27.2 simulator and boxes on the iOS 26.3.1 simulator. The row is a plain system-font `UILabel` (`cyl_languageCell` in `CYLLocalization.swift`) with no custom font, and the runtime has `AppleColorEmoji-160px.ttc`, so the boxes come from the iOS 26.3.1 simulator runtime (macOS 27.3 host), not the library; no code change. Screenshot below. |
+
+![iOS 27.2 and iOS 26.3.1 simulators, macOS 27.3, Xcode 27.2 (27B52), CYLTabBarController bf242302, feat/cross-platform-components, 2026-11-21. Purpose: the globe and flag emoji of the Language row](assets/pag-language-emoji-ios26-ios27.png)
 
 ## [CN]测试与截图
 ## [EN]Testing and screenshots

@@ -48,6 +48,7 @@ class MessageViewController: UIViewController, CYLAnimatedItemViewDelegate {
                 animationURL: URL(string: "https://raw.githubusercontent.com/ChenYilong/CYLTabBarController/master/Example-GIF/GIFApp/Resources/tab_rocket.gif"),
                 identifier: "CYLAnimatedItemDemoRemote")
         addInteractiveItem()
+        addCountdownItem()
     }
 
     private func addInteractiveItem() {
@@ -75,6 +76,20 @@ class MessageViewController: UIViewController, CYLAnimatedItemViewDelegate {
         eventLabel.accessibilityIdentifier = "CYLAnimatedItemDemoEvent"
         eventLabel.text = cylDemoLocalizedString("点击、点击附加图标或拖拽")
         stackView.addArrangedSubview(eventLabel)
+    }
+
+    /// [EN] The countdown style (docs/Animated-Item.md, "Countdown style"): a tap starts a 10-second countdown; the titles
+    ///      are the component's defaults ("Get code", "%ld s left", "Resend"), which an app replaces with its own texts.
+    /// [CN] 倒计时样式（docs/Animated-Item.md「倒计时样式」）：点击开始 10 秒倒计时；标题使用组件默认值（"Get code"、
+    ///      "%ld s left"、"Resend"），App 可以换成自己的文字。
+    private func addCountdownItem() {
+        let item = CYLAnimatedItemView()
+        item.style = .countdown
+        item.image = UIImage(systemName: "message")
+        item.countdownDuration = 10
+        item.startsCountdownOnTap = true
+        item.accessibilityIdentifier = "CYLAnimatedItemDemoCountdown"
+        stackView.addArrangedSubview(item)
     }
 
     private func show(event key: String) {

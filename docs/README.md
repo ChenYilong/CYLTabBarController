@@ -234,6 +234,7 @@ docs/
 │   ├── animated-item-android-flutter-rive-hybrid-composition.png
 │   ├── animated-item-android-gif-tabs.png
 │   ├── animated-item-android-tab-badges.png
+│   ├── animated-item-countdown-ios.png
 │   ├── animated-item-demo-ios26.3-en.png
 │   ├── animated-item-demo-ios26.3-zh-Hans.png
 │   ├── animated-item-demo-ios27-en.png
@@ -412,6 +413,7 @@ docs/
 │   ├── pag-animation-test-list.png
 │   ├── pag-classic.png
 │   ├── pag-flat-design.png
+│   ├── pag-language-emoji-ios26-ios27.png
 │   ├── pag-liquid-glass.png
 │   ├── pag-nearby-ios17-simulator-crash.png
 │   ├── pag-nearby-ios17-simulator-fixed.png
