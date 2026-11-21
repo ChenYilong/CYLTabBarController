@@ -34,6 +34,13 @@ class CYLHapX8664Tests(unittest.TestCase):
             with zipfile.ZipFile(out) as result:
                 self.assertEqual(sorted(result.namelist()), ['ets/modules.abc', 'libs/x86_64/libown.so', 'module.json'])
 
+    def test_local_path_is_absolute_in_the_platform_form(self):
+        path = cyl.cyl_local_path('some/dir/../entry.hap')
+        self.assertTrue(os.path.isabs(path))
+        self.assertTrue(path.endswith(os.path.join('some', 'entry.hap')))
+        if os.sep == '\\':
+            self.assertNotIn('/', cyl.cyl_local_path('C:/Users/x/entry.hap'))
+
     def test_strip_without_abis_drops_every_native_library(self):
         with tempfile.TemporaryDirectory() as folder:
             hap = self.make_hap(folder)

@@ -14,10 +14,14 @@
   ],
   "buildModeBinder": [
     { "buildModeName": "debug", "mappings": [{ "targetName": "emulator", "buildOptionName": "emulator" }] },
-    { "buildModeName": "release", "mappings": [{ "targetName": "emulator", "buildOptionName": "emulator" }] }
+    { "buildModeName": "release", "mappings": [{ "targetName": "emulator", "buildOptionName": "emulator" }] },
+    // The ohosTest HAP carries the same arm64-v8a .so files; -p buildMode=emulatorTest builds it for the x86_64 emulator
+    // without them (phones and arm64 emulators keep -p buildMode=test).
+    { "buildModeName": "emulatorTest", "mappings": [{ "targetName": "ohosTest", "buildOptionName": "emulator" }] }
   ],
   "targets": [
     { "name": "default" },
+    { "name": "ohosTest" },
     { "name": "emulator" }
   ]
 }

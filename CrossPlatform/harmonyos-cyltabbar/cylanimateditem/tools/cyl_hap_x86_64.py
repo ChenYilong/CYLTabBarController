@@ -38,6 +38,14 @@ def cyl_strip(source, target, keep_abis=None):
     return dropped
 
 
+def cyl_local_path(path):
+    """
+    An absolute path in the platform's own form. On Windows hdc reads "C:/Users/..." as a relative path ("Error opening
+    file ...\\C:/Users/..."), so it needs backslashes (reported by the CYLTableViewPlaceHolder session, 2026-11-22).
+    """
+    return os.path.abspath(os.path.normpath(path))
+
+
 def cyl_hdc_default():
     """
     The hdc of DevEco Studio on Windows or macOS, else "hdc" from PATH.
@@ -71,13 +79,13 @@ def main(argv):
         print(__doc__)
         return 2
     if argv[0] == 'strip':
-        source = argv[1]
-        target = argv[2] if len(argv) > 2 else source.replace('.hap', '-x86_64.hap')
+        source = cyl_local_path(argv[1])
+        target = cyl_local_path(argv[2]) if len(argv) > 2 else source.replace('.hap', '-x86_64.hap')
         dropped = cyl_strip(source, target)
         print(f'{target}: left out {len(dropped)} native libraries')
         return 0
     args = argv[1:]
-    hap, target, hdc, strip = args[0], '', cyl_hdc_default(), 'auto'
+    hap, target, hdc, strip = cyl_local_path(args[0]), '', cyl_hdc_default(), 'auto'
     for flag, value in zip(args[1::2], args[2::2]):
         if flag == '--target':
             target = value
@@ -97,7 +105,7 @@ def main(argv):
         install = os.path.join(tempfile.mkdtemp(prefix='cyl-hap-'), os.path.basename(hap).replace('.hap', '-x86_64.hap'))
         dropped = cyl_strip(hap, install, keep_abis=device)
         print(f'left out {len(dropped)} native libraries the device cannot load: {install}')
-    command = [hdc] + (['-t', target] if target else []) + ['install', '-r', install]
+    command = [hdc] + (['-t', target] if target else []) + ['install', '-r', cyl_local_path(install)]
     result = subprocess.run(command, capture_output=True, text=True)
     print(result.stdout.strip() or result.stderr.strip())
     return 0 if 'successfully' in result.stdout else 1

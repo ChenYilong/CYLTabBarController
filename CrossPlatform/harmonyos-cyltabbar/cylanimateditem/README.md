@@ -67,4 +67,21 @@ it); `strip <in.hap> [<out.hap>]` only copies the HAP without native libraries. 
 |:---|:---|
 | Lottie, SVGA and GIF playback; still images and placeholders; PAG and Rive items on their still images (no crash, no blank item); `showsImageWhenAnimationEnds` with Lottie or SVGA; layout, dark mode, accessibility, localization, gestures, countdown, stack view | PAG and Rive playback, their `onEnded`, Rive's dispose crash workarounds |
 
+Device tests (hypium): the cyltabbar example's `entry/src/ohosTest` (`CYLAnimatedItemFallback.test.ets`) checks the
+ABI rules on the device (expectations follow `deviceInfo.abiList`, so it also passes on arm64), a simulated x86_64 and
+arm64 device, an app engine with a native library, and a UI test whose page holds a Rive and a Lottie item with a marker
+builder: without `arm64-v8a` the Rive item builds no engine view and keeps its still image, the Lottie item builds one.
+On the x86_64 emulator:
+
+```sh
+hvigorw --mode module -p module=entry@emulator -p product=default assembleHap
+hvigorw --mode module -p module=entry@ohosTest -p isOhosTest=true -p buildMode=emulatorTest -p product=default assembleHap
+hdc install -r entry/build/default/outputs/emulator/entry-emulator-unsigned.hap
+hdc install -r entry/build/default/outputs/ohosTest/entry-ohosTest-unsigned.hap
+hdc shell aa test -b com.cyl.tabbar.harmony -m entry_test -s unittest OpenHarmonyTestRunner -s timeout 15000
+```
+
+Result on 2026-11-22 (x86_64 emulator, HarmonyOS 6.0.1): Tests run: 6, Failure: 0, Error: 0, Pass: 6. On Windows give hdc
+backslash paths (`tools/cyl_hap_x86_64.py` does).
+
 Say in every report and screenshot footer which part ran on x86_64 and which still needs an arm64 device.

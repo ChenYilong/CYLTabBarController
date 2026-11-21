@@ -2,5 +2,7 @@
   "modelVersion": "6.0.1",
   "description": "CYLTabBarController for HarmonyOS: the cyltabbar library and its example.",
   "dependencies": {},
-  "devDependencies": {}
+  "devDependencies": {
+    "@ohos/hypium": "1.0.21"
+  }
 }
