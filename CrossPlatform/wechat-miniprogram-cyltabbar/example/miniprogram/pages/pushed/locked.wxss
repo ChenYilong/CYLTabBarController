@@ -1,0 +1,6 @@
+.cyl-pushed { position: relative; min-height: 100vh; box-sizing: border-box; padding: calc(env(safe-area-inset-top) + 44px) 20px 0; }
+.cyl-pushed-back { position: absolute; left: 12px; padding: 6px 10px; color: #fff; font-size: 17px; }
+.cyl-pushed-note { display: block; margin-top: 106px; color: #fff; font-size: 16px; text-align: center; }
+/* [EN] A transformed frame holds the fixed cyl-tab-bar at the bottom. [CN] 带 transform 的框把 fixed 的 cyl-tab-bar 留在底部。 */
+.cyl-pushed-frame { position: absolute; left: 0; right: 0; bottom: 0; height: 120px; transform: translateZ(0); }
+.cyl-pushed-close { position: absolute; left: 50%; bottom: 82px; margin-left: 18px; width: 22px; height: 22px; border-radius: 11px; color: #fff; font-size: 12px; display: flex; align-items: center; justify-content: center; z-index: 10; }

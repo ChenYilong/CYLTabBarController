@@ -1,0 +1,40 @@
+:host {
+  display: inline-block;
+  /* [EN] Fills the box it is given (cyl-animated-item's icon box, a tab bar icon box, a page's class). A fixed 100 x 100 px
+     host drew past the 20 px icon of CollectionViewClassifyMenu's tags. Size it from outside (a parent without a size
+     leaves it at 1 px). [CN] 填满外部给定的区域（cyl-animated-item 的图标区域、Tab 图标区域、页面的 class）；固定 100 x 100 px
+     时会画出标签 20 px 的图标区域。尺寸由外部设置（父容器没有尺寸时只有 1 px）。 */
+  width: 100%;
+  height: 100%;
+  min-width: 1px;
+  min-height: 1px;
+}
+
+.cyl-svga-box {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.cyl-svga-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* [EN] WeChat DevTools: the canvas only draws, off screen and transparent; its image shows the animation (see cyl-lottie). [CN] 微信开发者工具：画布只在屏幕外透明地绘制，由其图片显示动画（见 cyl-lottie）。 */
+.cyl-svga-canvas-covered {
+  position: absolute;
+  left: -10000px;
+  top: 0;
+  visibility: hidden;
+  opacity: 0;
+}
+
+.cyl-svga-snapshot {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+}

@@ -12,7 +12,9 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        // [EN] SVGAPlayer-Android (com.github.yyued) is only on JitPack, for example-rive. [CN] SVGAPlayer-Android 只在 JitPack 上，供 example-rive 使用。
+        maven("https://jitpack.io") { content { includeGroup("com.github.yyued") } }
     }
 }
 rootProject.name = "CYLTabBarControllerAndroid"
-include(":tabpages", ":cyltabbar", ":demokit", ":app", ":example-gif", ":example-pag", ":example-rive")
+include(":tabpages", ":cylanimateditem", ":cyltabbar", ":demokit", ":app", ":example-gif", ":example-pag", ":example-rive")

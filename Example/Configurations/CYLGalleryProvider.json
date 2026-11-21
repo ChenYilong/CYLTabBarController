@@ -1,0 +1,9 @@
+{
+  "CYLTabBarControllerStyleType": "default",
+  "CYLTabBarControllerTabBarItemsAttributes": [
+    {
+      "CYLTabBarItemTitle": "More",
+      "CYLTabBarItemIdentifier": "overflow"
+    }
+  ]
+}

@@ -8,6 +8,7 @@
 
 #import "CYLFlatDesignModalViewController.h"
 #import "CYLTabBarController.h"
+#import "CYLDemoLocalization.h"
 
 @interface CYLFlatDesignModalViewController ()
 @property (nonatomic, strong) UIButton *button;
@@ -21,7 +22,7 @@
     self.view.backgroundColor = UIColor.systemBackgroundColor; // [EN] Dark Mode. [CN] 适配深色模式。
     
     _button = [[UIButton alloc] init];
-    [_button setTitle:CYLLocalizedString(@"关闭") forState:UIControlStateNormal];
+    [_button setTitle:CYLDemoLocalizedString(@"关闭") forState:UIControlStateNormal];
     [_button setTitleColor:UIColor.redColor forState:UIControlStateNormal];
     [_button addTarget:self action:@selector(onButtonClicked) forControlEvents:UIControlEventTouchUpInside];
     [self.view addSubview:_button];

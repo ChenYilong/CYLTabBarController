@@ -1,0 +1,40 @@
+{
+  "string": [
+    {
+      "name": "tab_home",
+      "value": "الرئيسية"
+    },
+    {
+      "name": "tab_nearby",
+      "value": "بالقرب"
+    },
+    {
+      "name": "tab_messages",
+      "value": "الرسائل"
+    },
+    {
+      "name": "tab_me",
+      "value": "أنا"
+    },
+    {
+      "name": "tab_post",
+      "value": "نشر"
+    },
+    {
+      "name": "tab_refresh",
+      "value": "تحديث"
+    },
+    {
+      "name": "module_desc",
+      "value": "CYLTabBarController example"
+    },
+    {
+      "name": "ability_desc",
+      "value": "CYLTabBarController example"
+    },
+    {
+      "name": "app_name",
+      "value": "CYLTabBar"
+    }
+  ]
+}

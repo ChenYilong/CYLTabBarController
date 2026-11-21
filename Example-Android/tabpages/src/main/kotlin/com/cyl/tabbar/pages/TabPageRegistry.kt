@@ -20,7 +20,9 @@ typealias TabPageProvider<P> = (pageId: String, tab: TabItem) -> P?
 class TabPageRegistry<P : Any> {
     private val providers = LinkedHashMap<String, TabPageProvider<P>>()
 
-    /** [EN] Registers (or replaces) one provider for one or more page IDs; blank IDs are ignored. [CN] 为一个或多个页面 ID 注册（或替换）提供者；空 ID 会被忽略。 */
+    /**
+     * [EN] Registers (or replaces) one provider for one or more page IDs; blank IDs are ignored. [CN] 为一个或多个页面 ID 注册（或替换）提供者；空 ID 会被忽略。
+     */
     @Synchronized
     fun register(vararg pageIds: String, provider: TabPageProvider<P>) {
         for (pageId in pageIds) {
@@ -29,17 +31,23 @@ class TabPageRegistry<P : Any> {
         }
     }
 
-    /** [EN] Removes the provider of a page ID. [CN] 移除页面 ID 的提供者。 */
+    /**
+     * [EN] Removes the provider of a page ID. [CN] 移除页面 ID 的提供者。
+     */
     @Synchronized
     fun unregister(pageId: String) {
         providers.remove(pageId.trim())
     }
 
-    /** [EN] The provider of a page ID, or null. [CN] 页面 ID 的提供者，没有则为 null。 */
+    /**
+     * [EN] The provider of a page ID, or null. [CN] 页面 ID 的提供者，没有则为 null。
+     */
     @Synchronized
     fun provider(pageId: String): TabPageProvider<P>? = providers[pageId.trim()]
 
-    /** [EN] The registered page IDs, sorted. [CN] 已注册的页面 ID（已排序）。 */
+    /**
+     * [EN] The registered page IDs, sorted. [CN] 已注册的页面 ID（已排序）。
+     */
     @get:Synchronized
     val registeredPageIds: List<String>
         get() = providers.keys.sorted()
@@ -53,10 +61,14 @@ class TabPageRegistry<P : Any> {
  *      [ServiceLoader] 会找到它，无需注册代码。两个工厂声明同一个 ID 时，按类名顺序保留第一个。
  */
 interface TabPageFactory {
-    /** [EN] The page ID, e.g. "auto". [CN] 页面 ID，例如 "auto"。 */
+    /**
+     * [EN] The page ID, e.g. "auto". [CN] 页面 ID，例如 "auto"。
+     */
     val pageId: String
 
-    /** [EN] Creates the page (e.g. a Fragment); null skips the tab. [CN] 创建页面（例如 Fragment）；返回 null 则跳过该 Tab。 */
+    /**
+     * [EN] Creates the page (e.g. a Fragment); null skips the tab. [CN] 创建页面（例如 Fragment）；返回 null 则跳过该 Tab。
+     */
     fun create(tab: TabItem): Any?
 }
 
@@ -65,7 +77,9 @@ interface TabPageFactory {
  * [CN] 按与 iOS 相同的规则查找各 Tab 的页面。
  */
 object TabPages {
-    /** [EN] Factories found by [ServiceLoader], by page ID; loaded once. [CN] [ServiceLoader] 找到的工厂（按页面 ID）；只加载一次。 */
+    /**
+     * [EN] Factories found by [ServiceLoader], by page ID; loaded once. [CN] [ServiceLoader] 找到的工厂（按页面 ID）；只加载一次。
+     */
     val automaticFactories: Map<String, TabPageFactory> by lazy {
         val factories = ServiceLoader.load(TabPageFactory::class.java).toList().sortedBy { it.javaClass.name }
         val byId = LinkedHashMap<String, TabPageFactory>()
@@ -125,7 +139,9 @@ object TabPages {
         return pages
     }
 
-    /** [EN] The sources of one resolution. [CN] 一次解析的来源。 */
+    /**
+     * [EN] The sources of one resolution. [CN] 一次解析的来源。
+     */
     private class Lookup<P : Any>(
         val pageClass: Class<P>,
         val registry: TabPageRegistry<P>?,
@@ -141,7 +157,9 @@ object TabPages {
             PageSource.AUTOMATIC -> automaticFactories[pageId]?.let { factory -> { _: String, item: TabItem -> pageClass.cast(factory.create(item)) } }
         }
 
-        /** [EN] The first page a source gives, or null with the tab recorded in [skipped]. [CN] 第一个来源给出的页面；没有时返回 null 并记录到 [skipped]。 */
+        /**
+         * [EN] The first page a source gives, or null with the tab recorded in [skipped]. [CN] 第一个来源给出的页面；没有时返回 null 并记录到 [skipped]。
+         */
         fun page(pageId: String, tab: TabItem, used: List<Pair<TabItem, P>>, skipped: MutableList<SkippedTab>?): P? {
             val candidates = order.mapNotNull { source -> provider(source, pageId)?.let { source to it } }
             val problems = ArrayList<String>()

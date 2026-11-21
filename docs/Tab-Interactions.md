@@ -8,9 +8,9 @@
 | 中文 | English |
 |:---|:---|
 | 绑定的代码类 `CYLTabBarController`：[`CYLTabBarController/CYLTabBarController.h`](../CYLTabBarController/CYLTabBarController.h) | Bound to the class `CYLTabBarController`: [`CYLTabBarController/CYLTabBarController.h`](../CYLTabBarController/CYLTabBarController.h) |
-| 绑定的代码类 `CYLTabButtonScaleAnimation`：[`CYLTabBarController/CYLTabButtonAnimation.h`](../CYLTabBarController/CYLTabButtonAnimation.h) | Bound to the class `CYLTabButtonScaleAnimation`: [`CYLTabBarController/CYLTabButtonAnimation.h`](../CYLTabBarController/CYLTabButtonAnimation.h) |
-| 绑定的代码类 `CYLTabButtonBlockAnimation`：[`CYLTabBarController/CYLTabButtonAnimation.h`](../CYLTabBarController/CYLTabButtonAnimation.h) | Bound to the class `CYLTabButtonBlockAnimation`: [`CYLTabBarController/CYLTabButtonAnimation.h`](../CYLTabBarController/CYLTabButtonAnimation.h) |
-| 绑定的代码类 `CYLTabBarSlideTransitionAnimator`：[`CYLTabBarController/CYLTabBarTransition.h`](../CYLTabBarController/CYLTabBarTransition.h) | Bound to the class `CYLTabBarSlideTransitionAnimator`: [`CYLTabBarController/CYLTabBarTransition.h`](../CYLTabBarController/CYLTabBarTransition.h) |
+| 绑定的代码类 `CYLTabButtonScaleAnimation`：[`CYLTabBarController/Swift/CYLTabButtonAnimation.swift`](../CYLTabBarController/Swift/CYLTabButtonAnimation.swift) | Bound to the class `CYLTabButtonScaleAnimation`: [`CYLTabBarController/Swift/CYLTabButtonAnimation.swift`](../CYLTabBarController/Swift/CYLTabButtonAnimation.swift) |
+| 绑定的代码类 `CYLTabButtonBlockAnimation`：[`CYLTabBarController/Swift/CYLTabButtonAnimation.swift`](../CYLTabBarController/Swift/CYLTabButtonAnimation.swift) | Bound to the class `CYLTabButtonBlockAnimation`: [`CYLTabBarController/Swift/CYLTabButtonAnimation.swift`](../CYLTabBarController/Swift/CYLTabButtonAnimation.swift) |
+| 绑定的代码类 `CYLTabBarSlideTransitionAnimator`：[`CYLTabBarController/Swift/CYLTabBarTransition.swift`](../CYLTabBarController/Swift/CYLTabBarTransition.swift) | Bound to the class `CYLTabBarSlideTransitionAnimator`: [`CYLTabBarController/Swift/CYLTabBarTransition.swift`](../CYLTabBarController/Swift/CYLTabBarTransition.swift) |
 
 <!-- binding:end -->
 
@@ -377,7 +377,7 @@ tabBarController.cyl_defaultTabButtonAnimation = animation
 
 | 中文 | English |
 |:---|:---|
-| 最低支持 iOS 12（与 podspec 一致）。新增代码只使用 iOS 12 及以下就有的 API（如 `UIGraphicsImageRenderer` iOS 10、`adjustedContentInset` iOS 11）；演示中的 SF Symbols 图标（iOS 13）用 `@available(iOS 13.0, *)` 隔离。 | The minimum is iOS 12, as in the podspec. The new code only uses APIs available on iOS 12 or earlier (e.g. `UIGraphicsImageRenderer` iOS 10, `adjustedContentInset` iOS 11); the demo's SF Symbols icons (iOS 13) are guarded with `@available(iOS 13.0, *)`. |
+| 最低支持 iOS 15（与 podspec 一致；2026-11-20 起，原为 iOS 12）。以下代码当时只使用 iOS 12 及以下就有的 API（如 `UIGraphicsImageRenderer` iOS 10、`adjustedContentInset` iOS 11）；演示中的 SF Symbols 图标（iOS 13）用 `@available(iOS 13.0, *)` 隔离。 | The minimum is iOS 15, as in the podspec (since 2026-11-20, was iOS 12). The code below only used APIs available on iOS 12 or earlier at the time (e.g. `UIGraphicsImageRenderer` iOS 10, `adjustedContentInset` iOS 11); the demo's SF Symbols icons (iOS 13) are guarded with `@available(iOS 13.0, *)`. |
 | Lottie：只有引入 Lottie 库时（`#if CYL_LOTTIE_AVAILABLE`），点击动画才会作用于 Lottie 视图，并通过 `respondsToSelector:` 调用；没有 Lottie 时作用于图标。 | Lottie: only with the Lottie library (`#if CYL_LOTTIE_AVAILABLE`) does the tap animation use the Lottie view, called through `respondsToSelector:`; without Lottie it uses the icon. |
 | 扁平样式：所有 FlatDesign 相关代码都在 `#if CYL_FLATDESIGN_AVAILABLE` 中，并只在 `CYLTabBarStyleTypeFlatDesign` 下执行，因此液态玻璃与经典样式不受影响。 | FlatDesign: every FlatDesign-specific line is inside `#if CYL_FLATDESIGN_AVAILABLE` and runs only for `CYLTabBarStyleTypeFlatDesign`, so Liquid Glass and the classic style are not affected. |
 

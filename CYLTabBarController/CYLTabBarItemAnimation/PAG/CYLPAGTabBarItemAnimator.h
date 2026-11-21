@@ -22,48 +22,29 @@
 #endif
 
 /*!
- * [EN] 1 when libpag (or libpag-enterprise) is part of the build, 0 otherwise. Everything below, the PAG keys included,
- *      exists only then: without libpag, using `CYLTabBarPAGURL` fails to build instead of being silently ignored. Use
- *      `#if CYL_PAG_AVAILABLE` for PAG-only code of your own. CocoaPods: `pod 'CYLTabBarController/PAG'` (or
- *      `PAGEnterprise`).
- * [CN] 工程中引入了 libpag（或 libpag-enterprise）时为 1，否则为 0。以下所有内容（包括 PAG 的 key）只在此时存在：没有 libpag 时，
- *      使用 `CYLTabBarPAGURL` 会编译失败，而不是被静默忽略。App 自己只用于 PAG 的代码可用 `#if CYL_PAG_AVAILABLE` 包住。
- *      CocoaPods：`pod 'CYLTabBarController/PAG'`（或 `PAGEnterprise`）。
+ * [EN] `CYL_PAG_AVAILABLE` (defined in the component's core, `CYLAnimatedItemMacros.h`) is 1 when this subspec and
+ *      libpag (or libpag-enterprise) are part of the build, 0 otherwise. The animator below exists only then. The PAG keys
+ *      (`CYLTabBarPAGURL`…) are declared in the component's core and always exist: without the engine they get a compile
+ *      warning, a debug log at run time, and the tab shows its static image (or the placeholder). Use
+ *      `#if CYL_PAG_AVAILABLE` for PAG-only code of your own. CocoaPods: `pod 'CYLAnimatedItem/PAG'` (tab bar:
+ *      `pod 'CYLTabBarController/PAG'`).
+ * [CN] `CYL_PAG_AVAILABLE`（定义在组件核心 `CYLAnimatedItemMacros.h`）在本子库与 libpag (or libpag-enterprise) 都参与构建时为 1，否则为 0。下面的 animator 只在此时
+ *      存在。PAG 的 key（`CYLTabBarPAGURL`……）声明在组件核心中，总是存在：没有引擎时会有编译警告与运行时的 debug 日志，Tab 显示静态图片
+ *      （或占位图）。App 自己只用于 PAG 的代码可用 `#if CYL_PAG_AVAILABLE` 包住。CocoaPods：`pod 'CYLAnimatedItem/PAG'`（TabBar：
+ *      `pod 'CYLTabBarController/PAG'`）。
  */
-#if __has_include(<libpag/PAGView.h>)
-#define CYL_PAG_AVAILABLE 1
+#if __has_include(<CYLAnimatedItem/CYLAnimatedItemMacros.h>)
+#import <CYLAnimatedItem/CYLAnimatedItemMacros.h>
+#elif __has_include("../../CYLAnimatedItem/CYLAnimatedItemMacros.h")
+#import "../../CYLAnimatedItem/CYLAnimatedItemMacros.h"
 #else
-#define CYL_PAG_AVAILABLE 0
+#import "CYLAnimatedItemMacros.h"
 #endif
+// [EN] CYL_PAG_AVAILABLE is defined in CYLAnimatedItemMacros.h (the component's core). [CN] CYL_PAG_AVAILABLE 定义在 CYLAnimatedItemMacros.h（组件核心）中。
 
 #if CYL_PAG_AVAILABLE
 NS_ASSUME_NONNULL_BEGIN
 
-/*!
- * FIX: issue #604 — PAG animations (Tencent libpag), the same way as Lottie.
- * [EN] Keys for a tab's PAG animation, used exactly like their Lottie twins and through the same pipeline: the view is
- *      added in place of the tab's icon, plays when the tab is selected, stops when another one is, follows
- *      `lottieAnimationViewContentMode`, is returned by `-[UIControl cyl_lottieAnimationView]` and posts
- *      `CYLTabBarItemAnimationViewDidAddNotification`. Needs the `CYLTabBarController/PAG` subspec (the `libpag`
- *      pod), which declares them here, next to the PAG animator (Core declares no library's keys). Use either the
- *      Lottie keys or the PAG keys for a tab;
- *      PAG has no playback speed, so `lottieAnimationSpeed` does not apply to it.
- *      - `CYLTabBarPAGURL`: an NSURL of a .pag file; `CYLTabBarPAGFilePath`: its path (NSString). The URL wins.
- *      - `CYLTabBarPAGSize`: the view size, an NSValue of CGSize (default: the icon placeholder size).
- *      - `CYLTabBarPAGDarkURL` / `CYLTabBarPAGDarkFilePath`: the Dark Mode version, like `CYLTabBarLottieDarkURL`.
- * [CN] Tab 的 PAG 动画 key，用法与对应的 Lottie key 完全相同，并走同一套流程：替换 Tab 图标显示，选中时播放，选中其他 Tab 时停止，
- *      遵循 `lottieAnimationViewContentMode`，由 `-[UIControl cyl_lottieAnimationView]` 返回，并发送
- *      `CYLTabBarItemAnimationViewDidAddNotification`。需要引入 `CYLTabBarController/PAG` 子库（依赖 `libpag` pod），这些 key 就声明在这里、
- *      PAG animator 旁边（Core 不声明任何动画库的 key）。同一个 Tab 请使用 Lottie key 或 PAG key 之一；PAG 没有播放速度，`lottieAnimationSpeed` 对其无效。
- *      - `CYLTabBarPAGURL`：.pag 文件的 NSURL；`CYLTabBarPAGFilePath`：其路径（NSString）。URL 优先。
- *      - `CYLTabBarPAGSize`：视图尺寸，CGSize 的 NSValue（默认使用图标占位尺寸）。
- *      - `CYLTabBarPAGDarkURL` / `CYLTabBarPAGDarkFilePath`：深色模式版本，与 `CYLTabBarLottieDarkURL` 相同。
- */
-FOUNDATION_EXTERN NSString *const CYLTabBarPAGURL;
-FOUNDATION_EXTERN NSString *const CYLTabBarPAGFilePath;
-FOUNDATION_EXTERN NSString *const CYLTabBarPAGSize;
-FOUNDATION_EXTERN NSString *const CYLTabBarPAGDarkURL;
-FOUNDATION_EXTERN NSString *const CYLTabBarPAGDarkFilePath;
 
 /*!
  * FIX: issue #604

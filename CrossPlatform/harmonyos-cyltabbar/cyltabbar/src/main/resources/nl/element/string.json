@@ -1,0 +1,952 @@
+{
+  "string": [
+    {
+      "name": "cyl_l10n_bffed61338ea",
+      "value": "%@ CYLTabBarController op HarmonyOS"
+    },
+    {
+      "name": "cyl_l10n_9ecf653a3fc6",
+      "value": "%@ · andere context · plustikken: %@"
+    },
+    {
+      "name": "cyl_l10n_aaf9b7d7382d",
+      "value": "%@ nieuwe berichten"
+    },
+    {
+      "name": "cyl_l10n_81a05b6c1cf9",
+      "value": "%@, %@"
+    },
+    {
+      "name": "cyl_l10n_0b0ae9062c5a",
+      "value": "Een tabbalkcontroller van een andere context, met een vierkante plusknop"
+    },
+    {
+      "name": "cyl_l10n_427131e7add2",
+      "value": "Andere plusknop"
+    },
+    {
+      "name": "cyl_l10n_aa3e67bda3c0",
+      "value": "ArkUI Tabs, de systeemtabbalk van HarmonyOS, met dezelfde tabbladen"
+    },
+    {
+      "name": "cyl_l10n_0557fa923dce",
+      "value": "Terug"
+    },
+    {
+      "name": "cyl_l10n_8665e238c516",
+      "value": "Badge: %@"
+    },
+    {
+      "name": "cyl_l10n_6b2186414c82",
+      "value": "3× knipperen"
+    },
+    {
+      "name": "cyl_l10n_070554647306",
+      "value": "Rand"
+    },
+    {
+      "name": "cyl_l10n_43d3e34b15fb",
+      "value": "Rand volgt donkere modus"
+    },
+    {
+      "name": "cyl_l10n_b67554192c50",
+      "value": "Linksonder"
+    },
+    {
+      "name": "cyl_l10n_5968e3c37145",
+      "value": "Rechtsonder"
+    },
+    {
+      "name": "cyl_l10n_5d60263416c2",
+      "value": "Stuiteren (doorlopend)"
+    },
+    {
+      "name": "cyl_l10n_f3ce1baf4805",
+      "value": "3× stuiteren (cyl_bounceAnimationRepeatTimes)"
+    },
+    {
+      "name": "cyl_l10n_0875a57843a1",
+      "value": "Ademen (doorlopend)"
+    },
+    {
+      "name": "cyl_l10n_8795570ddeef",
+      "value": "CYLTabBarItemBackgroundColor / CYLTabBarItemSelectedBackgroundColor"
+    },
+    {
+      "name": "cyl_l10n_687f0fbab628",
+      "value": "CYLTabBarRiveURL: selecting a tab sets its state machine input active; deselecting resets it"
+    },
+    {
+      "name": "cyl_l10n_d7c01888e55e",
+      "value": "CYLTabBarSVGAFilePath: speelt één keer bij selectie, anders het eerste beeld"
+    },
+    {
+      "name": "cyl_l10n_132201f60522",
+      "value": "CYLUtils: zwakke gekoppelde objecten en een knop zoeken (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_fa3d06c1b1e9",
+      "value": "CYLFlatDesignTabBarItem: niet gecentreerd (systeemstijl)"
+    },
+    {
+      "name": "cyl_l10n_5e74163d3804",
+      "value": "CYLFlatDesignTabBarItem: gecentreerd"
+    },
+    {
+      "name": "cyl_l10n_f6da70b584ae",
+      "value": "Configuratiebestand: %@"
+    },
+    {
+      "name": "cyl_l10n_158b3b19e868",
+      "value": "Hoekradius"
+    },
+    {
+      "name": "cyl_l10n_4d242c36821c",
+      "value": "Eigen kleuren"
+    },
+    {
+      "name": "cyl_l10n_4685555ab484",
+      "value": "Eigen lettertype"
+    },
+    {
+      "name": "cyl_l10n_a45350c25311",
+      "value": "Eigen maximum (9)"
+    },
+    {
+      "name": "cyl_l10n_3924c958175e",
+      "value": "Donkere modus"
+    },
+    {
+      "name": "cyl_l10n_b9c74f4cd786",
+      "value": "Gedimd"
+    },
+    {
+      "name": "cyl_l10n_abfc3a65538a",
+      "value": "Ontdekken"
+    },
+    {
+      "name": "cyl_l10n_bf0576472e31",
+      "value": "Dubbeltik om te openen"
+    },
+    {
+      "name": "cyl_l10n_7e0a1ad9a767",
+      "value": "Eenmaal infaden"
+    },
+    {
+      "name": "cyl_l10n_153407d52fed",
+      "value": "Flat Design"
+    },
+    {
+      "name": "cyl_l10n_5cfed317a99d",
+      "value": "Flat Design-stijl"
+    },
+    {
+      "name": "cyl_l10n_026b984bb8d8",
+      "value": "2× draaien"
+    },
+    {
+      "name": "cyl_l10n_c5d4cd682981",
+      "value": "GIF-symbool"
+    },
+    {
+      "name": "cyl_l10n_8cf04a973413",
+      "value": "Home"
+    },
+    {
+      "name": "cyl_l10n_d52d30723b2f",
+      "value": "Eenmaal van links naar rechts"
+    },
+    {
+      "name": "cyl_l10n_1aae3277f8d3",
+      "value": "Liquid Glass (referentie)"
+    },
+    {
+      "name": "cyl_l10n_32f643a9aa26",
+      "value": "Liquid Glass: het doorkijkeffect van de referentie"
+    },
+    {
+      "name": "cyl_l10n_f201a4158727",
+      "value": "Liquid Glass"
+    },
+    {
+      "name": "cyl_l10n_af3acf6eb4a9",
+      "value": "Liquid Glass"
+    },
+    {
+      "name": "cyl_l10n_2e8e48a2ebfd",
+      "value": "Houd een tabblad of de plusknop ingedrukt"
+    },
+    {
+      "name": "cyl_l10n_983696096694",
+      "value": "Marge"
+    },
+    {
+      "name": "cyl_l10n_318b2739ddc2",
+      "value": "Ik"
+    },
+    {
+      "name": "cyl_l10n_4c2a8fe7eaf2",
+      "value": "Berichten"
+    },
+    {
+      "name": "cyl_l10n_24d459a81449",
+      "value": "NIEUW"
+    },
+    {
+      "name": "cyl_l10n_03c2e7e41ffc",
+      "value": "Nieuw"
+    },
+    {
+      "name": "cyl_l10n_1e8f217bdf71",
+      "value": "Volgend tabblad (cyl_selectNextTab, issue #535)"
+    },
+    {
+      "name": "cyl_l10n_3826b8552c94",
+      "value": "Volgende nummer"
+    },
+    {
+      "name": "cyl_l10n_b2ee912b91d6",
+      "value": "Getal"
+    },
+    {
+      "name": "cyl_l10n_ab7fa33c83b1",
+      "value": "Getal boven maximum"
+    },
+    {
+      "name": "cyl_l10n_e0aa021e21dd",
+      "value": "OK"
+    },
+    {
+      "name": "cyl_l10n_8a7b0e9c294e",
+      "value": "Aan: %@; veeg de pagina naar links / rechts"
+    },
+    {
+      "name": "cyl_l10n_06eb0a05de97",
+      "value": "Aan: %@; de nieuwe pagina schuift in vanaf de kant van zijn tabblad"
+    },
+    {
+      "name": "cyl_l10n_287e78fd65af",
+      "value": "Andere tekst"
+    },
+    {
+      "name": "cyl_l10n_84432607fd87",
+      "value": "Pagina: %@"
+    },
+    {
+      "name": "cyl_l10n_105b296a83f9",
+      "value": "Pauzeren"
+    },
+    {
+      "name": "cyl_l10n_de3c731be563",
+      "value": "Afspelen"
+    },
+    {
+      "name": "cyl_l10n_41b77539cc64",
+      "value": "PlusButton-afbeelding later geladen"
+    },
+    {
+      "name": "cyl_l10n_72a245189eaf",
+      "value": "Aanraakgebied van PlusButton (issue #91)"
+    },
+    {
+      "name": "cyl_l10n_9a1d72fdd764",
+      "value": "Vorig tabblad (cyl_selectPreviousTab, issue #535)"
+    },
+    {
+      "name": "cyl_l10n_4b0282f4f1c6",
+      "value": "Push naar een systeem-UITabBarController (andere plusknop)"
+    },
+    {
+      "name": "cyl_l10n_e5416d3ed3c0",
+      "value": "Naar een andere CYLTabBarController (andere PlusButton)"
+    },
+    {
+      "name": "cyl_l10n_8c96672c9bc5",
+      "value": "Push een TabBarController met dezelfde context (dezelfde plusknopklasse)"
+    },
+    {
+      "name": "cyl_l10n_6166b27ea14b",
+      "value": "TabBarController met een nieuwe context pushen (PlusButton met een tikbare X-subweergave, issue #202)"
+    },
+    {
+      "name": "cyl_l10n_a63e8b745e73",
+      "value": "Opent een pagina die de navigatiebalk verbergt, zonder basisklasse"
+    },
+    {
+      "name": "cyl_l10n_79fe28f3a3ac",
+      "value": "Opent een tabbalkcontroller waarvan de plusknopafbeelding na 2 s verandert; de lay-out mag niet verschuiven"
+    },
+    {
+      "name": "cyl_l10n_c27618b1aa9d",
+      "value": "Rode stip"
+    },
+    {
+      "name": "cyl_l10n_255c00a63f9d",
+      "value": "Straal rode stip"
+    },
+    {
+      "name": "cyl_l10n_7aac5e07b16d",
+      "value": "Eenmaal van rechts naar links"
+    },
+    {
+      "name": "cyl_l10n_e7d74cf8c9a3",
+      "value": "Rive tab icons (configuration file)"
+    },
+    {
+      "name": "cyl_l10n_9d01c837b4bc",
+      "value": "Rive tab icon: house.riv (number input Rooms)"
+    },
+    {
+      "name": "cyl_l10n_f0c792c049bc",
+      "value": "Eenmaal rollen"
+    },
+    {
+      "name": "cyl_l10n_401ea21c7a44",
+      "value": "Rotatie (doorlopend)"
+    },
+    {
+      "name": "cyl_l10n_bd001817e373",
+      "value": "SVGA-tabsymbolen (configuratiebestand)"
+    },
+    {
+      "name": "cyl_l10n_b5fcd68edd9f",
+      "value": "Schalen (doorlopend)"
+    },
+    {
+      "name": "cyl_l10n_544d03258eaf",
+      "value": "Eenmaal schalen"
+    },
+    {
+      "name": "cyl_l10n_dbd4f5e49888",
+      "value": "3× schalen"
+    },
+    {
+      "name": "cyl_l10n_13348442cc6a",
+      "value": "Zoeken"
+    },
+    {
+      "name": "cyl_l10n_9ae56cc36e81",
+      "value": "Schudden (doorlopend)"
+    },
+    {
+      "name": "cyl_l10n_e0a90124b72f",
+      "value": "3× schudden (cyl_shakeAnimationRepeatTimes)"
+    },
+    {
+      "name": "cyl_l10n_b10d33d5ad4d",
+      "value": "Schudden, stopt bij Verminder beweging"
+    },
+    {
+      "name": "cyl_l10n_6cbe015b00fb",
+      "value": "CYLFlatDesignTabBar tonen / verbergen"
+    },
+    {
+      "name": "cyl_l10n_561582c1e7cc",
+      "value": "Toont het tikgebied in doorschijnend rood: %@; schaal %@x; tik voor 1x, 1,5x, 2x, uit"
+    },
+    {
+      "name": "cyl_l10n_3cb58e0d546d",
+      "value": "Veer (doorlopend)"
+    },
+    {
+      "name": "cyl_l10n_0a00b2238071",
+      "value": "Eenmaal veren"
+    },
+    {
+      "name": "cyl_l10n_fee4a478923f",
+      "value": "Tabinteracties"
+    },
+    {
+      "name": "cyl_l10n_5ea7bf3d8e63",
+      "value": "Tab icon animations loop: off"
+    },
+    {
+      "name": "cyl_l10n_918aff638366",
+      "value": "Tab icon animations loop: on"
+    },
+    {
+      "name": "cyl_l10n_98559580dcc7",
+      "value": "Tikanimatie van tabbladen (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_db89836d6e21",
+      "value": "Tikgeluid en haptiek van tabs (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_2f6e866d5219",
+      "value": "Tabpagina’s, selectie en inloggen"
+    },
+    {
+      "name": "cyl_l10n_6d067090c833",
+      "value": "Tabblad, %1$@ van %2$@"
+    },
+    {
+      "name": "cyl_l10n_456887f9731c",
+      "value": "Tabblad: %@"
+    },
+    {
+      "name": "cyl_l10n_ab5745daa734",
+      "value": "Tabbalkgalerij"
+    },
+    {
+      "name": "cyl_l10n_75ccb7ef4864",
+      "value": "Uiterlijk van de tabbalk"
+    },
+    {
+      "name": "cyl_l10n_7c4aecba91c3",
+      "value": "De afbeelding van het tabblad van deze pagina uit de rawfile van de app (de resourcebundel van iOS); tik opnieuw om te herstellen"
+    },
+    {
+      "name": "cyl_l10n_2e6d648945c0",
+      "value": "De plusknop steekt boven de balk uit; ook dat deel reageert (rood weergegeven)"
+    },
+    {
+      "name": "cyl_l10n_9b6633b75bf2",
+      "value": "Het tabblad ‘Ik’ vereist inloggen (issue #19); tik om te wisselen"
+    },
+    {
+      "name": "cyl_l10n_a4d0d101d6a3",
+      "value": "Linksboven"
+    },
+    {
+      "name": "cyl_l10n_2306a585ae00",
+      "value": "cyl_itemEdgeInsets: aan elk uiteinde 15% van een tabbreedte vrij"
+    },
+    {
+      "name": "cyl_l10n_6360bbdfb8ff",
+      "value": "cyl_itemEdgeInsets: nul, de tabbladen vullen de balk"
+    },
+    {
+      "name": "cyl_l10n_fd15e88376df",
+      "value": "Demo van cyl_pop / cyl_push-methoden"
+    },
+    {
+      "name": "cyl_l10n_ca3dcd2d62be",
+      "value": "cyl_popSelectTabBarChildViewControllerAtIndex: 1 (%@)"
+    },
+    {
+      "name": "cyl_l10n_3b06a9582640",
+      "value": "cyl_popSelectTabBarChildViewControllerForTabBarItemIdentifier: message"
+    },
+    {
+      "name": "cyl_l10n_59884403daf6",
+      "value": "cyl_pushOrPopToViewController: pages/Index (al in de stapel: terug)"
+    },
+    {
+      "name": "cyl_l10n_1ec113617309",
+      "value": "cyl_pushViewController, cyl_popSelectTabBarChildViewControllerAtIndex, cyl_pushOrPopToViewController"
+    },
+    {
+      "name": "cyl_l10n_9fb845377ee4",
+      "value": "cyl_pushViewController: een groene pagina"
+    },
+    {
+      "name": "cyl_l10n_ff5772993aee",
+      "value": "cyl_tabBarItemLongPressDuration = %@ ms, cyl_tabBarItemDoubleTapInterval = %@ ms; tik om te wisselen; dubbeltik op een tabblad om het te zien"
+    },
+    {
+      "name": "cyl_l10n_f69c71bc581e",
+      "value": "cyl_tabBarMinimizeBehavior = %@; tik om te kiezen en scrol dan deze lijst"
+    },
+    {
+      "name": "cyl_l10n_4abddd944c2e",
+      "value": "harmonyos-liquid-glass-tabbar: tabcapsule, zoekbal en muziekbalk boven kleurrijke inhoud; scroll om te verkleinen"
+    },
+    {
+      "name": "cyl_l10n_3b4e07b5542e",
+      "value": "numberInput=Rooms: each select or tap again sets Rooms to the next value (3, 4, 5, 6)"
+    },
+    {
+      "name": "cyl_l10n_f3f4ecf4a4a6",
+      "value": "selectedIndex = %@ (de pagina van de plusknop is %@, nooit een tabindex); tik voor het volgende tabblad"
+    },
+    {
+      "name": "cyl_l10n_ee5b6ac6461b",
+      "value": "selectedIndex en de PlusButton (issue #515)"
+    },
+    {
+      "name": "cyl_l10n_2de6d572f86b",
+      "value": "standardAppearance-thema (gedeeld door Liquid Glass en FlatDesign)"
+    },
+    {
+      "name": "cyl_l10n_c4376b477be8",
+      "value": "tabBarHidden = %@; verborgen, komt na 2 s terug"
+    },
+    {
+      "name": "cyl_l10n_2a0608059131",
+      "value": "Werkt de titels van alle tabs tegelijk bij; tik opnieuw om te herstellen"
+    },
+    {
+      "name": "cyl_l10n_57196013d558",
+      "value": "Halloween"
+    },
+    {
+      "name": "cyl_l10n_0a58c230c3d9",
+      "value": "Downloadt en werkt de pictogrammen van alle tabbladen bij; tik opnieuw om te herstellen"
+    },
+    {
+      "name": "cyl_l10n_5e347d8ccb68",
+      "value": "Netwerksymbool downloaden"
+    },
+    {
+      "name": "cyl_l10n_2e0e84a0dcfb",
+      "value": "Navigatiebalk verbergen zonder basisklasse (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_321ff794aab8",
+      "value": "N.v.t."
+    },
+    {
+      "name": "cyl_l10n_e1642a46b804",
+      "value": "Midherfstfestival"
+    },
+    {
+      "name": "cyl_l10n_0c2817d10627",
+      "value": "Gemiddelde haptische feedback"
+    },
+    {
+      "name": "cyl_l10n_0f60774903e0",
+      "value": "Afbeeldingen laden uit een bundle (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_0e1b02648a11",
+      "value": "Inzoomen"
+    },
+    {
+      "name": "cyl_l10n_83c39abd16cd",
+      "value": "Kies uit album"
+    },
+    {
+      "name": "cyl_l10n_cc03f47a389c",
+      "value": "Downloadt het tabsymbool van het netwerk (met cache); tik opnieuw om te herstellen"
+    },
+    {
+      "name": "cyl_l10n_e05f97c5159d",
+      "value": "TabBarController maken van een configuratiebestand"
+    },
+    {
+      "name": "cyl_l10n_5f0c0bf32dc1",
+      "value": "Behouden"
+    },
+    {
+      "name": "cyl_l10n_24fb8692947a",
+      "value": "behouden"
+    },
+    {
+      "name": "cyl_l10n_b15d91274e9f",
+      "value": "Sluiten"
+    },
+    {
+      "name": "cyl_l10n_70922c50ef07",
+      "value": "Geheugenwaarschuwing"
+    },
+    {
+      "name": "cyl_l10n_cbed6b29761b",
+      "value": "Plusknop"
+    },
+    {
+      "name": "cyl_l10n_18684d72945b",
+      "value": "Afbeelding laden"
+    },
+    {
+      "name": "cyl_l10n_b981b7b359a7",
+      "value": "Achtergrondafbeelding laden"
+    },
+    {
+      "name": "cyl_l10n_7136049eb4c7",
+      "value": "Ontlaadt niet-geselecteerde tabs; ze laden opnieuw bij selectie"
+    },
+    {
+      "name": "cyl_l10n_c7626d7d6194",
+      "value": "Wijzigt de tabtitel van deze pagina ter plekke; tik opnieuw om te herstellen"
+    },
+    {
+      "name": "cyl_l10n_15fb093f6fff",
+      "value": "Tabbladen ter plekke bijwerken"
+    },
+    {
+      "name": "cyl_l10n_c1ecedab11bc",
+      "value": "Origineel"
+    },
+    {
+      "name": "cyl_l10n_83611abd5f80",
+      "value": "Plaatsen"
+    },
+    {
+      "name": "cyl_l10n_625fb26b4b33",
+      "value": "Annuleren"
+    },
+    {
+      "name": "cyl_l10n_d25efeb790bb",
+      "value": "In de buurt"
+    },
+    {
+      "name": "cyl_l10n_7941d8987ff2",
+      "value": "Vergelijken met de systeem-UITabBar"
+    },
+    {
+      "name": "cyl_l10n_d0d78acf1941",
+      "value": "Kerstmis"
+    },
+    {
+      "name": "cyl_l10n_aa91e8ceec70",
+      "value": "Pasen"
+    },
+    {
+      "name": "cyl_l10n_3df20a295b39",
+      "value": "Zomer"
+    },
+    {
+      "name": "cyl_l10n_0ef6dae7e80c",
+      "value": "Ruimte"
+    },
+    {
+      "name": "cyl_l10n_2f383291bcf8",
+      "value": "Echt: %@"
+    },
+    {
+      "name": "cyl_l10n_bccc798b577a",
+      "value": "Gecentreerde capsule"
+    },
+    {
+      "name": "cyl_l10n_f613681ddf31",
+      "value": "Alle %@ simulaties tonen"
+    },
+    {
+      "name": "cyl_l10n_7c87af044929",
+      "value": "Vegen om van tabblad te wisselen (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_7a2261654d24",
+      "value": "ontladen"
+    },
+    {
+      "name": "cyl_l10n_f79d05d929aa",
+      "value": "TabBarController veilig gemaakt: %@ tabbladen"
+    },
+    {
+      "name": "cyl_l10n_091885db07e4",
+      "value": "Stuiteren"
+    },
+    {
+      "name": "cyl_l10n_758903c327de",
+      "value": "Toont een geanimeerde GIF als tabsymbool; tik opnieuw om te herstellen"
+    },
+    {
+      "name": "cyl_l10n_56e6ecf97176",
+      "value": "Loop"
+    },
+    {
+      "name": "cyl_l10n_c7db6d4f1a42",
+      "value": "Herstellen"
+    },
+    {
+      "name": "cyl_l10n_c4328f75476f",
+      "value": "Valentijnsdag"
+    },
+    {
+      "name": "cyl_l10n_07b181184280",
+      "value": "Ik"
+    },
+    {
+      "name": "cyl_l10n_2a3e7f5c382c",
+      "value": "Handmatig"
+    },
+    {
+      "name": "cyl_l10n_97a6bedeb7fd",
+      "value": "Handmatig: tik om verbergen bij scrollen aan te zetten, scrol omlaag om de TabBar te verbergen en doe dan wat de titel zegt. Verwacht: de TabBar komt meteen terug."
+    },
+    {
+      "name": "cyl_l10n_f68e7e217ad1",
+      "value": "Handmatig: %@"
+    },
+    {
+      "name": "cyl_l10n_89246468f7fd",
+      "value": "Tabbalkgalerij openen"
+    },
+    {
+      "name": "cyl_l10n_a01539048bb0",
+      "value": "Zet de schakelaar aan en druk lang op een tabblad of de PlusButton om de identificatie te zien."
+    },
+    {
+      "name": "cyl_l10n_633c2ee4dcc7",
+      "value": "Alle netwerkpictogrammen wijzigen"
+    },
+    {
+      "name": "cyl_l10n_f75fe6720861",
+      "value": "Alle lokale pictogrammen wijzigen"
+    },
+    {
+      "name": "cyl_l10n_7fb5208a54d5",
+      "value": "Alle titels wijzigen"
+    },
+    {
+      "name": "cyl_l10n_2f728e190695",
+      "value": "Toont andere pagina’s in de tabbladen aan weerszijden (issue #481); tik opnieuw om te herstellen"
+    },
+    {
+      "name": "cyl_l10n_bed9ec1e8448",
+      "value": "Foto maken"
+    },
+    {
+      "name": "cyl_l10n_0be5a194844c",
+      "value": "Skin"
+    },
+    {
+      "name": "cyl_l10n_61a9cd33b1ff",
+      "value": "Skin (thema, issue #216)"
+    },
+    {
+      "name": "cyl_l10n_09d0fdddca66",
+      "value": "Skins: feestdagen en kleuren (%@)"
+    },
+    {
+      "name": "cyl_l10n_3de5855e2c7f",
+      "value": "Simulatielijst inklappen"
+    },
+    {
+      "name": "cyl_l10n_a0ffdf359138",
+      "value": "Hoogte van CYLFlatDesignTabBar wijzigen"
+    },
+    {
+      "name": "cyl_l10n_01e3254a92ba",
+      "value": "Vergroten en verkleinen"
+    },
+    {
+      "name": "cyl_l10n_d46d5bb15db1",
+      "value": "Nieuwjaar"
+    },
+    {
+      "name": "cyl_l10n_79b5a6564585",
+      "value": "Draaien"
+    },
+    {
+      "name": "cyl_l10n_d81bb206a889",
+      "value": "Geen"
+    },
+    {
+      "name": "cyl_l10n_14f433db2189",
+      "value": "Zonder basisklasse, en hulpmiddelen"
+    },
+    {
+      "name": "cyl_l10n_d2339bb4edaa",
+      "value": "Lentefeest"
+    },
+    {
+      "name": "cyl_l10n_5f1de850fb46",
+      "value": "Tabtitel wijzigen"
+    },
+    {
+      "name": "cyl_l10n_9d0d66f312b5",
+      "value": "Vervangen door een grotere afbeelding"
+    },
+    {
+      "name": "cyl_l10n_b051a19ace76",
+      "value": "Naastgelegen tabbladen vervangen"
+    },
+    {
+      "name": "cyl_l10n_3e730a3320e9",
+      "value": "Vervangende pagina %@"
+    },
+    {
+      "name": "cyl_l10n_a131e4f178aa",
+      "value": "Nieuwe inhoud"
+    },
+    {
+      "name": "cyl_l10n_467b3e031441",
+      "value": "niet geladen"
+    },
+    {
+      "name": "cyl_l10n_2c8d9e877a54",
+      "value": "Titelverschuiving (titlePositionAdjustment)"
+    },
+    {
+      "name": "cyl_l10n_0787cd518387",
+      "value": "Geheugenwaarschuwing simuleren"
+    },
+    {
+      "name": "cyl_l10n_d76904d0e7ee",
+      "value": "Elke scène is een tabbalk gebouwd met de openbare API: stijlen, animaties, meldingen, Lottie en de nieuwere tab-API's"
+    },
+    {
+      "name": "cyl_l10n_6a00c1ae99fa",
+      "value": "Oceaan"
+    },
+    {
+      "name": "cyl_l10n_ff692f04ace0",
+      "value": "Berichten"
+    },
+    {
+      "name": "cyl_l10n_41e8e8b9935c",
+      "value": "Donker"
+    },
+    {
+      "name": "cyl_l10n_8dfe6bcdd6ec",
+      "value": "Schuifovergang (CYLTabBarSlideTransitionAnimator)"
+    },
+    {
+      "name": "cyl_l10n_9f44bafc75c6",
+      "value": "TabBar verkleinen / verbergen bij scrollen (issue #13)"
+    },
+    {
+      "name": "cyl_l10n_8625f5f225d7",
+      "value": "Verbergen bij scrollen: onderbrekingen simuleren (issue #13)"
+    },
+    {
+      "name": "cyl_l10n_678abebe6aac",
+      "value": "Tik op de X rechtsboven op de PlusButton: de X krijgt een willekeurige kleur en de PlusButton reageert niet"
+    },
+    {
+      "name": "cyl_l10n_7375af54db2a",
+      "value": "Tik om de tikanimatie van de tabbladen en de PlusButton te wisselen. Nu: %@"
+    },
+    {
+      "name": "cyl_l10n_5378f31b520c",
+      "value": "Tik om tabBar.standardAppearance te wisselen, huidig: %@"
+    },
+    {
+      "name": "cyl_l10n_4a986e4da535",
+      "value": "Tik om de verticale verschuiving van alle tabtitels te wisselen, huidig: %@"
+    },
+    {
+      "name": "cyl_l10n_3d0d9d3d7cc2",
+      "value": "Tik om de taal te wijzigen"
+    },
+    {
+      "name": "cyl_l10n_f4e41dda1094",
+      "value": "Tik om te wisselen en tik daarna op een tab of de PlusButton om het te horen. Haptiek trilt alleen op een echt apparaat. Nu: %@"
+    },
+    {
+      "name": "cyl_l10n_15855ab96e87",
+      "value": "Klik + haptiek"
+    },
+    {
+      "name": "cyl_l10n_cff8a9cded04",
+      "value": "Tik om een thema te kiezen: de achtergrond, symbolen en tekstkleuren van de TabBar wisselen ter plekke, in elke TabBar-stijl. Nu: %@"
+    },
+    {
+      "name": "cyl_l10n_1c00c4fd1cea",
+      "value": "Roze roos"
+    },
+    {
+      "name": "cyl_l10n_8483ed132b2c",
+      "value": "Verjaardag"
+    },
+    {
+      "name": "cyl_l10n_feef14745f21",
+      "value": "Werkt de pictogrammen van alle tabbladen bij met lokale afbeeldingen (naam, pad, UIImage, bestands-URL); tik opnieuw om te herstellen"
+    },
+    {
+      "name": "cyl_l10n_402d19e50fff",
+      "value": "Inloggen"
+    },
+    {
+      "name": "cyl_l10n_833152116634",
+      "value": "Afbeelding verwijderen"
+    },
+    {
+      "name": "cyl_l10n_a0676a7d84a9",
+      "value": "Groene lijn"
+    },
+    {
+      "name": "cyl_l10n_16068b2ff3fd",
+      "value": "Netwerkpictogrammen"
+    },
+    {
+      "name": "cyl_l10n_69ca6555a602",
+      "value": "Omdraaien"
+    },
+    {
+      "name": "cyl_l10n_4bd51044149f",
+      "value": "Eigen geluidsbestand (cyl_tabButtonTapSoundURL)"
+    },
+    {
+      "name": "cyl_l10n_9d1c8a70d4da",
+      "value": "Zelftest"
+    },
+    {
+      "name": "cyl_l10n_11858aeb1656",
+      "value": "Zelftest: alle automatische simulaties uitvoeren, PASS / FAIL melden"
+    },
+    {
+      "name": "cyl_l10n_beabcd498b94",
+      "value": "Grapefruit"
+    },
+    {
+      "name": "cyl_l10n_b8c467fce096",
+      "value": "Badges"
+    },
+    {
+      "name": "cyl_l10n_200e65177369",
+      "value": "Achtergrondkleur van CYLFlatDesignTabBarItem instellen"
+    },
+    {
+      "name": "cyl_l10n_295bb704f520",
+      "value": "Taal"
+    },
+    {
+      "name": "cyl_l10n_d673e0eb5c1c",
+      "value": "Reageren buiten de superview (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_71bbc726ace5",
+      "value": "Systeem volgen"
+    },
+    {
+      "name": "cyl_l10n_d0914cf6acd2",
+      "value": "Navigatie en vergelijkingen"
+    },
+    {
+      "name": "cyl_l10n_110abc875180",
+      "value": "Lichte haptische feedback"
+    },
+    {
+      "name": "cyl_l10n_fad7c8a21fe3",
+      "value": "Geselecteerd"
+    },
+    {
+      "name": "cyl_l10n_aa05fd09a619",
+      "value": "Algemeen"
+    },
+    {
+      "name": "cyl_l10n_15c64aa0b404",
+      "value": "Configuratiebestand"
+    },
+    {
+      "name": "cyl_l10n_d505958a042b",
+      "value": "Configuratie: gesimuleerde fouten"
+    },
+    {
+      "name": "cyl_l10n_45158907e07f",
+      "value": "Sterke haptische feedback"
+    },
+    {
+      "name": "cyl_l10n_d6982fecc6a4",
+      "value": "Tabbladen lang indrukken (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_aefae51d3c25",
+      "value": "Lang ingedrukt: ‘%@’"
+    },
+    {
+      "name": "cyl_l10n_abad1baa5479",
+      "value": "Duur van lang drukken en interval van dubbeltikken (issue #535 / #152)"
+    },
+    {
+      "name": "cyl_l10n_b146fc1a1531",
+      "value": "Gras"
+    },
+    {
+      "name": "cyl_l10n_db1c89e0f6e6",
+      "value": "Home"
+    },
+    {
+      "name": "cyl_l10n_18c63459a2c0",
+      "value": "Standaard"
+    },
+    {
+      "name": "cyl_l10n_be354ee4263a",
+      "value": "Standaardklik"
+    }
+  ]
+}

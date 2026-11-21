@@ -22,6 +22,7 @@ class DemoHostActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        DemoText.attach(this)
         val key = intent.getStringExtra(KEY)
         val builder = key?.let { synchronized(builders) { builders[it] } }
         if (builder == null) {

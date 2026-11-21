@@ -34,6 +34,7 @@
 | [动效资源](#cn动效资源) | [Animation files](#enanimation-files) |
 | [其他平台的参考](#cn其他平台的参考) | [What the other platforms do](#enwhat-the-other-platforms-do) |
 | [与 Lottie 的差异](#cn与-lottie-的差异) | [Differences from Lottie](#endifferences-from-lottie) |
+| [已知问题](#cn已知问题) | [Known issues](#enknown-issues) |
 | [测试与截图](#cn测试与截图) | [Testing and screenshots](#entesting-and-screenshots) |
 
 <!-- navigation:end -->
@@ -169,7 +170,7 @@ CYLTabBarController *tabBarController = [[CYLTabBarController alloc] initWithVie
 ```
 
 ```swift
-// Swift — from Example-PAG/HealthyHome/Tool/TabBarCommon.swift
+// Swift — from Example-Swift-03/HealthyHome/Tool/TabBarCommon.swift (#if CYL_DEMO_PAG, compiled by Example-PAG)
 let pagAttributes = CYLTabBarItemsAttributesAddingPAGFiles(tabBarItemsAttributes, ["like", "PAG_LOGO", "test2", "replacement"], nil)
 return pagAttributes.map { item in
     var item = item
@@ -213,6 +214,21 @@ return pagAttributes.map { item in
 | **深色颜色**：`CYLTabBarLottieDarkColors`（按 keypath 替换颜色）仅支持 Lottie 4.x；PAG 请使用深色文件 `CYLTabBarPAGDarkURL` / `CYLTabBarPAGDarkFilePath`。 | **Dark colors**: `CYLTabBarLottieDarkColors` (colors by keypath) is Lottie 4.x only; for PAG use a dark file, `CYLTabBarPAGDarkURL` / `CYLTabBarPAGDarkFilePath`. |
 | **安装方式**：仅 CocoaPods；SPM 与 Carthage 暂不提供 PAG。 | **Installation**: CocoaPods only; SPM and Carthage do not offer PAG yet. |
 | **命名**：为了与 Lottie 共用同一套流程，部分公开 API 仍沿用 "Lottie" 命名（如 `cyl_lottieAnimationView`、`lottieAnimationViewContentMode`、相关通知），它们对 PAG 同样生效；库内部的 PAG 代码则通过 `CYLTabBarItemAnimator` 协议与上面的中性方法实现，见[实现结构](#cn实现结构cyltabbaritemanimator-协议)。 | **Naming**: to share one pipeline with Lottie, some public APIs keep their "Lottie" names (`cyl_lottieAnimationView`, `lottieAnimationViewContentMode`, the notifications); they apply to PAG too. Inside the library, the PAG code goes through the `CYLTabBarItemAnimator` protocol and the neutral methods above, see [Implementation](#enimplementation-the-cyltabbaritemanimator-protocol). |
+
+## [CN]已知问题
+## [EN]Known issues
+
+| 中文 | English |
+|:---|:---|
+| **iOS 17.5 模拟器上打开带 PAG 动画的页面即崩溃（2026-11-16）**：Objective-C 示例的「同城」Tab 使用 CYLTableViewPlaceHolder 的 PAG 占位图与 PAG 下拉刷新图标（`CYLDemoPlaceholderAnimationPag`）。libpag 4.5.102 用 OpenGL ES 绘制；在 iOS 17.5 模拟器（iPhone 15 Pro，macOS 27.3 主机，Xcode 27.2）上，模拟器的 OpenGL 着色器编译器在后台队列 `com.apple.opengl.cvmDoWork` 中崩溃（`libCoreVMClient` `cvmsServerElementBuild` 中的 `EXC_BAD_ACCESS`，3 份崩溃报告，崩溃时 libpag 的 `tgfx::TaskGroup` 线程都在运行）。崩溃发生在 Apple 的代码中，不在本库或 libpag 的调用栈上，第 50 步（ed80367）与第 51 步的构建都会崩溃，与 Swift 迁移无关。iOS 26.3 模拟器不崩溃；真机使用真正的 GPU，不经过该编译器。没有 iOS 18 到 25 的模拟器可供测试。 | **Opening a page with PAG animations crashed on the iOS 17.5 simulator (2026-11-16)**: the Objective-C demo's Nearby tab uses CYLTableViewPlaceHolder's PAG placeholders and PAG refresh icon (`CYLDemoPlaceholderAnimationPag`). libpag 4.5.102 draws with OpenGL ES; on the iOS 17.5 simulator (iPhone 15 Pro, macOS 27.3 host, Xcode 27.2), the simulator's OpenGL shader compiler crashed on its background queue `com.apple.opengl.cvmDoWork` (`EXC_BAD_ACCESS` in `libCoreVMClient` `cvmsServerElementBuild`; 3 crash reports, each with libpag's `tgfx::TaskGroup` threads running). The crash is in Apple's code, not on a stack of this library or of libpag; the builds of step 50 (ed80367) and step 51 crash the same way, so the Swift migration did not cause it. The iOS 26.3 simulator does not crash; devices use the real GPU and never reach that compiler. iOS 18 to 25 simulators were not available to test. |
+| **示例中的处理**：`CYLDemoPlaceholder.supportedAnimation(for:)`（`Example-Shared/CYLDemoPlaceholder.swift`）在低于 iOS 26 的模拟器上用 Lottie 代替 PAG，`install` 与 `placeholderView(animation:)` 都经过它。只改示例，库不变：使用 PAG Tab 图标的 App 在旧模拟器上也可能遇到同样的崩溃，请在 iOS 26 以上的模拟器或真机上测试 PAG。 | **What the examples do**: `CYLDemoPlaceholder.supportedAnimation(for:)` (`Example-Shared/CYLDemoPlaceholder.swift`) uses Lottie instead of PAG on a simulator older than iOS 26; `install` and `placeholderView(animation:)` both go through it. Only the examples changed, not the library: an app with PAG tab icons may meet the same crash on an older simulator, so test PAG on an iOS 26 or later simulator or on a device. |
+| 从上到下：iOS 17.5 模拟器，点击「同城」后 App 退出，回到主屏幕（修复前，2026-11-16 03:22）；iOS 17.5 模拟器，修复后「同城」正常打开（经典样式，03:25）；iOS 26.3 模拟器（CYL 17Pro），修复前就不崩溃（液态玻璃，03:16）。平台 iOS，Xcode 27.2（27B52），macOS 27.3，基于提交 [ea0b2f0](https://github.com/ChenYilong/CYLTabBarController/commit/ea0b2f0) 的工作区。 | Top to bottom: the iOS 17.5 simulator, the app gone to the home screen after tapping Nearby (before the fix, 2026-11-16 03:22); the iOS 17.5 simulator, Nearby opens after the fix (classic style, 03:25); the iOS 26.3 simulator (CYL 17Pro), which never crashed (Liquid Glass, 03:16). Platform iOS, Xcode 27.2 (27B52), macOS 27.3, working tree on top of commit [ea0b2f0](https://github.com/ChenYilong/CYLTabBarController/commit/ea0b2f0). |
+| ![iOS 17.5 模拟器，修复前点击同城后崩溃](assets/pag-nearby-ios17-simulator-crash.png) | ![iOS 17.5 simulator, crash after tapping Nearby, before the fix](assets/pag-nearby-ios17-simulator-crash.png) |
+| ![iOS 17.5 模拟器，修复后同城正常打开](assets/pag-nearby-ios17-simulator-fixed.png) | ![iOS 17.5 simulator, Nearby opens after the fix](assets/pag-nearby-ios17-simulator-fixed.png) |
+| ![iOS 26.3 模拟器，同城正常打开](assets/pag-nearby-ios26-simulator.png) | ![iOS 26.3 simulator, Nearby opens](assets/pag-nearby-ios26-simulator.png) |
+| **DONE**（2026-11-21，模拟器运行时问题，与本库无关）：原 TODO「iOS 26.3 截图中「语言」行的地球与国旗 emoji 显示为方框（iOS 17.5 正常），待查」。同一份 Example-GIF 构建在 iOS 27.2 模拟器上正常显示 emoji，在 iOS 26.3.1 模拟器上显示为方框；该行是使用系统字体的普通 `UILabel`（`CYLLocalization.swift` 的 `cyl_languageCell`），没有自定义字体，运行时中也有 `AppleColorEmoji-160px.ttc`，因此方框来自 iOS 26.3.1 模拟器运行时（macOS 27.3 主机），不是本库的问题，无需修改代码。截图见下。 | **DONE** (2026-11-21, a simulator runtime problem, not the library): was TODO "in the iOS 26.3 screenshot, the globe and flag emoji of the Language row show as boxes (fine on iOS 17.5); to investigate". The same Example-GIF build draws the emoji on the iOS 27.2 simulator and boxes on the iOS 26.3.1 simulator. The row is a plain system-font `UILabel` (`cyl_languageCell` in `CYLLocalization.swift`) with no custom font, and the runtime has `AppleColorEmoji-160px.ttc`, so the boxes come from the iOS 26.3.1 simulator runtime (macOS 27.3 host), not the library; no code change. Screenshot below. |
+
+![iOS 27.2 and iOS 26.3.1 simulators, macOS 27.3, Xcode 27.2 (27B52), CYLTabBarController bf242302, feat/cross-platform-components, 2026-11-21. Purpose: the globe and flag emoji of the Language row](assets/pag-language-emoji-ios26-ios27.png)
 
 ## [CN]测试与截图
 ## [EN]Testing and screenshots

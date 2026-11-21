@@ -1,0 +1,4 @@
+{
+  "navigationStyle": "custom",
+  "usingComponents": { "cyl-tab-bar": "cyl-tabbar-miniprogram/cyl-tab-bar/index" }
+}

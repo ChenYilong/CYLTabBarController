@@ -124,6 +124,7 @@
 "有新内容" = "Nuovi contenuti";
 "%@ 条新消息" = "%@ nuovi messaggi";
 "加号按钮" = "Pulsante più";
+"更多" = "Altro";
 "模拟内存警告" = "Simula avviso di memoria";
 "卸载未选中的 Tab，切换时重新加载" = "Scarica i pannelli non selezionati; si ricaricano quando selezionati";
 "内存警告" = "Avviso di memoria";
@@ -368,3 +369,12 @@
 "网络图标、标题与配色" = "Icone di rete, titoli e colori";
 /* The settings group of the configuration file rows (docs/Configuration-File.md). */
 "配置文件" = "File di configurazione";
+/* Scroll hiding simulations (issue #13): kind labels and title prefixes; API names stay English. */
+"恢复" = "Ripristina";
+"保持" = "Mantieni";
+"不适用" = "N/D";
+"手动" = "Manuale";
+"自测" = "Autotest";
+"手动：%@" = "Manuale: %@";
+"实测：%@" = "Reale: %@";
+"自测：依次运行所有自动模拟，报告 PASS / FAIL" = "Autotest: esegui tutte le simulazioni automatiche, riporta PASS / FAIL";

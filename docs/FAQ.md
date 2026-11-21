@@ -34,6 +34,7 @@
 | [8. 导航、转场与手势](#cn8-导航转场与手势) | [8. Navigation, transitions and gestures](#en8-navigation-transitions-and-gestures) |
 | [9. 与第三方库的兼容](#cn9-与第三方库的兼容) | [9. Compatibility with third-party libraries](#en9-compatibility-with-third-party-libraries) |
 | [10. 其他](#cn10-其他) | [10. Other](#en10-other) |
+| [11. 来自 README 的问答](#cn11-来自-readme-的问答) | [11. Questions moved from the README](#en11-questions-moved-from-the-readme) |
 
 <!-- navigation:end -->
 
@@ -48,7 +49,7 @@
 | 来源：[#534](https://github.com/ChenYilong/CYLTabBarController/issues/534)、[#520](https://github.com/ChenYilong/CYLTabBarController/issues/520) | Source: [#534](https://github.com/ChenYilong/CYLTabBarController/issues/534), [#520](https://github.com/ChenYilong/CYLTabBarController/issues/520) |
 | 报错发生在 `git clone` 阶段，是本机到 GitHub 的网络中断，与本库代码无关。可以： | The error happens during `git clone`: the network connection to GitHub dropped. It is unrelated to the library code. You can: |
 | 1. 重试，或为 git 配置可用的网络代理； | 1. Retry, or configure a working proxy for git. |
-| 2. 按 README 的 [清除 CocoaPods 本地缓存](../README.md#cn清除-cocoapods-本地缓存) 与 [升级本地 CocoaPods 源](../README.md#cn升级本地-cocoapods-源) 操作后重新 `pod install`； | 2. Follow [Clear the CocoaPods cache](../README.md#enclear-the-cocoapods-cache) and [Update the local CocoaPods repository](../README.md#enupdate-the-local-cocoapods-repository) in the README, then run `pod install` again. |
+| 2. 按 README 的 [清除 CocoaPods 本地缓存](Usage-Guide.md#cn清除-cocoapods-本地缓存) 与 [升级本地 CocoaPods 源](Usage-Guide.md#cn升级本地-cocoapods-源) 操作后重新 `pod install`； | 2. Follow [Clear the CocoaPods cache](Usage-Guide.md#enclear-the-cocoapods-cache) and [Update the local CocoaPods repository](Usage-Guide.md#enupdate-the-local-cocoapods-repository) in the README, then run `pod install` again. |
 | 3. 仍失败时，可改用 Carthage 或 Swift Package Manager 导入（见 README）。 | 3. If it still fails, integrate with Carthage or Swift Package Manager instead (see the README). |
 
 ### [CN]Demo 无法运行
@@ -67,7 +68,7 @@
 | 中文 | English |
 |:---|:---|
 | 来源：[#400](https://github.com/ChenYilong/CYLTabBarController/issues/400) | Source: [#400](https://github.com/ChenYilong/CYLTabBarController/issues/400) |
-| 本库使用 Objective-C 编写，可直接在 Swift 项目中使用。仓库中提供了多个 Swift Demo（`Example-Swift*` 目录），用法见 README 的 [在 Swift 项目中使用 CYLTabBarController](../README.md#cn在-swift-项目中使用-cyltabbarcontroller)，完整的 Swift 接入与 API 示例见 [Swift 使用指南](Swift-Guide.md)（含 `import` 报错的解决方法，[#282](https://github.com/ChenYilong/CYLTabBarController/issues/282)）。 | The library is written in Objective-C and works in Swift projects as is. The repository has several Swift demos (the `Example-Swift*` directories); see [Using CYLTabBarController in a Swift project](../README.md#enusing-cyltabbarcontroller-in-a-swift-project) in the README, and the [Swift guide](Swift-Guide.md) for full setup and API examples in Swift (including fixes for `import` errors, [#282](https://github.com/ChenYilong/CYLTabBarController/issues/282)). |
+| 本库使用 Objective-C 编写，可直接在 Swift 项目中使用。仓库中提供了多个 Swift Demo（`Example-Swift*` 目录），用法见 README 的 [在 Swift 项目中使用 CYLTabBarController](Usage-Guide.md#cn在-swift-项目中使用-cyltabbarcontroller)，完整的 Swift 接入与 API 示例见 [Swift 使用指南](Swift-Guide.md)（含 `import` 报错的解决方法，[#282](https://github.com/ChenYilong/CYLTabBarController/issues/282)）。 | The library is written in Objective-C and works in Swift projects as is. The repository has several Swift demos (the `Example-Swift*` directories); see [Using CYLTabBarController in a Swift project](Usage-Guide.md#enusing-cyltabbarcontroller-in-a-swift-project) in the README, and the [Swift guide](Swift-Guide.md) for full setup and API examples in Swift (including fixes for `import` errors, [#282](https://github.com/ChenYilong/CYLTabBarController/issues/282)). |
 
 ### [CN]控制台打印 `Class CYLTabBar overrides the -traitCollection getter, which is not supported`
 ### [EN]The console prints `Class CYLTabBar overrides the -traitCollection getter, which is not supported`
@@ -96,7 +97,7 @@
 | 中文 | English |
 |:---|:---|
 | 来源：[#490](https://github.com/ChenYilong/CYLTabBarController/issues/490) | Source: [#490](https://github.com/ChenYilong/CYLTabBarController/issues/490) |
-| 请使用 README [捕获 TabBar 点击事件](../README.md#cn捕获-tabbar-点击事件) 中的方式监听选中事件，并参考 [#201](https://github.com/ChenYilong/CYLTabBarController/issues/201#issuecomment-498562038)、[#161](https://github.com/ChenYilong/CYLTabBarController/issues/161) 中的讨论。 | Observe selection as described in [Handling TabBar selection events](../README.md#enhandling-tabbar-selection-events) in the README; see also the discussions in [#201](https://github.com/ChenYilong/CYLTabBarController/issues/201#issuecomment-498562038) and [#161](https://github.com/ChenYilong/CYLTabBarController/issues/161). |
+| 请使用 README [捕获 TabBar 点击事件](Usage-Guide.md#cn捕获-tabbar-点击事件) 中的方式监听选中事件，并参考 [#201](https://github.com/ChenYilong/CYLTabBarController/issues/201#issuecomment-498562038)、[#161](https://github.com/ChenYilong/CYLTabBarController/issues/161) 中的讨论。 | Observe selection as described in [Handling TabBar selection events](Usage-Guide.md#enhandling-tabbar-selection-events) in the README; see also the discussions in [#201](https://github.com/ChenYilong/CYLTabBarController/issues/201#issuecomment-498562038) and [#161](https://github.com/ChenYilong/CYLTabBarController/issues/161). |
 
 ### [CN]能否动态更新某个 Tab 的 ViewController？重新 `setViewControllers` 后黑屏
 ### [EN]Can a tab's view controller be replaced at runtime? The screen is black after `setViewControllers` again
@@ -135,6 +136,7 @@ unloadsUnselectedViewsOnMemoryWarning = true
 | 不开启时，库不会卸载任何页面；可以在各子控制器的 `-didReceiveMemoryWarning` 中自行释放大资源（图片、缓存等），并在 `-viewWillAppear:` 中按需重新加载。 | With it off, the library unloads nothing; release large resources (images, caches) in each child view controller's `-didReceiveMemoryWarning` and load them again in `-viewWillAppear:`. |
 | 调试：`+[CYLTabBarController cyl_simulateMemoryWarning]` 仅用公开 API 模拟一次内存警告：发送 `UIApplicationDidReceiveMemoryWarningNotification`，调用 App 代理和最近活跃 TabBarController 的 `-didReceiveMemoryWarning`（仅发送通知不会调用它），之后在日志中输出每个 Tab 的角标状态和 Lottie 播放速度。指定某个 TabBarController 时用 `+cyl_simulateMemoryWarningForTabBarController:`。 | Testing: `+[CYLTabBarController cyl_simulateMemoryWarning]` simulates a memory warning with public API only: it posts `UIApplicationDidReceiveMemoryWarningNotification`, calls the app delegate's and the most recently active tab bar controller's `-didReceiveMemoryWarning` (posting the notification alone does not call it), then logs each tab's badge state and Lottie speed. For a given tab bar controller, use `+cyl_simulateMemoryWarningForTabBarController:`. |
 | Demo：ObjC Demo 每个列表顶部的「模拟内存警告」行（`UIViewController+CYLMemoryWarning`，`-cyl_simulateMemoryWarningAndShowResult`，位于设置分组 `CYLSettingsSection`）对所在的 TabBarController 模拟内存警告，并弹窗列出每个 Tab 是否被卸载及原因，之后切换到已卸载的 Tab 会重新执行 `-viewDidLoad`；Swift Demo 中点击角标列表的 cell 会调用 `cyl_simulateMemoryWarning` 并输出日志。普通、液态玻璃和扁平样式都适用。 | Demo: in the ObjC demo, the "模拟内存警告 Memory warning" row at the top of each list (`UIViewController+CYLMemoryWarning`, `-cyl_simulateMemoryWarningAndShowResult`, in the settings section `CYLSettingsSection`) simulates a memory warning for its tab bar controller and shows in an alert whether each tab was unloaded and why not; selecting an unloaded tab then runs its `-viewDidLoad` again. In the Swift demos, tapping a cell of the badge list calls `cyl_simulateMemoryWarning` and logs the state. Works in the classic, Liquid Glass and flat design styles. |
+| 配置文件、跨平台：`CYLTabBarControllerUnloadsUnselectedViewsOnMemoryWarning`（布尔值）开启卸载，`CYLTabBarControllerKeepsLoadedTabBarItemIdentifiers`（标识列表，对应 `cyl_keepsLoadedTabBarItemIdentifiers`）保留部分 Tab，无需子类；`CYLSimulateMemoryWarningReport()`（iOS / Android）模拟内存警告并返回每个 Tab 的结果，即上面弹窗的内容。`CYLTabBarHostView` 的 `simulateMemoryWarning`、React Native 与 Flutter 组件的 `memoryWarningRequest` / `onMemoryWarning` 使用它；示例的「模拟内存警告」行与 ObjC Demo 相同，保留首页 Tab。 | Configuration files, cross-platform: `CYLTabBarControllerUnloadsUnselectedViewsOnMemoryWarning` (a boolean) turns unloading on and `CYLTabBarControllerKeepsLoadedTabBarItemIdentifiers` (a list of identifiers, `cyl_keepsLoadedTabBarItemIdentifiers`) keeps some tabs, without a subclass; `CYLSimulateMemoryWarningReport()` (iOS / Android) simulates a memory warning and returns what happened to each tab, the alert above. `CYLTabBarHostView`'s `simulateMemoryWarning` and the React Native and Flutter components' `memoryWarningRequest` / `onMemoryWarning` use it; the examples' "Simulate memory warning" row works as the ObjC Demo's and keeps the home tab. |
 
 ### [CN]TabBar 超过 5 个 item 时，如何隐藏 More 按钮？
 ### [EN]How do I hide the More button with more than five items?
@@ -142,7 +144,8 @@ unloadsUnselectedViewsOnMemoryWarning = true
 | 中文 | English |
 |:---|:---|
 | 来源：[#472](https://github.com/ChenYilong/CYLTabBarController/issues/472)、[#493](https://github.com/ChenYilong/CYLTabBarController/issues/493) | Source: [#472](https://github.com/ChenYilong/CYLTabBarController/issues/472), [#493](https://github.com/ChenYilong/CYLTabBarController/issues/493) |
-| 系统 `UITabBar` 最多显示 5 个 item，超过时会出现 More，这是系统逻辑，也是审核要求。PlusButton 不计入这 5 个，因此最多为 5 个 TabBarItem + 1 个 PlusButton，详见 README [为什么放置 6 个 TabBarItem 会显示异常？](../README.md#cn为什么放置-6-个-tabbaritem-会显示异常)。 | The system `UITabBar` shows at most five items and adds More beyond that; this is system behavior and an App Review requirement. The PlusButton does not count, so the limit is five TabBarItems plus one PlusButton; see [Why does placing six TabBarItems behave unexpectedly?](../README.md#enwhy-does-placing-six-tabbaritems-behave-unexpectedly) in the README. |
+| 系统 `UITabBar` 最多显示 5 个 item，超过时会出现 More，这是系统逻辑，也是审核要求。PlusButton 不计入这 5 个，因此最多为 5 个 TabBarItem + 1 个 PlusButton，详见 README [为什么放置 6 个 TabBarItem 会显示异常？](FAQ.md#cn为什么放置-6-个-tabbaritem-会显示异常)。 | The system `UITabBar` shows at most five items and adds More beyond that; this is system behavior and an App Review requirement. The PlusButton does not count, so the limit is five TabBarItems plus one PlusButton; see [Why does placing six TabBarItems behave unexpectedly?](FAQ.md#enwhy-does-placing-six-tabbaritems-behave-unexpectedly) in the README. |
+| 2026-11-10 修复：以前经典样式与液态玻璃下超过 5 个 Tab 时只显示前 5 个，没有 More，第 6 个及之后的 Tab 无法访问（这条路径用 `-addChildViewController:` 安装 Tab，而 UIKit 只为尚未成为子控制器的视图控制器在 `-setViewControllers:` 中生成 More）。现在超过 5 个 Tab 时与系统 `UITabBarController` 一样出现 More，收在 More 中的 Tab 可以选中、编辑；5 个及以内不受影响。截图见 [Liquid-Glass-Robustness](Liquid-Glass-Robustness.md)。仍建议控制在 5 个以内，或用下面的「溢出位」做法。 | Fixed on 2026-11-10: with more than five tabs the classic style and Liquid Glass used to show only the first five and no More, so the sixth tab and later could not be reached (that path installs tabs with `-addChildViewController:`, and UIKit builds More in `-setViewControllers:` only for view controllers that are not children yet). More than five tabs now give a More tab as the system `UITabBarController` does, and the tabs under More can be selected and edited; five or fewer are unchanged. Screenshots in [Liquid-Glass-Robustness](Liquid-Glass-Robustness.md). Staying within five, or the overflow slot below, is still recommended. |
 | 不出现系统 More 的做法：More 是 UIKit 在视图控制器超过 5 个时自动添加的，无法关闭，所以只给 TabBarController 5 个视图控制器，第 5 个 Tab 作为「溢出位」。用自定义点击操作接口（`cyl_shouldPerformCustomTabActionHandler` + `cyl_customTabActionHandler`，见 [Tab-Custom-Action.md](Tab-Custom-Action.md)）让点击溢出位时弹出你自己的菜单，列出放不下的页面；选中后用 `-replaceViewControllerAtIndex:withViewController:attributes:` 把该页面连同它的标题、图标放进溢出位并选中。其他 Tab 选中时点击溢出位直接进入其中的页面，再次点击则重新弹出菜单。这样 TabBar 上始终只有 5 个 Tab，所有页面都能到达，也没有系统 More 列表。 | Avoiding the system More: UIKit adds More by itself once there are more than five view controllers, and it cannot be turned off, so give the tab bar controller five view controllers and use the fifth tab as an overflow slot. With the custom tab action API (`cyl_shouldPerformCustomTabActionHandler` + `cyl_customTabActionHandler`, see [Tab-Custom-Action.md](Tab-Custom-Action.md)), tapping the slot shows your own menu of the pages that do not fit; the chosen page goes into the slot with its own title and icon through `-replaceViewControllerAtIndex:withViewController:attributes:` and is selected. While another tab is selected, tapping the slot opens its page directly; tapping it again shows the menu. The tab bar always has five tabs, every page is reachable, and there is no system More list. |
 | 示例：ObjC Demo 的「Tab Bar Gallery」→「More than five tabs」→「8 tabs without the system "More"」（`+overflowMenuScene`，`Example/Classes/Gallery/CYLGalleryProvider.m`），同组第二行是系统 More 的对照。 | Example: the ObjC demo's "Tab Bar Gallery" → "More than five tabs" → "8 tabs without the system "More"" (`+overflowMenuScene` in `Example/Classes/Gallery/CYLGalleryProvider.m`); the second row of that section shows the system More for comparison. |
 
@@ -168,7 +171,7 @@ tabBarController.cyl_customTabActionHandler = ^(CYLTabBarController *controller,
 | 中文 | English |
 |:---|:---|
 | 来源：[#463](https://github.com/ChenYilong/CYLTabBarController/issues/463) | Source: [#463](https://github.com/ChenYilong/CYLTabBarController/issues/463) |
-| 1. 在 `-application:didFinishLaunchingWithOptions:` 中、**创建 CYLTabBarController 之前**调用 `[YourPlusButtonSubclass registerPlusButton]`（不要放在 `+load` 中，见 README [为什么 iOS 10 会崩溃而 iOS 9 不会？](../README.md#cn为什么-ios-10-会崩溃而-ios-9-不会)）； | 1. Call `[YourPlusButtonSubclass registerPlusButton]` in `-application:didFinishLaunchingWithOptions:`, **before creating the CYLTabBarController** (not in `+load`; see [Why does it crash on iOS 10 but not iOS 9?](../README.md#enwhy-does-it-crash-on-ios-10-but-not-ios-9) in the README). |
+| 1. 在 `-application:didFinishLaunchingWithOptions:` 中、**创建 CYLTabBarController 之前**调用 `[YourPlusButtonSubclass registerPlusButton]`（不要放在 `+load` 中，见 README [为什么 iOS 10 会崩溃而 iOS 9 不会？](FAQ.md#cn为什么-ios-10-会崩溃而-ios-9-不会)）； | 1. Call `[YourPlusButtonSubclass registerPlusButton]` in `-application:didFinishLaunchingWithOptions:`, **before creating the CYLTabBarController** (not in `+load`; see [Why does it crash on iOS 10 but not iOS 9?](FAQ.md#enwhy-does-it-crash-on-ios-10-but-not-ios-9) in the README). |
 | 2. 子类需遵守 `CYLPlusButtonSubclassing` 协议并实现 `+plusButton`； | 2. The subclass must conform to `CYLPlusButtonSubclassing` and implement `+plusButton`. |
 | 3. 使用 Lottie 时，请通过 `pod 'CYLTabBarController/Lottie'` 导入，不要单独再导入一份 Lottie 后只使用 `Core`，否则库内部检测不到 Lottie。 | 3. With Lottie, integrate `pod 'CYLTabBarController/Lottie'`. Adding Lottie separately next to the `Core` subspec leaves the library unable to detect it. |
 
@@ -194,7 +197,7 @@ tabBarController.selectedIndex = [YourPlusButtonSubclass indexOfPlusButtonInTabB
 | 中文 | English |
 |:---|:---|
 | 来源：[#403](https://github.com/ChenYilong/CYLTabBarController/issues/403) | Source: [#403](https://github.com/ChenYilong/CYLTabBarController/issues/403) |
-| 不要手动设置 `CYLExternPlusButton.selected`，按上一条用 `selectedIndex` 选中即可，选中状态由库维护。如果自定义了 `UITabBarControllerDelegate`，请按 README [PlusButton 选中后无法恢复为 normal](../README.md#cnplusbutton-选中后无法恢复为-normal) 在 `-tabBarController:shouldSelectViewController:` 中同步状态。 | Don't set `CYLExternPlusButton.selected` yourself; select it with `selectedIndex` as above and the library keeps the state. With a custom `UITabBarControllerDelegate`, sync the state in `-tabBarController:shouldSelectViewController:` as described in [PlusButton remains selected after selecting another tab](../README.md#enplusbutton-remains-selected-after-selecting-another-tab). |
+| 不要手动设置 `CYLExternPlusButton.selected`，按上一条用 `selectedIndex` 选中即可，选中状态由库维护。如果自定义了 `UITabBarControllerDelegate`，请按 README [PlusButton 选中后无法恢复为 normal](FAQ.md#cnplusbutton-选中后无法恢复为-normal) 在 `-tabBarController:shouldSelectViewController:` 中同步状态。 | Don't set `CYLExternPlusButton.selected` yourself; select it with `selectedIndex` as above and the library keeps the state. With a custom `UITabBarControllerDelegate`, sync the state in `-tabBarController:shouldSelectViewController:` as described in [PlusButton remains selected after selecting another tab](FAQ.md#enplusbutton-remains-selected-after-selecting-another-tab). |
 
 ### [CN]3 个按钮（含 PlusButton）时如何让 PlusButton 居中？PlusButton 与其他 item 间距不均匀
 ### [EN]How do I center the PlusButton among three buttons? The PlusButton is not evenly spaced
@@ -203,7 +206,7 @@ tabBarController.selectedIndex = [YourPlusButtonSubclass indexOfPlusButtonInTabB
 |:---|:---|
 | 来源：[#419](https://github.com/ChenYilong/CYLTabBarController/issues/419)、[#446](https://github.com/ChenYilong/CYLTabBarController/issues/446) | Source: [#419](https://github.com/ChenYilong/CYLTabBarController/issues/419), [#446](https://github.com/ChenYilong/CYLTabBarController/issues/446) |
 | 用 `+indexOfPlusButtonInTabBar` 指定 PlusButton 的位置（3 个按钮时返回 `1`）。 | Set the PlusButton's position with `+indexOfPlusButtonInTabBar` (return `1` for three buttons). |
-| 间距不均匀时，按 README [PlusButton 与其他 TabBarItem 的间距不均匀](../README.md#cnplusbutton-与其他-tabbaritem-的间距不均匀) 给 PlusButton 设置与其他 item 相同的宽度，或参考 [调整 PlusButton 与 TabBarItem 的宽度](../README.md#cn调整-plusbutton-与-tabbaritem-的宽度)。 | For uneven spacing, give the PlusButton the same width as the other items as described in [The PlusButton is not evenly spaced](../README.md#enthe-plusbutton-is-not-evenly-spaced), or see [Customize the PlusButton and TabBarItem widths](../README.md#encustomize-the-plusbutton-and-tabbaritem-widths). |
+| 间距不均匀时，按 README [PlusButton 与其他 TabBarItem 的间距不均匀](FAQ.md#cnplusbutton-与其他-tabbaritem-的间距不均匀) 给 PlusButton 设置与其他 item 相同的宽度，或参考 [调整 PlusButton 与 TabBarItem 的宽度](Usage-Guide.md#cn调整-plusbutton-与-tabbaritem-的宽度)。 | For uneven spacing, give the PlusButton the same width as the other items as described in [The PlusButton is not evenly spaced](FAQ.md#enthe-plusbutton-is-not-evenly-spaced), or see [Customize the PlusButton and TabBarItem widths](Usage-Guide.md#encustomize-the-plusbutton-and-tabbaritem-widths). |
 
 ### [CN]TabBar 上只有一个 PlusButton，能否实现？
 ### [EN]Can a TabBar have only a PlusButton?
@@ -227,7 +230,7 @@ tabBarController.selectedIndex = [YourPlusButtonSubclass indexOfPlusButtonInTabB
 | 中文 | English |
 |:---|:---|
 | 来源：[#476](https://github.com/ChenYilong/CYLTabBarController/issues/476) | Source: [#476](https://github.com/ChenYilong/CYLTabBarController/issues/476) |
-| 新版本已支持多个 TabBarController 各自使用不同的 PlusButton：PlusButton 按 `context` 绑定到对应的 TabBarController，item 个数、宽度等布局数据也由每个 TabBar 各自保存。用法见 README [多 TabBar 嵌套并指定 PlusButton 位置](../README.md#cn多-tabbar-嵌套并指定-plusbutton-位置)。 | Several TabBarControllers can now each have their own PlusButton: a PlusButton is bound to its TabBarController by `context`, and each TabBar keeps its own layout data such as item count and width. See [Nesting multiple TabBars and specifying the PlusButton position](../README.md#ennesting-multiple-tabbars-and-specifying-the-plusbutton-position) in the README. |
+| 新版本已支持多个 TabBarController 各自使用不同的 PlusButton：PlusButton 按 `context` 绑定到对应的 TabBarController，item 个数、宽度等布局数据也由每个 TabBar 各自保存。用法见 README [多 TabBar 嵌套并指定 PlusButton 位置](Usage-Guide.md#cn多-tabbar-嵌套并指定-plusbutton-位置)。 | Several TabBarControllers can now each have their own PlusButton: a PlusButton is bound to its TabBarController by `context`, and each TabBar keeps its own layout data such as item count and width. See [Nesting multiple TabBars and specifying the PlusButton position](Usage-Guide.md#ennesting-multiple-tabbars-and-specifying-the-plusbutton-position) in the README. |
 
 ## [CN]4. TabBarItem 的图标、文字与布局
 ## [EN]4. TabBarItem icons, titles and layout
@@ -254,7 +257,7 @@ tabBarController.selectedIndex = [YourPlusButtonSubclass indexOfPlusButtonInTabB
 | 中文 | English |
 |:---|:---|
 | 来源：[#485](https://github.com/ChenYilong/CYLTabBarController/issues/485)、[#512](https://github.com/ChenYilong/CYLTabBarController/issues/512) | Source: [#485](https://github.com/ChenYilong/CYLTabBarController/issues/485), [#512](https://github.com/ChenYilong/CYLTabBarController/issues/512) |
-| 只显示图标：在 `tabBarItemsAttributes` 中省略 `CYLTabBarItemTitle`，库会自动让图标垂直居中，见 README [让 TabBarItem 仅显示图标并使图标垂直居中](../README.md#cn让-tabbaritem-仅显示图标并使图标垂直居中)。 | Icons only: omit `CYLTabBarItemTitle` from `tabBarItemsAttributes` and the library centers the icon vertically; see [Display only icons in TabBarItems and center them vertically](../README.md#endisplay-only-icons-in-tabbaritems-and-center-them-vertically) in the README. |
+| 只显示图标：在 `tabBarItemsAttributes` 中省略 `CYLTabBarItemTitle`，库会自动让图标垂直居中，见 README [让 TabBarItem 仅显示图标并使图标垂直居中](Usage-Guide.md#cn让-tabbaritem-仅显示图标并使图标垂直居中)。 | Icons only: omit `CYLTabBarItemTitle` from `tabBarItemsAttributes` and the library centers the icon vertically; see [Display only icons in TabBarItems and center them vertically](Usage-Guide.md#endisplay-only-icons-in-tabbaritems-and-center-them-vertically) in the README. |
 | 只显示文字：不传图片时，库会使用占位图（`+[UIImage cyl_tabItemPlaceholderImage]`）以保证布局，可用 `CYLTabBarItemTitlePositionAdjustment` 把文字移到垂直居中的位置；也可以把文字做成图片，按「只显示图标」的方式处理。 | Titles only: without an image, the library uses a placeholder image (`+[UIImage cyl_tabItemPlaceholderImage]`) to keep the layout. Move the title to the vertical center with `CYLTabBarItemTitlePositionAdjustment`, or render the text as an image and treat it as an icon. |
 
 ### [CN]能否让图标和标题水平排列（图标在左、标题在右）？
@@ -283,7 +286,7 @@ tabBarController.tabBar.itemPositioning = UITabBarItemPositioningFill;
 | 中文 | English |
 |:---|:---|
 | 来源：[#545](https://github.com/ChenYilong/CYLTabBarController/issues/545) | Source: [#545](https://github.com/ChenYilong/CYLTabBarController/issues/545) |
-| `selectionIndicatorImage` 由系统按 item 的区域绘制，不会随标题偏移移动。需要在图片本身预留偏移；自定义选中背景的做法见 README [如何添加选中背景色？](../README.md#cn如何添加选中背景色)。 | The system draws `selectionIndicatorImage` over the item's area; it does not follow the title offset. Build the offset into the image itself; for a custom selected background, see [How can I add a selected background color?](../README.md#enhow-can-i-add-a-selected-background-color) in the README. |
+| `selectionIndicatorImage` 由系统按 item 的区域绘制，不会随标题偏移移动。需要在图片本身预留偏移；自定义选中背景的做法见 README [如何添加选中背景色？](FAQ.md#cn如何添加选中背景色)。 | The system draws `selectionIndicatorImage` over the item's area; it does not follow the title offset. Build the offset into the image itself; for a custom selected background, see [How can I add a selected background color?](FAQ.md#enhow-can-i-add-a-selected-background-color) in the README. |
 
 ### [CN]未选中的图标被染成灰色，与设计图不一致；`unselectedItemTintColor` 无效
 ### [EN]Unselected icons are tinted gray instead of the designed colors; `unselectedItemTintColor` has no effect
@@ -295,7 +298,7 @@ tabBarController.tabBar.itemPositioning = UITabBarItemPositioningFill;
 | 1. 在 `tabBarItemsAttributes` 中传图片名（NSString）而不是 UIImage（推荐）：库会按原图渲染，并自动加载深色图片，#465 正是这样解决的；或 | 1. Pass the image name (NSString) instead of a UIImage in `tabBarItemsAttributes` (recommended): the library renders it as original and loads its dark image, which is how #465 was solved; or |
 | 2. 在 Asset Catalog 中把图片的 Render As 设为 Original Image；或 | 2. Set Render As to Original Image for the image in the asset catalog; or |
 | 3. 代码中使用 `[image imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal]`。 | 3. Use `[image imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal]` in code. |
-| 两种形式的区别见 README [图片传名称还是 UIImage](../README.md#cn图片传名称nsstring还是-uiimage)。 | See [Image names or UIImage objects](../README.md#enimage-names-nsstring-or-uiimage-objects) in the README for the differences. |
+| 两种形式的区别见 README [图片传名称还是 UIImage](Usage-Guide.md#cn图片传名称nsstring还是-uiimage)。 | See [Image names or UIImage objects](Usage-Guide.md#enimage-names-nsstring-or-uiimage-objects) in the README for the differences. |
 | 只希望改变颜色时，使用模板图片并设置 `unselectedItemTintColor`。 | To change only the color, use template images and set `unselectedItemTintColor`. |
 
 ### [CN]iOS 13 起，`[[UITabBarItem appearance] setTitleTextAttributes:...]` 设置的文字颜色、字体不生效
@@ -329,7 +332,7 @@ if (@available(iOS 13.0, *)) {
 | 中文 | English |
 |:---|:---|
 | 来源：[#518](https://github.com/ChenYilong/CYLTabBarController/issues/518)、[#258](https://github.com/ChenYilong/CYLTabBarController/issues/258) | Source: [#518](https://github.com/ChenYilong/CYLTabBarController/issues/518), [#258](https://github.com/ChenYilong/CYLTabBarController/issues/258) |
-| `self.title` 会同时修改导航栏标题和 TabBarItem 标题。请改用 `self.navigationItem.title`，见 README [ViewController 标题与 TabBar 标题不一致](../README.md#cnviewcontroller-标题与-tabbar-标题不一致)。 | `self.title` sets both the navigation bar title and the TabBarItem title. Use `self.navigationItem.title` instead; see [The ViewController title does not match the TabBar title](../README.md#enthe-viewcontroller-title-does-not-match-the-tabbar-title) in the README. |
+| `self.title` 会同时修改导航栏标题和 TabBarItem 标题。请改用 `self.navigationItem.title`，见 README [ViewController 标题与 TabBar 标题不一致](FAQ.md#cnviewcontroller-标题与-tabbar-标题不一致)。 | `self.title` sets both the navigation bar title and the TabBarItem title. Use `self.navigationItem.title` instead; see [The ViewController title does not match the TabBar title](FAQ.md#enthe-viewcontroller-title-does-not-match-the-tabbar-title) in the README. |
 | 典型现象（[#258](https://github.com/ChenYilong/CYLTabBarController/issues/258)）：第一次切换到某个 Tab 时，底部文字闪一下，然后变成这个页面的导航栏标题。原因是 Tab 的页面在第一次被选中时才执行 `viewDidLoad`，其中的 `self.title = ...` 由 UIKit 同步写入 `tabBarItem.title`（页面是导航控制器的根页面时，也会写入导航控制器的 `tabBarItem`），TabBar 随之重新布局，文字就变了。这是 UIKit 的行为，CYLTabBarController 在切换 Tab 时不会修改 Tab 的文字。 | Typical symptom ([#258](https://github.com/ChenYilong/CYLTabBarController/issues/258)): the first time a tab is selected, its title flickers and then turns into that page's navigation bar title. The tab's page runs `viewDidLoad` only when it is first selected, and the `self.title = ...` in it is copied by UIKit into `tabBarItem.title` (and into the navigation controller's `tabBarItem` when the page is its root), so the TabBar lays out again with the new text. This is UIKit behavior; CYLTabBarController does not change tab titles when switching tabs. |
 | 解决：在页面中只设置 `navigationItem.title`；Tab 的文字只通过 `tabBarItemsAttributes` 的 `CYLTabBarItemTitle` 设置。如果必须使用 `self.title`，请让它和 `CYLTabBarItemTitle` 完全相同。Swift Demo（`Example-Swift-03`、`Example-Swift-Carthage`、`Example-SwiftUI`）已改为 `navigationItem.title`。 | Fix: in the page, set only `navigationItem.title`; set the tab text only through `CYLTabBarItemTitle` in `tabBarItemsAttributes`. If you must use `self.title`, make it exactly equal to `CYLTabBarItemTitle`. The Swift demos (`Example-Swift-03`, `Example-Swift-Carthage`, `Example-SwiftUI`) now use `navigationItem.title`. |
 
@@ -372,7 +375,7 @@ override func viewDidLoad() {
 | iOS 13 起不要通过 KVC 修改 TabBar 内部视图，可以： | Since iOS 13, don't modify the TabBar's internal views through KVC. Instead: |
 | 1. 使用 `UITabBarAppearance` 的 `backgroundImage`（配合 `backgroundImageContentMode`）设置背景； | 1. Set the background with `backgroundImage` (and `backgroundImageContentMode`) on `UITabBarAppearance`. |
 | 2. 凸起部分超出 TabBar 时，在 `tabBar` 上插入一个 `y` 为负值的 `UIImageView` 显示凸起部分。 | 2. For a part that rises above the TabBar, insert a `UIImageView` with a negative `y` into `tabBar`. |
-| 全面屏机型的 TabBar 更高（含底部安全区），图片需按实际高度适配，或使用可拉伸图片。超出 TabBar 的区域默认不响应点击，见 README [凸起的图标超出 49pt 后无法响应](../README.md#cn凸起的图标超出-49pt-后无法响应)。 | On devices without a Home button the TabBar is taller (it includes the bottom safe area), so fit the image to the real height or use a resizable image. Areas outside the TabBar don't receive taps; see [A raised icon does not respond above 49pt](../README.md#ena-raised-icon-does-not-respond-above-49pt) in the README. |
+| 全面屏机型的 TabBar 更高（含底部安全区），图片需按实际高度适配，或使用可拉伸图片。超出 TabBar 的区域默认不响应点击，见 README [凸起的图标超出 49pt 后无法响应](FAQ.md#cn凸起的图标超出-49pt-后无法响应)。 | On devices without a Home button the TabBar is taller (it includes the bottom safe area), so fit the image to the real height or use a resizable image. Areas outside the TabBar don't receive taps; see [A raised icon does not respond above 49pt](FAQ.md#ena-raised-icon-does-not-respond-above-49pt) in the README. |
 
 ### [CN]iOS 13 起用 KVC 设置 TabBar 会崩溃吗？
 ### [EN]Does setting TabBar properties through KVC crash since iOS 13?
@@ -390,7 +393,7 @@ override func viewDidLoad() {
 | 来源：[#540](https://github.com/ChenYilong/CYLTabBarController/issues/540)、[#517](https://github.com/ChenYilong/CYLTabBarController/issues/517)、[#552](https://github.com/ChenYilong/CYLTabBarController/issues/552)、[#486](https://github.com/ChenYilong/CYLTabBarController/issues/486) | Source: [#540](https://github.com/ChenYilong/CYLTabBarController/issues/540), [#517](https://github.com/ChenYilong/CYLTabBarController/issues/517), [#552](https://github.com/ChenYilong/CYLTabBarController/issues/552), [#486](https://github.com/ChenYilong/CYLTabBarController/issues/486) |
 | 颜色：使用动态颜色，例如系统的 `systemBackgroundColor`，或库提供的 `cyl_systemBackgroundColor`、`cyl_labelColor` 等（见 `UIColor+CYLTabBarControllerExtention.h`）；指定浅色和深色两种颜色时，新版本可用 `+[UIColor cyl_colorWithLightColor:darkColor:]`。不要在设置颜色时自行判断当前模式后传入固定颜色，此时得到的 trait 可能是 `unspecified`（#552 的原因）。 | Colors: use dynamic colors, such as the system `systemBackgroundColor` or the library's `cyl_systemBackgroundColor`, `cyl_labelColor` and others (see `UIColor+CYLTabBarControllerExtention.h`); for a light and a dark color, newer versions add `+[UIColor cyl_colorWithLightColor:darkColor:]`. Don't check the current mode yourself and pass a fixed color: at that point the trait may still be `unspecified` (the cause of #552). |
 | 图片：在 Asset Catalog 中为图片添加 Dark 外观，再在 `tabBarItemsAttributes` 中传入图片名；新版本中也可以按命名规范提供 `<图片名>_dark`（传图片名时自动加载），或用 `+[UIImage cyl_imageWithLightImage:darkImage:]` 把两张图合成一张会自动切换的图片，不必在 `-traitCollectionDidChange:` 中手动替换（[#486](https://github.com/ChenYilong/CYLTabBarController/issues/486#issuecomment-698183206) 中的旧做法）。 | Images: add a Dark appearance to the image in the asset catalog, and pass the image name in `tabBarItemsAttributes`; in newer versions, also provide `<name>_dark` by naming convention (loaded automatically with the name), or combine two images into one that switches by itself with `+[UIImage cyl_imageWithLightImage:darkImage:]`, instead of replacing them in `-traitCollectionDidChange:` (the older workaround in [#486](https://github.com/ChenYilong/CYLTabBarController/issues/486#issuecomment-698183206)). |
-| 详见 README [适配深色模式](../README.md#cn适配深色模式)。 | See [Supporting Dark Mode](../README.md#ensupporting-dark-mode) in the README. |
+| 详见 README [适配深色模式](Usage-Guide.md#cn适配深色模式)。 | See [Supporting Dark Mode](Usage-Guide.md#ensupporting-dark-mode) in the README. |
 
 ### [CN]App 不需要深色模式；手动设置 window 的 overrideUserInterfaceStyle 后图片仍跟随系统
 ### [EN]The app doesn't support Dark Mode; images still follow the system after setting the window's overrideUserInterfaceStyle
@@ -439,7 +442,7 @@ if (@available(iOS 13.0, *)) {
 | 中文 | English |
 |:---|:---|
 | 来源：[#425](https://github.com/ChenYilong/CYLTabBarController/issues/425) | Source: [#425](https://github.com/ChenYilong/CYLTabBarController/issues/425) |
-| 新版本提供了 `CYLBadgeAppearance`，在显示角标之前统一设置一次即可，对象上单独设置的值仍然优先。详见 README [全局设置角标样式](../README.md#cn全局设置角标样式)。 | Newer versions add `CYLBadgeAppearance`: set it once before showing badges; a value set on an object still wins. See [Setting the badge style globally](../README.md#ensetting-the-badge-style-globally) in the README. |
+| 新版本提供了 `CYLBadgeAppearance`，在显示角标之前统一设置一次即可，对象上单独设置的值仍然优先。详见 README [全局设置角标样式](Usage-Guide.md#cn全局设置角标样式)。 | Newer versions add `CYLBadgeAppearance`: set it once before showing badges; a value set on an object still wins. See [Setting the badge style globally](Usage-Guide.md#ensetting-the-badge-style-globally) in the README. |
 
 ```Objective-C
 [CYLBadgeAppearance globalAppearance].backgroundColor = [UIColor systemPinkColor];
@@ -461,8 +464,8 @@ if (@available(iOS 13.0, *)) {
 | 中文 | English |
 |:---|:---|
 | 来源：[#404](https://github.com/ChenYilong/CYLTabBarController/issues/404) | Source: [#404](https://github.com/ChenYilong/CYLTabBarController/issues/404) |
-| 常见原因是子类在 `-init` 中创建了另一个 CYLTabBarController 并返回它（旧版 README 的写法）：App 显示的是那个普通实例，子类的 `-viewDidLoad` 中设置的 block 落在被丢弃的对象上，永远不会执行。请按 README [第二步](../README.md#cn第二步设置-cyltabbarcontroller-的两个数组) 通过 `[super initWithViewControllers:…]` 初始化。 | The usual cause is a subclass whose `-init` creates and returns another CYLTabBarController (as the old README did): the app shows that plain instance, and the block set in the subclass's `-viewDidLoad` lands on a discarded object and never runs. Initialize through `[super initWithViewControllers:…]` as in [Step 2](../README.md#enstep-2-configure-the-view-controller-and-tab-bar-item-attribute-arrays) of the README. |
-| 显示或更新 Tab 角标请改用 `-reloadBadgesWithBlock:`：可随时、多次调用，Tab 按钮就绪后执行，无需 `dispatch_after`。once-block 只保存一个 block，且在 TabBar 已完成布局后设置的可能不再执行。详见 README [更新 Tab 角标](../README.md#cn更新-tab-角标)。 | To show or update tab badges, use `-reloadBadgesWithBlock:` instead: call it any time, as often as needed; it runs once the tab buttons exist, with no `dispatch_after`. The once-block holds a single block, and one set after the tab bar was laid out may never run. See [Updating tab badges](../README.md#enupdating-tab-badges) in the README. |
+| 常见原因是子类在 `-init` 中创建了另一个 CYLTabBarController 并返回它（旧版 README 的写法）：App 显示的是那个普通实例，子类的 `-viewDidLoad` 中设置的 block 落在被丢弃的对象上，永远不会执行。请按 README [第二步](Usage-Guide.md#cn第二步设置-cyltabbarcontroller-的两个数组) 通过 `[super initWithViewControllers:…]` 初始化。 | The usual cause is a subclass whose `-init` creates and returns another CYLTabBarController (as the old README did): the app shows that plain instance, and the block set in the subclass's `-viewDidLoad` lands on a discarded object and never runs. Initialize through `[super initWithViewControllers:…]` as in [Step 2](Usage-Guide.md#enstep-2-configure-the-view-controller-and-tab-bar-item-attribute-arrays) of the README. |
+| 显示或更新 Tab 角标请改用 `-reloadBadgesWithBlock:`：可随时、多次调用，Tab 按钮就绪后执行，无需 `dispatch_after`。once-block 只保存一个 block，且在 TabBar 已完成布局后设置的可能不再执行。详见 README [更新 Tab 角标](Usage-Guide.md#cn更新-tab-角标)。 | To show or update tab badges, use `-reloadBadgesWithBlock:` instead: call it any time, as often as needed; it runs once the tab buttons exist, with no `dispatch_after`. The once-block holds a single block, and one set after the tab bar was laid out may never run. See [Updating tab badges](Usage-Guide.md#enupdating-tab-badges) in the README. |
 
 ## [CN]7. Lottie 动画
 ## [EN]7. Lottie animations
@@ -650,3 +653,248 @@ lottieAnimationSpeed = 1.5
 |:---|:---|
 | 来源：[#595](https://github.com/ChenYilong/CYLTabBarController/issues/595) | Source: [#595](https://github.com/ChenYilong/CYLTabBarController/issues/595) |
 | 该 issue 只有模板内容，没有描述问题。如有疑问，请重新提交并补充具体描述。 | The issue contains only the template, with no question. Please open a new issue with a description. |
+
+## [CN]11. 来自 README 的问答
+## [EN]11. Questions moved from the README
+
+| 中文 | English |
+|:---|:---|
+| 以下问答原在 README 的「常见问题」一节，现移到本页。 | The questions below used to be in the README's FAQ section and now live here. |
+
+
+| 中文 | English |
+|:---|:---|
+| 更多问答请查看 [docs/FAQ.md](FAQ.md)，其中整理了 Issues 中的使用问答（原 issue 见 [Q-A 标签](https://github.com/ChenYilong/CYLTabBarController/issues?q=label%3AQ-A)）。 | For more questions and answers, see [docs/FAQ.md](FAQ.md), which collects the usage questions from Issues (the original issues are under the [Q-A label](https://github.com/ChenYilong/CYLTabBarController/issues?q=label%3AQ-A)). |
+
+### [CN]为什么放置 6 个 TabBarItem 会显示异常？
+### [EN]Why does placing six TabBarItems behave unexpectedly?
+
+| 中文 | English |
+|:---|:---|
+| Apple 规定，一个 `TabBar` 最多显示 5 个 `TabBarItem`，第六个及之后的项目不会显示。 | Apple allows a maximum of five `TabBarItem` instances in a `TabBar`; additional items are hidden. |
+
+| 中文 | English |
+|:---|:---|
+| Apple 检测的是 `UITabBarItem` 及其子类。由于 PlusButton 是 `UIButton`，它不计入这五个项目。 | Because PlusButton is a `UIButton`, it is not counted as one of those five items. |
+
+| 中文 | English |
+|:---|:---|
+| 因此，一个 TabBar 最多可以放置 5 个 TabBarItem 和 1 个 PlusButton。 | The practical limit is therefore five TabBarItems plus one PlusButton. |
+
+### [CN]按钮响应区域发生偏移
+### [EN]The button hit area is offset
+
+| 中文 | English |
+|:---|:---|
+| 我把 Demo 两侧的 item 各去掉一个后，按钮的响应区域变成了下图的样子： | After removing one item from each side of the demo, the button hit area looked like this: |
+
+<p align="center"><a href="https://mp.weixin.qq.com/s/A4e5h3xgIEh6PInf1Rjqsw"><img src="https://cloud.githubusercontent.com/assets/12152553/10725491/62600172-7c07-11e5-9e0a-0ec7d795d1e3.jpeg"></a></p>
+
+| 中文 | English |
+|:---|:---|
+| v1.5.5 已修复该问题，不会再出现点击区域无响应或响应区域偏移。 | This was fixed in v1.5.5; the hit area should no longer be offset. |
+
+### [CN]如何添加选中背景色？
+### [EN]How can I add a selected background color?
+
+<p align="center"><a href="https://mp.weixin.qq.com/s/A4e5h3xgIEh6PInf1Rjqsw"><img src="https://cloud.githubusercontent.com/assets/7238866/10777333/5d7811c8-7d55-11e5-88be-8cb11bbeaf90.png"></a></p>
+
+| 中文 | English |
+|:---|:---|
+| Demo 中已提供实现代码，详见 `CYLTabBarControllerConfig` 的以下方法： | The demo includes an implementation in `CYLTabBarControllerConfig`: |
+
+ ```Objective-C
+/**
+ *  更多TabBar自定义设置：比如：tabBarItem 的选中和不选中文字和背景图片属性、tabbar 背景图片属性
+ */
+- (void)customizeTabBarAppearance:(CYLTabBarController *)tabBarController;
+
+ ```
+
+| 中文 | English |
+|:---|:---|
+| 效果如下： | The result is shown below: |
+
+<p align="center"><a href="https://mp.weixin.qq.com/s/A4e5h3xgIEh6PInf1Rjqsw"><img src="https://cloud.githubusercontent.com/assets/2911921/10779397/34956b0a-7d6b-11e5-82d9-fa75aa34e8d0.png"></a></p>
+
+### [CN]ViewController 标题与 TabBar 标题不一致
+### [EN]The ViewController title does not match the TabBar title
+
+| 中文 | English |
+|:---|:---|
+| 当 `ViewController` 的 `self.title` 与 `tabBarItemsAttributes` 中的 `title` 不一致时，可能导致排序异常。 | If `self.title` differs from the corresponding `tabBarItemsAttributes` title, the order may appear incorrect. |
+
+| 中文 | English |
+|:---|:---|
+| v1.0.7 已修复相关 bug，但仍建议不要使用 `self.title` 设置导航栏标题。 | This bug was fixed in v1.0.7, but do not use `self.title` to set the navigation bar title. |
+
+| 中文 | English |
+|:---|:---|
+| 请使用 `self.navigationItem.title = @"同城";`： | Use `self.navigationItem.title = @"同城";`: |
+| 切换 Tab 时底部文字闪动、或变成导航栏标题（[#258](https://github.com/ChenYilong/CYLTabBarController/issues/258)），也是 `self.title` 导致的：页面第一次被选中时才执行 `viewDidLoad`，UIKit 把其中的 `self.title` 同步写入 `tabBarItem.title`。详见 [FAQ](FAQ.md#cn页面里设置-selftitle-后tab-的文字也变了)。 | A tab title that flickers when switching tabs, or turns into the navigation bar title ([#258](https://github.com/ChenYilong/CYLTabBarController/issues/258)), is also caused by `self.title`: the page runs `viewDidLoad` only when first selected, and UIKit copies its `self.title` into `tabBarItem.title`. See the [FAQ](FAQ.md#ensetting-selftitle-in-a-page-also-changes-the-tab-title). |
+
+| 中文 | English |
+|:---|:---|
+| `self.title = @"同城";  ` 这种方式，如果和 `tabBarItemsAttributes` 中对应的 `title` 不一致的时候可能会导致如下现象（不算 bug，但看起来也很奇怪）： | If `self.title = @"同城";` differs from the corresponding `tabBarItemsAttributes` title, the following strange-looking behavior may occur (this is not technically a bug): |
+
+<p align="center"><a href="https://mp.weixin.qq.com/s/A4e5h3xgIEh6PInf1Rjqsw"><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g6ur9yhnqej30ac01pq2z.jpg"></a></p>
+
+| 中文 | English |
+|:---|:---|
+| 推荐规则如下： | Recommended usage: |
+
+ ```Objective-C
+
+    self.navigationItem.title = @"同城";    //✅sets navigation bar title.The right way to set the title of the navigation
+    self.tabBarItem.title = @"同城";   //❌sets tab bar title. Even the `tabBarItem.title` changed, this will be ignored in  tabbar.
+    self.title = @"同城1";                  //❌sets both of these. Do not do this‼️‼️ This may cause something strange like this : http://i68.tinypic.com/282l3x4.jpg
+
+ ```
+
+### [CN]调用 `cyl_popSelectTabBarChildViewControllerAtIndex:` 时出现黑边
+### [EN]Black borders appear when calling `cyl_popSelectTabBarChildViewControllerAtIndex:`
+
+<p align="center"><a href="https://mp.weixin.qq.com/s/A4e5h3xgIEh6PInf1Rjqsw"><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g6ur5d01x6j30af0ijmy6.jpg"></a></p>
+
+| 中文 | English |
+|:---|:---|
+| 这是早期 iOS 系统的问题，测试表明 iOS 9.3 已修复。 | This was an issue on older iOS versions; testing shows that it was fixed in iOS 9.3. |
+| 在受影响的旧版本上，可以将根窗口背景色设置为白色： | On affected older iOS versions, set the root window background color to white: |
+
+ ```Objective-C
+//#import "CYLTabBarController.h"
+    [[self cyl_tabBarController] rootWindow].backgroundColor = [UIColor whiteColor];
+ ```
+
+### [CN]iPhone Duo 展开横屏时左右出现黑边
+### [EN]Black bars on the left and right of the unfolded iPhone Duo in landscape
+
+| 中文 | English |
+|:---|:---|
+| 这是系统行为，与 TabBar 无关（#719、#680）。App 不支持横屏时，展开的 iPhone Duo 横放会把 App 当作竖屏窗口显示在屏幕中间，两侧留黑。只勾选 Portrait 时就是这种情况。 | This is system behavior, not the tab bar (#719, #680). When an app does not support landscape, the unfolded iPhone Duo held in landscape shows it as a portrait window in the middle of the screen, with black bars on both sides. Checking only Portrait does exactly this. |
+| 要铺满内屏，需要同时满足下面三项： | To fill the inner screen, do all three: |
+| 1. **启动屏有效**：`Info.plist` 使用 `UILaunchScreen`（iOS 14+），或者 `UILaunchStoryboardName` 指向一个专用的启动 storyboard。名称不带 `.storyboard` 扩展名，storyboard 里不能有自定义类，并且用 Auto Layout 适配任意尺寸。不要把 `Main.storyboard` 当作启动屏。 | 1. **A valid launch screen**: `UILaunchScreen` in `Info.plist` (iOS 14+), or `UILaunchStoryboardName` naming a dedicated launch storyboard. Give the name without the `.storyboard` extension, use no custom classes, and lay it out with Auto Layout for any size. Do not use `Main.storyboard` as the launch screen. |
+| 2. **`Info.plist` 声明横屏**：`UISupportedInterfaceOrientations` 包含 `LandscapeLeft` 和 `LandscapeRight`。系统只会在这里声明过的方向中选择，代码返回的方向不能超出这个范围。 | 2. **Landscape in `Info.plist`**: `UISupportedInterfaceOrientations` includes `LandscapeLeft` and `LandscapeRight`. The system only picks from these, so code cannot return an orientation missing here. |
+| 3. **运行时允许横屏**：如果实现了 `application:supportedInterfaceOrientationsForWindow:` 或 `supportedInterfaceOrientations`，在可折叠设备上返回包含横屏的值。 | 3. **Allow landscape at run time**: if you implement `application:supportedInterfaceOrientationsForWindow:` or `supportedInterfaceOrientations`, return a mask with landscape on foldable devices. |
+| 普通 iPhone 仍想只用竖屏：在 `Info.plist` 中保留横屏，在代码中默认返回竖屏，检测到铰链（只有可折叠设备会报告）后再放开横屏。Demo 就是这样做的，见 `Example/CYLMainRootViewController.m` 和 `Example/ AppDelegate.m`： | To keep other iPhones portrait-only, keep landscape in `Info.plist`, return portrait in code by default, and allow landscape once a hinge is reported (only foldable devices report one). The demo does this; see `Example/CYLMainRootViewController.m` and `Example/ AppDelegate.m`: |
+
+ ```Objective-C
+// AppDelegate.m
+- (UIInterfaceOrientationMask)application:(UIApplication *)application supportedInterfaceOrientationsForWindow:(UIWindow *)window {
+    return self.supportsLandscapeOnFoldableDevice ? UIInterfaceOrientationMaskAllButUpsideDown : UIInterfaceOrientationMaskPortrait;
+}
+
+// Root view controller, -viewDidLoad
+if (@available(iOS 27.1, *)) {
+    __weak __typeof(self) weakSelf = self;
+    UIHingeInteraction *hingeInteraction = [[UIHingeInteraction alloc] initWithUpdateHandler:^(UIHingeInteraction *interaction, UIHingeInteractionUpdate *update) {
+        AppDelegate *appDelegate = (AppDelegate *)UIApplication.sharedApplication.delegate;
+        if (!update.hinge || appDelegate.supportsLandscapeOnFoldableDevice) { return; }
+        appDelegate.supportsLandscapeOnFoldableDevice = YES;
+        [weakSelf setNeedsUpdateOfSupportedInterfaceOrientations];
+    }];
+    [self.view addInteraction:hingeInteraction];
+}
+ ```
+
+| 中文 | English |
+|:---|:---|
+| 横屏时希望 TabBar 显示在右侧竖向栏，再设置 `tabBarController.allowsVerticalBar = YES;`。 | To show the tab bar in the trailing vertical bar in landscape, also set `tabBarController.allowsVerticalBar = YES;`. |
+
+### [CN]凸起的图标超出 49pt 后无法响应
+### [EN]A raised icon does not respond above 49pt
+
+| 中文 | English |
+|:---|:---|
+| 库会自动处理，但只能保证 `UIButton` frame 内的区域可以响应。 | The library handles this automatically, but only the `UIButton` frame is guaranteed to receive taps. |
+
+| 中文 | English |
+|:---|:---|
+| 请给 button 设置明显的背景色以确认实际 frame。红色区域可以响应，超出 button frame 的图片区域不能响应。 | Use a visible background color to inspect the button frame. The button area receives taps; image pixels outside the frame do not. |
+
+<p align="center"><a href="https://mp.weixin.qq.com/s/A4e5h3xgIEh6PInf1Rjqsw"><img src="https://tva1.sinaimg.cn/large/006y8mN6ly1g6ur67tddnj30yi0c6abk.jpg"></a></p>
+
+| 中文 | English |
+|:---|:---|
+| 这是因为响应链中的 `UIControl` 可以响应点击，而 `UIImage` 不能。 | This is because `UIControl` participates in hit testing, while `UIImage` does not. |
+
+### [CN]为什么 iOS 10 会崩溃而 iOS 9 不会？
+### [EN]Why does it crash on iOS 10 but not iOS 9?
+
+| 中文 | English |
+|:---|:---|
+| 注册 PlusButton 时，必须在 `-application:didFinishLaunchingWithOptions:` 中调用 `[YourClass registerPlusButton]`。 | Register the PlusButton by calling `[YourClass registerPlusButton]` from `-application:didFinishLaunchingWithOptions:`. |
+
+| 中文 | English |
+|:---|:---|
+| 不要在子类的 `+load` 方法中调用，否则在 iOS 10 上可能崩溃。 | Do not call it from the subclass `+load` method, as this may crash on iOS 10. |
+
+ ```Objective-C
+ + (void)load {
+    [super registerPlusButton];
+}
+ ```
+
+### [CN]PlusButton 选中后无法恢复为 normal
+### [EN]PlusButton remains selected after selecting another tab
+
+| 中文 | English |
+|:---|:---|
+| 通常有两种原因： | There are two common causes: |
+
+| 中文 | English |
+|:---|:---|
+| `tabBar` 设置了自定义 delegate，覆盖了默认状态切换逻辑。请在 delegate 中手动同步状态。 | A custom `tabBar` delegate may override the default selection handling. Synchronize the state manually: |
+
+ ```Objective-C
+- (BOOL)tabBarController:(UITabBarController *)tabBarController shouldSelectViewController:(UIViewController *)viewController {
+    [[self cyl_tabBarController] updateSelectionStatusIfNeededForTabBarController:tabBarController shouldSelectViewController:viewController];
+    return YES;
+}
+ ```
+
+| 中文 | English |
+|:---|:---|
+| PlusButton 添加了自定义点击事件或手势，与库内置逻辑冲突。请移除自定义 `addTarget` 或手势。 | A custom action or gesture may conflict with the library. Remove the custom `addTarget` or gesture. |
+
+### [CN]PlusButton 与其他 TabBarItem 的间距不均匀
+### [EN]The PlusButton is not evenly spaced
+
+| 中文 | English |
+|:---|:---|
+| 对应 [issue #36](https://github.com/ChenYilong/CYLTabBarController/issues/36#issuecomment-269165471)。 | See [issue #36](https://github.com/ChenYilong/CYLTabBarController/issues/36#issuecomment-269165471). |
+
+| 中文 | English |
+|:---|:---|
+| 将 Demo 中的： | Replace this in the demo: |
+
+ ```Objective-C
+[button sizeToFit];
+ ```
+
+| 中文 | English |
+|:---|:---|
+| 改为： | Replace it with: |
+
+ ```Objective-C
+button.frame = CGRectMake(0.0, 0.0, w, h);
+ ```
+
+| 中文 | English |
+|:---|:---|
+| 如果只放置一个相机图标，尺寸应以设计稿为准。 | For a camera-only icon, use the size specified by your design. |
+
+| 中文 | English |
+|:---|:---|
+| 通常可以使用与其他 TabBarItem 相同的宽度： | In most cases, use the same width as the other TabBarItems: |
+
+ ```Objective-C
+ [UIScreen mainScreen].bounds.size.width / [CYLTabBarController allItemsInTabBarCount]
+ ```
+
+### [CN]如何兼容 Lottie 动画？
+### [EN]How do I integrate Lottie animations?
+
+| 中文 | English |
+|:---|:---|
+| Lottie、PAG、Rive 的接入步骤与注意事项见 [docs/Tab-Icon-Animation-Quick-Start.md](Tab-Icon-Animation-Quick-Start.md)，接入前建议先运行对应的 Demo 体验一下。更早的讨论见 [issue #341](https://github.com/ChenYilong/CYLTabBarController/issues/341)。 | For the steps and things to watch for with Lottie, PAG and Rive, see [docs/Tab-Icon-Animation-Quick-Start.md](Tab-Icon-Animation-Quick-Start.md); run the matching demo first to try the effect. Earlier discussion: [issue #341](https://github.com/ChenYilong/CYLTabBarController/issues/341). |

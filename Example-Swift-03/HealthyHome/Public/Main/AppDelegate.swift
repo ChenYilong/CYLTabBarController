@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import CYLTabBarController
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {

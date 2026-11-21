@@ -1,0 +1,41 @@
+<!-- [EN] An animated icon (or an image) with its badge, and a title. [CN] 动画图标（或图片）与角标，以及标题。 -->
+<view
+  class="cyl-item cyl-item-style-{{cylItemStyle}} {{isDark ? 'cyl-item-dark' : ''}} {{m.selected ? 'cyl-item-selected' : ''}} {{m.centered ? 'cyl-item-centered' : ''}} {{animationClass}}"
+  hover-class="cyl-item-pressed"
+  hover-stay-time="120"
+  style="{{m.itemStyle}}"
+  bindtap="cyl_onTap"
+  aria-hidden="true"
+>
+  <!-- [EN] Liquid Glass: the lens behind the selected icon and title (decoration). [CN] 液态玻璃：选中图标与标题后的透镜（装饰）。 -->
+  <cyl-glass-lens wx:if="{{cylItemStyle === 'liquidGlass' && m.selected}}" class="cyl-item-glass-lens" is-dark="{{isDark}}" lens-style="{{glassLensStyle}}" aria-hidden="true" />
+  <view wx:if="{{m.image || m.animationPath}}" class="cyl-item-icon-box" style="{{m.iconBoxStyle}}">
+    <!-- [EN] The icon is cyl-animated-item (docs/Animated-Item.md): every animation type it knows (Lottie, PAG, Rive,
+         SVGA, GIF), and the static image or the placeholder when the engine is missing or fails.
+         [CN] 图标由 cyl-animated-item 绘制（docs/Animated-Item.md）：支持其所有动画类型（Lottie、PAG、Rive、SVGA、GIF），引擎缺失或失败时显示静态图片或占位图。 -->
+    <cyl-animated-item
+      id="cyl-item-icon"
+      class="cyl-item-animation"
+      bare="{{true}}"
+      accessibility-hidden="{{true}}"
+      image="{{m.image}}"
+      animation-url="{{m.animationPath}}"
+      selected="{{m.selected}}"
+      icon-width="{{m.iconWidth}}"
+      icon-height="{{m.iconHeight}}"
+      icon-tint="{{m.iconTint}}"
+      animation-tint="{{m.animationTint}}"
+      colors="{{animationColors}}"
+      loop="{{animationLoop || (!m.selected && loopsWhenUnselected)}}"
+      speed="{{animationSpeed}}"
+      autoplay="{{!m.selected && loopsWhenUnselected}}"
+      generic:cyl-lottie-view="cyl-lottie-view"
+      generic:cyl-pag-view="cyl-pag-view"
+      generic:cyl-rive-view="cyl-rive-view"
+      generic:cyl-svga-view="cyl-svga-view"
+    />
+    <text wx:if="{{m.showsBadge && !m.badgeIsDot}}" class="cyl-item-badge {{m.badgeClass}}" style="{{m.badgeStyle}}">{{m.badgeText}}</text>
+    <view wx:if="{{m.showsBadge && m.badgeIsDot}}" class="cyl-item-badge-dot {{m.badgeClass}}" style="{{m.badgeStyle}}"></view>
+  </view>
+  <text wx:if="{{m.title}}" class="cyl-item-title" style="{{m.titleStyle}}">{{m.title}}</text>
+</view>

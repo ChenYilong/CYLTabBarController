@@ -124,6 +124,7 @@
 "有新内容" = "Uutta sisältöä";
 "%@ 条新消息" = "%@ uutta viestiä";
 "加号按钮" = "Plus-painike";
+"更多" = "Lisää";
 "模拟内存警告" = "Simuloi muistivaroitus";
 "卸载未选中的 Tab，切换时重新加载" = "Vapauttaa valitsemattomat välilehdet; ne ladataan uudelleen valittaessa";
 "内存警告" = "Muistivaroitus";
@@ -368,3 +369,12 @@
 "网络图标、标题与配色" = "Verkkokuvakkeet, otsikot ja värit";
 /* The settings group of the configuration file rows (docs/Configuration-File.md). */
 "配置文件" = "Määritystiedosto";
+/* Scroll hiding simulations (issue #13): kind labels and title prefixes; API names stay English. */
+"恢复" = "Palauta";
+"保持" = "Säilytä";
+"不适用" = "Ei sovellu";
+"手动" = "Manuaalinen";
+"自测" = "Itsetesti";
+"手动：%@" = "Manuaalinen: %@";
+"实测：%@" = "Todellinen: %@";
+"自测：依次运行所有自动模拟，报告 PASS / FAIL" = "Itsetesti: suorita kaikki automaattiset simulaatiot, raportoi PASS / FAIL";

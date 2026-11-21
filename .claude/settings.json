@@ -1,0 +1,6 @@
+{
+  "advisorModel": "claude-opus-5-5",
+  "env": {
+    "CLAUDE_CODE_ATTRIBUTION_HEADER": "0"
+  }
+}

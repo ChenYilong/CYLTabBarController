@@ -1,0 +1,40 @@
+{
+  "string": [
+    {
+      "name": "tab_home",
+      "value": "בית"
+    },
+    {
+      "name": "tab_nearby",
+      "value": "בקרבת מקום"
+    },
+    {
+      "name": "tab_messages",
+      "value": "הודעות"
+    },
+    {
+      "name": "tab_me",
+      "value": "אני"
+    },
+    {
+      "name": "tab_post",
+      "value": "פרסום"
+    },
+    {
+      "name": "tab_refresh",
+      "value": "רענון"
+    },
+    {
+      "name": "module_desc",
+      "value": "CYLTabBarController example"
+    },
+    {
+      "name": "ability_desc",
+      "value": "CYLTabBarController example"
+    },
+    {
+      "name": "app_name",
+      "value": "CYLTabBar"
+    }
+  ]
+}

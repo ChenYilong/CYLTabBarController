@@ -5,13 +5,21 @@ description: "Xcode and iOS version compatibility of CYLTabBarController: projec
 
 # Xcode and iOS compatibility
 
+CI vs local: GitHub CI/CD for iOS runs on macOS 26 by default (read `.github/workflows/ios.yml` on master first; the
+`MACOS_RUNNER` variable can change it), so CI builds with that runner's Xcode. Locally (directly on this Mac, not through
+GitHub CI/CD) the default is macOS 27 with Xcode 27. AGENTS.md, "CI/CD and where tests run".
+Before every local build, check the first line of `.github/workflows/ios.yml`, the local environment comment
+(`# local-run-environment: macOS …, Xcode …`): run `scripts/local-run-environment.sh`, which adds it when missing, leaves it
+when the versions are unchanged and rewrites it when macOS or Xcode differs (Xcode of `/Applications/Xcode.app`).
+
+
 Source of truth: code, then `docs/`, then `README.md`. If they disagree, fix the wrong one first (usually `README.md`), then this skill.
 
 ## Versions at a glance
 
 | Item | Value | Where |
 |:---|:---|:---|
-| Library minimum | podspec iOS 12.0; `LottieSwift` and `CYLFlatDesignTabBar` 13.0; `Rive` 14.0; SPM 13 | `CYLTabBarController.podspec`, `Package.swift` |
+| Library minimum | podspec iOS 15.0 (raised 2026-11-20 from 12.0; every subspec 15.0); SPM 15 | `CYLTabBarController.podspec`, `Package.swift` |
 | Swift | `s.swift_versions = 5.0`, `SWIFT_VERSION = 5.0` in the demos; swift-tools 5.9 | podspec, `Package.swift` |
 | Local Xcode | 27 builds down to iOS 15.0 only, so linting forces 15.0 | `scripts/pod-lint.xcconfig` |
 | CI | `macos-26` (Xcode 26.x) unless the `MACOS_RUNNER` variable says otherwise | `.github/workflows/ios.yml`, [Mac-CI-CD](../../../docs/Mac-CI-CD.md) |
@@ -101,3 +109,7 @@ done
 ## Podfile, app icon, launch screen
 
 Every Xcode project checks its Podfile (top lines `platform :ios, '15.0'`, `ENV['SWIFT_VERSION'] = '5'`, `project '<name>.xcodeproj'`; a `post_install` hook that sets `IPHONEOS_DEPLOYMENT_TARGET` to 15.0 on every pod), and copies the ObjC example's app icon and launch screen when it has none. Full rule and exceptions (one `post_install` only, React Native minimum 15.1): AGENTS.md, "Xcode projects: Podfile, app icon, launch screen".
+
+## Swift first on iOS (added 2026-11-19)
+
+- **The iOS core is Swift; every new piece of code is Swift first (added 2026-11-19, owner)**: the core code of this project on iOS (the CocoaPods / Swift Package Manager / Carthage sources under `CYLTabBarController/`, including the `CYLAnimatedItem` module) is Swift. Write every new class, extension, test and example in Swift. Use Objective-C only where Swift cannot do the job (a header that must stay importable from Objective-C without modules, a `+load`-time hook, a C macro), and give the reason in a comment and in the task's document in `docs/`. Keep the public API usable from Objective-C (`@objc`, `@objcMembers`, `NS_SWIFT_NAME` counterparts) so existing Objective-C callers keep working. When you touch Objective-C code for a new feature, prefer adding the feature in a Swift file over growing the Objective-C file. Migration log: `docs/Swift-Migration.md`. Details: `AGENTS.md`, "Code rules".

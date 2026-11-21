@@ -8,6 +8,32 @@
 #import <XCTest/XCTest.h>
 #import <CYLTabBarController/CYLTabBarController.h>
 #import <CYLTabBarController/CYLTabBar.h>
+#import "CYLTabBarControllerTests-Swift.h"
+
+
+/// [EN] A delegate that refuses the Liquid Glass lens. [CN] 拒绝液态玻璃放大镜的代理。
+@interface CYLLensRefusingDelegate : NSObject <CYLTabBarControllerDelegate>
+@end
+
+@implementation CYLLensRefusingDelegate
+- (BOOL)tabBarController:(CYLTabBarController *)tabBarController shouldShowPlatterLiquidLensViewForControl:(UIControl *)control {
+    return NO;
+}
+@end
+
+/// [EN] A delegate that records `-tabBarController:didSelectControl:`. [CN] 记录 `-tabBarController:didSelectControl:` 的代理。
+@interface CYLDidSelectRecordingDelegate : NSObject <CYLTabBarControllerDelegate>
+@property (nonatomic, strong) NSMutableArray<UIControl *> *controls;
+@end
+
+@implementation CYLDidSelectRecordingDelegate
+- (void)tabBarController:(UITabBarController *)tabBarController didSelectControl:(UIControl *)control {
+    if (!self.controls) {
+        self.controls = [NSMutableArray array];
+    }
+    [self.controls addObject:control];
+}
+@end
 
 @interface CYLTabBarToolkitTests : XCTestCase
 @end
@@ -150,6 +176,88 @@
     XCTAssertFalse(tabBarController.cyl_fixesOpaqueTabBarSafeAreaInsets);
 }
 
+#pragma mark - Reselect and custom tab actions (Swift since step 53)
+
+- (void)testReselectBehaviorIsKept {
+    CYLTabBarController *tabBarController = [self newTabBarController];
+    XCTAssertEqual(tabBarController.cyl_reselectBehavior, CYLTabBarReselectBehaviorNone);
+    tabBarController.cyl_reselectBehavior = CYLTabBarReselectBehaviorPopToRoot | CYLTabBarReselectBehaviorScrollToTop;
+    XCTAssertEqual(tabBarController.cyl_reselectBehavior, CYLTabBarReselectBehaviorPopToRoot | CYLTabBarReselectBehaviorScrollToTop);
+}
+
+/// [EN] Pop to root first; the private selector is reached at run time. [CN] 先返回根页面；私有 selector 在运行时调用。
+- (void)testReselectPopsToRoot {
+    CYLTabBarController *tabBarController = [self newTabBarController];
+    // [EN] In a window: a navigation controller outside one does not pop. [CN] 放入窗口：不在窗口中的导航控制器不会返回。
+    UIWindow *window = [[UIWindow alloc] initWithFrame:CGRectMake(0, 0, 390, 844)];
+    window.rootViewController = tabBarController;
+    [window makeKeyAndVisible];
+    [[NSRunLoop mainRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.2]];
+    UINavigationController *navigationController = (UINavigationController *)tabBarController.viewControllers.firstObject;
+    [navigationController pushViewController:[UIViewController new] animated:NO];
+    [[NSRunLoop mainRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.2]];
+    XCTAssertEqual(navigationController.viewControllers.count, 2u);
+    SEL selector = NSSelectorFromString(@"cyl_performReselectBehaviorForViewController:");
+    XCTAssertTrue([tabBarController respondsToSelector:selector]);
+    tabBarController.cyl_reselectBehavior = CYLTabBarReselectBehaviorNone;
+    ((void (*)(id, SEL, id))[tabBarController methodForSelector:selector])(tabBarController, selector, navigationController);
+    XCTAssertEqual(navigationController.viewControllers.count, 2u, @"no behavior, nothing happens");
+    tabBarController.cyl_reselectBehavior = CYLTabBarReselectBehaviorPopToRoot;
+    ((void (*)(id, SEL, id))[tabBarController methodForSelector:selector])(tabBarController, selector, navigationController);
+    // [EN] An animated pop ends on a later run loop turn. [CN] 带动画的返回在之后的 runloop 中完成。
+    [[NSRunLoop mainRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:1.0]];
+    XCTAssertEqual(navigationController.viewControllers.count, 1u);
+}
+
+- (void)testCustomTabActionRunsOncePerRunLoopTurn {
+    CYLTabBarController *tabBarController = [self newTabBarController];
+    UIViewController *first = tabBarController.viewControllers.firstObject;
+    UIViewController *second = tabBarController.viewControllers.lastObject;
+    XCTAssertNotNil(first.cyl_tabBarItemIdentifier);
+    tabBarController.cyl_customActionTabBarItemIdentifiers = @[ first.cyl_tabBarItemIdentifier ];
+    XCTAssertEqualObjects(tabBarController.cyl_customActionTabBarItemIdentifiers, @[ first.cyl_tabBarItemIdentifier ]);
+    __block NSInteger runs = 0;
+    tabBarController.cyl_customTabActionHandler = ^(CYLTabBarController *controller, UIViewController *viewController) {
+        XCTAssertEqual(viewController, first);
+        runs += 1;
+    };
+    XCTAssertTrue([tabBarController cyl_isCustomActionTabViewController:first]);
+    XCTAssertFalse([tabBarController cyl_isCustomActionTabViewController:second]);
+    XCTAssertTrue([tabBarController cyl_performCustomTabActionIfNeededForViewController:first]);
+    XCTAssertTrue([tabBarController cyl_performCustomTabActionIfNeededForViewController:first], @"the same tap: handled, not run again");
+    XCTAssertFalse([tabBarController cyl_performCustomTabActionIfNeededForViewController:second]);
+    XCTAssertEqual(runs, 1);
+    [[NSRunLoop mainRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.05]];
+    XCTAssertTrue([tabBarController cyl_performCustomTabActionIfNeededForViewController:first]);
+    XCTAssertEqual(runs, 2, @"a later run loop turn runs it again");
+}
+
+- (void)testShouldPerformCustomTabActionHandlerWins {
+    CYLTabBarController *tabBarController = [self newTabBarController];
+    UIViewController *second = tabBarController.viewControllers.lastObject;
+    tabBarController.cyl_customActionTabBarItemIdentifiers = @[];
+    tabBarController.cyl_shouldPerformCustomTabActionHandler = ^BOOL(CYLTabBarController *controller, UIViewController *viewController) {
+        return viewController == second;
+    };
+    XCTAssertTrue([tabBarController cyl_isCustomActionTabViewController:second]);
+    XCTAssertFalse([tabBarController cyl_isCustomActionTabViewController:tabBarController.viewControllers.firstObject]);
+    tabBarController.cyl_shouldPerformCustomTabActionHandler = nil;
+    XCTAssertFalse([tabBarController cyl_isCustomActionTabViewController:second]);
+}
+
+/// [EN] The item styles are kept and read back. [CN] item 样式会被保存并可读回。
+- (void)testItemStylesAreKept {
+    CYLTabBarController *tabBarController = [self newTabBarController];
+    UIFont *font = [UIFont systemFontOfSize:11];
+    tabBarController.cyl_tabBarItemTitleFont = font;
+    tabBarController.cyl_tabBarItemSelectedImageColor = UIColor.redColor;
+    XCTAssertEqualObjects(tabBarController.cyl_tabBarItemTitleFont, font);
+    XCTAssertEqualObjects(tabBarController.cyl_tabBarItemSelectedImageColor, UIColor.redColor);
+    XCTAssertNil(tabBarController.cyl_tabBarShadowColor);
+    tabBarController.cyl_tabBarItemTitleFont = nil;
+    XCTAssertNil(tabBarController.cyl_tabBarItemTitleFont);
+}
+
 - (void)testItemLayoutBlockIsKept {
     UITabBarItem *item = [[UITabBarItem alloc] initWithTitle:@"A" image:nil tag:0];
     void (^block)(UITabBarItem *, UIView *) = ^(UITabBarItem *tabBarItem, UIView *view) {};
@@ -157,6 +265,214 @@
     XCTAssertNotNil(item.cyl_viewDidLayoutSubviewsBlock);
     item.cyl_viewDidLayoutSubviewsBlock = nil;
     XCTAssertNil(item.cyl_viewDidLayoutSubviewsBlock);
+}
+
+#pragma mark - Selected tab badge (Swift since step 56)
+
+/// [EN] The selected tab's badge value is stored while hidden and comes back when another tab is selected or the property is off.
+/// [CN] 选中 Tab 的角标值在隐藏期间被暂存，选中其他 Tab 或关闭属性后恢复。
+- (void)testHidesBadgeOfSelectedTab {
+    CYLTabBarController *tabBarController = [self newTabBarController];
+    UITabBarItem *firstItem = tabBarController.viewControllers[0].tabBarItem;
+    UITabBarItem *secondItem = tabBarController.viewControllers[1].tabBarItem;
+    firstItem.badgeValue = @"3";
+    secondItem.badgeValue = @"5";
+    tabBarController.selectedIndex = 0;
+    XCTAssertFalse(tabBarController.cyl_hidesBadgeOfSelectedTab);
+    tabBarController.cyl_hidesBadgeOfSelectedTab = YES;
+    XCTAssertTrue(tabBarController.cyl_hidesBadgeOfSelectedTab);
+    XCTAssertNil(firstItem.badgeValue, @"the selected tab's badge is hidden");
+    XCTAssertEqualObjects(secondItem.badgeValue, @"5");
+    tabBarController.selectedIndex = 1;
+    SEL update = NSSelectorFromString(@"cyl_updateBadgesOfSelectedTab");
+    XCTAssertTrue([tabBarController respondsToSelector:update]);
+    ((void (*)(id, SEL))[tabBarController methodForSelector:update])(tabBarController, update);
+    XCTAssertEqualObjects(firstItem.badgeValue, @"3", @"restored once another tab is selected");
+    XCTAssertNil(secondItem.badgeValue);
+    tabBarController.cyl_hidesBadgeOfSelectedTab = NO;
+    XCTAssertEqualObjects(secondItem.badgeValue, @"5", @"everything hidden comes back when the property is off");
+}
+
+#pragma mark - Per-tab colors and title offset (Swift since step 57, issue #475)
+
+/// [EN] A tab's own selected title color and the title offset go into its own appearance; the other tab keeps the bar's.
+/// [CN] Tab 自己的选中标题颜色与标题偏移写入它自己的 appearance；另一个 Tab 使用 TabBar 的 appearance。
+- (void)testPerTabColorAndOffsetReachTheItemAppearance {
+    UINavigationController *first = [[UINavigationController alloc] initWithRootViewController:[UIViewController new]];
+    UINavigationController *second = [[UINavigationController alloc] initWithRootViewController:[UIViewController new]];
+    CYLTabBarController *tabBarController = [[CYLTabBarController alloc] initWithViewControllers:@[ first, second ]
+                                                                           tabBarItemsAttributes:@[ @{ CYLTabBarItemTitle : @"First",
+                                                                                                       CYLTabBarItemSelectedTitleColor : UIColor.redColor },
+                                                                                                    @{ CYLTabBarItemTitle : @"Second" } ]];
+    tabBarController.view.frame = CGRectMake(0, 0, 390, 844);
+    [tabBarController.view layoutIfNeeded];
+    XCTAssertEqual(tabBarController.tabBar.items.count, 2u, @"the color pass walks the tab bar's items");
+    tabBarController.titlePositionAdjustment = UIOffsetMake(0, -3);
+    SEL sync = NSSelectorFromString(@"cyl_syncTitlePositionAdjustmentAppearances");
+    XCTAssertTrue([tabBarController respondsToSelector:sync]);
+    ((void (*)(id, SEL))[tabBarController methodForSelector:sync])(tabBarController, sync);
+    UITabBarAppearance *firstAppearance = first.tabBarItem.standardAppearance;
+    XCTAssertNotNil(firstAppearance);
+    UITabBarItemStateAppearance *selected = firstAppearance.stackedLayoutAppearance.selected;
+    XCTAssertEqualObjects(selected.titleTextAttributes[NSForegroundColorAttributeName], UIColor.redColor);
+    XCTAssertTrue(UIOffsetEqualToOffset(selected.titlePositionAdjustment, UIOffsetMake(0, -3)));
+    // [EN] Without its own colors, the second tab still gets the offset. [CN] 第二个 Tab 没有自己的颜色，仍会得到偏移。
+    UITabBarAppearance *secondAppearance = second.tabBarItem.standardAppearance;
+    XCTAssertTrue(UIOffsetEqualToOffset(secondAppearance.stackedLayoutAppearance.normal.titlePositionAdjustment, UIOffsetMake(0, -3)));
+    XCTAssertNil(secondAppearance.stackedLayoutAppearance.selected.titleTextAttributes[NSForegroundColorAttributeName]);
+    // [EN] Reset: the copies go away. [CN] 重置：副本被移除。
+    tabBarController.titlePositionAdjustment = UIOffsetZero;
+    XCTAssertNil(second.tabBarItem.standardAppearance);
+}
+
+#pragma mark - Reported control and the lens (Swift since step 59)
+
+/// [EN] Without a plus button, a control reports itself; nil stays nil. [CN] 没有 PlusButton 时控件上报自身；nil 仍为 nil。
+- (void)testReportedControlWithoutPlusButtonIsTheControl {
+    CYLTabBarController *tabBarController = [self newTabBarController];
+    SEL reported = NSSelectorFromString(@"cyl_reportedControlForControl:");
+    XCTAssertTrue([tabBarController respondsToSelector:reported]);
+    UIControl *control = [UIControl new];
+    UIControl *(*call)(id, SEL, id) = (UIControl *(*)(id, SEL, id))[tabBarController methodForSelector:reported];
+    XCTAssertEqual(call(tabBarController, reported, control), control);
+    XCTAssertNil(call(tabBarController, reported, nil));
+}
+
+/// [EN] Liquid Glass: a delegate that refuses the lens turns its gestures off; without one they stay on.
+/// [CN] 液态玻璃：拒绝放大镜的代理会关闭其手势；没有代理时手势保持开启。
+- (void)testBeginShowLensFollowsTheDelegate {
+    CYLTabBarController *tabBarController = [self newTabBarController];
+    if (![CYLConstants isLiquidGlassActive] || ![tabBarController.tabBar isKindOfClass:[CYLTabBar class]]) {
+        return;
+    }
+    SEL begin = NSSelectorFromString(@"tabBarController:beginShowPlatterLiquidLensViewForControl:");
+    XCTAssertTrue([tabBarController respondsToSelector:begin]);
+    void (*call)(id, SEL, id, id) = (void (*)(id, SEL, id, id))[tabBarController methodForSelector:begin];
+    CYLTabBar *tabBar = tabBarController.tabBar;
+    UIControl *control = [UIControl new];
+    CYLLensRefusingDelegate *delegate = [CYLLensRefusingDelegate new];
+    tabBarController.delegate = (id)delegate;
+    call(tabBarController, begin, tabBarController, control);
+    XCTAssertFalse(tabBar.liquidGlassContinuousGestureRecognizer.enabled);
+    // [EN] The long press recognizer exists only once the tab bar is in a window. [CN] 长按手势只在 TabBar 进入窗口后存在。
+    XCTAssertFalse(tabBar.liquidGlassLongGestureRecognizer.enabled);
+    tabBarController.delegate = nil;
+    call(tabBarController, begin, tabBarController, control);
+    XCTAssertTrue(tabBar.liquidGlassContinuousGestureRecognizer.enabled);
+    if (tabBar.liquidGlassLongGestureRecognizer) {
+        XCTAssertTrue(tabBar.liquidGlassLongGestureRecognizer.enabled);
+    }
+}
+
+#pragma mark - Selection (Swift since step 61)
+
+/// [EN] super reaches the library's `-tabBarController:shouldSelectViewController:`: the selected tab is refused, another
+///      one allowed, and a custom action tab refused.
+/// [CN] super 能调用到库的 `-tabBarController:shouldSelectViewController:`：已选中的 Tab 被拒绝，其他 Tab 允许，自定义操作的 Tab 被拒绝。
+- (void)testSubclassSuperReachesShouldSelect {
+    UINavigationController *first = [[UINavigationController alloc] initWithRootViewController:[UIViewController new]];
+    UINavigationController *second = [[UINavigationController alloc] initWithRootViewController:[UIViewController new]];
+    CYLSuperCallingTabBarController *tabBarController = [[CYLSuperCallingTabBarController alloc] initWithViewControllers:@[ first, second ]
+                                                                                                   tabBarItemsAttributes:@[ @{ CYLTabBarItemTitle : @"First" },
+                                                                                                                            @{ CYLTabBarItemTitle : @"Second" } ]];
+    tabBarController.view.frame = CGRectMake(0, 0, 390, 844);
+    [tabBarController.view layoutIfNeeded];
+    tabBarController.selectedIndex = 0;
+    XCTAssertFalse([tabBarController tabBarController:tabBarController shouldSelectViewController:first], @"already selected");
+    XCTAssertTrue([tabBarController tabBarController:tabBarController shouldSelectViewController:second]);
+    tabBarController.cyl_customActionTabBarItemIdentifiers = @[ second.cyl_tabBarItemIdentifier ];
+    tabBarController.cyl_customTabActionHandler = ^(CYLTabBarController *controller, UIViewController *viewController) {};
+    XCTAssertFalse([tabBarController tabBarController:tabBarController shouldSelectViewController:second], @"a custom action tab");
+    XCTAssertEqual(tabBarController.shouldSelectCalls, 3);
+    XCTAssertNoThrow([tabBarController updateSelectionStatusIfNeededForTabBarController:tabBarController shouldSelectViewController:second shouldSelect:NO]);
+    XCTAssertNoThrow([tabBarController updateSelectionStatusIfNeededForTabBarController:tabBarController shouldSelectViewController:second]);
+}
+
+#pragma mark - Lens decision (Swift since step 62)
+
+/// [EN] Reached by selector, as CYLTabBar calls it: without a plus child view controller the lens shows on Liquid Glass;
+///      without Liquid Glass it never shows. The PR #793 check is NO without a plus button.
+/// [CN] 与 CYLTabBar 一样通过 selector 调用：没有 PlusButton 子控制器时，液态玻璃下显示放大镜；没有液态玻璃时从不显示。没有 PlusButton 时 PR #793 的判断为 NO。
+- (void)testShouldShowLensBySelector {
+    CYLTabBarController *tabBarController = [self newTabBarController];
+    SEL should = NSSelectorFromString(@"tabBarController:shouldShowPlatterLiquidLensViewForControl:");
+    XCTAssertTrue([tabBarController respondsToSelector:should]);
+    BOOL (*call)(id, SEL, id, id) = (BOOL (*)(id, SEL, id, id))[tabBarController methodForSelector:should];
+    BOOL shows = call(tabBarController, should, tabBarController, [UIControl new]);
+    BOOL liquidGlassBar = [CYLConstants isLiquidGlassActive] && [tabBarController.tabBar isKindOfClass:[CYLTabBar class]];
+    XCTAssertEqual(shows, liquidGlassBar);
+    SEL drawn = NSSelectorFromString(@"cyl_plusButtonTitleIsDrawnByItsTabItem");
+    XCTAssertTrue([tabBarController respondsToSelector:drawn]);
+    XCTAssertFalse(((BOOL (*)(id, SEL))[tabBarController methodForSelector:drawn])(tabBarController, drawn));
+}
+
+#pragma mark - Reported tap (Swift since step 63)
+
+/// [EN] A reported tap reaches `-tabBarController:didSelectControl:` once, with the control. [CN] 上报的点击以该控件调用一次代理。
+- (void)testSendDidSelectControlReachesTheDelegate {
+    CYLTabBarController *tabBarController = [self newTabBarController];
+    CYLDidSelectRecordingDelegate *delegate = [CYLDidSelectRecordingDelegate new];
+    tabBarController.delegate = (id)delegate;
+    SEL send = NSSelectorFromString(@"cyl_sendDidSelectControl:");
+    XCTAssertTrue([tabBarController respondsToSelector:send]);
+    UIControl *control = [UIControl new];
+    ((void (*)(id, SEL, id))[tabBarController methodForSelector:send])(tabBarController, send, control);
+    XCTAssertEqual(delegate.controls.count, 1u);
+    XCTAssertEqual(delegate.controls.firstObject, control);
+    tabBarController.delegate = nil;
+}
+
+#pragma mark - Tab button tap (Swift since step 64)
+
+/// [EN] In a window, a tap on the second tab's button marks it selected and reports it once.
+/// [CN] 在窗口中，点击第二个 Tab 的按钮会把它标记为选中，并上报一次。
+- (void)testDidSelectControlSelectsAndReportsTheTabButton {
+    CYLTabBarController *tabBarController = [self newTabBarController];
+    UIWindow *window = [[UIWindow alloc] initWithFrame:CGRectMake(0, 0, 390, 844)];
+    window.rootViewController = tabBarController;
+    [window makeKeyAndVisible];
+    [[NSRunLoop mainRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.3]];
+    UIControl *button = tabBarController.viewControllers[1].cyl_tabButton;
+    if (!button) {
+        return;
+    }
+    CYLDidSelectRecordingDelegate *delegate = [CYLDidSelectRecordingDelegate new];
+    tabBarController.delegate = (id)delegate;
+    SEL select = NSSelectorFromString(@"didSelectControl:");
+    XCTAssertTrue([tabBarController respondsToSelector:select]);
+    ((void (*)(id, SEL, id))[tabBarController methodForSelector:select])(tabBarController, select, button);
+    XCTAssertTrue(button.selected);
+    XCTAssertEqual(delegate.controls.count, 1u);
+    XCTAssertEqual(delegate.controls.firstObject, button);
+    tabBarController.delegate = nil;
+    window.hidden = YES;
+}
+
+#pragma mark - Tab icon setters (Swift since step 67, issue #601)
+
+/// [EN] The icon notification names the tab and hands back the very provider the app passed; nil removes it.
+/// [CN] 图标通知指出该 Tab，并交回 App 传入的同一个 provider；传 nil 时移除。
+- (void)testIconViewProviderNotificationKeepsTheProvider {
+    CYLTabBarController *tabBarController = [self newTabBarController];
+    CYLTabBarItemIconViewProvider provider = [^UIView *(BOOL selected) { return [UIView new]; } copy];
+    __block NSDictionary *userInfo = nil;
+    id observer = [[NSNotificationCenter defaultCenter] addObserverForName:CYLTabBarItemIconDidChangeNotification object:nil queue:nil
+                                                                usingBlock:^(NSNotification *note) { userInfo = note.userInfo; }];
+    XCTAssertTrue([tabBarController setTabBarItemIconViewProvider:provider atIndex:1]);
+    XCTAssertEqualObjects(userInfo[CYLTabBarItemIndexKey], @1);
+    XCTAssertEqual(userInfo[CYLTabBarControllerKey], tabBarController);
+    XCTAssertEqual((id)userInfo[CYLTabBarItemIconViewProviderKey], (id)provider, @"the same block, not a wrapper");
+    userInfo = nil;
+    XCTAssertTrue([tabBarController setTabBarItemIconViewProvider:nil atIndex:1]);
+    XCTAssertNotNil(userInfo);
+    XCTAssertNil(userInfo[CYLTabBarItemIconViewProviderKey]);
+    XCTAssertFalse([tabBarController setTabBarItemIconViewProvider:provider atIndex:9], @"no such tab");
+    // [EN] nil on purpose: the call must refuse it. [CN] 故意传入 nil：该调用必须拒绝它。
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wnonnull"
+    XCTAssertFalse([tabBarController setTabBarItemIcon:nil selectedIcon:nil size:CGSizeZero atIndex:0], @"no icon");
+#pragma clang diagnostic pop
+    [[NSNotificationCenter defaultCenter] removeObserver:observer];
 }
 
 @end

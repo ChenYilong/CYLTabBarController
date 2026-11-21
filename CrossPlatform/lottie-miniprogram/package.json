@@ -1,0 +1,53 @@
+{
+  "name": "cyl-lottie-miniprogram",
+  "version": "1.0.13",
+  "description": "lottie for miniprogram (the CYLTabBarController fork of wechat-miniprogram/lottie-miniprogram) and the cyl-lottie component",
+  "main": "miniprogram_dist/index.js",
+  "cylExampleResources": {
+    "folder": "lottie",
+    "source": "Example/Classes/Other/LottieResources",
+    "files": [
+      "green_lottie_tab_home.json",
+      "green_lottie_tab_home_dark.json",
+      "green_lottie_tab_news.json",
+      "green_lottie_tab_news_dark.json",
+      "green_lottie_tab_discover.json",
+      "green_lottie_tab_discover_dark.json",
+      "green_lottie_tab_mine.json",
+      "green_lottie_tab_mine_dark.json"
+    ]
+  },
+  "scripts": {
+    "dev": "webpack --mode=development",
+    "build": "webpack --mode=production",
+    "lint": "eslint \"src/**/*.js\"",
+    "test": "node --test test/*.test.js"
+  },
+  "miniprogram": "miniprogram_dist",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ChenYilong/CYLTabBarController.git",
+    "directory": "CrossPlatform/lottie-miniprogram"
+  },
+  "keywords": ["lottie", "miniprogram"],
+  "author": "ChenYilong <luohanchenyilong@163.com> (fork of wechat-miniprogram/lottie-miniprogram)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ChenYilong/CYLTabBarController/issues"
+  },
+  "homepage": "https://github.com/ChenYilong/CYLTabBarController/tree/master/CrossPlatform/lottie-miniprogram",
+  "devDependencies": {
+    "@babel/core": "^7.5.5",
+    "@babel/plugin-proposal-class-properties": "^7.5.5",
+    "@babel/preset-env": "^7.5.5",
+    "babel-eslint": "^10.0.2",
+    "babel-loader": "^8.0.6",
+    "eslint": "^6.1.0",
+    "eslint-loader": "^2.2.1",
+    "string-replace-loader": "^2.2.0",
+    "webpack": "^4.39.1",
+    "webpack-cli": "^3.3.6",
+    "lottie-web": "^5.12.2",
+    "copy-webpack-plugin": "^6.0.3"
+  }
+}

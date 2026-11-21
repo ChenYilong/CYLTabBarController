@@ -68,7 +68,7 @@
 | 与 PAG 的集成 / PAG integration | 72 | 72 | 100 | 同上；PAG 无颜色覆盖，只差文件替换 / same; PAG has no color override, only the file swap is missing |
 | 与 Rive 的集成 / Rive integration | 70 | 70 | 100 | 同 Lottie；Rive 的 view model 颜色只认深色模式 / as Lottie; Rive view-model colors know Dark Mode only |
 | 测试 / Tests | 60 | 90 | 100 | 动画 + 主题没有测试（功能尚不存在）/ no animation + theme test (the feature does not exist yet) |
-| 截图 / Screenshots | 0 | 0 | 100 | 文档中仍无截图 / still no screenshot in the docs |
+| 截图 / Screenshots | 0 | 100 | 100 | Theme-Switching.md 已有液态玻璃、扁平样式、运行时切换、节日图标与网络皮肤的截图（2026-11-06 / 11-09，iOS 26 模拟器）/ Theme-Switching.md now has screenshots of Liquid Glass, FlatDesign, a runtime switch, holiday icons and the network skin (2026-11-06 / 11-09, iOS 26 simulators) |
 | **换肤组件合计 / Theme component** | **86** | **95** | 100 | |
 | **与动画组件的集成 / Integration with animation** | **72** | **72** | 100 | |
 
@@ -120,7 +120,7 @@
 
 | 中文 | English |
 |:---|:---|
-| 测试：`CYLThemeTests`（8 个，#773 合入）覆盖管理器与颜色；本次新增 `CYLThemeValueTests`（6 个）覆盖主题图片是新对象且保留内容、`UIImageView` / `UIButton` 各状态替换、模糊效果替换、layer 颜色与 sublayer、离屏视图经记住的视图到达、Bar appearance 的图片与效果。在 iPhone 15 Pro（iOS 17.5）模拟器上 14 个全部通过。截图：文档「测试与截图」仍写着在 Linux 上完成、没有截图；本仓库现在有模拟器，应补。 | Tests: `CYLThemeTests` (8, merged with #773) cover the manager and the colors; this commit adds `CYLThemeValueTests` (6): a theme image is a new object that keeps its content, every `UIImageView` / `UIButton` state is replaced, a blur effect is replaced, layer colors and sublayers, an off-screen view reached through the tracked views, and the images and effects of a bar appearance. All 14 pass on the iPhone 15 Pro (iOS 17.5) simulator. Screenshots: the doc's "Testing and screenshots" still says the work was done on Linux with no screenshot; a simulator is available now, so they are owed. |
+| 测试：`CYLThemeTests`（8 个，#773 合入）覆盖管理器与颜色；本次新增 `CYLThemeValueTests`（6 个）覆盖主题图片是新对象且保留内容、`UIImageView` / `UIButton` 各状态替换、模糊效果替换、layer 颜色与 sublayer、离屏视图经记住的视图到达、Bar appearance 的图片与效果。在 iPhone 15 Pro（iOS 17.5）模拟器上 14 个全部通过。截图：已补，见 [Theme-Switching.md](Theme-Switching.md) 的「演示」与「测试与截图」（2026-11-10 更新）。 | Tests: `CYLThemeTests` (8, merged with #773) cover the manager and the colors; this commit adds `CYLThemeValueTests` (6): a theme image is a new object that keeps its content, every `UIImageView` / `UIButton` state is replaced, a blur effect is replaced, layer colors and sublayers, an off-screen view reached through the tracked views, and the images and effects of a bar appearance. All 14 pass on the iPhone 15 Pro (iOS 17.5) simulator. Screenshots: done since; see [Theme-Switching.md](Theme-Switching.md) "Demo" and "Testing and screenshots" (2026-11-10 update). |
 
 ## [CN]2. 与动画组件的集成：逐项评估（72 分）
 ## [EN]2. Integration with the animation components, area by area (72)
@@ -193,7 +193,7 @@
 | 接缝：面向接口 / Seam: interfaces | 55 | 92 | 三个可选协议方法（service 两个、播放器一个、风格来源一个）把主题接到动画 / four optional protocol methods (two on the service, one on the player, one on the style source) join theming to animation |
 | 接缝：依赖反转 / Seam: dependency inversion | 60 | 88 | `traitCollectionDidChange:` 仍直接调用两个单例 / `traitCollectionDidChange:` still calls the two singletons |
 | 接缝：健壮性 / Seam: robustness | 70 | 90 | 无动画库时打印 `🔴[CYL #216]` 日志 / `🔴[CYL #216]` logged without a library |
-| 接缝：解耦 / Seam: decoupling | 75 | 92 | 主题侧在 `CYLTabBarController+CYLTheme.m`，动画侧在引擎；`cyl_updateLoopingLottieViews` 属于 Core 的 Lottie 循环播放，不属于主题，留在原处 / theme side in `CYLTabBarController+CYLTheme.m`, animation side in the engine; `cyl_updateLoopingLottieViews` is Core's Lottie looping, not theming, and stays |
+| 接缝：解耦 / Seam: decoupling | 75 | 92 | 主题侧在 `CYLTabBarController+CYLTheme.swift`，动画侧在引擎；`cyl_updateLoopingLottieViews` 属于 Core 的 Lottie 循环播放，不属于主题，留在原处 / theme side in `CYLTabBarController+CYLTheme.swift`, animation side in the engine; `cyl_updateLoopingLottieViews` is Core's Lottie looping, not theming, and stays |
 | 测试 / Tests | 90 | 94 | `CYLThemeAnimationTests`（3 个）：颜色注册、原地替换文件、注入管理器；没有带真实动画视图的测试 / `CYLThemeAnimationTests` (3): color registration, in-place file swap, injected manager; no test with a real animation view |
 | **与动画组件的集成 / Integration with animation** | **72** | **93** | |
 

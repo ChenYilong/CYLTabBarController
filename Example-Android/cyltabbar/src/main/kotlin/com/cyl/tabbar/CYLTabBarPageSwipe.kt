@@ -70,7 +70,9 @@ internal class CYLTabBarPageSwipe(private val controller: CYLTabBarController, p
         return dragging
     }
 
-    /** [EN] Starts a drag once the finger moved mostly sideways past the touch slop. [CN] 手指主要横向移动并超过 touch slop 时开始拖动。 */
+    /**
+     * [EN] Starts a drag once the finger moved mostly sideways past the touch slop. [CN] 手指主要横向移动并超过 touch slop 时开始拖动。
+     */
     private fun detect(event: MotionEvent) {
         when (event.actionMasked) {
             MotionEvent.ACTION_DOWN -> { startX = event.x; startY = event.y; dragging = false; track(event, reset = true) }
@@ -122,7 +124,9 @@ internal class CYLTabBarPageSwipe(private val controller: CYLTabBarController, p
         velocityTracker = null
     }
 
-    /** [EN] `ViewPager.canScroll`: whether a view under the point can still scroll horizontally in `direction`. [CN] 触点下方的视图是否仍可沿 `direction` 横向滚动。 */
+    /**
+     * [EN] `ViewPager.canScroll`: whether a view under the point can still scroll horizontally in `direction`. [CN] 触点下方的视图是否仍可沿 `direction` 横向滚动。
+     */
     private fun canScroll(view: View, direction: Int, x: Int, y: Int): Boolean {
         if (view is ViewGroup) {
             for (index in view.childCount - 1 downTo 0) {
@@ -136,7 +140,9 @@ internal class CYLTabBarPageSwipe(private val controller: CYLTabBarController, p
         return view !== container && view.canScrollHorizontally(direction)
     }
 
-    /** [EN] Starts dragging towards `selectedIndex + direction`, when that tab may be selected. [CN] 开始向 `selectedIndex + direction` 拖动（该 Tab 可被选中时）。 */
+    /**
+     * [EN] Starts dragging towards `selectedIndex + direction`, when that tab may be selected. [CN] 开始向 `selectedIndex + direction` 拖动（该 Tab 可被选中时）。
+     */
     private fun begin(direction: Int): Boolean {
         val index = controller.selectedIndex + direction
         val page = controller.cyl_swipeTargetPage(index) ?: return false

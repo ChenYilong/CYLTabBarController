@@ -1,0 +1,61 @@
+/*
+ * [EN] As the iOS lens (measured on the iOS example): the whole slot, 5 px from the top and bottom of a 62 px bar (about
+ *      52 pt high), a translucent neutral tint with blur and saturation, a faint top highlight, no colored edge.
+ * [CN] 与 iOS 透镜一致（按 iOS 示例测量）：占满整个位置，距 62 px 高的 TabBar 上下各 5 px（约 52 pt 高），带模糊与饱和度
+ *      的半透明中性色，顶部有淡淡的高光，没有彩色边缘。
+ */
+:host {
+  position: absolute;
+  top: 5px;
+  bottom: 5px;
+  left: 0;
+  right: 0;
+  display: block;
+  pointer-events: none;
+}
+
+.cyl-glass-lens {
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  border-radius: 999px;
+  /* [EN] Nearly opaque, so the lens looks the same on any bar: the color measured on the reference lens (the gallery
+   *      bar, screenshot 41: (225, 221, 219)). A translucent tint took the color of what was behind it, so the same lens
+   *      looked gray on the white main bar and light on the colored gallery bar.
+   * [CN] 接近不透明，使透镜在任何 TabBar 上看起来一致：取自参考透镜测得的颜色（画廊 TabBar，截图 41：(225, 221, 219)）。
+   *      半透明底色会带上背后的颜色，因此同一透镜在白色主 TabBar 上显灰，在彩色画廊 TabBar 上显亮。 */
+  /* [EN] CYLGlassLensStyle regular (default). [CN] CYLGlassLensStyle regular（默认）。 */
+  background-color: rgba(225, 222, 220, 0.92);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  animation: cyl-glass-lens-in 0.45s cubic-bezier(0.19, 1, 0.22, 1) both;
+}
+
+/* [EN] CYLGlassLensStyle skeuomorphic: the see-through tint of the first lens (commit b6d4d05): it takes the color of
+ *      what is behind it, like real glass.
+ * [CN] CYLGlassLensStyle skeuomorphic：最初透镜的半透明底色（提交 b6d4d05）：像真实的玻璃一样透出背后的颜色。 */
+.cyl-glass-lens-skeuomorphic {
+  background-color: rgba(120, 120, 128, 0.14);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55);
+}
+
+.cyl-glass-lens-dark {
+  background-color: rgba(255, 255, 255, 0.14);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18);
+}
+
+@keyframes cyl-glass-lens-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.06);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}

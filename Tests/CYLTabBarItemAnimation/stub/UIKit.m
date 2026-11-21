@@ -4,6 +4,16 @@
 @end
 
 @implementation UIColor
++ (UIColor *)colorWithRed:(CGFloat)red green:(CGFloat)green blue:(CGFloat)blue alpha:(CGFloat)alpha {
+    (void)red; (void)green; (void)blue; (void)alpha;
+    return [[self alloc] init];
+}
+- (CGColorRef)CGColor {
+    return CGColorGetConstantColor(kCGColorBlack);
+}
++ (UIColor *)colorWithDynamicProvider:(UIColor * (^)(UITraitCollection *traitCollection))dynamicProvider {
+    return dynamicProvider([[UITraitCollection alloc] init]);
+}
 - (UIColor *)resolvedColorWithTraitCollection:(UITraitCollection *)traitCollection {
     (void)traitCollection;
     return self;
@@ -16,6 +26,14 @@
 
 @implementation UIView {
     NSMutableArray<UIView *> *_subviewList;
+    CALayer *_layer;
+}
+- (CALayer *)layer {
+    if (!_layer) {
+        _layer = [CALayer layer];
+        _layer.delegate = (id<CALayerDelegate>)self;
+    }
+    return _layer;
 }
 - (CGRect)bounds {
     return CGRectMake(0, 0, self.frame.size.width, self.frame.size.height);
@@ -48,4 +66,32 @@
 @end
 
 @implementation UIControl
+@end
+
+@implementation UIImage
+- (UIImage *)imageWithRenderingMode:(UIImageRenderingMode)renderingMode {
+    (void)renderingMode;
+    return self;
+}
+@end
+
+@implementation UIImageView
+@end
+
+@implementation UILabel
+@end
+
+@implementation UIGestureRecognizer
+@end
+
+@implementation UILongPressGestureRecognizer
+@end
+
+@implementation UIPanGestureRecognizer
+@end
+
+@implementation UITabBarItemStateAppearance
+@end
+
+@implementation UITabBarItemAppearance
 @end

@@ -44,6 +44,11 @@ android {
         getByName("main") {
             assets.srcDir("$cylRepository/Example-SwiftUI-Rive/AnimatedApp/RiveAssets")
             assets.srcDir("$cylRepository/Example-SwiftUI-Rive/AnimatedApp/Assets.xcassets")
+            // [EN] Issue #415: the SVGA tab icons of Example-SwiftUI-Rive (not a copy) and this demo's SVGA configuration file
+            //      (assets/svga/cyl_tabbar_configuration_svga.json, route "bundle:svga?name=cyl_tabbar_configuration_svga").
+            // [CN] Issue #415：Example-SwiftUI-Rive 的 SVGA Tab 图标（不是副本）与本 Demo 的 SVGA 配置文件。
+            assets.srcDir("$cylRepository/Example-SwiftUI-Rive/AnimatedApp/SVGAAssets")
+            assets.srcDir("../../configurations")
             java.srcDir(cylDemoAssetsDir)
         }
     }
@@ -75,4 +80,6 @@ flutter {
 dependencies {
     // [EN] The library plays the animation files through this library, found by reflection. [CN] 库通过反射找到该库播放动画文件。
     implementation(libs.rive.android)
+    // [EN] Issue #415: SVGA through SVGAPlayer-Android (JitPack), found by reflection. [CN] Issue #415：通过反射找到 SVGAPlayer-Android（JitPack）播放 SVGA。
+    implementation(libs.svgaplayer)
 }

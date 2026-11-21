@@ -1,0 +1,49 @@
+{
+  "CYLTabBarControllerContext": "CYLSVGAConfigurationDemo",
+  "CYLTabBarControllerTabBarItemsAttributes": [
+    {
+      "CYLTabBarItemTitle": "Chat",
+      "CYLTabBarItemImage": "system:message",
+      "CYLTabBarItemSelectedImage": "system:message",
+      "CYLTabBarItemIdentifier": "chat",
+      "CYLTabBarItemPageIdentifier": "svga-chat",
+      "CYLTabBarSVGAFilePath": "tab_chat.svga",
+      "CYLTabBarSVGASize": "{32, 32}"
+    },
+    {
+      "CYLTabBarItemTitle": "Search",
+      "CYLTabBarItemImage": "system:magnifyingglass",
+      "CYLTabBarItemSelectedImage": "system:magnifyingglass",
+      "CYLTabBarItemIdentifier": "search",
+      "CYLTabBarItemPageIdentifier": "svga-search",
+      "CYLTabBarSVGAFilePath": "tab_search.svga",
+      "CYLTabBarSVGASize": "{32, 32}"
+    },
+    {
+      "CYLTabBarItemTitle": "Bell",
+      "CYLTabBarItemImage": "system:bell",
+      "CYLTabBarItemSelectedImage": "system:bell",
+      "CYLTabBarItemIdentifier": "bell",
+      "CYLTabBarItemPageIdentifier": "svga-bell",
+      "CYLTabBarSVGAFilePath": "tab_list.svga",
+      "CYLTabBarSVGASize": "{32, 32}"
+    },
+    {
+      "CYLTabBarItemTitle": "User",
+      "CYLTabBarItemImage": "system:person",
+      "CYLTabBarItemSelectedImage": "system:person",
+      "CYLTabBarItemIdentifier": "user",
+      "CYLTabBarItemPageIdentifier": "svga-user",
+      "CYLTabBarSVGAFilePath": "tab_profile.svga",
+      "CYLTabBarSVGASize": "{32, 32}"
+    }
+  ],
+  "CYLTabBarControllerPlusButton": {
+    "CYLTabBarItemTitle": "Start",
+    "CYLTabBarItemImage": "svga_plus_button",
+    "CYLTabBarItemIdentifier": "plus",
+    "CYLTabBarItemPageIdentifier": "svga-timer",
+    "CYLPlusButtonIndexInTabBar": 2,
+    "CYLPlusButtonImageSize": "{44, 44}"
+  }
+}

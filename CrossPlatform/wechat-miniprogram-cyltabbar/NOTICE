@@ -1,0 +1,15 @@
+wechat-miniprogram-cyltabbar
+Copyright (c) ChenYilong. Licensed under the MIT License (see LICENSE).
+
+docs/WeChat-Mini-Program.md lists these WeChat custom tab bar projects as references:
+  https://github.com/mtjsoft/customTabBar
+  https://github.com/Jonham/weapp-component-tabbar
+  https://github.com/jiangdoc/wxChar
+  https://github.com/handwill/weapp-custom-tabbar
+  https://github.com/LonJinUp/wxTabBar
+They were used for the approach only (app.json "tabBar": {"custom": true} with a custom-tab-bar component, a raised
+middle button, getTabBar() in the tab pages). No source code, image or other file of them is included here.
+
+The files in example/miniprogram/shared are copies of Example-Shared/Configurations (skins, localization) and of
+Example/Classes/Other/LottieResources (Lottie icons) of this repository, written by example/scripts/cyl_sync_shared.js.
+cyl-lottie-miniprogram (../lottie-miniprogram) is a fork of wechat-miniprogram/lottie-miniprogram (MIT).

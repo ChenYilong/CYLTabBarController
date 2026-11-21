@@ -19,7 +19,9 @@ import org.w3c.dom.Node
 enum class TabConfigurationFormat { JSON, PLIST, PROPERTIES }
 
 object TabConfigurationFormats {
-    /** [EN] The format of a file name, by extension; null when unknown. [CN] 按扩展名判断文件格式；未知时为 null。 */
+    /**
+     * [EN] The format of a file name, by extension; null when unknown. [CN] 按扩展名判断文件格式；未知时为 null。
+     */
     fun formatOf(fileName: String): TabConfigurationFormat? = when (fileName.substringAfterLast('.', "").lowercase()) {
         "json", "json5", "jsonc" -> TabConfigurationFormat.JSON
         "plist" -> TabConfigurationFormat.PLIST
@@ -40,7 +42,9 @@ object TabConfigurationFormats {
         }
     }
 
-    /** [EN] The top-level dictionary of a configuration text. [CN] 配置文本的顶层字典。 */
+    /**
+     * [EN] The top-level dictionary of a configuration text. [CN] 配置文本的顶层字典。
+     */
     fun parse(text: String, format: TabConfigurationFormat = detect(text)): Map<String, Any?> = when (format) {
         TabConfigurationFormat.JSON -> TabConfiguration.toMap(JSONObject(text))
         TabConfigurationFormat.PLIST -> parsePlist(text)
@@ -125,13 +129,17 @@ object TabConfigurationFormats {
         return root.toMap()
     }
 
-    /** [EN] A key path tree of a properties file. [CN] properties 文件的键路径树。 */
+    /**
+     * [EN] A key path tree of a properties file. [CN] properties 文件的键路径树。
+     */
     private class PropertyNode(val value: String? = null) {
         val children = LinkedHashMap<String, PropertyNode>()
 
         fun toMap(): Map<String, Any?> = children.mapValues { it.value.toValue() }
 
-        /** [EN] A leaf is its string; a node whose keys are all numbers is a list in number order. [CN] 叶子为其字符串；键全为数字的节点为按数字排序的列表。 */
+        /**
+         * [EN] A leaf is its string; a node whose keys are all numbers is a list in number order. [CN] 叶子为其字符串；键全为数字的节点为按数字排序的列表。
+         */
         fun toValue(): Any? = when {
             children.isEmpty() -> value
             children.keys.all { it.toIntOrNull() != null } -> children.entries.sortedBy { it.key.toInt() }.map { it.value.toValue() }

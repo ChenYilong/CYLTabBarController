@@ -35,13 +35,13 @@ class TextPageFragment : Fragment() {
         })
         arguments.getString(URL)?.let { url ->
             layout.addView(Button(context).apply {
-                setText(R.string.open_in_browser)
+                text = cylDemoText("Open in the browser")
                 setOnClickListener { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url))) }
             })
         }
         if (arguments.getBoolean(OPENS_TWO_TAB_BARS)) {
             layout.addView(Button(context).apply {
-                setText(R.string.open_two_tab_bars)
+                text = cylDemoText("Open: two tab bars, one page ID")
                 setOnClickListener { startActivity(Intent(context, TwoTabBarsActivity::class.java)) }
             })
         }

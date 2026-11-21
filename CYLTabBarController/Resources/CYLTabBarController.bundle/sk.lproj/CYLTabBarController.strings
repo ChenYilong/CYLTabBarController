@@ -124,6 +124,7 @@
 "有新内容" = "Nový obsah";
 "%@ 条新消息" = "Nové správy: %@";
 "加号按钮" = "Tlačidlo plus";
+"更多" = "Viac";
 "模拟内存警告" = "Simulovať varovanie o pamäti";
 "卸载未选中的 Tab，切换时重新加载" = "Uvoľní nevybrané karty; po výbere sa znova načítajú";
 "内存警告" = "Varovanie o pamäti";
@@ -368,3 +369,12 @@
 "网络图标、标题与配色" = "Ikony zo siete, názvy a farby";
 /* The settings group of the configuration file rows (docs/Configuration-File.md). */
 "配置文件" = "Konfiguračný súbor";
+/* Scroll hiding simulations (issue #13): kind labels and title prefixes; API names stay English. */
+"恢复" = "Obnoviť";
+"保持" = "Zachovať";
+"不适用" = "N/A";
+"手动" = "Ručne";
+"自测" = "Autotest";
+"手动：%@" = "Ručne: %@";
+"实测：%@" = "Skutočné: %@";
+"自测：依次运行所有自动模拟，报告 PASS / FAIL" = "Autotest: spustiť všetky automatické simulácie, hlásiť PASS / FAIL";

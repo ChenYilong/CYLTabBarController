@@ -124,6 +124,7 @@
 "有新内容" = "Kandungan baharu";
 "%@ 条新消息" = "%@ mesej baharu";
 "加号按钮" = "Butang tambah";
+"更多" = "Lagi";
 "模拟内存警告" = "Simulasikan amaran memori";
 "卸载未选中的 Tab，切换时重新加载" = "Memunggah tab yang tidak dipilih; dimuatkan semula apabila dipilih";
 "内存警告" = "Amaran memori";
@@ -368,3 +369,12 @@
 "网络图标、标题与配色" = "Ikon rangkaian, tajuk dan warna";
 /* The settings group of the configuration file rows (docs/Configuration-File.md). */
 "配置文件" = "Fail konfigurasi";
+/* Scroll hiding simulations (issue #13): kind labels and title prefixes; API names stay English. */
+"恢复" = "Pulihkan";
+"保持" = "Kekalkan";
+"不适用" = "T/B";
+"手动" = "Manual";
+"自测" = "Ujian kendiri";
+"手动：%@" = "Manual: %@";
+"实测：%@" = "Sebenar: %@";
+"自测：依次运行所有自动模拟，报告 PASS / FAIL" = "Ujian kendiri: jalankan semua simulasi automatik, laporkan PASS / FAIL";

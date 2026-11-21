@@ -1,0 +1,115 @@
+/* [EN] Layout of cyl-animated-item. [CN] cyl-animated-item 的布局。 */
+.cyl-animated-item {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 4px;
+  box-sizing: border-box;
+}
+.cyl-animated-item-embedded {
+  display: flex;
+  min-height: 0;
+  padding: 0;
+}
+.cyl-animated-item-horizontal {
+  flex-direction: row;
+}
+.cyl-animated-item-vertical {
+  flex-direction: column;
+}
+/* [EN] Embedded in a host that is the touch target (the tab bar item): no padding, no minimum size, fills the host.
+   [CN] 嵌入在作为触摸目标的宿主中（TabBar Item）：无内边距、无最小尺寸，填满宿主。 */
+.cyl-animated-item-bare {
+  display: flex;
+  min-height: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+}
+/* [EN] Tinting: the image is drawn outside the clipped box and its drop shadow lands in place (#787).
+   [CN] 着色：图片画在裁剪框外，投影落在原位（#787）。 */
+.cyl-animated-item-tint {
+  overflow: hidden;
+}
+.cyl-animated-item-tinted {
+  display: block;
+  width: 100%;
+  height: 100%;
+  transform: translateX(-200px);
+}
+.cyl-animated-item-disabled {
+  opacity: 0.5;
+}
+.cyl-animated-item-icon {
+  position: relative;
+  flex: none;
+}
+.cyl-animated-item-image,
+.cyl-animated-item-animation {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+}
+.cyl-animated-item-hidden {
+  opacity: 0;
+}
+/* [EN] An ended play-once animation under its still image (showsImageWhenAnimationEnds): a canvas ignores opacity, so it is
+   also made invisible. [CN] 已结束的只播放一次的动画位于静态图片下方（showsImageWhenAnimationEnds）：canvas 不受 opacity 影响，因此同时设为不可见。 */
+.cyl-animated-item-ended {
+  opacity: 0;
+  visibility: hidden;
+}
+.cyl-animated-item-horizontal .cyl-animated-item-title {
+  margin-left: 4px;
+}
+.cyl-animated-item-vertical .cyl-animated-item-title {
+  margin-top: 2px;
+  /* [EN] Wrapped lines are centred under the icon. [CN] 换行后的每一行在图标下方居中。 */
+  text-align: center;
+}
+.cyl-animated-item-title {
+  font-size: 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+/* [EN] titleLines 0 (no limit) or more than 1: wraps; more than 1 ends with an ellipsis after that many lines.
+   [CN] titleLines 为 0（不限）或大于 1：换行；大于 1 时超出行数以省略号结尾。 */
+.cyl-animated-item-title-wrap {
+  white-space: normal;
+  word-break: break-word;
+}
+.cyl-animated-item-title-clamp {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+}
+.cyl-animated-item-accessory {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+}
+.cyl-animated-item-accessory-corner {
+  position: absolute;
+  top: -22px;
+  right: -22px;
+}
+.cyl-animated-item-accessory-image {
+  width: 18px;
+  height: 18px;
+}
+/* [EN] The countdown style (`itemStyle` "countdown"): a bordered, rounded button with a light background; the border is
+        gray while it counts down. [CN] 倒计时样式（`itemStyle` 为 "countdown"）：带边框与圆角、浅色背景的按钮；倒计时中边框为灰色。 */
+.cyl-animated-item-countdown {
+  padding: 8px 12px;
+  border: 0.5px solid #07c160;
+  border-radius: 6px;
+  background-color: #f2f2f7;
+}
+.cyl-animated-item-countdown.cyl-animated-item-disabled {
+  border-color: #c7c7cc;
+}

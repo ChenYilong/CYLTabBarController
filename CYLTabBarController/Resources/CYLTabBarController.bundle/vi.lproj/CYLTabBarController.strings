@@ -124,6 +124,7 @@
 "有新内容" = "Có nội dung mới";
 "%@ 条新消息" = "%@ tin nhắn mới";
 "加号按钮" = "Nút cộng";
+"更多" = "Thêm";
 "模拟内存警告" = "Mô phỏng cảnh báo bộ nhớ";
 "卸载未选中的 Tab，切换时重新加载" = "Giải phóng các tab chưa chọn; tải lại khi được chọn";
 "内存警告" = "Cảnh báo bộ nhớ";
@@ -368,3 +369,12 @@
 "网络图标、标题与配色" = "Biểu tượng từ mạng, tiêu đề và màu sắc";
 /* The settings group of the configuration file rows (docs/Configuration-File.md). */
 "配置文件" = "Tệp cấu hình";
+/* Scroll hiding simulations (issue #13): kind labels and title prefixes; API names stay English. */
+"恢复" = "Khôi phục";
+"保持" = "Giữ nguyên";
+"不适用" = "Không áp dụng";
+"手动" = "Thủ công";
+"自测" = "Tự kiểm tra";
+"手动：%@" = "Thủ công: %@";
+"实测：%@" = "Thực tế: %@";
+"自测：依次运行所有自动模拟，报告 PASS / FAIL" = "Tự kiểm tra: chạy mọi mô phỏng tự động, báo cáo PASS / FAIL";

@@ -1,0 +1,12 @@
+{
+  "cards": [
+    { "id": 1, "emoji": "💎", "title": "Glass lens", "subtitle": "Blur + saturate + rim", "from": "#a18cd1", "to": "#fbc2eb" },
+    { "id": 2, "emoji": "🌊", "title": "Fluid blobs", "subtitle": "Slow floating light", "from": "#84fab0", "to": "#8fd3f4" },
+    { "id": 3, "emoji": "🪄", "title": "Spring in", "subtitle": "Scale 0.6 → 1.06 → 1", "from": "#fccb90", "to": "#d57eeb" },
+    { "id": 4, "emoji": "🧭", "title": "Navigation bar", "subtitle": "Frosted, under the status bar", "from": "#e0c3fc", "to": "#8ec5fc" },
+    { "id": 5, "emoji": "🔍", "title": "Search box", "subtitle": "Thin glass, live filter", "from": "#f093fb", "to": "#f5576c" },
+    { "id": 6, "emoji": "📰", "title": "Feed", "subtitle": "Cards with tags", "from": "#4facfe", "to": "#00f2fe" },
+    { "id": 7, "emoji": "🧱", "title": "Collection", "subtitle": "Two-column grid", "from": "#43e97b", "to": "#38f9d7" },
+    { "id": 8, "emoji": "✨", "title": "Iridescent rim", "subtitle": "Light through glass", "from": "#fa709a", "to": "#fee140" }
+  ]
+}

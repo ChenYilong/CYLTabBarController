@@ -33,3 +33,13 @@ allprojects { project ->
         }
     }
 }
+
+// [EN] Issue #415: SVGAPlayer-Android (com.github.yyued) is only on JitPack. [CN] Issue #415：SVGAPlayer-Android 只在 JitPack 上。
+allprojects {
+    repositories {
+        maven {
+            url "https://jitpack.io"
+            content { includeGroup("com.github.yyued") }
+        }
+    }
+}

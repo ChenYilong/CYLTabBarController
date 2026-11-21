@@ -22,10 +22,12 @@
 | 中文 | English |
 |:---|:---|
 | [用法](#用法--usage) | [Usage](#用法--usage) |
+| &nbsp;&nbsp;&nbsp;&nbsp;↳ [图标渲染方式：一张图片随状态变色（#787）/ Icon rendering mode: one image, two colors (#787)](#图标渲染方式一张图片随状态变色787-icon-rendering-mode-one-image-two-colors-787) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [图标渲染方式：一张图片随状态变色（#787）/ Icon rendering mode: one image, two colors (#787)](#图标渲染方式一张图片随状态变色787-icon-rendering-mode-one-image-two-colors-787) |
 | &nbsp;&nbsp;&nbsp;&nbsp;↳ [单个 Tab 的字体](#单个-tab-的字体--per-tab-fonts) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [Per-tab fonts](#单个-tab-的字体--per-tab-fonts) |
 | [API](#api) | [API](#api) |
 | [限制](#限制--limits) | [Limits](#限制--limits) |
 | [截图](#截图--screenshots) | [Screenshots](#截图--screenshots) |
+| [状态](#状态--status) | [Status](#状态--status) |
 
 <!-- navigation:end -->
 
@@ -54,6 +56,37 @@ let live: [String: Any] = [
 ]
 ```
 
+### 图标渲染方式：一张图片随状态变色（#787）/ Icon rendering mode: one image, two colors (#787)
+
+```objc
+// 整个 TabBar（配置字典或配置文件）/ The whole tab bar (a configuration dictionary or file):
+NSDictionary *configuration = @{
+    CYLTabBarControllerIconRenderingMode : @"template",   // 没有单独设置的所有 Tab / every tab without its own
+    CYLTabBarControllerIconColor : @"#8E8E93",            // 未选中 / unselected
+    CYLTabBarControllerSelectedIconColor : @"#FF3B30",    // 选中 / selected
+    CYLTabBarControllerTabBarItemsAttributes : @[
+        @{ CYLTabBarItemTitle : @"Home", CYLTabBarItemImage : @"home_normal" },          // 只需一张图 / one image is enough
+        @{ CYLTabBarItemTitle : @"Shop", CYLTabBarItemImage : @"shop_colorful",
+           CYLTabBarItemIconRenderingMode : @"original" },                                 // 保持原色 / keeps its colors
+    ],
+};
+CYLTabBarController *tabBarController = [CYLTabBarController tabBarControllerWithConfiguration:configuration];
+
+// 单个 Tab，代码中 / One tab, in code:
+@{ CYLTabBarItemImage : @"home_normal", CYLTabBarItemIconRenderingMode : @"template",
+   CYLTabBarItemIconColor : UIColor.systemGrayColor, CYLTabBarItemSelectedIconColor : UIColor.systemRedColor };
+```
+
+| 值 / Value | 中文 | English |
+|:---|:---|:---|
+| `"template"` | 图标作为模板着色：未选中用 `CYLTabBarItemIconColor`，选中用 `CYLTabBarItemSelectedIconColor`，未设置时用 TabBar 的着色。没有选中图片时使用普通图片，因此一张图即可。 | The icon is tinted as a template: `CYLTabBarItemIconColor` unselected, `CYLTabBarItemSelectedIconColor` selected, else the tab bar's tint. Without a selected image the normal one is used, so one image is enough. |
+| `"original"` | 图标保持原色，即使设置了图标颜色（解决图标被染成灰色，#465、#588）。 | The icon keeps its own colors, even with an icon color set (the fix for icons turned gray, #465, #588). |
+| `"automatic"`（默认 / default） | 与之前相同：图片名按原图绘制，模板图片（SF Symbols）被着色。 | As before: image names are drawn as original, template images (SF Symbols) are tinted. |
+
+| 中文 | English |
+|:---|:---|
+| 值不区分大小写；其他值被移除并输出警告。Tab 自己的值优先于 TabBar 的默认值。`-updateTabBarItemAtIndex:attributes:` 换图时保持该 Tab 的渲染方式，只传 `CYLTabBarItemIconRenderingMode` 时重新绘制两张图片。 | Values are case-insensitive; others are removed with a warning. A tab's own value wins over the tab bar's default. `-updateTabBarItemAtIndex:attributes:` keeps the tab's mode when it changes an image, and redraws both images when given only `CYLTabBarItemIconRenderingMode`. |
+
 ### 单个 Tab 的字体 / Per-tab fonts
 
 ```objc
@@ -76,6 +109,8 @@ NSDictionary *live = @{
 | `CYLTabBarItemSelectedTitleColor` | 选中标题颜色。 | Selected title color. |
 | `CYLTabBarItemIconColor` | 未选中图标着色（仅模板图）。 | Unselected icon tint (template images only). |
 | `CYLTabBarItemSelectedIconColor` | 选中图标着色（仅模板图）。 | Selected icon tint (template images only). |
+| `CYLTabBarItemIconRenderingMode` | 图标渲染方式：`"template"`、`"original"` 或 `"automatic"`（#787）。Android 上为 `CYLConstants` 的同名键，`"automatic"` 时有图标颜色才着色。 | Icon rendering mode: `"template"`, `"original"` or `"automatic"` (#787). On Android the same key in `CYLConstants`; `"automatic"` tints only with an icon color. |
+| `CYLTabBarControllerIconRenderingMode`、`CYLTabBarControllerIconColor`、`CYLTabBarControllerSelectedIconColor` | 配置键：没有单独设置的所有 Tab 的渲染方式与图标颜色（#787）。 | Configuration keys: the rendering mode and icon colors of every tab without its own (#787). |
 | `CYLTabBarItemSelectedBackgroundColor` | 选中 Tab 的背景色（经典 TabBar 与扁平样式）。 | Background of the selected tab (classic tab bar and FlatDesign). |
 | `CYLTabBarItemBackgroundColor` | 未选中 Tab 的背景色；未设置选中背景色时，选中后也使用它。 | Background of the tab while not selected; also used when selected if there is no selected background. |
 | `CYLTabBarItemTitleFont` | 未选中标题字体（UIFont）。 | Unselected title font (UIFont). |
@@ -91,12 +126,28 @@ NSDictionary *live = @{
 
 | 中文 | English |
 |:---|:---|
-| 图标着色只对模板图片生效（`UIImageRenderingModeAlwaysTemplate`、SF Symbols）。以图片名传入的图标按原图绘制，不会被着色。 | Icon tints apply to template images only (`UIImageRenderingModeAlwaysTemplate`, SF Symbols). Icons given as image names are drawn as original and are not tinted. |
-| 液态玻璃自带选中效果，不支持 `CYLTabBarItemSelectedBackgroundColor`；扁平样式暂不支持图标着色。 | Liquid Glass draws its own selection, so `CYLTabBarItemSelectedBackgroundColor` does not apply there; FlatDesign does not tint icons yet. |
+| 图标着色只对模板图片生效（`UIImageRenderingModeAlwaysTemplate`、SF Symbols）。以图片名传入的图标默认按原图绘制；设置 `CYLTabBarItemIconRenderingMode` 为 `"template"` 后才会被着色。网络图标（`CYLTabBarItemImageURL`）与动画图标不受渲染方式影响。 | Icon tints apply to template images only (`UIImageRenderingModeAlwaysTemplate`, SF Symbols). Icons given as image names are drawn as original by default; `CYLTabBarItemIconRenderingMode` `"template"` tints them. Network icons (`CYLTabBarItemImageURL`) and animated icons are not affected by the mode. |
+| 液态玻璃自带选中效果，不支持 `CYLTabBarItemSelectedBackgroundColor`。iOS 26 的液态玻璃由系统以自己的颜色绘制未选中的模板图标与标题，`CYLTabBarItemIconColor` 只在选中时可见（见上方 iOS 截图中未选中的 Home）。扁平样式中模板图标由其图片视图着色（所有按钮使用选中 Tab 的 appearance 中的图标颜色），"original" 图标保持原色。 | Liquid Glass draws its own selection, so `CYLTabBarItemSelectedBackgroundColor` does not apply there. On iOS 26, Liquid Glass draws unselected template icons and titles in the system's own color, so `CYLTabBarItemIconColor` shows only once selected (see the unselected Home in the iOS screenshot above). In FlatDesign, template icons are tinted by their image view (every button uses the icon colors of the selected tab's appearance), and "original" icons keep their colors. |
 | 标题与图标颜色需要 iOS 13+（`UITabBarAppearance`），iOS 12 上忽略；经典 TabBar 的选中背景色在 iOS 12 上同样有效。 | Title and icon colors need iOS 13+ (`UITabBarAppearance`) and are ignored on iOS 12; the classic selected background works on iOS 12 too. |
 
 ## 截图 / Screenshots
 
 | 中文 | English |
 |:---|:---|
-| 本次开发环境没有 iOS 模拟器或真机，无法运行 Demo，因此暂无测试截图。在设备上验证后，请将截图放入 `docs/assets/` 并在此引用，例如 `![单个 Tab 的颜色](assets/tab-item-colors.png)`。 | This change was developed without an iOS simulator or device, so there are no test screenshots yet. After testing on a device, put screenshots in `docs/assets/` and reference them here, e.g. `![Per-tab colors](assets/tab-item-colors.png)`. |
+| Android（API 35 模拟器，Demo「Icon rendering mode (#787)」）。从上到下：默认样式选中 Home、选中 Video；液态玻璃选中 Home、选中 Video。Home 与 Video 为 "template"（Home 有自己的图标颜色：灰 / 红；Video 使用 TabBar 着色），Favor 为 "original"（设置了灰色图标颜色仍保持黄色），Shop 为 "automatic"（没有图标颜色，按原图绘制）。| Android (API 35 emulator, demo "Icon rendering mode (#787)"). Top to bottom: default style with Home selected, with Video selected; Liquid Glass with Home selected, with Video selected. Home and Video are "template" (Home has its own icon colors: gray / red; Video takes the bar's tint), Favor is "original" (stays yellow although its icon color is gray), Shop is "automatic" (no icon color, drawn as it is). |
+
+![Icon rendering mode on Android](assets/tab-item-icon-rendering-android.png)
+
+| 中文 | English |
+|:---|:---|
+| iOS 26.1（iPhone 17 Pro Max 模拟器，ObjC Demo 图库「8.5 Icon rendering mode (#787)」）。从上到下：选中 Home、选中 Video。Home 与 Video 为 "template"（Home 选中为自己的红色；Video 选中为 TabBar 的蓝色），Fishpond 为 "original"（设置了灰色图标颜色仍保持原色），Account 为 "automatic"（按原图绘制）。 | iOS 26.1 (iPhone 17 Pro Max simulator, ObjC demo gallery "8.5 Icon rendering mode (#787)"). Top to bottom: Home selected, Video selected. Home and Video are "template" (Home selected in its own red; Video selected in the bar's blue), Fishpond is "original" (keeps its colors although its icon color is gray), Account is "automatic" (drawn as it is). |
+
+![Icon rendering mode on iOS](assets/tab-item-icon-rendering-ios.png)
+
+## 状态 / Status
+
+| 中文 | English |
+|:---|:---|
+| DONE（#787 iOS，100/100，2026-11-10）：代码、配置解析、Protobuf 字段 13–15 / 62。单元测试 `testIconRenderingMode`、`testIconRenderingModeKeepsTheDarkImage`（深色图片：测试发现 `-imageWithRenderingMode:` 会丢掉深色版本，已修复为两种外观分别转换后重新合成）、`testIconRenderingModeInFlatDesign`（扁平样式：template 为模板图、original 保持原色）通过（iPhone 17 Pro Max 模拟器，115 个测试）。ObjC Demo 图库「8.5 Icon rendering mode (#787)」与「8.6 … on Liquid Glass」在 iOS 26.1 模拟器上运行，截图见下方。 | DONE (#787 iOS, 100/100, 2026-11-10): code, configuration parsing, Protobuf fields 13–15 / 62. Unit tests `testIconRenderingMode`, `testIconRenderingModeKeepsTheDarkImage` (dark images: the test found that `-imageWithRenderingMode:` dropped the dark variant; fixed by converting both appearances and combining them again) and `testIconRenderingModeInFlatDesign` (FlatDesign: template images are templates, original ones keep their colors) pass (iPhone 17 Pro Max simulator, 115 tests). The ObjC demo gallery scenes "8.5 Icon rendering mode (#787)" and "8.6 … on Liquid Glass" ran on an iOS 26.1 simulator; screenshots below. |
+| DONE（#787 Android，100/100，2026-11-10）：`CYLConstants` 的 4 个键、配置规范化（TabBar 默认值、小写、未知值移除）、Protobuf 字段 13–15 / 62、`CYLTabBarItem.cyl_iconRenderingMode` 与着色。单元测试 `iconRenderingModeTintsOrKeepsTheIcon` 与 `templateIconsOnLiquidGlassTakeTheBarTint`（液态玻璃：没有图标颜色的模板图标未选中时与标题同色，选中时为选中着色）通过（108 个测试）。在 API 35 模拟器上运行 Demo「Icon rendering mode (#787)」与其液态玻璃版本，截图见下方。 | DONE (#787 Android, 100/100, 2026-11-10): the 4 keys in `CYLConstants`, configuration normalization (bar defaults, lowercase, unknown values dropped), Protobuf fields 13–15 / 62, `CYLTabBarItem.cyl_iconRenderingMode` and the tint. Unit tests `iconRenderingModeTintsOrKeepsTheIcon` and `templateIconsOnLiquidGlassTakeTheBarTint` (Liquid Glass: a template icon without an icon color has the title's color unselected and the selected tint once selected) pass (108 tests). The demo "Icon rendering mode (#787)" and its Liquid Glass twin ran on an API 35 emulator; screenshots below. |
+| DONE（#787 React Native 与 Flutter，2026-11-10）：两个组件提供 `iconRenderingMode`、`iconColor`、`selectedIconColor`（TabBar 与每个 Tab），映射到同样的键，由 iOS 与 Android 的库处理。测试：React Native `src/__tests__/index.test.tsx`（jest）与 Flutter `test/cyl_tab_bar_test.dart`（5 个测试）通过，`tsc` 无错误。 | DONE (#787 React Native and Flutter, 2026-11-10): both components have `iconRenderingMode`, `iconColor`, `selectedIconColor` (bar and each tab), mapped to the same keys and handled by the iOS and Android libraries. Tests: React Native `src/__tests__/index.test.tsx` (jest) and Flutter `test/cyl_tab_bar_test.dart` (5 tests) pass, `tsc` reports no errors. |

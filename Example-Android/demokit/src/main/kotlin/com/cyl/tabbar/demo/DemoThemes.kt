@@ -38,11 +38,11 @@ class EmojiDrawable(private val emoji: String) : Drawable() {
 
 /**
  * [EN] One skin of the iOS demo's theme list (issue #216, `CYLDemoTheme` in `UIViewController+CYLThemeSettings`): a tint, a
- *      bar color, an unselected color; a holiday skin's icons (`cyl_theme_<name>@3x.png` of the library's resource bundle)
+ *      bar color, an unselected color; a holiday skin's icons (`Skins/1.0.0/<theme>/<name>@3x.png` of Example-Shared/Configurations)
  *      in turn on every tab, selected in full color and unselected faded, the last one on the plus button; the network skin
  *      a "★" title prefix and icons downloaded from the network.
  * [CN] iOS 演示皮肤列表中的一个皮肤（issue #216，`UIViewController+CYLThemeSettings` 中的 `CYLDemoTheme`）：强调色、TabBar 颜色、未选中颜色；
- *      节日皮肤的图标（库资源 bundle 中的 `cyl_theme_<name>@3x.png`）依次用于每个 Tab，选中时为全彩、未选中时为淡色，最后一个用于 PlusButton；
+ *      节日皮肤的图标（Example-Shared/Configurations 中的 `Skins/1.0.0/<主题>/<名称>@3x.png`）依次用于每个 Tab，选中时为全彩、未选中时为淡色，最后一个用于 PlusButton；
  *      网络皮肤为标题加 "★" 前缀，并从网络下载图标。
  */
 class DemoTheme(
@@ -56,7 +56,15 @@ class DemoTheme(
     private val plusButtonIconURLs: Pair<String, String>? = null,
 ) : CYLTabBarTheme {
 
-    private fun icon(context: Context, name: String): Drawable? = DemoAssets.drawable(context, "cyl_theme_$name")
+    /**
+     * [EN] A holiday icon of the app (Example-Shared/Configurations, the assets root): `Skins/1.0.0/<theme>/<icon>@3x.png`,
+     *      the theme folder being the name in lowercase with "-" for spaces, as on iOS.
+     * [CN] App 中的节日图标（Example-Shared/Configurations，即 assets 根目录）：`Skins/1.0.0/<主题>/<图标>@3x.png`，主题文件夹为小写名称、空格换成 "-"，与 iOS 相同。
+     */
+    private fun icon(context: Context, name: String): Drawable? {
+        val folder = this.name.lowercase().replace("'", "").replace(" ", "-")
+        return DemoAssets.file(context, "Skins/1.0.0/$folder/$name@3x.png", 3f)
+    }
 
     override fun cyl_tabBarItemsAttributesForTabBarController(tabBarController: CYLTabBarController): List<Map<String, Any?>>? {
         val count = tabBarController.tabBarItemsAttributes.size

@@ -1,0 +1,40 @@
+{
+  "string": [
+    {
+      "name": "tab_home",
+      "value": "หน้าแรก"
+    },
+    {
+      "name": "tab_nearby",
+      "value": "ใกล้ฉัน"
+    },
+    {
+      "name": "tab_messages",
+      "value": "ข้อความ"
+    },
+    {
+      "name": "tab_me",
+      "value": "ฉัน"
+    },
+    {
+      "name": "tab_post",
+      "value": "โพสต์"
+    },
+    {
+      "name": "tab_refresh",
+      "value": "รีเฟรช"
+    },
+    {
+      "name": "module_desc",
+      "value": "CYLTabBarController example"
+    },
+    {
+      "name": "ability_desc",
+      "value": "CYLTabBarController example"
+    },
+    {
+      "name": "app_name",
+      "value": "CYLTabBar"
+    }
+  ]
+}

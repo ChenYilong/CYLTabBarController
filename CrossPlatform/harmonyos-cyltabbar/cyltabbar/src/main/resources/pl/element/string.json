@@ -1,0 +1,952 @@
+{
+  "string": [
+    {
+      "name": "cyl_l10n_bffed61338ea",
+      "value": "%@ CYLTabBarController w HarmonyOS"
+    },
+    {
+      "name": "cyl_l10n_9ecf653a3fc6",
+      "value": "%@ · inny kontekst · stuknięcia plusa: %@"
+    },
+    {
+      "name": "cyl_l10n_aaf9b7d7382d",
+      "value": "Nowe wiadomości: %@"
+    },
+    {
+      "name": "cyl_l10n_81a05b6c1cf9",
+      "value": "%@, %@"
+    },
+    {
+      "name": "cyl_l10n_0b0ae9062c5a",
+      "value": "Kontroler paska kart z innego kontekstu, z kwadratowym przyciskiem plus"
+    },
+    {
+      "name": "cyl_l10n_427131e7add2",
+      "value": "Inny przycisk plus"
+    },
+    {
+      "name": "cyl_l10n_aa3e67bda3c0",
+      "value": "ArkUI Tabs, systemowy pasek kart HarmonyOS, z tymi samymi kartami"
+    },
+    {
+      "name": "cyl_l10n_0557fa923dce",
+      "value": "Wstecz"
+    },
+    {
+      "name": "cyl_l10n_8665e238c516",
+      "value": "Plakietka: %@"
+    },
+    {
+      "name": "cyl_l10n_6b2186414c82",
+      "value": "Mignięcie ×3"
+    },
+    {
+      "name": "cyl_l10n_070554647306",
+      "value": "Obramowanie"
+    },
+    {
+      "name": "cyl_l10n_43d3e34b15fb",
+      "value": "Obramowanie zgodne z trybem ciemnym"
+    },
+    {
+      "name": "cyl_l10n_b67554192c50",
+      "value": "Lewy dolny"
+    },
+    {
+      "name": "cyl_l10n_5968e3c37145",
+      "value": "Prawy dolny"
+    },
+    {
+      "name": "cyl_l10n_5d60263416c2",
+      "value": "Odbijanie (bez końca)"
+    },
+    {
+      "name": "cyl_l10n_f3ce1baf4805",
+      "value": "Odbijanie ×3 (cyl_bounceAnimationRepeatTimes)"
+    },
+    {
+      "name": "cyl_l10n_0875a57843a1",
+      "value": "Oddychanie (bez końca)"
+    },
+    {
+      "name": "cyl_l10n_8795570ddeef",
+      "value": "CYLTabBarItemBackgroundColor / CYLTabBarItemSelectedBackgroundColor"
+    },
+    {
+      "name": "cyl_l10n_687f0fbab628",
+      "value": "CYLTabBarRiveURL: selecting a tab sets its state machine input active; deselecting resets it"
+    },
+    {
+      "name": "cyl_l10n_d7c01888e55e",
+      "value": "CYLTabBarSVGAFilePath: odtwarza raz po wybraniu, w przeciwnym razie pierwsza klatka"
+    },
+    {
+      "name": "cyl_l10n_132201f60522",
+      "value": "CYLUtils: słabe obiekty powiązane i wyszukiwanie przycisku (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_fa3d06c1b1e9",
+      "value": "CYLFlatDesignTabBarItem: niewyśrodkowany (styl systemowy)"
+    },
+    {
+      "name": "cyl_l10n_5e74163d3804",
+      "value": "CYLFlatDesignTabBarItem: wyśrodkowany"
+    },
+    {
+      "name": "cyl_l10n_f6da70b584ae",
+      "value": "Plik konfiguracyjny: %@"
+    },
+    {
+      "name": "cyl_l10n_158b3b19e868",
+      "value": "Promień narożnika"
+    },
+    {
+      "name": "cyl_l10n_4d242c36821c",
+      "value": "Własne kolory"
+    },
+    {
+      "name": "cyl_l10n_4685555ab484",
+      "value": "Własna czcionka"
+    },
+    {
+      "name": "cyl_l10n_a45350c25311",
+      "value": "Własne maksimum (9)"
+    },
+    {
+      "name": "cyl_l10n_3924c958175e",
+      "value": "Tryb ciemny"
+    },
+    {
+      "name": "cyl_l10n_b9c74f4cd786",
+      "value": "Przygaszony"
+    },
+    {
+      "name": "cyl_l10n_abfc3a65538a",
+      "value": "Odkrywaj"
+    },
+    {
+      "name": "cyl_l10n_bf0576472e31",
+      "value": "Stuknij dwukrotnie, aby otworzyć"
+    },
+    {
+      "name": "cyl_l10n_7e0a1ad9a767",
+      "value": "Jednorazowe pojawienie"
+    },
+    {
+      "name": "cyl_l10n_153407d52fed",
+      "value": "Flat Design"
+    },
+    {
+      "name": "cyl_l10n_5cfed317a99d",
+      "value": "Styl Flat Design"
+    },
+    {
+      "name": "cyl_l10n_026b984bb8d8",
+      "value": "Obrót ×2"
+    },
+    {
+      "name": "cyl_l10n_c5d4cd682981",
+      "value": "Ikona GIF"
+    },
+    {
+      "name": "cyl_l10n_8cf04a973413",
+      "value": "Start"
+    },
+    {
+      "name": "cyl_l10n_d52d30723b2f",
+      "value": "Jednorazowo od lewej do prawej"
+    },
+    {
+      "name": "cyl_l10n_1aae3277f8d3",
+      "value": "Liquid Glass (wzorzec)"
+    },
+    {
+      "name": "cyl_l10n_32f643a9aa26",
+      "value": "Liquid Glass: efekt przezroczystości wzorca"
+    },
+    {
+      "name": "cyl_l10n_f201a4158727",
+      "value": "Liquid Glass"
+    },
+    {
+      "name": "cyl_l10n_af3acf6eb4a9",
+      "value": "Liquid Glass"
+    },
+    {
+      "name": "cyl_l10n_2e8e48a2ebfd",
+      "value": "Przytrzymaj kartę lub przycisk plus"
+    },
+    {
+      "name": "cyl_l10n_983696096694",
+      "value": "Margines"
+    },
+    {
+      "name": "cyl_l10n_318b2739ddc2",
+      "value": "Ja"
+    },
+    {
+      "name": "cyl_l10n_4c2a8fe7eaf2",
+      "value": "Wiadomości"
+    },
+    {
+      "name": "cyl_l10n_24d459a81449",
+      "value": "NOWE"
+    },
+    {
+      "name": "cyl_l10n_03c2e7e41ffc",
+      "value": "Nowe"
+    },
+    {
+      "name": "cyl_l10n_1e8f217bdf71",
+      "value": "Następna karta (cyl_selectNextTab, issue #535)"
+    },
+    {
+      "name": "cyl_l10n_3826b8552c94",
+      "value": "Następny utwór"
+    },
+    {
+      "name": "cyl_l10n_b2ee912b91d6",
+      "value": "Liczba"
+    },
+    {
+      "name": "cyl_l10n_ab7fa33c83b1",
+      "value": "Liczba powyżej maksimum"
+    },
+    {
+      "name": "cyl_l10n_e0aa021e21dd",
+      "value": "OK"
+    },
+    {
+      "name": "cyl_l10n_8a7b0e9c294e",
+      "value": "Wł.: %@; przesuń stronę w lewo / prawo"
+    },
+    {
+      "name": "cyl_l10n_06eb0a05de97",
+      "value": "Wł.: %@; nowa strona wsuwa się od strony swojej karty"
+    },
+    {
+      "name": "cyl_l10n_287e78fd65af",
+      "value": "Inny tekst"
+    },
+    {
+      "name": "cyl_l10n_84432607fd87",
+      "value": "Strona: %@"
+    },
+    {
+      "name": "cyl_l10n_105b296a83f9",
+      "value": "Wstrzymaj"
+    },
+    {
+      "name": "cyl_l10n_de3c731be563",
+      "value": "Odtwórz"
+    },
+    {
+      "name": "cyl_l10n_41b77539cc64",
+      "value": "Obraz PlusButton wczytany później"
+    },
+    {
+      "name": "cyl_l10n_72a245189eaf",
+      "value": "Obszar dotyku PlusButton (issue #91)"
+    },
+    {
+      "name": "cyl_l10n_9a1d72fdd764",
+      "value": "Poprzednia karta (cyl_selectPreviousTab, issue #535)"
+    },
+    {
+      "name": "cyl_l10n_4b0282f4f1c6",
+      "value": "Push do systemowego UITabBarController (inny przycisk plus)"
+    },
+    {
+      "name": "cyl_l10n_e5416d3ed3c0",
+      "value": "Przejdź do innego CYLTabBarController (inny PlusButton)"
+    },
+    {
+      "name": "cyl_l10n_8c96672c9bc5",
+      "value": "Push TabBarController z tym samym context (ta sama klasa przycisku plus)"
+    },
+    {
+      "name": "cyl_l10n_6166b27ea14b",
+      "value": "Pokaż TabBarController z nowym kontekstem (PlusButton z dotykalnym widokiem podrzędnym X, issue #202)"
+    },
+    {
+      "name": "cyl_l10n_a63e8b745e73",
+      "value": "Otwiera stronę, która ukrywa pasek nawigacji, bez klasy bazowej"
+    },
+    {
+      "name": "cyl_l10n_79fe28f3a3ac",
+      "value": "Otwiera kontroler, którego obraz przycisku plus zmienia się po 2 s; układ nie może się przesunąć"
+    },
+    {
+      "name": "cyl_l10n_c27618b1aa9d",
+      "value": "Czerwona kropka"
+    },
+    {
+      "name": "cyl_l10n_255c00a63f9d",
+      "value": "Promień czerwonej kropki"
+    },
+    {
+      "name": "cyl_l10n_7aac5e07b16d",
+      "value": "Jednorazowo od prawej do lewej"
+    },
+    {
+      "name": "cyl_l10n_e7d74cf8c9a3",
+      "value": "Rive tab icons (configuration file)"
+    },
+    {
+      "name": "cyl_l10n_9d01c837b4bc",
+      "value": "Rive tab icon: house.riv (number input Rooms)"
+    },
+    {
+      "name": "cyl_l10n_f0c792c049bc",
+      "value": "Jednorazowe przewinięcie"
+    },
+    {
+      "name": "cyl_l10n_401ea21c7a44",
+      "value": "Obrót (bez końca)"
+    },
+    {
+      "name": "cyl_l10n_bd001817e373",
+      "value": "Ikony kart SVGA (plik konfiguracyjny)"
+    },
+    {
+      "name": "cyl_l10n_b5fcd68edd9f",
+      "value": "Skalowanie (bez końca)"
+    },
+    {
+      "name": "cyl_l10n_544d03258eaf",
+      "value": "Jednorazowe skalowanie"
+    },
+    {
+      "name": "cyl_l10n_dbd4f5e49888",
+      "value": "Skalowanie ×3"
+    },
+    {
+      "name": "cyl_l10n_13348442cc6a",
+      "value": "Szukaj"
+    },
+    {
+      "name": "cyl_l10n_9ae56cc36e81",
+      "value": "Potrząsanie (bez końca)"
+    },
+    {
+      "name": "cyl_l10n_e0a90124b72f",
+      "value": "Potrząsanie ×3 (cyl_shakeAnimationRepeatTimes)"
+    },
+    {
+      "name": "cyl_l10n_b10d33d5ad4d",
+      "value": "Potrząsanie, zatrzymuje się przy Ograniczeniu ruchu"
+    },
+    {
+      "name": "cyl_l10n_6cbe015b00fb",
+      "value": "Pokaż / ukryj CYLFlatDesignTabBar"
+    },
+    {
+      "name": "cyl_l10n_561582c1e7cc",
+      "value": "Pokazuje obszar dotyku na półprzezroczystą czerwono: %@; skala %@x; stuknij: 1x, 1,5x, 2x, wył."
+    },
+    {
+      "name": "cyl_l10n_3cb58e0d546d",
+      "value": "Sprężyna (bez końca)"
+    },
+    {
+      "name": "cyl_l10n_0a00b2238071",
+      "value": "Jednorazowa sprężyna"
+    },
+    {
+      "name": "cyl_l10n_fee4a478923f",
+      "value": "Interakcje kart"
+    },
+    {
+      "name": "cyl_l10n_5ea7bf3d8e63",
+      "value": "Tab icon animations loop: off"
+    },
+    {
+      "name": "cyl_l10n_918aff638366",
+      "value": "Tab icon animations loop: on"
+    },
+    {
+      "name": "cyl_l10n_98559580dcc7",
+      "value": "Animacja dotknięcia kart (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_db89836d6e21",
+      "value": "Dźwięk i haptyka stuknięcia karty (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_2f6e866d5219",
+      "value": "Strony kart, wybór i logowanie"
+    },
+    {
+      "name": "cyl_l10n_6d067090c833",
+      "value": "Karta, %1$@ z %2$@"
+    },
+    {
+      "name": "cyl_l10n_456887f9731c",
+      "value": "Karta: %@"
+    },
+    {
+      "name": "cyl_l10n_ab5745daa734",
+      "value": "Galeria pasków kart"
+    },
+    {
+      "name": "cyl_l10n_75ccb7ef4864",
+      "value": "Wygląd paska kart"
+    },
+    {
+      "name": "cyl_l10n_7c4aecba91c3",
+      "value": "Obraz karty tej strony z rawfile aplikacji (pakiet zasobów w iOS); stuknij ponownie, aby przywrócić"
+    },
+    {
+      "name": "cyl_l10n_2e6d648945c0",
+      "value": "Przycisk plus wystaje ponad pasek; część nad paskiem też reaguje (na czerwono)"
+    },
+    {
+      "name": "cyl_l10n_9b6633b75bf2",
+      "value": "Karta „Ja” wymaga logowania (issue #19); stuknij, aby przełączyć"
+    },
+    {
+      "name": "cyl_l10n_a4d0d101d6a3",
+      "value": "Lewy górny"
+    },
+    {
+      "name": "cyl_l10n_2306a585ae00",
+      "value": "cyl_itemEdgeInsets: 15% szerokości karty wolne na każdym końcu"
+    },
+    {
+      "name": "cyl_l10n_6360bbdfb8ff",
+      "value": "cyl_itemEdgeInsets: zero, karty wypełniają pasek"
+    },
+    {
+      "name": "cyl_l10n_fd15e88376df",
+      "value": "Demo metod cyl_pop / cyl_push"
+    },
+    {
+      "name": "cyl_l10n_ca3dcd2d62be",
+      "value": "cyl_popSelectTabBarChildViewControllerAtIndex: 1 (%@)"
+    },
+    {
+      "name": "cyl_l10n_3b06a9582640",
+      "value": "cyl_popSelectTabBarChildViewControllerForTabBarItemIdentifier: message"
+    },
+    {
+      "name": "cyl_l10n_59884403daf6",
+      "value": "cyl_pushOrPopToViewController: pages/Index (już na stosie: wraca)"
+    },
+    {
+      "name": "cyl_l10n_1ec113617309",
+      "value": "cyl_pushViewController, cyl_popSelectTabBarChildViewControllerAtIndex, cyl_pushOrPopToViewController"
+    },
+    {
+      "name": "cyl_l10n_9fb845377ee4",
+      "value": "cyl_pushViewController: zielona strona"
+    },
+    {
+      "name": "cyl_l10n_ff5772993aee",
+      "value": "cyl_tabBarItemLongPressDuration = %@ ms, cyl_tabBarItemDoubleTapInterval = %@ ms; stuknij, aby zmienić; stuknij dwukrotnie kartę, aby zobaczyć"
+    },
+    {
+      "name": "cyl_l10n_f69c71bc581e",
+      "value": "cyl_tabBarMinimizeBehavior = %@; stuknij, aby wybrać, a potem przewiń tę listę"
+    },
+    {
+      "name": "cyl_l10n_4abddd944c2e",
+      "value": "harmonyos-liquid-glass-tabbar: kapsuła kart, kula wyszukiwania i pasek muzyki nad kolorową treścią; przewiń, aby zminimalizować"
+    },
+    {
+      "name": "cyl_l10n_3b4e07b5542e",
+      "value": "numberInput=Rooms: each select or tap again sets Rooms to the next value (3, 4, 5, 6)"
+    },
+    {
+      "name": "cyl_l10n_f3f4ecf4a4a6",
+      "value": "selectedIndex = %@ (strona przycisku plus to %@, nigdy indeks karty); stuknij, aby przejść do następnej karty"
+    },
+    {
+      "name": "cyl_l10n_ee5b6ac6461b",
+      "value": "selectedIndex i PlusButton (issue #515)"
+    },
+    {
+      "name": "cyl_l10n_2de6d572f86b",
+      "value": "Motyw standardAppearance (wspólny dla Liquid Glass i FlatDesign)"
+    },
+    {
+      "name": "cyl_l10n_c4376b477be8",
+      "value": "tabBarHidden = %@; ukryty, wraca po 2 s"
+    },
+    {
+      "name": "cyl_l10n_2a0608059131",
+      "value": "Aktualizuje tytuły wszystkich kart naraz; stuknij ponownie, aby przywrócić"
+    },
+    {
+      "name": "cyl_l10n_57196013d558",
+      "value": "Halloween"
+    },
+    {
+      "name": "cyl_l10n_0a58c230c3d9",
+      "value": "Pobiera i aktualizuje ikony wszystkich kart; stuknij ponownie, aby przywrócić"
+    },
+    {
+      "name": "cyl_l10n_5e347d8ccb68",
+      "value": "Pobierz ikonę z sieci"
+    },
+    {
+      "name": "cyl_l10n_2e0e84a0dcfb",
+      "value": "Ukrywanie paska nawigacji bez klasy bazowej (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_321ff794aab8",
+      "value": "N/D"
+    },
+    {
+      "name": "cyl_l10n_e1642a46b804",
+      "value": "Święto Środka Jesieni"
+    },
+    {
+      "name": "cyl_l10n_0c2817d10627",
+      "value": "Średnia haptyka"
+    },
+    {
+      "name": "cyl_l10n_0f60774903e0",
+      "value": "Wczytywanie obrazów z bundle (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_0e1b02648a11",
+      "value": "Przybliżenie"
+    },
+    {
+      "name": "cyl_l10n_83c39abd16cd",
+      "value": "Wybierz z albumu"
+    },
+    {
+      "name": "cyl_l10n_cc03f47a389c",
+      "value": "Pobiera ikonę karty z sieci (z pamięcią podręczną); stuknij ponownie, aby przywrócić"
+    },
+    {
+      "name": "cyl_l10n_e05f97c5159d",
+      "value": "Utwórz TabBarController z pliku konfiguracyjnego"
+    },
+    {
+      "name": "cyl_l10n_5f0c0bf32dc1",
+      "value": "Zachowaj"
+    },
+    {
+      "name": "cyl_l10n_24fb8692947a",
+      "value": "zachowana"
+    },
+    {
+      "name": "cyl_l10n_b15d91274e9f",
+      "value": "Zamknij"
+    },
+    {
+      "name": "cyl_l10n_70922c50ef07",
+      "value": "Ostrzeżenie o pamięci"
+    },
+    {
+      "name": "cyl_l10n_cbed6b29761b",
+      "value": "Przycisk plus"
+    },
+    {
+      "name": "cyl_l10n_18684d72945b",
+      "value": "Wczytaj obraz"
+    },
+    {
+      "name": "cyl_l10n_b981b7b359a7",
+      "value": "Wczytaj obraz tła"
+    },
+    {
+      "name": "cyl_l10n_7136049eb4c7",
+      "value": "Zwalnia niewybrane karty; ładują się ponownie po wybraniu"
+    },
+    {
+      "name": "cyl_l10n_c7626d7d6194",
+      "value": "Zmienia na miejscu tytuł karty tej strony; stuknij ponownie, aby przywrócić"
+    },
+    {
+      "name": "cyl_l10n_15fb093f6fff",
+      "value": "Aktualizacja kart w miejscu"
+    },
+    {
+      "name": "cyl_l10n_c1ecedab11bc",
+      "value": "Oryginalny"
+    },
+    {
+      "name": "cyl_l10n_83611abd5f80",
+      "value": "Opublikuj"
+    },
+    {
+      "name": "cyl_l10n_625fb26b4b33",
+      "value": "Anuluj"
+    },
+    {
+      "name": "cyl_l10n_d25efeb790bb",
+      "value": "W pobliżu"
+    },
+    {
+      "name": "cyl_l10n_7941d8987ff2",
+      "value": "Porównaj z systemowym UITabBar"
+    },
+    {
+      "name": "cyl_l10n_d0d78acf1941",
+      "value": "Boże Narodzenie"
+    },
+    {
+      "name": "cyl_l10n_aa91e8ceec70",
+      "value": "Wielkanoc"
+    },
+    {
+      "name": "cyl_l10n_3df20a295b39",
+      "value": "Lato"
+    },
+    {
+      "name": "cyl_l10n_0ef6dae7e80c",
+      "value": "Kosmos"
+    },
+    {
+      "name": "cyl_l10n_2f383291bcf8",
+      "value": "Rzeczywiste: %@"
+    },
+    {
+      "name": "cyl_l10n_bccc798b577a",
+      "value": "Kapsuła na środku"
+    },
+    {
+      "name": "cyl_l10n_f613681ddf31",
+      "value": "Pokaż wszystkie symulacje (%@)"
+    },
+    {
+      "name": "cyl_l10n_7c87af044929",
+      "value": "Przesuń, aby zmienić kartę (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_7a2261654d24",
+      "value": "zwolniona"
+    },
+    {
+      "name": "cyl_l10n_f79d05d929aa",
+      "value": "Bezpiecznie utworzono TabBarController: kart: %@"
+    },
+    {
+      "name": "cyl_l10n_091885db07e4",
+      "value": "Odbicie"
+    },
+    {
+      "name": "cyl_l10n_758903c327de",
+      "value": "Pokazuje animowany GIF jako ikonę karty; stuknij ponownie, aby przywrócić"
+    },
+    {
+      "name": "cyl_l10n_56e6ecf97176",
+      "value": "Loop"
+    },
+    {
+      "name": "cyl_l10n_c7db6d4f1a42",
+      "value": "Przywróć"
+    },
+    {
+      "name": "cyl_l10n_c4328f75476f",
+      "value": "Walentynki"
+    },
+    {
+      "name": "cyl_l10n_07b181184280",
+      "value": "Ja"
+    },
+    {
+      "name": "cyl_l10n_2a3e7f5c382c",
+      "value": "Ręcznie"
+    },
+    {
+      "name": "cyl_l10n_97a6bedeb7fd",
+      "value": "Ręcznie: stuknij, aby włączyć ukrywanie przy przewijaniu, przewiń w dół, aby ukryć TabBar, a potem zrób to, co mówi tytuł. Oczekiwane: TabBar od razu wraca."
+    },
+    {
+      "name": "cyl_l10n_f68e7e217ad1",
+      "value": "Ręcznie: %@"
+    },
+    {
+      "name": "cyl_l10n_89246468f7fd",
+      "value": "Otwórz galerię pasków kart"
+    },
+    {
+      "name": "cyl_l10n_a01539048bb0",
+      "value": "Włącz przełącznik, a następnie przytrzymaj dowolną kartę lub PlusButton, aby zobaczyć jego identyfikator."
+    },
+    {
+      "name": "cyl_l10n_633c2ee4dcc7",
+      "value": "Zmień wszystkie ikony sieciowe"
+    },
+    {
+      "name": "cyl_l10n_f75fe6720861",
+      "value": "Zmień wszystkie ikony lokalne"
+    },
+    {
+      "name": "cyl_l10n_7fb5208a54d5",
+      "value": "Zmień wszystkie tytuły"
+    },
+    {
+      "name": "cyl_l10n_2f728e190695",
+      "value": "Pokazuje inne strony w kartach po obu stronach tej karty (issue #481); stuknij ponownie, aby przywrócić"
+    },
+    {
+      "name": "cyl_l10n_bed9ec1e8448",
+      "value": "Zrób zdjęcie"
+    },
+    {
+      "name": "cyl_l10n_0be5a194844c",
+      "value": "Skórka"
+    },
+    {
+      "name": "cyl_l10n_61a9cd33b1ff",
+      "value": "Skórka (motyw, issue #216)"
+    },
+    {
+      "name": "cyl_l10n_09d0fdddca66",
+      "value": "Skórki: święta i kolory (%@)"
+    },
+    {
+      "name": "cyl_l10n_3de5855e2c7f",
+      "value": "Zwiń listę symulacji"
+    },
+    {
+      "name": "cyl_l10n_a0ffdf359138",
+      "value": "Zmień wysokość CYLFlatDesignTabBar"
+    },
+    {
+      "name": "cyl_l10n_01e3254a92ba",
+      "value": "Powiększ i pomniejsz"
+    },
+    {
+      "name": "cyl_l10n_d46d5bb15db1",
+      "value": "Nowy Rok"
+    },
+    {
+      "name": "cyl_l10n_79b5a6564585",
+      "value": "Obrót"
+    },
+    {
+      "name": "cyl_l10n_d81bb206a889",
+      "value": "Brak"
+    },
+    {
+      "name": "cyl_l10n_14f433db2189",
+      "value": "Bez klasy bazowej i narzędzia"
+    },
+    {
+      "name": "cyl_l10n_d2339bb4edaa",
+      "value": "Święto Wiosny"
+    },
+    {
+      "name": "cyl_l10n_5f1de850fb46",
+      "value": "Zmień tytuł karty"
+    },
+    {
+      "name": "cyl_l10n_9d0d66f312b5",
+      "value": "Zastąp większym obrazem"
+    },
+    {
+      "name": "cyl_l10n_b051a19ace76",
+      "value": "Zastąp sąsiednie karty"
+    },
+    {
+      "name": "cyl_l10n_3e730a3320e9",
+      "value": "Strona zastępcza %@"
+    },
+    {
+      "name": "cyl_l10n_a131e4f178aa",
+      "value": "Nowa zawartość"
+    },
+    {
+      "name": "cyl_l10n_467b3e031441",
+      "value": "niezaładowana"
+    },
+    {
+      "name": "cyl_l10n_2c8d9e877a54",
+      "value": "Przesunięcie tytułu (titlePositionAdjustment)"
+    },
+    {
+      "name": "cyl_l10n_0787cd518387",
+      "value": "Symuluj ostrzeżenie o pamięci"
+    },
+    {
+      "name": "cyl_l10n_d76904d0e7ee",
+      "value": "Każda scena to pasek kart zbudowany za pomocą publicznego API: style, animacje, przypomnienia, Lottie i nowsze API kart"
+    },
+    {
+      "name": "cyl_l10n_6a00c1ae99fa",
+      "value": "Ocean"
+    },
+    {
+      "name": "cyl_l10n_ff692f04ace0",
+      "value": "Wiadomości"
+    },
+    {
+      "name": "cyl_l10n_41e8e8b9935c",
+      "value": "Ciemny"
+    },
+    {
+      "name": "cyl_l10n_8dfe6bcdd6ec",
+      "value": "Przejście przesuwane (CYLTabBarSlideTransitionAnimator)"
+    },
+    {
+      "name": "cyl_l10n_9f44bafc75c6",
+      "value": "Zmniejszanie / ukrywanie TabBar podczas przewijania (issue #13)"
+    },
+    {
+      "name": "cyl_l10n_8625f5f225d7",
+      "value": "Ukrywanie przy przewijaniu: symulacja przerwań (issue #13)"
+    },
+    {
+      "name": "cyl_l10n_678abebe6aac",
+      "value": "Stuknij X w prawym górnym rogu PlusButton: X zmienia kolor na losowy, a PlusButton nie reaguje"
+    },
+    {
+      "name": "cyl_l10n_7375af54db2a",
+      "value": "Stuknij, aby zmienić animację dotknięcia kart i PlusButton. Teraz: %@"
+    },
+    {
+      "name": "cyl_l10n_5378f31b520c",
+      "value": "Stuknij, aby przełączyć tabBar.standardAppearance, bieżący: %@"
+    },
+    {
+      "name": "cyl_l10n_4a986e4da535",
+      "value": "Stuknij, aby przełączyć pionowe przesunięcie tytułów wszystkich kart, bieżące: %@"
+    },
+    {
+      "name": "cyl_l10n_3d0d9d3d7cc2",
+      "value": "Stuknij, aby zmienić język"
+    },
+    {
+      "name": "cyl_l10n_f4e41dda1094",
+      "value": "Stuknij, aby przełączyć, a potem stuknij dowolną kartę lub PlusButton, aby usłyszeć. Haptyka wibruje tylko na prawdziwym urządzeniu. Teraz: %@"
+    },
+    {
+      "name": "cyl_l10n_15855ab96e87",
+      "value": "Kliknięcie + haptyka"
+    },
+    {
+      "name": "cyl_l10n_cff8a9cded04",
+      "value": "Stuknij, aby wybrać motyw: tło, ikony i kolory tekstu TabBar zmieniają się na miejscu, w każdym stylu TabBar. Teraz: %@"
+    },
+    {
+      "name": "cyl_l10n_1c00c4fd1cea",
+      "value": "Różowa róża"
+    },
+    {
+      "name": "cyl_l10n_8483ed132b2c",
+      "value": "Urodziny"
+    },
+    {
+      "name": "cyl_l10n_feef14745f21",
+      "value": "Aktualizuje ikony wszystkich kart obrazami lokalnymi (nazwa, ścieżka, UIImage, URL pliku); stuknij ponownie, aby przywrócić"
+    },
+    {
+      "name": "cyl_l10n_402d19e50fff",
+      "value": "Zaloguj"
+    },
+    {
+      "name": "cyl_l10n_833152116634",
+      "value": "Usuń obraz"
+    },
+    {
+      "name": "cyl_l10n_a0676a7d84a9",
+      "value": "Zielona linia"
+    },
+    {
+      "name": "cyl_l10n_16068b2ff3fd",
+      "value": "Ikony z sieci"
+    },
+    {
+      "name": "cyl_l10n_69ca6555a602",
+      "value": "Odwrócenie"
+    },
+    {
+      "name": "cyl_l10n_4bd51044149f",
+      "value": "Własny plik dźwiękowy (cyl_tabButtonTapSoundURL)"
+    },
+    {
+      "name": "cyl_l10n_9d1c8a70d4da",
+      "value": "Autotest"
+    },
+    {
+      "name": "cyl_l10n_11858aeb1656",
+      "value": "Autotest: uruchom wszystkie automatyczne symulacje, zgłoś PASS / FAIL"
+    },
+    {
+      "name": "cyl_l10n_beabcd498b94",
+      "value": "Grejpfrut"
+    },
+    {
+      "name": "cyl_l10n_b8c467fce096",
+      "value": "Plakietki"
+    },
+    {
+      "name": "cyl_l10n_200e65177369",
+      "value": "Ustaw kolor tła CYLFlatDesignTabBarItem"
+    },
+    {
+      "name": "cyl_l10n_295bb704f520",
+      "value": "Język"
+    },
+    {
+      "name": "cyl_l10n_d673e0eb5c1c",
+      "value": "Reagowanie poza widokiem nadrzędnym (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_71bbc726ace5",
+      "value": "Zgodnie z systemem"
+    },
+    {
+      "name": "cyl_l10n_d0914cf6acd2",
+      "value": "Nawigacja i porównania"
+    },
+    {
+      "name": "cyl_l10n_110abc875180",
+      "value": "Lekka haptyka"
+    },
+    {
+      "name": "cyl_l10n_fad7c8a21fe3",
+      "value": "Wybrane"
+    },
+    {
+      "name": "cyl_l10n_aa05fd09a619",
+      "value": "Ogólne"
+    },
+    {
+      "name": "cyl_l10n_15c64aa0b404",
+      "value": "Plik konfiguracji"
+    },
+    {
+      "name": "cyl_l10n_d505958a042b",
+      "value": "Konfiguracja: symulowane awarie"
+    },
+    {
+      "name": "cyl_l10n_45158907e07f",
+      "value": "Silna haptyka"
+    },
+    {
+      "name": "cyl_l10n_d6982fecc6a4",
+      "value": "Przytrzymanie kart (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_aefae51d3c25",
+      "value": "Przytrzymano „%@”"
+    },
+    {
+      "name": "cyl_l10n_abad1baa5479",
+      "value": "Czas długiego naciśnięcia i odstęp podwójnego stuknięcia (issue #535 / #152)"
+    },
+    {
+      "name": "cyl_l10n_b146fc1a1531",
+      "value": "Trawa"
+    },
+    {
+      "name": "cyl_l10n_db1c89e0f6e6",
+      "value": "Start"
+    },
+    {
+      "name": "cyl_l10n_18c63459a2c0",
+      "value": "Domyślny"
+    },
+    {
+      "name": "cyl_l10n_be354ee4263a",
+      "value": "Domyślne kliknięcie"
+    }
+  ]
+}

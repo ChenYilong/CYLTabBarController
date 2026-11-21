@@ -11,7 +11,9 @@ export interface NativeProps extends ViewProps {
    * the fragment, as `CYLTabBarAnimationURLWithOptions()` writes them ("icons.riv#artboard=CHAT&input=active").
    */
   source?: string;
-  /** Plays when true, stops when false. */
+  /**
+   * Plays when true, stops when false.
+   */
   playing?: CodegenTypes.WithDefault<boolean, false>;
 }
 

@@ -51,7 +51,9 @@ internal object CYLLiquidGlassSupport {
     val rendersRefraction: Boolean get() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
 }
 
-/** [EN] The AGSL shaders, from Backdrop's `internal/Shaders.kt`. [CN] AGSL 着色器，来自 Backdrop 的 `internal/Shaders.kt`。 */
+/**
+ * [EN] The AGSL shaders, from Backdrop's `internal/Shaders.kt`. [CN] AGSL 着色器，来自 Backdrop 的 `internal/Shaders.kt`。
+ */
 internal object CYLLiquidGlassShaders {
     private const val ROUNDED_RECT_SDF = """
 float radiusAt(float2 coord, float4 radii) {
@@ -81,7 +83,9 @@ float2 gradSdRoundedRect(float2 coord, float2 halfSize, float radius) {
     }
 }"""
 
-    /** [EN] The lens: the content bends near the edge, like the rim of a glass. [CN] 透镜：内容在边缘附近弯折，如同玻璃的边缘。 */
+    /**
+     * [EN] The lens: the content bends near the edge, like the rim of a glass. [CN] 透镜：内容在边缘附近弯折，如同玻璃的边缘。
+     */
     const val REFRACTION = """
 uniform shader content;
 uniform float2 size;
@@ -112,7 +116,9 @@ half4 main(float2 coord) {
     return content.eval(refractedCoord);
 }"""
 
-    /** [EN] The lens with chromatic dispersion, for the pressed selection bubble. [CN] 带色散的透镜，用于按下时的选中气泡。 */
+    /**
+     * [EN] The lens with chromatic dispersion, for the pressed selection bubble. [CN] 带色散的透镜，用于按下时的选中气泡。
+     */
     const val REFRACTION_WITH_DISPERSION = """
 uniform shader content;
 uniform float2 size;
@@ -172,7 +178,9 @@ half4 main(float2 coord) {
     return color;
 }"""
 
-    /** [EN] The rim light: brighter where the edge faces `angle`. [CN] 边缘高光：边缘朝向 `angle` 的位置更亮。 */
+    /**
+     * [EN] The rim light: brighter where the edge faces `angle`. [CN] 边缘高光：边缘朝向 `angle` 的位置更亮。
+     */
     const val HIGHLIGHT = """
 uniform float2 size;
 uniform float4 cornerRadii;
@@ -193,7 +201,9 @@ half4 main(float2 coord) {
     return color * intensity;
 }"""
 
-    /** [EN] Backdrop's `vibrancy()`: saturation 1.5. [CN] Backdrop 的 `vibrancy()`：饱和度 1.5。 */
+    /**
+     * [EN] Backdrop's `vibrancy()`: saturation 1.5. [CN] Backdrop 的 `vibrancy()`：饱和度 1.5。
+     */
     fun vibrancyColorFilter(saturation: Float = 1.5f): ColorMatrixColorFilter {
         val inverse = 1f - saturation
         val r = 0.213f * inverse
@@ -225,7 +235,9 @@ internal class CYLSpring(var value: Float, private val dampingRatio: Float, priv
         velocity = 0f
     }
 
-    /** [EN] Moves by `seconds`; true while it is still moving. [CN] 前进 `seconds` 秒；仍在运动时返回 true。 */
+    /**
+     * [EN] Moves by `seconds`; true while it is still moving. [CN] 前进 `seconds` 秒；仍在运动时返回 true。
+     */
     fun step(seconds: Float): Boolean {
         val omega = sqrt(stiffness)
         var remaining = seconds.coerceAtMost(0.064f)
@@ -297,7 +309,9 @@ internal class CYLTabBarBackdrop {
         canvas.restore()
     }
 
-    /** [EN] The color behind the pages: the window's background color, else the theme's `colorBackground`. [CN] 页面后面的颜色：窗口背景色，否则为主题的 `colorBackground`。 */
+    /**
+     * [EN] The color behind the pages: the window's background color, else the theme's `colorBackground`. [CN] 页面后面的颜色：窗口背景色，否则为主题的 `colorBackground`。
+     */
     private fun windowBackgroundColor(source: View): Int {
         (source.rootView.background as? android.graphics.drawable.ColorDrawable)?.let { return it.color or 0xFF000000.toInt() }
         val value = android.util.TypedValue()
@@ -305,7 +319,9 @@ internal class CYLTabBarBackdrop {
                else android.graphics.Color.WHITE
     }
 
-    /** [EN] Backdrop's order: vibrancy, then blur, then the lens on top. [CN] Backdrop 的顺序：先鲜艳度，再模糊，最后透镜。 */
+    /**
+     * [EN] Backdrop's order: vibrancy, then blur, then the lens on top. [CN] Backdrop 的顺序：先鲜艳度，再模糊，最后透镜。
+     */
     @RequiresApi(Build.VERSION_CODES.S)
     private fun effectChain(width: Float, height: Float, radius: Float, effects: CYLGlassEffects): RenderEffect? {
         var effect: RenderEffect? = if (effects.saturation != 1f) RenderEffect.createColorFilterEffect(CYLLiquidGlassShaders.vibrancyColorFilter(effects.saturation)) else null
@@ -340,7 +356,9 @@ internal class CYLTabBarBackdrop {
     }
 }
 
-/** [EN] The effects of one glass shape, in px. [CN] 一个玻璃形状的效果（像素）。 */
+/**
+ * [EN] The effects of one glass shape, in px. [CN] 一个玻璃形状的效果（像素）。
+ */
 internal data class CYLGlassEffects(
     val saturation: Float = 1.5f,
     val blurRadius: Float = 0f,

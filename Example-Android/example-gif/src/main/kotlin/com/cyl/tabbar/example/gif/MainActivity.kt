@@ -4,6 +4,7 @@ import android.graphics.Color
 import com.cyl.tabbar.CYLConstants
 import com.cyl.tabbar.CYLEnums
 import com.cyl.tabbar.CYLPlusButton
+import com.cyl.tabbar.CYLTabBarAnimationURLWithOptions
 import com.cyl.tabbar.CYLTabBarController
 import com.cyl.tabbar.demo.DemoCatalog
 import com.cyl.tabbar.demo.DemoListFragment
@@ -41,6 +42,20 @@ class MainActivity : DemoTabBarActivity() {
         items[0][CYLConstants.CYLTabBarGIFSize] = size
         items[1][CYLConstants.CYLTabBarAnimationFilePath] = "tab_star.gif"
         items[1][CYLConstants.CYLTabBarAnimationSize] = size
+        // [EN] Tint for every engine (docs/Animated-Item.md), as the iOS demos' `-CYLDemoAnimationTint YES`: launched with the
+        //      boolean extra `CYLDemoAnimationTint`, tab 1 follows its title color ("title") and tab 2 is a fixed dark gray
+        //      that turns white at night (`darkTint`).
+        // [CN] 所有引擎的着色（docs/Animated-Item.md），与 iOS 演示的 `-CYLDemoAnimationTint YES` 相同：以布尔 extra `CYLDemoAnimationTint` 启动时，
+        //      第 1 个 Tab 跟随标题颜色（"title"），第 2 个 Tab 为固定深灰色，夜间变为白色（`darkTint`）。
+        if (intent.getBooleanExtra("CYLDemoAnimationTint", false)) {
+            items[0].remove(CYLConstants.CYLTabBarGIFFilePath)
+            items[0][CYLConstants.CYLTabBarGIFURL] = CYLTabBarAnimationURLWithOptions("tab_rocket.gif", mapOf(CYLConstants.CYLTabBarAnimationOptionTint to "title"))
+            items[1].remove(CYLConstants.CYLTabBarAnimationFilePath)
+            items[1][CYLConstants.CYLTabBarAnimationURL] = CYLTabBarAnimationURLWithOptions("tab_star.gif", mapOf(
+                CYLConstants.CYLTabBarAnimationOptionTint to "#1C1C1E",
+                CYLConstants.CYLTabBarAnimationOptionDarkTint to "#FFFFFF",
+            ))
+        }
         items[2][CYLConstants.CYLTabBarItemImageURL] = "tab_fire.gif"
         items[2][CYLConstants.CYLTabBarItemImageURLSize] = size
         val pages = listOf(

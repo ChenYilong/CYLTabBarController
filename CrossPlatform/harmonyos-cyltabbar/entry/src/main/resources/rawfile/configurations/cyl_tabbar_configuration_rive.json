@@ -1,0 +1,57 @@
+{
+  "CYLTabBarControllerContext": "CYLRiveConfigurationDemo",
+  "CYLTabBarControllerLocalization": {
+    "CYLTabBarLocalizationTableName": "ConfigurationDemo",
+    "CYLTabBarLocalizationPath": "CYLConfigurationDemo.bundle"
+  },
+  "CYLTabBarControllerThemeManagerName": "CYLRiveConfigurationDemo",
+  "CYLTabBarControllerThemeIdentifier": "course",
+  "CYLTabBarControllerDarkThemeIdentifier": "course",
+  "CYLTabBarControllerThemes": {
+    "course": {
+      "CYLTabBarBackgroundColor": "#17203ACC",
+      "CYLTabBarItemTitleColor": "#FFFFFF99",
+      "CYLTabBarItemSelectedTitleColor": "#FFFFFF",
+      "CYLTabBarItemIconColor": "#FFFFFF99",
+      "CYLTabBarItemSelectedIconColor": "#FFFFFF"
+    }
+  },
+  "CYLTabBarControllerTabBarItemsAttributes": [
+    {
+      "CYLTabBarItemTitle": "Home",
+      "CYLTabBarItemImage": "system:house",
+      "CYLTabBarItemSelectedImage": "system:house.fill",
+      "CYLTabBarItemIdentifier": "home",
+      "CYLTabBarItemPageIdentifier": "rive-home",
+      "CYLTabBarRiveURL": "rive/icons.riv?artboard=CHAT&stateMachine=CHAT_Interactivity&input=active&tint=title",
+      "CYLTabBarRiveSize": "{32, 32}"
+    },
+    {
+      "CYLTabBarItemTitle": "Discover",
+      "CYLTabBarItemImage": "system:safari",
+      "CYLTabBarItemSelectedImage": "system:safari.fill",
+      "CYLTabBarItemIdentifier": "discover",
+      "CYLTabBarItemPageIdentifier": "rive-discover",
+      "CYLTabBarRiveURL": "rive/icons.riv?artboard=SEARCH&stateMachine=SEARCH_Interactivity&input=active&tint=title",
+      "CYLTabBarRiveSize": "{32, 32}"
+    },
+    {
+      "CYLTabBarItemTitle": "Message",
+      "CYLTabBarItemImage": "system:message",
+      "CYLTabBarItemSelectedImage": "system:message.fill",
+      "CYLTabBarItemIdentifier": "message",
+      "CYLTabBarItemPageIdentifier": "rive-message",
+      "CYLTabBarRiveURL": "rive/icons.riv?artboard=BELL&stateMachine=BELL_Interactivity&input=active&tint=title",
+      "CYLTabBarRiveSize": "{32, 32}"
+    },
+    {
+      "CYLTabBarItemTitle": "Me",
+      "CYLTabBarItemImage": "system:person",
+      "CYLTabBarItemSelectedImage": "system:person.fill",
+      "CYLTabBarItemIdentifier": "me",
+      "CYLTabBarItemPageIdentifier": "rive-me",
+      "CYLTabBarRiveURL": "rive/icons.riv?artboard=USER&stateMachine=USER_Interactivity&input=active&tint=title",
+      "CYLTabBarRiveSize": "{32, 32}"
+    }
+  ]
+}

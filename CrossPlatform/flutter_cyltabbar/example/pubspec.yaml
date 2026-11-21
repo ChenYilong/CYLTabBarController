@@ -46,6 +46,11 @@ dev_dependencies:
 
 # The following section is specific to Flutter packages.
 flutter:
+  # [EN] CocoaPods on iOS: the Rive subspec of CYLTabBarController (RiveRuntime) has no Swift Package, and Rive tab
+  #      icons should animate in this example too (as example_rive). [CN] iOS 使用 CocoaPods：CYLTabBarController 的 Rive
+  #      子库（RiveRuntime）没有 Swift Package，本示例中的 Rive Tab 图标也应能播放（与 example_rive 相同）。
+  config:
+    enable-swift-package-manager: false
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in

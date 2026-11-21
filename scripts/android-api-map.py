@@ -25,6 +25,9 @@ import os
 import re
 import sys
 
+# [EN] The separator row of the two-column tables. [CN] 两列表格的分隔行。
+TABLE_RULE = '|:---|:---|'
+
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 HEADERS_ROOT = os.path.join(ROOT, 'CYLTabBarController')
 MAP_PATH = os.path.join(ROOT, 'Example-Android', 'cyltabbar', 'api-map.json')
@@ -33,7 +36,7 @@ STATUSES = ('done', 'partial', 'planned', 'n/a')
 # [EN] Private headers (podspec private_header_files, and the demo-only settings list). [CN] 私有头文件（podspec 的 private_header_files，以及仅用于演示的设置列表）。
 PRIVATE = {
     'CYLTabBarController/UIControl+CYLTabBarItemAnimation.h', 'CYLTabBarController/CYLTabBarItemAnimationService.h',
-    'CYLTabBarController/CYLTabBarController+CYLPrivate.h', 'CYLTabBarController/CYLUtils/CYLComponents/CYLTheme/CYLThemePrivate.h',
+    'CYLTabBarController/CYLUtils/CYLComponents/CYLTheme/CYLThemePrivate.h',
     'CYLTabBarController/CYLBadgeView/CYLBadgeViewDefines.h', 'CYLTabBarController/CYLTabBarItemAnimation/CYLTabBarItemAnimationEngine.h',
 }
 
@@ -61,7 +64,7 @@ def public_headers():
     headers = []
     for folder, _, files in os.walk(HEADERS_ROOT):
         for name in files:
-            path = os.path.relpath(os.path.join(folder, name), ROOT)
+            path = os.path.relpath(os.path.join(folder, name), ROOT).replace(os.sep, '/')  # [EN] '/' on every OS, as PRIVATE. [CN] 各系统统一用 '/'。
             if name.endswith('.h') and path not in PRIVATE and not name.startswith('_'):
                 headers.append(path)
     return sorted(headers)
@@ -165,13 +168,62 @@ def symbols_of(path):
     return symbols
 
 
-def inventory():
+SNAPSHOT_PATH = os.path.join(ROOT, 'scripts', 'ios-public-api.json')
+
+
+def header_inventory():
     rows = []
     for path in public_headers():
         for kind, owner, name in symbols_of(path):
             key = '%s %s' % (owner, name) if owner and kind in ('method', 'property') else name
             rows.append({'header': path, 'kind': kind, 'owner': owner, 'name': name, 'key': key})
     return rows
+
+
+def inventory():
+    """[EN] Every public symbol: the frozen list of scripts/ios-public-api.json (the Objective-C headers before the Swift
+    migration, whose declarations move into Swift files and the generated header; the Public API rule keeps all of them),
+    plus the symbols declared in the headers since, each after the last symbol of its header.
+    [CN] 全部公开符号：scripts/ios-public-api.json 中冻结的清单（Swift 迁移前的 Objective-C 头文件；其声明会移入 Swift 文件与生成的头文件，
+    公开 API 规则要求全部保留），加上之后在头文件中新增的符号，各自排在其头文件的最后一个符号之后。"""
+    current = header_inventory()
+    if not os.path.exists(SNAPSHOT_PATH):
+        return current
+    with open(SNAPSHOT_PATH, encoding='utf-8') as handle:
+        rows = [dict(row) for row in json.load(handle)['symbols']]
+    known = {row['key'] for row in rows}
+    # [EN] A category renamed later (e.g. to keep a macro from expanding its name) declares the same members: match a
+    #      member by its class and name, and drop a renamed category whose members are all known.
+    # [CN] 之后改名的分类（例如避免其名称被宏展开）声明相同的成员：成员按类名与名称匹配；成员都已知的改名分类不再列出。
+    def member(row):
+        return (row['owner'].split('(')[0], row['name']) if row['kind'] in ('method', 'property') else None
+    members = {member(row) for row in rows} - {None}
+    new_owners = {}
+    for row in current:
+        if row['key'] not in known and row['kind'] in ('method', 'property'):
+            new_owners.setdefault(row['owner'], []).append(member(row) in members)
+    renamed = {owner for owner, flags in new_owners.items() if all(flags)}
+    for row in current:
+        if row['key'] in known or member(row) in members or (row['kind'] == 'category' and row['owner'] in renamed):
+            continue
+        known.add(row['key'])
+        last = max((i for i, other in enumerate(rows) if other['header'] == row['header']), default=len(rows) - 1)
+        rows.insert(last + 1, row)
+    return rows
+
+
+ANDROID_ONLY_PATH = os.path.join(os.path.dirname(MAP_PATH), 'api-map-android-only.json')
+
+
+def load_android_only():
+    """
+    [EN] Android-only APIs (no iOS twin): a list of {"android", "note"}, listed in their own section, out of the score.
+    [CN] 仅 Android 的 API（iOS 无对应）：{"android", "note"} 列表，单独成节，不计入完成率。
+    """
+    if not os.path.exists(ANDROID_ONLY_PATH):
+        return []
+    with open(ANDROID_ONLY_PATH, encoding='utf-8') as handle:
+        return json.load(handle)
 
 
 def load_map():
@@ -202,7 +254,7 @@ def document(rows, mapping):
     counts = dict.fromkeys(STATUSES, 0)
     for row in rows:
         counts[mapping.get(row['key'], {}).get('status', 'planned')] += 1
-    out += ['| 中文 | English |', '|:---|:---|',
+    out += ['| 中文 | English |', TABLE_RULE,
             '| iOS 库的每个公开符号（公开头文件中的类、协议、方法、属性、常量、枚举、函数）及其 Android 版本（`Example-Android/cyltabbar`，Kotlin 与 Java）。状态：done 行为相同；partial 部分行为（见说明）；planned 尚未移植；n/a 仅 iOS（UIKit、扁平样式、液态玻璃、Core Animation 等），不计入完成率。 | Every public symbol of the iOS library (classes, protocols, methods, properties, constants, enums and functions of the public headers) with its Android version (`Example-Android/cyltabbar`, Kotlin and Java). Status: done, the same behavior; partial, part of it (see the note); planned, not ported yet; n/a, iOS only (UIKit, FlatDesign, Liquid Glass, Core Animation...), left out of the score. |',
             '| **迁移完成率：%d / 100**（done + 0.5 × partial，共 %d 个计入的符号；done %d、partial %d、planned %d、n/a %d）。 | **Migration score: %d / 100** (done + 0.5 × partial over %d counted symbols; done %d, partial %d, planned %d, n/a %d). |'
             % (percent, total, counts['done'], counts['partial'], counts['planned'], counts['n/a'], percent, total, counts['done'], counts['partial'], counts['planned'], counts['n/a']),
@@ -224,6 +276,14 @@ def document(rows, mapping):
             out.append('| %s | %s | %s | %s |' % (ios, '`%s`' % android if android else '—', status, note))
         out.append('')
         del done
+    extensions = load_android_only()
+    if extensions:
+        out += ['## 仅 Android / Android only', '',
+                '| 中文 | English |', TABLE_RULE,
+                '| 这些 API 只在 Android 上存在，iOS 库没有对应 API，不计入完成率。详见 [Android-Library](Android-Library.md) 的「仅 Android 的扩展」。 | These APIs exist on Android only; the iOS library has no counterpart, and they are left out of the score. Details: "Android-only extensions" in [Android-Library](Android-Library.md). |', '',
+                '| Android API | 说明 / Note |', TABLE_RULE]
+        out += ['| `%s` | %s |' % (entry['android'], entry.get('note', '')) for entry in extensions]
+        out.append('')
     return '\n'.join(out)
 
 
@@ -242,12 +302,21 @@ def with_navigation_of(existing, text):
     """[EN] Keeps the navigation blocks of the existing document in the new text. [CN] 把现有文档的导航块保留到新文本中。"""
     binding = NAV_BLOCKS[0].search(existing or '')
     contents = NAV_BLOCKS[1].search(existing or '')
+    # [EN] Each block goes back with exactly one blank line after it: its regex also takes the newlines that follow it, and
+    #      putting them back as they were added one blank line per run (the document grew on every regeneration).
+    # [CN] 每个块放回时后面只保留一个空行：其正则同时取走了后面的换行，原样放回会每运行一次多一个空行（文档每次重新生成都会变长）。
     if binding:
-        text = text.replace('<!-- bound-classes: none -->\n', '<!-- bound-classes: none -->\n' + binding.group(0), 1)
+        block = binding.group(0).rstrip('\n') + '\n\n'
+        text = text.replace('<!-- bound-classes: none -->\n', '<!-- bound-classes: none -->\n' + block, 1)
     if contents:
         first = text.find('\n## ')
+        block = contents.group(0).rstrip('\n') + '\n\n'
         if first >= 0:
-            text = text[:first + 1] + contents.group(0) + text[first + 1:]
+            text = text[:first + 1] + block + text[first + 1:].lstrip('\n')
+        else:
+            # [EN] No section heading (the HarmonyOS map): update-docs-navigation.py keeps the block at the end.
+            # [CN] 没有章节标题（鸿蒙对照表）：update-docs-navigation.py 把该块放在末尾。
+            text = text.rstrip('\n') + '\n\n' + block
     return text
 
 

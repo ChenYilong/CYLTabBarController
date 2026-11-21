@@ -15,11 +15,13 @@ allprojects {
 }
 
 // MARK: - Publishing (scripts/publish-android.sh) 发布
-// [EN] The two library modules are published with the same group and version: `tabpages` (pure Kotlin) and `cyltabbar`
-//      (the Android library, which depends on it). The version follows the iOS pod (CYLTabBarController.podspec) unless
+// [EN] The library modules are published with the same group and version: `tabpages` (pure Kotlin) and `cyltabbar`
+//      (the Android library, which depends on it), and `cylanimateditem` (the animation engine and CYLAnimatedItemView, which
+//      `cyltabbar` depends on). The version follows the iOS pod (CYLTabBarController.podspec) unless
 //      -PcylVersion is given; the group is -PcylGroup or io.github.chenyilong. Signing uses SIGNING_KEY / SIGNING_PASSWORD
 //      (an ASCII-armored key) or gpg (-Psigning.gnupg.keyName), and is skipped without a key (local builds).
-// [CN] 两个库模块以相同的 group 与版本发布：`tabpages`（纯 Kotlin）与依赖它的 `cyltabbar`（Android 库）。版本默认与 iOS pod
+// [CN] 库模块以相同的 group 与版本发布：`tabpages`（纯 Kotlin）、依赖它的 `cyltabbar`（Android 库），以及 `cyltabbar` 依赖的
+//      `cylanimateditem`（动画引擎与 CYLAnimatedItemView）。版本默认与 iOS pod
 //      （CYLTabBarController.podspec）一致，可用 -PcylVersion 指定；group 为 -PcylGroup 或 io.github.chenyilong。签名使用 SIGNING_KEY /
 //      SIGNING_PASSWORD（ASCII 格式的私钥）或 gpg（-Psigning.gnupg.keyName），没有私钥时跳过（本地构建）。
 val podspecVersion: String = Regex("""s\.version\s*=\s*["']([^"']+)["']""")
@@ -28,17 +30,23 @@ val cylVersion: String = providers.gradleProperty("cylVersion").orNull ?: podspe
 val cylGroup: String = providers.gradleProperty("cylGroup").orNull ?: "io.github.chenyilong"
 
 subprojects {
-    if (name != "tabpages" && name != "cyltabbar") return@subprojects
+    if (name != "tabpages" && name != "cyltabbar" && name != "cylanimateditem") return@subprojects
     group = cylGroup
     version = cylVersion
     plugins.withId("maven-publish") {
         configure<PublishingExtension> {
             publications.withType<MavenPublication>().configureEach {
                 pom {
-                    name.set(if (project.name == "tabpages") "CYLTabBarController pages" else "CYLTabBarController")
-                    description.set(if (project.name == "tabpages")
-                        "The page registry and configuration rules of CYLTabBarController for Android (pure Kotlin)."
-                        else "CYLTabBarController for Android: the iOS library's tab bar controller, plus button, badges, themes, animated tab icons and configuration files.")
+                    name.set(when (project.name) {
+                        "tabpages" -> "CYLTabBarController pages"
+                        "cylanimateditem" -> "CYLAnimatedItem"
+                        else -> "CYLTabBarController"
+                    })
+                    description.set(when (project.name) {
+                        "tabpages" -> "The page registry and configuration rules of CYLTabBarController for Android (pure Kotlin)."
+                        "cylanimateditem" -> "The animation engine (Lottie, PAG, Rive, GIF, SVGA) and CYLAnimatedItemView, an animated icon + title view to subclass; no tab bar code."
+                        else -> "CYLTabBarController for Android: the iOS library's tab bar controller, plus button, badges, themes, animated tab icons and configuration files."
+                    })
                     url.set("https://github.com/ChenYilong/CYLTabBarController")
                     licenses {
                         license {

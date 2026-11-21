@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import CYLTabBarController
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 

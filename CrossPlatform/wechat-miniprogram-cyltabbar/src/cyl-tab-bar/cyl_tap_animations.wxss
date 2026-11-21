@@ -1,0 +1,98 @@
+/* [EN] Tap animations of CYLTabBarControllerTabButtonTapAnimation, with the keyframes of CYLTabButtonAnimation.m: they move
+        the icon (and the title for fume). The duration is set on the item and inherited. [CN] CYLTabBarControllerTabButtonTapAnimation
+        的点击动画，使用 CYLTabButtonAnimation.m 的关键帧：作用于图标（fume 还作用于标题）。时长设置在 Item 上并被继承。 */
+.cyl-item-icon-box,
+.cyl-item-title,
+.cyl-plus-image-box,
+.cyl-plus-button .cyl-title {
+  animation-duration: inherit;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  animation-fill-mode: both;
+}
+
+.cyl-animate-scale .cyl-item-icon-box, .cyl-animate-scale .cyl-plus-image-box { animation-name: cyl-scale; }
+.cyl-animate-zoomIn .cyl-item-icon-box, .cyl-animate-zoomIn .cyl-plus-image-box { animation-name: cyl-zoom-in; }
+.cyl-animate-bounce .cyl-item-icon-box, .cyl-animate-bounce .cyl-plus-image-box,
+.cyl-animate-bounceWithFireworks .cyl-item-icon-box, .cyl-animate-bounceWithFireworks .cyl-plus-image-box { animation-name: cyl-bounce; }
+.cyl-animate-rotation .cyl-item-icon-box, .cyl-animate-rotation .cyl-plus-image-box { animation-name: cyl-rotation; animation-timing-function: linear; }
+.cyl-animate-flip.cyl-flip-1 .cyl-item-icon-box, .cyl-animate-flip.cyl-flip-1 .cyl-plus-image-box { animation-name: cyl-flip-left; }
+.cyl-animate-flip.cyl-flip-2 .cyl-item-icon-box, .cyl-animate-flip.cyl-flip-2 .cyl-plus-image-box { animation-name: cyl-flip-right; }
+.cyl-animate-flip.cyl-flip-3 .cyl-item-icon-box, .cyl-animate-flip.cyl-flip-3 .cyl-plus-image-box { animation-name: cyl-flip-top; }
+.cyl-animate-flip.cyl-flip-4 .cyl-item-icon-box, .cyl-animate-flip.cyl-flip-4 .cyl-plus-image-box { animation-name: cyl-flip-bottom; }
+.cyl-animate-flip.cyl-flip-5 .cyl-item-icon-box, .cyl-animate-flip.cyl-flip-5 .cyl-plus-image-box { animation-name: cyl-curl-up; }
+.cyl-animate-flip.cyl-flip-6 .cyl-item-icon-box, .cyl-animate-flip.cyl-flip-6 .cyl-plus-image-box { animation-name: cyl-curl-down; }
+.cyl-animate-fume .cyl-item-icon-box, .cyl-animate-fume .cyl-plus-image-box { animation-name: cyl-fume-icon; }
+.cyl-animate-fume .cyl-item-title, .cyl-animate-fume .cyl-title { animation-name: cyl-fume-title; }
+
+/* [EN] Scale 1 → 1.5 → 0.8 → 1 at 0, ⅓, ⅔, 1. [CN] 缩放 1 → 1.5 → 0.8 → 1。 */
+@keyframes cyl-scale { 0% { transform: scale(1); } 33% { transform: scale(1.5); } 66% { transform: scale(0.8); } 100% { transform: scale(1); } }
+/* [EN] Zoom in 0.1 → 1.2 → 0.9 → 1 at 0, 0.5, 0.75, 1. [CN] 从小放大 0.1 → 1.2 → 0.9 → 1。 */
+@keyframes cyl-zoom-in { 0% { transform: scale(0.1); } 50% { transform: scale(1.2); } 75% { transform: scale(0.9); } 100% { transform: scale(1); } }
+/* [EN] Bounce 1 → 0.85 → 1.15 → 0.95 → 1.02 → 1. [CN] 弹性 1 → 0.85 → 1.15 → 0.95 → 1.02 → 1。 */
+@keyframes cyl-bounce { 0% { transform: scale(1); } 20% { transform: scale(0.85); } 40% { transform: scale(1.15); } 60% { transform: scale(0.95); } 80% { transform: scale(1.02); } 100% { transform: scale(1); } }
+/* [EN] Rotation 0 → -2π. [CN] 旋转 0 → -2π。 */
+@keyframes cyl-rotation { 0% { transform: rotate(0deg); } 100% { transform: rotate(-360deg); } }
+@keyframes cyl-flip-left { 0% { transform: perspective(200px) rotateY(-180deg); } 100% { transform: perspective(200px) rotateY(0deg); } }
+@keyframes cyl-flip-right { 0% { transform: perspective(200px) rotateY(180deg); } 100% { transform: perspective(200px) rotateY(0deg); } }
+@keyframes cyl-flip-top { 0% { transform: perspective(200px) rotateX(180deg); } 100% { transform: perspective(200px) rotateX(0deg); } }
+@keyframes cyl-flip-bottom { 0% { transform: perspective(200px) rotateX(-180deg); } 100% { transform: perspective(200px) rotateX(0deg); } }
+@keyframes cyl-curl-up { 0% { transform: perspective(200px) rotateX(0deg); transform-origin: top; } 50% { transform: perspective(200px) rotateX(80deg) translateY(-4px); transform-origin: top; opacity: 0.4; } 100% { transform: perspective(200px) rotateX(0deg); transform-origin: top; } }
+@keyframes cyl-curl-down { 0% { transform: perspective(200px) rotateX(0deg); transform-origin: bottom; } 50% { transform: perspective(200px) rotateX(-80deg) translateY(4px); transform-origin: bottom; opacity: 0.4; } 100% { transform: perspective(200px) rotateX(0deg); transform-origin: bottom; } }
+/* [EN] Fume: the icon moves down 4 pt; the title rises 60 pt, doubles and fades. [CN] 飘散：图标下移 4pt；标题上升 60pt、放大一倍并淡出。 */
+@keyframes cyl-fume-icon { 0% { transform: translateY(0); } 50% { transform: translateY(4px); } 100% { transform: translateY(0); } }
+@keyframes cyl-fume-title { 0% { transform: translateY(0) scale(1); opacity: 1; } 60% { transform: translateY(-60px) scale(2); opacity: 0; } 61% { transform: translateY(15px) scale(1); opacity: 0; } 100% { transform: translateY(0) scale(1); opacity: 1; } }
+
+/* [EN] CYLTabButtonFrameAnimation: orange circles of 6, 12, 18, 24, 30 and 36 pt, one frame each. [CN] 逐帧动画：6 到 36pt 的橙色圆，每帧一个。 */
+.cyl-frames {
+  position: absolute;
+  left: 50%;
+  top: 40%;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: #ff9500;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  animation-name: cyl-frames;
+  animation-timing-function: steps(6, end);
+  animation-fill-mode: forwards;
+  z-index: 3;
+}
+
+@keyframes cyl-frames { 0% { width: 6px; height: 6px; } 100% { width: 42px; height: 42px; opacity: 0.6; } }
+
+/* [EN] Fireworks: particles that gather on the icon, then burst (0.5 s + 0.3 s). [CN] 烟花：粒子先聚到图标上，然后散开（0.5 秒 + 0.3 秒）。 */
+.cyl-fireworks {
+  position: absolute;
+  left: 50%;
+  top: 40%;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  z-index: 3;
+}
+
+.cyl-firework {
+  position: absolute;
+  left: -2px;
+  top: -2px;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  opacity: 0;
+  animation: cyl-firework 0.8s ease-out both;
+}
+
+.cyl-firework-image {
+  left: -4px;
+  top: -4px;
+  width: 8px;
+  height: 8px;
+  border-radius: 0;
+}
+
+@keyframes cyl-firework {
+  0% { transform: translate(calc(var(--cyl-dx) * 1.4), calc(var(--cyl-dy) * 1.4)) scale(0.4); opacity: 0; }
+  62% { transform: translate(0, 0) scale(1); opacity: 1; }
+  100% { transform: translate(calc(var(--cyl-dx) * 1.2), calc(var(--cyl-dy) * 1.2)) scale(0.6); opacity: 0; }
+}

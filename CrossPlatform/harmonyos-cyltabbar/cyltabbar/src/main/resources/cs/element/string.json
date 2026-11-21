@@ -1,0 +1,952 @@
+{
+  "string": [
+    {
+      "name": "cyl_l10n_bffed61338ea",
+      "value": "%@ CYLTabBarController v HarmonyOS"
+    },
+    {
+      "name": "cyl_l10n_9ecf653a3fc6",
+      "value": "%@ · jiný kontext · klepnutí na plus: %@"
+    },
+    {
+      "name": "cyl_l10n_aaf9b7d7382d",
+      "value": "Nové zprávy: %@"
+    },
+    {
+      "name": "cyl_l10n_81a05b6c1cf9",
+      "value": "%@, %@"
+    },
+    {
+      "name": "cyl_l10n_0b0ae9062c5a",
+      "value": "Ovladač panelu karet z jiného kontextu se čtvercovým tlačítkem plus"
+    },
+    {
+      "name": "cyl_l10n_427131e7add2",
+      "value": "Jiné tlačítko plus"
+    },
+    {
+      "name": "cyl_l10n_aa3e67bda3c0",
+      "value": "ArkUI Tabs, systémový panel karet HarmonyOS, se stejnými kartami"
+    },
+    {
+      "name": "cyl_l10n_0557fa923dce",
+      "value": "Zpět"
+    },
+    {
+      "name": "cyl_l10n_8665e238c516",
+      "value": "Odznak: %@"
+    },
+    {
+      "name": "cyl_l10n_6b2186414c82",
+      "value": "Bliknutí ×3"
+    },
+    {
+      "name": "cyl_l10n_070554647306",
+      "value": "Okraj"
+    },
+    {
+      "name": "cyl_l10n_43d3e34b15fb",
+      "value": "Okraj podle tmavého režimu"
+    },
+    {
+      "name": "cyl_l10n_b67554192c50",
+      "value": "Vlevo dole"
+    },
+    {
+      "name": "cyl_l10n_5968e3c37145",
+      "value": "Vpravo dole"
+    },
+    {
+      "name": "cyl_l10n_5d60263416c2",
+      "value": "Odraz (nekonečně)"
+    },
+    {
+      "name": "cyl_l10n_f3ce1baf4805",
+      "value": "Odraz ×3 (cyl_bounceAnimationRepeatTimes)"
+    },
+    {
+      "name": "cyl_l10n_0875a57843a1",
+      "value": "Dýchání (nekonečně)"
+    },
+    {
+      "name": "cyl_l10n_8795570ddeef",
+      "value": "CYLTabBarItemBackgroundColor / CYLTabBarItemSelectedBackgroundColor"
+    },
+    {
+      "name": "cyl_l10n_687f0fbab628",
+      "value": "CYLTabBarRiveURL: selecting a tab sets its state machine input active; deselecting resets it"
+    },
+    {
+      "name": "cyl_l10n_d7c01888e55e",
+      "value": "CYLTabBarSVGAFilePath: při výběru se přehraje jednou, jinak první snímek"
+    },
+    {
+      "name": "cyl_l10n_132201f60522",
+      "value": "CYLUtils: slabé přidružené objekty a hledání tlačítka (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_fa3d06c1b1e9",
+      "value": "CYLFlatDesignTabBarItem: necentrováno (systémový styl)"
+    },
+    {
+      "name": "cyl_l10n_5e74163d3804",
+      "value": "CYLFlatDesignTabBarItem: centrováno"
+    },
+    {
+      "name": "cyl_l10n_f6da70b584ae",
+      "value": "Konfigurační soubor: %@"
+    },
+    {
+      "name": "cyl_l10n_158b3b19e868",
+      "value": "Poloměr rohu"
+    },
+    {
+      "name": "cyl_l10n_4d242c36821c",
+      "value": "Vlastní barvy"
+    },
+    {
+      "name": "cyl_l10n_4685555ab484",
+      "value": "Vlastní písmo"
+    },
+    {
+      "name": "cyl_l10n_a45350c25311",
+      "value": "Vlastní maximum (9)"
+    },
+    {
+      "name": "cyl_l10n_3924c958175e",
+      "value": "Tmavý režim"
+    },
+    {
+      "name": "cyl_l10n_b9c74f4cd786",
+      "value": "Ztlumené"
+    },
+    {
+      "name": "cyl_l10n_abfc3a65538a",
+      "value": "Objevit"
+    },
+    {
+      "name": "cyl_l10n_bf0576472e31",
+      "value": "Otevřete dvojitým klepnutím"
+    },
+    {
+      "name": "cyl_l10n_7e0a1ad9a767",
+      "value": "Jednou prolnout"
+    },
+    {
+      "name": "cyl_l10n_153407d52fed",
+      "value": "Flat Design"
+    },
+    {
+      "name": "cyl_l10n_5cfed317a99d",
+      "value": "Styl Flat Design"
+    },
+    {
+      "name": "cyl_l10n_026b984bb8d8",
+      "value": "Překlopení ×2"
+    },
+    {
+      "name": "cyl_l10n_c5d4cd682981",
+      "value": "Ikona GIF"
+    },
+    {
+      "name": "cyl_l10n_8cf04a973413",
+      "value": "Domů"
+    },
+    {
+      "name": "cyl_l10n_d52d30723b2f",
+      "value": "Jednou zleva doprava"
+    },
+    {
+      "name": "cyl_l10n_1aae3277f8d3",
+      "value": "Liquid Glass (vzor)"
+    },
+    {
+      "name": "cyl_l10n_32f643a9aa26",
+      "value": "Liquid Glass: efekt průhlednosti vzoru"
+    },
+    {
+      "name": "cyl_l10n_f201a4158727",
+      "value": "Liquid Glass"
+    },
+    {
+      "name": "cyl_l10n_af3acf6eb4a9",
+      "value": "Liquid Glass"
+    },
+    {
+      "name": "cyl_l10n_2e8e48a2ebfd",
+      "value": "Podržte kartu nebo tlačítko plus"
+    },
+    {
+      "name": "cyl_l10n_983696096694",
+      "value": "Okraj textu"
+    },
+    {
+      "name": "cyl_l10n_318b2739ddc2",
+      "value": "Já"
+    },
+    {
+      "name": "cyl_l10n_4c2a8fe7eaf2",
+      "value": "Zprávy"
+    },
+    {
+      "name": "cyl_l10n_24d459a81449",
+      "value": "NOVÉ"
+    },
+    {
+      "name": "cyl_l10n_03c2e7e41ffc",
+      "value": "Nové"
+    },
+    {
+      "name": "cyl_l10n_1e8f217bdf71",
+      "value": "Další karta (cyl_selectNextTab, issue #535)"
+    },
+    {
+      "name": "cyl_l10n_3826b8552c94",
+      "value": "Další skladba"
+    },
+    {
+      "name": "cyl_l10n_b2ee912b91d6",
+      "value": "Číslo"
+    },
+    {
+      "name": "cyl_l10n_ab7fa33c83b1",
+      "value": "Číslo nad maximem"
+    },
+    {
+      "name": "cyl_l10n_e0aa021e21dd",
+      "value": "OK"
+    },
+    {
+      "name": "cyl_l10n_8a7b0e9c294e",
+      "value": "Zap.: %@; přejeďte stránkou doleva / doprava"
+    },
+    {
+      "name": "cyl_l10n_06eb0a05de97",
+      "value": "Zap.: %@; nová stránka vjede ze strany své karty"
+    },
+    {
+      "name": "cyl_l10n_287e78fd65af",
+      "value": "Jiný text"
+    },
+    {
+      "name": "cyl_l10n_84432607fd87",
+      "value": "Stránka: %@"
+    },
+    {
+      "name": "cyl_l10n_105b296a83f9",
+      "value": "Pozastavit"
+    },
+    {
+      "name": "cyl_l10n_de3c731be563",
+      "value": "Přehrát"
+    },
+    {
+      "name": "cyl_l10n_41b77539cc64",
+      "value": "Obrázek PlusButton načtený později"
+    },
+    {
+      "name": "cyl_l10n_72a245189eaf",
+      "value": "Dotyková oblast PlusButton (issue #91)"
+    },
+    {
+      "name": "cyl_l10n_9a1d72fdd764",
+      "value": "Předchozí karta (cyl_selectPreviousTab, issue #535)"
+    },
+    {
+      "name": "cyl_l10n_4b0282f4f1c6",
+      "value": "Push do systémového UITabBarController (jiné tlačítko plus)"
+    },
+    {
+      "name": "cyl_l10n_e5416d3ed3c0",
+      "value": "Přejít na jiný CYLTabBarController (jiné PlusButton)"
+    },
+    {
+      "name": "cyl_l10n_8c96672c9bc5",
+      "value": "Push TabBarController se stejným context (stejná třída tlačítka plus)"
+    },
+    {
+      "name": "cyl_l10n_6166b27ea14b",
+      "value": "Zobrazit TabBarController s novým kontextem (PlusButton s klepnutelným podzobrazením X, issue #202)"
+    },
+    {
+      "name": "cyl_l10n_a63e8b745e73",
+      "value": "Otevře stránku, která skryje navigační panel, bez základní třídy"
+    },
+    {
+      "name": "cyl_l10n_79fe28f3a3ac",
+      "value": "Otevře ovladač, jehož obrázek tlačítka plus se po 2 s změní; rozvržení se nesmí posunout"
+    },
+    {
+      "name": "cyl_l10n_c27618b1aa9d",
+      "value": "Červená tečka"
+    },
+    {
+      "name": "cyl_l10n_255c00a63f9d",
+      "value": "Poloměr červené tečky"
+    },
+    {
+      "name": "cyl_l10n_7aac5e07b16d",
+      "value": "Jednou zprava doleva"
+    },
+    {
+      "name": "cyl_l10n_e7d74cf8c9a3",
+      "value": "Rive tab icons (configuration file)"
+    },
+    {
+      "name": "cyl_l10n_9d01c837b4bc",
+      "value": "Rive tab icon: house.riv (number input Rooms)"
+    },
+    {
+      "name": "cyl_l10n_f0c792c049bc",
+      "value": "Jednou převinout"
+    },
+    {
+      "name": "cyl_l10n_401ea21c7a44",
+      "value": "Rotace (nekonečně)"
+    },
+    {
+      "name": "cyl_l10n_bd001817e373",
+      "value": "Ikony karet SVGA (konfigurační soubor)"
+    },
+    {
+      "name": "cyl_l10n_b5fcd68edd9f",
+      "value": "Zvětšení (nekonečně)"
+    },
+    {
+      "name": "cyl_l10n_544d03258eaf",
+      "value": "Jednou zvětšit"
+    },
+    {
+      "name": "cyl_l10n_dbd4f5e49888",
+      "value": "Zvětšení ×3"
+    },
+    {
+      "name": "cyl_l10n_13348442cc6a",
+      "value": "Hledat"
+    },
+    {
+      "name": "cyl_l10n_9ae56cc36e81",
+      "value": "Třesení (nekonečně)"
+    },
+    {
+      "name": "cyl_l10n_e0a90124b72f",
+      "value": "Třesení ×3 (cyl_shakeAnimationRepeatTimes)"
+    },
+    {
+      "name": "cyl_l10n_b10d33d5ad4d",
+      "value": "Třesení, zastaví se při Omezení pohybu"
+    },
+    {
+      "name": "cyl_l10n_6cbe015b00fb",
+      "value": "Zobrazit / skrýt CYLFlatDesignTabBar"
+    },
+    {
+      "name": "cyl_l10n_561582c1e7cc",
+      "value": "Zobrazuje dotykovou oblast poloprůhledně červeně: %@; měřítko %@x; klepnutím 1x, 1,5x, 2x, vyp."
+    },
+    {
+      "name": "cyl_l10n_3cb58e0d546d",
+      "value": "Pružina (nekonečně)"
+    },
+    {
+      "name": "cyl_l10n_0a00b2238071",
+      "value": "Jednou pružina"
+    },
+    {
+      "name": "cyl_l10n_fee4a478923f",
+      "value": "Interakce karet"
+    },
+    {
+      "name": "cyl_l10n_5ea7bf3d8e63",
+      "value": "Tab icon animations loop: off"
+    },
+    {
+      "name": "cyl_l10n_918aff638366",
+      "value": "Tab icon animations loop: on"
+    },
+    {
+      "name": "cyl_l10n_98559580dcc7",
+      "value": "Animace klepnutí na panely (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_db89836d6e21",
+      "value": "Zvuk a haptika klepnutí na kartu (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_2f6e866d5219",
+      "value": "Stránky karet, výběr a přihlášení"
+    },
+    {
+      "name": "cyl_l10n_6d067090c833",
+      "value": "Karta, %1$@ z %2$@"
+    },
+    {
+      "name": "cyl_l10n_456887f9731c",
+      "value": "Karta: %@"
+    },
+    {
+      "name": "cyl_l10n_ab5745daa734",
+      "value": "Galerie panelů karet"
+    },
+    {
+      "name": "cyl_l10n_75ccb7ef4864",
+      "value": "Vzhled panelu karet"
+    },
+    {
+      "name": "cyl_l10n_7c4aecba91c3",
+      "value": "Obrázek karty této stránky z rawfile aplikace (balíček prostředků v iOS); klepnutím znovu obnovíte"
+    },
+    {
+      "name": "cyl_l10n_2e6d648945c0",
+      "value": "Tlačítko plus přesahuje panel; i část nad ním reaguje (zobrazeno červeně)"
+    },
+    {
+      "name": "cyl_l10n_9b6633b75bf2",
+      "value": "Karta „Já“ vyžaduje přihlášení (issue #19); klepnutím přepnete"
+    },
+    {
+      "name": "cyl_l10n_a4d0d101d6a3",
+      "value": "Vlevo nahoře"
+    },
+    {
+      "name": "cyl_l10n_2306a585ae00",
+      "value": "cyl_itemEdgeInsets: na každém konci volných 15 % šířky karty"
+    },
+    {
+      "name": "cyl_l10n_6360bbdfb8ff",
+      "value": "cyl_itemEdgeInsets: nula, karty vyplňují panel"
+    },
+    {
+      "name": "cyl_l10n_fd15e88376df",
+      "value": "Ukázka metod cyl_pop / cyl_push"
+    },
+    {
+      "name": "cyl_l10n_ca3dcd2d62be",
+      "value": "cyl_popSelectTabBarChildViewControllerAtIndex: 1 (%@)"
+    },
+    {
+      "name": "cyl_l10n_3b06a9582640",
+      "value": "cyl_popSelectTabBarChildViewControllerForTabBarItemIdentifier: message"
+    },
+    {
+      "name": "cyl_l10n_59884403daf6",
+      "value": "cyl_pushOrPopToViewController: pages/Index (už je v zásobníku: vrátí se)"
+    },
+    {
+      "name": "cyl_l10n_1ec113617309",
+      "value": "cyl_pushViewController, cyl_popSelectTabBarChildViewControllerAtIndex, cyl_pushOrPopToViewController"
+    },
+    {
+      "name": "cyl_l10n_9fb845377ee4",
+      "value": "cyl_pushViewController: zelená stránka"
+    },
+    {
+      "name": "cyl_l10n_ff5772993aee",
+      "value": "cyl_tabBarItemLongPressDuration = %@ ms, cyl_tabBarItemDoubleTapInterval = %@ ms; klepnutím přepnete; dvojitým klepnutím na kartu to uvidíte"
+    },
+    {
+      "name": "cyl_l10n_f69c71bc581e",
+      "value": "cyl_tabBarMinimizeBehavior = %@; klepnutím vyberte a pak posuňte tento seznam"
+    },
+    {
+      "name": "cyl_l10n_4abddd944c2e",
+      "value": "harmonyos-liquid-glass-tabbar: kapsle karet, vyhledávací koule a hudební lišta nad barevným obsahem; posunutím minimalizujete"
+    },
+    {
+      "name": "cyl_l10n_3b4e07b5542e",
+      "value": "numberInput=Rooms: each select or tap again sets Rooms to the next value (3, 4, 5, 6)"
+    },
+    {
+      "name": "cyl_l10n_f3f4ecf4a4a6",
+      "value": "selectedIndex = %@ (stránka tlačítka plus je %@, nikdy index karty); klepnutím na další kartu"
+    },
+    {
+      "name": "cyl_l10n_ee5b6ac6461b",
+      "value": "selectedIndex a PlusButton (issue #515)"
+    },
+    {
+      "name": "cyl_l10n_2de6d572f86b",
+      "value": "Motiv standardAppearance (sdílený pro Liquid Glass a FlatDesign)"
+    },
+    {
+      "name": "cyl_l10n_c4376b477be8",
+      "value": "tabBarHidden = %@; skrytý, vrátí se po 2 s"
+    },
+    {
+      "name": "cyl_l10n_2a0608059131",
+      "value": "Aktualizuje názvy všech panelů najednou; klepnutím znovu obnovíte"
+    },
+    {
+      "name": "cyl_l10n_57196013d558",
+      "value": "Halloween"
+    },
+    {
+      "name": "cyl_l10n_0a58c230c3d9",
+      "value": "Stáhne a aktualizuje ikony všech karet; dalším klepnutím obnovíte"
+    },
+    {
+      "name": "cyl_l10n_5e347d8ccb68",
+      "value": "Stáhnout ikonu ze sítě"
+    },
+    {
+      "name": "cyl_l10n_2e0e84a0dcfb",
+      "value": "Skrýt navigační panel bez základní třídy (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_321ff794aab8",
+      "value": "N/A"
+    },
+    {
+      "name": "cyl_l10n_e1642a46b804",
+      "value": "Svátek středu podzimu"
+    },
+    {
+      "name": "cyl_l10n_0c2817d10627",
+      "value": "Střední haptická odezva"
+    },
+    {
+      "name": "cyl_l10n_0f60774903e0",
+      "value": "Načíst obrázky z bundle (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_0e1b02648a11",
+      "value": "Přiblížit"
+    },
+    {
+      "name": "cyl_l10n_83c39abd16cd",
+      "value": "Vybrat z alba"
+    },
+    {
+      "name": "cyl_l10n_cc03f47a389c",
+      "value": "Stáhne ikonu panelu ze sítě (s mezipamětí); klepnutím znovu obnovíte"
+    },
+    {
+      "name": "cyl_l10n_e05f97c5159d",
+      "value": "Vytvořit TabBarController z konfiguračního souboru"
+    },
+    {
+      "name": "cyl_l10n_5f0c0bf32dc1",
+      "value": "Zachovat"
+    },
+    {
+      "name": "cyl_l10n_24fb8692947a",
+      "value": "ponecháno"
+    },
+    {
+      "name": "cyl_l10n_b15d91274e9f",
+      "value": "Zavřít"
+    },
+    {
+      "name": "cyl_l10n_70922c50ef07",
+      "value": "Varování o paměti"
+    },
+    {
+      "name": "cyl_l10n_cbed6b29761b",
+      "value": "Tlačítko plus"
+    },
+    {
+      "name": "cyl_l10n_18684d72945b",
+      "value": "Načíst obrázek"
+    },
+    {
+      "name": "cyl_l10n_b981b7b359a7",
+      "value": "Načíst obrázek pozadí"
+    },
+    {
+      "name": "cyl_l10n_7136049eb4c7",
+      "value": "Uvolní nevybrané karty; po výběru se znovu načtou"
+    },
+    {
+      "name": "cyl_l10n_c7626d7d6194",
+      "value": "Změní na místě název panelu této stránky; klepnutím znovu obnovíte"
+    },
+    {
+      "name": "cyl_l10n_15fb093f6fff",
+      "value": "Aktualizace karet na místě"
+    },
+    {
+      "name": "cyl_l10n_c1ecedab11bc",
+      "value": "Původní"
+    },
+    {
+      "name": "cyl_l10n_83611abd5f80",
+      "value": "Zveřejnit"
+    },
+    {
+      "name": "cyl_l10n_625fb26b4b33",
+      "value": "Zrušit"
+    },
+    {
+      "name": "cyl_l10n_d25efeb790bb",
+      "value": "Poblíž"
+    },
+    {
+      "name": "cyl_l10n_7941d8987ff2",
+      "value": "Porovnat se systémovým UITabBar"
+    },
+    {
+      "name": "cyl_l10n_d0d78acf1941",
+      "value": "Vánoce"
+    },
+    {
+      "name": "cyl_l10n_aa91e8ceec70",
+      "value": "Velikonoce"
+    },
+    {
+      "name": "cyl_l10n_3df20a295b39",
+      "value": "Léto"
+    },
+    {
+      "name": "cyl_l10n_0ef6dae7e80c",
+      "value": "Vesmír"
+    },
+    {
+      "name": "cyl_l10n_2f383291bcf8",
+      "value": "Skutečné: %@"
+    },
+    {
+      "name": "cyl_l10n_bccc798b577a",
+      "value": "Kapsle uprostřed"
+    },
+    {
+      "name": "cyl_l10n_f613681ddf31",
+      "value": "Zobrazit všech %@ simulací"
+    },
+    {
+      "name": "cyl_l10n_7c87af044929",
+      "value": "Přepínání panelů přejetím (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_7a2261654d24",
+      "value": "uvolněno"
+    },
+    {
+      "name": "cyl_l10n_f79d05d929aa",
+      "value": "TabBarController bezpečně vytvořen: karet: %@"
+    },
+    {
+      "name": "cyl_l10n_091885db07e4",
+      "value": "Odraz"
+    },
+    {
+      "name": "cyl_l10n_758903c327de",
+      "value": "Zobrazí animovaný GIF jako ikonu panelu; klepnutím znovu obnovíte"
+    },
+    {
+      "name": "cyl_l10n_56e6ecf97176",
+      "value": "Loop"
+    },
+    {
+      "name": "cyl_l10n_c7db6d4f1a42",
+      "value": "Obnovit"
+    },
+    {
+      "name": "cyl_l10n_c4328f75476f",
+      "value": "Valentýn"
+    },
+    {
+      "name": "cyl_l10n_07b181184280",
+      "value": "Já"
+    },
+    {
+      "name": "cyl_l10n_2a3e7f5c382c",
+      "value": "Ručně"
+    },
+    {
+      "name": "cyl_l10n_97a6bedeb7fd",
+      "value": "Ručně: klepnutím zapněte skrývání při posouvání, posuňte dolů, aby se TabBar skryl, a proveďte, co říká název. Očekávání: TabBar se hned vrátí."
+    },
+    {
+      "name": "cyl_l10n_f68e7e217ad1",
+      "value": "Ručně: %@"
+    },
+    {
+      "name": "cyl_l10n_89246468f7fd",
+      "value": "Otevřít galerii panelů karet"
+    },
+    {
+      "name": "cyl_l10n_a01539048bb0",
+      "value": "Zapněte přepínač a dlouhým stisknutím libovolného panelu nebo PlusButton zobrazíte jeho identifikátor."
+    },
+    {
+      "name": "cyl_l10n_633c2ee4dcc7",
+      "value": "Změnit všechny síťové ikony"
+    },
+    {
+      "name": "cyl_l10n_f75fe6720861",
+      "value": "Změnit všechny místní ikony"
+    },
+    {
+      "name": "cyl_l10n_7fb5208a54d5",
+      "value": "Změnit všechny názvy"
+    },
+    {
+      "name": "cyl_l10n_2f728e190695",
+      "value": "Zobrazí jiné stránky v kartách po obou stranách této karty (issue #481); dalším klepnutím obnovíte"
+    },
+    {
+      "name": "cyl_l10n_bed9ec1e8448",
+      "value": "Pořídit fotku"
+    },
+    {
+      "name": "cyl_l10n_0be5a194844c",
+      "value": "Vzhled"
+    },
+    {
+      "name": "cyl_l10n_61a9cd33b1ff",
+      "value": "Vzhled (motiv, issue #216)"
+    },
+    {
+      "name": "cyl_l10n_09d0fdddca66",
+      "value": "Vzhledy: svátky a barvy (%@)"
+    },
+    {
+      "name": "cyl_l10n_3de5855e2c7f",
+      "value": "Sbalit seznam simulací"
+    },
+    {
+      "name": "cyl_l10n_a0ffdf359138",
+      "value": "Změnit výšku CYLFlatDesignTabBar"
+    },
+    {
+      "name": "cyl_l10n_01e3254a92ba",
+      "value": "Zvětšit a zmenšit"
+    },
+    {
+      "name": "cyl_l10n_d46d5bb15db1",
+      "value": "Nový rok"
+    },
+    {
+      "name": "cyl_l10n_79b5a6564585",
+      "value": "Otočit"
+    },
+    {
+      "name": "cyl_l10n_d81bb206a889",
+      "value": "Žádná"
+    },
+    {
+      "name": "cyl_l10n_14f433db2189",
+      "value": "Bez základní třídy a pomůcky"
+    },
+    {
+      "name": "cyl_l10n_d2339bb4edaa",
+      "value": "Svátky jara"
+    },
+    {
+      "name": "cyl_l10n_5f1de850fb46",
+      "value": "Změnit název panelu"
+    },
+    {
+      "name": "cyl_l10n_9d0d66f312b5",
+      "value": "Nahradit větším obrázkem"
+    },
+    {
+      "name": "cyl_l10n_b051a19ace76",
+      "value": "Nahradit sousední karty"
+    },
+    {
+      "name": "cyl_l10n_3e730a3320e9",
+      "value": "Náhradní stránka %@"
+    },
+    {
+      "name": "cyl_l10n_a131e4f178aa",
+      "value": "Nový obsah"
+    },
+    {
+      "name": "cyl_l10n_467b3e031441",
+      "value": "nenačteno"
+    },
+    {
+      "name": "cyl_l10n_2c8d9e877a54",
+      "value": "Posun titulku (titlePositionAdjustment)"
+    },
+    {
+      "name": "cyl_l10n_0787cd518387",
+      "value": "Simulovat varování o paměti"
+    },
+    {
+      "name": "cyl_l10n_d76904d0e7ee",
+      "value": "Každá scéna je panel karet vytvořený veřejným API: styly, animace, upozornění, Lottie a novější API karet"
+    },
+    {
+      "name": "cyl_l10n_6a00c1ae99fa",
+      "value": "Oceán"
+    },
+    {
+      "name": "cyl_l10n_ff692f04ace0",
+      "value": "Zprávy"
+    },
+    {
+      "name": "cyl_l10n_41e8e8b9935c",
+      "value": "Tmavý"
+    },
+    {
+      "name": "cyl_l10n_8dfe6bcdd6ec",
+      "value": "Posuvný přechod (CYLTabBarSlideTransitionAnimator)"
+    },
+    {
+      "name": "cyl_l10n_9f44bafc75c6",
+      "value": "Zmenšit / skrýt TabBar při posouvání (issue #13)"
+    },
+    {
+      "name": "cyl_l10n_8625f5f225d7",
+      "value": "Skrytí při posouvání: simulace přerušení (issue #13)"
+    },
+    {
+      "name": "cyl_l10n_678abebe6aac",
+      "value": "Klepněte na X vpravo nahoře u PlusButton: X změní barvu na náhodnou a PlusButton nereaguje"
+    },
+    {
+      "name": "cyl_l10n_7375af54db2a",
+      "value": "Klepnutím přepnete animaci klepnutí na panely a PlusButton. Nyní: %@"
+    },
+    {
+      "name": "cyl_l10n_5378f31b520c",
+      "value": "Klepnutím přepnete tabBar.standardAppearance, aktuální: %@"
+    },
+    {
+      "name": "cyl_l10n_4a986e4da535",
+      "value": "Klepnutím přepnete svislý posun titulků všech karet, aktuální: %@"
+    },
+    {
+      "name": "cyl_l10n_3d0d9d3d7cc2",
+      "value": "Klepnutím změníte jazyk"
+    },
+    {
+      "name": "cyl_l10n_f4e41dda1094",
+      "value": "Klepnutím přepněte a pak klepněte na libovolnou kartu nebo PlusButton, abyste to slyšeli. Haptika vibruje jen na skutečném zařízení. Nyní: %@"
+    },
+    {
+      "name": "cyl_l10n_15855ab96e87",
+      "value": "Cvaknutí + haptika"
+    },
+    {
+      "name": "cyl_l10n_cff8a9cded04",
+      "value": "Klepnutím vyberte motiv: pozadí, ikony a barvy textu TabBar se změní na místě, ve všech stylech TabBar. Nyní: %@"
+    },
+    {
+      "name": "cyl_l10n_1c00c4fd1cea",
+      "value": "Růžová růže"
+    },
+    {
+      "name": "cyl_l10n_8483ed132b2c",
+      "value": "Narozeniny"
+    },
+    {
+      "name": "cyl_l10n_feef14745f21",
+      "value": "Aktualizuje ikony všech karet místními obrázky (název, cesta, UIImage, URL souboru); dalším klepnutím obnovíte"
+    },
+    {
+      "name": "cyl_l10n_402d19e50fff",
+      "value": "Přihlásit"
+    },
+    {
+      "name": "cyl_l10n_833152116634",
+      "value": "Odstranit obrázek"
+    },
+    {
+      "name": "cyl_l10n_a0676a7d84a9",
+      "value": "Zelená linka"
+    },
+    {
+      "name": "cyl_l10n_16068b2ff3fd",
+      "value": "Ikony ze sítě"
+    },
+    {
+      "name": "cyl_l10n_69ca6555a602",
+      "value": "Převrátit"
+    },
+    {
+      "name": "cyl_l10n_4bd51044149f",
+      "value": "Vlastní zvukový soubor (cyl_tabButtonTapSoundURL)"
+    },
+    {
+      "name": "cyl_l10n_9d1c8a70d4da",
+      "value": "Autotest"
+    },
+    {
+      "name": "cyl_l10n_11858aeb1656",
+      "value": "Autotest: spustit všechny automatické simulace, hlásit PASS / FAIL"
+    },
+    {
+      "name": "cyl_l10n_beabcd498b94",
+      "value": "Grapefruit"
+    },
+    {
+      "name": "cyl_l10n_b8c467fce096",
+      "value": "Odznaky"
+    },
+    {
+      "name": "cyl_l10n_200e65177369",
+      "value": "Nastavit barvu pozadí CYLFlatDesignTabBarItem"
+    },
+    {
+      "name": "cyl_l10n_295bb704f520",
+      "value": "Jazyk"
+    },
+    {
+      "name": "cyl_l10n_d673e0eb5c1c",
+      "value": "Reagovat mimo nadřazené zobrazení (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_71bbc726ace5",
+      "value": "Podle systému"
+    },
+    {
+      "name": "cyl_l10n_d0914cf6acd2",
+      "value": "Navigace a srovnání"
+    },
+    {
+      "name": "cyl_l10n_110abc875180",
+      "value": "Lehká haptická odezva"
+    },
+    {
+      "name": "cyl_l10n_fad7c8a21fe3",
+      "value": "Vybráno"
+    },
+    {
+      "name": "cyl_l10n_aa05fd09a619",
+      "value": "Obecné"
+    },
+    {
+      "name": "cyl_l10n_15c64aa0b404",
+      "value": "Konfigurační soubor"
+    },
+    {
+      "name": "cyl_l10n_d505958a042b",
+      "value": "Konfigurace: simulované chyby"
+    },
+    {
+      "name": "cyl_l10n_45158907e07f",
+      "value": "Silná haptická odezva"
+    },
+    {
+      "name": "cyl_l10n_d6982fecc6a4",
+      "value": "Dlouhé stisknutí panelů (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_aefae51d3c25",
+      "value": "Dlouze stisknuto „%@“"
+    },
+    {
+      "name": "cyl_l10n_abad1baa5479",
+      "value": "Délka dlouhého stisku a interval dvojitého klepnutí (issue #535 / #152)"
+    },
+    {
+      "name": "cyl_l10n_b146fc1a1531",
+      "value": "Tráva"
+    },
+    {
+      "name": "cyl_l10n_db1c89e0f6e6",
+      "value": "Domů"
+    },
+    {
+      "name": "cyl_l10n_18c63459a2c0",
+      "value": "Výchozí"
+    },
+    {
+      "name": "cyl_l10n_be354ee4263a",
+      "value": "Výchozí cvaknutí"
+    }
+  ]
+}

@@ -26,16 +26,6 @@ class CYLConfigurationLocalizationTest {
 
     class Page : Fragment()
 
-    private fun <T> withActivity(qualifiers: String, block: (FragmentActivity) -> T): T {
-        RuntimeEnvironment.setQualifiers(qualifiers)
-        val controller = Robolectric.buildActivity(FragmentActivity::class.java).setup()
-        try {
-            return block(controller.get())
-        } finally {
-            controller.pause().stop().destroy()
-        }
-    }
-
     private fun titles(activity: FragmentActivity, configuration: Map<String, Any?>): List<Map<String, Any?>> {
         val withPages = configuration + (CYLConstants.CYLTabBarControllerViewControllers to listOf(Page(), Page()))
         return CYLTabBarController(activity, withPages).tabBarItemsAttributes

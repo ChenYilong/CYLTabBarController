@@ -10,6 +10,9 @@ import SwiftUI
 struct ContentView: View {
     @State var show = false
     @State var isOpen = false
+    // [EN] Issue #415: the tab icon source; changing it on the Bell page recreates the tab bar.
+    // [CN] Issue #415：Tab 图标来源；在 Bell 页面切换时重新创建 TabBar。
+    @State var tabIconSource = CYLDemoTabIconSource.current
     // [EN] The state machine input "isOpen" stays as set ("duration" 0) until it is set back.
     // [CN] 状态机输入 "isOpen" 保持设置的值（"duration" 为 0），直到再次设置。
     let button = RiveAnimation("menu_button", [.riveStateMachine: "State Machine", .riveInput: "isOpen", .riveActiveDuration: "0"])
@@ -27,7 +30,13 @@ struct ContentView: View {
             
             // [EN] The home screen and its tab bar: a CYLTabBarController with the course's Rive icons (TabBar.swift).
             // [CN] 首页及其 TabBar：使用课程 Rive 图标的 CYLTabBarController（TabBar.swift）。
-            TabBar()
+            TabBar(iconSource: tabIconSource)
+                .id(tabIconSource)
+                .onAppear {
+                    CYLDemoTabIconSource.rebuildTabBar = {
+                        tabIconSource = CYLDemoTabIconSource.current
+                    }
+                }
                 .mask(RoundedRectangle(cornerRadius: 30, style: .continuous))
                 .rotation3DEffect(.degrees(isOpen ? 30 : 0), axis: (x: 0, y: -1, z: 0), perspective: 1)
                 .offset(x: isOpen ? 265 : 0)

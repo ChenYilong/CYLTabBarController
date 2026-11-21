@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		EB6DE3E5F466459DA5D4772C /* green_lottie_tab_mine_dark.json in Resources */ = {isa = PBXBuildFile; fileRef = 17BE476FA978496A8324E63D /* green_lottie_tab_mine_dark.json */; };
 		945C22889D1A4725BC79DA54 /* green_lottie_tab_mine.json in Resources */ = {isa = PBXBuildFile; fileRef = DE7A286DC067478B849B91FF /* green_lottie_tab_mine.json */; };
+		14454ABF5DCE4BF7BD195CCA /* icons.riv in Resources */ = {isa = PBXBuildFile; fileRef = 3FF52A4B814A4B70AB8E9F30 /* icons.riv */; };
 		D98767A89ADE486B98B04E8D /* green_lottie_tab_news_dark.json in Resources */ = {isa = PBXBuildFile; fileRef = 1338B07BC7454727B0E7E40B /* green_lottie_tab_news_dark.json */; };
 		3025FD4F02F54357AC181B17 /* green_lottie_tab_news.json in Resources */ = {isa = PBXBuildFile; fileRef = 7930957FF92847C480DA6B48 /* green_lottie_tab_news.json */; };
 		16A760621D7D4D83BB61EB10 /* green_lottie_tab_discover_dark.json in Resources */ = {isa = PBXBuildFile; fileRef = 1CC8FDAA520C49DDB15A48D5 /* green_lottie_tab_discover_dark.json */; };
@@ -51,6 +52,7 @@
 /* Begin PBXFileReference section */
 		17BE476FA978496A8324E63D /* green_lottie_tab_mine_dark.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = "green_lottie_tab_mine_dark.json"; path = "../../../../Example/Classes/Other/LottieResources/green_lottie_tab_mine_dark.json"; sourceTree = SOURCE_ROOT; };
 		DE7A286DC067478B849B91FF /* green_lottie_tab_mine.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = "green_lottie_tab_mine.json"; path = "../../../../Example/Classes/Other/LottieResources/green_lottie_tab_mine.json"; sourceTree = SOURCE_ROOT; };
+		3FF52A4B814A4B70AB8E9F30 /* icons.riv */ = {isa = PBXFileReference; lastKnownFileType = file; name = icons.riv; path = "../../../../Example-SwiftUI-Rive/AnimatedApp/RiveAssets/icons.riv"; sourceTree = SOURCE_ROOT; };
 		1338B07BC7454727B0E7E40B /* green_lottie_tab_news_dark.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = "green_lottie_tab_news_dark.json"; path = "../../../../Example/Classes/Other/LottieResources/green_lottie_tab_news_dark.json"; sourceTree = SOURCE_ROOT; };
 		7930957FF92847C480DA6B48 /* green_lottie_tab_news.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = "green_lottie_tab_news.json"; path = "../../../../Example/Classes/Other/LottieResources/green_lottie_tab_news.json"; sourceTree = SOURCE_ROOT; };
 		1CC8FDAA520C49DDB15A48D5 /* green_lottie_tab_discover_dark.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = "green_lottie_tab_discover_dark.json"; path = "../../../../Example/Classes/Other/LottieResources/green_lottie_tab_discover_dark.json"; sourceTree = SOURCE_ROOT; };
@@ -65,7 +67,6 @@
 		74858FAD1ED2DC5600515810 /* Runner-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Runner-Bridging-Header.h"; sourceTree = "<group>"; };
 		74858FAE1ED2DC5600515810 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		784666492D4C4C64000A1A5F /* FlutterFramework */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = FlutterFramework; path = Flutter/ephemeral/Packages/.packages/FlutterFramework; sourceTree = "<group>"; };
-		78DABEA22ED26510000E7860 /* flutter_cyltabbar */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = flutter_cyltabbar; path = ../../ios/flutter_cyltabbar; sourceTree = "<group>"; };
 		78E0A7A72DC9AD7400C4905E /* FlutterGeneratedPluginSwiftPackage */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = FlutterGeneratedPluginSwiftPackage; path = Flutter/ephemeral/Packages/FlutterGeneratedPluginSwiftPackage; sourceTree = "<group>"; };
 		7AFA3C8E1D35360C0083082E /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = Release.xcconfig; path = Flutter/Release.xcconfig; sourceTree = "<group>"; };
 		9740EEB21CF90195004384FC /* Debug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Debug.xcconfig; path = Flutter/Debug.xcconfig; sourceTree = "<group>"; };
@@ -107,7 +108,6 @@
 		9740EEB11CF90186004384FC /* Flutter */ = {
 			isa = PBXGroup;
 			children = (
-				78DABEA22ED26510000E7860 /* flutter_cyltabbar */,
 				784666492D4C4C64000A1A5F /* FlutterFramework */,
 				78E0A7A72DC9AD7400C4905E /* FlutterGeneratedPluginSwiftPackage */,
 				3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */,
@@ -123,6 +123,7 @@
 			children = (
 				17BE476FA978496A8324E63D /* green_lottie_tab_mine_dark.json */,
 				DE7A286DC067478B849B91FF /* green_lottie_tab_mine.json */,
+				3FF52A4B814A4B70AB8E9F30 /* icons.riv */,
 				1338B07BC7454727B0E7E40B /* green_lottie_tab_news_dark.json */,
 				7930957FF92847C480DA6B48 /* green_lottie_tab_news.json */,
 				1CC8FDAA520C49DDB15A48D5 /* green_lottie_tab_discover_dark.json */,
@@ -260,6 +261,7 @@
 			files = (
 				EB6DE3E5F466459DA5D4772C /* green_lottie_tab_mine_dark.json in Resources */,
 				945C22889D1A4725BC79DA54 /* green_lottie_tab_mine.json in Resources */,
+				14454ABF5DCE4BF7BD195CCA /* icons.riv in Resources */,
 				D98767A89ADE486B98B04E8D /* green_lottie_tab_news_dark.json in Resources */,
 				3025FD4F02F54357AC181B17 /* green_lottie_tab_news.json in Resources */,
 				16A760621D7D4D83BB61EB10 /* green_lottie_tab_discover_dark.json in Resources */,

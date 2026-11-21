@@ -1,0 +1,40 @@
+{
+  "string": [
+    {
+      "name": "tab_home",
+      "value": "Hjem"
+    },
+    {
+      "name": "tab_nearby",
+      "value": "I nærheten"
+    },
+    {
+      "name": "tab_messages",
+      "value": "Meldinger"
+    },
+    {
+      "name": "tab_me",
+      "value": "Meg"
+    },
+    {
+      "name": "tab_post",
+      "value": "Publiser"
+    },
+    {
+      "name": "tab_refresh",
+      "value": "Oppdater"
+    },
+    {
+      "name": "module_desc",
+      "value": "CYLTabBarController example"
+    },
+    {
+      "name": "ability_desc",
+      "value": "CYLTabBarController example"
+    },
+    {
+      "name": "app_name",
+      "value": "CYLTabBar"
+    }
+  ]
+}

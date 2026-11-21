@@ -6,9 +6,23 @@
 //  Copyright © 2026 https://github.com/ChenYilong . All rights reserved.
 //
 
+// CYL-SWIFT-MIGRATION: objc-required — [EN] The category is Swift; these Objective-C declarations stay because their block
+//      parameter `CYLThemeImageProvider` uses `__kindof`, which the generated Swift interface drops (it prints the block type expanded), so an
+//      Objective-C block with a narrower parameter type (`UIColor *theme`) would no longer compile (CYLThemeTests.m; step 116,
+//      docs/Swift-Migration-Phase3.md). Hidden from Swift (`__swift__`), which uses the Swift declarations.
+// [CN] 类别为 Swift；这些 Objective-C 声明保留，因为其 block 参数 `CYLThemeImageProvider` 使用 `__kindof`，生成的 Swift 接口会丢掉它（展开打印 block 类型），
+//      参数类型更具体的 Objective-C block 将无法编译（CYLThemeTests.m；第 116 步）。对 Swift 隐藏，Swift 使用 Swift 声明。
 #import <UIKit/UIKit.h>
 
 NS_ASSUME_NONNULL_BEGIN
+
+/*!
+ * [EN] Implemented in Swift (`CYLUtils/Swift/UIImage+CYLTheme.swift`); declared here for Objective-C callers only and hidden from
+ *      Swift (`__swift__`), which uses the Swift declarations (docs/Swift-Migration.md).
+ * [CN] 在 Swift 中实现（`CYLUtils/Swift/UIImage+CYLTheme.swift`）；这里只为 Objective-C 调用方声明，并对 Swift 隐藏（`__swift__`），Swift 直接使用
+ *      Swift 声明（docs/Swift-Migration.md）。
+ */
+#ifndef __swift__
 
 @class CYLThemeManager;
 
@@ -89,5 +103,7 @@ typedef UIImage *_Nullable (^CYLThemeImageProvider)(__kindof CYLThemeManager *ma
 @property (nonatomic, strong, readonly) UIImage *cyl_rawImage;
 
 @end
+
+#endif
 
 NS_ASSUME_NONNULL_END

@@ -12,70 +12,13 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface UIBarButtonItem (CYLBadgeExtention)<CYLBadgeProtocol>
-
 /*!
- * [EN] Returns YES if a badge is currently shown on this bar button item.
- * [CN] 判断当前BarButtonItem上是否正在显示角标。
+ * [EN] `UIBarButtonItem (CYLBadgeExtention)` (the `CYLBadgeProtocol` conformance and `-cyl_showBadgeValue:animationType:backgroundColor:`) is Swift since docs/Swift-Migration.md step 115 (phase ③, group A of docs/Swift-Migration-Phase3.md): Objective-C
+ *      sees it through the generated Swift interface (`CYLSwiftInterface.h`), with the same names.
+ * [CN] `UIBarButtonItem (CYLBadgeExtention)` (the `CYLBadgeProtocol` conformance and `-cyl_showBadgeValue:animationType:backgroundColor:`) is 自第 115 步（第 ③ 阶段 A 组）起为 Swift：Objective-C 通过生成的 Swift 接口（`CYLSwiftInterface.h`）看到它，名称不变。
  */
-- (BOOL)cyl_isShowBadge;
 
-/**
- *  show badge with red dot style and CYLBadgeAnimationTypeNone by default.
- * [EN] Shows a red-dot badge on this bar button item with no animation.
- * [CN] 在当前BarButtonItem上显示红点角标，无动画。
- */
-- (void)cyl_showBadge;
-
-/**
- *  cyl_showBadge
- *
- *  @param value String value, default is `nil`. if value equal @"" means red dot style.
- *  @param animationType animationType
- * [EN] Shows a badge with `value` (@"" for a red dot) and the given animation on this bar button item.
- * [CN] 在当前BarButtonItem上显示值为 value 的角标（传 @"" 为红点），并使用指定动画。
- */
-- (void)cyl_showBadgeValue:(NSString *)value
-         animationType:(CYLBadgeAnimationType)animationType;
-
-/*!
- * [EN] Same as `-cyl_showBadgeValue:animationType:`, with the badge's background color set first (nil keeps the
- *      current one). Safe in `-viewDidLoad`, before the bar button is laid out:
- *
- *          [self.navigationItem.rightBarButtonItem cyl_showBadgeValue:@"" animationType:CYLBadgeAnimationTypeShake
- *                                                    backgroundColor:UIColor.cyl_randomColor];
- *          // Swift
- *          navigationItem.rightBarButtonItem?.cyl_showBadgeValue("", animationType: .shake, backgroundColor: .cyl_randomColor)
- *
- * [CN] 同 `-cyl_showBadgeValue:animationType:`，并先设置角标背景色（传 nil 保持当前颜色）。可在 `-viewDidLoad` 中、bar button
- *      完成布局之前调用（示例见上）。
- */
-- (void)cyl_showBadgeValue:(NSString *)value
-             animationType:(CYLBadgeAnimationType)animationType
-           backgroundColor:(nullable UIColor *)backgroundColor;
-
-
-/**
- *  clear badge(hide badge)
- * [EN] Hides the badge on this bar button item.
- * [CN] 隐藏当前BarButtonItem上的角标。
- */
-- (void)cyl_clearBadge;
-
-/**
- *  make bage(if existing) not hiden
- * [EN] Shows the badge again if one exists and was hidden.
- * [CN] 若角标存在且被隐藏，则重新显示。
- */
-- (void)cyl_resumeBadge;
-
-/*!
- * [EN] Returns YES if the badge is paused (hidden but kept).
- * [CN] 判断角标是否处于暂停（隐藏但保留）状态。
- */
-- (BOOL)cyl_isPauseBadge;
-
-@end
 
 NS_ASSUME_NONNULL_END
 
+#import "CYLSwiftInterface.h"

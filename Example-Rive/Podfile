@@ -10,6 +10,11 @@ target 'RiveApp' do
   # CYLTabBarController with Rive tab icons; it also brings the RiveRuntime pod.
   # CYLTabBarController 与 Rive Tab 图标；同时引入 RiveRuntime pod。
   pod 'CYLTabBarController/Rive', :path => '../'
+  # [EN] The animated item component's own pod (CYLAnimatedItem.podspec), by the same path until it is on the trunk.
+  # [CN] 动效组件独立的 pod（CYLAnimatedItem.podspec），发布到 trunk 之前按相同路径引入。
+  pod 'CYLAnimatedItem', :path => '../'
+  # FIX: issue #415 — SVGA animations (SVGAPlayer), shown after the Rive demo. SVGA 动画（SVGAPlayer），显示在 Rive 演示之后。
+  pod 'CYLTabBarController/SVGA', :path => '../'
   # The FlatDesign style, chosen with the navigation bar button of the settings list. It also brings Lottie.
   # 扁平样式，通过设置列表的导航栏按钮选择。它同时会引入 Lottie。
   pod 'CYLTabBarController/CYLFlatDesignTabBar', :path => '../'

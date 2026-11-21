@@ -311,7 +311,7 @@ enum GalleryProvider {
 
     static func reselectStyle() -> CYLTabBarController {
         let pages: [UIViewController] = (0..<3).map { index in
-            let list = GalleryListViewController(style: .plain)
+            let list = GalleryListViewController(style: .insetGrouped)
             list.title = Gallery.tabs[index].title
             return GalleryNavigationController(rootViewController: list)
         }

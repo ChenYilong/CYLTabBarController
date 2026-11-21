@@ -1,0 +1,16 @@
+.cyl-lottie-stage {
+  display: flex;
+  justify-content: center;
+  padding: 12px 0;
+}
+
+.cyl-lottie-view {
+  width: 200px;
+  height: 140px;
+  border-radius: 12px;
+  background-color: #ffffff;
+}
+
+.cyl-buttons {
+  margin-top: 16px;
+}

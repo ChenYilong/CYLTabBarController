@@ -81,4 +81,6 @@ tabBarController.cyl_reselectBehavior = .popToRootThenScrollToTop
 
 | 中文 | English |
 |:---|:---|
-| 本次开发环境没有 iOS 模拟器或真机，无法运行 Demo，因此暂无测试截图；上方为流程示意图。在设备上验证后，请将截图放入 `docs/assets/` 并在此引用，例如 `![重复点击返回根页面](assets/tab-reselect-pop-to-root.png)`。 | This change was developed without an iOS simulator or device, so there are no test screenshots yet; the figure above is a flow diagram. After testing on a device, put screenshots in `docs/assets/` and reference them here, e.g. `![Reselect pops to the root](assets/tab-reselect-pop-to-root.png)`. |
+| 已验证（2026-11-10，iOS 26.1，iPhone 17 Pro Max 模拟器，ObjC Demo 图库「8.1 Reselect: pop to root, then scroll to top」，`cyl_reselectBehavior = PopToRootThenScrollToTop`）。从上到下：① 点击 Row 1 push 页面（TabBar 保留）；② 再次点击 Home：返回根页面；③ 列表向下滚动；④ 再次点击 Home：滚动到顶部。测试中修复：该场景 push 的页面原先隐藏 TabBar，无法再次点击 Tab。 | Verified (2026-11-10, iOS 26.1, iPhone 17 Pro Max simulator, ObjC demo gallery "8.1 Reselect: pop to root, then scroll to top", `cyl_reselectBehavior = PopToRootThenScrollToTop`). Top to bottom: ① Row 1 pushes a page (the tab bar stays); ② tapping Home again pops to the root; ③ the list is scrolled down; ④ tapping Home again scrolls to the top. Fixed during testing: the scene's pushed pages used to hide the tab bar, so the tab could not be tapped again. |
+
+![Reselect pops to the root, then scrolls to the top](assets/tab-reselect-pop-to-root-ios.png)

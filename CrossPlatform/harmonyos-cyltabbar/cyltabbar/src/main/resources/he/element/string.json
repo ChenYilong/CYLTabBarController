@@ -1,0 +1,952 @@
+{
+  "string": [
+    {
+      "name": "cyl_l10n_bffed61338ea",
+      "value": "%@ CYLTabBarController ב-HarmonyOS"
+    },
+    {
+      "name": "cyl_l10n_9ecf653a3fc6",
+      "value": "%@ · הקשר אחר · הקשות פלוס: %@"
+    },
+    {
+      "name": "cyl_l10n_aaf9b7d7382d",
+      "value": "%@ הודעות חדשות"
+    },
+    {
+      "name": "cyl_l10n_81a05b6c1cf9",
+      "value": "%@, %@"
+    },
+    {
+      "name": "cyl_l10n_0b0ae9062c5a",
+      "value": "בקר סרגל כרטיסיות מהקשר אחר, עם כפתור פלוס מרובע"
+    },
+    {
+      "name": "cyl_l10n_427131e7add2",
+      "value": "כפתור פלוס אחר"
+    },
+    {
+      "name": "cyl_l10n_aa3e67bda3c0",
+      "value": "ArkUI Tabs, סרגל הכרטיסיות של מערכת HarmonyOS, עם אותן כרטיסיות"
+    },
+    {
+      "name": "cyl_l10n_0557fa923dce",
+      "value": "חזרה"
+    },
+    {
+      "name": "cyl_l10n_8665e238c516",
+      "value": "תג: %@"
+    },
+    {
+      "name": "cyl_l10n_6b2186414c82",
+      "value": "הבהוב ×3"
+    },
+    {
+      "name": "cyl_l10n_070554647306",
+      "value": "מסגרת"
+    },
+    {
+      "name": "cyl_l10n_43d3e34b15fb",
+      "value": "מסגרת לפי מצב כהה"
+    },
+    {
+      "name": "cyl_l10n_b67554192c50",
+      "value": "שמאל למטה"
+    },
+    {
+      "name": "cyl_l10n_5968e3c37145",
+      "value": "ימין למטה"
+    },
+    {
+      "name": "cyl_l10n_5d60263416c2",
+      "value": "קפיצה (ללא הפסקה)"
+    },
+    {
+      "name": "cyl_l10n_f3ce1baf4805",
+      "value": "קפיצה ×3 (cyl_bounceAnimationRepeatTimes)"
+    },
+    {
+      "name": "cyl_l10n_0875a57843a1",
+      "value": "נשימה (ללא הפסקה)"
+    },
+    {
+      "name": "cyl_l10n_8795570ddeef",
+      "value": "CYLTabBarItemBackgroundColor / CYLTabBarItemSelectedBackgroundColor"
+    },
+    {
+      "name": "cyl_l10n_687f0fbab628",
+      "value": "CYLTabBarRiveURL: selecting a tab sets its state machine input active; deselecting resets it"
+    },
+    {
+      "name": "cyl_l10n_d7c01888e55e",
+      "value": "CYLTabBarSVGAFilePath: מתנגן פעם אחת בבחירה, אחרת הפריים הראשון"
+    },
+    {
+      "name": "cyl_l10n_132201f60522",
+      "value": "CYLUtils: אובייקטים משויכים חלשים ומציאת כפתור (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_fa3d06c1b1e9",
+      "value": "CYLFlatDesignTabBarItem: לא ממורכז (סגנון מערכת)"
+    },
+    {
+      "name": "cyl_l10n_5e74163d3804",
+      "value": "CYLFlatDesignTabBarItem: ממורכז"
+    },
+    {
+      "name": "cyl_l10n_f6da70b584ae",
+      "value": "קובץ תצורה: %@"
+    },
+    {
+      "name": "cyl_l10n_158b3b19e868",
+      "value": "רדיוס פינה"
+    },
+    {
+      "name": "cyl_l10n_4d242c36821c",
+      "value": "צבעים מותאמים"
+    },
+    {
+      "name": "cyl_l10n_4685555ab484",
+      "value": "גופן מותאם"
+    },
+    {
+      "name": "cyl_l10n_a45350c25311",
+      "value": "מקסימום מותאם (9)"
+    },
+    {
+      "name": "cyl_l10n_3924c958175e",
+      "value": "מצב כהה"
+    },
+    {
+      "name": "cyl_l10n_b9c74f4cd786",
+      "value": "מעומעם"
+    },
+    {
+      "name": "cyl_l10n_abfc3a65538a",
+      "value": "גילוי"
+    },
+    {
+      "name": "cyl_l10n_bf0576472e31",
+      "value": "הקש פעמיים לפתיחה"
+    },
+    {
+      "name": "cyl_l10n_7e0a1ad9a767",
+      "value": "הופעה הדרגתית פעם אחת"
+    },
+    {
+      "name": "cyl_l10n_153407d52fed",
+      "value": "שטוח"
+    },
+    {
+      "name": "cyl_l10n_5cfed317a99d",
+      "value": "סגנון שטוח"
+    },
+    {
+      "name": "cyl_l10n_026b984bb8d8",
+      "value": "היפוך ×2"
+    },
+    {
+      "name": "cyl_l10n_c5d4cd682981",
+      "value": "סמל GIF"
+    },
+    {
+      "name": "cyl_l10n_8cf04a973413",
+      "value": "בית"
+    },
+    {
+      "name": "cyl_l10n_d52d30723b2f",
+      "value": "משמאל לימין פעם אחת"
+    },
+    {
+      "name": "cyl_l10n_1aae3277f8d3",
+      "value": "Liquid Glass (ייחוס)"
+    },
+    {
+      "name": "cyl_l10n_32f643a9aa26",
+      "value": "Liquid Glass: אפקט השקיפות של פרויקט הייחוס"
+    },
+    {
+      "name": "cyl_l10n_f201a4158727",
+      "value": "זכוכית נוזלית"
+    },
+    {
+      "name": "cyl_l10n_af3acf6eb4a9",
+      "value": "זכוכית נוזלית"
+    },
+    {
+      "name": "cyl_l10n_2e8e48a2ebfd",
+      "value": "לחיצה ארוכה על כרטיסייה או על כפתור הפלוס"
+    },
+    {
+      "name": "cyl_l10n_983696096694",
+      "value": "שוליים"
+    },
+    {
+      "name": "cyl_l10n_318b2739ddc2",
+      "value": "אני"
+    },
+    {
+      "name": "cyl_l10n_4c2a8fe7eaf2",
+      "value": "הודעות"
+    },
+    {
+      "name": "cyl_l10n_24d459a81449",
+      "value": "חדש"
+    },
+    {
+      "name": "cyl_l10n_03c2e7e41ffc",
+      "value": "חדש"
+    },
+    {
+      "name": "cyl_l10n_1e8f217bdf71",
+      "value": "הכרטיסייה הבאה (cyl_selectNextTab, issue #535)"
+    },
+    {
+      "name": "cyl_l10n_3826b8552c94",
+      "value": "הרצועה הבאה"
+    },
+    {
+      "name": "cyl_l10n_b2ee912b91d6",
+      "value": "מספר"
+    },
+    {
+      "name": "cyl_l10n_ab7fa33c83b1",
+      "value": "מספר מעל המקסימום"
+    },
+    {
+      "name": "cyl_l10n_e0aa021e21dd",
+      "value": "אישור"
+    },
+    {
+      "name": "cyl_l10n_8a7b0e9c294e",
+      "value": "פועל: %@; החלק את הדף שמאלה / ימינה"
+    },
+    {
+      "name": "cyl_l10n_06eb0a05de97",
+      "value": "פועל: %@; הדף החדש מחליק מצד הכרטיסייה שלו"
+    },
+    {
+      "name": "cyl_l10n_287e78fd65af",
+      "value": "טקסט אחר"
+    },
+    {
+      "name": "cyl_l10n_84432607fd87",
+      "value": "דף: %@"
+    },
+    {
+      "name": "cyl_l10n_105b296a83f9",
+      "value": "השהיה"
+    },
+    {
+      "name": "cyl_l10n_de3c731be563",
+      "value": "הפעלה"
+    },
+    {
+      "name": "cyl_l10n_41b77539cc64",
+      "value": "תמונת PlusButton שנטענת מאוחר יותר"
+    },
+    {
+      "name": "cyl_l10n_72a245189eaf",
+      "value": "אזור המגע של PlusButton (issue #91)"
+    },
+    {
+      "name": "cyl_l10n_9a1d72fdd764",
+      "value": "הכרטיסייה הקודמת (cyl_selectPreviousTab, issue #535)"
+    },
+    {
+      "name": "cyl_l10n_4b0282f4f1c6",
+      "value": "Push ל-UITabBarController של המערכת (כפתור פלוס אחר)"
+    },
+    {
+      "name": "cyl_l10n_e5416d3ed3c0",
+      "value": "מעבר ל-CYLTabBarController אחר (PlusButton אחר)"
+    },
+    {
+      "name": "cyl_l10n_8c96672c9bc5",
+      "value": "Push של TabBarController עם אותו context (אותה מחלקת כפתור פלוס)"
+    },
+    {
+      "name": "cyl_l10n_6166b27ea14b",
+      "value": "הצגת TabBarController עם הקשר חדש (PlusButton עם תת-תצוגת X שניתן להקיש עליה, issue #202)"
+    },
+    {
+      "name": "cyl_l10n_a63e8b745e73",
+      "value": "פותח דף שמסתיר את סרגל הניווט, ללא מחלקת בסיס"
+    },
+    {
+      "name": "cyl_l10n_79fe28f3a3ac",
+      "value": "פותח בקר שתמונת כפתור הפלוס שלו משתנה אחרי 2 שניות; הפריסה לא אמורה לזוז"
+    },
+    {
+      "name": "cyl_l10n_c27618b1aa9d",
+      "value": "נקודה אדומה"
+    },
+    {
+      "name": "cyl_l10n_255c00a63f9d",
+      "value": "רדיוס הנקודה האדומה"
+    },
+    {
+      "name": "cyl_l10n_7aac5e07b16d",
+      "value": "מימין לשמאל פעם אחת"
+    },
+    {
+      "name": "cyl_l10n_e7d74cf8c9a3",
+      "value": "Rive tab icons (configuration file)"
+    },
+    {
+      "name": "cyl_l10n_9d01c837b4bc",
+      "value": "Rive tab icon: house.riv (number input Rooms)"
+    },
+    {
+      "name": "cyl_l10n_f0c792c049bc",
+      "value": "גלילה פעם אחת"
+    },
+    {
+      "name": "cyl_l10n_401ea21c7a44",
+      "value": "סיבוב (ללא הפסקה)"
+    },
+    {
+      "name": "cyl_l10n_bd001817e373",
+      "value": "סמלי כרטיסיות SVGA (קובץ תצורה)"
+    },
+    {
+      "name": "cyl_l10n_b5fcd68edd9f",
+      "value": "שינוי גודל (ללא הפסקה)"
+    },
+    {
+      "name": "cyl_l10n_544d03258eaf",
+      "value": "שינוי גודל פעם אחת"
+    },
+    {
+      "name": "cyl_l10n_dbd4f5e49888",
+      "value": "שינוי גודל ×3"
+    },
+    {
+      "name": "cyl_l10n_13348442cc6a",
+      "value": "חיפוש"
+    },
+    {
+      "name": "cyl_l10n_9ae56cc36e81",
+      "value": "ניעור (ללא הפסקה)"
+    },
+    {
+      "name": "cyl_l10n_e0a90124b72f",
+      "value": "ניעור ×3 (cyl_shakeAnimationRepeatTimes)"
+    },
+    {
+      "name": "cyl_l10n_b10d33d5ad4d",
+      "value": "ניעור, נעצר עם „הפחתת תנועה”"
+    },
+    {
+      "name": "cyl_l10n_6cbe015b00fb",
+      "value": "הצגה / הסתרה של CYLFlatDesignTabBar"
+    },
+    {
+      "name": "cyl_l10n_561582c1e7cc",
+      "value": "מציג את אזור המגע באדום שקוף: %@; קנה מידה %@x; הקש להחלפה בין 1x, 1.5x, 2x, כבוי"
+    },
+    {
+      "name": "cyl_l10n_3cb58e0d546d",
+      "value": "קפיץ (ללא הפסקה)"
+    },
+    {
+      "name": "cyl_l10n_0a00b2238071",
+      "value": "קפיץ פעם אחת"
+    },
+    {
+      "name": "cyl_l10n_fee4a478923f",
+      "value": "אינטראקציות כרטיסיות"
+    },
+    {
+      "name": "cyl_l10n_5ea7bf3d8e63",
+      "value": "Tab icon animations loop: off"
+    },
+    {
+      "name": "cyl_l10n_918aff638366",
+      "value": "Tab icon animations loop: on"
+    },
+    {
+      "name": "cyl_l10n_98559580dcc7",
+      "value": "הנפשת הקשה על לשוניות (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_db89836d6e21",
+      "value": "צליל ומשוב הפטי בהקשה על כרטיסיות (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_2f6e866d5219",
+      "value": "דפים, בחירה והתחברות"
+    },
+    {
+      "name": "cyl_l10n_6d067090c833",
+      "value": "כרטיסייה, %1$@ מתוך %2$@"
+    },
+    {
+      "name": "cyl_l10n_456887f9731c",
+      "value": "כרטיסייה: %@"
+    },
+    {
+      "name": "cyl_l10n_ab5745daa734",
+      "value": "גלריית סרגלי לשוניות"
+    },
+    {
+      "name": "cyl_l10n_75ccb7ef4864",
+      "value": "מראה סרגל הלשוניות"
+    },
+    {
+      "name": "cyl_l10n_7c4aecba91c3",
+      "value": "התמונה של הכרטיסייה בדף זה מתוך ה-rawfile של האפליקציה (חבילת המשאבים ב-iOS); הקש שוב כדי לשחזר"
+    },
+    {
+      "name": "cyl_l10n_2e6d648945c0",
+      "value": "כפתור הפלוס בולט מעל הסרגל; גם החלק שמעליו מגיב (מוצג באדום)"
+    },
+    {
+      "name": "cyl_l10n_9b6633b75bf2",
+      "value": "הכרטיסייה „אני” דורשת התחברות (issue #19); הקש להחלפה"
+    },
+    {
+      "name": "cyl_l10n_a4d0d101d6a3",
+      "value": "שמאל למעלה"
+    },
+    {
+      "name": "cyl_l10n_2306a585ae00",
+      "value": "cyl_itemEdgeInsets: ‏15% מרוחב כרטיסייה פנוי בכל קצה"
+    },
+    {
+      "name": "cyl_l10n_6360bbdfb8ff",
+      "value": "cyl_itemEdgeInsets: אפס, הכרטיסיות ממלאות את הסרגל"
+    },
+    {
+      "name": "cyl_l10n_fd15e88376df",
+      "value": "הדגמת שיטות cyl_pop / cyl_push"
+    },
+    {
+      "name": "cyl_l10n_ca3dcd2d62be",
+      "value": "cyl_popSelectTabBarChildViewControllerAtIndex: 1 (%@)"
+    },
+    {
+      "name": "cyl_l10n_3b06a9582640",
+      "value": "cyl_popSelectTabBarChildViewControllerForTabBarItemIdentifier: message"
+    },
+    {
+      "name": "cyl_l10n_59884403daf6",
+      "value": "cyl_pushOrPopToViewController: pages/Index (כבר במחסנית: חוזר)"
+    },
+    {
+      "name": "cyl_l10n_1ec113617309",
+      "value": "cyl_pushViewController, cyl_popSelectTabBarChildViewControllerAtIndex, cyl_pushOrPopToViewController"
+    },
+    {
+      "name": "cyl_l10n_9fb845377ee4",
+      "value": "cyl_pushViewController: דף ירוק"
+    },
+    {
+      "name": "cyl_l10n_ff5772993aee",
+      "value": "cyl_tabBarItemLongPressDuration = %@ ms, cyl_tabBarItemDoubleTapInterval = %@ ms; הקש להחלפה; הקש פעמיים על כרטיסייה כדי לראות"
+    },
+    {
+      "name": "cyl_l10n_f69c71bc581e",
+      "value": "cyl_tabBarMinimizeBehavior = %@; הקש כדי לבחור ואז גלול את הרשימה"
+    },
+    {
+      "name": "cyl_l10n_4abddd944c2e",
+      "value": "harmonyos-liquid-glass-tabbar: קפסולת כרטיסיות, כדור חיפוש וסרגל מוזיקה מעל תוכן צבעוני; גלול כדי לכווץ"
+    },
+    {
+      "name": "cyl_l10n_3b4e07b5542e",
+      "value": "numberInput=Rooms: each select or tap again sets Rooms to the next value (3, 4, 5, 6)"
+    },
+    {
+      "name": "cyl_l10n_f3f4ecf4a4a6",
+      "value": "selectedIndex = %@ (הדף של כפתור הפלוס הוא %@, אף פעם לא אינדקס כרטיסייה); הקש לכרטיסייה הבאה"
+    },
+    {
+      "name": "cyl_l10n_ee5b6ac6461b",
+      "value": "selectedIndex ו-PlusButton (issue #515)"
+    },
+    {
+      "name": "cyl_l10n_2de6d572f86b",
+      "value": "ערכת standardAppearance (משותפת ל-Liquid Glass ול-FlatDesign)"
+    },
+    {
+      "name": "cyl_l10n_c4376b477be8",
+      "value": "tabBarHidden = %@; מוסתר, חוזר אחרי 2 שניות"
+    },
+    {
+      "name": "cyl_l10n_2a0608059131",
+      "value": "מעדכן את כותרות כל הכרטיסיות בבת אחת; הקישו שוב לשחזור"
+    },
+    {
+      "name": "cyl_l10n_57196013d558",
+      "value": "ליל כל הקדושים"
+    },
+    {
+      "name": "cyl_l10n_0a58c230c3d9",
+      "value": "מוריד ומעדכן את הסמלים של כל הלשוניות; הקש שוב לשחזור"
+    },
+    {
+      "name": "cyl_l10n_5e347d8ccb68",
+      "value": "הורדת סמל מהרשת"
+    },
+    {
+      "name": "cyl_l10n_2e0e84a0dcfb",
+      "value": "הסתרת סרגל הניווט ללא מחלקת בסיס (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_321ff794aab8",
+      "value": "לא רלוונטי"
+    },
+    {
+      "name": "cyl_l10n_e1642a46b804",
+      "value": "חג אמצע הסתיו"
+    },
+    {
+      "name": "cyl_l10n_0c2817d10627",
+      "value": "משוב הפטי בינוני"
+    },
+    {
+      "name": "cyl_l10n_0f60774903e0",
+      "value": "טעינת תמונות מ-bundle (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_0e1b02648a11",
+      "value": "התקרבות"
+    },
+    {
+      "name": "cyl_l10n_83c39abd16cd",
+      "value": "בחירה מהאלבום"
+    },
+    {
+      "name": "cyl_l10n_cc03f47a389c",
+      "value": "מוריד את סמל הכרטיסייה מהרשת (עם מטמון); הקישו שוב לשחזור"
+    },
+    {
+      "name": "cyl_l10n_e05f97c5159d",
+      "value": "יצירת TabBarController מקובץ תצורה"
+    },
+    {
+      "name": "cyl_l10n_5f0c0bf32dc1",
+      "value": "שמירה"
+    },
+    {
+      "name": "cyl_l10n_24fb8692947a",
+      "value": "נשמר"
+    },
+    {
+      "name": "cyl_l10n_b15d91274e9f",
+      "value": "סגירה"
+    },
+    {
+      "name": "cyl_l10n_70922c50ef07",
+      "value": "אזהרת זיכרון"
+    },
+    {
+      "name": "cyl_l10n_cbed6b29761b",
+      "value": "כפתור פלוס"
+    },
+    {
+      "name": "cyl_l10n_18684d72945b",
+      "value": "טעינת התמונה"
+    },
+    {
+      "name": "cyl_l10n_b981b7b359a7",
+      "value": "טעינת תמונת רקע"
+    },
+    {
+      "name": "cyl_l10n_7136049eb4c7",
+      "value": "פורק לשוניות שלא נבחרו; הן נטענות מחדש כשבוחרים בהן"
+    },
+    {
+      "name": "cyl_l10n_c7626d7d6194",
+      "value": "משנה במקום את כותרת הכרטיסייה של הדף; הקישו שוב לשחזור"
+    },
+    {
+      "name": "cyl_l10n_15fb093f6fff",
+      "value": "עדכון לשוניות במקום"
+    },
+    {
+      "name": "cyl_l10n_c1ecedab11bc",
+      "value": "מקורי"
+    },
+    {
+      "name": "cyl_l10n_83611abd5f80",
+      "value": "פרסום"
+    },
+    {
+      "name": "cyl_l10n_625fb26b4b33",
+      "value": "ביטול"
+    },
+    {
+      "name": "cyl_l10n_d25efeb790bb",
+      "value": "בקרבת מקום"
+    },
+    {
+      "name": "cyl_l10n_7941d8987ff2",
+      "value": "השוואה ל-UITabBar של המערכת"
+    },
+    {
+      "name": "cyl_l10n_d0d78acf1941",
+      "value": "חג המולד"
+    },
+    {
+      "name": "cyl_l10n_aa91e8ceec70",
+      "value": "פסחא"
+    },
+    {
+      "name": "cyl_l10n_3df20a295b39",
+      "value": "קיץ"
+    },
+    {
+      "name": "cyl_l10n_0ef6dae7e80c",
+      "value": "חלל"
+    },
+    {
+      "name": "cyl_l10n_2f383291bcf8",
+      "value": "אמיתי: %@"
+    },
+    {
+      "name": "cyl_l10n_bccc798b577a",
+      "value": "קפסולה ממורכזת"
+    },
+    {
+      "name": "cyl_l10n_f613681ddf31",
+      "value": "הצגת כל %@ ההדמיות"
+    },
+    {
+      "name": "cyl_l10n_7c87af044929",
+      "value": "החלקה להחלפת לשונית (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_7a2261654d24",
+      "value": "נפרק"
+    },
+    {
+      "name": "cyl_l10n_f79d05d929aa",
+      "value": "ה-TabBarController נוצר בבטחה: %@ לשוניות"
+    },
+    {
+      "name": "cyl_l10n_091885db07e4",
+      "value": "קפיצה"
+    },
+    {
+      "name": "cyl_l10n_758903c327de",
+      "value": "מציג GIF מונפש כסמל הכרטיסייה; הקישו שוב לשחזור"
+    },
+    {
+      "name": "cyl_l10n_56e6ecf97176",
+      "value": "Loop"
+    },
+    {
+      "name": "cyl_l10n_c7db6d4f1a42",
+      "value": "שחזור"
+    },
+    {
+      "name": "cyl_l10n_c4328f75476f",
+      "value": "יום האהבה"
+    },
+    {
+      "name": "cyl_l10n_07b181184280",
+      "value": "אני"
+    },
+    {
+      "name": "cyl_l10n_2a3e7f5c382c",
+      "value": "ידני"
+    },
+    {
+      "name": "cyl_l10n_97a6bedeb7fd",
+      "value": "ידני: הקש כדי להפעיל הסתרה בגלילה, גלול למטה כדי להסתיר את TabBar, ואז בצע את מה שכתוב בכותרת. צפוי: TabBar חוזר מיד."
+    },
+    {
+      "name": "cyl_l10n_f68e7e217ad1",
+      "value": "ידני: %@"
+    },
+    {
+      "name": "cyl_l10n_89246468f7fd",
+      "value": "פתיחת גלריית סרגלי הלשוניות"
+    },
+    {
+      "name": "cyl_l10n_a01539048bb0",
+      "value": "הפעילו את המתג ולחצו לחיצה ארוכה על לשונית כלשהי או על PlusButton כדי לראות את המזהה שלו."
+    },
+    {
+      "name": "cyl_l10n_633c2ee4dcc7",
+      "value": "שינוי כל סמלי הרשת"
+    },
+    {
+      "name": "cyl_l10n_f75fe6720861",
+      "value": "שינוי כל הסמלים המקומיים"
+    },
+    {
+      "name": "cyl_l10n_7fb5208a54d5",
+      "value": "שינוי כל הכותרות"
+    },
+    {
+      "name": "cyl_l10n_2f728e190695",
+      "value": "מציג דפים אחרים בלשוניות משני צדי לשונית זו (issue #481); הקש שוב לשחזור"
+    },
+    {
+      "name": "cyl_l10n_bed9ec1e8448",
+      "value": "צילום תמונה"
+    },
+    {
+      "name": "cyl_l10n_0be5a194844c",
+      "value": "ערכת עיצוב"
+    },
+    {
+      "name": "cyl_l10n_61a9cd33b1ff",
+      "value": "ערכת עיצוב (נושא, issue #216)"
+    },
+    {
+      "name": "cyl_l10n_09d0fdddca66",
+      "value": "ערכות עיצוב: חגים וצבעים (%@)"
+    },
+    {
+      "name": "cyl_l10n_3de5855e2c7f",
+      "value": "כיווץ רשימת ההדמיות"
+    },
+    {
+      "name": "cyl_l10n_a0ffdf359138",
+      "value": "שינוי הגובה של CYLFlatDesignTabBar"
+    },
+    {
+      "name": "cyl_l10n_01e3254a92ba",
+      "value": "הגדלה והקטנה"
+    },
+    {
+      "name": "cyl_l10n_d46d5bb15db1",
+      "value": "השנה החדשה"
+    },
+    {
+      "name": "cyl_l10n_79b5a6564585",
+      "value": "סיבוב"
+    },
+    {
+      "name": "cyl_l10n_d81bb206a889",
+      "value": "ללא"
+    },
+    {
+      "name": "cyl_l10n_14f433db2189",
+      "value": "ללא מחלקת בסיס, וכלי עזר"
+    },
+    {
+      "name": "cyl_l10n_d2339bb4edaa",
+      "value": "חג האביב"
+    },
+    {
+      "name": "cyl_l10n_5f1de850fb46",
+      "value": "שינוי כותרת הכרטיסייה"
+    },
+    {
+      "name": "cyl_l10n_9d0d66f312b5",
+      "value": "החלפה בתמונה גדולה יותר"
+    },
+    {
+      "name": "cyl_l10n_b051a19ace76",
+      "value": "החלפת הלשוניות הסמוכות"
+    },
+    {
+      "name": "cyl_l10n_3e730a3320e9",
+      "value": "דף חלופי %@"
+    },
+    {
+      "name": "cyl_l10n_a131e4f178aa",
+      "value": "תוכן חדש"
+    },
+    {
+      "name": "cyl_l10n_467b3e031441",
+      "value": "לא נטען"
+    },
+    {
+      "name": "cyl_l10n_2c8d9e877a54",
+      "value": "היסט כותרת (titlePositionAdjustment)"
+    },
+    {
+      "name": "cyl_l10n_0787cd518387",
+      "value": "הדמיית אזהרת זיכרון"
+    },
+    {
+      "name": "cyl_l10n_d76904d0e7ee",
+      "value": "כל סצנה היא סרגל לשוניות שנבנה עם ה-API הציבורי: סגנונות, אנימציות, תזכורות, Lottie וממשקי הלשוניות החדשים"
+    },
+    {
+      "name": "cyl_l10n_6a00c1ae99fa",
+      "value": "אוקיינוס"
+    },
+    {
+      "name": "cyl_l10n_ff692f04ace0",
+      "value": "הודעות"
+    },
+    {
+      "name": "cyl_l10n_41e8e8b9935c",
+      "value": "כהה"
+    },
+    {
+      "name": "cyl_l10n_8dfe6bcdd6ec",
+      "value": "מעבר בהחלקה (CYLTabBarSlideTransitionAnimator)"
+    },
+    {
+      "name": "cyl_l10n_9f44bafc75c6",
+      "value": "הקטנה / הסתרה של TabBar בגלילה (issue #13)"
+    },
+    {
+      "name": "cyl_l10n_8625f5f225d7",
+      "value": "הסתרה בגלילה: הדמיית הפרעות (issue #13)"
+    },
+    {
+      "name": "cyl_l10n_678abebe6aac",
+      "value": "הקישו על ה-X בפינה הימנית העליונה של PlusButton: ה-X משנה לצבע אקראי ו-PlusButton לא מגיב"
+    },
+    {
+      "name": "cyl_l10n_7375af54db2a",
+      "value": "הקישו כדי להחליף את הנפשת ההקשה של הלשוניות ושל PlusButton. כעת: %@"
+    },
+    {
+      "name": "cyl_l10n_5378f31b520c",
+      "value": "הקש כדי להחליף את tabBar.standardAppearance, נוכחי: %@"
+    },
+    {
+      "name": "cyl_l10n_4a986e4da535",
+      "value": "הקש כדי להחליף את ההיסט האנכי של כותרות כל הלשוניות, נוכחי: %@"
+    },
+    {
+      "name": "cyl_l10n_3d0d9d3d7cc2",
+      "value": "הקישו כדי לשנות שפה"
+    },
+    {
+      "name": "cyl_l10n_f4e41dda1094",
+      "value": "הקש כדי להחליף, ואז הקש על כרטיסייה כלשהי או על PlusButton כדי לשמוע. הרטט ההפטי פועל רק במכשיר אמיתי. כעת: %@"
+    },
+    {
+      "name": "cyl_l10n_15855ab96e87",
+      "value": "קליק + הפטי"
+    },
+    {
+      "name": "cyl_l10n_cff8a9cded04",
+      "value": "הקש כדי לבחור נושא: הרקע, הסמלים וצבעי הטקסט של ה-TabBar משתנים במקום, בכל סגנונות ה-TabBar. נוכחי: %@"
+    },
+    {
+      "name": "cyl_l10n_1c00c4fd1cea",
+      "value": "ורד ורוד"
+    },
+    {
+      "name": "cyl_l10n_8483ed132b2c",
+      "value": "יום הולדת"
+    },
+    {
+      "name": "cyl_l10n_feef14745f21",
+      "value": "מעדכן את הסמלים של כל הלשוניות בתמונות מקומיות (שם, נתיב, UIImage, כתובת קובץ); הקש שוב לשחזור"
+    },
+    {
+      "name": "cyl_l10n_402d19e50fff",
+      "value": "התחברות"
+    },
+    {
+      "name": "cyl_l10n_833152116634",
+      "value": "הסרת התמונה"
+    },
+    {
+      "name": "cyl_l10n_a0676a7d84a9",
+      "value": "קו ירוק"
+    },
+    {
+      "name": "cyl_l10n_16068b2ff3fd",
+      "value": "סמלים מהרשת"
+    },
+    {
+      "name": "cyl_l10n_69ca6555a602",
+      "value": "היפוך"
+    },
+    {
+      "name": "cyl_l10n_4bd51044149f",
+      "value": "קובץ צליל מותאם (cyl_tabButtonTapSoundURL)"
+    },
+    {
+      "name": "cyl_l10n_9d1c8a70d4da",
+      "value": "בדיקה עצמית"
+    },
+    {
+      "name": "cyl_l10n_11858aeb1656",
+      "value": "בדיקה עצמית: הרצת כל ההדמיות האוטומטיות ודיווח PASS / FAIL"
+    },
+    {
+      "name": "cyl_l10n_beabcd498b94",
+      "value": "אשכולית"
+    },
+    {
+      "name": "cyl_l10n_b8c467fce096",
+      "value": "תגים"
+    },
+    {
+      "name": "cyl_l10n_200e65177369",
+      "value": "הגדרת צבע רקע ל-CYLFlatDesignTabBarItem"
+    },
+    {
+      "name": "cyl_l10n_295bb704f520",
+      "value": "שפה"
+    },
+    {
+      "name": "cyl_l10n_d673e0eb5c1c",
+      "value": "תגובה מחוץ לתצוגת האב (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_71bbc726ace5",
+      "value": "לפי המערכת"
+    },
+    {
+      "name": "cyl_l10n_d0914cf6acd2",
+      "value": "ניווט והשוואות"
+    },
+    {
+      "name": "cyl_l10n_110abc875180",
+      "value": "משוב הפטי קל"
+    },
+    {
+      "name": "cyl_l10n_fad7c8a21fe3",
+      "value": "נבחר"
+    },
+    {
+      "name": "cyl_l10n_aa05fd09a619",
+      "value": "כללי"
+    },
+    {
+      "name": "cyl_l10n_15c64aa0b404",
+      "value": "קובץ תצורה"
+    },
+    {
+      "name": "cyl_l10n_d505958a042b",
+      "value": "תצורה: כשלים מדומים"
+    },
+    {
+      "name": "cyl_l10n_45158907e07f",
+      "value": "משוב הפטי חזק"
+    },
+    {
+      "name": "cyl_l10n_d6982fecc6a4",
+      "value": "לחיצה ארוכה על לשוניות (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_aefae51d3c25",
+      "value": "בוצעה לחיצה ארוכה על \"%@\""
+    },
+    {
+      "name": "cyl_l10n_abad1baa5479",
+      "value": "משך לחיצה ארוכה ומרווח הקשה כפולה (issue #535 / #152)"
+    },
+    {
+      "name": "cyl_l10n_b146fc1a1531",
+      "value": "דשא"
+    },
+    {
+      "name": "cyl_l10n_db1c89e0f6e6",
+      "value": "בית"
+    },
+    {
+      "name": "cyl_l10n_18c63459a2c0",
+      "value": "ברירת מחדל"
+    },
+    {
+      "name": "cyl_l10n_be354ee4263a",
+      "value": "קליק ברירת מחדל"
+    }
+  ]
+}

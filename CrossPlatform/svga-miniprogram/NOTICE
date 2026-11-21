@@ -1,0 +1,11 @@
+cyl-svga-miniprogram
+Copyright (c) ChenYilong. MIT License (LICENSE).
+
+This package contains:
+
+- miniprogram_dist/svga/fflate.js: fflate 0.8.2 (https://github.com/101arrowz/fflate), MIT License,
+  Copyright (c) 2023 Arjun Barrett; built by scripts/cyl_build.js (the optional worker_threads lookup removed).
+
+The SVGA player (miniprogram_dist/svga/cyl_svga_movie.js, cyl_svga_renderer.js) is written for this package from the
+SVGA 2.x file format (svga.proto of https://github.com/svga/SVGAPlayer-iOS, Apache License 2.0); it contains no code of
+the SVGA players.

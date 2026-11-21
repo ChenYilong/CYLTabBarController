@@ -48,7 +48,7 @@ class NextHomeViewController: UIViewController {
             self?.cyl_popSelectTabBarChildViewController(forTabBarItemIdentifier: "mine") { selected in
                 let next = NextHomeViewController()
                 next.hidesBottomBarWhenPushed = true
-                selected.navigationController?.pushViewController(next, animated: true)
+                selected?.navigationController?.pushViewController(next, animated: true)
             }
         })
         // Pops the current stack, selects the "city" tab, then pushes a page onto it. Pop 当前导航栈、选中「同城」，再向该 Tab push 一个页面。
@@ -63,11 +63,11 @@ class NextHomeViewController: UIViewController {
         // An unknown identifier returns nil: nothing is popped or selected. 未知标识返回 nil：不 pop、不切换 Tab。
         sheet.addAction(UIAlertAction(title: "forTabBarItemIdentifier: \"unknown\"", style: .default) { [weak self] _ in
             let selected = self?.cyl_popSelectTabBarChildViewController(forTabBarItemIdentifier: "unknown")
-            let alert = UIAlertController(title: nil, message: String(format: CYLLocalizedString("返回值：%@"), selected.map { "\($0)" } ?? "nil"), preferredStyle: .alert)
-            alert.addAction(UIAlertAction(title: CYLLocalizedString("OK"), style: .default))
+            let alert = UIAlertController(title: nil, message: String(format: cylDemoLocalizedString("返回值：%@"), selected.map { "\($0)" } ?? "nil"), preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: cylDemoLocalizedString("OK"), style: .default))
             self?.present(alert, animated: true)
         })
-        sheet.addAction(UIAlertAction(title: CYLLocalizedString("取消"), style: .cancel))
+        sheet.addAction(UIAlertAction(title: cylDemoLocalizedString("取消"), style: .cancel))
         sheet.popoverPresentationController?.barButtonItem = navigationItem.rightBarButtonItem
         present(sheet, animated: true)
     }

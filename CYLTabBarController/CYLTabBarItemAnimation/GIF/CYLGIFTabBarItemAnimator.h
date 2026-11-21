@@ -20,16 +20,25 @@
 #endif
 
 /*!
- * [EN] 1 when ImageIO, which decodes GIF files, is part of the build; 0 otherwise. Everything below, the GIF keys included,
- *      exists only then. Use `#if CYL_GIF_AVAILABLE` for GIF-only code of your own. CocoaPods: `pod 'CYLTabBarController/GIF'`.
- * [CN] 工程中有解码 GIF 的 ImageIO 时为 1，否则为 0。以下所有内容（包括 GIF 的 key）只在此时存在。App 自己只用于 GIF 的代码可用
- *      `#if CYL_GIF_AVAILABLE` 包住。CocoaPods：`pod 'CYLTabBarController/GIF'`。
+ * [EN] `CYL_GIF_AVAILABLE` (defined in the component's core, `CYLAnimatedItemMacros.h`) is 1 when this subspec and
+ *      ImageIO are part of the build, 0 otherwise. The animator below exists only then. The GIF keys
+ *      (`CYLTabBarGIFURL`…) are declared in the component's core and always exist: without the engine they get a compile
+ *      warning, a debug log at run time, and the tab shows its static image (or the placeholder). Use
+ *      `#if CYL_GIF_AVAILABLE` for GIF-only code of your own. CocoaPods: `pod 'CYLAnimatedItem/GIF'` (tab bar:
+ *      `pod 'CYLTabBarController/GIF'`).
+ * [CN] `CYL_GIF_AVAILABLE`（定义在组件核心 `CYLAnimatedItemMacros.h`）在本子库与 ImageIO 都参与构建时为 1，否则为 0。下面的 animator 只在此时
+ *      存在。GIF 的 key（`CYLTabBarGIFURL`……）声明在组件核心中，总是存在：没有引擎时会有编译警告与运行时的 debug 日志，Tab 显示静态图片
+ *      （或占位图）。App 自己只用于 GIF 的代码可用 `#if CYL_GIF_AVAILABLE` 包住。CocoaPods：`pod 'CYLAnimatedItem/GIF'`（TabBar：
+ *      `pod 'CYLTabBarController/GIF'`）。
  */
-#if __has_include(<ImageIO/ImageIO.h>)
-#define CYL_GIF_AVAILABLE 1
+#if __has_include(<CYLAnimatedItem/CYLAnimatedItemMacros.h>)
+#import <CYLAnimatedItem/CYLAnimatedItemMacros.h>
+#elif __has_include("../../CYLAnimatedItem/CYLAnimatedItemMacros.h")
+#import "../../CYLAnimatedItem/CYLAnimatedItemMacros.h"
 #else
-#define CYL_GIF_AVAILABLE 0
+#import "CYLAnimatedItemMacros.h"
 #endif
+// [EN] CYL_GIF_AVAILABLE is defined in CYLAnimatedItemMacros.h (the component's core). [CN] CYL_GIF_AVAILABLE 定义在 CYLAnimatedItemMacros.h（组件核心）中。
 
 #if CYL_GIF_AVAILABLE
 NS_ASSUME_NONNULL_BEGIN
@@ -50,28 +59,13 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CYLGIFTabBarItemAnimator : NSObject
 
-/// [EN] The registered animator, e.g. to inject another view provider. [CN] 已注册的 animator，例如用于注入其他视图 provider。
+/*!
+ * [EN] The registered animator, e.g. to inject another view provider. [CN] 已注册的 animator，例如用于注入其他视图 provider。
+ */
 @property (class, nonatomic, readonly) CYLTabBarItemViewAnimator *animator;
 
 @end
 
-/*!
- * [EN] Keys for a tab's GIF animation, aliases of the generic `CYLTabBarAnimation…` keys (either works), like the Lottie, PAG
- *      and Rive keys. A GIF has no color layers, so there is no dark colors key: give a Dark Mode file instead.
- *      - `CYLTabBarGIFURL`: an NSURL of a local .gif file; `CYLTabBarGIFFilePath`: its full path (NSString). The URL wins.
- *      - `CYLTabBarGIFSize`: the view size, an NSValue of CGSize.
- *      - `CYLTabBarGIFDarkURL` / `CYLTabBarGIFDarkFilePath`: the Dark Mode version.
- * [CN] Tab 的 GIF 动画 key，是通用 key `CYLTabBarAnimation…` 的别名（两者都可以用），与 Lottie、PAG、Rive 的 key 相同。GIF 没有颜色图层，因此没有深色颜色
- *      key：请提供深色模式的文件。
- *      - `CYLTabBarGIFURL`：本地 .gif 文件的 NSURL；`CYLTabBarGIFFilePath`：其完整路径（NSString）。URL 优先。
- *      - `CYLTabBarGIFSize`：视图尺寸，CGSize 的 NSValue。
- *      - `CYLTabBarGIFDarkURL` / `CYLTabBarGIFDarkFilePath`：深色模式版本。
- */
-FOUNDATION_EXTERN NSString *const CYLTabBarGIFURL;
-FOUNDATION_EXTERN NSString *const CYLTabBarGIFFilePath;
-FOUNDATION_EXTERN NSString *const CYLTabBarGIFSize;
-FOUNDATION_EXTERN NSString *const CYLTabBarGIFDarkURL;
-FOUNDATION_EXTERN NSString *const CYLTabBarGIFDarkFilePath;
 
 NS_ASSUME_NONNULL_END
 #endif

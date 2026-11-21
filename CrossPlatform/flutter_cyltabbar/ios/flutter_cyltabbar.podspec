@@ -16,5 +16,10 @@ Pod::Spec.new do |s|
   s.dependency 'Flutter'
   s.dependency 'CYLTabBarController'
   s.platform = :ios, '15.0'
-  s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES', 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386' }
+  s.pod_target_xcconfig = {
+    'DEFINES_MODULE' => 'YES',
+    'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386',
+    # [EN] Static libraries: the library's generated Swift header (CYLTabBarHostView). [CN] 静态库：库生成的 Swift 头文件（CYLTabBarHostView）。
+    'HEADER_SEARCH_PATHS' => '"$(PODS_CONFIGURATION_BUILD_DIR)/CYLTabBarController/Swift Compatibility Header"'
+  }
 end

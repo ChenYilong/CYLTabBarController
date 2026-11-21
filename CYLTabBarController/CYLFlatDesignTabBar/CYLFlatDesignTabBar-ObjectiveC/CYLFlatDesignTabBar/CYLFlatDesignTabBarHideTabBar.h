@@ -11,8 +11,14 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface CYLFlatDesignTabBarHideTabBar : UITabBar
-@end
+/*!
+ * [EN] `CYLFlatDesignTabBarHideTabBar` is implemented in Swift (`Swift/CYLFlatDesignTabBarHideTabBar.swift`, docs/Swift-Migration.md, step 47);
+ *      Objective-C callers get its declaration from the generated Swift interface imported below.
+ * [CN] `CYLFlatDesignTabBarHideTabBar` 在 Swift 中实现（`Swift/CYLFlatDesignTabBarHideTabBar.swift`，docs/Swift-Migration.md，第 47 步）；Objective-C 调用方从下方
+ *      导入的 Swift 生成接口获得其声明。
+ */
 
 
 NS_ASSUME_NONNULL_END
+
+#import "CYLSwiftInterface.h"

@@ -50,6 +50,9 @@ android {
             assets.srcDir("../../Example-SwiftUI-Rive/AnimatedApp/Assets.xcassets")
             // [EN] The course's fonts (Poppins, Inter). [CN] 课程的字体（Poppins、Inter）。
             assets.srcDir("../../Example-SwiftUI-Rive/AnimatedApp/Fonts")
+            // [EN] Issue #415: the SVGA tab icons and the SVGA configuration file of Example-Rive. [CN] Issue #415：SVGA Tab 图标与 Example-Rive 的 SVGA 配置文件。
+            assets.srcDir("../../Example-SwiftUI-Rive/AnimatedApp/SVGAAssets")
+            assets.srcDir("../../Example-Rive/RiveApp/SVGA")
         }
     }
 }
@@ -61,6 +64,8 @@ dependencies {
     implementation(libs.material)
     // [EN] The library plays Rive through rive-android, found by reflection. [CN] 库通过反射找到 rive-android 播放 Rive。
     implementation(libs.rive)
+    // [EN] The library plays SVGA through SVGAPlayer-Android, found by reflection (issue #415). [CN] 库通过反射找到 SVGAPlayer-Android 播放 SVGA（issue #415）。
+    implementation(libs.svgaplayer)
     testImplementation(libs.junit)
     testImplementation(libs.robolectric)
     testImplementation(libs.androidx.test.core)

@@ -1,0 +1,952 @@
+{
+  "string": [
+    {
+      "name": "cyl_l10n_bffed61338ea",
+      "value": "HarmonyOS의 %@ CYLTabBarController"
+    },
+    {
+      "name": "cyl_l10n_9ecf653a3fc6",
+      "value": "%@ · 다른 컨텍스트 · 플러스 탭 횟수: %@"
+    },
+    {
+      "name": "cyl_l10n_aaf9b7d7382d",
+      "value": "새 메시지 %@개"
+    },
+    {
+      "name": "cyl_l10n_81a05b6c1cf9",
+      "value": "%@, %@"
+    },
+    {
+      "name": "cyl_l10n_0b0ae9062c5a",
+      "value": "다른 컨텍스트의 탭 바 컨트롤러, 사각형 플러스 버튼"
+    },
+    {
+      "name": "cyl_l10n_427131e7add2",
+      "value": "다른 플러스 버튼"
+    },
+    {
+      "name": "cyl_l10n_aa3e67bda3c0",
+      "value": "ArkUI Tabs, HarmonyOS 시스템 탭 바, 같은 탭으로"
+    },
+    {
+      "name": "cyl_l10n_0557fa923dce",
+      "value": "뒤로"
+    },
+    {
+      "name": "cyl_l10n_8665e238c516",
+      "value": "배지: %@"
+    },
+    {
+      "name": "cyl_l10n_6b2186414c82",
+      "value": "깜박임 ×3"
+    },
+    {
+      "name": "cyl_l10n_070554647306",
+      "value": "테두리"
+    },
+    {
+      "name": "cyl_l10n_43d3e34b15fb",
+      "value": "다크 모드를 따르는 테두리"
+    },
+    {
+      "name": "cyl_l10n_b67554192c50",
+      "value": "왼쪽 아래"
+    },
+    {
+      "name": "cyl_l10n_5968e3c37145",
+      "value": "오른쪽 아래"
+    },
+    {
+      "name": "cyl_l10n_5d60263416c2",
+      "value": "바운스(계속)"
+    },
+    {
+      "name": "cyl_l10n_f3ce1baf4805",
+      "value": "바운스 ×3 (cyl_bounceAnimationRepeatTimes)"
+    },
+    {
+      "name": "cyl_l10n_0875a57843a1",
+      "value": "숨쉬기(계속)"
+    },
+    {
+      "name": "cyl_l10n_8795570ddeef",
+      "value": "CYLTabBarItemBackgroundColor / CYLTabBarItemSelectedBackgroundColor"
+    },
+    {
+      "name": "cyl_l10n_687f0fbab628",
+      "value": "CYLTabBarRiveURL: selecting a tab sets its state machine input active; deselecting resets it"
+    },
+    {
+      "name": "cyl_l10n_d7c01888e55e",
+      "value": "CYLTabBarSVGAFilePath: 선택하면 한 번 재생, 아니면 첫 프레임"
+    },
+    {
+      "name": "cyl_l10n_132201f60522",
+      "value": "CYLUtils 약한 연관 객체와 버튼 찾기 (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_fa3d06c1b1e9",
+      "value": "CYLFlatDesignTabBarItem 가운데 정렬 안 함(시스템 기본)"
+    },
+    {
+      "name": "cyl_l10n_5e74163d3804",
+      "value": "CYLFlatDesignTabBarItem 가운데 정렬"
+    },
+    {
+      "name": "cyl_l10n_f6da70b584ae",
+      "value": "설정 파일: %@"
+    },
+    {
+      "name": "cyl_l10n_158b3b19e868",
+      "value": "모서리 둥글기"
+    },
+    {
+      "name": "cyl_l10n_4d242c36821c",
+      "value": "사용자 지정 색상"
+    },
+    {
+      "name": "cyl_l10n_4685555ab484",
+      "value": "사용자 지정 서체"
+    },
+    {
+      "name": "cyl_l10n_a45350c25311",
+      "value": "사용자 지정 최댓값(9)"
+    },
+    {
+      "name": "cyl_l10n_3924c958175e",
+      "value": "다크 모드"
+    },
+    {
+      "name": "cyl_l10n_b9c74f4cd786",
+      "value": "흐리게 표시됨"
+    },
+    {
+      "name": "cyl_l10n_abfc3a65538a",
+      "value": "발견"
+    },
+    {
+      "name": "cyl_l10n_bf0576472e31",
+      "value": "두 번 탭하여 열기"
+    },
+    {
+      "name": "cyl_l10n_7e0a1ad9a767",
+      "value": "페이드 인 1회"
+    },
+    {
+      "name": "cyl_l10n_153407d52fed",
+      "value": "플랫"
+    },
+    {
+      "name": "cyl_l10n_5cfed317a99d",
+      "value": "플랫 디자인 스타일"
+    },
+    {
+      "name": "cyl_l10n_026b984bb8d8",
+      "value": "뒤집기 ×2"
+    },
+    {
+      "name": "cyl_l10n_c5d4cd682981",
+      "value": "GIF 아이콘"
+    },
+    {
+      "name": "cyl_l10n_8cf04a973413",
+      "value": "홈"
+    },
+    {
+      "name": "cyl_l10n_d52d30723b2f",
+      "value": "왼쪽에서 오른쪽으로 1회"
+    },
+    {
+      "name": "cyl_l10n_1aae3277f8d3",
+      "value": "Liquid Glass (참고)"
+    },
+    {
+      "name": "cyl_l10n_32f643a9aa26",
+      "value": "Liquid Glass: 참고 프로젝트의 투명 효과"
+    },
+    {
+      "name": "cyl_l10n_f201a4158727",
+      "value": "리퀴드 글래스"
+    },
+    {
+      "name": "cyl_l10n_af3acf6eb4a9",
+      "value": "리퀴드 글래스"
+    },
+    {
+      "name": "cyl_l10n_2e8e48a2ebfd",
+      "value": "탭이나 플러스 버튼을 길게 누르기"
+    },
+    {
+      "name": "cyl_l10n_983696096694",
+      "value": "여백"
+    },
+    {
+      "name": "cyl_l10n_318b2739ddc2",
+      "value": "내 정보"
+    },
+    {
+      "name": "cyl_l10n_4c2a8fe7eaf2",
+      "value": "메시지"
+    },
+    {
+      "name": "cyl_l10n_24d459a81449",
+      "value": "새 글"
+    },
+    {
+      "name": "cyl_l10n_03c2e7e41ffc",
+      "value": "새 항목"
+    },
+    {
+      "name": "cyl_l10n_1e8f217bdf71",
+      "value": "다음 탭 (cyl_selectNextTab, issue #535)"
+    },
+    {
+      "name": "cyl_l10n_3826b8552c94",
+      "value": "다음 곡"
+    },
+    {
+      "name": "cyl_l10n_b2ee912b91d6",
+      "value": "숫자"
+    },
+    {
+      "name": "cyl_l10n_ab7fa33c83b1",
+      "value": "최댓값을 넘는 숫자"
+    },
+    {
+      "name": "cyl_l10n_e0aa021e21dd",
+      "value": "확인"
+    },
+    {
+      "name": "cyl_l10n_8a7b0e9c294e",
+      "value": "켬: %@; 페이지를 왼쪽 / 오른쪽으로 스와이프"
+    },
+    {
+      "name": "cyl_l10n_06eb0a05de97",
+      "value": "켬: %@; 새 페이지가 해당 탭 쪽에서 밀려 들어옴"
+    },
+    {
+      "name": "cyl_l10n_287e78fd65af",
+      "value": "기타 텍스트"
+    },
+    {
+      "name": "cyl_l10n_84432607fd87",
+      "value": "페이지: %@"
+    },
+    {
+      "name": "cyl_l10n_105b296a83f9",
+      "value": "일시정지"
+    },
+    {
+      "name": "cyl_l10n_de3c731be563",
+      "value": "재생"
+    },
+    {
+      "name": "cyl_l10n_41b77539cc64",
+      "value": "나중에 불러오는 PlusButton 이미지"
+    },
+    {
+      "name": "cyl_l10n_72a245189eaf",
+      "value": "PlusButton 터치 영역 (issue #91)"
+    },
+    {
+      "name": "cyl_l10n_9a1d72fdd764",
+      "value": "이전 탭 (cyl_selectPreviousTab, issue #535)"
+    },
+    {
+      "name": "cyl_l10n_4b0282f4f1c6",
+      "value": "시스템 UITabBarController로 푸시(다른 플러스 버튼)"
+    },
+    {
+      "name": "cyl_l10n_e5416d3ed3c0",
+      "value": "다른 CYLTabBarController로 이동 (다른 PlusButton)"
+    },
+    {
+      "name": "cyl_l10n_8c96672c9bc5",
+      "value": "같은 컨텍스트의 TabBarController를 푸시(같은 플러스 버튼 클래스)"
+    },
+    {
+      "name": "cyl_l10n_6166b27ea14b",
+      "value": "새 컨텍스트의 TabBarController 푸시 (탭할 수 있는 X 하위 뷰가 있는 플러스 버튼, issue #202)"
+    },
+    {
+      "name": "cyl_l10n_a63e8b745e73",
+      "value": "표시되는 동안 내비게이션 바를 숨기는 페이지를 엽니다 (기본 클래스 없음)"
+    },
+    {
+      "name": "cyl_l10n_79fe28f3a3ac",
+      "value": "2초 뒤 플러스 버튼 이미지가 바뀌는 탭 바 컨트롤러를 엽니다. 레이아웃이 움직이면 안 됩니다"
+    },
+    {
+      "name": "cyl_l10n_c27618b1aa9d",
+      "value": "빨간 점"
+    },
+    {
+      "name": "cyl_l10n_255c00a63f9d",
+      "value": "빨간 점 반지름"
+    },
+    {
+      "name": "cyl_l10n_7aac5e07b16d",
+      "value": "오른쪽에서 왼쪽으로 1회"
+    },
+    {
+      "name": "cyl_l10n_e7d74cf8c9a3",
+      "value": "Rive tab icons (configuration file)"
+    },
+    {
+      "name": "cyl_l10n_9d01c837b4bc",
+      "value": "Rive 탭 아이콘: house.riv (숫자 입력 Rooms)"
+    },
+    {
+      "name": "cyl_l10n_f0c792c049bc",
+      "value": "롤링 1회"
+    },
+    {
+      "name": "cyl_l10n_401ea21c7a44",
+      "value": "회전(계속)"
+    },
+    {
+      "name": "cyl_l10n_bd001817e373",
+      "value": "SVGA 탭 아이콘 (구성 파일)"
+    },
+    {
+      "name": "cyl_l10n_b5fcd68edd9f",
+      "value": "크기 변화(계속)"
+    },
+    {
+      "name": "cyl_l10n_544d03258eaf",
+      "value": "크기 변화 1회"
+    },
+    {
+      "name": "cyl_l10n_dbd4f5e49888",
+      "value": "크기 변화 ×3"
+    },
+    {
+      "name": "cyl_l10n_13348442cc6a",
+      "value": "검색"
+    },
+    {
+      "name": "cyl_l10n_9ae56cc36e81",
+      "value": "흔들기(계속)"
+    },
+    {
+      "name": "cyl_l10n_e0a90124b72f",
+      "value": "흔들기 ×3 (cyl_shakeAnimationRepeatTimes)"
+    },
+    {
+      "name": "cyl_l10n_b10d33d5ad4d",
+      "value": "흔들기, ‘동작 줄이기’ 시 정지"
+    },
+    {
+      "name": "cyl_l10n_6cbe015b00fb",
+      "value": "CYLFlatDesignTabBar 보기 / 숨기기"
+    },
+    {
+      "name": "cyl_l10n_561582c1e7cc",
+      "value": "터치 영역을 반투명 빨간색으로 표시: %@; 배율 %@x; 탭하여 1x, 1.5x, 2x, 끔 전환"
+    },
+    {
+      "name": "cyl_l10n_3cb58e0d546d",
+      "value": "스프링(계속)"
+    },
+    {
+      "name": "cyl_l10n_0a00b2238071",
+      "value": "스프링 1회"
+    },
+    {
+      "name": "cyl_l10n_fee4a478923f",
+      "value": "탭 상호작용"
+    },
+    {
+      "name": "cyl_l10n_5ea7bf3d8e63",
+      "value": "Tab icon animations loop: off"
+    },
+    {
+      "name": "cyl_l10n_918aff638366",
+      "value": "Tab icon animations loop: on"
+    },
+    {
+      "name": "cyl_l10n_98559580dcc7",
+      "value": "탭 애니메이션 (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_db89836d6e21",
+      "value": "탭 클릭음과 햅틱 (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_2f6e866d5219",
+      "value": "탭 페이지, 선택 및 로그인"
+    },
+    {
+      "name": "cyl_l10n_6d067090c833",
+      "value": "탭, %2$@개 중 %1$@번째"
+    },
+    {
+      "name": "cyl_l10n_456887f9731c",
+      "value": "탭: %@"
+    },
+    {
+      "name": "cyl_l10n_ab5745daa734",
+      "value": "TabBar 갤러리"
+    },
+    {
+      "name": "cyl_l10n_75ccb7ef4864",
+      "value": "탭 바 모양"
+    },
+    {
+      "name": "cyl_l10n_7c4aecba91c3",
+      "value": "이 페이지 탭의 이미지를 앱의 rawfile(iOS의 리소스 번들)에서 불러옵니다. 다시 탭하면 복원"
+    },
+    {
+      "name": "cyl_l10n_2e6d648945c0",
+      "value": "플러스 버튼이 바 위로 튀어나오며, 위쪽 부분도 반응합니다 (빨간색 표시)"
+    },
+    {
+      "name": "cyl_l10n_9b6633b75bf2",
+      "value": "‘나’ 탭은 로그인이 필요합니다 (issue #19); 탭하여 전환"
+    },
+    {
+      "name": "cyl_l10n_a4d0d101d6a3",
+      "value": "왼쪽 위"
+    },
+    {
+      "name": "cyl_l10n_2306a585ae00",
+      "value": "cyl_itemEdgeInsets: 양 끝에 탭 너비의 15% 여백"
+    },
+    {
+      "name": "cyl_l10n_6360bbdfb8ff",
+      "value": "cyl_itemEdgeInsets: 0, 탭이 바를 가득 채움"
+    },
+    {
+      "name": "cyl_l10n_fd15e88376df",
+      "value": "cyl_pop / cyl_push 메서드 데모"
+    },
+    {
+      "name": "cyl_l10n_ca3dcd2d62be",
+      "value": "cyl_popSelectTabBarChildViewControllerAtIndex: 1 (%@)"
+    },
+    {
+      "name": "cyl_l10n_3b06a9582640",
+      "value": "cyl_popSelectTabBarChildViewControllerForTabBarItemIdentifier: message"
+    },
+    {
+      "name": "cyl_l10n_59884403daf6",
+      "value": "cyl_pushOrPopToViewController: pages/Index (이미 스택에 있어 돌아감)"
+    },
+    {
+      "name": "cyl_l10n_1ec113617309",
+      "value": "cyl_pushViewController, cyl_popSelectTabBarChildViewControllerAtIndex, cyl_pushOrPopToViewController"
+    },
+    {
+      "name": "cyl_l10n_9fb845377ee4",
+      "value": "cyl_pushViewController: 초록색 페이지"
+    },
+    {
+      "name": "cyl_l10n_ff5772993aee",
+      "value": "cyl_tabBarItemLongPressDuration = %@ ms, cyl_tabBarItemDoubleTapInterval = %@ ms; 탭하여 전환; 탭을 두 번 탭해 확인"
+    },
+    {
+      "name": "cyl_l10n_f69c71bc581e",
+      "value": "cyl_tabBarMinimizeBehavior = %@; 탭하여 선택한 뒤 이 목록을 스크롤"
+    },
+    {
+      "name": "cyl_l10n_4abddd944c2e",
+      "value": "harmonyos-liquid-glass-tabbar: 다채로운 콘텐츠 위의 탭 캡슐, 검색 볼, 음악 바. 스크롤하면 축소"
+    },
+    {
+      "name": "cyl_l10n_3b4e07b5542e",
+      "value": "numberInput=Rooms: each select or tap again sets Rooms to the next value (3, 4, 5, 6)"
+    },
+    {
+      "name": "cyl_l10n_f3f4ecf4a4a6",
+      "value": "selectedIndex = %@ (플러스 버튼의 페이지는 %@, 탭 인덱스가 아님); 탭하면 다음 탭"
+    },
+    {
+      "name": "cyl_l10n_ee5b6ac6461b",
+      "value": "selectedIndex와 플러스 버튼 (issue #515)"
+    },
+    {
+      "name": "cyl_l10n_2de6d572f86b",
+      "value": "standardAppearance 테마(Liquid Glass와 FlatDesign 공용)"
+    },
+    {
+      "name": "cyl_l10n_c4376b477be8",
+      "value": "tabBarHidden = %@; 숨기면 2초 뒤 돌아옴"
+    },
+    {
+      "name": "cyl_l10n_2a0608059131",
+      "value": "모든 탭의 제목을 한 번에 업데이트. 다시 탭하면 복원"
+    },
+    {
+      "name": "cyl_l10n_57196013d558",
+      "value": "핼러윈"
+    },
+    {
+      "name": "cyl_l10n_0a58c230c3d9",
+      "value": "모든 탭의 아이콘을 다운로드하여 업데이트합니다. 다시 탭하면 원래대로 돌아갑니다"
+    },
+    {
+      "name": "cyl_l10n_5e347d8ccb68",
+      "value": "네트워크 아이콘 다운로드"
+    },
+    {
+      "name": "cyl_l10n_2e0e84a0dcfb",
+      "value": "기본 클래스 없이 내비게이션 바 숨기기 (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_321ff794aab8",
+      "value": "해당 없음"
+    },
+    {
+      "name": "cyl_l10n_e1642a46b804",
+      "value": "추석"
+    },
+    {
+      "name": "cyl_l10n_0c2817d10627",
+      "value": "중간 햅틱"
+    },
+    {
+      "name": "cyl_l10n_0f60774903e0",
+      "value": "bundle에서 이미지 불러오기 (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_0e1b02648a11",
+      "value": "확대"
+    },
+    {
+      "name": "cyl_l10n_83c39abd16cd",
+      "value": "앨범에서 선택"
+    },
+    {
+      "name": "cyl_l10n_cc03f47a389c",
+      "value": "이 페이지 탭의 아이콘을 네트워크에서 다운로드(캐시됨). 다시 탭하면 복원"
+    },
+    {
+      "name": "cyl_l10n_e05f97c5159d",
+      "value": "구성 파일로 TabBarController 만들기"
+    },
+    {
+      "name": "cyl_l10n_5f0c0bf32dc1",
+      "value": "유지"
+    },
+    {
+      "name": "cyl_l10n_24fb8692947a",
+      "value": "유지"
+    },
+    {
+      "name": "cyl_l10n_b15d91274e9f",
+      "value": "닫기"
+    },
+    {
+      "name": "cyl_l10n_70922c50ef07",
+      "value": "메모리 경고"
+    },
+    {
+      "name": "cyl_l10n_cbed6b29761b",
+      "value": "플러스 버튼"
+    },
+    {
+      "name": "cyl_l10n_18684d72945b",
+      "value": "이미지 불러오기"
+    },
+    {
+      "name": "cyl_l10n_b981b7b359a7",
+      "value": "배경 이미지 불러오기"
+    },
+    {
+      "name": "cyl_l10n_7136049eb4c7",
+      "value": "선택되지 않은 탭을 해제하고 선택 시 다시 로드"
+    },
+    {
+      "name": "cyl_l10n_c7626d7d6194",
+      "value": "이 페이지 탭의 제목을 바로 변경. 다시 탭하면 복원"
+    },
+    {
+      "name": "cyl_l10n_15fb093f6fff",
+      "value": "탭 즉시 업데이트"
+    },
+    {
+      "name": "cyl_l10n_c1ecedab11bc",
+      "value": "원본"
+    },
+    {
+      "name": "cyl_l10n_83611abd5f80",
+      "value": "게시"
+    },
+    {
+      "name": "cyl_l10n_625fb26b4b33",
+      "value": "취소"
+    },
+    {
+      "name": "cyl_l10n_d25efeb790bb",
+      "value": "근처"
+    },
+    {
+      "name": "cyl_l10n_7941d8987ff2",
+      "value": "시스템 UITabBar와 비교"
+    },
+    {
+      "name": "cyl_l10n_d0d78acf1941",
+      "value": "크리스마스"
+    },
+    {
+      "name": "cyl_l10n_aa91e8ceec70",
+      "value": "부활절"
+    },
+    {
+      "name": "cyl_l10n_3df20a295b39",
+      "value": "여름"
+    },
+    {
+      "name": "cyl_l10n_0ef6dae7e80c",
+      "value": "우주"
+    },
+    {
+      "name": "cyl_l10n_2f383291bcf8",
+      "value": "실제: %@"
+    },
+    {
+      "name": "cyl_l10n_bccc798b577a",
+      "value": "가운데 캡슐"
+    },
+    {
+      "name": "cyl_l10n_f613681ddf31",
+      "value": "시뮬레이션 %@개 모두 보기"
+    },
+    {
+      "name": "cyl_l10n_7c87af044929",
+      "value": "스와이프로 탭 전환 (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_7a2261654d24",
+      "value": "해제됨"
+    },
+    {
+      "name": "cyl_l10n_f79d05d929aa",
+      "value": "TabBarController를 안전하게 만들었습니다: 탭 %@개"
+    },
+    {
+      "name": "cyl_l10n_091885db07e4",
+      "value": "바운스"
+    },
+    {
+      "name": "cyl_l10n_758903c327de",
+      "value": "이 페이지 탭에 GIF 애니메이션 표시. 다시 탭하면 복원"
+    },
+    {
+      "name": "cyl_l10n_56e6ecf97176",
+      "value": "반복"
+    },
+    {
+      "name": "cyl_l10n_c7db6d4f1a42",
+      "value": "복원"
+    },
+    {
+      "name": "cyl_l10n_c4328f75476f",
+      "value": "밸런타인데이"
+    },
+    {
+      "name": "cyl_l10n_07b181184280",
+      "value": "내 정보"
+    },
+    {
+      "name": "cyl_l10n_2a3e7f5c382c",
+      "value": "수동"
+    },
+    {
+      "name": "cyl_l10n_97a6bedeb7fd",
+      "value": "수동: 탭하여 스크롤 시 숨기기를 켜고, 아래로 스크롤해 TabBar를 숨긴 뒤 제목대로 조작하세요. 예상: TabBar가 즉시 다시 표시됩니다."
+    },
+    {
+      "name": "cyl_l10n_f68e7e217ad1",
+      "value": "수동: %@"
+    },
+    {
+      "name": "cyl_l10n_89246468f7fd",
+      "value": "TabBar 갤러리 열기"
+    },
+    {
+      "name": "cyl_l10n_a01539048bb0",
+      "value": "스위치를 켠 후 탭이나 플러스 버튼을 길게 누르면 해당 식별자가 표시됩니다."
+    },
+    {
+      "name": "cyl_l10n_633c2ee4dcc7",
+      "value": "모든 네트워크 아이콘 변경"
+    },
+    {
+      "name": "cyl_l10n_f75fe6720861",
+      "value": "모든 로컬 아이콘 변경"
+    },
+    {
+      "name": "cyl_l10n_7fb5208a54d5",
+      "value": "모든 제목 변경"
+    },
+    {
+      "name": "cyl_l10n_2f728e190695",
+      "value": "이 탭 양쪽의 탭을 다른 페이지로 바꿉니다(issue #481). 다시 탭하면 원래대로 돌아갑니다"
+    },
+    {
+      "name": "cyl_l10n_bed9ec1e8448",
+      "value": "사진 찍기"
+    },
+    {
+      "name": "cyl_l10n_0be5a194844c",
+      "value": "스킨"
+    },
+    {
+      "name": "cyl_l10n_61a9cd33b1ff",
+      "value": "스킨(테마, issue #216)"
+    },
+    {
+      "name": "cyl_l10n_09d0fdddca66",
+      "value": "스킨: 기념일과 색상(%@개)"
+    },
+    {
+      "name": "cyl_l10n_3de5855e2c7f",
+      "value": "시뮬레이션 목록 접기"
+    },
+    {
+      "name": "cyl_l10n_a0ffdf359138",
+      "value": "CYLFlatDesignTabBar 높이 변경"
+    },
+    {
+      "name": "cyl_l10n_01e3254a92ba",
+      "value": "확대 후 축소"
+    },
+    {
+      "name": "cyl_l10n_d46d5bb15db1",
+      "value": "새해"
+    },
+    {
+      "name": "cyl_l10n_79b5a6564585",
+      "value": "회전"
+    },
+    {
+      "name": "cyl_l10n_d81bb206a889",
+      "value": "없음"
+    },
+    {
+      "name": "cyl_l10n_14f433db2189",
+      "value": "기본 클래스 불필요 및 도구"
+    },
+    {
+      "name": "cyl_l10n_d2339bb4edaa",
+      "value": "춘절"
+    },
+    {
+      "name": "cyl_l10n_5f1de850fb46",
+      "value": "탭 제목 변경"
+    },
+    {
+      "name": "cyl_l10n_9d0d66f312b5",
+      "value": "더 큰 이미지로 교체"
+    },
+    {
+      "name": "cyl_l10n_b051a19ace76",
+      "value": "인접한 탭의 페이지 교체"
+    },
+    {
+      "name": "cyl_l10n_3e730a3320e9",
+      "value": "교체된 페이지 %@"
+    },
+    {
+      "name": "cyl_l10n_a131e4f178aa",
+      "value": "새 콘텐츠 있음"
+    },
+    {
+      "name": "cyl_l10n_467b3e031441",
+      "value": "로드 안 됨"
+    },
+    {
+      "name": "cyl_l10n_2c8d9e877a54",
+      "value": "제목 오프셋(titlePositionAdjustment)"
+    },
+    {
+      "name": "cyl_l10n_0787cd518387",
+      "value": "메모리 경고 시뮬레이션"
+    },
+    {
+      "name": "cyl_l10n_d76904d0e7ee",
+      "value": "모든 장면은 공개 API로 만든 TabBar입니다: 스타일, 애니메이션, 알림, Lottie, 새로운 Tab API"
+    },
+    {
+      "name": "cyl_l10n_6a00c1ae99fa",
+      "value": "바다"
+    },
+    {
+      "name": "cyl_l10n_ff692f04ace0",
+      "value": "메시지"
+    },
+    {
+      "name": "cyl_l10n_41e8e8b9935c",
+      "value": "다크"
+    },
+    {
+      "name": "cyl_l10n_8dfe6bcdd6ec",
+      "value": "슬라이드 전환 (CYLTabBarSlideTransitionAnimator)"
+    },
+    {
+      "name": "cyl_l10n_9f44bafc75c6",
+      "value": "스크롤 시 TabBar 축소 / 숨기기 (issue #13)"
+    },
+    {
+      "name": "cyl_l10n_8625f5f225d7",
+      "value": "스크롤 시 숨기기: 예외 상황 시뮬레이션 (issue #13)"
+    },
+    {
+      "name": "cyl_l10n_678abebe6aac",
+      "value": "플러스 버튼 오른쪽 위의 X를 탭: X가 임의의 색으로 바뀌고 플러스 버튼은 반응하지 않습니다"
+    },
+    {
+      "name": "cyl_l10n_7375af54db2a",
+      "value": "탭하여 탭과 플러스 버튼의 탭 애니메이션을 전환합니다. 현재: %@"
+    },
+    {
+      "name": "cyl_l10n_5378f31b520c",
+      "value": "탭하여 tabBar.standardAppearance 전환, 현재: %@"
+    },
+    {
+      "name": "cyl_l10n_4a986e4da535",
+      "value": "탭하여 모든 탭 제목의 세로 오프셋 전환, 현재: %@"
+    },
+    {
+      "name": "cyl_l10n_3d0d9d3d7cc2",
+      "value": "탭하여 언어 변경"
+    },
+    {
+      "name": "cyl_l10n_f4e41dda1094",
+      "value": "탭하여 전환한 다음 아무 탭이나 PlusButton을 탭해 들어 보세요. 햅틱은 실제 기기에서만 진동합니다. 현재: %@"
+    },
+    {
+      "name": "cyl_l10n_15855ab96e87",
+      "value": "클릭음 + 햅틱"
+    },
+    {
+      "name": "cyl_l10n_cff8a9cded04",
+      "value": "탭하여 테마 선택: TabBar의 배경, 아이콘, 글자 색상이 그 자리에서 바뀝니다(모든 TabBar 스타일 지원). 현재: %@"
+    },
+    {
+      "name": "cyl_l10n_1c00c4fd1cea",
+      "value": "핑크 로즈"
+    },
+    {
+      "name": "cyl_l10n_8483ed132b2c",
+      "value": "생일"
+    },
+    {
+      "name": "cyl_l10n_feef14745f21",
+      "value": "로컬 이미지(이름, 파일 경로, UIImage, 파일 URL)로 모든 탭의 아이콘을 업데이트합니다. 다시 탭하면 원래대로 돌아갑니다"
+    },
+    {
+      "name": "cyl_l10n_402d19e50fff",
+      "value": "로그인"
+    },
+    {
+      "name": "cyl_l10n_833152116634",
+      "value": "이미지 제거"
+    },
+    {
+      "name": "cyl_l10n_a0676a7d84a9",
+      "value": "녹색 선"
+    },
+    {
+      "name": "cyl_l10n_16068b2ff3fd",
+      "value": "네트워크 아이콘"
+    },
+    {
+      "name": "cyl_l10n_69ca6555a602",
+      "value": "뒤집기"
+    },
+    {
+      "name": "cyl_l10n_4bd51044149f",
+      "value": "사용자 지정 사운드 파일 (cyl_tabButtonTapSoundURL)"
+    },
+    {
+      "name": "cyl_l10n_9d1c8a70d4da",
+      "value": "자체 테스트"
+    },
+    {
+      "name": "cyl_l10n_11858aeb1656",
+      "value": "자체 테스트: 모든 자동 시뮬레이션을 실행하고 PASS / FAIL 보고"
+    },
+    {
+      "name": "cyl_l10n_beabcd498b94",
+      "value": "자몽"
+    },
+    {
+      "name": "cyl_l10n_b8c467fce096",
+      "value": "배지"
+    },
+    {
+      "name": "cyl_l10n_200e65177369",
+      "value": "CYLFlatDesignTabBarItem 배경색 설정"
+    },
+    {
+      "name": "cyl_l10n_295bb704f520",
+      "value": "언어"
+    },
+    {
+      "name": "cyl_l10n_d673e0eb5c1c",
+      "value": "상위 뷰 밖에서 탭에 반응 (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_71bbc726ace5",
+      "value": "시스템 설정 따르기"
+    },
+    {
+      "name": "cyl_l10n_d0914cf6acd2",
+      "value": "이동 및 비교"
+    },
+    {
+      "name": "cyl_l10n_110abc875180",
+      "value": "약한 햅틱"
+    },
+    {
+      "name": "cyl_l10n_fad7c8a21fe3",
+      "value": "선택됨"
+    },
+    {
+      "name": "cyl_l10n_aa05fd09a619",
+      "value": "일반"
+    },
+    {
+      "name": "cyl_l10n_15c64aa0b404",
+      "value": "구성 파일"
+    },
+    {
+      "name": "cyl_l10n_d505958a042b",
+      "value": "구성 파일: 오류 상황 시뮬레이션"
+    },
+    {
+      "name": "cyl_l10n_45158907e07f",
+      "value": "강한 햅틱"
+    },
+    {
+      "name": "cyl_l10n_d6982fecc6a4",
+      "value": "탭 길게 누르기 (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_aefae51d3c25",
+      "value": "\"%@\"을(를) 길게 눌렀습니다"
+    },
+    {
+      "name": "cyl_l10n_abad1baa5479",
+      "value": "길게 누르기 시간과 두 번 탭 간격 (issue #535 / #152)"
+    },
+    {
+      "name": "cyl_l10n_b146fc1a1531",
+      "value": "풀잎"
+    },
+    {
+      "name": "cyl_l10n_db1c89e0f6e6",
+      "value": "홈"
+    },
+    {
+      "name": "cyl_l10n_18c63459a2c0",
+      "value": "기본"
+    },
+    {
+      "name": "cyl_l10n_be354ee4263a",
+      "value": "기본 클릭음"
+    }
+  ]
+}

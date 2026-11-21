@@ -56,7 +56,7 @@
 | 14 | 消息页的行 / Message page rows | 2 | push 同一个 context 的 TabBarController；push 新 context、PlusButton 带可点击 X 子按钮（#202） | Push a tab bar controller of the same context; push one of a new context whose plus button has a tappable X (#202) |
 | 15 | 角标行 / Badge rows | 35 | 35 种角标样式（每页 15 或 30 行）；点击：首页改标题并 push、消息 push 另一个 PlusButton、发现 push 详情、我的显示角标并 push | 35 badge styles (15 or 30 rows a page); a tap: Home sets its title and pushes, Message pushes another plus button, Discover pushes details, Me shows a badge and pushes |
 | 16 | 导航栏按钮 / Navigation bar buttons | 3 | "FlatDesign"、"LiquidGlass" 重新创建 TabBar；"换肤" 菜单 | "FlatDesign" and "LiquidGlass" create the tab bar again; the "skin" menu |
-| 17 | TabBar 场景展示 / Tab Bar Gallery | 44 | 10 个分组、44 个场景（`CYLGalleryProvider`）：基础、嵌套、动画、异形按钮、自定义点击、提醒、Lottie、新 API、液态玻璃健壮性、超过五个 Tab | 10 sections, 44 scenes (`CYLGalleryProvider`): basic, embed, animation, irregular button, custom click, remind, Lottie, new APIs, Liquid Glass robustness, more than five tabs |
+| 17 | TabBar 场景展示 / Tab Bar Gallery | 46 | 10 个分组、46 个场景（`CYLGalleryProvider`）：基础、嵌套、动画、异形按钮、自定义点击、提醒、Lottie、新 API、液态玻璃健壮性、超过五个 Tab | 10 sections, 46 scenes (`CYLGalleryProvider`): basic, embed, animation, irregular button, custom click, remind, Lottie, new APIs, Liquid Glass robustness, more than five tabs |
 | | **合计 / Total** | **231** | | |
 
 ## [CN]Android 演示需要做的与完成情况
@@ -84,7 +84,7 @@
 | 14 | `DemoCatalog.messageRows()`：同一 context 的 TabBar；`CloseSubviewPlusButton`（#202） | 3 | 3 | done | | |
 | 15 | `cyl_badgeTitleForRow` / `ImageView.cyl_showBadgeForRow`：每页 15 或 30 行，四页的点击行为与 iOS 相同 | 6 | 6 | done | | |
 | 16 | `MainActivity` 菜单：FlatDesign、LiquidGlass（以该样式重新创建）、17 个皮肤 | 3 | 3 | adapted | Android 版没有玻璃效果，样式只改变 `tabBarStyleType` | The Android version draws no glass; the style only sets `tabBarStyleType` |
-| 17 | `DemoGalleryActivity` / `DemoGallery`：同样的 10 个分组与 44 个场景 | 10 | 10 | done | 4 个 n/a：`UITab`（iOS 18）、液态玻璃 PlusButton 替身（2 个）、系统 "More" 编辑，均为 UIKit API；系统 "More" 用 `BottomNavigationView` 的第 5 项表示 | 4 n/a: `UITab` (iOS 18), the Liquid Glass plus stand-in (2), the system "More" editor, all UIKit API; the system "More" is the fifth `BottomNavigationView` item |
+| 17 | `DemoGalleryActivity` / `DemoGallery`：同样的 10 个分组与 46 个场景 | 10 | 10 | done | 4 个 n/a：`UITab`（iOS 18）、液态玻璃 PlusButton 替身（2 个）、系统 "More" 编辑，均为 UIKit API；系统 "More" 用 `BottomNavigationView` 的第 5 项表示 | 4 n/a: `UITab` (iOS 18), the Liquid Glass plus stand-in (2), the system "More" editor, all UIKit API; the system "More" is the fifth `BottomNavigationView` item |
 | | **合计 / Total** | **100** | **100** | | | |
 
 ## [CN]进度
@@ -111,7 +111,7 @@
 | 中文 | English |
 |:---|:---|
 | 在 Android Studio 中打开 `Example-Android`，运行 `app`。首页、消息、发现、我的四个 Tab 都是演示列表，ActionBar 菜单中有 FlatDesign、LiquidGlass 与皮肤。 | Open `Example-Android` in Android Studio and run `app`. The Home, Message, Discover and Me tabs are the demo lists; the action bar menu has FlatDesign, LiquidGlass and the skins. |
-| `gradle :app:testDebugUnitTest`（`DemoMigrationTest`，Robolectric）检查：数量与 iOS 一致（46 个配置用例、39 个滚动模拟、44 个场景、17 个皮肤）；每个设置行运行时不抛异常；每个本地配置用例都有结果；自动的滚动隐藏模拟为 PASS；窗口失去焦点时恢复；每个场景都能打开。 | `gradle :app:testDebugUnitTest` (`DemoMigrationTest`, Robolectric) checks: the counts match iOS (46 configuration cases, 39 scroll simulations, 44 scenes, 17 skins); every settings row runs without an exception; every local configuration case gives a result; the automatic scroll hiding simulations PASS; a window losing the focus restores the bar; every scene opens. |
+| `gradle :app:testDebugUnitTest`（`DemoMigrationTest`，Robolectric）检查：数量与 iOS 一致（46 个配置用例、39 个滚动模拟、46 个场景、17 个皮肤）；每个设置行运行时不抛异常；每个本地配置用例都有结果；自动的滚动隐藏模拟为 PASS；窗口失去焦点时恢复；每个场景都能打开。 | `gradle :app:testDebugUnitTest` (`DemoMigrationTest`, Robolectric) checks: the counts match iOS (46 configuration cases, 39 scroll simulations, 46 scenes, 17 skins); every settings row runs without an exception; every local configuration case gives a result; the automatic scroll hiding simulations PASS; a window losing the focus restores the bar; every scene opens. |
 | 迁移中发现并修复了库的一个问题：App 安装了 Lottie 时，无法加载的动画文件会让 Lottie 在主线程抛出异常。现在 Lottie animator 设置失败监听，Tab 显示其图片，与 iOS 一致。 | The migration found and fixed a library bug: with Lottie installed, an animation file that cannot be loaded made Lottie throw on the main thread. The Lottie animator now sets a failure listener and the tab shows its image, as on iOS. |
 
 ## [CN]差异与限制

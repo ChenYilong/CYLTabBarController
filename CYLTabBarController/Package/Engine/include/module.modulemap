@@ -1,0 +1,4 @@
+module CYLTabBarControllerEngine {
+    umbrella header "CYLTabBarControllerEngine.h"
+    export *
+}

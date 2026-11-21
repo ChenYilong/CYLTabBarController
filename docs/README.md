@@ -20,21 +20,31 @@
 | [Android 版 CYLTabBarController](Android-Library.md) | [CYLTabBarController for Android](Android-Library.md) |
 | [Android 液态玻璃](Android-Liquid-Glass.md) | [Android Liquid Glass](Android-Liquid-Glass.md) |
 | [Android 库与 QMUI_Android、XUI 的 Tab 对比](Android-QMUI-Comparison.md) | [The Android library compared with QMUI_Android's and XUI's tabs](Android-QMUI-Comparison.md) |
+| [动效 icon + title 共用组件：CYLAnimatedItem](Animated-Item.md) | [The shared animated icon + title component: CYLAnimatedItem](Animated-Item.md) |
+| [角标调试](Badge-Debugging.md) | [Badge debugging](Badge-Debugging.md) |
 | [中英文双语文档](Bilingual-Documentation.md) | [Bilingual Documentation](Bilingual-Documentation.md) |
+| [CYLTableViewPlaceHolder 集成问题](CYLTableViewPlaceHolder-Integration-Issues.md) | [CYLTableViewPlaceHolder Integration Issues](CYLTableViewPlaceHolder-Integration-Issues.md) |
 | [CYLUtils 通用工具：超出父视图响应点击、点击动画与图片加载](CYLUtils-Helpers.md) | [CYLUtils helpers: responding outside the superview, a tap animation, and image loading](CYLUtils-Helpers.md) |
 | [Carthage 集成演示工程](Carthage-Example.md) | [Carthage integration demo project](Carthage-Example.md) |
 | [使用 Carthage 集成](Carthage.md) | [Integrating with Carthage](Carthage.md) |
 | [一个配置文件生成 TabBarController](Configuration-File.md) | [One configuration file, one TabBarController](Configuration-File.md) |
 | [配置文件的本地化文本](Configuration-Localization.md) | [Localized texts in a configuration file](Configuration-Localization.md) |
+| [TabBar 配置清单](Configuration-Manifest.md) | [Tab bar configuration manifest](Configuration-Manifest.md) |
 | [配置文件相关脚本：导出、边界情况与测试](Configuration-Scripts.md) | [Configuration scripts: export, edge cases and tests](Configuration-Scripts.md) |
 | [React Native 与 Flutter 组件](Cross-Platform-Components.md) | [React Native and Flutter components](Cross-Platform-Components.md) |
 | [自定义 TabBar 功能清单](Custom-Tab-Bar-Features.md) | [Custom Tab Bar Feature Checklist](Custom-Tab-Bar-Features.md) |
 | [Demo 测试列表：设置分组与纯 Swift 版本](Demo-Test-List.md) | [The demo test list: settings groups and a pure Swift version](Demo-Test-List.md) |
+| [示例层修复](Example-Layer-Fixes.md) | [Example-layer fixes](Example-Layer-Fixes.md) |
 | [CYLTabBarController 常见问题](FAQ.md) | [CYLTabBarController FAQ](FAQ.md) |
 | [FlatDesign × UITabBarAppearance](FlatDesign-StandardAppearance.md) | [FlatDesign × UITabBarAppearance](FlatDesign-StandardAppearance.md) |
 | [Flutter 接入：flutter_cyltabbar](Flutter-Component.md) | [Flutter integration: flutter_cyltabbar](Flutter-Component.md) |
 | [GIF Tab 图标：循环的图片，或点击播放一次的动画](GIF-Animation.md) | [GIF tab icons: a looping image, or an animation that plays once when tapped](GIF-Animation.md) |
+| [鸿蒙 API 对照表](HarmonyOS-API-Map.md) | [The HarmonyOS API map](HarmonyOS-API-Map.md) |
+| [鸿蒙端问题清单](HarmonyOS-Issues.md) | [HarmonyOS issues](HarmonyOS-Issues.md) |
+| [鸿蒙液态玻璃对标](HarmonyOS-Liquid-Glass-Parity.md) | [HarmonyOS Liquid Glass parity](HarmonyOS-Liquid-Glass-Parity.md) |
+| [鸿蒙端对齐](HarmonyOS-Parity.md) | [HarmonyOS parity](HarmonyOS-Parity.md) |
 | [纯图标 Tab 的自动居中](Image-Only-Tabs.md) | [Automatic centering of image-only tabs](Image-Only-Tabs.md) |
+| [发布包中的协议声明](License-Notices.md) | [License notices in published packages](License-Notices.md) |
 | [液态玻璃的健壮性改进](Liquid-Glass-Robustness.md) | [Liquid Glass Robustness](Liquid-Glass-Robustness.md) |
 | [需要登录的 Tab](Login-Required-Tabs.md) | [Tabs That Need Login](Login-Required-Tabs.md) |
 | [macOS CI/CD 调研报告：用 Mac 服务器构建本项目](Mac-CI-CD.md) | [macOS CI/CD research: building this project on Mac servers](Mac-CI-CD.md) |
@@ -51,10 +61,18 @@
 | [PlusButton 的实现：真实按钮、液态玻璃替身与选中态图片](PlusButton.md) | [How the PlusButton works: the real button, its Liquid Glass stand-in and selected images](PlusButton.md) |
 | [在任意位置获取导航控制器并 Push](Push-From-Anywhere.md) | [Get the navigation controller and push from anywhere](Push-From-Anywhere.md) |
 | [React Native 接入：react-native-cyltabbar](React-Native-Component.md) | [React Native integration: react-native-cyltabbar](React-Native-Component.md) |
+| [资源路由](Resource-Routes.md) | [Resource routes](Resource-Routes.md) |
 | [Rive 动画 Tab 图标（与 Lottie、PAG 用法相同）](Rive-Animation.md) | [Rive animated tab icons (used like Lottie and PAG)](Rive-Animation.md) |
+| [SVGA 动画 Tab 图标（与 Rive、PAG、Lottie 用法相同）](SVGA-Animation.md) | [SVGA animated tab icons (used like Rive, PAG and Lottie)](SVGA-Animation.md) |
+| [截图规范](Screenshot-Guidelines.md) | [Screenshot guidelines](Screenshot-Guidelines.md) |
 | [selectedIndex 与 PlusButton：选中的文字与图片一致](SelectedIndex-PlusButton.md) | [selectedIndex and the PlusButton: the selected title and image match](SelectedIndex-PlusButton.md) |
+| [在 Swift 中继承本库的类](Subclassing-In-Swift.md) | [Subclassing the library's classes in Swift](Subclassing-In-Swift.md) |
+| [Swift 编码规范](Swift-Coding-Style.md) | [Swift coding style](Swift-Coding-Style.md) |
 | [在 Swift 项目中使用 CYLTabBarController](Swift-Guide.md) | [Using CYLTabBarController in Swift](Swift-Guide.md) |
+| [Swift 迁移第 ③ 阶段：协议、枚举与公开头文件](Swift-Migration-Phase3.md) | [Swift migration phase ③: protocols, enums and the public headers](Swift-Migration-Phase3.md) |
+| [iOS 核心层迁移到 Swift](Swift-Migration.md) | [Migrating the iOS core layer to Swift](Swift-Migration.md) |
 | [在 SwiftUI 项目中集成 CYLTabBarController](SwiftUI-Integration.md) | [Integrating CYLTabBarController in a SwiftUI app](SwiftUI-Integration.md) |
+| [TODO 总览与清理进度](TODO-Sweep.md) | [TODO sweep: every open TODO and its status](TODO-Sweep.md) |
 | [Tab 的无障碍与 UI 测试](Tab-Accessibility.md) | [Tab Accessibility and UI Tests](Tab-Accessibility.md) |
 | [TabBar 图库](Tab-Bar-Gallery.md) | [Tab Bar Gallery](Tab-Bar-Gallery.md) |
 | [Tab 图标动画共用子库：CYLTabBarItemAnimation（面向协议，可扩展任意动画库）](Tab-Bar-Item-Animation.md) | [The shared tab icon animation subspec: CYLTabBarItemAnimation (protocol-oriented, open to any library)](Tab-Bar-Item-Animation.md) |
@@ -76,6 +94,9 @@
 | [换肤实现评估：与 QMUI 的差距、架构符合度与改进建议](Theme-Switching-QMUI-Evaluation.md) | [Theme switching evaluation: the gap to QMUI, fit with the original design, and what to improve](Theme-Switching-QMUI-Evaluation.md) |
 | [换肤（主题切换）](Theme-Switching.md) | [Theme switching (skins)](Theme-Switching.md) |
 | [原地更新 Tab：标题、图标、网络图标与替换页面](Update-Tab-Bar-Items-In-Place.md) | [Update Tabs in Place: Titles, Icons, Network Icons and Pages](Update-Tab-Bar-Items-In-Place.md) |
+| [CYLTabBarController 使用指南](Usage-Guide.md) | [CYLTabBarController usage guide](Usage-Guide.md) |
+| [CYLTabBarController 历史版本亮点](Version-Highlights.md) | [CYLTabBarController highlights of earlier versions](Version-Highlights.md) |
+| [微信小程序版 CYLTabBarController](WeChat-Mini-Program.md) | [CYLTabBarController for WeChat Mini Program](WeChat-Mini-Program.md) |
 | [提交前准备规则](commit-readiness-2026-11-09.md) | [Commit Readiness Rules](commit-readiness-2026-11-09.md) |
 | [文档文件夹说明](instructions.md) | [Documentation Folder Instructions](instructions.md) |
 
@@ -100,21 +121,31 @@ docs/
 ├── Android-Library.md
 ├── Android-Liquid-Glass.md
 ├── Android-QMUI-Comparison.md
+├── Animated-Item.md
+├── Badge-Debugging.md
 ├── Bilingual-Documentation.md
+├── CYLTableViewPlaceHolder-Integration-Issues.md
 ├── CYLUtils-Helpers.md
 ├── Carthage-Example.md
 ├── Carthage.md
 ├── Configuration-File.md
 ├── Configuration-Localization.md
+├── Configuration-Manifest.md
 ├── Configuration-Scripts.md
 ├── Cross-Platform-Components.md
 ├── Custom-Tab-Bar-Features.md
 ├── Demo-Test-List.md
+├── Example-Layer-Fixes.md
 ├── FAQ.md
 ├── FlatDesign-StandardAppearance.md
 ├── Flutter-Component.md
 ├── GIF-Animation.md
+├── HarmonyOS-API-Map.md
+├── HarmonyOS-Issues.md
+├── HarmonyOS-Liquid-Glass-Parity.md
+├── HarmonyOS-Parity.md
 ├── Image-Only-Tabs.md
+├── License-Notices.md
 ├── Liquid-Glass-Robustness.md
 ├── Login-Required-Tabs.md
 ├── Mac-CI-CD.md
@@ -134,10 +165,18 @@ docs/
 ├── Push-From-Anywhere.md
 ├── README.md
 ├── React-Native-Component.md
+├── Resource-Routes.md
 ├── Rive-Animation.md
+├── SVGA-Animation.md
+├── Screenshot-Guidelines.md
 ├── SelectedIndex-PlusButton.md
+├── Subclassing-In-Swift.md
+├── Swift-Coding-Style.md
 ├── Swift-Guide.md
+├── Swift-Migration-Phase3.md
+├── Swift-Migration.md
 ├── SwiftUI-Integration.md
+├── TODO-Sweep.md
 ├── Tab-Accessibility.md
 ├── Tab-Bar-Gallery.md
 ├── Tab-Bar-Item-Animation.md
@@ -159,35 +198,246 @@ docs/
 ├── Theme-Switching-QMUI-Evaluation.md
 ├── Theme-Switching.md
 ├── Update-Tab-Bar-Items-In-Place.md
+├── Usage-Guide.md
+├── Version-Highlights.md
+├── WeChat-Mini-Program.md
 ├── assets/
+│   ├── android-animated-item-stack-axis-tint.png
+│   ├── android-animated-item-stack-view.png
+│   ├── android-api37-20261118-rive-dark-mode-options.png
+│   ├── android-api37-20261118-rive-tint-at-0505042f.png
+│   ├── android-api37-20261118-rive-tint-title-and-dark-tint.png
+│   ├── android-api37-20261119-example-rive-live-uimode-switch.png
+│   ├── android-api37-20261119-rive-fixed-tint-unselected-only.png
+│   ├── android-api37-20261119-rive-follows-appearance.png
+│   ├── android-example-strings-en-zh-ja.png
+│   ├── android-gif-decoder-frame-clock.png
+│   ├── android-gif-image-rest-then-play.png
+│   ├── android-gif-tint-option.png
 │   ├── android-liquid-glass-surface-000.png
 │   ├── android-liquid-glass-surface-040.png
 │   ├── android-liquid-glass-surface-100.png
 │   ├── android-liquid-glass-surface-slider.png
+│   ├── android-lottie-pag-svga-tint-option.png
+│   ├── android-manifest-demo-themes.png
+│   ├── android-manifest-plus-button-middle.png
+│   ├── android-more-than-five-tabs-report.png
+│   ├── android-playback-controls-pag-example-api35-b57c844.png
+│   ├── android-rive-menu-loop-pause-fix.png
+│   ├── android-rive-menu-settles-then-rests.png
+│   ├── android-rive-rest-same-frame-every-launch.png
+│   ├── animated-icons-demo-controls-request-android.jpg
+│   ├── animated-item-android-demo-interaction.png
+│   ├── animated-item-android-demo-page.png
+│   ├── animated-item-android-demo.png
+│   ├── animated-item-android-flutter-rive-blank-at-rest.png
+│   ├── animated-item-android-flutter-rive-hybrid-composition.png
+│   ├── animated-item-android-gif-tabs.png
+│   ├── animated-item-android-tab-badges.png
+│   ├── animated-item-countdown-ios.png
+│   ├── animated-item-demo-ios26.3-en.png
+│   ├── animated-item-demo-ios26.3-zh-Hans.png
+│   ├── animated-item-demo-ios27-en.png
+│   ├── animated-item-flatdesign-tabbar-ios27.png
+│   ├── animated-item-flutter-rive-icons-faint.png
+│   ├── animated-item-flutter-rive-icons-tinted.png
+│   ├── animated-item-flutter-rive-switch-after.png
+│   ├── animated-item-flutter-rive-switch-before.png
+│   ├── animated-item-harmonyos-dark-tint.png
+│   ├── animated-item-harmonyos-lottie-done.png
+│   ├── animated-item-harmonyos-lottie-playing.png
+│   ├── animated-item-harmonyos-lottie-tint-src-in.png
+│   ├── animated-item-harmonyos-retap-replay.png
+│   ├── animated-item-harmonyos-rive-icon-color-tint.png
+│   ├── animated-item-harmonyos-rive-retap-replay.png
+│   ├── animated-item-harmonyos-rive-tint-option.png
+│   ├── animated-item-harmonyos-spacing-before.png
+│   ├── animated-item-harmonyos-stack-view.png
+│   ├── animated-item-harmonyos-static-icon-color.png
+│   ├── animated-item-harmonyos-svga-retap-replay.png
+│   ├── animated-item-harmonyos-tabbar.jpeg
+│   ├── animated-item-harmonyos-tint-option.png
+│   ├── animated-item-ios-demo-interactive-ios27.2.png
+│   ├── animated-item-ios-rive-loop-before-after.png
+│   ├── animated-item-ios-rive-loop-per-icon.png
+│   ├── animated-item-miniprogram-b7-engines-fixed.jpg
+│   ├── animated-item-miniprogram-b7-engines-overflow.jpg
+│   ├── animated-item-rn-rive-icons-tinted.png
+│   ├── b10-flatdesign-image-under-gif-after.png
+│   ├── b10-flatdesign-image-under-gif-before.png
+│   ├── b14-language-row-emoji-ios27.2.png
+│   ├── b18-example-gif-static-image-house-after.png
+│   ├── b18-example-gif-static-image-like-placeholder-before.jpg
+│   ├── badge-debugging-animations-off-harmonyos.png
+│   ├── carthage-example-ios.png
+│   ├── carthage-example-two-frameworks-ios27.png
+│   ├── configuration-demo-json-zh-hans.png
 │   ├── configuration-localization-en.png
 │   ├── configuration-localization-zh-hans.png
+│   ├── configuration-manifest-christmas.png
+│   ├── configuration-manifest-light.png
+│   ├── configuration-manifest-themes-bar.png
+│   ├── cyltableviewplaceholder-empty-placeholders-ios.png
+│   ├── cyltableviewplaceholder-refresh-icons-2e748b7-ios.png
+│   ├── cyltableviewplaceholder-refresh-icons-40ec453-ios.png
+│   ├── cyltableviewplaceholder-refresh-icons-ios.png
+│   ├── demo-second-tap-refresh-ios.png
 │   ├── demo-test-list-objc-classic.png
 │   ├── docs-navigation-index.png
+│   ├── flat-design-more-icon-fix-ios.png
+│   ├── flatdesign-plus-button-fixed-ios.png
+│   ├── flatdesign-plus-button-missing-ios.png
+│   ├── flatdesign-standard-appearance-ios.png
 │   ├── flatdesign-standard-appearance-mapping.svg
+│   ├── flutter-android-simulated-taps.png
 │   ├── flutter-component-android-bar.png
 │   ├── flutter-component-android.png
 │   ├── flutter-component-ios-bar.png
 │   ├── flutter-component-ios.png
+│   ├── flutter-ios-default-taps-select.png
+│   ├── flutter-ios-simulated-taps-3ee06877.png
+│   ├── flutter-ios-simulator-tap-loses-location.png
 │   ├── flutter-pag-android-bar.png
 │   ├── flutter-pag-ios-bar.png
+│   ├── flutter-playback-controls-android-api35-93abe96.png
+│   ├── flutter-plus-title-hidden-report.png
+│   ├── flutter-plus-title-own-page-ios.png
 │   ├── flutter-rive-android-bar.png
 │   ├── flutter-rive-ios-bar.png
+│   ├── flutter-rive-svga-tab-taps-android.png
+│   ├── flutter-search-plus-title-missing-when-selected-ios.png
+│   ├── flutter-svga-tab-icons-ios26.png
+│   ├── flutter-viewpager2-fix-android-bar.png
 │   ├── gif-classic.png
 │   ├── gif-flat-design.png
 │   ├── gif-liquid-glass.png
+│   ├── gif-tint-or-original-colors.png
+│   ├── harmonyos-animated-item-stack-axis-tint.png
+│   ├── harmonyos-animated-item-sys-symbol-b30.png
+│   ├── harmonyos-badge-bounce-around-place.png
+│   ├── harmonyos-bundle-image-row-localized.png
+│   ├── harmonyos-configuration-localization-bundle.png
+│   ├── harmonyos-cvcm-issue26-all.jpeg
+│   ├── harmonyos-cvcm-issue26-good.jpeg
+│   ├── harmonyos-cvcm-issue27-filter-open.jpeg
+│   ├── harmonyos-cvcm-issue27-plus.jpeg
+│   ├── harmonyos-emulator-pages-b7fdf26.png
+│   ├── harmonyos-flatdesign-liquidglass-taps-mate70pro.png
+│   ├── harmonyos-flatdesign-tint-fixed.png
+│   ├── harmonyos-gif-image-rest-then-play.png
+│   ├── harmonyos-gif-svga-tint-option.png
+│   ├── harmonyos-gif-svga-tint-x86_64.png
+│   ├── harmonyos-home-mate70pro-api21.jpeg
+│   ├── harmonyos-keyboard-moves-tab-bar-cylsearch.png
+│   ├── harmonyos-liquid-glass-badges-ios-vs-harmonyos.png
+│   ├── harmonyos-liquid-glass-dock-example.png
+│   ├── harmonyos-liquid-glass-ios-vs-harmonyos.png
+│   ├── harmonyos-liquid-glass-lens.png
+│   ├── harmonyos-liquid-glass-message-badge-before-after.png
+│   ├── harmonyos-liquid-glass-plus-raised.png
+│   ├── harmonyos-liquid-glass-reference-vs-ours.png
+│   ├── harmonyos-lottie-svga-loop-arm64.png
+│   ├── harmonyos-plus-button-liquid-glass-no-line.png
+│   ├── harmonyos-plus-button-top-line-before-after.png
+│   ├── harmonyos-plus-button-top-line-kept.png
+│   ├── harmonyos-plus-button-top-line-report.png
+│   ├── harmonyos-port-svga-demo-page.png
+│   ├── harmonyos-port-svga-demo-row.png
+│   ├── harmonyos-port-svga-demo-taps.png
+│   ├── harmonyos-rive-house-loop-arm64.png
+│   ├── harmonyos-rive-replay-arm64.png
+│   ├── harmonyos-rive-rest-then-play-arm64.png
+│   ├── harmonyos-rive-tab-icons-mate70pro-api21.png
+│   ├── harmonyos-styles-ocean-skin-b7995d0.png
+│   ├── harmonyos-styles-recheck-6befe36.png
+│   ├── harmonyos-styles-space-skin-981db1e.png
+│   ├── harmonyos-svga-tab-icons-emulator.png
+│   ├── harmonyos-system-tab-bar-plus-before-after.png
+│   ├── harmonyos-tab-badge-animations-on.png
+│   ├── harmonyos-tab-badge-top-left-before-after.png
+│   ├── harmonyos-tab-taps-three-styles.png
+│   ├── harmonyos-verify-arabic.jpeg
+│   ├── harmonyos-verify-configuration-svga-eba8c44.jpeg
+│   ├── harmonyos-verify-home-eba8c44.jpeg
+│   ├── harmonyos-verify-home-end-eba8c44.jpeg
+│   ├── harmonyos-verify-keyboard-fixed-tab-bar.jpeg
+│   ├── harmonyos-verify-l10n-mate70pro-api21.png
+│   ├── harmonyos-verify-language-picker.jpeg
+│   ├── harmonyos-verify-liquid-glass-eba8c44.png
+│   ├── harmonyos-verify-nav-title-mate70pro-api21.png
+│   ├── harmonyos-verify-pushed-page-eba8c44.jpeg
+│   ├── harmonyos-verify-replacement-page-eba8c44.jpeg
+│   ├── harmonyos-verify-rive-mate70pro-api21.png
+│   ├── harmonyos-verify-scroll-sim-labels-mate70pro-api21.jpeg
+│   ├── harmonyos-verify-skin-row-picker.jpeg
+│   ├── harmonyos-verify-skins-eba8c44.png
+│   ├── harmonyos-verify-spanish.jpeg
+│   ├── image-only-tabs-gallery-3-3-ios17.png
+│   ├── image-only-tabs-ios.png
+│   ├── inset-grouped-sections-demo-ios.png
+│   ├── ios-badge-breathe-not-under-icon.png
+│   ├── ios-badges-follow-swapped-animation-skin.png
+│   ├── ios-badges-on-animated-item-component.png
+│   ├── ios-flatdesign-animateditem-tab-ios26-4-a6e88609.png
+│   ├── ios-flatdesign-gif-no-image-under-animation-ios26-4-5ba3a089.png
+│   ├── ios-flatdesign-hide-show.png
+│   ├── ios-flatdesign-svga-selected-icon-fixed.png
+│   ├── ios-gif-image-rest-then-play.png
+│   ├── ios-gif-svga-tint-option.png
+│   ├── ios-lottie-pag-tint-option.png
+│   ├── ios-lottie4-tint-option.png
+│   ├── ios-playback-controls-message-tab-iphone17pro-ios26.1-dc04439.png
+│   ├── ios-rive-dark-tint-appearance-switch.png
+│   ├── ios-rive-fixed-tint-unselected-only.png
+│   ├── ios-rive-flatdesign-item-appearance.png
+│   ├── ios-rive-item-appearance-icon-title-tint.png
+│   ├── ios-rive-liquid-glass-item-appearance-plus-headroom.png
+│   ├── ios-rive-rest-then-play-bell.png
+│   ├── ios-rive-tab-badges-over-tinted-icons.png
+│   ├── ios-rive-tint-template.png
+│   ├── ios-rive-title-tint-light-dark.png
+│   ├── ios-swift-base-view-controllers.png
+│   ├── ios-swift-example-screens.png
+│   ├── ios-swift-flat-design-main-tab-bar-controller.png
+│   ├── ios-swift-main-tab-bar-controller.png
+│   ├── ios-swift-plus-button-lens-drag.png
+│   ├── ios-swift-plus-button.png
+│   ├── iphone-duo-example-rive-bottom-bar.png
+│   ├── iphone-duo-objc-vs-swift-side-bar.png
+│   ├── iphone-duo-tab-bar-ios27-2-b356c1e6.png
+│   ├── issue-561-ipad-tab-bars-ios.png
+│   ├── liquid-glass-plus-stand-in-landscape-ios.png
+│   ├── liquid-glass-robustness-more-ios.png
+│   ├── liquid-glass-robustness-plus-stand-in-ios.png
 │   ├── login-required-tabs-flow.svg
 │   ├── login-required-tabs-flutter-ios-logged-in.png
 │   ├── login-required-tabs-react-native-android-alert.png
+│   ├── miniprogram-tab-tap-previous-tab-frame-before-after.png
+│   ├── more-editing-done-star-comes-back-liquid-glass-ios.png
+│   ├── more-tab-eight-tabs-liquid-glass-ios.png
+│   ├── objc-demo-classic-ios17.png
 │   ├── pag-animation-tab-icons.png
 │   ├── pag-animation-test-list.png
 │   ├── pag-classic.png
 │   ├── pag-flat-design.png
+│   ├── pag-language-emoji-ios26-ios27.png
 │   ├── pag-liquid-glass.png
+│   ├── pag-nearby-ios17-simulator-crash.png
+│   ├── pag-nearby-ios17-simulator-fixed.png
+│   ├── pag-nearby-ios26-simulator.png
+│   ├── per-tab-animation-pag-ios.png
+│   ├── plus-button-first-display-fixed-ios.png
+│   ├── plus-button-first-display-glitch-ios.jpg
+│   ├── plus-button-follows-slot-long-titles-ios.png
+│   ├── plus-button-glitch-report-2-ios.png
+│   ├── plus-button-lens-crisp-ios.png
+│   ├── plus-button-lens-mask-drag-ios.png
+│   ├── plus-button-long-titles-liquid-glass-ios.png
+│   ├── plus-button-mask-off-first-display-ios.png
+│   ├── plus-button-title-color-mask-on-off-ios.png
+│   ├── plus-button-title-color-mask-report-ios.png
+│   ├── plus-button-title-only-mask-drag-ios.png
+│   ├── plus-button-titles-fit-liquid-glass-ios.png
 │   ├── plus-child-theme-switching.png
 │   ├── plusbutton-background-image-liquid-glass-selected.png
 │   ├── plusbutton-background-image-liquid-glass-swiftui.png
@@ -203,35 +453,83 @@ docs/
 │   ├── plusbutton-overlap-lg.png
 │   ├── plusbutton-slot-flatdesign.png
 │   ├── plusbutton-slot-liquid-glass-titles-changed.png
+│   ├── plusbutton-subview-touches-ios.png
 │   ├── plusbutton-subview-touches-issue-202.png
 │   ├── plusbutton-touchable-area-1x.png
 │   ├── plusbutton-touchable-area-2x.png
+│   ├── push-from-anywhere-ios.png
 │   ├── react-native-component-android-bar.png
 │   ├── react-native-component-android.png
 │   ├── react-native-component-ios-bar.png
 │   ├── react-native-component-ios.png
+│   ├── react-native-ios27.2-iphone18pro-20261119-tab-switch-74f0b4cd.png
 │   ├── react-native-pag-android-bar.png
 │   ├── react-native-pag-ios-bar.png
 │   ├── react-native-pag-menu.png
+│   ├── react-native-playback-controls-android-api35-3357382.png
 │   ├── react-native-rive-android-bar.png
 │   ├── react-native-rive-chat.png
 │   ├── react-native-rive-ios-bar.png
 │   ├── react-native-rive-search.png
 │   ├── react-native-rive-start.png
 │   ├── react-native-rive-user.png
+│   ├── react-native-svga-tab-icons-android.png
+│   ├── react-native-svga-tab-icons-configuration-ios26.png
+│   ├── react-native-svga-tab-icons-keys-ios26.png
+│   ├── react-native-svga-tab-taps-android.png
 │   ├── readme-english-before-reading.png
 │   ├── readme-english-bilingual-contents.png
 │   ├── readme-english-header-badges.png
+│   ├── resource-route-sandbox-zh-hans.png
 │   ├── rive-animation-onboarding-button.png
 │   ├── rive-animation-plus-button.png
 │   ├── rive-animation-search-tab-frames.png
 │   ├── rive-animation-swiftui-test-list.png
 │   ├── rive-animation-tab-icons.png
 │   ├── rive-animation-test-list.png
+│   ├── rive-bell-page-centered-android.png
 │   ├── rive-classic.png
 │   ├── rive-flat-design.png
+│   ├── rive-flutter-rn-basic-examples-ios.png
 │   ├── rive-liquid-glass.png
+│   ├── rive-tab-taps-and-menu-button-android.png
+│   ├── screenshot-guidelines-reference-example.png
+│   ├── svga-example-rive-bell.png
+│   ├── svga-example-rive-last-frame.png
+│   ├── svga-example-rive-playing.png
+│   ├── svga-miniprogram-renderer-frames.png
+│   ├── svga-tab-icon-classic.png
+│   ├── svga-tab-icon-flatdesign.png
+│   ├── svga-tab-icon-liquid-glass.png
+│   ├── svga-tab-icons-android-api35.png
+│   ├── svga-tab-icons-configuration-ios26.png
+│   ├── svga-tab-icons-configuration-plus-ios26.png
+│   ├── svga-tab-icons-keys-ios26.png
+│   ├── svga-tab-icons-svgaplayerlite-ios27.png
+│   ├── svga-tab-icons-swiftui-configuration-ios26.png
+│   ├── svga-tab-icons-swiftui-keys-ios26.png
+│   ├── svga-tab-icons-web-assets-ios26.png
+│   ├── swift-migration-badges-ios.png
+│   ├── swift-migration-localization-ios.png
+│   ├── swift-migration-step48-flatdesign-popped.png
+│   ├── swift-migration-step48-flatdesign-pushed.png
+│   ├── swift-migration-step49-flatdesign.png
+│   ├── swift-migration-step50-flatdesign.png
+│   ├── swift-migration-step51-classic-me.png
+│   ├── swift-migration-step51-classic-plus.png
+│   ├── swift-migration-step51-liquid-glass-bell.png
+│   ├── swift-migration-step51-liquid-glass-launch.png
+│   ├── swift-migration-step51-liquid-glass-plus.png
+│   ├── swift-migration-step52-classic-me.png
+│   ├── swift-migration-step52-classic-plus.png
+│   ├── swift-migration-step52-liquid-glass-bell.png
+│   ├── swift-migration-step52-liquid-glass-plus.png
+│   ├── swiftui-integration-ios.png
+│   ├── swiftui-plus-title-blur-ios.png
 │   ├── tab-accessibility-labels-after-title-change.png
+│   ├── tab-animation-pod-combinations-ios.png
+│   ├── tab-bar-gallery-sections-ios.png
+│   ├── tab-custom-action-ios.png
 │   ├── tab-interactions-long-press-classic.png
 │   ├── tab-interactions-long-press-flatdesign.png
 │   ├── tab-interactions-long-press-liquid-glass.png
@@ -243,6 +541,13 @@ docs/
 │   ├── tab-interactions-swipe-classic.png
 │   ├── tab-interactions-swipe-liquid-glass.png
 │   ├── tab-interactions-swipe-login-classic.png
+│   ├── tab-item-icon-rendering-android.png
+│   ├── tab-item-icon-rendering-ios.png
+│   ├── tab-item-positioning-ios.png
+│   ├── tab-page-registry-android.png
+│   ├── tab-reselect-pop-to-root-ios.png
+│   ├── tabbaritem-double-tap-refresh-ios.png
+│   ├── tabbaritem-gestures-ios.png
 │   ├── theme-switching-flat-design.png
 │   ├── theme-switching-holiday-icons.png
 │   ├── theme-switching-liquid-glass.png
@@ -282,7 +587,102 @@ docs/
 │   ├── update-tab-navigation-title-skin.png
 │   ├── update-tab-network-icons-plus-button.png
 │   ├── update-tab-plus-page-navigation-title-changed.png
-│   └── update-tab-plus-page-navigation-title.png
+│   ├── update-tab-plus-page-navigation-title.png
+│   ├── wechat-miniprogram-animated-item-stack-axis-tint.png
+│   ├── wechat-miniprogram-animated-item-stack.png
+│   ├── wechat-miniprogram-animated-item-title-dark-color.png
+│   ├── wechat-miniprogram-api-01-home-lottie.png
+│   ├── wechat-miniprogram-api-02-discover-selected.png
+│   ├── wechat-miniprogram-api-03-badges-lottie.png
+│   ├── wechat-miniprogram-api-04-dark-lottie.png
+│   ├── wechat-miniprogram-api-05-dark-images-tinted.png
+│   ├── wechat-miniprogram-api-06-plus-page-selection.png
+│   ├── wechat-miniprogram-api-07-swipe-to-discover.png
+│   ├── wechat-miniprogram-api-08-bold-selected-title.png
+│   ├── wechat-miniprogram-api-09-christmas-liquid-glass.png
+│   ├── wechat-miniprogram-api-10-flat-design-login.png
+│   ├── wechat-miniprogram-api-11-lottie-playground.png
+│   ├── wechat-miniprogram-api-12-lottie-recolor-cover.png
+│   ├── wechat-miniprogram-api-13-issue31-lottie.png
+│   ├── wechat-miniprogram-api-14-interface-style-dark.png
+│   ├── wechat-miniprogram-api-15-plus-tap-without-page.png
+│   ├── wechat-miniprogram-api-16-tab-bar-item-playground.png
+│   ├── wechat-miniprogram-api-17-four-tabs-like-ios.png
+│   ├── wechat-miniprogram-api-18-rive-dark.png
+│   ├── wechat-miniprogram-api-19-pag-home.png
+│   ├── wechat-miniprogram-api-20-pag-me.png
+│   ├── wechat-miniprogram-api-21-split-lottie.png
+│   ├── wechat-miniprogram-api-22-split-pag.png
+│   ├── wechat-miniprogram-api-23-split-rive-me.png
+│   ├── wechat-miniprogram-api-24-split-gif.png
+│   ├── wechat-miniprogram-api-25-glass-light.png
+│   ├── wechat-miniprogram-api-26-glass-dark.png
+│   ├── wechat-miniprogram-api-27-gallery-checkin.png
+│   ├── wechat-miniprogram-api-28-gallery-feed.png
+│   ├── wechat-miniprogram-api-29-gallery-cards.png
+│   ├── wechat-miniprogram-api-30-gallery-landing.png
+│   ├── wechat-miniprogram-api-31-bug-lens-spacing.png
+│   ├── wechat-miniprogram-api-32-fix-lens-spacing.png
+│   ├── wechat-miniprogram-api-33-playback-controls-lottie.png
+│   ├── wechat-miniprogram-api-34-plus-before-dark.jpg
+│   ├── wechat-miniprogram-api-35-plus-selected-default.png
+│   ├── wechat-miniprogram-api-35-plus-selected-liquidGlass-dark.png
+│   ├── wechat-miniprogram-api-35-plus-selected-liquidGlass.png
+│   ├── wechat-miniprogram-api-36-bug-flat-plus-glass.jpg
+│   ├── wechat-miniprogram-api-37-default-liquidGlass-plus.png
+│   ├── wechat-miniprogram-api-37-default-liquidGlass-tab.png
+│   ├── wechat-miniprogram-api-37-default-plus.png
+│   ├── wechat-miniprogram-api-37-default-tab.png
+│   ├── wechat-miniprogram-api-37-flatDesign-plus.png
+│   ├── wechat-miniprogram-api-37-flatDesign-tab.png
+│   ├── wechat-miniprogram-api-38-tab-lens-reference.jpg
+│   ├── wechat-miniprogram-api-39-lens-plus-dark.png
+│   ├── wechat-miniprogram-api-39-lens-plus.png
+│   ├── wechat-miniprogram-api-39-lens-tab-dark.png
+│   ├── wechat-miniprogram-api-39-lens-tab.png
+│   ├── wechat-miniprogram-api-40-lens-white-reference.jpg
+│   ├── wechat-miniprogram-api-41-lens-keep-reference.jpg
+│   ├── wechat-miniprogram-api-42-lens-question-gallery.png
+│   ├── wechat-miniprogram-api-42-lens-question-plus.png
+│   ├── wechat-miniprogram-api-43-lens-plus.png
+│   ├── wechat-miniprogram-api-43-lens-tab.png
+│   ├── wechat-miniprogram-api-44-lens-me-rows.png
+│   ├── wechat-miniprogram-api-44-lens-regular-discover.png
+│   ├── wechat-miniprogram-api-44-lens-skeuomorphic-discover.png
+│   ├── wechat-miniprogram-api-47-plus-title-default.png
+│   ├── wechat-miniprogram-api-47-plus-title-flat-design.png
+│   ├── wechat-miniprogram-api-47-plus-title-liquid-glass.png
+│   ├── wechat-miniprogram-api-49-home-table-gallery-badges.png
+│   ├── wechat-miniprogram-api-49-home-table-skins.png
+│   ├── wechat-miniprogram-api-49-home-table-top.png
+│   ├── wechat-miniprogram-api-50-milestone-regular.png
+│   ├── wechat-miniprogram-api-50-milestone-skeuomorphic.png
+│   ├── wechat-miniprogram-badges.png
+│   ├── wechat-miniprogram-cell-taps-devtools-sdk3.17.6-e00babf.png
+│   ├── wechat-miniprogram-christmas-glass.png
+│   ├── wechat-miniprogram-feed-taps-ios-parity-devtools-sdk3.17.6-ef5afc3-windows.png
+│   ├── wechat-miniprogram-feeds-ios-taps-devtools-sdk3.17.6-3dd395b.png
+│   ├── wechat-miniprogram-flat-login.png
+│   ├── wechat-miniprogram-gif-image-rest-then-play.png
+│   ├── wechat-miniprogram-home.png
+│   ├── wechat-miniprogram-objc-parity-batch1-launch-devtools-sdk3.17.6-4e2e327.png
+│   ├── wechat-miniprogram-objc-parity-batch2-skins-devtools-sdk3.17.6-b850f51.png
+│   ├── wechat-miniprogram-objc-parity-batch3a-home-rows-devtools-sdk3.17.6-a9b1278.png
+│   ├── wechat-miniprogram-objc-parity-batch3b1-arrows-touch-replaced-devtools-sdk3.17.6-5d86b75.png
+│   ├── wechat-miniprogram-objc-parity-batch3b2-tap-animations-devtools-sdk3.17.6-418d901.png
+│   ├── wechat-miniprogram-objc-parity-item11-languages-devtools-sdk3.17.6-c681422.png
+│   ├── wechat-miniprogram-objc-parity-item12-memory-warning-devtools-sdk3.17.6-5bbadb8.png
+│   ├── wechat-miniprogram-one-icon-layer-lottie-pag-rive-devtools-sdk3.17.6-e612393.png
+│   ├── wechat-miniprogram-rive-home-feed-one-layer-devtools-sdk3.17.6-e264ea2.png
+│   ├── wechat-miniprogram-rive-house-devtools.png
+│   ├── wechat-miniprogram-rive-play-all-loop-devtools.png
+│   ├── wechat-miniprogram-rive-tint-title.png
+│   ├── wechat-miniprogram-scroll-icons-devtools-sdk3.17.6-88dd149.png
+│   ├── wechat-miniprogram-scroll-icons-still-images-devtools-sdk3.17.6-a157c97.png
+│   ├── wechat-miniprogram-tab-item-badges.png
+│   ├── wechat-miniprogram-two-icon-layers-user-1-devtools.jpg
+│   ├── wechat-miniprogram-two-icon-layers-user-2-devtools.jpg
+│   └── wechat-miniprogram-visibility-hidden-identifiers-devtools-sdk3.17.6-49df44f.png
 ├── commit-readiness-2026-11-09.md
 └── instructions.md
 ```

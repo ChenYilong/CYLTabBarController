@@ -124,6 +124,7 @@
 "有新内容" = "Novi sadržaj";
 "%@ 条新消息" = "Nove poruke: %@";
 "加号按钮" = "Tipka plus";
+"更多" = "Više";
 "模拟内存警告" = "Simuliraj upozorenje o memoriji";
 "卸载未选中的 Tab，切换时重新加载" = "Oslobađa neodabrane kartice; ponovno se učitavaju kad se odaberu";
 "内存警告" = "Upozorenje o memoriji";
@@ -368,3 +369,12 @@
 "网络图标、标题与配色" = "Ikone s mreže, naslovi i boje";
 /* The settings group of the configuration file rows (docs/Configuration-File.md). */
 "配置文件" = "Konfiguracijska datoteka";
+/* Scroll hiding simulations (issue #13): kind labels and title prefixes; API names stay English. */
+"恢复" = "Vrati";
+"保持" = "Zadrži";
+"不适用" = "N/P";
+"手动" = "Ručno";
+"自测" = "Samotest";
+"手动：%@" = "Ručno: %@";
+"实测：%@" = "Stvarno: %@";
+"自测：依次运行所有自动模拟，报告 PASS / FAIL" = "Samotest: pokreni sve automatske simulacije, prijavi PASS / FAIL";

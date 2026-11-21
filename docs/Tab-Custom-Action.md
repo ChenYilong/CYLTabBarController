@@ -90,4 +90,6 @@ tabBarController.cyl_customTabActionHandler = { tabBarController, viewController
 
 | 中文 | English |
 |:---|:---|
-| 本次开发环境没有 iOS 模拟器或真机，无法运行 Demo，因此暂无测试截图；上方为流程示意图。在设备上验证后，请将截图放入 `docs/assets/` 并在此引用，例如 `![点击使用自定义点击操作的 Tab](assets/tab-custom-action-present.png)`。 | This change was developed without an iOS simulator or device, so there are no test screenshots yet; the figure above is a flow diagram. After testing on a device, put screenshots in `docs/assets/` and reference them here, e.g. `![Tapping a custom action tab](assets/tab-custom-action-present.png)`. |
+| 已验证（2026-11-10，iOS 26.1，iPhone 17 Pro Max 模拟器，ObjC Demo 图库「8.3 Custom action on a regular tab」）。上：点击 Photo 弹出「More features」，而不是切换页面（液态玻璃的选中效果在按下时移到 Photo，属系统行为）；下：关闭后仍选中 Home。 | Verified (2026-11-10, iOS 26.1, iPhone 17 Pro Max simulator, ObjC demo gallery "8.3 Custom action on a regular tab"). Top: tapping Photo shows "More features" instead of switching pages (Liquid Glass moves its selection under Photo while pressed, which is the system's); bottom: after closing it, Home is still selected. |
+
+![Tapping a custom action tab](assets/tab-custom-action-ios.png)

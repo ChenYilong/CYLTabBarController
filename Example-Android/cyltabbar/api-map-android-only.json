@@ -1,0 +1,14 @@
+[
+ {"android": "CYLTabBarController.cyl_showsAllTabs", "note": "Shows every tab instead of \"More\" past five view controllers / 超过五个时显示全部 Tab，不显示「更多」"},
+ {"android": "CYLConstants.CYLTabBarControllerShowsAllTabs", "note": "Configuration key of `cyl_showsAllTabs` / `cyl_showsAllTabs` 的配置文件键"},
+ {"android": "CYLTabBarController.cyl_isMoreSelected", "note": "Whether the \"More\" list is shown / 是否正在显示「更多」列表"},
+ {"android": "CYLTabBarController.cyl_moreViewController", "note": "The \"More\" list page (UIKit's `moreNavigationController` on iOS) / 「更多」列表页（iOS 由 UIKit 的 `moreNavigationController` 提供）"},
+ {"android": "CYLTabBar.cyl_moreButton", "note": "The \"More\" tab button, or null / 「更多」Tab 按钮，没有时为 null"},
+ {"android": "CYLTabBar.cyl_visibleTabCount", "note": "How many tabs the bar shows before \"More\" / 「更多」之前显示的 Tab 数"},
+ {"android": "CYLTabBar.cyl_indicator", "note": "QMUI indicator / QMUI 指示条"},
+ {"android": "CYLTabBar.cyl_scrollMode", "note": "QMUI scrollable mode (shows every tab) / QMUI 可滚动模式（显示全部 Tab）"},
+ {"android": "CYLTabBar.cyl_updateIndicatorPosition", "note": "Indicator for an app's own pager / 供 App 自己的翻页控件使用"},
+ {"android": "CYLTabBar.cyl_itemWidthWeights", "note": "Tab widths by weight / 按权重分配宽度"},
+ {"android": "CYLTabBarController.cyl_swipesBetweenPages", "note": "Swipe between pages / 滑动翻页"},
+ {"android": "CYLTabBarController.cyl_setupWithViewPager2", "note": "Pages in a ViewPager2 / 页面放进 ViewPager2"}
+]

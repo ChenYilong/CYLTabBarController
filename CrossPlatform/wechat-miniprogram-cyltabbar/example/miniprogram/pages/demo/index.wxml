@@ -1,0 +1,36 @@
+<!-- [EN] The demo page of a Home row: what the row does, run in the mini program. [CN] 首页某一行的演示页：该行的功能，在小程序中运行。 -->
+<view class="cyl-page {{demo.scroll ? 'cyl-demo-long' : ''}}">
+  <view class="cyl-header">
+    <text class="cyl-header-title" aria-role="heading">{{title}}</text>
+    <text wx:if="{{subtitle}}" class="cyl-header-subtitle">{{subtitle}}</text>
+  </view>
+  <view class="cyl-section">
+    <view class="cyl-row" aria-label="{{demo.note}}"><text aria-hidden="true">{{demo.note}}</text></view>
+    <view wx:if="{{demo.input !== undefined}}" class="cyl-row cyl-demo-code" aria-label="{{texts['Input']}}, {{demo.input || texts['empty']}}"><text aria-hidden="true" user-select>{{demo.input || texts['empty']}}</text></view>
+    <view wx:if="{{result}}" id="cyl-demo-result" class="cyl-row" aria-label="{{texts['Result']}}, {{result}}"><text aria-hidden="true">{{result}}</text></view>
+    <view wx:for="{{actions}}" wx:key="index" class="cyl-row cyl-row-action" bindtap="cyl_runAction" data-index="{{index}}" aria-role="button" aria-label="{{item}}"><text aria-hidden="true">{{item}}</text></view>
+  </view>
+
+  <block wx:if="{{demo.heights}}">
+    <view wx:for="{{demo.heights}}" wx:key="*this" class="cyl-demo-frame" style="height: {{item}}px;" aria-label="{{item}} px">
+      <view class="cyl-demo-scale" style="transform: scaleY({{item / 50}});"><cyl-tab-bar configuration="{{demo.configuration}}" selected-identifier="home" /></view>
+    </view>
+  </block>
+
+  <view wx:if="{{demo.items}}" class="cyl-section cyl-demo-items">
+    <view wx:for="{{demo.items}}" wx:key="title" class="cyl-demo-item" aria-label="{{item.title}}">
+      <cyl-tab-bar-item title="{{item.title}}" image="{{item.image ? '/shared/skins/2.1.0/light/' + item.image + '@3x.png' : ''}}" layout-centered="{{item.centered}}" selected="{{index === 0}}" />
+    </view>
+  </view>
+
+  <view wx:if="{{demo.slide}}" class="cyl-section cyl-demo-slides">
+    <view class="cyl-demo-slide-track" style="transform: translateX(-{{slideIndex * 100}}%);">
+      <view wx:for="{{slideTitles}}" wx:key="*this" class="cyl-demo-slide" aria-hidden="{{index !== slideIndex}}"><text>{{item}}</text></view>
+    </view>
+  </view>
+
+  <view wx:if="{{demo.configuration && !demo.heights}}" class="cyl-demo-frame" bindlongpress="cyl_longPress" bindtouchstart="cyl_touchStart" aria-label="cyl-tab-bar">
+    <cyl-tab-bar id="cyl-demo-tab-bar" configuration="{{demo.configuration}}" selected-identifier="{{selectedIdentifier}}" tab-bar-hidden="{{barHidden}}" bind:select="cyl_select" bind:reselect="cyl_select" bind:plustap="cyl_plusTap" />
+  </view>
+  <view wx:if="{{demo.scroll}}" class="cyl-demo-spacer" aria-hidden="true"></view>
+</view>

@@ -10,14 +10,13 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-/**
- [CN] UINavigationController Push / Pop 转场时，临时将CYLFlatDesignTabBar添加到ParallaxOverlayView上
- 使其效果和系统转场效果一致
- [EN] During UINavigationController Push / Pop transitions, temporarily add CYLFlatDesignTabBar to
-      ParallaxOverlayView so the effect matches the system transition.
+/*!
+ * [EN] `_CYLFlatDesignTabBarParallaxOverlayView` is implemented in Swift (`Swift/CYLFlatDesignTabBarHideTabBar.swift`, docs/Swift-Migration.md, step 47);
+ *      Objective-C callers get its declaration from the generated Swift interface imported below.
+ * [CN] `_CYLFlatDesignTabBarParallaxOverlayView` 在 Swift 中实现（`Swift/CYLFlatDesignTabBarHideTabBar.swift`，docs/Swift-Migration.md，第 47 步）；Objective-C 调用方从下方
+ *      导入的 Swift 生成接口获得其声明。
  */
-@interface _CYLFlatDesignTabBarParallaxOverlayView : UIView
-
-@end
 
 NS_ASSUME_NONNULL_END
+
+#import "CYLSwiftInterface.h"

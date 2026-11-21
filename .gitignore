@@ -114,3 +114,8 @@ __pycache__/
 # macOS AppleDouble metadata written on external volumes: never commit
 ._*
 *.base
+
+# [EN] The maintainer's local reference projects (RiveViewer-miniapp is PolyForm-Noncommercial): never committed.
+# [CN] 维护者本地的参考项目（RiveViewer-miniapp 为 PolyForm-Noncommercial 许可）：不提交。
+CrossPlatform/RiveViewer-miniapp/
+CrossPlatform/LottieWMC/

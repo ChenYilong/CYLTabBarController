@@ -20,7 +20,9 @@ import java.util.WeakHashMap
 
 private val followingPages = WeakHashMap<Fragment, Boolean>()
 
-/** [EN] The page itself, or the tab (or plus button's page) that holds it. [CN] 页面本身，或包含它的 Tab（或 PlusButton 的页面）。 */
+/**
+ * [EN] The page itself, or the tab (or plus button's page) that holds it. [CN] 页面本身，或包含它的 Tab（或 PlusButton 的页面）。
+ */
 private fun CYLTabBarController.cyl_pageOfFragment(fragment: Fragment): Fragment? {
     var candidate: Fragment? = fragment
     val plusChild = tabBar.plusButton?.provider?.plusChildViewController()
