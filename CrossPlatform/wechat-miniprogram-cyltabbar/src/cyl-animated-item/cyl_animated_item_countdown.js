@@ -1,6 +1,6 @@
 /**
  * [EN] The countdown of cyl-animated-item (`itemStyle` 'countdown'), the mini program counterpart of iOS
- *      `CYLAnimatedItemView.style = .countdown` and Android `CYLAnimatedItemView.style = COUNTDOWN`: the "Get code" button of
+ *      `CYLAnimatedItemView.itemStyle = .countdown` and Android `CYLAnimatedItemView.itemStyle = CYLAnimatedItemStyle.Countdown`: the "Get code" button of
  *      an SMS login. A state machine without any wx API (the clock and the storage are given), tested in Node
  *      (test/cyl_animated_item_countdown.test.js). The same rules as on the other platforms:
  *      - the end is a time, not a counter: the seconds spent in the background count, because the time left is read from the
@@ -10,8 +10,8 @@
  *        the state is `finished` and a new countdown can start;
  *      - with a cache key the running countdown is kept in the storage, so a new item with the same key takes it up again
  *        after the mini program was ended in the background (no start callback).
- * [CN] cyl-animated-item 的倒计时（`itemStyle` 为 'countdown'），对应 iOS 的 `CYLAnimatedItemView.style = .countdown` 与 Android 的
- *      `CYLAnimatedItemView.style = COUNTDOWN`：短信登录的「获取验证码」按钮。不使用任何 wx API 的状态机（时钟与存储由外部传入），在 Node 中测试
+ * [CN] cyl-animated-item 的倒计时（`itemStyle` 为 'countdown'），对应 iOS 的 `CYLAnimatedItemView.itemStyle = .countdown` 与 Android 的
+ *      `CYLAnimatedItemView.itemStyle = CYLAnimatedItemStyle.Countdown`：短信登录的「获取验证码」按钮。不使用任何 wx API 的状态机（时钟与存储由外部传入），在 Node 中测试
  *      （test/cyl_animated_item_countdown.test.js）。规则与其他平台相同：
  *      - 结束是一个时间点，而不是计数器：后台度过的秒数计入，因为每次 tick 与小程序再次显示时都从本地时钟读取剩余时间（修复 SMSCodeButton 的 issue #1）；
  *      - 记录开始时间、结束时间与最长时长；本地时钟超过结束时间，或被调回到开始之前（剩余时间超过最长时长，允许 1 秒误差）时关闭倒计时：
