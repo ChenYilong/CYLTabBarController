@@ -61,7 +61,13 @@
     "numberInput=Rooms：每次选中或再次点击时 Rooms 变为下一个值（3、4、5、6）": "numberInput=Rooms: each select or tap again sets Rooms to the next value (3, 4, 5, 6)",
     "循环播放": "Loop",
     "Tab 图标动画循环播放：开": "Tab icon animations loop: on",
-    "Tab 图标动画循环播放：关": "Tab icon animations loop: off"
+    "Tab 图标动画循环播放：关": "Tab icon animations loop: off",
+    "Still image after the animation ends": "Still image after the animation ends",
+    "showsImageWhenAnimationEnds: a play-once Lottie icon, then its still image": "showsImageWhenAnimationEnds: a play-once Lottie icon, then its still image",
+    "Show the still image when it ends: on": "Show the still image when it ends: on",
+    "Show the still image when it ends: off": "Show the still image when it ends: off",
+    "Replay": "Replay",
+    "Animation ended: %d": "Animation ended: %d"
   },
   "zh-Hans": {
     "Previous tab (cyl_selectPreviousTab, issue #535)": "上一个 Tab（cyl_selectPreviousTab，issue #535）",
@@ -125,7 +131,13 @@
     "numberInput=Rooms：每次选中或再次点击时 Rooms 变为下一个值（3、4、5、6）": "numberInput=Rooms：每次选中或再次点击时 Rooms 变为下一个值（3、4、5、6）",
     "循环播放": "循环播放",
     "Tab 图标动画循环播放：开": "Tab 图标动画循环播放：开",
-    "Tab 图标动画循环播放：关": "Tab 图标动画循环播放：关"
+    "Tab 图标动画循环播放：关": "Tab 图标动画循环播放：关",
+    "Still image after the animation ends": "动画结束后显示静态图片",
+    "showsImageWhenAnimationEnds: a play-once Lottie icon, then its still image": "showsImageWhenAnimationEnds：只播放一次的 Lottie 图标，结束后显示静态图片",
+    "Show the still image when it ends: on": "结束后显示静态图片：开",
+    "Show the still image when it ends: off": "结束后显示静态图片：关",
+    "Replay": "重新播放",
+    "Animation ended: %d": "动画结束次数：%d"
   },
   "zh-Hant": {
     "Previous tab (cyl_selectPreviousTab, issue #535)": "上一個 Tab（cyl_selectPreviousTab，issue #535）",
@@ -189,7 +201,13 @@
     "numberInput=Rooms：每次选中或再次点击时 Rooms 变为下一个值（3、4、5、6）": "numberInput=Rooms：每次選中或再次點擊時 Rooms 變為下一個值（3、4、5、6）",
     "循环播放": "循環播放",
     "Tab 图标动画循环播放：开": "Tab 圖示動畫循環播放：開",
-    "Tab 图标动画循环播放：关": "Tab 圖示動畫循環播放：關"
+    "Tab 图标动画循环播放：关": "Tab 圖示動畫循環播放：關",
+    "Still image after the animation ends": "動畫結束後顯示靜態圖片",
+    "showsImageWhenAnimationEnds: a play-once Lottie icon, then its still image": "showsImageWhenAnimationEnds：只播放一次的 Lottie 圖示，結束後顯示靜態圖片",
+    "Show the still image when it ends: on": "結束後顯示靜態圖片：開",
+    "Show the still image when it ends: off": "結束後顯示靜態圖片：關",
+    "Replay": "重新播放",
+    "Animation ended: %d": "動畫結束次數：%d"
   },
   "de": {
     "Previous tab (cyl_selectPreviousTab, issue #535)": "Vorheriger Tab (cyl_selectPreviousTab, issue #535)",

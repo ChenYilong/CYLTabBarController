@@ -975,6 +975,13 @@ struct Index {
         subtitle: this.animationLoops ? CYLLocalizedString('Tab 图标动画循环播放：开') : CYLLocalizedString('Tab 图标动画循环播放：关'),
         action: () => { this.animationLoops = !this.animationLoops; },
       } as DemoRow] } as DemoSection] : []),
+      // [EN] showsImageWhenAnimationEnds (docs/Animated-Item.md): the still image after a play-once animation ends.
+      // [CN] showsImageWhenAnimationEnds（docs/Animated-Item.md）：只播放一次的动画结束后显示静态图片。
+      ...(page === DEMO_CITY ? [{ title: CYLLocalizedString('Still image after the animation ends'), rows: [{
+        id: 'animated-item-end', title: CYLLocalizedString('Still image after the animation ends'),
+        subtitle: CYLLocalizedString('showsImageWhenAnimationEnds: a play-once Lottie icon, then its still image'),
+        action: () => this.push('pages/AnimatedItemEnd', {} as DemoPushParams),
+      } as DemoRow] } as DemoSection] : []),
       ...(page === DEMO_CITY ? [{ title: CYLLocalizedString('LiquidGlass'), rows: [{
         id: 'liquid-glass-dock', title: CYLLocalizedString('Liquid Glass: the see-through effect of the reference'),
         subtitle: CYLLocalizedString('harmonyos-liquid-glass-tabbar: tab capsule, search ball and music bar over colorful content; scroll to minimize'),

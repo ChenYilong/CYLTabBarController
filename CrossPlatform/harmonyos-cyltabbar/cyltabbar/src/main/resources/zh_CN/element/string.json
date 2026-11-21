@@ -21,6 +21,10 @@
       "value": "另一个 context 的 TabBarController，使用方形加号按钮"
     },
     {
+      "name": "cyl_l10n_4d3d8ce4d921",
+      "value": "动画结束次数：%d"
+    },
+    {
       "name": "cyl_l10n_427131e7add2",
       "value": "另一个加号按钮"
     },
@@ -285,6 +289,10 @@
       "value": "红点半径"
     },
     {
+      "name": "cyl_l10n_56e8fac7007d",
+      "value": "重新播放"
+    },
+    {
       "name": "cyl_l10n_7aac5e07b16d",
       "value": "从右到左一次"
     },
@@ -341,6 +349,14 @@
       "value": "显示 / 隐藏 CYLFlatDesignTabBar"
     },
     {
+      "name": "cyl_l10n_ad30d6513b94",
+      "value": "结束后显示静态图片：关"
+    },
+    {
+      "name": "cyl_l10n_0d07e309ae6a",
+      "value": "结束后显示静态图片：开"
+    },
+    {
       "name": "cyl_l10n_561582c1e7cc",
       "value": "半透明红色显示可点击区域：%@；倍数 %@；点击循环 1x、1.5x、2x、关闭"
     },
@@ -351,6 +367,10 @@
     {
       "name": "cyl_l10n_0a00b2238071",
       "value": "弹簧一次"
+    },
+    {
+      "name": "cyl_l10n_f1f3db859899",
+      "value": "动画结束后显示静态图片"
     },
     {
       "name": "cyl_l10n_fee4a478923f",
@@ -463,6 +483,10 @@
     {
       "name": "cyl_l10n_ee5b6ac6461b",
       "value": "selectedIndex 与加号按钮（issue #515）"
+    },
+    {
+      "name": "cyl_l10n_30be5f67de2b",
+      "value": "showsImageWhenAnimationEnds：只播放一次的 Lottie 图标，结束后显示静态图片"
     },
     {
       "name": "cyl_l10n_2de6d572f86b",

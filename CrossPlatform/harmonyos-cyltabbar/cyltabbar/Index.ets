@@ -17,6 +17,11 @@ export {
 } from './src/main/ets/CYLTabBarController';
 export { CYLBadgeSample, cyl_badgeTitleForRow, cyl_badgeStyleCount, cyl_applyBadgeSample } from './src/main/ets/CYLBadgeSamples';
 export { CYLLottieIcon } from './src/main/ets/CYLLottieIcon';
+/**
+ * [EN] The animated item component, for apps that place one outside the tab bar (they import only cyltabbar).
+ * [CN] 动效条目组件，供在 TabBar 之外放置它的 App 使用（App 只导入 cyltabbar）。
+ */
+export { CYLAnimatedItemView, CYLAnimatedItemAnimationContext, CYLAnimatedItemEngines } from 'cylanimateditem';
 export { CYLSVGAView } from './src/main/ets/svga/CYLSVGAView';
 export { CYLSVGAMovie, cylLoadSVGAMovie, cylDecodeSVGAMovie } from './src/main/ets/svga/CYLSVGAMovie';
 export { cylDrawSVGAFrame, cylParseSVGAPath } from './src/main/ets/svga/CYLSVGARenderer';
