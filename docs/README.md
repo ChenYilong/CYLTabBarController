@@ -313,6 +313,7 @@ docs/
 │   ├── gif-liquid-glass.png
 │   ├── gif-tint-or-original-colors.png
 │   ├── harmonyos-animated-item-stack-axis-tint.png
+│   ├── harmonyos-animated-item-still-image-after-end-lottie-a7f8a3c7.png
 │   ├── harmonyos-animated-item-sys-symbol-b30.png
 │   ├── harmonyos-badge-bounce-around-place.png
 │   ├── harmonyos-bundle-image-row-localized.png
@@ -590,6 +591,7 @@ docs/
 │   ├── update-tab-plus-page-navigation-title.png
 │   ├── wechat-miniprogram-animated-item-stack-axis-tint.png
 │   ├── wechat-miniprogram-animated-item-stack.png
+│   ├── wechat-miniprogram-animated-item-still-image-after-end-devtools-sdk3.17.6.png
 │   ├── wechat-miniprogram-animated-item-title-dark-color.png
 │   ├── wechat-miniprogram-api-01-home-lottie.png
 │   ├── wechat-miniprogram-api-02-discover-selected.png
