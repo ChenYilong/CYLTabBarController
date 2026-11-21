@@ -11,7 +11,7 @@ CYLTabBarControllerDarkThemeIdentifier = "dark"
 
 [CYLTabBarControllerLocalization]
 CYLTabBarLocalizationTableName = "ConfigurationDemo"
-CYLTabBarLocalizationPath = "Localization"
+CYLTabBarLocalizationPath = "CYLConfigurationDemo.bundle"
 
 [CYLTabBarControllerThemes.light]
 CYLTabBarItemSelectedTitleColor = "#007AFF"

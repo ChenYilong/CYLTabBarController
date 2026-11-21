@@ -127,7 +127,10 @@ def band(text, width, font_size, path):
     margin = int(font_size * 0.6)
     height = margin * 2 + line_height * len(lines)
     text_file = path + '.txt'
-    with open(text_file, 'w', encoding='utf-8') as handle:
+    # [EN] newline='\n': on Windows text mode writes CRLF, and drawtext draws each \r as a line of its own, so the band
+    #      (sized for LF lines) cut off its last lines.
+    # [CN] newline='\n'：Windows 的文本模式写入 CRLF，drawtext 会把每个 \r 当作单独一行，按 LF 计算高度的说明栏会截掉最后几行。
+    with open(text_file, 'w', encoding='utf-8', newline='\n') as handle:
         handle.write('\n'.join(lines))
     run(['ffmpeg', '-v', 'error', '-y', '-f', 'lavfi', '-i', f'color=c={BACKGROUND}:s={width}x{height}:d=1',
          *ONE_FRAME, '-vf',

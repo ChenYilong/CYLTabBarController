@@ -100,7 +100,7 @@ CYLTabBar(configurationRoute: 'bundle:Configurations?name=tabbar', onTabSelect: 
 | `^file:` | `file:///…/tabbar` | 本地文件 URL。 | A local file URL. |
 | `^/` | `/var/…/tabbar` | 本地绝对路径。 | An absolute local path. |
 | `^~/` | `~/Documents/tabbar` | App 主目录（iOS 沙盒根目录；Android：App 数据目录）。 | The app's home folder (iOS: the sandbox root; Android: the app's data folder). |
-| 其他 / anything else | `Localization` | 相对于 `baseDirectory`（配置文件所在目录；Android 也可以是 `asset:<目录>`），没有时相对于 App 内置资源。 | Relative to `baseDirectory` (the configuration file's folder; on Android also `asset:<folder>`), else to the app's built-in resources. |
+| 其他 / anything else | `CYLConfigurationDemo.bundle` | 相对于 `baseDirectory`（配置文件所在目录；Android 也可以是 `asset:<目录>`），没有时相对于 App 内置资源。 | Relative to `baseDirectory` (the configuration file's folder; on Android also `asset:<folder>`), else to the app's built-in resources. |
 
 ## [CN]查询参数
 ## [EN]Query
@@ -126,7 +126,7 @@ CYLTabBar(configurationRoute: 'bundle:Configurations?name=tabbar', onTabSelect: 
 | 中文 | English |
 |:---|:---|
 | 1. 把配置文件按上面的文件名格式保存到沙盒中的一个目录，例如 `Caches/tabbar/tabbar-dark@2.1.json`。 | 1. Save the configuration files into one folder of the sandbox with the names above, e.g. `Caches/tabbar/tabbar-dark@2.1.json`. |
-| 2. 字符串表保存到同一目录下的 `Localization/{language}.lproj/{table}.strings`，配置中写 `"CYLTabBarLocalizationPath": "Localization"`。 | 2. Save the string tables into `Localization/{language}.lproj/{table}.strings` of that folder, and write `"CYLTabBarLocalizationPath": "Localization"` in the configuration. |
+| 2. 字符串表保存到同一目录下的一个 `.bundle` 中：`Tabs.bundle/{language}.lproj/{table}.strings`（AGENTS.md：本地化文件不散放为 `.lproj` 文件夹；示例为 `CYLConfigurationDemo.bundle`），配置中写 `"CYLTabBarLocalizationPath": "Tabs.bundle"`。 | 2. Save the string tables into one `.bundle` of that folder, `Tabs.bundle/{language}.lproj/{table}.strings` (AGENTS.md: localized files are never left as loose `.lproj` folders; the sample's is `CYLConfigurationDemo.bundle`), and write `"CYLTabBarLocalizationPath": "Tabs.bundle"` in the configuration. |
 | 3. 用 `sandbox:Caches/tabbar?name=tabbar&theme=dark` 创建 TabBar。新版本下载后，同一个路由会选中更高的版本，代码不用改。 | 3. Create the tab bar with `sandbox:Caches/tabbar?name=tabbar&theme=dark`. When a newer version is downloaded, the same route picks it, with no change in code. |
 
 ## [CN]流程

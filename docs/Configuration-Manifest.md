@@ -169,7 +169,7 @@ Configurations/
 │   │   └── christmas/  home@3x.png  message@3x.png  discover@3x.png  me@3x.png  plus@3x.png
 │   └── 1.0.0/<theme>/<icon>@3x.png               # 演示的节日皮肤 / the demo's holiday skins
 │                                                 # (spring-festival, christmas, halloween, …)
-└── Localization/<language>.lproj/ConfigurationDemo.strings
+└── CYLConfigurationDemo.bundle/<language>.lproj/ConfigurationDemo.strings
 ```
 
 | 中文 | English |

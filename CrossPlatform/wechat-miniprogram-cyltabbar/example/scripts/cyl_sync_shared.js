@@ -3,7 +3,7 @@
  * [EN] Copies what the example shares with the other examples from Example-Shared/Configurations into
  *      miniprogram/shared/, because a mini program cannot read files outside its own folder:
  *      - configuration.js: cyl_tabbar_configuration.json as a CommonJS module;
- *      - localization.js: the ConfigurationDemo tables of every language (Localization/<language>.lproj);
+ *      - localization.js: the ConfigurationDemo tables of every language (CYLConfigurationDemo.bundle/<language>.lproj, the configuration's CYLTabBarLocalizationPath);
  *      - skins/2.1.0/<theme>/*.png: the skin images of the manifest (Manifests/cyl_tabbar_manifest.json);
  *      - demo_list.js: the demo list of the Objective-C example (Example-Shared/DemoList/demo-list.json, shared with the
  *        React Native and Flutter examples) with its translations in the example's languages, made by
@@ -15,7 +15,7 @@
  * [CN] 把示例与其他示例共用的内容从 Example-Shared/Configurations 复制到 miniprogram/shared/，因为小程序无法读取自身
  *      目录以外的文件：
  *      - configuration.js：cyl_tabbar_configuration.json 转为 CommonJS 模块；
- *      - localization.js：所有语言的 ConfigurationDemo 表（Localization/<语言>.lproj）；
+ *      - localization.js：所有语言的 ConfigurationDemo 表（CYLConfigurationDemo.bundle/<语言>.lproj，即配置的 CYLTabBarLocalizationPath）；
  *      - skins/2.1.0/<皮肤>/*.png：清单（Manifests/cyl_tabbar_manifest.json）中的皮肤图片；
  *      - demo_list.js：Objective-C 示例的演示列表（Example-Shared/DemoList/demo-list.json，与 React Native、Flutter 示例
  *        共用），以及示例各语言的翻译，由 scripts/sync-example-shared.py 根据库的字符串表生成；不含图标（5.4 MB）；
@@ -334,8 +334,8 @@ function cylGeneratedFiles() {
 
   const localization = {};
   const tableName = configuration.CYLTabBarControllerLocalization.CYLTabBarLocalizationTableName;
-  fs.readdirSync(path.join(CYL_SOURCE, 'Localization')).sort().forEach((folder) => {
-    const file = path.join(CYL_SOURCE, 'Localization', folder, `${tableName}.strings`);
+  fs.readdirSync(path.join(CYL_SOURCE, configuration.CYLTabBarControllerLocalization.CYLTabBarLocalizationPath)).sort().forEach((folder) => {
+    const file = path.join(CYL_SOURCE, configuration.CYLTabBarControllerLocalization.CYLTabBarLocalizationPath, folder, `${tableName}.strings`);
     if (folder.endsWith('.lproj') && fs.existsSync(file)) {
       localization[folder.replace(/\.lproj$/, '')] = cylReadStrings(file);
     }

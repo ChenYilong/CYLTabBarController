@@ -238,7 +238,7 @@
   },
   "localization": {
     "tableName": "ConfigurationDemo",
-    "route": "../Localization"
+    "route": "../CYLConfigurationDemo.bundle"
   },
   "conditions": [
     {

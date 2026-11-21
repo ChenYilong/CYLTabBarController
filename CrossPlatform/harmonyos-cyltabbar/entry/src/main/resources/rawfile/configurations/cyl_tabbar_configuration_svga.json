@@ -2,7 +2,7 @@
   "CYLTabBarControllerContext": "CYLSVGAConfigurationDemo",
   "CYLTabBarControllerLocalization": {
     "CYLTabBarLocalizationTableName": "ConfigurationDemo",
-    "CYLTabBarLocalizationPath": "Localization"
+    "CYLTabBarLocalizationPath": "CYLConfigurationDemo.bundle"
   },
   "CYLTabBarControllerTabBarItemsAttributes": [
     {

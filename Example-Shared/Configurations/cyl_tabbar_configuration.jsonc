@@ -2,8 +2,8 @@
   // JSONC: JSON with comments (VS Code style) and trailing commas.
   // JSONC：带注释（VS Code 风格）与尾逗号的 JSON。
   "CYLTabBarControllerContext": "CYLConfigurationDemo",
-  // Tab titles from Localization/<language>.lproj/ConfigurationDemo.strings, next to this file.
-  "CYLTabBarControllerLocalization": { "CYLTabBarLocalizationTableName": "ConfigurationDemo", "CYLTabBarLocalizationPath": "Localization" },
+  // Tab titles from CYLConfigurationDemo.bundle/<language>.lproj/ConfigurationDemo.strings, next to this file.
+  "CYLTabBarControllerLocalization": { "CYLTabBarLocalizationTableName": "ConfigurationDemo", "CYLTabBarLocalizationPath": "CYLConfigurationDemo.bundle" },
   "CYLTabBarControllerThemeManagerName": "CYLConfigurationDemo",
   "CYLTabBarControllerThemeIdentifier": "light",
   "CYLTabBarControllerDarkThemeIdentifier": "dark",

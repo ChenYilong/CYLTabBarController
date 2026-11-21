@@ -38,7 +38,7 @@ CYLTabBarControllerStyleType: "default"
 CYLTabBarControllerContext: "CYLConfigurationDemo"
 CYLTabBarControllerLocalization {
   CYLTabBarLocalizationTableName: "ConfigurationDemo"
-  CYLTabBarLocalizationPath: "Localization"
+  CYLTabBarLocalizationPath: "CYLConfigurationDemo.bundle"
 }
 CYLTabBarControllerThemeManagerName: "CYLConfigurationDemo"
 CYLTabBarControllerThemeIdentifier: "light"

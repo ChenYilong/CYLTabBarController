@@ -1,7 +1,7 @@
 /* OpenStep (old-style) property list. OpenStep（旧式）属性列表。 */
 {
     CYLTabBarControllerContext = CYLConfigurationDemo;
-    CYLTabBarControllerLocalization = { CYLTabBarLocalizationTableName = ConfigurationDemo; CYLTabBarLocalizationPath = Localization; };
+    CYLTabBarControllerLocalization = { CYLTabBarLocalizationTableName = ConfigurationDemo; CYLTabBarLocalizationPath = CYLConfigurationDemo.bundle; };
     CYLTabBarControllerThemeManagerName = CYLConfigurationDemo;
     CYLTabBarControllerThemeIdentifier = light;
     CYLTabBarControllerDarkThemeIdentifier = dark;

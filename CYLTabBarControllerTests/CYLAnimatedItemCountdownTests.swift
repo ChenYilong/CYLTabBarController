@@ -76,7 +76,7 @@ final class CYLAnimatedItemCountdownTests: XCTestCase {
         item.countdownRunningTitleFormat = "%ld s left"
         item.countdownFinishedTitle = "Resend"
         item.delegate = delegate
-        item.style = .countdown
+        item.itemStyle = .countdown
         return item
     }
 
@@ -303,13 +303,13 @@ final class CYLAnimatedItemCountdownTests: XCTestCase {
     func testPlainStyleHasNoCountdownLook() {
         let item = CYLAnimatedItemView(frame: CGRect(x: 0, y: 0, width: 200, height: 44))
         item.title = "Home"
-        XCTAssertEqual(item.style, .plain)
+        XCTAssertEqual(item.itemStyle, .plain)
         XCTAssertEqual(item.layer.borderWidth, 0)
         item.refreshCountdown()
         XCTAssertEqual(item.title, "Home", "not touched without the style")
-        item.style = .countdown
+        item.itemStyle = .countdown
         XCTAssertGreaterThan(item.layer.borderWidth, 0)
-        item.style = .plain
+        item.itemStyle = .plain
         XCTAssertEqual(item.layer.borderWidth, 0)
     }
 }

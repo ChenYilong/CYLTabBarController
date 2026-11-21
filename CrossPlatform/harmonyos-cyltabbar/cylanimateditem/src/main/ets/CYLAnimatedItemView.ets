@@ -346,11 +346,11 @@ export struct CYLAnimatedItemView {
   @Prop accessoryPlacement: CYLAnimatedItemAccessoryPlacement = CYLAnimatedItemAccessoryPlacement.Trailing;
   @Prop isDragEnabled: boolean = false;
   /**
-   * [EN] The look: plain (default) or a countdown button (iOS `style`). Set the `countdown…` props, then call
+   * [EN] The look: plain (default) or a countdown button (iOS `itemStyle`). Set the `countdown…` props, then call
    *      `controller.startCountdown()` (or set `startsCountdownOnTap`). The end is a time read from the local clock, so the
    *      seconds in the background count (FIX: issue #1 of SMSCodeButton); a clock past the longest duration, or set back to
    *      before the start, closes it; `countdownCacheKey` keeps it across a restart. While it runs the item is disabled.
-   * [CN] 样式：普通（默认）或倒计时按钮（对应 iOS 的 `style`）。设置 `countdown…` prop 后调用 `controller.startCountdown()`
+   * [CN] 样式：普通（默认）或倒计时按钮（对应 iOS 的 `itemStyle`）。设置 `countdown…` prop 后调用 `controller.startCountdown()`
    *      （或设置 `startsCountdownOnTap`）。结束是从本地时钟读取的时间点，因此后台的秒数计入（修复 SMSCodeButton 的 issue #1）；时钟超过最长时长
    *      或被调回到开始之前时关闭；`countdownCacheKey` 使其在重启后继续。倒计时中条目不可用。
    */

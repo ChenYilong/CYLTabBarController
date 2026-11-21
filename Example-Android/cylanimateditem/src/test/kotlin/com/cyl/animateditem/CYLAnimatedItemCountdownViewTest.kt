@@ -51,7 +51,7 @@ class CYLAnimatedItemCountdownViewTest {
             countdownRunningTitleFormat = "%d s left"
             countdownFinishedTitle = "Resend"
             gestureListener = recorder
-            style = CYLAnimatedItemStyle.Countdown
+            itemStyle = CYLAnimatedItemStyle.Countdown
         }
     }
 
@@ -147,6 +147,6 @@ class CYLAnimatedItemCountdownViewTest {
         view.title = "Home"
         view.refreshCountdown()
         assertEquals("Home", view.title)
-        assertEquals(CYLAnimatedItemStyle.Plain, view.style)
+        assertEquals(CYLAnimatedItemStyle.Plain, view.itemStyle)
     }
 }

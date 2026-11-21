@@ -103,7 +103,7 @@ enum CYLConfigurationDemo {
             "tabbar@2.0.json": "cyl_tabbar_configuration.json",
             "tabbar-dark@1.0.json": "cyl_tabbar_configuration.json",
             "tabbar-dark@2.0.yaml": "cyl_tabbar_configuration.yaml",
-            "Localization": "Localization",
+            "CYLConfigurationDemo.bundle": "CYLConfigurationDemo.bundle",
         ]
         for (name, source) in copies {
             try? manager.copyItem(atPath: (samples as NSString).appendingPathComponent(source), toPath: (folder as NSString).appendingPathComponent(name))

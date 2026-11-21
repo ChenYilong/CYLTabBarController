@@ -86,7 +86,7 @@ interface CYLAnimatedItemCountdownListener {
 
 /**
  * [EN] The countdown of `CYLAnimatedItemView` (`CYLAnimatedItemStyle.Countdown`), the Android counterpart of iOS
- *      `CYLAnimatedItemView.style = .countdown`: the "Get code" button of an SMS login. A state machine without any Android
+ *      `CYLAnimatedItemView.itemStyle = .countdown`: the "Get code" button of an SMS login. A state machine without any Android
  *      class (the clock and the storage are given), so it is tested on the JVM. The same rules as on the other platforms:
  *      - the end is a time, not a counter: the seconds spent in the background count, because the time left is read from the
  *        local clock on every tick and when the window is shown again (FIX: issue #1 of SMSCodeButton);
@@ -95,7 +95,7 @@ interface CYLAnimatedItemCountdownListener {
  *        the state is `Finished` and a new countdown can start;
  *      - with a cache key the running countdown is kept in the storage, so a new item with the same key takes it up again
  *        after the process was ended in the background (no start callback).
- * [CN] `CYLAnimatedItemView` 的倒计时（`CYLAnimatedItemStyle.Countdown`），对应 iOS 的 `CYLAnimatedItemView.style = .countdown`：短信登录的
+ * [CN] `CYLAnimatedItemView` 的倒计时（`CYLAnimatedItemStyle.Countdown`），对应 iOS 的 `CYLAnimatedItemView.itemStyle = .countdown`：短信登录的
  *      「获取验证码」按钮。不使用任何 Android 类的状态机（时钟与存储由外部传入），因此可以在 JVM 上测试。规则与其他平台相同：
  *      - 结束是一个时间点，而不是计数器：后台度过的秒数计入，因为每次 tick 与窗口再次显示时都从本地时钟读取剩余时间（修复 SMSCodeButton 的 issue #1）；
  *      - 记录开始时间、结束时间与最长时长；本地时钟超过结束时间，或被调回到开始之前（剩余时间超过最长时长，允许 1 秒误差）时关闭倒计时：
