@@ -211,6 +211,39 @@ function cylGIFResult(width, height, duration, frame) {
 }
 
 /**
+ * [EN] Reads one Graphic Control Extension (block 0x21, offset just past it): a label 0xF9 updates `state.delay` and
+ *      `state.transparent`, any other label leaves them as they are; either way its sub-blocks are skipped.
+ * [CN] 读取一个图形控制扩展（0x21 块，offset 为其后一个字节）：标签为 0xF9 时更新 `state.delay` 与 `state.transparent`，
+ *      其他标签不改变它们；两种情况都跳过其子块。
+ */
+function cylGIFReadExtensionBlock(bytes, offset, state) {
+  const label = bytes[offset++]
+  const control = label === 0xF9 ? cylReadGraphicControl(bytes, offset) : null
+  if (control) {
+    state.delay = control.delay
+    state.transparent = control.transparent
+  }
+  return cylSkipSubBlocks(bytes, offset)
+}
+
+/**
+ * [EN] Reads one image block (0x2C, offset just past it), adding its delay to `state.duration` and rendering it into
+ *      `state.frame` the first time a frame with a color table is found.
+ * [CN] 读取一个图像块（0x2C，offset 为其后一个字节），把其延时计入 `state.duration`，并在首次遇到带色表的帧时把它渲染进
+ *      `state.frame`。
+ */
+function cylGIFReadImageBlock(bytes, offset, header, state) {
+  const image = cylReadGIFImage(bytes, offset, header.globalTable)
+  state.duration += state.delay > 0 ? state.delay : 100
+  if (!state.frame && image.table) {
+    state.frame = cylRenderGIFFrame(image, header.width, header.height, state.transparent)
+  }
+  state.delay = 0
+  state.transparent = -1
+  return image.offset
+}
+
+/**
  * [EN] The logical width and height, the play time (ms) and the first frame (RGBA, width * height * 4) of a GIF.
  * [CN] GIF 的逻辑宽高、播放时长（毫秒）与第一帧（RGBA，width * height * 4）。
  */
@@ -218,31 +251,19 @@ function cylGIFImageInfo(input) {
   const bytes = cylGIFBytes(input)
   const header = cylReadGIFHeader(bytes)
   if (!header) return null
-  const { width, height } = header
+  const state = { duration: 0, delay: 0, transparent: -1, frame: null }
   let offset = header.offset
-  let duration = 0
-  let delay = 0
-  let transparent = -1
-  let frame = null
   while (offset < bytes.length) {
     const block = bytes[offset++]
     if (block === 0x3B) break
     if (block === 0x21) {
-      const label = bytes[offset++]
-      const control = label === 0xF9 ? cylReadGraphicControl(bytes, offset) : null
-      if (control) ({ delay, transparent } = control)
-      offset = cylSkipSubBlocks(bytes, offset)
+      offset = cylGIFReadExtensionBlock(bytes, offset, state)
       continue
     }
-    if (block !== 0x2C) return cylGIFResult(width, height, duration, frame)
-    const image = cylReadGIFImage(bytes, offset, header.globalTable)
-    offset = image.offset
-    duration += delay > 0 ? delay : 100
-    if (!frame && image.table) frame = cylRenderGIFFrame(image, width, height, transparent)
-    delay = 0
-    transparent = -1
+    if (block !== 0x2C) break
+    offset = cylGIFReadImageBlock(bytes, offset, header, state)
   }
-  return cylGIFResult(width, height, duration, frame)
+  return cylGIFResult(header.width, header.height, state.duration, state.frame)
 }
 
 module.exports = { cylIsGIFImagePath, cylGIFImageInfo }

@@ -158,22 +158,98 @@ open class CYLTabBarHostView: UIView {
      */
     @objc open var configuration: [String: Any]? {
         didSet {
-            generation += 1
-            pendingConfiguration = nil
-            guard let source = configuration else {
-                removeTabBarController()
-                return
+            appConfiguration = configuration
+            reloadConfiguration()
+        }
+    }
+
+    /**
+     * [EN] The URL of a tab bar manifest to download (docs/Configuration-Manifest.md); setting it downloads the manifest and
+     *      applies its configuration under the app's own configuration, which wins.
+     * [CN] 要下载的 TabBar 配置清单的 URL（docs/Configuration-Manifest.md）；设置后下载清单，并把它的配置放在 App 自己的配置
+     *      之下，App 的配置优先。
+     */
+    @objc open var manifestURL: String? {
+        didSet { loadManifest() }
+    }
+
+    /**
+     * [EN] The route of the manifest shipped with the app, used when the download fails (else the manifest's own
+     *      `fallback.embeddedRoute`).
+     * [CN] 随 App 发布的清单的路由，下载失败时使用（否则使用清单自身的 `fallback.embeddedRoute`）。
+     */
+    @objc open var embeddedManifestRoute: String?
+
+    /**
+     * [EN] The source of the manifest that was applied: "remote", "cache" or "embedded".
+     * [CN] 已应用的清单的来源："remote"、"cache" 或 "embedded"。
+     */
+    @objc open var didApplyManifest: ((String) -> Void)?
+
+    /**
+     * [EN] The message of the failure that made the loader fall back to another source.
+     * [CN] 导致加载器回退到其他来源的失败原因。
+     */
+    @objc open var didFailManifest: ((String) -> Void)?
+
+    /**
+     * [EN] Builds the tab bar again from the effective configuration (the manifest's first, the app's over it).
+     * [CN] 由生效的配置（先取清单的配置，再由 App 的配置覆盖）重新创建 TabBar。
+     */
+    private func reloadConfiguration() {
+        generation += 1
+        pendingConfiguration = nil
+        guard let source = effectiveConfiguration() else {
+            removeTabBarController()
+            return
+        }
+        let generation = generation
+        let resolver = imageResolver
+        // [EN] Image loads can be slow (a dev server, a big file): never on the main queue. [CN] 图片加载可能较慢（开发服务器、大文件）：不在主队列进行。
+        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+            let resolved = CYLTabBarHostView.configuration(withImagesOf: source, resolver: resolver)
+            DispatchQueue.main.async {
+                guard let self, generation == self.generation else { return }
+                self.pendingConfiguration = resolved
+                self.buildTabBarControllerIfReady()
             }
-            let generation = generation
-            let resolver = imageResolver
-            // [EN] Image loads can be slow (a dev server, a big file): never on the main queue. [CN] 图片加载可能较慢（开发服务器、大文件）：不在主队列进行。
-            DispatchQueue.global(qos: .userInitiated).async { [weak self] in
-                let resolved = CYLTabBarHostView.configuration(withImagesOf: source, resolver: resolver)
-                DispatchQueue.main.async {
-                    guard let self, generation == self.generation else { return }
-                    self.pendingConfiguration = resolved
-                    self.buildTabBarControllerIfReady()
-                }
+        }
+    }
+
+    /**
+     * [EN] The manifest's configuration first, the app's own configuration over it, as the `CYLTabBarControllerManifestRoute`
+     *      key does.
+     * [CN] 先取清单的配置，再由 App 自己的配置覆盖，与 `CYLTabBarControllerManifestRoute` 键相同。
+     */
+    private func effectiveConfiguration() -> [String: Any]? {
+        guard let app = appConfiguration else { return manifestConfiguration }
+        guard let manifest = manifestConfiguration else { return app }
+        return manifest.merging(app) { $1 }
+    }
+
+    /**
+     * [EN] Downloads the manifest at `manifestURL` and applies its configuration; a failure falls back to the cached or the
+     *      embedded manifest, as `CYLTabBarManifestLoader` does.
+     * [CN] 下载 `manifestURL` 处的清单并应用它的配置；失败时按 `CYLTabBarManifestLoader` 的规则回退到缓存或内置清单。
+     */
+    private func loadManifest() {
+        guard let text = manifestURL, !text.isEmpty, let url = URL(string: text) else { return }
+        let loader = CYLTabBarManifestLoader()
+        loader.embeddedManifestRoute = embeddedManifestRoute
+        loader.loadManifest(with: url) { [weak self] manifest, source, error in
+            guard let self else { return }
+            if let error {
+                self.didFailManifest?(error.localizedDescription)
+            }
+            if let manifest {
+                self.manifestConfiguration = manifest.configuration()
+                self.reloadConfiguration()
+            }
+            switch source {
+            case .remote: self.didApplyManifest?("remote")
+            case .cache: self.didApplyManifest?("cache")
+            case .embedded: self.didApplyManifest?("embedded")
+            case .none: break
             }
         }
     }
@@ -382,6 +458,10 @@ open class CYLTabBarHostView: UIView {
     private var generation = 0
     /// [EN] The configuration with its images loaded, waiting for a window and a width. [CN] 已加载图片、等待 window 与宽度的配置。
     private var pendingConfiguration: [String: Any]?
+    /// [EN] The app's own configuration; the manifest's configuration is under it. [CN] App 自己的配置；清单的配置在它之下。
+    private var appConfiguration: [String: Any]?
+    /// [EN] The configuration of the manifest that was downloaded. [CN] 已下载清单的配置。
+    private var manifestConfiguration: [String: Any]?
     /// [EN] `tabCoverImages` loaded (UIImage or NSNull), and the tab buttons now covered. [CN] 已加载的 `tabCoverImages`（UIImage 或 NSNull），以及当前被覆盖的 Tab 按钮。
     private var loadedTabCoverImages: [Any]?
     private var coveredTabButtons: [(button: UIControl, cover: UIView, selectedCover: UIView)] = []

@@ -55,6 +55,8 @@ internal class CYLFlutterTabBarView(
       channel.invokeMethod("onLoginRequest", mapOf("index" to index, "identifier" to identifier, "title" to title))
     }
     hostView.loginStateDidChange = { loggedIn -> channel.invokeMethod("onLoginStateChange", loggedIn) }
+    hostView.didApplyManifest = { source -> channel.invokeMethod("onManifestApply", source) }
+    hostView.didFailManifest = { message -> channel.invokeMethod("onManifestFail", message) }
     applyLoggedIn(arguments["loggedIn"])
     // [EN] Before the configuration, so it is built once, in this language. [CN] 在配置之前，使 TabBar 以该语言只创建一次。
     hostView.language = (arguments["language"] as? String)?.takeIf { it.isNotEmpty() }
@@ -70,6 +72,9 @@ internal class CYLFlutterTabBarView(
     hostView.plusButtonBadgeAttributes = badgeStyle(arguments["plusButtonBadge"])
     hostView.tabCoverImages = (arguments["tabCoverImages"] as? List<*>).orEmpty()
     hostView.setConfigurationJSON(arguments["configuration"] as? String)
+    // [EN] The manifest to download, after the configuration: the manifest's keys are under the app's own ones.
+    // [CN] 要下载的清单，在配置之后：清单的键位于 App 自己的键之下。
+    (arguments["manifestURL"] as? String)?.takeIf { it.isNotEmpty() }?.let { hostView.manifestURL = it }
   }
 
   override fun getView(): View = hostView
@@ -97,6 +102,7 @@ internal class CYLFlutterTabBarView(
       "setTitlePositionAdjustment" -> hostView.titlePositionAdjustment = titleOffset(call.arguments)
       "simulateMemoryWarning" -> return result.success(hostView.simulateMemoryWarning())
       "setLanguage" -> hostView.language = (call.arguments as? String)?.takeIf { it.isNotEmpty() }
+      "setManifestURL" -> (call.arguments as? String)?.takeIf { it.isNotEmpty() }?.let { hostView.manifestURL = it }
       else -> return result.notImplemented()
     }
     result.success(null)

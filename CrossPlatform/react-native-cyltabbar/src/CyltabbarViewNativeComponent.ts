@@ -32,6 +32,14 @@ type TabBarLayoutEvent = Readonly<{
   height: CodegenTypes.Double;
 }>;
 
+type ManifestApplyEvent = Readonly<{
+  source: string;
+}>;
+
+type ManifestFailEvent = Readonly<{
+  message: string;
+}>;
+
 export interface NativeProps extends ViewProps {
   /**
    * The configuration of CYLTabBarController, as JSON (docs/Configuration-File.md).
@@ -97,6 +105,19 @@ export interface NativeProps extends ViewProps {
    * The title offset of every tab, [horizontal, vertical], set at runtime; empty keeps the configuration's.
    */
   titlePositionAdjustment?: ReadonlyArray<CodegenTypes.Double>;
+  /**
+   * The URL of a tab bar manifest to download (docs/Configuration-Manifest.md); its configuration is applied under the
+   * configuration above, and the other props and `configuration` win over it.
+   */
+  manifestURL?: string;
+  /**
+   * The manifest was applied; the source is "remote", "cache" or "embedded".
+   */
+  onManifestApply?: CodegenTypes.DirectEventHandler<ManifestApplyEvent>;
+  /**
+   * The manifest could not be downloaded; the message says why, and another source was used if there was one.
+   */
+  onManifestFail?: CodegenTypes.DirectEventHandler<ManifestFailEvent>;
   onTabLongPress?: CodegenTypes.DirectEventHandler<TabLongPressEvent>;
   /**
    * A tab that needs login was tapped while logged out; it is not selected.

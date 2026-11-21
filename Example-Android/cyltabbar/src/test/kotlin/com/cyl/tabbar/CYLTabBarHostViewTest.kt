@@ -18,6 +18,8 @@ import org.robolectric.Robolectric
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.Shadows.shadowOf
 import org.robolectric.annotation.Config
+import org.json.JSONObject
+import java.io.File
 
 /**
  * [EN] `CYLTabBarHostView` (the view the React Native and Flutter components wrap) and `CYLTabBarControllerPlusButton`, on
@@ -49,6 +51,19 @@ class CYLTabBarHostViewTest {
             Thread.sleep(20)
         }
         throw AssertionError("the tab bar controller was not built")
+    }
+
+    /**
+     * [EN] Waits for a condition on the main thread; the manifest is downloaded on a background thread, which Robolectric
+     *      starts slowly. [CN] 在主线程等待一个条件；清单在后台线程下载，Robolectric 启动该线程较慢。
+     */
+    private fun waitUntil(condition: () -> Boolean) {
+        val deadline = System.currentTimeMillis() + 30_000
+        while (System.currentTimeMillis() < deadline) {
+            shadowOf(Looper.getMainLooper()).idle()
+            if (condition()) return
+            Thread.sleep(20)
+        }
     }
 
     private fun items(vararg titles: String, identifiers: Boolean = true) = titles.map {
@@ -449,8 +464,7 @@ class CYLTabBarHostViewTest {
     }
 
     @Test
-    fun plusBadgeSitsOnTheVisibleImage() = withActivity { activity ->
-        // [EN] A 40 x 40 image whose visible part is 10..30: 10 px of transparent margin on each side.
+    fun plusBadgeSitsOnTheVisibleImage() = withActivity { activity ->        // [EN] A 40 x 40 image whose visible part is 10..30: 10 px of transparent margin on each side.
         // [CN] 40 x 40 的图片，可见部分为 10..30：四周各有 10 像素透明边距。
         val bitmap = Bitmap.createBitmap(40, 40, Bitmap.Config.ARGB_8888)
         for (y in 10 until 30) for (x in 10 until 30) bitmap.setPixel(x, y, android.graphics.Color.BLUE)
@@ -519,5 +533,55 @@ class CYLTabBarHostViewTest {
         touch(android.view.MotionEvent.ACTION_UP, x, y)
         shadowOf(Looper.getMainLooper()).idle()
         assertEquals(1, taps)
+    }
+
+    /**
+     * [EN] The manifest at `manifestURL` is downloaded and its configuration is applied under the app's own one, which wins.
+     * [CN] `manifestURL` 处的清单会被下载，它的配置位于 App 自己的配置之下，App 的配置优先。
+     */
+    @Test
+    fun theManifestIsDownloadedAndItsConfigurationIsAppliedUnderTheAppsOwn() = withActivity { activity ->
+        val host = hostView(activity)
+        val file = File(activity.filesDir, "cyl-host-manifest.json")
+        file.writeText(JSONObject(linkedMapOf<String, Any?>(
+            "schemaVersion" to 1,
+            "id" to "host-manifest",
+            "version" to "1.0.0",
+            "runtime" to mapOf("platforms" to listOf("android")),
+            "tabBar" to mapOf("list" to listOf(
+                mapOf("key" to "home", "text" to "Home", "pagePath" to "home"),
+                mapOf("key" to "me", "text" to "Me", "pagePath" to "me"))),
+        )).toString())
+        var source: String? = null
+        var failure: String? = null
+        host.didApplyManifest = { source = it }
+        host.didFailManifest = { failure = it }
+        // [EN] The app's own configuration wins over the manifest's. [CN] App 自己的配置优先于清单的。
+        host.configuration = mapOf(CYLConstants.CYLTabBarControllerStyleType to "default")
+        host.manifestURL = file.toURI().toString()
+        waitUntil { source != null || failure != null }
+        assertNull("the manifest failed: $failure", failure)
+        assertEquals("remote", source)
+        val controller = waitForController(host)
+        assertEquals(2, controller.tabBarItems.size)
+        assertEquals("Home", controller.tabBarItems[0].title)
+        assertEquals("Me", controller.tabBarItems[1].title)
+    }
+
+    /**
+     * [EN] A manifest that cannot be downloaded is reported; the tab bar keeps the app's own configuration.
+     * [CN] 无法下载的清单会被报告；TabBar 保留 App 自己的配置。
+     */
+    @Test
+    fun aManifestThatCannotBeDownloadedIsReported() = withActivity { activity ->
+        val host = hostView(activity)
+        var failure: String? = null
+        host.didFailManifest = { failure = it }
+        host.configuration = mapOf(CYLConstants.CYLTabBarControllerTabBarItemsAttributes to items("A", "B"))
+        host.manifestURL = File(activity.filesDir, "does-not-exist.json").toURI().toString()
+        waitUntil { failure != null }
+        assertNotNull(failure)
+        val controller = waitForController(host)
+        assertEquals(2, controller.tabBarItems.size)
     }
 }

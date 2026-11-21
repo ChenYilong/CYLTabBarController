@@ -136,7 +136,7 @@ class CYLConfigurationThemesTest {
         val expected = CYLConfigurationThemes.themes(CYLTabBarConfigurationParser.dictionaryWithContentsOfFile(java.io.File(folder, "cyl_tabbar_configuration.json").path)[CYLConstants.CYLTabBarControllerThemes])
         assertEquals(setOf("light", "dark"), expected?.keys)
         // [EN] Every sample file, binary Protobuf and plist included. [CN] 每个示例文件，包括二进制 Protobuf 与 plist。
-        val files = folder.listFiles().orEmpty().filter { it.isFile && it.name.startsWith("cyl_tabbar_configuration") && it.extension != "proto" }
+        val files = folder?.listFiles().orEmpty().filter { it.isFile && it.name.startsWith("cyl_tabbar_configuration") && it.extension != "proto" }
         assertEquals(17, files.size)
         for (file in files) {
             val parsed = CYLTabBarConfigurationParser.dictionaryWithContentsOfFile(file.path)

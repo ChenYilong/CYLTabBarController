@@ -166,6 +166,20 @@ export type CYLTabBarProps = ViewProps & {
    */
   manifestRoute?: string;
   /**
+   * The URL of a tab bar manifest to download (docs/Configuration-Manifest.md); the manifest is downloaded, and its
+   * configuration is applied under the configuration of the other props, which win over it. A failed download falls back to
+   * the cached or the embedded manifest, and `onManifestFail` says why.
+   */
+  manifestURL?: string;
+  /**
+   * The manifest was applied; the source is "remote", "cache" or "embedded".
+   */
+  onManifestApply?: (source: string) => void;
+  /**
+   * The manifest could not be downloaded; the message says why, and another source was used if there was one.
+   */
+  onManifestFail?: (message: string) => void;
+  /**
    * Any other key of the configuration file (docs/Configuration-File.md); it wins over the props above.
    */
   configuration?: Record<string, unknown>;
@@ -411,6 +425,9 @@ export function CYLTabBar(props: CYLTabBarProps) {
     playAllRequest,
     onMemoryWarning,
     titlePositionAdjustment,
+    manifestURL,
+    onManifestApply,
+    onManifestFail,
     selectedIndex,
     badgeValues,
     plusButtonBadgeValue,
@@ -447,6 +464,9 @@ export function CYLTabBar(props: CYLTabBarProps) {
       playbackLoops={playbackLoops ?? false}
       playAllRequest={playAllRequest ?? 0}
       titlePositionAdjustment={titlePositionAdjustment ?? []}
+      manifestURL={manifestURL ?? ''}
+      onManifestApply={(event) => onManifestApply?.(event.nativeEvent.source)}
+      onManifestFail={(event) => onManifestFail?.(event.nativeEvent.message)}
       onMemoryWarning={(event) => onMemoryWarning?.(event.nativeEvent.report)}
       onLoginStateChange={(event) => onLoginStateChange?.(event.nativeEvent.loggedIn)}
       onLoginRequest={(event) =>

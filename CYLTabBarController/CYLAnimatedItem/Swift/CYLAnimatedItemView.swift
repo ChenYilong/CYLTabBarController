@@ -733,7 +733,14 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
         // [CN] 静态的选中图标搭配动图 `image` 时播放 `image` 的帧，与经典 TabBar 相同。
         let iconIsAnimated = (icon?.images?.count ?? 0) > 1
         let imageIsAnimated = (image?.images?.count ?? 0) > 1
-        let source = iconIsAnimated ? icon : (imageIsAnimated ? image : nil)
+        let source: UIImage?
+        if iconIsAnimated {
+            source = icon
+        } else if imageIsAnimated {
+            source = image
+        } else {
+            source = nil
+        }
         if let animated = source, let shown = icon {
             restingAnimatedImage = animated
             if !imageView.isAnimating {

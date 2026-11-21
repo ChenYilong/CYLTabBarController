@@ -40,9 +40,16 @@ def method_declarations(block):
     """[EN] (kind, +/-, selector) of the methods of one block. [CN] 一个块中各方法的（种类、+/-、selector）。"""
     found = []
     for match in METHOD.finditer(block):
-        # [EN] Spaces normalized with split / join and `str.replace`: no backtracking patterns (python:S8786). [CN] 用 split / join 与 `str.replace` 规范空白：不使用会回溯的正则。
+        # [EN] Spaces normalized with split / join and `str.replace`; the selector pieces are the last word before each
+        #      colon, found with `str.split(':')` rather than a regex, so nothing here can backtrack (python:S8786).
+        # [CN] 用 split / join 与 `str.replace` 规范空白；selector 的每一段是每个冒号前的最后一个单词，用 `str.split(':')` 取得，
+        #      而不是正则，因此这里不存在任何会回溯的写法（python:S8786）。
         signature = ' '.join(match.group(3).split()).replace(' :', ':')
-        parts = re.findall(r'(\w+):', signature)
+        parts = []
+        for piece in signature.split(':')[:-1]:
+            words = piece.split()
+            if words:
+                parts.append(words[-1])
         selector = ''.join(part + ':' for part in parts) if parts else signature.split()[0]
         found.append(('method', match.group(1), selector))
     return found

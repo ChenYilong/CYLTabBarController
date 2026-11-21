@@ -204,7 +204,7 @@ flowchart TD
 
 | 中文 | English |
 |:---|:---|
-| React Native 与 Flutter：`manifestRoute`（写入 `CYLTabBarControllerManifestRoute`）读取内置或沙盒中的清单；PlusButton 点击沿用 `onPlusButtonTap`。下载与回退回调尚未提供给 JavaScript / Dart（见 TODO）。 | React Native and Flutter: `manifestRoute` (it writes `CYLTabBarControllerManifestRoute`) reads a built-in or sandbox manifest; plus button taps keep `onPlusButtonTap`. The download and fallback callbacks are not given to JavaScript / Dart yet (see TODO). |
+| React Native 与 Flutter：`manifestRoute`（写入 `CYLTabBarControllerManifestRoute`）读取内置或沙盒中的清单；`manifestURL` 下载清单（http、https 或 file），其配置位于 App 自己的配置之下；`onManifestApply` 报告来源（remote / cache / embedded），`onManifestFail` 报告失败原因。PlusButton 点击沿用 `onPlusButtonTap`。 | React Native and Flutter: `manifestRoute` (it writes `CYLTabBarControllerManifestRoute`) reads a built-in or sandbox manifest; `manifestURL` downloads a manifest (http, https or file) and applies its configuration under the app's own one; `onManifestApply` reports the source (remote / cache / embedded) and `onManifestFail` the reason of a failure. Plus button taps keep `onPlusButtonTap`. |
 
 ## [CN]映射到本库的配置键
 ## [EN]Mapping onto this library's keys
@@ -255,6 +255,24 @@ CYLTabBarManifestLoader(context).apply { embeddedManifestRoute = "bundle:Manifes
 CYLTabBar(manifestRoute: 'bundle:Configurations/Manifests/cyl_tabbar_manifest.json')
 ```
 
+[EN] The manifest can also be downloaded. The host view downloads it, applies its configuration under the app's own one
+(which wins), and reports the source or the failure:
+[CN] 清单也可以下载。宿主视图下载它，把它的配置放在 App 自己的配置之下（App 的配置优先），并报告来源或失败原因：
+
+```tsx
+<CYLTabBar manifestURL="https://example.com/tabbar-manifest.json"
+  onManifestApply={(source) => console.log(source)} // "remote", "cache" or "embedded"
+  onManifestFail={(message) => console.warn(message)} />
+```
+
+```dart
+CYLTabBar(
+  manifestURL: 'https://example.com/tabbar-manifest.json',
+  onManifestApply: (source) => print(source), // "remote", "cache" or "embedded"
+  onManifestFail: (message) => print(message),
+)
+```
+
 | 中文 | English |
 |:---|:---|
 | ObjC Example：设置列表中“从配置文件创建 TabBarController”的操作表新增 4 项：`Manifest · light`、`Manifest · christmas`（内置清单与主题）、`download into sandbox:Caches`（模拟服务器目录 → 下载、校验、缓存）、`download with a bad asset → fallback`（哈希错误 → 回退到缓存或内置清单，并显示原因）。用启动参数 `-CYLDemoManifestTheme light\|dark\|christmas` 启动时，整个根 TabBar 由清单创建，页面 ID 打开示例自己的页面（`CYLMainRootViewController`）。 | ObjC Example: the action sheet of "Create a TabBarController from a configuration file" gains 4 items: `Manifest · light`, `Manifest · christmas` (the built-in manifest and a theme), `download into sandbox:Caches` (a simulated server folder → download, check, cache), `download with a bad asset → fallback` (a wrong hash → back to the cached or built-in manifest, with the reason). Launched with `-CYLDemoManifestTheme light\|dark\|christmas`, the whole root tab bar comes from the manifest, its page IDs opening the example's own pages (`CYLMainRootViewController`). |
@@ -289,10 +307,11 @@ CYLTabBar(manifestRoute: 'bundle:Configurations/Manifests/cyl_tabbar_manifest.js
 | 设计（参照 uni-app、Expo、Firebase） | ✅ | 本文。 | This document. |
 | iOS `CYLTabBarManifest` / `CYLTabBarManifestLoader` | ✅ | `CYLTabBarController/CYLTabBarManifest.{h,m}`；单元测试 `CYLTabBarManifestTests`（9 个，M1–M15）。 | `CYLTabBarController/CYLTabBarManifest.{h,m}`; unit tests `CYLTabBarManifestTests` (9, M1–M15). |
 | Android `CYLTabBarManifest.kt` | ✅ | 同样的规则与回调；单元测试 `CYLTabBarManifestTest`（8 个）。 | The same rules and callbacks; unit tests `CYLTabBarManifestTest` (8). |
-| React Native / Flutter `manifestRoute` | ✅（部分 / partly） | 内置或沙盒中的清单可用；下载与回调见 TODO。 | Built-in and sandbox manifests work; downloads and callbacks: see TODO. |
+| React Native / Flutter `manifestRoute` | ✅ | 内置或沙盒中的清单可用。 | Built-in and sandbox manifests work. |
+| React Native / Flutter `manifestURL` | ✅（2026-11-21） | 宿主视图下载清单（http、https、file），其配置位于 App 自己的配置之下；`onManifestApply` 报告来源（remote / cache / embedded），`onManifestFail` 报告失败原因。Android 单元测试 2 个（下载并应用、失败并报告）。 | The host view downloads the manifest (http, https, file) and applies its configuration under the app's own one; `onManifestApply` reports the source (remote / cache / embedded) and `onManifestFail` the reason of a failure. Two Android unit tests (downloaded and applied, failed and reported). |
 | 资源移出本库、按版本 / 主题 / Tab 存放 | ✅ | `Example-Shared/Configurations/Skins/`、`Manifests/`、`Localization/`。 | `Example-Shared/Configurations/Skins/`, `Manifests/`, `Localization/`. |
 | ObjC Example 演示与截图 | ✅ | 见下一节。 | See the next section. |
-| 评分 / Score | **94 / 100** | 扣分见 TODO（2026-11-19：Android 清单演示与截图 +2；PlusButton 默认位置 +2）。 | Deductions: see TODO (2026-11-19: the Android manifest demo and its screenshots, +2; the plus button's default index, +2). |
+| 评分 / Score | **97 / 100** | 扣分见 TODO（PlusButton 的主题图片 -3）。 | Deductions: see TODO (the plus button's theme image, -3). |
 
 ### [CN]TODO
 ### [EN]TODO
@@ -300,7 +319,7 @@ CYLTabBar(manifestRoute: 'bundle:Configurations/Manifests/cyl_tabbar_manifest.js
 | 中文 | English |
 |:---|:---|
 | -3：PlusButton 的图标只取默认主题的图片，切换主题时不随之更换（Tab 的图标会更换）。需要让 PlusButton 也接受主题中的 `@名称` 图片。 | -3: the plus button takes the default theme's image only and does not change with the theme (tab icons do). The plus button needs to accept `@name` images of the themes too. |
-| -3：React Native 与 Flutter 只能读取已在本地的清单；`CYLTabBarManifestLoader` 的下载、回退与回调尚未通过宿主视图提供给 JavaScript / Dart（计划：宿主视图的 `manifestURL` 与 `onManifestApply` / `onManifestFail`）。 | -3: React Native and Flutter can only read a manifest that is already local; `CYLTabBarManifestLoader`'s download, fallback and callbacks are not given to JavaScript / Dart through the host view yet (planned: the host view's `manifestURL` with `onManifestApply` / `onManifestFail`). |
+| 0（原 -3，2026-11-21 完成）：React Native 与 Flutter 可以下载清单：`CYLTabBarHostView`（iOS 与 Android）新增 `manifestURL`（http、https 或 file）、`embeddedManifestRoute`（回退时使用的内置清单路由）、`didApplyManifest`（来源：remote / cache / embedded）与 `didFailManifest`（失败原因）。清单的配置位于 App 自己的配置之下（App 的配置优先），与 `CYLTabBarControllerManifestRoute` 键相同。React Native 组件新增 `manifestURL` 属性与 `onManifestApply` / `onManifestFail` 事件；Flutter 组件新增 `manifestURL` 参数与同名回调。Android 单元测试 2 个（下载后应用、失败后报告且保留 App 自己的配置）通过。 | 0 (was -3, done 2026-11-21): React Native and Flutter can download a manifest: `CYLTabBarHostView` (iOS and Android) gains `manifestURL` (http, https or file), `embeddedManifestRoute` (the route of the app's own manifest, used as the fallback), `didApplyManifest` (the source: remote / cache / embedded) and `didFailManifest` (the reason of a failure). The manifest's configuration is under the app's own one (which wins), as with the `CYLTabBarControllerManifestRoute` key. The React Native component gains the `manifestURL` prop and the `onManifestApply` / `onManifestFail` events; the Flutter component the `manifestURL` parameter and the callbacks of the same names. Two Android unit tests (applied after the download, reported after a failure with the app's own configuration kept) pass. |
 | ~~-2：示例清单中 `midButton.index` 为 2，但在 3 个 Tab 时 PlusButton 显示在第 2 位；需要确认 `CYLPlusButtonIndexInTabBar` 与带页面的 PlusButton 一起使用时的位置规则。~~ 已解决（2026-11-19，用户反馈：「plusbutton 默认index不应该是写死的2，plus button 的默认index是算出来了。参考iOS端的算法。如果是4个常规tabbaritem ，那么默认是2项如果是2个tabbaritem 则index是1。」）：规则与 iOS 相同，没有 `CYLPlusButtonIndexInTabBar` 时为常规 Tab 个数 / 2（iOS `CYLTabBarController.m`、Android `CYLConfigurationPlusButton`、鸿蒙 `CYLTabBarController.ets` 都已如此计算）；写死的 2 来自示例清单的 `midButton.index`，而「我的」需要 App 版本 2.0.0，只显示 2 个 Tab 时 PlusButton 被放到最后。已从示例清单删除 `index`，各端按可见 Tab 计算（2 个 Tab 时为 1，位于中间）；Android 模拟器[截图](assets/android-manifest-plus-button-middle.png)。 | ~~-2: the sample's `midButton.index` is 2, but with 3 tabs the plus button shows in the second place; the rule of `CYLPlusButtonIndexInTabBar` with a plus button that has a page needs checking.~~ Resolved (2026-11-19, the user's report: the default plus button index must be computed as on iOS, 2 with 4 regular tabs, 1 with 2): every platform already uses count / 2 when `CYLPlusButtonIndexInTabBar` is not set (iOS `CYLTabBarController.m`, Android `CYLConfigurationPlusButton`, HarmonyOS `CYLTabBarController.ets`); the fixed 2 came from the sample manifest's `midButton.index`, and since "Me" needs app version 2.0.0 only 2 tabs show, so the plus button was last. `index` is removed from the sample manifest: each platform computes it from the visible tabs (1 with 2 tabs, in the middle); Android emulator [screenshot](assets/android-manifest-plus-button-middle.png). |
 | 0（原 -2，2026-11-19 完成）：Android 示例已加入清单演示：「配置文件」组的「A tab bar from the configuration manifest」行，选择清单的 light、dark 或 christmas 主题后，用与 iOS 共用的 `Manifests/cyl_tabbar_manifest.json`（图片在 `Skins/2.1.0`）创建 TabBar，并通过 `cyl_themeManager.currentThemeIdentifier` 应用主题；`DemoMigrationTest.theManifestDemoBuildsATabBarInEveryTheme` 在三个主题下创建 TabBar（app 单元测试 8 / 8）。模拟器截图已补，并修复截图中发现的问题：清单图标全部显示为演示解析器的「?」，原因是清单交给控制器的是 asset 名称，而库只调用 `imageResolver`；新增 `CYLTabBarConfiguration.drawable`，由库读取 asset 图片（按 @2x / @3x 设置密度），见[截图](assets/android-manifest-demo-themes.png)。 | 0 (was -2, done 2026-11-19): the Android example has a manifest demo now: the "A tab bar from the configuration manifest" row of the "Configuration file" group; choose the manifest's light, dark or christmas theme, and it builds the tab bar from the `Manifests/cyl_tabbar_manifest.json` shared with iOS (images in `Skins/2.1.0`) and applies the theme through `cyl_themeManager.currentThemeIdentifier`. `DemoMigrationTest.theManifestDemoBuildsATabBarInEveryTheme` builds it in the three themes (app unit tests 8 / 8). ~~Still to come: an Android emulator screenshot.~~ **Done (2026-11-19)**: the emulator screenshots found a bug (recorded, then fixed in the library, not in the example): every manifest icon showed the demo's "?" fallback, because the manifest hands `CYLTabBarController` asset names ("Skins/2.1.0/light/home@3x.png") and only `CYLTabBarConfiguration.imageResolver` was asked, which knows drawable names and files (the demo's resolver answers "?" for anything else). New `CYLTabBarConfiguration.drawable(context, name)`: "asset:" paths and asset names with a folder are read from the app assets by the library, at the density of their @2x / @3x suffix, before the resolver; every image lookup of the controller, the themes, the plus button and the host view uses it. Tests: `CYLTabBarConfigurationImageTest` (density by suffix), `DemoMigrationTest.theManifestDemoBuildsATabBarInEveryTheme` now checks the shown home image is the manifest's PNG; `:cyltabbar` 129, app 9, all passing. [Before / after in light, dark and christmas](assets/android-manifest-demo-themes.png). Android part DONE. |
 | 待验证：在真机上下载 http(s) 清单（单元测试与演示使用 file URL）。 | To verify: downloading an http(s) manifest on a device (the unit tests and the demo use file URLs). |
