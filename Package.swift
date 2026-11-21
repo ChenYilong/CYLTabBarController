@@ -121,7 +121,10 @@ let package = Package(
             path: "CYLTabBarController",
             exclude: ["CYLUtils/Swift/CYLAnimationURLOptions.swift", "CYLUtils/Swift/CYLAnimationKeyLookup.swift", "Package"],
             sources: ["CYLUtils/Swift", "CYLBadgeView/Swift", "Swift", "CYLFlatDesignTabBar/CYLFlatDesignTabBar-ObjectiveC/Swift"],
-            resources: [.copy("Resources/CYLTabBarController.bundle")]
+            resources: [.copy("Resources/CYLTabBarController.bundle")],
+            // [EN] SwiftPM always builds the engine: Core's engine-only Swift code (`#if CYL_ANIMATION_ENGINE_AVAILABLE`) is in.
+            // [CN] SwiftPM 总是编译引擎：Core 中只在有引擎时编译的 Swift 代码（`#if CYL_ANIMATION_ENGINE_AVAILABLE`）参与编译。
+            swiftSettings: [.define("CYL_ANIMATION_ENGINE_AVAILABLE")]
         ),
         .target(
             name: "CYLTabBarControllerEngine",
@@ -129,7 +132,6 @@ let package = Package(
             path: "CYLTabBarController",
             sources: [
                 "CYLTabBarItemAnimation/CYLTabBarItemAnimationEngine.m",
-                "CYLTabBarItemAnimation/UIControl+CYLTabBarItemAnimationPlayer.m",
                 "CYLTabBarItemAnimation/TabBar/CYLPAGTabBarItemAttributes.m",
                 "CYLTabBarItemAnimation/GIF/CYLGIFTabBarItemAnimator.m",
                 "CYLTabBarItemAnimation/Lottie/CYLLottieTabBarItemAnimator.m",

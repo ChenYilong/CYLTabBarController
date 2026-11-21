@@ -191,6 +191,9 @@ Pod::Spec.new do |s|
   end
   
   s.subspec 'LottieObjectiveC' do |lottieobjc|
+    # [EN] Core's engine-only Swift code (`#if CYL_ANIMATION_ENGINE_AVAILABLE`, the Swift side of the C macro) is compiled.
+    # [CN] 编译 Core 中只在有引擎时才编译的 Swift 代码（`#if CYL_ANIMATION_ENGINE_AVAILABLE`，对应同名 C 宏）。
+    lottieobjc.pod_target_xcconfig = { 'SWIFT_ACTIVE_COMPILATION_CONDITIONS' => '$(inherited) CYL_ANIMATION_ENGINE_AVAILABLE' }
     # [EN] The tab bar (Core) plus the component's engine `CYLAnimatedItemLottieObjectiveC` (no Core).
     # [CN] TabBar（Core）加组件的动效引擎 `CYLAnimatedItemLottieObjectiveC`（不依赖 Core）。
     lottieobjc.dependency 'CYLTabBarController/Core'
@@ -198,6 +201,9 @@ Pod::Spec.new do |s|
   end
   
   s.subspec "LottieSwift" do |lottieswift|
+    # [EN] Core's engine-only Swift code (`#if CYL_ANIMATION_ENGINE_AVAILABLE`, the Swift side of the C macro) is compiled.
+    # [CN] 编译 Core 中只在有引擎时才编译的 Swift 代码（`#if CYL_ANIMATION_ENGINE_AVAILABLE`，对应同名 C 宏）。
+    lottieswift.pod_target_xcconfig = { 'SWIFT_ACTIVE_COMPILATION_CONDITIONS' => '$(inherited) CYL_ANIMATION_ENGINE_AVAILABLE' }
     # [EN] The tab bar (Core) plus the component's engine `CYLAnimatedItemLottieSwift` (no Core).
     # [CN] TabBar（Core）加组件的动效引擎 `CYLAnimatedItemLottieSwift`（不依赖 Core）。
     lottieswift.dependency 'CYLTabBarController/Core'
@@ -213,6 +219,9 @@ Pod::Spec.new do |s|
   # `CYLTabBarPAGFilePath`（".pag" 文件），与 Lottie key 一致。libpag 为二进制 pod（libpag.xcframework），无需复制源码；
   # `CYLPAGTabBarItemAnimator`（CYLTabBarItemAnimation）通过 `__has_include(<libpag/PAGView.h>)` 识别，无论是否引入 Lottie。
   s.subspec 'PAG' do |pag|
+    # [EN] Core's engine-only Swift code (`#if CYL_ANIMATION_ENGINE_AVAILABLE`, the Swift side of the C macro) is compiled.
+    # [CN] 编译 Core 中只在有引擎时才编译的 Swift 代码（`#if CYL_ANIMATION_ENGINE_AVAILABLE`，对应同名 C 宏）。
+    pag.pod_target_xcconfig = { 'SWIFT_ACTIVE_COMPILATION_CONDITIONS' => '$(inherited) CYL_ANIMATION_ENGINE_AVAILABLE' }
     # [EN] The tab bar (Core) plus the component's engine `CYLAnimatedItemPAG` (no Core).
     # [CN] TabBar（Core）加组件的动效引擎 `CYLAnimatedItemPAG`（不依赖 Core）。
     pag.dependency 'CYLTabBarController/Core'
@@ -224,6 +233,9 @@ Pod::Spec.new do |s|
   # 使用 PAG 企业版（`libpag-enterprise`：音频、3D、视频图层等），与 Lottie 的两个版本类似。它包含同样的 `libpag.xcframework`，
   # 因此 `PAG` 与 `PAGEnterprise` 二选一，不要同时引入。
   s.subspec 'PAGEnterprise' do |pagenterprise|
+    # [EN] Core's engine-only Swift code (`#if CYL_ANIMATION_ENGINE_AVAILABLE`, the Swift side of the C macro) is compiled.
+    # [CN] 编译 Core 中只在有引擎时才编译的 Swift 代码（`#if CYL_ANIMATION_ENGINE_AVAILABLE`，对应同名 C 宏）。
+    pagenterprise.pod_target_xcconfig = { 'SWIFT_ACTIVE_COMPILATION_CONDITIONS' => '$(inherited) CYL_ANIMATION_ENGINE_AVAILABLE' }
     # [EN] The tab bar (Core) plus the component's engine `CYLAnimatedItemPAGEnterprise` (no Core).
     # [CN] TabBar（Core）加组件的动效引擎 `CYLAnimatedItemPAGEnterprise`（不依赖 Core）。
     pagenterprise.dependency 'CYLTabBarController/Core'
@@ -242,6 +254,9 @@ Pod::Spec.new do |s|
   # 没有任何 Rive 代码。RiveRuntime 为二进制 pod，提供 Swift API；6.29 起，其当前 API（`Worker`、`File`、`Rive`、`RiveUIView`）取代了已废弃的
   # `RiveViewModel`。
   s.subspec 'Rive' do |rive|
+    # [EN] Core's engine-only Swift code (`#if CYL_ANIMATION_ENGINE_AVAILABLE`, the Swift side of the C macro) is compiled.
+    # [CN] 编译 Core 中只在有引擎时才编译的 Swift 代码（`#if CYL_ANIMATION_ENGINE_AVAILABLE`，对应同名 C 宏）。
+    rive.pod_target_xcconfig = { 'SWIFT_ACTIVE_COMPILATION_CONDITIONS' => '$(inherited) CYL_ANIMATION_ENGINE_AVAILABLE' }
     # [EN] The tab bar (Core) plus the component's engine `CYLAnimatedItemRive` (no Core).
     # [CN] TabBar（Core）加组件的动效引擎 `CYLAnimatedItemRive`（不依赖 Core）。
     rive.dependency 'CYLTabBarController/Core'
@@ -252,6 +267,9 @@ Pod::Spec.new do |s|
   # FIX: issue #415 — SVGA tab icons (SVGAPlayer), integrated like Rive: the keys, the animator and its playable view.
   # SVGA Tab 图标（SVGAPlayer），接入方式与 Rive 相同：key、animator 及其可播放视图。
   s.subspec 'SVGA' do |svga|
+    # [EN] Core's engine-only Swift code (`#if CYL_ANIMATION_ENGINE_AVAILABLE`, the Swift side of the C macro) is compiled.
+    # [CN] 编译 Core 中只在有引擎时才编译的 Swift 代码（`#if CYL_ANIMATION_ENGINE_AVAILABLE`，对应同名 C 宏）。
+    svga.pod_target_xcconfig = { 'SWIFT_ACTIVE_COMPILATION_CONDITIONS' => '$(inherited) CYL_ANIMATION_ENGINE_AVAILABLE' }
     # [EN] The tab bar (Core) plus the component's engine `CYLAnimatedItemSVGA` (no Core).
     # [CN] TabBar（Core）加组件的动效引擎 `CYLAnimatedItemSVGA`（不依赖 Core）。
     svga.dependency 'CYLTabBarController/Core'
@@ -263,6 +281,9 @@ Pod::Spec.new do |s|
   # 选中时播放一次的 GIF Tab 图标，用法与 Lottie、PAG、Rive 相同。作为图片传入（`CYLTabBarItemImage`、`CYLTabBarItemImageURL`）的 GIF 循环播放，
   # 不需要子库。不依赖第三方库：由 ImageIO 解码。
   s.subspec 'GIF' do |gif|
+    # [EN] Core's engine-only Swift code (`#if CYL_ANIMATION_ENGINE_AVAILABLE`, the Swift side of the C macro) is compiled.
+    # [CN] 编译 Core 中只在有引擎时才编译的 Swift 代码（`#if CYL_ANIMATION_ENGINE_AVAILABLE`，对应同名 C 宏）。
+    gif.pod_target_xcconfig = { 'SWIFT_ACTIVE_COMPILATION_CONDITIONS' => '$(inherited) CYL_ANIMATION_ENGINE_AVAILABLE' }
     # [EN] The tab bar (Core) plus the component's engine `CYLAnimatedItemGIF` (no Core).
     # [CN] TabBar（Core）加组件的动效引擎 `CYLAnimatedItemGIF`（不依赖 Core）。
     gif.dependency 'CYLTabBarController/Core'

@@ -84,7 +84,7 @@ class MessageViewController: UIViewController, CYLAnimatedItemViewDelegate {
     ///      "%ld s left"、"Resend"），App 可以换成自己的文字。
     private func addCountdownItem() {
         let item = CYLAnimatedItemView()
-        item.style = .countdown
+        item.itemStyle = .countdown
         item.image = UIImage(systemName: "message")
         item.countdownDuration = 10
         item.startsCountdownOnTap = true
