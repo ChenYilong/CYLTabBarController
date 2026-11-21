@@ -244,7 +244,7 @@
   },
   {
     "id": 28,
-    "status": "TODO need 模拟器截图验证",
+    "status": "DONE (harmonyos-classifymenu-dark-animations-x86-9dc1f761.png: dark mode, every tag row at full width, the speed and loop labels readable; x86_64 emulator, HarmonyOS 6.0.1 (API 21), 127.0.0.1:5557, ClassifyMenu 9dc1f761 as a local x86_64 debug build, 2026-11-22)",
     "scope": "ChenYilong/CollectionViewClassifyMenu (harmony port; other repository, tracker docs/harmony-verification.md)",
     "title": "Dark mode, animations page: empty rows; the speed and loop labels are invisible",
     "evidence": "harmonyos-push-*.jpeg on feat/harmony 98df838 (report of session chenyilong-de): animations-tab",
@@ -256,7 +256,7 @@
     "status": "TODO need 模拟器截图验证",
     "scope": "ChenYilong/CollectionViewClassifyMenu (harmony port; other repository, tracker docs/harmony-verification.md)",
     "title": "Crash in libohos_rive.so on the animations page",
-    "evidence": "harmonyos-push-*.jpeg on feat/harmony 98df838 (report of session chenyilong-de): animations-tab",
+    "evidence": "harmonyos-push-*.jpeg on feat/harmony 98df838 (report of session chenyilong-de): animations-tab; 2026-11-22 rerun on the x86_64 emulator (ClassifyMenu 9dc1f761, local x86_64 debug build without the arm64-only .so files): the page ran 68 s without a crash, but no Rive view was created there, so this needs an arm64 device (harmonyos-classifymenu-dark-animations-x86-9dc1f761.png)",
     "cause": "Crash when a Rive view is disposed (bug in the ohos_rive library, still there)",
     "fix": "95bebc1 (feat/harmony): avoided by pooling Rive views (BuilderNode / NodeContainer) and never disposing them"
   },
