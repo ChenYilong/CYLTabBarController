@@ -285,6 +285,7 @@ docs/
 │   ├── demo-test-list-objc-classic.png
 │   ├── docs-navigation-index.png
 │   ├── flat-design-more-icon-fix-ios.png
+│   ├── flatdesign-plus-button-missing-ios.png
 │   ├── flatdesign-standard-appearance-ios.png
 │   ├── flatdesign-standard-appearance-mapping.svg
 │   ├── flutter-android-simulated-taps.png
