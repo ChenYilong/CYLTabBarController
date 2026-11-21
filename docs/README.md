@@ -527,6 +527,7 @@ docs/
 │   ├── swiftui-integration-ios.png
 │   ├── swiftui-plus-title-blur-ios.png
 │   ├── tab-accessibility-labels-after-title-change.png
+│   ├── tab-animation-pod-combinations-ios.png
 │   ├── tab-bar-gallery-sections-ios.png
 │   ├── tab-custom-action-ios.png
 │   ├── tab-interactions-long-press-classic.png
