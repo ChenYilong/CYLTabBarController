@@ -1486,6 +1486,7 @@ export struct CYLTabBarController {
         loops: context.loops,
         registerReplay: (replay: () => void) => context.setRestartHandler(replay),
         onLoaded: () => context.onLoaded(),
+        onEnded: () => context.onEnded(),
         onLoadError: (_message: string) => {
           context.onFailed();
           this.cylRiveFailures = this.cylRiveFailures.concat([index]);

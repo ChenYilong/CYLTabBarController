@@ -9,6 +9,7 @@
     "pages/ConfigurationFailures",
     "pages/Gallery",
     "pages/GalleryScene",
-    "pages/LiquidGlassDock"
+    "pages/LiquidGlassDock",
+    "pages/AnimatedItemEnd"
   ]
 }

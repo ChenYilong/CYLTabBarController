@@ -205,6 +205,8 @@ const CYL_RIVE_NEXT_FRAME_MS: number = 50;
 const CYL_RIVE_INPUT_OFF_MS: number = 150;
 /** [EN] Time for the first frame to be drawn before a loaded file pauses. [CN] 加载的文件暂停前绘制第一帧的时间。 */
 const CYL_RIVE_FIRST_FRAME_MS: number = 100;
+/** [EN] How often a play-once pass is checked for its end. [CN] 检查只播放一次的播放是否结束的间隔。 */
+const CYL_RIVE_END_WATCH_MS: number = 50;
 
 @Component
 export struct CYLRiveIcon {
@@ -225,6 +227,15 @@ export struct CYLRiveIcon {
   registerReplay: (replay: () => void) => void = (_replay: () => void) => {};
   /** [EN] The file is drawn (CYLAnimatedItemView shows it from here on). [CN] 文件已绘制。 */
   onLoaded: () => void = () => {};
+  /**
+   * [EN] A play-once pass (`loops` off) came to rest: the view stopped playing after it was seen playing, as Android's
+   *      Rive `isPlaying` (CYLAnimatedItemAnimationContext `onEnded`).
+   * [CN] 只播放一次（`loops` 关闭）的一遍播放停止：视图在播放之后停止播放，与 Android 的 Rive `isPlaying` 相同（CYLAnimatedItemAnimationContext 的 `onEnded`）。
+   */
+  onEnded: () => void = () => {};
+  private endWatchTimer: number = -1;
+  /** [EN] A timer will still start the pass (an input set or a trigger fired a frame later). [CN] 计时器稍后才开始这一遍播放（一帧之后设置输入或触发 trigger）。 */
+  private startPending: boolean = false;
   private riveView: RiveAnimationView | null = null;
   private bytes: ArrayBuffer | null = null;
   private options: Record<string, string> = {};
@@ -249,6 +260,7 @@ export struct CYLRiveIcon {
   aboutToDisappear(): void {
     this.cylCancelDeactivate();
     this.cylCancelLoop();
+    this.cylCancelEndWatch();
     this.riveView = null;
   }
 
@@ -429,8 +441,10 @@ export struct CYLRiveIcon {
     } else if (triggerInput !== undefined && machine !== undefined && this.cylHasInput(view, machine, triggerInput)) {
       view.reset();
       view.play();
+      this.startPending = true;
       this.deactivateTimer = setTimeout(() => {
         this.deactivateTimer = -1;
+        this.startPending = false;
         if (this.riveView === view) {
           try {
             view.fireState(machine, triggerInput);
@@ -456,8 +470,10 @@ export struct CYLRiveIcon {
       view.play();
       this.cylSetActive(view, false);
       const duration = this.cylDuration();
+      this.startPending = true;
       this.deactivateTimer = setTimeout(() => {
         this.deactivateTimer = -1;
+        this.startPending = false;
         if (this.riveView !== view) {
           return;
         }
@@ -478,6 +494,50 @@ export struct CYLRiveIcon {
       view.play();
     }
     this.cylScheduleLoop(view, trigger !== undefined || triggerInput !== undefined);
+    this.cylWatchForEnd(view);
+  }
+
+  /**
+   * [EN] Watches a play-once pass for its end (as Android's CYLAnimatedItemView): the end is when `isPlaying()` goes false
+   *      after it was seen true, once the pass has started; never while looping, unselected or replaced.
+   * [CN] 监视只播放一次的一遍播放何时结束（与 Android 的 CYLAnimatedItemView 相同）：这一遍开始后，`isPlaying()` 先为 true 再变为 false
+   *      即为结束；循环、未选中或视图被替换时从不结束。
+   */
+  private cylWatchForEnd(view: RiveAnimationView): void {
+    this.cylCancelEndWatch();
+    if (this.loops) {
+      return;
+    }
+    let seenPlaying = false;
+    this.endWatchTimer = setInterval(() => {
+      if (this.loops || !this.selected || this.riveView !== view) {
+        this.cylCancelEndWatch();
+        return;
+      }
+      if (this.startPending) {
+        return;
+      }
+      let playing = false;
+      try {
+        playing = view.isPlaying();
+      } catch (e) {
+        this.cylCancelEndWatch();
+        return;
+      }
+      if (playing) {
+        seenPlaying = true;
+      } else if (seenPlaying) {
+        this.cylCancelEndWatch();
+        this.onEnded();
+      }
+    }, CYL_RIVE_END_WATCH_MS);
+  }
+
+  private cylCancelEndWatch(): void {
+    if (this.endWatchTimer >= 0) {
+      clearInterval(this.endWatchTimer);
+      this.endWatchTimer = -1;
+    }
   }
 
   /** [EN] A number input's value, undefined when unknown. [CN] 数字输入的值，无法读取时为 undefined。 */
@@ -551,6 +611,7 @@ export struct CYLRiveIcon {
   private cylStop(view: RiveAnimationView): void {
     this.cylCancelDeactivate();
     this.cylCancelLoop();
+    this.cylCancelEndWatch();
     if (this.cylOption(CYLTabBarAnimationOptionRiveAnimation) !== undefined) {
       view.stop();
       return;
@@ -578,6 +639,7 @@ export struct CYLRiveIcon {
   }
 
   private cylCancelDeactivate(): void {
+    this.startPending = false;
     if (this.deactivateTimer >= 0) {
       clearTimeout(this.deactivateTimer);
       this.deactivateTimer = -1;

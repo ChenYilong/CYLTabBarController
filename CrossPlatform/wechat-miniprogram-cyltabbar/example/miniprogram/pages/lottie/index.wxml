@@ -78,6 +78,36 @@
     </view>
   </view>
 
+  <!-- [EN] showsImageWhenAnimationEnds (docs/Animated-Item.md): a play-once Lottie item ends on its still image; Play shows the
+       animation again, the switch keeps the last frame instead, and the row counts animationcomplete.
+       [CN] showsImageWhenAnimationEnds（docs/Animated-Item.md）：只播放一次的 Lottie 条目结束后显示静态图片；播放重新显示动画，开关关闭时保留最后一帧，
+       该行统计 animationcomplete。 -->
+  <block wx:if="{{!isPAG && !isRive}}">
+    <text class="cyl-section-title" aria-role="heading">showsImageWhenAnimationEnds</text>
+    <view class="cyl-lottie-stage">
+      <cyl-animated-item
+        id="cyl-end-item"
+        generic:cyl-lottie-view="cyl-lottie"
+        class="cyl-end-item"
+        bare="{{true}}"
+        icon-size="{{72}}"
+        image="/shared/objc/home_highlight.png"
+        animation-url="/shared/lottie/green_lottie_tab_home.json"
+        selected="{{true}}"
+        shows-image-when-animation-ends="{{endImage}}"
+        bind:animationcomplete="cyl_endItemComplete"
+      />
+    </view>
+    <view class="cyl-section">
+      <view id="cyl-end-play" class="cyl-row cyl-row-action" bindtap="cyl_endItemPlay" aria-role="button" aria-label="{{texts['Play']}}, showsImageWhenAnimationEnds"><text aria-hidden="true">{{texts['Play']}}</text></view>
+      <view class="cyl-row">
+        <text aria-hidden="true">showsImageWhenAnimationEnds</text>
+        <switch checked="{{endImage}}" bindchange="cyl_endImage" aria-label="showsImageWhenAnimationEnds" />
+      </view>
+      <view class="cyl-row" aria-label="animationcomplete × {{endCount}}"><text class="cyl-row-value" aria-hidden="true">animationcomplete × {{endCount}}</text></view>
+    </view>
+  </block>
+
   <text class="cyl-section-title" aria-role="heading">{{texts['Events']}}</text>
   <view class="cyl-section">
     <view wx:for="{{events}}" wx:key="index" class="cyl-row" hover-class="cyl-row-pressed" bindtap="cyl_copyEvent" data-value="{{item}}" aria-role="button" aria-label="{{item}}"><text class="cyl-row-value" aria-hidden="true">{{item}}</text></view>

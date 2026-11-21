@@ -21,6 +21,10 @@
       "value": "Un controller della barra schede di un altro contesto, con pulsante più quadrato"
     },
     {
+      "name": "cyl_l10n_4d3d8ce4d921",
+      "value": "Animation ended: %d"
+    },
+    {
       "name": "cyl_l10n_427131e7add2",
       "value": "Altro pulsante più"
     },
@@ -285,6 +289,10 @@
       "value": "Raggio del punto rosso"
     },
     {
+      "name": "cyl_l10n_56e8fac7007d",
+      "value": "Replay"
+    },
+    {
       "name": "cyl_l10n_7aac5e07b16d",
       "value": "Da destra a sinistra una volta"
     },
@@ -341,6 +349,14 @@
       "value": "Mostra / nascondi CYLFlatDesignTabBar"
     },
     {
+      "name": "cyl_l10n_ad30d6513b94",
+      "value": "Show the still image when it ends: off"
+    },
+    {
+      "name": "cyl_l10n_0d07e309ae6a",
+      "value": "Show the still image when it ends: on"
+    },
+    {
       "name": "cyl_l10n_561582c1e7cc",
       "value": "Mostra l’area toccabile in rosso traslucido: %@; scala %@x; tocca per 1x, 1,5x, 2x, spento"
     },
@@ -351,6 +367,10 @@
     {
       "name": "cyl_l10n_0a00b2238071",
       "value": "Molla una volta"
+    },
+    {
+      "name": "cyl_l10n_f1f3db859899",
+      "value": "Still image after the animation ends"
     },
     {
       "name": "cyl_l10n_fee4a478923f",
@@ -463,6 +483,10 @@
     {
       "name": "cyl_l10n_ee5b6ac6461b",
       "value": "selectedIndex e il PlusButton (issue #515)"
+    },
+    {
+      "name": "cyl_l10n_30be5f67de2b",
+      "value": "showsImageWhenAnimationEnds: a play-once Lottie icon, then its still image"
     },
     {
       "name": "cyl_l10n_2de6d572f86b",

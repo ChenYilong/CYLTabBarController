@@ -21,6 +21,10 @@
       "value": "En fanebjælke-controller i en anden kontekst med en firkantet plusknap"
     },
     {
+      "name": "cyl_l10n_4d3d8ce4d921",
+      "value": "Animation ended: %d"
+    },
+    {
       "name": "cyl_l10n_427131e7add2",
       "value": "Anden plusknap"
     },
@@ -285,6 +289,10 @@
       "value": "Radius for rød prik"
     },
     {
+      "name": "cyl_l10n_56e8fac7007d",
+      "value": "Replay"
+    },
+    {
       "name": "cyl_l10n_7aac5e07b16d",
       "value": "Højre mod venstre én gang"
     },
@@ -341,6 +349,14 @@
       "value": "Vis / skjul CYLFlatDesignTabBar"
     },
     {
+      "name": "cyl_l10n_ad30d6513b94",
+      "value": "Show the still image when it ends: off"
+    },
+    {
+      "name": "cyl_l10n_0d07e309ae6a",
+      "value": "Show the still image when it ends: on"
+    },
+    {
       "name": "cyl_l10n_561582c1e7cc",
       "value": "Viser trykområdet i gennemsigtigt rødt: %@; skala %@x; tryk for 1x, 1,5x, 2x, fra"
     },
@@ -351,6 +367,10 @@
     {
       "name": "cyl_l10n_0a00b2238071",
       "value": "Fjeder én gang"
+    },
+    {
+      "name": "cyl_l10n_f1f3db859899",
+      "value": "Still image after the animation ends"
     },
     {
       "name": "cyl_l10n_fee4a478923f",
@@ -463,6 +483,10 @@
     {
       "name": "cyl_l10n_ee5b6ac6461b",
       "value": "selectedIndex og PlusButton (issue #515)"
+    },
+    {
+      "name": "cyl_l10n_30be5f67de2b",
+      "value": "showsImageWhenAnimationEnds: a play-once Lottie icon, then its still image"
     },
     {
       "name": "cyl_l10n_2de6d572f86b",

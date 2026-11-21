@@ -21,6 +21,10 @@
       "value": "다른 컨텍스트의 탭 바 컨트롤러, 사각형 플러스 버튼"
     },
     {
+      "name": "cyl_l10n_4d3d8ce4d921",
+      "value": "Animation ended: %d"
+    },
+    {
       "name": "cyl_l10n_427131e7add2",
       "value": "다른 플러스 버튼"
     },
@@ -285,6 +289,10 @@
       "value": "빨간 점 반지름"
     },
     {
+      "name": "cyl_l10n_56e8fac7007d",
+      "value": "Replay"
+    },
+    {
       "name": "cyl_l10n_7aac5e07b16d",
       "value": "오른쪽에서 왼쪽으로 1회"
     },
@@ -341,6 +349,14 @@
       "value": "CYLFlatDesignTabBar 보기 / 숨기기"
     },
     {
+      "name": "cyl_l10n_ad30d6513b94",
+      "value": "Show the still image when it ends: off"
+    },
+    {
+      "name": "cyl_l10n_0d07e309ae6a",
+      "value": "Show the still image when it ends: on"
+    },
+    {
       "name": "cyl_l10n_561582c1e7cc",
       "value": "터치 영역을 반투명 빨간색으로 표시: %@; 배율 %@x; 탭하여 1x, 1.5x, 2x, 끔 전환"
     },
@@ -351,6 +367,10 @@
     {
       "name": "cyl_l10n_0a00b2238071",
       "value": "스프링 1회"
+    },
+    {
+      "name": "cyl_l10n_f1f3db859899",
+      "value": "Still image after the animation ends"
     },
     {
       "name": "cyl_l10n_fee4a478923f",
@@ -463,6 +483,10 @@
     {
       "name": "cyl_l10n_ee5b6ac6461b",
       "value": "selectedIndex와 플러스 버튼 (issue #515)"
+    },
+    {
+      "name": "cyl_l10n_30be5f67de2b",
+      "value": "showsImageWhenAnimationEnds: a play-once Lottie icon, then its still image"
     },
     {
       "name": "cyl_l10n_2de6d572f86b",
