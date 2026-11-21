@@ -487,6 +487,7 @@ docs/
 │   ├── rive-bell-page-centered-android.png
 │   ├── rive-classic.png
 │   ├── rive-flat-design.png
+│   ├── rive-flutter-rn-basic-examples-ios.png
 │   ├── rive-liquid-glass.png
 │   ├── rive-tab-taps-and-menu-button-android.png
 │   ├── screenshot-guidelines-reference-example.png
