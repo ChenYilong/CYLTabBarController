@@ -50,3 +50,37 @@ test('registering a known type without extensions just turns it on; an empty nam
   assert.deepEqual(R.registeredTypes(), ['Rive']);
   assert.equal(R.canPlay('a.riv'), true);
 });
+
+test('PAG and Rive need arm64-v8a: on an x86_64 device they do not play, with a reason (x86_64 emulator)', () => {
+  R.register('Lottie');
+  R.register('PAG');
+  R.register('Rive');
+  assert.equal(R.canPlay('a.pag'), true, 'device ABIs unknown: supported');
+  R.setDeviceAbis(['x86_64']);
+  assert.equal(R.canPlay('a.pag'), false);
+  assert.equal(R.canPlay('icons.riv.bin'), false);
+  assert.equal(R.canPlay('home.json'), true, 'Lottie is pure ArkTS');
+  assert.equal(R.unsupportedReason('a.riv'), 'Rive needs a native library built for arm64-v8a; this device has x86_64');
+  assert.equal(R.unsupportedReason('home.json'), '');
+  assert.equal(R.unsupportedReason('a.svga'), '', 'not registered is another reason');
+  R.setDeviceAbis([' arm64-v8a ', '']);
+  assert.equal(R.canPlay('a.pag'), true);
+  assert.equal(R.unsupportedReason('a.pag'), '');
+  assert.deepEqual(R.currentDeviceAbis(), ['arm64-v8a']);
+});
+
+test('an app overrides the ABIs an engine needs, at registration or later; unregister forgets it', () => {
+  R.setDeviceAbis(['x86_64']);
+  R.register('PAG', undefined, undefined, ['arm64-v8a', 'x86_64']);
+  assert.equal(R.canPlay('a.pag'), true, 'a library version that ships x86_64');
+  R.setRequiredNativeAbis('PAG', ['arm64-v8a']);
+  assert.equal(R.canPlay('a.pag'), false);
+  R.register('APNG', ['apng'], 'my-apng', ['arm64-v8a']);
+  assert.equal(R.canPlay('a.apng'), false, 'an app type with a native library');
+  assert.deepEqual(R.requiredNativeAbis('APNG'), ['arm64-v8a']);
+  R.unregister('PAG');
+  R.register('PAG');
+  assert.deepEqual(R.requiredNativeAbis('PAG'), ['arm64-v8a'], 'back to the built-in value');
+  R.setRequiredNativeAbis('PAG', []);
+  assert.equal(R.canPlay('a.pag'), true, '[] = any device');
+});

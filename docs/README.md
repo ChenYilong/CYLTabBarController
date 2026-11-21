@@ -317,6 +317,7 @@ docs/
 │   ├── harmonyos-animated-item-sys-symbol-b30.png
 │   ├── harmonyos-badge-bounce-around-place.png
 │   ├── harmonyos-bundle-image-row-localized.png
+│   ├── harmonyos-classifymenu-dark-animations-x86-9dc1f761.png
 │   ├── harmonyos-configuration-localization-bundle.png
 │   ├── harmonyos-cvcm-issue26-all.jpeg
 │   ├── harmonyos-cvcm-issue26-good.jpeg
@@ -373,6 +374,7 @@ docs/
 │   ├── harmonyos-verify-skin-row-picker.jpeg
 │   ├── harmonyos-verify-skins-eba8c44.png
 │   ├── harmonyos-verify-spanish.jpeg
+│   ├── harmonyos-x86-64-emulator-target-rive-still-images.png
 │   ├── image-only-tabs-gallery-3-3-ios17.png
 │   ├── image-only-tabs-ios.png
 │   ├── inset-grouped-sections-demo-ios.png

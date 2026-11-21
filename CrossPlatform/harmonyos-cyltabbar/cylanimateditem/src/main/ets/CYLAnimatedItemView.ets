@@ -7,6 +7,7 @@ import {
 import { preferences } from '@kit.ArkData';
 import { ApplicationStateChangeCallback } from '@kit.AbilityKit';
 import BuildProfile from '../../../BuildProfile';
+import { deviceInfo } from '@kit.BasicServicesKit';
 
 /** [EN] `maxLines` for a title without a line limit (`titleLines` 0). [CN] 标题不限行数（`titleLines` 为 0）时的 `maxLines`。 */
 const CYL_UNLIMITED_LINES: number = 1000;
@@ -194,14 +195,75 @@ export class CYLAnimatedItemEngines {
   private static warned: string[] = [];
 
   /**
+   * [EN] Reads the device's ABIs (`deviceInfo.abiList`) once, so engines whose native library is not built for this device
+   *      (PAG and Rive: arm64-v8a only) do not play on the x86_64 emulator: the item shows its still image instead of
+   *      loading a missing .so and crashing.
+   * [CN] 读取一次设备的 ABI（`deviceInfo.abiList`），使原生库没有为本设备构建的引擎（PAG 与 Rive：只有 arm64-v8a）在 x86_64 模拟器上不播放：
+   *      条目显示静态图片，而不是加载缺失的 .so 并崩溃。
+   */
+  private static cylReadDeviceAbis(): void {
+    if (!CYLAnimatedItemTypeRegistry.hasDeviceAbis()) {
+      CYLAnimatedItemTypeRegistry.setDeviceAbis((deviceInfo.abiList ?? '').split(','));
+    }
+  }
+
+  /**
+   * [EN] Sets the native ABIs the engine of `type` needs (one of them must be on the device); [] = any device. Built in:
+   *      PAG and Rive need arm64-v8a (@tencent/libpag 4.4.31, @ohos/rive 1.0.4). Call it when a library version adds an ABI.
+   * [CN] 设置 `type` 的引擎需要的原生 ABI（设备需具备其中之一）；[] 表示任何设备。内置：PAG 与 Rive 需要 arm64-v8a。库的新版本加入 ABI 时调用。
+   */
+  static setRequiredNativeAbis(type: string, abis: string[]): void {
+    CYLAnimatedItemTypeRegistry.setRequiredNativeAbis(type, abis);
+  }
+
+  /** [EN] The native ABIs the engine of `type` needs; [] = any device. [CN] `type` 的引擎需要的原生 ABI；[] 表示任何设备。 */
+  static requiredNativeAbis(type: string): string[] {
+    return CYLAnimatedItemTypeRegistry.requiredNativeAbis(type);
+  }
+
+  /**
+   * [EN] Whether this device can load the engine of `type` (false for PAG and Rive on the x86_64 emulator).
+   * [CN] 本设备能否加载 `type` 的引擎（x86_64 模拟器上 PAG 与 Rive 为 false）。
+   */
+  static isSupportedOnDevice(type: string): boolean {
+    CYLAnimatedItemEngines.cylReadDeviceAbis();
+    return CYLAnimatedItemTypeRegistry.supportsDevice(type);
+  }
+
+  /** [EN] The device's ABIs (`deviceInfo.abiList`). [CN] 设备的 ABI（`deviceInfo.abiList`）。 */
+  static deviceAbis(): string[] {
+    CYLAnimatedItemEngines.cylReadDeviceAbis();
+    return CYLAnimatedItemTypeRegistry.currentDeviceAbis();
+  }
+
+  /**
+   * [EN] Overrides the device's ABIs (tests, e.g. ['x86_64'] on an arm64 device); undefined reads `deviceInfo.abiList` again.
+   * [CN] 覆盖设备的 ABI（测试用，例如在 arm64 设备上设为 ['x86_64']）；undefined 表示重新读取 `deviceInfo.abiList`。
+   */
+  static setDeviceAbis(abis: string[] | undefined): void {
+    CYLAnimatedItemTypeRegistry.setDeviceAbis(abis);
+  }
+
+  /**
+   * [EN] Why `url` does not play on this device although its engine is registered (its native library is not built for the
+   *      device's ABIs), or '' (it plays, or the engine is simply not registered).
+   * [CN] 引擎已注册但 `url` 在本设备上不播放的原因（其原生库没有为设备的 ABI 构建），否则为 ''（能播放，或只是引擎未注册）。
+   */
+  static unsupportedReason(url: string): string {
+    CYLAnimatedItemEngines.cylReadDeviceAbis();
+    return CYLAnimatedItemTypeRegistry.unsupportedReason(url);
+  }
+
+  /**
    * [EN] Registers the engine of `type` ("Lottie", "PAG", "Rive", "SVGA", "GIF"). With `extensions`, an app can add its own
    *      type (`register('APNG', ['apng'])`, then `animationBuilder` draws it) or more extensions for a known type;
-   *      `packageName` names what to add in the debug log.
+   *      `packageName` names what to add in the debug log; `nativeAbis` the native ABIs its library ships (see
+   *      `setRequiredNativeAbis`).
    * [CN] 注册 `type` 的引擎（"Lottie"、"PAG"、"Rive"、"SVGA"、"GIF"）。传入 `extensions` 时，App 可以添加自己的类型（`register('APNG', ['apng'])`，
-   *      再由 `animationBuilder` 绘制），或为已知类型添加扩展名；`packageName` 为 debug 日志中提示加入的包。
+   *      再由 `animationBuilder` 绘制），或为已知类型添加扩展名；`packageName` 为 debug 日志中提示加入的包；`nativeAbis` 为其库提供的原生 ABI（见 `setRequiredNativeAbis`）。
    */
-  static register(type: string, extensions?: string[], packageName?: string): void {
-    CYLAnimatedItemTypeRegistry.register(type, extensions, packageName);
+  static register(type: string, extensions?: string[], packageName?: string, nativeAbis?: string[]): void {
+    CYLAnimatedItemTypeRegistry.register(type, extensions, packageName, nativeAbis);
   }
 
   /**
@@ -229,6 +291,7 @@ export class CYLAnimatedItemEngines {
 
   /** [EN] Whether a registered engine plays `url` (by its extension). [CN] 是否有已注册的引擎能播放 `url`（按扩展名）。 */
   static canPlay(url: string): boolean {
+    CYLAnimatedItemEngines.cylReadDeviceAbis();
     return CYLAnimatedItemTypeRegistry.canPlay(url);
   }
 
@@ -239,8 +302,16 @@ export class CYLAnimatedItemEngines {
    */
   static warnMissingEngine(url: string): void {
     let name: string = cylAnimatedItemTypeOf(url);
-    if (!BuildProfile.DEBUG || name.length === 0 || CYLAnimatedItemEngines.isRegistered(name) ||
-      CYLAnimatedItemEngines.warned.indexOf(name) >= 0) {
+    if (!BuildProfile.DEBUG || name.length === 0 || CYLAnimatedItemEngines.warned.indexOf(name) >= 0) {
+      return;
+    }
+    if (CYLAnimatedItemEngines.isRegistered(name)) {
+      let reason: string = CYLAnimatedItemEngines.unsupportedReason(url);
+      if (reason.length > 0) {
+        CYLAnimatedItemEngines.warned.push(name);
+        console.warn(`[CYLAnimatedItem] ${name} animation (${url}) cannot play on this device: ${reason}. Showing the ` +
+          `static image, or the placeholder without one. Test its playback on an arm64 device. Shown in debug builds only.`);
+      }
       return;
     }
     CYLAnimatedItemEngines.warned.push(name);

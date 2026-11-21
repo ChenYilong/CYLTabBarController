@@ -35,6 +35,12 @@
           "applyToProducts": [
             "default"
           ]
+        },
+        {
+          "name": "emulator",
+          "applyToProducts": [
+            "default"
+          ]
         }
       ]
     },
