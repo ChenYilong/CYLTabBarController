@@ -58,3 +58,14 @@ public protocol CYLFlatDesignTabBarDelegate: NSObjectProtocol {
     @objc(tabBar:didSelectItem:)
     optional func tabBar(_ tabBar: CYLFlatDesignTabBar, didSelect item: CYLFlatDesignTabBarItem)
 }
+
+/**
+ [EN] CYLTabBarController is the delegate of its flat-design tab bar, as `CYLTabBarController.h` declared before the class
+      switch (`<CYLTabBarControllerDelegate, CYLFlatDesignTabBarDelegate>`). Without it, the controller's
+      `as? CYLFlatDesignTabBarDelegate` gave nil, the bar had no delegate, counted as a standalone bar and showed no plus
+      button (docs/PlusButton.md, 2026-11-21).
+ [CN] CYLTabBarController 是其扁平样式 TabBar 的代理，与类切换前 `CYLTabBarController.h` 的声明相同
+      （`<CYLTabBarControllerDelegate, CYLFlatDesignTabBarDelegate>`）。缺少它时控制器的 `as? CYLFlatDesignTabBarDelegate` 得到 nil，
+      TabBar 没有代理，被当作独立 TabBar，不显示 PlusButton（docs/PlusButton.md，2026-11-21）。
+ */
+extension CYLTabBarController: CYLFlatDesignTabBarDelegate {}
