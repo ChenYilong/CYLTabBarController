@@ -67,8 +67,28 @@ jobs:
             sleep $((attempt * 30))
           done
           exit 1
-      - name: Unit tests, lint and release builds 单元测试、lint 与 release 构建
-        run: gradle -p Example-Android --console=plain testDebugUnitTest :tabpages:test lintDebug assembleRelease
+      # [EN] The same 429 hits the artifacts the tests download only when they run (Robolectric's nativeruntime-dist-compat jar,
+      #      runs 45077540911 and 45081008576), which the step above does not resolve. Retry the build only when its log says
+      #      "Too Many Requests"; Gradle keeps what it downloaded, so a retry fetches only what is missing. A test or lint
+      #      failure does not match and fails at once.
+      # [CN] 同样的 429 也会出现在测试运行时才下载的构件上（Robolectric 的 nativeruntime-dist-compat jar，run 45077540911 与 45081008576），
+      #      上一步不会解析它们。只有构建日志出现 "Too Many Requests" 时才重试；Gradle 会保留已下载的内容，重试只获取缺少的部分。
+      #      测试或 lint 失败不会匹配，会立即失败。
+      - name: Unit tests, lint and release builds (retried on a rate limit) 单元测试、lint 与 release 构建（限流时重试）
+        shell: bash
+        run: |
+          set -o pipefail
+          for attempt in 1 2 3 4; do
+            if gradle -p Example-Android --console=plain testDebugUnitTest :tabpages:test lintDebug assembleRelease 2>&1 | tee "$RUNNER_TEMP/gradle.log"; then
+              exit 0
+            fi
+            if ! grep -q "Too Many Requests" "$RUNNER_TEMP/gradle.log"; then
+              exit 1
+            fi
+            echo "Maven Central rate limit (attempt ${attempt}); retrying in $((attempt * 45)) s"
+            sleep $((attempt * 45))
+          done
+          exit 1
       - name: Maven bundle 发布包
         run: scripts/publish-android.sh staging --skip-tests
       - name: Reports 报告
