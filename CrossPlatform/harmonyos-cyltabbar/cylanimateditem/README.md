@@ -88,11 +88,13 @@ backslash paths (`tools/cyl_hap_x86_64.py` does).
 
 `x86_64-debug-engines/rive/` holds `libohos_rive.so` of @ohos/rive 1.0.4 built for x86_64 from its sources and the x86_64
 `libc++_shared.so` it links; `x86_64-debug-engines/pag/` holds `libpag.so` of @tencent/libpag 4.4.31 built for x86_64 from
-GitHub Tencent/libpag `v4.4.31` (provenance, checksums and licenses in each README). It is never part of a build:
+GitHub Tencent/libpag `v4.4.31`, and `x86_64-debug-engines/pag-4.5.102/` the same for 4.5.102 (provenance, checksums and
+licenses in each README; each folder's `kit.json` names its package and version). It is never part of a build:
 
 - `tools/cyl_hap_x86_64.py install <app.hap>` adds the kit (`libs/x86_64/`) and the marker rawfile
   `cyl_x86_64_debug_engines.json` when the device is x86_64, only for the engines the app uses (its `libs/` files and the
-  native modules its `ets/modules.abc` imports) (`--x86-engines auto`, the default; `no` / `yes` or
+  native modules its `ets/modules.abc` imports) and only in the exact package version the app's ArkTS was built with (read
+  from `ets/modules.abc`; a native library of another version crashed the app, so a mismatch is skipped with a message) (`--x86-engines auto`, the default; `no` / `yes` or
   `CYL_X86_ENGINES=0|1` force it).
 - `CYLAnimatedItemEngines.loadX86_64DebugEngines(context)` (called by `CYLAnimatedItemView` and `CYLTabBarController`)
   reads the marker **in debug builds only** and lets the engines it names (Rive, PAG) accept `x86_64`; `x86_64DebugEngines()` lists what it turned on.

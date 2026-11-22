@@ -2,7 +2,7 @@
 
 **Debug test kit for the x86_64 HarmonyOS emulator only.** Never part of a HAR, a release build or a published package:
 `tools/cyl_hap_x86_64.py install` adds these files to a debug HAP when the device is x86_64, and `CYLAnimatedItemEngines`
-turns PAG on for x86_64 only in debug builds and only when that tool installed the kit (README "x86_64 emulator", Plan 1;
+adds it only to a HAP built with @tencent/libpag 4.4.31 (`kit.json`; for 4.5.102 see `../pag-4.5.102`), and `CYLAnimatedItemEngines` turns PAG on for x86_64 only in debug builds and only when that tool installed the kit (README "x86_64 emulator", Plan 1;
 owner's rules in CYLTabBarController `instructions.md`, tag `windows-harmonyos`). Removing the debug guard needs the
 owner's approval.
 

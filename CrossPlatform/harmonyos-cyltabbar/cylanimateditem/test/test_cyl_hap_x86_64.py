@@ -96,6 +96,34 @@ class CYLHapX8664Tests(unittest.TestCase):
             self.assertEqual(cyl.cyl_add_debug_engines(self.make_hap(folder), out, kit,
                                                        shipped=cyl.cyl_hap_libraries(self.make_hap(folder))), ['PAG', 'Rive'])
 
+    def test_a_kit_of_another_package_version_is_skipped(self):
+        with tempfile.TemporaryDirectory() as folder:
+            kit = os.path.join(folder, 'kit')
+            for name, version in (('pag', '4.4.31'), ('pag-4.5.102', '4.5.102')):
+                os.makedirs(os.path.join(kit, name))
+                with open(os.path.join(kit, name, 'libpag.so'), 'w') as handle:
+                    handle.write(version)
+                with open(os.path.join(kit, name, 'kit.json'), 'w') as handle:
+                    handle.write('{"engine": "PAG", "package": "@tencent/libpag", "version": "%s"}' % version)
+            app = os.path.join(folder, 'app.hap')
+            with zipfile.ZipFile(app, 'w') as hap:
+                hap.writestr('ets/modules.abc', b'\x00&@tencent/libpag/Index&4.5.102\x00@normalized:Y&&&libpag.so&\x00')
+            self.assertEqual(cyl.cyl_package_versions(app), {'@tencent/libpag': '4.5.102'})
+            out = os.path.join(folder, 'out.hap')
+            args = dict(shipped=cyl.cyl_hap_libraries(app), versions=cyl.cyl_package_versions(app))
+            self.assertEqual(cyl.cyl_add_debug_engines(app, out, kit, **args), ['PAG'])
+            with zipfile.ZipFile(out) as result:
+                self.assertEqual(result.read('libs/x86_64/libpag.so').decode(), '4.5.102', 'the matching version only')
+            messages = []
+            self.assertEqual(cyl.cyl_add_debug_engines(app, out, kit, shipped=args['shipped'],
+                                                       versions={'@tencent/libpag': '4.6.0'}, log=messages.append), [])
+            self.assertTrue(any('skipped' in message for message in messages))
+
+    def test_the_real_kits_name_their_package_versions(self):
+        for name in ('rive', 'pag'):
+            info = cyl.cyl_kit_info(os.path.join(cyl.CYL_KIT_DIR, name), name)
+            self.assertIn('version', info)
+
     def test_strip_without_abis_drops_every_native_library(self):
         with tempfile.TemporaryDirectory() as folder:
             hap = self.make_hap(folder)
