@@ -10,6 +10,7 @@
     "@ohos/rive": "1.0.4",
     "cylanimateditem": "file:../cylanimateditem",
     "cylanimateditem_lottie": "file:../cylanimateditem_lottie",
-    "cylanimateditemrive": "file:../cylanimateditemrive"
+    "cylanimateditemrive": "file:../cylanimateditemrive",
+    "cyldeallocblockexecutor": "file:../cyldeallocblockexecutor"
   }
 }
