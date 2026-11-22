@@ -50,4 +50,4 @@
 | 得分：80 / 100。 | Score: 80 / 100. |
 | TODO（-5）：见右列。 | TODO (-5) Carthage: the framework target links CYLDeallocBlockExecutor statically, so an app that also adds CYLDeallocBlockExecutor gets two copies (two UIViewController hook installs, duplicate class warnings). Fix: ship `CYLDeallocBlockExecutor.xcframework` next to `CYLAnimatedItem.xcframework` and link it dynamically. |
 | TODO（-10）：见右列。 | TODO (-10) CI on this pull request: `pod lib lint` fails until 1.4.0 is on trunk; the other jobs are to be checked. |
-| TODO（-5）：见右列。 | TODO (-5) After 1.4.0 is published: replace the branch pins with `~> 1.4` / `from: "1.4.0"`, take the pull request out of draft. |
+| TODO（-5）：见右列。 | TODO (-5) After 1.4.0 is published: replace the branch pins with `~> 1.4` / `from: "1.4.0"`, remove `lint_external_podspecs` from `scripts/pod-lint.sh` (until then `pod lib lint` uses the branch podspec through `--external-podspecs`; Core subspec lint passed locally, 2026-11-22), take the pull request out of draft. |
