@@ -37,6 +37,9 @@ types by its selection and playback (selected: once from the start; unselected: 
   `cylanimateditem_rive` module, `CYLAnimatedItemRive.register()`; cyltabbar's `CYLRiveIcon` is a thin wrapper over its
   `CYLAnimatedItemRiveView`. Checked on the x86_64 emulator with the debug engine kit (2026-11-22):
   ![Rive tabs on cylanimateditem_rive](../../../docs/assets/harmonyos-x86-64-rive-tabs-on-cylanimateditem-rive.png)
+- The SVGA decoder is plain TypeScript (`svga/CYLInflate.ts`, `svga/CYLSVGADecoder.ts`), tested with Node
+  (`test/CYLAnimatedItemSVGADecoder.test.mjs`). SVGA tabs on the x86_64 emulator (2026-11-22):
+  ![SVGA tabs on the pure TypeScript decoder](../../../docs/assets/harmonyos-x86-64-svga-tabs-on-pure-ts-decoder.png)
 
 ## x86_64 emulator
 
