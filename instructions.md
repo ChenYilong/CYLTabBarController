@@ -51,3 +51,7 @@ Read this file before reading or writing files in this repository. It inherits t
   3. Every test that depends on the component passes on the x86_64 emulator with PAG and Rive items on their still images; PAG and Rive playback itself is still checked on an arm64 device, and the report says so.
 - **Until it is done (local workaround, never committed).** Build the HAP, copy it without `libs/` (for example with Python's `zipfile`), and in a local copy of the example skip the PAG and Rive views when `deviceInfo.abiList` has no `arm64-v8a`. Used on 2026-11-22 for HarmonyOS-Issues rows 28 and 29 (CollectionViewClassifyMenu `9dc1f761`).
 - Status (2026-11-22): built in `cylanimateditem` (ABI check in `CYLAnimatedItemEngines`, `tools/cyl_hap_x86_64.py`, the `emulator` target recipe in `cylanimateditem/README.md`, used by the cyltabbar example); dependents adopt it next. Task and score: `docs/Animated-Item.md`, "HarmonyOS x86_64 emulator".
+
+## Naming after the static analysis (added 2026-11-22)
+
+- SonarCloud flags `cyl_` Swift names (`swift:S100`: 743 of 956 issues on PR #788). In Swift: `CYL` stays on types; members of our own types take no prefix; members added to system types become `cylFoo` (with `@objc(cyl_foo)` for Objective-C); constants `cylFoo`; Objective-C selectors unchanged; released Swift names stay as deprecated shims. Other languages keep the prefix only on names in a global namespace (Android resources, channel / native module names, component tags, CSS classes, storage keys). Full rule: `AGENTS.md`, "Naming"; skill `cyl-naming`.
