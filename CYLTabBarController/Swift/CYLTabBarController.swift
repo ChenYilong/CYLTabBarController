@@ -507,7 +507,7 @@ open class CYLTabBarController: UITabBarController, CYLTabBarControllerDelegate,
 
     @objc open func hasPlusButton() -> Bool { cylContextPlusButton() != nil }
 
-    @objc(cyl_contextPlusButton) func cylContextPlusButton() -> CYLPlusButton? { CYLPlusButton.cylPlusButton(forOwner: self) as? CYLPlusButton }
+    @objc(cyl_contextPlusButton) func cylContextPlusButton() -> CYLPlusButton? { CYLPlusButton.cylPlusButton(forOwner: self) }
 
     @objc(cyl_contextPlusChildViewController) func cylContextPlusChildViewController() -> UIViewController? {
         CYLPlusButton.plusChildViewController(forOwner: self)

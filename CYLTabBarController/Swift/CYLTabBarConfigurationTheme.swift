@@ -182,7 +182,7 @@ open class CYLTabBarConfigurationTheme: NSObject, CYLTabBarTheme {
         var items: [[String: Any]] = []
         var themed = false
         var position = 0
-        for case let item as [AnyHashable: Any] in tabBarController.tabBarItemsAttributes {
+        for item in tabBarController.tabBarItemsAttributes {
             if (item[cylTabBarItemPlusSlotPlaceholderKey] as? NSNumber)?.boolValue == true {
                 continue
             }
