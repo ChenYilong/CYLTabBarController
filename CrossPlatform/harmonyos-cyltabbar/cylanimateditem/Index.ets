@@ -25,3 +25,6 @@ export {
 } from './src/main/ets/CYLAnimatedItemPlayer';
 export { CYLAnimatedItemEngineState, CYLAnimatedItemEngineViews, CYLAnimatedItemEngineView } from './src/main/ets/CYLAnimatedItemEngine';
 export { CYLAnimatedItemGIF, CYLAnimatedItemGIFPlayer, CYLAnimatedItemGIFView } from './src/main/ets/CYLAnimatedItemGIF';
+export { CYLAnimatedItemSVGA, CYLAnimatedItemSVGAPlayer, CYLAnimatedItemSVGAView } from './src/main/ets/CYLAnimatedItemSVGA';
+export { CYLSVGAMovie, cylLoadSVGAMovie, cylDecodeSVGAMovie } from './src/main/ets/svga/CYLSVGAMovie';
+export { cylDrawSVGAFrame } from './src/main/ets/svga/CYLSVGARenderer';
