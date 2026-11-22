@@ -690,6 +690,23 @@ docs/
 │   ├── wechat-miniprogram-two-icon-layers-user-2-devtools.jpg
 │   └── wechat-miniprogram-visibility-hidden-identifiers-devtools-sdk3.17.6-49df44f.png
 ├── commit-readiness-2026-11-09.md
+├── instructions/
+│   ├── accessibility-localization.md
+│   ├── animation.md
+│   ├── badges.md
+│   ├── code.md
+│   ├── cross-platform.md
+│   ├── dependencies.md
+│   ├── documentation.md
+│   ├── examples.md
+│   ├── git.md
+│   ├── instructions.md
+│   ├── macos.md
+│   ├── plus-button.md
+│   ├── screenshots.md
+│   ├── task-workflow.md
+│   ├── testing.md
+│   └── windows-harmonyos.md
 └── instructions.md
 ```
 

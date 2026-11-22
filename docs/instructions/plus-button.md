@@ -1,0 +1,13 @@
+# Plus button (tag: `plus-button`)
+
+Full text of the `plus-button` rules. [AGENTS.md](../../AGENTS.md#plus-button-tag-plus-button) keeps the summary of this tag;
+read this file when a task touches the tag. Moved verbatim from AGENTS.md on 2026-11-22 (instruction files are organized
+by tag and kept under 200 lines: see [instructions.md](instructions.md)).
+
+- **PlusButton images**: read [docs/PlusButton.md](docs/PlusButton.md) before changing the plus button's images, its stand-in or
+  its theming. With a plus child view controller on Liquid Glass (not FlatDesign), the stand-in ignores selected images and shows
+  only the real plus button's normal image. Selected images stay available to apps and themes for FlatDesign and the classic
+  tab bar, so keep this in the plus button's internals, behind a Liquid Glass guard.
+  When the app asks for the title to be aligned (`+alignsTitleWithTabBarItemTitles`), the stand-in and the real plus button line
+  up by icon only: take the icon's coordinates and ignore the other subviews.
+- **`-[CYLPlusButton cyl_updateLiquidGlassMask]` is a known source of plus button bugs (added 2026-11-12)**: implement it only with great care. When any plus button bug shows up (missing, cut, offset, flickering), first disable this method (since step 52 of the Swift migration it is Swift and does nothing unless the Swift compilation condition `CYL_PLUS_BUTTON_LENS_MASK_ENABLED` is set; before, an Objective-C macro of that name set to 0 made its first line return) and test again, to rule it out before looking anywhere else. Known failure: on iOS 26 and later, Liquid Glass (not FlatDesign), with a plus button that has a plus child view controller, select the plus button, then drag the Liquid Glass lens to another item: the plus button is cut in two. The maintainer removed an earlier implementation because of this. Keep an implementation only after complete testing shows that dragging the lens never cuts the plus button (the drag UI tests in `Example-SwiftUI/HealthyHomeUITests`, recorded on video, raised and flat plus buttons), and that the plus button is never missing or offset on first display or when the plus tab is selected in code. **Same risk, to verify (added 2026-11-13, TODO)**: PR #793 keeps the Liquid Glass lens on the plus page when the plus button's title is drawn by its tab item (`-[CYLTabBarController cyl_plusButtonTitleIsDrawnByItsTabItem]`, switch `CYL_PLUS_BUTTON_TITLE_KEEPS_LENS_ENABLED` (since Swift migration step 62 it is on unless the Swift compilation condition `CYL_PLUS_BUTTON_TITLE_KEEPS_LENS_DISABLED` is set)). The maintainer considers it as dangerous as the mask: verify it the same way, and on any plus button bug after selection turn both off first.
