@@ -132,6 +132,15 @@ FOUNDATION_EXTERN NSURL * _Nullable CYLTabBarAnimationURLWithOptions(NSURL * _Nu
                                                                      NSDictionary * _Nullable options) CYL_NOEXCEPT;
 
 /*!
+ * [EN] The options in `URL`'s fragment, the reading side of `CYLTabBarAnimationURLWithOptions()`: "name=value&…", percent-decoded
+ *      (an undecodable text is kept as it is), a pair without a name or without a value left out. An empty dictionary
+ *      without a fragment. The same rules as the other platforms (`CrossPlatform/animated-item-fixtures/source-options.json`).
+ * [CN] `URL` 的 fragment 中的选项，即 `CYLTabBarAnimationURLWithOptions()` 的读取端：「名称=值&…」，百分号解码（无法解码的文本保持原样），
+ *      没有名称或没有值的键值对被省略。没有 fragment 时返回空字典。规则与其他平台相同（`CrossPlatform/animated-item-fixtures/source-options.json`）。
+ */
+FOUNDATION_EXTERN NSDictionary<NSString *, NSString *> * _Nonnull CYLTabBarAnimationOptionsFromURL(NSURL * _Nullable URL) CYL_NOEXCEPT;
+
+/*!
  * [EN] The keys of each animation type (Lottie, PAG, Rive, SVGA, GIF), declared here in the component's core so
  *      that they always exist: a project that passes one without that type's engine still compiles, gets a compile
  *      warning on the key (`CYL_PAG_REQUIRED` and its siblings, from `CYLAnimatedItemMacros.h`), a debug log at run

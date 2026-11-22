@@ -108,7 +108,18 @@ public final class CYLLottieSwiftTabBarItemAnimationPlayer: CYLTabBarItemAnimati
 
     public func play() {
         lottieView?.animationProgress = 0
-        lottieView?.play()
+        // [EN] `finished` is true only when the pass ran to its end: a stop or a restart calls it with false. A pass that
+        //      ends while `loops` is on does not call `onEnded` (`notifyPlaybackEnded`).
+        // [CN] 只有一遍播放到结尾时 `finished` 才为 true：停止或重新播放时为 false。`loops` 开启时结束的一遍不调用 `onEnded`（`notifyPlaybackEnded`）。
+        lottieView?.play { [weak self] finished in
+            if finished {
+                self?.notifyPlaybackEnded()
+            }
+        }
+    }
+
+    public var isPlaying: Bool {
+        lottieView?.isAnimationPlaying ?? false
     }
 
     public func showLastFrame() {

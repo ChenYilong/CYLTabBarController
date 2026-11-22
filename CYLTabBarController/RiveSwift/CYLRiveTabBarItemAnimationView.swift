@@ -211,6 +211,7 @@ public final class CYLRiveTabBarItemAnimationView: UIView, CYLTabBarItemAnimatio
     private var deactivateTask: Task<Void, Never>?
     /// [EN] Plays again after each pass (`cyl_setAnimationViewLoops:`). [CN] 每次播放后再次播放（`cyl_setAnimationViewLoops:`）。
     private var loops = false
+    private var endHandler: (() -> Void)?
     private var loopTask: Task<Void, Never>?
 
     /// [EN] The colors asked for last (nil: the light colors), applied in order. [CN] 最近一次请求的颜色（nil 表示浅色颜色），按顺序应用。
@@ -418,9 +419,24 @@ public final class CYLRiveTabBarItemAnimationView: UIView, CYLTabBarItemAnimatio
                 }
                 instance.setValue(of: property, to: false)
                 self.isActive = false
+                if !self.loops {
+                    self.endHandler?()
+                }
             }
         }
         scheduleLoop()
+    }
+
+    /// [EN] Called when a pass of a boolean state machine with an `activeDuration` ends and looping is off; a trigger or a
+    ///      held boolean (`activeDuration` 0) has no end to tell. [CN] 带 `activeDuration` 的布尔状态机的一遍播放结束且循环关闭时调用；
+    ///      trigger 或保持不变的布尔属性（`activeDuration` 为 0）没有可判断的结束。
+    public func setAnimationEndHandler(_ handler: (() -> Void)?) {
+        endHandler = handler
+    }
+
+    /// [EN] Whether the boolean is held true now (a trigger has no state to read). [CN] 布尔属性当前是否保持为 true（trigger 没有可读取的状态）。
+    public func isAnimationPlaying() -> Bool {
+        isActive
     }
 
     /// [EN] `cyl_setAnimationViewLoops:`. [CN] `cyl_setAnimationViewLoops:`。

@@ -33,6 +33,7 @@ public final class CYLGIFTabBarItemAnimationView: UIImageView, CYLTabBarItemAnim
 
     private static let playAnimationKey = "CYLGIFTabBarItemPlayAnimation"
 
+    private var endHandler: (() -> Void)?
     private var frames: [UIImage] = []
     private var frameDelays: [TimeInterval] = []
 
@@ -142,7 +143,26 @@ public final class CYLGIFTabBarItemAnimationView: UIImageView, CYLTabBarItemAnim
         animation.values = frames.compactMap { $0.cgImage }
         animation.keyTimes = keyTimes
         animation.duration = duration
+        animation.delegate = CYLGIFPassObserver { [weak self] in self?.endHandler?() }
         layer.add(animation, forKey: Self.playAnimationKey)
+    }
+
+    /**
+     * [EN] Whether the frames are running (the keyframe animation is on the layer until its pass ends).
+     * [CN] 各帧是否正在播放（关键帧动画在一遍播放结束前一直在 layer 上）。
+     */
+    @objc(cyl_animationViewIsPlaying)
+    public func isAnimationPlaying() -> Bool {
+        layer.animation(forKey: Self.playAnimationKey) != nil
+    }
+
+    /**
+     * [EN] Called when a pass reaches its end; a stop, a restart or the end state does not call it (GIF has no loop mode here).
+     * [CN] 一遍播放到结尾时调用；停止、重新播放或显示结束状态时不调用（这里的 GIF 没有循环模式）。
+     */
+    @objc(cyl_setAnimationViewEndHandler:)
+    public func setAnimationEndHandler(_ handler: (() -> Void)?) {
+        endHandler = handler
     }
 
     public func showAnimationLastFrame() {
@@ -153,6 +173,24 @@ public final class CYLGIFTabBarItemAnimationView: UIImageView, CYLTabBarItemAnim
     public func stopAnimation() {
         layer.removeAnimation(forKey: Self.playAnimationKey)
         image = frames.first
+    }
+}
+
+/**
+ * [EN] Tells the GIF view that its keyframe animation ran to the end (`finished`), not that it was removed.
+ * [CN] 告知 GIF 视图其关键帧动画播放到了结尾（`finished`），而不是被移除。
+ */
+private final class CYLGIFPassObserver: NSObject, CAAnimationDelegate {
+    private let didFinish: () -> Void
+
+    init(didFinish: @escaping () -> Void) {
+        self.didFinish = didFinish
+    }
+
+    func animationDidStop(_: CAAnimation, finished: Bool) {
+        if finished {
+            didFinish()
+        }
     }
 }
 #endif

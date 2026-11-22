@@ -6,6 +6,12 @@
 //
 
 #import "CYLTabBarItemAnimationEngine.h"
+// [EN] The shared reader of a URL's options, from CYLUtils. [CN] 读取 URL 选项的共用函数，来自 CYLUtils。
+#if __has_include("../CYLUtils/CYLAnimationKeys.h")
+#import "../CYLUtils/CYLAnimationKeys.h"
+#else
+#import "CYLAnimationKeys.h"
+#endif
 #if __has_include("../CYLUtils/CYLUtilsMacros.h")
 #import "../CYLUtils/CYLUtilsMacros.h"
 #else
@@ -63,20 +69,13 @@ static const void *CYLTabBarItemAnimationTintOriginalFramesKey = &CYLTabBarItemA
 
 /// [EN] The options in a URL's fragment ("name=value&…", percent-encoded). [CN] URL fragment 中的选项（「名称=值&…」，百分号编码）。
 static NSDictionary<NSString *, NSString *> *CYLTabBarItemAnimationTintOptionsFromURL(NSURL *URL) {
-    NSString *fragment = URL ? [NSURLComponents componentsWithURL:URL resolvingAgainstBaseURL:YES].percentEncodedFragment : nil;
     NSMutableDictionary<NSString *, NSString *> *options = [NSMutableDictionary dictionary];
-    for (NSString *item in [fragment componentsSeparatedByString:@"&"]) {
-        NSRange separator = [item rangeOfString:@"="];
-        if (separator.location == NSNotFound || separator.location == 0) {
-            continue;
+    [CYLTabBarAnimationOptionsFromURL(URL) enumerateKeysAndObjectsUsingBlock:^(NSString *name, NSString *value, BOOL *stop) {
+        NSString *trimmed = [value stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceCharacterSet];
+        if (trimmed.length > 0) {
+            options[name] = trimmed;
         }
-        NSString *name = [[item substringToIndex:separator.location] stringByRemovingPercentEncoding];
-        NSString *value = [[[item substringFromIndex:NSMaxRange(separator)] stringByRemovingPercentEncoding]
-                           stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceCharacterSet];
-        if (name.length > 0 && value.length > 0) {
-            options[name] = value;
-        }
-    }
+    }];
     return [options copy];
 }
 

@@ -88,6 +88,61 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)applyColors:(nullable NSDictionary<NSString *, UIColor *> *)colors traitCollection:(UITraitCollection *)traitCollection;
 
+/*!
+ * [EN] The cross-platform player contract of HarmonyOS's `CYLAnimatedItemPlayer` (docs/Animated-Item.md, "Engine API across
+ *      platforms"). Every member below is optional; `CYLTabBarItemAnimationBasePlayer` answers each of them from what the
+ *      player already implements, so a player gets them by subclassing it and a player that does not subclass it answers
+ *      only what it implements (treat an unanswered `supports...` as NO).
+ * [CN] 跨平台播放器约定，对应鸿蒙的 `CYLAnimatedItemPlayer`（docs/Animated-Item.md，「Engine API across platforms」）。下面的成员都是可选的；
+ *      `CYLTabBarItemAnimationBasePlayer` 根据播放器已实现的内容回答每个成员，因此继承它即可获得；不继承它的播放器只回答自己实现的部分
+ *      （没有回答的 `supports...` 视为 NO）。
+ */
+
+/*!
+ * [EN] Whether `animationSpeed` / `speed` changes the playback rate (the setter exists). [CN] `animationSpeed` / `speed` 是否能改变播放速率（存在 setter）。
+ */
+@property (nonatomic, readonly) BOOL supportsSpeed;
+
+/*!
+ * [EN] Whether the player itself loops when `loops` is YES (the setter exists); NO: the host keeps its own loop. [CN] `loops` 为 YES 时播放器自己是否循环（存在 setter）；NO：由宿主自己循环。
+ */
+@property (nonatomic, readonly) BOOL supportsLoops;
+
+/*!
+ * [EN] Whether `progress` can be read and set. [CN] 能否读取与设置 `progress`。
+ */
+@property (nonatomic, readonly) BOOL supportsProgress;
+
+/*!
+ * [EN] Whether `-applyColors:` recolors the animation. [CN] `-applyColors:` 能否为动画改色。
+ */
+@property (nonatomic, readonly) BOOL supportsColors;
+
+/*!
+ * [EN] Whether a pass is playing now; NO for a player that cannot tell. [CN] 当前是否正在播放一遍；无法判断的播放器为 NO。
+ */
+@property (nonatomic, readonly, getter=isPlaying) BOOL playing;
+
+/*!
+ * [EN] The playback rate, the name HarmonyOS uses for `animationSpeed`: 0 or less is 1; a no-op where `supportsSpeed` is NO.
+ * [CN] 播放速率，鸿蒙对 `animationSpeed` 的称呼：0 或更小为 1；`supportsSpeed` 为 NO 时为空操作。
+ */
+@property (nonatomic, assign) CGFloat speed;
+
+/*!
+ * [EN] Called on the main queue when a play-once pass (`loops` NO) reaches its end; never on `-stop`, never while looping. A
+ *      player that cannot tell never calls it.
+ * [CN] 只播放一次（`loops` 为 NO）的一遍播放到结尾时在主队列调用；`-stop` 时不调用，循环时不调用。无法判断结束的播放器从不调用。
+ */
+@property (nonatomic, copy, nullable) void (^onEnded)(void);
+
+/*!
+ * [EN] Recolors the animation like `-applyColors:traitCollection:` with the view's own trait collection; nil restores the
+ *      file's colors. A no-op where `supportsColors` is NO.
+ * [CN] 为动画改色，等同于以视图自己的 trait collection 调用 `-applyColors:traitCollection:`；nil 恢复文件自身的颜色。`supportsColors` 为 NO 时为空操作。
+ */
+- (void)applyColors:(nullable NSDictionary<NSString *, UIColor *> *)colors;
+
 @end
 
 /*!
@@ -105,6 +160,18 @@ NS_ASSUME_NONNULL_BEGIN
  * [EN] The view it controls, held weakly. [CN] 它所控制的视图（弱引用）。
  */
 @property (nonatomic, weak, readonly, nullable) UIView *animationView;
+
+/*!
+ * [EN] The end callback of `CYLTabBarItemAnimationPlayer` (see there); stored here so that every subclass has it.
+ * [CN] `CYLTabBarItemAnimationPlayer` 的结束回调（见该协议）；保存在这里，所有子类都有。
+ */
+@property (nonatomic, copy, nullable) void (^onEnded)(void);
+
+/*!
+ * [EN] For subclasses: a play-once pass ended. Calls `onEnded` on the main queue unless the player loops (`loops` YES).
+ * [CN] 供子类调用：只播放一次的一遍播放结束。除非播放器在循环（`loops` 为 YES），否则在主队列调用 `onEnded`。
+ */
+- (void)notifyPlaybackEnded;
 
 @end
 

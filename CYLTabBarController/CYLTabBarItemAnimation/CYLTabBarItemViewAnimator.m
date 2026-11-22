@@ -6,6 +6,12 @@
 //
 
 #import "CYLTabBarItemViewAnimator.h"
+// [EN] The shared reader of a URL's options, from CYLUtils: no Core. [CN] 读取 URL 选项的共用函数，来自 CYLUtils：不依赖 Core。
+#if __has_include("../CYLUtils/CYLAnimationKeys.h")
+#import "../CYLUtils/CYLAnimationKeys.h"
+#else
+#import "CYLAnimationKeys.h"
+#endif
 
 /*!
  * [EN] The options in `URL`'s fragment, as written by `CYLTabBarAnimationURLWithOptions()` ("name=value&…",
@@ -13,20 +19,7 @@
  * [CN] `URL` 的 fragment 中的选项，格式与 `CYLTabBarAnimationURLWithOptions()` 写入的相同（「名称=值&…」，百分号编码）。
  */
 static NSDictionary<NSString *, NSString *> *CYLTabBarItemAnimationOptionsFromURL(NSURL *URL) {
-    NSString *fragment = [NSURLComponents componentsWithURL:URL resolvingAgainstBaseURL:YES].percentEncodedFragment;
-    NSMutableDictionary<NSString *, NSString *> *options = [NSMutableDictionary dictionary];
-    for (NSString *item in [fragment componentsSeparatedByString:@"&"]) {
-        NSRange separator = [item rangeOfString:@"="];
-        if (separator.location == NSNotFound || separator.location == 0) {
-            continue;
-        }
-        NSString *name = [[item substringToIndex:separator.location] stringByRemovingPercentEncoding];
-        NSString *value = [[item substringFromIndex:NSMaxRange(separator)] stringByRemovingPercentEncoding];
-        if (name.length > 0 && value.length > 0) {
-            options[name] = value;
-        }
-    }
-    return [options copy];
+    return CYLTabBarAnimationOptionsFromURL(URL);
 }
 
 /// [EN] `URL` without its fragment: the animation file itself. [CN] 去掉 fragment 的 `URL`，即动画文件本身。
@@ -100,6 +93,34 @@ static NSURL *CYLTabBarItemAnimationFileURLFromURL(NSURL *URL) {
 
 - (BOOL)loops {
     return _loops;
+}
+
+/*
+ * [EN] The cross-platform members: `supportsColors` is the view's (this class answers `-applyColors:traitCollection:` for
+ *      every view), `isPlaying` and the end of a pass come from the view when it can tell.
+ * [CN] 跨平台成员：`supportsColors` 取决于视图（本类对每个视图都响应 `-applyColors:traitCollection:`），`isPlaying` 与一遍播放的结束在视图
+ *      能判断时由视图提供。
+ */
+- (BOOL)supportsColors {
+    return [self.playableView respondsToSelector:@selector(cyl_applyAnimationViewColors:)];
+}
+
+- (BOOL)isPlaying {
+    id<CYLTabBarItemAnimationPlayableView> view = self.playableView;
+    return [view respondsToSelector:@selector(cyl_animationViewIsPlaying)] && [view cyl_animationViewIsPlaying];
+}
+
+- (instancetype)initWithAnimationView:(UIView *)animationView {
+    if (self = [super initWithAnimationView:animationView]) {
+        id<CYLTabBarItemAnimationPlayableView> view = self.playableView;
+        if ([view respondsToSelector:@selector(cyl_setAnimationViewEndHandler:)]) {
+            __weak typeof(self) weakSelf = self;
+            [view cyl_setAnimationViewEndHandler:^{
+                [weakSelf notifyPlaybackEnded];
+            }];
+        }
+    }
+    return self;
 }
 
 - (void)setLoops:(BOOL)loops {

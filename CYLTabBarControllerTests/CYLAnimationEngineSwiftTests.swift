@@ -95,11 +95,150 @@ final class CYLAnimationEngineSwiftTests: XCTestCase {
         XCTAssertEqual(CYLGIFTabBarItemAnimationView.frameDelay(properties: gif(kCGImagePropertyGIFDelayTime, 0.01)), 0.1)
         XCTAssertEqual(CYLGIFTabBarItemAnimationView.frameDelay(properties: gif(kCGImagePropertyGIFUnclampedDelayTime, 0.25)), 0.25)
     }
+
+    // MARK: - The cross-platform player contract 跨平台播放器约定
+
+    /// [EN] The GIF engine's answers: no speed, loops, progress or colors; playing and the end of a pass are reported.
+    /// [CN] GIF 引擎的回答：没有速度、循环、进度与颜色；播放状态与一遍播放的结束会被报告。
+    func testGIFPlayerAnswersTheCrossPlatformContract() throws {
+        let url = try makeTwoFrameGIF()
+        defer { try? FileManager.default.removeItem(at: url) }
+        let view = try XCTUnwrap(CYLTabBarItemAnimationFactory.shared().animationView(url: url, size: CGSize(width: 24, height: 24), contentMode: .scaleAspectFit))
+        let player = try XCTUnwrap(CYLTabBarItemAnimationFactory.shared().player(for: view))
+        XCTAssertEqual(player.supportsSpeed, false)
+        XCTAssertEqual(player.supportsLoops, false)
+        XCTAssertEqual(player.supportsProgress, false)
+        XCTAssertEqual(player.supportsColors, false)
+        XCTAssertEqual(player.isPlaying, false)
+        XCTAssertEqual(player.speed, 1, "an engine without speed reports 1")
+        let base = try XCTUnwrap(player as? CYLTabBarItemAnimationBasePlayer)
+        // [EN] Core Animation only runs the animation of a layer that is on screen. [CN] Core Animation 只运行在屏幕上的 layer 的动画。
+        let window = UIWindow(frame: CGRect(x: 0, y: 0, width: 100, height: 100))
+        window.addSubview(view)
+        window.makeKeyAndVisible()
+        defer { window.isHidden = true }
+        let ended = expectation(description: "the pass ended")
+        base.onEnded = { ended.fulfill() }
+        player.play()
+        XCTAssertEqual(player.isPlaying, true)
+        wait(for: [ended], timeout: 3)
+        XCTAssertEqual(player.isPlaying, false)
+    }
+
+    /// [EN] A stop is not the end of a pass. [CN] 停止不是一遍播放的结束。
+    func testGIFStopDoesNotReportTheEnd() throws {
+        let url = try makeTwoFrameGIF()
+        defer { try? FileManager.default.removeItem(at: url) }
+        let view = try XCTUnwrap(CYLTabBarItemAnimationFactory.shared().animationView(url: url, size: CGSize(width: 24, height: 24), contentMode: .scaleAspectFit))
+        let player = try XCTUnwrap(CYLTabBarItemAnimationFactory.shared().player(for: view))
+        let base = try XCTUnwrap(player as? CYLTabBarItemAnimationBasePlayer)
+        let notEnded = expectation(description: "no end after a stop")
+        notEnded.isInverted = true
+        base.onEnded = { notEnded.fulfill() }
+        player.play()
+        player.stop()
+        XCTAssertEqual(player.isPlaying, false)
+        wait(for: [notEnded], timeout: 1)
+    }
 }
 
 private func assertAccuratelyEqual(_ lhs: [Double], _ rhs: [Double], accuracy: Double, file: StaticString = #filePath, line: UInt = #line) {
     XCTAssertEqual(lhs.count, rhs.count, file: file, line: line)
     for (a, b) in zip(lhs, rhs) {
         XCTAssertEqual(a, b, accuracy: accuracy, file: file, line: line)
+    }
+}
+
+// MARK: - The `#` option fixture 选项测试向量
+
+/// [EN] A view that plays nothing, made by the recording provider. [CN] 什么也不播放的视图，由记录选项的 provider 创建。
+private final class CYLRecordingOptionsView: UIView, CYLTabBarItemAnimationPlayableView {
+    func playAnimation() {}
+    func showAnimationLastFrame() {}
+    func stopAnimation() {}
+}
+
+/// [EN] Records the file and the options the animator hands to its view provider. [CN] 记录 animator 交给视图 provider 的文件与选项。
+@MainActor
+private final class CYLRecordingOptionsProvider: NSObject, CYLTabBarItemAnimationViewProviding {
+    static var received: (fileURL: URL, options: [String: String])?
+
+    static func makeAnimationView(fileURL: URL, options: [String: String],
+                                  contentMode _: UIView.ContentMode) -> (UIView & CYLTabBarItemAnimationPlayableView)? {
+        received = (fileURL, options)
+        return CYLRecordingOptionsView()
+    }
+}
+
+/**
+ [EN] `CrossPlatform/animated-item-fixtures/source-options.json` against the iOS parsers: the text form
+      (`CYLAnimationSource`) and the URL form (`CYLTabBarAnimationURLWithOptions()` written, then read by the animator that
+      hands the options to its view). Every platform's parser test reads the same file.
+ [CN] `CrossPlatform/animated-item-fixtures/source-options.json` 对照 iOS 的解析器：文本形式（`CYLAnimationSource`）与 URL 形式
+      （`CYLTabBarAnimationURLWithOptions()` 写入，再由把选项交给视图的 animator 读取）。每个平台的解析测试读取同一个文件。
+ */
+@MainActor
+final class CYLAnimatedItemSourceOptionsTests: XCTestCase {
+
+    private struct Case {
+        let input: String
+        let file: String?
+        let inlineJSON: String?
+        let type: String?
+        let options: [String: String]
+    }
+
+    private func loadCases(file: StaticString = #filePath, line: UInt = #line) throws -> [Case] {
+        // [EN] Relative to this file: CYLTabBarControllerTests/ -> the repository root. [CN] 相对本文件：CYLTabBarControllerTests/ 的上一级为仓库根目录。
+        let root = URL(fileURLWithPath: "\(file)").deletingLastPathComponent().deletingLastPathComponent()
+        let fixture = root.appendingPathComponent("CrossPlatform/animated-item-fixtures/source-options.json")
+        let data = try Data(contentsOf: fixture)
+        let object = try XCTUnwrap(JSONSerialization.jsonObject(with: data) as? [String: Any], file: file, line: line)
+        let cases = try XCTUnwrap(object["cases"] as? [[String: Any]], file: file, line: line)
+        XCTAssertFalse(cases.isEmpty, "the fixture has no case", file: file, line: line)
+        return cases.map {
+            Case(input: $0["input"] as? String ?? "", file: $0["file"] as? String, inlineJSON: $0["inlineJSON"] as? String,
+                 type: $0["type"] as? String, options: $0["options"] as? [String: String] ?? [:])
+        }
+    }
+
+    func testTextFormFollowsTheFixture() throws {
+        for item in try loadCases() {
+            let source = CYLAnimationSource(parsing: item.input)
+            XCTAssertEqual(source.options, item.options, item.input)
+            XCTAssertEqual(source.inlineJSON, item.inlineJSON, item.input)
+            if let file = item.file {
+                XCTAssertEqual(source.file, file, item.input)
+            }
+            if let type = item.type {
+                XCTAssertEqual(source.type, type, item.input)
+            }
+        }
+    }
+
+    func testURLFormRoundTripsEveryOption() throws {
+        for item in try loadCases() where item.inlineJSON == nil {
+            let file = try XCTUnwrap(item.file)
+            let fileURL = URL(fileURLWithPath: "/tmp/\(file)")
+            let url = try XCTUnwrap(CYLTabBarAnimationURLWithOptions(fileURL, item.options), item.input)
+            let animator = CYLTabBarItemViewAnimator(identifier: "Recording", fileExtensions: [fileURL.pathExtension],
+                                                     attributeKeys: nil, viewProvider: CYLRecordingOptionsProvider.self)
+            CYLRecordingOptionsProvider.received = nil
+            XCTAssertNotNil(animator.animationView(with: url, size: CGSize(width: 24, height: 24), contentMode: .scaleAspectFit), item.input)
+            let received = try XCTUnwrap(CYLRecordingOptionsProvider.received, item.input)
+            XCTAssertEqual(received.options, item.options, item.input)
+            XCTAssertEqual(received.fileURL.path, fileURL.path, item.input)
+            XCTAssertEqual(CYLTabBarAnimationOptionsFromURL(url), item.options, item.input)
+        }
+    }
+
+    /// [EN] The rules the fixture lists: an undecodable text is kept, a pair without a name is dropped, `#` and `?` split a pair
+    ///      only when they do not follow `=`. [CN] 向量文件列出的规则：无法解码的文本保持原样，没有名称的键值对被丢弃，`#` 与 `?` 只在不紧跟 `=` 时拆分。
+    func testRulesOfTheFixture() {
+        XCTAssertEqual(CYLAnimationSource(parsing: "a.riv#x=100%&y=%E0%A4%A").options, ["x": "100%", "y": "%E0%A4%A"])
+        XCTAssertEqual(CYLAnimationSource(parsing: "a.riv#=1&novalue&k=v").options, ["k": "v"])
+        XCTAssertEqual(CYLAnimationSource(parsing: "a.riv?a=1#b=2&c=#FF0000").options, ["a": "1", "b": "2", "c": "#FF0000"])
+        XCTAssertEqual(CYLAnimationSource(parsing: "asset:a.riv#k=v").file, "a.riv")
+        XCTAssertEqual(CYLAnimationSource(parsing: "[1]").type, "Lottie")
     }
 }

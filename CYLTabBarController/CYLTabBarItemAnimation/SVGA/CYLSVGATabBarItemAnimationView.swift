@@ -58,6 +58,7 @@ public final class CYLSVGATabBarItemAnimationView: SVGAPlayer, SVGAPlayerDelegat
     private var speedLink: CADisplayLink?
     private var speedStartTime: CFTimeInterval = 0
     private var speedStartFrame = 0
+    private var endHandler: (() -> Void)?
 
     /**
      * [EN] `CYLTabBarItemAnimationViewProviding`: a view for an SVGA file (local, or http / https parsed by SVGAParser).
@@ -174,6 +175,24 @@ public final class CYLSVGATabBarItemAnimationView: SVGAPlayer, SVGAPlayerDelegat
         self.loops = loops ? 0 : 1
     }
 
+    /**
+     * [EN] Whether a pass is running: the display link of a rate other than 1, or SVGAPlayer's own animation.
+     * [CN] 是否正在播放一遍：速率不为 1 时的 display link，或 SVGAPlayer 自己的动画。
+     */
+    @objc(cyl_animationViewIsPlaying)
+    public func isAnimationPlaying() -> Bool {
+        speedLink != nil || isAnimating
+    }
+
+    /**
+     * [EN] Called when a one-pass animation reaches its last frame (either path); not on a stop, not while looping.
+     * [CN] 只播放一遍的动画到达最后一帧时调用（两种路径都会）；停止时不调用，循环时不调用。
+     */
+    @objc(cyl_setAnimationViewEndHandler:)
+    public func setAnimationEndHandler(_ handler: (() -> Void)?) {
+        endHandler = handler
+    }
+
     @objc(cyl_animationViewProgress)
     public func animationViewProgress() -> CGFloat {
         let frames = Int(videoItem?.frames ?? 0)
@@ -242,6 +261,7 @@ public final class CYLSVGATabBarItemAnimationView: SVGAPlayer, SVGAPlayerDelegat
                 currentFrame = frames - 1
                 step(toFrame: frames - 1, andPlay: false)
                 keepTintOverlayAboveDrawing()
+                endHandler?()
                 return
             }
             frame %= frames
@@ -262,6 +282,12 @@ public final class CYLSVGATabBarItemAnimationView: SVGAPlayer, SVGAPlayerDelegat
 
     public func svgaPlayer(_: SVGAPlayer!, didAnimatedToFrame frame: Int) {
         currentFrame = frame
+    }
+
+    public func svgaPlayerDidFinishedAnimation(_: SVGAPlayer!) {
+        if !loopsForever {
+            endHandler?()
+        }
     }
 
     /**

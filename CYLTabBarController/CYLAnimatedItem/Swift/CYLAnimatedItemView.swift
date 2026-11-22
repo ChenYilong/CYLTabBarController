@@ -579,13 +579,53 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
             #endif
         }
     }
+    /**
+     [EN] Grows by one on every `restartAnimation()` (Play all), the name and meaning of HarmonyOS's `animationRestartToken`:
+          a host that sees it change knows the item restarted. Read only here; React Native and Flutter call
+          `restartAnimation()` when their own restart token prop changes.
+     [CN] 每次 `restartAnimation()`（全部播放）加一，名称与含义同鸿蒙的 `animationRestartToken`：宿主看到它变化就知道条目重新播放了。这里只读；
+          React Native 与 Flutter 在各自的重播 token 属性变化时调用 `restartAnimation()`。
+     */
+    public private(set) var animationRestartToken = 0
+    /**
+     [EN] Whether the view applies its default playback rules to the animation's player: `animationSpeed`, `animationLoops`
+          (also the loop restart for a player without a loop mode) and `animationRestingProgress`. true by default; false
+          (HarmonyOS's `drivesAnimationPlayback: false`): the view only hands out `animationPlayer` and the host drives it.
+          `playAnimation()`, `restartAnimation()` and `stopAnimation()` still call the player when the host asks. The end
+          callback `onAnimationEnd` is not a rule and is kept.
+     [CN] 视图是否对动画的播放器应用默认播放规则：`animationSpeed`、`animationLoops`（含没有循环模式的播放器的循环重播）与
+          `animationRestingProgress`。默认为 true；false（鸿蒙的 `drivesAnimationPlayback: false`）：视图只提供 `animationPlayer`，由宿主驱动。
+          宿主调用 `playAnimation()`、`restartAnimation()`、`stopAnimation()` 时仍会操作播放器。结束回调 `onAnimationEnd` 不属于规则，保持有效。
+     */
+    public var drivesAnimationPlayback = true {
+        didSet {
+            #if CYL_ANIMATION_ENGINE_AVAILABLE
+            guard drivesAnimationPlayback != oldValue else { return }
+            if drivesAnimationPlayback {
+                applyPlayerSettings()
+                if !playing { setPlayerValue(storedRestingProgress, for: "progress") }
+                if animationLoops, playing { startLoopTimerIfNeeded() }
+            } else {
+                stopLoopTimer()
+            }
+            #endif
+        }
+    }
+    /**
+     [EN] Called on the main queue when a play-once pass (`animationLoops` off) reaches its end: not on a stop, not while
+          looping, and only for an engine that can tell (`CYLTabBarItemAnimationPlayer.onEnded`). Replaces the player's own
+          `onEnded` as long as the view owns the callback; a host that sets `animationPlayer`'s `onEnded` takes it over.
+     [CN] 只播放一次（`animationLoops` 关闭）的一遍播放到结尾时在主队列调用：停止时不调用，循环时不调用，且只有能判断结束的引擎才会调用
+          （`CYLTabBarItemAnimationPlayer.onEnded`）。视图拥有该回调期间会占用播放器自己的 `onEnded`；宿主设置 `animationPlayer` 的 `onEnded` 即接管。
+     */
+    public var onAnimationEnd: (() -> Void)?
     /** [EN] The progress shown while not playing, clamped to 0...1. [CN] 未播放时显示的进度，限制在 0...1。 */
     open var animationRestingProgress: CGFloat {
         get { storedRestingProgress }
         set {
             storedRestingProgress = min(1, max(0, newValue))
             #if CYL_ANIMATION_ENGINE_AVAILABLE
-            if !playing { setPlayerValue(storedRestingProgress, for: "progress") }
+            if !playing, drivesAnimationPlayback { setPlayerValue(storedRestingProgress, for: "progress") }
             #endif
         }
     }
@@ -1001,6 +1041,7 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
     open func reloadAnimation() {
         #if CYL_ANIMATION_ENGINE_AVAILABLE
         stopLoopTimer()
+        detachEndHandler()
         storedAnimationView?.removeFromSuperview()
         storedAnimationView = nil
         playing = false
@@ -1013,8 +1054,9 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
                 view.accessibilityElementsHidden = true
                 insertSubview(view, aboveSubview: imageView)
                 storedAnimationView = view
+                attachEndHandler()
                 applyPlayerSettings()
-                setPlayerValue(animationRestingProgress, for: "progress")
+                if drivesAnimationPlayback { setPlayerValue(animationRestingProgress, for: "progress") }
             } else {
                 // [EN] Debug builds: a type whose engine is not in the build says which pod to add. [CN] debug 构建：引擎未参与构建的类型提示需要加入的 pod。
                 CYLAnimationWarnMissingEngine(nil, url)
@@ -1043,6 +1085,7 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
 
     /** [EN] Plays from progress 0 (the examples' "Play all"). [CN] 从进度 0 开始播放（示例中的「全部播放」）。 */
     open func restartAnimation() {
+        animationRestartToken += 1
         if animationView == nil, playAnimatedImage() { return }
         #if CYL_ANIMATION_ENGINE_AVAILABLE
         setPlayerValue(CGFloat(0), for: "progress")
@@ -1058,7 +1101,7 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
         playing = false
         stopLoopTimer()
         player?.stop()
-        setPlayerValue(animationRestingProgress, for: "progress")
+        if drivesAnimationPlayback { setPlayerValue(animationRestingProgress, for: "progress") }
         #endif
     }
 
@@ -1086,8 +1129,31 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
         if player.responds(to: setter) { player.setValue(value, forKey: key) }
     }
 
+    /// [EN] Gives the player's `onEnded` to the view (a player without it never reports an end). The block holds the view
+    ///      weakly: the player belongs to the animation view, which the view owns.
+    /// [CN] 把播放器的 `onEnded` 交给视图（没有它的播放器从不报告结束）。block 对视图是弱引用：播放器属于动画视图，而动画视图由本视图持有。
+    private func attachEndHandler() {
+        guard let player = animationPlayer as? NSObject, player.responds(to: NSSelectorFromString("setOnEnded:")) else { return }
+        let handler: @convention(block) () -> Void = { [weak self] in self?.animationPassDidEnd() }
+        player.setValue(unsafeBitCast(handler, to: AnyObject.self), forKey: "onEnded")
+    }
+
+    private func detachEndHandler() {
+        guard let player = animationPlayer as? NSObject, player.responds(to: NSSelectorFromString("setOnEnded:")) else { return }
+        player.setValue(nil, forKey: "onEnded")
+    }
+
+    /// [EN] A pass ended. While the view loops the animation (itself or by the loop restart) there is no end to report.
+    /// [CN] 一遍播放结束。视图在让动画循环时（自己循环或由循环重播实现）没有可报告的结束。
+    private func animationPassDidEnd() {
+        if drivesAnimationPlayback, animationLoops { return }
+        playing = false
+        stopLoopTimer()
+        onAnimationEnd?()
+    }
+
     private func applyPlayerSettings() {
-        guard animationPlayer != nil else { return }
+        guard drivesAnimationPlayback, animationPlayer != nil else { return }
         if animationSpeed > 0 { setPlayerValue(animationSpeed, for: "animationSpeed") }
         setPlayerValue(animationLoops, for: "loops")
     }
@@ -1096,7 +1162,7 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
     ///      CollectionViewClassifyMenu's tags did.
     /// [CN] 没有 `loops`（或忽略 `loops`）的播放器，在播放到末尾时重新开始，与 CollectionViewClassifyMenu 的标签做法一致。
     private func startLoopTimerIfNeeded() {
-        guard animationLoops, loopTimer == nil, let player = animationPlayer,
+        guard drivesAnimationPlayback, animationLoops, loopTimer == nil, let player = animationPlayer,
               !player.responds(to: #selector(setter: CYLTabBarItemAnimationPlayer.loops)),
               player.responds(to: #selector(getter: CYLTabBarItemAnimationPlayer.progress)) else { return }
         let timer = Timer(timeInterval: cylAnimatedItemLoopCheckInterval, repeats: true) { [weak self] timer in
@@ -1468,6 +1534,7 @@ extension CYLAnimatedItemView: CYLTabBarItemAnimationFailureHandling {
     open func cylAnimationViewDidFail(_ animationView: UIView, error _: Error?) {
         guard animationView === self.animationView else { return }
         stopLoopTimer()
+        detachEndHandler()
         animationView.removeFromSuperview()
         storedAnimationView = nil
         playing = false

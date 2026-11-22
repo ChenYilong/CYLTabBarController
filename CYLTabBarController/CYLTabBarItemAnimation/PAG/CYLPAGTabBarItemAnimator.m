@@ -43,17 +43,33 @@
 //      `libpag/PAGView+Audio.h`（该子库同样因此使用 `-fno-modules`；pod lib lint 在运行 44975115535 中因此失败）。因此该子库的播放器与视图
 //      加载保留 Objective-C，类名与方法与 `PAG` 子库使用的 CYLPAGTabBarItemAnimation.swift 相同。
 /// [EN] Plays a `PAGView`. [CN] 播放 `PAGView`。
-@interface CYLPAGTabBarItemAnimationPlayer : CYLTabBarItemAnimationBasePlayer <CYLTabBarItemAnimationPlayer>
+@interface CYLPAGTabBarItemAnimationPlayer : CYLTabBarItemAnimationBasePlayer <CYLTabBarItemAnimationPlayer, PAGViewListener>
 @end
 
-@implementation CYLPAGTabBarItemAnimationPlayer
+@implementation CYLPAGTabBarItemAnimationPlayer {
+    /// [EN] Added to the view on the first `-play`, the only moment an end can follow. [CN] 在第一次 `-play` 时加到视图上，结束只可能出现在此之后。
+    BOOL _listening;
+}
 
 - (PAGView *)pagView {
     return (PAGView *)self.animationView;
 }
 
+- (BOOL)isPlaying {
+    return [self.pagView isPlaying];
+}
+
+/// [EN] PAG reports the end of the animation after its repeat count (never with `loops` on). [CN] PAG 在重复次数用完后报告动画结束（`loops` 开启时从不）。
+- (void)onAnimationEnd:(PAGView *)pagView {
+    [self notifyPlaybackEnded];
+}
+
 - (void)play {
     PAGView *pagView = self.pagView;
+    if (!_listening && pagView) {
+        _listening = YES;
+        [pagView addListener:self];
+    }
     [pagView stop];
     [pagView setProgress:0];
     [pagView play];
