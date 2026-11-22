@@ -56,13 +56,13 @@ final class CYLBadgeLabel: UILabel {
 
     override func didMoveToWindow() {
         super.didMoveToWindow()
-        cyl_notifyBadgeHostOfEnvironmentChange()
+        cylNotifyBadgeHostOfEnvironmentChange()
     }
 
     @available(iOS, deprecated: 17.0)
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
-        cyl_notifyBadgeHostOfEnvironmentChange()
+        cylNotifyBadgeHostOfEnvironmentChange()
     }
 }
 
@@ -169,12 +169,12 @@ final class CYLBadgeHostOverlayView: UIView {
         fatalError("init(coder:) is not supported")
     }
 
-    func cyl_attach(toHost host: UIView) {
+    func cylAttach(toHost host: UIView) {
         guard let container = host.superview else {
             return
         }
         if self.host !== host || superview !== container || !(hostConstraints.first?.isActive ?? false) {
-            cyl_detach()
+            cylDetach()
             self.host = host
             container.insertSubview(self, aboveSubview: host)
             hostConstraints = [
@@ -191,10 +191,10 @@ final class CYLBadgeHostOverlayView: UIView {
             container.insertSubview(self, aboveSubview: host)
         }
         frame = host.frame
-        cyl_followHostVisibility()
+        followHostVisibility()
     }
 
-    private func cyl_followHostVisibility() {
+    private func followHostVisibility() {
         let hostLayer = observedLayer
         // [EN] FIX: issue #601 — a host hidden for the view shown in its place keeps its badge visible, above that view too,
         //      which is added to the tab button later.
@@ -210,7 +210,7 @@ final class CYLBadgeHostOverlayView: UIView {
         alpha = CGFloat(hostLayer?.opacity ?? 1)
     }
 
-    func cyl_detach() {
+    func cylDetach() {
         if let observedLayer {
             observedLayer.removeObserver(self, forKeyPath: "hidden", context: &CYLBadgeHostOverlayView.kvoContext)
             observedLayer.removeObserver(self, forKeyPath: "opacity", context: &CYLBadgeHostOverlayView.kvoContext)
@@ -226,7 +226,7 @@ final class CYLBadgeHostOverlayView: UIView {
             super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
             return
         }
-        cyl_followHostVisibility()
+        followHostVisibility()
     }
 
     deinit {
@@ -245,7 +245,7 @@ private final class CYLBadgeHostOverlayToken: NSObject {
     weak var overlay: CYLBadgeHostOverlayView?
 
     deinit {
-        overlay?.cyl_detach()
+        overlay?.cylDetach()
         overlay?.removeFromSuperview()
     }
 }
@@ -287,7 +287,7 @@ private func cylBadgeContainer(forHost host: UIView) -> UIView {
     let needsOverlay = hostClips || host.cyl_badgeHostReplacedByIconView || cylBadgeHostDrawsAsTemplate(host)
     if !needsOverlay || host.superview == nil {
         if let overlay = token?.overlay {
-            overlay.cyl_detach()
+            overlay.cylDetach()
             overlay.removeFromSuperview()
             token?.overlay = nil
         }
@@ -299,7 +299,7 @@ private func cylBadgeContainer(forHost host: UIView) -> UIView {
     }
     let overlay = token?.overlay ?? CYLBadgeHostOverlayView(frame: host.frame)
     token?.overlay = overlay
-    overlay.cyl_attach(toHost: host)
+    overlay.cylAttach(toHost: host)
     return overlay.superview != nil ? overlay : host
 }
 
@@ -318,7 +318,7 @@ extension UIView {
 
     @objc(cyl_isReady)
     public dynamic func cyl_isReady() -> Bool {
-        if cyl_badgeClass() == nil {
+        if cylBadgeClass() == nil {
             return false
         }
         // [EN] No root view controller check: a bar button is not ready then, and its red dot could never be added.
@@ -339,15 +339,15 @@ extension UIView {
 
     @objc(cyl_showBadgeValue:animationTypeValue:)
     public dynamic func cyl_showBadgeValue(_ value: String, animationTypeValue: NSNumber) {
-        if cyl_forwardBadgeToAnimatedItemIcon(#selector(UIView.cyl_showBadgeValue(_:animationTypeValue:)), value, animationTypeValue) {
+        if cylForwardBadgeToAnimatedItemIcon(#selector(UIView.cyl_showBadgeValue(_:animationTypeValue:)), value, animationTypeValue) {
             return
         }
-        let generation = cyl_invalidatePendingBadgeValue()
-        if cyl_shouldWaitForLayoutBeforeShowingBadgeValue(value) {
+        let generation = cylInvalidatePendingBadgeValue()
+        if cylShouldWaitForLayoutBeforeShowingBadgeValue(value) {
             cyl_showBadgeValue(value, animationTypeValue: animationTypeValue, afterLayoutWithGeneration: generation, attempt: 0)
             return
         }
-        cyl_showBadgeValueNow(value, animationTypeValue: animationTypeValue)
+        cylShowBadgeValueNow(value, animationTypeValue: animationTypeValue)
     }
 
     /**
@@ -361,8 +361,8 @@ extension UIView {
      *      先在下一个 run loop、再按 `cyl_delayIfNeededForSeconds` 延迟重试，最多三次，只显示最新的值；（2）角标固定在宿主右上角，宿主尺寸
      *      之后改变时跟随。范围：所有 TabBar 样式中的角标，以及其他任意视图。
      */
-    private func cyl_shouldWaitForLayoutBeforeShowingBadgeValue(_ value: String?) -> Bool {
-        guard let value, cyl_badgeClass() != nil else {
+    private func cylShouldWaitForLayoutBeforeShowingBadgeValue(_ value: String?) -> Bool {
+        guard let value, cylBadgeClass() != nil else {
             return false
         }
         // [EN] A number <= 0 hides the badge, which needs no layout. [CN] 小于等于 0 的数字隐藏角标，无需布局。
@@ -376,19 +376,19 @@ extension UIView {
                                     attempt: Int) {
         let delay = attempt == 0 ? 0 : max(Double(cyl_delayIfNeededForSeconds), 0.1)
         DispatchQueue.main.asyncAfter(deadline: .now() + delay) { [weak self] in
-            guard let self, self.cyl_pendingBadgeGeneration() == generation else {
+            guard let self, self.cylPendingBadgeGeneration() == generation else {
                 return
             }
-            if attempt + 1 < CYLBadgeViewKeys.maximumLayoutRetryCount && self.cyl_shouldWaitForLayoutBeforeShowingBadgeValue(value) {
+            if attempt + 1 < CYLBadgeViewKeys.maximumLayoutRetryCount && self.cylShouldWaitForLayoutBeforeShowingBadgeValue(value) {
                 self.cyl_showBadgeValue(value, animationTypeValue: animationTypeValue, afterLayoutWithGeneration: generation,
                                         attempt: attempt + 1)
                 return
             }
-            self.cyl_showBadgeValueNow(value, animationTypeValue: animationTypeValue)
+            self.cylShowBadgeValueNow(value, animationTypeValue: animationTypeValue)
         }
     }
 
-    private func cyl_pendingBadgeGeneration() -> UInt {
+    private func cylPendingBadgeGeneration() -> UInt {
         (objc_getAssociatedObject(self, CYLBadgeViewKeys.pendingGeneration) as? NSNumber)?.uintValue ?? 0
     }
 
@@ -396,16 +396,16 @@ extension UIView {
      * [EN] Cancels a badge value waiting for layout; returns the new generation. [CN] 取消等待布局的角标值；返回新的代数。
      */
     @discardableResult
-    private func cyl_invalidatePendingBadgeValue() -> UInt {
-        let generation = cyl_pendingBadgeGeneration() + 1
+    private func cylInvalidatePendingBadgeValue() -> UInt {
+        let generation = cylPendingBadgeGeneration() + 1
         objc_setAssociatedObject(self, CYLBadgeViewKeys.pendingGeneration, NSNumber(value: generation),
                                  .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
         return generation
     }
 
-    private func cyl_showBadgeValueNow(_ value: String, animationTypeValue: NSNumber) {
+    private func cylShowBadgeValueNow(_ value: String, animationTypeValue: NSNumber) {
         cyl_badge?.subviews.forEach { $0.removeFromSuperview() }
-        if cyl_shouldUpdateBadgeSubviews() {
+        if cylShouldUpdateBadgeSubviews() {
             cyl_badge?.removeFromSuperview()
             cyl_badge = nil
         }
@@ -413,7 +413,7 @@ extension UIView {
         cyl_badgeAnimationTypeValue = NSNumber(value: animationType.rawValue)
         cyl_showBadge(withValue: value)
         if animationType != .none {
-            cyl_beginAnimation()
+            cylBeginAnimation()
         }
     }
 
@@ -449,10 +449,10 @@ extension UIView {
      * [CN] 与 `-willMoveToSuperview:` 交换（UIBarButtonItem+CYLBadgeExtention.m）：每次父视图出现时把角标移到兄弟视图之上。
      */
     @objc(cyl_willMoveToSuperview:)
-    dynamic func cyl_willMove(toSuperview newSuperview: UIView?) {
-        cyl_willMove(toSuperview: newSuperview)
+    dynamic func cylWillMove(toSuperview newSuperview: UIView?) {
+        cylWillMove(toSuperview: newSuperview)
         if newSuperview != nil, let badge = cyl_badge {
-            cyl_bringBadge(toFront: badge)
+            cylBringBadge(toFront: badge)
         }
     }
 
@@ -462,11 +462,11 @@ extension UIView {
             return
         }
         if !value.isEmpty && value.trimmingCharacters(in: .decimalDigits).isEmpty {
-            cyl_showNumberBadge(withValue: (value as NSString).integerValue)
+            cylShowNumberBadge(withValue: (value as NSString).integerValue)
             return
         }
         if value.isEmpty {
-            cyl_showRedDotBadge()
+            cylShowRedDotBadge()
             return
         }
         // [EN] Only spaces or line breaks: nothing to read, so hide instead of showing an empty pill.
@@ -476,10 +476,10 @@ extension UIView {
             return
         }
         if value == "new" || value == "NEW" {
-            cyl_showNewBadge(value)
+            cylShowNewBadge(value)
             return
         }
-        cyl_showTextBadge(value)
+        cylShowTextBadge(value)
     }
 
     /**
@@ -487,12 +487,12 @@ extension UIView {
      */
     @objc(cyl_clearBadge)
     public dynamic func cyl_clearBadge() {
-        if cyl_forwardBadgeToAnimatedItemIcon(#selector(UIView.cyl_clearBadge)) {
+        if cylForwardBadgeToAnimatedItemIcon(#selector(UIView.cyl_clearBadge)) {
             return
         }
-        cyl_invalidatePendingBadgeValue()
+        cylInvalidatePendingBadgeValue()
         cyl_badge?.cyl_setHidden(true)
-        cyl_updateBadgeAccessibility()
+        cylUpdateBadgeAccessibility()
     }
 
     @objc(cyl_isShowBadge)
@@ -512,12 +512,12 @@ extension UIView {
      */
     @objc(cyl_resumeBadge)
     public dynamic func cyl_resumeBadge() {
-        if cyl_forwardBadgeToAnimatedItemIcon(#selector(UIView.cyl_resumeBadge)) {
+        if cylForwardBadgeToAnimatedItemIcon(#selector(UIView.cyl_resumeBadge)) {
             return
         }
         if cyl_isPauseBadge() {
             cyl_badge?.cyl_setHidden(false)
-            cyl_badgeEnvironmentDidChange()
+            cylBadgeEnvironmentDidChange()
         }
     }
 
@@ -560,7 +560,7 @@ extension UIView {
      * [CN] 直接发给动效 item 的角标消息（例如没有 Core 的角标子库，此时 `UIControl` 不会转发）：通过常规的 `-cyl_performSelector:withObject:withObject:`
      *      转发给其图标子视图，角标添加在那里。已转发时返回 true；其他视图及图标本身返回 false。
      */
-    private func cyl_forwardBadgeToAnimatedItemIcon(_ selector: Selector, _ object1: Any? = nil, _ object2: Any? = nil) -> Bool {
+    private func cylForwardBadgeToAnimatedItemIcon(_ selector: Selector, _ object1: Any? = nil, _ object2: Any? = nil) -> Bool {
         guard let icon = cyl_animatedItemBadgeHost(), icon !== self else {
             return false
         }
@@ -631,7 +631,7 @@ extension UIView {
         _ = perform(aSelector, with: object1, with: object2)
     }
 
-    private func cyl_addMargin() {
+    private func cylAddMargin() {
         guard let badge = cyl_badge else {
             return
         }
@@ -644,25 +644,25 @@ extension UIView {
         badge.frame = frame
     }
 
-    private func cyl_showRedDotBadge() {
+    private func cylShowRedDotBadge() {
         if !cyl_isReady() {
             return
         }
-        cyl_badgeInit()
+        cylBadgeInit()
         // [EN] A badge already shown in another style must be updated. [CN] 已经以其他样式显示的角标需要更新。
         if let badge = cyl_badge, badge.tag != Int(CYLBadgeStyle.redDot.rawValue) {
             badge.text = ""
             badge.tag = Int(CYLBadgeStyle.redDot.rawValue)
-            cyl_resetRedDotBadgeFrame()
+            cylResetRedDotBadgeFrame()
             badge.layer.cornerRadius = badge.frame.width / 2
         }
-        cyl_applyBadgeBorder()
+        cylApplyBadgeBorder()
         cyl_badge?.cyl_setHidden(false)
-        cyl_updateBadgeAccessibility()
+        cylUpdateBadgeAccessibility()
     }
 
-    private func cyl_showNewBadge(_ value: String) {
-        if cyl_badgeClass() == nil {
+    private func cylShowNewBadge(_ value: String) {
+        if cylBadgeClass() == nil {
             return
         }
         // [EN] "new" / "NEW" are tokens; show them in the app's language. [CN] "new" / "NEW" 是标记，按 App 的语言显示。
@@ -670,32 +670,32 @@ extension UIView {
         let size = (localized as NSString).size(withAttributes: [.font: cyl_badgeFont as UIFont])
         let labelHeight = ceil(size.height) + cyl_badgeMargin
         cyl_badgeCornerRadius = labelHeight / 3
-        cyl_showTextBadge(localized)
+        cylShowTextBadge(localized)
     }
 
-    private func cyl_showTextBadge(_ value: String?) {
+    private func cylShowTextBadge(_ value: String?) {
         if !cyl_isReady() {
             return
         }
         guard let value, !value.isEmpty else {
             cyl_badge?.cyl_setHidden(true)
-            cyl_updateBadgeAccessibility()
+            cylUpdateBadgeAccessibility()
             return
         }
-        cyl_badgeInit()
+        cylBadgeInit()
         guard let badge = cyl_badge else {
             return
         }
         badge.tag = Int(CYLBadgeStyle.other.rawValue)
         badge.text = value
         badge.font = cyl_badgeFont
-        cyl_adjustLabelWidth(badge)
-        cyl_addMargin()
-        cyl_layoutBadgeAtTopRightCorner()
-        badge.layer.cornerRadius = cyl_textBadgeCornerRadius()
-        cyl_applyBadgeBorder()
+        cylAdjustLabelWidth(badge)
+        cylAddMargin()
+        cylLayoutBadgeAtTopRightCorner()
+        badge.layer.cornerRadius = cylTextBadgeCornerRadius()
+        cylApplyBadgeBorder()
         badge.cyl_setHidden(false)
-        cyl_updateBadgeAccessibility()
+        cylUpdateBadgeAccessibility()
     }
 
     /**
@@ -708,7 +708,7 @@ extension UIView {
      *      label 自身作为元素。
      */
     @objc(cyl_updateBadgeAccessibility)
-    dynamic func cyl_updateBadgeAccessibility() {
+    dynamic func cylUpdateBadgeAccessibility() {
         let badge = cyl_badge
         var description: String?
         if let badge, !badge.cyl_isHidden() {
@@ -743,20 +743,20 @@ extension UIView {
         }
     }
 
-    private func cyl_showNumberBadge(withValue value: Int) {
-        if cyl_badgeClass() == nil {
+    private func cylShowNumberBadge(withValue value: Int) {
+        if cylBadgeClass() == nil {
             return
         }
         if value <= 0 {
             cyl_badge?.cyl_setHidden(true)
             return
         }
-        cyl_badgeInit()
+        cylBadgeInit()
         cyl_badge?.cyl_setHidden(value == 0)
         cyl_badge?.tag = Int(CYLBadgeStyle.number.rawValue)
         // [EN] A maximum below 1 would turn every number into "0+". [CN] 小于 1 的上限会把所有数字变成 "0+"。
         let maximumBadgeNumber = max(1, cyl_badgeMaximumBadgeNumber)
-        cyl_showTextBadge(value > maximumBadgeNumber ? "\(maximumBadgeNumber)+" : "\(value)")
+        cylShowTextBadge(value > maximumBadgeNumber ? "\(maximumBadgeNumber)+" : "\(value)")
     }
 
     /**
@@ -765,7 +765,7 @@ extension UIView {
      * [CN] 延迟创建角标视图。颜色不写回对象：未设置时每次都从 `CYLBadgeAppearance` 取值（#425）；已存在的角标同步之后修改过的全局颜色。
      */
     @objc(cyl_badgeInit)
-    dynamic func cyl_badgeInit() {
+    dynamic func cylBadgeInit() {
         if !cyl_isReady() {
             return
         }
@@ -774,12 +774,12 @@ extension UIView {
             badge.textColor = cyl_badgeTextColor
             return
         }
-        guard let badgeClass = cyl_badgeClass(),
+        guard let badgeClass = cylBadgeClass(),
               let badge = badgeClass.init(frame: frame) as? UIView & CYLBadgeTextDisplaying else {
             return
         }
         cyl_badge = badge
-        cyl_resetRedDotBadgeFrame()
+        cylResetRedDotBadgeFrame()
         badge.textAlignment = .center
         badge.textColor = cyl_badgeTextColor
         badge.text = ""
@@ -788,15 +788,15 @@ extension UIView {
         badge.cyl_setHidden(true)
         badge.isAccessibilityElement = false
         badge.backgroundColor = cyl_badgeBackgroundColor
-        cyl_applyBadgeBorder()
-        cyl_bringBadge(toFront: badge)
+        cylApplyBadgeBorder()
+        cylBringBadge(toFront: badge)
     }
 
     /**
      * [EN] Above everything in the host, or in an overlay above the host when the host clips (`CYLBadgeHostOverlayView`).
      * [CN] 位于宿主所有内容之上；宿主会裁剪时放在宿主之上的浮层中（`CYLBadgeHostOverlayView`）。
      */
-    private func cyl_bringBadge(toFront view: UIView) {
+    private func cylBringBadge(toFront view: UIView) {
         if !cyl_isReady() {
             return
         }
@@ -805,10 +805,10 @@ extension UIView {
             container.addSubview(view)
         }
         container.bringSubviewToFront(view)
-        view.layer.zPosition = .cyl_topZPosition
+        view.layer.zPosition = .cylTopZPosition
     }
 
-    private func cyl_resetRedDotBadgeFrame() {
+    private func cylResetRedDotBadgeFrame() {
         var redDotWidth = CYLBadgeViewKeys.defaultRedDotRadius * 2
         let badgeRadius = cyl_badgeRadius
         if badgeRadius > 0 && badgeRadius.isFinite {
@@ -819,7 +819,7 @@ extension UIView {
         }
         badge.frame = CGRect(x: bounds.width, y: -redDotWidth, width: redDotWidth, height: redDotWidth)
         badge.layoutIfNeeded()
-        cyl_layoutBadgeAtTopRightCorner()
+        cylLayoutBadgeAtTopRightCorner()
         badge.layer.masksToBounds = true
     }
 
@@ -831,7 +831,7 @@ extension UIView {
      *      `bounds` 而不是 `frame`：宿主上的 transform（如 Tab 图片动画）不应移动角标。
      */
     @objc(cyl_layoutBadgeAtTopRightCorner)
-    dynamic func cyl_layoutBadgeAtTopRightCorner() {
+    dynamic func cylLayoutBadgeAtTopRightCorner() {
         guard let badge = cyl_badge else {
             return
         }
@@ -847,7 +847,7 @@ extension UIView {
      *      automatic: half the height.
      * [CN] 自定义的 `cyl_badgeCornerRadius` 不超过角标短边的一半；0、负数或非有限值表示自动：高度的一半。
      */
-    private func cyl_textBadgeCornerRadius() -> CGFloat {
+    private func cylTextBadgeCornerRadius() -> CGFloat {
         let size = cyl_badge?.bounds.size ?? .zero
         let maximumRadius = max(0, min(size.width, size.height) / 2)
         let customRadius = cyl_badgeCornerRadius
@@ -865,7 +865,7 @@ extension UIView {
      * [CN] 应用 `cyl_badgeBorderWidth` / `cyl_badgeBorderColor`。`CALayer.borderColor` 不会自动跟随深色模式，因此在这里按角标的 trait
      *      解析动态颜色，并在 trait 改变时重新解析。
      */
-    private func cyl_applyBadgeBorder() {
+    private func cylApplyBadgeBorder() {
         guard let badge = cyl_badge else {
             return
         }
@@ -882,13 +882,13 @@ extension UIView {
      * [CN] 由角标视图自身（`CYLBadgeLabel`、`CYLTabBarBadgeView`）在进入 window 或 trait 改变时调用。
      */
     @objc(cyl_notifyBadgeHostOfEnvironmentChange)
-    dynamic func cyl_notifyBadgeHostOfEnvironmentChange() {
+    dynamic func cylNotifyBadgeHostOfEnvironmentChange() {
         var host = superview
         if let overlay = host as? CYLBadgeHostOverlayView {
             host = overlay.host
         }
         if let host, host.cyl_badge === self {
-            host.cyl_badgeEnvironmentDidChange()
+            host.cylBadgeEnvironmentDidChange()
         }
     }
 
@@ -898,22 +898,22 @@ extension UIView {
      * [CN] 重新解析边框颜色，并使循环动画与环境保持一致：被 UIKit 移除时恢复，开启“减弱动态效果”时移除。一次性动画不会在这里重播。
      */
     @objc(cyl_badgeEnvironmentDidChange)
-    dynamic func cyl_badgeEnvironmentDidChange() {
+    dynamic func cylBadgeEnvironmentDidChange() {
         guard let badge = cyl_badge else {
             return
         }
-        cyl_applyBadgeBorder()
+        cylApplyBadgeBorder()
         let animationType = cyl_badgeAnimationType
         guard CYLBadgeAnimationTypeRepeats(animationType), let key = CYLBadgeAnimationKeyForType(animationType),
               badge.window != nil, !badge.isHidden, badge.alpha > 0.01 else {
             return
         }
-        if cyl_shouldReduceBadgeMotion() {
-            cyl_removeBadgeAnimations()
+        if cylShouldReduceBadgeMotion() {
+            cylRemoveBadgeAnimations()
             return
         }
         if badge.layer.animation(forKey: key) == nil {
-            cyl_beginAnimation()
+            cylBeginAnimation()
         }
     }
 
@@ -922,7 +922,7 @@ extension UIView {
      */
     @objc(cyl_refreshBadge)
     public dynamic func cyl_refreshBadge() {
-        if cyl_forwardBadgeToAnimatedItemIcon(#selector(UIView.cyl_refreshBadge)) {
+        if cylForwardBadgeToAnimatedItemIcon(#selector(UIView.cyl_refreshBadge)) {
             return
         }
         guard let badge = cyl_badge else {
@@ -937,8 +937,8 @@ extension UIView {
             container.addSubview(badge)
         }
         container.bringSubviewToFront(badge)
-        cyl_layoutBadgeAtTopRightCorner()
-        cyl_badgeEnvironmentDidChange()
+        cylLayoutBadgeAtTopRightCorner()
+        cylBadgeEnvironmentDidChange()
     }
 
     /**
@@ -974,14 +974,14 @@ extension UIView {
         badge.backgroundColor = cyl_badgeBackgroundColor
         badge.textColor = cyl_badgeTextColor
         badge.font = cyl_badgeFont
-        cyl_applyBadgeBorder()
+        cylApplyBadgeBorder()
     }
 
-    private func cyl_shouldReduceBadgeMotion() -> Bool {
+    private func cylShouldReduceBadgeMotion() -> Bool {
         cyl_badgeRespectsReduceMotion && UIAccessibility.isReduceMotionEnabled
     }
 
-    private func cyl_removeBadgeAnimations() {
+    private func cylRemoveBadgeAnimations() {
         guard let layer = cyl_badge?.layer else {
             return
         }
@@ -994,7 +994,7 @@ extension UIView {
      * [EN] Sizes the badge to its text (the label of a `CYLTabBarBadgeView`, or the badge itself when it is a label).
      * [CN] 按文本确定角标尺寸（`CYLTabBarBadgeView` 的 label，或角标本身为 label 时）。
      */
-    private func cyl_adjustLabelWidth(_ badge: UIView & CYLBadgeTextDisplaying) {
+    private func cylAdjustLabelWidth(_ badge: UIView & CYLBadgeTextDisplaying) {
         let label: UILabel?
         if let badgeLabel = badge as? UILabel {
             label = badgeLabel
@@ -1004,7 +1004,7 @@ extension UIView {
         guard let label, let text = label.text, !text.isEmpty else {
             return
         }
-        let size = cyl_getLabelSize(label)
+        let size = cylGetLabelSize(label)
         if size == .zero {
             return
         }
@@ -1022,7 +1022,7 @@ extension UIView {
      * [CN] 角标只有一行：按单行测量文本并让 label 保持单行（`numberOfLines` 为 1），宽度稍有不足也不会换出被裁掉的第二行。含换行符的文本
      *      只显示第一行。
      */
-    private func cyl_getLabelSize(_ label: UILabel) -> CGSize {
+    private func cylGetLabelSize(_ label: UILabel) -> CGSize {
         label.numberOfLines = 1
         guard let text = label.text, !text.isEmpty, let font = label.font else {
             return .zero
@@ -1041,12 +1041,12 @@ extension UIView {
      *      （CYLBadgeProtocol.h），在 `CAAnimation+CYLBadgeExtention` 中添加动画，并在 `CYLBadgeAnimationForType()` 中添加分支。
      */
     @objc(cyl_beginAnimation)
-    dynamic func cyl_beginAnimation() {
+    dynamic func cylBeginAnimation() {
         guard let badge = cyl_badge else {
             return
         }
-        cyl_removeBadgeAnimations()
-        if cyl_shouldReduceBadgeMotion() {
+        cylRemoveBadgeAnimations()
+        if cylShouldReduceBadgeMotion() {
             return
         }
         #if CYL_BADGE_ANIMATION_DISABLED
@@ -1063,7 +1063,7 @@ extension UIView {
     }
 
     @objc(cyl_removeAnimation)
-    dynamic func cyl_removeAnimation() {
+    dynamic func cylRemoveAnimation() {
         cyl_badge?.layer.removeAllAnimations()
     }
 
@@ -1089,7 +1089,7 @@ extension UIView {
         @objc(cyl_setBadgeFont:) set {
             objc_setAssociatedObject(self, CYLBadgeViewKeys.font, newValue, .OBJC_ASSOCIATION_RETAIN)
             if cyl_badge == nil {
-                cyl_badgeInit()
+                cylBadgeInit()
             }
             // [EN] nil restores the global font. [CN] nil 恢复全局字体。
             cyl_badge?.font = cyl_badgeFont
@@ -1103,7 +1103,7 @@ extension UIView {
         @objc(cyl_setBadgeBackgroundColor:) set {
             objc_setAssociatedObject(self, CYLBadgeViewKeys.backgroundColor, newValue, .OBJC_ASSOCIATION_RETAIN)
             if cyl_badge == nil {
-                cyl_badgeInit()
+                cylBadgeInit()
             }
             cyl_badge?.backgroundColor = cyl_badgeBackgroundColor
         }
@@ -1116,7 +1116,7 @@ extension UIView {
         @objc(cyl_setBadgeTextColor:) set {
             objc_setAssociatedObject(self, CYLBadgeViewKeys.textColor, newValue, .OBJC_ASSOCIATION_RETAIN)
             if cyl_badge == nil {
-                cyl_badgeInit()
+                cylBadgeInit()
             }
             cyl_badge?.textColor = cyl_badgeTextColor
         }
@@ -1130,10 +1130,10 @@ extension UIView {
         @objc(cyl_setBadgeAnimationType:) set {
             objc_setAssociatedObject(self, CYLBadgeViewKeys.animationType, NSNumber(value: newValue.rawValue), .OBJC_ASSOCIATION_RETAIN)
             if cyl_badge == nil {
-                cyl_badgeInit()
+                cylBadgeInit()
             }
-            cyl_removeAnimation()
-            cyl_beginAnimation()
+            cylRemoveAnimation()
+            cylBeginAnimation()
         }
     }
 
@@ -1168,7 +1168,7 @@ extension UIView {
                                             "height": NSNumber(value: Double(newValue.height))]
             objc_setAssociatedObject(self, CYLBadgeViewKeys.frame, info, .OBJC_ASSOCIATION_RETAIN)
             if cyl_badge == nil {
-                cyl_badgeInit()
+                cylBadgeInit()
             }
             cyl_badge?.frame = newValue
         }
@@ -1213,13 +1213,13 @@ extension UIView {
         @objc(cyl_setBadgeCenterOffset:) set {
             let info: [String: NSNumber] = ["x": NSNumber(value: Double(newValue.x)), "y": NSNumber(value: Double(newValue.y))]
             objc_setAssociatedObject(self, CYLBadgeViewKeys.centerOffset, info, .OBJC_ASSOCIATION_RETAIN)
-            if cyl_shouldUpdateBadgeSubviews() {
+            if cylShouldUpdateBadgeSubviews() {
                 return
             }
             if cyl_badge == nil {
-                cyl_badgeInit()
+                cylBadgeInit()
             }
-            cyl_layoutBadgeAtTopRightCorner()
+            cylLayoutBadgeAtTopRightCorner()
         }
     }
 
@@ -1240,7 +1240,7 @@ extension UIView {
         @objc(cyl_setBadgeRadius:) set {
             objc_setAssociatedObject(self, CYLBadgeViewKeys.radius, NSNumber(value: Double(newValue)), .OBJC_ASSOCIATION_RETAIN)
             if cyl_badge == nil {
-                cyl_badgeInit()
+                cylBadgeInit()
             }
         }
     }
@@ -1262,7 +1262,7 @@ extension UIView {
         @objc(cyl_setBadgeMargin:) set {
             objc_setAssociatedObject(self, CYLBadgeViewKeys.margin, NSNumber(value: Double(newValue)), .OBJC_ASSOCIATION_RETAIN)
             if cyl_badge == nil {
-                cyl_badgeInit()
+                cylBadgeInit()
             }
         }
     }
@@ -1284,7 +1284,7 @@ extension UIView {
         @objc(cyl_setBadgeMaximumBadgeNumber:) set {
             objc_setAssociatedObject(self, CYLBadgeViewKeys.maximumBadgeNumber, NSNumber(value: newValue), .OBJC_ASSOCIATION_RETAIN)
             if cyl_badge == nil {
-                cyl_badgeInit()
+                cylBadgeInit()
             }
         }
     }
@@ -1308,7 +1308,7 @@ extension UIView {
         }
         @objc(cyl_setBadgeBorderColor:) set {
             objc_setAssociatedObject(self, CYLBadgeViewKeys.borderColor, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
-            cyl_applyBadgeBorder()
+            cylApplyBadgeBorder()
         }
     }
 
@@ -1325,7 +1325,7 @@ extension UIView {
             let borderWidth = newValue.isFinite ? max(0, newValue) : 0
             objc_setAssociatedObject(self, CYLBadgeViewKeys.borderWidth, NSNumber(value: Double(borderWidth)),
                                      .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
-            cyl_applyBadgeBorder()
+            cylApplyBadgeBorder()
         }
     }
 
@@ -1403,12 +1403,12 @@ extension UIView {
      *      `CYLBadgeLabel`（否则为 nil，与以前相同）。
      */
     @objc(cyl_badgeClass)
-    dynamic func cyl_badgeClass() -> UIView.Type? {
+    dynamic func cylBadgeClass() -> UIView.Type? {
         // [EN] `CYL_IS_IOS_27` in Objective-C. [CN] Objective-C 中的 `CYL_IS_IOS_27`。
         if (UIDevice.current.systemVersion as NSString).floatValue < 27 {
             return CYLBadgeLabel.self
         }
-        if cyl_isCYLTabBarStyleTypeLiquidGlass() {
+        if cylIsCYLTabBarStyleTypeLiquidGlass() {
             return CYLTabBarBadgeView.self
         }
         // [EN] `CYL_FLATDESIGN_AVAILABLE` in Objective-C: FlatDesign is part of the build.
@@ -1416,12 +1416,12 @@ extension UIView {
         return NSClassFromString("CYLFlatDesignTabBar") != nil ? CYLBadgeLabel.self : nil
     }
 
-    private func cyl_isCYLTabBarStyleTypeLiquidGlass() -> Bool {
+    private func cylIsCYLTabBarStyleTypeLiquidGlass() -> Bool {
         CYLUtils.isLiquidGlassActive()
     }
 
     @objc(cyl_shouldUpdateBadgeSubviews)
-    dynamic func cyl_shouldUpdateBadgeSubviews() -> Bool {
+    dynamic func cylShouldUpdateBadgeSubviews() -> Bool {
         CYLUtils.isLiquidGlassActive()
     }
 }

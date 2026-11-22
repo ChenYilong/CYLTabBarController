@@ -13,7 +13,7 @@ import CYLAnimatedItem
 /**
  * [EN] The same object, or equal ones (nil only matches nil). [CN] 同一对象或相等的对象（nil 只与 nil 匹配）。
  */
-func CYLThemeSameValue(_ value: Any?, _ otherValue: Any?) -> Bool {
+func cylThemeSameValue(_ value: Any?, _ otherValue: Any?) -> Bool {
     switch (value, otherValue) {
     case (nil, nil):
         return true
@@ -46,7 +46,7 @@ final class CYLThemeRestorableValue: NSObject {
     var installed: Any?
 
     func prepare(currentValue current: Any?) {
-        if installed != nil && !CYLThemeSameValue(current, installed) {
+        if installed != nil && !cylThemeSameValue(current, installed) {
             original = current ?? NSNull()
             installed = nil
         }
@@ -61,7 +61,7 @@ final class CYLThemeRestorableValue: NSObject {
 
     func shouldRestore(currentValue current: Any?) -> (restore: Bool, original: Any?) {
         let originalValue: Any? = original is NSNull ? nil : original
-        return (installed != nil && CYLThemeSameValue(current, installed), originalValue)
+        return (installed != nil && cylThemeSameValue(current, installed), originalValue)
     }
 }
 
@@ -104,7 +104,7 @@ enum CYLThemeKeys {
 }
 
 /// [EN] `attributes` without its icon keys. [CN] 去掉图标 key 的 `attributes`。
-private func CYLThemeAttributesWithoutIcons(_ attributes: [String: Any]?) -> [String: Any] {
+private func cylThemeAttributesWithoutIcons(_ attributes: [String: Any]?) -> [String: Any] {
     var withoutIcons = attributes ?? [:]
     for key in CYLThemeKeys.iconAttributeKeys {
         withoutIcons.removeValue(forKey: key)
@@ -113,7 +113,7 @@ private func CYLThemeAttributesWithoutIcons(_ attributes: [String: Any]?) -> [St
 }
 
 /// [EN] What the plus button shows now for `part`. [CN] PlusButton 当前显示的 `part`。
-private func CYLThemePlusButtonCurrentPart(_ plusButton: CYLPlusButton, _ part: String) -> Any? {
+private func cylThemePlusButtonCurrentPart(_ plusButton: CYLPlusButton, _ part: String) -> Any? {
     if part == CYLThemeKeys.plusPartTitle {
         return plusButton.cyl_title
     }
@@ -335,7 +335,7 @@ extension CYLTabBarController {
                 continue
             }
             let current = tabBarItemAttributes(at: UInt(index)) ?? [:]
-            let themeValues = CYLThemeAttributesWithoutIcons(tabAttributes.object(forKey: viewController) as? [String: Any])
+            let themeValues = cylThemeAttributesWithoutIcons(tabAttributes.object(forKey: viewController) as? [String: Any])
             let record = restorables.object(forKey: viewController) ?? CYLThemeAttributeValues()
             var toWrite: [String: Any] = [:]
             var toRemove: [String] = []
@@ -440,7 +440,7 @@ extension CYLTabBarController {
                     }
                     value.didInstall(self.cylTabBarItemIconViewProviders().object(forKey: viewController))
                 }
-                if image == nil || tabIcon.selectedIcon == nil || CYLThemeSameValue(tabIcon.selectedIcon, tabIcon.icon) {
+                if image == nil || tabIcon.selectedIcon == nil || cylThemeSameValue(tabIcon.selectedIcon, tabIcon.icon) {
                     show(nil)
                 } else {
                     CYLTabBarController.cylLoadTabBarItemIcon(tabIcon.selectedIcon, completion: show)
@@ -496,10 +496,10 @@ extension CYLTabBarController {
             }
             let value = cyl_themeSettings.plusButtonRestorables[part] ?? CYLThemeRestorableValue()
             cyl_themeSettings.plusButtonRestorables[part] = value
-            value.prepare(currentValue: CYLThemePlusButtonCurrentPart(plusButton, part))
+            value.prepare(currentValue: cylThemePlusButtonCurrentPart(plusButton, part))
             if part == CYLThemeKeys.plusPartTitle {
                 if updatePlusButton(attributes: [CYLTabBarItemTitle: themeValue]) {
-                    value.didInstall(CYLThemePlusButtonCurrentPart(plusButton, part) ?? themeValue)
+                    value.didInstall(cylThemePlusButtonCurrentPart(plusButton, part) ?? themeValue)
                 }
                 continue
             }
@@ -518,7 +518,7 @@ extension CYLTabBarController {
                     imageAttributes[CYLTabBarItemImageURLSize] = sizeValue
                 }
                 if self.updatePlusButton(attributes: imageAttributes) {
-                    value.didInstall(CYLThemePlusButtonCurrentPart(plusButton, part))
+                    value.didInstall(cylThemePlusButtonCurrentPart(plusButton, part))
                 }
             }
         }
@@ -548,7 +548,7 @@ extension CYLTabBarController {
         let settings = cyl_themeSettings
         guard let value = settings.plusButtonRestorables[part], let plusButton = CYLPlusButton(forOwner: self) else { return }
         settings.plusButtonRestorables.removeValue(forKey: part)
-        let result = value.shouldRestore(currentValue: CYLThemePlusButtonCurrentPart(plusButton, part))
+        let result = value.shouldRestore(currentValue: cylThemePlusButtonCurrentPart(plusButton, part))
         guard result.restore else { return }
         if part == CYLThemeKeys.plusPartTitle {
             plusButton.cyl_updateTitle((result.original as? String) ?? "", image: nil, selectedImage: nil)

@@ -161,9 +161,9 @@ import UIKit
 /// [EN] How often a running countdown reads the clock. The title changes only when the whole seconds left change, so a tick
 ///      that is a little late (a busy main thread) shows the right number, and the display is never ahead by more than this.
 /// [CN] 运行中的倒计时读取时钟的间隔。只有剩余整秒数变化时才改变标题，因此 tick 稍有延迟（主线程繁忙）时仍显示正确的数字，显示最多超前此间隔。
-private let CYLAnimatedItemCountdownTickInterval: TimeInterval = 0.25
+private let cylAnimatedItemCountdownTickInterval: TimeInterval = 0.25
 
-private let CYLAnimatedItemCountdownNumberFormatter: NumberFormatter = {
+private let cylAnimatedItemCountdownNumberFormatter: NumberFormatter = {
     let formatter = NumberFormatter()
     formatter.locale = Locale.autoupdatingCurrent
     formatter.usesGroupingSeparator = false
@@ -173,25 +173,25 @@ private let CYLAnimatedItemCountdownNumberFormatter: NumberFormatter = {
 /// [EN] `format` with its `%ld` (or `%d`) replaced by `seconds`, in the user's digits. A replacement instead of
 ///      `String(format:)` because the format is the app's text, not a literal.
 /// [CN] 把 `format` 中的 `%ld`（或 `%d`）替换为 `seconds`（使用用户所在地区的数字）。使用替换而不是 `String(format:)`，因为格式是 App 的文本，不是字面量。
-private func CYLAnimatedItemCountdownText(_ format: String, seconds: Int) -> String {
-    let number = CYLAnimatedItemCountdownNumberFormatter.string(from: NSNumber(value: seconds)) ?? String(seconds)
+private func cylAnimatedItemCountdownText(_ format: String, seconds: Int) -> String {
+    let number = cylAnimatedItemCountdownNumberFormatter.string(from: NSNumber(value: seconds)) ?? String(seconds)
     return format.replacingOccurrences(of: "%ld", with: number).replacingOccurrences(of: "%d", with: number)
 }
 
 /// [EN] The default animation size, as the tab bar's. [CN] 默认动画尺寸，与 TabBar 一致。
-private let CYLAnimatedItemDefaultAnimationSide: CGFloat = 24
+private let cylAnimatedItemDefaultAnimationSide: CGFloat = 24
 
 #if CYL_ANIMATION_ENGINE_AVAILABLE
 /// [EN] How often a looping animation whose player has no `loops` checks whether it reached the end.
 /// [CN] 播放器没有 `loops` 时，循环动画检查是否播放到末尾的间隔。
-private let CYLAnimatedItemLoopCheckInterval: TimeInterval = 0.05
+private let cylAnimatedItemLoopCheckInterval: TimeInterval = 0.05
 
 /// [EN] Whether `url` is a local file that is missing, not a regular file, or empty: no animation view is made for it, so
 ///      the static image or the placeholder shows at once. Remote files are checked by the animator, which reports a failed
 ///      download or a corrupted file (`CYLTabBarItemAnimationReportFailure`).
 /// [CN] `url` 是否为不存在、不是普通文件或为空的本地文件：不为其创建动画视图，立即显示静态图片或占位图。远程文件由 animator 检查，下载失败或文件损坏时报告
 ///      （`CYLTabBarItemAnimationReportFailure`）。
-private func CYLAnimatedItemLocalFileIsMissing(_ url: URL) -> Bool {
+private func cylAnimatedItemLocalFileIsMissing(_ url: URL) -> Bool {
     guard url.isFileURL else { return false }
     let path = url.path
     if path.isEmpty { return true }
@@ -267,8 +267,8 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
         get { storedPlaceholderImage ?? type(of: self).defaultPlaceholderImage }
         set {
             storedPlaceholderImage = newValue
-            cyl_updateIcon()
-            cyl_contentDidChange()
+            updateIcon()
+            contentDidChange()
         }
     }
     private var storedPlaceholderImage: UIImage?
@@ -315,31 +315,31 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
         didSet {
             titleLabel.text = title
             updateItemAccessibility()
-            cyl_contentDidChange()
+            contentDidChange()
         }
     }
     /** [EN] The static icon. [CN] 静态图标。 */
     @objc open dynamic var image: UIImage? {
         didSet {
-            cyl_updateIcon()
-            cyl_contentDidChange()
+            updateIcon()
+            contentDidChange()
         }
     }
     /** [EN] The icon while selected; nil uses `image`. [CN] 选中时的图标；为 nil 时使用 `image`。 */
     @objc open dynamic var selectedImage: UIImage? {
-        didSet { cyl_updateIcon() }
+        didSet { updateIcon() }
     }
 
     // MARK: - Layout properties 布局属性
 
     /** [EN] Icon beside the title (default) or above it. [CN] 图标在标题旁（默认）或上方。 */
-    @objc public dynamic var axis: CYLAnimatedItemAxis = .horizontal { didSet { cyl_contentDidChange() } }
+    @objc public dynamic var axis: CYLAnimatedItemAxis = .horizontal { didSet { contentDidChange() } }
     /** [EN] Centered (default) or against the leading edge. [CN] 居中（默认）或靠前缘。 */
     public var alignment: CYLAnimatedItemAlignment = .center { didSet { setNeedsLayout() } }
     /** [EN] Space between the icon, the title and the accessory (4 by default). [CN] 图标、标题与附加图标之间的间距（默认 4）。 */
-    @objc public dynamic var spacing: CGFloat = 4 { didSet { cyl_contentDidChange() } }
+    @objc public dynamic var spacing: CGFloat = 4 { didSet { contentDidChange() } }
     /** [EN] Insets around the content. [CN] 内容四周的内边距。 */
-    @objc public dynamic var contentInsets: UIEdgeInsets = .zero { didSet { cyl_contentDidChange() } }
+    @objc public dynamic var contentInsets: UIEdgeInsets = .zero { didSet { contentDidChange() } }
     /**
      [EN] The icon's size; CGSizeZero (default) uses the image's own size, and 24 x 24 for an animation.
      [CN] 图标尺寸；CGSizeZero（默认）使用图片自身尺寸，动画为 24 x 24。
@@ -363,20 +363,20 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
                 accessory.isAccessibilityElement = true
                 accessory.accessibilityTraits.insert(.button)
                 if let control = accessory as? UIControl {
-                    control.addTarget(self, action: #selector(cyl_handleAccessoryTap), for: .touchUpInside)
+                    control.addTarget(self, action: #selector(handleAccessoryTap), for: .touchUpInside)
                 } else {
-                    accessory.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(cyl_handleAccessoryTap)))
+                    accessory.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleAccessoryTap)))
                 }
                 addSubview(accessory)
             }
-            cyl_contentDidChange()
+            contentDidChange()
         }
     }
     private var storedAccessoryView: UIView?
     /** [EN] Where the accessory goes (after the content by default). [CN] 附加图标的位置（默认在内容之后）。 */
-    public var accessoryPlacement: CYLAnimatedItemAccessoryPlacement = .trailing { didSet { cyl_contentDidChange() } }
+    public var accessoryPlacement: CYLAnimatedItemAccessoryPlacement = .trailing { didSet { contentDidChange() } }
     /** [EN] The accessory's size (18 x 18 by default). [CN] 附加图标的尺寸（默认 18 x 18）。 */
-    public var accessorySize = CGSize(width: 18, height: 18) { didSet { cyl_contentDidChange() } }
+    public var accessorySize = CGSize(width: 18, height: 18) { didSet { contentDidChange() } }
 
     // MARK: - Countdown properties 倒计时属性
 
@@ -394,7 +394,7 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
           label 的标题，不重建系统按钮，因此不会闪烁；控件保持最宽标题的宽度，也不会抖动。倒计时期间控件不可用，VoiceOver 朗读剩余秒数。
      */
     public var itemStyle: CYLAnimatedItemStyle = .plain {
-        didSet { cyl_countdownStyleDidChange(from: oldValue) }
+        didSet { countdownStyleDidChange(from: oldValue) }
     }
     /** [EN] The length in seconds, 60 by default. Used by `startCountdown()`. [CN] 总时长（秒），默认 60。`startCountdown()` 使用。 */
     public var countdownDuration: TimeInterval = 60
@@ -402,26 +402,26 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
      [EN] The title before it starts, e.g. "Get code" (the default text is English; set the app's localized text).
      [CN] 开始前的标题，例如「获取验证码」（默认文本为英文；请设置 App 本地化后的文本）。
      */
-    public var countdownIdleTitle = "Get code" { didSet { cyl_refreshCountdownTitle() } }
+    public var countdownIdleTitle = "Get code" { didSet { refreshCountdownTitle() } }
     /**
      [EN] The title while counting: a format with one `%ld`, the whole seconds left, e.g. "%ld s left".
      [CN] 倒计时中的标题：带一个 `%ld`（剩余整秒数）的格式，例如「还剩%ld秒」。
      */
-    public var countdownRunningTitleFormat = "%ld s left" { didSet { cyl_refreshCountdownTitle() } }
+    public var countdownRunningTitleFormat = "%ld s left" { didSet { refreshCountdownTitle() } }
     /** [EN] The title once the time is up, e.g. "Resend". [CN] 时间到之后的标题，例如「重新获取」。 */
-    public var countdownFinishedTitle = "Resend" { didSet { cyl_refreshCountdownTitle() } }
+    public var countdownFinishedTitle = "Resend" { didSet { refreshCountdownTitle() } }
     /** [EN] The icon while counting (e.g. a clock); nil keeps `image`. [CN] 倒计时中的图标（例如时钟）；为 nil 时保持 `image`。 */
     public var countdownImage: UIImage? {
         didSet {
-            cyl_updateIcon()
-            cyl_contentDidChange()
+            updateIcon()
+            contentDidChange()
         }
     }
     /**
      [EN] The title color while counting (gray by default). Idle and finished use `titleLabel.textColor`.
      [CN] 倒计时中的标题颜色（默认灰色）。待机与结束使用 `titleLabel.textColor`。
      */
-    public var countdownRunningTitleColor: UIColor = .gray { didSet { cyl_applyCountdownAppearance() } }
+    public var countdownRunningTitleColor: UIColor = .gray { didSet { applyCountdownAppearance() } }
     /**
      [EN] Whether a tap starts the countdown after the delegate's `animatedItemViewDidTap(_:)` (off by default). With it off
           the app starts it itself, e.g. once the server accepted the request.
@@ -437,7 +437,7 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
     /** [EN] The whole seconds left (rounded up): 0 when it is not running. [CN] 剩余整秒数（向上取整）：未运行时为 0。 */
     public var countdownRemainingSeconds: Int {
         guard countdownState == .running, let end = countdownEndDate else { return 0 }
-        let left = end.timeIntervalSince(cyl_now)
+        let left = end.timeIntervalSince(cylNow)
         return left > 0 ? Int(ceil(left)) : 0
     }
     /**
@@ -453,11 +453,11 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
     public var countdownCacheKey: String? {
         didSet {
             guard countdownCacheKey != oldValue else { return }
-            if let old = oldValue { countdownCacheStore.removeObject(forKey: Self.cyl_countdownCacheName(old)) }
+            if let old = oldValue { countdownCacheStore.removeObject(forKey: Self.countdownCacheName(old)) }
             if countdownState == .running {
-                cyl_saveCountdownToCache()
+                saveCountdownToCache()
             } else {
-                cyl_restoreCountdownFromCache()
+                restoreCountdownFromCache()
             }
         }
     }
@@ -505,7 +505,7 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
         set {
             guard storedIconHidden != newValue else { return }
             storedIconHidden = newValue
-            cyl_updateIcon()
+            updateIcon()
         }
     }
     private var storedIconHidden = false
@@ -528,7 +528,7 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
         didSet {
             if oldValue === itemAppearance { return }
             applyItemAppearance()
-            cyl_contentDidChange()
+            contentDidChange()
         }
     }
 
@@ -553,8 +553,8 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
             #else
             // [EN] No engine: the file cannot play, so the placeholder shows when there is no static image.
             // [CN] 没有引擎：文件无法播放，没有静态图片时显示占位图。
-            cyl_updateIcon()
-            cyl_contentDidChange()
+            updateIcon()
+            contentDidChange()
             #endif
         }
     }
@@ -562,7 +562,7 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
     open var animationSpeed: CGFloat = 1 {
         didSet {
             #if CYL_ANIMATION_ENGINE_AVAILABLE
-            cyl_applyPlayerSettings()
+            applyPlayerSettings()
             #endif
         }
     }
@@ -570,11 +570,11 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
     open var animationLoops = false {
         didSet {
             #if CYL_ANIMATION_ENGINE_AVAILABLE
-            cyl_applyPlayerSettings()
+            applyPlayerSettings()
             if !animationLoops {
-                cyl_stopLoopTimer()
+                stopLoopTimer()
             } else if playing {
-                cyl_startLoopTimerIfNeeded()
+                startLoopTimerIfNeeded()
             }
             #endif
         }
@@ -585,7 +585,7 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
         set {
             storedRestingProgress = min(1, max(0, newValue))
             #if CYL_ANIMATION_ENGINE_AVAILABLE
-            if !playing { cyl_setPlayerValue(storedRestingProgress, for: "progress") }
+            if !playing { setPlayerValue(storedRestingProgress, for: "progress") }
             #endif
         }
     }
@@ -645,7 +645,7 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
         guard imageView.isAnimating || imageView.animationImages != nil else { return }
         imageView.stopAnimating()
         imageView.animationImages = nil
-        cyl_updateIcon()
+        updateIcon()
     }
     private var playing = false
     /// [EN] The icon tint applied last (`applyIconTintColor(_:)`), given again to a new animation view. [CN] 最近应用的图标着色，再次交给新的动画视图。
@@ -655,12 +655,12 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
 
     public override init(frame: CGRect) {
         super.init(frame: frame)
-        cyl_animatedItemSetUp()
+        animatedItemSetUp()
     }
 
     public required init?(coder: NSCoder) {
         super.init(coder: coder)
-        cyl_animatedItemSetUp()
+        animatedItemSetUp()
     }
 
     deinit {
@@ -669,7 +669,7 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
         NotificationCenter.default.removeObserver(self)
     }
 
-    private func cyl_animatedItemSetUp() {
+    private func animatedItemSetUp() {
         imageView.contentMode = .scaleAspectFit
         imageView.isAccessibilityElement = false
         imageView.accessibilityElementsHidden = true
@@ -682,18 +682,18 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
         titleLabel.isAccessibilityElement = false
         addSubview(titleLabel)
 
-        let longPress = UILongPressGestureRecognizer(target: self, action: #selector(cyl_handleLongPress(_:)))
+        let longPress = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPress(_:)))
         longPress.delegate = self
         addGestureRecognizer(longPress)
         longPressGestureRecognizer = longPress
 
-        let pan = UIPanGestureRecognizer(target: self, action: #selector(cyl_handlePan(_:)))
+        let pan = UIPanGestureRecognizer(target: self, action: #selector(handlePan(_:)))
         pan.delegate = self
         pan.isEnabled = false
         addGestureRecognizer(pan)
         panGestureRecognizer = pan
 
-        addTarget(self, action: #selector(cyl_handleTap), for: .touchUpInside)
+        addTarget(self, action: #selector(handleTap), for: .touchUpInside)
 
         isAccessibilityElement = true
         accessibilityTraits = .button
@@ -703,8 +703,8 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
     // MARK: - Icon 图标
 
     /// [EN] The placeholder, when there is no static image and the animation file cannot play. [CN] 没有静态图片且动画文件无法播放时的占位图。
-    private func cyl_placeholderIfNeeded() -> UIImage? {
-        if image != nil || selectedImage != nil || animationURL == nil || cyl_animationShows() { return nil }
+    private func placeholderIfNeeded() -> UIImage? {
+        if image != nil || selectedImage != nil || animationURL == nil || animationShows() { return nil }
         guard let placeholder = placeholderImage, placeholder.size.width > 0, placeholder.size.height > 0 else { return nil }
         return placeholder
     }
@@ -712,7 +712,7 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
     /// [EN] Whether the animation is on screen: made, and not waiting for its file (a download). Until then the static image
     ///      given, or the placeholder when there is none, shows.
     /// [CN] 动画是否已显示：已创建且不在等待其文件（下载）。在此之前显示传入的静态图片，没有时显示占位图。
-    private func cyl_animationShows() -> Bool {
+    private func animationShows() -> Bool {
         #if CYL_ANIMATION_ENGINE_AVAILABLE
         guard let view = animationView else { return false }
         return !CYLTabBarItemAnimationIsLoading(view)
@@ -721,10 +721,10 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
         #endif
     }
 
-    private func cyl_updateIcon() {
+    private func updateIcon() {
         var icon = (isSelected && selectedImage != nil) ? selectedImage : image
         if countdownState == .running, let countdownIcon = countdownImage { icon = countdownIcon }
-        if icon == nil { icon = cyl_placeholderIfNeeded() }
+        if icon == nil { icon = placeholderIfNeeded() }
         // [EN] An animated image (`UIImage.images`, e.g. a GIF) rests on its first frame until it is played, like an animation
         //      file (docs/Animated-Item.md, "every animated tab icon rests until it is played"); `playAnimation()` plays it.
         // [CN] 动图（`UIImage.images`，例如 GIF）与动画文件一样，在播放前停在第一帧（docs/Animated-Item.md，「每个动效 Tab 图标在播放前保持静止」）；
@@ -753,7 +753,7 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
             imageView.image = icon
         }
         // [EN] `isIconHidden`: another view is shown in the icon's place. [CN] `isIconHidden`：另一个视图显示在图标的位置。
-        imageView.isHidden = isIconHidden || cyl_animationShows()
+        imageView.isHidden = isIconHidden || animationShows()
         if isIconHidden { animationView?.isHidden = true }
         // [EN] A new animation view or icon takes the current icon tint. [CN] 新的动画视图或图标使用当前的图标着色。
         if let color = currentItemStateAppearance?.iconColor ?? lastIconTintColor {
@@ -761,21 +761,21 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
         }
     }
 
-    private func cyl_contentDidChange() {
+    private func contentDidChange() {
         invalidateIntrinsicContentSize()
         setNeedsLayout()
     }
 
     // MARK: - Measuring and layout 测量与布局
 
-    private var cyl_showsIcon: Bool { animationView != nil || imageView.image != nil }
-    private var cyl_showsTitle: Bool { !(title ?? "").isEmpty }
-    private var cyl_accessoryInline: Bool { accessoryView != nil && accessoryPlacement != .topTrailing }
+    private var cylShowsIcon: Bool { animationView != nil || imageView.image != nil }
+    private var cylShowsTitle: Bool { !(title ?? "").isEmpty }
+    private var accessoryInline: Bool { accessoryView != nil && accessoryPlacement != .topTrailing }
 
-    private var cyl_currentIconSize: CGSize {
-        guard cyl_showsIcon else { return .zero }
+    private var currentIconSize: CGSize {
+        guard cylShowsIcon else { return .zero }
         if iconSize.width > 0 && iconSize.height > 0 { return iconSize }
-        if animationView != nil { return CGSize(width: CYLAnimatedItemDefaultAnimationSide, height: CYLAnimatedItemDefaultAnimationSide) }
+        if animationView != nil { return CGSize(width: cylAnimatedItemDefaultAnimationSide, height: cylAnimatedItemDefaultAnimationSide) }
         return imageView.image?.size ?? .zero
     }
 
@@ -785,18 +785,18 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
      [CN] 子类钩子：给定宽度上限时内容的自然尺寸（不含 `contentInsets`）。需要其他排列时与 `layoutContent(in:)` 一起重写。
      */
     open func contentSizeThatFits(_ size: CGSize) -> CGSize {
-        let icon = cyl_currentIconSize
-        let showsIcon = cyl_showsIcon
-        let showsTitle = cyl_showsTitle
+        let icon = currentIconSize
+        let showsIcon = cylShowsIcon
+        let showsTitle = cylShowsTitle
         let gap = (showsIcon && showsTitle) ? spacing : 0
-        let accessory = cyl_accessoryInline ? accessorySize.width : 0
+        let accessory = accessoryInline ? accessorySize.width : 0
         let accessorySpacing = (accessory > 0 && (showsIcon || showsTitle)) ? spacing : 0
         let titleLimit = max(0, size.width - accessory - accessorySpacing - (axis == .horizontal ? icon.width + gap : 0))
         var titleSize = showsTitle ? titleLabel.sizeThatFits(CGSize(width: titleLimit, height: .greatestFiniteMagnitude)) : .zero
         titleSize.width = min(ceil(titleSize.width), titleLimit)
-        if showsTitle { titleSize.width = min(max(titleSize.width, cyl_countdownTitleWidth), titleLimit) }
+        if showsTitle { titleSize.width = min(max(titleSize.width, countdownTitleWidth), titleLimit) }
         titleSize.height = ceil(titleSize.height)
-        let accessoryHeight = cyl_accessoryInline ? accessorySize.height : 0
+        let accessoryHeight = accessoryInline ? accessorySize.height : 0
         if axis == .horizontal {
             return CGSize(width: icon.width + gap + titleSize.width + accessory + accessorySpacing,
                           height: max(max(icon.height, titleSize.height), accessoryHeight))
@@ -819,7 +819,7 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
     open override func layoutSubviews() {
         super.layoutSubviews()
         layoutContent(in: bounds.inset(by: contentInsets))
-        cyl_applyCountdownAppearance()
+        applyCountdownAppearance()
     }
 
     /**
@@ -842,22 +842,22 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
     @objc(layoutContentInRect:)
     open func layoutContent(in rect: CGRect) {
         let rtl = effectiveUserInterfaceLayoutDirection == .rightToLeft
-        let showsIcon = cyl_showsIcon
-        let showsTitle = cyl_showsTitle
-        let accessorySpacing = (cyl_accessoryInline && (showsIcon || showsTitle)) ? spacing : 0
+        let showsIcon = cylShowsIcon
+        let showsTitle = cylShowsTitle
+        let accessorySpacing = (accessoryInline && (showsIcon || showsTitle)) ? spacing : 0
         var content = rect
-        if cyl_accessoryInline {
+        if accessoryInline {
             let leading = accessoryPlacement == .leading
             let reserved = accessorySize.width + accessorySpacing
             content.size.width = max(0, content.width - reserved)
             if leading != rtl { content.origin.x += reserved }
         }
-        let icon = cyl_currentIconSize
+        let icon = currentIconSize
         let gap = (showsIcon && showsTitle) ? spacing : 0
         let titleLimit = axis == .horizontal ? max(0, content.width - icon.width - gap) : content.width
         var titleSize = showsTitle ? titleLabel.sizeThatFits(CGSize(width: titleLimit, height: content.height)) : .zero
         titleSize.width = min(ceil(titleSize.width), titleLimit)
-        if showsTitle { titleSize.width = min(max(titleSize.width, cyl_countdownTitleWidth), titleLimit) }
+        if showsTitle { titleSize.width = min(max(titleSize.width, countdownTitleWidth), titleLimit) }
         titleSize.height = min(ceil(titleSize.height), content.height)
         let leadingAligned = alignment == .leading
         let iconFrame: CGRect
@@ -882,10 +882,10 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
         // [EN] The appearance's title offset (`titlePositionAdjustment`). [CN] 外观的标题偏移（`titlePositionAdjustment`）。
         let offset = currentItemStateAppearance?.titlePositionAdjustment ?? .zero
         titleLabel.frame = titleFrame.offsetBy(dx: offset.horizontal, dy: offset.vertical)
-        cyl_layoutAccessory(in: rect, iconFrame: iconFrame, rightToLeft: rtl)
+        layoutAccessory(in: rect, iconFrame: iconFrame, rightToLeft: rtl)
     }
 
-    private func cyl_layoutAccessory(in rect: CGRect, iconFrame: CGRect, rightToLeft rtl: Bool) {
+    private func layoutAccessory(in rect: CGRect, iconFrame: CGRect, rightToLeft rtl: Bool) {
         guard let accessory = accessoryView else { return }
         let size = accessorySize
         let midY = rect.midY - size.height / 2
@@ -906,7 +906,7 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
         didSet {
             guard isSelected != oldValue else { return }
             applyItemAppearance()
-            cyl_updateIcon()
+            updateIcon()
             itemStateDidChange()
             updateItemAccessibility()
         }
@@ -915,7 +915,7 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
     open override var isHighlighted: Bool {
         didSet {
             guard isHighlighted != oldValue else { return }
-            cyl_applyCountdownAppearance()
+            applyCountdownAppearance()
             itemStateDidChange()
         }
     }
@@ -924,7 +924,7 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
         didSet {
             guard isEnabled != oldValue else { return }
             applyItemAppearance()
-            cyl_applyCountdownAppearance()
+            applyCountdownAppearance()
             itemStateDidChange()
             updateItemAccessibility()
         }
@@ -1000,21 +1000,21 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
      */
     open func reloadAnimation() {
         #if CYL_ANIMATION_ENGINE_AVAILABLE
-        cyl_stopLoopTimer()
+        stopLoopTimer()
         storedAnimationView?.removeFromSuperview()
         storedAnimationView = nil
         playing = false
-        if let url = animationURL, !CYLAnimatedItemLocalFileIsMissing(url) {
+        if let url = animationURL, !cylAnimatedItemLocalFileIsMissing(url) {
             let size = (iconSize.width > 0 && iconSize.height > 0)
-                ? iconSize : CGSize(width: CYLAnimatedItemDefaultAnimationSide, height: CYLAnimatedItemDefaultAnimationSide)
+                ? iconSize : CGSize(width: cylAnimatedItemDefaultAnimationSide, height: cylAnimatedItemDefaultAnimationSide)
             if let view = animationSource.animationView(url: url, size: size, contentMode: .scaleAspectFit) {
                 view.isUserInteractionEnabled = false
                 view.isAccessibilityElement = false
                 view.accessibilityElementsHidden = true
                 insertSubview(view, aboveSubview: imageView)
                 storedAnimationView = view
-                cyl_applyPlayerSettings()
-                cyl_setPlayerValue(animationRestingProgress, for: "progress")
+                applyPlayerSettings()
+                setPlayerValue(animationRestingProgress, for: "progress")
             } else {
                 // [EN] Debug builds: a type whose engine is not in the build says which pod to add. [CN] debug 构建：引擎未参与构建的类型提示需要加入的 pod。
                 CYLAnimationWarnMissingEngine(nil, url)
@@ -1024,8 +1024,8 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
         // [EN] No engine: debug builds say which pod to add. [CN] 没有引擎：debug 构建提示需要加入的 pod。
         if let url = animationURL { CYLAnimationWarnMissingEngine(nil, url) }
         #endif
-        cyl_updateIcon()
-        cyl_contentDidChange()
+        updateIcon()
+        contentDidChange()
     }
 
     /** [EN] Plays from the current progress. [CN] 从当前进度开始播放。 */
@@ -1033,9 +1033,9 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
         #if CYL_ANIMATION_ENGINE_AVAILABLE
         guard let player = animationPlayer else { playAnimatedImage(); return }
         playing = true
-        cyl_applyPlayerSettings()
+        applyPlayerSettings()
         player.play()
-        cyl_startLoopTimerIfNeeded()
+        startLoopTimerIfNeeded()
         #else
         playAnimatedImage()
         #endif
@@ -1045,7 +1045,7 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
     open func restartAnimation() {
         if animationView == nil, playAnimatedImage() { return }
         #if CYL_ANIMATION_ENGINE_AVAILABLE
-        cyl_setPlayerValue(CGFloat(0), for: "progress")
+        setPlayerValue(CGFloat(0), for: "progress")
         playAnimation()
         #endif
     }
@@ -1056,9 +1056,9 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
         #if CYL_ANIMATION_ENGINE_AVAILABLE
         let player = animationPlayer
         playing = false
-        cyl_stopLoopTimer()
+        stopLoopTimer()
         player?.stop()
-        cyl_setPlayerValue(animationRestingProgress, for: "progress")
+        setPlayerValue(animationRestingProgress, for: "progress")
         #endif
     }
 
@@ -1066,12 +1066,12 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
     open func showAnimationLastFrame() {
         #if CYL_ANIMATION_ENGINE_AVAILABLE
         playing = false
-        cyl_stopLoopTimer()
+        stopLoopTimer()
         animationPlayer?.showLastFrame()
         #endif
     }
 
-    private func cyl_stopLoopTimer() {
+    private func stopLoopTimer() {
         loopTimer?.invalidate()
         loopTimer = nil
     }
@@ -1080,32 +1080,32 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
     /// [EN] Sets an optional player property (`progress`, `animationSpeed`, `loops`) when the player has it. Swift cannot assign
     ///      an optional protocol requirement, so it goes through its setter by key.
     /// [CN] 播放器有该可选属性（`progress`、`animationSpeed`、`loops`）时设置它。Swift 不能给可选协议要求赋值，因此按 key 调用其 setter。
-    private func cyl_setPlayerValue(_ value: Any, for key: String) {
+    private func setPlayerValue(_ value: Any, for key: String) {
         guard let player = animationPlayer as? NSObject else { return }
         let setter = NSSelectorFromString("set" + key.prefix(1).uppercased() + key.dropFirst() + ":")
         if player.responds(to: setter) { player.setValue(value, forKey: key) }
     }
 
-    private func cyl_applyPlayerSettings() {
+    private func applyPlayerSettings() {
         guard animationPlayer != nil else { return }
-        if animationSpeed > 0 { cyl_setPlayerValue(animationSpeed, for: "animationSpeed") }
-        cyl_setPlayerValue(animationLoops, for: "loops")
+        if animationSpeed > 0 { setPlayerValue(animationSpeed, for: "animationSpeed") }
+        setPlayerValue(animationLoops, for: "loops")
     }
 
     /// [EN] A player without `loops` (or with a `loops` it ignores) is restarted when it reaches the end, as
     ///      CollectionViewClassifyMenu's tags did.
     /// [CN] 没有 `loops`（或忽略 `loops`）的播放器，在播放到末尾时重新开始，与 CollectionViewClassifyMenu 的标签做法一致。
-    private func cyl_startLoopTimerIfNeeded() {
+    private func startLoopTimerIfNeeded() {
         guard animationLoops, loopTimer == nil, let player = animationPlayer,
               !player.responds(to: #selector(setter: CYLTabBarItemAnimationPlayer.loops)),
               player.responds(to: #selector(getter: CYLTabBarItemAnimationPlayer.progress)) else { return }
-        let timer = Timer(timeInterval: CYLAnimatedItemLoopCheckInterval, repeats: true) { [weak self] timer in
+        let timer = Timer(timeInterval: cylAnimatedItemLoopCheckInterval, repeats: true) { [weak self] timer in
             guard let self = self, self.playing, let current = self.animationPlayer else {
                 timer.invalidate()
                 return
             }
             if (current.progress ?? 0) >= 0.999 {
-                self.cyl_setPlayerValue(CGFloat(0), for: "progress")
+                self.setPlayerValue(CGFloat(0), for: "progress")
                 current.play()
             }
         }
@@ -1116,22 +1116,22 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
 
     // MARK: - Gesture handling 手势处理
 
-    @objc private func cyl_handleTap() {
+    @objc(cyl_handleTap) private func handleTap() {
         delegate?.animatedItemViewDidTap?(self)
         if itemStyle == .countdown, startsCountdownOnTap, countdownState != .running {
             startCountdown()
         }
     }
 
-    @objc private func cyl_handleAccessoryTap() {
+    @objc(cyl_handleAccessoryTap) private func handleAccessoryTap() {
         delegate?.animatedItemViewDidTapAccessory?(self)
     }
 
-    @objc private func cyl_handleLongPress(_ recognizer: UILongPressGestureRecognizer) {
+    @objc(cyl_handleLongPress:) private func handleLongPress(_ recognizer: UILongPressGestureRecognizer) {
         if recognizer.state == .began { delegate?.animatedItemViewDidLongPress?(self) }
     }
 
-    @objc private func cyl_handlePan(_ recognizer: UIPanGestureRecognizer) {
+    @objc(cyl_handlePan:) private func handlePan(_ recognizer: UIPanGestureRecognizer) {
         let translation = recognizer.translation(in: superview)
         switch recognizer.state {
         case .began:
@@ -1165,9 +1165,9 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
 
     // MARK: - Countdown 倒计时
 
-    private var cyl_now: Date { countdownDateProvider?() ?? Date() }
+    private var cylNow: Date { countdownDateProvider?() ?? Date() }
 
-    private func cyl_countdownStyleDidChange(from oldStyle: CYLAnimatedItemStyle) {
+    private func countdownStyleDidChange(from oldStyle: CYLAnimatedItemStyle) {
         guard itemStyle != oldStyle else { return }
         if itemStyle == .countdown {
             // [EN] The default look of a countdown button: a rounded border and a light background, as the original
@@ -1178,9 +1178,9 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
             layer.cornerRadius = 6
             layer.masksToBounds = true
             titleLabel.font = UIFont.preferredFont(forTextStyle: .body)
-            cyl_showCountdownIdleOrFinishedTitle()
-            cyl_applyCountdownAppearance()
-            cyl_restoreCountdownFromCache()
+            showCountdownIdleOrFinishedTitle()
+            applyCountdownAppearance()
+            restoreCountdownFromCache()
         } else {
             resetCountdown()
             layer.cornerRadius = 0
@@ -1188,38 +1188,38 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
             titleLabel.alpha = 1
             imageView.alpha = 1
         }
-        cyl_contentDidChange()
+        contentDidChange()
     }
 
     /// [EN] Shows the title that belongs to the current state, after a title property changed. [CN] 某个标题属性变化后，显示与当前状态对应的标题。
-    private func cyl_refreshCountdownTitle() {
+    private func refreshCountdownTitle() {
         guard itemStyle == .countdown else { return }
         if countdownState == .running {
-            title = CYLAnimatedItemCountdownText(countdownRunningTitleFormat, seconds: max(countdownShownSeconds, 0))
+            title = cylAnimatedItemCountdownText(countdownRunningTitleFormat, seconds: max(countdownShownSeconds, 0))
         } else {
-            cyl_showCountdownIdleOrFinishedTitle()
+            showCountdownIdleOrFinishedTitle()
         }
     }
 
-    private func cyl_showCountdownIdleOrFinishedTitle() {
+    private func showCountdownIdleOrFinishedTitle() {
         title = countdownState == .finished ? countdownFinishedTitle : countdownIdleTitle
     }
 
     /// [EN] The widest title the countdown shows, so the control keeps its width: the idle and finished titles and the
     ///      running one with the widest digits of `countdownDuration`. 0 for another style.
     /// [CN] 倒计时会显示的最宽标题，使控件保持宽度：待机标题、结束标题，以及用 `countdownDuration` 位数的最宽数字组成的倒计时标题。其他样式为 0。
-    private var cyl_countdownTitleWidth: CGFloat {
+    private var countdownTitleWidth: CGFloat {
         guard itemStyle == .countdown else { return 0 }
         let digits = String(max(1, Int(ceil(countdownDuration)))).count
         let widest = Int(String(repeating: "8", count: digits)) ?? 88
         let attributes: [NSAttributedString.Key: Any] = [.font: titleLabel.font as Any]
-        let texts = [countdownIdleTitle, countdownFinishedTitle, CYLAnimatedItemCountdownText(countdownRunningTitleFormat, seconds: widest)]
+        let texts = [countdownIdleTitle, countdownFinishedTitle, cylAnimatedItemCountdownText(countdownRunningTitleFormat, seconds: widest)]
         return texts.map { ceil(($0 as NSString).size(withAttributes: attributes).width) }.max() ?? 0
     }
 
     /// [EN] The border, the title color and the pressed look of the countdown style, for the state it is in.
     /// [CN] 倒计时样式在当前状态下的边框、标题颜色与按下外观。
-    private func cyl_applyCountdownAppearance() {
+    private func applyCountdownAppearance() {
         guard itemStyle == .countdown else { return }
         let running = countdownState == .running
         let border: UIColor = running ? .lightGray : (tintColor ?? .systemBlue)
@@ -1232,7 +1232,7 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
     }
 
     /// [EN] Puts back the title color the running color replaced. [CN] 恢复被倒计时颜色替换的标题颜色。
-    private func cyl_restoreCountdownTitleColor() {
+    private func restoreCountdownTitleColor() {
         guard let color = countdownRestingTitleColor else { return }
         titleLabel.textColor = color
         countdownRestingTitleColor = nil
@@ -1256,13 +1256,13 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
             return
         }
         if itemStyle != .countdown { itemStyle = .countdown }
-        let start = cyl_now
-        cyl_beginCountdown(start: start, end: start.addingTimeInterval(duration), duration: duration, announcesStart: true)
+        let start = cylNow
+        beginCountdown(start: start, end: start.addingTimeInterval(duration), duration: duration, announcesStart: true)
     }
 
     /// [EN] Enters the running state for `start`...`end`; `announcesStart` is false when a cached countdown is taken up again.
     /// [CN] 进入 `start`…`end` 的运行状态；接续缓存的倒计时时 `announcesStart` 为 false。
-    private func cyl_beginCountdown(start: Date, end: Date, duration: TimeInterval, announcesStart: Bool) {
+    private func beginCountdown(start: Date, end: Date, duration: TimeInterval, announcesStart: Bool) {
         if countdownState != .running {
             // [EN] The color to go back to when the time is up, taken before the running color replaces it.
             // [CN] 时间到之后要恢复的颜色，在倒计时颜色替换它之前取得。
@@ -1274,12 +1274,12 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
         countdownState = .running
         countdownShownSeconds = -1
         isEnabled = false
-        cyl_saveCountdownToCache()
-        cyl_startCountdownTimer()
-        cyl_updateIcon()
+        saveCountdownToCache()
+        startCountdownTimer()
+        updateIcon()
         if announcesStart { delegate?.animatedItemViewDidStartCountdown?(self) }
         refreshCountdown()
-        cyl_contentDidChange()
+        contentDidChange()
     }
 
     /**
@@ -1287,21 +1287,21 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
      */
     open func resetCountdown() {
         let wasRunning = countdownState == .running
-        cyl_stopCountdownTimer()
+        stopCountdownTimer()
         countdownEndDate = nil
         countdownStartDate = nil
-        cyl_clearCountdownCache()
+        clearCountdownCache()
         countdownState = .idle
         if wasRunning {
             isEnabled = true
-            cyl_restoreCountdownTitleColor()
+            restoreCountdownTitleColor()
         }
         if itemStyle == .countdown {
-            cyl_showCountdownIdleOrFinishedTitle()
-            cyl_applyCountdownAppearance()
+            showCountdownIdleOrFinishedTitle()
+            applyCountdownAppearance()
         }
-        cyl_updateIcon()
-        cyl_contentDidChange()
+        updateIcon()
+        contentDidChange()
     }
 
     /**
@@ -1310,7 +1310,7 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
      */
     @objc open func refreshCountdown() {
         guard countdownState == .running, let start = countdownStartDate, let end = countdownEndDate else { return }
-        let now = cyl_now
+        let now = cylNow
         let left = end.timeIntervalSince(now)
         // [EN] Closed when the time is up, and also when the local clock is no longer plausible for this countdown: the clock
         //      was set back to before the start (a left time longer than the longest duration, which was recorded at the
@@ -1318,83 +1318,83 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
         // [CN] 时间到时关闭；本地时钟对这次倒计时不再合理时也关闭：时钟被调回到开始之前（剩余时间超过开始时记录的最长时长）。
         //      此时控件恢复可用，可以重新开始倒计时。允许 1 秒的时钟同步误差。
         guard left > 0, now.timeIntervalSince(start) >= -1, left <= countdownRunDuration + 1 else {
-            cyl_finishCountdown()
+            finishCountdown()
             return
         }
         let seconds = min(Int(ceil(left)), Int(ceil(countdownRunDuration)))
         guard seconds != countdownShownSeconds else { return }
         countdownShownSeconds = seconds
-        title = CYLAnimatedItemCountdownText(countdownRunningTitleFormat, seconds: seconds)
-        cyl_applyCountdownAppearance()
+        title = cylAnimatedItemCountdownText(countdownRunningTitleFormat, seconds: seconds)
+        applyCountdownAppearance()
         delegate?.animatedItemView?(self, didTickCountdown: seconds)
     }
 
-    private func cyl_finishCountdown() {
-        cyl_stopCountdownTimer()
+    private func finishCountdown() {
+        stopCountdownTimer()
         countdownEndDate = nil
         countdownStartDate = nil
-        cyl_clearCountdownCache()
+        clearCountdownCache()
         countdownState = .finished
         isEnabled = true
-        cyl_restoreCountdownTitleColor()
-        cyl_showCountdownIdleOrFinishedTitle()
-        cyl_applyCountdownAppearance()
-        cyl_updateIcon()
-        cyl_contentDidChange()
+        restoreCountdownTitleColor()
+        showCountdownIdleOrFinishedTitle()
+        applyCountdownAppearance()
+        updateIcon()
+        contentDidChange()
         if UIAccessibility.isVoiceOverRunning {
             UIAccessibility.post(notification: .announcement, argument: countdownFinishedTitle)
         }
         delegate?.animatedItemViewDidFinishCountdown?(self)
     }
 
-    private static func cyl_countdownCacheName(_ key: String) -> String {
+    private static func countdownCacheName(_ key: String) -> String {
         "CYLAnimatedItemCountdown.\(key)"
     }
 
     /// [EN] Keeps the running countdown (start, end, longest duration) when `countdownCacheKey` is set.
     /// [CN] 设置了 `countdownCacheKey` 时保存运行中的倒计时（开始时间、结束时间、最长时长）。
-    private func cyl_saveCountdownToCache() {
+    private func saveCountdownToCache() {
         guard let key = countdownCacheKey, let start = countdownStartDate, let end = countdownEndDate else { return }
         countdownCacheStore.set(["start": start.timeIntervalSince1970, "end": end.timeIntervalSince1970, "duration": countdownRunDuration],
-                                forKey: Self.cyl_countdownCacheName(key))
+                                forKey: Self.countdownCacheName(key))
     }
 
-    private func cyl_clearCountdownCache() {
+    private func clearCountdownCache() {
         guard let key = countdownCacheKey else { return }
-        countdownCacheStore.removeObject(forKey: Self.cyl_countdownCacheName(key))
+        countdownCacheStore.removeObject(forKey: Self.countdownCacheName(key))
     }
 
     /// [EN] Takes up a cached countdown that is still valid by the local clock (not over, not from the future, not longer than
     ///      the longest duration it recorded); an invalid one is dropped, and the control stays idle. Nothing is announced.
     /// [CN] 接续按本地时钟仍然有效的缓存倒计时（未结束、不是来自未来、不超过其记录的最长时长）；无效的缓存被丢弃，控件保持待机。不触发开始回调。
-    private func cyl_restoreCountdownFromCache() {
+    private func restoreCountdownFromCache() {
         guard itemStyle == .countdown, countdownState != .running, let key = countdownCacheKey,
-              let cached = countdownCacheStore.dictionary(forKey: Self.cyl_countdownCacheName(key)) as? [String: TimeInterval],
+              let cached = countdownCacheStore.dictionary(forKey: Self.countdownCacheName(key)) as? [String: TimeInterval],
               let start = cached["start"], let end = cached["end"], let duration = cached["duration"] else { return }
-        let now = cyl_now
+        let now = cylNow
         let startDate = Date(timeIntervalSince1970: start)
         let endDate = Date(timeIntervalSince1970: end)
         guard duration > 0, endDate.timeIntervalSince(now) > 0, now.timeIntervalSince(startDate) >= -1,
               endDate.timeIntervalSince(now) <= duration + 1 else {
-            countdownCacheStore.removeObject(forKey: Self.cyl_countdownCacheName(key))
+            countdownCacheStore.removeObject(forKey: Self.countdownCacheName(key))
             return
         }
-        cyl_beginCountdown(start: startDate, end: endDate, duration: duration, announcesStart: false)
+        beginCountdown(start: startDate, end: endDate, duration: duration, announcesStart: false)
     }
 
     /// [EN] The timer only schedules the reads; the end date decides. The app returning from the background reads the clock
     ///      at once, so the seconds spent there count (FIX: issue #1 of SMSCodeButton).
     /// [CN] 定时器只负责安排读取，由结束时间决定剩余时间。App 从后台返回时立即读取时钟，因此在后台度过的秒数会计入（修复 SMSCodeButton 的 issue #1）。
-    private func cyl_startCountdownTimer() {
-        cyl_stopCountdownTimer()
-        let timer = Timer(timeInterval: CYLAnimatedItemCountdownTickInterval, repeats: true) { [weak self] timer in
+    private func startCountdownTimer() {
+        stopCountdownTimer()
+        let timer = Timer(timeInterval: cylAnimatedItemCountdownTickInterval, repeats: true) { [weak self] timer in
             guard let self = self else {
                 timer.invalidate()
                 return
             }
             self.refreshCountdown()
         }
-        timer.tolerance = CYLAnimatedItemCountdownTickInterval / 2
+        timer.tolerance = cylAnimatedItemCountdownTickInterval / 2
         RunLoop.main.add(timer, forMode: .common)
         countdownTimer = timer
         let center = NotificationCenter.default
@@ -1402,7 +1402,7 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
         center.addObserver(self, selector: #selector(refreshCountdown), name: UIApplication.didBecomeActiveNotification, object: nil)
     }
 
-    private func cyl_stopCountdownTimer() {
+    private func stopCountdownTimer() {
         countdownTimer?.invalidate()
         countdownTimer = nil
         let center = NotificationCenter.default
@@ -1436,14 +1436,14 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
             guard let accessory = accessoryView, let label = accessory.accessibilityLabel, !label.isEmpty else { return existing }
             // [EN] VoiceOver reaches the accessory from the control's actions, since the control is one element.
             // [CN] 控件是一个无障碍元素，VoiceOver 通过控件的操作访问附加图标。
-            let action = UIAccessibilityCustomAction(name: label, target: self, selector: #selector(cyl_performAccessoryAction(_:)))
+            let action = UIAccessibilityCustomAction(name: label, target: self, selector: #selector(performAccessoryAction(_:)))
             return (existing ?? []) + [action]
         }
         set { super.accessibilityCustomActions = newValue }
     }
 
-    @objc private func cyl_performAccessoryAction(_: UIAccessibilityCustomAction) -> Bool {
-        cyl_handleAccessoryTap()
+    @objc(cyl_performAccessoryAction:) private func performAccessoryAction(_: UIAccessibilityCustomAction) -> Bool {
+        handleAccessoryTap()
         return true
     }
 }
@@ -1457,8 +1457,8 @@ extension CYLAnimatedItemView: CYLTabBarItemAnimationFailureHandling {
     /** [EN] The file of a loading animation arrived: show the animation. [CN] 加载中的动画拿到了文件：显示动画。 */
     open func cylAnimationViewDidLoad(_ animationView: UIView) {
         guard animationView === self.animationView else { return }
-        cyl_updateIcon()
-        cyl_contentDidChange()
+        updateIcon()
+        contentDidChange()
     }
 
     /**
@@ -1467,12 +1467,12 @@ extension CYLAnimatedItemView: CYLTabBarItemAnimationFailureHandling {
      */
     open func cylAnimationViewDidFail(_ animationView: UIView, error _: Error?) {
         guard animationView === self.animationView else { return }
-        cyl_stopLoopTimer()
+        stopLoopTimer()
         animationView.removeFromSuperview()
         storedAnimationView = nil
         playing = false
-        cyl_updateIcon()
-        cyl_contentDidChange()
+        updateIcon()
+        contentDidChange()
     }
 }
 #endif

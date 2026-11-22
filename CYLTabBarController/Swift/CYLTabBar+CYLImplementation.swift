@@ -115,7 +115,7 @@ private enum CYLTabBarImplementationKeys {
 @MainActor private var cylIsPlusButtonActionsSendPending = false
 
 /// [EN] `attributes` with the foreground color replaced (removed for nil). [CN] 替换（为 nil 时移除）前景色后的 `attributes`。
-private func CYLTitleAttributesWithColor(_ attributes: [NSAttributedString.Key: Any], _ color: UIColor?) -> [NSAttributedString.Key: Any] {
+private func cylTitleAttributesWithColor(_ attributes: [NSAttributedString.Key: Any], _ color: UIColor?) -> [NSAttributedString.Key: Any] {
     var result = attributes
     result[.foregroundColor] = color
     return result
@@ -126,7 +126,7 @@ private func CYLTitleAttributesWithColor(_ attributes: [NSAttributedString.Key: 
  *      first (`widths` holds every title's width).
  * [CN] 把所有更宽的标题截断到该宽度后能让出 `width` 的最大标题宽度，先从最长的标题中让出（`widths` 为各标题的宽度）。
  */
-private func CYLTitleWidthCapRemovingWidth(_ widths: [CGFloat], _ width: CGFloat) -> CGFloat {
+private func cylTitleWidthCapRemovingWidth(_ widths: [CGFloat], _ width: CGFloat) -> CGFloat {
     let sorted = widths.sorted(by: >)
     var sum: CGFloat = 0
     for count in 1...max(sorted.count, 1) where count <= sorted.count {
@@ -142,7 +142,7 @@ private func CYLTitleWidthCapRemovingWidth(_ widths: [CGFloat], _ width: CGFloat
 }
 
 /// [EN] `title`, or its longest start followed by "…", that fits in `width`. [CN] 能放进 `width` 的 `title`，或其后接「…」的最长前缀。
-private func CYLTitleFittingWidth(_ title: String, _ width: CGFloat, _ font: UIFont) -> String {
+private func cylTitleFittingWidth(_ title: String, _ width: CGFloat, _ font: UIFont) -> String {
     let attributes: [NSAttributedString.Key: Any] = [.font: font]
     func fits(_ text: String) -> Bool {
         (text as NSString).size(withAttributes: attributes).width.rounded(.up) <= width
@@ -442,7 +442,7 @@ extension CYLTabBar {
         guard let tintColor, cylShouldSyncClassicStyle() else { return }
         cylSyncClassicStyle(bar: nil) { itemAppearance in
             itemAppearance.selected.iconColor = tintColor
-            itemAppearance.selected.titleTextAttributes = CYLTitleAttributesWithColor(itemAppearance.selected.titleTextAttributes, tintColor)
+            itemAppearance.selected.titleTextAttributes = cylTitleAttributesWithColor(itemAppearance.selected.titleTextAttributes, tintColor)
         }
     }
 
@@ -451,7 +451,7 @@ extension CYLTabBar {
         guard color != previous, cylShouldSyncClassicStyle() else { return }
         cylSyncClassicStyle(bar: nil) { itemAppearance in
             itemAppearance.normal.iconColor = color
-            itemAppearance.normal.titleTextAttributes = CYLTitleAttributesWithColor(itemAppearance.normal.titleTextAttributes, color)
+            itemAppearance.normal.titleTextAttributes = cylTitleAttributesWithColor(itemAppearance.normal.titleTextAttributes, color)
         }
     }
 
@@ -943,12 +943,12 @@ extension CYLTabBar {
             guard let font = tabButtons[index].cyl_tabLabel()?.font, let title = items[index].title, !title.isEmpty else { return 0 }
             return (title as NSString).size(withAttributes: [.font: font]).width.rounded(.up)
         }
-        let cap = CYLTitleWidthCapRemovingWidth(widths, excess + 1)
+        let cap = cylTitleWidthCapRemovingWidth(widths, excess + 1)
         var didCut = false
         for (index, item) in items.enumerated() where widths[index] > cap {
             guard let font = tabButtons[index].cyl_tabLabel()?.font,
                   let fullTitle = cylFullTitle(of: item) ?? item.title else { continue }
-            let fittingTitle = CYLTitleFittingWidth(fullTitle, cap, font)
+            let fittingTitle = cylTitleFittingWidth(fullTitle, cap, font)
             if fittingTitle == item.title {
                 continue
             }

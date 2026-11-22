@@ -14,12 +14,12 @@ import CYLAnimatedItem
  * [EN] The object at `index`, or nil when `array` is nil or `index` is out of range (negative, `NSNotFound` or too large).
  * [CN] 返回 `index` 处的对象；`array` 为 nil 或 `index` 越界（负数、`NSNotFound` 或过大）时返回 nil。
  */
-private func CYLObjectAtIndex<Element>(_ array: [Element]?, _ index: Int) -> Element? {
+private func cylObjectAtIndex<Element>(_ array: [Element]?, _ index: Int) -> Element? {
     guard let array, index >= 0, index < array.count else { return nil }
     return array[index]
 }
 
-private func CYLKey(_ name: String) -> UnsafeRawPointer {
+private func cylKey(_ name: String) -> UnsafeRawPointer {
     CYLUtilsKeys.key(name)
 }
 
@@ -42,19 +42,19 @@ private func CYLKey(_ name: String) -> UnsafeRawPointer {
 extension UITabBar {
 
     func cylPlatterViewWidth() -> CGFloat {
-        CGFloat((objc_getAssociatedObject(self, CYLKey("cyl_platterViewWidth")) as? NSNumber)?.doubleValue ?? 0)
+        CGFloat((objc_getAssociatedObject(self, cylKey("cyl_platterViewWidth")) as? NSNumber)?.doubleValue ?? 0)
     }
 
     func cylSetPlatterViewWidth(_ width: CGFloat) {
-        objc_setAssociatedObject(self, CYLKey("cyl_platterViewWidth"), NSNumber(value: Double(width)), .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+        objc_setAssociatedObject(self, cylKey("cyl_platterViewWidth"), NSNumber(value: Double(width)), .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
     }
 
     func cylPlatterViewSize() -> NSValue? {
-        objc_getAssociatedObject(self, CYLKey("cyl_platterViewSize")) as? NSValue
+        objc_getAssociatedObject(self, cylKey("cyl_platterViewSize")) as? NSValue
     }
 
     func cylSetPlatterViewSize(_ size: NSValue?) {
-        objc_setAssociatedObject(self, CYLKey("cyl_platterViewSize"), size, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+        objc_setAssociatedObject(self, cylKey("cyl_platterViewSize"), size, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
     }
 
     /**
@@ -69,35 +69,35 @@ extension UITabBar {
 
     /// [EN] Weak, as the header declares. [CN] 与头文件声明一致，弱引用。
     func cylPlatterView() -> UIView? {
-        cyl_weakAssociatedObject(forKey: CYLKey("cyl_platterView")) as? UIView
+        cyl_weakAssociatedObject(forKey: cylKey("cyl_platterView")) as? UIView
     }
 
     func cylSetPlatterView(_ view: UIView?) {
-        cyl_setWeakAssociatedObject(view, forKey: CYLKey("cyl_platterView"))
+        cyl_setWeakAssociatedObject(view, forKey: cylKey("cyl_platterView"))
     }
 
     func cylPlatterContentView() -> UIView? {
-        cyl_weakAssociatedObject(forKey: CYLKey("cyl_platterContentView")) as? UIView
+        cyl_weakAssociatedObject(forKey: cylKey("cyl_platterContentView")) as? UIView
     }
 
     func cylSetPlatterContentView(_ view: UIView?) {
-        cyl_setWeakAssociatedObject(view, forKey: CYLKey("cyl_platterContentView"))
+        cyl_setWeakAssociatedObject(view, forKey: cylKey("cyl_platterContentView"))
     }
 
     func cylPortalLayer() -> CALayer? {
-        cyl_weakAssociatedObject(forKey: CYLKey("cyl_portalLayer")) as? CALayer
+        cyl_weakAssociatedObject(forKey: cylKey("cyl_portalLayer")) as? CALayer
     }
 
     func cylSetPortalLayer(_ layer: CALayer?) {
-        cyl_setWeakAssociatedObject(layer, forKey: CYLKey("cyl_portalLayer"))
+        cyl_setWeakAssociatedObject(layer, forKey: cylKey("cyl_portalLayer"))
     }
 
     func cylPortalView() -> UIView? {
-        objc_getAssociatedObject(self, CYLKey("cyl_portalView")) as? UIView
+        objc_getAssociatedObject(self, cylKey("cyl_portalView")) as? UIView
     }
 
     func cylSetPortalView(_ view: UIView?) {
-        objc_setAssociatedObject(self, CYLKey("cyl_portalView"), view, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+        objc_setAssociatedObject(self, cylKey("cyl_portalView"), view, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
     }
 
     /**
@@ -177,7 +177,7 @@ extension UITabBar {
     }
 
     func cylPlatterView(withIndex index: Int) -> UIView? {
-        CYLObjectAtIndex(cylPlatterViews(), index)
+        cylObjectAtIndex(cylPlatterViews(), index)
     }
 
     func cylPlatterContentViews() -> [UIView] {
@@ -185,7 +185,7 @@ extension UITabBar {
     }
 
     func cylPlatterContentView(withIndex index: Int) -> UIView? {
-        CYLObjectAtIndex(cylPlatterContentViews(), index)
+        cylObjectAtIndex(cylPlatterContentViews(), index)
     }
 
     private func platterSubview(where test: (UIView) -> Bool) -> UIView? {
@@ -235,11 +235,11 @@ extension UITabBar {
     }
 
     func cylPlatterSelectedContentViewWithoutPlusButton(withIndex index: Int) -> UIControl? {
-        CYLObjectAtIndex(cylPlatterSelectedContentViewsWithoutPlusButton(), index)
+        cylObjectAtIndex(cylPlatterSelectedContentViewsWithoutPlusButton(), index)
     }
 
     func cylPlatterSelectedContentView(withIndex index: Int) -> UIControl? {
-        CYLObjectAtIndex(cylPlatterSelectedContentViews(), index)
+        cylObjectAtIndex(cylPlatterSelectedContentViews(), index)
     }
 
     func cylPlatterPortalViews() -> [UIView] {
@@ -247,7 +247,7 @@ extension UITabBar {
     }
 
     func cylPlatterPortalView(withIndex index: Int) -> UIView? {
-        CYLObjectAtIndex(cylPlatterPortalViews(), index)
+        cylObjectAtIndex(cylPlatterPortalViews(), index)
     }
 }
 
@@ -393,12 +393,12 @@ extension CYLTabBar {
            !CYLPlusButton.isPlusButtonView(tabButton) {
             return tabButton
         }
-        return CYLObjectAtIndex(cylSubTabBarButtons(), Int(tabIndex))
+        return cylObjectAtIndex(cylSubTabBarButtons(), Int(tabIndex))
     }
 
     @objc(cyl_visibleControlWithIndex:)
     public func cylVisibleControl(withIndex index: UInt) -> UIControl? {
-        CYLObjectAtIndex(cylVisibleControls(), Int(index))
+        cylObjectAtIndex(cylVisibleControls(), Int(index))
     }
 
     /**
@@ -431,7 +431,7 @@ extension CYLTabBar {
     @objc(cyl_normalContentControlFromSelectedContentControl:)
     public func cylNormalContentControl(fromSelectedContentControl selectedContentControl: UIControl) -> UIControl? {
         guard let index = cylPlatterSelectedContentViews()?.firstIndex(where: { $0 === selectedContentControl }) else { return nil }
-        return CYLObjectAtIndex(cylSubTabBarButtons(), index)
+        return cylObjectAtIndex(cylSubTabBarButtons(), index)
     }
 
     @objc(cyl_cachedXOffsetWithIndex:)
@@ -456,7 +456,7 @@ extension CYLTabBar {
      */
     @objc(cyl_selectedControl)
     public func cylSelectedControl() -> UIControl? {
-        if let selected = objc_getAssociatedObject(self, CYLKey("cyl_selectedControl")) as? UIControl {
+        if let selected = objc_getAssociatedObject(self, cylKey("cyl_selectedControl")) as? UIControl {
             return selected
         }
         let candidates: [[UIView]] = [cylPlatterSelectedContentViews() ?? [], cylPlatterContentViews(), cylVisibleControls() ?? []]
@@ -470,7 +470,7 @@ extension CYLTabBar {
 
     @objc(cyl_setSelectedControl:)
     public func cylSetSelectedControl(_ control: UIControl?) {
-        objc_setAssociatedObject(self, CYLKey("cyl_selectedControl"), control, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+        objc_setAssociatedObject(self, cylKey("cyl_selectedControl"), control, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
     }
 
     @objc(cyl_selectedIndex)

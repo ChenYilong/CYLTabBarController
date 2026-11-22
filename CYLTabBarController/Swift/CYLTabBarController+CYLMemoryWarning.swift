@@ -9,7 +9,7 @@ import UIKit
 
 /// [EN] The associated object key of `cyl_keepsLoadedTabBarItemIdentifiers` (selector-based, as in CYLTabBarController.m before).
 /// [CN] `cyl_keepsLoadedTabBarItemIdentifiers` 的关联对象 key（基于 selector，与原 CYLTabBarController.m 相同）。
-private let CYLKeepsLoadedTabBarItemIdentifiersKey = CYLUtilsKeys.key("cyl_keepsLoadedTabBarItemIdentifiers")
+private let cylKeepsLoadedTabBarItemIdentifiersKey = CYLUtilsKeys.key("cyl_keepsLoadedTabBarItemIdentifiers")
 
 /**
  * FIX: issue #426
@@ -43,11 +43,11 @@ extension CYLTabBarController {
     }
 
     func cylKeepsLoadedTabBarItemIdentifiers() -> [String] {
-        objc_getAssociatedObject(self, CYLKeepsLoadedTabBarItemIdentifiersKey) as? [String] ?? []
+        objc_getAssociatedObject(self, cylKeepsLoadedTabBarItemIdentifiersKey) as? [String] ?? []
     }
 
     func cylSetKeepsLoadedTabBarItemIdentifiers(_ identifiers: [String]) {
-        objc_setAssociatedObject(self, CYLKeepsLoadedTabBarItemIdentifiersKey, identifiers, .OBJC_ASSOCIATION_COPY_NONATOMIC)
+        objc_setAssociatedObject(self, cylKeepsLoadedTabBarItemIdentifiersKey, identifiers, .OBJC_ASSOCIATION_COPY_NONATOMIC)
     }
 
     @objc(unloadViewsOfUnselectedViewControllers)

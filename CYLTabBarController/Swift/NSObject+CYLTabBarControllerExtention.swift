@@ -225,7 +225,7 @@ extension NSObject {
      * [CN] 对象的方法（来自 `-_methodDescription`），用于在 LLDB 中调试。
      */
     @objc(cyl_methodList)
-    func cyl_methodList() -> String? {
+    func cylMethodList() -> String? {
         perform(NSSelectorFromString("_methodDescription"))?.takeUnretainedValue() as? String
     }
 
@@ -234,7 +234,7 @@ extension NSObject {
      * [CN] 对象自身类的方法（来自 `-_shortMethodDescription`），用于在 LLDB 中调试。
      */
     @objc(cyl_shortMethodList)
-    func cyl_shortMethodList() -> String? {
+    func cylShortMethodList() -> String? {
         perform(NSSelectorFromString("_shortMethodDescription"))?.takeUnretainedValue() as? String
     }
 
@@ -243,7 +243,7 @@ extension NSObject {
      * [CN] 视图树（来自 `-recursiveDescription`），用于在 LLDB 中调试。
      */
     @objc(cyl_viewInfo)
-    func cyl_viewInfo() -> String? {
+    func cylViewInfo() -> String? {
         guard self is UIView else {
             return "Sorry, only support UIView"
         }

@@ -50,7 +50,7 @@ public func CYLRememberItemImageInsets(_ item: AnyObject?, _ insets: UIEdgeInset
 }
 
 /// [EN] The title offset of a tab: its own, else the controller's. [CN] Tab 的标题偏移：自身的，否则为控制器的。
-func CYLTitlePositionAdjustment(forItem item: AnyObject?, controllerOffset: UIOffset) -> UIOffset {
+func cylTitlePositionAdjustment(forItem item: AnyObject?, controllerOffset: UIOffset) -> UIOffset {
     guard let item, let value = objc_getAssociatedObject(item, cylTitlePositionAdjustmentItemOffsetKey) as? NSValue else {
         return controllerOffset
     }
@@ -58,7 +58,7 @@ func CYLTitlePositionAdjustment(forItem item: AnyObject?, controllerOffset: UIOf
 }
 
 /// [EN] The image insets of a tab: its own, else the controller's. [CN] Tab 的图片内边距：自身的，否则为控制器的。
-func CYLImageInsets(forItem item: AnyObject?, controllerInsets: UIEdgeInsets) -> UIEdgeInsets {
+func cylImageInsets(forItem item: AnyObject?, controllerInsets: UIEdgeInsets) -> UIEdgeInsets {
     guard let item, let value = objc_getAssociatedObject(item, cylImageInsetsItemKey) as? NSValue else {
         return controllerInsets
     }
@@ -94,7 +94,7 @@ extension CYLTabBarController {
         }
         for viewController in viewControllers ?? [] {
             let item = viewController.tabBarItem
-            cylApplyTitlePositionAdjustment(CYLTitlePositionAdjustment(forItem: item, controllerOffset: offset), to: item)
+            cylApplyTitlePositionAdjustment(cylTitlePositionAdjustment(forItem: item, controllerOffset: offset), to: item)
         }
     }
 

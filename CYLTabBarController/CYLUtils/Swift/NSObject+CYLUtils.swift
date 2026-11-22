@@ -108,7 +108,7 @@ extension CGFloat {
      * [CN] `MAXFLOAT`，最上层的 `zPosition`（与 Objective-C 相同）：`CGFloat.greatestFiniteMagnitude` 是 Double 的最大值，CoreAnimation
      *      不接受（"zPosition should be within (-FLT_MAX, FLT_MAX) range"）。
      */
-    static let cyl_topZPosition = CGFloat(Float.greatestFiniteMagnitude)
+    static let cylTopZPosition = CGFloat(Float.greatestFiniteMagnitude)
 }
 
 enum CYLUtilsKeys {

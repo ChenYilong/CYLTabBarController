@@ -68,8 +68,7 @@ Pod::Spec.new do |s|
   # [CN] 每种动画类型一个子库，结构相同：Core + Engine + 动画库。
   s.subspec 'LottieObjectiveC' do |lottieobjc|
     lottieobjc.dependency 'CYLAnimatedItem/Engine'
-    # [EN] The lottie-ios 2.x player is Swift (Lottie/ObjectiveC/); the animator stays Objective-C (+load). [CN] lottie-ios 2.x 播放器为 Swift（Lottie/ObjectiveC/）；animator 保留为 Objective-C（+load）。
-    lottieobjc.source_files = 'CYLTabBarController/CYLTabBarItemAnimation/Lottie/*.{h,m}', 'CYLTabBarController/CYLTabBarItemAnimation/Lottie/ObjectiveC/*.swift'
+    lottieobjc.source_files = 'CYLTabBarController/CYLTabBarItemAnimation/Lottie/*.{h,m}'
     lottieobjc.private_header_files = 'CYLTabBarController/CYLTabBarItemAnimation/Lottie/*.h'
     lottieobjc.dependency 'lottie-ios', '~> 2.5.3'
   end

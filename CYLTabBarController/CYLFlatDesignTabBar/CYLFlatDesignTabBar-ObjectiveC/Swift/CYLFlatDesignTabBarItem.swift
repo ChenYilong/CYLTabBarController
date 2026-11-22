@@ -39,7 +39,7 @@ open class CYLFlatDesignTabBarItem: NSObject {
      * [CN] 显示本 item 的按钮；由按钮设置。
      */
     @objc open var tabBarButton: CYLFlatDesignTabBarButton? {
-        didSet { cyl_linkSystemTabBarItem() }
+        didSet { linkSystemTabBarItem() }
     }
 
     /// [EN] Makes this item's button the system item's button (`UITabBarItem.cyl_replacementTabButton`), so a badge set on the
@@ -47,7 +47,7 @@ open class CYLFlatDesignTabBarItem: NSObject {
     ///      the page is set, whichever comes last.
     /// [CN] 把本 item 的按钮设为系统 item 的按钮（`UITabBarItem.cyl_replacementTabButton`），使设置在页面 `tabBarItem` 上的角标到达可见的扁平样式
     ///      按钮，而不是 UIKit 隐藏的按钮。在设置按钮或页面时运行，以后设置的一方为准。
-    private func cyl_linkSystemTabBarItem() {
+    private func linkSystemTabBarItem() {
         guard let button = tabBarButton, let page = childViewController else { return }
         page.tabBarItem?.cyl_replacementTabButton = button
         if let navigation = page as? UINavigationController, let root = navigation.viewControllers.first {
@@ -114,7 +114,7 @@ open class CYLFlatDesignTabBarItem: NSObject {
     @objc open weak var childViewController: UIViewController? {
         didSet {
             childViewController?.cylflatdesign_tabBarController = cylflatdesign_tabBarController
-            cyl_linkSystemTabBarItem()
+            linkSystemTabBarItem()
         }
     }
 

@@ -247,6 +247,8 @@ export struct CYLRiveIcon {
   /** [EN] Paused on its first frame after load, not played yet. [CN] 加载后暂停在第一帧、尚未播放。 */
   private restingAfterLoad: boolean = false;
   private hasPlayed: boolean = false;
+  /** [EN] Frames `cylPlay` has waited for @ohos/rive to build the file. [CN] `cylPlay` 等待 @ohos/rive 建好文件的帧数。 */
+  private fileWaits: number = 0;
 
   aboutToAppear(): void {
     this.registerReplay(() => this.cylReplay());
@@ -450,6 +452,23 @@ export struct CYLRiveIcon {
   private cylPlay(view: RiveAnimationView): void {
     this.cylCancelDeactivate();
     this.cylCancelLoop();
+    // [EN] setRiveBytes() returns before @ohos/rive builds the file (about a frame later on the x86_64 emulator): a play in
+    //      between selected no artboard ("cannot select an Artboard without a valid File") and was lost, so an icon
+    //      selected when it loaded stayed on the file's first frame (a linear `animation` never played, `onEnded` never
+    //      came). Wait for the file, a frame at a time, at most 60 frames.
+    // [CN] setRiveBytes() 返回时 @ohos/rive 还没有建好文件（x86_64 模拟器上约晚一帧）：这期间的播放选不到画板而丢失，加载时已选中的图标
+    //      停在文件的第一帧（线性 `animation` 不播放，`onEnded` 不调用）。逐帧等待文件，最多 60 帧。
+    if ((view.controller === null || view.controller.file === null) && this.fileWaits < 60) {
+      this.fileWaits++;
+      this.deactivateTimer = setTimeout(() => {
+        this.deactivateTimer = -1;
+        if (this.riveView === view && this.selected) {
+          this.cylPlay(view);
+        }
+      }, CYL_RIVE_NEXT_FRAME_MS);
+      return;
+    }
+    this.fileWaits = 0;
     this.hasPlayed = true;
     if (this.restingAfterLoad) {
       // [EN] Resumed where it rests (no settling), then played as usual. Only the state machine: an unnamed `play()` also
