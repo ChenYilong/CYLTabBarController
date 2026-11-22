@@ -26,6 +26,8 @@
 | [任务记录](#cn任务记录) | [Task log](#entask-log) |
 | &nbsp;&nbsp;&nbsp;&nbsp;↳ [TODO: CYLDeallocBlockExecutor as a core dependency (2026-11-22, branch `feat/dealloc-block-executor-dependency`)](#todo-cyldeallocblockexecutor-as-a-core-dependency-2026-11-22-branch-featdealloc-block-executor-dependency) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [TODO: CYLDeallocBlockExecutor as a core dependency (2026-11-22, branch `feat/dealloc-block-executor-dependency`)](#todo-cyldeallocblockexecutor-as-a-core-dependency-2026-11-22-branch-featdealloc-block-executor-dependency) |
 | &nbsp;&nbsp;&nbsp;&nbsp;↳ [TODO: all platforms, step 1 Android (2026-11-23, branch `feat/dealloc-block-executor-dependency`)](#todo-all-platforms-step-1-android-2026-11-23-branch-featdealloc-block-executor-dependency) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [TODO: all platforms, step 1 Android (2026-11-23, branch `feat/dealloc-block-executor-dependency`)](#todo-all-platforms-step-1-android-2026-11-23-branch-featdealloc-block-executor-dependency) |
+| &nbsp;&nbsp;&nbsp;&nbsp;↳ [TODO: all platforms, step 2 HarmonyOS (2026-11-23, branch `feat/dealloc-block-executor-dependency`)](#todo-all-platforms-step-2-harmonyos-2026-11-23-branch-featdealloc-block-executor-dependency) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [TODO: all platforms, step 2 HarmonyOS (2026-11-23, branch `feat/dealloc-block-executor-dependency`)](#todo-all-platforms-step-2-harmonyos-2026-11-23-branch-featdealloc-block-executor-dependency) |
+| &nbsp;&nbsp;&nbsp;&nbsp;↳ [TODO: all platforms, step 3 Mini program (2026-11-23, branch `feat/dealloc-block-executor-dependency`)](#todo-all-platforms-step-3-mini-program-2026-11-23-branch-featdealloc-block-executor-dependency) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [TODO: all platforms, step 3 Mini program (2026-11-23, branch `feat/dealloc-block-executor-dependency`)](#todo-all-platforms-step-3-mini-program-2026-11-23-branch-featdealloc-block-executor-dependency) |
 
 <!-- navigation:end -->
 
@@ -67,3 +69,24 @@
 | Android 测试：见右列。 | Not verified: the Flutter example's Android build (`flutter build apk --debug`) did not finish on this Mac (a Gradle daemon started inside the sandbox had no DNS for storage.googleapis.com, later runs were killed while the machine's load average was above 100), the React Native Android build did not run (no `node_modules`), and the `gradle.lockfile` of the Flutter and React Native examples was not rewritten (they use LENIENT locking). Android tests: `CYLLayoutBlockTest` (5: one-time, every time, theme-switch re-arm, property read at run time, replacement by key); the whole Example-Android unit test suite (252 tests, 0 failures) and `assembleDebug` pass on macOS 27.3 with JDK 17.0.21 and Gradle 9.3.1. |
 | 得分：见右列。 | Score (Android step): see the final report; HarmonyOS and the Mini Program are the next steps. |
 
+### TODO: all platforms, step 2 HarmonyOS (2026-11-23, branch `feat/dealloc-block-executor-dependency`)
+
+| 中文 | English |
+|:---|:---|
+| 背景：第 1 步（Android）已完成。第 2 步：把同样的回调注册表（库分支 `feat/lifecycle-callbacks-android`，PR #13）移植到HarmonyOS（ArkTS）并作为核心依赖接入。 | Context: step 1 (Android) is done. Step 2: the same callback registry (library branch `feat/lifecycle-callbacks-android`, PR #13) is ported to HarmonyOS (ArkTS) and becomes a core dependency. |
+| 需求（英文翻译）：为 Android、Flutter、React Native、小程序和 HarmonyOS 构建核心代码，逻辑与 iOS 相同，并安装为 CYLTabBarController 核心依赖。 | Requirement (English translation): build core code for Android, Flutter, React Native, the Mini Program and HarmonyOS, with the same logic as iOS, and install it as a CYLTabBarController core dependency. |
+| 原始提示：见右列。 | Prompt (verbatim): "please  build core code for other platform like android flutter react native miniplatform and harmonyos. logic is same as what we done on ios, and install in the CYLTabBarController core dependence" |
+| 评分：100 = 库与测试 40、对照表 15、CYLTabBarController 集成 30、文档与 CI 15。60 = 库、测试、对照表和已声明的依赖。 | Rubric: 100 = library and tests 40, parity table 15, integration in CYLTabBarController 30, docs and CI 15. 60 = library, tests, parity column and the declared dependency. |
+| 计划：见右列。 | Plan: HAR module in the library, vendored into `CrossPlatform/harmonyos-cyltabbar/cyldeallocblockexecutor` (`scripts/sync-cyldeallocblockexecutor.sh`, `VENDORED.md`), used by `CYLTabBarController.ets` for the keyboard listener (`cyl.core.keyboardListener`); the layout block stays N/A on HarmonyOS. |
+| 得分：见右列。 | Score: see the final report; TODO until the step is done. |
+
+### TODO: all platforms, step 3 Mini program (2026-11-23, branch `feat/dealloc-block-executor-dependency`)
+
+| 中文 | English |
+|:---|:---|
+| 背景：第 1 步（Android）已完成。第 3 步：把同样的回调注册表（库分支 `feat/lifecycle-callbacks-android`，PR #13）移植到微信小程序（JavaScript）并作为核心依赖接入。 | Context: step 1 (Android) is done. Step 3: the same callback registry (library branch `feat/lifecycle-callbacks-android`, PR #13) is ported to the WeChat Mini Program (JavaScript) and becomes a core dependency. |
+| 需求（英文翻译）：为 Android、Flutter、React Native、小程序和 HarmonyOS 构建核心代码，逻辑与 iOS 相同，并安装为 CYLTabBarController 核心依赖。 | Requirement (English translation): build core code for Android, Flutter, React Native, the Mini Program and HarmonyOS, with the same logic as iOS, and install it as a CYLTabBarController core dependency. |
+| 原始提示：见右列。 | Prompt (verbatim): "please  build core code for other platform like android flutter react native miniplatform and harmonyos. logic is same as what we done on ios, and install in the CYLTabBarController core dependence" |
+| 评分：100 = 库与测试 40、对照表 15、CYLTabBarController 集成 30、文档与 CI 15。60 = 库、测试、对照表和已声明的依赖。 | Rubric: 100 = library and tests 40, parity table 15, integration in CYLTabBarController 30, docs and CI 15. 60 = library, tests, parity column and the declared dependency. |
+| 计划：见右列。 | Plan: CommonJS module in the library, vendored into `CrossPlatform/wechat-miniprogram-cyltabbar/src/cyl-dealloc-block-executor/`, used by `cyl-tab-bar` for its detached cleanup. |
+| 得分：见右列。 | Score: see the final report; TODO until the step is done. |
