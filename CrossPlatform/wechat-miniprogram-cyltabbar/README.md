@@ -77,7 +77,34 @@ stills a GIF always plays), `riveWasmPath` / `pagWasmPath` (cyl-rive / cyl-pag `
 `accessoryAccessibilityLabel`, `accessoryPlacement`, `animationTint` (one color for a Rive animation, passed to cyl-rive `tint`; '' keeps the file's colors), `titleColor`, `titleDarkColor` (the title color while dark; '' keeps `titleColor`), `userInterfaceStyle` ('system', the default, follows the system theme and needs `"darkmode": true` in app.json; 'light' or 'dark' forces it), `titleFontSize` (px; 0 keeps 14), `titleFontWeight` ('normal', 'bold', 'bolder', 'lighter' or 100–900; '' keeps the default), `titleLines` (1: one line with an ellipsis, the default; 0: no limit; n > 1: up to n lines), `titleLineHeight` (px; 0 keeps the default), `titleSpacing` (px between the icon and the title; -1 keeps 2 px vertical / 4 px horizontal; a vertical item centres each wrapped line), `dragEnabled`, `accessibilityLabel`, `embedded` (inside a control that is the accessibility element: no padding, no 44 px
 minimum, hidden from accessibility, no gestures). Methods (through
 `selectComponent`): `playAnimation()` (from progress 0; a file still loading plays when ready), `restartAnimation()`,
-`stopAnimation()`. Events: `itemtap`, `itemlongpress`, `accessorytap`, `dragstart` / `dragmove` / `dragend`, and the engine's own, forwarded with its detail: `animationready` (e.g. `duration`), `animationcomplete` (a non-looping pass ended, e.g. to count repeats), `animationloopcomplete` (a looping pass ended), `animationerror` (`message`; the item still shows its image). GIF sends none of the four.
+`stopAnimation()`, `cyl_player()` (the player, below). Events: `itemtap`, `itemlongpress`, `accessorytap`, `dragstart` / `dragmove` / `dragend`, and the engine's own, forwarded with its detail: `animationready` (e.g. `duration`), `animationcomplete` (a non-looping pass ended, e.g. to count repeats), `animationloopcomplete` (a looping pass ended), `animationerror` (`message`; the item still shows its image). GIF sends none of the four.
+
+### Engine contract: the player, host-driven mode, `restartToken`
+
+The same contract HarmonyOS defines (`CrossPlatform/harmonyos-cyltabbar/cylanimateditem/README.md`, "Engine views";
+[docs/Animated-Item.md](../../docs/Animated-Item.md), "Engine API across platforms").
+
+- **`cyl_player()`** (a method, not an event) returns the item's one `CYLAnimatedItemPlayer`
+  (`src/cyl-animated-item/cyl_animated_item_player.js`, pure JavaScript): `play()` (from progress 0 once; before
+  `animationready` it waits for the file), `stopAtProgress(p)` (pauses, then seeks to 0...1; where the engine has no seek it
+  rests on the first frame, or the last at 1), `speed`, `loops` (the item's `speed` and `loop`, applied at once),
+  `supportsSpeed` / `supportsLoops` / `supportsProgress` / `supportsColors`, `isPlaying`, `onEnded(cb)` (the end of a
+  play-once pass, the same moment as `animationcomplete`; returns a function that removes it), `applyColors(colors)` (a `Map`
+  or an object; undefined restores the file's colors). Support, by type: Lottie speed, progress, colors; PAG and SVGA speed,
+  progress; Rive speed, colors (no seek); GIF none of them (loops only with stills). `progress` (the current position) is not
+  offered: no engine component reports it.
+- **`drivesAnimationPlayback`** (default true). false: the item applies none of the default rules (a selection change touches no
+  engine, the engine never autoplays on `ready`, `restartToken` is ignored, the engine's own resting frame stays on the host's
+  last `stopAtProgress`) and the host plays through `cyl_player()`. `playAnimation()`, `restartAnimation()` and `stopAnimation()`
+  still do what they are called for. Set it when the item is created. All engines stay behind the four generic nodes
+  (`generic:cyl-lottie-view=…`), each package with its own default, so the 2 MB package limit is unchanged.
+- **`restartToken`** (Number, default 0): each time it grows the item plays again from the start, like `restartAnimation()`;
+  the value at creation and a lower value are not restarts.
+- **The end callback** is the existing `animationcomplete` event (no separate `animationend`), and `player.onEnded`. A GIF given
+  as the `image` (canvas) sends neither.
+- Tests: `test/cyl_animated_item_player.test.js` (player, host-driven mode, restart token) and
+  `test/cyl_animated_item_source.test.js` (`cylAnimatedItemSource`, the `#` options, against
+  `CrossPlatform/animated-item-fixtures/source-options.json`).
 
 ## The tab switch contract
 

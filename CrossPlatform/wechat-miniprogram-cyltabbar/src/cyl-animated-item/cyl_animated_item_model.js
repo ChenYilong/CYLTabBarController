@@ -47,6 +47,73 @@ function cylAnimatedItemType(path) {
 }
 
 /**
+ * [EN] The "name=value" pairs after the first "?" or "#": split at "&", and at a "?" or "#" that starts the next group
+ *      ("artboard=CHAT#input=active"), not at one inside a value ("tint=#FF0000", a color written without encoding).
+ *      The HarmonyOS rule (`cylOptionPairs`).
+ * [CN] 第一个 "?" 或 "#" 之后的「名称=值」对：在 "&" 处分开，也在开始下一组的 "?" 或 "#" 处分开，但不在值内部的 "#" 处分开
+ *      （例如 "tint=#FF0000"）。鸿蒙的规则（`cylOptionPairs`）。
+ */
+function cylAnimatedItemOptionPairs(text) {
+  const pairs = []
+  text.split('&').forEach((piece) => {
+    let start = 0
+    for (let i = 1; i < piece.length; i++) {
+      const c = piece.charAt(i)
+      if ((c === '#' || c === '?') && piece.charAt(i - 1) !== '=') {
+        pairs.push(piece.slice(start, i))
+        start = i + 1
+      }
+    }
+    pairs.push(piece.slice(start))
+  })
+  return pairs
+}
+
+/** [EN] Percent-decoded text; an undecodable text is kept as it is. [CN] 百分号解码后的文本；无法解码时保持原样。 */
+function cylAnimatedItemDecode(text) {
+  try {
+    return decodeURIComponent(text)
+  } catch {
+    return text
+  }
+}
+
+/**
+ * [EN] An animation value split into its file (or inline Lottie JSON), its `#` options and its type, with the rules of
+ *      HarmonyOS `CYLAnimatedItemSource.parse` and the shared vectors in `CrossPlatform/animated-item-fixtures/
+ *      source-options.json` (test/cyl_animated_item_source.test.js): an `asset:` prefix is dropped; the options follow the first
+ *      "#" or "?"; names and values are percent-decoded; a pair without a name is dropped; the type comes from the file
+ *      extension ('lottie', 'pag', 'rive', 'svga', 'gif', or ''); trimmed text that starts with "{" or "[" is inline Lottie JSON.
+ *      Returns `{ url, file, inlineJSON, options, type }`; `file` is '' and `inlineJSON` is set for inline JSON, else
+ *      `inlineJSON` is undefined.
+ * [CN] 把动画值拆分为文件（或内联 Lottie JSON）、`#` 选项与类型，规则与鸿蒙的 `CYLAnimatedItemSource.parse` 以及共享测试向量
+ *      `CrossPlatform/animated-item-fixtures/source-options.json` 一致（test/cyl_animated_item_source.test.js）：丢弃 `asset:` 前缀；
+ *      选项位于第一个 "#" 或 "?" 之后；名称与值经百分号解码；没有名称的对被丢弃；类型来自文件扩展名（'lottie'、'pag'、'rive'、'svga'、
+ *      'gif' 或 ''）；去掉首尾空白后以 "{" 或 "[" 开头的文本是内联 Lottie JSON。返回 `{ url, file, inlineJSON, options, type }`；
+ *      内联 JSON 时 `file` 为 '' 且设置 `inlineJSON`，否则 `inlineJSON` 为 undefined。
+ */
+function cylAnimatedItemSource(value) {
+  const url = value === null || value === undefined ? '' : String(value)
+  const trimmed = url.trim()
+  if (!trimmed.startsWith('asset:') && (trimmed.startsWith('{') || trimmed.startsWith('['))) {
+    return { url, file: '', inlineJSON: trimmed, options: {}, type: 'lottie' }
+  }
+  const raw = trimmed.startsWith('asset:') ? trimmed.slice('asset:'.length) : trimmed
+  const query = raw.indexOf('?')
+  const hash = raw.indexOf('#')
+  const at = query < 0 ? hash : (hash < 0 ? query : Math.min(query, hash))
+  const options = {}
+  if (at >= 0) {
+    cylAnimatedItemOptionPairs(raw.slice(at + 1)).forEach((pair) => {
+      const eq = pair.indexOf('=')
+      if (eq > 0) options[cylAnimatedItemDecode(pair.slice(0, eq))] = cylAnimatedItemDecode(pair.slice(eq + 1))
+    })
+  }
+  const file = at >= 0 ? raw.slice(0, at) : raw
+  return { url, file, inlineJSON: undefined, options, type: cylAnimatedItemType(file) }
+}
+
+/**
  * [EN] The npm package that plays `type`, or '' (GIF needs none). [CN] 播放 `type` 的 npm 包，没有时为 ''（GIF 不需要）。
  */
 function cylAnimatedItemPackage(type) {
@@ -61,6 +128,12 @@ function cylAnimatedItemPackage(type) {
  *      `CYLAnimatedItemView.animationRestingProgress` 相同。
  */
 function cylAnimatedItemRestingProgress(p) {
+  // [EN] Host-driven (`drivesAnimationPlayback` false): the progress the host last stopped at, whatever is selected.
+  // [CN] 宿主驱动（`drivesAnimationPlayback` 为 false）：宿主上次停下的进度，与选中状态无关。
+  if (p.drivesAnimationPlayback === false) {
+    const hosted = Number(p.hostRestingProgress)
+    return Number.isFinite(hosted) ? Math.min(1, Math.max(0, hosted)) : 0
+  }
   if (p.selected) return 1
   const progress = Number(p.restingProgress)
   return Number.isFinite(progress) ? Math.min(1, Math.max(0, progress)) : 0
@@ -265,7 +338,7 @@ function cylAnimatedItemModel(input) {
     dark,
     animationPath,
     animationType,
-    restingFrame: p.selected ? 'last' : 'first',
+    restingFrame: (p.drivesAnimationPlayback === false ? cylAnimatedItemRestingProgress(p) >= 1 : p.selected) ? 'last' : 'first',
     usesEngine,
     // [EN] The engine is hidden: its play-once animation ended and the still image shows. [CN] 引擎被隐藏：只播放一次的动画已结束，显示静态图片。
     animationHidden: usesEngine && ended,
@@ -298,6 +371,7 @@ module.exports = {
   cylAnimatedItemIsDark,
   cylAnimatedItemModel,
   cylAnimatedItemType,
+  cylAnimatedItemSource,
   cylAnimatedItemPackage,
   cylAnimatedItemRestingProgress,
   cylAnimatedItemGifSource,
