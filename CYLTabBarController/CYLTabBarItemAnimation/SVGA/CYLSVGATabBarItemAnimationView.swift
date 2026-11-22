@@ -64,7 +64,7 @@ public final class CYLSVGATabBarItemAnimationView: SVGAPlayer, SVGAPlayerDelegat
      * [CN] `CYLTabBarItemAnimationViewProviding`：为 SVGA 文件（本地，或由 SVGAParser 解析的 http / https）创建视图。
      */
     @objc(cyl_animationViewWithFileURL:options:contentMode:)
-    public static func makeAnimationView(fileURL: URL, options: [String: String], contentMode: UIView.ContentMode) -> UIView? {
+    public static func makeAnimationView(fileURL: URL, options _: [String: String], contentMode: UIView.ContentMode) -> UIView? {
         let view = CYLSVGATabBarItemAnimationView(frame: .zero)
         view.loops = 1
         view.delegate = view
@@ -226,7 +226,7 @@ public final class CYLSVGATabBarItemAnimationView: SVGAPlayer, SVGAPlayerDelegat
         speedLink = nil
     }
 
-    @objc private func speedTick(_ link: CADisplayLink) {
+    @objc private func speedTick(_: CADisplayLink) {
         let frames = Int(videoItem?.frames ?? 0)
         let fps = Double(videoItem?.fps ?? 0)
         guard frames > 0, fps > 0 else {
@@ -260,7 +260,7 @@ public final class CYLSVGATabBarItemAnimationView: SVGAPlayer, SVGAPlayerDelegat
 
     // MARK: - SVGAPlayerDelegate
 
-    public func svgaPlayer(_ player: SVGAPlayer!, didAnimatedToFrame frame: Int) {
+    public func svgaPlayer(_: SVGAPlayer!, didAnimatedToFrame frame: Int) {
         currentFrame = frame
     }
 
