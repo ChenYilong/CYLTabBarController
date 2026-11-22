@@ -1,53 +1,78 @@
 package com.cyltabbar
 
 import android.content.Context
-import android.view.View
 import android.widget.FrameLayout
-import android.widget.ImageView
-import com.cyl.tabbar.CYLSize
-import com.cyl.tabbar.CYLTabBarItemAnimationFactory
+import com.cyl.animateditem.CYLAnimatedItemAnimationEndListener
+import com.cyl.animateditem.CYLAnimatedItemView
+import com.cyl.animateditem.CYLSize
 
 /**
- * An animation played by CYLTabBarController's engine (`CYLTabBarItemAnimationFactory`), whatever its library (Rive,
- * Lottie, PAG, GIF) when the app has it. 由 CYLTabBarController 引擎播放的动画，App 引入对应库时可用（Rive、Lottie、PAG、GIF）。
+ * An animation played by CYLTabBarController's engine through a `CYLAnimatedItemView` (the cross-platform engine API:
+ * `docs/Animated-Item.md`, "Engine API across platforms"). Props `source`, `playing`, `selected`, `animationSpeed`,
+ * `animationLoops`, `animationRestartToken`, `drivesAnimationPlayback` (default true), `iconSize`, `tintColor`; commands
+ * `play`, `stopAtProgress`, `restart`; events `onAnimationLoaded`, `onAnimationFailed`, `onAnimationEnd`. No engine logic here.
+ * 由 CYLTabBarController 引擎通过 `CYLAnimatedItemView` 播放的动画（跨端引擎 API，见 `docs/Animated-Item.md`）。
  */
 class CyltabbarAnimationView(context: Context) : FrameLayout(context) {
-  private var source: String? = null
-  private var playing = false
-  private var animationView: View? = null
+  private val density = resources.displayMetrics.density
+  private var iconSize: Float? = null
 
-  fun applySource(value: String?) {
-    if (value == source) return
-    source = value
-    rebuild()
+  /** Called with the event name ("loaded", "failed", "end"); the manager turns it into a React Native event. */
+  var onEvent: ((String) -> Unit)? = null
+
+  val item = CYLAnimatedItemView(context).apply {
+    // Icon only: the view React Native lays out is the icon's frame. 只有图标：React Native 布局的视图就是图标的范围。
+    drivesAnimationPlayback = true
+    animationEndListener = CYLAnimatedItemAnimationEndListener { onEvent?.invoke("end") }
+    onAnimationLoaded = { onEvent?.invoke("loaded") }
+    onAnimationFailed = { onEvent?.invoke("failed") }
   }
 
-  fun applyPlaying(value: Boolean) {
-    playing = value
-    play()
+  init {
+    addView(item, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
   }
 
   override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
     super.onSizeChanged(w, h, oldw, oldh)
-    if (animationView == null && w > 0) post { rebuild() }
+    fitIcon()
   }
 
-  private fun rebuild() {
-    animationView?.let(::removeView)
-    animationView = null
-    val url = source?.takeIf { it.isNotBlank() } ?: return
-    val density = resources.displayMetrics.density
-    val size = if (width > 0) CYLSize(width / density, height / density) else CYLSize(44f, 44f)
-    val view = CYLTabBarItemAnimationFactory.animationViewWithURL(context, url, size, ImageView.ScaleType.FIT_CENTER) ?: return
-    addView(view, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
-    animationView = view
-    play()
+  /** The icon fills the view, or is `iconSize` (dp) when given. 图标铺满视图，给了 `iconSize`（dp）时为该尺寸。 */
+  private fun fitIcon() {
+    val side = iconSize
+    val size = when {
+      side != null -> CYLSize(side, side)
+      width > 0 -> CYLSize(width / density, height / density)
+      else -> return
+    }
+    if (item.iconSizeDp != size) item.iconSizeDp = size
   }
 
-  private fun play() {
-    val player = CYLTabBarItemAnimationFactory.playerForView(animationView) ?: return
-    if (playing) player.play() else player.stop()
-  }
+  fun applySource(value: String?) { item.animationURL = value?.takeIf { it.isNotBlank() } }
+
+  fun applyPlaying(value: Boolean) { if (value) item.playAnimation() else item.stopAnimation() }
+
+  fun applySelected(value: Boolean) { item.isSelected = value }
+
+  fun applyAnimationSpeed(value: Float) { item.animationSpeed = value }
+
+  fun applyAnimationLoops(value: Boolean) { item.animationLoops = value }
+
+  fun applyAnimationRestartToken(value: Int) { item.animationRestartToken = value }
+
+  fun applyDrivesAnimationPlayback(value: Boolean) { item.drivesAnimationPlayback = value }
+
+  /** `iconSize` in dp; 0 or less fills the view. */
+  fun applyIconSize(value: Float) { iconSize = value.takeIf { it > 0f }; fitIcon() }
+
+  /** `tintColor` as an ARGB int; null clears it. */
+  fun applyTintColor(value: Int?) { item.iconColor = value }
+
+  fun play() = item.animatedItemPlayer.play()
+
+  fun stopAtProgress(progress: Float) = item.animatedItemPlayer.stopAtProgress(progress)
+
+  fun restart() = item.restartAnimation()
 
   // React Native does not lay out views it did not create. React Native 不布局它没有创建的视图。
   private val measureAndLayout = Runnable {

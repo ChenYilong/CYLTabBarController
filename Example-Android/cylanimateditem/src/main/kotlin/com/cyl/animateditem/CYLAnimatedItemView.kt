@@ -371,6 +371,51 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
         set(value) { field = value; if (playing) watchForAnimationEnd() }
 
     /**
+     * [EN] The end callback of `animatedItemPlayer.onEnded`. [CN] `animatedItemPlayer.onEnded` 的结束回调。
+     */
+    internal var playerEndedCallback: (() -> Unit)? = null
+        set(value) { field = value; if (playing) watchForAnimationEnd() }
+
+    /**
+     * [EN] The player over whatever engine plays `animationURL` (HarmonyOS `CYLAnimatedItemPlayer`): `play`,
+     *      `stopAtProgress`, `speed`, `loops`, `supports…`, `isPlaying`, `progress`, `onEnded`, `applyColors`.
+     * [CN] 覆盖播放 `animationURL` 的任何引擎的播放器（对应鸿蒙 `CYLAnimatedItemPlayer`）。
+     */
+    val animatedItemPlayer: CYLAnimatedItemPlayer by lazy { CYLAnimatedItemPlayer(this) }
+
+    /**
+     * [EN] Whether the item applies the default rules itself: selected plays once from the start, unselected rests at
+     *      `animationRestingProgress`, a grown `animationRestartToken` restarts, and a ready animation of a selected item
+     *      plays. False (the default here, so existing users keep their behavior; the React Native and Flutter views turn
+     *      it on) leaves all of that to the host, which plays through `animatedItemPlayer`. HarmonyOS: `drivesAnimationPlayback`.
+     * [CN] 条目是否自行应用默认规则：选中时从头播放一次，未选中时停在 `animationRestingProgress`，`animationRestartToken` 增大时重新播放，
+     *      选中条目的动画就绪后播放。false（此处默认，现有用法的行为不变；React Native 与 Flutter 的视图会开启）则全部交给宿主，宿主通过
+     *      `animatedItemPlayer` 播放。鸿蒙：`drivesAnimationPlayback`。
+     */
+    var drivesAnimationPlayback: Boolean = false
+
+    /**
+     * [EN] A token that restarts the animation from the start when it changes (only while `drivesAnimationPlayback`); the
+     *      value at creation is not a restart. [CN] 变化时让动画从头重新播放的令牌（仅在 `drivesAnimationPlayback` 时）；创建时的值不算重新播放。
+     */
+    var animationRestartToken: Int = 0
+        set(value) {
+            val changed = field != value
+            field = value
+            if (changed && drivesAnimationPlayback) restartAnimation()
+        }
+
+    /**
+     * [EN] Called when the engine has loaded the file; with `onAnimationFailed`, what the bridges report. [CN] 引擎加载完文件时调用；与 `onAnimationFailed` 一起是桥接层上报的内容。
+     */
+    var onAnimationLoaded: (() -> Unit)? = null
+
+    /**
+     * [EN] Called when the engine could not load the file. [CN] 引擎无法加载文件时调用。
+     */
+    var onAnimationFailed: (() -> Unit)? = null
+
+    /**
      * [EN] Whether the still image replaces the ended animation now (`showsImageWhenAnimationEnds`). [CN] 静态图片当前是否替换了已结束的动画。
      */
     var isShowingImageAfterAnimationEnd: Boolean = false
@@ -573,6 +618,7 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
         val changed = selected != isSelected
         super.setSelected(selected)
         if (changed) { updateIcon(); applyIconColor(); onItemStateChanged(); updateAccessibility() }
+        if (changed && drivesAnimationPlayback && animationView != null) { if (selected) restartAnimation() else stopAnimation() }
     }
 
     // MARK: - Icon color 图标颜色
@@ -681,6 +727,7 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
                     if (animationSpeed > 0f) player.animationSpeed = animationSpeed
                     player.progress = animationRestingProgress
                 }
+                if (drivesAnimationPlayback && isSelected) playAnimation()
             } ?: CYLAnimationEngines.warnMissingEngine(context, null, url)
         }
         updateIcon()
@@ -748,7 +795,7 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
      */
     private fun watchForAnimationEnd() {
         val generation = ++endWatchGeneration
-        if (!showsImageWhenAnimationEnds && animationEndListener == null) return
+        if (!showsImageWhenAnimationEnds && animationEndListener == null && playerEndedCallback == null) return
         var started = false
         lateinit var check: Runnable
         check = Runnable {
@@ -780,6 +827,7 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
             requestLayout()
         }
         animationEndListener?.onAnimationEnd(this)
+        playerEndedCallback?.invoke()
     }
 
     /**
@@ -797,7 +845,11 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
      * [EN] The engine could not load the file: drop the animation and show the static icon. [CN] 引擎无法加载文件：移除动画并显示静态图标。
      */
     override fun cyl_animationViewDidLoad(animationView: View) {
-        if (animationView === this.animationView) { updateIcon(); requestLayout() }
+        if (animationView !== this.animationView) return
+        updateIcon()
+        requestLayout()
+        if (drivesAnimationPlayback && isSelected) playAnimation()
+        onAnimationLoaded?.invoke()
     }
 
     override fun cyl_animationViewDidFail(animationView: View) {
@@ -807,6 +859,7 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
         playing = false
         updateIcon()
         requestLayout()
+        onAnimationFailed?.invoke()
     }
 
     // MARK: - Touches 触摸

@@ -1,31 +1,57 @@
 #import "CyltabbarAnimationView.h"
 
 #import <CYLTabBarController/CYLTabBarController.h>
-// [EN] The classes translated to Swift (CYLTabBarHostView, step 36; the animation factory): the umbrella header does not
-//      import the generated Swift header (docs/Swift-Migration.md).
-// [CN] 已翻译为 Swift 的类（CYLTabBarHostView，第 36 步；动画工厂）：伞头文件不导入生成的 Swift 头文件（docs/Swift-Migration.md）。
-#if __has_include(<CYLTabBarController/CYLTabBarController-Swift.h>)
-#import <CYLTabBarController/CYLTabBarController-Swift.h>
-#else
-#import "CYLTabBarController-Swift.h"
-#endif
-#if __has_include(<CYLTabBarController/CYLTabBarItemAnimationFactory.h>)
-#import <CYLTabBarController/CYLTabBarItemAnimationFactory.h>
+// [EN] The animation view is a `CYLAnimatedItemView` (the cross-platform engine API, docs/Animated-Item.md, "Engine API across
+//      platforms"), in the CYLAnimatedItem pod that comes with CYLTabBarController; its generated Swift header declares it
+//      (docs/Swift-Migration.md). Without the pod the view stays empty.
+// [CN] 动画视图是 `CYLAnimatedItemView`（跨端引擎 API，见 docs/Animated-Item.md「跨端引擎 API」），位于随 CYLTabBarController 提供的
+//      CYLAnimatedItem pod 中，由其生成的 Swift 头文件声明（docs/Swift-Migration.md）。没有该 pod 时视图保持为空。
+#if __has_include(<CYLAnimatedItem/CYLAnimatedItem-Swift.h>)
+#import <CYLAnimatedItem/CYLAnimatedItem-Swift.h>
+#define CYL_RN_ANIMATION_AVAILABLE 1
+#elif __has_include("CYLAnimatedItem-Swift.h")
+#import "CYLAnimatedItem-Swift.h"
 #define CYL_RN_ANIMATION_AVAILABLE 1
 #else
 #define CYL_RN_ANIMATION_AVAILABLE 0
 #endif
+#if CYL_RN_ANIMATION_AVAILABLE && __has_include(<CYLAnimatedItem/CYLTabBarItemAnimationPlayer.h>)
+#import <CYLAnimatedItem/CYLTabBarItemAnimationPlayer.h>
+#endif
 
+#import <React/RCTConversions.h>
 #import <react/renderer/components/CyltabbarViewSpec/ComponentDescriptors.h>
+#import <react/renderer/components/CyltabbarViewSpec/EventEmitters.h>
 #import <react/renderer/components/CyltabbarViewSpec/Props.h>
 #import <react/renderer/components/CyltabbarViewSpec/RCTComponentViewHelpers.h>
 
 using namespace facebook::react;
 
+/**
+ * [EN] An animation played by CYLTabBarController's engine through a `CYLAnimatedItemView`, the same contract as the Android
+ *      view (`CyltabbarAnimationView.kt`): the props `source`, `playing`, `selected`, `animationSpeed`, `animationLoops`,
+ *      `animationRestartToken`, `drivesAnimationPlayback`, `iconSize`, `tintColor`; the events `onAnimationLoaded`,
+ *      `onAnimationFailed`, `onAnimationEnd`; the commands `play`, `stopAtProgress`, `restart`. No engine logic here. The
+ *      restart token is read-only on iOS (`animationRestartToken` grows on every `restartAnimation()`), so a changed token calls
+ *      `restartAnimation()`; the token the view is created with is not a restart.
+ * [CN] 由 CYLTabBarController 引擎通过 `CYLAnimatedItemView` 播放的动画，契约与 Android 视图相同（`CyltabbarAnimationView.kt`）：
+ *      属性 `source`、`playing`、`selected`、`animationSpeed`、`animationLoops`、`animationRestartToken`、`drivesAnimationPlayback`、
+ *      `iconSize`、`tintColor`；事件 `onAnimationLoaded`、`onAnimationFailed`、`onAnimationEnd`；命令 `play`、`stopAtProgress`、`restart`。
+ *      这里没有引擎逻辑。重播 token 在 iOS 上只读（每次 `restartAnimation()` 后 `animationRestartToken` 加一），因此 token 变化时调用
+ *      `restartAnimation()`；创建视图时的 token 不算重播。
+ */
+@interface CyltabbarAnimationView () <RCTCyltabbarAnimationViewViewProtocol>
+@end
+
 @implementation CyltabbarAnimationView {
   NSString *_source;
   BOOL _playing;
-  UIView *_animationView;
+#if CYL_RN_ANIMATION_AVAILABLE
+  CYLAnimatedItemView *_item;
+  BOOL _hasRestartToken;
+  NSInteger _restartToken;
+  CGFloat _iconSide;
+#endif
 }
 
 + (ComponentDescriptorProvider)componentDescriptorProvider
@@ -38,6 +64,9 @@ using namespace facebook::react;
   if (self = [super initWithFrame:frame]) {
     static const auto defaultProps = std::make_shared<const CyltabbarAnimationViewProps>();
     _props = defaultProps;
+#if CYL_RN_ANIMATION_AVAILABLE
+    [self setUpItem];
+#endif
   }
   return self;
 }
@@ -62,64 +91,131 @@ static NSURL *CYLRNAnimationURL(NSString *source)
   components.percentEncodedFragment = fragment;
   return components.URL;
 }
+
+- (void)setUpItem
+{
+  __weak __typeof(self) weakSelf = self;
+  _item = [[CYLAnimatedItemView alloc] initWithFrame:self.bounds];
+  // [EN] Icon only; the view the host gives is the icon's frame. [CN] 只有图标；宿主给的视图就是图标的范围。
+  _item.onAnimationEnd = ^{ [weakSelf emit:@"end"]; };
+  _item.onAnimationLoaded = ^{ [weakSelf emit:@"loaded"]; };
+  _item.onAnimationFailed = ^{ [weakSelf emit:@"failed"]; };
+  [self addSubview:_item];
+}
+
+/// [EN] `loaded`, `failed` or `end`, sent as `onAnimationLoaded`, `onAnimationFailed` or `onAnimationEnd`. [CN] 发送对应的事件。
+- (void)emit:(NSString *)name
+{
+  if (!_eventEmitter) {
+    return;
+  }
+  auto emitter = std::static_pointer_cast<CyltabbarAnimationViewEventEmitter const>(_eventEmitter);
+  if ([name isEqualToString:@"loaded"]) {
+    emitter->onAnimationLoaded(CyltabbarAnimationViewEventEmitter::OnAnimationLoaded{});
+  } else if ([name isEqualToString:@"failed"]) {
+    emitter->onAnimationFailed(CyltabbarAnimationViewEventEmitter::OnAnimationFailed{});
+  } else {
+    emitter->onAnimationEnd(CyltabbarAnimationViewEventEmitter::OnAnimationEnd{});
+  }
+}
+
+/// [EN] The icon fills the view, or is `iconSize` (points) when given. [CN] 图标铺满视图，给了 `iconSize`（点）时为该尺寸。
+- (void)fitIcon
+{
+  CGSize size = _iconSide > 0 ? CGSizeMake(_iconSide, _iconSide) : self.bounds.size;
+  if (size.width > 0 && size.height > 0 && !CGSizeEqualToSize(_item.iconSize, size)) {
+    _item.iconSize = size;
+  }
+}
+
+/// [EN] The player of the current animation, nil until it is in place. [CN] 当前动画的播放器，就绪前为 nil。
+- (id<CYLTabBarItemAnimationPlayer>)player
+{
+  return _item.animationPlayer;
+}
 #endif
 
 - (void)updateProps:(Props::Shared const &)props oldProps:(Props::Shared const &)oldProps
 {
+#if CYL_RN_ANIMATION_AVAILABLE
   const auto &newProps = *std::static_pointer_cast<CyltabbarAnimationViewProps const>(props);
+  _item.drivesAnimationPlayback = newProps.drivesAnimationPlayback;
+  _item.animationSpeed = newProps.animationSpeed;
+  _item.animationLoops = newProps.animationLoops;
+  _iconSide = newProps.iconSize;
+  [self fitIcon];
+  [_item applyIconTintColor:RCTUIColorFromSharedColor(newProps.tintColor)];
+  _item.selected = newProps.selected;
+  if (_hasRestartToken && newProps.animationRestartToken != _restartToken) {
+    [_item restartAnimation];
+  }
+  _hasRestartToken = YES;
+  _restartToken = newProps.animationRestartToken;
   NSString *source = [NSString stringWithUTF8String:newProps.source.c_str()];
   if (![source isEqualToString:_source ?: @""]) {
     _source = source;
-    [self rebuild];
+    _item.animationURL = source.length > 0 ? CYLRNAnimationURL(source) : nil;
   }
   if (newProps.playing != _playing) {
     _playing = newProps.playing;
-    [self applyPlaying];
-  }
-  [super updateProps:props oldProps:oldProps];
-}
-
-- (void)rebuild
-{
-  [_animationView removeFromSuperview];
-  _animationView = nil;
-#if CYL_RN_ANIMATION_AVAILABLE
-  NSURL *URL = _source.length > 0 ? CYLRNAnimationURL(_source) : nil;
-  CGSize size = self.bounds.size.width > 0 ? self.bounds.size : CGSizeMake(44, 44);
-  UIView *view = URL ? [CYLTabBarItemAnimationFactory animationViewWithURL:URL size:size contentMode:UIViewContentModeScaleAspectFit] : nil;
-  if (view) {
-    view.frame = self.bounds;
-    view.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-    [self addSubview:view];
-    _animationView = view;
+    if (_playing) {
+      [_item playAnimation];
+    } else {
+      [_item stopAnimation];
+    }
   }
 #endif
-  [self applyPlaying];
+  [super updateProps:props oldProps:oldProps];
 }
 
 - (void)layoutSubviews
 {
   [super layoutSubviews];
-  _animationView.frame = self.bounds;
+#if CYL_RN_ANIMATION_AVAILABLE
+  _item.frame = self.bounds;
+  [self fitIcon];
+#endif
 }
 
-- (void)applyPlaying
+#pragma mark - Commands 命令
+
+- (void)handleCommand:(const NSString *)commandName args:(const NSArray *)args
+{
+  RCTCyltabbarAnimationViewHandleCommand(self, commandName, args);
+}
+
+- (void)play
 {
 #if CYL_RN_ANIMATION_AVAILABLE
-  id<CYLTabBarItemAnimationPlayer> player = [CYLTabBarItemAnimationFactory playerForView:_animationView];
-  if (_playing) {
-    [player play];
-  } else {
-    [player stop];
+  [[self player] play];
+#endif
+}
+
+- (void)stopAtProgress:(float)progress
+{
+#if CYL_RN_ANIMATION_AVAILABLE
+  id<CYLTabBarItemAnimationPlayer> player = [self player];
+  [player stop];
+  if ([player respondsToSelector:@selector(setProgress:)]) {
+    player.progress = progress;
   }
+#endif
+}
+
+- (void)restart
+{
+#if CYL_RN_ANIMATION_AVAILABLE
+  [_item restartAnimation];
 #endif
 }
 
 - (void)prepareForRecycle
 {
   [super prepareForRecycle];
-  [_animationView removeFromSuperview];
-  _animationView = nil;
+#if CYL_RN_ANIMATION_AVAILABLE
+  _item.animationURL = nil;
+  _hasRestartToken = NO;
+#endif
   _source = nil;
   _playing = NO;
 }

@@ -476,6 +476,46 @@ FOUNDATION_EXTERN BOOL CYLTabBarItemAnimationURLMayBeLottie(NSURL *_Nullable URL
     XCTAssertEqual(bare.imageView.image, placeholder);
 }
 
+/// [EN] `onAnimationLoaded` / `onAnimationFailed` (HarmonyOS's `onAnimationLoaded` / `onAnimationFailed`, forwarded by React Native
+///      and Flutter): a local file in place, a download that arrives or fails, a missing file.
+/// [CN] `onAnimationLoaded` / `onAnimationFailed`（鸿蒙同名回调，React Native 与 Flutter 转发它们）：本地文件就绪、下载完成或失败、文件不存在。
+- (void)testTheLoadedAndFailedCallbacksReportTheAnimation {
+    __block NSInteger loaded = 0;
+    __block NSInteger failed = 0;
+    CYLAnimatedItemView *item = [[CYLAnimatedItemView alloc] initWithFrame:CGRectMake(0, 0, 200, 44)];
+    item.animationSource = [[CYLAnimatedItemFakeSource alloc] init];
+    item.onAnimationLoaded = ^{ loaded++; };
+    item.onAnimationFailed = ^{ failed++; };
+    NSString *full = [NSTemporaryDirectory() stringByAppendingPathComponent:@"cyl-callback-home.fake"];
+    [[@"{}" dataUsingEncoding:NSUTF8StringEncoding] writeToFile:full atomically:YES];
+    item.animationURL = [NSURL fileURLWithPath:full];
+    [[NSRunLoop mainRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.05]];
+    XCTAssertEqual(loaded, 1, @"a local file in place is loaded");
+    XCTAssertEqual(failed, 0);
+
+    NSString *missing = [NSTemporaryDirectory() stringByAppendingPathComponent:@"cyl-callback-missing.fake"];
+    [[NSFileManager defaultManager] removeItemAtPath:missing error:NULL];
+    item.animationURL = [NSURL fileURLWithPath:missing];
+    [[NSRunLoop mainRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.05]];
+    XCTAssertEqual(failed, 1, @"a missing file fails");
+
+    CYLAnimatedItemView *download = [[CYLAnimatedItemView alloc] initWithFrame:CGRectMake(0, 0, 200, 44)];
+    download.animationSource = [[CYLAnimatedItemDownloadingSource alloc] init];
+    __block NSInteger downloaded = 0;
+    __block NSInteger downloadFailed = 0;
+    download.onAnimationLoaded = ^{ downloaded++; };
+    download.onAnimationFailed = ^{ downloadFailed++; };
+    download.animationURL = [NSURL URLWithString:@"https://example.com/home.fake"];
+    [[NSRunLoop mainRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.05]];
+    XCTAssertEqual(downloaded, 0, @"still downloading");
+    CYLTabBarItemAnimationReportLoaded(download.animationView);
+    [[NSRunLoop mainRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.05]];
+    XCTAssertEqual(downloaded, 1, @"the download arrived");
+    CYLTabBarItemAnimationReportFailure(download.animationView, nil);
+    [[NSRunLoop mainRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.05]];
+    XCTAssertEqual(downloadFailed, 1, @"a failure after loading drops the animation");
+}
+
 - (void)testAFailureOfAnOldAnimationIsIgnored {
     CYLAnimatedItemView *item = [[CYLAnimatedItemView alloc] initWithFrame:CGRectMake(0, 0, 200, 44)];
     item.animationSource = [[CYLAnimatedItemFakeSource alloc] init];

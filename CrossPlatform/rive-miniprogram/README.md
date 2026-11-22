@@ -15,7 +15,7 @@ it for `.riv` tab icons through `cyl-tab-bar-item`.
 
 A mini program code package leaves out `.riv` files: name package copies `*.riv.bin`, or load from an http(s) URL.
 
-Properties: `path` (with optional options in its fragment), `artboard`, `stateMachine`, `input` / `triggerInput` (legacy
+Properties: `path` (with optional options after its first `#` or `?`, the rules shared by every platform: `CrossPlatform/animated-item-fixtures/source-options.json`; an http / https query stays in the path), `artboard`, `stateMachine`, `input` / `triggerInput` (legacy
 state machine inputs), `active` / `trigger` (view model properties), `duration` (seconds the input stays true, default 1),
 `numberInput` / `number` (a state machine NUMBER input, or a data-binding view model number property, set to the next of
 `values` on each play, e.g. house.riv `numberInput=Rooms&values=3,4,5,6`; without `values`, +1), `colors` (view model color path -> color), `tint` (one CSS color for the whole drawing, like a template image: every drawn pixel takes it and keeps its alpha; '' keeps the file's colors), `loop` (plays again after each pass; a file still moving on its own is not restarted), `speed` (render clock and input duration, applied live), `autoplay`, `fit`, `label`, `wasmPath` (default

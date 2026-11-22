@@ -8,7 +8,7 @@
  * 通过 <CYLTabBar> 由配置创建；课程页面（Example-SwiftUI-Rive/AnimatedApp）由 React Native 绘制，其中的 Rive 动画通过 <CYLAnimationView>
  * （CYLTabBarController 自己的引擎）播放。
  */
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, useRef } from 'react';
 import {
   Alert,
   Image,
@@ -23,7 +23,7 @@ import {
   View,
   type ImageSourcePropType,
 } from 'react-native';
-import { CYLAnimationView, CYLTabBar, type CYLTabBarItem } from 'react-native-cyltabbar';
+import { CYLAnimationView, CYLTabBar, type CYLAnimationViewHandle, type CYLTabBarItem } from 'react-native-cyltabbar';
 import { useSafeAreaInsetsTop } from './safeArea';
 
 const locale: string =
@@ -301,6 +301,49 @@ function OnboardingPage() {
 
 // MARK: - Bell: menu_button.riv (RiveMenuButtonDemoView.swift) above the settings list
 
+/**
+ * The engine API of <CYLAnimationView> (docs/Animated-Item.md, "Engine API across platforms"): Play all (the ref's
+ * restart), a speed stepper (animationSpeed) and a loop switch (animationLoops), each with an accessibility label.
+ */
+function EngineApiRow() {
+  const animation = useRef<CYLAnimationViewHandle>(null);
+  const [speed, setSpeed] = useState(1);
+  const [loops, setLoops] = useState(false);
+  const speedText = String(speed);
+  return (
+    <View style={styles.engineRow}>
+      <CYLAnimationView
+        ref={animation}
+        file="icons.riv"
+        options={{ artboard: 'TIMER', stateMachine: 'TIMER_Interactivity', input: 'active', duration: 2 }}
+        selected
+        animationSpeed={speed}
+        animationLoops={loops}
+        iconSize={48}
+        style={styles.svgaIcon}
+        accessible
+        accessibilityRole="image"
+        accessibilityLabel="CYLAnimationView, icons.riv"
+      />
+      <Pressable onPress={() => animation.current?.restart()} accessibilityRole="button" accessibilityLabel={chinese ? '全部播放' : 'Play all'}>
+        <Text style={styles.playStop}>{chinese ? '全部播放' : 'Play all'}</Text>
+      </Pressable>
+      <View style={styles.speedStepper} accessible accessibilityRole="adjustable" accessibilityLabel={chinese ? `倍速，${speedText} 倍` : `Speed, ${speedText} times`}
+        accessibilityActions={[{ name: 'increment' }, { name: 'decrement' }]}
+        onAccessibilityAction={(event) => setSpeed((value) => Math.min(3, Math.max(0.25, value + (event.nativeEvent.actionName === 'increment' ? 0.25 : -0.25))))}>
+        <Pressable onPress={() => setSpeed((value) => Math.max(0.25, value - 0.25))} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
+          <Text style={styles.playStop}>−</Text>
+        </Pressable>
+        <Text style={styles.rowTitle}>{`${speedText}×`}</Text>
+        <Pressable onPress={() => setSpeed((value) => Math.min(3, value + 0.25))} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
+          <Text style={styles.playStop}>+</Text>
+        </Pressable>
+      </View>
+      <Switch value={loops} onValueChange={setLoops} accessibilityLabel={chinese ? '循环播放' : 'Loop'} />
+    </View>
+  );
+}
+
 function BellPage({ styleIndex, onStyle, iconSource, onIconSource }: Readonly<{ styleIndex: number; onStyle: () => void; iconSource: number; onIconSource: () => void }>) {
   const [open, setOpen] = useState(false);
   const [svgaPlaying, setSVGAPlaying] = useState(false);
@@ -329,6 +372,7 @@ function BellPage({ styleIndex, onStyle, iconSource, onIconSource }: Readonly<{ 
             <Text style={styles.playStop}>{chinese ? `Tab 图标来源：${source.titleCN}` : `Tab icon source: ${source.title}`}</Text>
           </Pressable>
         </View>
+        <EngineApiRow />
         <Text style={styles.sectionTitle}>{chinese ? 'TabBar 外观' : 'Tab bar appearance'}</Text>
         <View style={styles.card}>
           <Pressable style={styles.row} onPress={onStyle}>
@@ -531,6 +575,8 @@ const styles = StyleSheet.create({
   card: { borderRadius: 14, backgroundColor: '#1C1C1E', marginHorizontal: 16, overflow: 'hidden' },
   row: { minHeight: 52, paddingHorizontal: 16, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   svgaIcons: { flexDirection: 'row', gap: 24 },
+  engineRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginHorizontal: 16, marginTop: 12 },
+  speedStepper: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   svgaIcon: { width: 64, height: 64 },
   rowTitle: { fontSize: 16, color: '#FFFFFF' },
   rowDetail: { fontSize: 14, color: '#8E8E93' },
