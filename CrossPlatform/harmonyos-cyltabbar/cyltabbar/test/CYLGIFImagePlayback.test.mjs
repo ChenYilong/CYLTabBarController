@@ -3,7 +3,9 @@
 // [CN] CYLGIFImagePlayback（GIF Tab 图片在播放前静止）的单元测试。Node 22.18+：node --test CrossPlatform/harmonyos-cyltabbar/cyltabbar/test/*.test.mjs
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { cylIsGIFImagePath, cylGIFDuration, CYLGIFImagePlayback, CYLGIFImageState } from '../src/main/ets/CYLGIFImagePlayback.ts';
+import './cyl-ts-import.mjs';
+
+const { cylIsGIFImagePath, cylGIFDuration, CYLGIFImagePlayback, CYLGIFImageState } = await import('../src/main/ets/CYLGIFImagePlayback.ts');
 
 test('a GIF path is recognized before its query', () => {
   assert.equal(cylIsGIFImagePath('https://example.com/tab_fire.GIF?v=2'), true);
@@ -17,6 +19,7 @@ test('the duration adds the delays, 100 ms for a missing one', () => {
   assert.equal(cylGIFDuration([100, 200, 300]), 600);
   assert.equal(cylGIFDuration([0, 50]), 150);
   assert.equal(cylGIFDuration([]), 100);
+  assert.equal(cylGIFDuration([5, 10, 11]), 211, 'a delay of 10 ms or less counts 100 ms, as the GIF engine');
 });
 
 test('a GIF image rests, plays one pass per play, then rests', () => {

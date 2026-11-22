@@ -25,6 +25,7 @@ export {
 } from './src/main/ets/CYLAnimatedItemPlayer';
 export { CYLAnimatedItemEngineState, CYLAnimatedItemEngineViews, CYLAnimatedItemEngineView } from './src/main/ets/CYLAnimatedItemEngine';
 export { CYLAnimatedItemGIF, CYLAnimatedItemGIFPlayer, CYLAnimatedItemGIFView } from './src/main/ets/CYLAnimatedItemGIF';
+export { CYL_GIF_DEFAULT_DELAY_MS, CYL_GIF_MIN_DELAY_MS, cylGIFDelays, cylGIFDuration, cylGIFFrameIndex } from './src/main/ets/CYLAnimatedItemGIFTiming';
 export { CYLAnimatedItemSVGA, CYLAnimatedItemSVGAPlayer, CYLAnimatedItemSVGAView } from './src/main/ets/CYLAnimatedItemSVGA';
 export { CYLAnimatedItemRGBA, cylAnimatedItemParseHexColor, cylAnimatedItemARGBInteger } from './src/main/ets/CYLAnimatedItemColors';
 export {

@@ -7,6 +7,7 @@
  *      （选中或再次点击）之前停在第一帧，播放一遍，`tabBarItemAnimationLoops` 开启时重复播放，之后回到静止（docs/GIF-Animation.md，与 iOS 915bddbd、
  *      Android `CYLGIFDrawable` 一致）。纯逻辑，用 Node 做单元测试（test/CYLGIFImagePlayback.test.mjs）。
  */
+import { CYL_GIF_DEFAULT_DELAY_MS, cylGIFDelays, cylGIFDuration as cylAnimatedItemGIFDuration } from 'cylanimateditem/src/main/ets/CYLAnimatedItemGIFTiming';
 
 /** [EN] Whether an image path or URL is a GIF (".gif", before any query or fragment). [CN] 图片路径或 URL 是否为 GIF。 */
 export function cylIsGIFImagePath(path: Object | undefined): boolean {
@@ -17,13 +18,15 @@ export function cylIsGIFImagePath(path: Object | undefined): boolean {
   return plain.toLowerCase().endsWith('.gif');
 }
 
-/** [EN] The play time of a GIF: the sum of its frame delays (ms), 100 ms for a missing or 0 delay, as browsers do. [CN] GIF 的播放时长：各帧延时之和（毫秒），缺失或为 0 的延时按 100 毫秒。 */
+/**
+ * [EN] The play time of a GIF: the sum of its frame delays (ms), 100 ms for a missing, 0 or 10 ms-or-less delay, as browsers
+ *      do. The delay rule is the GIF engine's (`cylGIFDelays` in cylanimateditem); an empty list is 100 ms.
+ * [CN] GIF 的播放时长：各帧延时之和（毫秒），缺失、为 0 或不超过 10 毫秒的延时按 100 毫秒，与浏览器相同。延时规则来自 GIF 引擎
+ *      （cylanimateditem 的 `cylGIFDelays`）；空列表为 100 毫秒。
+ */
 export function cylGIFDuration(delays: number[]): number {
-  let total = 0;
-  for (const delay of delays) {
-    total += delay > 0 ? delay : 100;
-  }
-  return total > 0 ? total : 100;
+  const total = cylAnimatedItemGIFDuration(cylGIFDelays(delays.length, delays));
+  return total > 0 ? total : CYL_GIF_DEFAULT_DELAY_MS;
 }
 
 /** [EN] What a GIF image shows: Resting (the first frame), PlayingOnce, Looping. [CN] GIF 图片显示的内容：静止（第一帧）、播放一遍、重复播放。 */
