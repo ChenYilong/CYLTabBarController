@@ -750,21 +750,25 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
         val generation = ++endWatchGeneration
         if (!showsImageWhenAnimationEnds && animationEndListener == null) return
         var started = false
-        val check = object : Runnable {
-            override fun run() {
-                if (generation != endWatchGeneration || !playing) return
-                // [EN] Looping: keep watching, a later `animationLoops = false` lets the pass end. [CN] 循环时继续检测，之后关闭循环会让这一遍结束。
-                val player = animationPlayer ?: return
-                val ended = if (animationLoops) false else when (player.isPlaying) {
-                    true -> { started = true; false }
-                    false -> started
-                    null -> player.progress.let { progress -> if (progress < END_PROGRESS) { started = true; false } else started }
-                }
-                if (ended) animationDidEnd() else postOnAnimationDelayed(this, END_WATCH_INTERVAL_MS)
-            }
+        lateinit var check: Runnable
+        check = Runnable {
+            if (generation != endWatchGeneration || !playing) return@Runnable
+            // [EN] Looping: keep watching, a later `animationLoops = false` lets the pass end. [CN] 循环时继续检测，之后关闭循环会让这一遍结束。
+            val player = animationPlayer ?: return@Runnable
+            val running = !animationLoops && isPassRunning(player)
+            if (running) started = true
+            val ended = !animationLoops && !running && started
+            if (ended) animationDidEnd() else postOnAnimationDelayed(check, END_WATCH_INTERVAL_MS)
         }
         postOnAnimationDelayed(check, END_WATCH_INTERVAL_MS)
     }
+
+    /**
+     * [EN] Whether the player is still playing: its `isPlaying`, or, without it, `progress` below the end.
+     * [CN] 播放器是否仍在播放：其 `isPlaying`，没有时则 `progress` 小于结束值。
+     */
+    private fun isPassRunning(player: CYLTabBarItemAnimationPlayer): Boolean =
+        player.isPlaying ?: (player.progress < END_PROGRESS)
 
     private fun animationDidEnd() {
         playing = false
