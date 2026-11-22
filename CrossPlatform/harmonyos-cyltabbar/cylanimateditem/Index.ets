@@ -26,5 +26,8 @@ export {
 export { CYLAnimatedItemEngineState, CYLAnimatedItemEngineViews, CYLAnimatedItemEngineView } from './src/main/ets/CYLAnimatedItemEngine';
 export { CYLAnimatedItemGIF, CYLAnimatedItemGIFPlayer, CYLAnimatedItemGIFView } from './src/main/ets/CYLAnimatedItemGIF';
 export { CYLAnimatedItemSVGA, CYLAnimatedItemSVGAPlayer, CYLAnimatedItemSVGAView } from './src/main/ets/CYLAnimatedItemSVGA';
-export { CYLSVGAMovie, cylLoadSVGAMovie, cylDecodeSVGAMovie } from './src/main/ets/svga/CYLSVGAMovie';
-export { cylDrawSVGAFrame } from './src/main/ets/svga/CYLSVGARenderer';
+export {
+  CYLSVGALayout, CYLSVGATransform, CYLSVGAColor, CYLSVGAStyle, CYLSVGARect, CYLSVGAEllipse, CYLSVGAShape, CYLSVGAFrame,
+  CYLSVGASprite, CYLSVGAMovie, cylLoadSVGAMovie, cylDecodeSVGAMovie
+} from './src/main/ets/svga/CYLSVGAMovie';
+export { cylDrawSVGAFrame, cylParseSVGAPath } from './src/main/ets/svga/CYLSVGARenderer';
