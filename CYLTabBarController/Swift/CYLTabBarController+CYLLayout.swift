@@ -111,7 +111,7 @@ extension CYLTabBarController {
         cylRegisterLayoutBlockCallbackIfNeeded(invokeOnce: hooks.cylShouldInvokeOnceViewDidLayoutSubViewsBlock())
         // [EN] The `.end` blocks of `-viewDidLayoutSubviews` (the layout block, keyed, and any the app added) run here, at the
         //      end of the core's layout. [CN] `-viewDidLayoutSubviews` 的 `.end` block（带 key 的布局 block 与 App 添加的 block）在此执行。
-        cyl_invokeLifecycleCallbacks(for: .viewDidLayoutSubviews, timing: .end)
+        cylInvokeLifecycleCallbacks(for: .viewDidLayoutSubviews, timing: .end)
     }
 
     /// [EN] The key of the layout block in CYLDeallocBlockExecutor; `cyl.core.` keys belong to the core.
@@ -129,8 +129,8 @@ extension CYLTabBarController {
     func cylRegisterLayoutBlockCallbackIfNeeded(invokeOnce: Bool) {
         guard cylLayoutBlockRegisteredInvokeOnce != invokeOnce else { return }
         cylLayoutBlockRegisteredInvokeOnce = invokeOnce
-        cyl_setManualLifecycleDispatch(true, for: [.viewDidLayoutSubviews], timings: [.end])
-        cyl_addLifecycleCallback(for: .viewDidLayoutSubviews, timing: .end, invokeOnce: invokeOnce,
+        cylSetManualLifecycleDispatch(true, for: [.viewDidLayoutSubviews], timings: [.end])
+        cylAddLifecycleCallback(for: .viewDidLayoutSubviews, timing: .end, invokeOnce: invokeOnce,
                                  key: Self.cylLayoutBlockKey) { owner, _, _ in
             owner.cylLayoutHooks.cylViewDidLayoutSubviewsBlock()?(owner)
         }

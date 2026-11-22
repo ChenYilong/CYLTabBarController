@@ -291,7 +291,7 @@ extension CYLTabBarController {
         cylPrivate.cylSetInvokeOnceViewDidLayoutSubViewsBlock(true)
         // [EN] Only the core's keyed block is re-armed; the app's own invoke-once blocks keep their state.
         // [CN] 只重新启用核心带 key 的 block；App 自己的只执行一次 block 保持原状态。
-        _ = cyl_rearmLifecycleCallback(key: Self.cylLayoutBlockKey)
+        _ = cylRearmLifecycleCallback(key: Self.cylLayoutBlockKey)
         if isViewLoaded {
             view.setNeedsLayout()
         }
