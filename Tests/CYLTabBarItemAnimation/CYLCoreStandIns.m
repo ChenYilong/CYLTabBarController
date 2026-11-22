@@ -65,6 +65,45 @@ NSURL *CYLTabBarAnimationURLWithOptions(NSURL *fileURL, NSDictionary<CYLTabBarAn
     return components.URL;
 }
 
+/// [EN] `cylTabBarAnimationOptionsFromURLEntryPoint` (CYLUtils/Swift/CYLAnimationURLOptions.swift, with its private
+///      `cylAnimationOptions(inText:)`): the fragment split at `&`, then at a `#` or `?` that does not follow `=`; a pair needs a
+///      name; names and values percent-decoded when they can be (kept as they are otherwise); an empty value left out.
+/// [CN] `cylTabBarAnimationOptionsFromURLEntryPoint`（CYLUtils/Swift/CYLAnimationURLOptions.swift 及其私有的
+///      `cylAnimationOptions(inText:)`）：fragment 先按 `&` 分开，再按不跟在 `=` 后面的 `#` 或 `?` 分开；键值对必须有名称；名称与值能解码时
+///      百分号解码（否则保持原样）；空值被省略。
+NSDictionary *CYLTabBarAnimationOptionsFromURL(NSURL *URL) {
+    NSString *fragment = URL ? [NSURLComponents componentsWithURL:URL resolvingAgainstBaseURL:YES].percentEncodedFragment : nil;
+    if (fragment == nil) {
+        return @{};
+    }
+    NSMutableArray<NSString *> *pairs = [NSMutableArray array];
+    for (NSString *piece in [fragment componentsSeparatedByString:@"&"]) {
+        NSUInteger start = 0;
+        for (NSUInteger index = 1; index < piece.length; index++) {
+            unichar character = [piece characterAtIndex:index];
+            if ((character == '#' || character == '?') && [piece characterAtIndex:index - 1] != '=') {
+                [pairs addObject:[piece substringWithRange:NSMakeRange(start, index - start)]];
+                start = index + 1;
+            }
+        }
+        [pairs addObject:start <= piece.length ? [piece substringFromIndex:start] : @""];
+    }
+    NSMutableDictionary<NSString *, NSString *> *options = [NSMutableDictionary dictionary];
+    for (NSString *pair in pairs) {
+        NSRange separator = [pair rangeOfString:@"="];
+        if (separator.location == NSNotFound || separator.location == 0) {
+            continue;
+        }
+        NSString *name = [pair substringToIndex:separator.location];
+        NSString *value = [pair substringFromIndex:NSMaxRange(separator)];
+        NSString *decodedValue = value.stringByRemovingPercentEncoding ?: value;
+        if (decodedValue.length > 0) {
+            options[name.stringByRemovingPercentEncoding ?: name] = decodedValue;
+        }
+    }
+    return [options copy];
+}
+
 /// [EN] `CYLTabBarItemAnimationStyleRegistry` (the dark versions and dark colors it keeps per URL).
 /// [CN] `CYLTabBarItemAnimationStyleRegistry`（按 URL 保存的深色版本与深色颜色）。
 @interface CYLTabBarItemAnimationStyleRegistry : NSObject <CYLTabBarItemAnimationStyleSource>

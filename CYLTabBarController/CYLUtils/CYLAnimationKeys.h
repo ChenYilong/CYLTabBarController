@@ -138,7 +138,13 @@ FOUNDATION_EXTERN NSURL * _Nullable CYLTabBarAnimationURLWithOptions(NSURL * _Nu
  * [CN] `URL` 的 fragment 中的选项，即 `CYLTabBarAnimationURLWithOptions()` 的读取端：「名称=值&…」，百分号解码（无法解码的文本保持原样），
  *      没有名称或没有值的键值对被省略。没有 fragment 时返回空字典。规则与其他平台相同（`CrossPlatform/animated-item-fixtures/source-options.json`）。
  */
-FOUNDATION_EXTERN NSDictionary<NSString *, NSString *> * _Nonnull CYLTabBarAnimationOptionsFromURL(NSURL * _Nullable URL) CYL_NOEXCEPT;
+// [EN] FIX: plain `NSDictionary *`, the exact type of the Swift `@_cdecl` definition (CYLAnimationURLOptions.swift): with
+//      `NSDictionary<NSString *, NSString *> *` the two declarations differ, and a file that sees both (SwiftPM:
+//      CYLTabBarItemAnimationEngine.m) fails with "call to 'CYLTabBarAnimationOptionsFromURL' is ambiguous". Keys and values are strings.
+// [CN] FIX：使用普通的 `NSDictionary *`，与 Swift `@_cdecl` 定义（CYLAnimationURLOptions.swift）的类型完全一致：若写成
+//      `NSDictionary<NSString *, NSString *> *`，两处声明不同，同时看到两者的文件（SwiftPM：CYLTabBarItemAnimationEngine.m）会报
+//      "call to 'CYLTabBarAnimationOptionsFromURL' is ambiguous"。键与值都是字符串。
+FOUNDATION_EXTERN NSDictionary * _Nonnull CYLTabBarAnimationOptionsFromURL(NSURL * _Nullable URL) CYL_NOEXCEPT;
 
 /*!
  * [EN] The keys of each animation type (Lottie, PAG, Rive, SVGA, GIF), declared here in the component's core so

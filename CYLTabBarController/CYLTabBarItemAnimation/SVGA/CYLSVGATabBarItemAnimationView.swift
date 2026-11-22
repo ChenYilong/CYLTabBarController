@@ -59,6 +59,9 @@ public final class CYLSVGATabBarItemAnimationView: SVGAPlayer, SVGAPlayerDelegat
     private var speedStartTime: CFTimeInterval = 0
     private var speedStartFrame = 0
     private var endHandler: (() -> Void)?
+    /// [EN] Whether SVGAPlayer's own display link runs a pass (`step(toFrame:andPlay: true)`): SVGAPlayer does not expose it.
+    /// [CN] SVGAPlayer 自己的 display link 是否正在播放一遍（`step(toFrame:andPlay: true)`）：SVGAPlayer 没有公开这一状态。
+    private var playerRunning = false
 
     /**
      * [EN] `CYLTabBarItemAnimationViewProviding`: a view for an SVGA file (local, or http / https parsed by SVGAParser).
@@ -134,9 +137,11 @@ public final class CYLSVGATabBarItemAnimationView: SVGAPlayer, SVGAPlayerDelegat
         stopSpeedLink()
         currentFrame = 0
         if speed != 1 && videoItem.fps > 0 {
+            playerRunning = false
             step(toFrame: 0, andPlay: false)
             startSpeedLink(from: 0)
         } else {
+            playerRunning = true
             step(toFrame: 0, andPlay: true)
         }
         keepTintOverlayAboveDrawing()
@@ -150,6 +155,7 @@ public final class CYLSVGATabBarItemAnimationView: SVGAPlayer, SVGAPlayerDelegat
             return
         }
         currentFrame = Int(frames) - 1
+        playerRunning = false
         step(toFrame: currentFrame, andPlay: false)
         keepTintOverlayAboveDrawing()
     }
@@ -162,6 +168,7 @@ public final class CYLSVGATabBarItemAnimationView: SVGAPlayer, SVGAPlayerDelegat
             return
         }
         currentFrame = 0
+        playerRunning = false
         step(toFrame: 0, andPlay: false)
         keepTintOverlayAboveDrawing()
     }
@@ -181,7 +188,7 @@ public final class CYLSVGATabBarItemAnimationView: SVGAPlayer, SVGAPlayerDelegat
      */
     @objc(cyl_animationViewIsPlaying)
     public func isAnimationPlaying() -> Bool {
-        speedLink != nil || isAnimating
+        speedLink != nil || playerRunning
     }
 
     /**
@@ -207,6 +214,7 @@ public final class CYLSVGATabBarItemAnimationView: SVGAPlayer, SVGAPlayerDelegat
         }
         stopSpeedLink()
         currentFrame = Int((min(max(progress, 0), 1) * CGFloat(frames - 1)).rounded())
+        playerRunning = false
         step(toFrame: currentFrame, andPlay: false)
         keepTintOverlayAboveDrawing()
     }
@@ -225,8 +233,10 @@ public final class CYLSVGATabBarItemAnimationView: SVGAPlayer, SVGAPlayerDelegat
         let frame = currentFrame
         stopSpeedLink()
         if speed == 1 {
+            playerRunning = true
             step(toFrame: frame, andPlay: true)
         } else {
+            playerRunning = false
             pauseAnimation()
             startSpeedLink(from: frame)
         }
@@ -259,6 +269,7 @@ public final class CYLSVGATabBarItemAnimationView: SVGAPlayer, SVGAPlayerDelegat
                 // [EN] One pass: rest on the last frame, as fillMode "Forward". [CN] 播放一遍：停在最后一帧，与 fillMode "Forward" 相同。
                 stopSpeedLink()
                 currentFrame = frames - 1
+                playerRunning = false
                 step(toFrame: frames - 1, andPlay: false)
                 keepTintOverlayAboveDrawing()
                 endHandler?()
@@ -286,6 +297,7 @@ public final class CYLSVGATabBarItemAnimationView: SVGAPlayer, SVGAPlayerDelegat
 
     public func svgaPlayerDidFinishedAnimation(_: SVGAPlayer!) {
         if !loopsForever {
+            playerRunning = false
             endHandler?()
         }
     }
