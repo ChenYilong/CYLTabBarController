@@ -12,8 +12,8 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
-        // [EN] SVGAPlayer-Android (com.github.yyued) is only on JitPack, for example-rive. [CN] SVGAPlayer-Android 只在 JitPack 上，供 example-rive 使用。
-        maven("https://jitpack.io") { content { includeGroup("com.github.yyued") } }
+        // [EN] SVGAPlayer-Android (com.github.yyued) is only on JitPack, for example-rive; so is CYLDeallocBlockExecutor (com.github.ChenYilong), a dependency of cyltabbar. [CN] SVGAPlayer-Android 只在 JitPack 上，供 example-rive 使用；CYLDeallocBlockExecutor（com.github.ChenYilong）也在 JitPack 上，是 cyltabbar 的依赖。
+        maven("https://jitpack.io") { content { includeGroup("com.github.yyued"); includeGroup("com.github.ChenYilong") } }
     }
 }
 rootProject.name = "CYLTabBarControllerAndroid"

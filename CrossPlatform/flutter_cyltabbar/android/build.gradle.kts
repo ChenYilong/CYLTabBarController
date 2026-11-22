@@ -18,6 +18,8 @@ allprojects {
     repositories {
         google()
         mavenCentral()
+        // [EN] CYLDeallocBlockExecutor (com.github.ChenYilong) is only on JitPack, a dependency of the cyltabbar sources below. [CN] CYLDeallocBlockExecutor（com.github.ChenYilong）只在 JitPack 上，是下面 cyltabbar 源码的依赖。
+        maven("https://jitpack.io") { content { includeGroup("com.github.ChenYilong") } }
     }
 }
 
@@ -117,6 +119,9 @@ dependencies {
         implementation("androidx.fragment:fragment-ktx:1.8.5")
         // As in cyltabbar: CYLViewPager2Binding compiles against ViewPager2, which an app adds when it uses it.
         compileOnly("androidx.viewpager2:viewpager2:1.0.0")
+        // [EN] As in cyltabbar (the layout block's callback registry), pinned to the same commit. TODO: replace the pin with a release once the library is on Maven Central.
+        // [CN] 与 cyltabbar 相同（布局 block 的回调注册表），固定到同一提交。TODO：库发布到 Maven Central 后改为正式版本。
+        implementation("com.github.ChenYilong:CYLDeallocBlockExecutor:03814d4852c1de2492e6ab7ff1e8c5a425af6338")
         if (cylAnimatedItemModule != null) implementation(cylAnimatedItemModule)
         else if (cylAnimatedItemIncluded) implementation("io.github.chenyilong:cyltabbarcontroller-animateditem:$cylAndroidVersion")
     } else {
