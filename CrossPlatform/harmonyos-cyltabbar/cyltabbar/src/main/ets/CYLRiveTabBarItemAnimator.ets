@@ -127,15 +127,21 @@ export function CYLTabBarAnimationURLWithOptions(file: string, options: Record<s
 }
 
 /**
- * [EN] The file part and the options of a Rive URL. [CN] Rive 地址的文件部分与选项。
+ * [EN] The file part and the options of a Rive URL. The options follow "?" (as `CYLTabBarAnimationURLWithOptions` writes
+ *      them here) or "#" (the fragment of iOS `CYLTabBarAnimationURLWithOptions`, CYLTableViewPlaceHolder and the WeChat
+ *      Mini Program), whichever comes first; pairs after both are read ("file.riv?artboard=CHAT#input=active").
+ * [CN] Rive 地址的文件部分与选项。选项跟在 "?"（本端 `CYLTabBarAnimationURLWithOptions` 的写法）或 "#"（iOS
+ *      `CYLTabBarAnimationURLWithOptions`、CYLTableViewPlaceHolder 与微信小程序使用的 fragment）之后，以先出现者为准；两者之后的键值对都会读取。
  */
 export function cylRiveFileAndOptions(url: string): [string, Record<string, string>] {
   const options: Record<string, string> = {};
-  const at = url.indexOf('?');
+  const query = url.indexOf('?');
+  const hash = url.indexOf('#');
+  const at = query < 0 ? hash : (hash < 0 ? query : Math.min(query, hash));
   if (at < 0) {
     return [url, options];
   }
-  url.substring(at + 1).split('&').forEach((pair: string) => {
+  url.substring(at + 1).split(/[&?#]/).forEach((pair: string) => {
     const eq = pair.indexOf('=');
     if (eq > 0) {
       options[decodeURIComponent(pair.substring(0, eq))] = decodeURIComponent(pair.substring(eq + 1));
