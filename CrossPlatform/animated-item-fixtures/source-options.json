@@ -1,0 +1,18 @@
+{
+  "_comment": "[EN] Test vectors of the animation source and its '#' options, from the HarmonyOS parser (cylanimateditem/src/main/ets/CYLAnimatedItemSource.ts and its test). Every platform's parser test reads this file; add a vector here, not in one platform. [CN] 动画来源与 '#' 选项的测试向量，取自鸿蒙解析器。每个平台的解析测试都读取本文件；新增向量写在这里，不要只写在某个平台里。",
+  "cases": [
+    { "input": "asset:Rive/house.riv#stateMachine=State%20Machine%201&input=active", "file": "Rive/house.riv", "type": "Rive", "options": { "stateMachine": "State Machine 1", "input": "active" } },
+    { "input": "rive/icons.riv?artboard=CHAT#input=active&tint=#FF0000", "file": "rive/icons.riv", "options": { "artboard": "CHAT", "input": "active", "tint": "#FF0000" } },
+    { "input": "lottie/home.json", "file": "lottie/home.json", "type": "Lottie", "options": {} },
+    { "input": "svga/a.svga?tint=title", "file": "svga/a.svga", "type": "SVGA", "options": { "tint": "title" } },
+    { "input": "a.gif", "file": "a.gif", "type": "GIF", "options": {} },
+    { "input": "a.pag", "file": "a.pag", "type": "PAG", "options": {} },
+    { "input": " {\"v\":\"5.7.4\"} ", "inlineJSON": "{\"v\":\"5.7.4\"}", "type": "Lottie", "options": {} }
+  ],
+  "rules": [
+    "Options follow the first '#' or '?'; pairs are split at '&', and at a '#' or '?' that does not follow '='.",
+    "Names and values are percent-decoded; an undecodable text is kept as it is.",
+    "A pair without a name (no '=' or '=' first) is dropped.",
+    "The type comes from the file extension; inline text that starts with '{' is Lottie JSON."
+  ]
+}
