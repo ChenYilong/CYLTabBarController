@@ -9,6 +9,7 @@
     "@ohos/lottie": "^2.0.38",
     "@ohos/rive": "1.0.4",
     "cylanimateditem": "file:../cylanimateditem",
-    "cylanimateditem_lottie": "file:../cylanimateditem_lottie"
+    "cylanimateditem_lottie": "file:../cylanimateditem_lottie",
+    "cylanimateditem_rive": "file:../cylanimateditem_rive"
   }
 }

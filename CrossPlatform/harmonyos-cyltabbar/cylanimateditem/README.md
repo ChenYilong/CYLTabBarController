@@ -33,6 +33,10 @@ types by its selection and playback (selected: once from the start; unselected: 
 - Engine views are created one at a time, 50 ms apart (a screen full of animated items froze while decoding all of them
   at once: CollectionViewClassifyMenu Z5).
 - Tests: `node --test test/*.test.mjs` (`CYLAnimatedItemSource`, `CYLAnimatedItemPlayer`, GIF timing).
+- SVGA: `CYLAnimatedItemSVGA.register()` (in this module: `svga/` decoder and renderer, a timed player). Rive: the
+  `cylanimateditem_rive` module, `CYLAnimatedItemRive.register()`; cyltabbar's `CYLRiveIcon` is a thin wrapper over its
+  `CYLAnimatedItemRiveView`. Checked on the x86_64 emulator with the debug engine kit (2026-11-22):
+  ![Rive tabs on cylanimateditem_rive](../../../docs/assets/harmonyos-x86-64-rive-tabs-on-cylanimateditem-rive.png)
 
 ## x86_64 emulator
 
