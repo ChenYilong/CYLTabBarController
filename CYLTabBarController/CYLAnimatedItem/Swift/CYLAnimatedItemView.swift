@@ -619,6 +619,20 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
           （`CYLTabBarItemAnimationPlayer.onEnded`）。视图拥有该回调期间会占用播放器自己的 `onEnded`；宿主设置 `animationPlayer` 的 `onEnded` 即接管。
      */
     public var onAnimationEnd: (() -> Void)?
+    /**
+     [EN] Called on the main queue when the animation of `animationURL` is in place (a local file once parsed, a download once
+          it arrived), the name and meaning of HarmonyOS's `onAnimationLoaded`. React Native and Flutter forward it as `onAnimationLoaded`.
+     [CN] `animationURL` 的动画就绪时在主队列调用（本地文件解析完成，或下载完成），名称与含义同鸿蒙的 `onAnimationLoaded`。
+          React Native 与 Flutter 把它转发为 `onAnimationLoaded`。
+     */
+    public var onAnimationLoaded: (() -> Void)?
+    /**
+     [EN] Called on the main queue when the animation of `animationURL` cannot play: a missing file, a corrupted file, a parse error
+          or a failed download (the static image or the placeholder shows instead), HarmonyOS's `onAnimationFailed`.
+     [CN] `animationURL` 的动画无法播放时在主队列调用：文件不存在、文件损坏、解析错误或下载失败（此时显示静态图片或占位图），
+          同鸿蒙的 `onAnimationFailed`。
+     */
+    public var onAnimationFailed: (() -> Void)?
     /** [EN] The progress shown while not playing, clamped to 0...1. [CN] 未播放时显示的进度，限制在 0...1。 */
     open var animationRestingProgress: CGFloat {
         get { storedRestingProgress }
@@ -1057,17 +1071,37 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
                 attachEndHandler()
                 applyPlayerSettings()
                 if drivesAnimationPlayback { setPlayerValue(animationRestingProgress, for: "progress") }
+                // [EN] A local file is in place now; a download reports through `cylAnimationViewDidLoad`.
+                // [CN] 本地文件此时已就绪；下载中的文件通过 `cylAnimationViewDidLoad` 报告。
+                if !CYLTabBarItemAnimationIsLoading(view) { notifyAnimationLoaded(of: view) }
             } else {
                 // [EN] Debug builds: a type whose engine is not in the build says which pod to add. [CN] debug 构建：引擎未参与构建的类型提示需要加入的 pod。
                 CYLAnimationWarnMissingEngine(nil, url)
+                notifyAnimationFailed()
             }
+        } else if animationURL != nil {
+            notifyAnimationFailed()
         }
         #else
         // [EN] No engine: debug builds say which pod to add. [CN] 没有引擎：debug 构建提示需要加入的 pod。
-        if let url = animationURL { CYLAnimationWarnMissingEngine(nil, url) }
+        if let url = animationURL { CYLAnimationWarnMissingEngine(nil, url); notifyAnimationFailed() }
         #endif
         updateIcon()
         contentDidChange()
+    }
+
+    /// [EN] `onAnimationLoaded` on the next main queue turn, so a host that sets the callback after the URL still hears it; only
+    ///      while `view` is still the animation. [CN] 在下一次主队列循环调用 `onAnimationLoaded`，宿主在设置 URL 之后才设置回调也能收到；仅当 `view` 仍是当前动画。
+    private func notifyAnimationLoaded(of view: UIView) {
+        DispatchQueue.main.async { [weak self, weak view] in
+            guard let self, let view, view === self.storedAnimationView else { return }
+            self.onAnimationLoaded?()
+        }
+    }
+
+    /// [EN] `onAnimationFailed` on the next main queue turn, for the same reason. [CN] 同理，在下一次主队列循环调用 `onAnimationFailed`。
+    private func notifyAnimationFailed() {
+        DispatchQueue.main.async { [weak self] in self?.onAnimationFailed?() }
     }
 
     /** [EN] Plays from the current progress. [CN] 从当前进度开始播放。 */
@@ -1525,6 +1559,7 @@ extension CYLAnimatedItemView: CYLTabBarItemAnimationFailureHandling {
         guard animationView === self.animationView else { return }
         updateIcon()
         contentDidChange()
+        onAnimationLoaded?()
     }
 
     /**
@@ -1540,6 +1575,7 @@ extension CYLAnimatedItemView: CYLTabBarItemAnimationFailureHandling {
         playing = false
         updateIcon()
         contentDidChange()
+        onAnimationFailed?()
     }
 }
 #endif

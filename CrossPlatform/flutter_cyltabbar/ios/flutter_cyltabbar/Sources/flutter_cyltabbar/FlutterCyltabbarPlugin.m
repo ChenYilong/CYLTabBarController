@@ -13,14 +13,23 @@
 #else
 @import CYLTabBarController;
 #endif
-#if __has_include(<CYLTabBarController/CYLTabBarItemAnimationFactory.h>)
-#import <CYLTabBarController/CYLTabBarItemAnimationFactory.h>
+// [EN] The animation view is a `CYLAnimatedItemView` (the cross-platform engine API, docs/Animated-Item.md, "Engine API across
+//      platforms"); the CYLAnimatedItem pod comes with CYLTabBarController. Without it the animation view stays empty.
+// [CN] 动画视图是 `CYLAnimatedItemView`（跨端引擎 API，见 docs/Animated-Item.md「跨端引擎 API」）；CYLAnimatedItem pod 随 CYLTabBarController
+//      一起提供。没有它时动画视图保持为空。
+#if __has_include(<CYLAnimatedItem/CYLAnimatedItem-Swift.h>)
+#import <CYLAnimatedItem/CYLAnimatedItem-Swift.h>
 #define CYL_FLUTTER_ANIMATION_AVAILABLE 1
-#elif __has_include("CYLTabBarItemAnimationFactory.h")
-#import "CYLTabBarItemAnimationFactory.h"
+#elif __has_include("CYLAnimatedItem-Swift.h")
+#import "CYLAnimatedItem-Swift.h"
 #define CYL_FLUTTER_ANIMATION_AVAILABLE 1
 #else
 #define CYL_FLUTTER_ANIMATION_AVAILABLE 0
+#endif
+#if CYL_FLUTTER_ANIMATION_AVAILABLE
+#if __has_include(<CYLAnimatedItem/CYLTabBarItemAnimationPlayer.h>)
+#import <CYLAnimatedItem/CYLTabBarItemAnimationPlayer.h>
+#endif
 #endif
 
 static NSString *const CYLFlutterViewType = @"flutter_cyltabbar/CYLTabBar";
@@ -221,6 +230,7 @@ static UIImage *CYLFlutterAssetImage(NSString *asset, NSObject<FlutterPluginRegi
 
 #pragma mark - The animation view
 
+#if CYL_FLUTTER_ANIMATION_AVAILABLE
 /// A file name of the main bundle becomes its file URL, the options (the fragment) kept. 主 bundle 中的文件名转为其文件 URL，保留选项（fragment）。
 static NSURL *CYLFlutterAnimationURL(NSString *source) {
     NSURL *URL = [NSURL URLWithString:source];
@@ -239,6 +249,8 @@ static NSURL *CYLFlutterAnimationURL(NSString *source) {
     return components.URL;
 }
 
+#endif
+
 /// An animation played by CYLTabBarController's engine. 由 CYLTabBarController 引擎播放的动画。
 @interface CYLFlutterAnimationContainerView : UIView
 @property (nonatomic, copy) void (^layoutBlock)(void);
@@ -251,15 +263,42 @@ static NSURL *CYLFlutterAnimationURL(NSString *source) {
 }
 @end
 
+#if CYL_FLUTTER_ANIMATION_AVAILABLE
+/// [EN] A color the Dart side sends: an ARGB integer (`Color.value`). [CN] Dart 一侧发送的颜色：ARGB 整数（`Color.value`）。
+static UIColor *CYLFlutterColor(id value) {
+    if (![value isKindOfClass:[NSNumber class]]) {
+        return nil;
+    }
+    uint32_t argb = (uint32_t)[value unsignedLongLongValue];
+    return [UIColor colorWithRed:((argb >> 16) & 0xFF) / 255.0 green:((argb >> 8) & 0xFF) / 255.0
+                            blue:(argb & 0xFF) / 255.0 alpha:((argb >> 24) & 0xFF) / 255.0];
+}
+#endif
+
+/**
+ * [EN] An animation played by CYLTabBarController's engine through a `CYLAnimatedItemView`, the same contract as the Android
+ *      view (`CYLFlutterAnimationView.kt`). Channel `flutter_cyltabbar/CYLAnimationView/<id>`: the methods `setSource`,
+ *      `setSelected`, `setAnimationSpeed`, `setAnimationLoops`, `setAnimationRestartToken`, `setDrivesAnimationPlayback`,
+ *      `setPlaying`, `setIconSize`, `setTintColor` and the commands `play`, `stopAtProgress`, `restart`; it calls back
+ *      `onAnimationLoaded`, `onAnimationFailed` and `onAnimationEnd`. No engine logic here. The restart token is read-only on
+ *      iOS (`animationRestartToken` grows on every `restartAnimation()`), so a changed token calls `restartAnimation()`.
+ * [CN] 由 CYLTabBarController 引擎通过 `CYLAnimatedItemView` 播放的动画，契约与 Android 视图相同（`CYLFlutterAnimationView.kt`）。
+ *      通道 `flutter_cyltabbar/CYLAnimationView/<id>`：方法 `setSource`、`setSelected`、`setAnimationSpeed`、`setAnimationLoops`、
+ *      `setAnimationRestartToken`、`setDrivesAnimationPlayback`、`setPlaying`、`setIconSize`、`setTintColor`，命令 `play`、
+ *      `stopAtProgress`、`restart`；回调 `onAnimationLoaded`、`onAnimationFailed`、`onAnimationEnd`。这里没有引擎逻辑。重播 token 在 iOS 上
+ *      只读（每次 `restartAnimation()` 后 `animationRestartToken` 加一），因此 token 变化时调用 `restartAnimation()`。
+ */
 @interface CYLFlutterAnimationView : NSObject <FlutterPlatformView>
 @end
 
 @implementation CYLFlutterAnimationView {
     CYLFlutterAnimationContainerView *_view;
-    UIView *_animationView;
     FlutterMethodChannel *_channel;
-    NSString *_source;
-    BOOL _playing;
+#if CYL_FLUTTER_ANIMATION_AVAILABLE
+    CYLAnimatedItemView *_item;
+    NSInteger _restartToken;
+    CGFloat _iconSide;
+#endif
 }
 
 - (instancetype)initWithFrame:(CGRect)frame viewId:(int64_t)viewId arguments:(NSDictionary *)arguments registrar:(NSObject<FlutterPluginRegistrar> *)registrar {
@@ -269,13 +308,14 @@ static NSURL *CYLFlutterAnimationURL(NSString *source) {
         _view.layoutBlock = ^{
             [weakSelf layout];
         };
-        _source = [arguments[@"source"] isKindOfClass:[NSString class]] ? arguments[@"source"] : nil;
-        _playing = [arguments[@"playing"] boolValue];
         NSString *name = [NSString stringWithFormat:@"flutter_cyltabbar/CYLAnimationView/%lld", viewId];
         _channel = [FlutterMethodChannel methodChannelWithName:name binaryMessenger:registrar.messenger];
         [_channel setMethodCallHandler:^(FlutterMethodCall *call, FlutterResult result) {
             [weakSelf handleMethodCall:call result:result];
         }];
+#if CYL_FLUTTER_ANIMATION_AVAILABLE
+        [self setUpItemWithArguments:arguments];
+#endif
     }
     return self;
 }
@@ -284,53 +324,118 @@ static NSURL *CYLFlutterAnimationURL(NSString *source) {
     return _view;
 }
 
+#if CYL_FLUTTER_ANIMATION_AVAILABLE
+- (void)setUpItemWithArguments:(NSDictionary *)arguments {
+    // [EN] The blocks hold the channel, not self: the channel does not own the item, so there is no cycle.
+    // [CN] block 持有 channel 而不是 self：channel 不持有该条目，因此没有循环引用。
+    FlutterMethodChannel *channel = _channel;
+    _item = [[CYLAnimatedItemView alloc] initWithFrame:_view.bounds];
+    // [EN] Icon only; the view the host gives is the icon's frame. [CN] 只有图标；宿主给的视图就是图标的范围。
+    _item.onAnimationEnd = ^{ [channel invokeMethod:@"onAnimationEnd" arguments:nil]; };
+    _item.onAnimationLoaded = ^{ [channel invokeMethod:@"onAnimationLoaded" arguments:nil]; };
+    _item.onAnimationFailed = ^{ [channel invokeMethod:@"onAnimationFailed" arguments:nil]; };
+    [_view addSubview:_item];
+    if ([arguments[@"drivesAnimationPlayback"] isKindOfClass:[NSNumber class]]) {
+        _item.drivesAnimationPlayback = [arguments[@"drivesAnimationPlayback"] boolValue];
+    }
+    if ([arguments[@"animationSpeed"] isKindOfClass:[NSNumber class]]) {
+        _item.animationSpeed = [arguments[@"animationSpeed"] doubleValue];
+    }
+    if ([arguments[@"animationLoops"] isKindOfClass:[NSNumber class]]) {
+        _item.animationLoops = [arguments[@"animationLoops"] boolValue];
+    }
+    // [EN] The token at creation is not a restart. [CN] 创建时的 token 不算重播。
+    _restartToken = [arguments[@"animationRestartToken"] isKindOfClass:[NSNumber class]] ? [arguments[@"animationRestartToken"] integerValue] : 0;
+    _iconSide = [arguments[@"iconSize"] isKindOfClass:[NSNumber class]] ? [arguments[@"iconSize"] doubleValue] : 0;
+    UIColor *tint = CYLFlutterColor(arguments[@"tintColor"]);
+    if (tint) {
+        [_item applyIconTintColor:tint];
+    }
+    if ([arguments[@"selected"] isKindOfClass:[NSNumber class]]) {
+        _item.selected = [arguments[@"selected"] boolValue];
+    }
+    [self fitIcon];
+    NSString *source = [arguments[@"source"] isKindOfClass:[NSString class]] ? arguments[@"source"] : nil;
+    [self applySource:source];
+    if ([arguments[@"playing"] boolValue]) {
+        [_item playAnimation];
+    }
+}
+
+- (void)applySource:(NSString *)source {
+    _item.animationURL = source.length > 0 ? CYLFlutterAnimationURL(source) : nil;
+}
+
+/// [EN] The icon fills the view, or is `iconSize` (points) when given. [CN] 图标铺满视图，给了 `iconSize`（点）时为该尺寸。
+- (void)fitIcon {
+    CGSize size = _iconSide > 0 ? CGSizeMake(_iconSide, _iconSide) : _view.bounds.size;
+    if (size.width > 0 && size.height > 0 && !CGSizeEqualToSize(_item.iconSize, size)) {
+        _item.iconSize = size;
+    }
+}
+
+/// [EN] The player of the current animation, nil until it is in place. [CN] 当前动画的播放器，就绪前为 nil。
+- (id<CYLTabBarItemAnimationPlayer>)player {
+    return _item.animationPlayer;
+}
+#endif
+
 - (void)handleMethodCall:(FlutterMethodCall *)call result:(FlutterResult)result {
-    if ([call.method isEqualToString:@"setSource"]) {
-        _source = [call.arguments isKindOfClass:[NSString class]] ? call.arguments : nil;
-        [self rebuild];
-    } else if ([call.method isEqualToString:@"setPlaying"]) {
-        _playing = [call.arguments boolValue];
-        [self applyPlaying];
+#if CYL_FLUTTER_ANIMATION_AVAILABLE
+    id argument = call.arguments;
+    NSString *method = call.method;
+    if ([method isEqualToString:@"setSource"]) {
+        [self applySource:[argument isKindOfClass:[NSString class]] ? argument : nil];
+    } else if ([method isEqualToString:@"setSelected"]) {
+        _item.selected = [argument boolValue];
+    } else if ([method isEqualToString:@"setAnimationSpeed"]) {
+        _item.animationSpeed = [argument isKindOfClass:[NSNumber class]] ? [argument doubleValue] : 1;
+    } else if ([method isEqualToString:@"setAnimationLoops"]) {
+        _item.animationLoops = [argument boolValue];
+    } else if ([method isEqualToString:@"setAnimationRestartToken"]) {
+        NSInteger token = [argument isKindOfClass:[NSNumber class]] ? [argument integerValue] : 0;
+        if (token != _restartToken) {
+            _restartToken = token;
+            [_item restartAnimation];
+        }
+    } else if ([method isEqualToString:@"setDrivesAnimationPlayback"]) {
+        _item.drivesAnimationPlayback = [argument isKindOfClass:[NSNumber class]] ? [argument boolValue] : YES;
+    } else if ([method isEqualToString:@"setPlaying"]) {
+        if ([argument boolValue]) {
+            [_item playAnimation];
+        } else {
+            [_item stopAnimation];
+        }
+    } else if ([method isEqualToString:@"setIconSize"]) {
+        _iconSide = [argument isKindOfClass:[NSNumber class]] ? [argument doubleValue] : 0;
+        [self fitIcon];
+    } else if ([method isEqualToString:@"setTintColor"]) {
+        [_item applyIconTintColor:CYLFlutterColor(argument)];
+    } else if ([method isEqualToString:@"play"]) {
+        [[self player] play];
+    } else if ([method isEqualToString:@"stopAtProgress"]) {
+        id<CYLTabBarItemAnimationPlayer> player = [self player];
+        [player stop];
+        if ([player respondsToSelector:@selector(setProgress:)]) {
+            player.progress = [argument isKindOfClass:[NSNumber class]] ? [argument doubleValue] : 0;
+        }
+    } else if ([method isEqualToString:@"restart"]) {
+        [_item restartAnimation];
     } else {
         result(FlutterMethodNotImplemented);
         return;
     }
     result(nil);
-}
-
-/// [EN] Built once the view has a size (Flutter makes it with an empty frame). [CN] 视图有尺寸后才创建（Flutter 以空 frame 创建视图）。
-- (void)layout {
-    if (!_animationView && CGRectGetWidth(_view.bounds) > 0) {
-        [self rebuild];
-    }
-    _animationView.frame = _view.bounds;
-}
-
-- (void)rebuild {
-    [_animationView removeFromSuperview];
-    _animationView = nil;
-#if CYL_FLUTTER_ANIMATION_AVAILABLE
-    NSURL *URL = _source.length > 0 ? CYLFlutterAnimationURL(_source) : nil;
-    if (URL && CGRectGetWidth(_view.bounds) > 0) {
-        UIView *view = [CYLTabBarItemAnimationFactory animationViewWithURL:URL size:_view.bounds.size contentMode:UIViewContentModeScaleAspectFit];
-        if (view) {
-            view.frame = _view.bounds;
-            [_view addSubview:view];
-            _animationView = view;
-        }
-    }
+#else
+    result(FlutterMethodNotImplemented);
 #endif
-    [self applyPlaying];
 }
 
-- (void)applyPlaying {
+/// [EN] Keeps the icon at the view's size. [CN] 让图标保持与视图相同的尺寸。
+- (void)layout {
 #if CYL_FLUTTER_ANIMATION_AVAILABLE
-    id<CYLTabBarItemAnimationPlayer> player = [CYLTabBarItemAnimationFactory playerForView:_animationView];
-    if (_playing) {
-        [player play];
-    } else {
-        [player stop];
-    }
+    _item.frame = _view.bounds;
+    [self fitIcon];
 #endif
 }
 
