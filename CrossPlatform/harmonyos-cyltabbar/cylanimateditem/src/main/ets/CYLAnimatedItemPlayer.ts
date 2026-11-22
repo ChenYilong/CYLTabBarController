@@ -87,6 +87,24 @@ export class CYLAnimatedItemPlayer {
     return undefined;
   }
 
+  /**
+   * [EN] Whether `applyColors` recolors the animation (false here; Lottie and Rive implement it).
+   * [CN] `applyColors` 能否为动画改色（此处为 false；Lottie 与 Rive 实现了它）。
+   */
+  get supportsColors(): boolean {
+    return false;
+  }
+
+  /**
+   * [EN] Recolors the animation: keypath (Lottie, lottie-ios names) or view model property (Rive) → color ("#RRGGBB" or
+   *      "#AARRGGBB"), for example a dark-mode color set; undefined restores the file's own colors. A no-op where
+   *      `supportsColors` is false.
+   * [CN] 为动画改色：keypath（Lottie，lottie-ios 名称）或视图模型属性（Rive）→ 颜色（"#RRGGBB" 或 "#AARRGGBB"），例如深色模式的颜色表；
+   *      undefined 恢复文件自身的颜色。`supportsColors` 为 false 时为空操作。
+   */
+  applyColors(colors: Map<string, string> | undefined): void {
+  }
+
   /** [EN] Plays from progress 0. [CN] 从进度 0 播放。 */
   play(): void {
   }
