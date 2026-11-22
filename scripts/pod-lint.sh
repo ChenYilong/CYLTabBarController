@@ -206,5 +206,6 @@ case "$1" in
   versions) update_carthage; update_spm; update_navigation ;;
   *)        [ "$1" = lib ] && shift
             pod lib lint "$COMPONENT_PODSPEC" --allow-warnings "$@"
-            pod lib lint "$PODSPEC" --allow-warnings --include-podspecs="$COMPONENT_PODSPEC" $(lint_external_podspecs) "$@" ;;
+            external_podspecs="$(lint_external_podspecs)"
+            pod lib lint "$PODSPEC" --allow-warnings --include-podspecs="$COMPONENT_PODSPEC" ${external_podspecs:+"$external_podspecs"} "$@" ;;
 esac
