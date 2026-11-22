@@ -1,8 +1,8 @@
 # CYLTabBarController folder instructions
 
-## Behavioral guidelines: read in full first (tag: `behavior`)
+## Behavioral guidelines: read in full first (tag: `behavioral`)
 
-- **You must read [Behavioral_guidelines_to_reduce_common_LLM_coding_mistakes.md](docs/instructions/Behavioral_guidelines_to_reduce_common_LLM_coding_mistakes.md) in full, every line, before any task in this repository.** It holds the
+- **You must read [docs/instructions/behavioral.md](docs/instructions/behavioral.md) in full, every line, before any task in this repository.** It holds the
   behavioral guidelines that reduce common LLM coding mistakes (think before coding, simplicity first, surgical changes,
   goal-driven execution). It applies to every task and every tag below.
 

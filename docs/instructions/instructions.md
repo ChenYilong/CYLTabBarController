@@ -15,8 +15,8 @@ with content of its own).
 4. **Moving text.** Rules are moved verbatim, never dropped; a new rule goes under its tag's heading (summary) and into
    the tag's file (full text). A new tag gets a heading, a row in the tag table of `AGENTS.md` and its own file.
 5. **Read-in-full files (added 2026-11-22, owner).** A file the owner marks as "read in full" (today
-   [Behavioral_guidelines_to_reduce_common_LLM_coding_mistakes.md](Behavioral_guidelines_to_reduce_common_LLM_coding_mistakes.md),
-   tag `behavior`) is linked at the very top of the root instruction files (`AGENTS.md`, `instructions.md`; `CLAUDE.md`
+   [behavioral.md](behavioral.md),
+   tag `behavioral`) is linked at the very top of the root instruction files (`AGENTS.md`, `instructions.md`; `CLAUDE.md`
    loads `AGENTS.md`) under its own tag heading, with the words "read in full"; it is read completely before any task,
    not only when its tag is triggered. When a root instruction file would pass 200 lines, the overflow goes to the
    matching file in `docs/instructions/` first.

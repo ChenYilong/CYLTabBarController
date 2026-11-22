@@ -1,8 +1,8 @@
 # Agent rules for this repository (any tool)
 
-## Behavioral guidelines: read in full first (tag: `behavior`)
+## Behavioral guidelines: read in full first (tag: `behavioral`)
 
-- **You must read [Behavioral_guidelines_to_reduce_common_LLM_coding_mistakes.md](docs/instructions/Behavioral_guidelines_to_reduce_common_LLM_coding_mistakes.md) in full, every line, before any task in this repository.** It holds the
+- **You must read [docs/instructions/behavioral.md](docs/instructions/behavioral.md) in full, every line, before any task in this repository.** It holds the
   behavioral guidelines that reduce common LLM coding mistakes (think before coding, simplicity first, surgical changes,
   goal-driven execution). It applies to every task and every tag below.
 
@@ -22,7 +22,7 @@ appears in the task). Instruction files (this file, `instructions.md`, `docs/ins
 
 | Tag | Heading | Full text |
 |:---|:---|:---|
-| `behavior` | [Behavioral guidelines: read in full first](#behavioral-guidelines-read-in-full-first-tag-behavior) | [docs/instructions/Behavioral_guidelines_to_reduce_common_LLM_coding_mistakes.md](docs/instructions/Behavioral_guidelines_to_reduce_common_LLM_coding_mistakes.md) (read in full) |
+| `behavioral` | [Behavioral guidelines: read in full first](#behavioral-guidelines-read-in-full-first-tag-behavioral) | [docs/instructions/behavioral.md](docs/instructions/behavioral.md) (read in full) |
 | `task-workflow` | [Task workflow and sessions](#task-workflow-and-sessions-tag-task-workflow) | [docs/instructions/task-workflow.md](docs/instructions/task-workflow.md) |
 | `documentation` | [Documentation and skills](#documentation-and-skills-tag-documentation) | [docs/instructions/documentation.md](docs/instructions/documentation.md) |
 | `code` | [Code rules](#code-rules-tag-code) | [docs/instructions/code.md](docs/instructions/code.md) |

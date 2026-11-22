@@ -691,10 +691,10 @@ docs/
 │   └── wechat-miniprogram-visibility-hidden-identifiers-devtools-sdk3.17.6-49df44f.png
 ├── commit-readiness-2026-11-09.md
 ├── instructions/
-│   ├── Behavioral_guidelines_to_reduce_common_LLM_coding_mistakes.md
 │   ├── accessibility-localization.md
 │   ├── animation.md
 │   ├── badges.md
+│   ├── behavioral.md
 │   ├── code.md
 │   ├── cross-platform.md
 │   ├── dependencies.md

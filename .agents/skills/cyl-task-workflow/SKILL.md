@@ -93,4 +93,4 @@ The instruction files (`AGENTS.md`, `instructions.md`, `docs/instructions.md`, `
 
 ## Read in full before any task (added 2026-11-22, owner)
 
-Before any task in this repository, read `docs/instructions/Behavioral_guidelines_to_reduce_common_LLM_coding_mistakes.md` in full (tag `behavior`, linked at the top of `AGENTS.md` and `instructions.md`). Files marked "read in full" are linked at the top of the root instruction files under their own tag heading: `docs/instructions/instructions.md`, rule 5.
+Before any task in this repository, read `docs/instructions/behavioral.md` in full (tag `behavioral`, linked at the top of `AGENTS.md` and `instructions.md`). Files marked "read in full" are linked at the top of the root instruction files under their own tag heading: `docs/instructions/instructions.md`, rule 5.

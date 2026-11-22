@@ -1,4 +1,11 @@
-# CLAUDE.md
+# Behavioral guidelines (tag: `behavioral`)
+
+**Read this file in full before any task in this repository.** It is linked at the top of [AGENTS.md](../../AGENTS.md)
+and [instructions.md](../../instructions.md) under the `behavioral` tag; unlike the other tag files it is not read on
+demand but always, completely (rule 5 of [instructions.md](instructions.md)). Added by the owner on 2026-11-22 as
+`Behavioral_guidelines_to_reduce_common_LLM_coding_mistakes.md`, renamed to follow the tag file names; the text below is
+unchanged (its original title was "CLAUDE.md").
+
 
 Behavioral guidelines to reduce common LLM coding mistakes. Merge with project-specific instructions as needed.
 
