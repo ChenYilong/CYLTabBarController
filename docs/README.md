@@ -418,6 +418,7 @@ docs/
 │   ├── login-required-tabs-flow.svg
 │   ├── login-required-tabs-flutter-ios-logged-in.png
 │   ├── login-required-tabs-react-native-android-alert.png
+│   ├── lottie-swift-players-ios.png
 │   ├── miniprogram-tab-tap-previous-tab-frame-before-after.png
 │   ├── more-editing-done-star-comes-back-liquid-glass-ios.png
 │   ├── more-tab-eight-tabs-liquid-glass-ios.png

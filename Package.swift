@@ -75,11 +75,13 @@ let package = Package(
             // [EN] SwiftPM always builds the engine (the CYLAnimatedItem target). [CN] SwiftPM 总是编译引擎（CYLAnimatedItem target）。
             swiftSettings: [.define("CYL_ANIMATION_ENGINE_AVAILABLE")]
         ),
-        // Swift bridge that exposes Lottie 4.x to the Objective-C sources (`CYLCompatibleLOTAnimationView`).
+        // Swift bridge that exposes Lottie 4.x to the Objective-C sources (`CYLCompatibleLOTAnimationView`), and the
+        // Lottie 4.x player (`CYLLottieSwiftTabBarItemAnimationPlayer`, a subclass of the engine's base player).
         // SPM cannot mix Swift and Objective-C in one target, so it lives in its own target.
         .target(
             name: "CYLTabBarControllerLottieSwift",
             dependencies: [
+                "CYLAnimatedItem",
                 .product(name: "Lottie", package: "lottie-spm"),
             ],
             path: "CYLTabBarController/LottieSwift"

@@ -12,6 +12,8 @@
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Tab-Bar-Item-Animation.md
 // docs-binding:end
 
+// CYL-SWIFT-MIGRATION: objc-required — [EN] Declares the Lottie animator, an Objective-C class because its `+load` registers it (Swift has no `+load`); its players are Swift. [CN] 声明 Lottie animator：它的 `+load` 负责注册（Swift 没有 `+load`），因此是 Objective-C 类；其播放器为 Swift。
+
 #import <Foundation/Foundation.h>
 #if __has_include("../CYLTabBarItemAnimator.h")
 #import "../CYLTabBarItemAnimator.h"

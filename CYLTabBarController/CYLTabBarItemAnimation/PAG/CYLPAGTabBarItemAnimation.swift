@@ -6,11 +6,11 @@
 //
 
 // [EN] FIX: issue #604 — the PAG player and view loading of the `CYLAnimatedItem/PAG` and `PAGEnterprise` subspecs, translated
-//      from Objective-C (CYLPAGTabBarItemAnimator.m; docs/Swift-Migration.md, engine step 5). CYLPAGTabBarItemAnimator stays
+//      from Objective-C (CYLPAGTabBarItemAnimator.m; docs/Swift-Migration.md, engine step 4). CYLPAGTabBarItemAnimator stays
 //      Objective-C as the composition root: its `+load` registers the animator (Swift has no `+load`), and it forwards to
 //      the types below. Public only so that the generated header exports them to that Objective-C file.
 // [CN] FIX: issue #604 — `CYLAnimatedItem/PAG` 与 `PAGEnterprise` 子库的 PAG 播放器与视图加载，由 Objective-C 翻译而来
-//      （CYLPAGTabBarItemAnimator.m；docs/Swift-Migration.md 引擎第 5 步）。CYLPAGTabBarItemAnimator 作为组合根保留为 Objective-C：其 `+load`
+//      （CYLPAGTabBarItemAnimator.m；docs/Swift-Migration.md 引擎第 4 步）。CYLPAGTabBarItemAnimator 作为组合根保留为 Objective-C：其 `+load`
 //      注册 animator（Swift 没有 `+load`），并转发给下面的类型。声明为 public 只是为了让生成的头文件把它们导出给那个 Objective-C 文件。
 
 #if canImport(libpag)
