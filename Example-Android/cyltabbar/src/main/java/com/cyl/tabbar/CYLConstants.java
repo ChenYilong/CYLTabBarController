@@ -4,6 +4,11 @@ import com.cyl.animateditem.CYLSize;
 import com.cyl.animateditem.CYLTabBarItemAnimationKeys;
 import com.cyl.animateditem.CYLTabBarItemAnimatorRegistry;
 
+import android.content.Context;
+import android.content.res.Resources;
+import android.content.res.TypedArray;
+import android.util.TypedValue;
+
 import androidx.annotation.NonNull;
 
 /**
@@ -286,9 +291,61 @@ public final class CYLConstants {
     public static final float CYLTabBarItemImagePlaceholderWidth = 30f;
     public static final float CYLTabBarItemImagePlaceholderHeight = 30f;
     /**
-     * [EN] The default tab bar height, in dp (iOS: 49 pt). [CN] 默认 TabBar 高度（dp；iOS 为 49 pt）。
+     * [EN] The iOS tab bar height, in dp (iOS: 49 pt). Since 2026-11-22 it is no longer the default: a CYLTabBarController
+     *      without `tabBarHeight` takes the system tab bar's height, `cyl_systemTabBarHeight(context)`.
+     * [CN] iOS 的 TabBar 高度（dp；iOS 为 49 pt）。2026-11-22 起不再是默认值：未设置 `tabBarHeight` 的 CYLTabBarController 使用系统 TabBar 的高度
+     *      `cyl_systemTabBarHeight(context)`。
      */
     public static final float CYLTabBarHeight = 49f;
+
+    /**
+     * [EN] The Material 3 navigation bar's height, in dp (80): the system tab bar height when the theme does not say
+     *      otherwise. [CN] Material 3 导航栏高度（dp，80）：主题未另行说明时的系统 TabBar 高度。
+     */
+    public static final float CYLSystemTabBarHeightMaterial3 = 80f;
+
+    /**
+     * [EN] The Material 2 bottom navigation height, in dp (56). [CN] Material 2 底部导航高度（dp，56）。
+     */
+    public static final float CYLSystemTabBarHeightMaterial2 = 56f;
+
+    /**
+     * [EN] The height of the system tab bar (Material `BottomNavigationView`) in this context's theme, in dp: the
+     *      `android:minHeight` of the theme's `bottomNavigationStyle` (Material 3: 80), else Material 2's
+     *      `design_bottom_navigation_height` (56), else 80 (an app without the Material library: the current Android
+     *      navigation bar). The default height of CYLTabBarController, so that with no `tabBarHeight` it is as tall as
+     *      the system tab bar, as on iOS (UITabBar) and HarmonyOS (`CYLTabBarDefaultHeight`, 56 vp). The library does not
+     *      depend on Material: the theme attribute and the dimension are looked up by name.
+     * [CN] 本 context 主题中系统 TabBar（Material `BottomNavigationView`）的高度（dp）：主题 `bottomNavigationStyle` 的 `android:minHeight`
+     *      （Material 3：80），否则为 Material 2 的 `design_bottom_navigation_height`（56），否则为 80（没有 Material 库的 App：当前 Android 导航栏）。
+     *      这是 CYLTabBarController 的默认高度，使未设置 `tabBarHeight` 时与系统 TabBar 等高，与 iOS（UITabBar）、鸿蒙（56 vp）一致。库不依赖
+     *      Material：主题属性与尺寸按名称查找。
+     */
+    public static float cyl_systemTabBarHeight(@NonNull Context context) {
+        Resources resources = context.getResources();
+        float density = resources.getDisplayMetrics().density;
+        String packageName = context.getPackageName();
+        int styleAttr = resources.getIdentifier("bottomNavigationStyle", "attr", packageName);
+        if (styleAttr != 0) {
+            TypedValue value = new TypedValue();
+            if (context.getTheme().resolveAttribute(styleAttr, value, true) && value.resourceId != 0) {
+                TypedArray array = context.obtainStyledAttributes(value.resourceId, new int[]{android.R.attr.minHeight});
+                try {
+                    int minHeight = array.getDimensionPixelSize(0, 0);
+                    if (minHeight > 0) {
+                        return minHeight / density;
+                    }
+                } finally {
+                    array.recycle();
+                }
+            }
+        }
+        int dimen = resources.getIdentifier("design_bottom_navigation_height", "dimen", packageName);
+        if (dimen != 0) {
+            return resources.getDimension(dimen) / density;
+        }
+        return CYLSystemTabBarHeightMaterial3;
+    }
 
     /**
      * [EN] The default plus button index: the middle of the tabs. [CN] 默认 PlusButton 下标：Tab 的中间。

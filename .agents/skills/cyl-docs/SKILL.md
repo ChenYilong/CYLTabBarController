@@ -198,3 +198,11 @@ classes link back to it:
 ## Swift first on iOS (added 2026-11-19)
 
 - **The iOS core is Swift; every new piece of code is Swift first (added 2026-11-19, owner)**: the core code of this project on iOS (the CocoaPods / Swift Package Manager / Carthage sources under `CYLTabBarController/`, including the `CYLAnimatedItem` module) is Swift. Write every new class, extension, test and example in Swift. Use Objective-C only where Swift cannot do the job (a header that must stay importable from Objective-C without modules, a `+load`-time hook, a C macro), and give the reason in a comment and in the task's document in `docs/`. Keep the public API usable from Objective-C (`@objc`, `@objcMembers`, `NS_SWIFT_NAME` counterparts) so existing Objective-C callers keep working. When you touch Objective-C code for a new feature, prefer adding the feature in a Swift file over growing the Objective-C file. Migration log: `docs/Swift-Migration.md`. Details: `AGENTS.md`, "Code rules".
+
+## Instruction files: tags and the 200-line limit (added 2026-11-22, owner)
+
+The instruction files (`AGENTS.md`, `instructions.md`, `docs/instructions.md`, `CLAUDE.md`) are organized by tag: every rule has a tag (a keyword such as `testing`, `windows-harmonyos`, `macos`, `documentation`, `git`), each tag is a visible heading `## <Title> (tag: `<tag>`)` with a short summary, and no file goes above 200 lines; what does not fit moves verbatim to `docs/instructions/<tag>.md`, linked from the heading by a relative path, and is read only when a task touches the tag. A new rule goes under its tag (summary) and into the tag's file (full text). Full rule: `docs/instructions/instructions.md`.
+
+## Read in full before any task (added 2026-11-22, owner)
+
+Before any task in this repository, read `docs/instructions/behavioral.md` in full (tag `behavioral`, linked at the top of `AGENTS.md` and `instructions.md`). Files marked "read in full" are linked at the top of the root instruction files under their own tag heading: `docs/instructions/instructions.md`, rule 5.

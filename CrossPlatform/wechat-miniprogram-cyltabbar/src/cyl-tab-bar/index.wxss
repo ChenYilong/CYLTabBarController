@@ -1,7 +1,7 @@
 @import "./cyl_tap_animations.wxss";
 @import "./cyl_badge_animations.wxss";
 
-/* [EN] Classic bar (default, system): a 50 pt bar with a hairline on top, above the home indicator. [CN] 经典 TabBar（default、system）：50 pt 高、顶部一条细线，位于 Home 指示条之上。 */
+/* [EN] Classic bar (default, system): the system tab bar's 48 px (or tabBarHeight, through --cyl-bar-height) with a hairline on top, above the home indicator. [CN] 经典 TabBar（default、system）：系统 tabBar 的 48 px（或 tabBarHeight，经由 --cyl-bar-height）、顶部一条细线，位于 Home 指示条之上。 */
 .cyl-tab-bar {
   position: fixed;
   left: 0;
@@ -10,7 +10,7 @@
   display: flex;
   flex-direction: row;
   align-items: stretch;
-  height: 50px;
+  height: var(--cyl-bar-height, 48px);
   padding-bottom: env(safe-area-inset-bottom);
   background-color: #f9f9f9;
   border-top: 1rpx solid rgba(0, 0, 0, 0.15);
@@ -29,7 +29,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 50px;
+  height: var(--cyl-bar-height, 48px);
   overflow: visible;
 }
 

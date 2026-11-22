@@ -6,7 +6,7 @@ import {
   CYLTabBarMinimizeBehavior, cyl_reportScroll, cyl_pushViewController, CYLThemeManager, CYLThemeManagerCenter,
   cyl_tabBarItemIdentifiers, cyl_indexOfTabBarItemWithIdentifier, cyl_selectTabBarItemWithIdentifier
 } from 'cyltabbar';
-import { CYLLocalizedString, cyl_localizationKey, cyl_badgeAccessibilityText } from 'cyltabbar';
+import { CYLLocalizedString, cyl_localizationKey, cyl_badgeAccessibilityText, CYLTabBarDefaultHeight } from 'cyltabbar';
 import { DemoTheme, DEMO_THEMES, demoRegisterThemes } from '../demo/DemoThemes';
 import { DemoScrollKind, DemoScrollSimulation, DEMO_SCROLL_SIMULATIONS, demoScrollKindName, demoScrollTitle } from '../demo/DemoScrollHide';
 import { cyl_restoreTabBar, CYLSetLocalizationLanguage, CYLLocalizationLanguage } from 'cyltabbar';
@@ -32,9 +32,9 @@ const CYL_TABS: CYLTabBarItemAttributes[] = [
 const CYL_RANDOM_COLORS: string[] = ['#FF3B30', '#FF9500', '#34C759', '#007AFF', '#AF52DE', '#FF2D55'];
 
 /**
- * [EN] The space under the last row of a demo list (vp): the tab bar (49), the raised plus button above it and the
+ * [EN] The space under the last row of a demo list (vp): the tab bar (CYLTabBarDefaultHeight, 56), the raised plus button above it and the
  *      gesture bar, so no row stays hidden behind them (HarmonyOS screenshot issue 5).
- * [CN] 演示列表最后一行下方的空间（vp）：TabBar（49）、其上方凸起的 PlusButton 与手势条，使任何一行都不会被挡住（鸿蒙截图问题 5）。
+ * [CN] 演示列表最后一行下方的空间（vp）：TabBar（CYLTabBarDefaultHeight，56）、其上方凸起的 PlusButton 与手势条，使任何一行都不会被挡住（鸿蒙截图问题 5）。
  */
 const CYL_LIST_END_INSET: number = 120;
 
@@ -86,7 +86,8 @@ struct Index {
   @State titleOffset: CYLOffset = { horizontal: 0, vertical: 0 };
   @State appearanceIndex: number = 0;
   @State tabBarHidden: boolean = false;
-  @State tabBarHeight: number = 49;
+  // [EN] The default height (the system tab bar's) until the row below changes it. [CN] 默认高度（系统 TabBar 的高度），直到下方一行修改它。
+  @State tabBarHeight: number = CYLTabBarDefaultHeight;
   @State itemEdgeInsets: CYLEdgeInsets = { top: 0, left: 0, bottom: 0, right: 0 };
   @State itemBackgrounds: boolean = false;
   @State unloads: boolean = false;
@@ -364,7 +365,7 @@ struct Index {
       },
       {
         id: 'tab-bar-height', title: CYLLocalizedString('改变 CYLFlatDesignTabBar 高度'), subtitle: `tabBarHeight = ${this.tabBarHeight}`,
-        action: () => this.tabBarHeight = this.tabBarHeight === 49 ? 69 : 49,
+        action: () => this.tabBarHeight = this.tabBarHeight === CYLTabBarDefaultHeight ? 69 : CYLTabBarDefaultHeight,
       },
       {
         id: 'items-not-centered', title: CYLLocalizedString('Change CYLFlatDesignTabBarItem 不居中显示（系统效果）'),

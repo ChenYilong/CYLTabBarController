@@ -1,9 +1,27 @@
 {
   "apiType": "stageMode",
   "buildOption": {},
-  "targets": [
+  "buildOptionSet": [
     {
-      "name": "default"
+      // For the x86_64 HarmonyOS emulator: @ohos/rive and @tencent/libpag ship arm64-v8a .so files only, and the installer
+      // rejects a HAP whose native libraries do not match the device ABI ("install parse native so failed"). This option
+      // leaves every arm64-v8a .so out (libc++_shared.so included); Rive and PAG items then show their still images
+      // (CYLAnimatedItemEngines.isSupportedOnDevice). Build it with -p module=entry@emulator. Phones use the default target.
+      // See cylanimateditem/README.md, "x86_64 emulator".
+      "name": "emulator",
+      "nativeLib": { "filter": { "excludes": ["**/arm64-v8a/*.so"] } }
     }
+  ],
+  "buildModeBinder": [
+    { "buildModeName": "debug", "mappings": [{ "targetName": "emulator", "buildOptionName": "emulator" }] },
+    { "buildModeName": "release", "mappings": [{ "targetName": "emulator", "buildOptionName": "emulator" }] },
+    // The ohosTest HAP carries the same arm64-v8a .so files; -p buildMode=emulatorTest builds it for the x86_64 emulator
+    // without them (phones and arm64 emulators keep -p buildMode=test).
+    { "buildModeName": "emulatorTest", "mappings": [{ "targetName": "ohosTest", "buildOptionName": "emulator" }] }
+  ],
+  "targets": [
+    { "name": "default" },
+    { "name": "ohosTest" },
+    { "name": "emulator" }
   ]
 }

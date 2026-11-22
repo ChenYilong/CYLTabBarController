@@ -58,6 +58,8 @@ dependencies {
     testImplementation(libs.robolectric)
     // [EN] Only to test the Lottie animator found by reflection; apps add Lottie themselves. [CN] 仅用于测试通过反射找到的 Lottie animator；App 自行添加 Lottie。
     testImplementation(libs.lottie)
+    // [EN] Only to test the system tab bar height read from Material themes. [CN] 仅用于测试从 Material 主题读取的系统 TabBar 高度。
+    testImplementation(libs.material)
     testImplementation(libs.androidx.test.core)
     testImplementation(kotlin("test"))
 }

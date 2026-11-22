@@ -210,6 +210,7 @@ docs/
 │   ├── android-api37-20261119-example-rive-live-uimode-switch.png
 │   ├── android-api37-20261119-rive-fixed-tint-unselected-only.png
 │   ├── android-api37-20261119-rive-follows-appearance.png
+│   ├── android-default-tab-bar-height-system-80dp.png
 │   ├── android-example-strings-en-zh-ja.png
 │   ├── android-gif-decoder-frame-clock.png
 │   ├── android-gif-image-rest-then-play.png
@@ -323,6 +324,7 @@ docs/
 │   ├── harmonyos-cvcm-issue26-good.jpeg
 │   ├── harmonyos-cvcm-issue27-filter-open.jpeg
 │   ├── harmonyos-cvcm-issue27-plus.jpeg
+│   ├── harmonyos-default-tab-bar-height-system-56vp.png
 │   ├── harmonyos-emulator-pages-b7fdf26.png
 │   ├── harmonyos-flatdesign-liquidglass-taps-mate70pro.png
 │   ├── harmonyos-flatdesign-tint-fixed.png
@@ -374,6 +376,7 @@ docs/
 │   ├── harmonyos-verify-skin-row-picker.jpeg
 │   ├── harmonyos-verify-skins-eba8c44.png
 │   ├── harmonyos-verify-spanish.jpeg
+│   ├── harmonyos-x86-64-emulator-target-rive-still-images.png
 │   ├── image-only-tabs-gallery-3-3-ios17.png
 │   ├── image-only-tabs-ios.png
 │   ├── inset-grouped-sections-demo-ios.png
@@ -687,6 +690,24 @@ docs/
 │   ├── wechat-miniprogram-two-icon-layers-user-2-devtools.jpg
 │   └── wechat-miniprogram-visibility-hidden-identifiers-devtools-sdk3.17.6-49df44f.png
 ├── commit-readiness-2026-11-09.md
+├── instructions/
+│   ├── accessibility-localization.md
+│   ├── animation.md
+│   ├── badges.md
+│   ├── behavioral.md
+│   ├── code.md
+│   ├── cross-platform.md
+│   ├── dependencies.md
+│   ├── documentation.md
+│   ├── examples.md
+│   ├── git.md
+│   ├── instructions.md
+│   ├── macos.md
+│   ├── plus-button.md
+│   ├── screenshots.md
+│   ├── task-workflow.md
+│   ├── testing.md
+│   └── windows-harmonyos.md
 └── instructions.md
 ```
 
