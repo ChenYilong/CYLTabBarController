@@ -2,7 +2,8 @@
 
 The animated icon + title component of CYLTabBarController for HarmonyOS NEXT (`CYLAnimatedItemView`,
 `CYLAnimatedItemStackView`, `CYLAnimatedItemEngines`). It depends on no other package and on no animation library.
-Guide: [docs/Animated-Item.md](../../../docs/Animated-Item.md) in CYLTabBarController.
+Guide: [docs/Animated-Item.md](../../../docs/Animated-Item.md) in CYLTabBarController. To play `.riv` files in it with one shared
+Rive view and a working Loop, add the sibling module [cylanimateditemrive](../cylanimateditemrive/README.md).
 
 ## x86_64 emulator
 
