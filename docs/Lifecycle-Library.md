@@ -25,6 +25,7 @@
 |:---|:---|
 | [任务记录](#cn任务记录) | [Task log](#entask-log) |
 | &nbsp;&nbsp;&nbsp;&nbsp;↳ [TODO: CYLDeallocBlockExecutor as a core dependency (2026-11-22, branch `feat/dealloc-block-executor-dependency`)](#todo-cyldeallocblockexecutor-as-a-core-dependency-2026-11-22-branch-featdealloc-block-executor-dependency) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [TODO: CYLDeallocBlockExecutor as a core dependency (2026-11-22, branch `feat/dealloc-block-executor-dependency`)](#todo-cyldeallocblockexecutor-as-a-core-dependency-2026-11-22-branch-featdealloc-block-executor-dependency) |
+| &nbsp;&nbsp;&nbsp;&nbsp;↳ [TODO: all platforms, step 1 Android (2026-11-23, branch `feat/dealloc-block-executor-dependency`)](#todo-all-platforms-step-1-android-2026-11-23-branch-featdealloc-block-executor-dependency) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [TODO: all platforms, step 1 Android (2026-11-23, branch `feat/dealloc-block-executor-dependency`)](#todo-all-platforms-step-1-android-2026-11-23-branch-featdealloc-block-executor-dependency) |
 
 <!-- navigation:end -->
 
@@ -51,3 +52,14 @@
 | TODO（-5）：见右列。 | TODO (-5) Carthage: the framework target links CYLDeallocBlockExecutor statically, so an app that also adds CYLDeallocBlockExecutor gets two copies (two UIViewController hook installs, duplicate class warnings). Fix: ship `CYLDeallocBlockExecutor.xcframework` next to `CYLAnimatedItem.xcframework` and link it dynamically. |
 | TODO（-10）：见右列。 | TODO (-10) CI on this pull request: `pod lib lint` fails until 1.4.0 is on trunk; the other jobs are to be checked. |
 | TODO（-5）：见右列。 | TODO (-5) After 1.4.0 is published: replace the branch pins with `~> 1.4` / `from: "1.4.0"`, remove `lint_external_podspecs` from `scripts/pod-lint.sh` (until then `pod lib lint` uses the branch podspec through `--external-podspecs`; Core subspec lint passed locally, 2026-11-22), take the pull request out of draft. |
+
+### TODO: all platforms, step 1 Android (2026-11-23, branch `feat/dealloc-block-executor-dependency`)
+
+| 中文 | English |
+|:---|:---|
+| 背景：iOS 已依赖 CYLDeallocBlockExecutor。现在把同样的回调注册表（Kotlin 版，库分支 `feat/lifecycle-callbacks-android`）接入 Android 核心 `Example-Android/cyltabbar`；Flutter 与 React Native 通过各自的原生核心获得；之后是 HarmonyOS 与小程序。 | Context: iOS already depends on CYLDeallocBlockExecutor. Now the same callback registry (Kotlin port, library branch `feat/lifecycle-callbacks-android`) becomes a dependency of the Android core `Example-Android/cyltabbar`. Flutter and React Native get it through their native cores; HarmonyOS and the Mini Program follow. |
+| 需求（英文翻译）：为 Android、Flutter、React Native、小程序和 HarmonyOS 构建核心代码，逻辑与 iOS 相同，并安装为 CYLTabBarController 核心依赖。 | Requirement (English translation): build core code for Android, Flutter, React Native, the Mini Program and HarmonyOS, with the same logic as iOS, and install it as a CYLTabBarController core dependency. |
+| 原始提示：见右列。 | Prompt (verbatim): "please  build core code for other platform like android flutter react native miniplatform and harmonyos. logic is same as what we done on ios, and install in the CYLTabBarController core dependence" |
+| 评分：100 = Android 核心依赖该库（JitPack，固定提交），布局 block 使用键 `cyl.core.layoutBlock`，单元测试通过，Android 示例与 Flutter 示例的 Android 构建通过，文档完整。60 = 依赖加调用点，Android 单元测试通过。 | Rubric: 100 = the Android core depends on the library (JitPack, pinned commit), the layout block uses the key `cyl.core.layoutBlock`, unit tests pass, the Android example and the Flutter example's Android build pass, docs complete. 60 = the dependency plus the call site, Android unit tests pass. |
+| 得分：0 / 100（TODO：全部）。 | Score: 0 / 100 (TODO: everything). |
+
