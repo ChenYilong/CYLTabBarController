@@ -34,11 +34,12 @@ export default function cylRiveLoopPolicyTest() {
       expect(CYLRiveLoopPolicy.schedulesNextPass(CYLRiveLoopPolicy.WhilePlaying, true, false, true)).assertFalse();
     });
 
-    it('cylRegisterRiveEngine registers Rive, supported where arm64-v8a is', 0, () => {
-      CYLAnimatedItemEngines.unregister('Rive');
+    it('cylRegisterRiveEngine registers Rive and keeps its ABIs (the x86_64 debug kit included)', 0, () => {
+      const before: string = CYLAnimatedItemEngines.requiredNativeAbis('Rive').join(',');
       cylRegisterRiveEngine();
       expect(CYLAnimatedItemEngines.isRegistered('Rive')).assertTrue();
-      expect(CYLAnimatedItemEngines.requiredNativeAbis('Rive')[0]).assertEqual('arm64-v8a');
+      expect(CYLAnimatedItemEngines.requiredNativeAbis('Rive').join(',')).assertEqual(before);
+      expect(CYLAnimatedItemEngines.requiredNativeAbis('Rive').includes('arm64-v8a')).assertTrue();
       expect(cylRiveIsSupported()).assertEqual(CYLAnimatedItemEngines.isSupportedOnDevice('Rive'));
     });
   });
