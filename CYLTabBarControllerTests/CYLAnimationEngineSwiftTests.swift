@@ -80,6 +80,15 @@ final class CYLAnimationEngineSwiftTests: XCTestCase {
         XCTAssertNil(CYLGIFTabBarItemAnimationView.makeAnimationView(fileURL: notGIF, options: [:], contentMode: .center))
     }
 
+    /// [EN] The resource bundle lookup, Swift since engine step 3: the C symbol and the Swift entry point return the same cached bundle.
+    /// [CN] 资源包查找，引擎第 3 步起为 Swift：C 符号与 Swift 入口返回同一个缓存的资源包。
+    func testResourceBundleKeepsItsCSymbol() {
+        XCTAssertTrue(CYLAnimatedItemResourceBundle() === cylAnimatedItemResourceBundleEntryPoint())
+        if let bundle = CYLAnimatedItemResourceBundle() {
+            XCTAssertEqual(bundle.bundleURL.lastPathComponent, "CYLAnimatedItem.bundle")
+        }
+    }
+
     func testGIFFrameDelayClampsLikeBrowsers() {
         XCTAssertEqual(CYLGIFTabBarItemAnimationView.frameDelay(properties: nil), 0.1)
         let gif = { (key: CFString, value: Double) in [kCGImagePropertyGIFDictionary: [key: value] as [CFString: Any]] as [CFString: Any] }

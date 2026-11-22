@@ -252,7 +252,7 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
     public class var defaultPlaceholderImage: UIImage? { CYLAnimatedItemView.sharedPlaceholderImage }
 
     private static let sharedPlaceholderImage: UIImage? = {
-        guard let bundle = CYLAnimatedItemResourceBundle() else { return nil }
+        guard let bundle = cylAnimatedItemResourceBundleEntryPoint() else { return nil }
         return UIImage(named: "cyl_animated_item_placeholder", in: bundle, compatibleWith: nil)?.withRenderingMode(.alwaysTemplate)
     }()
 

@@ -313,7 +313,7 @@
 		F795BE9A01FFB8C97E99D4B4 /* CYLTabBarItemAnimationPlayableView.h in Headers */ = {isa = PBXBuildFile; fileRef = 65782D7AF478D76A4A89289D /* CYLTabBarItemAnimationPlayableView.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		F86B27B2D87129FE1C4EF432 /* UIControl+CYLTabBarControllerExtention.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BD00F3733DD972414D5C559 /* UIControl+CYLTabBarControllerExtention.swift */; };
 		F86EAD1B424CC7C8FD0797F6 /* UIViewController+CYLTheme.h in Headers */ = {isa = PBXBuildFile; fileRef = B7867273EDC0A1A56B351CBE /* UIViewController+CYLTheme.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		F93033E104853F61A5751459 /* CYLAnimatedItemResources.m in Sources */ = {isa = PBXBuildFile; fileRef = D2E81251A0704712D5DBBA00 /* CYLAnimatedItemResources.m */; };
+		F93033E104853F61A5751459 /* CYLAnimatedItemResources.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2E81251A0704712D5DBBA00 /* CYLAnimatedItemResources.swift */; };
 		FC2645E143BEC2310AF550C3 /* CYLDemoPlaceholder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3328D7F6D42DD55B99C24546 /* CYLDemoPlaceholder.swift */; };
 		FD9F87B7AF2EF1118AEDFC0B /* CYLSettingsDemoRows.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8EC53F13DFB7439CFABA029 /* CYLSettingsDemoRows.swift */; };
 		FEC9F8C46A3B167916110B50 /* CYLTabBarItemAnimationEngine.h in Headers */ = {isa = PBXBuildFile; fileRef = 5423B525B553B0DAE94BC048 /* CYLTabBarItemAnimationEngine.h */; };
@@ -654,7 +654,7 @@
 		42161B91A54E00DA5B67E9BB /* CYLFlatDesignProtocols.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "CYLFlatDesignProtocols.swift"; sourceTree = "<group>"; };
 		D2534A69F5FC89B62CD7252E /* green_lottie_tab_news_dark.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = green_lottie_tab_news_dark.json; sourceTree = "<group>"; };
 		D2E396F2E63F5565ECB146B1 /* CYLAnimatedItem.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CYLAnimatedItem.h; sourceTree = "<group>"; };
-		D2E81251A0704712D5DBBA00 /* CYLAnimatedItemResources.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = CYLAnimatedItemResources.m; sourceTree = "<group>"; };
+		D2E81251A0704712D5DBBA00 /* CYLAnimatedItemResources.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Swift/CYLAnimatedItemResources.swift; sourceTree = "<group>"; };
 		D2F3185B21B02FF225DB51F4 /* UIColor+CYLTabBarControllerExtention.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "UIColor+CYLTabBarControllerExtention.swift"; sourceTree = "<group>"; };
 		D323BEEEEA532E45BD814422 /* UIViewController+CYLTheme.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "UIViewController+CYLTheme.swift"; sourceTree = "<group>"; };
 		D3D5F41E7F84C9AF1386B45E /* UIViewController+CYLFlatDesignTabBarItem.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "UIViewController+CYLFlatDesignTabBarItem.swift"; sourceTree = "<group>"; };
@@ -1363,7 +1363,7 @@
 				21BB208E919470BD7E295947 /* CYLAnimatedItemView.swift */,
 				E7358A37970FCF7D3118C3E5 /* CYLAnimatedItemStackView.swift */,
 				0DD4A3A6BC38825D6C1C28C3 /* CYLAnimatedItemMacros.h */,
-				D2E81251A0704712D5DBBA00 /* CYLAnimatedItemResources.m */,
+				D2E81251A0704712D5DBBA00 /* CYLAnimatedItemResources.swift */,
 				D2E396F2E63F5565ECB146B1 /* CYLAnimatedItem.h */,
 			);
 			path = CYLAnimatedItem;
@@ -1880,7 +1880,7 @@
 				480DFD5E85DC1808EFEC4890 /* CYLAnimationKeyLookup.swift in Sources */,
 				502FF92D395D1CBBC5E72285 /* CYLAnimationKeys.m in Sources */,
 				838230DBBE4B235BD8C5FD22 /* CYLTabBarItemAnimationPlayableView.swift in Sources */,
-				F93033E104853F61A5751459 /* CYLAnimatedItemResources.m in Sources */,
+				F93033E104853F61A5751459 /* CYLAnimatedItemResources.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

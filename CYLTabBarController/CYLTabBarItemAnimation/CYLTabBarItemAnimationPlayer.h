@@ -12,6 +12,9 @@
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Tab-Bar-Item-Animation.md
 // docs-binding:end
 
+
+// CYL-SWIFT-MIGRATION: objc-shell — [EN] Declares the Objective-C shell `CYLTabBarItemAnimationBasePlayer` (subclassed in Objective-C) and the player protocol it is used with. [CN] 声明 Objective-C 外壳类 `CYLTabBarItemAnimationBasePlayer`（供 Objective-C 继承）及与其配套的播放器协议。
+
 #import <UIKit/UIKit.h>
 
 NS_ASSUME_NONNULL_BEGIN
