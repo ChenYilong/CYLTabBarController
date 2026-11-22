@@ -377,7 +377,10 @@ docs/
 │   ├── harmonyos-verify-skins-eba8c44.png
 │   ├── harmonyos-verify-spanish.jpeg
 │   ├── harmonyos-x86-64-emulator-target-rive-still-images.png
+│   ├── harmonyos-x86-64-pag-4.5.102-version-match.png
+│   ├── harmonyos-x86-64-pag-debug-engine-kit.png
 │   ├── harmonyos-x86-64-rive-debug-engine-kit.png
+│   ├── harmonyos-x86-64-rive-onended-debug-engine-kit.png
 │   ├── image-only-tabs-gallery-3-3-ios17.png
 │   ├── image-only-tabs-ios.png
 │   ├── inset-grouped-sections-demo-ios.png
@@ -691,7 +694,8 @@ docs/
 │   ├── wechat-miniprogram-tab-item-badges.png
 │   ├── wechat-miniprogram-two-icon-layers-user-1-devtools.jpg
 │   ├── wechat-miniprogram-two-icon-layers-user-2-devtools.jpg
-│   └── wechat-miniprogram-visibility-hidden-identifiers-devtools-sdk3.17.6-49df44f.png
+│   ├── wechat-miniprogram-visibility-hidden-identifiers-devtools-sdk3.17.6-49df44f.png
+│   └── x86-64-emulators-pag-rive-display.png
 ├── commit-readiness-2026-11-09.md
 ├── instructions/
 │   ├── accessibility-localization.md

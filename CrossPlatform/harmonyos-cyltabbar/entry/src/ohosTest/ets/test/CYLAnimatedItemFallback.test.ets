@@ -33,12 +33,24 @@ function riveExpected(): boolean {
   return onArm64() || riveKit();
 }
 
+/**
+ * [EN] Whether the kit added PAG (only for a HAP that ships @tencent/libpag; this example does not, so false here).
+ * [CN] 调试引擎包是否加入了 PAG（仅当 HAP 含 @tencent/libpag；本示例不含，因此这里为 false）。
+ */
+function pagKit(): boolean {
+  riveKit();
+  return CYLAnimatedItemEngines.x86_64DebugEngines().indexOf('PAG') >= 0;
+}
+
 export default function cylAnimatedItemFallbackTest() {
   describe('CYLAnimatedItemFallback', () => {
     afterEach(() => {
       CYLAnimatedItemEngines.setDeviceAbis(undefined);
       if (riveKit()) {
         CYLAnimatedItemEngines.setRequiredNativeAbis('Rive', ['arm64-v8a', 'x86_64']);
+      }
+      if (pagKit()) {
+        CYLAnimatedItemEngines.setRequiredNativeAbis('PAG', ['arm64-v8a', 'x86_64']);
       }
     });
 
@@ -47,7 +59,7 @@ export default function cylAnimatedItemFallbackTest() {
     });
 
     it('PAG and Rive need arm64-v8a, Lottie SVGA and GIF need no native library', 0, () => {
-      expect(CYLAnimatedItemEngines.requiredNativeAbis('PAG').join(',')).assertEqual('arm64-v8a');
+      expect(CYLAnimatedItemEngines.requiredNativeAbis('PAG').join(',')).assertEqual(pagKit() ? 'arm64-v8a,x86_64' : 'arm64-v8a');
       // [EN] Rive gains x86_64 only through the x86_64 debug engine kit (next tests). [CN] Rive 只通过 x86_64 调试引擎包获得 x86_64（见后续测试）。
       expect(CYLAnimatedItemEngines.requiredNativeAbis('Rive').join(',')).assertEqual(riveKit() ? 'arm64-v8a,x86_64' : 'arm64-v8a');
       expect(CYLAnimatedItemEngines.requiredNativeAbis('Lottie').length).assertEqual(0);
@@ -56,10 +68,10 @@ export default function cylAnimatedItemFallbackTest() {
       expect(CYLAnimatedItemEngines.isSupportedOnDevice('GIF')).assertTrue();
     });
 
-    it('this device: PAG is supported exactly on arm64-v8a; Rive also on x86_64 with the debug engine kit', 0, () => {
+    it('this device: PAG and Rive are supported on arm64-v8a, and on x86_64 with the debug engine kit', 0, () => {
       CYLAnimatedItemEngines.register('Rive');
       expect(CYLAnimatedItemEngines.isSupportedOnDevice('Rive')).assertEqual(riveExpected());
-      expect(CYLAnimatedItemEngines.isSupportedOnDevice('PAG')).assertEqual(onArm64());
+      expect(CYLAnimatedItemEngines.isSupportedOnDevice('PAG')).assertEqual(onArm64() || pagKit());
       expect(CYLAnimatedItemEngines.canPlay('icons.riv')).assertEqual(riveExpected());
       expect(CYLAnimatedItemEngines.unsupportedReason('icons.riv').length > 0).assertEqual(!riveExpected());
     });
@@ -68,8 +80,8 @@ export default function cylAnimatedItemFallbackTest() {
       const kit = riveKit();
       expect(CYLAnimatedItemEngines.requiredNativeAbis('Rive').indexOf('arm64-v8a') >= 0).assertTrue();
       expect(CYLAnimatedItemEngines.requiredNativeAbis('Rive').indexOf('x86_64') >= 0).assertEqual(kit);
-      expect(CYLAnimatedItemEngines.requiredNativeAbis('PAG').join(',')).assertEqual('arm64-v8a');
-      expect(CYLAnimatedItemEngines.x86_64DebugEngines().every((type: string) => type === 'Rive')).assertTrue();
+      expect(CYLAnimatedItemEngines.requiredNativeAbis('PAG').join(',')).assertEqual(pagKit() ? 'arm64-v8a,x86_64' : 'arm64-v8a');
+      expect(CYLAnimatedItemEngines.x86_64DebugEngines().every((type: string) => type === 'Rive' || type === 'PAG')).assertTrue();
     });
 
     it('a simulated x86_64 device: Rive does not play and says why; arm64 plays it', 0, () => {

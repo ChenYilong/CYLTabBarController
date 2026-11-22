@@ -84,20 +84,25 @@ hdc shell aa test -b com.cyl.tabbar.harmony -m entry_test -s unittest OpenHarmon
 Result on 2026-11-22 (x86_64 emulator, HarmonyOS 6.0.1): Tests run: 6, Failure: 0, Error: 0, Pass: 6. On Windows give hdc
 backslash paths (`tools/cyl_hap_x86_64.py` does).
 
-### 5. Rive playback on x86_64: the debug engine kit (owner's Plan 1)
+### 5. Rive and PAG playback on x86_64: the debug engine kit (owner's Plan 1)
 
-`x86_64-debug-engines/rive/` holds `libohos_rive.so` of @ohos/rive 1.0.4 built for x86_64 from its sources (provenance,
-checksums and licenses in its README) and the x86_64 `libc++_shared.so` it links. It is never part of a build:
+`x86_64-debug-engines/rive/` holds `libohos_rive.so` of @ohos/rive 1.0.4 built for x86_64 from its sources and the x86_64
+`libc++_shared.so` it links; `x86_64-debug-engines/pag/` holds `libpag.so` of @tencent/libpag 4.4.31 built for x86_64 from
+GitHub Tencent/libpag `v4.4.31`, and `x86_64-debug-engines/pag-4.5.102/` the same for 4.5.102 (provenance, checksums and
+licenses in each README; each folder's `kit.json` names its package and version). It is never part of a build:
 
 - `tools/cyl_hap_x86_64.py install <app.hap>` adds the kit (`libs/x86_64/`) and the marker rawfile
-  `cyl_x86_64_debug_engines.json` when the device is x86_64 (`--x86-engines auto`, the default; `no` / `yes` or
+  `cyl_x86_64_debug_engines.json` when the device is x86_64, only for the engines the app uses (its `libs/` files and the
+  native modules its `ets/modules.abc` imports) and only in the exact package version the app's ArkTS was built with (read
+  from `ets/modules.abc`; a native library of another version crashed the app, so a mismatch is skipped with a message) (`--x86-engines auto`, the default; `no` / `yes` or
   `CYL_X86_ENGINES=0|1` force it).
 - `CYLAnimatedItemEngines.loadX86_64DebugEngines(context)` (called by `CYLAnimatedItemView` and `CYLTabBarController`)
-  reads the marker **in debug builds only** and lets Rive accept `x86_64`; `x86_64DebugEngines()` lists what it turned on.
+  reads the marker **in debug builds only** and lets the engines it names (Rive, PAG) accept `x86_64`; `x86_64DebugEngines()` lists what it turned on.
   Release builds and debug builds installed without the kit keep the still images.
-- The debug guard stays until the owner approves removing it. PAG has no x86_64 kit yet (its playback still needs arm64).
+- The debug guard stays until the owner approves removing it.
 
 Checked on the x86_64 emulator (2026-11-22): with the kit the Rive tab icons draw and animate, without it they keep their
-still images, and the hypium suite passes 9 / 9 in both installs.
+still images, and the hypium suite passes 9 / 9 in both installs; in CollectionViewClassifyMenu the PAG icons play and end
+on their last frame with the kit, no crash.
 
 Say in every report and screenshot footer which part ran on x86_64 and which still needs an arm64 device.
