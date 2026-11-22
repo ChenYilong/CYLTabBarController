@@ -95,10 +95,15 @@ Pod::Spec.new do |s|
 
   s.subspec 'PAGEnterprise' do |pagenterprise|
     pagenterprise.dependency 'CYLAnimatedItem/Engine'
-    pagenterprise.source_files = 'CYLTabBarController/CYLTabBarItemAnimation/PAG/*.{h,m,swift}'
+    # [EN] No Swift here: Swift cannot import libpag-enterprise's module (its umbrella header includes a missing header,
+    #      hence -fno-modules); CYLPAGTabBarItemAnimator.m has the Objective-C player behind CYL_PAG_OBJC_PLAYER.
+    # [CN] 此处不含 Swift：Swift 无法导入 libpag-enterprise 的模块（其 umbrella 头文件引用了缺失的头文件，因此使用 -fno-modules）；
+    #      CYLPAGTabBarItemAnimator.m 在 CYL_PAG_OBJC_PLAYER 下提供 Objective-C 播放器。
+    pagenterprise.source_files = 'CYLTabBarController/CYLTabBarItemAnimation/PAG/*.{h,m}'
     pagenterprise.public_header_files = 'CYLTabBarController/CYLTabBarItemAnimation/PAG/*.h'
     pagenterprise.dependency 'libpag-enterprise', '>= 4.0'
     pagenterprise.compiler_flags = '-fno-modules'
+    pagenterprise.pod_target_xcconfig = { 'GCC_PREPROCESSOR_DEFINITIONS' => '$(inherited) CYL_PAG_OBJC_PLAYER=1' }
   end
 
   s.subspec 'Rive' do |rive|
