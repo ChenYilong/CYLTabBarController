@@ -5,7 +5,7 @@ description: "How to name new code in CYLTabBarController after the SonarCloud r
 
 # Naming after the static analysis (added 2026-11-22)
 
-The same rule is in `AGENTS.md` ("Naming: keep the project's prefixes", sub-item "the prefix after the static analysis"). When they disagree, `AGENTS.md` wins; fix this file.
+The same rule is in `docs/instructions/code.md` ("Naming: keep the project's prefixes", sub-item "Swift names follow SonarCloud"). When they disagree, the instruction file wins; fix this file.
 
 ## Checklist
 
@@ -20,3 +20,34 @@ The same rule is in `AGENTS.md` ("Naming: keep the project's prefixes", sub-item
 ## Evidence
 
 SonarCloud, PR #788 (2026-11-22): 956 open issues: `swift:S100` 743, `swift:S115` 146, `S1075` 18, `S116` 16, `S117` 11, `S101` 3. Rule formats: S100 and S115 `^[a-z][a-zA-Z0-9]*$`, S101 `^[A-Z][a-zA-Z0-9]*$`.
+
+## Table (Swift, 2026-11-23)
+
+| Symbol | Swift name | Objective-C name |
+|---|---|---|
+| Type | `CYLFoo` (no leading `_`) | same (`@objc(CYLFoo)`) |
+| Member of our own type | `foo` | `@objc(cyl_foo:)` = the exact old selector, when Objective-C calls it |
+| Member added in an extension | `cylFoo` | `@objc(cyl_foo:)` |
+| Global function / constant | `cylFoo` | unchanged C name through `@_cdecl("CYLFoo")` |
+| `@_cdecl` function | `cylFooEntryPoint` | `CYLFoo` |
+| Enum case | lowerCamelCase, no backticks (`.standard`, not `` .`default` ``) | `NS_SWIFT_NAME` if needed |
+| Test helper | lowerCamelCase, never an XCTest name (`assertAccuratelyEqual`, not `XCTAssertEqual`) | n/a |
+| Unused parameter | `_` or `label _` (S1172) | n/a |
+| Function with more than 7 parameters | group into a struct or options object (S107) | n/a |
+
+## Names that stay (bucket d of docs/Swift-Coding-Style.md)
+
+- An `open` member: a client subclass overrides it by name, a deprecated forward cannot redirect an override.
+- A requirement of a public protocol apps implement (`CYLBadgeProtocol`, `CYLTabBarTheme`, `CYLTabButtonAnimation`,
+  `UINavigationControllerExtensionDelegate`), and our witnesses of it. To add a Swift-style name, add a second method
+  without the underscore (see "Swift-friendly names for underscored protocol methods" in `docs/instructions/code.md`).
+- A released enum case (`.default`).
+- Each one is listed with its reason in bucket d and accepted in the SonarCloud UI by the owner. Do not add to the list
+  for new code: a new member is `open` only when subclassing it is intended, and a new protocol requirement uses the
+  Swift name.
+
+## Check before committing Swift
+
+`grep -rnE '\b(func|var|let) cyl_|func CYL[A-Za-z]*\(' CYLTabBarController --include='*.swift' | grep -v Deprecated/`
+prints only names listed in bucket d. Then diff the generated `CYLTabBarController-Swift.h`: selectors stay identical.
+

@@ -43,6 +43,17 @@ by tag and kept under 200 lines: see [instructions.md](instructions.md)).
   - Remove any other prefix the copied code carries (another project's or author's prefix, `XX`, `My`, `QMUI`, `JX`…)
     and rename its symbols, files and references accordingly; keep a credit to the source in a comment instead.
   - Keep the names of public APIs that already shipped, as the Public API rule requires; this rule is for new code.
+  - **Swift names follow SonarCloud (added 2026-11-23, owner; swift:S100 / S101 / S115 / S116 / S117 and the Swift
+    API Design Guidelines).** The `cyl_` rule above is for Objective-C selectors and for non-Swift languages. In Swift:
+    types keep `CYL` (`CYLFoo`, no leading underscore); a member of our own type has no prefix (`reloadTabButtons`);
+    a member added to a system type or to one of our types in an extension is `cylFoo` (add `@objc(cyl_foo)` when
+    Objective-C calls it, so the selector stays); a global function or constant is `cylFoo`; a test helper is
+    lowerCamelCase and never shares an XCTest name; the Swift name of an `@_cdecl("CYLFoo")` function is
+    `cylFooEntryPoint`. Never write `func cyl_foo`, `var cyl_foo`, `let CYLFoo` or `func CYLFoo` in a new Swift file.
+    A name that must stay (an `open` member a client may override, a requirement of a public protocol that apps
+    implement, a released `.default`) is listed in docs/Swift-Coding-Style.md, bucket d, with its reason. Renaming a
+    released Swift name needs a deprecated forward under a `Deprecated/` folder (excluded in `.sonarcloud.properties`).
+    Details and the check: skill `cyl-naming`.
   - Sample apps follow it too: React Native and Flutter components, helpers and assets of the examples use `CYL`
     (`CYLBadgeView`, `cyl_badge_sample_icon`), unless the platform's own naming forbids it (e.g. Dart file names are
     snake_case: `cyl_badge_view.dart`).

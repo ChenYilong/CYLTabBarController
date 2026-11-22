@@ -55,7 +55,7 @@ private let cylAnimationTypeTable: [CYLAnimationTypeEntry] = [
  [CN] `attributes` 中通用 key 的值：先取通用 key，再依次取每种类型的专用 key。
  */
 @_cdecl("CYLAnimationAttributesValue")
-public func CYLAnimationAttributesValueEntryPoint(_ attributes: NSDictionary?, _ genericKey: NSString) -> Any? {
+public func cylAnimationAttributesValueEntryPoint(_ attributes: NSDictionary?, _ genericKey: NSString) -> Any? {
     guard let attributes, genericKey.length > 0 else { return nil }
     if let value = attributes[genericKey] {
         return value
@@ -73,7 +73,7 @@ public func CYLAnimationAttributesValueEntryPoint(_ attributes: NSDictionary?, _
  [CN] Tab 的动画类型：`attributes` 使用了哪种类型的 key 即为该类型，否则按文件扩展名判断。
  */
 @_cdecl("CYLAnimationTypeOfFile")
-public func CYLAnimationTypeOfFileEntryPoint(_ attributes: NSDictionary?, _ fileURL: NSURL?) -> NSString? {
+public func cylAnimationTypeOfFileEntryPoint(_ attributes: NSDictionary?, _ fileURL: NSURL?) -> NSString? {
     if let attributes {
         for entry in cylAnimationTypeTable where entry.keys.values.contains(where: { attributes[$0] != nil }) {
             return entry.type as NSString
@@ -88,7 +88,7 @@ public func CYLAnimationTypeOfFileEntryPoint(_ attributes: NSDictionary?, _ file
  [EN] The names of the known animation types. [CN] 已知动画类型的名称。
  */
 @_cdecl("CYLAnimationKnownTypes")
-public func CYLAnimationKnownTypesEntryPoint() -> NSArray {
+public func cylAnimationKnownTypesEntryPoint() -> NSArray {
     cylAnimationTypeTable.map { $0.type } as NSArray
 }
 
@@ -96,7 +96,7 @@ public func CYLAnimationKnownTypesEntryPoint() -> NSArray {
  [EN] The subspec that brings a type's engine ("Lottie" → "LottieSwift"). [CN] 提供某类型引擎的子库（"Lottie" → "LottieSwift"）。
  */
 @_cdecl("CYLAnimationSubspecOfType")
-public func CYLAnimationSubspecOfTypeEntryPoint(_ type: NSString?) -> NSString? {
+public func cylAnimationSubspecOfTypeEntryPoint(_ type: NSString?) -> NSString? {
     guard let type, type.length > 0 else { return nil }
     return cylAnimationTypeTable.first { $0.type == type as String }?.pod as NSString?
 }
@@ -105,7 +105,7 @@ public func CYLAnimationSubspecOfTypeEntryPoint(_ type: NSString?) -> NSString? 
  [EN] The file extensions of a type. [CN] 某类型的文件扩展名。
  */
 @_cdecl("CYLAnimationFileExtensionsOfType")
-public func CYLAnimationFileExtensionsOfTypeEntryPoint(_ type: NSString?) -> NSArray {
+public func cylAnimationFileExtensionsOfTypeEntryPoint(_ type: NSString?) -> NSArray {
     guard let type, type.length > 0 else { return [] as NSArray }
     return (cylAnimationTypeTable.first { $0.type == type as String }?.extensions ?? []) as NSArray
 }

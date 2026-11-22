@@ -75,7 +75,7 @@ public final class CYLGIFTabBarItemAnimationView: UIImageView, CYLTabBarItemAnim
         return true
     }
 
-    public static func makeAnimationView(fileURL: URL, options: [String: String],
+    public static func makeAnimationView(fileURL: URL, options _: [String: String],
                                          contentMode: UIView.ContentMode) -> (UIView & CYLTabBarItemAnimationPlayableView)? {
         if !fileURL.isFileURL, let scheme = fileURL.scheme, !scheme.isEmpty {
             return downloadingView(url: fileURL, contentMode: contentMode)

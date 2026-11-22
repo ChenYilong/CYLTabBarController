@@ -176,7 +176,7 @@ public final class CYLLottieSwiftTabBarItemAnimationPlayer: CYLTabBarItemAnimati
      * [CN] FIX: issue #216 — 用 Lottie 的 value provider 设置 `colors`（已解析），并移除上一次调用设置、这次不再包含的 keypath 的 provider；
      *      nil 移除全部。
      */
-    public func applyColors(_ colors: [String: UIColor]?, traitCollection: UITraitCollection) {
+    public func applyColors(_ colors: [String: UIColor]?, traitCollection _: UITraitCollection) {
         guard let lottieView else {
             return
         }

@@ -69,7 +69,7 @@ final class CYLAnimationEngineSwiftTests: XCTestCase {
         XCTAssertEqual(animation.calculationMode, .discrete)
         XCTAssertEqual(animation.duration, 0.5, accuracy: 0.001)
         XCTAssertEqual(animation.values?.count, 2)
-        XCTAssertEqual(animation.keyTimes?.map(\.doubleValue) ?? [], [0, 0.4, 1], accuracy: 0.001)
+        assertAccuratelyEqual(animation.keyTimes?.map(\.doubleValue) ?? [], [0, 0.4, 1], accuracy: 0.001)
         XCTAssertFalse(view.image === first, "the last frame is the end state")
         view.stopAnimation()
         XCTAssertNil(view.layer.animation(forKey: "CYLGIFTabBarItemPlayAnimation"))
@@ -97,7 +97,7 @@ final class CYLAnimationEngineSwiftTests: XCTestCase {
     }
 }
 
-private func XCTAssertEqual(_ lhs: [Double], _ rhs: [Double], accuracy: Double, file: StaticString = #filePath, line: UInt = #line) {
+private func assertAccuratelyEqual(_ lhs: [Double], _ rhs: [Double], accuracy: Double, file: StaticString = #filePath, line: UInt = #line) {
     XCTAssertEqual(lhs.count, rhs.count, file: file, line: line)
     for (a, b) in zip(lhs, rhs) {
         XCTAssertEqual(a, b, accuracy: accuracy, file: file, line: line)
