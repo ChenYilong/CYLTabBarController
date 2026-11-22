@@ -774,6 +774,60 @@ object CYLReflection {
  *      registered when that library is in the app. Looked up last: it plays every file no other animator plays.
  * [CN] 使用 lottie-android（`com.airbnb.lottie.LottieAnimationView`）的 Lottie Tab 图标，App 中有该库时注册。最后查找：播放其他 animator 都不播放的文件。
  */
+/**
+ * [EN] The images of a Lottie file (its "assets" with a "p" file name): lottie-android throws when it draws an image layer
+ *      without an images folder or a delegate ("You must set an images folder"), while lottie-ios loads them by name. The
+ *      delegate loads each image from the app's drawable of the same name (lower case, "-" as "_"), else from the app's
+ *      assets next to the file ("<file's folder>/<u><p>", then "<u><p>"), else gives none. Embedded ("data:") images are
+ *      decoded by lottie-android itself. An app that set its own delegate keeps it (set after the view is made, it
+ *      replaces this one). By reflection: the component does not depend on lottie-android. Moved from
+ *      CollectionViewClassifyMenu's `CYLTagLottieImages` (its tags' Lottie files with images).
+ * [CN] Lottie 文件的图片（"assets" 中带 "p" 文件名的条目）：没有图片目录或代理时，lottie-android 绘制图片图层会抛出异常，而 lottie-ios 按名称
+ *      加载。该代理先从 App 同名 drawable（小写，"-" 换成 "_"）加载，再从 App assets 中文件旁（"<文件目录>/<u><p>"，然后 "<u><p>"）加载，否则不提供。
+ *      内嵌（"data:"）图片由 lottie-android 自己解码。App 之后设置的代理会替换本代理。通过反射实现：组件不依赖 lottie-android。从
+ *      CollectionViewClassifyMenu 的 `CYLTagLottieImages` 迁移而来。
+ */
+internal object CYLLottieImageAssets {
+    fun prepare(context: Context, view: View, file: String) {
+        val delegateType = CYLReflection.type("com.airbnb.lottie.ImageAssetDelegate") ?: return
+        val folder = if (file.contains('/')) file.substringBeforeLast('/') + "/" else ""
+        val appContext = context.applicationContext ?: context
+        try {
+            val delegate = java.lang.reflect.Proxy.newProxyInstance(delegateType.classLoader, arrayOf(delegateType)) { proxy, method, args ->
+                when (method.name) {
+                    "fetchBitmap" -> args?.firstOrNull()?.let { bitmap(appContext, it, folder) }
+                    "hashCode" -> System.identityHashCode(proxy)
+                    "equals" -> proxy === args?.firstOrNull()
+                    "toString" -> "CYLLottieImageAssets"
+                    else -> null
+                }
+            }
+            view.javaClass.getMethod("setImageAssetDelegate", delegateType).invoke(view, delegate)
+        } catch (error: Throwable) {
+            // [EN] An older lottie-android without the delegate: the failure listener shows the static image.
+            // [CN] 没有该代理的旧版 lottie-android：失败监听显示静态图片。
+        }
+    }
+
+    private fun bitmap(context: Context, asset: Any, folder: String): android.graphics.Bitmap? {
+        val fileName = asset.javaClass.getMethod("getFileName").invoke(asset) as? String ?: return null
+        val dirName = (try { asset.javaClass.getMethod("getDirName").invoke(asset) as? String } catch (e: Throwable) { null }) ?: ""
+        val name = fileName.substringAfterLast('/').substringBeforeLast('.').replace('-', '_').lowercase()
+        val id = context.resources.getIdentifier(name, "drawable", context.packageName)
+        if (id != 0) {
+            return android.graphics.BitmapFactory.decodeResource(context.resources, id)
+        }
+        for (path in listOf(folder + dirName + fileName, dirName + fileName, fileName)) {
+            try {
+                context.assets.open(path).use { return android.graphics.BitmapFactory.decodeStream(it) }
+            } catch (error: Throwable) {
+                // [EN] Try the next location. [CN] 尝试下一个位置。
+            }
+        }
+        return null
+    }
+}
+
 object CYLLottieTabBarItemAnimator : CYLTabBarItemAnimator {
     private const val VIEW_CLASS = "com.airbnb.lottie.LottieAnimationView"
     val isAvailable: Boolean get() = CYLReflection.type(VIEW_CLASS) != null
@@ -806,6 +860,7 @@ object CYLLottieTabBarItemAnimator : CYLTabBarItemAnimator {
         //      代理从 drawable 目录解码（已按屏幕缩放）的位图或 @2x / @3x 文件会大 2-3 倍并溢出图标。
         CYLReflection.call(view, "setMaintainOriginalImageBounds", true)
         val file = url.substringBefore('#')
+        CYLLottieImageAssets.prepare(context, view, file)
         setFailureListener(view, file)
         if (CYLTabBarItemAnimationFiles.isRemote(file)) {
             // [EN] A download: the host shows its static image or placeholder until the composition is loaded.
