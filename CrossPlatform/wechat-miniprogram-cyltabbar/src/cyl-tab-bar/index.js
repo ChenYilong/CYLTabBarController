@@ -21,7 +21,14 @@ const { cylTabBarItemStyle, cylTabBarItemStyleForStyleType, cylGlassLensStyle } 
  * [CN] 来自样式表的高度（px）：TabBar（index.wxss `.cyl-tab`，液态玻璃 `.cyl-style-liquidGlass .cyl-tab`）、Tab 的默认图标
  *      及其标题（cyl-tab-bar-item：间距 2 + 行 12）以及 PlusButton 标题（间距 2 + 行 12）。
  */
-const CYL_BAR_HEIGHT = 50;
+/**
+ * [EN] The default bar height when the app sets no `tabBarHeight`: 48 px, the WeChat native tab bar's height (measured in
+ *      WeChat DevTools 3.17.6, iPhone 12/13 Pro: a page is 82 px shorter with the native tab bar, minus the 34 px safe
+ *      area), so the bar matches the system tab bar as on iOS, Android and HarmonyOS. It was 50 px before 2026-11-22.
+ * [CN] App 未设置 `tabBarHeight` 时的默认高度：48 px，即微信原生 tabBar 的高度（微信开发者工具 3.17.6、iPhone 12/13 Pro 实测：有原生 tabBar 时
+ *      页面矮 82 px，减去 34 px 安全区），与 iOS、Android、鸿蒙一样与系统 TabBar 等高。2026-11-22 之前为 50 px。
+ */
+const CYL_BAR_HEIGHT = 48;
 const CYL_LIQUID_GLASS_BAR_HEIGHT = 62;
 const CYL_ITEM_ICON_HEIGHT = 28;
 const CYL_ITEM_TITLE_HEIGHT = 14;
@@ -33,6 +40,15 @@ const CYL_PLUS_TITLE_HEIGHT = 14;
  * [CN] Tab 标题所在的行，取自第一个 Tab：其图标高度（动画或图片尺寸，否则 28 px，与 cyl-tab-bar-item 的绘制一致）与其
  *      标题的垂直偏移（CYLTabBarItemTitlePositionAdjustment）。
  */
+/**
+ * [EN] The classic bar's height: `tabBarHeight` when the app sets one (more than 0), else the system tab bar's 48 px.
+ * [CN] 经典 TabBar 的高度：App 设置了 `tabBarHeight`（大于 0）时使用它，否则为系统 tabBar 的 48 px。
+ */
+function cylBarHeight(tabBarHeight) {
+  const value = Number(tabBarHeight);
+  return Number.isFinite(value) && value > 0 ? value : CYL_BAR_HEIGHT;
+}
+
 function cylTitleLine(slots) {
   const slot = slots.find((candidate) => candidate.item);
   const size = slot ? (slot.item.animationSize || slot.item.imageSize) : null;
@@ -233,6 +249,12 @@ Component({
      */
     configuration: { type: Object, value: {} },
     /**
+     * [EN] The bar's height in px (`tabBarHeight`); 0 or less: the default, the WeChat native tab bar's 48 px. Not used by
+     *      the Liquid Glass style, whose capsule has its own height.
+     * [CN] TabBar 高度（px，`tabBarHeight`）；0 或更小：默认值，即微信原生 tabBar 的 48 px。液态玻璃样式不使用，其胶囊有自己的高度。
+     */
+    tabBarHeight: { type: Number, value: 0 },
+    /**
      * [EN] The localization table of the configuration for the current language (title -> translation).
      * [CN] 当前语言的配置本地化表（标题 -> 译文）。
      */
@@ -328,7 +350,7 @@ Component({
   },
 
   observers: {
-    'configuration, strings, symbolsByTheme, imageBasePath, animationBasePath, selectedIdentifier, appVersion, itemStyle, glassLensStyle, hiddenIdentifiers': function () {
+    'configuration, strings, symbolsByTheme, imageBasePath, animationBasePath, selectedIdentifier, appVersion, itemStyle, glassLensStyle, hiddenIdentifiers, tabBarHeight': function () {
       this.cyl_render();
     },
   },
@@ -407,7 +429,7 @@ Component({
       const slots = model.items.map((item) => this.cyl_slot(item, selected));
       if (model.plusButton) {
         slots.splice(model.plusButton.index, 0, this.cyl_plusSlot(model.plusButton, selected,
-          this.cyl_itemStyle(model) === 'liquidGlass' ? CYL_LIQUID_GLASS_BAR_HEIGHT : CYL_BAR_HEIGHT,
+          this.cyl_itemStyle(model) === 'liquidGlass' ? CYL_LIQUID_GLASS_BAR_HEIGHT : cylBarHeight(this.data.tabBarHeight),
           cylTitleLine(slots)));
       }
       slots.forEach((slot, index) => {
@@ -427,7 +449,8 @@ Component({
           ? this.cylRequestedGlassLensStyle : this.data.glassLensStyle),
         cylStyleType: styleType,
         cylIsDark: model.isDark,
-        cylBarStyle: (model.backgroundColor ? `background-color: ${model.backgroundColor};` : '')
+        cylBarStyle: (itemStyle === 'liquidGlass' ? '' : `--cyl-bar-height: ${cylBarHeight(this.data.tabBarHeight)}px;`)
+          + (model.backgroundColor ? `background-color: ${model.backgroundColor};` : '')
           + (model.shadowColor ? `border-top-color: ${model.shadowColor};` : ''),
         cylThemeIdentifier: model.themeIdentifier,
         cylTapAnimation: model.tapAnimation,

@@ -57,7 +57,7 @@ package it installed.
 <cyl-tab-bar generic:cyl-lottie-view="cyl-lottie" configuration="{{configuration}}" selected-identifier="{{selected}}" animation-base-path="/assets/lottie" bind:select="onSelect" />
 ```
 
-Properties: `itemStyle` (CYLTabBarItemStyle `flat` / `liquidGlass`), `glassLensStyle` (CYLGlassLensStyle `regular`, the default "liquid", / `skeuomorphic`, "skeuomorphic liquid"; Liquid Glass only), `animationSpeed`, `animationLoop`, `configuration`, `strings`, `symbolsByTheme`, `imageBasePath`, `animationBasePath`, `selectedIdentifier`,
+Properties: `tabBarHeight` (px; the default, 0, is 48 px, the WeChat native tab bar's height; not used by Liquid Glass), `itemStyle` (CYLTabBarItemStyle `flat` / `liquidGlass`), `glassLensStyle` (CYLGlassLensStyle `regular`, the default "liquid", / `skeuomorphic`, "skeuomorphic liquid"; Liquid Glass only), `animationSpeed`, `animationLoop`, `configuration`, `strings`, `symbolsByTheme`, `imageBasePath`, `animationBasePath`, `selectedIdentifier`,
 `loggedIn`, `appVersion`. Events: `select`, `reselect`, `plustap`, `loginrequired` (detail: `index`, `identifier`,
 `pageIdentifier`, `pageParameters`, `context`, `isPlusButton`). Methods: `cyl_selectIdentifier`, `cyl_showBadgeValue`,
 `cyl_showBadgeDot`, `cyl_removeBadge`, `cyl_setThemeIdentifier`, `cyl_themeIdentifiers`, `cyl_playLottie`,
