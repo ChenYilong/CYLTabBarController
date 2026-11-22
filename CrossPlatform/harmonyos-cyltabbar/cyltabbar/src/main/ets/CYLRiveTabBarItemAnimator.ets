@@ -432,6 +432,21 @@ export struct CYLRiveIcon {
     }
   }
 
+  /**
+   * [EN] Plays the state machine by name. An unnamed `play()` also starts the artboard's linear animations (see the resume
+   *      above); a looping one kept `isPlaying()` true for good, so a play-once pass never ended and `onEnded` never came
+   *      (house.riv on the HarmonyOS emulator: a state machine and a linear animation still playing 10 s after the pass).
+   * [CN] 按名字播放状态机。不带名字的 `play()` 还会启动画板的线性动画（见上方的恢复）；循环的线性动画使 `isPlaying()` 一直为 true，
+   *      只播放一次的一遍永不结束，`onEnded` 也就从不调用（鸿蒙模拟器上的 house.riv：一遍之后 10 秒仍有一个状态机和一个线性动画在播放）。
+   */
+  private cylPlayMachine(view: RiveAnimationView, machine: string | undefined): void {
+    if (machine !== undefined) {
+      view.play(machine, undefined, undefined, true);
+    } else {
+      view.play();
+    }
+  }
+
   private cylPlay(view: RiveAnimationView): void {
     this.cylCancelDeactivate();
     this.cylCancelLoop();
@@ -458,7 +473,7 @@ export struct CYLRiveIcon {
       view.play(animation, Loop.ONESHOT);
     } else if (triggerInput !== undefined && machine !== undefined && this.cylHasInput(view, machine, triggerInput)) {
       this.cylReset(view);
-      view.play();
+      this.cylPlayMachine(view, machine);
       this.startPending = true;
       this.deactivateTimer = setTimeout(() => {
         this.deactivateTimer = -1;
@@ -473,11 +488,11 @@ export struct CYLRiveIcon {
       }, CYL_RIVE_NEXT_FRAME_MS);
     } else if (numberInput !== undefined && machine !== undefined && this.cylHasInput(view, machine, numberInput)) {
       // [EN] The next value: house.riv moves only when Rooms changes. [CN] 下一个值：house.riv 只在 Rooms 变化时运动。
-      view.play();
+      this.cylPlayMachine(view, machine);
       view.setNumberState(machine, numberInput,
         cylRiveNextNumber(this.cylOption(CYLTabBarAnimationOptionRiveNumberValues), this.cylNumberValue(view, machine, numberInput)));
     } else if (trigger !== undefined && instance !== null) {
-      view.play();
+      this.cylPlayMachine(view, machine);
       try {
         instance.getTriggerProperty(trigger).trigger();
       } catch (e) {
@@ -485,7 +500,7 @@ export struct CYLRiveIcon {
       }
     } else if (instance !== null || (legacyInput !== undefined && machine !== undefined
       && this.cylHasInput(view, machine, legacyInput))) {
-      view.play();
+      this.cylPlayMachine(view, machine);
       this.cylSetActive(view, false);
       const duration = this.cylDuration();
       this.startPending = true;

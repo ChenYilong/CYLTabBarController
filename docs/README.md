@@ -380,6 +380,7 @@ docs/
 │   ├── harmonyos-x86-64-pag-4.5.102-version-match.png
 │   ├── harmonyos-x86-64-pag-debug-engine-kit.png
 │   ├── harmonyos-x86-64-rive-debug-engine-kit.png
+│   ├── harmonyos-x86-64-rive-onended-debug-engine-kit.png
 │   ├── image-only-tabs-gallery-3-3-ios17.png
 │   ├── image-only-tabs-ios.png
 │   ├── inset-grouped-sections-demo-ios.png
