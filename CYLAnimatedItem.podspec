@@ -117,7 +117,7 @@ Pod::Spec.new do |s|
 
   s.subspec 'SVGA' do |svga|
     svga.dependency 'CYLAnimatedItem/Engine'
-    svga.source_files = 'CYLTabBarController/CYLTabBarItemAnimation/SVGA/*.{h,m}'
+    svga.source_files = 'CYLTabBarController/CYLTabBarItemAnimation/SVGA/*.{h,m,swift}'
     svga.public_header_files = 'CYLTabBarController/CYLTabBarItemAnimation/SVGA/*.h'
     svga.dependency 'SVGAPlayerLite', '~> 1.0', '>= 1.0.8'
   end
