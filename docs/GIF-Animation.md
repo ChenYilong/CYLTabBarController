@@ -89,7 +89,7 @@ pod 'CYLTabBarController/GIF'
 ```swift
 // The generic helper finds the file by name and picks the library by its extension. 通用函数按名称查找文件，并按扩展名选择动画库。
 var item = CYLTabBarItemAttributesAddingAnimationFile(attributes, "tab_star.gif", nil) as? [String: Any]
-item?[CYLTabBarAnimationSize] = NSValue(cgSize: CGSize(width: 30, height: 30))
+item?[cylTabBarAnimationSize] = NSValue(cgSize: CGSize(width: 30, height: 30))
 ```
 
 | Key | 说明 / Description |

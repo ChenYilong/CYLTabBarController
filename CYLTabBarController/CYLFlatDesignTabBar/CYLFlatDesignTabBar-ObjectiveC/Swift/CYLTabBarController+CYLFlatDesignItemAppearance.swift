@@ -77,11 +77,11 @@ extension CYLTabBarController {
         for (index, viewController) in viewControllers.enumerated() {
             guard let attributes = tabBarItemAttributes(at: UInt(index)),
                   let item = objc_getAssociatedObject(viewController, cylFlatDesignTabBarItemKey) as? CYLFlatDesignTabBarItem else { continue }
-            let titleFont = attributes[CYLTabBarItemTitleFont] as? UIFont
-            let selectedTitleFont = attributes[CYLTabBarItemSelectedTitleFont] as? UIFont ?? titleFont
+            let titleFont = attributes[cylTabBarItemTitleFont] as? UIFont
+            let selectedTitleFont = attributes[cylTabBarItemSelectedTitleFont] as? UIFont ?? titleFont
             let values: [(UIControl.State, NSAttributedString.Key, Any?)] = [
-                (.normal, .foregroundColor, attributes[CYLTabBarItemTitleColor] as? UIColor),
-                (.selected, .foregroundColor, attributes[CYLTabBarItemSelectedTitleColor] as? UIColor),
+                (.normal, .foregroundColor, attributes[cylTabBarItemTitleColor] as? UIColor),
+                (.selected, .foregroundColor, attributes[cylTabBarItemSelectedTitleColor] as? UIColor),
                 (.normal, .font, titleFont),
                 (.selected, .font, selectedTitleFont),
             ]
@@ -93,10 +93,10 @@ extension CYLTabBarController {
                 textAttributes[key] = value
                 item.setTitleTextAttributes(textAttributes, for: state)
             }
-            if let color = attributes[CYLTabBarItemBackgroundColor] as? UIColor, item.backgroundColor != color {
+            if let color = attributes[cylTabBarItemBackgroundColor] as? UIColor, item.backgroundColor != color {
                 item.backgroundColor = color
             }
-            if let color = attributes[CYLTabBarItemSelectedBackgroundColor] as? UIColor, item.selectedBackgroundColor != color {
+            if let color = attributes[cylTabBarItemSelectedBackgroundColor] as? UIColor, item.selectedBackgroundColor != color {
                 item.selectedBackgroundColor = color
             }
         }

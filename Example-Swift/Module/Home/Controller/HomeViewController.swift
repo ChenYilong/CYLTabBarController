@@ -14,6 +14,6 @@ final class HomeViewController: CYLBadgeHelperTableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         // No navigation bar button here: a bell button is added first. 没有导航栏按钮：先添加铃铛按钮。
-        cyl_showNavigationBadge(value: "new", animationType: .breathe, backgroundColor: UIColor.cyl_randomColor)
+        cylShowNavigationBadge(value: "new", animationType: .breathe, backgroundColor: UIColor.cyl_randomColor)
     }
 }

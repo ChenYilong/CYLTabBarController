@@ -53,7 +53,7 @@
 
 ```swift
 // Swift
-var home: [AnyHashable: Any] = [CYLTabBarItemTitle: "Home", CYLTabBarItemImage: "home_normal"]
+var home: [AnyHashable: Any] = [cylTabBarItemTitle: "Home", cylTabBarItemImage: "home_normal"]
 home[CYLTabBarSVGAURL] = Bundle.main.url(forResource: "heartbeat", withExtension: "svga")
 home[CYLTabBarSVGASize] = NSValue(cgSize: CGSize(width: 33, height: 33))
 

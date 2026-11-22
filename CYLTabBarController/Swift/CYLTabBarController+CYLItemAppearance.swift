@@ -32,7 +32,7 @@ private let cylImageOnlyTabAdjustmentKey = CYLUtilsKeys.key("cyl_imageOnlyTabAdj
  [CN] 记住 Tab 自身设置的标题偏移，使控制器的偏移不会覆盖它（为零时清除）。CYLTabBarController.m 以此 C 名称调用。
  */
 @_cdecl("CYLRememberItemTitlePositionAdjustment")
-public func CYLRememberItemTitlePositionAdjustment(_ item: AnyObject?, _ offset: UIOffset) {
+public func cylRememberItemTitlePositionAdjustment(_ item: AnyObject?, _ offset: UIOffset) {
     guard let item else { return }
     let value: NSValue? = offset == .zero ? nil : NSValue(uiOffset: offset)
     objc_setAssociatedObject(item, cylTitlePositionAdjustmentItemOffsetKey, value, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
@@ -43,7 +43,7 @@ public func CYLRememberItemTitlePositionAdjustment(_ item: AnyObject?, _ offset:
  [CN] 记住 Tab 自身设置的图片内边距（为零时清除）。CYLTabBarController.m 以此 C 名称调用。
  */
 @_cdecl("CYLRememberItemImageInsets")
-public func CYLRememberItemImageInsets(_ item: AnyObject?, _ insets: UIEdgeInsets) {
+public func cylRememberItemImageInsets(_ item: AnyObject?, _ insets: UIEdgeInsets) {
     guard let item else { return }
     let value: NSValue? = insets == .zero ? nil : NSValue(uiEdgeInsets: insets)
     objc_setAssociatedObject(item, cylImageInsetsItemKey, value, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
@@ -143,12 +143,12 @@ extension CYLTabBarController {
                   (attributes["CYLTabBarLottieLoopsWhenUnselected"] as? NSNumber)?.boolValue == true,
                   let control = viewController.tabBarItem.cyl_tabButton ?? viewController.cyl_tabButton else { continue }
             var controls = [control]
-            if CYLConstants.isLiquidGlassActive(), let selectedLayer = control.cyl_platterSelected(), selectedLayer !== control {
+            if CYLConstants.isLiquidGlassActive(), let selectedLayer = control.cylPlatterSelected(), selectedLayer !== control {
                 controls.append(selectedLayer)
             }
             let selected = viewController === selectedViewController
             for each in controls {
-                guard let lottieView = each.cyl_tabBarItemAnimationView() else { continue }
+                guard let lottieView = each.cylTabBarItemAnimationView() else { continue }
                 if selected {
                     cylCallIfImplemented(lottieView, "pause")
                     continue
@@ -178,6 +178,6 @@ extension CYLTabBarController {
     @objc(getImageFromImageInfo:)
     func cylGetImage(fromImageInfo imageInfo: Any?) -> UIImage? {
         guard let imageInfo else { return nil }
-        return UIImage.cyl_getImage(fromImageInfo: imageInfo)
+        return UIImage.cylGetImage(fromImageInfo: imageInfo)
     }
 }

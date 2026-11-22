@@ -130,7 +130,7 @@ enum CYLThemeRuntime {
     }
 
     private static func refreshLayerColors(ofViewTree view: UIView) {
-        view.layer.cyl_updateThemeColors()
+        view.layer.cylUpdateThemeColors()
         for subview in view.subviews {
             refreshLayerColors(ofViewTree: subview)
         }

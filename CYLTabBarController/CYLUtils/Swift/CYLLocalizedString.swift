@@ -21,14 +21,14 @@ import UIKit
  * [EN] Posted on the main thread after `CYLSetLocalizationLanguage()` changed the language.
  * [CN] `CYLSetLocalizationLanguage()` 修改语言后在主线程发送。
  */
-public let CYLLocalizationLanguageDidChangeNotification =
+public let cylLocalizationLanguageDidChangeNotification =
     "CYLLocalizationLanguageDidChangeNotification"
 
 /**
  * [EN] The string of `key` in the library's string table, in the current language; `key` itself when there is none.
  * [CN] 本库字符串表中 `key` 在当前语言下的字符串；没有时返回 `key` 本身。
  */
-public func CYLLocalizedString(_ key: String) -> String {
+public func cylLocalizedString(_ key: String) -> String {
     CYLLocalization.string(key, bundle: CYLLocalization.languageBundle().bundle)
 }
 
@@ -37,7 +37,7 @@ public func CYLLocalizedString(_ key: String) -> String {
  *      Carthage and a copied folder.
  * [CN] 本库的资源包（`CYLTabBarController.bundle`），在 CocoaPods、SwiftPM、Carthage 与直接拖入时以同样方式找到。
  */
-public func CYLResourceBundle() -> Bundle {
+public func cylResourceBundle() -> Bundle {
     CYLLocalization.resourceBundle
 }
 
@@ -46,7 +46,7 @@ public func CYLResourceBundle() -> Bundle {
  *      `CYLLocalizationLanguageDidChangeNotification` on the main thread.
  * [CN] 设置本库字符串的语言；传 nil 恢复跟随 App。在主线程发送 `CYLLocalizationLanguageDidChangeNotification`。
  */
-public func CYLSetLocalizationLanguage(_ language: String?) {
+public func cylSetLocalizationLanguage(_ language: String?) {
     CYLLocalization.setLanguage(language)
 }
 
@@ -54,7 +54,7 @@ public func CYLSetLocalizationLanguage(_ language: String?) {
  * [EN] The string of `key` in `language` (nil: the system's preferred languages).
  * [CN] `key` 在 `language` 中的字符串（nil：系统的首选语言）。
  */
-public func CYLLocalizedStringForLanguage(_ key: String, _ language: String?) -> String {
+public func cylLocalizedStringForLanguage(_ key: String, _ language: String?) -> String {
     let closest = CYLLocalization.closestLanguage(language.map { [$0] } ?? Locale.preferredLanguages)
     return CYLLocalization.string(key, bundle: CYLLocalization.bundle(forLanguage: closest))
 }
@@ -63,7 +63,7 @@ public func CYLLocalizedStringForLanguage(_ key: String, _ language: String?) ->
  * [EN] The language the library's strings are in now.
  * [CN] 本库字符串当前使用的语言。
  */
-public func CYLLocalizationLanguage() -> String {
+public func cylLocalizationLanguage() -> String {
     CYLLocalization.languageBundle().language
 }
 
@@ -71,12 +71,12 @@ public func CYLLocalizationLanguage() -> String {
 
 @_cdecl("CYLLocalizedString")
 public func cylLocalizedStringEntryPoint(_ key: NSString?) -> NSString {
-    CYLLocalizedString((key ?? "") as String) as NSString
+    cylLocalizedString((key ?? "") as String) as NSString
 }
 
 @_cdecl("CYLResourceBundle")
 public func cylResourceBundleEntryPoint() -> Bundle {
-    CYLResourceBundle()
+    cylResourceBundle()
 }
 
 @_cdecl("CYLResourceBundleNamed")
@@ -86,17 +86,17 @@ public func cylResourceBundleNamedEntryPoint(_ name: NSString) -> Bundle? {
 
 @_cdecl("CYLSetLocalizationLanguage")
 public func cylSetLocalizationLanguageEntryPoint(_ language: NSString?) {
-    CYLSetLocalizationLanguage(language as String?)
+    cylSetLocalizationLanguage(language as String?)
 }
 
 @_cdecl("CYLLocalizedStringForLanguage")
 public func cylLocalizedStringForLanguageEntryPoint(_ key: NSString?, _ language: NSString?) -> NSString {
-    CYLLocalizedStringForLanguage((key ?? "") as String, language as String?) as NSString
+    cylLocalizedStringForLanguage((key ?? "") as String, language as String?) as NSString
 }
 
 @_cdecl("CYLLocalizationLanguage")
 public func cylLocalizationLanguageEntryPoint() -> NSString {
-    CYLLocalizationLanguage() as NSString
+    cylLocalizationLanguage() as NSString
 }
 
 // MARK: - Implementation
@@ -187,8 +187,8 @@ private enum CYLLocalization {
         resolved = nil
         lock.unlock()
         let didChange = {
-            UIApplication.shared.accessibilityLanguage = language != nil ? CYLLocalizationLanguage() : nil
-            NotificationCenter.default.post(name: Notification.Name(CYLLocalizationLanguageDidChangeNotification), object: nil)
+            UIApplication.shared.accessibilityLanguage = language != nil ? cylLocalizationLanguage() : nil
+            NotificationCenter.default.post(name: Notification.Name(cylLocalizationLanguageDidChangeNotification), object: nil)
         }
         if Thread.isMainThread {
             didChange()

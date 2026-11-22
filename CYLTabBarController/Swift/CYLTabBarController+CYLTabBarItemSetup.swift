@@ -81,12 +81,12 @@ extension CYLTabBarController {
             let stored = tabBarItemsAttributes
             if Int(idx) < stored.count, let attributes = stored[Int(idx)] as? [String: Any] {
                 // FIX: issue #437
-                setup.title = attributes[CYLTabBarItemTitle] as? String ?? ""
+                setup.title = attributes[cylTabBarItemTitle] as? String ?? ""
                 // [EN] #620: an optional dark image per state, combined here so every style gets it.
                 // [CN] #620：每种状态可选的深色图片，在这里合成，所有样式都能使用。
-                let normalInfo = UIImage.cyl_image(withImageInfo: attributes[CYLTabBarItemImage], darkImageInfo: attributes[CYLTabBarItemDarkImage])
-                let selectedInfo = UIImage.cyl_image(withImageInfo: attributes[CYLTabBarItemSelectedImage],
-                                                     darkImageInfo: attributes[CYLTabBarItemSelectedDarkImage])
+                let normalInfo = UIImage.cylImage(withImageInfo: attributes[cylTabBarItemImage], darkImageInfo: attributes[cylTabBarItemDarkImage])
+                let selectedInfo = UIImage.cylImage(withImageInfo: attributes[cylTabBarItemSelectedImage],
+                                                     darkImageInfo: attributes[cylTabBarItemSelectedDarkImage])
                 let infos = Self.cylImageInfos(of: attributes, applyingIconRenderingModeTo: normalInfo, selectedImageInfo: selectedInfo)
                 setup.normalImageInfo = infos[0] is NSNull ? nil : infos[0]
                 setup.selectedImageInfo = infos[1] is NSNull ? nil : infos[1]
@@ -105,16 +105,16 @@ extension CYLTabBarController {
                     }
                 }
                 setup.animationSizeValue = cylTabBarItemAttributesAnimationValueEntryPoint(attributes as NSDictionary,
-                                                                                           CYLTabBarAnimationSize as NSString) as? NSValue
+                                                                                           cylTabBarAnimationSize as NSString) as? NSValue
                 // FIX: issue #408 — the tab's identifier. [CN] Tab 的标识。
-                viewController.cyl_tabBarItemIdentifier = attributes[CYLTabBarItemIdentifier] as? String
+                viewController.cyl_tabBarItemIdentifier = attributes[cylTabBarItemIdentifier] as? String
                 // FIX: issue #433 — the title shown while the tab is selected. [CN] 选中时显示的标题。
                 cylRememberTabBarItemSelectedTitle(viewController, attributes as NSDictionary, setup.title as NSString?)
                 // [EN] A page that follows its tab title gets it as its navigation bar title now. [CN] 跟随 Tab 标题的页面现在获得导航栏标题。
                 Self.cylApplyNavigationTitle(ofFollowingPage: viewController, title: setup.title)
-                setup.titlePositionAdjustment = (attributes[CYLTabBarItemTitlePositionAdjustment] as? NSValue)?.uiOffsetValue ?? .zero
-                setup.imagePositionAdjustment = (attributes[CYLTabBarItemImagePositionAdjustment] as? NSValue)?.uiOffsetValue ?? .zero
-                setup.imageInsets = (attributes[CYLTabBarItemImageInsets] as? NSValue)?.uiEdgeInsetsValue ?? .zero
+                setup.titlePositionAdjustment = (attributes[cylTabBarItemTitlePositionAdjustment] as? NSValue)?.uiOffsetValue ?? .zero
+                setup.imagePositionAdjustment = (attributes[cylTabBarItemImagePositionAdjustment] as? NSValue)?.uiOffsetValue ?? .zero
+                setup.imageInsets = (attributes[cylTabBarItemImageInsets] as? NSValue)?.uiEdgeInsetsValue ?? .zero
             }
         } else {
             // FIX: issue #563

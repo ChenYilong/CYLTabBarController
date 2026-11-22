@@ -23,10 +23,10 @@ func cylDemoLocalizedString(_ key: String) -> String {
     // [EN] A sentinel tells "not in the demo table" apart from a translation equal to the key.
     // [CN] 用哨兵值区分「示例表中没有」与「译文恰好等于键」。
     let missing = "<CYLDemoLocalizedString: missing>"
-    let bundle = CYLDemoLocalizationBundle.languageBundle(for: CYLLocalizationLanguage())
+    let bundle = CYLDemoLocalizationBundle.languageBundle(for: cylLocalizationLanguage())
     let value = bundle?.localizedString(forKey: key, value: missing, table: "CYLDemo") ?? missing
     if value.isEmpty || value == missing {
-        return CYLLocalizedString(key)
+        return cylLocalizedString(key)
     }
     return value
 }

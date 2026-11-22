@@ -92,7 +92,7 @@ extension CYLTabBarController {
                 page = navigationController.topViewController
             }
             page?.view.layoutIfNeeded()
-            page?.cyl_runScrollHideSelfTest()
+            page?.cylRunScrollHideSelfTest()
         }
     }
 
@@ -150,7 +150,7 @@ extension CYLTabBarController {
         //      tab that needs login must not be marked selected or play its animation here.
         // [CN] 该事件在 UIKit 询问 `-tabBarController:shouldSelectViewController:` 之后执行，即使被拒绝也会执行：需要登录的 Tab 不能在这里被设为选中或播放动画。
         let tappedIndex = tappedControl.cyl_tabBarChildViewControllerIndex
-        let tappedViewController = !tappedControl.cyl_isPlusControl() && tappedIndex >= 0 && tappedIndex < viewControllers.count
+        let tappedViewController = !tappedControl.cylIsPlusControl() && tappedIndex >= 0 && tappedIndex < viewControllers.count
             ? viewControllers[tappedIndex] : nil
         if let tappedViewController, cyl_interceptLoginIfNeeded(for: tappedViewController) {
             return
@@ -159,7 +159,7 @@ extension CYLTabBarController {
         //      gesture delegate when a touch begins, and checks the tap in `-tabBarController:shouldSelectViewController:`.
         // [CN] 使用自定义点击操作的 Tab（CYLCustomTabAction）改为执行对应操作（每次点击一次）。液态玻璃在手指按下时从手势代理调用本方法，点击本身在
         //      `-tabBarController:shouldSelectViewController:` 中检查。
-        if !CYLConstants.isLiquidGlassActive(), let candidate = cyl_viewController(forTabControl: tappedControl),
+        if !CYLConstants.isLiquidGlassActive(), let candidate = cylViewController(forTabControl: tappedControl),
            cyl_performCustomTabActionIfNeeded(for: candidate) {
             return
         }
@@ -200,7 +200,7 @@ extension CYLTabBarController {
             return
         }
         let viewController = viewController ?? selectedViewController
-        let control = control ?? viewController?.cyl_getViewControllerInsteadOfNavigation().cyl_tabButton ?? viewController?.cyl_tabButton
+        let control = control ?? viewController?.cylGetViewControllerInsteadOfNavigation().cyl_tabButton ?? viewController?.cyl_tabButton
         if let viewController {
             updateSelectionStatusIfNeeded(for: nil, shouldSelect: viewController)
         }
@@ -211,7 +211,7 @@ extension CYLTabBarController {
         // [EN] Classic taps come here, not always through `-setSelectedViewController:`.
         // [CN] 经典样式的点击会到这里，不一定经过 `-setSelectedViewController:`。
         cylSetNeedsUpdateTabBarItemSelectedTitles(self)
-        let isChildViewControllerPlusButton = control?.cyl_isChildViewControllerPlusButton() ?? false
+        let isChildViewControllerPlusButton = control?.cylIsChildViewControllerPlusButton() ?? false
         // [EN] Shared by Liquid Glass and the other styles: the Lottie playback lives here.
         // [CN] 液态玻璃与其他样式共用：Lottie 播放逻辑都在这里。
         if cylIsLottieEnabled(), !isChildViewControllerPlusButton, selectedViewController?.cyl_isPlaceholder != true,
@@ -234,7 +234,7 @@ extension CYLTabBarController {
             if CYLConstants.isLiquidGlassActive() {
                 for (index, viewController) in (self.viewControllers ?? []).enumerated() {
                     guard let control = viewController.cyl_tabButton, let url = viewController.tabBarItem.cyl_tabBarItemAnimationURL,
-                          viewController.cyl_embedInTabBarController, !control.cyl_isPlusControl() else {
+                          viewController.cyl_embedInTabBarController, !control.cylIsPlusControl() else {
                         continue
                     }
                     let defaultSelected = index == self.selectedIndex

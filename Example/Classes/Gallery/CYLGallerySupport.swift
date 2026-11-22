@@ -88,11 +88,11 @@ enum CYLGallery {
                            extra: ((Int) -> [String: Any]?)? = nil) -> [[String: Any]] {
         (0..<count).map { index in
             let spec = tabSpecs[index]
-            var item: [String: Any] = [CYLTabBarItemImage: symbol(spec.symbol, filled: false, pointSize: pointSize),
-                                       CYLTabBarItemSelectedImage: symbol(spec.symbol, filled: true, pointSize: pointSize),
-                                       CYLTabBarItemIdentifier: spec.identifier]
+            var item: [String: Any] = [cylTabBarItemImage: symbol(spec.symbol, filled: false, pointSize: pointSize),
+                                       cylTabBarItemSelectedImage: symbol(spec.symbol, filled: true, pointSize: pointSize),
+                                       cylTabBarItemIdentifier: spec.identifier]
             if showsTitles {
-                item[CYLTabBarItemTitle] = spec.title
+                item[cylTabBarItemTitle] = spec.title
             }
             if let more = extra?(index) {
                 item.merge(more) { _, new in new }
@@ -107,13 +107,13 @@ enum CYLGallery {
      */
     static func iconRenderingAttributes() -> [[String: Any]] {
         [
-            [CYLTabBarItemTitle: "Home", CYLTabBarItemImage: "home_normal", CYLTabBarItemIdentifier: "home",
-             CYLTabBarItemIconRenderingMode: "template", CYLTabBarItemIconColor: UIColor.systemGray, CYLTabBarItemSelectedIconColor: UIColor.systemRed],
-            [CYLTabBarItemTitle: "Video", CYLTabBarItemImage: symbol("play.rectangle", filled: false, pointSize: 20), CYLTabBarItemIdentifier: "video",
-             CYLTabBarItemIconRenderingMode: "template"],
-            [CYLTabBarItemTitle: "Fishpond", CYLTabBarItemImage: "fishpond_highlight", CYLTabBarItemIdentifier: "fishpond",
-             CYLTabBarItemIconRenderingMode: "original", CYLTabBarItemIconColor: UIColor.systemGray],
-            [CYLTabBarItemTitle: "Account", CYLTabBarItemImage: "account_highlight", CYLTabBarItemIdentifier: "account"],
+            [cylTabBarItemTitle: "Home", cylTabBarItemImage: "home_normal", cylTabBarItemIdentifier: "home",
+             cylTabBarItemIconRenderingMode: "template", cylTabBarItemIconColor: UIColor.systemGray, cylTabBarItemSelectedIconColor: UIColor.systemRed],
+            [cylTabBarItemTitle: "Video", cylTabBarItemImage: symbol("play.rectangle", filled: false, pointSize: 20), cylTabBarItemIdentifier: "video",
+             cylTabBarItemIconRenderingMode: "template"],
+            [cylTabBarItemTitle: "Fishpond", cylTabBarItemImage: "fishpond_highlight", cylTabBarItemIdentifier: "fishpond",
+             cylTabBarItemIconRenderingMode: "original", cylTabBarItemIconColor: UIColor.systemGray],
+            [cylTabBarItemTitle: "Account", cylTabBarItemImage: "account_highlight", cylTabBarItemIdentifier: "account"],
         ]
     }
 
@@ -282,11 +282,11 @@ enum CYLGallery {
      */
     static func darkTabAttributes(special: Bool) -> [String: Any] {
         if special {
-            return [CYLTabBarItemIconColor: UIColor.white, CYLTabBarItemSelectedIconColor: UIColor.white,
-                    CYLTabBarItemBackgroundColor: rgb(17, 86, 136), CYLTabBarItemSelectedBackgroundColor: rgb(22, 24, 25)]
+            return [cylTabBarItemIconColor: UIColor.white, cylTabBarItemSelectedIconColor: UIColor.white,
+                    cylTabBarItemBackgroundColor: rgb(17, 86, 136), cylTabBarItemSelectedBackgroundColor: rgb(22, 24, 25)]
         }
-        return [CYLTabBarItemIconColor: gray(165), CYLTabBarItemSelectedIconColor: UIColor.white,
-                CYLTabBarItemBackgroundColor: rgb(37, 39, 42), CYLTabBarItemSelectedBackgroundColor: rgb(22, 24, 25)]
+        return [cylTabBarItemIconColor: gray(165), cylTabBarItemSelectedIconColor: UIColor.white,
+                cylTabBarItemBackgroundColor: rgb(37, 39, 42), cylTabBarItemSelectedBackgroundColor: rgb(22, 24, 25)]
     }
 
     static func setTabBarBackgroundColor(_ tabBarController: UITabBarController, _ color: UIColor) {
@@ -322,8 +322,8 @@ enum CYLGallery {
         let attributes = attributes(5, showsTitles: false, pointSize: 22) { index in
             var item = darkTabAttributes(special: index == 2)
             if index == 2 {
-                item[CYLTabBarItemImage] = symbol("camera", filled: false, pointSize: 28)
-                item[CYLTabBarItemSelectedImage] = symbol("camera", filled: true, pointSize: 28)
+                item[cylTabBarItemImage] = symbol("camera", filled: false, pointSize: 28)
+                item[cylTabBarItemSelectedImage] = symbol("camera", filled: true, pointSize: 28)
             }
             return item
         }
@@ -359,7 +359,7 @@ enum CYLGallery {
             return nil
         }
         let viewController = viewControllers[index]
-        return (viewController.tabBarItem.cyl_tabButton ?? viewController.cyl_tabButton)?.cyl_tabImageView()
+        return (viewController.tabBarItem.cyl_tabButton ?? viewController.cyl_tabButton)?.cylTabImageView()
     }
 
     /**
@@ -368,15 +368,15 @@ enum CYLGallery {
      */
     static func tealTabAttributes() -> [String: Any] {
         let teal = rgb(23, 149, 158)
-        return [CYLTabBarItemTitleColor: UIColor.white, CYLTabBarItemSelectedTitleColor: teal,
-                CYLTabBarItemIconColor: UIColor.white, CYLTabBarItemSelectedIconColor: teal]
+        return [cylTabBarItemTitleColor: UIColor.white, cylTabBarItemSelectedTitleColor: teal,
+                cylTabBarItemIconColor: UIColor.white, cylTabBarItemSelectedIconColor: teal]
     }
 
     static func redTabAttributes() -> [String: Any] {
         let gray = gray(175)
         let red = rgb(254, 73, 42)
-        return [CYLTabBarItemTitleColor: gray, CYLTabBarItemSelectedTitleColor: red,
-                CYLTabBarItemIconColor: gray, CYLTabBarItemSelectedIconColor: red]
+        return [cylTabBarItemTitleColor: gray, cylTabBarItemSelectedTitleColor: red,
+                cylTabBarItemIconColor: gray, cylTabBarItemSelectedIconColor: red]
     }
 
     /**
@@ -387,7 +387,7 @@ enum CYLGallery {
         guard let tabBar else {
             return []
         }
-        return UIView.cyl_insertedTabControlViews().filter { $0.isDescendant(of: tabBar) }
+        return UIView.cylInsertedTabControlViews().filter { $0.isDescendant(of: tabBar) }
     }
 
     /**

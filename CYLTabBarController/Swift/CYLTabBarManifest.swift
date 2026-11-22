@@ -42,29 +42,29 @@ import CryptoKit
  *      （docs/Swift-Migration.md）。
  */
 enum CYLConfigurationKeys {
-    static let styleType = CYLTabBarControllerStyleType
-    static let itemsAttributes = CYLTabBarControllerTabBarItemsAttributes
-    static let themes = CYLTabBarControllerThemes
-    static let themeIdentifier = CYLTabBarControllerThemeIdentifier
-    static let darkThemeIdentifier = CYLTabBarControllerDarkThemeIdentifier
-    static let themeManagerName = CYLTabBarControllerThemeManagerName
-    static let plusButton = CYLTabBarControllerPlusButton
-    static let context = CYLTabBarControllerContext
-    static let localization = CYLTabBarControllerLocalization
-    static let itemIdentifier = CYLTabBarItemIdentifier
-    static let itemTitle = CYLTabBarItemTitle
-    static let itemImage = CYLTabBarItemImage
-    static let itemSelectedImage = CYLTabBarItemSelectedImage
-    static let itemPageIdentifier = CYLTabBarItemPageIdentifier
-    static let itemMinimumAppVersion = CYLTabBarItemMinimumAppVersion
-    static let itemTitleColor = CYLTabBarItemTitleColor
-    static let itemSelectedTitleColor = CYLTabBarItemSelectedTitleColor
-    static let backgroundColor = CYLTabBarBackgroundColor
-    static let plusButtonBackgroundImage = CYLPlusButtonBackgroundImage
-    static let plusButtonIndexInTabBar = CYLPlusButtonIndexInTabBar
-    static let plusButtonSize = CYLPlusButtonSize
-    static let localizationTableName = CYLTabBarLocalizationTableName
-    static let localizationPath = CYLTabBarLocalizationPath
+    static let styleType = cylTabBarControllerStyleType
+    static let itemsAttributes = cylTabBarControllerTabBarItemsAttributes
+    static let themes = cylTabBarControllerThemes
+    static let themeIdentifier = cylTabBarControllerThemeIdentifier
+    static let darkThemeIdentifier = cylTabBarControllerDarkThemeIdentifier
+    static let themeManagerName = cylTabBarControllerThemeManagerName
+    static let plusButton = cylTabBarControllerPlusButton
+    static let context = cylTabBarControllerContext
+    static let localization = cylTabBarControllerLocalization
+    static let itemIdentifier = cylTabBarItemIdentifier
+    static let itemTitle = cylTabBarItemTitle
+    static let itemImage = cylTabBarItemImage
+    static let itemSelectedImage = cylTabBarItemSelectedImage
+    static let itemPageIdentifier = cylTabBarItemPageIdentifier
+    static let itemMinimumAppVersion = cylTabBarItemMinimumAppVersion
+    static let itemTitleColor = cylTabBarItemTitleColor
+    static let itemSelectedTitleColor = cylTabBarItemSelectedTitleColor
+    static let backgroundColor = cylTabBarBackgroundColor
+    static let plusButtonBackgroundImage = cylPlusButtonBackgroundImage
+    static let plusButtonIndexInTabBar = cylPlusButtonIndexInTabBar
+    static let plusButtonSize = cylPlusButtonSize
+    static let localizationTableName = cylTabBarLocalizationTableName
+    static let localizationPath = cylTabBarLocalizationPath
 }
 
 /**
@@ -76,7 +76,7 @@ enum CYLManifestValues {
     static let assetNamePrefix = "cyl.asset."
 
     static func error(_ code: CYLTabBarConfigurationErrorCode, _ description: String) -> NSError {
-        NSError(domain: CYLTabBarConfigurationErrorDomain, code: code.rawValue, userInfo: [NSLocalizedDescriptionKey: description])
+        NSError(domain: cylTabBarConfigurationErrorDomain, code: code.rawValue, userInfo: [NSLocalizedDescriptionKey: description])
     }
 
     static func dictionary(_ container: Any?, _ key: String) -> [String: Any]? {
@@ -226,7 +226,7 @@ enum CYLManifestValues {
             return current >= (parts[1] as NSString).integerValue && current <= (parts[2] as NSString).integerValue
         }
         if let parts = match("^device\\.language\\s+in\\s+\\[(.*)\\]$", text) {
-            let current = CYLLocalizationLanguage().lowercased()
+            let current = cylLocalizationLanguage().lowercased()
             for item in parts[1].components(separatedBy: ",") {
                 let wanted = quoted(item).lowercased()
                 if !wanted.isEmpty && (current == wanted || current.hasPrefix(wanted + "-")) {

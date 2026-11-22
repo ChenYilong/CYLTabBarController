@@ -31,7 +31,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     //      已声明 "Default Configuration" 及其 SceneDelegate，UIKit 会直接使用。
 
     func makeMainTabBarController() -> MainTabBarController {
-        let titles = CYLLocalizedTabBarItemsAttributes(["首页", "同城", "消息", "我的"],
+        let titles = cylLocalizedTabBarItemsAttributes(["首页", "同城", "消息", "我的"],
                                                        ["home_normal", "mycity_normal", "message_normal", "account_normal"],
                                                        ["home_highlight", "mycity_highlight", "message_highlight", "account_highlight"],
                                                        [:])
@@ -47,12 +47,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // [CN] 第 2 个 Tab，通用函数：按名称查找文件，并按扩展名选择动画库。播放方式相同。
         if let item = CYLTabBarItemAttributesAddingAnimationFile(items[1], "tab_star.gif", nil) as? [String: Any] {
             items[1] = item
-            items[1][CYLTabBarAnimationSize] = size
+            items[1][cylTabBarAnimationSize] = size
         }
         // [EN] Tab 3, a plain image entry: no animation key; the GIF rests on its first frame and plays once per tap (loops while looping is on).
         // [CN] 第 3 个 Tab，普通图片入口：没有动画 key；GIF 停在第一帧，每次点击播放一次（开启循环时一直播放）。
-        items[2][CYLTabBarItemImageURL] = Bundle.main.url(forResource: "tab_fire", withExtension: "gif")
-        items[2][CYLTabBarItemImageURLSize] = size
+        items[2][cylTabBarItemImageURL] = Bundle.main.url(forResource: "tab_fire", withExtension: "gif")
+        items[2][cylTabBarItemImageURLSize] = size
         // [EN] Tab 4 keeps its static images. [CN] 第 4 个 Tab 保持静态图片。
         // [EN] `-CYLDemoAnimationTint YES`: the GIF tabs tinted like template images (`tint` option): tab 1 in its title's
         //      colors ("title"), tab 2 in a fixed color with a Dark Mode one ("#1C1C1E" / `darkTint` "#FFFFFF").
@@ -63,8 +63,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             let star = Bundle.main.url(forResource: "tab_star", withExtension: "gif")
             items[0][CYLTabBarGIFFilePath] = nil
             items[0][CYLTabBarGIFURL] = CYLTabBarAnimationURLWithOptions(rocket, [.tint: "title"] as [CYLTabBarAnimationOption: String])
-            items[1][CYLTabBarAnimationFilePath] = nil
-            items[1][CYLTabBarAnimationURL] = CYLTabBarAnimationURLWithOptions(star, [.tint: "#1C1C1E", .darkTint: "#FFFFFF"] as [CYLTabBarAnimationOption: String])
+            items[1][cylTabBarAnimationFilePath] = nil
+            items[1][cylTabBarAnimationURL] = CYLTabBarAnimationURLWithOptions(star, [.tint: "#1C1C1E", .darkTint: "#FFFFFF"] as [CYLTabBarAnimationOption: String])
         }
         DemoPlusButton.register()
         return MainTabBarController(viewControllers: viewControllers(), tabBarItemsAttributes: items, styleType: CYLDemoTabBarStyle.styleType, context: nil)

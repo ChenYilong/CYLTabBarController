@@ -78,7 +78,7 @@ final class GalleryIrregularPlusButton: CYLPlusButton, CYLPlusButtonSubclassing 
 
     @objc private func galleryDidTap() {
         playRipple()
-        let presenter = cyl_owningTabBarController()
+        let presenter = cylOwningTabBarController()
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [weak self] in
             let sheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
             sheet.addAction(UIAlertAction(title: "Take a photo", style: .default))

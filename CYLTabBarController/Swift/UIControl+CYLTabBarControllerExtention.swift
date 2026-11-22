@@ -73,7 +73,7 @@ final class CYLTabButtonLayoutTracker: UIView {
         tracker.isUserInteractionEnabled = false
         tracker.backgroundColor = .clear
         tabButton.insertSubview(tracker, at: 0)
-        tracker.cyl_markAsInserted(forTabControl: tabButton)
+        tracker.cylMarkAsInserted(forTabControl: tabButton)
         return tracker
     }
 
@@ -182,11 +182,11 @@ extension UIControl {
      * [CN] 判断当前控件是否为已添加子控制器的 PlusButton。
      */
     @objc(cyl_isChildViewControllerPlusButton)
-    public func cyl_isChildViewControllerPlusButton() -> Bool {
+    public func cylIsChildViewControllerPlusButton() -> Bool {
         guard CYLPlusButton.plusChildViewController(forOwner: self)?.cyl_plusViewControllerEverAdded == true else {
             return false
         }
-        if cyl_isPlusButton() {
+        if cylIsPlusButton() {
             return true
         }
         return CYLPlusButton(forOwner: self)?.cyl_tabBarItemVisibleIndex == cyl_tabBarItemVisibleIndex
@@ -197,8 +197,8 @@ extension UIControl {
      * [CN] 判断当前控件是否处于选中状态，且对应的 Tab 为 TabBarController 当前选中的索引。
      */
     @objc(cyl_isSelected)
-    public func cyl_isSelected() -> Bool {
-        guard let tabBarController = cyl_tabBarController else {
+    public func cylIsSelected() -> Bool {
+        guard let tabBarController = cylTabBarController else {
             return false
         }
         var isSelected = self.isSelected && tabBarController.selectedIndex == cyl_tabBarChildViewControllerIndex
@@ -213,8 +213,8 @@ extension UIControl {
      * [CN] 判断当前控件是否为 PlusButton（已注册的 PlusButton 类，或 PlusButton 子控制器对应的按钮）。
      */
     @objc(cyl_isPlusControl)
-    public func cyl_isPlusControl() -> Bool {
-        CYLPlusButton.isPlusButtonView(self) || cyl_isChildViewControllerPlusButton()
+    public func cylIsPlusControl() -> Bool {
+        CYLPlusButton.isPlusButtonView(self) || cylIsChildViewControllerPlusButton()
     }
 
     /**
@@ -261,7 +261,7 @@ extension UIControl {
             }
             // [EN] A plus button: its class's identifier, the same for every tab bar controller's copy.
             // [CN] PlusButton：其类的标识，多个 TabBarController 的副本共用。
-            if cyl_isPlusButton() {
+            if cylIsPlusButton() {
                 return cyl_plusButtonClassIdentifier
             }
             // [EN] A FlatDesign tab button knows its tab through its item (no child view controller index, and no
@@ -271,7 +271,7 @@ extension UIControl {
                 return (value(forKeyPath: "tabBarItem.childViewController") as? UIViewController)?.cyl_tabBarItemIdentifier
             }
             let index = cyl_tabBarChildViewControllerIndex
-            guard let viewControllers = cyl_tabBarController?.viewControllers,
+            guard let viewControllers = cylTabBarController?.viewControllers,
                   index >= 0, index != NSNotFound, index < viewControllers.count else {
                 return nil
             }
@@ -328,8 +328,8 @@ extension UIControl {
      * [CN] 用 newView 替换 Tab 按钮的图片视图。
      */
     @objc(cyl_replaceTabImageViewWithNewView:show:)
-    public func cyl_replaceTabImageView(withNewView newView: UIView, show: Bool) {
-        cyl_replaceTabImageView(withNewView: newView, offset: .zero, show: show, completion: nil)
+    public func cylReplaceTabImageView(withNewView newView: UIView, show: Bool) {
+        cylReplaceTabImageView(withNewView: newView, offset: .zero, show: show, completion: nil)
     }
 
     /**
@@ -337,7 +337,7 @@ extension UIControl {
      * [CN] 用 newView 替换 Tab 按钮的图片视图并应用 offset 偏移，完成后通过 completion 回调结果。
      */
     @objc(cyl_replaceTabImageViewWithNewView:offset:show:completion:)
-    public func cyl_replaceTabImageView(withNewView newView: UIView, offset: UIOffset, show: Bool,
+    public func cylReplaceTabImageView(withNewView newView: UIView, offset: UIOffset, show: Bool,
                                         completion: CYLTabButtonReplaceCompletion?) {
         cylReplace(isTabButton: false, newView: newView, offset: offset, show: show, autoHidesNewView: true,
                     hidesOriginalView: true, completion: completion)
@@ -348,10 +348,10 @@ extension UIControl {
      * [CN] 用 newView 替换整个 Tab 按钮，并隐藏原图片视图。
      */
     @objc(cyl_replaceTabButtonWithNewView:show:)
-    public func cyl_replaceTabButton(withNewView newView: UIView, show: Bool) {
-        cyl_replaceTabButton(withNewView: newView, offset: .zero, show: show) { isReplaced, tabBarButton, _ in
+    public func cylReplaceTabButton(withNewView newView: UIView, show: Bool) {
+        cylReplaceTabButton(withNewView: newView, offset: .zero, show: show) { isReplaced, tabBarButton, _ in
             if isReplaced {
-                tabBarButton.cyl_swappableImageViewViewInTabBarButton()?.isHidden = true
+                tabBarButton.cylSwappableImageViewViewInTabBarButton()?.isHidden = true
             }
         }
     }
@@ -361,7 +361,7 @@ extension UIControl {
      * [CN] 用 newView 替换整个 Tab 按钮并应用 offset 偏移，完成后通过 completion 回调结果。
      */
     @objc(cyl_replaceTabButtonWithNewView:offset:show:completion:)
-    public func cyl_replaceTabButton(withNewView newView: UIView, offset: UIOffset, show: Bool,
+    public func cylReplaceTabButton(withNewView newView: UIView, offset: UIOffset, show: Bool,
                                      completion: CYLTabButtonReplaceCompletion?) {
         cylReplace(isTabButton: true, newView: newView, offset: offset, show: show, autoHidesNewView: true,
                     hidesOriginalView: true, completion: completion)
@@ -373,7 +373,7 @@ extension UIControl {
      * [CN] 用 newView 覆盖 Tab 图片视图（或整个按钮），不隐藏原视图；按钮未就绪（如动画未加载完成）时延迟 delay 秒执行。
      */
     @objc(cyl_coverTabImageViewOrTabButton:newView:offset:show:delayIfNeededForSeconds:completion:)
-    public func cyl_coverTabImageViewOrTabButton(_ isTabButton: Bool, newView: UIView, offset: UIOffset, show: Bool,
+    public func cylCoverTabImageViewOrTabButton(_ isTabButton: Bool, newView: UIView, offset: UIOffset, show: Bool,
                                                  delayIfNeededForSeconds delay: CGFloat,
                                                  completion: CYLTabButtonReplaceCompletion?) {
         // [EN] An animation icon that is not ready yet is waited for; otherwise the cover lands before it is laid out.
@@ -396,10 +396,10 @@ extension UIControl {
      * [CN] 同 -cyl_coverTabImageViewOrTabButton:…，但作用于 Platter 选中态控件（没有则作用于自身）。
      */
     @objc(cyl_coverSeclectContentTabImageViewOrTabButton:newView:offset:show:delayIfNeededForSeconds:completion:)
-    public func cyl_coverSeclectContentTabImageViewOrTabButton(_ isTabButton: Bool, newView: UIView, offset: UIOffset,
+    public func cylCoverSeclectContentTabImageViewOrTabButton(_ isTabButton: Bool, newView: UIView, offset: UIOffset,
                                                                show: Bool, delayIfNeededForSeconds delay: CGFloat,
                                                                completion: CYLTabButtonReplaceCompletion?) {
-        (cyl_platterSelected() ?? self).cyl_coverTabImageViewOrTabButton(
+        (cylPlatterSelected() ?? self).cylCoverTabImageViewOrTabButton(
             isTabButton, newView: newView, offset: offset, show: show, delayIfNeededForSeconds: delay, completion: completion)
     }
 
@@ -408,10 +408,10 @@ extension UIControl {
      * [CN] 用 newView 覆盖当前可见的 Tab 图片视图（或按钮），内部转调选中态内容的覆盖方法。
      */
     @objc(cyl_coverVisiableTabImageViewOrTabButton:newView:offset:show:delayIfNeededForSeconds:completion:)
-    public func cyl_coverVisiableTabImageViewOrTabButton(_ isTabButton: Bool, newView: UIView, offset: UIOffset, show: Bool,
+    public func cylCoverVisiableTabImageViewOrTabButton(_ isTabButton: Bool, newView: UIView, offset: UIOffset, show: Bool,
                                                          delayIfNeededForSeconds delay: CGFloat,
                                                          completion: CYLTabButtonReplaceCompletion?) {
-        cyl_coverSeclectContentTabImageViewOrTabButton(isTabButton, newView: newView, offset: offset, show: show,
+        cylCoverSeclectContentTabImageViewOrTabButton(isTabButton, newView: newView, offset: offset, show: show,
                                                        delayIfNeededForSeconds: delay, completion: completion)
     }
 
@@ -420,17 +420,17 @@ extension UIControl {
      * [CN] 分别用 contentNewView 覆盖常态内容、用 seclectContentNewView 覆盖选中态内容。
      */
     @objc(cyl_coverVisiableTabImageViewOrTabButton:contentNewView:seclectContentNewView:offset:show:delayIfNeededForSeconds:completion:)
-    public func cyl_coverVisiableTabImageViewOrTabButton(_ isTabButton: Bool, contentNewView: UIView,
+    public func cylCoverVisiableTabImageViewOrTabButton(_ isTabButton: Bool, contentNewView: UIView,
                                                          seclectContentNewView: UIView, offset: UIOffset, show: Bool,
                                                          delayIfNeededForSeconds delay: CGFloat,
                                                          completion: CYLTabButtonReplaceCompletion?) {
-        cyl_coverTabImageViewOrTabButton(isTabButton, newView: contentNewView, offset: offset, show: show,
+        cylCoverTabImageViewOrTabButton(isTabButton, newView: contentNewView, offset: offset, show: show,
                                          delayIfNeededForSeconds: delay) { isReplaced, tabBarButton, newView in
-            guard isReplaced, tabBarButton.cyl_platterSelected() != nil else {
+            guard isReplaced, tabBarButton.cylPlatterSelected() != nil else {
                 completion?(isReplaced, tabBarButton, newView)
                 return
             }
-            tabBarButton.cyl_coverSeclectContentTabImageViewOrTabButton(isTabButton, newView: seclectContentNewView,
+            tabBarButton.cylCoverSeclectContentTabImageViewOrTabButton(isTabButton, newView: seclectContentNewView,
                                                                         offset: offset, show: show,
                                                                         delayIfNeededForSeconds: delay, completion: completion)
         }
@@ -443,11 +443,11 @@ extension UIControl {
      * [CN] 判断当前控件是否为液态玻璃 Platter 中的选中态控件。
      */
     @objc(cyl_isPlatterSelectedControl)
-    public func cyl_isPlatterSelectedControl() -> Bool {
+    public func cylIsPlatterSelectedControl() -> Bool {
         guard CYLConstants.isLiquidGlassActive(), let superview, cyl_hasCYLTabBar else {
             return false
         }
-        return superview.cyl_isPlatterSelectedContentView()
+        return superview.cylIsPlatterSelectedContentView()
     }
 
     /**
@@ -455,8 +455,8 @@ extension UIControl {
      * [CN] 与当前控件对应的 Platter 选中态控件，没有则返回自身；不在 `CYLTabBar` 中时为 nil。
      */
     @objc(cyl_platterSelectedControl)
-    public func cyl_platterSelected() -> UIControl? {
-        guard cyl_hasCYLTabBar, let tabBar = cyl_tabBarController?.tabBar as? CYLTabBar else {
+    public func cylPlatterSelected() -> UIControl? {
+        guard cyl_hasCYLTabBar, let tabBar = cylTabBarController?.tabBar as? CYLTabBar else {
             return nil
         }
         return tabBar.cylSelectedContentControl(fromContentControl: self) ?? self
@@ -467,11 +467,11 @@ extension UIControl {
      * [CN] 判断当前控件是否位于 Platter 内容视图中（常态控件）。
      */
     @objc(cyl_isPlatterNormalControl)
-    public func cyl_isPlatterNormalControl() -> Bool {
+    public func cylIsPlatterNormalControl() -> Bool {
         guard cyl_hasCYLTabBar else {
             return false
         }
-        return superview?.cyl_isPlatterContentView() ?? false
+        return superview?.cylIsPlatterContentView() ?? false
     }
 
     /**
@@ -479,8 +479,8 @@ extension UIControl {
      * [CN] 与当前控件对应的 Platter 常态控件，没有则返回自身。
      */
     @objc(cyl_platterNormalControl)
-    public func cyl_platterNormal() -> UIControl {
-        (cyl_tabBarController?.tabBar as? CYLTabBar)?.cylNormalContentControl(fromSelectedContentControl: self) ?? self
+    public func cylPlatterNormal() -> UIControl {
+        (cylTabBarController?.tabBar as? CYLTabBar)?.cylNormalContentControl(fromSelectedContentControl: self) ?? self
     }
 
     /**
@@ -488,11 +488,11 @@ extension UIControl {
      * [CN] 隐藏当前控件及其选中态对应控件（包括标题与图片），并禁用交互。
      */
     @objc(cyl_hideControl)
-    public func cyl_hideControl() {
-        for control in [self, cyl_platterSelected()].compactMap({ $0 }) {
+    public func cylHideControl() {
+        for control in [self, cylPlatterSelected()].compactMap({ $0 }) {
             control.isHidden = true
-            control.cyl_tabLabel()?.isHidden = true
-            control.cyl_swappableImageViewViewInTabBarButton()?.isHidden = true
+            control.cylTabLabel()?.isHidden = true
+            control.cylSwappableImageViewViewInTabBarButton()?.isHidden = true
             control.isUserInteractionEnabled = false
         }
     }
@@ -504,8 +504,8 @@ extension UIControl {
      */
     @available(*, deprecated, message: "Use -cyl_tabBarItemAnimationView")
     @objc(cyl_lottieAnimationView)
-    public func cyl_lottieAnimationView() -> UIView? {
-        cyl_tabBarItemAnimationView()
+    public func cylLottieAnimationView() -> UIView? {
+        cylTabBarItemAnimationView()
     }
 
     /**
@@ -513,8 +513,8 @@ extension UIControl {
      */
     @available(*, deprecated, message: "Use -cyl_isTabBarItemAnimationReady")
     @objc(cyl_isLottieReady)
-    public func cyl_isLottieReady() -> Bool {
-        cyl_isTabBarItemAnimationReady()
+    public func cylIsLottieReady() -> Bool {
+        cylIsTabBarItemAnimationReady()
     }
 
     /**
@@ -522,8 +522,8 @@ extension UIControl {
      */
     @available(*, deprecated, message: "Use -cyl_addTabBarItemAnimationWithURL:size:contentMode:")
     @objc(cyl_addLottieImageWithLottieURL:size:contentMode:)
-    public func cyl_addLottieImage(withLottieURL lottieURL: URL?, size: CGSize, contentMode: UIView.ContentMode) {
-        cyl_addTabBarItemAnimation(with: lottieURL, size: size, contentMode: contentMode)
+    public func cylAddLottieImage(withLottieURL lottieURL: URL?, size: CGSize, contentMode: UIView.ContentMode) {
+        cylAddTabBarItemAnimation(with: lottieURL, size: size, contentMode: contentMode)
     }
 
     /**
@@ -531,8 +531,8 @@ extension UIControl {
      */
     @available(*, deprecated, message: "Use -cyl_addTabBarItemAnimationWithURL:size:contentMode: with a file URL")
     @objc(cyl_addLottieImageWithLottieFilePath:size:contentMode:)
-    public func cyl_addLottieImage(withLottieFilePath lottieFilePath: String, size: CGSize, contentMode: UIView.ContentMode) {
-        cyl_addTabBarItemAnimation(with: CYLConstants.cyl_getURL(from: lottieFilePath), size: size, contentMode: contentMode)
+    public func cylAddLottieImage(withLottieFilePath lottieFilePath: String, size: CGSize, contentMode: UIView.ContentMode) {
+        cylAddTabBarItemAnimation(with: CYLConstants.cyl_getURL(from: lottieFilePath), size: size, contentMode: contentMode)
     }
 
     /**
@@ -540,9 +540,9 @@ extension UIControl {
      */
     @available(*, deprecated, message: "Use -cyl_addTabBarItemAnimationWithURL:size:contentMode:animationSpeed:")
     @objc(cyl_addLottieImageWithLottieURL:size:contentMode:animationSpeed:)
-    public func cyl_addLottieImage(withLottieURL lottieURL: URL?, size: CGSize, contentMode: UIView.ContentMode,
+    public func cylAddLottieImage(withLottieURL lottieURL: URL?, size: CGSize, contentMode: UIView.ContentMode,
                                    animationSpeed: CGFloat) {
-        cyl_addTabBarItemAnimation(with: lottieURL, size: size, contentMode: contentMode, animationSpeed: animationSpeed)
+        cylAddTabBarItemAnimation(with: lottieURL, size: size, contentMode: contentMode, animationSpeed: animationSpeed)
     }
 
     /**
@@ -550,8 +550,8 @@ extension UIControl {
      */
     @available(*, deprecated, message: "Use -cyl_setTabBarItemAnimationSpeed:")
     @objc(cyl_setLottieAnimationSpeed:)
-    public func cyl_setLottieAnimationSpeed(_ animationSpeed: CGFloat) {
-        cyl_setTabBarItemAnimationSpeed(animationSpeed)
+    public func cylSetLottieAnimationSpeed(_ animationSpeed: CGFloat) {
+        cylSetTabBarItemAnimationSpeed(animationSpeed)
     }
 
     /**
@@ -560,8 +560,8 @@ extension UIControl {
      */
     @available(*, deprecated, message: "Use -cyl_reloadTabBarItemAnimationViewForCurrentStyle")
     @objc(cyl_reloadLottieAnimationViewForCurrentStyle)
-    public func cyl_reloadLottieAnimationViewForCurrentStyle() {
-        cyl_reloadTabBarItemAnimationViewForCurrentStyle()
+    public func cylReloadLottieAnimationViewForCurrentStyle() {
+        cylReloadTabBarItemAnimationViewForCurrentStyle()
     }
 
     /**
@@ -569,9 +569,9 @@ extension UIControl {
      */
     @available(*, deprecated, message: "Use -cyl_playTabBarItemAnimationWithURL:size:defaultSelected:contentMode:")
     @objc(cyl_animationLottieImageWithLottieURL:size:defaultSelected:contentMode:)
-    public func cyl_animationLottieImage(withLottieURL lottieURL: URL, size: CGSize, defaultSelected: Bool,
+    public func cylAnimationLottieImage(withLottieURL lottieURL: URL, size: CGSize, defaultSelected: Bool,
                                          contentMode: UIView.ContentMode) {
-        cyl_playTabBarItemAnimation(with: lottieURL, size: size, defaultSelected: defaultSelected, contentMode: contentMode)
+        cylPlayTabBarItemAnimation(with: lottieURL, size: size, defaultSelected: defaultSelected, contentMode: contentMode)
     }
 
     /**
@@ -579,8 +579,8 @@ extension UIControl {
      */
     @available(*, deprecated, message: "Use -cyl_stopTabBarItemAnimation")
     @objc(cyl_stopAnimationOfLottieView)
-    public func cyl_stopAnimationOfLottieView() {
-        cyl_stopTabBarItemAnimation()
+    public func cylStopAnimationOfLottieView() {
+        cylStopTabBarItemAnimation()
     }
 
     // MARK: Private
@@ -590,11 +590,11 @@ extension UIControl {
      * [CN] TabBar 在运行时为 `CYLTabBar` 时为 YES（属性声明为该类型，但 App 可以设置其他类）。
      */
     private var cyl_hasCYLTabBar: Bool {
-        cyl_tabBarController?.tabBar.isKind(of: CYLTabBar.self) ?? false
+        cylTabBarController?.tabBar.isKind(of: CYLTabBar.self) ?? false
     }
 
     private var cyl_isTabButtonOrPlusButton: Bool {
-        cyl_isTabButton() || cyl_isPlusButton()
+        cylIsTabButton() || cylIsPlusButton()
     }
 
     private func integer(for key: UnsafeRawPointer) -> Int {
@@ -636,9 +636,9 @@ extension UIControl {
         } else {
             cover.layer.zPosition = 0
         }
-        cyl_swappableImageViewViewInTabBarButton()?.isHidden = true
+        cylSwappableImageViewViewInTabBarButton()?.isHidden = true
         for subview in subviews where subview !== cover && !(subview is CYLTabButtonLayoutTracker) {
-            subview.cyl_setHidden(show)
+            subview.cylSetHidden(show)
         }
     }
 
@@ -648,7 +648,7 @@ extension UIControl {
      */
     private func cylReplace(isTabButton: Bool, newView: UIView, offset: UIOffset, show: Bool, autoHidesNewView: Bool,
                              hidesOriginalView: Bool, completion: CYLTabButtonReplaceCompletion?) {
-        let swappableImageView = cyl_tabImageView()
+        let swappableImageView = cylTabImageView()
         guard let replacedView: UIView = isTabButton ? self : swappableImageView else {
             completion?(false, self, newView)
             return
@@ -657,7 +657,7 @@ extension UIControl {
         //      limited for now, as covering is the main case. A size set on `newView` decides how large it shows.
         // [CN] 待定：区分覆盖与替换两种场景，决定是否限制新视图尺寸；目前不限制，因为主要场景为覆盖。`newView` 设置的尺寸决定其显示大小。
         if newView.frame.width == 0 || newView.frame.height == 0 {
-            if cyl_tabBarController?.adjustTabBarItemImageViewSizeDependOnSuperView == true {
+            if cylTabBarController?.adjustTabBarItemImageViewSizeDependOnSuperView == true {
                 newView.frame.size = frame.size
             } else {
                 newView.frame.size = swappableImageView?.image?.size ?? .zero
@@ -680,7 +680,7 @@ extension UIControl {
         //      selected tab's icon went blank.
         // [CN] 动效引擎显示在图标位置的 Tab 自身动画视图就是图标：动效 item（扁平样式）必须继续显示它。若标记为隐藏，item 会在下一次更新（切换选中）时隐藏它，
         //      选中 Tab 的图标变为空白。
-        let isOwnAnimationView = newView.cyl_isTabBarItemAnimationView()
+        let isOwnAnimationView = newView.cylIsTabBarItemAnimationView()
         if hidesOriginalView && isOwnAnimationView {
             swappableImageView?.isHidden = show
         } else if hidesOriginalView {
@@ -688,7 +688,7 @@ extension UIControl {
             // [EN] An animated item shows its animation view instead of its image view while the animation plays: that view
             //      is the icon to hide (and show again), not only the image view (which the item hides itself then).
             // [CN] 动效 item 在动画播放时显示其动画视图而不是图片视图：要隐藏（及重新显示）的图标是该视图，而不只是图片视图（此时 item 自己已将其隐藏）。
-            if let iconView = cyl_animatedItemBadgeHost(), iconView !== swappableImageView {
+            if let iconView = cylAnimatedItemBadgeHost(), iconView !== swappableImageView {
                 iconView.isHidden = show
             }
             // [EN] The item keeps it hidden across its own icon updates (a selection change). [CN] item 在自身图标更新（切换选中）时保持隐藏。
@@ -696,14 +696,14 @@ extension UIControl {
                 setValue(show, forKey: "iconHidden")
             }
             if isTabButton {
-                cyl_tabLabel()?.isHidden = show
+                cylTabLabel()?.isHidden = show
             }
         }
         if show && newView.superview == nil {
             addSubview(newView)
             // [EN] Marked: found again in one pass, and recognized in an old button after UIKit rebuilt them.
             // [CN] 标记：可一次性找到；UIKit 重建按钮后仍在旧按钮中时也能被识别。
-            newView.cyl_markAsInserted(forTabControl: self)
+            newView.cylMarkAsInserted(forTabControl: self)
             CYLTabButtonLayoutTracker.track(newView, size: newView.frame.size, in: self, imageView: swappableImageView,
                                             replacedView: replacedView, offset: offset)
             completion?(true, self, newView)
@@ -747,7 +747,7 @@ extension UIControl {
             if let view = objc_getAssociatedObject(self, CYLControlTabBarKeys.tabBadgePointView) as? UIView {
                 return view
             }
-            let view = UIView.cyl_tabBadgePointView(withClolor: .red, radius: 4.5)
+            let view = UIView.cylTabBadgePointView(withClolor: .red, radius: 4.5)
             objc_setAssociatedObject(self, CYLControlTabBarKeys.tabBadgePointView, view, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
             return view
         }
@@ -782,7 +782,7 @@ extension UIControl {
      */
     @available(*, deprecated, message: "Deprecated in 1.19.0. Use method in <CYLBadgeProtocol> instead.")
     @objc(cyl_showTabBadgePoint)
-    public func cyl_showTabBadgePoint() {
+    public func cylShowTabBadgePoint() {
         cylSetShowsTabBadgePoint(true)
     }
 
@@ -792,7 +792,7 @@ extension UIControl {
      */
     @available(*, deprecated, message: "Deprecated in 1.19.0. Use method in <CYLBadgeProtocol> instead.")
     @objc(cyl_removeTabBadgePoint)
-    public func cyl_removeTabBadgePoint() {
+    public func cylRemoveTabBadgePoint() {
         cylSetShowsTabBadgePoint(false)
     }
 
@@ -802,7 +802,7 @@ extension UIControl {
      */
     @available(*, deprecated, message: "Deprecated in 1.19.0. Use method in <CYLBadgeProtocol> instead.")
     @objc(cyl_isShowTabBadgePoint)
-    public func cyl_isShowTabBadgePoint() -> Bool {
+    public func cylIsShowTabBadgePoint() -> Bool {
         !cyl_tabBadgePointView.isHidden
     }
 
@@ -810,11 +810,11 @@ extension UIControl {
     private func cylSetShowsTabBadgePoint(_ shows: Bool) {
         let pointView = cyl_tabBadgePointView
         if shows && pointView.superview == nil {
-            cyl_bringSubview(toFront: pointView)
+            cylBringSubview(toFront: pointView)
             // FIX: issue #653 — frames, not constraints: centre at the image view's top-right corner plus the offset.
             // [CN] 用 frame 而非约束：中心位于图片视图右上角，再加偏移量。
             pointView.translatesAutoresizingMaskIntoConstraints = true
-            CYLTabButtonLayoutTracker.tracker(for: self).track(pointView) { [weak imageView = cyl_tabImageView()] tabButton in
+            CYLTabButtonLayoutTracker.tracker(for: self).track(pointView) { [weak imageView = cylTabImageView()] tabButton in
                 let topRight = CYLTabButtonLayoutTracker.point(
                     CGPoint(x: imageView?.bounds.maxX ?? 0, y: imageView?.bounds.minY ?? 0), of: imageView, in: tabButton)
                 let offset = tabButton.cyl_tabBadgePointViewOffset
@@ -822,7 +822,7 @@ extension UIControl {
             }
         }
         pointView.isHidden = !shows
-        cyl_tabBadgeView()?.isHidden = shows
+        cylTabBadgeView()?.isHidden = shows
     }
 }
 
@@ -835,9 +835,9 @@ extension UIView {
      * [CN] 把 `view` 的布局跟踪（#653）改为跟随 `newView`，`newView` 同时沿用 `view` 的 Tab 按钮标记。
      */
     @objc(cyl_replaceTrackedSubview:withView:)
-    public func cyl_replaceTrackedSubview(_ view: UIView, withView newView: UIView) {
+    public func cylReplaceTrackedSubview(_ view: UIView, withView newView: UIView) {
         if let tabControl = view.cyl_insertedForTabControl ?? (self as? UIControl) {
-            newView.cyl_markAsInserted(forTabControl: tabControl)
+            newView.cylMarkAsInserted(forTabControl: tabControl)
         }
         for case let tracker as CYLTabButtonLayoutTracker in subviews {
             tracker.replaceTrackedView(view, with: newView)
@@ -845,11 +845,11 @@ extension UIView {
         // [EN] The old view (a tab's animation view swapped for another file, its dark file or a skin) held the tab's badge,
         //      which would go away with it: it moves to the new view. The new view also takes the icon tint again.
         // [CN] 旧视图（Tab 的动画视图被换成另一个文件、其深色文件或皮肤）承载着 Tab 的角标，会随之消失：把角标移到新视图。新视图也重新获得图标着色。
-        view.cyl_moveBadge(to: newView)
+        view.cylMoveBadge(to: newView)
         let control = view.cyl_insertedForTabControl ?? (self as? UIControl) ?? (superview as? UIControl)
         control?.setNeedsLayout()
         let tintSelector = NSSelectorFromString("cyl_setNeedsApplyTabBarItemAnimationTintColors")
-        if let tabBarController = control?.cyl_tabBarController, tabBarController.responds(to: tintSelector) {
+        if let tabBarController = control?.cylTabBarController, tabBarController.responds(to: tintSelector) {
             tabBarController.perform(tintSelector)
         }
     }

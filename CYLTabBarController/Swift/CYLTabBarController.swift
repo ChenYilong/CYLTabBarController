@@ -266,12 +266,12 @@ open class CYLTabBarController: UITabBarController, CYLTabBarControllerDelegate,
     public required convenience init(viewControllers: [UIViewController], tabBarItemsAttributes: [[AnyHashable: Any]], imageInsets: UIEdgeInsets,
                             titlePositionAdjustment: UIOffset, styleType: CYLTabBarStyleType, context: String?) {
         var configuration: [String: Any] = [:]
-        configuration[CYLTabBarControllerViewControllers] = viewControllers
-        configuration[CYLTabBarControllerTabBarItemsAttributes] = tabBarItemsAttributes
-        configuration[CYLTabBarControllerImageInsets] = NSValue(uiEdgeInsets: imageInsets)
-        configuration[CYLTabBarControllerTitlePositionAdjustment] = NSValue(uiOffset: titlePositionAdjustment)
-        configuration[CYLTabBarControllerStyleType] = styleType.rawValue
-        configuration[CYLTabBarControllerContext] = context
+        configuration[cylTabBarControllerViewControllers] = viewControllers
+        configuration[cylTabBarControllerTabBarItemsAttributes] = tabBarItemsAttributes
+        configuration[cylTabBarControllerImageInsets] = NSValue(uiEdgeInsets: imageInsets)
+        configuration[cylTabBarControllerTitlePositionAdjustment] = NSValue(uiOffset: titlePositionAdjustment)
+        configuration[cylTabBarControllerStyleType] = styleType.rawValue
+        configuration[cylTabBarControllerContext] = context
         configuration["_CYLTabBarControllerKeepsEmptyViewControllers"] = true
         self.init(configuration: configuration)
     }
@@ -500,7 +500,7 @@ open class CYLTabBarController: UITabBarController, CYLTabBarControllerDelegate,
             return
         }
         cyl_tabBar?.layoutIfNeeded()
-        (cyl_tabBar as? UITabBar)?.cyl_tabShadowImageView()?.cyl_setHidden(true)
+        (cyl_tabBar as? UITabBar)?.cylTabShadowImageView()?.cylSetHidden(true)
     }
 
     @available(*, deprecated)
@@ -569,7 +569,7 @@ open class CYLTabBarController: UITabBarController, CYLTabBarControllerDelegate,
     // MARK: - UITabBarControllerDelegate
 
     open dynamic func tabBarController(_ tabBarController: UITabBarController, shouldSelect viewController: UIViewController) -> Bool {
-        cyl_tabBarController(tabBarController, shouldSelect: viewController)
+        cylTabBarController(tabBarController, shouldSelect: viewController)
     }
 }
 

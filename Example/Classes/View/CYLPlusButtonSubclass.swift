@@ -195,7 +195,7 @@ class CYLPlusButtonSubclass: CYLPlusButton, CYLPlusButtonSubclassing {
     // MARK: - Event response 事件响应
 
     @objc func clickPublish() {
-        guard let viewController = CYLGetRootViewController() else { return }
+        guard let viewController = cylGetRootViewController() else { return }
         // [EN] The new tab bar controller shows the OTHER plus button (another context): the title tells which.
         // [CN] 新的 TabBarController 显示另一个 PlusButton（另一个 context），标题会说明是哪一个。
         let nextClass: AnyClass = CYLPlusButtonSubclass.alternatePlusButtonClass(forOwner: self)

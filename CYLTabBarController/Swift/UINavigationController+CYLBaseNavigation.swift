@@ -21,7 +21,7 @@ extension UINavigationController {
           hidden). [CN] push 之前：压在根页面上的页面隐藏 TabBar，更深的页面不改变它（TabBar 已经隐藏）。
      */
     @objc(cyl_baseNavigationWillPushViewController:)
-    public func cyl_baseNavigationWillPush(_ viewController: UIViewController) {
+    public func cylBaseNavigationWillPush(_ viewController: UIViewController) {
         viewController.cyl_hidesBottomBarWhenPushed = viewControllers.count == 1
     }
 
@@ -29,7 +29,7 @@ extension UINavigationController {
      [EN] After the stack changed: the top page hides the tab bar unless it is the root. [CN] 栈变化之后：顶部页面不是根页面时隐藏 TabBar。
      */
     @objc(cyl_baseNavigationToggleTabBarHidden)
-    public func cyl_baseNavigationToggleTabBarHidden() {
+    public func cylBaseNavigationToggleTabBarHidden() {
         viewControllers.last?.cyl_hidesBottomBarWhenPushed = viewControllers.count > 1
     }
 }

@@ -136,7 +136,7 @@ Pod::Spec.new do |s|
     #      the Podfiles pin its branch until it is.
     # [CN] 生命周期与 dealloc block（只执行一次的布局 block，docs/Lifecycle-Library.md）。1.4.0 尚未发布到 trunk：发布前各 Podfile 指定其分支。
     core.dependency 'CYLDeallocBlockExecutor', '~> 1.4'
-    core.source_files = 'CYLTabBarController', 'CYLTabBarController/**/*.{h,m}', 'CYLTabBarController/Swift/*.swift'
+    core.source_files = 'CYLTabBarController', 'CYLTabBarController/**/*.{h,m}', 'CYLTabBarController/Swift/*.swift', 'CYLTabBarController/Swift/Deprecated/*.swift'
     core.exclude_files = [
     'CYLTabBarController/Package/**/*', # SPM-only: the umbrella headers, module maps and header links of the C targets
     'CYLTabBarController/CYLUtils/**/*', # the CYLUtils subspec above

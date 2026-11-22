@@ -56,14 +56,14 @@
 ```swift
 override func numberOfSections(in _: UITableView) -> Int { groups.count }
 override func tableView(_: UITableView, numberOfRowsInSection section: Int) -> Int {
-    cyl_settingsRows(in: groups[section]).count
+    cylSettingsRows(in: groups[section]).count
 }
 override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-    cyl_settingsCell(for: tableView, row: settingsRow(at: indexPath))
+    cylSettingsCell(for: tableView, row: settingsRow(at: indexPath))
 }
 override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     tableView.deselectRow(at: indexPath, animated: true)
-    cyl_didSelectSettingsRow(settingsRow(at: indexPath))
+    cylDidSelectSettingsRow(settingsRow(at: indexPath))
     tableView.reloadData()
 }
 ```

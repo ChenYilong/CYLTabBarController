@@ -33,7 +33,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func makeMainTabBarController() -> MainTabBarController {
         // Dark Mode (#620): "home_normal" also loads home_normal_dark (naming convention), the message tab names its dark
         // image, account_normal has its own Dark appearance. 深色模式：见 README「适配深色模式」。
-        let tabBarItemsAttributes = CYLLocalizedTabBarItemsAttributes(["首页", "同城", "消息", "我的"],
+        let tabBarItemsAttributes = cylLocalizedTabBarItemsAttributes(["首页", "同城", "消息", "我的"],
                                                                       ["home_normal", "mycity_normal", "message_normal", "account_normal"],
                                                                       ["home_highlight", "mycity_highlight", "message_highlight", "account_highlight"],
                                                                       [2: "message_normal_night"])

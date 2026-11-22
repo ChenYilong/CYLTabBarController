@@ -268,11 +268,11 @@ extension CYLTabBarController {
      */
     @objc(cyl_pagesOfReloadedTabs:keptTabs:)
     func cylPagesOfReloadedTabs(_ tabBarItemsAttributes: [[AnyHashable: Any]], keptTabs: NSMutableArray) -> [UIViewController] {
-        let normalized = CYLTabBarController.cyl_normalizedConfiguration([CYLTabBarControllerTabBarItemsAttributes: tabBarItemsAttributes])
+        let normalized = CYLTabBarController.cyl_normalizedConfiguration([cylTabBarControllerTabBarItemsAttributes: tabBarItemsAttributes])
         let skipped = NSMutableArray()
         // [EN] Dictionary objects, not Swift copies: a resolved tab is matched by identity, as the provider keeps it.
         // [CN] 使用字典对象而不是 Swift 副本：已解析的 Tab 按对象身份匹配。
-        let tabs = CYLTabBarController.cylResolvableTabs(normalized[CYLTabBarControllerTabBarItemsAttributes] as? [Any] ?? [], skipped: skipped)
+        let tabs = CYLTabBarController.cylResolvableTabs(normalized[cylTabBarControllerTabBarItemsAttributes] as? [Any] ?? [], skipped: skipped)
             .map { $0 as NSDictionary }
         var available: [String: [UIViewController]] = [:]
         for (pageIdentifier, pages) in cylPrivate.cylPagesByPageIdentifierState() ?? [:] {
@@ -349,7 +349,7 @@ extension CYLTabBarController {
             cylTabSetupStorage.cylSetStoredTabBar(created)
             newTabBar = created
         }
-        cyl_setValue(newTabBar, forKey: "tabBar")
+        cylSetValue(newTabBar, forKey: "tabBar")
         cylSetUpIPAD(for: newTabBar)
     }
 
@@ -416,7 +416,7 @@ extension CYLTabBarController {
                 tab.view.removeFromSuperview()
                 tab.removeFromParent()
             }
-            if hasPlusChildViewController() && !cyl_isPlusViewControllerAdded(oldTabs),
+            if hasPlusChildViewController() && !cylIsPlusViewControllerAdded(oldTabs),
                let plusChild = cylPrivate.cylContextPlusChildViewController() {
                 plusChild.willMove(toParent: nil)
                 plusChild.view.removeFromSuperview()
@@ -429,7 +429,7 @@ extension CYLTabBarController {
         }
         guard !newTabs.isEmpty else {
             for tab in oldTabs {
-                tab.cyl_getViewControllerInsteadOfNavigation().cylSetTabBarController(nil)
+                tab.cylGetViewControllerInsteadOfNavigation().cylSetTabBarController(nil)
                 tab.cylSetTabBarController(nil)
             }
             cylTabSetupStorage.cylSetViewControllersStorage(nil)
@@ -445,7 +445,7 @@ extension CYLTabBarController {
             cylHandTabsToUIKitIfMoreThanFive()
             return false
         }
-        tabBar.cyl_tabBarItemWidth = (tabBar.cyl_boundsSize().width - tabBar.cyl_plusButtonWidth()) / CGFloat(tabBar.cyl_tabbarItemsCount)
+        tabBar.cyl_tabBarItemWidth = (tabBar.cyl_boundsSize().width - tabBar.cylPlusButtonWidth()) / CGFloat(tabBar.cyl_tabbarItemsCount)
         var idx: UInt = 0
         for viewController in viewControllers ?? [] {
             // FIX: issue #604 — one place reads a tab item's attributes, for every style. [CN] 所有样式共用同一处读取属性的代码。
@@ -455,14 +455,14 @@ extension CYLTabBarController {
             var selectedImageInfo = setup.selectedImageInfo
             // [EN] A placeholder without its own slot entry keeps the placeholder image. [CN] 没有自己 slot 项的占位保留占位图片。
             if viewController.cyl_isPlaceholder && !cylTabBarItemsAttributesIncludePlusSlot() {
-                normalImageInfo = UIImage.cyl_tabItemPlaceholder()
-                selectedImageInfo = UIImage.cyl_tabItemPlaceholder()
+                normalImageInfo = UIImage.cylTabItemPlaceholder()
+                selectedImageInfo = UIImage.cylTabItemPlaceholder()
             }
             cylTabSetupStorage.cylAddOneChildViewController(viewController, withTitle: setup.title, normalImageInfo: normalImageInfo,
                                                             selectedImageInfo: selectedImageInfo, titlePositionAdjustment: setup.titlePositionAdjustment,
                                                             imagePositionAdjustment: setup.imagePositionAdjustment, imageInsets: setup.imageInsets,
                                                             lottieURL: setup.animationURL, lottieSizeValue: setup.animationSizeValue)
-            let content = viewController.cyl_getViewControllerInsteadOfNavigation()
+            let content = viewController.cylGetViewControllerInsteadOfNavigation()
             let bound: [Any?] = [viewController, content, viewController.cyl_getActualBadgeSuperView(), content.cyl_getActualBadgeSuperView(),
                                  viewController.tabBarItem.cyl_getActualBadgeSuperView(), content.tabBarItem.cyl_getActualBadgeSuperView()]
             for object in bound {
@@ -511,9 +511,9 @@ extension CYLTabBarController {
     @objc(cyl_loadImageURLsOfAttributes:atIndex:)
     @discardableResult
     func cylLoadImageURLs(ofAttributes attributes: [String: Any], at index: UInt) -> Bool {
-        guard let icon = attributes[CYLTabBarItemImageURL] else { return false }
-        let size = (attributes[CYLTabBarItemImageURLSize] as? NSValue)?.cgSizeValue ?? .zero
-        return setTabBarItemIcon(icon, selectedIcon: attributes[CYLTabBarItemSelectedImageURL], size: size, at: index)
+        guard let icon = attributes[cylTabBarItemImageURL] else { return false }
+        let size = (attributes[cylTabBarItemImageURLSize] as? NSValue)?.cgSizeValue ?? .zero
+        return setTabBarItemIcon(icon, selectedIcon: attributes[cylTabBarItemSelectedImageURL], size: size, at: index)
     }
 
     // MARK: - FIX: issue #618, diagnostics only (DEBUG / BETA builds)

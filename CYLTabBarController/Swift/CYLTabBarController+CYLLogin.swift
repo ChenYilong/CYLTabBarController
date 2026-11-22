@@ -72,7 +72,7 @@ extension CYLTabBarController {
         if !loggedIn {
             leaveTabRequiringLoginIfNeeded()
         }
-        NotificationCenter.default.post(name: .CYLTabBarLoginStateDidChange, object: self)
+        NotificationCenter.default.post(name: .cylTabBarLoginStateDidChange, object: self)
     }
 
     @objc(cyl_loginStateProvider)
@@ -177,8 +177,8 @@ extension CYLTabBarController {
             return present
         }
 #if DEBUG
-        NSLog(CYLLocalizedString("🔴类名与方法名：%@（在第%@行）, 描述：%@"), "\(type(of: self)) \(#function)" as NSString, "\(#line)" as NSString,
-              CYLLocalizedString("需要登录的 Tab 被点击，但没有设置 cyl_loginHandler 或代理方法 -tabBarController:presentLoginForViewController:completion:。") as NSString)
+        NSLog(cylLocalizedString("🔴类名与方法名：%@（在第%@行）, 描述：%@"), "\(type(of: self)) \(#function)" as NSString, "\(#line)" as NSString,
+              cylLocalizedString("需要登录的 Tab 被点击，但没有设置 cyl_loginHandler 或代理方法 -tabBarController:presentLoginForViewController:completion:。") as NSString)
 #endif
     }
 

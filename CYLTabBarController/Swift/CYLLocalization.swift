@@ -14,10 +14,10 @@ import UIKit
  *      仍是 Swift 层看不到的 Objective-C 常量。`CYLTabBarController` 的常量迁移到 Swift 后删除。
  */
 enum CYLLocalizationItemKeys {
-    static let title = CYLTabBarItemTitle
-    static let image = CYLTabBarItemImage
-    static let selectedImage = CYLTabBarItemSelectedImage
-    static let darkImage = CYLTabBarItemDarkImage
+    static let title = cylTabBarItemTitle
+    static let image = cylTabBarItemImage
+    static let selectedImage = cylTabBarItemSelectedImage
+    static let darkImage = cylTabBarItemDarkImage
 }
 
 /**
@@ -26,10 +26,10 @@ enum CYLLocalizationItemKeys {
  * [CN] 生成 TabBarItem 属性：本地化标题（`CYLLocalizedString`）、图片、选中图片，以及按索引给出的深色图片。已从 Objective-C 翻译
  *      （docs/Swift-Migration.md）；Objective-C 调用方继续使用 C 函数（`@_cdecl`）。
  */
-public func CYLLocalizedTabBarItemsAttributes(_ titles: [String], _ images: [Any], _ selectedImages: [Any],
+public func cylLocalizedTabBarItemsAttributes(_ titles: [String], _ images: [Any], _ selectedImages: [Any],
                                               _ darkImages: [NSNumber: Any]?) -> [[AnyHashable: Any]] {
     titles.enumerated().map { index, title in
-        var item: [AnyHashable: Any] = [CYLLocalizationItemKeys.title: CYLLocalizedString(title)]
+        var item: [AnyHashable: Any] = [CYLLocalizationItemKeys.title: cylLocalizedString(title)]
         item[CYLLocalizationItemKeys.image] = index < images.count ? images[index] : nil
         item[CYLLocalizationItemKeys.selectedImage] = index < selectedImages.count ? selectedImages[index] : nil
         item[CYLLocalizationItemKeys.darkImage] = darkImages?[NSNumber(value: index)]
@@ -41,7 +41,7 @@ public func CYLLocalizedTabBarItemsAttributes(_ titles: [String], _ images: [Any
 public func cylLocalizedTabBarItemsAttributesEntryPoint(_ titles: NSArray, _ images: NSArray, _ selectedImages: NSArray,
                                                         _ darkImages: NSDictionary?) -> NSArray {
     let darkImagesByIndex = darkImages as? [NSNumber: Any]
-    return CYLLocalizedTabBarItemsAttributes(titles.compactMap { $0 as? String }, images as? [Any] ?? [],
+    return cylLocalizedTabBarItemsAttributes(titles.compactMap { $0 as? String }, images as? [Any] ?? [],
                                              selectedImages as? [Any] ?? [], darkImagesByIndex) as NSArray
 }
 
@@ -57,22 +57,22 @@ extension UIView {
      * [CN] 用 `CYLLocalizedString` 替换本视图及其子视图的文字（按钮标题、标签文字、输入框占位文字）。
      */
     @objc(cyl_localizeTexts)
-    public func cyl_localizeTexts() {
+    public func cylLocalizeTexts() {
         if let button = self as? UIButton {
             for state: UIControl.State in [.normal, .highlighted, .selected, .disabled] {
                 if let title = button.title(for: state), !title.isEmpty {
-                    button.setTitle(CYLLocalizedString(title), for: state)
+                    button.setTitle(cylLocalizedString(title), for: state)
                 }
             }
             return
         }
         if let label = self as? UILabel, let text = label.text, !text.isEmpty {
-            label.text = CYLLocalizedString(text)
+            label.text = cylLocalizedString(text)
         } else if let textField = self as? UITextField, let placeholder = textField.placeholder, !placeholder.isEmpty {
-            textField.placeholder = CYLLocalizedString(placeholder)
+            textField.placeholder = cylLocalizedString(placeholder)
         }
         for subview in subviews {
-            subview.cyl_localizeTexts()
+            subview.cylLocalizeTexts()
         }
     }
 }
@@ -99,15 +99,15 @@ extension UIViewController {
      * [CN] 显示当前语言的表格行；选中时应调用 `cyl_presentLanguagePicker()`。
      */
     @objc(cyl_languageCellForTableView:)
-    public func cyl_languageCell(for tableView: UITableView) -> UITableViewCell {
+    public func cylLanguageCell(for tableView: UITableView) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: UIViewController.languageCellIdentifier)
             ?? UITableViewCell(style: .subtitle, reuseIdentifier: UIViewController.languageCellIdentifier)
         cell.accessoryType = .disclosureIndicator
         cell.detailTextLabel?.textColor = .gray
-        let language = CYLLocalizationLanguage()
-        let languageTitle = CYLLocalizedString("语言")
+        let language = cylLocalizationLanguage()
+        let languageTitle = cylLocalizedString("语言")
         cell.textLabel?.text = "🌐 \(languageTitle)：\(CYLLanguageNames.flaggedName(language))"
-        cell.detailTextLabel?.text = CYLLocalizedStringForLanguage("点击切换语言", nil)
+        cell.detailTextLabel?.text = cylLocalizedStringForLanguage("点击切换语言", nil)
         cell.accessibilityLabel = "\(languageTitle), \(CYLLanguageNames.nativeName(language))"
         cell.accessibilityHint = cell.detailTextLabel?.text
         cell.accessibilityTraits = .button
@@ -119,20 +119,20 @@ extension UIViewController {
      * [CN] 弹出包含各语言、"跟随系统"与取消的操作表。
      */
     @objc(cyl_presentLanguagePicker)
-    public func cyl_presentLanguagePicker() {
-        let picker = UIAlertController(title: CYLLocalizedString("语言"), message: CYLLocalizedStringForLanguage("点击切换语言", nil),
+    public func cylPresentLanguagePicker() {
+        let picker = UIAlertController(title: cylLocalizedString("语言"), message: cylLocalizedStringForLanguage("点击切换语言", nil),
                                        preferredStyle: .actionSheet)
         for language in type(of: self).cyl_pickerLanguages() {
             let action = UIAlertAction(title: CYLLanguageNames.flaggedName(language), style: .default) { _ in
-                CYLSetLocalizationLanguage(language)
+                cylSetLocalizationLanguage(language)
             }
             action.accessibilityLabel = CYLLanguageNames.nativeName(language)
             picker.addAction(action)
         }
-        picker.addAction(UIAlertAction(title: CYLLocalizedString("跟随系统"), style: .default) { _ in
-            CYLSetLocalizationLanguage(nil)
+        picker.addAction(UIAlertAction(title: cylLocalizedString("跟随系统"), style: .default) { _ in
+            cylSetLocalizationLanguage(nil)
         })
-        picker.addAction(UIAlertAction(title: CYLLocalizedString("取消"), style: .cancel))
+        picker.addAction(UIAlertAction(title: cylLocalizedString("取消"), style: .cancel))
         picker.popoverPresentationController?.sourceView = view
         picker.popoverPresentationController?.sourceRect = CGRect(x: view.bounds.midX, y: view.bounds.midY, width: 1, height: 1)
         present(picker, animated: true)
@@ -156,12 +156,12 @@ extension UIWindow {
      *      仍未释放时打印日志（issue #488）。
      */
     @objc(cyl_setRootViewControllerProvider:)
-    public func cyl_setRootViewControllerProvider(_ provider: @escaping () -> UIViewController) {
+    public func cylSetRootViewControllerProvider(_ provider: @escaping () -> UIViewController) {
         if let previousObserver = objc_getAssociatedObject(self, UIWindow.rootProviderObserverKey) {
             NotificationCenter.default.removeObserver(previousObserver)
         }
         let reload: () -> Void = { [weak self] in
-            let rightToLeft = Locale.characterDirection(forLanguage: CYLLocalizationLanguage()) == .rightToLeft
+            let rightToLeft = Locale.characterDirection(forLanguage: cylLocalizationLanguage()) == .rightToLeft
             UIView.appearance().semanticContentAttribute = rightToLeft ? .forceRightToLeft : .unspecified
             let previousRootViewController = self?.rootViewController
             self?.rootViewController = provider()
@@ -169,7 +169,7 @@ extension UIWindow {
         }
         reload()
         let observer = NotificationCenter.default.addObserver(
-            forName: NSNotification.Name(CYLLocalizationLanguageDidChangeNotification), object: nil, queue: .main) { _ in
+            forName: NSNotification.Name(cylLocalizationLanguageDidChangeNotification), object: nil, queue: .main) { _ in
             reload()
         }
         objc_setAssociatedObject(self, UIWindow.rootProviderObserverKey, observer, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)

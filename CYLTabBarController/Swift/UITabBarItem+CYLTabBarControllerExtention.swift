@@ -87,8 +87,8 @@ extension UITabBarItem {
      * [CN] TabBarItem 的 Tab 按钮中的图片视图。
      */
     @objc(cyl_imageView)
-    public func cyl_imageView() -> UIImageView? {
-        cyl_view()?.cyl_tabImageView()
+    public func cylImageView() -> UIImageView? {
+        cylView()?.cylTabImageView()
     }
 
     /**
@@ -96,8 +96,8 @@ extension UITabBarItem {
      * [CN] 与 `cyl_imageView()` 相同。
      */
     @objc(cyl_imageViewInTabBarButton)
-    public func cyl_imageViewInTabBarButton() -> UIImageView? {
-        cyl_view()?.cyl_tabImageView()
+    public func cylImageViewInTabBarButton() -> UIImageView? {
+        cylView()?.cylTabImageView()
     }
 
     // MARK: - Tab buttons
@@ -107,10 +107,10 @@ extension UITabBarItem {
      * [CN] 液态玻璃下，TabBarItem 在 platter 选中层中的按钮；否则为 nil。
      */
     @objc public var cyl_selectedTabButton: UIControl? {
-        guard CYLConstants.isLiquidGlassActive(), let view = cyl_view(),
+        guard CYLConstants.isLiquidGlassActive(), let view = cylView(),
               let index = view.superview?.subviews.firstIndex(of: view),
-              let platterView = cyl_tabBarController?.tabBar.cyl_platterView, platterView.cyl_isPlatterView(),
-              let selectedContentView = platterView.subviews.first, selectedContentView.cyl_isPlatterSelectedContentView(),
+              let platterView = cylTabBarController?.tabBar.cyl_platterView, platterView.cylIsPlatterView(),
+              let selectedContentView = platterView.subviews.first, selectedContentView.cylIsPlatterSelectedContentView(),
               index < selectedContentView.subviews.count else {
             return nil
         }
@@ -177,7 +177,7 @@ extension UITabBarAppearance {
      * [CN] 依次以 stacked、inline 与 compact inline 三种 item 外观调用 `block`。
      */
     @objc(cyl_applyItemAppearanceWithBlock:)
-    public func cyl_applyItemAppearance(_ block: (UITabBarItemAppearance) -> Void) {
+    public func cylApplyItemAppearance(_ block: (UITabBarItemAppearance) -> Void) {
         block(stackedLayoutAppearance)
         block(inlineLayoutAppearance)
         block(compactInlineLayoutAppearance)

@@ -11,7 +11,7 @@ import UIKit
  * [EN] Row height that leaves room around the icon for its badge (the Objective-C header has a macro of the same name).
  * [CN] 行高：为图标四周的角标留出空间（Objective-C 头文件中有同名宏）。
  */
-public let CYLBadgeRowHeight: CGFloat = 60
+public let cylBadgeRowHeight: CGFloat = 60
 
 /**
  * [EN] One badge sample: its title, the core API behind it (shown after the title), the badge value and what the row
@@ -35,17 +35,17 @@ struct CYLBadgeSample {
             let size = badge.bounds.size
             switch self {
             case .rotationForever:
-                return CAAnimation.cyl_rotationAnimation(withDuration: 2, degree: 2 * .pi, direction: .Z, repeatCount: .greatestFiniteMagnitude)
+                return CAAnimation.cylRotationAnimation(withDuration: 2, degree: 2 * .pi, direction: .Z, repeatCount: .greatestFiniteMagnitude)
             case .springForever:
-                let animation = CAAnimation.cyl_springAnimation(forDuration: 1)
+                let animation = CAAnimation.cylSpringAnimation(forDuration: 1)
                 animation.repeatCount = .greatestFiniteMagnitude
                 return animation
-            case .shakeThreeTimes: return CAAnimation.cyl_shakeAnimationRepeatTimes(3, duration: 1, offset: size.width / 4)
-            case .bounceThreeTimes: return CAAnimation.cyl_bounceRepeatTimes(3, duration: 1, offset: size.height / 4)
-            case .scaleThreeTimes: return CAAnimation.cyl_scale(fromScale: 1.4, toScale: 0.6, duration: 1, repeatTimes: 3)
-            case .blinkThreeTimes: return CAAnimation.cyl_opacityTimesAnimationRepeatTimes(3, duration: 0.8)
-            case .flipTwice: return CAAnimation.cyl_rotationAnimation(withDuration: 1, degree: .pi, direction: .Y, repeatCount: 2)
-            case .springOnce: return CAAnimation.cyl_springAnimation(forDuration: 0.6)
+            case .shakeThreeTimes: return CAAnimation.cylShakeAnimationRepeatTimes(3, duration: 1, offset: size.width / 4)
+            case .bounceThreeTimes: return CAAnimation.cylBounceRepeatTimes(3, duration: 1, offset: size.height / 4)
+            case .scaleThreeTimes: return CAAnimation.cylScale(fromScale: 1.4, toScale: 0.6, duration: 1, repeatTimes: 3)
+            case .blinkThreeTimes: return CAAnimation.cylOpacityTimesAnimationRepeatTimes(3, duration: 0.8)
+            case .flipTwice: return CAAnimation.cylRotationAnimation(withDuration: 1, degree: .pi, direction: .Y, repeatCount: 2)
+            case .springOnce: return CAAnimation.cylSpringAnimation(forDuration: 0.6)
             }
         }
     }
@@ -99,7 +99,7 @@ struct CYLBadgeSample {
      * [CN] 所有角标样式与动画，按显示顺序：右上角带动画（无限循环、重复几次、播放一次）；右上角无动画（样式、外观选项）；其他角。语言变化时重建。
      */
     static var all: [CYLBadgeSample] {
-        let language = CYLLocalizationLanguage()
+        let language = cylLocalizationLanguage()
         if cachedSamples.isEmpty || cachedLanguage != language {
             cachedLanguage = language
             cachedSamples = makeAll()
@@ -108,7 +108,7 @@ struct CYLBadgeSample {
     }
 
     private static func makeAll() -> [CYLBadgeSample] {
-        func title(_ key: String) -> String { CYLLocalizedString(key) }
+        func title(_ key: String) -> String { cylLocalizedString(key) }
         return [
             // [EN] 1.1 Animations that repeat forever: `CYLBadgeAnimationType`. [CN] 1.1 无限循环的动画：`CYLBadgeAnimationType`。
             CYLBadgeSample(title: title("Scale (forever)"), api: "CYLBadgeAnimationTypeScale", value: "3", animationType: .scale),
@@ -166,7 +166,7 @@ struct CYLBadgeSample {
      * [CN] 以 30 x 30 pt 绘制的圆角示例图标，在 60 pt 的行中上下各留 15 pt：角标位于图标的一角，需要这些空间（包括动画）。
      */
     static let icon: UIImage = {
-        let image = UIImage(named: "cyl_badge_sample_icon", in: CYLResourceBundle(), compatibleWith: nil)
+        let image = UIImage(named: "cyl_badge_sample_icon", in: cylResourceBundle(), compatibleWith: nil)
         let rect = CGRect(x: 0, y: 0, width: iconSide, height: iconSide)
         return UIGraphicsImageRenderer(size: rect.size).image { _ in
             UIBezierPath(roundedRect: rect, cornerRadius: 6).addClip()
@@ -207,7 +207,7 @@ extension UITableViewCell {
      * [CN] 在 cell 上显示图标及其角标，样式和动画随行号变化。
      */
     @objc(cyl_showBadgeForRow:)
-    public func cyl_showBadge(forRow row: Int) {
+    public func cylShowBadge(forRow row: Int) {
         let sample = CYLBadgeSample.sample(forRow: row)
         // [EN] A long sample title is cut in the middle, so the API name at its end stays readable.
         // [CN] 过长的样例标题从中间截断，保证末尾的 API 名称可读。
@@ -224,7 +224,7 @@ extension UITableViewCell {
         //      再显示角标。
         iconView.cyl_badge?.layer.removeAllAnimations()
         iconView.cyl_clearBadge()
-        iconView.cyl_resetBadgeAppearance()
+        iconView.cylResetBadgeAppearance()
         if sample.customColors {
             iconView.cyl_badgeBackgroundColor = .purple
             iconView.cyl_badgeTextColor = .yellow
@@ -264,7 +264,7 @@ extension UITableViewCell {
      * [CN] 第 `row` 行角标样例的标题，后面附上实现该效果的核心 API，例如“20. 数字 (cyl_showBadgeValue:)”；标题中已含 API 名称时不再附加。
      */
     @objc(cyl_badgeTitleForRow:)
-    public class func cyl_badgeTitle(forRow row: Int) -> String {
+    public class func cylBadgeTitle(forRow row: Int) -> String {
         let sample = CYLBadgeSample.sample(forRow: row)
         let title = sample.api.isEmpty || sample.title.contains(sample.api) ? sample.title : "\(sample.title) (\(sample.api))"
         return "\(row + 1). \(title)"
@@ -274,7 +274,7 @@ extension UITableViewCell {
      * [EN] Number of different badge samples. [CN] 角标样例的种数。
      */
     @objc(cyl_badgeStyleCount)
-    public class func cyl_badgeStyleCount() -> Int {
+    public class func cylBadgeStyleCount() -> Int {
         CYLBadgeSample.all.count
     }
 
@@ -287,7 +287,7 @@ extension UITableViewCell {
      *      16 pt 半粗体、副标题为 14 pt，均跟随动态字体。与 `+cyl_setUpAutomaticRowHeightForTableView:` 一起使用。
      */
     @objc(cyl_wrapsTextLabels)
-    public func cyl_wrapsTextLabels() {
+    public func cylWrapsTextLabels() {
         for label in [textLabel, detailTextLabel] {
             label?.numberOfLines = 0
             label?.lineBreakMode = .byWordWrapping
@@ -308,9 +308,9 @@ extension UITableViewCell {
      * [CN] 行高随换行后的文字变化（`-cyl_wrapsTextLabels`），预估行高为 `CYLBadgeRowHeight`。
      */
     @objc(cyl_setUpAutomaticRowHeightForTableView:)
-    public class func cyl_setUpAutomaticRowHeight(for tableView: UITableView) {
+    public class func cylSetUpAutomaticRowHeight(for tableView: UITableView) {
         tableView.rowHeight = UITableView.automaticDimension
-        tableView.estimatedRowHeight = CYLBadgeRowHeight
+        tableView.estimatedRowHeight = cylBadgeRowHeight
     }
 }
 
@@ -325,13 +325,13 @@ extension UIViewController {
      */
     @objc(cyl_showNavigationBadgeValue:animationType:backgroundColor:)
     @discardableResult
-    public func cyl_showNavigationBadge(value: String, animationType: CYLBadgeAnimationType, backgroundColor: UIColor?) -> UIBarButtonItem {
+    public func cylShowNavigationBadge(value: String, animationType: CYLBadgeAnimationType, backgroundColor: UIColor?) -> UIBarButtonItem {
         let item = navigationItem.rightBarButtonItem ?? {
             let item = UIBarButtonItem(image: UIImage(systemName: "bell"), style: .plain, target: nil, action: nil)
             navigationItem.rightBarButtonItem = item
             return item
         }()
-        item.cyl_showBadgeValue(value, animationType: animationType, backgroundColor: backgroundColor)
+        item.cylShowBadgeValue(value, animationType: animationType, backgroundColor: backgroundColor)
         return item
     }
 
@@ -340,7 +340,7 @@ extension UIViewController {
      * [CN] 添加一个铺满当前视图的 `CYLBadgeHelperTableViewController` 子控制器。
      */
     @objc(cyl_addBadgeHelperTable)
-    public func cyl_addBadgeHelperTable() {
+    public func cylAddBadgeHelperTable() {
         let badgeHelper = CYLBadgeHelperTableViewController(style: .plain)
         addChild(badgeHelper)
         badgeHelper.view.frame = view.bounds
@@ -369,8 +369,8 @@ open class CYLBadgeHelperTableViewController: UITableViewController {
 
     override open func viewDidLoad() {
         super.viewDidLoad()
-        navigationItem.title = CYLLocalizedString("Badge")
-        UITableViewCell.cyl_setUpAutomaticRowHeight(for: tableView)
+        navigationItem.title = cylLocalizedString("Badge")
+        UITableViewCell.cylSetUpAutomaticRowHeight(for: tableView)
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: CYLBadgeSample.cellIdentifier)
     }
 
@@ -379,28 +379,28 @@ open class CYLBadgeHelperTableViewController: UITableViewController {
     }
 
     override open func tableView(_: UITableView, numberOfRowsInSection section: Int) -> Int {
-        section == Int(CYLSettingsSection) ? cyl_settingsRowCount() : UITableViewCell.cyl_badgeStyleCount()
+        section == Int(CYLSettingsSection) ? cylSettingsRowCount() : UITableViewCell.cylBadgeStyleCount()
     }
 
     override open func tableView(_: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if indexPath.section == Int(CYLSettingsSection) {
-            return cyl_settingsCell(for: tableView, at: indexPath)
+            return cylSettingsCell(for: tableView, at: indexPath)
         }
         let cell = tableView.dequeueReusableCell(withIdentifier: CYLBadgeSample.cellIdentifier, for: indexPath)
-        cell.textLabel?.text = UITableViewCell.cyl_badgeTitle(forRow: indexPath.row)
-        cell.cyl_wrapsTextLabels()
-        cell.cyl_showBadge(forRow: indexPath.row)
+        cell.textLabel?.text = UITableViewCell.cylBadgeTitle(forRow: indexPath.row)
+        cell.cylWrapsTextLabels()
+        cell.cylShowBadge(forRow: indexPath.row)
         return cell
     }
 
     override open func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if indexPath.section == Int(CYLSettingsSection) {
-            cyl_didSelectSettingsRow(at: indexPath, in: tableView)
+            cylDidSelectSettingsRow(at: indexPath, in: tableView)
             return
         }
         tableView.deselectRow(at: indexPath, animated: true)
         (tableView.cellForRow(at: indexPath)?.imageView as UIView?)?.cyl_clearBadge()
         didSelectRowHandler?(indexPath)
-        CYLTabBarController.cyl_simulateMemoryWarning()
+        CYLTabBarController.cylSimulateMemoryWarning()
     }
 }

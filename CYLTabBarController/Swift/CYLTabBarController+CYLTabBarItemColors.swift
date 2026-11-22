@@ -117,7 +117,7 @@ extension CYLTabBarController {
      */
     private var cylUsesTabBackgroundColors: Bool {
         tabBarItemsAttributes.contains { attributes in
-            attributes[CYLTabBarItemSelectedBackgroundColor] != nil || attributes[CYLTabBarItemBackgroundColor] != nil
+            attributes[cylTabBarItemSelectedBackgroundColor] != nil || attributes[cylTabBarItemBackgroundColor] != nil
         }
     }
 
@@ -141,11 +141,11 @@ extension CYLTabBarController {
             return
         }
         // [EN] Counted as in `-cyl_bindTabControlActions`: system tab buttons only. [CN] 与 `-cyl_bindTabControlActions` 相同，只计系统 Tab 按钮。
-        let tabButtons = (tabBar.cylVisibleControls() ?? []).filter { $0.cyl_isTabButton() }
+        let tabButtons = (tabBar.cylVisibleControls() ?? []).filter { $0.cylIsTabButton() }
         for (tabIndex, control) in tabButtons.enumerated() {
             let attributes = tabBarItemAttributes(at: UInt(tabIndex))
-            let selectedColor = attributes?[CYLTabBarItemSelectedBackgroundColor] as? UIColor
-            let normalColor = attributes?[CYLTabBarItemBackgroundColor] as? UIColor
+            let selectedColor = attributes?[cylTabBarItemSelectedBackgroundColor] as? UIColor
+            let normalColor = attributes?[cylTabBarItemBackgroundColor] as? UIColor
             if selectedColor == nil && normalColor == nil {
                 // [EN] The keys were removed (e.g. by a reload): clear the color the library set.
                 // [CN] 这些键已被移除（如重新加载）：清除本库设置的颜色。

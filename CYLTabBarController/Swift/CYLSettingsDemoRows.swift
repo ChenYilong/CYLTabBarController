@@ -53,8 +53,8 @@ enum CYLSettingsDemo {
     static func titlePositionAdjustmentCell(_ tableView: UITableView, _ tabBarController: CYLTabBarController?) -> UITableViewCell {
         let cell = subtitleCell(tableView, "CYLTitlePositionAdjustmentCell", symbol: "arrow.up.arrow.down")
         let offset = tabBarController?.titlePositionAdjustment ?? .zero
-        cell.textLabel?.text = CYLLocalizedString("标题偏移（titlePositionAdjustment）")
-        cell.detailTextLabel?.text = String(format: CYLLocalizedString("点击切换所有 Tab 标题的垂直偏移，当前：%@"),
+        cell.textLabel?.text = cylLocalizedString("标题偏移（titlePositionAdjustment）")
+        cell.detailTextLabel?.text = String(format: cylLocalizedString("点击切换所有 Tab 标题的垂直偏移，当前：%@"),
                                             String(format: "(%g, %g)", offset.horizontal, offset.vertical))
         return cell
     }
@@ -84,10 +84,10 @@ enum CYLSettingsDemo {
 
         var name: String {
             switch self {
-            case .original: return CYLLocalizedString("原始")
-            case .dark: return CYLLocalizedString("深色")
-            case .centeredCapsule: return CYLLocalizedString("居中胶囊")
-            case .greenLine: return CYLLocalizedString("绿色描边")
+            case .original: return cylLocalizedString("原始")
+            case .dark: return cylLocalizedString("深色")
+            case .centeredCapsule: return cylLocalizedString("居中胶囊")
+            case .greenLine: return cylLocalizedString("绿色描边")
             }
         }
     }
@@ -149,8 +149,8 @@ enum CYLSettingsDemo {
     static func standardAppearanceCell(_ tableView: UITableView, _ tabBarController: CYLTabBarController?) -> UITableViewCell {
         let cell = subtitleCell(tableView, "CYLStandardAppearanceCell", symbol: "paintpalette")
         let theme = tabBarController.flatMap { flag($0, appearanceThemeKey) }.flatMap(AppearanceTheme.init(rawValue:)) ?? .original
-        cell.textLabel?.text = CYLLocalizedString("standardAppearance 主题（液态玻璃与扁平样式共用）")
-        cell.detailTextLabel?.text = String(format: CYLLocalizedString("点击切换 tabBar.standardAppearance，当前：%@"), theme.name)
+        cell.textLabel?.text = cylLocalizedString("standardAppearance 主题（液态玻璃与扁平样式共用）")
+        cell.detailTextLabel?.text = String(format: cylLocalizedString("点击切换 tabBar.standardAppearance，当前：%@"), theme.name)
         return cell
     }
 
@@ -190,9 +190,9 @@ enum CYLSettingsDemo {
     static func loginRequiredTabTitles(_ tabBarController: CYLTabBarController?) -> String {
         guard let tabBarController else { return "" }
         let titles = (tabBarController.viewControllers ?? []).filter { tabBarController.cyl_isLoginRequired(for: $0) }.compactMap { viewController in
-            (viewController.tabBarItem.title ?? viewController.cyl_getViewControllerInsteadOfNavigation().title).flatMap { $0.isEmpty ? nil : $0 }
+            (viewController.tabBarItem.title ?? viewController.cylGetViewControllerInsteadOfNavigation().title).flatMap { $0.isEmpty ? nil : $0 }
         }
-        return titles.joined(separator: CYLLocalizedString("、"))
+        return titles.joined(separator: cylLocalizedString("、"))
     }
 
     /**
@@ -201,12 +201,12 @@ enum CYLSettingsDemo {
     static func configureLoginStateCell(_ cell: UITableViewCell, _ tabBarController: CYLTabBarController?) {
         let loggedIn = tabBarController?.cyl_loggedIn ?? false
         cell.imageView?.image = UIImage(systemName: loggedIn ? "person.crop.circle.badge.checkmark" : "person.crop.circle.badge.xmark")
-        cell.textLabel?.text = loggedIn ? CYLLocalizedString("登录状态：已登录") : CYLLocalizedString("登录状态：未登录")
+        cell.textLabel?.text = loggedIn ? cylLocalizedString("登录状态：已登录") : cylLocalizedString("登录状态：未登录")
         let titles = loginRequiredTabTitles(tabBarController)
         if titles.isEmpty {
-            cell.detailTextLabel?.text = CYLLocalizedString("打开开关表示已登录，关闭表示未登录（已缓存到本地）。当前没有需要登录的 Tab。")
+            cell.detailTextLabel?.text = cylLocalizedString("打开开关表示已登录，关闭表示未登录（已缓存到本地）。当前没有需要登录的 Tab。")
         } else {
-            cell.detailTextLabel?.text = String(format: CYLLocalizedString("打开开关表示已登录，关闭表示未登录（已缓存到本地）。未登录时点击「%@」会先弹出登录页，登录后自动切换到该 Tab；已登录时直接切换。"), titles)
+            cell.detailTextLabel?.text = String(format: cylLocalizedString("打开开关表示已登录，关闭表示未登录（已缓存到本地）。未登录时点击「%@」会先弹出登录页，登录后自动切换到该 Tab；已登录时直接切换。"), titles)
         }
     }
 
@@ -253,9 +253,9 @@ enum CYLSettingsDemo {
         let indexText = tabBarController.map { $0.cyl_selectedIndexIgnoringPlusButton }.flatMap { $0 == NSNotFound ? nil : "\($0)" } ?? "-"
         let selectedIndexText = tabBarController.map { $0.selectedIndex }.flatMap { $0 == NSNotFound ? nil : "\($0)" } ?? "-"
         let selected = tabBarController?.selectedViewController
-        let title = selected?.cyl_getViewControllerInsteadOfNavigation().tabBarItem.title ?? selected?.tabBarItem.title ?? "-"
-        cell.textLabel?.text = CYLLocalizedString("selectedIndex 与 PlusButton（issue #515）")
-        cell.detailTextLabel?.text = String(format: CYLLocalizedString("点击切换到下一个 Tab。不含 PlusButton 的下标：%1$@，selectedIndex：%2$@，当前：%3$@"),
+        let title = selected?.cylGetViewControllerInsteadOfNavigation().tabBarItem.title ?? selected?.tabBarItem.title ?? "-"
+        cell.textLabel?.text = cylLocalizedString("selectedIndex 与 PlusButton（issue #515）")
+        cell.detailTextLabel?.text = String(format: cylLocalizedString("点击切换到下一个 Tab。不含 PlusButton 的下标：%1$@，selectedIndex：%2$@，当前：%3$@"),
                                             indexText, selectedIndexText, title)
         return cell
     }
@@ -292,14 +292,14 @@ enum CYLSettingsDemo {
 
     static func tapAnimationTypeName(_ type: CYLTabButtonTapAnimationType) -> String {
         switch type {
-        case .scale: return CYLLocalizedString("放大再缩小")
-        case .zoomIn: return CYLLocalizedString("从小放大")
-        case .bounce: return CYLLocalizedString("弹性")
-        case .bounceWithFireworks: return CYLLocalizedString("弹性 + 烟花")
-        case .rotation: return CYLLocalizedString("旋转")
-        case .flip: return CYLLocalizedString("翻转")
-        case .fume: return CYLLocalizedString("飘散")
-        default: return CYLLocalizedString("无")
+        case .scale: return cylLocalizedString("放大再缩小")
+        case .zoomIn: return cylLocalizedString("从小放大")
+        case .bounce: return cylLocalizedString("弹性")
+        case .bounceWithFireworks: return cylLocalizedString("弹性 + 烟花")
+        case .rotation: return cylLocalizedString("旋转")
+        case .flip: return cylLocalizedString("翻转")
+        case .fume: return cylLocalizedString("飘散")
+        default: return cylLocalizedString("无")
         }
     }
 
@@ -314,7 +314,7 @@ enum CYLSettingsDemo {
     static func frameImages() -> [UIImage] {
         (1...6).compactMap { index in
             let side = 6.0 * CGFloat(index)
-            return UIImage.cyl_image(with: .systemOrange, size: CGSize(width: side, height: side), cornerRadius: side / 2)
+            return UIImage.cylImage(with: .systemOrange, size: CGSize(width: side, height: side), cornerRadius: side / 2)
         }
     }
 
@@ -349,20 +349,20 @@ enum CYLSettingsDemo {
 
     static func tapAnimationStepName(_ step: Int) -> String {
         switch step {
-        case TapAnimationStep.oneTabRotation: return CYLLocalizedString("旋转（仅当前 Tab：viewController.cyl_tabButtonAnimation）")
-        case TapAnimationStep.defaultFrameAnimation: return CYLLocalizedString("逐帧 + 烟花（所有 Tab：cyl_defaultTabButtonAnimation）")
-        case TapAnimationStep.slowScale: return CYLLocalizedString("慢速放大再缩小（CYLTabButtonScaleAnimation.duration = 1.2）")
-        case TapAnimationStep.slowZoomIn: return CYLLocalizedString("慢速从小放大（CYLTabButtonZoomInAnimation.duration = 1.2）")
-        case TapAnimationStep.starFireworks: return CYLLocalizedString("弹性 + 星星烟花（CYLTabButtonBounceAnimation.fireworksImage）")
-        case TapAnimationStep.curlUp: return CYLLocalizedString("向上卷页，取消选中无动画（CYLTabButtonFlipAnimation.direction = 5）")
+        case TapAnimationStep.oneTabRotation: return cylLocalizedString("旋转（仅当前 Tab：viewController.cyl_tabButtonAnimation）")
+        case TapAnimationStep.defaultFrameAnimation: return cylLocalizedString("逐帧 + 烟花（所有 Tab：cyl_defaultTabButtonAnimation）")
+        case TapAnimationStep.slowScale: return cylLocalizedString("慢速放大再缩小（CYLTabButtonScaleAnimation.duration = 1.2）")
+        case TapAnimationStep.slowZoomIn: return cylLocalizedString("慢速从小放大（CYLTabButtonZoomInAnimation.duration = 1.2）")
+        case TapAnimationStep.starFireworks: return cylLocalizedString("弹性 + 星星烟花（CYLTabButtonBounceAnimation.fireworksImage）")
+        case TapAnimationStep.curlUp: return cylLocalizedString("向上卷页，取消选中无动画（CYLTabButtonFlipAnimation.direction = 5）")
         default: return tapAnimationTypeName(CYLTabButtonTapAnimationType(rawValue: step) ?? .none)
         }
     }
 
     static func tapAnimationCell(_ tableView: UITableView, _ tabBarController: CYLTabBarController?) -> UITableViewCell {
         let cell = subtitleCell(tableView, "CYLTabButtonTapAnimationCell", symbol: "sparkles")
-        cell.textLabel?.text = CYLLocalizedString("Tab 点击动画（issue #535）")
-        cell.detailTextLabel?.text = String(format: CYLLocalizedString("点击切换 Tab 与 PlusButton 的点击动画，当前：%@"),
+        cell.textLabel?.text = cylLocalizedString("Tab 点击动画（issue #535）")
+        cell.detailTextLabel?.text = String(format: cylLocalizedString("点击切换 Tab 与 PlusButton 的点击动画，当前：%@"),
                                             tapAnimationStepName(currentTapAnimationStep(tabBarController)))
         return cell
     }
@@ -424,9 +424,9 @@ enum CYLSettingsDemo {
             tabBarController.cyl_swipeToSwitchTabEnabled = on
         case .longPress:
             tabBarController.cyl_didLongPressControlBlock = on ? { pressedTabBarController, control in
-                let alert = UIAlertController(title: String(format: CYLLocalizedString("长按了「%@」"), control.cyl_tabBarItemDisplayName),
+                let alert = UIAlertController(title: String(format: cylLocalizedString("长按了「%@」"), control.cyl_tabBarItemDisplayName),
                                               message: nil, preferredStyle: .alert)
-                alert.addAction(UIAlertAction(title: CYLLocalizedString("取消"), style: .cancel))
+                alert.addAction(UIAlertAction(title: cylLocalizedString("取消"), style: .cancel))
                 pressedTabBarController.present(alert, animated: true)
             } : nil
         }
@@ -441,9 +441,9 @@ enum CYLSettingsDemo {
         demoSwitch.isOn = isInteractionOn(tabBarController, kind)
         let isSwipe = kind == .swipe
         cell.imageView?.image = UIImage(systemName: isSwipe ? "hand.draw" : "hand.tap")
-        cell.textLabel?.text = isSwipe ? CYLLocalizedString("左右滑动切换 Tab（issue #535）") : CYLLocalizedString("长按 Tab（issue #535）")
-        cell.detailTextLabel?.text = isSwipe ? CYLLocalizedString("打开开关后在页面上左右滑动，切换到下一个或上一个 Tab。")
-            : CYLLocalizedString("打开开关后长按任意 Tab 或 PlusButton，会弹出该按钮的标识。")
+        cell.textLabel?.text = isSwipe ? cylLocalizedString("左右滑动切换 Tab（issue #535）") : cylLocalizedString("长按 Tab（issue #535）")
+        cell.detailTextLabel?.text = isSwipe ? cylLocalizedString("打开开关后在页面上左右滑动，切换到下一个或上一个 Tab。")
+            : cylLocalizedString("打开开关后长按任意 Tab 或 PlusButton，会弹出该按钮的标识。")
         return cell
     }
 
@@ -471,7 +471,7 @@ final class CYLLoginStateSwitch: UISwitch {
         super.init(frame: frame)
         addTarget(self, action: #selector(valueDidChange), for: .valueChanged)
         NotificationCenter.default.addObserver(self, selector: #selector(loginStateDidChange),
-                                               name: .CYLTabBarLoginStateDidChange, object: nil)
+                                               name: .cylTabBarLoginStateDidChange, object: nil)
     }
 
     required init?(coder _: NSCoder) {
@@ -545,13 +545,13 @@ final class CYLTouchableAreaCell: UITableViewCell {
 
     func reload() {
         let plusButton = plusButton
-        titleLabel.text = CYLLocalizedString("PlusButton 点击范围（issue #91）")
+        titleLabel.text = cylLocalizedString("PlusButton 点击范围（issue #91）")
         // [EN] Accessibility: the slider reads as the row's title, with the scale as its value. [CN] 无障碍：滑块读作本行标题，倍数作为其值。
         scaleSlider.accessibilityLabel = titleLabel.text
         scaleSlider.isEnabled = plusButton != nil
         overlaySwitch.isEnabled = plusButton != nil
         guard let plusButton else {
-            summaryLabel.text = CYLLocalizedString("当前 TabBar 没有 PlusButton")
+            summaryLabel.text = cylLocalizedString("当前 TabBar 没有 PlusButton")
             scaleSlider.value = 1
             overlaySwitch.isOn = false
             return
@@ -560,7 +560,7 @@ final class CYLTouchableAreaCell: UITableViewCell {
         overlaySwitch.isOn = plusButton.showsTouchableArea
         let scaleText = String(format: "%.1f", plusButton.touchableAreaScale)
         scaleSlider.accessibilityValue = scaleText + "×"
-        summaryLabel.text = String(format: CYLLocalizedString("打开开关以半透明红色显示可点击区域，关闭恢复正常；拖动滑块按倍数扩大点击范围，当前：%@ 倍"), scaleText)
+        summaryLabel.text = String(format: cylLocalizedString("打开开关以半透明红色显示可点击区域，关闭恢复正常；拖动滑块按倍数扩大点击范围，当前：%@ 倍"), scaleText)
     }
 
     @objc private func scaleDidChange() {

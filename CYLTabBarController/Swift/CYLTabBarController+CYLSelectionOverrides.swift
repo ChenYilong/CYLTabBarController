@@ -63,8 +63,8 @@ extension CYLTabBarController {
         // [EN] The classic tab bar sometimes became transparent on iOS 15 and later: show its effect and shadow views again.
         // [CN] iOS 15 及以上经典 TabBar 有时会变透明：重新显示其效果视图与阴影视图。
         if #available(iOS 15.0, *), !CYLConstants.isLiquidGlassActive(), UITabBar.appearance().backgroundImage == nil, let tabBar = cyl_tabBar as? UITabBar {
-            tabBar.cyl_tabBackgroundView()?.cyl_tabEffectView()?.alpha = 1
-            if let shadow = tabBar.cyl_tabShadowImageView(), let first = shadow.subviews.first {
+            tabBar.cylTabBackgroundView()?.cylTabEffectView()?.alpha = 1
+            if let shadow = tabBar.cylTabShadowImageView(), let first = shadow.subviews.first {
                 first.alpha = 1
             }
         }
@@ -76,7 +76,7 @@ extension CYLTabBarController {
         if let plusChild = cylPrivate.cylContextPlusChildViewController(), selectedViewController.isEqual(plusChild),
            let plusButton = cylPrivate.cylContextPlusButton() {
             plusButton.isSelected = true
-            tabChanged(toSelectedIndex: (cyl_tabBar as? UITabBar)?.cyl_plusButtonIndex() ?? 0, viewController: selectedViewController,
+            tabChanged(toSelectedIndex: (cyl_tabBar as? UITabBar)?.cylPlusButtonIndex() ?? 0, viewController: selectedViewController,
                           control: plusButton)
         } else {
             tabChanged(toSelectedIndex: UInt(selectedIndex), viewController: selectedViewController, control: selectedViewController.cyl_tabButton)
@@ -124,7 +124,7 @@ extension CYLTabBarController {
     @objc(cyl_plusButtonControlIfSelectingPlusChildViewController:)
     func cylPlusButtonControlIfSelectingPlusChildViewController(_ viewController: UIViewController?) -> UIControl? {
         guard let viewController, let plusButton = cylPrivate.cylContextPlusButton(), hasPlusButton(), hasPlusChildViewController(),
-              let plusChild = cylPrivate.cylContextPlusChildViewController(), viewController.cyl_isEqual(to: plusChild) else {
+              let plusChild = cylPrivate.cylContextPlusChildViewController(), viewController.cylIsEqual(to: plusChild) else {
             return nil
         }
         let selector = NSSelectorFromString("shouldSelectPlusChildViewController")
@@ -179,6 +179,6 @@ extension CYLTabBarController {
     /// [EN] The size of the tab bar on screen. [CN] 屏幕上 TabBar 的尺寸。
     @objc(visiableTabBarSize)
     open func visiableTabBarSize() -> CGSize {
-        cyl_tabBarController?.tabBar.cyl_boundsSize() ?? .zero
+        cylTabBarController?.tabBar.cyl_boundsSize() ?? .zero
     }
 }

@@ -22,7 +22,7 @@ extension UIView {
      * [CN] 注册属性（按 getter 名称），其主题颜色、图片或效果会在主题切换时重新设置。
      */
     @objc(cyl_registerThemeColorProperties:)
-    public func cyl_registerThemeColorProperties(_ getters: [String]) {
+    public func cylRegisterThemeColorProperties(_ getters: [String]) {
         for getterName in getters {
             let setterName = CYLThemeViewKeys.setterName(for: getterName)
             guard responds(to: NSSelectorFromString(getterName)), responds(to: NSSelectorFromString(setterName)) else {
@@ -42,7 +42,7 @@ extension UIView {
      * [CN] 停止刷新给出的属性。
      */
     @objc(cyl_unregisterThemeColorProperties:)
-    public func cyl_unregisterThemeColorProperties(_ getters: [String]) {
+    public func cylUnregisterThemeColorProperties(_ getters: [String]) {
         cyl_themeColorProperties?.removeObjects(forKeys: getters)
     }
 
@@ -62,7 +62,7 @@ extension UIView {
         if CYLThemeViewKeys.refreshBuiltInValues(of: self, manager: manager) {
             CYLThemeRuntime.track(self)
         }
-        layer.cyl_updateThemeColors()
+        layer.cylUpdateThemeColors()
         if self is UILabel || self is UITextView {
             setNeedsDisplay()
         }
@@ -92,7 +92,7 @@ extension UIView {
      * [CN] 将当前主题应用到本视图及其子视图。
      */
     @objc(cyl_applyCurrentTheme)
-    public func cyl_applyCurrentTheme() {
+    public func cylApplyCurrentTheme() {
         applyThemeChange(by: nil, identifier: nil, theme: nil, enumeratesSubviews: true)
     }
 

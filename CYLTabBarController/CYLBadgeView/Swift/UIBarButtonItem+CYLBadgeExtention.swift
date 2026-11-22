@@ -72,7 +72,7 @@ enum CYLBarButtonItemBadgeSupport {
         if value.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
             return nil
         }
-        return .string(value == "new" || value == "NEW" ? CYLLocalizedString(value) : value)
+        return .string(value == "new" || value == "NEW" ? cylLocalizedString(value) : value)
     }
 
     /**
@@ -108,7 +108,7 @@ enum CYLBarButtonItemBadgeSupport {
             return
         }
         DispatchQueue.main.async { [weak item] in
-            let itemView = item?.cyl_view()
+            let itemView = item?.cylView()
             // [EN] The bar that holds the item; its badge may be outside the item's own view.
             // [CN] item 所在的 bar；系统角标可能不在 item 自身的视图中。
             var barView = itemView
@@ -121,9 +121,9 @@ enum CYLBarButtonItemBadgeSupport {
                     ?? barView.flatMap({ systemBadgeView(in: $0, itemFrameInWindow: itemFrameInWindow) }) else {
                 return
             }
-            CYLBadgeAllAnimationKeys().forEach { badgeView.layer.removeAnimation(forKey: $0) }
+            cylBadgeAllAnimationKeys().forEach { badgeView.layer.removeAnimation(forKey: $0) }
             if let animation = cylBadgeAnimationForTypeEntryPoint(animationType, badgeView.bounds.size),
-               let key = CYLBadgeAnimationKeyForType(animationType) {
+               let key = cylBadgeAnimationKeyForType(animationType) {
                 badgeView.layer.add(animation, forKey: key)
             }
         }
@@ -202,7 +202,7 @@ extension UIBarButtonItem {
      *      Objective-C enum). [CN] 自第 115 步起为 public（`CYLBadgeAnimationType` 为 Objective-C 枚举时声明在 UIBarButtonItem+CYLBadgeExtention.h 中）。
      */
     @objc(cyl_showBadgeValue:animationType:backgroundColor:)
-    public dynamic func cyl_showBadgeValue(_ value: String, animationType: CYLBadgeAnimationType, backgroundColor: UIColor?) {
+    public dynamic func cylShowBadgeValue(_ value: String, animationType: CYLBadgeAnimationType, backgroundColor: UIColor?) {
         if let backgroundColor {
             cyl_badgeBackgroundColor = backgroundColor
         }
@@ -281,12 +281,12 @@ extension UIBarButtonItem {
         // [EN] A custom view that is, or holds, an animated item (`CYLAnimatedItemView`): the badge goes on its icon.
         // [CN] 自定义视图是或包含动效 item（`CYLAnimatedItemView`）：角标放在其图标上。
         if let custom = customView,
-           let iconHost = custom.cyl_animatedItemBadgeHost() ?? custom.subviews.lazy.compactMap({ $0.cyl_animatedItemBadgeHost() }).first {
+           let iconHost = custom.cylAnimatedItemBadgeHost() ?? custom.subviews.lazy.compactMap({ $0.cylAnimatedItemBadgeHost() }).first {
             iconHost.clipsToBounds = false
             iconHost.layoutIfNeeded()
             return iconHost
         }
-        let contentView = cyl_view()?.cyl_findBarButtonContentView()
+        let contentView = cylView()?.cylFindBarButtonContentView()
         var actualBadgeSuperView: UIView? = contentView
         if let button = contentView as? UIButton {
             if let imageView = button.imageView, imageView.frame.size.width > 10 {

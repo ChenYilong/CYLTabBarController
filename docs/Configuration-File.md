@@ -69,8 +69,8 @@ CYLTabBarController *tabBarController = [[CYLTabBarController alloc] initWithCon
 ```swift
 // Swift
 let tabBarController = CYLTabBarController(configuration: [
-    CYLTabBarControllerTabBarItemsAttributes: tabBarItemsAttributes,
-    CYLTabBarControllerStyleType: "liquidGlass",
+    cylTabBarControllerTabBarItemsAttributes: tabBarItemsAttributes,
+    cylTabBarControllerStyleType: "liquidGlass",
 ])
 ```
 

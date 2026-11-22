@@ -18,7 +18,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
         let window = UIWindow(windowScene: windowScene)
         // Rebuilt after a language change, so every text shows in the new language.
-        window.cyl_setRootViewControllerProvider { appDelegate.makeMainTabBarController() }
+        window.cylSetRootViewControllerProvider { appDelegate.makeMainTabBarController() }
         // [EN] The navigation bar button of the first tab rebuilds the tab bar in the other style.
         // [CN] 第一个 Tab 的导航栏按钮以另一种样式重建 TabBar。
         CYLDemoTabBarStyle.rebuildRootViewController = { [weak window] in

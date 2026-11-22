@@ -150,7 +150,7 @@ private enum CYLTabButtonViews {
             return iconView
         }
         // [EN] FIX: issue #604 — a tab with an animated icon animates its animation view. [CN] 有动画图标的 Tab 对其动画视图播放动画。
-        if let animationView = control.cyl_tabBarItemAnimationView() {
+        if let animationView = control.cylTabBarItemAnimationView() {
             return animationView
         }
         if let button = control as? UIButton {
@@ -159,7 +159,7 @@ private enum CYLTabButtonViews {
         if isFlatDesignButton(control) {
             return flatDesignSubview(of: control, key: "imageView") ?? control
         }
-        return control.cyl_tabImageView() ?? control
+        return control.cylTabImageView() ?? control
     }
 
     static func titleLabel(_ control: UIControl) -> UILabel? {
@@ -169,7 +169,7 @@ private enum CYLTabButtonViews {
         if isFlatDesignButton(control) {
             return flatDesignSubview(of: control, key: "titleLabel") as? UILabel
         }
-        return control.cyl_tabLabel()
+        return control.cylTabLabel()
     }
 
     /**
@@ -182,7 +182,7 @@ private enum CYLTabButtonViews {
         if let plusButton = control as? CYLPlusButton {
             selectedLayerControl = ((plusButton as? CYLPlusButtonSubclassing)?.selectedContentView ?? nil) as UIControl?
         } else if CYLConstants.isLiquidGlassActive() {
-            selectedLayerControl = control.cyl_platterSelected()
+            selectedLayerControl = control.cylPlatterSelected()
         }
         if let selectedLayerControl, selectedLayerControl !== control, selectedLayerControl.window != nil {
             return [control, selectedLayerControl]
@@ -237,7 +237,7 @@ private enum CYLTabButtonAnimationPlayer {
     static func playBadgeChanged(_ animation: CYLTabButtonAnimation, on control: UIControl) {
         for layer in CYLTabButtonViews.layers(control) {
             let iconView = CYLTabButtonViews.iconView(layer)
-            let badgeView = layer.cyl_tabBadgeView()
+            let badgeView = layer.cylTabBadgeView()
             if animation.responds(to: NSSelectorFromString("cylPlayBadgeChangedAnimationWithTabButton:iconView:badgeView:")) {
                 animation.cylPlayBadgeChangedAnimation?(withTabButton: layer, iconView: iconView, badgeView: badgeView)
             } else {
@@ -329,7 +329,7 @@ extension CYLTabBarController {
         }
         if let index = viewControllers.firstIndex(where: { viewController in
             guard let tabButton = viewController.cyl_tabButton else { return false }
-            return tabButton === control || tabButton.cyl_platterSelected() === control
+            return tabButton === control || tabButton.cylPlatterSelected() === control
         }) {
             return index
         }
@@ -345,7 +345,7 @@ extension CYLTabBarController {
 
     private func cylAnimation(forTabControl control: UIControl?) -> CYLTabButtonAnimation? {
         if let index = cylViewControllerIndex(forTabControl: control), let viewController = viewControllers?[index],
-           let animation = viewController.cyl_tabButtonAnimation ?? viewController.cyl_getViewControllerInsteadOfNavigation().cyl_tabButtonAnimation {
+           let animation = viewController.cyl_tabButtonAnimation ?? viewController.cylGetViewControllerInsteadOfNavigation().cyl_tabButtonAnimation {
             return animation
         }
         return cylInteraction.defaultAnimation ?? cylInteraction.tapAnimation
@@ -581,13 +581,13 @@ extension CYLTabBarController {
     func cylTabControl(at touchPoint: CGPoint) -> UIControl? {
         guard let tabBar = cylTabBarView, !tabBar.isHidden, tabBar.window != nil,
               let hitView = tabBar.hitTest(tabBar.convert(touchPoint, from: view), with: nil),
-              var control = hitView.cyl_nearestControl(below: tabBar) else { return nil }
+              var control = hitView.cylNearestControl(below: tabBar) else { return nil }
         // [EN] FlatDesign only: its buttons are reported as they are. [CN] 仅扁平样式：其按钮按原样上报。
         if tabBarStyleType == .flatDesign {
             return control
         }
-        if control.cyl_isPlatterSelectedControl() {
-            control = control.cyl_platterNormal()
+        if control.cylIsPlatterSelectedControl() {
+            control = control.cylPlatterNormal()
         }
         return cylReportedControl(for: control) ?? control
     }
@@ -613,7 +613,7 @@ extension CYLTabBarController {
                 cylReportTabBarItemGesture(.longPress, control: current, viewController: viewController)
                 return
             }
-            candidate = current.superview?.cyl_nearestControl(below: tabBar)
+            candidate = current.superview?.cylNearestControl(below: tabBar)
         }
     }
 
@@ -667,7 +667,7 @@ extension CYLTabBarController {
         if control == nil {
             var closestControl: UIControl?
             var closestDistance = CGFloat.greatestFiniteMagnitude
-            for candidate in tabBar.cyl_visibleControls() ?? [] {
+            for candidate in tabBar.cylVisibleControls() ?? [] {
                 if candidate.isHidden || candidate.alpha < 0.01 || candidate.window == nil || candidate.cyl_isPlaceholder {
                     continue
                 }
@@ -687,8 +687,8 @@ extension CYLTabBarController {
             }
         }
         guard var found = control else { return nil }
-        if found.cyl_isPlatterSelectedControl() {
-            found = found.cyl_platterNormal()
+        if found.cylIsPlatterSelectedControl() {
+            found = found.cylPlatterNormal()
         }
         return cylReportedControl(for: found) ?? found
     }
@@ -735,7 +735,7 @@ extension CYLTabBarController {
                followed.state == .began || followed.state == .changed {
                 return
             }
-            guard let control = cylLiquidGlassTabControl(atWindowPoint: windowPoint), !control.cyl_isPlusButton() else {
+            guard let control = cylLiquidGlassTabControl(atWindowPoint: windowPoint), !control.cylIsPlusButton() else {
                 settings.liquidGlassPress = nil
                 return
             }
@@ -780,7 +780,7 @@ extension CYLTabBarController {
      *      不处理（它们的点击在手势开始时上报）。
      */
     private func cylSelectTabAfterLostTouch(atWindowPoint windowPoint: CGPoint) {
-        guard let control = cylLiquidGlassTabControl(atWindowPoint: windowPoint), !control.cyl_isPlusButton(),
+        guard let control = cylLiquidGlassTabControl(atWindowPoint: windowPoint), !control.cylIsPlusButton(),
               let viewControllers, let index = viewControllers.firstIndex(where: { candidate in
                   candidate.cyl_tabButton === control || cylTabButtons(of: candidate).contains { $0 === control }
               }) else { return }
@@ -868,7 +868,7 @@ extension CYLTabBarController {
                     return false
                 }
                 let plusChild = hasPlusChildViewController() ? cylPrivate.cylContextPlusChildViewController() : nil
-                let isPlusChildViewController = plusChild.map { candidate.cyl_isEqual(to: $0) } ?? false
+                let isPlusChildViewController = plusChild.map { candidate.cylIsEqual(to: $0) } ?? false
                 if isPlusChildViewController || cylShouldSwipeSelect(candidate) {
                     toViewController = candidate
                     break
@@ -1001,7 +1001,7 @@ final class CYLTabBarInteractionHandler: NSObject, UIGestureRecognizerDelegate {
             let control = tabBarController.cylTabControl(at: touch.location(in: tabBarController.view))
             // [EN] In Liquid Glass the tab buttons' long press comes from UIKit's own gestures; this recognizer keeps only the plus button.
             // [CN] 液态玻璃下 Tab 按钮的长按来自系统手势；此时本手势只处理 PlusButton。
-            if let control, !control.cyl_isPlusButton(), tabBarController.cylLiquidGlassReceivesTabTouches() {
+            if let control, !control.cylIsPlusButton(), tabBarController.cylLiquidGlassReceivesTabTouches() {
                 return false
             }
             longPressGestureRecognizer?.cylPressedControl = control
@@ -1105,12 +1105,12 @@ extension CYLTabBarController {
         // [EN] Guards: only with a plus button, and only when it has a child view controller (the second layer).
         // [CN] 仅在有 PlusButton，且其有子控制器（第二个图层）时处理。
         guard let control, hasPlusButton(), hasPlusChildViewController(), let plusButton = cylPrivate.cylContextPlusButton(),
-              control !== plusButton, !control.cyl_isPlusButton() else {
+              control !== plusButton, !control.cylIsPlusButton() else {
             return control
         }
         let plusChildViewController = cylPrivate.cylContextPlusChildViewController()
         let isPlusChildTabButton = control === plusChildViewController?.cyl_tabButton ||
-            control === plusChildViewController?.cyl_getViewControllerInsteadOfNavigation().cyl_tabButton
+            control === plusChildViewController?.cylGetViewControllerInsteadOfNavigation().cyl_tabButton
         return isPlusChildTabButton ? plusButton : control
     }
 
@@ -1133,14 +1133,14 @@ extension CYLTabBarController {
      *      的液态玻璃放大镜（及其手势）（没有实现时为 YES）。
      */
     @objc(tabBarController:beginShowPlatterLiquidLensViewForControl:)
-    func cyl_tabBarController(_ tabBarController: CYLTabBarController, beginShowPlatterLiquidLensViewFor control: UIControl) {
+    func cylTabBarController(_ tabBarController: CYLTabBarController, beginShowPlatterLiquidLensViewFor control: UIControl) {
         let tabBar: UITabBar = tabBarController.tabBar
         guard CYLConstants.isLiquidGlassActive(), let tabBar = tabBar as? CYLTabBar else {
             return
         }
         let delegate = cylDelegate
         let shows = delegate?.tabBarController?(tabBarController, shouldShowPlatterLiquidLensViewFor: control) ?? true
-        tabBar.cyl_platterLiquidLensViewContentView()?.cyl_setHidden(!shows)
+        tabBar.cyl_platterLiquidLensViewContentView()?.cylSetHidden(!shows)
         tabBar.liquidGlassContinuousGestureRecognizer?.isEnabled = shows
         tabBar.liquidGlassLongGestureRecognizer?.isEnabled = shows
     }
@@ -1245,7 +1245,7 @@ extension CYLTabBarController {
     func cylSendDidSelectControl(_ control: UIControl) {
         cyl_playTabButtonAnimation(for: control)
         cyl_playTabButtonTapFeedback()
-        if control.cyl_isPlusControl(), let plusButton = CYLPlusButton.cylPlusButton(forTabBarContext: context) {
+        if control.cylIsPlusControl(), let plusButton = CYLPlusButton.cylPlusButton(forTabBarContext: context) {
             let tapped = NSSelectorFromString("cyl_configurationPlusButtonTapped")
             if plusButton.responds(to: tapped) {
                 plusButton.perform(tapped)
@@ -1279,7 +1279,7 @@ extension CYLTabBarController {
         var selectedContentControl: UIControl?
         if let tabBar = cyl_tabBar as? CYLTabBar {
             selectedContentControl = tabBar.cylSelectedContentControl(fromContentControl: control)
-            if control?.cyl_isPlusControl() == true {
+            if control?.cylIsPlusControl() == true {
                 tabBar.cylSetSelectedControl(cylPrivate.cylContextPlusButton())
             } else {
                 tabBar.cylSetSelectedControl(selectedContentControl ?? control)
@@ -1290,9 +1290,9 @@ extension CYLTabBarController {
             // [CN] 液态玻璃且有 PlusButton 子控制器：PlusButton 在选中图层中的替身自己维护状态（`-cyl_updateSelectedContentViewImage`）；
             //      PlusButton 上报点击时若在这里选中它，换肤后替身会保留旧图片（PlusButton 子控制器换肤测试）。
             let plusButtonKeepsItsOwnState = CYLConstants.isLiquidGlassActive() && hasPlusChildViewController() &&
-                control?.cyl_isPlusControl() == true
+                control?.cylIsPlusControl() == true
             if shouldSelectViewController {
-                ((tabBar.cyl_visibleControls() ?? []) + (tabBar.cylPlatterSelectedContentViews() ?? [])).forEach { $0.isSelected = false }
+                ((tabBar.cylVisibleControls() ?? []) + (tabBar.cylPlatterSelectedContentViews() ?? [])).forEach { $0.isSelected = false }
                 if !plusButtonKeepsItsOwnState {
                     control?.isSelected = true
                 }
@@ -1305,7 +1305,7 @@ extension CYLTabBarController {
             cylSetNeedsApplyTabBarItemAnimationTintColors()
             return
         }
-        cyl_tabBarController(self, beginShowPlatterLiquidLensViewFor: tappedControl)
+        cylTabBarController(self, beginShowPlatterLiquidLensViewFor: tappedControl)
         // FIX: plus button badge does not change on tap
         // [EN] A plus button with a child view controller has two layers: the plus button and, under it, the system tab
         //      button of `plusChildViewController`. A tap could be reported with that system tab button, or not at all (the
@@ -1441,9 +1441,9 @@ extension CYLTabBarController {
         //      in its tab button. [CN] 每次布局都执行，且在下面的提前返回之前：主题会修改已在 Tab 按钮中的替身的图片。
         contextPlusButton.cylUpdateSelectedContentViewImage()
         contextPlusButton.cylMoveSelectedContentViewWithPlusButton()
-        let plusSelectedControl = plusControlOrigin?.cyl_platterSelected()
-        plusControlOrigin?.cyl_tabImageView()?.cyl_setHidden(true)
-        plusControlOrigin?.cyl_swappableImageViewViewInTabBarButton()?.cyl_setHidden(true)
+        let plusSelectedControl = plusControlOrigin?.cylPlatterSelected()
+        plusControlOrigin?.cylTabImageView()?.cylSetHidden(true)
+        plusControlOrigin?.cylSwappableImageViewViewInTabBarButton()?.cylSetHidden(true)
 
         // [EN] The selected layer renders later than the normal one, so it may be missing now; a later layout pass or the
         //      single retry below adds what is missing.
@@ -1476,14 +1476,14 @@ extension CYLTabBarController {
                     // [CN] TabBarItem 显示 PlusButton 的标题：与普通图层中的 PlusButton 一样，替身只替换 Tab 图标，Tab 的标题及按钮的其他子视图保持系统
                     //      布局（覆盖整个 Tab 按钮也会隐藏标题的容器）。
                     if isRetry || (plusSelectedControl as UIView).cyl_isReady() {
-                        plusSelectedControl.cyl_replaceTabImageView(withNewView: selectedCover, offset: .zero, show: true,
+                        plusSelectedControl.cylReplaceTabImageView(withNewView: selectedCover, offset: .zero, show: true,
                                                                     completion: centerOnPlusButton)
-                        plusSelectedControl.cyl_swappableImageViewViewInTabBarButton()?.cyl_setHidden(true)
+                        plusSelectedControl.cylSwappableImageViewViewInTabBarButton()?.cylSetHidden(true)
                     } else {
                         needsRetry = true
                     }
                 } else {
-                    plusSelectedControl.cyl_coverTabImageViewOrTabButton(true, newView: selectedCover, offset: .zero, show: true,
+                    plusSelectedControl.cylCoverTabImageViewOrTabButton(true, newView: selectedCover, offset: .zero, show: true,
                                                                          delayIfNeededForSeconds: CGFloat(delaySecondsForSelectedContentView),
                                                                          completion: centerOnPlusButton)
                 }
@@ -1491,9 +1491,9 @@ extension CYLTabBarController {
         } else if let plusSelectedControl {
             // [EN] The image view is the main one; it is sometimes not there yet, then it is retried. The swappable image view
             //      is hidden defensively. [CN] imageView 是主要的；有时暂时取不到，此时重试。可替换的图片视图出于防御一并隐藏。
-            let tabImageView = plusSelectedControl.cyl_tabImageView()
-            tabImageView?.cyl_setHidden(true)
-            plusSelectedControl.cyl_swappableImageViewViewInTabBarButton()?.cyl_setHidden(true)
+            let tabImageView = plusSelectedControl.cylTabImageView()
+            tabImageView?.cylSetHidden(true)
+            plusSelectedControl.cylSwappableImageViewViewInTabBarButton()?.cylSetHidden(true)
             needsRetry = tabImageView == nil
         }
         // [EN] Fallback: one pending retry at a time, which looks everything up again. [CN] 兜底：同一时间只安排一次重试，重试时重新查找全部视图。

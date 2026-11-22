@@ -92,7 +92,7 @@ extension UINavigationController {
      *      由 CYLFlatDesignTabBar 调用，因此只有扁平样式会安装。
      */
     @objc(cyl_navigationBarActionHook)
-    public class func cyl_navigationBarActionHook() {
+    public class func cylNavigationBarActionHook() {
         _ = cylflatdesignHookInstalled
     }
 
@@ -183,7 +183,7 @@ extension UINavigationController {
             state.extensionDelegate = nil
             state.nestedInFlatDesignTabBarController = false
             cylflatdesignUnregisterPopGestureRecognizer()
-        } else if let parent, parent.cyl_isFlatDesignStyleTabBar() {
+        } else if let parent, parent.cylIsFlatDesignStyleTabBar() {
             state.extensionDelegate = parent
             state.nestedInFlatDesignTabBarController = true
             cylflatdesignRegisterPopGestureRecognizer()
@@ -282,7 +282,7 @@ extension UINavigationController {
         var toVC = target
         if let fromVC, fromVC === toVC {
             #if DEBUG
-            NSLog("%@", CYLLocalizedString("UINavigationController+CYLFlatDesignTabBarPrivate：是否连续 pop 操作？这可能会出问题!"))
+            NSLog("%@", cylLocalizedString("UINavigationController+CYLFlatDesignTabBarPrivate：是否连续 pop 操作？这可能会出问题!"))
             #endif
             // [EN] Consecutive pops: the destination is the one below. [CN] 连续 pop：目标为下面一个控制器。
             if let index = viewControllers.firstIndex(of: fromVC), index > 0 {

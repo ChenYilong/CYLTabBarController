@@ -36,7 +36,7 @@ public protocol CYLTabBarControllerMemoryWarningSeam: NSObjectProtocol {
  * [CN] 对 `tabBarController` 模拟内存警告（`+[CYLTabBarController cyl_simulateMemoryWarningForTabBarController:]`），并描述每个 Tab 的结果。
  *      已从 Objective-C 翻译（docs/Swift-Migration.md）；参数类型为 `UITabBarController`，每个 `CYLTabBarController` 都是。
  */
-public func CYLSimulateMemoryWarningReport(_ tabBarController: UITabBarController?) -> String {
+public func cylSimulateMemoryWarningReport(_ tabBarController: UITabBarController?) -> String {
     let viewControllers = tabBarController?.viewControllers ?? []
     let wasLoaded = viewControllers.map { CYLMemoryWarning.root(of: $0).isViewLoaded }
     CYLMemoryWarning.simulate(for: tabBarController)
@@ -44,24 +44,24 @@ public func CYLSimulateMemoryWarningReport(_ tabBarController: UITabBarControlle
     let unloads = seam?.unloadsUnselectedViewsOnMemoryWarning ?? false
     var lines: [String] = []
     if tabBarController == nil {
-        lines.append(CYLLocalizedString("不在 CYLTabBarController 中，没有可卸载的 Tab。"))
+        lines.append(cylLocalizedString("不在 CYLTabBarController 中，没有可卸载的 Tab。"))
     } else if !unloads {
-        lines.append(CYLLocalizedString("unloadsUnselectedViewsOnMemoryWarning = NO，未卸载任何 Tab。"))
+        lines.append(cylLocalizedString("unloadsUnselectedViewsOnMemoryWarning = NO，未卸载任何 Tab。"))
     }
     for (index, viewController) in viewControllers.enumerated() where !viewController.cyl_isPlaceholder {
         let root = CYLMemoryWarning.root(of: viewController)
         let title = viewController.tabBarItem.title ?? root.title ?? NSStringFromClass(type(of: root))
         let status: String
         if !wasLoaded[index] {
-            status = CYLLocalizedString("未加载")
+            status = cylLocalizedString("未加载")
         } else if !root.isViewLoaded {
-            status = CYLLocalizedString("已卸载")
+            status = cylLocalizedString("已卸载")
         } else if viewController === tabBarController?.selectedViewController {
-            status = CYLLocalizedString("保留：当前选中")
+            status = cylLocalizedString("保留：当前选中")
         } else if unloads, seam?.shouldUnloadView(of: viewController) == false {
-            status = CYLLocalizedString("保留：shouldUnload 返回 NO")
+            status = cylLocalizedString("保留：shouldUnload 返回 NO")
         } else {
-            status = CYLLocalizedString("保留")
+            status = cylLocalizedString("保留")
         }
         lines.append("\(title): \(status)")
     }
@@ -70,7 +70,7 @@ public func CYLSimulateMemoryWarningReport(_ tabBarController: UITabBarControlle
 
 @_cdecl("CYLSimulateMemoryWarningReport")
 public func cylSimulateMemoryWarningReportEntryPoint(_ tabBarController: UITabBarController?) -> NSString {
-    CYLSimulateMemoryWarningReport(tabBarController) as NSString
+    cylSimulateMemoryWarningReport(tabBarController) as NSString
 }
 
 /**
@@ -86,14 +86,14 @@ extension UIViewController {
      * [CN] "模拟内存警告"表格行；选中时应调用 `cyl_simulateMemoryWarningAndShowResult()`。
      */
     @objc(cyl_memoryWarningCellForTableView:)
-    public func cyl_memoryWarningCell(for tableView: UITableView) -> UITableViewCell {
+    public func cylMemoryWarningCell(for tableView: UITableView) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: UIViewController.memoryWarningCellIdentifier)
             ?? UITableViewCell(style: .subtitle, reuseIdentifier: UIViewController.memoryWarningCellIdentifier)
         cell.textLabel?.font = .boldSystemFont(ofSize: 15)
         cell.detailTextLabel?.textColor = .gray
         cell.imageView?.image = UIImage(systemName: "memorychip")
-        cell.textLabel?.text = CYLLocalizedString("模拟内存警告")
-        cell.detailTextLabel?.text = CYLLocalizedString("卸载未选中的 Tab，切换时重新加载")
+        cell.textLabel?.text = cylLocalizedString("模拟内存警告")
+        cell.detailTextLabel?.text = cylLocalizedString("卸载未选中的 Tab，切换时重新加载")
         return cell
     }
 
@@ -102,12 +102,12 @@ extension UIViewController {
      * [CN] 对本控制器所在的 TabBarController 模拟内存警告，并用弹窗显示结果。
      */
     @objc(cyl_simulateMemoryWarningAndShowResult)
-    public func cyl_simulateMemoryWarningAndShowResult() {
+    public func cylSimulateMemoryWarningAndShowResult() {
         let tabBarController = CYLMemoryWarning.tabBarController(of: self)
-        let alertController = UIAlertController(title: CYLLocalizedString("内存警告"),
-                                                message: CYLSimulateMemoryWarningReport(tabBarController),
+        let alertController = UIAlertController(title: cylLocalizedString("内存警告"),
+                                                message: cylSimulateMemoryWarningReport(tabBarController),
                                                 preferredStyle: .alert)
-        alertController.addAction(UIAlertAction(title: CYLLocalizedString("OK"), style: .default))
+        alertController.addAction(UIAlertAction(title: cylLocalizedString("OK"), style: .default))
         present(alertController, animated: true)
     }
 }

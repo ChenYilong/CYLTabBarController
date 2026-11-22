@@ -49,8 +49,8 @@ open class CYLFlatDesignTabBarHideTabBar: UITabBar {
 
     open override func layoutSubviews() {
         super.layoutSubviews()
-        cylPlatterView()?.cyl_setHidden(true)
-        platterView?.cyl_setHidden(true)
+        cylPlatterView()?.cylSetHidden(true)
+        platterView?.cylSetHidden(true)
     }
 
     open override func addSubview(_ view: UIView) {
@@ -59,7 +59,7 @@ open class CYLFlatDesignTabBarHideTabBar: UITabBar {
             // [CN] 忽略把 TabBar 添加到自身（`[self.tabBar addSubview:myTabBar]`）的情况；请改用 KVC 设置。
             return
         }
-        if view.cyl_isPlatterView() {
+        if view.cylIsPlatterView() {
             view.isHidden = true
             cylSetPlatterView(view)
             platterView = view
@@ -69,7 +69,7 @@ open class CYLFlatDesignTabBarHideTabBar: UITabBar {
     }
 
     open override func addGestureRecognizer(_ gestureRecognizer: UIGestureRecognizer) {
-        if gestureRecognizer.cyl_isContinuousGestureRecognizer() || gestureRecognizer.cyl_isLongGestureRecognizer() {
+        if gestureRecognizer.cylIsContinuousGestureRecognizer() || gestureRecognizer.cylIsLongGestureRecognizer() {
             gestureRecognizer.isEnabled = false
         }
         super.addGestureRecognizer(gestureRecognizer)
