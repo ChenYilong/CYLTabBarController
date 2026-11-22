@@ -6,6 +6,8 @@
 //
 
 import UIKit
+// [EN] Internal: CYLTabBarController's public interface does not expose the library. [CN] internal：公开接口不暴露该库。
+internal import CYLDeallocBlockExecutor
 
 /**
  * [EN] The FlatDesign side of the life cycle, implemented in the FlatDesign subspec (CYLTabBarController+CYLFlatDesign.swift).
@@ -287,7 +289,9 @@ extension CYLTabBarController {
     @objc(cyl_rearmViewDidLayoutSubviewsBlockInvokeOnce)
     func cylRearmViewDidLayoutSubviewsBlockInvokeOnce() {
         cylPrivate.cylSetInvokeOnceViewDidLayoutSubViewsBlock(true)
-        objc_setAssociatedObject(self, CYLUtilsKeys.key("viewDidLayoutSubviews"), nil, .OBJC_ASSOCIATION_RETAIN)
+        // [EN] Only the core's keyed block is re-armed; the app's own invoke-once blocks keep their state.
+        // [CN] 只重新启用核心带 key 的 block；App 自己的只执行一次 block 保持原状态。
+        _ = cyl_rearmLifecycleCallback(key: Self.cylLayoutBlockKey)
         if isViewLoaded {
             view.setNeedsLayout()
         }

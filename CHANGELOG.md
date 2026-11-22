@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### New dependency: CYLDeallocBlockExecutor / 新依赖：CYLDeallocBlockExecutor
+
+- **[EN]** The iOS core depends on [CYLDeallocBlockExecutor](https://github.com/ChenYilong/CYLDeallocBlockExecutor) 1.4 (CocoaPods Core subspec, Swift Package Manager, and the Xcode framework target that builds the Carthage XCFramework, linked statically). The one-time layout block (`viewDidLayoutSubviewsBlock`, `-setViewDidLayoutSubViewsBlockInvokeOnce:block:`, `-cyl_rearmViewDidLayoutSubviewsBlockInvokeOnce`) is kept by it under the key `cyl.core.layoutBlock`; its behavior and selectors are unchanged. The first CYLTabBarController that lays out installs the library's UIViewController lifecycle hooks (once per app). Details: docs/Lifecycle-Library.md.
+- **[CN]** iOS 核心依赖 [CYLDeallocBlockExecutor](https://github.com/ChenYilong/CYLDeallocBlockExecutor) 1.4（CocoaPods Core 子库、Swift Package Manager，以及构建 Carthage XCFramework 的 Xcode framework target，静态链接）。只执行一次的布局 block（`viewDidLayoutSubviewsBlock`、`-setViewDidLayoutSubViewsBlockInvokeOnce:block:`、`-cyl_rearmViewDidLayoutSubviewsBlockInvokeOnce`）由它以 key `cyl.core.layoutBlock` 保存；行为与 selector 不变。第一个完成布局的 CYLTabBarController 会安装该库的 UIViewController 生命周期 hook（每个 App 一次）。详见 docs/Lifecycle-Library.md。
+- **TODO:** 1.4.0 is not published yet; until then the Podfiles, `Package.swift` and the Xcode project pin the branch `feat/lifecycle-callbacks`. / 1.4.0 尚未发布；发布前各 Podfile、`Package.swift` 与 Xcode 工程指定分支 `feat/lifecycle-callbacks`。
+
 ### Breaking: the minimum iOS version is 15.0 / 最低 iOS 版本提高到 15.0
 
 - **[EN]** `CYLTabBarController.podspec`, `CYLAnimatedItem.podspec` and `Package.swift` now require iOS 15.0 (they were iOS 12.0, with the LottieSwift and FlatDesign subspecs at 13.0 and Rive at 14.0). Apps that support iOS 12 to 14 stay on the previous release. The Example projects and their Podfiles are at 15.0 too. Reason: the Swift migration (docs/Swift-Migration.md) uses iOS 13+ UIKit types (`UITabBarItemAppearance`, `UITabBarItemStateAppearance`) without availability guards, which broke builds at deployment target 12.0 (CYLTableViewPlaceHolder's "iOS 12 runtime" job); current Xcode cannot build below iOS 15 anyway.

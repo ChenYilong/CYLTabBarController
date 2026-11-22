@@ -24,6 +24,9 @@ let package = Package(
         // Same requirement as the podspec's `LottieSwift` subspec: 'lottie-ios', '>= 4.5.1' (`removeValueProvider(for:)`).
         // lottie-spm is Airbnb's official SPM distribution of lottie-ios.
         .package(url: "https://github.com/airbnb/lottie-spm.git", from: "4.5.1"),
+        // [EN] Lifecycle and dealloc blocks (docs/Lifecycle-Library.md). TODO: `from: "1.4.0"` once it is tagged.
+        // [CN] 生命周期与 dealloc block（docs/Lifecycle-Library.md）。TODO：打 tag 后改为 `from: "1.4.0"`。
+        .package(url: "https://github.com/ChenYilong/CYLDeallocBlockExecutor.git", branch: "feat/lifecycle-callbacks"),
     ],
     targets: [
         // [EN] CYLAnimatedItem, Swift half: the animation URL options and the engine's Swift protocols, plus the component's
@@ -120,6 +123,7 @@ let package = Package(
                 "CYLAnimatedItemViews",
                 "CYLTabBarControllerLottieSwift",
                 .product(name: "Lottie", package: "lottie-spm"),
+                .product(name: "CYLDeallocBlockExecutor", package: "CYLDeallocBlockExecutor"),
             ],
             path: "CYLTabBarController",
             exclude: ["CYLUtils/Swift/CYLAnimationURLOptions.swift", "CYLUtils/Swift/CYLAnimationKeyLookup.swift", "Package"],

@@ -145,6 +145,9 @@ open class CYLTabBarController: UITabBarController, CYLTabBarControllerDelegate,
     /// [EN] Backing flag of `automaticallyAdjustsImageOnlyTabs`, negated so that the default (false) means true (issues #257, #522). [CN] `automaticallyAdjustsImageOnlyTabs` 的存储标记，取反存储。
     @objc var cyl_imageOnlyTabsAdjustmentDisabled = false
     private var invokeOnceViewDidLayoutSubViewsBlockStorage = false
+    /// [EN] The "once" mode the layout block was registered with in CYLDeallocBlockExecutor; nil before the first layout.
+    /// [CN] 布局 block 在 CYLDeallocBlockExecutor 中注册时的“只执行一次”模式；首次布局前为 nil。
+    var cylLayoutBlockRegisteredInvokeOnce: Bool?
     /// [EN] Getter `shouldInvokeOnce…`, setter `setInvokeOnce…:` (the selectors the Objective-C property had). [CN] getter 为 `shouldInvokeOnce…`、setter 为 `setInvokeOnce…:`（与原 Objective-C 属性的 selector 相同）。
     @objc(shouldInvokeOnceViewDidLayoutSubViewsBlock) var invokeOnceViewDidLayoutSubViewsBlock: Bool {
         @objc(shouldInvokeOnceViewDidLayoutSubViewsBlock) get { invokeOnceViewDidLayoutSubViewsBlockStorage }
