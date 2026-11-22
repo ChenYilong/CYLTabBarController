@@ -210,6 +210,7 @@ docs/
 │   ├── android-api37-20261119-example-rive-live-uimode-switch.png
 │   ├── android-api37-20261119-rive-fixed-tint-unselected-only.png
 │   ├── android-api37-20261119-rive-follows-appearance.png
+│   ├── android-default-tab-bar-height-system-80dp.png
 │   ├── android-example-strings-en-zh-ja.png
 │   ├── android-gif-decoder-frame-clock.png
 │   ├── android-gif-image-rest-then-play.png

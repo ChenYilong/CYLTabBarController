@@ -718,7 +718,7 @@
 | `CYLPlusButtonIndex` | `CYLTabBar.CYLPlusButtonIndex` | done | updated by the latest tab bar layout (dp) |
 | `CYLPlusButtonWidth` | `CYLTabBar.CYLPlusButtonWidth` | done | updated by the latest tab bar layout (dp) |
 | `CYLTabBarItemWidth` | `CYLTabBar.CYLTabBarItemWidth` | done | updated by the latest tab bar layout (dp) |
-| `CYLTabBarHeight` | `CYLTabBar.CYLTabBarHeight` | done | updated by the latest tab bar layout (dp) |
+| `CYLTabBarHeight` | `CYLTabBar.CYLTabBarHeight` | done | updated by the latest tab bar layout (dp); the default height is the system tab bar's, `CYLConstants.cyl_systemTabBarHeight(context)` (Material 3: 80 dp), since 2026-11-22 |
 | `CYLTabBarLoginCompletion` | `typealias CYLTabBarLoginCompletion` | done |  |
 | `CYLTabBarLoginStateDidChangeNotification` | `CYLConstants.CYLTabBarLoginStateDidChangeNotification` | done |  |
 | `CYLTabBarReselectBehavior` | `CYLEnums.CYLTabBarReselectBehavior` | done |  |

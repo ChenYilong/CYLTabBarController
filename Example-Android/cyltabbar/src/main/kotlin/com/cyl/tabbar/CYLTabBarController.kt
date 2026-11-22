@@ -277,7 +277,12 @@ open class CYLTabBarController(val activity: FragmentActivity) {
         private set
     var tabBarItemsAttributes: List<Map<String, Any?>> = emptyList()
         private set
-    var tabBarHeight: Float = CYLConstants.CYLTabBarHeight
+    /**
+     * [EN] The tab bar height, in dp. Without a value set, the system tab bar's height in the activity's theme
+     *      (`CYLConstants.cyl_systemTabBarHeight`: 80 with Material 3); a value the app sets wins.
+     * [CN] TabBar 高度（dp）。未设置时为 activity 主题中系统 TabBar 的高度（`CYLConstants.cyl_systemTabBarHeight`：Material 3 为 80）；App 设置的值优先。
+     */
+    var tabBarHeight: Float = CYLConstants.cyl_systemTabBarHeight(activity)
         set(value) { field = value; tabBar.requestLayout() }
     var imageInsets: CYLEdgeInsets = CYLEdgeInsets.zero
         set(value) { field = value; tabBar.requestLayout() }

@@ -1063,7 +1063,7 @@ class CYLTabBar(context: Context) : ViewGroup(context) {
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         val width = MeasureSpec.getSize(widthMeasureSpec)
-        val tabBarHeight = ((tabBarController?.tabBarHeight ?: CYLConstants.CYLTabBarHeight) * resources.displayMetrics.density).toInt()
+        val tabBarHeight = ((tabBarController?.tabBarHeight ?: CYLConstants.cyl_systemTabBarHeight(context)) * resources.displayMetrics.density).toInt()
         val barHeight = styleRenderer.barHeight(this, tabBarHeight, cyl_safeAreaBottom)
         styleRenderer.itemsFrame(this, width, barHeight, tabBarHeight, cyl_safeAreaBottom, cyl_itemsFrame)
         val height = cyl_itemsFrame.height()
@@ -1144,7 +1144,7 @@ class CYLTabBar(context: Context) : ViewGroup(context) {
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
         val density = resources.displayMetrics.density
-        styleRenderer.itemsFrame(this, width, height, ((tabBarController?.tabBarHeight ?: CYLConstants.CYLTabBarHeight) * density).toInt(), cyl_safeAreaBottom, cyl_itemsFrame)
+        styleRenderer.itemsFrame(this, width, height, ((tabBarController?.tabBarHeight ?: CYLConstants.cyl_systemTabBarHeight(context)) * density).toInt(), cyl_safeAreaBottom, cyl_itemsFrame)
         if (slotWidths.size != slotCount()) slotWidths = computeSlotWidths(cyl_itemsFrame.width())
         val plusIndex = plusButtonIndex()
         var slot = 0
