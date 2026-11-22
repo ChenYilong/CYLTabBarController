@@ -383,6 +383,8 @@ docs/
 │   ├── harmonyos-x86-64-rive-icon-waits-for-file.png
 │   ├── harmonyos-x86-64-rive-latest-builds.png
 │   ├── harmonyos-x86-64-rive-onended-debug-engine-kit.png
+│   ├── harmonyos-x86-64-rive-tabs-on-cylanimateditem-rive.png
+│   ├── harmonyos-x86-64-svga-tabs-on-pure-ts-decoder.png
 │   ├── image-only-tabs-gallery-3-3-ios17.png
 │   ├── image-only-tabs-ios.png
 │   ├── inset-grouped-sections-demo-ios.png

@@ -16,14 +16,19 @@ types by its selection and playback (selected: once from the start; unselected: 
 | Type | Where | Register |
 |:---|:---|:---|
 | GIF | this module (ImageKit, no library) | `CYLAnimatedItemGIF.register()` |
-| SVGA | this module (no library) | in progress (chen-yilong-3a) |
-| Lottie | module `cylanimateditem_lottie` (`@ohos/lottie`) | in progress |
-| PAG | module `cylanimateditem_pag` (`@tencent/libpag`) | in progress |
-| Rive | module `cylanimateditem_rive` (`@ohos/rive`) | in progress (chen-yilong-3a) |
+| SVGA | this module (pure TypeScript decoder and renderer, `svga/`) | `CYLAnimatedItemSVGA.register()` |
+| Lottie | module `cylanimateditem_lottie` (`@ohos/lottie` ^2.0.38) | `CYLAnimatedItemLottie.register()` |
+| PAG | module `cylanimateditem_pag` (`@tencent/libpag` ^4.4.31; an app on another version can pin one with ohpm `overrides`) | `CYLAnimatedItemPAG.register()` |
+| Rive | module `cylanimateditem_rive` (`@ohos/rive` 1.0.4) | `CYLAnimatedItemRive.register()` |
+
+Used by: cyltabbar (Lottie and SVGA tabs through the engine views; `CYLRiveIcon` and `svga/` delegate to the modules),
+CollectionViewClassifyMenu (every tag icon; no players of its own), CYLTableViewPlaceHolder and CYLSearchViewController
+(switching).
 
 - A host that drives playback itself (resting progress, Play all) sets `drivesAnimationPlayback: false` and gets the
   player in `onAnimationPlayer`: `CYLAnimatedItemPlayer` (`play()`, `stopAtProgress(p)`, `speed`, `loops`,
-  `supportsSpeed` / `supportsLoops` / `supportsProgress`, `isPlaying`, `progress`, `onEnded`).
+  `supportsSpeed` / `supportsLoops` / `supportsProgress`, `isPlaying`, `progress`, `onEnded`, `supportsColors` /
+  `applyColors(colors)`).
 - Writing an engine: a `@Component` that gets `state: CYLAnimatedItemEngineState` (the parsed
   `CYLAnimatedItemSource` with its `#` options, the size, the playback, the callbacks), makes a player (subclass
   `CYLAnimatedItemPlayer`, or `CYLAnimatedItemTimedPlayer` for an engine without speed), and calls
