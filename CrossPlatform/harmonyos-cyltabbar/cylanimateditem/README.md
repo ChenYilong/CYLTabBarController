@@ -65,7 +65,7 @@ it); `strip <in.hap> [<out.hap>]` only copies the HAP without native libraries. 
 
 | Testable on the x86_64 emulator | Needs an arm64 device |
 |:---|:---|
-| Lottie, SVGA and GIF playback; still images and placeholders; PAG and Rive items on their still images (no crash, no blank item); `showsImageWhenAnimationEnds` with Lottie or SVGA; layout, dark mode, accessibility, localization, gestures, countdown, stack view | PAG and Rive playback, their `onEnded`, Rive's dispose crash workarounds |
+| Lottie, SVGA and GIF playback; still images and placeholders; PAG and Rive items on their still images (no crash, no blank item); Rive playback in debug builds with the debug engine kit (section 5); `showsImageWhenAnimationEnds` with Lottie or SVGA; layout, dark mode, accessibility, localization, gestures, countdown, stack view | PAG playback; Rive in release builds; Rive's dispose crash workarounds on a real device |
 
 Device tests (hypium): the cyltabbar example's `entry/src/ohosTest` (`CYLAnimatedItemFallback.test.ets`) checks the
 ABI rules on the device (expectations follow `deviceInfo.abiList`, so it also passes on arm64), a simulated x86_64 and
@@ -84,11 +84,20 @@ hdc shell aa test -b com.cyl.tabbar.harmony -m entry_test -s unittest OpenHarmon
 Result on 2026-11-22 (x86_64 emulator, HarmonyOS 6.0.1): Tests run: 6, Failure: 0, Error: 0, Pass: 6. On Windows give hdc
 backslash paths (`tools/cyl_hap_x86_64.py` does).
 
-### 5. Next: PAG and Rive playback on x86_64 (owner's plan, TODO)
+### 5. Rive playback on x86_64: the debug engine kit (owner's Plan 1)
 
-Plan 1: load x86_64 builds of the PAG and Rive libraries (from their GitHub sources) when the device is x86_64; compile and
-never crash first, then play correctly; behind a debug build option until verified, and the guard is removed only with the
-owner's approval. Plan 2, if Plan 1 fails: the macOS (arm64) session runs these tests. Full text: CYLTabBarController
-`instructions.md`, "Rive and PAG on the x86_64 emulator: two plans for arm64-only tests".
+`x86_64-debug-engines/rive/` holds `libohos_rive.so` of @ohos/rive 1.0.4 built for x86_64 from its sources (provenance,
+checksums and licenses in its README) and the x86_64 `libc++_shared.so` it links. It is never part of a build:
+
+- `tools/cyl_hap_x86_64.py install <app.hap>` adds the kit (`libs/x86_64/`) and the marker rawfile
+  `cyl_x86_64_debug_engines.json` when the device is x86_64 (`--x86-engines auto`, the default; `no` / `yes` or
+  `CYL_X86_ENGINES=0|1` force it).
+- `CYLAnimatedItemEngines.loadX86_64DebugEngines(context)` (called by `CYLAnimatedItemView` and `CYLTabBarController`)
+  reads the marker **in debug builds only** and lets Rive accept `x86_64`; `x86_64DebugEngines()` lists what it turned on.
+  Release builds and debug builds installed without the kit keep the still images.
+- The debug guard stays until the owner approves removing it. PAG has no x86_64 kit yet (its playback still needs arm64).
+
+Checked on the x86_64 emulator (2026-11-22): with the kit the Rive tab icons draw and animate, without it they keep their
+still images, and the hypium suite passes 9 / 9 in both installs.
 
 Say in every report and screenshot footer which part ran on x86_64 and which still needs an arm64 device.

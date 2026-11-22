@@ -377,6 +377,7 @@ docs/
 │   ├── harmonyos-verify-skins-eba8c44.png
 │   ├── harmonyos-verify-spanish.jpeg
 │   ├── harmonyos-x86-64-emulator-target-rive-still-images.png
+│   ├── harmonyos-x86-64-rive-debug-engine-kit.png
 │   ├── image-only-tabs-gallery-3-3-ios17.png
 │   ├── image-only-tabs-ios.png
 │   ├── inset-grouped-sections-demo-ios.png

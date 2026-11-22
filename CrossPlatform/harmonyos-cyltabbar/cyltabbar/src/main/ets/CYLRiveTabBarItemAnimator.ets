@@ -1,6 +1,7 @@
 import { Fit, Loop, RendererType, RiveAnimationView, SMINumber, ViewModelInstance, initializeRive } from '@ohos/rive';
 import { deviceInfo } from '@kit.BasicServicesKit';
 import { common } from '@kit.AbilityKit';
+import { CYLAnimatedItemEngines } from 'cylanimateditem';
 
 /*
  * [EN] Rive tab icons (iOS `CYLRiveTabBarItemAnimator` + `CYLRiveTabBarItemAnimationView`, Android
@@ -165,8 +166,9 @@ let cylRiveInitialized: boolean = false;
  *      Rive Tab 显示其图片。
  */
 export function cylRiveIsSupported(): boolean {
-  const abis: string = deviceInfo.abiList ?? '';
-  return abis.split(',').map((abi: string) => abi.trim()).indexOf('arm64-v8a') >= 0;
+  // [EN] The engine registry decides (arm64-v8a; x86_64 too in debug builds with the x86_64 debug engine kit,
+  //      CYLAnimatedItemEngines.loadX86_64DebugEngines). [CN] 由引擎注册表决定（arm64-v8a；debug 构建安装了 x86_64 调试引擎包时也包括 x86_64）。
+  return CYLAnimatedItemEngines.isSupportedOnDevice('Rive');
 }
 
 /**

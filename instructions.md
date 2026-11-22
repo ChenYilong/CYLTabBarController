@@ -42,6 +42,8 @@ Organized by tag (tag: `instructions`): each heading has its tag and a summary; 
 - Owner's two plans for arm64-only tests (added 2026-11-22): Plan 1, x86_64 builds of the Rive and PAG libraries from
   GitHub inside `cylanimateditem`, guarded by the device architecture, compile and no crash first, behind a debug build
   option until verified (removing it needs the owner's approval); Plan 2, if it fails, the macOS (arm64) session tests.
+- Plan 1 status (2026-11-22): Rive done behind the debug guard (the debug engine kit in
+  `cylanimateditem/x86_64-debug-engines/`, `CYLAnimatedItemEngines.loadX86_64DebugEngines`); PAG next.
 - Full text: [docs/instructions/windows-harmonyos.md](docs/instructions/windows-harmonyos.md), "From instructions.md".
 
 ## Git (tag: `git`)

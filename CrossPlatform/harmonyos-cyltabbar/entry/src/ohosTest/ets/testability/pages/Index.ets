@@ -28,6 +28,13 @@ struct Index {
   aboutToAppear(): void {
     CYLAnimatedItemEngines.register('Rive');
     CYLAnimatedItemEngines.register('Lottie');
+    // [EN] The x86_64 debug engine kit marker is a rawfile of the app module (entry), not of this test module.
+    // [CN] x86_64 调试引擎包的标记是 App 模块（entry）的 rawfile，而不是本测试模块的。
+    try {
+      CYLAnimatedItemEngines.loadX86_64DebugEngines(this.getUIContext().getHostContext()?.createModuleContext('entry'));
+    } catch (e) {
+      // [EN] No entry module context: the kit stays off. [CN] 没有 entry 模块 context：调试引擎包保持关闭。
+    }
   }
 
   @Builder
