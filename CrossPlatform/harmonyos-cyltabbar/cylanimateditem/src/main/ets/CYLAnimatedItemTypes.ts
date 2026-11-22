@@ -158,7 +158,12 @@ export class CYLAnimatedItemTypeRegistry {
     if (name.length === 0) {
       return;
     }
-    if (nativeAbis !== undefined) {
+    // [EN] An ABI list set earlier wins (the x86_64 debug engine kit adds x86_64 at launch): registering an engine after
+    //      `CYLAnimatedItemEngines.loadX86_64DebugEngines` used to reset PAG / Rive to arm64-v8a, so they showed their still
+    //      image on the x86_64 emulator (CYLTableViewPlaceHolder, 2026-11-22).
+    // [CN] 先设置的 ABI 列表优先（x86_64 调试引擎包在启动时加入 x86_64）：以前在 loadX86_64DebugEngines 之后注册引擎会把 PAG / Rive 重置为
+    //      arm64-v8a，使其在 x86_64 模拟器上只显示静态图片。
+    if (nativeAbis !== undefined && !CYLAnimatedItemTypeRegistry.abiOverrides.has(name)) {
       CYLAnimatedItemTypeRegistry.setRequiredNativeAbis(name, nativeAbis);
     }
     const clean = (extensions ?? []).map((extension: string) => extension.replace(/^\./, '').toLowerCase()).filter((extension: string) => extension.length > 0);
