@@ -121,7 +121,7 @@ dependencies {
         compileOnly("androidx.viewpager2:viewpager2:1.0.0")
         // [EN] As in cyltabbar (the layout block's callback registry), pinned to the same commit. TODO: replace the pin with a release once the library is on Maven Central.
         // [CN] 与 cyltabbar 相同（布局 block 的回调注册表），固定到同一提交。TODO：库发布到 Maven Central 后改为正式版本。
-        implementation("com.github.ChenYilong:CYLDeallocBlockExecutor:03814d4852c1de2492e6ab7ff1e8c5a425af6338")
+        implementation("com.github.ChenYilong.CYLDeallocBlockExecutor:cyl-dealloc-block-executor-core:3aafe8ecc9a640f663103ea4457b598ddbdca9f9")
         if (cylAnimatedItemModule != null) implementation(cylAnimatedItemModule)
         else if (cylAnimatedItemIncluded) implementation("io.github.chenyilong:cyltabbarcontroller-animateditem:$cylAndroidVersion")
     } else {

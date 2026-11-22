@@ -1,15 +1,9 @@
 {
   "name": "cyl-dealloc-block-executor-miniprogram",
   "version": "1.4.0",
-  "description": "CYLDeallocBlockExecutor for the WeChat Mini Program: lifecycle and dealloc callbacks with identifiers, keys, invoke once and re-arm. No dependencies.",
-  "license": "MIT",
-  "author": "ChenYilong <luohanchenyilong@163.com>",
-  "main": "cyl-dealloc-block-executor.js",
-  "files": [
-    "cyl-dealloc-block-executor.js",
-    "LICENSE"
-  ],
-  "scripts": {
-    "test": "node --test test/*.test.js"
-  }
+  "private": true,
+  "description": "Lifecycle and teardown blocks for Mini Program pages, aligned with the iOS CYLDeallocBlockExecutor API.",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": { "test": "node --test \"test/*.test.js\"" }
 }

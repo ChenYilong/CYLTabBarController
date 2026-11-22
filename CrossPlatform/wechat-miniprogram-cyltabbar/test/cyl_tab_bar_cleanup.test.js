@@ -1,6 +1,6 @@
 /**
  * [EN] Tests of the cleanup of cyl-tab-bar: each resource (the theme listener, the live-bar entry, the tap animation timer) registers
- *      its own keyed willDealloc callback (CYLDeallocBlockExecutor) where it is created, and `detached` runs them once. Run: `npm test`.
+ *      its own keyed dealloc callback (CYLDeallocBlockExecutor) where it is created, and `detached` runs them once. Run: `npm test`.
  * [CN] cyl-tab-bar 清理逻辑的测试：每个资源（主题监听、存活 TabBar 记录、点击动画定时器）在创建处注册各自带 key 的 willDealloc 回调
  *      （CYLDeallocBlockExecutor），`detached` 时运行一次。运行：`npm test`。
  */
@@ -30,7 +30,7 @@ function cylMount(definition, model) {
   return bar
 }
 
-test('detached removes the theme listener once, and the registry then refuses new callbacks', () => {
+test('detached removes the theme listener once, and the controller is then detached', () => {
   const listeners = []
   global.wx = {
     getSystemInfoSync: () => ({ theme: 'light' }),
@@ -46,7 +46,7 @@ test('detached removes the theme listener once, and the registry then refuses ne
   assert.equal(listeners.length, 0, 'the theme listener is removed')
   definition.lifetimes.detached.call(bar)
   assert.equal(listeners.length, 0, 'a second detached does nothing')
-  assert.equal(bar.cylCallbacks.willDealloc(() => {}), 0)
+  assert.equal(bar.cylLifecycle.isDetached, true, 'the controller is detached: new cleanups are not registered')
   delete global.wx
 })
 
