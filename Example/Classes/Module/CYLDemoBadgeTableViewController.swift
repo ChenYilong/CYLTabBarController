@@ -48,7 +48,7 @@ class CYLDemoBadgeTableViewController: CYLBaseTableViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        UITableViewCell.cyl_setUpAutomaticRowHeight(for: tableView)
+        UITableViewCell.cylSetUpAutomaticRowHeight(for: tableView)
         // [EN] The grouped background, so the rounded sections stand out. [CN] 分组背景色，使圆角分组清晰可见。
         view.backgroundColor = .systemGroupedBackground
         tableView.cyl_header = CYLRefreshNormalHeader(refreshingBlock: { [weak self] in
@@ -71,11 +71,11 @@ class CYLDemoBadgeTableViewController: CYLBaseTableViewController {
 
     /// [EN] A badge row: the badge sample as the title, the page as the subtitle; both wrap. [CN] 角标行：角标样例为主标题，页面为副标题；均可换行。
     func configure(_ cell: UITableViewCell, for indexPath: IndexPath) {
-        cell.cyl_showBadge(forRow: indexPath.row)
-        cell.textLabel?.text = UITableViewCell.cyl_badgeTitle(forRow: indexPath.row)
+        cell.cylShowBadge(forRow: indexPath.row)
+        cell.textLabel?.text = UITableViewCell.cylBadgeTitle(forRow: indexPath.row)
         cell.detailTextLabel?.text = String(format: cylDemoLocalizedString("%@ CYLTabBarController on iOS %@"), title ?? "",
                                             "\(Float(UIDevice.current.systemVersion) ?? 0)")
-        cell.cyl_wrapsTextLabels()
+        cell.cylWrapsTextLabels()
     }
 
     /// [EN] A row of this page (not of the demo sections). [CN] 本页的行（不属于演示 section）。
@@ -104,7 +104,7 @@ class CYLDemoBadgeTableViewController: CYLBaseTableViewController {
         if section < cyl_demoSectionCount() {
             return cyl_demoRowCount(inSection: section)
         }
-        return max(minimumBadgeRowCount, UITableViewCell.cyl_badgeStyleCount())
+        return max(minimumBadgeRowCount, UITableViewCell.cylBadgeStyleCount())
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {

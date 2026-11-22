@@ -18,7 +18,7 @@ class TabBarCommon: NSObject {
     class func tabBarSelectIndex(_ selectIndex: Int) {
         CYLPlusButtonSubclass.register()
         // Rebuilt after a language change too, so every text shows in the new language.
-        UIApplication.shared.delegate?.window??.cyl_setRootViewControllerProvider {
+        UIApplication.shared.delegate?.window??.cylSetRootViewControllerProvider {
             let tabBarController = makeRootTabBarController()
             #if !CYL_DEMO_PAG
             tabBarController.tabBarStyleType = .liquidGlass
@@ -47,7 +47,7 @@ class TabBarCommon: NSObject {
     class func setUpRootTabBarController() {
         CYLPlusButtonSubclass.register()
         // Rebuilt after a language change, so every text shows in the new language.
-        UIApplication.shared.delegate?.window??.cyl_setRootViewControllerProvider {
+        UIApplication.shared.delegate?.window??.cylSetRootViewControllerProvider {
             makeRootTabBarController()
         }
         #if CYL_DEMO_PAG
@@ -86,24 +86,24 @@ class TabBarCommon: NSObject {
     
     class func tabBarItemsAttributesForController() -> [[AnyHashable: Any]] {
             
-        let tabBarItemHome = [CYLTabBarItemTitle: cylDemoLocalizedString("首页"),
-                              CYLTabBarItemImage: "Home",
-                              CYLTabBarItemSelectedImage: "HomeSelected"]
+        let tabBarItemHome = [cylTabBarItemTitle: cylDemoLocalizedString("首页"),
+                              cylTabBarItemImage: "Home",
+                              cylTabBarItemSelectedImage: "HomeSelected"]
         
         // Dark Mode (#620): "Home" also loads Home_dark (naming convention), this tab names its dark image, "Me" has its
         // own Dark appearance. 深色模式：见 README「适配深色模式」。
-        let tabBarItemHealthy = [CYLTabBarItemTitle: cylDemoLocalizedString("健康"),
-                              CYLTabBarItemImage: "Message",
-                              CYLTabBarItemDarkImage: "Message_night",
-                              CYLTabBarItemSelectedImage: "MessageSelected"]
+        let tabBarItemHealthy = [cylTabBarItemTitle: cylDemoLocalizedString("健康"),
+                              cylTabBarItemImage: "Message",
+                              cylTabBarItemDarkImage: "Message_night",
+                              cylTabBarItemSelectedImage: "MessageSelected"]
 
-        let tabBarItemFriends = [CYLTabBarItemTitle: cylDemoLocalizedString("朋友圈"),
-                              CYLTabBarItemImage: "lianxiren",
-                              CYLTabBarItemSelectedImage: "lianxirenSelected"]
+        let tabBarItemFriends = [cylTabBarItemTitle: cylDemoLocalizedString("朋友圈"),
+                              cylTabBarItemImage: "lianxiren",
+                              cylTabBarItemSelectedImage: "lianxirenSelected"]
         
-        let tabBarItemMe = [CYLTabBarItemTitle: cylDemoLocalizedString("我的"),
-                              CYLTabBarItemImage: "Me",
-                              CYLTabBarItemSelectedImage: "MeSelected"]
+        let tabBarItemMe = [cylTabBarItemTitle: cylDemoLocalizedString("我的"),
+                              cylTabBarItemImage: "Me",
+                              cylTabBarItemSelectedImage: "MeSelected"]
 
         let tabBarItemsAttributes = [tabBarItemHome, tabBarItemHealthy, tabBarItemFriends, tabBarItemMe]
         #if CYL_DEMO_PAG
@@ -129,15 +129,15 @@ class TabBarCommon: NSObject {
         return zip(tabBarItemsAttributes, animationFiles).enumerated().map { index, pair in
             let (attributes, fileName) = pair
             var item = CYLTabBarItemAttributesAddingAnimationFile(attributes, fileName, nil)
-            if index < tints.count, let path = item[CYLTabBarAnimationFilePath] as? String {
-                item[CYLTabBarAnimationFilePath] = nil
-                item[CYLTabBarAnimationDarkFilePath] = nil
-                item[CYLTabBarAnimationURL] = CYLTabBarAnimationURLWithOptions(URL(fileURLWithPath: path), tints[index])
+            if index < tints.count, let path = item[cylTabBarAnimationFilePath] as? String {
+                item[cylTabBarAnimationFilePath] = nil
+                item[cylTabBarAnimationDarkFilePath] = nil
+                item[cylTabBarAnimationURL] = CYLTabBarAnimationURLWithOptions(URL(fileURLWithPath: path), tints[index])
             }
             // [EN] The generic size key, for any animation library: `CYLTabBarAnimationSize` (only for the animated tabs).
             // [CN] 通用的尺寸 key，适用于任意动画库：`CYLTabBarAnimationSize`（仅用于有动画的 Tab）。
-            if item[CYLTabBarAnimationFilePath] != nil || item[CYLTabBarAnimationURL] != nil {
-                item[CYLTabBarAnimationSize] = NSValue(cgSize: CGSize(width: 33, height: 33))
+            if item[cylTabBarAnimationFilePath] != nil || item[cylTabBarAnimationURL] != nil {
+                item[cylTabBarAnimationSize] = NSValue(cgSize: CGSize(width: 33, height: 33))
             }
             return item
         }
@@ -167,7 +167,7 @@ class TabBarCommon: NSObject {
             if index < tints.count, let path = item["CYLTabBarLottieFilePath"] as? String {
                 item["CYLTabBarLottieFilePath"] = nil
                 item["CYLTabBarLottieDarkFilePath"] = nil
-                item[CYLTabBarAnimationURL] = CYLTabBarAnimationURLWithOptions(URL(fileURLWithPath: path), tints[index])
+                item[cylTabBarAnimationURL] = CYLTabBarAnimationURLWithOptions(URL(fileURLWithPath: path), tints[index])
                 colors = [:]
             }
             if !colors.isEmpty {

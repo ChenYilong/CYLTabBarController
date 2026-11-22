@@ -55,7 +55,7 @@ final class CYLDemoPlaybackControlsView: UIView {
     }
 
     private var tabBarController: CYLTabBarController? {
-        viewController?.cyl_tabBarController
+        viewController?.cylTabBarController
     }
 
     override func didMoveToWindow() {

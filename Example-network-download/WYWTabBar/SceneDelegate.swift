@@ -56,42 +56,42 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let urls = Bundle.main.object(forInfoDictionaryKey: "CYLDemoNetworkIconURLs") as? [String: String] ?? [:]
         let attributes: [[AnyHashable: Any]] = [
             // [CN] 首页 [EN] Home
-            [CYLTabBarItemTitle: cylDemoLocalizedString("首页"),
-             CYLTabBarItemImage: UIImage(systemName: "house") as Any,
-             CYLTabBarItemSelectedImage: UIImage(systemName: "house.fill") as Any,
-             CYLTabBarItemImageURL: urls["home"] as Any,
-             CYLTabBarItemSelectedImageURL: urls["homeSelected"] as Any,
-             CYLTabBarItemImageURLSize: iconSize],
+            [cylTabBarItemTitle: cylDemoLocalizedString("首页"),
+             cylTabBarItemImage: UIImage(systemName: "house") as Any,
+             cylTabBarItemSelectedImage: UIImage(systemName: "house.fill") as Any,
+             cylTabBarItemImageURL: urls["home"] as Any,
+             cylTabBarItemSelectedImageURL: urls["homeSelected"] as Any,
+             cylTabBarItemImageURLSize: iconSize],
             // [CN] 行情 [EN] Markets
-            [CYLTabBarItemTitle: cylDemoLocalizedString("行情"),
-             CYLTabBarItemImage: UIImage(systemName: "chart.line.uptrend.xyaxis") as Any,
-             CYLTabBarItemSelectedImage: UIImage(systemName: "chart.line.uptrend.xyaxis") as Any,
-             CYLTabBarItemImageURL: urls["markets"] as Any,
-             CYLTabBarItemSelectedImageURL: urls["marketsSelected"] as Any,
-             CYLTabBarItemImageURLSize: iconSize],
+            [cylTabBarItemTitle: cylDemoLocalizedString("行情"),
+             cylTabBarItemImage: UIImage(systemName: "chart.line.uptrend.xyaxis") as Any,
+             cylTabBarItemSelectedImage: UIImage(systemName: "chart.line.uptrend.xyaxis") as Any,
+             cylTabBarItemImageURL: urls["markets"] as Any,
+             cylTabBarItemSelectedImageURL: urls["marketsSelected"] as Any,
+             cylTabBarItemImageURLSize: iconSize],
             // [CN] 交易 [EN] Trade
-            [CYLTabBarItemTitle: cylDemoLocalizedString("交易"),
-             CYLTabBarItemImage: UIImage(systemName: "plus.circle") as Any,
-             CYLTabBarItemSelectedImage: UIImage(systemName: "plus.circle.fill") as Any,
-             CYLTabBarItemImageURL: urls["trade"] as Any,
-             CYLTabBarItemSelectedImageURL: urls["tradeSelected"] as Any,
-             CYLTabBarItemImageURLSize: iconSize],
+            [cylTabBarItemTitle: cylDemoLocalizedString("交易"),
+             cylTabBarItemImage: UIImage(systemName: "plus.circle") as Any,
+             cylTabBarItemSelectedImage: UIImage(systemName: "plus.circle.fill") as Any,
+             cylTabBarItemImageURL: urls["trade"] as Any,
+             cylTabBarItemSelectedImageURL: urls["tradeSelected"] as Any,
+             cylTabBarItemImageURLSize: iconSize],
             // [CN] 资讯 [EN] News
-            [CYLTabBarItemTitle: cylDemoLocalizedString("资讯"),
-             CYLTabBarItemImage: UIImage(systemName: "newspaper") as Any,
-             CYLTabBarItemSelectedImage: UIImage(systemName: "newspaper.fill") as Any,
-             CYLTabBarItemImageURL: urls["news"] as Any,
-             CYLTabBarItemSelectedImageURL: urls["newsSelected"] as Any,
-             CYLTabBarItemImageURLSize: iconSize],
+            [cylTabBarItemTitle: cylDemoLocalizedString("资讯"),
+             cylTabBarItemImage: UIImage(systemName: "newspaper") as Any,
+             cylTabBarItemSelectedImage: UIImage(systemName: "newspaper.fill") as Any,
+             cylTabBarItemImageURL: urls["news"] as Any,
+             cylTabBarItemSelectedImageURL: urls["newsSelected"] as Any,
+             cylTabBarItemImageURLSize: iconSize],
             // [CN] 我的 [EN] Me
             // FIX: issue #605
             // [EN] An animated GIF icon; any URL works, a file URL here.
             // [CN] GIF 动图图标；任何 URL 都可以，这里使用本地文件 URL。
-            [CYLTabBarItemTitle: cylDemoLocalizedString("我的"),
-             CYLTabBarItemImage: UIImage(systemName: "person") as Any,
-             CYLTabBarItemSelectedImage: UIImage(systemName: "person.fill") as Any,
-             CYLTabBarItemImageURL: Bundle.main.url(forResource: "tab_animated", withExtension: "gif") as Any,
-             CYLTabBarItemImageURLSize: iconSize],
+            [cylTabBarItemTitle: cylDemoLocalizedString("我的"),
+             cylTabBarItemImage: UIImage(systemName: "person") as Any,
+             cylTabBarItemSelectedImage: UIImage(systemName: "person.fill") as Any,
+             cylTabBarItemImageURL: Bundle.main.url(forResource: "tab_animated", withExtension: "gif") as Any,
+             cylTabBarItemImageURLSize: iconSize],
         ]
         let tabBarController = CYLTabBarController(viewControllers: [homeNav, wealthNav, tradeNav, infoNav, mineNav],
                                                    tabBarItemsAttributes: attributes,
@@ -115,6 +115,6 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     private func updateTitleAfterPurchase() {
         // [EN] FIX: issue #601 — e.g. after a purchase: the title of a tab, in place.
         // [CN] 例如购买课程后：原地更新某个 Tab 的标题。
-        tabBarController?.updateTabBarItem(at: 1, attributes: [CYLTabBarItemTitle: cylDemoLocalizedString("已购课程")])
+        tabBarController?.updateTabBarItem(at: 1, attributes: [cylTabBarItemTitle: cylDemoLocalizedString("已购课程")])
     }
 }

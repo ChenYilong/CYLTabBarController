@@ -177,7 +177,7 @@ enum CYLGalleryProvider {
                 let tabBarController = CYLGallery.backgroundTabBarController()
                 tabBarController.cyl_defaultTabButtonAnimation = CYLGalleryHighlightAnimation()
                 CYLGallery.forEachTabButton(of: tabBarController) { button, _ in
-                    button.cyl_tabImageView()?.transform = CGAffineTransform(scaleX: 1.15, y: 1.15)
+                    button.cylTabImageView()?.transform = CGAffineTransform(scaleX: 1.15, y: 1.15)
                 }
                 return CYLGallery.embed(tabBarController)
             },
@@ -207,10 +207,10 @@ enum CYLGalleryProvider {
         var items = CYLGallery.attributes(4, showsTitles: true, pointSize: 20) { _ in CYLGallery.tealTabAttributes() }
         for index in 2..<4 {
             let spec = CYLGallery.tabSpecs[index + 1]
-            items[index][CYLTabBarItemTitle] = spec.title
-            items[index][CYLTabBarItemImage] = CYLGallery.symbol(spec.symbol, filled: false, pointSize: 20)
-            items[index][CYLTabBarItemSelectedImage] = CYLGallery.symbol(spec.symbol, filled: true, pointSize: 20)
-            items[index][CYLTabBarItemIdentifier] = spec.identifier
+            items[index][cylTabBarItemTitle] = spec.title
+            items[index][cylTabBarItemImage] = CYLGallery.symbol(spec.symbol, filled: false, pointSize: 20)
+            items[index][cylTabBarItemSelectedImage] = CYLGallery.symbol(spec.symbol, filled: true, pointSize: 20)
+            items[index][cylTabBarItemIdentifier] = spec.identifier
         }
         let pages = CYLGallery.pages(4, embedsInNavigation: false)
         let tabBarController = CYLGallery.tabBarController(pages: pages, attributes: items, styleType: .default,
@@ -327,7 +327,7 @@ enum CYLGalleryProvider {
                 let selected = CYLGallery.rgb(252, 13, 27)
                 let lottieURL = Bundle.main.url(forResource: "tab_search_animate", withExtension: "json")
                 let attributes = CYLGallery.attributes(5, showsTitles: false, pointSize: 22) { index in
-                    var item: [String: Any] = [CYLTabBarItemIconColor: normal, CYLTabBarItemSelectedIconColor: selected]
+                    var item: [String: Any] = [cylTabBarItemIconColor: normal, cylTabBarItemSelectedIconColor: selected]
                     if index == 2, let lottieURL {
                         item[CYLTabBarLottieURL] = lottieURL
                         item[CYLTabBarLottieSize] = NSValue(cgSize: CGSize(width: 33, height: 33))
@@ -371,10 +371,10 @@ enum CYLGalleryProvider {
                 let colors: [UIColor] = [.systemRed, .systemOrange, .systemGreen, .systemBlue, .systemPurple]
                 let attributes = CYLGallery.attributes(5, showsTitles: true, pointSize: 20) { index in
                     let color = colors[index]
-                    return [CYLTabBarItemSelectedTitleColor: color, CYLTabBarItemSelectedIconColor: color,
-                            CYLTabBarItemTitleFont: UIFont.systemFont(ofSize: 10),
-                            CYLTabBarItemSelectedTitleFont: UIFont.systemFont(ofSize: 11, weight: .bold),
-                            CYLTabBarItemSelectedBackgroundColor: color.withAlphaComponent(0.12)]
+                    return [cylTabBarItemSelectedTitleColor: color, cylTabBarItemSelectedIconColor: color,
+                            cylTabBarItemTitleFont: UIFont.systemFont(ofSize: 10),
+                            cylTabBarItemSelectedTitleFont: UIFont.systemFont(ofSize: 11, weight: .bold),
+                            cylTabBarItemSelectedBackgroundColor: color.withAlphaComponent(0.12)]
                 }
                 return CYLGallery.tabBarController(pages: CYLGallery.pages(5, embedsInNavigation: false), attributes: attributes,
                                                    styleType: .default, context: CYLGallery.context)
@@ -414,7 +414,7 @@ enum CYLGalleryProvider {
                 }
                 let tabBarController = CYLGallery.tabBarController(pages: CYLGallery.pages(5, embedsInNavigation: false), attributes: attributes,
                                                                    styleType: .default, context: CYLGallery.context)
-                tabBarController.tabBar.cyl_itemEdgeInsets = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
+                tabBarController.tabBar.cylItemEdgeInsets = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
                 tabBarController.tabBar.itemSpacing = 2
                 CYLGallery.setTabBarBackgroundColor(tabBarController, .black)
                 return CYLGallery.embed(tabBarController)
@@ -434,7 +434,7 @@ enum CYLGalleryProvider {
         var attributes = CYLGallery.attributes(5, showsTitles: true, pointSize: 20)
         attributes.remove(at: 2)
         for (index, title) in titles.enumerated() {
-            attributes[index][CYLTabBarItemTitle] = title
+            attributes[index][cylTabBarItemTitle] = title
         }
         var pages = CYLGallery.pages(5, embedsInNavigation: false)
         pages.remove(at: 2)
@@ -480,7 +480,7 @@ enum CYLGalleryProvider {
      * [CN] 用星星替换 Home 的图标，然后在下一个 runloop 统计被标记的视图。
      */
     private static func markHomeIconWithStar(in controller: CYLTabBarController) {
-        controller.viewControllers?.first?.cyl_tabButton?.cyl_replaceTabImageView(withNewView: CYLGallery.starView(), show: true)
+        controller.viewControllers?.first?.cyl_tabButton?.cylReplaceTabImageView(withNewView: CYLGallery.starView(), show: true)
         DispatchQueue.main.async { [weak controller] in
             if let controller {
                 showMarkedViewCount(of: controller)
@@ -520,7 +520,7 @@ enum CYLGalleryProvider {
                         return
                     }
                     let tabBar = controller.tabBar
-                    controller.navigationItem.title = "index \(tabBar.cyl_selectedIndex()), \(className(of: tabBar.cyl_selectedControl))"
+                    controller.navigationItem.title = "index \(tabBar.cylSelectedIndex()), \(className(of: tabBar.cyl_selectedControl))"
                 }
                 tabBarController.navigationItem.rightBarButtonItem = CYLGallery.barButtonItem("Read", read)
                 CYLGallery.whenTabBarItemsReady(tabBarController) { _ in read() }
@@ -536,7 +536,7 @@ enum CYLGalleryProvider {
                     let lines = [
                         "cyl_platterContentViewWithIndex: \(describe(tabBar.cyl_platterContentView(with: 99)))",
                         "cyl_platterSelectedContentViewWithIndex: \(describe(tabBar.cyl_platterSelectedContentView(with: 99)))",
-                        "cyl_tabBarButtonWithTabIndex: \(describe(tabBar.cyl_tabBarButton(withTabIndex: 99)))",
+                        "cyl_tabBarButtonWithTabIndex: \(describe(tabBar.cylTabBarButton(withTabIndex: 99)))",
                     ]
                     let alert = UIAlertController(title: "Index 99", message: lines.joined(separator: "\n"), preferredStyle: .alert)
                     alert.addAction(UIAlertAction(title: cylDemoLocalizedString("好"), style: .cancel))
@@ -586,7 +586,7 @@ enum CYLGalleryProvider {
                 let tabBarController = defaultTabBarController(count: 8)
                 tabBarController.title = cylDemoLocalizedString("编辑更多")
                 CYLGallery.whenTabBarItemsReady(tabBarController) { controller in
-                    controller.viewControllers?.first?.cyl_tabButton?.cyl_replaceTabImageView(withNewView: CYLGallery.starView(), show: true)
+                    controller.viewControllers?.first?.cyl_tabButton?.cylReplaceTabImageView(withNewView: CYLGallery.starView(), show: true)
                 }
                 return tabBarController
             },
@@ -614,10 +614,10 @@ enum CYLGalleryProvider {
      */
     private static func overflowMenuScene() -> UIViewController {
         var attributes = CYLGallery.attributes(4, showsTitles: true, pointSize: 20)
-        attributes.append([CYLTabBarItemTitle: "More",
-                           CYLTabBarItemImage: CYLGallery.symbol("ellipsis.circle", filled: false, pointSize: 20),
-                           CYLTabBarItemSelectedImage: CYLGallery.symbol("ellipsis.circle", filled: true, pointSize: 20),
-                           CYLTabBarItemIdentifier: "overflow"])
+        attributes.append([cylTabBarItemTitle: "More",
+                           cylTabBarItemImage: CYLGallery.symbol("ellipsis.circle", filled: false, pointSize: 20),
+                           cylTabBarItemSelectedImage: CYLGallery.symbol("ellipsis.circle", filled: true, pointSize: 20),
+                           cylTabBarItemIdentifier: "overflow"])
         var pages = CYLGallery.pages(4, embedsInNavigation: false)
         let placeholder = CYLGalleryPageViewController()
         pages.append(placeholder)
@@ -625,10 +625,10 @@ enum CYLGalleryProvider {
         let overflowSpecs = CYLGallery.tabSpecs[4...]
         let overflowPages = overflowSpecs.map { _ in CYLGalleryPageViewController() }
         let overflowAttributes: [[String: Any]] = overflowSpecs.map { spec in
-            [CYLTabBarItemTitle: spec.title,
-             CYLTabBarItemImage: CYLGallery.symbol(spec.symbol, filled: false, pointSize: 20),
-             CYLTabBarItemSelectedImage: CYLGallery.symbol(spec.symbol, filled: true, pointSize: 20),
-             CYLTabBarItemIdentifier: "overflow"]
+            [cylTabBarItemTitle: spec.title,
+             cylTabBarItemImage: CYLGallery.symbol(spec.symbol, filled: false, pointSize: 20),
+             cylTabBarItemSelectedImage: CYLGallery.symbol(spec.symbol, filled: true, pointSize: 20),
+             cylTabBarItemIdentifier: "overflow"]
         }
         let tabBarController = CYLGallery.tabBarController(pages: pages, attributes: attributes, styleType: .default, context: CYLGallery.context)
         tabBarController.cyl_customActionTabBarItemIdentifiers = ["overflow"]
@@ -642,7 +642,7 @@ enum CYLGalleryProvider {
         tabBarController.cyl_customTabActionHandler = { controller, _ in
             let menu = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
             for (page, pageAttributes) in zip(overflowPages, overflowAttributes) {
-                menu.addAction(UIAlertAction(title: pageAttributes[CYLTabBarItemTitle] as? String, style: .default) { _ in
+                menu.addAction(UIAlertAction(title: pageAttributes[cylTabBarItemTitle] as? String, style: .default) { _ in
                     if controller.viewControllers?[4] !== page {
                         controller.replaceViewController(at: 4, with: page, attributes: pageAttributes)
                     }

@@ -120,10 +120,10 @@ class MainTabBarController: CYLTabBarController, CYLFlatDesignUITabBarController
 
     /// [EN] Issue #428: called once per Lottie view. [CN] Issue #428：每个 Lottie 视图添加后回调一次。
     private func observeLottieAnimationViewDidAdd() {
-        NotificationCenter.default.addObserver(forName: .CYLTabBarItemAnimationViewDidAdd, object: nil, queue: .main) { [weak self] note in
-            guard let tabButton = note.object as? UIControl, tabButton.cyl_tabBarController === self else { return }
+        NotificationCenter.default.addObserver(forName: .cylTabBarItemAnimationViewDidAdd, object: nil, queue: .main) { [weak self] note in
+            guard let tabButton = note.object as? UIControl, tabButton.cylTabBarController === self else { return }
             NSLog("🟢 Lottie view added: tab %@, animationSpeed %@", "\(tabButton.cyl_tabBarChildViewControllerIndex)",
-                  String(describing: (tabButton.cyl_tabBarItemAnimationView() as AnyObject?)?.value(forKey: "animationSpeed")))
+                  String(describing: (tabButton.cylTabBarItemAnimationView() as AnyObject?)?.value(forKey: "animationSpeed")))
         }
     }
 
@@ -149,47 +149,47 @@ class MainTabBarController: CYLTabBarController, CYLFlatDesignUITabBarController
         let path = { (name: String) -> String in Bundle.main.path(forResource: name, ofType: "json") ?? "" }
         // [EN] The Lottie files come from NorthSea, respect! [CN] Lottie 动画的 json 文件来自 NorthSea，致敬！
         let first: [String: Any] = [
-            CYLTabBarItemTitle: cylDemoLocalizedString("首页"),
+            cylTabBarItemTitle: cylDemoLocalizedString("首页"),
             // [EN] #433: the selected Home tab reads "Refresh"; a re-tap replays its animation.
             // [CN] #433：选中的「首页」显示「刷新」；再次点击重播动画。
-            CYLTabBarItemSelectedTitle: cylDemoLocalizedString("刷新"),
-            CYLTabBarItemIdentifier: "home",
+            cylTabBarItemSelectedTitle: cylDemoLocalizedString("刷新"),
+            cylTabBarItemIdentifier: "home",
             // [EN] A name also loads "<name>_dark" when it exists. [CN] 图片名会同时加载存在的「<name>_dark」。
-            CYLTabBarItemImage: "home_normal",
-            CYLTabBarItemSelectedImage: "home_highlight",
+            cylTabBarItemImage: "home_normal",
+            cylTabBarItemSelectedImage: "home_highlight",
             CYLTabBarLottieFilePath: path("green_lottie_tab_home"),
             CYLTabBarLottieDarkFilePath: path("green_lottie_tab_home_dark"),
         ]
         let second: [String: Any] = [
-            CYLTabBarItemTitle: cylDemoLocalizedString("同城"),
-            CYLTabBarItemIdentifier: "city",
-            CYLTabBarItemImage: "fishpond_normal",
-            CYLTabBarItemSelectedImage: "fishpond_highlight",
+            cylTabBarItemTitle: cylDemoLocalizedString("同城"),
+            cylTabBarItemIdentifier: "city",
+            cylTabBarItemImage: "fishpond_normal",
+            cylTabBarItemSelectedImage: "fishpond_highlight",
             CYLTabBarLottieFilePath: path("green_lottie_tab_discover"),
             CYLTabBarLottieDarkFilePath: path("green_lottie_tab_discover_dark"),
             // [EN] #216: the unselected icon's color follows the skin: gray, or red with the Grapefruit skin.
             // [CN] #216：未选中图标的颜色跟随皮肤：灰色，西柚皮肤时为红色。
-            CYLTabBarAnimationColors: ["Icon_Discovery_Normal.**.Color": UIColor.cyl_color { _, identifier, _ in
+            cylTabBarAnimationColors: ["Icon_Discovery_Normal.**.Color": UIColor.cylColor { _, identifier, _ in
                 (identifier as? NSObject)?.isEqual("Grapefruit") == true ? .systemRed : UIColor(white: 0.498, alpha: 1)
             }],
         ]
         let third: [String: Any] = [
-            CYLTabBarItemTitle: cylDemoLocalizedString("消息"),
-            CYLTabBarItemIdentifier: "message",
+            cylTabBarItemTitle: cylDemoLocalizedString("消息"),
+            cylTabBarItemIdentifier: "message",
             // [EN] A dark image under any name. [CN] 任意名称的深色图片。
-            CYLTabBarItemImage: "message_normal",
-            CYLTabBarItemDarkImage: "message_normal_night",
-            CYLTabBarItemSelectedImage: "message_highlight",
+            cylTabBarItemImage: "message_normal",
+            cylTabBarItemDarkImage: "message_normal_night",
+            cylTabBarItemSelectedImage: "message_highlight",
             CYLTabBarLottieFilePath: path("green_lottie_tab_news"),
             CYLTabBarLottieDarkFilePath: path("green_lottie_tab_news_dark"),
         ]
         let fourth: [String: Any] = [
-            CYLTabBarItemTitle: cylDemoLocalizedString("我的"),
+            cylTabBarItemTitle: cylDemoLocalizedString("我的"),
             // [EN] No identifier: the default is the class name, "CYLMineViewController" (#408); account_normal has its own Dark
             //      appearance in Images.xcassets.
             // [CN] 未设置标识：默认值为类名 "CYLMineViewController"（#408）；account_normal 在 Images.xcassets 中自带 Dark 外观。
-            CYLTabBarItemImage: "account_normal",
-            CYLTabBarItemSelectedImage: "account_highlight",
+            cylTabBarItemImage: "account_normal",
+            cylTabBarItemSelectedImage: "account_highlight",
             CYLTabBarLottieFilePath: path("green_lottie_tab_mine"),
             CYLTabBarLottieDarkFilePath: path("green_lottie_tab_mine_dark"),
         ]
@@ -223,7 +223,7 @@ class MainTabBarController: CYLTabBarController, CYLFlatDesignUITabBarController
     }
 
     private func customizeTabBarAppearance(titlePositionAdjustment: UIOffset) {
-        CYLGetRootWindow()?.backgroundColor = UIColor.cyl_systemBackground
+        cylGetRootWindow()?.backgroundColor = UIColor.cyl_systemBackground
         // [EN] The same appearance also styles the FlatDesign tab bar. [CN] 同一个 appearance 同样作用于扁平样式 TabBar。
         let appearance = MainTabBarController.demoStandardAppearance(titlePositionAdjustment: titlePositionAdjustment)
         tabBar.unselectedItemTintColor = .red
@@ -240,7 +240,7 @@ class MainTabBarController: CYLTabBarController, CYLFlatDesignUITabBarController
         guard !cYLDemoIsIOS26 else { return }
         // [EN] This tab bar's own item width. [CN] 本 TabBar 自己的 item 宽度。
         let size = CGSize(width: cyl_tabBar?.cyl_tabBarItemWidth ?? 0, height: cYLTabBarControllerHeight)
-        let image = UIImage.cyl_image(with: .red, size: size)?.resizableImage(withCapInsets: UIEdgeInsets(top: 1, left: 0, bottom: 0, right: 0))
+        let image = UIImage.cylImage(with: .red, size: size)?.resizableImage(withCapInsets: UIEdgeInsets(top: 1, left: 0, bottom: 0, right: 0))
         tabBar.selectionIndicatorImage = image
     }
 
@@ -273,7 +273,7 @@ class MainTabBarController: CYLTabBarController, CYLFlatDesignUITabBarController
         guard let contentCover, let selectedContentCover else { return }
         // [EN] A Lottie icon needs the delay, or the replacement happens before the animation view is ready.
         // [CN] Lottie 图标需要延迟，否则会在动画视图就绪前替换。
-        firstTabButton.cyl_coverVisiableTabImageViewOrTabButton(true, contentNewView: contentCover, seclectContentNewView: selectedContentCover,
+        firstTabButton.cylCoverVisiableTabImageViewOrTabButton(true, contentNewView: contentCover, seclectContentNewView: selectedContentCover,
                                                                 offset: .zero, show: show, delayIfNeededForSeconds: 0.1) { [weak self] isReplaced, _, newView in
             guard let self, isReplaced, show else { return }
             self.viewControllers?.first?.cyl_clearBadge()
@@ -296,7 +296,7 @@ class MainTabBarController: CYLTabBarController, CYLFlatDesignUITabBarController
         super.traitCollectionDidChange(previousTraitCollection)
         // [EN] #620: compare this controller's own traits. [CN] #620：比较本控制器自身的 trait。
         guard traitCollection.hasDifferentColorAppearance(comparedTo: previousTraitCollection) else { return }
-        UIViewController.cyl_topmostViewController()?.navigationController?.navigationBar.barTintColor = UIColor.cyl_systemBackground
+        UIViewController.cylTopmostViewController()?.navigationController?.navigationBar.barTintColor = UIColor.cyl_systemBackground
     }
 
     private func customizeInterface() {
@@ -394,7 +394,7 @@ class MainTabBarController: CYLTabBarController, CYLFlatDesignUITabBarController
         for eachIdentifier in tabBarController.cyl_tabBarItemIdentifiers {
             let eachControl = tabBarController.cyl_control(withTabBarItemIdentifier: eachIdentifier)
             NSLog("   \"%@\": index %@, %@", eachIdentifier, "\(tabBarController.cyl_index(ofTabBarItemIdentifier: eachIdentifier))",
-                  eachControl?.cyl_isPlusButton() == true ? "plus button" : "tab button")
+                  eachControl?.cylIsPlusButton() == true ? "plus button" : "tab button")
         }
         switch identifier {
         case "plus", "camera": NSLog("   plus button of context %@", tabBarController.context ?? "")
@@ -410,11 +410,11 @@ class MainTabBarController: CYLTabBarController, CYLFlatDesignUITabBarController
         var animationView: UIView?
         // [EN] #535: the plus button's badge changes on every tap; checked first (before iOS 26 `cyl_isTabButton` is also true
         //      for the plus button). [CN] #535：每次点击 PlusButton 角标都会变化；需先判断（iOS 26 以前 `cyl_isTabButton` 对 PlusButton 也为真）。
-        let isPlusControl = tabBarController.hasPlusButton() && control.cyl_isPlusControl()
+        let isPlusControl = tabBarController.hasPlusButton() && control.cylIsPlusControl()
         if isPlusControl {
             tabBarController.cylDemoPlusButtonDidTap()
             animationView = CYLPlusButton(forOwner: tabBarController)?.imageView
-        } else if control.cyl_isTabButton() {
+        } else if control.cylIsTabButton() {
             // [EN] Toggle the red dot. [CN] 切换红点。
             let isFlatDesign = tabBarController.tabBarStyleType == .flatDesign
             if control.cyl_isShowBadge() {
@@ -428,7 +428,7 @@ class MainTabBarController: CYLTabBarController, CYLFlatDesignUITabBarController
             } else {
                 tabBarController.selectedViewController?.cyl_showBadge()
             }
-            animationView = control.cyl_tabImageView()
+            animationView = control.cylTabImageView()
         }
         addScaleAnimation(on: animationView, repeatCount: 1)
     }
@@ -496,7 +496,7 @@ extension CYLTabBarController {
     /// [EN] #19: the login alert of the demo. [CN] #19：Demo 的登录弹框。
     @objc(cyl_demo_presentLoginForViewController:completion:)
     func cylDemoPresentLogin(for viewController: UIViewController, completion: @escaping CYLTabBarLoginCompletion) {
-        let title = viewController.tabBarItem.title ?? viewController.cyl_getViewControllerInsteadOfNavigation().title ?? ""
+        let title = viewController.tabBarItem.title ?? viewController.cylGetViewControllerInsteadOfNavigation().title ?? ""
         let alert = UIAlertController(title: cylDemoLocalizedString("需要登录"),
                                       message: String(format: cylDemoLocalizedString("「%@」需要登录后才能查看"), title), preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: cylDemoLocalizedString("取消"), style: .cancel) { _ in completion(false) })
@@ -512,7 +512,7 @@ extension CYLTabBarController {
     /// [EN] #152: re-tap refreshes the list (or scrolls to the top), long press shows a menu. [CN] #152：再次点击刷新列表（或滚动到顶部），长按显示菜单。
     @objc(cyl_demo_handleTabBarItemGesture:control:viewController:)
     func cylDemoHandleTabBarItemGesture(_ gesture: CYLTabBarItemGesture, control: UIControl, viewController: UIViewController) {
-        let content = viewController.cyl_getViewControllerInsteadOfNavigation()
+        let content = viewController.cylGetViewControllerInsteadOfNavigation()
         NSLog("🟣 #152 gesture %@ on \"%@\"", "\(gesture.rawValue)", control.cyl_tabBarItemIdentifier ?? "")
         switch gesture {
         case .reselect:
@@ -546,7 +546,7 @@ extension CYLTabBarController {
     private func cylDemoShowActions(for control: UIControl) {
         let identifier = control.cyl_tabBarItemIdentifier ?? ""
         let sheet = UIAlertController(title: identifier, message: cylDemoLocalizedString("长按（#152）"), preferredStyle: .actionSheet)
-        if !identifier.isEmpty, !control.cyl_isPlusButton() {
+        if !identifier.isEmpty, !control.cylIsPlusButton() {
             sheet.addAction(UIAlertAction(title: cylDemoLocalizedString("选中"), style: .default) { [weak self] _ in
                 self?.cyl_selectTabBarItem(withIdentifier: identifier)
             })

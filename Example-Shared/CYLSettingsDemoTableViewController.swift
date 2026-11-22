@@ -39,7 +39,7 @@ class CYLSettingsDemoTableViewController: UITableViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        UITableViewCell.cyl_setUpAutomaticRowHeight(for: tableView)
+        UITableViewCell.cylSetUpAutomaticRowHeight(for: tableView)
         reloadGroups()
         layoutHeaderView()
         // [EN] The skin row shows the current theme, and a theme is picked while this list stays on screen (#216).
@@ -82,7 +82,7 @@ class CYLSettingsDemoTableViewController: UITableViewController {
     }
 
     private func reloadGroups() {
-        groups = cyl_settingsGroups().compactMap { CYLSettingsGroup(rawValue: $0.intValue) }
+        groups = cylSettingsGroups().compactMap { CYLSettingsGroup(rawValue: $0.intValue) }
         tableView.reloadData()
     }
 
@@ -110,7 +110,7 @@ class CYLSettingsDemoTableViewController: UITableViewController {
     }
 
     private func settingsRow(at indexPath: IndexPath) -> Int {
-        cyl_settingsRows(in: groups[indexPath.section])[indexPath.row].intValue
+        cylSettingsRows(in: groups[indexPath.section])[indexPath.row].intValue
     }
 
     // MARK: - UITableViewDataSource
@@ -120,22 +120,22 @@ class CYLSettingsDemoTableViewController: UITableViewController {
     }
 
     override func tableView(_: UITableView, numberOfRowsInSection section: Int) -> Int {
-        cyl_settingsRows(in: groups[section]).count
+        cylSettingsRows(in: groups[section]).count
     }
 
     override func tableView(_: UITableView, titleForHeaderInSection section: Int) -> String? {
-        cyl_title(for: groups[section])
+        cylTitle(for: groups[section])
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        cyl_settingsCell(for: tableView, row: settingsRow(at: indexPath))
+        cylSettingsCell(for: tableView, row: settingsRow(at: indexPath))
     }
 
     // MARK: - UITableViewDelegate
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        cyl_didSelectSettingsRow(settingsRow(at: indexPath))
+        cylDidSelectSettingsRow(settingsRow(at: indexPath))
         // [EN] The row may have switched a tab, so this list may no longer be on screen. [CN] 该行可能已切换 Tab，本列表可能已不在屏幕上。
         if tableView.window != nil {
             tableView.reloadData()

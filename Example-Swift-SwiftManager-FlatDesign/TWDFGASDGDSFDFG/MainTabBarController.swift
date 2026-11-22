@@ -75,7 +75,7 @@ class MainTabBarController: CYLTabBarController, CYLFlatDesignUITabBarController
         var activeColor: UIColor {
             switch self {
             case .normal:
-                return UIColor.cyl_color(withLight: .black, dark: .white)
+                return UIColor.cylColor(withLight: .black, dark: .white)
             case .roomStyle:
                 return .white
             }
@@ -86,7 +86,7 @@ class MainTabBarController: CYLTabBarController, CYLFlatDesignUITabBarController
         var tabBarBackground: UIColor {
             switch self {
             case .normal:
-                return UIColor.cyl_color(withLight: .white, dark: .black)
+                return UIColor.cylColor(withLight: .white, dark: .black)
             case .roomStyle:
                 return .black
             }
@@ -252,14 +252,14 @@ class MainTabBarController: CYLTabBarController, CYLFlatDesignUITabBarController
     private func buildTabBars(theme: Theme) {
         tabBarItemsAttributes = Module.allCases.map { module in
             var attrs: [String: Any] = [
-                CYLTabBarItemTitle: module.title,
-                CYLTabBarItemImage: module.icon(for: theme).identifier,
-                CYLTabBarItemSelectedImage: module.activeIcon.identifier,
-                CYLTabBarItemImagePositionAdjustment: NSValue(uiOffset: UIOffset(horizontal: 0, vertical: 1.5)),
-                CYLTabBarItemTitlePositionAdjustment: NSValue(uiOffset: UIOffset(horizontal: 0, vertical: -1.5))
+                cylTabBarItemTitle: module.title,
+                cylTabBarItemImage: module.icon(for: theme).identifier,
+                cylTabBarItemSelectedImage: module.activeIcon.identifier,
+                cylTabBarItemImagePositionAdjustment: NSValue(uiOffset: UIOffset(horizontal: 0, vertical: 1.5)),
+                cylTabBarItemTitlePositionAdjustment: NSValue(uiOffset: UIOffset(horizontal: 0, vertical: -1.5))
             ]
             if let darkIcon = module.darkIcon {
-                attrs[CYLTabBarItemDarkImage] = darkIcon.identifier
+                attrs[cylTabBarItemDarkImage] = darkIcon.identifier
             }
             
             if let anim = module.animation(for: theme), let url = anim.resolvedURL {
@@ -297,9 +297,9 @@ class MainTabBarController: CYLTabBarController, CYLFlatDesignUITabBarController
             // A 1-pt line from the library; a dynamic color would give an image that follows Dark Mode too.
             flatTabBar.shadowImage = theme.shadowColor == .clear
                 ? UIImage()
-                : UIImage.cyl_image(with: theme.shadowColor, size: CGSize(width: 1, height: 1)) ?? UIImage()
+                : UIImage.cylImage(with: theme.shadowColor, size: CGSize(width: 1, height: 1)) ?? UIImage()
             viewControllers?.forEach { vc in
-                let item = vc.cyl_getViewControllerInsteadOfNavigation().cyl_tabBarItem
+                let item = vc.cylGetViewControllerInsteadOfNavigation().cyl_tabBarItem
                 item?.setTitleTextAttributes(normalAttrs, for: .normal)
                 item?.setTitleTextAttributes(activeAttrs, for: .selected)
             }
@@ -335,13 +335,13 @@ class MainTabBarController: CYLTabBarController, CYLFlatDesignUITabBarController
     /// 扁平样式下点击每个 Tab 按钮和 PlusButton 也会调用；用标识（未设置时为默认值，即类名）区分是哪一个。
     func tabBarController(_ _: CYLTabBarController, didSelect control: UIControl) {
         demoPlusButtonDidTap(control)
-        NSLog("[#610] flat design tapped \"%@\" (%@)", control.cyl_tabBarItemIdentifier ?? "nil", control.cyl_isPlusButton() ? "plus button" : "tab button")
+        NSLog("[#610] flat design tapped \"%@\" (%@)", control.cyl_tabBarItemIdentifier ?? "nil", control.cylIsPlusButton() ? "plus button" : "tab button")
     }
 
     func tabBarController(_ _: UITabBarController, didSelect viewController: UIViewController) {
         // [CN] flatDesign 下点击时 selectedIndex 可能仍是旧值，用 VC 判断更准
         // [EN] With flatDesign, selectedIndex may still hold the old value on tap; checking the VC is more accurate
-        let root = viewController.cyl_getViewControllerInsteadOfNavigation()
+        let root = viewController.cylGetViewControllerInsteadOfNavigation()
         // [CN] 此处判断逻辑已根据 ViewController 标题解耦
         // [EN] The check here has been decoupled based on the ViewController title
         currentTheme = (root.navigationItem.title == cylDemoLocalizedString("房间")) ? .roomStyle : .normal
@@ -354,6 +354,6 @@ private final class HomeViewController: CYLBadgeHelperTableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         // No navigation bar button here: a bell button is added first. 没有导航栏按钮：先添加铃铛按钮。
-        cyl_showNavigationBadge(value: "99", animationType: .scale, backgroundColor: UIColor.cyl_randomColor)
+        cylShowNavigationBadge(value: "99", animationType: .scale, backgroundColor: UIColor.cyl_randomColor)
     }
 }

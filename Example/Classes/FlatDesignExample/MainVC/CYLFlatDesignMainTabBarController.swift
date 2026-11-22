@@ -59,7 +59,7 @@ class CYLFlatDesignMainTabBarController: CYLTabBarController, CYLFlatDesignUITab
         // [EN] Used only while no `standardAppearance` is set. [CN] 仅在没有设置 `standardAppearance` 时使用。
         if let flatTabBar = cyl_tabBar as? CYLFlatDesignTabBar {
             flatTabBar.barTintColor = .systemBackground
-            flatTabBar.shadowImage = UIImage.cyl_image(with: UIColor.lightGray.withAlphaComponent(0.5), size: CGSize(width: 1, height: 1))
+            flatTabBar.shadowImage = UIImage.cylImage(with: UIColor.lightGray.withAlphaComponent(0.5), size: CGSize(width: 1, height: 1))
         }
     }
 
@@ -107,13 +107,13 @@ class CYLFlatDesignMainTabBarController: CYLTabBarController, CYLFlatDesignUITab
         #if DEBUG
         // [EN] #610 / #408: every tab button and the plus button report here; the identifier tells which.
         // [CN] #610 / #408：每个 Tab 按钮和 PlusButton 都会回调；用标识区分。
-        NSLog("🟢 #610 flat design tapped \"%@\" (%@)", control.cyl_tabBarItemIdentifier ?? "", control.cyl_isPlusButton() ? "plus button" : "tab button")
+        NSLog("🟢 #610 flat design tapped \"%@\" (%@)", control.cyl_tabBarItemIdentifier ?? "", control.cylIsPlusButton() ? "plus button" : "tab button")
         #endif
         // [EN] #535: the plus button's badge changes on every tap; checked first. [CN] #535：每次点击 PlusButton 角标都会变化；需先判断。
-        let isPlusControl = tabBarController.hasPlusButton() && control.cyl_isPlusControl()
+        let isPlusControl = tabBarController.hasPlusButton() && control.cylIsPlusControl()
         if isPlusControl {
             tabBarController.cylDemoPlusButtonDidTap()
-        } else if control.cyl_isTabButton() {
+        } else if control.cylIsTabButton() {
             // [EN] Toggle the red dot. [CN] 切换红点。
             let isFlatDesign = tabBarController.tabBarStyleType == .flatDesign
             if control.cyl_isShowBadge() {
@@ -217,7 +217,7 @@ class CYLFlatDesignMainTabBarController: CYLTabBarController, CYLFlatDesignUITab
         cover.imageView?.contentMode = .scaleAspectFit
         cover.translatesAutoresizingMaskIntoConstraints = false
         cover.isUserInteractionEnabled = false
-        cover.cyl_setHidden(false)
+        cover.cylSetHidden(false)
         return cover
     }
 
@@ -231,14 +231,14 @@ class CYLFlatDesignMainTabBarController: CYLTabBarController, CYLFlatDesignUITab
         }
         guard let contentCover, let selectedContentCover else { return }
         // [EN] A Lottie icon needs the delay. [CN] Lottie 图标需要延迟。
-        firstTabButton.cyl_coverVisiableTabImageViewOrTabButton(true, contentNewView: contentCover, seclectContentNewView: selectedContentCover,
+        firstTabButton.cylCoverVisiableTabImageViewOrTabButton(true, contentNewView: contentCover, seclectContentNewView: selectedContentCover,
                                                                 offset: .zero, show: show, delayIfNeededForSeconds: 0.5) { [weak self] isReplaced, _, newView in
             guard let self, isReplaced, show else { return }
             newView.layoutIfNeeded()
             self.viewControllers?.first?.cyl_clearBadge()
             // [EN] Liquid Glass has its own scale animation. [CN] 液态玻璃自带缩放动画。
             if !CYLConstants.isLiquidGlassActive() {
-                newView.layer.add(CAAnimation.cyl_badge_once_scale_AnimationRepeatTimes(1, duration: 0.5), forKey: "animation")
+                newView.layer.add(CAAnimation.cylBadgeOnceScaleAnimationRepeatTimes(1, duration: 0.5), forKey: "animation")
             }
         }
     }
@@ -248,6 +248,6 @@ class CYLFlatDesignMainTabBarController: CYLTabBarController, CYLFlatDesignUITab
     private func springAnimation(on view: UIView?) {
         guard let view else { return }
         view.layer.removeAnimation(forKey: cYLSpringAnimationKey)
-        view.layer.add(CAKeyframeAnimation.cyl_springAnimation(forDuration: 0.6), forKey: cYLSpringAnimationKey)
+        view.layer.add(CAKeyframeAnimation.cylSpringAnimation(forDuration: 0.6), forKey: cYLSpringAnimationKey)
     }
 }
