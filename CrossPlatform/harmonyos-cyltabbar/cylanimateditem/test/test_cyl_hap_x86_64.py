@@ -66,6 +66,36 @@ class CYLHapX8664Tests(unittest.TestCase):
         self.assertTrue(os.path.isfile(os.path.join(rive, 'libohos_rive.so')))
         self.assertTrue(os.path.isfile(os.path.join(rive, 'libc++_shared.so')))
 
+    def test_the_real_kit_holds_the_x86_64_pag_library(self):
+        self.assertTrue(os.path.isfile(os.path.join(cyl.CYL_KIT_DIR, 'pag', 'libpag.so')))
+
+    def test_only_the_engines_the_app_ships_are_added(self):
+        with tempfile.TemporaryDirectory() as folder:
+            kit = os.path.join(folder, 'kit')
+            for engine, libraries in (('rive', ('libohos_rive.so', 'libc++_shared.so')), ('pag', ('libpag.so',))):
+                os.makedirs(os.path.join(kit, engine))
+                for name in libraries:
+                    with open(os.path.join(kit, engine, name), 'w') as handle:
+                        handle.write(name)
+            app = os.path.join(folder, 'rive-only.hap')
+            with zipfile.ZipFile(app, 'w') as hap:
+                hap.writestr('module.json', '{}')
+                hap.writestr('libs/arm64-v8a/libohos_rive.so', 'rive')
+                hap.writestr('libs/arm64-v8a/libc++_shared.so', 'cxx')
+            out = os.path.join(folder, 'out.hap')
+            self.assertEqual(cyl.cyl_add_debug_engines(app, out, kit, shipped=cyl.cyl_hap_libraries(app)), ['Rive'])
+            with zipfile.ZipFile(out) as result:
+                self.assertNotIn('libs/x86_64/libpag.so', result.namelist())
+            self.assertEqual(cyl.cyl_add_debug_engines(app, out, kit, shipped=set()), [])
+            # [EN] A HAP of the "emulator" target carries no arm64 file; its ArkTS still imports the module.
+            emulator = os.path.join(folder, 'emulator.hap')
+            with zipfile.ZipFile(emulator, 'w') as hap:
+                hap.writestr('ets/modules.abc', b'\x00@normalized:Y&&&libohos_rive.so&\x00')
+            self.assertEqual(cyl.cyl_hap_libraries(emulator), {'libohos_rive.so'})
+            self.assertEqual(cyl.cyl_add_debug_engines(emulator, out, kit, shipped=cyl.cyl_hap_libraries(emulator)), ['Rive'])
+            self.assertEqual(cyl.cyl_add_debug_engines(self.make_hap(folder), out, kit,
+                                                       shipped=cyl.cyl_hap_libraries(self.make_hap(folder))), ['PAG', 'Rive'])
+
     def test_strip_without_abis_drops_every_native_library(self):
         with tempfile.TemporaryDirectory() as folder:
             hap = self.make_hap(folder)

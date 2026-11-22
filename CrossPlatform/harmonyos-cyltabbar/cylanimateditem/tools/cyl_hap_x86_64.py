@@ -14,12 +14,14 @@ that was built without it, and for installing any HAP on the right device.
 "install" asks the device for its ABIs (hdc shell param get const.product.cpu.abilist); with --strip auto (default) it
 strips libs/<abi>/ folders the device does not list, then runs hdc install -r. CYL_HAP_STRIP_LIBS=1 / 0 forces strip on /
 off. With --x86-engines auto (default) on an x86_64 device, it also adds the x86_64 debug engine kit
-(../x86_64-debug-engines/rive: libohos_rive.so of @ohos/rive 1.0.4, libc++_shared.so) and the marker rawfile
-cyl_x86_64_debug_engines.json, so Rive plays in DEBUG builds (CYLAnimatedItemEngines reads the marker); CYL_X86_ENGINES=1 / 0
+(../x86_64-debug-engines/rive: libohos_rive.so of @ohos/rive 1.0.4, libc++_shared.so; ../x86_64-debug-engines/pag: libpag.so
+of @tencent/libpag 4.4.31), only for the engines whose library the HAP ships, and the marker rawfile
+cyl_x86_64_debug_engines.json, so Rive and PAG play in DEBUG builds (CYLAnimatedItemEngines reads the marker); CYL_X86_ENGINES=1 / 0
 forces it. Standard library only. The Rive and PAG items of the stripped app show their still images
 (CYLAnimatedItemEngines.isSupportedOnDevice); their playback still needs an arm64 device.
 """
 import os
+import re
 import subprocess
 import sys
 import tempfile
@@ -54,15 +56,32 @@ CYL_KIT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'x8
 CYL_MARKER = 'resources/rawfile/cyl_x86_64_debug_engines.json'
 
 
-def cyl_add_debug_engines(source, target, kit_dir=CYL_KIT_DIR):
+def cyl_hap_libraries(path):
+    """
+    The native libraries a HAP uses, e.g. {'libpag.so', 'libohos_rive.so'}: those it carries for any ABI, and those its
+    ArkTS imports (`ets/modules.abc` names them, also when the "emulator" build target left the arm64 files out).
+    """
+    with zipfile.ZipFile(path) as hap:
+        names = {name.split('/')[-1] for name in hap.namelist() if name.startswith('libs/') and name.count('/') >= 2}
+        if 'ets/modules.abc' in hap.namelist():
+            names |= {match.decode() for match in re.findall(rb'lib[A-Za-z0-9_+-]+\.so', hap.read('ets/modules.abc'))}
+        return names
+
+
+def cyl_add_debug_engines(source, target, kit_dir=CYL_KIT_DIR, shipped=None):
     """
     Copies source to target with the x86_64 debug engine kit added: libs/x86_64/<library> for each engine folder of kit_dir
-    (stored, not compressed) and the marker rawfile that names the engines. Returns the engine names added.
+    (stored, not compressed) and the marker rawfile that names the engines. With shipped (the library names of the
+    original HAP, cyl_hap_libraries), only the engines whose main library (the first .so that is not libc++_shared.so)
+    the app ships: an app without @tencent/libpag gets no PAG. Returns the engine names added.
     """
     engines, files = [], {}
     for name in sorted(os.listdir(kit_dir)) if os.path.isdir(kit_dir) else []:
         folder = os.path.join(kit_dir, name)
         libraries = [f for f in sorted(os.listdir(folder)) if f.endswith('.so')] if os.path.isdir(folder) else []
+        main = [f for f in libraries if f != 'libc++_shared.so']
+        if shipped is not None and not (main and main[0] in shipped):
+            continue
         if libraries:
             engines.append({'rive': 'Rive', 'pag': 'PAG'}.get(name, name))
             for library in libraries:
@@ -146,7 +165,7 @@ def main(argv):
         engines = 'yes' if forced_engines == '1' else 'no'
     if engines == 'yes' or (engines == 'auto' and 'x86_64' in device):
         with_engines = os.path.join(tempfile.mkdtemp(prefix='cyl-hap-'), os.path.basename(install).replace('.hap', '-engines.hap'))
-        added = cyl_add_debug_engines(install, with_engines)
+        added = cyl_add_debug_engines(install, with_engines, shipped=cyl_hap_libraries(hap))
         print(f'x86_64 debug engine kit: {", ".join(added) or "none"} ({with_engines})')
         install = with_engines
     command = [hdc] + (['-t', target] if target else []) + ['install', '-r', cyl_local_path(install)]

@@ -416,6 +416,22 @@ export struct CYLRiveIcon {
     }, CYL_RIVE_FIRST_FRAME_MS);
   }
 
+  /**
+   * [EN] `reset()` keeping the item's artboard. @ohos/rive 1.0.4's `RiveAnimationView.reset()` selects the file's first
+   *      artboard (`RiveArtboardRenderer.reset()` calls `selectArtboard()` without a name), so an item with
+   *      "?artboard=CHAT" played the default artboard after its first play and kept it (CollectionViewClassifyMenu,
+   *      icons.riv dark tags: every item turned into "refresh"). The named artboard is selected again.
+   * [CN] 保留条目画板的 `reset()`。@ohos/rive 1.0.4 的 `RiveAnimationView.reset()` 会选中文件的第一个画板（`RiveArtboardRenderer.reset()`
+   *      调用不带名字的 `selectArtboard()`），因此带 "?artboard=CHAT" 的条目首次播放后变成默认画板并一直保持。这里重新选中指定画板。
+   */
+  private cylReset(view: RiveAnimationView): void {
+    view.reset();
+    const artboard = this.cylOption(CYLTabBarAnimationOptionRiveArtboard);
+    if (artboard !== undefined && artboard.length > 0 && view.getArtboardName() !== artboard) {
+      view.setArtboardName(artboard);
+    }
+  }
+
   private cylPlay(view: RiveAnimationView): void {
     this.cylCancelDeactivate();
     this.cylCancelLoop();
@@ -438,10 +454,10 @@ export struct CYLRiveIcon {
     const legacyInput = this.cylOption(CYLTabBarAnimationOptionRiveInput);
     const numberInput = this.cylOption(CYLTabBarAnimationOptionRiveNumberInput);
     if (animation !== undefined) {
-      view.reset();
+      this.cylReset(view);
       view.play(animation, Loop.ONESHOT);
     } else if (triggerInput !== undefined && machine !== undefined && this.cylHasInput(view, machine, triggerInput)) {
-      view.reset();
+      this.cylReset(view);
       view.play();
       this.startPending = true;
       this.deactivateTimer = setTimeout(() => {
@@ -492,7 +508,7 @@ export struct CYLRiveIcon {
         //      program); otherwise a frame. [CN] 循环保持的输入时为半个循环周期，使状态机真正停留在关闭状态（与 Android、小程序相同）；否则为一帧。
       }, this.loops && duration <= 0 ? CYL_RIVE_LOOP_SECONDS * 500 : CYL_RIVE_INPUT_OFF_MS);
     } else {
-      view.reset();
+      this.cylReset(view);
       view.play();
     }
     this.cylScheduleLoop(view, trigger !== undefined || triggerInput !== undefined);

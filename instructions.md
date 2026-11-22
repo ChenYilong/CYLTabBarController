@@ -43,7 +43,8 @@ Organized by tag (tag: `instructions`): each heading has its tag and a summary; 
   GitHub inside `cylanimateditem`, guarded by the device architecture, compile and no crash first, behind a debug build
   option until verified (removing it needs the owner's approval); Plan 2, if it fails, the macOS (arm64) session tests.
 - Plan 1 status (2026-11-22): Rive done behind the debug guard (the debug engine kit in
-  `cylanimateditem/x86_64-debug-engines/`, `CYLAnimatedItemEngines.loadX86_64DebugEngines`); PAG next.
+  `cylanimateditem/x86_64-debug-engines/`, `CYLAnimatedItemEngines.loadX86_64DebugEngines`); PAG done the same way
+  (`x86_64-debug-engines/pag`, libpag 4.4.31); the debug guard stays until the owner approves removing it.
 - Full text: [docs/instructions/windows-harmonyos.md](docs/instructions/windows-harmonyos.md), "From instructions.md".
 
 ## Git (tag: `git`)
