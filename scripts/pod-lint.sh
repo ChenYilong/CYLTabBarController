@@ -178,10 +178,10 @@ bump_version() {
   echo "Podspec: s.version $version → $new_version (commit this change, then tag the merged commit $new_version)"
 }
 
-# [EN] TODO: remove after CYLDeallocBlockExecutor 1.4.0 is published (docs/Lifecycle-Library.md). The core subspec needs
+# [EN] Pending: remove after CYLDeallocBlockExecutor 1.4.0 is published (docs/Lifecycle-Library.md). The core subspec needs
 #      CYLDeallocBlockExecutor ~> 1.4, which is not on trunk yet, so `lib` lints against a local podspec that fetches
 #      the branch the Podfiles pin (--external-podspecs downloads its source). Set CYL_DEALLOC_EXECUTOR_BRANCH= (empty) to lint against trunk.
-# [CN] TODO：CYLDeallocBlockExecutor 1.4.0 发布后删除（docs/Lifecycle-Library.md）。核心子库依赖 CYLDeallocBlockExecutor ~> 1.4，
+# [CN] 待办：CYLDeallocBlockExecutor 1.4.0 发布后删除（docs/Lifecycle-Library.md）。核心子库依赖 CYLDeallocBlockExecutor ~> 1.4，
 #      trunk 上还没有，因此 `lib` 使用一个从 Podfile 所固定分支获取源码的本地 podspec。设置 CYL_DEALLOC_EXECUTOR_BRANCH=（空）
 #      则使用 trunk。
 CYL_DEALLOC_EXECUTOR_BRANCH="${CYL_DEALLOC_EXECUTOR_BRANCH-feat/lifecycle-callbacks}"

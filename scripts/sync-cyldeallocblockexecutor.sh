@@ -7,7 +7,7 @@
 #      The library repository: $CYL_DEALLOC_LIBRARY (a path) or https://github.com/ChenYilong/CYLDeallocBlockExecutor.git.
 # [CN] 把 CYLDeallocBlockExecutor 的鸿蒙与小程序移植从库的某个提交复制到本仓库（ohpm 与 npm 无法安装 git 依赖，库尚未发布），并在每份副本旁写
 #      VENDORED.md。--check 在临时目录重新生成两份副本，仓库与固定提交不一致时失败。
-#      TODO: replace the copies with the ohpm and npm packages after the library is published (owner's OK).
+#      Pending: replace the copies with the ohpm and npm packages after the library is published (owner's OK).
 set -euo pipefail
 
 root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -25,16 +25,16 @@ for argument in "$@"; do
   esac
 done
 
-if [ -z "$commit" ]; then
+if [[ -z "$commit" ]]; then
   # shellcheck disable=SC2016
   commit="$(sed -n 's/^- Commit: `\([0-9a-f]\{40\}\)`.*/\1/p' "$root/$harmony_dest/VENDORED.md" | head -1)"
-  [ -n "$commit" ] || { echo "no pinned commit in $harmony_dest/VENDORED.md" >&2; exit 2; }
+  [[ -n "$commit" ]] || { echo "no pinned commit in $harmony_dest/VENDORED.md" >&2; exit 2; }
 fi
 
 work="$(mktemp -d)"
 trap 'rm -rf "$work"' EXIT
 library="${CYL_DEALLOC_LIBRARY:-}"
-if [ -z "$library" ]; then
+if [[ -z "$library" ]]; then
   git clone --quiet --no-checkout "$repository_url" "$work/library"
   library="$work/library"
 fi
@@ -86,13 +86,13 @@ EOT
 }
 
 mkdir -p "$work/x"
-if [ "$check" -eq 1 ]; then
+if [[ "$check" -eq 1 ]]; then
   generate "$work/expected"
   status=0
   for destination in "$harmony_dest" "$mini_dest"; do
     diff -r -x build -x BuildProfile.ets -x oh_modules -x .hvigor "$work/expected/$destination" "$root/$destination" || status=1
   done
-  [ "$status" -eq 0 ] && echo "cyldeallocblockexecutor copies match $full" || echo "the copies differ from $full: run scripts/sync-cyldeallocblockexecutor.sh" >&2
+  [[ "$status" -eq 0 ]] && echo "cyldeallocblockexecutor copies match $full" || echo "the copies differ from $full: run scripts/sync-cyldeallocblockexecutor.sh" >&2
   exit "$status"
 fi
 for destination in "$harmony_dest" "$mini_dest"; do
