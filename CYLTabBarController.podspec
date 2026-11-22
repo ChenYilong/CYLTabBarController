@@ -132,6 +132,10 @@ Pod::Spec.new do |s|
     #      with an animation subspec (`CYL_ANIMATION_ENGINE_AVAILABLE`).
     # [CN] 组件核心（CYLAnimatedItemView，静态图片），从不依赖动效引擎：只有引入动画子库时 TabBar 才会播放动画（`CYL_ANIMATION_ENGINE_AVAILABLE`）。
     core.dependency 'CYLTabBarController/CYLAnimatedItem'
+    # [EN] Lifecycle and dealloc blocks (the one-time layout block, docs/Lifecycle-Library.md). 1.4.0 is not on trunk yet:
+    #      the Podfiles pin its branch until it is.
+    # [CN] 生命周期与 dealloc block（只执行一次的布局 block，docs/Lifecycle-Library.md）。1.4.0 尚未发布到 trunk：发布前各 Podfile 指定其分支。
+    core.dependency 'CYLDeallocBlockExecutor', '~> 1.4'
     core.source_files = 'CYLTabBarController', 'CYLTabBarController/**/*.{h,m}', 'CYLTabBarController/Swift/*.swift', 'CYLTabBarController/Swift/Deprecated/*.swift'
     core.exclude_files = [
     'CYLTabBarController/Package/**/*', # SPM-only: the umbrella headers, module maps and header links of the C targets

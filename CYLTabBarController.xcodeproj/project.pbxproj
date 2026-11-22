@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3A1536B500E7B3A8505DD239 /* CYLDeallocBlockExecutor in Frameworks */ = {isa = PBXBuildFile; productRef = 6C706BAB9FD9DEE0EBE1B730 /* CYLDeallocBlockExecutor */; };
 		E86CDD18A373B09C64D8AF27 /* CYLDemoBadgeTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F239F99979BEEECA16CCD408 /* CYLDemoBadgeTableViewController.swift */; };
 		AA6412D6C537B3A835C02181 /* CYLSameCityViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E54D0C1079837F9C9129AD9 /* CYLSameCityViewController.swift */; };
 		C63C581B21A7AF9B937CD46C /* CYLDetailsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FD0F35BF0BC3FB2C2B07B49 /* CYLDetailsViewController.swift */; };
@@ -274,6 +275,7 @@
 		D7FC63F63FFB38293772402B /* CYLTestSubclasses.swift in Sources */ = {isa = PBXBuildFile; fileRef = 961BC0F62694C23750891477 /* CYLTestSubclasses.swift */; };
 		B7C0DE5A11A2233D4001FB02 /* CYLAnimatedItemCountdownTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7C0DE5A11A2233D4001FB01 /* CYLAnimatedItemCountdownTests.swift */; };
 		B7C0DE5A11A2233D4001FC02 /* CYLFlatDesignDelegateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7C0DE5A11A2233D4001FC01 /* CYLFlatDesignDelegateTests.swift */; };
+		9AC0FFEE2C3064BD00000102 /* CYLLayoutBlockTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AC0FFEE2C3064BD00000101 /* CYLLayoutBlockTests.swift */; };
 		C0DE0B5E11A2233D4001AB02 /* CYLAnimationEngineSwiftTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0DE0B5E11A2233D4001AB01 /* CYLAnimationEngineSwiftTests.swift */; };
 		C0DE0B5E11A2233D4001AC02 /* CYLSelectorDumpTests.m in Sources */ = {isa = PBXBuildFile; fileRef = C0DE0B5E11A2233D4001AC01 /* CYLSelectorDumpTests.m */; };
 		F53850E7A7B858FE08DA6371 /* CYLAnimatedItemTintStateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEE6420896408BF196FDE8B1 /* CYLAnimatedItemTintStateTests.swift */; };
@@ -651,6 +653,7 @@
 		B7C0DE5A11A2233D4001FB01 /* CYLAnimatedItemCountdownTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CYLAnimatedItemCountdownTests.swift; sourceTree = "<group>"; };
 		B7C0DE5A11A2233D4001FC01 /* CYLFlatDesignDelegateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CYLFlatDesignDelegateTests.swift; sourceTree = "<group>"; };
 		C0DE0B5E11A2233D4001AC01 /* CYLSelectorDumpTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CYLSelectorDumpTests.m; sourceTree = "<group>"; };
+		9AC0FFEE2C3064BD00000101 /* CYLLayoutBlockTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CYLLayoutBlockTests.swift; sourceTree = "<group>"; };
 		C0DE0B5E11A2233D4001AB01 /* CYLAnimationEngineSwiftTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CYLAnimationEngineSwiftTests.swift; sourceTree = "<group>"; };
 		BEE6420896408BF196FDE8B1 /* CYLAnimatedItemTintStateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CYLAnimatedItemTintStateTests.swift; sourceTree = "<group>"; };
 		B9742EEB9F5580FC8B76001C /* CYLAnimatedItemStackViewTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CYLAnimatedItemStackViewTests.m; sourceTree = "<group>"; };
@@ -814,6 +817,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3A1536B500E7B3A8505DD239 /* CYLDeallocBlockExecutor in Frameworks */,
 				735FEE912022408A7A33904C /* Foundation.framework in Frameworks */,
 				224CC39CB870E7DCF846D86A /* CYLAnimatedItem.framework in Frameworks */,
 			);
@@ -1269,6 +1273,7 @@
 				961BC0F62694C23750891477 /* CYLTestSubclasses.swift */,
 				B7C0DE5A11A2233D4001FB01 /* CYLAnimatedItemCountdownTests.swift */,
 				B7C0DE5A11A2233D4001FC01 /* CYLFlatDesignDelegateTests.swift */,
+				9AC0FFEE2C3064BD00000101 /* CYLLayoutBlockTests.swift */,
 				C0DE0B5E11A2233D4001AB01 /* CYLAnimationEngineSwiftTests.swift */,
 				C0DE0B5E11A2233D4001AC01 /* CYLSelectorDumpTests.m */,
 				BEE6420896408BF196FDE8B1 /* CYLAnimatedItemTintStateTests.swift */,
@@ -1706,6 +1711,9 @@
 				FDB3480092737DA7AB2CB9C9 /* PBXTargetDependency */,
 			);
 			name = "CYLTabBarController-Framework";
+			packageProductDependencies = (
+				6C706BAB9FD9DEE0EBE1B730 /* CYLDeallocBlockExecutor */,
+			);
 			productName = "CYLTabBarController-Framework";
 			productReference = 19643FEF52A4CA9D50A3811C /* CYLTabBarController-Framework.framework */;
 			productType = "com.apple.product-type.framework";
@@ -1825,6 +1833,9 @@
 				Base,
 			);
 			mainGroup = 9AE9426B1BDC91B800354519;
+			packageReferences = (
+				F7607EE5FE824189A50113F0 /* XCRemoteSwiftPackageReference "CYLDeallocBlockExecutor" */,
+			);
 			productRefGroup = 9AE942751BDC91B800354519 /* Products */;
 			projectDirPath = "";
 			projectReferences = (
@@ -2243,6 +2254,7 @@
 				D7FC63F63FFB38293772402B /* CYLTestSubclasses.swift in Sources */,
 				B7C0DE5A11A2233D4001FB02 /* CYLAnimatedItemCountdownTests.swift in Sources */,
 				B7C0DE5A11A2233D4001FC02 /* CYLFlatDesignDelegateTests.swift in Sources */,
+				9AC0FFEE2C3064BD00000102 /* CYLLayoutBlockTests.swift in Sources */,
 				C0DE0B5E11A2233D4001AB02 /* CYLAnimationEngineSwiftTests.swift in Sources */,
 				C0DE0B5E11A2233D4001AC02 /* CYLSelectorDumpTests.m in Sources */,
 				F53850E7A7B858FE08DA6371 /* CYLAnimatedItemTintStateTests.swift in Sources */,
@@ -2330,6 +2342,7 @@
 		05DD3F37BEE07A780D802AF1 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				SWIFT_INCLUDE_PATHS = "$(inherited) $(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
 				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_WEAK = NO;
@@ -2413,6 +2426,7 @@
 		6D4C91BD4EE36CDC67D02564 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				SWIFT_INCLUDE_PATHS = "$(inherited) $(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
 				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_WEAK = NO;
@@ -2724,6 +2738,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		F7607EE5FE824189A50113F0 /* XCRemoteSwiftPackageReference "CYLDeallocBlockExecutor" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/ChenYilong/CYLDeallocBlockExecutor.git";
+			requirement = {
+				branch = "feat/lifecycle-callbacks";
+				kind = branch;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		6C706BAB9FD9DEE0EBE1B730 /* CYLDeallocBlockExecutor */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F7607EE5FE824189A50113F0 /* XCRemoteSwiftPackageReference "CYLDeallocBlockExecutor" */;
+			productName = CYLDeallocBlockExecutor;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 9AE9426C1BDC91B800354519 /* Project object */;
 }

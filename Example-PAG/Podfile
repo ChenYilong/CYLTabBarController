@@ -16,6 +16,7 @@ target 'HealthyHome' do
   # #604: PAG tab icons (Tencent libpag), the same way as `CYLTabBarController/LottieSwift`.
   # #604：PAG Tab 图标（腾讯 libpag），用法与 `CYLTabBarController/LottieSwift` 相同。
   pod 'CYLTabBarController/PAG', :path => '../'
+  pod 'CYLDeallocBlockExecutor', :git => 'https://github.com/ChenYilong/CYLDeallocBlockExecutor.git', :branch => 'feat/lifecycle-callbacks' # TODO: remove after CYLDeallocBlockExecutor 1.4.0 is published (docs/Lifecycle-Library.md)
   # [EN] The animated item component's own pod (CYLAnimatedItem.podspec), by the same path until it is on the trunk.
   # [CN] 动效组件独立的 pod（CYLAnimatedItem.podspec），发布到 trunk 之前按相同路径引入。
   pod 'CYLAnimatedItem', :path => '../'
