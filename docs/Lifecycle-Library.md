@@ -42,3 +42,10 @@
 | 中文 | English |
 |:---|:---|
 | 评分：100 = CocoaPods、Swift Package Manager、Carthage 三种方式都依赖该库，并有一个真实调用点（只执行一次的布局 block 使用 key `cyl.core.layoutBlock`），ObjC Example 与 Example-Swift 编译并在模拟器上运行，单元测试通过，CI 通过（发布 1.4.0 前 `pod lib lint` 除外）。60 = CocoaPods 与 SPM 依赖加真实调用点，主 Example 编译运行。 | Rubric: 100 = CocoaPods, Swift Package Manager and Carthage all depend on the library, with one real call site (the one-time layout block uses the key `cyl.core.layoutBlock`); the ObjC Example and Example-Swift build and run on a simulator; unit tests pass; CI passes (except `pod lib lint` before 1.4.0 is published). 60 = the CocoaPods and SPM dependencies plus the call site, with the main Example built and run. |
+
+| 中文 | English |
+|:---|:---|
+| 进度（2026-11-22，提交 6994a0ca）：见右列。 | Progress (2026-11-22, commit 6994a0ca): CocoaPods (Core subspec `'CYLDeallocBlockExecutor', '~> 1.4'`, 17 Podfiles pin the branch), Swift Package Manager (`Package.swift` + `Package.resolved`, branch `feat/lifecycle-callbacks` at d6db301) and the Xcode framework target (SPM package reference, `SWIFT_INCLUDE_PATHS`, `internal import`, linked statically, so the Carthage XCFramework needs no extra framework) depend on the library. Call site: the one-time layout block is the keyed block `cyl.core.layoutBlock` with `.end` dispatched by the core. Local checks (macOS 27.3, Xcode 27.2, iPhone 18 Pro simulator iOS 27.2): `scripts/unit-tests.sh` 217 tests, 0 failures, 2 skipped, including the new `CYLLayoutBlockTests` (3); the ObjC Example and Example-Swift build; the ObjC Example launches with its tab bar, plus button and badges. |
+| 得分：85 / 100。 | Score: 85 / 100. |
+| TODO（-10）：见右列。 | TODO (-10) CI on this pull request: `pod lib lint` fails until 1.4.0 is on trunk; the other jobs are to be checked. |
+| TODO（-5）：见右列。 | TODO (-5) After 1.4.0 is published: replace the branch pins with `~> 1.4` / `from: "1.4.0"`, take the pull request out of draft. |
