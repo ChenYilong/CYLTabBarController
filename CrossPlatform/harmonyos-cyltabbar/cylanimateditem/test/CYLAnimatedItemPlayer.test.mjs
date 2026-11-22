@@ -134,3 +134,7 @@ test('GIF timing: default delays, the frame at a progress, the last frame at 1',
   assert.equal(G.cylGIFFrameIndex(delays, 1), 2);
   assert.equal(G.cylGIFFrameIndex([], 0.5), -1);
 });
+
+test('GIF timing: a delay of 10 ms or less shows for 100 ms, as browsers and the iOS / Android engines do', () => {
+  assert.deepEqual(G.cylGIFDelays(5, [10, 1, 11, 20, -5]), [100, 100, 11, 20, 100]);
+});

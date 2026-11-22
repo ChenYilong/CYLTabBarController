@@ -1,15 +1,24 @@
 /**
- * [EN] GIF frame timing (pure, unit tested with Node): each frame's delay (0 or less: 100 ms, as browsers do) and the frame
- *      shown at a progress. [CN] GIF 帧时间（纯逻辑，用 Node 做单元测试）：每帧的延时（0 或更小为 100 毫秒，与浏览器相同）以及某进度显示的帧。
+ * [EN] GIF frame timing (pure, unit tested with Node): each frame's delay (10 ms or less: 100 ms, as browsers do and as the
+ *      iOS and Android GIF engines of CYLAnimatedItem do) and the frame shown at a progress.
+ * [CN] GIF 帧时间（纯逻辑，用 Node 做单元测试）：每帧的延时（10 毫秒或更小为 100 毫秒，与浏览器以及 iOS、Android 的 CYLAnimatedItem GIF 引擎相同）
+ *      以及某进度显示的帧。
  */
 export const CYL_GIF_DEFAULT_DELAY_MS: number = 100;
+/**
+ * [EN] The longest declared delay still replaced by the default: browsers show 0-10 ms frames for 100 ms (iOS
+ *      CYLGIFTabBarItemAnimationView: under 11 ms; Android CYLGIFDecoder: 10 ms or less), so a GIF made for browsers does
+ *      not race. [CN] 仍按默认值处理的最长声明延时：浏览器把 0-10 毫秒的帧显示 100 毫秒（iOS：小于 11 毫秒；Android：10 毫秒或更小），
+ *      为浏览器制作的 GIF 因此不会播得过快。
+ */
+export const CYL_GIF_MIN_DELAY_MS: number = 10;
 
 /** [EN] The delays of `count` frames from the decoder's list. [CN] 由解码器列表得到 `count` 帧的延时。 */
 export function cylGIFDelays(count: number, delays: number[]): number[] {
   const result: number[] = [];
   for (let i = 0; i < count; i++) {
     const delay = i < delays.length ? delays[i] : CYL_GIF_DEFAULT_DELAY_MS;
-    result.push(delay > 0 ? delay : CYL_GIF_DEFAULT_DELAY_MS);
+    result.push(delay > CYL_GIF_MIN_DELAY_MS ? delay : CYL_GIF_DEFAULT_DELAY_MS);
   }
   return result;
 }

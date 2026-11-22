@@ -15,7 +15,7 @@ types by its selection and playback (selected: once from the start; unselected: 
 
 | Type | Where | Register |
 |:---|:---|:---|
-| GIF | this module (ImageKit, no library) | `CYLAnimatedItemGIF.register()` |
+| GIF | this module (ImageKit, no library; a frame of 10 ms or less shows for 100 ms, as browsers and the iOS / Android engines do) | `CYLAnimatedItemGIF.register()` |
 | SVGA | this module (pure TypeScript decoder and renderer, `svga/`) | `CYLAnimatedItemSVGA.register()` |
 | Lottie | module `cylanimateditem_lottie` (`@ohos/lottie` ^2.0.38) | `CYLAnimatedItemLottie.register()` |
 | PAG | module `cylanimateditem_pag` (`@tencent/libpag` ^4.4.31; an app on another version can pin one with ohpm `overrides`) | `CYLAnimatedItemPAG.register()` |
