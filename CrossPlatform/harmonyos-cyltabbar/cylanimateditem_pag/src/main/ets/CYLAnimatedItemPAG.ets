@@ -1,5 +1,5 @@
 /**
- * [EN] The PAG engine of CYLAnimatedItemView (@tencent/libpag): libpag's `PAGView` with a rawfile PAG file. libpag has no
+ * [EN] The PAG engine of CYLAnimatedItemView (@tencent/libpag ^4.4.31: 4.4.31 and 4.5.102 are both in use): libpag's `PAGView` with a rawfile PAG file. libpag has no
  *      playback speed on HarmonyOS, so the player drives the progress itself (`setProgress` + `flush` on a timer): speed,
  *      loop, any progress and the end of a pass. `CYLAnimatedItemPAG.register()` once makes every `CYLAnimatedItemView`
  *      without an `animationBuilder` play PAG files. libpag's native library is arm64-only: on an x86_64 emulator the type
