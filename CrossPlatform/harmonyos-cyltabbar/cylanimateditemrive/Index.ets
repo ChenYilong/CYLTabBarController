@@ -14,5 +14,9 @@ export {
   CYLTabBarAnimationOptionRiveNumberInput, CYLTabBarAnimationOptionRiveNumberValues, cylRiveNextNumber,
   cylRiveFileAndOptions, cylRiveRendererType, cylEnsureRiveInitialized, cylRiveIsSupported
 } from './src/main/ets/CYLRiveIcon';
+export {
+  CYLAnimatedItemRive, CYLAnimatedItemRivePlayer, CYLAnimatedItemRiveView
+} from './src/main/ets/CYLAnimatedItemRive';
+export { CYLAnimatedItemRiveOption, cylRiveUsesLegacyRuntime } from './src/main/ets/CYLAnimatedItemRiveOptions';
 export { CYLRiveLoopPolicy } from './src/main/ets/CYLRiveLoopPolicy';
 export { CYLRiveAnimationBuilder, cylRegisterRiveEngine } from './src/main/ets/CYLRiveAnimationBuilder';

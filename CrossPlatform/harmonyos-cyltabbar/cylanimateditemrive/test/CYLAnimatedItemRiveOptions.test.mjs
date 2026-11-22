@@ -1,11 +1,11 @@
-// [EN] Unit tests of cylanimateditem_rive's CYLAnimatedItemRiveOptions.ts (pure): the number input's next value, the legacy
-//      runtime choice and the active duration. Node 22.18+: node --test CrossPlatform/harmonyos-cyltabbar/cylanimateditem/test/*.test.mjs
-// [CN] cylanimateditem_rive 的 CYLAnimatedItemRiveOptions.ts（纯逻辑）的单元测试。
-import './cyl-ts-import.mjs';
+// [EN] Unit tests of cylanimateditemrive's CYLAnimatedItemRiveOptions.ts (pure): the number input's next value, the legacy
+//      runtime choice and the active duration. Node 22.18+: node --test CrossPlatform/harmonyos-cyltabbar/cylanimateditemrive/test/*.test.mjs
+// [CN] cylanimateditemrive 的 CYLAnimatedItemRiveOptions.ts（纯逻辑）的单元测试。
+import '../../cylanimateditem/test/cyl-ts-import.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
-const R = await import('../../cylanimateditem_rive/src/main/ets/CYLAnimatedItemRiveOptions.ts');
+const R = await import('../src/main/ets/CYLAnimatedItemRiveOptions.ts');
 
 test('a number input steps through its values, cycling, else +1', () => {
   assert.equal(R.cylRiveNextNumber('3,4,5,6', 3), 4);

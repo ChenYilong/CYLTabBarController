@@ -6,7 +6,6 @@
   "author": "ChenYilong",
   "license": "MIT",
   "dependencies": {
-    "@ohos/rive": "1.0.4",
-    "cylanimateditem": "file:../cylanimateditem"
+    "cylanimateditemrive": "file:../cylanimateditemrive"
   }
 }
