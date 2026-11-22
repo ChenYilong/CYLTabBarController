@@ -317,6 +317,7 @@ docs/
 │   ├── harmonyos-animated-item-sys-symbol-b30.png
 │   ├── harmonyos-badge-bounce-around-place.png
 │   ├── harmonyos-bundle-image-row-localized.png
+│   ├── harmonyos-classifymenu-dark-animations-x86-9dc1f761.png
 │   ├── harmonyos-configuration-localization-bundle.png
 │   ├── harmonyos-cvcm-issue26-all.jpeg
 │   ├── harmonyos-cvcm-issue26-good.jpeg

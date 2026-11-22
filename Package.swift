@@ -135,7 +135,6 @@ let package = Package(
             path: "CYLTabBarController",
             sources: [
                 "CYLTabBarItemAnimation/CYLTabBarItemAnimationEngine.m",
-                "CYLTabBarItemAnimation/TabBar/CYLPAGTabBarItemAttributes.m",
                 "CYLTabBarItemAnimation/GIF/CYLGIFTabBarItemAnimator.m",
                 "CYLTabBarItemAnimation/Lottie/CYLLottieTabBarItemAnimator.m",
                 "CYLTabBarItemAnimation/PAG/CYLPAGTabBarItemAnimator.m",
