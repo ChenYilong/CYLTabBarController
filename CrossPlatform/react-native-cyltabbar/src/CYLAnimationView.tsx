@@ -1,6 +1,7 @@
-import type { CYLAnimationViewProps } from './CYLAnimationView.native';
+import { forwardRef } from 'react';
+import type { CYLAnimationViewHandle, CYLAnimationViewProps } from './CYLAnimationView.native';
 
-export function CYLAnimationView(_props: CYLAnimationViewProps): never {
+export const CYLAnimationView = forwardRef<CYLAnimationViewHandle, CYLAnimationViewProps>(function CYLAnimationView(): never {
   throw new Error("'react-native-cyltabbar' is only supported on iOS and Android.");
-}
+});
 export { animationURLWithOptions } from './CYLAnimationView.native';

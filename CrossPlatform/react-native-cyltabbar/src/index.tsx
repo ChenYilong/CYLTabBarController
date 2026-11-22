@@ -9,4 +9,4 @@ export type {
   CYLTabBarIconRenderingMode,
 } from './CyltabbarView.native';
 export { CYLAnimationView, animationURLWithOptions } from './CYLAnimationView';
-export type { CYLAnimationViewProps, CYLAnimationOptions } from './CYLAnimationView.native';
+export type { CYLAnimationViewProps, CYLAnimationViewHandle, CYLAnimationOptions } from './CYLAnimationView.native';

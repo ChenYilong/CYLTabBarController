@@ -830,6 +830,32 @@ class _ExamplePageState extends State<CYLExamplePage> {
                 riveIcons: cylRiveTabIcons,
                 onRiveIconsChanged: widget.onRiveIconsChanged,
               ),
+            // The engine API of CYLAnimationView (docs/Animated-Item.md): the same Play all, speed and loop controls drive
+            // one icon of icons.riv through animationRestartToken, animationSpeed and animationLoops.
+            // CYLAnimationView 的引擎 API：同一组「全部播放」、倍速与循环控件通过 animationRestartToken、animationSpeed 与
+            // animationLoops 驱动 icons.riv 的一个图标。
+            if (!_plusPageSelected && _selectedIndex != 0)
+              Semantics(
+                label: 'CYLAnimationView, icons.riv',
+                image: true,
+                child: SizedBox(
+                  height: 48,
+                  child: CYLAnimationView(
+                    file: 'icons.riv',
+                    options: const {
+                      'artboard': 'TIMER',
+                      'stateMachine': 'TIMER_Interactivity',
+                      'input': 'active',
+                      'duration': 2,
+                    },
+                    selected: true,
+                    animationSpeed: _animationSpeed,
+                    animationLoops: _animationLoops,
+                    animationRestartToken: _playAllRequest,
+                    iconSize: 40,
+                  ),
+                ),
+              ),
             Expanded(
               child: _plusPageSelected
                   ? Center(
