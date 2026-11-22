@@ -14,7 +14,7 @@
 const { cylReadConfiguration } = require('./cyl_configuration');
 const { cylBadgeAnimationClass } = require('./cyl_debug');
 const { cylTabBarItemStyle, cylTabBarItemStyleForStyleType, cylGlassLensStyle } = require('./cyl_tab_bar_item_style');
-// TODO: replace the vendored copy with the npm package after the library is published (owner's OK): see ../cyl-dealloc-block-executor/VENDORED.md.
+// Pending: replace the vendored copy with the npm package after the library is published (owner's OK): see ../cyl-dealloc-block-executor/VENDORED.md.
 const { LifecycleController } = require('../cyl-dealloc-block-executor/index');
 
 /**
