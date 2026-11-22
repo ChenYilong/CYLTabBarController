@@ -15,7 +15,7 @@ const { cylReadConfiguration } = require('./cyl_configuration');
 const { cylBadgeAnimationClass } = require('./cyl_debug');
 const { cylTabBarItemStyle, cylTabBarItemStyleForStyleType, cylGlassLensStyle } = require('./cyl_tab_bar_item_style');
 // TODO: replace the vendored copy with the npm package after the library is published (owner's OK): see ../cyl-dealloc-block-executor/VENDORED.md.
-const { CYLLifecycleCallbacks, CYLLifecycleEvent } = require('../cyl-dealloc-block-executor/cyl-dealloc-block-executor');
+const { LifecycleController } = require('../cyl-dealloc-block-executor/index');
 
 /**
  * [EN] Heights in px from the stylesheets: the bar (index.wxss `.cyl-tab`, Liquid Glass `.cyl-style-liquidGlass .cyl-tab`),
@@ -380,26 +380,26 @@ Component({
       this.cylRequestedTheme = '';
       // [EN] CYLDeallocBlockExecutor: each resource registers its own cleanup, keyed, where it is created; `detached` runs them.
       // [CN] CYLDeallocBlockExecutor：每个资源在创建处注册各自带 key 的清理；`detached` 时运行。
-      this.cylCallbacks = new CYLLifecycleCallbacks(this);
+      this.cylLifecycle = new LifecycleController(this);
+      this.cylLifecycle.onLoad();
       this.cylThemeListener = (result) => {
         this.cylSystemTheme = result.theme === 'dark' ? 'dark' : 'light';
         this.cyl_render();
       };
       if (typeof wx.onThemeChange === 'function') {
         wx.onThemeChange(this.cylThemeListener);
-        this.cylCallbacks.willDealloc((bar) => {
+        this.cylLifecycle.registry.addDeallocCallback((bar) => {
           if (typeof wx.offThemeChange === 'function') {
             wx.offThemeChange(bar.cylThemeListener);
           }
         }, { key: 'cyl.core.themeListener' });
       }
       cylLiveBars.add(this);
-      this.cylCallbacks.willDealloc((bar) => cylLiveBars.delete(bar), { key: 'cyl.core.liveBar' });
+      this.cylLifecycle.registry.addDeallocCallback((bar) => cylLiveBars.delete(bar), { key: 'cyl.core.liveBar' });
       this.cyl_render();
     },
     detached() {
-      this.cylCallbacks.perform(CYLLifecycleEvent.DETACHED);
-      this.cylCallbacks.dealloc(CYLLifecycleEvent.DETACHED);
+      this.cylLifecycle.onUnload();
     },
   },
 
@@ -840,8 +840,8 @@ Component({
           model.animationDuration + (fireworks ? 900 : 100));
         // [EN] The timer is a resource of its own: cleared when the bar detaches (the keyed callback is replaced per timer).
         // [CN] 定时器是独立的资源：TabBar detached 时清除（每个定时器替换同 key 的回调）。
-        if (this.cylCallbacks) {
-          this.cylCallbacks.willDealloc((bar) => clearTimeout(bar.cylAnimationTimer), { key: 'cyl.core.animationTimer' });
+        if (this.cylLifecycle && !this.cylLifecycle.isDetached) {
+          this.cylLifecycle.registry.addDeallocCallback((bar) => clearTimeout(bar.cylAnimationTimer), { key: 'cyl.core.animationTimer' });
         }
       });
     },

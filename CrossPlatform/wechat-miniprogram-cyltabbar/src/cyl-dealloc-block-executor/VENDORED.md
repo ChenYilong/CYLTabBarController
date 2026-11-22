@@ -8,6 +8,6 @@
 | TODO：库发布后改用 ohpm / npm 包（需要所有者同意）。 | TODO: replace this copy with the ohpm / npm package after the library is published (the owner's OK is needed). |
 
 - Library: https://github.com/ChenYilong/CYLDeallocBlockExecutor
-- Branch: `feat/lifecycle-callbacks-android` (pull request #13)
-- Folder in the library: `miniprogram`
-- Commit: `0394b466dca2ce15be37a0a8a64b43673107e01b`
+- Branch: `feat/lifecycle-callbacks` (pull request #12)
+- Folder in the library: `MiniProgram`
+- Commit: `3aafe8ecc9a640f663103ea4457b598ddbdca9f9`

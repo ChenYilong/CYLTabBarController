@@ -14,7 +14,7 @@ root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 harmony_dest="CrossPlatform/harmonyos-cyltabbar/cyldeallocblockexecutor"
 mini_dest="CrossPlatform/wechat-miniprogram-cyltabbar/src/cyl-dealloc-block-executor"
 repository_url="https://github.com/ChenYilong/CYLDeallocBlockExecutor.git"
-branch="feat/lifecycle-callbacks-android"
+branch="feat/lifecycle-callbacks"
 
 check=0
 commit=""
@@ -54,7 +54,7 @@ vendored_md() {
 | TODO：库发布后改用 ohpm / npm 包（需要所有者同意）。 | TODO: replace this copy with the ohpm / npm package after the library is published (the owner's OK is needed). |
 
 - Library: https://github.com/ChenYilong/CYLDeallocBlockExecutor
-- Branch: \`$branch\` (pull request #13)
+- Branch: \`$branch\` (pull request #12)
 - Folder in the library: \`$1\`
 - Commit: \`$full\`
 EOF
@@ -63,17 +63,29 @@ EOF
 generate() {
   # $1: output root
   local out="$1"
-  mkdir -p "$out/$harmony_dest" "$out/$mini_dest"
-  git -C "$library" archive "$full" harmonyos/cyldeallocblockexecutor | tar -x -C "$work/h"
-  git -C "$library" archive "$full" miniprogram | tar -x -C "$work/m"
-  cp -R "$work/h/harmonyos/cyldeallocblockexecutor/." "$out/$harmony_dest/"
-  cp "$work/m/miniprogram/cyl-dealloc-block-executor.js" "$work/m/miniprogram/package.json" "$work/m/miniprogram/LICENSE" "$out/$mini_dest/"
-  rm -rf "$out/$harmony_dest/test"
-  vendored_md "harmonyos/cyldeallocblockexecutor" "HarmonyOS, ArkTS" > "$out/$harmony_dest/VENDORED.md"
-  vendored_md "miniprogram" "WeChat Mini Program, JavaScript" > "$out/$mini_dest/VENDORED.md"
+  mkdir -p "$out/$harmony_dest/src/main/ets" "$out/$mini_dest"
+  git -C "$library" archive "$full" HarmonyOS MiniProgram LICENSE | tar -x -C "$work/x"
+  # [EN] HarmonyOS: the registry and controller as plain TypeScript, imported without the `.ts` extension (ArkTS resolves by name).
+  # [CN] 鸿蒙：注册表与控制器为纯 TypeScript，导入时不带 `.ts` 扩展名（ArkTS 按名称解析）。
+  for file in types registry controller; do
+    sed "s#from '\./\([a-z]*\)\.ts'#from './\1'#" "$work/x/HarmonyOS/src/$file.ts" > "$out/$harmony_dest/src/main/ets/$file.ts"
+  done
+  cp "$work/x/HarmonyOS/cyldeallocblockexecutor/oh-package.json5" "$work/x/HarmonyOS/cyldeallocblockexecutor/build-profile.json5" \
+     "$work/x/HarmonyOS/cyldeallocblockexecutor/hvigorfile.ts" "$work/x/LICENSE" "$out/$harmony_dest/"
+  cp "$work/x/HarmonyOS/cyldeallocblockexecutor/src/main/module.json5" "$out/$harmony_dest/src/main/"
+  cat > "$out/$harmony_dest/Index.ets" <<'EOT'
+export { LifecycleController } from './src/main/ets/controller';
+export { LifecycleRegistry } from './src/main/ets/registry';
+export { LifecycleEvent, LifecycleTiming } from './src/main/ets/types';
+EOT
+  # [EN] Mini Program: CommonJS files of the library, no build step. [CN] 小程序：库中的 CommonJS 文件，无需构建。
+  cp "$work/x/MiniProgram/index.js" "$work/x/MiniProgram/registry.js" "$work/x/MiniProgram/types.js" "$work/x/MiniProgram/controller.js" \
+     "$work/x/MiniProgram/package.json" "$work/x/LICENSE" "$out/$mini_dest/"
+  vendored_md "HarmonyOS" "HarmonyOS, ArkTS" > "$out/$harmony_dest/VENDORED.md"
+  vendored_md "MiniProgram" "WeChat Mini Program, JavaScript" > "$out/$mini_dest/VENDORED.md"
 }
 
-mkdir -p "$work/h" "$work/m"
+mkdir -p "$work/x"
 if [ "$check" -eq 1 ]; then
   generate "$work/expected"
   status=0

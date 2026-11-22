@@ -1,7 +1,7 @@
 {
   "name": "cyldeallocblockexecutor",
   "version": "1.4.0",
-  "description": "CYLDeallocBlockExecutor for HarmonyOS NEXT (ArkTS): lifecycle and dealloc callbacks for an ArkUI component, with identifiers, keys, invoke once and re-arm. No dependencies.",
+  "description": "CYLDeallocBlockExecutor for HarmonyOS (ArkTS): lifecycle and dealloc callbacks for an ArkUI page or component, with identifiers, keys, invoke once and re-arm. No dependencies.",
   "main": "Index.ets",
   "author": "ChenYilong",
   "license": "MIT",

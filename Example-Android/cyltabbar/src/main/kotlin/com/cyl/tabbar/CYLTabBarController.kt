@@ -22,8 +22,9 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager
-import com.cyl.deallocblockexecutor.CYLLifecycleCallbacks
-import com.cyl.deallocblockexecutor.CYLLifecycleEvent
+import com.chenyilong.cyldeallocblockexecutor.LifecycleEvent
+import com.chenyilong.cyldeallocblockexecutor.LifecycleRegistry
+import com.chenyilong.cyldeallocblockexecutor.LifecycleTiming
 import java.util.WeakHashMap
 
 /**
@@ -357,9 +358,13 @@ open class CYLTabBarController(val activity: FragmentActivity) {
         set(value) { tabBarStyleType = if (value) CYLEnums.CYLTabBarStyleType.LiquidGlass else CYLEnums.CYLTabBarStyleType.FlatDesign }
     var allowsVerticalBar: Boolean = false
     var viewDidLayoutSubviewsBlock: CYLViewDidLayoutSubViewsBlock? = null
-    // [EN] The callbacks of this controller (CYLDeallocBlockExecutor, as on iOS). The layout block is the keyed callback `cyl.core.layoutBlock` on LAYOUT; it reads `viewDidLayoutSubviewsBlock` when it runs.
-    // [CN] 本控制器的回调（CYLDeallocBlockExecutor，与 iOS 相同）。布局 block 是 LAYOUT 事件上带 key 的回调 `cyl.core.layoutBlock`，执行时读取 `viewDidLayoutSubviewsBlock`。
-    private val cylLifecycleCallbacks = CYLLifecycleCallbacks(this).also { registerLayoutBlockCallback(it, false) }
+    // [EN] The callbacks of this controller (CYLDeallocBlockExecutor, as on iOS). The layout block is the keyed `.end` callback `cyl.core.layoutBlock` on `viewDidLayoutSubviews`; it reads `viewDidLayoutSubviewsBlock` when it runs.
+    // [CN] 本控制器的回调（CYLDeallocBlockExecutor，与 iOS 相同）。布局 block 是 viewDidLayoutSubviews 上带 key 的 `.end` 回调 `cyl.core.layoutBlock`，执行时读取 `viewDidLayoutSubviewsBlock`。
+    private val cylLifecycleCallbacks = LifecycleRegistry.of(this).also {
+        // [EN] The core dispatches `.end` of the layout event itself, where the block runs today. [CN] 核心自己在原来执行 block 的位置派发布局事件的 `.end`。
+        it.setManualLifecycleDispatch(true, setOf(LifecycleEvent.viewDidLayoutSubviews), setOf(LifecycleTiming.end))
+        registerLayoutBlockCallback(it, false)
+    }
     /**
      * [EN] The animation file of each animated tab, in tab order (`CYLTabBarAnimation…` and the library keys). [CN] 每个有动画的 Tab 的动画文件，按 Tab 顺序。
      */
@@ -674,8 +679,8 @@ open class CYLTabBarController(val activity: FragmentActivity) {
         cyl_applyNavigationTitleOfSelectedPage()
         // [EN] Every new set of tabs (also a theme switch and a reload) lets the one-time layout block run once more, as on iOS (`cylRearmViewDidLayoutSubviewsBlockInvokeOnce`).
         // [CN] 每次重新设置 Tab（包括换肤与重新加载）都让只执行一次的布局 block 再执行一次，与 iOS 相同（`cylRearmViewDidLayoutSubviewsBlockInvokeOnce`）。
-        cylLifecycleCallbacks.rearm(LAYOUT_BLOCK_KEY)
-        cylLifecycleCallbacks.perform(CYLLifecycleEvent.LAYOUT)
+        cylLifecycleCallbacks.rearmLifecycleCallback(LAYOUT_BLOCK_KEY)
+        cylLifecycleCallbacks.invokeLifecycleCallbacks(LifecycleEvent.viewDidLayoutSubviews, LifecycleTiming.end)
     }
 
     private fun makeItem(attributes: Map<String, Any?>): CYLTabBarItem {
@@ -1207,12 +1212,12 @@ open class CYLTabBarController(val activity: FragmentActivity) {
     fun setViewDidLayoutSubViewsBlockInvokeOnce(once: Boolean, block: ((CYLTabBarController) -> Unit)?) {
         viewDidLayoutSubviewsBlock = block
         registerLayoutBlockCallback(cylLifecycleCallbacks, once)
-        cylLifecycleCallbacks.rearm(LAYOUT_BLOCK_KEY)
+        cylLifecycleCallbacks.rearmLifecycleCallback(LAYOUT_BLOCK_KEY)
     }
 
     // [EN] Replaces the keyed layout callback (the replacement starts armed). [CN] 替换带 key 的布局回调（新回调处于未执行状态）。
-    private fun registerLayoutBlockCallback(callbacks: CYLLifecycleCallbacks<CYLTabBarController>, invokeOnce: Boolean) {
-        callbacks.addCallback(CYLLifecycleEvent.LAYOUT, invokeOnce, LAYOUT_BLOCK_KEY) { owner, _, _ -> owner.viewDidLayoutSubviewsBlock?.invoke(owner) }
+    private fun registerLayoutBlockCallback(callbacks: LifecycleRegistry, invokeOnce: Boolean) {
+        callbacks.addLifecycleCallback<CYLTabBarController>(LifecycleEvent.viewDidLayoutSubviews, LifecycleTiming.end, invokeOnce, LAYOUT_BLOCK_KEY) { owner, _, _ -> owner.viewDidLayoutSubviewsBlock?.invoke(owner) }
     }
     fun updateImageInsets(insets: CYLEdgeInsets) { imageInsets = insets }
     fun hideTabBarShadowImageView() { tabBar.cyl_shadowColor = null; tabBar.refreshSelection() }
