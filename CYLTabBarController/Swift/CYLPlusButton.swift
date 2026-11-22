@@ -54,10 +54,10 @@ public func CYLPlusButtonCurrentWidth() -> CGFloat {
 
 /**
  [EN] A plus button a configuration's `CYLTabBarControllerPlusButton` entry chooses as its page
-      (`CYLConfigurationPlusButtonPageKey`, a macro of CYLPlusButton.h with the same string).
+      (`cylConfigurationPlusButtonPageKey`, a macro of CYLPlusButton.h with the same string).
  [CN] 配置中 `CYLTabBarControllerPlusButton` 选作页面的键（CYLPlusButton.h 中同名宏，字符串相同）。
  */
-let CYLConfigurationPlusButtonPageKey = "CYLConfigurationPlusButtonPage"
+let cylConfigurationPlusButtonPageKey = "CYLConfigurationPlusButtonPage"
 
 /**
  [EN] `+cyl_plusButtonClassSelectedContentView` sent to the runtime class (it may be a class made at run time).
@@ -67,8 +67,8 @@ let CYLConfigurationPlusButtonPageKey = "CYLConfigurationPlusButtonPage"
     @objc(cyl_plusButtonClassSelectedContentView) func cylPlusButtonClassSelectedContentView() -> UIButton?
 }
 
-private let CYLPlusButtonSetConfigurationSelector = NSSelectorFromString("setConfiguration:")
-private let CYLPlusButtonClearBadgeSelector = NSSelectorFromString("cyl_clearBadge")
+private let cylPlusButtonSetConfigurationSelector = NSSelectorFromString("setConfiguration:")
+private let cylPlusButtonClearBadgeSelector = NSSelectorFromString("cyl_clearBadge")
 
 /**
  [EN] `+[cls new]` through the Objective-C runtime: a class made at run time (`objc_allocateClassPair`) has no Swift metadata,
@@ -76,7 +76,7 @@ private let CYLPlusButtonClearBadgeSelector = NSSelectorFromString("cyl_clearBad
  [CN] 通过 Objective-C 运行时调用 `+[cls new]`：运行时创建的类（`objc_allocateClassPair`）没有 Swift 元数据，对其元类型调用 Swift 的
       `init()` 会创建最近的 Swift 类的实例。
  */
-func CYLPlusButtonNewInstance(of cls: AnyClass) -> AnyObject {
+func cylPlusButtonNewInstance(of cls: AnyClass) -> AnyObject {
     (cls as AnyObject).perform(NSSelectorFromString("new")).takeRetainedValue()
 }
 
@@ -120,11 +120,11 @@ open class CYLPlusButton: UIButton {
         let setConfiguration: @convention(block) (CYLPlusButton, AnyObject?) -> Void = { button, configuration in
             button.cylPlusButtonSetConfiguration(configuration as? UIButton.Configuration)
         }
-        class_addMethod(CYLPlusButton.self, CYLPlusButtonSetConfigurationSelector, imp_implementationWithBlock(setConfiguration), "v@:@")
+        class_addMethod(CYLPlusButton.self, cylPlusButtonSetConfigurationSelector, imp_implementationWithBlock(setConfiguration), "v@:@")
         let clearBadge: @convention(block) (CYLPlusButton) -> Void = { button in
             button.cylPlusButtonClearBadge()
         }
-        class_addMethod(CYLPlusButton.self, CYLPlusButtonClearBadgeSelector, imp_implementationWithBlock(clearBadge), "v@:")
+        class_addMethod(CYLPlusButton.self, cylPlusButtonClearBadgeSelector, imp_implementationWithBlock(clearBadge), "v@:")
         // [EN] The default `+selectedContentView` (a new plus button of the class), added at run time so a Swift subclass can
         //      still declare its own (`CYLPlusButtonSubclassing`) without a selector conflict. `+contentImage` /
         //      `+selectedContentImage` have no default: the Objective-C class returned nil, which is what a missing one gives.
@@ -166,7 +166,7 @@ open class CYLPlusButton: UIButton {
     open class func cyl_plusButton(with image: UIImage, title: String, selectedTitle: String?, selectedTitleColor: UIColor?) -> Self {
         // [EN] `-init` through the runtime: a class method cannot call a non-required initializer on `self`.
         // [CN] 通过运行时调用 `-init`：类方法不能对 `self` 调用非 required 的初始化方法。
-        let button = unsafeDowncast(CYLPlusButtonNewInstance(of: self), to: self)
+        let button = unsafeDowncast(cylPlusButtonNewInstance(of: self), to: self)
         button.cylPlusButtonSetUp(image: image, title: title, selectedTitle: selectedTitle, selectedTitleColor: selectedTitleColor)
         return button
     }
@@ -278,8 +278,8 @@ open class CYLPlusButton: UIButton {
     @objc(cyl_superSetConfiguration:)
     func cylSuperSetConfiguration(_ configuration: UIButton.Configuration?) {
         typealias Setter = @convention(c) (AnyObject, Selector, AnyObject?) -> Void
-        guard let imp = class_getMethodImplementation(UIButton.self, CYLPlusButtonSetConfigurationSelector) else { return }
-        unsafeBitCast(imp, to: Setter.self)(self, CYLPlusButtonSetConfigurationSelector, configuration.map { $0 as AnyObject })
+        guard let imp = class_getMethodImplementation(UIButton.self, cylPlusButtonSetConfigurationSelector) else { return }
+        unsafeBitCast(imp, to: Setter.self)(self, cylPlusButtonSetConfigurationSelector, configuration.map { $0 as AnyObject })
     }
 
     @objc(cyl_superShowBadgeValue:animationTypeValue:)
@@ -290,8 +290,8 @@ open class CYLPlusButton: UIButton {
     @objc(cyl_superClearBadge)
     func cylSuperClearBadge() {
         typealias Clear = @convention(c) (AnyObject, Selector) -> Void
-        guard let imp = class_getMethodImplementation(UIControl.self, CYLPlusButtonClearBadgeSelector) else { return }
-        unsafeBitCast(imp, to: Clear.self)(self, CYLPlusButtonClearBadgeSelector)
+        guard let imp = class_getMethodImplementation(UIControl.self, cylPlusButtonClearBadgeSelector) else { return }
+        unsafeBitCast(imp, to: Clear.self)(self, cylPlusButtonClearBadgeSelector)
     }
 
     // MARK: Public API 公开 API
@@ -610,12 +610,12 @@ extension CYLPlusButtonRegisteredInstance {
 
 // MARK: - Registering a plus button from attributes (CYLTabBarControllerPlusButton)
 
-private var CYLConfigurationPlusButtonEntryKey: UInt8 = 0
-private let CYLConfigurationPlusButtonAttributesKey = "attributes"
-private let CYLConfigurationPlusButtonActionKey = "action"
-private let CYLConfigurationPlusButtonContextKey = "context"
-private let CYLConfigurationPlusButtonDefaultContext = "CYLTabBarController"
-private var CYLConfigurationPlusButtonCounter = 0
+private var cylConfigurationPlusButtonEntryKey: UInt8 = 0
+private let cylConfigurationPlusButtonAttributesKey = "attributes"
+private let cylConfigurationPlusButtonActionKey = "action"
+private let cylConfigurationPlusButtonContextKey = "context"
+private let cylConfigurationPlusButtonDefaultContext = "CYLTabBarController"
+private var cylConfigurationPlusButtonCounter = 0
 
 extension CYLPlusButton {
 
@@ -629,16 +629,16 @@ extension CYLPlusButton {
     open class func cyl_register(attributes: [String: Any] = [:], action: ((CYLPlusButton) -> Void)?, context: String?) {
         let hasImage = attributes[CYLTabBarItemImage] is UIImage || attributes[CYLPlusButtonBackgroundImage] is UIImage
         guard hasImage else { return }
-        CYLConfigurationPlusButtonCounter += 1
-        let className = "CYLConfigurationPlusButton_\(CYLConfigurationPlusButtonCounter)"
+        cylConfigurationPlusButtonCounter += 1
+        let className = "CYLConfigurationPlusButton_\(cylConfigurationPlusButtonCounter)"
         guard let cls = objc_allocateClassPair(CYLConfigurationPlusButton.self, className, 0) else { return }
         objc_registerClassPair(cls)
-        var entry: [String: Any] = [CYLConfigurationPlusButtonAttributesKey: attributes]
-        entry[CYLConfigurationPlusButtonContextKey] = (context?.isEmpty == false) ? context : CYLConfigurationPlusButtonDefaultContext
+        var entry: [String: Any] = [cylConfigurationPlusButtonAttributesKey: attributes]
+        entry[cylConfigurationPlusButtonContextKey] = (context?.isEmpty == false) ? context : cylConfigurationPlusButtonDefaultContext
         if let action {
-            entry[CYLConfigurationPlusButtonActionKey] = action
+            entry[cylConfigurationPlusButtonActionKey] = action
         }
-        objc_setAssociatedObject(cls, &CYLConfigurationPlusButtonEntryKey, entry as NSDictionary, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+        objc_setAssociatedObject(cls, &cylConfigurationPlusButtonEntryKey, entry as NSDictionary, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
         CYLConfigurationPlusButton.cylAddClassMethods(to: cls, attributes: attributes)
         // [EN] By selector: Swift's metatype dispatch would see the nearest Swift class, not the class made at run time.
         // [CN] 通过 selector 调用：Swift 的元类型派发看到的是最近的 Swift 类，而不是运行时创建的类。
@@ -657,26 +657,26 @@ extension CYLPlusButton {
 final class CYLConfigurationPlusButton: CYLPlusButton, CYLPlusButtonSubclassing {
 
     private class var cylConfigurationEntry: [String: Any] {
-        (objc_getAssociatedObject(self, &CYLConfigurationPlusButtonEntryKey) as? [String: Any]) ?? [:]
+        (objc_getAssociatedObject(self, &cylConfigurationPlusButtonEntryKey) as? [String: Any]) ?? [:]
     }
 
     static func plusButton() -> Any {
         // [EN] The runtime class (`self` may be a class made at run time). [CN] 运行时的类（`self` 可能是运行时创建的类）。
-        let button = unsafeDowncast(CYLPlusButtonNewInstance(of: self), to: CYLPlusButton.self)
-        button.cylConfigurationPlusButtonSetUp(attributes: cylConfigurationEntry[CYLConfigurationPlusButtonAttributesKey] as? [String: Any])
+        let button = unsafeDowncast(cylPlusButtonNewInstance(of: self), to: CYLPlusButton.self)
+        button.cylConfigurationPlusButtonSetUp(attributes: cylConfigurationEntry[cylConfigurationPlusButtonAttributesKey] as? [String: Any])
         return button
     }
 
     @objc static func tabBarContext() -> String {
-        (cylConfigurationEntry[CYLConfigurationPlusButtonContextKey] as? String) ?? CYLConfigurationPlusButtonDefaultContext
+        (cylConfigurationEntry[cylConfigurationPlusButtonContextKey] as? String) ?? cylConfigurationPlusButtonDefaultContext
     }
 
     static func alignsTitleWithTabBarItemTitles() -> Bool {
-        cylConfigurationPlusButtonAlignsTitle(attributes: cylConfigurationEntry[CYLConfigurationPlusButtonAttributesKey] as? [String: Any])
+        cylConfigurationPlusButtonAlignsTitle(attributes: cylConfigurationEntry[cylConfigurationPlusButtonAttributesKey] as? [String: Any])
     }
 
-    @objc func cyl_configurationPlusButtonTapped() {
-        let action = (object_getClass(self) as? CYLConfigurationPlusButton.Type)?.cylConfigurationEntry[CYLConfigurationPlusButtonActionKey]
+    @objc(cyl_configurationPlusButtonTapped) func configurationPlusButtonTapped() {
+        let action = (object_getClass(self) as? CYLConfigurationPlusButton.Type)?.cylConfigurationEntry[cylConfigurationPlusButtonActionKey]
         (action as? (CYLPlusButton) -> Void)?(self)
     }
 
@@ -702,7 +702,7 @@ final class CYLConfigurationPlusButton: CYLPlusButton, CYLPlusButtonSubclassing 
             let block: @convention(block) (AnyObject) -> NSString = { _ in identifier as NSString }
             class_addMethod(metaClass, NSSelectorFromString("tabBarItemIdentifier"), imp_implementationWithBlock(block), "@@:")
         }
-        if let page = attributes[CYLConfigurationPlusButtonPageKey] as? UIViewController {
+        if let page = attributes[cylConfigurationPlusButtonPageKey] as? UIViewController {
             let block: @convention(block) (AnyObject) -> UIViewController = { _ in page }
             class_addMethod(metaClass, NSSelectorFromString("plusChildViewController"), imp_implementationWithBlock(block), "@@:")
         }

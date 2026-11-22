@@ -656,12 +656,12 @@ extension UIViewController {
     public func cyl_themeMenu(withCompletion completion: (() -> Void)?) -> UIMenu {
         UIViewController.cyl_setUpThemeSettings()
         let deferred = UIDeferredMenuElement.uncached { provide in
-            provide(UIViewController.cyl_themeMenuElements(completion))
+            provide(UIViewController.cylThemeMenuElements(completion))
         }
         return UIMenu(title: CYLLocalizedString("选择主题"), children: [deferred])
     }
 
-    private static func cyl_themeMenuElements(_ completion: (() -> Void)?) -> [UIMenuElement] {
+    private static func cylThemeMenuElements(_ completion: (() -> Void)?) -> [UIMenuElement] {
         let currentIdentifier = CYLDemoThemes.current.identifier
         let themeActions: [UIMenuElement] = CYLDemoThemes.all.map { theme in
             let action = UIAction(title: theme.localizedName, image: CYLDemoThemes.listIcon(of: theme)) { _ in

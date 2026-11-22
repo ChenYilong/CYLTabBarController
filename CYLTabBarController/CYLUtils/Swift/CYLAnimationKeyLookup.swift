@@ -7,16 +7,16 @@
 
 import Foundation
 
-// [EN] The lookup of the animation keys (CYLAnimationKeys.h), Swift since docs/Swift-Migration.md step 122 (phase ③, group J of
+// [EN] The lookup of the animation keys (cylAnimationKeys.h), Swift since docs/Swift-Migration.md step 122 (phase ③, group J of
 //      docs/Swift-Migration-Phase3.md). Part of the CYLAnimatedItem component (its pod, its Xcode target, the SwiftPM target
 //      `CYLAnimatedItemSwift`), never of CYLTabBarController's CYLUtils, so each C symbol is defined once. The keys are written
 //      as strings here (each key equals its name): referring to the constants would raise their per-engine warnings
 //      (`CYL_PAG_REQUIRED` …) in Swift, where they cannot be silenced. The constants, `CYLAnimationTypeIsAvailable()` and
-//      `CYLAnimationWarnMissingEngine()` stay in CYLAnimationKeys.m: they need the `__has_include` engine switches.
-// [CN] 动画 key（CYLAnimationKeys.h）的查找，自第 122 步（第 ③ 阶段 J 组）起为 Swift。属于 CYLAnimatedItem 组件（其 pod、Xcode target、
+//      `CYLAnimationWarnMissingEngine()` stay in cylAnimationKeys.m: they need the `__has_include` engine switches.
+// [CN] 动画 key（cylAnimationKeys.h）的查找，自第 122 步（第 ③ 阶段 J 组）起为 Swift。属于 CYLAnimatedItem 组件（其 pod、Xcode target、
 //      SwiftPM target `CYLAnimatedItemSwift`），不属于 CYLTabBarController 的 CYLUtils，因此每个 C 符号只定义一次。这里以字符串写出 key（每个 key 等于其
 //      名称）：引用常量会在 Swift 中触发各引擎的警告（`CYL_PAG_REQUIRED` 等），且无法屏蔽。常量、`CYLAnimationTypeIsAvailable()` 与
-//      `CYLAnimationWarnMissingEngine()` 留在 CYLAnimationKeys.m：它们需要 `__has_include` 引擎开关。
+//      `CYLAnimationWarnMissingEngine()` 留在 cylAnimationKeys.m：它们需要 `__has_include` 引擎开关。
 
 /// [EN] One animation type: its name, file extensions, subspec and the type-specific key of each generic key.
 /// [CN] 一种动画类型：名称、文件扩展名、子库以及每个通用 key 对应的类型专用 key。
@@ -28,26 +28,26 @@ private struct CYLAnimationTypeEntry {
 }
 
 /// [EN] The generic keys (`CYLTabBarAnimationURL` …), in the order of the table. [CN] 通用 key（`CYLTabBarAnimationURL` 等）。
-private let CYLAnimationGenericKeys = ["CYLTabBarAnimationURL", "CYLTabBarAnimationFilePath", "CYLTabBarAnimationSize",
+private let cylAnimationGenericKeys = ["CYLTabBarAnimationURL", "CYLTabBarAnimationFilePath", "CYLTabBarAnimationSize",
                                        "CYLTabBarAnimationDarkURL", "CYLTabBarAnimationDarkFilePath", "CYLTabBarAnimationDarkColors"]
 
 /// [EN] The type-specific keys of `prefix` ("Lottie" → `CYLTabBarLottieURL` …); `darkColors` says whether it has one.
 /// [CN] `prefix` 的类型专用 key（"Lottie" → `CYLTabBarLottieURL` 等）；`darkColors` 表示是否有深色配色 key。
-private func CYLAnimationKeys(_ prefix: String, darkColors: Bool) -> [String: String] {
+private func cylAnimationKeys(_ prefix: String, darkColors: Bool) -> [String: String] {
     let suffixes = ["URL", "FilePath", "Size", "DarkURL", "DarkFilePath", "DarkColors"]
     var keys: [String: String] = [:]
-    for (generic, suffix) in zip(CYLAnimationGenericKeys, suffixes) where darkColors || suffix != "DarkColors" {
+    for (generic, suffix) in zip(cylAnimationGenericKeys, suffixes) where darkColors || suffix != "DarkColors" {
         keys[generic] = "CYLTabBar\(prefix)\(suffix)"
     }
     return keys
 }
 
-private let CYLAnimationTypeTable: [CYLAnimationTypeEntry] = [
-    CYLAnimationTypeEntry(type: "Lottie", extensions: ["json", "lottie"], pod: "LottieSwift", keys: CYLAnimationKeys("Lottie", darkColors: true)),
-    CYLAnimationTypeEntry(type: "PAG", extensions: ["pag"], pod: "PAG", keys: CYLAnimationKeys("PAG", darkColors: false)),
-    CYLAnimationTypeEntry(type: "Rive", extensions: ["riv"], pod: "Rive", keys: CYLAnimationKeys("Rive", darkColors: true)),
-    CYLAnimationTypeEntry(type: "SVGA", extensions: ["svga"], pod: "SVGA", keys: CYLAnimationKeys("SVGA", darkColors: false)),
-    CYLAnimationTypeEntry(type: "GIF", extensions: ["gif"], pod: "GIF", keys: CYLAnimationKeys("GIF", darkColors: false)),
+private let cylAnimationTypeTable: [CYLAnimationTypeEntry] = [
+    CYLAnimationTypeEntry(type: "Lottie", extensions: ["json", "lottie"], pod: "LottieSwift", keys: cylAnimationKeys("Lottie", darkColors: true)),
+    CYLAnimationTypeEntry(type: "PAG", extensions: ["pag"], pod: "PAG", keys: cylAnimationKeys("PAG", darkColors: false)),
+    CYLAnimationTypeEntry(type: "Rive", extensions: ["riv"], pod: "Rive", keys: cylAnimationKeys("Rive", darkColors: true)),
+    CYLAnimationTypeEntry(type: "SVGA", extensions: ["svga"], pod: "SVGA", keys: cylAnimationKeys("SVGA", darkColors: false)),
+    CYLAnimationTypeEntry(type: "GIF", extensions: ["gif"], pod: "GIF", keys: cylAnimationKeys("GIF", darkColors: false)),
 ]
 
 /**
@@ -60,7 +60,7 @@ public func CYLAnimationAttributesValueEntryPoint(_ attributes: NSDictionary?, _
     if let value = attributes[genericKey] {
         return value
     }
-    for entry in CYLAnimationTypeTable {
+    for entry in cylAnimationTypeTable {
         if let key = entry.keys[genericKey as String], let value = attributes[key] {
             return value
         }
@@ -75,13 +75,13 @@ public func CYLAnimationAttributesValueEntryPoint(_ attributes: NSDictionary?, _
 @_cdecl("CYLAnimationTypeOfFile")
 public func CYLAnimationTypeOfFileEntryPoint(_ attributes: NSDictionary?, _ fileURL: NSURL?) -> NSString? {
     if let attributes {
-        for entry in CYLAnimationTypeTable where entry.keys.values.contains(where: { attributes[$0] != nil }) {
+        for entry in cylAnimationTypeTable where entry.keys.values.contains(where: { attributes[$0] != nil }) {
             return entry.type as NSString
         }
     }
     let fileExtension = (fileURL?.path as NSString?)?.pathExtension.lowercased() ?? ""
     guard !fileExtension.isEmpty else { return nil }
-    return CYLAnimationTypeTable.first { $0.extensions.contains(fileExtension) }?.type as NSString?
+    return cylAnimationTypeTable.first { $0.extensions.contains(fileExtension) }?.type as NSString?
 }
 
 /**
@@ -89,7 +89,7 @@ public func CYLAnimationTypeOfFileEntryPoint(_ attributes: NSDictionary?, _ file
  */
 @_cdecl("CYLAnimationKnownTypes")
 public func CYLAnimationKnownTypesEntryPoint() -> NSArray {
-    CYLAnimationTypeTable.map { $0.type } as NSArray
+    cylAnimationTypeTable.map { $0.type } as NSArray
 }
 
 /**
@@ -98,7 +98,7 @@ public func CYLAnimationKnownTypesEntryPoint() -> NSArray {
 @_cdecl("CYLAnimationSubspecOfType")
 public func CYLAnimationSubspecOfTypeEntryPoint(_ type: NSString?) -> NSString? {
     guard let type, type.length > 0 else { return nil }
-    return CYLAnimationTypeTable.first { $0.type == type as String }?.pod as NSString?
+    return cylAnimationTypeTable.first { $0.type == type as String }?.pod as NSString?
 }
 
 /**
@@ -107,5 +107,5 @@ public func CYLAnimationSubspecOfTypeEntryPoint(_ type: NSString?) -> NSString? 
 @_cdecl("CYLAnimationFileExtensionsOfType")
 public func CYLAnimationFileExtensionsOfTypeEntryPoint(_ type: NSString?) -> NSArray {
     guard let type, type.length > 0 else { return [] as NSArray }
-    return (CYLAnimationTypeTable.first { $0.type == type as String }?.extensions ?? []) as NSArray
+    return (cylAnimationTypeTable.first { $0.type == type as String }?.extensions ?? []) as NSArray
 }

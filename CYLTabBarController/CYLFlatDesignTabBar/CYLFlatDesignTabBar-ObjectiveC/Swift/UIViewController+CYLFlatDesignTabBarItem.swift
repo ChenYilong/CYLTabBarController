@@ -15,11 +15,11 @@ import UIKit
  */
 extension UIViewController {
 
-    private static let cyl_flatDesignTabBarItemKey = CYLUtilsKeys.key("cyl_tabBarItem")
+    private static let cylFlatDesignTabBarItemKey = CYLUtilsKeys.key("cyl_tabBarItem")
 
-    private func cyl_storeFlatDesignTabBarItem(_ item: CYLFlatDesignTabBarItem?) {
-        objc_setAssociatedObject(self, Self.cyl_flatDesignTabBarItemKey, item, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
-        objc_setAssociatedObject(cyl_getViewControllerInsteadOfNavigation(), Self.cyl_flatDesignTabBarItemKey, item,
+    private func cylStoreFlatDesignTabBarItem(_ item: CYLFlatDesignTabBarItem?) {
+        objc_setAssociatedObject(self, Self.cylFlatDesignTabBarItemKey, item, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+        objc_setAssociatedObject(cyl_getViewControllerInsteadOfNavigation(), Self.cylFlatDesignTabBarItemKey, item,
                                  .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
     }
 
@@ -31,18 +31,18 @@ extension UIViewController {
     @objc(cyl_tabBarItem)
     public var cyl_tabBarItem: CYLFlatDesignTabBarItem! {
         @objc(cyl_tabBarItem) get {
-            if let item = objc_getAssociatedObject(self, Self.cyl_flatDesignTabBarItemKey) as? CYLFlatDesignTabBarItem {
+            if let item = objc_getAssociatedObject(self, Self.cylFlatDesignTabBarItemKey) as? CYLFlatDesignTabBarItem {
                 return item
             }
-            let item = cyl_makeFlatDesignTabBarItem()
-            cyl_storeFlatDesignTabBarItem(item)
+            let item = cylMakeFlatDesignTabBarItem()
+            cylStoreFlatDesignTabBarItem(item)
             return item
         }
         @objc(cyl_setTabBarItem:) set {
             let item = newValue ?? CYLFlatDesignTabBarItem(title: title, image: nil)
             // [EN] Note: `-[CYLFlatDesignTabBarButton setTabBarItem:]` must run before this, or the item has no button yet.
             // [CN] 注意：`-[CYLFlatDesignTabBarButton setTabBarItem:]` 需要在此之前调用，否则 item 还没有按钮。
-            let contentItem = objc_getAssociatedObject(cyl_getViewControllerInsteadOfNavigation(), Self.cyl_flatDesignTabBarItemKey)
+            let contentItem = objc_getAssociatedObject(cyl_getViewControllerInsteadOfNavigation(), Self.cylFlatDesignTabBarItemKey)
                 as? CYLFlatDesignTabBarItem
             let oldItem: CYLFlatDesignTabBarItem = contentItem ?? cyl_tabBarItem
             // [EN] PATCH(aifirx): the item is bound to the page even when the (weak) tab bar controller is gone, else the
@@ -55,7 +55,7 @@ extension UIViewController {
                     cyl_tabButton = button
                 }
             }
-            cyl_storeFlatDesignTabBarItem(item)
+            cylStoreFlatDesignTabBarItem(item)
         }
     }
 
@@ -66,7 +66,7 @@ extension UIViewController {
      * [CN] FIX：扁平样式的「More」Tab 没有图标：现在取自 UIKit 的 `tabBarItem`，没有 `image` 的系统「More」item（由 UIKit 绘制）使用
      *      "ellipsis"。没有标题（例如 PlusButton 下方的位置）时保持为空，VoiceOver 不会读出内容。
      */
-    private func cyl_makeFlatDesignTabBarItem() -> CYLFlatDesignTabBarItem {
+    private func cylMakeFlatDesignTabBarItem() -> CYLFlatDesignTabBarItem {
         let systemItem = tabBarItem
         // [EN] An animated tab image: the system item shows its first frame and keeps the animated image under a selector key
         //      (`CYLTabBarController.m`); the FlatDesign button takes the animated one, rests on its first frame and plays it.

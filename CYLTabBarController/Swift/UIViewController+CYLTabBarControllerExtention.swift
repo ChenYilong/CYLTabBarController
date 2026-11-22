@@ -169,7 +169,7 @@ extension UIViewController {
                     return stored
                 }
             }
-            return cyl_lookUpTabButton()
+            return cylLookUpTabButton()
         }
         @objc(cyl_setTabButton:) set {
             objc_setAssociatedObject(self, CYLViewControllerTabBarKeys.tabButton, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
@@ -288,11 +288,11 @@ extension UIViewController {
         let viewController = cyl_getViewControllerInsteadOfNavigation()
         guard let tabBarController = viewController.cyl_popSelectTabBarController,
               let viewControllers = tabBarController.viewControllers, index < viewControllers.count else {
-            cyl_logInvalidTabIndex()
+            cylLogInvalidTabIndex()
             return nil
         }
-        viewController.cyl_deselectPlusButtonIfNeeded(in: tabBarController, forIndex: Int(index))
-        let navigationController = viewController.cyl_popSelectNavigationController(in: tabBarController)
+        viewController.cylDeselectPlusButtonIfNeeded(in: tabBarController, forIndex: Int(index))
+        let navigationController = viewController.cylPopSelectNavigationController(in: tabBarController)
         tabBarController.selectedIndex = Int(index)
         navigationController?.popToRootViewController(animated: animated)
         navigationController?.view.setNeedsLayout()
@@ -311,7 +311,7 @@ extension UIViewController {
     public func cyl_popSelectTabBarChildViewController(at index: UInt,
                                                         completion: CYLPopSelectCompletion?) {
         let selected = cyl_popSelectTabBarChildViewController(at: index)
-        cyl_callOnMainQueue(completion, with: selected)
+        cylCallOnMainQueue(completion, with: selected)
     }
 
     /**
@@ -323,7 +323,7 @@ extension UIViewController {
     public func cyl_popSelectTabBarChildViewController(forClassType classType: AnyClass) -> UIViewController? {
         let viewControllers = cyl_getViewControllerInsteadOfNavigation().cyl_popSelectTabBarController?.viewControllers ?? []
         guard let index = viewControllers.firstIndex(where: { $0.cyl_getViewControllerInsteadOfNavigation().isKind(of: classType) }) else {
-            cyl_logInvalidTabIndex()
+            cylLogInvalidTabIndex()
             return nil
         }
         return cyl_popSelectTabBarChildViewController(at: UInt(index))
@@ -337,7 +337,7 @@ extension UIViewController {
     public func cyl_popSelectTabBarChildViewController(forClassType classType: AnyClass,
                                                         completion: CYLPopSelectCompletion?) {
         let selected = cyl_popSelectTabBarChildViewController(forClassType: classType)
-        cyl_callOnMainQueue(completion, with: selected)
+        cylCallOnMainQueue(completion, with: selected)
     }
 
     /**
@@ -377,7 +377,7 @@ extension UIViewController {
     public func cyl_popSelectTabBarChildViewController(forTabBarItemIdentifier identifier: String,
                                                         completion: CYLPopSelectCompletion?) {
         let selected = cyl_popSelectTabBarChildViewController(forTabBarItemIdentifier: identifier)
-        cyl_callOnMainQueue(completion, with: selected)
+        cylCallOnMainQueue(completion, with: selected)
     }
 
     // MARK: Pushing or popping to a page
@@ -464,7 +464,7 @@ extension UIViewController {
      * [CN] `cyl_popSelect…` 要 pop 的导航栈：`self` 所在的那个，且必须在 `tabBarController` 之内（pop 外层导航栈会移除整个 TabBarController）；
      *      否则为当前选中 Tab 的导航栈。需要在切换 Tab 之前调用。
      */
-    private func cyl_popSelectNavigationController(in tabBarController: CYLTabBarController) -> UINavigationController? {
+    private func cylPopSelectNavigationController(in tabBarController: CYLTabBarController) -> UINavigationController? {
         if let navigationController, navigationController !== tabBarController.navigationController {
             return navigationController
         }
@@ -475,7 +475,7 @@ extension UIViewController {
      * [EN] Deselects the plus button when another tab than the plus child view controller's is selected.
      * [CN] 选中的不是 PlusButton 子控制器所在的 Tab 时，取消 PlusButton 的选中状态。
      */
-    private func cyl_deselectPlusButtonIfNeeded(in tabBarController: CYLTabBarController, forIndex index: Int) {
+    private func cylDeselectPlusButtonIfNeeded(in tabBarController: CYLTabBarController, forIndex index: Int) {
         guard let plusChildViewController = CYLPlusButton.plusChildViewController(forOwner: tabBarController),
               let viewControllers = tabBarController.viewControllers, index < viewControllers.count else {
             return
@@ -486,7 +486,7 @@ extension UIViewController {
         }
     }
 
-    private func cyl_logInvalidTabIndex() {
+    private func cylLogInvalidTabIndex() {
 #if DEBUG
         let reason = "The class type, index or navigation controller passed to `-cyl_popSelectTabBarChildViewController…` "
             + "is not a tab of the CYLTabBarController."
@@ -495,7 +495,7 @@ extension UIViewController {
 #endif
     }
 
-    private func cyl_callOnMainQueue(_ completion: CYLPopSelectCompletion?, with selected: UIViewController?) {
+    private func cylCallOnMainQueue(_ completion: CYLPopSelectCompletion?, with selected: UIViewController?) {
         DispatchQueue.main.async {
             completion?(selected)
         }
@@ -521,7 +521,7 @@ extension UIViewController {
             let navigationController = selected?.navigationController ?? currentNavigationController
             navigationController?.pushViewController(viewController, animated: animated)
         }
-        let sameClassViewControllers = cyl_otherViewControllersInStack(ofClassOf: viewController)
+        let sameClassViewControllers = cylOtherViewControllersInStack(ofClassOf: viewController)
         let completionHandler: CYLPushOrPopHandler = { shouldPop, viewControllerPopTo, shouldPopSelect, index in
             DispatchQueue.main.async {
                 // [EN] `-popToViewController:animated:` raises for a page that is not in the stack: push then.
@@ -549,7 +549,7 @@ extension UIViewController {
      * [EN] The pages of the current stack, other than this page, that are of `viewController`'s class.
      * [CN] 当前导航栈中除本页面以外、与 `viewController` 同类的页面。
      */
-    private func cyl_otherViewControllersInStack(ofClassOf viewController: UIViewController) -> [UIViewController] {
+    private func cylOtherViewControllersInStack(ofClassOf viewController: UIViewController) -> [UIViewController] {
         let contentViewController = cyl_getViewControllerInsteadOfNavigation()
         let stack = contentViewController.navigationController?.children ?? []
         guard stack.count >= 2 else { return [] }
@@ -561,7 +561,7 @@ extension UIViewController {
      *      the button of the page's (or its content page's) `tabBarItem`.
      * [CN] 查找 Tab 按钮：依次按 Tab 下标、占位页面对应的 PlusButton、扁平样式 item 的按钮、页面（或其内容页面）`tabBarItem` 的按钮。
      */
-    private func cyl_lookUpTabButton() -> UIControl? {
+    private func cylLookUpTabButton() -> UIControl? {
         let tabIndex = cyl_tabIndex
         if tabIndex != NSNotFound, let items = cyl_tabBarController?.tabBar.items, tabIndex < items.count,
            let control = items[tabIndex].cyl_tabButton {
@@ -670,15 +670,15 @@ extension UIViewController {
         cyl_getViewControllerInsteadOfNavigation().cyl_getActualBadgeSuperView() as? NSObject
     }
 
-    private func cyl_forwardToBadgeHost(_ selectorName: String, _ object: Any? = nil) {
+    private func cylForwardToBadgeHost(_ selectorName: String, _ object: Any? = nil) {
         cyl_badgeHost?.perform(NSSelectorFromString(selectorName), with: object)
     }
 
-    private func cyl_badgeHostNumber(_ selectorName: String) -> NSNumber? {
+    private func cylBadgeHostNumber(_ selectorName: String) -> NSNumber? {
         CYLFlatDesignLookup.object(cyl_badgeHost, selectorName) as? NSNumber
     }
 
-    private func cyl_badgeHostValue(_ selectorName: String) -> NSValue? {
+    private func cylBadgeHostValue(_ selectorName: String) -> NSValue? {
         CYLFlatDesignLookup.object(cyl_badgeHost, selectorName) as? NSValue
     }
 
@@ -688,7 +688,7 @@ extension UIViewController {
      * [CN] VoiceOver 根据 `UITabBarItem` 朗读 Tab（液态玻璃据此生成无障碍元素），而不是角标所在的按钮，因此角标也写入该 item 的
      *      `accessibilityValue`；传 nil 清除。
      */
-    private func cyl_setBadgeAccessibilityValue(_ value: String?) {
+    private func cylSetBadgeAccessibilityValue(_ value: String?) {
         let tabViewController: UIViewController = navigationController?.viewControllers.first === self ? navigationController ?? self : self
         tabViewController.tabBarItem.accessibilityValue = cylBadgeAccessibilityDescriptionEntryPoint(value as NSString?) as String?
     }
@@ -704,7 +704,7 @@ extension UIViewController {
             return nil
         }
         let viewController = cyl_getViewControllerInsteadOfNavigation()
-        if let flatDesignHost = cyl_flatDesignBadgeHost(of: viewController) {
+        if let flatDesignHost = cylFlatDesignBadgeHost(of: viewController) {
             return flatDesignHost
         }
         let control = viewController.tabBarItem.cyl_tabButton
@@ -726,7 +726,7 @@ extension UIViewController {
      * [CN] 扁平样式绘制自己的按钮：即使 item 仍有系统 Tab 按钮（不在屏幕上，例如不在导航控制器中的 React Native 或 Flutter 宿主页面），
      *      角标也由扁平按钮承载。
      */
-    private func cyl_flatDesignBadgeHost(of viewController: UIViewController) -> Any? {
+    private func cylFlatDesignBadgeHost(of viewController: UIViewController) -> Any? {
         let tabBarController = CYLFlatDesignLookup.object(viewController, "cylflatdesign_tabBarController") as? CYLTabBarController
         guard CYLFlatDesignLookup.isKind(tabBarController?.cyl_tabBar, CYLFlatDesignLookup.tabBarClass) else {
             return nil
@@ -769,14 +769,14 @@ extension UIViewController {
      */
     @objc(cyl_showBadge)
     public func cyl_showBadge() {
-        cyl_forwardToBadgeHost("cyl_showBadge")
-        cyl_setBadgeAccessibilityValue("")
+        cylForwardToBadgeHost("cyl_showBadge")
+        cylSetBadgeAccessibilityValue("")
     }
 
     @objc(cyl_showBadgeValue:animationTypeValue:)
     func cyl_showBadgeValue(_ value: String, animationTypeValue: NSNumber) {
         cyl_badgeHost?.perform(NSSelectorFromString("cyl_showBadgeValue:animationTypeValue:"), with: value, with: animationTypeValue)
-        cyl_setBadgeAccessibilityValue(value)
+        cylSetBadgeAccessibilityValue(value)
     }
 
     @objc(cyl_showBadgeValue:animationType:)
@@ -786,13 +786,13 @@ extension UIViewController {
 
     @objc(cyl_clearBadge)
     public func cyl_clearBadge() {
-        cyl_forwardToBadgeHost("cyl_clearBadge")
-        cyl_setBadgeAccessibilityValue(nil)
+        cylForwardToBadgeHost("cyl_clearBadge")
+        cylSetBadgeAccessibilityValue(nil)
     }
 
     @objc(cyl_resumeBadge)
     public func cyl_resumeBadge() {
-        cyl_forwardToBadgeHost("cyl_resumeBadge")
+        cylForwardToBadgeHost("cyl_resumeBadge")
     }
 
     @objc(cyl_isShowBadge)
@@ -814,34 +814,34 @@ extension UIViewController {
             let host = cyl_badgeHost
             return (host as? UIView)?.cyl_badge ?? (host as? UITabBarItem)?.cyl_badge
         }
-        @objc(cyl_setBadge:) set { cyl_forwardToBadgeHost("cyl_setBadge:", newValue) }
+        @objc(cyl_setBadge:) set { cylForwardToBadgeHost("cyl_setBadge:", newValue) }
     }
 
     @objc(cyl_badgeFont)
     public var cyl_badgeFont: UIFont! {
         @objc(cyl_badgeFont) get { CYLFlatDesignLookup.object(cyl_badgeHost, "cyl_badgeFont") as? UIFont }
-        @objc(cyl_setBadgeFont:) set { cyl_forwardToBadgeHost("cyl_setBadgeFont:", newValue) }
+        @objc(cyl_setBadgeFont:) set { cylForwardToBadgeHost("cyl_setBadgeFont:", newValue) }
     }
 
     @objc(cyl_badgeBackgroundColor)
     public var cyl_badgeBackgroundColor: UIColor! {
         @objc(cyl_badgeBackgroundColor) get { CYLFlatDesignLookup.object(cyl_badgeHost, "cyl_badgeBackgroundColor") as? UIColor }
-        @objc(cyl_setBadgeBackgroundColor:) set { cyl_forwardToBadgeHost("cyl_setBadgeBackgroundColor:", newValue) }
+        @objc(cyl_setBadgeBackgroundColor:) set { cylForwardToBadgeHost("cyl_setBadgeBackgroundColor:", newValue) }
     }
 
     @objc(cyl_badgeTextColor)
     public var cyl_badgeTextColor: UIColor! {
         @objc(cyl_badgeTextColor) get { CYLFlatDesignLookup.object(cyl_badgeHost, "cyl_badgeTextColor") as? UIColor }
-        @objc(cyl_setBadgeTextColor:) set { cyl_forwardToBadgeHost("cyl_setBadgeTextColor:", newValue) }
+        @objc(cyl_setBadgeTextColor:) set { cylForwardToBadgeHost("cyl_setBadgeTextColor:", newValue) }
     }
 
     @objc(cyl_badgeAnimationType)
     public var cyl_badgeAnimationType: CYLBadgeAnimationType {
         @objc(cyl_badgeAnimationType) get {
-            CYLBadgeAnimationType(rawValue: cyl_badgeHostNumber("cyl_badgeAnimationTypeValue")?.uintValue ?? 0) ?? .none
+            CYLBadgeAnimationType(rawValue: cylBadgeHostNumber("cyl_badgeAnimationTypeValue")?.uintValue ?? 0) ?? .none
         }
         @objc(cyl_setBadgeAnimationType:) set {
-            cyl_forwardToBadgeHost("cyl_setBadgeAnimationTypeValue:", NSNumber(value: newValue.rawValue))
+            cylForwardToBadgeHost("cyl_setBadgeAnimationTypeValue:", NSNumber(value: newValue.rawValue))
         }
     }
 
@@ -855,8 +855,8 @@ extension UIViewController {
 
     @objc(cyl_badgeFrame)
     public var cyl_badgeFrame: CGRect {
-        @objc(cyl_badgeFrame) get { cyl_badgeHostValue("cyl_badgeFrameValue")?.cgRectValue ?? .zero }
-        @objc(cyl_setBadgeFrame:) set { cyl_forwardToBadgeHost("cyl_setBadgeFrameValue:", NSValue(cgRect: newValue)) }
+        @objc(cyl_badgeFrame) get { cylBadgeHostValue("cyl_badgeFrameValue")?.cgRectValue ?? .zero }
+        @objc(cyl_setBadgeFrame:) set { cylForwardToBadgeHost("cyl_setBadgeFrameValue:", NSValue(cgRect: newValue)) }
     }
 
     @objc(cyl_badgeFrameValue)
@@ -867,9 +867,9 @@ extension UIViewController {
 
     @objc(cyl_badgeCenterOffset)
     public var cyl_badgeCenterOffset: CGPoint {
-        @objc(cyl_badgeCenterOffset) get { cyl_badgeHostValue("cyl_badgeCenterOffsetValue")?.cgPointValue ?? .zero }
+        @objc(cyl_badgeCenterOffset) get { cylBadgeHostValue("cyl_badgeCenterOffsetValue")?.cgPointValue ?? .zero }
         @objc(cyl_setBadgeCenterOffset:) set {
-            cyl_forwardToBadgeHost("cyl_setBadgeCenterOffsetValue:", NSValue(cgPoint: newValue))
+            cylForwardToBadgeHost("cyl_setBadgeCenterOffsetValue:", NSValue(cgPoint: newValue))
         }
     }
 
@@ -881,9 +881,9 @@ extension UIViewController {
 
     @objc(cyl_badgeMaximumBadgeNumber)
     public var cyl_badgeMaximumBadgeNumber: Int {
-        @objc(cyl_badgeMaximumBadgeNumber) get { cyl_badgeHostNumber("cyl_badgeMaximumBadgeNumberValue")?.intValue ?? 0 }
+        @objc(cyl_badgeMaximumBadgeNumber) get { cylBadgeHostNumber("cyl_badgeMaximumBadgeNumberValue")?.intValue ?? 0 }
         @objc(cyl_setBadgeMaximumBadgeNumber:) set {
-            cyl_forwardToBadgeHost("cyl_setBadgeMaximumBadgeNumberValue:", NSNumber(value: newValue))
+            cylForwardToBadgeHost("cyl_setBadgeMaximumBadgeNumberValue:", NSNumber(value: newValue))
         }
     }
 
@@ -895,8 +895,8 @@ extension UIViewController {
 
     @objc(cyl_badgeMargin)
     public var cyl_badgeMargin: CGFloat {
-        @objc(cyl_badgeMargin) get { CGFloat(cyl_badgeHostNumber("cyl_badgeMarginValue")?.doubleValue ?? 0) }
-        @objc(cyl_setBadgeMargin:) set { cyl_forwardToBadgeHost("cyl_setBadgeMarginValue:", NSNumber(value: Double(newValue))) }
+        @objc(cyl_badgeMargin) get { CGFloat(cylBadgeHostNumber("cyl_badgeMarginValue")?.doubleValue ?? 0) }
+        @objc(cyl_setBadgeMargin:) set { cylForwardToBadgeHost("cyl_setBadgeMarginValue:", NSNumber(value: Double(newValue))) }
     }
 
     @objc(cyl_badgeMarginValue)
@@ -907,8 +907,8 @@ extension UIViewController {
 
     @objc(cyl_badgeRadius)
     public var cyl_badgeRadius: CGFloat {
-        @objc(cyl_badgeRadius) get { CGFloat(cyl_badgeHostNumber("cyl_badgeRadiusValue")?.doubleValue ?? 0) }
-        @objc(cyl_setBadgeRadius:) set { cyl_forwardToBadgeHost("cyl_setBadgeRadiusValue:", NSNumber(value: Double(newValue))) }
+        @objc(cyl_badgeRadius) get { CGFloat(cylBadgeHostNumber("cyl_badgeRadiusValue")?.doubleValue ?? 0) }
+        @objc(cyl_setBadgeRadius:) set { cylForwardToBadgeHost("cyl_setBadgeRadiusValue:", NSNumber(value: Double(newValue))) }
     }
 
     @objc(cyl_badgeRadiusValue)
@@ -919,9 +919,9 @@ extension UIViewController {
 
     @objc(cyl_badgeCornerRadius)
     public var cyl_badgeCornerRadius: CGFloat {
-        @objc(cyl_badgeCornerRadius) get { CGFloat(cyl_badgeHostNumber("cyl_badgeCornerRadiusValue")?.doubleValue ?? 0) }
+        @objc(cyl_badgeCornerRadius) get { CGFloat(cylBadgeHostNumber("cyl_badgeCornerRadiusValue")?.doubleValue ?? 0) }
         @objc(cyl_setBadgeCornerRadius:) set {
-            cyl_forwardToBadgeHost("cyl_setBadgeCornerRadiusValue:", NSNumber(value: Double(newValue)))
+            cylForwardToBadgeHost("cyl_setBadgeCornerRadiusValue:", NSNumber(value: Double(newValue)))
         }
     }
 
@@ -937,9 +937,9 @@ extension UIViewController {
      */
     @objc(cyl_delayIfNeededForSeconds)
     public var cyl_delayIfNeededForSeconds: CGFloat {
-        @objc(cyl_delayIfNeededForSeconds) get { CGFloat(cyl_badgeHostNumber("cyl_delayIfNeededForSecondsValue")?.doubleValue ?? 0) }
+        @objc(cyl_delayIfNeededForSeconds) get { CGFloat(cylBadgeHostNumber("cyl_delayIfNeededForSecondsValue")?.doubleValue ?? 0) }
         @objc(cyl_setDelayIfNeededForSeconds:) set {
-            cyl_forwardToBadgeHost("cyl_setDelayIfNeededForSecondsValue:", NSNumber(value: Double(newValue)))
+            cylForwardToBadgeHost("cyl_setDelayIfNeededForSecondsValue:", NSNumber(value: Double(newValue)))
         }
     }
 

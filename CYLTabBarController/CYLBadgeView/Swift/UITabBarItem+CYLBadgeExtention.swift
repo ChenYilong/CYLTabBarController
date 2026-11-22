@@ -89,7 +89,7 @@ extension UITabBarItem {
     }
 
     @objc(cyl_setBadgeValue:)
-    dynamic func cyl_setBadgeValue(_ badgeValue: String) {
+    dynamic func cylSetBadgeValue(_ badgeValue: String) {
         // [EN] No longer required (the deprecated system badge point), kept for apps that still add one.
         // [CN] 已不再必需（废弃的系统角标点），为仍在添加它的 App 保留。
         let removeSelector = NSSelectorFromString("cyl_removeTabBadgePoint")

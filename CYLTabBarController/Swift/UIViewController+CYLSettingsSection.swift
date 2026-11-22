@@ -90,13 +90,13 @@ extension UIViewController {
      */
     @objc(cyl_settingsCellForTableView:atIndexPath:)
     public func cyl_settingsCell(for tableView: UITableView, at indexPath: IndexPath) -> UITableViewCell {
-        let cell = cyl_settingsRowCell(for: tableView, row: indexPath.row)
+        let cell = cylSettingsRowCell(for: tableView, row: indexPath.row)
         cell.cyl_wrapsTextLabels()
         return cell
     }
 
     // swiftlint:disable:next cyclomatic_complexity
-    private func cyl_settingsRowCell(for tableView: UITableView, row: Int) -> UITableViewCell {
+    private func cylSettingsRowCell(for tableView: UITableView, row: Int) -> UITableViewCell {
         let tabBarController = cyl_settingsTabBarController
         let updateStart = cyl_settingsTabBarItemUpdateStart
         if row >= updateStart {
@@ -138,7 +138,7 @@ extension UIViewController {
     /**
      * [EN] The rows each group places, in display order. [CN] 每个分组放置的行，按显示顺序。
      */
-    private func cyl_placedSettingsRows(in group: CYLSettingsGroup) -> [Int] {
+    private func cylPlacedSettingsRows(in group: CYLSettingsGroup) -> [Int] {
         let update = cyl_settingsTabBarItemUpdateStart
         func rows(_ rows: CYLSettingsRow...) -> [Int] { rows.map(\.rawValue) }
         func updates(_ rows: CYLTabBarItemUpdateRow...) -> [Int] { rows.map { update + $0.rawValue } }
@@ -197,9 +197,9 @@ extension UIViewController {
     @objc(cyl_settingsRowsInGroup:)
     public func cyl_settingsRows(in group: CYLSettingsGroup) -> [NSNumber] {
         let rowCount = cyl_settingsRowCount()
-        var rows = cyl_placedSettingsRows(in: group).filter { $0 < rowCount }
+        var rows = cylPlacedSettingsRows(in: group).filter { $0 < rowCount }
         if group == .general {
-            let placed = Set(CYLSettingsGroup.allCases.flatMap(cyl_placedSettingsRows(in:)))
+            let placed = Set(CYLSettingsGroup.allCases.flatMap(cylPlacedSettingsRows(in:)))
             rows += (0..<rowCount).filter { !placed.contains($0) }
         }
         return rows.map { NSNumber(value: $0) }
@@ -220,7 +220,7 @@ extension UIViewController {
      */
     @objc(cyl_didSelectSettingsRow:)
     public func cyl_didSelectSettingsRow(_ row: Int) {
-        cyl_runSettingsRow(at: IndexPath(row: row, section: Int(CYLSettingsSection)), in: nil)
+        cylRunSettingsRow(at: IndexPath(row: row, section: Int(CYLSettingsSection)), in: nil)
     }
 
     /**
@@ -228,11 +228,11 @@ extension UIViewController {
      */
     @objc(cyl_didSelectSettingsRowAtIndexPath:inTableView:)
     public func cyl_didSelectSettingsRow(at indexPath: IndexPath, in tableView: UITableView) {
-        cyl_runSettingsRow(at: indexPath, in: tableView)
+        cylRunSettingsRow(at: indexPath, in: tableView)
     }
 
     // swiftlint:disable:next cyclomatic_complexity function_body_length
-    private func cyl_runSettingsRow(at indexPath: IndexPath, in tableView: UITableView?) {
+    private func cylRunSettingsRow(at indexPath: IndexPath, in tableView: UITableView?) {
         tableView?.deselectRow(at: indexPath, animated: true)
         let tabBarController = cyl_settingsTabBarController
         let row = indexPath.row

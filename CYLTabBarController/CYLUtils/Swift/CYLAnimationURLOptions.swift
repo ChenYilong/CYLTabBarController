@@ -7,9 +7,9 @@
 
 import Foundation
 
-// [EN] `CYLTabBarAnimationURLWithOptions()` (declared in CYLAnimationKeys.h), moved from Core's
+// [EN] `CYLTabBarAnimationURLWithOptions()` (declared in cylAnimationKeys.h), moved from Core's
 //      UIControl+CYLTabBarItemAnimation.swift unchanged, so the animation subspecs (Rive) do not need Core.
-// [CN] `CYLTabBarAnimationURLWithOptions()`（声明于 CYLAnimationKeys.h），从 Core 的 UIControl+CYLTabBarItemAnimation.swift 原样移来，
+// [CN] `CYLTabBarAnimationURLWithOptions()`（声明于 cylAnimationKeys.h），从 Core 的 UIControl+CYLTabBarItemAnimation.swift 原样移来，
 //      使动画子库（Rive）不再需要 Core。
 @_cdecl("CYLTabBarAnimationURLWithOptions")
 public func cylTabBarAnimationURLWithOptionsEntryPoint(_ fileURL: NSURL?, _ options: NSDictionary?) -> NSURL? {

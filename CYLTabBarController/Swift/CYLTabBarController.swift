@@ -143,7 +143,7 @@ open class CYLTabBarController: UITabBarController, CYLTabBarControllerDelegate,
         @objc(setObservingTabImageViewDefaultOffset:) set { storedObservingTabImageViewDefaultOffset = newValue }
     }
     /// [EN] Backing flag of `automaticallyAdjustsImageOnlyTabs`, negated so that the default (false) means true (issues #257, #522). [CN] `automaticallyAdjustsImageOnlyTabs` 的存储标记，取反存储。
-    @objc var cyl_imageOnlyTabsAdjustmentDisabled = false
+    @objc(cyl_imageOnlyTabsAdjustmentDisabled) var imageOnlyTabsAdjustmentDisabled = false
     private var invokeOnceViewDidLayoutSubViewsBlockStorage = false
     /// [EN] The "once" mode the layout block was registered with in CYLDeallocBlockExecutor; nil before the first layout.
     /// [CN] 布局 block 在 CYLDeallocBlockExecutor 中注册时的“只执行一次”模式；首次布局前为 nil。
@@ -153,7 +153,7 @@ open class CYLTabBarController: UITabBarController, CYLTabBarControllerDelegate,
         @objc(shouldInvokeOnceViewDidLayoutSubViewsBlock) get { invokeOnceViewDidLayoutSubViewsBlockStorage }
         @objc(setInvokeOnceViewDidLayoutSubViewsBlock:) set { invokeOnceViewDidLayoutSubViewsBlockStorage = newValue }
     }
-    @objc(cyl_controlReportedInCurrentRunLoop) weak var cyl_controlReportedInCurrentRunLoop: UIControl?
+    @objc(cyl_controlReportedInCurrentRunLoop) weak var controlReportedInCurrentRunLoop: UIControl?
     private var storedTabBarItemAnimationViewAdded = false
     @objc(isTabBarItemAnimationViewAdded) var isTabBarItemAnimationViewAdded: Bool {
         @objc(isTabBarItemAnimationViewAdded) get { storedTabBarItemAnimationViewAdded }
@@ -167,7 +167,7 @@ open class CYLTabBarController: UITabBarController, CYLTabBarControllerDelegate,
 
     // FlatDesign state (always present; see the class comment)
     @objc var items: NSMutableArray = NSMutableArray()
-    @objc var cyl_tabBarHidden = false
+    @objc(cyl_tabBarHidden) var cylTabBarHidden = false
     @objc var cylDelegateHasWillShowTabBar = false
     @objc var cylDelegateHasDidShowTabBar = false
     @objc var cylDelegateHasWillHideTabBar = false

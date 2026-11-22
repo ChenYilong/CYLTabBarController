@@ -189,7 +189,7 @@ lint_external_podspecs() {
   [ -n "$CYL_DEALLOC_EXECUTOR_BRANCH" ] || return 0
   dir="$PWD/build/pod-lint-podspecs"
   mkdir -p "$dir"
-  curl -fsSL "https://raw.githubusercontent.com/ChenYilong/CYLDeallocBlockExecutor/$CYL_DEALLOC_EXECUTOR_BRANCH/CYLDeallocBlockExecutor.podspec" |
+  curl -fsSL --proto '=https' --tlsv1.2 "https://raw.githubusercontent.com/ChenYilong/CYLDeallocBlockExecutor/$CYL_DEALLOC_EXECUTOR_BRANCH/CYLDeallocBlockExecutor.podspec" |
     sed "s|:tag => s.version.to_s|:branch => \"$CYL_DEALLOC_EXECUTOR_BRANCH\"|" > "$dir/CYLDeallocBlockExecutor.podspec"
   grep -q ":branch =>" "$dir/CYLDeallocBlockExecutor.podspec" || { echo "error: could not pin CYLDeallocBlockExecutor to $CYL_DEALLOC_EXECUTOR_BRANCH" >&2; exit 1; }
   echo "--external-podspecs=$dir/CYLDeallocBlockExecutor.podspec"

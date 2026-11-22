@@ -112,11 +112,11 @@ extension UIViewController {
             cell.detailTextLabel?.textColor = .gray
             return cell
         }()
-        let (title, subtitle, symbolName) = Self.cyl_tabBarItemUpdateTexts(of: CYLTabBarItemUpdateRow(rawValue: row) ?? .allTitles)
+        let (title, subtitle, symbolName) = Self.cylTabBarItemUpdateTexts(of: CYLTabBarItemUpdateRow(rawValue: row) ?? .allTitles)
         cell.textLabel?.text = title
         cell.detailTextLabel?.text = subtitle
         cell.imageView?.image = UIImage(systemName: symbolName)
-        cell.accessoryType = cyl_isTabBarItemUpdateRowActive(row) ? .checkmark : .none
+        cell.accessoryType = cylIsTabBarItemUpdateRowActive(row) ? .checkmark : .none
         return cell
     }
 
@@ -131,26 +131,26 @@ extension UIViewController {
               let index = tabBarController.viewControllers?.firstIndex(of: tabViewController) else {
             return
         }
-        _ = cyl_initialTabBarItemsAttributes(of: tabBarController)
-        _ = cyl_initialPlusButtonAttributes(of: tabBarController)
+        _ = cylInitialTabBarItemsAttributes(of: tabBarController)
+        _ = cylInitialPlusButtonAttributes(of: tabBarController)
         let updateRow = CYLTabBarItemUpdateRow(rawValue: row) ?? .allTitles
         switch updateRow {
         case .title:
-            cyl_toggleTitle(of: tabViewController, in: tabBarController)
+            cylToggleTitle(of: tabViewController, in: tabBarController)
         case .iconView, .networkIcon, .GIFIcon:
-            cyl_toggleIconRow(updateRow, of: tabViewController, at: index, in: tabBarController)
+            cylToggleIconRow(updateRow, of: tabViewController, at: index, in: tabBarController)
         case .allNetworkIcons, .allLocalIcons:
-            cyl_toggleAllIconsRow(updateRow, in: tabBarController)
+            cylToggleAllIconsRow(updateRow, in: tabBarController)
         case .replaceNeighbors:
-            cyl_toggleReplacedNeighborsOfTab(at: index, in: tabBarController)
+            cylToggleReplacedNeighborsOfTab(at: index, in: tabBarController)
         case .allTitles, .count:
-            cyl_toggleAllTitles(in: tabBarController)
+            cylToggleAllTitles(in: tabBarController)
         }
     }
 
     // MARK: Rows
 
-    private static func cyl_tabBarItemUpdateTexts(of row: CYLTabBarItemUpdateRow) -> (String, String, String) {
+    private static func cylTabBarItemUpdateTexts(of row: CYLTabBarItemUpdateRow) -> (String, String, String) {
         switch row {
         case .title:
             return (CYLLocalizedString("更换 Tab 标题"), CYLLocalizedString("原地更换当前页 Tab 的标题，再点恢复"), "textformat")
@@ -175,22 +175,22 @@ extension UIViewController {
         }
     }
 
-    private func cyl_isTabBarItemUpdateRowActive(_ row: Int) -> Bool {
+    private func cylIsTabBarItemUpdateRowActive(_ row: Int) -> Bool {
         let tabViewController = cyl_tabBarItemUpdateTabViewController
         let tabBarController = cyl_tabBarItemUpdateTabBarController
         switch CYLTabBarItemUpdateRow(rawValue: row) ?? .allTitles {
         case .title:
-            return Self.cyl_flag(tabViewController, CYLTabBarItemUpdateKeys.titleUpdated)
+            return Self.cylFlag(tabViewController, CYLTabBarItemUpdateKeys.titleUpdated)
         case .iconView, .networkIcon, .GIFIcon:
             return (objc_getAssociatedObject(tabViewController, CYLTabBarItemUpdateKeys.activeIconRow) as? NSNumber)?.intValue == row
         case .allNetworkIcons:
-            return Self.cyl_flag(tabBarController, CYLTabBarItemUpdateKeys.allNetworkIcons)
+            return Self.cylFlag(tabBarController, CYLTabBarItemUpdateKeys.allNetworkIcons)
         case .allLocalIcons:
-            return Self.cyl_flag(tabBarController, CYLTabBarItemUpdateKeys.allLocalIcons)
+            return Self.cylFlag(tabBarController, CYLTabBarItemUpdateKeys.allLocalIcons)
         case .replaceNeighbors:
             return tabBarController.map { objc_getAssociatedObject($0, CYLTabBarItemUpdateKeys.replacedNeighbors) != nil } ?? false
         case .allTitles, .count:
-            return Self.cyl_flag(tabBarController, CYLTabBarItemUpdateKeys.allTitlesUpdated)
+            return Self.cylFlag(tabBarController, CYLTabBarItemUpdateKeys.allTitlesUpdated)
         }
     }
 
@@ -198,11 +198,11 @@ extension UIViewController {
      * [EN] The title: "Purchased courses"; tapped again, the title given at initialization.
      * [CN] 标题：“已购课程”；再次点击，恢复为初始化时的标题。
      */
-    private func cyl_toggleTitle(of tabViewController: UIViewController, in tabBarController: CYLTabBarController) {
-        let isUpdated = Self.cyl_flag(tabViewController, CYLTabBarItemUpdateKeys.titleUpdated)
-        let title = isUpdated ? cyl_initialTitle(of: tabViewController, in: tabBarController) : CYLLocalizedString("已购课程")
+    private func cylToggleTitle(of tabViewController: UIViewController, in tabBarController: CYLTabBarController) {
+        let isUpdated = Self.cylFlag(tabViewController, CYLTabBarItemUpdateKeys.titleUpdated)
+        let title = isUpdated ? cylInitialTitle(of: tabViewController, in: tabBarController) : CYLLocalizedString("已购课程")
         if tabBarController.updateTabBarItem(for: tabViewController, attributes: [CYLTabBarItemTitle: title ?? ""]) {
-            Self.cyl_setFlag(tabViewController, CYLTabBarItemUpdateKeys.titleUpdated, !isUpdated)
+            Self.cylSetFlag(tabViewController, CYLTabBarItemUpdateKeys.titleUpdated, !isUpdated)
         }
     }
 
@@ -210,11 +210,11 @@ extension UIViewController {
      * [EN] The icon of this row; the same row again, the icon given at initialization.
      * [CN] 该行的图标；再次点击同一行，恢复为初始化时的图标。
      */
-    private func cyl_toggleIconRow(_ row: CYLTabBarItemUpdateRow, of tabViewController: UIViewController, at index: Int,
+    private func cylToggleIconRow(_ row: CYLTabBarItemUpdateRow, of tabViewController: UIViewController, at index: Int,
                                    in tabBarController: CYLTabBarController) {
         let key = CYLTabBarItemUpdateKeys.activeIconRow
         if (objc_getAssociatedObject(tabViewController, key) as? NSNumber)?.intValue == row.rawValue {
-            cyl_restoreInitialIcon(of: tabViewController, at: index, in: tabBarController)
+            cylRestoreInitialIcon(of: tabViewController, at: index, in: tabBarController)
             objc_setAssociatedObject(tabViewController, key, nil, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
             return
         }
@@ -254,14 +254,14 @@ extension UIViewController {
      *      the titles given at initialization.
      * [CN] 所有 Tab 的标题加上星号（每个 Tab 一项，PlusButton 不占项），PlusButton 的标题也一样；再次点击，恢复为初始化时的标题。
      */
-    private func cyl_toggleAllTitles(in tabBarController: CYLTabBarController) {
-        let isUpdated = Self.cyl_flag(tabBarController, CYLTabBarItemUpdateKeys.allTitlesUpdated)
-        let attributes: [[String: Any]] = cyl_realTabs(of: tabBarController).map { _, viewController in
+    private func cylToggleAllTitles(in tabBarController: CYLTabBarController) {
+        let isUpdated = Self.cylFlag(tabBarController, CYLTabBarItemUpdateKeys.allTitlesUpdated)
+        let attributes: [[String: Any]] = cylRealTabs(of: tabBarController).map { _, viewController in
             let title: String?
             if isUpdated {
-                title = cyl_initialTitle(of: viewController, in: tabBarController)
+                title = cylInitialTitle(of: viewController, in: tabBarController)
                 // [EN] Every title is the initial one again, also the one of "Change tab title". [CN] 所有标题都已恢复。
-                Self.cyl_setFlag(viewController, CYLTabBarItemUpdateKeys.titleUpdated, false)
+                Self.cylSetFlag(viewController, CYLTabBarItemUpdateKeys.titleUpdated, false)
             } else {
                 title = "★ " + (cyl_title(of: viewController, in: tabBarController) ?? "")
             }
@@ -269,13 +269,13 @@ extension UIViewController {
         }
         tabBarController.updateTabBarItems(withAttributes: attributes)
         let plusTitle = CYLPlusButton(forOwner: tabBarController)?.cyl_title()
-        let initialPlusTitle = cyl_initialPlusButtonAttributes(of: tabBarController)[CYLTabBarItemTitle]
+        let initialPlusTitle = cylInitialPlusButtonAttributes(of: tabBarController)[CYLTabBarItemTitle]
         if isUpdated, let initialPlusTitle {
             tabBarController.updatePlusButton(attributes: [CYLTabBarItemTitle: initialPlusTitle])
         } else if !isUpdated, let plusTitle {
             tabBarController.updatePlusButton(attributes: [CYLTabBarItemTitle: "★ " + plusTitle])
         }
-        Self.cyl_setFlag(tabBarController, CYLTabBarItemUpdateKeys.allTitlesUpdated, !isUpdated)
+        Self.cylSetFlag(tabBarController, CYLTabBarItemUpdateKeys.allTitlesUpdated, !isUpdated)
     }
 
     /**
@@ -285,7 +285,7 @@ extension UIViewController {
      * [CN] 每个 Tab 的图标，按顺序（超过 4 个时循环），先未选中后选中：来自网络，或来自本地，每个 Tab 一种来源（图片名、文件路径、`UIImage`、
      *      GIF 文件 URL）；缺少本地图片时改用系统符号。
      */
-    private func cyl_icons(ofAllIconsRow row: CYLTabBarItemUpdateRow) -> [[Any]] {
+    private func cylIcons(ofAllIconsRow row: CYLTabBarItemUpdateRow) -> [[Any]] {
         if row == .allNetworkIcons {
             let base = "https://cdn-icons-png.flaticon.com/512/"
             return [
@@ -321,16 +321,16 @@ extension UIViewController {
      * [CN] 用 `row` 的图标更新所有 Tab 的图标（`-setTabBarItemIcon:selectedIcon:size:atIndex:`），以背景图为图片的 PlusButton 以外也更新
      *      PlusButton；再次点击，恢复为初始化时的图标。两行同一时间只有一行生效。
      */
-    private func cyl_toggleAllIconsRow(_ row: CYLTabBarItemUpdateRow, in tabBarController: CYLTabBarController) {
+    private func cylToggleAllIconsRow(_ row: CYLTabBarItemUpdateRow, in tabBarController: CYLTabBarController) {
         let key = row == .allNetworkIcons ? CYLTabBarItemUpdateKeys.allNetworkIcons : CYLTabBarItemUpdateKeys.allLocalIcons
         let otherKey = row == .allNetworkIcons ? CYLTabBarItemUpdateKeys.allLocalIcons : CYLTabBarItemUpdateKeys.allNetworkIcons
-        let isActive = Self.cyl_flag(tabBarController, key)
-        let icons = cyl_icons(ofAllIconsRow: row)
-        for (tabIndex, (index, viewController)) in cyl_realTabs(of: tabBarController).enumerated() {
+        let isActive = Self.cylFlag(tabBarController, key)
+        let icons = cylIcons(ofAllIconsRow: row)
+        for (tabIndex, (index, viewController)) in cylRealTabs(of: tabBarController).enumerated() {
             // [EN] Replaces this tab's own icon row as well. [CN] 同时取代该 Tab 单独设置的图标行。
             objc_setAssociatedObject(viewController, CYLTabBarItemUpdateKeys.activeIconRow, nil, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
             if isActive {
-                cyl_restoreInitialIcon(of: viewController, at: index, in: tabBarController)
+                cylRestoreInitialIcon(of: viewController, at: index, in: tabBarController)
             } else {
                 let tabIcons = icons[tabIndex % icons.count]
                 tabBarController.setTabBarItemIcon(tabIcons[0], selectedIcon: tabIcons[1], size: CYLTabBarItemUpdateKeys.iconSize,
@@ -340,16 +340,16 @@ extension UIViewController {
         let plusButton = CYLPlusButton(forOwner: tabBarController)
         let drawsTitleOverBackgroundImage = (plusButton?.value(forKey: "cyl_drawsTitleOverBackgroundImage") as? Bool) ?? false
         if !drawsTitleOverBackgroundImage {
-            cyl_updatePlusButtonIcons(ofAllIconsRow: row, restoring: isActive, in: tabBarController)
+            cylUpdatePlusButtonIcons(ofAllIconsRow: row, restoring: isActive, in: tabBarController)
         }
-        Self.cyl_setFlag(tabBarController, key, !isActive)
-        Self.cyl_setFlag(tabBarController, otherKey, false)
+        Self.cylSetFlag(tabBarController, key, !isActive)
+        Self.cylSetFlag(tabBarController, otherKey, false)
     }
 
-    private func cyl_updatePlusButtonIcons(ofAllIconsRow row: CYLTabBarItemUpdateRow, restoring: Bool,
+    private func cylUpdatePlusButtonIcons(ofAllIconsRow row: CYLTabBarItemUpdateRow, restoring: Bool,
                                            in tabBarController: CYLTabBarController) {
         if restoring {
-            var imageAttributes = cyl_initialPlusButtonAttributes(of: tabBarController)
+            var imageAttributes = cylInitialPlusButtonAttributes(of: tabBarController)
             imageAttributes[CYLTabBarItemTitle] = nil
             if !imageAttributes.isEmpty {
                 tabBarController.updatePlusButton(attributes: imageAttributes)
@@ -373,7 +373,7 @@ extension UIViewController {
      *      again, the original pages and tab items come back.
      * [CN] 第 `index` 个 Tab 两侧最近的真实 Tab 显示其他页面，使用各自的标题和图标；再次点击，恢复原来的页面和 TabBarItem。
      */
-    private func cyl_toggleReplacedNeighborsOfTab(at index: Int, in tabBarController: CYLTabBarController) {
+    private func cylToggleReplacedNeighborsOfTab(at index: Int, in tabBarController: CYLTabBarController) {
         let key = CYLTabBarItemUpdateKeys.replacedNeighbors
         if let replaced = objc_getAssociatedObject(tabBarController, key) as? [CYLReplacedNeighbor] {
             for entry in replaced {
@@ -382,12 +382,12 @@ extension UIViewController {
                 }
             }
             objc_setAssociatedObject(tabBarController, key, nil, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
-            cyl_redecorate(tabBarController)
+            cylRedecorate(tabBarController)
             return
         }
         var entries: [CYLReplacedNeighbor] = []
         for (side, (name, symbolName, step)) in [("A", "a.circle", -1), ("B", "b.circle", 1)].enumerated() {
-            guard let neighborIndex = cyl_realTabIndex(nextTo: index, step: step, in: tabBarController),
+            guard let neighborIndex = cylRealTabIndex(nextTo: index, step: step, in: tabBarController),
                   let original = tabBarController.viewControllers?[neighborIndex] else {
                 continue
             }
@@ -407,7 +407,7 @@ extension UIViewController {
         if !entries.isEmpty {
             objc_setAssociatedObject(tabBarController, key, entries, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
         }
-        cyl_redecorate(tabBarController)
+        cylRedecorate(tabBarController)
     }
 
     /**
@@ -416,7 +416,7 @@ extension UIViewController {
      * [CN] 替换后 Tab 按钮是新的：在其创建后（`-performWhenTabBarItemsReady:`，issue #22），若 TabBarController 实现了
      *      `-cyl_demo_decorateTabBarController:`，重新添加 App 的装饰。
      */
-    private func cyl_redecorate(_ tabBarController: CYLTabBarController) {
+    private func cylRedecorate(_ tabBarController: CYLTabBarController) {
         let decorate = NSSelectorFromString("cyl_demo_decorateTabBarController:")
         guard tabBarController.responds(to: decorate) else { return }
         tabBarController.perform(whenTabBarItemsReady: { readyTabBarController in
@@ -426,12 +426,12 @@ extension UIViewController {
 
     // MARK: Helpers
 
-    private static func cyl_flag(_ object: AnyObject?, _ key: UnsafeRawPointer) -> Bool {
+    private static func cylFlag(_ object: AnyObject?, _ key: UnsafeRawPointer) -> Bool {
         guard let object else { return false }
         return (objc_getAssociatedObject(object, key) as? NSNumber)?.boolValue ?? false
     }
 
-    private static func cyl_setFlag(_ object: AnyObject, _ key: UnsafeRawPointer, _ value: Bool) {
+    private static func cylSetFlag(_ object: AnyObject, _ key: UnsafeRawPointer, _ value: Bool) {
         objc_setAssociatedObject(object, key, value ? NSNumber(value: true) : nil, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
     }
 
@@ -439,7 +439,7 @@ extension UIViewController {
      * [EN] The tabs with their index, without the plus button's page and placeholders.
      * [CN] 各 Tab 及其下标，不含 PlusButton 的页面与占位页面。
      */
-    private func cyl_realTabs(of tabBarController: CYLTabBarController) -> [(Int, UIViewController)] {
+    private func cylRealTabs(of tabBarController: CYLTabBarController) -> [(Int, UIViewController)] {
         let plusChildViewController = CYLPlusButton.plusChildViewController(forOwner: tabBarController)
         return (tabBarController.viewControllers ?? []).enumerated().filter { _, viewController in
             !viewController.cyl_isPlaceholder && viewController !== plusChildViewController
@@ -450,8 +450,8 @@ extension UIViewController {
      * [EN] The nearest real tab from `index` in direction `step`; nil when none.
      * [CN] 从 `index` 沿 `step` 方向最近的真实 Tab；没有时为 nil。
      */
-    private func cyl_realTabIndex(nextTo index: Int, step: Int, in tabBarController: CYLTabBarController) -> Int? {
-        let realIndexes = Set(cyl_realTabs(of: tabBarController).map { $0.0 })
+    private func cylRealTabIndex(nextTo index: Int, step: Int, in tabBarController: CYLTabBarController) -> Int? {
+        let realIndexes = Set(cylRealTabs(of: tabBarController).map { $0.0 })
         let count = tabBarController.viewControllers?.count ?? 0
         return stride(from: index + step, to: step < 0 ? -1 : count, by: step).first { realIndexes.contains($0) }
     }
@@ -461,7 +461,7 @@ extension UIViewController {
      *      controller merges each update into them).
      * [CN] 初始化时传入的 `tabBarItemsAttributes`，按 Tab 保存，在第一次修改前复制（TabBarController 会把每次更新合并进去）。
      */
-    private func cyl_initialTabBarItemsAttributes(of tabBarController: CYLTabBarController) -> NSMapTable<UIViewController, NSDictionary> {
+    private func cylInitialTabBarItemsAttributes(of tabBarController: CYLTabBarController) -> NSMapTable<UIViewController, NSDictionary> {
         let key = CYLTabBarItemUpdateKeys.initialAttributes
         if let attributes = objc_getAssociatedObject(tabBarController, key) as? NSMapTable<UIViewController, NSDictionary> {
             return attributes
@@ -480,7 +480,7 @@ extension UIViewController {
      * [EN] The plus button's title and images before the first change (`-updatePlusButtonWithAttributes:` keys).
      * [CN] 第一次修改前 PlusButton 的标题与图片（`-updatePlusButtonWithAttributes:` 的 key）。
      */
-    private func cyl_initialPlusButtonAttributes(of tabBarController: CYLTabBarController) -> [String: Any] {
+    private func cylInitialPlusButtonAttributes(of tabBarController: CYLTabBarController) -> [String: Any] {
         let key = CYLTabBarItemUpdateKeys.plusButtonInitialAttributes
         if let attributes = objc_getAssociatedObject(tabBarController, key) as? [String: Any] {
             return attributes
@@ -494,8 +494,8 @@ extension UIViewController {
         return attributes
     }
 
-    private func cyl_initialTitle(of tabViewController: UIViewController, in tabBarController: CYLTabBarController) -> String? {
-        let attributes = cyl_initialTabBarItemsAttributes(of: tabBarController).object(forKey: tabViewController)
+    private func cylInitialTitle(of tabViewController: UIViewController, in tabBarController: CYLTabBarController) -> String? {
+        let attributes = cylInitialTabBarItemsAttributes(of: tabBarController).object(forKey: tabViewController)
         return attributes?[CYLTabBarItemTitle] as? String ?? cyl_title(of: tabViewController, in: tabBarController)
     }
 
@@ -503,8 +503,8 @@ extension UIViewController {
      * [EN] The tab's initial icon back: its network icons when it had `CYLTabBarItemImageURL`, else its own (nil provider).
      * [CN] 恢复 Tab 的初始图标：有 `CYLTabBarItemImageURL` 时为网络图标，否则为 Tab 自身的图标（provider 传 nil）。
      */
-    private func cyl_restoreInitialIcon(of tabViewController: UIViewController, at index: Int, in tabBarController: CYLTabBarController) {
-        let attributes = cyl_initialTabBarItemsAttributes(of: tabBarController).object(forKey: tabViewController)
+    private func cylRestoreInitialIcon(of tabViewController: UIViewController, at index: Int, in tabBarController: CYLTabBarController) {
+        let attributes = cylInitialTabBarItemsAttributes(of: tabBarController).object(forKey: tabViewController)
         var urlAttributes: [String: Any] = [:]
         for key in [CYLTabBarItemImageURL, CYLTabBarItemSelectedImageURL, CYLTabBarItemImageURLSize] {
             urlAttributes[key] = attributes?[key]

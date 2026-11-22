@@ -12,10 +12,10 @@ import ObjectiveC
  * [EN] Translated from Objective-C (docs/Swift-Migration.md); Objective-C callers keep the declaration in
  *      `UIView+CYLHitTestOutsideBounds.h`. A subview with `cyl_respondsOutsideSuperviewBounds` set receives touches
  *      outside its superview's bounds. The first time one is set, `-hitTest:withEvent:` of `UIView` is exchanged once
- *      for `-cyl_outsideBoundsHitTest:withEvent:`, which asks the system first and only then those subviews.
+ *      for `-cylOutsideBoundsHitTest:withEvent:`, which asks the system first and only then those subviews.
  * [CN] 已从 Objective-C 翻译为 Swift（docs/Swift-Migration.md）；Objective-C 调用方继续使用 `UIView+CYLHitTestOutsideBounds.h`
  *      中的声明。设置了 `cyl_respondsOutsideSuperviewBounds` 的子视图可以接收父视图范围之外的触摸。第一次设置时，把 `UIView` 的
- *      `-hitTest:withEvent:` 与 `-cyl_outsideBoundsHitTest:withEvent:` 交换一次：先询问系统，再询问这些子视图。
+ *      `-hitTest:withEvent:` 与 `-cylOutsideBoundsHitTest:withEvent:` 交换一次：先询问系统，再询问这些子视图。
  */
 extension UIView {
 
@@ -43,8 +43,8 @@ extension UIView {
      * [CN] 与 `-hitTest:withEvent:` 交换：在这里调用它即执行系统的实现。
      */
     @objc(cyl_outsideBoundsHitTest:withEvent:)
-    dynamic func cyl_outsideBoundsHitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
-        let view = cyl_outsideBoundsHitTest(point, with: event)
+    dynamic func cylOutsideBoundsHitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
+        let view = cylOutsideBoundsHitTest(point, with: event)
         if view != nil || !CYLHitTestOutsideBounds.isInstalled {
             return view
         }
@@ -74,7 +74,7 @@ private enum CYLHitTestOutsideBounds {
     private static let installation: Void = {
         let viewClass: AnyClass = UIView.self
         guard let original = class_getInstanceMethod(viewClass, #selector(UIView.hitTest(_:with:))),
-              let swizzled = class_getInstanceMethod(viewClass, #selector(UIView.cyl_outsideBoundsHitTest(_:with:))) else {
+              let swizzled = class_getInstanceMethod(viewClass, #selector(UIView.cylOutsideBoundsHitTest(_:with:))) else {
             return
         }
         method_exchangeImplementations(original, swizzled)

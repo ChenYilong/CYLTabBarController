@@ -49,7 +49,7 @@ extension CYLTabBarController {
     func cylFlatDesignApplyTitlePositionAdjustment(_ offset: UIOffset) -> Bool {
         guard let tabBar = cylFlatDesignTabBarIfShown else { return false }
         for (_, item) in cylFlatDesignItems() {
-            item.titlePositionAdjustment = CYLTitlePositionAdjustment(forItem: item, controllerOffset: offset)
+            item.titlePositionAdjustment = cylTitlePositionAdjustment(forItem: item, controllerOffset: offset)
         }
         cylRelayOutFlatDesignTabBar(tabBar)
         return true
@@ -61,7 +61,7 @@ extension CYLTabBarController {
     func cylFlatDesignApplyImageInsets(_ insets: UIEdgeInsets) -> Bool {
         guard let tabBar = cylFlatDesignTabBarIfShown else { return false }
         for (_, item) in cylFlatDesignItems() {
-            item.imageInsets = CYLImageInsets(forItem: item, controllerInsets: insets)
+            item.imageInsets = cylImageInsets(forItem: item, controllerInsets: insets)
         }
         cylRelayOutFlatDesignTabBar(tabBar)
         return true
