@@ -10,6 +10,8 @@
 //       `CYLUtilsMacros.h` 导入本文件以获得共用的宏。
 //
 
+
+// CYL-SWIFT-MIGRATION: objc-required — [EN] C macros (the engine switches `CYL_*_AVAILABLE`, `@try` wrappers) and the prototype of the C function `CYLAnimatedItemResourceBundle()`, now defined in Swift (Swift/CYLAnimatedItemResources.swift): Swift cannot export macros or C prototypes. [CN] C 宏（引擎开关 `CYL_*_AVAILABLE`、`@try` 包装）与 C 函数 `CYLAnimatedItemResourceBundle()` 的原型（定义已改为 Swift）：Swift 无法导出宏或 C 原型。
 #ifndef CYLAnimatedItemMacros_h
 #define CYLAnimatedItemMacros_h
 

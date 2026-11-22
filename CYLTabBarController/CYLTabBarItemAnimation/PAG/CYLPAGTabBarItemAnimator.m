@@ -5,6 +5,8 @@
 //  Copyright © 2026 https://github.com/ChenYilong . All rights reserved.
 //
 
+// CYL-SWIFT-MIGRATION: objc-required — [EN] The composition root of the PAG subspecs: its `+load` registers the animator before any tab is built, and Swift has no `+load`. The player and the view loading are Swift (CYLPAGTabBarItemAnimation.swift). [CN] PAG 子库的组合根：其 `+load` 在创建任何 Tab 之前注册 animator，而 Swift 没有 `+load`。播放器与视图加载为 Swift（CYLPAGTabBarItemAnimation.swift）。
+
 #import "CYLPAGTabBarItemAnimator.h"
 // [EN] The generic keys, from CYLUtils: no Core. [CN] 通用 key，来自 CYLUtils：不依赖 Core。
 #if __has_include("../../CYLUtils/CYLAnimationKeys.h")
@@ -32,6 +34,14 @@
 #import "CYLTabBarItemAnimationFactory.h"
 #endif
 
+#if CYL_PAG_OBJC_PLAYER
+// CYL-SWIFT-MIGRATION: objc-required — [EN] The `CYLAnimatedItem/PAGEnterprise` subspec only: Swift cannot `import libpag` from
+//      libpag-enterprise, whose umbrella header includes the missing `libpag/PAGView+Audio.h` (the reason that subspec also
+//      builds with `-fno-modules`; pod lib lint failed on it in run 44975115535). So there the player and the view loading stay
+//      Objective-C, with the same class names and methods as CYLPAGTabBarItemAnimation.swift, which the `PAG` subspec uses.
+// [CN] 仅用于 `CYLAnimatedItem/PAGEnterprise` 子库：Swift 无法从 libpag-enterprise `import libpag`，其 umbrella 头文件引用了不存在的
+//      `libpag/PAGView+Audio.h`（该子库同样因此使用 `-fno-modules`；pod lib lint 在运行 44975115535 中因此失败）。因此该子库的播放器与视图
+//      加载保留 Objective-C，类名与方法与 `PAG` 子库使用的 CYLPAGTabBarItemAnimation.swift 相同。
 /// [EN] Plays a `PAGView`. [CN] 播放 `PAGView`。
 @interface CYLPAGTabBarItemAnimationPlayer : CYLTabBarItemAnimationBasePlayer <CYLTabBarItemAnimationPlayer>
 @end
@@ -88,37 +98,15 @@
 
 @end
 
-@implementation CYLPAGTabBarItemAnimator
+/// [EN] Makes the `PAGView` of a tab and its player (PAGEnterprise). [CN] 创建 Tab 的 `PAGView` 及其播放器（PAGEnterprise）。
+@interface CYLPAGTabBarItemAnimationViews : NSObject
++ (UIView *)animationViewWithURL:(NSURL *)URL size:(CGSize)size contentMode:(UIViewContentMode)contentMode;
++ (id<CYLTabBarItemAnimationPlayer>)playerForAnimationView:(UIView *)view;
+@end
 
-/// [EN] Registers itself when it is linked (only with libpag). [CN] 被链接时自行注册（仅在引入 libpag 时）。
-+ (void)load {
-    [CYLTabBarItemAnimatorRegistry registerAnimator:[[self alloc] init]];
-}
+@implementation CYLPAGTabBarItemAnimationViews
 
-- (NSString *)identifier {
-    return @"PAG";
-}
-
-- (NSArray<NSString *> *)fileExtensions {
-    return @[ @"pag" ];
-}
-
-/// [EN] The PAG keys, which stand for the generic `CYLTabBarAnimation…` keys. [CN] PAG 的 key，对应通用的 `CYLTabBarAnimation…` key。
-- (NSDictionary<NSString *, NSString *> *)attributeKeys {
-    return @{
-        CYLTabBarAnimationURL : CYLTabBarPAGURL,
-        CYLTabBarAnimationFilePath : CYLTabBarPAGFilePath,
-        CYLTabBarAnimationSize : CYLTabBarPAGSize,
-        CYLTabBarAnimationDarkURL : CYLTabBarPAGDarkURL,
-        CYLTabBarAnimationDarkFilePath : CYLTabBarPAGDarkFilePath,
-    };
-}
-
-- (BOOL)canAnimateFileAtURL:(NSURL *)URL {
-    return [URL.pathExtension.lowercaseString isEqualToString:@"pag"];
-}
-
-- (UIView *)animationViewWithURL:(NSURL *)URL size:(CGSize)size contentMode:(UIViewContentMode)contentMode {
++ (UIView *)animationViewWithURL:(NSURL *)URL size:(CGSize)size contentMode:(UIViewContentMode)contentMode {
     // Loaded as the official samples (libpag/pag-ios) do: `-setComposition:` with `+[PAGFile Load:]`, which every
     // libpag version has (3.x and later).
     // 与官方示例（libpag/pag-ios）一致：用 `+[PAGFile Load:]` 加 `-setComposition:` 加载，各版本均支持。
@@ -161,7 +149,7 @@
  *      thread. The view is marked loading until then.
  * [CN] 通过共享的 URL session 把 `URL` 下载到缓存目录，然后在主线程交给 `pagView`。在此之前视图被标记为加载中。
  */
-- (void)cyl_loadRemoteURL:(NSURL *)URL intoView:(PAGView *)pagView {
++ (void)cyl_loadRemoteURL:(NSURL *)URL intoView:(PAGView *)pagView {
     CYLTabBarItemAnimationMarkLoading(pagView);
     __weak PAGView *weakView = pagView;
     NSURLSessionDownloadTask *task = [[NSURLSession sharedSession] downloadTaskWithURL:URL completionHandler:^(NSURL *location, NSURLResponse *response, NSError *error) {
@@ -195,8 +183,55 @@
     [task resume];
 }
 
-- (id<CYLTabBarItemAnimationPlayer>)playerForAnimationView:(UIView *)view {
++ (id<CYLTabBarItemAnimationPlayer>)playerForAnimationView:(UIView *)view {
     return [view isKindOfClass:[PAGView class]] ? [[CYLPAGTabBarItemAnimationPlayer alloc] initWithAnimationView:view] : nil;
+}
+
+@end
+#else
+// [EN] The Swift player and view loading of this subspec, through the module's generated header (framework or static library).
+// [CN] 本子库的 Swift 播放器与视图加载，通过模块生成的头文件引入（framework 或静态库）。
+#if __has_include(<CYLAnimatedItem/CYLAnimatedItem-Swift.h>)
+#import <CYLAnimatedItem/CYLAnimatedItem-Swift.h>
+#else
+#import "CYLAnimatedItem-Swift.h"
+#endif
+#endif
+
+@implementation CYLPAGTabBarItemAnimator
+
++ (void)load {
+    [CYLTabBarItemAnimatorRegistry registerAnimator:[[self alloc] init]];
+}
+
+- (NSString *)identifier {
+    return @"PAG";
+}
+
+- (NSArray<NSString *> *)fileExtensions {
+    return @[ @"pag" ];
+}
+
+- (NSDictionary<NSString *, NSString *> *)attributeKeys {
+    return @{
+        CYLTabBarAnimationURL : CYLTabBarPAGURL,
+        CYLTabBarAnimationFilePath : CYLTabBarPAGFilePath,
+        CYLTabBarAnimationSize : CYLTabBarPAGSize,
+        CYLTabBarAnimationDarkURL : CYLTabBarPAGDarkURL,
+        CYLTabBarAnimationDarkFilePath : CYLTabBarPAGDarkFilePath,
+    };
+}
+
+- (BOOL)canAnimateFileAtURL:(NSURL *)URL {
+    return [URL.pathExtension.lowercaseString isEqualToString:@"pag"];
+}
+
+- (UIView *)animationViewWithURL:(NSURL *)URL size:(CGSize)size contentMode:(UIViewContentMode)contentMode {
+    return [CYLPAGTabBarItemAnimationViews animationViewWithURL:URL size:size contentMode:contentMode];
+}
+
+- (id<CYLTabBarItemAnimationPlayer>)playerForAnimationView:(UIView *)view {
+    return [CYLPAGTabBarItemAnimationViews playerForAnimationView:view];
 }
 
 @end

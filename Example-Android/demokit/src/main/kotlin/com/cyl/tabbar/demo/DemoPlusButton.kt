@@ -38,9 +38,17 @@ class DemoPlusButton(context: Context) : CYLPlusButton(context) {
     }
 
     object Provider : CYLPlusButtonSubclassing {
+        private const val CENTER_FROM_TOP_DP = 0.3f * 49f
         private val page: Fragment by lazy { TextPageFragment.newInstance("PlusButton\nplusChildViewController") }
         override fun plusButton(context: Context) = DemoPlusButton(context)
-        override fun multiplierOfTabBarHeight(tabBarHeight: Float) = 0.3f
+        /**
+         * [EN] A raised plus button (AGENTS.md): its center stays 14.7 dp below the bar's top (0.3 of the iOS 49), so it
+         *      rises above the bar at any height; the default height became the system tab bar's (80 dp with Material 3)
+         *      on 2026-11-22, where 0.3 of the height left it level with the bar's top.
+         * [CN] 凸起的 PlusButton（AGENTS.md）：其中心始终位于 TabBar 顶部下方 14.7 dp（iOS 49 的 0.3），任何高度下都高出 TabBar；2026-11-22 默认高度改为
+         *      系统 TabBar 的高度（Material 3 为 80 dp），按高度的 0.3 计算时会与 TabBar 顶部齐平。
+         */
+        override fun multiplierOfTabBarHeight(tabBarHeight: Float) = if (tabBarHeight > 0) CENTER_FROM_TOP_DP / tabBarHeight else 0.3f
         override fun plusChildViewController(): Fragment = page
         override fun tabBarContext() = "CYLConfigurationDemo"
     }

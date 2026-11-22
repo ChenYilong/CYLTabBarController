@@ -5,6 +5,8 @@
 //  Copyright © 2026 https://github.com/ChenYilong . All rights reserved.
 //
 
+// CYL-SWIFT-MIGRATION: objc-required — [EN] The composition root of the Rive subspec: its `+load` registers the animator before any tab is built, and Swift has no `+load`. The views are Swift (RiveSwift/). [CN] Rive 子库的组合根：其 `+load` 在创建任何 Tab 之前注册 animator，而 Swift 没有 `+load`。视图为 Swift（RiveSwift/）。
+
 #import "CYLRiveTabBarItemAnimator.h"
 // [EN] The registry of the `CYLTabBarItemAnimation` subspec. [CN] `CYLTabBarItemAnimation` 子库的注册表。
 #if __has_include("../CYLTabBarItemAnimatorRegistry.h")

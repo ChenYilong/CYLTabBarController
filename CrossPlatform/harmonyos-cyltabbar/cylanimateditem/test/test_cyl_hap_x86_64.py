@@ -41,6 +41,89 @@ class CYLHapX8664Tests(unittest.TestCase):
         if os.sep == '\\':
             self.assertNotIn('/', cyl.cyl_local_path('C:/Users/x/entry.hap'))
 
+    def test_debug_engine_kit_adds_the_x86_64_libraries_and_the_marker(self):
+        with tempfile.TemporaryDirectory() as folder:
+            hap = self.make_hap(folder)
+            stripped = os.path.join(folder, 'stripped.hap')
+            cyl.cyl_strip(hap, stripped, keep_abis=['x86_64'])
+            kit = os.path.join(folder, 'kit', 'rive')
+            os.makedirs(kit)
+            for name in ('libohos_rive.so', 'libc++_shared.so', 'README.md'):
+                with open(os.path.join(kit, name), 'w') as handle:
+                    handle.write(name)
+            out = os.path.join(folder, 'out.hap')
+            self.assertEqual(cyl.cyl_add_debug_engines(stripped, out, os.path.join(folder, 'kit')), ['Rive'])
+            with zipfile.ZipFile(out) as result:
+                names = result.namelist()
+                self.assertIn('libs/x86_64/libohos_rive.so', names)
+                self.assertIn('libs/x86_64/libc++_shared.so', names)
+                self.assertNotIn('libs/x86_64/README.md', names)
+                self.assertEqual(result.getinfo('libs/x86_64/libohos_rive.so').compress_type, zipfile.ZIP_STORED)
+                self.assertIn('"Rive"', result.read(cyl.CYL_MARKER).decode())
+
+    def test_the_real_kit_holds_the_x86_64_rive_library(self):
+        rive = os.path.join(cyl.CYL_KIT_DIR, 'rive')
+        self.assertTrue(os.path.isfile(os.path.join(rive, 'libohos_rive.so')))
+        self.assertTrue(os.path.isfile(os.path.join(rive, 'libc++_shared.so')))
+
+    def test_the_real_kit_holds_the_x86_64_pag_library(self):
+        self.assertTrue(os.path.isfile(os.path.join(cyl.CYL_KIT_DIR, 'pag', 'libpag.so')))
+
+    def test_only_the_engines_the_app_ships_are_added(self):
+        with tempfile.TemporaryDirectory() as folder:
+            kit = os.path.join(folder, 'kit')
+            for engine, libraries in (('rive', ('libohos_rive.so', 'libc++_shared.so')), ('pag', ('libpag.so',))):
+                os.makedirs(os.path.join(kit, engine))
+                for name in libraries:
+                    with open(os.path.join(kit, engine, name), 'w') as handle:
+                        handle.write(name)
+            app = os.path.join(folder, 'rive-only.hap')
+            with zipfile.ZipFile(app, 'w') as hap:
+                hap.writestr('module.json', '{}')
+                hap.writestr('libs/arm64-v8a/libohos_rive.so', 'rive')
+                hap.writestr('libs/arm64-v8a/libc++_shared.so', 'cxx')
+            out = os.path.join(folder, 'out.hap')
+            self.assertEqual(cyl.cyl_add_debug_engines(app, out, kit, shipped=cyl.cyl_hap_libraries(app)), ['Rive'])
+            with zipfile.ZipFile(out) as result:
+                self.assertNotIn('libs/x86_64/libpag.so', result.namelist())
+            self.assertEqual(cyl.cyl_add_debug_engines(app, out, kit, shipped=set()), [])
+            # [EN] A HAP of the "emulator" target carries no arm64 file; its ArkTS still imports the module.
+            emulator = os.path.join(folder, 'emulator.hap')
+            with zipfile.ZipFile(emulator, 'w') as hap:
+                hap.writestr('ets/modules.abc', b'\x00@normalized:Y&&&libohos_rive.so&\x00')
+            self.assertEqual(cyl.cyl_hap_libraries(emulator), {'libohos_rive.so'})
+            self.assertEqual(cyl.cyl_add_debug_engines(emulator, out, kit, shipped=cyl.cyl_hap_libraries(emulator)), ['Rive'])
+            self.assertEqual(cyl.cyl_add_debug_engines(self.make_hap(folder), out, kit,
+                                                       shipped=cyl.cyl_hap_libraries(self.make_hap(folder))), ['PAG', 'Rive'])
+
+    def test_a_kit_of_another_package_version_is_skipped(self):
+        with tempfile.TemporaryDirectory() as folder:
+            kit = os.path.join(folder, 'kit')
+            for name, version in (('pag', '4.4.31'), ('pag-4.5.102', '4.5.102')):
+                os.makedirs(os.path.join(kit, name))
+                with open(os.path.join(kit, name, 'libpag.so'), 'w') as handle:
+                    handle.write(version)
+                with open(os.path.join(kit, name, 'kit.json'), 'w') as handle:
+                    handle.write('{"engine": "PAG", "package": "@tencent/libpag", "version": "%s"}' % version)
+            app = os.path.join(folder, 'app.hap')
+            with zipfile.ZipFile(app, 'w') as hap:
+                hap.writestr('ets/modules.abc', b'\x00&@tencent/libpag/Index&4.5.102\x00@normalized:Y&&&libpag.so&\x00')
+            self.assertEqual(cyl.cyl_package_versions(app), {'@tencent/libpag': '4.5.102'})
+            out = os.path.join(folder, 'out.hap')
+            args = dict(shipped=cyl.cyl_hap_libraries(app), versions=cyl.cyl_package_versions(app))
+            self.assertEqual(cyl.cyl_add_debug_engines(app, out, kit, **args), ['PAG'])
+            with zipfile.ZipFile(out) as result:
+                self.assertEqual(result.read('libs/x86_64/libpag.so').decode(), '4.5.102', 'the matching version only')
+            messages = []
+            self.assertEqual(cyl.cyl_add_debug_engines(app, out, kit, shipped=args['shipped'],
+                                                       versions={'@tencent/libpag': '4.6.0'}, log=messages.append), [])
+            self.assertTrue(any('skipped' in message for message in messages))
+
+    def test_the_real_kits_name_their_package_versions(self):
+        for name in ('rive', 'pag'):
+            info = cyl.cyl_kit_info(os.path.join(cyl.CYL_KIT_DIR, name), name)
+            self.assertIn('version', info)
+
     def test_strip_without_abis_drops_every_native_library(self):
         with tempfile.TemporaryDirectory() as folder:
             hap = self.make_hap(folder)

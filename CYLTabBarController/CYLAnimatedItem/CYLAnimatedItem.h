@@ -2,6 +2,8 @@
 //  CYLAnimatedItem.h
 //  CYLAnimatedItem
 //
+
+// CYL-SWIFT-MIGRATION: objc-required — [EN] The framework umbrella header: Xcode requires it, with the version symbols it exports; Swift cannot write a header. [CN] framework 伞头文件：Xcode 要求提供它及其导出的版本符号；Swift 不能编写头文件。
 /*!
  * [EN] Umbrella header of the CYLAnimatedItem framework (the Carthage / Xcode framework target of CYLTabBarController.xcodeproj,
  *      docs/Animated-Item.md): the animated icon + title component, its animation keys and its engine. It never imports

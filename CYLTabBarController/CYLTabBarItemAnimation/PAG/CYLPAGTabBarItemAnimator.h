@@ -14,6 +14,8 @@
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Tab-Bar-Item-Animation.md
 // docs-binding:end
 
+// CYL-SWIFT-MIGRATION: objc-required — [EN] Declares the PAG animator, an Objective-C class because its `+load` registers it (Swift has no `+load`); its player and views are Swift. Also the C prototype of `CYLTabBarItemsAttributesAddingPAGFiles()`. [CN] 声明 PAG animator：它的 `+load` 负责注册（Swift 没有 `+load`），因此是 Objective-C 类；其播放器与视图为 Swift。
+
 #import <Foundation/Foundation.h>
 #if __has_include("../CYLTabBarItemAnimator.h")
 #import "../CYLTabBarItemAnimator.h"

@@ -212,6 +212,7 @@ docs/
 │   ├── android-api37-20261119-example-rive-live-uimode-switch.png
 │   ├── android-api37-20261119-rive-fixed-tint-unselected-only.png
 │   ├── android-api37-20261119-rive-follows-appearance.png
+│   ├── android-default-tab-bar-height-system-80dp.png
 │   ├── android-example-strings-en-zh-ja.png
 │   ├── android-gif-decoder-frame-clock.png
 │   ├── android-gif-image-rest-then-play.png
@@ -325,6 +326,7 @@ docs/
 │   ├── harmonyos-cvcm-issue26-good.jpeg
 │   ├── harmonyos-cvcm-issue27-filter-open.jpeg
 │   ├── harmonyos-cvcm-issue27-plus.jpeg
+│   ├── harmonyos-default-tab-bar-height-system-56vp.png
 │   ├── harmonyos-emulator-pages-b7fdf26.png
 │   ├── harmonyos-flatdesign-liquidglass-taps-mate70pro.png
 │   ├── harmonyos-flatdesign-tint-fixed.png
@@ -377,6 +379,11 @@ docs/
 │   ├── harmonyos-verify-skins-eba8c44.png
 │   ├── harmonyos-verify-spanish.jpeg
 │   ├── harmonyos-x86-64-emulator-target-rive-still-images.png
+│   ├── harmonyos-x86-64-pag-4.5.102-version-match.png
+│   ├── harmonyos-x86-64-pag-debug-engine-kit.png
+│   ├── harmonyos-x86-64-rive-debug-engine-kit.png
+│   ├── harmonyos-x86-64-rive-latest-builds.png
+│   ├── harmonyos-x86-64-rive-onended-debug-engine-kit.png
 │   ├── image-only-tabs-gallery-3-3-ios17.png
 │   ├── image-only-tabs-ios.png
 │   ├── inset-grouped-sections-demo-ios.png
@@ -418,6 +425,7 @@ docs/
 │   ├── login-required-tabs-flow.svg
 │   ├── login-required-tabs-flutter-ios-logged-in.png
 │   ├── login-required-tabs-react-native-android-alert.png
+│   ├── lottie-swift-players-ios.png
 │   ├── miniprogram-tab-tap-previous-tab-frame-before-after.png
 │   ├── more-editing-done-star-comes-back-liquid-glass-ios.png
 │   ├── more-tab-eight-tabs-liquid-glass-ios.png
@@ -431,6 +439,7 @@ docs/
 │   ├── pag-nearby-ios17-simulator-crash.png
 │   ├── pag-nearby-ios17-simulator-fixed.png
 │   ├── pag-nearby-ios26-simulator.png
+│   ├── pag-swift-player-ios.png
 │   ├── per-tab-animation-pag-ios.png
 │   ├── plus-button-first-display-fixed-ios.png
 │   ├── plus-button-first-display-glitch-ios.jpg
@@ -504,6 +513,7 @@ docs/
 │   ├── svga-example-rive-last-frame.png
 │   ├── svga-example-rive-playing.png
 │   ├── svga-miniprogram-renderer-frames.png
+│   ├── svga-swift-view-ios.png
 │   ├── svga-tab-icon-classic.png
 │   ├── svga-tab-icon-flatdesign.png
 │   ├── svga-tab-icon-liquid-glass.png
@@ -689,8 +699,27 @@ docs/
 │   ├── wechat-miniprogram-tab-item-badges.png
 │   ├── wechat-miniprogram-two-icon-layers-user-1-devtools.jpg
 │   ├── wechat-miniprogram-two-icon-layers-user-2-devtools.jpg
-│   └── wechat-miniprogram-visibility-hidden-identifiers-devtools-sdk3.17.6-49df44f.png
+│   ├── wechat-miniprogram-visibility-hidden-identifiers-devtools-sdk3.17.6-49df44f.png
+│   └── x86-64-emulators-pag-rive-display.png
 ├── commit-readiness-2026-11-09.md
+├── instructions/
+│   ├── accessibility-localization.md
+│   ├── animation.md
+│   ├── badges.md
+│   ├── behavioral.md
+│   ├── code.md
+│   ├── cross-platform.md
+│   ├── dependencies.md
+│   ├── documentation.md
+│   ├── examples.md
+│   ├── git.md
+│   ├── instructions.md
+│   ├── macos.md
+│   ├── plus-button.md
+│   ├── screenshots.md
+│   ├── task-workflow.md
+│   ├── testing.md
+│   └── windows-harmonyos.md
 └── instructions.md
 ```
 

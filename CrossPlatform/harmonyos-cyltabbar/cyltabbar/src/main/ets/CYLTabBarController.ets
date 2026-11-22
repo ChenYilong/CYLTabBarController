@@ -1,4 +1,5 @@
 import { CYLTabBarStyleType, cyl_tabBarStyleModifier } from './CYLFlatDesignTabBar';
+import { CYLTabBarDefaultHeight } from './CYLConstants';
 import { CYLLiquidGlassTokens, CYLLiquidGlassCapsuleModifier, CYLLiquidGlassContainerModifier } from './CYLLiquidGlass';
 import { curves, window, KeyboardAvoidMode } from '@kit.ArkUI';
 import { CYLTabBarItemAttributes, CYLTitleOffset } from './CYLTabBarItem';
@@ -294,8 +295,11 @@ export struct CYLTabBarController {
   @Prop tabBarBackgroundColor: ResourceColor = '#F8F8F8';
   /** [EN] cyl_tabBarShadowColor / CYLTabBarShadowColor: the line on top of the bar; transparent hides it. [CN] TabBar 顶部分割线颜色；透明即隐藏。 */
   @Prop tabBarShadowColor: ResourceColor = '#1F000000';
-  /** [EN] tabBarHeight / CYLTabBarHeight (vp). [CN] TabBar 高度（vp）。 */
-  @Prop tabBarHeight: number = 49;
+  /**
+   * [EN] tabBarHeight / CYLTabBarHeight (vp). Without it, CYLTabBarDefaultHeight (56 vp): the system tab bar's height.
+   * [CN] TabBar 高度（vp）。未设置时为 CYLTabBarDefaultHeight（56 vp）：系统 TabBar 的高度。
+   */
+  @Prop tabBarHeight: number = CYLTabBarDefaultHeight;
   /**
    * [EN] `tabBarStyleType` (iOS CYLConstants.h): Default, System, FlatDesign or LiquidGlass (demo 7: FlatDesign).
    * [CN] TabBar 样式（iOS CYLConstants.h）：默认、系统、扁平或液态玻璃（第 7 项：扁平样式）。
@@ -500,6 +504,9 @@ export struct CYLTabBarController {
     // [EN] cyltabbar plays Lottie (@ohos/lottie), Rive (@ohos/rive) and SVGA (its own player): CYLAnimatedItemView draws them.
     // [CN] cyltabbar 播放 Lottie、Rive 与 SVGA（自带播放器）：由 CYLAnimatedItemView 绘制。
     ['Lottie', 'Rive', 'SVGA'].forEach((type: string) => CYLAnimatedItemEngines.register(type));
+    // [EN] Debug builds installed with the x86_64 debug engine kit: Rive also plays on the x86_64 emulator.
+    // [CN] 安装了 x86_64 调试引擎包的 debug 构建：Rive 也能在 x86_64 模拟器上播放。
+    CYLAnimatedItemEngines.loadX86_64DebugEngines(this.getUIContext().getHostContext());
     this.loaded = [this.selectedIndex];
     this.cylGIFPlayback.loops = this.tabBarItemAnimationLoops;
     this.cylLoadGIFImages();

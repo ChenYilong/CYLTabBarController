@@ -72,7 +72,7 @@ export {
   CYLTabBarPageSkipReason, CYLTabBarSkippedTab, CYLTabBarResolvedPage, CYLTabBarPagesResult, CYLTabBarPageProviding
 } from './src/main/ets/CYLTabBarPageRegistry';
 export {
-  CYLConstants, CYLSize, CYLTabBarItemImagePlaceholderWidth, CYLTabBarItemImagePlaceholderHeight,
+  CYLConstants, CYLSize, CYLTabBarDefaultHeight, CYLTabBarItemImagePlaceholderWidth, CYLTabBarItemImagePlaceholderHeight,
   cyl_setTabBarItemImagePlaceholderSize
 } from './src/main/ets/CYLConstants';
 export { CYLThemeColor, CYLThemeColorProvider } from './src/main/ets/CYLThemeColor';

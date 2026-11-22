@@ -1,4 +1,5 @@
 import { CYLLiquidGlassTokens } from './CYLLiquidGlass';
+import { CYLTabBarDefaultHeight } from './CYLConstants';
 
 /**
  * [EN] The plus button (CYLPlusButton.h, the CYLPlusButton* keys of CYLTabBarController.h): an extra button in the tab bar,
@@ -59,7 +60,7 @@ export interface CYLPlusButtonInsets {
  *      标题对齐时图片紧贴标题上方，标题顶部在 tabBarHeight - 17；否则图片（及其下方 14 vp 的标题）在 TabBar 中居中并按
  *      centerYOffset 移动。液态玻璃中内容在更高的胶囊内下移 (61 - tabBarHeight) / 2：将其作为 contentDy 传入（结果从胶囊顶部量起）。
  */
-export function cyl_plusButtonOverhang(plusButton: CYLPlusButton | undefined, tabBarHeight: number = 49,
+export function cyl_plusButtonOverhang(plusButton: CYLPlusButton | undefined, tabBarHeight: number = CYLTabBarDefaultHeight,
   contentDy: number = 0): number {
   if (plusButton === undefined) {
     return 0;
@@ -80,6 +81,6 @@ export function cyl_plusButtonOverhang(plusButton: CYLPlusButton | undefined, ta
  * [CN] 液态玻璃（展开态）：Tab 内容（含加号按钮）为在胶囊（ROW_HEIGHT_EXPANDED，61 vp）中居中而下移的距离；胶囊高于
  *      tabBarHeight。将其作为 cyl_plusButtonOverhang 的 contentDy 传入。tabBarHeight 不小于胶囊高度时为 0。其他样式不移动内容（contentDy 为 0）。
  */
-export function cyl_liquidGlassContentDy(tabBarHeight: number = 49): number {
+export function cyl_liquidGlassContentDy(tabBarHeight: number = CYLTabBarDefaultHeight): number {
   return Math.max(0, (Math.max(tabBarHeight, CYLLiquidGlassTokens.ROW_HEIGHT_EXPANDED) - tabBarHeight) / 2);
 }

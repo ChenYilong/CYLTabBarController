@@ -68,7 +68,8 @@ Pod::Spec.new do |s|
   # [CN] 每种动画类型一个子库，结构相同：Core + Engine + 动画库。
   s.subspec 'LottieObjectiveC' do |lottieobjc|
     lottieobjc.dependency 'CYLAnimatedItem/Engine'
-    lottieobjc.source_files = 'CYLTabBarController/CYLTabBarItemAnimation/Lottie/*.{h,m}'
+    # [EN] The lottie-ios 2.x player is Swift (Lottie/ObjectiveC/); the animator stays Objective-C (+load). [CN] lottie-ios 2.x 播放器为 Swift（Lottie/ObjectiveC/）；animator 保留为 Objective-C（+load）。
+    lottieobjc.source_files = 'CYLTabBarController/CYLTabBarItemAnimation/Lottie/*.{h,m}', 'CYLTabBarController/CYLTabBarItemAnimation/Lottie/ObjectiveC/*.swift'
     lottieobjc.private_header_files = 'CYLTabBarController/CYLTabBarItemAnimation/Lottie/*.h'
     lottieobjc.dependency 'lottie-ios', '~> 2.5.3'
   end
@@ -87,7 +88,7 @@ Pod::Spec.new do |s|
 
   s.subspec 'PAG' do |pag|
     pag.dependency 'CYLAnimatedItem/Engine'
-    pag.source_files = 'CYLTabBarController/CYLTabBarItemAnimation/PAG/*.{h,m}'
+    pag.source_files = 'CYLTabBarController/CYLTabBarItemAnimation/PAG/*.{h,m,swift}'
     pag.public_header_files = 'CYLTabBarController/CYLTabBarItemAnimation/PAG/*.h'
     pag.dependency 'libpag', '>= 4.0'
     pag.pod_target_xcconfig = { 'GCC_PREPROCESSOR_DEFINITIONS' => '$(inherited) GLES_SILENCE_DEPRECATION=1' }
@@ -95,10 +96,15 @@ Pod::Spec.new do |s|
 
   s.subspec 'PAGEnterprise' do |pagenterprise|
     pagenterprise.dependency 'CYLAnimatedItem/Engine'
+    # [EN] No Swift here: Swift cannot import libpag-enterprise's module (its umbrella header includes a missing header,
+    #      hence -fno-modules); CYLPAGTabBarItemAnimator.m has the Objective-C player behind CYL_PAG_OBJC_PLAYER.
+    # [CN] 此处不含 Swift：Swift 无法导入 libpag-enterprise 的模块（其 umbrella 头文件引用了缺失的头文件，因此使用 -fno-modules）；
+    #      CYLPAGTabBarItemAnimator.m 在 CYL_PAG_OBJC_PLAYER 下提供 Objective-C 播放器。
     pagenterprise.source_files = 'CYLTabBarController/CYLTabBarItemAnimation/PAG/*.{h,m}'
     pagenterprise.public_header_files = 'CYLTabBarController/CYLTabBarItemAnimation/PAG/*.h'
     pagenterprise.dependency 'libpag-enterprise', '>= 4.0'
     pagenterprise.compiler_flags = '-fno-modules'
+    pagenterprise.pod_target_xcconfig = { 'GCC_PREPROCESSOR_DEFINITIONS' => '$(inherited) CYL_PAG_OBJC_PLAYER=1' }
   end
 
   s.subspec 'Rive' do |rive|
@@ -111,7 +117,7 @@ Pod::Spec.new do |s|
 
   s.subspec 'SVGA' do |svga|
     svga.dependency 'CYLAnimatedItem/Engine'
-    svga.source_files = 'CYLTabBarController/CYLTabBarItemAnimation/SVGA/*.{h,m}'
+    svga.source_files = 'CYLTabBarController/CYLTabBarItemAnimation/SVGA/*.{h,m,swift}'
     svga.public_header_files = 'CYLTabBarController/CYLTabBarItemAnimation/SVGA/*.h'
     svga.dependency 'SVGAPlayerLite', '~> 1.0', '>= 1.0.8'
   end

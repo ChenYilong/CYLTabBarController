@@ -142,10 +142,12 @@ Pod::Spec.new do |s|
     'CYLTabBarController/CYLUtils/**/*', # the CYLUtils subspec above
     'CYLTabBarController/CYLBadgeView/**/*', # the CYLBadgeView subspec above
     # [EN] The engine (CYLAnimationEngine) and the animators (one subspec each). Core keeps the tab buttons' side of the engine
-    #      (CYLTabBarItemAnimationEngine, UIControl+CYLTabBarItemAnimationPlayer, TabBar/), compiled only with an animation
-    #      subspec (`CYL_ANIMATION_ENGINE_AVAILABLE`).
+    #      (CYLTabBarItemAnimationEngine; Swift/UIControl+CYLTabBarItemAnimationPlayer.swift and the PAG helper
+    #      Swift/CYLPAGTabBarItemAttributes.swift), compiled only with an animation subspec (`CYL_ANIMATION_ENGINE_AVAILABLE`,
+    #      `CYL_PAG_AVAILABLE`).
     # [CN] 引擎（CYLAnimationEngine）与各 animator（各自一个子库）。Core 保留 Tab 按钮使用引擎的部分（CYLTabBarItemAnimationEngine、
-    #      UIControl+CYLTabBarItemAnimationPlayer、TabBar/），只有引入动画子库时才编译（`CYL_ANIMATION_ENGINE_AVAILABLE`）。
+    #      Swift/UIControl+CYLTabBarItemAnimationPlayer.swift 与 PAG 工具函数 Swift/CYLPAGTabBarItemAttributes.swift），只有引入动画子库时才编译
+    #      （`CYL_ANIMATION_ENGINE_AVAILABLE`、`CYL_PAG_AVAILABLE`）。
     'CYLTabBarController/CYLTabBarItemAnimation/{GIF,Lottie,PAG,Rive,SVGA,Swift}/**/*',
     'CYLTabBarController/CYLTabBarItemAnimation/{CYLTabBarItemAnimator,CYLTabBarItemAnimationPlayer,CYLTabBarItemAnimatorRegistry,CYLTabBarItemAnimationFactory,CYLTabBarItemAnimationPlayableView,CYLTabBarItemViewAnimator}.{h,m}',
     'CYLTabBarController/CYLAnimatedItem/**/*', # the CYLAnimatedItem subspec above (the engine files are in CYLTabBarItemAnimation/)
@@ -225,7 +227,8 @@ Pod::Spec.new do |s|
   s.subspec 'PAG' do |pag|
     # [EN] Core's engine-only Swift code (`#if CYL_ANIMATION_ENGINE_AVAILABLE`, the Swift side of the C macro) is compiled.
     # [CN] 编译 Core 中只在有引擎时才编译的 Swift 代码（`#if CYL_ANIMATION_ENGINE_AVAILABLE`，对应同名 C 宏）。
-    pag.pod_target_xcconfig = { 'SWIFT_ACTIVE_COMPILATION_CONDITIONS' => '$(inherited) CYL_ANIMATION_ENGINE_AVAILABLE' }
+    # [EN] Also `CYL_PAG_AVAILABLE`: Core's PAG helper (Swift/CYLPAGTabBarItemAttributes.swift). [CN] 另加 `CYL_PAG_AVAILABLE`：Core 的 PAG 工具函数。
+    pag.pod_target_xcconfig = { 'SWIFT_ACTIVE_COMPILATION_CONDITIONS' => '$(inherited) CYL_ANIMATION_ENGINE_AVAILABLE CYL_PAG_AVAILABLE' }
     # [EN] The tab bar (Core) plus the component's engine `CYLAnimatedItemPAG` (no Core).
     # [CN] TabBar（Core）加组件的动效引擎 `CYLAnimatedItemPAG`（不依赖 Core）。
     pag.dependency 'CYLTabBarController/Core'
@@ -239,7 +242,8 @@ Pod::Spec.new do |s|
   s.subspec 'PAGEnterprise' do |pagenterprise|
     # [EN] Core's engine-only Swift code (`#if CYL_ANIMATION_ENGINE_AVAILABLE`, the Swift side of the C macro) is compiled.
     # [CN] 编译 Core 中只在有引擎时才编译的 Swift 代码（`#if CYL_ANIMATION_ENGINE_AVAILABLE`，对应同名 C 宏）。
-    pagenterprise.pod_target_xcconfig = { 'SWIFT_ACTIVE_COMPILATION_CONDITIONS' => '$(inherited) CYL_ANIMATION_ENGINE_AVAILABLE' }
+    # [EN] Also `CYL_PAG_AVAILABLE`: Core's PAG helper (Swift/CYLPAGTabBarItemAttributes.swift). [CN] 另加 `CYL_PAG_AVAILABLE`：Core 的 PAG 工具函数。
+    pagenterprise.pod_target_xcconfig = { 'SWIFT_ACTIVE_COMPILATION_CONDITIONS' => '$(inherited) CYL_ANIMATION_ENGINE_AVAILABLE CYL_PAG_AVAILABLE' }
     # [EN] The tab bar (Core) plus the component's engine `CYLAnimatedItemPAGEnterprise` (no Core).
     # [CN] TabBar（Core）加组件的动效引擎 `CYLAnimatedItemPAGEnterprise`（不依赖 Core）。
     pagenterprise.dependency 'CYLTabBarController/Core'

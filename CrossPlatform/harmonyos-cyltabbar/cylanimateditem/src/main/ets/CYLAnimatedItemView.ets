@@ -5,7 +5,7 @@ import {
   CYLCountdownTickIntervalMillis, cylCountdownText, cylCountdownTitleWidth
 } from './CYLAnimatedItemCountdown';
 import { preferences } from '@kit.ArkData';
-import { ApplicationStateChangeCallback } from '@kit.AbilityKit';
+import { ApplicationStateChangeCallback, common } from '@kit.AbilityKit';
 import BuildProfile from '../../../BuildProfile';
 import { deviceInfo } from '@kit.BasicServicesKit';
 
@@ -201,6 +201,53 @@ export class CYLAnimatedItemEngines {
    * [CN] 读取一次设备的 ABI（`deviceInfo.abiList`），使原生库没有为本设备构建的引擎（PAG 与 Rive：只有 arm64-v8a）在 x86_64 模拟器上不播放：
    *      条目显示静态图片，而不是加载缺失的 .so 并崩溃。
    */
+  private static cylX86DebugEngines: string[] | undefined = undefined;
+
+  /**
+   * [EN] Debug builds only: turns on the engines of the x86_64 debug engine kit (`x86_64-debug-engines`, e.g. Rive built
+   *      for x86_64) when `tools/cyl_hap_x86_64.py install` added it to this HAP, which it marks with the rawfile
+   *      `cyl_x86_64_debug_engines.json`; those engines then also accept `x86_64`. Release builds, and debug builds installed
+   *      without the kit, change nothing (PAG and Rive keep their still images on x86_64). Kept once found; returns the engines.
+   *      CYLAnimatedItemView and CYLTabBarController call it. Owner's Plan 1: this debug guard stays until the owner
+   *      approves removing it.
+   * [CN] 仅 debug 构建：当 `tools/cyl_hap_x86_64.py install` 把 x86_64 调试引擎包（`x86_64-debug-engines`，例如为 x86_64 构建的 Rive）
+   *      加入本 HAP（以 rawfile `cyl_x86_64_debug_engines.json` 标记）时，开启该包中的引擎，这些引擎随即也接受 `x86_64`。release 构建以及
+   *      未安装该包的 debug 构建不做任何改变（x86_64 上 PAG 与 Rive 保持静态图片）。找到后保留；返回这些引擎。
+   */
+  static loadX86_64DebugEngines(context: common.Context | undefined): string[] {
+    if (CYLAnimatedItemEngines.cylX86DebugEngines !== undefined && CYLAnimatedItemEngines.cylX86DebugEngines.length > 0) {
+      return CYLAnimatedItemEngines.cylX86DebugEngines.slice();
+    }
+    let engines: string[] = [];
+    if (BuildProfile.DEBUG && context !== undefined) {
+      try {
+        const bytes: Uint8Array = context.resourceManager.getRawFileContentSync('cyl_x86_64_debug_engines.json');
+        let text: string = '';
+        bytes.forEach((byte: number) => { text += String.fromCharCode(byte); });
+        const parsed: Record<string, Object> = JSON.parse(text) as Record<string, Object>;
+        engines = (parsed['engines'] as string[] | undefined) ?? [];
+      } catch (e) {
+        engines = [];
+      }
+    }
+    engines.forEach((type: string) => {
+      const required: string[] = CYLAnimatedItemTypeRegistry.requiredNativeAbis(type);
+      if (required.length > 0 && required.indexOf('x86_64') < 0) {
+        CYLAnimatedItemTypeRegistry.setRequiredNativeAbis(type, required.concat(['x86_64']));
+      }
+    });
+    if (engines.length > 0) {
+      console.warn(`[CYLAnimatedItem] x86_64 debug engine kit active: ${engines.join(', ')} (debug builds only).`);
+    }
+    CYLAnimatedItemEngines.cylX86DebugEngines = engines;
+    return engines.slice();
+  }
+
+  /** [EN] The engines `loadX86_64DebugEngines` turned on. [CN] `loadX86_64DebugEngines` 开启的引擎。 */
+  static x86_64DebugEngines(): string[] {
+    return (CYLAnimatedItemEngines.cylX86DebugEngines ?? []).slice();
+  }
+
   private static cylReadDeviceAbis(): void {
     if (!CYLAnimatedItemTypeRegistry.hasDeviceAbis()) {
       CYLAnimatedItemTypeRegistry.setDeviceAbis((deviceInfo.abiList ?? '').split(','));
@@ -518,6 +565,7 @@ export struct CYLAnimatedItemView {
   @State private animationContext: CYLAnimatedItemAnimationContext = new CYLAnimatedItemAnimationContext();
 
   aboutToAppear(): void {
+    CYLAnimatedItemEngines.loadX86_64DebugEngines(this.getUIContext().getHostContext());
     this.cylLastRestartToken = this.animationRestartToken + this.cylControllerRestarts;
     this.cylLastSelected = this.isItemSelected;
     if (this.controller) {
