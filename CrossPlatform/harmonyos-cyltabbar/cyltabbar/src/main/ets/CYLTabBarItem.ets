@@ -57,10 +57,11 @@ export interface CYLTabBarItemAttributes {
   /** [EN] CYLTabBarSVGASize (vp); the image size when unset. [CN] SVGA 尺寸（vp）；未设置时用图片尺寸。 */
   svgaSize?: number;
   /**
-   * [EN] CYLTabBarRiveFilePath: a rawfile path of a .riv file, with Rive options in its query
-   *      (`CYLTabBarAnimationURLWithOptions`), e.g. "rive/icons.riv?artboard=CHAT&stateMachine=CHAT_Interactivity&input=active".
+   * [EN] CYLTabBarRiveFilePath: a rawfile path of a .riv file, with Rive options in its fragment
+   *      (`CYLTabBarAnimationURLWithOptions`), e.g. "rive/icons.riv#artboard=CHAT&stateMachine=CHAT_Interactivity&input=active"
+   *      (a "?" query is read too).
    *      Shown instead of the image and played when the tab is selected (`CYLRiveIcon`); the image when it cannot load.
-   * [CN] .riv 文件的 rawfile 路径，Rive 选项放在查询参数中。代替图片显示，Tab 选中时播放（`CYLRiveIcon`）；无法加载时显示图片。
+   * [CN] .riv 文件的 rawfile 路径，Rive 选项放在 fragment 中（也读取 "?" 查询参数）。代替图片显示，Tab 选中时播放（`CYLRiveIcon`）；无法加载时显示图片。
    */
   riveFilePath?: string;
   /**

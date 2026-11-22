@@ -12,14 +12,15 @@ import { CYLAnimatedItemEngines } from 'cylanimateditem';
  */
 
 /**
- * [EN] `CYLTabBarRiveURL`: a .riv file at an http(s) URL or a rawfile path, with options in its query
- *      (`CYLTabBarAnimationURLWithOptions`, e.g. "rive/icons.riv?artboard=CHAT&stateMachine=CHAT_Interactivity").
- * [CN] .riv 文件的 http(s) 地址或 rawfile 路径，选项放在查询参数中。
+ * [EN] `CYLTabBarRiveURL`: a .riv file at an http(s) URL or a rawfile path, with options in its fragment
+ *      (`CYLTabBarAnimationURLWithOptions`, e.g. "rive/icons.riv#artboard=CHAT&stateMachine=CHAT_Interactivity"; a "?"
+ *      query is read too).
+ * [CN] .riv 文件的 http(s) 地址或 rawfile 路径，选项放在 fragment 中（也读取 "?" 查询参数）。
  */
 export const CYLTabBarRiveURL: string = 'CYLTabBarRiveURL';
 /**
- * [EN] `CYLTabBarRiveFilePath`: a rawfile path of a .riv file (the default artboard unless the query names one).
- * [CN] .riv 文件的 rawfile 路径（查询参数未指定时使用默认画板）。
+ * [EN] `CYLTabBarRiveFilePath`: a rawfile path of a .riv file (the default artboard unless its options name one).
+ * [CN] .riv 文件的 rawfile 路径（选项未指定时使用默认画板）。
  */
 export const CYLTabBarRiveFilePath: string = 'CYLTabBarRiveFilePath';
 /**
@@ -37,9 +38,9 @@ export const CYLTabBarRiveDarkFilePath: string = 'CYLTabBarRiveDarkFilePath';
 /**
  * [EN] `CYLTabBarAnimationOptionTint`: draws a tab's animation (any engine) in one color, like a tinted template image:
  *      "title" = the tab's title color for its state (selected / normal), or a fixed "#RRGGBB" / "#AARRGGBB", as on iOS
- *      and Android. In the animation path's query, e.g. "rive/icons.riv?artboard=CHAT&tint=title".
+ *      and Android. In the animation path's options, e.g. "rive/icons.riv#artboard=CHAT&tint=title".
  * [CN] 以单一颜色绘制 Tab 的动画（任何引擎），与着色的模板图片一致："title" = Tab 当前状态（选中 / 普通）的标题颜色，或固定的
- *      "#RRGGBB" / "#AARRGGBB"，与 iOS、Android 相同。写在动画路径的查询参数中。
+ *      "#RRGGBB" / "#AARRGGBB"，与 iOS、Android 相同。写在动画路径的选项中。
  */
 export const CYLTabBarAnimationOptionTint: string = 'tint';
 /**
@@ -116,23 +117,53 @@ export function cylRiveNextNumber(values: string | undefined, current: number | 
 }
 
 /**
- * [EN] `CYLTabBarAnimationURLWithOptions`: a file path or URL with its options as a query, as on iOS and Android.
- * [CN] 把选项作为查询参数附加到文件路径或地址，与 iOS、Android 相同。
+ * [EN] `CYLTabBarAnimationURLWithOptions`: a file path or URL with its options in its fragment ("name=value&…",
+ *      percent-encoded, sorted by name), replacing a fragment it had, as on iOS and Android
+ *      ("rive/icons.riv#artboard=CHAT&stateMachine=CHAT_Interactivity"). `cylRiveFileAndOptions` also reads options
+ *      after "?", the form this function wrote before 2026-11-23 and the configuration files still use.
+ * [CN] 把选项写入文件路径或地址的 fragment（「名称=值&…」，百分号编码，按名称排序），替换原有的 fragment，与 iOS、Android 相同。
+ *      `cylRiveFileAndOptions` 也读取 "?" 之后的选项（本函数 2026-11-23 之前的写法，配置文件仍在使用）。
  */
 export function CYLTabBarAnimationURLWithOptions(file: string, options: Record<string, string>): string {
+  const hash = file.indexOf('#');
+  const base = hash >= 0 ? file.substring(0, hash) : file;
   const pairs: string[] = Object.keys(options)
-    .filter((key: string) => options[key] !== undefined && options[key].length > 0)
+    .filter((key: string) => key.length > 0 && options[key] !== undefined && options[key].length > 0)
+    .sort()
     .map((key: string) => `${encodeURIComponent(key)}=${encodeURIComponent(options[key])}`);
-  return pairs.length > 0 ? `${file}${file.includes('?') ? '&' : '?'}${pairs.join('&')}` : file;
+  return pairs.length > 0 ? `${base}#${pairs.join('&')}` : base;
 }
 
 /**
- * [EN] The file part and the options of a Rive URL. The options follow "?" (as `CYLTabBarAnimationURLWithOptions` writes
- *      them here) or "#" (the fragment of iOS `CYLTabBarAnimationURLWithOptions`, CYLTableViewPlaceHolder and the WeChat
- *      Mini Program), whichever comes first; pairs after both are read ("file.riv?artboard=CHAT#input=active").
- * [CN] Rive 地址的文件部分与选项。选项跟在 "?"（本端 `CYLTabBarAnimationURLWithOptions` 的写法）或 "#"（iOS
- *      `CYLTabBarAnimationURLWithOptions`、CYLTableViewPlaceHolder 与微信小程序使用的 fragment）之后，以先出现者为准；两者之后的键值对都会读取。
+ * [EN] The file part and the options of a Rive URL. The options follow "#" (the fragment `CYLTabBarAnimationURLWithOptions`
+ *      writes, as on iOS and Android, CYLTableViewPlaceHolder and the WeChat Mini Program) or "?" (the earlier HarmonyOS
+ *      form, still in the configuration files), whichever comes first; pairs after both are read
+ *      ("file.riv?artboard=CHAT#input=active").
+ * [CN] Rive 地址的文件部分与选项。选项跟在 "#"（`CYLTabBarAnimationURLWithOptions` 写入的 fragment，与 iOS、Android、CYLTableViewPlaceHolder、
+ *      微信小程序相同）或 "?"（鸿蒙之前的写法，配置文件仍在使用）之后，以先出现者为准；两者之后的键值对都会读取。
  */
+/**
+ * [EN] The "name=value" pairs after the first "?" or "#": split at "&", and at a "?" or "#" that starts the next group
+ *      ("artboard=CHAT#input=active"), not one inside a value ("tint=#FF0000", a color written without encoding).
+ * [CN] 第一个 "?" 或 "#" 之后的「名称=值」对：在 "&" 处分开，也在开始下一组的 "?" 或 "#" 处分开（"artboard=CHAT#input=active"），
+ *      但不在值内部的 "#" 处分开（"tint=#FF0000"，未编码的颜色）。
+ */
+function cylRiveOptionPairs(text: string): string[] {
+  const pairs: string[] = [];
+  text.split('&').forEach((piece: string) => {
+    let start = 0;
+    for (let i = 1; i < piece.length; i++) {
+      const c = piece.charAt(i);
+      if ((c === '#' || c === '?') && piece.charAt(i - 1) !== '=') {
+        pairs.push(piece.substring(start, i));
+        start = i + 1;
+      }
+    }
+    pairs.push(piece.substring(start));
+  });
+  return pairs;
+}
+
 export function cylRiveFileAndOptions(url: string): [string, Record<string, string>] {
   const options: Record<string, string> = {};
   const query = url.indexOf('?');
@@ -141,7 +172,7 @@ export function cylRiveFileAndOptions(url: string): [string, Record<string, stri
   if (at < 0) {
     return [url, options];
   }
-  url.substring(at + 1).split(/[&?#]/).forEach((pair: string) => {
+  cylRiveOptionPairs(url.substring(at + 1)).forEach((pair: string) => {
     const eq = pair.indexOf('=');
     if (eq > 0) {
       options[decodeURIComponent(pair.substring(0, eq))] = decodeURIComponent(pair.substring(eq + 1));
