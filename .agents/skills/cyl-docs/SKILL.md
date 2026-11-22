@@ -202,3 +202,7 @@ classes link back to it:
 ## Instruction files: tags and the 200-line limit (added 2026-11-22, owner)
 
 The instruction files (`AGENTS.md`, `instructions.md`, `docs/instructions.md`, `CLAUDE.md`) are organized by tag: every rule has a tag (a keyword such as `testing`, `windows-harmonyos`, `macos`, `documentation`, `git`), each tag is a visible heading `## <Title> (tag: `<tag>`)` with a short summary, and no file goes above 200 lines; what does not fit moves verbatim to `docs/instructions/<tag>.md`, linked from the heading by a relative path, and is read only when a task touches the tag. A new rule goes under its tag (summary) and into the tag's file (full text). Full rule: `docs/instructions/instructions.md`.
+
+## Read in full before any task (added 2026-11-22, owner)
+
+Before any task in this repository, read `docs/instructions/Behavioral_guidelines_to_reduce_common_LLM_coding_mistakes.md` in full (tag `behavior`, linked at the top of `AGENTS.md` and `instructions.md`). Files marked "read in full" are linked at the top of the root instruction files under their own tag heading: `docs/instructions/instructions.md`, rule 5.
