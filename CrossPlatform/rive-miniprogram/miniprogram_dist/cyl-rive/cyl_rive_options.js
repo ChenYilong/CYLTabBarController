@@ -15,18 +15,64 @@ const CYL_OPTION_NAMES = Object.freeze(['artboard', 'stateMachine', 'animation',
   'duration', 'color', 'numberInput', 'number', 'values'])
 
 /**
- * [EN] {path, options}: the file path without its fragment, and the fragment's options.
- * [CN] {path, options}：去掉 fragment 的文件路径，以及 fragment 中的选项。
+ * [EN] The "name=value" pairs of an options text: split at "&", and at a "#" or "?" that does not follow "="
+ *      ("artboard=CHAT#input=active" is two pairs, "tint=#FF0000" one). The shared rule of every platform
+ *      (`CrossPlatform/animated-item-fixtures/source-options.json`; the mini program's `cylAnimatedItemOptionPairs`).
+ * [CN] 选项文本中的「名称=值」对：在 "&" 处分开，也在不跟在 "=" 后面的 "#" 或 "?" 处分开（"artboard=CHAT#input=active" 是两对，
+ *      "tint=#FF0000" 是一对）。各平台共同的规则（`CrossPlatform/animated-item-fixtures/source-options.json`；小程序的
+ *      `cylAnimatedItemOptionPairs`）。
+ */
+function cylRiveOptionPairs(text) {
+  const pairs = []
+  text.split('&').forEach((piece) => {
+    let start = 0
+    for (let i = 1; i < piece.length; i++) {
+      const c = piece.charAt(i)
+      if ((c === '#' || c === '?') && piece.charAt(i - 1) !== '=') {
+        pairs.push(piece.slice(start, i))
+        start = i + 1
+      }
+    }
+    pairs.push(piece.slice(start))
+  })
+  return pairs
+}
+
+/** [EN] Percent-decoded text; an undecodable text is kept as it is. [CN] 百分号解码后的文本；无法解码时保持原样。 */
+function cylRiveDecode(text) {
+  try {
+    return decodeURIComponent(text)
+  } catch {
+    return text
+  }
+}
+
+/**
+ * [EN] {path, options}: the file path without its options, and the options cyl-rive reads (`CYL_RIVE_OPTION_NAMES`), with the
+ *      shared rules (`CrossPlatform/animated-item-fixtures/source-options.json`, test/cyl_rive_options.test.js): an `asset:`
+ *      prefix is dropped; the options follow the first "#" or "?" (for an http / https URL only "#", so its query stays in the
+ *      path); names and values are percent-decoded, an undecodable text kept; a pair without a name or a value is dropped.
+ * [CN] {path, options}：去掉选项的文件路径，以及 cyl-rive 读取的选项（`CYL_RIVE_OPTION_NAMES`），规则与共享测试向量一致
+ *      （`CrossPlatform/animated-item-fixtures/source-options.json`，test/cyl_rive_options.test.js）：丢弃 `asset:` 前缀；选项位于第一个
+ *      "#" 或 "?" 之后（http / https URL 只认 "#"，其查询参数保留在路径中）；名称与值经百分号解码，无法解码时保持原样；没有名称或没有值的对被丢弃。
  */
 function cylRiveRoute(route) {
-  const value = String(route || '')
-  const index = value.indexOf('#')
+  const trimmed = String(route || '').trim()
+  const value = trimmed.startsWith('asset:') ? trimmed.slice('asset:'.length) : trimmed
+  const hash = value.indexOf('#')
+  const query = /^https?:\/\//i.test(value) ? -1 : value.indexOf('?')
+  const index = query < 0 ? hash : (hash < 0 ? query : Math.min(query, hash))
   const options = {}
   if (index >= 0) {
-    value.slice(index + 1).split('&').forEach((pair) => {
-      const [key, raw] = pair.split('=')
-      if (CYL_OPTION_NAMES.includes(key) && raw !== undefined) {
-        options[key] = decodeURIComponent(raw)
+    cylRiveOptionPairs(value.slice(index + 1)).forEach((pair) => {
+      const eq = pair.indexOf('=')
+      if (eq <= 0) {
+        return
+      }
+      const key = cylRiveDecode(pair.slice(0, eq))
+      const raw = pair.slice(eq + 1)
+      if (CYL_OPTION_NAMES.includes(key) && raw !== '') {
+        options[key] = cylRiveDecode(raw)
       }
     })
   }
