@@ -41,6 +41,31 @@ class CYLHapX8664Tests(unittest.TestCase):
         if os.sep == '\\':
             self.assertNotIn('/', cyl.cyl_local_path('C:/Users/x/entry.hap'))
 
+    def test_debug_engine_kit_adds_the_x86_64_libraries_and_the_marker(self):
+        with tempfile.TemporaryDirectory() as folder:
+            hap = self.make_hap(folder)
+            stripped = os.path.join(folder, 'stripped.hap')
+            cyl.cyl_strip(hap, stripped, keep_abis=['x86_64'])
+            kit = os.path.join(folder, 'kit', 'rive')
+            os.makedirs(kit)
+            for name in ('libohos_rive.so', 'libc++_shared.so', 'README.md'):
+                with open(os.path.join(kit, name), 'w') as handle:
+                    handle.write(name)
+            out = os.path.join(folder, 'out.hap')
+            self.assertEqual(cyl.cyl_add_debug_engines(stripped, out, os.path.join(folder, 'kit')), ['Rive'])
+            with zipfile.ZipFile(out) as result:
+                names = result.namelist()
+                self.assertIn('libs/x86_64/libohos_rive.so', names)
+                self.assertIn('libs/x86_64/libc++_shared.so', names)
+                self.assertNotIn('libs/x86_64/README.md', names)
+                self.assertEqual(result.getinfo('libs/x86_64/libohos_rive.so').compress_type, zipfile.ZIP_STORED)
+                self.assertIn('"Rive"', result.read(cyl.CYL_MARKER).decode())
+
+    def test_the_real_kit_holds_the_x86_64_rive_library(self):
+        rive = os.path.join(cyl.CYL_KIT_DIR, 'rive')
+        self.assertTrue(os.path.isfile(os.path.join(rive, 'libohos_rive.so')))
+        self.assertTrue(os.path.isfile(os.path.join(rive, 'libc++_shared.so')))
+
     def test_strip_without_abis_drops_every_native_library(self):
         with tempfile.TemporaryDirectory() as folder:
             hap = self.make_hap(folder)

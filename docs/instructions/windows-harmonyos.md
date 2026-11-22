@@ -95,4 +95,4 @@ Tests that today can only run on arm64 (PAG and Rive playback, their `onEnded`, 
    - Until Plan 1 works, the current fallback stays: on x86_64, PAG and Rive items show their still images (`CYLAnimatedItemEngines.isSupportedOnDevice`, the `emulator` build target, `cylanimateditem/README.md`, "x86_64 emulator").
 2. **Plan 2, if Plan 1 fails: hand the test to the macOS session.** A Mac (Apple silicon) is arm64, so its arm64 HarmonyOS emulator runs PAG and Rive natively. Send the task to the active session whose name starts with `Mac` (`ListAgents`), with the build, the commands and what to check; when none is reachable, record it as a TODO in the task's document for the next Mac session.
 
-Status: TODO (Plan 1 not started). Task and score: `docs/Animated-Item.md`, "Rive and PAG on the x86_64 emulator".
+Status (2026-11-22): Plan 1 done for Rive behind the debug guard (`cylanimateditem/x86_64-debug-engines/rive`, `CYLAnimatedItemEngines.loadX86_64DebugEngines`, `tools/cyl_hap_x86_64.py install`); PAG not started. Task and score: `docs/Animated-Item.md`, "Rive and PAG on the x86_64 emulator".

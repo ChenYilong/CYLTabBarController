@@ -504,6 +504,9 @@ export struct CYLTabBarController {
     // [EN] cyltabbar plays Lottie (@ohos/lottie), Rive (@ohos/rive) and SVGA (its own player): CYLAnimatedItemView draws them.
     // [CN] cyltabbar 播放 Lottie、Rive 与 SVGA（自带播放器）：由 CYLAnimatedItemView 绘制。
     ['Lottie', 'Rive', 'SVGA'].forEach((type: string) => CYLAnimatedItemEngines.register(type));
+    // [EN] Debug builds installed with the x86_64 debug engine kit: Rive also plays on the x86_64 emulator.
+    // [CN] 安装了 x86_64 调试引擎包的 debug 构建：Rive 也能在 x86_64 模拟器上播放。
+    CYLAnimatedItemEngines.loadX86_64DebugEngines(this.getUIContext().getHostContext());
     this.loaded = [this.selectedIndex];
     this.cylGIFPlayback.loops = this.tabBarItemAnimationLoops;
     this.cylLoadGIFImages();
