@@ -111,10 +111,10 @@ struct CYLTabBarControllerView: UIViewControllerRepresentable {
             return UINavigationController(rootViewController: hostingController)
         }
         let attributes: [[AnyHashable: Any]] = SwiftUITab.allCases.map { tab in
-            [CYLTabBarItemTitle: tab.title,
-             CYLTabBarItemImage: tab.imageName,
-             CYLTabBarItemSelectedImage: tab.selectedImageName,
-             CYLTabBarItemIdentifier: tab.identifier]
+            [cylTabBarItemTitle: tab.title,
+             cylTabBarItemImage: tab.imageName,
+             cylTabBarItemSelectedImage: tab.selectedImageName,
+             cylTabBarItemIdentifier: tab.identifier]
         }
         let tabBarController = CYLTabBarController(viewControllers: viewControllers, tabBarItemsAttributes: attributes)
         tabBarController.tabBarStyleType = .liquidGlass
@@ -177,7 +177,7 @@ class CYLPlusButtonSubclass: CYLPlusButton, CYLPlusButtonSubclassing {
 
     static func plusChildViewController() -> UIViewController {
         let publish = UIHostingController(rootView: PublishView())
-        publish.title = CYLLocalizedString("发布")
+        publish.title = cylLocalizedString("发布")
         return UINavigationController(rootViewController: publish)
     }
 }

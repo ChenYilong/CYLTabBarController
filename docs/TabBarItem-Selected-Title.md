@@ -83,10 +83,10 @@ self.cyl_tabBarItemGestureHandler = ^(CYLTabBarController *tabBarController, CYL
 
 ```swift
 let home: [AnyHashable: Any] = [
-    CYLTabBarItemTitle: "Home",
-    CYLTabBarItemSelectedTitle: "Refresh",   // #433
-    CYLTabBarItemImage: "home_normal",
-    CYLTabBarItemSelectedImage: "home_refresh",
+    cylTabBarItemTitle: "Home",
+    cylTabBarItemSelectedTitle: "Refresh",   // #433
+    cylTabBarItemImage: "home_normal",
+    cylTabBarItemSelectedImage: "home_refresh",
 ]
 ```
 

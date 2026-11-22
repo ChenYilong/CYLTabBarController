@@ -368,13 +368,13 @@ final class MainTabBarController: CYLTabBarController {
             UINavigationController(rootViewController: HomeViewController()),
             UINavigationController(rootViewController: MessageViewController()),
         ], tabBarItemsAttributes: [
-            [CYLTabBarItemTitle: "Home",
-             CYLTabBarItemImage: "home_normal",           // an image name (recommended) or a UIImage
-             CYLTabBarItemSelectedImage: "home_highlight",
-             CYLTabBarItemDarkImage: "home_normal_night"], // optional: Dark Mode
-            [CYLTabBarItemTitle: "Messages",
-             CYLTabBarItemImage: "message_normal",
-             CYLTabBarItemSelectedImage: "message_highlight"],
+            [cylTabBarItemTitle: "Home",
+             cylTabBarItemImage: "home_normal",           // an image name (recommended) or a UIImage
+             cylTabBarItemSelectedImage: "home_highlight",
+             cylTabBarItemDarkImage: "home_normal_night"], // optional: Dark Mode
+            [cylTabBarItemTitle: "Messages",
+             cylTabBarItemImage: "message_normal",
+             cylTabBarItemSelectedImage: "message_highlight"],
         ])
     }
 }
@@ -394,7 +394,7 @@ func scene(_ scene: UIScene, willConnectTo session: UISceneSession,
            options connectionOptions: UIScene.ConnectionOptions) {
     guard let windowScene = scene as? UIWindowScene else { return }
     let window = UIWindow(windowScene: windowScene)
-    window.cyl_setRootViewControllerProvider { MainTabBarController() }
+    window.cylSetRootViewControllerProvider { MainTabBarController() }
     window.makeKeyAndVisible()
     self.window = window
 }

@@ -50,9 +50,9 @@ NSDictionary *live = @{
 
 ```swift
 let live: [String: Any] = [
-    CYLTabBarItemTitle: "Live",
-    CYLTabBarItemSelectedTitleColor: UIColor.systemRed,
-    CYLTabBarItemSelectedBackgroundColor: UIColor.systemRed.withAlphaComponent(0.12),
+    cylTabBarItemTitle: "Live",
+    cylTabBarItemSelectedTitleColor: UIColor.systemRed,
+    cylTabBarItemSelectedBackgroundColor: UIColor.systemRed.withAlphaComponent(0.12),
 ]
 ```
 
