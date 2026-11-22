@@ -16,7 +16,7 @@ import { BusinessError } from '@kit.BasicServicesKit';
 import { util } from '@kit.ArkTS';
 import {
   CYLAnimatedItemEngineBinding, CYLAnimatedItemEngineState, CYLAnimatedItemEngineViews, CYLAnimatedItemPlayer,
-  CYLAnimatedItemSource
+  CYLAnimatedItemSource, cylAnimatedItemParseHexColor
 } from 'cylanimateditem';
 
 let cylLottieCount: number = 0;
@@ -31,6 +31,13 @@ export class CYLAnimatedItemLottiePlayer extends CYLAnimatedItemPlayer {
   readonly name: string;
   /** [EN] A progress asked for before the file finished loading, applied once it has. [CN] 文件加载完成前请求的进度，加载后应用。 */
   private pendingProgress?: number;
+  /** [EN] The colors applied (re-applied once the file has loaded). [CN] 已应用的颜色（文件加载完成后重新应用）。 */
+  private colors?: Map<string, string>;
+  /**
+   * [EN] Loads the file again (set by the view): lottie-ohos cannot undo changeColor, so restoring the file's colors reloads.
+   * [CN] 重新加载文件（由视图设置）：lottie-ohos 无法撤销 changeColor，因此恢复文件颜色时重新加载。
+   */
+  reload?: () => void;
 
   constructor(source: CYLAnimatedItemSource, item: AnimationItem, name: string) {
     super('Lottie', source);
@@ -42,6 +49,7 @@ export class CYLAnimatedItemLottiePlayer extends CYLAnimatedItemPlayer {
       if (progress !== undefined && this.lottieItem.isPaused) {
         this.stopAtProgress(progress);
       }
+      this.applyColorsToItem();
     });
     item.addEventListener('complete', () => this.didEnd());
   }
@@ -53,6 +61,41 @@ export class CYLAnimatedItemLottiePlayer extends CYLAnimatedItemPlayer {
   get progress(): number | undefined {
     const last = Math.max(1, this.lottieItem.totalFrames - 1);
     return Math.min(1, Math.max(0, this.lottieItem.currentFrame / last));
+  }
+
+  /** [EN] lottie-ohos recolors whole layers, not key paths. [CN] lottie-ohos 按整层改色，而非按 keypath。 */
+  get supportsColors(): boolean {
+    return true;
+  }
+
+  /**
+   * [EN] lottie-ohos recolors whole layers, not key paths: the first color paints every layer (as Android does; moved from
+   *      CYLTableViewPlaceHolder's Lottie animator). undefined restores the file's colors by loading it again.
+   * [CN] lottie-ohos 按整层改色，而非按 keypath：第一个颜色绘制所有图层（与 Android 相同；从 CYLTableViewPlaceHolder 的 Lottie 动画器迁移）。
+   *      undefined 时重新加载文件以恢复其颜色。
+   */
+  applyColors(colors: Map<string, string> | undefined): void {
+    const hadColors = this.colors !== undefined;
+    this.colors = colors !== undefined && colors.size > 0 ? colors : undefined;
+    if (this.colors === undefined) {
+      if (hadColors) {
+        this.reload?.();
+      }
+      return;
+    }
+    this.applyColorsToItem();
+  }
+
+  private applyColorsToItem(): void {
+    const colors = this.colors;
+    if (colors === undefined || this.lottieItem.totalFrames <= 0) {
+      return;
+    }
+    const first = Array.from(colors.values())[0];
+    const color = first === undefined ? undefined : cylAnimatedItemParseHexColor(first);
+    if (color !== undefined) {
+      this.lottieItem.changeColor([color.red, color.green, color.blue, color.alpha / 255]);
+    }
   }
 
   play(): void {
@@ -148,7 +191,7 @@ export struct CYLAnimatedItemLottieView {
         container: this.context2D, renderer: 'canvas', loop: false, autoplay: false, name: name, path: source.path
       });
       remote.addEventListener('data_failed', () => this.binding.failed(this.state));
-      this.binding.ready(this.state, new CYLAnimatedItemLottiePlayer(source, remote, name));
+      this.cylReady(new CYLAnimatedItemLottiePlayer(source, remote, name));
       return;
     }
     const data = context === undefined ? undefined : cylLottieData(context, source);
@@ -183,7 +226,16 @@ export struct CYLAnimatedItemLottieView {
       }
     });
     item.addEventListener('data_failed', () => this.binding.failed(this.state));
-    this.binding.ready(this.state, new CYLAnimatedItemLottiePlayer(source, item, name));
+    this.cylReady(new CYLAnimatedItemLottiePlayer(source, item, name));
+  }
+
+  /** [EN] Hands the player out; restoring colors reloads the file through it. [CN] 交出播放器；恢复颜色时通过它重新加载文件。 */
+  private cylReady(player: CYLAnimatedItemLottiePlayer): void {
+    player.reload = () => {
+      this.binding.release();
+      this.cylLoad();
+    };
+    this.binding.ready(this.state, player);
   }
 
   build() {

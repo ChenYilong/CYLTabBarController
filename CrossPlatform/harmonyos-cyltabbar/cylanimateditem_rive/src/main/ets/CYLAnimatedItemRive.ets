@@ -25,7 +25,7 @@ import { Fit, Loop, RendererType, RiveAnimationView, SMINumber, ViewModelInstanc
 import { deviceInfo } from '@kit.BasicServicesKit';
 import {
   CYLAnimatedItemEngineBinding, CYLAnimatedItemEngineState, CYLAnimatedItemEngineViews, CYLAnimatedItemEngines,
-  CYLAnimatedItemPlayer, CYLAnimatedItemSource
+  CYLAnimatedItemPlayer, CYLAnimatedItemSource, cylAnimatedItemARGBInteger, cylAnimatedItemParseHexColor
 } from 'cylanimateditem';
 import { CYLAnimatedItemRiveOption, cylRiveActiveDuration, cylRiveNextNumber, cylRiveUsesLegacyRuntime } from './CYLAnimatedItemRiveOptions';
 
@@ -93,6 +93,10 @@ export class CYLAnimatedItemRivePlayer extends CYLAnimatedItemPlayer {
   private restingAfterLoad: boolean = false;
   private hasPlayed: boolean = false;
   private fileWaits: number = 0;
+  /** [EN] The colors asked for (applied once the view model exists). [CN] 请求的颜色（视图模型存在后应用）。 */
+  private requestedColors?: Map<string, string>;
+  private originalColors: Map<string, number> = new Map<string, number>();
+  private overriddenColorPaths: Set<string> = new Set<string>();
 
   constructor(source: CYLAnimatedItemSource, view: RiveAnimationView) {
     super('Rive', source);
@@ -108,6 +112,62 @@ export class CYLAnimatedItemRivePlayer extends CYLAnimatedItemPlayer {
   /** [EN] @ohos/rive exposes no progress. [CN] @ohos/rive 不提供进度。 */
   get supportsProgress(): boolean {
     return false;
+  }
+
+  /** [EN] View model color properties. [CN] 视图模型的颜色属性。 */
+  get supportsColors(): boolean {
+    return true;
+  }
+
+  /**
+   * [EN] View model color property path -> color; undefined restores the file's colors. Files without a view model keep
+   *      theirs. Moved from CYLTableViewPlaceHolder's Rive animator (iOS CYLPlaceholderRiveItemAnimationView.applyAnimationColors).
+   * [CN] 视图模型颜色属性路径 -> 颜色；undefined 恢复文件的颜色。没有视图模型的文件保持原色。从 CYLTableViewPlaceHolder 的 Rive 动画器迁移。
+   */
+  applyColors(colors: Map<string, string> | undefined): void {
+    this.requestedColors = colors !== undefined && colors.size > 0 ? colors : undefined;
+    const view = this.riveView;
+    if (view !== null) {
+      this.cylApplyRequestedColors(view);
+    }
+  }
+
+  private cylApplyRequestedColors(view: RiveAnimationView): void {
+    const instance = this.cylViewModel(view);
+    if (instance === null) {
+      return;
+    }
+    const colors = this.requestedColors;
+    if (colors !== undefined) {
+      colors.forEach((text: string, path: string) => {
+        const color = cylAnimatedItemParseHexColor(text);
+        if (color === undefined) {
+          return;
+        }
+        try {
+          const property = instance.getColorProperty(path);
+          if (!this.originalColors.has(path)) {
+            this.originalColors.set(path, property.value);
+          }
+          property.value = cylAnimatedItemARGBInteger(color);
+          this.overriddenColorPaths.add(path);
+        } catch (e) {
+          // [EN] No such color property. [CN] 没有该颜色属性。
+        }
+      });
+      return;
+    }
+    this.overriddenColorPaths.forEach((path: string) => {
+      const original = this.originalColors.get(path);
+      if (original !== undefined) {
+        try {
+          instance.getColorProperty(path).value = original;
+        } catch (e) {
+          // [EN] No such color property. [CN] 没有该颜色属性。
+        }
+      }
+    });
+    this.overriddenColorPaths.clear();
   }
 
   get isPlaying(): boolean {
@@ -294,6 +354,10 @@ export class CYLAnimatedItemRivePlayer extends CYLAnimatedItemPlayer {
     }
     this.fileWaits = 0;
     this.hasPlayed = true;
+    // [EN] Colors asked for before the file was built. [CN] 文件建好之前请求的颜色。
+    if (this.requestedColors !== undefined) {
+      this.cylApplyRequestedColors(view);
+    }
     if (this.restingAfterLoad) {
       // [EN] Resumed where it rests, then played as usual; only the state machine (an unnamed play() also starts the
       //      linear animations, which override the machine). [CN] 从静止处恢复，然后照常播放；只恢复状态机。
