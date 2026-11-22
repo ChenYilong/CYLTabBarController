@@ -22,6 +22,8 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager
+import com.cyl.deallocblockexecutor.CYLLifecycleCallbacks
+import com.cyl.deallocblockexecutor.CYLLifecycleEvent
 import java.util.WeakHashMap
 
 /**
@@ -355,6 +357,9 @@ open class CYLTabBarController(val activity: FragmentActivity) {
         set(value) { tabBarStyleType = if (value) CYLEnums.CYLTabBarStyleType.LiquidGlass else CYLEnums.CYLTabBarStyleType.FlatDesign }
     var allowsVerticalBar: Boolean = false
     var viewDidLayoutSubviewsBlock: CYLViewDidLayoutSubViewsBlock? = null
+    // [EN] The callbacks of this controller (CYLDeallocBlockExecutor, as on iOS). The layout block is the keyed callback `cyl.core.layoutBlock` on LAYOUT; it reads `viewDidLayoutSubviewsBlock` when it runs.
+    // [CN] 本控制器的回调（CYLDeallocBlockExecutor，与 iOS 相同）。布局 block 是 LAYOUT 事件上带 key 的回调 `cyl.core.layoutBlock`，执行时读取 `viewDidLayoutSubviewsBlock`。
+    private val cylLifecycleCallbacks = CYLLifecycleCallbacks(this).also { registerLayoutBlockCallback(it, false) }
     /**
      * [EN] The animation file of each animated tab, in tab order (`CYLTabBarAnimation…` and the library keys). [CN] 每个有动画的 Tab 的动画文件，按 Tab 顺序。
      */
@@ -667,7 +672,10 @@ open class CYLTabBarController(val activity: FragmentActivity) {
         loadImageURLs()
         cyl_applyLaunchTabBarThemeIfNeeded()
         cyl_applyNavigationTitleOfSelectedPage()
-        viewDidLayoutSubviewsBlock?.invoke(this)
+        // [EN] Every new set of tabs (also a theme switch and a reload) lets the one-time layout block run once more, as on iOS (`cylRearmViewDidLayoutSubviewsBlockInvokeOnce`).
+        // [CN] 每次重新设置 Tab（包括换肤与重新加载）都让只执行一次的布局 block 再执行一次，与 iOS 相同（`cylRearmViewDidLayoutSubviewsBlockInvokeOnce`）。
+        cylLifecycleCallbacks.rearm(LAYOUT_BLOCK_KEY)
+        cylLifecycleCallbacks.perform(CYLLifecycleEvent.LAYOUT)
     }
 
     private fun makeItem(attributes: Map<String, Any?>): CYLTabBarItem {
@@ -1192,9 +1200,19 @@ open class CYLTabBarController(val activity: FragmentActivity) {
      * [EN] `-reloadBadgesWithBlock:`: `block` sets the badges once the tab buttons are ready. [CN] Tab 按钮就绪后由 `block` 设置角标。
      */
     fun reloadBadgesWithBlock(block: (CYLTabBarController) -> Unit) = performWhenTabBarItemsReady(block)
-    fun setViewDidLayoutSubViewsBlock(block: ((CYLTabBarController) -> Unit)?) { viewDidLayoutSubviewsBlock = block }
+    fun setViewDidLayoutSubViewsBlock(block: ((CYLTabBarController) -> Unit)?) {
+        viewDidLayoutSubviewsBlock = block
+        registerLayoutBlockCallback(cylLifecycleCallbacks, false)
+    }
     fun setViewDidLayoutSubViewsBlockInvokeOnce(once: Boolean, block: ((CYLTabBarController) -> Unit)?) {
-        viewDidLayoutSubviewsBlock = if (once && block != null) { controller -> block(controller); viewDidLayoutSubviewsBlock = null } else block
+        viewDidLayoutSubviewsBlock = block
+        registerLayoutBlockCallback(cylLifecycleCallbacks, once)
+        cylLifecycleCallbacks.rearm(LAYOUT_BLOCK_KEY)
+    }
+
+    // [EN] Replaces the keyed layout callback (the replacement starts armed). [CN] 替换带 key 的布局回调（新回调处于未执行状态）。
+    private fun registerLayoutBlockCallback(callbacks: CYLLifecycleCallbacks<CYLTabBarController>, invokeOnce: Boolean) {
+        callbacks.addCallback(CYLLifecycleEvent.LAYOUT, invokeOnce, LAYOUT_BLOCK_KEY) { owner, _, _ -> owner.viewDidLayoutSubviewsBlock?.invoke(owner) }
     }
     fun updateImageInsets(insets: CYLEdgeInsets) { imageInsets = insets }
     fun hideTabBarShadowImageView() { tabBar.cyl_shadowColor = null; tabBar.refreshSelection() }
@@ -1790,6 +1808,10 @@ open class CYLTabBarController(val activity: FragmentActivity) {
          * [EN] The queue that downloads and decodes the tab icons of every tab bar controller. [CN] 为所有 TabBarController 下载并解码 Tab 图标的队列。
          */
         private val iconLoader = java.util.concurrent.Executors.newSingleThreadExecutor()
+        /**
+         * [EN] The key of the layout block in CYLDeallocBlockExecutor; `cyl.core.` keys belong to the core. [CN] 布局 block 在 CYLDeallocBlockExecutor 中的 key；`cyl.core.` 开头的 key 属于核心。
+         */
+        private const val LAYOUT_BLOCK_KEY = "cyl.core.layoutBlock"
         /**
          * [EN] Decoded tab icons by URL, shared by every tab bar controller. [CN] 按 URL 缓存的已解码 Tab 图标，所有 TabBarController 共用。
          */

@@ -39,7 +39,7 @@ allprojects {
     repositories {
         maven {
             url "https://jitpack.io"
-            content { includeGroup("com.github.yyued") }
+            content { includeGroup("com.github.yyued"); includeGroup("com.github.ChenYilong") }
         }
     }
 }
