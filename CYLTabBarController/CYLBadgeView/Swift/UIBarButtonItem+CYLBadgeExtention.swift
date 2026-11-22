@@ -258,7 +258,7 @@ extension UIBarButtonItem {
      * [CN] 用显示角标的视图执行 `block`：bar button 已布局时立即执行，否则与 `-cyl_showBadgeValue:animationType:` 一样延迟 0.5 秒，
      *      因此在 `-viewDidLoad` 中设置的样式不会丢失，并在角标显示之前生效。
      */
-    private func cyl_performWithBadgeSuperView(_ block: @escaping (UIView) -> Void) {
+    private func cylPerformWithBadgeSuperView(_ block: @escaping (UIView) -> Void) {
         if cyl_isReady() {
             if let view = cyl_actualBadgeView {
                 block(view)
@@ -340,7 +340,7 @@ extension UIBarButtonItem {
     @objc(cyl_badge)
     public dynamic var cyl_badge: (UIView & CYLBadgeTextDisplaying)? {
         @objc(cyl_badge) get { cyl_actualBadgeView?.cyl_badge }
-        @objc(cyl_setBadge:) set { cyl_performWithBadgeSuperView { $0.cyl_badge = newValue } }
+        @objc(cyl_setBadge:) set { cylPerformWithBadgeSuperView { $0.cyl_badge = newValue } }
     }
 
     // [EN] The font and colors are remembered on the item too, for the system badge (iOS 26+) and before the bar button is
@@ -354,7 +354,7 @@ extension UIBarButtonItem {
         }
         @objc(cyl_setBadgeFont:) set {
             objc_setAssociatedObject(self, CYLBarButtonItemBadgeSupport.font, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
-            cyl_performWithBadgeSuperView { $0.cyl_badgeFont = newValue }
+            cylPerformWithBadgeSuperView { $0.cyl_badgeFont = newValue }
         }
     }
 
@@ -366,7 +366,7 @@ extension UIBarButtonItem {
         }
         @objc(cyl_setBadgeBackgroundColor:) set {
             objc_setAssociatedObject(self, CYLBarButtonItemBadgeSupport.backgroundColor, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
-            cyl_performWithBadgeSuperView { $0.cyl_badgeBackgroundColor = newValue }
+            cylPerformWithBadgeSuperView { $0.cyl_badgeBackgroundColor = newValue }
         }
     }
 
@@ -378,7 +378,7 @@ extension UIBarButtonItem {
         }
         @objc(cyl_setBadgeTextColor:) set {
             objc_setAssociatedObject(self, CYLBarButtonItemBadgeSupport.textColor, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
-            cyl_performWithBadgeSuperView { $0.cyl_badgeTextColor = newValue }
+            cylPerformWithBadgeSuperView { $0.cyl_badgeTextColor = newValue }
         }
     }
 
@@ -395,7 +395,7 @@ extension UIBarButtonItem {
         @objc(cyl_setBadgeAnimationType:) set {
             objc_setAssociatedObject(self, CYLBarButtonItemBadgeSupport.animationType, NSNumber(value: newValue.rawValue),
                                      .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
-            cyl_performWithBadgeSuperView { $0.cyl_badgeAnimationType = newValue }
+            cylPerformWithBadgeSuperView { $0.cyl_badgeAnimationType = newValue }
         }
     }
 
@@ -410,7 +410,7 @@ extension UIBarButtonItem {
     @objc(cyl_badgeFrame)
     public dynamic var cyl_badgeFrame: CGRect {
         @objc(cyl_badgeFrame) get { cyl_actualBadgeView?.cyl_badgeFrame ?? .zero }
-        @objc(cyl_setBadgeFrame:) set { cyl_performWithBadgeSuperView { $0.cyl_badgeFrame = newValue } }
+        @objc(cyl_setBadgeFrame:) set { cylPerformWithBadgeSuperView { $0.cyl_badgeFrame = newValue } }
     }
 
     @objc(cyl_badgeFrameValue)
@@ -422,7 +422,7 @@ extension UIBarButtonItem {
     @objc(cyl_badgeCenterOffset)
     public dynamic var cyl_badgeCenterOffset: CGPoint {
         @objc(cyl_badgeCenterOffset) get { cyl_actualBadgeView?.cyl_badgeCenterOffset ?? .zero }
-        @objc(cyl_setBadgeCenterOffset:) set { cyl_performWithBadgeSuperView { $0.cyl_badgeCenterOffset = newValue } }
+        @objc(cyl_setBadgeCenterOffset:) set { cylPerformWithBadgeSuperView { $0.cyl_badgeCenterOffset = newValue } }
     }
 
     @objc(cyl_badgeCenterOffsetValue)
@@ -434,7 +434,7 @@ extension UIBarButtonItem {
     @objc(cyl_badgeMaximumBadgeNumber)
     public dynamic var cyl_badgeMaximumBadgeNumber: Int {
         @objc(cyl_badgeMaximumBadgeNumber) get { cyl_actualBadgeView?.cyl_badgeMaximumBadgeNumber ?? 0 }
-        @objc(cyl_setBadgeMaximumBadgeNumber:) set { cyl_performWithBadgeSuperView { $0.cyl_badgeMaximumBadgeNumber = newValue } }
+        @objc(cyl_setBadgeMaximumBadgeNumber:) set { cylPerformWithBadgeSuperView { $0.cyl_badgeMaximumBadgeNumber = newValue } }
     }
 
     @objc(cyl_badgeMaximumBadgeNumberValue)
@@ -446,7 +446,7 @@ extension UIBarButtonItem {
     @objc(cyl_badgeMargin)
     public dynamic var cyl_badgeMargin: CGFloat {
         @objc(cyl_badgeMargin) get { cyl_actualBadgeView?.cyl_badgeMargin ?? 0 }
-        @objc(cyl_setBadgeMargin:) set { cyl_performWithBadgeSuperView { $0.cyl_badgeMargin = newValue } }
+        @objc(cyl_setBadgeMargin:) set { cylPerformWithBadgeSuperView { $0.cyl_badgeMargin = newValue } }
     }
 
     @objc(cyl_badgeMarginValue)
@@ -458,7 +458,7 @@ extension UIBarButtonItem {
     @objc(cyl_badgeRadius)
     public dynamic var cyl_badgeRadius: CGFloat {
         @objc(cyl_badgeRadius) get { cyl_actualBadgeView?.cyl_badgeRadius ?? 0 }
-        @objc(cyl_setBadgeRadius:) set { cyl_performWithBadgeSuperView { $0.cyl_badgeRadius = newValue } }
+        @objc(cyl_setBadgeRadius:) set { cylPerformWithBadgeSuperView { $0.cyl_badgeRadius = newValue } }
     }
 
     @objc(cyl_badgeRadiusValue)
@@ -470,7 +470,7 @@ extension UIBarButtonItem {
     @objc(cyl_badgeCornerRadius)
     public dynamic var cyl_badgeCornerRadius: CGFloat {
         @objc(cyl_badgeCornerRadius) get { cyl_actualBadgeView?.cyl_badgeCornerRadius ?? 0 }
-        @objc(cyl_setBadgeCornerRadius:) set { cyl_performWithBadgeSuperView { $0.cyl_badgeCornerRadius = newValue } }
+        @objc(cyl_setBadgeCornerRadius:) set { cylPerformWithBadgeSuperView { $0.cyl_badgeCornerRadius = newValue } }
     }
 
     @objc(cyl_badgeCornerRadiusValue)

@@ -339,7 +339,7 @@ extension UIControl {
     @objc(cyl_replaceTabImageViewWithNewView:offset:show:completion:)
     public func cyl_replaceTabImageView(withNewView newView: UIView, offset: UIOffset, show: Bool,
                                         completion: CYLTabButtonReplaceCompletion?) {
-        cyl_replace(isTabButton: false, newView: newView, offset: offset, show: show, autoHidesNewView: true,
+        cylReplace(isTabButton: false, newView: newView, offset: offset, show: show, autoHidesNewView: true,
                     hidesOriginalView: true, completion: completion)
     }
 
@@ -363,7 +363,7 @@ extension UIControl {
     @objc(cyl_replaceTabButtonWithNewView:offset:show:completion:)
     public func cyl_replaceTabButton(withNewView newView: UIView, offset: UIOffset, show: Bool,
                                      completion: CYLTabButtonReplaceCompletion?) {
-        cyl_replace(isTabButton: true, newView: newView, offset: offset, show: show, autoHidesNewView: true,
+        cylReplace(isTabButton: true, newView: newView, offset: offset, show: show, autoHidesNewView: true,
                     hidesOriginalView: true, completion: completion)
     }
 
@@ -380,10 +380,10 @@ extension UIControl {
         // [CN] 动画图标未就绪时需要等待，否则会在其布局完成前覆盖，位置错误。
         let delaySeconds = (self as UIView).cyl_isReady() ? 0 : max(TimeInterval(delay), 0)
         DispatchQueue.main.asyncAfter(deadline: .now() + delaySeconds) {
-            self.cyl_replace(isTabButton: isTabButton, newView: newView, offset: offset, show: show, autoHidesNewView: false,
+            self.cylReplace(isTabButton: isTabButton, newView: newView, offset: offset, show: show, autoHidesNewView: false,
                              hidesOriginalView: false) { isReplaced, tabBarButton, newView in
                 if isReplaced {
-                    tabBarButton.cyl_showCover(newView, show: show)
+                    tabBarButton.cylShowCover(newView, show: show)
                 }
                 (tabBarButton as UIView).cyl_perform(NSSelectorFromString(show ? "cyl_clearBadge" : "cyl_resumeBadge"))
                 completion?(isReplaced, tabBarButton, newView)
@@ -626,13 +626,13 @@ extension UIControl {
      * [EN] Shows `cover` over every other subview (as a badge is, `-cyl_bringBadgeToFront:`), or puts it back.
      * [CN] 让 `cover` 位于其他所有子视图之上（与角标一样，`-cyl_bringBadgeToFront:`），或恢复原状。
      */
-    private func cyl_showCover(_ cover: UIView, show: Bool) {
+    private func cylShowCover(_ cover: UIView, show: Bool) {
         // [EN] Issue #601: the views shown in place of the tab's icon stay hidden under the cover.
         // [CN] 替换图标的视图在封面下保持隐藏。
         cover.cyl_tabButtonCoverView = show
         if show {
             bringSubviewToFront(cover)
-            cover.layer.zPosition = .cyl_topZPosition
+            cover.layer.zPosition = .cylTopZPosition
         } else {
             cover.layer.zPosition = 0
         }
@@ -646,7 +646,7 @@ extension UIControl {
      * [EN] Shows `newView` in place of the tab image view (or the whole button), placed by frame (#653).
      * [CN] 用 `newView` 替换 Tab 图片视图（或整个按钮）显示，用 frame 定位（#653）。
      */
-    private func cyl_replace(isTabButton: Bool, newView: UIView, offset: UIOffset, show: Bool, autoHidesNewView: Bool,
+    private func cylReplace(isTabButton: Bool, newView: UIView, offset: UIOffset, show: Bool, autoHidesNewView: Bool,
                              hidesOriginalView: Bool, completion: CYLTabButtonReplaceCompletion?) {
         let swappableImageView = cyl_tabImageView()
         guard let replacedView: UIView = isTabButton ? self : swappableImageView else {
@@ -783,7 +783,7 @@ extension UIControl {
     @available(*, deprecated, message: "Deprecated in 1.19.0. Use method in <CYLBadgeProtocol> instead.")
     @objc(cyl_showTabBadgePoint)
     public func cyl_showTabBadgePoint() {
-        cyl_setShowsTabBadgePoint(true)
+        cylSetShowsTabBadgePoint(true)
     }
 
     /**
@@ -793,7 +793,7 @@ extension UIControl {
     @available(*, deprecated, message: "Deprecated in 1.19.0. Use method in <CYLBadgeProtocol> instead.")
     @objc(cyl_removeTabBadgePoint)
     public func cyl_removeTabBadgePoint() {
-        cyl_setShowsTabBadgePoint(false)
+        cylSetShowsTabBadgePoint(false)
     }
 
     /**
@@ -807,7 +807,7 @@ extension UIControl {
     }
 
     @available(*, deprecated, message: "Deprecated in 1.19.0. Use method in <CYLBadgeProtocol> instead.")
-    private func cyl_setShowsTabBadgePoint(_ shows: Bool) {
+    private func cylSetShowsTabBadgePoint(_ shows: Bool) {
         let pointView = cyl_tabBadgePointView
         if shows && pointView.superview == nil {
             cyl_bringSubview(toFront: pointView)

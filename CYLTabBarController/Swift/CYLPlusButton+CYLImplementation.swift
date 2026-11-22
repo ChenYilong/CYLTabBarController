@@ -69,26 +69,26 @@ import UIKit
     func mirrorLegacyGlobals(plusButton: CYLPlusButton?, plusChildViewController: UIViewController?, width: CGFloat)
 }
 
-private func CYLPlusButtonClass(_ cls: AnyClass) -> CYLPlusButtonClassAPI {
+private func cylPlusButtonClass(_ cls: AnyClass) -> CYLPlusButtonClassAPI {
     unsafeBitCast(cls as AnyObject, to: CYLPlusButtonClassAPI.self)
 }
 
-private let CYLPlusButtonImageStates: [UIControl.State] = [.normal, .highlighted, .selected, [.selected, .highlighted], .disabled]
+private let cylPlusButtonImageStates: [UIControl.State] = [.normal, .highlighted, .selected, [.selected, .highlighted], .disabled]
 
 /**
  * [EN] The states UIKit draws from another state's image when they have none, darkened (highlighted) or faded (disabled), mapped
  *      to the state whose image they show instead.
  * [CN] 没有图片时，系统会用其他状态的图片并加暗（高亮）或变淡（禁用）绘制的状态，以及改为显示其图片的状态。
  */
-private let CYLPlusButtonDerivedImageStates: [(derived: UIControl.State, source: UIControl.State)] = [
+private let cylPlusButtonDerivedImageStates: [(derived: UIControl.State, source: UIControl.State)] = [
     (.highlighted, .normal), (.disabled, .normal), ([.selected, .highlighted], .selected),
 ]
 
 /** [EN] Between the image and the title it sits above. [CN] 图片与其下方标题之间的间距。 */
-private let CYLPlusButtonImageToTitleSpacing: CGFloat = 2
+private let cylPlusButtonImageToTitleSpacing: CGFloat = 2
 
 /** [EN] The name of the lens mask layer. [CN] 放大镜遮罩图层的名称。 */
-private let CYLPlusButtonLensMaskName = "CYLPlusButtonLensMask"
+private let cylPlusButtonLensMaskName = "CYLPlusButtonLensMask"
 
 // MARK: - Registry: context -> plus button
 
@@ -148,7 +148,7 @@ private final class CYLPlusButtonRegistry: @unchecked Sendable {
 }
 
 /** [EN] Points the globals at `registration` (nil clears them). [CN] 让全局变量指向 `registration`（nil 时清空）。 */
-private func CYLPlusButtonMirrorLegacyGlobals(_ registration: CYLPlusButtonRegistration?) {
+private func cylPlusButtonMirrorLegacyGlobals(_ registration: CYLPlusButtonRegistration?) {
     CYLPlusButtonRegistry.shared.latestContext = registration?.context
     // [EN] The globals are nonnull in CYLTabBarController.h, so Swift cannot clear them: CYLPlusButton.m sets them.
     // [CN] 这些全局变量在 CYLTabBarController.h 中为 nonnull，Swift 无法将其置空：由 CYLPlusButton.m 设置。
@@ -162,7 +162,7 @@ private func CYLPlusButtonMirrorLegacyGlobals(_ registration: CYLPlusButtonRegis
  *      and Flat tab bars lay the tabs out with it.
  * [CN] PlusButton 尺寸变化后（例如图片之后才加载）更新其 context 登记的宽度：经典与扁平样式的 TabBar 用它布局各 Tab。
  */
-private func CYLPlusButtonUpdateRegisteredWidth(_ plusButton: CYLPlusButton) {
+private func cylPlusButtonUpdateRegisteredWidth(_ plusButton: CYLPlusButton) {
     let registry = CYLPlusButtonRegistry.shared
     registry.withLock { registrations in
         for registration in registrations.values
@@ -183,7 +183,7 @@ private func CYLPlusButtonUpdateRegisteredWidth(_ plusButton: CYLPlusButton) {
  * [CN] 加载给 PlusButton 的所有图片在所有样式下都按原图绘制（`UIImageRenderingModeAlwaysOriginal`）：不会被 TabBar、液态玻璃的选中图层或按钮
  *      configuration 染色，按下时也不会变暗。
  */
-private func CYLPlusButtonOriginalImage(_ image: UIImage?) -> UIImage? {
+private func cylPlusButtonOriginalImage(_ image: UIImage?) -> UIImage? {
     guard let image, image.renderingMode != .alwaysOriginal else { return image }
     return image.withRenderingMode(.alwaysOriginal)
 }
@@ -192,7 +192,7 @@ private func CYLPlusButtonOriginalImage(_ image: UIImage?) -> UIImage? {
  * [EN] Whether two images draw the same picture: the same object, the same bitmap at the same size, or equal (e.g. the same symbol).
  * [CN] 两张图片是否绘制相同的内容：同一对象、相同尺寸的同一位图，或相等（例如同一 SF Symbol）。
  */
-private func CYLPlusButtonImagesDrawTheSame(_ image: UIImage?, _ otherImage: UIImage?) -> Bool {
+private func cylPlusButtonImagesDrawTheSame(_ image: UIImage?, _ otherImage: UIImage?) -> Bool {
     if image === otherImage {
         return true
     }
@@ -207,13 +207,13 @@ private func CYLPlusButtonImagesDrawTheSame(_ image: UIImage?, _ otherImage: UII
  * [EN] Draws the images a button already has as is: a stand-in returned by `+selectedContentView` may be any UIButton.
  * [CN] 让按钮已有的图片按原图绘制：`+selectedContentView` 返回的替身可能是任意 UIButton。
  */
-private func CYLPlusButtonDrawImagesAsIs(_ button: UIButton) {
-    for state in CYLPlusButtonImageStates {
+private func cylPlusButtonDrawImagesAsIs(_ button: UIButton) {
+    for state in cylPlusButtonImageStates {
         if let image = button.image(for: state), image.renderingMode != .alwaysOriginal {
-            button.setImage(CYLPlusButtonOriginalImage(image), for: state)
+            button.setImage(cylPlusButtonOriginalImage(image), for: state)
         }
         if let backgroundImage = button.backgroundImage(for: state), backgroundImage.renderingMode != .alwaysOriginal {
-            button.setBackgroundImage(CYLPlusButtonOriginalImage(backgroundImage), for: state)
+            button.setBackgroundImage(cylPlusButtonOriginalImage(backgroundImage), for: state)
         }
     }
 }
@@ -223,7 +223,7 @@ private func CYLPlusButtonDrawImagesAsIs(_ button: UIButton) {
  *      image view keeps its old frame.
  * [CN] `button` 的图标中心在 `view` 中的坐标；图标尚未布局或已隐藏时返回 nil：图片移除后，隐藏的 imageView 仍保留旧 frame。
  */
-private func CYLPlusButtonIconCenter(_ button: UIButton, in view: UIView?) -> CGPoint? {
+private func cylPlusButtonIconCenter(_ button: UIButton, in view: UIView?) -> CGPoint? {
     guard let imageView = button.imageView, let superview = imageView.superview, !imageView.isHidden, !imageView.frame.isEmpty else {
         return nil
     }
@@ -238,11 +238,11 @@ private func CYLPlusButtonIconCenter(_ button: UIButton, in view: UIView?) -> CG
  * [CN] 替身在其父视图中的中心。App 要求标题与 Tab 标题对齐时（`+alignsTitleWithTabBarItemTitles`），替身与 PlusButton 只对齐图标；其他布局，或图标
  *      尚未布局时，使用 PlusButton 的中心。以背景图为图片的按钮没有可对齐的图标。
  */
-private func CYLPlusButtonCenterOfStandIn(_ plusButton: CYLPlusButton, _ standIn: UIButton) -> CGPoint {
+private func cylPlusButtonCenterOfStandIn(_ plusButton: CYLPlusButton, _ standIn: UIButton) -> CGPoint {
     let container = standIn.superview
     if !plusButton.cylDrawsTitleOverBackgroundImage(), plusButton.cylAlignsTitleWithTabBarItemTitles(),
-       let plusIcon = CYLPlusButtonIconCenter(plusButton, in: container),
-       let standInIcon = CYLPlusButtonIconCenter(standIn, in: standIn) {
+       let plusIcon = cylPlusButtonIconCenter(plusButton, in: container),
+       let standInIcon = cylPlusButtonIconCenter(standIn, in: standIn) {
         return CGPoint(x: plusIcon.x - (standInIcon.x - standIn.bounds.midX), y: plusIcon.y - (standInIcon.y - standIn.bounds.midY))
     }
     return container?.convert(plusButton.center, from: plusButton.superview) ?? plusButton.center
@@ -254,7 +254,7 @@ private func CYLPlusButtonCenterOfStandIn(_ plusButton: CYLPlusButton, _ standIn
  * [CN] `plusButton` 位于液态玻璃 TabBar 中时为 YES：液态玻璃处于活动状态，且其 TabBarController 不是扁平样式（iOS 26 上使用扁平样式 TabBar 时
  *      `+isLiquidGlassActive` 也为 YES）。找不到 TabBarController 时为 NO。
  */
-private func CYLPlusButtonIsInLiquidGlassTabBar(_ plusButton: CYLPlusButton) -> Bool {
+private func cylPlusButtonIsInLiquidGlassTabBar(_ plusButton: CYLPlusButton) -> Bool {
     guard CYLConstants.isLiquidGlassActive() else { return false }
     let tabBarController = plusButton.cyl_owningTabBarController()
         ?? CYLTabBarController.cyl_tabBarController(forContext: CYLPlusButton.cylPlusButtonTabBarContext(forOwner: plusButton))
@@ -266,7 +266,7 @@ private func CYLPlusButtonIsInLiquidGlassTabBar(_ plusButton: CYLPlusButton) -> 
  * [EN] YES when `view`, or a superview of it below `plusButton`, takes touches itself (issue #202).
  * [CN] `view` 或它在 `plusButton` 之下的某个父视图自己接收触摸时为 YES（issue #202）。
  */
-private func CYLPlusButtonSubviewTakesTouches(_ view: UIView, _ plusButton: UIView) -> Bool {
+private func cylPlusButtonSubviewTakesTouches(_ view: UIView, _ plusButton: UIView) -> Bool {
     var current: UIView? = view
     while let candidate = current, candidate !== plusButton {
         if let control = candidate as? UIControl, control.isEnabled {
@@ -285,14 +285,14 @@ private func CYLPlusButtonSubviewTakesTouches(_ view: UIView, _ plusButton: UIVi
  *      is the accessibility element. Hidden from accessibility.
  * [CN] 替身（`-selectedContentView`）是 PlusButton 在液态玻璃选中图层中的画面；真实 PlusButton 是无障碍元素。这里对无障碍隐藏。
  */
-private func CYLPlusButtonHideStandInFromAccessibility(_ plusButton: UIButton, _ standIn: UIButton) {
+private func cylPlusButtonHideStandInFromAccessibility(_ plusButton: UIButton, _ standIn: UIButton) {
     guard standIn !== plusButton else { return }
     standIn.isAccessibilityElement = false
     standIn.accessibilityElementsHidden = true
 }
 
 /** [EN] The first `UITabBar` among `view` and its superviews. [CN] `view` 及其父视图中的第一个 `UITabBar`。 */
-private func CYLPlusButtonSystemTabBar(of view: UIView?) -> UITabBar? {
+private func cylPlusButtonSystemTabBar(of view: UIView?) -> UITabBar? {
     var current = view
     while let candidate = current {
         if let tabBar = candidate as? UITabBar {
@@ -386,7 +386,7 @@ extension CYLPlusButton {
      * [CN] 运行时看到的本按钮的类（`object_getClass`），运行时创建的类因此由其自身回答。
      */
     private var cylClass: CYLPlusButtonClassAPI {
-        CYLPlusButtonClass(object_getClass(self) ?? type(of: self))
+        cylPlusButtonClass(object_getClass(self) ?? type(of: self))
     }
 
     /** [EN] The stand-in, unless it is this button itself. [CN] 替身（不是本按钮自身时）。 */
@@ -501,8 +501,8 @@ extension CYLPlusButton {
     private func cylSetImage(_ image: UIImage?, for state: UIControl.State, explicitStates: inout Set<UInt>,
                              getter: (UIControl.State) -> UIImage?, setter: (UIImage?, UIControl.State) -> Void) {
         explicitStates.insert(state.rawValue)
-        setter(CYLPlusButtonOriginalImage(image), state)
-        for (derived, source) in CYLPlusButtonDerivedImageStates where !explicitStates.contains(derived.rawValue) {
+        setter(cylPlusButtonOriginalImage(image), state)
+        for (derived, source) in cylPlusButtonDerivedImageStates where !explicitStates.contains(derived.rawValue) {
             // [EN] `getter` falls back like UIKit (e.g. no selected image: the normal one). [CN] `getter` 与系统一样回退。
             setter(getter(source), derived)
         }
@@ -531,7 +531,7 @@ extension CYLPlusButton {
     @objc(cyl_removeImage)
     func cylRemoveImage() {
         let standIn = cylStandIn
-        for state in CYLPlusButtonImageStates {
+        for state in cylPlusButtonImageStates {
             setImage(nil, for: state)
             standIn?.setImage(nil, for: state)
         }
@@ -548,7 +548,7 @@ extension CYLPlusButton {
 
     /** [EN] Liquid Glass with a plus child view controller. [CN] 液态玻璃且有 PlusButton 子控制器。 */
     private func cylStandInShowsNormalImageOnly() -> Bool {
-        CYLPlusButtonIsInLiquidGlassTabBar(self) && CYLPlusButton.cylPlusChildViewController(forOwner: self) != nil
+        cylPlusButtonIsInLiquidGlassTabBar(self) && CYLPlusButton.cylPlusChildViewController(forOwner: self) != nil
     }
 
     /**
@@ -574,11 +574,11 @@ extension CYLPlusButton {
         if image == nil && !removingIfEmpty {
             return
         }
-        if var configuration = standIn.configuration, !CYLPlusButtonImagesDrawTheSame(configuration.image, image) {
+        if var configuration = standIn.configuration, !cylPlusButtonImagesDrawTheSame(configuration.image, image) {
             configuration.image = image
             standIn.configuration = configuration
         }
-        for state in CYLPlusButtonImageStates where !CYLPlusButtonImagesDrawTheSame(standIn.image(for: state), image) {
+        for state in cylPlusButtonImageStates where !cylPlusButtonImagesDrawTheSame(standIn.image(for: state), image) {
             standIn.setImage(image, for: state)
         }
         // [EN] The real button is selected while the stand-in shows, so it draws the same picture too; its own selected image
@@ -586,7 +586,7 @@ extension CYLPlusButton {
         // [CN] 显示替身时真实按钮处于选中状态，因此也绘制同一张图片；它自己的选中图片仍可通过 `-imageForState:` 读取。
         let storage = cylPlusButtonStorage
         for state: UIControl.State in [.selected, [.selected, .highlighted]] {
-            guard let drawnImage = cylSuper.superImage(for: state), !CYLPlusButtonImagesDrawTheSame(drawnImage, image) else {
+            guard let drawnImage = cylSuper.superImage(for: state), !cylPlusButtonImagesDrawTheSame(drawnImage, image) else {
                 continue
             }
             if storage.keptSelectedImages[state.rawValue] == nil {
@@ -631,7 +631,7 @@ extension CYLPlusButton {
             let center = self.center
             bounds = CGRect(origin: .zero, size: CGSize(width: max(size.width, fittingSize.width), height: max(size.height, fittingSize.height)))
             self.center = center
-            CYLPlusButtonUpdateRegisteredWidth(self)
+            cylPlusButtonUpdateRegisteredWidth(self)
         }
         setNeedsLayout()
         superview?.setNeedsLayout()
@@ -643,8 +643,8 @@ extension CYLPlusButton {
         if var newConfiguration = configuration,
            (newConfiguration.image.map { $0.renderingMode != .alwaysOriginal } ?? false) ||
            (newConfiguration.background.image.map { $0.renderingMode != .alwaysOriginal } ?? false) {
-            newConfiguration.image = CYLPlusButtonOriginalImage(newConfiguration.image)
-            newConfiguration.background.image = CYLPlusButtonOriginalImage(newConfiguration.background.image)
+            newConfiguration.image = cylPlusButtonOriginalImage(newConfiguration.image)
+            newConfiguration.background.image = cylPlusButtonOriginalImage(newConfiguration.background.image)
             configuration = newConfiguration
         }
         let oldConfiguration = self.configuration
@@ -652,8 +652,8 @@ extension CYLPlusButton {
         // [EN] Only a new picture: the plus button sets its configuration too (e.g. without the title, #636), and treating that
         //      as a new picture moved the title back and forth forever. Images are compared by what they draw.
         // [CN] 仅在图片变化时处理：PlusButton 自己也会设置 configuration（例如去掉标题，#636），把它当作新图片会让标题来回移动、无限循环。按绘制内容比较图片。
-        if !CYLPlusButtonImagesDrawTheSame(configuration?.image, oldConfiguration?.image) ||
-            !CYLPlusButtonImagesDrawTheSame(configuration?.background.image, oldConfiguration?.background.image) {
+        if !cylPlusButtonImagesDrawTheSame(configuration?.image, oldConfiguration?.image) ||
+            !cylPlusButtonImagesDrawTheSame(configuration?.background.image, oldConfiguration?.background.image) {
             cylUpdateSelectedContentViewImage()
             cylContentImageDidChange()
         }
@@ -731,7 +731,7 @@ extension CYLPlusButton {
      */
     @objc(cyl_plusButtonBadgeLayerControls)
     func cylPlusButtonBadgeLayerControls() -> [UIControl] {
-        if let standIn = cylStandIn, CYLPlusButtonIsInLiquidGlassTabBar(self) {
+        if let standIn = cylStandIn, cylPlusButtonIsInLiquidGlassTabBar(self) {
             return [self, standIn]
         }
         return [self]
@@ -844,7 +844,7 @@ extension CYLPlusButton {
               CYLPlusButton.cylPlusChildViewController(forOwner: self) != nil, plusButton.cylStandInFollowsPlusButton() else {
             return center
         }
-        return CYLPlusButtonCenterOfStandIn(plusButton, self)
+        return cylPlusButtonCenterOfStandIn(plusButton, self)
     }
 
     /**
@@ -875,7 +875,7 @@ extension CYLPlusButton {
         if (cylPlusButtonStorage.movedTitle ?? "").isEmpty && (currentTitle ?? "").isEmpty {
             return false
         }
-        return CYLPlusButtonSystemTabBar(of: superview) != nil
+        return cylPlusButtonSystemTabBar(of: superview) != nil
     }
 
     /**
@@ -1059,7 +1059,7 @@ extension CYLPlusButton {
      */
     private func cylOwnTitleLabelInTabBarItem(nearX x: CGFloat, in container: UIView) -> UILabel? {
         guard let movedTitle = cylPlusButtonStorage.movedTitle, !movedTitle.isEmpty,
-              let systemTabBar = CYLPlusButtonSystemTabBar(of: superview) else {
+              let systemTabBar = cylPlusButtonSystemTabBar(of: superview) else {
             return nil
         }
         if let slotLabel = cylTitleLabel(movedTitle, inSlotTabButtonNearX: x, in: container) {
@@ -1153,7 +1153,7 @@ extension CYLPlusButton {
         cylUpdateLiquidGlassMask()
     }
 
-    /** [EN] Puts the stand-in in place (`CYLPlusButtonCenterOfStandIn()`). [CN] 放置替身。 */
+    /** [EN] Puts the stand-in in place (`cylPlusButtonCenterOfStandIn()`). [CN] 放置替身。 */
     @objc(cyl_placeSelectedContentView)
     func cylPlaceSelectedContentView() {
         guard let selectedContentView = cylPlusButtonStorage.selectedContentView, selectedContentView.superview != nil,
@@ -1161,7 +1161,7 @@ extension CYLPlusButton {
             return
         }
         selectedContentView.layoutIfNeeded()
-        let center = CYLPlusButtonCenterOfStandIn(self, selectedContentView)
+        let center = cylPlusButtonCenterOfStandIn(self, selectedContentView)
         if center != selectedContentView.center {
             selectedContentView.center = center
         }
@@ -1225,7 +1225,7 @@ extension CYLPlusButton {
 
     private func cylApplyLiquidGlassLensMask() {
         if cylPlusButtonStorage.isLensMaskSuspended {
-            if layer.mask?.name == CYLPlusButtonLensMaskName {
+            if layer.mask?.name == cylPlusButtonLensMaskName {
                 layer.mask = nil
             }
             return
@@ -1238,7 +1238,7 @@ extension CYLPlusButton {
         let selectedPage = cyl_owningTabBarController()?.selectedViewController
         let plusPageSelected = plusPage != nil && (selectedPage === plusPage || (selectedPage != nil && selectedPage === plusPage?.navigationController))
         var masks = plusPageSelected && standIn != nil && standIn !== self && standIn?.window != nil && standIn?.window === window &&
-            standIn?.isHidden == false && standInTabButton != nil && !cylIsInPlatterSelectedLayer() && CYLPlusButtonIsInLiquidGlassTabBar(self)
+            standIn?.isHidden == false && standInTabButton != nil && !cylIsInPlatterSelectedLayer() && cylPlusButtonIsInLiquidGlassTabBar(self)
         // [EN] Only mask once the lens sits on the plus slot; until then check again every 0.1 s.
         // [CN] 只有放大镜停在 PlusButton 的位置上时才遮住；在此之前每 0.1 秒重新判断。
         if masks, let standInTabButton, !cylLensIsOnTabButton(standInTabButton) {
@@ -1248,7 +1248,7 @@ extension CYLPlusButton {
             }
         }
         // [EN] A mask the app set itself is kept. [CN] 保留 App 自己设置的遮罩。
-        let ownsMask = layer.mask == nil || layer.mask?.name == CYLPlusButtonLensMaskName
+        let ownsMask = layer.mask == nil || layer.mask?.name == cylPlusButtonLensMaskName
         var hidden = CGRect.null
         if masks && ownsMask {
             layoutIfNeeded()
@@ -1271,7 +1271,7 @@ extension CYLPlusButton {
         path.append(UIBezierPath(rect: hidden))
         let mask = (layer.mask as? CAShapeLayer) ?? {
             let newMask = CAShapeLayer()
-            newMask.name = CYLPlusButtonLensMaskName
+            newMask.name = cylPlusButtonLensMaskName
             newMask.fillRule = .evenOdd
             layer.mask = newMask
             return newMask
@@ -1421,7 +1421,7 @@ extension CYLPlusButton {
      *      选中颜色取所在按钮为选中状态的标题颜色，否则取其他颜色。无法判断时为 nil。
      */
     private func cylTitleColors(ofTabBarItemTitleLabels labels: [UILabel]) -> (normal: UIColor?, selected: UIColor?) {
-        if CYLConstants.isLiquidGlassActive(), CYLPlusButtonSystemTabBar(of: superview) != nil {
+        if CYLConstants.isLiquidGlassActive(), cylPlusButtonSystemTabBar(of: superview) != nil {
             let normalColor = cylColor(.label, resolvedFor: labels.first)
             let selectedLabel = labels.first { cylTabButton(ofTabBarItemTitleLabel: $0)?.cyl_isPlatterSelectedControl() ?? false }
             return (normalColor, selectedLabel.flatMap { cylShownTextColor(of: $0) })
@@ -1574,7 +1574,7 @@ extension CYLPlusButton {
         var titleCenterY = imageHeight + verticalMargin * 2 + lineHeight * 0.5 + 10
         if let alignedTitleCenterY = cylPlusButtonStorage.alignedTitleCenterY, !cylShowsTitleInTabBarItem() {
             titleCenterY = alignedTitleCenterY
-            imageCenter.y = titleCenterY - lineHeight * 0.5 - CYLPlusButtonImageToTitleSpacing - imageSize.height * 0.5
+            imageCenter.y = titleCenterY - lineHeight * 0.5 - cylPlusButtonImageToTitleSpacing - imageSize.height * 0.5
         }
         let imageFrame = CGRect(x: imageCenter.x - imageSize.width * 0.5, y: imageCenter.y - imageSize.height * 0.5,
                                 width: imageSize.width, height: imageSize.height)
@@ -1586,7 +1586,7 @@ extension CYLPlusButton {
     @objc(cyl_plusButtonRegister)
     class func cylPlusButtonRegister() {
         guard (self as AnyClass).conforms(to: CYLPlusButtonSubclassing.self) else { return }
-        let classAPI = CYLPlusButtonClass(self)
+        let classAPI = cylPlusButtonClass(self)
         let registration = CYLPlusButtonRegistration()
         registration.context = cylPlusButtonMatchedTabBarContext()
         registration.plusButtonClass = self
@@ -1615,7 +1615,7 @@ extension CYLPlusButton {
         }
         CYLPlusButtonRegistry.shared.withLock { registrations in
             registrations[registration.context] = registration
-            CYLPlusButtonMirrorLegacyGlobals(registration)
+            cylPlusButtonMirrorLegacyGlobals(registration)
         }
     }
 
@@ -1638,7 +1638,7 @@ extension CYLPlusButton {
         let removedRegistration: CYLPlusButtonRegistration? = registry.withLock { registrations in
             guard let registration = registrations.removeValue(forKey: tabBarContext) else { return nil }
             if registry.latestContext == tabBarContext {
-                CYLPlusButtonMirrorLegacyGlobals(nil)
+                cylPlusButtonMirrorLegacyGlobals(nil)
             }
             return registration
         }
@@ -1812,7 +1812,7 @@ extension CYLPlusButton {
         // [EN] Front to back; each subview hit-tests in its own bounds. [CN] 从前往后；每个子视图在自身范围内做 hitTest。
         for subview in subviews.reversed() {
             if let hitView = subview.hitTest(subview.convert(point, from: self), with: event),
-               CYLPlusButtonSubviewTakesTouches(hitView, self) {
+               cylPlusButtonSubviewTakesTouches(hitView, self) {
                 return hitView
             }
         }
@@ -1999,7 +1999,7 @@ extension CYLPlusButton {
      */
     @objc(cyl_plusButtonClassSelectedContentView)
     class func cylPlusButtonClassSelectedContentView() -> UIButton? {
-        let plusButton = CYLPlusButtonClass(self).plusButton?() as? UIButton
+        let plusButton = cylPlusButtonClass(self).plusButton?() as? UIButton
         if let plusButton, cylControlReportsTapsEntryPoint(plusButton) {
             plusButton.isHighlighted = true
         }
@@ -2013,8 +2013,8 @@ extension CYLPlusButton {
             return selectedContentView
         }
         if let button = cylClass.selectedContentView?() {
-            CYLPlusButtonDrawImagesAsIs(button)
-            CYLPlusButtonHideStandInFromAccessibility(self, button)
+            cylPlusButtonDrawImagesAsIs(button)
+            cylPlusButtonHideStandInFromAccessibility(self, button)
             storage.selectedContentView = button
             // FIX: the plus button's stand-in kept the original image after a theme
             // [EN] Liquid Glass only. The class makes a new plus button with the app's original images: give it the images set since
@@ -2022,7 +2022,7 @@ extension CYLPlusButton {
             // [CN] 仅液态玻璃。类方法新建的 PlusButton 使用 App 原来的图片：为它设置之后更新过的图片（启动时恢复的主题曾让替身保持旧图片）。
             if cylStandInShowsNormalImageOnly() {
                 cylUpdateSelectedContentViewImage()
-            } else if button !== self && CYLPlusButtonIsInLiquidGlassTabBar(self) {
+            } else if button !== self && cylPlusButtonIsInLiquidGlassTabBar(self) {
                 if let image = storage.updatedImage {
                     button.setImage(image, for: .normal)
                     button.setImage(storage.updatedSelectedImage ?? image, for: .highlighted)
@@ -2037,8 +2037,8 @@ extension CYLPlusButton {
         }
         let selectedContentView = UIButton(type: .custom)
         let classAPI = cylClass
-        selectedContentView.setImage(CYLPlusButtonOriginalImage(classAPI.contentImage?() ?? cylPlusButtonContentImage() ?? UIImage()), for: .normal)
-        selectedContentView.setImage(CYLPlusButtonOriginalImage(classAPI.selectedContentImage?() ?? cylPlusButtonSelectedContentImage() ?? UIImage()),
+        selectedContentView.setImage(cylPlusButtonOriginalImage(classAPI.contentImage?() ?? cylPlusButtonContentImage() ?? UIImage()), for: .normal)
+        selectedContentView.setImage(cylPlusButtonOriginalImage(classAPI.selectedContentImage?() ?? cylPlusButtonSelectedContentImage() ?? UIImage()),
                                      for: .highlighted)
         selectedContentView.frame.size = bounds.size
         selectedContentView.contentMode = .center
@@ -2051,7 +2051,7 @@ extension CYLPlusButton {
             // [EN] Not selected, to avoid the selected background. [CN] 不使用 selected 以避免选中背景。
             selectedContentView.isHighlighted = true
         }
-        CYLPlusButtonHideStandInFromAccessibility(self, selectedContentView)
+        cylPlusButtonHideStandInFromAccessibility(self, selectedContentView)
         storage.selectedContentView = selectedContentView
         cylUpdateSelectedContentViewImage()
         cylShowRequestedBadgeIfNeeded()
@@ -2077,8 +2077,8 @@ extension CYLPlusButton {
     @objc(cyl_plusButtonUpdateTitle:image:selectedImage:)
     func cylPlusButtonUpdate(title: String?, image: UIImage?, selectedImage: UIImage?) {
         // [EN] Also for the stand-in, which may be a plain UIButton. [CN] 替身可能是普通 UIButton，同样按原图绘制。
-        let image = CYLPlusButtonOriginalImage(image)
-        let selectedImage = CYLPlusButtonOriginalImage(selectedImage)
+        let image = cylPlusButtonOriginalImage(image)
+        let selectedImage = cylPlusButtonOriginalImage(selectedImage)
         let storage = cylPlusButtonStorage
         if let title {
             if storage.movedTitle != nil {
@@ -2330,7 +2330,7 @@ extension CYLPlusButton {
      */
     private class func cylMakeOwnPlusButton(for binding: CYLPlusButtonBinding, registration: CYLPlusButtonRegistration) {
         guard let plusButtonClass = registration.plusButtonClass else { return }
-        let classAPI = CYLPlusButtonClass(plusButtonClass)
+        let classAPI = cylPlusButtonClass(plusButtonClass)
         guard let plusButton = classAPI.plusButton?() as? CYLPlusButton, plusButton !== registration.plusButton else {
             binding.plusButton = registration.plusButton
             binding.plusChildViewController = registration.plusChildViewController
@@ -2359,7 +2359,7 @@ extension CYLPlusButton {
 
     @objc(cyl_plusButtonMatchedTabBarContext)
     class func cylPlusButtonMatchedTabBarContext() -> String {
-        if let context = CYLPlusButtonClass(self).tabBarContext?(), !context.isEmpty {
+        if let context = cylPlusButtonClass(self).tabBarContext?(), !context.isEmpty {
             return context
         }
         return NSStringFromClass(CYLTabBarController.self)
@@ -2367,7 +2367,7 @@ extension CYLPlusButton {
 
     @objc(cyl_plusButtonIndexForTabbarItemsCount:)
     class func cylPlusButtonIndex(forTabbarItemsCount tabbarItemsCount: UInt) -> UInt {
-        if let index = CYLPlusButtonClass(self).indexOfPlusButtonInTabBar?() {
+        if let index = cylPlusButtonClass(self).indexOfPlusButtonInTabBar?() {
             return index
         }
         if tabbarItemsCount % 2 != 0 {
@@ -2395,7 +2395,7 @@ extension CYLPlusButton {
  * [EN] `CYLPlusButtonImageSize`: `image` drawn aspect fit in `size`, keeping its rendering mode; `image` itself without a size.
  * [CN] `CYLPlusButtonImageSize`：把 `image` 等比绘制到 `size` 中，保留其渲染模式；没有尺寸时返回 `image` 本身。
  */
-private func CYLPlusButtonImageFittingSize(_ image: Any, _ size: Any?) -> Any {
+private func cylPlusButtonImageFittingSize(_ image: Any, _ size: Any?) -> Any {
     let target = (size as? NSValue)?.cgSizeValue ?? .zero
     guard let source = image as? UIImage, target.width > 0, target.height > 0, source.size.width > 0, source.size.height > 0 else {
         return image
@@ -2425,7 +2425,7 @@ extension CYLPlusButton {
         var attributes = configurationAttributes ?? [:]
         for key in [CYLTabBarItemImage, CYLTabBarItemSelectedImage] {
             if let image = attributes[key] {
-                attributes[key] = CYLPlusButtonImageFittingSize(image, attributes[CYLPlusButtonImageSize])
+                attributes[key] = cylPlusButtonImageFittingSize(image, attributes[CYLPlusButtonImageSize])
             }
         }
         let title = attributes[CYLTabBarItemTitle] as? String ?? ""

@@ -76,11 +76,11 @@ extension UIViewController {
 
     // MARK: Settings
 
-    private func cyl_bool(_ key: UnsafeRawPointer) -> Bool {
+    private func cylBool(_ key: UnsafeRawPointer) -> Bool {
         (objc_getAssociatedObject(self, key) as? NSNumber)?.boolValue ?? false
     }
 
-    private func cyl_setBool(_ value: Bool, _ key: UnsafeRawPointer) {
+    private func cylSetBool(_ value: Bool, _ key: UnsafeRawPointer) {
         objc_setAssociatedObject(self, key, NSNumber(value: value), .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
     }
 
@@ -90,8 +90,8 @@ extension UIViewController {
      */
     @objc(cyl_disablePopGestureRecognizer)
     public var cyl_disablePopGestureRecognizer: Bool {
-        @objc(cyl_disablePopGestureRecognizer) get { cyl_bool(CYLNavigationSettingKeys.disablePopGestureRecognizer) }
-        @objc(cyl_setDisablePopGestureRecognizer:) set { cyl_setBool(newValue, CYLNavigationSettingKeys.disablePopGestureRecognizer) }
+        @objc(cyl_disablePopGestureRecognizer) get { cylBool(CYLNavigationSettingKeys.disablePopGestureRecognizer) }
+        @objc(cyl_setDisablePopGestureRecognizer:) set { cylSetBool(newValue, CYLNavigationSettingKeys.disablePopGestureRecognizer) }
     }
 
     /**
@@ -100,8 +100,8 @@ extension UIViewController {
      */
     @objc(cyl_hideNavigationBarSeparator)
     public var cyl_hideNavigationBarSeparator: Bool {
-        @objc(cyl_hideNavigationBarSeparator) get { cyl_bool(CYLNavigationSettingKeys.hideNavigationBarSeparator) }
-        @objc(cyl_setHideNavigationBarSeparator:) set { cyl_setBool(newValue, CYLNavigationSettingKeys.hideNavigationBarSeparator) }
+        @objc(cyl_hideNavigationBarSeparator) get { cylBool(CYLNavigationSettingKeys.hideNavigationBarSeparator) }
+        @objc(cyl_setHideNavigationBarSeparator:) set { cylSetBool(newValue, CYLNavigationSettingKeys.hideNavigationBarSeparator) }
     }
 
     /**
@@ -110,8 +110,8 @@ extension UIViewController {
      */
     @objc(cyl_navigationBarHidden)
     public var cyl_navigationBarHidden: Bool {
-        @objc(cyl_navigationBarHidden) get { cyl_bool(CYLNavigationSettingKeys.navigationBarHidden) }
-        @objc(cyl_setNavigationBarHidden:) set { cyl_setBool(newValue, CYLNavigationSettingKeys.navigationBarHidden) }
+        @objc(cyl_navigationBarHidden) get { cylBool(CYLNavigationSettingKeys.navigationBarHidden) }
+        @objc(cyl_setNavigationBarHidden:) set { cylSetBool(newValue, CYLNavigationSettingKeys.navigationBarHidden) }
     }
 
     /**
@@ -119,10 +119,10 @@ extension UIViewController {
      */
     @objc(cyl_hidesBottomBarWhenPushed)
     public var cyl_hidesBottomBarWhenPushed: Bool {
-        @objc(cyl_hidesBottomBarWhenPushed) get { cyl_bool(CYLNavigationSettingKeys.hidesBottomBarWhenPushed) }
+        @objc(cyl_hidesBottomBarWhenPushed) get { cylBool(CYLNavigationSettingKeys.hidesBottomBarWhenPushed) }
         @objc(cyl_setHidesBottomBarWhenPushed:) set {
             hidesBottomBarWhenPushed = newValue
-            cyl_setBool(newValue, CYLNavigationSettingKeys.hidesBottomBarWhenPushed)
+            cylSetBool(newValue, CYLNavigationSettingKeys.hidesBottomBarWhenPushed)
         }
     }
 
@@ -134,8 +134,8 @@ extension UIViewController {
      */
     @objc(cyl_hidesAncestorNavigationBars)
     public var cyl_hidesAncestorNavigationBars: Bool {
-        @objc(cyl_hidesAncestorNavigationBars) get { cyl_bool(CYLNavigationSettingKeys.hidesAncestorNavigationBars) }
-        @objc(cyl_setHidesAncestorNavigationBars:) set { cyl_setBool(newValue, CYLNavigationSettingKeys.hidesAncestorNavigationBars) }
+        @objc(cyl_hidesAncestorNavigationBars) get { cylBool(CYLNavigationSettingKeys.hidesAncestorNavigationBars) }
+        @objc(cyl_setHidesAncestorNavigationBars:) set { cylSetBool(newValue, CYLNavigationSettingKeys.hidesAncestorNavigationBars) }
     }
 
     /**
@@ -161,7 +161,7 @@ extension UIViewController {
 
     // MARK: The pop gesture
 
-    private func cyl_setPopGestureDelegate(_ delegate: Any?, enabled: Bool?) {
+    private func cylSetPopGestureDelegate(_ delegate: Any?, enabled: Bool?) {
         guard let navigationController else { return }
         var recognizers: [UIGestureRecognizer] = [navigationController.interactivePopGestureRecognizer].compactMap { $0 }
         if #available(iOS 26.0, *) {
@@ -183,7 +183,7 @@ extension UIViewController {
      */
     @objc(cyl_disableInteractivePopGestureRecognizer)
     public func cyl_disableInteractivePopGestureRecognizer() {
-        cyl_setPopGestureDelegate(nil, enabled: nil)
+        cylSetPopGestureDelegate(nil, enabled: nil)
     }
 
     /**
@@ -192,7 +192,7 @@ extension UIViewController {
      */
     @objc(cyl_enableInteractivePopGestureRecognizer)
     public func cyl_enableInteractivePopGestureRecognizer() {
-        cyl_setPopGestureDelegate(self, enabled: true)
+        cylSetPopGestureDelegate(self, enabled: true)
     }
 
     /**
@@ -274,7 +274,7 @@ extension UIViewController {
     public func cyl_viewWillAppearNavigationSetting(_ animated: Bool) {
         cyl_hideNavigationBarSeparatorIfNeeded()
         cyl_setNavigationBarHiddenIfNeeded(animated)
-        cyl_hideAncestorNavigationBarsIfNeeded(animated)
+        cylHideAncestorNavigationBarsIfNeeded(animated)
     }
 
     /**
@@ -294,7 +294,7 @@ extension UIViewController {
     @objc(cyl_viewDidDisappearNavigationSetting:)
     public func cyl_viewDidDisappearNavigationSetting(_ animated: Bool) {
         cyl_enableInteractivePopGestureRecognizer()
-        cyl_showAncestorNavigationBarsIfNeeded(animated)
+        cylShowAncestorNavigationBarsIfNeeded(animated)
     }
 
     /**
@@ -331,7 +331,7 @@ extension UIViewController {
         return result
     }
 
-    private func cyl_hideAncestorNavigationBarsIfNeeded(_ animated: Bool) {
+    private func cylHideAncestorNavigationBarsIfNeeded(_ animated: Bool) {
         guard cyl_hidesAncestorNavigationBars else { return }
         for navigationController in cyl_ancestorNavigationControllers where !navigationController.isNavigationBarHidden {
             // [EN] Remember that this bar was hidden here, so only it is shown again. [CN] 记录该导航栏是在这里隐藏的，之后只恢复它。
@@ -341,7 +341,7 @@ extension UIViewController {
         }
     }
 
-    private func cyl_showAncestorNavigationBarsIfNeeded(_ animated: Bool) {
+    private func cylShowAncestorNavigationBarsIfNeeded(_ animated: Bool) {
         guard cyl_hidesAncestorNavigationBars else { return }
         for navigationController in cyl_ancestorNavigationControllers {
             let hiddenHere = (objc_getAssociatedObject(navigationController, CYLNavigationSettingKeys.ancestorBarHiddenHere) as? NSNumber)?.boolValue ?? false

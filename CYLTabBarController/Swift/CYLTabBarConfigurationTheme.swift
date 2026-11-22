@@ -56,7 +56,7 @@ public protocol CYLTabBarTheme: NSObjectProtocol {
 }
 
 /// [EN] Private: the plus button slot's entry (`Swift/CYLTabBarController+CYLPlusSlot.swift`). [CN] 私有：PlusButton slot 的一项。
-private let CYLTabBarItemPlusSlotPlaceholderKey = "CYLTabBarItemPlusSlotPlaceholder"
+private let cylTabBarItemPlusSlotPlaceholderKey = "CYLTabBarItemPlusSlotPlaceholder"
 
 /**
  [EN] A skin of a configuration file (`CYLTabBarControllerThemes`): its named values, and the tab bar look they give (a
@@ -183,7 +183,7 @@ open class CYLTabBarConfigurationTheme: NSObject, CYLTabBarTheme {
         var themed = false
         var position = 0
         for case let item as [AnyHashable: Any] in tabBarController.tabBarItemsAttributes {
-            if (item[CYLTabBarItemPlusSlotPlaceholderKey] as? NSNumber)?.boolValue == true {
+            if (item[cylTabBarItemPlusSlotPlaceholderKey] as? NSNumber)?.boolValue == true {
                 continue
             }
             let identifier = CYLTabBarController.cylConfigurationStringValue(item[CYLTabBarItemIdentifier]) ?? ""

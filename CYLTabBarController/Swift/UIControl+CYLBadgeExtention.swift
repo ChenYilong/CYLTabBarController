@@ -45,22 +45,22 @@ enum CYLControlBadgeKeys {
  */
 @objc(CYLBadgeAnchorView)
 final class CYLBadgeAnchorView: UIView {
-    weak var cyl_target: UIView?
-    var cyl_unitRect: CGRect = CGRect(x: 0, y: 0, width: 1, height: 1)
-    weak var cyl_leadingConstraint: NSLayoutConstraint?
-    weak var cyl_topConstraint: NSLayoutConstraint?
+    weak var cylTarget: UIView?
+    var cylUnitRect: CGRect = CGRect(x: 0, y: 0, width: 1, height: 1)
+    weak var leadingConstraint: NSLayoutConstraint?
+    weak var topConstraint: NSLayoutConstraint?
 
     override func layoutSubviews() {
         super.layoutSubviews()
         // [EN] The padding before the visible part follows the target's current size.
         // [CN] 可见部分之前的边距随目标当前尺寸变化。
-        let targetSize = cyl_target?.bounds.size ?? .zero
-        let leading = cyl_unitRect.minX * targetSize.width
-        let top = cyl_unitRect.minY * targetSize.height
-        if let constraint = cyl_leadingConstraint, abs(constraint.constant - leading) > 0.01 {
+        let targetSize = cylTarget?.bounds.size ?? .zero
+        let leading = cylUnitRect.minX * targetSize.width
+        let top = cylUnitRect.minY * targetSize.height
+        if let constraint = leadingConstraint, abs(constraint.constant - leading) > 0.01 {
             constraint.constant = leading
         }
-        if let constraint = cyl_topConstraint, abs(constraint.constant - top) > 0.01 {
+        if let constraint = topConstraint, abs(constraint.constant - top) > 0.01 {
             constraint.constant = top
         }
         cyl_layoutBadgeAtTopRightCorner()
@@ -356,7 +356,7 @@ extension UIControl {
                 addSubview(anchorView)
             }
             bringSubviewToFront(anchorView)
-            anchorView.layer.zPosition = .cyl_topZPosition
+            anchorView.layer.zPosition = .cylTopZPosition
         } else {
             if anchorView.superview !== container {
                 anchorView.removeFromSuperview()
@@ -398,10 +398,10 @@ extension UIControl {
         let leading = unitRect.minX * targetSize.width
         let top = unitRect.minY * targetSize.height
         if let badgeAnchorView = anchorView as? CYLBadgeAnchorView {
-            badgeAnchorView.cyl_target = target
-            badgeAnchorView.cyl_unitRect = unitRect
-            badgeAnchorView.cyl_leadingConstraint = constraints[0]
-            badgeAnchorView.cyl_topConstraint = constraints[1]
+            badgeAnchorView.cylTarget = target
+            badgeAnchorView.cylUnitRect = unitRect
+            badgeAnchorView.leadingConstraint = constraints[0]
+            badgeAnchorView.topConstraint = constraints[1]
         }
         if abs(constraints[0].constant - leading) >= 0.5 {
             constraints[0].constant = leading

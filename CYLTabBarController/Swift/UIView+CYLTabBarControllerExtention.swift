@@ -65,7 +65,7 @@ extension UIView {
             return true
         }
         if !CYLConstants.isLiquidGlassActive() {
-            return cyl_isKind(of: UIControl.self)
+            return cylIsKind(of: UIControl.self)
         }
         // [EN] UIControl, shared by FlatDesign and Liquid Glass. [CN] UIControl，扁平样式与液态玻璃共用。
         return self is UIControl
@@ -90,24 +90,24 @@ extension UIView {
 
     @objc(cyl_isPlatterContentView)
     public func cyl_isPlatterContentView() -> Bool {
-        cyl_isVisibleLiquidGlassView { $0.contains("ContentView") && !$0.contains("Selected") }
+        cylIsVisibleLiquidGlassView { $0.contains("ContentView") && !$0.contains("Selected") }
     }
 
     @objc(cyl_isPlatterSelectedContentView)
     public func cyl_isPlatterSelectedContentView() -> Bool {
-        cyl_isVisibleLiquidGlassView { $0.hasSuffix("SelectedContentView") }
+        cylIsVisibleLiquidGlassView { $0.hasSuffix("SelectedContentView") }
     }
 
     @objc(cyl_isPlatterVisualProviderFloatingSelectedContentView)
     public func cyl_isPlatterVisualProviderFloatingSelectedContentView() -> Bool {
-        cyl_isVisibleLiquidGlassView {
+        cylIsVisibleLiquidGlassView {
             $0.hasPrefix("_UITab") && $0.contains("VisualProvider") && $0.contains("_Floating") && $0.contains("SelectedContentView")
         }
     }
 
     @objc(cyl_isPlatterLiquidLensView)
     public func cyl_isPlatterLiquidLensView() -> Bool {
-        cyl_isVisibleLiquidGlassView {
+        cylIsVisibleLiquidGlassView {
             $0.hasPrefix("_UI") && $0.contains("LiquidLens") && $0.contains("View") && !$0.contains("DestOutView")
                 && !$0.contains("BackdropView")
         }
@@ -115,22 +115,22 @@ extension UIView {
 
     @objc(cyl_isPlatterLiquidLensClearGlassView)
     public func cyl_isPlatterLiquidLensClearGlassView() -> Bool {
-        cyl_isVisibleLiquidGlassView { $0.hasPrefix("_UI") && $0.contains("LiquidLens") && $0.hasSuffix("ClearGlassView") }
+        cylIsVisibleLiquidGlassView { $0.hasPrefix("_UI") && $0.contains("LiquidLens") && $0.hasSuffix("ClearGlassView") }
     }
 
     @objc(cyl_isPlatterLiquidLensTabSelectionView)
     public func cyl_isPlatterLiquidLensTabSelectionView() -> Bool {
-        cyl_isVisibleLiquidGlassView { $0.hasPrefix("_UITab") && $0.hasSuffix("SelectionView") }
+        cylIsVisibleLiquidGlassView { $0.hasPrefix("_UITab") && $0.hasSuffix("SelectionView") }
     }
 
     @objc(cyl_isPlatterLiquidLensBackdropView)
     public func cyl_isPlatterLiquidLensBackdropView() -> Bool {
-        cyl_isVisibleLiquidGlassView { $0.hasPrefix("_UI") && $0.contains("LiquidLens") && $0.hasSuffix("BackdropView") }
+        cylIsVisibleLiquidGlassView { $0.hasPrefix("_UI") && $0.contains("LiquidLens") && $0.hasSuffix("BackdropView") }
     }
 
     @objc(cyl_isPlatterDestOutView)
     public func cyl_isPlatterDestOutView() -> Bool {
-        cyl_isVisibleLiquidGlassView {
+        cylIsVisibleLiquidGlassView {
             $0.hasPrefix("_UI") && $0.contains("LiquidLens") && $0.contains("View") && $0.contains("DestOutView")
         }
     }
@@ -169,7 +169,7 @@ extension UIView {
      */
     @objc(cyl_isTabImageView)
     public func cyl_isTabImageView() -> Bool {
-        guard cyl_isKind(of: UIImageView.self) else {
+        guard cylIsKind(of: UIImageView.self) else {
             return false
         }
         var view: UIView? = self
@@ -186,7 +186,7 @@ extension UIView {
     public func cyl_isTabLabel() -> Bool {
         // [EN] Before iOS 26, keep the original logic. [CN] iOS 26 以前保持原逻辑。
         if !CYLConstants.isLiquidGlassActive() {
-            return cyl_isKind(of: UILabel.self)
+            return cylIsKind(of: UILabel.self)
         }
         let className = cyl_className
         if className.hasSuffix("Label") && className.contains("TabButton") && className.contains("_UI") {
@@ -365,7 +365,7 @@ extension UIView {
     public func cyl_bringSubview(toTop view: UIView) {
         addSubview(view)
         bringSubviewToFront(view)
-        view.layer.zPosition = .cyl_topZPosition
+        view.layer.zPosition = .cylTopZPosition
     }
 
     // MARK: Snapshots
@@ -502,7 +502,7 @@ extension UIView {
         guard let plusButton = CYLPlusButton(forOwner: self) else {
             return CYLPlusButtonIndex
         }
-        if let slotIndex = cyl_plusSlotIndex() {
+        if let slotIndex = cylPlusSlotIndex() {
             return UInt(slotIndex)
         }
         return plusButton.cyl_index(forTabbarItemsCount: cyl_tabbarItemsCount)
@@ -522,7 +522,7 @@ extension UIView {
     /**
      * [EN] A Liquid Glass view whose class name matches, and that is visible. [CN] 类名匹配且可见的液态玻璃视图。
      */
-    private func cyl_isVisibleLiquidGlassView(_ matches: (String) -> Bool) -> Bool {
+    private func cylIsVisibleLiquidGlassView(_ matches: (String) -> Bool) -> Bool {
         guard CYLConstants.isLiquidGlassActive() else {
             return false
         }
@@ -533,7 +533,7 @@ extension UIView {
      * [EN] A subclass of `aClass` (not the class itself) whose class name starts with "UITabBar".
      * [CN] `aClass` 的子类（不包括其本身），且类名以 "UITabBar" 开头。
      */
-    private func cyl_isKind(of aClass: AnyClass) -> Bool {
+    private func cylIsKind(of aClass: AnyClass) -> Bool {
         isKind(of: aClass) && !isMember(of: aClass) && cyl_className.hasPrefix("U" + "IT" + "a" + "bB" + "ar")
     }
 
@@ -543,7 +543,7 @@ extension UIView {
      * [CN] PlusButton 的 slot 在其 TabBarController 的 `viewControllers` 中的下标（只由 `-[CYLTabBarController setViewControllers:]`
      *      插入），没有时为 nil。
      */
-    private func cyl_plusSlotIndex() -> Int? {
+    private func cylPlusSlotIndex() -> Int? {
         guard let tabBarController = cyl_owningTabBarController() else {
             return nil
         }

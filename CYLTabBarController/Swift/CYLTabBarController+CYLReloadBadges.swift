@@ -9,7 +9,7 @@ import UIKit
 
 /// [EN] The blocks of `-reloadBadgesWithBlock:` / `-performWhenTabBarItemsReady:` that wait for the tab buttons (#404).
 /// [CN] `-reloadBadgesWithBlock:` / `-performWhenTabBarItemsReady:` 中等待 Tab 按钮创建的 block（#404）。
-private let CYLPendingReloadBadgesBlocksKey = CYLUtilsKeys.key("cyl_pendingReloadBadgesBlocks")
+private let cylPendingReloadBadgesBlocksKey = CYLUtilsKeys.key("cyl_pendingReloadBadgesBlocks")
 
 /**
  * FIX: issue #404, issue #605, issue #610
@@ -27,11 +27,11 @@ private let CYLPendingReloadBadgesBlocksKey = CYLUtilsKeys.key("cyl_pendingReloa
 extension CYLTabBarController {
 
     private var cylPendingReloadBadgesBlocks: NSMutableArray {
-        if let blocks = objc_getAssociatedObject(self, CYLPendingReloadBadgesBlocksKey) as? NSMutableArray {
+        if let blocks = objc_getAssociatedObject(self, cylPendingReloadBadgesBlocksKey) as? NSMutableArray {
             return blocks
         }
         let blocks = NSMutableArray()
-        objc_setAssociatedObject(self, CYLPendingReloadBadgesBlocksKey, blocks, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+        objc_setAssociatedObject(self, cylPendingReloadBadgesBlocksKey, blocks, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
         return blocks
     }
 

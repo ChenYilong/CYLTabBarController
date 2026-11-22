@@ -95,7 +95,7 @@ extension CYLTabBarController {
                     if (page.title ?? "").isEmpty, let plusTitle = plusButtonAttributes[CYLTabBarItemTitle] as? String, !plusTitle.isEmpty {
                         page.title = plusTitle
                     }
-                    plusButtonAttributes[CYLConfigurationPlusButtonPageKey] = page
+                    plusButtonAttributes[cylConfigurationPlusButtonPageKey] = page
                     if plusButtonAttributes[CYLPlusButtonIndexInTabBar] == nil {
                         plusButtonAttributes[CYLPlusButtonIndexInTabBar] = tabBarItemsAttributes.count / 2
                     }

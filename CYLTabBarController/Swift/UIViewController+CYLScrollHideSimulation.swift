@@ -226,7 +226,7 @@ extension UIViewController {
             cyl_runScrollHideSelfTest()
         case .restore, .keep:
             CYLScrollHideSimulation.after(CYLScrollHideSimulation.delay) { [weak self] in
-                self?.cyl_runScrollHideSimulation(simulation, tabBarController: tabBarController)
+                self?.cylRunScrollHideSimulation(simulation, tabBarController: tabBarController)
             }
         }
     }
@@ -246,11 +246,11 @@ extension UIViewController {
             })
         }
         menu.addAction(UIAlertAction(title: CYLLocalizedString("取消"), style: .cancel))
-        cyl_anchorPopover(menu.popoverPresentationController)
+        cylAnchorPopover(menu.popoverPresentationController)
         present(menu, animated: true)
     }
 
-    private func cyl_anchorPopover(_ popover: UIPopoverPresentationController?) {
+    private func cylAnchorPopover(_ popover: UIPopoverPresentationController?) {
         popover?.sourceView = view
         popover?.sourceRect = CGRect(x: view.bounds.midX, y: view.bounds.midY, width: 1, height: 1)
     }
@@ -265,13 +265,13 @@ extension UIViewController {
     /**
      * [EN] A plain page that leaves by itself. [CN] 一个会自行离开的普通页面。
      */
-    private func cyl_scrollHideSimulationPage() -> UIViewController {
+    private func cylScrollHideSimulationPage() -> UIViewController {
         let page = UIViewController()
         page.view.backgroundColor = UIColor(red: 0.35, green: 0.78, blue: 0.98, alpha: 1)
         return page
     }
 
-    private func cyl_presentThenDismiss(_ page: UIViewController, completion: (() -> Void)? = nil) {
+    private func cylPresentThenDismiss(_ page: UIViewController, completion: (() -> Void)? = nil) {
         present(page, animated: true) {
             CYLScrollHideSimulation.after(CYLScrollHideSimulation.hold) {
                 page.dismiss(animated: true, completion: completion)
@@ -279,7 +279,7 @@ extension UIViewController {
         }
     }
 
-    private func cyl_showKeyboard(for seconds: TimeInterval) {
+    private func cylShowKeyboard(for seconds: TimeInterval) {
         let textField = UITextField(frame: CGRect(x: 0, y: -100, width: 10, height: 10))
         view.addSubview(textField)
         textField.becomeFirstResponder()
@@ -290,7 +290,7 @@ extension UIViewController {
     }
 
     // swiftlint:disable:next cyclomatic_complexity function_body_length
-    private func cyl_runScrollHideSimulation(_ simulation: CYLScrollHideSimulation.Row, tabBarController: CYLTabBarController) {
+    private func cylRunScrollHideSimulation(_ simulation: CYLScrollHideSimulation.Row, tabBarController: CYLTabBarController) {
         let center = NotificationCenter.default
         let application = UIApplication.shared
         let hold = CYLScrollHideSimulation.hold
@@ -299,18 +299,18 @@ extension UIViewController {
         case .alert, .actionSheet:
             let alert = UIAlertController(title: "CYLTabBarController", message: "#13", preferredStyle: simulation == .alert ? .alert : .actionSheet)
             alert.addAction(UIAlertAction(title: CYLLocalizedString("OK"), style: .cancel))
-            cyl_anchorPopover(alert.popoverPresentationController)
+            cylAnchorPopover(alert.popoverPresentationController)
             present(alert, animated: true)
         case .fullScreenModal, .pageSheet:
-            let page = cyl_scrollHideSimulationPage()
+            let page = cylScrollHideSimulationPage()
             page.modalPresentationStyle = simulation == .fullScreenModal ? .fullScreen : .pageSheet
-            cyl_presentThenDismiss(page)
+            cylPresentThenDismiss(page)
         case .pushThenPop, .pushHidesBottomBar, .notificationTapPush:
             if simulation == .notificationTapPush {
                 center.post(name: UIApplication.willEnterForegroundNotification, object: application)
                 center.post(name: UIApplication.didBecomeActiveNotification, object: application)
             }
-            let page = cyl_scrollHideSimulationPage()
+            let page = cylScrollHideSimulationPage()
             page.hidesBottomBarWhenPushed = simulation == .pushHidesBottomBar
             navigationController?.pushViewController(page, animated: true)
             after(hold) { [weak self] in self?.navigationController?.popViewController(animated: true) }
@@ -336,7 +336,7 @@ extension UIViewController {
             let mainWindow = view.window
             let overlay = mainWindow?.windowScene.map { UIWindow(windowScene: $0) } ?? UIWindow(frame: mainWindow?.bounds ?? .zero)
             overlay.windowLevel = .alert
-            overlay.rootViewController = cyl_scrollHideSimulationPage()
+            overlay.rootViewController = cylScrollHideSimulationPage()
             overlay.rootViewController?.view.alpha = 0.6
             overlay.makeKeyAndVisible()
             after(hold) {
@@ -344,12 +344,12 @@ extension UIViewController {
                 mainWindow?.makeKey()
             }
         case .keyboard:
-            cyl_showKeyboard(for: hold)
+            cylShowKeyboard(for: hold)
         case .keyboardWhileScrolling:
-            cyl_showKeyboard(for: 4)
+            cylShowKeyboard(for: 4)
         case .shareSheet:
             let share = UIActivityViewController(activityItems: ["https://github.com/ChenYilong/CYLTabBarController/issues/13"], applicationActivities: nil)
-            cyl_anchorPopover(share.popoverPresentationController)
+            cylAnchorPopover(share.popoverPresentationController)
             present(share, animated: true)
         case .scrollToTopInCode:
             if let scrollView = cyl_scrollHideSimulationScrollView {
@@ -381,18 +381,18 @@ extension UIViewController {
         case .overCurrentContext:
             let definedPresentationContext = definesPresentationContext
             definesPresentationContext = true
-            let page = cyl_scrollHideSimulationPage()
+            let page = cylScrollHideSimulationPage()
             page.view.alpha = 0.7
             page.modalPresentationStyle = .overCurrentContext
-            cyl_presentThenDismiss(page) { [weak self] in self?.definesPresentationContext = definedPresentationContext }
+            cylPresentThenDismiss(page) { [weak self] in self?.definesPresentationContext = definedPresentationContext }
         case .popover:
-            let page = cyl_scrollHideSimulationPage()
+            let page = cylScrollHideSimulationPage()
             page.modalPresentationStyle = .popover
             page.preferredContentSize = CGSize(width: 240, height: 160)
-            cyl_anchorPopover(page.popoverPresentationController)
-            cyl_presentThenDismiss(page)
+            cylAnchorPopover(page.popoverPresentationController)
+            cylPresentThenDismiss(page)
         default:
-            cyl_runLaterScrollHideSimulation(simulation, tabBarController: tabBarController)
+            cylRunLaterScrollHideSimulation(simulation, tabBarController: tabBarController)
         }
     }
 
@@ -400,12 +400,12 @@ extension UIViewController {
      * [EN] The simulations from `.drawer` on (a second switch keeps each under 30 cases). [CN] 从 `.drawer` 起的模拟（第二个 switch 使每个 switch 不超过 30 个分支）。
      */
     /// [EN] The drawer simulation's way back (a separate function: closures nest at most two deep). [CN] 抽屉模拟的返回动画（单独的函数：闭包最多嵌套两层）。
-    private static func cyl_slideDrawerBack(_ controllerView: UIView) {
+    private static func cylSlideDrawerBack(_ controllerView: UIView) {
         UIView.animate(withDuration: 0.3) { controllerView.transform = .identity }
     }
 
     // swiftlint:disable:next cyclomatic_complexity function_body_length
-    private func cyl_runLaterScrollHideSimulation(_ simulation: CYLScrollHideSimulation.Row, tabBarController: CYLTabBarController) {
+    private func cylRunLaterScrollHideSimulation(_ simulation: CYLScrollHideSimulation.Row, tabBarController: CYLTabBarController) {
         let center = NotificationCenter.default
         let application = UIApplication.shared
         let hold = CYLScrollHideSimulation.hold
@@ -416,7 +416,7 @@ extension UIViewController {
             UIView.animate(withDuration: 0.3, animations: {
                 controllerView.transform = CGAffineTransform(translationX: controllerView.bounds.width * 0.6, y: 0)
             }, completion: { _ in
-                after(hold) { Self.cyl_slideDrawerBack(controllerView) }
+                after(hold) { Self.cylSlideDrawerBack(controllerView) }
             })
         case .safeAreaTop:
             let insets = tabBarController.additionalSafeAreaInsets
@@ -478,7 +478,7 @@ extension UIViewController {
         guard let tabBarController = cyl_owningTabBarController() ?? cyl_tabBarController else { return }
         tabBarController.cyl_hidesTabBarOnScroll = true
         NSLog("[CYLTabBarController] scroll hiding self-test: start (%@ simulations)", NSNumber(value: CYLScrollHideSimulation.Row.allCases.count))
-        cyl_runScrollHideSelfTestRow(0, tabBarController: tabBarController, results: [], attempt: 0)
+        cylRunScrollHideSelfTestRow(0, tabBarController: tabBarController, results: [], attempt: 0)
     }
 
     /**
@@ -488,14 +488,14 @@ extension UIViewController {
      * [CN] 每一行开始前，显示遗留的隐藏（不是滚动隐藏）TabBar，并关闭上一个模拟遗留的页面（模拟器上分享面板可能在几秒后才出现，而有页面
      *      present 时滚动隐藏会拒绝隐藏）。每 0.5 秒尝试一次，最多 10 秒。
      */
-    private func cyl_runScrollHideSelfTestRow(_ row: Int, tabBarController: CYLTabBarController, results: [String], attempt: Int) {
+    private func cylRunScrollHideSelfTestRow(_ row: Int, tabBarController: CYLTabBarController, results: [String], attempt: Int) {
         guard let simulation = CYLScrollHideSimulation.Row(rawValue: row) else {
-            cyl_finishScrollHideSelfTest(results)
+            cylFinishScrollHideSelfTest(results)
             return
         }
         let retry = { [weak self] in
             CYLScrollHideSimulation.after(0.5) {
-                self?.cyl_runScrollHideSelfTestRow(row, tabBarController: tabBarController, results: results, attempt: attempt + 1)
+                self?.cylRunScrollHideSelfTestRow(row, tabBarController: tabBarController, results: results, attempt: attempt + 1)
             }
         }
         if tabBarController.isTabBarHidden && !tabBarController.cyl_isTabBarHiddenByScroll && attempt < 20 {
@@ -514,7 +514,7 @@ extension UIViewController {
         let title = CYLScrollHideSimulation.title(of: simulation).0
         let expectation = CYLScrollHideSimulation.expectation(of: simulation)
         let next: ([String]) -> Void = { [weak self] results in
-            self?.cyl_runScrollHideSelfTestRow(row + 1, tabBarController: tabBarController, results: results, attempt: 0)
+            self?.cylRunScrollHideSelfTestRow(row + 1, tabBarController: tabBarController, results: results, attempt: 0)
         }
         // [EN] Scroll into the content (in code: does not hide by itself), then hide as a downward scroll would.
         // [CN] 先滚入内容（代码滚动本身不会隐藏），再像向下滚动一样隐藏。
@@ -534,9 +534,9 @@ extension UIViewController {
         // [CN] 隐藏之后稍等片刻再执行模拟，与真实的打断在用户滚动之后发生一致：0.5 秒内重复最近一次隐藏的 App 请求会被当作扁平样式对它的
         //      重放而忽略。
         CYLScrollHideSimulation.after(CYLScrollHideSimulation.hideSettleDelay) { [weak self] in
-            self?.cyl_runScrollHideSimulation(simulation, tabBarController: tabBarController)
+            self?.cylRunScrollHideSimulation(simulation, tabBarController: tabBarController)
             CYLScrollHideSimulation.after(CYLScrollHideSimulation.checkDelay) {
-                self?.cyl_checkScrollHideSelfTest(title: title, expectation: expectation, tabBarController: tabBarController,
+                self?.cylCheckScrollHideSelfTest(title: title, expectation: expectation, tabBarController: tabBarController,
                                                   results: results, next: next, waited: 0)
             }
         }
@@ -547,13 +547,13 @@ extension UIViewController {
      *      before it fails; the other expectations are checked once. Then cleans up and goes on.
      * [CN] 检查一行。期望 TabBar 恢复的行在判为失败前，每 0.5 秒再检查一次，最多再等 `restoreExtraWait` 秒；其他期望只检查一次。然后清理并继续。
      */
-    private func cyl_checkScrollHideSelfTest(title: String, expectation: CYLScrollHideSimulation.Expectation,
+    private func cylCheckScrollHideSelfTest(title: String, expectation: CYLScrollHideSimulation.Expectation,
                                              tabBarController: CYLTabBarController, results: [String],
                                              next: @escaping ([String]) -> Void, waited: TimeInterval) {
         let hiddenByScroll = tabBarController.cyl_isTabBarHiddenByScroll
         if expectation == .restored && hiddenByScroll && waited < CYLScrollHideSimulation.restoreExtraWait {
             CYLScrollHideSimulation.after(0.5) { [weak self] in
-                self?.cyl_checkScrollHideSelfTest(title: title, expectation: expectation, tabBarController: tabBarController,
+                self?.cylCheckScrollHideSelfTest(title: title, expectation: expectation, tabBarController: tabBarController,
                                                   results: results, next: next, waited: waited + 0.5)
             }
             return
@@ -581,7 +581,7 @@ extension UIViewController {
         CYLScrollHideSimulation.after(wait) { next(results + [line]) }
     }
 
-    private func cyl_finishScrollHideSelfTest(_ results: [String]) {
+    private func cylFinishScrollHideSelfTest(_ results: [String]) {
         let passed = results.filter { $0.hasPrefix("PASS") }.count
         let failed = results.filter { $0.hasPrefix("FAIL") }.count
         let summary = "\(passed) passed, \(failed) failed, \(results.count - passed - failed) skipped"
