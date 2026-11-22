@@ -10,6 +10,8 @@ import { CYLSVGAView } from './svga/CYLSVGAView';
 import { CYLRiveIcon, cylRiveIsSupported, cylRiveFileAndOptions, CYLTabBarAnimationOptionTint, CYLTabBarAnimationOptionDarkTint,
   CYLTabBarAnimationTintTitle } from './CYLRiveTabBarItemAnimator';
 import { CYLAnimatedItemView, CYLAnimatedItemAnimationContext, CYLAnimatedItemEngines } from 'cylanimateditem';
+// TODO: replace the file: dependency (cyltabbar/oh-package.json5, a vendored copy) with the ohpm package after the library is published (owner's OK).
+import { CYLLifecycleCallbacks, CYLLifecycleEvent, cylDeallocCallbackIllegalIdentifier } from 'cyldeallocblockexecutor';
 import { CYLLocalizedString, cyl_textOf } from './CYLLocalization';
 import { CYLTabButtonAnimation, CYLTabButtonProperty, CYLTabButtonView, CYLTabButtonViewImpl } from './CYLTabButtonAnimation';
 
@@ -478,6 +480,13 @@ export struct CYLTabBarController {
    */
   @State private keyboardCoversTabBar: boolean = false;
   private cylKeyboardWindow: window.Window | undefined = undefined;
+  /**
+   * [EN] CYLDeallocBlockExecutor's registry of this controller (iOS: the layout block; here the keyboard listener, as a keyed
+   *      willDealloc callback `cyl.core.keyboardListener`, run by dealloc() from aboutToDisappear).
+   * [CN] 本控制器的 CYLDeallocBlockExecutor 注册表（iOS 用于布局 block；这里用于键盘监听，作为带 key 的 willDealloc 回调
+   *      `cyl.core.keyboardListener`，在 aboutToDisappear 中由 dealloc() 运行）。
+   */
+  private cylCallbacks: CYLLifecycleCallbacks<CYLTabBarController> | undefined = undefined;
   private cylKeyboardListener: (height: number) => void = (height: number) => {
     let mode = KeyboardAvoidMode.OFFSET;
     try {
@@ -503,6 +512,7 @@ export struct CYLTabBarController {
   aboutToAppear(): void {
     // [EN] cyltabbar plays Lottie (@ohos/lottie), Rive (@ohos/rive) and SVGA (its own player): CYLAnimatedItemView draws them.
     // [CN] cyltabbar 播放 Lottie、Rive 与 SVGA（自带播放器）：由 CYLAnimatedItemView 绘制。
+    this.cylCallbacks = new CYLLifecycleCallbacks<CYLTabBarController>(this);
     ['Lottie', 'Rive', 'SVGA'].forEach((type: string) => CYLAnimatedItemEngines.register(type));
     // [EN] Debug builds installed with the x86_64 debug engine kit: Rive also plays on the x86_64 emulator.
     // [CN] 安装了 x86_64 调试引擎包的 debug 构建：Rive 也能在 x86_64 模拟器上播放。
@@ -516,9 +526,19 @@ export struct CYLTabBarController {
     this.cylObserveKeyboard();
     // [EN] The Liquid Glass lens starts on the selected slot. [CN] 液态玻璃镜片从选中槽位开始。
     this.glassLensPosition = this.cylGlassSelectedSlot();
+    this.cylCallbacks.perform(CYLLifecycleEvent.ABOUT_TO_APPEAR);
   }
 
   aboutToDisappear(): void {
+    this.cylCallbacks?.perform(CYLLifecycleEvent.ABOUT_TO_DISAPPEAR);
+    this.cylCallbacks?.dealloc(CYLLifecycleEvent.ABOUT_TO_DISAPPEAR);
+  }
+
+  /**
+   * [EN] Removes the keyboard listener (the keyed willDealloc callback `cyl.core.keyboardListener`).
+   * [CN] 移除键盘监听（带 key 的 willDealloc 回调 `cyl.core.keyboardListener`）。
+   */
+  private cylRemoveKeyboardListener(): void {
     try {
       this.cylKeyboardWindow?.off('keyboardHeightChange', this.cylKeyboardListener);
     } catch (error) {
@@ -538,6 +558,12 @@ export struct CYLTabBarController {
     window.getLastWindow(context).then((found: window.Window) => {
       this.cylKeyboardWindow = found;
       found.on('keyboardHeightChange', this.cylKeyboardListener);
+      // [EN] If the component already disappeared (the window came late), the registry refuses the callback: remove now.
+      // [CN] 若组件已消失（窗口回调较晚），注册表会拒绝该回调：立即移除。
+      const callbacks = this.cylCallbacks;
+      if (callbacks === undefined || callbacks.willDealloc((owner: CYLTabBarController) => owner.cylRemoveKeyboardListener(), 'cyl.core.keyboardListener') === cylDeallocCallbackIllegalIdentifier) {
+        this.cylRemoveKeyboardListener();
+      }
       try {
         const area = found.getWindowAvoidArea(window.AvoidAreaType.TYPE_NAVIGATION_INDICATOR);
         this.glassGestureBarHeight = this.getUIContext().px2vp(area.bottomRect.height);
